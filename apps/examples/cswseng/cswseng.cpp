@@ -431,7 +431,7 @@ void ceCswsEngineApp::LoadNewMap (const char* filename)
   // we use that.
   char copy_filename[CS_MAXPATHLEN+1];
   strcpy (copy_filename, filename);
-  int len = strlen (copy_filename);
+  size_t len = strlen (copy_filename);
   if (!strcmp (copy_filename+len-5, "world"))
   {
     copy_filename[len-5] = 0;

@@ -47,11 +47,11 @@ bool CZipFile::AddFile(const char* originalname, const char* zipname)
 
   char Buffer[1000];
 
-  int totalread = 0;
-  int numread   = 0;
+  size_t totalread = 0;
+  size_t numread   = 0;
   do
   {
-    numread = fread(Buffer, 1, 1000, fd);
+    numread = fread (Buffer, 1, 1000, fd);
     if (!Write(file, Buffer, numread))
     {
       printf("Can't add data of file '%s' to zip archive\n", originalname);
@@ -106,7 +106,7 @@ bool CZipFile::ExtractData(CBinaryData* pData, const char* zipname)
     char* pZipData = Read (zipname);
     assert(pZipData);
 
-    pData->SetData(pZipData, filesize);
+    pData->SetData (pZipData, (int)filesize);
     delete[] pZipData;
 
     return true;

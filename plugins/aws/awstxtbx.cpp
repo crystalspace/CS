@@ -126,10 +126,12 @@ bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   pm->GetInt (settings, "Focusable", _focusable);
   focusable = _focusable;
   
-  if (text) {
-    strCursor = text->Length ();
+  if (text) 
+  {
+    strCursor = (int)text->Length ();
     text = new scfString(*text);
-  } else
+  } 
+  else
     text = new scfString ();
 
   switch (frame_style)
@@ -465,8 +467,8 @@ bool awsTextBox::OnMouseDown (int, int x, int y)
       WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
 	GetDimensions (mask, mw, mh);
       strCursor = strStart + ((x - 4 - Frame ().xmin) / mw);
-	  if(strCursor > text->Length()) // maximum is string length.
-		  strCursor = text->Length();
+      if(strCursor > text->Length()) // maximum is string length.
+	strCursor = (int)text->Length();
     }
     else
     {
@@ -643,7 +645,7 @@ bool awsTextBox::OnKeyboard (const csKeyEventData& eventData)
       break;
 
     case CSKEY_END:
-      strCursor=text->Length();
+      strCursor=(int)text->Length();
 
       break;
 
@@ -686,7 +688,7 @@ bool awsTextBox::OnKeyboard (const csKeyEventData& eventData)
 	      scfString tmp ((char*)ch);
 	      text->Insert (strCursor, &tmp);
 	    }
-	    strCursor += chSize;
+	    strCursor += (uint)chSize;
 	    changed = true;
 	  }
 	  if (changed) Broadcast (signalChanged);

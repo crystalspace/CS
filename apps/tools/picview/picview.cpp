@@ -193,14 +193,15 @@ void PicView::CreateGui ()
   }
 }
 
-void PicView::LoadNextImage (int idx, int step)
+void PicView::LoadNextImage (size_t idx, int step)
 {
   iTextureManager* txtmgr = g3d->GetTextureManager();
 
   if (idx) cur_idx = idx;
-  cur_idx += step;
-
-  if (cur_idx < 0) cur_idx = files->Length ()-1;
+  if ((step < 0) && ((size_t)-step > cur_idx))
+    cur_idx = files->Length ()-1;
+  else
+    cur_idx += step;
   if ((size_t)cur_idx >= files->Length ()) cur_idx = 0;
 
   csRef<iDataBuffer> buf (vfs->ReadFile (files->Get (cur_idx), false));

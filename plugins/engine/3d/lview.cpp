@@ -183,7 +183,7 @@ void csShadowBlock::AddAllShadows (iShadowBlockList *source)
 void csShadowBlock::AddUniqueRelevantShadows (csShadowBlockList *source)
 {
   int i;
-  int cnt = shadows.Length ();
+  int cnt = (int)shadows.Length ();
 
   csShadowIterator *shadow_it = source->GetCsShadowIterator ();
   while (shadow_it->HasNext ())

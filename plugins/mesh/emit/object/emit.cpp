@@ -613,8 +613,8 @@ void csEmitMeshObject::SetupObject ()
 
 
     /// create new particles and add to particle system
-    size_t i;
-    for (i=0 ; i < number ; i++)
+    int i;
+    for (i=0 ; i < (int)number ; i++)
     {
       if(using_rect_sprites)
         AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
@@ -810,8 +810,8 @@ void csEmitMeshObject::Update (csTicks elapsed_time)
   float delta_t = elapsed_time / 1000.0f; // in seconds
   int elapsed = elapsed_time;
   // age particles;
-  size_t i;
-  for (i=0 ; i < particles.Length () ; i++)
+  int i;
+  for (i=0 ; i < (int)particles.Length () ; i++)
   {
     if(ages[i] + elapsed > timetolive)
     {

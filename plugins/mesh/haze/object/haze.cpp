@@ -605,7 +605,7 @@ void csHazeMeshObject::GenGeometryAdapt (iRenderView *rview, iGraphics3D *g3d,
     // emit geometry
     for (int i = 0; i < 3; i++)
     {
-      GetTempIndices()->Push (GetTempVertices()->Length());
+      GetTempIndices()->Push ((uint)GetTempVertices()->Length());
       GetTempVertices()->Push (campts[i]);
       GetTempTexels()->Push (uvs[i]);
     }
@@ -802,7 +802,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
 
   //rm->object2camera = tr_o2c;
 
-  rm->indexend = GetTempIndices()->Length();
+  rm->indexend = (uint)GetTempIndices()->Length();
 
   rm->buffers->SetRenderBuffer (CS_BUFFER_INDEX, indices.buffer);
   rm->buffers->SetRenderBuffer (CS_BUFFER_POSITION, vertices.buffer);

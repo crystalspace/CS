@@ -60,7 +60,7 @@ public:
   /**
    * Get the number of objects in this collection.
    */
-  int GetObjectCount () const { return objects.Length(); }
+  int GetObjectCount () const { return (int)objects.Length(); }
 
   /// Add an object to the collection.
   void AddObject (iObject* obj) { objects.Push (obj); }

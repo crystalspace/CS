@@ -63,7 +63,7 @@ const csVector2 *csSprite2DUVAnimationFrame::GetUVCoo ()
 
 int csSprite2DUVAnimationFrame::GetUVCount ()
 {
-  return vCoo.Length ();
+  return (int)vCoo.Length ();
 }
 
 void csSprite2DUVAnimationFrame::SetUV (int idx, float u, float v)
@@ -133,7 +133,7 @@ const char *csSprite2DUVAnimation::GetName () const
 
 int csSprite2DUVAnimation::GetFrameCount ()
 {
-  return vFrames.Length ();
+  return (int)vFrames.Length ();
 }
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (int idx)
@@ -143,7 +143,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (int idx)
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (const char *name)
 {
-  int idx = vFrames.FindKey (vFrames.KeyCmp(name));
+  int idx = (int)vFrames.FindKey (vFrames.KeyCmp(name));
   return (iSprite2DUVAnimationFrame *)(idx != -1 ? vFrames.Get (idx) : 0);
 }
 

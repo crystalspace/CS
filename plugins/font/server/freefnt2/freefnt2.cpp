@@ -234,7 +234,7 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
 	}
 	FT_Face ftFace;
 	if (FreetypeError (FT_New_Memory_Face (library, 
-	  (FT_Byte*)fontdata->GetData (), size, 0, &ftFace),
+	  (FT_Byte*)fontdata->GetData (), (FT_Long)size, 0, &ftFace),
 	  "Font file %s could not be loaded", filename))
 	{
 	  return 0;
@@ -335,7 +335,8 @@ csFreeType2Font::csFreeType2Font (csFreeType2Server* server,
 
 csFreeType2Font::~csFreeType2Font ()
 {
-  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  size_t i = DeleteCallbacks.Length ();
+  while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     delnot->BeforeDelete (this);
@@ -498,7 +499,7 @@ void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &de
   oW = 0; 
   oH = (size->metrics.height + 63) >> 6; 
   desc = (-size->metrics.descender + 63) >> 6;
-  int textLen = strlen ((char*)text);
+  size_t textLen = strlen ((char*)text);
   while (textLen > 0)
   {
     utf32_char glyph;
@@ -556,7 +557,7 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
   }
 
   int count = 0;
-  int textLen = strlen ((char*)text);
+  size_t textLen = strlen ((char*)text);
   while (textLen > 0)
   {
     utf32_char glyph;
@@ -600,8 +601,8 @@ void csFreeType2Font::AddDeleteCallback (iFontDeleteNotify* func)
 
 bool csFreeType2Font::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  int i;
-  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  size_t i = DeleteCallbacks.Length ();
+  while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     if (delnot == func)

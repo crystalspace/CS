@@ -308,7 +308,7 @@ void csBezierMesh::LightDisconnect (iLight* light)
   int dt = light->GetDynamicType ();
   for (i = 0; i < curves.Length (); i++)
   {
-    csCurve *c = GetCurve (i);
+    csCurve *c = GetCurve ((int)i);
     if (dt == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
       c->DynamicLightDisconnect (light);
     else
@@ -460,7 +460,7 @@ iCurve *csBezierMesh::CreateCurve ()
 
 int csBezierMesh::FindCurveIndex (iCurve *curve) const
 {
-  return curves.Find (curve->GetOriginalObject ());
+  return (int)curves.Find (curve->GetOriginalObject ());
 }
 
 void csBezierMesh::RemoveCurve (int idx)
@@ -489,7 +489,7 @@ void csBezierMesh::HardTransform (const csReversibleTransform &t)
   curves_transf_ok = false;
   for (i = 0; i < curves.Length (); i++)
   {
-    csCurve *c = GetCurve (i);
+    csCurve *c = GetCurve ((int)i);
     c->HardTransform (t);
   }
 }
@@ -735,8 +735,8 @@ void BezierPolyMeshHelper::Setup ()
   {
     csCurve *c = thing->curves.Get (i);
     csCurveTesselated *tess = c->Tesselate (1000);    // @@@ High quality?
-    num_poly += tess->GetTriangleCount ();
-    num_verts += tess->GetVertexCount ();
+    num_poly += (int)tess->GetTriangleCount ();
+    num_verts += (int)tess->GetVertexCount ();
   }
 
   if (!num_verts || !num_poly) return;
@@ -752,7 +752,7 @@ void BezierPolyMeshHelper::Setup ()
     csCurve *c = thing->curves.Get (i);
     csCurveTesselated *tess = c->Tesselate (1000);  // @@@ High quality?
     csTriangle *tris = tess->GetTriangles ();
-    int tri_count = tess->GetTriangleCount ();
+    int tri_count = (int)tess->GetTriangleCount ();
     for (j = 0; j < tri_count; j++)
     {
       polygons[num_poly].num_vertices = 3;
@@ -767,7 +767,7 @@ void BezierPolyMeshHelper::Setup ()
     }
 
     csVector3 *vts = tess->GetVertices ();
-    int num_vt = tess->GetVertexCount ();
+    int num_vt = (int)tess->GetVertexCount ();
     memcpy (vertices + num_verts, vts, sizeof (csVector3) * num_vt);
     num_verts += num_vt;
   }
@@ -979,12 +979,12 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     }
 
     rm->indexstart = 0;
-    rm->indexend = tess->GetTriangleCount() * 3;
+    rm->indexend = (uint)tess->GetTriangleCount() * 3;
     rm->meshtype = CS_MESHTYPE_TRIANGLES;
     rm->material = c->GetMaterial ();
   }
 
-  n = meshes.Length();
+  n = (int)meshes.Length();
   return meshes.GetArray();
 }
 

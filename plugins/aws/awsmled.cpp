@@ -336,9 +336,9 @@ const char *awsMultiLineEdit::Type ()
 
 bool awsMultiLineEdit::HandleEvent (iEvent &Event)
 {
-  int idx;
+  size_t idx;
   idx = vDispatcher.FindSortedKey (vDispatcher.EventCmp(&Event));
-  if (idx != -1)
+  if (idx != csArrayItemNotFound)
     (this->*vDispatcher.Get (idx)->ring) ();
   else
     if ((Event.Type == csevKeyboard) && 
@@ -549,11 +549,11 @@ void awsMultiLineEdit::OnDraw (csRect)
       {
         // check if we have a marked substring to draw
         int m_from=-1, m_to=-1;
-        GetMarked (i, m_from, m_to);
+        GetMarked ((int)i, m_from, m_to);
 
         // this routine forces the variable width fonts to be displayed as fixed width ones
         int theCol = leftcol;
-	int theOfs = strOfs;
+	int theOfs = (int)strOfs;
         int fcolor, bcolor;
         const char *str = s->GetData () + theOfs;
         int x = contentRect.xmin;
@@ -641,14 +641,14 @@ bool awsMultiLineEdit::GetMarked (int theRow, int &from, int &to)
         if (theRow == fromRow && theRow == toRow)
           from = fromCol, to = toCol;
         else if (theRow == fromRow)
-          from = fromCol, to = vText[theRow]->Length ();
+          from = fromCol, to = (int)vText[theRow]->Length ();
         else if (theRow == toRow)
           from = 0, to = toCol;
         else
-          from = 0, to = vText[theRow]->Length ();
+          from = 0, to = (int)vText[theRow]->Length ();
       }
       else if (nMarkMode == MARK_ROW)
-        from = 0, to = vText[theRow]->Length ();
+        from = 0, to = (int)vText[theRow]->Length ();
       return true;
     }
   }
@@ -823,21 +823,21 @@ void awsMultiLineEdit::NextWord ()
       if (len == strlen (p))
       {
         row++;
-        col = s->Length ()+1;
+        col = (int)s->Length ()+1;
         continue;
       }
       p += len;
-      col += len;
+      col += (int)len;
     }
     // find something thats not a space
     size_t len = strspn (p, " \t\n");
     if (len == strlen (p))
     {
       row++;
-      col = s->Length ()+1;
+      col = (int)s->Length ()+1;
       continue;
     }
-    col += len;
+    col += (int)len;
     break;
   }
 
@@ -859,7 +859,7 @@ void awsMultiLineEdit::PrevWord ()
     if (found_space)
     {
       p += s->Length ();
-      col = s->Length ();
+      col = (int)s->Length ();
     }
     else
       p += from;
@@ -915,8 +915,8 @@ void awsMultiLineEdit::PrevRow ()
 
 void awsMultiLineEdit::EndOfText ()
 {
-  row = vText.Length ()-1;
-  col = vText[row]->Length ();
+  row = (int)vText.Length ()-1;
+  col = (int)vText[row]->Length ();
   MoveCursor (row, col);
 }
 
@@ -929,7 +929,7 @@ void awsMultiLineEdit::BeginOfText ()
 
 void awsMultiLineEdit::EndOfLine ()
 {
-  col = vText[row]->Length ();
+  col = (int)vText[row]->Length ();
   MoveCursor (row, col);
 }
 
@@ -967,7 +967,7 @@ void awsMultiLineEdit::DeleteBackward ()
     else
     {
       csString *sp = vText[row-1];
-      col = sp->Length ();
+      col = (int)sp->Length ();
       sp->Append (*s);
       vText.DeleteIndex (row);
       row--;
@@ -1066,7 +1066,7 @@ void awsMultiLineEdit::DeleteMarked ()
         if (i == fromRow && i == toRow)
           from = fromCol, to = MIN (toCol, (int)s->Length ());
         else if (i == fromRow)
-          from = fromCol, to = s->Length ();
+          from = fromCol, to = (int)s->Length ();
         else if (i == fromRow)
           from = 0, to = MIN (toCol, (int)s->Length ());
 
@@ -1204,7 +1204,7 @@ void awsMultiLineEdit::actGetRowCount (intptr_t owner, iAwsParmList* parmlist)
     return;
   
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
-  parmlist->AddInt ("count", me->vText.Length ());
+  parmlist->AddInt ("count", (int)me->vText.Length ());
 }
 
 void awsMultiLineEdit::actGetText (intptr_t owner, iAwsParmList* parmlist)
@@ -1238,7 +1238,7 @@ void awsMultiLineEdit::actSetText (intptr_t owner, iAwsParmList* parmlist)
     if (text)
     {
       const char *p = text->GetData ();
-      int len;
+      size_t len;
       while (*p)
       {
         csString *s = new csString;

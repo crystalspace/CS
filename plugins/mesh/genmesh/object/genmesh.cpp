@@ -1003,7 +1003,7 @@ void csGenmeshMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   csReversibleTransform trans = movable->GetFullTransform ();
   // the object center in world coordinates. "0" because the object
   // center in object space is obviously at (0,0,0).
-  int num_lights = lights.Length ();
+  int num_lights = (int)lights.Length ();
   for (l = 0 ; l < num_lights ; l++)
   {
     iLight* li = lights[l];
@@ -1184,7 +1184,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     }
   }
 
-  n = renderMeshes.Length ();
+  n = (int)renderMeshes.Length ();
   return renderMeshes.GetArray ();
 }
 

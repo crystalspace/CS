@@ -410,7 +410,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
     static const csInterleavedSubBufferOptions interleavedElements[2] =
       {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 4}};
     csRef<iRenderBuffer> buffers[2];
-    int bufsize = (point_sprites ? buffer_length : buffer_length * 4);
+    int bufsize = (int)(point_sprites ? buffer_length : buffer_length * 4);
     masterBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (bufsize, 
       CS_BUF_DYNAMIC, 2, interleavedElements, buffers);
     vertex_buffer = buffers[0];
@@ -467,7 +467,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
   {
     if (point_sprites)
     {
-      int len = point_data->Length ();
+      int len = (int)point_data->Length ();
       vertex_data.SetLength (len);
       for (int i = 0; i < len - 1; i++)
       {
@@ -480,7 +480,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
     }
     else
     {
-      int len = point_data->Length ();
+      int len = (int)point_data->Length ();
       vertex_data.SetLength (len * 4);
       int i,j;
       for (i = 0, j = 0; i < len - 1; i++, j += 4)

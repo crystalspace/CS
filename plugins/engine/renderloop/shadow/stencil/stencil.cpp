@@ -621,7 +621,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   shadowMeshes.Truncate (0);
   culler->VisTest (lightSphere, &shadowDrawVisCallback);
 
-  int numShadowMeshes;
+  size_t numShadowMeshes;
   if ((numShadowMeshes = shadowMeshes.Length ()) > 0)
   {
     csVector3 rad, center;
@@ -632,7 +632,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
     for (size_t p = 0; p < shadow->GetNumberOfPasses (shaderTicket); p ++) 
     {
       shadow->ActivatePass (shaderTicket, p);
-      for (int m = 0; m < numShadowMeshes; m++)
+      for (size_t m = 0; m < numShadowMeshes; m++)
       {
 	iMeshWrapper*& sp = shadowMeshes[m];
 
@@ -689,12 +689,12 @@ int csStencilShadowStep::AddStep (iRenderStep* step)
   csRef<iLightRenderStep> lrs = 
     SCF_QUERY_INTERFACE (step, iLightRenderStep);
   if (!lrs) return -1;
-  return steps.Push (lrs);
+  return (int)steps.Push (lrs);
 }
 
 int csStencilShadowStep::GetStepCount ()
 {
-  return steps.Length();
+  return (int)steps.Length();
 }
 
 SCF_IMPLEMENT_IBASE(csStencilShadowStep::ShadowDrawVisCallback)

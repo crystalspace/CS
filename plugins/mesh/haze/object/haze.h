@@ -381,7 +381,7 @@ public:
     { scfParent->directional=pos;}
     virtual const csVector3& GetDirectional() const
     {return scfParent->directional;}
-    virtual int GetLayerCount() const {return scfParent->layers.Length();}
+    virtual int GetLayerCount() const {return (int)scfParent->layers.Length();}
     virtual void AddLayer(iHazeHull *hull, float scale)
     { csHazeLayer *lay = new csHazeLayer(hull, scale);
       scfParent->layers.Push(lay); }
@@ -467,7 +467,7 @@ public:
     { scfParent->directional=pos;}
     virtual const csVector3& GetDirectional() const
     {return scfParent->directional;}
-    virtual int GetLayerCount() const {return scfParent->layers.Length();}
+    virtual int GetLayerCount() const {return (int)scfParent->layers.Length();}
     virtual void AddLayer(iHazeHull *hull, float scale)
     { csHazeLayer *lay = new csHazeLayer(hull, scale);
       scfParent->layers.Push(lay); }

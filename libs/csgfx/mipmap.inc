@@ -100,7 +100,7 @@ static void MIPMAP_NAME (unsigned int w, unsigned int h, const csRGBpixel *src, 
 // ACCUMULATE_PIXEL - retrieve a source pixel
 #if defined (MIPMAP_ALPHA)
 #    define ACCUMULATE_PIXEL(p, m)					\
-     a += (long)p * (long)m;
+     a += *((uint8*)p) * (long)m;
 #else
 #  if defined (MIPMAP_TRANSPARENT)
 #    define ACCUMULATE_PIXEL(p, m)					\

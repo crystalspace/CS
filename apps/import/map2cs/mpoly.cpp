@@ -123,8 +123,8 @@ void CMapPolygon::Create(CMapTexturedPlane*              pBaseplane,
   redplanes.DeleteIndex(redplanes.Find(pPlane2));
 
   //Remove the baseplane too.
-  int BaseplaneIndex = redplanes.Find(pBaseplane);
-  if (BaseplaneIndex >= 0) redplanes.DeleteIndex(BaseplaneIndex);
+  size_t BaseplaneIndex = redplanes.Find(pBaseplane);
+  if (BaseplaneIndex != csArrayItemNotFound) redplanes.DeleteIndex(BaseplaneIndex);
 
   //Insert pPlane1 as first element of redplanes. This will ensure, that
   //this plane is preferred to close the polygon again. Otherwise there
@@ -287,8 +287,8 @@ void CMapPolygon::Split(CMapTexturedPlane* pSplitplane,
   //unneeded planes and vertices.
   CMapTexturedPlaneVector NewPlanes;
 
-  int NumPlanes = m_Planes.Length();
-  int i;
+  size_t NumPlanes = m_Planes.Length();
+  size_t i;
   for (i=0; i<NumPlanes; i++)
   {
     //Use all current planes
@@ -349,10 +349,10 @@ void CMapPolygon::GetStartplanes(const CMapTexturedPlaneVector& planes,
                                  CMapTexturedPlane*&            pPlane2,
                                  CdVector3&                     point)
 {
-  int NumPlanes = planes.Length();
+  size_t NumPlanes = planes.Length();
 
   //Try the follwing for all possible pairs of planes.
-  int i, j;
+  size_t i, j;
   for (i=0; i<NumPlanes; i++)
   {
     pPlane1 = planes[i];
@@ -400,10 +400,10 @@ int  CMapPolygon::GetNumberOfValidVertices(CMapTexturedPlane*             pPlane
                        // getting three values happens only in case of an error,
                        // that will be explicitly tracked down.
 
-  int NumPlanes = planes.Length();
+  size_t NumPlanes = planes.Length();
 
   //Try the follwing for all planes.
-  int i;
+  size_t i;
   for (i=0; i<NumPlanes; i++)
   {
     CMapTexturedPlane* pOtherPlane = planes[i];
@@ -455,7 +455,7 @@ bool CMapPolygon::CheckIfInside(const CdVector3&               point,
   //All thre planes create at least a single point. Now we need to
   //determine, if that point is inside or outside the given polygons
 
-  int k, NumPlanes = planes.Length();
+  size_t k, NumPlanes = planes.Length();
   for (k=0; k<NumPlanes; k++)
   {
     CMapTexturedPlane* pPlane = planes[k];

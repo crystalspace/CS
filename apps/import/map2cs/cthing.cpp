@@ -112,8 +112,7 @@ bool CCSThing::WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector
 
   assert(pMap);
 
-  size_t i;
-  int j;
+  size_t i, j;
 
   //DocNode part = CreateNode (node, "part");
   //part->SetAttribute ("name", 

@@ -51,12 +51,13 @@ CIWorld::~CIWorld()
 
 void CIWorld::FindSectors()
 {
-  int i, j, SectorCounter = 0;
+  size_t j, SectorCounter = 0;
+  size_t i;
 
   //iterate all entities and brushes
   for (i=0; i<m_pMap->GetNumEntities(); i++)
   {
-    CMapEntity* pEntity = m_pMap->GetEntity(i);
+    CMapEntity* pEntity = m_pMap->GetEntity((int)i);
     if (strcmp(pEntity->GetClassname(), "cs_sector")==0)
     {
       //This entity is a sector!
@@ -197,12 +198,12 @@ CISector* CIWorld::FindSectorForPoint(CdVector3& v)
 
 void CIWorld::BuildTexturelist()
 {
-  int i, c;
-  size_t j;
+  size_t c;
+  size_t j, i;
 
   for (i=0; i<m_pMap->GetPlaneCount(); i++)
   {
-    CTextureFile* pTexture = m_pMap->GetPlane(i)->GetTexture();
+    CTextureFile* pTexture = m_pMap->GetPlane((int)i)->GetTexture();
 
     bool TextureFound = false;
     for (j=0; j<m_TextureFileNames.Length(); j++)
@@ -224,7 +225,7 @@ void CIWorld::BuildTexturelist()
 
   for (i=0; i<m_pMap->GetNumEntities(); i++)
   {
-    CMapEntity* pEntity = m_pMap->GetEntity(i);
+    CMapEntity* pEntity = m_pMap->GetEntity((int)i);
     for (c=0; c<pEntity->GetCurveCount(); c++)
     {
       CMapCurve*    pCurve   = pEntity->GetCurve(c);
@@ -252,7 +253,7 @@ void CIWorld::BuildTexturelist()
   //add textures for all 2D cs_sprite
   for (i=0; i<m_pMap->GetNumEntities(); i++)
   {
-    CMapEntity* pEntity = m_pMap->GetEntity(i);
+    CMapEntity* pEntity = m_pMap->GetEntity((int)i);
     if (strcmp(pEntity->GetClassname(), "cs_sprite")==0)
     {
       CTextureManager* pTexMan  = m_pMap->GetTextureManager();
@@ -290,9 +291,9 @@ bool CIWorld::PrepareData(const char* filename, CMapFile* pMap)
   specified in the worldspawn
   **************************/
 
-  int maxEnt = pMap->GetNumEntities();
+  size_t maxEnt = pMap->GetNumEntities();
 
-  for (int i = 0; i < maxEnt; i++) 
+  for (size_t i = 0; i < maxEnt; i++) 
   {
     CMapEntity*	curEnt = pMap->GetEntity(i);
 

@@ -75,7 +75,7 @@ void csPortalContainerPolyMeshHelper::Setup ()
         if (p->flags.CheckAll (poly_flag))
         {
 	  csDirtyAccessArray<int>& vidx = p->GetVertexIndices ();
-          polygons[num_poly].num_vertices = vidx.Length ();
+          polygons[num_poly].num_vertices = (int)vidx.Length ();
           polygons[num_poly].vertices = vidx.GetArray ();
           num_poly++;
         }
@@ -172,7 +172,7 @@ void csPortalContainer::Prepare ()
     csPoly3D poly;
     for (j = 0 ; j < vidx.Length () ; j++)
     {
-      if (vt) vidx[j] = vt[vidx[j]].new_idx;
+      if (vt) vidx[j] = (int)vt[vidx[j]].new_idx;
       poly.AddVertex (vertices[vidx[j]]);
     }
     prt->SetObjectPlane (poly.ComputePlane ());
@@ -199,7 +199,7 @@ iPortal* csPortalContainer::CreatePortal (csVector3* vertices, int num)
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    int idx = csPortalContainer::vertices.Push (vertices[i]);
+    int idx = (int)csPortalContainer::vertices.Push (vertices[i]);
     prt->AddVertexIndex (idx);
   }
 
@@ -297,7 +297,7 @@ bool csPortalContainer::ClipToPlane (
   cnt_vis = 0;
   csPortal* portal = portals[portal_idx];
   csDirtyAccessArray<int>& vt = portal->GetVertexIndices ();
-  num_vertices = vt.Length ();
+  num_vertices = (int)vt.Length ();
   for (i = 0; i < num_vertices; i++)
     if (camera_vertices[vt[i]].z >= 0)
     {
@@ -735,10 +735,10 @@ void csPortalContainer::DrawOnePortal (
   {
     csSimpleRenderMesh mesh;
     mesh.meshtype = CS_MESHTYPE_TRIANGLEFAN;
-    mesh.indexCount = po->GetVertexIndices ().Length ();
+    mesh.indexCount = (uint)po->GetVertexIndices ().Length ();
     // @@@ Weirdo overloads approaching, captain!
     mesh.indices = (const uint*)(int*)po->GetVertexIndices ().GetArray ();
-    mesh.vertexCount = vertices.Length ();
+    mesh.vertexCount = (uint)vertices.Length ();
     mesh.vertices = vertices.GetArray ();
     mesh.texcoords = 0;
     mesh.texture = 0;
@@ -864,7 +864,7 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
     {
       csVector3 *verts;
       int num_verts;
-      if (ClipToPlane (i, pportal_plane, camtrans.GetOrigin (),
+      if (ClipToPlane ((int)i, pportal_plane, camtrans.GetOrigin (),
       	verts, num_verts))
       {
         // The far plane is defined negative. So if the portal is entirely
@@ -892,7 +892,7 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
       csPoly2D poly;
       csPortal* prt = portals[i];
       csDirtyAccessArray<int>& vt = prt->GetVertexIndices ();
-      int num_vertices = vt.Length ();
+      int num_vertices = (int)vt.Length ();
       int j;
       for (j = 0 ; j < num_vertices ; j++)
         AddPerspective (&poly, camera_vertices[vt[j]], fov, shift_x, shift_y);
@@ -963,7 +963,7 @@ bool csPortalContainer::HitBeamObject (const csVector3& start,
       if (r < best_r)
       {
         best_r = r;
-        best_p = i;
+        best_p = (int)i;
         isect = cur_isect;
       }
     }

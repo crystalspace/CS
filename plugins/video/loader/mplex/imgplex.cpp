@@ -137,8 +137,8 @@ csPtr<iImage> csMultiplexImageIO::Load (iDataBuffer* buf, int iFormat)
   bool consecutive = false; // set to true if we searched the list completely.
   do
   {
-    int i;
-    for (i=list.Length(); (i--)>0; ) 
+    size_t i = list.Length();
+    while (i-- > 0)
       // i is decremented after comparison but before we use it below;
       //  hence it goes from list.Length()-1 to 0
     {
@@ -177,8 +177,8 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (
   bool consecutive = false; 
   do
   {
-    int i;
-    for (i=list.Length(); (i--)>0; ) 
+    size_t i = list.Length();
+    while (i-- > 0)
     {
       csRef<iImageIO> pIO = (iImageIO*)list.Get(i);
       csRef<iDataBuffer> buf (pIO->Save(image, format, extraoptions));
@@ -206,8 +206,8 @@ csPtr<iDataBuffer> csMultiplexImageIO::Save (iImage *image, const char *mime,
   bool consecutive = false; 
   do
   {
-    int i;
-    for (i=list.Length(); (i--)>0; ) 
+    size_t i = list.Length();
+    while (i-- > 0)
     {
       csRef<iImageIO> pIO = (iImageIO*)list.Get(i);
       csRef<iDataBuffer> buf (pIO->Save(image, mime, extraoptions));

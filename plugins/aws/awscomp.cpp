@@ -892,7 +892,7 @@ iAwsComponent *awsComponent::TabNext (iAwsComponent *child)
 
 iAwsComponent *awsComponent::TabPrev (iAwsComponent *child)
 {
-  int n = TabOrder.Find(child);
+  int n = (int)TabOrder.Find(child);
 
   if (n == -1)
     return 0;
@@ -907,7 +907,7 @@ iAwsComponent *awsComponent::TabPrev (iAwsComponent *child)
 
 int awsComponent::GetTabLength ()
 {
-  return TabOrder.Length ();
+  return (int)TabOrder.Length ();
 }
 
 iAwsComponent *awsComponent::GetTabComponent (int index)

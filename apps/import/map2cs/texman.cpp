@@ -238,8 +238,8 @@ void CTextureManager::CleanupTexturename(char* Name)
 
   for (i=0; i<int(sizeof(Q3Extensions)/sizeof(Q3Extensions[0])); i++)
   {
-    int ExtensionLen = strlen(Q3Extensions[i]);
-    int NameLen      = strlen(Name);
+    size_t ExtensionLen = strlen(Q3Extensions[i]);
+    size_t NameLen      = strlen(Name);
     if (NameLen>ExtensionLen)
     {
       if (strcmp(Name+NameLen-ExtensionLen, Q3Extensions[i])==0)

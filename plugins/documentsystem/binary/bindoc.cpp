@@ -714,7 +714,7 @@ uint csBdNode::atNum ()
 { 
   if (flags & BD_NODE_MODIFIED)
   {
-    return attrs->Length();
+    return (uint)attrs->Length();
   }
   else
   {
@@ -783,7 +783,7 @@ uint csBdNode::ctNum ()
 {
   if (flags & BD_NODE_MODIFIED)
   {
-    return nodes->Length();
+    return (uint)nodes->Length();
   }
   else
   {
@@ -1516,7 +1516,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     unsigned int i;
     for (i = 0; i < attrCount; i++)
     {
-      startsScratch[i] = csLittleEndianLong (nodesFile->GetPos() - attrStart);
+      startsScratch[i] = csLittleEndianLong ((uint32)nodesFile->GetPos() - attrStart);
       csBinaryDocAttribute* attr = doc->GetPoolAttr ();
       attr->SetTo (nodeData->atGetItem (i), this);
       attr->Store (nodesFile);
@@ -1532,7 +1532,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     unsigned int i;
     for (i = 0; i < childCount; i++)
     {
-      startsScratch[i] = csLittleEndianLong (nodesFile->GetPos() - childStart);
+      startsScratch[i] = csLittleEndianLong ((uint32)nodesFile->GetPos() - childStart);
       csBinaryDocNode* node = doc->GetPoolNode();
       node->SetTo (nodeData->ctGetItem (i), this);
       node->Store (nodesFile);
@@ -1700,7 +1700,7 @@ uint32 csBinaryDocument::GetOutStringID (const char* str)
   val = outStrHash->Request (str);
   if (val == csInvalidStringID)
   {
-    val = outStrStorage->GetPos() - outStrTabOfs;
+    val = (csStringID)(outStrStorage->GetPos() - outStrTabOfs);
     outStrStorage->Write (str, strlen (str) + 1);
     outStrHash->Register (str, val);
   }
@@ -1804,7 +1804,7 @@ const char* csBinaryDocument::Write (iFile* out)
 
   outStrStorage = out;
   outStrHash = new csStringHash (431);
-  doc.ofsStr = out->GetPos();
+  doc.ofsStr = (uint32)out->GetPos();
   {
     int pad = (4 - doc.ofsStr) & 3;
     if (pad != 0)
@@ -1814,10 +1814,10 @@ const char* csBinaryDocument::Write (iFile* out)
       out->Write (null, pad);
       doc.ofsStr += pad;
     }
-    doc.ofsStr -= docStart;
+    doc.ofsStr -= (uint32)docStart;
   }
   doc.ofsStr = csLittleEndianLong (doc.ofsStr);
-  outStrTabOfs = out->GetPos();
+  outStrTabOfs = (uint32)out->GetPos();
 
   csMemFile* outNodes = new csMemFile;
   if (root)
@@ -1831,7 +1831,7 @@ const char* csBinaryDocument::Write (iFile* out)
   delete outStrHash; 
   outStrHash = 0;
 
-  doc.ofsRoot = out->GetPos();
+  doc.ofsRoot = (uint32)out->GetPos();
   {
     int pad = (4 - doc.ofsRoot) & 3;
     if (pad != 0)
@@ -1841,13 +1841,13 @@ const char* csBinaryDocument::Write (iFile* out)
       out->Write (null, pad);
       doc.ofsRoot += pad;
     }
-    doc.ofsRoot -= docStart;
+    doc.ofsRoot -= (uint32)docStart;
   }
   doc.ofsRoot = csLittleEndianLong (doc.ofsRoot);
   out->Write (outNodes->GetData(), outNodes->GetSize());
   delete outNodes;
 
-  head.size = out->GetSize();
+  head.size = (uint32)out->GetSize();
   out->SetPos (0);
   out->Write ((char*)&head, sizeof (head));
   out->Write ((char*)&doc, sizeof (doc));

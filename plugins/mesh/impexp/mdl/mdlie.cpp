@@ -78,9 +78,9 @@ public:
   virtual ~csModelConverterMDL ();
 
   bool Initialize (iObjectRegistry *object_reg);
-  virtual int GetFormatCount();
-  virtual const csModelConverterFormat *GetFormat( int idx );
-  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
+  virtual size_t GetFormatCount();
+  virtual const csModelConverterFormat *GetFormat( size_t idx );
+  virtual csPtr<iModelData> Load( uint8* Buffer, size_t size );
   virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
 
   struct Component : public iComponent
@@ -128,12 +128,12 @@ bool csModelConverterMDL::Initialize (iObjectRegistry *)
   return true;
 }
 
-int csModelConverterMDL::GetFormatCount ()
+size_t csModelConverterMDL::GetFormatCount ()
 {
   return 1;
 }
 
-const csModelConverterFormat *csModelConverterMDL::GetFormat (int idx)
+const csModelConverterFormat *csModelConverterMDL::GetFormat (size_t idx)
 {
   return (idx == 0) ? &FormatInfo : 0;
 }
@@ -214,7 +214,7 @@ static void ReadMDLHeader (csMDLHeader *hdr, csDataStream *in)
 #undef CS_MDL_READ_LONG
 #undef CS_MDL_READ_FLOAT
 
-csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
+csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, size_t Size)
 {
   // prepare input buffer
   csDataStream in (Buffer, Size, false);
@@ -276,7 +276,7 @@ csPtr<iModelData> csModelConverterMDL::Load (uint8 *Buffer, uint32 Size)
       csGetLittleEndianLong(Readbuffer + 2*SIZEOF_MDLLONG) / (float)Header.SkinHeight);
     if (IsSeamVertex) {
       csVector2 SeamTexel = Texels [i] + csVector2 (0.5, 0);
-      SeamTexels [i] = Texels.Push (SeamTexel);
+      SeamTexels [i] = (int)Texels.Push (SeamTexel);
     } else SeamTexels [i] = -1;
   }
 

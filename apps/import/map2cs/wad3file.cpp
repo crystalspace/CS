@@ -229,7 +229,7 @@ bool CWad3File::Extract(const char* Texture, char*& Data, int& Size, csString& f
     csRef<iDataBuffer> db = ImageLoader->Save (&mi, "image/png", "compress=100");
     if (db)
     {
-      Size = db->GetSize();
+      Size = (int)db->GetSize();
       Data = new char[Size];
       memcpy (Data, db->GetData(), Size);
       db = 0;

@@ -102,8 +102,8 @@ public:
                           CMapPolygon& Poly);
 
   /// Access all polygons from outside
-  int          GetPolygonCount()      {return m_Polygons.Length();}
-  CMapPolygon* GetPolygon(int index) {return m_Polygons.Get(index);}
+  size_t GetPolygonCount()      {return m_Polygons.Length();}
+  CMapPolygon* GetPolygon(size_t index) {return m_Polygons.Get(index);}
 
   /// Add a plane. (Useful, when creating a brush from the outside)
   void AddPlane(CMapTexturedPlane* pPlane) {m_Planes.Push(pPlane);}

@@ -102,7 +102,7 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
   spread_pos = 0.6f;
   spread_speed = 2.0f;
   spread_accel = 2.0f;
-  SetParticleCount (number);
+  SetParticleCount ((int)number);
 }
 
 csExploMeshObject::~csExploMeshObject()

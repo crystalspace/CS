@@ -137,9 +137,9 @@ void csView::UpdateView ()
   
   if (PolyView)
   {
-    int i;
+    size_t i;
     csVector2 *pverts = PolyView->GetVertices ();
-    int InCount = PolyView->GetVertexCount ();
+    size_t InCount = PolyView->GetVertexCount ();
     // scale poly
     for (i = 0; i < InCount; i++)
     {

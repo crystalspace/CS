@@ -169,7 +169,7 @@ public:
   virtual char const* GetName () const
   { return name; }
   /// Get total number of frames in this action
-  virtual int GetFrameCount () { return frames.Length (); }
+  virtual int GetFrameCount () { return (int)frames.Length (); }
   /// Query the frame number f.
   csSpriteFrame* GetCsFrame (int f)
   {
@@ -472,7 +472,7 @@ public:
   /// Add a vertex, normal, and texel
   void AddVertex () { AddVertices (1); }
   /// Query the number of vertices.
-  int GetVertexCount () const { return vertices.Get (0)->GetVertexCount (); }
+  int GetVertexCount () const { return (int)vertices.Get (0)->GetVertexCount (); }
 
   /// Get a texel.
   csVector2& GetTexel (int frame, int vertex) const
@@ -514,7 +514,7 @@ public:
   /// returns the triangles of the texel_mesh
   csTriangle* GetTriangles () const { return texel_mesh->GetTriangles (); }
   /// returns the number of triangles in the sprite
-  int GetTriangleCount () const { return texel_mesh->GetTriangleCount (); }
+  int GetTriangleCount () const { return (int)texel_mesh->GetTriangleCount (); }
   /// Size triangle buffer size
   void SetTriangleCount (int count) { texel_mesh->SetSize (count); }
   /// Set a bank of triangles.  The bank is copied.
@@ -526,7 +526,7 @@ public:
   /// find a named frame into the sprite.
   csSpriteFrame* FindFrame (const char * name);
   /// Query the number of frames
-  int GetFrameCount () const { return frames.Length (); }
+  int GetFrameCount () const { return (int)frames.Length (); }
   /// Query the frame number f
   csSpriteFrame* GetFrame (int f) const
   {
@@ -544,7 +544,7 @@ public:
   { return (csSpriteAction2 *)actions [0]; }
   /// Get number of actions in sprite
   int GetActionCount () const
-  { return actions.Length (); }
+  { return (int)actions.Length (); }
   /// Get action number No
   csSpriteAction2* GetAction (int No) const
   { return (csSpriteAction2 *)actions [No]; }
@@ -556,7 +556,7 @@ public:
   /// find a socked based on the sprite attached to it
   csSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
-  int GetSocketCount () const { return sockets.Length (); }
+  int GetSocketCount () const { return (int)sockets.Length (); }
   /// Query the socket number f
   csSpriteSocket* GetSocket (int f) const
   {
@@ -1636,7 +1636,7 @@ public:
   /// find a socked based on the sprite attached to it
   csSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
-  int GetSocketCount () const { return sockets.Length (); }
+  int GetSocketCount () const { return (int)sockets.Length (); }
   /// Query the socket number f
   csSpriteSocket* GetSocket (int f) const
   {

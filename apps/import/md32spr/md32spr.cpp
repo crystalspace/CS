@@ -542,12 +542,15 @@ bool MD3Model::LoadSkin(char *skinFile)
     return false;
 
   bufPtr = **buf;
-  for (i = 0; i < (int) buf->GetSize(); i++) {
-    if (bufPtr[i] == '\n' || bufPtr[i] == '\r') {
+  for (i = 0; i < (int) buf->GetSize(); i++) 
+  {
+    if (bufPtr[i] == '\n' || bufPtr[i] == '\r') 
+    {
       for (j = 0; j < header->numMeshes; j++)
-	if (stristr(line, meshes[j].meshHeader->name)) {
-	  int k = line.Length();
-	  char *name = new char[line.Length() + 1];
+	if (stristr(line, meshes[j].meshHeader->name)) 
+	{
+	  size_t k = line.Length();
+	  char *name = new char[k + 1];
 	  strcpy(name, line.GetData());
 	  if(strtok(name, ",") != 0)
 	    strcpy(meshes[j].skins[0].name, strtok(0, ","));
@@ -557,7 +560,9 @@ bool MD3Model::LoadSkin(char *skinFile)
 	  strcpy(fileName, (line.GetData() + k + 1));
 	}
       line.Clear();
-    } else {
+    } 
+    else 
+    {
       line.Append(bufPtr[i]);
     }
   }
@@ -567,7 +572,8 @@ bool MD3Model::LoadSkin(char *skinFile)
 
 bool MD32spr::LoadAnimation(char *animFile)
 {
-  int lineLen = 0, tmp = -1, i = 0;
+  size_t lineLen = 0;
+  int tmp = -1, i = 0;
   int headActions = 1, upperActions = 0, lowerActions = 0;
   char *line;
   size_t fileSz;
@@ -1114,7 +1120,7 @@ int main(int argc, char *argv[])
 char *stristr(const char *String, const char *Pattern)
 {
   char *pptr, *sptr, *start;
-  uint slen, plen;
+  size_t slen, plen;
 
   for (start = (char *) String,
        pptr = (char *) Pattern,
@@ -1154,7 +1160,7 @@ char *basename(const char *path, char *base)
 {
   char *dir, *file;
   char *ptr, *point;
-  int sz = 0;
+  size_t sz = 0;
   if (!path || !base)
     return 0;
   if(!strlen(path))
@@ -1164,10 +1170,13 @@ char *basename(const char *path, char *base)
   splitpath(path, dir, strlen(path), file, strlen(path));
   point = stristr(file, ".");
   ptr = file;
-  if(point != 0) {
+  if(point != 0) 
+  {
     while (ptr++ != point)
       sz++;
-  } else {
+  } 
+  else 
+  {
     sz = strlen(file);
   }
   strncpy(base, file, sz);
@@ -1178,7 +1187,7 @@ char *basename(const char *path, char *base)
 char *filename(char *path, char *file)
 {
   char *dir, *fname;
-  int sz = 0;
+  size_t sz = 0;
   if (!path || !file)
     return 0;
   if(!strlen(path))

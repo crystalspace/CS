@@ -567,8 +567,8 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
       char name_action[64];
       memset(name_action, 0, 64);
 
-      int base_action = strlen(framesets[i].frames[0].name);
-      for (j = strlen(framesets[i].frames[0].name) - 1; j > 1; j--)
+      size_t base_action = strlen(framesets[i].frames[0].name);
+      for (j = (int)strlen(framesets[i].frames[0].name) - 1; j > 1; j--)
         if (!isdigit(framesets[i].frames[0].name[j]))
 	  break;
       base_action=j + 1;
@@ -598,7 +598,7 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         memset(name_action, 0, 64);
 
         int base_action;
-        for (j = strlen(framesets[i].frames[0].name) - 1; j > 1; j--)
+        for (j = (int)strlen(framesets[i].frames[0].name) - 1; j > 1; j--)
           if (!isdigit(framesets[i].frames[0].name[j]))
 	    break;
         base_action=j + 1;

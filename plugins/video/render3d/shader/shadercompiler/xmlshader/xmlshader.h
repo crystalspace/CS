@@ -111,12 +111,12 @@ private:
   static iRenderBuffer* last_buffers[shaderPass::STREAMMAX*2];
   static iRenderBuffer* clear_buffers[shaderPass::STREAMMAX*2];
   //static csVertexAttrib vertexattributes[shaderPass::STREAMMAX*2];
-  static int lastBufferCount;
+  static size_t lastBufferCount;
 
   static iTextureHandle* last_textures[shaderPass::TEXTUREMAX];
   static iTextureHandle* clear_textures[shaderPass::TEXTUREMAX];
   static int textureUnits[shaderPass::TEXTUREMAX];
-  static int lastTexturesCount;
+  static size_t lastTexturesCount;
 
   //keep this so we can reset in deactivate
   bool orig_wmRed, orig_wmGreen, orig_wmBlue, orig_wmAlpha;

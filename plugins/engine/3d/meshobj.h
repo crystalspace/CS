@@ -74,7 +74,7 @@ public:
   /// Override FreeMesh
   virtual void FreeMesh (iMeshWrapper*) { }
 
-  virtual int GetCount () const { return list.Length () ; }
+  virtual int GetCount () const { return (int)list.Length () ; }
   virtual iMeshWrapper *Get (int n) const { return list.Get (n); }
   virtual int Add (iMeshWrapper *obj);
   virtual bool Remove (iMeshWrapper *obj);
@@ -119,7 +119,7 @@ public:
   virtual void PrepareFactory (iMeshFactoryWrapper*) { }
   virtual void FreeFactory (iMeshFactoryWrapper*) { }
 
-  virtual int GetCount () const { return list.Length (); }
+  virtual int GetCount () const { return (int)list.Length (); }
   virtual iMeshFactoryWrapper *Get (int n) const { return list.Get (n); }
   virtual int Add (iMeshFactoryWrapper *obj);
   virtual bool Remove (iMeshFactoryWrapper *obj);
@@ -444,7 +444,7 @@ public:
 
   virtual int GetDrawCallbackCount () const
   {
-    return draw_cb_vector.Length ();
+    return (int)draw_cb_vector.Length ();
   }
 
   iMeshDrawCallback* GetDrawCallback (int idx) const

@@ -88,7 +88,7 @@ void csParticlesPhysicsSimple::RemoveParticles (
   iParticlesObjectState *particles)
 {
   particles_object *temp;
-  int end = partobjects.Length () - 1;
+  int end = (int)partobjects.Length () - 1;
   for (int i=end;i>=0;--i) {
     temp = partobjects[i];
     if (temp->particles == particles) {
@@ -169,11 +169,11 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
   if ((part->dead_particles-part->new_particles) <
     part->data.Length () * 0.30f)
   {
-    int oldlen = part->data.Length ();
+    int oldlen = (int)part->data.Length ();
     int newlen = (oldlen > (int)part->new_particles) ?
       oldlen << 1 : (int)part->new_particles << 1;
     part->data.SetLength (newlen);
-    part->dead_particles += part->data.Length() - oldlen;
+    part->dead_particles += (int)part->data.Length() - oldlen;
     for(i = oldlen; i < part->data.Length (); i++) {
       csParticlesData &p = part->data.Get (i);
       p.sort = -FLT_MAX;
@@ -184,9 +184,9 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
   else if (part->dead_particles - part->new_particles >
     part->data.Length () * 0.70f && part->data.Length() > 1)
   {
-    int oldlen = part->data.Length();
+    int oldlen = (int)part->data.Length();
     part->data.Truncate ((part->data.Length () >> 1));
-    part->dead_particles -= oldlen - part->data.Length();
+    part->dead_particles -= oldlen - (int)part->data.Length();
   }
 
   size_t dead_offset = part->data.Length() - part->dead_particles;
@@ -359,7 +359,7 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
         + part->particles->GetTimeVariation ());
       const csArray<csColor4> &gradient_colors =
         part->particles->GetGradient ();
-      int color_len=gradient_colors.Length();
+      int color_len = (int)gradient_colors.Length();
       if (color_len)
       {
         // With a gradient

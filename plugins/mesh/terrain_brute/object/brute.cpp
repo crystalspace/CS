@@ -574,7 +574,7 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   
   bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, terr->mesh_indices[idx]);
 
-  for (size_t i=0; i<=(baseonly?0:terr->palette.Length ()); ++i)
+  for (int i=0; i<=(baseonly?0:(int)terr->palette.Length ()); ++i)
   {
     if ((i > 0) && !IsMaterialUsed (i - 1)) continue;
 
@@ -1210,7 +1210,7 @@ void csTerrainObject::AddListener (iObjectModelListener *listener)
 
 void csTerrainObject::RemoveListener (iObjectModelListener *listener)
 {
-  int idx = listeners.Find (listener);
+  int idx = (int)listeners.Find (listener);
   if (idx == -1) return ;
   listeners.DeleteIndex (idx);
 }
@@ -2036,7 +2036,7 @@ csRenderMesh** csTerrainObject::GetRenderMeshes (int &n,
 {
   SetupObject();
   DrawTest (rview, movable, frustum_mask);
-  n = returnMeshes->Length ();
+  n = (int)returnMeshes->Length ();
   return returnMeshes->GetArray ();
 }
 

@@ -318,7 +318,7 @@ public:
   	const char* name);
   virtual iMaterialWrapper* NewMaterial (iMaterialHandle *ith,
   	const char* name);
-  virtual int GetCount () const { return list.Length (); }
+  virtual int GetCount () const { return (int)list.Length (); }
   virtual iMaterialWrapper *Get (int n) const { return list[n]; }
   virtual int Add (iMaterialWrapper *obj);
   virtual bool Remove (iMaterialWrapper *obj);

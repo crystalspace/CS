@@ -355,8 +355,8 @@ const char* csPS1xTo14Converter::CollectUsage (
 
   size_t i;
   uint currentBits = 0;
-  int lastTempUse[2] = {-1, -1};
-  int lastTexUse[4] = {-1, -1, -1, -1};
+  size_t lastTempUse[2] = {(size_t)-1, (size_t)-1};
+  size_t lastTexUse[4] = {(size_t)-1, (size_t)-1, (size_t)-1, (size_t)-1};
 
   /* 
     @@@ DP3 and DP4 are executed in both the RGB and A pipe... 
@@ -405,7 +405,8 @@ const char* csPS1xTo14Converter::CollectUsage (
     {
       const uint mask = ~TEMPREG_BIT (dr, srcModBits (instr.dest_reg_mods));
       // Register is free up to the last instr it was read.
-      for (j = i - 1; j > lastTempUse[dr]; j--)
+      size_t j = i;
+      while (--j != lastTempUse[dr])
       {
 	neededRegs[j] &= mask;
       }
@@ -420,15 +421,17 @@ const char* csPS1xTo14Converter::CollectUsage (
   for (reg = 1; reg < 2; reg++)
   {
     const uint mask = ~TEMPREG_BIT (reg, BIT_RGBA);
-    for (int j = instrs->Length() - 1; j > lastTempUse[reg]; j--)
+    size_t j = instrs->Length();
+    while (--j != lastTempUse[reg])
     {
       neededRegs[j] &= mask;
     }
-  }
+  }				  
   for (reg = 0; reg < 4; reg++)
   {
     const uint mask = ~TEXREG_BIT (reg, BIT_RGBA);
-    for (int j = instrs->Length() - 1; j > lastTexUse[reg]; j--)
+    size_t j = instrs->Length();
+    while (--j != lastTexUse[reg])
     {
       neededRegs[j] &= mask;
     }

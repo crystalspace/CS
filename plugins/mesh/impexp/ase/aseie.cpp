@@ -72,9 +72,9 @@ public:
   virtual ~csModelConverterASE ();
 
   bool Initialize (iObjectRegistry *object_reg);
-  virtual int GetFormatCount();
-  virtual const csModelConverterFormat *GetFormat( int idx );
-  virtual csPtr<iModelData> Load( uint8* Buffer, uint32 size );
+  virtual size_t GetFormatCount();
+  virtual const csModelConverterFormat *GetFormat( size_t idx );
+  virtual csPtr<iModelData> Load( uint8* Buffer, size_t size );
   virtual csPtr<iDataBuffer> Save( iModelData*, const char *format );
 
   struct Component : public iComponent
@@ -122,12 +122,12 @@ bool csModelConverterASE::Initialize (iObjectRegistry *)
   return true;
 }
 
-int csModelConverterASE::GetFormatCount ()
+size_t csModelConverterASE::GetFormatCount ()
 {
   return 1;
 }
 
-const csModelConverterFormat *csModelConverterASE::GetFormat (int idx)
+const csModelConverterFormat *csModelConverterASE::GetFormat (size_t idx)
 {
   return (idx == 0) ? &FormatInfo : 0;
 }
@@ -419,8 +419,8 @@ bool csASEInterpreter_MESH_NORMALS (csModelConverterASE *conv,
     float z = in.ReadTextFloat ();
     csVector3 v (x, y, z);
 
-    n = conv->Vertices->FindNormal (v);
-    if (n == -1) n = conv->Vertices->AddNormal (v);
+    n = (int)conv->Vertices->FindNormal (v);
+    if (n == -1) n = (int)conv->Vertices->AddNormal (v);
     conv->CurrentPolygon->SetNormal (conv->CurrentVertex, n);
     conv->CurrentVertex++;
 
@@ -484,7 +484,7 @@ bool csASEInterpreter_MESH_TVERTLIST (csModelConverterASE *conv,
   return false;
 }
 
-csPtr<iModelData> csModelConverterASE::Load (uint8 *Buffer, uint32 Size)
+csPtr<iModelData> csModelConverterASE::Load (uint8 *Buffer, size_t Size)
 {
   csDataStream in (Buffer, Size, false);
   interp = &csASEInterpreter_MAIN;
@@ -608,17 +608,17 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data,
   while (it.HasNext ())
   {
     iModelDataPolygon *poly = it.Next ();
-    int v1 = VertexTexelSet.Add(poly->GetVertex(0), -1, -1, poly->GetTexel(0));
+    int v1 = (int)VertexTexelSet.Add(poly->GetVertex(0), -1, -1, poly->GetTexel(0));
     int vprev =
-      VertexTexelSet.Add(poly->GetVertex(1), -1, -1, poly->GetTexel(1));
+      (int)VertexTexelSet.Add(poly->GetVertex(1), -1, -1, poly->GetTexel(1));
 
     size_t i;
     for (i=2; i<poly->GetVertexCount (); i++)
     {
       int vn =
-	VertexTexelSet.Add(poly->GetVertex(i), -1, -1, poly->GetTexel(i));
+	(int)VertexTexelSet.Add(poly->GetVertex(i), -1, -1, poly->GetTexel(i));
       tri.Push (new csTriangle (v1, vprev, vn));
-      origtri.Push (new csExtTriangle (poly, 0, i-1, i));
+      origtri.Push (new csExtTriangle (poly, 0, (int)i-1, (int)i));
       vprev = vn;
     }
   }
@@ -664,8 +664,8 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data,
   //   Items
   out << "  *MESH {\n";
   out << "    *TIMEVALUE 0\n";
-  out << "    *MESH_NUMVERTEX " << VertexTexelSet.GetVertexCount () << "\n";
-  out << "    *MESH_NUMFACES " << tri.Length () << "\n";
+  out << "    *MESH_NUMVERTEX " << (uint)VertexTexelSet.GetVertexCount () << "\n";
+  out << "    *MESH_NUMFACES " << (uint)tri.Length () << "\n";
 
   // Sub sub block MESH_VERTEX_LIST
   out << "    *MESH_VERTEX_LIST {\n";
@@ -744,6 +744,6 @@ csPtr<iDataBuffer> csModelConverterASE::Save (iModelData *Data,
   // Close the GEOM object.
   out << "}\n";
 
-  int Size = out.Length ();
+  int Size = (int)out.Length ();
   return csPtr<iDataBuffer> (new csDataBuffer (out.Detach (), Size));
 }

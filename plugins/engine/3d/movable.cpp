@@ -63,7 +63,7 @@ bool csMovableSectorList::PrepareSector (iSector* sector)
 int csMovableSectorList::Add (iSector *obj)
 {
   if (!PrepareSector (obj)) return -1;
-  return Push (obj);
+  return (int)Push (obj);
 }
 
 bool csMovableSectorList::Remove (iSector *obj)
@@ -88,7 +88,7 @@ void csMovableSectorList::RemoveAll ()
 
 int csMovableSectorList::Find (iSector *obj) const
 {
-  return csRefArrayObject<iSector>::Find (obj);
+  return (int)csRefArrayObject<iSector>::Find (obj);
 }
 
 iSector *csMovableSectorList::FindByName (const char *Name) const

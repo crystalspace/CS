@@ -150,7 +150,7 @@ void csSprite2DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   //}
 
   int i;
-  int num_lights = lights.Length ();
+  int num_lights = (int)lights.Length ();
   for (i = 0; i < num_lights; i++)
   {
     csColor light_color = lights[i]->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
@@ -245,7 +245,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
       disappear. 
      */
   rm->indexstart = 0;
-  rm->indexend = vertices.Length();
+  rm->indexend = (uint)vertices.Length();
   rm->object2camera = tr_o2c;
   rm->camera_origin = camera_origin;
 
@@ -286,7 +286,7 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
       int texels_count;
       const csVector2 *uvani_uv = 0;
       if (!uvani)
-	texels_count = vertices.Length ();
+	texels_count = (int)vertices.Length ();
       else
 	uvani_uv = uvani->GetVertices (texels_count);
 	  
@@ -700,7 +700,7 @@ bool csSprite2DMeshObject::HitBeamOutline(const csVector3& start,
   csMatrix3 o2t;
   CheckBeam (start, pl, sqr, o2t);
   csVector3 r = o2t * isect;
-  int trail, len = vertices.Length();
+  int trail, len = (int)vertices.Length();
   trail = len - 1;
   csVector2 isec(r.x, r.y);
   int i;

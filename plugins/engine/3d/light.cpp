@@ -72,7 +72,7 @@ csLight::csLight (
 
 csLight::~csLight ()
 {
-  int i = light_cb_vector.Length ()-1;
+  int i = (int)light_cb_vector.Length ()-1;
   while (i >= 0)
   {
     iLightCallback* cb = light_cb_vector[i];
@@ -185,12 +185,11 @@ float csLight::GetBrightnessAtDistance (float d)
 void csLight::OnSetPosition ()
 {
   csVector3 pos = GetCenter ();
-  int i = light_cb_vector.Length ()-1;
-  while (i >= 0)
+  size_t i = light_cb_vector.Length ();
+  while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
     cb->OnPositionChange (&scfiLight, pos);
-    i--;
   }
 
   lightnr++;
@@ -198,12 +197,11 @@ void csLight::OnSetPosition ()
 
 void csLight::OnSetSector (iSector *sector)
 {
-  int i = light_cb_vector.Length ()-1;
-  while (i >= 0)
+  size_t i = light_cb_vector.Length ();
+  while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
     cb->OnSectorChange (&scfiLight, sector);
-    i--;
   }
 
   lightnr++;
@@ -211,12 +209,11 @@ void csLight::OnSetSector (iSector *sector)
 
 void csLight::SetColor (const csColor& col) 
 {
-  int i = light_cb_vector.Length ()-1;
-  while (i >= 0)
+  size_t i = light_cb_vector.Length ();
+  while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
     cb->OnColorChange (&scfiLight, col);
-    i--;
   }
 
   color = col; 
@@ -247,12 +244,11 @@ void csLight::SetAttenuationMode (csLightAttenuationMode a)
 
   attenuation = a;
 
-  int i = light_cb_vector.Length ()-1;
-  while (i >= 0)
+  size_t i = light_cb_vector.Length ();
+  while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
     cb->OnAttenuationChange (&scfiLight, a);
-    i--;
   }
 }
 
@@ -264,24 +260,22 @@ void csLight::SetAttenuationConstants (const csVector3& attenv)
   influenceValid = false;*/
   attenuationConstants = attenv;
 
-  int i = light_cb_vector.Length ()-1;
-  while (i >= 0)
+  size_t i = light_cb_vector.Length ();
+  while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
     cb->OnAttenuationChange (&scfiLight, attenuation);
-    i--;
   }
 }
 
 void csLight::SetCutoffDistance (float radius)
 {
   if (radius <= 0) return;
-  int i = light_cb_vector.Length ()-1;
-  while (i >= 0)
+  size_t i = light_cb_vector.Length ();
+  while (i-- > 0)
   {
     iLightCallback* cb = light_cb_vector[i];
     cb->OnRadiusChange (&scfiLight, radius);
-    i--;
   }
   lightnr++;
   cutoffDistance = radius;  
@@ -446,7 +440,7 @@ int csLightList::Add (iLight *obj)
   const char* lightname = obj->QueryObject ()->GetName ();
   if (lightname)
     lights_hash.Put (lightname, obj);
-  return list.Push (obj);
+  return (int)list.Push (obj);
 }
 
 bool csLightList::Remove (iLight *obj)
@@ -481,7 +475,7 @@ void csLightList::RemoveAll ()
 
 int csLightList::Find (iLight *obj) const
 {
-  return list.Find (obj);
+  return (int)list.Find (obj);
 }
 
 iLight *csLightList::FindByName (const char *Name) const

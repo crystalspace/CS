@@ -77,10 +77,10 @@ public:
   virtual void SetParticleCount (int num)
   {
     csParticleSystem::SetParticleCount (num);
-    SetCount (number);
+    SetCount ((int)number);
   }
   /// Get the number of particles
-  int GetParticleCount () const {return number;}
+  int GetParticleCount () const {return (int)number;}
   /// Set the explosion center.
   void SetCenter (const csVector3& center)
   {

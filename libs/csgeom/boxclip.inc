@@ -51,7 +51,7 @@
   // The current output polygon
   csVector2 *OutP = (ClipCount & 1) ? OutPolygon : TempPoly;
   // Number of output vertices
-  int OutV = -1;
+  int OutV = (size_t)-1;
   // Current input vertex, vertex % num_vertices
   int vert, realvert;
   // Flag: was input polygon clipped?
@@ -145,7 +145,7 @@
 #include "edgeclip.inc"
 
   // The polygon is fully inside clipper polygon?
-  if (OutV == -1)
+  if (OutV == (size_t)-1)
   {
     OutV = InV;
     if (InP != OutPolygon)

@@ -21,21 +21,21 @@
 
 class DataBuffer {
   char *data;
-  int position;
-  int buffSize;
-  int maxline;
+  size_t position;
+  size_t buffSize;
+  size_t maxline;
  public:
-  DataBuffer(char*, int);
+  DataBuffer(char*, size_t);
   //DataBuffer(csString);
   ~DataBuffer();
-  void SetPosition(int p);
-  int GetPosition();
+  void SetPosition(size_t p);
+  size_t GetPosition();
   void ResetPosition();
-  int GetSize();
-  void SetData(char *d, int bSize);
-  bool GetData(char *,int);
+  size_t GetSize();
+  void SetData(char *d, size_t bSize);
+  bool GetData(char *,size_t);
   bool GetLine(char *);
-  int GetMaxLineLength() ;
+  size_t GetMaxLineLength() ;
   bool eof();
 };
 

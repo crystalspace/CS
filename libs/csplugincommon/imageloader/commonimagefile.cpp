@@ -49,7 +49,7 @@ void csCommonImageFileLoader::ApplyTo (csImageMemory* image)
   CS_ASSERT (dataType != rdtInvalid);
   if (dataType == rdtIndexed)
   {
-    image->ConvertFromPal8 (indexData, alpha, palette, paletteCount);
+    image->ConvertFromPal8 (indexData, alpha, palette, (int)paletteCount);
     palette = 0; indexData = 0; alpha = 0;
   }
   else if (dataType == rdtRGBpixel)

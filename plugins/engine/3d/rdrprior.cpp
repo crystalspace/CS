@@ -87,10 +87,10 @@ void csRenderQueueSet::SortAll (csArrayMeshMask& meshes, iRenderView* rview)
   size_t priority;
   for (priority = 0 ; priority < visible.Length () ; priority++)
   {
-    Sort (rview, priority);
+    Sort (rview, (int)priority);
     csArrayMeshMask* v = visible[priority];
     if (v)
-      tot_objects += v->Length ();
+      tot_objects += (int)v->Length ();
   }
   if (!tot_objects) return;
 

@@ -436,7 +436,7 @@ public:
     virtual void SetLighting (bool l)
     { scfParent->SetLighting (l); }
     virtual int GetParticleCount () const
-    { return scfParent->GetParticleCount (); }
+    { return (int)scfParent->GetParticleCount (); }
     virtual bool GetLighting () const
     { return scfParent->GetLighting (); }
     virtual void SetParticleTime (int l)

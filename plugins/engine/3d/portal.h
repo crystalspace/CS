@@ -168,7 +168,7 @@ public:
   }
   virtual int GetPortalCallbackCount () const
   {
-    return portal_cb_vector.Length ();
+    return (int)portal_cb_vector.Length ();
   }
   virtual iPortalCallback* GetPortalCallback (int idx) const;
 
@@ -180,7 +180,7 @@ public:
   }
   virtual int GetMissingSectorCallbackCount () const
   {
-    return sector_cb_vector.Length ();
+    return (int)sector_cb_vector.Length ();
   }
   virtual iPortalCallback* GetMissingSectorCallback (int idx) const;
 

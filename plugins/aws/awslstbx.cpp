@@ -374,7 +374,7 @@ void awsListBox::MapVisibleItems (
 static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
 {
   v->sortcol = v->local_sortcol;
-  int i = v->FindKey (v->KeyCmp(text));
+  int i = (int)v->FindKey (v->KeyCmp(text));
 
   if (i>=0)
   {
@@ -393,7 +393,7 @@ static int DoFindItem (awsListRowVector *v, iString *text, bool with_delete)
       {
         if (with_delete) r->children->DeleteIndex (j);
 
-        return j;
+        return (int)j;
       }
     }
   }
@@ -514,7 +514,7 @@ void awsListBox::DeleteItem (intptr_t owner, iAwsParmList* parmlist)
     if (!parmlist->GetString ("id", &str)) return ;
 
   if (lb->sel)
-    selidx = lb->rows.Find (lb->sel);
+    selidx = (int)lb->rows.Find (lb->sel);
 
   i = DoFindItem (&lb->rows, str, true);
   if (i == selidx && selidx > -1)
@@ -933,7 +933,7 @@ void awsListBox::OnDraw (csRect clip)
 
       if (parent == 0)
       { // Get next item from main list
-        int i = rows.Find (row);
+        int i = (int)rows.Find (row);
 
         // This should never occur
         if (i == -1)
@@ -952,7 +952,7 @@ void awsListBox::OnDraw (csRect clip)
       } // end if no parent.
       else
       {
-        int i = parent->children->Find (row);
+        int i = (int)parent->children->Find (row);
 
         // This should never occur
         if (i == -1)
@@ -1445,7 +1445,7 @@ bool awsListBox::OnKeyboard (const csKeyEventData& eventData)
 
       if (parent == 0)
       { 
-	int i = rows.Find (sel);
+	int i = (int)rows.Find (sel);
 	
 	if(i < (int)rows.Length() -1 && rows.Length() > 0)
 	{
@@ -1481,7 +1481,7 @@ bool awsListBox::OnKeyboard (const csKeyEventData& eventData)
 
       if (parent == 0)
       { 
-	int i = rows.Find (sel);
+	int i = (int)rows.Find (sel);
 
 	if(i > 0 && rows.Length () > 0)
 	{

@@ -74,8 +74,7 @@ void CMapPolygonSet::FlipSide()
 void CMapPolygonSet::ReduceToCommonParts(const CMapPolygonSet& Other, bool optimise)
 {
   CMapPolygonVector NewPoly;
-  size_t i, j;
-  int k;
+  size_t i, j, k;
 
   //We handle every pair of convex Polygon and Other convex Polygon
   for (i=0; i<m_Polygon.Length(); i++)
@@ -154,8 +153,7 @@ void CMapPolygonSet::RemovePolygon(const CMapPolygon& Other)
 {
   CMapPolygonVector NewPoly;
 
-  size_t i;
-  int k;
+  size_t i, k;
   for (i=0; i<m_Polygon.Length(); i++)
   {
     CMapPolygon Poly(*(m_Polygon[i]));

@@ -45,7 +45,7 @@ CISector::CISector(CMapBrush* pBrush)
   m_IsDefaultsector = (pBrush->GetEntity() == 0);
 
   // Create wall polygon sets for all sides of the brush
-  int i;
+  size_t i;
   for (i=0; i<pBrush->GetPolygonCount(); i++)
   {
     CMapPolygon* pPolygon = pBrush->GetPolygon(i);
@@ -78,7 +78,7 @@ bool CISector::IsInside(CdVector3& v)
 void CISector::CreatePortal(CISector* pOtherSector)
 {
   assert(pOtherSector != this);
-  int i;
+  size_t i;
   size_t j;
 
   //Check all pairs of this sectors walls and the other sectors walls. We are using
@@ -92,7 +92,8 @@ void CISector::CreatePortal(CISector* pOtherSector)
 
     for (j=0; j<pOtherSector->m_Walls.Length(); j++)
     {
-      CMapPolygonSet*    pOtherWall  = new CMapPolygonSet(*pOtherSector->m_pOriginalBrush->GetPolygon(j));
+      CMapPolygonSet*    pOtherWall  = 
+	new CMapPolygonSet(*pOtherSector->m_pOriginalBrush->GetPolygon((int)j));
       CMapTexturedPlane* pOtherPlane = pOtherWall->GetBaseplane()->GetMirror();
 
       //Tf both walls are on the same plane, they might be an intersection, we
@@ -164,12 +165,13 @@ void CISector::TextureWalls(CIWorld* pWorld)
 {
   assert(pWorld);
 
-  int i, j, k;
+  size_t j, k;
+  size_t i;
 
   //iterate all entities, brushes, polygons
   for (i=0; i<pWorld->GetNumEntities(); i++)
   {
-    CMapEntity* pEntity = pWorld->GetEntity(i);
+    CMapEntity* pEntity = pWorld->GetEntity((int)i);
 
     //the entity is the regular world brush, and no special brush
     //we only texture walls with brushes of that entity, to avoid
@@ -207,15 +209,15 @@ void CISector::InsertThings(CIWorld* pWorld)
 {
   assert(pWorld);
 
-  int i, j, k, p, r;
+  size_t i, j, k, p, r;
 
-  int BrushesProcessed = 0;
-  int BrushesToProcess = pWorld->GetMap()->GetNumBrushes() - pWorld->GetNumSectors();
+  size_t BrushesProcessed = 0;
+  size_t BrushesToProcess = pWorld->GetMap()->GetNumBrushes() - pWorld->GetNumSectors();
 
   //iterate all entities, brushes, polygons
   for (i=0; i<pWorld->GetNumEntities(); i++)
   {
-    CMapEntity* pEntity = pWorld->GetEntity(i);
+    CMapEntity* pEntity = pWorld->GetEntity((int)i);
     if (pEntity->GetNumBrushes() == 0 &&
         pEntity->GetCurveCount() == 0)
     {

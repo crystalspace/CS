@@ -231,7 +231,7 @@ void csMovieRecorder::SetupPlugin()
 	char nameForm [6];
 	cs_snprintf (nameForm, 6, "%%0%dd", captureFormatNumberDigits);
 
-	int newlen = strlen(captureFormat)+strlen(nameForm)-
+	size_t newlen = strlen(captureFormat)+strlen(nameForm)-
 	  captureFormatNumberDigits+1;
 	char* newCapForm = new char[newlen];
 	memset (newCapForm, 0, newlen);

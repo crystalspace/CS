@@ -44,9 +44,9 @@ public:
 
   bool Initialize (const char* filename);
 
-  size_t Read (char* buf, size_t maxsize)
+  int Read (char* buf, size_t maxsize)
   {
-    return input->Read (buf, maxsize);
+    return (int)input->Read (buf, maxsize);
   }
 
   awsKey* MapSourceToSink (

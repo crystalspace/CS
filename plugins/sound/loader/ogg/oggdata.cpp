@@ -54,9 +54,9 @@ static int cs_ogg_seek (void *datasource, ogg_int64_t offset, int whence)
   if (whence == SEEK_SET)
     np = offset;
   else if (whence == SEEK_CUR)
-    np = ds->pos + offset;
+    np = (size_t)(ds->pos + offset);
   else if (whence == SEEK_END)
-    np = ds->length + offset;
+    np = (size_t)(ds->length + offset);
   else
     return -1;
 
@@ -77,7 +77,7 @@ static int cs_ogg_close (void *)
 static long cs_ogg_tell (void *datasource)
 {
   csOggSoundData::datastore *ds = (csOggSoundData::datastore*)datasource;
-  return ds->pos;
+  return (long)ds->pos;
 }
 
 csOggSoundData::cs_ov_callbacks::cs_ov_callbacks ()
@@ -200,10 +200,10 @@ void *csOggSoundData::ReadStreamed(long &NumSamples)
     while (bytes_read && buffersize)
     {
       
-      bytes_read = ov_read (&vf, (char *)write_ptr, buffersize, endian,
+      bytes_read = ov_read (&vf, (char *)write_ptr, (int)buffersize, endian,
 			       fmt.Bits>>3, 1, &current_section);
 
-      NumSamples += bytes_read / ((fmt.Bits >> 3) * fmt.Channels);
+      NumSamples += (long)bytes_read / ((fmt.Bits >> 3) * fmt.Channels);
       buffersize-=bytes_read;
       write_ptr += bytes_read;
     }

@@ -99,7 +99,7 @@ csImageVolumeMaker::~csImageVolumeMaker()
 void csImageVolumeMaker::AppendPending ()
 {
   if (pendingImages.Length() == 0) return;
-  int newDepth = Depth + pendingImages.Length();
+  int newDepth = Depth + (int)pendingImages.Length();
   void* newData;
   uint8* newAlpha = 0;
   switch (Format & CS_IMGFMT_MASK)

@@ -116,9 +116,9 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
     return false;
 
   const char* programstring = (char*)data->GetData ();
-  int stringlen = data->GetSize ();
+  size_t stringlen = data->GetSize ();
 
-  int i=0;
+  size_t i=0;
   while (*programstring != '!' && (i < stringlen))
   {
     ++programstring;
@@ -130,7 +130,7 @@ bool csShaderGLAFP::LoadProgramStringToGL ()
   ext->glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, program_num);
   
   ext->glProgramStringARB(GL_FRAGMENT_PROGRAM_ARB, GL_PROGRAM_FORMAT_ASCII_ARB, 
-    stringlen, (void*) programstring);
+    (GLsizei)stringlen, (void*) programstring);
 
   const GLubyte * programErrorString = glGetString(GL_PROGRAM_ERROR_STRING_ARB);
 

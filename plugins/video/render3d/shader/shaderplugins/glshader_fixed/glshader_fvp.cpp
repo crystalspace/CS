@@ -185,7 +185,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
 
   for (i=0; i<layers.Length (); i++)
   {
-    statecache->SetActiveTU (i);
+    statecache->SetActiveTU ((int)i);
     statecache->ActivateTU ();
     if (layers[i].texgen == TEXGEN_REFLECT_CUBE)
     {
@@ -461,7 +461,7 @@ void csGLShaderFVP::ResetState ()
 
   for (i=0; i<layers.Length (); i++)
   {
-    statecache->SetActiveTU (i);
+    statecache->SetActiveTU ((int)i);
     statecache->ActivateTU ();
     if ((layers[i].texgen != TEXGEN_NONE) ||
       (layers[i].texMatrixOps.Length() > 0))
@@ -585,7 +585,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
           {
             do_lighting = true;
             lights.Push (lightingentry ());
-            int i = lights.Length ()-1;
+            size_t i = lights.Length ()-1;
 
             const char* str;
 

@@ -239,7 +239,7 @@ protected:
 
     //helper for listmanagement
     size_t GetSizeFromIndex (uint index) { return max(1<<(index+8), 256); }
-    uint GetIndexFromSize (size_t size) { return max(csLog2 (size-1)-7, 0); }
+    uint GetIndexFromSize (size_t size) { return max(csLog2 ((int)size-1)-7, 0); }
 
     struct slotList
     {

@@ -10,6 +10,7 @@ chronological order.
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()
 	  taking an iImage**, not an csRef<iImage>*.
+	- res fixed a couple VC7 64bit warnings.
 23-Mar-2005
 	- res removed the Apache snprintf code.
 	- res fixed AWS after the recent 64bit compatibility changes. In 

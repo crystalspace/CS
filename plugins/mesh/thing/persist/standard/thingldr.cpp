@@ -554,7 +554,7 @@ bool csThingLoader::ParsePoly3d (
         {
 	  int vt_idx = child->GetContentsValueAsInt ();
 	  bool ignore = false;
-	  int cnt = vertices_to_add.Length ();
+	  int cnt = (int)vertices_to_add.Length ();
 	  for (int i = 0 ; i < cnt ; i++)
 	  {
 	    if (vertices_to_add[i] == vt_idx+vt_offset)
@@ -620,7 +620,7 @@ bool csThingLoader::ParsePoly3d (
   }
 
   thing_fact_state->SetPolygonVertexIndices (CS_POLYRANGE_LAST,
-  	vertices_to_add.Length (), vertices_to_add.GetArray ());
+  	(int)vertices_to_add.Length (), vertices_to_add.GetArray ());
 
   mat = thing_fact_state->GetPolygonMaterial (CS_POLYINDEX_LAST);
   csRef<iMaterialEngine> mateng = SCF_QUERY_INTERFACE (mat->GetMaterial (),
@@ -1150,7 +1150,7 @@ Nag to Jorrit about this feature if you want it.");
         CHECK_TOPLEVEL("replacematerial");
         CHECK_OBJECTONLY("replacematerial");
 	{
-	  int idx = info.replace_materials.Push (RepMaterial ());
+	  int idx = (int)info.replace_materials.Push (RepMaterial ());
 	  info.replace_materials[idx].oldmat = csStrNew (
 		child->GetAttributeValue ("old"));
 	  info.replace_materials[idx].newmat = csStrNew (
@@ -1209,8 +1209,8 @@ Nag to Jorrit about this feature if you want it.");
   if (mixmode == CS_FX_COPY)
   {
     // Mixmode is copy, delete all polygons that became portals.
-    int i;
-    for (i = polygons_to_delete.Length ()-1 ; i >= 0 ; i--)
+    size_t i = polygons_to_delete.Length ();
+    while (i-- > 0)
       info.thing_fact_state->RemovePolygon (polygons_to_delete[i]);
   }
 

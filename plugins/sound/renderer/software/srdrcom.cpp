@@ -252,8 +252,8 @@ csPtr<iSoundHandle> csSoundRenderSoftware::RegisterSound(iSoundData *snd)
 
 void csSoundRenderSoftware::UnregisterSound(iSoundHandle *snd)
 {
-  int n = SoundHandles.Find((csSoundHandleSoftware*)snd);
-  if (n != -1)
+  size_t n = SoundHandles.Find((csSoundHandleSoftware*)snd);
+  if (n != csArrayItemNotFound)
   {
     if (owning || mixing->LockWait ()) // dont remove while we mix
     {
@@ -310,8 +310,8 @@ void csSoundRenderSoftware::RemoveSource(csSoundSourceSoftware *src)
   if (downing || mixing->LockWait ()) // dont remove while we mix
   {
     if (!downing) owning = true;
-    int n=Sources.Find(src);
-    if (n!=-1)
+    size_t n = Sources.Find(src);
+    if (n != csArrayItemNotFound)
     {
       Sources.DeleteIndex (n);
       src->DecRef();

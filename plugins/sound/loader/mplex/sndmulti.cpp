@@ -152,7 +152,7 @@ csPtr<iSoundData> csSoundLoaderMultiplexer::LoadSound (
   bool consecutive = false; // set to true if we searched the list completely.
   do
   {
-    int i;
+    size_t i;
     for (i=Loaders.Length(); (i--)>0; ) 
       // i is decremented after comparison but before we use it below;
       //  hence it goes from Laoders.Length()-1 to 0

@@ -182,7 +182,7 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
       }
 
       size_t i;
-      int j;
+      size_t j;
 
       for (i=0; i<m_Portals.Length(); i++)
       {
@@ -198,7 +198,7 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
  	  CMapPolygon*   pPolygon = pPortal->GetPolygon(j);
  	  
  	  CVertexBuffer Vb;
- 	  for (int l = pPolygon->GetVertexCount() - 1 ; l >= 0; l-- ) 
+ 	  for (size_t l = pPolygon->GetVertexCount() - 1 ; l >= 0; l-- ) 
 	  {
  	    Vb.AddVertex(pPolygon->GetVertex(l));
  	  }
@@ -295,12 +295,12 @@ bool CCSSector::WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld)
 
   assert(pMap);
 
-  int i;
+  size_t i;
 
   //iterate all entities, brushes, polygons and vertices:
   for (i=0; i<pMap->GetNumEntities(); i++)
   {
-    CMapEntity* pEntity = pMap->GetEntity(i);
+    CMapEntity* pEntity = pMap->GetEntity((int)i);
     if (strcmp(pEntity->GetClassname(), "light")==0)
     {
       CdVector3 origin;
@@ -495,11 +495,11 @@ bool CCSSector::WriteCurves(csRef<iDocumentNode> node, CIWorld* pWorld)
 
   assert(pMap);
 
-  int i, curve;
+  size_t i, curve;
   for (i=0; i<pMap->GetNumEntities(); i++)
   {
     CMapEntity* pEntity = pMap->GetEntity(i);
-    int const ncurves = pEntity->GetCurveCount();
+    size_t const ncurves = pEntity->GetCurveCount();
     if (ncurves>0)
     {
       for (curve=0; curve<ncurves; curve++)

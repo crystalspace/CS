@@ -75,8 +75,7 @@ const char* CIThing::GetClassname()
 
 bool CIThing::ContainsVisiblePolygons()
 {
-  size_t i;
-  int j;
+  size_t i, j;
   for (i=0; i<m_Polygon.Length(); i++)
   {
     CMapPolygonSet* pPolySet = m_Polygon[i];

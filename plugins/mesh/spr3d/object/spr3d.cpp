@@ -512,7 +512,8 @@ void csSprite3DMeshObjectFactory::ComputeBoundingBox ()
 
 csSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
 {
-  csSpriteFrame* fr = new csSpriteFrame (frames.Length(), texels.Length());
+  csSpriteFrame* fr = new csSpriteFrame ((int)frames.Length(), 
+    (int)texels.Length());
   csPoly3D* nr = new csPoly3D ();
   csPoly2D* tx = new csPoly2D ();
   csPoly3D* vr = new csPoly3D ();
@@ -600,7 +601,7 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
-  int num_triangles = texel_mesh->GetTriangleCount();
+  int num_triangles = (int)texel_mesh->GetTriangleCount();
   // @@@ Avoid this allocate!
   csVector3 * tri_normals = new csVector3[num_triangles];
 
@@ -742,7 +743,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
-  int num_triangles = texel_mesh->GetTriangleCount();
+  int num_triangles = (int)texel_mesh->GetTriangleCount();
   // @@@ Avoid this allocate!
   csVector3 * tri_normals = new csVector3[num_triangles];
 
@@ -769,7 +770,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
       csVector3 difference = base_verts[i] - base_verts[j];
       if (difference.SquaredNorm () < 0.0001)
       {
-        merge[i] = j;
+        merge[i] = (int)j;
         break;
       }
     }
@@ -1551,7 +1552,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   final_colors = vertex_colors;
   final_triangles = m->GetTriangles ();
   final_num_vertices = num_verts_for_lod;
-  final_num_triangles = m->GetTriangleCount ();
+  final_num_triangles = (int)m->GetTriangleCount ();
 
   rmesh->clip_portal = clip_portal;
   rmesh->clip_plane = clip_plane;
@@ -1958,7 +1959,7 @@ void csSprite3DMeshObject::UpdateLightingFast (const csArray<iLight*>& lights,
   float amb_b = b / 128.0;
 #endif
 
-  int num_lights = lights.Length ();
+  int num_lights = (int)lights.Length ();
   for (light_num = 0 ; light_num < num_lights ; light_num++)
   {
     light_color = lights [light_num]->GetColor ()
@@ -2064,7 +2065,7 @@ void csSprite3DMeshObject::UpdateLightingLQ (const csArray<iLight*>& lights,
   }
   csColor color;
 
-  int num_lights = lights.Length ();
+  int num_lights = (int)lights.Length ();
   for (i = 0 ; i < num_lights ; i++)
   {
     // Compute light position in object coordinates
@@ -2149,7 +2150,7 @@ void csSprite3DMeshObject::UpdateLightingHQ (const csArray<iLight*>& lights,
   csColor color;
 
   csReversibleTransform movtrans = movable->GetFullTransform ();
-  int num_lights = lights.Length ();
+  int num_lights = (int)lights.Length ();
   for (i = 0 ; i < num_lights ; i++)
   {
     csColor light_color = lights [i]->GetColor ()

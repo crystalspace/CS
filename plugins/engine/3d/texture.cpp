@@ -320,7 +320,7 @@ iTextureWrapper *csTextureList::TextureList::NewTexture (iTextureHandle *ith)
 
 int csTextureList::TextureList::GetCount () const
 {
-  return scfParent->Length ();
+  return (int)scfParent->Length ();
 }
 
 iTextureWrapper *csTextureList::TextureList::Get (int n) const
@@ -330,7 +330,7 @@ iTextureWrapper *csTextureList::TextureList::Get (int n) const
 
 int csTextureList::TextureList::Add (iTextureWrapper *obj)
 {
-  return scfParent->Push (obj);
+  return (int)scfParent->Push (obj);
 }
 
 bool csTextureList::TextureList::Remove (iTextureWrapper *obj)
@@ -350,7 +350,7 @@ void csTextureList::TextureList::RemoveAll ()
 
 int csTextureList::TextureList::Find (iTextureWrapper *obj) const
 {
-  return scfParent->Find (obj);
+  return (int)scfParent->Find (obj);
 }
 
 iTextureWrapper *csTextureList::TextureList::FindByName (

@@ -334,10 +334,10 @@ bool csReporterListener::HandleEvent (iEvent& event)
     if (event.Command.Code == cscmdPostProcess)
     {
       csScopedMutexLock lock (mutex);
-      int l = messages.Length ();
+      size_t l = messages.Length ();
       if (l > 0)
       {
-	int i;
+	size_t i;
         csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
         csRef<iGraphics2D> g2d = g3d->GetDriver2D ();
@@ -363,7 +363,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
           int sep = g2d->FindRGB (int (255*0.7), int (255*0.7),
 	      int (180*0.7));
 
-	  int max_l = (sh-4-6-4-6) / (fh+6);
+	  size_t max_l = (sh-4-6-4-6) / (fh+6);
 	  if (l > max_l) l = max_l;
           int h = 0;
           int c = 0;

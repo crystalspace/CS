@@ -136,12 +136,12 @@ bool csModelConverter3ds::Initialize( iObjectRegistry * )
   return true;
 }
 
-int csModelConverter3ds::GetFormatCount()
+size_t csModelConverter3ds::GetFormatCount()
 {
   return 1;
 }
 
-const csModelConverterFormat *csModelConverter3ds::GetFormat( int idx )
+const csModelConverterFormat *csModelConverter3ds::GetFormat( size_t idx )
 {
   if( idx == 0 )
     return &FormatInfo;
@@ -241,7 +241,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
  
   int i,j,k,index;
   iModelDataPolygon * pCurPoly;
-  int numVertices = Vertices->GetVertexCount();
+  int numVertices = (int)Vertices->GetVertexCount();
 
   FacesVector adj_faces;
 
@@ -287,7 +287,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 
     if (!pCurFace->smoothing)
     {
-      normindex = Vertices->AddNormal (csVector3(pCurFace->normal[0], 
+      normindex = (int)Vertices->AddNormal (csVector3(pCurFace->normal[0], 
 	pCurFace->normal[1], pCurFace->normal[2]));
       for( j = 0 ; j <3 ; j++ )
       {
@@ -303,7 +303,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 	  // add a new triangle facing the opposite direction
 	pCurPoly = new csModelDataPolygon ();
 	pDataObject->QueryObject ()->ObjAdd (pCurPoly->QueryObject ());
-	normindex = Vertices->AddNormal (csVector3(-pCurFace->normal[0], 
+	normindex = (int)Vertices->AddNormal (csVector3(-pCurFace->normal[0], 
 	  -pCurFace->normal[1], -pCurFace->normal[2]));
 	for( j = 2 ; j >= 0 ; j-- )
 	{
@@ -325,7 +325,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 
 	index = pCurFace->points[j];
 
-	for (k = adj_faces[index]->Length()-1; k >= 0; k--)
+	for (k = (int)adj_faces[index]->Length()-1; k >= 0; k--)
 	{
 	  AdjacentFace &adj_face = (*adj_faces[index])[k];
 	  /* check if there is an adjacent triangle in the same
@@ -353,7 +353,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 	if (normindex == -1)
 	{
 	  normal.Normalize();
-	  normindex = Vertices->AddNormal (normal);
+	  normindex = (int)Vertices->AddNormal (normal);
 	  (*adj_faces[index])[firstadjface].normal = normindex;
 	}
 	// now add the vertex
@@ -372,7 +372,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 	for( j = 2 ; j >= 0 ; j-- )
 	{
 	  index = pCurFace->points[j];
-	  normindex = Vertices->AddNormal (backnormal[j]);
+	  normindex = (int)Vertices->AddNormal (backnormal[j]);
 	  // now add the vertex
 //	  if(hasTexels) 
 	    pCurPoly->AddVertex(index, normindex , 0, index);

@@ -220,7 +220,7 @@ iCameraPosition *csCameraPositionList::CameraPositionList::NewCameraPosition (
 
 int csCameraPositionList::CameraPositionList::GetCount () const
 {
-  return scfParent->Length ();
+  return (int)scfParent->Length ();
 }
 
 iCameraPosition *csCameraPositionList::CameraPositionList::Get (int n) const
@@ -230,7 +230,7 @@ iCameraPosition *csCameraPositionList::CameraPositionList::Get (int n) const
 
 int csCameraPositionList::CameraPositionList::Add (iCameraPosition *obj)
 {
-  return scfParent->Push (obj);
+  return (int)scfParent->Push (obj);
 }
 
 bool csCameraPositionList::CameraPositionList::Remove (iCameraPosition *obj)
@@ -251,7 +251,7 @@ void csCameraPositionList::CameraPositionList::RemoveAll ()
 int csCameraPositionList::CameraPositionList::Find (
   iCameraPosition *obj) const
 {
-  return scfParent->Find (obj);
+  return (int)scfParent->Find (obj);
 }
 
 iCameraPosition *csCameraPositionList::CameraPositionList::FindByName (
@@ -298,7 +298,7 @@ iCollection *csCollectionList::CollectionList::NewCollection (
 
 int csCollectionList::CollectionList::GetCount () const
 {
-  return scfParent->Length ();
+  return (int)scfParent->Length ();
 }
 
 iCollection *csCollectionList::CollectionList::Get (int n) const
@@ -308,7 +308,7 @@ iCollection *csCollectionList::CollectionList::Get (int n) const
 
 int csCollectionList::CollectionList::Add (iCollection *obj)
 {
-  return scfParent->Push (obj);
+  return (int)scfParent->Push (obj);
 }
 
 bool csCollectionList::CollectionList::Remove (iCollection *obj)
@@ -328,7 +328,7 @@ void csCollectionList::CollectionList::RemoveAll ()
 
 int csCollectionList::CollectionList::Find (iCollection *obj) const
 {
-  return scfParent->Find (obj);
+  return (int)scfParent->Find (obj);
 }
 
 iCollection *csCollectionList::CollectionList::FindByName (
@@ -713,7 +713,7 @@ csObjectListIt::csObjectListIt (csArray<iObject*>* list)
 {
   SCF_CONSTRUCT_IBASE (0);
   csObjectListIt::list = list;
-  num_objects = list->Length ();
+  num_objects = (int)list->Length ();
   Reset ();
 }
 
@@ -750,7 +750,7 @@ csMeshListIt::csMeshListIt (csArray<iMeshWrapper*>* list)
 {
   SCF_CONSTRUCT_IBASE (0);
   csMeshListIt::list = list;
-  num_objects = list->Length ();
+  num_objects = (int)list->Length ();
   Reset ();
 }
 
@@ -1158,7 +1158,7 @@ void csEngine::RegisterRenderPriority (
     render_priority_sortflags.SetLength (priority + 2);
     render_priorities.SetLength (priority+2);
   }
-  for (i = old_pri_len; i <= priority; i++)
+  for (i = (int)old_pri_len; i <= priority; i++)
   {
     render_priority_sortflags[i] = CS_RENDPRI_NONE;
   }
@@ -1224,7 +1224,7 @@ void csEngine::ClearRenderPriorities ()
 
 int csEngine::GetRenderPriorityCount () const
 {
-  return render_priorities.Length ();
+  return (int)render_priorities.Length ();
 }
 
 const char* csEngine::GetRenderPriorityName (long priority) const
@@ -1881,7 +1881,8 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   if (halos.Length () > 0)
   {
     csTicks elapsed = virtual_clock->GetElapsedTicks ();
-    for (int halo = halos.Length () - 1; halo >= 0; halo--)
+    size_t halo = halos.Length ();
+    while (halo-- > 0)
       if (!halos[halo]->Process (elapsed, c, this))
 	halos.DeleteIndex (halo);
   }

@@ -131,7 +131,7 @@ void csShaderGLPS1_NV::ActivateTextureShaders ()
   size_t i;
   for(i = 0; i < 4; i++)
   {
-    ext->glActiveTextureARB (GL_TEXTURE0_ARB + i);
+    ext->glActiveTextureARB (GL_TEXTURE0_ARB + (int)i);
     glTexEnvi(GL_TEXTURE_SHADER_NV, GL_SHADER_OPERATION_NV,
       GL_NONE);
   }

@@ -123,7 +123,7 @@ void CMapEntity::AddKeyValuePair(const char* Key, const char* Value)
 
 const char* CMapEntity::GetValueOfKey (const char* key, const char* defaultvalue)
 {
-  int i, NumKeys = m_Keymap.Length();
+  size_t i, NumKeys = m_Keymap.Length();
   for (i=0; i<NumKeys; i++)
   {
     if (strcmp(key, m_Keymap[i]->GetKey())==0)

@@ -500,7 +500,7 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
         sect,
         box,
         relevant_lights.GetArray (),
-        relevant_lights_max);
+        (int)relevant_lights_max);
     relevant_lights.SetLength (num_lights);
     relevant_lights_ref.SetLength (num_lights);
     if (!always_update)
@@ -679,7 +679,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview, uint32 frustum_mask)
   int i;
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
-  i = draw_cb_vector.Length ()-1;
+  i = (int)draw_cb_vector.Length ()-1;
   while (i >= 0)
   {
     iMeshDrawCallback* cb = draw_cb_vector.Get (i);
@@ -1292,7 +1292,7 @@ int csMeshList::Add (iMeshWrapper *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     meshes_hash.Put (name, obj);
-  return list.Push (obj);
+  return (int)list.Push (obj);
 }
 
 bool csMeshList::Remove (iMeshWrapper *obj)
@@ -1329,7 +1329,7 @@ void csMeshList::RemoveAll ()
 
 int csMeshList::Find (iMeshWrapper *obj) const
 {
-  return list.Find (obj);
+  return (int)list.Find (obj);
 }
 
 iMeshWrapper *csMeshList::FindByName (const char *Name) const
@@ -1429,7 +1429,7 @@ int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     factories_hash.Put (name, obj);
-  return list.Push (obj);
+  return (int)list.Push (obj);
 }
 
 bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
@@ -1460,7 +1460,7 @@ void csMeshFactoryList::RemoveAll ()
 
 int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 {
-  return list.Find (obj);
+  return (int)list.Find (obj);
 }
 
 iMeshFactoryWrapper *csMeshFactoryList::FindByName (

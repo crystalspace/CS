@@ -132,10 +132,10 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 
   csRef<iStringArray> classlist =
     iSCF::SCF->QueryClassList("crystalspace.graphics3d.shadercompiler.");
-  int const nmatches = classlist.IsValid() ? classlist->Length() : 0;
+  size_t const nmatches = classlist.IsValid() ? classlist->Length() : 0;
   if (nmatches != 0)
   {
-    int i;
+    size_t i;
     for (i = 0; i < nmatches; ++i)
     {
       const char* classname = classlist->Get(i);
@@ -348,7 +348,7 @@ const csSet<csStringID>& csShaderManager::GetTags (csShaderTagPresence presence,
     int& count)
 {
   csSet<csStringID>& set = GetTagSet (presence);
-  count = set.GetSize ();
+  count = (int)set.GetSize ();
   return set;
 }
 

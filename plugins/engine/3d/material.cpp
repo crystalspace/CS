@@ -420,7 +420,7 @@ int csMaterialList::Add (iMaterialWrapper *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     mat_hash.Put (name, obj);
-  return list.Push (obj);
+  return (int)list.Push (obj);
 }
 
 bool csMaterialList::Remove (iMaterialWrapper *obj)
@@ -448,7 +448,7 @@ void csMaterialList::RemoveAll ()
 
 int csMaterialList::Find (iMaterialWrapper *obj) const
 {
-  return list.Find (obj);
+  return (int)list.Find (obj);
 }
 
 iMaterialWrapper *csMaterialList::FindByName (const char *Name) const

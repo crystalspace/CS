@@ -631,7 +631,7 @@ void csGenmeshAnimationControlFactory::UpdateGroupsMapping ()
         csArray<ac_group_data>& vertices = groups_vertices
       	  .GetExtend (vtdata[j].idx);
         ac_group_data gd;
-        gd.idx = i;
+        gd.idx = (int)i;
         gd.weight = vtdata[j].weight;
         vertices.Push (gd);	// Push group index.
       }
@@ -640,7 +640,7 @@ void csGenmeshAnimationControlFactory::UpdateGroupsMapping ()
         csArray<ac_group_data>& colors = groups_colors
       	  .GetExtend (vtdata[j].idx);
         ac_group_data gd;
-        gd.idx = i;
+        gd.idx = (int)i;
         gd.weight = vtdata[j].col_weight;
         colors.Push (gd);	// Push group index.
       }

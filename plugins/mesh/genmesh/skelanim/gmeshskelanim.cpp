@@ -959,8 +959,8 @@ void csGenmeshSkelAnimationControlFactory::UpdateBonesMapping ()
 			{
 				csArray<sac_bone_data>& vertices = bones_vertices.GetExtend (vtdata[j].idx);
 				sac_bone_data gd;
-				gd.idx = i;
-				gd.v_idx = j;
+				gd.idx = (int)i;
+				gd.v_idx = (int)j;
 				vertices.Push (gd); // Push bone index.
 			}
 		}

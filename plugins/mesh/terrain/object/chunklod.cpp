@@ -541,7 +541,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   {
     if (!vertex_buffer) 
     {
-      unsigned int len = vertices.Length();
+      size_t len = vertices.Length();
       vertex_buffer = csRenderBuffer::CreateRenderBuffer (
 	len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
@@ -553,7 +553,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   {
     if (!normal_buffer)
     {
-      unsigned int len = normals.Length();
+      size_t len = normals.Length();
       normal_buffer = csRenderBuffer::CreateRenderBuffer (
 	len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
@@ -566,7 +566,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   {
     if (!tangent_buffer)
     {
-      unsigned int len = tangents.Length();
+      size_t len = tangents.Length();
       tangent_buffer = csRenderBuffer::CreateRenderBuffer (
 	len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
@@ -579,7 +579,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   {
     if (!binormal_buffer)
     {
-      unsigned int len = binormals.Length();
+      size_t len = binormals.Length();
       binormal_buffer = csRenderBuffer::CreateRenderBuffer (
 	len, CS_BUF_STATIC, 
 	CS_BUFCOMP_FLOAT, 3);
@@ -592,7 +592,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   {
     if (!texcors_buffer)
     {
-      unsigned int len = texcors.Length();
+      size_t len = texcors.Length();
       {
         texcors_buffer = csRenderBuffer::CreateRenderBuffer (
 	  len, CS_BUF_STATIC, 
@@ -606,7 +606,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   {
     if (!index_buffer)
     {
-      unsigned int len = vertices.Length();
+      size_t len = vertices.Length();
       if (len < UCHAR_MAX) 
       {
 	index_buffer = csRenderBuffer::CreateIndexRenderBuffer (
@@ -659,7 +659,7 @@ void csChunkLodTerrainFactory::MeshTreeNode::InitBuffer (const Data& d, int p)
 
 void csChunkLodTerrainFactory::MeshTreeNode::AddVertex (const Data& d, int p)
 {
-  int len = vertices.Length ();
+  int len = (int)vertices.Length ();
   if (d.pos == vertices[len - 1] || d.pos == vertices[len - 2])
     return;
   if (p == parity)
@@ -1013,7 +1013,7 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
     return 0;
   }
 
-  n = returnMeshes->Length();
+  n = (int)returnMeshes->Length();
   if (n == 0) 
   {
     // pass back root node as default always
@@ -1829,7 +1829,7 @@ void csChunkLodTerrainObject::MeshTreeNodeRBA::PreGetBuffer
     if (!colorBuffer || (colorVersion != obj->colorVersion))
     {
       const csArray<int>& colors = wrapper->factoryNode->colors;
-      unsigned int len = colors.Length();
+      size_t len = colors.Length();
       if (!colorBuffer)
       {
 	colorBuffer = csRenderBuffer::CreateRenderBuffer (

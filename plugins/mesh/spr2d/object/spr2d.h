@@ -364,7 +364,7 @@ public:
   /// Get mixmode.
   uint GetMixMode () const { return MixMode; }
 
-  int GetUVAnimationCount () const {return vAnims.Length ();}
+  int GetUVAnimationCount () const {return (int)vAnims.Length ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
   {
     csSprite2DUVAnimation *p = new csSprite2DUVAnimation (0);
@@ -373,7 +373,7 @@ public:
   }
   void RemoveUVAnimation (iSprite2DUVAnimation *anim)
   {
-    int idx = vAnims.Find ((csSprite2DUVAnimation*)anim);
+    int idx = (int)vAnims.Find ((csSprite2DUVAnimation*)anim);
     if (idx != -1)
     {
       anim->DecRef ();
@@ -382,7 +382,7 @@ public:
   }
   iSprite2DUVAnimation *GetUVAnimation (const char *name)
   {
-    int idx = vAnims.FindKey (vAnims.KeyCmp(name));
+    int idx = (int)vAnims.FindKey (vAnims.KeyCmp(name));
     return (iSprite2DUVAnimation *)(idx != -1 ? vAnims.Get (idx) : 0);
   }
   iSprite2DUVAnimation *GetUVAnimation (int idx)

@@ -2920,7 +2920,7 @@ int csBugPlug::FindCounter (const char* countername)
   size_t i;
   for (i = 0 ; i < counters.Length () ; i++)
     if (!strcmp (counters[i]->countername, countername))
-      return i;
+      return (int)i;
   return -1;
 }
 

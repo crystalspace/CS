@@ -64,8 +64,8 @@ public:
 
   T* FindByName (const char* name) const
   {
-    int i = GetIndexByName (name);
-    if (i != -1)
+    size_t i = GetIndexByName (name);
+    if (i != csArrayItemNotFound)
       return (*this)[i];
     else
       return 0;

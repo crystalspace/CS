@@ -249,8 +249,8 @@ void csSoundRenderDS3D::UnregisterSound(iSoundHandle *snd)
 {
   mutex_SoundHandles->LockWait();
   csRef<csSoundHandleDS3D> hdl = (csSoundHandleDS3D *)snd;
-  int n = SoundHandles.Find(hdl);
-  if (n != -1)
+  size_t n = SoundHandles.Find(hdl);
+  if (n != csArrayItemNotFound)
   {
     SoundHandles.DeleteIndex (n);
     hdl->Unregister();
@@ -325,8 +325,8 @@ void csSoundRenderDS3D::AddSource(csSoundSourceDS3D *src)
 void csSoundRenderDS3D::RemoveSource(csSoundSourceDS3D *src)
 {
   mutex_ActiveSources->LockWait();
-  int n=ActiveSources.Find(src);
-  if (n!=-1)
+  size_t n = ActiveSources.Find(src);
+  if (n != csArrayItemNotFound)
   {
     ActiveSources.DeleteIndex (n);
   }

@@ -581,7 +581,7 @@ public:
 
   virtual int GetMaterialIndex (iMaterialHandle* mat)
   {
-    return materials.Find ((csGLMaterialHandle*)mat); // @@@ Evil cast?
+    return (int)materials.Find ((csGLMaterialHandle*)mat); // @@@ Evil cast?
   }
 
   /// Dump all SLMs to image files.

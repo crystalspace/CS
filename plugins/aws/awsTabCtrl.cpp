@@ -470,7 +470,7 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
   if (!caption || !caption->GetData ())
   {
     csString theCap ("Tab ");
-    theCap += vTabs.Length () + 1;
+    theCap += (uint)vTabs.Length () + 1;
     caption = new scfString ((const char*)theCap);
   }
 
@@ -491,7 +491,7 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
 
   // Resize button.
   csRect r (btn->getPreferredSize ());
-  int last = vTabs.Length ();
+  int last = (int)vTabs.Length ();
   if (r.Height () > Frame ().Height ())
   {
     int delta = r.Height () - Frame ().Height ();
@@ -530,7 +530,7 @@ void awsTabCtrl::RemoveTabParam (intptr_t user_param)
 
 void awsTabCtrl::RemoveTab (iAwsSource *src)
 {
-  int idx = vTabs.Find ((awsTab*)src->GetComponent ());
+  int idx = (int)vTabs.Find ((awsTab*)src->GetComponent ());
   if (idx >= 0) RemoveTabIndex (idx);
 }
 
@@ -658,7 +658,7 @@ int awsTabCtrl::FindTab (intptr_t user_param)
     intptr_t p;
     vTabs.Get (i)->GetProperty ("User Param", &p);
     if (p == user_param)
-      return i;
+      return (int)i;
   }
   return -1;
 }
@@ -672,7 +672,7 @@ void awsTabCtrl::ActivateTabParam (intptr_t param)
 
 void awsTabCtrl::ActivateTab (iAwsSource *src)
 {
-  int idx = vTabs.Find ((awsTab*) src->GetComponent ());
+  int idx = (int)vTabs.Find ((awsTab*) src->GetComponent ());
   if (idx >= 0)
     ActivateTabIndex (idx);
 }
@@ -713,7 +713,7 @@ void awsTabCtrl::OnResized ()
 void awsTabCtrl::ActivateTabCallback (intptr_t p, iAwsSource *source)
 {
   awsTabCtrl *tc = (awsTabCtrl *)p;
-  int idx = tc->vTabs.Find ((awsTab*) source->GetComponent ());
+  int idx = (int)tc->vTabs.Find ((awsTab*) source->GetComponent ());
   if (idx != -1 && tc->active != idx)
   {
     // Hide the active and make the new one active.

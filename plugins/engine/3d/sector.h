@@ -314,7 +314,7 @@ public:
 
   int GetSectorCallbackCount () const
   {
-    return sector_cb_vector.Length ();
+    return (int)sector_cb_vector.Length ();
   }
 
   iSectorCallback* GetSectorCallback (int idx) const
@@ -642,7 +642,7 @@ public:
   /// Override FreeSector.
   virtual void FreeSector (iSector* item);
 
-  virtual int GetCount () const { return list.Length (); }
+  virtual int GetCount () const { return (int)list.Length (); }
   virtual iSector *Get (int n) const { return list.Get (n); }
   virtual int Add (iSector *obj);
   virtual bool Remove (iSector *obj);

@@ -43,7 +43,7 @@
     // Second ("current") point x/y
     float cx, cy;
     realvert = LastVertex ? 0 : vert;
-    CS_ASSERT (realvert >= 0 && realvert < InV);
+    CS_ASSERT (realvert < InV);
     cx = InP [realvert].x;
     cy = InP [realvert].y;
 

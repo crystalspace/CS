@@ -246,8 +246,8 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
 {
   if (suspended) return;
   csTicks current_time = seqmgr->GetMainTime ();
-  int i = 0;
-  int len = pathForMesh.Length ();
+  size_t i = 0;
+  size_t len = pathForMesh.Length ();
   while (i < len)
   {
     PathForMesh* pfm = pathForMesh[i];
@@ -334,8 +334,8 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
 void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
     csTicks debug_time)
 {
-  int i = 0;
-  int len = pathForMesh.Length ();
+  size_t i = 0;
+  size_t len = pathForMesh.Length ();
   while (i < len)
   {
     PathForMesh* pfm = pathForMesh[i];
@@ -445,8 +445,8 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
 	const char* hilight, const csVector2& tl, const csVector2& br,
 	int selpoint)
 {
-  int i;
-  int len = pathForMesh.Length ();
+  size_t i;
+  size_t len = pathForMesh.Length ();
   csTicks current_time = seqmgr->GetMainTime ();
 
   //=====
@@ -618,8 +618,8 @@ csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight)
 csNamedPath* DemoSequenceManager::GetSelectedPath (const char* hilight,
 	csTicks& start, csTicks& total)
 {
-  int i = 0;
-  int len = pathForMesh.Length ();
+  size_t i = 0;
+  size_t len = pathForMesh.Length ();
   while (i < len)
   {
     PathForMesh* pfm = pathForMesh[i];

@@ -189,7 +189,7 @@ public:
     float Radius () { return radius; }
     float Error () { return error; }
 
-    int Count () { return vertices.Length(); }
+    int Count () { return (int)vertices.Length(); }
 
     const csVector3* GetVertices() const { return vertices.GetArray(); }
     const csVector3* GetNormals() const { return normals.GetArray(); }

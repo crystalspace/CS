@@ -828,7 +828,7 @@ void csSector::FireRemoveMesh (iMeshWrapper* mesh)
 
 void csSector::CheckFrustum (iFrustumView *lview)
 {
-  int i = sector_cb_vector.Length ()-1;
+  int i = (int)sector_cb_vector.Length ()-1;
   while (i >= 0)
   {
     iSectorCallback* cb = sector_cb_vector.Get (i);
@@ -983,7 +983,7 @@ int csSectorList::Add (iSector *obj)
   const char* name = obj->QueryObject ()->GetName ();
   if (name)
     sectors_hash.Put (name, obj);
-  return list.Push (obj);
+  return (int)list.Push (obj);
 }
 
 bool csSectorList::Remove (iSector *obj)
@@ -1019,7 +1019,7 @@ void csSectorList::RemoveAll ()
 
 int csSectorList::Find (iSector *obj) const
 {
-  return list.Find (obj);
+  return (int)list.Find (obj);
 }
 
 iSector *csSectorList::FindByName (const char *Name) const

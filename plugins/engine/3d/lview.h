@@ -235,7 +235,7 @@ public:
   /// Get the number of shadows in this list.
   virtual int GetShadowCount ()
   {
-    return shadows.Length ();
+    return (int)shadows.Length ();
   }
 
   /// Get the specified shadow.

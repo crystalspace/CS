@@ -902,7 +902,7 @@ printf ("b\n"); fflush (stdout);
     iPortal* portal;
     csRef<iMeshWrapper> portalMesh = Sys->Engine->CreatePortal (
     	"new_portal", tmov->GetSectors ()->Get (0), csVector3 (0),
-	start_sector, poly.GetVertices (), poly.GetVertexCount (),
+	start_sector, poly.GetVertices (), (int)poly.GetVertexCount (),
 	portal);
     //iPortal* portal = portalPoly->CreatePortal (start_sector);
     portal->GetFlags ().Set (CS_PORTAL_ZFILL);
@@ -933,7 +933,7 @@ printf ("b\n"); fflush (stdout);
       csRef<iMeshWrapper> portalMeshBack = Sys->Engine->CreatePortal (
     	  "new_portal_back", tbmov->GetSectors ()->Get (0), csVector3 (0),
 	  tmov->GetSectors ()->Get (0), polyBack.GetVertices (),
-	  polyBack.GetVertexCount (),
+	  (int)polyBack.GetVertexCount (),
 	  portalBack);
       //iPortal* portalBack = portalPolyBack->CreatePortal (room);
       portalBack->GetFlags ().Set (CS_PORTAL_ZFILL);

@@ -295,7 +295,7 @@ void csSimpleConsole::PutTextV (const char *iText2, va_list args)
 
   putTextLevel++;
 
-  int len;
+  size_t len;
   char *dst;
   const char *src;
   char c;
@@ -481,10 +481,10 @@ void csSimpleConsole::Draw2D (csRect* area)
       cursor[cursorSize] = 0;
 
       char *tmp = csStrNew (Line [LineNumber]);
-      int curx = strlen (tmp);
-      if ((CursorPos >= 0) && (CursorPos < curx))
+      size_t curPosX = strlen (tmp);
+      if ((CursorPos >= 0) && ((size_t)CursorPos < curPosX))
       {
-	size_t tl = strlen (tmp);
+	size_t tl = curPosX;
 	size_t cp = CursorPos;
 	size_t tp = 0;
 	while (cp > 0)
@@ -499,7 +499,7 @@ void csSimpleConsole::Draw2D (csRect* area)
 
       //if ((CursorPos >= 0) && (CursorPos < curx))
       //  tmp [CursorPos] = 0;
-      int temp_h;
+      int temp_h, curx;
       console_font->GetDimensions (tmp, curx, temp_h);
       delete [] tmp;
 

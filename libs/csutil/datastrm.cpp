@@ -20,7 +20,7 @@
 #include "csutil/datastrm.h"
 #include <ctype.h>
 
-csDataStream::csDataStream (void *buf, int n, bool del) :
+csDataStream::csDataStream (void *buf, size_t n, bool del) :
   Data ((uint8*)buf), Position (0), Size (n), DeleteBuffer (del)
 {
 }
@@ -31,17 +31,17 @@ csDataStream::~csDataStream ()
     delete[] Data;
 }
 
-int csDataStream::GetPosition ()
+size_t csDataStream::GetPosition ()
 {
   return Position;
 }
 
-void csDataStream::SetPosition (int pos)
+void csDataStream::SetPosition (size_t pos)
 {
   Position = pos;
 }
 
-int csDataStream::GetLength ()
+size_t csDataStream::GetLength ()
 {
   return Size;
 }
@@ -51,13 +51,13 @@ bool csDataStream::Finished ()
   return (Position == Size);
 }
 
-void csDataStream::Skip (int num)
+void csDataStream::Skip (size_t num)
 {
   Position += num;
   if (Position > Size) Position = Size;
 }
 
-int csDataStream::Read (void *buf, int n)
+size_t csDataStream::Read (void *buf, size_t n)
 {
   if (Position + n > Size)
     n = Size - Position;
@@ -89,13 +89,13 @@ int csDataStream::GetChar ()
 
 int csDataStream::LookChar ()
 {
-  int OldPosition = Position;
+  size_t OldPosition = Position;
   int Result = GetChar ();
   Position = OldPosition;
   return Result;
 }
 
-bool csDataStream::GetString (char* buf, int len, bool OmitNewline)
+bool csDataStream::GetString (char* buf, size_t len, bool OmitNewline)
 {
   // test for EOF
   if (Position == Size) return false;
@@ -113,7 +113,7 @@ bool csDataStream::GetString (char* buf, int len, bool OmitNewline)
   }
 
   // calculate the length of the line including the newline character
-  int LineLen = FirstNewline - String + 1;
+  size_t LineLen = FirstNewline - String + 1;
 
   // truncate buffer length if greater than length of the line
   // (+1 for the null character)

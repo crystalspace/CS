@@ -1312,7 +1312,7 @@ void awsSink::FillGraphicFileList()
   if (GraphicSelectionData.iawscomponent_GraphicFileList != 0 && vfs != 0)
   {
     csRef<iStringArray> files;
-    int length,i;
+    size_t length,i;
     const char *filename;
     iAwsParmList *pl=0;
     pl=wmgr->CreateParmList();

@@ -377,8 +377,8 @@ csTriangle* csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
 
   // Table which keeps information on how the vertices move.
   int* move_table = new int[num];
-  for (i = 0 ; i < (size_t)num ; i++)
-    move_table[i] = i;
+  for (int j = 0 ; j < num ; j++)
+    move_table[j] = j;
 
   // Sort the vertices.
   csTriangleVerticesSorted* sorted = verts->SortVertices ();
@@ -479,8 +479,8 @@ csTriangle* csTriangleMeshLOD::CalculateLODFast (csTriangleMesh* mesh,
 
   // Table which keeps information on how the vertices move.
   int* move_table = new int[num];
-  for (i = 0 ; i < (size_t)num ; i++)
-    move_table[i] = i;
+  for (int j = 0 ; j < num ; j++)
+    move_table[j] = j;
 
   // Sort the vertices.
   csTriangleVerticesSorted* sorted = verts->SortVertices ();

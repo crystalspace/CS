@@ -50,8 +50,8 @@ void CVertexBuffer::AddVertex(CdVector3 Vertex)
 void CVertexBuffer::AddVertices(CMapPolygon* pPoly)
 {
   //Add all vertices of this polygon
-  int  NumPolyVertices = pPoly->GetVertexCount();
-  int i;
+  size_t NumPolyVertices = pPoly->GetVertexCount();
+  size_t i;
   for (i=0; i<NumPolyVertices; i++)
   {
     AddVertex(pPoly->GetVertex(i));
@@ -61,8 +61,8 @@ void CVertexBuffer::AddVertices(CMapPolygon* pPoly)
 void CVertexBuffer::AddVertices(CMapPolygonSet* pPolySet)
 {
   //Add all vertices of all polygons
-  int  NumPolygons = pPolySet->GetPolygonCount();
-  int i;
+  size_t NumPolygons = pPolySet->GetPolygonCount();
+  size_t i;
   for (i=0; i<NumPolygons ; i++)
   {
     AddVertices(pPolySet->GetPolygon(i));
@@ -87,7 +87,7 @@ void CVertexBuffer::AddVertices(CIPortalVector* pPortalVector)
   }
 }
 
-int CVertexBuffer::GetIndex(CdVector3 Vertex) const
+size_t CVertexBuffer::GetIndex(CdVector3 Vertex) const
 {
   //search for the vertex in the buffer
   size_t i;
@@ -101,7 +101,7 @@ int CVertexBuffer::GetIndex(CdVector3 Vertex) const
   }
 
   //index not found
-  return -1;
+  return (size_t)-1;
 }
 
 bool CVertexBuffer::WriteCS(csRef<iDocumentNode> node, CIWorld* pWorld)

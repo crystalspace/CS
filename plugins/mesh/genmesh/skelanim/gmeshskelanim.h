@@ -136,7 +136,7 @@ public:
 	virtual BoneTransformMode GetMode () { return bone_mode; }
 	virtual void SetRigidBody (iRigidBody *r_body) { rigid_body = r_body; }
 	virtual iRigidBody *GetRigidBody () { return rigid_body; }
-	virtual int GetChildrenCount () { return bones.Length () ;}
+	virtual int GetChildrenCount () { return (int)bones.Length () ;}
 	virtual iGenMeshSkeletonBone *GetChild (int i) { return bones[i]; }
 	virtual iGenMeshSkeletonBone *FindChild (const char *name);
 };
@@ -420,7 +420,7 @@ public:
 		const csColor* colors, int num_colors, uint32 version_id);
 
 	// --- For iGenMeshSkeletonControlState
-	virtual int GetBonesCount () { return bones.Length (); }
+	virtual int GetBonesCount () { return (int)bones.Length (); }
 	virtual iGenMeshSkeletonBone *GetBone (int i) { return bones[i]; }
 	virtual iGenMeshSkeletonBone *FindBone (const char *name);
 

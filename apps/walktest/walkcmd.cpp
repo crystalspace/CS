@@ -89,7 +89,7 @@ void SaveRecording (iVFS* vfs, const char* fName)
 {
   csRef<iFile> cf;
   cf = vfs->Open (fName, VFS_FILE_WRITE);
-  int32 l = Sys->recording.Length();
+  uint32 l = (int32)Sys->recording.Length();
   l = csConvertEndian (l);
   cf->Write ((char*)&l, sizeof (l));
   size_t i;
@@ -120,17 +120,19 @@ void SaveRecording (iVFS* vfs, const char* fName)
     }
     else
     {
-      len = strlen (reccam->sector->QueryObject ()->GetName ());
+      size_t _len = strlen (reccam->sector->QueryObject ()->GetName ());
+      len = (_len > 255) ? 255 : (unsigned char)len;
       cf->Write ((char*)&len, 1);
       cf->Write (reccam->sector->QueryObject ()->GetName (),
-      	1+strlen (reccam->sector->QueryObject ()->GetName ()));
+      	1+len);
     }
     prev_sector = reccam->sector;
     if (reccam->cmd)
     {
-      len = strlen (reccam->cmd);
+      size_t _len = strlen (reccam->cmd);
+      len = (_len > 255) ? 255 : (unsigned char)len;
       cf->Write ((char*)&len, 1);
-      cf->Write (reccam->cmd, 1+strlen(reccam->cmd));
+      cf->Write (reccam->cmd, 1+len);
     }
     else
     {
@@ -139,9 +141,10 @@ void SaveRecording (iVFS* vfs, const char* fName)
     }
     if (reccam->arg)
     {
-      len = strlen (reccam->arg);
+      size_t _len = strlen (reccam->arg);
+      len = (_len > 255) ? 255 : (unsigned char)len;
       cf->Write ((char*)&len, 1);
-      cf->Write (reccam->arg, 1+strlen(reccam->arg));
+      cf->Write (reccam->arg, 1+len);
     }
     else
     {

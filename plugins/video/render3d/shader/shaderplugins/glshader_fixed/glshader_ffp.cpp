@@ -406,7 +406,7 @@ void csGLShaderFFP::Activate ()
 {
   for(size_t i = 0; i < texlayers.Length(); ++i)
   {
-    statecache->SetActiveTU (i);
+    statecache->SetActiveTU ((int)i);
     statecache->ActivateTU ();
 
     if (shaderPlug->enableCombine)

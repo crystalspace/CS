@@ -127,7 +127,7 @@ public:
     }
     virtual int GetParticleCount () const
     {
-      return scfParent->GetParticleCount();
+      return (int)scfParent->GetParticleCount();
     }
     virtual void SetParticleSize (float partwidth, float partheight)
     {

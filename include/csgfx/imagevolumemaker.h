@@ -70,7 +70,7 @@ public:
   virtual const void *GetImageData ();
   virtual int GetWidth () const { return Width > 0 ? Width : 0; }
   virtual int GetHeight () const { return Height > 0 ? Height : 0; ; }
-  virtual int GetDepth () const { return Depth + pendingImages.Length(); }
+  virtual int GetDepth () const { return Depth + (int)pendingImages.Length(); }
   /// Set the name of the image.
   virtual void SetName (const char *iName);
   /**

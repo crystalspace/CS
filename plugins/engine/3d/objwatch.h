@@ -71,12 +71,12 @@ public:
 
   virtual void WatchLight (iLight* light);
   virtual void RemoveLight (iLight* light);
-  virtual int GetWatchedLightCount () const { return lights.Length (); }
+  virtual int GetWatchedLightCount () const { return (int)lights.Length (); }
   virtual iLight* GetLight (int idx);
 
   virtual void WatchMovable (iMovable* movable);
   virtual void RemoveMovable (iMovable* movable);
-  virtual int GetWatchedMovableCount () const { return movables.Length (); }
+  virtual int GetWatchedMovableCount () const { return (int)movables.Length (); }
   virtual iMovable* GetMovable (int idx);
 
   virtual void Reset ();

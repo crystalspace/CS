@@ -2,5 +2,6 @@ SubDir TOP plugins documentsystem ;
 
 SubInclude TOP plugins documentsystem binary ;
 SubInclude TOP plugins documentsystem dsplex ;
+#SubInclude TOP plugins documentsystem pattern ;
 SubInclude TOP plugins documentsystem xmlread ;
 SubInclude TOP plugins documentsystem xmltiny ;

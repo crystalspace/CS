@@ -18,6 +18,7 @@
 #include "cssysdef.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/polyclip.h"
+#include "csutil/sysfunc.h"
 
 CS_IMPLEMENT_STATIC_CLASSVAR (csPoly2DFactory, sharedFactory, \
 			      SharedFactory, csPoly2DFactory,())
@@ -345,10 +346,10 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   if (!((vertices[i2] - other[j1]) < EPSILON))
   {
     for (i = 0; i < GetVertexCount (); i++)
-      printf ("  orig %d: %f,%f\n", i, (*this)[i].x, (*this)[i].y);
+      csPrintf ("  orig %d: %f,%f\n", i, (*this)[i].x, (*this)[i].y);
     for (i = 0; i < other.GetVertexCount (); i++)
-      printf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
-    printf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
+      csPrintf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
+    csPrintf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
     CS_ASSERT (false);
   }
 
@@ -379,20 +380,20 @@ void csPoly2D::ExtendConvex (const csPoly2D &other, int i1)
   jp = j2;
   j = (j2 + 1) % other_num;
 
-  int cnt = other_num;
+  size_t cnt = other_num;
   while (pl1.Classify (other[j]) > EPSILON)
   {
     jp = j;
     j = (j + 1) % other_num;
     cnt--;
-    if (cnt < 0)
+    if (cnt == (size_t)-1)
     {
-      printf ("INTERNAL ERROR! Looping forever!\n");
+      csPrintf ("INTERNAL ERROR! Looping forever!\n");
       for (i = 0; i < orig.GetVertexCount (); i++)
-        printf ("  orig %d: %f,%f\n", i, orig[i].x, orig[i].y);
+        csPrintf ("  orig %d: %f,%f\n", i, orig[i].x, orig[i].y);
       for (i = 0; i < other.GetVertexCount (); i++)
-        printf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
-      printf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
+        csPrintf ("  other %d: %f,%f\n", i, other[i].x, other[i].y);
+      csPrintf ("  i1=%d i2=%d j1=%d j2=%d\n", i1, i2, j1, j2);
       CS_ASSERT (false);
     }
   }

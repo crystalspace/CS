@@ -175,8 +175,8 @@ void csReporter::Clear (int severity)
 {
   csScopedMutexLock lock (mutex);
 
-  int i = 0;
-  int len = messages.Length ();
+  size_t i = 0;
+  size_t len = messages.Length ();
   while (i < len)
   {
     csReporterMessage* msg = messages[i];
@@ -195,8 +195,8 @@ void csReporter::Clear (int severity)
 void csReporter::Clear (const char* mask)
 {
   csScopedMutexLock lock (mutex);
-  int i = 0;
-  int len = messages.Length ();
+  size_t i = 0;
+  size_t len = messages.Length ();
   while (i < len)
   {
     csReporterMessage* msg = messages[i];
@@ -237,8 +237,8 @@ void csReporter::AddReporterListener (iReporterListener* listener)
 void csReporter::RemoveReporterListener (iReporterListener* listener)
 {
   csScopedMutexLock lock (mutex);
-  int idx = listeners.Find (listener);
-  if (idx != -1)
+  size_t idx = listeners.Find (listener);
+  if (idx != csArrayItemNotFound)
   {
     listeners.DeleteIndex (idx);
   }
@@ -247,8 +247,8 @@ void csReporter::RemoveReporterListener (iReporterListener* listener)
 bool csReporter::FindReporterListener (iReporterListener* listener)
 {
   csScopedMutexLock lock (mutex);
-  int idx = listeners.Find (listener);
-  return idx != -1;
+  size_t idx = listeners.Find (listener);
+  return idx != csArrayItemNotFound;
 }
 
 csReporterMessage::~csReporterMessage ()

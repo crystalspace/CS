@@ -1086,7 +1086,7 @@ void csPolygon3D::RemovePolyTexture ()
 
 int csPolygon3D::GetPolyIdx () const
 {
-  return thing->polygons.GetIndex (this);
+  return (int)thing->polygons.GetIndex (this);
 }
 
 csPolygon3DStatic* csPolygon3D::GetStaticPoly () const

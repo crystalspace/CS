@@ -439,7 +439,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual int GetPolygonCount () { return static_polygons.Length (); }
+  virtual int GetPolygonCount () { return (int)static_polygons.Length (); }
   virtual void RemovePolygon (int idx);
   virtual void RemovePolygons ();
 
@@ -772,7 +772,7 @@ public:
 
   /// Get the number of polygons in this thing.
   int GetPolygonCount ()
-  { return polygons.Length (); }
+  { return (int)polygons.Length (); }
 
   /// Get the specified polygon from this set.
   csPolygon3DStatic *GetPolygon3DStatic (int idx)

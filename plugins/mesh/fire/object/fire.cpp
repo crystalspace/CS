@@ -83,7 +83,7 @@ void csFireMeshObject::SetupObject ()
     part_pos = new csVector3[number];
     part_speed = new csVector3[number];
     part_age = new float[number];
-    amt = number;
+    amt = (int)number;
 
     float fradius = drop_width * swirl; // guessed radius of the fire
     csVector3 height = total_time * direction; // guessed height
@@ -99,8 +99,8 @@ void csFireMeshObject::SetupObject ()
     radius = csQsqrt (a*a + a*a);
 
     // create particles
-    size_t i;
-    for (i=0 ; i < number ; i++)
+    int i;
+    for (i=0 ; i < (int)number ; i++)
     {
       AppendRectSprite (drop_width, drop_height, mat, lighted_particles);
       GetParticle (i)->SetMixMode (MixMode);
@@ -221,8 +221,8 @@ void csFireMeshObject::Update (csTicks elapsed_time)
 
   float delta_t = elapsed_time / 1000.0f; // in seconds
   // move particles;
-  size_t i;
-  for (i=0 ; i < particles.Length () ; i++)
+  int i;
+  for (i=0 ; i < (int)particles.Length () ; i++)
   {
     MoveAndAge (i, delta_t);
   }

@@ -140,7 +140,7 @@ csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elem
   elementSize = offsets[count];
   csRef<iRenderBuffer> master;
   master.AttachNew (new csRenderBuffer (elementCount * elementSize,
-    type, CS_BUFCOMP_BYTE, elementSize, 0, 0, true));
+    type, CS_BUFCOMP_BYTE, (uint)elementSize, 0, 0, true));
   for (i = 0; i < count; i++)
   {
     const csInterleavedSubBufferOptions& element = elements[i];

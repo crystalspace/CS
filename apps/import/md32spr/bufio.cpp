@@ -20,7 +20,7 @@
 #include <string.h>
 #include "bufio.h"
 
-DataBuffer::DataBuffer(char *d, int sz) 
+DataBuffer::DataBuffer(char *d, size_t sz) 
 {
   data = new char[sz + 2];
   memcpy(data, d, sz);
@@ -29,8 +29,9 @@ DataBuffer::DataBuffer(char *d, int sz)
   buffSize = sz;
   position = 0;
   maxline = 0;
-  while (position < buffSize) {
-    if((strchr((data + position), '\n') - (data + position)) > maxline)
+  while (position < buffSize) 
+  {
+    if((size_t)(strchr((data + position), '\n') - (data + position)) > maxline)
       maxline = strchr((data + position), '\n') - (data + position);
     position++;
   }
@@ -41,7 +42,7 @@ DataBuffer::~DataBuffer()
 {
 }
 
-bool DataBuffer::GetData (char *d, int len) 
+bool DataBuffer::GetData (char *d, size_t len) 
 {
   if(eof())
     return false;
@@ -59,30 +60,35 @@ bool DataBuffer::GetData (char *d, int len)
 
 bool DataBuffer::GetLine(char *line) 
 {
-  int length = 0;
+  size_t length = 0;
   char *ptr;
   if(!eof()) {
-    if((ptr = strchr((data + position), '\n')) != 0) {
+    if((ptr = strchr((data + position), '\n')) != 0) 
+    {
       length = ptr - (data + position);
-    } else {
+    } 
+    else 
+    {
       length = buffSize - position;
     }
     memcpy(line, (data + position), length);
     line[length] ='\0';
     position += length + 1;
     return true;
-  } else {
+  } 
+  else 
+  {
     line = 0;
     return false;
   }
 }
 
-void DataBuffer::SetPosition(int p)
+void DataBuffer::SetPosition(size_t p)
 {
   position = p;
 }
 
-int DataBuffer::GetPosition()
+size_t DataBuffer::GetPosition()
 {
   return position;
 }
@@ -92,19 +98,19 @@ void DataBuffer::ResetPosition()
   position = 0;
 }
 
-int DataBuffer::GetSize()
+size_t DataBuffer::GetSize()
 {
   return buffSize;
 }
 
-void DataBuffer::SetData(char *d, int bSize)
+void DataBuffer::SetData(char *d, size_t bSize)
 {
   data = d;
   buffSize = bSize;
   position = 0;
 }
 
-int DataBuffer::GetMaxLineLength()
+size_t DataBuffer::GetMaxLineLength()
 {
   return maxline;
 }

@@ -122,17 +122,17 @@ void csSpiralMeshObject::RestartParticle (int index, float pre_move)
 
 int csSpiralMeshObject::FindOldest ()
 {
-  int num = GetNumParticles ();
+  int num = (int)GetNumParticles ();
   int part_idx;
   if ((size_t)num >= number)
   {
     part_idx = last_reuse;
-    last_reuse = (last_reuse+1)%number;
+    last_reuse = (last_reuse+1)%(int)number;
   }
   else
   {
     AppendRectSprite (part_width, part_height, mat, false);	// @@@ PARAMETER
-    part_idx = GetNumParticles ()-1;
+    part_idx = (int)GetNumParticles ()-1;
     GetParticle(part_idx)->SetMixMode(MixMode);
   }
   return part_idx;
@@ -156,8 +156,8 @@ void csSpiralMeshObject::Update (csTicks elapsed_time)
   float delta_t = elapsed_time / 1000.0f; // in seconds
 
   // Update position
-  size_t i;
-  for (i=0 ; i < particles.Length () ; i++)
+  int i;
+  for (i=0 ; i < (int)particles.Length () ; i++)
   {
     part_pos[i] += part_speed* delta_t;
     SetPosition (i);

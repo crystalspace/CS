@@ -60,10 +60,10 @@ static int cs_modreader_read (MREADER* mr, void *dest, size_t length)
   memcpy (dest, r->ds.data + r->ds.pos, maxsize);
   r->bEof = r->ds.pos + (long)length > r->ds.length;
 
-  r->ds.pos += maxsize;
+  r->ds.pos += (long)maxsize;
 
   //  printf ("%ld %ld %d\n", r->ds.pos, r->ds.length, length);
-  return maxsize;
+  return (int)maxsize;
 }
 
 static int cs_modreader_get (MREADER* mr)

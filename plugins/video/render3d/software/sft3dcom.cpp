@@ -2904,7 +2904,7 @@ void csSoftwareGraphics3DCommon::OpenPortal (size_t numVertices,
   csClipPortal* cp = new csClipPortal ();
   cp->poly = new csVector2[numVertices];
   memcpy (cp->poly, vertices, numVertices * sizeof (csVector2));
-  cp->num_poly = numVertices;
+  cp->num_poly = (int)numVertices;
   cp->normal = normal;
   clipportal_stack.Push (cp);
   clipportal_dirty = true;

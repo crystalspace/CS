@@ -139,7 +139,7 @@ static void TestDemoFile (const char* zip, iVFS* myVFS, csStringArray& demos)
   if (testpath[strlen (testpath)-1] == '/')
   {
     // We have a directory.
-    int l = strlen (testpath);
+    size_t l = strlen (testpath);
     testpath[l-1] = '$';
     testpath[l] = '/';
     testpath[l+1] = 0;

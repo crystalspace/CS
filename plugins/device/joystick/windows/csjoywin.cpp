@@ -140,7 +140,7 @@ bool csWindowsJoystick::CreateDevice (const DIDEVICEINSTANCE*  pdidInstanc)
   if (device) 
   {
     joydata data;
-    data.number = joystick.Length() + 1; // CS joystick numbers are 1-based.
+    data.number = (int)joystick.Length() + 1; // CS joystick numbers are 1-based.
     caps.dwSize = sizeof (caps);
     data.device = (LPDIRECTINPUTDEVICE2)device;
     data.device->GetCapabilities (&caps);

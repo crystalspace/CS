@@ -52,12 +52,13 @@ CCSWorld::~CCSWorld()
 
 void CCSWorld::FindSectors()
 {
-  int i, j, SectorCounter = 0;
+  size_t j, SectorCounter = 0;
+  size_t i;
 
   //iterate all entities and brushes
   for (i=0; i<m_pMap->GetNumEntities(); i++)
   {
-    CMapEntity* pEntity = m_pMap->GetEntity(i);
+    CMapEntity* pEntity = m_pMap->GetEntity((int)i);
     if (strcmp(pEntity->GetClassname(), "cs_sector")==0)
     {
       //This entity is a sector!
@@ -167,8 +168,8 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap,
   CMapEntity* pEntity = GetWorldspawn();
   
   {
-    int keyNum = pEntity->GetNumberOfKeyValuePairs();
-    for (int i = 0; i < keyNum; i++) {
+    size_t keyNum = pEntity->GetNumberOfKeyValuePairs();
+    for (size_t i = 0; i < keyNum; i++) {
       CMapKeyValuePair*	newPair = pEntity->GetKeyValuePair(i);
       if (strcmp(newPair->GetKey (), "world_scale")==0 
        || strcmp(newPair->GetKey (), "archive")==0
@@ -240,7 +241,7 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap,
 
 CMapEntity* CCSWorld::GetWorldspawn()
 {
-  int i, NumEntities = GetNumEntities();
+  size_t i, NumEntities = GetNumEntities();
   for (i=0; i<NumEntities; i++)
   {
     CMapEntity* pEntity = GetEntity(i);
@@ -469,7 +470,7 @@ void CCSWorld::FindAdditionalTextures()
   // through all entities twice, and it avoids adding some textures multiple
   // times with the same name.)
 
-  int j=0;
+  size_t j=0;
 
   // Look for cs_sprite entities
   for (j=0; j<m_pMap->GetNumEntities(); j++)
@@ -505,7 +506,7 @@ void CCSWorld::FindAdditionalTextures()
 
   //texture for 3D sprites (cs_model)
   //requires models subdir under data. also, need to be added to vfs
-  int NumEntities = GetNumEntities();
+  size_t NumEntities = GetNumEntities();
   for (j=0; j<NumEntities; j++)
   {
     CMapEntity* pEntity = GetEntity(j);
@@ -578,7 +579,7 @@ bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
   DocNode textures = CreateNode (node, "textures");
   DocNode materials = CreateNode (node, "materials");
 
-  int i=0;
+  size_t i=0;
   for (i=0; i<m_pMap->GetTextureManager()->GetTextureCount(); i++)
   {
     CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(i);
@@ -663,7 +664,7 @@ bool CCSWorld::WritePlugins(csRef<iDocumentNode> node)
 
 bool CCSWorld::WritePlayerStart(csRef<iDocumentNode> node)
 {
-  int i;
+  size_t i;
 
   //iterate all entities, brushes, polygons and vertices:
   for (i=0; i<m_pMap->GetNumEntities(); i++)
@@ -838,7 +839,7 @@ bool CCSWorld::WriteVector(csRef<iDocumentNode> node, const char* name,
 
 bool CCSWorld::WriteCurvetemplates(csRef<iDocumentNode> node)
 {
-  int i, c;
+  size_t i, c;
   for (i=0; i<m_pMap->GetNumEntities(); i++)
   {
     CMapEntity* pEntity = m_pMap->GetEntity(i);
@@ -890,7 +891,7 @@ bool CCSWorld::WriteKeys(csRef<iDocumentNode> node, CIWorld* pWorld,
 {
   if (pEntity)
   {
-    int i;
+    size_t i;
     for (i=0; i<pEntity->GetNumberOfKeyValuePairs(); i++)
     {
       CMapKeyValuePair* pKV = pEntity->GetKeyValuePair(i);
@@ -931,7 +932,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
 {
   const CMapTexturedPlane* pPlane   = pPolygon->GetBaseplane();
   CMapEntity*              pEntity  = pPolygon->GetEntity();
-  int l;
+  size_t l;
 
   DocNode poly = CreateNode (node, "p");
   if (SectorPolygon)
@@ -941,7 +942,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
     //backface culling in the engine.
     for (l=pPolygon->GetVertexCount()-1; l>=0; l--)
     {
-      CreateNode (poly, "v", Vb.GetIndex(pPolygon->GetVertex(l)));
+      CreateNode (poly, "v", (int)Vb.GetIndex(pPolygon->GetVertex(l)));
     }
   }
   else
@@ -949,7 +950,7 @@ bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon,
     //regular vertex order
     for (l=0; l<pPolygon->GetVertexCount(); l++)
     {
-      CreateNode (poly, "v", Vb.GetIndex(pPolygon->GetVertex(l)));
+      CreateNode (poly, "v", (int)Vb.GetIndex(pPolygon->GetVertex(l)));
     }
   }
 
@@ -1040,7 +1041,7 @@ CISector* CCSWorld::CreateNewSector(CMapBrush* pBrush)
 
 void CCSWorld::WriteSpritesTemplate(csRef<iDocumentNode> node)
 {
-  int i;
+  size_t i;
   char   mdlname[99] = "none";
   char   action[99] = "none";
 
@@ -1221,9 +1222,9 @@ void CCSWorld::WriteScriptsTemplate(csRef<iDocumentNode> node)
 //add filename.zip to vfs in lib/sounds
 void CCSWorld::WriteSounds(csRef<iDocumentNode> node)
 {
-  int i;
+  size_t i;
   char sfname[99] = "none";
-  int found = 0;
+  size_t found = 0;
   //iterate all entities, brushes, polygons and vertices:
   for (i=0; i<m_pMap->GetNumEntities(); i++)
   {

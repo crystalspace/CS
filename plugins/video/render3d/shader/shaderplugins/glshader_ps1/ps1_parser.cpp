@@ -86,15 +86,15 @@ csPixelShaderParser::~csPixelShaderParser ()
 int csPixelShaderParser::GetArguments (const csString &str, csString &dest,
   csString &src1, csString &src2, csString &src3, csString &src4)
 {
-  int start = str.FindFirst (' ');
-  if(start < 0) return 0;
+  size_t start = str.FindFirst (' ');
+  if (start == (size_t)-1) return 0;
 
   int argument = 0;
-  int len = str.Length ();
+  size_t len = str.Length ();
   while(argument < 5 && start < len)
   {
-    int end = str.FindFirst (',', start + 1);
-    if(end < 0) end = str.Length ();
+    size_t end = str.FindFirst (',', start + 1);
+    if(end == (size_t)-1) end = str.Length ();
     if(end - start < 1) break;;
 
     csString reg;
@@ -186,8 +186,8 @@ bool csPixelShaderParser::GetInstruction (const char *str,
   csString line (str);
   line.Downcase ();
 
-  int comment = line.FindFirst ('/');
-  if(comment >= 0 && line.GetAt (comment + 1) == '/')
+  size_t comment = line.FindFirst ('/');
+  if(comment != (size_t)-1 && line.GetAt (comment + 1) == '/')
     line.Truncate (comment);
   comment = line.FindFirst (';');
   if(comment >= 0) line.Truncate (comment);
@@ -237,8 +237,8 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     return true;
   }
 
-  int mod_pos = istr.FindFirst ('_');
-  if(mod_pos >= 0)
+  size_t mod_pos = istr.FindFirst ('_');
+  if(mod_pos != (size_t)-1)
   {
     csString unmod;
     istr.SubString (unmod, 0, mod_pos);
@@ -381,7 +381,7 @@ bool csPixelShaderParser::ParseProgram (iDataBuffer* program)
   // Trim any leading/trailing blank lines
   prog.Trim ();
 
-  int len = prog.Length ();
+  size_t len = prog.Length ();
 
   if (len == 0)
   {

@@ -454,7 +454,7 @@ void csGLTextureHandle::CreateMipMaps()
     for (i=0; i < subImageCount; i++)
     {
       transform (!textureSettings->forceDecompress, targetFormat, 
-	image->GetSubImage (i), 0, i);
+	image->GetSubImage ((uint)i), 0, (int)i);
     }
   }
   else
@@ -474,8 +474,8 @@ void csGLTextureHandle::CreateMipMaps()
     {
       int nTex = 0;
       int nMip = 0;
-      csRef<iImage> thisImage = image->GetSubImage (i); 
-      int nMipmaps = image->GetSubImage (i)->HasMipmaps();
+      csRef<iImage> thisImage = image->GetSubImage ((uint)i); 
+      int nMipmaps = image->GetSubImage ((uint)i)->HasMipmaps();
 
       do
       {
@@ -484,7 +484,7 @@ void csGLTextureHandle::CreateMipMaps()
 
 	if ((mipskip == 0) || ((w == 1) && (h == 1)))
 	  transform (!textureSettings->forceDecompress, targetFormat, 
-	  thisImage, nTex++, i);
+	  thisImage, nTex++, (int)i);
 
 	if ((w == 1) && (h == 1)) break;
 
@@ -493,7 +493,7 @@ void csGLTextureHandle::CreateMipMaps()
 	bool precompMip = false;
 	if (nMipmaps != 0)
 	{
-	  cimg = image->GetSubImage (i)->GetMipmap (nMip);
+	  cimg = image->GetSubImage ((uint)i)->GetMipmap (nMip);
 	  nMipmaps--;
 	  precompMip = true;
 	}
@@ -722,7 +722,7 @@ void csGLTextureHandle::Load ()
       {
 	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_2D, uploadData.mip, 
 	  uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  0, uploadData.compressedSize, uploadData.image_data);
+	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {
@@ -760,7 +760,8 @@ void csGLTextureHandle::Load ()
       {
 	G3D->ext->glCompressedTexImage3DARB (GL_TEXTURE_3D, uploadData.mip, 
 	  uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  uploadData.d, 0, uploadData.compressedSize, uploadData.image_data);
+	  uploadData.d, 0, (GLsizei)uploadData.compressedSize, 
+	  uploadData.image_data);
       }
       else
       {
@@ -805,7 +806,7 @@ void csGLTextureHandle::Load ()
 	  GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
 	  uploadData.mip, 
 	  uploadData.targetFormat, uploadData.w, uploadData.h, 
-	  0, uploadData.compressedSize, uploadData.image_data);
+	  0, (GLsizei)uploadData.compressedSize, uploadData.image_data);
       }
       else
       {

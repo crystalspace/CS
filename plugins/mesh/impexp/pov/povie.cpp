@@ -41,9 +41,9 @@ public:
   virtual ~csModelConverterPOV ();
 
   bool Initialize (iObjectRegistry *object_reg);
-  virtual int GetFormatCount();
-  virtual const csModelConverterFormat *GetFormat(int idx);
-  virtual csPtr<iModelData> Load(uint8* Buffer, uint32 size);
+  virtual size_t GetFormatCount();
+  virtual const csModelConverterFormat *GetFormat(size_t idx);
+  virtual csPtr<iModelData> Load(uint8* Buffer, size_t size);
   virtual csPtr<iDataBuffer> Save(iModelData*, const char *format);
 
   struct Component : public iComponent
@@ -91,12 +91,12 @@ bool csModelConverterPOV::Initialize (iObjectRegistry *)
   return true;
 }
 
-int csModelConverterPOV::GetFormatCount ()
+size_t csModelConverterPOV::GetFormatCount ()
 {
   return 1;
 }
 
-const csModelConverterFormat *csModelConverterPOV::GetFormat (int idx)
+const csModelConverterFormat *csModelConverterPOV::GetFormat (size_t idx)
 {
   return (idx == 0) ? &FormatInfo : 0;
 }
@@ -114,7 +114,7 @@ static void WriteVertex (csString &out, iModelDataVertices *Vertices,
 }
 
 csPtr<iModelData> csModelConverterPOV::Load (uint8 * /*Buffer*/,
-					     uint32 /*Size*/)
+					     size_t /*Size*/)
 {
   return 0;
 }
@@ -270,7 +270,7 @@ csPtr<iDataBuffer> csModelConverterPOV::Save (iModelData *Data,
     out << "}\n";
   }
 
-  int Length = out.Length () + 1;
+  int Length = (int)out.Length () + 1;
   char *FileData = out.Detach ();
   return csPtr<iDataBuffer> (new csDataBuffer (FileData, Length));
 }

@@ -483,12 +483,12 @@ int csGLGraphics3D::SetupClipPlanes (bool add_clipper,
     CalculateFrustum ();
     csPlane3 pl;
     int i1;
-    i1 = frustum.GetVertexCount ()-1;
+    i1 = (int)frustum.GetVertexCount ()-1;
 
     int maxfrustplanes = 6;
     if (add_near_clip) maxfrustplanes--;
     if (add_z_clip) maxfrustplanes--;
-    int numfrustplanes = frustum.GetVertexCount ();
+    int numfrustplanes = (int)frustum.GetVertexCount ();
     // Correct for broken stencil implementation.
     if (numfrustplanes > maxfrustplanes)
       numfrustplanes = maxfrustplanes;
@@ -1418,7 +1418,7 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
     if (data != (void*)-1) 
     {
       statecache->SetVertexPointer (buffer->GetComponentCount (),
-        compType, buffer->GetStride (), data);
+        compType, (GLsizei)buffer->GetStride (), data);
       statecache->Enable_GL_VERTEX_ARRAY ();
     }
   }
@@ -1438,7 +1438,7 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
     if (data != (void*)-1) 
     {
       statecache->SetNormalPointer (compType, 
-        buffer->GetStride(), data);
+        (GLsizei)buffer->GetStride(), data);
       statecache->Enable_GL_NORMAL_ARRAY ();
     }
   }
@@ -1458,7 +1458,7 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
     if (data != (void*)-1) 
     {
       statecache->SetColorPointer (buffer->GetComponentCount(),
-        compType, buffer->GetStride (), data);
+        compType, (GLsizei)buffer->GetStride (), data);
       statecache->Enable_GL_COLOR_ARRAY ();
     }
   }
@@ -1482,7 +1482,7 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
         statecache->SetActiveTU (0);
       }
       statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-        compType, buffer->GetStride (), data);
+        compType, (GLsizei)buffer->GetStride (), data);
       statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
     }
   }
@@ -1512,7 +1512,7 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
         {
           statecache->SetActiveTU (i);
           statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-            compType, buffer->GetStride (), data);
+            compType, (GLsizei)buffer->GetStride (), data);
           statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
         }
       }
@@ -1553,16 +1553,17 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
     case CS_VATTRIB_POSITION:
       statecache->Enable_GL_VERTEX_ARRAY ();
       statecache->SetVertexPointer (buffer->GetComponentCount (),
-        compType, buffer->GetStride (), data);
+        compType, (GLsizei)buffer->GetStride (), data);
       break;
     case CS_VATTRIB_NORMAL:
       statecache->Enable_GL_NORMAL_ARRAY ();
-      statecache->SetNormalPointer (compType,buffer->GetStride (), data);
+      statecache->SetNormalPointer (compType, (GLsizei)buffer->GetStride (), 
+	data);
       break;
     case CS_VATTRIB_COLOR:
       statecache->Enable_GL_COLOR_ARRAY ();
       statecache->SetColorPointer (buffer->GetComponentCount (),
-        compType, buffer->GetStride (), data);
+        compType, (GLsizei)buffer->GetStride (), data);
       break;
     default:
       if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
@@ -1575,13 +1576,13 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
         } 
         statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
         statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-          compType, buffer->GetStride (), data);
+          compType, (GLsizei)buffer->GetStride (), data);
       }
       else if (CS_VATTRIB_IS_GENERIC(att) && ext->glEnableVertexAttribArrayARB)
       {
         ext->glEnableVertexAttribArrayARB (att);
         ext->glVertexAttribPointerARB(att, buffer->GetComponentCount (),
-          compType, false, buffer->GetStride (), data);
+          compType, false, (GLsizei)buffer->GetStride (), data);
       }
       else
       {
@@ -1979,8 +1980,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     if ((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
       alpha = (float)(mixmode & CS_FX_MASK_ALPHA) / 255.0f;
     glColor4f (1.0f, 1.0f, 1.0f, alpha);
-    glDrawRangeElements (primitivetype, iIndexbuf->GetRangeStart(), 
-      iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
+    glDrawRangeElements (primitivetype, (GLuint)iIndexbuf->GetRangeStart(), 
+      (GLuint)iIndexbuf->GetRangeEnd(), mymesh->indexend - mymesh->indexstart,
       compType, 
       ((uint8*)bufData) + (indexCompsBytes * mymesh->indexstart));
     //indexbuf->Release();
@@ -2169,7 +2170,7 @@ void csGLGraphics3D::OpenPortal (size_t numVertices,
   csClipPortal* cp = new csClipPortal ();
   cp->poly = new csVector2[numVertices];
   memcpy (cp->poly, vertices, numVertices * sizeof (csVector2));
-  cp->num_poly = numVertices;
+  cp->num_poly = (int)numVertices;
   cp->normal = normal;
   clipportal_stack.Push (cp);
   clipportal_dirty = true;

@@ -55,8 +55,8 @@ SCF_IMPLEMENT_FACTORY (csPNGImageIO);
 
 struct datastore{
   unsigned char *data;
-  long pos;
-  long length;
+  size_t pos;
+  size_t length;
 
   datastore () { data = 0; pos = 0; length = 0; }
   ~datastore () { free (data); }
@@ -406,7 +406,7 @@ bool ImagePngFile::PngLoader::InitOk ()
   const png_bytep iBuffer = dataSource->GetUint8();
   const size_t iSize = dataSource->GetSize();
 
-  if (!png_check_sig (iBuffer, iSize))
+  if (!png_check_sig (iBuffer, (int)iSize))
     return false;
   png = png_create_read_struct (PNG_LIBPNG_VER_STRING, 0, 0, 0);
   if (!png)

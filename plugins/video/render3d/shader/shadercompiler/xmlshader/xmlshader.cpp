@@ -43,12 +43,12 @@ CS_IMPLEMENT_PLUGIN
 
 iRenderBuffer* csXMLShaderTech::last_buffers[shaderPass::STREAMMAX*2];
 iRenderBuffer* csXMLShaderTech::clear_buffers[shaderPass::STREAMMAX*2];
-int csXMLShaderTech::lastBufferCount;
+size_t csXMLShaderTech::lastBufferCount;
 
 iTextureHandle* csXMLShaderTech::last_textures[shaderPass::TEXTUREMAX];
 iTextureHandle* csXMLShaderTech::clear_textures[shaderPass::TEXTUREMAX];
 int csXMLShaderTech::textureUnits[shaderPass::TEXTUREMAX];
-int csXMLShaderTech::lastTexturesCount;
+size_t csXMLShaderTech::lastTexturesCount;
 
 csXMLShaderTech::csXMLShaderTech (csXMLShader* parent) : 
   passes(0), passesCount(0), currentPass(~0),
@@ -619,11 +619,11 @@ bool csXMLShaderTech::DeactivatePass ()
   iGraphics3D* g3d = parent->g3d;
 /*  g3d->SetBufferState(thispass->vertexattributes, clear_buffers, 
     lastBufferCount);*/
-  g3d->DeactivateBuffers (thispass->custommaping_attrib.GetArray (), lastBufferCount);
+  g3d->DeactivateBuffers (thispass->custommaping_attrib.GetArray (), (int)lastBufferCount);
   lastBufferCount=0;
 
   g3d->SetTextureState(textureUnits, clear_textures, 
-    lastTexturesCount);
+    (int)lastTexturesCount);
   lastTexturesCount=0;
   
   if (thispass->overrideZmode)
@@ -665,7 +665,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   }
   g3d->ActivateBuffers (mesh->buffers, thispass->defaultMappings);
   g3d->ActivateBuffers (thispass->custommaping_attrib.GetArray (), last_buffers, 
-    thispass->custommaping_attrib.Length ());
+    (uint)thispass->custommaping_attrib.Length ());
   lastBufferCount = thispass->custommaping_attrib.Length ();
   
   //and the textures

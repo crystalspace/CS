@@ -137,7 +137,7 @@ unsigned long awsSink::GetTriggerID (const char *_name)
   {
     TriggerMap *tm = triggers[i];
     if (tm->name == name)
-      return i;
+      return (unsigned long)i;
   }
 
   sink_err = AWS_ERR_SINK_TRIGGER_NOT_FOUND;

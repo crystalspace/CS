@@ -394,7 +394,7 @@ public:
 
   /// Get the number of curves in this thing.
   int GetCurveCount () const
-  { return curves.Length (); }
+  { return (int)curves.Length (); }
 
   /// Get the specified curve from this set.
   csCurve* GetCurve (int idx) const

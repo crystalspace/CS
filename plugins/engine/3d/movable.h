@@ -47,7 +47,7 @@ public:
 
   bool PrepareSector (iSector* item);
 
-  virtual int GetCount () const { return Length (); }
+  virtual int GetCount () const { return (int)Length (); }
   virtual iSector *Get (int n) const { return (*this)[n]; }
   virtual int Add (iSector *obj);
   virtual bool Remove (iSector *obj);

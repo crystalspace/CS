@@ -110,7 +110,7 @@ static void trimwhite (char*& s)
   skipspc(s);
   if (s != 0)
   {
-    int n = strlen(s);
+    size_t n = strlen(s);
     while (n-- > 0)
       if (isspace (s[n]))
         s[n] = '\0';
@@ -300,7 +300,7 @@ static void cmd_ls (char *args)
       }
       else
       {
-        int dirlen = strlen (fname);
+        size_t dirlen = strlen (fname);
         if (dirlen)
           dirlen--;
         while (dirlen && fname [dirlen - 1] != VFS_PATH_SEPARATOR)
@@ -339,7 +339,7 @@ static void cmd_cp (char *args)
 
     if (fl->Length () > 1)
     {
-      int dirlen = strlen (src);
+      size_t dirlen = strlen (src);
       if (dirlen)
         dirlen--;
       while (dirlen && src [dirlen - 1] != VFS_PATH_SEPARATOR)

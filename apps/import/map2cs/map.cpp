@@ -188,7 +188,7 @@ CMapTexturedPlane* CMapFile::AddPlane(CdVector3 v1, CdVector3 v2, CdVector3 v3,
 CMapTexturedPlane* CMapFile::AddPlane(CMapTexturedPlane* pNewPlane)
 {
   //first we look in m_Planes to check, if a similar plane is already stored.
-  int i, NumPlanes = m_Planes.Length();
+  size_t i, NumPlanes = m_Planes.Length();
   for (i=0; i<NumPlanes; i++)
   {
     CMapTexturedPlane* pPlane = m_Planes[i];
@@ -235,10 +235,10 @@ void CMapFile::GetMapSize(CdVector3& Min, CdVector3& Max)
   Max = CdVector3(0,0,0);
 
   //iterate all entities, brushes, polygons and vertices:
-  int i;
+  size_t i;
   for (i=0; i<GetNumEntities(); i++)
   {
-    CMapEntity* pEntity = GetEntity(i);
+    CMapEntity* pEntity = GetEntity((int)i);
 
     // First take care of the "origin" of entities, because otherwise
     // in very open maps, we might miss some lights.
@@ -269,7 +269,7 @@ void CMapFile::GetMapSize(CdVector3& Min, CdVector3& Max)
       }
     }
 
-	int j, k, l;
+    size_t j, k, l;
     for (j=0; j<pEntity->GetNumBrushes(); j++)
     {
       CMapBrush* pBrush = pEntity->GetBrush(j);

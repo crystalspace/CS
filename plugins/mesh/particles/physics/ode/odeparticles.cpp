@@ -164,7 +164,7 @@ void csODEParticlePhysics::Execute (float stepsize)
     float newdead = po.dead_particles - po.new_particles;
     if (newdead < po.data.Length() * 0.3)
     {
-      int oldlen = po.data.Length ();
+      int oldlen = (int)po.data.Length ();
       int newlen = (oldlen > (int)po.new_particles) ?
         oldlen : (int)po.new_particles;
       newlen <<= 1;
@@ -182,14 +182,14 @@ void csODEParticlePhysics::Execute (float stepsize)
     }
     else if (newdead > po.data.Length () * 0.7 && po.data.Length() > 1)
     {
-      int oldlen = po.data.Length ();
+      int oldlen = (int)po.data.Length ();
       int newlen = oldlen >> 1;
       po.data.Truncate (newlen);
       po.bodies.Truncate (newlen);
       po.dead_particles -= oldlen - newlen;
     }
 
-    int dead_offset = po.data.Length () - po.dead_particles;
+    int dead_offset = (int)po.data.Length () - po.dead_particles;
     
     csVector3 emitter;
     po.particles->GetEmitPosition (emitter);

@@ -123,19 +123,19 @@ public:
   CTextureFile* GetTexture(const char* TextureName);
 
   /// Get the number of all contained entities
-  int         GetNumEntities()     {return m_Entities.Length();}
+  size_t         GetNumEntities()     {return m_Entities.Length();}
 
   /// Get the specified entity
-  CMapEntity* GetEntity(int index) {return m_Entities.Get(index);}
+  CMapEntity* GetEntity(size_t index) {return m_Entities.Get(index);}
 
   /// Get the number of the contained planes
-  int                GetPlaneCount()      {return m_Planes.Length();}
+  size_t         GetPlaneCount()      {return m_Planes.Length();}
 
   /// Get the specified plane
-  CMapTexturedPlane* GetPlane(int index) {return m_Planes.Get(index);}
+  CMapTexturedPlane* GetPlane(size_t index) {return m_Planes.Get(index);}
 
   /// Get the total number of brushes in this map
-  int GetNumBrushes() {return m_NumBrushes;}
+  size_t GetNumBrushes() {return m_NumBrushes;}
 
   /// Get a pointer to the Config File
   csConfigFile* GetConfigFile() {return m_pConfigFile;}
@@ -201,7 +201,7 @@ protected:
   char* m_IniFilename;
 
   /// For statistics: How many Brushes are in this map.
-  int m_NumBrushes;
+  size_t m_NumBrushes;
 };
 
 #endif // __MAP_H__

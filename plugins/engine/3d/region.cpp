@@ -449,7 +449,7 @@ csRegionList::~csRegionList()
 
 int csRegionList::RegionList::GetCount () const
 {
-  return scfParent->Length ();
+  return (int)scfParent->Length ();
 }
 
 iRegion *csRegionList::RegionList::Get (int n) const
@@ -459,7 +459,7 @@ iRegion *csRegionList::RegionList::Get (int n) const
 
 int csRegionList::RegionList::Add (iRegion *obj)
 {
-  return scfParent->Push (obj);
+  return (int)scfParent->Push (obj);
 }
 
 bool csRegionList::RegionList::Remove (iRegion *obj)
@@ -479,7 +479,7 @@ void csRegionList::RegionList::RemoveAll ()
 
 int csRegionList::RegionList::Find (iRegion *obj) const
 {
-  return scfParent->Find (obj);
+  return (int)scfParent->Find (obj);
 }
 
 iRegion *csRegionList::RegionList::FindByName (const char *Name) const

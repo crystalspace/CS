@@ -83,7 +83,7 @@ int* csPortal::GetVertexIndices () const
 
 int csPortal::GetVertexIndicesCount () const
 {
-  return vertex_indices.Length ();
+  return (int)vertex_indices.Length ();
 }
 
 bool csPortal::CompleteSector (iBase *context)
@@ -94,7 +94,7 @@ bool csPortal::CompleteSector (iBase *context)
     int i;
     // Callback are traversed in reverse order so that they can safely
     // delete themselves.
-    i = portal_cb_vector.Length ()-1;
+    i = (int)portal_cb_vector.Length ()-1;
     while (i >= 0)
     {
       iPortalCallback* cb = portal_cb_vector[i];
@@ -109,7 +109,7 @@ bool csPortal::CompleteSector (iBase *context)
     bool rc = false;
     // Callback are traversed in reverse order so that they can safely
     // delete themselves.
-    int i = sector_cb_vector.Length ()-1;
+    int i = (int)sector_cb_vector.Length ()-1;
     while (i >= 0)
     {
       iPortalCallback* cb = sector_cb_vector[i];
@@ -283,7 +283,7 @@ void csPortal::CastShadows (iMovable* movable, iFrustumView* fview)
 
   // @@@ Check if this isn't a memory leak.
   new_ctxt->SetNewLightFrustum (light_frustum->Intersect (
-      poly, num_vertices));
+      poly, (int)num_vertices));
   if (new_ctxt->GetLightFrustum ())
   {
     CheckFrustum (fview, movable->GetTransform (), 0);

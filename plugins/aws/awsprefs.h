@@ -408,7 +408,7 @@ public:
   iAwsKey* GetAt (int i) const { return children[i]; }
 
   /// Returns number of childrens.
-  int Length () const { return children.Length (); }
+  int Length () const { return (int)children.Length (); }
     
   /// Removes an item from the container.
   void Remove (iString *name);

@@ -53,7 +53,12 @@ public:
   {return Frames.Length();}
   /// get total length of animation (all delays added together)
   inline csTicks GetLength() const
-  {return (GetFrameCount()==0)?0:FinishTimes[GetFrameCount()-1];}
+  { 
+    if (GetFrameCount() == 0)
+      return 0;
+    else
+      return (csTicks)(FinishTimes.Get (GetFrameCount()-1)); 
+  }
   /// add a frame. (giving the length of this frame)
   inline void AddFrame(csTicks Delay, csPixmap *s)
   {FinishTimes.Push(GetLength() + Delay); Frames.Push (s);}

@@ -62,9 +62,9 @@ public:
   CMapPolygonSet& operator=(const CMapPolygonSet& Other);
 
   /// Returns the number of polygons, this set is made of
-  int GetPolygonCount() {return m_Polygon.Length();}
+  size_t GetPolygonCount() {return m_Polygon.Length();}
 
-  CMapPolygon* GetPolygon(int index) {return m_Polygon[index];}
+  CMapPolygon* GetPolygon(size_t index) {return m_Polygon[index];}
 
   /**
     * Adds the polygons contained in the other set to this set.

@@ -30,7 +30,7 @@
 void CMapBrushBoundingBox::Extend(CMapPolygon* pPoly)
 {
   assert(pPoly);
-  int i;
+  size_t i;
   for (i=0; i<pPoly->GetVertexCount(); i++)
   {
     CdVector3 v = pPoly->GetVertex(i);
@@ -288,8 +288,8 @@ bool CMapBrush::ReadVector(CMapParser* pParser, CdVector3& v)
 void CMapBrush::CreatePolygons()
 {
   CMapPolygon* pPoly = new CMapPolygon;
-  int NumPlanes = m_Planes.Length();
-  int i;
+  size_t NumPlanes = m_Planes.Length();
+  size_t i;
   for (i = 0; i<NumPlanes; i++)
   {
     pPoly->SetErrorInfo(m_Line, i);
@@ -307,7 +307,7 @@ void CMapBrush::CreatePolygons()
 
 bool CMapBrush::IsInside(CdVector3& v)
 {
-  int k, NumPlanes = m_Planes.Length();
+  size_t k, NumPlanes = m_Planes.Length();
   for (k=0; k<NumPlanes; k++)
   {
     CMapTexturedPlane* pPlane = m_Planes[k];
@@ -331,7 +331,7 @@ void CMapBrush::IntersectWithPlane(CMapTexturedPlane* pIntersectplane,
 
 bool CMapBrush::IsVisible()
 {
-  int k, NumPlanes = m_Planes.Length();
+  size_t k, NumPlanes = m_Planes.Length();
   for (k=0; k<NumPlanes; k++)
   {
     CMapTexturedPlane* pPlane = m_Planes[k];

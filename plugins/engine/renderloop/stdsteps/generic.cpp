@@ -184,7 +184,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
                                         iShader* shader, size_t ticket,
 					iShaderVariableContext** meshContexts,
                                         csRenderMesh** meshes, 
-                                        int num,
+                                        size_t num,
                                         csShaderVarStack& stacks)
 {
   if (num == 0) return;
@@ -202,7 +202,7 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
   {
     shader->ActivatePass (ticket, p);
 
-    int j;
+    size_t j;
     for (j = 0; j < num; j++)
     {
       csRenderMesh* mesh = meshes[j];
@@ -287,7 +287,7 @@ class ShaderTicketHelper
 private:
   csShaderVarStack& stacks;
   const csArray<csShaderVariableContext>& shadervars;
-  int shadervars_idx;
+  size_t shadervars_idx;
   //csShaderVariableContext& shadervars;
 
   iMaterial* lastMat;
@@ -303,7 +303,7 @@ private:
 public:
   ShaderTicketHelper (csShaderVarStack& Stacks,
     const csArray<csShaderVariableContext>& sv,
-    int sv_idx) :
+    size_t sv_idx) :
     	stacks (Stacks), 
     	shadervars (sv),
 	shadervars_idx (sv_idx)
@@ -382,7 +382,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   iShaderVariableContext** sameShaderMeshSvcs = mesh_svc.GetArray ()
   	+ visible_meshes_index;
   int prev_visible_meshes_index = visible_meshes_index;
-  visible_meshes_index += num;
+  visible_meshes_index += (int)num;
   meshlist->GetSortedMeshes (sameShaderMeshes, imeshes_scratch.GetArray());
   for (size_t i = 0; i < num; i++)
     sameShaderMeshSvcs[i] = imeshes_scratch[i]->GetSVContext();

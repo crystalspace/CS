@@ -211,8 +211,8 @@ void csGLVBOBufferManager::Precache (iRenderBuffer *buffer,
   ActivateVBOSlot (slot);
 
   void* bufferData = buffer->Lock (CS_BUF_LOCK_READ);
-  ext->glBufferSubDataARB (slot->vboTarget, slot->offset, 
-    buffer->GetSize(), bufferData);
+  ext->glBufferSubDataARB (slot->vboTarget, (GLsizei)slot->offset, 
+    (GLsizei)buffer->GetSize(), bufferData);
   buffer->Release ();
 
   slot->lastCachedVersion = buffer->GetVersion();
@@ -251,7 +251,7 @@ GLuint csGLVBOBufferManager::AllocateVBOBuffer (size_t size, bool ib)
   GLenum usage = ib ? GL_ELEMENT_ARRAY_BUFFER_ARB : GL_ARRAY_BUFFER_ARB;
   ext->glGenBuffersARB (1, &vboid);
   ext->glBindBufferARB (usage, vboid);
-  ext->glBufferDataARB (usage, size, 0, GL_DYNAMIC_DRAW_ARB);
+  ext->glBufferDataARB (usage, (GLsizei)size, 0, GL_DYNAMIC_DRAW_ARB);
   ext->glBindBufferARB (usage, 0);
   return vboid;
 }
@@ -380,13 +380,13 @@ void csGLVBOBufferManager::csGLVBOBuffer::Setup (GLenum usage,
   vboTarget = usage;
 
   //round to lower 4mb boundary (for simplicity)
-  unsigned int numBlocks = (totalSize/(8*1024*1024)); //number of 8Mb chunks to use
+  unsigned int numBlocks = ((uint)totalSize/(8*1024*1024)); //number of 8Mb chunks to use
   if (numBlocks == 0) numBlocks = 1;
   size = numBlocks * (8*1024*1024);
 
   ext->glGenBuffersARB (1, &vboID);
   ext->glBindBufferARB (usage, vboID);
-  ext->glBufferDataARB (usage, size, 0, GL_DYNAMIC_DRAW_ARB);
+  ext->glBufferDataARB (usage, (GLsizei)size, 0, GL_DYNAMIC_DRAW_ARB);
   ext->glBindBufferARB (usage, 0);
 
   //setup initial layout like below

@@ -91,18 +91,18 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
     for (i = lights->GetCount (); i-- > 0;)
       // Tell the engine to try to add this light into the halo queue
       engine->AddHalo (rview->GetCamera(), 
-        ((csLight::Light*)lights->Get (i))->GetPrivateObject ());
+        ((csLight::Light*)lights->Get ((int)i))->GetPrivateObject ());
   }
 }
 
 int csRenderLoop::AddStep (iRenderStep* step)
 {
-  return steps.Push (step);
+  return (int)steps.Push (step);
 }
 
 int csRenderLoop::GetStepCount ()
 {
-  return steps.Length();
+  return (int)steps.Length();
 }
 
 //---------------------------------------------------------------------------

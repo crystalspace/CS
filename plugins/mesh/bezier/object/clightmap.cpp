@@ -53,7 +53,7 @@ void csCurveShadowMap::Alloc (iLight *l, int w, int h)
 void csCurveShadowMap::CalcMaxShadow()
 {
   max_shadow=0;
-  int len = Length ();
+  int len = (int)Length ();
   for (int i=0; i<len; i++)
     if (GetArray()[i] > max_shadow)
       max_shadow = GetArray()[i];

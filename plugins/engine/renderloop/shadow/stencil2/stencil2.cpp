@@ -101,8 +101,8 @@ csStencil2ShadowCacheEntry::~csStencil2ShadowCacheEntry ()
 void csStencil2ShadowCacheEntry::UpdateRenderBuffers(csArray<csVector3> & shadow_vertices,
                                                      csArray<int> & shadow_indeces)
 {
-  int vertex_count = shadow_vertices.Length();
-  int index_count = shadow_indeces.Length();
+  int vertex_count = (int)shadow_vertices.Length();
+  int index_count = (int)shadow_indeces.Length();
 
   shadow_vertex_buffer = csRenderBuffer::CreateRenderBuffer (
     vertex_count, CS_BUF_DYNAMIC,
@@ -187,18 +187,18 @@ bool csStencil2ShadowCacheEntry::CalculateEdges()
   {
     for (j = 0; j < tri_count ; j++)
     {
-      if (vertices[triangles[j].a] == vertices[i]) triangles[j].a = i;
-      if (vertices[triangles[j].b] == vertices[i]) triangles[j].b = i;
-      if (vertices[triangles[j].c] == vertices[i]) triangles[j].c = i;
+      if (vertices[triangles[j].a] == vertices[i]) triangles[j].a = (int)i;
+      if (vertices[triangles[j].b] == vertices[i]) triangles[j].b = (int)i;
+      if (vertices[triangles[j].c] == vertices[i]) triangles[j].c = (int)i;
     }
   }
 
   edges.DeleteAll();
   for (i = 0; i < tri_count; i++) 
   {
-    AddEdge(triangles[i].a, triangles[i].b, i);
-    AddEdge(triangles[i].b, triangles[i].c, i);
-    AddEdge(triangles[i].c, triangles[i].a, i);
+    AddEdge(triangles[i].a, triangles[i].b, (int)i);
+    AddEdge(triangles[i].b, triangles[i].c, (int)i);
+    AddEdge(triangles[i].c, triangles[i].a, (int)i);
   }
 
   bool result = true;
@@ -302,7 +302,7 @@ bool csStencil2ShadowCacheEntry::GetShadow(csVector3 &light_pos, float shadow_le
       // for silhouette edge face_1 and face_2 should be oposite situated toward the light
       if (back_faces[edges[i]->face_1] ^ back_faces[edges[i]->face_2])
       {
-        silhouette_edges.Push(i);
+        silhouette_edges.Push ((int)i);
       }
       //}
     }
@@ -612,7 +612,7 @@ void csStencil2ShadowStep::DrawShadow(iRenderView *rview, int method, csStencil2
   rmesh.buffers = cache_entry->bufferHolder;
   rmesh.meshtype = CS_MESHTYPE_TRIANGLES;
   rmesh.indexstart = 0;
-  rmesh.indexend = shadow_indeces.Length();
+  rmesh.indexend = (uint)shadow_indeces.Length();
 
   cache_entry->UpdateRenderBuffers(shadow_vertices, shadow_indeces);
 
@@ -663,7 +663,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
   csRef<iVisibilityCuller> culler = sector->GetVisibilityCuller ();
   shadowMeshes.Truncate (0);
   culler->VisTest (lightSphere, &shadowDrawVisCallback);
-  int numShadowMeshes;
+  size_t numShadowMeshes;
   if ((numShadowMeshes = shadowMeshes.Length ()) > 0)
   {
     g3d->SetZMode (CS_ZBUF_TEST);
@@ -674,7 +674,7 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
     for (size_t p = 0; p < shadow->GetNumberOfPasses (shaderTicket); p ++) 
     {
       shadow->ActivatePass (shaderTicket, p);
-      for (int m = 0; m < numShadowMeshes; m++)
+      for (size_t m = 0; m < numShadowMeshes; m++)
       {
         iMeshWrapper*& sp = shadowMeshes[m];
 
@@ -767,12 +767,12 @@ int csStencil2ShadowStep::AddStep (iRenderStep* step)
   csRef<iLightRenderStep> lrs = 
     SCF_QUERY_INTERFACE (step, iLightRenderStep);
   if (!lrs) return -1;
-  return steps.Push (lrs);
+  return (int)steps.Push (lrs);
 }
 
 int csStencil2ShadowStep::GetStepCount ()
 {
-  return steps.Length();
+  return (int)steps.Length();
 }
 
 SCF_IMPLEMENT_IBASE(csStencil2ShadowStep::ShadowDrawVisCallback)

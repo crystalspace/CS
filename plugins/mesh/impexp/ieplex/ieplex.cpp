@@ -52,9 +52,9 @@ public:
   virtual ~csModelConverterMultiplexer ();
 
   bool Initialize (iObjectRegistry *object_reg);
-  virtual int GetFormatCount ();
-  virtual const csModelConverterFormat *GetFormat (int idx);
-  virtual csPtr<iModelData> Load (uint8* Buffer, uint32 Size);
+  virtual size_t GetFormatCount ();
+  virtual const csModelConverterFormat *GetFormat (size_t idx);
+  virtual csPtr<iModelData> Load (uint8* Buffer, size_t Size);
   virtual csPtr<iDataBuffer> Save (iModelData*, const char *Format);
 
   struct Component : public iComponent {
@@ -124,32 +124,32 @@ bool csModelConverterMultiplexer::LoadNextPlugin ()
     // remember the plugin
     Converters.Push (plugin);
     // and load its description, since we gonna return it on request
-    for (int i=0; i<plugin->GetFormatCount (); i++)
+    for (size_t i=0; i<plugin->GetFormatCount (); i++)
       Formats.Push (plugin->GetFormat (i));
   }
   classlist->DeleteIndex (0);
   return true;
 }
 
-int csModelConverterMultiplexer::GetFormatCount ()
+size_t csModelConverterMultiplexer::GetFormatCount ()
 {
   while (LoadNextPlugin ());
   return Formats.Length ();
 }
 
-const csModelConverterFormat *csModelConverterMultiplexer::GetFormat (int idx)
+const csModelConverterFormat *csModelConverterMultiplexer::GetFormat (size_t idx)
 {
   while (LoadNextPlugin ());
   return Formats.Get (idx);
 }
 
-csPtr<iModelData> csModelConverterMultiplexer::Load (uint8* Buffer, uint32 Size)
+csPtr<iModelData> csModelConverterMultiplexer::Load (uint8* Buffer, size_t Size)
 {
   bool consecutive = false; // set to true if we searched the list completely.
   do
   {
-    int i;
-    for (i=Converters.Length(); (i--)>0; ) 
+    size_t i = Converters.Length();
+    while (i-- > 0)
       // i is decremented after comparison but before we use it below;
       //  hence it goes from Converters.Length()-1 to 0
     {
@@ -186,8 +186,8 @@ csPtr<iDataBuffer> csModelConverterMultiplexer::Save (iModelData *mdl,
   bool consecutive = false; // set to true if we searched the list completely.
   do
   {
-    int i;
-    for (i=Converters.Length(); (i--)>0; ) 
+    size_t i = Converters.Length();
+    while (i-- > 0)
     {
       csRef<iModelConverter> conv = Converters.Get(i);
       csRef<iDataBuffer> dbuf (conv->Save (mdl, Format));

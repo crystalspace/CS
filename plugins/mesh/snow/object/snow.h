@@ -155,7 +155,7 @@ public:
       scfParent->SetSwirl (sw);
     }
     virtual int GetParticleCount () const
-    { return scfParent->GetParticleCount (); }
+    { return (int)scfParent->GetParticleCount (); }
     virtual void GetDropSize (float& dropwidth, float& dropheight) const
     { scfParent->GetDropSize (dropwidth, dropheight); }
     virtual void GetBox (csVector3& minbox, csVector3& maxbox) const

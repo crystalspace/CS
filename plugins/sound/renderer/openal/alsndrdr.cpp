@@ -264,8 +264,8 @@ void csSoundRenderOpenAL::UnregisterSound (iSoundHandle *snd)
   mutex_SoundHandles->LockWait();
   // Remove the handle from the list
   csRef<csSoundHandleOpenAL> hdl = (csSoundHandleOpenAL *)snd;
-  int n = SoundHandles.Find(hdl);
-  if (n != -1)
+  size_t n = SoundHandles.Find(hdl);
+  if (n != csArrayItemNotFound)
   {
     SoundHandles.DeleteIndex (n);
   }

@@ -516,7 +516,7 @@ template<int D> struct CoordSplitter
 {
   static inline void Split (int* destCoords, size_t coord, const int* dim)
   {
-    destCoords[D] = coord / dim[D];
+    destCoords[D] = (int)coord / dim[D];
     CoordSplitter<D-1>::Split (destCoords, coord % dim[D], dim);
   }
 };
@@ -525,7 +525,7 @@ CS_SPECIALIZE_TEMPLATE struct CoordSplitter<0>
   static inline void Split (int* destCoords, size_t coord, const int* dim)
   {
     CS_ASSERT (dim[0] == 1);
-    destCoords[0] = coord;
+    destCoords[0] = (int)coord;
   }
 };
 

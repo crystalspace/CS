@@ -139,7 +139,7 @@ bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
       if (*pix != 0)
       {
 	int bitValue = (*pix == fgIndex) ? 1 : 0;
-	size_t bitIndex = (y * bytesPerBitmapLine * 8) + x;
+	int bitIndex = (y * bytesPerBitmapLine * 8) + x;
 	int shift = XbitOrder ? (bitIndex % 8) : (7 - (bitIndex % 8));
 	bitmap[bitIndex / 8] |= bitValue << shift;
 	mask[bitIndex / 8] |= 1 << shift;

@@ -145,7 +145,7 @@ protected:
       te->comp = comp;
       te->sink = sink;
       sink->IncRef ();
-      return csPDelArray<tabEntry>::Push (te);
+      return (int)csPDelArray<tabEntry>::Push (te);
     }
 
     void FreeAll ()

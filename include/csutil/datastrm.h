@@ -33,31 +33,31 @@ private:
   /// Pointer to data.
   uint8 *Data;
   /// Current position
-  int Position;
+  size_t Position;
   /// Data size
-  int Size;
+  size_t Size;
   /// Free the buffer when destroying?
   bool DeleteBuffer;
 
 public:
   /// constructor
-  csDataStream (void *buf, int Size, bool DeleteBuffer = true);
+  csDataStream (void *buf, size_t Size, bool DeleteBuffer = true);
   /// destructor
   ~csDataStream ();
 
   /// Return the current position
-  int GetPosition ();
+  size_t GetPosition ();
   /// Set the current position
-  void SetPosition (int pos);
+  void SetPosition (size_t pos);
   /// Return the length of the stream
-  int GetLength ();
+  size_t GetLength ();
   /// Returns true if the stream has finished
   bool Finished ();
   /// Skip the given amount of bytes
-  void Skip (int num);
+  void Skip (size_t num);
 
   /// Read a buffer of data. Returns the number of bytes actually read.
-  int Read (void *buf, int NumBytes);
+  size_t Read (void *buf, size_t NumBytes);
 
   /// Read a one-byte value. Returns false on EOF.
   bool ReadInt8 (int8 &val);
@@ -81,7 +81,7 @@ public:
    * Read a line of text. Returns false if the stream has finished. If
    * 'OmitNewline' is true then the newline character will be thrown away.
    */
-  bool GetString (char* buf, int len, bool OmitNewline = true);
+  bool GetString (char* buf, size_t len, bool OmitNewline = true);
   /**
    * Read an integer value from the stream that is stored as ASCII.
    */

@@ -50,12 +50,12 @@ SCF_VERSION (iModelConverter, 0, 0, 1);
 struct iModelConverter : public iBase
 {
   /// Return the number of supported formats
-  virtual int GetFormatCount () = 0;
+  virtual size_t GetFormatCount () = 0;
   /// Return the description of a supported format
-  virtual const csModelConverterFormat *GetFormat (int idx) = 0;
+  virtual const csModelConverterFormat *GetFormat (size_t idx) = 0;
 
   /// Read a model file
-  virtual csPtr<iModelData> Load (uint8* Buffer, uint32 Size) = 0;
+  virtual csPtr<iModelData> Load (uint8* Buffer, size_t Size) = 0;
 
   /// Write data to a file
   virtual csPtr<iDataBuffer> Save (iModelData*, const char *Format) = 0;

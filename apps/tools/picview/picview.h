@@ -36,7 +36,7 @@ private:
   csRef<iTextureHandle> txt;
   csSimplePixmap* pic;
   iAwsWindow *gui;
-  int cur_idx;
+  size_t cur_idx;
   bool scale;
   float x,y;
 
@@ -47,7 +47,7 @@ private:
   void FinishFrame ();
 
   void CreateGui ();
-  void LoadNextImage (int idx, int step);
+  void LoadNextImage (size_t idx, int step);
 
   static void ButtonFirst(intptr_t app, iAwsSource *source);
   static void ButtonPrev (intptr_t app, iAwsSource *source);

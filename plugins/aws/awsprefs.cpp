@@ -273,8 +273,8 @@ bool awsPrefManager::Load (const char *def_file)
     return false;
   }
 
-  int ncw = win_defs.Length();
-  int ncs = skin_defs.Length();
+  int ncw = (int)win_defs.Length();
+  int ncs = (int)skin_defs.Length();
 
   if (awsparse (wmgr))
   {

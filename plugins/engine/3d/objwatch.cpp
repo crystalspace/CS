@@ -156,12 +156,11 @@ void csObjectWatcher::ReportOperation (int op, iMovable* movable, iLight* light)
   last_movable = movable;
   last_light = light;
   updatenr++;
-  int i = listeners.Length ()-1;
-  while (i >= 0)
+  size_t i = listeners.Length ();
+  while (i-- > 0)
   {
     iObjectWatcherListener* l = listeners[i];
     l->ObjectChanged (op, movable, light);
-    i--;
   }
 }
 

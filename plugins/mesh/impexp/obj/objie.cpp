@@ -43,9 +43,9 @@ public:
   virtual ~csModelConverterOBJ ();
 
   bool Initialize (iObjectRegistry *object_reg);
-  virtual int GetFormatCount();
-  virtual const csModelConverterFormat *GetFormat(int idx);
-  virtual csPtr<iModelData> Load(uint8* Buffer, uint32 size);
+  virtual size_t GetFormatCount();
+  virtual const csModelConverterFormat *GetFormat(size_t idx);
+  virtual csPtr<iModelData> Load(uint8* Buffer, size_t size);
   virtual csPtr<iDataBuffer> Save(iModelData*, const char *format);
 
   struct Component : public iComponent
@@ -92,17 +92,17 @@ bool csModelConverterOBJ::Initialize (iObjectRegistry *)
   return true;
 }
 
-int csModelConverterOBJ::GetFormatCount ()
+size_t csModelConverterOBJ::GetFormatCount ()
 {
   return 1;
 }
 
-const csModelConverterFormat *csModelConverterOBJ::GetFormat (int idx)
+const csModelConverterFormat *csModelConverterOBJ::GetFormat (size_t idx)
 {
   return (idx == 0) ? &FormatInfo : 0;
 }
 
-csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
+csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, size_t Size)
 {
   // prepare input buffer
   csDataStream in (Buffer, Size, false);
@@ -229,7 +229,7 @@ csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
     else if (!strcasecmp (token, "F"))
     {
       iModelDataPolygon *poly = new csModelDataPolygon ();
-      csDataStream Params (params, strlen (params), false);
+      csDataStream Params (params, (int)strlen (params), false);
 
       while (!Params.Finished ())
       {
@@ -268,9 +268,9 @@ csPtr<iModelData> csModelConverterOBJ::Load (uint8 *Buffer, uint32 Size)
 	if (!tidx) tidx = 1;
 
 	// handle negative indices
-	if (vidx < 0) vidx += Vertices->GetVertexCount () + 1;
-	if (nidx < 0) nidx += Vertices->GetNormalCount () + 1;
-	if (tidx < 0) tidx += Vertices->GetTexelCount () + 1;
+	if (vidx < 0) vidx += (int)Vertices->GetVertexCount () + 1;
+	if (nidx < 0) nidx += (int)Vertices->GetNormalCount () + 1;
+	if (tidx < 0) tidx += (int)Vertices->GetTexelCount () + 1;
 
 	poly->AddVertex (vidx-1, nidx-1, 0, tidx-1);
       }
@@ -556,6 +556,6 @@ csPtr<iDataBuffer> csModelConverterOBJ::Save (iModelData *Data,
     out << '\n';
   }
 
-  int Size = out.Length ();
+  int Size = (int)out.Length ();
   return csPtr<iDataBuffer> (new csDataBuffer (out.Detach (), Size));
 }

@@ -47,7 +47,7 @@ class csModSoundData : public iSoundData
       }
       else
 	data = d;
-      pos=0; length = l;
+      pos=0; length = (long)l;
       bOwn = own;
     }
     ~datastore(){ if (bOwn) delete[] data;}

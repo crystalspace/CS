@@ -130,7 +130,7 @@ public:
 
   inline void RenderMeshes (iGraphics3D* g3d, iShader* shader, 					
     size_t ticket, iShaderVariableContext** meshContext, 
-    csRenderMesh** meshes, int num, csShaderVarStack &stacks);
+    csRenderMesh** meshes, size_t num, csShaderVarStack &stacks);
 
   /// Enables/disables z offset and z mode as needed
   inline void ToggleStepSettings (iGraphics3D* g3d, bool settings);

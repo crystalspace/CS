@@ -102,7 +102,7 @@ public:
 
   virtual int GetVertexCount () 
   { 
-    return verts.Length (); 
+    return (int)verts.Length (); 
   }
   virtual csVector3* GetVertices () 
   { 
@@ -110,7 +110,7 @@ public:
   }
   virtual int GetPolygonCount () 
   { 
-    return polys.Length (); 
+    return (int)polys.Length (); 
   }
   virtual csMeshedPolygon* GetPolygons () 
   { 

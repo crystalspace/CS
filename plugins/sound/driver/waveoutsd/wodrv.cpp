@@ -478,7 +478,7 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
     ResetEvent(parent_driver->hevent_EmptyBlocksReady);
 
     // Fill all available blocks
-    block_count=parent_driver->EmptyBlocks.Length();
+    block_count=(int)parent_driver->EmptyBlocks.Length();
     while (block_count>0)
     {
       bool fill_result;

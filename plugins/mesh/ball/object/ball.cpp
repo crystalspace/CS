@@ -657,7 +657,7 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
   // the object center in world coordinates. "0" because the object
   // center in object space is obviously at (0,0,0).
   csColor color;
-  int num_lights = lights.Length ();
+  int num_lights = (int)lights.Length ();
   for (l = 0 ; l < num_lights ; l++)
   {
     iLight* li = lights[l];

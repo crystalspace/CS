@@ -201,7 +201,7 @@ void csPolygonClipper::Prepare ()
   ClipBox.StartBoundingBox (ClipPoly[0]);
   for (vert = 0; vert < ClipPolyVertices; vert++)
   {
-    int next = (vert == ClipPolyVertices - 1 ? 0 : vert + 1);
+    size_t next = (vert == ClipPolyVertices - 1 ? 0 : vert + 1);
     ClipData[vert].x = ClipPoly[next].x - ClipPoly[vert].x;
     ClipData[vert].y = ClipPoly[next].y - ClipPoly[vert].y;
     if (vert) ClipBox.AddBoundingVertex (ClipPoly[vert]);

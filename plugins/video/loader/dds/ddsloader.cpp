@@ -377,7 +377,7 @@ const uint8* csDDSImageFile::GetAlpha ()
 
 uint csDDSImageFile::HasMipmaps () const
 {
-  return mipmaps.Length();
+  return (uint)mipmaps.Length();
 }
 
 csRef<iImage> csDDSImageFile::GetMipmap (uint num)
@@ -392,7 +392,7 @@ csRef<iImage> csDDSImageFile::GetMipmap (uint num)
 
 uint csDDSImageFile::HasSubImages() const 
 { 
-  return subImages.Length();
+  return (uint)subImages.Length();
 }
 
 csRef<iImage> csDDSImageFile::GetSubImage (uint num) 

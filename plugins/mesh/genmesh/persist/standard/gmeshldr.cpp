@@ -768,7 +768,7 @@ bool csGeneralMeshLoader::ParseSubMesh(iDocumentNode *node,
     return false;
   }
 
-  state->AddSubMesh (triangles.GetArray (), triangles.Length (), material);
+  state->AddSubMesh (triangles.GetArray (), (int)triangles.Length (), material);
 
   return true;
 }

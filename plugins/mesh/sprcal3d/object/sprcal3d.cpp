@@ -680,7 +680,7 @@ void csSpriteCal3DMeshObjectFactory::HardTransform (
 
     const uint trackCount = anim->getTrackCount();
     std::vector<CalTransform> poses = anim->getPoses();
-    const uint frameCount = poses.size() / trackCount;
+    const uint frameCount = (uint)poses.size() / trackCount;
 
     // loop through all root core bones
     std::list<int>::iterator iteratorRootCoreBoneId;

@@ -107,7 +107,7 @@ public:
   /// Get the mesh array for a lod between 0 and 1.
   csArray<iMeshWrapper*>& GetMeshesForLOD (float lod)
   {
-    int l = meshes_for_lod.Length ();
+    int l = (int)meshes_for_lod.Length ();
     int idx = int (lod * l);
     if (idx < 0) idx = 0;
     else if (idx >= l) idx = l-1;
@@ -117,7 +117,7 @@ public:
   /// Get number of lod levels we have.
   int GetLODCount ()
   {
-    return meshes_for_lod.Length ();
+    return (int)meshes_for_lod.Length ();
   }
 };
 
@@ -170,7 +170,7 @@ public:
   /// Get number of lod levels we have.
   int GetLODCount ()
   {
-    return meshes_for_lod.Length ();
+    return (int)meshes_for_lod.Length ();
   }
 };
 

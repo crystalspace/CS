@@ -60,7 +60,7 @@ public:
     * returns the index of the given Vertex, or -1 if the vertex is
     * not yet stored in this VertexBuffer
     */
-  int  GetIndex(CdVector3 Vertex) const;
+  size_t GetIndex(CdVector3 Vertex) const;
 
   /**
     * Write all the vertices that have been previously added by

@@ -885,7 +885,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   {
     if (str) str->DecRef ();
     csString theCap ("Tab ");
-    theCap += vTabs.Length ()+1;
+    theCap += (uint)vTabs.Length ()+1;
     str = new scfString ((const char*)theCap);
   }
 
@@ -914,7 +914,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
 
   // resize button
   csRect r(btn->getPreferredSize ());
-  int last = vTabs.Length ();
+  int last = (int)vTabs.Length ();
   if (r.Height () > Frame ().Height())
   {
     int delta = r.Height () - Frame ().Height ();
@@ -1103,7 +1103,7 @@ void awsNotebookButtonBar::Activate (int idx)
 void awsNotebookButtonBar::ActivateTab (intptr_t sk, iAwsSource *source)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
-  int idx = bb->vTabs.FindKey (
+  int idx = (int)bb->vTabs.FindKey (
     bb->vTabs.KeyButtonFunctor((awsNotebookButton*)source->GetComponent ()));
   if (idx != -1 && bb->active != idx)
   {
