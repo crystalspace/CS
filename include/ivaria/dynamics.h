@@ -121,9 +121,11 @@ struct iRigidBody : public iBase
   /// Set the bodies physic properties
   virtual void SetProperties (float mass, const csVector3& center,
   	const csMatrix3& inertia) = 0;
+  /// Get the physic properties. NULL parameters are ignored
+  virtual void GetProperties (float* mass, csVector3* center,
+    csMatrix3* inertia) = 0;
   /// Set total mass to targetmass, and adjust properties
   virtual void AdjustTotalMass (float targetmass) = 0;
-
 
   /// Add a force (world space) (active for one timestep)
   virtual void AddForce	(const csVector3& force) = 0;

@@ -489,6 +489,20 @@ void csODERigidBody::SetProperties (float mass,
   dBodySetMass (bodyID, m);
 }
 
+void csODERigidBody::GetProperties (float* mass,
+  csVector3* center, csMatrix3* inertia)
+{
+  dMass m;
+  dBodyGetMass (bodyID, &m);
+  if (mass != NULL) *mass = m.mass;
+  if (center != NULL) center->Set (m.c[0], m.c[1], m.c[2]);
+  if (inertia != NULL) {
+    inertia->Set (m.I[0], m.I[1], m.I[2],
+     m.I[4], m.I[5], m.I[6],
+     m.I[8], m.I[9], m.I[10]);
+  }
+}
+
 void csODERigidBody::AdjustTotalMass (float targetmass)
 {
   dMass m;
@@ -558,14 +572,14 @@ const csVector3 csODERigidBody::GetTorque () const
 
 void csODERigidBody::AttachMesh (iMeshWrapper* m)
 {
-  if (m) mesh->IncRef();
+  if (m) m->IncRef();
   if (mesh) mesh->DecRef();
   mesh = m;
 }
 
 void csODERigidBody::AttachBone (iSkeletonBone* b)
 {
-  if (b) bone->IncRef();
+  if (b) b->IncRef();
   if (bone) bone->DecRef();
   bone = b;
 }

@@ -200,6 +200,8 @@ public:
 
   void SetProperties (float mass, const csVector3& center,
   	const csMatrix3& inertia);
+  void GetProperties (float* mass, csVector3* center,
+    csMatrix3* inertia);
   void AdjustTotalMass (float targetmass);
 
   void AddForce (const csVector3& force);
