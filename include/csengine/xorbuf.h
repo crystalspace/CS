@@ -173,6 +173,14 @@ public:
    */
   bool Debug_ExtensiveTest (int num_iterations, csVector2* verts,
   	int& num_verts);
+
+  /**
+   * This test routine will do an extensive unit test of the XOR
+   * buffer. It will return false if there was an error. Some details
+   * about error will be put on standard output. It will also time the
+   * execution so you can use it for benchmarking too.
+   */
+  static bool Debug_UnitTest (int num_iterations = 1);
 };
 
 #endif // __CS_XORBUF_H__

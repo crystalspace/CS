@@ -397,7 +397,8 @@ void WalkTest::SetupFrame ()
     {
       buf->InitializePolygonBuffer ();
       buf->SetDebugMode (true);
-      buf->DrawPolygon (poly, num_verts);
+      csBox2Int bb;
+      buf->DrawPolygon (poly, num_verts, bb);
       cnt++;
       switch (((cnt >> 6) & 3))
       {

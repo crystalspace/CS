@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+26-Apr-2002
+	- Fixed a bad bug in the XOR buffer which could cause memory
+	  overwrites. A nice side effect of fixing this bug is that it is
+	  now also more optimal :-)
+	- Fixed another bug in the XOR buffer.
+	- Added a csXORBuffer::Debug_UnitTest() function which tries to do
+	  a full test of the XOR buffer to see that it is working to
+	  expectations.
+	- Added a new 'unittest' application. The purpose of this application
+	  is to contain tests that are useful to be repeated at any time
+	  in the future too. i.e. these tests serve to test importants
+	  part of CS. If a test ever fails something went wrong so we can
+	  quickly detect that. At this moment this test program is non
+	  graphical and only calls csXORBuffer::Debug_UnitTest().
 25-Apr-2002
 	- Removed the 'togglecull' and 'togglexor' commands from BugPlug.
 	  Instead added the ability to have arguments with bugplug commands
