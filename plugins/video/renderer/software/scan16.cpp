@@ -21,6 +21,7 @@
 #include "scan.h"
 #include "ipolygon.h"
 #include "ilghtmap.h"
+#include "soft_g3d.h"
 
 #include "sttest.h"
 
@@ -72,8 +73,6 @@
 
 #ifndef NO_draw_scanline_map_filt_zfil
 
-extern int filter_bf;
-
 #define SCANFUNC csScan_16_draw_scanline_map_filt_zfil
 #define SCANMAP 1
 #define SCANLOOP \
@@ -86,7 +85,7 @@ extern int filter_bf;
       }                                                                   \
       while ((_dest <= _destend)&&!((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
       {									\
-        if ((((long)_dest) & filter_bf) != 0)				\
+        if ((((long)_dest) & csGraphics3DSoftware::filter_bf) != 0)				\
         {									\
           if ((uu&0xffff) < 64*256) filter_du = -1;			\
           else if ((uu&0xffff) > 192*256) filter_du = 1;			\
