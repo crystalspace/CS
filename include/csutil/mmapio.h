@@ -64,15 +64,9 @@ class csMemoryMappedIO
 
   /// Number of cache blocks in cache
   unsigned int cache_block_count;
-
-  /// Current age of system, the closer a cache-block's age is to this, the younger it is.
-  unsigned int age;
-
+  
   /// Array of bits where one bit = cache_block_size * block_size bytes.  A set bit indicates we have the page in memory.
   csBitArray *page_map;
-
-  /// Pointer to file that contains the mapped data.
-  FILE *mapped_file;
 
   /// Holds a contiguous array of cache blocks
   struct CacheBlock
@@ -128,7 +122,43 @@ public:
   /** This pointer will only be valid for a little while.  Read, at least until the next call to GetPointer.
    * NEVER EVER EVER SAVE THIS POINTER.  You must recall this pointer when you want access to the data again.
    */
-  inline void *GetPointer(unsigned int index);
+  inline void *GetPointer(unsigned int index)
+  {
+#ifdef CS_HAS_MEMORY_MAPPED_IO
+
+    return platform.data + (index*block_size);
+
+#else
+
+    unsigned int page = index/cache_block_size;
+  
+    if (!valid_mmio_object) return NULL;
+
+    if (!(*page_map)[page])
+      CachePage(page);
+
+    // This MUST come AFTER CachPage b/c CachePage might re-orient things.
+    CacheBlock *cp = cache[page % csmmioDefaultHashSize];
+
+    while(cp)
+    { 
+      if (cp->page==page)
+      {
+        // Decrease age     
+        ++cp->age;
+	      
+        return cp->data + ((index-cp->offset)*block_size);
+      }
+
+      cp=cp->next;
+    }
+
+  //Serious error! The page is marked as here, but we could not find it!
+  return NULL;
+  
+#endif
+
+  }
 
 #ifndef CS_HAS_MEMORY_MAPPED_IO
 
