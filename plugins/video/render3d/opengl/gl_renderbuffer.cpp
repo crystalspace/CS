@@ -229,8 +229,8 @@ static csString ByteFormat (size_t size)
   return str;
 }
 
-csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext
-                                            , csGLStateCache *state,
+csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext, 
+					    csGLStateCache *state,
                                             iObjectRegistry* p)
   : ext (ext), statecache (state), object_reg (p),
     verbose (false), superVerbose (false)

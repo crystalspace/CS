@@ -19,6 +19,7 @@
 #ifndef __CS_CSGEOM_TCOVBUF_H__
 #define __CS_CSGEOM_TCOVBUF_H__
 
+#include "csextern.h"
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
 #include "iutil/dbghelp.h"
@@ -102,7 +103,7 @@ struct csLineOperation
  * One tile is 32x64 or 64x32 pixels. Every tile is made from 4x8 or 8x4
  * blocks (so one block is 8x8 pixels).
  */
-class csCoverageTile
+class CS_CSGEOM_EXPORT csCoverageTile
 {
   friend class csTiledCoverageBuffer;
 
@@ -436,7 +437,7 @@ public:
  * In addition there is also a maximum depth value for every 8x8 pixels.
  * The screen buffer is divided into tiles of 64x32 or 32x64 pixels.
  */
-class csTiledCoverageBuffer : public iBase
+class CS_CSGEOM_EXPORT csTiledCoverageBuffer : public iBase
 {
 public:
   iBugPlug* bugplug;	// For debugging...

@@ -332,7 +332,7 @@ error2:
   png_bytep packedData;
   if ((format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
   {
-    packedData = (png_bytep)csPackRGBpixelToRGBA 
+    packedData = (png_bytep)csPackRGBA::PackRGBpixelToRGBA 
       ((csRGBpixel *)Image->GetImageData (), width * height);
   }
   else
@@ -345,7 +345,7 @@ error2:
   png_write_image (png, row_pointers);
   if ((format & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
   {
-    csDiscardPackedRGBA (packedData);
+    csPackRGBA::DiscardPackedRGBA (packedData);
   }
 
   /* It is REQUIRED to call this to finish writing the rest of the file */
@@ -585,7 +585,7 @@ nomem2:
 
   if (ImageType == imgRGB)
   {
-    csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel
+    csRGBpixel *rgbImage = csPackRGBA::CopyUnpackRGBAtoRGBpixel
       (NewImage, Width * Height);
     ConvertFromRGBA (rgbImage);
     delete[] NewImage;

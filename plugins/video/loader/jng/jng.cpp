@@ -650,7 +650,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
   jpeg_start_compress (&cinfo, true);
 
   JSAMPROW row_pointer[1];
-  JSAMPLE *image = (JSAMPLE*)csPackRGBpixelToRGB
+  JSAMPLE *image = (JSAMPLE*)csPackRGB::PackRGBpixelToRGB
     ((csRGBpixel*)Image->GetImageData (),
     Image->GetWidth () * Image->GetHeight ());
   row_pointer[0] = (JSAMPLE*)&row[0];
@@ -911,7 +911,8 @@ bool ImageJngFile::Load (uint8 *iBuffer, size_t iSize)
 
   if (NewImage)
   {
-    csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel (NewImage, Width*Height);
+    csRGBpixel *rgbImage = 
+      csPackRGBA::CopyUnpackRGBAtoRGBpixel (NewImage, Width*Height);
     ConvertFromRGBA (rgbImage);
     CheckAlpha();
   }
@@ -950,7 +951,8 @@ bool ImageJngFile::Animate (csTicks time, csRect* dirtyrect)
 
   if (updated)
   {
-    csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel (NewImage, Width*Height);
+    csRGBpixel *rgbImage = csPackRGBA::CopyUnpackRGBAtoRGBpixel (
+      NewImage, Width*Height);
     ConvertFromRGBA (rgbImage);
     CheckAlpha();
   }

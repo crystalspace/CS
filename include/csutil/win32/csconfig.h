@@ -42,9 +42,6 @@
 #  define CS_USE_MMX
 #endif
 
-#define CS_RGBCOLOR_SANE
-#define CS_RGBPIXEL_SANE
-
 #define CS_HAS_WCHAR_H
 #define CS_WCHAR_T_SIZE 2
 

@@ -28,6 +28,8 @@
 #include "csextern.h"
 
 #include "cstypes.h"
+#include "iutil/databuff.h"
+#include "csutil/databuf.h"
 #include "rgbpixel.h"
 
 /**\addtogroup gfx
@@ -48,269 +50,306 @@
  * @{
  */
 
-/**\fn const uint8* csPackRGBcolorToRGB (const csRGBcolor* pixels, int numPixels)
- * Pack an array of csRGBcolor into a RGB byte array. 
- * \remarks
- * May return \p pixels.
- * May allocate memory. Free it using csDiscardPackedRGB() when finished.
- * \param pixels Source array of csRGBcolor data
- * \param numPixels Number of pixels in the array
- * \return A byte array containing the source data packed as RGB.
+/**
+ * RGB data packing.
  */
-
-/**\fn void csDiscardPackedRGB (const uint8* rgb)
- * Frees memory possibly allocated by csPackRGBcolorToRGB().
- * \param rgb Pointer to packed RGB data returned by csPackRGBcolorToRGB().
- */
-
-/**\fn const csRGBcolor* csUnpackRGBtoRGBcolor (const uint8* rgb, int numPixels)
- * Unpack a RGB byte array into an array of csRGBcolor. 
- * \remarks
- * May return \p pixels.
- * May allocate memory. Free it using csDiscardUnpackedRGBcolor() when finished.
- * \param rgb Source array of RGB data
- * \param numPixels Number of pixels in the array
- * \return An array containing the source data in csRGBcolor structs.
- */
-
-/**\fn void csDiscardUnpackedRGBcolor (const csRGBcolor* pixels)
- * Frees memory possibly allocated by csUnpackRGBtoRGBcolor().
- * \param pixels Pointer to csRGBcolor array returned by csUnpackRGBtoRGBcolor().
- */
-
-#ifdef CS_RGBCOLOR_SANE
-// sizeof(csRGBcolor) == 3
-
-inline const uint8* csPackRGBcolorToRGB (const csRGBcolor* pixels, 
-					 int /*numPixels*/)
+struct csPackRGB
 {
-  return (const uint8*)pixels;
-}
-
-inline void csDiscardPackedRGB (const uint8* /*rgb*/) {}
-
-inline const csRGBcolor* csUnpackRGBtoRGBcolor (const uint8* rgb, 
-						int /*numPixels*/)
-{
-  return (const csRGBcolor*)rgb;
-}
-
-inline void csDiscardUnpackedRGBcolor (const csRGBcolor* /*pixels*/) {}
-
-#else
-// sizeof(csRGBcolor) != 3
-
-inline uint8* csPackRGBcolorToRGB (const csRGBcolor* pixels, 
-				   int numPixels)
-{
-  uint8* buf = new uint8[numPixels * 3];
-  uint8* bufptr = buf;
-  while (numPixels--)
+  static bool IsRGBcolorSane() { return (sizeof(csRGBcolor) == 3); }
+  /**
+   * Pack an array of csRGBcolor into a RGB byte array. 
+   * \param buf Buffer to pack the data into.
+   * \param pixels Source array of csRGBcolor data
+   * \param numPixels Number of pixels in the array
+   */
+  static void PackRGBcolorToRGBBuffer (uint8* buf, 
+    const csRGBcolor* pixels, size_t numPixels)
   {
-    *bufptr++ = pixels->red;
-    *bufptr++ = pixels->green;
-    *bufptr++ = pixels->blue;
-    pixels++; 
+    if (IsRGBcolorSane())
+      memcpy (buf, pixels, numPixels * 3);
+    else
+    {
+      uint8* bufptr = buf;
+      while (numPixels--)
+      {
+	*bufptr++ = pixels->red;
+	*bufptr++ = pixels->green;
+	*bufptr++ = pixels->blue;
+	pixels++; 
+      }
+    }
   }
-  return buf;
-}
-
-inline void csDiscardPackedRGB (const uint8* rgb) 
-{
-  delete[] rgb;
-}
-
-inline const csRGBcolor* csUnpackRGBtoRGBcolor (const uint8* rgb, 
-					        int numPixels)
-{
-  csRGBcolor* buf = new csRGBcolor[numPixels];
-  csRGBcolor* bufptr = buf;
-  while (numPixels--)
+  /**
+   * Pack an array of csRGBcolor into a RGB byte array. 
+   * \remarks
+   * May return \p pixels.
+   * May allocate memory. Free it using DiscardPackedRGB() when finished.
+   * \param pixels Source array of csRGBcolor data
+   * \param numPixels Number of pixels in the array
+   * \return A byte array containing the source data packed as RGB.
+   */
+  static const uint8* PackRGBcolorToRGB (const csRGBcolor* pixels, 
+    size_t numPixels)
   {
-    bufptr->red = *rgb++;
-    bufptr->green = *rgb++;
-    bufptr->blue = *rgb++;
-    bufptr++; 
+    if (IsRGBcolorSane())
+      return (uint8*)pixels;
+    else
+    {
+      uint8* buf = new uint8[numPixels * 3];
+      PackRGBcolorToRGBBuffer (buf, pixels, numPixels);
+      return buf;
+    }
   }
-  return buf;
-}
-
-inline void csDiscardUnpackedRGBcolor (const csRGBcolor* pixels) 
-{
-  delete[] pixels;
-}
-
-#endif // CS_RGBCOLOR_SANE
-
-/**\fn const uint8* csPackRGBpixelToRGBA (const csRGBpixel* pixels, int numPixels)
- * Pack an array of csRGBpixel into a RGBA byte array. 
- * \remarks
- * May return \p pixels.
- * May allocate memory. Free it using csDiscardPackedRGBA() when finished.
- * \param pixels Source array of csRGBpixel data
- * \param numPixels Number of pixels in the array
- * \return A byte array containing the source data packed as RGBA.
- */
-
-/**\fn void csDiscardPackedRGBA (const uint8* rgba)
- * Frees memory possibly allocated by csPackRGBpixelToRGBA().
- * \param rgba Pointer to packed RGB data returned by csPackRGBpixelToRGBA().
- */
-
-/**\fn const csRGBpixel* csUnpackRGBAtoRGBpixel (const uint8* rgba, int numPixels)
- * Unpack a RGBA byte array into an array of csRGBpixel. 
- * \remarks
- * May return \p pixels.
- * May allocate memory. Free it using csDiscardUnpackedRGBpixel() when finished.
- * \param rgba Source array of RGBA data
- * \param numPixels Number of pixels in the array
- * \return An array containing the source data in csRGBpixel structs.
- */
-
-/**\fn csRGBpixel* csCopyUnpackRGBAtoRGBpixel(const uint8*pixels,int numPixels)
- * Unpack a RGBA byte array into an array of csRGBpixel. 
- * \remarks
- * Never returns \p pixels.
- * Allocate memory. Free it using delete[] when finished.
- * \param pixels Source array of RGBA data
- * \param numPixels Number of pixels in the array
- * \return An array containing the source data in csRGBpixel structs.
- */
-
-/**\fn void csDiscardUnpackedRGBpixel(const csRGBpixel* pixels)
- * Frees memory possibly allocated by csUnpackRGBAtoRGBpixel().
- * \param pixels Pointer to csRGBpixel array returned by
- * csUnpackRGBAtoRGBpixel().
- */
-
-#ifdef CS_RGBPIXEL_SANE
-// sizeof(csRGBpixel) == 4
-
-inline const uint8* csPackRGBpixelToRGBA (const csRGBpixel* pixels, 
-				    int /*numPixels*/)
-{
-  return (uint8*)pixels;
-}
-
-inline void csDiscardPackedRGBA (const uint8* /*rgba*/) {}
-
-inline const csRGBpixel* csUnpackRGBAtoRGBpixel (const uint8* rgba, 
-						 int /*numPixels*/)
-{
-  return (csRGBpixel*)rgba;
-}
-
-inline csRGBpixel* csCopyUnpackRGBAtoRGBpixel (const uint8* rgba, 
-					       int numPixels)
-{
-  csRGBpixel* buf = new csRGBpixel[numPixels];
-  memcpy ((void*)buf, (const void*)rgba, numPixels*  sizeof(csRGBpixel));
-  return buf;
-}
-
-inline void csDiscardUnpackedRGBpixel (const csRGBpixel* /*pixels*/) {}
-
-#else
-// sizeof(csRGBpixel) != 4
-
-inline const uint8* csPackRGBpixelToRGBA (const csRGBpixel* pixels, 
-					  int numPixels)
-{
-  uint8* buf = new uint8[numPixels * 4];
-  uint8* bufptr = buf;
-  while (numPixels--)
+  /**
+   * Frees memory possibly allocated by PackRGBcolorToRGB().
+   * \param rgb Pointer to packed RGB data returned by PackRGBcolorToRGB().
+   */
+  static void DiscardPackedRGB (const uint8* rgb) 
   {
-    *bufptr++ = pixels->red;
-    *bufptr++ = pixels->green;
-    *bufptr++ = pixels->blue;
-    *bufptr++ = pixels->alpha;
-    pixels++; 
+    if (!IsRGBcolorSane())
+      delete[] (uint8*)rgb;
   }
-  return buf;
-}
-
-inline void csDiscardPackedRGBA (const uint8* rgba) 
-{
-  delete[] rgba;
-}
-
-inline const csRGBpixel* csUnpackRGBAtoRGBpixel (const uint8* rgba, 
-						 int numPixels)
-{
-  csRGBpixel* buf = new csRGBpixel[numPixels];
-  csRGBpixel* bufptr = buf;
-  while (numPixels--)
+  /**
+   * Unpack a RGB byte array into an array of csRGBcolor. 
+   * \param buf Buffer to unpack the data into.
+   * \param rgb Source array of RGB data
+   * \param numPixels Number of pixels in the array
+   */
+  static void UnpackRGBtoRGBcolor (csRGBcolor* buf, const uint8* rgb, 
+    size_t numPixels)
   {
-    bufptr->red = *rgba++;
-    bufptr->green = *rgba++;
-    bufptr->blue = *rgba++;
-    bufptr->alpha = *rgba++;
-    bufptr++; 
+    if (IsRGBcolorSane())
+      memcpy (buf, rgb, numPixels * 3);
+    else
+    {
+      csRGBcolor* bufptr = buf;
+      while (numPixels--)
+      {
+	bufptr->red = *rgb++;
+	bufptr->green = *rgb++;
+	bufptr->blue = *rgb++;
+	bufptr++; 
+      }
+    }
   }
-  return buf;
-}
-
-inline csRGBpixel* csCopyUnpackRGBAtoRGBpixel (const uint8* rgba, 
-					       int numPixels)
-{
-  return (csRGBpixel*)csUnpackRGBAtoRGBpixel (rgba, numPixels);
-}
-
-inline void csDiscardUnpackedRGBpixel (const csRGBpixel* pixels) 
-{
-  delete[] pixels;
-}
-
-#endif // CS_RGBPIXEL_SANE
+  /**
+   * Unpack a RGB byte array into an array of csRGBcolor. 
+   * \remarks
+   * May return \p pixels.
+   * May allocate memory. Free it using sDiscardUnpackedRGBcolor() when finished.
+   * \param rgb Source array of RGB data
+   * \param numPixels Number of pixels in the array
+   * \return An array containing the source data in csRGBcolor structs.
+   */
+  static const csRGBcolor* UnpackRGBtoRGBcolor (const uint8* rgb, 
+    size_t numPixels)
+  {
+    if (IsRGBcolorSane())
+      return (const csRGBcolor*)rgb;
+    else
+    {
+      csRGBcolor* buf = new csRGBcolor[numPixels];
+      UnpackRGBtoRGBcolor (buf, rgb, numPixels);
+      return buf;
+    }
+  }
+  /**
+   * Frees memory possibly allocated by UnpackRGBtoRGBcolor().
+   * \param pixels Pointer to csRGBcolor array returned by UnpackRGBtoRGBcolor().
+   */
+  static void DiscardUnpackedRGBcolor (const csRGBcolor* pixels) 
+  {
+    if (!IsRGBcolorSane())
+      delete[] (csRGBcolor*)pixels;
+  }
+  /**
+   * Pack an array of csRGBpixel into a RGB byte array. Alpha information 
+   * is discarded!
+   * \remarks
+   * Allocates memory. Free it using delete[] when finished.
+   * \param pixels Source array of csRGBpixel data
+   * \param numPixels Number of pixels in the array
+   * \return A byte array containing the source data packed as RGB.
+   */
+  static inline uint8* PackRGBpixelToRGB (const csRGBpixel* pixels, 
+    size_t numPixels)
+  {
+    uint8* buf = new uint8[numPixels * 3];
+    uint8* bufptr = buf;
+    while (numPixels--)
+    {
+      *bufptr++ = pixels->red;
+      *bufptr++ = pixels->green;
+      *bufptr++ = pixels->blue;
+      pixels++; 
+    }
+    return buf;
+  }
+};
 
 /**
- * Pack an array of csRGBpixel into a RGB byte array. Alpha information 
- * is discarded!
- * \remarks
- * Allocates memory. Free it using delete[] when finished.
- * \param pixels Source array of csRGBpixel data
- * \param numPixels Number of pixels in the array
- * \return A byte array containing the source data packed as RGB.
+ * RGBA data packing.
  */
-inline uint8* csPackRGBpixelToRGB (const csRGBpixel* pixels, 
-				   int numPixels)
+struct csPackRGBA
 {
-  uint8* buf = new uint8[numPixels * 3];
-  uint8* bufptr = buf;
-  while (numPixels--)
+  static bool IsRGBpixelSane() { return (sizeof(csRGBpixel) == 4); }
+  /**
+   * Pack an array of csRGBpixel into a RGBA byte array. 
+   * \param buf Buffer to pack the data into.
+   * \param pixels Source array of csRGBpixel data
+   * \param numPixels Number of pixels in the array
+   */
+  static void PackRGBpixelToRGBA (uint8* buf, const csRGBpixel* pixels, 
+    size_t numPixels)
   {
-    *bufptr++ = pixels->red;
-    *bufptr++ = pixels->green;
-    *bufptr++ = pixels->blue;
-    pixels++; 
+    if (IsRGBpixelSane())
+      memcpy (buf, pixels, numPixels * 4);
+    else
+    {
+      uint8* bufptr = buf;
+      while (numPixels--)
+      {
+	*bufptr++ = pixels->red;
+	*bufptr++ = pixels->green;
+	*bufptr++ = pixels->blue;
+	*bufptr++ = pixels->alpha;
+	pixels++; 
+      }
+    }
   }
-  return buf;
-}
-
-/**
- * Unpack a RGBA byte array into an array of csRGBcolor. Alpha information 
- * is discarded!
- * \remarks
- * Allocates memory. Free it using delete[] when finished.
- * \param rgba Source array of RGBA data
- * \param numPixels Number of pixels in the array
- * \return An array containing the source data in csRGBcolor structs.
- */
-inline csRGBcolor* csUnpackRGBAtoRGBcolor (const uint8* rgba, 
-					   int numPixels)
-{
-  csRGBcolor* buf = new csRGBcolor[numPixels];
-  csRGBcolor* bufptr = buf;
-  while (numPixels--)
+  /**
+   * Pack an array of csRGBpixel into a RGBA byte array. 
+   * \remarks
+   * May return \p pixels.
+   * May allocate memory. Free it using DiscardPackedRGBA() when finished.
+   * \param pixels Source array of csRGBpixel data
+   * \param numPixels Number of pixels in the array
+   * \return A byte array containing the source data packed as RGBA.
+   */
+  static const uint8* PackRGBpixelToRGBA (const csRGBpixel* pixels, 
+    size_t numPixels)
   {
-    bufptr->red = *rgba++;
-    bufptr->green = *rgba++;
-    bufptr->blue = *rgba++;
-    rgba++;
-    bufptr++; 
+    if (IsRGBpixelSane())
+      return (uint8*)pixels;
+    else
+    {
+      uint8* buf = new uint8[numPixels * 4];
+      PackRGBpixelToRGBA (buf, pixels, numPixels);
+      return buf;
+    }
   }
-  return buf;
-}
+  /**
+   * Frees memory possibly allocated by PackRGBpixelToRGBA().
+   * \param rgba Pointer to packed RGB data returned by PackRGBpixelToRGBA().
+   */
+  static void DiscardPackedRGBA (const uint8* rgba) 
+  {
+    if (!IsRGBpixelSane())
+    {
+      delete[] (uint8*)rgba;
+    }
+  }
+  /**
+   * Unpack a RGBA byte array into an array of csRGBpixel. 
+   * \param buf Buffer to unpack the data into.
+   * \param rgba Source array of RGBA data
+   * \param numPixels Number of pixels in the array
+   */
+  static void UnpackRGBAtoRGBpixel (csRGBpixel* buf, const uint8* rgba, 
+    size_t numPixels)
+  {
+    if (IsRGBpixelSane())
+      memcpy (buf, rgba, numPixels * 4);
+    else
+    {
+      csRGBpixel* bufptr = buf;
+      while (numPixels--)
+      {
+	bufptr->red = *rgba++;
+	bufptr->green = *rgba++;
+	bufptr->blue = *rgba++;
+	bufptr->alpha = *rgba++;
+	bufptr++; 
+      }
+    }
+  }
+  /**
+   * Unpack a RGBA byte array into an array of csRGBpixel. 
+   * \remarks
+   * May return \p pixels.
+   * May allocate memory. Free it using DiscardUnpackedRGBpixel() when finished.
+   * \param rgba Source array of RGBA data
+   * \param numPixels Number of pixels in the array
+   * \return An array containing the source data in csRGBpixel structs.
+   */
+  static const csRGBpixel* UnpackRGBAtoRGBpixel (const uint8* rgba, 
+    size_t numPixels)
+  {
+    if (IsRGBpixelSane())
+      return (csRGBpixel*)rgba;
+    else
+    {
+      csRGBpixel* buf = new csRGBpixel[numPixels];
+      UnpackRGBAtoRGBpixel (buf, rgba, numPixels);
+      return buf;
+    }
+  }
+  /**
+   * Unpack a RGBA byte array into an array of csRGBpixel. 
+   * \remarks
+   * Never returns \p pixels.
+   * Allocate memory. Free it using delete[] when finished.
+   * \param pixels Source array of RGBA data
+   * \param numPixels Number of pixels in the array
+   * \return An array containing the source data in csRGBpixel structs.
+   */
+  static csRGBpixel* CopyUnpackRGBAtoRGBpixel (const uint8* rgba, 
+    size_t numPixels)
+  {
+    if (IsRGBpixelSane())
+    {
+      csRGBpixel* buf = new csRGBpixel[numPixels];
+      memcpy (buf, rgba, numPixels * sizeof(csRGBpixel));
+      return buf;
+    }
+    else
+      return (csRGBpixel*)UnpackRGBAtoRGBpixel (rgba, numPixels);
+  }
+  /**
+   * Frees memory possibly allocated by UnpackRGBAtoRGBpixel().
+   * \param pixels Pointer to csRGBpixel array returned by
+   * UnpackRGBAtoRGBpixel().
+   */
+  static void csDiscardUnpackedRGBpixel (const csRGBpixel* pixels) 
+  {
+    if (!IsRGBpixelSane())
+      delete[] (csRGBpixel*)pixels;
+  }
+  /**
+   * Unpack a RGBA byte array into an array of csRGBcolor. Alpha information 
+   * is discarded!
+   * \remarks
+   * Allocates memory. Free it using delete[] when finished.
+   * \param rgba Source array of RGBA data
+   * \param numPixels Number of pixels in the array
+   * \return An array containing the source data in csRGBcolor structs.
+   */
+  static inline csRGBcolor* UnpackRGBAtoRGBcolor (const uint8* rgba, 
+    size_t numPixels)
+  {
+    csRGBcolor* buf = new csRGBcolor[numPixels];
+    csRGBcolor* bufptr = buf;
+    while (numPixels--)
+    {
+      bufptr->red = *rgba++;
+      bufptr->green = *rgba++;
+      bufptr->blue = *rgba++;
+      rgba++;
+      bufptr++; 
+    }
+    return buf;
+  }
+};
 
 /** @} */
 

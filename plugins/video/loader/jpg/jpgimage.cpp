@@ -309,7 +309,7 @@ csPtr<iDataBuffer> csJPGImageIO::Save(iImage *Image, iImageIO::FileFormatDescrip
   jpeg_start_compress (&cinfo, true);
 
   JSAMPROW row_pointer[1];
-  JSAMPLE *image = (JSAMPLE*)csPackRGBpixelToRGB
+  JSAMPLE *image = (JSAMPLE*)csPackRGB::PackRGBpixelToRGB
     ((csRGBpixel*)Image->GetImageData (),
      Image->GetWidth () * Image->GetHeight ());
   row_pointer[0] = (JSAMPLE*)&row[0];

@@ -10,6 +10,14 @@ chronological order.
 	- Jorrit moved the tiled coverage buffer from Dynavis to csgeom.
 	  This class is going to be useful for the PVS calculator.
         - Philip Wyett eliminated some initialization warnings.
+	- res fixed an improper usage of csDataBuffer in vostexture.cpp: 
+	  iDataBuffers are refcounted, so passing a pointer to a csDataBuffer
+	  on the stack does not work!
+	- res updated the VC7 projects for the coverage buffer move and also 
+	  added missing CS_CSGEOM_EXPORTs to tcovbuf.h.
+	- res changed the pixel packing code to use sizeof() in code instead
+	  of defines to determine csRGBcolor/csRGBpixel sanity.
+	- res changed the pixel packing support functions to reside in structs.
 28-Jan-2005
 	- Andrew Mann fixed bugs in the software sound renderer which prevented
 	  looping from working, and which caused a gap in the looping process.

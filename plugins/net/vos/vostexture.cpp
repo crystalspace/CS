@@ -88,10 +88,11 @@ void ConstructTextureTask::doTask()
     return;
   }
 
-  char* c = (char*)malloc(texturedata.size());
+  char* c = new char[texturedata.size()];
   memcpy(c, texturedata.c_str(), texturedata.size());
-  csDataBuffer db(c, texturedata.size(), true);
-  csRef<iImage> image (io->Load (&db, engine->GetTextureFormat()));
+  csRef<iDataBuffer> db;
+  texDataBuf.AttachNEw (new csDataBuffer (c, texturedata.size(), true));
+  csRef<iImage> image (io->Load (db, engine->GetTextureFormat()));
 
   csRef<iTextureHandle> handle (txtmgr->RegisterTexture (image, CS_TEXTURE_3D));
 
