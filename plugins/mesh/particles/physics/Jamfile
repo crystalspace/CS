@@ -1,0 +1,3 @@
+SubDir TOP plugins mesh particles physics ;
+
+SubInclude TOP plugins mesh particles physics simple ;
