@@ -387,10 +387,10 @@ struct iCameraPosition : public iBase
 
 struct iSectorList : public iBase
 {
-  virtual int GetSectorCount () = 0;
-  virtual iSector *GetSector (int idx) = 0;
-  virtual void AddSector (iSector *sec) = 0;
-  virtual void RemoveSector (iSector *sec) = 0;
+  virtual int GetCount () = 0;
+  virtual iSector *Get (int idx) = 0;
+  virtual void Add (iSector *sec) = 0;
+  virtual void Remove (iSector *sec) = 0;
   virtual iSector *FindByName (const char *name) = 0;
 };
 
