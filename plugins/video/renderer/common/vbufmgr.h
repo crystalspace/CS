@@ -28,6 +28,8 @@ class csVector3;
 class csVector2;
 class csColor;
 
+#define CS_VBUF_TOTAL_USERA 16
+
 /**
  * A general vertex buffer.
  */
@@ -38,8 +40,8 @@ protected:
   csVector3* verts;
   csVector2* texels;
   csColor* colors;
-	int usercmp[16];
-	float* user[16];
+	int usercmp[CS_VBUF_TOTAL_USERA];
+	float* user[CS_VBUF_TOTAL_USERA];
   /// The number of vertices.
   int num_verts;
   /// Priority.
@@ -85,7 +87,7 @@ public:
     csVertexBuffer::texels = texels;
     csVertexBuffer::colors = colors;
     csVertexBuffer::num_verts = num_verts;
-		for( int i=0; i<16; i++ )
+		for( int i=0; i<CS_VBUF_TOTAL_USERA; i++ )
 			user[i] = NULL;
   }
 
@@ -93,6 +95,8 @@ public:
 		float* user, 
 		int num_components)
   {
+		if (index>CS_VBUF_TOTAL_USERA)
+			return;
 		csVertexBuffer::user[index] = user;
 		csVertexBuffer::usercmp[index] = num_components;
   }

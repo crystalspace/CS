@@ -25,6 +25,7 @@ REGISTER_STRING( enabled, "enabled" )
 REGISTER_STRING( disabled, "disabled" )
 REGISTER_STRING( fog, "fog" )
 REGISTER_STRING( mesh, "mesh" )
+REGISTER_STRING( lightmap, "lightmap" )
 
 /////////////////////////////////////////
 // Misc drawing strings

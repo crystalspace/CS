@@ -2596,7 +2596,7 @@ static void ResolveVertex (
   static float user1[CS_VBUF_TOTAL_USERA*4], user2[CS_VBUF_TOTAL_USERA*4];
   static float* userpointers1[CS_VBUF_TOTAL_USERA];
   static float* userpointers2[CS_VBUF_TOTAL_USERA];
-  static init = false;
+  static bool init = false;
   if (!init)
   {
     for (int u=0; u<CS_VBUF_TOTAL_USERA; u++)
