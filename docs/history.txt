@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	  When you go to the basement (through the hole in the floor
 	  in flarge) one of the corridors will start having fluctuating
 	  fog as soon as you first look at that corridor.
+	- Fixed a bug with metaballs which didn't work properly in fog
+	  (OpenGL only).
 22-Sep-2002
 	- Modified iMeshWrapper->SetDrawCallback() so that multiple
 	  callbacks are now supported. Added RemoveDrawCallback() and

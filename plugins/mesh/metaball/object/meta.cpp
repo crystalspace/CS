@@ -103,6 +103,7 @@ csMetaBall::~csMetaBall ()
   if (vis_cb) vis_cb->DecRef ();
   delete [] meta_balls;
   delete [] mesh.triangles;
+  delete [] mesh.vertex_fog;
   delete [] mesh_vertices;
   delete [] mesh_texels;
   delete [] mesh_colors;
@@ -146,6 +147,7 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     mesh_vertices = new csVector3[max_vertices];
     mesh_texels = new csVector2[max_vertices];
     mesh_colors = new csColor[max_vertices];
+    mesh.vertex_fog = new G3DFogInfo[max_vertices];
 	int i;
     for (i = 0; i < max_vertices; i++)
     {
