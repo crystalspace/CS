@@ -22,6 +22,7 @@
 #include "cscom/com.h"
 #include "cs2d/common/graph2d.h"
 #include "cssys/unix/iunix.h"
+#include "cs2d/openglx/gl2d_font.h"
 
 #include <GL/glx.h>
 
@@ -92,6 +93,8 @@ class csGraphics2DGLX : public csGraphics2D
   /// Pointer to DOS-specific interface
   IUnixSystemDriver* UnixSystem;
 
+  static csGraphics2DOpenGLFontServer *LocalFontServer;
+
 public:
   csGraphics2DGLX (ISystem* piSystem);
   virtual ~csGraphics2DGLX ();
@@ -102,6 +105,7 @@ public:
 
   virtual bool BeginDraw () { return (Memory != NULL); }
 
+  virtual void Clear(int color);
   virtual void Print (csRect *area = NULL);
   virtual void SetRGB (int i, int r, int g, int b);
 
@@ -116,6 +120,9 @@ public:
   /// Draw a 2D sprite
   static void DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th);
+  /// Figure out GL RGB color from a packed color format
+  static void setGLColorfromint(int color);
+
   /**
    * Get address of video RAM at given x,y coordinates.
    * The OpenGL version of this function just returns NULL.
