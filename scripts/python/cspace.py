@@ -5465,6 +5465,7 @@ class iSpriteCal3DFactoryState(iBase):
     def AddMorphAnimation(*args): return _cspace.iSpriteCal3DFactoryState_AddMorphAnimation(*args)
     def AddMorphTarget(*args): return _cspace.iSpriteCal3DFactoryState_AddMorphTarget(*args)
     def AddCoreMaterial(*args): return _cspace.iSpriteCal3DFactoryState_AddCoreMaterial(*args)
+    def CalculateAllBoneBoundingBoxes(*args): return _cspace.iSpriteCal3DFactoryState_CalculateAllBoneBoundingBoxes(*args)
     def BindMaterials(*args): return _cspace.iSpriteCal3DFactoryState_BindMaterials(*args)
     def GetMeshCount(*args): return _cspace.iSpriteCal3DFactoryState_GetMeshCount(*args)
     def GetMorphAnimationCount(*args): return _cspace.iSpriteCal3DFactoryState_GetMorphAnimationCount(*args)
