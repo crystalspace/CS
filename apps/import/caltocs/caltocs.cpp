@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cssysdef.h"
 #include "cal3d/cal3d.h"
+#include "cssysdef.h"
 #include <stdio.h>
 #include <stdarg.h>
 
