@@ -2035,15 +2035,13 @@ AC_CHECK_TYPE([wchar_t], [cs_type_wchar_t=yes], [cs_type_wchar_t=no],
 
 AS_IF([test $cs_type_wchar_t = yes],
     [AC_CHECK_FUNC([wcslen], [], [CS_HEADER_PROPERTY([CS_USE_FAKE_WCSLEN])])
+    AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])], [])
     AC_CHECK_SIZEOF([wchar_t], []
 	[[#if HAVE_WCHAR_H
 	#include <wchar.h>
 	#endif]])
     CS_HEADER_PROPERTY([CS_WCHAR_T_SIZE], [$ac_cv_sizeof_wchar_t])],
     [CS_HEADER_PROPERTY([CS_USE_FAKE_WCHAR_TYPE])])
-
-AS_IF([test $cs_type_wchar_t = yes],
-    [AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])], [])])
 
 AC_LANG_POP([C++])
 
