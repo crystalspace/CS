@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Apr-2004
+	- Eric Sunshine fixed bugs in cross-product functions of csVector4 and
+	  csDVector4 where it was accessing 'x' component of wrong vector.
+	  Reported by Bernd Waibel <waebbl@gmx.dew>. Also fixed some incorrect
+	  Doxygen comments.
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render

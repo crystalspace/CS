@@ -40,7 +40,7 @@ class csVector4;
 
 
 /**
- * A 3D vector.
+ * A 4D vector with "double" components.
  */
 class CS_CSGEOM_EXPORT csDVector4
 {
@@ -56,8 +56,7 @@ public:
 
   /**
    * Make a new vector. The vector is not
-   * initialized. This makes the code slightly faster as
-   * csDVector4 objects are used a lot.
+   * initialized. This makes the code slightly faster.
    */
   csDVector4 () {}
 
@@ -77,7 +76,7 @@ public:
   /// Conversion from single precision vector to double.
   csDVector4 (const csVector4&);
 
-  /// Conversion from a 3 component vector. set W  =0;
+  /// Conversion from a three-component vector. w is set to 1.
   csDVector4 (const csDVector3& v) { x = v.x; y = v.y; z = v.z; w = 1.0; }
 
   /// Add two vectors.
@@ -101,7 +100,7 @@ public:
     return csDVector4 ( (v1.x*v2.y - v1.y*v2.x) + (v1.x*v2.z - v1.z*v2.x) + (v1.y*v2.z - v1.z*v2.y),
                         (v1.z*v2.y - v1.y*v2.z) + (v1.y*v2.w - v1.w*v2.y) + (v1.z*v2.w - v1.w*v2.z),
                         (v1.x*v2.z - v1.z-v2.x) + (v1.w*v2.x - v1.x*v2.w) + (v1.z*v2.w - v1.w*v2.z),
-                        (v1.y*v1.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w) );
+                        (v1.y*v2.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w) );
   }
 
   /// Take cross product of two vectors and put result in this vector.
@@ -110,7 +109,7 @@ public:
     x = (v1.x*v2.y - v1.y*v2.x) + (v1.x*v2.z - v1.z*v2.x) + (v1.y*v2.z - v1.z*v2.y);
     y = (v1.z*v2.y - v1.y*v2.z) + (v1.y*v2.w - v1.w*v2.y) + (v1.z*v2.w - v1.w*v2.z);
     z = (v1.x*v2.z - v1.z-v2.x) + (v1.w*v2.x - v1.x*v2.w) + (v1.z*v2.w - v1.w*v2.z);
-    w = (v1.y*v1.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w);
+    w = (v1.y*v2.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w);
   }
 
   /// Multiply a vector and a scalar.
@@ -151,11 +150,13 @@ public:
   inline friend bool operator> (double f, const csDVector4& v)
   { return ABS(v.x)<f && ABS(v.y)<f && ABS(v.z)<f && ABS(v.w)<f; }
 
-  /// Returns n-th component of the vector.
-  inline double operator[](int n) const {return !n?x:n&1?y:n&2?z:w;}
+  /// Returns n'th component of the vector.
+  inline double operator[](int n) const
+  { return !n?x:n&1?y:n&2?z:w; }
 
-  /// Returns n-th component of the vector.
-  inline double & operator[](int n){return !n?x:n&1?y:n&2?z:w;}
+  /// Returns n'th component of the vector.
+  inline double & operator[](int n)
+  { return !n?x:n&1?y:n&2?z:w; }
 
   /// Add another vector to this vector.
   inline csDVector4& operator+= (const csDVector4& v)
@@ -221,7 +222,7 @@ public:
 
 
 /**
- * A 4D vector.
+ * A 4D vector with "float" components.
  */
 class CS_CSGEOM_EXPORT csVector4
 {
@@ -237,8 +238,7 @@ public:
 
   /**
    * Make a new vector. The vector is not
-   * initialized. This makes the code slightly faster as
-   * csVector4 objects are used a lot.
+   * initialized. This makes the code slightly faster.
    */
   csVector4 () {}
 
@@ -258,18 +258,18 @@ public:
   /// Copy from a double-vector
   csVector4 (const csDVector4 &v);
 
-  /// Convert from csVector3. Set w = 1
+  /// Convert from a three-component vector. w is set to 1.
   csVector4 (const csVector3 &v) : x(v.x), y(v.y), z(v.z), w(1.0f) {}
 
   /// Add two vectors.
   inline friend csVector4 operator+ (const csVector4& v1, const csVector4& v2)
   { return csVector4(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z, v1.w+v2.w); }
 
-  /// Add two vectors of differing type, raise the csVector4 to DVector3.
+  /// Add two vectors of differing type, raise the csVector4 to csDVector4.
   inline friend csDVector4 operator+ (const csDVector4& v1, const csVector4& v2)
   { return csDVector4(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z, v1.w+v2.w); }
 
-  /// Add two vectors of differing type, raise the csVector4 to DVector3.
+  /// Add two vectors of differing type, raise the csVector4 to csDVector4.
   inline friend csDVector4 operator+ (const csVector4& v1, const csDVector4& v2)
   { return csDVector4(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z, v1.w+v2.w); }
 
@@ -277,11 +277,11 @@ public:
   inline friend csVector4 operator- (const csVector4& v1, const csVector4& v2)
   { return csVector4(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z, v1.w-v2.w); }
 
-  /// Subtract two vectors of differing type, cast to double.
+  /// Subtract two vectors of differing type, raise the csVector4 to csDVector4.
   inline friend csDVector4 operator- (const csVector4& v1, const csDVector4& v2)
   { return csDVector4(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z, v1.w-v2.w); }
 
-  /// Subtract two vectors of differing type, cast to double.
+  /// Subtract two vectors of differing type, raise the csVector4 to csDVector4.
   inline friend csDVector4 operator- (const csDVector4& v1, const csVector4& v2)
   { return csDVector4(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z, v1.w-v2.w); }
 
@@ -296,7 +296,7 @@ public:
     return csVector4 (  (v1.x*v2.y - v1.y*v2.x) + (v1.x*v2.z - v1.z*v2.x) + (v1.y*v2.z - v1.z*v2.y),
                         (v1.z*v2.y - v1.y*v2.z) + (v1.y*v2.w - v1.w*v2.y) + (v1.z*v2.w - v1.w*v2.z),
                         (v1.x*v2.z - v1.z*v2.x) + (v1.w*v2.x - v1.x*v2.w) + (v1.z*v2.w - v1.w*v2.z),
-                        (v1.y*v1.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w) );
+                        (v1.y*v2.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w) );
   }
 
   /// Take cross product of two vectors and put result in this vector.
@@ -305,7 +305,7 @@ public:
     x = (v1.x*v2.y - v1.y*v2.x) + (v1.x*v2.z - v1.z*v2.x) + (v1.y*v2.z - v1.z*v2.y);
     y = (v1.z*v2.y - v1.y*v2.z) + (v1.y*v2.w - v1.w*v2.y) + (v1.z*v2.w - v1.w*v2.z);
     z = (v1.x*v2.z - v1.z*v2.x) + (v1.w*v2.x - v1.x*v2.w) + (v1.z*v2.w - v1.w*v2.z);
-    w = (v1.y*v1.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w);
+    w = (v1.y*v2.x - v1.x*v2.y) + (v1.w*v2.x - v1.x*v2.w) + (v1.w*v2.y - v1.y*v2.w);
   }
 
   /// Multiply a vector and a scalar.
@@ -316,11 +316,11 @@ public:
   inline friend csVector4 operator* (float f, const csVector4& v)
   { return csVector4(v.x*f, v.y*f, v.z*f, v.w*f); }
 
-  /// Multiply a vector and a scalar double. Upgrade v to DVector.
+  /// Multiply a vector and a scalar double. Upgrade v to csDVector4.
   inline friend csDVector4 operator* (const csVector4& v, double f)
   { return csDVector4(v) * f; }
 
-  /// Multiply a vector and a scalar double. Upgrade v to DVector.
+  /// Multiply a vector and a scalar double. Upgrade v to csDVector4.
   inline friend csDVector4 operator* (double f, const csVector4& v)
   { return csDVector4(v) * f; }
 
@@ -336,7 +336,7 @@ public:
   inline friend csVector4 operator/ (const csVector4& v, float f)
   { f = 1.0f/f; return csVector4(v.x*f, v.y*f, v.z*f, v.w*f); }
 
-  /// Divide a vector by a scalar double. Upgrade v to DVector.
+  /// Divide a vector by a scalar double. Upgrade v to csDVector4.
   inline friend csDVector4 operator/ (const csVector4& v, double f)
   { return csDVector4(v) / f; }
 
@@ -369,10 +369,12 @@ public:
   { return ABS(v.x)<f && ABS(v.y)<f && ABS(v.z)<f && ABS(v.w)<f; }
 
   /// Returns n-th component of the vector.
-  inline float operator[] (int n) const { return !n?x:n&1?y:n&2?z:w; }
+  inline float operator[] (int n) const
+  { return !n?x:n&1?y:n&2?z:w; }
 
   /// Returns n-th component of the vector.
-  inline float & operator[] (int n) { return !n?x:n&1?y:n&2?z:w; }
+  inline float & operator[] (int n)
+  { return !n?x:n&1?y:n&2?z:w; }
 
   /// Add another vector to this vector.
   inline csVector4& operator+= (const csVector4& v)
@@ -445,8 +447,6 @@ public:
             && (ABS(z) < precision) &&  (ABS(w) < precision);
   }
 };
-
-
 
 /** @} */
 
