@@ -2730,7 +2730,8 @@ void Blocks::WriteConfig ()
 	  keys.SetStr("HighScores",key,highscores[level][size-3].GetName (i));
         }
     }
-  keys.SaveIfDirty (Sys->VFS, "/config/blocks.cfg");
+  if (keys.IsDirty())
+    keys.Save();
 }
 
 // -----------------------------------------------------------------
