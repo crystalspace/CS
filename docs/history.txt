@@ -3,33 +3,48 @@ The history order is reversed so that new features are at the top.
 23-Jan-2003
 	- Fixed genmesh so it compiles again.
 	- Fixed effects plugin so it compiles again.
-	- Fixed an initialization error with the new mesh_tri_normals
-	  in genmesh.
+	- Fixed an initialization error with the new mesh_tri_normals in
+	  genmesh.
 	- Fixed bug in dynamic lighting of curves. Hitting 'L' in walktest
 	  would trigger the bug if the donut in the street was visible.
 	- Removed 'effects' plugin from walkall again and instead added
 	  'effects' to 'drivers' and 'drivers3d' targets.
 	- Sound loaders are no longer listed in the 'drivers' and 'snddrivers'
-	  targett. Those are not drivers.
-	- Fixed a bug in the OpenGL renderer where a 'modified' flag was
-	  not exactly set in the right way.
+	  target. Those are not drivers.
+	- Fixed a bug in the OpenGL renderer where a 'modified' flag was not
+	  exactly set in the right way.
 	- Fixed a bug in DrawPolygonMesh() with regards to lightmaps (in the
-	  OpenGL renderer). The bug was that GL_RGBA8 was used in case
-	  the super lightmap was not in the cache and GL_RGBA was used
-	  otherwise. Now GL_RGBA is used in all cases.
+	  OpenGL renderer).  The bug was that GL_RGBA8 was used in case the
+	  super lightmap was not in the cache and GL_RGBA was used otherwise.
+	  Now GL_RGBA is used in all cases.
 	- DrawTriangleMesh() and EffectDrawTriangleMesh() initialized
-	  use_lazy_clipping to false. It was never set to true. However
-	  lazy clipping is very good for performance so it is best to set
-	  that to true initially and only set it to false when it is
-	  required (OpenGL renderer).
+	  use_lazy_clipping to false.  It was never set to true.  However lazy
+	  clipping is very good for performance so it is best to set that to
+	  true initially and only set it to false when it is required (OpenGL
+	  renderer).
 	- Increased the number of super lightmaps from 10 to 16 for OpenGL.
 	- Improved setting of use_lazy_clipping flag a bit.
-	- Fixed the memory leak in csPolygonMeshTools for real using
-	  the proper CS_IMPLEMENT_STATIC_VAR instead of the non-portable
-	  dependency on global constructors/destructors.
+	- Fixed the memory leak in csPolygonMeshTools for real using the proper
+	  CS_IMPLEMENT_STATIC_VAR instead of the non-portable dependency on
+	  global constructors/destructors.
 	- Made sure that for outer and optional clippers the '0' (software)
-	  clipper is never selected (OpenGL renderer). Instead it is
-	  replaced with 'N' (lazy clipping).
+	  clipper is never selected (OpenGL renderer).  Instead it is replaced
+	  with 'N' (lazy clipping).
+	- Eric Sunshine made the following changes:
+	    - Restored debug symbols for plugins in Mingw/Cygwin.  Apparently,
+	      the technique of using -shared to create plugins produced
+	      inconsistent results: some plugins displayed debug symbols in
+	      gdb, while others did not.  (Note that --export-all-symbols had
+	      absolutely no effect.)  Reverted to using dllwrap for plugin
+	      creation, as this seems to give more reliable results with debug
+	      symbols in gdb.  Also now uses dlltool to create the .def file
+	      rather than dllwrapwrap.sh.
+	    - Also had to work around problem caused by console-support main()
+	      function in win32.cpp.  Unfortunately, dllwrap tried resolving
+	      the symbols referenced by this function, even though it is not
+	      used for plugins, but the referenced symbols (_cs_main and
+	      ApplicationShow) do not exist in plugins.  Consequently, had to
+	      dummy up these symbols in CS_IMPLEMENT_PLATFORM_PLUGIN().
 22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.

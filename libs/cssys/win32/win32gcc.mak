@@ -72,10 +72,11 @@ LFLAGS.profile = -pg
 DFLAGS.optimize += -s
 
 # Flags for linking DLLs in debug mode
-DFLAGS.debug = -Xlinker --export-all-symbols
+DFLAGS.debug =
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL = $(DFLAGS.$(MODE)) -shared
+LFLAGS.DLL = $(DFLAGS.$(MODE)) -q --def=$(OUT)/$*.def \
+  --no-export-all-symbols --dllname $*
 
 # Typical extension for objects and static libraries
 LIB = .a
@@ -118,7 +119,7 @@ ifeq ($(MAKESECTION),postdefines)
 COMMAND_DELIM = ;
 
 # How to make shared libs for cs-config
-LINK.PLUGIN = $(LINK)
+LINK.PLUGIN = dllwrap --driver-name=$(LINK)
 PLUGIN.POSTFLAGS = -mwindows -mconsole
 
 # How to make a shared (a.k.a. dynamic) library.
@@ -129,6 +130,7 @@ else
 endif
 
 COMPILE_RES = windres --include-dir include $(RCFLAGS) 
+CREATE_RES = dlltool --output-def=$(OUT)/$*.def
 MAKEVERSIONINFO = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh
 
@@ -139,6 +141,7 @@ DO.SHARED.PLUGIN.CORE = \
     $(OUT)/$(@:$(DLL)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
   $(COMPILE_RES) -i $(OUT)/$(@:$(DLL)=-rsrc.rc) \
     -o $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
+  $(CREATE_RES) $(^^) $(OUT)/$(@:$(DLL)=-rsrc.o) $(COMMAND_DELIM) \
   $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(DLL)=-rsrc.o) $(L^) $(LIBS) $(LFLAGS) \
     -mwindows
