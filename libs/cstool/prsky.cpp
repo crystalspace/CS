@@ -483,7 +483,7 @@ uint8 csProcSky::GetCloudVal(int x, int y)
 }
 
 void csProcSky::DrawToTexture (csProcSkyTexture *skytex, csTicks current_time,
-	iObjectRegistry* object_reg)
+  iObjectRegistry*)
 {
   int i;
   csVector3 txtorig, txtu, txtv;
