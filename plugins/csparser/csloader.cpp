@@ -2521,7 +2521,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //the meshes' hierarchy, starting from the 'mesh' mesh object.
         csRefArray<iMeshWrapper> meshesArray;
         CollectAllChildren (mesh, meshesArray);
-        int i, count = meshesArray.Length ();
+        size_t i, count = meshesArray.Length ();
         for (i = 0; i < count; i++)
         {
           csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
@@ -2539,7 +2539,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         //the meshes' hierarchy, starting from the 'mesh' mesh object.
         csRefArray<iMeshWrapper> meshesArray;
         CollectAllChildren (mesh, meshesArray);
-        int i, count = meshesArray.Length ();
+        size_t i, count = meshesArray.Length ();
         for (i = 0; i < count; i++)
         {
           csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
@@ -2557,7 +2557,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         {
           csRefArray<iMeshWrapper> meshesArray;
           CollectAllChildren (mesh, meshesArray);
-          int i, count = meshesArray.Length ();
+          size_t i, count = meshesArray.Length ();
           for (i = 0; i < count; i++)
           {
             ClosedFlags (meshesArray[i]);
@@ -2575,7 +2575,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         {
           csRefArray<iMeshWrapper> meshesArray;
           CollectAllChildren (mesh, meshesArray);
-          int i, count = meshesArray.Length ();
+          size_t i, count = meshesArray.Length ();
           for (i = 0; i < count; i++)
           {
             ConvexFlags (meshesArray[i]);
@@ -2792,7 +2792,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
   {
     csRefArray<iMeshWrapper> meshesArray;
     CollectAllChildren (mesh, meshesArray);
-    int i, count = meshesArray.Length ();
+    size_t i, count = meshesArray.Length ();
     for (i = 0; i < count; i++)
     {
       iMeshWrapper* mesh = meshesArray[i];
@@ -4459,7 +4459,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
     	iPortalContainer);
     CS_ASSERT (pc != 0);
-    portal = pc->CreatePortal (poly.GetVertices (), poly.GetVertexCount ());
+    portal = pc->CreatePortal (poly.GetVertices (), (int)poly.GetVertexCount ());
     portal->SetSector (destSector);
   }
   else if (parent)
@@ -4468,7 +4468,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     mesh = Engine->CreatePortal (
   	  container_name ? container_name : name,
   	  parent, destSector,
-  	  poly.GetVertices (), poly.GetVertexCount (), portal);
+  	  poly.GetVertices (), (int)poly.GetVertexCount (), portal);
     AddToRegion (ldr_context, mesh->QueryObject ());
   }
   else
@@ -4477,7 +4477,7 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     mesh = Engine->CreatePortal (
   	  container_name ? container_name : name,
   	  sourceSector, csVector3 (0), destSector,
-  	  poly.GetVertices (), poly.GetVertexCount (), portal);
+  	  poly.GetVertices (), (int)poly.GetVertexCount (), portal);
     AddToRegion (ldr_context, mesh->QueryObject ());
   }
   container_mesh = mesh;

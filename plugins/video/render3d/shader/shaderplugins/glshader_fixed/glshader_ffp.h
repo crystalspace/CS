@@ -73,54 +73,41 @@ private:
   // Layers of multitexturing
   struct mtexlayer
   {
-    //remember which vars to reset on deactivate
-    bool doTexture;
-
-    //texturenumber to use
-    int texnum;
+    // texture to use
     csRef<iTextureHandle> texturehandle;
 
-    //colorsource
-    int colorsource[3];
-    //color modifier
-    int colormod[3];
-    //color operation
-    int colorp;
+    struct TexFunc
+    {
+      // Argument sources
+      int source[3];
+      // Modifier
+      int mod[3];
+      // Operation
+      int op;
+      // Scale
+      float scale;
 
-    //alphasource
-    int alphasource[4];
-    //alpha modifier
-    int alphamod[4];
-    //alpha operation
-    int alphap;
+      TexFunc()
+      {
+	source[0] = GL_PREVIOUS_ARB;
+	source[1] = GL_TEXTURE;
+	source[2] = -1;
+	op = GL_MODULATE;
+	scale = 1.0f;
+      }
+    };
 
-    // rgb scale
-    float scale_rgb;
-    // alpha scale
-    float scale_alpha;
+    TexFunc color;
+    TexFunc alpha;
+
     mtexlayer()
     {
-      texnum = -1;
-      doTexture = false;
-
-      colorsource[0] = GL_PREVIOUS_ARB;
-      colorsource[1] = GL_TEXTURE;
-      colorsource[2] = -1;
-      colormod[0] = GL_SRC_COLOR;
-      colormod[1] = GL_SRC_COLOR;
-      colormod[2] = GL_SRC_COLOR;
-      colorp = GL_MODULATE;
-
-      alphasource[0] = GL_PREVIOUS_ARB;
-      alphasource[1] = GL_TEXTURE;
-      alphasource[2] = -1;
-      alphamod[0] = GL_SRC_ALPHA;
-      alphamod[1] = GL_SRC_ALPHA;
-      alphamod[2] = GL_SRC_ALPHA;
-      alphap = GL_MODULATE;
-
-      scale_rgb = 1.0f;
-      scale_alpha = 1.0f;
+      color.mod[0] = GL_SRC_COLOR;
+      color.mod[1] = GL_SRC_COLOR;
+      color.mod[2] = GL_SRC_COLOR;
+      alpha.mod[0] = GL_SRC_ALPHA;
+      alpha.mod[1] = GL_SRC_ALPHA;
+      alpha.mod[2] = GL_SRC_ALPHA;
     }
   };
 
@@ -133,11 +120,17 @@ private:
 
   void Report (int severity, const char* msg, ...);
 
-  void UpdateValid();
-  
   bool LoadLayer(mtexlayer* layer, iDocumentNode* node);
   bool LoadEnvironment(mtexlayer* layer, iDocumentNode* node);
   bool ParseFog (iDocumentNode* node, FogInfo& fog);
+
+  void DumpTexFunc (const mtexlayer::TexFunc& tf);
+  void CompactLayers();
+  bool TryMergeTexFuncs (mtexlayer::TexFunc& newTF, 
+    const mtexlayer::TexFunc& tf1, const mtexlayer::TexFunc& tf2);
+
+  void ActivateTexFunc (const mtexlayer::TexFunc& tf, GLenum sourceP,
+    GLenum operandP, GLenum combineP, GLenum scaleP);
 
   void BuildTokenHash();
 public:
@@ -172,7 +165,7 @@ public:
   { return false; }
 
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+  virtual bool Compile (csArray<iShaderVariableContext*> &staticContexts);
 
   virtual int ResolveTextureBinding (const char* binding)
   { return layerNames.Get (binding, -1); }

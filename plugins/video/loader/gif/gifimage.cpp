@@ -119,18 +119,18 @@ class GIFStream
 {
 private:
   uint8 *buf, *ptr, *bmark;
-  long size, remaining;
+  size_t size, remaining;
   uint8 bitoffs;
   bool EOFcode;
 
 public:
-  GIFStream(uint8* b, long fsize, int offs=0) :
+  GIFStream(uint8* b, size_t fsize, size_t offs=0) :
    buf(b), ptr(b+offs), bmark(0), size(fsize), remaining(fsize-offs),
    bitoffs(0), EOFcode( fsize <= offs ) {}
 
   uint8 operator* () const
   { if (EOFcode) return 0;  else return *ptr; }
-  uint8 operator[] (int i) const
+  uint8 operator[] (size_t i) const
   { if (i >= remaining) return 0;  else return ptr[i]; }
   GIFStream& operator++ ()
   { ptr++;  remaining--;  EOFcode = remaining<=0;  return *this; }
@@ -256,7 +256,7 @@ public:
 
 //---------------------------------------------------------------------------
 
-int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
+int ImageGifFile::decode_gif (uint8* iBuffer, size_t iSize, int* Prefix,
   int* Suffix, int* OutCode)
 {
   GIFStream gptr (iBuffer,iSize);

@@ -798,7 +798,7 @@ class csPrintfFormatter
     {
       do
       {
-	int d = value % 10;
+	int d = (int)(value % 10);
 	scratch.Insert (insertOffs, d + '0');
 	width++;
 	value = value / 10;
@@ -836,7 +836,7 @@ class csPrintfFormatter
     {
       do
       {
-	uint d = value % radix;
+	uint d = (uint)(value % radix);
 	utf32_char ch;
 	if (d <= 9)
 	  ch = d + '0';
@@ -1257,7 +1257,7 @@ public:
 	  }
 	  break;
 	case convGetNum:
-	  *((int*)(params[currentFormat.paramIdx].vPtr)) = writer.GetTotal();
+	  *((int*)(params[currentFormat.paramIdx].vPtr)) = (int)writer.GetTotal();
 	  break;
 	case convErrno:
 	  OutputString (writer, currentFormat, 

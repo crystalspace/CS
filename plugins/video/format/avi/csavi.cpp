@@ -613,13 +613,13 @@ void csAVIFormat::ChunkList::LoadList (uint8 *data, uint32 length)
 {
   uint32 i, nEntries = length / sizeof(indexentry);
   indexentry *ie = (indexentry*)data;
-  int idx;
+  size_t idx;
 
   for (i = 0; i < nEntries; i++)
   {
     ie->Endian ();
     idx = streamlist.FindKey (streamlist.KeyCmp(ie->id));
-    if (idx == -1)
+    if (idx == csArrayItemNotFound)
       idx = streamlist.Push (new StreamIdx (ie->id));
     streamlist.Get (idx)->Push (ie);
     ie++;
@@ -628,14 +628,14 @@ void csAVIFormat::ChunkList::LoadList (uint8 *data, uint32 length)
 
 bool csAVIFormat::ChunkList::HasChunk (uint32 id, uint32 idx)
 {
-  int i = streamlist.FindKey (streamlist.KeyCmp(id));
-  return (i == -1 ? false : idx < (uint32)streamlist.Get (i)->Length ());
+  size_t i = streamlist.FindKey (streamlist.KeyCmp(id));
+  return (i == csArrayItemNotFound ? false : idx < (uint32)streamlist.Get (i)->Length ());
 }
 
 bool csAVIFormat::ChunkList::GetPos (uint32 id, uint32 idx, char *&pos, uint32 &size)
 {
-  int i = streamlist.FindKey (streamlist.KeyCmp(id));
-  if (i != -1)
+  size_t i = streamlist.FindKey (streamlist.KeyCmp(id));
+  if (i != csArrayItemNotFound)
   {
     indexentry *ie = streamlist.Get (i)->Get (idx);
     pos = start + ie->offset;

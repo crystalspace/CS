@@ -334,7 +334,7 @@ const char *csConsoleInput::GetText (int iLine) const
 
 int csConsoleInput::GetCurLine () const
 {
-  return History.Length () - 1;
+  return (int)History.Length () - 1;
 }
 
 void csConsoleInput::SetBufferSize (int iSize)
@@ -366,7 +366,7 @@ void csConsoleInput::Refresh ()
   Console->PutText ("\r");
   Console->PutText ("%s", Prompt);
   Console->PutText ("%s", line.GetData ());
-  Console->SetCursorPos (PromptLen + vCursorPos);
+  Console->SetCursorPos ((int)(PromptLen + vCursorPos));
   if (InsertMode)
     Console->SetCursorStyle (csConInsertCursor);
   else

@@ -708,7 +708,7 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH,
   if (glyphData != 0)
     defW = glyphData->gMetrics.advance;
 
-  int textLen = strlen ((char*)text);
+  size_t textLen = strlen ((char*)text);
   while (textLen > 0)
   {
     utf32_char glyph;
@@ -743,7 +743,7 @@ int csDefaultFont::GetLength (const char *text, int maxwidth)
     defW = glyphData->gMetrics.advance;
 
   int n = 0;
-  int textLen = strlen ((char*)text);
+  size_t textLen = strlen ((char*)text);
   while (textLen > 0)
   {
     utf32_char glyph;
@@ -779,8 +779,8 @@ void csDefaultFont::AddDeleteCallback (iFontDeleteNotify* func)
 
 bool csDefaultFont::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  int idx = DeleteCallbacks.Find (func);
-  if (idx != -1)
+  size_t idx = DeleteCallbacks.Find (func);
+  if (idx != csArrayItemNotFound)
   {
     DeleteCallbacks.Delete (func);
     return true;

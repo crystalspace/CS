@@ -1055,11 +1055,11 @@ public:
 class esmPar : public iParameterESM
 {
 private:
-  int idx;
+  size_t idx;
 
 public:
   SCF_DECLARE_IBASE;
-  esmPar (int idx)
+  esmPar (size_t idx)
   {
     SCF_CONSTRUCT_IBASE (0);
     esmPar::idx = idx;
@@ -1157,8 +1157,8 @@ SCF_IMPLEMENT_IBASE_END
 csPtr<iParameterESM> csEngineSequenceParameters::CreateParameterESM (
 	const char* name)
 {
-  int idx = GetParameterIdx (name);
-  if (idx == -1) return 0;
+  size_t idx = GetParameterIdx (name);
+  if (idx == csArrayItemNotFound) return 0;
   csRef<iParameterESM> par = csPtr<iParameterESM> (new esmPar (idx));
   return csPtr<iParameterESM>(par);
 }
@@ -1203,7 +1203,7 @@ csPtr<iEngineSequenceParameters> csSequenceWrapper::CreateParameterBlock ()
   if (!params) return 0;
   csEngineSequenceParameters* copyparams = new csEngineSequenceParameters ();
 
-  int i;
+  size_t i;
   for (i = 0 ; i < params->GetParameterCount () ; i++)
   {
     const char* name = params->GetParameterName (i);
@@ -1918,8 +1918,8 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
     global_framenr++;
 
     csTicks curtime = seqmgr->GetMainTime () + seqmgr->GetDeltaTime ();
-    int i = timed_operations.Length ()-1;
-    while (i >= 0)
+    size_t i = timed_operations.Length ();
+    while (i-- > 0)
     {
       csTimedOperation* op = timed_operations[i];
       if (curtime >= op->end)
@@ -1932,7 +1932,6 @@ bool csEngineSequenceManager::HandleEvent (iEvent &event)
 	float time = float (curtime-op->start) / float (op->end-op->start);
         op->op->Do (time, op->GetParams ());
       }
-      i--;
     }
 
     return true;
@@ -2009,12 +2008,12 @@ void csEngineSequenceManager::RemoveTriggers ()
   triggers.DeleteAll ();
 }
 
-int csEngineSequenceManager::GetTriggerCount () const
+size_t csEngineSequenceManager::GetTriggerCount () const
 {
   return triggers.Length ();
 }
 
-iSequenceTrigger* csEngineSequenceManager::GetTrigger (int idx) const
+iSequenceTrigger* csEngineSequenceManager::GetTrigger (size_t idx) const
 {
   return triggers[idx];
 }
@@ -2063,12 +2062,12 @@ void csEngineSequenceManager::RemoveSequences ()
   sequences.DeleteAll ();
 }
 
-int csEngineSequenceManager::GetSequenceCount () const
+size_t csEngineSequenceManager::GetSequenceCount () const
 {
   return sequences.Length ();
 }
 
-iSequenceWrapper* csEngineSequenceManager::GetSequence (int idx) const
+iSequenceWrapper* csEngineSequenceManager::GetSequence (size_t idx) const
 {
   return sequences[idx];
 }

@@ -279,7 +279,7 @@ const char *csConsoleOutput::GetLine (int line) const
 void csConsoleOutput::DeleteText (int start, int end)
 {
   csString *text = buffer->WriteLine ();
-  int length = text->Length ();
+  int length = (int)text->Length ();
 
   // Avoid invalid start points
   if (start > length)
@@ -289,7 +289,7 @@ void csConsoleOutput::DeleteText (int start, int end)
   if ((end == -1) || (end >= length))
   {
     text->DeleteAt (start, length - start);
-    cx = text->Length ();
+    cx = (int)text->Length ();
   }
   else
   {
@@ -561,7 +561,7 @@ void csConsoleOutput::SetCursorPos(int x, int y)
   const csString *curline = buffer->GetLine (cy);
 
   if (curline)
-    max_x = curline->Length ();
+    max_x = (int)curline->Length ();
   else
     max_x = 0;
 
@@ -586,7 +586,7 @@ void csConsoleOutput::SetCursorPos (int iCharNo)
     int max_x;
     const csString *curline = buffer->GetLine (cy);
 
-    max_x = curline ? curline->Length () : 0;
+    max_x = curline ? (int)curline->Length () : 0;
     cx = (iCharNo > max_x) ? max_x : (iCharNo <= 0) ? 0 : iCharNo;
   }
 }

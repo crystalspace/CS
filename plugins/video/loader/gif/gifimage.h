@@ -58,7 +58,7 @@ class csGIFImageIO : public iImageIO
 class ImageGifFile : public csImageMemory
 {
   friend class csGIFImageIO;
-  int decode_gif (uint8* iBuffer, long iSize, int* Prefix, int* Suffix, int* OutCode);
+  int decode_gif (uint8* iBuffer, size_t iSize, int* Prefix, int* Suffix, int* OutCode);
 
 private:
   /// Initialize the image object

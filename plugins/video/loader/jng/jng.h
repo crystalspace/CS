@@ -81,7 +81,7 @@ class ImageJngFile : public csImageMemory, public iAnimatedImage
   friend class csJNGImageIO;
 private:
   uint8  *buffer, *bufptr;
-  uint32 bufferSize;
+  size_t bufferSize;
   
   uint8 *NewImage;
   iObjectRegistry* object_reg;

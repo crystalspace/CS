@@ -159,7 +159,7 @@ void LevelWriter::WriteTexturesMaterials (iDocumentNode* worldnode)
     // set file name to name of texture, whether it's valid or not
     // (this is only to maintain backward compatibility w/old 3ds2lev)
     textnode->SetValue (pMaterial->name);
-    int pos = strlen(pMaterial->name);
+    size_t pos = strlen(pMaterial->name);
 
     // if material name does not end with dot and 3 letters
     // try to get it from the filename field of the texture1_map

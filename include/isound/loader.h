@@ -25,7 +25,7 @@
 struct iSoundData;
 struct csSoundFormat;
 
-SCF_VERSION (iSoundLoader, 1, 0, 1);
+SCF_VERSION (iSoundLoader, 1, 1, 0);
 
 /**
  * The sound loader is used to load sound files given a raw input data stream.
@@ -33,7 +33,7 @@ SCF_VERSION (iSoundLoader, 1, 0, 1);
 struct iSoundLoader : public iBase
 {
   /// Create a sound object from raw input data.
-  virtual csPtr<iSoundData> LoadSound(void *Data, uint32 Size) = 0;
+  virtual csPtr<iSoundData> LoadSound(void *Data, size_t Size) = 0;
 };
 
 #endif // __CS_ISOUND_LOADER_H__

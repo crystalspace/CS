@@ -217,13 +217,13 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
   }
 }
 
-int csTargetRenderStep::AddStep (iRenderStep* step)
+size_t csTargetRenderStep::AddStep (iRenderStep* step)
 {
-  if (!step) return -1;
+  if (!step) return csArrayItemNotFound;
   return steps.Push (step);
 }
 
-int csTargetRenderStep::GetStepCount ()
+size_t csTargetRenderStep::GetStepCount ()
 {
   return steps.Length();
 }

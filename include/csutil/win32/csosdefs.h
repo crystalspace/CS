@@ -218,12 +218,14 @@
 /*
   LONG_PTR is used in the Win32 canvases, but it's only defined in newer 
   Platform or DirectX SDKs (in BaseTsd.h).
-  Ergo, on older SDKs, we have to define ourselves. One indicator for the
-  presence of LONG_PTR seems to be if the __int3264 macro is #defines.
+  Ergo, on older SDKs, we have to define it ourselves. One indicator for the
+  presence of LONG_PTR seems to be if the __int3264 macro is #defined.
   So, if it's not, we define LONG_PTR.
  */
 #ifndef __int3264
   typedef LONG LONG_PTR;
+  typedef ULONG ULONG_PTR;
+  typedef DWORD DWORD_PTR;
 #endif
 
 #if defined(_DEBUG) || defined(CS_DEBUG)

@@ -378,7 +378,7 @@ bool Md2::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
         memset(name_action, 0, 64);
 
         int base_action;
-        for (j = strlen(frames[i].name)-1; j > 1; j--)
+        for (j = (int)strlen(frames[i].name)-1; j > 1; j--)
           if (!isdigit(frames[i].name[j]))
             break;
         if(strlen(frames[i].name) > (unsigned int) j + 3)

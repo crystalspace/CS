@@ -33,8 +33,8 @@ SCF_VERSION (iRenderStepContainer, 0, 0, 1);
  */
 struct iRenderStepContainer : public iBase
 {
-  virtual int AddStep (iRenderStep* step) = 0;
-  virtual int GetStepCount () = 0;
+  virtual size_t AddStep (iRenderStep* step) = 0;
+  virtual size_t GetStepCount () = 0;
 };
 
 #endif

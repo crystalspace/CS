@@ -475,7 +475,7 @@ bool CMapPolygon::CheckIfInside(const CdVector3&               point,
   return true;
 }
 
-void CMapPolygon::SetErrorInfo(int BrushLineNumber, int PlaneNumber)
+void CMapPolygon::SetErrorInfo(int BrushLineNumber, size_t PlaneNumber)
 {
   m_BrushLineNumber = BrushLineNumber;
   m_PlaneNumber     = PlaneNumber;

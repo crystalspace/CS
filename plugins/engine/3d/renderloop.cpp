@@ -95,14 +95,14 @@ void csRenderLoop::Draw (iRenderView *rview, iSector *s)
   }
 }
 
-int csRenderLoop::AddStep (iRenderStep* step)
+size_t csRenderLoop::AddStep (iRenderStep* step)
 {
-  return (int)steps.Push (step);
+  return steps.Push (step);
 }
 
-int csRenderLoop::GetStepCount ()
+size_t csRenderLoop::GetStepCount ()
 {
-  return (int)steps.Length();
+  return steps.Length();
 }
 
 //---------------------------------------------------------------------------

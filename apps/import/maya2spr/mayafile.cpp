@@ -69,7 +69,7 @@ int InputFile::ReadRawBytes(int iBytes,void *pBuff)
 {
     if (!IsValid())
         return 0;
-    return fread(pBuff,iBytes,1,f);
+    return (int)fread(pBuff,iBytes,1,f);
 }
 
 csString& InputFile::ReadBytes(int iBytes)
@@ -94,7 +94,7 @@ csString& InputFile::ReadBytes(int iBytes)
 int InputFile::Read(void *pPtr,int iNum)
 {
     if (IsValid())
-        return fread(pPtr,1,iNum,f);
+        return (int)fread(pPtr,1,iNum,f);
     else
         return 0;
 }

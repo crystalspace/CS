@@ -155,15 +155,19 @@ extern "C" {
 
 /* lzo_uint is used like size_t */
 #if !defined(LZO_UINT_MAX)
+// Use __w64 for MSVC7+ to silence 64bit warnings
+#  if !defined(_MSC_VER) || (_MSC_VER < 1300)
+#    define __w64
+#  endif
 #  if (UINT_MAX >= LZO_0xffffffffL)
-     typedef unsigned int       lzo_uint;
-     typedef int                lzo_int;
+     typedef __w64 unsigned int       lzo_uint;
+     typedef __w64 int                lzo_int;
 #    define LZO_UINT_MAX        UINT_MAX
 #    define LZO_INT_MAX         INT_MAX
 #    define LZO_INT_MIN         INT_MIN
 #  elif (ULONG_MAX >= LZO_0xffffffffL)
-     typedef unsigned long      lzo_uint;
-     typedef long               lzo_int;
+     typedef __w64 unsigned long      lzo_uint;
+     typedef __w64 long               lzo_int;
 #    define LZO_UINT_MAX        ULONG_MAX
 #    define LZO_INT_MAX         LONG_MAX
 #    define LZO_INT_MIN         LONG_MIN

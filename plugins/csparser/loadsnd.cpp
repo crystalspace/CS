@@ -49,7 +49,7 @@ csPtr<iSoundData> csLoader::LoadSoundData(const char* filename)
 
   // load the sound
   csRef<iSoundData> Sound (
-		  SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize ()));
+    SoundLoader->LoadSound (buf->GetUint8 (), buf->GetSize ()));
 
   // check for valid sound data
   if (!Sound)

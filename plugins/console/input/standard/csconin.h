@@ -45,7 +45,7 @@ class csConsoleInput : public iConsoleInput
   iConsoleOutput *Console;
   // The prompt
   char *Prompt;
-  int PromptLen;
+  size_t PromptLen;
   // Current line
   csString line;
   //int linemax;
@@ -101,7 +101,7 @@ public:
 
   /// Retrieve the size of the history buffer
   virtual int GetBufferSize () const
-  { return MaxLines; }
+  { return (int)MaxLines; }
 
   /// Set the size of the history buffer;
   virtual void SetBufferSize (int iSize);

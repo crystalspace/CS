@@ -246,8 +246,8 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
       error = true;
       return 0;
     }
-    int idx = params->GetParameterIdx (parname);
-    if (idx == -1)
+    size_t idx = params->GetParameterIdx (parname);
+    if (idx == csArrayItemNotFound)
     {
       SyntaxService->ReportError (
 	"crystalspace.maploader.parse.sequenceparams", child,

@@ -268,7 +268,7 @@ void csFontServerMultiplexor::ParseFontLoaderOrder (
   while ((str != 0) && (*str != 0))
   {
     const char* comma = strchr (str, ',');
-    int partLen = (comma ? (comma - str) : strlen (str));
+    size_t partLen = (comma ? (comma - str) : strlen (str));
     CS_ALLOC_STACK_ARRAY (char, part, partLen + 1);
     strncpy (part, str, partLen);
     part[partLen] = 0;
@@ -380,7 +380,8 @@ csFontPlexer::~csFontPlexer ()
 
   delete order;
 
-  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  size_t i = DeleteCallbacks.Length ();
+  while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     delnot->BeforeDelete (this);
@@ -466,7 +467,7 @@ void csFontPlexer::GetDimensions (const char *text, int &oW, int &oH, int &desc)
   primaryFont->GetMaxSize (dummy, oH);
   desc = primaryFont->GetDescent ();
 
-  int textLen = strlen ((char*)text);
+  size_t textLen = strlen ((char*)text);
   while (textLen > 0)
   {
     utf32_char glyph;
@@ -517,7 +518,7 @@ int csFontPlexer::GetLength (const char *text, int maxwidth)
   }
 
   int n = 0;
-  int textLen = strlen ((char*)text);
+  size_t textLen = strlen ((char*)text);
   while (textLen > 0)
   {
     utf32_char glyph;
@@ -557,8 +558,8 @@ void csFontPlexer::AddDeleteCallback (iFontDeleteNotify* func)
 
 bool csFontPlexer::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  int i;
-  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  size_t i = DeleteCallbacks.Length ();
+  while (i-- > 0)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     if (delnot == func)

@@ -43,6 +43,9 @@ chronological order.
 	- Eric Sunshine fixed bug in CS_PATH_CRYSTAL_CHECK() in crystal.m4
 	  which caused the test to fail on Windows because the program
 	  contained two main() functions.
+	- res fixed a couple VC7 64bit warnings again.
+	- res made the fixed function FP support do some optimization, that is,
+	  under some circumstances two layers are merged into one.
 24-Mar-2005
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()

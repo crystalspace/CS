@@ -860,10 +860,10 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
       continue;
 
     bool do_clamp = false;
-    int num_verts = poly->num_vertices;
+    size_t num_verts = poly->num_vertices;
     int* vi = poly->vertices;
     float max_depth = -1.0;
-    int j;
+    size_t j;
     for (j = 0 ; j < num_verts ; j++)
     {
       int vertex_idx = vi[j];
@@ -907,7 +907,7 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
     }
     if (max_depth > 0.0)
     {
-      int mod = tcovbuf->InsertPolygon (verts2d, num_verts, max_depth,
+      int mod = tcovbuf->InsertPolygon (verts2d, (int)num_verts, max_depth,
       	occluder_box);
       modified += mod;
 #     ifdef CS_DEBUG
@@ -939,7 +939,7 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
         Perspective (v, verts2d[j], fov, sx, sy);
       }
 
-      int mod = tcovbuf->InsertPolygon (verts2d, num_verts, max_depth,
+      int mod = tcovbuf->InsertPolygon (verts2d, (int)num_verts, max_depth,
       	occluder_box);
       modified += mod;
 #     ifdef CS_DEBUG
@@ -963,7 +963,7 @@ void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
   {
     // Remember the amount of already occluded objects in all tiles modified
     // by this occluder.
-    int idx = occluder_info.Length ();
+    size_t idx = occluder_info.Length ();
     occluder_info.SetLength (idx+1);
     csOccluderInfo& occinfo = occluder_info[idx];
     occinfo.obj = obj;
@@ -1041,7 +1041,7 @@ void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
   {
     // Remember the amount of already occluded objects in all tiles modified
     // by this occluder.
-    int idx = occluder_info.Length ();
+    size_t idx = occluder_info.Length ();
     occluder_info.SetLength (idx+1);
     csOccluderInfo& occinfo = occluder_info[idx];
     occinfo.obj = obj;

@@ -130,12 +130,12 @@ struct iEngineSequenceParameters : public iBase
   /**
    * Get the number of parameters supported.
    */
-  virtual int GetParameterCount () const = 0;
+  virtual size_t GetParameterCount () const = 0;
 
   /**
    * Get a parameter.
    */
-  virtual iBase* GetParameter (int idx) const = 0;
+  virtual iBase* GetParameter (size_t idx) const = 0;
 
   /**
    * Get a parameter by name.
@@ -145,12 +145,12 @@ struct iEngineSequenceParameters : public iBase
   /**
    * Get a parameter index by name.
    */
-  virtual int GetParameterIdx (const char* name) const = 0;
+  virtual size_t GetParameterIdx (const char* name) const = 0;
 
   /**
    * Get parameter name.
    */
-  virtual const char* GetParameterName (int idx) const = 0;
+  virtual const char* GetParameterName (size_t idx) const = 0;
 
   /**
    * Add a parameter. Warning! ONLY call this for setting up the
@@ -162,7 +162,7 @@ struct iEngineSequenceParameters : public iBase
   /**
    * Set a parameter by index.
    */
-  virtual void SetParameter (int idx, iBase* value) = 0;
+  virtual void SetParameter (size_t idx, iBase* value) = 0;
 
   /**
    * Set a parameter by name.
@@ -745,12 +745,12 @@ struct iEngineSequenceManager : public iBase
   /**
    * Get the number of triggers.
    */
-  virtual int GetTriggerCount () const = 0;
+  virtual size_t GetTriggerCount () const = 0;
 
   /**
    * Get a trigger.
    */
-  virtual iSequenceTrigger* GetTrigger (int idx) const = 0;
+  virtual iSequenceTrigger* GetTrigger (size_t idx) const = 0;
 
   /**
    * Get a trigger by name.
@@ -785,12 +785,12 @@ struct iEngineSequenceManager : public iBase
   /**
    * Get the number of sequences.
    */
-  virtual int GetSequenceCount () const = 0;
+  virtual size_t GetSequenceCount () const = 0;
 
   /**
    * Get a sequence.
    */
-  virtual iSequenceWrapper* GetSequence (int idx) const = 0;
+  virtual iSequenceWrapper* GetSequence (size_t idx) const = 0;
 
   /**
    * Get a sequence by name.

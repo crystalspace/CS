@@ -426,7 +426,7 @@ bool csSoundDriverWaveOut::BackgroundThread::FillBlock(SoundBlock *Block)
   lpWaveHdr->dwBufferLength = parent_driver->MemorySize;
   lpWaveHdr->dwFlags = 0L;
   lpWaveHdr->dwLoops = 0L;
-  lpWaveHdr->dwUser = (DWORD)Block;
+  lpWaveHdr->dwUser = (DWORD_PTR)Block;
 
   result = waveOutPrepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
   if (!CheckError("waveOutPrepareHeader", result)) {
@@ -462,8 +462,8 @@ void csSoundDriverWaveOut::BackgroundThread::Run()
   SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_TIME_CRITICAL);
 
   // Startup waveOut device
-  result = waveOutOpen (&WaveOut, parent_driver->waveout_device_index, &(parent_driver->Format),
-    (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
+  result = waveOutOpen (&WaveOut, parent_driver->waveout_device_index, 
+    &(parent_driver->Format), (DWORD_PTR)&waveOutProc, 0L, CALLBACK_FUNCTION);
   CheckError ("waveOutOpen", result);
 
 

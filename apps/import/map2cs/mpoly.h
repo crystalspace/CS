@@ -93,7 +93,7 @@ public:
   void FlipSide();
 
   /// Give some info to the polygon so better errors can be generated.
-  void SetErrorInfo(int BrushLineNumber, int PlaneNumber);
+  void SetErrorInfo (int BrushLineNumber, size_t PlaneNumber);
 
   /// Access all vertices from outside
   size_t             GetVertexCount() const     {return m_Vertices.Length();}
@@ -167,7 +167,7 @@ protected:
   int m_BrushLineNumber;
 
   /// info on the plane in the brush
-  int m_PlaneNumber;
+  size_t m_PlaneNumber;
 
   /// pointer to the brush, that this polyon was originally part of.
   CMapBrush* m_pBrush;

@@ -57,7 +57,7 @@ public:
     SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
     SCF_DESTRUCT_IBASE();
   }
-  virtual csPtr<iSoundData> LoadSound(void *Buffer, uint32 Size);
+  virtual csPtr<iSoundData> LoadSound(void *Buffer, size_t Size);
 };
 
 SCF_IMPLEMENT_IBASE(csSoundLoader_AIFF)
@@ -84,7 +84,7 @@ SCF_IMPLEMENT_FACTORY(csSoundLoader_AIFF)
 #define Stream buf[index]
 
 csPtr<iSoundData>
-csSoundLoader_AIFF::LoadSound(void* databuf, uint32 size)
+csSoundLoader_AIFF::LoadSound(void* databuf, size_t size)
 {
   uint8 *buf = (uint8*) databuf;
   unsigned long index=0;

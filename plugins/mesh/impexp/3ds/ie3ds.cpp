@@ -72,20 +72,21 @@ static long DataSeekFunc( void *self, long offset, Lib3dsIoSeek origin )
 {
   csDataStream *pData = (csDataStream*)self;
 
+  size_t newOffs = offset;
   switch (origin)
   {
     case LIB3DS_SEEK_SET:
       break;
     case LIB3DS_SEEK_CUR:
-      offset += pData->GetPosition();
+      newOffs += pData->GetPosition();
       break;
     case LIB3DS_SEEK_END:
-      offset += pData->GetLength();
+      newOffs = pData->GetLength();
       break;
     default:
       return 1;
   }
-  pData->SetPosition( offset );
+  pData->SetPosition (newOffs);
   return 0;
 }
 
@@ -100,7 +101,7 @@ static long DataTellFunc( void *self )
 static int DataReadFunc( void *self, Lib3dsByte *buffer, int size )
 {
   csDataStream *pData = (csDataStream*)self;
-  return pData->Read( buffer, size );
+  return (int)pData->Read( buffer, size );
 }
 
 

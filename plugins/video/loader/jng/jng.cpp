@@ -184,7 +184,7 @@ mng_bool csJNGImageIO::cb_writedata (mng_handle hHandle, mng_ptr pBuf,
 
   this_ = (csJNGImageIO *)mng_get_userdata (hHandle);
 
-  *pWritten = this_->outfile->Write ((char*)pBuf, iBuflen);
+  *pWritten = (mng_uint32)this_->outfile->Write ((char*)pBuf, iBuflen);
 
   return MNG_TRUE;
 }
@@ -527,7 +527,8 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
 
       // funny, mng_putchunk_jdaa is missing from libmng
       //if (mng_putchunk_jdaa (handle, ds.len, ds.data) != MNG_NOERROR)
-      if (mng_putchunk_unknown (handle, MNG_UINT_JDAA, ds.len, ds.data) != MNG_NOERROR)
+      if (mng_putchunk_unknown (handle, MNG_UINT_JDAA, 
+	(mng_uint32)ds.len, ds.data) != MNG_NOERROR)
       {
 	ReportLibmngError (object_reg, handle, "failed to put JDAA chunk");
 	mng_cleanup (&handle);
@@ -593,7 +594,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
         size_t size = sizeof (buff) - zs.avail_out;
 
 	// create a chuk w/compressed data.
-	if (mng_putchunk_idat (handle, size, &buff) != MNG_NOERROR)
+	if (mng_putchunk_idat (handle, (mng_uint32)size, &buff) != MNG_NOERROR)
 	{
 	  ReportLibmngError (object_reg, handle, "failed to put IDAT chunk");
           deflateEnd (&zs);
@@ -667,7 +668,7 @@ csPtr<iDataBuffer> csJNGImageIO::Save (iImage *Image,
 
   delete [] row;
 
-  if (mng_putchunk_jdat (handle, ds.len, ds.data) != MNG_NOERROR)
+  if (mng_putchunk_jdat (handle, (mng_uint32)ds.len, ds.data) != MNG_NOERROR)
   {
     ReportLibmngError (object_reg, handle, "failed to put JDAT chunk");
     mng_cleanup (&handle);

@@ -64,7 +64,7 @@ csSharedVariableList::~csSharedVariableList ()
 
 int csSharedVariableList::SharedVariableList::GetCount () const
 {
-  return scfParent->Length ();
+  return (int)scfParent->Length ();
 }
 
 iSharedVariable *csSharedVariableList::SharedVariableList::Get (int n) const
@@ -74,7 +74,7 @@ iSharedVariable *csSharedVariableList::SharedVariableList::Get (int n) const
 
 int csSharedVariableList::SharedVariableList::Add (iSharedVariable *obj)
 {
-  return scfParent->Push (obj);
+  return (int)scfParent->Push (obj);
 }
 
 bool csSharedVariableList::SharedVariableList::Remove (iSharedVariable *obj)
@@ -94,7 +94,7 @@ void csSharedVariableList::SharedVariableList::RemoveAll ()
 
 int csSharedVariableList::SharedVariableList::Find (iSharedVariable *obj) const
 {
-  return scfParent->Find (obj);
+  return (int)scfParent->Find (obj);
 }
 
 iSharedVariable *csSharedVariableList::SharedVariableList::FindByName (

@@ -147,8 +147,8 @@ public:
   void Perform (iRenderView* rview, iSector* sector, iLight* light,
     csShaderVarStack &stacks);
 
-  virtual int AddStep (iRenderStep* step);
-  virtual int GetStepCount ();
+  virtual size_t AddStep (iRenderStep* step);
+  virtual size_t GetStepCount ();
 
   struct ShadowDrawVisCallback : public iVisibilityCullerListener
   {

@@ -123,8 +123,8 @@ bool csRenderStepParser::ParseRenderSteps (iRenderStepContainer* container,
 	  {
 	    return false;
 	  }
-	  int idx;
-	  if ((idx = container->AddStep (step)) < 0)
+	  size_t idx;
+	  if ((idx = container->AddStep (step)) == csArrayItemNotFound)
 	  {
 	    if (synldr)
 	    {

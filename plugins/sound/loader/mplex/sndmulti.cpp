@@ -54,7 +54,7 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
 
   // Load a sound file from the raw data.
-  virtual csPtr<iSoundData> LoadSound(void *Data, uint32 Size);
+  virtual csPtr<iSoundData> LoadSound(void *Data, size_t Size);
 
   struct eiComponent : public iComponent
   {
@@ -147,7 +147,7 @@ bool csSoundLoaderMultiplexer::LoadNextPlugin ()
 }
 
 csPtr<iSoundData> csSoundLoaderMultiplexer::LoadSound (
-	void *Data, uint32 Size) 
+	void *Data, size_t Size) 
 {
   bool consecutive = false; // set to true if we searched the list completely.
   do

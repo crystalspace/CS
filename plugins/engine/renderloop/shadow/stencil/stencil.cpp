@@ -684,17 +684,17 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
 }
 
-int csStencilShadowStep::AddStep (iRenderStep* step)
+size_t csStencilShadowStep::AddStep (iRenderStep* step)
 {
   csRef<iLightRenderStep> lrs = 
     SCF_QUERY_INTERFACE (step, iLightRenderStep);
-  if (!lrs) return -1;
-  return (int)steps.Push (lrs);
+  if (!lrs) return csArrayItemNotFound;
+  return steps.Push (lrs);
 }
 
-int csStencilShadowStep::GetStepCount ()
+size_t csStencilShadowStep::GetStepCount ()
 {
-  return (int)steps.Length();
+  return steps.Length();
 }
 
 SCF_IMPLEMENT_IBASE(csStencilShadowStep::ShadowDrawVisCallback)

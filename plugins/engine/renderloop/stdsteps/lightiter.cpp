@@ -300,15 +300,15 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
   }
 }
 
-int csLightIterRenderStep::AddStep (iRenderStep* step)
+size_t csLightIterRenderStep::AddStep (iRenderStep* step)
 {
   csRef<iLightRenderStep> lrs = 
     SCF_QUERY_INTERFACE (step, iLightRenderStep);
-  if (!lrs) return -1;
+  if (!lrs) return csArrayItemNotFound;
   return steps.Push (lrs);
 }
 
-int csLightIterRenderStep::GetStepCount ()
+size_t csLightIterRenderStep::GetStepCount ()
 {
   return steps.Length();
 }

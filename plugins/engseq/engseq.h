@@ -55,13 +55,13 @@ public:
   virtual ~csEngineSequenceParameters ()
   { SCF_DESTRUCT_IBASE(); }
 
-  virtual int GetParameterCount () const
+  virtual size_t GetParameterCount () const
   {
     return params.Length ();
   }
-  virtual iBase* GetParameter (int idx) const
+  virtual iBase* GetParameter (size_t idx) const
   {
-    CS_ASSERT (idx >= 0 && (size_t)idx < params.Length ());
+    CS_ASSERT (idx < params.Length ());
     return params[idx]->value;
   }
   virtual iBase* GetParameter (const char* name) const
@@ -71,16 +71,16 @@ public:
       if (!strcmp (name, params[i]->name)) return params[i]->value;
     return 0;
   }
-  virtual int GetParameterIdx (const char* name) const
+  virtual size_t GetParameterIdx (const char* name) const
   {
     size_t i;
     for (i = 0 ; i < params.Length () ; i++)
       if (!strcmp (name, params[i]->name)) return i;
-    return -1;
+    return csArrayItemNotFound;
   }
-  virtual const char* GetParameterName (int idx) const
+  virtual const char* GetParameterName (size_t idx) const
   {
-    CS_ASSERT (idx >= 0 && (size_t)idx < params.Length ());
+    CS_ASSERT (idx < params.Length ());
     return params[idx]->name;
   }
   virtual void AddParameter (const char* name, iBase* def_value = 0)
@@ -91,15 +91,15 @@ public:
     params.Push (p);
     p->DecRef ();
   }
-  virtual void SetParameter (int idx, iBase* value)
+  virtual void SetParameter (size_t idx, iBase* value)
   {
-    CS_ASSERT (idx >= 0 && (size_t)idx < params.Length ());
+    CS_ASSERT (idx < params.Length ());
     params[idx]->value = value;
   }
   virtual void SetParameter (const char* name, iBase* value)
   {
-    int idx = GetParameterIdx (name);
-    if (idx == -1) return;
+    size_t idx = GetParameterIdx (name);
+    if (idx == csArrayItemNotFound) return;
     params[idx]->value = value;
   }
   virtual csPtr<iParameterESM> CreateParameterESM (const char* name);
@@ -594,15 +594,15 @@ public:
   virtual csPtr<iSequenceTrigger> CreateTrigger (const char* name);
   virtual void RemoveTrigger (iSequenceTrigger* trigger);
   virtual void RemoveTriggers ();
-  virtual int GetTriggerCount () const;
-  virtual iSequenceTrigger* GetTrigger (int idx) const;
+  virtual size_t GetTriggerCount () const;
+  virtual iSequenceTrigger* GetTrigger (size_t idx) const;
   virtual iSequenceTrigger* FindTriggerByName (const char* name) const;
   virtual bool FireTriggerByName (const char *name, bool now = false) const;
   virtual csPtr<iSequenceWrapper> CreateSequence (const char* name);
   virtual void RemoveSequence (iSequenceWrapper* seq);
   virtual void RemoveSequences ();
-  virtual int GetSequenceCount () const;
-  virtual iSequenceWrapper* GetSequence (int idx) const;
+  virtual size_t GetSequenceCount () const;
+  virtual iSequenceWrapper* GetSequence (size_t idx) const;
   virtual iSequenceWrapper* FindSequenceByName (const char* name) const;
   virtual bool RunSequenceByName (const char *name,int delay) const;
   virtual void FireTimedOperation (csTicks delta,

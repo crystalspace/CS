@@ -240,11 +240,11 @@ public:
     SCF_DESTRUCT_IBASE();
   }
 
-  virtual csPtr<iSoundData> LoadSound (void *Buffer, uint32 Size)
+  virtual csPtr<iSoundData> LoadSound (void *Buffer, size_t Size)
   {
     csOggSoundData *sd=0;
     if (csOggSoundData::IsOgg (Buffer, Size))
-      sd = new csOggSoundData ((iBase*)this, (uint8*)Buffer, (size_t) Size);
+      sd = new csOggSoundData ((iBase*)this, (uint8*)Buffer, Size);
 
     return csPtr<iSoundData> (sd);
   }

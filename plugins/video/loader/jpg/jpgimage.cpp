@@ -473,7 +473,7 @@ bool ImageJpgFile::JpegLoader::InitOk()
   decompCreated = true;
 
   /* ==== Step 2: specify data source (memory buffer, in this case) */
-  jpeg_memory_src (&cinfo, dataSource->GetData(), dataSource->GetSize());
+  jpeg_memory_src (&cinfo, dataSource->GetData(), (int)dataSource->GetSize());
 
   /* ==== Step 3: read file parameters with jpeg_read_header() */
   (void) jpeg_read_header(&cinfo, TRUE);

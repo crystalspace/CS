@@ -53,8 +53,8 @@ public:
 
   virtual void Draw (iRenderView *rview, iSector *s);
 
-  virtual int AddStep (iRenderStep* step);
-  virtual int GetStepCount ();
+  virtual size_t AddStep (iRenderStep* step);
+  virtual size_t GetStepCount ();
 };
 
 class csRenderLoopManager : public iRenderLoopManager

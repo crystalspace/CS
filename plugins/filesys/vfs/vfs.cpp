@@ -2282,7 +2282,7 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
     CS_ASSERT(node->RPathV.Length() != 0);
     char const* defpath = node->RPathV.Get(0);
     CS_ASSERT(defpath != 0);
-    int const len = strlen(defpath);
+    size_t const len = strlen(defpath);
     if (len > 0 && defpath[len - 1] != VFS_PATH_SEPARATOR)
       sprintf(path, "%s%c%s", defpath, VFS_PATH_SEPARATOR, suffix);
     else

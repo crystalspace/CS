@@ -121,7 +121,7 @@ public:
     SCF_DESTRUCT_IBASE();
   }
 
-  virtual csPtr<iSoundData> LoadSound(void *Buffer, uint32 Size);
+  virtual csPtr<iSoundData> LoadSound(void *Buffer, size_t Size);
 };
 
 SCF_IMPLEMENT_IBASE(csSoundLoader_WAV)
@@ -195,7 +195,7 @@ static inline void csByteSwap32bitBuffer (uint32* ptr, size_t count)
 }
 
 csPtr<iSoundData>
-csSoundLoader_WAV::LoadSound (void* databuf, uint32 size)
+csSoundLoader_WAV::LoadSound (void* databuf, size_t size)
 {
   uint8* buf = (uint8*) databuf;
   csSoundFormat format;

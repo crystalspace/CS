@@ -78,7 +78,8 @@ void Loader::DecompressDXT1 (csRGBpixel* buffer, const uint8* source,
   unsigned char *Temp;
   uint16       color_0, color_1;
   Color8888    colours[4];
-  uint32       bitmask, Offset;
+  uint32       bitmask;
+  size_t       Offset;
 
   Temp = (unsigned char*) source;
   for (z = 0; z < depth; z++) 
@@ -175,9 +176,10 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, const uint8* source,
 {
   int           x, y, z, i, j, k, Select;
   unsigned char *Temp;
-  uint16       color_0, color_1;
+  uint16        color_0, color_1;
   Color8888     colours[4];
-  uint32        bitmask, Offset;
+  uint32        bitmask;
+  size_t	Offset;
   uint16	word;
   DXTAlphaBlockExplicit alpha;
 
@@ -274,7 +276,8 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, const uint8* source,
   const uint8     *Temp;
   uint16       color_0, color_1;
   Color8888       colours[4];
-  uint32          bitmask, Offset;
+  uint32          bitmask;
+  size_t	  Offset;
   uint8		  alphas[8];
   const uint8*	  alphamask;
   uint32          bits;

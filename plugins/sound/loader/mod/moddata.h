@@ -35,8 +35,8 @@ class csModSoundData : public iSoundData
   struct datastore
   {
     unsigned char *data;
-    long pos;
-    long length;
+    size_t pos;
+    size_t length;
     bool bOwn;
     datastore (uint8 *d, size_t l, bool own)
     {
@@ -47,7 +47,7 @@ class csModSoundData : public iSoundData
       }
       else
 	data = d;
-      pos=0; length = (long)l;
+      pos=0; length = l;
       bOwn = own;
     }
     ~datastore(){ if (bOwn) delete[] data;}
@@ -76,7 +76,7 @@ class csModSoundData : public iSoundData
   csSoundFormat fmt;
   bool mod_ok;
   uint8 *buf, *pos;
-  long len, bytes_left;
+  size_t len, bytes_left;
 
  public:
   static bool mikmod_init, mikmod_reinit;

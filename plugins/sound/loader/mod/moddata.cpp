@@ -33,11 +33,13 @@ static int cs_modreader_seek (MREADER* mr, long offset, int whence)
 {
   csModSoundData::cs_mod_reader *r = (csModSoundData::cs_mod_reader *)mr;
 
-  long newpos = (whence == SEEK_SET ? offset :
+  if ((whence == SEEK_END) && ((size_t)-offset > r->ds.length))
+    return -1;
+  size_t newpos = (whence == SEEK_SET ? offset :
 		 whence == SEEK_CUR ? r->ds.pos + offset : r->ds.length + offset);
 
   //  printf("pos = %ld -> seek %ld -> pos = %ld\n",r->ds.pos, offset, newpos);
-  if (newpos < 0 || newpos > r->ds.length)
+  if (newpos > r->ds.length)
     return -1;
   else
     r->ds.pos = newpos;
@@ -48,7 +50,7 @@ static int cs_modreader_seek (MREADER* mr, long offset, int whence)
 static long cs_modreader_tell (MREADER* mr)
 {
   csModSoundData::cs_mod_reader *r = (csModSoundData::cs_mod_reader *)mr;
-  return r->ds.pos;
+  return (long)r->ds.pos;
 }
 
 static int cs_modreader_read (MREADER* mr, void *dest, size_t length)
@@ -263,7 +265,7 @@ void *csModSoundData::ReadStreamed(long &NumSamples)
   if (Player_Active () && mod_ok)
   {
     unsigned char *p;
-    long buffersize = NumSamples * (fmt.Bits >> 3) * fmt.Channels;
+    size_t buffersize = NumSamples * (fmt.Bits >> 3) * fmt.Channels;
     if (buffersize > len)
     {
       buf = (uint8*) realloc (buf, buffersize);
@@ -272,7 +274,7 @@ void *csModSoundData::ReadStreamed(long &NumSamples)
 
     if (!bytes_left)
     {
-      buffersize = VC_WriteBytes ((SBYTE*)buf, buffersize);
+      buffersize = VC_WriteBytes ((SBYTE*)buf, (ULONG)buffersize);
       if (buffersize)
       {
 	bytes_left = buffersize;
@@ -287,18 +289,18 @@ void *csModSoundData::ReadStreamed(long &NumSamples)
 
     p = pos;
 
-    long samples = bytes_left / ((fmt.Bits >> 3) * fmt.Channels);
+    size_t samples = bytes_left / ((fmt.Bits >> 3) * fmt.Channels);
 
     //    printf ("returning %d samples\n", samples);
 
-    if (samples > NumSamples)
+    if (samples > (size_t)NumSamples)
     {
       pos += NumSamples * ((fmt.Bits >> 3) * fmt.Channels);
       bytes_left -= NumSamples * ((fmt.Bits >> 3) * fmt.Channels);
     }
     else
     {
-      NumSamples = samples;
+      NumSamples = (long)samples;
       bytes_left = 0;
     }
 
@@ -337,7 +339,7 @@ public:
     SCF_DESTRUCT_IBASE();
   }
 
-  virtual csPtr<iSoundData> LoadSound (void *Buffer, uint32 Size)
+  virtual csPtr<iSoundData> LoadSound (void *Buffer, size_t Size)
   {
     csModSoundData *sd=0;
     if (csModSoundData::IsMod (Buffer, Size))

@@ -92,8 +92,8 @@ public:
   virtual void Perform (iRenderView* rview, iSector* sector,
     csShaderVarStack &stacks);
 
-  virtual int AddStep (iRenderStep* step);
-  virtual int GetStepCount ();
+  virtual size_t AddStep (iRenderStep* step);
+  virtual size_t GetStepCount ();
 
   void SetTarget (const char* t)
   { target = t; }
