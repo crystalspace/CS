@@ -38,6 +38,7 @@ bool csCurvesArray::FreeItem (csSome Item)
 
 int csCurvesArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
+  (void) Mode;
   const char *name = ((csCurve *)Item)->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
 }
@@ -57,6 +58,7 @@ bool csPolygonArray::FreeItem (csSome Item)
 
 int csPolygonArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
+  (void) Mode;
   const char *name = ((csPolygon3D *)(csPolygonInt *)Item)->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
 }
@@ -81,6 +83,7 @@ bool csPolygonTemplateArray::FreeItem (csSome Item)
 
 int csPolygonTemplateArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
+  (void) Mode;
   const char *name = ((csPolygonTemplate *)Item)->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
 }
@@ -100,6 +103,7 @@ bool csCurveTemplateArray::FreeItem (csSome Item)
 
 int csCurveTemplateArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
 {
+  (void) Mode;
   const char *name = ((csCurveTemplate *)Item)->GetName ();
   return name ? strcmp (name, (char *)Key) : -1;
 }
