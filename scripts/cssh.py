@@ -38,24 +38,21 @@ class csShell:
 		print
 
 	def Handle(self, Command):
-		Alias=1
 		Exec=1
 		if Command[0] == '#':
 			Command=Command[1:]
-			Alias=0
+		else:
+			Command=self.Alias(Command)			
 			
 		if Command[0] == ';':
 			Command=Command[1:]
+			self.Shell(Command)
 			Exec=0
 			
 		else:
 			try:
-				if(Alias):
-					Command=self.Alias(Command)			
 				if(Exec):
 					exec Command in self.UserGlobals, self.UserLocals
-			except NameError, Description:
-				self.Shell(Command)
 			except SystemExit: #Allow script to exit
 				raise SystemExit
 			except:
