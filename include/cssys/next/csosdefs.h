@@ -237,4 +237,77 @@ static inline char* getcwd(char* p, size_t size)
 #  define CS_NO_QSQRT
 #endif
 
+
+//-----------------------------------------------------------------------------
+// This is the (hopefully) MAC OS X compliant mmap code.
+// It supplies the hardware interface for memory-mapped I/O
+//-----------------------------------------------------------------------------
+
+#if defined(OS_NEXT_MACOSX)
+
+#ifdef CS_SYSDEF_PROVIDE_HARDWARE_MMIO
+
+// Needed for Memory-Mapped IO functions below.
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
+// Defines that this platform supports hardware memory-mapped i/o
+#define CS_HAS_MEMORY_MAPPED_IO 1
+
+// Unix specific memory mapped I/O platform dependent stuff
+struct mmioInfo
+{          
+    /// Handle to the mapped file 
+    int hMappedFile;
+
+    /// Base pointer to the data
+    unsigned char *data;
+
+    /// File size
+    unsigned int file_size;
+};
+
+// Fills in the mmioInfo struct by mapping in filename.  Returns true on success, false otherwise.
+inline 
+bool
+MemoryMapFile(mmioInfo *platform, char *filename)
+{   
+  struct stat statInfo;
+  
+  // Have 'nix map this file in for use
+  if (
+      (platform->hMappedFile = open(filename, O_RDONLY)) == -1   ||
+      (fstat(platform->hMappedFile, &statInfo )) == -1           ||
+      (int)(platform->data = (unsigned char *)mmap(0, statInfo.st_size, PROT_READ, 0, platform->hMappedFile, 0)) == -1
+     )
+  {
+    return false;
+  }
+  else
+  {
+    platform->file_size=statInfo.st_size;
+    return true;
+  }
+}
+
+inline 
+void
+UnMemoryMapFile(mmioInfo *platform, char *filename)
+{
+  if (platform->data != -1)
+    munmap(platform->data, file_size);
+
+  if (platform->hMappedFile != -1)
+    close(platform->hMappedFile);
+}
+
+#endif // memory-mapped I/O
+
+
+#endif // OS_NEXT_MACOSX
+
+
 #endif // __NeXT_csosdefs_h

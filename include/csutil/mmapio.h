@@ -39,10 +39,10 @@
 const unsigned csmmioDefaultCacheBlockSize = 256;
 
 /// Default cache size (in cache blocks)
-const unsigned csmmioDefaultCacheSize = 2048;
+const unsigned csmmioDefaultCacheSize = 256;//2048;
 
 /// Default size for hash table (best to use primes here)
-const unsigned csmmioDefaultHashSize = 1559;
+const unsigned csmmioDefaultHashSize = 211;//1559;
 
 
 /// Defines a simple memory-mapped IO class that is portable.  Requires that data be organized in fixed block sizes.
@@ -67,6 +67,18 @@ class csMemoryMappedIO
   
   /// Array of bits where one bit = cache_block_size * block_size bytes.  A set bit indicates we have the page in memory.
   csBitArray *page_map;
+
+#ifdef CS_DEBUG
+
+public:
+  /// Cache hits
+  unsigned int hits;
+
+  /// Cache misses
+  unsigned int misses;
+
+private:
+#endif
 
   /// Holds a contiguous array of cache blocks
   struct CacheBlock
@@ -135,7 +147,15 @@ public:
     if (!valid_mmio_object) return NULL;
 
     if (!(*page_map)[page])
+    {
+      #ifdef CS_DEBUG
+       ++misses;
+      #endif
       CachePage(page);
+    }
+#ifdef CS_DEBUG
+    else ++hits;
+#endif
 
     // This MUST come AFTER CachPage b/c CachePage might re-orient things.
     CacheBlock *cp = cache[page % csmmioDefaultHashSize];
