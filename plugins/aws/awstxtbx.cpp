@@ -103,9 +103,10 @@ bool awsTextBox::Setup (iAws *_wmgr, awsComponentNode *settings)
   pm->GetString (settings, "Disallow", disallow);
   pm->GetString (settings, "MaskChar", maskchar);
 
-  if (text)
-    cursor = text->Length ();
-  else
+  if (text) {
+      cursor = text->Length ();
+      text = new scfString(*text);
+  } else
     text = new scfString ();
 
   switch (frame_style)
@@ -306,7 +307,7 @@ void awsTextBox::OnDraw (csRect /*clip*/)
             bkg,
             Frame ().xmin,
             Frame ().ymin,
-            Frame ().Width (), 
+            Frame ().Width (),
             Frame ().Height (),
             0,
             0,
@@ -337,7 +338,7 @@ void awsTextBox::OnDraw (csRect /*clip*/)
         text->GetData () + start,
         Frame ().Width () - 10);
 
-    if (mcc) 
+    if (mcc)
     {
 
       // Check to see if we're getting wierd.
@@ -350,7 +351,7 @@ void awsTextBox::OnDraw (csRect /*clip*/)
 
       // Get the size of the text
       WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->
-		  GetDimensions (tmp.GetData (), tw, th);
+          GetDimensions (tmp.GetData (), tw, th);
 
       // Calculate the center
       tx = 4;
@@ -358,19 +359,19 @@ void awsTextBox::OnDraw (csRect /*clip*/)
 
       // Draw the text
       g2d->Write (
-	  WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
-	  Frame ().xmin + tx,
-	  Frame ().ymin + ty,
-	  WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
-	  -1,
-	  tmp.GetData ());
+      WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+      Frame ().xmin + tx,
+      Frame ().ymin + ty,
+      WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
+      -1,
+      tmp.GetData ());
 
       if (should_mask && maskchar && saved)
       {
-	text->Clear ();
-	text->Append (saved);
-	saved->Clear ();
-	saved->DecRef ();
+    text->Clear ();
+    text->Append (saved);
+    saved->Clear ();
+    saved->DecRef ();
       }
 
     if (has_focus && blink)
@@ -456,7 +457,7 @@ bool awsTextBox::OnKeypress (int key, int modifiers)
         break;
 
 
-  
+
     case CSKEY_BACKSPACE:
       if (cursor > 0) cursor--;
       if (cursor - start < 5) start = cursor - 5;
