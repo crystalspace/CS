@@ -27,23 +27,11 @@
 #include "cssys/unix/iunix.h"
 #endif
 #include "csutil/inifile.h"
-//#include "cs2d/glide2common/gl2d_font.h"
-#include "cs3d/glide2/gl_txtmgr.h"
-#include "cs3d/glide2/glcache.h"
 #include "iglide2d.h"
+#include <glide.h>
 
-//struct iTextureHandle;
-//class OpenGLTextureCache;
-
-/** Basic OpenGL version of the 2D driver class
- *  You can look at the openGLX graphics class as an example
- *  of how to inherit and use this class.  In short,
- *  inherit from this common class instead of from csGraphics2D,
- *  and override all the functions you normally would except for
- *  the 2D drawing functions, which are supplied for you here.
- *  That way all OpenGL drawing functions are unified over platforms,
- *  so that a fix or improvement will be inherited by all platforms
- *  instead of percolating via people copying code over. -GJH
+/** This is the base implemementation for the glide 2D driver.
+ *  Platform specific implementations inherit from this one.
  */
 class csGraphics2DGlideCommon : public csGraphics2D, public iGraphics2DGlide
 {
@@ -58,14 +46,10 @@ protected:
   int glDrawMode;
   bool GraphicsReady;
   GrLfbInfo_t lfbInfo;
-    
+  GrState fxstate;
+      
   /// flag to prevent 2D drawing
   static bool locked;	
-  /// my own private texture cache--for 2D sprites!
-//  OpenGLTextureCache *texture_cache; //dh: not implemented yet
-
-  /// hold the CS fonts in an OpenGL-friendly format
-//  csGraphics2DOpenGLFontServer *LocalFontServer; //dh: not implemented yet
 
 public:
   DECLARE_IBASE;
@@ -111,23 +95,31 @@ public:
   /// Draw a line
   virtual void DrawLine( int x1, int y1, int x2, int y2, int color);
   /// Draw a pixel
-  static void DrawPixelGlide (csGraphics2D *This, int x, int y, int color);
+  virtual void DrawPixel (int x, int y, int color);
   /// Write a single character
   static void WriteCharGlide (csGraphics2D *This, int x, int y, int fg, int bg, char c);
   /// Draw a 2D sprite
-  static void DrawSpriteGlide (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
-    int sw, int sh, int tx, int ty, int tw, int th);
+  virtual void DrawSprite (iTextureHandle *hTex, int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th);
 
   virtual bool BeginDraw();
   virtual void FinishDraw();
+
+ /**
+  * Save a subarea of screen and return a handle to saved buffer.
+  * Storage is allocated in this call, you should either FreeArea()
+  * the handle after usage or RestoreArea () it.
+  */
+  virtual csImageArea *SaveArea (int x, int y, int w, int h);
+  /// Restore a subarea of screen saved with SaveArea()
+  virtual void RestoreArea (csImageArea *Area, bool Free);
+
   /// Figure out GL RGB color from a packed color format
 //  virtual void setGlideColorfromint(int color); //dh: not implemented yet
 
   /**
    * Get address of video RAM at given x,y coordinates.
-   * The Glide version of this function just returns NULL.
    */
-  static unsigned char* GetPixelAtGlide (csGraphics2D *This,int x, int y);
+  unsigned char* GetPixelAt (int x, int y);
 
   virtual void Print( csRect* area );  
   // iGraphics2DGlide
@@ -135,3 +127,4 @@ public:
 };
 
 #endif
+

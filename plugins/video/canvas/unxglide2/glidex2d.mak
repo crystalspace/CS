@@ -29,13 +29,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cs2d/glide2common
+#vpath %.cpp libs/cs2d/glide2common
 
 # local CFLAGS
-CFLAGS.GLIDEX2D+=-L$(X11_PATH)/include -I/usr/local/glide/include -I/usr/include/glide
+CFLAGS.GLIDEX2D=-I$(X11_PATH)/include -I/usr/local/glide/include -I/usr/include/glide
 
 #add for proper compiling in glide2common
-CFLAGS+=$(CFLAGS.GLIDEX2D)
+#CFLAGS+=$(CFLAGS.GLIDEX2D)
 
 LIBS._GLIDEX2D+=-L$(X11_PATH)/lib -lXext -lX11 -lglide2x  
 
@@ -50,7 +50,6 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_GLIDEX2D
 endif
 DESCRIPTION.$(GLIDEX2D) = $(DESCRIPTION.glidex2d)
-#SRC.GLIDEX2D = $(wildcard libs/cs2d/unxglide2/*.cpp libs/cs2d/glide2common/*.cpp )
 SRC.GLIDEX2D = $(wildcard libs/cs2d/unxglide2/*.cpp $(SRC.COMMON.DRV2D) $(SRC.COMMON.DRV2D.GLIDE))
 OBJ.GLIDEX2D = $(addprefix $(OUT),$(notdir $(SRC.GLIDEX2D:.cpp=$O)))
 
@@ -67,6 +66,9 @@ clean: glidexclean
 glidex2d: $(OUTDIRS) $(GLIDEX2D)
 
 $(OUT)%$O: libs/cs2d/unxglide2/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEX2D)
+ 
+$(OUT)%$O: libs/cs2d/glide2common/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDEX2D)
  
 $(GLIDEX2D): $(OBJ.GLIDEX2D) $(CSGEOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)

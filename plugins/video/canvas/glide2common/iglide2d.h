@@ -43,6 +43,7 @@ struct iGraphics2DGlide : public iBase
   /// Query the display handle
   virtual Display *GetDisplay () = 0;
 #endif
+  /// Do we want to wait for a vertical retrace before we swap front and backbuffer ?
   virtual void SetVRetrace( bool wait4vretrace )=0;
 };
 

@@ -18,8 +18,7 @@
 
 #include <stdarg.h>
 #include "sysdef.h"
-#include "cs2d/glide2common/glide2common2d.h"
-#include "cs3d/glide2/gl_txtmgr.h"
+#include "glide2common2d.h"
 #include "csutil/scf.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
@@ -47,8 +46,6 @@ csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
   csGraphics2D ()
 {
   CONSTRUCT_IBASE (NULL);
-//  LocalFontServer = NULL;
-//  texture_cache = NULL;
   SetVRetrace( false );
 }
 
@@ -64,23 +61,15 @@ bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
   
   Depth = 16;
 
-  _DrawPixel = DrawPixelGlide;
   _WriteChar = WriteCharGlide;
-  _GetPixelAt = GetPixelAtGlide;
-  _DrawSprite = DrawSpriteGlide;
 
   return true;
 }
 
 csGraphics2DGlideCommon::~csGraphics2DGlideCommon ()
 {
-  // Destroy your graphic interface
   Close ();
   CHKB (delete [] Memory);
-//  CHKB (delete [] LocalFontServer);
-//  LocalFontServer = NULL;
-//  CHKB (delete [] texture_cache);
-//  texture_cache = NULL;
 }
 
 bool csGraphics2DGlideCommon::Open(const char *Title)
@@ -91,29 +80,6 @@ bool csGraphics2DGlideCommon::Open(const char *Title)
 
   bPalettized = false;
   bPaletteChanged = false;
-/*
-  // load font 'server'
-  if (LocalFontServer == NULL)
-  {
-       CsPrintf(MSG_INITIALIZATION,"loading fonts...");
-       LocalFontServer = new csGraphics2DOpenGLFontServer(&FontList[0]);
-       for (int fontindex=1; 
-       		fontindex < 8;
-		fontindex++)
-       {
-       	   CsPrintf(MSG_INITIALIZATION,"%d...",fontindex);
-	   LocalFontServer->AddFont(FontList[fontindex]);
-       }
-       CsPrintf(MSG_INITIALIZATION,"\n");
-  }
-
-  // make our own local texture cache for 2D sprites
-    if (texture_cache == NULL)
-  {
-    CHK (texture_cache = new OpenGLTextureCache(1<<24,24));
-  }
-
-  Clear (0);*/  // to be implemented
   return true;
 }
 
@@ -173,7 +139,10 @@ bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
 
   if(locked) FinishDraw();
 
-    
+  // save current state
+//  GlideLib_grGlideGetState( &fxstate );
+//  GlideLib_grDisableAllEffects();
+      
   bret=GlideLib_grLfbLock(glDrawMode|GR_LFB_IDLE,
                           GR_DRAWBUFFER,
                           GR_LFBWRITEMODE_565,
@@ -195,7 +164,10 @@ bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
             LineAddress [i] = (omi--) * lfbInfo.strideInBytes;
         }
       locked=true;
-    }
+    }else
+  {
+//    GlideLib_grGlideSetState( &fxstate );
+  }
   return bret;
 
 }
@@ -211,11 +183,12 @@ void csGraphics2DGlideCommon::FinishDraw ()
   if (locked) 
     GlideLib_grLfbUnlock(glDrawMode,GR_DRAWBUFFER);
   
+//  GlideLib_grGlideSetState( &fxstate );
   locked = false;
 }
 
 
-void csGraphics2DGlideCommon::DrawPixelGlide ( csGraphics2D *This, int x, int y, int color)
+void csGraphics2DGlideCommon::DrawPixel (int x, int y, int color)
 {
   // can't do this while framebuffer is locked...
   if (locked) return;
@@ -229,64 +202,177 @@ void csGraphics2DGlideCommon::DrawPixelGlide ( csGraphics2D *This, int x, int y,
 
 void csGraphics2DGlideCommon::WriteCharGlide ( csGraphics2D *This, int x, int y, int fg, int bg, char c)
 {
-  //if (!locked)
-//thisPtr->BeginDraw();
-//  if (locked) thisPtr->FinishDraw();
-//  thisPtr->BeginDraw();
   This->WriteChar16( This, x,y,fg,bg,c);
-
-  // not implemented yet...
 }
 
-void csGraphics2DGlideCommon::DrawSpriteGlide ( csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
-  int sw, int sh, int tx, int ty, int tw, int th)
+unsigned char* csGraphics2DGlideCommon::GetPixelAt ( int x, int y)
 {
- // if (!locked) thisPtr->BeginDraw();
-//  if (locked) thisPtr->FinishDraw();
-  //thisPtr->BeginDraw();
-  This->DrawSprite16( This, hTex,sx,sy,sw,sh,tx,ty,tw,th);
-  // not implemented yet...
-}
-
-unsigned char* csGraphics2DGlideCommon::GetPixelAtGlide ( csGraphics2D *This, int x, int y)
-{
-  // not implemented yet...
-   //static FxBool bret;
-//   static unsigned char ch;
-   //static GrLfbInfo_t lfbInfo;
-
-/*   if (!locked)
-   {
-     lfbInfo.size=sizeof(GrLfbInfo_t);
-
-
-     bret=GlideLib_grLfbLock(GR_LFB_READ_ONLY|GR_LFB_IDLE,
-                          GR_DRAWBUFFER,
-                          GR_LFBWRITEMODE_565,
-                          GR_ORIGIN_ANY,
-                          FXFALSE,
-                          &lfbInfo);
-     locked=bret;
-   }*/
-
-
-   if (!locked) This->BeginDraw();
-
-   return This->GetPixelAt16( This, x,y);
-/*   if(locked)
-   {
-     //Memory=(unsigned char*)lfbInfo.lfbPtr;
-     return (unsigned char *)thisPtr->Memory+(y*thisPtr->lfbInfo.strideInBytes+x);
-
-     //GlideLib_grLfbUnlock(GR_LFB_READ_ONLY,GR_DRAWBUFFER);
-   }
-
-   else return NULL;*/
+  if (!locked) BeginDraw();
+  return (Memory + (x + x + LineAddress[ y ]));
 }
 
 void csGraphics2DGlideCommon::Print( csRect* area ){
 
-    // swap the buffers only to show the new frame
-    GlideLib_grBufferSwap( m_bVRetrace ? 1 : 0 );
+  // swap the buffers only to show the new frame
+  GlideLib_grBufferSwap( m_bVRetrace ? 1 : 0 );
+}
+
+csImageArea *csGraphics2DGlideCommon::SaveArea (int x, int y, int w, int h)
+{
+  if (x < 0)
+  { w += x; x = 0; }
+  if (x + w > Width)
+    w = Width - x;
+  if (y < 0)
+  { h += y; y = 0; }
+  if (y + h > Height)
+    h = Height - y;
+  if ((w <= 0) || (h <= 0))
+    return NULL;
+
+  CHK (csImageArea *Area = new csImageArea (x, y, w, h));
+  if (!Area)
+    return NULL;
+  CHK (char *dest = Area->data = new char [w * h * pfmt.PixelBytes]);
+  if (!dest)
+  {
+    delete Area;
+    return NULL;
+  }
+  if ( GlideLib_grLfbReadRegion( GR_BUFFER_FRONTBUFFER, x, y, w, h, w*pfmt.PixelBytes, Area->data ) )
+  {
+    // reorder to prepare for restoring
+    y = w*h;
+    UShort hlp;
+    UShort *vram = (UShort*)Area->data;
+    for (x=0; x < y ; x+=2)
+    {
+      hlp = *vram;
+      *vram++ = *(vram+1);
+      *vram++ = hlp;
+    }
+  }
+  else
+  {
+    FreeArea( Area );
+    Area = NULL;
+  }      
+  return Area;
+  
+}
+
+void csGraphics2DGlideCommon::RestoreArea (csImageArea *Area, bool Free)
+{
+  if (Area)
+  {
+    if ( !locked ){
+      GlideLib_grLfbWriteRegion( GR_BUFFER_BACKBUFFER, Area->x, Area->y, GR_LFB_SRC_FMT_565, Area->w, Area->h, Area->w*pfmt.PixelBytes, Area->data );
+    }else{
+      int x, y, n;
+      unsigned char *data = (unsigned char*)Area->data;
+      x = Area->x * pfmt.PixelBytes;
+      n = Area->w * pfmt.PixelBytes;
+      for( y=Area->y; y < Area->h; y++ ){
+        memcpy( Memory + LineAddress[ y ] + x, data, n );
+	data += n;
+      }
+      
+    }
+    if (Free)
+      FreeArea (Area);
+  } /* endif */
+}
+
+void csGraphics2DGlideCommon::DrawSprite ( iTextureHandle *hTex,
+  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
+{
+  bool transp = hTex->GetTransparent ();
+  int bw, bh;
+  hTex->GetMipMapDimensions (0, bw, bh);
+  UShort *bitmap = (UShort *)hTex->GetMipMapData (0);
+  UShort tp;
+
+  int dx = (tw << 16) / sw;
+  int dy = (th << 16) / sh;
+
+  // Clipping
+  if ((sx >= ClipX2) || (sy >= ClipY2) ||
+      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
+    return;				// Sprite is totally invisible
+  if (sx < ClipX1)		// Left margin crossed?
+  {
+    int nw = sw - (ClipX1 - sx);	// New width
+    tx += (ClipX1 - sx) * tw / sw;// Adjust X coord on texture
+    tw = (tw * nw) / sw;		// Adjust width on texture
+    sw = nw; sx = ClipX1;
+  } /* endif */
+  if (sx + sw > ClipX2)		// Right margin crossed?
+  {
+    int nw = ClipX2 - sx;		// New width
+    tw = (tw * nw) / sw;		// Adjust width on texture
+    sw = nw;
+  } /* endif */
+  if (sy < ClipY1)		// Top margin crossed?
+  {
+    int nh = sh - (ClipY1 - sy);	// New height
+    ty += (ClipY1 - sy) * th / sh;// Adjust Y coord on texture
+    th = (th * nh) / sh;		// Adjust height on texture
+    sh = nh; sy = ClipY1;
+  } /* endif */
+  if (sy + sh > ClipY2)		// Bottom margin crossed?
+  {
+    int nh = ClipY2 - sy;		// New height
+    th = (th * nh) / sh;		// Adjust height on texture
+    sh = nh;
+  } /* endif */
+
+  if (transp){
+    UByte r,g,b;
+    hTex->GetTransparent (r, g, b);
+    tp = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3);
+  }
+      
+  bitmap += ty * bw + tx;
+  ty = 0;
+
+  if (sw == tw)
+    for (; sh > 0; sh--, ty += dy, sy++)
+    {
+      UShort *VRAM = (UShort *)GetPixelAt (sx, sy);
+      UShort *data = bitmap + (ty >> 16) * bw;
+      if (transp)
+        for (int w = sw; w; w--)
+        {
+          if (*data != tp )
+            *VRAM = *data;
+          VRAM++;
+          data++;
+        } /* endfor */
+      else
+        for (int w = sw; w; w--)
+          *VRAM++ = *data++;
+    } /* endfor */
+  else
+    for (; sh > 0; sh--, ty += dy, sy++)
+    {
+      UShort *VRAM = (UShort *)GetPixelAt (sx, sy);
+      UShort *data = bitmap + (ty >> 16) * bw;
+      int tx = 0;
+      if (transp)
+        for (int w = sw; w; w--)
+        {
+          UShort pixel = *(data + (tx >> 16));
+          if (pixel != tp)
+            *VRAM = pixel;
+          VRAM++;
+          tx += dx;
+        } /* endfor */
+      else
+        for (int w = sw; w; w--)
+        {
+          *VRAM++ = *(data + (tx >> 16));
+          tx += dx;
+        } /* endfor */
+    } /* endfor */
 }
 

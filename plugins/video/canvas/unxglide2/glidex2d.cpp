@@ -18,7 +18,7 @@
 
 #include <stdarg.h>
 #include "sysdef.h"
-#include "cs2d/unxglide2/glidex2d.h"
+#include "glidex2d.h"
 #include "csutil/scf.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
@@ -34,16 +34,6 @@ EXPORT_CLASS_TABLE (glidex2d)
   EXPORT_CLASS (csGraphics2DGlideX, "crystalspace.graphics2d.glidex",
     "Glide/X 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
-
-/*
-IMPLEMENT_IBASE (csGraphics2DGlideX)
-    IMPLEMENTS_INTERFACE (iPlugIn)
-    IMPLEMENTS_INTERFACE (iGraphics2D)
-    IMPLEMENTS_INTERFACE (iGraphics2DGlide)
-IMPLEMENT_IBASE_END
-*/
-
-// replace this with config stuff...
 
 csGraphics2DGlideX* thisPtr=NULL;
 
