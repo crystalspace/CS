@@ -531,7 +531,10 @@ private:
       SCF_DESTRUCT_IBASE ();
     }
     virtual void PreGetValue (csShaderVariable *variable);
+
+    
   };
+  friend class BaseAccessor;
 
   bool rmeshesSetup;
   csRef<iStringSet> strings;

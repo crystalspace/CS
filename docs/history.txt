@@ -32,6 +32,10 @@ chronological order.
 	      more.
 	    - Removed some unused stuff from csengine.
 	    - Cosmetic change in msvcgen.jam.
+	- Luca added a friend declaration to access a private member from 
+	  an enclosed class in the class csSpriteCal3DMeshObject. 
+	  He also added the needed dependencies for sprcal3d and sprcal3dldr
+	  (CSGFX CSGEOM CSUTIL).
 20-Jan-2004
 	- Jorrit added a new MemoryAllocator template parameter to csArray.
 	  With this parameter it is possible to use another memory allocator
