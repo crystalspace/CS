@@ -87,7 +87,7 @@ my $PROG_NAME = 'jobber.pl';
 my $PROG_VERSION = '12';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
-my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
+my $COPYRIGHT = "Copyright (C) 2000,2001 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 
 #------------------------------------------------------------------------------
 # Configuration Section
@@ -167,8 +167,15 @@ my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 # For write-access, SourceForge requires SSH access.
 $ENV{'CVS_RSH'} = 'ssh';
 
-# Doxygen resides in /usr/local/bin on SourceForge, so add that to path.
-$ENV{'PATH'} .= ':/usr/local/bin:/home/groups/crystal/bin';
+# Doxygen is not installed on SourceForge, so use a local copy.
+$ENV{'PATH'} .= ':/home/groups/c/cr/crystal/bin:/usr/local/bin';
+
+# The SourceForge shell machine has no developer tools.  Nothing in this script
+# requires a compiler, but this script does need to configure the makefiles
+# by invoking `make platform'.  Unfortunately, unixconf.sh which is invoked by
+# `make platform' does expect to find a compiler.  We can fake out unixconf.sh
+# by pretending that a compiler is present.
+$ENV{'CXX'} = 'true';
 
 # The Visual-C++ DSW and DSP generation process is a bit too noisy.
 $ENV{'MSVC_QUIET'} = 'yes';
@@ -216,15 +223,7 @@ my @TARGETS =
        'export' =>
 	   { 'dir'    => 'pubapi',
 	     'name'   => 'cspubapi-html',
-	     'appear' => "$PROJECT_ROOT/docs/pubapi" }},
-     { 'name'   => 'Developer\'s API Reference',
-       'action' => 'Generating',
-       'make'   => 'devapi',
-       'newdir' => 'out/docs/devapi',
-       'export' =>
-	   { 'dir'    => 'devapi',
-	     'name'   => 'csdevapi-html',
-	     'appear' => "$PROJECT_ROOT/docs/devapi" }});
+	     'appear' => "$PROJECT_ROOT/docs/pubapi" }});
 
 my @ARCHIVERS =
     ({ 'name' => 'gzip',
