@@ -31,7 +31,9 @@ chronological order.
 	  he has trouble debugging plugins (missing debug symbols) built with
 	  both "gcc -shared" and dllwrap, so we might as well use the more
 	  well-supported option (gcc -shared) rather than the deprecated one
-	  (dllwrap).
+	  (dllwrap).  It has also been reported that this change might work
+	  around a crash when loading some DLLs (such as glwin32) which are
+	  created with very recent Mingw/Msys tools.
 	- Eric Sunshine fixed a typographical error in configure.ac:
 	  CS_GL_PATH --> CS_GLU_PATH
 	- Eric Sunshine fixed render3d/opengl/gl_txtcache.cpp so that, when
