@@ -1016,21 +1016,6 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
   if (!CheckToken(cmd, tag, buf))
     return false;   
 
-  iMeshFactoryList *list = Engine->GetMeshFactories();
-  iMeshFactoryWrapper *mfw2;
-
-  int i,count;
-
-  count = list->GetCount();
-
-  printf("Cat");
-  printf("iMeshFactoryList count = %d",count);
-  for(i=0;i<count;i++)
-  {
-    mfw2 = list->Get(i);
-    ReportNotify(tag,"%s %d",mfw2->QueryObject() ->GetName(), count);
-  }
-
   return true;
 }
 
