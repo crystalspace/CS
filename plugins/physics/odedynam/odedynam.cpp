@@ -857,8 +857,7 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
 
   bodyID = dBodyCreate (dynsys->GetWorldID());
   dBodySetData (bodyID, this);
-  groupID = dCreateGeomGroup (dynsys->GetSpaceID());
-  dGeomSetBody (groupID, bodyID);
+  groupID = dSimpleSpaceCreate (dynsys->GetSpaceID ());
   statjoint = 0;
   collision_group = 0;
 
@@ -948,7 +947,7 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   dBodySetMass (bodyID, &om);
 
   dGeomSetBody (id, bodyID);
-  dGeomGroupAdd (groupID, id);
+  dSpaceAdd (groupID, id);
 
   float *f = new float[3];
   f[0] = friction;
@@ -996,7 +995,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   dBodySetMass (bodyID, &om);
 
   dGeomSetBody (id, bodyID);
-  dGeomGroupAdd (groupID, id);
+  dSpaceAdd (groupID, id);
 
   float *f = new float[3];
   f[0] = friction;
@@ -1044,7 +1043,7 @@ bool csODERigidBody::AttachColliderBox (const csVector3 &size,
   dBodySetMass (bodyID, &om);
 
   dGeomSetBody (id, bodyID);
-  dGeomGroupAdd (groupID, id);
+  dSpaceAdd (groupID, id);
 
   float *f = new float[3];
   f[0] = friction;
@@ -1082,7 +1081,7 @@ bool csODERigidBody::AttachColliderSphere (float radius, const csVector3 &offset
   dBodySetMass (bodyID, &om);
 
   dGeomSetBody (id, bodyID);
-  dGeomGroupAdd (groupID, id);
+  dSpaceAdd (groupID, id);
 
   float *f = new float[3];
   f[0] = friction;
@@ -1112,13 +1111,13 @@ bool csODERigidBody::AttachColliderPlane (const csPlane3& plane,
 
 void csODERigidBody::SetPosition (const csVector3& pos)
 {
-    dGeomSetPosition (groupID, pos.x, pos.y, pos.z);
+    dBodySetPosition (bodyID, pos.x, pos.y, pos.z);
     if (statjoint != 0) dJointSetFixed(statjoint);
 }
 
 const csVector3 csODERigidBody::GetPosition () const
 {
-  const dReal* pos = dGeomGetPosition (groupID);
+  const dReal* pos = dBodyGetPosition (bodyID);
   return csVector3 (pos[0], pos[1], pos[2]);
 }
 

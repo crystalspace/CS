@@ -290,7 +290,7 @@ class csODERigidBody : public csObject
 {
 private:
   dBodyID bodyID;
-  dGeomID groupID;
+  dSpaceID groupID;
   csGeomList ids;
   dJointID statjoint;
 
