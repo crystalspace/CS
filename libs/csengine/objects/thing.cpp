@@ -339,6 +339,7 @@ void csThing::Draw (csRenderView& rview, bool use_z_buf)
 
   if (TransformWorld2Cam (rview))
   {
+    if (rview.callback) rview.callback (&rview, CALLBACK_THING, (void*)this);
     Stats::polygons_considered += num_polygon;
 
     DrawCurves (rview, use_z_buf);
@@ -362,6 +363,7 @@ void csThing::Draw (csRenderView& rview, bool use_z_buf)
     }
 
     DrawPolygonArray (polygons, num_polygon, &rview, use_z_buf);
+    if (rview.callback) rview.callback (&rview, CALLBACK_THINGEXIT, (void*)this);
   }
 
   RestoreTransformation (old);

@@ -557,6 +557,8 @@ void csSector::Draw (csRenderView& rview)
     }
   }
 
+  if (rview.callback) rview.callback (&rview, CALLBACK_SECTOREXIT, (void*)this);
+
   RestoreTransformation (old_tr3);
   draw_busy--;
 }

@@ -48,6 +48,9 @@ typedef void (csLightingFunc) (csLightView* lview, int type, void* entity);
 #define CALLBACK_POLYGON2D 2
 #define CALLBACK_POLYGONQ 3
 #define CALLBACK_SECTOR 4
+#define CALLBACK_SECTOREXIT 5
+#define CALLBACK_THING 6
+#define CALLBACK_THINGEXIT 7
 
 /**
  * This structure represents all information needed for drawing
