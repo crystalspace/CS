@@ -1499,7 +1499,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
   G3D->SetPerspectiveAspect (c->GetFOV ());
 
   iSector *s = c->GetSector ();
-  s->Draw (&rview);
+  if (s) s->Draw (&rview);
 
   // draw all halos on the screen
   if (halos.Length () > 0)

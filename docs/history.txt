@@ -11,6 +11,7 @@ The history order is reversed so that new features are at the top.
 	  this bug in AWS itself but for now I fixed the problem by
 	  clamping the clip rect in g2d to the size of the screen so it is
 	  now impossible to make the clip rect go outside screen boundaries.
+	- The engine no longer crashes if the camera has a NULL sector.
 19-Feb-2003
 	- Mårten Svanfeldt fixed a bug introduced when adding the new
 	  light-parameters for the new renderer due to a missing
