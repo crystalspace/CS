@@ -42,7 +42,7 @@ public:
   /**
    * Initialize with the identity transformation.
    */
-  csTransform () : m_o2t (), v_o2t () {}
+  csTransform () : m_o2t (), v_o2t (0, 0, 0) {}
 
   /**
    * Initialize with the given transformation. The transformation
