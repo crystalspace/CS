@@ -164,8 +164,21 @@ struct csRGBpixel
    * Use this only if you know there is no overflow. Also take
    * care to set alpha to 0 in 'c'!
    */
-  void UnsafeAdd(const csRGBpixel&c)
+  void UnsafeAdd (const csRGBpixel&c)
   { *(uint32*)this += *(uint32*)&c; }
+  /**
+   * Use this in the general case. This version test for overflow.
+   * Note that alpha is ignored by this routine.
+   */
+  void SafeAdd (const csRGBpixel&c)
+  {
+    int color = red+c.red;
+    red = (color > 255) ? 255 : color;
+    color = green+c.green;
+    green = (color > 255) ? 255 : color;
+    color = blue+c.blue;
+    blue = (color > 255) ? 255 : color;
+  }
 } CS_STRUCT_ALIGN_4BYTE_END;
 
 // We don't need RGB_MASK anymore

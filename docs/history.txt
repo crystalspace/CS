@@ -3,6 +3,9 @@ The history order is reversed so that new features are at the top.
 17-Mar-2003
 	- Fixed scale issue with dynamic ambient. Dynamic ambient brightness
 	  was divided by 1.5 but that's not needed.
+	- Added csRGBpixel::SafeAdd(). Lightmap code now uses that.
+	- Cleaned up lightmap code a bit with regards to dynamic ambient and
+	  pseudo-dynamic lightmap updating.
 15-Mar-2003
 	- Greg Block fixed lightmap loading and saving on
 	  non-Intel-endian systems.

@@ -31,11 +31,6 @@
 #define LMMAGIC	    "LM04" // must be 4 chars!
 
 
-#ifdef DEBUG_OVERFLOWOPT
-int countfast = 0;
-int countslow = 0;
-#endif
-
 csShadowMap::csShadowMap ()
 {
   Light = NULL;
@@ -554,38 +549,23 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
         max_static_color_values.green + ambient.green < 256  &&
         max_static_color_values.blue  + ambient.blue  < 256)
     {
-      // no lightmap overflows so we can use fastest loop with no checking
+      // No lightmap overflows so we can use fastest loop with no checking.
       for (int i=0; i<lm_size; i++)
       {
         real_lm[i] = static_lm[i];
         real_lm[i].UnsafeAdd (ambient);
       }
       temp_max_color_values.UnsafeAdd (ambient);
-#ifdef DEBUG_OVERFLOWOPT
-      countfast++;
-#endif
     }
-    else  // an overflow is somewhere here, so check each and every addition
+    else
     {
+      // An overflow is somewhere here, so check each and every addition.
       for (int i=0; i<lm_size; i++)
       {
         real_lm[i] = static_lm[i];
-        int color = ambient.red+real_lm[i].red;
-        real_lm[i].red = (color > 255) ? 255 : color;
-        color = ambient.green+real_lm[i].green;
-        real_lm[i].green= (color > 255) ? 255 : color;
-        color = ambient.blue+real_lm[i].blue;
-        real_lm[i].blue = (color > 255) ? 255 : color;
+	real_lm[i].SafeAdd (ambient);
       }
-      int color = ambient.red+max_static_color_values.red;
-      temp_max_color_values.red = (color > 255) ? 255 : color;
-      color = ambient.green+max_static_color_values.green;
-      temp_max_color_values.green = (color > 255) ? 255 : color;
-      color = ambient.blue+max_static_color_values.blue;
-      temp_max_color_values.blue = (color > 255) ? 255 : color;
-#ifdef DEBUG_OVERFLOWOPT
-      countslow++;
-#endif
+      temp_max_color_values.SafeAdd (ambient);
     }
   }
   else
@@ -615,11 +595,13 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
       p = smap->GetArray ();
       last_p = p + lm_size;
 
-      if (temp_max_color_values.red   + smap->max_shadow * red   < 256  &&
-          temp_max_color_values.green + smap->max_shadow * green < 256  &&
-          temp_max_color_values.blue  + smap->max_shadow * blue  < 256)
+      int tm_r = temp_max_color_values.red   + QInt (smap->max_shadow * red);
+      int tm_g = temp_max_color_values.green + QInt (smap->max_shadow * green);
+      int tm_b = temp_max_color_values.blue  + QInt (smap->max_shadow * blue);
+
+      if (tm_r < 256  && tm_g < 256  && tm_b < 256)
       {
-        // Again, if there is no risk of overflow, use fastest possible merge
+        // Again, if there is no risk of overflow, use fastest possible merge.
         do
         {
           s = *p++;
@@ -630,13 +612,10 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
           map++;
         } while (p < last_p);
 
-        // Now update max color to include this merged shadowmap
-        temp_max_color_values.red   += (unsigned char)(smap->max_shadow * red);
-        temp_max_color_values.green += (unsigned char)(smap->max_shadow * green);
-        temp_max_color_values.blue  += (unsigned char)(smap->max_shadow * blue);
-#ifdef DEBUG_OVERFLOWOPT
-        countfast++;
-#endif
+        // Now update max color to include this merged shadowmap.
+        temp_max_color_values.red   = tm_r;
+        temp_max_color_values.green = tm_g;
+        temp_max_color_values.blue  = tm_b;
       }
       else
       {
@@ -655,16 +634,9 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
 
         } while (p < last_p);
         // Now update max color to include this merged shadowmap
-        int color = int(temp_max_color_values.red + smap->max_shadow * red);
-        temp_max_color_values.red = (color>255)?255:color;
-        color = int(temp_max_color_values.green + smap->max_shadow * green);
-        temp_max_color_values.green = (color>255)?255:color;
-        color = int(temp_max_color_values.blue + smap->max_shadow * blue);
-        temp_max_color_values.blue= (color>255)?255:color;
-
-#ifdef DEBUG_OVERFLOWOPT
-        countslow++;
-#endif
+        temp_max_color_values.red = (tm_r>255)?255:tm_r;
+        temp_max_color_values.green = (tm_g>255)?255:tm_g;
+        temp_max_color_values.blue= (tm_b>255)?255:tm_b;
       }
       smap = smap->next;
     } while (smap);
