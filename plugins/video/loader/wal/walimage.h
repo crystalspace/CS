@@ -19,7 +19,7 @@
 #ifndef __CS_WALIMAGE_H__
 #define __CS_WALIMAGE_H__
 
-#include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -57,12 +57,12 @@ class csWALImageIO : public iImageIO
 /**
  * An csImageFile subclass for reading WAL files.
  */
-class ImageWALFile : public csImageFile
+class ImageWALFile : public csImageMemory
 {
   friend class csWALImageIO;
 private:
   /// Initialize the image object
-  ImageWALFile (int iFormat) : csImageFile (iFormat) { };
+  ImageWALFile (int iFormat) : csImageMemory (iFormat) { };
   /// Try to read the WAL file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 };

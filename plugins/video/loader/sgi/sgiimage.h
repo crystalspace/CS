@@ -1,7 +1,7 @@
 #ifndef __CS_SGIIMAGE_H__
 #define __CS_SGIIMAGE_H__
 
-#include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -36,7 +36,7 @@ class csSGIImageIO : public iImageIO
   } scfiComponent;
 };
 
-class ImageSGIFile : public csImageFile
+class ImageSGIFile : public csImageMemory
 {
   friend class csSGIImageIO;
   // Read SGI header and get the number of planes (only 3 or 4 is supported)
@@ -48,7 +48,7 @@ class ImageSGIFile : public csImageFile
 
 private:
   /// Initialize the image object
-  ImageSGIFile (int iFormat) : csImageFile (iFormat) { };
+  ImageSGIFile (int iFormat) : csImageMemory (iFormat) { };
   /// Try to read the SGI file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 };

@@ -831,10 +831,10 @@ void csGLFontCache::DumpFontCache (csRefArray<iImage>& pages)
 {
   for (size_t t = 0; t < textures.Length(); t++)
   {
-    csRef<iImage> page;
+    csRef<csImageMemory> page;
     page.AttachNew (new csImageMemory (texSize, texSize, 
       CS_IMGFMT_PALETTED8));
-    csRGBpixel* pal = page->GetPalette ();
+    csRGBpixel* pal = page->GetPalettePtr ();
     for (int i = 0; i < 256; i++)
     {
       pal[i].Set (i, i, i);
@@ -842,7 +842,7 @@ void csGLFontCache::DumpFontCache (csRefArray<iImage>& pages)
 
     statecache->SetTexture (GL_TEXTURE_2D, textures[t].handle);
     glGetTexImage (GL_TEXTURE_2D, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, 
-      page->GetImageData ());
+      page->GetImagePtr ());
     pages.Push (page);
   }
 }

@@ -68,18 +68,18 @@
 #endif
 
 #if defined (MIPMAP_ALPHA)
-static void MIPMAP_NAME (unsigned int w, unsigned int h, uint8 *src, uint8 *dst)
+static void MIPMAP_NAME (unsigned int w, unsigned int h, const uint8 *src, uint8 *dst)
 #elif defined (MIPMAP_PALETTED)
 #  ifdef MIPMAP_TRANSPARENT
-static void MIPMAP_NAME (unsigned int w, unsigned int h, uint8 *src, csRGBpixel *dst, csRGBpixel *pal, uint8 transp)
+static void MIPMAP_NAME (unsigned int w, unsigned int h, const uint8 *src, csRGBpixel *dst, const csRGBpixel *pal, uint8 transp)
 #  else
-static void MIPMAP_NAME (unsigned int w, unsigned int h, uint8 *src, csRGBpixel *dst, csRGBpixel *pal)
+static void MIPMAP_NAME (unsigned int w, unsigned int h, const uint8 *src, csRGBpixel *dst, const csRGBpixel *pal)
 #  endif
 #else
 #  ifdef MIPMAP_TRANSPARENT
-static void MIPMAP_NAME (unsigned int w, unsigned int h, csRGBpixel *src, csRGBpixel *dst, csRGBpixel transp)
+static void MIPMAP_NAME (unsigned int w, unsigned int h, const csRGBpixel *src, csRGBpixel *dst, csRGBpixel transp)
 #  else
-static void MIPMAP_NAME (unsigned int w, unsigned int h, csRGBpixel *src, csRGBpixel *dst)
+static void MIPMAP_NAME (unsigned int w, unsigned int h, const csRGBpixel *src, csRGBpixel *dst)
 #  endif
 #endif
 {

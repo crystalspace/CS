@@ -65,7 +65,6 @@ static const char* UnstoredTextures[] =
 
 CTextureFile::CTextureFile()
 {
-  m_pImage         = 0;
   m_OriginalWidth  = 1;
   m_OriginalHeight = 1;
   m_Visible        = false;
@@ -79,7 +78,6 @@ CTextureFile::CTextureFile()
 
 CTextureFile::~CTextureFile()
 {
-  delete m_pImage;
 }
 
 extern iImageIO* ImageLoader;

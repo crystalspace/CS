@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/imagetools.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/packrgb.h"
 #include "csutil/databuf.h"
@@ -124,38 +125,6 @@ csPtr<iImage> csPNGImageIO::Load (uint8* iBuffer, size_t iSize, int iFormat)
 
 void csPNGImageIO::SetDithering (bool)
 {
-}
-
-static inline unsigned sqr (int x)
-{
-  return (x * x);
-}
-
-int closest_index (iImage *Image, csRGBpixel *iColor)
-{
-  csRGBpixel *Palette = Image->GetPalette();
-
-  if (!Palette)
-    return -1;
-
-  int closest_idx = -1;
-  unsigned closest_dst = (unsigned)-1;
-
-  int idx;
-  for (idx = 0; idx < 256; idx++)
-  {
-    unsigned dst = sqr (iColor->red   - Palette [idx].red)   * R_COEF_SQ +
-                   sqr (iColor->green - Palette [idx].green) * G_COEF_SQ +
-                   sqr (iColor->blue  - Palette [idx].blue)  * B_COEF_SQ;
-    if (dst == 0)
-      return idx;
-    if (dst < closest_dst)
-    {
-      closest_dst = dst;
-      closest_idx = idx;
-    } /* endif */
-  }
-  return closest_idx;
 }
 
 csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *,
@@ -283,7 +252,7 @@ error2:
   /* set the palette if there is one. */
   if (colortype & PNG_COLOR_MASK_PALETTE)
   {
-    csRGBpixel *pal = Image->GetPalette ();
+    const csRGBpixel *pal = Image->GetPalette ();
     
     palette = (png_colorp)malloc (256 * sizeof (png_color));
     int i;
@@ -312,7 +281,8 @@ error2:
       int key_r, key_g, key_b;
       Image->GetKeyColor (key_r, key_g, key_b);
       csRGBpixel key (key_r, key_g, key_b);
-      int key_index = closest_index (Image, &key);
+      int key_index = csImageTools::ClosestPaletteIndex (
+	Image->GetPalette(), key);
       png_bytep trans = new png_byte[key_index + 1];
       memset (trans, 0xff, key_index);
       trans[key_index] = 0;
@@ -574,7 +544,7 @@ nomem2:
   png_read_update_info (png, info);
 
   // Allocate the memory to hold the image
-  set_dimensions (Width, Height);
+  SetDimensions (Width, Height);
   if (ImageType == imgRGB)
     exp_rowbytes = Width * 4;	  // RGBA
   else if (ImageType == imgGrayAlpha)
@@ -617,7 +587,7 @@ nomem2:
   {
     csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel
       (NewImage, Width * Height);
-    convert_rgba (rgbImage);
+    ConvertFromRGBA (rgbImage);
     delete[] NewImage;
   }
   else if (ImageType == imgPAL)
@@ -651,7 +621,7 @@ nomem2:
       keycolour.green = palette[keycolor_index].green;
       keycolour.blue = palette[keycolor_index].blue;
     }
-    convert_pal8 ((uint8 *)NewImage, palette, colors);
+    ConvertFromPal8 ((uint8 *)NewImage, palette, colors);
     delete[] palette;
   }
   else // grayscale + alpha
@@ -673,7 +643,7 @@ nomem2:
       Alpha [i] = *src++;
     }
     delete [] (uint8 *)NewImage;
-    convert_pal8 (image, palette);
+    ConvertFromPal8 (image, palette);
   }
 
   // clean up after the read, and free any memory allocated

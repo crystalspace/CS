@@ -39,44 +39,24 @@ public:
   csGLScreenShot (csGraphics2DGLCommon*);
   virtual ~csGLScreenShot ();
 
-  virtual void *GetImageData ()
+  virtual const void *GetImageData ()
   { return Data; }
   virtual int GetWidth () const
   { return Width; }
   virtual int GetHeight () const
   { return Height; }
-  virtual int GetSize () const
-  { return 0; }
-  virtual void Rescale (int, int)
-  { }
-  virtual csPtr<iImage> MipMap (int, csRGBpixel*)
-  { return 0; }
   virtual void SetName (const char *iName)
   { (void) iName; }
   virtual const char *GetName () const
   { return 0; }
   virtual int GetFormat () const
   { return Format; }
-  virtual csRGBpixel *GetPalette ()
+  virtual const csRGBpixel *GetPalette ()
   { return 0; }
-  virtual uint8 *GetAlpha ()
+  virtual int GetClosestIndex (const csRGBpixel& color)
+  { return -1; }
+  virtual const uint8 *GetAlpha ()
   { return 0; }
-  virtual void SetFormat (int /*iFormat*/)
-  { }
-  virtual csPtr<iImage> Clone () const
-  { return 0; }
-  virtual csPtr<iImage> Crop (int, int, int, int) const
-  { return 0; }
-  virtual void CheckAlpha ()
-  { }
-  virtual bool Copy (iImage* sImage, int x, int y, int width, int height) const
-  { return false; }
-  virtual bool CopyScale (iImage* sImage, int x, int y,
-  	int width, int height) const
-  { return false; }
-  virtual bool CopyTile (iImage* sImage, int x, int y,
-  	int width, int height) const 
-  { return false; }
   virtual bool HasKeyColor () const
   { return 0; }
   virtual bool HasKeycolor () const
@@ -85,10 +65,10 @@ public:
   { r=0; g=0; b=0; }
   virtual void GetKeycolor (int &r, int &g, int &b) const
   { GetKeyColor(r,g,b); }
-  virtual csPtr<iImage> Sharpen (csRGBpixel*, int) const
+  virtual uint HasMipmaps () const
   { return 0; }
-  virtual int HasMipmaps () const
-  { return 0; }
+  virtual csRef<iImage> GetMipmap (uint num)
+  { return (num == 0) ? this : 0; }
   void SetData (void*);
 };
 

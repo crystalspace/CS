@@ -24,22 +24,14 @@ SCF_IMPLEMENT_IBASE (SkinImage)
   SCF_IMPLEMENTS_INTERFACE (iImage)
 SCF_IMPLEMENT_IBASE_END
 
-void *SkinImage::GetImageData () { return Image; }
+const void *SkinImage::GetImageData () { return Image; }
 int SkinImage::GetWidth () const { return Width; }
 int SkinImage::GetHeight () const { return Height; }
-int SkinImage::GetSize () const { return Size; }
-void SkinImage::Rescale (int, int) {}
-csPtr<iImage> SkinImage::MipMap (int, csRGBpixel*) { return 0; }
 void SkinImage::SetName (const char*) {}
 const char *SkinImage::GetName () const { return 0; }
 int SkinImage::GetFormat () const { return CS_IMGFMT_PALETTED8; }
-csRGBpixel *SkinImage::GetPalette () { return Palette; }
-uint8 *SkinImage::GetAlpha () { return 0; }
-void SkinImage::CheckAlpha () { }
-void SkinImage::SetFormat (int) {}
-csPtr<iImage> SkinImage::Clone () const { return 0; }
-csPtr<iImage> SkinImage::Crop (int, int, int, int) const { return 0; }
-csPtr<iImage> SkinImage::Sharpen (csRGBpixel*, int) const { return 0; }
+const csRGBpixel *SkinImage::GetPalette () { return Palette; }
+const uint8 *SkinImage::GetAlpha () { return 0; }
 
 SkinImage::SkinImage(void* Data, const void* Pal, int w, int h) :
   Image(Data), Width(w), Height(h), Size(w * h)

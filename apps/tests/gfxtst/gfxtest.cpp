@@ -22,7 +22,9 @@
 #include <string.h>
 #include "cssysdef.h"
 
-#include "csgfx/csimage.h"
+#include "csgfx/imagemanipulate.h"
+#include "csgfx/imagetools.h"
+#include "csgfx/memimage.h"
 #include "csqsqrt.h"
 #include "cstool/initapp.h"
 #include "csutil/cfgfile.h"
@@ -65,7 +67,6 @@ static struct option long_options[] =
   {"prefix", required_argument, 0, 'P'},
   {"suffix", required_argument, 0, 'U'},
   {"display", optional_argument, 0, 'D'},
-  {"heightmap", optional_argument, 0, 'H'},
   {"info", no_argument, 0, 'I'},
   {0, no_argument, 0, 0}
 };
@@ -136,7 +137,6 @@ static int display_help ()
   printf ("  -P   --prefix=#      Add prefix before output filename\n");
   printf ("  -U   --suffix=#      Add suffix after output filename\n");
   printf ("  -D   --display=#,#   Display the image in ASCII format :-)\n");
-  printf ("  -H   --heightmap[=#] Output a 3D heightmap in Crystal Space format\n");
   printf ("                       An optional scale argument may be specified\n");
   printf ("  -I   --info          Display image info (and don't do anything more)\n");
   return 1;
@@ -163,7 +163,7 @@ static int list_supported_formats (iObjectRegistry *r)
   return 1;
 }
 
-static bool output_picture (const char *fname, const char *suffix, iImage *ifile)
+static bool output_picture (const char *fname, const char *suffix, csRef<iImage> ifile)
 {
   char outname [CS_MAXPATHLEN + 1];
   char* eol;
@@ -218,152 +218,24 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
   return true;
 }
 
-static bool display_picture (iImage *ifile)
+static bool display_picture (csRef<iImage> ifile)
 {
   static char imgchr [] = " .,;+*oO";
-  ifile->Rescale (opt.displayW, opt.displayH);
-  csRGBpixel *rgb = ifile->GetPalette ();
-  uint8 *idx = (uint8 *)ifile->GetImageData ();
+  ifile = csImageManipulate::Rescale (ifile, opt.displayW, opt.displayH);
+  const csRGBpixel *rgb = ifile->GetPalette ();
+  const uint8 *idx = (uint8 *)ifile->GetImageData ();
   int y, x;
   for (y = 0; y < opt.displayH; y++)
   {
     for (x = 0; x < opt.displayW; x++)
     {
-      csRGBpixel &src = rgb [*idx++];
+      const csRGBpixel &src = rgb [*idx++];
       int gray = int (csQsqrt (src.red * src.red + src.green * src.green +
         src.blue * src.blue) * 8 / 442);
       putc (imgchr [gray], stdout);
     }
     putc ('\n', stdout);
   }
-  return true;
-}
-
-static bool output_heightmap (const char *fname, iImage *ifile)
-{
-  char outname [CS_MAXPATHLEN + 1];
-  strcpy (outname, fname);
-  char *eol = strchr (outname, 0);
-  while (eol > outname && *eol != '.') eol--;
-  if (eol == outname) eol = strchr (outname, 0);
-  strcpy (eol, ".csm");
-  printf ("Saving output file %s\n", outname);
-
-  FILE *f = fopen (outname, "w");
-  if (!f)
-  {
-    printf ("%s: cannot write file %s\n", programname, fname);
-    return false;
-  }
-
-  // Compute the intensity of each color
-  int w = ifile->GetWidth ();
-  int h = ifile->GetHeight ();
-  uint8 *img = (uint8 *)ifile->GetImageData ();
-
-  int height [257], tc = 0;
-  csRGBpixel *pal = ifile->GetPalette ();
-  height [256] = transpcolor.Intensity ();
-  int i;
-  for (i = 0; i < 256; i++)
-    if (opt.transp && transpcolor.eq (pal [i]))
-      height [tc = i] = -1;
-    else
-      height [i] = pal [i].Intensity ();
-
-  // And now write the 3D file
-  *eol = 0;
-  csSplitPath (outname, 0, 0, outname, sizeof (outname));
-  fprintf (f, "WORLD\n(\n  THING '%s'\n  (\n", outname);
-
-  int x, y;
-  int size = w * h;
-  int *idx = new int [size];
-  int src = 0, curidx = 0;
-  int px [3][3];
-
-  // Initialized to stop MSVC 5/6/7 whining.
-  px [0][0] = px [1][0] = px [1][0] = px [2][0] =
-    px [0][1] = px [1][1] = px [1][1] = px [2][1] =
-    px [0][2] = px [1][2] = px [1][2] = px [2][2] = 0;
-
-  for (y = 0; y < h; y++)
-  {
-    px [0][0] = px [0][1] = px [0][2] =
-    px [1][0] = px [1][1] = px [1][2] = tc;
-    bool tr = (y > 0), br = (y < h - 1);
-    px [2][0] = tr ? img [src - w] : tc;
-    px [2][1] = img [src];
-    px [2][0] = br ? img [src + w] : tc;
-    for (x = 0; x < w; x++, src++)
-    {
-      px [0][0] = px [1][0]; px [1][0] = px [2][0];
-      px [0][1] = px [1][1]; px [1][1] = px [2][1];
-      px [0][2] = px [1][2]; px [1][2] = px [2][2];
-      if (x < w - 1)
-      {
-        px [2][0] = tr ? img [src - w + 1] : tc;
-        px [2][1] = img [src + 1];
-        px [2][2] = br ? img [src + w + 1] : tc;
-      }
-      else
-        px [2][0] = px [2][1] = px [2][2] = tc;
-
-      int pix = px [1][1];
-      if (height [pix] < 0)
-      {
-        // Check if all surrounding pixels are transparent
-        if (height [px [0][0]] >= 0
-         || height [px [1][0]] >= 0
-         || height [px [2][0]] >= 0
-         || height [px [0][1]] >= 0
-         || height [px [2][1]] >= 0
-         || height [px [0][2]] >= 0
-         || height [px [1][2]] >= 0
-         || height [px [2][2]] >= 0)
-          pix = 256;
-      }
-
-      if (height [pix] >= 0)
-      {
-        idx [src] = curidx++;
-        fprintf (f, "    VERTEX (%g,%g,%g)\n", (x - w / 2) / 10.0,
-          height [img [src]] * opt.hmscale, (h / 2 - y) / 10.0);
-      }
-      else
-        idx [src] = -1;
-    }
-  }
-
-  for (y = 1; y < h; y++)
-    for (x = 1; x < w; x++)
-    {
-      src = (y - 1) * w + x - 1;
-      int h00 = idx [src];
-      int h10 = idx [src + 1];
-      int h01 = idx [src + w];
-      int h11 = idx [src + w + 1];
-      if (h00 < 0 || h10 < 0 || h01 < 0 || h11 < 0)
-      {
-        if (h00 >= 0 && h10 >= 0 && h11 >= 0)
-          fprintf (f, "    POLYGON(VERTICES(%d,%d,%d))\n", h00, h10, h11);
-        else if (h00 >= 0 && h11 >= 0 && h01 >= 0)
-          fprintf (f, "    POLYGON(VERTICES(%d,%d,%d))\n", h00, h11, h01);
-        else if (h10 >= 0 && h11 >= 0 && h01 >= 0)
-          fprintf (f, "    POLYGON(VERTICES(%d,%d,%d))\n", h10, h11, h01);
-        else if (h00 >= 0 && h10 >= 0 && h01 >= 0)
-          fprintf (f, "    POLYGON(VERTICES(%d,%d,%d))\n", h00, h10, h01);
-      }
-      else
-        fprintf (f, "    POLYGON(VERTICES(%d,%d,%d)) POLYGON(VERTICES(%d,%d,%d))\n",
-          h00, h10, h11, h00, h11, h01);
-    }
-
-  delete idx;
-
-  fprintf (f, "  )\n)\n");
-  fclose (f);
-
   return true;
 }
 
@@ -416,7 +288,7 @@ static bool process_file (const char *fname)
   if (opt.verbose || opt.info)
   {
     printf ("Image size: %d x %d pixels, %d bytes\n", ifile->GetWidth (),
-      ifile->GetHeight (), ifile->GetSize ());
+      ifile->GetHeight (), csImageTools::ComputeDataSize (ifile));
     int fmt = ifile->GetFormat ();
     printf ("Image format: %s, alpha channel: %s\n",
       (fmt & CS_IMGFMT_MASK) == CS_IMGFMT_NONE ? "none" :
@@ -436,16 +308,15 @@ static bool process_file (const char *fname)
       scaleY = (ifile->GetHeight () * opt.scaleX) / ifile->GetWidth ();
     }
     printf ("Rescaling image to %d x %d\n", opt.scaleX, scaleY);
-    ifile->Rescale (opt.scaleX, scaleY);
+    ifile = csImageManipulate::Rescale (ifile, opt.scaleX, scaleY);
     sprintf (strchr (suffix, 0), "-s%dx%d", opt.scaleX, scaleY);
   }
 
   if (opt.mipmap >= 0)
   {
     printf ("Creating mipmap level %d from image\n", opt.mipmap);
-    csRef<iImage> ifile2 (csPtr<iImage> (ifile->MipMap (opt.mipmap,
-      opt.transp ? &transpcolor : 0)));
-    ifile = ifile2;
+    ifile = csImageManipulate::Mipmap (ifile, opt.mipmap,
+      opt.transp ? &transpcolor : 0);
     sprintf (strchr (suffix, 0), "-m%d", opt.mipmap);
   }
 
@@ -455,7 +326,7 @@ static bool process_file (const char *fname)
     if (format & CS_IMGFMT_ALPHA)
     {
       printf ("Removing alpha channel from image\n");
-      ifile->SetFormat (format & ~CS_IMGFMT_ALPHA);
+      ifile.AttachNew (new csImageMemory (ifile, format & ~CS_IMGFMT_ALPHA));
     }
   }
 
@@ -465,7 +336,7 @@ static bool process_file (const char *fname)
     if (!(format & CS_IMGFMT_ALPHA))
     {
       printf ("Adding alpha channel from image\n");
-      ifile->SetFormat (format | CS_IMGFMT_ALPHA);
+      ifile.AttachNew (new csImageMemory (ifile, format | CS_IMGFMT_ALPHA));
 
       // merge keycolor into alpha
       if (ifile->HasKeyColor())
@@ -481,9 +352,10 @@ static bool process_file (const char *fname)
 	{
 	case CS_IMGFMT_PALETTED8:
 	  {
-	    uint8 *data = (uint8*)ifile->GetImageData();
-	    csRGBpixel *pal = ifile->GetPalette();
-	    uint8 *alphamap = (uint8*)ifile->GetAlpha();
+	    csImageMemory* newImg = new csImageMemory (ifile);
+	    const uint8 *data = (uint8*)ifile->GetImageData();
+	    const csRGBpixel *pal = ifile->GetPalette();
+	    uint8 *alphamap = newImg->GetAlphaPtr();
 	    for (i = 0; i < pixels; i++)
 	    {
 	      if (pal[data[i]] == key)
@@ -491,6 +363,7 @@ static bool process_file (const char *fname)
 		alphamap[i] = 0;
 	      }
 	    }
+	    ifile.AttachNew (newImg);
 	  }
 	  break;
 	case CS_IMGFMT_TRUECOLOR:
@@ -513,9 +386,8 @@ static bool process_file (const char *fname)
   if (opt.sharpen)
   {
     printf ("Sharpening image with strength %d\n", opt.sharpen);
-    csRef<iImage> ifile2 (csPtr<iImage> (
-    	ifile->Sharpen (opt.transp ? &transpcolor : 0, opt.sharpen)));
-    ifile = ifile2;
+    ifile = csImageManipulate::Sharpen (ifile, opt.sharpen,
+      opt.transp ? &transpcolor : 0);
   }
 
   bool success = false;
@@ -528,9 +400,6 @@ static bool process_file (const char *fname)
       success = display_picture (ifile);
       break;
     case 2:
-      success = output_heightmap (fname, ifile);
-      break;
-    case 3:
       success = true;
       break;
   }
@@ -644,16 +513,8 @@ int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
           return -1;
         }
         break;
-      case 'H':
-        opt.outputmode = 2;
-        if (optarg)
-        {
-          sscanf (optarg, "%g", &opt.hmscale);
-          opt.hmscale *= 1/500.0f;
-        }
-        break;
       case 'I':
-        opt.outputmode = 3;
+        opt.outputmode = 2;
         opt.info = true;
         break;
       case 'h':

@@ -220,7 +220,7 @@ bool csSimpleFormer::SetIntegerMap (csStringID type, iImage* map,
   {
     // It's a paletted image, so we grab data & palette
     unsigned char *data = (unsigned char*)map->GetImageData ();
-    csRGBpixel *palette = map->GetPalette ();
+    const csRGBpixel *palette = map->GetPalette ();
 
     // Keep an index to avoid uneccesary x+y*w calculations
     // Start at last line, since we're gonna want it reversed in Y later
@@ -296,7 +296,7 @@ bool csSimpleFormer::SetFloatMap (csStringID type, iImage* map,
   {
     // It's a paletted image, so we grab data & palette
     unsigned char *data = (unsigned char*)map->GetImageData ();
-    csRGBpixel *palette = map->GetPalette ();
+    const csRGBpixel *palette = map->GetPalette ();
 
     // Keep an index to avoid uneccesary x+y*w calculations
     // Start at last line, since we're gonna want it reversed in Y later
@@ -354,7 +354,7 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
   {
     // It's a paletted image, so we grab data & palette
     unsigned char *data = (unsigned char*)heightmap->GetImageData ();
-    csRGBpixel *palette = heightmap->GetPalette ();
+    const csRGBpixel *palette = heightmap->GetPalette ();
 
     // Keep an index to avoid uneccesary x+y*w calculations
     // Start at last line, since we're gonna want it reversed in Y later

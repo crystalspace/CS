@@ -19,7 +19,6 @@
 #ifndef __CS_IMGMULTIPLEX_H__
 #define __CS_IMGMULTIPLEX_H__
 
-#include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

@@ -74,12 +74,12 @@ void csWSTexture::FixKeyColor ()
   KeyChanged = false;
 
   csRGBpixel color;
-  csRGBpixel *src;
+  const csRGBpixel *src;
   int size;
   if ((Image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
   {
     src = (csRGBpixel *)Image->GetImageData ();
-    size = Image->GetSize ();
+    size = Image->GetWidth() * Image->GetHeight();
   }
   else
   {

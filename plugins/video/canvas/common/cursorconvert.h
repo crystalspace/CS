@@ -24,6 +24,7 @@
 #include "csgfx/quantize.h"
 
 struct iImage;
+class csImageMemory;
 
 class csCursorConverter
 {
@@ -49,7 +50,7 @@ public:
    * with \p replaceColor.
    */
   static void StripAlphaFromRGBA (iImage* image, csRGBpixel replaceColor);
-  static void StripAlphaFromPal8 (iImage* image);
+  static void StripAlphaFromPal8 (csImageMemory* image);
 };
 
 #endif // __CS_CANVAS_COMMON_CURSORCONVERT_H__

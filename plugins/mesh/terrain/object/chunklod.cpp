@@ -1110,12 +1110,13 @@ bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
 
 bool csChunkLodTerrainObject::SetMaterialMap (iImage* map)
 {
+  const size_t mapSize = map->GetWidth() * map->GetHeight();
   csArray<char> image_data;
-  image_data.SetLength (map->GetSize());
+  image_data.SetLength (mapSize);
   if (map->GetFormat () & CS_IMGFMT_PALETTED8)
   {
     uint8 *data = (uint8 *)map->GetImageData ();
-    for (int i = 0; i < map->GetSize (); i ++)
+    for (size_t i = 0; i < mapSize; i ++)
     {
       image_data[i] = data[i];
     }
@@ -1123,7 +1124,7 @@ bool csChunkLodTerrainObject::SetMaterialMap (iImage* map)
   else
   {
     csRGBpixel *data = (csRGBpixel *)map->GetImageData ();
-    for (int i = 0; i < map->GetSize (); i ++)
+    for (size_t i = 0; i < mapSize; i ++)
     {
       image_data[i] = data[i].Intensity();
     }

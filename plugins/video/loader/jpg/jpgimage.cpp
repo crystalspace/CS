@@ -516,7 +516,7 @@ bool ImageJpgFile::Load (uint8* iBuffer, size_t iSize)
    * In this example, we need to make an output work buffer of the right size.
    */
 
-  set_dimensions (cinfo.output_width, cinfo.output_height);
+  SetDimensions (cinfo.output_width, cinfo.output_height);
 
   int pixelcount = Width * Height;
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)

@@ -132,7 +132,7 @@ bool ImageSGIFile::Load (uint8* iBuffer, size_t iSize)
   if (planes !=3 && planes != 4)
     return false;
 
-  set_dimensions (header.Width, header.Height);
+  SetDimensions (header.Width, header.Height);
   csRGBpixel *buffer = new csRGBpixel [Width * Height];
 
   uint8 *line = new uint8 [Width];
@@ -208,7 +208,7 @@ bool ImageSGIFile::Load (uint8* iBuffer, size_t iSize)
     return false;
   }
 
-  convert_rgba (buffer);
+  ConvertFromRGBA (buffer);
 
   // Check if the alpha channel is valid
   CheckAlpha ();

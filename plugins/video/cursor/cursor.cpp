@@ -22,6 +22,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/csstring.h"
 #include "csutil/stringarray.h"
+#include "csgfx/memimage.h"
 #include "iutil/objreg.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
@@ -215,8 +216,9 @@ bool csCursor::HandleEvent (iEvent &ev)
       {
 	const char* name = current.GetData();
 
-	csRef<iImage> newImage = ci->image->Clone ();
-	newImage->SetFormat (txtmgr->GetTextureFormat());
+	csRef<iImage> newImage;
+	newImage.AttachNew (new csImageMemory (ci->image, 
+	  txtmgr->GetTextureFormat()));
 	ci->image = newImage;
 
 	// Create texture 

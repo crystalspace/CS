@@ -902,3 +902,35 @@ which was shared by all clients, instances of @samp{csRandomFloatGen} can be
 controlled and seeded individually, thus making it far more flexible and
 useful.  (Note that the more general-purpose @samp{csRandomGen} class is also
 able to vend floating point numbers.)
+
+@subheading @samp{iImage} Changes
+
+The @samp{iImage} interface has been reduced to a level where it merely serves
+as a container for pixel data; however, the image editing functionality was
+only relocated, not removed.
+
+Forbidding direct manipulation of an @samp{iImage}'s pixel data has the 
+following consequences:
+@itemize bullet
+@item
+The @code{Clone()} function was removed. The
+@samp{csImageMemory} class provides a constructor that copies the pixel data
+from another @samp{iImage} object, providing a functionality equal to 
+@code{Clone()}.
+@item
+To edit the pixel data of an image, create a clone of an image (e.g. a
+@samp{csImageMemory} as mentioned above) and manipulate the data in the newly
+cerated instance.
+@item
+If the image data is needed in another
+format, as the @code{SetFormat()} call has been removed from the interface.
+@item
+The image editing functionality found in methods such as @code{Rescale()},
+@code{Sharpen()} was moved into the @samp{csImageManipulate} class.
+@item
+The @code{CopyXXX()} method that copied an image into another are now provided
+by @samp{csImageMemory}.
+@end itemize
+
+As a side-effect of these changes, the @samp{csImageFile} and 
+@samp{csImageMemory} were merged and the former removed.

@@ -1285,7 +1285,8 @@ void csGLGraphics3D::FinishDraw ()
 	  images->SetImage (0, image);
 	}
 
-	void* imgdata = image->GetImageData ();
+	// @@@ BAD BAD BAD BAD CAST
+	void* imgdata = CS_CONST_CAST(void*, image->GetImageData ());
 	glReadPixels (1, viewheight - txt_h, txt_w, txt_h, GL_RGBA, GL_UNSIGNED_BYTE, 
 	  imgdata);
 

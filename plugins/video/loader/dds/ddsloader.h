@@ -20,7 +20,7 @@
 #define __DDS_DDSLOADER_H__
 
 #include "csutil/scf.h"
-#include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 
 #include "iutil/comp.h"
 #include "igraphic/imageio.h"
@@ -53,22 +53,22 @@ private:
   iObjectRegistry* object_reg;
 };
 
-class csDDSImageFile : public csImageFile
+class csDDSImageFile : public csImageMemory
 {
   friend class csDDSImageIO;
 public:
   virtual ~csDDSImageFile ();
 
-  virtual csPtr<iImage> MipMap (int step, csRGBpixel* transp);
+  virtual csRef<iImage> GetMipmap (uint num);
   
-  virtual int HasMipmaps ();  
+  virtual uint HasMipmaps () const;  
 private:
   csDDSImageFile (iObjectRegistry* object_reg, int format);
 
   bool Load (dds::Loader* loader);
 
   csRefArray<iImage> mipmaps;
-  int mipmapcount;
+  uint mipmapcount;
   iObjectRegistry* object_reg;
 
   void Report (int severity, const char* msg, ...);

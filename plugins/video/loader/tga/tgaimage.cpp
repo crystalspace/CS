@@ -223,7 +223,7 @@ csPtr<iDataBuffer> csTGAImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   int i, x, y;
   if (palette)
   {
-    csRGBpixel *pal = Image->GetPalette ();
+    const csRGBpixel *pal = Image->GetPalette ();
     for (i= 0; i < 256; i++)
     {
       *(p++) = pal[i].blue;
@@ -363,7 +363,7 @@ bool ImageTgaFile::Load (uint8* iBuffer, size_t iSize)
                tga_head.ImgType == TGA_RLEMono);
 
   /* Read the Targa file body and convert to portable format. */
-  set_dimensions (cols, rows);
+  SetDimensions (cols, rows);
 
   // @@todo: avoid converting colormapped images into RGB,
   // instead pass a pointer to convert_pal8
@@ -391,7 +391,7 @@ bool ImageTgaFile::Load (uint8* iBuffer, size_t iSize)
   }
 
   // Convert image from RGB to requested format
-  convert_rgba (pixels);
+  ConvertFromRGBA (pixels);
 
   // Check if the alpha channel is valid
   CheckAlpha ();

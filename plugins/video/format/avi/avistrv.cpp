@@ -33,13 +33,14 @@ SCF_IMPLEMENT_IBASE (csAVIStreamVideo)
   SCF_IMPLEMENTS_INTERFACE (iStream)
 SCF_IMPLEMENT_IBASE_END
 
-csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
+csAVIStreamVideo::csAVIStreamVideo (iBase *pBase)
 {
   SCF_CONSTRUCT_IBASE (pBase);
   pChunk = 0;
   pAVI = (csAVIFormat*)pBase;
   object_reg = 0;
   pIA = new csImageArea (1,1,1,1);
+  memimage.AttachNew (new csImageMemory (1, 1));
 }
 
 bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
@@ -163,7 +164,7 @@ bool csAVIStreamVideo::SetRect (int x, int y, int w, int h)
   polyfx.vertices[3].x = x;
   polyfx.vertices[3].y = height - (y+h);*/
 
-  memimage.Rescale (w, h);
+  memimage.AttachNew (new csImageMemory (rc.Width(), rc.Height()));
   return true;
 }
 
@@ -196,7 +197,7 @@ void csAVIStreamVideo::PrepImageArea ()
     pIA->h = rc.Height ();
   }
 
-  csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
+  csRGBpixel *pixel = (csRGBpixel *)memimage->GetImageData ();
   char *p = pIA->data;
 
   int row, col;
@@ -299,7 +300,7 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   int sr=0, sc; // source row and col
   int row, col;
 
-  csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
+  csRGBpixel *pixel = (csRGBpixel *)memimage->GetImagePtr ();
   for (row=0; row < th; row++)
   {
     xtic = 0;
@@ -358,7 +359,7 @@ void csAVIStreamVideo::rgba_interleave (char *data)
   int row, col;
 
   csRGBpixel *src = (csRGBpixel*)data;
-  csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
+  csRGBpixel *pixel = (csRGBpixel *)memimage->GetImageData ();
   for (row=0; row < th; row++)
   {
     xtic = 0;
@@ -392,9 +393,9 @@ void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])
   char *rdata = data[0];
   char *gdata = data[1];
   char *bdata = data[2];
-  csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (idx=0, y=0; y < memimage.GetHeight (); y++)
-    for (x=0; x < memimage.GetWidth (); x++)
+  csRGBpixel *pixel = (csRGBpixel *)memimage->GetImagePtr ();
+  for (idx=0, y=0; y < memimage->GetHeight (); y++)
+    for (x=0; x < memimage->GetWidth (); x++)
     {
       pixel[idx].red   = rdata[idx];
       pixel[idx].green = gdata[idx];
@@ -410,9 +411,9 @@ void csAVIStreamVideo::rgba_channel_2_rgba_interleave (char *data[4])
   char *gdata = data[1];
   char *bdata = data[2];
   char *adata = data[3];
-  csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
-  for (idx=0, y=0; y < memimage.GetHeight (); y++)
-    for (x=0; x < memimage.GetWidth (); x++)
+  csRGBpixel *pixel = (csRGBpixel *)memimage->GetImagePtr ();
+  for (idx=0, y=0; y < memimage->GetHeight (); y++)
+    for (x=0; x < memimage->GetWidth (); x++)
     {
       pixel[idx].red   = rdata[idx];
       pixel[idx].green = gdata[idx];
@@ -426,7 +427,7 @@ void csAVIStreamVideo::makeMaterial ()
 {
   iTextureManager *txtmgr = pG3D->GetTextureManager();
   csRef<iTextureHandle> pFrameTex (
-  	txtmgr->RegisterTexture (&memimage, CS_TEXTURE_NOMIPMAPS));
+  	txtmgr->RegisterTexture (memimage, CS_TEXTURE_NOMIPMAPS));
   pMaterial = txtmgr->RegisterMaterial (pFrameTex);
 }
 

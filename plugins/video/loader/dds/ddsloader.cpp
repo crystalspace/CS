@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/imagemanipulate.h"
 #include "ivaria/reporter.h"
 #include "dds.h"
 #include "ddsloader.h"
@@ -95,7 +96,7 @@ csPtr<iDataBuffer> csDDSImageIO::Save (iImage* image, const char* mime,
 //---------------------------------------------------------------------------
 
 csDDSImageFile::csDDSImageFile (iObjectRegistry* object_reg, int format)
-  : csImageFile (format), mipmaps(0), mipmapcount(0)
+  : csImageMemory (format), mipmaps(0), mipmapcount(0)
 {
   csDDSImageFile::object_reg = object_reg;
 }
@@ -106,7 +107,7 @@ csDDSImageFile::~csDDSImageFile ()
 
 bool csDDSImageFile::Load (dds::Loader* loader)
 {
-  set_dimensions (loader->GetWidth(), loader->GetHeight());
+  SetDimensions (loader->GetWidth(), loader->GetHeight());
   /*if (loader->GetBytesPerPixel() != 4)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, 
@@ -116,14 +117,14 @@ bool csDDSImageFile::Load (dds::Loader* loader)
   csRGBpixel* img = loader->LoadImage ();
   if (!img)
     return false;
-  convert_rgba (img);
+  ConvertFromRGBA (img);
   if (loader->GetFormat() == dds::FORMAT_RGB)
     Format &= ~CS_IMGFMT_ALPHA;
   else
     CheckAlpha();
 
   mipmapcount = loader->GetMipmapCount () - 1;
-  for (int i=0;i<mipmapcount;i++)
+  for (uint i=0;i<mipmapcount;i++)
   {
     csRGBpixel* img = loader->LoadMipmap(i);
     if (!img)
@@ -135,22 +136,25 @@ bool csDDSImageFile::Load (dds::Loader* loader)
     newW = MAX(newW, 1);
     int newH = loader->GetHeight() >> (i+1);
     newH = MAX(newH, 1);
-    image->set_dimensions (newW, newH);
-    image->convert_rgba(img);
+    image->SetDimensions (newW, newH);
+    image->ConvertFromRGBA (img);
     mipmaps.Push (image);
   }
 
   return true;
 }
 
-csPtr<iImage> csDDSImageFile::MipMap (int step, csRGBpixel* transp)
+csRef<iImage> csDDSImageFile::GetMipmap (uint num)
 {
-  if (step == 0 || step > mipmapcount || transp)
-    return csImageFile::MipMap (step, transp);
-  return csPtr<iImage> (mipmaps[step-1]->Clone ());
+  if (num == 0)
+    return this;
+  if (num > mipmapcount)
+    return 0;
+
+  return mipmaps[num-1];
 }
 
-int csDDSImageFile::HasMipmaps ()
+uint csDDSImageFile::HasMipmaps () const
 {
   return mipmapcount;
 }

@@ -23,6 +23,7 @@
 #include "txtmgr.h"
 #include "csutil/util.h"
 #include "csutil/debug.h"
+#include "csgfx/imagemanipulate.h"
 #include "iutil/objreg.h"
 #include "csqint.h"
 #include "igraphic/image.h"
@@ -127,9 +128,9 @@ void csTextureHandle::CreateMipmaps ()
   if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
   {
     // Create each new level by creating a level 2 mipmap from previous level
-    csRef<iImage> i1 = image->MipMap (1, tc);
-    csRef<iImage> i2 = i1->MipMap (1, tc);
-    csRef<iImage> i3 = i2->MipMap (1, tc);
+    csRef<iImage> i1 = csImageManipulate::Mipmap (image, 1, tc);
+    csRef<iImage> i2 = csImageManipulate::Mipmap (i1, 1, tc);
+    csRef<iImage> i3 = csImageManipulate::Mipmap (i2, 1, tc);
 
     tex [1] = NewTexture (i1, true);
     DG_LINK (this, tex[1]);
@@ -193,7 +194,7 @@ void csTextureHandle::AdjustSizePo2 ()
     newwidth, newheight);
 
   if (newwidth != image->GetWidth () || newheight != image->GetHeight ())
-    image->Rescale (newwidth, newheight);
+    image = csImageManipulate::Rescale (image, newwidth, newheight);
 }
 
 void csTextureHandle::CalculateNextBestPo2Size (const int width, 

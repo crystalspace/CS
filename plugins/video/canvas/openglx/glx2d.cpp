@@ -309,7 +309,13 @@ bool csGraphics2DGLX::CreateVisuals ()
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
     glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : 
-    "indirect renderer");
+    "(indirect renderer)");
+  if (!glXIsDirect (dpy, active_GLContext))
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "Indirect rendering may indicate a flawed OpenGL setup if you run on "
+      "a local X server.");
+  }
 
   Depth = xvis->depth;
 

@@ -17,28 +17,85 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_MEMIMAGE_H__
-#define __CS_MEMIMAGE_H__
+#ifndef __CS_CSGFX_MEMIMAGE_H__
+#define __CS_CSGFX_MEMIMAGE_H__
 
 #include "csextern.h"
-#include "csimage.h"
+#include "csutil/leakguard.h"
+#include "csgfx/imagetools.h"
+#include "csgfx/rgbpixel.h"
+#include "igraphic/image.h"
 
 /**
  * Memory image.
- * \remark Does not support cropping or cloning.
  */
-class CS_CSGFX_EXPORT csImageMemory : public csImageFile
+class CS_CSGFX_EXPORT csImageMemory : public iImage
 {
 private:
-  /// If we are a blank image, we can take a short cut with rescaling
-  bool short_cut;
+  /// Common code shared by constructors.
+  void ConstructCommon();
+  /// Used by ctors setting a width/height/format.
+  void ConstructWHF (int width, int height, int format);
+  /// Used by the "copy from iImage" ctor.
+  void ConstructSource (iImage* source);
+  /// Used by the "init from buffers" ctors.
+  void ConstructBuffers (int width, int height, void* buffer, 
+    bool destroy, int format, csRGBpixel *palette);
+protected:
+  /// Width of image.
+  int Width;
+  /// Height of image.
+  int Height;
+  /**
+   * The image data.
+   * A value of 0 means the Image contents are "undefined". However,
+   * this is an internal state only. No operation should fail due
+   * undefined image data (although the data may stay undefined).
+   */
+  void* Image;
+  /// The image palette or 0
+  csRGBpixel *Palette;
+  /// The alpha map
+  uint8 *Alpha;
+  /// Image file name
+  char *fName;
+  /// Image format (see CS_IMGFMT_XXX above)
+  int Format;
+  /// if it has a keycolour.
+  bool has_keycolour;
+  /// keycolour value
+  csRGBpixel keycolour;
   /// If true when these interfaces are destroyed the image is also.
   bool destroy_image;
- 
-protected:
-  virtual void FreeImage ();
 
+  /**
+   * csImageMemory constructor, only set a format, no dimensions.
+   * Intended to be used by loaders which later call SetDimensions().
+   */
+  csImageMemory (int iFormat);
+  /**
+   * Set the width and height.
+   * This will also free the 'image' buffer to hold the pixel data,
+   * but it will NOT allocate a new buffer (thus `image' is 0
+   * after calling this function). You should pass an appropiate
+   * pointer to one of ConvertXXX functions below, define the
+   * image itself (or assign something to `Image' manually),
+   * or call EnsureImage().
+   */
+  void SetDimensions (int newWidth, int newHeight);
+
+  /// Allocate the pixel data buffers.
+  void AllocImage();
+  /// Allocate the pixel data buffers if they aren't already.
+  void EnsureImage();
+  /**
+   * Free all image data: pixels and palette. Takes care of image data format.
+   */
+  void FreeImage ();
 public:
+  SCF_DECLARE_IBASE;
+  CS_LEAKGUARD_DECLARE (csImageMemory);
+
   /**
    * Create a blank image of these dimensions and the specified
    * format.
@@ -48,9 +105,9 @@ public:
    */
   csImageMemory (int width, int height, int format = CS_IMGFMT_TRUECOLOR);
   /**
-   * Create an iImage interface for this true colour buffer with
-   * these dimensions. If destroy is set to true then the supplied buffer
-   * will be destroyed when the interfaces are.
+   * Create an instance for this pixel buffer with these dimensions. 
+   * If destroy is set to true then the supplied buffer
+   * will be destroyed when the instance is.
    * \param width Width of the image
    * \param height Height of the image
    * \param buffer Data containing initial data
@@ -59,16 +116,79 @@ public:
    * Default: #CS_IMGFMT_TRUECOLOR
    * \param palette Palette for indexed images.
    */
-  csImageMemory (int width, int height, void *buffer, bool destroy,
+  csImageMemory (int width, int height, void* buffer, bool destroy,
     int format = CS_IMGFMT_TRUECOLOR, csRGBpixel *palette = 0);
+  /**
+   * Create an instance from a pixel buffer with these dimensions. 
+   * A copy of the pixel data is made.
+   * \param width Width of the image
+   * \param height Height of the image
+   * \param buffer Data containing initial data
+   * \param format Image format. Data in \arg buffer must be in this format.
+   * Default: #CS_IMGFMT_TRUECOLOR
+   * \param palette Palette for indexed images.
+   */
+  csImageMemory (int width, int height, const void* buffer, 
+    int format = CS_IMGFMT_TRUECOLOR, const csRGBpixel *palette = 0);
+  /**
+   * Create an instance that copies the pixel data from another iImage
+   * object.
+   */
+  csImageMemory (iImage* source);
+  /**
+   * Create an instance that copies the pixel data from another iImage
+   * object, and also change the data format.
+   */
+  csImageMemory (iImage* source, int newFormat);
 
   virtual ~csImageMemory ();
 
+  /// Get a pointer to the image data that can be changed.
+  void* GetImagePtr ();
+  /// Get a pointer to the palette data that can be changed.
+  csRGBpixel* GetPalettePtr ();
+  /// Get a pointer to the alpha data that can be changed.
+  uint8* GetAlphaPtr ();
+
+  virtual const void *GetImageData () { return GetImagePtr(); }
+  virtual int GetWidth () const { return Width; }
+  virtual int GetHeight () const { return Height; }
+
+  virtual void SetName (const char *iName);
+  virtual const char *GetName () const { return fName; }
+
+  virtual int GetFormat () const { return Format; }
+  virtual const csRGBpixel* GetPalette () { return GetPalettePtr(); }
+  virtual const uint8* GetAlpha () { return GetAlphaPtr(); }
+
+  virtual bool HasKeyColor () const { return has_keycolour; }
+  virtual bool HasKeycolor () const
+  { return HasKeyColor(); }
+
+  virtual void GetKeyColor (int &r, int &g, int &b) const
+  { r = keycolour.red; g = keycolour.green; b = keycolour.blue; }
+  virtual void GetKeycolor (int &r, int &g, int &b) const
+  { GetKeyColor (r, g, b); }
+
+  virtual uint HasMipmaps () const { return 0; }
+  virtual csRef<iImage> GetMipmap (uint num)
+  { return (num == 0) ? this : 0; }
+  
   /// Clears image to colour. Only works for truecolor images.
   void Clear (const csRGBpixel &colour);
 
-  /// Rescale the image to the given size
-  virtual void Rescale (int NewWidth, int NewHeight);
+  /// Check if all alpha values are "non-transparent" and if so, discard alpha
+  void CheckAlpha ();
+  /**
+   * Convert the image to another format.
+   * This method will allocate a respective color component if
+   * it was not allocated before. For example, you can use this
+   * method to add alpha channel to paletted images, to allocate
+   * a image for CS_IMGFMT_NONE alphamaps or vice versa, to remove
+   * the image and leave alphamap alone. This routine may be used
+   * as well for removing alpha channel.
+   */
+  void SetFormat (int iFormat);
 
   /// Set the keycolor
   virtual void SetKeyColor (int r, int g, int b);
@@ -83,6 +203,48 @@ public:
    */
   virtual void ApplyKeyColor ();
   virtual void ApplyKeycolor () { ApplyKeyColor(); }
+
+  /// Copy an image as subpart into this image.
+  bool Copy (iImage* srcImage, int x, int y, int width, int height);
+  /**
+   * Copy an image as subpart into this image with scaling \a sImage to the
+   * given size.
+   */
+  bool CopyScale (iImage* srcImage, int x, int y, int width, int height);
+  /**
+   * Copy an image as subpart into this image and tile and scale \a sImage 
+   * to the given size.
+   */
+  bool CopyTile (iImage* srcImage, int x, int y, int width, int height);
+
+  /**
+   * Used to convert an truecolor RGB image into requested format.
+   * If the image loader cannot handle conversion itself, and the image
+   * file is in a format that is different from the requested one,
+   * load the image in csRGBpixel format and pass the pointer to this
+   * function which will handle the RGB -> target format conversion.
+   * NOTE: the pointer should be allocated with new csRGBpixel [] and you should
+   * not free it after calling this function: the function will free
+   * the buffer itself if it is appropiate (or wont if the buffer
+   * size/contents are appropiate for target format).
+   */
+  void ConvertFromRGBA (csRGBpixel* iImage);
+  /**
+   * Used to convert an 8-bit indexed image into requested format.
+   * Pass a pointer to color indices and a pointer to palette, and you're done.
+   * NOTE: the pointer should be allocated with new uint8 [] and you should
+   * not free it after calling this function: the function will free
+   * the buffer itself if it is appropiate (or wont if the buffer
+   * size/contents are appropiate for target format). Same about palette.
+   */
+  void ConvertFromPal8 (uint8* iImage, csRGBpixel* iPalette, int nPalColors = 256);
+  /**
+   * Same as above but accepts an array of csRGBcolor's as palette.
+   * The csRGBcolor array is never freed, so its your responsability
+   * if you did it.
+   */
+  void ConvertFromPal8 (uint8* iImage, const csRGBcolor* iPalette,
+    int nPalColors = 256);
 };
 
-#endif // __CS_MEMIMAGE_H__
+#endif // __CS_CSGFX_MEMIMAGE_H__

@@ -19,7 +19,7 @@
 #ifndef __CS_TGAIMAGE_H__
 #define __CS_TGAIMAGE_H__
 
-#include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -57,13 +57,13 @@ class csTGAImageIO : public iImageIO
 /**
  * An csImageFile subclass for reading TGA files.
  */
-class ImageTgaFile : public csImageFile
+class ImageTgaFile : public csImageMemory
 {
   friend class csTGAImageIO;
 
 private:
   /// Initialize the image object
-  ImageTgaFile (int iFormat) : csImageFile (iFormat) { };
+  ImageTgaFile (int iFormat) : csImageMemory (iFormat) { };
   /// Try to read the PNG file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 };

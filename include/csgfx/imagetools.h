@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
-	      (C) 2001 by F.Richter
+    Copyright (C) 2005 by Jorrit Tyberghein
+	      (C) 2005 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,32 +18,39 @@
 */
 
 /**\file
+ * Some helper functions to deal with iImage objects.
  */
  
 /**\addtogroup gfx
  * @{ 
  */
 
-#ifndef __CS_CSGFX_XORPAT_H__
-#define __CS_CSGFX_XORPAT_H__
+#ifndef __CS_CSGFX_IMAGETOOLS_H__
+#define __CS_CSGFX_IMAGETOOLS_H__
 
 #include "csextern.h"
+#include "igraphic/image.h"
 
 /**
- * Create an iImage with a nice XOR pattern with 2^\p recdepth
- * shades of from white to black.
- * \param width Width of the image to create
- * \param height Height of the image to create
- * \param recdepth "recursion depth", clamped to range 1-8.
- * \param red Maximum value of red component
- * \param green Maximum value of green component
- * \param blue Maximum value of blue component
+ * Some helper functions to deal with iImage objects.
  */
-extern CS_CSGFX_EXPORT csPtr<iImage> csCreateXORPatternImage(int width, 
-  int height, int recdepth, float red = 1.0f, float green = 1.0f,
-  float blue = 1.0f);
+class CS_CSGFX_EXPORT csImageTools
+{
+public:
+  /// Compute the size of an image data, in bytes.
+  static inline size_t ComputeDataSize (const iImage* img) 
+  {
+    return img->GetWidth() * img->GetHeight() * 
+      (((img->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8) ? 1 : 
+      sizeof (csRGBpixel));
+  }
+  /**
+   * Return the closest palette index to given color. 
+   */
+  static int ClosestPaletteIndex (const csRGBpixel* Palette, 
+    const csRGBpixel& iColor, int palEntries = 256);
+};
 
 /** @} */
 
-#endif // __CS_CSGFX_XORPAT_H__
-
+#endif // __CS_CSGFX_IMAGETOOLS_H__

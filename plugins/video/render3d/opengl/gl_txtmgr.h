@@ -52,7 +52,7 @@ class csGLTextureCache;
 
 struct csGLUploadData
 {
-  void* image_data;
+  const void* image_data;
   int w, h, d;
   csRef<iBase> dataRef;
   GLenum sourceFormat;
@@ -72,8 +72,6 @@ private:
   //GLenum targetFormat;
   csStringID textureClass;
 
-  /// 2D Canvas
-  csRef<iGraphics2D> canvas;
   /// The transparent color
   csRGBpixel transp_color;
   

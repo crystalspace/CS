@@ -31,6 +31,7 @@
 #include "igraphic/image.h"
 #include "ivaria/reporter.h"
 #include "csqint.h"
+#include "csgfx/imagemanipulate.h"
 #include "csgfx/memimage.h"
 #include "csgfx/xorpat.h"
 #include "soft_g3d.h"
@@ -131,7 +132,7 @@ csTexture *csSoftwareTextureHandle::NewTexture (iImage *newImage,
   if (ismipmap && texman->sharpen_mipmaps)
   { 
     csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
-    Image = newImage->Sharpen (tc, texman->sharpen_mipmaps);
+    Image = csImageManipulate::Sharpen (newImage, texman->sharpen_mipmaps, tc);
   }
   else
     Image = newImage;

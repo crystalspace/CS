@@ -27,6 +27,7 @@
 #include "csutil/debug.h"
 #include "csutil/util.h"
 #include "csgfx/csimgvec.h"
+#include "csgfx/imagemanipulate.h"
 #include "csgfx/memimage.h"
 #include "csgfx/xorpat.h"
 #include "cstool/debugimagewriter.h"
@@ -333,7 +334,8 @@ void csGLTextureHandle::AdjustSizePo2 ()
 
     if (newwidth != orig_width || newheight != orig_height)
     {
-      images->GetImage (i)->Rescale (newwidth, newheight);
+      images->SetImage (i, csImageManipulate::Rescale (
+	images->GetImage (i), newwidth, newheight));
     }
   }
 }
@@ -386,9 +388,9 @@ void csGLTextureHandle::CreateMipMaps()
     int nTex = 0;
     int nMip = 0;
 
-    for (i=0; i < thisImages->Length(); i++)
+    for (i=0; i < images->Length(); i++)
     {
-      nMipmaps.Push (thisImages->GetImage (i)->HasMipmaps());
+      nMipmaps.Push (images->GetImage (i)->HasMipmaps());
     }
     
     do
@@ -408,20 +410,21 @@ void csGLTextureHandle::CreateMipMaps()
 	bool precompMip = false;
 	if (nMipmaps[i] != 0)
 	{
-	  cimg = images->GetImage (i)->MipMap (nMip, tc);
+	  cimg = images->GetImage (i)->GetMipmap (nMip);
 	  nMipmaps[i]--;
 	  precompMip = true;
 	}
 	else
 	{
-	  cimg = thisImages->GetImage (i)->MipMap (1, tc);
+	  cimg = csImageManipulate::Mipmap (thisImages->GetImage (i), 1, tc);
 	}
 	if (txtmgr->sharpen_mipmaps 
 	  && (mipskip == 0) // don't sharpen when doing skip...
 	  && textureSettings->allowMipSharpen
 	  && (!precompMip || textureSettings->sharpenPrecomputedMipmaps))
 	{
-	  cimg = cimg->Sharpen (tc, txtmgr->sharpen_mipmaps);
+	  cimg = csImageManipulate::Sharpen (cimg, txtmgr->sharpen_mipmaps, 
+	    tc);
 	}
   #ifdef MIPMAP_DEBUG
 	csDebugImageWriter::DebugImageWrite (cimg,
@@ -436,7 +439,7 @@ void csGLTextureHandle::CreateMipMaps()
 }
 
 
-bool csGLTextureHandle::transform (iImageVector *ImageVector/*, csGLTexture *tex*/, int mipNum)
+bool csGLTextureHandle::transform (iImageVector *ImageVector, int mipNum)
 {
   uint8 *h;
 
@@ -475,7 +478,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector/*, csGLTexture *tex
       uploadData.sourceType = GL_UNSIGNED_BYTE;
       uploadData.mip = mipNum;
 
-      void* data = 0;
+      const void* data = 0;
       int j;
 
       csRef<csDataBuffer> volumeData;

@@ -28,8 +28,8 @@ csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth,
 				      float red, float green, float blue)
 {
   int x,y;
-  iImage *image = new csImageMemory(width, height);
-  csRGBpixel *pixel = (csRGBpixel*)image->GetImageData();
+  csImageMemory* image = new csImageMemory (width, height);
+  csRGBpixel *pixel = (csRGBpixel*)image->GetImagePtr();
 
   if (recdepth<1) recdepth = 1;
   if (recdepth>8) recdepth = 8;
@@ -51,7 +51,9 @@ csPtr<iImage> csCreateXORPatternImage(int width, int height, int recdepth,
     }
   }
 
-  return image;
+  csRef<iImage> imageRef;
+  imageRef.AttachNew (image);
+  return csPtr<iImage> (imageRef);
 }
 
 

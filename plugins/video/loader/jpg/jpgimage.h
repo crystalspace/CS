@@ -19,7 +19,7 @@
 #ifndef __CS_JPGIMAGE_H__
 #define __CS_JPGIMAGE_H__
 
-#include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "csutil/leakguard.h"
 #include "iutil/eventh.h"
@@ -65,7 +65,7 @@ public:
  * An csImageFile subclass for reading JPG files.<p>
  * This implementation needs libjpeg to read JFIF files.
  */
-class ImageJpgFile : public csImageFile
+class ImageJpgFile : public csImageMemory
 {
   friend class csJPGImageIO;
   static bool dither;
@@ -74,7 +74,7 @@ private:
   iObjectRegistry* object_reg;
 
   /// Initialize the image object
-  ImageJpgFile (int iFormat, iObjectRegistry* p) : csImageFile (iFormat) 
+  ImageJpgFile (int iFormat, iObjectRegistry* p) : csImageMemory (iFormat) 
     { object_reg = p; };
   /// Try to read the PNG file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);

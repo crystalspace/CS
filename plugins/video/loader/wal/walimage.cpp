@@ -145,15 +145,15 @@ bool ImageWALFile::Load (uint8* iBuffer, size_t iSize)
   if (chkfilesize != iSize)
     return false;
 
-  set_dimensions (head.width, head.height);
+  SetDimensions (head.width, head.height);
 
   // There are 4 mipmaps in a wal-file, but we just use the first and discard the rest
   uint8 *buffer = new uint8 [Width * Height];
 
   memcpy (buffer, iBuffer + head.offsets[0], Width * Height);
-  const csRGBcolor *WALpal = csUnpackRGBtoRGBcolor (WALpalette, 256);
-  convert_pal8 (buffer, WALpal);
-  csDiscardUnpackedRGBcolor (WALpal);
+  csRGBpixel* newPal = new csRGBpixel[256];
+  memcpy (newPal, WALpalette, sizeof (csRGBpixel) * 256);
+  ConvertFromPal8 (buffer, newPal);
 
   return true;
 }

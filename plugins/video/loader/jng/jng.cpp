@@ -812,7 +812,7 @@ mng_bool ImageJngFile::cb_settimer (mng_handle hHandle, mng_uint32 iMsecs)
 }
 
 ImageJngFile::ImageJngFile (int iFormat, iObjectRegistry* p) : 
-  csImageFile (iFormat)
+  csImageMemory (iFormat)
 { 
   object_reg = p; 
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
@@ -912,7 +912,7 @@ bool ImageJngFile::Load (uint8 *iBuffer, size_t iSize)
   if (NewImage)
   {
     csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel (NewImage, Width*Height);
-    convert_rgba (rgbImage);
+    ConvertFromRGBA (rgbImage);
     CheckAlpha();
   }
 
@@ -951,7 +951,7 @@ bool ImageJngFile::Animate (csTicks time, csRect* dirtyrect)
   if (updated)
   {
     csRGBpixel *rgbImage = csCopyUnpackRGBAtoRGBpixel (NewImage, Width*Height);
-    convert_rgba (rgbImage);
+    ConvertFromRGBA (rgbImage);
     CheckAlpha();
   }
 

@@ -19,7 +19,7 @@
 #ifndef __CS_PNGIMAGE_H__
 #define __CS_PNGIMAGE_H__
 
-#include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "csutil/leakguard.h"
 #include "iutil/eventh.h"
@@ -60,12 +60,12 @@ public:
  * An csImageFile subclass for reading PNG files.<p>
  * This implementation needs both zlib and pnglib to read .PNG files.
  */
-class ImagePngFile : public csImageFile
+class ImagePngFile : public csImageMemory
 {
   friend class csPNGImageIO;
 private:
   /// Initialize the image object
-  ImagePngFile (int iFormat) : csImageFile (iFormat) { };
+  ImagePngFile (int iFormat) : csImageMemory (iFormat) { };
   /// Try to read the PNG file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 

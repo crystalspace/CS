@@ -43,8 +43,8 @@ bool csCursorConverter::ConvertTo1bpp (iImage* image, uint8*& bitmap,
 				       const csRGBcolor* keycolor,
 				       bool XbitOrder)
 {
-  csRef<iImage> myImage = image->Clone ();
-  myImage->SetFormat (CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+  csRef<csImageMemory> myImage;
+  myImage.AttachNew (new csImageMemory (image, CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
   myImage->SetName (image->GetName ());
 
   csColorQuantizer quantizer;
@@ -176,7 +176,7 @@ bool csCursorConverter::ConvertTo8bpp (iImage* image, uint8*& pixels,
   if ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
     dataSize *= sizeof (csRGBpixel);
 
-  memcpy (myImage->GetImageData (), image->GetImageData (),
+  memcpy (myImage->GetImagePtr(), image->GetImageData(),
     dataSize);
 
   csRGBcolor transp;
@@ -196,7 +196,7 @@ bool csCursorConverter::ConvertTo8bpp (iImage* image, uint8*& pixels,
   if ((image->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
   {
     // copy over the original palette
-    memcpy (myImage->GetPalette(), image->GetPalette(), 
+    memcpy (myImage->GetPalettePtr(), image->GetPalette(), 
       sizeof (csRGBpixel) * 256);
     myImage->ApplyKeyColor ();
   }
@@ -296,15 +296,15 @@ void csCursorConverter::StripAlphaFromRGBA (iImage* image,
 #endif
 }
 
-void csCursorConverter::StripAlphaFromPal8 (iImage* image)
+void csCursorConverter::StripAlphaFromPal8 (csImageMemory* image)
 {
   CS_ASSERT_MSG (
-    "csCursorConverter::StripAlphaFromRGBA called with image of wrong format",
+    "csCursorConverter::StripAlphaFromPal8 called with image of wrong format",
     ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
     && (image->GetFormat () & CS_IMGFMT_ALPHA));;
 #ifdef ALPHA_DITHERING
   // Fancy: dither alpha to opaque/transparent
-  uint8* imageData = image->GetAlpha ();
+  uint8* imageData = image->GetAlphaPtr ();
   int pixcount = image->GetWidth () * image->GetHeight ();
   csRGBpixel* alphaData = new csRGBpixel[pixcount];
   uint8* imagePtr = imageData;
@@ -329,7 +329,7 @@ void csCursorConverter::StripAlphaFromPal8 (iImage* image)
   quantizer.RemapDither (alphaData, pixcount, image->GetWidth (), pal, 
     maxcolors, alphaDithered);
 
-  imagePtr = (uint8*)image->GetImageData ();
+  imagePtr = (uint8*)image->GetImagePtr ();
   uint8* ditherPtr = alphaDithered;
   for (p = 0; p < pixcount; p++)
   {

@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 
+#include "csgfx/memimage.h"
 #include "igraphic/image.h"
 
 #include "customcursor.h"
@@ -160,7 +161,7 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   uint8* pixels = 0;
   csRGBpixel* palette = 0;
   uint8* pixelsRGB = 0;
-  csRef<iImage> imageRGB;
+  csRef<csImageMemory> imageRGB;
   csRGBpixel transp;
   if (doPaletted)
   {
@@ -169,7 +170,7 @@ csWin32CustomCursors::CachedCursor csWin32CustomCursors::CreateCursor(
   }
   else
   {
-    imageRGB = image->Clone();
+    imageRGB.AttachNew (new csImageMemory (image));
     if (!doAlpha)
     {
       imageRGB->SetFormat (CS_IMGFMT_TRUECOLOR 

@@ -19,7 +19,7 @@
 #ifndef __CS_JNG_H__
 #define __CS_JNG_H__
 
-#include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "igraphic/animimg.h"
 #include "iutil/eventh.h"
@@ -76,7 +76,7 @@ class csJNGImageIO : public iImageIO
  * An csImageFile subclass for reading JNG files.<p>
  * This implementation needs libmng to read .JNG files.
  */
-class ImageJngFile : public csImageFile, public iAnimatedImage
+class ImageJngFile : public csImageMemory, public iAnimatedImage
 {
   friend class csJNGImageIO;
 private:
@@ -119,7 +119,7 @@ private:
   /// Try to read the JNG file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 public:
-  SCF_DECLARE_IBASE_EXT (csImageFile);
+  SCF_DECLARE_IBASE_EXT (csImageMemory);
 
   virtual bool Animate (csTicks time, csRect* dirtyrect = 0);
   virtual bool IsAnimated ();

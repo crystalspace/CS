@@ -29,6 +29,7 @@
  */
 
 #include "csutil/scf.h"
+#include "csgfx/rgbpixel.h"
 
 /*
  * We can request to load image in one of several formats.
@@ -58,15 +59,21 @@
 #define CS_IMGFMT_INVALID	0x80000000
 
 
-struct csRGBpixel;
-
-SCF_VERSION (iImage, 1, 0, 3);
+SCF_VERSION (iImage, 2, 0, 0);
 
 /**
- * The iImage interface is used to work with image files
- * (what did you expect?). Crystal Space supports loading of images in
- * GIF, JPEG, PNG, SGI etc formats, you can work with any image
- * through this interface.
+ * The iImage interface is used to work with image objects.
+ * <p>
+ * You cannot manipulate the pixel data of iImage objects directly. 
+ * To do this, you need to instantiate a your own copy of the image, e.g.
+ * by creating a csImageMemory instance (which allows access to the
+ * pixel data).
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iImageIO::Load()
+ *   </ul>
+ * \sa csImageMemory, csImageManipulate, csImageTools
  */
 struct iImage : public iBase
 {
@@ -77,28 +84,11 @@ struct iImage : public iBase
    * will return 0 (because alpha is not stored separately, as for
    * paletted images).
    */
-  virtual void *GetImageData () = 0;
+  virtual const void *GetImageData () = 0;
   /// Query image width
   virtual int GetWidth () const = 0;
   /// Query image height
   virtual int GetHeight () const = 0;
-  /// Query image size in bytes
-  virtual int GetSize () const = 0;
-
-  /// Rescale the image to the given size
-  virtual void Rescale (int NewWidth, int NewHeight) = 0;
-
-  /**
-   * Create a new iImage which is a mipmapped version of this one.
-   * 'step' indicates how much the mipmap should be scaled down. Step 0 
-   * returns a blurred version of the image without image being scaled down.
-   * Step 1 scales the image down to 1/2. Steps &gt; 1 repeat this 
-   * <i>'step'</i> times.
-   * The new image will have same format as the original one. If you pass
-   * a pointer to a transparent color, the texels of that color are handled
-   * differently.
-   */
-  virtual csPtr<iImage> MipMap (int step, csRGBpixel *transp) = 0;
 
   /// Set image file name
   virtual void SetName (const char *iName) = 0;
@@ -108,55 +98,17 @@ struct iImage : public iBase
   /// Qyery image format (see CS_IMGFMT_XXX above)
   virtual int GetFormat () const = 0;
   /// Get image palette (or 0 if no palette)
-  virtual csRGBpixel *GetPalette () = 0;
+  virtual const csRGBpixel* GetPalette () = 0;
   /**
    * Get alpha map for 8-bit paletted image.
    * RGBA images contains alpha within themself.
    * If image has no alpha map, or the image is in RGBA format,
    * this function will return 0.
    */
-  virtual uint8 *GetAlpha () = 0;
-  /**
-   * Convert the image to another format.
-   * This method will allocate a respective color component if
-   * it was not allocated before. For example, you can use this
-   * method to add alpha channel to paletted images, to allocate
-   * a image for CS_IMGFMT_NONE alphamaps or vice versa, to remove
-   * the image and leave alphamap alone. This routine may be used
-   * as well for removing alpha channel.
-   */
-  virtual void SetFormat (int iFormat) = 0;
-
-  /// Create yet another image and copy this one into the new image.
-  virtual csPtr<iImage> Clone () const = 0;
-
-  /**
-   * Create a new image and copy a subpart of the actual image into the new
-   * image.
-   */
-  virtual csPtr<iImage> Crop (int x, int y, int width, int height) const = 0;
-
-  /// Check if all alpha values are "non-transparent" and if so, discard alpha
-  virtual void CheckAlpha () = 0;
+  virtual const uint8* GetAlpha () = 0;
 
   /// Check if image has a keycolour stored with it.
   virtual bool HasKeyColor () const = 0;
-
-  /// Copy an image as subpart in the actual Image.
-  virtual bool Copy (iImage* sImage, int x, int y,
-  	int width, int height) const = 0;
-  /**
-   * Copy an image as subpart in the actual Image and scale it to the
-   * given size.
-   */
-  virtual bool CopyScale (iImage* sImage, int x, int y, int width,
-  	int height) const = 0;
-  /**
-   * Copy an image as subpart in the actual Image and tile and scale it
-   * to the given size.
-   */
-  virtual bool CopyTile (iImage* sImage, int x, int y,
-  	int width, int height) const = 0;
 
   /**
    * Check if image has a keycolour stored with it.
@@ -174,18 +126,17 @@ struct iImage : public iBase
   CS_DEPRECATED_METHOD virtual void GetKeycolor (int &r, int &g, int &b) const = 0;
 
   /**
-   * Create a sharpened copy of the image.
-   * The effect of 'strength' differs from image to image. Values around
-   * 128-512 give good results. On really blurry images values up to 1024 or
-   * 2048 can be used.
-   */
-  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) const = 0;
-
-  /**
    * Returns the number of mipmaps contained in the image (in case there exist
-   * any precalculated mipmaps.
+   * any precalculated mipmaps), in addition to the original image. 0 means
+   * there a no mipmaps.
    */
-  virtual int HasMipmaps () const = 0;
+  virtual uint HasMipmaps () const = 0;
+  /**
+   * Return a precomputed mipmap. \a num specifies which mipmap to return;
+   * 0 returns the original image, \a num <= the return value of HasMipmaps()
+   * returns that mipmap.
+   */
+  virtual csRef<iImage> GetMipmap (uint num) = 0;
 };
 
 /** @} */

@@ -26,8 +26,8 @@
  
 #include "csextern.h"
  
-#include "csgfx/csimage.h"
 #include "csutil/parray.h"
+#include "igraphic/image.h"
 
 struct iTextureHandle;
 struct iTextureManager;

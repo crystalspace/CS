@@ -31,7 +31,6 @@
 #include "cstool/sndwrap.h"
 #include "cstool/mapnode.h"
 #include "cstool/mdltool.h"
-#include "csgfx/csimage.h"
 #include "csloader.h"
 
 #include "iutil/databuff.h"

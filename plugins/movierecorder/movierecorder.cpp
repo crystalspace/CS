@@ -36,6 +36,7 @@
 #include "iengine/engine.h"
 #include "igraphic/image.h"
 #include "csutil/event.h"
+#include "csgfx/imagemanipulate.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -325,13 +326,7 @@ bool csMovieRecorder::HandleEndFrame (iEvent& /*event*/)
 
     // If we're recording to a different resolution, try to scale the image
     if (img->GetWidth() != writer->width || img->GetHeight() != writer->height) {
-      img->Rescale(writer->width, writer->height);
-      if (img->GetWidth() != writer->width || img->GetHeight() != writer->height) {
-	Report (CS_REPORTER_SEVERITY_ERROR, 
-		"This video driver's screenshot object doens't support rescaling.");
-	Stop();
-	return false;
-      }
+      img = csImageManipulate::Rescale (img, writer->width, writer->height);
     }
 
     numFrames++;

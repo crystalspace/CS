@@ -23,7 +23,6 @@
 #define __TEXFILE_H__
 
 #include "bindata.h"
-#include "csgfx/csimage.h"
 #include "csutil/ref.h"
 
 class CMapFile;
@@ -123,11 +122,6 @@ protected:
     * scaling is required.
     */
   CBinaryData m_OriginalData;
-
-  /**
-    * The texture as a useable image.
-    */
-  csImageFile* m_pImage;
 
   /// the original width of the texture (before scaling)
   int m_OriginalWidth;

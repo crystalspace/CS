@@ -19,7 +19,7 @@
 #ifndef __CS_GIFIMAGE_H__
 #define __CS_GIFIMAGE_H__
 
-#include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -55,14 +55,14 @@ class csGIFImageIO : public iImageIO
 };
 
 /// An csImageFile subclass for reading GIF files.
-class ImageGifFile : public csImageFile
+class ImageGifFile : public csImageMemory
 {
   friend class csGIFImageIO;
   int decode_gif (uint8* iBuffer, long iSize, int* Prefix, int* Suffix, int* OutCode);
 
 private:
   /// Initialize the image object
-  ImageGifFile (int iFormat) : csImageFile (iFormat) { };
+  ImageGifFile (int iFormat) : csImageMemory (iFormat) { };
   /// Try to read the GIF file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 };

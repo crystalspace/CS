@@ -20,7 +20,6 @@
 #include "imgplex.h"
 #include "iutil/plugin.h"
 #include "iutil/stringarray.h"
-#include "csgfx/csimage.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"

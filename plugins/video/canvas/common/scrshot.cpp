@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgfx/imagetools.h"
 #include "scrshot.h"
 
 SCF_IMPLEMENT_IBASE (csScreenShot)
@@ -99,4 +100,9 @@ csScreenShot::~csScreenShot ()
     delete [] (csRGBpixel *)Data;
 
   SCF_DESTRUCT_IBASE();
+}
+
+int csScreenShot::GetClosestIndex (const csRGBpixel& color)
+{ 
+  return csImageTools::ClosestPaletteIndex (Palette, color);
 }

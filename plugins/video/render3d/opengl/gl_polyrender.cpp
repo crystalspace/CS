@@ -281,6 +281,8 @@ void csGLPolygonRenderer::BufferAccessor::PreGetBuffer (
     UpdateBinormals ();
     holder->SetRenderBuffer (CS_BUFFER_BINORMAL, binormal_buffer);
     break;
+  default:
+    break;
   }
 }
 

@@ -20,7 +20,7 @@
 #ifndef __CS_BMPIMAGE_H__
 #define __CS_BMPIMAGE_H__
 
-#include "csgfx/csimage.h"
+#include "csgfx/memimage.h"
 #include "igraphic/imageio.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -62,7 +62,7 @@ class csBMPImageIO : public iImageIO
  * Only able to read 24 bits RGB encoded with no palette files and
  * 8 bits RGB encoded files.
  */
-class ImageBMPFile : public csImageFile
+class ImageBMPFile : public csImageMemory
 {
   friend class csBMPImageIO;
   // Load a Windows-format BMP file
@@ -70,7 +70,7 @@ class ImageBMPFile : public csImageFile
 
 private:
   /// Initialize the image object
-  ImageBMPFile (int iFormat) : csImageFile (iFormat) { };
+  ImageBMPFile (int iFormat) : csImageMemory (iFormat) { };
   /// Try to read the BMP file from the buffer and return success status
   bool Load (uint8* iBuffer, size_t iSize);
 };

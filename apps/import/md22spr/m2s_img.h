@@ -33,36 +33,23 @@ public:
   SCF_DECLARE_IBASE;
   SkinImage(void* Data, const void* Pal, int w, int h);
   virtual ~SkinImage () { SCF_DESTRUCT_IBASE(); }
-  virtual void *GetImageData ();
+  virtual const void *GetImageData ();
   virtual int GetWidth () const;
   virtual int GetHeight () const;
-  virtual int GetSize () const;
-  virtual void Rescale (int NewWidth, int NewHeight);
-  virtual csPtr<iImage> MipMap (int step, csRGBpixel *transp);
   virtual void SetName (const char*);
   virtual const char *GetName () const;
   virtual int GetFormat () const;
-  virtual csRGBpixel *GetPalette ();
-  virtual uint8 *GetAlpha ();
-  virtual void CheckAlpha ();
-  virtual void SetFormat (int iFormat);
-  virtual csPtr<iImage> Clone () const;
-  virtual csPtr<iImage> Crop (int x, int y, int width, int height) const;
-  virtual bool Copy (iImage* sImage, int x, int y, int width, int height) const
-  { return false; }
-  virtual bool CopyScale (iImage* sImage, int x, int y,
-  	int width, int height) const
-  { return false; }
-  virtual bool CopyTile (iImage* sImage, int x, int y,
-  	int width, int height) const 
-  { return false; }
-  virtual bool HasKeyColor () const { return 0; }
-  virtual bool HasKeycolor () const { return HasKeyColor(); }
-  virtual void GetKeyColor (int &r, int &g, int &b) const { r=0; g=0; b=0; }
+  virtual const csRGBpixel *GetPalette ();
+  virtual const uint8 *GetAlpha ();
+  virtual bool HasKeyColor () const { return false; }
+  virtual bool HasKeycolor () const
+  { return HasKeyColor(); }
+  virtual void GetKeyColor (int &r, int &g, int &b) const { }
   virtual void GetKeycolor (int &r, int &g, int &b) const
-  { GetKeyColor(r,g,b); }
-  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) const;
-  virtual int HasMipmaps() const { return 0; }
+  { GetKeyColor (r, g, b); }
+  virtual uint HasMipmaps() const { return 0; }
+  virtual csRef<iImage> GetMipmap (uint num)
+  { return (num == 0) ? this : 0; }
 };
 
 #endif // __M2S_IMG_H__

@@ -5,7 +5,7 @@ Description imgplex : "imgplex image I/O multiplexer" ;
 Plugin imgplex
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith imgplex : csgfx csutil ;
+LinkWith imgplex : csutil ;
 
 CompileGroups imgplex :  imageloaders ;
 

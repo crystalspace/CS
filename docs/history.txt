@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Jan-2004
+	- res reduced the iImage interface to a container for pixel data,
+	  merged csImageFile and csImageMemory and moved the image 
+	  manipulation functions into helper classes.
 15-Jan-2004
 	- Jorrit fixed a bug in engine->GetNearbyObjects() and
 	  GetNearbyMeshes(). These functions could get confused in situations

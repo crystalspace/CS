@@ -325,7 +325,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
 
   int width  = gptr.nextword();
   int height = gptr.nextword();
-  set_dimensions (width, height);
+  SetDimensions (width, height);
 
   GIFOutput optr(width, height, (gptr.nextbyte() & INTERLACEMASK));
 
@@ -441,7 +441,7 @@ int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
   }
 
   Format &= ~CS_IMGFMT_ALPHA;
-  convert_pal8 (optr.get_image (), palette.get_palette ());
+  ConvertFromPal8 (optr.get_image (), palette.get_palette ());
 
   return 0;
 }

@@ -18,7 +18,6 @@
 */
 
 #include "cssysdef.h"
-#include "csgfx/csimage.h"
 #include "csgfx/csimgvec.h"
 #include "csgfx/csrgbvct.h"
 #include "csgfx/gradient.h"

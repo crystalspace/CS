@@ -250,7 +250,7 @@ csPtr<iDataBuffer> csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescri
   int x, y, i;
   if (palette)
   {
-    csRGBpixel *pal = Image->GetPalette ();
+    const csRGBpixel *pal = Image->GetPalette ();
     for (i= 0; i < 256; i++)
     {
       *p++ = pal[i].blue;
@@ -306,7 +306,7 @@ bool ImageBMPFile::Load (uint8* iBuffer, size_t iSize)
 
 bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
 {
-  set_dimensions (BIWIDTH(iBuffer), BIHEIGHT(iBuffer));
+  SetDimensions (BIWIDTH(iBuffer), BIHEIGHT(iBuffer));
   const int bmp_size = Width * Height;
 
   uint8 *iPtr = iBuffer + BFOFFBITS(iBuffer);
@@ -359,7 +359,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
     else
       return false;
 
-    convert_pal8 (buffer, palette, 16);
+    ConvertFromPal8 (buffer, palette, 16);
     return true;
   }
   else if (BITCOUNT(iBuffer) == _256Color)
@@ -443,7 +443,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
       }
     }
     // Now transform the image data to target format
-    convert_pal8 (buffer, palette);
+    ConvertFromPal8 (buffer, palette);
     return true;
   }
   else if (BITCOUNT(iBuffer) == TRUECOLOR24)
@@ -470,7 +470,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
       buffer_y -= Width;
     }
     // Now transform the image data to target format
-    convert_rgba (buffer);
+    ConvertFromRGBA (buffer);
     return true;
   }
   else if (BITCOUNT(iBuffer) == TRUECOLOR32)
@@ -495,7 +495,7 @@ bool ImageBMPFile::LoadWindowsBitmap (uint8* iBuffer, size_t iSize)
       buffer_y -= Width;
     }
     // Now transform the image data to target format
-    convert_rgba (buffer);
+    ConvertFromRGBA (buffer);
     return true;
   }
 

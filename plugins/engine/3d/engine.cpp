@@ -43,7 +43,6 @@
 #include "csgeom/sphere.h"
 #include "csgeom/kdtree.h"
 #include "csgeom/polyclip.h"
-#include "csgfx/csimage.h"
 #include "csgfx/memimage.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"

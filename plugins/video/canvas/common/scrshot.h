@@ -28,6 +28,7 @@ class csScreenShot : public iImage
   void *Data;
   csRGBpixel *Palette;
   int Width, Height;
+
 public:
   SCF_DECLARE_IBASE;
   /// Initialize the screenshot object
@@ -35,7 +36,7 @@ public:
   /// Destroy the screenshot object
   virtual ~csScreenShot ();
   /// Get a pointer to image data
-  virtual void *GetImageData ()
+  virtual const void *GetImageData ()
   { return Data; }
   /// Query image width
   virtual int GetWidth () const
@@ -43,14 +44,6 @@ public:
   /// Query image height
   virtual int GetHeight () const
   { return Height; }
-  /// Query image size in bytes
-  virtual int GetSize () const { return 0; }
-  /// Rescale the image to the given size
-  virtual void Rescale (int NewWidth, int NewHeight)
-  { (void) NewWidth; (void) NewHeight; }
-  /// Create a new iImage which is a mipmapped version of this one.
-  virtual csPtr<iImage> MipMap (int step, csRGBpixel *transp)
-  { (void)step; (void)transp; return 0; }
   /// Set image file name
   virtual void SetName (const char *iName)
   { (void) iName; }
@@ -61,40 +54,15 @@ public:
   virtual int GetFormat () const
   { return Format; }
   /// Get image palette (or 0 if no palette)
-  virtual csRGBpixel *GetPalette ()
+  virtual const csRGBpixel *GetPalette ()
   { return Palette; }
+  virtual int GetClosestIndex (const csRGBpixel& color);
   /// Get alpha map for 8-bit paletted image.
-  virtual uint8 *GetAlpha ()
+  virtual const uint8 *GetAlpha ()
   { return 0; }
   /// Change image format
   virtual void SetFormat (int /*iFormat*/)
   { }
-  /// Create yet another image and copy this one into the new image.
-  virtual csPtr<iImage> Clone () const
-  { return 0; }
-  /// Create another image holding a subimage of current image
-  virtual csPtr<iImage> Crop (int, int, int, int) const
-  { return 0; }
-  /// Check if the alpha channel is valid
-  virtual void CheckAlpha ()
-  { }
-  /// Copy an image as subpart in the actual Image.
-  virtual bool Copy (iImage* sImage, int x, int y, int width, int height) const
-  { return false; }
-  /**
-   * Copy an image as subpart in the actual Image and scale it to
-   * the given size.
-   */
-  virtual bool CopyScale (iImage* sImage, int x, int y,
-  	int width, int height) const
-  { return false; }
-  /**
-   * Copy an image as subpart in the actual Image and tile and scale it
-   * to the given size.
-   */
-  virtual bool CopyTile (iImage* sImage, int x, int y,
-  	int width, int height) const 
-  { return false; }
 
 
   /// Check if image has a keycolour stored with it.
@@ -107,12 +75,11 @@ public:
   { r=0;g=0;b=0; }
   virtual void GetKeycolor (int &r, int &g, int &b) const
   { GetKeyColor(r,g,b); }
-  /// Sharpen the image.
-  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) const
-  { transp = 0; strength = 0; return 0; }
   /// Has mipmaps.
-  virtual int HasMipmaps () const
+  virtual uint HasMipmaps () const
   { return 0; }
+  virtual csRef<iImage> GetMipmap (uint num)
+  { return (num == 0) ? this : 0; }
 };
 
 #endif // __CS_SCRSHOT_H__
