@@ -67,7 +67,10 @@ csRef<iStrVector> csScanPluginsDir (const char* dir,
 	  csRef<iDocument> doc = docsys.CreateDocument();
 	  char const* errmsg = doc->Parse(&file);
 	  if (errmsg == 0)
-	    scfInitialize(doc);
+	  {
+	    metadata.Push (doc);
+	    plugins->Push (csStrNew (scffilepath));
+	  }  
 	  else
 	  {
 	    csString errstr;
