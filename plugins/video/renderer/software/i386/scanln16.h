@@ -163,7 +163,7 @@
       izz += dzz;							\
     }									\
     while (z_buffer <= lastZbuf)
-#include "cs3d/software/scanln.inc"
+#include "video/renderer/software/scanln.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -221,7 +221,7 @@
     : "eax", "%ebx", "ecx", "edx", "esi" );				\
     uu = uu1;								\
     vv = vv1;
-#include "cs3d/software/scanln.inc"
+#include "video/renderer/software/scanln.inc"
 
 #define I386_SCANLINE_MAP_ALPHA50_16 \
     int uFrac, duFrac, vFrac, dvFrac;					\
@@ -347,7 +347,7 @@
 #define SCANFUNC csScan_16_draw_scanline_map_alpha50
 #define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP_ALPHA50_16
-#include "cs3d/software/scanln.inc"
+#include "video/renderer/software/scanln.inc"
 
 #if defined (DO_MMX)
 
@@ -360,7 +360,7 @@
 #define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP16
 #define SCANEND MMX_FILLZBUFFER
-#include "cs3d/software/scanln.inc"
+#include "video/renderer/software/scanln.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -378,7 +378,7 @@
     }									\
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
-#include "cs3d/software/scanln.inc"
+#include "video/renderer/software/scanln.inc"
 
 #endif
 
