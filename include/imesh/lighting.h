@@ -37,6 +37,7 @@ struct iLightingInfo : public iBase
    * If clear is true then the lighting is really cleared to black. Otherwise
    * the lighting system is just warned that lighting information is
    * going to be added. This is useful in case a single light is added.
+   * Thus the first call to this function should use a clear of true.
    */
   virtual void InitializeDefault (bool clear) = 0;
 
