@@ -29,9 +29,7 @@
 #include "iutil/document.h"
 #include "imesh/genmesh.h"
 #include "ivideo/graph3d.h"
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
-#endif // CS_USE_NEW_RENDERER
 #include "qint.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
@@ -60,9 +58,7 @@ enum
   XMLTOKEN_V,
   XMLTOKEN_T,
   XMLTOKEN_N,
-#ifdef CS_USE_NEW_RENDERER
   XMLTOKEN_RENDERBUFFER,
-#endif
   XMLTOKEN_COLORS,
   XMLTOKEN_AUTONORMALS,
   XMLTOKEN_NOSHADOWS,
@@ -137,9 +133,7 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("color", XMLTOKEN_COLOR);
   xmltokens.Register ("autonormals", XMLTOKEN_AUTONORMALS);
   xmltokens.Register ("n", XMLTOKEN_N);
-#ifdef CS_USE_NEW_RENDERER
   xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
-#endif
   return true;
 }
 
@@ -359,11 +353,11 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_NUMVT:
         state->SetVertexCount (child->GetContentsValueAsInt ());
 	break;
-#ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_RENDERBUFFER:
+#ifdef CS_USE_NEW_RENDERER
         ParseRenderBuffer(child, state);
-        break;
 #endif
+        break;
       case XMLTOKEN_T:
 	{
 	  csTriangle* tr = state->GetTriangles ();

@@ -65,11 +65,7 @@
 #include "qsqrt.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
-
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rendermesh.h"
-#endif
-
 #include "igraphic/imageio.h"
 #include "csgfx/memimage.h"
 #include "csgeom/subrec.h"
@@ -1655,13 +1651,13 @@ void csThing::Prepare ()
       if (cached_movable) movablenr = cached_movable->GetUpdateNumber ()-1;
       else movablenr--;
 
-    #ifndef CS_USE_NEW_RENDERER
+#ifndef CS_USE_NEW_RENDERER
       if (polybuf)
       {
 	polybuf->DecRef ();
 	polybuf = 0;
       }
-    #endif // CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
 #if 1
       polybuf_materials.DeleteAll ();
@@ -1878,7 +1874,6 @@ bool csThing::HitBeamObject (const csVector3& start,
   return true;
 }
 
-#ifndef CS_USE_NEW_RENDERER
 void csThing::DrawOnePolygon (
   csPolygon3D *p,
   csPolygon2D *poly,
@@ -2050,8 +2045,6 @@ struct MatPol
   csPolygon3D *poly;
 };
 
-#endif // CS_USE_NEW_RENDERER
-
 static int ComparePointer (void const* item1,
 	void const* item2)
 {
@@ -2163,7 +2156,6 @@ void csThing::PreparePolygonBuffer ()
 #endif // CS_USE_NEW_RENDERER
 }
 
-#ifndef CS_USE_NEW_RENDERER
 void csThing::DrawPolygonArrayDPM (
   iRenderView *rview,
   iMovable *movable,
@@ -2204,7 +2196,6 @@ void csThing::DrawPolygonArrayDPM (
   rview->CalculateFogMesh(tr_o2c,mesh);
   rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
 }
-#endif // CS_USE_NEW_RENDERER
 
 void csThing::InvalidateMaterialHandles ()
 {
@@ -2456,7 +2447,6 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
 
 bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 {
-#ifndef CS_USE_NEW_RENDERER
   iCamera *icam = rview->GetCamera ();
   const csReversibleTransform &camtrans = icam->GetTransform ();
 
@@ -2480,7 +2470,6 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
   }
 
   draw_busy--;
-#endif // CS_USE_NEW_RENDERER
   return true;                                  // @@@@ RETURN correct vis info
 }
 

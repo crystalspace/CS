@@ -533,13 +533,12 @@ private:
   /// Optional array of materials to replace.
   csArray<RepMaterial> replace_materials;
 
-#ifndef CS_USE_NEW_RENDERER
   /**
+   * @@@OR@@@
    * If we are a detail object then this will contain a reference to a
    * polygon buffer for the 3D renderer. This can be used by DrawPolygonMesh.
    */
   iPolygonBuffer* polybuf;
-#endif // CS_USE_NEW_RENDERER
   /**
    * An array of materials that are used with the polygon buffer.
    */
@@ -1075,26 +1074,6 @@ public:
     {
       return scfParent->Draw (rview, movable, zMode);
     }
-#ifdef CS_USE_NEW_RENDERER
-    virtual bool DrawZ (iRenderView* rview, iMovable* movable,
-    	csZBufMode zMode)
-    {
-      return false;
-    }
-    virtual bool DrawShadow (iRenderView* rview, iMovable* movable,
-    	csZBufMode zMode, iLight *light)
-    {
-      return false;
-    }
-    virtual bool DrawLight (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode, iLight *light)
-    {
-      return false;
-    }
-      /// The following enable/disable shadow caps for stencil shadow rendering
-    virtual void EnableShadowCaps () {}
-    virtual void DisableShadowCaps () {}
-#endif // CS_USE_NEW_RENDERER
     virtual csRenderMesh** GetRenderMeshes (int &n)
     {
       return scfParent->GetRenderMeshes (n);

@@ -24,9 +24,7 @@
 #include "csutil/garray.h"
 #include "csutil/randomgen.h"
 #include "ivideo/graph3d.h"
-#ifndef CS_USE_NEW_RENDERER
 #include "ivideo/vbufmgr.h"
-#endif // CS_USE_NEW_RENDERER
 #include "iengine/camera.h"
 #include "iengine/rview.h"
 #include "iengine/movable.h"
@@ -751,37 +749,6 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   delete[] merge;
   delete tv;
 }
-
-#ifdef CS_USE_NEW_RENDERER
-bool csSprite3DMeshObjectFactory::AddRenderBuffer (const char *name, 
-	csRenderBufferComponentType component_type, int component_size)
-{
-  return anon_buffers->AddRenderBuffer(name, component_type, component_size, GetVertexCount());
-}
-
-bool csSprite3DMeshObjectFactory::SetRenderBufferComponent (const char *name, 
-	int index, int component, float value)
-{
-  return anon_buffers->SetRenderBufferComponent(name, index, component, value);
-}
-
-bool csSprite3DMeshObjectFactory::SetRenderBufferComponent (const char *name, 
-	int index, int component, int value)
-{
-  return anon_buffers->SetRenderBufferComponent(name, index, component, value);
-}
-
-bool csSprite3DMeshObjectFactory::SetRenderBuffer (const char *name, float *value)
-{
-  return anon_buffers->SetRenderBuffer (name, value, GetVertexCount());
-}
-
-bool csSprite3DMeshObjectFactory::SetRenderBuffer (const char *name, int *value)
-{
-  return anon_buffers->SetRenderBuffer(name, value, GetVertexCount());
-}
-
-#endif
 
 int csSprite3DMeshObjectFactory::GetLODPolygonCount (float lod) const
 {

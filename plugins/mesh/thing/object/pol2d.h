@@ -41,20 +41,23 @@ class csPolygon2D : public csPoly2D
 {
 public:
   /**
-   * Compute the perspective transformation of a 3D vertex and add it to the polygon.
+   * Compute the perspective transformation of a 3D vertex and add it to the
+   * polygon.
    */
   void AddPerspective (const csVector3& v,
   	int aspect, float shift_x, float shift_y);
 
   /**
-   * Compute the perspective transformation of a 3D vertex and add it to the polygon.
+   * Compute the perspective transformation of a 3D vertex and add it to the
+   * polygon.
    * This version computes unit perspective correction for which aspect ratio
    * is one and shift_x and shift_y are zero.
    */
   void AddPerspectiveUnit (const csVector3& v);
 
   /**
-   * Compute the perspective transformation of a 3D vertex and add it to the polygon.
+   * Compute the perspective transformation of a 3D vertex and add it to the
+   * polygon.
    * This version computes perspective correction for a given aspect
    * ratio and given shift value.
    */
@@ -65,7 +68,6 @@ public:
    */
   void Draw (iGraphics2D* g2d, int col);
 
-#ifndef CS_USE_NEW_RENDERER
   /**
    * Draw a texture mapped polygon.
    * 'plane' should be a correctly transformed plane (transformed to camera
@@ -88,7 +90,6 @@ public:
    */
   void AddFogPolygon (iGraphics3D* g3d, csPolygon3D* poly,
   	const csPlane3& camera_plane, bool mirror, CS_ID id, int fog_type);
-#endif // CS_USE_NEW_RENDERER
 };
 
 /**

@@ -127,11 +127,7 @@ void csStarsMeshObject::DrawPoint(iRenderView *rview,
   // test zbuffer?
   if(zbufmode & CS_ZBUF_TEST) // tests if zbuf is ZBUF_TEST or ZBUF_USE
   {
-#ifndef CS_USE_NEW_RENDERER
     float atpoint = g3d->GetZBuffValue(x, y);
-#else
-    float atpoint = 1;
-#endif
     if(pos.z < atpoint) return;
   }
 

@@ -323,13 +323,11 @@ public:
    */
   virtual void Prepare ();
 
-#ifdef CS_USE_NEW_RENDERER
   /**
   * Get associated shader
   */
   virtual iShaderWrapper* GetShader (csStringID type) 
   { return 0; }
-#endif // CS_USE_NEW_RENDERER
 };
 
 /**

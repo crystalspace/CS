@@ -319,9 +319,7 @@ bool csPortal::Draw (
   rview->CreateRenderContext ();
   rview->SetRenderRecursionLevel (rview->GetRenderRecursionLevel () + 1);
   rview->SetClipper (&new_view);
-#ifndef CS_USE_NEW_RENDERER
   rview->ResetFogInfo ();
-#endif // CS_USE_NEW_RENDERER
   rview->SetPortalPolygon (portal_polygon);
   rview->SetPreviousSector (rview->GetThisSector ());
   rview->SetClipPlane (camera_plane);
@@ -334,7 +332,6 @@ bool csPortal::Draw (
   // When going through a portal we first remember the old clipper
   // and clip plane (if any). Then we set a new one. Later we restore.
   iGraphics3D *G3D = rview->GetGraphics3D ();
-#ifndef CS_USE_NEW_RENDERER
   iClipper2D *old_clipper = G3D->GetClipper ();
   if (old_clipper) old_clipper->IncRef ();
 
@@ -350,7 +347,6 @@ bool csPortal::Draw (
     G3D->SetNearPlane (cp);
   else
     G3D->ResetNearPlane ();
-#endif // CS_USE_NEW_RENDERER
 
   if (flags.Check (CS_PORTAL_WARP))
   {
@@ -370,14 +366,12 @@ bool csPortal::Draw (
   rview->RestoreRenderContext (old_ctxt);
 
   // Now restore our G3D clipper and plane.
-#ifndef CS_USE_NEW_RENDERER
   G3D->SetClipper (old_clipper, old_cliptype);
   if (old_clipper) old_clipper->DecRef ();
   if (old_do_near_plane)
     G3D->SetNearPlane (old_near_plane);
   else
     G3D->ResetNearPlane ();
-#endif // CS_USE_NEW_RENDERER
 
   return true;
 }

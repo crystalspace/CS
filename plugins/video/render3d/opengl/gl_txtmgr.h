@@ -515,13 +515,15 @@ public:
    * The texture is unregistered at destruction, i.e. as soon as the last
    * reference to the texture handle is released.
    *<p>
-   * If CS_USE_NEW_RENDERER is enabled param target specifies the texture target.
+   * If CS_USE_NEW_RENDERER is enabled param target specifies the texture
+   * target.
    * Defines for that can be found in ivideo/texture.h
-   *
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags);
 
-  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image, int flags, int target);
+  /// Document me! @@@
+  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
+  	int flags, int target);
 
   /**
    * After all textures have been added, this function does all

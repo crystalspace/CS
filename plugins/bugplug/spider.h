@@ -92,15 +92,6 @@ public:
   virtual void UpdateLighting (iLight**, int, iMovable*) { }
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode) { return false; }
   virtual csRenderMesh** GetRenderMeshes (int& n) { n = 0; return 0; }
-#ifdef CS_USE_NEW_RENDERER
-  virtual bool DrawZ (iRenderView*, iMovable*, csZBufMode) { return false; }
-  virtual bool DrawShadow (iRenderView*, iMovable*, csZBufMode, iLight *light) { return false; }
-  virtual bool DrawLight (iRenderView*, iMovable*, csZBufMode, iLight *) { return false; }
-  /// The following enable/disable shadow caps for stencil shadow rendering
-  virtual void EnableShadowCaps (){;}
-  virtual void DisableShadowCaps (){;}
-
-#endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback*) { }
   virtual iMeshObjectDrawCallback* GetVisibleCallback () const { return 0; }
   virtual void NextFrame (csTicks, const csVector3& /*pos*/) { }

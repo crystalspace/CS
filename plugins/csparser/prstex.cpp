@@ -42,16 +42,9 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "igraphic/animimg.h"
-
-#ifdef CS_USE_NEW_RENDERER
 #include "csgfx/csimgvec.h"
-#endif
-
 #include "loadtex.h"
-
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/shader/shader.h"
-#endif //CS_USE_NEW_RENDERER
 
 #define PLUGIN_LEGACY_TEXTYPE_PREFIX  "crystalspace.texture.loader."
 
@@ -265,7 +258,6 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	  return 0;
 	break;
       case XMLTOKEN_CLAMP:
-#ifdef CS_USE_NEW_RENDERER
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
@@ -275,10 +267,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
           else
             context.SetFlags (context.GetFlags() & ~CS_TEXTURE_CLAMP);
         }
-#endif
         break;
       case XMLTOKEN_FILTER:
-#ifdef CS_USE_NEW_RENDERER
         {
           bool c;
           if (!SyntaxService->ParseBool (child, c, true))
@@ -288,7 +278,6 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
           else
             context.SetFlags (context.GetFlags() | CS_TEXTURE_NOFILTER);
         }
-#endif // CS_USE_NEW_RENDERER
         break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -706,6 +695,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   AddToRegion (ldr_context, mat->QueryObject ());
   return mat;
 }
+
 #ifdef CS_USE_NEW_RENDERER
 /// Parse a Cubemap texture definition and add the texture to the engine
 iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,

@@ -448,7 +448,6 @@ void csBugPlug::HideSpider (iCamera* camera)
   }
 }
 
-#ifndef CS_USE_NEW_RENDERER
 void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
 {
   if (!G3D) return;
@@ -466,25 +465,6 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
     	name);
   }
 }
-#else
-void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
-{
-  if (!G3D) return;
-  bool v;
-  v = G3D->GetRenderState (op);
-  v = !v;
-  if (G3D->SetRenderState (op, v))
-  {
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug %s %s.",
-	v ? "enabled" : "disabled", name);
-  }
-  else
-  {
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "%s not supported for this renderer!",
-    	name);
-  }
-}
-#endif
 
 void csBugPlug::MouseButton1 (iCamera*)
 {
@@ -859,7 +839,6 @@ bool csBugPlug::EatKey (iEvent& event)
         Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug %s screen clearing.",
 	  	do_clear ? "enabled" : "disabled");
         break;
-#ifndef CS_USE_NEW_RENDERER
       case DEBUGCMD_EDGES:
         ToggleG3DState (G3DRENDERSTATE_EDGES, "edge drawing");
         break;
@@ -930,7 +909,6 @@ bool csBugPlug::EatKey (iEvent& event)
           EnterEditMode (cmd, "Enter new gamma:", buf);
 	}
         break;
-#endif
       case DEBUGCMD_DBLBUFF:
         {
 	  bool state = G2D->GetDoubleBufferState ();
@@ -1176,7 +1154,6 @@ bool csBugPlug::EatKey (iEvent& event)
 	    	"BugPlug %s counting.",
 		counter_freeze ? "disabled" : "enabled");
 	break;
-#ifdef CS_USE_NEW_RENDERER
       case DEBUGCMD_SHADOWDEBUG:
 	// swap the default shadow volume material shader to/from a version
 	// better visualizing the volume.
@@ -1219,7 +1196,6 @@ bool csBugPlug::EatKey (iEvent& event)
 	    "BugPlug %s shadow debugging.",
 	    do_shadow_debug ? "enabled" : "disabled");*/
         break;
-#endif
     }
     process_next_key = false;
   }
@@ -1299,10 +1275,8 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
   if (visculler)
   {
     csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (visculler, iDebugHelper));
-#ifndef CS_USE_NEW_RENDERER   
     if (dbghelp)
       dbghelp->Dump (G3D);
-#endif
   }
 
   if (debug_sector.show)

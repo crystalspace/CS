@@ -753,30 +753,11 @@ public:
     {
       return scfParent->Draw (rview, movable, zMode);
     }
-#ifdef CS_USE_NEW_RENDERER
-    virtual bool DrawZ (iRenderView* rview, iMovable* movable,
-    	csZBufMode zMode)
-    {
-      return false;
-    }
-    virtual bool DrawShadow (iRenderView* rview, iMovable* movable,
-    	csZBufMode zMode, iLight *light)
-    {
-      return false;
-    }
-    virtual bool DrawLight (iRenderView* rview, iMovable* movable,
-  	csZBufMode zbufMode, iLight *light)
-    {
-      return false;
-    }
-      /// The following enable/disable shadow caps for stencil shadow rendering
-    virtual void EnableShadowCaps () {}
-    virtual void DisableShadowCaps () {}
-#endif // CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
     { return 0; }
-    virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/) { }
+    virtual void NextFrame (csTicks /*current_time*/,const csVector3& /*pos*/)
+    { }
     virtual void HardTransform (const csReversibleTransform& t)
     {
       scfParent->HardTransform (t);

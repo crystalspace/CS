@@ -36,12 +36,9 @@
 #include "igeom/clip2d.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/objreg.h"
+#include "iutil/strset.h"
 
 #include "meta.h"
-
-#ifdef CS_USE_NEW_RENDERER
-  #include "iutil/strset.h"
-#endif
 
 CS_IMPLEMENT_PLUGIN
 
@@ -175,10 +172,7 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     meta_balls = new MetaBall[num_meta_balls];
 #ifndef CS_USE_NEW_RENDERER
     memset(&mesh,0,sizeof(G3DTriangleMesh));
-#endif
 
-   
-#ifndef CS_USE_NEW_RENDERER
     SetupVertexBuffer ();
     mesh.num_vertices_pool = 1;
     mesh.triangles = new csTriangle[int(max_vertices/3)];
@@ -221,7 +215,6 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     bool rndbuf_texels_dirty = true;
     bool rndbuf_colors_dirty = true;
     bool rndbuf_index_dirty = true;
-
 #endif
   }
   return true;

@@ -24,9 +24,7 @@
 #include "csutil/garray.h"
 #include "csutil/randomgen.h"
 #include "ivideo/graph3d.h"
-#ifndef CS_USE_NEW_RENDERER
 #include "ivideo/vbufmgr.h"
-#endif // CS_USE_NEW_RENDERER
 #include "iengine/camera.h"
 #include "iengine/rview.h"
 #include "iengine/movable.h"

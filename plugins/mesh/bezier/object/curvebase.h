@@ -180,10 +180,15 @@ public:
   /// Destructor
   virtual ~csCurve ();
 
-#ifndef CS_USE_NEW_RENDERER
   /// Get the vertex buffer for this curve.
-  iVertexBuffer* GetVertexBuffer () const { return vbuf; }
+  iVertexBuffer* GetVertexBuffer () const
+  {
+#ifndef CS_USE_NEW_RENDERER
+    return vbuf;
+#else
+    return 0;
 #endif // CS_USE_NEW_RENDERER
+  }
 
   /// Return the material handle for this curve
   inline iMaterialHandle* GetMaterialHandle () const;

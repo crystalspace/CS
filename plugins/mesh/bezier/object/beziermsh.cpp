@@ -805,7 +805,6 @@ void csBezierMesh::UpdateCurveTransform ()
 }
 
 /// The list of fog vertices
-#ifndef CS_USE_NEW_RENDERER
 typedef csDirtyAccessArray<G3DFogInfo> engine3d_StaticFogVerts;
 CS_IMPLEMENT_STATIC_VAR (GetStaticFogVerts, engine3d_StaticFogVerts,())
 
@@ -929,7 +928,6 @@ bool csBezierMesh::DrawCurves (
 
   return true;                                  //@@@ RETURN correct vis info
 }
-#endif // CS_USE_NEW_RENDERER
 
 bool csBezierMesh::DrawTest (iRenderView *rview, iMovable *movable)
 {
@@ -955,11 +953,10 @@ bool csBezierMesh::DrawTest (iRenderView *rview, iMovable *movable)
   return rc;
 }
 
-bool csBezierMesh::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
+bool csBezierMesh::Draw (iRenderView *rview, iMovable *movable,
+	csZBufMode zMode)
 {
-#ifndef CS_USE_NEW_RENDERER
   DrawCurves (rview, movable, zMode);
-#endif
   return true;                                  // @@@@ RETURN correct vis info
 }
 

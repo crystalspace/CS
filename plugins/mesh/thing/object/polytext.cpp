@@ -114,14 +114,12 @@ void csPolyTexture::SetRendererLightmap (iRendererLightmap* rlm)
 
 csPolyTexture::~csPolyTexture ()
 {
-#ifndef CS_USE_NEW_RENDERER
   if (polygon && polygon->GetParent ())
   {
     iGraphics3D* G3D = polygon->GetParent ()->GetStaticData ()->thing_type->G3D;
     if (G3D && rlm) G3D->RemoveFromCache (/*thismapping, tmapping, */
       rlm);
   }
-#endif // CS_USE_NEW_RENDERER
   if (cache_data)
   {
     CS_ASSERT (cache_data[0] == 0);

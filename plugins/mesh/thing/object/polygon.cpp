@@ -93,9 +93,7 @@ csPolygon3DStatic::csPolygon3DStatic () : vertices(4)
   VectorArray->IncRef ();
 
   Alpha = 0;
-#ifndef CS_USE_NEW_RENDERER
   MixMode = CS_FX_COPY;
-#endif // CS_USE_NEW_RENDERER
 }
 
 csPolygon3DStatic::~csPolygon3DStatic ()
@@ -420,9 +418,7 @@ void csPolygon3DStatic::eiPolygon3DStatic::CreatePlane (
 bool csPolygon3DStatic::IsTransparent ()
 {
   if (Alpha) return true;
-#ifndef CS_USE_NEW_RENDERER
   if (MixMode != CS_FX_COPY) return true;
-#endif // CS_USE_NEW_RENDERER
 
   iTextureHandle *txt_handle = GetMaterialHandle ()->GetTexture ();
   return txt_handle && ((txt_handle->GetAlphaMap ()
@@ -649,8 +645,6 @@ bool csPolygon3DStatic::Finish ()
     }
   }
 
-#ifndef CS_USE_NEW_RENDERER
-#endif // CS_USE_NEW_RENDERER
   return rc;
 }
 

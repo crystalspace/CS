@@ -192,7 +192,6 @@ void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
   g3dpoly->var [i].component = v1 + t * (v2 - v1); \
 }
 
-#ifndef CS_USE_NEW_RENDERER
 static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
   csVector2* clipped_verts, int num_vertices, csVertexStatus* clipped_vtstats,
   int orig_num_vertices, bool gouraud)
@@ -286,7 +285,6 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
     }
   }
 }
-#endif
 
 #undef INTERPOLATE
 #undef INTERPOLATE1
@@ -294,7 +292,6 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode mode)
 {
-#ifndef CS_USE_NEW_RENDERER
 // @@@ TODO:
 //     - Z fill vs Z use
   if (!material)
@@ -376,7 +373,6 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   rview->CalculateFogPolygon (g3dpolyfx);
   g3dpolyfx.mixmode = MixMode | CS_FX_GOURAUD;
   g3d->DrawPolygonFX (g3dpolyfx);
-#endif
   return true;
 }
 

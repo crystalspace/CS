@@ -49,9 +49,7 @@
 
 #include "qsqrt.h"
 
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rendermesh.h"
-#endif
 
 CS_IMPLEMENT_PLUGIN
 

@@ -31,11 +31,8 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
 #include "igeom/polymesh.h"
-
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
-#endif
 
 struct iMaterialWrapper;
 struct iObjectRegistry;

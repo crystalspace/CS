@@ -24,6 +24,9 @@ chronological order.
 	- Jorrit improved error reporting in the renderloop loader plugin.
 	- Jorrit removed un unneeded dependency on iEngine from
 	  glshader_ffp.
+	- Jorrit removed lots of #ifdef CS_USE_NEW_RENDERER in the plugins
+	  directory.
+	- Jorrit fixed aws compile with old renderer.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:

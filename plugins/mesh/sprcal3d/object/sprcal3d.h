@@ -39,13 +39,10 @@
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
-#ifndef CS_USE_NEW_RENDERER
 #include "ivideo/vbufmgr.h"
-#else
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 #include "cstool/anonrndbuf.h"
-#endif // CS_USE_NEW_RENDERER
 #include "ivideo/material.h"
 #include "qint.h"
 

@@ -43,13 +43,10 @@
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
-#ifndef CS_USE_NEW_RENDERER
 #include "ivideo/vbufmgr.h"
-#else
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
 #include "cstool/anonrndbuf.h"
-#endif // CS_USE_NEW_RENDERER
 #include "ivideo/material.h"
 #include "qint.h"
 
@@ -609,14 +606,6 @@ public:
   uint GetMixMode () const
   { return MixMode; }
 
-#ifdef CS_USE_NEW_RENDERER
-  bool AddRenderBuffer (const char *name, csRenderBufferComponentType component_type, int component_size);
-  bool SetRenderBufferComponent (const char *name, int index, int component, float value);
-  bool SetRenderBufferComponent (const char *name, int index, int component, int value);
-  bool SetRenderBuffer (const char *name, float *value);
-  bool SetRenderBuffer (const char *name, int *value);
-#endif
-
   /// For LOD.
   int GetLODPolygonCount (float lod) const;
   /// Default LOD level for this factory.
@@ -933,28 +922,6 @@ public:
     { scfParent->SetMixMode (mode); }
     virtual uint GetMixMode () const
     { return scfParent->GetMixMode (); }
-#ifdef CS_USE_NEW_RENDERER
-    virtual bool AddRenderBuffer (const char *name, csRenderBufferComponentType component_type, int component_size)
-    {
-      return scfParent->AddRenderBuffer (name, component_type, component_size);
-    }
-    virtual bool SetRenderBufferComponent (const char *name, int index, int component, float value)
-    {
-      return scfParent->SetRenderBufferComponent(name, index, component, value);
-    }
-    virtual bool SetRenderBufferComponent (const char *name, int index, int component, int value)
-    {
-      return scfParent->SetRenderBufferComponent(name, index, component, value);
-    }
-    virtual bool SetRenderBuffer (const char *name, float *value)
-    {
-      return scfParent->SetRenderBuffer(name, value);
-    }
-    virtual bool SetRenderBuffer (const char *name, int *value)
-    {
-      return scfParent->SetRenderBuffer(name, value);
-    }
-#endif
   } scfiSprite3DFactoryState;
 
   //--------------------- iLODControl implementation -------------//

@@ -26,15 +26,15 @@
 #include "csgeom/math3d.h"
 #include "csgeom/tesselat.h"
 #include "csgeom/objmodel.h"
+#include "csgeom/transfrm.h"
 #include "csutil/refarr.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imesh/object.h"
 #include "imesh/metaball.h"
-
-#ifndef CS_USE_NEW_RENDERER
-
 #include "ivideo/vbufmgr.h"
+#include "ivideo/rndbuf.h"
+#include "ivideo/rendermesh.h"
 
 class csMaterialHandle;
 struct G3DTriangleMesh;
@@ -43,17 +43,6 @@ struct iGraphics3D;
 struct iGraphics2D;
 struct iMaterialWrapper;
 struct iMeshObject;
-
-#else
-
-#include "ivideo/rndbuf.h"
-#include "ivideo/rendermesh.h"
-#include "csgeom/transfrm.h"
-struct iMaterialHandle;
-struct iGraphics3D;
-
-
-#endif
 
 
 struct MetaBall

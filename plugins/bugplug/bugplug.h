@@ -27,9 +27,7 @@
 #include "csutil/cfgacc.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/shader/shader.h"
-#endif
 #include "ivaria/bugplug.h"
 
 struct iObjectRegistry;
@@ -218,10 +216,8 @@ private:
 
   // Toggle a G3D boolean option.
   bool do_shadow_debug;
-#ifdef CS_USE_NEW_RENDERER
   csRef<iShader> standardShadowShader;
   csRef<iShader> debugShadowShader;
-#endif
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
 
   // The selected mesh.

@@ -141,10 +141,11 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   polygons = 0;
   
 #ifdef CS_USE_NEW_RENDERER
-  g3d = CS_QUERY_REGISTRY (((csBallMeshObjectFactory*)factory)->object_reg, iGraphics3D);
-  csRef<iStringSet> strings = 
-    CS_QUERY_REGISTRY_TAG_INTERFACE (((csBallMeshObjectFactory*)factory)->object_reg, 
-    "crystalspace.renderer.stringset", iStringSet);
+  g3d = CS_QUERY_REGISTRY (
+  	((csBallMeshObjectFactory*)factory)->object_reg, iGraphics3D);
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    	((csBallMeshObjectFactory*)factory)->object_reg, 
+	"crystalspace.renderer.stringset", iStringSet);
 
   vertex_name = strings->Request ("vertices");
   texel_name = strings->Request ("texture coordinates");

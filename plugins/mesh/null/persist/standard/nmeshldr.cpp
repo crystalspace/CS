@@ -30,9 +30,7 @@
 #include "iutil/document.h"
 #include "imesh/nullmesh.h"
 #include "ivideo/graph3d.h"
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/rndbuf.h"
-#endif // CS_USE_NEW_RENDERER
 #include "qint.h"
 #include "iutil/object.h"
 #include "iengine/material.h"
@@ -52,9 +50,7 @@ enum
   XMLTOKEN_BOX = 1,
   XMLTOKEN_RADIUS,
   XMLTOKEN_FACTORY,
-#ifdef CS_USE_NEW_RENDERER
-  XMLTOKEN_RENDERBUFFER,
-#endif
+  XMLTOKEN_RENDERBUFFER
 };
 
 SCF_IMPLEMENT_IBASE (csNullFactoryLoader)
@@ -117,9 +113,7 @@ bool csNullFactoryLoader::Initialize (iObjectRegistry* object_reg)
 
   xmltokens.Register ("box", XMLTOKEN_BOX);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
-#ifdef CS_USE_NEW_RENDERER
   xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
-#endif
   return true;
 }
 
@@ -313,11 +307,11 @@ csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_RADIUS:
         state->SetRadius (child->GetContentsValueAsFloat ());
 	break;
-#ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_RENDERBUFFER:
+#ifdef CS_USE_NEW_RENDERER
         ParseRenderBuffer(child, state);
-        break;
 #endif
+        break;
       default:
 	synldr->ReportBadToken (child);
 	return 0;

@@ -82,10 +82,8 @@
 
 #include "loadtex.h"
 
-#ifdef CS_USE_NEW_RENDERER
 #include "ivideo/shader/shader.h"
 #include "iengine/renderloop.h"
-#endif //CS_USE_NEW_RENDERER
 
 //---------------------------------------------------------------------------
 
@@ -976,10 +974,8 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 {
   if (!Engine) return false;
 
-#ifdef CS_USE_NEW_RENDERER
   // Will be set to true if we find a <shader> section.
   bool shader_given = false;
-#endif
 
   csRef<iDocumentNode> sequences;
   csRef<iDocumentNode> triggers;
@@ -1115,8 +1111,8 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
           LoadEffectFile(child->GetContentsValue());
           break;
         case XMLTOKEN_SHADERS:
-#ifdef CS_USE_NEW_RENDERER
 	  shader_given = true;
+#ifdef CS_USE_NEW_RENDERER
           ParseShaderList (child);
 #endif //CS_USE_NEW_RENDERER
           break;
@@ -1192,11 +1188,11 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
           if (!ParseMaterialList (ldr_context, child))
             return false;
           break;
-#ifdef CS_USE_NEW_RENDERER
         case XMLTOKEN_SHADERS:
+#ifdef CS_USE_NEW_RENDERER
           ParseShaderList (child);
-          break;
 #endif //CS_USE_NEW_RENDERER
+          break;
 	case  XMLTOKEN_VARIABLELIST:
 	  if (!ParseVariableList (ldr_context, child))
 	    return false;
@@ -2502,8 +2498,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	mesh->GetMovable ()->UpdateMove ();
       }
       break;
-#ifdef CS_USE_NEW_RENDERER
     case XMLTOKEN_CAST_HW_SHADOW:
+#ifdef CS_USE_NEW_RENDERER
       if (!mesh)
       {
 	SyntaxService->ReportError (
@@ -2518,8 +2514,8 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
         else if (strcasecmp (child->GetAttributeValue ("enable"), "false") == 0)
           mesh->CastHardwareShadow (false);
       }
-      break;
 #endif
+      break;
     default:
       handled = false;
       return true;
@@ -3191,8 +3187,8 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	  Engine->SetAmbientLight (c);
         }
 	break;
-#ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_RENDERLOOP:
+#ifdef CS_USE_NEW_RENDERER
 	{
 	  const char* loopName = child->GetContentsValue ();
 	  if (loopName)
@@ -3223,8 +3219,8 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	      loopName);
 	  }
 	}
-	break;
 #endif
+	break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
