@@ -6,6 +6,7 @@ The history order is reversed so that new features are at the top.
 12-Apr-2003
 	- Philip Wyett fixed clean of 'CS' root dir for 'jam distclean'
 	  after recent configure merge/changes.
+	    - Eliminated DO_ASM redefinition in jam build.
 11-Apr-2003
 	- Fixed a problem with portals in combination with <hardmove>
 	  and HardTransform(). The problem was that the sector and portal
