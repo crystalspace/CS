@@ -299,7 +299,11 @@ void csGraphics2DOpenGL::CalcPixelFormat ()
       PFD_TYPE_RGBA,                  /* color type */
       Depth,                          /* prefered color depth */
       0, 0, 0, 0, 0, 0,               /* color bits (ignored) */
+#ifndef CS_USE_NEW_RENDERER
       0,                              /* no alpha buffer */
+#else
+      8,                              /* 8 bit alpha buffer */
+#endif // CS_USE_NEW_RENDERER
       0,                              /* alpha bits (ignored) */
       0,                              /* no accumulation buffer */
       0, 0, 0, 0,                     /* accum bits (ignored) */

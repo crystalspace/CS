@@ -136,6 +136,8 @@ enum csZBufMode
 #define CS_FX_ALPHA        0x40000000 
 /// =DST
 #define CS_FX_TRANSPARENT  0x50000000 
+/// =(dstalpha)*SRC + DST
+#define CS_FX_DESTALPHAADD 0x60000000 
 /// color 0 is transparent
 #define CS_FX_KEYCOLOR     0x08000000 
 /// Gouraud shading

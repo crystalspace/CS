@@ -802,6 +802,7 @@ bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
 
   // Prepare for rendering.
   mesh.z_buf_mode = mode;
+  mesh.mixmode = CS_FX_COPY;
 
   r3d->SetObjectToCamera (&tr_o2c);
   mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
@@ -945,7 +946,7 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
       
   // Prepare for rendering.
   mesh.z_buf_mode = CS_ZBUF_TEST;
-  mesh.mixmode = CS_FX_ADD;
+  mesh.mixmode = MixMode;
 
   r3d->SetObjectToCamera (&tr_o2c);
   mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);

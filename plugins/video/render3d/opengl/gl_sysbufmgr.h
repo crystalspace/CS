@@ -91,6 +91,11 @@ class csSysRenderBufferManager: public iRenderBufferManager
 public:
   SCF_DECLARE_IBASE;
 
+  csSysRenderBufferManager::csSysRenderBufferManager ()
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+  }
+
   /// Allocate a buffer of the specified type and return it
   csPtr<iRenderBuffer> CreateBuffer(int buffersize, CS_RENDERBUFFER_TYPE location);
 

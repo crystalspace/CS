@@ -277,7 +277,7 @@ csPtr<iRenderBuffer> csVARRenderBufferManager::CreateBuffer(int size, CS_RENDERB
 {
   csVARRenderBuffer* buffer = new csVARRenderBuffer( NULL, size, location, this);
 
-  //printf("Created buffer at: %X\n", (long)buffer);
+  printf("Created buffer at: %X\n", (long)buffer);
   //buffer->IncRef();
   if(false)
 	  myalloc->PrintStats();
@@ -414,7 +414,8 @@ csVARRenderBuffer::~csVARRenderBuffer()
 void* csVARRenderBuffer::Lock(CS_BUFFER_LOCK_TYPE lockType)
 {
   //if its already locked, we cannot return it
-  if(locked) return NULL;
+  if(locked) 
+    return NULL;
 
   //first, if doing render-locking, just return our current memblock buffer
   if(lockType == CS_BUF_LOCK_RENDER)

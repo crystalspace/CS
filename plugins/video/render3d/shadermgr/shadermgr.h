@@ -34,6 +34,10 @@
 #include "ivideo/render3d.h"
 #include "ivideo/shader/shader.h"
 
+// (These are undeffed at end of shadermgr.cpp. Ugly?)
+#define STREAMMAX 16  // @@@ Hardcoded max streams to 16 
+#define TEXMAX 16  // @@@ Hardcoded max texture units to 16
+
 class csShaderManager : public iShaderManager
 {
 private:
@@ -146,9 +150,6 @@ public:
   /// Check if valid (normaly a shader is valid if there is at least one valid technique)
   virtual bool IsValid();
 
-  /// Sets a stream-mapping
-  virtual void MapStream( int mapped_id, const char* streamname);
-
   /// Set this shader's name
   virtual void SetName( const char* name ) 
   {
@@ -212,8 +213,6 @@ public:
   
 
   //================== iShaderTechnique ============//
-  /// Sets a stream-mapping
-  virtual void MapStream( int mapped_id, const char* streamname);
 
   /* Get technique priority. If there are several valid techniques
    * use the one with highest priority
@@ -252,10 +251,19 @@ private:
   csShaderTechnique* parent;
   csHashMap variables;
 
+  uint mixmode;
+
+  csStringID streammapping[STREAMMAX];
+  int texmappinglayer[TEXMAX];
+  char* texmappingname[TEXMAX];
+
     //loading related
   enum
   {
     XMLTOKEN_DECLARE,
+    XMLTOKEN_MIXMODE,
+    XMLTOKEN_STREAMMAPPING,
+    XMLTOKEN_TEXTUREMAPPING,
     XMLTOKEN_VP,
     XMLTOKEN_FP,
     XMLTOKEN_WRITEMASK
@@ -283,12 +291,40 @@ public:
     vp = 0; fp = 0;
     parent = owner;
     objectreg = reg;
+    mixmode = 0;
+    int i;
+    for (i=0; i<STREAMMAX; i++)
+      streammapping[i] = csInvalidStringID;
+    for (i=0; i<TEXMAX; i++)
+    {
+      texmappinglayer[i] = -1;
+      texmappingname[i] = NULL;
+    }
+
     writemaskRed = true;
     writemaskGreen = true;
     writemaskBlue = true;
     writemaskAlpha = true;
   }
   virtual ~csShaderPass () {}
+
+  /// Add a stream mapping
+  virtual void AddStreamMapping (csStringID name, int attribute);
+  /// Get stream mapping for a certain attribute
+  virtual csStringID GetStreamMapping (int attribute);
+
+  /// Add a texture mapping by name
+  virtual void AddTextureMapping (const char* name, int unit);
+  /// Add a texture mapping by material layer
+  virtual void AddTextureMapping (int layer, int unit);
+  /// Get texture mapping for a certain unit as a layer index
+  virtual int GetTextureMappingAsLayer (int unit);
+  /// Get texture mapping for a certain unit as a texture name
+  virtual const char* GetTextureMappingAsName (int unit);
+
+  /// Get mixmode override
+  virtual uint GetMixmodeOverride ()
+  { return mixmode; }
 
   /// Get vertex-program
   virtual iShaderProgram* GetVertexProgram() {return vp; }
@@ -312,21 +348,10 @@ public:
   }
 
   /// Activate
-  virtual void Activate(csRenderMesh* mesh)
-  {
-    r3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
-    r3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
-    if(vp) vp->Activate(this, mesh);
-    if(fp) fp->Activate(this, mesh);
-  }
+  virtual void Activate(csRenderMesh* mesh);
 
   /// Deactivate
-  virtual void Deactivate(csRenderMesh* mesh)
-  {
-    if(vp) vp->Deactivate(this, mesh);
-    if(fp) fp->Deactivate(this, mesh);
-    r3d->SetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
-  }
+  virtual void Deactivate(csRenderMesh* mesh);
 
   /// Add a variable to this context
   virtual bool AddVariable(iShaderVariable* variable){return false;}

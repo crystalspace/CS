@@ -51,6 +51,22 @@ The history order is reversed so that new features are at the top.
 	- Matze fixed socket problems on cygwin where winsock.h redefines
 	  fdset. You can define __USE_W32_SOCKETS before including any headers
 	  to avoid this problem.
+	- Anders Stenberg made the following changes related to the new 
+	  renderer.
+	    - Fixed a bug in mtex plugin causing crashes at shutdown
+	    - Fixed an erroneous buffer release in the renderer causing VAR
+	      to crash. VAR still doesn't release buffer correctly, and can't
+	      be used yet.
+	    - Made the windows GL canvas force alpha in framebuffer when using
+	      new renderer. Probably something similar needs to be done in
+	      other canvases.
+	    - Fixed some errors in shader loading. Shaders wasn't prepared 
+	      correctly.
+	    - Added possibility to override blendmode per shader pass, and a new
+	      blendmode in new renderer. (DESTALPHAADD)
+	    - Added two example PPL-shaders. They both need some special
+	      attenuationmaps and material setup.
+	    - Fixed a bug in genmesh anonymous stream loading.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.

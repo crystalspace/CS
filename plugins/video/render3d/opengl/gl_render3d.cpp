@@ -292,6 +292,11 @@ float csGLRender3D::SetMixMode (uint mode, float m_alpha, bool txt_alpha)
       m_alpha = 1.0f;
       statecache->SetBlendFunc (GL_ONE, GL_ONE);
       break;
+    case CS_FX_DESTALPHAADD:
+      // Color = DEST + DestAlpha * SRC
+      m_alpha = 1.0f;
+      statecache->SetBlendFunc (GL_DST_ALPHA, GL_ONE);
+      break;
     case CS_FX_ALPHA:
       // Color = Alpha * DEST + (1-Alpha) * SRC
       statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -765,7 +770,20 @@ bool csGLRender3D::Open ()
 
 void csGLRender3D::Close ()
 {
-  
+  glFinish ();
+
+  if (txtmgr)
+  {
+    txtmgr->Clear ();
+    //delete txtmgr; txtmgr = NULL;
+  }
+  if (txtcache)
+  {
+    txtcache->Clear ();
+    //delete txtcache; txtcache = NULL;
+  }
+  buffermgr = NULL;
+
   if (G2D)
     G2D->Close ();
 }
@@ -1142,16 +1160,19 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     int currp;
     for(currp = 0; currp< tech->GetPassCount(); ++currp)
     {
+      uint mixmode = tech->GetPass (currp)->GetMixmodeOverride ();
+      if (mixmode != 0)
+        SetMixMode (mixmode, 0, true);
       tech->GetPass(currp)->Activate(mymesh);
       glDrawElements (
-      primitivetype,
-      mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
-      GL_UNSIGNED_INT,
-      ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
-      +mymesh->GetIndexStart ());
+        primitivetype,
+        mymesh->GetIndexEnd ()-mymesh->GetIndexStart (),
+        GL_UNSIGNED_INT,
+        ((unsigned int*)indexbuf->Lock(iRenderBuffer::CS_BUF_LOCK_RENDER))
+        +mymesh->GetIndexStart ());
       tech->GetPass(currp)->Deactivate(mymesh);
+      indexbuf->Release ();
     }
-    indexbuf->Release ();
   } else {
     csRef<iStreamSource> source = mymesh->GetStreamSource ();
     csRef<iRenderBuffer> vertexbuf =

@@ -310,6 +310,8 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
         if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
           o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB||o == GL_DOT3_RGBA_ARB)
           layer->colorp = o;
+        if(child->GetAttribute("scale") != NULL)
+          layer->scale_rgb = child->GetAttributeValueAsFloat ("scale");
       }
       break;
     case XMLTOKEN_ALPHAOP:
@@ -318,6 +320,8 @@ bool csShaderGLMTEX::LoadEnvironment(mtexlayer* layer, iDocumentNode* node)
         if(o == GL_REPLACE|| o == GL_MODULATE||o == GL_ADD||o == GL_ADD_SIGNED_ARB||
           o == GL_INTERPOLATE_ARB||o == GL_SUBTRACT_ARB||o == GL_DOT3_RGB_ARB||o == GL_DOT3_RGBA_ARB)
           layer->alphap = o;
+        if(child->GetAttribute("scale") != NULL)
+          layer->scale_alpha = child->GetAttributeValueAsFloat ("scale");
       }
       break;
     }
@@ -371,6 +375,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
   {
     mtexlayer* layer = (mtexlayer*) texlayers.Get(i);
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + i);
+    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + i);
 
 /*
     if(layer->ccsource == CS_COLORSOURCE_MESH)
@@ -428,12 +433,21 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
         // @@@ SHOULD BE CACHED
         glEnable (GL_TEXTURE_3D);
         glBindTexture (GL_TEXTURE_3D, texturehandle);
-      } else{
+      } else if (txt_gl->target == iTextureHandle::CS_TEX_IMG_1D)
+      {
+        // @@@ SHOULD BE CACHED
+        glEnable (GL_TEXTURE_1D);
+        statecache->Disable_GL_TEXTURE_2D (i);
+        glBindTexture (GL_TEXTURE_1D, texturehandle);
+      } else {
         statecache->Enable_GL_TEXTURE_2D (i);
         statecache->SetTexture (GL_TEXTURE_2D, texturehandle, i);
       }
 
       layer->doTexture = true;
+    } else {
+      statecache->SetTexture (GL_TEXTURE_2D, 0, i);
+      statecache->Enable_GL_TEXTURE_2D (i);
     }
 
     if(ext->CS_GL_ARB_texture_env_combine || ext->CS_GL_EXT_texture_env_combine)
@@ -489,9 +503,10 @@ void csShaderGLMTEX::Deactivate(iShaderPass* current, csRenderMesh* mesh)
     ext->glClientActiveTextureARB (GL_TEXTURE0_ARB+i);
     statecache->Disable_GL_TEXTURE_2D (i);
     // @@@ HACK
+    glDisable (GL_TEXTURE_1D);
     glDisable (GL_TEXTURE_3D);
     glDisable (GL_TEXTURE_CUBE_MAP);
-    statecache->SetTexture (GL_TEXTURE_2D, -1, i); //should not be necessary
+    statecache->SetTexture (GL_TEXTURE_2D, 0, i); //should not be necessary
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   }
 }

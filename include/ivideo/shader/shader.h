@@ -24,6 +24,7 @@
 #include "csgeom/vector4.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
+#include "csutil/strhash.h"
 #include "ivideo/render3d.h"
 
 struct iString;
@@ -38,7 +39,6 @@ struct iShaderTechnique;
 struct iShaderPass;
 struct iShaderProgram;
 struct iShaderProgramPlugin;
-
 
 SCF_VERSION (iShaderManager, 0,0,1);
 /**
@@ -77,9 +77,6 @@ SCF_VERSION (iShader, 0,0,1);
  */
 struct iShader : iBase
 {
-  /// Sets a stream-mapping
-  virtual void MapStream( int mapped_id, const char* streamname) = 0;
-
   /// Set this shader's name
   virtual void SetName( const char* name ) = 0;
   /// Retrieve name of shader
@@ -151,9 +148,6 @@ SCF_VERSION (iShaderTechnique, 0,0,1);
  */
 struct iShaderTechnique : iBase
 {
-  /// Sets a stream-mapping
-  virtual void MapStream( int mapped_id, const char* streamname) = 0;
-
   /* Get technique priority. If there are several valid techniques
    * use the one with highest priority
    */
@@ -188,6 +182,23 @@ SCF_VERSION (iShaderPass, 0,0,1);
  */
 struct iShaderPass : iBase
 {
+  /// Add a stream mapping
+  virtual void AddStreamMapping (csStringID name, int attribute) = 0;
+  /// Get stream mapping for a certain attribute
+  virtual csStringID GetStreamMapping (int attribute) = 0;
+
+  /// Add a texture mapping by name
+  virtual void AddTextureMapping (const char* name, int unit) = 0;
+  /// Add a texture mapping by material layer
+  virtual void AddTextureMapping (int layer, int unit) = 0;
+  /// Get texture mapping for a certain unit as a layer index
+  virtual int GetTextureMappingAsLayer (int unit) = 0;
+  /// Get texture mapping for a certain unit as a texture name
+  virtual const char* GetTextureMappingAsName (int unit) = 0;
+
+  /// Get mixmode override
+  virtual uint GetMixmodeOverride () = 0;
+
   /// Get vertex-program
   virtual iShaderProgram* GetVertexProgram() = 0;
 

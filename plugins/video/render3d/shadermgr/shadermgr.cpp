@@ -30,6 +30,7 @@
 #include "csutil/hashmap.h"
 #include "csutil/xmltiny.h"
 
+#include "imap/services.h"
 #include "iutil/document.h"
 #include "igeom/clip2d.h"
 #include "iutil/vfs.h"
@@ -410,10 +411,6 @@ iShaderTechnique* csShader::GetBestTechnique()
   return tech;
 }
 
-void csShader::MapStream(int mapid, const char* streamname)
-{
-}
-
 void csShader::BuildTokenHash()
 {
   xmltokens.Register ("shader", XMLTOKEN_SHADER);
@@ -562,6 +559,64 @@ bool csShader::Prepare()
 }
 
 //==================== csShaderPass ==============//
+void csShaderPass::Activate(csRenderMesh* mesh)
+{
+  /*int i;
+  for (i=0; i<STREAMMAX; i++)
+  {
+    if (streammapping[i] != csInvalidStringID)
+    {
+      csRef<iRenderBuffer> buf (
+        mesh->GetStreamSource ()->GetBuffer (streammapping[i]));
+    }
+  }*/
+
+  r3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
+  r3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
+
+  if(vp) vp->Activate(this, mesh);
+  if(fp) fp->Activate(this, mesh);
+}
+
+void csShaderPass::Deactivate(csRenderMesh* mesh)
+{
+  if(vp) vp->Deactivate(this, mesh);
+  if(fp) fp->Deactivate(this, mesh);
+  r3d->SetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
+}
+
+void csShaderPass::AddStreamMapping (csStringID name, int attribute)
+{
+  streammapping[attribute] = name;
+}
+
+csStringID csShaderPass::GetStreamMapping (int attribute)
+{
+  return streammapping[attribute];
+}
+
+void csShaderPass::AddTextureMapping (const char* name, int unit)
+{
+  delete[] texmappingname[unit];
+  texmappingname[unit] = new char[strlen(name)+1];
+  strcpy (texmappingname[unit], name);
+}
+
+void csShaderPass::AddTextureMapping (int layer, int unit)
+{
+  texmappinglayer[unit] = layer;
+}
+
+int csShaderPass::GetTextureMappingAsLayer (int unit)
+{
+  return texmappinglayer[unit];
+}
+
+const char* csShaderPass::GetTextureMappingAsName (int unit)
+{
+  return texmappingname[unit];
+}
+
 iShaderVariable* csShaderPass::GetVariable(int namehash)
 {
   iShaderVariable* var;
@@ -585,6 +640,9 @@ iShaderVariable* csShaderPass::GetVariable(int namehash)
 void csShaderPass::BuildTokenHash()
 {
   xmltokens.Register ("declare", XMLTOKEN_DECLARE);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("streammapping", XMLTOKEN_STREAMMAPPING);
+  xmltokens.Register ("texturemapping", XMLTOKEN_TEXTUREMAPPING);
   xmltokens.Register ("vp", XMLTOKEN_VP);
   xmltokens.Register ("fp", XMLTOKEN_FP);
   xmltokens.Register ("writemask", XMLTOKEN_WRITEMASK);
@@ -597,6 +655,9 @@ bool csShaderPass::Load(iDocumentNode* node)
 
   BuildTokenHash();
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(objectreg, iShaderManager);
+  csRef<iRender3D> r3d = CS_QUERY_REGISTRY(objectreg, iRender3D);
+  csRef<iSyntaxService> synserv = 
+    CS_QUERY_REGISTRY (objectreg, iSyntaxService);
 
   if(node)
   {
@@ -609,6 +670,30 @@ bool csShaderPass::Load(iDocumentNode* node)
       csStringID id = xmltokens.Request (value);
       switch(id)
       {
+      case XMLTOKEN_MIXMODE:
+        {
+          synserv->ParseMixmode (child, mixmode);
+        }
+        break;
+      case XMLTOKEN_STREAMMAPPING:
+        {
+          AddStreamMapping (
+            r3d->GetStringContainer ()->Request (child->GetAttributeValue ("stream")),
+            child->GetAttributeValueAsInt ("attribute"));
+        }
+        break;
+      case XMLTOKEN_TEXTUREMAPPING:
+        {
+          if (child->GetAttribute ("name"))
+          {
+            AddTextureMapping (child->GetAttributeValue ("name"),
+              child->GetAttributeValueAsInt ("unit"));
+          } else {
+            AddTextureMapping (child->GetAttributeValueAsInt ("layer"),
+              child->GetAttributeValueAsInt ("unit"));
+          }
+        }
+        break;
       case XMLTOKEN_VP:
         {
           csRef<iShaderProgram> vp = shadermgr->CreateShaderProgram(child->GetAttributeValue("type"));
@@ -759,10 +844,6 @@ iShaderPass* csShaderTechnique::GetPass(int pass)
   return (iShaderPass*)passes->Get(pass);
 }
 
-void csShaderTechnique::MapStream(int mapped_id, const char* streamname)
-{
-}
-
 bool csShaderTechnique::IsValid()
 {
   bool valid = false;
@@ -830,3 +911,6 @@ bool csShaderTechnique::Prepare()
   }
   return true;
 }
+
+#undef STREAMMAX
+#undef TEXTUREMAX

@@ -184,7 +184,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
           char attribname[12];
           attribname[0] = 'f';
           attribname[1] = '\0';
-          sprintf (&attribname[1], "%10d", i);
+          sprintf (&attribname[1], "%d", i);
 
           floatarray[vertexindex * compcount + i] = child->GetAttributeValueAsFloat(attribname);
         }
@@ -212,7 +212,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
           char attribname[12];
           attribname[0] = 'i';
           attribname[1] = '\0';
-          sprintf(&attribname[1], "%10d", i);
+          sprintf(&attribname[1], "%d", i);
 
           intarray[vertexindex * compcount + i] = child->GetAttributeValueAsInt(attribname);
         }
@@ -242,7 +242,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
           char attribname[12];
           attribname[0] = 's';
           attribname[1] = '\0';
-          sprintf (&attribname[1], "%10d", i);
+          sprintf (&attribname[1], "%d", i);
 
           shortarray[vertexindex * compcount + i] = child->GetAttributeValueAsInt(attribname);
         }
@@ -272,7 +272,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node, iGeneralFactorySta
           char attribname[12];
           attribname[0] = 'b';
           attribname[1] = '\0';
-          sprintf (&attribname[1], "%10d", i);
+          sprintf (&attribname[1], "%d", i);
 
           bytearray[vertexindex * compcount + i] = child->GetAttributeValueAsInt(attribname);
         }

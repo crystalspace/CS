@@ -38,6 +38,10 @@
 #include "iengine/region.h"
 #include "iutil/objreg.h"
 
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/shader/shader.h"
+#endif //CS_USE_NEW_RENDERER
+
 bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
 {
   if (!Engine) return false;
@@ -300,6 +304,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
   iTextureWrapper* txt_layers[4];
   
   csRef<iEffectDefinition> efdef ;
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iShader> shader;
+#endif // CS_USE_NEW_RENDERER
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -431,6 +438,25 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
 	  num_txt_layer++;
 	}
         break;
+#ifdef CS_USE_NEW_RENDERER
+      case XMLTOKEN_SHADER:
+        {
+          csRef<iShaderManager> shaderMgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+          if (!shaderMgr)
+          {
+            ReportNotify ("iShaderManager not found, ignoring shader!");
+            break;
+          }
+          const char* shadername = child->GetContentsValue ();
+          shader = shaderMgr->GetShader (shadername);
+          if (!shader)
+          {
+            ReportNotify ("Shader (%s) couldn't be found for material %s, ignoring it", shadername,matname);
+            break;
+          }
+        }
+        break;
+#endif //CS_USE_NEW_RENDERER
       default:
 	SyntaxService->ReportBadToken (child);
 	return NULL;
@@ -463,6 +489,13 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
   }
   else
     mat->QueryObject()->SetName (matname);
+#ifdef CS_USE_NEW_RENDERER
+  if (shader)
+  {
+    if (shader->Prepare ())
+      material->SetShader (shader);
+  }
+#endif // CS_USE_NEW_RENDERER
   // dereference material since mat already incremented it
 
   return mat;

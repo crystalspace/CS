@@ -242,7 +242,9 @@ enum
   XMLTOKEN_ARGS,
   XMLTOKEN_VARIABLELIST
 #ifdef CS_USE_NEW_RENDERER
-  ,XMLTOKEN_CAST_HW_SHADOW
+  ,XMLTOKEN_CAST_HW_SHADOW,
+  XMLTOKEN_SHADERS,
+  XMLTOKEN_SHADER
 #endif
 };
 
@@ -400,6 +402,11 @@ private:
   bool ParseEffectPass (iDocumentNode* node, iEffectPass* pass);
   /// Parse single layer in pass
   bool ParseEffectLayer (iDocumentNode* node, iEffectLayer* layer);
+
+#ifdef CS_USE_NEW_RENDERER
+  /// Parse a shaderlist
+  bool ParseShaderList (iDocumentNode* node);
+#endif //CS_USE_NEW_RENDERER
 
   /// For heightgen.
   csGenerateImageTexture* ParseHeightgenTexture (iDocumentNode* node);

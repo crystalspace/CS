@@ -77,6 +77,10 @@
 #include "imesh/crossbld.h"
 #include "ivaria/reporter.h"
 
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/shader/shader.h"
+#endif //CS_USE_NEW_RENDERER
+
 //---------------------------------------------------------------------------
 
 /*
@@ -833,6 +837,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
 #ifdef CS_USE_NEW_RENDERER
   xmltokens.Register ("casthwshadow", XMLTOKEN_CAST_HW_SHADOW);
+  xmltokens.Register ("shaders", XMLTOKEN_SHADERS);
+  xmltokens.Register ("shader", XMLTOKEN_SHADER);
 #endif
   return true;
 }
@@ -961,6 +967,11 @@ bool csLoader::LoadMap (iDocumentNode* node)
         case XMLTOKEN_EFFECTS:
           LoadEffectFile(child->GetContentsValue());
           break;
+#ifdef CS_USE_NEW_RENDERER
+        case XMLTOKEN_SHADERS:
+          ParseShaderList (child);
+          break;
+#endif //CS_USE_NEW_RENDERER
 	default:
 	  SyntaxService->ReportBadToken (child);
 	  return false;
@@ -1033,6 +1044,11 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
           if (!ParseMaterialList (child))
             return false;
           break;
+#ifdef CS_USE_NEW_RENDERER
+        case XMLTOKEN_SHADERS:
+          ParseShaderList (child);
+          break;
+#endif //CS_USE_NEW_RENDERER
 	case  XMLTOKEN_VARIABLELIST:
 	  if (!ParseVariableList (child))
 	    return false;
@@ -3218,3 +3234,46 @@ bool csLoader::ParseSharedVariable (iDocumentNode* node)
 //========================================================================
 //========================================================================
 
+#ifdef CS_USE_NEW_RENDERER
+bool csLoader::ParseShaderList (iDocumentNode* node)
+{
+  csRef<iShaderManager> shaderMgr (
+    CS_QUERY_REGISTRY (csLoader::object_reg, iShaderManager));
+
+  if(!shaderMgr)
+  {
+    ReportNotify ("iShaderManager not found, ignoring shaders!");
+    return false;
+  }
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+    case XMLTOKEN_SHADER:
+      {
+        csRef<iShader> shader (shaderMgr->CreateShader ());
+        //test if we have a childnode named file, if so load from file, else
+        //use inline loading
+        csRef<iDocumentNode> fileChild = child->GetNode ("file");
+        if (fileChild)
+        {
+          csRef<iVFS> vfs (CS_QUERY_REGISTRY (csLoader::object_reg, iVFS));
+          shader->Load (csRef<iDataBuffer> (vfs->ReadFile (fileChild->GetContentsValue ())));
+        }
+        else
+        {
+          shader->Load (child);
+        }
+      }
+      break;
+    }
+  }
+  return true;
+}
+#endif //CS_USE_NEW_RENDERER
