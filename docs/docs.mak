@@ -233,15 +233,13 @@ $(OUT.DOC.IMAGE.DIRS.PDF)  $(OUT.DOC.IMAGE.DIRS.INFO):
 # Rule for copying a selected subset of the source image list to a target
 # directory.  To copy images of type "png", "jpg", and "gif" to directory
 # "foo", specify "foo/png.jpg.gif.IMAGES" as dependency of some target.
-# Note that this rule takes special care to avoid a trailing semi-colon after
-# the last command since some shells can not properly grok such an occurrence.
 %.IMAGES:
 ifeq ($(DOC.IMAGE.LIST),)
 	@echo "No images to copy."
 else
 	@echo "Copying images." $(foreach file,$(filter $(foreach \
 	ext,$(subst ., ,$(notdir $*)),%.$(ext)),$(DOC.IMAGE.LIST)),\
-	; $(CP) $(file) $(subst $(CSMANUAL_DIR)/,$(dir $*),$(file)))
+	$(NEWLINE)$(CP) $(file) $(subst $(CSMANUAL_DIR)/,$(dir $*),$(file)))
 endif
 
 # Rule for removing a selected subset of the source image list from a target

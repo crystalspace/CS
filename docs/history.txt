@@ -1,6 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
 16-Jan-2001
+	- Eric Sunshine changed the image-copying rule in docs.mak so that it
+	  should once again work on Windows/DOS.  (It used to work, but the
+	  command-line for copying images became too long, at some point, for
+	  the DOS command-line input buffer.)
 	- Eric Sunshine removed the broken and unuspported cygwin.mak file.
 15-Jan-2001
 	- Fixed a serious bug in csMeshWrapper::SetMeshObject(). This
