@@ -91,7 +91,7 @@ private:
   bool forceWireframe;
 
   int asp_center_x, asp_center_y;
-  float aspect;
+  float aspect, inv_aspect;
   bool needProjectionUpdate;
   float fov;
   int viewwidth, viewheight;
@@ -323,6 +323,7 @@ public:
   virtual void SetPerspectiveAspect (float aspect)
   {
     csGLGraphics3D::aspect = aspect;
+    inv_aspect = 1.0f / aspect;
     frustum_valid = false;
     needProjectionUpdate = true;
   }

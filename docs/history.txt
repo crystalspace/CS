@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Jun-2004
+	- Jorrit fixed two serious problems with the NR floating portals
+	  implementations (csGLGraphics3D::SetupClipPortals()):
+	    - First SetupClipPortals() (which is being called by DrawMesh())
+	      itself calls DrawMesh() which can cause bad things to happen.
+	    - Second, SetupClipPortals() simply ignored the portal/polygon
+	      normal for setting up the stencil. This means the z-buffer
+	      contents of the portal would be incorrect.
+	  Unfortunatelly both fixes don't yet solve floating portals completely
+	  with NR. Have to investigate further.
 14-Jun-2004
 	- Jorrit implemented correct static lighting for static lod. In case
 	  of casting shadows, the lowest detail object that has a shadow

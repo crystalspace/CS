@@ -351,7 +351,7 @@ void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
 
   if (fogVerticesNum != renderer->polysNum)
   {
-    int num_verts = 0, num_indices = 0, max_vc = 0;
+    int num_verts = 0;
     int i;
 
     for (i = 0; i < renderer->polys.Length(); i++)
@@ -360,8 +360,9 @@ void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
       num_verts += poly->num_vertices;
     }
 
-    fog_buffer = renderer->parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
+    fog_buffer = renderer->parent->CreateRenderBuffer (
+    	num_verts * sizeof (csVector3), 
+        CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3, false);
     void *buf = fog_buffer->Lock(CS_BUF_LOCK_NORMAL);
     memset (buf,0,num_verts*sizeof(csVector3));
     fog_buffer->Release();
@@ -371,8 +372,6 @@ void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
   csVector3* fog = (csVector3*)fog_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
   
-  int vindex = 0, iindex = 0;
-
   csReversibleTransform rt(transMatrix, transVector);
   csVector3 planeNormal = fogPlane.Normal ();
   csVector3 refpos = rt.GetO2TTranslation();

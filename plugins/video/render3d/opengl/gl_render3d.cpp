@@ -1139,7 +1139,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
       ActivateTexture (render_target);
       statecache->Disable_GL_BLEND ();
-      SetZMode (CS_ZBUF_NONE);
+      SetZMode (CS_ZBUF_NONE, false);
 
       glBegin (GL_QUADS);
       glTexCoord2f (0, 0); glVertex2i (0, viewheight-txt_h);
@@ -1214,7 +1214,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
       statecache->SetMatrixMode (GL_MODELVIEW);
       glLoadIdentity ();
 
-      SetZMode (CS_ZBUF_NONE);
+      SetZMode (CS_ZBUF_NONE, false);
       
       SetMixMode (CS_FX_COPY);
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
@@ -1255,14 +1255,14 @@ void csGLGraphics3D::FinishDraw ()
     {
       rt_onscreen = false;
       //statecache->Enable_GL_TEXTURE_2D ();
-      SetZMode (CS_ZBUF_NONE);
+      SetZMode (CS_ZBUF_NONE, false);
       statecache->Disable_GL_BLEND ();
       statecache->Disable_GL_ALPHA_TEST ();
       int txt_w, txt_h;
       render_target->GetMipMapDimensions (0, txt_w, txt_h);
       csGLTextureHandle* tex_mm = (csGLTextureHandle *)
         render_target->GetPrivateObject ();
-      csGLTexture *tex_0 = tex_mm->vTex[0];
+      //csGLTexture *tex_0 = tex_mm->vTex[0];
       csTxtCacheData *tex_data = (csTxtCacheData*)render_target->GetCacheData();
       if (!tex_data)
       {
@@ -1819,8 +1819,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       CS_ASSERT_MSG ("Meshes can't have zmesh zmode. You deserve some spanking", 
 	(modes.z_buf_mode != CS_ZBUF_MESH) && 
 	(modes.z_buf_mode != CS_ZBUF_MESH2));
-      SetZMode ((current_zmode == CS_ZBUF_MESH2) ? 
-	GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode, true);
+        SetZMode ((current_zmode == CS_ZBUF_MESH2) ? 
+	  GetZModePass2 (modes.z_buf_mode) : modes.z_buf_mode, true);
 /*      if (mymesh->z_buf_mode != CS_ZBUF_MESH)
       {
         SetZMode (mymesh->z_buf_mode, true);
@@ -1889,7 +1889,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   // as we are drawing in 2D, we disable some of the commonly used features
   // for fancy 3D drawing
   statecache->SetShadeModel (GL_FLAT);
-  SetZMode (CS_ZBUF_NONE);
+  SetZMode (CS_ZBUF_NONE, false);
   //@@@???statecache->SetDepthMask (GL_FALSE);
 
   // if the texture has transparent bits, we have to tweak the
@@ -2022,39 +2022,54 @@ void csGLGraphics3D::SetupClipPortals ()
         statecache->SetStencilFunc (GL_ALWAYS, 1, 1);
         statecache->SetStencilOp (GL_KEEP, GL_ZERO, GL_REPLACE);
 
-	CS_ALLOC_STACK_ARRAY(csVector3, vertices3, cp->num_poly);
-	CS_ALLOC_STACK_ARRAY(uint, indices, cp->num_poly);
-	for (int v = 0; v < cp->num_poly; v++)
-	{
-	  vertices3[v].Set (cp->poly[v].x, cp->poly[v].y, 0.0f);
-	  indices[v] = v;
-	}
-	csSimpleRenderMesh simpleRM;
-	simpleRM.meshtype = CS_MESHTYPE_TRIANGLEFAN;
-	simpleRM.indexCount = cp->num_poly;
-	simpleRM.indices = indices;
-	simpleRM.vertexCount = cp->num_poly;
-	simpleRM.vertices = vertices3;
-	simpleRM.texcoords = 0;
-        // USE OR FILL@@@?
-	simpleRM.z_buf_mode = CS_ZBUF_USE;
-
-	DrawSimpleMesh (simpleRM);
-
-	//DrawPolygonZFill (cp->poly, cp->num_poly, cp->normal);
-
-        // Use the stencil area.
-        statecache->SetStencilFunc (GL_EQUAL, 1, 1);
-        statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-
-	// First clear the z-buffer here.
-	SetZMode (CS_ZBUF_FILLONLY);
 	GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
 	statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
 	statecache->SetColorMask (false, false, false, false);
 	GLenum oldcullface;
 	statecache->GetCullFace (oldcullface);
 	statecache->SetCullFace (GL_FRONT);
+        statecache->Disable_GL_TEXTURE_2D ();
+        statecache->SetShadeModel (GL_FLAT);
+
+	SetZMode (CS_ZBUF_USE, false);
+        // Get the plane normal of the polygon. Using this we can calculate
+        // '1/z' at every screen space point.
+
+        float M, N, O;
+	float Dc = cp->normal.D ();
+        if (ABS (Dc) < 0.01f)
+        {
+          M = N = 0;
+          O = 1;
+        }
+        else
+        {
+          float inv_Dc = 1.0f / Dc;
+          M = -cp->normal.A () * inv_Dc * inv_aspect;
+          N = -cp->normal.B () * inv_Dc * inv_aspect;
+          O = -cp->normal.C () * inv_Dc;
+        }
+
+	int v;
+	glBegin (GL_TRIANGLE_FAN);
+	csVector2* vt = cp->poly;
+	for (v = 0 ; v < cp->num_poly ; v++)
+	{
+	  float sx = cp->poly[v].x - asp_center_x;
+	  float sy = cp->poly[v].y - asp_center_y;
+	  float one_over_sz = M * sx + N * sy + O;
+	  float sz = 1.0f / one_over_sz;
+	  glVertex4f (vt->x * sz, vt->y * sz, -1.0f, sz);
+	  vt++;
+	}
+	glEnd ();
+
+        // Use the stencil area.
+        statecache->SetStencilFunc (GL_EQUAL, 1, 1);
+        statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+
+	// First clear the z-buffer here.
+	SetZMode (CS_ZBUF_FILLONLY, false);
 
         statecache->SetMatrixMode (GL_PROJECTION);
         glPushMatrix ();
@@ -2327,7 +2342,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     rmesh.alphaType = mesh.alphaType.alphaType;
   }
   
-  SetZMode (mesh.z_buf_mode);
+  SetZMode (mesh.z_buf_mode, false);
   csRenderMeshModes modes (rmesh);
   for (int p = 0; p < passCount; p++)
   {
