@@ -46,6 +46,16 @@ csTextureMM::csTextureMM (iImage* Image, int Flags)
 
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
+
+  if(image->HasKeycolor ())
+  {
+    int r,g,b;
+    image->GetKeycolor (r,g,b);
+    transp_color.red = r;
+    transp_color.green = g;
+    transp_color.blue = b;
+    transp = true;
+  }
   cachedata = NULL;
 }
 
