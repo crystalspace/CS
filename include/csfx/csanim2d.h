@@ -30,9 +30,12 @@ class csAnimatedPixmap;
 /// A 2d animation template. This class is used to create animated pixmaps.
 class csAnimationTemplate {
 private:
-  // sprite frames
+  /// sprite frames
   csVector Frames;
-  // absolute time to finish a frame
+  /** 
+   * absolute time to finish a frame 
+   * (the time from start to finish of the frame)
+   */
   csVector FinishTimes;
 
 public:
@@ -41,25 +44,25 @@ public:
   /// destructor
   ~csAnimationTemplate();
 
-  // add a frame.
+  /// get number of frames
+  inline int GetNumFrames() const
+    {return Frames.Length();}
+  /// get total length of animation (all delays added together)
+  inline cs_time GetLength() const
+    {return (GetNumFrames()==0)?0:(cs_time)FinishTimes.Get(GetNumFrames()-1);}
+  /// add a frame. (giving the length of this frame)
   inline void AddFrame(cs_time Delay, csPixmap *s)
     {Frames.Push(s); FinishTimes.Push((csSome)(GetLength() + Delay));}
-  /// add a frame
+  /// add a frame (giving the length of this frame)
   inline void AddFrame(cs_time Delay, iTextureHandle *Tex)
     {AddFrame(Delay, new csSimplePixmap(Tex));}
-  /// add a frame
+  /// add a frame (giving the length of this frame)
   inline void AddFrame(cs_time Delay, iTextureHandle *Tex, int x, int y, int w, int h)
     {AddFrame(Delay, new csSimplePixmap(Tex, x, y, w, h));}
 
   /// get a frame by number
   inline csPixmap *GetFrame(int n) const
     {return (csPixmap*)(Frames.Get(n));}
-  /// get number of frames
-  inline int GetNumFrames() const
-    {return Frames.Length();}
-  /// get total length of animation (all delays added together)
-  inline cs_time GetLength() const
-    {return (cs_time)FinishTimes.Get(GetNumFrames()-1);}
   /// get a frame by time
   csPixmap *GetFrameByTime(cs_time Time);
 
@@ -67,6 +70,8 @@ public:
   csAnimatedPixmap *CreateInstance();
 };
 
+
+/// a pixmap with a 2d animation 
 class csAnimatedPixmap : public csPixmap {
 public:
   /// create an animated pixmap

@@ -35,10 +35,13 @@ csPixmap *csAnimationTemplate::GetFrameByTime(cs_time Time) {
   // test for empty animation
   if (GetNumFrames() == 0) return NULL;
   // wrap time
+  printf("Getting at curtime %ld for length %ld\n", Time, GetLength());
   Time %= GetLength();
+  printf("Finding %d\n", Time);
   // search for frame (@@@ optimize this!)
   long i;
-  for (i=0; i<GetNumFrames(); i++) {
+  for (i=0; i<GetNumFrames(); i--) {
+    printf("Comparing [%d] to %d\n", i, (cs_time)FinishTimes.Get(i));
     if (Time < (cs_time)FinishTimes.Get(i))
       return GetFrame(i);
   }
