@@ -63,9 +63,9 @@
 # To-Do List
 #    * Generalize into a "job" processing mechanism.  Each job should reside
 #      within its own source file.  There can be jobs to check out files from
-#      CVS, run the various `make' commands (make htmldoc, make repairdoc, make
-#      msvc7gen, etc.), and perform the comparision and commit of generated
-#      files.
+#      CVS, run the various `make' commands (make manualhtml, make repairdoc,
+#      make msvc7gen, etc.), and perform the comparision and commit of
+#      generated files.
 #    * The mechanism used to publish packages for download and online browsing
 #      needs to be generalized further.  It is still somewhat geared toward
 #      the publication of documentation packages and is, thus, not flexible
@@ -87,7 +87,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '26';
+my $PROG_VERSION = '27';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -160,13 +160,13 @@ my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #        to only exporting the first directory referenced by the sibling
 #        "newdirs" key.  The key "appear" controls the appearance of the
 #        directory in the generated package.  For example, when packaging the
-#        directory "out/docs/html", it should actually appear as "CS/docs/html"
-#        in the downloadable package.  The "browseable-postprocess" key allows
-#        specification of a post-processing step for the documentation which is
-#        being made available for online browsing.  The value of this key is
-#        any valid shell command.  If the meta-token ~T appears in the command,
-#        the path of the directory which is being published is interpolated
-#        into the command in its place.
+#        directory "out/docs/html/manual", it should actually appear as
+#        "CS/docs/html/manual" in the downloadable package.  The
+#        "browseable-postprocess" key allows specification of a post-processing
+#        step for the documentation which is being made available for online
+#        browsing.  The value of this key is any valid shell command.  If the
+#        meta-token ~T appears in the command, the path of the directory which
+#        is being published is interpolated into the command in its place.
 #    ARCHIVERS - A list of archiver records.  Each arechiver is used to
 #        generate a package from an input directory.  Each archiver record is
 #        a dictionary which contains the following keys.  The key "name"
@@ -183,7 +183,7 @@ my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 $ENV{'CVS_RSH'} = 'ssh';
 
 # Ensure that Doxygen and Swig can be found.
-$ENV{'PATH'} = 
+$ENV{'PATH'} =
     '/home/groups/c/cr/crystal/bin:' .
     '/home/groups/c/cr/crystal/swig/bin:' .
     $ENV{'PATH'} .
@@ -244,36 +244,36 @@ my @TARGETS =
        'log'     => 'Automated Swig Perl5 file repair.' },
      { 'name'    => 'User\'s Manual',
        'action'  => 'Generating',
-       'make'    => 'htmldoc',
-       'newdirs' => ['out/docs/html'],
-       'olddirs' => ['docs/html'],
+       'make'    => 'manualhtml',
+       'newdirs' => ['out/docs/html/manual'],
+       'olddirs' => ['docs/html/manual'],
        'log'     => 'Automated Texinfo to HTML conversion.',
        'export'  =>
 	   { 'dir'    => 'manual',
 	     'name'   => 'csmanual-html',
-	     'appear' => "$PROJECT_ROOT/docs/html",
+	     'appear' => "$PROJECT_ROOT/docs/html/manual",
 	     'browseable-postprocess' =>
 	         'sh docs/support/annotate/transform.sh ~T' }},
      { 'name'    => 'Public API Reference',
        'action'  => 'Generating',
-       'make'    => 'pubapi',
-       'newdirs' => ['out/docs/pubapi'],
-       'olddirs' => ['docs/pubapi'],
+       'make'    => 'apihtml',
+       'newdirs' => ['out/docs/html/api'],
+       'olddirs' => ['docs/html/api'],
        'log'     => 'Automated API reference generation.',
        'export'  =>
-	   { 'dir'    => 'pubapi',
-	     'name'   => 'cspubapi-html',
-	     'appear' => "$PROJECT_ROOT/docs/pubapi",
+	   { 'dir'    => 'api',
+	     'name'   => 'csapi-html',
+	     'appear' => "$PROJECT_ROOT/docs/html/api",
 	     'browseable-postprocess' =>
 	         'sh docs/support/annotate/transform.sh ~T' }},
      { 'name'    => 'Developer API Reference',
        'action'  => 'Generating',
-       'make'    => 'devapi',
-       'newdirs' => ['out/docs/devapi'],
+       'make'    => 'apidevhtml',
+       'newdirs' => ['out/docs/html/apidev'],
        'export'  =>
-	   { 'dir'    => 'devapi',
-	     'name'   => 'csdevapi-html',
-	     'appear' => "$PROJECT_ROOT/docs/devapi",
+	   { 'dir'    => 'apidev',
+	     'name'   => 'csapidev-html',
+	     'appear' => "$PROJECT_ROOT/docs/html/apidev",
 	     'browseable-postprocess' =>
 	         'sh docs/support/annotate/transform.sh ~T' }});
 
@@ -746,8 +746,8 @@ sub publish_package {
 # indicated by the ARCHIVERS array.  The 'appear' key in the 'export'
 # dictionary of the TARGETS array, is used to control how the packaged
 # directory appears in the archive.  For instance, although the directory
-# 'out/docs/html' may be packaged, the 'appear' key may indicate that it
-# should appear as 'CS/docs/html' in the generated package.  This
+# 'out/docs/html/manual' may be packaged, the 'appear' key may indicate that it
+# should appear as 'CS/docs/html/manual' in the generated package.  This
 # functionality is handled by temporarily giving the target directory the
 # desired name just prior to archiving.  Note that during this operation, the
 # current working directory is CONV_DIR/PROJECT_ROOT, and all operations are

@@ -1,15 +1,16 @@
-Creating the documentation in HTML Help format:
-===============================================
+Creating the documentation in MS compressed HTML Help format
+============================================================
 
-required: HTML Help Workshop 1.3 (available at www.microsoft.com), 
+Required: HTML Help Workshop 1.3 (available at www.microsoft.com), 
 	  Perl (www.activestate.com, for example).
 
-1. do a 'make htmldoc' and 'make pubapi'. Or, if you're lazy, copy the 
-   directories docs/html and docs/pubapi to out/docs/html and out/docs/pubapi.
+1. Invoke 'make manualhtml' and 'make apihtml'. Or, if you're lazy, copy the 
+   directories docs/html/manual and docs/html/api to out/docs/html/manual and
+   out/docs/manual/api.
    
-2. run 'make chmsupp'.
+2. Invoke 'make manualchm apichm'.
 
-3. in the directory out/docs you can find two html help project files, 
-   csapi.hhp and csdocs.hhp. Compile those with HTML Help Workshop.
+3. In the directory out/docs you can find two HTML help project files, 
+   csapi.hhp and csmanual.hhp. Compile those with HTML Help Workshop.
    
 4. Enjoy.

@@ -2,10 +2,10 @@ SubDir TOP docs doxygen ;
 
 if $(CMD.DOXYGEN)
 {
-  
-DoxyGen pubapi : pubapi.dox : pubapi : csblur.png csblurb.png csshadow.png ;
-DoxyGen devapi : devapi.dox : devapi ;
-Help pubapi : "public API reference manual" ;
-Help devapi : "developer API reference manual" ;
+DoxyGen apihtml : pubapi.dox : html api : csblur.png csblurb.png csshadow.png ;
+DoxyGen apidevhtml : devapi.dox : html apidev :
+  csblur.png csblurb.png csshadow.png ;
+Help apihtml : "public API reference manual" ;
+Help apidevhtml : "developer API reference manual" ;
 }
 

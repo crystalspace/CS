@@ -6,16 +6,20 @@ TEXIFILE=$1 ; shift
 OUTDIR=$1 ; shift
 FLAGS=$@
 
+# Poor man's (portable) 'dirname' command.
+dirpart() {
+    expr "$1" : '\(..*\)[/\\].*'
+}
+
 # copy images
-IMAGEDIR=`dirname "$TEXIFILE"`
+OLDDIR=`pwd`
+IMAGEDIR=`dirpart "$TEXIFILE"`
 cd "$IMAGEDIR"
-IMAGEFILES=`find -name "*.jpg"` `find -name "*.png"` `find -name "*.gif"`
-cd -
+IMAGEFILES=`find . \( -name \*.jpg -o -name \*.png -o -name \*.gif \) -print`
+cd "$OLDDIR"
 for i in $IMAGEFILES; do
-    if test ! -e $OUTDIR/`dirname $i`; then
-	$MKDIRS "$OUTDIR/`dirname $i`"
-    fi
-    cp -p "$IMAGEDIR/$i" "$OUTDIR/$i"
+    test -r $OUTDIR/`dirpart $i` || $MKDIRS "$OUTDIR/`dirpart $i`"
+    cp "$IMAGEDIR/$i" "$OUTDIR/$i"
 done
 
 # run texi2html

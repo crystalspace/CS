@@ -6,17 +6,21 @@ OUTPUT=$1 ; shift
 TEXIFILE=$1 ; shift
 FLAGS=$@
 
+# Poor man's (portable) 'dirname' command.
+dirpart() {
+    expr "$1" : '\(..*\)[/\\].*'
+}
+
 # copy images
-OUTDIR=`dirname "$OUTPUT"`
-IMAGEDIR=`dirname "$TEXIFILE"`
+OLDDIR=`pwd`
+OUTDIR=`dirpart "$OUTPUT"`
+IMAGEDIR=`dirpart "$TEXIFILE"`
 cd "$IMAGEDIR"
-IMAGEFILES=`find -name "*.eps"`
-cd -
+IMAGEFILES=`find . -name \*.eps -print`
+cd "$OLDDIR"
 for i in $IMAGEFILES; do
-    if test ! -e $OUTDIR/`dirname $i`; then
-	$MKDIRS "$OUTDIR/`dirname $i`"
-    fi
-    cp -p "$IMAGEDIR/$i" "$OUTDIR/$i"
+    test -r $OUTDIR/`dirpart $i` || $MKDIRS "$OUTDIR/`dirpart $i`"
+    cp "$IMAGEDIR/$i" "$OUTDIR/$i"
 done
 
 # run texi2html

@@ -19,14 +19,11 @@
 #
 #==============================================================================
 
-#
-# Purpose of this script: create a HTMLHELP TOC out of the CrystalSpace docs.
-# HHW's automatic TOC generation isn't all crappy, but doesn't handle the CS docs 
-# too well. So we do it ourselves.
-# This script isn't really useful for anything other than the CS docs.
-# The HH compiler will complain about unresolveable URLs in the TOC. Don't worry,
-# it'll work fine, though.
-#
+# Purpose of this script: Create an HTMLHELP TOC out of the Crystal Space docs.
+# HHW's automatic TOC generation is not entirely poor, but it does not handle
+# the CS docs too well, thus we do it ourselves.  This script is not really
+# useful for anything other than the CS docs.  The HH compiler will complain
+# about unresolveable URLs in the TOC. Don't worry, it'll work fine, though.
 
 use strict;
 use HTMLEntities;
@@ -38,7 +35,7 @@ sub doctoc_index {
   	(my $docroot, my $srcfile, my $TOCFILE) = @_;
   	my %indexfiles;
   	my %letterindexed;
-  
+
   	open(my $INDEXFILE, "<$docroot/$srcfile");
   	while (<$INDEXFILE>) {
   			chomp $_;
@@ -328,5 +325,4 @@ EOTOCEND
   	close($TOCFILE);
 }
 
-doctoc("html");
-apitoc("pubapi");
+doctoc($ARGV[0]);
