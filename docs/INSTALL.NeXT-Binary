@@ -1,9 +1,11 @@
 ===============================================================================
-    Crystal Space for NextStep, OpenStep, Rhapsody (MacOS/X Server) DR2
+    Crystal Space for MacOS/X Server, OpenStep, NextStep
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/03/02
+    1999/07/16
+
+    Also see README.NeXT for implementation details.
 ===============================================================================
 
 0. Contents
@@ -19,27 +21,27 @@
 1. Introduction
 ---------------
 
-This is a binary-only distribution of Crystal Space for NextStep 3.3, OpenStep
-4.2, or Rhapsody (MacOS/X Server) DR2.  This package contains demonstration
-programs and resources which illustrate the Crystal Space 3D project.
+This is a binary-only distribution of Crystal Space for MacOS/X Server,
+OpenStep 4.2, and NextStep 3.3.  This package contains demonstration programs
+and resources which illustrate the Crystal Space 3D project.
 
-Crystal Space was ported to NextStep, OpenStep, and Rhapsody by Eric Sunshine
-in February of 1999.  If you have questions or comments about this port,
-please contact me at: Eric Sunshine <sunshine@sunshineco.com>.
+Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
+Sunshine in February of 1999.  If you have questions or comments about this
+port, please contact me at: Eric Sunshine <sunshine@sunshineco.com>.
 
 
 2. References
 -------------
 
-Read this document for a simple overview of Crystal Space usage on NextStep,
-OpenStep, or Rhapsody DR2.
+Read this document for a simple overview of Crystal Space usage on MacOS/X
+Server, OpenStep, and NextStep.
 
 See the accompanying README file for information about the Crystal Space
 project in general as well as other related resources and mailing lists.
 
-For comprehensive technical information about the NextStep, OpenStep, and
-Rhapsody ports, download the Crystal Space source code packages and consult
-the README.NeXT file in the src/system/next directory.
+For comprehensive technical information about the MacOS/X Server, OpenStep,
+and NextStep ports, download the Crystal Space source code package and consult
+the README.NeXT document in the CS/docs directory.
 
 
 3. Architectures
@@ -49,55 +51,56 @@ The programs contained in this archive are multi-architecture binaries (MAB).
 They may be used on any hardware architecture supported by the target
 platform, as summarized below.
 
-    Platform    Architectures           Tested
-    --------    -------------           ------
-    NextStep    i386 m68k sparc hppa    i386 m68k
-    OpenStep    i386 m68k sparc         i386 m68k
-    Rhapsody    i386 ppc                i386
+    Platform        Architectures           Tested
+    --------        -------------           ------
+    MacOS/X Server  i386 ppc                i386 ppc
+    OpenStep        i386 m68k sparc         i386 m68k
+    NextStep        i386 m68k sparc hppa    i386 m68k sparc
 
 
 4. Using Crystal Space
 ----------------------
 
-You need to have one or more level files in order to run Crystal Space.  These
-are the files which contain the maps and rooms which you can explore with the
-"cryst" program, and which you can edit with "mazed".  See the accompanying
-README document for information about obtaining level files.
+WalkTest is a 3D first-person exploration program.  With it the user can view
+and explore Crystal Space levels or maps.  MetaBalls demonstrates Crystal
+Space's facilities for curved surfaces and dynamic animation.  MazeD is the
+Crystal Space level or map editor.  Blocks is a 3D-Tetris style game.
 
-The first time you explore a level after downloading it from the Internet
-Crystal Space may determine that it needs to recalculate some of the lighting
-information which is stored in the level file.  This is a normal occurrence
-and should not cause alarm, however the process can be quite time consuming,
-particularly for sizable levels such as "large.zip", so please be patient.
+You should download one or more level files in order to run Crystal Space.
+These are the files which contain the maps and rooms which you explore with
+WalkTest and edit with MazeD.  See the accompanying README document for
+information about obtaining level files.
 
-Assuming that the level file "large.zip" is in the same directory as the
-Crystal Space "WalkTest" demonstration program "cryst", one can explore the
-level by typing this command:
+The first time you explore a level with WalkTest after downloading it from the
+Internet, Crystal Space may determine that it needs to recalculate some of the
+lighting information which is stored in the level file.  This is a normal
+occurrence and should not cause alarm, however the process can be quite time
+consuming, particularly for sizable levels such as large.zip, so please be
+patient.
 
-    % ./cryst large.zip
+Assuming that the level file large.zip is in the same directory as WalkTest,
+you can explore the it by typing this command:
 
-To explore a different level, substitute its name in place of "large.zip".
-The Crystal Space editor, MazeD, can be run with this command:
+    % ./walktest large.zip
 
+MetaBalls, MazeD, and Blocks can be run with the following commands:
+
+    % ./metademo
     % ./mazed
-
-Blocks, the 3D-Tetris style game can be run with this command:
-
     % ./blocks
 
 
 5. Controls
 -----------
 
-The document docs/keys.txt summarizes the keys which can be used to move
-around and explore the level with the Crystal Space example program "cryst".
+To learn how to operate the demonstration programs, you may want to read the
+documentation files keys.txt & console.txt which explain how to control
+WalkTest, as well as mazed.html & blocks.txt which explain MazeD and Blocks,
+respectively.
 
-This same program also features a console into which the user can type
-commands to interact with the program.  To access the console while running
-the program, press the Tab key.  To get help and a list of commands which the
-console response to, type "help".  To exit from the console and resume the
-interactive exploration of the level, press Tab a second time.
-
-The document docs/blocks.txt summarizes the keys which can be used to play
-Blocks, the 3D-Tetris style game.
-
+In addition to providing a first-person exploration experience, WalkTest also
+features a console into which the user can type commands to interact with the
+program.  To access the console while running the program, press the Tab key.
+To get help and a list of commands which the console responds to, type "help".
+To exit from the console and resume the interactive exploration of the level,
+press Tab a second time.

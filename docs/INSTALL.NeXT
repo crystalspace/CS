@@ -1,20 +1,20 @@
 ===============================================================================
-    Crystal Space for NextStep, OpenStep, Rhapsody (MacOS/X Server) DR2
+    Crystal Space for MacOS/X Server, OpenStep, NextStep
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/03/02
+    1999/07/16
 
-    Also see src/system/next/README.NeXT for implementation details.
+    Also see README.NeXT for implementation details.
 ===============================================================================
 
 0. Contents
 -----------
 
     1. Introduction
-    2. Other References
+    2. References
     3. GNU make
-    4. Unpacking
+    4. Packages
     5. Architectures
     6. Supporting Libraries
     7. Building
@@ -25,30 +25,30 @@
 1. Introduction
 ---------------
 
-This document discusses installation and usage of Crystal Space for NextStep
-3.3, OpenStep 4.2, and Rhapsody (MacOS/X Server) DR2.
+This document accompanies the source code distribution of Crystal Space and
+contains installation and usage instructions for MacOS/X Server, OpenStep 4.2,
+and NextStep 3.3.
 
-Crystal Space was ported to NextStep, OpenStep, and Rhapsody by Eric Sunshine
-in February of 1999.  If you have questions or comments about this port,
-please contact me at: Eric Sunshine <sunshine@sunshineco.com>.
+Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
+Sunshine in February of 1999.  If you have questions or comments about this
+port, please contact me at: Eric Sunshine <sunshine@sunshineco.com>.
 
 
-2. Other References
--------------------
+2. References
+-------------
 
-The file README.NeXT in the directory src/system/next contains comprehensive
-and detailed implementation information about the NextStep, OpenStep, and
-Rhapsody ports of Crystal Space.  It also contains a list of known bugs.
+The accompanying README.NeXT file contains comprehensive and detailed
+implementation information about the MacOS/X Server, OpenStep, and NextStep
+ports of Crystal Space.  It also contains a list of known bugs and future
+plans.
 
 The file INSTALL.General contains generic instructions regarding installation
 on Unix systems, as well as instructions for obtaining the latest supporting
 libraries, such as zlib, libpng, and libjpeg, which Crystal Space requires.
-It also contains information about special makefile variables which the more
-adventurous may find useful.
 
-The directories cryst/docs and cryst/csdocs contain many documents which may
-be of interest to those who are curious about the internal structure of
-Crystal Space.
+The CS/docs directory, which accompanies the source distribution, contains
+many documents which may be of interest to those curious about the internal
+structure and operation of Crystal Space.
 
 
 3. GNU make
@@ -56,9 +56,9 @@ Crystal Space.
 
 Building Crystal Space requires GNU's "make" utility.  NextStep does not ship
 with GNU make, so it must be downloaded and installed before this project can
-be built.  OpenStep and Rhapsody both ship with GNU make installed.  On these
-platforms, it is named "gnumake".  OpenStep and Rhapsody users may skip to the
-next section.
+be built.  MacOS/X Server and OpenStep both ship with GNU make already
+installed.  On these platforms, it is named "gnumake".  MacOS/X Server and
+OpenStep users may skip to the next section.
 
 NextStep users can find pre-built binaries of GNU make at these locations:
 
@@ -73,7 +73,7 @@ of the standard GNU mirror sites:
 
 The current version of GNU make (3.77 at the time of this writing), does not
 correctly perform filename wildcard expansion, out of the box.  Fortunately,
-this problem can be easily corrected.  Build the program following these
+this problem can be easily corrected.  Build the program by following these
 instructions:
 
     a) Unpack the source
@@ -89,40 +89,45 @@ instructions:
     d) Build the project
        % make install
 
-In order to be consistent with the OpenStep and Rhapsody installations, you
-should probably rename the installed executable to "gnumake" rather than the
-default name, "make".  The remaining instructions in this document assume that
-it is installed as "gnumake".
+In order to be consistent with the MacOS/X Server and OpenStep installations,
+you should probably rename the installed executable to "gnumake" rather than
+the default name, "make".  The remaining instructions in this document assume
+that it is installed as "gnumake".
 
 
-4. Unpacking
+4. Packages
 ------------
 
-Unpack the core Crystal Space source code.
+Once you have obtained the latest Crystal Space source code package and its
+supporting libraries, unpack them into a convenient directory.  See the
+document dir.txt for a description of the directory hierarchy which is created
+when you unpack the archive.
 
-    % gnutar xfz csmain*.tgz
-    % gnutar xfz csnext*.tgz
-    % gnutar xfz csunix*.tgz
+    % gnutar xfz <CS-package-name>.tgz
+
+The JPEG, PNG, and ZLIB libraries must be installed within the CS/libs
+directory of Crystal Space.  If you obtained the archives for these libraries
+at the same site from which you obtained the Crystal Space source code package
+then they will automatically unpack into the correct directory.  If you
+obtained the packages elsewhere, then you must manually ensure that they are
+placed within CS/libs.
+
     % gnutar xfz libjpeg*.tgz
     % gnutar xfz libpng*.tgz
     % gnutar xfz zlib*.tgz
 
-Unpack optional packages which you are interested in building or using.
-
-    % gnutar xfz csmazed*.tgz
-    % gnutar xfz csblocks*.tgz
-    % gnutar xfz csdocs*.tgz
-
-Place the file "standard.zip" into the main source directory.  This file
+If the file "standard.zip" was not included with the Crystal Space package,
+download it and place it within the top-level CS directory.  This file
 contains resources which are used by the Crystal Space demonstration programs.
+Do not unzip this file.  Crystal Space uses it as is.
 
-    % cp standard.zip cryst/src/standard.zip
+    % cp standard.zip CS/standard.zip
 
-You must have at least one "level" file in order to use Crystal Space.
-Typically the level files should be placed in the cryst/data directory.  For
-instance:
+You must have at least one "level" file in order to use the Crystal Space
+demonstration program, WalkTest.  Typically level files should be placed in
+the CS/data directory.  For example:
 
-    % mv large.zip cryst/data/large.zip
+    % mv large.zip CS/data/large.zip
 
 
 5. Architectures
@@ -131,25 +136,33 @@ instance:
 This project may be built for any of the architectures which are supported by
 the standard developer tools, as summarized below.
 
-    Platform    Architectures           Tested
-    --------    -------------           ------
-    NextStep    i386 m68k sparc hppa    i386 m68k
-    OpenStep    i386 m68k sparc         i386 m68k
-    Rhapsody    i386 ppc                i386
+    Platform        Architectures           Tested
+    --------        -------------           ------
+    MacOS/X Server  i386 ppc                i386 ppc
+    OpenStep        i386 m68k sparc         i386 m68k
+    NextStep        i386 m68k sparc hppa    i386 m68k sparc
 
-Crystal Space and the supporting components may be built as a multi-
-architecture binaries (MAB), thus allowing a single executable file to be used
-on multiple architectures.
+Crystal Space and the supporting components may be built as multi-architecture
+binaries (MAB), thus allowing a single executable file to be used on multiple
+architectures.
 
-When building Crystal Space and its components multi-architecture binaries are
-generated by specifying the standard NeXT makefile variable TARGET_ARCHS on
-the command-line each time you invoke gnumake.  For instance, to build a MAB
-executable for Intel, Motorola, and Sparc, one would type:
+When building Crystal Space and its components, multi-architecture binaries
+are generated by specifying the standard Apple/NeXT makefile variable
+TARGET_ARCHS on the command-line.
 
-    gnumake TARGET_ARCHS="i386 m68k sparc" cs
+By using TARGET_ARCHS, the desired architectures may be specified during
+initial configure the build system.  In this case, the chosen architectures
+are remembered and automatically applied to all subsequent build operations,
+unless manually overridden.  If you do not specify TARGET_ARCHS at
+configuration time, then the project will be compiled for the hardware on
+which it is being built.
 
-If TARGET_ARCHS is not specified then the project is compiled for the hardware
-on which it is being built.
+You can manually override the configured choice of architectures by specifying
+TARGET_ARCHS on the command line at build time.  For instance, to build the
+"walktest" demonstration program as a MAB executable for Intel, Motorola, and
+Sparc, one would type:
+
+    gnumake TARGET_ARCHS="i386 m68k sparc" walk
 
 When building the supporting libraries, multi-architecture binaries are
 generated by specifying an alternate definition for CC on the command-line.
@@ -170,10 +183,11 @@ libraries, zlib, libpng, and libjpeg.  Crystal Space makes uses of these
 libraries, even though they are not part of the project itself.
 
 These instructions assume that you wish to build multi-architecture libraries.
-If you do not care about this feature, then omit the CC="..." argument from
-the build commands.
+Adjust the CC="..." directive to reflect the architectures you wish to include
+in the generated libraries.  If you do not care about this feature, then omit
+the CC="..." directive altogether.
 
-    % cd cryst/zlib
+    % cd CS/libs/zlib
     % sh ./configure
     % make libz.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
 
@@ -190,103 +204,108 @@ the build commands.
 -----------
 
 The Crystal Space project consists of a number of components and example
-programs.  The following commands must be issued from within the cryst/src
-directory.  To see a list of all targets which can be built by the makefile,
-type:
-
-    % gnumake help
+programs.  The following commands are all issued from within the top level
+Crystal Space source code directory named CS.
 
 To begin building Crystal Space, first configure the makefiles for the
 appropriate platform by typing the correct build command as indicated below.
 
-    Platform    Build Command
-    --------    -------------
-    NextStep    % gnumake nextstep
-    OpenStep    % gnumake openstep
-    Rhapsody    % gnumake rhapsody
+    Platform        Build Command
+    --------        -------------
+    MacOS/X Server  gnumake macosxs
+    OpenStep        gnumake openstep
+    NextStep        gnumake nextstep
 
-Once the makefiles are configured for the appropriate platform, it is
-necessary to build the components which are required by most of the the
-Crystal Space example programs.  To build the components and programs as
-multi-architecture binaries specify the makefile variable TARGET_ARCHS on the
-command-line each time you invoke gnumake, as discussed in the "Architectures"
-section of this document.  To build the components, issue these commands:
+If you want to build multi-architecture binaries of Crystal Space then you can
+specify TARGET_ARCHS on the configuration command line.  Your choice of
+architectures will be remembered and automatically applied to subsequent build
+operations.  For instance, if you want to build Crystal Space executables for
+Intel, Motorola, and Sparc on an OpenStep 4.2 system, you would type:
 
-    % gnumake next2d            # NeXT 2D graphics driver
-    % gnumake soft              # Software renderer
-    % gnumake netdrvn           # Null network driver
-    % gnumake netdrvs           # Socket network driver
-    % gnumake netmann           # Null network manager
-    % gnumake netmans           # Socket network manager
+    % gnumake openstep TARGET_ARCHS="i386 m68k sparc"
 
-The main Crystal Space example program is named "cryst".  With this program
-the user can view and explore the maps.  The unfinished, but still impressive
-map editor is named "mazed".  To build these programs type:
+Once the makefiles have been configured for the appropriate platform, you can
+begin building the Crystal Space demonstration programs.  Alternately, if you
+are interested in building only certain components of the system, such as
+drivers or libraries, then can do that instead.
 
-    % gnumake cs                # cryst, WalkTest the main example program
-    % gnumake mz                # mazed, MazeD the Crystal Space editor
-    % gnumake bl                # blocks, Blocks 3D-Tetris style game
+To see a list of all targets which can be built, type:
+
+    % gnumake help
+
+The prominent Crystal Space demonstration programs are WalkTest, MetaBalls,
+MazeD, and Blocks.  Other applications are also available and are listed in
+the output generated by the help target as mentioned above.
+
+WalkTest is a 3D first-person exploration program.  With it the user can view
+and explore Crystal Space levels or maps.  MetaBalls demonstrates Crystal
+Space's facilities for curved surfaces and dynamic animation.  MazeD is the
+Crystal Space level or map editor.  Blocks is a 3D-Tetris style game.  To
+build these programs type:
+
+    % gnumake walk  # Builds walktest, the level exploration program
+    % gnumake meta  # Builds metademo, the MetaBalls demonstration
+    % gnumake mzed  # Builds mazed, the Crystal Space level editor
+    % gnumake blks  # Builds blocks, the 3D-Tetris style game
 
 
 8. Using Crystal Space
 ----------------------
 
-Make sure that the file "standard.zip" is in the cryst/src directory, as
+Ensure that the file "standard.zip" is in the top-level CS directory, as
 described in the "Unpacking" section of this document.  This file contains
 standard resources which are used by the example programs.
 
-You need to have one or more level files in order to run Crystal Space.  These
-are the files which contain the maps and rooms which you can explore with the
-"cryst" program, and which you can edit with "mazed".
+You need to have one or more level or map files in order to run WalkTest.
+These are the files which contain the maps and rooms which you can explore
+with WalkTest, and edit with MazeD.
 
-Before running Crystal Space for the first time, you should locate the file
-"cryst.cfg" which is in the cryst/src directory.  This file contains
-parameters which affect the Crystal Space environment such as mixing mode for
-lights, texture mapping modes, and light ambience.
+Before running the demonstration programs for the first time, you should
+locate the file cryst.cfg in the top-level CS directory.  This file contains
+parameters which control Crystal Space's environment.
 
-By default, the overall ambient light level is generally too dark for
-NextStep, OpenStep, and Rhapsody.  To fix this, edit the file cryst.cfg, and
-find the line which reads "AMBIENT_WHITE=".  Change the value of AMBIENT_WHITE
-to a value more suitable for the target platform, as summarized below:
+By default, the overall ambient light level specified in cryst.cfg is
+generally too dark for MacOS/X Server, OpenStep, and NextStep.  To correct
+this problem, edit cryst.cfg and change the line which reads "AMBIENT_WHITE=".
+Set the value of AMBIENT_WHITE to a level more suitable for the target
+platform, as summarized below:
 
-    Platform    Setting
-    --------    -------
-    NextStep    AMBIENT_WHITE=40
-    OpenStep    AMBIENT_WHITE=40
-    Rhapsody    AMBIENT_WHITE=60
+    Platform        Setting
+    --------        -------
+    MacOS/X Server  AMBIENT_WHITE=60
+    OpenStep        AMBIENT_WHITE=40
+    NextStep        AMBIENT_WHITE=40
 
 The first time you explore a level after changing the AMBIENT_WHITE value,
 Crystal Space will automatically recalculate the lights in the map.  This
 process can be quite time consuming, particularly for sizable levels such as
-"large.zip", so be patient.
+large.zip, so be patient.
 
-To run the Crystal Space "WalkTest" demonstration program, type:
+To run the WalkTest demonstration program, type:
 
-    % ./cryst ../data/large.zip
+    % ./walktest data/large.zip
 
-This example allows you to explore the level "large.zip".  To explore a
-different level, substitute its name in place of "large.zip".
+With this command, you will be able to explore the level file large.zip.  To
+explore a different level, substitute its name in place of large.zip.
 
-The Crystal Space editor, MazeD, can be run with this command:
+MetaBalls, MazeD, and Blocks can be run with the following commands:
 
+    % ./metademo
     % ./mazed
-
-Blocks, the 3D-Tetris style game can be run with this command:
-
     % ./blocks
 
 
 9. Controls
 -----------
 
-The document cryst/docs/keys.txt summarizes the keys which can be used to move
-around and explore the level with the Crystal Space example program "cryst".
+To learn how to operate the demonstration programs, you may want to read the
+documentation files keys.txt & console.txt which explain how to control
+WalkTest, as well as mazed.html & blocks.txt which explain MazeD and Blocks,
+respectively.
 
-This same program also features a console into which the user can type
-commands to interact with the program.  To access the console while running
-the program, press the Tab key.  To get help and a list of commands which the
-console response to, type "help".  To exit from the console and resume the
-interactive exploration of the level, press Tab a second time.
-
-The document cryst/docs/blocks.txt summarizes the keys which can be used to
-play Blocks, the 3D-Tetris style game.
+In addition to providing a first-person exploration experience, WalkTest also
+features a console into which the user can type commands to interact with the
+program.  To access the console while running the program, press the Tab key.
+To get help and a list of commands which the console responds to, type "help".
+To exit from the console and resume the interactive exploration of the level,
+press Tab a second time.

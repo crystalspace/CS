@@ -1,9 +1,9 @@
 ===============================================================================
-    Crystal Space for NextStep, OpenStep, Rhapsody (MacOS/X Server) DR2
+    Crystal Space for MacOS/X Server, OpenStep, NextStep
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/03/02
+    1999/07/16
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -27,41 +27,40 @@
 ---------------
 
 This document contains comprehensive and detailed implementation information
-about the NextStep 3.3, OpenStep 4.2, and Rhapsody (MacOS/X Server) DR2 ports
-of Crystal Space.  Installation and usage information can be found in the
-associated document, INSTALL.NeXT.
+about the MacOS/X Server, OpenStep 4.2, and NextStep 3.3 ports of Crystal
+Space.  Installation and usage information can be found in the associated
+document, INSTALL.NeXT.
 
-Crystal Space was ported to NextStep, OpenStep, and Rhapsody by Eric Sunshine
-in February of 1999.  If you have questions or comments about this port,
-please contact me at: Eric Sunshine <sunshine@sunshineco.com>.
+Crystal Space was ported to MacOS/X Server, OpenStep, and NextStep by Eric
+Sunshine in February of 1999.  If you have questions or comments about this
+port, please contact me at: Eric Sunshine <sunshine@sunshineco.com>.
 
 This project may be built for any of the architectures which are supported by
 the standard developer tools, as summarized below.
 
-    Platform    Architectures           Tested
-    --------    -------------           ------
-    NextStep    i386 m68k sparc hppa    i386 m68k
-    OpenStep    i386 m68k sparc         i386 m68k
-    Rhapsody    i386 ppc                i386
+    Platform        Architectures           Tested
+    --------        -------------           ------
+    MacOS/X Server  i386 ppc                i386 ppc
+    OpenStep        i386 m68k sparc         i386 m68k
+    NextStep        i386 m68k sparc hppa    i386 m68k sparc
 
 It is possible to build multi-architecture binaries (MAB) by using the
-standard NeXT makefile variable TARGET_ARCHS on the command-line.  See the
-"Architectures" section in INSTALL.NeXT for a full discussion of this
+standard Apple/NeXT makefile variable TARGET_ARCHS on the command-line.  See
+the "Architectures" section in INSTALL.NeXT for a full discussion of this
 facility.
 
-Although the current trend with non-NeXT ports of Crystal Space is to make
-extensive use of dynamically loaded modules, this implementation does not
-currently provide such support since NextStep, OpenStep, and Rhapsody provide
-little or no facilities for looking up C++ class names in dynamically loaded
-modules.  Consequently, "plug-in" renderers are not yet supported.
+Although the current trend with non-NeXT ports of Crystal Space is to make use
+of dynamically loaded modules, this implementation does not currently provide
+such support.  Therefore, at this time, "plug-in" renderers are not supported.
+This limitation is subject to change in the future.
 
 This implementation makes use of public AppKit API to interface with the
 Display PostScript Server (DPS) for all animation and event handling.  It does
 not make use of the private, undocumented & unsupported Interceptor library.
 
-A future version of the Rhapsody port may make use of the new public API for
-direct frame-buffer access provided by the NSDirectBitmap, NSDirectPalette,
-and NSDirectScreen classes.
+A future version of the MacOS/X Server port may make use of the new public API
+for direct frame-buffer access provided by the NSDirectBitmap,
+NSDirectPalette, and NSDirectScreen classes.
 
 
 2. BOOL vs. BOOL
@@ -96,7 +95,7 @@ the "Files" section of this document.
 
 Other classes have been dissected in a similar fashion in order to work around
 the BOOL conflict.  In general a class named "SomeClass" is split into
-component parts via the following pattern.
+component parts in the following manner.
 
     SomeClass           A skeleton COM-based class.  Acts as a shell which
                         forwards messages to a proxy which does the real work.
@@ -110,50 +109,51 @@ component parts via the following pattern.
 3. Directories
 --------------
 
-The root of this port of Crystal Space is the directory src/system/next.
-Relative to this directory, in platform-specific subdirectories, are the the
-files comprising the associated NextStep, OpenStep, and Rhapsody components.
-The contents of the subdirectories of src/system/next are summarized below.
+The root components of this port of Crystal Space are in the directories
+CS/libs/cssys/next and CS/libs/cssys/cs2d/next.  Relative to each directory,
+in platform-specific subdirectories, are the the files comprising the
+associated MacOS/X Server, OpenStep, and NextStep components.  The contents of
+the subdirectories of CS/libs/cssys/next and CS/libs/cs2d/next are summarized
+below.
 
     Directory           Contents
     ---------           --------
-    shared              Resources common to NextStep, OpenStep & Rhapsody.
+    shared              Resources common to MacOS/X Server, OpenStep & NextStep
+    macosxs             Resources specific to MacOS/X Server.
+    openstep            Resources specific to OpenStep & MacOS/X Server.
     nextstep            Resources specific to NextStep.
-    openstep            Resources specific to OpenStep & Rhapsody.
-    rhapsody            Resources specific to Rhapsody.
 
 Functionally, this port is comprised of two distinct system-dependent modules.
 
 1) The core components which provide low-level platform-specific functionality
-   to the Crystal Space engine.  These files and resources are located
-   directly in the platform-specific subdirectory for the given port.  For
-   instance, files specific to the NextStep port reside in
-   src/system/next/nextstep, while files common to all three platforms reside
-   in src/system/next/shared.
+   to the Crystal Space engine.  These files and resources are located in
+   platform-specific subdirectories of CS/libs/cssys/next.  For instance,
+   files specific to the MacOS/X Server port reside in
+   CS/libs/cssys/next/macosxs, whereas files common to all three platforms
+   reside in CS/libs/cssys/next/shared.
 
 2) The library which provides 2D graphics capability into which Crystal Space
-   renders its images.  These files and resources are located in a
-   subdirectory named driver2d.  For instance, files specific to the NextStep
-   port reside in src/system/next/nextstep/driver2d, while files common to all
-   three platforms reside in src/system/next/shared/driver2d.
+   renders its images.  These files and resources are located in
+   platform-specific subdirectories of CS/libs/cs2d/next.  For instance, files
+   specific to the MacOS/X Server port reside in CS/libs/cs2d/next/nextstep,
+   whereas files common to all three platforms reside in
+   CS/libs/cs2d/next/shared.
 
 
 4. Files
 --------
 
 This port of Crystal Space makes use of a number of platform-specific
-makefiles which are located in src/mk/system.  A makefile exists for each
+makefiles which are located in CS/mk/system.  A makefile exists for each
 target platform.
 
-    nextstep.mak            Defines NextStep-specific attributes.
-    openstep.mak            Defines OpenStep-specific attributes.
-    rhapsody.mak            Defines Rhapsody-specific attributes.
+    macosxs.mak             Defines MacOS/X Server-specific build attributes.
+    openstep.mak            Defines OpenStep-specific build attributes.
+    nextstep.mak            Defines NextStep-specific build attributes.
+    next.mak                Common to all three platforms; controls the build.
 
-The remaining makefiles actually drive the build process and are common to all
-platforms.
-
-    next.mak                Defines build options and targets.
-    next2d.mak              Builds NeXT-specific 2D graphics library.
+An additional makefile, CS/libs/cs2d/next/next2d.mak is common to all three
+platforms and controls the build process for the 2D display driver.
 
 The core components provide low-level platform-specific functionality which
 Crystal Space requires.  This includes interfaces to the underlying operating
@@ -202,8 +202,8 @@ AppKit's Application class.  The files comprising this module are:
 
     NeXTfopen.cpp           Platform-specific implementations of
     NeXTprintf.cpp          csSystemDriver::fopen(), csSystemDriver::printf(),
-    NeXTTime.cpp            and csSystemDriver::Time() which work on NextStep,
-                            OpenStep, and Rhapsody.
+    NeXTTime.cpp            and csSystemDriver::Time() which work on MacOS/X
+                            Server, OpenStep, and NextStep.
 
     malloc.h                A header which works around Crystal Space's misuse
                             of the deprecated <malloc.h> header.
@@ -211,14 +211,15 @@ AppKit's Application class.  The files comprising this module are:
     osdefs.h                Implementation of platform-specific operating
                             system functionality.  Allows Crystal Space to
                             treat the operating system services abstractly.
-                            Included by system/sysdef.h.
+                            Located in CS/include/cssys/next, and included by
+                            CS/include/sysdef.h.
 
-The "driver2d" directories house the NeXT 2D graphics library which provides
-2D graphics capability to the Crystal Space engine.  This library is
-responsible for providing a hardware-specific frame-buffer into which Crystal
-Space can draw.  It is also responsible for actually displaying the
-frame-buffer in a manner which is appropriate for the given platform.  The
-files comprising the 2D graphics library are:
+The NeXT 2D graphics library in CS/libs/cs2d/next provides 2D graphics
+capability to the Crystal Space engine.  This library is responsible for
+providing a hardware-specific frame-buffer into which Crystal Space can draw.
+It is also responsible for actually displaying the frame-buffer in a manner
+which is appropriate for the given platform.  The files comprising the 2D
+graphics library are:
 
     NeXTDriver2DFactory.cpp The COM server object which knows how to vend
     NeXTDriver2DFactory.h   NeXTDriver2D objects to clients.
@@ -302,10 +303,10 @@ as the name implies, provides the capability of recursive run-loop invocation
 by patching and overriding the default run-loop behavior.  The implementation
 of this method is contained in NeXTSystemProxy.cpp.
 
-In the long run Crystal Space should probably be re-engineered so that it runs
-as a client in a surrounding application framework, rather than forcing the
-application environment into the subordinate position.  This would be more in
-line with today's "windowed" computing environments where most application
+In the long run, it may be desirable to re-engineer Crystal Space so that it
+runs as a client in a surrounding application framework, rather than forcing
+the application environment into the subordinate position.  This would be more
+in line with today's "windowed" computing environments where most application
 specific functionality is contained within a generic application framework.
 The current design is geared more toward outmoded command-line environments,
 such as DOS or Unix, where the program can simply take control of the entire
@@ -315,13 +316,13 @@ environment without regard to other outside factors.
 6. Video Optimizations
 ----------------------
 
-Unlike programs on some other platforms, NextStep and OpenStep applications do
+Unlike programs on some other platforms, OpenStep and NextStep applications do
 not have direct access to the display hardware, thus video performance
-suffers.  The final customer release of Rhapsody may include a facility for
-accessing display hardware directly, but said facility has not finalized in
-the current developer release (DR2).
+suffers.  As MacOS/X Server and MacOS/X evolve, they may include facilities
+for accessing display hardware directly, but at this time these facilities
+have not been finalized.
 
-Under NextStep, OpenStep, and Rhapsody, all drawing to the display is
+Under MacOS/X Server, OpenStep, and NextStep, all drawing to the display is
 performed by a separate program called the WindowServer.  Whenever an
 applications needs to draw to the screen, it actually sends drawing commands
 across an IPC connection to the WindowServer and the WindowServer performs the
@@ -346,7 +347,7 @@ performance in essentially three ways.
        application may supply image data in the format RRRRGGGGBBBBAAAA, which
        may be converted to RRRRRGGGGGGBBBBB by the WindowServer.
 
-This port of Crystal Space implements video optimizations discussed in the the
+This port of Crystal Space implements video optimizations discussed in the
 NextStep 3.0 WindowServer release notes in order to work around these problems
 as much as possible.  The optimizations are:
 
@@ -354,7 +355,8 @@ as much as possible.  The optimizations are:
       window server as out-of-band data in a Mach message.  This is very fast
       since the data need only be mapped into the WindowServer's address space
       rather than actually copied.  Such alignment is guaranteed by using
-      vm_allocate() on NextStep, and NSAllocateMemoryPages() on OpenStep.
+      NSAllocateMemoryPages() on MacOS/X & OpenStep, and vm_allocate() on
+      NextStep.
 
     o Image samples are organized in a meshed format.
 
@@ -381,18 +383,18 @@ as much as possible.  The optimizations are:
 Many of these optimizations are actually geared toward traditional NeXT (m68k)
 hardware and may not be as effective on other platforms such as Intel.  In
 some cases using these optimizations on original NeXT hardware, can result in
-a very dramatic improvement in video performance.  In all cases, it is claimed
-that the WindowServer has been hand-optimized to perform well on each platform
-when given data meeting these conditions.  Therefore following these
-guidelines is sensible even for non-NeXT hardware.
+a very dramatic improvement in video performance.  In all cases, it is
+presumed that the WindowServer has been hand-optimized to perform well on each
+platform when presented with data meeting these prerequisites.  Therefore
+following these guidelines is sensible even for non-NeXT hardware.
 
 Some further optimizations are employed which are not discussed in the
 WindowServer release notes.  These include:
 
     o Disabling PostScript "clipping" in the View in which the image is
-      displayed.  (Not applicable to OpenStep.)
+      displayed.  (Not applicable to MacOS/X Server or OpenStep.)
 
-    o Allocating a PostScript "gstate" for the View which saves valuable time
+    o Allocating a PostScript "gstate" for the view.  This saves valuable time
       whenever focusing on the view, though at the expense of memory.  Without
       the gstate the view has to perform certain time-consuming actions each
       time it is focused upon.
@@ -406,10 +408,10 @@ WindowServer release notes.  These include:
 7. Palette
 ----------
 
-With few exceptions, most NextStep, OpenStep, and Rhapsody configurations use
-"true color" rather than palletized color.  However, "true color" is rather
-relative in this case since the AppKit supports only a limited number of
-configurations for image data.  In particular, these are:
+With few exceptions, most MacOS/X Server, OpenStep, and NextStep
+configurations use "true color" rather than palettized color.  However, "true
+color" is rather relative in this case since the AppKit supports only a
+limited number of configurations for image data.  In particular, these are:
 
     2-bit gray          NX_TwoBitGrayDepth
     8-bit gray          NX_EightBitGrayDepth
@@ -417,9 +419,9 @@ configurations for image data.  In particular, these are:
     12-bit color        NX_TwelveBitRGBDepth
     24-bit color        NX_TwentyFourBitRGBDepth
 
-OpenStep and Rhapsody DR2 take a stab at providing more comprehensive color
-depth support, but in their current state, these facilities provide little, if
-any, additional assistance and, consequently, are not discussed further.
+MacOS/X Server and OpenStep take a stab at providing more comprehensive color
+depth support, but in their current state, these facilities provide little
+additional assistance and, consequently, are not discussed further.
 
 At the lowest level, the WindowServer itself supports additional
 configurations and adjusts appropriately to the underlying hardware.  The
@@ -436,10 +438,10 @@ performance, 12-bit and 24-bit data must include an alpha channel and all
 alpha bits must be set to one.
 
 Unfortunately Crystal Space is unable to produce image data in a format usable
-by the NeXT WindowServer when video performance is a concern.  This is
-unfortunate since it means that this port must itself massage the data into a
-suitable format and that tends to be a time consuming operation.  Crystal
-Space is unable to produce the proper image format for two reasons.
+by the WindowServer when video performance is a concern.  This is unfortunate
+since it means that this port must itself massage the data into a format
+suitable to the WindowServer, and that tends to be a time consuming operation.
+Crystal Space is unable to produce the proper image format for two reasons.
 
     1) The rendering engine has no facilities for forcing certain unused bits
        to conform to a certain value.  In this case the alpha bits need to be
@@ -502,6 +504,14 @@ this limitation may not be particularly severe.
 ---------------
 This is a list of items which are planned for future releases of this project.
 
+    o Rewrite code which queries for device depth.  It should really be
+      querying the WindowServer directly instead of the AppKit, since the
+      WindowServer has a better notion of its preferred image format.  Under
+      NextStep the WindowServer and AppKit will return the same value, however
+      as of OpenStep 4.1, the values may differ, and the WindowServer's result
+      should be taken as the truth.
+    o NeXTSystemProxy.h is identical in the nextstep & openstep directories.
+      It can be moved to the shared directory.
     o Possibly implement sound support.
     o Consult with Jorrit concerning "true color" video modes.  The more I
       think about it, the more I think it can be implemented without too much
@@ -513,6 +523,21 @@ This is a list of items which are planned for future releases of this project.
 -------
 This is a list of known problems with the current release of this project.
 
+    o In NeXTDelegate.cpp, all values are inappropriately being assigned to
+      the variable "s":
+        - (void)isEvent:(NSEvent*)p shift:(bool*)s alt:(bool*)a ctrl:(bool*)c
+            {
+            unsigned int const flags = [p modifierFlags];
+            *s = (flags & NSShiftKeyMask    ) != 0;
+            *s = (flags & NSAlternateKeyMask) != 0;
+            *s = (flags & NSControlKeyMask  ) != 0;
+            }
+      This entire method can probably be dropped.  It is only used by
+      -mouseDown: to determine which modifiers are depressed.  However, since
+      NeXTDelegate is already keeping state information for each of the
+      modifiers from -flagsChanged: events, this information is already
+      available and need not be extracted a second time from the mouse-down
+      event.
     o The NextStep compiler generates invalid code at locations which make COM
       queries for the IID_IHaloRasterizer module.  This is the only COM module
       which is derived with multiple-inheritance, and it is the only module
@@ -527,25 +552,38 @@ This is a list of known problems with the current release of this project.
       (BEGIN_INTERFACE_TABLE) in graph2d.cpp, the problem disappears.
       Currently conditional compilation directives are used to ignore the
       offending code.
-    o When compiled with "debug" on OpenStep 4.2, applications crash upon 
-      invocation of csVector constructor.  Works fine when compiled with 
-      "optimized".  
-    o Keyboard events generated with the "alt" modifier are not correctly
-      translated to Crystal Space events.  The reason is that NextStep "cooks"
-      the key-code completely into some other character prior to sending the
-      key-down event, and there is no way to recover the original unmodified
-      key-code.  This is a short-coming in NeXT's event system.  Fortunately
-      neither OpenStep nor Rhapsody suffer from this problem since both
-      provide the much needed ability to recover the uncooked key-code.  One
-      possible solution to this problem for NextStep is to use the raw
-      keyboard scan-code and manually cook that into the appropriate ASCII
-      key-code, but this is a very ugly solution since there are at least
-      seven distinct keyboard / hardware combinations that NextStep runs on,
-      and it would be necessary to hard-code scan-codes for each one.
+    o When compiled with "debug" on OpenStep 4.2, applications crash upon
+      invocation of csVector constructor.  Works fine when compiled with
+      "optimized".
+    o Keyboard events generated with the "alt" modifier are not correctly 
+      translated to Crystal Space events.  The reason is that NextStep "cooks" 
+      the key-code completely into some other character prior to sending the 
+      key-down event, and there is no way to recover the original unmodified 
+      key-code.  This is a short-coming in NeXT's event system.  Fortunately 
+      neither MacOS/X Server nor OpenStep suffer from this problem since both 
+      provide the much needed ability to recover the uncooked key-code.  One 
+      possible solution to this problem for NextStep is to use the raw 
+      keyboard scan-code and manually cook that into the appropriate ASCII 
+      key-code, but this is a very ugly solution since there are at least 
+      seven distinct keyboard / hardware combinations that NextStep runs on, 
+      and it would be necessary to hard-code scan-codes for each one.  
 
 
 10. History
 -----------
+1999/07/16 (13r012+CVS)
+    Updated all ports to work with Crystal Space beta 13.  Much has changed
+        including a new directory hierarchy.  Updated all documentation to
+        reflect new beta 13 organization.
+    Fixed various compiler warnings in MazeD, impexp.cpp, socket driver,
+        math2d.h, and MetaBalls.
+    Added a 'distclean' target to the makefile.
+    Removed redundant code and hard-coded constants from Makefile and cs.mak.
+    Updated makefiles so that drivers2d, drivers3d, netdrivers, snddrivers,
+        and drivers targets work even for platforms which specify USE_DLL=no.
+    Updated PrimEdit to work with beta 13.
+    Now TARGET_ARCHS is a "sticky" option, specified at configuration time.
+
 1999/03/02 (12r002)
     Fixed a very nasty crasher where Bot::move() was trying to generate a unit
         vector from <0,0,0>.  Unfortunately Vector3::unit() which computes
@@ -563,7 +601,8 @@ This is a list of known problems with the current release of this project.
         the clock also pauses.  This prevents program AI from experiencing a
         temporal anomaly when execution is resumed.
     Added a README.Binaries file which will be included in the binary-only
-	distributions of Crystal Space for NextStep, OpenStep, & Rhapsody.
+        distributions of Crystal Space for MacOS/X Server, OpenStep, and
+	NextStep.
 
 1999/03/02 (12r001)
     Moved the Blocks game into the cryst/src/general directory.  It used to be
