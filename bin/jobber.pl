@@ -87,7 +87,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '29';
+my $PROG_VERSION = '30';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2004 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -301,14 +301,18 @@ my $CAPTURED_OUTPUT = '';
 # needs to be configured, however the SourceForge shell machine does not have
 # compilers installed, thus we can not configure the project with the Autoconf
 # "configure" script.  Instead, we fake up project configuration by creating a
-# minimal Jamconfig and Jamfile.  (Note that the quoted 'EOF' is intentaional.
-# It prevents the shell from interpreting embedded $ symbols.)
-my $CONFIGURE = "cat << 'EOF' > Jamconfig\n" .
+# minimal Jamconfig and Jamfile.
+my $CONFIGURE = 
+    "csver=`./configure --version | awk '/crystal/ { print \$3 }'`\n" .
+    "csverlist=`echo \$csver | tr '.' ' '`\n" .
+    "copy=`sed '/\\[[Cc]opyright/!d;s/[^[]*\\[\\([^]]*\\)\\].*/\\1/'" .
+    "  < configure.ac`\n" .
+    "cat << EOF > Jamconfig\n" .
     "CMD.C++ ?= \"g++\" ;\n" .
     "CMD.CC ?= \"gcc\" ;\n" .
     "CMD.DOXYGEN ?= \"doxygen\" ;\n" .
     "CMD.DVIPS ?= \"dvips\" ;\n" .
-    "CMD.LINK ?= \"\$(CMD.C++)\" ;\n" .
+    "CMD.LINK ?= \"\\\$(CMD.C++)\" ;\n" .
     "CMD.MAKEINFO ?= \"makeinfo\" ;\n" .
     "CMD.MKDIR ?= \"mkdir\" ;\n" .
     "CMD.MKDIRS ?= \"mkdir -p\" ;\n" .
@@ -320,14 +324,13 @@ my $CONFIGURE = "cat << 'EOF' > Jamconfig\n" .
     "JAMCONFIG_READ ?= \"yes\" ;\n" .
     "MODE ?= \"optimize\" ;\n" .
     "MSVCGEN_SILENT ?= \"yes\" ;\n" .
-    "PACKAGE_COPYRIGHT ?= \n" .
-    "  \"Copyright (C)1998-2004 Jorrit Tyberghein and others\" ;\n" .
+    "PACKAGE_COPYRIGHT ?= \"\$copy\" ;\n" .
     "PACKAGE_HOMEPAGE ?= \"http://crystal.sourceforge.net/\" ;\n" .
     "PACKAGE_LONGNAME ?= \"Crystal Space\" ;\n" .
     "PACKAGE_NAME ?= \"crystal\" ;\n" .
-    "PACKAGE_VERSION_LIST ?= 0 97 ;\n" .
-    "PACKAGE_VERSION ?= \"0.97\" ;\n" .
-    "PACKAGE_STRING ?= \"crystal 0.97\" ;\n" .
+    "PACKAGE_STRING ?= \"crystal \$csver\" ;\n" .
+    "PACKAGE_VERSION ?= \"\$csver\" ;\n" .
+    "PACKAGE_VERSION_LIST ?= \$csverlist ;\n" .
     "PERL ?= \"perl\" ;\n" .
     "PERL5.AVAILABLE ?= \"yes\" ;\n" .
     "PYTHON ?= \"python\" ;\n" .

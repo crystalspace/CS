@@ -6,15 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Apr-2004
+	- Eric Sunshine augmented jobber.pl so that the Crystal Space version
+	  number and copyright are now gleaned from the configure script rather
+	  than being hard-coded into jobber.pl.
 24-Apr-2004
 	- Jorrit fixed a compile bug in glshader_fixed. 'friend' needs
 	  'struct'.
 	- Jorrit started unifying the engine a bit between OR and NR usage
-	  (involves bringing the OR a bit closer to the NR in way of operations).
-	  The advantage of this is that I can clean up a lot of OR specific
-	  code that way. This unification currently involved sharing the
-	  ObjectVisible callback in csSector so the same callback code is used
-	  in OR and NR.
+	  (involves bringing the OR a bit closer to the NR in way of
+	  operations).  The advantage of this is that I can clean up a lot of
+	  OR specific code that way.  This unification currently involved
+	  sharing the ObjectVisible callback in csSector so the same callback
+	  code is used in OR and NR.
 	- res fixed the rain and partgen Jamfiles to also depend on csgfx.
 	- res added PACKAGE_VERSION and PACKAGE_STRING to the jobber Jamconfig.
 	- res changed the render mesh holder to automatically set the inUse
@@ -93,7 +97,7 @@ chronological order.
 	  it will now return the index of the triangle that was hit.
 	  That way it will also work with iSector->HitBeam() and
 	  HitBeamPortals().
-	- Jorrit removed the csRenderContextFrustum class and merged it with 
+	- Jorrit removed the csRenderContextFrustum class and merged it with
 	  csRenderContext. There is a one-to-one relationship between
 	  those classes so it doesn't make sense to have the additional
 	  overhead (more pointer redirection, more object management) for this.
@@ -287,8 +291,8 @@ chronological order.
 	      package name.
 	- Eric Sunshine eliminated TeX 'underfull hbox' warning from
 	  apimod98.txi.
-	- res added a workaround to csArray<>::Push() for the case an element 
-	  from the array itself was pushed. Under certain circumstance, bogus 
+	- res added a workaround to csArray<>::Push() for the case an element
+	  from the array itself was pushed. Under certain circumstance, bogus
 	  data was pushed onto the array.
 18-Apr-2004
 	- Eric Sunshine fixed CS/bin/autogen.sh so that it returns the exit
