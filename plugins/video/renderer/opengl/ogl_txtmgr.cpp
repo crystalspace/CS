@@ -634,6 +634,7 @@ void csTextureHandleOpenGL::ComputeMeanColor (int w, int h, csRGBpixel *src)
   int pixels = w * h;
   unsigned r = 0, g = 0, b = 0;
   int count = pixels;
+  CS_ASSERT (pixels > 0);
   has_alpha = false;
   while (count--)
   {

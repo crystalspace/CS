@@ -5,6 +5,9 @@ The history order is reversed so that new features are at the top.
 	- Fixed simplept so it works again. Basically there was a problem
 	  with timing of asking for the 3D interface. Still doesn't work
 	  with OpenGL for some reason.
+	- Added an assert in OpenGL to check for a case that should
+	  never happen but which apparently occurs on some systems (texture
+	  dimensions 0).
 28-Sep-2002
 	- Fixed a new bug with iSector->HitBeam() in octree based
 	  levels.
