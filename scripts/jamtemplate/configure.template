@@ -34,10 +34,10 @@ AS_IF([test -z "$CXX"],
 CS_PROG_LINK
 
 AC_CHECK_PROGS([INSTALL], [install])
-AS_IF([test -n "$INSTALL"], [CS_JAMCONFIG_PROPERTY([CMD.INSTALL], [$INSTALL])])
+AS_IF([test -n "$INSTALL"], [CS_JAMCONFIG_PROPERTY([INSTALL], [$INSTALL])])
 
 AC_PROG_RANLIB
-AS_IF([test -n "$RANLIB"], [CS_JAMCONFIG_PROPERTY([CMD.RANLIB], [$RANLIB])])
+AS_IF([test -n "$RANLIB"], [CS_JAMCONFIG_PROPERTY([RANLIB], [$RANLIB])])
 
 #----------------------------------------------------------------------------
 # Determine system type

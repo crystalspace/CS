@@ -188,7 +188,7 @@ CS_HEADER_PROPERTY([CS_COMPILER_NAME],
     [AS_ESCAPE(["])$cs_compiler_name[]AS_ESCAPE(["])])
 
 AC_PROG_RANLIB
-CS_BUILD_PROPERTY([CMD.RANLIB], [$RANLIB])
+CS_BUILD_PROPERTY([RANLIB], [$RANLIB])
 
 AC_CHECK_TOOLS([DLLTOOL], [dlltool])
 CS_BUILD_PROPERTY([CMD.DLLTOOL], [$DLLTOOL])
@@ -228,7 +228,7 @@ AC_CHECK_PROGS([MAKEINFO], [makeinfo])
 CS_BUILD_PROPERTY([CMD.MAKEINFO], [$MAKEINFO])
 
 AC_CHECK_PROGS([INSTALL], [install])
-CS_BUILD_PROPERTY([CMD.INSTALL], [$INSTALL])
+CS_BUILD_PROPERTY([INSTALL], [$INSTALL])
 
 AC_CHECK_PROGS([SWIGBIN], [swig])
 AS_IF([test -n "$SWIGBIN"],
@@ -1011,7 +1011,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     AC_REQUIRE([AC_PROG_CXX])
 
     # MacOS/X Panther ranlib complains if -s option is omitted.
-    AS_IF([test -n "$RANLIB"], [CS_BUILD_PROPERTY([CMD.RANLIB], [-s], [+])])
+    AS_IF([test -n "$RANLIB"], [CS_BUILD_PROPERTY([RANLIB], [-s], [+])])
 
     # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
     # a way to distinguish between the two.  If Carbon.h is present, then

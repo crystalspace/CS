@@ -76,7 +76,7 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     AC_REQUIRE([AC_PROG_CXX])
 
     # MacOS/X Panther ranlib complains if -s option is omitted.
-    AS_IF([test -n "$RANLIB"], [CS_JAMCONFIG_PROPERTY([CMD.RANLIB], [-s], [+])])
+    AS_IF([test -n "$RANLIB"], [CS_JAMCONFIG_PROPERTY([RANLIB], [-s], [+])])
 
     # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
     # a way to distinguish between the two.  If Carbon.h is present, then

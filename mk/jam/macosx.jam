@@ -25,25 +25,28 @@ actions Archive
 #------------------------------------------------------------------------------
 
 # ConstructApplicationTarget target : options
-#    Constructs the application target name (ie. foo.app for foo)
+#    Constructs the application target name.
 rule ConstructApplicationTarget
 {
   return $(<) ;
 }
 
 # ConstructLibraryTarget target : options
+#    Constructs the library target name.
 rule ConstructLibraryTarget
 {
       return lib$(<).a ;
 }
 
-# ConstructPluginTarget : options
+# ConstructPluginTarget target : options
+#    Constructs the plugin target name.
 rule ConstructPluginTarget
 {
     return $(<).csbundle ;
 }
 
 # SystemLinkApplication target : objects : options
+#    Apply appropriate rule to link the application based upon the options.
 rule SystemLinkApplication
 {
     local target = $($(<)_TARGET) ;
@@ -51,17 +54,17 @@ rule SystemLinkApplication
     if [ IsElem console : $(3) ]
     {
         LinkApplicationConsole $(target) : $(>) ;
-        Clean clean : $(target) ;
-        Clean $(<)clean : $(target) ;
+        Clean clean $(<)clean : $(target) ;
     }
     else
     {
         CreateApplicationWrapper $(target) : $(>) ;
-        CleanDir clean : [ Wrapper $(<) : app ] ;
-        CleanDir $(<)clean : [ Wrapper $(<) : app ] ;
+        CleanDir clean $(<)clean : [ Wrapper $(<) : app ] ;
     }
 }
 
+# SystemInstallApplication target : subdirs : options
+#    Apply appropriate rule to install the application based upon the options.
 rule SystemInstallApplication
 {
     if [ IsElem console : $(3) ]
@@ -70,17 +73,20 @@ rule SystemInstallApplication
     }
     else
     {
-        InstallApplicationGUI $(<) ;
+        InstallApplicationGUI $(<) : $(bindir) $(2) ;
     }
 }
 
+# SystemInstallPlugin target : subdirs : options
+#    Apply appropriate rule to install the plugin based upon the options.
 rule SystemInstallPlugin
 {
-    Depends install_plugin : [ DoInstall $(<) : $(plugindir) $(2) :
-        $(INSTALL_PROGRAM) ] ;
+    Depends install_plugin :
+	[ DoInstall $(<) : $(plugindir) $(2) : $(INSTALL_PROGRAM) ] ;
 }
 
 # SystemLinkPlugin target : objects : options
+#    Link a plugin module and handle meta-data appropriately.
 rule SystemLinkPlugin
 {
     local target = $($(<)_TARGET) ;
@@ -322,7 +328,8 @@ rule AppIcon
     local icon = $(>:G=$(<)) ;
     Depends $(<) : $(icon) ; 
     Depends $(icon) : $(>) ;
-    MakeLocate $(icon) : [ FDirName [ Wrapper $(<) : app ] Contents Resources ] ;
+    MakeLocate $(icon) : 
+      [ FDirName [ Wrapper $(<) : app ] Contents Resources ] ;
     AppIcon1 $(icon) : $(>) ;
     Clean clean : $(icon) ;
     Clean $(<)clean : $(icon) ;
@@ -333,29 +340,27 @@ actions AppIcon1
     $(CP) $(>) $(<)
 }
 
-# InstallApplicationGUI installapp : app
-#    Overrides InstallApplicationGUI from install.jam.  Unlike applications
-#    on other platforms which exist as a single executable file, on MacOS/X,
-#    an application is wrapped in a directory hierarchy, thus a deep copy is
-#    needed (i.e. the typical Install rule does not work).
+# InstallApplicationGUI app : installdirs
+#    Install a GUI application.  Unlike applications on other platforms which
+#    exist as a single executable file, on MacOS/X, an application is wrapped
+#    in a directory hierarchy, thus a deep copy is needed (i.e. the typical
+#    Install rule does not work).
 rule InstallApplicationGUI
 {
-    local target = $(<).app ;
-    local wrapper = [ Wrapper $(>) : app ] ;
+    local wrapper = $(<).app ;
+    Depends $(wrapper) : $(<) ;
     SEARCH on $(wrapper) = $(LOCATE.TARGETS) ;
-    NotFile $(<) ;
-    Always $(<) ;
-    Depends $(<) : $(target) ;
-    Depends $(target) : $(<:D:G=dir) ; # Ensure installation directory exists.
-    MkDir $(<:D:G=dir) ;
-    Depends $(target) : $(wrapper) ;
-    Depends $(wrapper) : $(>) ;
-    InstallApplicationWrapper $(target) : $(wrapper) ;
+
+    # Yuck! Internal knowledge of how DoInstall composes 'dir' and 'target'.
+    local dir = [ ConcatDirs $(DESTDIR) $(2) ] ;
+    local target = $(wrapper:BSR=$(dir):G=install) ;
+
+    InstallApplicationWrapperPrepare $(target) ;
+    Depends install_bin :
+	[ DoInstall $(wrapper) : $(2) : "$(DEEPCOPY)" ] ; 
 }
 
-actions InstallApplicationWrapper
+actions InstallApplicationWrapperPrepare
 {
     $(DELTREE) $(<) ;
-    $(DEEPCOPY) $(>) $(<) ;
 }
-

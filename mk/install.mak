@@ -170,7 +170,7 @@ endef
 # set of archives, and we want the expansion to be a series of "ranlib"
 # commands, one per line.
 define INSTALL.RANLIB
-  $(CMD.RANLIB) $(F)
+  $(RANLIB) $(F)
 
 endef
 
@@ -226,7 +226,7 @@ endif
 # Install static libraries.
 install_staticlibs: $(INSTALL_LIB.DIR)
 	$(CP) $(TO_INSTALL.STATIC_LIBS) $(INSTALL_LIB.DIR)
-ifneq (,$(CMD.RANLIB))
+ifneq (,$(RANLIB))
 	$(foreach F,$(addprefix $(INSTALL_LIB.DIR)/,\
 	$(notdir $(TO_INSTALL.STATIC_LIBS))),$(INSTALL.RANLIB))
 endif

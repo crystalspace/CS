@@ -2917,9 +2917,9 @@ fi
 
 cs_build_prop_val=`echo x$RANLIB | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}CMD.RANLIB = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}RANLIB = $cs_build_prop_val
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.RANLIB ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}RANLIB ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -3758,9 +3758,9 @@ done
 
 cs_build_prop_val=`echo x$INSTALL | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}CMD.INSTALL = $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}INSTALL = $cs_build_prop_val
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.INSTALL ?= \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}INSTALL ?= \"$cs_build_prop_val\" ;
 "
 fi
 
@@ -11489,9 +11489,9 @@ fi
     if test -n "$RANLIB"; then
   cs_build_prop_val=`echo x-s | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}CMD.RANLIB += $cs_build_prop_val
+  cs_makefile_text="${cs_makefile_text}RANLIB += $cs_build_prop_val
 "
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.RANLIB += \"$cs_build_prop_val\" ;
+    cs_jamconfig_text="${cs_jamconfig_text}RANLIB += \"$cs_build_prop_val\" ;
 "
 fi
 

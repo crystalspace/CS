@@ -21,7 +21,8 @@ plugindir ?= [ ConcatDirs $(libdir) $(PACKAGE_NAME) ] ;
 rule InstallHeader
 {
     SEARCH on $(<:G=installheader) = $(SUBDIR) ;
-    Depends install_include : [ DoInstall $(<:G=installheader) : $(includedir) $(2) ] ;
+    Depends install_include : 
+	[ DoInstall $(<:G=installheader) : $(includedir) $(2) ] ;
 }
 
 ##  InstallShellScript scriptname [ : subdir ]
@@ -30,8 +31,8 @@ rule InstallHeader
 rule InstallShellScript
 {
     SEARCH on $(<:G=installscript) = $(SUBDIR) ;
-    Depends install_shellscript 
-        : [ DoInstall $(<:G=installscript) : $(bindir) $(2) : $(INSTALL_SCRIPT) ]
+    Depends install_shellscript :
+        [ DoInstall $(<:G=installscript) : $(bindir) $(2) : $(INSTALL_SCRIPT) ]
     ;
 }
 
@@ -40,7 +41,8 @@ rule InstallShellScript
 rule InstallData
 {
     SEARCH on $(<:G=installdata) = $(SUBDIR) ;
-    Depends install_data : [ DoInstall $(<:G=installdata) : $(appdatadir) $(2) ] ;
+    Depends install_data :
+	[ DoInstall $(<:G=installdata) : $(appdatadir) $(2) ] ;
 }
 
 ##  InstallConfig files [ : subdir ]
@@ -48,7 +50,8 @@ rule InstallData
 rule InstallConfig
 {
     SEARCH on $(<:G=installconfig) = $(SUBDIR) ;
-    Depends install_config : [ DoInstall $(<:G=installconfig) : $(appconfdir) $(2) ] ;
+    Depends install_config :
+	[ DoInstall $(<:G=installconfig) : $(appconfdir) $(2) ] ;
 }
 
 ##  InstallDoc files [ : subdir ]
@@ -85,11 +88,10 @@ rule InstallMan
     }
 }
 
-##  DoDoInstall sourcename : directories [ : installapp ]
-##    Creates a new installtarget for the given sources. The target(s) are
-##    returned as function result.
-##    (note: we can't name this rule Install, because Jambase already defines an
-##     action for DoInstall :-/)
+##  DoInstall sourcename : directories [ : installapp ]
+##    Creates a new installtarget for the given sources.  The target(s) are
+##    returned as function result.  (Note: We can't name this rule Install,
+##    because Jambase already defines an action for DoInstall :-/)
 rule DoInstall
 {
     local targets target i dir gdir ;
@@ -98,15 +100,19 @@ rule DoInstall
     gdir = $(dir:G=dir) ;
     MkDir $(gdir) ;
   
-    for i in $(1) {
+    for i in $(1)
+    {
         target = $(i:BSR=$(dir):G=install) ;
         targets += $(target) ;
         Depends $(target) : $(gdir) $(i) ;
         Install1 $(target) : $(i) ;
 
-        if $(3) {
+        if "$(3)"
+	{
             INSTALL_APP on $(target) = $(3) ;
-        } else {
+        }
+	else
+	{
             INSTALL_APP on $(target) = $(INSTALL_DATA) ;
         }
     }
@@ -129,11 +135,10 @@ Help install : "Install $(PACKAGE_NAME)" ;
 
 actions Install1
 {
-  $(INSTALL_APP) $(>) $(<) $(INSTALLFLAGS) ;
+  $(INSTALL_APP) $(INSTALLFLAGS) $(>) $(<) ;
 }
 
 actions CopyDirs
 {
   $(COPYDIRS) $(>) $(<)
 }
-

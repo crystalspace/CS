@@ -102,7 +102,7 @@ rule Library
   Clean $(<)clean : $(target) ;
   Depends clean : $(<)clean ;
 
-  if $(CMD.RANLIB) { Ranlib $(target) ; }
+  if $(RANLIB) { Ranlib $(target) ; }
 
   # If we can't scan the library, we have to leave the .o's around.
   if ! ( $(NOARSCAN) || $(NOARUPDATE) )
@@ -130,7 +130,7 @@ rule LibDepends
 
 actions together Ranlib
 {
-  $(CMD.RANLIB) $(<)
+  $(RANLIB) $(<)
 }
 
 # Construct pseudo target libs which is used instead of the pseudo target lib

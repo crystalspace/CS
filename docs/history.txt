@@ -53,13 +53,6 @@ chronological order.
 	  cspython.mak by slightly reorganizing the rules.
 	- Eric Sunshine eliminated need for DO_SWIGPERL5INST conditional from
 	  csperl5.mak by slightly reorganizing the rules.
-	- Jorrit added two parameters to the new
-	  iLightManager->GetRelevantLights() function. The first parameter
-	  is the maximum number of lights the caller needs and the second
-	  parameter indicates if sorting on relevance is desired. Mesh
-	  objects can use these parameters to get more control on the list
-	  of lights they get from the light manager.
-	  This is currently not implemented. It is just an API change.
 	- Eric Sunshine added check to configure.ac which determines how to
 	  disable warnings about unused variables.  The result of this check is
 	  used by a few Jamfiles and makefiles when building auto-generated
@@ -69,6 +62,29 @@ chronological order.
 	  -Wno-unused.
 	- Eric Sunshine fixed copy/paste error in _GetCollisionPairs() in
 	  perlpost.i which resulted in syntax error.
+	- Jorrit added two parameters to the new
+	  iLightManager->GetRelevantLights() function. The first parameter
+	  is the maximum number of lights the caller needs and the second
+	  parameter indicates if sorting on relevance is desired. Mesh
+	  objects can use these parameters to get more control on the list
+	  of lights they get from the light manager.
+	  This is currently not implemented. It is just an API change.
+	- Eric Sunshine fixed more serious brokeness resulting from Matze's
+	  recent changes to the Jam build facility:
+	    - GUI application install rule in macosx.jam was totally borked.
+	      It had not been updated at all for the new installation scheme.
+	    - General borkness of macosx.jam caused build of GUI and console
+	      applications to fail while trying to invoke `mkdir -p ""'.
+	    - Application rule in application.jam neglected to send "options"
+	      (such as "console") to SystemInstallApplication.  This further
+	      broke installation on MacOS/X since SystemInstallApplication was
+	      given to believe that it was always installing GUI applications.
+	    - Install targets ignored $(CMD.INSTALL) which is emitted by
+	      configure and were instead using $(INSTALL).  Fixed by having
+	      configure emit $(INSTALL) instead of $(CMD.INSTALL).  For
+	      consistency, also renamed $(CMD.RANLIB) to $(RANLIB).
+	    - Fixed bug in Install1 in install.jam where it was applying
+	      $(INSTALLFLAGS) at the wrong position in the command invocation.
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration
