@@ -420,10 +420,10 @@ bool R3DTest::Initialize ()
   matwrap = engine->GetMaterialList ()->FindByName ("portal");
 
   // Just disregard this. It's for testing. /Anders Stenberg
-  vfs->Mount ("/level", "./data/r3dtest.zip");
+  // vfs->Mount ("/level", "./data/r3dtest.zip");
   // vfs->ChDir ("/level");
-  vfs->ChDir ("/this/data/r3dtest");
-  loader->LoadMapFile ("world.xml", false);
+  // vfs->ChDir ("/this/data/r3dtest");
+  // loader->LoadMapFile ("world.xml", false);
 
   // csRef<iSector> room = engine->CreateSector ("room");
   csRef<iSector> room = engine->FindSector ("room");
