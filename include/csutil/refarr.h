@@ -20,15 +20,34 @@
 #ifndef __CS_REFARR_H__
 #define __CS_REFARR_H__
 
-#include "csutil/arraybase.h"
-#include "csutil/ref.h"
 #include "csutil/array.h"
+
+template <class T>
+class csRefArrayElementHandler
+{
+public:
+  static void Construct (T* address, T const& src)
+  {
+    *address = src;
+    if (src) src->IncRef ();
+  }
+
+  static void Destroy (T* address)
+  {
+    if (*address) (*address)->DecRef ();
+  }
+
+  static void InitRegion (T* address, int count)
+  {
+    memset (address, 0, count*sizeof (T));
+  }
+};
 
 /**
  * An array of smart pointers.
  */
 template <class T>
-class csRefArray : public csArray<csRef<T> >
+class csRefArray : public csArray<T*, csRefArrayElementHandler<T*> >
 {
 public:
   /**
@@ -36,7 +55,7 @@ public:
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csRefArray (int ilimit = 0, int ithreshold = 0)
-  	: csArray<csRef<T> > (ilimit, ithreshold)
+  	: csArray<T*, csRefArrayElementHandler<T*> > (ilimit, ithreshold)
   {
   }
 

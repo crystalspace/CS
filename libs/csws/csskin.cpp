@@ -29,12 +29,12 @@
 
 //--//--//--//--//--//--//--//--//--//--//--// The skin repository class -//--//
 
-int csSkin::CompareKey (csSkinSlice const* Item, void* Key)
+int csSkin::CompareKey (csSkinSlice* const& Item, void* Key)
 {
   return strcmp (Item->GetName (), (char *)Key);
 }
 
-int csSkin::Compare (csSkinSlice const* Item1, csSkinSlice const* Item2)
+int csSkin::Compare (csSkinSlice* const& Item1, csSkinSlice* const& Item2)
 {
   return strcmp (Item1->GetName (), Item2->GetName ());
 }

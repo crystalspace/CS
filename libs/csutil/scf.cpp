@@ -99,7 +99,7 @@ class scfSharedLibrary;
 class scfLibraryVector : public csPDelArray<scfSharedLibrary>
 {
 public:
-  static int CompareKey (scfSharedLibrary const* Item, void* key);
+  static int CompareKey (scfSharedLibrary* const& Item, void* key);
 };
 
 // This is the registry for all shared libraries
@@ -197,7 +197,7 @@ scfSharedLibrary::~scfSharedLibrary ()
   delete [] LibraryName;
 }
 
-int scfLibraryVector::CompareKey (scfSharedLibrary const* Item, void* key)
+int scfLibraryVector::CompareKey (scfSharedLibrary* const& Item, void* key)
 {
   return (strcmp (Item->LibraryName, (char *)key));
 }
@@ -255,7 +255,7 @@ class scfClassRegistry : public csPDelArray<scfFactory>
 {
 public:
   scfClassRegistry () : csPDelArray<scfFactory> (16, 16) {}
-  static int CompareKey (scfFactory const* Item, void* key)
+  static int CompareKey (scfFactory* const& Item, void* key)
   { return strcmp (Item->ClassID, (char *)key); }
   static int Compare (void const* Item1, void const* Item2)
   { return strcmp ((*(scfFactory**)Item1)->ClassID,

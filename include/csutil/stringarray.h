@@ -372,4 +372,7 @@ public:
   }
 };
 
+#undef ElementHandler
+#undef ArraySuper
+
 #endif // __CS_STRINGARRAY_H__

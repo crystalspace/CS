@@ -82,7 +82,7 @@ GLGlyphSet::~GLGlyphSet ()
 GLFontCache::GLGlyphVector::GLGlyphVector (int limit, int threshold)
     	: csPDelArray<GLGlyphSet> (limit, threshold) {}
 
-int GLFontCache::GLGlyphVector::CompareKey (GLGlyphSet const* gs, void* Key)
+int GLFontCache::GLGlyphVector::CompareKey (GLGlyphSet* const& gs, void* Key)
 {
   iFont *font = (iFont *)Key;
   if (gs->font < font)

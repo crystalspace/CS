@@ -155,20 +155,20 @@ class awsNotebookButtonBar : public awsComponent
       SCF_DEC_REF (te->slot);
       SCF_DEC_REF (te->sink);
     }
-    static int CompareComp (tabEntry const* te1, tabEntry const* te2)
+    static int CompareComp (tabEntry* const& te1, tabEntry* const& te2)
     {
       return (te1->comp < te2->comp ? -1 : te1->comp > te2->comp ? 1 : 0);
     }
-    static int CompareButton (tabEntry const* te1, tabEntry const* te2)
+    static int CompareButton (tabEntry* const& te1, tabEntry* const& te2)
     {
       return (te1->button < te2->button ? -1 : te1->button>te2->button ? 1 : 0);
     }
-    static int CompareKeyComp (tabEntry const* te1, void* Key)
+    static int CompareKeyComp (tabEntry* const& te1, void* Key)
     {
       iAwsComponent *comp = (iAwsComponent *)Key;
       return (te1->comp < comp ? -1 : te1->comp > comp ? 1 : 0);
     }
-    static int CompareKeyButton (tabEntry const* te1, void* Key)
+    static int CompareKeyButton (tabEntry* const& te1, void* Key)
     {
       awsNotebookButton *button = (awsNotebookButton *)Key;
       return (te1->button < button ? -1 : te1->button > button ? 1 : 0);

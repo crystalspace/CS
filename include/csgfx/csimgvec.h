@@ -39,23 +39,23 @@ public:
   /**
   * Add an Image to the Vector
   */
-  virtual void AddImage (csRef<iImage> img);
+  virtual void AddImage (iImage* img);
   /**
   * Insert an Image into the Vector at specified index
   */
-  virtual void InsertImage (csRef<iImage> img, int index);
+  virtual void InsertImage (iImage* img, int index);
   /**
   * Add an Image to the End of the Vector
   */
-  virtual void operator += (csRef<iImage> img);
+  virtual void operator += (iImage* img);
   /**
   * Get Image at specified index
   */
-  virtual csRef<iImage> &GetImage(int index);
+  virtual csRef<iImage> GetImage(int index);
   /**
   * Get Image operator[]
   */
-  virtual csRef<iImage> &operator[](int index) ;
+  virtual csRef<iImage> operator[](int index) ;
   /**
   * Get Image Count
   */

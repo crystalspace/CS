@@ -82,10 +82,10 @@ public:
   virtual ~csSkin () { }
 
   /// Compare a item from this array with some key
-  static int CompareKey (csSkinSlice const* Item, void* Key);
+  static int CompareKey (csSkinSlice* const& Item, void* Key);
 
   /// Compare two items from this array
-  static int Compare (csSkinSlice const* Item1, csSkinSlice const* Item2);
+  static int Compare (csSkinSlice* const& Item1, csSkinSlice* const& Item2);
 
   /// Apply this skin to some component and all components inserted into it
   void Apply (csComponent *iComp);

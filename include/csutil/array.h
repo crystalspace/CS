@@ -48,9 +48,7 @@ public:
   }
 };
 
-#undef ElementHandler
 #undef ArraySuper
-#define ElementHandler csArrayElementHandler<T>
 #define ArraySuper csArrayBase<T, ElementHandler >
 
 /**
@@ -60,7 +58,7 @@ public:
  * pointers (such as iSomething*), then you should look at csRefArray instead
  * of this class.
  */
-template <class T>
+template <class T, class ElementHandler = csArrayElementHandler<T> >
 class csArray : private ArraySuper	// Note! Private inheritance!
 {
 public:
@@ -82,6 +80,17 @@ public:
   using ArraySuper::DeleteRange;
   using ArraySuper::Delete;
 
+protected:
+  /**
+   * Initialize a region. This is a dangerous function to use because it
+   * does not properly destruct the items in the array.
+   */
+  void InitRegion (int start, int count)
+  {
+    ElementHandler::InitRegion (root+start, count);
+  }
+
+public:
   /// This function prototype is used for csArray::InsertSorted()
   typedef int ArrayCompareFunction (T const& item1, T const& item2);
   /// This function prototype is used for csArray::FindKey()
@@ -153,6 +162,16 @@ public:
   T& operator [] (int n)
   {
     return Get(n);
+  }
+
+  /// Put an element at some position.
+  void Put (int n, T const& what)
+  {
+    CS_ASSERT (n >= 0);
+    if (n >= count)
+      SetLength (n+1);
+    ElementHandler::Destroy (root + n);
+    ElementHandler::Construct (root + n, what);
   }
 
   /**
@@ -332,7 +351,6 @@ public:
   { return Iterator(*this); }
 };
 
-#undef ElementHandler
 #undef ArraySuper
 
 #ifdef CS_EXTENSIVE_MEMDEBUG

@@ -121,10 +121,10 @@ class csSparseGrid
     // Set the data at given column
     void SetAt (int col, void* data);
     // Compare two row entries
-    static int Compare (csGridRowEntry const* Item1,
-    	csGridRowEntry const* Item2);
+    static int Compare (csGridRowEntry* const& Item1,
+    	csGridRowEntry* const& Item2);
     // Compare a row entry with a key
-    static int CompareKey (csGridRowEntry const* Item1, void* Key);
+    static int CompareKey (csGridRowEntry* const& Item1, void* Key);
   };
   friend class csSparseGrid::csGridRow;
 

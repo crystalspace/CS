@@ -100,14 +100,14 @@ void csMotionTemplate::SetLoopFlip (bool enable) {
   loopflip=enable;
 }
 
-static int compare_bones (csMotionBone const* mb1, csMotionBone const* mb2)
+static int compare_bones (csMotionBone* const& mb1, csMotionBone* const& mb2)
 {
   unsigned int id1 = mb1->GetHash ();
   unsigned int id2 = mb2->GetHash ();
   return id1-id2;
 }
 
-static int comparekey_bones (csMotionBone const* mb, void* key)
+static int comparekey_bones (csMotionBone* const& mb, void* key)
 {
   unsigned int id1 = mb->GetHash ();
   unsigned int id2 = (unsigned int)key;
@@ -449,15 +449,15 @@ bool csMotionManager::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-static int compare_motions (csMotionTemplate const* mb1,
-	csMotionTemplate const* mb2)
+static int compare_motions (csMotionTemplate* const& mb1,
+	csMotionTemplate* const& mb2)
 {
   unsigned int id1 = mb1->GetHash ();
   unsigned int id2 = mb2->GetHash ();
   return id1-id2;
 }
 
-static int comparekey_motions (csMotionTemplate const* mb, void* key)
+static int comparekey_motions (csMotionTemplate* const& mb, void* key)
 {
   unsigned int id1 = mb->GetHash ();
   unsigned int id2 = (unsigned int)key;
@@ -494,15 +494,15 @@ void csMotionManager::DeleteMotion( iMotionTemplate* motiontemp )
   motions.Delete((csMotionTemplate*)motiontemp);
 }
 
-static int compare_skeleton (csMotionController const* mb1,
-	csMotionController const* mb2)
+static int compare_skeleton (csMotionController* const& mb1,
+	csMotionController* const& mb2)
 {
   unsigned int id1 = (unsigned int)mb1->GetSkeleton ();
   unsigned int id2 = (unsigned int)mb2->GetSkeleton ();
   return id1-id2;
 }
 
-static int comparekey_skeleton (csMotionController const* mb, void* key)
+static int comparekey_skeleton (csMotionController* const& mb, void* key)
 {
   unsigned int id1 = (unsigned int)mb->GetSkeleton ();
   unsigned int id2 = (unsigned int)key;

@@ -7,6 +7,27 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 7-Aug-2003
+	- Jorrit did the following array related changes:
+	    - Added Put() to csArray.
+	    - Added a protected csArray::InitRegion(). This function will
+	      re-initialize a region in the array WITHOUT properly destructing
+	      the previous contents! This is needed by some subclasses (like
+	      csPDelArray) in order to implement GetAndClear() and Extract().
+	    - csArray now has a second template argument to specify an
+	      ElementHandler. That way you can use csArray with specialized
+	      item constructors and destructors. By default csArray will
+	      still work as before.
+	    - Made csPDelArray a subclass of csArray using a specialized
+	      element handler.
+	    - Re-implemented csRefArray as a subclass of csArray. Instead of
+	      being defined as csArray<csRef<T> > it is now defined as
+	      csArray<T*, csRefArrayElementHandler<T*> >. The element handler
+	      will now do IncRef() and DecRef(). This is more efficient
+	      then letting csRef do it as csRef does some additional and
+	      unneeded tests.
+	- Jorrit changed csRef<iImage> to iImage* in the arguments to
+	  iImageVector. Additionally changed the csRef<iImage>& return
+	  to csRef<iImage>.
 	- Keith added some new enhancements to the cal3d wrapper and viewer.
 	  viewmesh now divides cal3d animations by looping and non-looping
 	  types, and dynamically updates the list of animations to remove

@@ -73,7 +73,7 @@ protected:
   {
   public:
     GLGlyphVector (int limit, int threshold);
-    static int CompareKey (GLGlyphSet const* gs, void* Key);
+    static int CompareKey (GLGlyphSet* const& gs, void* Key);
   } FontCache;
 
   /// the current clipping rect

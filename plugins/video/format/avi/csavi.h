@@ -87,11 +87,11 @@ class csAVIFormat : public iStreamFormat
     {
     public:
       StreamList () : csPDelArray<StreamIdx> (8, 8){}
-      static int Compare (StreamIdx const* i1, StreamIdx const* i2)
+      static int Compare (StreamIdx* const& i1, StreamIdx* const& i2)
       {
         return (i1->id < i2->id ? -1 : i1->id > i2->id ? 1 : 0);
       }
-      static int CompareKey (StreamIdx const* i1, void* key)
+      static int CompareKey (StreamIdx* const& i1, void* key)
       {
 	uint32 id = (uint32)key;
         return (i1->id < id ? -1 : i1->id > id ? 1 : 0);

@@ -86,7 +86,7 @@ public:
 class csTokenVector : public csPDelArray<csTokenDesc>
 {
 public:
-  static int Compare (csTokenDesc const* td1, csTokenDesc const* td2)
+  static int Compare (csTokenDesc* const& td1, csTokenDesc* const& td2)
   {
     int l1 = td1->len;
     int l2 = td2->len;

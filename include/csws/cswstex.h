@@ -117,7 +117,7 @@ public:
   /// Initialize the texture vector
   csWSTexVector ();
   /// Compare texture with name; used in FindKey ()
-  static int CompareKey (csWSTexture const* Item, void* Key);
+  static int CompareKey (csWSTexture* const& Item, void* Key);
   /// Find a texture by name
   csWSTexture *FindTexture (const char *name)
   {

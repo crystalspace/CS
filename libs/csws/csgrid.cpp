@@ -167,13 +167,13 @@ void csSparseGrid::csGridRow::SetAt (int col, void* data)
       DeleteIndex (key);
 }
 
-int csSparseGrid::csGridRow::Compare (csGridRowEntry const* Item1,
-	csGridRowEntry const* Item2)
+int csSparseGrid::csGridRow::Compare (csGridRowEntry* const& Item1,
+	csGridRowEntry* const& Item2)
 {
   return (Item1->col < Item2->col ? -1 : Item1->col > Item2->col ? 1 : 0);
 }
 
-int csSparseGrid::csGridRow::CompareKey (csGridRowEntry const* Item1, void* Key)
+int csSparseGrid::csGridRow::CompareKey (csGridRowEntry* const& Item1, void* Key)
 {
   return (Item1->col < (int)Key ? -1 : Item1->col > (int)Key ? 1 : 0);
 }
