@@ -213,8 +213,8 @@ csConfigManager::csConfigManager(iConfigFile *dyn, bool opt)
   csRef<iConfigFile> dyndom(dyn);
   if (!dyndom.IsValid())
     dyndom.AttachNew(new csConfigFile);
-  AddDomain(dyn, PriorityMedium);
-  DynamicDomain = FindConfig(dyn);
+  AddDomain(dyndom, PriorityMedium);
+  DynamicDomain = FindConfig(dyndom);
 }
 
 csConfigManager::~csConfigManager()
