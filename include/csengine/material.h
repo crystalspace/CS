@@ -31,7 +31,6 @@ struct iTextureManager;
 /**
  * A material class.
  */
-
 class csMaterial : public iMaterial
 {
 private:
@@ -114,7 +113,7 @@ public:
   csMaterialWrapper (iMaterial* Image);
 
   /**
-   * Construct a csMaterialWrapper from a pre-registered AND prepared material 
+   * Construct a csMaterialWrapper from a pre-registered AND prepared material
    * handle. The engine takes over responsibility for destroying the material
    * handle. To prevent this IncRef () the material handle.
    */

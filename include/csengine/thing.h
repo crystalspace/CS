@@ -294,15 +294,10 @@ public:
 
     /// Get the movable for this thing.
     virtual iMovable* GetMovable ()
-    {
-      csMovable* movable = &(scfParent->GetMovable ());
-      return QUERY_INTERFACE (movable, iMovable);
-    }
+    { return &scfParent->GetMovable ().scfiMovable; }
     /// Update the thing after doing a move.
     virtual void UpdateMove ()
-    {
-      scfParent->UpdateMove ();
-    }
+    { scfParent->UpdateMove (); }
   } scfiThing;
   friend struct eiThing;
 };

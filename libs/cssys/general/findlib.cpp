@@ -24,28 +24,24 @@
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"
 
-static csStrVector *LibPath = NULL;
+static csStrVector LibPath (4, 4);
 bool findlib_search_nodir = true;
 
 void csAddLibraryPath (const char *iPath)
 {
-  if (!LibPath) LibPath = new csStrVector (4,4);
-  CS_ASSERT (LibPath);      
-  LibPath->Push (strnew (iPath));
+  LibPath.Push (strnew (iPath));
 }
 
 csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
   const char *iSuffix)
 {
-  if (!LibPath) LibPath = new csStrVector (4,4);
-  CS_ASSERT (LibPath);      
-  for (int i = findlib_search_nodir ? -1 : 0; i < LibPath->Length (); i++)
+  for (int i = findlib_search_nodir ? -1 : 0; i < LibPath.Length (); i++)
   {
     char lib [MAXPATHLEN + 1];
 
     // For i == -1 try without any prefix at all
     if (i >= 0)
-      strcpy (lib, LibPath->Get (i));
+      strcpy (lib, LibPath.Get (i));
     else
       lib [0] = 0;
 
@@ -64,7 +60,7 @@ csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
         break;
     }
   }
-  printf ("DYNAMIC LINKING ERROR: Could not find (%s)%s(%s).\n",
-    iPrefix, iName, iSuffix);
+
+  csPrintLibraryError (iName);
   return (csLibraryHandle)0;
 }

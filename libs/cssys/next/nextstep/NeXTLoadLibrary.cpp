@@ -24,22 +24,18 @@ extern "C" {
 #include <streams/streams.h>
 }
 
-// Upon initialization add the OS_NEXT_PLUGIN_DIR to the
-// list of paths searched for plugins
-class __loadlib_init
-{
-public:
-  __loadlib_init ()
-  {
-    extern bool findlib_search_nodir;
-    findlib_search_nodir = false;
-    csAddLibraryPath (OS_NEXT_PLUGIN_DIR);
-  }
-} __loadlib_init_dummy;
-
 csLibraryHandle csFindLoadLibrary (const char *iName)
 {
-  return csFindLoadLibrary (NULL, iName, OS_NEXT_PLUGIN_EXT);
+    static bool init_done = false;
+    if (!init_done)
+	{
+	init_done = true;
+        extern bool findlib_search_nodir;
+        findlib_search_nodir = false;
+        csAddLibraryPath (OS_NEXT_PLUGIN_DIR);
+	}
+
+    return csFindLoadLibrary (NULL, iName, OS_NEXT_PLUGIN_EXT);
 }
 
 //-----------------------------------------------------------------------------

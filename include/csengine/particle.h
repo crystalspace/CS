@@ -165,7 +165,7 @@ public:
    *  making particle systems of particle systems.
    *  Do not add particle systems to themselves, you'll get infinite loops.
    */
-  iParticle* GetAsParticle() { return QUERY_INTERFACE(this, iParticle); }
+  iParticle* GetAsParticle() { return &scfiParticle; }
 
   /// Move all particles to this position
   virtual void SetPosition(const csVector3& pos);

@@ -1399,7 +1399,7 @@ bool csWorld::ProcessHalo (csLightHalo *Halo)
     }
   }
 
-  float hintensity = Halo->Light->GetHalo ()->Intensity;
+  float hintensity = Halo->Light->GetHalo ()->GetIntensity ();
   if (halo_vis)
   {
     if (hintensity < 1.0 - HALO_INTENSITY_STEP)
@@ -1415,7 +1415,7 @@ bool csWorld::ProcessHalo (csLightHalo *Halo)
     if (hintensity <= 0)
       return false;
   }
-  Halo->Light->GetHalo ()->Intensity = hintensity;
+  Halo->Light->GetHalo ()->SetIntensity (hintensity);
 
   if (draw_halo)
     Halo->Handle->Draw (xtl, ytl, -1, -1, hintensity, HaloClip, HaloVCount);

@@ -92,9 +92,7 @@ bool csKeyboardAccelerator::PostHandleEvent (iEvent &Event)
       if ((ae->Key == Event.Key.Code)
        && (ae->Shifts == (Event.Key.Modifiers & CSMASK_ALLSHIFTS)))
       {
-        iEvent *ev = app->CreateEvent ();
-        *ev = ae->Event;
-        app->PutEvent (ev);
+        app->PutEvent (new csEvent (ae->Event));
         return true;
       } /* endif */
     } /* endfor */

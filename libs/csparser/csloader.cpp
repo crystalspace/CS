@@ -392,8 +392,8 @@ csMaterialWrapper *csLoader::FindMaterial (const char *iName)
   {
     // Add a default material with the same name as the texture
     csMaterial *material = new csMaterial ();
-    csMaterialWrapper *mat = World->GetMaterials ()->NewMaterial (material);
     material->SetTextureWrapper (tex);
+    csMaterialWrapper *mat = World->GetMaterials ()->NewMaterial (material);
     mat->SetName (iName);
     material->DecRef ();
     return mat;

@@ -53,3 +53,7 @@ bool csUnloadLibrary (csLibraryHandle Handle)
 {
   return (DosFreeModule (Handle) == 0);
 }
+
+void csPrintLibraryError (const char *iModule)
+{
+}

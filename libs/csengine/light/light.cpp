@@ -472,16 +472,18 @@ void csDynLight::AddLightedSprite (csLightHitsSprite* lp)
 
 //---------------------------------------------------------------------------
 
-csHalo::csHalo ()
+csHalo::csHalo (csHaloType iType)
 {
   Intensity = 0;
+  Type = iType;
 }
 
 csHalo::~csHalo ()
 {
 }
 
-csCrossHalo::csCrossHalo (float intensity_factor, float cross_factor) : csHalo ()
+csCrossHalo::csCrossHalo (float intensity_factor, float cross_factor)
+  : csHalo (cshtCross)
 {
   IntensityFactor = intensity_factor;
   CrossFactor = cross_factor;
@@ -492,7 +494,8 @@ unsigned char *csCrossHalo::Generate (int Size)
   return GenerateHalo (Size, IntensityFactor, CrossFactor);
 }
 
-csNovaHalo::csNovaHalo (int seed, int num_spokes, float roundness) : csHalo ()
+csNovaHalo::csNovaHalo (int seed, int num_spokes, float roundness)
+  : csHalo (cshtNova)
 {
   Seed = seed;
   NumSpokes = num_spokes;

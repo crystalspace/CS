@@ -72,4 +72,11 @@ extern csLibraryHandle csFindLoadLibrary (const char *iModule);
 extern csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
   const char *iSuffix);
 
+/**
+ * Print out the latest dynamic loader error.
+ * This is not strictly required (and on some platforms its just a empty
+ * routine) but sometimes it helps to find problems.
+ */
+extern void csPrintLibraryError (const char *iModule);
+
 #endif // __CSSHLIB_H__

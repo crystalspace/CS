@@ -23,23 +23,39 @@
 #include "csengine/light.h"
 #include "ihalo.h"
 
+enum csHaloType
+{
+  cshtCross,
+  cshtNova
+};
+
 /** 
  * This is the basic class for all types of halos.
  * The csLight class contains a pointer to a object derived from this class.
  */
 class csHalo
 {
-public:
   /// the current intensity of the attached halo; if >0 halo is in halo queue.
   float Intensity;
 
+public:
+  /// The type of halo
+  csHaloType Type;
+
   /// Constructor
-  csHalo ();
+  csHalo (csHaloType iType);
   /// Destructor
   virtual ~csHalo ();
 
   /// Generate the alphamap for this halo of size Size x Size
   virtual unsigned char *Generate (int Size) = 0;
+
+  /// Get halo intensity
+  float GetIntensity ()
+  { return Intensity; }
+  /// Set halo intensity
+  void SetIntensity (float iInt)
+  { Intensity = iInt; }
 };
 
 /**

@@ -33,6 +33,10 @@ csLibraryHandle csLoadLibrary (const char* iName)
   return load_add_on (iName);
 }
 
+void csPrintLibraryError (const char *iModule)
+{
+}
+
 void *csGetLibrarySymbol (csLibraryHandle h, const char* name)
 {
   void* sym;

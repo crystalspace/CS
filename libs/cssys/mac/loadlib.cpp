@@ -73,3 +73,7 @@ bool csUnloadLibrary(csLibraryHandle Handle)
 
 	return ( theError == noErr );
 }
+
+void csPrintLibraryError (const char *iModule)
+{
+}

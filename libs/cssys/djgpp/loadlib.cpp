@@ -165,6 +165,11 @@ csLibraryHandle csLoadLibrary (const char* iName)
   return dlopen (module = iName, 0);
 }
 
+void csPrintLibraryError (const char *iModule)
+{
+  fprintf (stderr, "DLERROR (%s): %s\n", iModule, dlerror ());
+}
+
 void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)
 {
   return dlsym (Handle, iName);
