@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <world>
-    <addon>
-      <plugin>crystalspace.renderloop.loop.loader</plugin>
-      <params>
+    <addon plugin="crystalspace.renderloop.loop.loader">
 	<name>myLoop</name>
 	<steps>
 	  <!-- ambient lighting -->
@@ -28,7 +26,6 @@
 	    </steps>
 	  </step>
 	</steps>
-      </params>
     </addon>
     
     <settings>
