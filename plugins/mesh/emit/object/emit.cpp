@@ -541,8 +541,8 @@ void csEmitMeshObject::SetupObject ()
 {
   if (!initialized)
   {
-    RemoveParticles ();
     initialized = true;
+    RemoveParticles ();
     delete[] ages;
     delete[] part_pos;
     delete[] part_speed;

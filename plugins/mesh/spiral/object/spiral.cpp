@@ -41,8 +41,8 @@ void csSpiralMeshObject::SetupObject ()
 {
   if (!initialized)
   {
-    RemoveParticles ();
     initialized = true;
+    RemoveParticles ();
 
     SetCount(max);
     time_before_new_particle = 0;

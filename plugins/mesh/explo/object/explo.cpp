@@ -45,8 +45,8 @@ void csExploMeshObject::SetupObject ()
 {
   if (!initialized)
   {
-    RemoveParticles ();
     initialized = true;
+    RemoveParticles ();
     int i;
     csVector3 pos;
     /// add particles

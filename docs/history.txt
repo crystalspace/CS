@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+27-Nov-2002
+	- Jeremy Williams fixed a bug in the explosion particle system
+	  which would cause crashes when firing missiles in walktest.
+	- Fixed a similar bug in the snow, emit, fire, fountain, and spiral
+	  particle systems. Only rain appeared to be ok for some reason.
 26-Nov-2002
 	- Fixed a bug in the software renderer when materials are used without
 	  textures. Reported by groton.

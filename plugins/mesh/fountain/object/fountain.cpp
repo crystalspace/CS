@@ -41,8 +41,8 @@ void csFountainMeshObject::SetupObject ()
 {
   if (!initialized)
   {
-    RemoveParticles ();
     initialized = true;
+    RemoveParticles ();
     delete[] part_pos;
     delete[] part_speed;
     delete[] part_age;

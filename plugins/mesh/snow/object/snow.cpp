@@ -41,8 +41,8 @@ void csSnowMeshObject::SetupObject ()
 {
   if (!initialized)
   {
-    RemoveParticles ();
     initialized = true;
+    RemoveParticles ();
     delete[] part_pos;
     delete[] part_speed;
 
