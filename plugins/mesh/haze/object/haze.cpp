@@ -428,6 +428,7 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeState);
   csHazeMeshObject::factory = factory;
+  logparent = NULL;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
   material = factory->GetMaterialWrapper ();
   MixMode = factory->GetMixMode ();
@@ -1080,6 +1081,7 @@ csHazeMeshObjectFactory::csHazeMeshObjectFactory (iBase *pParent)
   MixMode = 0;
   origin.Set(0,0,0);
   directional.Set(0,0,0);
+  logparent = NULL;
 }
 
 csHazeMeshObjectFactory::~csHazeMeshObjectFactory ()

@@ -52,6 +52,7 @@ csMetaGen::csMetaGen (iBase* parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiMetaGen);
+  logparent = NULL;
 
   XStart = YStart = ZStart = 0.0;
   XFin = YFin = ZFin = 0.0;

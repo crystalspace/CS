@@ -260,8 +260,8 @@ public:
 
 static bool load_thing_part (iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
-	iMeshWrapper* imeshwrap, iEngine* engine,
-	iThingState* thing_state, char* buf, int vt_offset, bool isParent)
+	iEngine* engine, iThingState* thing_state,
+	char* buf, int vt_offset, bool isParent)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (VBLOCK)
@@ -358,8 +358,6 @@ static bool load_thing_part (iObjectRegistry* object_reg, iReporter* reporter,
           }
 	  iThingState* tmpl_thing_state = SCF_QUERY_INTERFACE (
 	  	fact->GetMeshObjectFactory (), iThingState);
-	  if (cmd == CS_TOKEN_FACTORY && imeshwrap)
-	    imeshwrap->SetFactory (fact);
 	  if (!tmpl_thing_state)
 	  {
 	    ReportError (reporter,
@@ -418,7 +416,7 @@ static bool load_thing_part (iObjectRegistry* object_reg, iReporter* reporter,
         break;
       case CS_TOKEN_PART:
 	if (!load_thing_part (object_reg, reporter, synldr, info,
-		imeshwrap, engine, thing_state, params,
+		engine, thing_state, params,
 		thing_state->GetVertexCount (), false))
 	  return false;
         break;
@@ -612,19 +610,13 @@ Nag to Jorrit about this feature if you want it.");
 }
 
 iBase* csThingLoader::Parse (const char* string, iMaterialList*,
-	iMeshFactoryList*, iBase* context)
+	iMeshFactoryList*, iBase*)
 {
   // Things only work with the real 3D engine and not with the iso engine.
   iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   CS_ASSERT (engine != NULL);
   iMeshObjectFactory* fact = NULL;
   iThingState* thing_state = NULL;
-
-  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
-  if (imeshwrap) imeshwrap->DecRef ();
-  iMeshFactoryWrapper* ifactmeshwrap = SCF_QUERY_INTERFACE (context,
-  	iMeshFactoryWrapper);
-  if (ifactmeshwrap) ifactmeshwrap->DecRef ();
 
   iMeshObjectType* type = engine->GetThingType (); // @@@ CS_LOAD_PLUGIN LATER!
   // We always do NewFactory() even for mesh objects.
@@ -635,7 +627,7 @@ iBase* csThingLoader::Parse (const char* string, iMaterialList*,
   char* buf = (char*)string;
   ThingLoadInfo info;
   if (!load_thing_part (object_reg, reporter, synldr, info,
-  	imeshwrap, engine, thing_state, buf, 0, true))
+  	engine, thing_state, buf, 0, true))
   {
     fact->DecRef ();
     fact = NULL;

@@ -445,7 +445,7 @@ bool csSprite2DLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase* context)
+	iMeshFactoryList* factlist, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
@@ -462,10 +462,6 @@ iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
   long cmd;
   char* params;
   char str[255];
-
-  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
-  CS_ASSERT (imeshwrap != NULL);
-  imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
   iSprite2DState* spr2dLook = NULL;
@@ -497,7 +493,6 @@ iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	  imeshwrap->SetFactory (fact);
           spr2dLook = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
 	  verts = &(spr2dLook->GetVertices ());
 	}

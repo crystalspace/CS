@@ -101,6 +101,7 @@ struct TexelArray
 // through here all the time ( which is not necessary ).
 class csMetaGen : public iMeshObjectFactory
 {
+  iBase* logparent;
   float XStart, YStart, ZStart; // Rendering Cache size and resolution
   float XFin, YFin, ZFin;
 
@@ -246,6 +247,8 @@ public:
   virtual iMeshObject* NewInstance() { return NULL; }
   virtual void HardTransform( const csReversibleTransform &t );
   virtual bool SupportsHardTransform() const { return true; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
   virtual bool IsLighting() { return do_lighting; }
   virtual void SetLighting( bool set ) { do_lighting = set; }
 

@@ -200,6 +200,7 @@ private:
 
   /// Material handle as returned by iTextureManager.
   iMaterialWrapper* cstxt;
+  iBase* logparent;
 
   /// An optional skeleton.
   csSkel* skeleton;
@@ -492,6 +493,8 @@ public:
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //--------------------- iSprite3DFactoryState implementation -------------//
   struct Sprite3DFactoryState : public iSprite3DFactoryState
@@ -759,6 +762,7 @@ class csSprite3DMeshObject : public iMeshObject
 private:
   /// Set the size of internally used tables
   static void UpdateWorkTables (int max_size);
+  iBase* logparent;
 
 public:
   /**
@@ -1274,6 +1278,8 @@ public:
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
     csVector3& intersect, float* pr);
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh

@@ -181,6 +181,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
+  logparent = NULL;
   cstxt = NULL;
   emerge_from = NULL;
   skeleton = NULL;
@@ -659,6 +660,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLODControl);
+  logparent = NULL;
   cur_frame = 0;
   factory = NULL;
   force_otherskin = false;

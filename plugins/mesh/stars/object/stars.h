@@ -38,6 +38,7 @@ class csStarsMeshObject : public iMeshObject
 {
 private:
   iMeshObjectFactory* factory;
+  iBase* logparent;
   csBox3 box;
   iMeshObjectDrawCallback* vis_cb;
   csColor color;
@@ -148,6 +149,8 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iStarsState implementation ----------------
   class StarsState : public iStarsState
@@ -208,6 +211,9 @@ public:
  */
 class csStarsMeshObjectFactory : public iMeshObjectFactory
 {
+private:
+  iBase* logparent;
+
 public:
   /// Constructor.
   csStarsMeshObjectFactory (iBase *pParent);
@@ -221,6 +227,8 @@ public:
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
 /**

@@ -358,7 +358,7 @@ bool csCubeLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csCubeLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase* context)
+	iMeshFactoryList* factlist, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)
@@ -368,9 +368,6 @@ iBase* csCubeLoader::Parse (const char* string, iMaterialList* matlist,
   long cmd;
   char* params;
   char str[255];
-
-  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
-  imeshwrap->DecRef ();
 
   iMeshObject* mesh = 0;
 
@@ -393,7 +390,6 @@ iBase* csCubeLoader::Parse (const char* string, iMaterialList* matlist,
 	  return NULL;
 	}
 	mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	imeshwrap->SetFactory (fact);
 	break;
     }
   }

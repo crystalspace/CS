@@ -52,6 +52,7 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticleState);
   initialized = false;
   csParticleSystem::factory = factory;
+  logparent = NULL;
   particles.SetLength (0);
   self_destruct = false;
   time_to_live = 0;

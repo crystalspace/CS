@@ -87,6 +87,7 @@ public:
 
 private:
   iObjectRegistry* object_reg;
+  iBase* logparent;
   iMeshObjectFactory* pFactory;
   iMeshObjectDrawCallback* vis_cb;
   iVertexBufferManager *vbufmgr;
@@ -469,6 +470,8 @@ public:
 
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
         csVector3& isect, float* pr);
@@ -630,6 +633,9 @@ public:
  */
 class csTerrFuncObjectFactory : public iMeshObjectFactory
 {
+private:
+  iBase* logparent;
+
 public:
   iObjectRegistry *object_reg;
 
@@ -645,6 +651,8 @@ public:
 
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
 /**

@@ -241,6 +241,8 @@ private:
 
   /// Pointer to the Thing Template which it derived from.
   csThing* ParentTemplate;
+  /// Pointer to logical parent.
+  iBase* logparent;
 
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
@@ -1203,6 +1205,8 @@ public:
     	const csVector3& /*end*/,
   	csVector3& /*isect*/, float* /*pr*/) { return false; }
     virtual long GetShapeNumber () const { return 0; /*@@@*/ }
+    virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
+    virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
   } scfiMeshObject;
   friend struct MeshObject;
 
@@ -1216,6 +1220,8 @@ public:
       scfParent->HardTransform (t);
     }
     virtual bool SupportsHardTransform () const { return true; }
+    virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
+    virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;
 };

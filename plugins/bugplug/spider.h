@@ -49,6 +49,7 @@ struct iMeshWrapper;
 class csSpider : public iMeshObject
 {
 private:
+  iBase* logparent;
   iCamera* camera;
   iMeshWrapper* wrap;
 
@@ -100,6 +101,8 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return 1; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
 #endif // __CS_SPIDER_H__

@@ -145,6 +145,7 @@ csSpiralMeshObjectFactory::csSpiralMeshObjectFactory (iBase *p,
 {
   SCF_CONSTRUCT_IBASE (p);
   object_reg = s;
+  logparent = NULL;
 }
 
 csSpiralMeshObjectFactory::~csSpiralMeshObjectFactory ()

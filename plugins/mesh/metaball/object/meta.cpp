@@ -63,6 +63,7 @@ csMetaBall::csMetaBall (iMeshObjectFactory *fact)
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiMetaBallState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+  logparent = NULL;
   th = NULL;
   alpha = frame = 0;
   meta_balls = NULL;
@@ -540,6 +541,7 @@ csMetaBallFactory::csMetaBallFactory( iBase *par, iObjectRegistry* object_reg )
 {
   SCF_CONSTRUCT_IBASE(par);
   csMetaBallFactory::object_reg = object_reg;
+  logparent = NULL;
 }
 
 csMetaBallFactory::~csMetaBallFactory()

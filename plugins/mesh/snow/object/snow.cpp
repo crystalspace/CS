@@ -158,6 +158,7 @@ csSnowMeshObjectFactory::csSnowMeshObjectFactory (iBase* p, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
   object_reg = s;
+  logparent = NULL;
 }
 
 csSnowMeshObjectFactory::~csSnowMeshObjectFactory ()

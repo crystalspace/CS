@@ -58,6 +58,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csBallMeshObject::factory = factory;
+  logparent = NULL;
   initialized = false;
   cur_cameranr = -1;
   cur_movablenr = -1;
@@ -924,6 +925,7 @@ csBallMeshObjectFactory::csBallMeshObjectFactory (iBase *pParent,
 {
   SCF_CONSTRUCT_IBASE (pParent);
   csBallMeshObjectFactory::object_reg = object_reg;
+  logparent = NULL;
 }
 
 csBallMeshObjectFactory::~csBallMeshObjectFactory ()

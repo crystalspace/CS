@@ -42,6 +42,7 @@ class csBallMeshObject : public iMeshObject
 {
 private:
   iMeshObjectFactory* factory;
+  iBase* logparent;
   float radiusx, radiusy, radiusz;
   csVector3 max_radius;
   csVector3 shift;
@@ -230,6 +231,8 @@ public:
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState
@@ -309,6 +312,7 @@ class csBallMeshObjectFactory : public iMeshObjectFactory
 {
 public:
   iObjectRegistry* object_reg;
+  iBase* logparent;
 
   /// Constructor.
   csBallMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
@@ -322,6 +326,8 @@ public:
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
 /**

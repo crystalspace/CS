@@ -2,6 +2,42 @@ The history order is reversed so that new features are at the top.
 
 12-Dec-2001
 	- Bumped up version for pending 0.92 release.
+	- Added GetLogicalParent() and SetLogicalParent() functions
+	  to iMeshObject and iMeshObjectFactory. The idea is that using
+	  these functions you can set the logical parent of an iMeshObject
+	  or iMeshObjectFactory. When mesh objects are being used in the
+	  3D engine the logical parent for iMeshObject will be an iMeshWrapper
+	  holding that mesh object and the logical parent for
+	  iMeshObjectFactory will be an iMeshFactoryWrapper. When mesh
+	  objects are being used in the isometric engine the logical
+	  parent for iMeshObjectFactory will be the same but the logical
+	  parent for iMeshWrapper will be iIsoMeshSprite.
+	  Note that the mesh objects themselves will not use this logical
+	  parent. It is only for convenience of the engine that is using
+	  them.
+	- Fixed all iMeshObject implementations (all mesh plugins, the thing
+	  implementation in the engine and the two mesh objects in bugplug)
+	  for this change.
+	- Changed csparser plugin to set this logical parent correctly for
+	  both new loaded mesh objects and mesh factories. Additionally
+	  use the logical parent from the parent factory (iMeshObjectFactory)
+	  from the loaded mesh to be able to set the parent factory
+	  (iMeshFactoryWrapper) for the iMeshWrapper as well.
+	- Changed csparser plugin so that it no longer gives a context
+	  to the mesh object and factory loaders. This context is now no
+	  longer needed since csparser will handle everything using the logical
+	  parent. The only exception is for the mesh factory loaders
+	  where it is possible to append additional information to an already
+	  loaded factory.
+	- Changed all plugin loaders not to use the context (except for the
+	  3D sprite loader for factories which can append additional
+	  information to a previously loaded factory).
+	- The changes above allow the use of the mesh object loaders together
+	  with the isometric engine. The changes yesterday already allowed
+	  this for the factory loaders already but it was still not possible
+	  for the mesh objects since the iso engine does not have an
+	  iMeshWrapper implementation. Now the plugin loaders no longer
+	  depend on iMeshWrapper.
 11-Dec-2001
 	- Thanks to Matze we finally got debugging to work properly with
 	  cygwin and mingw ports. In the past there was no useful debug

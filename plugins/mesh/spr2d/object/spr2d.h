@@ -42,7 +42,7 @@ class csBox2;
  */
 class csSprite2DMeshObject : public iMeshObject
 {
- protected:
+protected:
   class uvAnimationControl
   {
   public:
@@ -58,8 +58,9 @@ class csSprite2DMeshObject : public iMeshObject
 
   uvAnimationControl uvani;
 
- private:
+private:
   iMeshObjectFactory* ifactory;
+  iBase* logparent;
   csSprite2DMeshObjectFactory* factory;
 
   iMaterialWrapper* material;
@@ -99,7 +100,8 @@ class csSprite2DMeshObject : public iMeshObject
   void UpdateLighting (iLight** lights, int num_lights, const csVector3& pos);
 
   /// Check the start vector and recalculate the LookAt matrix if changed.
-  void CheckBeam(const csVector3& start, const csVector3& plane, float dist_squared);
+  void CheckBeam (const csVector3& start, const csVector3& plane,
+  	float dist_squared);
 
 public:
   /// Constructor.
@@ -149,6 +151,8 @@ public:
   	csVector3& isect, float* pr) 
   { return HitBeamOutline(start, end, isect, pr); }
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState
@@ -216,7 +220,7 @@ public:
  */
 class csSprite2DMeshObjectFactory : public iMeshObjectFactory
 {
- protected:
+protected:
 
   class animVector : public csVector
   {
@@ -233,8 +237,9 @@ class csSprite2DMeshObjectFactory : public iMeshObjectFactory
 
   animVector vAnims;
 
- private:
+private:
   iMaterialWrapper* material;
+  iBase* logparent;
   UInt MixMode;
   /**
    * If false then we don't do lighting but instead use
@@ -242,7 +247,7 @@ class csSprite2DMeshObjectFactory : public iMeshObjectFactory
    */
   bool lighting;
   
- public:
+public:
   /// Constructor.
   csSprite2DMeshObjectFactory (iBase *pParent);
 
@@ -288,8 +293,10 @@ class csSprite2DMeshObjectFactory : public iMeshObjectFactory
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
-  //------------------------- iSprite2DFactoryState implementation ----------------
+  //---------------------- iSprite2DFactoryState implementation ----------------
   class Sprite2DFactoryState : public iSprite2DFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObjectFactory);

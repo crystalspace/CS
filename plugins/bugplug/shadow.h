@@ -44,6 +44,7 @@ struct iMeshWrapper;
 class csShadow : public iMeshObject
 {
 private:
+  iBase* logparent;
   iMeshWrapper* wrap;
   iMeshWrapper* shadow_mesh;
   bool do_bbox;	// Show bounding box.
@@ -127,6 +128,8 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return 1; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
 #endif // __CS_SHADOW_H__

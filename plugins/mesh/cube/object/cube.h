@@ -41,6 +41,7 @@ class csCubeMeshObject : public iMeshObject
 {
 private:
   csCubeMeshObjectFactory* factory;
+  iBase* logparent;
   iMeshObjectFactory* ifactory;
   csVector3 vertices[8];
   csVector3 normals[8];
@@ -140,6 +141,8 @@ public:
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
 /**
@@ -157,6 +160,7 @@ private:
 
 public:
   iObjectRegistry* object_reg;
+  iBase* logparent;
 
   /// Constructor.
   csCubeMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
@@ -189,6 +193,8 @@ public:
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iCubeFactoryState implementation ----------------
   class CubeFactoryState : public iCubeFactoryState

@@ -178,6 +178,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csTerrFuncObject::object_reg = object_reg;
   csTerrFuncObject::pFactory = pFactory;
+  logparent = NULL;
   initialized = false;
   blockxy = 4;
   gridx = 8; gridy = 8;
@@ -1629,6 +1630,7 @@ csTerrFuncObjectFactory::csTerrFuncObjectFactory (iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   csTerrFuncObjectFactory::object_reg = object_reg;
+  logparent = NULL;
 }
 
 csTerrFuncObjectFactory::~csTerrFuncObjectFactory ()

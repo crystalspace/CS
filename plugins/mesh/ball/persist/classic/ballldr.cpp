@@ -253,7 +253,7 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
 
 iBase* csBallLoader::Parse (const char* string, iMaterialList* matlist,
 	iMeshFactoryList* factlist,
-	iBase* context)
+	iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -276,8 +276,6 @@ iBase* csBallLoader::Parse (const char* string, iMaterialList* matlist,
 
   iMeshObject* mesh = NULL;
   iBallState* ballstate = NULL;
-  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
-  imeshwrap->DecRef ();
 
   char* buf = (char*)string;
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -361,7 +359,6 @@ iBase* csBallLoader::Parse (const char* string, iMaterialList* matlist,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	  imeshwrap->SetFactory (fact);
           ballstate = SCF_QUERY_INTERFACE (mesh, iBallState);
 	}
 	break;

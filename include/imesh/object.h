@@ -62,7 +62,7 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 0, 20);
+SCF_VERSION (iMeshObject, 0, 0, 21);
 
 /**
  * This is a general mesh object that the engine can interact with. The mesh
@@ -196,9 +196,26 @@ struct iMeshObject : public iBase
    * and perform calculations on that.
    */
   virtual long GetShapeNumber () const = 0;
+
+  /**
+   * Set a reference to some logical parent in the context that holds
+   * the mesh objects. When a mesh object is used in the context of the
+   * 3D engine then this will be an iMeshWrapper. In case it is used
+   * in the context of the isometric engine this will be an iIsoMeshSprite.
+   * Note that this function should NOT increase the ref-count of the
+   * given logical parent because this would cause a circular reference
+   * (since the logical parent already holds a reference to this mesh object).
+   */
+  virtual void SetLogicalParent (iBase* logparent) = 0;
+
+  /**
+   * Get the logical parent for this mesh object. See SetLogicalParent()
+   * for more information.
+   */
+  virtual iBase* GetLogicalParent () const = 0;
 };
 
-SCF_VERSION (iMeshObjectFactory, 0, 0, 4);
+SCF_VERSION (iMeshObjectFactory, 0, 0, 5);
 
 /**
  * This object is a factory which can generate
@@ -230,6 +247,23 @@ struct iMeshObjectFactory : public iBase
    * Return true if HardTransform is supported for this factory.
    */
   virtual bool SupportsHardTransform () const = 0;
+
+  /**
+   * Set a reference to some logical parent in the context that holds
+   * the mesh factories. When a mesh factory is used in the context of the
+   * 3D engine then this will be an iMeshFactoryWrapper. Similarly for
+   * the isometric engine. Note that this function should NOT increase the
+   * ref-count of the given logical parent because this would cause a
+   * circular reference (since the logical parent already holds a reference
+   * to this mesh factory).
+   */
+  virtual void SetLogicalParent (iBase* logparent) = 0;
+
+  /**
+   * Get the logical parent for this mesh factory. See SetLogicalParent()
+   * for more information.
+   */
+  virtual iBase* GetLogicalParent () const = 0;
 };
 
 SCF_VERSION (iMeshObjectType, 0, 0, 2);

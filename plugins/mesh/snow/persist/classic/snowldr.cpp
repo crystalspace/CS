@@ -271,7 +271,7 @@ static UInt ParseMixmode (char* buf)
 }
 
 iBase* csSnowLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase* context)
+	iMeshFactoryList* factlist, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -290,9 +290,6 @@ iBase* csSnowLoader::Parse (const char* string, iMaterialList* matlist,
   long cmd;
   char* params;
   char str[255];
-
-  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
-  imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
   iParticleState* partstate = NULL;
@@ -359,7 +356,6 @@ iBase* csSnowLoader::Parse (const char* string, iMaterialList* matlist,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	  imeshwrap->SetFactory (fact);
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
           snowstate = SCF_QUERY_INTERFACE (mesh, iSnowState);
 	}

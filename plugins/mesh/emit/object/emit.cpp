@@ -894,6 +894,7 @@ csEmitMeshObjectFactory::csEmitMeshObjectFactory (iBase *p, iObjectRegistry* s)
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEmitFactoryState);
   object_reg = s;
+  logparent = NULL;
 }
 
 csEmitMeshObjectFactory::~csEmitMeshObjectFactory ()

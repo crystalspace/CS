@@ -44,6 +44,7 @@ class csParticleSystem : public iMeshObject
 {
 protected:
   iMeshObjectFactory* factory;
+  iBase* logparent;
   /// Object space radius.
   csVector3 radius;
   /// iParticle ptrs to the particles.
@@ -257,6 +258,8 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState

@@ -174,6 +174,7 @@ csExploMeshObjectFactory::csExploMeshObjectFactory (iBase *p,
 	iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (p);
+  logparent = NULL;
   object_reg = s;
 }
 

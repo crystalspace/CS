@@ -40,6 +40,7 @@ csShadow::csShadow ()
   do_rad = true;
   do_beam = true;
   beam[0] = beam[1] = isec = csVector3();
+  logparent = NULL;
 }
 
 csShadow::~csShadow ()

@@ -271,6 +271,7 @@ SCF_IMPLEMENT_IBASE_END
 csFireMeshObjectFactory::csFireMeshObjectFactory(iBase* b, iObjectRegistry* s)
 {
   SCF_CONSTRUCT_IBASE (b);
+  logparent = NULL;
   object_reg = s;
 }
 

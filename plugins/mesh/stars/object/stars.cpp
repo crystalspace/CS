@@ -49,6 +49,7 @@ csStarsMeshObject::csStarsMeshObject (iMeshObjectFactory* factory)
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStarsState);
   csStarsMeshObject::factory = factory;
+  logparent = NULL;
   initialized = false;
   box.Set (csVector3 (-10, -10, -10), csVector3 (10, 10, 10));
   vis_cb = NULL;
@@ -274,6 +275,7 @@ SCF_IMPLEMENT_IBASE_END
 csStarsMeshObjectFactory::csStarsMeshObjectFactory (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+  logparent = NULL;
 }
 
 csStarsMeshObjectFactory::~csStarsMeshObjectFactory ()

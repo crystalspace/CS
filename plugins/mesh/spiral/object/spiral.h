@@ -101,6 +101,7 @@ class csSpiralMeshObjectFactory : public iMeshObjectFactory
 {
 private:
   iObjectRegistry* object_reg;
+  iBase* logparent;
 
 public:
   /// Constructor.
@@ -115,6 +116,8 @@ public:
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
  
 /**

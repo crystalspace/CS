@@ -415,7 +415,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 }
 
 iBase* csEmitLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase* context)
+	iMeshFactoryList* factlist, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (AGING)
@@ -438,9 +438,6 @@ iBase* csEmitLoader::Parse (const char* string, iMaterialList* matlist,
   long cmd;
   char* params;
   char str[255];
-
-  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
-  imeshwrap->DecRef ();
 
   iEmitGen3D *emit;
   iMeshObject* mesh = NULL;
@@ -476,10 +473,9 @@ iBase* csEmitLoader::Parse (const char* string, iMaterialList* matlist,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	  imeshwrap->SetFactory (fact);
           partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
           emitstate = SCF_QUERY_INTERFACE (mesh, iEmitState);
-	  emitfactorystate = SCF_QUERY_INTERFACE(fact->GetMeshObjectFactory(),
+	  emitfactorystate = SCF_QUERY_INTERFACE (fact->GetMeshObjectFactory(),
 	    iEmitFactoryState);
 	}
 	break;

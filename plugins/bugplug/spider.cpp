@@ -33,6 +33,7 @@ csSpider::csSpider ()
   SCF_CONSTRUCT_IBASE (NULL);
   camera = NULL;
   wrap = NULL;
+  logparent = NULL;
 }
 
 csSpider::~csSpider ()

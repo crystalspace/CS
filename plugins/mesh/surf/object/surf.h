@@ -40,6 +40,7 @@ class csSurfMeshObject : public iMeshObject
 {
 private:
   iMeshObjectFactory* factory;
+  iBase* logparent;
   int xres, yres;
   csVector3 topleft;
   float xscale, yscale;
@@ -191,6 +192,8 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float* pr);
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iSurfaceState implementation ----------------
   class SurfaceState : public iSurfaceState
@@ -269,6 +272,9 @@ public:
  */
 class csSurfMeshObjectFactory : public iMeshObjectFactory
 {
+private:
+  iBase* logparent;
+
 public:
   iObjectRegistry* object_reg;
 
@@ -284,6 +290,8 @@ public:
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
 /**

@@ -896,8 +896,11 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	}
 	else
 	{
+	  // We give here the iMeshObjectFactory as the context. If this
+	  // is a new factory this will be NULL. Otherwise it is possible
+	  // to append information to the already loaded factory.
 	  iBase* mof = plug->Parse (params, Engine->GetMaterialList (),
-	  	Engine->GetMeshFactories (), stemp);
+	  	Engine->GetMeshFactories (), stemp->GetMeshObjectFactory ());
 	  if (!mof)
 	  {
             ReportError (
@@ -907,7 +910,18 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  }
 	  else
 	  {
-	    stemp->SetMeshObjectFactory ((iMeshObjectFactory *)mof);
+	    iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof,
+	    	iMeshObjectFactory);
+	    if (!mof2)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.meshfactory",
+		"Returned object does not implement iMeshObjectFactory!");
+	      return false;
+	    }
+	    stemp->SetMeshObjectFactory (mof2);
+	    mof2->SetLogicalParent (stemp);
+	    mof2->DecRef ();
 	    mof->DecRef ();
 	  }
 	}
@@ -1685,11 +1699,30 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	else
 	{
 	  iBase* mo = plug->Parse (params, Engine->GetMaterialList (),
-	  	Engine->GetMeshFactories (), mesh);
+	  	Engine->GetMeshFactories (), NULL);
           if (mo)
           {
 	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+	    if (!mo2)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.mesh",
+		"Returned object does not implement iMeshObject!");
+	      return false;
+	    }
 	    mesh->SetMeshObject (mo2);
+	    mo2->SetLogicalParent (mesh);
+	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
+	    {
+	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
+	      iMeshFactoryWrapper* mfw = SCF_QUERY_INTERFACE (lp,
+	      	iMeshFactoryWrapper);
+	      if (mfw)
+	      {
+	        mesh->SetFactory (mfw);
+		mfw->DecRef ();
+	      }
+	    }
 	    mo2->DecRef ();
             mo->DecRef ();
           }

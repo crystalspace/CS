@@ -56,6 +56,7 @@ csSurfMeshObject::csSurfMeshObject (iMeshObjectFactory* factory)
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSurfaceState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+  logparent = NULL;
   csSurfMeshObject::factory = factory;
   initialized = false;
   cur_cameranr = -1;
@@ -492,6 +493,7 @@ csSurfMeshObjectFactory::csSurfMeshObjectFactory (iBase *pParent,
 {
   SCF_CONSTRUCT_IBASE (pParent);
   csSurfMeshObjectFactory::object_reg = object_reg;
+  logparent = NULL;
 }
 
 csSurfMeshObjectFactory::~csSurfMeshObjectFactory ()

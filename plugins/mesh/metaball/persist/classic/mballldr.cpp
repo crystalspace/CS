@@ -251,7 +251,7 @@ static UInt ParseMixmode (char* buf)
 }
 
 iBase* csMetaBallLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase* context)
+	iMeshFactoryList* factlist, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
@@ -274,8 +274,6 @@ iBase* csMetaBallLoader::Parse (const char* string, iMaterialList* matlist,
   iMeshObject* mesh = NULL;
   iMetaBallState* ballstate = NULL;
   MetaParameters* mp = NULL;
-  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
-  imeshwrap->DecRef ();
 
   char* buf = (char*)string;
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
@@ -346,7 +344,6 @@ iBase* csMetaBallLoader::Parse (const char* string, iMaterialList* matlist,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	  imeshwrap->SetFactory (fact);
       ballstate = SCF_QUERY_INTERFACE (mesh, iMetaBallState);
 	  mp = ballstate->GetParameters();
 	}

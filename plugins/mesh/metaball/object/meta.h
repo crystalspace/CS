@@ -70,6 +70,7 @@ class csMetaBall : public iMeshObject
   char frame;
 //------------- MeshObject Data
   iMeshObjectFactory* factory;
+  iBase* logparent;
   csBox3 camera_bbox;
   csBox3 object_bbox;
   iMeshObjectDrawCallback* vis_cb;
@@ -162,6 +163,9 @@ public:
   virtual bool HitBeamObject( const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr);
   virtual long GetShapeNumber() const { return shape_num; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
+
   virtual void GetRadius(csVector3& radius, csVector3& cent) 
 	{ radius =  rad; cent = object_bbox.GetCenter(); }
   virtual UInt GetMixMode() { return MixMode; }
@@ -211,6 +215,7 @@ class csMetaBallFactory : public iMeshObjectFactory
 {
 public:
   iObjectRegistry* object_reg;
+  iBase* logparent;
 
   csMetaBallFactory( iBase *parent, iObjectRegistry* object_reg);
   virtual ~csMetaBallFactory();
@@ -218,6 +223,8 @@ public:
   virtual iMeshObject* NewInstance();
   virtual void HardTransform ( const csReversibleTransform & ) {};
   virtual bool SupportsHardTransform() const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 };
 
 

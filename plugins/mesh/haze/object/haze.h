@@ -196,8 +196,9 @@ public:
  */
 class csHazeMeshObject : public iMeshObject
 {
- private:
+private:
   iMeshObjectFactory* ifactory;
+  iBase* logparent;
   csHazeMeshObjectFactory* factory;
 
   iMaterialWrapper* material;
@@ -254,8 +255,6 @@ class csHazeMeshObject : public iMeshObject
   float GetScreenBoundingBox (long cameranr, long movablenr, float fov,
         float sx, float sy,
         const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
-
- 
 
 public:
   /// Constructor.
@@ -330,6 +329,8 @@ public:
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
   virtual long GetShapeNumber () const { return shapenr; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iHazeState implementation ----------------
   class HazeState : public iHazeState
@@ -373,15 +374,16 @@ public:
  */
 class csHazeMeshObjectFactory : public iMeshObjectFactory
 {
- private:
+private:
   iMaterialWrapper* material;
   UInt MixMode;
   /// haze state info
   csVector3 origin, directional;
   /// vector of csHazeLayer
   csHazeLayerVector layers;
+  iBase* logparent;
   
- public:
+public:
   /// Constructor.
   csHazeMeshObjectFactory (iBase *pParent);
 
@@ -405,6 +407,8 @@ class csHazeMeshObjectFactory : public iMeshObjectFactory
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  virtual iBase* GetLogicalParent () const { return logparent; }
 
   //------------------------- iHazeFactoryState implementation ----------------
   class HazeFactoryState : public iHazeFactoryState

@@ -137,3 +137,15 @@ factory list (@code{iMaterialList} and @code{iMeshFactoryList}) instead of an
 Changed @code{iSaverPlugin::WriteDown()} so that it no longer has
 the @code{iEngine} parameter.
 
+@subheading iMeshObject and iMeshObjectFactory Changes
+@cindex @code{iMeshObject}
+@cindex @code{iMeshObjectFactory}
+
+Added @code{SetLogicalParent()} and @code{GetLogicalParent()} to
+both @code{iMeshObject} and @code{iMeshObjectFactory}. This should
+be no issue for applications simply using mesh objects but it is an
+issue if you made your own mesh object implementation. Also beware
+that there have been some changes in the way the parser interact
+with the plugin loaders. The plugin loaders are no longer responsible
+for setting the factory pointer. The parser will now do that.
+

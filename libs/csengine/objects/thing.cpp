@@ -104,6 +104,7 @@ csThing::csThing (iBase* parent) : csObject (parent),
   last_thing_id++;
   thing_id = last_thing_id;
   last_polygon_id = 0;
+  logparent = NULL;
 
   curves_center.x = curves_center.y = curves_center.z = 0;
   curves_scale = 40;  

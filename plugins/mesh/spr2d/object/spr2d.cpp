@@ -56,6 +56,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
   csSprite2DMeshObject::factory = factory;
+  logparent = NULL;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
@@ -672,6 +673,7 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent)
   material = NULL;
   MixMode = 0;
   lighting = true;
+  logparent = NULL;
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()

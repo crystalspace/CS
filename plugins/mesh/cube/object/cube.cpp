@@ -49,6 +49,7 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   csCubeMeshObject::factory = factory;
+  logparent = NULL;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
   initialized = false;
   cur_cameranr = -1;
@@ -438,6 +439,7 @@ csCubeMeshObjectFactory::csCubeMeshObjectFactory (iBase *pParent,
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCubeFactoryState);
+  logparent = NULL;
   sizex = 1;
   sizey = 1;
   sizez = 1;

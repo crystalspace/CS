@@ -489,11 +489,6 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
   char* params2;
   char str[255];
 
-  iMeshFactoryWrapper* imeshfactwrap = SCF_QUERY_INTERFACE (context,
-  	iMeshFactoryWrapper);
-  CS_ASSERT (imeshfactwrap != NULL);
-  imeshfactwrap->DecRef ();
-
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	"crystalspace.mesh.object.sprite.3d", iMeshObjectType);
   if (!type)
@@ -508,13 +503,18 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
 		"Could not load the sprite.3d mesh object plugin!");
     return NULL;
   }
-  iMeshObjectFactory* fact;
+
   // @@@ Temporary fix to allow to set actions for objects loaded
   // with impexp. Once those loaders move to another plugin this code
   // below should be removed.
-  if (imeshfactwrap->GetMeshObjectFactory ())
-    (fact = imeshfactwrap->GetMeshObjectFactory ())->IncRef ();
-  else
+  iMeshObjectFactory* fact =
+    context
+      ? SCF_QUERY_INTERFACE (context, iMeshObjectFactory)
+      : NULL;
+  // DecRef of fact will be handled later.
+
+  // If there was no factory we create a new one.
+  if (!fact)
     fact = type->NewFactory ();
 
   type->DecRef ();
@@ -905,7 +905,7 @@ bool csSprite3DLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase* context)
+	iMeshFactoryList* factlist, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ACTION)
@@ -922,10 +922,6 @@ iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
   long cmd;
   char* params;
   char str[255];
-
-  iMeshWrapper* imeshwrap = SCF_QUERY_INTERFACE (context, iMeshWrapper);
-  CS_ASSERT (imeshwrap != NULL);
-  imeshwrap->DecRef ();
 
   iMeshObject* mesh = NULL;
   iSprite3DState* spr3dLook = NULL;
@@ -956,7 +952,6 @@ iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
 	    return NULL;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-	  imeshwrap->SetFactory (fact);
           spr3dLook = SCF_QUERY_INTERFACE (mesh, iSprite3DState);
 	}
 	break;
