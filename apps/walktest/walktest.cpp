@@ -1548,8 +1548,19 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 	{
 	  valfiletype = "zip";
 	}
-        sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
-           name, valfiletype, name, valfiletype, name, valfiletype );
+	char* extension = strrchr (name, '.');
+	if (extension && !strcmp (extension+1, valfiletype))
+	{
+	  // The file already ends with the correct extension.
+          sprintf (tmp, "$.$/data$/%s, $.$/%s, $(..)$/data$/%s, %s",
+             name, name, name, name);
+	}
+	else
+	{
+	  // Add the extension.
+          sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
+             name, valfiletype, name, valfiletype, name, valfiletype);
+	}
         myVFS->Mount (map_dir, tmp);
       }
     }

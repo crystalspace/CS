@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+31-Jan-2002
+	- Fixed a long-standing annoyance in WalkTest. WalkTest was able
+	  to load levels in the following cases:
+	    - If the level was mounted in vfs.cfg you would just say
+	      walktest mounted_name
+	    - If the level was not mounted but it was either in the current
+	      directory, the data directory or the data directory of the
+	      parent, WalkTest would automatically mount it. However you
+	      could not use the '.zip' extension then.
+	  I extended the last feature so that you can now also use the
+	  full filename with extension. If WalkTest finds there is already
+	  an extension included it will not try to add its own extension.
+	  In addition you can now give a full pathname so walktest can load
+	  levels from everywhere without requiring a mount in vfs.cfg.
 30-Jan-2002
 	- Added iEngine::FindLight().
 	- Improved comment with iCamera::GetHit().
