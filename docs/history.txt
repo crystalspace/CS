@@ -38,6 +38,9 @@ Short-term cleanups that need to be done:
 	- Renamed BOOL to COMBOOL for compatiblity problems with BOOL on
 	  some systems (like IRIX, MacOS/X Server, OpenStep, and NextStep).
 	- Eric Sunshine made these changes:
+	    - Eric Sunshine made drawing optimizations to csProgressMeter and
+	      csProgressPulse.  In many cases the impact of these
+	      optimizations on drawing performance is quite dramatic.
 	    - Fixed a new compilation warning in cssprite.cpp.
 	    - Fixed the MacOS/X Server, OpenStep, and NextStep ports to so
 	      that they once again compile following the rename of BOOL to
