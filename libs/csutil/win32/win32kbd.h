@@ -60,6 +60,7 @@ private:
     utf32_char& rawCode, utf32_char& cookedCode, csKeyCharType& charType);
 public:
   csWin32KeyboardDriver (iObjectRegistry* r);
+  virtual ~csWin32KeyboardDriver ();
 
   virtual void Reset ();
   virtual void RestoreKeys ();

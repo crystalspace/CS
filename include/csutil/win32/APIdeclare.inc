@@ -17,10 +17,36 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */	
 
-#include "cssysdef.h"
-#include "cachedll.h"
-#include "csutil/win32/DbgHelpAPI.h"
+class cswinCacheDLL;
 
-#define CS_API_DLL		"dbghelp.dll"
+class CS_API_NAME
+{
+private:
+  static cswinCacheDLL* dll;
+  static bool dllLoaded;
+  static int refCount;
 
-#include "APIdefine.inc"
+  static bool Available ();
+public:
+  // A refcount mechanism is used to determine when to unload
+  // the DLL.
+  static void IncRef();
+  static void DecRef();
+
+  #define FUNC_GROUP_BEGIN(name)	    \
+    private: static bool name ## _avail;    \
+    public: static bool name ## Available() \
+    {					    \
+      return Available() && name ## _avail; \
+    }
+  #define FUNC_GROUP_END
+  #define FUNC(ret, name, args)		    \
+    typedef ret (WINAPI* PFN ## name) args;
+  #include CS_API_FUNCTIONS
+
+  #define FUNC_GROUP_BEGIN(name)	    
+  #define FUNC_GROUP_END
+  #define FUNC(ret, name, args)		    \
+    static PFN ## name name;
+  #include CS_API_FUNCTIONS
+};

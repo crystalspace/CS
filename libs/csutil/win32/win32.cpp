@@ -682,6 +682,7 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     case WM_UNICHAR:
     case WM_DEADCHAR:
     case WM_SYSDEADCHAR:
+    case WM_IME_COMPOSITION:
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
     case WM_KEYUP:

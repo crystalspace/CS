@@ -340,7 +340,7 @@ void csKeyboardDriver::Reset ()
     bool isDown = keyIter.Next (rawCode);
     if (isDown)
     {
-      DoKey (rawCode, 0, false);
+      DoKey (rawCode, 0, false); // @@@ Hmmm... synthesizes cooked all the time
     }
   }
 }

@@ -160,39 +160,7 @@ struct IMAGEHLP_STACK_FRAME
 typedef IMAGEHLP_STACK_FRAME* PIMAGEHLP_STACK_FRAME;
 typedef void* PIMAGEHLP_CONTEXT;
 
-class cswinCacheDLL;
+#define CS_API_NAME		DbgHelp
+#define CS_API_FUNCTIONS	"include/csutil/win32/DbgHelpAPI.fun"
 
-/** 
- * Wrapper to dynamically load DbgHelp.dll.
- */
-class DbgHelp
-{
-private:
-  static cswinCacheDLL* dll;
-  static bool dllLoaded;
-  static int refCount;
-
-  static bool Available ();
-public:
-  // A refcount mechanism is used to determine when to unload
-  // the DbgHelp.dll.
-  static void IncRef();
-  static void DecRef();
-
-  #define FUNC_GROUP_BEGIN(name)	    \
-    private: static bool name ## _avail;    \
-    public: static bool name ## Available() \
-    {					    \
-      return Available() && name ## _avail; \
-    }
-  #define FUNC_GROUP_END
-  #define FUNC(ret, name, args)		    \
-    typedef ret (WINAPI* PFN ## name) args;
-  #include "DbgHelpAPI.fun"
-
-  #define FUNC_GROUP_BEGIN(name)	    
-  #define FUNC_GROUP_END
-  #define FUNC(ret, name, args)		    \
-    static PFN ## name name;
-  #include "DbgHelpAPI.fun"
-};
+#include "APIdeclare.inc"

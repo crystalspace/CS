@@ -54,6 +54,15 @@ chronological order.
 	- Jorrit did a quick untested change to mdl2spr so that it should
 	  now output XML instead of the old map format.
 	- Jorrit also fixed the MDL part of mdl2spr (not only MD2).
+	- res made the following changes to the standard render steps:
+	    - Add the ability to create the texture and use a persistent 
+	      render target in the 'target' step.
+	    - Changed the 'fullscreen' step to accept a shader instead of a
+	      material/shadertype combo, textures, mixmode, alpha mode and 
+	      shader vars, as well as optionally different behaviour when it's 
+	      drawn the first time. Also changed it to use DrawSimpleMesh().
+	- res augmented the Win32 keyboard handling to support input from an
+	  IME, based on some code from 'fusilli'.
 4-Apr-2004
 	- res moved the attenuation texture generation to the light iter 
 	  plugin. Still the same texture for all lights, though. Plan is to
