@@ -382,14 +382,10 @@ MSVC.FORMAT.POST = $(MSVC.WORKSPACE.$(MSVC.CAR).NAME)
 MSVC.FORMAT.1 =
 MSVC.FORMAT.2 = -
 
-# Macro to determine workspace base name. (ex: "TYPICAL" becomes "typical")
-# If $* contains a slash, then only the text before the slash is used.
-MSVC.WORKSPACE.CORE = $(MSVC.WORKSPACE.$(MSVC.CAR).NAME)
-
 # Macro to compose workspace name. (ex: "TYPICAL" becomes "wkstypical.sln")
 # If $* contains a slash, then only the text before the slash is used.
 MSVC.WORKSPACE = \
-  $(MSVC.PFX.WORKSPACE)$(MSVC.WORKSPACE.CORE).$(MSVC.EXT.WORKSPACE)
+  $(MSVC.PFX.WORKSPACE)$(MSVC.WORKSPACE.$(MSVC.CAR).NAME).$(MSVC.EXT.WORKSPACE)
 
 # Macro to compose project name. (ex: "CSGEOM" becomes "libcsgeom")
 # If $* is of the form "workspace/proj", then the composed project name is
