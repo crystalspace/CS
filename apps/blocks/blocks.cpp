@@ -45,6 +45,7 @@
 #include "isound/renderer.h"
 #include "isound/handle.h"
 #include "isound/wrapper.h"
+#include "isound/source.h"
 #include "iengine/ptextype.h"
 #include "iengine/sector.h"
 #include "iengine/movable.h"
@@ -315,6 +316,7 @@ Blocks::Blocks ()
   myG3D = NULL;
   myVFS = NULL;
   myNetDrv = NULL;
+  backsound = NULL;
 
   full_rotate_x = create_rotate_x (M_PI/2);
   full_rotate_y = create_rotate_y (M_PI/2);
@@ -397,11 +399,13 @@ Blocks::~Blocks ()
 #if defined(BLOCKS_NETWORKING)
   TerminateConnection();
 #endif
+  DEC_REF (font);
   if (LevelLoader) LevelLoader->DecRef();
   if (myNetDrv) myNetDrv->DecRef ();
   if (myG2D) myG2D->DecRef ();
   if (myG3D) myG3D->DecRef ();
   if (myVFS) myVFS->DecRef ();
+  if (backsound) backsound->Stop ();
 }
 
 void Blocks::InitGame ()
@@ -2233,9 +2237,15 @@ void Blocks::InitEngine ()
   {
     // Load the blocks.zip library where sound refs are stored
     LevelLoader->LoadLibraryFile ("/data/blocks/Library");
+    
     iSoundWrapper* w = GET_NAMED_CHILD_OBJECT (
       engine->QueryObject (), iSoundWrapper, "background.wav");
-    if (w) w->GetSound ()->Play (true);
+    if (w)
+    {
+      backsound = w->GetSound ()->Play (true);
+      w->DecRef ();
+    }
+    
     snd->DecRef (); 
   }
 }
