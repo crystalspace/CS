@@ -2,7 +2,7 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csgeom/math3d.h"
-#include "csutil/parser.h"
+//#include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/cscolor.h"
 #include "clothldr.h"
@@ -553,7 +553,7 @@ bool csClothMeshLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 };
 
-
+ 
 
 csPtr<iBase> csClothMeshLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase*)
