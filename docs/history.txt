@@ -60,6 +60,14 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine modified cs.txi so that @value{TITLE} now expands to
 	  just "Crystal Space" rather than "Crytal Space" plus the version
 	  number.
+	- Eric Sunshine reverted the change to dnparse.h which Wyatt Miler
+	  made on 7 July 2000, since it introduced incorrect and buggy
+	  behavior.  Applied a different patch which should be acceptable even
+	  to his compiler.  String-constant concatenation is a standard
+	  feature of all ANSI-C compilers.  If the Macintosh compiler he is
+	  using can not deal with it, then that represents a bug in the
+	  compiler.  Note, also, that this type of string concatentation is
+	  used at many other places within the project.
 8-Sep-2000
 	- Eric Sunshine renamed several classes from the NetSpace suite which
 	  only differed from other classes in the case of the name.  This was
