@@ -1209,7 +1209,61 @@ STDMETHODIMP csTextureManagerSoftware::UnregisterTexture (ITextureHandle* handle
 STDMETHODIMP csTextureManagerSoftware::MergeTexture (ITextureHandle* handle)
 {
   (void)handle;
-  //@@@ Not implemented yet.
+  csTextureMMSoftware* txt = (csTextureMMSoftware*)GetcsTextureMMFromITextureHandle (handle);
+  if (txt->for_3d ()) txt->alloc_mipmaps (this);
+  if (txt->for_2d ()) txt->alloc_2dtexture (this);
+  txt->compute_color_usage ();
+  // The following code is for allocating an extra color for each
+  // color table. This is so that we have a palette which is better
+  // suited for colored lighting.
+  // This is not needed for truecolor mode.
+  int i, dist = 50;
+
+  // Then allocate colors for all textures at the same time.
+  for (i = 0 ; i < 256 ; i++)
+  {
+      if (i < txt->get_num_colors ())
+      {
+        alloc_rgb (txt->get_usage (i).red,
+                   txt->get_usage (i).green,
+                   txt->get_usage (i).blue,
+                   prefered_dist);
+        if (!truecolor && mixing == MIX_TRUE_RGB)
+        {
+          alloc_rgb (txt->get_usage (i).red + dist,
+                     txt->get_usage (i).green,
+                     txt->get_usage (i).blue,
+                     prefered_col_dist);
+          alloc_rgb (txt->get_usage (i).red,
+                     txt->get_usage (i).green + dist,
+                     txt->get_usage (i).blue,
+                     prefered_col_dist);
+          alloc_rgb (txt->get_usage (i).red,
+                     txt->get_usage (i).green,
+                     txt->get_usage (i).blue + dist,
+                     prefered_col_dist);
+        }
+      }
+  }
+
+  // compute light tables
+  if (txtMode == TXT_PRIVATE)
+    create_lt_truergb_private ();
+  else if (mixing == MIX_TRUE_RGB)
+    create_lt_truergb ();
+  if (truecolor)
+    create_lt_white16 ();
+  else
+    create_lt_white8 ();
+  if (!truecolor)
+    create_lt_alpha ();
+
+  // Remap all textures according to the new colormap.
+  txt->remap_texture (this);
+
+  // create Mipmaps
+  if (txt->for_3d ()) txt->create_mipmaps (this);
+  txt->free_usage_table ();
   return S_OK;
 }
 
