@@ -1021,10 +1021,9 @@ void perf_test (int num)
     t = csGetTicks ();
   }
   t2 = csGetTicks ();
-  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "%f secs to render %d frames: %f fps",
-        (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
-  Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "%f secs to render %d frames: %f fps",
-        (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "%f secs to render %d frames: %f fps", (float) (t2 - t1) / 1000., num,
+    100000. / (float) (t2 - t1));
   cnt = 1;
   time0 = (csTicks)-1;
   Sys->busy_perf_test = false;
