@@ -19,6 +19,9 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed recently introduced bugs in Simple and PySimp.
 	  Each program was bypassing Initialize() of its immediate superclass
 	  SysSystemDriver by incorrectly calling csSystemDriver instead.
+	- Eric Sunshine fixed the -video option so that it no longer generates
+	  warning messages, crashes the application, or tries to load multiple
+	  drivers.
 21-Nov-1999
 	- Michael Dale Long added some changes to CrystalClear:
 	    - Fixed rotation skew in cctest.
