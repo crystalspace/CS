@@ -1,4 +1,3 @@
-
 DESCRIPTION.csperl5 = Crystal Space Perl v5 Scripting Plugin
 
 #-------------------------------------------------------------- rootdefines ---#
@@ -16,9 +15,6 @@ ifeq ($(MAKESECTION), roottargets)
 
 all plugins: csperl5
 
-clean: csperl5clean
-distclean: csperl5distclean
-
 csperl5:
 	$(MAKE_TARGET) MAKE_DLL=yes
 csperl5clean:
@@ -30,8 +26,6 @@ endif
 
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION), postdefines)
-
-vpath % plugins/cscript/csperl5
 
 ifeq ($(USE_PLUGINS),yes)
   CSPERL5 = $(OUTDLL)/csperl5$(DLL)
@@ -69,7 +63,6 @@ DSP.CSPERL5.NAME = csperl5
 DSP.CSPERL5.TYPE = plugin
 DSP.CSPERL5.LFLAGS = /L C:\perl\lib\CORE
 DSP.CSPERL5.LIBS = perl
-DSP.CSPERL5.DEPEND = CSUTIL CSSYS
 
 endif
 
@@ -78,10 +71,12 @@ ifeq ($(MAKESECTION), targets)
 
 .PHONY: csperl5 csperl5clean csperl5distclean
 
-csperl5: $(CSPERL5) $(CSPERL5.PM) $(CEX.PERL5)
+csperl5: $(OUTDIRS) $(CSPERL5) $(CSPERL5.PM) $(CEX.PERL5)
 
 $(CSPERL5): $(OBJ.CSPERL5) $(LIB.CSPERL5) $(PERLXSI.O) $(SWIG.PERL5.DLL)
-	$(DO.PLUGIN) $(PERL5.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(PERL5.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 $(OUT)/%$O: plugins/cscript/csperl5/%.cpp
 	$(DO.COMPILE.CPP) $(PERL5.CFLAGS)
@@ -99,15 +94,20 @@ $(SWIG.PERL5.PM) $(SWIG.PERL5.C): $(SWIG.I)
 	$(MV) plugins/cscript/csperl5/$(SWIG.MOD).pm $(SWIG.PERL5.PM)
 
 $(SWIG.PERL5.O): $(SWIG.PERL5.C)
-	$(DO.COMPILE.CPP) $(PERL5.CFLAGS) -DPERL_POLLUTE -DNO_HANDY_PERL_MACROS
+	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) $(PERL5.CFLAGS) -DPERL_POLLUTE -DNO_HANDY_PERL_MACROS)
 
 $(SWIG.PERL5.DLL): $(SWIG.PERL5.O) $(LIB.CSPERL5)
-	$(DO.PLUGIN) $(PERL5.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(PERL5.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 $(CEX.PERL5): $(CIN.PERL5)
 	@echo Generating perl5 cs-config extension...
 	$(PERL5) $(CIN.PERL5) \
 	$"CFLAGS=$(PERL5.CFLAGS)$" $"LFLAGS=$(PERL5.LFLAGS)$" > $@
+
+clean: csperl5clean
+distclean: csperl5distclean
 
 csperl5clean:
 	-$(RM) $(CSPERL5) $(OBJ.CSPERL5) $(PERLXSI.O) \
