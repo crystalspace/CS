@@ -25,7 +25,7 @@ chronological order.
 	  memory leaks at exit.
 	- Jorrit reverted the helper.jam fix from Eric by putting an invalid
 	  character back instead of $(i). This will break static linking but
-	  at least normal linking works. With $(i) many modules wont link
+	  at least normal linking works. With $(i) many modules won't link
 	  correctly.
 	- Jorrit fixed a bad bug in the OpenGL renderer. DrawPolygonMesh()
 	  didn't call FlushDrawPolygon() which could cause particle systems

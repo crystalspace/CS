@@ -13,7 +13,7 @@ rule LinkWith
   for i in $(>) {
       libs += $(i) $($(i)_depends) ;
   }
-  # We must eleminate the duplicates in reverse order in order to ensure that
+  # We must eliminate the duplicates in reverse order in order to ensure that
   # we do not destroy the overall library ordering since Unix linkers are
   # order-sensitive.
   libs = [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
