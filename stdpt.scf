@@ -1,0 +1,11 @@
+.scfVersion = 1
+; 'Dots' procedural texture loader
+crystalspace.proctex.loader.dots = stdpt:crystalspace.graphics3d., 
+; 'Fire' procedural texture loader
+crystalspace.proctex.loader.fire = stdpt:crystalspace.graphics3d., 
+; 'Water' procedural texture loader
+crystalspace.proctex.loader.water = stdpt:crystalspace.graphics3d., 
+; 'Plasma' procedural texture loader
+crystalspace.proctex.loader.plasma = stdpt:crystalspace.graphics3d., 
+
+

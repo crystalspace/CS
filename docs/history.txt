@@ -35,6 +35,7 @@ The history order is reversed so that new features are at the top.
 	  could let the Application rule construct a list of application
 	  targets and generate the clean targets from this list, but I think
 	  the question is if we really need this features) 
+	- res did some smaller fixes to the stdpt makefile and added stdpt.scf.
 6-May-2003
 	- Eric Sunshine made the following changes:
 	    - Fixed Linux joystick makefile so that makefile target and
