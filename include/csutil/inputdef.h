@@ -64,72 +64,100 @@ protected:
   friend class csInputBinder;
 
 public:
-  /// Default constructor.
+  /**
+   * Default constructor.
+   * \param honorModifiers A bitmask of modifier keys that will be recognised.
+   * \param useCookedCode If true, will use the cooked key code instead of raw.
+   */
   csInputDefinition (uint32 honorModifiers = 0, bool useCookedCode = false);
 
   /// Copy constructor.
   csInputDefinition (const csInputDefinition &other);
 
-  /// Construct an input description from an iEvent (usually a button).
+  /**
+   * Construct an input description from an iEvent (usually a button).
+   * \param event The event to analyse for input data.
+   * \param honorModifiers A bitmask of modifier keys that will be recognised.
+   * \param useCookedCode If true, will use the cooked key code instead of raw.
+   */
   csInputDefinition (iEvent *event,
 		     uint32 honorModifiers = 0, bool useCookedCode = false);
 
   /**
    * Construct an input description from an iEvent (usually an axis).
-   * Axis: 0 = x, 1 = y.
+   * \param event The event to analyse for input data.
+   * \param axis Events include all axes, so choose: 0 = x, 1 = y.
    */
   csInputDefinition (iEvent *event, int axis);
 
-  /// Construct an input description from a string like "mouse1" or "shift+a".
+  /**
+   * Construct an input description from a string.
+   * \param string The string to parse, e.g. "mouse1", "shift+a".
+   * \param honorModifiers A bitmask of modifier keys that will be recognised.
+   * \param useCookedCode If true, will use the cooked key code instead of raw.
+   */
   csInputDefinition (const char *string,
 		     uint32 honorModifiers = 0, bool useCookedCode = false);
 
-  /// Return a boolean indicating whether the object contains a valid input.
+  /**
+   * Gets the string representation of the description.
+   * \param distinguishModifiers If false, left and right modifiers will be
+   *   output as plain-old modifiers (e.g. "LAlt" and "RAlt" become just "Alt").
+   * \return The string representation of the description (e.g. "mouse1",
+   *   "shift+a").
+   */
+  csString ToString (bool distinguishModifiers = true) const;
+
+  /// Returns a boolean indicating whether the object contains a valid input.
   bool IsValid () const;
 
-  /// Return the event type of the description (a csev... constant).
+  /// Returns the event type of the description (a csev... constant).
   int GetType () const { return containedType; }
-
-  /**
-   * Return the numeric value of the description (button number of a button
-   * event, axis number of an axis event (0 = x, 1 = y)).
-   */
-  int GetNumber () const { return mouseButton; }
-
-  /// Gives the key code of the description, assuming it is a keyboard type.
-  bool GetKeyCode (utf32_char &code, bool &isCooked) const
-    { code = keyboard.code;
-      isCooked = keyboard.isCooked;
-      return containedType == csevKeyboard; }
-
-  /// Return the keyboard modifiers of the description.
-  const csKeyModifiers& GetModifiers () const { return modifiers; }
 
   /// Set the event type of the description (a csev... constant).
   void SetType (int t) { containedType = t; }
 
   /**
-   * Set the numeric value of the description (button number of a button
-   * event, axis number of an axis event (0 = x, 1 = y)).
+   * Gives the key code of the description, assuming it is a keyboard type.
+   * \param code Will be set to the key code.
+   * \param isCooked Will be set to true if the code is cooked, false if raw.
+   * \return False if the description is not a keyboard type.
    */
-  void SetNumber (int n) { mouseButton = n; }
+  bool GetKeyCode (utf32_char &code, bool &isCooked) const
+    { code = keyboard.code;
+      isCooked = keyboard.isCooked;
+      return containedType == csevKeyboard; }
 
-  /// Set the key code of the description, assuming it is a keyboard type.
+  /// Sets the key code of the description, assuming it is a keyboard type.
   bool SetKeyCode (utf32_char code)
     { if (containedType != csevKeyboard) return false;
       keyboard.code = code;
       return true; }
 
-  /// Set the keyboard modifiers of the description.
-  void SetModifiers (const csKeyModifiers &mods) { modifiers = mods; }
+  /**
+   * Returns the numeric value of the description.
+   * \return If non-keyboard button event, the button number. If axis event,
+   *   the axis number (0 = x, 1 = y).
+   */
+  int GetNumber () const { return mouseButton; }
 
-  /// Get the string representation of the description.
-  csString ToString (bool distinguishModifiers = true) const;
+  /**
+   * Sets the numeric value of the description
+   * \param n If non-keyboard button event, the button number. If axis event,
+   *   the axis number (0 = x, 1 = y).
+   */
+  void SetNumber (int n) { mouseButton = n; }
+
+  /// Returns the keyboard modifiers of the description.
+  const csKeyModifiers& GetModifiers () const { return modifiers; }
+
+  /// Sets the keyboard modifiers of the description.
+  void SetModifiers (const csKeyModifiers &mods) { modifiers = mods; }
 
   /// Generate a hash value from the object.
   uint32 ComputeHash () const;
 
-  /// Return a boolean indicating whether the definitions are equal.
+  /// Return a boolean indicating whether the two definitions are equal.
   bool Compare (csInputDefinition const &) const;
 
   /**
@@ -189,11 +217,11 @@ public:
   static csString GetOtherString (int type, int num, const csKeyModifiers *mods,
     bool distinguishModifiers = true);
 
-  /// Put here to allow this class to be used as a csHash key handler.
+  /// Allows this class to be used as a csHash key handler.
   static unsigned int ComputeHash (const csInputDefinition &key)
   { return key.ComputeHash (); }
 
-  /// Put here to allow this class to be used as a csHash key handler.
+  /// Allows this class to be used as a csHash key handler.
   static bool CompareKeys (const csInputDefinition &key1,
 			   const csInputDefinition &key2)
   { return key1.Compare (key2); }

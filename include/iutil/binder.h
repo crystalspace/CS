@@ -33,9 +33,8 @@ struct iInputBinder : public iBase
 {
   /**
    * Get a pointer to the embedded iEventHander.
-   *
-   * This class can be registered with the event queue:
-   * EventQueue->RegisterListener(InputBinder->QueryHandler (), CSMASK_Input);
+   * \remarks This class can be registered with the event queue:
+   *   EventQueue->RegisterListener(InputBinder->QueryHandler (), CSMASK_Input);
    */
   virtual iEventHandler* QueryHandler () = 0;
 
@@ -47,35 +46,22 @@ struct iInputBinder : public iBase
 
   /**
    * Bind a button event to a button command.
-   *
-   * E.g. pass a keyboard, mouse button or joystick button definition to this
-   * method to bind to those particular buttons.
-   *
-   * Note that cmd is used as an array index so the numbers you use should be
-   * consecutive, starting with 0.
-   *
-   * If toggle is true, the status is toggled on keydown events. If it is
-   * false, status is set to 0 on keyup and 1 on keydown.
+   * \param def Describes the physical button to bind to.
+   * \param cmd The ID of the command to bind.
+   * \param toggle If true, button status is only toggled on keydown events.
+   * \remarks Note that cmd is used as an array index so the numbers you use
+   *   should be consecutive, starting with 0.
    */
   virtual void BindButton (const csInputDefinition &def, unsigned cmd,
     bool toggle = false) = 0;
 
   /**
    * Bind an axis motion event to an axis command.
-   *
-   * E.g. pass a mouse or joystick movement defintion to this method to bind to
-   * that particular axis.
-   *
-   * Note that cmd is used as an array index so the numbers you use should be
-   * consecutive, starting with 0.
-   *
-   * Movements will be multiplied by the sensitivity values. Remember you can
-   * use negative sensitivites to invert the mouse. The default values (~0) for
-   * the min and max parameters mean there will be no limit imposed on the
-   * cumulative movements.
-   *
-   * The wrap parameter specifies whether the value will jump to the other end
-   * of the range if it goes beyond the minimum or maximum value.
+   * \param def Describes the physical axis to bind to.
+   * \param cmd The ID of the command to bind.
+   * \param sensitivity A multiplier for the axis command.
+   * \remarks Note that cmd is used as an array index so the numbers you use
+   *   should be consecutive, starting with 0.
    */
   virtual void BindAxis (const csInputDefinition &def, unsigned cmd,
     int sensitivity = 1) = 0;
