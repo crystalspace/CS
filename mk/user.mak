@@ -48,6 +48,7 @@ PLUGINS += motion/object/default   motion/loader/default
 
 PLUGINS.DYNAMIC += engine
 PLUGINS.DYNAMIC += iso
+PLUGINS.DYNAMIC += cslexan
 PLUGINS.DYNAMIC += sequence
 PLUGINS.DYNAMIC += strserv
 PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
