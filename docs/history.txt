@@ -16,6 +16,14 @@ The history order is reversed so that new features are at the top.
 	  will use the one from the object. This fix makes sure that objects
 	  can optionally override the object model if they need that.
 	- Jorrit added default csPolygonMesh implementation for conveniance.
+	- Eric Sunshine fixed the DirectDraw check in configure.ac so that it
+	  actually works.  Problem was that it was not including windows.h.
+	  Also takes into account Jorrit's strange installation in which
+	  windows.h barfs for lack of int32.  Finally, takes Cygwin into
+	  account by checking if headers are present in /usr/include/directx.
+	  Overall, this change fixes the problem where the Jam build system
+	  would never build the DirectDraw canvas(es) because it thought
+	  DirectDraw was unavilable.
 1-June-2003
 	- Philip Wyett started adding MSVC 7 external app HOWTO screenshot
 	  images.

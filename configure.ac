@@ -826,10 +826,13 @@ AS_IF([test "$no_x" != yes],
 # flags are used if available.  We check for Windows opengl32 first because
 # Cygwin users often have Mesa installed, and Mesa's OpenGL library is compiled
 # without the __stdcall flags which results in link errors, whereas Microsoft's
-# native opengl32 works fine.  Finally, many OpenGL libraries on Unix already
-# contain GLX, so there is no separate GLX library, thus we first check for GLX
-# using the discovered OpenGL library before attempting to locate a separate
+# native opengl32 works fine.  Many OpenGL libraries on Unix already contain
+# GLX, so there is no separate GLX library, thus we first check for GLX using
+# the discovered OpenGL library before attempting to locate a separate
 # GLX-specific library.  The same logic is also applied to GLU and GLUT checks.
+# Finally, at least one user (Jorrit) has a strange installation in which
+# inclusion of <windows.h> fails if an int32 is not present, thus we must take
+# this into account.
 #------------------------------------------------------------------------------
 m4_define([cs_define_int32],
     [@%:@if !HAVE_TYPE_INT32
@@ -958,11 +961,22 @@ AS_IF([test $cs_cv_libgl = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for DirectDraw.
+# Check for DirectDraw.  At least one user (Jorrit) has a strange installation
+# in which inclusion of <windows.h> fails if an int32 is not present, thus we
+# must take this into account.  With Cygwin, we must check for the DirectX
+# headers in /usr/include/directx.
 #------------------------------------------------------------------------------
+AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])
 CS_CHECK_BUILD([for DirectDraw], [cs_cv_libddraw],
-    [AC_LANG_PROGRAM([#include <ddraw.h>], [DirectDrawCreate(0,0,0)])],
-    [CS_CREATE_TUPLE([],[],[-lddraw])], [],
+    [AC_LANG_PROGRAM(
+	[@%:@if !HAVE_TYPE_INT32
+	typedef long int32;
+	@%:@endif
+	@%:@include <windows.h>
+	@%:@include <ddraw.h>],
+	[DirectDrawCreate(0,0,0)])],
+    [CS_CREATE_TUPLE([],[],[-lddraw]) \
+    CS_CREATE_TUPLE([-I/usr/include/directx],[],[-lddraw])], [],
     [CS_EMIT_BUILD_RESULT([cs_cv_libddraw], [DDRAW])])
 
 
