@@ -9,6 +9,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine instructed Doxygen to ignore include/volatile.h.  Since
 	  its contents are specific to each person's installation, it does not
 	  belong in the generated documentation.
+	- Eric Sunshine moved -lstdc++ to DO.PLUGIN.POSTAMBLE in win32gcc.mak.
+	  This ensures that this library will appear after any other special
+	  libraries a module might require.  This fixes a problem with the
+	  odedynam plugin not linking following the earlier work around to get
+	  dllwrap working on Win9x and WinME.
 27-Feb-2003
 	- Philip Wyett imported Matze's Cygwin socket changes from main CVS. 
 26-Feb-2003
