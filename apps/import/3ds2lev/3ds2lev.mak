@@ -53,7 +53,7 @@ all: $(3DS2LEV.EXE)
 clean: 3dslevclean
 
 $(3DS2LEV.EXE): $(OBJ.3DS2LEV) $(LIB.3DS2LEV)
-	$(DO.LINK.CONSOLE.EXE)
+	$(DO.LINK.CONSOLE.EXE) -l3ds
 
 3dslevclean:
 	-$(RM) $(3DS2LEV.EXE) $(OBJ.3DS2LEV)

@@ -40,6 +40,8 @@ void OutpHeadCS (FILE *o, Lib3dsFile *p3dsFile)
     // extracts all unique textures
     char *textures[100];
     int numTextures = 0;
+    int j;
+
     // set the current mesh to the first in the file
     Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
     // as long as we have a valid mesh...
@@ -47,7 +49,8 @@ void OutpHeadCS (FILE *o, Lib3dsFile *p3dsFile)
     {
       // search if already present
       bool found = false;
-      for (int j=0; j<numTextures; j++) {
+      
+      for (j=0; j<numTextures; j++) {
         if (strcmp(p3dsMesh->faceL->material, textures[j])==0) {
           found = true;
           break;
@@ -69,7 +72,7 @@ void OutpHeadCS (FILE *o, Lib3dsFile *p3dsFile)
 
     // set the current mesh to the first in the file
 
-    for (int j=0; j<numTextures; j++)
+    for (j=0; j<numTextures; j++)
         fprintf (o, "    TEXTURE '%s' (FILE (%s.png)) \n",textures[j], textures[j]);
 
     fprintf (o, "  )\n\n");
@@ -106,6 +109,7 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
 
     // count meshes
     int numMeshes = 0;
+    int n;
     while (p3dsMesh) {
          numMeshes++;
          p3dsMesh = p3dsMesh->next;
@@ -113,7 +117,7 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     // build an array with all meshes
     Lib3dsMesh* p3dsMeshArray = new Lib3dsMesh[numMeshes];
     p3dsMesh = p3dsFile->meshes;
-    for (int n=0; n<numMeshes; n++) {
+    for (n=0; n<numMeshes; n++) {
          p3dsMeshArray[n] = *p3dsMesh;
          p3dsMesh = p3dsMesh->next;
     }
@@ -206,12 +210,13 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
 
     // get the number of vertices in the current mesh
     int numVertices = p3dsMesh->points;
-
+    int i;
+    
     // vertexes pointer
     Lib3dsPoint *pCurPoint = p3dsMesh->pointL;
     Lib3dsTexel *pCurTexel = p3dsMesh->texelL;
 
-    for ( int i = 0 ; i < numVertices ; i++ )
+    for (i = 0 ; i < numVertices ; i++ )
     {
       // index to the position on the list using index
       float *xyz = pCurPoint->pos;

@@ -200,7 +200,7 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
 
   // used for coords of vertex
   float *xyz;
-
+  
   // set the current mesh to the first in the file
   Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
 
@@ -209,10 +209,10 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
   {
     // get the number of vertices in the current mesh
     int numVertices = p3dsMesh->points;
-
+    int i;
     // vertexes pointer
     pCurPoint = p3dsMesh->pointL;
-    for ( int i = 0 ; i < numVertices ; i++ )
+    for ( i = 0 ; i < numVertices ; i++ )
     {
         // index to the position on the list using index
         xyz = pCurPoint->pos;
@@ -235,9 +235,9 @@ void Lib3dsConvertXYZ (Lib3dsFile* p3dsFile)
         float v2 = pCurFace->points[1];
         float v3 = pCurFace->points[2];
         ConvertXYZ (v1, v2, v3);
-        pCurFace->points[0] = v1;
-        pCurFace->points[1] = v2;
-        pCurFace->points[2] = v3;
+        pCurFace->points[0] = (short unsigned int)v1;
+        pCurFace->points[1] = (short unsigned int)v2;
+        pCurFace->points[2] = (short unsigned int)v3;
 
         // go to next triangle
         pCurFace++;
@@ -676,7 +676,7 @@ int main (int argc, char * argv[])
     {
         // get the numbers in the current mesh
         fprintf(stderr, "===================================================\n");
-        fprintf(stderr, "%-14s  %5d  %5d  %5d    %s\n",
+        fprintf(stderr, "%-14s  %5ld  %5ld  %5d    %s\n",
               p3dsMesh->name, p3dsMesh->faces, p3dsMesh->points, -1, " ");
 
         // go to next mesh
