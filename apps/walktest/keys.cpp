@@ -56,6 +56,66 @@
 
 csKeyMap* mapping = NULL;
 
+/// Save/load camera functions
+void SaveCamera (const char *fName)
+{
+  csCamera *c = Sys->view->GetCamera ();
+  FILE *f = fopen (fName, "w");
+  if (!f)
+    return;
+  const csMatrix3& m_o2t = c->GetO2T ();
+  const csVector3& v_o2t = c->GetOrigin ();
+  fprintf (f, "%f %f %f\n", v_o2t.x, v_o2t.y, v_o2t.z);
+  fprintf (f, "%f %f %f\n", m_o2t.m11, m_o2t.m12, m_o2t.m13);
+  fprintf (f, "%f %f %f\n", m_o2t.m21, m_o2t.m22, m_o2t.m23); 
+  fprintf (f, "%f %f %f\n", m_o2t.m31, m_o2t.m32, m_o2t.m33);
+  fprintf (f, "%s\n", csNameObject::GetName(*c->GetSector ()));
+  fprintf (f, "%d\n", c->IsMirrored ());
+  fprintf (f, "%f %f %f\n", Sys->angle.x, Sys->angle.y, Sys->angle.z);
+  fclose (f);
+}
+
+bool LoadCamera (const char *fName)
+{
+  char buf[100];
+  FILE *f = fopen (fName, "r");
+  if (!f)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Could not open coordinate file 'coord'!\n");
+    return false;
+  }
+  csMatrix3 m;
+  csVector3 v;
+  csSector* s;
+  int imirror;
+
+  fscanf (f, "%f %f %f\n", &v.x, &v.y, &v.z);
+  fscanf (f, "%f %f %f\n", &m.m11, &m.m12, &m.m13);
+  fscanf (f, "%f %f %f\n", &m.m21, &m.m22, &m.m23); 
+  fscanf (f, "%f %f %f\n", &m.m31, &m.m32, &m.m33);
+  fscanf (f, "%s\n", buf);
+  s = (csSector*)Sys->world->sectors.FindByName (buf);
+  if (!s)
+  {
+    fclose (f);
+    CsPrintf (MSG_FATAL_ERROR, "Sector in coordinate file does not exist in this world!\n");
+    return false;
+  }
+  imirror = false; fscanf (f, "%d\n", &imirror);
+
+  // Load head angle
+  fscanf (f, "%f %f %f", &Sys->angle.x, &Sys->angle.y, &Sys->angle.z);
+
+  fclose (f);
+
+  csCamera *c = Sys->view->GetCamera ();
+  c->SetSector (s);
+  c->SetMirrored ((bool)imirror);
+  c->SetO2T (m);
+  c->SetOrigin (v);
+  return true;
+}
+
 csSprite3D *FindNextClosestSprite(csSprite3D *baseSprite, csCamera *camera, csVector2 *screenCoord);
 
 //===========================================================================
@@ -994,41 +1054,13 @@ static bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "coordsave"))
   {
-    ISystem *s=GetISystemFromSystem(System);
-
     Sys->Printf (MSG_CONSOLE, "SAVE COORDS\n");
-    Sys->view->GetCamera()->SaveFile ("coord");
-    FILE *fo;
-
-    s->FOpen("coord","a",&fo);
-
-    fprintf(fo,"Head=(%g,%g,%g)\n",Sys->angle.x,Sys->angle.y,Sys->angle.z);
-
-    s->FClose(fo);
+    SaveCamera ("coord");
   }
   else if (!strcasecmp (cmd, "coordload"))
   {
-    ISystem *s=GetISystemFromSystem(System);
-
     Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
-    Sys->view->GetCamera()->LoadFile (Sys->world, "coord");
-    FILE *fp;
-
-    s->FOpen("coord","r",&fp);
-
-    char buf[128];
-
-    while(!feof(fp))
-    {
-      fgets(buf,127,fp);
-      if(!strncmp(buf,"Head=(",6))
-      {
-        sscanf(buf+6,"%f,%f,%f",&Sys->angle.x,&Sys->angle.y,&Sys->angle.z);
-        break;
-      }
-    }
-
-    s->FClose(fp);
+    LoadCamera ("coord");
   }
   else if (!strcasecmp (cmd, "dumpvis"))
   {

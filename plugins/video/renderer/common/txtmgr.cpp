@@ -27,9 +27,6 @@
 #include "isystem.h"
 #include "lightdef.h"
 
-// Ignore image file loading errors?
-bool csTextureMM::fIgnoreLoadingErrors = false;
-
 //---------------------------------------------------------------------------
 
 IMPLEMENT_UNKNOWN_NODELETE (csTextureMM)

@@ -164,22 +164,6 @@ public:
   virtual const char* GetDescription() const = 0;
 
   /**
-   * Load an image given the filename.
-   * This routine will open the file named filename, try to recognize its
-   * type, and return an ImageFile of the appropriate type.  Returns a
-   * pointer to the ImageFile on success, or NULL on failure.
-   */
-  static ImageFile* load (ISystem* sys, char* filename);
-
-  /**
-   * Load an image given a file pointer.
-   * This routine will read from the given file, try to recognize its
-   * type, and return an ImageFile of the appropriate type.  Returns a
-   * pointer to the ImageFile on success, or NULL on failure.
-   */
-  static ImageFile* load (FILE* fp);
-
-  /**
    * Load an image from a buffer.
    * This routine will read from the buffer buf of length size, try to
    * recognize the type of image contained within, and return an ImageFile

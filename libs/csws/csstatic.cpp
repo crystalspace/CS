@@ -143,26 +143,7 @@ bool csStatic::HandleEvent (csEvent &Event)
         if (!app->MouseOwner
          && link)
         {
-          oldMO = app->CaptureMouse (this);
-          link->SendCommand (cscmdStaticMouseEvent, (void *)&Event);
-          CheckUp ();
-          return true;
-        } /* endif */
-        break;
-      case csevMouseUp:
-        if (app->MouseOwner
-         && link)
-        {
-          link->SendCommand (cscmdStaticMouseEvent, (void *)&Event);
-          app->CaptureMouse (oldMO);
-          CheckUp ();
-          return true;
-        } /* endif */
-        break;
-      case csevMouseMove:
-        if (app->MouseOwner
-         && link)
-        {
+          app->CaptureMouse (this);
           link->SendCommand (cscmdStaticMouseEvent, (void *)&Event);
           CheckUp ();
           return true;

@@ -1126,7 +1126,7 @@ void CaptureScreen (void)
  */
 void debug_dump ()
 {
-  Sys->view->GetCamera ()->SaveFile ("coord.bug");
+  SaveCamera ("coord.bug");
   Sys->Printf (MSG_DEBUG_0, "Camera saved in coord.bug\n");
   Dumper::dump (Sys->view->GetCamera ());
   Sys->Printf (MSG_DEBUG_0, "Camera dumped in debug.txt\n");

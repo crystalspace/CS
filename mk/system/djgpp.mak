@@ -100,7 +100,7 @@ NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/djgpp/djgpp.cpp libs/cssys/djgpp/printf.cpp \
 	libs/cssys/djgpp/djmousys.s libs/cssys/djgpp/djkeysys.s \
-	libs/cssys/general/fopen.cpp libs/cssys/general/timing.cpp
+	libs/cssys/general/timing.cpp
 
 # Where to put the dynamic libraries on this system?
 OUTDLL=

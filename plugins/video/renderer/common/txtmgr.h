@@ -97,9 +97,6 @@ protected:
   virtual void convert_to_internal (csTextureManager* tex, IImageFile* imfile, unsigned char* bm) = 0;
 
 public:
-  /// Set this to TRUE to ignore image loading errors
-  static bool fIgnoreLoadingErrors;
-
   ///
   csTextureMM (IImageFile* image);
   ///
@@ -133,7 +130,7 @@ public:
   void free_image ();
 
   /// Return true if the texture has been loaded correctly.
-  bool loaded_correctly () { return fIgnoreLoadingErrors || (ifile != NULL); }
+  bool loaded_correctly () { return (ifile != NULL); }
 
   /// Get the mipmapped texture at some level (0..3).
   csTexture* get_texture (int lev);

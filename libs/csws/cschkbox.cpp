@@ -124,6 +124,8 @@ bool csCheckBox::HandleEvent (csEvent &Event)
             int dX = 0, dY = 0;
             app->MouseOwner->LocalToGlobal (dX, dY);
             GlobalToLocal (dX, dY);
+            // release mouse ownership so that csButton::HandleEvent can capture it
+            app->CaptureMouse (NULL);
             if ((ev->Type == csevMouseMove)
              && app->MouseOwner->bound.ContainsRel (ev->Mouse.x, ev->Mouse.y))
               ev->Mouse.x = ev->Mouse.y = 0;

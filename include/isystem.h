@@ -57,10 +57,6 @@ interface ISystem : public IUnknown
   STDMETHOD (GetSubSystemPtr) (void **retval, int iSubSystemID) PURE;
   /// print a string to the specified device.
   STDMETHOD (Print) (int mode, const char *string) PURE;
-  /// open a file in a system independent way (translating directory '/' if needed).
-  STDMETHOD (FOpen) (const char* filename, const char* mode, FILE** fp) PURE;
-  /// close a file in a system independent way.
-  STDMETHOD (FClose) (FILE* fp) PURE;
   /// get the time in milliseconds.
   STDMETHOD (GetTime) (time_t& time) PURE;
   /// quit the system.

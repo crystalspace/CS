@@ -50,7 +50,6 @@ class csCamera : public csOrthoTransform
 {
   friend class Dumper;
 
-private:
   /// The sector the camera is in.
   csSector* sector;
   /// If true we are in a mirrored world.
@@ -67,27 +66,12 @@ public:
   float shift_x;
   float shift_y;
 
-public:
   ///
   csCamera ();
   /// copy constructor
   csCamera (csCamera* c);
   ///
   virtual ~csCamera ();
-
-  /**
-   * Save the camera position to a file. The camera
-   * can then later be restored by using LoadFile().
-   * This function is mainly useful for debugging.
-   */
-  void SaveFile (char* filename);
-
-  /**
-   * Load the camera position from a file as saved
-   * by SaveFile(). This function is mainly useful for
-   * debugging.
-   */
-  bool LoadFile (csWorld* world, char* filename);
 
   /**
    * Check if there is a polygon in front of us in the direction

@@ -38,22 +38,6 @@ public:
   virtual const char* get_desc() const = 0;
 
   /**
-   * Load an wave given the filename.
-   * This routine will open the file named filename, try to recognize its
-   * type, and return an Wave of the appropriate type.  Returns a
-   * pointer to the Wave on success, or NULL on failure.
-   */
-  static csSoundData* load (ISystem* system, const char* filename);
-
-  /**
-   * Load an wave given a file pointer.
-   * This routine will read from the given file, try to recognize its
-   * type, and return an Wave of the appropriate type.  Returns a
-   * pointer to the Wave on success, or NULL on failure.
-   */
-  static csSoundData* load (FILE* fp);
-
-  /**
    * Load an wave from a buffer.
    * This routine will read from the buffer buf of length size, try to 
    * recognize the type of wave contained within, and return an Wave

@@ -222,7 +222,6 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     int deltay = (fy2 - fy1) / (fx2 - fx1);
     for (int x = fx1, y = fy1; x <= fx2; x++)
     {
-      // Assumption: Y cannot be negative (after clipping)
       DrawPixel (x, y >> 16, color);
       y += deltay;
     }
@@ -242,7 +241,6 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     int deltax = int (fx2 - fx1) / int (fy2 - fy1);
     for (int x = fx1, y = fy1; y <= fy2; y++)
     {
-      // Assumption: X cannot be negative (after clipping)
       DrawPixel (x >> 16, y, color);
       x += deltax;
     }
@@ -547,11 +545,10 @@ void csGraphics2D::GetClipRect (int &xmin, int &ymin, int &xmax, int &ymax)
 bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
   int xmin, int ymin, int xmax, int ymax)
 {
-  // Shrink clip area by one pixel
   float fxmin = xmin;
-  float fxmax = xmax - 1;
+  float fxmax = float (xmax) - 0.0001;
   float fymin = ymin;
-  float fymax = ymax - 1;
+  float fymax = float (ymax) - 0.0001;
 
 #define CLIP_LEFT   0x01
 #define CLIP_TOP    0x02

@@ -90,7 +90,7 @@ public:
   virtual ~csVFS ();
 
   /// Add a virtual link: real path can contain $(...) macros
-  bool AddLink (char *VirtualPath, char *RealPath);
+  bool AddLink (const char *VirtualPath, const char *RealPath);
 
   /// Set current working directory
   bool ChDir (const char *Path);
@@ -131,9 +131,9 @@ public:
   /// Set an entry in configuration file (like "CD = /proc/cd")
   bool SetConfig (char *VarName, char *Value);
   /// Mount an VFS path on a "real-world-filesystem" path
-  bool Mount (char *VirtualPath, char *RealPath);
+  bool Mount (const char *VirtualPath, const char *RealPath);
   /// Unmount an VFS path; if RealPath is NULL, entire VirtualPath is unmounted
-  bool Unmount (char *VirtualPath, char *RealPath);
+  bool Unmount (const char *VirtualPath, const char *RealPath);
 
   /// Save current configuration back into configuration file
   bool SaveMounts (const char *FileName);
@@ -186,7 +186,7 @@ protected:
   int Error;
 
   // The constructor for csFile
-  csFile (int Mode, VfsNode *ParentNode, int RIndex, char *NameSuffix);
+  csFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix);
 
 public:
   /// Instead of fclose() do "delete file"

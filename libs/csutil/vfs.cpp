@@ -53,7 +53,7 @@ class DiskFile : public csFile
   // The file
   FILE *file;
   // constructor
-  DiskFile (int Mode, VfsNode *ParentNode, int RIndex, char *NameSuffix);
+  DiskFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix);
   // set Error according to errno
   void CheckError ();
 
@@ -72,7 +72,7 @@ public:
   virtual int GetStatus ();
 private:
   // Create a directory or a series of directories starting from PathBase
-  void MakeDir (char *PathBase, char *PathSuffix);
+  void MakeDir (const char *PathBase, const char *PathSuffix);
 };
 
 // used by ArchiveFile
@@ -92,7 +92,7 @@ class ArchiveFile : public csFile
   // current data pointer
   size_t fpos;
   // constructor
-  ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex, char *NameSuffix,
+  ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix,
     VfsArchive *ParentArchive);
 
 public:
@@ -213,24 +213,24 @@ public:
   csStrVector UPathV;
 
   // Initialize the object
-  VfsNode (char *iPath, char *iConfigKey);
+  VfsNode (char *iPath, const char *iConfigKey);
   // Destroy the object
   virtual ~VfsNode ();
 
   // Parse a directory link directive and fill RPathV
-  bool AddRPath (char *RealPath, const csIniFile *Config);
+  bool AddRPath (const char *RealPath, const csIniFile *Config);
   // Remove a real-world path
-  bool RemoveRPath (char *RealPath);
+  bool RemoveRPath (const char *RealPath);
   // Get value of a variable
-  static const char *GetValue (const csIniFile *Config, char *VarName);
+  static const char *GetValue (const csIniFile *Config, const char *VarName);
   // Find all files in a subpath
-  void FindFiles (char *Suffix, char *Mask, csStrVector *FileList);
+  void FindFiles (const char *Suffix, const char *Mask, csStrVector *FileList);
   // Find a file and return the appropiate csFile object
-  csFile *Open (int Mode, char *Suffix);
+  csFile *Open (int Mode, const char *Suffix);
   // Delete a file
-  bool Delete (char *Suffix);
+  bool Delete (const char *Suffix);
   // Does file exists?
-  bool Exists (char *Suffix);
+  bool Exists (const char *Suffix);
 };
 
 // The global archive cache
@@ -238,7 +238,7 @@ static VfsArchiveCache ArchiveCache;
 
 // --------------------------------------------------------------- csFile --- //
 
-csFile::csFile (int Mode, VfsNode *ParentNode, int RIndex, char *NameSuffix)
+csFile::csFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix)
 {
   (void)Mode;
   Node = ParentNode;
@@ -283,7 +283,7 @@ char *csFile::GetAllData ()
 #define VFS_WRITE_MODE	(O_CREAT | O_TRUNC | O_WRONLY | O_BINARY)
 
 DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
-  char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
+  const char *NameSuffix) : csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
   char *rp = (char *)Node->RPathV [Index];
   size_t rpl = strlen (rp);
@@ -350,7 +350,7 @@ DiskFile::~DiskFile ()
     fclose (file);
 }
 
-void DiskFile::MakeDir (char *PathBase, char *PathSuffix)
+void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
 {
   size_t pbl = strlen (PathBase);
   size_t pl = pbl + strlen (PathSuffix) + 1;
@@ -492,7 +492,7 @@ size_t DiskFile::GetPos ()
 // ---------------------------------------------------------- ArchiveFile --- //
 
 ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
-  char *NameSuffix, VfsArchive *ParentArchive) : csFile (Mode, ParentNode,
+  const char *NameSuffix, VfsArchive *ParentArchive) : csFile (Mode, ParentNode,
   RIndex, NameSuffix)
 {
   Archive = ParentArchive;
@@ -583,7 +583,7 @@ char *ArchiveFile::GetAllData ()
 
 // -------------------------------------------------------------- VfsNode --- //
 
-VfsNode::VfsNode (char *iPath, char *iConfigKey)
+VfsNode::VfsNode (char *iPath, const char *iConfigKey)
 {
   VPath = iPath;
   ConfigKey = strnew (iConfigKey);
@@ -597,12 +597,13 @@ VfsNode::~VfsNode ()
     delete [] VPath;
 }
 
-bool VfsNode::AddRPath (char *RealPath, const csIniFile *Config)
+bool VfsNode::AddRPath (const char *RealPath, const csIniFile *Config)
 {
   bool rc = false;
   // Split rpath into several, separated by commas
   int rpl = strlen (RealPath);
-  char *cur, *src = RealPath;
+  char *cur, *src;
+  char *oldsrc = src = strnew (RealPath);
   for (cur = src; rpl >= 0; cur++, rpl--)
     if ((rpl == 0) || (*cur == VFS_PATH_DIVIDER))
     {
@@ -668,10 +669,12 @@ bool VfsNode::AddRPath (char *RealPath, const csIniFile *Config)
       src = cur + 1;
     } /* endif */
 
+  delete [] oldsrc;
+
   return rc;
 }
 
-bool VfsNode::RemoveRPath (char *RealPath)
+bool VfsNode::RemoveRPath (const char *RealPath)
 {
   if (!RealPath)
   {
@@ -691,7 +694,7 @@ bool VfsNode::RemoveRPath (char *RealPath)
   return false;
 }
 
-const char *VfsNode::GetValue (const csIniFile *Config, char *VarName)
+const char *VfsNode::GetValue (const csIniFile *Config, const char *VarName)
 {
   // Look in environment first
   char *value = getenv (VarName);
@@ -723,7 +726,7 @@ const char *VfsNode::GetValue (const csIniFile *Config, char *VarName)
   return "";
 }
 
-void VfsNode::FindFiles (char *Suffix, char *Mask, csStrVector *FileList)
+void VfsNode::FindFiles (const char *Suffix, const char *Mask, csStrVector *FileList)
 {
   // Look through all RPathV's for file or directory
   for (int i = 0; i < RPathV.Length (); i++)
@@ -829,7 +832,7 @@ void VfsNode::FindFiles (char *Suffix, char *Mask, csStrVector *FileList)
   }
 }
 
-csFile *VfsNode::Open (int Mode, char *FileName)
+csFile *VfsNode::Open (int Mode, const char *FileName)
 {
   csFile *f = NULL;
 
@@ -880,7 +883,7 @@ csFile *VfsNode::Open (int Mode, char *FileName)
   return f;
 }
 
-bool VfsNode::Delete (char *Suffix)
+bool VfsNode::Delete (const char *Suffix)
 {
   // Look through all RPathV's for file or directory
   for (int i = 0; i < RPathV.Length (); i++)
@@ -921,7 +924,7 @@ bool VfsNode::Delete (char *Suffix)
   return false;
 }
 
-bool VfsNode::Exists (char *Suffix)
+bool VfsNode::Exists (const char *Suffix)
 {
   // Look through all RPathV's for file or directory
   for (int i = 0; i < RPathV.Length (); i++)
@@ -1016,7 +1019,7 @@ bool csVFS::EnumConfig (csSome Parm, char *Name, size_t DataSize, csSome Data)
   return false;
 }
 
-bool csVFS::AddLink (char *VirtualPath, char *RealPath)
+bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 {
   VfsNode *e = new VfsNode (ExpandPath (VirtualPath, true), VirtualPath);
   if (!e->AddRPath (RealPath, config))
@@ -1215,7 +1218,7 @@ csStrVector *csVFS::FindFiles (const char *Path) const
     if ((memcmp (node->VPath, XPath, sl) == 0)
      && (node->VPath [sl]))
     {
-      char *pp = node->VPath + sl;
+      const char *pp = node->VPath + sl;
       while (*pp && *pp == VFS_PATH_SEPARATOR)
 	pp++;
       while (*pp && *pp != VFS_PATH_SEPARATOR)
@@ -1332,7 +1335,7 @@ bool csVFS::DeleteFile (const char *FileName)
   return rc;
 }
 
-bool csVFS::Mount (char *VirtualPath, char *RealPath)
+bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 {
   ArchiveCache.CheckUp ();
 
@@ -1360,7 +1363,7 @@ bool csVFS::Mount (char *VirtualPath, char *RealPath)
   return true;
 }
 
-bool csVFS::Unmount (char *VirtualPath, char *RealPath)
+bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
 {
   ArchiveCache.CheckUp ();
 

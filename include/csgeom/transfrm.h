@@ -318,4 +318,3 @@ public:
 };
 
 #endif /*TRANSFORM_H*/
-

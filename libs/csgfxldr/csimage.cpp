@@ -343,28 +343,6 @@ bool ImageLoader::Register (ImageLoader* loader)
   return true;
 }
 
-ImageFile* ImageLoader::load (ISystem* sys, char* filename)
-{
-  FILE* fp;
-  sys->FOpen (filename, "rb", &fp);
-  if (!fp) return NULL;
-  ImageFile* i = load(fp);
-  sys->FClose (fp);
-  return i;
-}
-
-ImageFile* ImageLoader::load (FILE* fp)
-{
-  fseek(fp, 0, SEEK_END);
-  ULong size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-  CHK (UByte* buf = new UByte [size+1] );
-  fread(buf, 1, size+1, fp);
-  ImageFile* i = load(buf,size);
-  CHK (delete [] buf);
-  return i;
-}
-
 ImageFile* ImageLoader::load (UByte* buf, ULong size)
 {
   int i=0;

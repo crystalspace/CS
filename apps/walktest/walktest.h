@@ -262,6 +262,9 @@ extern void perf_test ();
 extern void CaptureScreen ();
 extern void free_keymap ();
 
+extern void SaveCamera (const char *fName);
+extern bool LoadCamera (const char *fName);
+
 /// Apply lights to all static objects (currently only sprites)
 void light_statics ();
 

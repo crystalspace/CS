@@ -24,6 +24,7 @@
 #include "csengine/csspr2d.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
+#include "qint.h"
 #include "igraph2d.h"
 #include "csws/cscomp.h"
 #include "csws/csmouse.h"
@@ -601,7 +602,7 @@ void csComponent::Drag (int x, int y, int DragMode)
       return;
   }
   else if (!(DragStyle & CS_DRAG_SIZEABLE))
-      return;
+    return;
 
   dragMode = DragMode;
   LocalToGlobal (x, y);
@@ -1107,7 +1108,7 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
 {
   // First clip the line against dirty rectangle
   if (System->piG2D->ClipLine (x1, y1, x2, y2,
-         dirty.xmin, dirty.ymin, dirty.xmax, dirty.ymax) == S_OK)
+        dirty.xmin, dirty.ymin, dirty.xmax, dirty.ymax) == S_OK)
     return;
 
  /* Do clipping as follows: create a minimal rectangle which fits the line,
@@ -1115,10 +1116,10 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
   * all resulting rectangles.
   */
   csObjVector rect (8, 4);
-  CHK (csRect *lb = new csRect ((int) x1, (int) y1, (int) x2, (int) y2));
+  CHK (csRect *lb = new csRect (QInt (x1), QInt (y1), QInt (x2), QInt (y2)));
   lb->Normalize ();
-  lb->xmax++;
-  lb->ymax++;
+  lb->xmax += 2;
+  lb->ymax += 2;
   lb->Intersect (dirty);
   if (!clip.IsEmpty ())
     lb->Intersect (clip);

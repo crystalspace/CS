@@ -103,7 +103,7 @@ class csStatic : public csComponent
   // Text alignment (for csscsText style)
   int TextAlignment;
   // Old keyboard and mouse owner
-  csComponent *oldKO, *oldMO;
+  csComponent *oldKO;
   // link is focused?
   bool linkactive;
 

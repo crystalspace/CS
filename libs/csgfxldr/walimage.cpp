@@ -59,7 +59,7 @@ ImageWALFile::~ImageWALFile ()
 ImageWALFile::ImageWALFile (UByte* ptr, long filesize) : ImageFile ()
 {
   status=IFE_BadFormat;
-  unsigned int chkfilesize;
+  long chkfilesize;
   unsigned char *datPtr;
   unsigned int palindex;
   unsigned int i;
@@ -69,8 +69,8 @@ ImageWALFile::ImageWALFile (UByte* ptr, long filesize) : ImageFile ()
   
   // There's no id-tag in .WAL files, so the only way I know to check
   // if it's a wal, is to use this method. Hope it works
-  chkfilesize=head->offsets[3]+((head->height/8)*(head->width/8));
-  if(chkfilesize!=filesize) return;
+  chkfilesize = head->offsets[3]+((head->height/8)*(head->width/8));
+  if (chkfilesize != filesize) return;
 
   //There are 4 mipmaps in a wal-file, but we just use the first and
   //Discard the rest

@@ -239,14 +239,6 @@ public:
   static void printf_close ();
   static int printf (const char *str, ...);
 
-  /**
-   * Open a file. This function first translates the directory
-   * separator ('/' is used here) to whatever the system uses
-   * and after that passes control to 'fopen'.
-   * Default implementation of first function is in 'def_sys'.
-   */
-  static FILE* fopen (const char* filename, const char* mode);
-
 protected:
   /**
    * This is a system-dependent function which eats a single
@@ -317,8 +309,6 @@ protected:
     STDMETHODIMP GetWidthSetting(int& retval);
     STDMETHODIMP GetSubSystemPtr(void **retval, int iSubSystemID);
     STDMETHODIMP Print(int mode, const char* string);
-    STDMETHODIMP FOpen (const char* filename, const char* mode, FILE** fp);
-    STDMETHODIMP FClose (FILE* fp);
     STDMETHODIMP GetTime (time_t& time);
     STDMETHODIMP Shutdown ();
     STDMETHODIMP GetShutdown (bool &Shutdown);
@@ -340,7 +330,6 @@ protected:
 #define pprintf_init	csSystemDriver::printf_init
 #define pprintf_close	csSystemDriver::printf_close
 #define pprintf		csSystemDriver::printf
-#define SysOpen		csSystemDriver::fopen
 #define SysGetTime	csSystemDriver::Time
 
 // CrystalSpace global variables

@@ -27,11 +27,11 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_UNKNOWN_NODELETE( csCamera )
+IMPLEMENT_UNKNOWN_NODELETE (csCamera)
 
-BEGIN_INTERFACE_TABLE( csCamera )
-	IMPLEMENTS_COMPOSITE_INTERFACE( Camera )
-END_INTERFACE_TABLE()
+BEGIN_INTERFACE_TABLE (csCamera)
+  IMPLEMENTS_COMPOSITE_INTERFACE (Camera)
+END_INTERFACE_TABLE ()
 
 int csCamera::default_aspect = 0;
 float csCamera::default_inv_aspect = 0;
@@ -46,7 +46,7 @@ csCamera::csCamera () : csOrthoTransform()
   shift_y = csWorld::frame_height / 2;
 }
 
-csCamera::csCamera (csCamera* c) : csOrthoTransform((csOrthoTransform &)c)
+csCamera::csCamera (csCamera* c) : csOrthoTransform (*c)
 {
   mirror = c->mirror;
   sector = c->sector;
@@ -56,60 +56,8 @@ csCamera::csCamera (csCamera* c) : csOrthoTransform((csOrthoTransform &)c)
   shift_y = c->shift_y;
 }
 
-
-csCamera::~csCamera () {}
-
-void csCamera::SaveFile (char* filename)
+csCamera::~csCamera ()
 {
-  FILE* fp;
-  csWorld::isys->FOpen (filename, "w", &fp);
-  fprintf (fp, "%12e %12e %12e\n", v_o2t.x, v_o2t.y, v_o2t.z);
-  fprintf (fp, "%12e %12e %12e\n", m_o2t.m11, m_o2t.m12, m_o2t.m13);
-  fprintf (fp, "%12e %12e %12e\n", m_o2t.m21, m_o2t.m22, m_o2t.m23); 
-  fprintf (fp, "%12e %12e %12e\n", m_o2t.m31, m_o2t.m32, m_o2t.m33);
-  fprintf (fp, "%s\n", csNameObject::GetName(*sector));
-  fprintf (fp, "%d\n", mirror);
-  csWorld::isys->FClose (fp);
-}
-
-bool csCamera::LoadFile (csWorld* world, char* filename)
-{
-  char buf[100];
-  FILE* fp;
-  csWorld::isys->FOpen (filename, "r", &fp);
-  if (!fp)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Could not open coordinate file 'coord'!\n");
-    return false;
-  }
-  csMatrix3 m;
-  csVector3 v;
-  csSector* s;
-  int imirror;
-
-  fscanf (fp, "%f %f %f\n", &v.x, &v.y, &v.z);
-  fscanf (fp, "%f %f %f\n", &m.m11, &m.m12, &m.m13);
-  fscanf (fp, "%f %f %f\n", &m.m21, &m.m22, &m.m23); 
-  fscanf (fp, "%f %f %f\n", &m.m31, &m.m32, &m.m33);
-  fscanf (fp, "%s\n", buf);
-  s = (csSector*)world->sectors.FindByName (buf);
-  if (!s)
-  {
-    csWorld::isys->FClose (fp);
-    CsPrintf (MSG_FATAL_ERROR, "Sector in coordinate file does not exist in this world!\n");
-    return false;
-  }
-  imirror = false; fscanf (fp, "%d\n", &imirror);
-
-  csWorld::isys->FClose (fp);
-
-  sector = s;
-  mirror = (bool)imirror;
-  v_o2t = v;
-  m_o2t = m;
-  // For camera matrices a transpose is equivalent to the inverse of a matrix.
-  m_t2o = m_o2t.GetTranspose ();
-  return true;
 }
 
 csPolygon3D* csCamera::GetHit (csVector3& v)
@@ -238,7 +186,4 @@ void csCamera::Correct (int n, float* vals[])
   *vals[0] = r*cos(angle);  *vals[1] = r*sin(angle); 
 }
 
-
-
 //---------------------------------------------------------------------------
-

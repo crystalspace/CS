@@ -1,28 +1,28 @@
 /*
-  Crystal Space Windowing System: rectangle class interface
-  Copyright (C) 1998 by Jorrit Tyberghein
-  Written by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Windowing System: rectangle class interface
+    Copyright (C) 1998 by Jorrit Tyberghein
+    Written by Andrew Zabolotny <bit@eltech.ru>
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Library General Public
-  License as published by the Free Software Foundation; either
-  version 2 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Library General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
 
-  You should have received a copy of the GNU Library General Public
-  License along with this library; if not, write to the Free
-  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef __CSRECT_H__
 #define __CSRECT_H__
 
+#include "types.h"
 #include "csutil/csbase.h"
-#include "types.h"	// for bool
 
 /**
  * Rectangle class: simple class for manipulating 2D rectangles.
@@ -178,6 +178,13 @@ public:
   {
     return (xmin != rect.xmin) || (ymin != rect.ymin)
         || (xmax != rect.xmax) || (ymax != rect.ymax);
+  }
+
+  /// Extend rectangle so that it will include given point
+  inline void Extend (int x, int y)
+  {
+    if (xmin > x) xmin = x; if (xmax < x) xmax = x;
+    if (ymin > y) ymin = y; if (ymax < y) ymax = y;
   }
 };
 

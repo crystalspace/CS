@@ -30,7 +30,7 @@ csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
   SetPalette (CSPAL_DIALOG);
   state |= CSS_SELECTABLE;
   FrameStyle = iFrameStyle;
-  DragStyle = CS_DRAG_MOVEABLE;
+  DragStyle = 0;
   first = NULL;
   GridX = GridY = -1;
   SnapSizeToGrid = false;

@@ -106,8 +106,7 @@ NASMFLAGS.SYSTEM=-f elf
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/unix/unix.cpp libs/cssys/unix/loadlib.cpp \
- libs/cssys/general/printf.cpp libs/cssys/unix/utiming.cpp \
- libs/cssys/general/fopen.cpp 
+ libs/cssys/general/printf.cpp libs/cssys/unix/utiming.cpp
 SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 
 # Where to put the dynamic libraries on this system?

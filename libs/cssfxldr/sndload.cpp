@@ -53,31 +53,9 @@ csVector *csSoundLoader::loaderlist = NULL;
 bool csSoundLoader::Register (csSoundLoader* loader)
 {
   if (!loaderlist)
-    { CHK (loaderlist = new csVector (8, 8)); }
+    CHKB (loaderlist = new csVector (8, 8));
   loaderlist->Push ((csSome)loader);
   return true;
-}
-
-csSoundData* csSoundLoader::load (ISystem* system, const char* filename)
-{
-  FILE* fp;
-  system->FOpen (filename, "rb", &fp);
-  if (!fp) return NULL;
-  csSoundData* i = load(fp);
-  system->FClose (fp);
-  return i;
-}
-
-csSoundData* csSoundLoader::load (FILE* fp)
-{
-  fseek(fp, 0, SEEK_END);
-  ULong size = ftell(fp);
-  fseek(fp, 0, SEEK_SET);
-  CHK (UByte* buf = new UByte [size+1] );
-  fread(buf, 1, size+1, fp);
-  csSoundData* i = load(buf,size);
-  CHK (delete [] buf);
-  return i;
 }
 
 csSoundData* csSoundLoader::load (UByte* buf, ULong size)

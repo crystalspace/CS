@@ -33,63 +33,6 @@
 #include <string.h>
 
 /*
- *	fopen
- *
- *	Same as the library fopen except convert the 
- *	unix path into a mac path then open the file.
- */
-
-FILE * fopen(const char * filename, const char * mode)
-{
-	FILE *			file;
-	char			new_filename[256];
-	const char *	s = filename;
-	char *			d = new_filename;
-
-	/*
-	 *	If the path is relative, start the path with a colon.
-	 */
-
-	if ( strchr( filename, '/' ) && ( filename[0] != '/' ) && ( filename[0] != '.' )) {
-		*d++ = ':';
-	}
-
-	while (*s)
-	{
-		/*
-		 *	If the character is a slash replace it with colons.
-		 */
-		if (*s == '/')
-			*d++ = ':';
-		/*
-		 *	If the characters are double periods with a slash replace the
-		 *	periods with a colon.  This will end up with two colons which
-		 *	is the mac way of moving up the directory tree.
-		 */
-		else if (( *s == '.' ) && ( *(s+1) == '.') && (*(s+2) == '/' )) {
-			*d++ = ':';
-			s++;
-		} else
-			*d++ = *s;
-		s++;
-	}
-	*d = 0;
-
-	/*
-	 *	This code is taken from fopen in the MSL library source.
-	 */
-
-	__begin_critical_region( files_access);
-	
-	file = freopen( new_filename, mode, __find_unopened_file() );
-	
-	__end_critical_region( files_access );
-	
-	return file;
-}
-
-
-/*
  *	fgets
  *
  *	Handle the three different line endings Mac (cr), Unix (lf), and DOS (crlf)

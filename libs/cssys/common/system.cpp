@@ -812,20 +812,6 @@ STDMETHODIMP csSystemDriver::XSystem::Print(int mode, const char* string)
     return S_OK;
 }
 
-STDMETHODIMP csSystemDriver::XSystem::FOpen (const char* filename, 
-                                             const char* mode, FILE** fp)
-{
-  METHOD_PROLOGUE (csSystemDriver, System);
-  *fp = pThis->fopen (filename, mode);
-  return S_OK;
-}
-
-STDMETHODIMP csSystemDriver::XSystem::FClose (FILE* fp)
-{
-  fclose (fp);
-  return S_OK;
-}
-
 STDMETHODIMP csSystemDriver::XSystem::GetTime (time_t& time)
 {
   time = csSystemDriver::Time ();

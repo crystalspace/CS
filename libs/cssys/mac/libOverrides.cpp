@@ -85,38 +85,6 @@ static void FixupFilePath( const char *source, char *dest )
 #endif
 
 /*
- *	fopen
- *
- *	Same as the library fopen except convert the 
- *	unix path into a mac path then open the file.
- */
-
-FILE * fopen(const char * filename, const char * mode)
-{
-	FILE *			file;
-	char			new_filename[ FILENAME_MAX ];
-
-	/*
-	 *	Convert the path to mac style.
-	 */
-
-	FixupFilePath( filename, new_filename );
-
-	/*
-	 *	This code is taken from fopen in the MSL library source.
-	 */
-
-	__begin_critical_region( files_access);
-	
-	file = freopen( new_filename, mode, __find_unopened_file() );
-	
-	__end_critical_region( files_access );
-	
-	return file;
-}
-
-
-/*
  *	fgets
  *
  *	Handle the three different line endings Mac (cr), Unix (lf), and DOS (crlf)
