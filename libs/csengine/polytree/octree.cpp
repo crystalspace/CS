@@ -938,7 +938,6 @@ bool csOctree::BoxOccludeeShadowOutline (const csBox3& occluder_box,
 	int plane_nr, float plane_pos)
 {
   int j;
-  csPolygon3D* p;
   csPoly3D cur_poly;
   csPoly2D result_poly;
   bool first_time = true;
