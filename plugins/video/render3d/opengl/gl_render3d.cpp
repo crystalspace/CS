@@ -1282,9 +1282,6 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
   void* data = ((csGLRenderBuffer*)buffer)->RenderLock (
   	CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
   int stride = buffer->GetStride ();
-  if(stride) {
-    stride = stride;
-  }
   if (data != (void*)-1)
   {
     if (ext->glEnableVertexAttribArrayARB && attrib < CS_VATTRIB_SPECIFIC_FIRST)
