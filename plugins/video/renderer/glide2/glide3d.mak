@@ -46,7 +46,8 @@ endif
 DESCRIPTION.$(GLIDE3D) = $(DESCRIPTION.glide3d)
 SRC.GLIDE3D = $(wildcard libs/cs3d/glide2/*.cpp) \
   libs/cs3d/common/texmem.cpp libs/cs3d/common/txtmgr.cpp \
-  libs/cs3d/common/memheap.cpp libs/cs3d/common/imgtools.cpp
+  libs/cs3d/common/memheap.cpp libs/cs3d/common/imgtools.cpp \
+  libs/cs3d/common/scrnshot.cpp
 OBJ.GLIDE3D = $(addprefix $(OUT),$(notdir $(SRC.GLIDE3D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

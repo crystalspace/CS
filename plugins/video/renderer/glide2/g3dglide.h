@@ -97,6 +97,7 @@ private:
   bool rstate_gouraud;
   bool rstate_flat;
   bool rstate_alphablend;
+  bool rstate_lighting;
   int rstate_mipmap;
 
   bool  m_gouraud;
@@ -224,6 +225,9 @@ public:
   virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
   virtual void CloseFogObject (CS_ID id);
 
+  /// Take a screenshot : return a iImage object
+  virtual iImage* ScreenShot();
+  
   //  virtual csHaloHandle CreateHalo(float r, float g, float b);
   virtual iHalo *CreateHalo(float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, int iHeight );
   //  virtual void DestroyHalo (csHaloHandle haloInfo);

@@ -65,6 +65,7 @@ public:
 	FxU32 (__stdcall *grSstScreenWidth)( void );
 	FxU32 (__stdcall *grSstStatus)( void );
 	FxBool (__stdcall *grLfbWriteRegion)( GrBuffer_t dst_buffer, FxU32 dst_x, FxU32 dst_y, GrLfbSrcFmt_t src_format, FxU32 src_width, FxU32 src_height, FxI32 src_stride, void *src_data );
+	FxBool (__stdcall *grLfbReadRegion)( GrBuffer_t dst_buffer, FxU32 src_x, FxU32 src_y, FxU32 src_width, FxU32 src_height, FxU32 dst_stride, void *dst_data );
 	void (__stdcall *grColorCombine)(
                GrCombineFunction_t function, GrCombineFactor_t factor,
                GrCombineLocal_t local, GrCombineOther_t other,
@@ -131,6 +132,7 @@ extern GlideLib * glLib;
 #define GlideLib_grSstScreenWidth glLib->grSstScreenWidth
 #define GlideLib_grSstStatus glLib->grSstStatus
 #define GlideLib_grLfbWriteRegion glLib->grLfbWriteRegion
+#define GlideLib_grLfbReadRegion glLib->grLfbReadRegion
 #define GlideLib_grColorCombine glLib->grColorCombine
 #define GlideLib_grColorMask glLib->grColorMask
 #define GlideLib_grCullMode glLib->grCullMode
@@ -192,6 +194,7 @@ extern GlideLib * glLib;
 #define GlideLib_grSstScreenWidth grSstScreenWidth
 #define GlideLib_grSstStatus grSstStatus
 #define GlideLib_grLfbWriteRegion grLfbWriteRegion
+#define GlideLib_grLfbReadRegion grLfbReadRegion
 #define GlideLib_grColorCombine grColorCombine
 #define GlideLib_grColorMask grColorMask
 #define GlideLib_grCullMode grCullMode

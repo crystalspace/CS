@@ -75,6 +75,7 @@ GlideLib::GlideLib(void)
 	LOADFUNCTIONPROC(grSstScreenWidth,(FxU32 (__stdcall *)( void )),0);
 	LOADFUNCTIONPROC(grSstStatus,(FxU32 (__stdcall *)( void )),0);
 	LOADFUNCTIONPROC(grLfbWriteRegion,(FxBool (__stdcall *)( GrBuffer_t , FxU32 , FxU32 , GrLfbSrcFmt_t , FxU32 , FxU32 , FxI32 , void * )),32);
+	LOADFUNCTIONPROC(grLfbReadRegion,(FxBool (__stdcall *)( GrBuffer_t , FxU32 , FxU32 , FxU32 , FxU32 , FxU32 , void * )),28);
 	LOADFUNCTIONPROC(grSstWinOpen,(FxBool (__stdcall *)(FxU32 , GrScreenResolution_t , GrScreenRefresh_t, GrColorFormat_t, GrOriginLocation_t , int , int )),28);
 	LOADFUNCTIONPROC(grColorCombine,(void (__stdcall *)(GrCombineFunction_t , GrCombineFactor_t , GrCombineLocal_t , GrCombineOther_t , FxBool  )),20);
 	LOADFUNCTIONPROC(grColorMask,(void (__stdcall *)( FxBool , FxBool  )),8);

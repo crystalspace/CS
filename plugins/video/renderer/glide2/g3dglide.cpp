@@ -64,6 +64,7 @@
 #include "cs3d/glide2/glidelib.h"
 #include "cs3d/glide2/g3dglide.h"
 
+#include "cs2d/glide2common/scrnshot.h"
 
 //
 // Interface table definition
@@ -408,6 +409,7 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   rstate_flat = true;
   rstate_alphablend = true;
   rstate_mipmap = true;
+  rstate_lighting = true;
 }
 
 csGraphics3DGlide2x::~csGraphics3DGlide2x()
@@ -960,7 +962,7 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
 //  ASSERT( tcache );
         
   // retrieve the lightmap from the cache.
-  iLightMap* piLM = pTex->GetLightMap ();
+  iLightMap* piLM = ( rstate_lighting ? pTex->GetLightMap () : NULL );
   
   if ( piLM )
   {
@@ -1299,9 +1301,11 @@ bool csGraphics3DGlide2x::SetRenderState(G3D_RENDERSTATEOPTION option, long valu
   case G3DRENDERSTATE_TEXTUREMAPPINGENABLE:
     rstate_flat = !value;
     break;
+  case G3DRENDERSTATE_LIGHTINGENABLE :
+    rstate_lighting = value;
+    break;
   case G3DRENDERSTATE_FILTERINGENABLE :
   case G3DRENDERSTATE_PERFECTMAPPINGENABLE :
-  case G3DRENDERSTATE_LIGHTINGENABLE :
   case G3DRENDERSTATE_INTERLACINGENABLE :
   case G3DRENDERSTATE_MMXENABLE :
     break;
@@ -1729,4 +1733,19 @@ void csGraphics3DGlide2x::csHaloDrawer::drawline_innerrim(int x1, int x2, int y)
 
     r -= rdelta; g -= gdelta; b -= bdelta; a -= adelta;
   }
+}
+
+iImage* csGraphics3DGlide2x::ScreenShot(){
+  int height = m_piG2D->GetHeight();
+  int width = m_piG2D->GetWidth();
+  UShort *data = new UShort[ width * height ];
+  bool succ;
+  succ = GlideLib_grLfbReadRegion( GR_BUFFER_FRONTBUFFER, 0, 0, width, height, width*2, data );
+  if ( succ ){
+    csScreenShot *ss = new csScreenShot ( m_piG2D, data );
+    delete [] data;
+    return ss;
+  }
+  delete [] data;
+  return NULL;
 }

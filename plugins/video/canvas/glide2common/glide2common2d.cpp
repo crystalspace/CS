@@ -289,3 +289,4 @@ void csGraphics2DGlideCommon::Print( csRect* area ){
     // swap the buffers only to show the new frame
     GlideLib_grBufferSwap( m_bVRetrace ? 1 : 0 );
 }
+
