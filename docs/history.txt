@@ -46,6 +46,9 @@ chronological order.
 	- res fixed map2cs so that q3 invisible textures are handled properly.
 	- res fixed the PS shader plugin so constants are honored for ATI
 	  programs.
+	- res changed the glrender3d to also call G2D->BeginDraw()/FinishDraw()
+	  before beginning/finishing 3d graphics.
+	- res moved the NV/ATI fragment shader setup to the ps1 plugin.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader

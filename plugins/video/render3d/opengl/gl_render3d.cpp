@@ -700,11 +700,6 @@ bool csGLGraphics3D::Open ()
    */
   if (config->GetBool ("Video.OpenGL.UseNVidiaExt", true))
   {
-    ext->InitGL_NV_register_combiners ();
-    ext->InitGL_NV_register_combiners2 ();
-    ext->InitGL_NV_texture_shader ();
-    ext->InitGL_NV_texture_shader2 ();
-    ext->InitGL_NV_texture_shader3 ();
   }
   /*
     Check whether to init ATI-only exts.
@@ -714,7 +709,6 @@ bool csGLGraphics3D::Open ()
   if (config->GetBool ("Video.OpenGL.UseATIExt", true))
   {
     ext->InitGL_ATI_separate_stencil ();
-    ext->InitGL_ATI_fragment_shader ();
   }
 
   rendercaps.minTexHeight = 2;
@@ -1001,6 +995,14 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   for (i = 15; i >= 0; i--)
     DeactivateTexture (i);
 
+  // if 2D graphics is not locked, lock it
+  if ((drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
+   && (!(current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
+  {
+    if (!G2D->BeginDraw ())
+      return false;
+  }
+
   if (render_target)
   {
     int txt_w, txt_h;
@@ -1097,7 +1099,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     
     SetMixMode (CS_FX_COPY);
     glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
-    return G2D->BeginDraw ();
+    return true;//G2D->BeginDraw ();
   }
 
   current_drawflags = 0;
@@ -1108,7 +1110,7 @@ void csGLGraphics3D::FinishDraw ()
 {
   SetMirrorMode (false);
 
-  if (current_drawflags & CSDRAW_2DGRAPHICS)
+  if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
 
   current_drawflags = 0;

@@ -253,7 +253,6 @@ void csGraphics2DGLCommon::FinishDraw ()
   csGraphics2D::FinishDraw();
   if (FrameBufferLocked != 0) return;
   statecache->Disable_GL_SCISSOR_TEST ();
-  statecache->Enable_GL_TEXTURE_2D ();
 }
 
 void csGraphics2DGLCommon::DecomposeColor (int iColor,

@@ -90,6 +90,8 @@ csPtr<iShaderProgram> csGLShader_PS1::CreateProgram (const char* type)
 {
   if (strcasecmp (type, "fp") == 0)
   {
+    Open();
+
     if(ext->CS_GL_ATI_fragment_shader)
       return csPtr<iShaderProgram> (new csShaderGLPS1_ATI (this));
     else if(ext->CS_GL_NV_register_combiners)
@@ -106,12 +108,20 @@ void csGLShader_PS1::Open()
 
   if (!ext) return;
 
-  ext->InitGL_ATI_fragment_shader ();
-  ext->InitGL_NV_texture_shader ();
-  ext->InitGL_NV_texture_shader2 ();
-  ext->InitGL_NV_texture_shader3 ();
-  ext->InitGL_NV_register_combiners ();
-  ext->InitGL_NV_register_combiners2 ();
+  csRef<iConfigManager> config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  if (config->GetBool ("Video.OpenGL.UseNVidiaExt", true))
+  {
+    ext->InitGL_NV_register_combiners ();
+    ext->InitGL_NV_register_combiners2 ();
+    ext->InitGL_NV_texture_shader ();
+    ext->InitGL_NV_texture_shader2 ();
+    ext->InitGL_NV_texture_shader3 ();
+  }
+  if (config->GetBool ("Video.OpenGL.UseATIExt", true))
+  {
+    ext->InitGL_ATI_fragment_shader ();
+  }
+  
   if(ext->CS_GL_ATI_fragment_shader)
   {
     Report(CS_REPORTER_SEVERITY_NOTIFY, "ATI Fragment Shader Extension Supported");

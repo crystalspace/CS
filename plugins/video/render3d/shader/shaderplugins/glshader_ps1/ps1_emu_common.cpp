@@ -157,8 +157,6 @@ bool csShaderGLPS1_Common::Load(iDocumentNode* program)
 
 bool csShaderGLPS1_Common::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
-  shaderPlug->Open ();
-
   csShaderVariable *var;
   int i,j;
 
