@@ -58,6 +58,8 @@ chronological order.
 	      cswigpl5.inc to CS/scripts/perl5/.
 	    - Commented out the Jamfile since I don't know how to make it do
 	      what I want it to do.
+	- Anders Stenberg added three pass PPL technique for cards with just 
+	  two texture units. Also inlined all FFPs.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:

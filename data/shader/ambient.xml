@@ -8,7 +8,15 @@
 			<streammapping stream="texture coordinates" destination="attribute 1" />
 			<vp type="gl_arb_vp" file="/shader/ambient.avp"/>
 			<texturemapping unit="0" name="tex diffuse" />
-			<fp type="gl_fixed_fp" file="/shader/modulate.ffp"/>
+			<fp type="gl_fixed_fp">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="primary color" modifier="color"/>
+            <colorsource num="1" source="texture" modifier="color"/>
+            <coloroperation operation="modulate"/>
+          </layer>
+        </fixedfp>
+      </fp>
 		</pass>
 	</technique>
 	<technique priority="50">
@@ -18,7 +26,15 @@
 			<streammapping stream="texture coordinates" destination="texture coordinate" />
 			<vp type="gl_fixed_vp" file="/shader/ambient.fvp"/>
 			<texturemapping unit="0" name="tex diffuse" />
-			<fp type="gl_fixed_fp" file="/shader/modulate.ffp"/>
+			<fp type="gl_fixed_fp">
+        <fixedfp>
+          <layer>
+            <colorsource num="0" source="primary color" modifier="color"/>
+            <colorsource num="1" source="texture" modifier="color"/>
+            <coloroperation operation="modulate"/>
+          </layer>
+        </fixedfp>
+      </fp>
 		</pass>
 	</technique>
 </shader>

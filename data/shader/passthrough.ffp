@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?> 
-<fixedfp>
-	<layer>
-		<colorsource num="0" source="texture" modifier="color"/>
-		<coloroperation operation="replace"/>
-	</layer>
-</fixedfp>

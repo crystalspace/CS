@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8" ?> 
-<fixedfp>
-	<layer>
-		<colorsource num="0" source="primary color" modifier="color"/>
-		<colorsource num="1" source="texture" modifier="color"/>
-		<coloroperation operation="modulate"/>
-	</layer>
-</fixedfp>
