@@ -157,6 +157,7 @@ uint32 csHashMap::prime_table[] =
 
 csHashMap::csHashMap (uint32 size)
 {
+  size = FindLargerPrime(size);
   NumBuckets = size;
   Buckets.SetLength (size, csHashBucket ());
   hash_elements = 0;
