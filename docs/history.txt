@@ -12,6 +12,8 @@ The history order is reversed so that new features are at the top.
 	- res fixed a stupid bug in the Win32 registry configuration where a 
 	  string was deleted and immediately used after. One of the symptoms
 	  were non-functional writing of settings.
+        - DeSigna added an assertion that ensures csString::SubString()'s 
+          csString& argument isn't itself.
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().
