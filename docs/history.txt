@@ -42,6 +42,8 @@ chronological order.
 	    - Added ability to give layers in fixed FPs names and use them to 
 	      refer to a layer from VPs.
 	    - Made the shader condition handling a tad more efficient.
+	    - Fixed an issue with pooled SCF classes were PoolRecycle() was
+	      called multiple times.
 23-Mar-2005
 	- res removed the Apache snprintf code.
 	- res fixed AWS after the recent 64bit compatibility changes. In 
