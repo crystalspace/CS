@@ -359,7 +359,7 @@ void csConfigFile::InitializeObject ()
   LastNode = new csConfigNode(0);
   LastNode->InsertAfter(FirstNode);
 
-  Iterators = new csVector();
+  Iterators = new csArray<csConfigIterator*>();
   Filename = 0;
   Dirty = false;
   EOFComment = 0;
@@ -388,7 +388,7 @@ csConfigFile::~csConfigFile()
   // deleted there shouldn't be any iterators left.
   CS_ASSERT(Iterators->Length() == 0);
   delete Iterators;
-  if (Filename) delete[] Filename;
+  delete[] Filename;
 }
 
 const char* csConfigFile::GetFileName() const
@@ -533,7 +533,7 @@ void csConfigFile::Clear()
   // rewind all iterators
   for (long i = 0; i < Iterators->Length(); i++)
   {
-    csConfigIterator *it = (csConfigIterator*)Iterators->Get(i);
+    csConfigIterator *it = Iterators->Get(i);
     it->Rewind();
   }
   if (EOFComment)
@@ -546,7 +546,7 @@ void csConfigFile::Clear()
 
 csPtr<iConfigIterator> csConfigFile::Enumerate(const char *Subsection)
 {
-  iConfigIterator *it = new csConfigIterator(this, Subsection);
+  csConfigIterator *it = new csConfigIterator(this, Subsection);
   Iterators->Push(it);
   return csPtr<iConfigIterator> (it);
 }
@@ -811,7 +811,7 @@ void csConfigFile::RemoveIterator(csConfigIterator *it) const
 {
   int n = Iterators->Find(it);
   CS_ASSERT(n != -1);
-  Iterators->Delete(n);
+  Iterators->DeleteIndex(n);
 }
 
 void csConfigFile::SetEOFComment(const char *text)

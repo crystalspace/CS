@@ -20,7 +20,8 @@
 #define __CS_UTIL_CFGFILE_H__
 
 #include "iutil/cfgfile.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
+
 class csConfigNode;
 class csConfigIterator;
 
@@ -149,7 +150,7 @@ private:
    * changes to the configuration may affect the iterators (e.g. when
    * you delete a key). Sorry, but this can't be a typed vector!
    */
-  csVector *Iterators;
+  csArray<csConfigIterator*> *Iterators;
   // current file name and file system
   char *Filename;
   // the VFS filesystem used for this file (or 0 if not used)

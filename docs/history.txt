@@ -5,6 +5,17 @@ The overall history is in reverse (descending) chronological order, so that
 each new day's apears before the previous day's entry.  The individual changes
 for each given day, however, are in normal (ascending) chronological order.
 
+28-Jul-2003
+	- Jorrit removed several csVector's throughout CS:
+	    - Replaced 'render_priorities' in the engine with csStringArray.
+	    - Replaced 'references' in csSector with csArray<iReference*>.
+	    - Replaced 'FinishTimes' in csAnimationTemplate with
+	      csArray<csTicks>.
+	    - Replaced 'ConfigFiles' in csConfigAccess with
+	      csArray<iConfigFile*>.
+	    - Replaced 'Iterators' in csConfigFile with
+	      csArray<csConfigIterator>.
+	  This is only the start.
 27-Jul-2003
 	- Philipp Aumayr added Cubemap and Texture3d Parser/Loader
 	- Marten Svanfeldt made a few changes related to new renderer
@@ -14,7 +25,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Added a check for VBO before trying to use it in DeactivateBuffer
 	- Keith Fulton changed thing.cpp so that deallocation of lightmaps
           doesn't crash the system when using a null renderer.
-	- Keith also committed a fix to csutil/list.h to fix an obvious bug there.
+	- Keith also committed a fix to csutil/list.h to fix an obvious bug
+	  there.
 	- Jorrit cleaned up the public header files of AWS. Performed
 	  proper indentation, added missing doxygen comments, fixed several
 	  wrong doxygen comments, added missing LGPL notice, added missing

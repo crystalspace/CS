@@ -46,7 +46,7 @@ csConfigAccess::~csConfigAccess()
     {
       int i;
       for (i = 0; i < ConfigFiles.Length (); i++)
-	cfgmgr->RemoveDomain ((iConfigFile *)ConfigFiles.Get (i));
+	cfgmgr->RemoveDomain (ConfigFiles[i]);
     }
   }
 }

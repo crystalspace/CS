@@ -20,7 +20,7 @@
 #ifndef __CS_CSANIM2D_H__
 #define __CS_CSANIM2D_H__
 
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "csutil/parray.h"
 #include "cstool/cspixmap.h"
 
@@ -38,7 +38,7 @@ private:
    * absolute time to finish a frame
    * (the time from start to finish of the frame)
    */
-  csVector FinishTimes;
+  csArray<csTicks> FinishTimes;
 
 public:
   /// build a new animation
@@ -48,23 +48,24 @@ public:
 
   /// get number of frames
   inline int GetFrameCount() const
-    {return Frames.Length();}
+  {return Frames.Length();}
   /// get total length of animation (all delays added together)
   inline csTicks GetLength() const
-    {return (GetFrameCount()==0)?0:(csTicks)FinishTimes.Get(GetFrameCount()-1);}
+  {return (GetFrameCount()==0)?0:FinishTimes[GetFrameCount()-1];}
   /// add a frame. (giving the length of this frame)
   inline void AddFrame(csTicks Delay, csPixmap *s)
-    {FinishTimes.Push((void*) (GetLength() + Delay)); Frames.Push (s);}
+  {FinishTimes.Push(GetLength() + Delay); Frames.Push (s);}
   /// add a frame (giving the length of this frame)
   inline void AddFrame(csTicks Delay, iTextureHandle *Tex)
-    {AddFrame(Delay, new csSimplePixmap(Tex));}
+  {AddFrame(Delay, new csSimplePixmap(Tex));}
   /// add a frame (giving the length of this frame)
-  inline void AddFrame(csTicks Delay, iTextureHandle *Tex, int x, int y, int w, int h)
-    {AddFrame(Delay, new csSimplePixmap(Tex, x, y, w, h));}
+  inline void AddFrame(csTicks Delay, iTextureHandle *Tex, int x, int y,
+	int w, int h)
+  {AddFrame(Delay, new csSimplePixmap(Tex, x, y, w, h));}
 
   /// get a frame by number
   inline csPixmap *GetFrame(int n) const
-    {return Frames.Get(n);}
+  {return Frames.Get(n);}
   /// get a frame by time
   csPixmap *GetFrameByTime(csTicks Time);
 

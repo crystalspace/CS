@@ -24,6 +24,7 @@
 #include "csutil/nobjvec.h"
 #include "csutil/refarr.h"
 #include "csutil/cscolor.h"
+#include "csutil/array.h"
 #include "iutil/objref.h"
 #include "csengine/light.h"
 #include "csengine/meshobj.h"
@@ -230,7 +231,7 @@ private:
   /**
    * List of references (portals?) to this sector.
    */
-  csVector references;
+  csArray<iReference*> references;
 
   /**
    * List of sector callbacks.

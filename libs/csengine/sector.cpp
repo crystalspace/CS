@@ -546,7 +546,7 @@ void csSector::CleanupReferences ()
 {
   while (references.Length () > 0)
   {
-    iReference *ref = (iReference *)references[references.Length () - 1];
+    iReference *ref = references[references.Length () - 1];
 #ifdef CS_DEBUG
     // Sanity check.
     iReferencedObject *refobj = ref->GetReferencedObject ();
@@ -1374,10 +1374,10 @@ void csSector::ReferencedObject::RemoveReference (iReference *ref)
   // refs to a sector will also scan backwards. So this is more efficient.
   for (i = scfParent->references.Length () - 1; i >= 0; i--)
   {
-    iReference *r = (iReference *) (scfParent->references[i]);
+    iReference *r = scfParent->references[i];
     if (r == ref)
     {
-      scfParent->references.Delete (i);
+      scfParent->references.DeleteIndex (i);
       return ;
     }
   }

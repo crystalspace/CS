@@ -38,7 +38,7 @@ csPixmap *csAnimationTemplate::GetFrameByTime(csTicks Time)
   // search for frame (@@@ optimize this!)
   long i;
   for (i=0; i<GetFrameCount(); i++) {
-    if (Time < (csTicks)FinishTimes.Get(i))
+    if (Time < FinishTimes[i])
       return GetFrame(i);
   }
   // this should never happen because it means that this class is buggy

@@ -764,13 +764,6 @@ csEngine::~csEngine ()
 
   DeleteAll ();
 
-  int i;
-  for (i = 0; i < render_priorities.Length (); i++)
-  {
-    char *n = (char *)render_priorities[i];
-    delete[] n;
-  }
-
   render_priorities.DeleteAll ();
 
   // @@@TOTALLY DISABLED FOR NOW delete rad_debug;
@@ -991,22 +984,20 @@ void csEngine::RegisterRenderPriority (
 
   // If our priority goes over the number of defined priorities
   // then we have to initialize.
+  int old_pri_len = render_priorities.Length ();
   if (priority + 1 >= render_priority_sortflags.Limit ())
   {
     render_priority_sortflags.SetLimit (priority + 2);
     render_priority_cameraflags.SetLimit (priority + 2);
+    render_priorities.SetLength (priority+2);
   }
-  for (i = render_priorities.Length (); i <= priority; i++)
+  for (i = old_pri_len; i <= priority; i++)
   {
-    render_priorities[i] = 0;
     render_priority_sortflags[i] = CS_RENDPRI_NONE;
     render_priority_cameraflags[i] = false;
   }
 
-  char *n = (char *)render_priorities[priority];
-  delete[] n;
-  n = csStrNew (name);
-  render_priorities[priority] = n;
+  render_priorities.Put (priority, name);
   render_priority_sortflags[priority] = rendsort;
   render_priority_cameraflags[priority] = do_camera;
   if (!strcmp (name, "sky"))
@@ -1024,7 +1015,7 @@ long csEngine::GetRenderPriority (const char *name) const
   int i;
   for (i = 0; i < render_priorities.Length (); i++)
   {
-    char *n = (char *)render_priorities[i];
+    const char *n = render_priorities[i];
     if (n && !strcmp (name, n)) return i;
   }
 
@@ -1041,7 +1032,7 @@ bool csEngine::GetRenderPriorityCamera (const char *name) const
   int i;
   for (i = 0; i < render_priorities.Length (); i++)
   {
-    char *n = (char *)render_priorities[i];
+    const char *n = render_priorities[i];
     if (n && !strcmp (name, n)) return render_priority_cameraflags[i];
   }
 
@@ -1058,7 +1049,7 @@ int csEngine::GetRenderPrioritySorting (const char *name) const
   int i;
   for (i = 0; i < render_priorities.Length (); i++)
   {
-    char *n = (char *)render_priorities[i];
+    const char *n = render_priorities[i];
     if (n && !strcmp (name, n)) return render_priority_sortflags[i];
   }
 
@@ -1072,13 +1063,6 @@ int csEngine::GetRenderPrioritySorting (long priority) const
 
 void csEngine::ClearRenderPriorities ()
 {
-  int i;
-  for (i = 0; i < render_priorities.Length (); i++)
-  {
-    char *n = (char *)render_priorities[i];
-    delete[] n;
-  }
-
   render_priorities.DeleteAll ();
   render_priority_sortflags.SetLimit (0);
   render_priority_cameraflags.SetLimit (0);
@@ -1096,7 +1080,7 @@ int csEngine::GetRenderPriorityCount () const
 const char* csEngine::GetRenderPriorityName (long priority) const
 {
   if (priority < 0 && priority >= render_priorities.Length ()) return 0;
-  return (const char*)render_priorities[priority];
+  return render_priorities[priority];
 }
 
 void csEngine::ResetWorldSpecificSettings()

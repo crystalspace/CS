@@ -24,6 +24,7 @@
 #include "csutil/csobject.h"
 #include "csutil/garray.h"
 #include "csutil/parray.h"
+#include "csutil/stringarray.h"
 #include "csutil/refarr.h"
 #include "csutil/hashmap.h"
 #include "iutil/eventh.h"
@@ -326,7 +327,7 @@ public:
   csRegionList regions;
 
   /// The list of all named render priorities.
-  csVector render_priorities;
+  csStringArray render_priorities;
   /// Sorting flags for the render priorities.
   csGrowingArray<int> render_priority_sortflags;
   /// Do_camera flags for the render priorities.

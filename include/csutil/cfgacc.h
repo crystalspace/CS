@@ -19,8 +19,9 @@
 #ifndef __CS_CFGACC_H__
 #define __CS_CFGACC_H__
 
-#include "csutil/csvector.h"
+#include "csutil/array.h"
 #include "iutil/cfgmgr.h"
+
 struct iConfigFile;
 struct iObjectRegistry;
 
@@ -52,7 +53,7 @@ public:
 
 private:
   iObjectRegistry *object_reg;
-  csVector ConfigFiles;
+  csArray<iConfigFile*> ConfigFiles;
 };
 
 #endif // __CS_CFGACC_H__
