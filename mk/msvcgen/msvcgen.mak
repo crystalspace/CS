@@ -240,20 +240,24 @@ MSVC.OUTPUT = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.PROJECT)
 MSVC.FRAGMENT = $(MSVC.OUT.FRAGMENT)/$(MSVC.PROJECT).$(MSVC.EXT.FRAGMENT)
 
 # Only generate version info for apps and plugins
-MSVC.VERSIONRC = \
-  $(if $(subst appcon,,$(DSP.$*.TYPE)),$(if \
-    $(subst plugin,,$(DSP.$*.TYPE)),,$(MSVC.PROJECT).rc),$(MSVC.PROJECT).rc)
+#MSVC.VERSIONRC = \
+#  $(if $(subst appcon,,$(DSP.$*.TYPE)),$(if \
+#    $(subst plugin,,$(DSP.$*.TYPE)),,$(MSVC.PROJECT).rc),$(MSVC.PROJECT).rc)
 
 # Get description
-MSVC.VERSIONDESC = \
-  $(DESCRIPTION.$(shell echo $* | \
-    sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
+#MSVC.VERSIONDESC = \
+#  $(DESCRIPTION.$(shell echo $* | \
+#    sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
 
 # Generate the .RC file
-MSVC.MAKEVERRC = \
-  $(if $(MSVC.VERSIONRC),libs/cssys/win32/mkverres.sh \
-  $(MSVC.OUT.DIR)/$(MSVC.VERSIONRC) \
-  "$(if $(MSVC.VERSIONDESC),$(MSVC.VERSIONDESC),$*)",)
+#MSVC.MAKEVERRC = \
+#  $(if $(MSVC.VERSIONRC),libs/cssys/win32/mkverres.sh \
+#  $(MSVC.OUT.DIR)/$(MSVC.VERSIONRC) \
+#  "$(if $(MSVC.VERSIONDESC),$(MSVC.VERSIONDESC),$*)",)
+
+MSVC.VERSIONRC =
+MSVC.VERSIONDESC =
+MSVC.MAKEVERRC = 
 
 # Macro to compose entire list of resources which comprise a project.
 MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) \
