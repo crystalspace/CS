@@ -606,16 +606,15 @@ bool ViewMesh::SaveSprite(const char *filename)
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-  csRef<iSaverPlugin> saver (CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.mesh.saver.factory.sprite.3d.binary", iSaverPlugin));
+  csRef<iBinarySaverPlugin> saver (CS_LOAD_PLUGIN (plugin_mgr,
+    "crystalspace.mesh.saver.factory.sprite.3d.binary", iBinarySaverPlugin));
 	
 	
   csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
 
   csRef<iFile> cf (VFS->Open (filename, VFS_FILE_WRITE));
   
-  //TBD: change to new API
-  //saver->WriteDown(imeshfact, cf);
+  saver->WriteDown(imeshfact, cf);
 
   return true;
 }

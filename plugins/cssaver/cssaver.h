@@ -50,14 +50,16 @@ public:
 
   bool SaveTextures(csRef<iDocumentNode>& parent);
   bool SaveMaterials(csRef<iDocumentNode>& parent);
-	bool SaveCameraPositions(csRef<iDocumentNode> &parent);
-	bool SaveRenderPriorities(csRef<iDocumentNode> &parent);
-	bool SaveSectors(csRef<iDocumentNode> &parent);
-	bool SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent);
+  bool SaveCameraPositions(csRef<iDocumentNode> &parent);
+  bool SaveRenderPriorities(csRef<iDocumentNode> &parent);
+  bool SaveSectors(csRef<iDocumentNode> &parent);
+  bool SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent);
+  bool SaveSectorLights(iSector *s, csRef<iDocumentNode> &parent);
+  bool SavePortals(iPortal *portal, csRef<iDocumentNode> &parent);
 
   virtual csRef<iString> SaveMapFile();
   virtual bool SaveMapFile(const char *filename);
-	virtual bool SaveMapFile(csRef<iDocumentNode> &root);
+  virtual bool SaveMapFile(csRef<iDocumentNode> &root);
 
   struct eiComponent : public iComponent
   {

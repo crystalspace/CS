@@ -6,12 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Jul-2004
+	- PK made the following changes:
+	    - Changed viewmesh to support the iBinarySaverPlugin.
+	    - Started with the iLight dump in iSaver.
+	    - Changed some code to fit the codingstyle in iSaver.
+	    - Fixed the default code of the iSaverPlugin implementation.
 18-Jul-2004
 	- PK changed iSaver and iSaverPlugin to support the iDocumentNode system
 	- PK added iBinarySaverPlugin and changed SprCal3dbinldr to support it
 	- PK implemented saving of sectors and meshes
 	- hangman implemented saving of camera positions
-
 16-Jul-2004
 	- res added csColor4, a descendant of csColor, with an alpha component
 	  added.

@@ -31,6 +31,8 @@
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
 #include "iengine/campos.h"
+#include "iengine/portal.h"
+#include "iengine/portalcontainer.h"
 #include "igraphic/image.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
@@ -198,7 +200,7 @@ bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent)
       {
         const char* texname = layerTexWrap->QueryObject()->GetName();
         if (texname && *texname)
-	  CreateValueNode(layerItem, "texture", texname);
+          CreateValueNode(layerItem, "texture", texname);
       }
 
       csTextureLayer* texLayer = mat->GetTextureLayer(i);
@@ -229,23 +231,23 @@ bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent)
           CreateNode(mixmodeItem, "add");
         }
         if (blendmode == CS_FX_MULTIPLY)
-	{
+        {
           CreateNode(mixmodeItem, "multiply");
         }
         if (blendmode == CS_FX_MULTIPLY2)
-	{
+        {
           CreateNode(mixmodeItem, "multiply2");
         }
         if (blendmode == CS_FX_TRANSPARENT)
-	{
+        {
           CreateNode(mixmodeItem, "transparent");
         }
         if (texLayer->mode & CS_FX_KEYCOLOR)
-	{
+        {
           CreateNode(mixmodeItem, "keycolor");
         }
         if (texLayer->mode & CS_FX_TILING)
-	{
+        {
           CreateNode(mixmodeItem, "tiling");
         }
       }
@@ -295,93 +297,103 @@ bool csSaver::SaveRenderPriorities(csRef<iDocumentNode> &parent)
 
 bool csSaver::SaveCameraPositions(csRef<iDocumentNode> &parent)
 {
-	csRef<iCameraPositionList> camlist = engine->GetCameraPositions();
+  csRef<iCameraPositionList> camlist = engine->GetCameraPositions();
 	
-	for(int i = 0; i < camlist->GetCount(); i++)
-	{
-		csRef<iCameraPosition> cam = camlist->Get(i);
+  for(int i = 0; i < camlist->GetCount(); i++)
+  {
+    csRef<iCameraPosition> cam = camlist->Get(i);
 		
-		csRef<iDocumentNode> n = CreateNode(parent, "start");
-		// Set the name attribute if cam pos has a name
-		const char *camname = cam->QueryObject()->GetName();
-		if(camname && strcmp(camname, "") != 0)
-			n->SetAttribute("name", camname);
+    csRef<iDocumentNode> n = CreateNode(parent, "start");
+    // Set the name attribute if cam pos has a name
+    const char *camname = cam->QueryObject()->GetName();
+    if(camname && strcmp(camname, "") != 0)
+      n->SetAttribute("name", camname);
 
-		// write the sector
-		csRef<iDocumentNode> sectornode = CreateNode(n, "sector");
-		const char *sectorname = cam->GetSector();
-		if(sectorname)
+    // write the sector
+    csRef<iDocumentNode> sectornode = CreateNode(n, "sector");
+    const char *sectorname = cam->GetSector();
+    if(sectorname)
       sectornode->SetValue(cam->GetSector());
+      
+    // write position
+    csRef<iDocumentNode> positionnode = CreateNode(n, "position");
+    positionnode->SetAttributeAsFloat("x", cam->GetPosition().x);
+    positionnode->SetAttributeAsFloat("y", cam->GetPosition().y);
+    positionnode->SetAttributeAsFloat("z", cam->GetPosition().z);
 
-		// write position
-		csRef<iDocumentNode> positionnode = CreateNode(n, "position");
-		positionnode->SetAttributeAsFloat("x", cam->GetPosition().x);
-		positionnode->SetAttributeAsFloat("y", cam->GetPosition().y);
-		positionnode->SetAttributeAsFloat("z", cam->GetPosition().z);
+    // write up vector
+    csRef<iDocumentNode> upnode = CreateNode(n, "up");
+    upnode->SetAttributeAsFloat("x", cam->GetUpwardVector().x);
+    upnode->SetAttributeAsFloat("y", cam->GetUpwardVector().y);
+    upnode->SetAttributeAsFloat("z", cam->GetUpwardVector().z);
 
-		// write up vector
-		csRef<iDocumentNode> upnode = CreateNode(n, "up");
-		upnode->SetAttributeAsFloat("x", cam->GetUpwardVector().x);
-		upnode->SetAttributeAsFloat("y", cam->GetUpwardVector().y);
-		upnode->SetAttributeAsFloat("z", cam->GetUpwardVector().z);
+    // write forward vector
+    csRef<iDocumentNode> forwardnode = CreateNode(n, "forward");
+    forwardnode->SetAttributeAsFloat("x", cam->GetForwardVector().x);
+    forwardnode->SetAttributeAsFloat("y", cam->GetForwardVector().y);
+    forwardnode->SetAttributeAsFloat("z", cam->GetForwardVector().z);
 
-		// write forward vector
-		csRef<iDocumentNode> forwardnode = CreateNode(n, "forward");
-		forwardnode->SetAttributeAsFloat("x", cam->GetForwardVector().x);
-		forwardnode->SetAttributeAsFloat("y", cam->GetForwardVector().y);
-		forwardnode->SetAttributeAsFloat("z", cam->GetForwardVector().z);
-
-		// write farplane if available
-		csPlane3 *fp = cam->GetFarPlane();
-		if(fp)
-		{
-			csRef<iDocumentNode> farplanenode = CreateNode(n, "farplane");
-			farplanenode->SetAttributeAsFloat("a", fp->A());
-			farplanenode->SetAttributeAsFloat("b", fp->B());
-			farplanenode->SetAttributeAsFloat("c", fp->C());
-			farplanenode->SetAttributeAsFloat("d", fp->D());
-		}
-	}
-	return true;
+    // write farplane if available
+    csPlane3 *fp = cam->GetFarPlane();
+    if(fp)
+    {
+      csRef<iDocumentNode> farplanenode = CreateNode(n, "farplane");
+      farplanenode->SetAttributeAsFloat("a", fp->A());
+      farplanenode->SetAttributeAsFloat("b", fp->B());
+      farplanenode->SetAttributeAsFloat("c", fp->C());
+      farplanenode->SetAttributeAsFloat("d", fp->D());
+    }
+  }
+  return true;
 }
 
 bool csSaver::SaveSectors(csRef<iDocumentNode> &parent)
 {
-	iSectorList* sectorList=engine->GetSectors();
+  iSectorList* sectorList=engine->GetSectors();
   for (int i=0; i<sectorList->GetCount(); i++)
   {
     iSector* sector = sectorList->Get(i);
     csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
     const char* name = sector->QueryObject()->GetName();
     if (name && *name) sectorNode->SetAttribute("name", name);
-    
-		if(!SaveSectorMeshes(sector, sectorNode))
-			return false;
-
-      
+    if(!SaveSectorMeshes(sector, sectorNode)) return false;
+    if(!SaveSectorLights(sector, sectorNode)) return false;
 	}
 	return true;
 }
 
 bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
 {
-	iMeshList* meshList = s->GetMeshes();
+  iMeshList* meshList = s->GetMeshes();
   for (int i=0; i<meshList->GetCount(); i++)
   {
     iMeshWrapper* meshwrapper = meshList->Get(i);
     //Create the Tag for the MeshObj
     csRef<iDocumentNode> meshNode = CreateNode(parent, "meshobj");
+	//Check if it's a portal
+	csRef<iPortalContainer> portal = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
+	if (portal) 
+    {
+      meshNode->SetValue ("portal");
+      for (int i=0; i<portal->GetPortalCount(); i++)
+        if (!SavePortals(portal->GetPortal(i), meshNode)) return false;
+    }
     //Add the mesh's name to the MeshObj tag
     const char* name = meshwrapper->QueryObject()->GetName();
     if (name && *name) 
-			meshNode->SetAttribute("name", name);
+    meshNode->SetAttribute("name", name);
 
     //TBD: write <plugin>
     
     //Let the iSaverPlugin write the parameters of the mesh
     //It has to create the params node itself, maybe it might like to write
     //more things outside the params at a later stage. you never know ;)
-		csRef<iFactory> factory =  SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iFactory);
+    csRef<iFactory> factory;
+    iMeshObjectFactory* meshobjectfactory = meshwrapper->GetMeshObject()->GetFactory();
+    if (meshobjectfactory)
+      factory = SCF_QUERY_INTERFACE(meshobjectfactory, iFactory);
+    if (!factory) 
+      factory = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iFactory);
     if (factory)
     {
       csString pluginname = factory->QueryClassID();
@@ -399,13 +411,11 @@ bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
             pluginname=pluginname.Slice(0,i)+newstring + pluginname.Slice(i+8,pluginname.Length());
         }
 
-				csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, pluginname, iSaverPlugin);
-        
-				if (!saver) 
-					saver = CS_LOAD_PLUGIN(plugin_mgr, pluginname, iSaverPlugin);
-        
-				if (saver)
-          saver->WriteDown(object_reg, meshNode);
+        csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, pluginname, iSaverPlugin);
+
+        if (!saver) saver = CS_LOAD_PLUGIN(plugin_mgr, pluginname, iSaverPlugin);
+
+        if (saver) saver->WriteDown(object_reg, meshNode);
       }
 
     }      
@@ -415,10 +425,58 @@ bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
 	return true;
 }
 
+bool csSaver::SavePortals(iPortal *portal, csRef<iDocumentNode> &parent)
+{
+  csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
+  iSector* sector = portal->GetSector();
+  if (sector)
+  {
+    const char* name = sector->QueryObject()->GetName();
+    if (name && *name) sectorNode->SetAttribute("name", name);
+  }
+  //saving the vertices (portal->GetVertices(), portal->GetVertexIndicesCount());
+
+  return true;
+}
+
+bool csSaver::SaveSectorLights(iSector *s, csRef<iDocumentNode> &parent)
+{
+  iLightList* lightList = s->GetLights();
+  for (int i=0; i<lightList->GetCount(); i++)
+  {
+    iLight* light = lightList->Get(i);
+    //Create the Tag for the Light
+    csRef<iDocumentNode> lightNode = CreateNode(parent, "light");
+
+    //Add the light's name to the MeshObj tag
+    csString name = light->QueryObject()->GetName();
+    if (!name.Compare("__light__")) lightNode->SetAttribute("name", name);
+
+	//Add the light center node
+    csVector3 center = light->GetCenter();
+    csRef<iDocumentNode> centerNode = CreateNode(lightNode, "center");
+	centerNode->SetAttributeAsFloat("x", center.x);
+	centerNode->SetAttributeAsFloat("y", center.y);
+	centerNode->SetAttributeAsFloat("z", center.z);
+
+	//Add the light center node
+    //int radius = //light->GetRadius();
+    //csRef<iDocumentNode> radiusNode = CreateNode(lightNode, "radius");
+	//radiusNode->CreateNodeBefore(CS_NODE_TEXT)->SetAttributeAsFloat(radius);
+
+	//Add the light center node
+    csColor color = light->GetColor();
+    csRef<iDocumentNode> colorNode = CreateNode(lightNode, "center");
+	colorNode->SetAttributeAsFloat("red", color.red);
+	colorNode->SetAttributeAsFloat("green", color.green);
+	colorNode->SetAttributeAsFloat("blue", color.blue);
+  }
+  return true;
+}
+
 csRef<iString> csSaver::SaveMapFile()
 {
-  csRef<iDocumentSystem> xml =
-    csPtr<iDocumentSystem>(new csTinyDocumentSystem());
+  csRef<iDocumentSystem> xml = csPtr<iDocumentSystem>(new csTinyDocumentSystem());
   csRef<iDocument> doc = xml->CreateDocument();
   csRef<iDocumentNode> root = doc->CreateRoot();
   csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
@@ -431,7 +489,7 @@ csRef<iString> csSaver::SaveMapFile()
   //TBD: Save the Factories
   //if (!SaveFactories(parent)) return 0;
   
-	if (!SaveSectors(parent)) return 0;
+  if (!SaveSectors(parent)) return 0;
 
   iString* str = new scfString();
   if (doc->Write(str) != 0)
@@ -457,12 +515,12 @@ bool csSaver::SaveMapFile(const char* filename)
 
 bool csSaver::SaveMapFile(csRef<iDocumentNode> &root)
 {
-	csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  csRef<iDocumentNode> parent = root->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   parent->SetValue("world");
 
   if (!SaveTextures(parent)) return false;
   if (!SaveMaterials(parent)) return false;
 
-	/// TODO: write mesh objects, factories
-	return true;
+  /// TODO: write mesh objects, factories
+  return true;
 }
