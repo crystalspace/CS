@@ -79,16 +79,16 @@ AS_IF([test $with_cs != no],
 #----------------------------------------------------------------------------
 # Package configuration switches
 #----------------------------------------------------------------------------
-AC_MSG_CHECKING([build mode])
 AC_ARG_ENABLE([debug],
     [AC_HELP_STRING([--enable-debug],
 	[build with debugging information (default NO)])],
     [], [enable_debug=no])
-AC_MSG_RESULT([$enable_debug])
 
-AS_IF([test $enable_debug = yes],
-    [CS_EMIT_BUILD_PROPERTY([MODE], [debug])],
-    [CS_EMIT_BUILD_PROPERTY([MODE], [optimize])])
+AC_MSG_CHECKING([build mode])
+AS_IF([test $enable_debug = yes], [build_mode=debug], [build_mode=optimize])
+AC_MSG_RESULT([$build_mode])
+
+CS_EMIT_BUILD_PROPERTY([MODE], [$build_mode])
 
 #-----------------------------------------------------------------------------
 # Output Installpaths/package info
