@@ -13,9 +13,16 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+14-Oct-1999
+	- First try at integration of landscape engine. Note that the
+	  new code doesn't even TRY to be efficient :-)
+	  Needless to say it doesn't work yet.
 13-Oct-1999
 	- Andrew Zabolotny added keyboard support to CSWS scroll bars.
+	- Thomas Hieber updated the Win/VC project files.
+	- Michael Dale Long update CrystalClear impulse layer.
 12-Oct-1999
+	- Robert Bate removed SOUIX console from Mac projects.
 	- Andrew Zabolotny did more work on MazeD:
 	  - New color wheel control.
 	  - New function csColorDialog() returning a standard color choose
@@ -41,6 +48,12 @@ Short-term cleanups that need to be done:
 	  rasterizer.  In order to fix the problem, he reworked
 	  csGraphics3DSoftware so that it implements IHaloRasterizer via
 	  composition rather than inheritence.
+	- Seth Galbraith fixed sprite lighting by initializing vertex
+	  normals to 0,0,0 before accumulating adjacent triangle normals.
+	- Brandon Ehle moved some of the COM stuff he added to csutil to
+	  csengine instead. He also made COM optional in some of the
+	  remaining csutil classes. The result is that csutil is once again
+	  seperate from cscom.
 10-Oct-1999
 	- Fixed bug in octree outline table which caused octree visibility
 	  culling not to work correctly in some cases.
