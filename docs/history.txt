@@ -16,6 +16,15 @@ Short-term cleanups that need to be done:
 9-Nov-1999
 	- Eric Sunshine removed many, many obsolete COM references from
 	  documentation and source code comments.
+	- Andrew Zabolotny committed the missing scfstrv.h header.
+	  Unfortunately, he did not have the opportunity to commit the real
+	  istrvec.h and scfstrv.cpp files as well (probably on account of the
+	  erratic behavior of the CVS server today).
+	- Eric Sunshine updated the "fake" istrvec.h and scfstrv.cpp files to
+	  correctly reflect Andrew's "real" scfstrv.h.  This allows the
+	  project to once again compile.
+	- Eric Sunshine and Thomas Hieber added missing 'const' to many of
+	  the prototypes in iStrVector and scfStrVector.
 8-Nov-1999
 	- Eric Sunshine reverse-engineered Andrew Zabolotny's SCF changes and
 	  was able to recreate some missing files which Andrew forgot to
