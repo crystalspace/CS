@@ -43,12 +43,12 @@ csTextureDirect3D::csTextureDirect3D (csTextureMM*             Parent,
   compute_masks ();
 
   // Convert the texture to the screen-dependent format
-  int rsl = iG3D->rsl;
-  int rsr = iG3D->rsr;
-  int gsl = iG3D->gsl;
-  int gsr = iG3D->gsr;
-  int bsl = iG3D->bsl;
-  int bsr = iG3D->bsr;
+  int rsl = iG3D->TextureRsl;
+  int rsr = iG3D->TextureRsr;
+  int gsl = iG3D->TextureGsl;
+  int gsr = iG3D->TextureGsr;
+  int bsl = iG3D->TextureBsl;
+  int bsr = iG3D->TextureBsr;
 
   Image->SetFormat(CS_IMGFMT_TRUECOLOR);
   RGBPixel* pPixels   = (RGBPixel *)Image->GetImageData();
@@ -154,6 +154,17 @@ csTextureManagerDirect3D::csTextureManagerDirect3D (iSystem*                 iSy
 csTextureManagerDirect3D::~csTextureManagerDirect3D ()
 {
   Clear ();
+}
+
+int csTextureManagerDirect3D::FindRGB (int r, int g, int b)
+{
+  if (r > 255) r = 255; else if (r < 0) r = 0;
+  if (g > 255) g = 255; else if (g < 0) g = 0;
+  if (b > 255) b = 255; else if (b < 0) b = 0;
+
+  return ((r >> m_pG3D->ScreenRsr) << m_pG3D->ScreenRsl) |
+         ((g >> m_pG3D->ScreenGsr) << m_pG3D->ScreenGsl) |
+         ((b >> m_pG3D->ScreenBsr) << m_pG3D->ScreenBsl);
 }
 
 void csTextureManagerDirect3D::PrepareTextures ()

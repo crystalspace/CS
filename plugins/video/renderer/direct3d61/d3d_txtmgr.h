@@ -85,6 +85,13 @@ public:
   ///
   virtual ~csTextureManagerDirect3D ();
 
+  /**
+   * Return the index for some color. This works in 8-bit
+   * (returns an index in the 256-color table) and in 15/16-bit
+   * (returns a 15/16-bit encoded RGB value).
+   */
+  virtual int FindRGB (int r, int g, int b);
+
   ///
   virtual void PrepareTextures ();
   ///

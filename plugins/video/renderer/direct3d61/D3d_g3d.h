@@ -196,12 +196,14 @@ public:
   /// The texture manager
   csTextureManagerDirect3D* txtmgr;
 
+  static DDSURFACEDESC2 m_ddsdPrimarySurfDesc;
   static DDSURFACEDESC2 m_ddsdLightmapSurfDesc;
   static DDSURFACEDESC2 m_ddsdTextureSurfDesc;
   static DDSURFACEDESC2 m_ddsdHaloSurfDesc;
 
   /// Shift counters for converting R8G8B8 to internal texture format
-  int rsr, rsl, gsr, gsl, bsr, bsl;
+  int ScreenRsr,  ScreenRsl,  ScreenGsr,  ScreenGsl,  ScreenBsr,  ScreenBsl;
+  int TextureRsr, TextureRsl, TextureGsr, TextureGsl, TextureBsr, TextureBsl;
   
   /// The constructor. It is passed an interface to the system using it.
   csGraphics3DDirect3DDx6 (iBase*);

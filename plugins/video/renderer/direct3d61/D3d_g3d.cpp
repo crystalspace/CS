@@ -146,6 +146,7 @@ DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc = { 0 };
 DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc = { 0 };
 // have to work on the HALO-support ... will not be easy ... shit MS
 DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdHaloSurfDesc = { 0 };
+DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdPrimarySurfDesc = { 0 };
 
 //
 // Interface table definition
@@ -347,6 +348,32 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
   return true;
 }
 
+// Compute the shift masks for converting R8G8B8 into texture format
+void ComputeShift(int& sr, int& sl, unsigned mask)               
+{
+  sr = 8; 
+  sl = 0;
+  unsigned m = mask;                      
+
+  while ((m & 1) == 0) 
+  { 
+    sl++; 
+    m >>= 1; 
+  } 
+  
+  while ((m & 1) == 1) 
+  { 
+    sr--; 
+    m >>= 1; 
+  } 
+
+  if (sr < 0) 
+  { 
+    sl -= sr; 
+    sr = 0; 
+  }       
+}
+
 bool csGraphics3DDirect3DDx6::Open(const char* Title)
 {
   LPD3DDEVICEDESC lpD3dDeviceDesc;
@@ -432,6 +459,8 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     SysPrintf (MSG_FATAL_ERROR, "Error in 'GetSurfaceDesc' ! \n");
     return false;
   }
+
+  memcpy(&m_ddsdPrimarySurfDesc, &ddsd, sizeof(ddsd));
 
   switch (ddsd.ddpfPixelFormat.dwRGBBitCount)
   {
@@ -565,20 +594,18 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     bGotLitDesc = true;
   }
 
-  // Compute the shift masks for converting R8G8B8 into texture format
-#define COMPUTE(sr, sl, mask)               \
-  sr = 8; sl = 0;                           \
-  {                                         \
-    unsigned m = mask;                      \
-    while ((m & 1) == 0) { sl++; m >>= 1; } \
-    while ((m & 1) == 1) { sr--; m >>= 1; } \
-    if (sr < 0) { sl -= sr; sr = 0; }       \
-  }
-
-  COMPUTE (rsr, rsl, csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRBitMask);
-  COMPUTE (gsr, gsl, csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwGBitMask);
-  COMPUTE (bsr, bsl, csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwBBitMask);
-#undef COMPUTE
+  ComputeShift(TextureRsr, TextureRsl, 
+               csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRBitMask);
+  ComputeShift(TextureGsr, TextureGsl, 
+               csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwGBitMask);
+  ComputeShift(TextureBsr, TextureBsl, 
+               csGraphics3DDirect3DDx6::m_ddsdTextureSurfDesc.ddpfPixelFormat.dwBBitMask);
+  ComputeShift(ScreenRsr, ScreenRsl,   
+               csGraphics3DDirect3DDx6::m_ddsdPrimarySurfDesc.ddpfPixelFormat.dwRBitMask);
+  ComputeShift(ScreenGsr, ScreenGsl,   
+               csGraphics3DDirect3DDx6::m_ddsdPrimarySurfDesc.ddpfPixelFormat.dwGBitMask);
+  ComputeShift(ScreenBsr, ScreenBsl,   
+               csGraphics3DDirect3DDx6::m_ddsdPrimarySurfDesc.ddpfPixelFormat.dwBBitMask);
 
   if (!bGotTexDesc && !bGotLitDesc)
   {
