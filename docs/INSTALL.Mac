@@ -1,5 +1,5 @@
 Crystal Space Macintosh Development Readme
-This is up to date as of May 17th, 1999
+This is up to date as of August 11th, 1999
 Written by K. Robert Bate
 If you have any questions or problems, contact me at rbate@ma.ultranet.com.
 
@@ -27,7 +27,7 @@ out "includes Folder".
 
 [3] WORKING WITH THE CRYSTAL SPACE PROJECTS
 
-There are 19 Crystal Space projects in the mwcw folder: 
+There are 22 Crystal Space projects in the mwcw folder: 
 
 2 projects that build static libraries:
 CSpace.mcp		- generates the static linked library, which includes the
@@ -48,13 +48,17 @@ SoundRenderNull.mcp		- generates the null sound render manager shared library.
 GlideRender.mcp			- generates the Glide Render shared library.
 OpenGLRndr.mcp			- generates the OpenGL Render shared library.
 
-6 projects that generate applications
-CSRegSvr.mcp	- generates the application which registers the shared libraries.
-CSWSTest.mcp	- generates the application which tests the Crystal Space Windowing System.
-MazeD.mcp		- generates the Crystal Space Editor.
-Primedit.mcp	- generates another Crystal Space Editor.
-Simple.mcp  	- generates a Simple Crystal Space application.
-Walktest.mcp	- generates another Simple Crystal Space application.
+10 projects that generate applications
+Blocks.mcp		- A Tetris type game
+CSRegSvr.mcp	- The application which registers the shared libraries.
+CSWSTest.mcp	- The application which tests the Crystal Space Windowing System.
+MazeD.mcp		- The Crystal Space Editor.
+MetaDemo.mcp	- A demo application
+Primedit.mcp	- Another Crystal Space Editor. (Not up to date)
+Simple.mcp  	- Simple Crystal Space application.
+Shooter.mcp  	- A Crystal Space application.
+Squawk.mcp  	- A Crystal Space application.
+Walktest.mcp	- Another Simple Crystal Space application.
 
 and 1 project that builds other projects
 MakeShared.mcp	- Makes sure all of the shared libraries and CSRegSvr are up to date.

@@ -7,11 +7,15 @@ Add Network support.
 Optimize everything.
 
 History:
+11-Aug-99
+	- Bringing documentation up to date.
+	- Added four more application projects: Blocks.mcp, MetaCemo.mcp, Shooter.mcp and Squawk.mcp.
+	- Fixed all known (to me) bugs.
 27-May-99
 	- Added fastsqrt.cpp to CSpace.mcp.
 	- Increased the memory partition for MazeD and CSWSTest so they would run.
 24-May-99
-	- Added consile support to the Mac OpenGL Driver.
+	- Added console support to the Mac OpenGL Driver.
 18-May-99
 	- Changing all of the projects to end in .mcp instead of .prj so MacCVS Pro will know that
 	  they are MetroWerks CodeWarrior Projects.
