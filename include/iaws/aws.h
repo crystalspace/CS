@@ -88,7 +88,7 @@ const int AWSF_AlwaysRedrawWindows=2;
 const int AWSF_RaiseOnMouseOver = 4;
 
 /** This flag allwos focusing controls using TAB (CTR + TAB) key, calling Click events
-  * using ENTER key and some other features that are not finifshed yet.
+  * using ENTER key and some other features that are not finished yet.
   */
 const int AWSF_KeyboardControl = 8;
 
