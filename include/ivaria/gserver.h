@@ -5,7 +5,7 @@
 */
 
 #ifndef __CS_IVARIA_GSERVER_H__
-#define __CS_IVAR_A_GSERVER_H__
+#define __CS_IVARIA_GSERVER_H__
 
 #include "csutil/scf.h"
 
