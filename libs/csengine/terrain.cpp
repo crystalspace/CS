@@ -63,6 +63,7 @@ int csTerrain::GetNumTextures ()
   return mesh->getBinTreeNo ()/2;
 }
 
+static ddgControl control;
 bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 {
   heightMap = new ddgHeightMap ();
@@ -72,6 +73,7 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
   mesh = new ddgTBinMesh (heightMap);
   clipbox = new ddgBBox (ddgVector3(0,0,3),ddgVector3(640, 480, 15000));
   context = new ddgContext ();
+  context->control( &control );
 
   vbuf = new ddgVArray ();
 
@@ -80,25 +82,6 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
   vbuf->size((mesh->absMaxDetail()*3*11)/10);
   vbuf->init ();
   vbuf->reset ();
-/*
-JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
-         and put them in an array so I can reach them in the 
-		 Draw method.
-		 This is probably not even the right place do this, perhaps
-		 it is better done in csLoader.
-		 I would suggest that in the world file syntax we derive the
-		 the texture name from the heightMap file name eg.
-		 myTerrain.TGN
-		 has textures named:
-		 myTerrain0.jpg
-		 myTerrain1.jpg 
-		 ...
-		 myTerrain128.jpg
-		 
-	 Here is how DDG does it, but I use the ddgTexture class which is
-	 openGL specific:
-*/
-
 
   // We are going to get texture coords from the terrain engine
   // ranging from 0 to rows and 0 to cols.
@@ -106,8 +89,7 @@ JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
   _pos = csVector3(0,0,0);
   _size = csVector3(heightMap->cols(),mesh->wheight(mesh->absMaxHeight()),heightMap->rows());
 
-  // (15 May 2000) To Alex: This is new code that allocates the
-  // texture array for the terrain.
+  // This is  code that allocates the texture array for the terrain.
   _textureMap = new csTextureHandle* [GetNumTextures ()];
   return true;
 }
@@ -156,78 +138,74 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 {
   bool modified = true;
-  /* Get matrices in OpenGL form
-  JORRIT:
-     this code is copied from the ogl_g3d renderer.
-  csMatrix3 orientation = o2c.GetO2T();
+  // Get matrices in OpenGL form
 
-  // Alex: here it is I think:
+  unsigned int i = 0, s = 0;
+  ddgTBinTree *bt;
+
   const csMatrix3& orientation = rview.GetO2T ();
-  int aspect = rview.aspect;
 
   // set up coordinate transform
-  GLfloat matrixholder[16];
+  ddgMatrix4 *mm = context->transformation();
+ 
+  *mm[0] = 1.0;
+  *mm[5] = 1.0;
+  *mm[10] = 1.0;
+  *mm[15] = 1.0;
 
-  glMatrixMode(GL_MODELVIEW);
-  glPushMatrix();
-  glLoadIdentity();
-  // this zeroing is probably not needed, but I'm playing it safe in case
-  // this code is changed later... GJH
-  for (i=0; i<16; i++) matrixholder[i] = 0.0;
+  *mm[0] = orientation.m11;
+  *mm[1] = orientation.m21;
+  *mm[2] = orientation.m31;
 
-  matrixholder[0] = 1.0;
-  matrixholder[5] = 1.0;
-  matrixholder[10] = 1.0;
+  *mm[4] = orientation.m12;
+  *mm[5] = orientation.m22;
+  *mm[6] = orientation.m32;
 
-  matrixholder[0] = orientation.m11;
-  matrixholder[1] = orientation.m21;
-  matrixholder[2] = orientation.m31;
+  *mm[8] = orientation.m13;
+  *mm[9] = orientation.m23;
+  *mm[10] = orientation.m33;
 
-  matrixholder[4] = orientation.m12;
-  matrixholder[5] = orientation.m22;
-  matrixholder[6] = orientation.m32;
+  const csVector3& translation = rview.GetO2TTranslation();
 
-  matrixholder[8] = orientation.m13;
-  matrixholder[9] = orientation.m23;
-  matrixholder[10] = orientation.m33;
+  *mm[3] = translation.x;
+  *mm[7] = translation.y;
+  *mm[11] = translation.z;
 
-  matrixholder[15] = 1.0;
+  *mm[12] = *mm[13] = *mm[14] = 0;
 
-  csVector3 translation = o2c.GetO2TTranslation();
-
-  glMultMatrixf(matrixholder);
-
-  glTranslatef(-translation.x, -translation.y, -translation.z);
-  glMatrixMode(GL_PROJECTION);
-  glPushMatrix();
-  glLoadIdentity();
-
-  glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
-
-  glTranslatef(width2,height2,0);
-
-  for (i = 0 ; i < 16 ; i++)
-    matrixholder[i] = 0.0;
+  ddgControl *control = context->control();
+  control->position(translation.x, translation.y, translation.z);
+ 
+  ddgMatrix4 *pm = context->projection();
   
-  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
-  
-  matrixholder[10] = 0.0;
-  matrixholder[11] = +1.0/aspect;
-  matrixholder[14] = -1.0/aspect;
-  matrixholder[15] = 0.0;
+  float rnear = 1.0;
+  float rfar = 10.0;
+  *pm[0] = 2 *rnear/ (rview.rightx - rview.leftx);
+  *pm[1] = 0;
+  *pm[2] = (rview.rightx + rview.leftx)/ (rview.rightx - rview.leftx);
+  *pm[3] = 0;
 
-  glMultMatrixf(matrixholder);
+  *pm[4] = 0;
+  *pm[5] = 2 *rnear/ (rview.topy - rview.boty);
+  *pm[6] = (rview.topy + rview.boty)/(rview.topy - rview.boty);
+  *pm[7] = 0;
 
-*/
-	context->extractPlanes(context->frustrum());
-	// Optimize the mesh w.r.t. the current viewing location.
-	modified = mesh->calculate(context);
+  *pm[8] = 0;
+  *pm[9] = 0;
+  *pm[10] = -1 * (rfar + rnear)/ (rfar - rnear);
+  *pm[11] = -2 * rnear * rfar /(rfar - rnear);
 
-  	unsigned int i = 0, s = 0;
-	ddgTBinTree *bt;
+  *pm[12] = 0;
+  *pm[13] = 0;
+  *pm[14] = -1;
+  *pm[15] = 0;
 
-	// If our orientation has changed, reload the buffer.
-	if (modified)
+  context->extractPlanes(context->frustrum());
+  // Optimize the mesh w.r.t. the current viewing location.
+  modified = mesh->calculate(context);
+
+  // If our orientation has changed, reload the buffer.
+  if (modified)
 	{
 		vbuf->reset();
 		// Update the vertex buffers.
@@ -283,10 +261,10 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 	s = 0;
 	while (i < mesh->getBinTreeNo())
 	{
-//	  if (_textureMap && (i%2 == 0) && _textureMap[i/2])
+	  if (_textureMap && (i%2 == 0) && _textureMap[i/2])
 		g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
 
-		if ((bt = mesh->getBinTree(i)) && (bt->visTriangle() > 0))
+	  if ((bt = mesh->getBinTree(i)) && (bt->visTriangle() > 0))
 		{
 			// Render this bintree.
             g3dmesh.num_triangles = bt->visTriangle(); // number of triangles
