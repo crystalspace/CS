@@ -206,6 +206,7 @@ Documentation Updates:
 	- Complete update of map format documentation.
 	- HOWTO on KEY and NODE system for game specific
 	  purposes (i.e. triggers, scripts, and things like that).
+	- HOWTO on HUD.
 	- Go over the API documentation (doxygen comments) and
 	  see if they can be improved.
 	- Complete the features lists.
