@@ -4798,8 +4798,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // If do_multiply_color == true this means that we will multiply
   // the base color (color array in mesh) with the flat color from
   // the material.
-  bool do_multiply_color = false;
-  if (mesh.mat_handle)
+  bool do_multiply_color = !m_textured;
+  if (mesh.mat_handle && !m_textured)
   {
     csRGBpixel color;
     if (txt_handle)
