@@ -1160,13 +1160,14 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygonDPQ& poly, boo
 
 STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPFXMixMode mode, bool gouroud)
 {
-  HighColorCache_Data *pTexData;
-  
+  m_gouroud = gouroud;
+  m_mixmode = mode;
+
   csTextureMMDirect3D* txt_mm = (csTextureMMDirect3D*)GetcsTextureMMFromITextureHandle (handle);
 
   m_pTextureCache->Add (handle);
 
-  pTexData = txt_mm->get_hicolorcache ();
+  HighColorCache_Data* pTexData = txt_mm->get_hicolorcache ();
 
   bool  bColorKeyed  = txt_mm->get_transparent ();
 
@@ -1215,7 +1216,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX(ITextureHandle* handle, DPF
       break;
   }
 
-  m_gouroud = gouroud;
+  //m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ANTIALIAS, D3DANTIALIAS_NONE);
 
   VERIFY_SUCCESS( m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, ((D3DTextureCache_Data *)pTexData->pData)->htex) == DD_OK );
 
@@ -1242,7 +1243,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool g
   VERIFY_SUCCESS( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS) == DD_OK );
   
   float alpha = poly.alpha;
-  if (alpha == 0.0f)
+  if (alpha == 0.0f && m_mixmode == Alpha)
   {
     //workaround for a bug in alpha transparency. It looks like on some cards you may not select
     //alpha == 0, (opaque) because that will make the result invisible. :-(
@@ -1880,7 +1881,7 @@ csGraphics3DDirect3DDx5::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r,
   // until the halo itself is of a constant height,
   // at which point the vertical line decreases.
   
-  y1 = my - mWidth/±0;
+  y1 = my - mWidth/10;
   y2 = my + mWidth/10;
   
   if (dim < mWidth / 6)

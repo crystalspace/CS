@@ -134,7 +134,8 @@ class csGraphics3DDirect3DDx5 : public IGraphics3D,
   int rstate_mipmap;
   bool rstate_edges;
 
-  bool m_gouroud;
+  bool        m_gouroud;
+  DPFXMixMode m_mixmode;
 
   /// Capabilities of the renderer.
   G3D_CAPS m_Caps;
