@@ -300,6 +300,21 @@ public:
     rows[1][2] = rows[2][0] = rows[2][1] = 0.0;
   }
 
+  ctMatrix3( real p00, real p01, real p02,
+    real p10, real p11, real p12,
+    real p20, real p21, real p22 )
+  {
+    rows[0][0] = p00; 
+    rows[0][1] = p01; 
+    rows[0][2] = p02;
+    rows[1][0] = p10; 
+    rows[1][1] = p11; 
+    rows[1][2] = p12;
+    rows[2][0] = p20; 
+    rows[2][1] = p21; 
+    rows[2][2] = p22;
+  }
+
   void set( real p00, real p01, real p02,
     real p10, real p11, real p12,
     real p20, real p21, real p22 );
@@ -321,9 +336,29 @@ public:
     return Mret;
   }
 
+  void put_transpose( ctMatrix3 &Mret ) const {
+    for( int idx = 0; idx < 3; idx++ )
+      for( int idy = 0; idy < 3; idy++ )
+        Mret[idx][idy] = (*this)[idy][idx];
+  }
+
+  // I think that's what this is called... M * A * M_transpose
+  void similarity_transform( ctMatrix3 &Mret, const ctMatrix3 &pA ) const {
+    for( int idr = 0; idr < 3; idr++ )
+      for( int idc = 0; idc < 3; idc++ ){
+        Mret[idr][idc] = 0.0;
+        for( int adder = 0; adder < 3; adder++ ){
+          Mret[idr][idc] += ( rows[idr][0]*pA[0][adder] + 
+                              rows[idr][1]*pA[1][adder] + 
+                              rows[idr][2]*pA[2][adder] ) *
+                              rows[idc][adder];
+        }
+      }
+  }
+
   void orthonormalize();
 
-  void mult_v( ctVector3 &pdest, const ctVector3 pv ){
+  void mult_v( ctVector3 &pdest, const ctVector3 &pv ){
     for( int idx = 0; idx < 3; idx++ ){
       pdest[idx] = 0;
       for( int idy = 0; idy < 3; idy++ ){

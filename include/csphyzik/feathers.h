@@ -88,6 +88,13 @@ protected:
 	real sIs;
 	real QsZIc;
 	bool sIsQsZIc_computed;
+
+private:
+  // some work variables that I don't want piled on the stack during recursion
+  // should convert to iteration actually for better performance
+  ctMatrix3 Mwork;
+  ctSpatialMatrix sMwork;
+  ctSpatialVector ZaIac;
 };
 
 #endif

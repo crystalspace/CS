@@ -78,7 +78,7 @@ public:
   void orthonormalize();
 
 
-  void mult_v( ctSpatialVector6 &pdest, const ctSpatialVector6 pv ){
+  void mult_v( ctSpatialVector6 &pdest, const ctSpatialVector6 &pv ){
     for( int idx = 0; idx < 6; idx++ ){
       pdest[idx] = 0;
       for( int idy = 0; idy < 6; idy++ ){
@@ -119,6 +119,27 @@ public:
       }
 
     return Mret;
+  }
+
+  void mult_M( ctSpatialMatrix6 &Mret, const ctSpatialMatrix6 &MM ) const {
+    for( int idr = 0; idr < 6; idr++ )
+      for( int idc = 0; idc < 6; idc++ ){
+        Mret[idr][idc] = 0.0;
+        for( int adder = 0; adder < 6; adder++ )
+          Mret[idr][idc] += rows[idr][adder]*MM[adder][idc];
+      }
+  }
+
+  void operator*=( const ctSpatialMatrix6 &MM ){
+    ctSpatialMatrix6 Mret;
+    for( int idr = 0; idr < 6; idr++ )
+      for( int idc = 0; idc < 6; idc++ ){
+        Mret[idr][idc] = 0.0;
+        for( int adder = 0; adder < 6; adder++ )
+          Mret[idr][idc] += rows[idr][adder]*MM[adder][idc];
+      }
+
+    *this = Mret;
   }
 
   ctSpatialMatrix6 operator* ( const real pk ) const {

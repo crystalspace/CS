@@ -134,6 +134,12 @@ public:
 		return trans;
 	}
 
+  // do a spatial dot and return scalar
+  real spatial_dot( ctSpatialVector6 &pb ){
+    return ( elements[3]*pb[0] + elements[4]*pb[1] + elements[5]*pb[2] +
+              elements[0]*pb[3] + elements[1]*pb[4] + elements[2]*pb[5] );
+  }
+
 	ctVectorTranspose6 operator!(){
 		return transpose();
 	}
