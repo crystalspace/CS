@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Feb-2005
+	- Eric Sunshine fixed some bogus mounts in vfs.cfg.template (the
+	  vfs.cfg which gets installed), which caused several of the maps to
+	  fail to load.
 6-Feb-2005
         - Magodra made the following changes:
             - Fixed a problem where csSpriteCal3DMeshObject::SetMaterial
