@@ -1,5 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
+22-May-2000
+	- Added csPoly2D::GetSignedArea() and csPoly3D::GetSignedArea()
+	  to calculate the signed area of a polygon.
+	- Fixed another small bug in PVS building.
+	- Added a new function to csFrustumView that is called for every
+	  octree node that is visited.
+	- Use CheckFrustum to optimize PVS building. Added a QAD PVS
+	  that is not correct but very fast to build. It is not correct in
+	  the sense that it will incorrectly mark nodes as invisible even
+	  if they are visible. But all nodes marked visible are SURE to
+	  be visible and this is important. This means that we can use
+	  the PVS in the first place to debug the other PVS. The real PVS
+	  should never cull nodes that are marked visible by the QAD PVS.
+	  Later we can use this QAD PVS to optimize building the real PVS
+	  because nodes marked visible by the QAD PVS do not need to be
+	  tested.
 21-May-2000
 	- Performance optimizations to terrain engine from Alex Pfaffe.
 	- Fixed big bug in PVS building which could cause significant

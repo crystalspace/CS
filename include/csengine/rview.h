@@ -358,7 +358,9 @@ public:
 
 class csFrustumView;
 class csObject;
+class csOctreeNode;
 typedef void (csFrustumViewFunc)(csObject* obj, csFrustumView* lview);
+typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview);
 
 /**
  * This structure represents all information needed for the frustum
@@ -372,6 +374,8 @@ class csFrustumView
 public:
   /// Data for the functions below.
   void* userdata;
+  /// A function that is called for every node that is visited.
+  csFrustumViewNodeFunc* node_func;
   /// A function that is called for every polygon that is hit.
   csFrustumViewFunc* poly_func;
   /// A function that is called for every curve that is hit.

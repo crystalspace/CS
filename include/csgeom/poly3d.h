@@ -231,6 +231,11 @@ public:
 
   /// Compute the plane of this polygon.
   csPlane3 ComputePlane ();
+
+  /**
+   * Calculate the signed area of this polygon.
+   */
+  float GetSignedArea();
 };
 
 /**

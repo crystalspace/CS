@@ -93,8 +93,7 @@ int csPoly3D::AddVertex (float x, float y, float z)
 bool csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
 	csPoly2D* poly2d)
 {
-  poly2d->SetNumVertices (0);
-  poly2d->GetBoundingBox ().StartBoundingBox ();
+  poly2d->MakeEmpty ();
   csVector2 p;
   csVector3 v;
   float x_dist = plane_x - point.x;
@@ -113,8 +112,7 @@ bool csPoly3D::ProjectXPlane (const csVector3& point, float plane_x,
 bool csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
 	csPoly2D* poly2d)
 {
-  poly2d->SetNumVertices (0);
-  poly2d->GetBoundingBox ().StartBoundingBox ();
+  poly2d->MakeEmpty ();
   csVector2 p;
   csVector3 v;
   float y_dist = plane_y - point.y;
@@ -133,8 +131,7 @@ bool csPoly3D::ProjectYPlane (const csVector3& point, float plane_y,
 bool csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
 	csPoly2D* poly2d)
 {
-  poly2d->SetNumVertices (0);
-  poly2d->GetBoundingBox ().StartBoundingBox ();
+  poly2d->MakeEmpty ();
   csVector2 p;
   csVector3 v;
   float z_dist = plane_z - point.z;
@@ -496,6 +493,15 @@ csPlane3 csPoly3D::ComputePlane ()
   csVector3 pl = ComputeNormal ();
   D = -pl.x*vertices[0].x - pl.y*vertices[0].y - pl.z*vertices[0].z;
   return csPlane3 (pl, D);
+}
+
+float csPoly3D::GetSignedArea ()
+{
+  float area = 0.0;
+  // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
+  for (int i=0 ; i < GetNumVertices()-2 ; i++)
+    area += csMath3::Area3 ( vertices[0], vertices[i+1], vertices[i+2] );
+  return area / 2.0;
 }
 
 

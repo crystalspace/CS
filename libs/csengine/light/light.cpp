@@ -38,6 +38,13 @@ csFrustumView::csFrustumView () : light_frustum (NULL), callback (NULL),
   callback_data (NULL)
 {
   frustum_id = __last_frustum_id++;
+  poly_func = NULL;
+  curve_func = NULL;
+  node_func = NULL;
+  userdata = NULL;
+  light_frustum = NULL;
+  callback = NULL;
+  callback_data = NULL;
 }
 
 csFrustumView::csFrustumView (const csFrustumView &iCopy)

@@ -63,16 +63,24 @@ private:
   csPolygonArrayNoFree polygons;
   // The visible node.
   csOctreeNode* node;
+  // If true then this node is TRUELY visible. i.e. we
+  // know that there is at least one point in the leaf from where this
+  // node can be seen.
+  bool really_visible;
   
 public:
   csOctreeVisible() : next (NULL), prev (NULL), polygons (8, 16),
-  	node (NULL) {}
+  	node (NULL), really_visible (false) {}
   /// Set octree node.
   void SetOctreeNode (csOctreeNode* onode) { node = onode; }
   /// Get octree node.
   csOctreeNode* GetOctreeNode () { return node; }
   /// Get the polygon array.
   csPolygonArrayNoFree& GetPolygons () { return polygons; }
+  /// Return true if this node is really visible.
+  bool IsReallyVisible () { return really_visible; }
+  /// Mark this node as really visible.
+  void MarkReallyVisible () { really_visible = true; }
 };
 
 /**
@@ -437,8 +445,20 @@ private:
 
   /**
    * Build PVS for this node.
+   * Call SetupDummyPVS() and optionally BuildQADPVS()
+   * before calling BuildPVS().
    */
   void BuildPVS (csThing* thing, csOctreeNode* node);
+
+  /**
+   * Build quick PVS for this node.
+   * The quick PVS will not correctly find all visible nodes but all
+   * nodes that it marks as visible are SURE to be correct. Note that
+   * SetupDummyPVS() must be called before this. The real BuildPVS()
+   * will use this PVS to optimize PVS building (i.e. don't test PVS
+   * for nodes that are sure to be mutually visible).
+   */
+  void BuildQADPVS (csOctreeNode* node);
 
   /**
    * Delete the given occludee and all children of that occludee

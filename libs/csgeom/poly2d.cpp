@@ -148,8 +148,8 @@ void csPoly2D::Intersect (const csPlane2& plane,
   // we know that the polygon has other vertices too.
   int skip_left = 0, skip_right = 0;
 
-  left->SetNumVertices (0);
-  right->SetNumVertices (0);
+  left->MakeEmpty ();
+  right->MakeEmpty ();
 
   i1 = num_vertices-1;
   c1 = plane.Classify (vertices[i1]);
@@ -223,5 +223,15 @@ void csPoly2D::Intersect (const csPlane2& plane,
       skip_right--;
     }
 }
+
+float csPoly2D::GetSignedArea ()
+{
+  float area = 0.0;
+  // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
+  for (int i=0 ; i < GetNumVertices()-2 ; i++)
+    area += csMath2::Area2 ( vertices[0], vertices[i+1], vertices[i+2] );
+  return area / 2.0;
+}
+
 
 //---------------------------------------------------------------------------

@@ -171,6 +171,11 @@ public:
    * get degenerate polygons.
    */
   void Intersect (const csPlane2& plane, csPoly2D* left, csPoly2D* right);
+
+  /**
+   * Calculate the signed area of this polygon.
+   */
+  float GetSignedArea();
 };
 
 /**

@@ -1244,6 +1244,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
   if (ABS (dist) < EPSILON)
   {
     // We are in the node.
+    if (lview->node_func) lview->node_func (onode, lview);
     return true;
   }
 
@@ -1273,6 +1274,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
     }
   }
   count_cull_not++;
+  if (lview->node_func) lview->node_func (onode, lview);
   return true;
 }
 

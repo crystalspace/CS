@@ -25,6 +25,7 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/covcube.h"
+#include "csengine/cbufcube.h"
 #include "csengine/cbuffer.h"
 #include "csengine/polygon.h"
 #include "csengine/thing.h"
@@ -1109,7 +1110,8 @@ bool csOctree::CalculatePolygonShadow (
     result_poly = proj_poly;
   else
   {
-    float ar = csMath2::Area2 (proj_poly[0], proj_poly[1], proj_poly[2]);
+    //float ar = csMath2::Area2 (proj_poly[0], proj_poly[1], proj_poly[2]);
+    float ar = proj_poly.GetSignedArea ();
     csClipper* clipper = new csPolygonClipper (&proj_poly, ar > 0);
     result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
     int num_verts = result_poly.GetNumVertices ();
@@ -1130,7 +1132,6 @@ static csClipper* box_clipper;
 // Max size used for this pass of PVS building.
 static csVector3 max_pvs_size;
 // For statistics, number of times solid node opt is used.
-static int total_solid_opt;
 static int total_total_solid_opt;
 // For statistics, number of times a node is culled.
 static int total_cull_node;
@@ -1308,7 +1309,6 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
     // of the polygons in the node.
     if (!occluder->PVSCanSee (occludee_center))
     {
-      total_solid_opt++;
       total_total_solid_opt++;
       if (BoxOccludeeShadowOutline (occluder_box, occludee_box,
 	cbuffer, scale, shift, plane_nr, plane_pos))
@@ -1492,11 +1492,19 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
     // in this pass.
     return;
   }
-  else if (!leaf->GetPVS ().FindNode (occludee))
+  csPVS& pvs = leaf->GetPVS ();
+  csOctreeVisible* ovis = pvs.FindNode (occludee);
+  if (!ovis)
   {
     // Node is not in PVS so it isn't visible.
     return;
   }
+  //else if (ovis->IsReallyVisible ())
+  //{
+    // Node is in PVS and is marked REALLY visible.
+    // In that case we don't waste time processing it.
+    //visible = true;
+  //}
   else if (occludee->GetBox ().In (leaf->GetCenter ()))
     visible = true;
   else if ((adjacent_side = leaf->GetBox ().Adjacent (occludee->GetBox ())) != -1)
@@ -1534,9 +1542,13 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
       	thing, leaf);
   else
   {
+    if (ovis->IsReallyVisible ())
+    {
+      // @@@ ERROR!!!
+      printf ("E");
+    }
     total_cull_node += 1+occludee->CountChildren ();
     total_total_cull_node += 1+occludee->CountChildren ();
-    csPVS& pvs = leaf->GetPVS ();
     DeleteNodeAndChildrenFromPVS (pvs, occludee);
   }
 }
@@ -1587,16 +1599,14 @@ void csOctree::BuildPVS (csThing* thing,
     // extra smaller octree leafs so that our granularity
     // for the PVS is better. Those octree leafs are ignored
     // by the normal polygon/node traversal process.
-    printf ("%d:", count_leaves); fflush (stdout);
-    count_leaves++;
     total_cull_node = 0;
-    total_solid_opt = 0;
     BuildPVSForLeaf ((csOctreeNode*)root, thing, node);
     if (total_cull_node)
-      printf ("-%d,%d ", total_cull_node, total_solid_opt);
+      printf (" %d:-%d ", count_leaves, total_cull_node);
     else
-      printf ("%d ", total_solid_opt);
+      printf (".");
     fflush (stdout);
+    count_leaves++;
   }
   else
   {
@@ -1630,6 +1640,14 @@ void csOctree::BuildPVS (csThing* thing)
   	(bbox.MaxY ()-bbox.MinY ())/10.,
   	(bbox.MaxZ ()-bbox.MinZ ())/10.);
 
+  // First build a Quick And Dirty PVS which is going to be used to
+  // optimize the real PVS building.
+  CsPrintf (MSG_INITIALIZATION, "  QAD Pass 0...\n");
+  total_total_cull_node = 0;
+  count_leaves = 0;
+  BuildQADPVS ((csOctreeNode*)root);
+  printf ("\nTotal culled nodes=%d\n", total_total_cull_node);
+
   // Then build the PVS for real which will remove nodes from the
   // PVS (hopefully).
   CsPrintf (MSG_INITIALIZATION, "  Pass 1...\n");
@@ -1655,6 +1673,73 @@ void csOctree::BuildPVS (csThing* thing)
   	total_total_solid_opt);
 
   delete box_clipper;
+}
+
+void node_pvs_func (csOctreeNode* node, csFrustumView* lview)
+{
+  csOctreeNode* leaf = (csOctreeNode*)(lview->userdata);
+  csPVS& pvs = leaf->GetPVS ();
+  csOctreeVisible* ovis = pvs.FindNode (node);
+  ovis->MarkReallyVisible ();
+}
+
+void poly_pvs_func (csObject*, csFrustumView*)
+{
+}
+
+void curve_pvs_func (csObject*, csFrustumView*)
+{
+}
+
+void csOctree::BuildQADPVS (csOctreeNode* node)
+{
+  if (!node) return;
+
+  if (node->IsLeaf ())
+  {
+    // We have a leaf, here we start our QAD pvs building.
+    csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
+    csCovcube* cc = csWorld::current_world->GetCovcube ();
+    if (cb) cb->MakeEmpty ();
+    else cc->MakeEmpty ();
+    csFrustumView lview;
+    lview.userdata = (void*)node;
+    lview.node_func = node_pvs_func;
+    lview.poly_func = poly_pvs_func;
+    lview.curve_func = curve_pvs_func;
+    lview.radius = 1000000000.;
+    lview.sq_radius = 1000000000.;
+    lview.things_shadow = false;
+    lview.mirror = false;
+    lview.dynamic = false;
+    csVector3 cen = node->GetCenter ();
+    lview.light_frustum = new csFrustum (cen);
+    lview.light_frustum->MakeInfinite ();
+    sector->CheckFrustum (lview);
+
+    total_cull_node = 0;
+    csPVS& pvs = node->GetPVS ();
+    csOctreeVisible* ovis = pvs.GetFirst ();
+    while (ovis)
+    {
+      if (!ovis->IsReallyVisible ()) total_cull_node++;
+      ovis = pvs.GetNext (ovis);
+    }
+    total_total_cull_node += total_cull_node;
+    if (total_cull_node)
+      printf (" %d:-%d ", count_leaves, total_cull_node);
+    else
+      printf (".");
+    fflush (stdout);
+    count_leaves++;
+  }
+  else
+  {
+    // Traverse to the children.
+    int i;
+    for (i = 0 ; i < 8 ; i++)
+      BuildQADPVS ((csOctreeNode*)node->children[i]);
+  }
 }
 
 static void SplitOptPlane2 (const csPoly3D* np, csPoly3D& inputF, const csPoly3D** npF,
