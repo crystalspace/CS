@@ -6,6 +6,23 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Oct-2004
+	- Jorrit added a new 'proto' mesh. This is a basic mesh that can
+	  be used to start creating a new mesh. It supports the following
+	  features:
+	    - Primitive geometry (8 vertices, 12 triangles, just enough for
+	      a box).
+	    - Setting of base color and per vertex color.
+	    - Setting of vertices, texels, and normals.
+	    - Material per mesh object.
+	    - Sharing geometry in the factory.
+	    - Collision detection.
+	    - Direct creation of render buffers.
+	    - Delayed creation of render buffers.
+	  The mesh only works in NR but should be compilable with OR
+	  because it is used in flarge (it should display nothing with
+	  OR).
+	- Jorrit added a protomesh to flarge.
 6-Oct-2004
 	- Jorrit did various lighting related optimizations to genmesh:
 	    - To genmesh pseudo dynamic lighting handling. If the light is

@@ -19,6 +19,8 @@
         <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
         <plugin name="dots">crystalspace.texture.loader.dots</plugin>
         <plugin name="fire">crystalspace.texture.loader.fire</plugin>
+        <plugin name="protoFact">crystalspace.mesh.loader.factory.protomesh</plugin>
+        <plugin name="proto">crystalspace.mesh.loader.protomesh</plugin>
     </plugins>
     <textures>
         <texture name="tree">
@@ -343,6 +345,31 @@
         <position x="0" y="0" z="0" />
 	<!-- <farplane a="0" b="0" c="1" d="10" /> -->
     </start>
+    <meshfact name="prototest">
+        <plugin>protoFact</plugin>
+        <params>
+            <v x="-.5" y="-.5" z="-.5" u="0" v="0"   nx="0" ny="0" nz="0"  red="1" green="0" blue="0" />
+            <v x=".5" y="-.5" z="-.5"  u="1" v="0"   nx="0" ny="0" nz="0"  red="0" green="1" blue="0" />
+            <v x="-.5" y=".5" z="-.5"  u="0" v="1"   nx="0" ny="0" nz="0"  red="0" green="0" blue="1" />
+            <v x=".5" y=".5" z="-.5"   u="1" v="1"   nx="0" ny="0" nz="0"  red="1" green="1" blue="0" />
+            <v x="-.5" y="-.5" z=".5"  u=".5" v="0"  nx="0" ny="0" nz="0"  red="1" green="0" blue="1" />
+            <v x=".5" y="-.5" z=".5"   u="0" v=".5"  nx="0" ny="0" nz="0"  red="0" green="1" blue="1" />
+            <v x="-.5" y=".5" z=".5"   u=".5" v=".5" nx="0" ny="0" nz="0"  red="1" green="0" blue="0" />
+            <v x=".5" y=".5" z=".5"    u="1" v=".5"  nx="0" ny="0" nz="0"  red=".5" green=".5" blue=".5" />
+	    <t v1="0" v2="2" v3="3" />
+	    <t v1="0" v2="3" v3="1" />
+	    <t v1="1" v2="3" v3="7" />
+	    <t v1="1" v2="7" v3="5" />
+	    <t v1="5" v2="7" v3="6" />
+	    <t v1="5" v2="6" v3="4" />
+	    <t v1="4" v2="6" v3="2" />
+	    <t v1="4" v2="2" v3="0" />
+	    <t v1="2" v2="6" v3="7" />
+	    <t v1="2" v2="7" v3="3" />
+	    <t v1="4" v2="0" v3="1" />
+	    <t v1="4" v2="1" v3="5" />
+        </params>
+    </meshfact>
     <meshfact name="square">
         <plugin>meshFact</plugin>
         <params>
@@ -6432,6 +6459,16 @@
                 <v x="-1.5" y="-.7" z="14" />
             </move>
         </meshobj>
+        <meshobj name="proto">
+            <plugin>proto</plugin>
+            <params>
+                <factory>prototest</factory>
+                <material>parket</material>
+            </params>
+            <move>
+                <v x="-16" y="-.7" z="18" />
+            </move>
+	</meshobj>
         <meshobj name="genMesh2">
             <plugin>mesh</plugin>
             <params>
