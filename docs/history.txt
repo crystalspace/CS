@@ -25,12 +25,14 @@ chronological order.
 	    - GetPolygonVertexCount (int)
 	    - GetPolygonVertex (int, int)
 	    - SetPolygonTextureMapping (csPolygonRange, csMatrix3, csVector3)
-	    - SetPolygonTextureMapping (csPolygonRange, csVector2, csVector2, csVector2)
-	    - SetPolygonTextureMapping (csPolygonRange, csVector3, csVector2, csVector3,
-	    	csVector2, csVector3, csVector2)
-	    - SetPolygonTextureMapping (csPolygonRange, csVector3, csVector3, float)
-	    - SetPolygonTextureMapping (csPolygonRange, csVector3, csVector3, float,
-	    	csVector3, float)
+	    - SetPolygonTextureMapping (csPolygonRange, csVector2, csVector2,
+	    	csVector2)
+	    - SetPolygonTextureMapping (csPolygonRange, csVector3, csVector2,
+	    	csVector3, csVector2, csVector3, csVector2)
+	    - SetPolygonTextureMapping (csPolygonRange, csVector3, csVector3,
+	    	float)
+	    - SetPolygonTextureMapping (csPolygonRange, csVector3, csVector3,
+	    	float, csVector3, float)
 	    - SetPolygonTextureMapping (csPolygonRange, float)
 	    - GetPolygonTextureMapping (int, csMatrix3, csVector3)
 	    - SetTextureMappingEnabled (csPolygonRange, bool)
@@ -44,36 +46,38 @@ chronological order.
 	    - GetPolygonWorldPlane (int)
 	    - GetPolygonMaterial (int)
 	    - SetPolygonMaterial (csPolygonRange, iMaterialWrapper*)
-	  The idea is to eventually get rid of the iPolygon3DStatic and iPolygon3D
-	  interfaces. To do that we have to provide alternative ways to create polygons.
-	  We attempted to make an API that is as flexible as the old one but a lot easier
-	  to use. For example, in simple1 we could replace about 44 lines with 3 using the
-	  new API.
-	- Jorrit removed the bumptest app since this way to do bumpmapping is obsolete
-	  when the new renderer is ready.
-	- Jorrit converted all applications to use the new thing API. As a consequence
-	  none of the applications use the iPolygon3D or iPolygon3DStatic interfaces now.
-	- Jorrit fixed some parts of the documentation to reflect the latest changes.
+	  The idea is to eventually get rid of the iPolygon3DStatic and
+	  iPolygon3D interfaces.  To do that we have to provide alternative
+	  ways to create polygons.  We attempted to make an API that is as
+	  flexible as the old one but a lot easier to use.  For example, in
+	  simple1 we could replace about 44 lines with 3 using the new API.
+	- Jorrit removed the bumptest app since this way to do bumpmapping is
+	  obsolete when the new renderer is ready.
+	- Jorrit converted all applications to use the new thing API.  As a
+	  consequence none of the applications use the iPolygon3D or
+	  iPolygon3DStatic interfaces now.
+	- Jorrit fixed some parts of the documentation to reflect the latest
+	  changes.
 	- Jorrit renamed iThingFactoryState->SetTextureMappingEnabled() to
 	  SetPolygonTextureMappingEnabled() to be more consistent.
 8-Oct-2003
 	- Jorrit fixed keycolor rendering in the old OpenGL renderer in case
 	  DrawPolygonMesh was used (fastmesh).
-	- Jorrit added support for setting global mixmode on a thing (only
-	  for objects). Extended iThingState with SetMixMode() and GetMixMode().
+	- Jorrit added support for setting global mixmode on a thing (only for
+	  objects).  Extended iThingState with SetMixMode() and GetMixMode().
 	  Also extended the thingloader with a new <mixmode> keyword.
 	- Jorrit removed support for setting mixmode and alpha for individual
-	  polygons. It is now only possible to set this on the entire mesh.
-	  So if you need a transparent polygon then you have to make it
-	  a seperate mesh.
+	  polygons.  It is now only possible to set this on the entire mesh.
+	  So if you need a transparent polygon then you have to make it a
+	  seperate mesh.
 	- Jorrit fixed alpha support with DrawPolygonMesh by doing the above
-	  change. However, the alpha is still to dark in combination with
-	  a lightmap. The old OpenGL renderer still needs fixing for that.
-	- Jorrit removed support for individual polygon drawing in thing.
-	  This greatly cleans up thing. The fastmesh thresshold flag has
-	  been removed too as this no longer makes sense: all thing meshes
-	  are fastmesh now.
-	- Jorrit removed csPolygon2D in thing mesh plugin completely. This
+	  change.  However, the alpha is still to dark in combination with a
+	  lightmap.  The old OpenGL renderer still needs fixing for that.
+	- Jorrit removed support for individual polygon drawing in thing.  This
+	  greatly cleans up thing.  The fastmesh thresshold flag has been
+	  removed too as this no longer makes sense: all thing meshes are
+	  fastmesh now.
+	- Jorrit removed csPolygon2D in thing mesh plugin completely.  This
 	  class is no longer needed.
 	- Jorrit removed support for getting camera vertices from iThingState
 	  and iPolygon3D (GetVertexC() function).
@@ -81,50 +85,52 @@ chronological order.
 	  was emitting -L/usr/local/include rather than -L/usr/local/lib.
 7-Oct-2003
 	- Jorrit changed the main loader for portals:
-	    - New <portals> statement that can group several portals and
-	      also allows the keywords 'lodlevel', 'move', 'hardmove', ...
+	    - New <portals> statement that can group several portals and also
+	      allows the keywords 'lodlevel', 'move', 'hardmove', ...
 	    - The ability to specify <portals> or <portal> as a child of
 	      another mesh.
 	    - Some notes: if you have a standalone <portal> then the optional
 	      name of that portal will be used for both the portal container
-	      and the portal. In that case portals sharing the same name
-	      will be grouped on the same portal container. If you use
-	      a manually specified <portals> statement then the names
-	      of the individual portals will no longer be used for the portal
-	      container (only for the portals).
+	      and the portal.  In that case portals sharing the same name will
+	      be grouped on the same portal container.  If you use a manually
+	      specified <portals> statement then the names of the individual
+	      portals will no longer be used for the portal container (only for
+	      the portals).
 	- Jorrit marked everything with the PRE_THING_PORTALREMOVE tag.
-	- Jorrit removed portal support from thing. There are still some issues:
+	- Jorrit removed portal support from thing.  There are still some
+	  issues:
 	    - 'portal' command in walktest is now temporarily broken.
 	    - Infinite maze is now temporarily broken.
-	- Jorrit removed iThingState and iThingFactoryState, IntersectSegment().
-	  This function is now obsolete (same as iMeshObject->HitBeamObject()).
+	- Jorrit removed iThingState and iThingFactoryState,
+	  IntersectSegment().  This function is now obsolete (same as
+	  iMeshObject->HitBeamObject()).
 	- Jorrit removed the temporary function iRenderView->GetLastPortalP().
 	- Jorrit added iMeshWrapper->GetPortalContainer() as an easy and
 	  efficient way to get to the portal container of a mesh.
 	- Jorrit removed iMeshObject->GetPortalCount() and GetPortal().
 	- Jorrit changed api documentation to reflect new portal changes.
-	- res changed the GL extensions manager to set function pointers to
-	  0 only at initialization time, not when retrieving the ext fails.
-	  This should fix the crashes on GL implementations that support
-	  ARB_vertex_program, but not ARB_fragment_program. Also added 
+	- res changed the GL extensions manager to set function pointers to 0
+	  only at initialization time, not when retrieving the ext fails.  This
+	  should fix the crashes on GL implementations that support
+	  ARB_vertex_program, but not ARB_fragment_program.  Also added
 	  GL_ARB_texture_non_power_of_two and GL_ARB_point_sprite extensions.
 	- Eric Sunshine upgraded the snap15 and snap16 images in the MSVC6
 	  HOWTO in the user manual so that they no longer mention the obsolete
 	  cssys library.
 6-Oct-2003
         - Philip Wyett added 'waterdemo' to CS root .cvsignore file.
-	- Jorrit fixed waterdemo so it no longer uses '/this/data'. It is
-	  best to avoid /this.
+	- Jorrit fixed waterdemo so it no longer uses '/this/data'.  It is best
+	  to avoid /this.
 5-Oct-2003
-	- Marten Svanfeldt added the posibility to automatically generate 
+	- Marten Svanfeldt added the posibility to automatically generate
 	  texturecoordinates for reflective cubemaping.
 	- Marten Svanfeldt added a demo using a reflective cubemap and a simple
 	  liquid surface simulation
-	- Marten added a missing check of the ARB_texture_cube_map extension
-	  to the reflective cubemapping code.
+	- Marten added a missing check of the ARB_texture_cube_map extension to
+	  the reflective cubemapping code.
 	- res fixed a few flaws in the waterdemo Jamfile: some superflous
 	  CompileGroup statements and the wrong Help.
-	- Marten applied a fix to csSet::GetIterator and the 
+	- Marten applied a fix to csSet::GetIterator and the
 	  csSet::GlobalIterator
 	- res fixed borked recursive directory scan logic in the cssys/general
 	  .csplugin plugin scanner.
@@ -139,107 +145,106 @@ chronological order.
 	  char or EOF.
 3-Oct-2003
 	- Jorrit changed syntax services->ParsePortal() into
-	  HandlePortalParameter(). This is a more general function which can
-	  parse portal parameters but doesn't return an error if it
-	  doesn't recognize the token. That way the standard loader will be
-	  able to use this and also add additional tokens to parse.
-	- Jorrit changed the warp vector notation for portals in the loader from
-	  'v' to 'wv' and 'w' to 'ww' to avoid collision with using 'v'
+	  HandlePortalParameter().  This is a more general function which can
+	  parse portal parameters but doesn't return an error if it doesn't
+	  recognize the token.  That way the standard loader will be able to
+	  use this and also add additional tokens to parse.
+	- Jorrit changed the warp vector notation for portals in the loader
+	  from 'v' to 'wv' and 'w' to 'ww' to avoid collision with using 'v'
 	  for specifying the vertices of a portal.
 	- Jorrit changed the main loader so that it also calls syntax services
-	  HandlePortalParameter(). This means that you can now specify all
+	  HandlePortalParameter().  This means that you can now specify all
 	  portal stuff in the <portal> statement.
 	- res added a patch from Fritz Elfert <felfert@to.com> to fix thread
-	  problems after change to _beginthreadex(). Apparently, the last 
+	  problems after change to _beginthreadex().  Apparently, the last
 	  parameter needs to be a valid pointer.
 2-Oct-2003
-	- Jorrit extended the two versions of iEngine->CreatePortal() with
-	  a 'name' parameter. That name will be used for the portal container
-	  mesh. If there is already a portal container with that name then
+	- Jorrit extended the two versions of iEngine->CreatePortal() with a
+	  'name' parameter.  That name will be used for the portal container
+	  mesh.  If there is already a portal container with that name then
 	  that portal container will be reused (possibly allowing to create
 	  multiple portals in the same portal container).
-	- Jorrit changed the main loader to use the name of the <portal>
-	  for the created portal container.
+	- Jorrit changed the main loader to use the name of the <portal> for
+	  the created portal container.
 	- Jorrit changed the disabled part of thing loader (which creates
-	  portal containers instead of portals in the thing itself) to
-	  use "__portals__" as the name of the portal container where all
-	  portals are created.
+	  portal containers instead of portals in the thing itself) to use
+	  "__portals__" as the name of the portal container where all portals
+	  are created.
 	- Jorrit additionally added a return 'portal' parameter to both
 	  versions of iEngine->CreatePortal() so that the caller can more
-	  easily find out the portal that was created without having to
-	  revert to getting the last created portal in the portal container.
-	- res fixed the missing of the csappframe library directory from 
-	  cs-config output under certain circumstances, as reported by 
-	  Bjorn Hansen <holomorph@users.sourceforge.net>.
+	  easily find out the portal that was created without having to revert
+	  to getting the last created portal in the portal container.
+	- res fixed the missing of the csappframe library directory from
+	  cs-config output under certain circumstances, as reported by Bjorn
+	  Hansen <holomorph@users.sourceforge.net>.
 	- Jorrit fixed a bug in the portal implementation of portal containers.
-	  The csPortal->IntersectSegment() routine didn't work properly if
-	  a portal container contains more then one portal.
-	- Jorrit added a new 'portal' render priority. If that render priority
-	  is present then it will be used automatically for portals created
-	  by the thing loader.
+	  The csPortal->IntersectSegment() routine didn't work properly if a
+	  portal container contains more then one portal.
+	- Jorrit added a new 'portal' render priority.  If that render priority
+	  is present then it will be used automatically for portals created by
+	  the thing loader.
 	- Jorrit fixed some bugs related to render priorities in case some
 	  render priorities are not specified by the map file.
-	- Jorrit changed the way the rotating door works in flarge. The overlay
-	  texture of the portal is now a seperate child mesh in a higher render
-	  priority. This works a lot better with the new portal container
-	  approach. Also added a 'portal' render priority to flarge.
+	- Jorrit changed the way the rotating door works in flarge.  The
+	  overlay texture of the portal is now a seperate child mesh in a
+	  higher render priority.  This works a lot better with the new portal
+	  container approach.  Also added a 'portal' render priority to flarge.
 	- Jorrit temporarily removed the <float> from the door portal in flarge
 	  since it appears to be broken a bit with the new portal containers.
 	  Need to investigate.
 	- Jorrit added SetName/GetName() to iPortal.
-	- Jorrit attempted to fix the 'wavy portal' stuff in flarge for the
-	  new portal containers but failed.
+	- Jorrit attempted to fix the 'wavy portal' stuff in flarge for the new
+	  portal containers but failed.
 	- Jorrit implemented HardTransform() for portal containers.
 	- Jorrit enabled portal compatibility mode in the thing loader now!
-	  This means that all portals that you create in map files using
-	  the <portal> keyword inside a polygon will now become portals in
-	  a portal container that is linked to the mesh of the polygon.
-	  Note that portals in things are still supported (but not through
-	  the map file). These will be removed later if this turns out to
-	  work well. So this is basically an experimental stage. There are still
-	  a few issues though:
-	      - In OpenGL mode the keycolor of the hole in the large room
-	        of flarge no longer works. With software renderer it is fine.
-		Strangely enough the keycolor works fine if you look at the
-		hole from underneath. That's a different portal though.
-	      - In Software mode the rotating door no longer has correct
-	        reflection. In OpenGL it is fine.
-	      - The <float/> keyword for the rotating door had to be removed
-	        so there may be some issues there. This needs to be
-		investigated.
-	      - Wavy sector doesn't work yet.
-	- Jorrit fixed a bug in the HardTransform() implementation of
-	  the portal container. This fixes the partsys level.
+	  This means that all portals that you create in map files using the
+	  <portal> keyword inside a polygon will now become portals in a portal
+	  container that is linked to the mesh of the polygon.  Note that
+	  portals in things are still supported (but not through the map file).
+	  These will be removed later if this turns out to work well.  So this
+	  is basically an experimental stage.  There are still a few issues
+	  though:
+	    - In OpenGL mode the keycolor of the hole in the large room of
+	      flarge no longer works.  With software renderer it is fine.
+	      Strangely enough the keycolor works fine if you look at the hole
+	      from underneath.  That's a different portal though.
+	    - In Software mode the rotating door no longer has correct
+	      reflection.  In OpenGL it is fine.
+	    - The <float/> keyword for the rotating door had to be removed so
+	      there may be some issues there.  This needs to be investigated.
+	    - Wavy sector doesn't work yet.
+	- Jorrit fixed a bug in the HardTransform() implementation of the
+	  portal container.  This fixes the partsys level.
 1-Oct-2003
-	- Jorrit fixed a bug reported by valgrind in the portal container.
-	  It was using an uninitialized variable.
+	- Jorrit fixed a bug reported by valgrind in the portal container.  It
+	  was using an uninitialized variable.
 	- Jorrit made frustvis and dynavis totally independent of things.
 	- Jorrit changed the default value of accurate for the second
-	  iVisibilityCuller->IntersectSegment() function (the one that
-	  returns polygon indices) from false to true. This means that by
-	  default the most accurate version is used.
+	  iVisibilityCuller->IntersectSegment() function (the one that returns
+	  polygon indices) from false to true.  This means that by default the
+	  most accurate version is used.
 	- Jorrit added an optional movable parameter to
-	  iPortal->GetWorldPlane(). This can be used by the portal container to
-	  update the world plane if that is needed.
+	  iPortal->GetWorldPlane().  This can be used by the portal container
+	  to update the world plane if that is needed.
 	- Jorrit added iPortal->PointOnPolygon() which tests if a worldspace
 	  point is in the portal polygon.
 	- Jorrit implemented iMeshWrapper->PlaceMesh() so that it works with
-	  the new portal containers. In addition it now also works on portals
-	  that move. This wasn't the case in the past.
+	  the new portal containers.  In addition it now also works on portals
+	  that move.  This wasn't the case in the past.
 	- Jorrit updated the apimod documentation for all recent beam
 	  intersection related changes.
-	- Jorrit fixed a bug in iSector->FollowSegment(). If a polygon was
-	  hit but that polygon was not a portal then the intersection point
-	  was not correctly set. This bug could cause the explosion in walktest
-	  to not appear from time to time.
-	- Jorrit changed portal container so that it implements iShadowReceiver.
-	  This fixes lighting for the new portals.
-	- Jorrit fixed a bug with thing and polygon meshes. If a polygon mesh
-	  didn't have any polygons in it then the polygon mesh would be
-	  setup and cleaned all the time causing performance degradation.
+	- Jorrit fixed a bug in iSector->FollowSegment().  If a polygon was hit
+	  but that polygon was not a portal then the intersection point was not
+	  correctly set.  This bug could cause the explosion in walktest to not
+	  appear from time to time.
+	- Jorrit changed portal container so that it implements
+	  iShadowReceiver.  This fixes lighting for the new portals.
+	- Jorrit fixed a bug with thing and polygon meshes.  If a polygon mesh
+	  didn't have any polygons in it then the polygon mesh would be setup
+	  and cleaned all the time causing performance degradation.
 	- Jorrit added a random value to the pause between setup of polygon
-	  mesh and cleanup (in thing plugin). That way the load of cleaning
-	  up all polygon meshes will be spread in time.
+	  mesh and cleanup (in thing plugin).  That way the load of cleaning up
+	  all polygon meshes will be spread in time.
 	- Eric Sunshine fixed a bug in cs-config where the value of
 	  $(LIB.EXE.PLATFORM) was not emitted by cs-config's --libs option.
 	  This caused linking problems on Windows since gdi32.lib was not
@@ -268,7 +273,7 @@ chronological order.
 	    - Removed unused glwin32 wglext.h.
 	    - Changed glwin32 plugin to use less UTF8/WCHAR conversions.
 	    - Fixed mode switching when exiting/terminating app on glwin32.
-	    - Removed a prototype for a non-existing function from 
+	    - Removed a prototype for a non-existing function from
 	      win32/wintools.h.
 	- Jorrit made the parsing of the 'start' keyword safer by allocating
 	  the string from the node.
@@ -290,7 +295,7 @@ chronological order.
 	- res fixed another problem with mode switching back on app exit.
 	- res did some small cleanups in graph2d.cpp (removed some commented
 	  out statements, removed a printf.)
-	- Keith added fix for missing GetTriangles() in sprcal3d.  Still is 
+	- Keith added fix for missing GetTriangles() in sprcal3d.  Still is
 	  not 100% correct but will work well enough for viewmesh.
 	- Duhprey added a todolist for the terrain plugin
 29-Sep-2003
@@ -450,20 +455,20 @@ chronological order.
 	      polygon buffers of the OR; you feed in some polygons, and get out
 	      a render buffer source you have specify in the csRenderMesh
 	      structure. The 'mesh type' has to be 'POLYGON'.
-	    - In the csRenderMesh structure, the 'transform' member was 
+	    - In the csRenderMesh structure, the 'transform' member was
 	      renamed to the more speaking 'object2camera'.
 	    - Brought the NR SW renderer up-to-date.
 	    - Added polygon drawing to NR SW. Still veeery crude.
 	    - Some GL extensions are now inited in the plugins which actually
 	      use them.
-	    - Fixed the problem that the shader manager only accepted 
+	    - Fixed the problem that the shader manager only accepted
 	      technique priorities > 0.
 	- Norman Kraemer extended pythmod_setup.py to handle "-l" prefixed
 	  additional libraries between the two "--".
 	- Norman Kraemer augmented PYTHMOD.LIBS.PLATFORM flags to include
 	  LIBBFD.LFLAGS. He thinks this should probably go into configure.ac.
 	- res removed the 'privateGetVariable()' stuff from shader manager.
-	- DeSigna removed incorrect information about iEventQueue's name in 
+	- DeSigna removed incorrect information about iEventQueue's name in
 	  the object registry from ievq's doxygen comments.
 	- Keith Fulton added functions to set the spr3d action by index instead
 	  of having to use action name strings.
@@ -530,7 +535,7 @@ chronological order.
 	- Jorrit implemented csPortalContainer::DrawTest(). This still leaves
 	  Draw() unimplemented.
 	- Jorrit started implementation of csPortalContainer::Draw().
-	- res added constructors to csSet<>::Iterator and 
+	- res added constructors to csSet<>::Iterator and
 	  csSet<>::GlobalIterator to shut up MSVC7 warnings about failure to
 	  create default constructors.
 22-Sep-2003
@@ -571,15 +576,15 @@ chronological order.
 	  to reduce the likelihood of over- and underfull hbox warnings.
 	- DeSigna patched in jsquare's changes to the msvc7 external
 	  project howto, and added jpeg images for the HTML version.
-	- res added EPS versions of the new images for the VC7 external 
+	- res added EPS versions of the new images for the VC7 external
 	  project HOWTO.
 	- res changed the EPS images from the Cygwin setup guide to be wrapped
 	  versions of the JPEG images and reduced their size in the document a
 	  bit.
-	- Norman Kraemer changed qsqrt to silence gcc-3.3.1, which started to 
-	  complain about deprecated use of memory input without lvalue in asm 
-	  argument. The resulting code is the same as generated with the 
-	  deprecated version (hopefully this is true for other gcc versions 
+	- Norman Kraemer changed qsqrt to silence gcc-3.3.1, which started to
+	  complain about deprecated use of memory input without lvalue in asm
+	  argument. The resulting code is the same as generated with the
+	  deprecated version (hopefully this is true for other gcc versions
 	  too).
 21-Sep-2003
 	- Jorrit added iEngine->CreatePortalContainer() and CreatePortal().
@@ -592,20 +597,20 @@ chronological order.
 	  AC_CHECK_TOOL() rather AC_CHECK_PROGS() in order to support
 	  cross-builds.
 	- Marten Svanfeldt made these changes
-	    - Added GetCurrentFrameNumber() to [cs/i]Engine. It will return a 
+	    - Added GetCurrentFrameNumber() to [cs/i]Engine. It will return a
 	      number which is incremented on each Engine::Draw.
-	    - Added Empty () to csRenderMeshList. It will empty all meshlists, 
+	    - Added Empty () to csRenderMeshList. It will empty all meshlists,
 	      but keep the renderpriority structs.
 	    - Added Sector::GetVisibleMeshes(iRenderView*). It will return
 	      all visible meshes for a given sector and rview. These will
-	      be cached, and only updated once each frame. This is to avoid 
+	      be cached, and only updated once each frame. This is to avoid
 	      doing culling so many times when using multipass rendering.
 	      Also made the generic renderstep to use it.
 	    - Fixed a nasty bug in csGLRender3D where CS_ASSERT() was set
 	      around an important statement in the VBO renderbuffer
 	      implementation.  This had the sideeffect that VBO didn't work in
 	      releasemode.
-	- res added a missing #include to portalcontainer.cpp (older GCC 
+	- res added a missing #include to portalcontainer.cpp (older GCC
 	  didn't like the (void)t where t's type was only forward declared.)
 20-Sep-2003
 	- Jorrit reverted nearly all his changes of yesterday. The only two
@@ -648,7 +653,7 @@ chronological order.
 	  csgfx and csutil.
 	- Jorrit added iPortalContainerList.
 	- res made the following changes to the stencil shadow render step:
-	    - When a shadow mesh is auto-closed, the created polymesh is 
+	    - When a shadow mesh is auto-closed, the created polymesh is
 	      reused the next time the shadow mesh has to be closed.
 	    - Don't draw shadow volumes when the shadow shader doesn't offer
 	      a suitable technique.
@@ -803,7 +808,7 @@ chronological order.
 	  LIBS.EXE.PLATFORM.
 14-Sep-2003
 	- DeSigna made the following changes:
-	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 
+	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in
 	      accordance to the other SCF macros.
 	    - Fixed all usage of SCF_CREATE_INSTANCE in CS to work correctly.
 	    - Fixed nettut to use csRef<> tracking instead of raw pointers.
@@ -834,7 +839,7 @@ chronological order.
 	  Jamconfig since their values were empty.
 13-Sep-2003
 	- Philipp Aumayr removed changed a delete data; to delete[] data; in
-	  plugins/video/openglcommon/glfontcache.h. mentioned by unaek in 
+	  plugins/video/openglcommon/glfontcache.h. mentioned by unaek in
 	  #crystalspace
 	- Jorrit cleaned up the shadermanager. Also fixed a small bug in the
 	  registration of the event handler where it would use || to combine
