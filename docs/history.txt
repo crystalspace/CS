@@ -27,6 +27,9 @@ The history order is reversed so that new features are at the top.
 	  Use OPCODE if you want commercial usage.
 	- Fixed three initialization errors in the OPCODE plugin which could
 	  cause a crash at exit (and actually did).
+	- Both RAPID and OPCODE now call Cleanup() on the polygon mesh to
+	  release unneeded memory. I thought this was done a long time
+	  ago but apparently not.
 16-Apr-2003
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.

@@ -110,6 +110,7 @@ csRapidCollider::csRapidCollider (iPolygonMesh* mesh)
   GetMR ();
   GetMT ();
   GeometryInitialize (mesh);
+  mesh->Cleanup ();
 }
 
 inline float min3 (float a, float b, float c)
