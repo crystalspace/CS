@@ -107,7 +107,7 @@ public:
 #define CSOBJTYPE							\
   public:								\
     static const csIdType Type;						\
-    virtual const csIdType& GetType () const;
+    virtual const csIdType& GetType () const
 
 /**
  * The function implementations for a pseudoRTTI class.
