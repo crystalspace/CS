@@ -24,32 +24,35 @@
 static char const ANIMATION[] = "-\\|/";
 int const ANIMATION_COUNT = sizeof(ANIMATION) / sizeof(ANIMATION[0]) - 1;
 
-static int GLOBAL_STATE = 0;
-int const NO_STATE = -1;
-
-csProgressPulse::csProgressPulse(bool inherit) :
-  type(MSG_INITIALIZATION), state(NO_STATE), inherit_global_state(inherit)
+csProgressPulse::csProgressPulse() :
+    type(MSG_INITIALIZATION), state(0), drawn(false)
 {
 }
 
 csProgressPulse::~csProgressPulse()
 {
-  if (state != NO_STATE)
+  Erase();
+}
+
+void csProgressPulse::Erase()
+{
+  if (drawn)
   {
     CsPrintf (type, "\b \b");
-    GLOBAL_STATE = state;
+    drawn = false;
   }
+}
+
+void csProgressPulse::Reset()
+{
+  Erase();
+  state = 0;
 }
 
 void csProgressPulse::Step()
 {
-  char const* prefix = "\b";
-  if (state == NO_STATE)
-  {
-    prefix = "";
-    state = (inherit_global_state ? GLOBAL_STATE : 0);
-  }
-
+  char const* prefix = (drawn ? "\b" : "");
+  drawn = true;
   CsPrintf (type, "%s%c", prefix, ANIMATION[state]);
   if (++state >= ANIMATION_COUNT)
     state = 0;

@@ -21,6 +21,7 @@
 #define __CSPPULSE_H__
 
 #include "csutil/csbase.h"
+#include "types.h"
 
 /**
  * The csProgressPulse class provides a simple twirling textual cursor built
@@ -30,35 +31,31 @@
  * being made and that the program is not hanging.  By default, the pulse beat
  * is presented to the user by passing MSG_INITIALIZATION to the system print
  * function.  This setting may be changed with the SetMessageType() method.
- * When you construct a pulse object, you can specify whether its state is
- * initialized to a default value or whether it inherits from the global
- * state.  Global state allows one pulse object to pick up where another left
- * off in its animation sequence.  This allows you to create unrelated pulse
- * objects in different parts of a program and have them appear to the user as
- * representing a single computational operation, without having to manually
- * pass around state information.  To animate the pulse object, call the
- * Step() method each time a unit of work has been completed.  At each step a
- * backspace (\b) followed by one of the pulse characters (-, \, |, or /) is
- * printed, except for the very first step, in which case the backspace is
- * omitted.  If Step() was called at any time during the object's life time,
- * then when it is destroyed, it it prints a backspace, followed by a space
- * (' '), followed by one more backspace.
+ * To animate the pulse object, call the Step() method each time a unit of
+ * work has been completed.  At each step a backspace (\b) followed by one of
+ * the pulse characters (-, \, |, or /) is printed, except for the very first
+ * step, in which case the backspace is omitted.  Erase() clears the pulse, if
+ * necessary, by printing a backspace, followed by a space (' '), followed by
+ * one more backspace.  Reset() erases the pulse and then resets the state.
+ * Erase() is called automatically by the destructor.
  */
 class csProgressPulse : public csBase
 {
 private:
   int type;	// One of MSG_INITIALIZATION, MSG_CONSOLE, MSG_STDOUT, etc.
   int state;
-  bool inherit_global_state;
+  bool drawn;
 
 public:
-  csProgressPulse(bool inherit_global_state = false);
+  csProgressPulse();
   ~csProgressPulse();
 
   void SetMessageType(int n) { type = n; }
   int GetMessageType() const { return type; }
 
   void Step();
+  void Erase();
+  void Reset();
 };
 
 #endif // __CSPPULSE_H__
