@@ -25,6 +25,8 @@ chronological order.
 	- Eric Sunshine removed the InstallHTMLDocs and ScanHeaders rules
 	  (docs/html/Jamfile & include/Jamfile), and replaced them with simple
 	  invocations of the new Recurse rule.
+	- Eric Sunshine added missing lghtngldr.csplugin, lghtngldr.mak, and
+	  mesh/lghtng/persist/standard/Jamfile.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support

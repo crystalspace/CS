@@ -90,7 +90,7 @@ else
 PLUGINS += mesh/terrfunc/object    mesh/terrfunc/persist/standard
 PLUGINS += mesh/terrbig
 endif
-PLUGINS += mesh/lghtng/object
+PLUGINS += mesh/lghtng/object      mesh/lghtng/persist/standard
 PLUGINS += mesh/null/object        mesh/null/persist/standard
 PLUGINS += mesh/bcterr/object      mesh/bcterr/persist/standard
 PLUGINS += mesh/metagen/object
