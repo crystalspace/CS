@@ -314,7 +314,6 @@ void Scan32::draw_scanline_fog_plane (int xx, unsigned char* d,
                               unsigned long* z_buf,
                               float inv_z, float u_div_z, float v_div_z)
 {
-//printf ("xx=%d\n", xx);
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
   UShort* _dest = (UShort*)d;
@@ -327,7 +326,7 @@ void Scan32::draw_scanline_fog_plane (int xx, unsigned char* d,
   int fog_g = 256+Scan::fog_green;
   int fog_b = 256+Scan::fog_blue;
 
-  long dist = QInt24 (1. / .3);
+  long dist = QInt24 (1. / 1.);
   int dens_dist = tables.exp_table_2[fog_dens / dist];
 //printf ("fog_dens=%d dist=%d dens_dist=%d\n", fog_dens, dist, dens_dist);
 
@@ -358,7 +357,7 @@ void Scan32::draw_scanline_fog_plane (int xx, unsigned char* d,
   while (_dest <= _destend);
 }
 
-#endif // NO_draw_scanline_fog_view
+#endif // NO_draw_scanline_fog_plane
 
 //------------------------------------------------------------------
 
