@@ -13,6 +13,10 @@ chronological order.
 	- Jorrit fixed a bug with a hardcoded alpha render priority for
 	  explosions in walktest. This could cause particles to be
 	  rendered after other objects sometimes.
+	- Jorrit fixed the OR OpenPortal() command (for floating portals).
+	  The function to do a z-fill of the buffer (to clear the z-buffer
+	  for geometry in the portal) was backface culled and thus didn't
+	  do anything.
 8-Jun-2004
 	- Jorrit fixed a bug in the FindByNameWithChild() function in the
 	  engine. This function would crash if there were unnamed meshes

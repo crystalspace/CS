@@ -5505,11 +5505,11 @@ void csGraphics3DOGLCommon::SetupClipPortals ()
 	glColorMask (false, false, false, false);
 
 	glBegin (GL_QUADS);
-	glVertex4f (0.0*100000.0, 0.0*100000.0, -1.0, 100000.0);
-	glVertex4f (float (width-1)*100000.0, 0.0*100000.0, -1.0, 100000.0);
+	glVertex4f (0.0*100000.0, float (height-1)*100000.0, -1.0, 100000.0);
 	glVertex4f (float (width-1)*100000.0, float (height-1)*100000.0,
 		-1.0, 100000.0);
-	glVertex4f (0.0*100000.0, float (height-1)*100000.0, -1.0, 100000.0);
+	glVertex4f (float (width-1)*100000.0, 0.0*100000.0, -1.0, 100000.0);
+	glVertex4f (0.0*100000.0, 0.0*100000.0, -1.0, 100000.0);
 	glEnd ();
 	glColorMask (true, true, true, true);
 
