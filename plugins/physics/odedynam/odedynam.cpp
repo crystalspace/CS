@@ -1083,7 +1083,6 @@ void csODEJoint::BuildJoint ()
         if (rotConstraint[0]) {
           BuildHinge (rot.Col1(), minAngle.x, maxAngle.x);
         } else if (rotConstraint[1]) {
-printf ("rot.Col2(%f %f %f)\n", rot.Col2().x, rot.Col2().y, rot.Col2().z);
           BuildHinge (rot.Col2(), minAngle.y, maxAngle.y);
         } else if (rotConstraint[2]) {
           BuildHinge (rot.Col3(), minAngle.z, maxAngle.z);
