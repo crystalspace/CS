@@ -48,6 +48,9 @@ SCF_REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 
+// the global system driver variable
+Simple *System;
+
 Simple::Simple ()
 {
   view = NULL;
@@ -82,9 +85,13 @@ Simple::~Simple ()
   delete sky_u;
   delete sky_d;
 
-  //delete flock;
+  delete flock;
+}
 
-  console_out ("Cleaning up...\n");
+void cleanup ()
+{
+  System->console_out ("Cleaning up...\n");
+  delete System;
 }
 
 void Simple::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, 
@@ -150,6 +157,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (!Open ("Crystal Space Procedural Sky Demo"))
   {
     Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+	cleanup ();
     exit (1);
   }
 
@@ -512,14 +520,14 @@ int main (int argc, char* argv[])
   if (!System->Initialize (argc, argv, NULL))
   {
     System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+	cleanup ();
     exit (1);
   }
 
   // Main loop.
   System->Loop ();
 
-  // cleanup
-  delete System;
+  cleanup ();
 
   return 0;
 }
