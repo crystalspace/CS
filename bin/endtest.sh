@@ -10,7 +10,7 @@
 
 echo "int main() { long x = 0x12; return *(unsigned char *)&x == 0x12; }" > comptest.cpp
 
-${CXX} -o comptest endtest.cpp 2>/dev/null || echo "endtest.sh: cannot compile testcase" >&2
+${CXX} -o comptest comptest.cpp 2>/dev/null || echo "endtest.sh: cannot compile testcase" >&2
 if test -f ./comptest; then
     if ./comptest; then
 	echo "CS_BIG_ENDIAN = 1"
