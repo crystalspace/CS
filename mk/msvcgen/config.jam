@@ -68,3 +68,8 @@ WAVEOUT.AVAILABLE = yes ;
 WAVEOUT.LIBS = winmm.lib ;
 ZLIB.AVAILABLE = yes ;
 ZLIB.LIBS = zlib.lib ;
+WX.AVAILABLE = yes ;
+WX.CFLAGS = "/D \"wxUSE_GUI=1\" /D \"WXUSINGDLL=1\"" ;
+WX.LIBS = "wxmsw24.lib opengl32.lib" ;
+WX.CFLAGS.DEBUG = "/D \"wxUSE_GUI=1\" /D \"WXDEBUG=1\" /D \"WXUSINGDLL=1\"" ;
+WX.LIBS.DEBUG = "wxmsw24d.lib opengl32.lib" ;

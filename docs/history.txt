@@ -48,6 +48,15 @@ chronological order.
 	  necessary because wxWindow is typically an alias, created with
 	  #define, to some platform-specific implementation class, so our
 	  forward declaration was incorrect.
+	- res fixed the VC7 group projects to also specify intermediate & 
+	  output directories and an output file (so cleaning them works 
+	  without warnings).
+	- res enabled VC project generation for WX-dependent plugins and also
+	  added two new workspaces which include the wxgl plugins (they are 
+	  not included in the default workspaces as not everyone may want to
+	  spend the effort to build wxWidgets or need the wxgl canvas).
+	- res updated the "External Libraries" docs to point to the latest
+	  cs-win32libs package.
 18-Sep-2004
 	- Eric Sunshine changed the executable subsystem type in the MSVC
 	  project files for GUI applications from "windows" to "console". This

@@ -41,6 +41,7 @@ MsvcGenWorkspace typical : :
   terrainldr
   waterdemo
   xmlshader
+  wxgl
   ;
 
 # Similar to "typical" but using the new renderer instead of the old.
@@ -50,6 +51,40 @@ MsvcGenWorkspace newrenderer : :
   cspython
   gl3d
   "grp.+_(?!newrenderer$)"
+  null3d
+  renderercommon
+  soft3d
+  wxgl
+  ;
+
+# Like "typical", but with WX, too.
+MsvcGenWorkspace wx-typical : :
+  chunklod
+  glrender3d
+  glshader_arb
+  glshader_cg
+  glshader_fixed
+  glshader_ps1
+  grpnrall
+  "grp.+_(?!wx-typical$)"
+  isotest
+  nullrender3d
+  render3dcommon
+  shadermgr
+  softrender3d
+  softshader
+  terrainldr
+  waterdemo
+  xmlshader
+  ;
+
+# Like "newrenderer", but with WX, too.
+MsvcGenWorkspace wx-newrenderer : :
+  csjava
+  csperl5
+  cspython
+  gl3d
+  "grp.+_(?!wx-newrenderer$)"
   null3d
   renderercommon
   soft3d
