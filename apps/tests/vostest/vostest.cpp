@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/sysfunc.h"
+//#include "csutil/sysfunc.h"
 #include "iutil/vfs.h"
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
@@ -28,6 +28,7 @@
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
+#include "iutil/plugin.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
@@ -50,6 +51,7 @@
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
+#include "ivaria/engseq.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/event.h"
 
@@ -129,13 +131,11 @@ bool Vostest::HandleEvent (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    std::cout << "HandleEvent SetupFrame\n";
     vostest->SetupFrame ();
     return true;
   }
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
   {
-    std::cout << "HandleEvent FinishFrame\n";
     vostest->FinishFrame ();
     return true;
   }
@@ -211,6 +211,12 @@ bool Vostest::Initialize ()
     return false;
   }
 
+#if 0
+  csRef<iPluginManager> pm = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  pm->LoadPlugin("crystalspace.utilities.sequence.engine", "iEngineSequenceManager", 3, true);
+  pm->LoadPlugin("crystalspace.culling.frustvis", "iVisibilityCuller", 262144, true);
+#endif
+
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (loader == 0)
   {
@@ -274,19 +280,18 @@ bool Vostest::Initialize ()
 
   engine->Prepare ();
 
-  csRef<iVosSector> vossector = vosa3dl->GetSector("vop://localhost/world");
-  vossector->Load();
-  room = vossector->GetSector();
-
-  std::cout << "yearg 1\n";
-
   view = csPtr<iView> (new csView (engine, g3d));
-  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->SetSector (engine->CreateSector("_tmp"));
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  std::cout << "yearg 2\n";
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN));
+  view->Draw ();
+
+  csRef<iVosSector> vossector = vosa3dl->GetSector("vop://localhost/world");
+  vossector->Load();
+  view->GetCamera()->SetSector(vossector->GetSector());
 
   return true;
 }
