@@ -48,6 +48,8 @@ The history order is reversed so that new features are at the top.
 	  caused weird things on various systems. For some weird reason
 	  Marten removed this initialization code during the rewrite of
 	  ball mesh to the new renderer.
+	- Jorrit did some updates to the documentation to avoid the word
+	  'region' where something else is meant.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

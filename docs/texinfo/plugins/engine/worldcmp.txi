@@ -15,7 +15,7 @@ The world is built up from the following objects:
 @itemize @bullet
 @item
 @dfn{Sectors}. For details, see the portal engine discussion
-(@pxref{Portal Engine}). Basically sectors define a region of space
+(@pxref{Portal Engine}). Basically sectors define an area
 that can contain several geometrical objects. As opposed to earlier
 versions of Crystal Space, a sector does not itself represent geometry.
 Instead all geometry in a sector is made from @dfn{Mesh Objects}.
@@ -42,8 +42,8 @@ be hierarchical like mesh objects.
 
 @item
 @dfn{Portals}. Again see the portal discussion (@pxref{Portal Engine}) but
-the idea is that sectors are normally totally independent regions of
-space unless you connect them through portals. Portals are currently implemented
+the idea is that sectors are normally totally independent areas
+unless you connect them through portals. Portals are currently implemented
 inside the @dfn{Thing Mesh Object}. There you can assign a portal to some
 sector to a single polygon.
 
@@ -59,9 +59,10 @@ confuse them with hierarchical objects.
 @dfn{Regions}. A region is also a collection of objects but the purpose
 is different (as opposed to collections). A region can contain textures,
 materials, mesh objects, mesh factories, lights, collections, sectors,
-@dots{}. Regions are useful when you want to load/unload big parts of a world
-dynamically. This can be used in cases where the world is too big to fit
-in memory and you want to use dynamic loading.
+sequences, triggers, shared variables, @dots{}. Regions are useful when you
+want to load/unload big parts of a world dynamically. This can be used in
+cases where the world is too big to fit in memory and you want to use dynamic
+loading.
 
 @item
 @dfn{Key/value Pairs}. A key/value pair is a

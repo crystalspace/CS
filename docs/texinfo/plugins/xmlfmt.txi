@@ -610,7 +610,8 @@ Sectors can contain keys and addons.
 @cindex regions (Map File)
 
 With regions it is possible to group related objects (like textures,
-materials, mesh objects, mesh factories, sectors, @dots{}).
+materials, mesh objects, mesh factories, sectors, sequences, triggers,
+shared variables, @dots{}).
 Regions are not a geometrical concept. It is possible to define a region which
 contains all wall geometry and a region which contains all moving geometry.
 Usually though, regions represent some area in the world. You can use

@@ -8,7 +8,7 @@
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
 
 The world in Crystal Space is defined with @dfn{Sectors}. A sector is
-a region of space that itself does not represent geometry but can
+an area of space that itself does not represent geometry but can
 contain objects that represent geometry. In this discussion we will limit
 ourselves to mesh objects of the @dfn{Thing} type since things implement
 @dfn{portals}.
@@ -84,7 +84,7 @@ ceiling polygon.  All polygons are equivalent.
 @cindex visibility culler
 
 In this section I will describe Sectors a bit more thoroughly.  As stated
-before sectors are regions of space. You can fill a sector with geometry
+before sectors represent infinite space. You can fill a sector with geometry
 by using mesh objects (@pxref{MeshObject}).
 
 With a sector there is always an associated visibility culler. Currently

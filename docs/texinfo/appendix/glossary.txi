@@ -131,7 +131,8 @@ all objects in Crystal Space that can use textures.
 
 @item Region
 A region in Crystal Space is a collection of objects (textures, materials,
-mesh objects, mesh factories, sectors, @dots{}).
+mesh objects, mesh factories, sectors, sequences, triggers, shared variables,
+collections, @dots{}).
 Regions are not a geometrical concept. It is possible to define a region which
 contains all wall geometry and a region which contains all moving geometry.
 Usually though, regions represent some area in the world. You can use
