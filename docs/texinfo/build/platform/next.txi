@@ -5,7 +5,7 @@
 @sc{n}e@sc{xt}
 @end macro
 
-@node NeXT, MacOS/9, MingW, Platform Instructions
+@node NeXT, MacOS/9, MinGW, Platform Instructions
 @subsection MacOS/X, MacOS/X Server 1.0, OpenStep, NextStep
 @cindex @sc{n}e@sc{xt}
 @cindex MacOS/X
