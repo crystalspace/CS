@@ -1654,14 +1654,6 @@ int main (int argc, char *argv[])
     return -1;
   }
   
-  if (!System.myG3D->Open ())
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.g2dtest",
-        "Unable to open graphics context!");
-    return -1;
-  }
-
   System.cursorPlugin = CS_QUERY_REGISTRY(object_reg, iCursor);
   if (System.cursorPlugin)
   {

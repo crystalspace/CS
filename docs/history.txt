@@ -43,6 +43,7 @@ chronological order.
 	- res fixed the passing of a bool through '...' in the NR GL renderer.
 	- res fixed an array access with an negative index in bruteblock.
 	- Eric Sunshine fixed several compilation warnings.
+	- res fixed a double-Open() of the renderer in g2dtest.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data
