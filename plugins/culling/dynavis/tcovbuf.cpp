@@ -251,7 +251,7 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
       {
 
         csBits64 allOnes; allOnes.Full ();
-        csBits64 temp;
+        // csBits64 temp;
 #ifdef COMP_VC
         int i = (int) &this->tile_full;
         __asm
@@ -398,7 +398,7 @@ fillCol:
       {
         
         csBits64 allOnes; allOnes.Full ();
-        csBits64 temp;
+        // csBits64 temp;
     #ifdef COMP_VC
         int i = (int) &this->tile_full;
         __asm
