@@ -22,6 +22,7 @@ Short-term cleanups that need to be done:
 	  performed a real SCF conversion on the Win32 port.  (Note, however,
 	  that Eric is unable to test the conversion, so someone else will
 	  have to do so.)
+	- Fixes to Win32 port from Brandon Ehle.
 	- Eric Sunshine fixed a bug introduced into csSystemDriver::Print()
 	  during the SCF conversion which caused Print() to generate garbage
 	  if the printed string contained percent "%" characters.
@@ -49,6 +50,9 @@ Short-term cleanups that need to be done:
 	  "cspython" the makefile's list of targets if haspythn.sh has
 	  determined that Python is installed.
 8-Nov-1999
+	- New fixes to terrain loading from Alex Pfaffe. There is now
+	  support for texture mapping and lighting based on the sun
+	  position.
 	- Eric Sunshine reverse-engineered Andrew Zabolotny's SCF changes and
 	  was able to recreate some missing files which Andrew forgot to
 	  commit to the CVS repository.  Eric's recreations are minimal, yet
@@ -56,17 +60,27 @@ Short-term cleanups that need to be done:
 	  check in the "real" files when he has the opportunity to do so.
 	- Eric Sunshine canonicalized the line terminator in many of the new
 	  TeX documents.
+	- Adjustments for SCF/Windows port from Thomas Hieber.
+	- Thomas also added support for mirrored planes in map2cs.
 7-Nov-1999
 	- Eric Sunshine re-engineered the Python detection code in haspyth.sh
 	  so that it deals gracefully with the case where multiple Python
 	  header and library directories are found.  Problem was reported by
 	  Donald Ryan Willhoit <willhoit@mail1.andrew.cmu.edu>.
 5-Nov-1999
+	- Fixes to LaTeX docs from Brandon Ehle.
+	- Fixes to terrain engine from Alex Pfaffe again. These fixes
+	  FINALLY fix the terrain engine so that it works on big-endian
+	  systems.
+	- Fix to camera.cpp from Brandon Ehle.
 	- Andrew Zabolotny converted much of Crystal Space over from COM to
 	  SCF (the Shared Class Facility).  This was an enormous task.  About
 	  70 or 80% of the conversion has been completed, although many
 	  drivers and platform-specific code is still broken and needs to be
 	  converted by the particular port maintainer.
+4-Nov-1999
+	- Change to terrain engine from Alex Pfaffe in the ongoing effort
+	  to try to get the thing working on Solaris.
 3-Nov-1999
 	- Jorrit eliminated initialization of four function pointers in OpenGL
 	  driver because gcc fails on them.
@@ -78,6 +92,8 @@ Short-term cleanups that need to be done:
 	  csEngine.
 	- Eric Sunshine worked around an OpenStep compiler bug which was
 	  triggered by recent changes to csBox.
+	- Brandon Ehle added and modified new LaTeX docs in newdoc directory.
+	- Some changes to VC project files from Thomas Hieber.
 2-Nov-1999
 	- Added -lmgrid and -lmonly commandline option for software renderer.
 	  -lmgrid adds an extra grid to every lightmap lumel.  -lmonly doesn't
