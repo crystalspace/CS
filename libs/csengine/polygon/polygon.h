@@ -765,6 +765,17 @@ public:
   void FillLightmap (csLightView& lview);
 
   /**
+   * Check all shadow frustrums and mark all relevant ones. A shadow
+   * frustrum is relevant if it is (partially) inside the light frustrum
+   * and if it is not obscured by other shadow frustrums.
+   * In addition to the checking above this routine will return false
+   * if it can find a shadow frustrum which totally obscures the light
+   * frustrum. In this case it makes no sense to continue lighting the
+   * polygon.
+   */
+  bool MarkRelevantShadowFrustrums (csLightView& lview);
+
+  /**
    * Check visibility of this polygon with the given csLightView
    * and fill the lightmap if needed (this function calls FillLightmap ()).
    * This function will also traverse through a portal if so needed.

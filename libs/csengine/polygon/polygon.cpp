@@ -1234,6 +1234,19 @@ void csPolygon3D::FillLightmap (csLightView& lview)
     lp->num_vertices = lview.light_frustrum->GetNumVertices ();
     CHK (lp->vertices = new csVector3 [lp->num_vertices]);
 
+    // Copy shadow frustrums.
+    csShadowFrustrum* sf, * copy_sf;
+    sf = lview.shadows.GetFirst ();
+    while (sf)
+    {
+      if (sf->relevant)
+      {
+        CHK (copy_sf = new csShadowFrustrum (*sf));
+        lp->shadows.AddLast (copy_sf);
+      }
+      sf = sf->next;
+    }
+
     int i, mi;
     for (i = 0 ; i < lp->num_vertices ; i++)
     {
@@ -1258,6 +1271,54 @@ void csPolygon3D::FillLightmap (csLightView& lview)
     if (lightmap1) create_lightmaps ();
 #endif
   }
+}
+
+bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview)
+{
+  // @@@ Currently this function only checks if a shadow frustrum is inside
+  // the light frustrum. There is no checking done if shadow frustrums obscure
+  // each other.
+
+  int i, count;
+  bool contains;
+  csShadowFrustrum* sf = lview.shadows.GetFirst ();
+  while (sf)
+  {
+    // Assume that the shadow frustrum is relevant.
+    sf->relevant = true;
+
+    // Check if any of the vertices of the shadow polygon is inside the light frustrum.
+    // If that is the case then the shadow frustrum is indeed relevant.
+    contains = false;
+    for (i = 0 ; i < sf->GetNumVertices () ; i++)
+      if (lview.light_frustrum->Contains (sf->GetVertex (i))) { contains = true; break; }
+    if (!contains)
+    {
+      // All vertices of the shadow polygon are outside the light frustrum. In this
+      // case it is still possible that the light frustrum is completely inside the
+      // shadow frustrum.
+      count = 0;
+      for (i = 0 ; i < lview.light_frustrum->GetNumVertices () ; i++)
+        if (sf->Contains (lview.light_frustrum->GetVertex (i))) count++;
+      if (count == 0)
+      {
+        // All vertices of the light frustrum (polygon we are trying to light)
+	// are outside of the shadow frustrum. In this case the shadow frustrum is
+	// not relevant.
+	sf->relevant = false;
+      }
+      else if (count == lview.light_frustrum->GetNumVertices ())
+      {
+        // All vertices of the light frustrum are inside the shadow frustrum. This
+	// is a special case. Now we know that the light frustrum is totally invisible
+	// and we stop the routine and return false here.
+	return false;
+      }
+    }
+
+    sf = sf->next;
+  }
+  return true;
 }
 
 void csPolygon3D::CalculateLighting (csLightView* lview)
@@ -1301,8 +1362,17 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
   }
   csVector3* poly = cleanable->array;
 
-  if (!plane->VisibleFromPoint (center) || ABS (plane->Classify (center)) < SMALL_EPSILON) return;
+  // If plane is not visible then return.
+  if (!plane->VisibleFromPoint (center)) return;
 
+  // Compute the distance from the center of the light to the plane of the polygon.
+  float dist_to_plane = GetPolyPlane ()->Distance (center);
+
+  // If distance is too small or greater than the radius of the light then we have a
+  // trivial case (no hit).
+  if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->l->GetRadius ()) return;
+
+  // Calculate the new frustrum for this polygon.
   int j;
   if (lview->mirror)
     for (j = 0 ; j < num_vertices ; j++)
@@ -1317,45 +1387,45 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
     // There is an intersection of the current light frustrum with the polygon.
     // This means that the polygon is hit by the light.
 
-    // First compute the distance from the center of the light to the plane of
-    // the polygon. If this distance is greater than the radius of the light then
-    // we have a trivial case (no hit possible).
-    float dist_to_plane = GetPolyPlane ()->Distance (center);
-
-    bool faraway = true;
-    if (dist_to_plane < lview->l->GetRadius ())
-    {
-      // The light is close enough to the plane of the polygon. Now we calculate
-      // an accurate minimum squared distance from the light to the polygon. Note
-      // that we use the new_frustrum which is relative to the center of the light.
-      // So this algorithm works with the light position at (0,0,0) (@@@ we should
-      // use this to optimize this algorithm further).
-      csVector3 o (0, 0, 0);
-      float min_sqdist = csSquaredDist::PointPoly (o, new_light_frustrum->GetVertices (),
+    // The light is close enough to the plane of the polygon. Now we calculate
+    // an accurate minimum squared distance from the light to the polygon. Note
+    // that we use the new_frustrum which is relative to the center of the light.
+    // So this algorithm works with the light position at (0,0,0) (@@@ we should
+    // use this to optimize this algorithm further).
+    csVector3 o (0, 0, 0);
+    float min_sqdist = csSquaredDist::PointPoly (o, new_light_frustrum->GetVertices (),
 		new_light_frustrum->GetNumVertices (),
 		*(GetPolyPlane ()), dist_to_plane*dist_to_plane);
-      if (min_sqdist < lview->l->GetSquaredRadius ()) faraway = false;	// Light reaches polygon.
-    }
-
-    if (!faraway)
+    if (min_sqdist < lview->l->GetSquaredRadius ())
     {
       csLightView new_lview = *lview;
       new_lview.light_frustrum = new_light_frustrum;
-      FillLightmap (new_lview);
-      po = GetPortal ();
-      if (po) po->CalculateLighting (new_lview);
-      else if (!new_lview.dynamic && csSector::do_radiosity)
+
+      // Mark all shadow frustrums in 'new_lview' which are relevant. i.e.
+      // which are inside the light frustrum and are not obscured (shadowed)
+      // by other shadow frustrums.
+      // FillLightmap() will use this information and csPortalCS::CalculateLighting()
+      // will also use it!!
+      if (MarkRelevantShadowFrustrums (new_lview))
       {
-        // If there is no portal we simulate radiosity by creating
-	// a dummy portal for this polygon which reflects light.
-	csPortalCS mirror;
-	mirror.SetSector (GetSector ());
-	mirror.SetAlpha (10);
-	float r, g, b;
-	GetTextureHandle ()->GetMeanColor (r, g, b);
-	mirror.SetFilter (r/4, g/4, b/4);
-	mirror.SetWarp (csTransform::GetReflect ( *(GetPolyPlane ()) ));
-	mirror.CalculateLighting (new_lview);
+        // Update the lightmap given the light and shadow frustrums in new_lview.
+        FillLightmap (new_lview);
+
+        po = GetPortal ();
+        if (po) po->CalculateLighting (new_lview);
+        else if (!new_lview.dynamic && csSector::do_radiosity)
+        {
+          // If there is no portal we simulate radiosity by creating
+	  // a dummy portal for this polygon which reflects light.
+	  csPortalCS mirror;
+	  mirror.SetSector (GetSector ());
+	  mirror.SetAlpha (10);
+	  float r, g, b;
+	  GetTextureHandle ()->GetMeanColor (r, g, b);
+	  mirror.SetFilter (r/4, g/4, b/4);
+	  mirror.SetWarp (csTransform::GetReflect ( *(GetPolyPlane ()) ));
+	  mirror.CalculateLighting (new_lview);
+        }
       }
     }
     else
