@@ -172,7 +172,7 @@ options.
 COPYING contains the conditions by which you can use the Crystal Space
 engine in your own products. These conditions are from LGPL.
 
-FILES contains a list and description of the directory structure of
+dir.txt contains a list and description of the directory structure of
 Crystal Space. It also explains what all documents are for.
 
 CREDITS contains a list of all people who contributed in some way

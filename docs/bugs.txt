@@ -78,15 +78,6 @@ SOLUTION: 32-bit display mode is easy. It just
 needs to be done. 8-bit is another matter.
 DIFFICULTY: easy to moderate
 
-PROBLEM: If lightmap size in 'cryst.cfg' is less than 16 (8, 4 or 2),
-then Walktest will exit after recomputing all the lightmaps (after
-'Caching Lightmaps') and just before the frame 'Computing OBB' with 'Bad
-mipmap value!' error. If lightmap size is 1, then it will exit with the
-same error after the phrase 'Computing mipmapped textures...\nDONE!'.
-(mrsigma@surrey.quik.com)
-SOLUTION: Should be investigated.
-DIFFICULTY: probably easy?..
-
 PROBLEM: Semi-transparent textures (textures in which one color is completely
 transparent and the rest is opaque) only work correctly in 16-bit color. In
 32-bit color there is no transparancy and in 8-bit color there is only
@@ -100,9 +91,10 @@ PROBLEM: MazeD only works in windowed mode (on Windows).
 SOLUTION: Rewrite buggy getpage() method in Windows renderer.
 DIFFICULTY: easy
 
-PROBLEM: There is no startup text in 8-bit display color.
-SOLUTION: Probably easy to fix. Just need to have a look. (comment by
-mrsigma@surrey.quik.com -- it seems that ReserveColor method in Texture
-Manager does not work)
-DIFFICULTY: easy
+PROBLEM: Unlighted texture mapping in 32-bit mode does not look right
+if your display hardware does not use the ARGB format (red becomes blue,
+etc).
+SOLUTION: Just write special versions for every format (similar to what
+is done for fog).
+DIFFICULTY: very easy
 

@@ -12,11 +12,63 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+12-Jul-99:
+	- New 'dumpvis' command. This command takes the current view
+	  and dumps information for the rendering process. You will
+	  see what sectors and polygons are rendered and how they are
+	  clipped. This is useful for debugging purposes. The output
+	  comes into 'debug.txt'.
+	  I added 'ctrl-d' as a key shortcut for 'dumpvis'.
+	- Fixed bug in engine so that you can safely set low values
+	  for LIGHTMAP_SIZE in cryst.cfg. I tested 8 and 4 and this gives
+	  really accurate shadows (at the expense of memory and speed of
+	  course).
+11-Jul-99:
+	- Thomas Hieber fixed/enabled mipmapping again in the Direct3D
+	  renderer. This also improves performance a little.
+	  Transparency will also work on mipmapped textures.
+	  Textures are now automatically scaled to their ideal sizes
+	  according to hardware restrictions (for example < 256).
+	- Thomas also moved a few utility routines to the csutil library.
+	- Denis Dmitriev moved 'coodload' and 'coordsave' commands
+	  to WalkTest.
+	- Denis also made our legs longer so that we can climb the
+	  sidewalks in large.zip :-)
+	- Thomas added a new build mode 'RelDeb' to the VC projects. This
+	  is a release version with debug information.
+10-Jul-99:
+	- Denis Dmitriev fixed the Direct3D renderer so that the skydome
+	  works correctly (problem with Z values being very large).
+	- Andrew Zabolotny removed tables.*. Tables are now kept in
+	  the Scan structure. New NASM routines for 16-bit fog (about
+	  10% improvement).
+9-Jul-99:
+	- Made loading of worlds slightly more robust in case the
+	  world file is corrupt (or just not a world file).
+	- I added a fix from Thomas Hieber so that the Direct3D port
+	  works correctly on RIVA 128 cards. The problem had to do with
+	  the RIVA 128 DX driver not supporting non-square textures.
+	  The fix is easy and general.
+	- Ivan Avramovic moved the (nearly obsolete) csscript code out
+	  of the engine into its own library (csscript). This clean
+	  seperation means that the engine no longer depends on that
+	  code and that we can safely remove it when something better
+	  appears.
+	- Andrew Zabolotny modified the X 2D drivers (Software, OpenGL,
+	  and Glide) so that autorepeat behaves better. This improves
+	  the speed for walking around with the new movement code.
+	  He also added support for keypad arrow keys.
+	- Andrew also changed the makefiles so that there is no longer
+	  a seperate PIC directory if CFLAGS.DLL is empty.
 8-Jul-99:
 	- Updated makefiles for ndrvdemo. There are now two makefiles. One
 	  for the client and one for the server. They generate the executables
 	  'client' and 'server' (on Unix). Also did some other fixes (like
 	  renaming scon.* to ndrvscon.* and proper txtmgr init).
+	- Fixed a bug in the lighting routines (mostly with lighting through
+	  portals on things). Fixing this bug happens to be an optimization
+	  as well :-)
+	- Some changes (bugfixes) to DJGPP port from Andrew Zabolotny.
 7-Jul-99:
 	- Major bugfix in collision detection code. It crashed completely
 	  on sprites. CD with sprites seems to be broken though. But now
