@@ -1570,6 +1570,5 @@ iSector *csWorld::CreateSector (const char *iName)
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
   sector->SetName (iName);
   sectors.Push (sector);
-  sector->IncRef ();
-  return sector;
+  return QUERY_INTERFACE (sector, iSector);
 }
