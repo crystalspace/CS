@@ -16,6 +16,29 @@ Short-term cleanups that need to be done:
 	- Continued debugging work on solid BSP. Still not perfect
 	  although I'm getting closer all the time.
 	- Added csPlane2::SquaredDistance.
+	- Andrew Zabolotny did the following changes:
+	    - Removed NeedPO2Maps(), GetMaxAspectRatio() calls from
+	      igraph3d. Moved to GetCaps(). Removed unneeded (and simply
+	      wrong) stuff from GetCaps(), added PO2Maps and MaxAspectRatio
+	      instead.
+	    - Instead of G3DRENDERSTATE_ZBUFFERFILLENABLE and
+	      ..._ZBUFFERTESTENABLE there is just only one state:
+	      G3DRENDERSTATE_ZBUFFERMODE. I've removed the SetZBuffMode()
+	      method from iGraphics3D. Now you can do directly
+	      g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE),
+	      for example.
+	    - Implemented G3DRENDERSTATE_GAMMACORRECTION for all modes.
+	      In 8-bit mode this is done via palette; in truecolor modes
+	      this is done via texture palette remapping. It seems to work
+	      pretty fast, although gamma value has different meaning (and
+	      effect) in 8-bit and truecolor modes. In return, you can see
+	      the lightmaps now with software renderer by turning gamma to
+	      something very low (about zero). The black lightmap
+	      borders are seen very well with almost white textures. This
+	      works only in truecolor modes; in 8-bit modes you will simply
+	      see a white screen :-)
+	- Norman Kramer did some fixes after Andrews changes (to glide
+	  and funcon).
 21-Mar-2000
 	- Norman Kramer added lines to draw 3D part of console if available.
 	  (and made the console window smaller to enjoy the funky console
