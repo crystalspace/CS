@@ -57,7 +57,7 @@ bool CMapParser::Open(const char* filename)
     GetNextChar(); //Ensure m_NextChars is inited;
   }
 
-  if (!ReadNextToken(m_NextToken))
+  if (!ReadNextToken(m_NextToken, sizeof(m_NextToken)))
   {
     m_NextToken[0] = 0;
   }
@@ -123,7 +123,7 @@ bool CMapParser::GetNextToken(char* str)
 {
   strcpy(str, m_NextToken);
   if (m_NextToken[0] == 0) return false;
-  ReadNextToken(m_NextToken);
+  ReadNextToken(m_NextToken, sizeof(m_NextToken));
   return true;
 }
 
@@ -134,8 +134,10 @@ bool CMapParser::PeekNextToken(char* str)
   return true;
 }
 
-bool CMapParser::ReadNextToken(char* str)
+bool CMapParser::ReadNextToken(char* str, int maxlen)
 {
+  char *strStart = str;
+  
   *str = 0; //clear the string first
   
   if (!SkipWhitespace()) return false;  
@@ -172,7 +174,7 @@ bool CMapParser::ReadNextToken(char* str)
     if (!SkipWhitespace()) return false;
 
     //Call recursively, to eliminate multiple commented lines.
-    return ReadNextToken(str);
+    return ReadNextToken(str, maxlen-(str-strStart));
   }
 
   //Quoted strings are returned directly
@@ -196,7 +198,7 @@ bool CMapParser::ReadNextToken(char* str)
         return true;
       }
       *str++ = m_NextChars[0];
-    } while (1);
+    } while (str<(strStart+maxlen));
   }
 
   // Check for special single character tokens
@@ -240,7 +242,17 @@ bool CMapParser::ReadNextToken(char* str)
     {
       break;
     }
-  } while (1);
+  } while (str<(strStart+maxlen));
+
+  if (str>=(strStart+maxlen)) {
+    char tokenBegin[16];
+
+    strncpy(tokenBegin, strStart, sizeof(tokenBegin)-1);
+    tokenBegin[sizeof(tokenBegin)] = '\0';
+
+    ReportError("Token (\"%s\"...) too long, max. length %d", tokenBegin, (char*)maxlen);
+    return false;
+  }
   
   *str = 0;
   return true;

@@ -141,7 +141,7 @@ protected:
   /**
     * Reads the next token directly from the imputfile
     */
-  bool ReadNextToken(char* str);
+  bool ReadNextToken(char* str, int maxlen);
 
   /**
     * Gets the next character into the m_NextChars array. If there

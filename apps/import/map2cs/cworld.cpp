@@ -522,7 +522,7 @@ bool CCSWorld::WriteTextures()
 
     WriteIndent();
 
-    fprintf(m_fd, "TEXTURE '%s' (FILE(%s)", 
+    fprintf(m_fd, "TEXTURE '%s' (FILE (%s)", 
                    pTexture->GetTexturename(), 
                    pTexture->GetFilename());
 
@@ -558,7 +558,7 @@ bool CCSWorld::WriteTextures()
     assert(pTexture);
 
     WriteIndent();
-    fprintf(m_fd, "MATERIAL '%s' (TEXTURE(%s))\n", 
+    fprintf(m_fd, "MATERIAL '%s' (TEXTURE (%s))\n", 
                   pTexture->GetTexturename(), 
                   pTexture->GetTexturename());
   }

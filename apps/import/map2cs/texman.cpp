@@ -104,6 +104,20 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   strcpy(CleanedUpTextureName, TextureName);
   CleanupTexturename(CleanedUpTextureName);
 
+  // filter out all chars not recognized as valid string chars 
+  // by csScanStr() 
+  char *TextureCleanName;
+
+  TextureCleanName = (char*)malloc(strlen(TextureName)+1);
+  strcpy(TextureCleanName, CleanedUpTextureName);
+
+  char *p = TextureCleanName;
+  while (*p != 0) {
+    p += strspn (p, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		    "_0123456789./");
+    if (*p != 0) {*p++ = '_'; }
+  }
+
   int i=0;
 
   //First, we search in the array of already stored textures.
@@ -111,7 +125,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   {
     CTextureFile* pTexture = m_StoredTextures[i];
     assert(pTexture);
-    if (strcasecmp(pTexture->GetTexturename(), TextureName)==0)
+    if (strcasecmp(pTexture->GetTexturename(), TextureCleanName)==0)
     { 
       return pTexture;
     }
@@ -125,7 +139,8 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
     CTextureFile* pTexture = pTexArchive->CreateTexture(CleanedUpTextureName);
     if (pTexture)
     {
-      pTexture->SetTexturename(TextureName);
+      pTexture->SetTexturename(TextureCleanName);
+      free(TextureCleanName);
       m_StoredTextures.Push(pTexture);
       return pTexture;
     }
@@ -147,7 +162,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
     {
       printf("Warning: texture '%s'('%s') is missing.\n         Using '%s' instead!\n", 
              TextureName, CleanedUpTextureName, defaultname);
-      pTexture->SetTexturename(TextureName);
+      pTexture->SetTexturename(TextureCleanName);
       m_StoredTextures.Push(pTexture);
       return pTexture;
     }
@@ -192,6 +207,7 @@ bool CTextureManager::AddAllTexturesToZip(CZipFile* pZipfile)
 void CTextureManager::CleanupTexturename(char* Name)
 {
   int i;
+
   for (i=0; i<int(sizeof(Q3Extensions)/sizeof(Q3Extensions[0])); i++)
   {
     int ExtensionLen = strlen(Q3Extensions[i]);
