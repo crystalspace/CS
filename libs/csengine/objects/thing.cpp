@@ -277,6 +277,8 @@ void csThing::Prepare ()
 {
   if (prepared) return;
   prepared = true;
+  if (!flags.Check (CS_THING_NOCOMPRESS))
+    CompressVertices ();
   int i;
   csPolygon3D* p;
   for (i = 0 ; i < polygons.Length () ; i++)

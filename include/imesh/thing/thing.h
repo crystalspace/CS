@@ -54,6 +54,14 @@ struct csFog;
 #define CS_THING_FASTMESH 2
 
 /**
+ * If CS_THING_NOCOMPRESS is set then vertices of this thing will not
+ * be compressed. By default the vertex table is compressed before the
+ * thing is used for the first time (this means that duplicate vertices
+ * are removed).
+ */
+#define CS_THING_NOCOMPRESS 4
+
+/**
  * The following flags affect movement options for a thing. See
  * SetMovingOption() for more info.
  */
