@@ -394,9 +394,8 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygon& poly)
   int i;
   int max_i, min_i;
   float max_y, min_y;
-  float min_z;
   void (*dscan) (int len, unsigned char* d, unsigned long* z_buf,
-    float inv_z, float u_div_z, float v_div_z);
+                 float inv_z, float u_div_z, float v_div_z);
   unsigned char *d;
   unsigned long *z_buf;
   
