@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/cmdline.h"
 
-struct csCommandLineParser::csCommandLineOption
+struct csCommandLineOption
 {
   /// Option name
   char *Name;
@@ -95,8 +95,8 @@ void csCommandLineParser::Initialize (int argc, const char* const argv[])
   }
 }
 
-csCommandLineParser::csCommandLineOption *csCommandLineParser::FindOption (
-  const char *iName, int iIndex) const
+csCommandLineOption*
+csCommandLineParser::FindOption (const char *iName, int iIndex) const
 {
   int idx = Options.FindKey (iName);
   if (idx >= 0)
@@ -139,7 +139,7 @@ bool csCommandLineParser::ReplaceName (const char *iValue, int iIndex)
     return false;
 }
 
-const char *csCommandLineParser::GetOption (const char *iName, int iIndex) const
+const char *csCommandLineParser::GetOption(const char *iName, int iIndex) const
 {
   csCommandLineOption *clo = FindOption (iName, iIndex);
   return clo ? (clo->Value ? clo->Value : "") : NULL;

@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+1-Jul-2001
+	- Eric Sunshine repaired the new cmdline.cpp and cmdline.h so that they
+	  compile error-free with the NextStep compiler.
 29-Jun-2001
 	- Got an Insure log from Philip Wyett. Using this I fixed a number
 	  of small problems and one rather bad problem. The bad problem
