@@ -6,6 +6,11 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug with the ball mesh not clipping correctly to the
 	  screen boundaries. It appeared that the transformed bounding
 	  box was not calculated correctly.
+	- Fixed a bug with the software renderer where an alpha texture
+	  was used together with a non-COPY mixmode. This caused the
+	  blend tables not to be set up correctly. This bug causes
+	  the partsys level to crash in the room at the far left (software
+	  renderer only).
 	- Michael H. Voase did the following:
 	  HitBeam updates:
 	    Fleshed out HitBeam interface. HitBeamBBox

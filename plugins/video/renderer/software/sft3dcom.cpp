@@ -2756,39 +2756,40 @@ void csGraphics3DSoftwareCommon::RealStartPolygonFX (iMaterialHandle* handle,
       SCANPROC_PI_TEX_ALPHA_ZNONE;
     pqinfo.drawline = ScanProcPI [scan_index];
   }
-  else
-    switch (mode & CS_FX_MASK_MIXMODE)
+  switch (mode & CS_FX_MASK_MIXMODE)
+  {
+    case CS_FX_ADD:
+      Scan.BlendTable = BlendingTable [BLENDTABLE_ADD];
+      break;
+    case CS_FX_MULTIPLY:
+      Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY];
+      break;
+    case CS_FX_MULTIPLY2:
+      Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY2];
+      break;
+    case CS_FX_ALPHA:
     {
-      case CS_FX_ADD:
-        Scan.BlendTable = BlendingTable [BLENDTABLE_ADD];
-        break;
-      case CS_FX_MULTIPLY:
-        Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY];
-        break;
-      case CS_FX_MULTIPLY2:
-        Scan.BlendTable = BlendingTable [BLENDTABLE_MULTIPLY2];
-        break;
-      case CS_FX_ALPHA:
-      {
-        int alpha = mode & CS_FX_MASK_ALPHA;
-        if (alpha < 12)
-          mode = (mode & ~CS_FX_MASK_MIXMODE) | CS_FX_COPY;
-        else if (alpha < 96)
-          Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA25];
-        else if (alpha < 160)
-          Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA50];
-        else if (alpha < 244)
-          Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA75];
-        else
-          goto zfill_only;
-        break;
-      }
-      case CS_FX_TRANSPARENT:
-zfill_only:
-        mode &= ~CS_FX_GOURAUD;
-        pqinfo.drawline = (z_buf_mode == CS_ZBUF_USE) ? NULL : csScan_scan_pi_zfil;
-        break;
+      int alpha = mode & CS_FX_MASK_ALPHA;
+      if (alpha < 12)
+        mode = (mode & ~CS_FX_MASK_MIXMODE) | CS_FX_COPY;
+      else if (alpha < 96)
+        Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA25];
+      else if (alpha < 160)
+        Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA50];
+      else if (alpha < 244)
+        Scan.BlendTable = BlendingTable [BLENDTABLE_ALPHA75];
+      else
+        goto zfill_only;
+      break;
     }
+    case CS_FX_TRANSPARENT:
+zfill_only:
+      mode &= ~CS_FX_GOURAUD;
+      pqinfo.drawline = (z_buf_mode == CS_ZBUF_USE) ? NULL : csScan_scan_pi_zfil;
+      break;
+    default:
+      break;
+  }
 
   // Select draw scanline routines
   int scan_index = pqinfo.textured ? SCANPROC_PI_TEX_ZNONE : SCANPROC_PI_FLAT_ZNONE;
