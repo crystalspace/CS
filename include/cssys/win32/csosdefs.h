@@ -71,6 +71,11 @@
   #ifndef CS_DEBUG
     #define CS_DEBUG
   #endif
+
+  // less annoying
+  #undef  CRASH
+  #define CRASH { ::DebugBreak(); }
+
 #else
   #define ASSERT(expression)
   #define VERIFY_SUCCESS(expression) expression
