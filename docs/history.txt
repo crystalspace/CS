@@ -29,6 +29,8 @@ chronological order.
 	  not finished yet though.
 	- Jorrit optimized Dynavis routine FlushNoDepthConstFValue() to also
 	  test for full coverage of blocks.
+	- Jorrit additionally optimized FlushGeneralConstFValue() to also
+	  test for full coverage of blocks.
 13-Nov-2003
 	- Keith Fulton committed updated versions of the scripts for 3ds Max
  	  exporting.  I've had these for two months and forgot to commit them

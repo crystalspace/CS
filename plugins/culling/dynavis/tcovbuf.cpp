@@ -376,6 +376,9 @@ void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
     if (maxdepth < depth[14]) { depth[14] = maxdepth; recheck_depth = true; }
     if (maxdepth < depth[15]) { depth[15] = maxdepth; recheck_depth = true; }
   }
+#if NUM_TILEROW==64
+  @@@ TODO
+#endif
   if (recheck_depth)
   {
     modified = true;
@@ -414,11 +417,6 @@ void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
     // to update depth later.
     csTileCol mods;
     mods.Empty ();
-    // 'fullcover' is used to detect if we fully cover some 8x8 block.
-    // In that case we can reduce max depth instead of increasing it
-    // (potentially improving culling efficiency).
-    csTileCol fullcover;
-    fullcover.Full ();
 
     int j = 8;
     while (j > 0)
@@ -426,92 +424,57 @@ void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
       test = fvalue;
       test.AndInverted (*c);
       mods |= test;
-      fullcover &= fvalue;
       *c |= fvalue;
       fulltest &= *c;
       c++;
       j--;
     }
-    // @@@ check on fullcover even if mods is empty!!!
 
     // If 'mods' is not empty we test individual bytes of 'mods' to
     // see which depth values we have to update.
     if (!mods.IsEmpty ())
     {
       modified = true;
-      fullcover.Invert ();
       float* ldepth = &depth[i];
       {
         float& d = ldepth[0];
-        if (!fullcover.CheckByte0 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte0 ())
+        if (mods.CheckByte0 ())
 	  if (maxdepth > d) d = maxdepth;
       }
       {
         float& d = ldepth[4];
-        if (!fullcover.CheckByte1 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte1 ())
+        if (mods.CheckByte1 ())
 	  if (maxdepth > d) d = maxdepth;
       }
       {
         float& d = ldepth[8];
-        if (!fullcover.CheckByte2 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte2 ())
+        if (mods.CheckByte2 ())
 	  if (maxdepth > d) d = maxdepth;
       }
       {
         float& d = ldepth[12];
-        if (!fullcover.CheckByte3 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte3 ())
+        if (mods.CheckByte3 ())
 	  if (maxdepth > d) d = maxdepth;
       }
 #if NUM_TILEROW==64
       {
         float& d = ldepth[16];
-        if (!fullcover.CheckByte4 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte4 ())
+        if (mods.CheckByte4 ())
 	  if (maxdepth > d) d = maxdepth;
       }
       {
         float& d = ldepth[20];
-        if (!fullcover.CheckByte5 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte5 ())
+        if (mods.CheckByte5 ())
 	  if (maxdepth > d) d = maxdepth;
       }
       {
         float& d = ldepth[24];
-        if (!fullcover.CheckByte6 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte6 ())
+        if (mods.CheckByte6 ())
 	  if (maxdepth > d) d = maxdepth;
       }
       {
         float& d = ldepth[28];
-        if (!fullcover.CheckByte7 ())
-	{
-	  if (maxdepth < d) d = maxdepth;
-        }
-        else if (mods.CheckByte7 ())
+        if (mods.CheckByte7 ())
 	  if (maxdepth > d) d = maxdepth;
       }
 #endif
@@ -519,6 +482,42 @@ void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
   }
 
   tile_full = fulltest.IsFull ();
+
+  // Check for full coverage.
+  csTileCol test;
+  test = fvalue;
+  test.Invert ();
+  if (!test.CheckByte0 ())
+  {
+    if (maxdepth < depth[0]) { depth[0] = maxdepth; modified = true; }
+    if (maxdepth < depth[1]) { depth[1] = maxdepth; modified = true; }
+    if (maxdepth < depth[2]) { depth[2] = maxdepth; modified = true; }
+    if (maxdepth < depth[3]) { depth[3] = maxdepth; modified = true; }
+  }
+  if (!test.CheckByte1 ())
+  {
+    if (maxdepth < depth[4]) { depth[4] = maxdepth; modified = true; }
+    if (maxdepth < depth[5]) { depth[5] = maxdepth; modified = true; }
+    if (maxdepth < depth[6]) { depth[6] = maxdepth; modified = true; }
+    if (maxdepth < depth[7]) { depth[7] = maxdepth; modified = true; }
+  }
+  if (!test.CheckByte2 ())
+  {
+    if (maxdepth < depth[8]) { depth[8] = maxdepth; modified = true; }
+    if (maxdepth < depth[9]) { depth[9] = maxdepth; modified = true; }
+    if (maxdepth < depth[10]) { depth[10] = maxdepth; modified = true; }
+    if (maxdepth < depth[11]) { depth[11] = maxdepth; modified = true; }
+  }
+  if (!test.CheckByte3 ())
+  {
+    if (maxdepth < depth[12]) { depth[12] = maxdepth; modified = true; }
+    if (maxdepth < depth[13]) { depth[13] = maxdepth; modified = true; }
+    if (maxdepth < depth[14]) { depth[14] = maxdepth; modified = true; }
+    if (maxdepth < depth[15]) { depth[15] = maxdepth; modified = true; }
+  }
+#if NUM_TILEROW==64
+  @@@ TODO
+#endif
 
   if (maxdepth < tile_min_depth || maxdepth > tile_max_depth)
   {
