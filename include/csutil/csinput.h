@@ -54,12 +54,14 @@ protected:
   {
     csInputDriver* Parent;
     SCF_DECLARE_IBASE;
-    FocusListener() { SCF_CONSTRUCT_IBASE(0); }
+    FocusListener() {}
+    void SetSCFParent(iBase* p) { SCF_CONSTRUCT_IBASE(p); }
     virtual bool HandleEvent(iEvent&);
   };
   friend struct FocusListener;
   FocusListener Listener;
   iEventQueue* Queue;
+  void SetSCFParent(iBase*);
   void StartListening();
   void StopListening();
 };

@@ -47,7 +47,6 @@ SCF_IMPLEMENT_IBASE_END
 csInputDriver::csInputDriver(iObjectRegistry* r) : Registry(r), Queue(0)
 {
   Listener.Parent = this;
-  StartListening();
 }
 
 csInputDriver::~csInputDriver()
@@ -57,6 +56,12 @@ csInputDriver::~csInputDriver()
   Queue = 0;
   GetEventQueue();
   StopListening();
+}
+
+void csInputDriver::SetSCFParent(iBase* p)
+{
+  Listener.SetSCFParent(p);
+  StartListening();
 }
 
 iEventQueue* csInputDriver::GetEventQueue()
@@ -106,7 +111,7 @@ csKeyboardDriver::csKeyboardDriver (iObjectRegistry* r) :
   csInputDriver(r), KeyState (256 + (CSKEY_LAST - CSKEY_FIRST + 1))
 {
   SCF_CONSTRUCT_IBASE(0);
-  Listener.scfParent = this;
+  SetSCFParent(this);
   KeyState.Reset();
 }
 
@@ -168,7 +173,7 @@ csMouseDriver::csMouseDriver (iObjectRegistry* r) :
   csInputDriver(r), Keyboard(0)
 {
   SCF_CONSTRUCT_IBASE(0);
-  Listener.scfParent = this;
+  SetSCFParent(this);
 
   LastX = LastY = 0;
   memset (&Button, 0, sizeof (Button));
@@ -266,7 +271,7 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
   csInputDriver(r), Keyboard(0)
 {
   SCF_CONSTRUCT_IBASE(0);
-  Listener.scfParent = this;
+  SetSCFParent(this);
   memset (&Button, 0, sizeof (Button));
   memset (&LastX, sizeof (LastX), 0);
   memset (&LastY, sizeof (LastY), 0);
