@@ -70,7 +70,7 @@ SCF_IMPLEMENT_IBASE_END
 
 class RecvPacket : public iNetworkPacket
 {
-  char data [256];
+  int8 data [256];
   unsigned position;
 
   public:
@@ -82,7 +82,7 @@ class RecvPacket : public iNetworkPacket
   }
   virtual ~RecvPacket () {}
 
-  const char* GetData () { return data; }
+  const int8* GetData () { return data; }
 
   virtual bool Read (csDataStream &stream, iNetworkSocket2 *sock)
   {
