@@ -876,8 +876,8 @@ void csGraphics3DOpenGL::StartPolygonFX (iTextureHandle * handle, UInt mode)
   GLuint texturehandle = 0;
   if (handle && m_renderstate.textured)
   {
-    texture_cache->cache_texture (handle);
     csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) handle->GetPrivateObject ();
+    texture_cache->cache_texture (handle);
     csGLCacheData *cachedata = (csGLCacheData *)txt_mm->GetCacheData ();
     texturehandle = cachedata->Handle;
   }
@@ -1054,7 +1054,6 @@ void csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX & poly)
 
 void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
-
   // yet another work in progress - GJH
 
   //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
@@ -1113,32 +1112,18 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
     csVector3* f2 = mesh.vertices[1];
     csVector2* uv2 = mesh.texels[1][0];
     csColor* col2 = mesh.vertex_colors[1];
-    if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
-      for (i = 0 ; i < mesh.num_vertices ; i++)
+    for (i = 0 ; i < mesh.num_vertices ; i++)
+    {
+      tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
+      if (mesh.do_morph_texels)
+        uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
+      if (mesh.do_morph_colors)
       {
-        tr_verts[i] = o2c * (tween_ratio * f2[i] + remainder * f1[i]);
-	if (mesh.do_morph_texels)
-	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
-	if (mesh.do_morph_colors)
-	{
-	  color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
-	  color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;
-	  color_verts[i].blue = tween_ratio * col2[i].blue + remainder * col1[i].blue;
-	}
+        color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
+	color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;
+	color_verts[i].blue = tween_ratio * col2[i].blue + remainder * col1[i].blue;
       }
-    else
-      for (i = 0 ; i < mesh.num_vertices ; i++)
-      {
-        tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
-	if (mesh.do_morph_texels)
-	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
-	if (mesh.do_morph_colors)
-	{
-	  color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
-	  color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;
-	  color_verts[i].blue = tween_ratio * col2[i].blue + remainder * col1[i].blue;
-	}
-      }
+    }
     work_verts = tr_verts.GetArray ();
     if (mesh.do_morph_texels)
       work_uv_verts = uv_verts.GetArray ();
@@ -1164,25 +1149,21 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
 
   // set up coordinate transform
-  static GLfloat matrixholder[16];
+  GLfloat matrixholder[16];
 
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
 
-  glTranslatef(width2,height2,0);
-
-  for (i = 0 ; i < 16 ; i++)
-    matrixholder[i] = 0.0;
-  
-  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
-  
+  // set up world->camera transform, if needed
   if (0)//(mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
   {
-    matrixholder[3] = matrixholder[7] = matrixholder[11] = 0.0;
+    csMatrix3 orientation = o2c.GetO2T();
+    
+//    csVector3 translation = o2c.GetO2TTranslation();
+//    glTranslatef(-translation.x, -translation.y, -translation.z);
 
-/*    csMatrix3 orientation = o2c.GetO2T();
-    csVector3 translation = orientation * o2c.GetO2TTranslation();
+    matrixholder[3] = matrixholder[7] = matrixholder[11] = 0.0;
 
     matrixholder[0] = orientation.m11;
     matrixholder[1] = orientation.m21;
@@ -1196,38 +1177,45 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
     matrixholder[9] = orientation.m23;
     matrixholder[10] = orientation.m33;
 
-    matrixholder[12] = translation.x;
-    matrixholder[13] = translation.y;
-    matrixholder[14] = translation.z;
+    matrixholder[12] = 0.0;
+    matrixholder[13] = 0.0;
+    matrixholder[14] = 0.0;
+    matrixholder[15] = 1.0;
 
-    matrixholder[11] = 1.0;*/
-
-    matrixholder[11] = 1.0;
+    glMultMatrixf(matrixholder);
   }
+
+  // setup camera perspective+viewport projection.  This is accumulated
+  // in the modelview matrix as well; we could stuff this into
+  // the projection and viewport state but that would require manipulating
+  // three separate OpenGL entities which would be supremely messy.
+  glTranslatef(width2,height2,0);
+
+  for (i = 0 ; i < 16 ; i++)
+    matrixholder[i] = 0.0;
+  
+  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
+  
+  matrixholder[10] = 0.0;
+  matrixholder[11] = 1.0/aspect;
+  matrixholder[14] = -1.0/aspect;
+  matrixholder[15] = 0.0;
 
   glMultMatrixf(matrixholder);
 
+  // old perspective transform
   for (i = 0 ; i < mesh.num_vertices ; i++)
   {
-    if (work_verts[i].z >= SMALL_Z)
     {
-      persp[i].z = -1. / work_verts[i].z;
-      float iz = -aspect * persp[i].z;
-      persp[i].x = work_verts[i].x* iz;
-      persp[i].y = work_verts[i].y* iz;
+      persp[i].x = work_verts[i].x;
+      persp[i].y = work_verts[i].y;
+      persp[i].z = work_verts[i].z;
       visible[i] = true;
-    }
-    else
-    {
-      visible[i] = false;
     }
   }
 
-  // Clipped polygon (assume it cannot have more than 64 vertices)
-  G3DPolygonDPFX poly;
-  memset (&poly, 0, sizeof(poly));
-
   // Fill flat color if renderer decide to paint it flat-shaded
+  G3DPolygonDPFX poly;
   mesh.txt_handle[0]->GetMeanColor (poly.flat_color_r,
     poly.flat_color_g, poly.flat_color_b);
 
@@ -1265,6 +1253,10 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
       visible_indices[visible_index_count++] = triangles[i].c;
     }
   }
+
+  // no vertices?
+  if (visible_index_count == 0)
+    return;
 
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
@@ -1374,7 +1366,7 @@ bool csGraphics3DOpenGL::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
   switch (op)
   {
     case G3DRENDERSTATE_ZBUFFERMODE:
-      z_buf_mode = csZBufMode (value);
+      z_buf_mode = (csZBufMode) value;
       break;
     case G3DRENDERSTATE_DITHERENABLE:
       m_renderstate.dither = value;
@@ -1791,93 +1783,9 @@ void csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP & poly)
   DrawPolygonSingleTexture (poly);
 }
 
-void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex,
-  int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
+/// Draw a 2D sprite
+void csGraphics3DOpenGL::DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
-  /// Retrieve clipping rectangle
-  int ClipX1, ClipY1, ClipX2, ClipY2;
-  G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
-
-  // Texture coordinates (floats)
-  float _tx = tx, _ty = ty, _tw = tw, _th = th;
-
-  // Clipping
-  if ((sx >= ClipX2) || (sy >= ClipY2) ||
-      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
-    return;                             // Sprite is totally invisible
-  if (sx < ClipX1)                      // Left margin crossed?
-  {
-    int nw = sw - (ClipX1 - sx);        // New width
-    _tx += (ClipX1 - sx) * _tw / sw;    // Adjust X coord on texture
-    _tw = (_tw * nw) / sw;              // Adjust width on texture
-    sw = nw; sx = ClipX1;
-  } /* endif */
-  if (sx + sw > ClipX2)                 // Right margin crossed?
-  {
-    int nw = ClipX2 - sx;               // New width
-    _tw = (_tw * nw) / sw;              // Adjust width on texture
-    sw = nw;
-  } /* endif */
-  if (sy < ClipY1)                      // Top margin crossed?
-  {
-    int nh = sh - (ClipY1 - sy);        // New height
-    _ty += (ClipY1 - sy) * _th / sh;    // Adjust Y coord on texture
-    _th = (_th * nh) / sh;              // Adjust height on texture
-    sh = nh; sy = ClipY1;
-  } /* endif */
-  if (sy + sh > ClipY2)                 // Bottom margin crossed?
-  {
-    int nh = ClipY2 - sy;               // New height
-    _th = (_th * nh) / sh;              // Adjust height on texture
-    sh = nh;
-  } /* endif */
-
-  // cache the texture if we haven't already.
-  texture_cache->cache_texture (hTex);
-
-  // Get texture handle
-  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *)hTex->GetPrivateObject ();
-  GLuint texturehandle = ((csGLCacheData *)txt_mm->GetCacheData ())->Handle;
-
-  // as we are drawing in 2D, we disable some of the commonly used features
-  // for fancy 3D drawing
-  glShadeModel (GL_FLAT);
-  glDisable (GL_DEPTH_TEST);
-  glDepthMask (GL_FALSE);
-
-  // if the texture has transparent bits, we have to tweak the
-  // OpenGL blend mode so that it handles the transparent pixels correctly
-  if (hTex->GetTransparent ())
-  {
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  }
-  else
-    glDisable (GL_BLEND);
-
-  glEnable (GL_TEXTURE_2D);
-  glColor4f (1.,1.,1.,1.);
-  glBindTexture (GL_TEXTURE_2D, texturehandle);
-  
-  int bitmapwidth = 0, bitmapheight = 0;
-  hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
-
-  // convert texture coords given above to normalized (0-1.0) texture coordinates
-  float ntx1,nty1,ntx2,nty2;
-  ntx1 = (_tx      ) / bitmapwidth;
-  ntx2 = (_tx + _tw) / bitmapwidth;
-  nty1 = (_ty      ) / bitmapheight;
-  nty2 = (_ty + _th) / bitmapheight;
-
-  // draw the bitmap
-  glBegin (GL_QUADS);
-  glTexCoord2f (ntx1, nty1);
-  glVertex2i (sx, height - sy - 1);
-  glTexCoord2f (ntx2, nty1);
-  glVertex2i (sx + sw, height - sy - 1);
-  glTexCoord2f (ntx2, nty2);
-  glVertex2i (sx + sw, height - sy - sh - 1);
-  glTexCoord2f (ntx1, nty2);
-  glVertex2i (sx, height - sy - sh - 1);
-  glEnd ();
 }
+
+
