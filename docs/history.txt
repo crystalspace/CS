@@ -1,8 +1,29 @@
 The history order has been reversed so that new features are at the top.
 
 13-Apr-2001
+	- Martin Geisse did the following changes:
+	    - Added texture loading methods to iLoaderNew. The loader now
+	      uses these functions for texture loading.
+	    - Added a temporary function to iTextureWrapper to get the
+	      private csTextureWrapper object.
+	    - Fixed a bug in csTextureWrapper.
+	    - Fixed VC compilation problems in csPortal.
 	- Wouter Wijngaards updated the iso engine. The engine now has
 	  colored, dynamic lighting. Shadows are calculated in realtime.
+	  In addition he did the following things:
+	    - Smaller player.
+	    - Added a stone pillar to the isotest app to show the
+	      lighting and shadows.
+	    - Added a nice doorway to show off lighting.
+	    - The blue light now uses another attenuation type, nicely
+	      casts through the door opening now.
+	    - The vertical scale has been corrected for the skew.
+	    - Performed some speed optimisations.
+	    - Added mouse support to isotest.  You can click where you
+	      want to move to.
+	    - Made keyboard cursorskeys in isotest more intuitive.
+	    - Added support for transparency in the isometric engine.
+  	    - Changed the player sprite in isotest to be partially transparent.
 	- Michael Voase declared spr_write() in impexp.h. csparser now
 	  compiles.
 	- Fixed Philip's fix on the terrain engine. Now it works AND
