@@ -61,7 +61,6 @@
 /// Name string for old renderer: layer 4
 #define CS_MATERIAL_TEXTURE_LAYER4		"tex layer4"
 
-struct iEffectDefinition;
 struct iTextureHandle;
 struct csRGBpixel;
 struct csRGBcolor;
@@ -102,18 +101,6 @@ struct iMaterial : public iShaderVariableContext
    * Get shader associated with a shader type
    */
   virtual iShader* GetShader (csStringID type) = 0;
-
-#ifndef CS_USE_NEW_RENDERER
-  /**
-   * Set the material's effect.
-   */
-  virtual void SetEffect (iEffectDefinition *ed) = 0;
-
-  /**
-   * Get the effect from the material.
-   */
-  virtual iEffectDefinition *GetEffect () = 0;
-#endif
 
   /**
    * Get the base texture from the material.

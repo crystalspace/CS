@@ -19,7 +19,7 @@
 #ifndef __CS_EFFECTLAYER_H__
 #define __CS_EFFECTLAYER_H__
 
-#include "ivideo/effects/eflayer.h"
+#include "../ieffects/eflayer.h"
 #include "statehdr.h"
 
 class csEffectLayer : public csStateHandler, public iEffectLayer

@@ -25,7 +25,6 @@
 #include "csutil/nobjvec.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
-#include "ivideo/effects/efdef.h"
 
 #include "plugins/engine/3d/engine.h"
 
@@ -60,9 +59,6 @@ private:
   float ambient;
   /// The reflectiveness of the material
   float reflection;
-  
-  /// The effect associated with this material
-  iEffectDefinition* effect;
 #endif
 
   /// Shader associated with material
@@ -152,12 +148,6 @@ public:
   /// Get shader associated with a shader type
   virtual iShader* GetShader (csStringID type);
 
-#ifndef CS_USE_NEW_RENDERER
-  /// Set effect.
-  virtual void SetEffect (iEffectDefinition *ed);
-  /// Get effect.
-  virtual iEffectDefinition *GetEffect ();
-#endif
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
   /**

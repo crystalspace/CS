@@ -46,6 +46,7 @@ DIR.GL3D = plugins/video/renderer/opengl
 OUT.GL3D = $(OUT)/$(DIR.GL3D)
 INF.GL3D = $(SRCDIR)/$(DIR.GL3D)/gl3d.csplugin
 INC.GL3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GL3D)/*.h \
+  $(wildcard plugins/video/renderer/opengl/effects/*.h) \
   plugins/video/renderer/common/txtmgr.h \
   plugins/video/renderer/common/dtmesh.h \
   plugins/video/renderer/common/dpmesh.h \
@@ -53,6 +54,7 @@ INC.GL3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GL3D)/*.h \
   plugins/video/renderer/common/polybuf.h \
   plugins/video/renderer/common/pixfmt.h))
 SRC.GL3D = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.GL3D)/*.cpp \
+  $(wildcard plugins/video/renderer/opengl/effects/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/dtmesh.cpp \
   plugins/video/renderer/common/dpmesh.cpp \

@@ -23,7 +23,7 @@
 #include "csutil/refarr.h"
 #include "csutil/hashmap.h"
 #include "statehdr.h"
-#include "ivideo/effects/efpass.h"
+#include "../ieffects/efpass.h"
 
 struct iEffectLayer;
 

@@ -35,6 +35,7 @@
 #include "ogl_txtmgr.h"
 #include "plugins/video/renderer/common/polybuf.h"
 #include "ogl_polybuf.h"
+#include "effects/efserver.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/event.h"
@@ -61,13 +62,13 @@
 #include "csgfx/memimage.h"
 #include "qsqrt.h"
 
-#include "ivideo/effects/efserver.h"
-#include "ivideo/effects/efdef.h"
-#include "ivideo/effects/eftech.h"
-#include "ivideo/effects/efpass.h"
-#include "ivideo/effects/eflayer.h"
-#include "ivideo/effects/efstring.h"
-#include "ivideo/effects/efvector4.h"
+#include "ieffects/efserver.h"
+#include "ieffects/efdef.h"
+#include "ieffects/eftech.h"
+#include "ieffects/efpass.h"
+#include "ieffects/eflayer.h"
+#include "ieffects/efstring.h"
+#include "ieffects/efvector4.h"
 #include "effectdata.h"
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
@@ -1121,26 +1122,11 @@ bool csGraphics3DOGLCommon::NewOpen ()
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   statecache->Disable_GL_BLEND ();
 
-  effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
-  if( !effectserver )
-  {
-    csRef<iPluginManager> plugin_mgr (
-      CS_QUERY_REGISTRY (object_reg, iPluginManager));
-    effectserver = CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.video.effects.stdserver", iEffectServer);
-    if (!effectserver)
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Wasn't able to load effect"
-	  " server plugin. Did you compile it (effects)?");
-      // This is the only way to stop here. As the return value from Open() is
-      // ignored :-/
-      csRef<iEventQueue> queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-      if (queue)
-	queue->GetEventOutlet()->Broadcast (cscmdQuit);
-    }
-		
-    object_reg->Register (effectserver, "iEffectServer");
-  }
+  csEffectServer* efsrv = new csEffectServer (0);
+  effectserver = csPtr<iEffectServer> (efsrv);
+  if (!efsrv->Initialize (object_reg))
+    return false;
+
   //csEffectStrings::InitStrings( effectserver );
   InitStockEffects();
 
@@ -4611,8 +4597,8 @@ void csGraphics3DOGLCommon::SetupDTMEffect (G3DTriangleMesh& mesh)
       ci.technique = GetStockTechnique (mesh);
       return;
     }
-    ci.effect = material->GetEffect();
-    ci.technique = effectserver->SelectAppropriateTechnique (ci.effect);
+    ci.effect = 0; //material->GetEffect();
+    ci.technique = 0; //effectserver->SelectAppropriateTechnique (ci.effect);
   }
   else
   {

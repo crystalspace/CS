@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Feb-2004
+	- Jorrit started the removal of the old effect system (used in OR).
+	  This is unused and doesn't work properly as well. Removed support
+	  for the 'effect' and 'effects' keywords in the loader. Removed support
+	  for setting effects on materials. The effect plugin is still there
+	  because the old OpenGL renderer still needs it.
+	- Jorrit moved the effects plugin source into the
+	  plugins/video/renderer/opengl directory. So it is now private to the
+	  old OpenGL renderer. This means that the effect system is not
+	  essentially removed (it will be really removed when the old OpenGL
+	  renderer is removed).
 3-Feb-2004
 	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
 	  which manifested when running 'msvcgen' targets.

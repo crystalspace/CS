@@ -12,7 +12,6 @@ CompileGroups engine : walkall ;
 CompileGroups vfs : walkall ;
 CompileGroups softcanvas : walkall ;
 CompileGroups openglcanvas : walkall ;
-CompileGroups effects : walkall ;
 CompileGroups csfont : walkall ;
 CompileGroups csconin : walkall ;
 CompileGroups simpcon : walkall ;

@@ -24,12 +24,12 @@
 #include "csutil/strset.h"
 #include "ivideo/graph3d.h"
 
-#include "ivideo/effects/efclient.h"
-#include "ivideo/effects/efserver.h"
+#include "../ieffects/efclient.h"
+#include "../ieffects/efserver.h"
 #include "efserver.h"
-#include "ivideo/effects/efdef.h"
+#include "../ieffects/efdef.h"
 #include "efdef.h"
-#include "ivideo/effects/eftech.h"
+#include "../ieffects/eftech.h"
 #include "eftech.h"
 
 csEffectServer::csEffectServer(iBase* parent)
@@ -131,13 +131,9 @@ const char* csEffectServer::RequestString(csStringID id)
 
 // Plugin part
 
-CS_IMPLEMENT_PLUGIN
-
 SCF_IMPLEMENT_IBASE(csEffectServer)
   SCF_IMPLEMENTS_INTERFACE(iEffectServer)
   SCF_IMPLEMENTS_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_FACTORY(csEffectServer)
 
 

@@ -24,9 +24,9 @@
 #include "csutil/hashmap.h"
 #include "csutil/strset.h"
 
-#include "ivideo/effects/eftech.h"
+#include "../ieffects/eftech.h"
 #include "eftech.h"
-#include "ivideo/effects/efpass.h"
+#include "../ieffects/efpass.h"
 #include "efpass.h"
 
 csEffectTechnique::csEffectTechnique()

@@ -23,7 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
 #include "cstypes.h"
-#include "ivideo/effects/efpass.h"
+#include "../ieffects/efpass.h"
 
 class csEffectTechnique : public iEffectTechnique
 {

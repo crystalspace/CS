@@ -48,9 +48,9 @@
 #include "video/canvas/openglcommon/iogl.h"
 #include "video/canvas/openglcommon/glstates.h"
 
-#include "ivideo/effects/efdef.h"
-#include "ivideo/effects/efserver.h"
-#include "ivideo/effects/efclient.h"
+#include "ieffects/efdef.h"
+#include "ieffects/efserver.h"
+#include "ieffects/efclient.h"
 
 struct iGraphics2D;
 class OpenGLTextureCache;

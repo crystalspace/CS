@@ -21,7 +21,7 @@
 #define __CS_STATEHANDLER_H__
 
 #include "csutil/strset.h"
-#include "ivideo/effects/efvector4.h"
+#include "../ieffects/efvector4.h"
 
 #define CS_STATETYPE_FLOAT    1
 #define CS_STATETYPE_STRING   2

@@ -24,9 +24,9 @@
 #include <csutil/strset.h>
 #include <csutil/util.h>
 
-#include "ivideo/effects/efdef.h"
+#include "../ieffects/efdef.h"
 #include "efdef.h"
-#include "ivideo/effects/eftech.h"
+#include "../ieffects/eftech.h"
 #include "eftech.h"
 
 SCF_IMPLEMENT_IBASE( csEffectDefinition )

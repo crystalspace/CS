@@ -921,8 +921,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("colorsource2", XMLTOKEN_COLORSOURCE2);
   xmltokens.Register ("colorsource3", XMLTOKEN_COLORSOURCE3);
   xmltokens.Register ("destinationblend", XMLTOKEN_DESTINATIONBLEND);
-  xmltokens.Register ("effect", XMLTOKEN_EFFECT);
-  xmltokens.Register ("effects", XMLTOKEN_EFFECTS);
   xmltokens.Register ("pass", XMLTOKEN_PASS);
   xmltokens.Register ("quality", XMLTOKEN_QUALITY);
   xmltokens.Register ("shading", XMLTOKEN_SHADING);
@@ -1139,9 +1137,6 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 	    else
 	      return false;
 	  }
-          break;
-        case XMLTOKEN_EFFECTS:
-          LoadEffectFile(child->GetContentsValue());
           break;
         case XMLTOKEN_SHADERS:
 	  shader_given = true;

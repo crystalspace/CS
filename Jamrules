@@ -51,7 +51,6 @@ if $(USE_NEW_RENDERER) = "yes"
     cspngimg
     cssynldr
     dynavis
-    effects
     emit
     emitldr
     engine
@@ -123,7 +122,6 @@ else
     cspngimg
     cssynldr
     dynavis
-    effects
     emit
     emitldr
     engine

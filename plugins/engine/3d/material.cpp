@@ -74,7 +74,6 @@ csMaterial::csMaterial (csEngine* engine)
 
 #ifndef CS_USE_NEW_RENDERER
   num_texture_layers = 0;
-  effect = 0;
 #endif
 }
 
@@ -102,7 +101,6 @@ csMaterial::csMaterial (csEngine* engine,
 
 #ifndef CS_USE_NEW_RENDERER
   num_texture_layers = 0;
-  effect = 0;
 #endif
 }
 
@@ -322,18 +320,6 @@ void csMaterial::AddTextureLayer (
   texture_layers[num_texture_layers].ushift = ushift;
   texture_layers[num_texture_layers].vshift = vshift;
   num_texture_layers++;
-}
-#endif
-
-#ifndef CS_USE_NEW_RENDERER
-void csMaterial::SetEffect (iEffectDefinition *ed)
-{
-  effect = ed;
-}
-
-iEffectDefinition *csMaterial::GetEffect ()
-{
-  return effect;
 }
 #endif
 

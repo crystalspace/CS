@@ -6,6 +6,8 @@ Help gl3d : "Crystal Space OpenGL 3D renderer" ;
 
 Plugin gl3d
 	: [ Wildcard *.cpp *.h ]
+	  [ Wildcard effects : *.cpp *.h ]
+	:
 ;
 LinkWith gl3d : renderercommon csgeom csgfx csutil ;
 ExternalLibs gl3d :  GL ;

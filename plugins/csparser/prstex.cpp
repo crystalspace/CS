@@ -454,7 +454,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   csTextureLayer layers[4];
 #endif
   
-  csRef<iEffectDefinition> efdef ;
 #ifdef CS_USE_NEW_RENDERER
   bool shaders_mentioned = false;	// If true there were shaders.
   csArray<csStringID> shadertypes;
@@ -507,27 +506,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_REFLECTION:
 	reflection = child->GetContentsValueAsFloat ();
-        break;
-      case XMLTOKEN_EFFECT:
-        // @@@ TODO: add warning for deprecated with NR!!!
-#ifndef CS_USE_NEW_RENDERER
-        {
-          csRef<iEffectServer> efs = CS_QUERY_REGISTRY(object_reg, iEffectServer);
-          if(!efs.IsValid())
-          {
-            ReportNotify ("Effectserver isn't found. Ignoring effect-directive in material %s",matname);
-            break;
-          }
-          const char* efname = child->GetContentsValue();
-          efdef = efs->GetEffect(efname);
-          if(!efdef.IsValid())
-          {
-            ReportNotify ("Effect (%s) couldn't be found for material %s, ignoring it", efname,matname);
-            break;
-          }
-
-        }
-#endif
         break;
       case XMLTOKEN_LAYER:
         // @@@ TODO: add shortcut to support NR!
@@ -698,11 +676,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   if (col_set)
     material->SetFlatColor (col);
   material->SetReflection (diffuse, ambient, reflection);
-
-#ifndef CS_USE_NEW_RENDERER
-  if(efdef.IsValid())
-    material->SetEffect(efdef);
-#endif
 
   iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
  

@@ -36,12 +36,6 @@
 #include "imap/ldrctxt.h"
 #include "ivaria/engseq.h"
 
-#include "ivideo/effects/efserver.h"
-#include "ivideo/effects/efdef.h"
-#include "ivideo/effects/efpass.h"
-#include "ivideo/effects/eflayer.h"
-#include "ivideo/effects/eftech.h"
-
 class csGenerateImageTexture;
 class csGenerateImageValue;
 class csReversibleTransform;
@@ -230,8 +224,6 @@ enum
   XMLTOKEN_COLORSOURCE2,
   XMLTOKEN_COLORSOURCE3,
   XMLTOKEN_DESTINATIONBLEND,
-  XMLTOKEN_EFFECT,
-  XMLTOKEN_EFFECTS,
   XMLTOKEN_PASS,
   XMLTOKEN_QUALITY,
   XMLTOKEN_SHADING,
@@ -531,20 +523,6 @@ private:
 
   /// -----------------------------------------------------------------------
 
-  /**
-   * Parsse a list of effects and add them to the effectsystem. If effectsystem
-   * isn't loaded, ignore all this 
-   */
-  bool ParseEffectList (iDocumentNode * node);
-  /// Parse single effect
-  bool ParseEffect (iDocumentNode * node, iEffectServer* pParent);
-  /// Parse effect-technique
-  bool ParseEffectTech (iDocumentNode* node, iEffectTechnique* tech);
-  /// Parse Effect-pass
-  bool ParseEffectPass (iDocumentNode* node, iEffectPass* pass);
-  /// Parse single layer in pass
-  bool ParseEffectLayer (iDocumentNode* node, iEffectLayer* layer);
-
 #ifdef CS_USE_NEW_RENDERER
   /// Parse a shaderlist
   bool ParseShaderList (iDocumentNode* node);
@@ -749,9 +727,6 @@ public:
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname);
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname);
-
-  virtual bool LoadEffectFile (const char* filename);
-
 
   struct eiComponent : public iComponent
   {

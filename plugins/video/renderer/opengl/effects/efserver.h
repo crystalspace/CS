@@ -26,8 +26,8 @@
 #include "csutil/refarr.h"
 #include "csutil/objreg.h"
 #include "iutil/comp.h"
-#include "ivideo/effects/efdef.h"
-#include "ivideo/effects/efstring.h"
+#include "../ieffects/efdef.h"
+#include "../ieffects/efstring.h"
 
 /**
  * Effect server

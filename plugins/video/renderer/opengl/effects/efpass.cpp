@@ -24,9 +24,9 @@
 #include "csutil/hashmap.h"
 #include "csutil/strset.h"
 
-#include "ivideo/effects/efpass.h"
+#include "../ieffects/efpass.h"
 #include "efpass.h"
-#include "ivideo/effects/eflayer.h"
+#include "../ieffects/eflayer.h"
 #include "eflayer.h"
 
 csEffectPass::csEffectPass()
