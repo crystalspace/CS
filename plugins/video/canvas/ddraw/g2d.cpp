@@ -187,13 +187,6 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
   //m_bUses3D(bUses3D)
 {
   CONSTRUCT_IBASE (iParent);
-
-  HRESULT ddrval;
-
-  // QI for iWin32SystemDriver //
-  m_piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
-  if (!m_piWin32System)
-      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.", ddrval);
 }
 
 csGraphics2DDDraw3::~csGraphics2DDDraw3(void)
@@ -211,6 +204,11 @@ bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
 
   if (!csGraphics2D::Initialize(pSystem))
     return false;
+
+  // QI for iWin32SystemDriver //
+  m_piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
+  if (!m_piWin32System)
+      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
 
   // Get the creation parameters //
   m_hInstance = m_piWin32System->GetInstance();
