@@ -36,7 +36,7 @@ XXX Fill in some text
 2.2 Building
 
  0. cd into the source directory
- 1. Run "./configure" with some options if you which. You get a list of possible
+ 1. Run "./configure" with some options if you wish. You get a list of possible
    options when you invoke configure with --help
  2. Run "jam"
 
