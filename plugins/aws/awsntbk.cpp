@@ -873,10 +873,10 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   // determine caption of tab
   iString *str = NULL;
 
-  //  DEBUG_BREAK;
   comp->GetProperty ("Caption", (csSome*)&str);
-  if (!str)
+  if (!str || !str->GetData ())
   {
+    SCF_DEC_REF(str);
     csString theCap ("Tab ");
     theCap += vTabs.Length ()+1;
     str = new scfString ((const char*)theCap);
