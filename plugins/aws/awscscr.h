@@ -41,6 +41,8 @@ public:
   /// Initialize this canvas with custom pointers to a valid g2d and g3d
   awsScreenCanvas (iGraphics2D *g2d, iGraphics3D *g3d):rG2D(g2d), rG3D(g3d) 
   { 
+    SCF_CONSTRUCT_IBASE(NULL);
+
     g2d->IncRef(); 
     g3d->IncRef(); 
   }
