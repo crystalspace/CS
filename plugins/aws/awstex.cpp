@@ -28,6 +28,12 @@ NameToId(char *txt)
   return aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)txt, strlen(txt));
 }
 
+awsTextureManager::awsTexture::~awsTexture ()
+{
+  img->DecRef ();
+  tex->DecRef ();
+}
+
 awsTextureManager::awsTextureManager():loader(NULL), txtmgr(NULL), vfs(NULL), object_reg(NULL)
 {
  // empty
@@ -35,7 +41,12 @@ awsTextureManager::awsTextureManager():loader(NULL), txtmgr(NULL), vfs(NULL), ob
   
 awsTextureManager::~awsTextureManager()
 {
-  if (loader) loader->DecRef();
+  for (int i=0; i < textures.Length (); i++)
+    delete (awsTexture*)textures.Get (i);
+
+  SCF_DEC_REF (loader);
+  SCF_DEC_REF (vfs);
+  SCF_DEC_REF (txtmgr);
 }
 
 void
@@ -78,7 +89,6 @@ awsTextureManager::Initialize(iObjectRegistry* obj_reg)
         	"could not mount the default aws skin (awsdef.zip)aws.");
     }
   }
-
   
 }
 

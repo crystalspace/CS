@@ -116,8 +116,9 @@ class awsManager : public iAws
     */
    struct awsComponentFactoryMap
    {
-      awsComponentFactory *factory;
-      unsigned long        id;
+     ~awsComponentFactoryMap ();
+     awsComponentFactory *factory;
+     unsigned long        id;
    };
 
    /// Contains the list of factory to ID mappings.

@@ -8,6 +8,12 @@ awsSigSrc::awsSigSrc()
 
 awsSigSrc::~awsSigSrc() 
 {
+  void *p = slots.GetFirstItem();
+  while ((p=slots.GetCurrentItem ()))
+  {
+    delete (SlotSignalMap*)p;
+    slots.RemoveItem ();
+  }
 }
 
 

@@ -10,6 +10,11 @@
 #include "ivaria/reporter.h"
 #include <stdio.h>
 
+awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
+{
+  factory->DecRef ();
+}
+
 awsManager::awsManager(iBase *p):prefmgr(NULL), 
                dirty_lid(0), all_buckets_full(false),
                top(NULL), ptG2D(NULL), ptG3D(NULL), object_reg(NULL), 
@@ -24,6 +29,14 @@ awsManager::awsManager(iBase *p):prefmgr(NULL),
 
 awsManager::~awsManager()
 {
+  SCF_DEC_REF (prefmgr);
+
+  void *p = component_factories.GetFirstItem();
+  while ((p=component_factories.GetCurrentItem ()))
+  {
+    delete (awsComponentFactoryMap *)p;
+    component_factories.RemoveItem ();
+  }
 }
 
 bool 
@@ -90,7 +103,6 @@ awsManager::RegisterComponentFactory(awsComponentFactory *factory, char *name)
 
    cfm->factory= factory;
    cfm->id=prefmgr->NameToId(name);
-
 
    component_factories.AddItem(cfm);
 }
@@ -473,6 +485,7 @@ awsManager::awsCanvas::awsCanvas ()
 void 
 awsManager::awsCanvas::Animate (csTicks current_time)
 {
+  (void)current_time;
 }
 
 void 

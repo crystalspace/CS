@@ -120,10 +120,13 @@ awsComponent::Overlaps(csRect &r)
 void 
 awsComponent::AddChild(awsComponent *child, bool owner)
 {
+  (void)owner;
+  /* @@@: we cannot incref for non-owned only if we generally decrefing upon destruction
+          We either incref them all or we store an additional mark for owned children
    // Only grab a reference if we are not the owner.
    if (owner==false)
      child->IncRef();
-
+  */
    // Create a new child list if the current one does not exist.
    if (children==NULL)
      children = new csDLinkList();
@@ -138,7 +141,11 @@ void
 awsComponent::RemoveChild(awsComponent *child)
 {
    if (children)
-     children->RemoveItem(child);
+     if (children->SetCurrentItem (child))
+     {
+       children->RemoveItem();
+       child->DecRef ();
+     }
 }
 
 awsComponent *

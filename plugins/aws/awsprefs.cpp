@@ -47,6 +47,9 @@ awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0), de
 
 awsPrefManager::~awsPrefManager()
 {
+  SCF_DEC_REF (default_font);
+  SCF_DEC_REF (fontsvr);
+  delete awstxtmgr;
 }
 
 void 
@@ -123,13 +126,13 @@ awsPrefManager::SetTextureManager(iTextureManager *txtmgr)
 void
 awsPrefManager::SetFontServer(iFontServer *fntsvr)
 {
-  if (fontsvr)
-    fontsvr->DecRef();
-
   if (default_font)
     default_font->DecRef();
 
-  fontsvr = fntsvr;
+  if (fontsvr)
+    fontsvr->DecRef();
+
+  (fontsvr = fntsvr)->IncRef ();
 
   // kludge for the moment: this will eventually be more intelligent
   default_font = fontsvr->LoadFont(CSFONT_LARGE);
