@@ -34,8 +34,8 @@
 class csMetaLight : public A3DL::Light, public VOS::PropertyListener
 {
 protected:
+  iObjectRegistry *object_reg;
   csRef<iSector> sector;
-  csRef<iObjectRegistry> object_reg;
   csRef<iLight> light;
 
   bool alreadyLoaded; // light already created & listening to property updates

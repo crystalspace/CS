@@ -35,21 +35,19 @@ using namespace VOS;
 class ConstructTextureTask : public Task
 {
 public:
-    csRef<iObjectRegistry> object_reg;
+    iObjectRegistry *object_reg;
     std::string texturename;
     std::string texturedata;
     std::string cachefilename;
     vRef<csMetaTexture> metatxt;
 
-    ConstructTextureTask(csRef<iObjectRegistry> objreg,
-                         const std::string& name,
-                         const std::string& cache,
-                         csMetaTexture* mt);
+    ConstructTextureTask(iObjectRegistry *objreg, const std::string& name,
+                         const std::string& cache, csMetaTexture* mt);
     virtual ~ConstructTextureTask();
     virtual void doTask();
 };
 
-ConstructTextureTask::ConstructTextureTask(csRef<iObjectRegistry> objreg,
+ConstructTextureTask::ConstructTextureTask(iObjectRegistry *objreg,
                                            const std::string& name,
                                            const std::string& cache,
                                            csMetaTexture* mt)

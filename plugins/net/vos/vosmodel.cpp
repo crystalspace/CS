@@ -42,7 +42,7 @@ using namespace VOS;
 class ConstructModelTask : public Task
 {
 public:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry *object_reg;
   vRef<csMetaMaterial> metamat;
   vRef<Property> property;
   csRef<iDataBuffer> databuf;
@@ -50,15 +50,15 @@ public:
   std::string name;
   csRef<iSector> sector;
 
-  ConstructModelTask(csRef<iObjectRegistry> objreg, vRef<csMetaMaterial> mat,
-                     vRef<Property> p, csMetaModel* m, std::string n, csRef<iSector> s);
+  ConstructModelTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
+                     vRef<Property> p, csMetaModel* m, std::string n, iSector *s);
   virtual ~ConstructModelTask();
   virtual void doTask();
 };
 
-ConstructModelTask::ConstructModelTask (csRef<iObjectRegistry> objreg,
+ConstructModelTask::ConstructModelTask (iObjectRegistry *objreg,
                       vRef<csMetaMaterial> mat, vRef<Property> p,
-                      csMetaModel* m, std::string n, csRef<iSector> s)
+                      csMetaModel* m, std::string n, iSector *s)
   : object_reg(objreg), metamat(mat), property(p), model(m, true), name(n), sector(s)
 {
 }

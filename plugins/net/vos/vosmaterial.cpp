@@ -46,16 +46,17 @@ public:
   std::vector<csMetaTexture*> layers;
   csTextureLayer* coords;
   vRef<csMetaMaterial> metamaterial;
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry *object_reg;
   bool iscolor;
   float R, G, B;
 
-  ConstructMaterialTask(csRef<iObjectRegistry> objreg, csMetaMaterial* mm);
+  ConstructMaterialTask(iObjectRegistry *objreg, csMetaMaterial* mm);
   virtual ~ConstructMaterialTask();
   virtual void doTask();
 };
 
-ConstructMaterialTask::ConstructMaterialTask(csRef<iObjectRegistry> objreg, csMetaMaterial* mm)
+ConstructMaterialTask::ConstructMaterialTask(iObjectRegistry *objreg, 
+                                             csMetaMaterial* mm)
   : coords(0), metamaterial(mm, true), object_reg(objreg)
 {
 }

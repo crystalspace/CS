@@ -40,7 +40,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csVosSector(csRef<iObjectRegistry> o, csVosA3DL* vosa3dl, const char* s);
+  csVosSector(iObjectRegistry *o, csVosA3DL* vosa3dl, const char* s);
   virtual ~csVosSector();
 
   virtual void Load();

@@ -25,6 +25,7 @@
 #include "vossector.h"
 #include "vosobject3d.h"
 #include "voslight.h"
+#include "iengine/movable.h"
 
 #include "vos/metaobjects/a3dl/a3dl.hh"
 
@@ -76,7 +77,7 @@ SetAmbientTask::SetAmbientTask(csVosA3DL* va, csVosSector* vs)
 
 void SetAmbientTask::doTask()
 {
-  csRef<iObjectRegistry> objreg = vosa3dl->GetObjectRegistry();
+  iObjectRegistry *objreg = vosa3dl->GetObjectRegistry();
   csRef<iEngine> engine = CS_QUERY_REGISTRY(objreg, iEngine);
   engine->SetAmbientLight(csColor(.2, .2, .2));
 }
@@ -121,7 +122,19 @@ void LoadSectorTask::doTask()
     {
       try
       {
-        obj3d->Setup(vosa3dl, (csVosSector*)sector);
+		csRef<iMeshWrapper> wrapper = obj3d->GetCSinterface()->GetMeshWrapper();
+        if (wrapper)
+        {
+		  if (wrapper->GetMovable()->GetSectors()->GetCount() == 0)
+		  {
+            LOG("LoadSectorTask", 3, "Object already setup, setting sector");
+            wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
+		    wrapper->GetMovable()->UpdateMove();
+		  }
+		  else LOG("LoadSectorTask", 3, "Object already setup and in sector");
+        }
+        else
+          obj3d->Setup(vosa3dl, (csVosSector*)sector);
       }
       catch(std::runtime_error& e)
       {
@@ -149,7 +162,7 @@ void LoadSectorTask::doTask()
 
 /// csVosSector ///
 
-csVosSector::csVosSector(csRef<iObjectRegistry> o, csVosA3DL* va, const char* s)
+csVosSector::csVosSector(iObjectRegistry *o, csVosA3DL* va, const char* s)
 {
   SCF_CONSTRUCT_IBASE(0);
   objreg = o;

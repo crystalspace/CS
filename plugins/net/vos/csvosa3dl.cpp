@@ -33,6 +33,7 @@
 #include "vospolygonmesh.h"
 #include "voslight.h"
 #include "vosmodel.h"
+#include "vosclone.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
@@ -78,6 +79,7 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.polygonmesh", &A3DL::PolygonMesh::new_PolygonMesh);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.billboard", &A3DL::Billboard::new_Billboard);
   Site::removeRemoteMetaObjectFactory("a3dl:object3D.model", &A3DL::Billboard::new_Billboard);
+  Site::removeRemoteMetaObjectFactory("a3dl:object3D.clone", &A3DL::Clone::new_Clone);
   Site::removeRemoteMetaObjectFactory("a3dl:texture", &A3DL::Texture::new_Texture);
   Site::removeRemoteMetaObjectFactory("a3dl:material", &A3DL::Material::new_Material);
   Site::removeRemoteMetaObjectFactory("a3dl:light", &A3DL::Light::new_Light);
@@ -88,6 +90,8 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
                                    &csMetaCube::new_csMetaCube);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.cone", "a3dl:object3D.cone",
                                    &csMetaCone::new_csMetaCone);
+  Site::addRemoteMetaObjectFactory("a3dl:object3D.clone", "a3dl:object3D.clone",
+                                   &csMetaClone::new_csMetaClone);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.polygonmesh", "a3dl:object3D.polygonmesh",
                                    &csMetaPolygonMesh::new_csMetaPolygonMesh);
   Site::addRemoteMetaObjectFactory("a3dl:object3D.billboard", "a3dl:object3D.billboard",

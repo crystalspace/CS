@@ -31,7 +31,7 @@ using namespace VOS;
 class ConstructLightTask : public Task
 {
 public:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry *object_reg;
   csRef<iSector> sector;
   vRef<csMetaLight> metalight;
   std::string name;
@@ -40,16 +40,14 @@ public:
   float radius;
   bool isStatic;
 
-  ConstructLightTask(csRef<iObjectRegistry> objreg, csRef<iSector> sector,
-                     const std::string& n, csMetaLight* ml);
+  ConstructLightTask(iObjectRegistry *objreg, iSector *sector,
+                     const std::string &n, csMetaLight *ml);
   virtual ~ConstructLightTask();
   virtual void doTask();
 };
 
-ConstructLightTask::ConstructLightTask(csRef<iObjectRegistry> objreg,
-                                       csRef<iSector> s,
-                                       const std::string& n,
-                                       csMetaLight* ml)
+ConstructLightTask::ConstructLightTask(iObjectRegistry *objreg, iSector *s,
+                                       const std::string &n, csMetaLight *ml)
   : object_reg(objreg), sector(s), metalight(ml, true), name(n)
 {
 }

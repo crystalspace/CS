@@ -43,7 +43,7 @@ using namespace VOS;
 class ConstructPolygonMeshTask : public Task
 {
 public:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry *object_reg;
   A3DL::MaterialIterator materials;
   A3DL::PortalIterator portals;
   vRef<csMetaPolygonMesh> polygonmesh;
@@ -56,14 +56,14 @@ public:
   std::vector<A3DL::PolygonMesh::Texel> texels;
   std::vector<A3DL::PolygonMesh::TextureSpace> texsp;
 
-  ConstructPolygonMeshTask(csRef<iObjectRegistry> objreg,  csMetaPolygonMesh* c,
-                           std::string n, csRef<iSector> s);
+  ConstructPolygonMeshTask(iObjectRegistry *objreg,  csMetaPolygonMesh* c,
+                           std::string n, iSector *s);
   virtual ~ConstructPolygonMeshTask();
   virtual void doTask();
 };
 
-ConstructPolygonMeshTask::ConstructPolygonMeshTask(csRef<iObjectRegistry> objreg,
-                                     csMetaPolygonMesh* pm, std::string n, csRef<iSector> s)
+ConstructPolygonMeshTask::ConstructPolygonMeshTask(iObjectRegistry *objreg,
+                            csMetaPolygonMesh* pm, std::string n, iSector *s)
   : object_reg(objreg), polygonmesh(pm, true), name(n), sector(s), isStatic(false)
 {
 }
@@ -86,19 +86,19 @@ void ConstructPolygonMeshTask::doTask()
                                                                       "polygonmesh_factory");
       csRef<iThingFactoryState> thingfac = SCF_QUERY_INTERFACE(factory->GetMeshObjectFactory(), iThingFactoryState);
 
-      for(unsigned int i = 0; i < verts.size(); i++)
+      for(size_t i = 0; i < verts.size(); i++)
       {
         thingfac->CreateVertex(csVector3(verts[i].x, verts[i].y, verts[i].z));
       }
       std::vector<int> polymap(polys.size());
 
-      for(unsigned int i = 0; i < polys.size(); i++)
+      for(size_t i = 0; i < polys.size(); i++)
       {
         polymap[i] = thingfac->AddEmptyPolygon();
 
         bool flat = false;
         if(polys[i].size() < 3) flat = true;
-        for(unsigned int n = 0; n < polys[i].size(); n++)
+        for(size_t n = 0; n < polys[i].size(); n++)
         {
           thingfac->AddPolygonVertex(CS_POLYRANGE_SINGLE(polymap[i]),polys[i][n]);
 
@@ -122,7 +122,7 @@ void ConstructPolygonMeshTask::doTask()
 
       if(texels.size() > 0)
       {
-        for(unsigned int i = 0; i < polys.size(); i++)
+        for(size_t i = 0; i < polys.size(); i++)
         {
           if(polymap[i] == -1) continue;
           //Convenience: prevents us from having to say CS_POLYRANGE_SINGLE in every thingfac->SetPolygonFoo method
@@ -161,7 +161,7 @@ void ConstructPolygonMeshTask::doTask()
       }
       else
       {
-        for(unsigned int i = 0; i < polys.size(); i++)
+        for(size_t i = 0; i < polys.size(); i++)
         {
           if(polymap[i] == -1) continue;
           //Convenience: prevents us from having to say CS_POLYRANGE_SINGLE in every thingfac->SetPolygonFoo method
@@ -360,7 +360,7 @@ void ConstructPolygonMeshTask::doTask()
       // Load vertices
       genmesh->SetVertexCount(verts.size());
       csVector3* vertices = genmesh->GetVertices();
-      for(unsigned int i = 0; i < verts.size(); i++)
+      for(size_t i = 0; i < verts.size(); i++)
       {
         vertices[i].x = verts[i].x;
         vertices[i].y = verts[i].y;
@@ -368,7 +368,7 @@ void ConstructPolygonMeshTask::doTask()
       }
 
       int num = 0;
-      for(unsigned int i = 0; i < polys.size(); i++) {
+      for(size_t i = 0; i < polys.size(); i++) {
         num += polys[i].size() - 2;
       }
       // XXX check this property below and save it in the task structure above
@@ -379,8 +379,8 @@ void ConstructPolygonMeshTask::doTask()
       genmesh->SetTriangleCount(num);
       csTriangle* triangles = genmesh->GetTriangles();
       num = 0;
-      for(unsigned int i = 0; i < polys.size(); i++) {
-        for(int c = 2; c < polys[i].size(); c++) {
+      for(size_t i = 0; i < polys.size(); i++) {
+        for(size_t c = 2; c < polys[i].size(); c++) {
           triangles[num].a = polys[i][0];
           triangles[num].b = polys[i][c-1];
           triangles[num].c = polys[i][c];
@@ -394,12 +394,12 @@ void ConstructPolygonMeshTask::doTask()
         }
       }
 
-      if(genmesh->GetVertexCount() < texels.size()) {
+      if((size_t)genmesh->GetVertexCount() < texels.size()) {
         LOG("terangreal::polygonmesh", 2, "Warning: there are more texels than existing vertices; increasing mesh's vertex count...");
         genmesh->SetVertexCount(texels.size());
       }
       csVector2* gmtexels = genmesh->GetTexels();
-      for(unsigned int i = 0; i < texels.size(); i++) {
+      for(size_t i = 0; i < texels.size(); i++) {
         gmtexels[i].x = texels[i].x;
         gmtexels[i].y = texels[i].y;
       }

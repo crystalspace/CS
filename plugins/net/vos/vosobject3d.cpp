@@ -63,21 +63,21 @@ void csVosObject3D::SetMeshWrapper(iMeshWrapper* mw)
 class ConstructObject3DTask : public Task
 {
 public:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry *object_reg;
   vRef<csMetaObject3D> obj;
   csVector3 pos;
   csMatrix3 ori;
   csVector3 hardpos;
   csMatrix3 hardtrans;
 
-  ConstructObject3DTask(csRef<iObjectRegistry> objreg, csMetaObject3D* obj,
+  ConstructObject3DTask(iObjectRegistry *objreg, csMetaObject3D* obj,
                         const csVector3& pos, const csMatrix3& ori,
                         const csVector3& posht, const csMatrix3& htrans);
   virtual ~ConstructObject3DTask();
   virtual void doTask();
 };
 
-ConstructObject3DTask::ConstructObject3DTask(csRef<iObjectRegistry> objreg,
+ConstructObject3DTask::ConstructObject3DTask(iObjectRegistry *objreg,
                                              csMetaObject3D* ob,
                                              const csVector3& p,
                                              const csMatrix3& o,

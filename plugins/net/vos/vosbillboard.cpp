@@ -44,21 +44,22 @@ using namespace VOS;
 class ConstructBillboardTask : public Task
 {
 public:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry *object_reg;
   vRef<csMetaMaterial> metamat;
   vRef<csMetaBillboard> billboard;
   std::string name;
   csRef<iSector> sector;
 
-  ConstructBillboardTask(csRef<iObjectRegistry> objreg, vRef<csMetaMaterial> mat,
-                         csMetaBillboard* b, std::string n, csRef<iSector> s);
+  ConstructBillboardTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
+                         csMetaBillboard* b, std::string n, iSector *s);
   virtual ~ConstructBillboardTask();
   virtual void doTask();
 };
 
-ConstructBillboardTask::ConstructBillboardTask (csRef<iObjectRegistry> objreg,
-                                                vRef<csMetaMaterial> mat, csMetaBillboard* b,
-                                                std::string n, csRef<iSector> s)
+ConstructBillboardTask::ConstructBillboardTask (iObjectRegistry *objreg,
+                                                vRef<csMetaMaterial> mat, 
+												csMetaBillboard* b,
+                                                std::string n, iSector *s)
   : object_reg(objreg), metamat(mat), billboard(b, true), name(n), sector(s)
 {
 }

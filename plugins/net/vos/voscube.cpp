@@ -36,20 +36,21 @@ using namespace VOS;
 class ConstructCubeTask : public Task
 {
 public:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry *object_reg;
   vRef<csMetaMaterial> metamat;
   vRef<csMetaCube> cube;
   std::string name;
   csRef<iSector> sector;
 
-  ConstructCubeTask(csRef<iObjectRegistry> objreg, vRef<csMetaMaterial> mat,
-                    csMetaCube* c, std::string n, csRef<iSector> s);
+  ConstructCubeTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
+                    csMetaCube* c, std::string n, iSector *s);
   virtual ~ConstructCubeTask();
   virtual void doTask();
 };
 
-ConstructCubeTask::ConstructCubeTask(csRef<iObjectRegistry> objreg, vRef<csMetaMaterial> mat,
-                                     csMetaCube* c, std::string n, csRef<iSector> s)
+ConstructCubeTask::ConstructCubeTask(iObjectRegistry *objreg, 
+                                     vRef<csMetaMaterial> mat, csMetaCube* c,
+                                     std::string n, iSector *s)
   : object_reg(objreg), metamat(mat), cube(c, true), name(n), sector(s)
 {
 }
@@ -64,20 +65,21 @@ void ConstructCubeTask::doTask()
 
   // should store a single cube factory for everything?  or do we always get
   // the same one back?
-  //if(! cube_factory) {
-  csRef<iMeshFactoryWrapper> cube_factory = engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh",
-                                                                       "cube_factory");
+  //if(! cube_factory) 
+  //{
+  csRef<iMeshFactoryWrapper> cube_factory = engine->CreateMeshFactory (
+                         "crystalspace.mesh.object.genmesh", "cube_factory");
   //}
 
-  csRef<iGeneralFactoryState> cubeLook = SCF_QUERY_INTERFACE(cube_factory->GetMeshObjectFactory(),
-                                                             iGeneralFactoryState);
+  csRef<iGeneralFactoryState> cubeLook = SCF_QUERY_INTERFACE(
+                   cube_factory->GetMeshObjectFactory(), iGeneralFactoryState);
   if(cubeLook)
   {
     cubeLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
     cubeLook->GenerateBox(csBox3(-.5, -.5, -.5, .5, .5, .5));
 
-    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (cube_factory, name.c_str(),
-                                                                 sector, csVector3(0, 0, 0));
+    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (
+                    cube_factory, name.c_str(), sector, csVector3(0, 0, 0));
     cube->GetCSinterface()->SetMeshWrapper(meshwrapper);
   }
 }

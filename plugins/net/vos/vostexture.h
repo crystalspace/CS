@@ -41,8 +41,8 @@ class csMetaTexture :
   public VOS::PropertyListener
 {
 private:
+  iObjectRegistry *object_reg;
   csRef<iTextureWrapper> texturewrapper;
-  csRef<iObjectRegistry> object_reg;
   bool alreadyLoaded;
 
 public:

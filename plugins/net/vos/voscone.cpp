@@ -36,20 +36,21 @@ using namespace VOS;
 class ConstructConeTask : public Task
 {
 public:
-  csRef<iObjectRegistry> object_reg;
+  iObjectRegistry *object_reg;
   vRef<csMetaMaterial> metamat;
   vRef<csMetaCone> cone;
   std::string name;
   csRef<iSector> sector;
 
-  ConstructConeTask(csRef<iObjectRegistry> objreg, vRef<csMetaMaterial> mat,
-                    csMetaCone* c, std::string n, csRef<iSector> s);
+  ConstructConeTask(iObjectRegistry *objreg, vRef<csMetaMaterial> mat,
+                    csMetaCone* c, std::string n, iSector *s);
   virtual ~ConstructConeTask();
   virtual void doTask();
 };
 
-ConstructConeTask::ConstructConeTask(csRef<iObjectRegistry> objreg, vRef<csMetaMaterial> mat,
-                                     csMetaCone* c, std::string n, csRef<iSector> s)
+ConstructConeTask::ConstructConeTask(iObjectRegistry *objreg, 
+                                     vRef<csMetaMaterial> mat, csMetaCone* c, 
+                                     std::string n, iSector *s)
   : object_reg(objreg), metamat(mat), cone(c, true), name(n), sector(s)
 {
 }
@@ -64,13 +65,14 @@ void ConstructConeTask::doTask()
 
   // should store a single cone factory for everything?  or do we always get
   // the same one back?
-  //if(! cone_factory) {
-  csRef<iMeshFactoryWrapper> cone_factory = engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh",
-                                                                       "cone_factory");
+  //if (!cone_factory) 
+  //{
+  csRef<iMeshFactoryWrapper> cone_factory = engine->CreateMeshFactory (
+                          "crystalspace.mesh.object.genmesh", "cone_factory");
   //}
 
-  csRef<iGeneralFactoryState> coneLook = SCF_QUERY_INTERFACE(cone_factory->GetMeshObjectFactory(),
-                                                             iGeneralFactoryState);
+  csRef<iGeneralFactoryState> coneLook = SCF_QUERY_INTERFACE(
+                   cone_factory->GetMeshObjectFactory(), iGeneralFactoryState);
   if(coneLook)
   {
     coneLook->SetMaterialWrapper(metamat->GetMaterialWrapper());
@@ -143,8 +145,8 @@ void ConstructConeTask::doTask()
     coneLook->Invalidate ();
     coneLook->CalculateNormals ();
 
-    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (cone_factory, name.c_str(),
-                                                                 sector, csVector3(0, 0, 0));
+    csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (cone_factory,
+                                     name.c_str(), sector, csVector3(0, 0, 0));
     cone->GetCSinterface()->SetMeshWrapper(meshwrapper);
   }
 }
@@ -170,10 +172,10 @@ void csMetaCone::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   LOG("csMetaCone", 2, "getting material " << mat.isValid());
   mat->Setup(vosa3dl);
   LOG("csMetaCone", 2, "setting up cone");
-  vosa3dl->mainThreadTasks.push(new ConstructConeTask(vosa3dl->GetObjectRegistry(), mat,
-                                                      this, getURLstr(), sect->GetSector()));
+  vosa3dl->mainThreadTasks.push(new ConstructConeTask(
+                                      vosa3dl->GetObjectRegistry(), mat, this, 
+                                      getURLstr(), sect->GetSector()));
 
   LOG("csMetaCone", 2, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);
 }
-
