@@ -10,6 +10,11 @@ chronological order.
 	- Daniel Fryer found a bug in the thing mesh plugin when adding
 	  polygon vertices one at a time. The vertex count was not correctly
 	  updated in all cases.
+	- Jorrit fixed a bug in the software renderer. GetOriginalDimensions()
+	  would not return the original dimensions for a texture that was
+	  scaled to fit po2 sizes.
+	- Jorrit fixed a bug in the loader. It wouldn't parse <keepimage/>
+	  correctly.
 25-Nov-2003
 	- Eric Sunshine removed the ugly, semi-private, legacy name_VERSION and
 	  name_scfGetID() API which SCF_VERSION() created for each declared

@@ -54,6 +54,8 @@ csTextureHandle::csTextureHandle (iImage* Image, int Flags)
   DG_TYPE (this, "csTextureHandle");
 
   image = Image;
+  orig_w = image->GetWidth ();
+  orig_h = image->GetHeight ();
   DG_LINK (this, image);
   flags = Flags;
 

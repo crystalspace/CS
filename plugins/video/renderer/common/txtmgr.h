@@ -60,6 +60,11 @@ protected:
   /// The original image object.
   csRef<iImage> image;
 
+  /**
+   * Original image size (before correcting to po2 sizes).
+   */
+  int orig_w, orig_h;
+
   /// Texture usage flags: 2d/3d/etc
   int flags;
 
@@ -105,7 +110,8 @@ public:
 
   /**
    * Adjusts the textures size, to ensure some restrictions like
-   * power of two dimension are met.
+   * power of two dimension are met. This functions sets orig_w and
+   * orig_h.
    */
   void AdjustSizePo2 ();
 
@@ -145,7 +151,8 @@ public:
   virtual bool GetMipMapDimensions (int mm, int& w, int& h);
   virtual void GetOriginalDimensions (int& w, int& h)
   {
-    GetMipMapDimensions (0, w, h);
+    w = orig_w;
+    h = orig_h;
   }
 
   /// Get the mean color.
