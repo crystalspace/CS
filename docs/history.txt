@@ -30,6 +30,10 @@ Short-term cleanups that need to be done:
 	- For more fun, Jorrit extended the 'addskel' command so that you
 	  can now give a negative width. In that case the real width at every
 	  node will be random between 1 and -width.
+	- Implemented csSprite3D::DeferUpdateLighting() which defers update to
+	  sprite lighting until the sprite becomes visible. Much more optimal.
+	- Renamed BOOL to COMBOOL for compatiblity problems with BOOL on
+	  some systems (like IRIX).
 19-Jul-1999
 	- Added GetXRotation(), GetYRotation() and GetZRotation() to
 	  csMatrix3.
