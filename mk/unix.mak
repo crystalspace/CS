@@ -70,3 +70,6 @@ SYS_SED_DEPEND=
 # support in your X server because Crystal Space will autodetect
 # the availability of XSHM.
 DO_SHM=yes
+
+# Put this in front of the application name to run the test
+RUN_TEST=./

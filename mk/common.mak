@@ -77,3 +77,11 @@ define MAKE_APP
   +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak build.$@
 endef
 
+# Macro used to build and run a unittest
+define MAKE_CHECK
+  @echo $(SEPARATOR)
+  @echo $"  Testing $(DESCRIPTION.$(subst check,,$@))$"
+  @echo $(SEPARATOR)
+  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+endef
+
