@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Jan-2005
+	- Jorrit reverted a fix from res2k in walktest/keys.cpp which changes
+	  the way keys are parsed. This fix breaks parsing of keys with
+	  modifiers.
 23-Jan-2005
 	- Eric Sunshine applied a boundary-condition fix from Andrew Mann for
 	  the timspec::tv_nsec overflow check in csPosixCondition::Wait().
