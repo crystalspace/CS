@@ -10,7 +10,14 @@ depends()
 	-lcstool) DEPS="-lcsutil -lcssys -lcsgeom";;
 	-lcsws) DEPS="-lcsgfx -lcsgeom -lcsutil -lcssys";;
 	-lcsphyzik) DEPS="-lcsgeom -lcsutil -lcssys";;
-	*) DEPS=""
+	*)
+	    CEXFILE=`echo "$1.cex" | sed -e "s/\-l//"`
+	    if test -r "$CEXFILE"; then
+		DEPS=`/bin/sh $CEXFILE --deps`
+	    else
+		DEPS=''
+	    fi
+	    ;;                                        	    
     esac
 }
 
@@ -127,6 +134,24 @@ addlib()
     done
 }
 
+addexlib()
+{
+    EXDEP=`/bin/sh $1.cex --deps`
+    EXLIB=`/bin/sh $1.cex --libs`
+    EXCXXFLAGS=`/bin/sh $1.cex --cxxflags`
+    EXCFLAGS=`/bin/sh $1.cex --cflags`
+    add_cxxflags="$add_cxxflags $EXCXXFLAGS"
+    add_cflags="$add_cflags $EXCFLAGS"
+
+    for lib in "$EXDEP"; do
+	addlib "$lib"
+    done
+
+    if test -n "$EXLIB"; then
+        addlib "$EXLIB"
+    fi
+}
+
 the_libs=""
 show_libs=""
 show_cflags=""
@@ -184,17 +209,23 @@ while test $# -gt 0; do
 	addlib "-lcsphyzik"
 	;;
     *)
-        usage 1 1>&2
+	if test -r "$1.cex"; then
+	    addexlib "$1"            
+	else
+	    echo "Unknown lib: $1"
+            usage 1 1>&2
+	    exit 1
+	fi                           
         ;;
   esac
   shift
 done
 
 if test -n "$show_cflags"; then
-	echo "-I$includedir $common_cflags"
+	echo "-I$includedir $common_cflags $add_cflags"
 fi
 if test -n "$show_cxxflags"; then
-	echo "-I$includedir $common_cxxflags"
+	echo "-I$includedir $common_cxxflags $add_cxxflags"
 fi
 if test -n "$show_libs"; then
     #if users specified no lib, output all
