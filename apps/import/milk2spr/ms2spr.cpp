@@ -35,8 +35,8 @@ static void usage(FILE* s, int rc)
   fprintf(s, "Usage: milk2spr <option> [model-file] [sprite-name]\n[sprite-name] without the trailing .lib\n");
   fprintf(s, "Options:\n");
   fprintf(s, "  -h : help (this page)\n");
-  fprintf(s, "  -c : example code for loading(replaced by tutorial)\n");
   fprintf(s, "  -d <float> : duration of a frame in seconds (default %f)\n",FRAME_DURATION_DEFAULT);
+  printCode(s,rc);
   exit(rc);
 }
 
@@ -45,8 +45,8 @@ static void okay_usage()  { usage(stdout,  0); }
 
 static void printCode(FILE* s, int rc)
 {
-  fprintf(s, "The code example is replaced by a tutorial.\n");
-  fprintf(s, "Look in /apps/tutorial/\n");
+  fprintf(s, "The code example is replaced by a program.\n");
+  fprintf(s, "Look in /apps/tests/mottest\n");
   exit(rc);
 }
 
