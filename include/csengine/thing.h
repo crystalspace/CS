@@ -257,7 +257,7 @@ public:
    * Add polygons and vertices from the specified template. Replace the materials if they 
    * match one in the matList.
    */
-  void MergeTemplate (csThing* tpl, csMaterialList* matList, const char* prefix, 
+  void MergeTemplate (csThing* tpl, csSector* sector, csMaterialList* matList, const char* prefix, 
 	csMaterialWrapper* default_material = NULL,
   	float default_texlen = 1, bool objspace = false,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
@@ -265,7 +265,7 @@ public:
   /**
    * Add polygons and vertices from the specified thing (seen as template).
    */
-  void MergeTemplate (csThing* tpl, csMaterialWrapper* default_material = NULL,
+  void MergeTemplate (csThing* tpl, csSector* sector, csMaterialWrapper* default_material = NULL,
   	float default_texlen = 1, bool objspace = false,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 

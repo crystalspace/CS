@@ -63,7 +63,10 @@ csThing::csThing (csWorld* world, bool is_sky) :
 
 csThing::~csThing ()
 {
-  world->UnlinkThing (this);
+  if (is_sky)
+    world->UnlinkSky (this);
+  else
+    world->UnlinkThing (this);
 }
 
 void csThing::SetConvex (bool c)
@@ -553,7 +556,7 @@ void csThing::Merge (csThing* other)
 }
 
 
-void csThing::MergeTemplate (csThing* tpl,
+void csThing::MergeTemplate (csThing* tpl, csSector* sector,
   csMaterialWrapper* default_material, float default_texlen,
   bool objspace, csVector3* shift, csMatrix3* transform)
 {
@@ -632,7 +635,7 @@ void csThing::MergeTemplate (csThing* tpl,
     csCurve* p = pt->MakeCurve ();
     p->SetName (pt->GetName ());
     p->SetParent (this);
-    p->SetSector (tpl->movable.GetSector (0));
+    p->SetSector (sector);
 
     if (!pt->GetMaterialWrapper ()) p->SetMaterialWrapper (default_material);
     for (j = 0 ; j < pt->NumVertices () ; j++)
@@ -643,7 +646,7 @@ void csThing::MergeTemplate (csThing* tpl,
   delete [] merge_vertices;
 }
 
-void csThing::MergeTemplate (csThing* tpl, csMaterialList* matList,
+void csThing::MergeTemplate (csThing* tpl, csSector* sector, csMaterialList* matList,
   const char* prefix, csMaterialWrapper* default_material, float default_texlen,
   bool objspace, csVector3* shift, csMatrix3* transform)
 {
@@ -651,7 +654,7 @@ void csThing::MergeTemplate (csThing* tpl, csMaterialList* matList,
   const char *txtname;
   char *newname=NULL;
     
-  MergeTemplate (tpl, default_material, default_texlen, objspace,
+  MergeTemplate (tpl, sector, default_material, default_texlen, objspace,
     shift, transform);
     
   // Now replace the materials.

@@ -1494,7 +1494,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
   csLoaderStat::things_loaded++;
 
-  thing->GetMovable ().SetSector (sec);
+  if (sec) thing->GetMovable ().SetSector (sec);
   csReversibleTransform obj;
   csMaterialWrapper* material = NULL;
   bool is_convex = false;
@@ -1854,12 +1854,12 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
           }
 	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t, World->GetMaterials (), info.mat_set_name,
+            thing->MergeTemplate (t, sec, World->GetMaterials (), info.mat_set_name,
               info.default_material, info.default_texlen, false);
             info.use_mat_set = false;
 	  }
           else
-            thing->MergeTemplate (t, info.default_material, info.default_texlen,
+            thing->MergeTemplate (t, sec, info.default_material, info.default_texlen,
 		false);
           csLoaderStat::polygons_loaded += t->GetNumPolygons ();
         }
@@ -1875,12 +1875,12 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
           }
 	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t, World->GetMaterials (), info.mat_set_name,
+            thing->MergeTemplate (t, sec, World->GetMaterials (), info.mat_set_name,
               info.default_material, info.default_texlen, true);
             info.use_mat_set = false;
 	  }
           else
-            thing->MergeTemplate (t, info.default_material, info.default_texlen,
+            thing->MergeTemplate (t, sec, info.default_material, info.default_texlen,
 		true);
           csLoaderStat::polygons_loaded += t->GetNumPolygons ();
         }
@@ -2188,7 +2188,16 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
               tx2_len = tx2.Norm ();
               tx2 += tx_orig;
               break;
-          }
+	    case CS_TOKEN_UV:
+	      {
+		float u1, v1, u2, v2, u3, v3;
+                ScanStr (params, "%f,%f,%f,%f,%f,%f",
+			&u1, &v1, &u2, &v2, &u3, &v3);
+	        csMatrix3 f_uv;
+		
+              }
+	      break;
+	  }
         }
         break;
       case CS_TOKEN_VERTICES:

@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+1-Oct-2000
+	- Since Martin fixed a bug in the sound code Blocks sound is now
+	  working so I enabled it by default.
+	- Fixed bug with adding of SIXFACE templates.
+	- Fixed bug with deletion of sky things.
+	- Fixed bug with thing templates containing curved surfaces. This
+	  bug could cause walktest to crash at exit (for flarge).
 30-Sep-2000
 	- Eric Sunshine fixed nasty bug in csHashMap/csHashSet where it would
 	  happily access negative array elements.
@@ -62,7 +69,7 @@ The history order has been reversed so that new features are at the top.
 	  This will initialize the radiosity process but not start it yet.
 	  Using the console command db_radstep you can single step radiosity
 	  one iteration at a time (or more if you give an argument). This
-	  key is assigned to 'shift-r'. Before doing this you can also
+	  command is assigned to 'shift-r'. Before doing this you can also
 	  hilight the polygon that is going to be used next for radiosity.
 	  This is with the db_radhi command (assigned to 'alt-r').
 	  There is also the db_radtodo command which toggles between showing
