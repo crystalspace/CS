@@ -413,6 +413,7 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner, csPo
 
 void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWorld* world)
 {
+  (void) world;
   char buf[200];
   PolySave ps;
   long l;
