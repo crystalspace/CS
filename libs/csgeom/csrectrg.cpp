@@ -75,8 +75,8 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
 
   
   printf("csrectrgn: fragmenting with rule %d\n", edges);
-  printf("\t%d,%d,%d,%d\n", r1.xmin, r1.ymin, r1.xmax, r1.ymax);
-  printf("\t%d,%d,%d,%d\n", r2.xmin, r2.ymin, r2.xmax, r2.ymax);
+  //printf("\t%d,%d,%d,%d\n", r1.xmin, r1.ymin, r1.xmax, r1.ymax);
+  //printf("\t%d,%d,%d,%d\n", r2.xmin, r2.ymin, r2.xmax, r2.ymax);
 
   switch(edges)
   {
@@ -199,15 +199,18 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
     return;
 
   case 14:
-    // One rect (bot)                   [rect on top, horizontally touches left and right sides]
+    // One rect (left)                   [rect on right, vertically touches top and bottom ]
     
-    pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax)); //bottom
+    pushRect(csRect(r1.xmin, r1.ymin, r2.xmin-1, r1.ymax)); //bottom
   
     return;
 
   case 15:
     // No rects 
     // In this case, the rects cancel themselves out.
+
+    // Include needs to special case this, otherwise it will not
+    //  be handled correctly.
 
     return;
   
@@ -258,7 +261,7 @@ void csRectRegion::fragmentRect(
      ri.Intersect(r2);
 
      fragmentContainedRect(r1, ri);
-     
+           
      return;
     }
   }
@@ -299,20 +302,11 @@ bool csRectRegion::chopEdgeIntersection(csRect &rect1, csRect &rect2)
 {
   if ((rect1.xmin <= rect2.xmin && rect1.xmax >= rect2.xmax) ||
       (rect1.ymin <= rect2.ymin && rect1.ymax >= rect2.ymax))
-  {
-    printf("csrectrgn: chopping edge\n");
-    printf("\t(%d,%d,%d,%d) intersects ", rect1.xmin, rect1.ymin, rect1.xmax, rect1.ymax);
-    printf("(%d,%d,%d,%d)", rect2.xmin, rect2.ymin, rect2.xmax, rect2.ymax);
+  {    
 
     csRect i(rect2);
     i.Intersect(rect1);
     rect2.Subtract(i);
-
-    printf(" at (%d,%d,%d,%d)\n", i.xmin, i.ymin, i.xmax, i.ymax);
-
-
-    printf("\tyielding (%d,%d,%d,%d) and ", rect1.xmin, rect1.ymin, rect1.xmax, rect1.ymax);
-    printf("(%d,%d,%d,%d)\n", rect2.xmin, rect2.ymin, rect2.xmax, rect2.ymax);
 
     return true;
   }
@@ -362,7 +356,7 @@ void csRectRegion::Include(csRect &rect)
     // what.  It may be more efficient to chop part off of one or the other.
     // Usually, it's easier to chop up the smaller one.
 
-    r2.Set(rect);
+    /*r2.Set(rect);
     
     if (!chopEdgeIntersection(r1, r2))
     {
@@ -378,7 +372,7 @@ void csRectRegion::Include(csRect &rect)
 
       if (rect.IsEmpty()) return;
       else                continue;
-    }
+    }*/
       
 
     // Otherwise we have to do the most irritating part: A full split operation
@@ -393,8 +387,9 @@ void csRectRegion::Include(csRect &rect)
     deleteRect(i);
   
     // Fragment it
-    fragmentRect(r1, r2, true, true);
-  } // end for
+    fragmentRect(r1, r2, true, false);
+    
+   } // end for
 
   // In the end, we need to put the rect on the stack
   if (!rect.IsEmpty()) pushRect(rect);
