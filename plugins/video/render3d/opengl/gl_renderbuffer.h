@@ -155,12 +155,13 @@ public:
     csVBORenderBuffer::buftype = type;
     locked = false;
     ext->glGenBuffersARB (1, &bufferId);
-    ext->glBindBufferARB (index?
-      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, bufferId);
-    ext->glBufferDataARB (index?
-      GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, size, 0, 
+    const GLenum bufferType = 
+      index ? GL_ELEMENT_ARRAY_BUFFER_ARB : GL_ARRAY_BUFFER_ARB;
+    ext->glBindBufferARB (bufferType, bufferId);
+    ext->glBufferDataARB (bufferType, size, 0, 
       (type==CS_BUF_STATIC) ? GL_STATIC_DRAW_ARB : GL_DYNAMIC_DRAW_ARB);
     lastLock = CS_BUF_LOCK_NOLOCK;
+    ext->glBindBufferARB (bufferType, 0);
   }
   csVBORenderBuffer (csVBORenderBuffer *copy) :
     csGLRenderBuffer (copy->size, copy->type, copy->comptype, copy->compcount)
@@ -204,13 +205,15 @@ public:
   /// Releases the buffer. After this all writing to the buffer is illegal
   virtual void Release() 
   {
+    const GLenum bufferType = 
+      index ? GL_ELEMENT_ARRAY_BUFFER_ARB : GL_ARRAY_BUFFER_ARB;
     if (lastLock == CS_BUF_LOCK_NORMAL)
     {
-      ext->glBindBufferARB (index?
-                            GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, bufferId);
+      ext->glBindBufferARB (bufferType, bufferId);
       // @@@ Should be real error check.
-      ext->glUnmapBufferARB (index?GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB);
+      ext->glUnmapBufferARB (bufferType);
     }
+    ext->glBindBufferARB (bufferType, 0);
     locked = false;
     lastLock = CS_BUF_LOCK_NOLOCK;
   }
