@@ -174,11 +174,16 @@ public:
   /// Add an adjanced rectangle if resulting rectangle will have larger area.
   void AddAdjanced (const csRect &rect);
 
+  /// Test equality of two rectangles.
+  inline bool operator == (const csRect& rect) const
+  {
+    return Equal (rect);
+  }
+
   /// Test inequality of two rectangles.
   inline bool operator != (const csRect &rect) const
   {
-    return (xmin != rect.xmin) || (ymin != rect.ymin)
-        || (xmax != rect.xmax) || (ymax != rect.ymax);
+    return !Equal (rect);
   }
 
   /// Extend rectangle so that it will include given point
