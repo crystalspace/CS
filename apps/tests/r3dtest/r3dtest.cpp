@@ -26,6 +26,7 @@
 #include "cstool/initapp.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
+#include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
@@ -54,7 +55,7 @@
 #include "imesh/terrfunc.h"
 #include "imesh/genmesh.h"
 #include "ivideo/shader/shader.h"
-//#include "ilight/testlt.h"
+#include "ilight/testlt.h"
 
 /*#include "csengine/material.h"
 #include "csengine/texture.h"*/
@@ -170,7 +171,6 @@ void R3DTest::SetupFrame ()
   // First get elapsed time from the virtual clock.
   csTicks elapsed_time = vc->GetElapsedTicks ();
 
-
   // Now rotate the camera according to keyboard state
 
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
@@ -186,24 +186,38 @@ void R3DTest::SetupFrame ()
     timeaccum = 0;
   }
 
-
-  if (kbd->GetKeyState (CSKEY_RIGHT))
+  /*if (kbd->GetKeyState (CSKEY_RIGHT))
     view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * 5.0);
   if (kbd->GetKeyState (CSKEY_LEFT))
     view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_LEFT, speed * 5.0);
   if (kbd->GetKeyState (CSKEY_PGUP))
     view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * 5.0);
   if (kbd->GetKeyState (CSKEY_PGDN))
-    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * 5.0);
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_DOWN, speed * 5.0);*/
+
+  int w = r3d->GetDriver2D ()->GetWidth()/2;
+  int h = r3d->GetDriver2D ()->GetHeight()/2;
+  int x = mouse->GetLastX();
+  int y = mouse->GetLastY();
+
+  view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * (y-h) * 2);
+  view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * (x-w) * 2);
+  r3d->GetDriver2D ()->SetMousePosition (w, h);
+
+
 
   if (kbd->GetKeyState (CSKEY_UP))
-    view->GetCamera ()->Move (CS_VEC_FORWARD * speed * 50.0);
+    view->GetCamera ()->Move (CS_VEC_FORWARD * speed * 25.0);
   if (kbd->GetKeyState (CSKEY_DOWN))
-    view->GetCamera ()->Move (CS_VEC_BACKWARD * speed * 50.0);
+    view->GetCamera ()->Move (CS_VEC_BACKWARD * speed * 25.0);
+  if (kbd->GetKeyState (CSKEY_LEFT))
+    view->GetCamera ()->Move (CS_VEC_LEFT * speed * 25.0);
+  if (kbd->GetKeyState (CSKEY_RIGHT))
+    view->GetCamera ()->Move (CS_VEC_RIGHT * speed * 25.0);
   if (kbd->GetKeyState (CSKEY_HOME))
-    view->GetCamera ()->Move (CS_VEC_UP * speed * 50.0);
+    view->GetCamera ()->Move (CS_VEC_UP * speed * 25.0);
   if (kbd->GetKeyState (CSKEY_END))
-    view->GetCamera ()->Move (CS_VEC_DOWN * speed * 50.0);
+    view->GetCamera ()->Move (CS_VEC_DOWN * speed * 25.0);
 
   r3d->SetPerspectiveAspect (r3d->GetDriver2D ()->GetHeight ());
   r3d->SetPerspectiveCenter (r3d->GetDriver2D ()->GetWidth ()/2,
@@ -213,51 +227,7 @@ void R3DTest::SetupFrame ()
   if (!r3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER))
     return;
 
-/*
-  csRenderMesh mesh;
-  mesh.SetIndexRange (0, 36);
-  mesh.SetMaterialWrapper (matwrap);
-  mesh.SetStreamSource (testmesh);
-  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
-*/
-
-  csReversibleTransform trans;
-  static float a = 0;
-
-  csVector2 clipshape[10];
-  clipshape[0] = csVector2 (sin(a*5.0)*100.0+200, 100);
-  clipshape[1] = csVector2 (sin(a*5.0+0.5)*100.0+150, 200);
-  clipshape[2] = csVector2 (sin(a*5.0+1.0)*100.0+300, 300);
-  clipshape[3] = csVector2 (sin(a*5.0+1.5)*100.0+450, 200);
-  clipshape[4] = csVector2 (sin(a*5.0+2.0)*100.0+400, 100);
-  csPolygonClipper polyclip (clipshape, 5);
-  csRef<iClipper2D> clipper = SCF_QUERY_INTERFACE (&polyclip, iClipper2D);
-  r3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
-
-  a += speed;
-  trans.RotateOther (csVector3 (1,0,0), a*2.0);
-  trans.RotateOther (csVector3 (0,1,0), a*1.5);
-  trans.RotateOther (csVector3 (0,0,1), a*1.0);
-  trans.SetOrigin (csVector3 (0,0,10));
-  // trans = trans.GetInverse ();
-  mesh->GetMovable ()->SetTransform (trans);
-/*
-  r3d->SetObjectToCamera (&trans);
-  mesh.clip_plane = CS_CLIP_NOT;
-  mesh.clip_z_plane = CS_CLIP_NOT;
-  mesh.clip_portal = CS_CLIP_NOT;
-  mesh.z_buf_mode = CS_ZBUF_NONE;
-  mesh.do_mirror = false;
-  r3d->DrawMesh (&mesh);
-*/
-
-  /*light->GetMovable ()->SetPosition (csVector3 (0, 1+sin(a*4.0), sin(a*2.0)*4));
-  light->GetMovable ()->UpdateMove ();*/
-
-  // Tell the camera to render into the frame buffer.
   view->Draw ();
-
-  r3d->SetClipper (NULL, CS_CLIPPER_NONE);
 
   r3d->FinishDraw ();
   
@@ -274,6 +244,7 @@ void R3DTest::SetupFrame ()
   char text[1024];
   sprintf (text, "Ah, it iz le test!      Le FPS c'est cyrrentlee %f, frame %d", FPS, framecount);
   r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF00FF, -1, text);
+
   r3d->FinishDraw ();
 }
 
@@ -389,6 +360,15 @@ bool R3DTest::Initialize ()
     return false;
   }
 
+  mouse = CS_QUERY_REGISTRY (object_reg, iMouseDriver);
+  if (mouse == NULL)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.r3dtest",
+    	"No iMouseDriver plugin!");
+    return false;
+  }
+
   csRef<iLoader> loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (loader == NULL)
   {
@@ -408,75 +388,11 @@ bool R3DTest::Initialize ()
     return false;
   }
 
-  testmesh = new csTestMesh (r3d);
+  // Change this path to something /Anders Stenberg
+  vfs->ChDir ("/this/data/mayatest");
+  loader->LoadMapFile ("mayatest.xml", true);
 
-  if (!loader->LoadTexture ("portal", "/lib/std/portal.jpg"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.r3dtest",
-    	"Error loading 'portal' texture!");
-    return false;
-  }
-  matwrap = engine->GetMaterialList ()->FindByName ("portal");
-
-  // Just disregard this. It's for testing. /Anders Stenberg
-  // vfs->Mount ("/level", "./data/r3dtest.zip");
-  // vfs->ChDir ("/level");
-  // vfs->ChDir ("/this/data/r3dtest");
-  // loader->LoadMapFile ("world.xml", false);
-
-  // csRef<iSector> room = engine->CreateSector ("room");
   csRef<iSector> room = engine->FindSector ("room");
-
-  /*light = engine->CreateMeshWrapper (
-    "crystalspace.mesh.object.testlight", 
-    "testlight", 
-    room, 
-    csVector3 (0, 1, 1));
-
-  csRef<iTestLightState> lightstate = SCF_QUERY_INTERFACE (
-    light->GetMeshObject (),
-    iTestLightState);
-
-  lightstate->SetRange (1.0);*/
-
-  csRef<iMeshFactoryWrapper> factory (engine->CreateMeshFactory ("crystalspace.mesh.object.genmesh", "meshfactory"));
-  csRef<iGeneralFactoryState> state (SCF_QUERY_INTERFACE (factory->GetMeshObjectFactory(), iGeneralFactoryState));
-  state->SetMaterialWrapper (matwrap);
-  state->SetVertexCount (8);
-  csVector3 *vbuf = state->GetVertices ();
-    vbuf[0] = csVector3 (-1,  1, -1);
-    vbuf[1] = csVector3 ( 1,  1, -1);
-    vbuf[2] = csVector3 (-1,  1,  1);
-    vbuf[3] = csVector3 ( 1,  1,  1);
-    vbuf[4] = csVector3 (-1, -1, -1);
-    vbuf[5] = csVector3 ( 1, -1, -1);
-    vbuf[6] = csVector3 (-1, -1,  1);
-    vbuf[7] = csVector3 ( 1, -1,  1);
-  csVector2 *tcbuf = state->GetTexels ();
-    tcbuf[0] = csVector2 (0, 0);
-    tcbuf[1] = csVector2 (1, 0);
-    tcbuf[2] = csVector2 (0, 1);
-    tcbuf[3] = csVector2 (1, 1);
-    tcbuf[4] = csVector2 (0, 0);
-    tcbuf[5] = csVector2 (1, 0);
-    tcbuf[6] = csVector2 (0, 1);
-    tcbuf[7] = csVector2 (1, 1);
-  state->SetTriangleCount (12);
-  csTriangle *tbuf = state->GetTriangles ();
-    tbuf[0] = csTriangle (0, 1, 4);
-    tbuf[1] = csTriangle (1, 5, 4);
-    tbuf[2] = csTriangle (0, 3, 1);
-    tbuf[3] = csTriangle (0, 2, 3);
-    tbuf[4] = csTriangle (4, 7, 6);
-    tbuf[5] = csTriangle (4, 5, 7);
-    tbuf[6] = csTriangle (1, 3, 5);
-    tbuf[7] = csTriangle (3, 7, 5);
-    tbuf[8] = csTriangle (2, 0, 6);
-    tbuf[9] = csTriangle (0, 4, 6);
-    tbuf[10] = csTriangle (2, 6, 3);
-	tbuf[11] = csTriangle (3, 6, 7);
-  mesh = engine->CreateMeshWrapper (factory, "mesh", room, csVector3 (0,0,0));
 
   view = csPtr<iView> (new csView (engine, r3d));
   view->GetCamera ()->SetSector (room);
@@ -486,37 +402,7 @@ bool R3DTest::Initialize ()
 
   engine->Prepare ();
 
-  iFontServer* fntsvr = r3d->GetDriver2D ()->GetFontServer ();
-  CS_ASSERT (fntsvr != NULL);
-  csRef<iFont> fnt (fntsvr->GetFont (0));
-  if (fnt == NULL)
-  {
-    fnt = fntsvr->LoadFont (CSFONT_COURIER);
-  }
-  char text[1024];
-  r3d->SetRenderTarget (matwrap->GetMaterial ()->GetTexture (), true);
-
-  // Tell 3D driver we're going to display 3D things.
-  if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
-    return false;
-
-  sprintf (text, "Le SetRenderTargette iz workeeng!");
-  r3d->GetDriver2D ()->Write (fnt, 10, 10, 0x00FF00FF, -1, text);
-
-  r3d->FinishDraw ();
-  r3d->SetRenderTarget (NULL);
-
-  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
-  csRef<iShader> shader = shmgr->CreateShader();
-  shader->SetName("rainbow");
-
-  csRef<iShaderTechnique> shtech = shader->CreateTechnique();
-  shtech->SetPriority(100);
-
-  csRef<iShaderPass> shpass = shtech->CreatePass();
-  shpass->SetVertexProgram ( csRef<iShaderProgram>(shmgr->CreateShaderProgramFromFile("/shader/ms.avp","gl_arb_vp")) );
-
-  // matwrap->GetMaterial()->SetShader(shader);
+  r3d->GetDriver2D ()->SetMouseCursor( csmcNone );
 
   return true;
 }

@@ -28,6 +28,7 @@ struct iEvent;
 struct iVirtualClock;
 struct iMaterialWrapper;
 struct iKeyboardDriver;
+struct iMouseDriver;
 struct iVFS;
 
 
@@ -41,12 +42,10 @@ private:
   csRef<iRender3D> r3d;
   csRef<iView> view;
   csRef<iKeyboardDriver> kbd;
-  csRef<iMeshWrapper> light;
+  csRef<iMouseDriver> mouse;
 
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
-  csRef<iMaterialWrapper> matwrap;
-  csRef<iMeshWrapper> mesh;
 
   iSector* room;
 
