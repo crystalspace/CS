@@ -1,0 +1,46 @@
+This version of CS has a new feature called octree/c-buffer
+visibility culling. This feature is not fully ready yet but it
+is already possible to use it.
+
+This kind of visibility culling is ideal for large sectors which
+are difficult to portalize or would generate an excessive amount
+of portals. What you have to do is to create one large sector
+which is convex. Mostly it will probably be a skybox or skydome
+type sector with no other geometry on the sector itself. Then
+you add all entities (like buildings, rooms, and other static
+geometry) as normal things. You can add as many as you want. All
+things that you add will be considered static geometry and added
+to the octree. If you don't want that to happen for some things
+(for example because they can move around) then you should add the
+MOVEABLE() keyword to those things.
+
+If you defined your sector then add the STATBSP() keyword somewhere
+in the definition of the sector.
+
+This should be it. Now you have to do a little modification to CS.
+This is because the current version of CS doesn't use the right
+collision detection system yet for moving around. If you don't do
+this modification then moving around will be extremely slow.
+Edit libs/csengine/camera.cpp and go to the csCamera::MoveWorld()
+function. Edit it so that it looks as follows:
+    void csCamera::MoveWorld (const csVector3& v)
+    {
+      csVector3 new_position = GetOrigin () + v;
+      //if (sector)
+        //sector = sector->FollowSegment (*this, new_position, mirror);
+      SetOrigin (new_position);
+    }
+In other words: add the two comments.
+Note that this will prevent CS from properly walking through portals
+so don't forget to change this again when going back to portal levels.
+
+Now you can start your level. Warning! This might be very slow if you
+added a lot of lights. Lighting currently also doesn't use the new
+octree yet so lighting is still extremely slow.
+
+At some point CS will start up hopefully. If all goes well things should
+be very slow :-)  This is normal. The optization is not yet enabled
+by default. Press the 'd' key and you SHOULD get a significant speed
+increase.
+
+
