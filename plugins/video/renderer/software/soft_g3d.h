@@ -380,7 +380,7 @@ public:
 
   /// Use to printf through system driver
   void SysPrintf (int mode, char* str, ...);
-
+#ifdef REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
   ///------------ iHaloRasterizer interface implementation ------------------
   class csSoftHalo : public iHaloRasterizer
   {
@@ -399,7 +399,7 @@ public:
   } scfiHaloRasterizer;
   friend class  csSoftHalo;
   friend struct csSoftHaloHandle;
-
+#endif // REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
   ///------------------- iConfig interface implementation -------------------
   struct csSoftConfig : public iConfig
   {

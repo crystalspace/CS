@@ -118,7 +118,9 @@ EXPORT_CLASS_TABLE_END
 IMPLEMENT_IBASE (csGraphics3DSoftware)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
+#ifdef REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
   IMPLEMENTS_EMBEDDED_INTERFACE (iHaloRasterizer)
+#endif REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
   IMPLEMENTS_EMBEDDED_INTERFACE (iConfig)
 IMPLEMENT_IBASE_END
 
@@ -146,7 +148,9 @@ char* get_software_2d_driver ()
 csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 {
   CONSTRUCT_IBASE (iParent);
+#ifdef REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
   CONSTRUCT_EMBEDDED_IBASE (scfiHaloRasterizer);
+#endif // REMOVE_ME_IF_YOU_HAVE_HALOGEN_CPP
   CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
 
   config = new csIniFile ("soft3d.cfg");
