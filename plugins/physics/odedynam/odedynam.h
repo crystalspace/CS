@@ -642,6 +642,7 @@ class csODEJoint : public iJoint
 
   int transConstraint[3], rotConstraint[3];
   csVector3 maxTrans, minTrans, maxAngle, minAngle;
+  csVector3 stopBounce, desiredVelocity, fMax;
 
   csOrthoTransform transform;
 
@@ -679,95 +680,102 @@ public:
   void SetMaximumAngle (const csVector3 &max);
   csVector3 GetMaximumAngle ();
 
-  struct ODEJointState : public iODEJointState
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csODEJoint);
-    inline ODEJointType GetType()
-    {
-       return STATIC_CAST (ODEJointType, dJointGetType (scfParent->jointID));
-    }
+  void SetBounce (const csVector3 & bounce );
+  csVector3 GetBounce ();
+  void SetDesiredVelocity (const csVector3 & velocity );
+  csVector3 GetDesiredVelocity ();
+  void SetMaxForce (const csVector3 & maxForce );
+  csVector3 GetMaxForce ();
 
-    void SetLoStop (float value) { SetParam (dParamLoStop, value); }
-    void SetHiStop (float value) { SetParam (dParamHiStop, value); }
-    void SetVel (float value) { SetParam (dParamVel, value); }
-    void SetFMax (float value) { SetParam (dParamFMax, value); }
-    void SetFudgeFactor (float value) { SetParam (dParamFudgeFactor, value); }
-    void SetBounce (float value) { SetParam (dParamBounce, value); }
-    void SetCFM (float value) { SetParam (dParamCFM, value); }
-    void SetStopERP (float value) { SetParam (dParamStopERP, value); }
-    void SetStopCFM (float value) { SetParam (dParamStopCFM, value); }
-    void SetSuspensionERP (float value) { SetParam (dParamSuspensionERP, value); }
-    void SetSuspensionCFM (float value) { SetParam (dParamSuspensionCFM, value); }
-
-    void SetLoStop2 (float value) { SetParam (dParamLoStop2, value); }
-    void SetHiStop2 (float value) { SetParam (dParamHiStop2, value); }
-    void SetVel2 (float value) { SetParam (dParamVel2, value); }
-    void SetFMax2 (float value) { SetParam (dParamFMax2, value); }
-    void SetFudgeFactor2 (float value) { SetParam (dParamFudgeFactor2, value); }
-    void SetBounce2 (float value) { SetParam (dParamBounce2, value); }
-    void SetCFM2 (float value) { SetParam (dParamCFM2, value); }
-    void SetStopERP2 (float value) { SetParam (dParamStopERP2, value); }
-    void SetStopCFM2 (float value) { SetParam (dParamStopCFM2, value); }
-    void SetSuspensionERP2 (float value) { SetParam (dParamSuspensionERP2, value); }
-    void SetSuspensionCFM2 (float value) { SetParam (dParamSuspensionCFM2, value); }
-
-    void SetLoStop3 (float value) { SetParam (dParamLoStop3, value); }
-    void SetHiStop3 (float value) { SetParam (dParamHiStop3, value); }
-    void SetVel3 (float value) { SetParam (dParamVel3, value); }
-    void SetFMax3 (float value) { SetParam (dParamFMax3, value); }
-    void SetFudgeFactor3 (float value) { SetParam (dParamFudgeFactor3, value); }
-    void SetBounce3 (float value) { SetParam (dParamBounce3, value); }
-    void SetCFM3 (float value) { SetParam (dParamCFM3, value); }
-    void SetStopERP3 (float value) { SetParam (dParamStopERP3, value); }
-    void SetStopCFM3 (float value) { SetParam (dParamStopCFM3, value); }
-    void SetSuspensionERP3 (float value) { SetParam (dParamSuspensionERP3, value); }
-    void SetSuspensionCFM3 (float value) { SetParam (dParamSuspensionCFM3, value); }
-
-    float GetLoStop (float value) { return GetParam (dParamLoStop); }
-    float GetHiStop (float value) { return GetParam (dParamHiStop); }
-    float GetVel (float value) { return GetParam (dParamVel); }
-    float GetFMax (float value) { return GetParam (dParamFMax); }
-    float GetFudgeFactor (float value) { return GetParam (dParamFudgeFactor); }
-    float GetBounce (float value) { return GetParam (dParamBounce); }
-    float GetCFM (float value) { return GetParam (dParamCFM); }
-    float GetStopERP (float value) { return GetParam (dParamStopERP); }
-    float GetStopCFM (float value) { return GetParam (dParamStopCFM); }
-    float GetSuspensionERP (float value) { return GetParam (dParamSuspensionERP); }
-    float GetSuspensionCFM (float value) { return GetParam (dParamSuspensionCFM); }
-
-    float GetLoStop2 (float value) { return GetParam (dParamLoStop2); }
-    float GetHiStop2 (float value) { return GetParam (dParamHiStop2); }
-    float GetVel2 (float value) { return GetParam (dParamVel2); }
-    float GetFMax2 (float value) { return GetParam (dParamFMax2); }
-    float GetFudgeFactor2 (float value) { return GetParam (dParamFudgeFactor2); }
-    float GetBounce2 (float value) { return GetParam (dParamBounce2); }
-    float GetCFM2 (float value) { return GetParam (dParamCFM2); }
-    float GetStopERP2 (float value) { return GetParam (dParamStopERP2); }
-    float GetStopCFM2 (float value) { return GetParam (dParamStopCFM2); }
-    float GetSuspensionERP2 (float value) { return GetParam (dParamSuspensionERP2); }
-    float GetSuspensionCFM2 (float value) { return GetParam (dParamSuspensionCFM2); }
-
-    float GetLoStop3 (float value) { return GetParam (dParamLoStop3); }
-    float GetHiStop3 (float value) { return GetParam (dParamHiStop3); }
-    float GetVel3 (float value) { return GetParam (dParamVel3); }
-    float GetFMax3 (float value) { return GetParam (dParamFMax3); }
-    float GetFudgeFactor3 (float value) { return GetParam (dParamFudgeFactor3); }
-    float GetBounce3 (float value) { return GetParam (dParamBounce3); }
-    float GetCFM3 (float value) { return GetParam (dParamCFM3); }
-    float GetStopERP3 (float value) { return GetParam (dParamStopERP3); }
-    float GetStopCFM3 (float value) { return GetParam (dParamStopCFM3); }
-    float GetSuspensionERP3 (float value) { return GetParam (dParamSuspensionERP3); }
-    float GetSuspensionCFM3 (float value) { return GetParam (dParamSuspensionCFM3); }
-
-    void SetHinge2Axis1 (const csVector3& axis);
-    void SetHinge2Axis2 (const csVector3& axis);
-    void SetHinge2Anchor (const csVector3& point);
-
-  private:
-    void SetParam (int parameter, float value);
-    float GetParam (int parameter);
-  } scfiODEJointState;
-
+   struct ODEJointState : public iODEJointState
+   {
+     SCF_DECLARE_EMBEDDED_IBASE (csODEJoint);
+     inline ODEJointType GetType()
+     {
+        return STATIC_CAST (ODEJointType, dJointGetType (scfParent->jointID));
+     }
+ 
+     void SetLoStop (float value) { SetParam (dParamLoStop, value); }
+     void SetHiStop (float value) { SetParam (dParamHiStop, value); }
+     void SetVel (float value) { SetParam (dParamVel, value); }
+     void SetFMax (float value) { SetParam (dParamFMax, value); }
+     void SetFudgeFactor (float value) { SetParam (dParamFudgeFactor, value); }
+     void SetBounce (float value) { SetParam (dParamBounce, value); }
+     void SetCFM (float value) { SetParam (dParamCFM, value); }
+     void SetStopERP (float value) { SetParam (dParamStopERP, value); }
+     void SetStopCFM (float value) { SetParam (dParamStopCFM, value); }
+     void SetSuspensionERP (float value) { SetParam (dParamSuspensionERP, value); }
+     void SetSuspensionCFM (float value) { SetParam (dParamSuspensionCFM, value); }
+ 
+     void SetLoStop2 (float value) { SetParam (dParamLoStop2, value); }
+     void SetHiStop2 (float value) { SetParam (dParamHiStop2, value); }
+     void SetVel2 (float value) { SetParam (dParamVel2, value); }
+     void SetFMax2 (float value) { SetParam (dParamFMax2, value); }
+     void SetFudgeFactor2 (float value) { SetParam (dParamFudgeFactor2, value); }
+     void SetBounce2 (float value) { SetParam (dParamBounce2, value); }
+     void SetCFM2 (float value) { SetParam (dParamCFM2, value); }
+     void SetStopERP2 (float value) { SetParam (dParamStopERP2, value); }
+     void SetStopCFM2 (float value) { SetParam (dParamStopCFM2, value); }
+     void SetSuspensionERP2 (float value) { SetParam (dParamSuspensionERP2, value); }
+     void SetSuspensionCFM2 (float value) { SetParam (dParamSuspensionCFM2, value); }
+ 
+     void SetLoStop3 (float value) { SetParam (dParamLoStop3, value); }
+     void SetHiStop3 (float value) { SetParam (dParamHiStop3, value); }
+     void SetVel3 (float value) { SetParam (dParamVel3, value); }
+     void SetFMax3 (float value) { SetParam (dParamFMax3, value); }
+     void SetFudgeFactor3 (float value) { SetParam (dParamFudgeFactor3, value); }
+     void SetBounce3 (float value) { SetParam (dParamBounce3, value); }
+     void SetCFM3 (float value) { SetParam (dParamCFM3, value); }
+     void SetStopERP3 (float value) { SetParam (dParamStopERP3, value); }
+     void SetStopCFM3 (float value) { SetParam (dParamStopCFM3, value); }
+     void SetSuspensionERP3 (float value) { SetParam (dParamSuspensionERP3, value); }
+     void SetSuspensionCFM3 (float value) { SetParam (dParamSuspensionCFM3, value); }
+ 
+     float GetLoStop (float value) { return GetParam (dParamLoStop); }
+     float GetHiStop (float value) { return GetParam (dParamHiStop); }
+     float GetVel (float value) { return GetParam (dParamVel); }
+     float GetFMax (float value) { return GetParam (dParamFMax); }
+     float GetFudgeFactor (float value) { return GetParam (dParamFudgeFactor); }
+     float GetBounce (float value) { return GetParam (dParamBounce); }
+     float GetCFM (float value) { return GetParam (dParamCFM); }
+     float GetStopERP (float value) { return GetParam (dParamStopERP); }
+     float GetStopCFM (float value) { return GetParam (dParamStopCFM); }
+     float GetSuspensionERP (float value) { return GetParam (dParamSuspensionERP); }
+     float GetSuspensionCFM (float value) { return GetParam (dParamSuspensionCFM); }
+ 
+     float GetLoStop2 (float value) { return GetParam (dParamLoStop2); }
+     float GetHiStop2 (float value) { return GetParam (dParamHiStop2); }
+     float GetVel2 (float value) { return GetParam (dParamVel2); }
+     float GetFMax2 (float value) { return GetParam (dParamFMax2); }
+     float GetFudgeFactor2 (float value) { return GetParam (dParamFudgeFactor2); }
+     float GetBounce2 (float value) { return GetParam (dParamBounce2); }
+     float GetCFM2 (float value) { return GetParam (dParamCFM2); }
+     float GetStopERP2 (float value) { return GetParam (dParamStopERP2); }
+     float GetStopCFM2 (float value) { return GetParam (dParamStopCFM2); }
+     float GetSuspensionERP2 (float value) { return GetParam (dParamSuspensionERP2); }
+     float GetSuspensionCFM2 (float value) { return GetParam (dParamSuspensionCFM2); }
+ 
+     float GetLoStop3 (float value) { return GetParam (dParamLoStop3); }
+     float GetHiStop3 (float value) { return GetParam (dParamHiStop3); }
+     float GetVel3 (float value) { return GetParam (dParamVel3); }
+     float GetFMax3 (float value) { return GetParam (dParamFMax3); }
+     float GetFudgeFactor3 (float value) { return GetParam (dParamFudgeFactor3); }
+     float GetBounce3 (float value) { return GetParam (dParamBounce3); }
+     float GetCFM3 (float value) { return GetParam (dParamCFM3); }
+     float GetStopERP3 (float value) { return GetParam (dParamStopERP3); }
+     float GetStopCFM3 (float value) { return GetParam (dParamStopCFM3); }
+     float GetSuspensionERP3 (float value) { return GetParam (dParamSuspensionERP3); }
+     float GetSuspensionCFM3 (float value) { return GetParam (dParamSuspensionCFM3); }
+ 
+     void SetHinge2Axis1 (const csVector3& axis);
+     void SetHinge2Axis2 (const csVector3& axis);
+     void SetHinge2Anchor (const csVector3& point);
+ 
+   private:
+     void SetParam (int parameter, float value);
+     float GetParam (int parameter);
+   } scfiODEJointState;
+ 
 private:
 
   void BuildHinge (const csVector3 &axis, float min, float max);
@@ -775,6 +783,8 @@ private:
   	 const csVector3 &axis2, float min2, float max2);
   void BuildSlider (const csVector3 &axis, float min, float max);
   void BuildJoint ();
+
+  void ApplyJointProperty (int parameter, csVector3 & values);
 };
 
 /**

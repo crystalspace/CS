@@ -1872,6 +1872,78 @@ void csODEJoint::BuildSlider (const csVector3 &axis, float min, float max)
   }
 }
 
+void csODEJoint::SetBounce (const csVector3 & bounce) 
+{
+  stopBounce = bounce;
+  ApplyJointProperty (dParamBounce, stopBounce);
+}
+
+
+// parameter: one of ODE joint parameters.  
+// values: up to three possible values for up to 3 possible axis
+// For slider joints, property must correspond to axis with 
+// translational constraint.  For hinges, the first element is used.
+// for 2 axis 'steering' type joints, the first 2 elements are used.
+// for ball and socket joints and angular motors, all three elements 
+// are used (NYI).
+
+void csODEJoint::ApplyJointProperty (int parameter, csVector3 & values)
+{
+  int jointType = dJointGetType (jointID);
+  switch(jointType)
+  {
+    case dJointTypeHinge:
+      dJointSetHingeParam (jointID, parameter, values.x);
+      break;
+    case dJointTypeSlider:
+      if (transConstraint[0])        
+        dJointSetSliderParam (jointID, parameter, values.x);
+      else if (transConstraint[1])
+        dJointSetSliderParam (jointID, parameter, values.y);
+      else 
+        dJointSetSliderParam (jointID, parameter, values.z);
+      break;
+    case dJointTypeHinge2:
+        //looks like axis 2 is meant to be axle, 
+        //axis 1 is steering, I may need to check that later though.
+        dJointSetHinge2Param (jointID, parameter, values.x);
+        dJointSetHinge2Param (jointID, parameter + dParamGroup, values.y);
+                                   //dParamXi = dParamX + dParamGroup * (i-1)
+    default:
+    //case dJointTypeBall:       // maybe supported later via AMotor
+    //case dJointTypeAMotor:     // not supported here
+    //case dJointTypeUniversal:  // not sure if that's supported in here
+      break;
+  }
+}
+
+csVector3 csODEJoint::GetBounce ()
+{
+  return stopBounce;
+}
+
+void csODEJoint::SetDesiredVelocity (const csVector3 & velocity)
+{
+  desiredVelocity = velocity;
+  ApplyJointProperty (dParamVel, desiredVelocity);
+}
+
+csVector3 csODEJoint::GetDesiredVelocity ()
+{
+  return desiredVelocity;
+}
+
+void csODEJoint::SetMaxForce (const csVector3 & maxForce)
+{
+  fMax = maxForce;
+  ApplyJointProperty (dParamFMax, fMax);
+}
+
+csVector3 csODEJoint::GetMaxForce ()
+{
+  return fMax;
+}
+
 void csODEJoint::BuildJoint ()
 {
   if (!(bodyID[0] || bodyID[1]))

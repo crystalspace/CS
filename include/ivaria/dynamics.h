@@ -517,6 +517,21 @@ struct iJoint : public iBase
   virtual void SetMaximumAngle (const csVector3 &max) = 0;
   /// Gets the maximum constrained angle between bodies
   virtual csVector3 GetMaximumAngle () = 0;
+
+  /** 
+   * Sets the restitution of the joint's stop point (this is the 
+   * elasticity of the joint when say throwing open a door how 
+   * much it will bounce the door back closed when it hits)
+   */
+  virtual void SetBounce (const csVector3 & bounce ) = 0;
+  /// Get the joint restitution
+  virtual csVector3 GetBounce () = 0;
+  /// Apply a motor velocity to joint (for instance on wheels)
+  virtual void SetDesiredVelocity (const csVector3 & velocity ) = 0;
+  virtual csVector3 GetDesiredVelocity () = 0;
+  /// Sets the force at which the desired velocity will be achieved
+  virtual void SetMaxForce (const csVector3 & maxForce ) = 0;
+  virtual csVector3 GetMaxForce () = 0;
 };
 
 #endif // __CS_IVARIA_DYNAMICS_H__
