@@ -132,7 +132,7 @@ void csStaticPVSNode::AddObject (const csBox3& bbox,
     return;
   }
 
-  float mi, ma;
+  float mi = 0, ma = 0;
   switch (axis)
   {
     case 0: mi = bbox.MinX (); ma = bbox.MaxX (); break;
