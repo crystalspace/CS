@@ -57,6 +57,9 @@ The history order is reversed so that new features are at the top.
 	- Added empty skeleton of the new 'dynavis' plugin. This plugin
 	  will contain the implementation of the new dynamic visibility
 	  system.
+	- Fixed CS_DBGHELP_UNITTTEST and removed one 'T' :-)
+	- unittest app will also call UnitTest() on engine (not supported
+	  right now) and new dynavis plugin (also not supported).
 29-Apr-2002
 	- Eric Sunshine renamed OSXDelegate2D_CGBLit.h to
 	  OSXDelegate2D_CGBlit.h (notice the case distinction) so that #include

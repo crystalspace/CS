@@ -30,7 +30,7 @@ SCF_VERSION (iDebugHelper, 0, 0, 1);
 /**
  * iDebugHelper implementation supports UnitTest().
  */
-#define CS_DBGHELP_UNITTTEST 1
+#define CS_DBGHELP_UNITTEST 1
 
 /**
  * iDebugHelper implementation supports Benchmark().
@@ -63,7 +63,7 @@ struct iDebugHelper : public iBase
    * unit test implementation supports. This will return a combination of
    * the CS_DBGHELP_... flags:
    * <ul>
-   * <li> CS_DBGHELP_UNITTTEST
+   * <li> CS_DBGHELP_UNITTEST
    * <li> CS_DBGHELP_BENCHMARK
    * <li> CS_DBGHELP_TXTDUMP
    * <li> CS_DBGHELP_GFXDUMP

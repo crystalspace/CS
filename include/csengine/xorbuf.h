@@ -152,7 +152,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csXORBuffer);
     virtual int GetSupportedTests () const
     {
-      return CS_DBGHELP_UNITTTEST |
+      return CS_DBGHELP_UNITTEST |
       	     CS_DBGHELP_BENCHMARK |
 	     CS_DBGHELP_GFXDUMP;
     }
