@@ -135,7 +135,7 @@ NeXTDriver2DFactory::CreateInstance( REFIID riid, ISystem* sys, void** ppv )
 //-----------------------------------------------------------------------------
 // LockServer
 //-----------------------------------------------------------------------------
-STDMETHODIMP NeXTDriver2DFactory::LockServer( BOOL lock )
+STDMETHODIMP NeXTDriver2DFactory::LockServer( COMBOOL lock )
     {
     if (lock)
 	FACTORY_REF_COUNT++;

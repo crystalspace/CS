@@ -33,7 +33,7 @@ public:
     DECLARE_IUNKNOWN()
     DECLARE_INTERFACE_TABLE(csGraphics2DNextStepLibFactory)
     STDMETHOD(CreateInstance)( REFIID riid, ISystem*, void** );
-    STDMETHOD(LockServer)( BOOL );
+    STDMETHOD(LockServer)( COMBOOL );
     };
 
 #endif //__NeXT_NeXTDriver2DFactory_h
