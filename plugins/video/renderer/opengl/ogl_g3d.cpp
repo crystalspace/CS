@@ -63,7 +63,7 @@ bool csGraphics3DOpenGL::do_texel_filt = false;
 
 #if USE_MULTITEXTURE
 // function to check for a certain extension - stolen from 
-// an example by Mark Kilgard
+// an example by Mark Kilgard -GJH
 static int isExtensionSupported(const char * extension);
 #endif
 //---------------------------------------------------------------------------
@@ -71,6 +71,7 @@ static int isExtensionSupported(const char * extension);
 // fog variables
 // size of the fog texture
 static const unsigned int FOGTABLE_SIZE=64;
+
 // each texel in the fog table holds the fog alpha value at a certain
 // (distance*density).  The median distance parameter determines the
 // (distance*density) value represented by the texel at the center of
@@ -79,6 +80,7 @@ static const unsigned int FOGTABLE_SIZE=64;
 // 
 static const double FOGTABLE_MEDIANDISTANCE=10.0;
 static const double FOGTABLE_MAXDISTANCE = FOGTABLE_MEDIANDISTANCE * 2.0;
+
 // fog (distance*density) is mapped to a texture coordinate and then
 // clamped.  This determines the clamp value.  Some OpenGL drivers don't
 // like clamping textures so we must do it ourself
@@ -90,18 +92,17 @@ BEGIN_INTERFACE_TABLE (csGraphics3DOpenGL)
     IMPLEMENTS_INTERFACE (IGraphics3D)
 END_INTERFACE_TABLE ()
 
-csGraphics3DOpenGL::csGraphics3DOpenGL (ISystem* piSystem) : m_piG2D (NULL)
+csGraphics3DOpenGL::csGraphics3DOpenGL (ISystem* piSystem)
+  : m_fogtexturehandle(0),
+    ShortcutDrawPolygon(NULL), ShortcutStartPolygonFX(NULL),
+    ShortcutDrawPolygonFX(NULL), ShortcutFinishPolygonFX(NULL),
+    m_piG2D (NULL), txtmgr(NULL), texture_cache(NULL), lightmap_cache(NULL),
+    m_piSystem(piSystem)
 {
   HRESULT hRes;
   CLSID clsid2dDriver;
   char *sz2DDriver = OPENGL_2D_DRIVER;
   IGraphics2DFactory* piFactory = NULL;
-  texture_cache = NULL;
-  lightmap_cache = NULL;
-  txtmgr = NULL;
-  m_fogtexturehandle = 0;
-
-  m_piSystem = piSystem;
 
   hRes = csCLSIDFromProgID( &sz2DDriver, &clsid2dDriver );
   if (FAILED(hRes))
@@ -186,23 +187,7 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
 
   csPixelFormat pfmt;
   piGI->GetPixelFormat (&pfmt);
-/*
-  if (gi_pixelbytes > 1)
-  {
-    csPixelFormat pfmt;
-    piGI->GetPixelFormat( &pfmt );
 
-    SysPrintf (MSG_INITIALIZATION, "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
-          gi_pixelbytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
-
-    CHK (tcache = new TextureCache16 ());
-  }
-  else
-  {
-    SysPrintf (MSG_INITIALIZATION, "Using palette mode with 1 byte per pixel (256 colors).\n");
-    CHK (tcache = new TextureCache ());
-  }
-*/
   if (rstate_dither)
     glEnable (GL_DITHER);
   else
@@ -216,38 +201,32 @@ STDMETHODIMP csGraphics3DOpenGL::Open (const char *Title)
   do_extra_bright = config->GetYesNo ("OpenGL", "EXTRA_BRIGHT", false);
 
   // determine what blend mode to use when combining lightmaps with their
-  // under lying textures.  This mode is set in the Opengl configuration file
+  // underlying textures.  This mode is set in the Opengl configuration file
+  struct {
+     char *blendstylename;
+     GLenum srcblend, dstblend;
+  } blendstyles[] = {{ "multiplydouble", GL_DST_COLOR, GL_SRC_COLOR},
+                     { "multiply"      , GL_DST_COLOR, GL_ZERO     },
+                     { "add"           , GL_ONE      , GL_ONE      },
+                     { "coloradd"      , GL_ONE      , GL_SRC_COLOR},
+                     { NULL            , GL_DST_COLOR, GL_ZERO     }
+		    };
+  // default lightmap blend style
+  m_lightmap_src_blend = GL_DST_COLOR;
+  m_lightmap_dst_blend = GL_ZERO;
+
+  // try to match user's blend name with a name in the blendstyles table
   char *lightmapstyle = config->GetStr("OpenGL", "LIGHTMAP_MODE","multiplydouble");
-  if (strcmp(lightmapstyle,"multiplydouble") == 0)
+  int blendstyleindex = 0;
+  while (blendstyles[blendstyleindex].blendstylename != NULL)
   {
-     // final color = lightmap * texture * 2
-     m_lightmap_src_blend = GL_DST_COLOR;
-     m_lightmap_dst_blend = GL_SRC_COLOR;
-  }
-  else if (strcmp(lightmapstyle,"multiply") == 0)
-  {
-    // final color = lightmap * texture
-    m_lightmap_src_blend = GL_DST_COLOR;
-    m_lightmap_dst_blend = GL_ZERO;
-  }
-  else if (strcmp(lightmapstyle,"add") == 0)
-  {
-    // final color = lightmap + texture
-    m_lightmap_src_blend = GL_ONE;
-    m_lightmap_dst_blend = GL_ONE;
-  }
-  else if (strcmp(lightmapstyle,"coloradd") == 0)
-  {
-    // final color = lightmap + lightmap * texture
-    m_lightmap_src_blend = GL_ONE;
-    m_lightmap_dst_blend = GL_SRC_COLOR;
-  }
-  else // default is multiply, which is reasonably supported
-  {
-    SysPrintf (MSG_INITIALIZATION, "Unknown lightmap mode '%s', using default\n",
-      lightmapstyle);
-    m_lightmap_src_blend = GL_DST_COLOR;
-    m_lightmap_dst_blend = GL_ZERO;
+    if (strcmp(lightmapstyle, blendstyles[blendstyleindex].blendstylename) == 0)
+    {
+      m_lightmap_src_blend = blendstyles[blendstyleindex].srcblend;
+      m_lightmap_dst_blend = blendstyles[blendstyleindex].dstblend;
+      break;
+    }
+    blendstyleindex++;
   }
 
 #if USE_MULTITEXTURE
@@ -349,7 +328,25 @@ STDMETHODIMP csGraphics3DOpenGL::Close()
   HRESULT rc = S_OK;
   if ((width == height) && height == -1)
     return rc;
+
+  // we should remove all texture handles before we kill
+  // the graphics context
+  CHK (delete texture_cache);
+  texture_cache = NULL;
+  CHK (delete lightmap_cache);
+  lightmap_cache = NULL;
+  CHK (delete txtmgr);
+  txtmgr = NULL;
+
+  if (m_fogtexturehandle)
+  {
+    glDeleteTextures (1,&m_fogtexturehandle);
+    m_fogtexturehandle = 0;
+  }
+
+  // kill the graphics context
   rc = m_piG2D->Close();
+
   width = height = -1;
   return rc;
 }
@@ -357,18 +354,9 @@ STDMETHODIMP csGraphics3DOpenGL::Close()
 csGraphics3DOpenGL::~csGraphics3DOpenGL ()
 {
   CHK (delete config);
+
   Close ();
   FINAL_RELEASE (m_piG2D);
-
-  CHK (delete texture_cache);
-  CHK (delete lightmap_cache);
-  CHK (delete txtmgr);
-
-  if (m_fogtexturehandle)
-  {
-    glDeleteTextures (1,&m_fogtexturehandle);
-    m_fogtexturehandle = 0;
-  }
 }
 
 STDMETHODIMP csGraphics3DOpenGL::SetDimensions (int width, int height)
@@ -477,6 +465,10 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3) return S_FALSE;
+
+  // take shortcut drawing if possible
+  if (ShortcutDrawPolygon && (this->*ShortcutDrawPolygon)(poly))
+  { return S_OK; }
 
   // For debugging: is we reach the maximum number of polygons to draw we simply stop.
   dbg_current_polygon++;
@@ -653,89 +645,6 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   tex->GetLightMap(&thelightmap);
 
   float sx,sy,sz, one_over_sz, u_over_sz, v_over_sz;
-#if USE_MULTITEXTURE
-  // if we support multiple textures, then it may be possible to combine
-  // the following two passes into a single pass with multitexuring.
-  if (thelightmap && (do_multitexture_level > 1) )
-  {
-    HighColorCache_Data *lightmapcache_data;
-    thelightmap->GetHighColorCache(&lightmapcache_data);
-    GLuint lightmaphandle = *( (GLuint *)(lightmapcache_data->pData) );
-
-    // Jorrit: this code was added to scale the lightmap.
-    // @@@ Note that many calculations in this routine are not very optimal
-    // to do here and should in fact be precalculated.
-    int lmwidth, lmrealwidth, lmheight, lmrealheight;
-    thelightmap->GetWidth (lmwidth);
-    thelightmap->GetRealWidth (lmrealwidth);
-    thelightmap->GetHeight (lmheight);
-    thelightmap->GetRealHeight (lmrealheight);
-    //float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
-    //float scale_v = (float)(lmrealheight-1) / (float)lmheight;
-    float scale_u = (float)(lmrealwidth) / (float)lmwidth;
-    float scale_v = (float)(lmrealheight) / (float)lmheight;
-
-    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
-    tex->GetTextureBox(lightmap_low_u,lightmap_low_v,
-                       lightmap_high_u,lightmap_high_v);
-
-    float lightmap_scale_u, lightmap_scale_v;
-
-    if (lightmap_high_u == lightmap_low_u)
-      lightmap_scale_u = scale_u;	// @@@ Is this right?
-    else
-      lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
-
-    if (lightmap_high_v == lightmap_low_v)
-      lightmap_scale_v = scale_v;	// @@@ Is this right?
-    else
-      lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
-
-    float light_u, light_v;
-
-    glActiveTextureARB(GL_TEXTURE0_ARB);
-    glBindTexture (GL_TEXTURE_2D, texturehandle);
-    glActiveTextureARB(GL_TEXTURE1_ARB);
-    glEnable (GL_TEXTURE_2D);
-    glBindTexture (GL_TEXTURE_2D, lightmaphandle);
-    glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    
-    glBegin(GL_TRIANGLE_FAN);
-    for (i=0; i<poly.num; i++)
-    {
-      sx = poly.vertices[i].sx - width2;
-      sy = poly.vertices[i].sy - height2;
-      one_over_sz = M*sx + N*sy + O;
-      sz = 1.0/one_over_sz;
-      u_over_sz = (J1 * sx + J2 * sy + J3);
-      v_over_sz = (K1 * sx + K2 * sy + K3);
-      light_u = (u_over_sz*sz - lightmap_low_u) * lightmap_scale_u;
-      light_v = (v_over_sz*sz - lightmap_low_v) * lightmap_scale_v;
-      // we must communicate the perspective correction (1/z) for textures
-      // by using homogenous coordinates in either texture space
-      // or in object (vertex) space.  We do it in texture space.
-
-      // modified to use homogenous object space coordinates instead
-      // of homogenous texture space coordinates
-      glMultiTexCoord2fARB (GL_TEXTURE0_ARB,u_over_sz*sz, v_over_sz*sz);
-      glMultiTexCoord2fARB (GL_TEXTURE1_ARB,light_u, light_v);
-      glVertex4f (poly.vertices[i].sx*sz, poly.vertices[i].sy*sz, -1.0, sz);
-    }
-    glEnd();
-
-    // we must disable the 2nd texture unit, so that other parts of the
-    // code won't accidently have a second texture applied if they
-    // don't want it.
-    // at this point our active texture is still TEXTURE1_ARB
-    glActiveTextureARB(GL_TEXTURE1_ARB);
-    glDisable (GL_TEXTURE_2D);
-    glActiveTextureARB(GL_TEXTURE0_ARB);
-
-    FINAL_RELEASE (thelightmap);
-  }
-  else
-  {
-#endif
 
   glBindTexture (GL_TEXTURE_2D, texturehandle);
   glBegin(GL_TRIANGLE_FAN);
@@ -854,11 +763,6 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
     FINAL_RELEASE (thelightmap);
   }
 
-#if USE_MULTITEXTURE
-  }
-  // end of 'if (thelightmap...)' in #ifdef section above
-#endif
-
   // An extra pass which improves the lighting on SRC*DST so that
   // it looks more like 2*SRC*DST.
   if (do_extra_bright)
@@ -890,8 +794,6 @@ STDMETHODIMP csGraphics3DOpenGL::DrawPolygon (G3DPolygonDP& poly)
   // If there is vertex fog then we apply that last.
   if (poly.use_fog)
   {
-/*    glDisable (GL_TEXTURE_2D);
-    glEnable (GL_TEXTURE_1D);*/
     glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
     glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
@@ -952,6 +854,11 @@ inline long round16 (long f)
 
 STDMETHODIMP csGraphics3DOpenGL::StartPolygonFX (ITextureHandle* handle, UInt mode)
 {
+
+  // try shortcut method if available
+  if (ShortcutStartPolygonFX && (this->*ShortcutStartPolygonFX)(handle, mode) ) 
+  { return S_OK; }
+
   m_gouraud = do_lighting && rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
   m_alpha = 1.0f - float (mode & CS_FX_MASK_ALPHA) / 255.;
@@ -1045,11 +952,19 @@ STDMETHODIMP csGraphics3DOpenGL::StartPolygonFX (ITextureHandle* handle, UInt mo
 
 STDMETHODIMP csGraphics3DOpenGL::FinishPolygonFX()
 {
+  // attempt shortcut method
+  if (ShortcutFinishPolygonFX && (this->*ShortcutFinishPolygonFX)())
+  { return S_OK; }
+
   return S_OK;
 }
 
 STDMETHODIMP csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
+  // take shortcut if possible
+  if (ShortcutDrawPolygonFX && (this->*ShortcutDrawPolygonFX)(poly))
+  { return S_OK; }
+
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
   {
@@ -1540,4 +1455,120 @@ int isExtensionSupported(const char *extension)
   }
   return 0;
 }
+
+/// Shortcut to override standard polygon drawing when we have multitexture
+bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
+{
+#if USE_MULTITEXTURE
+  IPolygonTexture*   tex     = poly.poly_texture[0];
+
+  // find lightmap information, if any
+  ILightMap *thelightmap = NULL;
+  tex->GetLightMap(&thelightmap);
+
+  // if we support multiple textures, then it may be possible to combine
+  // the following two passes into a single pass with multitexuring.
+  if (thelightmap && (do_multitexture_level > 1) )
+  {
+    HighColorCache_Data *lightmapcache_data;
+    thelightmap->GetHighColorCache(&lightmapcache_data);
+    GLuint lightmaphandle = *( (GLuint *)(lightmapcache_data->pData) );
+
+    // Jorrit: this code was added to scale the lightmap.
+    // @@@ Note that many calculations in this routine are not very optimal
+    // to do here and should in fact be precalculated.
+    int lmwidth, lmrealwidth, lmheight, lmrealheight;
+    thelightmap->GetWidth (lmwidth);
+    thelightmap->GetRealWidth (lmrealwidth);
+    thelightmap->GetHeight (lmheight);
+    thelightmap->GetRealHeight (lmrealheight);
+    //float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
+    //float scale_v = (float)(lmrealheight-1) / (float)lmheight;
+    float scale_u = (float)(lmrealwidth) / (float)lmwidth;
+    float scale_v = (float)(lmrealheight) / (float)lmheight;
+
+    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
+    tex->GetTextureBox(lightmap_low_u,lightmap_low_v,
+                       lightmap_high_u,lightmap_high_v);
+
+    float lightmap_scale_u, lightmap_scale_v;
+
+    if (lightmap_high_u == lightmap_low_u)
+      lightmap_scale_u = scale_u;	// @@@ Is this right?
+    else
+      lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u);
+
+    if (lightmap_high_v == lightmap_low_v)
+      lightmap_scale_v = scale_v;	// @@@ Is this right?
+    else
+      lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
+
+    float light_u, light_v;
+
+    glActiveTextureARB(GL_TEXTURE0_ARB);
+    glBindTexture (GL_TEXTURE_2D, texturehandle);
+    glActiveTextureARB(GL_TEXTURE1_ARB);
+    glEnable (GL_TEXTURE_2D);
+    glBindTexture (GL_TEXTURE_2D, lightmaphandle);
+    glTexEnvf  (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    
+    glBegin(GL_TRIANGLE_FAN);
+    for (i=0; i<poly.num; i++)
+    {
+      sx = poly.vertices[i].sx - width2;
+      sy = poly.vertices[i].sy - height2;
+      one_over_sz = M*sx + N*sy + O;
+      sz = 1.0/one_over_sz;
+      u_over_sz = (J1 * sx + J2 * sy + J3);
+      v_over_sz = (K1 * sx + K2 * sy + K3);
+      light_u = (u_over_sz*sz - lightmap_low_u) * lightmap_scale_u;
+      light_v = (v_over_sz*sz - lightmap_low_v) * lightmap_scale_v;
+      // we must communicate the perspective correction (1/z) for textures
+      // by using homogenous coordinates in either texture space
+      // or in object (vertex) space.  We do it in texture space.
+
+      // modified to use homogenous object space coordinates instead
+      // of homogenous texture space coordinates
+      glMultiTexCoord2fARB (GL_TEXTURE0_ARB,u_over_sz*sz, v_over_sz*sz);
+      glMultiTexCoord2fARB (GL_TEXTURE1_ARB,light_u, light_v);
+      glVertex4f (poly.vertices[i].sx*sz, poly.vertices[i].sy*sz, -1.0, sz);
+    }
+    glEnd();
+
+    // we must disable the 2nd texture unit, so that other parts of the
+    // code won't accidently have a second texture applied if they
+    // don't want it.
+    // at this point our active texture is still TEXTURE1_ARB
+    glActiveTextureARB(GL_TEXTURE1_ARB);
+    glDisable (GL_TEXTURE_2D);
+    glActiveTextureARB(GL_TEXTURE0_ARB);
+
+    FINAL_RELEASE (thelightmap);
+  }
+#endif
+  // not done yet
+  return false;
+}
+
+/// Shortcuts to replace the standard Start/Draw/Finish set of Draw...FX functions;
+/// this set collects up polygons and then draws them in batches, instead
+/// of drawing each individual poly with gl calls
+bool csGraphics3DOpenGL::BatchStartPolygonFX(ITextureHandle *handle, UInt mode)
+{
+  // not done yet
+  return false;
+}
+
+bool csGraphics3DOpenGL::BatchAccumulatePolygonFX(G3DPolygonDPFX &poly)
+{
+  // not done yet
+  return false;
+}
+
+bool csGraphics3DOpenGL::BatchFlushPolygonFX()
+{
+  // not done yet
+  return false;
+}
+
 

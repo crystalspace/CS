@@ -24,6 +24,7 @@
 
 // Concieved by Jorrit Tyberghein and Gary Clark
 // Expanded by Dan Ogles
+// Further expanded by Gary Haussmann
 
 #include <GL/gl.h>
 
@@ -49,6 +50,59 @@ private:
   // to SetRasterCaps and the call to the polygon
   // drawing routine
   void SetGLZBufferFlags();
+
+  /// handle of a local 1D alpha-blend texture; this texture holds an
+  /// exponential alpha curve from 0 to 1.  Using this texture, you
+  /// can convert from a linear texture coordinate of 0-1 to an
+  /// exponential alpha-blend curve.  Such a mapping is useful for
+  /// drawing exponential fog polygons.  A value of 0 means the handle
+  /// is unallocated
+  GLuint m_fogtexturehandle;
+
+  /// Pointer to a member function that tries to draw the polygon in a quick
+  /// optimized manner.  If this function succeeds in drawing the polygon,
+  /// it should return true thus bypassing the normal polygon drawing code
+  /// altogether.  If the function cannot draw the polygon for whatever
+  /// reason (typically it is because the polygon has certain layers or
+  /// attributes that cannot be drawn in an optimized manner) the function
+  /// should return false, meaning that the default generalized polygon
+  /// drawing code should draw the polygon instead.
+  bool (csGraphics3DOpenGL::*ShortcutDrawPolygon)(G3DPolygonDP &poly);
+
+  /// This shortcut routine gets called by
+  /// StartPolygonFX before normal FX setup occurs.  If the shortcut routine
+  /// determines that it can draw the upcoming series of polygons in an
+  /// optimized manner, it should set up properly and return true.  If it
+  /// cannot, it should return false and let the standard DrawPolygonFX
+  /// perform setup.  In any case, the value returned by the StartPolygonFX
+  /// must be matched in subsequent calls to DrawPolygonFX; that is, if
+  /// a StartPolygonFX call returns 'true', then calls to DrawPolygonFX and
+  /// FinishPolygonFX must also return 'true' until the next time StartPolygonFX
+  /// is called.
+  bool (csGraphics3DOpenGL::*ShortcutStartPolygonFX)(ITextureHandle *handle,UInt mode);
+
+  /// Shortcut tried before executing standard DrawPolygonFX code.  The
+  /// value returned by this must match the most recent return value of
+  /// ShortcutStartPolygonFX(); see comments for that member.
+  bool (csGraphics3DOpenGL::*ShortcutDrawPolygonFX)(G3DPolygonDPFX &poly);
+
+  /// Shortcut tried before executing standard FinishPolygonFX code.
+  /// The value returned by this must match the most recent return value of
+  /// ShortcutStartPolygonFX(); see comments for that member.
+  bool (csGraphics3DOpenGL::*ShortcutFinishPolygonFX)();
+
+  // Some common shortcut functions that may or may not apply, depending
+  // on the underlying hardware
+
+  /// Shortcut to Override standard polygon drawing when we have multitexture
+  bool MultitextureDrawPolygon(G3DPolygonDP &poly);
+
+  /// Shortcuts to replace the standard Start/Draw/Finish set of Draw...FX functions;
+  /// this set collects up polygons and then draws them in batches, instead
+  /// of drawing each individual poly with gl calls
+  bool BatchStartPolygonFX(ITextureHandle *handle, UInt mode);
+  bool BatchAccumulatePolygonFX(G3DPolygonDPFX &poly);
+  bool BatchFlushPolygonFX();
 
 protected:
   /// Z Buffer mode to use while rendering next polygon.
@@ -97,14 +151,6 @@ protected:
    * At least it seems to do this on a RIVA 128.
    */
   bool do_extra_bright;
-
-  /// handle of a local 1D alpha-blend texture; this texture holds an
-  /// exponential alpha curve from 0 to 1.  Using this texture, you
-  /// can convert from a linear texture coordinate of 0-1 to an
-  /// exponential alpha-blend curve.  Such a mapping is useful for
-  /// drawing exponential fog polygons.  A value of 0 means the handle
-  /// is unallocated
-  GLuint m_fogtexturehandle;
 
   /// For debugging: the maximum number of polygons to draw in a frame.
   long dbg_max_polygons_to_draw;
