@@ -97,6 +97,12 @@ public:
 
   /// Lookup the value of a rect key by id (from the skin def)
   virtual bool LookupRectKey(unsigned long id, csRect &rect)=0; 
+  
+  /// Lookup the value of an RGB key by name (from the skin def)
+  virtual bool LookupRGBKey(char *name, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
+    
+  /// Lookup the value of an RGB key by name (from the skin def)
+  virtual bool LookupRGBKey(unsigned long id, unsigned char &red, unsigned char &green, unsigned char &blue)=0;
 
   /// Get the an integer from a given component node
   virtual bool GetInt(awsComponentNode *node, char *name, int &val)=0;
