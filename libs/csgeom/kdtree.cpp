@@ -625,12 +625,27 @@ void csKDTree::Flatten ()
   return;
 }
 
-bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+void csKDTree::TraverseRandom (csKDTreeVisitFunc* func,
   	void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
 {
   CS_ASSERT (this != 0);
   if (!func (this, userdata, cur_timestamp, frustum_mask))
-    return false;
+    return;
+  if (child1)
+  {
+    // There are children.
+    child1->TraverseRandom (func, userdata, cur_timestamp, frustum_mask);
+    CS_ASSERT (child2 != 0);
+    child2->TraverseRandom (func, userdata, cur_timestamp, frustum_mask);
+  }
+}
+
+void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask)
+{
+  CS_ASSERT (this != 0);
+  if (!func (this, userdata, cur_timestamp, frustum_mask))
+    return;
   if (child1)
   {
     // There are children.
@@ -647,7 +662,6 @@ bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
       child1->Front2Back (pos, func, userdata, cur_timestamp, frustum_mask);
     }
   }
-  return true;
 }
 
 void csKDTree::ResetTimestamps ()
@@ -662,8 +676,7 @@ void csKDTree::ResetTimestamps ()
   }
 }
 
-void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
-  	void* userdata, uint32 frustum_mask)
+uint32 csKDTree::NewTraversal ()
 {
   if (global_timestamp > 4000000000u)
   {
@@ -678,6 +691,20 @@ void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
   {
     global_timestamp++;
   }
+  return global_timestamp;
+}
+
+void csKDTree::TraverseRandom (csKDTreeVisitFunc* func,
+  	void* userdata, uint32 frustum_mask)
+{
+  NewTraversal ();
+  TraverseRandom (func, userdata, global_timestamp, frustum_mask);
+}
+
+void csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  	void* userdata, uint32 frustum_mask)
+{
+  NewTraversal ();
   Front2Back (pos, func, userdata, global_timestamp, frustum_mask);
 }
 

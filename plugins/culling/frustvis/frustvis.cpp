@@ -332,7 +332,6 @@ struct FrustTest_Front2BackData
 {
   csVector3 pos;
   iRenderView* rview;
-  csFrustumVis* frustvis;
 
   // During VisTest() we use the current frustum as five planes.
   // Associated with this frustum we also have a clip mask which
@@ -418,17 +417,15 @@ static void CallVisibilityCallbacksForSubtree (csKDTree* treenode,
 
 }
 
-static bool FrustTest_Front2Back (csKDTree* treenode, void* userdata,
-	uint32 cur_timestamp, uint32& frustum_mask)
+void csFrustumVis::FrustTest_Traverse (csKDTree* treenode,
+	FrustTest_Front2BackData* data,
+	uint32 cur_timestamp, uint32 frustum_mask)
 {
-  FrustTest_Front2BackData* data = (FrustTest_Front2BackData*)userdata;
-  csFrustumVis* frustvis = data->frustvis;
-
   // In the first part of this test we are going to test if the node
   // itself is visible. If it is not then we don't need to continue.
-  int nodevis = frustvis->TestNodeVisibility (treenode, data, frustum_mask);
+  int nodevis = TestNodeVisibility (treenode, data, frustum_mask);
   if (nodevis == NODE_INVISIBLE)
-    return false;
+    return;
 
   if (nodevis == NODE_VISIBLE && frustum_mask == 0)
   {
@@ -439,7 +436,7 @@ static bool FrustTest_Front2Back (csKDTree* treenode, void* userdata,
     // tree manually from this point on. To stop the Front2Back traversal
     // we return false here.
     CallVisibilityCallbacksForSubtree (treenode, data, cur_timestamp);
-    return false;
+    return;
   }
 
   treenode->Distribute ();
@@ -456,11 +453,16 @@ static bool FrustTest_Front2Back (csKDTree* treenode, void* userdata,
       objects[i]->timestamp = cur_timestamp;
       csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
       	objects[i]->GetObject ();
-      frustvis->TestObjectVisibility (visobj_wrap, data, frustum_mask);
+      TestObjectVisibility (visobj_wrap, data, frustum_mask);
     }
   }
 
-  return true;
+  csKDTree* child1 = treenode->GetChild1 ();
+  if (child1) FrustTest_Traverse (child1, data, cur_timestamp, frustum_mask);
+  csKDTree* child2 = treenode->GetChild2 ();
+  if (child2) FrustTest_Traverse (child2, data, cur_timestamp, frustum_mask);
+
+  return;
 }
 
 bool csFrustumVis::VisTest (iRenderView* rview, 
@@ -496,10 +498,8 @@ bool csFrustumVis::VisTest (iRenderView* rview,
   // visible that are visible.
   data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
   data.rview = rview;
-  data.frustvis = this;
   data.viscallback = viscallback;
-  kdtree->Front2Back (data.pos, FrustTest_Front2Back, (void*)&data,
-  	frustum_mask);
+  FrustTest_Traverse (kdtree, &data, kdtree->NewTraversal (), frustum_mask);
 
   return true;
 }
@@ -600,7 +600,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
   data.viscallback = 0;
   uint32 frustum_mask = (1 << num_planes)-1;
 
-  kdtree->Front2Back (csVector3 (0, 0, 0), FrustTestPlanes_Front2Back,
+  kdtree->TraverseRandom (FrustTestPlanes_Front2Back,
   	(void*)&data, frustum_mask);
 
   csFrustVisObjIt* vobjit = new csFrustVisObjIt (v,
@@ -620,7 +620,7 @@ void csFrustumVis::VisTest (csPlane3* planes,
   data.viscallback = viscallback;
   uint32 frustum_mask = (1 << num_planes)-1;
 
-  kdtree->Front2Back (csVector3 (0, 0, 0), FrustTestPlanes_Front2Back,
+  kdtree->TraverseRandom (FrustTestPlanes_Front2Back,
   	(void*)&data, frustum_mask);
 }
 

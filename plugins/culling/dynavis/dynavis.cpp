@@ -1804,7 +1804,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
   data.viscallback = 0;
   uint32 frustum_mask = (1 << num_planes)-1;
 
-  kdtree->Front2Back (csVector3 (0, 0, 0), VisTestPlanes_Front2Back,
+  kdtree->TraverseRandom (VisTestPlanes_Front2Back,
   	(void*)&data, frustum_mask);
 
   csDynVisObjIt* vobjit = new csDynVisObjIt (v,
@@ -1824,7 +1824,7 @@ void csDynaVis::VisTest (csPlane3* planes, int num_planes,
   data.viscallback = viscallback;
   uint32 frustum_mask = (1 << num_planes)-1;
 
-  kdtree->Front2Back (csVector3 (0, 0, 0), VisTestPlanes_Front2Back,
+  kdtree->TraverseRandom (VisTestPlanes_Front2Back,
   	(void*)&data, frustum_mask);
 }
 

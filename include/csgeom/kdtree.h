@@ -206,7 +206,16 @@ private:
    * The mask parameter is optionally used for frustum checking.
    * Front2Back will pass it to the tree nodes.
    */
-  bool Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  void Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
+  	void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
+
+  /**
+   * Traverse the tree from front to back. Every node of the
+   * tree will be encountered. Returns false if traversal should stop.
+   * The mask parameter is optionally used for frustum checking.
+   * Front2Back will pass it to the tree nodes.
+   */
+  void TraverseRandom (csKDTreeVisitFunc* func,
   	void* userdata, uint32 cur_timestamp, uint32 frustum_mask);
 
   /**
@@ -289,6 +298,14 @@ public:
   void Flatten ();
 
   /**
+   * Traverse the tree in random order.
+   * The mask parameter is optionally used for frustum checking.
+   * TraverseRandom will pass it to the tree nodes.
+   */
+  void TraverseRandom (csKDTreeVisitFunc* func,
+  	void* userdata, uint32 frustum_mask);
+
+  /**
    * Traverse the tree from front to back. Every node of the
    * tree will be encountered.
    * The mask parameter is optionally used for frustum checking.
@@ -296,6 +313,15 @@ public:
    */
   void Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
   	void* userdata, uint32 frustum_mask);
+
+  /**
+   * Start a new traversal. This will basically make a new
+   * timestamp and return it. You can then use that timestamp
+   * to check if objects have been visited already. This function
+   * is automatically called by Front2Back() but it can be useful
+   * to call this if you plan to do a manual traversal of the tree.
+   */
+  uint32 NewTraversal ();
 
   /**
    * Get child one.

@@ -116,6 +116,11 @@ private:
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
+  // Traverse the kdtree for frustum culling.
+  void FrustTest_Traverse (csKDTree* treenode,
+	FrustTest_Front2BackData* data,
+	uint32 cur_timestamp, uint32 frustum_mask);
+
 public:
   SCF_DECLARE_IBASE;
 
