@@ -98,7 +98,7 @@ Here is a simple example showing the module in use.
 @example
 #include "inetwork/driver2.h"
 #include "inetwork/socket2.h"
-#include "inetwork/socketerr.h"
+#include "inetwork/sockerr.h"
 
 iNetworkDriver2* netdriver = NULL;
 iSocketDriver2*  client = NULL;

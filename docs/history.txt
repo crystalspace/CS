@@ -16,6 +16,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed bug in texi2html reported by Vincent K.
 	  <vince@iefr.ath.cx> which caused language translation of "reserved
 	  words" to fail.
+	- Eric Sunshine fixed typographical error in ensocket.txi pointed out
+	  by Adrien Constant <adrien@gamerinstinct.com>.
 18-Mar-2003
 	- Added two entries to the faq about scaled objects.
 	- Some Doxygen improvements on iMovable and iMeshWrapper.
