@@ -1800,8 +1800,12 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 
   min_i = max_i = min_z_i = 0;
   min_y = max_y = poly.vertices[0].sy;
-  min_z = M * (poly.vertices[0].sx - width2)
-        + N * (poly.vertices[0].sy - height2) + O;
+
+  float t = (M == 0.f ? N : N/M);
+  bool M_neg = (M<0.f);
+  bool M_zero = (M == 0.f);
+  min_z = (M_zero ? 0 : poly.vertices[0].sx) + t*poly.vertices[0].sy;
+
   // count 'real' number of vertices
   int num_vertices = 1;
   for (i = 1 ; i < poly.num ; i++)
@@ -1820,9 +1824,9 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
       min_y = poly.vertices[i].sy;
       min_i = i;
     }
-    float inv_z = M * (poly.vertices[i].sx - width2)
-                + N * (poly.vertices[i].sy - height2) + O;
-    if (inv_z > min_z)
+    float inv_z = (M_zero ? 0 : poly.vertices[i].sx) + t*poly.vertices[i].sy;
+
+    if ((inv_z > min_z) ^ M_neg)
     {
       min_z = inv_z;
       min_z_i = i;
@@ -1838,6 +1842,9 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   if (((min_y + EPSILON) < 0) ||
       ((max_y - EPSILON) > height))
     return;
+
+  min_z = M * (poly.vertices[min_z_i].sx - width2)
+        + N * (poly.vertices[min_z_i].sy - height2) + O;
 
   // if this is a 'degenerate' polygon, skip it.
   if (num_vertices < 3)
