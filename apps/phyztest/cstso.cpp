@@ -103,16 +103,15 @@ void csRigidSpaceTimeObj::evolve_system( real t1, real t2, ctWorld *time_world, 
 
 void csRigidSpaceTimeObj::update_space()
 {
-ctVector3 px;
+ctVector3 new_p;
 csMatrix3 m; 
 ctMatrix3 M;
 csRigidSpaceTimeObj *sto;
 
   for( int i = 0; i < continuum_end; i++ ){
     sto = space_time_continuum[i];
-    px = sto->rb->get_pos();
+    new_p = sto->rb->get_pos();
 
-    csVector3 new_p( px[0], px[1], px[2] );   
     sto->sprt->SetMove ( new_p );
 
     M = sto->rb->get_R();   // get orientation for this link
@@ -134,7 +133,6 @@ ctMatrix3 M;
 csMatrix3 m;
 csVector3 n;
 csVector3 x;
-ctVector3 X;
 csVector3 trime;
 CDTriangle *wall;
 CDTriangle *htri;
@@ -162,8 +160,7 @@ collision_pair *CD_contact = NULL;
                M[1][0], M[1][1], M[1][2],
                M[2][0], M[2][1], M[2][2]);    // orientation of sprite
 //    hits += CollisionDetect (col, first_sector, &m);
-    X = space_time_continuum[i]->rb->get_pos();
-    x.x = X[0]; x.y = X[1]; x.z = X[2];
+    x = space_time_continuum[i]->rb->get_pos();
     // this IS a transformaition from other to this space.
     tfm.SetO2T( m );
     // NOT a traslation from other space to this space.  Actually opposite.
@@ -200,8 +197,7 @@ collision_pair *CD_contact = NULL;
         wall = CD_contact[acol].tr2;
         n = ((wall->p2-wall->p1)%(wall->p3-wall->p2)).Unit();
       //  CsPrintf( MSG_DEBUG_1, "n %f, %f, %f\n", n.x, n.y, n.z );
-        this_contact->n =
-          ctVector3(n.x, n.y, n.z );
+        this_contact->n = n;
 
       // just one collision at a time here.
 //      this_contact->next = NULL;
@@ -231,8 +227,7 @@ collision_pair *CD_contact = NULL;
           }
          
           if( current_depth > 0.0 ){
-            this_contact->contact_p = 
-              ctVector3( trime.x, trime.y, trime.z );
+            this_contact->contact_p = trime;
         
             ctCollidingContact *chk = space_time_continuum[i]->contact;
             bool duplicate = false;

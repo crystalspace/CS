@@ -262,7 +262,6 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
   int i;
   csMatrix3 m; 
   ctMatrix3 M;
-  ctVector3 px;
 
   superclass::NextFrame (elapsed_time, current_time);
 
@@ -383,11 +382,7 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
 
   // if we have a spring and mass demo started
   if( bot ){
-    // note: ctVector3 and csVector3 are not directly compatable yet
-    px = rb_bot->get_pos();
-
-    csVector3 new_p( px[0], px[1], px[2] );   
-//    bot->SetMove ( new_p );
+    csVector3 new_p = rb_bot->get_pos();
     csLight* lights[2];
     int num_lights = world->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     bot->UpdateLighting (lights, num_lights);  
@@ -405,8 +400,7 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
     for( i = 0; i < NUM_LINKS; i++ ){
       if( chain[i] != NULL ){
         //  get the position of this link
-        px = chain[i]->rb->get_pos();
-        new_p.x = px[0]; new_p.y = px[1]; new_p.z = px[2];   
+        new_p = chain[i]->rb->get_pos();
         chain[i]->sprt->SetMove ( new_p );
         M = chain[i]->rb->get_R();   // get orientation for this link
         // ctMatrix3 and csMatrix3 not directly compatable yet
