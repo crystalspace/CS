@@ -133,7 +133,7 @@ void csIsoLight::CalcVis()
   for(int y = ymin; y<=ymax; y++)
   {
     // set pos to the start of the x line
-    // set it to the center of that square
+    // set it to the topleft from center of that square
     pos.Set(
       float(y+mingridy*multy)/float(multy),
       0.,
@@ -232,6 +232,8 @@ void csIsoLight::ShineSprite(iIsoSprite *sprite)
     int x = QInt(vpos.z * float(multx)) + sprx;
     int y = QInt(vpos.x * float(multy)) + spry;
     float vis = GetVis(x,y);
+    vis += GetVis(x-1,y) + GetVis(x,y-1) + GetVis(x+1,y) + GetVis(x,y+1);
+    vis *= 0.2;
     if(vis==0.0) continue;
     csVector3 path = vpos - relpos;
     float dist = path.Norm();
