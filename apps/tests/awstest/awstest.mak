@@ -5,7 +5,7 @@ DESCRIPTION.awstest = Alternate Windowing System test
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP+=$(NEWLINE)echo $"  make awstest       Make the $(DESCRIPTION.awstest)$"
+APPHELP+=$(NEWLINE)echo $"  make awstest      Make the $(DESCRIPTION.awstest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
