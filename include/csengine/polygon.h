@@ -444,7 +444,7 @@ public:
  * the texture is filtered in which case it is drawn on top of the other
  * sector.
  */
-class csPolygon3D : public csPolygonInt, public iBase, public csObject
+class csPolygon3D : public csPolygonInt, public csObject
 // NOTE: DO NOT MOVE csPolygonInt FROM FIRST PLACE! THERE ARE LOTS OF PLACES
 // WHERE CODE BLATANTLY SWITCHES BETWEEN csPolygon3D AND csPolygonInt TYPES
 // WITHOUT GIVING TO THE C++ COMPILER EVEN A CHANCE TO ADJUST THE POINTER!!!
@@ -1232,7 +1232,7 @@ public:
   { txt_share_list = next; }
 
   CSOBJTYPE;
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csObject);
 
   //------------------- iPolygon3D interface implementation -------------------
 

@@ -36,6 +36,7 @@
 #include "igraph3d.h"
 #include "iparticl.h"
 #include "ipolmesh.h"
+#include "isprite.h"
 
 class Dumper;
 class csMaterialList;
@@ -142,7 +143,7 @@ private:
  * This class represents a template from which a csSprite3D
  * class can be made.
  */
-class csSpriteTemplate : public csObject
+class csSpriteTemplate : public csObject, public iSpriteTemplate
 {
   friend class Dumper;
 
@@ -346,6 +347,7 @@ public:
   void MergeNormals ();
 
   CSOBJTYPE;
+  DECLARE_IBASE;
 };
 
 /// A callback function for csSprite3D::Draw().
@@ -356,7 +358,7 @@ typedef void (csSpriteCallback2) (csSprite3D* spr, csRenderView* rview, csObject
 /**
  * The base class for all types of sprites.
  */
-class csSprite : public csObject, public iBase
+class csSprite : public csObject
 {
   friend class Dumper;
   friend class csMovable;
@@ -586,6 +588,9 @@ public:
   /// Rotate sprite in some manner (as defined by subclass), in radians.
   virtual void Rotate (float angle) = 0;
 
+  CSOBJTYPE;
+  DECLARE_IBASE_EXT (csObject);
+
   //------------------------- iParticle implementation -----------------------//
   struct Particle : public iParticle
   {
@@ -602,8 +607,18 @@ public:
     virtual void UpdateLighting(csLight**, int num_lights);
     virtual void DeferUpdateLighting(int flags, int num_lights);
   } scfiParticle;
-  DECLARE_IBASE;
-  CSOBJTYPE;
+
+  //------------------------- iSprite implementation -----------------------//
+  struct Sprite : public iSprite
+  {
+    DECLARE_EMBEDDED_IBASE (csSprite);
+    /// Used by the engine to retrieve internal sprite object (ugly)
+    virtual csSprite *GetPrivateObject ()
+    { return scfParent; }
+
+    virtual iMovable* GetMovable ()
+    { return &scfParent->GetMovable ().scfiMovable; }
+  } scfiSprite;
 };
 
 /**

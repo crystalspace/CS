@@ -1401,8 +1401,9 @@ csStatLight* csEngine::FindLight (CS_ID id)
   return NULL;
 }
 
-csStatLight* csEngine::FindLight (const char* name)
+csStatLight* csEngine::FindLight (const char* name, bool regionOnly)
 {
+  //@@@### regionOnly
   csStatLight* l;
   int sn = sectors.Length ();
   while (sn > 0)
@@ -1937,27 +1938,94 @@ iSector *csEngine::GetSector (int iIndex)
   return &((csSector *)sectors.Get (iIndex))->scfiSector;
 }
 
-iSector *csEngine::FindSector (const char *iName)
+iSector *csEngine::FindSector (const char *iName, bool regionOnly)
 {
-  csSector *sec = (csSector *)sectors.FindByName (iName);
-  return sec ? &sec->scfiSector : NULL;
+  if (regionOnly && region)
+  {
+    return region->FindSector (iName);
+  }
+  else
+  {
+    csSector *sec = (csSector *)sectors.FindByName (iName);
+    return sec ? &sec->scfiSector : NULL;
+  }
 }
 
-iThing *csEngine::FindThing (const char *iName)
+iThing *csEngine::FindThing (const char *iName, bool regionOnly)
 {
-  csThing* thing = (csThing*)things.FindByName (iName);
-  return thing ? &thing->scfiThing : NULL;
+  if (regionOnly && region)
+  {
+    return region->FindThing (iName);
+  }
+  else
+  {
+    csThing* thing = (csThing*)things.FindByName (iName);
+    return thing ? &thing->scfiThing : NULL;
+  }
 }
 
-iSprite *csEngine::FindSprite (const char *iName)
+iThing *csEngine::FindSky (const char *iName, bool regionOnly)
 {
-  (void)iName;
-  return NULL; /*not implemented yet*/
+  if (regionOnly && region)
+  {
+    return region->FindSky (iName);
+  }
+  else
+  {
+    csThing* thing = (csThing*)skies.FindByName (iName);
+    return thing ? &thing->scfiThing : NULL;
+  }
 }
 
-iMaterialWrapper* csEngine::FindMaterial (const char* iName)
+iThing *csEngine::FindThingTemplate (const char *iName, bool regionOnly)
 {
-  return (iMaterialWrapper*)materials->FindByName (iName);
+  if (regionOnly && region)
+  {
+    return region->FindThingTemplate (iName);
+  }
+  else
+  {
+    csThing* thing = (csThing*)thing_templates.FindByName (iName);
+    return thing ? &thing->scfiThing : NULL;
+  }
+}
+
+iSprite *csEngine::FindSprite (const char *iName, bool regionOnly)
+{
+  if (regionOnly && region)
+  {
+    return region->FindSprite (iName);
+  }
+  else
+  {
+    csSprite* sprite = (csSprite*)sprites.FindByName (iName);
+    return sprite ? &sprite->scfiSprite : NULL;
+  }
+}
+
+iSpriteTemplate *csEngine::FindSpriteTemplate (const char *iName, bool regionOnly)
+{
+  if (regionOnly && region)
+  {
+    return region->FindSpriteTemplate (iName);
+  }
+  else
+  {
+    csSpriteTemplate* sprite = (csSpriteTemplate*)sprite_templates.FindByName (iName);
+    return (iSpriteTemplate*)sprite;
+  }
+}
+
+iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
+{
+  if (regionOnly && region)
+  {
+    return region->FindMaterial (iName);
+  }
+  else
+  {
+    return (iMaterialWrapper*)materials->FindByName (iName);
+  }
 }
 
 //----------------Begin-Multi-Context-Support------------------------------

@@ -2867,6 +2867,8 @@ bool Blocks::InitNet()
 void Blocks::Connect ()
 {
   const char target[] = "localhost:2222";
+  Connection = NULL;
+  if (!Sys->NetDrv) return;
   Sys->Printf(MSG_INITIALIZATION, "Attempting connection to %s...", target);
   Connection = Sys->NetDrv->NewConnection(target, true, false);
   if (Connection == NULL)

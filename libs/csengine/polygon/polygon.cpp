@@ -189,8 +189,7 @@ void csPolyTexGouraud::SetDynamicColor (int i, float r, float g, float b)
 
 IMPLEMENT_CSOBJTYPE (csPolygon3D,csObject);
 
-IMPLEMENT_IBASE (csPolygon3D)
-  IMPLEMENTS_INTERFACE (iBase)
+IMPLEMENT_IBASE_EXT (csPolygon3D)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygon3D)
 IMPLEMENT_IBASE_END
 
@@ -201,7 +200,6 @@ IMPLEMENT_EMBEDDED_IBASE_END
 csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
   csObject (), vertices (4)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
 
   if (material) SetMaterial (material);
@@ -234,9 +232,8 @@ csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
-  iBase (), csObject (), vertices (4)
+  csObject (), vertices (4)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
 
   const char* tname = poly.GetName ();

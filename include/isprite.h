@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,33 +16,38 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ITHING_H__
-#define __ITHING_H__
+#ifndef __ISPRITE_H__
+#define __ISPRITE_H__
 
 #include "csutil/scf.h"
 
-class csVector3;
-class csMatrix3;
-class csThing;
-struct iSector;
+class csSprite;
+class csSpriteTemplate;
 struct iMovable;
 
-SCF_VERSION (iThing, 0, 0, 2);
+SCF_VERSION (iSprite, 0, 0, 1);
 
 /**
- * This is the generalized interface to Things.<p>
- * A thing is a 3D model, in most cases non-moveable, which is mostly used
- * for details. That is, iSector objects outlines the basic bounds of the
- * room (e.g. walls) and iThing's are the inside details (tables, columns,
- * paintings and so on).
+ * This is the generalized interface to iSprites.<p>
+ * A sprite is a (movable) 3D model.
  */
-struct iThing : public iBase
+struct iSprite : public iBase
 {
-  /// Used by the engine to retrieve internal thing object (ugly)
-  virtual csThing *GetPrivateObject () = 0;
+  /// Used by the engine to retrieve internal sprite object (ugly)
+  virtual csSprite *GetPrivateObject () = 0;
 
-  /// Get the movable for this thing.
+  /// Get the movable for this sprite.
   virtual iMovable* GetMovable () = 0;
 };
 
+SCF_VERSION (iSpriteTemplate, 0, 0, 1);
+
+/**
+ * A sprite template.
+ */
+struct iSpriteTemplate : public iBase
+{
+};
+
 #endif
+

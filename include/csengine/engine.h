@@ -62,6 +62,8 @@ struct iSystem;
 struct iVFS;
 struct iMaterialWrapper;
 struct iRegion;
+struct iSprite;
+struct iSpriteTemplate;
 
 
 /**
@@ -948,7 +950,7 @@ public:
   /**
    * Find the light with the given name.
    */
-  csStatLight* FindLight (const char* name);
+  csStatLight* FindLight (const char* name, bool regionOnly = false);
 
   /**
    * Advance the frames of all sprites given the current time.
@@ -1111,15 +1113,21 @@ public:
   /// Get a sector by index
   virtual iSector *GetSector (int iIndex);
   /// Find a sector by name
-  virtual iSector *FindSector (const char *iName);
+  virtual iSector *FindSector (const char *iName, bool regionOnly = false);
 
   /// Find a thing by name
-  virtual iThing *FindThing (const char *iName);
+  virtual iThing *FindThing (const char *iName, bool regionOnly = false);
+  /// Find a sky thing by name
+  virtual iThing *FindSky (const char *iName, bool regionOnly = false);
+  /// Find a thing template by name
+  virtual iThing *FindThingTemplate (const char *iName, bool regionOnly = false);
   /// Find a sprite by name
-  virtual iSprite *FindSprite (const char *iName);
+  virtual iSprite *FindSprite (const char *iName, bool regionOnly = false);
+  /// Find a sprite template by name
+  virtual iSpriteTemplate *FindSpriteTemplate (const char *iName, bool regionOnly = false);
 
   /// Find a loaded material by name.
-  virtual iMaterialWrapper* FindMaterial (const char* iName);
+  virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false);
 
   //--------------------- iConfig interface implementation --------------------
 

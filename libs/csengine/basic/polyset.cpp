@@ -45,8 +45,7 @@
 
 IMPLEMENT_CSOBJTYPE (csPolygonSet,csObject);
 
-IMPLEMENT_IBASE (csPolygonSet)
-  IMPLEMENTS_INTERFACE (iBase)
+IMPLEMENT_IBASE_EXT (csPolygonSet)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonSet)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
 IMPLEMENT_IBASE_END
@@ -64,7 +63,6 @@ long csPolygonSet::current_light_frame_number = 0;
 csPolygonSet::csPolygonSet (csEngine* engine) : csObject(),
   polygons (64, 64), curves (16, 16)
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonSet);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   max_vertices = num_vertices = 0;

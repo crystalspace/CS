@@ -31,10 +31,11 @@ class csColor;
 struct iSector;
 struct iThing;
 struct iSprite;
+struct iSpriteTemplate;
 struct iMaterialWrapper;
 struct iRegion;
 
-SCF_VERSION (iEngine, 0, 1, 2);
+SCF_VERSION (iEngine, 0, 1, 3);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -98,12 +99,18 @@ struct iEngine : public iPlugIn
   /// Get a sector by index
   virtual iSector *GetSector (int iIndex) = 0;
   /// Find a sector by name
-  virtual iSector *FindSector (const char *iName) = 0;
+  virtual iSector *FindSector (const char *iName, bool regionOnly = false) = 0;
 
   /// Find a thing by name
-  virtual iThing *FindThing (const char *iName) = 0;
+  virtual iThing *FindThing (const char *iName, bool regionOnly = false) = 0;
+  /// Find a sky thing by name
+  virtual iThing *FindSky (const char *iName, bool regionOnly = false) = 0;
+  /// Find a thing template by name
+  virtual iThing *FindThingTemplate (const char *iName, bool regionOnly = false) = 0;
   /// Find a sprite by name
-  virtual iSprite *FindSprite (const char *iName) = 0;
+  virtual iSprite *FindSprite (const char *iName, bool regionOnly = false) = 0;
+  /// Find a sprite template by name
+  virtual iSpriteTemplate *FindSpriteTemplate (const char *iName, bool regionOnly = false) = 0;
 
   /// Enable/disable the lighting cache.
   virtual void EnableLightingCache (bool do_cache) = 0;
@@ -111,7 +118,7 @@ struct iEngine : public iPlugIn
   virtual bool IsLightingCacheEnabled () = 0;
 
   /// Find a loaded material.
-  virtual iMaterialWrapper* FindMaterial (const char* iName) = 0;
+  virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false) = 0;
 };
 
 #endif // __IENGINE_H__

@@ -154,7 +154,7 @@ public:
  * A limb in a skeletal system (state version, see csSkeletonState for
  * more information).
  */
-class csSkeletonLimbState : public csObject, public iBase
+class csSkeletonLimbState : public csObject
 {
   friend class csSkeletonLimb;
 
@@ -207,7 +207,7 @@ public:
   csSkeletonLimbState* GetNext () { return next; }
 
   CSOBJTYPE;
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csObject);
 };
 
 /**

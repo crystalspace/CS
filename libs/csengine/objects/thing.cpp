@@ -49,7 +49,7 @@ IMPLEMENT_EMBEDDED_IBASE (csThing::eiThing)
   IMPLEMENTS_INTERFACE (iThing)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csThing::csThing (csEngine* engine, bool is_sky) :
+csThing::csThing (csEngine* engine, bool is_sky, bool is_template) :
 	csPolygonSet (engine), tree_bbox (NULL), movable ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiThing);
@@ -58,6 +58,7 @@ csThing::csThing (csEngine* engine, bool is_sky) :
   ParentTemplate = NULL;
   tree_bbox.SetOwner (this);
   csThing::is_sky = is_sky;
+  csThing::is_template = is_template;
   movable.SetObject (this);
   engine->AddToCurrentRegion (this);
 }

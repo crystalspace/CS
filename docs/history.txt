@@ -1,5 +1,44 @@
 The history order has been reversed so that new features are at the top.
 
+9-Dec-2000
+	- Added 'regionOnly' parameter to all 'FindXxx()' methods in
+	  csEngine and iEngine. When this parameter is 'true' (default is
+	  'false') only objects in the current region will be searched.
+	- Added 'FindSky' to csEngine and iEngine.
+	- Added all the 'FindXxx()' methods to csRegion and iRegion as well.
+	- In addition added a general 'FindObject()' method to csRegion with
+	  which you can find any object of a given name and type.
+	- Added csThing::IsSky() which returns true if the thing is a sky
+	  object.
+	- Added optional is_template parameter to the constructor of csThing.
+	  This is just to mark a thing as being a template. Usually this
+	  should be set to true if the thing is pushed on the template list
+	  in the engine. Also added IsTemplate() function to csThing to
+	  query the status of this flag. Modified csLoader to correctly
+	  set this flag in the constructor.
+	- Added 'FindThingTemplate()' to csEngine, iEngine, csRegion, and
+	  iRegion.
+	- Added iSprite and iSpriteTemplate SCF classes and let csSprite
+	  and csSpriteTemplate implement them. csSprite implements iSprite
+	  through embedding (similar to how csThing implements iThing).
+	  csSpriteTemplate implements iSpriteTemplate with (multiple)
+	  inheritance.
+	- Because iSprite is now implemented it is possible to actually
+	  implement csRegion and csEngine::FindSprite. In addition because
+	  iSpriteTemplate now exists I also added csRegion and csEngine::
+	  FindSpriteTemplate. Also added to iRegion and iEngine.
+	- Added iObject SCF interface. csObject now implements iObject.
+	  iObject is currently almost empty (only contains GetName and
+	  SetName). It's main purpose is to allow further definition of the
+	  engine SCF interface for all methods that expect or return csObject
+	  instances. This rather fundamental change triggered a number of
+	  other changes in the engine classes with regards to where they
+	  get the iBase implementation. Previously some of those classes
+	  implemented iBase for sake of embedding or subclasses. Now, those
+	  classes can use the iBase provided by csObject.
+	- Fixed a bug in Blocks which caused crashes if no network driver
+	  was present. Now it simply doesn't attempt to open a connection
+	  if there is no network driver.
 8-Dec-2000
 	- Samuel Humphreys did the following changes to phyztest:
 	    - First stage of reformatting csphyziks to be more consistent

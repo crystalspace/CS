@@ -34,7 +34,6 @@ class csTextureWrapper;
 class csMaterialWrapper;
 class csSkeletonLimb;
 class csPolygonTemplate;
-class csThingTemplate;
 class csPolyPlane;
 class csPolyTxtPlane;
 class csCollection;
@@ -102,9 +101,10 @@ class csLoader
   /// Parse the terrain engine's parameters
   static void terrain_process (csSector& sector, char* name, char* buf);
   /// Load a sixface (i.e. box) definition (obsolete, should not be used)
-  static csThing* load_sixface (char* name, char* buf, csSector* sec);
+  static csThing* load_sixface (char* name, char* buf, csSector* sec, bool is_template);
   /// Parse the definition for a thing and create a thing object
-  static csThing* load_thing (char* name, char* buf, csSector*, bool is_sky);
+  static csThing* load_thing (char* name, char* buf, csSector*, bool is_sky,
+      	bool is_template);
   /// Parse a 3D polygon definition and return a new object
   static csPolygon3D* load_poly3d (char* polyname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,
@@ -116,19 +116,11 @@ class csLoader
   static void txt_process (char *name, char* buf);
   /// Parse and load a single material
   static void mat_process (char *name, char* buf, const char* prefix = NULL);
-  /// Parse polygon template definition and return a new object
-  static csPolygonTemplate* load_ptemplate (char* ptname, char* buf,
-    csMaterialWrapper* default_material, float default_texlen,
-    csThingTemplate* parent);
-  /// Parse a thing template definition and return a new object
-  static csThingTemplate* load_thingtpl (char* tname, char* buf);
   /// Parse a Bezier surface definition and return a new object
   static csCurveTemplate* load_beziertemplate (char* ptname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,
     csVector3* curve_vertices);
 
-  /// Create a thing template from a sixface (obsolete)
-  static csThingTemplate* load_sixtpl(char* tname,char* buf);
   /// Parse a room definition (obsolete)
   static csSector* load_room (char* secname, char* buf);
   /// Parse a sector definition and return a new object

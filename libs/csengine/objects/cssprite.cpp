@@ -101,12 +101,18 @@ void csSpriteAction::AddFrame (csFrame * f, int d)
 
 //--------------------------------------------------------------------------
 
+IMPLEMENT_IBASE (csSpriteTemplate)
+  IMPLEMENTS_INTERFACE (iSpriteTemplate)
+IMPLEMENT_IBASE_END
+
+
 IMPLEMENT_CSOBJTYPE (csSpriteTemplate, csObject)
 
 csSpriteTemplate::csSpriteTemplate ()
   : csObject (), frames (8, 8), actions (8, 8),
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
+  CONSTRUCT_IBASE (NULL);
   cstxt = NULL;
   emerge_from = NULL;
   skeleton = NULL;
@@ -475,19 +481,24 @@ void csSpriteTemplate::HardTransform (const csReversibleTransform& t)
 //=============================================================================
 
 IMPLEMENT_CSOBJTYPE (csSprite, csObject)
-IMPLEMENT_IBASE (csSprite)
-  IMPLEMENTS_INTERFACE (iBase)
+
+IMPLEMENT_IBASE_EXT (csSprite)
   IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSprite)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE (csSprite::Particle)
   IMPLEMENTS_INTERFACE (iParticle)
 IMPLEMENT_EMBEDDED_IBASE_END
 
+IMPLEMENT_EMBEDDED_IBASE (csSprite::Sprite)
+  IMPLEMENTS_INTERFACE (iSprite)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csSprite::csSprite (csObject* theParent) : csObject ()
 {
-  CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSprite);
   movable.scfParent = this;
   dynamiclights = NULL;
   MixMode = CS_FX_COPY;

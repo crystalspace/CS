@@ -108,6 +108,9 @@ private:
   /// If true this thing is a 'sky' object.
   bool is_sky;
 
+  /// If true this thing is a 'template' object.
+  bool is_template;
+
   /**
    * Update this thing in the polygon trees.
    */
@@ -140,7 +143,7 @@ public:
   /**
    * Create an empty thing.
    */
-  csThing (csEngine*, bool is_sky = false);
+  csThing (csEngine*, bool is_sky = false, bool is_template = false);
 
   /// Destructor.
   virtual ~csThing ();
@@ -153,6 +156,16 @@ public:
    * correctly updated.
    */
   csMovable& GetMovable () { return movable; }
+
+  /**
+   * Return true if this thing is a sky object.
+   */
+  bool IsSky () { return is_sky; }
+
+  /**
+   * Return true if this thing is a template.
+   */
+  bool IsTemplate () { return is_template; }
 
   /**
    * Set convexity flag of this thing. You should call this instead
@@ -285,16 +298,13 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csThing);
 
-    /// Used by the engine to retrieve internal sector object (ugly)
+    /// Used by the engine to retrieve internal thing object (ugly)
     virtual csThing *GetPrivateObject ()
     { return scfParent; }
 
     /// Get the movable for this thing.
     virtual iMovable* GetMovable ()
     { return &scfParent->GetMovable ().scfiMovable; }
-    /// Update the thing after doing a move.
-    virtual void UpdateMove ()
-    { scfParent->UpdateMove (); }
   } scfiThing;
   friend struct eiThing;
 };

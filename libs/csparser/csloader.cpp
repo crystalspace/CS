@@ -1474,7 +1474,8 @@ all non-convex polygons in things.\n");
 
 //---------------------------------------------------------------------------
 
-csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
+csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec,
+    	bool is_template)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MOVEABLE)
@@ -1504,7 +1505,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
   char* xname;
 
-  csThing* thing = new csThing (Engine);
+  csThing* thing = new csThing (Engine, false, is_template);
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
@@ -1757,7 +1758,8 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
   return thing;
 }
 
-csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky)
+csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
+    bool is_sky, bool is_template)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (VERTEX)
@@ -1794,7 +1796,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
 
   char* xname;
 
-  csThing* thing = new csThing (Engine, is_sky);
+  csThing* thing = new csThing (Engine, is_sky, is_template);
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
@@ -3191,13 +3193,13 @@ csSector* csLoader::load_room (char* secname, char* buf)
         }
         break;
       case CS_TOKEN_SKY:
-        Engine->skies.Push (load_thing (name, params, sector, true));
+        Engine->skies.Push (load_thing (name, params, sector, true, false));
         break;
       case CS_TOKEN_THING:
-        Engine->things.Push (load_thing (name, params, sector, false));
+        Engine->things.Push (load_thing (name, params, sector, false, false));
         break;
       case CS_TOKEN_SIXFACE:
-        Engine->things.Push (load_sixface (name, params, sector));
+        Engine->things.Push (load_sixface (name, params, sector, false));
         break;
       case CS_TOKEN_PORTAL:
         {
@@ -3574,13 +3576,13 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 	partsys->GetMovable ().UpdateMove ();
         break;
       case CS_TOKEN_SKY:
-        Engine->skies.Push (load_thing (name, params, sector, true));
+        Engine->skies.Push (load_thing (name, params, sector, true, false));
         break;
       case CS_TOKEN_THING:
-        Engine->things.Push (load_thing (name, params, sector, false));
+        Engine->things.Push (load_thing (name, params, sector, false, false));
         break;
       case CS_TOKEN_SIXFACE:
-        Engine->things.Push (load_sixface (name, params, sector));
+        Engine->things.Push (load_sixface (name, params, sector, false));
         break;
       case CS_TOKEN_SPRITE:
         {
@@ -4093,11 +4095,11 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
           break;
         case CS_TOKEN_THING:
           if (!Engine->thing_templates.FindByName (name))
-            Engine->thing_templates.Push (load_thing (name, params, NULL, false));
+            Engine->thing_templates.Push (load_thing (name, params, NULL, false, true));
           break;
         case CS_TOKEN_SIXFACE:
           if (!Engine->thing_templates.FindByName (name))
-            Engine->thing_templates.Push (load_sixface (name, params, NULL));
+            Engine->thing_templates.Push (load_sixface (name, params, NULL, true));
           break;
         case CS_TOKEN_SECTOR:
           if (!Engine->sectors.FindByName (name))
@@ -4399,7 +4401,7 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case CS_TOKEN_THING:
           if (!Engine->thing_templates.FindByName (name))
-            Engine->thing_templates.Push (load_thing (name, params, NULL, false));
+            Engine->thing_templates.Push (load_thing (name, params, NULL, false, true));
           break;
       }
     }

@@ -97,7 +97,7 @@ struct csPolygonSetBBox
  * <li> Things do not require portals but can use them. 
  * </ul>
  */
-class csPolygonSet : public csObject, public iBase
+class csPolygonSet : public csObject
 {
   friend class Dumper;
 
@@ -481,7 +481,7 @@ public:
   virtual void CompressVertices ();
 
   CSOBJTYPE;
-  DECLARE_IBASE;
+  DECLARE_IBASE_EXT (csObject);
 
   //-------------------- iPolygonSet interface implementation ------------------
   struct PolySet : public iPolygonSet

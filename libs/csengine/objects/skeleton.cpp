@@ -146,14 +146,12 @@ IMPLEMENT_CSOBJTYPE (csSkeletonLimbState,csObject);
 IMPLEMENT_CSOBJTYPE (csSkeletonConnectionState,csSkeletonLimbState);
 IMPLEMENT_CSOBJTYPE (csSkeletonState,csSkeletonLimbState);
 
-IMPLEMENT_IBASE (csSkeletonLimbState)
-  IMPLEMENTS_INTERFACE (iBase)
+IMPLEMENT_IBASE_EXT (csSkeletonLimbState)
 IMPLEMENT_IBASE_END
 
 csSkeletonLimbState::csSkeletonLimbState (): 
   next (NULL), vertices (NULL), num_vertices (0), children (NULL)
 { 
-  CONSTRUCT_IBASE(NULL);
 }
 
 csSkeletonLimbState::~csSkeletonLimbState ()

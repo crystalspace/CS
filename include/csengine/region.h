@@ -57,6 +57,14 @@ public:
    */
   void ReleaseFromRegion (csObject* obj);
 
+  /**
+   * Find an object of a given name and type.
+   * If 'derived' == true it will also consider objects
+   * which are of derived types of the given type.
+   */
+  csObject* FindObject (const char* iName, const csIdType& type,
+      	bool derived = false);
+
   CSOBJTYPE;
 
   //--------------------- iRegion implementation ---------------------
@@ -78,6 +86,21 @@ public:
    * directly after loading new objects.
    */
   virtual bool Prepare ();
+
+  /// Find a sector in this region by name.
+  virtual iSector *FindSector (const char *iName);
+  /// Find a thing in this region by name
+  virtual iThing *FindThing (const char *iName);
+  /// Find a sky thing in this region by name
+  virtual iThing *FindSky (const char *iName);
+  /// Find a thing template in this region by name
+  virtual iThing *FindThingTemplate (const char *iName);
+  /// Find a sprite in this region by name
+  virtual iSprite *FindSprite (const char *iName);
+  /// Find a sprite template in this region by name
+  virtual iSpriteTemplate *FindSpriteTemplate (const char *iName);
+  /// Find a material in this region by name
+  virtual iMaterialWrapper *FindMaterial (const char *iName);
 };
 
 #endif // __CS_REGION_H__

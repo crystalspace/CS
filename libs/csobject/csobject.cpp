@@ -66,22 +66,28 @@ const csIdType& csObject::GetType () const
   return Type;
 }
 
-csObject::csObject () : csBase (), children (NULL), Name (NULL)
+IMPLEMENT_IBASE (csObject)
+  IMPLEMENTS_INTERFACE (iObject)
+IMPLEMENT_IBASE_END
+
+csObject::csObject () : csBase (), iObject (), children (NULL), Name (NULL)
 {
+  CONSTRUCT_IBASE (NULL);
   static CS_ID id = 0;
   csid = id++;
 }
 
-csObject::csObject (csObject& iObject) : csBase (), csid (iObject.csid),
+csObject::csObject (csObject& iObj) : csBase (), iObject (iObj), csid (iObj.csid),
   children (NULL), Name (NULL)
 {
-  if (iObject.children)
+  CONSTRUCT_IBASE (NULL);
+  if (iObj.children)
   {
-    int size = sizeof (csObjContainer) + sizeof (csObject *) * (iObject.children->limit - 1);
+    int size = sizeof (csObjContainer) + sizeof (csObject *) * (iObj.children->limit - 1);
     if (size > 0)
     {
       children = (csObjContainer *)malloc (size);
-      memcpy (children, iObject.children, size);
+      memcpy (children, iObj.children, size);
     }
   }
 }
@@ -163,17 +169,17 @@ void csObject::ObjRemove (csObject *obj)
 
 //------------------------------------------------------ Object iterator -----//
 
-csObjIterator::csObjIterator (const csIdType &iType, const csObject &iObject,
+csObjIterator::csObjIterator (const csIdType &iType, const csObject &iObj,
 	bool derived)
 {
   csObjIterator::derived = derived;
-  Reset (iType, iObject);
+  Reset (iType, iObj);
 }
 
-void csObjIterator::Reset (const csIdType &iType, const csObject &iObject)
+void csObjIterator::Reset (const csIdType &iType, const csObject &iObj)
 {
   Type = &iType;
-  Container = iObject.children;
+  Container = iObj.children;
   Index = -1;
   Next ();
 }

@@ -25,6 +25,7 @@
 #include "csengine/texture.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"
+#include "csengine/material.h"
 #include "csengine/polytmap.h"
 #include "csengine/curve.h"
 #include "csobject/objiter.h"
@@ -228,3 +229,95 @@ void csRegion::ReleaseFromRegion (csObject* obj)
 {
   ObjRelease (obj);
 }
+
+csObject* csRegion::FindObject (const char* iName, const csIdType& type,
+      	bool derived)
+{
+  for (csObjIterator iter = GetIterator (type, derived);
+  	!iter.IsFinished () ; ++iter)
+  {
+    csObject* o = iter.GetObj ();
+    const char* on = o->GetName ();
+    if (on && !strcmp (on, iName)) return o;
+  }
+  return NULL;
+}
+
+iSector* csRegion::FindSector (const char *iName)
+{
+  csSector* obj = (csSector*)FindObject (iName, csSector::Type, false);
+  if (!obj) return NULL;
+  return &obj->scfiSector;
+}
+
+iThing* csRegion::FindThing (const char *iName)
+{
+  for (csObjIterator iter = GetIterator (csThing::Type, false);
+  	!iter.IsFinished () ; ++iter)
+  {
+    csThing* o = (csThing*)iter.GetObj ();
+    if (!o->IsSky () && !o->IsTemplate ())
+    {
+      // Only if not a sky and not a template.
+      const char* on = o->GetName ();
+      if (on && !strcmp (on, iName)) return &o->scfiThing;
+    }
+  }
+  return NULL;
+}
+
+iThing* csRegion::FindSky (const char *iName)
+{
+  for (csObjIterator iter = GetIterator (csThing::Type, false);
+  	!iter.IsFinished () ; ++iter)
+  {
+    csThing* o = (csThing*)iter.GetObj ();
+    if (o->IsSky () && !o->IsTemplate ())
+    {
+      // Only if a sky and not a template.
+      const char* on = o->GetName ();
+      if (on && !strcmp (on, iName)) return &o->scfiThing;
+    }
+  }
+  return NULL;
+}
+
+iThing* csRegion::FindThingTemplate (const char *iName)
+{
+  for (csObjIterator iter = GetIterator (csThing::Type, false);
+  	!iter.IsFinished () ; ++iter)
+  {
+    csThing* o = (csThing*)iter.GetObj ();
+    if (o->IsTemplate ())
+    {
+      // Only if a template.
+      const char* on = o->GetName ();
+      if (on && !strcmp (on, iName)) return &o->scfiThing;
+    }
+  }
+  return NULL;
+}
+
+iSprite* csRegion::FindSprite (const char *iName)
+{
+  csSprite* obj = (csSprite*)FindObject (iName, csSprite::Type, true);
+  if (!obj) return NULL;
+  return &obj->scfiSprite;
+}
+
+iSpriteTemplate* csRegion::FindSpriteTemplate (const char *iName)
+{
+  csSpriteTemplate* obj = (csSpriteTemplate*)FindObject (iName, csSpriteTemplate::Type, false);
+  if (!obj) return NULL;
+  return (iSpriteTemplate*)obj;
+}
+
+iMaterialWrapper* csRegion::FindMaterial (const char *iName)
+{
+  csObject* obj = FindObject (iName, csMaterialWrapper::Type, false);
+  if (!obj) return NULL;
+  // Cast two times to avoid problems with multi-inherit.
+  csMaterialWrapper* wrapper = (csMaterialWrapper*)obj;
+  return (iMaterialWrapper*)wrapper;
+}
+

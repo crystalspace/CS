@@ -22,6 +22,12 @@
 
 #include "csutil/scf.h"
 
+struct iSector;
+struct iThing;
+struct iSprite;
+struct iSpriteTemplate;
+struct iMaterialWrapper;
+
 SCF_VERSION (iRegion, 0, 1, 0);
 
 /**
@@ -46,6 +52,21 @@ struct iRegion : public iBase
    * directly after loading new objects.
    */
   virtual bool Prepare () = 0;
+
+  /// Find a sector in this region by name.
+  virtual iSector *FindSector (const char *iName) = 0;
+  /// Find a thing in this region by name
+  virtual iThing *FindThing (const char *iName) = 0;
+  /// Find a sky thing in this region by name
+  virtual iThing *FindSky (const char *iName) = 0;
+  /// Find a thing template in this region by name
+  virtual iThing *FindThingTemplate (const char *iName) = 0;
+  /// Find a sprite in this region by name
+  virtual iSprite *FindSprite (const char *iName) = 0;
+  /// Find a sprite template in this region by name
+  virtual iSpriteTemplate *FindSpriteTemplate (const char *iName) = 0;
+  /// Find a material in this region by name
+  virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
 };
 
 #endif // __IREGION_H__

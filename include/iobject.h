@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,33 +16,26 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ITHING_H__
-#define __ITHING_H__
+#ifndef __IOBJECT_H__
+#define __IOBJECT_H__
 
 #include "csutil/scf.h"
 
-class csVector3;
-class csMatrix3;
-class csThing;
-struct iSector;
-struct iMovable;
+class csObject;
 
-SCF_VERSION (iThing, 0, 0, 2);
+SCF_VERSION (iObject, 0, 0, 1);
 
 /**
- * This is the generalized interface to Things.<p>
- * A thing is a 3D model, in most cases non-moveable, which is mostly used
- * for details. That is, iSector objects outlines the basic bounds of the
- * room (e.g. walls) and iThing's are the inside details (tables, columns,
- * paintings and so on).
+ * This interface is an SCF interface for encapsulating csObject.
  */
-struct iThing : public iBase
+struct iObject : public iBase
 {
-  /// Used by the engine to retrieve internal thing object (ugly)
-  virtual csThing *GetPrivateObject () = 0;
+  /// Set object name
+  virtual void SetName (const char *iName) = 0;
 
-  /// Get the movable for this thing.
-  virtual iMovable* GetMovable () = 0;
+  /// Query object name
+  virtual const char *GetName () const = 0;
+
 };
 
 #endif

@@ -25,6 +25,7 @@
 #include "csobject/objiter.h"
 #include "csutil/csbase.h"
 #include "csutil/util.h"
+#include "iobject.h"
 
 /**
  * A generic csObject class.
@@ -37,7 +38,7 @@
  * IMPLEMENT_CSOBJTYPE (newClass,parentClass);
  * </pre>
  */ 
-class csObject : public csBase
+class csObject : public csBase, public iObject
 {
 protected:
   friend class csObjIterator;
@@ -58,7 +59,7 @@ public:
   /// Initialize the csObject
   csObject ();
   /// Make a copy of another object
-  csObject (csObject& iObject);
+  csObject (csObject& iObj);
   /// Destroy this object and the associated children
   virtual ~csObject ();
 
@@ -104,6 +105,7 @@ public:
   void ObjRemove (csObject *obj);
 
   CSOBJTYPE;
+  DECLARE_IBASE;
 };
 
 /**
