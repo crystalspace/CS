@@ -206,6 +206,14 @@ public:
    */
   static int FindObserverSides (const csBox3& box1, const csBox3& box2,
   	int* sides);
+
+  /**
+   * Given two angles in radians, calculate the position on the sphere
+   * around (0,0,0) with radius 1. The first angle is the angle along
+   * the horizontal (x/z) plane. The second angle is the vertical angle.
+   */
+  static void SpherePosition (float angle_xz, float angle_vert,
+  	csVector3& pos);
 };
 
 /**

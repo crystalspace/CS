@@ -1,13 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+11-Feb-2002
+	- Added csMath3::SpherePosition() which calculates the position
+	  on a unit sphere given two angles.
 8-Feb-2002
 	- Matt Reda added support for displaying on any monitor on OSX
 	  systems with more than one monitor.  Also added small
-	  performance improvement to the OSX software canvas
+	  performance improvement to the OSX software canvas.
 	- Matt Reda changed the pixel formats used by the base OpenGL canvas
-	  to correspond to the pixel formats used by the software renderer
+	  to correspond to the pixel formats used by the software renderer.
 	- Matze fixed a bug in csHashIterator - it was returning already
-	    deleted elemenst in some special cases
+	  deleted elements in some special cases.
 6-Feb-2002
 	- Matt Reda fixed a bug in the OpenGL renderer which caused
 	  fades (F5 in walktest and fade effect in csdemo) not to work

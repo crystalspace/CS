@@ -274,6 +274,16 @@ int csMath3::FindObserverSides (const csBox3& box1, const csBox3& box2,
   return num_sides;
 }
 
+void csMath3::SpherePosition (float angle_xz, float angle_vert,
+  	csVector3& pos)
+{
+  float cosxz = cos (angle_xz);
+  float sinxz = sin (angle_xz);
+  float cosve = cos (angle_vert);
+  float sinve = sin (angle_vert);
+  pos.Set (cosxz * cosve, sinve, sinxz * cosve);
+}
+
 //---------------------------------------------------------------------------
 
 float csSquaredDist::PointLine (const csVector3& p,
