@@ -95,11 +95,11 @@ class Blocks : public SysSystemDriver
 {
 private:
   csThingTemplate* cube_tmpl;
-  csThingTemplate* pilar_tmpl;
+  csThingTemplate* pillar_tmpl;
   csThingTemplate* vrast_tmpl;
   csThingTemplate* hrast_tmpl;
   csTextureHandle* cube_txt;
-  csTextureHandle* pilar_txt;
+  csTextureHandle* pillar_txt;
   csTextureHandle* raster_txt;
   csSector* room;
   csSector* demo_room;
@@ -211,6 +211,8 @@ private:
 
 public:
   csWorld* world;
+  iTextureManager* txtmgr;
+  int white, black;
 
 public:
   Blocks ();
@@ -234,19 +236,19 @@ public:
   csThing* add_cube_thing (csSector* sect, float dx, float dy, float dz,
   	float x, float y, float z);
   void add_cube (float dx, float dy, float dz, float x, float y, float z);
-  void add_pilar (int x, int y);
+  void add_pillar (int x, int y);
   void add_vrast (int x, int y, float dx, float dy, float rot_z);
   void add_hrast (int x, int y, float dx, float dy, float rot_z);
 
   // All the templates for creating geometry.
   void add_cube_template ();
-  void add_pilar_template ();
+  void add_pillar_template ();
   void add_vrast_template ();
   void add_hrast_template ();
 
   // Default textures for geometry.
   void set_cube_texture (csTextureHandle* ct) { cube_txt = ct; }
-  void set_pilar_texture (csTextureHandle* ct) { pilar_txt = ct; }
+  void set_pillar_texture (csTextureHandle* ct) { pillar_txt = ct; }
   void set_raster_texture (csTextureHandle* ct) { raster_txt = ct; }
 
   // Handle movement of the game.

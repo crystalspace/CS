@@ -33,6 +33,8 @@ Short-term cleanups that need to be done:
 	  in the Win32 driver in the absence of DirectInput.  The ESC key
 	  was generating multiple key-down events, and the Return key was
 	  generating two key-down events with distinct key codes.
+	- Blocks uses correct FindRGB to look for colors.
+	- Fixed bug in Blocks so that shapes cannot be stranded partially.
 31-Jan-2000
 	- Eric Sunshine fixed unixconf.sh so that it correctly captures
 	  and interprets output of 'which' command.

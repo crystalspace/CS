@@ -23,7 +23,6 @@
     Better rotation of blocks.
     Better textures.
     Make keys configurable.
-    Fix bug with partially shifted blocks.
     Add highscore list.
     Add 'nightmare' level.
     'pause' should temporarily remove visible blocks (or fog area).
@@ -210,62 +209,62 @@ csPolygonTemplate* add_polygon_template (csThingTemplate* tmpl,
   return p;
 }
 
-void Blocks::add_pilar_template ()
+void Blocks::add_pillar_template ()
 {
   float dim = CUBE_DIM/2.;
-  pilar_tmpl = new csThingTemplate ();
-  pilar_tmpl->SetName ("pilar");
-  pilar_tmpl->AddVertex (-dim, 0, dim);
-  pilar_tmpl->AddVertex (dim, 0, dim);
-  pilar_tmpl->AddVertex (dim, 0, -dim);
-  pilar_tmpl->AddVertex (-dim, 0, -dim);
-  pilar_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, dim);
-  pilar_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, dim);
-  pilar_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, -dim);
-  pilar_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, -dim);
+  pillar_tmpl = new csThingTemplate ();
+  pillar_tmpl->SetName ("pillar");
+  pillar_tmpl->AddVertex (-dim, 0, dim);
+  pillar_tmpl->AddVertex (dim, 0, dim);
+  pillar_tmpl->AddVertex (dim, 0, -dim);
+  pillar_tmpl->AddVertex (-dim, 0, -dim);
+  pillar_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, dim);
+  pillar_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, dim);
+  pillar_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, -dim);
+  pillar_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, -dim);
 
   csPolygonTemplate* p;
   float A, B, C;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = add_polygon_template (pilar_tmpl, "d", pilar_txt, 3, 2, 1, 0);
+  p = add_polygon_template (pillar_tmpl, "d", pillar_txt, 3, 2, 1, 0);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pilar_tmpl->Vtex (0), pilar_tmpl->Vtex (1), 1, A, B, C);
+      	pillar_tmpl->Vtex (0), pillar_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pilar_tmpl, "b", pilar_txt, 0, 1, 5, 4);
+  p = add_polygon_template (pillar_tmpl, "b", pillar_txt, 0, 1, 5, 4);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pilar_tmpl->Vtex (0), pilar_tmpl->Vtex (1), 1, A, B, C);
+      	pillar_tmpl->Vtex (0), pillar_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pilar_tmpl, "t", pilar_txt, 4, 5, 6, 7);
+  p = add_polygon_template (pillar_tmpl, "t", pillar_txt, 4, 5, 6, 7);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pilar_tmpl->Vtex (4), pilar_tmpl->Vtex (5), 1, A, B, C);
+      	pillar_tmpl->Vtex (4), pillar_tmpl->Vtex (5), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pilar_tmpl, "f", pilar_txt, 7, 6, 2, 3);
+  p = add_polygon_template (pillar_tmpl, "f", pillar_txt, 7, 6, 2, 3);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pilar_tmpl->Vtex (7), pilar_tmpl->Vtex (6), 1, A, B, C);
+      	pillar_tmpl->Vtex (7), pillar_tmpl->Vtex (6), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pilar_tmpl, "l", pilar_txt, 4, 7, 3, 0);
+  p = add_polygon_template (pillar_tmpl, "l", pillar_txt, 4, 7, 3, 0);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pilar_tmpl->Vtex (7), pilar_tmpl->Vtex (3), 1, A, B, C);
+      	pillar_tmpl->Vtex (7), pillar_tmpl->Vtex (3), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pilar_tmpl, "r", pilar_txt, 6, 5, 1, 2);
+  p = add_polygon_template (pillar_tmpl, "r", pillar_txt, 6, 5, 1, 2);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pilar_tmpl->Vtex (6), pilar_tmpl->Vtex (5), 1, A, B, C);
+      	pillar_tmpl->Vtex (6), pillar_tmpl->Vtex (5), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  world->thing_templates.Push (pilar_tmpl);
+  world->thing_templates.Push (pillar_tmpl);
 }
 
 void Blocks::add_vrast_template ()
@@ -333,18 +332,18 @@ void Blocks::add_hrast_template ()
 }
 
 
-void Blocks::add_pilar (int x, int y)
+void Blocks::add_pillar (int x, int y)
 {
-  csThing* pilar;
-  pilar = new csThing ();
-  pilar->SetName ("pilar");
-  pilar->SetSector (room);
-  pilar->SetFlags (CS_ENTITY_MOVEABLE, 0);
-  pilar->MergeTemplate (pilar_tmpl, pilar_txt, 1);
-  room->AddThing (pilar);
+  csThing* pillar;
+  pillar = new csThing ();
+  pillar->SetName ("pillar");
+  pillar->SetSector (room);
+  pillar->SetFlags (CS_ENTITY_MOVEABLE, 0);
+  pillar->MergeTemplate (pillar_tmpl, pillar_txt, 1);
+  room->AddThing (pillar);
   csVector3 v ((x-ZONE_DIM/2)*CUBE_DIM, 0, (y-ZONE_DIM/2)*CUBE_DIM);
-  pilar->SetMove (room, v);
-  pilar->Transform ();
+  pillar->SetMove (room, v);
+  pillar->Transform ();
 }
 
 void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
@@ -1000,11 +999,15 @@ void Blocks::move_cubes (time_t elapsed_time)
     bool stop = !check_new_shape_location (0, 0, -1);
     if (stop)
     {
-      freeze_shape ();
-      checkForPlane ();
-      if (!transition)
-        start_shape ((BlShapeType)(rand () % difficulty), 3, 3, ZONE_HEIGHT-3);
-      return;
+      if (!(rot_px_todo || rot_mx_todo || rot_py_todo || rot_my_todo ||
+      	    rot_pz_todo || rot_mz_todo || move_hor_todo))
+      {
+        freeze_shape ();
+        checkForPlane ();
+        if (!transition)
+          start_shape ((BlShapeType)(rand () % difficulty), 3, 3, ZONE_HEIGHT-3);
+        return;
+      }
     }
     else
     {
@@ -1092,8 +1095,8 @@ void Blocks::InitTextures ()
   if (world) world->Clear ();
 
   // Maybe we shouldn't load the textures again if this is not the first time.
-  Sys->set_pilar_texture (
-    csLoader::LoadTexture (Sys->world, "pilar", "stone4.gif"));
+  Sys->set_pillar_texture (
+    csLoader::LoadTexture (Sys->world, "pillar", "stone4.gif"));
   Sys->set_cube_texture (
     csLoader::LoadTexture (Sys->world, "cube", "cube.gif"));
   Sys->set_raster_texture (
@@ -1149,15 +1152,15 @@ void Blocks::InitWorld ()
   p->AddVertex (5, 0, -5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
-  Sys->add_pilar_template ();
+  Sys->add_pillar_template ();
   Sys->add_cube_template ();
   Sys->add_vrast_template ();
   Sys->add_hrast_template ();
 
-  Sys->add_pilar (-1, -1);
-  Sys->add_pilar (ZONE_DIM, -1);
-  Sys->add_pilar (-1, ZONE_DIM);
-  Sys->add_pilar (ZONE_DIM, ZONE_DIM);
+  Sys->add_pillar (-1, -1);
+  Sys->add_pillar (ZONE_DIM, -1);
+  Sys->add_pillar (-1, ZONE_DIM);
+  Sys->add_pillar (ZONE_DIM, ZONE_DIM);
 
   int i;
   for (i = 0 ; i < ZONE_DIM-1 ; i++)
@@ -1422,9 +1425,9 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
     if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
     view->Draw ();
     if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    Gfx2D->Write (100, 100, 0xffff, 0, "1: novice");
-    Gfx2D->Write (100, 120, 0xffff, 0, "2: normal");
-    Gfx2D->Write (100, 140, 0xffff, 0, "3: expert");
+    Gfx2D->Write (100, 100, white, black, "1: novice");
+    Gfx2D->Write (100, 120, white, black, "2: normal");
+    Gfx2D->Write (100, 140, white, black, "3: expert");
     Gfx3D->FinishDraw ();
     Gfx3D->Print (NULL);
     return;
@@ -1445,7 +1448,7 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
   char scorebuf[50];
   sprintf (scorebuf, "%d", score);
-  Gfx2D->Write (10, Sys->FrameHeight-20, 0xffff, 0, scorebuf);
+  Gfx2D->Write (10, Sys->FrameHeight-20, white, black, scorebuf);
 
   // Drawing code ends here
   Gfx3D->FinishDraw ();
@@ -1549,8 +1552,8 @@ int main (int argc, char* argv[])
   // Some commercials...
   Sys->Printf (MSG_INITIALIZATION, "3D Blocks version 0.2.\n");
   Sys->Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
-  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
-  txtmgr->SetVerbose (true);
+  Sys->txtmgr = Gfx3D->GetTextureManager ();
+  Sys->txtmgr->SetVerbose (true);
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -1567,7 +1570,9 @@ int main (int argc, char* argv[])
 
   Sys->InitWorld ();  
 
-  txtmgr->AllocPalette ();
+  Sys->txtmgr->AllocPalette ();
+  Sys->white = Sys->txtmgr->FindRGB (255, 255, 255);
+  Sys->black = Sys->txtmgr->FindRGB (0, 0, 0);
 
   Sys->Loop ();
 
