@@ -267,7 +267,7 @@ bool cswinCallStack::GetLineNumber (size_t num, csString& str)
   if (DbgHelp::SymGetLineFromAddr64 (symInit.GetSymProcessHandle (), 
     entries[num].instrPtr, &displacement, &line))
   {
-    str.Format ("%s:%" PRId32, line.FileName, (uint32)line.LineNumber);
+    str.Format ("%s:%" PRIu32, line.FileName, (uint32)line.LineNumber);
     return true;
   }
   return false;
