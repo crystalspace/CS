@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+10-Feb-2003
+  - Philip Wyett removed duplicate CS_REPORTER_SEVERITY_DEBUG, which caused
+    perftest to output results twice.
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.
