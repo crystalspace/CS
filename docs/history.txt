@@ -7,6 +7,16 @@ The history order is reversed so that new features are at the top.
 	      - Keep virtual clock instance in csEngine instead of querying
 	        it every time.
 	- Removed the plugin manager variable in csEngine.
+	- Cleaned up the RAPID collision detection plugin code a little by
+	  eliminating an unneeded and confusing intermediate class. This
+	  makes it (slightly) more efficient too.
+	- Optimized the RAPID collision detection code a little bit.
+	- Added a new function CollidePath() to iCollideSystem. This function
+	  can check if an object can move from the old position to a new
+	  position. It will check collisions along the way.
+	- Added a first implementation of CollidePath() for the RAPID
+	  plugin. This implementation is not very optimal yet and it is
+	  also untested.
 30-Dec-2001
 	- Fixed iPolygonMesh implementation in csThing so that it will
 	  check if the parent array of object-space vertices is still

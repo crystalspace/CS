@@ -65,6 +65,7 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/matrix3.h"
+#include "ivaria/polymesh.h"
 
 /// A triangle, to be used in collision detection
 struct csCdTriangle
@@ -83,7 +84,7 @@ struct csCdTriangle
 class csCdBBox
 {
   friend class csCdModel;
-  friend class csRAPIDCollider;
+  friend class csRapidCollider;
 
 protected:
   /// Pointer to the contained triangle. May be NULL, if the BBox is a node.
@@ -102,7 +103,7 @@ protected:
     * Pointers to child boxes. These pointers are only for reference, they
     * do not indicate ownership. (these boxes are deleted elsewhere)
     */
-  csCdBBox* m_pChild[2];
+  csCdBBox* m_pChild0, * m_pChild1;
 
   /**
     * Checks if two Bounding Boxes do collide. Thes routine assumes, 
@@ -139,7 +140,7 @@ protected:
     * properly initialised to NULL, which is currently not the case.
     * - thieber 14.03.2000 -
     */
-  bool IsLeaf() const { return (!m_pChild[0] && !m_pChild[1]); } 
+  bool IsLeaf() const { return (!m_pChild0 && !m_pChild1); } 
   
   /**
     * return the size of the bounding box. Why this returns d.x and not 
@@ -150,36 +151,41 @@ protected:
 public:
 
   /// Construct a default bounding box
-  csCdBBox() : m_Translation(0, 0, 0), m_Radius(0, 0, 0) { }
+  csCdBBox() :
+  	m_pTriangle (NULL),
+  	m_Translation(0, 0, 0),
+	m_Radius(0, 0, 0),
+  	m_pChild0 (NULL),
+	m_pChild1 (NULL)
+  { }
 
   /// returns the "Radius", that is, half the measure of each side's length
   const csVector3& GetRadius() const {return m_Radius;}
-
 };
 
 /**
-  * This class organizes a set of triangles for collision detection. This class is
-  * used by csRAPIDCollider to handle 3D sprites and polygon sets in a uniform way.
-  * This class is also responsible for allocating and freeing memory for the
-  * bounding boxes and the triangles.
+  * This class organizes a set of triangles for collision detection.
+  * This class is used by csRapidCollider to handle 3D sprites and polygon
+  * sets in a uniform way. This class is also responsible for allocating
+  * and freeing memory for the bounding boxes and the triangles.
   * THIS CLASS IS FOR INTERNAL USE OF COLLISION DETECTION
   */
 class csCdModel
 {
-  friend class csRAPIDCollider;
+  friend class csRapidCollider;
 protected:
-  //- BOXES ----------------
+  //------ BOXES ----------------
   /// An array containing all the bounding boxes to be used in this model
-  csCdBBox*     m_pBoxes;
+  csCdBBox* m_pBoxes;
   /// The number of boxes in this array. (twice the number of triangles...)
-  int           m_NumBoxesAlloced;
+  int m_NumBoxesAlloced;
   //------------------------
 
-  //- TRIANGLES ------------
+  //------ TRIANGLES ------------
   /// All triangles that appear in this model
   csCdTriangle* m_pTriangles;
-  int           m_NumTriangles;
-  int           m_NumTrianglesAllocated;
+  int m_NumTriangles;
+  int m_NumTrianglesAllocated;
   //------------------------
   
   /// Build a tree of bounding boxes from the given Triangles
@@ -294,8 +300,36 @@ public:
   inline void moments(int *t, int n)
   {
     clear ();
-	int i;
-    for (i = 0; i < n; i++)
-      moment (Moment::stack [t [i]]);
+    for (int i = 0; i < n; i++)
+      moment (Moment::stack [t[i]]);
   }
 };
+
+/**
+ * This is a class implementing iPolygonMesh which is used to
+ * test collision detection along a path for a moving object. It
+ * is made by taking the vertices of the bounding box and making
+ * several triangles connected to the vertices of the same bounding
+ * box at the new position.
+ */
+class PathPolygonMesh : public iPolygonMesh
+{
+public:
+  csVector3 vertices[16];	// 2 times 8 vertices (for two bbox'es).
+
+  // 8 polygons for making rays between the two bounding boxes.
+  // 12 polygons for the source bbox and 12 polygons for the destination bbox.
+  csMeshedPolygon polygons[8+12+12];
+
+  PathPolygonMesh ();
+  virtual ~PathPolygonMesh ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual int GetVertexCount () { return 16; }
+  virtual csVector3* GetVertices () { return vertices; }
+  virtual int GetPolygonCount () { return 8+12+12; }
+  virtual csMeshedPolygon* GetPolygons () { return polygons; }
+  virtual void Cleanup () { }
+};
+

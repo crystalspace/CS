@@ -20,24 +20,9 @@
 #include "csrapid.h"
 #include "rapcol.h"
 #include "ivaria/polymesh.h"
+#include "prapid.h"
 
 CS_IMPLEMENT_PLUGIN
-
-SCF_IMPLEMENT_IBASE (csRapidCollider)
-  SCF_IMPLEMENTS_INTERFACE (iCollider)
-SCF_IMPLEMENT_IBASE_END
-
-csRapidCollider::csRapidCollider (iPolygonMesh* mesh)
-{
-  SCF_CONSTRUCT_IBASE (NULL);
-  collider = new csRAPIDCollider (mesh);
-  mesh->Cleanup ();
-}
-
-csRapidCollider::~csRapidCollider ()
-{
-  delete collider;
-}
 
 //----------------------------------------------------------------------
 
@@ -62,6 +47,12 @@ csRapidCollideSystem::csRapidCollideSystem (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  path_mesh = new PathPolygonMesh ();
+}
+
+csRapidCollideSystem::~csRapidCollideSystem ()
+{
+  delete path_mesh;
 }
 
 iCollider* csRapidCollideSystem::CreateCollider (iPolygonMesh* mesh)
@@ -76,22 +67,34 @@ bool csRapidCollideSystem::Collide (
 {
   csRapidCollider* col1 = (csRapidCollider*)collider1;
   csRapidCollider* col2 = (csRapidCollider*)collider2;
-  return col1->GetPrivateCollider ()->Collide (*(col2->GetPrivateCollider ()),
-  	trans1, trans2);
+  return col1->Collide (*col2, trans1, trans2);
+}
+
+bool csRapidCollideSystem::CollidePath (
+  	iCollider* collider, const csReversibleTransform* trans,
+	csVector3& newpos,
+	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform** transforms)
+{
+  csRapidCollider* thiscol = (csRapidCollider*)collider;
+  return thiscol->CollidePath (trans, newpos,
+	num_colliders, colliders, transforms, path_mesh);
 }
 
 csCollisionPair* csRapidCollideSystem::GetCollisionPairs ()
 {
-  return csRAPIDCollider::GetCollisions ();
+  return csRapidCollider::GetCollisions ();
 }
 
 int csRapidCollideSystem::GetCollisionPairCount ()
 {
-  return csRAPIDCollider::numHits;
+  return csRapidCollider::numHits;
 }
 
 void csRapidCollideSystem::ResetCollisionPairs ()
 {
-  csRAPIDCollider::CollideReset ();
-  csRAPIDCollider::numHits = 0;
+  csRapidCollider::CollideReset ();
+  csRapidCollider::numHits = 0;
 }
+

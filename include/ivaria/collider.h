@@ -21,6 +21,7 @@
 #define __IENGINE_COLLIDER_H__
 
 #include "csutil/scf.h"
+#include "csutil/csvector.h"
 #include "csgeom/vector3.h"
 
 struct iPolygonMesh;
@@ -44,7 +45,7 @@ struct iCollider : public iBase
 {
 };
 
-SCF_VERSION (iCollideSystem, 0, 0, 1);
+SCF_VERSION (iCollideSystem, 0, 0, 2);
 
 /**
  * This is the Collide plug-in. This plugin is a factory for creating
@@ -101,6 +102,29 @@ struct iCollideSystem : public iBase
    * For CD systems that support one hit only this will always return true.
    */
   virtual bool GetOneHitOnly () = 0;
+
+  /**
+   * Test if an object can move to a new position. The new position
+   * vector will be modified to reflect the maximum new position that the
+   * object could move to without colliding with something. This function
+   * will return true if the object could not move to the desired position
+   * and false if the object could move unhindered along the path.
+   * <p>
+   * This function will reset the collision pair array. If there was a
+   * collision along the way the array will contain the information for
+   * the first collision preventing movement.
+   * <p>
+   * The given transform should be the transform of the object corresponding
+   * with the old position. 'colliders' and 'transforms' should be arrays
+   * with 'num_colliders' elements for all the objects that we should
+   * test against.
+   */
+  virtual bool CollidePath (
+  	iCollider* collider, const csReversibleTransform* trans,
+	csVector3& newpos,
+	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform** transforms) = 0;
 };
 
 #endif // __IENGINE_COLLIDER_H__

@@ -75,29 +75,35 @@ static CS_DECLARE_GROWING_ARRAY_REF (CD_contact, csCollisionPair);
 
 static int hits = 0;
 // Array of hits.
-static csRAPIDCollider* hitv[CD_MAX_COLLISION][2];
+static csRapidCollider* hitv[CD_MAX_COLLISION][2];
 static int currHit;
 
 ///
-csMatrix3 csRAPIDCollider::mR;
-csVector3 csRAPIDCollider::mT (0, 0, 0);
+csMatrix3 csRapidCollider::mR;
+csVector3 csRapidCollider::mT (0, 0, 0);
 ///
-int   csRAPIDCollider::trianglesTested = 0;
-int   csRAPIDCollider::boxesTested     = 0;
-int   csRAPIDCollider::testLevel       = 0;
-bool  csRAPIDCollider::firstHit        = true;
-int   csRAPIDCollider::numHits         = 0;
-float csRAPIDCollider::minBBoxDiam     = 0.0;
+int   csRapidCollider::trianglesTested = 0;
+int   csRapidCollider::boxesTested     = 0;
+int   csRapidCollider::testLevel       = 0;
+bool  csRapidCollider::firstHit        = true;
+int   csRapidCollider::numHits         = 0;
+float csRapidCollider::minBBoxDiam     = 0.0;
 ///
 
-Moment *Moment::stack = 0;
+SCF_IMPLEMENT_IBASE (csRapidCollider)
+  SCF_IMPLEMENTS_INTERFACE (iCollider)
+SCF_IMPLEMENT_IBASE_END
 
-csRAPIDCollider::csRAPIDCollider (iPolygonMesh* mesh)
+
+Moment *Moment::stack = NULL;
+
+csRapidCollider::csRapidCollider (iPolygonMesh* mesh)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   GeometryInitialize (mesh);
 }
 
-void csRAPIDCollider::GeometryInitialize (iPolygonMesh* mesh)
+void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
 {
   m_pCollisionModel = NULL;
 
@@ -115,6 +121,7 @@ void csRAPIDCollider::GeometryInitialize (iPolygonMesh* mesh)
     tri_count += p.num_vertices - 2;
   }
 
+  object_bbox.StartBoundingBox ();
   if (tri_count)
   {
     m_pCollisionModel = new csCdModel (tri_count);
@@ -126,18 +133,21 @@ void csRAPIDCollider::GeometryInitialize (iPolygonMesh* mesh)
       csMeshedPolygon& p = polygons[i];
       int* vidx = p.vertices;
       // Collision detection only works with triangles.
+      object_bbox.AddBoundingVertex (vertices[vidx[0]]);
+      object_bbox.AddBoundingVertex (vertices[vidx[1]]);
       for (v = 2; v < p.num_vertices; v++)
       {
-        m_pCollisionModel->AddTriangle (vertices [vidx[v - 1]],
-                                        vertices [vidx[v]], 
-                                        vertices [vidx[0]]);
+        m_pCollisionModel->AddTriangle (vertices[vidx[v - 1]],
+                                        vertices[vidx[v]], 
+                                        vertices[vidx[0]]);
+        object_bbox.AddBoundingVertex (vertices[vidx[v]]);
       }
     }
     m_pCollisionModel->BuildHierarchy ();
   }
 }
 
-csRAPIDCollider::~csRAPIDCollider(void)
+csRapidCollider::~csRapidCollider ()
 {
   if (m_pCollisionModel)
   {
@@ -148,11 +158,11 @@ csRAPIDCollider::~csRAPIDCollider(void)
   CD_contact.DecRef ();
 }
 
-bool csRAPIDCollider::Collide (csRAPIDCollider &otherCollider, 
+bool csRapidCollider::Collide (csRapidCollider &otherCollider, 
                                const csReversibleTransform *pTransform1, 
                                const csReversibleTransform *pTransform2)
 {
-  csRAPIDCollider *pRAPIDCollider2 = (csRAPIDCollider *)&otherCollider;
+  csRapidCollider *pRAPIDCollider2 = (csRapidCollider *)&otherCollider;
   if (pRAPIDCollider2 == this) return false;
 
   // JTY: also skip objects with m_pCollisionModel NULL. This fixes
@@ -162,9 +172,9 @@ bool csRAPIDCollider::Collide (csRAPIDCollider &otherCollider,
 
   // I don't know, why this is commented out. I need to elaborate this
   // further. thieber 2000-02-19
-  //  csRAPIDCollider::firstHit = true; 
+  //  csRapidCollider::firstHit = true; 
 
-  //call the low level collision detection routine.
+  // call the low level collision detection routine.
 
   csCdBBox *b1 = m_pCollisionModel->m_pBoxes;
   csCdBBox *b2 = pRAPIDCollider2->m_pCollisionModel->m_pBoxes;
@@ -209,19 +219,19 @@ bool csRAPIDCollider::Collide (csRAPIDCollider &otherCollider,
   // To transform tri's from model1's CS to model2's CS use this:
   //    x2 = mR . x1 + mT
 
-  csRAPIDCollider::mR = R1;
-  csRAPIDCollider::mT = T1;
+  csRapidCollider::mR = R1;
+  csRapidCollider::mT = T1;
 
   // reset the report fields
-  csRAPIDCollider::numHits = 0;
-  csRAPIDCollider::trianglesTested = 0;
-  csRAPIDCollider::boxesTested = 0;
+  csRapidCollider::numHits = 0;
+  csRapidCollider::trianglesTested = 0;
+  csRapidCollider::boxesTested = 0;
   // make the call
   if (CollideRecursive (b1, b2, R, T))
   {
     // Error.
   }
-  else if (csRAPIDCollider::numHits != 0)
+  else if (csRapidCollider::numHits != 0)
   {
     hitv [hits][0] = this;
     hitv [hits][1] = pRAPIDCollider2;
@@ -231,7 +241,108 @@ bool csRAPIDCollider::Collide (csRAPIDCollider &otherCollider,
   return 0;
 }
 
-csCollisionPair *csRAPIDCollider::GetCollisions ()
+bool csRapidCollider::CollideArray (
+  	const csReversibleTransform* trans,
+  	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform **transforms)
+{
+  int i;
+  for (i = 0 ; i < num_colliders ; i++)
+  {
+    bool rc = Collide (*(csRapidCollider*)colliders[i],
+    	trans, transforms[i]);
+    if (rc) return rc;
+  }
+  return false;
+}
+
+bool csRapidCollider::CollidePath (
+  	const csReversibleTransform* trans,
+	csVector3& newpos,
+	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform** transforms,
+	PathPolygonMesh* path_mesh)
+{
+  csReversibleTransform newtrans = *trans;
+  newtrans.SetOrigin (newpos);
+
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+  {
+    path_mesh->vertices[i] = trans->This2Other (object_bbox.GetCorner (i));
+    path_mesh->vertices[i+8] = newtrans.This2Other (object_bbox.GetCorner (i));
+  }
+
+  CollideReset ();
+  numHits = 0;
+
+  // @@@ This can be done more efficiently by making a specialized
+  // version of csRapidCollider constructor that works faster for this
+  // special case.
+  csRapidCollider* path_col = new csRapidCollider (path_mesh);
+  bool was_cd = path_col->CollideArray (NULL, num_colliders,
+  	colliders, transforms);
+  path_col->DecRef ();
+
+  if (was_cd)
+  {
+    // There was a collision along the way.
+    // Now we are going to do a binary search using the path_col
+    // to find out in which segment we have to search for collisions.
+    csReversibleTransform oldtrans = *trans;
+    csVector3 start = trans->GetOrigin ();
+    csVector3 end = newpos;
+    while (csSquaredDist::PointPoint (start, end) > .1)
+    {
+      csVector3 cent = (start+end)/2;
+      oldtrans.SetOrigin (start);
+      newtrans.SetOrigin (cent);
+      for (i = 0 ; i < 8 ; i++)
+      {
+        path_mesh->vertices[i] = oldtrans.This2Other (
+		object_bbox.GetCorner (i));
+        path_mesh->vertices[i+8] = newtrans.This2Other (
+		object_bbox.GetCorner (i));
+      }
+      path_col = new csRapidCollider (path_mesh);
+      was_cd = path_col->CollideArray (NULL, num_colliders,
+      	colliders, transforms);
+      path_col->DecRef ();
+      if (was_cd)
+      {
+        // There was a collision in the left segment.
+	end = cent;
+      }
+      else
+      {
+        // There was a collision in the right segment.
+	start = cent;
+      }
+    }
+
+    // start-end is now the first segment that we can find where
+    // the path between start and end (made by the moving bounding
+    // boxes) collides with geometry.
+    // Here we set the position we can move to to 'start' but first
+    // we calculate the collision detection information at 'end'.
+    CollideReset ();
+    numHits = 0;
+    newpos = start;
+    newtrans.SetOrigin (end);
+    CollideArray (&newtrans, num_colliders, colliders, transforms);
+    was_cd = true;
+  }
+  else
+  {
+    // There was no collision so we can move the entire way.
+  }
+
+  return was_cd;
+}
+
+csCollisionPair *csRapidCollider::GetCollisions ()
 {
   return CD_contact.GetArray ();
 }
@@ -633,21 +744,21 @@ bool tri_contact (csVector3 P1, csVector3 P2, csVector3 P3,
 int add_collision (csCdTriangle *tr1, csCdTriangle *tr2)
 {
   int limit = CD_contact.Limit ();
-  if (csRAPIDCollider::numHits >= limit)
+  if (csRapidCollider::numHits >= limit)
   {
 //  is this really needed? - A.Z.
 //  if (!limit)
-//    csRAPIDCollidernumHits = 0;
+//    csRapidCollidernumHits = 0;
     CD_contact.SetLimit (limit + 16);
   }
 
-  CD_contact [csRAPIDCollider::numHits].a1 = tr1->p1;
-  CD_contact [csRAPIDCollider::numHits].b1 = tr1->p2;
-  CD_contact [csRAPIDCollider::numHits].c1 = tr1->p3;
-  CD_contact [csRAPIDCollider::numHits].a2 = tr2->p1;
-  CD_contact [csRAPIDCollider::numHits].b2 = tr2->p2;
-  CD_contact [csRAPIDCollider::numHits].c2 = tr2->p3;
-  csRAPIDCollider::numHits++;
+  CD_contact [csRapidCollider::numHits].a1 = tr1->p1;
+  CD_contact [csRapidCollider::numHits].b1 = tr1->p2;
+  CD_contact [csRapidCollider::numHits].c1 = tr1->p3;
+  CD_contact [csRapidCollider::numHits].a2 = tr2->p1;
+  CD_contact [csRapidCollider::numHits].b2 = tr2->p2;
+  CD_contact [csRapidCollider::numHits].c2 = tr2->p3;
+  csRapidCollider::numHits++;
 
   return false;
 }
@@ -780,15 +891,15 @@ int obb_disjoint (const csMatrix3& B, const csVector3& T,
 }
 
 
-int csRAPIDCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
+int csRapidCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
 	const csMatrix3& R, const csVector3& T)
 {
   int rc;      // return codes
-  if (csRAPIDCollider::firstHit && (csRAPIDCollider::numHits > 0))
+  if (csRapidCollider::firstHit && (csRapidCollider::numHits > 0))
     return false;
 
   // test top level
-  csRAPIDCollider::boxesTested++;
+  csRapidCollider::boxesTested++;
 
   int f1 = obb_disjoint (R, T, b1->GetRadius(), b2->GetRadius());
 
@@ -800,7 +911,7 @@ int csRAPIDCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
   {
     // it is a leaf pair - compare the polygons therein
     // TrianglesHaveContact uses the model-to-model transforms stored in
-    // csRAPIDCollider::mR, csRAPIDCollider::mT.
+    // csRapidCollider::mR, csRapidCollider::mT.
 
     // this will pass along any OUT_OF_MEMORY return codes which
     // may be generated.
@@ -824,18 +935,18 @@ int csRAPIDCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
     // for each child, and store the transform into the collision
     // test queue.
 
-    cR = b1->m_pChild[1]->m_Rotation.GetTranspose () * R;
-    cT = b1->m_pChild[1]->m_Rotation.GetTranspose () *
-      (T - b1->m_pChild[1]->m_Translation);
+    csMatrix3 rot_transp = b1->m_pChild1->m_Rotation.GetTranspose ();
+    cR = rot_transp * R;
+    cT = rot_transp * (T - b1->m_pChild1->m_Translation);
 
-    if ((rc = CollideRecursive (b1->m_pChild[1], b2, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1->m_pChild1, b2, cR, cT)) != false)
       return rc;
 	
-    cR = b1->m_pChild[0]->m_Rotation.GetTranspose () * R;
-    cT = b1->m_pChild[0]->m_Rotation.GetTranspose () *
-      (T - b1->m_pChild[0]->m_Translation);
+    rot_transp = b1->m_pChild0->m_Rotation.GetTranspose ();
+    cR = rot_transp * R;
+    cT = rot_transp * (T - b1->m_pChild0->m_Translation);
 
-    if ((rc = CollideRecursive (b1->m_pChild[0], b2, cR, cT)) != false)
+    if ((rc = CollideRecursive (b1->m_pChild0, b2, cR, cT)) != false)
       return rc;
   }
   else
@@ -843,29 +954,29 @@ int csRAPIDCollider::CollideRecursive (csCdBBox *b1, csCdBBox *b2,
     // here we descend to the children of b2.  See comments for
     // other 'if' clause for explanation.
 
-    cR = R * b2->m_pChild[1]->m_Rotation;
-    cT = ( R * b2->m_pChild[1]->m_Translation) + T;
+    cR = R * b2->m_pChild1->m_Rotation;
+    cT = ( R * b2->m_pChild1->m_Translation) + T;
 	
-    if ((rc = CollideRecursive (b1, b2->m_pChild[1], cR, cT)) != false)
+    if ((rc = CollideRecursive (b1, b2->m_pChild1, cR, cT)) != false)
       return rc;
 	
-    cR = R * b2->m_pChild[0]->m_Rotation;
-    cT = ( R * b2->m_pChild[0]->m_Translation) + T;
+    cR = R * b2->m_pChild0->m_Rotation;
+    cT = ( R * b2->m_pChild0->m_Translation) + T;
 
-    if ((rc = CollideRecursive (b1, b2->m_pChild[0], cR, cT)) != false)
+    if ((rc = CollideRecursive (b1, b2->m_pChild0, cR, cT)) != false)
       return rc;
   }
 
   return false;
 }
 
-void csRAPIDCollider::CollideReset (void)
+void csRapidCollider::CollideReset (void)
 {
   hits = 0;
   currHit = 0;
 }
 
-int csRAPIDCollider::Report (csRAPIDCollider **id1, csRAPIDCollider **id2)
+int csRapidCollider::Report (csRapidCollider **id1, csRapidCollider **id2)
 {
   if (currHit >= hits) return 0;
 
@@ -881,19 +992,19 @@ bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
 
   // the vertices of the CDTriangle in b2 is in model1 C.S.  The vertices of
   // the other triangle is in model2 CS.
-  // Use csRAPIDCollider::mR, csRAPIDCollider::mT, and to transform into
+  // Use csRapidCollider::mR, csRapidCollider::mT, and to transform into
   // model2 CS.
 
   int rc;  // return code
 
   csVector3 i1 =
-    ((csRAPIDCollider::mR * pBox1->m_pTriangle->p1) + csRAPIDCollider::mT);
+    ((csRapidCollider::mR * pBox1->m_pTriangle->p1) + csRapidCollider::mT);
   csVector3 i2 =
-    ((csRAPIDCollider::mR * pBox1->m_pTriangle->p2) + csRAPIDCollider::mT);
+    ((csRapidCollider::mR * pBox1->m_pTriangle->p2) + csRapidCollider::mT);
   csVector3 i3 =
-    ((csRAPIDCollider::mR * pBox1->m_pTriangle->p3) + csRAPIDCollider::mT);
+    ((csRapidCollider::mR * pBox1->m_pTriangle->p3) + csRapidCollider::mT);
 
-  csRAPIDCollider::trianglesTested++;
+  csRapidCollider::trianglesTested++;
 
   bool f = ::tri_contact(i1, i2, i3, 
                          pBox2->m_pTriangle->p1, 
@@ -911,12 +1022,141 @@ bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)
   return false;
 }
 
-const csVector3 &csRAPIDCollider::GetRadius() const 
+const csVector3 &csRapidCollider::GetRadius() const 
 {
   return GetBbox()->GetRadius();
 }
 
-const csCdBBox* csRAPIDCollider::GetBbox(void) const 
+const csCdBBox* csRapidCollider::GetBbox(void) const 
 {
   return m_pCollisionModel->GetTopLevelBox();
 }
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (PathPolygonMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
+PathPolygonMesh::PathPolygonMesh ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  int i;
+  for (i = 0 ; i < 8+12+12 ; i++)
+  {
+    polygons[i].num_vertices = 3;
+    polygons[i].vertices = new int[3];
+  }
+  int j = 0;
+  // Connecting rays.
+  polygons[j].vertices[0]   = BOX_CORNER_xyz;
+  polygons[j].vertices[1]   = BOX_CORNER_Xyz;
+  polygons[j++].vertices[2] = BOX_CORNER_xyz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_xyz;
+  polygons[j].vertices[1]   = BOX_CORNER_xYz;
+  polygons[j++].vertices[2] = BOX_CORNER_xyz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_xyz;
+  polygons[j].vertices[1]   = BOX_CORNER_xyZ;
+  polygons[j++].vertices[2] = BOX_CORNER_xyz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_XYZ;
+  polygons[j].vertices[1]   = BOX_CORNER_xYZ;
+  polygons[j++].vertices[2] = BOX_CORNER_XYZ+8;
+  polygons[j].vertices[0]   = BOX_CORNER_XYZ;
+  polygons[j].vertices[1]   = BOX_CORNER_XyZ;
+  polygons[j++].vertices[2] = BOX_CORNER_XYZ+8;
+  polygons[j].vertices[0]   = BOX_CORNER_XYZ;
+  polygons[j].vertices[1]   = BOX_CORNER_XYz;
+  polygons[j++].vertices[2] = BOX_CORNER_XYZ+8;
+  polygons[j].vertices[0]   = BOX_CORNER_XYz;
+  polygons[j].vertices[1]   = BOX_CORNER_XYZ;
+  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_XYz;
+  polygons[j].vertices[1]   = BOX_CORNER_Xyz;
+  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
+
+  // Source bbox.
+  polygons[j].vertices[0]   = BOX_CORNER_xyz;
+  polygons[j].vertices[1]   = BOX_CORNER_xYz;
+  polygons[j++].vertices[2] = BOX_CORNER_Xyz;
+  polygons[j].vertices[0]   = BOX_CORNER_Xyz;
+  polygons[j].vertices[1]   = BOX_CORNER_xYz;
+  polygons[j++].vertices[2] = BOX_CORNER_XYz;
+  polygons[j].vertices[0]   = BOX_CORNER_Xyz;
+  polygons[j].vertices[1]   = BOX_CORNER_XyZ;
+  polygons[j++].vertices[2] = BOX_CORNER_XYz;
+  polygons[j].vertices[0]   = BOX_CORNER_XYz;
+  polygons[j].vertices[1]   = BOX_CORNER_XYZ;
+  polygons[j++].vertices[2] = BOX_CORNER_XyZ;
+  polygons[j].vertices[0]   = BOX_CORNER_xYz;
+  polygons[j].vertices[1]   = BOX_CORNER_XYz;
+  polygons[j++].vertices[2] = BOX_CORNER_xYZ;
+  polygons[j].vertices[0]   = BOX_CORNER_xYZ;
+  polygons[j].vertices[1]   = BOX_CORNER_XYZ;
+  polygons[j++].vertices[2] = BOX_CORNER_XYz;
+  polygons[j].vertices[0]   = BOX_CORNER_XYZ;
+  polygons[j].vertices[1]   = BOX_CORNER_xYZ;
+  polygons[j++].vertices[2] = BOX_CORNER_XyZ;
+  polygons[j].vertices[0]   = BOX_CORNER_XyZ;
+  polygons[j].vertices[1]   = BOX_CORNER_xYZ;
+  polygons[j++].vertices[2] = BOX_CORNER_xyZ;
+  polygons[j].vertices[0]   = BOX_CORNER_xYz;
+  polygons[j].vertices[1]   = BOX_CORNER_xYZ;
+  polygons[j++].vertices[2] = BOX_CORNER_xyZ;
+  polygons[j].vertices[0]   = BOX_CORNER_xYz;
+  polygons[j].vertices[1]   = BOX_CORNER_xyZ;
+  polygons[j++].vertices[2] = BOX_CORNER_xyz;
+  polygons[j].vertices[0]   = BOX_CORNER_xyz;
+  polygons[j].vertices[1]   = BOX_CORNER_xyZ;
+  polygons[j++].vertices[2] = BOX_CORNER_Xyz;
+  polygons[j].vertices[0]   = BOX_CORNER_Xyz;
+  polygons[j].vertices[1]   = BOX_CORNER_xyZ;
+  polygons[j++].vertices[2] = BOX_CORNER_XyZ;
+
+  // Dest bbox.
+  polygons[j].vertices[0]   = BOX_CORNER_xyz+8;
+  polygons[j].vertices[1]   = BOX_CORNER_xYz+8;
+  polygons[j++].vertices[2] = BOX_CORNER_Xyz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_Xyz+8;
+  polygons[j].vertices[1]   = BOX_CORNER_xYz+8;
+  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_Xyz+8;
+  polygons[j].vertices[1]   = BOX_CORNER_XyZ+8;
+  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_XYz+8;
+  polygons[j].vertices[1]   = BOX_CORNER_XYZ+8;
+  polygons[j++].vertices[2] = BOX_CORNER_XyZ+8;
+  polygons[j].vertices[0]   = BOX_CORNER_xYz+8;
+  polygons[j].vertices[1]   = BOX_CORNER_XYz+8;
+  polygons[j++].vertices[2] = BOX_CORNER_xYZ+8;
+  polygons[j].vertices[0]   = BOX_CORNER_xYZ+8;
+  polygons[j].vertices[1]   = BOX_CORNER_XYZ+8;
+  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_XYZ+8;
+  polygons[j].vertices[1]   = BOX_CORNER_xYZ+8;
+  polygons[j++].vertices[2] = BOX_CORNER_XyZ+8;
+  polygons[j].vertices[0]   = BOX_CORNER_XyZ+8;
+  polygons[j].vertices[1]   = BOX_CORNER_xYZ+8;
+  polygons[j++].vertices[2] = BOX_CORNER_xyZ+8;
+  polygons[j].vertices[0]   = BOX_CORNER_xYz+8;
+  polygons[j].vertices[1]   = BOX_CORNER_xYZ+8;
+  polygons[j++].vertices[2] = BOX_CORNER_xyZ+8;
+  polygons[j].vertices[0]   = BOX_CORNER_xYz+8;
+  polygons[j].vertices[1]   = BOX_CORNER_xyZ+8;
+  polygons[j++].vertices[2] = BOX_CORNER_xyz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_xyz+8;
+  polygons[j].vertices[1]   = BOX_CORNER_xyZ+8;
+  polygons[j++].vertices[2] = BOX_CORNER_Xyz+8;
+  polygons[j].vertices[0]   = BOX_CORNER_Xyz+8;
+  polygons[j].vertices[1]   = BOX_CORNER_xyZ+8;
+  polygons[j++].vertices[2] = BOX_CORNER_XyZ+8;
+}
+
+PathPolygonMesh::~PathPolygonMesh ()
+{
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+  {
+    delete[] polygons[i].vertices;
+  }
+}
+

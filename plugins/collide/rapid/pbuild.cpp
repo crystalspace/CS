@@ -66,20 +66,20 @@ bool csCdModel::AddTriangle (const csVector3 &p1, const csVector3 &p2,
 }
 
 /*
-  There are <n> csCdTriangle structures in an array starting at <t>.
-  
-  We are told that the mean point is <mp> and the orientation
-  for the parent box will be <or>.  The split axis is to be the 
-  vector given by <ax>.
-
-  <or>, <ax>, and <mp> are model space coordinates.
-*/
+ * There are <n> csCdTriangle structures in an array starting at <t>.
+ *
+ * We are told that the mean point is <mp> and the orientation
+ * for the parent box will be <or>.  The split axis is to be the 
+ * vector given by <ax>.
+ *
+ * <or>, <ax>, and <mp> are model space coordinates.
+ */
 bool csCdModel::BuildHierarchy ()
 {
-  // Delete the boxes if they're already allocated
+  // Delete the boxes if they're already allocated.
   delete [] m_pBoxes;
 
-  // allocate the boxes and set the box list globals
+  // Allocate the boxes and set the box list globals.
   m_NumBoxesAlloced = m_NumTriangles * 2;
   m_pBoxes = new csCdBBox [m_NumBoxesAlloced];
   if (!m_pBoxes) return false;
@@ -88,6 +88,8 @@ bool csCdModel::BuildHierarchy ()
   int i; 
   Accum _M;
   
+  // Should never be allocated at this point, but this is safer.
+  delete[] Moment::stack;
   Moment::stack = new Moment[m_NumTriangles];
 
   if (!Moment::stack)
@@ -180,10 +182,11 @@ bool csCdModel::BuildHierarchy ()
   return true;
 }
 
-bool csCdBBox::BuildBBoxTree(int*          TriangleIndices, 
-                             int           NumTriangles, 
-                             csCdTriangle* Triangles,
-                             csCdBBox*&    box_pool)
+bool csCdBBox::BuildBBoxTree (
+	int* TriangleIndices, 
+	int NumTriangles, 
+	csCdTriangle* Triangles,
+	csCdBBox*& box_pool)
 {
   // The orientation for the parent box is already assigned to this->m_Rotation.
   // The axis along which to split will be column 0 of this->m_Rotation.
@@ -282,19 +285,15 @@ bool csCdBBox::BuildBBoxTree(int*          TriangleIndices,
 
   // With the max and min data, determine the center point and dimensions
   // of the parent box.
-
   c = (minval + maxval) * 0.5f; 
-
-  m_Translation.x = c.x * m_Rotation.m11 + c.y * m_Rotation.m12 + c.z * m_Rotation.m13;
-  m_Translation.y = c.x * m_Rotation.m21 + c.y * m_Rotation.m22 + c.z * m_Rotation.m23;
-  m_Translation.z = c.x * m_Rotation.m31 + c.y * m_Rotation.m32 + c.z * m_Rotation.m33;
+  m_Translation = m_Rotation * c;
 
   // delta.
   m_Radius = (maxval - minval ) * 0.5f;
 
   // allocate new boxes
-  m_pChild[0] = box_pool++;
-  m_pChild[1] = box_pool++;
+  m_pChild0 = box_pool++;
+  m_pChild1 = box_pool++;
 
   // Compute the orientations for the child boxes (eigenvectors of
   // covariance matrix).  Select the direction of maximum spread to be
@@ -302,7 +301,7 @@ bool csCdBBox::BuildBBoxTree(int*          TriangleIndices,
   csMatrix3 tR;
   if (n1 > 1)
   {
-    _M1.mean (&m_pChild[0]->m_Translation);
+    _M1.mean (&m_pChild0->m_Translation);
     _M1.covariance (&C);
 
     int nn = SortedEigen(C, tR);
@@ -312,8 +311,8 @@ bool csCdBBox::BuildBBoxTree(int*          TriangleIndices,
       tR.Identity ();
     }
 
-    m_pChild[0]->m_Rotation = tR;
-    if (!m_pChild[0]->BuildBBoxTree (TriangleIndices, n1, 
+    m_pChild0->m_Rotation = tR;
+    if (!m_pChild0->BuildBBoxTree (TriangleIndices, n1, 
                                      Triangles, box_pool))
     {
       return false;
@@ -321,19 +320,19 @@ bool csCdBBox::BuildBBoxTree(int*          TriangleIndices,
   }
   else
   {
-    if (!m_pChild[0]->SetLeaf(&Triangles[TriangleIndices[0]]))
+    if (!m_pChild0->SetLeaf(&Triangles[TriangleIndices[0]]))
       return false;
   }
 
-  C = m_pChild[0]->m_Rotation;
-  m_pChild[0]->m_Rotation    = m_Rotation.GetTranspose () * C;
+  C = m_pChild0->m_Rotation;
+  m_pChild0->m_Rotation    = m_Rotation.GetTranspose () * C;
 
-  c = m_pChild[0]->m_Translation - m_Translation;
-  m_pChild[0]->m_Translation = m_Rotation.GetTranspose () * c;
+  c = m_pChild0->m_Translation - m_Translation;
+  m_pChild0->m_Translation = m_Rotation.GetTranspose () * c;
 
   if ((NumTriangles-n1) > 1)
   {      
-    _M2.mean (&m_pChild[1]->m_Translation);
+    _M2.mean (&m_pChild1->m_Translation);
     _M2.covariance (&C);
     int nn = SortedEigen(C, tR);
 
@@ -343,8 +342,8 @@ bool csCdBBox::BuildBBoxTree(int*          TriangleIndices,
       tR.Identity ();
     }
       
-    m_pChild[1]->m_Rotation = m_Rotation;
-    if (!m_pChild[1]->BuildBBoxTree(TriangleIndices + n1, NumTriangles - n1, 
+    m_pChild1->m_Rotation = m_Rotation;
+    if (!m_pChild1->BuildBBoxTree(TriangleIndices + n1, NumTriangles - n1, 
                                     Triangles, box_pool))
     {
       return false;
@@ -352,15 +351,15 @@ bool csCdBBox::BuildBBoxTree(int*          TriangleIndices,
   }
   else
   {
-    if (!m_pChild[1]->SetLeaf(&Triangles[TriangleIndices[n1]]))
+    if (!m_pChild1->SetLeaf(&Triangles[TriangleIndices[n1]]))
       return false;
   }
 
-  C = m_pChild[1]->m_Rotation;
-  m_pChild[1]->m_Rotation = m_Rotation.GetTranspose () * C;
+  C = m_pChild1->m_Rotation;
+  m_pChild1->m_Rotation = m_Rotation.GetTranspose () * C;
  
-  c = m_pChild[1]->m_Translation - m_Translation;
-  m_pChild[1]->m_Translation = m_Rotation.GetTranspose () * c;
+  c = m_pChild1->m_Translation - m_Translation;
+  m_pChild1->m_Translation = m_Rotation.GetTranspose () * c;
 
   return true;
 }
@@ -375,8 +374,8 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
   // this->m_Rotation, this->m_Radius, and 
   // this->m_Translation are set herein.
 
-  m_pChild[0] = NULL;
-  m_pChild[1] = NULL;
+  m_pChild0 = NULL;
+  m_pChild1 = NULL;
 
   // Find the major axis: parallel to the longest edge.
   // First compute the squared-lengths of each edge
@@ -450,11 +449,7 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
   // With the max and min data, determine the center point and dimensions
   // of the box
   c = (minval + maxval) * 0.5f;
-
-  m_Translation.x = c.x * m_Rotation.m11 + c.y * m_Rotation.m12 + c.z * m_Rotation.m13;
-  m_Translation.y = c.x * m_Rotation.m21 + c.y * m_Rotation.m22 + c.z * m_Rotation.m23;
-  m_Translation.z = c.x * m_Rotation.m31 + c.y * m_Rotation.m32 + c.z * m_Rotation.m33;
-
+  m_Translation = m_Rotation * c;
 
   m_Radius = (maxval - minval) * 0.5f;
 
@@ -463,3 +458,4 @@ bool csCdBBox::SetLeaf(csCdTriangle* pTriangle)
 
   return true;
 }
+

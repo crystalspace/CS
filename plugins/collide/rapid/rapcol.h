@@ -22,6 +22,8 @@
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
+#include "csgeom/box.h"
+#include "ivaria/collider.h"
 
 class csReversibleTransform;
 
@@ -30,10 +32,12 @@ class csCdBBox;
 struct csCdTriangle;
 struct csCollisionPair;
 struct iPolygonMesh;
+class PathPolygonMesh;
 
 /// Low level collision detection using the RAPID algorithm.
-class csRAPIDCollider
+class csRapidCollider : public iCollider
 {
+private:
   friend class csCdBBox;
 
   /// The internal collision object.
@@ -41,6 +45,12 @@ class csRAPIDCollider
 
   /// Get top level bounding box.
   const csCdBBox* GetBbox () const;
+
+  /**
+   * The bounding box in object space.
+   * This is used for CollidePath().
+   */
+  csBox3 object_bbox;
 
   /// Delete and free memory of this objects oriented bounding box.
   void DestroyBbox ();
@@ -55,6 +65,7 @@ class csRAPIDCollider
     */
   static csMatrix3 mR;
   static csVector3 mT;
+
   /**
    * Statistics, to allow early bailout.
    * If the number of triangles tested is too high the BBox structure
@@ -76,14 +87,13 @@ class csRAPIDCollider
   void GeometryInitialize (iPolygonMesh *mesh);
   
 public:
-
   static int numHits;
  
   /// Create a collider based on geometry.
-  csRAPIDCollider (iPolygonMesh* mesh);
+  csRapidCollider (iPolygonMesh* mesh);
 
   /// Destroy the RAPID collider object
-  virtual ~csRAPIDCollider();
+  virtual ~csRapidCollider();
 
   /**
    * Check if this collider collides with pOtherCollider.
@@ -92,18 +102,35 @@ public:
    * This collider and pOtherCollider must be of comparable subclasses, if
    * not false is returned.
    */
-  bool Collide (csRAPIDCollider &pOtherCollider,
+  bool Collide (csRapidCollider &pOtherCollider,
                         const csReversibleTransform *pThisTransform = NULL,
                         const csReversibleTransform *pOtherTransform = NULL);
+
+  /// Test collision with an array of colliders.
+  bool CollideArray (
+  	const csReversibleTransform *pThisTransform,
+  	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform **transforms);
+
+  bool CollidePath (
+  	const csReversibleTransform* thisTransform,
+	csVector3& newpos,
+	int num_colliders,
+	iCollider** colliders,
+	csReversibleTransform** transforms,
+	PathPolygonMesh* path_mesh);
 
   /// Query the array with collisions (and their count).
   static csCollisionPair *GetCollisions ();
 
   static void CollideReset ();
-  static void SetFirstHit (bool fh) {firstHit = fh;}
-  static bool GetFirstHit () {return firstHit;}
-  static int Report (csRAPIDCollider **id1, csRAPIDCollider **id2);
+  static void SetFirstHit (bool fh) { firstHit = fh; }
+  static bool GetFirstHit () { return firstHit; }
+  static int Report (csRapidCollider **id1, csRapidCollider **id2);
   const csVector3 &GetRadius() const;
+
+  SCF_DECLARE_IBASE;
 };
 
 
