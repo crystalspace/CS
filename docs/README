@@ -61,26 +61,23 @@ are many known and unknown bugs and that things in general may not work
 as expected (or may not work at all). The known bugs are in docs/todo.html;
 I'm currently still busy making the list of unknown bugs :-)
 
-Crystal Space also lacks many essential feature which would make it
-really useable as a game engine. Have a look at docs/todo.html to see
-some of the stuff that is missing.
+However Crystal Space starts to become useful. There are actually
+already a few projects starting to use CS.
 
 Crystal Space is also not fully optimized yet. Performance is adequate
 provided you have a Pentium but things could certainly be better.
 
-But aside from all these negative comments, Crystal Space currently has
-an active developers team working to make it as useable as possible.
-We are not there yet, but we are getting there.
+We also have a very active developers team working to make it as useable
+as possible. We are are getting there :-)
 
 
 4. Using Crystal Space For Your Project
 ---------------------------------------
 
-But what if you still want to use Crystal Space in your project even
-though you have read the previous section? Well this is possible. The
-best approach at this point in time is to become a member of the
-developers mailing list (more about this later) and listen how everything
-develops. If you're really serious about things you can even join
+What if you want to use Crystal Space in your project? Well this is
+possible. The best approach at this point in time is to become a member of
+the developers mailing list (more about this later) and listen how
+everything develops. If you're really serious about things you can even join
 discussions and develop stuff. I will gladly add contributed code
 to Crystal Space (provided I can use the stuff, I will not add code
 to format disks as I think that this is a little off topic :-)
@@ -127,12 +124,9 @@ and levels for Crystal Space. Here is the URL:
 
   http://crystal.linuxgames.com/
 
-An avid fan of mine (Nathaniel Saint Martin <noote@bigfoot.com>) also
-created a page from which you can download the official and development
-releases. In addition you can often download executables and drivers for
-the latest version from there as well. Here is the URL:
-
-  http://www.multimania.com/noote/CrystalSpace/
+If you want to keep in touch with the latest development of CS you
+can try to access the CVS server. Have a look at the above page to
+see how this works.
 
 
 7. Mailing Lists

@@ -12,6 +12,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+8-Jul-99:
+	- Updated makefiles for ndrvdemo. There are now two makefiles. One
+	  for the client and one for the server. They generate the executables
+	  'client' and 'server' (on Unix). Also did some other fixes (like
+	  renaming scon.* to ndrvscon.* and proper txtmgr init).
 7-Jul-99:
 	- Major bugfix in collision detection code. It crashed completely
 	  on sprites. CD with sprites seems to be broken though. But now
@@ -27,6 +32,17 @@ Short-term cleanups that need to be done:
 	- Changed clipper not to use memory allocation for sprite and curve
 	  triangles. This makes drawing curves and sprites faster again.
 	- Optimized curve drawing.
+	- Andrew Zabolotny fixed an additional number of warnings and
+	  converted some documents from CR/LF to LF.
+	- Andrew also fixed the bug with startup console not working in
+	  8-bit mode.
+	- Andrew added a 'dosconf.bat' script which will help detect what kind
+	  of options the DJGPP compiler understands. This works similar to
+	  unixconf.sh. In addition he updated the DOS port to simplify palette
+	  stuff, fix a bug with single-page non-X and non-VESA modes, and
+	  fix a bug with Matrox VESA BIOS.
+	- Serguei Narojnyi (Snaar) updated NdrvDemo and also added VC project
+	  files.
 6-Jul-99:
 	- Andrew Zabolotny made the movement system from Denis Dmitriev time
 	  dependent (so that movement speed is correct even if frame rate is
@@ -36,6 +52,7 @@ Short-term cleanups that need to be done:
 	- Andrew fixed SetMousePosition() for OS/2.
 	- Fixed dependency on an csengine include file in OpenGL, Direct3D,
 	  and Glide renderers.
+	- Some fixes to networking code from Serguei Narojnyi (Snaar).
 5-Jul-99:
 	- I completely removed support for the 'map' command from the engine
 	  and moved all of it to WalkTest using the new 'DrawFunc()' system.
