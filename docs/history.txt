@@ -16,6 +16,9 @@ The history order has been reversed so that new features are at the top.
 	  same as csPolygon3D::IntersectRay() but without back-face
 	  culling.
 	- Wouter Wijngaards made a small quality increase in radiosity.
+	- Fixed csPolygonTree::ClassifyPoint().
+	- Disabled the new routine to calculate the solid mask because
+	  it is too slow. I need to make this faster.
 15-May-2000
 	- Added const version of csPoly3D::operator[].
 	- Added csPoly3D::SplitWithPlaneXYZ().
