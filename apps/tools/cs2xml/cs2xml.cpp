@@ -63,7 +63,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ATTACH)
   CS_TOKEN_DEF (BASECOLOR)
   CS_TOKEN_DEF (BLOCKS)
-  CS_TOKEN_DEF (BLOCKSIZE
+  CS_TOKEN_DEF (BLOCKSIZE)
   CS_TOKEN_DEF (BOX)
   CS_TOKEN_DEF (BC)
   CS_TOKEN_DEF (BH)
@@ -1270,7 +1270,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	      // We have a single heightmap string (for bcterr).
 	      char buf[2048];
               csScanStr (params, "%s", buf);
-	      CreateValueNode (child, tokname, buf);
+	      CreateValueNode (parent, tokname, buf);
 	    }
 	    else
 	    {
@@ -1540,7 +1540,7 @@ defaulthalo:
 	    child->SetAttributeAsFloat ("y", cp.y);
 	    child->SetAttributeAsFloat ("z", cp.z);
 	    child->SetAttributeAsInt ("cpx", x);
-	    child->SetAttributeAsInt ("cpy", y);
+	    child->SetAttributeAsInt ("cpy", z);
 	  }
 	  break;
         case CS_TOKEN_BH:	// bcterr
@@ -1554,7 +1554,7 @@ defaulthalo:
             csScanStr (params, "%d, %d, %f", &x, &z, &h );
 	    child->SetAttributeAsFloat ("height", h);
 	    child->SetAttributeAsInt ("cpx", x);
-	    child->SetAttributeAsInt ("cpy", y);
+	    child->SetAttributeAsInt ("cpy", z);
 	  }
 	  break;
         case CS_TOKEN_SYSDIST:	// bcterr
