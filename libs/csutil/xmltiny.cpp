@@ -38,16 +38,64 @@ SCF_IMPLEMENT_IBASE_END
 csTinyDocumentSystem::csTinyDocumentSystem ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  pool = NULL;
 }
 
 csTinyDocumentSystem::~csTinyDocumentSystem ()
 {
+  while (pool)
+  {
+    csTinyXmlNode* n = pool->next_pool;
+    delete pool;
+    pool = n;
+  }
 }
 
 csRef<iDocument> csTinyDocumentSystem::CreateDocument ()
 {
-  csRef<iDocument> doc (csPtr<iDocument> (new csTinyXmlDocument ()));
+  csRef<iDocument> doc (csPtr<iDocument> (new csTinyXmlDocument (this)));
   return doc;
+}
+
+static int cnt = 0;
+csTinyXmlNode* csTinyDocumentSystem::Alloc ()
+{
+return new csTinyXmlNode (this);
+#if 0
+  if (pool)
+  {
+    csTinyXmlNode* n = pool;
+    pool = n->next_pool;
+    n->scfRefCount = 1;
+printf ("from pool %p (scfParent=%p sys=%p next_pool=%p)\n", n,
+	n->scfParent, n->sys, n->next_pool); fflush (stdout);
+    return n;
+  }
+  else
+  {
+    csTinyXmlNode* n = new csTinyXmlNode (this);
+cnt++;
+printf ("from new %p, total alloc %d (ref=%d)\n", n, cnt, n->scfRefCount); fflush (stdout);
+    return n;
+  }
+#endif
+}
+
+csTinyXmlNode* csTinyDocumentSystem::Alloc (TiDocumentNode* node)
+{
+  csTinyXmlNode* n = Alloc ();
+  n->SetTiNode (node);
+  return n;
+}
+
+void csTinyDocumentSystem::Free (csTinyXmlNode* n)
+{
+delete n;
+#if 0
+printf ("free %p pool=%p\n", n, pool); fflush (stdout);
+  n->next_pool = pool;
+  pool = n;
+#endif
 }
 
 //------------------------------------------------------------------------
@@ -90,10 +138,12 @@ SCF_IMPLEMENT_IBASE (csTinyXmlNodeIterator)
   SCF_IMPLEMENTS_INTERFACE (iDocumentNodeIterator)
 SCF_IMPLEMENT_IBASE_END
 
-csTinyXmlNodeIterator::csTinyXmlNodeIterator (TiDocumentNode* parent,
+csTinyXmlNodeIterator::csTinyXmlNodeIterator (
+	csTinyDocumentSystem* sys, TiDocumentNode* parent,
 	const char* value)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  csTinyXmlNodeIterator::sys = sys;
   csTinyXmlNodeIterator::parent = parent;
   csTinyXmlNodeIterator::value = value ? csStrNew (value) : NULL;
   if (value)
@@ -112,7 +162,7 @@ csRef<iDocumentNode> csTinyXmlNodeIterator::Next ()
   csRef<iDocumentNode> node;
   if (current != NULL)
   {
-    node = csPtr<iDocumentNode> (new csTinyXmlNode (current));
+    node = csPtr<iDocumentNode> (sys->Alloc (current));
     if (value)
       current = current->NextSibling (value);
     else
@@ -129,20 +179,32 @@ SCF_IMPLEMENT_IBASE_END
 
 //------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csTinyXmlNode)
+//SCF_IMPLEMENT_IBASE_INCREF(csTinyXmlNode)
+void csTinyXmlNode::IncRef ()
+{
+  scfRefCount++;
+//printf ("+++incref %p (ref %d)\n", this, scfRefCount); fflush (stdout);
+}
+void csTinyXmlNode::DecRef ()
+{
+  scfRefCount--;
+//printf ("---decref %p (ref %d)\n", this, scfRefCount); fflush (stdout);
+  if (scfRefCount <= 0)
+  {
+    if (scfParent) scfParent->DecRef ();
+    sys->Free (this);
+  }
+}
+SCF_IMPLEMENT_IBASE_GETREFCOUNT(csTinyXmlNode)
+SCF_IMPLEMENT_IBASE_QUERY(csTinyXmlNode)
   SCF_IMPLEMENTS_INTERFACE (iDocumentNode)
 SCF_IMPLEMENT_IBASE_END
 
-csTinyXmlNode::csTinyXmlNode ()
+csTinyXmlNode::csTinyXmlNode (csTinyDocumentSystem* sys)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   node = NULL;
-}
-
-csTinyXmlNode::csTinyXmlNode (TiDocumentNode* node)
-{
-  SCF_CONSTRUCT_IBASE (NULL);
-  csTinyXmlNode::node = node;
+  csTinyXmlNode::sys = sys;
 }
 
 csTinyXmlNode::~csTinyXmlNode ()
@@ -153,7 +215,7 @@ csRef<iDocumentNode> csTinyXmlNode::GetParent ()
 {
   csRef<iDocumentNode> child;
   if (!node->Parent ()) return child;
-  child = csPtr<iDocumentNode> (new csTinyXmlNode (node->Parent ()));
+  child = csPtr<iDocumentNode> (sys->Alloc (node->Parent ()));
   return child;
 }
 
@@ -197,14 +259,16 @@ void csTinyXmlNode::SetValueAsFloat (float value)
 csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes ()
 {
   csRef<iDocumentNodeIterator> it;
-  it = csPtr<iDocumentNodeIterator> (new csTinyXmlNodeIterator (node, NULL));
+  it = csPtr<iDocumentNodeIterator> (new csTinyXmlNodeIterator (
+  	sys, node, NULL));
   return it;
 }
 
 csRef<iDocumentNodeIterator> csTinyXmlNode::GetNodes (const char* type)
 {
   csRef<iDocumentNodeIterator> it;
-  it = csPtr<iDocumentNodeIterator> (new csTinyXmlNodeIterator (node, type));
+  it = csPtr<iDocumentNodeIterator> (new csTinyXmlNodeIterator (
+  	sys, node, type));
   return it;
 }
 
@@ -213,7 +277,7 @@ csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* type)
   csRef<iDocumentNode> child;
   TiDocumentNode* c = node->FirstChild (type);
   if (!c) return child;
-  child = csPtr<iDocumentNode> (new csTinyXmlNode (c));
+  child = csPtr<iDocumentNode> (sys->Alloc (c));
   return child;
 }
 
@@ -301,7 +365,7 @@ csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
       break;
   }
   if (child)
-    n = csPtr<iDocumentNode> (new csTinyXmlNode (child));
+    n = csPtr<iDocumentNode> (sys->Alloc (child));
   return n;
 }
 
@@ -418,9 +482,10 @@ SCF_IMPLEMENT_IBASE (csTinyXmlDocument)
   SCF_IMPLEMENTS_INTERFACE (iDocument)
 SCF_IMPLEMENT_IBASE_END
 
-csTinyXmlDocument::csTinyXmlDocument ()
+csTinyXmlDocument::csTinyXmlDocument (csTinyDocumentSystem* sys)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  csTinyXmlDocument::sys = sys;
 }
 
 csTinyXmlDocument::~csTinyXmlDocument ()
@@ -436,7 +501,7 @@ csRef<iDocumentNode> csTinyXmlDocument::CreateRoot ()
 {
   Clear ();
   TiDocument* doc = new TiDocument ();
-  root = csPtr<iDocumentNode> (new csTinyXmlNode (doc));
+  root = csPtr<iDocumentNode> (sys->Alloc (doc));
   return root;
 }
 

@@ -21,11 +21,18 @@
 
 #include "iutil/document.h"
 
+class csTinyXmlNode;
+class TiDocumentNode;
+
 /**
  * This is an SCF compatible wrapper for the TinyXml parser in csutil.
  */
 class csTinyDocumentSystem : public iDocumentSystem
 {
+private:
+  friend class csTinyXmlNode;
+  csTinyXmlNode* pool;
+
 public:
   csTinyDocumentSystem ();
   virtual ~csTinyDocumentSystem ();
@@ -33,6 +40,13 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual csRef<iDocument> CreateDocument ();
+
+  /// Internal function: don't use!
+  csTinyXmlNode* Alloc ();
+  /// Internal function: don't use!
+  csTinyXmlNode* Alloc (TiDocumentNode*);
+  /// Internal function: don't use!
+  void Free (csTinyXmlNode* n);
 };
 
 #endif // __CSUTIL_XMLTINY_H__
