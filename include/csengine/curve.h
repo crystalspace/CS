@@ -368,7 +368,7 @@ public:
   virtual int NumVertices ();
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE_EXT (csCurveTemplate);
+  DECLARE_OBJECT_INTERFACE;
 };
 
 /**
@@ -423,7 +423,7 @@ public:
   virtual void HardTransform (const csReversibleTransform& trans);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE_EXT (csCurve);
+  DECLARE_OBJECT_INTERFACE;
 };
 
 #endif // __CS_CURVE_H__

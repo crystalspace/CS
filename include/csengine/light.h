@@ -334,7 +334,7 @@ public:
   void LightingFunc (csLightingFunc* callback, void* callback_data = NULL);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE_EXT (csLight);
+  DECLARE_OBJECT_INTERFACE;
 
   //------------------------ iStatLight interface -----------------------------
   DECLARE_IBASE_EXT (csLight);
@@ -535,7 +535,7 @@ public:
   csDynLight* GetPrev () { return prev; }
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE_EXT (csLight);
+  DECLARE_OBJECT_INTERFACE;
 
   //------------------------ iDynLight interface -----------------------------
   DECLARE_IBASE_EXT (csLight);

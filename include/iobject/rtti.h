@@ -69,15 +69,6 @@
 	virtual void *QueryObjectType (int typeID);
 
 /**
- * Put this macro in the cass definition of an RTTI object that is a subclass
- * of another RTTI-able class. It adds the method that is required for the
- * 'dynamic cast', which also asks the parent class for the requested type.
- */
-#define DECLARE_OBJECT_INTERFACE_EXT(parentclass)			\
-	typedef parentclass objParentClass;				\
-	virtual void *QueryObjectType (int typeID);
-
-/**
  * Put these macros in the source file for the RTTI object. They implement the
  * 'dynamic cast' method. In the simple case you just write:
  *
@@ -93,18 +84,20 @@
  *     IMPLEMENTS_OBJECT_TYPE (iSector)
  *   IMPLEMENT_OBJECT_INTERFACE_END
  *
- * You must use the 'EXT' version of the macros if you want to allow casting
- * to whatever the parent class allows (i.e. when using
- * DECLARE_OBJECT_INTERFACE_EXT).
+ * You can use the 'EXT' version of the macros if your RTTI-able class is a
+ * subclass of another RTTI-able class to extend the class list of the
+ * parent class.
  */
 
 #define IMPLEMENT_OBJECT_INTERFACE(object)				\
 	void *object::QueryObjectType (int Type) {			\
 	  if (Type == csObjectType_##object) return this;
 
-#define IMPLEMENT_OBJECT_INTERFACE_EXT(object)				\
+#define IMPLEMENT_OBJECT_INTERFACE_EXT(object,parentclass)		\
 	void *object::QueryObjectType (int Type) {			\
-	  if (Type == csObjectType_##object) return this;
+	  void *obj = parentclass::QueryObjectType (Type);		\
+	  if (obj) return obj;						\
+	  if (Type == csObjectType_##object) return this;		\
 
 #define IMPLEMENTS_OBJECT_TYPE(type)					\
 	if (Type == csObjectType_##type) return this;
@@ -116,7 +109,7 @@
 	return NULL; }
 
 #define IMPLEMENT_OBJECT_INTERFACE_EXT_END				\
-	return objParentClass::QueryObjectType(Type); }
+	return NULL; }
 
 /**
  * Sometimes functions want you to pass a type ID number. You can get the

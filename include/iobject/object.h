@@ -24,6 +24,25 @@
 
 struct iObjectIterator;
 
+/// You can use this macro to get a child object from a csObject
+#define GET_CHILD_OBJECT(object,type)				\
+  ((type*)(object)->GetChild (OBJECT_TYPE_ID(type)))
+
+/**
+ * You can use this macro to get a child object with
+ * the given name from a csObject.
+ */
+#define GET_NAMED_CHILD_OBJECT(object,type,name)				\
+  ((type*)(object)->GetChild (OBJECT_TYPE_ID(type), name))
+
+/**
+ * same as GET_CHILD_OBJECT, but stops at the first object with the given
+ * name, even if it does not implement the requested type.
+ */
+#define GET_FIRST_NAMED_CHILD_OBJECT(object,type,name)				\
+  ((type*)(object)->GetChild (OBJECT_TYPE_ID(type), name, true))
+
+
 SCF_VERSION (iObject, 0, 0, 2);
 
 /**

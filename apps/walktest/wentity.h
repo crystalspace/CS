@@ -80,7 +80,7 @@ public:
   virtual void NextFrame (float elapsed_time);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE_EXT (csWalkEntity);
+  DECLARE_OBJECT_INTERFACE;
 };
 
 /**
@@ -117,7 +117,7 @@ public:
   virtual void NextFrame (float elapsed_time);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE_EXT (csWalkEntity);
+  DECLARE_OBJECT_INTERFACE;
 };
 
 /**
@@ -158,7 +158,7 @@ public:
   virtual void NextFrame (float elapsed_time);
 
   CSOBJTYPE;
-  DECLARE_OBJECT_INTERFACE_EXT (csWalkEntity);
+  DECLARE_OBJECT_INTERFACE;
 };
 
 #endif // __WENTITY_H

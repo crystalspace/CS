@@ -393,7 +393,7 @@ void csRadElement::RestoreStaticMap ()
 
 IMPLEMENT_CSOBJTYPE(csRadPoly, csObject);
 
-IMPLEMENT_OBJECT_INTERFACE_EXT (csRadPoly)
+IMPLEMENT_OBJECT_INTERFACE_EXT (csRadPoly, csRadElement)
 IMPLEMENT_OBJECT_INTERFACE_EXT_END
 
 csRadPoly :: csRadPoly(csPolygon3D *original, csSector* sector)
@@ -492,7 +492,7 @@ csColor csRadPoly::GetFlatColor() const
 
 IMPLEMENT_CSOBJTYPE(csRadCurve, csObject);
 
-IMPLEMENT_OBJECT_INTERFACE_EXT (csRadCurve)
+IMPLEMENT_OBJECT_INTERFACE_EXT (csRadCurve, csRadElement)
 IMPLEMENT_OBJECT_INTERFACE_EXT_END
 
 csRadCurve :: csRadCurve(csCurve *original, csSector* sector)
