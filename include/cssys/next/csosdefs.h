@@ -111,6 +111,7 @@ static inline char* getcwd( char* p, size_t size )
 #ifdef SYSDEF_ALLOCA
 #undef SYSDEF_ALLOCA
 #define	alloca(x) __builtin_alloca(x)
+#define ALLOC_STACK_ARRAY(var,type,size) type var[size]
 #endif // SYSDEF_ALLOCA
 
 
