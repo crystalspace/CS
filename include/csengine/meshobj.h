@@ -511,6 +511,7 @@ public:
       scfParent->HardTransform (t);
     }
   } scfiMeshFactoryWrapper;
+  friend struct MeshFactoryWrapper;
 };
 
 #endif // __CS_MESHOBJ_H__

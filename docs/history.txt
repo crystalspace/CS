@@ -32,6 +32,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine renamed csApp::printf(...) to Printf(...) and also
 	  added a PrintfV(va_list) variation.  Printf() is now implemented as a
 	  very thin wrapper over PrintfV().
+	- Eric Sunshine eliminated a compilation warning about
+	  csMeshFactoryWrapper having private destructor but no `friend'.
 29-Jun-2001
 	- Got an Insure log from Philip Wyett. Using this I fixed a number
 	  of small problems and one rather bad problem. The bad problem
