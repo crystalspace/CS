@@ -40,6 +40,9 @@ chronological order.
 	  Assigned to ctrl-m key.
 	- Eric Sunshine applied some additional corrections to .chm creation
 	  scripts/configurations to reflect documentation unification.
+	- John Harger cleaned up the particles interface a bit, using Eric's
+	  suggestion of the iParticlesBase SCF interface for all shared
+	  functions
 15-Feb-2004
 	- Norman Kraemer removed inclusion of recently removed av3dtxt.h in AWS
 	  screencanvas header.

@@ -125,6 +125,8 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
 
   autostart = true;
 
+  transform_mode = false;
+
   physics_plugin = "crystalspace.particles.physics.simple";
 
   color_method = CS_PART_COLOR_CONSTANT;
@@ -227,6 +229,8 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
   loop_time = p->loop_time;
   color_callback = p->color_callback;
 
+  transform_mode = p->transform_mode;
+
   point_data = NULL; // This gets created by the physics plugin
 
   emitter = csVector3(0.0f, 0.0f, 0.0f);
@@ -323,6 +327,7 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
   {
     tr_o2c /= movable->GetFullTransform ();
   }
+  rotation_matrix = movable->GetTransform ().GetT2O ();
 
   int vertnum = 0;
   float new_radius = 0.0f;
@@ -597,8 +602,8 @@ void csParticlesObject::GetObjectBoundingBox (csBox3& bbox, int type)
     break;
   case CS_BBOX_MAX:
     // TODO: Come up with a better estimated maximum
-    bbox.AddBoundingVertex (-100, -100, -100);
-    bbox.AddBoundingVertex (100, 100, 100);
+    bbox.AddBoundingVertex (-100000.0f, -100000.0f, -100000.0f);
+    bbox.AddBoundingVertex (100000.0f, 100000.0f, 100000.0f);
     break;
   }
 }

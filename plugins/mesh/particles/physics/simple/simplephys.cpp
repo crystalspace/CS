@@ -77,6 +77,9 @@ const csArray<csParticlesData> *csParticlesPhysicsSimple::RegisterParticles (
 {
   particles_object *part = new particles_object;
   part->particles = particles;
+  part->dead_particles = 0;
+  part->new_particles = 0;
+  part->total_elapsed_time = 0.0f;
   partobjects.Push (part);
   return &part->data;
 }
@@ -201,9 +204,9 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     {
     case CS_PART_EMIT_SPHERE:
     {
-      start = csVector3((rng.Get() - 0.5) * 2,
-                        (rng.Get() - 0.5) * 2,
-			(rng.Get() - 0.5) * 2);
+      start = csVector3((rng.Get() - 0.5f) * 2,
+                        (rng.Get() - 0.5f) * 2,
+			                  (rng.Get() - 0.5f) * 2);
       start.Normalize ();
       float inner_radius = part->particles->GetSphereEmitInnerRadius ();
       float outer_radius = part->particles->GetSphereEmitOuterRadius ();
@@ -213,8 +216,19 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       break;
     }
     case CS_PART_EMIT_PLANE:
+    {
+      start = csVector3((rng.Get() - 0.5f) * part->particles->GetEmitXSize(),
+        0.0f, (rng.Get() - 0.5f) * part->particles->GetEmitYSize());
+      start = part->particles->GetRotation () * start;
+      start += emitter;
       break;
+    }
     case CS_PART_EMIT_BOX:
+      start = csVector3((rng.Get() - 0.5f) * part->particles->GetEmitXSize(),
+        (rng.Get() - 0.5f) * part->particles->GetEmitYSize(),
+        (rng.Get() - 0.5f) * part->particles->GetEmitZSize());
+      start = part->particles->GetRotation () * start;
+      start += emitter;
       break;
     }
 

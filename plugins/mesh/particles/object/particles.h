@@ -157,13 +157,32 @@ public:
     emit_size_1 = outer_radius;
     emit_size_2 = inner_radius;
   }
+  void SetPlaneEmitType (float x_size, float y_size)
+  {
+    emit_type = CS_PART_EMIT_PLANE;
+    emit_size_1 = x_size;
+    emit_size_2 = y_size;
+  }
+  void SetBoxEmitType (float x_size, float y_size, float z_size)
+  {
+    emit_type = CS_PART_EMIT_BOX;
+    emit_size_1 = x_size;
+    emit_size_2 = y_size;
+    emit_size_3 = z_size;
+  }
+  void SetCylinderEmitType (float radius, float height)
+  {
+    emit_type = CS_PART_EMIT_CYLINDER;
+    emit_size_1 = radius;
+    emit_size_2 = height;
+  }
   void SetRadialForceType (float range, csParticleFalloffType falloff)
   {
     force_type = CS_PART_FORCE_RADIAL;
     force_range = range;
     force_falloff = falloff;
   }
-  void SetLinearForceType (csVector3 &direction, float range,
+  void SetLinearForceType (const csVector3 &direction, float range,
     csParticleFalloffType falloff)
   {
     force_type = CS_PART_FORCE_LINEAR;
@@ -171,7 +190,7 @@ public:
     force_range = range;
     force_falloff = falloff;
   }
-  void SetConeForceType (csVector3 &direction, float range,
+  void SetConeForceType (const csVector3 &direction, float range,
     csParticleFalloffType falloff, float radius,
     csParticleFalloffType radius_falloff)
   {
@@ -186,7 +205,7 @@ public:
   { force_amount = force; }
   void SetDiffusion (float size)
   { diffusion = size; }
-  void SetGravity (csVector3 &gravity)
+  void SetGravity (const csVector3 &gravity)
   { csParticlesFactory::gravity = gravity; }
   void SetEmitTime (float time)
   { emit_time = time; }
@@ -230,6 +249,56 @@ public:
   }
   void SetParticleRadius (float rad)
   { particle_radius = rad; }
+  int GetParticlesPerSecond ()
+  { return particles_per_second; }
+  int GetInitialParticleCount ()
+  { return initial_particles; }
+  csParticleEmitType GetEmitType ()
+  { return emit_type; }
+  float GetEmitSize1 ()
+  { return emit_size_1; }
+  float GetEmitSize2 ()
+  { return emit_size_2; }
+  float GetEmitSize3 ()
+  { return emit_size_3; }
+  csParticleForceType GetForceType ()
+  { return force_type; }
+  void GetFalloffType(csParticleFalloffType &force,
+    csParticleFalloffType &cone)
+  {
+    force = force_falloff;
+    cone = force_cone_radius_falloff;
+  }
+  float GetForceRange ()
+  { return force_range; }
+  void GetForceDirection (csVector3 &dir)
+  { dir = force_direction; }
+  float GetForceConeRadius ()
+  { return force_cone_radius; }
+  float GetForce ()
+  { return force_amount; }
+  float GetDiffusion ()
+  { return diffusion; }
+  void GetGravity (csVector3 &gravity)
+  { gravity = csParticlesFactory::gravity; }
+  float GetEmitTime ()
+  { return emit_time; }
+  float GetTimeToLive ()
+  { return time_to_live; }
+  float GetTimeVariation ()
+  { return time_variation; }
+  float GetParticleRadius ()
+  { return particle_radius; }
+  csParticleColorMethod GetParticleColorMethod ()
+  { return color_method; }
+  csColor GetConstantColor ()
+  { return constant_color; }
+  float GetColorLoopTime ()
+  { return loop_time; }
+  float GetBaseHeat ()
+  { return base_heat; }
+  const csArray<csColor> &GetGradient ()
+  { return gradient_colors; }
   void SetDampener (float damp)
   { dampener = damp; }
   float GetDampener ()
@@ -246,6 +315,8 @@ public:
   { autostart = a; }
   void SetTransformMode (bool transform)
   { transform_mode = transform; }
+  bool GetTransformMode ()
+  { return transform_mode; }
   void SetPhysicsPlugin (const char *plugin)
   { physics_plugin = plugin; }
 
@@ -263,15 +334,17 @@ public:
     virtual void SetSphereEmitType (float outer_radius, float inner_radius)
     { scfParent->SetSphereEmitType(outer_radius, inner_radius); }
     virtual void SetPlaneEmitType (float x_size, float y_size)
-    {}
+    { scfParent->SetPlaneEmitType (x_size, y_size); }
     virtual void SetBoxEmitType (float x_size, float y_size, float z_size)
-    {}
+    {scfParent->SetBoxEmitType (x_size, y_size, z_size); }
+    virtual void SetCylinderEmitType (float radius, float height)
+    {scfParent->SetCylinderEmitType (radius, height); }
     virtual void SetRadialForceType(float range, csParticleFalloffType falloff)
     { scfParent->SetRadialForceType(range, falloff); }
-    virtual void SetLinearForceType(csVector3 &direction, float range,
+    virtual void SetLinearForceType(const csVector3 &direction, float range,
       csParticleFalloffType falloff)
     { scfParent->SetLinearForceType(direction, range, falloff); }
-    virtual void SetConeForceType (csVector3 &direction, float range,
+    virtual void SetConeForceType (const csVector3 &direction, float range,
       csParticleFalloffType falloff, float radius,
       csParticleFalloffType radius_falloff)
     { scfParent->SetConeForceType (direction, range, falloff, radius,
@@ -280,7 +353,7 @@ public:
     { scfParent->SetForce (force); }
     virtual void SetDiffusion (float size)
     { scfParent->SetDiffusion (size); }
-    virtual void SetGravity (csVector3 &gravity)
+    virtual void SetGravity (const csVector3 &gravity)
     { scfParent->SetGravity (gravity); }
     virtual void SetEmitTime (float time)
     { scfParent->SetEmitTime (time); }
@@ -306,6 +379,57 @@ public:
     { return scfParent->GetColorCallback (); }
     virtual void SetParticleRadius (float radius)
     { scfParent->SetParticleRadius (radius); }
+    virtual csParticleColorMethod GetParticleColorMethod ()
+    { return scfParent->GetParticleColorMethod (); }
+    virtual csColor GetConstantColor ()
+    { return scfParent->GetConstantColor (); }
+    virtual float GetColorLoopTime ()
+    { return scfParent->GetColorLoopTime (); }
+    virtual const csArray<csColor> &GetGradient ()
+    { return scfParent->GetGradient (); }
+    virtual float GetBaseHeat ()
+    { return scfParent->GetBaseHeat (); }
+    virtual int GetParticlesPerSecond ()
+    { return scfParent->GetParticlesPerSecond (); }
+    virtual int GetInitialParticleCount ()
+    { return scfParent->GetInitialParticleCount (); }
+    virtual csParticleEmitType GetEmitType ()
+    { return scfParent->GetEmitType (); }
+    virtual float GetSphereEmitInnerRadius ()
+    { return scfParent->GetEmitSize2 (); }
+    virtual float GetSphereEmitOuterRadius ()
+    { return scfParent->GetEmitSize1 (); }
+    virtual float GetEmitXSize ()
+    { return scfParent->GetEmitSize1 (); }
+    virtual float GetEmitYSize ()
+    { return scfParent->GetEmitSize2 (); }
+    virtual float GetEmitZSize ()
+    { return scfParent->GetEmitSize3 (); }
+    virtual csParticleForceType GetForceType ()
+    { return scfParent->GetForceType (); }
+    virtual void GetFalloffType(csParticleFalloffType &force,
+      csParticleFalloffType &cone)
+    { scfParent->GetFalloffType (force, cone); }
+    virtual float GetForceRange ()
+    { return scfParent->GetForceRange (); }
+    virtual void GetForceDirection (csVector3 &dir)
+    { scfParent->GetForceDirection (dir); }
+    virtual float GetForceConeRadius ()
+    { return scfParent->GetForceConeRadius (); }
+    virtual float GetForce ()
+    { return scfParent->GetForce (); }
+    virtual float GetDiffusion ()
+    { return scfParent->GetDiffusion (); }
+    virtual void GetGravity (csVector3 &gravity)
+    { scfParent->GetGravity (gravity); }
+    virtual float GetEmitTime ()
+    { return scfParent->GetEmitTime (); }
+    virtual float GetTimeToLive ()
+    { return scfParent->GetTimeToLive (); }
+    virtual float GetTimeVariation ()
+    { return scfParent->GetTimeVariation (); }
+    virtual float GetParticleRadius ()
+    { return scfParent->GetParticleRadius (); }
     virtual void SetDampener (float damp)
     { scfParent->SetDampener (damp); }
     virtual float GetDampener ()
@@ -320,6 +444,8 @@ public:
     { scfParent->SetAutoStart (autostart); }
     virtual void SetTransformMode (bool transform)
     { scfParent->SetTransformMode (transform); }
+    virtual bool GetTransformMode ()
+    { return scfParent->GetTransformMode (); }
     virtual float GetMassVariation ()
     { return scfParent->GetMassVariation (); }
     virtual void SetPhysicsPlugin (const char *plugin)
@@ -347,6 +473,7 @@ private:
   int meshppsize;
 
   csReversibleTransform tr_o2c;
+  csMatrix3 rotation_matrix;
   int tricount;
 
   csStringID vertex_name;
@@ -512,13 +639,32 @@ public:
     emit_size_1 = outer_radius;
     emit_size_2 = inner_radius;
   }
+  void SetPlaneEmitType (float x_size, float y_size)
+  {
+    emit_type = CS_PART_EMIT_PLANE;
+    emit_size_1 = x_size;
+    emit_size_2 = y_size;
+  }
+  void SetBoxEmitType (float x_size, float y_size, float z_size)
+  {
+    emit_type = CS_PART_EMIT_BOX;
+    emit_size_1 = x_size;
+    emit_size_2 = y_size;
+    emit_size_3 = z_size;
+  }
+  void SetCylinderEmitType (float radius, float height)
+  {
+    emit_type = CS_PART_EMIT_CYLINDER;
+    emit_size_1 = radius;
+    emit_size_2 = height;
+  }
   void SetRadialForceType (float range, csParticleFalloffType falloff)
   {
     force_type = CS_PART_FORCE_RADIAL;
     force_range = range;
     force_falloff = falloff;
   }
-  void SetLinearForceType (csVector3 &direction, float range,
+  void SetLinearForceType (const csVector3 &direction, float range,
     csParticleFalloffType falloff)
   {
     force_type = CS_PART_FORCE_LINEAR;
@@ -526,7 +672,7 @@ public:
     force_range = range;
     force_falloff = falloff;
   }
-  void SetConeForceType (csVector3 &direction, float range,
+  void SetConeForceType (const csVector3 &direction, float range,
     csParticleFalloffType falloff, float radius,
     csParticleFalloffType radius_falloff)
   {
@@ -541,7 +687,7 @@ public:
   { force_amount = force; }
   void SetDiffusion (float size)
   { diffusion = size; }
-  void SetGravity (csVector3 &gravity)
+  void SetGravity (const csVector3 &gravity)
   { csParticlesObject::gravity = gravity; }
   void SetEmitTime (float time)
   { emit_time = time; }
@@ -653,8 +799,12 @@ public:
   { return gradient_colors; }
   void SetTransformMode (bool transform)
   { transform_mode = transform; }
+  bool GetTransformMode ()
+  { return transform_mode; }
   csReversibleTransform GetCameraTranform ()
   { return tr_o2c; }
+  const csMatrix3 &GetRotation ()
+  { return rotation_matrix; }
 
   void Start ();
   void Stop ();
@@ -675,15 +825,17 @@ public:
     virtual void SetSphereEmitType (float outer_radius, float inner_radius)
     { scfParent->SetSphereEmitType (outer_radius, inner_radius); }
     virtual void SetPlaneEmitType (float x_size, float y_size)
-    {}
+    { scfParent->SetPlaneEmitType (x_size, y_size); }
     virtual void SetBoxEmitType (float x_size, float y_size, float z_size)
-    {}
+    {scfParent->SetBoxEmitType (x_size, y_size, z_size); }
+    virtual void SetCylinderEmitType (float radius, float height)
+    {scfParent->SetCylinderEmitType (radius, height); }
     virtual void SetRadialForceType(float range, csParticleFalloffType falloff)
     { scfParent->SetRadialForceType(range, falloff); }
-    virtual void SetLinearForceType(csVector3 &direction, float range,
+    virtual void SetLinearForceType(const csVector3 &direction, float range,
       csParticleFalloffType falloff)
     { scfParent->SetLinearForceType(direction, range, falloff); }
-    virtual void SetConeForceType (csVector3 &direction, float range,
+    virtual void SetConeForceType (const csVector3 &direction, float range,
       csParticleFalloffType falloff, float radius,
       csParticleFalloffType radius_falloff)
     { scfParent->SetConeForceType (direction, range, falloff, radius,
@@ -692,7 +844,7 @@ public:
     { scfParent->SetForce (force); }
     virtual void SetDiffusion (float size)
     { scfParent->SetDiffusion (size); }
-    virtual void SetGravity (csVector3 &gravity)
+    virtual void SetGravity (const csVector3 &gravity)
     { scfParent->SetGravity (gravity); }
     virtual void SetEmitTime (float time)
     { scfParent->SetEmitTime (time); }
@@ -785,8 +937,12 @@ public:
     { return scfParent->GetMassVariation (); }
     virtual void SetTransformMode (bool transform)
     { scfParent->SetTransformMode (transform); }
+    virtual bool GetTransformMode ()
+    { return scfParent->GetTransformMode (); }
     virtual csReversibleTransform GetObjectToCamera ()
     { return scfParent->GetCameraTranform (); }
+    virtual const csMatrix3 &GetRotation ()
+    { return scfParent->GetRotation (); }
     virtual void ChangePhysicsPlugin (const char *plugin)
     { scfParent->LoadPhysicsPlugin (plugin); }
     virtual void Start ()
