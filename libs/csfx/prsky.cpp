@@ -272,7 +272,8 @@ uint8 csProcSky::GetCloudVal(int x, int y)
   /// now overcast sky cloud value.
   /// lessen cloudyness.
   /// res in (200-300);
-  int lessen = 20;
+#if 0
+  int lessen = 180;
   res -= lessen;
   if(res<0)res=0;
   int cloudyness = 270;
@@ -284,6 +285,10 @@ uint8 csProcSky::GetCloudVal(int x, int y)
   }
   // res*res/cloudyness;
   else res = res;
+#endif
+  int cloudmin = 180;
+  int cloudlen = 420 - cloudmin;
+  res = (res-cloudmin)*255/cloudlen;
 
   if(res>255) res=255;
   return (uint8)res;
@@ -349,7 +354,7 @@ void csProcSky::DrawToTexture(csProcSkyTexture *skytex)
 	clcol.Set(sunshadow,sunshadow,sunshadow);
       }
       int hazefact = int(haze*255.);
-      if(cloud<64) hazefact=255;
+      //if(cloud<64) hazefact=255;
       if(hazefact<255-cloud) hazefact = 255-cloud;
 
       int r,g,b;
