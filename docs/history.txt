@@ -55,6 +55,16 @@ chronological order.
 	- Eric Sunshine fixed a bug in assembler.jam where the pathnames used
 	  with the -I directives lacked a trailing slash.  The slash is
 	  required by NASM.  (Bug #827028)
+	- Jorrit added the ability to csBox3 and csBox2 to use CS_BOX_CENTER3
+	  and CS_BOX_CENTER2 for GetCorner(). This will return the center.
+	  Yes I know. The center of a box is not a corner. Just leave me alone
+	  will you? :-)
+	- Jorrit notes that the previous trick now also works for csOBB.
+	- Jorrit added a default constructor to csOBBFrozen which does
+	  nothing.
+	- Jorrit changed VPT tracking so that it tries the 8 corners of the
+	  object box to see which point is visible. This seems to work a
+	  lot better now.
 22-Oct-2003
 	- Jorrit fixed a bug in csMovableSectorList which did all the needed
 	  SCF stuff EXCEPT inherit from iBase. This is an old bug but for

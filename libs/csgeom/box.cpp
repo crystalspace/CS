@@ -43,6 +43,7 @@ csVector2 csBox2::GetCorner (int corner) const
     case CS_BOX_CORNER_xY:  return csVector2 (MinX (), MaxY ());
     case CS_BOX_CORNER_Xy:  return csVector2 (MaxX (), MinY ());
     case CS_BOX_CORNER_XY:  return Max ();
+    case CS_BOX_CENTER2:    return GetCenter ();
   }
 
   return csVector2 (0, 0);
@@ -440,6 +441,7 @@ csVector3 csBox3::GetCorner (int corner) const
     case CS_BOX_CORNER_XyZ: return csVector3 (MaxX (), MinY (), MaxZ ());
     case CS_BOX_CORNER_XYz: return csVector3 (MaxX (), MaxY (), MinZ ());
     case CS_BOX_CORNER_XYZ: return Max ();
+    case CS_BOX_CENTER3:    return GetCenter ();
   }
 
   return csVector3 (0, 0, 0);

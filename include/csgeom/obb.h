@@ -117,6 +117,18 @@ public:
   }
 
   /**
+   * Copy a normal OBB and freeze the corners.
+   */
+  void Copy (const csOBB& obb, const csReversibleTransform& trans);
+
+  /**
+   * Create an empty csOBBFrozen which is not initialized.
+   */
+  csOBBFrozen ()
+  {
+  }
+
+  /**
    * Create a frozen OBB from a normal OBB.
    */
   csOBBFrozen (const csOBB& obb)
@@ -130,7 +142,10 @@ public:
    * AFTER the matrix of the obb is applied (using
    * Other2This).
    */
-  csOBBFrozen (const csOBB& obb, const csReversibleTransform& trans);
+  csOBBFrozen (const csOBB& obb, const csReversibleTransform& trans)
+  {
+    Copy (obb, trans);
+  }
 
   /**
    * Get one corner from the OBB.

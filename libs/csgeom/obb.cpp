@@ -26,7 +26,7 @@
 
 //=============================================================================
 
-csOBBFrozen::csOBBFrozen (const csOBB& obb, const csReversibleTransform& trans)
+void csOBBFrozen::Copy (const csOBB& obb, const csReversibleTransform& trans)
 {
   csReversibleTransform newtrans;
   csMatrix3 mat_transp = obb.GetMatrix ().GetTranspose ();

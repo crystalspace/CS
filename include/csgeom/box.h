@@ -52,6 +52,8 @@ class csTransform;
 #define CS_BOX_CORNER_Xy 2
 /// max X, max Y
 #define CS_BOX_CORNER_XY 3
+/// center
+#define CS_BOX_CENTER2 4
 /** @} */
 
 /**
@@ -124,6 +126,7 @@ public:
    * those are only the min and max corners.
    * Corner 0 = xy, 1 = xY, 2 = Xy, 3 = XY.
    * Use #CS_BOX_CORNER_xy etc. defines.
+   * #CS_BOX_CENTER2 also works.
    */
   csVector2 GetCorner (int corner) const;
 
@@ -411,6 +414,8 @@ public:
 #define CS_BOX_CORNER_XYz 6
 /// max X, max Y, max Z
 #define CS_BOX_CORNER_XYZ 7
+/// center
+#define CS_BOX_CENTER3 8
 /** @} */
 
 /**
@@ -547,6 +552,7 @@ public:
    * Corner 0 = xyz, 1 = xyZ, 2 = xYz, 3 = xYZ,
    *        4 = Xyz, 5 = XyZ, 6 = XYz, 7 = XYZ.
    * Use #CS_BOX_CORNER_xyz etc. defines.
+   * #CS_BOX_CENTER3 also works.
    */
   csVector3 GetCorner (int corner) const;
 

@@ -531,9 +531,8 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
         printf ("Before node test:\n%s\n", str->GetData ());
       }
 #     endif
-      int x, y;
       // @@@ VPT tracking for nodes!!!
-      bool rc = tcovbuf->TestRectangle (sbox, min_depth, x, y);
+      bool rc = tcovbuf->TestRectangle (sbox, min_depth);
 
       if (!rc)
       {
@@ -992,19 +991,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       bool rc = false;
       float max_depth;
 
-      if (do_cull_vpt)
+      if (do_cull_vpt && hist->has_vpt_point)
       {
-	csVector3 cam_center;
-#if 0
-	if (hist->has_vpt_point)
-	{
-	  cam_center = camtrans * hist->vpt_point;
-	  cnt_real++;
-	}
-	else
-#endif
-	  cam_center = camtrans * obj_bbox.GetCenter ();
-
+	csVector3 cam_center = camtrans * hist->vpt_point;
 	if (cam_center.z >= .1)
 	{
 	  csVector2 sbox_center;
@@ -1030,10 +1019,11 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
         }
       }
 
+      csOBBFrozen frozen_obb;
       if (obj->model->HasOBB ())
       {
         const csOBB& obb = obj->model->GetOBB ();
-        csOBBFrozen frozen_obb (obb, trans);
+        frozen_obb.Copy (obb, trans);
         rc = frozen_obb.ProjectOBB (fov, sx, sy, sbox, min_depth, max_depth);
       }
       else
@@ -1042,7 +1032,6 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
         rc = obj_bbox.ProjectBox (camtrans, fov, sx, sy, sbox, min_depth, max_depth);
       }
 
-      int testrect_x = -1, testrect_y;
       if (rc)
       {
 #       ifdef CS_DEBUG
@@ -1052,7 +1041,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
           printf ("Before obj test:\n%s\n", str->GetData ());
         }
 #       endif
-	rc = tcovbuf->TestRectangle (sbox, min_depth, testrect_x, testrect_y);
+	rc = tcovbuf->TestRectangle (sbox, min_depth);
       }
 
       if (rc)
@@ -1093,7 +1082,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	    }
 	    while (qobj);
 	    // Now try again.
-            rc = tcovbuf->TestRectangle (sbox, min_depth, testrect_x, testrect_y);
+            rc = tcovbuf->TestRectangle (sbox, min_depth);
             if (!rc)
 	    {
 	      // It really is invisible.
@@ -1113,22 +1102,51 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
         goto end;
       }
 
-#if 0
       // If we come here we are visible and we can update a point for VPT tracking.
-      if (do_cull_vpt && testrect_x != -1)
+      if (do_cull_vpt)
       {
-        // We have a visible point for VPT tracking.
-	csVector3 cam_center = camtrans * obj_bbox.GetCenter ();
-	if (cam_center.z >= .1)
+	hist->has_vpt_point = false;
+        int i;
+	// First we try to find a visible point on the OBB or AABB.
+        if (obj->model->HasOBB ())
+        {
+	  for (i = 0 ; i < 8 ; i++)
+	  {
+	    csVector3 v = frozen_obb.GetCorner (i);
+	    if (v.z >= .1)
+	    {
+	      csVector2 p;
+	      Perspective (v, p, fov, sx, sy);
+	      bool test = tcovbuf->TestPoint (p, v.z);
+	      if (test)
+	      {
+		hist->vpt_point = frozen_obb.GetCorner (i);
+		hist->has_vpt_point = true;
+		break;
+	      }
+	    }
+	  }
+	}
+	else
 	{
-	  csVector2 p (testrect_x, testrect_y);
-	  csVector3 v;
-	  InvPerspective (p, cam_center.z, v, fov, sx, sy);
-	  hist->vpt_point = camtrans.This2Other (v);
-	  hist->has_vpt_point = true;
-        }
+	  for (i = 0 ; i < 9 ; i++)	// Also include CS_BOX_CENTER3
+	  {
+	    csVector3 v = camtrans * obj_bbox.GetCorner (i);
+	    if (v.z >= .1)
+	    {
+	      csVector2 p;
+	      Perspective (v, p, fov, sx, sy);
+	      bool test = tcovbuf->TestPoint (p, v.z);
+	      if (test)
+	      {
+		hist->vpt_point = obj_bbox.GetCorner (i);
+		hist->has_vpt_point = true;
+		break;
+	      }
+	    }
+	  }
+	}
       }
-#endif
     }
 
     //---------------------------------------------------------------
@@ -2416,8 +2434,7 @@ public:
     csBox2 box;
     box.Set (bugplug->DebugViewGetPoint (box_idx1),
     	bugplug->DebugViewGetPoint (box_idx2));
-    int x, y;
-    bool rc = tcovbuf->TestRectangle (box, 100, x, y);
+    bool rc = tcovbuf->TestRectangle (box, 100);
     if (rc)
     {
       int colred = g3d->GetDriver2D ()->FindRGB (255, 0, 0);
