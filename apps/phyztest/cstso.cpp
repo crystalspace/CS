@@ -137,8 +137,8 @@ real csRigidSpaceTimeObj::collision_check()
 
     if ( first_sector )
     {
-	  thng = first_sector->GetMesh("walls");
-      coli->Collide(*thng, &tfm);
+//      thng = first_sector->GetMesh("walls");
+      coli->Collide(*first_sector, &tfm);
       CD_contact = cdsys->GetCollisionPairs ();
     }
 

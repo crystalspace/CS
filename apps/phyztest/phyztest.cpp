@@ -208,50 +208,71 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
 
+  iMaterialWrapper *iMW = QUERY_INTERFACE (tm, iMaterialWrapper);
+ 
   room = engine->CreateCsSector ("room");
-  csThing* walls = engine->CreateSectorWalls (room, "walls");
-  csPolygon3D* p;
-  p = walls->NewPolygon (tm);
-  p->AddVertex (-5, -5, 5);//1
-  p->AddVertex (5, -5, 5);//2
-  p->AddVertex (5, -5, -5);//3
-  p->AddVertex (-5, -5, -5);//4
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  iThing* walls = QUERY_INTERFACE (engine->CreateSectorWallsMesh (room, "walls")->GetMeshObject (), 
+				   iThing);
+  csVector3 
+	   f1 (-5,  5,  5),
+	   f2 ( 5,  5,  5), 
+	   f3 ( 5, -5,  5), 
+	   f4 (-5, -5,  5), 
+	   b1 (-5,  5, -5),
+	   b2 ( 5,  5, -5), 
+	   b3 ( 5, -5, -5), 
+	   b4 (-5, -5, -5);
 
-  p = walls->NewPolygon (tm);
-  p->AddVertex (-5, 5, -5);//5
-  p->AddVertex (5, 5, -5);//6
-  p->AddVertex (5, 5, 5);//7
-  p->AddVertex (-5, 5, 5);//8
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  iPolygon3D* p = walls->CreatePolygon ("back");
+  p->SetMaterial (iMW);
+  p->CreateVertex (b4);
+  p->CreateVertex (b3);
+  p->CreateVertex (b2);
+  p->CreateVertex (b1);
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = walls->NewPolygon (tm);
-  p->AddVertex (-5, 5, 5);//9
-  p->AddVertex (5, 5, 5);//10
-  p->AddVertex (5, -5, 5);//11
-  p->AddVertex (-5, -5, 5);//12
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls->CreatePolygon ("front");
+  p->SetMaterial (iMW);
+  p->CreateVertex (f1);
+  p->CreateVertex (f2);
+  p->CreateVertex (f3);
+  p->CreateVertex (f4);
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = walls->NewPolygon (tm);
-  p->AddVertex (5, 5, 5);//13
-  p->AddVertex (5, 5, -5);//14
-  p->AddVertex (5, -5, -5);//15
-  p->AddVertex (5, -5, 5);//16
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls->CreatePolygon ("top");
+  p->SetMaterial (iMW);
+  p->CreateVertex (b1);
+  p->CreateVertex (b2);
+  p->CreateVertex (f2);
+  p->CreateVertex (f1);
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = walls->NewPolygon (tm);
-  p->AddVertex (-5, 5, -5);//17
-  p->AddVertex (-5, 5, 5);//18
-  p->AddVertex (-5, -5, 5);//19
-  p->AddVertex (-5, -5, -5);//20
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls->CreatePolygon ("right");
+  p->SetMaterial (iMW);
+  p->CreateVertex (f2);
+  p->CreateVertex (b2);
+  p->CreateVertex (b3);
+  p->CreateVertex (f3);
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  p = walls->NewPolygon (tm);
-  p->AddVertex (5, 5, -5);//21
-  p->AddVertex (-5, 5, -5);//22
-  p->AddVertex (-5, -5, -5);//23
-  p->AddVertex (5, -5, -5);//24
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p = walls->CreatePolygon ("left");
+  p->SetMaterial (iMW);
+  p->CreateVertex (f1);
+  p->CreateVertex (f4);
+  p->CreateVertex (b4);
+  p->CreateVertex (b1);
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
+
+  p = walls->CreatePolygon ("bottom");
+  p->SetMaterial (iMW);
+  p->CreateVertex (f4);
+  p->CreateVertex (f3);
+  p->CreateVertex (b3);
+  p->CreateVertex (b4);
+  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
+
+  iMW->DecRef ();
+  walls->DecRef ();
 
   csStatLight* light;
   light = new csStatLight (-3, -4, 0, 10, 1, 0, 0, false);
@@ -261,8 +282,9 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   light = new csStatLight (0, -4, -3, 10, 0, 1, 0, false);
   room->AddLight (light);
 
-  iPolygonMesh* mesh = QUERY_INTERFACE (walls, iPolygonMesh);
-  (void)new csCollider(*walls, cdsys, mesh);
+  csMeshWrapper *mw = room->GetMesh (0);
+  iPolygonMesh* mesh = QUERY_INTERFACE (mw->GetMeshObject (), iPolygonMesh);
+  (void)new csCollider(*mw, cdsys, mesh);
   mesh->DecRef ();
 
   engine->Prepare ();
