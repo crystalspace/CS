@@ -6,17 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-
 2-Oct-2004
-	- Rhad improved windows waveout sound driver performance through
-	  brute force threading.
-	- Added an event to trigger buffer filling instead of timeslice
-	  based filling.
+	- Rhad improved windows waveout sound driver performance through brute
+	  force threading.
+	- Added an event to trigger buffer filling instead of timeslice based
+	  filling.
 	- Background thread is now set to time critical priority.
 	- Rhad applied more fixes to software sound renderer.
-	  - Fixed crash when source was deleted while background thread was reading sound data related to the source.
+	  - Fixed crash when source was deleted while background thread was
+	    reading sound data related to the source.
 	  - Fixed sound plays at full volume when beyond maxdistance.
-	  - Added assertion on handle destruction if sources are still associated with the handle.
+	  - Added assertion on handle destruction if sources are still
+	    associated with the handle.
 1-Oct-2004
 	- Rhad added Get,set MinimumDistance and MaximumDistance interface
 	  functions to the iSoundSource interface
@@ -87,7 +88,8 @@ chronological order.
 	- Vincent Knecht worked around an #error single quote error in bindoc.h
 	- Rhad made further adjustments to the windows waveout driver:
 	    - waveOutUnprepareHeader is no longer called on blocks that have
-	      not been prepared.  Fixes "no sound on some C-Media audio devices"
+	      not been prepared.  Fixes "no sound on some C-Media audio
+	      devices".
 	    - empty blocks are now unprepared on shutdown.
 	    - Default buffer length increased from 0.05s to 0.1s
 29-Sep-2004
@@ -151,9 +153,9 @@ chronological order.
 	- Rhad changed the Windows waveout sound driver to properly handle
 	  threading issues, buffer sounds better, manage memory better, and
 	  not blow up randomly.
-	    - Fixes "waveOutUnprepareHeader: 0000000b An invalid 
-		     parameter was passed"
-	    - Should reduce/fix sound studdering during moderate system load.
+	    - Fixes "waveOutUnprepareHeader: 0000000b An invalid parameter was
+	      passed"
+	    - Should reduce/fix sound stuttering during moderate system load.
 	    - The software renderer needs certain changes to be made to thread 
 	      safety to go along with this.
 	- res fixed a bug in bindoc where a struct member was accessed directly
