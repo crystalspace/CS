@@ -16,6 +16,13 @@ The history order has been reversed so that new features are at the top.
 	- Did another optimization in addition to the above one by using
 	  glVertex4fv instead of glVertex4f (similar to glTexCoord2). According
 	  to the same FAQ this should also improve matters.
+	- Did another optimization but this is more a quick hack. In order
+	  to avoid unneeded glBindTexture calls I now created a csglBindTexture
+	  which remembers the old glBindTexture. I'm not sure that this
+	  approach is totally safe and it is not tested well. Also it might
+	  not work well with multi-texture extension. This is something
+	  we need to test. I let it in for now so that it will actually
+	  get tested :-)
 	- Fixed a bug in csString as reported by George Yohng
 	  <yohng@drivex.dosware.8m.com>.
 	- Got a new patch from Travis McIntosh.  This patch finished

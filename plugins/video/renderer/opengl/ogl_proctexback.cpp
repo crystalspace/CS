@@ -28,6 +28,7 @@ IMPLEMENT_IBASE (csOpenGLProcBackBuffer)
   IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END;
 
+extern void csglBindTexture (GLenum target, GLuint handle);
 
 csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
   csGraphics3DOGLCommon ()
@@ -107,7 +108,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
     tex_data->Handle = 0;
     glGenTextures (1, &tex_data->Handle);
     // Texture is in tha cache, update texture directly. 
-    glBindTexture (GL_TEXTURE_2D, tex_data->Handle);
+    csglBindTexture (GL_TEXTURE_2D, tex_data->Handle);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

@@ -72,6 +72,17 @@ void csGraphics3DOGLCommon::DetectExtensions ()
 }
 #endif
 
+//@@@ Another experimental optimization:
+static GLuint prev_handle = 0;
+void csglBindTexture (GLenum target, GLuint handle)
+{
+  if (prev_handle != handle)
+  {
+    prev_handle = handle;
+    glBindTexture (target, handle);
+  }
+}
+
 /*===========================================================================
  Fog Variables Section
  ===========================================================================*/
@@ -338,7 +349,7 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   // we could use a 1D texture but some OpenGL drivers don't
   // handle 1D textures very well
   glGenTextures (1, &m_fogtexturehandle);
-  glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+  csglBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -697,7 +708,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
   float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
 
-  glBindTexture (GL_TEXTURE_2D, texturehandle);
+  csglBindTexture (GL_TEXTURE_2D, texturehandle);
 
 #if 1
   // First copy all data in an array so that we can minimize
@@ -821,7 +832,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
     float light_u, light_v;
 
-    glBindTexture (GL_TEXTURE_2D, lightmaphandle);
+    csglBindTexture (GL_TEXTURE_2D, lightmaphandle);
     glEnable (GL_TEXTURE_2D);
 
     // Here we set the Z buffer depth function to GL_EQUAL to make
@@ -893,7 +904,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   // If there is vertex fog then we apply that last.
   if (poly.use_fog)
   {
-    glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    csglBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     if (z_buf_mode == CS_ZBUF_FILL)
@@ -1039,7 +1050,7 @@ void csGraphics3DOGLCommon::StartPolygonFX (iTextureHandle * handle, UInt mode)
   m_textured = (texturehandle != 0);
   if (m_textured)
   {
-    glBindTexture (GL_TEXTURE_2D, texturehandle);
+    csglBindTexture (GL_TEXTURE_2D, texturehandle);
     glEnable (GL_TEXTURE_2D);
   }
   else
@@ -1102,7 +1113,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
     // we need to texture and blend, without vertex color
     // interpolation
     glEnable (GL_TEXTURE_2D);
-    glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    csglBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable (GL_BLEND);
     glDepthFunc (GL_EQUAL);
@@ -1404,7 +1415,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     // we need to texture and blend, with vertex color
     // interpolation
     glEnable (GL_TEXTURE_2D);
-    glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    csglBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
     glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
     glEnable (GL_BLEND);
@@ -1766,7 +1777,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   // configure base texture for texure unit 0
   float flat_r = 1.0, flat_g = 1.0, flat_b = 1.0;
   glActiveTextureARB (GL_TEXTURE0_ARB);
-  glBindTexture (GL_TEXTURE_2D, texturehandle);
+  csglBindTexture (GL_TEXTURE_2D, texturehandle);
   if ((poly_alpha > 0) || tex_transp)
   {
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1790,7 +1801,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   // configure lightmap for texture unit 1
   glActiveTextureARB (GL_TEXTURE1_ARB);
   glEnable (GL_TEXTURE_2D);
-  glBindTexture (GL_TEXTURE_2D, lightmaphandle);
+  csglBindTexture (GL_TEXTURE_2D, lightmaphandle);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   SetGLZBufferFlags ();
@@ -1953,7 +1964,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
 
   glEnable (GL_TEXTURE_2D);
   glColor4f (1.,1.,1.,1.);
-  glBindTexture (GL_TEXTURE_2D, texturehandle);
+  csglBindTexture (GL_TEXTURE_2D, texturehandle);
   
   int bitmapwidth = 0, bitmapheight = 0;
   hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);

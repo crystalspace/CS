@@ -34,6 +34,8 @@ IMPLEMENT_IBASE_END;
 
 #define SysPrintf system->Printf
 
+extern void csglBindTexture (GLenum target, GLuint handle);
+
 //----------------------------------------------------------------------------
 // Keep a private vector of soft textures generated from ogl textures
 //----------------------------------------------------------------------------
@@ -242,7 +244,7 @@ void csOpenGLProcSoftware::Print (csRect *area)
   {
     // Texture is in tha cache, update texture directly.
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glBindTexture (GL_TEXTURE_2D, tex_data->Handle);
+    csglBindTexture (GL_TEXTURE_2D, tex_data->Handle);
 
     switch (pfmt.PixelBytes)
     {

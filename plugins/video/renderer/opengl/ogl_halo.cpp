@@ -29,6 +29,8 @@
 #include "ogl_g3dcom.h"
 #include "ihalo.h"
 
+extern void csglBindTexture (GLenum target, GLuint handle);
+
 class csOpenGLHalo:public iHalo
 {
   float R,G,B;        //This halos color
@@ -92,7 +94,7 @@ csOpenGLHalo::csOpenGLHalo(float iR,float iG,float iB,unsigned char *iAlpha,
   y_scale=int((1.0*iHeight)/Height); // (used for drawing)
 
   glGenTextures(1,&halohandle); //Create handle
-  glBindTexture(GL_TEXTURE_2D,halohandle);  //Activate handle
+  csglBindTexture(GL_TEXTURE_2D,halohandle);  //Activate handle
 
 
   //Jaddajaddajadda
@@ -138,7 +140,7 @@ void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVecto
     texcoords[i].y=(iVertices[i].y-y)/Height;
   }
 
-  glBindTexture (GL_TEXTURE_2D, halohandle);    
+  csglBindTexture (GL_TEXTURE_2D, halohandle);    
   glEnable(GL_TEXTURE_2D);
   glEnable(GL_BLEND);
   glShadeModel (GL_FLAT);
