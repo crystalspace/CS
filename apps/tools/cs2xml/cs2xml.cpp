@@ -90,10 +90,12 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (NUM)
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (ORIGIN)
+  CS_TOKEN_DEF (ORIGINBOX)
   CS_TOKEN_DEF (POLYGON)
   CS_TOKEN_DEF (PORTAL)
   CS_TOKEN_DEF (POS)
   CS_TOKEN_DEF (POSITION)
+  CS_TOKEN_DEF (Q)
   CS_TOKEN_DEF (PRIORITY)
   CS_TOKEN_DEF (RADIUS)
   CS_TOKEN_DEF (RECTPARTICLES)
@@ -109,10 +111,12 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SECOND)
   CS_TOKEN_DEF (SHIFT)
   CS_TOKEN_DEF (SOURCE)
+  CS_TOKEN_DEF (START)
   CS_TOKEN_DEF (T)
   CS_TOKEN_DEF (TEXTURE)
   CS_TOKEN_DEF (TRANSPARENT)
   CS_TOKEN_DEF (TRIANGLE)
+  CS_TOKEN_DEF (TRIANGLES)
   CS_TOKEN_DEF (TYPE)
   CS_TOKEN_DEF (UV)
   CS_TOKEN_DEF (V)
@@ -120,9 +124,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (VERTICES)
   CS_TOKEN_DEF (W)
   CS_TOKEN_DEF (WARP)
-  CS_TOKEN_DEF (TRIANGLES)
-  CS_TOKEN_DEF (ORIGINBOX)
-  CS_TOKEN_DEF (Q)
 CS_TOKEN_DEF_END
 
 //-----------------------------------------------------------------------------
@@ -490,6 +491,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (POS)
     CS_TOKEN_TABLE (POSITION)
     CS_TOKEN_TABLE (PRIORITY)
+    CS_TOKEN_TABLE (Q)
     CS_TOKEN_TABLE (RADIUS)
     CS_TOKEN_TABLE (RECTPARTICLES)
     CS_TOKEN_TABLE (REGULARPARTICLES)
@@ -498,6 +500,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (SECOND)
     CS_TOKEN_TABLE (SHIFT)
     CS_TOKEN_TABLE (SOURCE)
+    CS_TOKEN_TABLE (START)
     CS_TOKEN_TABLE (T)
     CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (TRANSPARENT)
@@ -510,7 +513,6 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (VERTICES)
     CS_TOKEN_TABLE (W)
     CS_TOKEN_TABLE (WARP)
-    CS_TOKEN_TABLE (Q)
   CS_TOKEN_TABLE_END
 
   char *name, *params;
@@ -555,7 +557,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    child->SetAttributeAsFloat ("red", x);
 	    child->SetAttributeAsFloat ("green", y);
 	    child->SetAttributeAsFloat ("blue", z);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  break;
         case CS_TOKEN_POLYGON:
@@ -563,7 +565,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	    child->SetValue ("p");
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
             ParseGeneral ("p", parser, child, params);
 	  }
 	  break;
@@ -578,7 +580,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    child->SetAttributeAsFloat ("y", y);
 	    child->SetAttributeAsFloat ("z", z);
 	    child->SetAttributeAsFloat ("r", r);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  break;
         case CS_TOKEN_W:
@@ -613,7 +615,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    {
 	      child = CreateValueNodeAsFloat (parent, tokname, x);
 	    }
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  break;
         case CS_TOKEN_CURVECONTROL:
@@ -628,7 +630,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    child->SetAttributeAsFloat ("z", z);
 	    child->SetAttributeAsFloat ("u", u);
 	    child->SetAttributeAsFloat ("v", v);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  break;
 	case CS_TOKEN_DURATION:
@@ -651,7 +653,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    }
 	    else
 	    {
-	      if (name) child->SetAttribute ("name", name);
+	      if (name && *name) child->SetAttribute ("name", name);
 	    }
             ParseGeneral (tokname, parser, child, params);
 	  }
@@ -666,7 +668,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    child->SetAttributeAsFloat ("x", x);
 	    child->SetAttributeAsFloat ("y", y);
 	    child->SetAttributeAsFloat ("z", z);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  break;
         case CS_TOKEN_V:
@@ -691,7 +693,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	        child->SetAttributeAsFloat ("ny", ny);
 	        child->SetAttributeAsFloat ("nz", nz);
 	      }
-	      if (name) child->SetAttribute ("name", name);
+	      if (name && *name) child->SetAttribute ("name", name);
 	    }
 	    else if (!strcmp (parent_token, "p"))
 	    {
@@ -713,7 +715,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	      child->SetAttributeAsFloat ("x", x);
 	      child->SetAttributeAsFloat ("y", y);
 	      child->SetAttributeAsFloat ("z", z);
-	      if (name) child->SetAttribute ("name", name);
+	      if (name && *name) child->SetAttribute ("name", name);
 	      break;
 	    }
 	  }
@@ -876,7 +878,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	      child->SetValue ("texmap");
-	      if (name) child->SetAttribute ("name", name);
+	      if (name && *name) child->SetAttribute ("name", name);
               ParseGeneral ("texmap", parser, child, params);
 	    }
 	    else if (!strcmp (parent_token, "material"))
@@ -896,7 +898,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	      child->SetValue ("texture");
-	      if (name) child->SetAttribute ("name", name);
+	      if (name && *name) child->SetAttribute ("name", name);
               ParseGeneral ("texture", parser, child, params);
 	    }
 	  }
@@ -906,7 +908,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    ParseMatrix (parser, child, params);
 	  }
 	  break;
@@ -929,7 +931,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    child->SetAttributeAsInt ("v1", list[0]);
 	    child->SetAttributeAsInt ("v2", list[1]);
 	    child->SetAttributeAsInt ("v3", list[2]);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  break;
         case CS_TOKEN_HALO:
@@ -937,7 +939,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 
 	    char str[256];
             int cnt = csScanStr (params, "%s", str);
@@ -1004,7 +1006,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    child->SetAttributeAsFloat ("red", r);
 	    child->SetAttributeAsFloat ("green", g);
 	    child->SetAttributeAsFloat ("blue", b);
@@ -1032,7 +1034,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    csRef<iDocumentNode> colornode = child->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	    colornode->SetValue ("color");
@@ -1051,7 +1053,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    int sides;
 	    float radius;
 	    csScanStr (params, "%d,%f", &sides, &radius);
@@ -1065,7 +1067,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    float w, h;
 	    csScanStr (params, "%f,%f", &w, &h);
 	    child->SetAttributeAsFloat ("w", w);
@@ -1081,7 +1083,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    csRef<iDocumentNode> minnode = child->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	    minnode->SetValue ("min");
@@ -1107,7 +1109,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    csRef<iDocumentNode> minnode = child->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	    minnode->SetValue ("min");
@@ -1137,7 +1139,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    csRef<iDocumentNode> minnode = child->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	    minnode->SetValue ("min");
@@ -1159,7 +1161,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    child->SetAttributeAsFloat ("x", x1);
 	    child->SetAttributeAsFloat ("y", y1);
 	    child->SetAttributeAsFloat ("z", z1);
@@ -1172,7 +1174,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    child->SetAttributeAsFloat ("x", x1);
 	    child->SetAttributeAsFloat ("y", y1);
 	    child->SetAttributeAsFloat ("z", z1);
@@ -1232,12 +1234,40 @@ defaulthalo:
 	    }
 	  }
 	  break;
+	case CS_TOKEN_START:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    if (strchr (params, '('))
+	    {
+	      // New format.
+              ParseGeneral (tokname, parser, child, params);
+	    }
+	    else
+	    {
+	      // Old format.
+	      char start_sector[1000];
+	      csVector3 pos;
+	      csScanStr (params, "%s,%f,%f,%f", &start_sector,
+		&pos.x, &pos.y, &pos.z);
+	      CreateValueNode (child, "sector", start_sector);
+	      csRef<iDocumentNode> childchild;
+	      childchild = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	      childchild->SetValue ("position");
+	      childchild->SetAttributeAsFloat ("x", pos.x);
+	      childchild->SetAttributeAsFloat ("y", pos.y);
+	      childchild->SetAttributeAsFloat ("z", pos.z);
+	    }
+	  }
+	  break;
         case CS_TOKEN_LIGHT:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	    	  CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    if (strchr (params, ':'))
 	    {
 	      int d;
@@ -1277,7 +1307,7 @@ defaulthalo:
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	  	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	    float r, g, b;
 	    csScanStr (params, "%f,%f,%f", &r, &g, &b);
 	    child->SetAttributeAsFloat ("red", r);
@@ -1327,27 +1357,27 @@ defaulthalo:
 	    csScanStr (params, "%f", &f);
 	    csRef<iDocumentNode> child = CreateValueNodeAsFloat (
 	    	parent, tokname, f);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  else if (IsBoolean (params, val))
 	  {
 	    csRef<iDocumentNode> child = CreateValueNode (
 	    	parent, tokname, val ? "yes" : "no");
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  else if (IsString (params))
 	  {
 	    char buf[2048];
             csScanStr (params, "%s", buf);
 	    csRef<iDocumentNode> child = CreateValueNode (parent, tokname, buf);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
 	  }
 	  else
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
+	    if (name && *name) child->SetAttribute ("name", name);
             ParseGeneral (tokname, parser, child, params);
 	  }
           break;

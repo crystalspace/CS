@@ -20,6 +20,7 @@
 #ifndef __CS_CSLOADER_H__
 #define __CS_CSLOADER_H__
 
+#include <stdarg.h>
 #include "imap/parser.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

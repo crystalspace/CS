@@ -21,6 +21,7 @@
  * not handle parsing of texture statements in any way.
  */
 
+#include <ctype.h>
 #include "cssysdef.h"
 #include "csloader.h"
 #include "iutil/databuff.h"
