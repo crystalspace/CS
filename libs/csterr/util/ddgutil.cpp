@@ -16,14 +16,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-// For timing info.
-#include "cssysdef.h"
-#if defined(OS_WIN32) || defined(OS_MACOS) || !defined(COMP_GCC)
-#include <time.h>
-#else
-#include <sys/types.h>
-#include <sys/times.h>
-#endif
 #include "util/ddgutil.h"
 // ----------------------------------------------------------------------
 //
