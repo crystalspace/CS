@@ -21,7 +21,7 @@ chronological order.
 	- Eric Sunshine renamed csHash<>::PutFirst() to PutUnique(). (The old
 	  name is still recognized, though deprecated.) Also clarified
 	  documentation for Put() to state that it does not replace an existing
-	  key/tuple.
+	  key/value tuple.
 	- Eric Sunshine fixed bug in csKeyValuePair::SetValue() where it was
 	  incorrectly invoking csHash<>::Put() rather than PutUnique(). In
 	  practice, this caused all invocations of SetValue(), other than the
@@ -355,7 +355,7 @@ chronological order.
 	  destroyed.
 	- res fixed a wrong ref counting in the waveout sound driver.
 	- res fixed the '*' appearing on the API doc front page. (Apparently,
-	  doxygen doesn't remove the '*'s at the beginning in \htmlonly 
+	  Doxygen doesn't remove the '*'s at the beginning in \htmlonly 
 	  blocks.)
 	- Eric Sunshine fixed a few places (csparser, vfs) where the
 	  26-Oct-2004 change to preserve whitespace, by default, in
@@ -2145,7 +2145,7 @@ chronological order.
 	  lighter.
 	- Eric Sunshine fixed a significant number of Texinfo mark-up and
 	  formatting problems in sprcal3d.txi.
-	- Vincent Knecht made corrections in csapplicationframework.h doxygen
+	- Vincent Knecht made corrections in csapplicationframework.h Doxygen
 	  sample code.
 15-Aug-2004
 	- Jorrit extended iEngine->PrecacheDraw() so that it also causes
@@ -2672,7 +2672,7 @@ chronological order.
 	      without any special compiler flags, thus it was unable to locate
 	      header files, such as cssysdef.h, scf.h, etc.
 	- res added an example on how to obtain the global string set to the
-	  iStringSet doxygen docu.
+	  iStringSet Doxygen documentation.
         - Matze fixed a jam install bug for command-line tools on OS/X where
 	  they were not assigned execute permission.
 	- aarobber added a Clone() function to the catmul rom spline.
@@ -2703,7 +2703,7 @@ chronological order.
 	- res made the following changes:
 	    - Removed the fake bool stuff. Compilers that are able to deal with
 	      CS' usage of templates are deemed to have a 'bool' type.
-	    - Some doxygen documentation fixes.
+	    - Some Doxygen documentation fixes.
 	    - Replaced the CS_ASSERTs with CS_ASSERT_MSGs in csutil/ref.h.
 	    - Removed the flattening from iEvent. Instead, iEvent now offers
 	      an attribute iterator which can be used to serialize an event
@@ -5129,8 +5129,9 @@ chronological order.
 	  clean, and distclean pseudo-targets.  Also fixed some other minor
 	  aesthetic problems with the output of "jam help".
 	- res made the following changes:
-	    - Added doxygen documentation for macro-generated csString members.
-	    - Fixed doxygen doc for CS_INITIALIZE_PLATFORM_APPLICATION.
+	    - Added Doxygen documentation for macro-generated csString members.
+	    - Fixed Doxygen documentation for
+	      CS_INITIALIZE_PLATFORM_APPLICATION.
 	    - Fixed some compiler errors in minidump.cpp.
 	- Eric Sunshine made the following changes to the Jam build system:
 	    - Added a general-purpose "property bag" mechanism.  Jamfiles are
@@ -5542,7 +5543,7 @@ chronological order.
 	- Jorrit augmented the API documentation of iCollideSystem.
 	- Luca has fixed a tiny error in the engine plugin. The error was
 	  returning a value in a function whose return value is void. He
-	  also updated the doxygen's comment for the iMeshWrapper::GetFlags()
+	  also updated the Doxygen's comment for the iMeshWrapper::GetFlags()
 	  method.
 	- Aren Blondahl revised <settings> block in map2cs and added ambient
 	  lighting, clearscreen, and maxlightmapsize support to map2cs.
