@@ -4,7 +4,7 @@
 // Matthias Braun <matze@braunis.de>
 //-----------------------------------------------------------------------------
 
-$basedir=".";
+$basedir="/home/groups/c/cr/crystal/htdocs/annotations";
 
 $theme=preg_replace("\" \"","_",$theme);
 $theme=preg_replace("[^a-zA-Z0-9_]","",$theme);
