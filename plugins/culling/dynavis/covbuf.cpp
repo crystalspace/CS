@@ -106,9 +106,11 @@ void csCoverageBuffer::InitializePolygonBuffer (const csBox2Int& bbox)
 {
   // @@@ Make a special case for po2 width? (1024 for example)
 
-  int startcol = bbox.minx-40;
-  if (startcol < 0) startcol = 0;
-  int endcol = bbox.maxx+40;
+  int startcol = bbox.minx;
+  if (startcol >= 40) startcol -= 40;
+  else if (startcol < 0) startcol = 0;
+  int endcol = bbox.maxx;
+  if (endcol < 1000000) endcol += 40;	// For safety reasons!
   if (endcol >= width) endcol = width-1;
   int horsize = endcol-startcol+1;
 
@@ -116,6 +118,8 @@ void csCoverageBuffer::InitializePolygonBuffer (const csBox2Int& bbox)
   if (startrow < 0) startrow = 0;
   int endrow = bbox.maxy >> 5;
   if (endrow >= numrows) endrow = numrows-1;
+
+  CS_ASSERT (startcol >= 0 && startcol <= width);
 
   int i;
   for (i = startrow ; i <= endrow ; i++)
@@ -162,7 +166,7 @@ void csCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     return;
   }
 
-  if (x1 < 0 && x2 < 0)
+  if (x1 <= 0 && x2 <= 0)
   {
     //------
     // Totally on the left side. Just clamp.

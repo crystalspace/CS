@@ -85,6 +85,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   do_cull_coverage = COVERAGE_OUTLINE;
   cfg_view_mode = VIEWMODE_STATS;
   do_state_dump = false;
+  do_cull_history = true;
 }
 
 csDynaVis::~csDynaVis ()
@@ -261,7 +262,6 @@ struct VisTest_Front2BackData
 bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 	VisTest_Front2BackData* data)
 {
-printf ("t1 treenode=%p\n", treenode); fflush (stdout);
   const csBox3& node_bbox = treenode->GetNodeBBox ();
   const csVector3& pos = data->pos;
 
@@ -522,6 +522,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data)
 {
   bool vis = true;
+  bool do_write_object = false;
 
   // For coverage test.
   csBox2 sbox;
@@ -529,12 +530,19 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
   if (!obj->visobj->IsVisible ())
   {
+    if (do_cull_history && obj->vis_cnt > 0)
+    {
+      obj->MarkVisible (VISIBLE_HISTORY, obj->vis_cnt-1);
+      do_write_object = true;
+      goto end;
+    }
+
     const csBox3& obj_bbox = obj->child->GetBBox ();
     const csVector3& pos = data->pos;
     if (obj_bbox.Contains (pos))
     {
-      obj->visobj->MarkVisible ();
-      obj->reason = VISIBLE_INSIDE;
+      obj->MarkVisible (VISIBLE_INSIDE, 1+((rand ()>>3)&0x3));
+      do_write_object = true;
       goto end;
     }
   
@@ -564,24 +572,25 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
     //---------------------------------------------------------------
 
-    // Object is visible. Let it update the coverage buffer if we
-    // are using do_cull_coverage.
-    if (do_cull_coverage != COVERAGE_NONE && obj->visobj->GetObjectModel ()->
-    	GetSmallerPolygonMesh ())
-    {
-      if (do_cull_coverage == COVERAGE_POLYGON)
-        UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
-      	  obj->model);
-      else
-	UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
-      	  obj->model);
-    }
-
-    obj->visobj->MarkVisible ();
-    obj->reason = VISIBLE;
+    // Object is visible so we should write it to the coverage buffer.
+    obj->MarkVisible (VISIBLE, 1+((rand ()>>3)&0x3));
+    do_write_object = true;
   }
 
 end:
+  if (do_write_object && do_cull_coverage != COVERAGE_NONE &&
+  	obj->visobj->GetObjectModel ()->GetSmallerPolygonMesh ())
+  {
+    // Object is visible. Let it update the coverage buffer if we
+    // are using do_cull_coverage.
+    if (do_cull_coverage == COVERAGE_POLYGON)
+      UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
+    	  obj->model);
+    else
+      UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
+      	  obj->model);
+  }
+
   if (do_state_dump)
   {
     const csBox3& obj_bbox = obj->child->GetBBox ();
@@ -593,11 +602,13 @@ end:
 	obj->reason == INVISIBLE_FRUSTUM ? "outside frustum" :
 	obj->reason == INVISIBLE_TESTRECT ? "covered" :
 	obj->reason == VISIBLE_INSIDE ? "visible inside" :
+	obj->reason == VISIBLE_HISTORY ? "visible history" :
 	obj->reason == VISIBLE ? "visible" :
 	"?"
 	);
     if (iobj) iobj->DecRef ();
-    if (obj->reason != INVISIBLE_FRUSTUM && obj->reason != VISIBLE_INSIDE)
+    if (obj->reason != INVISIBLE_FRUSTUM && obj->reason != VISIBLE_INSIDE
+    	&& obj->reason != VISIBLE_HISTORY)
     {
       printf ("  (%g,%g)-(%g,%g) min_depth=%g\n",
       	sbox.MinX (), sbox.MinY (),
@@ -782,7 +793,8 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
     { 64, 128, 64 },
     { 128, 64, 64 },
     { 255, 255, 255 },
-    { 255, 255, 128 }
+    { 255, 255, 128 },
+    { 255, 255, 196 }
   };
 
   if (debug_camera)
@@ -912,6 +924,53 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
       	  trans.Other2This (b.GetCorner (CS_BOX_CORNER_xYZ)), fov, col);
       }
     }
+    else if (cfg_view_mode == VIEWMODE_OUTLINES)
+    {
+      int i;
+      for (i = 0 ; i < visobj_vector.Length () ; i++)
+      {
+	csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+	  visobj_vector[i];
+	iVisibilityObject* visobj = visobj_wrap->visobj;
+        if (visobj->IsVisible ())
+	{
+	  // Only render outline if visible.
+          const csReversibleTransform& camtrans = debug_camera->GetTransform ();
+	  iMovable* movable = visobj->GetMovable ();
+	  csReversibleTransform movtrans = movable->GetFullTransform ();
+	  csReversibleTransform trans = camtrans / movtrans;
+
+	  csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
+	  visobj_wrap->model->UpdateOutline (campos_object);
+	  const csOutlineInfo& outline_info = visobj_wrap->model
+	  	->GetOutlineInfo ();
+	  float fov = debug_camera->GetFOV ();
+	  float sx = debug_camera->GetShiftX ();
+	  float sy = debug_camera->GetShiftY ();
+
+	  iPolygonMesh* polymesh = visobj->GetObjectModel ()->
+	  	GetSmallerPolygonMesh ();
+	  const csVector3* verts = polymesh->GetVertices ();
+
+	  int j;
+	  int* e = outline_info.outline_edges;
+	  for (j = 0 ; j < outline_info.num_outline_edges ; j++)
+	  {
+	    int vt1 = *e++;
+	    int vt2 = *e++;
+	    csVector3 camv1 = trans.Other2This (verts[vt1]);
+	    if (camv1.z <= 0.0) continue;
+	    csVector3 camv2 = trans.Other2This (verts[vt2]);
+	    if (camv2.z <= 0.0) continue;
+	    csVector2 tr_vert1, tr_vert2;
+	    Perspective (camv1, tr_vert1, fov, sx, sy);
+	    Perspective (camv2, tr_vert2, fov, sx, sy);
+	    g2d->DrawLine (tr_vert1.x,  g2d->GetHeight ()-tr_vert1.y,
+	    	tr_vert2.x,  g2d->GetHeight ()-tr_vert2.y, col_bgtext);
+	  }
+	}
+      }
+    }
 
     // Try to correct for the time taken to print this debug info.
     csTicks t2 = csGetTicks ();
@@ -926,6 +985,13 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     do_cull_frustum = !do_cull_frustum;
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"%s frustum culling!", do_cull_frustum ? "Enabled" : "Disabled");
+    return true;
+  }
+  else if (!strcmp (cmd, "toggle_history"))
+  {
+    do_cull_history = !do_cull_history;
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+    	"%s history culling!", do_cull_history ? "Enabled" : "Disabled");
     return true;
   }
   else if (!strcmp (cmd, "toggle_coverage"))
@@ -958,6 +1024,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	cfg_view_mode == VIEWMODE_STATS ? "statistics only" :
 	cfg_view_mode == VIEWMODE_STATSOVERLAY ? "statistics and map" :
 	cfg_view_mode == VIEWMODE_CLEARSTATSOVERLAY ? "statistics and map (c)" :
+	cfg_view_mode == VIEWMODE_OUTLINES ? "outlines" :
 	"?");
     return true;
   }

@@ -132,6 +132,7 @@ csKDTree::csKDTree (csKDTree* parent)
   objects = NULL;
   num_objects = max_objects = 0;
   disallow_distribute = false;
+  split_axis = CS_KDTREE_AXISINVALID;
 
   obj_bbox_valid = true;
   obj_bbox.StartBoundingBox ();
@@ -675,8 +676,10 @@ bool csKDTree::Debug_CheckTree (csString& str)
     KDT_ASSERT (GetNodeBBox ().Contains (child2->GetNodeBBox ()),
     	"node_bbox mismatch");
 
-    KDT_ASSERT (split_location >= GetNodeBBox ().Min (split_axis), "split/node");
-    KDT_ASSERT (split_location <= GetNodeBBox ().Max (split_axis), "split/node");
+    KDT_ASSERT (split_location >= GetNodeBBox ().Min (split_axis),
+    	"split/node");
+    KDT_ASSERT (split_location <= GetNodeBBox ().Max (split_axis),
+    	"split/node");
 
     csBox3 new_node_bbox = child1->GetNodeBBox ();
     new_node_bbox += child2->GetNodeBBox ();

@@ -100,6 +100,7 @@ public:
   void* GetObject () const { return object; }
 };
 
+#define CS_KDTREE_AXISINVALID -1
 #define CS_KDTREE_AXISX 0
 #define CS_KDTREE_AXISY 1
 #define CS_KDTREE_AXISZ 2

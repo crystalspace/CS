@@ -28,6 +28,8 @@ void csPolygonMeshTools::CalculateNormals (iPolygonMesh* mesh,
 {
   int p;
   csVector3* verts = mesh->GetVertices ();
+  int num_verts = mesh->GetVertexCount ();
+  (void)num_verts;
   int num_poly = mesh->GetPolygonCount ();
   csMeshedPolygon* poly = mesh->GetPolygons ();
   for (p = 0 ; p < num_poly ; p++)
@@ -40,11 +42,13 @@ void csPolygonMeshTools::CalculateNormals (iPolygonMesh* mesh,
 
     int* vi = poly->vertices;
     i1 = poly->num_vertices - 1;
+    CS_ASSERT (vi[i1] >= 0 && vi[i1] < num_verts);
     x1 = verts[vi[i1]].x;
     y1 = verts[vi[i1]].y;
     z1 = verts[vi[i1]].z;
     for (i = 0 ; i < poly->num_vertices ; i++)
     {
+      CS_ASSERT (vi[i] >= 0 && vi[i] < num_verts);
       x = verts[vi[i]].x;
       y = verts[vi[i]].y;
       z = verts[vi[i]].z;
@@ -73,6 +77,8 @@ void csPolygonMeshTools::CalculatePlanes (iPolygonMesh* mesh,
 {
   int p;
   csVector3* verts = mesh->GetVertices ();
+  int num_verts = mesh->GetVertexCount ();
+  (void)num_verts;
   int num_poly = mesh->GetPolygonCount ();
   csMeshedPolygon* poly = mesh->GetPolygons ();
   for (p = 0 ; p < num_poly ; p++)
@@ -85,11 +91,13 @@ void csPolygonMeshTools::CalculatePlanes (iPolygonMesh* mesh,
 
     int* vi = poly->vertices;
     i1 = poly->num_vertices - 1;
+    CS_ASSERT (vi[i1] >= 0 && vi[i1] < num_verts);
     x1 = verts[vi[i1]].x;
     y1 = verts[vi[i1]].y;
     z1 = verts[vi[i1]].z;
     for (i = 0 ; i < poly->num_vertices ; i++)
     {
+      CS_ASSERT (vi[i] >= 0 && vi[i] < num_verts);
       x = verts[vi[i]].x;
       y = verts[vi[i]].y;
       z = verts[vi[i]].z;
@@ -305,6 +313,7 @@ void csPolygonMeshTools::CalculateOutline (
       *outline_edges++ = e->vt1;
       *outline_edges++ = e->vt2;
       num_outline_edges++;
+      CS_ASSERT (num_outline_edges <= num_edges);
       CS_ASSERT (e->vt1 >= 0 && e->vt1 < num_vertices);
       CS_ASSERT (e->vt2 >= 0 && e->vt2 < num_vertices);
       outline_verts[e->vt1] = true;	// Mark vertices as in use.
@@ -324,6 +333,7 @@ void csPolygonMeshTools::CalculateOutline (
         *outline_edges++ = e->vt1;
         *outline_edges++ = e->vt2;
         num_outline_edges++;
+        CS_ASSERT (num_outline_edges <= num_edges);
         CS_ASSERT (e->vt1 >= 0 && e->vt1 < num_vertices);
         CS_ASSERT (e->vt2 >= 0 && e->vt2 < num_vertices);
         outline_verts[e->vt1] = true;	// Mark vertices as in use.

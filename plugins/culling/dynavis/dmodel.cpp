@@ -71,7 +71,6 @@ void csObjectModel::UpdateOutline (const csVector3& pos)
 	outline_info.outline_edges, outline_info.num_outline_edges,
 	outline_info.outline_verts,
 	outline_info.valid_radius);
-    printf ("Recalc outline %g\n", outline_info.valid_radius); fflush (stdout);
     outline_info.outline_pos = pos;
   }
 }

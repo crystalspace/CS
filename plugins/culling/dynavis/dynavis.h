@@ -42,15 +42,17 @@ enum csVisReason
   INVISIBLE_TESTRECT,	// Invisible because covbuf->TestRectangle() failed.
   VISIBLE,		// Just visible.
   VISIBLE_INSIDE,	// Visible because camera is inside bbox.
+  VISIBLE_HISTORY,	// Visible because it was visible last frame.
   LAST_REASON
 };
 
 #define VIEWMODE_STATS 0
 #define VIEWMODE_STATSOVERLAY 1
 #define VIEWMODE_CLEARSTATSOVERLAY 2
+#define VIEWMODE_OUTLINES 3
 
 #define VIEWMODE_FIRST 0
-#define VIEWMODE_LAST 2
+#define VIEWMODE_LAST 3
 
 #define COVERAGE_NONE 0
 #define COVERAGE_POLYGON 1
@@ -70,6 +72,22 @@ public:
   long shape_number;	// Last used shape_number from model.
   csVisReason reason;	// Reason object is visible/invisible.
   csObjectModel* model;
+
+  // If the folloging counter > 0 then the object will be assumed visible
+  // automatically. The counter will be decremented then.
+  int vis_cnt;
+
+  csVisibilityObjectWrapper ()
+  {
+    vis_cnt = 0;
+  }
+
+  void MarkVisible (csVisReason reason, int cnt)
+  {
+    visobj->MarkVisible ();
+    csVisibilityObjectWrapper::reason = reason;
+    vis_cnt = cnt;
+  }
 };
 
 /**
@@ -97,6 +115,7 @@ private:
   // Various flags to enable/disable parts of the culling algorithm.
   bool do_cull_frustum;
   int do_cull_coverage;
+  bool do_cull_history;
 
   // View mode for debugging (one of VIEWMODE_... constants).
   int cfg_view_mode;

@@ -10,15 +10,14 @@
 - Improve filling of outline in coverage buffer. Clamp outline to Z=0
   plane instead of rejecting write objects that are clipped by that plane.
 
-- Make a new line draw function in the coverage buffer that isn't
-  concerned about left/right lines.
-
 - Split coverage buffer into tiles and implement delayed writing.
 
 - Predict quality of occluders.
 
-- VPT (Visible Point Tracking) and keeping an object visible for a
-  random number of frames.
+- VPT (Visible Point Tracking).
 
 - Automatic rebalancing of KD-tree.
+
+- Only calculate planes, edges, active edges in model when REALLY
+  needed (i.e. delay).
 

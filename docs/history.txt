@@ -1,5 +1,25 @@
 The history order is reversed so that new features are at the top.
 
+29-May-2002
+	- Implemented history culling in Dynavis. This means that if an
+	  object is visible then it will be kept as visible for a few
+	  frames (random). This will avoid testing objects that are most
+	  likely visible, too much.
+	- Added a new 'toggle_history' command in Dynavis to enable/disable
+	  this new feature. Assigned to the '3' key in BugPlug.
+	- Added a new outline debugging mode. This will render all outlines
+	  on screen so you can examine if they are allright. You can go to this
+	  mode with BugPlug key shift-v. Note that only the outlines of
+	  visible objects are shown.
+	- Added several CS_ASSERT's to csgeom and Dynavis to help debugging.
+	- Added first version of the ODE based dynamics plugin to CS. This
+	  plugin was made by Anders Stenberg. Source code for this plugin
+	  can be found in plugins/physics/odedynam. The interface header
+	  is in include/ivaria/dynamics.h. Note that there is no makefile
+	  yet (and no MSVC project files). I didn't have time to actually
+	  make those.
+	- Fixed a severe memory overwrite bug in the coverage buffer
+	  (InitializePolygonBuffer() function).
 28-May-2002
 	- Fixed visibility culling in Dynavis when the camera was inside
 	  the bounding box of an object.
