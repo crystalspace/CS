@@ -65,6 +65,10 @@ chronological order.
 	  $(CAL3D.LFLAGS) to LIBS.EXE for static build.  Also updated makefile
 	  to new style in which object files are placed in custom subdirectory
 	  of $(OUT) rather than polluting $(OUT).
+	- Eric Sunshine fixed bugs in gl_render3d.mak where it failed to
+	  utilize GLU.CFLAGS.
+	- Eric Sunshine fixed bug in render3d/opengl/Jamfile where it failed to
+	  utilize GLU.CFLAGS and GLU.LFLAGS.
 12-Jan-2004
 	- Peter Amstutz added a preliminary version of a VOS 
 	  plugin for CS, along with a test program.  The configure script
