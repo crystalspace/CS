@@ -1194,6 +1194,8 @@ public:
   iCurveTemplate* FindCurveTemplate (const char *iName);
   void RemovePolyTxtPlane (iPolyTxtPlane* pl);
   void RemoveCurveTemplate (iCurveTemplate* ct);
+  void ClearPolyTxtPlanes ();
+  void ClearCurveTemplates ();
 
   struct eiThingEnvironment : public iThingEnvironment
   {
@@ -1221,6 +1223,14 @@ public:
     virtual void RemoveCurveTemplate (iCurveTemplate* ct)
     {
       scfParent->RemoveCurveTemplate (ct);
+    }
+    virtual void ClearPolyTxtPlanes ()
+    {
+      scfParent->ClearPolyTxtPlanes ();
+    }
+    virtual void ClearCurveTemplates ()
+    {
+      scfParent->ClearCurveTemplates ();
     }
   } scfiThingEnvironment;
 

@@ -3196,16 +3196,8 @@ csThingObjectType::csThingObjectType (iBase* pParent)
 
 csThingObjectType::~csThingObjectType ()
 {
-  int i;
-  for (i = 0 ; i < planes.Length () ; i++)
-  {
-    csPolyTxtPlane* p = (csPolyTxtPlane*)planes[i];
-    planes[i] = NULL;
-    p->DecRef ();
-  }
-  planes.DeleteAll ();
-  curve_templates.DeleteAll ();
-
+  ClearPolyTxtPlanes ();
+  ClearCurveTemplates ();
 }
 
 bool csThingObjectType::Initialize (iObjectRegistry* object_reg)
@@ -3288,6 +3280,23 @@ void csThingObjectType::RemoveCurveTemplate (iCurveTemplate* ct)
       return;
     }
   }
+}
+
+void csThingObjectType::ClearPolyTxtPlanes ()
+{
+  int i;
+  for (i = 0 ; i < planes.Length () ; i++)
+  {
+    csPolyTxtPlane* p = (csPolyTxtPlane*)planes[i];
+    planes[i] = NULL;
+    p->DecRef ();
+  }
+  planes.DeleteAll ();
+}
+
+void csThingObjectType::ClearCurveTemplates ()
+{
+  curve_templates.DeleteAll ();
 }
 
 //---------------------------------------------------------------------------

@@ -10,6 +10,12 @@ The history order is reversed so that new features are at the top.
 	  actually succeeds. If it doesn't then it will do nothing.
 	  This fixes a crash at exit for programs that use the debugging
 	  graph.
+	- Extended iThingEnvironment with ClearPolyTxtPlanes() and
+	  ClearCurveTemplates(). With these two functions you can clear
+	  all planes and curve templates in the thing environment.
+	  iEngine::DeleteAll() will now call these two functions to further
+	  clean up. This fixes several memory leaks when reloading a map
+	  file.
 22-Nov-2001
 	- Further work on documentation. Created a 'Documentation Guide'
 	  section which guides the CS game writer through some of the more

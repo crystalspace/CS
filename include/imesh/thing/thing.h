@@ -235,7 +235,7 @@ struct iThingState : public iBase
   virtual csFog* GetFog () const = 0;
 };
 
-SCF_VERSION (iThingEnvironment, 0, 0, 1);
+SCF_VERSION (iThingEnvironment, 0, 0, 2);
 
 /**
  * This interface is implemented by the iObjectType for things.
@@ -244,12 +244,26 @@ SCF_VERSION (iThingEnvironment, 0, 0, 1);
  */
 struct iThingEnvironment : public iBase
 {
+  /**
+   * Create a new texture mapping plane with the given name.
+   * If you don't use a name then there is no way to find the plane by name
+   * later.
+   */
   virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL) = 0;
+  /// Find a plane with the given name.
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name) = 0;
+  /// Create a bezier template with the given name.
   virtual iCurveTemplate* CreateBezierTemplate (const char* name = NULL) = 0;
+  /// Find a bezier template.
   virtual iCurveTemplate* FindCurveTemplate (const char *iName) = 0;
+  /// Remove the given polygon texture mapping plane.
   virtual void RemovePolyTxtPlane (iPolyTxtPlane* pl) = 0;
+  /// Remove the given curve template.
   virtual void RemoveCurveTemplate (iCurveTemplate* ct) = 0;
+  /// Remove all polygon texture mapping planes.
+  virtual void ClearPolyTxtPlanes () = 0;
+  /// Remove all curve templates.
+  virtual void ClearCurveTemplates () = 0;
 };
 
 #endif

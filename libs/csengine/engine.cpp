@@ -938,6 +938,12 @@ void csEngine::DeleteAll ()
   delete textures; 
   textures = new csTextureList ();
 
+  iThingEnvironment* te = SCF_QUERY_INTERFACE (thing_type, iThingEnvironment);
+  CS_ASSERT (te != NULL);
+  te->ClearPolyTxtPlanes ();
+  te->ClearCurveTemplates ();
+  te->DecRef ();
+
   // Delete engine states and their references to cullers before cullers are
   // deleted in InitCuller below.
   if (engine_states)
