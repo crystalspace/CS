@@ -69,7 +69,7 @@ class csNetworkSocket2 : public iNetworkSocket2
   bool socket_ready;
   bool connected;
   bool blocking;
-  fd_set fd_mask;
+  fd_set fd_maskset;
   SOCKET fd_list[1];
   struct sockaddr_in local_addr;
   struct sockaddr_in remote_addr;

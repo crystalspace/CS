@@ -138,8 +138,8 @@ csNetworkSocket2::csNetworkSocket2 (iBase *parent, int socket_type)
   
   fd_list[0] = socketfd;
   
-  FD_ZERO(&fd_mask);
-  FD_SET(fd_list[0],&fd_mask);
+  FD_ZERO(&fd_maskset);
+  FD_SET(fd_list[0],&fd_maskset);
 
   if (proto_type == -1)
     last_error = CS_NET_SOCKET_UNSUPPORTED_SOCKET_TYPE; 
@@ -169,7 +169,7 @@ int csNetworkSocket2::LastOSError ()
 int csNetworkSocket2::Close() 
 {
   connected = false;
-  FD_ZERO(&fd_mask);
+  FD_ZERO(&fd_maskset);
   closesocket(socketfd);
 
   return CS_NET_SOCKET_NOERROR;
@@ -262,8 +262,8 @@ int csNetworkSocket2::WaitForConnection (int source, int port, int que)
   if (!blocking) 
   {
     fd_list[0] = socketfd;
-    FD_ZERO(&fd_mask);
-    FD_SET(fd_list[0],&fd_mask);
+    FD_ZERO(&fd_maskset);
+    FD_SET(fd_list[0],&fd_maskset);
   }
   return CS_NET_SOCKET_NOERROR;
 }
@@ -275,8 +275,8 @@ int csNetworkSocket2::set (SOCKET socket_fd, bool bConnected, struct sockaddr_in
   memcpy(&local_addr,&saddr,sizeof(struct sockaddr_in));
 
   fd_list[0] = socketfd;
-  FD_ZERO(&fd_mask);
-  FD_SET(fd_list[0],&fd_mask);
+  FD_ZERO(&fd_maskset);
+  FD_SET(fd_list[0],&fd_maskset);
 
   return CS_NET_SOCKET_NOERROR;
 }
@@ -340,17 +340,17 @@ iNetworkSocket2* csNetworkSocket2::Accept()
 
   if (!blocking) 
   {
-    FD_ZERO(&fd_mask);
+    FD_ZERO(&fd_maskset);
     fd_list[0] = socketfd;
-    FD_SET(fd_list[0],&fd_mask);
-    if (SELECT(FD_SETSIZE,&fd_mask,0,0) != 1)
+    FD_SET(fd_list[0],&fd_maskset);
+    if (SELECT(FD_SETSIZE,&fd_maskset,0,0) != 1)
     {
 	  last_error = CS_NET_SOCKET_NODATA;
 	  return 0; 
     }
   }
 
-  //if (FD_ISSET(fd_list[0],&fd_mask)) {
+  //if (FD_ISSET(fd_list[0],&fd_maskset)) {
   sin_size = sizeof(struct sockaddr_in);
   
   SOCKET socket_fd = accept(socketfd,(struct sockaddr *)&remote_addr,&sin_size);
@@ -371,8 +371,8 @@ iNetworkSocket2* csNetworkSocket2::Accept()
   if (!blocking) 
   {
     fd_list[0] = socketfd;
-    FD_ZERO(&fd_mask);
-    FD_SET(fd_list[0],&fd_mask);
+    FD_ZERO(&fd_maskset);
+    FD_SET(fd_list[0],&fd_maskset);
   }
   
   return tmpSocket;
@@ -390,16 +390,16 @@ int csNetworkSocket2::Recv (char *buff, size_t size)
     {
       if (!blocking) 
       {
-        FD_ZERO(&fd_mask);
+        FD_ZERO(&fd_maskset);
         fd_list[0] = socketfd;
-        FD_SET(fd_list[0],&fd_mask);
-        if (SELECT(FD_SETSIZE,&fd_mask,0,0) != 1)
+        FD_SET(fd_list[0],&fd_maskset);
+        if (SELECT(FD_SETSIZE,&fd_maskset,0,0) != 1)
         { 
           last_error = CS_NET_SOCKET_NODATA;
           return -1;
         }
 
-        if (FD_ISSET(socketfd,&fd_mask)) 
+        if (FD_ISSET(socketfd,&fd_maskset)) 
         {
           result = recv(socketfd,buff,1,0);
           /*
@@ -437,10 +437,10 @@ int csNetworkSocket2::Recv (char *buff, size_t size)
       
       if (!blocking)
       {
-        FD_ZERO(&fd_mask);
-        FD_SET(fd_list[0],&fd_mask);
-        if (SELECT(FD_SETSIZE,&fd_mask,0,0) != 1) return 0;
-        if (FD_ISSET(fd_list[0],&fd_mask)) 
+        FD_ZERO(&fd_maskset);
+        FD_SET(fd_list[0],&fd_maskset);
+        if (SELECT(FD_SETSIZE,&fd_maskset,0,0) != 1) return 0;
+        if (FD_ISSET(fd_list[0],&fd_maskset)) 
         {
           result = recvfrom(socketfd,buff,size,0,(struct sockaddr *)&local_addr,&addr_len);
           if (result == socket_error)
@@ -635,8 +635,8 @@ int csNetworkSocket2::Connect (char *host, int port)
 
   connected = true;
   fd_list[0] = socketfd;
-  FD_ZERO(&fd_mask);
-  FD_SET(fd_list[0],&fd_mask);
+  FD_ZERO(&fd_maskset);
+  FD_SET(fd_list[0],&fd_maskset);
   
   return CS_NET_SOCKET_NOERROR;
 }
