@@ -21,6 +21,7 @@ chronological order.
               symmetrical with unix.jam.
             - Fixed the logic when to use local and csutil static var cleanup
               function.
+        - res worked around shared lib build breakage on unix.
 4-Dec-2004
         - res fixed the GL renderer to not call glDeleteTextures() on super
           lightmap textures.

@@ -1,7 +1,10 @@
 SubDir TOP libs ;
 
+# @@@ NOTE: Currently shared libs require that the "Library" statements appear
+# in depedency order (ie when Y depends on X, the directory for X must be
+# stated before Y's). 
+SubInclude TOP libs csutil ;
 SubInclude TOP libs csgeom ;
 SubInclude TOP libs csgfx ;
 SubInclude TOP libs cstool ;
-SubInclude TOP libs csutil ;
 SubInclude TOP libs csws ;
