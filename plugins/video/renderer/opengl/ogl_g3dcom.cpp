@@ -126,6 +126,9 @@ CS_IMPLEMENT_STATIC_VAR (Get_clipped_lightmap_fog_texels, ogl_g3dcom_clipped_lig
 
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo1, csClipInfo, [100])
 CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo2, csClipInfo, [100])
+CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo3, csClipInfo, [100])
+CS_IMPLEMENT_STATIC_VAR_ARRAY (GetStaticClipInfo4, csClipInfo, [100])
+
 
 
 static ogl_g3dcom_tr_verts *tr_verts = NULL;
@@ -3650,7 +3653,7 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
       }
 
       csVector3 poly[100];	// @@@ Arbitrary limit
-      static csClipInfo clipinfo[100];
+      static csClipInfo *clipinfo = GetStaticClipInfo3 ();
       csVector3 vaux;
       vaux.x = vertices[tri.a].x - frust_origin.x;
       vaux.y = vertices[tri.a].y - frust_origin.y;
@@ -4097,7 +4100,7 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
       }
 
       csVector3 poly[100];	// @@@ Arbitrary limit
-      static csClipInfo clipinfo[100];
+      static csClipInfo *clipinfo = GetStaticClipInfo4 ();
       csVector3 vaux;
       vaux.x = vertices[tri.a].x - frust_origin.x;
       vaux.y = vertices[tri.a].y - frust_origin.y;
