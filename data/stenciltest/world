@@ -10,6 +10,7 @@
 		</texture>
 		<texture name="bricksDOT3">
 			<file>bricks_n.png</file>
+			<class>normalmap</class>
 		</texture>
 	</textures>
         <shaders>
@@ -37,7 +38,7 @@
 	</plugins>
 	<addon>
 	  <plugin>renderloopLoader</plugin>
-	  <paramsfile>/shader/std_rloop_shadowed.xml</paramsfile>
+	  <paramsfile>/shader/std_rloop_shadowed_dbg.xml</paramsfile>
 	</addon>
 	
 	<settings>

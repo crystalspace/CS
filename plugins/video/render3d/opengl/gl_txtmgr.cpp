@@ -637,9 +637,6 @@ void csGLTextureHandle::Load ()
 {
   if (Handle != 0) return;
 
-  const csGLTextureClassSettings* textureSettings = 
-    txtmgr->GetTextureClassSettings (textureClass);
-
   static const GLint textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
     GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
   static const GLint textureMagFilters[3] = {GL_NEAREST, GL_LINEAR, 

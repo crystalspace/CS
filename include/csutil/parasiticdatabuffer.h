@@ -114,7 +114,8 @@ class CS_CSUTIL_EXPORT csParasiticDataBufferPooled :
   public csParasiticDataBufferBase
 {
 public:
-  SCF_DECLARE_IBASE_POOLED(csParasiticDataBufferPooled);
+  SCF_DECLARE_IBASE_POOLED_EXTERN(CS_CSUTIL_EXPORT, 
+    csParasiticDataBufferPooled);
 
   /**
    * Set contents of this data buffer.

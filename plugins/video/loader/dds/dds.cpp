@@ -427,7 +427,6 @@ void Loader::DecompressRGB (csRGBpixel* buffer, const uint8* source,
 			    int w, int h, int depth, size_t size, 
 			    const PixelFormat& pf)
 {
-  const int valShift = 32 - pf.bitdepth;
   const uint valMask = (1 << pf.bitdepth) - 1;
   const size_t pixSize = (pf.bitdepth + 7) / 8;
   int rShift1, rMul, rShift2;
@@ -456,7 +455,7 @@ void Loader::DecompressRGBA (csRGBpixel* buffer, const uint8* source,
 			     int w, int h, int depth, size_t size, 
 			     const PixelFormat& pf)
 {
-  const int valShift = 32 - pf.bitdepth;
+  const uint valMask = (1 << pf.bitdepth) - 1;
   const size_t pixSize = (pf.bitdepth + 7) / 8;
   int rShift1, rMul, rShift2;
   ComputeMaskParams (pf.redmask, rShift1, rMul, rShift2);
@@ -470,7 +469,7 @@ void Loader::DecompressRGBA (csRGBpixel* buffer, const uint8* source,
   uint pixnum = w * h * depth;
   while (pixnum-- > 0)
   {
-    uint32 px = csGetLittleEndianLong (source) >> valShift;
+    uint32 px = csGetLittleEndianLong (source) & valMask;
     source += pixSize;
     uint32 pxc = px & pf.redmask;
     buffer->red = ((pxc >> rShift1) * rMul) >> rShift2;

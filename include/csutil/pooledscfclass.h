@@ -30,6 +30,22 @@
 
 #include "scf.h"
 
+#define	SCF_DECLARE_IBASE_POOLED_DECL(Class, parentClass)\
+  Class Pool						\
+  {							\
+    parentClass* pool;					\
+  public:						\
+    Pool ();						\
+    ~Pool ();						\
+    parentClass* Alloc ();				\
+    void Recycle (parentClass* instance);		\
+  };							\
+  friend class Pool;					\
+  Pool* scfPool;					\
+  parentClass* poolNext;				\
+  virtual void PoolRecycle ();				\
+  SCF_DECLARE_IBASE;					\
+  
 /**
  * Embed this macro instead of #SCF_DECLARE_IBASE into an SCF class that is to 
  * be pooled.
@@ -55,21 +71,14 @@
  *  #SCF_IMPLEMENT_DEFAULT_POOLRECYCLE macro contains a default (empty)
  *  implementation.
  */
-#define	SCF_DECLARE_IBASE_POOLED(parentClass)		\
-  SCF_DECLARE_IBASE;					\
-  class Pool						\
-  {							\
-    parentClass* pool;					\
-  public:						\
-    Pool ();						\
-    ~Pool ();						\
-    parentClass* Alloc ();				\
-    void Recycle (parentClass* instance);		\
-  };							\
-  friend class Pool;					\
-  Pool* scfPool;					\
-  parentClass* poolNext;				\
-  virtual void PoolRecycle ();				\
+#define	SCF_DECLARE_IBASE_POOLED(parentClass)			\
+  SCF_DECLARE_IBASE_POOLED_DECL(class, parentClass)
+
+/**
+ * Same as SCF_DECLARE_IBASE_POOLED, use for external classes.
+ */
+#define	SCF_DECLARE_IBASE_POOLED_EXTERN(Extern, parentClass)	\
+  SCF_DECLARE_IBASE_POOLED_DECL(class Extern, parentClass)
 
 /**
  * Has to be invoked inside the class constructor instead of 

@@ -1458,8 +1458,6 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
     statecache->Disable_GL_COLOR_ARRAY ();
   }
 
-  unsigned int u = -1;
-
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0]);
   if (buffer)
   {

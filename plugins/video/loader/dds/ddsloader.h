@@ -54,8 +54,6 @@ enum csDDSRawDataType
 class csDDSImageIO : public iImageIO, public iComponent
 {
 public:
-  csParasiticDataBufferPooled::Pool bufferPool;
-
   SCF_DECLARE_IBASE;
 
   csDDSImageIO (iBase* parent);

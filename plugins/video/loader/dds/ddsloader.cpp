@@ -192,11 +192,7 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
     format = (format & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR;
 
   csRef<iDataBuffer> imgBuf;
-  {
-    csParasiticDataBufferPooled* bufPtr = bufferPool.Alloc ();
-    bufPtr->SetContents (buf, imgOffset, dataSize);
-    imgBuf.AttachNew (bufPtr);
-  }
+  imgBuf.AttachNew (new csParasiticDataBuffer (buf, imgOffset, dataSize));
   csDDSImageFile* Image;
   Image = new csDDSImageFile (object_reg, format, imgBuf,
     dataType, head.pixelformat);
@@ -213,11 +209,7 @@ csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
       w = MAX (1, w >> 1); h = MAX (1, h >> 1); d = MAX (1, d >> 1);
       imgOffset += dataSize;
       dataSize = DataSize (dataType, bpp, w, h, d);
-      {
-	csParasiticDataBufferPooled* bufPtr = bufferPool.Alloc ();
-	bufPtr->SetContents (buf, imgOffset, dataSize);
-	imgBuf.AttachNew (bufPtr);
-      }
+      imgBuf.AttachNew (new csParasiticDataBuffer (buf, imgOffset, dataSize));
       mip.AttachNew (new csDDSImageFile (object_reg, format, imgBuf,
 	dataType, head.pixelformat));
       mip->SetDimensions (w, h);

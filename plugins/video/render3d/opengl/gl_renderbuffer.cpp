@@ -256,7 +256,7 @@ csGLVBOBufferManager::csGLVBOBufferManager (csGLExtensionManager *ext,
 
   if (verbose) Report (CS_REPORTER_SEVERITY_NOTIFY, 
     "Setting up VBO buffers, VB: %s IB: %s",
-    ByteFormat (vbSize), ByteFormat (ibSize));
+    ByteFormat (vbSize).GetData(), ByteFormat (ibSize).GetData());
 
   vertexBuffer.Setup (GL_ARRAY_BUFFER_ARB, vbSize, ext);
   indexBuffer.Setup (GL_ELEMENT_ARRAY_BUFFER_ARB, ibSize, ext);

@@ -274,7 +274,6 @@ bool ImageTgaFile::Load (uint8* iBuffer, size_t iSize)
   int i;
   unsigned int temp1, temp2;
   int rows, cols, row, col, realrow, truerow, baserow;
-  int maxval;
 
   /* @@todo: Add TGA format detection */
 
@@ -306,43 +305,10 @@ bool ImageTgaFile::Load (uint8* iBuffer, size_t iSize)
     if (tga_head.CoMapType != 1)
       return false;
     mapped = 1;
-    /* Figure maxval from CoSize. */
-    switch (tga_head.CoSize)
-    {
-      case 8:
-      case 24:
-      case 32:
-        maxval = 255;
-        break;
-
-      case 15:
-      case 16:
-        maxval = 31;
-        break;
-
-      default:
-	return false;
-    }
   }
   else
-  { /* Not colormap, so figure maxval from PixelSize. */
+  { /* Not colormap */
     mapped = 0;
-    switch (tga_head.PixelSize)
-    {
-      case 8:
-      case 24:
-      case 32:
-        maxval = 255;
-        break;
-
-      case 15:
-      case 16:
-        maxval = 31;
-        break;
-
-      default:
-	return false;
-    }
   }
 
   /* If required, read the color map information. */
@@ -501,7 +467,7 @@ static void get_pixel (uint8*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
   {
     case 8:				/* Grey scale, read and triplicate. */
       Red = Grn = Blu = l = *iBuffer++;
-      Alpha = 0;
+      Alpha = 0xff;
       break;
 
     case 16:				/* 5 bits each of red green and blue. */
@@ -509,10 +475,13 @@ static void get_pixel (uint8*& iBuffer, csRGBpixel* dest, int Size, bool alpha)
       j = *iBuffer++;
       k = *iBuffer++;
       l = ((unsigned int) k << 8)  + j;
-      Red = (k & 0x7C)  >> 2;
-      Grn = ( (k & 0x03)  << 3)  + ( (j & 0xE0)  >> 5);
-      Blu = j & 0x1F;
-      Alpha = 0;
+      Red = (k & 0x7C) << 1;
+      Red |= Red >> 5;
+      Grn = ((k & 0x03) << 6) | ((j & 0xE0) >> 2);
+      Grn |= Grn >> 5;
+      Blu = (j & 0x1F) << 3;
+      Blu |= Blu >> 5;
+      Alpha = 0xff;
       break;
 
     case 32:

@@ -18,6 +18,12 @@ chronological order.
 	- res changed the pixel packing code to use sizeof() in code instead
 	  of defines to determine csRGBcolor/csRGBpixel sanity.
 	- res changed the pixel packing support functions to reside in structs.
+	- res fixed the fix in vostexture.cpp to make sense.
+	- res fixed the pooled SCF class stuff to allow exported classes.
+	- res fixed some gcc warnings.
+	- res made the DDS buffer use unpooled parasitic databuffers. Pooled 
+	  ones aren't that sensible there.
+	- res fixed the TGA loader to properly load 16bpp TGAs.
 28-Jan-2005
 	- Andrew Mann fixed bugs in the software sound renderer which prevented
 	  looping from working, and which caused a gap in the looping process.
