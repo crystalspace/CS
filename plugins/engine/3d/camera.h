@@ -21,10 +21,10 @@
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
+#include "csutil/refarr.h"
 #include "iengine/camera.h"
 #include "plugins/engine/3d/sector.h"
 
-class Vertex;
 class csEngine;
 
 /**
@@ -37,6 +37,9 @@ private:
   iSector* sector;
   /// If true we are in a mirrored world.
   bool mirror;
+
+  /// Callbacks.
+  csRefArray<iCameraSectorListener> listeners;
 
   /**
    * If true then we only check collision with portals and not
@@ -154,6 +157,7 @@ public:
   {
     sector = s;
     cameranr = cur_cameranr++;
+    FireCameraSectorListeners (sector);
   }
 
   /**
@@ -324,6 +328,18 @@ public:
     v.y = (p.y - shift_y) * z * inv_aspect;
   }
 
+  void AddCameraSectorListener (iCameraSectorListener* listener)
+  {
+    listeners.Push (listener);
+  }
+
+  void RemoveCameraSectorListener (iCameraSectorListener* listener)
+  {
+    listeners.Delete (listener);
+  }
+
+  void FireCameraSectorListeners (iSector* sector);
+
   SCF_DECLARE_IBASE;
 
   //------------------------ iCamera implementation ------------------------
@@ -414,6 +430,14 @@ public:
     virtual bool GetOnlyPortals ()
     {
       return scfParent->only_portals;
+    }
+    virtual void AddCameraSectorListener (iCameraSectorListener* listener)
+    {
+      scfParent->AddCameraSectorListener (listener);
+    }
+    virtual void RemoveCameraSectorListener (iCameraSectorListener* listener)
+    {
+      scfParent->RemoveCameraSectorListener (listener);
     }
   } scfiCamera;
   friend struct Camera;

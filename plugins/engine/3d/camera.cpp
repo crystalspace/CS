@@ -92,6 +92,13 @@ csCamera::~csCamera ()
   SCF_DESTRUCT_IBASE ();
 }
 
+void csCamera::FireCameraSectorListeners (iSector* sector)
+{
+  size_t i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->NewSector (&scfiCamera, sector);
+}
+
 void csCamera::SetFarPlane (const csPlane3 *farplane)
 {
   delete fp;
@@ -117,7 +124,10 @@ void csCamera::MoveWorld (const csVector3 &v, bool cd)
       if (!cd) new_position = remember_position;
     }
     else
+    {
       sector = new_sector;
+      FireCameraSectorListeners (sector);
+    }
   }
 
   SetOrigin (new_position);
@@ -219,7 +229,8 @@ void csCamera::ComputeAngle (int width)
   float disp_width = (float)width * 0.5f;
   float inv_disp_radius = qisqrt (
       rview_fov * rview_fov + disp_width * disp_width);
-  fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius) * (360.0f / TWO_PI);
+  fov_angle = 2.0f * (float)acos (disp_width * inv_disp_radius)
+  	* (360.0f / TWO_PI);
 }
 
 void csCamera::ComputeDefaultAngle (int width)

@@ -48,6 +48,19 @@ class csVector3;
 class csVector2;
 struct iSector;
 struct iMeshWrapper;
+struct iCamera;
+
+SCF_VERSION (iCameraSectorListener, 0, 0, 1);
+
+/**
+ * Implement this interface if you are interested in learning when
+ * the camera changes sector.
+ */
+struct iCameraSectorListener : public iBase
+{
+  /// Fired when the sector changes.
+  virtual void NewSector (iCamera* camera, iSector* sector) = 0;
+};
 
 SCF_VERSION (iCamera, 0, 2, 0);
 
@@ -89,7 +102,10 @@ SCF_VERSION (iCamera, 0, 2, 0);
  */
 struct iCamera : public iBase
 {
-  /// Create a clone of this camera
+  /**
+   * Create a clone of this camera. Note that the array of listeners
+   * is not cloned.
+   */
   virtual iCamera *Clone () const = 0;
 
   /// Return the FOV (field of view) in pixels
@@ -232,6 +248,11 @@ struct iCamera : public iBase
 
   /// Get the hit-only-portals flag.
   virtual bool GetOnlyPortals () = 0;
+
+  /// Add a listener to this camera.
+  virtual void AddCameraSectorListener (iCameraSectorListener* listener) = 0;
+  /// Remove a listener from this camera.
+  virtual void RemoveCameraSectorListener (iCameraSectorListener* listener) = 0;
 };
 
 /** @} */
