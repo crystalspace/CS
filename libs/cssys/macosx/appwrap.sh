@@ -10,11 +10,15 @@
 NAME=$1
 DIR=$2
 ICON=$3
+if test -n "$4"; then
+  VERSION_FILE="$4"
+else
+  VERSION_FILE="include/csver.h"
+fi
 
 APP="${DIR}/${NAME}.app"
 ICON_ROOT=`basename ${ICON}`
 
-VERSION_FILE="include/csver.h"
 VERSION_MAJOR=`sed -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e 's/#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < ${VERSION_FILE}`
 VERSION_MINOR=`sed -e '/#define[ 	][ 	]*CS_VERSION_MINOR/!d' -e 's/#define[ 	][ 	]*CS_VERSION_MINOR[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < ${VERSION_FILE}`
 VERSION_DATE=`sed -e '/#define[ 	][ 	]*CS_RELEASE_DATE/!d' -e 's/#define[ 	][ 	]*CS_RELEASE_DATE[ 	][ 	]*CS_VER_QUOTE(\(..*\)).*/\1/' < ${VERSION_FILE}`

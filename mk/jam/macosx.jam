@@ -9,18 +9,22 @@ if $(PTHREAD.AVAILABLE) = "yes"
 }
 
 APPLICATION.LFLAGS += -framework AppKit -framework Foundation ;
-APPLICATION.CONSOLE.LFLAGS = -framework AppKit -framework Foundation ;
-PLUGIN.LFLAGS = -framework AppKit -framework Foundation ;
-SUFPLUGIN ?= .csplugin ;
+APPLICATION.CONSOLE.LFLAGS += -framework AppKit -framework Foundation ;
+PLUGIN.LFLAGS += -bundle -framework AppKit -framework Foundation ;
+SUFPLUGIN ?= $(MACOSX.PLUGIN_EXT) ;
+MACOSX.APP_DIR = . ;
+MACOSX.APP_ICON = $(TOP)/libs/cssys/macosx/appicon.icns ;
 
 # XXX: The actions here are just guesses, I wasn't able to properly test them.
 actions LinkPlugin bind NEEDLIBS
 {
-  $(CMD.LINK) -v -bundle -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+  $(CMD.LINK) -bundle -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
 }
 
 actions LinkApplication bind NEEDLIBS
 {
-  $(CMD.LINK) -v -bundle -o $(<) $(>) $(NEEDLIBS) $(LINKLIBS)
+  $(TOP)/libs/cssys/macosx/appwrap.sh $(NAME) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(TOP)/include/csver.h
+  $(CMD.LINK) -o $(NAME)/Contents/MacOS/$(NAME) $(>) $(NEEDLIBS) $(LINKLIBS)
+  touch $(<)
 }
 
