@@ -355,8 +355,24 @@
             <xsl:with-param name="inp" select="substring-after($token,$idsepa)"/>
           </xsl:call-template>
         </xsl:when>
+        <xsl:when test="$tokenid='l'">
+          <xsl:call-template name="do_literal">
+            <xsl:with-param name="inp" select="substring-after($token,$idsepa)"/>
+          </xsl:call-template>
+        </xsl:when>
       </xsl:choose>
+
+      <xsl:call-template name="awsinfo">
+        <xsl:with-param name="info" select="substring-after($info,$sepa)"/>
+        <xsl:with-param name="sepa" select="$sepa"/>
+        <xsl:with-param name="idsepa" select="$idsepa"/>
+      </xsl:call-template>
     </xsl:if>
+  </xsl:template>
+
+  <xsl:template name="do_literal">
+    <xsl:param name="inp"/>
+    <xsl:call-template name="spacer"/><xsl:value-of select="$inp"/>
   </xsl:template>
 
   <xsl:template name="do_connect">
