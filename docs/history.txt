@@ -37,6 +37,14 @@ The history order is reversed so that new features are at the top.
 	  discussion and repaired several `overfull hbox' warnings reported by
 	  TeX.
 	- Eric Sunshine removed the now obsolete MazeD.cfg and MazeD.zip.
+	- Wouter Wijngaards added a randomly generated maze to isotest
+	  application.
+	- Philip Wyett fixed a small compile problem in iso engine.
+	- Philip updated the win32gcc.txi doc to add explanation about
+	  PYTHONPATH environment variable.
+	- Michael Voasse implemented radius calculation on metaball,
+	  'borrowed' HitBeamObject code from sprite3d and fixed shape
+	  number update.
 25-Jun-2001
 	- Added iBase::GetRefCount(). This way you can now get the reference
 	  counter from any SCF interface. Note that this is ONLY for debugging
