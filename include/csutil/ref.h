@@ -84,7 +84,7 @@ public:
    * has already been called on behalf of the smart pointer.  Otherwise a new
    * reference is created via IncRef().
    */
-  void Assign (T* newobj, bool transfer_ownership = false)
+  void Assign (T* newobj, bool transfer_ownership = true)
   {
     T* oldobj = obj;
     obj = newobj;

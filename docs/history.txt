@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+31-Jul-2002
+	- Fixed behaviour of csRef::Assign(). By default it will now
+	  transfer owner ship (for pointers) as was intended in the first
+	  place.
 30-Jul-2002
 	- Added simple csRefCount class which does reference counting
 	  without the need for iBase.
