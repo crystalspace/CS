@@ -5,6 +5,38 @@ The history order is reversed so that new features are at the top.
 	- Fixed the cslua plugin by regenerating the swig file with luaswig.
 	- Also fixed the scripts/lua/pysimp.lua so that pysimp -lua
 	  actually works.
+	- Philip Wyett made the following changes to CS project:
+	    - Replaced MSVC port specific "better_memcpy()" with
+	      a new more efficient version "fast_mem_copy()", which
+	      has more chance of getting L1 cache hits on higher
+	      end processors.
+	    - Updated winlibs version to take account of new release.
+	      Also added a second download link on my personal site to
+	      act as a mirror.
+	    - Minor tweak of the new "fast_mem_copy()" for MSVC port,
+	      shaving a few more tenths off. Profiler function timing notes
+	      just to give you an idea of the difference between new
+	      "fast_mem_copy()" function against the old "better_memcpy()"
+	      one.
+		Func          Func+Child           Hit
+		Time   %         Time      %      Count  Function
+	        -------------------------------------------------------
+		129.867  33.2      129.867  33.2  1000000 better_memcpy
+		126.196  31.5      126.196  31.5  1000000 fast_mem_copy
+		118.228  30.2      375.859  96.0        1 _main
+		.... extra runtime timings snipped ...
+	    - Minor loop optimization and conformation with CS coding style
+	      and standard in AWS, some csutil classes, eax sound renderer,
+	      line 3d renderer, spr2d mesh object, terrfunc mesh object,
+	      system driver, ASE importer plugin, spr builder, csrectrg.cpp,
+	      and povie plugin.
+	- Martin Geisse made the following changes:
+	    - Removed the old converter and crossbuilder classes.
+	    - Removed the following 'new' converter frame classes: DXF, HRC,
+	      IV, SMF, STLA, VLA.
+	    - Fixed a bug in the ASE importer.
+	- Christopher Nelson added texture.png and fixed definition for window
+	  texture.
 3-Sep-2001
 	- Philip Wyett did a minor typo fix to the msvc5/msvc6 documentation.
 	- Philip Wyett made the following changes to CS:
