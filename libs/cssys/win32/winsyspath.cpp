@@ -35,7 +35,7 @@ char* csExpandPath (const char* path)
   return (csStrNew (fullName));
 }
 
-char* csGetAppPath ()
+char* csGetAppPath (const char*)
 {
   char appPath[MAX_PATH];
   GetModuleFileName (0, appPath, sizeof (appPath) - 1);

@@ -1,0 +1,32 @@
+@c -*-texinfo-*-
+@node Platform peruser
+@section Platform-specific per-user configuration
+@cindex Per-user configuration
+
+CrystalSpace' configuration system provides the storage of user-specific
+settings, utilizing a platform's common protocol for this, while being 
+completely transparent to the application. While knowledge of the details 
+is not necessary, there should be an understanding of some basic issues so
+the the user-specific settings can "play nicely" across all platforms.
+
+@subheading The @emph{unique identifier}
+
+To distinguish between different configurations for the same user a
+@emph{unique identifier} is used. The @emph{Application ID} 
+(@pxref{Configuration File}) is directly used as such an 
+@emph{unique identifier}. How in detail it is used to distinguish between
+configurations is up to the individual platform-dependent implementation.
+However, to make the @emph{unique identifier} 'as unique as possible', 
+it is strongly recommended that an application ID always has the shape 
+@samp{<Producer>.<ProductName>}. If the application is a tool that is only 
+meaningful if used together with CrystalSpace, or if you think your name is 
+not worthy enough to be used in such an exposed place as the 
+per-user configuration, you can also use something generic like 
+@samp{CrystalSpaceApp} or just @samp{CrystalSpace} (latter one is also at 
+least used by CrystalSpace itself, so be wary of possible conflicts).
+
+@menu
+* Platform peruser Win32:: Storage of per-user configuration on Windows
+@end menu
+
+@importss{options,platform,win32.txi}

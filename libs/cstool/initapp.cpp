@@ -82,7 +82,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
   CS_INITIALIZE_PLATFORM_APPLICATION;
 
   iObjectRegistry* reg = 0;
-  if (InitializeSCF())
+  if (InitializeSCF (argc, argv))
   {
     iObjectRegistry* r = CreateObjectRegistry();
     if (r != 0)
@@ -102,9 +102,9 @@ iObjectRegistry* csInitializer::CreateEnvironment (
   return reg;
 }
 
-bool csInitializer::InitializeSCF ()
+bool csInitializer::InitializeSCF (int argc, const char* const argv[])
 {
-  scfInitialize();
+  scfInitialize (argc, argv);
 
   return true;
 }

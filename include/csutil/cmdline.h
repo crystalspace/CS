@@ -58,6 +58,8 @@ private:
   /// Find Nth command-line option and return a pointer to the object (or 0)
   csCommandLineOption *FindOption (const char *iName, int iIndex) const;
 
+  /// Directory of application executable
+  const char* appPath;
 public:
   SCF_DECLARE_IBASE;
 
@@ -66,7 +68,7 @@ public:
   /// Construct with a given command line.
   csCommandLineParser (int argc, const char* const argv[]);
   /// Destructor.
-  virtual ~csCommandLineParser() {}
+  virtual ~csCommandLineParser();
 
   /**
    * Initialize for the given command line.  Options from command line are
@@ -95,6 +97,9 @@ public:
    */
   virtual bool GetBoolOption (const char *iName, 
     bool defaultValue = false);
+
+  /// Retrieve directory of application executable
+  virtual const char* GetAppPath ();
 };
 
 #endif // __CS_CMDLINE_H__

@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "cssys/syspath.h"
 #include "csutil/cmdline.h"
 
 SCF_IMPLEMENT_IBASE (csCommandLineParser)
@@ -26,6 +27,7 @@ SCF_IMPLEMENT_IBASE_END
 csCommandLineParser::csCommandLineParser (iBase *Parent) : Names (16, 16)
 {
   SCF_CONSTRUCT_IBASE (Parent);
+  appPath = 0;
 }
 
 csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
@@ -33,6 +35,11 @@ csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
 {
   SCF_CONSTRUCT_IBASE (0);
   Initialize (argc, argv);
+}
+
+csCommandLineParser::~csCommandLineParser()
+{
+  delete[] appPath;
 }
 
 void csCommandLineParser::Initialize (int argc, const char* const argv[])
@@ -60,6 +67,8 @@ void csCommandLineParser::Initialize (int argc, const char* const argv[])
     else
       Names.Push (csStrNew (opt));
   }
+  
+  appPath = csGetAppPath (argv[0]);
 }
 
 void csCommandLineParser::Reset()
@@ -168,4 +177,8 @@ bool csCommandLineParser::GetBoolOption(const char *iName, bool defaultValue)
   return result;
 }
 
+const char* csCommandLineParser::GetAppPath ()
+{
+  return appPath;
+}
 

@@ -543,7 +543,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   char* pathEnv = csStrNew (getenv("PATH"));
   bool pathChanged = false;
 
-  csPluginPaths* pluginpaths = csGetPluginPaths ();
+  csPluginPaths* pluginpaths = csGetPluginPaths (__argv[0]);
   for (int i = 0; i < pluginpaths->GetCount(); i++)
   {
     // @@@ deal with path recursion here?

@@ -115,7 +115,7 @@ char* csGetConfigPath ();
  * Get a list of directories where plugins are installed.
  * \remark Caller is responsible to free the list with delete after using it.
  */
-csPluginPaths* csGetPluginPaths ();
+csPluginPaths* csGetPluginPaths (const char* argv0);
 
 /**
  * Expand a native path relative to the current directory.
@@ -128,8 +128,12 @@ char* csExpandPath (const char* path);
  * Return the path the application was started from.
  * \remark Caller is responsible to free the returend string with delete[] 
  *   after using it.
+ * \remark This function is primarily intended for very low-level use before 
+ *   or during the initialization of CS' core components. Past this pointe,
+ *   applications and plugins should rather use 
+ *   iCommandLineParser::GetAppPath().
  */
-char* csGetAppPath ();
+char* csGetAppPath (const char* argv0);
 
 /**
  * Check whether two native paths actually point to the same location.

@@ -66,6 +66,11 @@ struct iCommandLineParser : public iBase
    */
   virtual bool GetBoolOption (const char *iName, 
     bool defaultValue = false) = 0;
+    
+  /**
+   * Returns the path of the application binary.
+   */
+  virtual const char* GetAppPath () = 0;
 };
 
 /** @} */

@@ -1,11 +1,2 @@
-    if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
-    const char* extensions;
-    if (CS_WGL_ARB_extensions_string)
-    {
-      extensions = wglGetExtensionsStringARB (hDC);
-    }
-    else
-    {
-      extensions = (const char*)glGetString (GL_EXTENSIONS);
-    }
-    CS_%Name% = (strstr (extensions, ext) != NULL);
+    SetupWGLextStr (hDC);
+    CS_%Name% = (strstr (extstrWGL, ext) != NULL);

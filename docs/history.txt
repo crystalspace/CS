@@ -12,6 +12,17 @@ The history order is reversed so that new features are at the top.
 	- Marten removed the sc. discardingsystem for renderbuffers
 	- Marten ported the ballmesh, nullmesh, simplecon and csconout to 
 	  new renderer.
+	- res made the following changes:
+	    - Added some documentation about per-user configs.
+	    - Fixed csGetAppPath() on unix.
+	    - On Win32, external .csplugin files are supported again (in
+	      addition to embedded metadata.)
+	    - SCF factories have internally a 'context' now. The 'context' 
+ 	      basically identifies the directory of a plugin and is used to
+	      decide whether duplicate class ID will be reported or not.
+	    - Eliminated a bit of redundant code and used more macros in
+	      the GL extension manager to reduce it's bloat a bit.
+	    - Renamed "win32/syspath.cpp" to "win32/winsyspath.cpp".
 17-Jun-2003
 	- Marten fixed an error with uninitialized extensions in render3d.
 	- Marten fixed jamfiles for glshader_. They need to link to GL.

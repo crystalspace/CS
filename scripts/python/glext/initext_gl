@@ -13,22 +13,7 @@
     {
       allclear = true;
 %FunctionsInit%
-      if (CS_%Name% = allclear)
-      {
-        CS_%Name% &= config->GetBool (cfgkey, true);
-        if (CS_%Name%)
-        {
-          Report ("GL Extension '%%s' found and used.", ext);
-        }
-        else
-        {
-          Report ("GL Extension '%%s' found, but not used.", ext);
-        }
-      }
-      else
-      {
-        Report ("GL Extension '%%s' failed to initialize.", ext);
-      }
+      EXTMGR_REPORT_INIT_RESULT("GL", %Name%)
     }
     else
     {

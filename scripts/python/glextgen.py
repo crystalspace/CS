@@ -67,13 +67,13 @@ def getConstant (const):
 def getFunctionType (func):
     values = { "name" : func.getAttribute ("name"), 
       "return" : func.getAttribute ("return") };
-    if (func.getAttribute ("pointer") == "TRUE"):
+    if (func.getAttribute ("pointer") == "true"):
       values["pointer"] = "*";
     else:
       values["pointer"] = "";
     prevarg = 0;
     arguments = "";
-    for arg in func.getElementsByTagName ("ARG"):
+    for arg in func.getElementsByTagName ("arg"):
       arguments = arguments + join (getArgument (arg, prevarg), "");
       prevarg = arg;
     values["arglist"] = arguments;
@@ -89,7 +89,7 @@ def getArgument (arg, prevarg):
         values["type"] = "GL" + arg.getAttribute("type").lstrip ("GL").lower ();
     else:
         values["type"] = arg.getAttribute("type");
-    if (arg.getAttribute ("pointer") == "TRUE"):
+    if (arg.getAttribute ("pointer") == "true"):
       values["pointer"] = "*";
     else:
       values["pointer"] = "";
@@ -100,9 +100,9 @@ def getDefinitions (ext):
     name = ext.getAttribute ("name");
     type = ((name.split ("_"))[0]).lower();
     values = { "name" : name, "tokens" : "", "functiontypes" : "" };
-    for const in ext.getElementsByTagName ("TOKEN"):
+    for const in ext.getElementsByTagName ("token"):
       values["tokens"] = values["tokens"] + join (getConstant (const), "");
-    for func in ext.getElementsByTagName ("FUNCTION"):
+    for func in ext.getElementsByTagName ("function"):
       if func.getAttribute("name") not in writtenFuncTypes:
 	values["functiontypes"] = values["functiontypes"] + \
 	  join (getFunctionType (func), "");
@@ -143,7 +143,7 @@ def getFunctions (ext):
   funcs = list();
   name = ext.getAttribute ("name");
   type = ((name.split ("_"))[0]).lower();
-  for func in ext.getElementsByTagName ("FUNCTION"):
+  for func in ext.getElementsByTagName ("function"):
     values = { "name" : func.getAttribute("name") };
     if func.getAttribute("name") not in writtenFuncs:
       funcs = funcs + interpolate (getTemplate ("func"), values);
@@ -171,7 +171,7 @@ def getInitExtensions (ext):
       ettype = "special";
     values["extcheck"] = join (interpolate (getTemplateK ("extcheck", 
       ettype), values), "");
-    for func in ext.getElementsByTagName ("FUNCTION"):
+    for func in ext.getElementsByTagName ("function"):
       values["functionsinit"] += join (getFunctionInit (func), "");
     return interpolate (getTemplateK ("initext", 
       type), values);
@@ -182,7 +182,7 @@ def getFunctionInit (func):
       "name" : name};
     return interpolate (getTemplate ("funcinit"), values);
 
-stuff = join (getExtensions (xmldoc.getElementsByTagName ("EXTENSION")),
+stuff = join (getExtensions (xmldoc.getElementsByTagName ("extension")),
   "");
 output = file ("glextmanager.h", "w")
 output.write (stuff);

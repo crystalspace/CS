@@ -12,7 +12,9 @@ configuration.
 @menu
 * Common Command Line Options::
 * Configuration File::
+* Platform peruser:: Platform-specific per-user configuration
 @end menu
 
 @imports{options,cmdline.txi}
 @imports{options,config.txi}
+@imports{options,platform.txi}

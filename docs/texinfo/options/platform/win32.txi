@@ -1,0 +1,27 @@
+@c -*-texinfo-*-
+@node Platform peruser Win32
+@subsection Storage of per-user configuration on Windows
+@cindex Windows per-user configuration
+
+Per-user data is stored on Windows as a configuration file in the
+@file{Application Data} directory. The location (and name) differs in various
+versions and languages of Windows - on Windows 2000 and NT it is something
+like @file{C:\Documents and Settings\<user name>\Application Data}, on Win9x
+@file{C:\WINDOWS\Application Data}. 
+
+The actual path of the configuration file is generated from the 
+@emph{unique identifier} by replacing all dots (@code{'.'}) with backslashes 
+(@code{'\'}) and adding a @file{.cfg} suffix.
+
+Example: The configuration with the @emph{unique identifier} 
+@samp{MyGames.ClickFrenzy2} will actually be stored as 
+@file{Application Data\MyGames\ClickFrenzy2.cfg}.
+
+The configuration file format is the same as described
+in @ref{Configuration File}.
+
+@subsubheading Registry access
+
+On Windows, it is also possible to read and store configuration settings to 
+and from the registry; for more information please refer to the documentation
+of the @code{csWin32RegistryConfig} class.

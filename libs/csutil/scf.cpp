@@ -49,7 +49,8 @@ class csSCF : public iSCF
 private:
   csRef<csMutex> mutex;
 
-  void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode);
+  void RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
+    int context = -1);
 public:
   SCF_DECLARE_IBASE;
 
@@ -64,12 +65,12 @@ public:
   virtual void RegisterClasses (iDocument*);
   virtual void RegisterClasses (char const*);
   virtual void RegisterClasses (char const* pluginPath, 
-    iDocument* scfnode);
+    iDocument* scfnode, int context = -1);
   virtual bool RegisterClass (const char *iClassID,
     const char *iLibraryName, const char *iFactoryClass,
-    const char *Description, const char *Dependencies = 0);
+    const char *Description, const char *Dependencies = 0, int context = -1);
   virtual bool RegisterClass (scfFactoryFunc, const char *iClassID,
-    const char *Description, const char *Dependencies = 0);
+    const char *Description, const char *Dependencies = 0, int context = -1);
   virtual bool RegisterFactoryFunc (scfFactoryFunc, const char *FactClass);
   virtual bool ClassRegistered (const char *iClassID);
   virtual void *CreateInstance (const char *iClassID,
@@ -216,6 +217,11 @@ public:
   char *FactoryClass;
   // Function which actually creates an instance
   scfFactoryFunc CreateFunc;
+  /*
+    "Context" of this class (used to decide whether a class conflict will 
+    be reported)
+  */
+  int classContext;
 #ifndef CS_STATIC_LINKED
   // Shared module that implements this class or 0 for local classes
   char *LibraryName;
@@ -226,7 +232,7 @@ public:
   // Create the factory for a class located in a shared library
   scfFactory (const char *iClassID, const char *iLibraryName,
     const char *iFactoryClass, scfFactoryFunc iCreateFunc, const char *iDesc,
-    const char *iDepend);
+    const char *iDepend, int context = -1);
   // Free the factory object (but not objects created by this factory)
   virtual ~scfFactory ();
   // Create a insance of class this factory represents
@@ -260,7 +266,7 @@ public:
 
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iFactoryClass, scfFactoryFunc iCreate, const char *iDescription,
-  const char *iDepend)
+  const char *iDepend, int context)
 {
   // Don't use SCF_CONSTRUCT_IBASE (0) since it will call IncRef()
   scfRefCount = 0; scfParent = 0;
@@ -269,6 +275,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   Dependencies = csStrNew (iDepend);
   FactoryClass = csStrNew (iFactoryClass);
   CreateFunc = iCreate;
+  classContext = context;
 #ifndef CS_STATIC_LINKED
   LibraryName = csStrNew (iLibraryName);
   Library = 0;
@@ -411,7 +418,8 @@ SCF_IMPLEMENT_IBASE (csSCF);
   SCF_IMPLEMENTS_INTERFACE (iSCF);
 SCF_IMPLEMENT_IBASE_END;
 
-void scfInitialize (csPluginPaths* pluginPaths)
+void scfInitialize (int argc, const char* const argv[], 
+  csPluginPaths* pluginPaths)
 {
   if (!PrivateSCF)
     PrivateSCF = new csSCF ();
@@ -424,26 +432,36 @@ void scfInitialize (csPluginPaths* pluginPaths)
   bool freePaths = false;
   if (!pluginPaths)
   {
-    pluginPaths = csGetPluginPaths ();
+    pluginPaths = csGetPluginPaths (argv[0]);
     freePaths = true;
   }
 
-  csRef<iStrVector> messages = 
-    csScanPluginDirs (pluginPaths, plugins, metadata);
-
-  int j;
-  if ((messages != 0) && (messages->Length() > 0))
+  int i, j;
+  for (i = 0; i < pluginPaths->GetCount(); i++)
   {
-    for (j = 0; j < messages->Length(); j++)
+    if (plugins) plugins->DeleteAll();
+    metadata.DeleteAll();
+
+    csRef<iStrVector> messages = 
+      csScanPluginDir ((*pluginPaths)[i].path, plugins, metadata,
+        (*pluginPaths)[i].scanRecursive);
+
+    if ((messages != 0) && (messages->Length() > 0))
     {
-      fprintf(stderr,
-	"%s\n", messages->Get (j));
-    }
-  }
+      fprintf (stderr,
+	"The following issue(s) came up while scanning '%s':",
+	(*pluginPaths)[i].path);
 
-  for (j = 0; j < metadata.Length(); j++)
-  {
-    PrivateSCF->RegisterClasses (plugins->Get (j), metadata[j]);
+      for (j = 0; j < messages->Length(); j++)
+      {
+	fprintf(stderr,
+	  " %s\n", messages->Get (j));
+      }
+    }
+    for (j = 0; j < metadata.Length(); j++)
+    {
+      PrivateSCF->RegisterClasses (plugins->Get (j), metadata[j], i);
+    }
   }
 
   if (freePaths)
@@ -500,7 +518,7 @@ void csSCF::RegisterClasses (iDocument* doc)
 }
 
 void csSCF::RegisterClasses (char const* pluginPath, 
-    iDocument* doc)
+    iDocument* doc, int context)
 {
   if (doc)
   {
@@ -512,7 +530,7 @@ void csSCF::RegisterClasses (char const* pluginPath,
       {
 	csRef<iDocumentNode> scfnode = pluginnode->GetNode("scf");
 	if (scfnode.IsValid())
-	  RegisterClassesInt (pluginPath, scfnode);
+	  RegisterClassesInt (pluginPath, scfnode, context);
 	else
 	  fprintf(stderr, "csSCF::RegisterClasses: Missing <scf> node.\n");
       }
@@ -529,7 +547,8 @@ static char const* get_node_value(csRef<iDocumentNode> parent, char const* key)
   return node.IsValid() ? node->GetContentsValue() : "";
 }
 
-void csSCF::RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode)
+void csSCF::RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode, 
+				int context)
 {
   csRef<iDocumentNode> classesnode = scfnode->GetNode("classes");
   if (classesnode)
@@ -560,7 +579,7 @@ void csSCF::RegisterClassesInt (char const* pluginPath, iDocumentNode* scfnode)
       }
 
       char const* pdepend = (depend.IsEmpty() ? 0 : depend.GetData());
-      RegisterClass(classname, pluginPath, imp, desc, pdepend);
+      RegisterClass(classname, pluginPath, imp, desc, pdepend, context);
     }
   }
 }
@@ -619,27 +638,80 @@ void csSCF::UnloadUnusedModules ()
 #endif
 }
 
+inline static bool SameContext (int contextA, int contextB)
+{
+  return ((contextA != -1) && (contextB != -1) && (contextA == contextB));
+}
+
 bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
-  const char *iFactoryClass, const char *iDesc, const char *Dependencies)
+  const char *iFactoryClass, const char *iDesc, const char *Dependencies, 
+  int context)
 {
   csScopedMutexLock lock (mutex);
-  if (ClassRegistry->FindKey (iClassID) >= 0)
+  int idx;
+  if ((idx = ClassRegistry->FindKey (iClassID)) >= 0)
+  {
+    scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
+    if (SameContext (cf->classContext, context))
+    {
+      fprintf (stderr,
+	"SCF_WARNING: class %s has already been registered in the same context\n", 
+	iClassID);
+    }
+    else
+    {
+      /*
+        The user may want to override a standard CS plugin by putting
+	a plugin exhibiting the same class ID into the e.g. app directory.
+	In this case a warning is probably not desired. But for debugging
+	purposes we emit something.
+       */
+    #ifdef CS_DEBUG
+      // @@@ some way to have this warning in non-debug builds would be nice.
+      fprintf (stderr,
+	"SCF_NOTIFY: class %s has already been registered in a different context "
+	"(this message appears only in debug builds)\n", 
+	iClassID);
+    #endif
+    }
     return false;
+  }
   scfFactory* factory = new scfFactory (iClassID, iLibraryName, iFactoryClass,
-    0, iDesc, Dependencies);
+    0, iDesc, Dependencies, context);
   ClassRegistry->Push (factory);
   SortClassRegistry = true;
   return true;
 }
 
 bool csSCF::RegisterClass (scfFactoryFunc Func, const char *iClassID,
-  const char *Desc, const char *Dependencies )
+  const char *Desc, const char *Dependencies, int context)
 {
   csScopedMutexLock lock (mutex);
-  if (ClassRegistry->FindKey (iClassID) >= 0)
+  int idx;
+  if ((idx = ClassRegistry->FindKey (iClassID)) >= 0)
+  {
+    scfFactory *cf = (scfFactory *)ClassRegistry->Get (idx);
+    if (SameContext (cf->classContext, context))
+    {
+      fprintf (stderr,
+	"SCF_WARNING: class %s has already been registered in the same context\n", 
+	iClassID);
+    }
+    else
+    {
+      // See notice in other RegisterClass()
+    #ifdef CS_DEBUG
+      // @@@ some way to have this warning in non-debug builds would be nice.
+      fprintf (stderr,
+	"SCF_NOTIFY: class %s has already been registered in a different context "
+	"(this message appears only in debug builds)\n", 
+	iClassID);
+    #endif
+    }
     return false;
+  }
   scfFactory* factory =
-    new scfFactory (iClassID, 0, 0, Func, Desc, Dependencies);
+    new scfFactory (iClassID, 0, 0, Func, Desc, Dependencies, context);
   ClassRegistry->Push (factory);
   SortClassRegistry = true;
   return true;

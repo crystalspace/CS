@@ -6,7 +6,7 @@ case WIN32 :
   SearchSubdir win32 ;
   SearchSubdir general ; 
   SYSFILES = [ Wildcard win32 : *.cpp *.h ] 
-		findlib.cpp getopt.cpp printf.cpp runloop.cpp sysinit.cpp 
+		findlib.cpp getopt.cpp printf.cpp runloop.cpp 
 		csprocessorcap.cpp pluginpaths.cpp ;
 case MACOS_X :
   SearchSubdir macosx ;

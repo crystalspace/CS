@@ -48,11 +48,11 @@ int csPluginPaths::AddOnce (const char* path, bool scanRecursive,
   return (paths.Push (pluginPath));
 }
 
-csPluginPaths* csGetPluginPaths ()
+csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;
 
-  char* appPath = csGetAppPath ();
+  char* appPath = csGetAppPath (argv0);
   char* configPath = csGetConfigPath ();
   
   /*

@@ -114,12 +114,59 @@
 #  define REPORT_MISSING_ENTRIES false
 #endif
 
+#define EXTMGR_FUNC_INIT(nameNC, nameUC) \
+      funcTest = ((nameNC = (cs##nameUC) gl->GetProcAddress (#nameNC)) != 0); \
+      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", \
+        REPORT_MISSING_ENTRIES)) \
+      { \
+        Report ("Failed to retrieve %%s", #nameNC); \
+      } \
+      allclear &= funcTest;
+
+#define EXTMGR_REPORT_INIT_RESULT(exttype, nameNC) \
+      if (CS_##nameNC = allclear) \
+      { \
+        CS_##nameNC &= config->GetBool (cfgkey, true); \
+        if (CS_##nameNC) \
+        { \
+          Report (exttype " Extension '%%s' found and used.", ext); \
+        } \
+        else \
+        { \
+          Report (exttype " Extension '%%s' found, but not used.", ext); \
+        } \
+      } \
+      else \
+      { \
+        Report (exttype " Extension '%%s' failed to initialize.", ext); \
+      } 
+
 struct csGLExtensionManager
 {
 private:
   iObjectRegistry* object_reg;
   csConfigAccess config;
   iOpenGLInterface* gl;
+  
+  const char* extstrGL;
+#ifdef __WIN32__
+  const char* extstrWGL;
+  
+  void SetupWGLextStr (HDC hDC)
+  {
+    if (extstrWGL != 0) return;
+  
+    if (!tested_CS_WGL_ARB_extensions_string) InitWGL_ARB_extensions_string (hDC);
+    if (CS_WGL_ARB_extensions_string)
+    {
+      extstrWGL = wglGetExtensionsStringARB (hDC);
+    }
+    else
+    {
+      extstrWGL = extstrGL;
+    }
+  }
+#endif
 
   void Report (const char* msg, ...)
   {
@@ -148,10 +195,14 @@ public:
       iConfigManager::ConfigPriorityPlugin - 1);
   }
   
-  void Open () { }
+  void Open () 
+  { 
+    extstrGL = (const char*)glGetString (GL_EXTENSIONS);
+  }
+  
   void Close () { }
   
-  %Functions%
+%Functions%
 
   // end of functions
   
@@ -161,13 +212,21 @@ private:
 public:
   csGLExtensionManager (): object_reg(NULL)
   {
-    %InitFlags%
+    extstrGL = 0;
+#ifdef __WIN32__
+    extstrWGL = 0;
+#endif
+
+%InitFlags%
   }
   
-  %InitExtensions%
+%InitExtensions%
 };
 
 #undef REPORT_MISSING_ENTRIES
+
+#undef EXTMGR_FUNC_INIT
+#undef EXTMGR_REPORT_INIT_RESULT
 
 #endif // __CS_GLEXTENSIONMANAGER_H__
 

@@ -512,7 +512,8 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Class##_StaticInit__()						\
     {									\
-      scfInitialize();							\
+      const char* dummyArgv[] = {0}; 					\
+      scfInitialize(0, dummyArgv);					\
       iSCF::SCF->RegisterClass(						\
         CS_EXPORTED_NAME(Class,_Create), Ident, Desc, Dep);		\
     }									\
@@ -528,7 +529,8 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Module##_StaticInit()						\
     {									\
-      scfInitialize();							\
+      const char* dummyArgv[] = {0}; 					\
+      scfInitialize(0, dummyArgv);					\
       iSCF::SCF->RegisterClasses(MetaInfo);				\
     }									\
   } Module##_static_init__;
@@ -548,7 +550,8 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Class##_StaticInit()						\
     {									\
-      scfInitialize();							\
+      const char* dummyArgv[] = {0}; 					\
+      scfInitialize(0, dummyArgv);					\
       iSCF::SCF->RegisterFactoryFunc(CS_EXPORTED_NAME(Class,_Create),#Class); \
     }									\
   } Class##_static_init__;
@@ -650,7 +653,8 @@ inline static scfInterfaceID Name##_scfGetID ()				\
  *   parameter is 0, the paths returned by csGetPluginPaths() will be scanned.
  * \remark The path list is ignored for static builds. 
  */
-extern void scfInitialize (csPluginPaths* pluginPaths = 0);
+extern void scfInitialize (int argc, const char* const argv[], 
+  csPluginPaths* pluginPaths = 0);
 
 /**
  * This function checks whenever an interface is compatible with given version.
@@ -711,7 +715,7 @@ struct iSCF : public iBase
    * Read additional class descriptions from the given iDocument.  
    */
   virtual void RegisterClasses (const char* pluginPath, 
-    iDocument* metadata) = 0;
+    iDocument* metadata, int context = -1) = 0;
 
   /**
    * Check whenever the class is present in SCF registry.
@@ -770,7 +774,8 @@ struct iSCF : public iBase
    */
   virtual bool RegisterClass (const char *iClassID,
 	const char *iLibraryName, const char *iFactoryClass,
-	const char *Description, const char *Dependencies = 0) = 0;
+	const char *Description, const char *Dependencies = 0,
+	int context = -1) = 0;
 
   /**
    * Register a single dynamic class.  This function tells SCF kernel that a
@@ -779,7 +784,8 @@ struct iSCF : public iBase
    * application-specific dependency list.
    */
   virtual bool RegisterClass (scfFactoryFunc, const char *iClassID,
-	const char *Description, const char *Dependencies = 0) = 0;
+	const char *Description, const char *Dependencies = 0,
+	int context = -1) = 0;
 
   /**
    * Associate a factory function (the function which instantiates a class)

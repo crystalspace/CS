@@ -56,11 +56,9 @@ This domain is intended for users who want to override the configuration from
 the lower-priority domains explained above. This is an application-neutral
 domain, so any options you define here are used by all applications.
 
-@emph{Warning}: Currently this domain does not yet properly support multi-user
-environments.  All options are stored in @file{CS/data/config/user.cfg} and are
-prepended with the string @samp{Global.}.  So for example the option
-@samp{Walktest.Settings.FPS} will be called
-@samp{Global.Walktest.Settings.FPS}.
+It is stored in a platform-dependent manner. For more information
+@pxref{Platform peruser}. The @emph{unique identifier} is 
+@samp{CrystalSpace.Global}.
 
 @item
 The user-specific, application-specific domain. This domain works like the
@@ -68,11 +66,19 @@ application-neutral user domain, except that it is not application-neutral.
 A user may set options in this domain, for example, if he wants different
 screen size settings for different applications.
 
-@emph{Warning}: Currently, this domain not yet properly support multi-user
-environments.  All options are stored in @file{CS/data/config/user.cfg} and are
-prepended with the string @samp{ApplicationID.}, where @samp{ApplicationID} is
+It is stored in a platform-dependent manner. For more information
+@pxref{Platform peruser}. The @emph{unique identifier} is 
+@samp{<ApplicationID>}, where @samp{<ApplicationID>} is
 defined in the user-neutral, application-specific config file (e.g.
 @file{walktest.cfg}).
+
+It is strongly recommended that an application ID always has the shape 
+@samp{<Producer>.<ProductName>}. If the application is a tool that is only 
+meaningful if used together with CrystalSpace, or if you think your name is 
+not worthy enough to be used in such an exposed place as the 
+per-user configuration, you can also use something generic like 
+@samp{CrystalSpaceApp} or just @samp{CrystalSpace} (latter one is also at 
+least used by CrystalSpace itself, so be wary of possible conflicts).
 
 @item
 The command-line parameters. @strong{Note}: This is not yet implemented.

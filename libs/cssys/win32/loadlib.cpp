@@ -25,8 +25,10 @@
 #endif
 #include "csutil/csstring.h"
 #include "csutil/csstrvec.h"
+#include "csutil/physfile.h"
 #include "csutil/scfstr.h"
 #include "csutil/scfstrv.h"
+#include "csutil/strhash.h"
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "iutil/document.h"
@@ -183,6 +185,7 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
 						 iDocumentSystem* docsys)
 {
   iString* result = 0;
+  metadata = 0;
 
   HMODULE hLibrary = LoadLibraryEx (fullPath, 0, 
     LOADLIBEX_FLAGS | LOAD_LIBRARY_AS_DATAFILE);
@@ -206,10 +209,8 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
 	  }
 	  else
 	  {
-	    metadata = 0;
-
 	    csString errstr;
-	    errstr.Format ("Error parsing metadata from %s: %s",
+	    errstr.Format ("Error parsing metadata from '%s': %s",
 	      fullPath, errmsg);
 
 	    result = new scfString (errstr);
@@ -235,10 +236,65 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
 {
   csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
     (new csTinyDocumentSystem ());
-  return InternalGetPluginMetadata (fullPath, metadata, docsys);
+
+  csRef<iString> result = 
+    InternalGetPluginMetadata (fullPath, metadata, docsys);
+
+  /* Check whether a .csplugin file exists as well */
+
+  CS_ALLOC_STACK_ARRAY (char, cspluginPath, strlen (fullPath) + 10);
+  strcpy (cspluginPath, fullPath);
+  char* dot = strrchr (cspluginPath, '.');
+  if (dot && (strcasecmp (dot, ".dll") == 0))
+  {
+    strcpy (dot, ".csplugin");
+    csPhysicalFile file (cspluginPath, "rb");
+
+    if (file.GetStatus() == VFS_STATUS_OK)
+    {
+      if (metadata != 0)
+      {
+	csString errstr;
+	errstr.Format ("'%s' contains embedded metadata, "
+	  "but external '%s' exists as well. Ignoring the latter.",
+	  fullPath, cspluginPath);
+
+	result.AttachNew (new scfString (errstr));
+      }
+      else
+      {
+	csRef<iDocument> doc = docsys->CreateDocument();
+	char const* errmsg = doc->Parse (&file);
+
+	if (errmsg == 0)
+	{
+	  metadata = doc;
+	}
+	else
+	{
+	  csString errstr;
+	  errstr.Format ("Error parsing metadata from '%s': %s",
+	    cspluginPath, errmsg);
+
+	  result.AttachNew (new scfString (errstr));
+	}
+      }
+    }
+  }
+
+  return (result);
 }
 
 extern char* csGetConfigPath ();
+
+inline static void AddLower (csStringHash& hash, const char* str)
+{
+  static int id = 0;
+
+  csString tmp (str);
+  tmp.strlwr ();
+  hash.Register (tmp, id++);
+}
 
 void InternalScanPluginDir (iStrVector*& messages,
 			    iDocumentSystem* docsys,
@@ -247,6 +303,9 @@ void InternalScanPluginDir (iStrVector*& messages,
 			    csRefArray<iDocument>& metadata,
 			    bool recursive)
 {
+  csStringHash files;
+  csStringHash dirs;
+
   csString filemask;
   filemask << dir << PATH_SEPARATOR << "*.*";
 
@@ -256,47 +315,30 @@ void InternalScanPluginDir (iStrVector*& messages,
   {
     do
     {
-      csString fullPath;
-      fullPath << dir << PATH_SEPARATOR << findData.cFileName;
-
       if (findData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       {
+	/*
+	  instead of processing them immediately, first a list of
+	  diectories is filled.
+	 */
 	if (recursive && (strcmp (findData.cFileName, ".") != 0)
 	  && (strcmp (findData.cFileName, "..") != 0))
 	{
-	  iStrVector* subdirMessages = 0;
-
-	  InternalScanPluginDir (subdirMessages, docsys, fullPath,
-	    plugins, metadata, recursive);
-
-	  if (subdirMessages != 0)
-	  {
-	    for (int i = 0; i < subdirMessages->Length(); i++)
-	    {
-	      AppendStrVecString (messages, subdirMessages->Get (i));
-	    }
-
-	    subdirMessages->DecRef();
-	  }
+	  // Add file names in lower case, as Win32 doesn't care about FS case.
+	  AddLower (dirs, findData.cFileName);
 	}
       }
       else
       {
-	char* ext = strrchr (fullPath, '.');
-        if (ext && (strcasecmp (ext, ".dll") == 0))
+	/*
+	  instead of processing them immediately, first a list of
+	  plugin files is created.
+	 */
+	char* ext = strrchr (findData.cFileName, '.');
+        if (ext && ((strcasecmp (ext, ".dll") == 0) || 
+	  (strcasecmp (ext, ".csplugin") == 0)))
 	{
-	  csRef<iDocument> doc;
-	  csRef<iString> error = InternalGetPluginMetadata (
-	    fullPath, doc, docsys);
-	  if (error == 0)
-	  {
-	    plugins->Push (csStrNew (fullPath));
-	    metadata.Push (doc);
-	  }
-	  else
-	  {
-	    AppendStrVecString (messages, error->GetData ());
-	  }
+	  AddLower (files, findData.cFileName);
 	}
       }
     }
@@ -316,6 +358,119 @@ void InternalScanPluginDir (iStrVector*& messages,
       AppendWin32Error ("FindFirst() call failed",
 	errorCode,
 	messages);
+    }
+  }
+
+  // now go over all the files. This way files in a dir will have precedence over
+  // files a subdir.
+  {
+    csStringHashIterator fileIt (&files);
+    csString fullPath;
+
+    csRef<iString> msg;
+    csRef<iDocument> doc;
+    csRef<iDocument> pluginMetadata;
+
+    while (fileIt.HasNext())
+    {
+      csStringID id = fileIt.Next();
+
+      const char* fileName = files.Request (id);
+
+      char* ext = strrchr (fileName, '.');
+      // ignore .csplugins, there are checked explicitly.
+      if ((strcasecmp (ext, ".dll") == 0))
+      {
+	fullPath.Clear();
+	fullPath << dir << PATH_SEPARATOR << fileName;
+
+	msg = InternalGetPluginMetadata (fullPath, pluginMetadata, docsys);
+	if (msg != 0)
+	{
+	  AppendStrVecString (messages, msg->GetData());
+	}
+
+	/*
+	  Check whether the DLL has a companion .csplugin.
+	 */
+	char cspluginPath [MAX_PATH + 10];
+
+	strcpy (cspluginPath, fileName);
+	char* dot = strrchr (cspluginPath, '.');
+	strcpy (dot, ".csplugin");
+
+	csStringID cspID = files.Request (cspluginPath);
+	if (cspID != csInvalidStringID)
+	{
+	  if (pluginMetadata != 0)
+	  {
+	    csString errstr;
+	    errstr.Format ("'%s' contains embedded metadata, "
+	      "but external '%s' exists as well. Ignoring the latter.",
+	      fileName, cspluginPath);
+
+	    AppendStrVecString (messages, errstr);
+	  }
+	  else
+	  {
+	    fullPath.Clear();
+	    fullPath << dir << PATH_SEPARATOR << cspluginPath;
+
+	    // parse .csplugin
+	    csPhysicalFile file (cspluginPath, "rb");
+
+	    doc = docsys->CreateDocument();
+	    char const* errmsg = doc->Parse (&file);
+
+	    if (errmsg == 0)
+	    {
+	      pluginMetadata = doc;
+	    }
+	    else
+	    {
+	      csString errstr;
+	      errstr.Format ("Error parsing metadata from '%s': %s",
+		cspluginPath, errmsg);
+
+	      AppendStrVecString (messages, errstr);
+	    }
+	  }
+	}
+	if (pluginMetadata != 0)
+	{
+	  plugins->Push (csStrNew (fullPath));
+	  metadata.Push (pluginMetadata);
+	}
+      }
+    }
+
+    // release some memory.
+    files.Clear();
+  }
+  {
+    csStringHashIterator dirIt (&dirs);
+    csString fullPath;
+
+    while (dirIt.HasNext())
+    {
+      csStringID id = dirIt.Next();
+
+      fullPath.Clear();
+      fullPath << dir << PATH_SEPARATOR << dirs.Request (id);
+
+      iStrVector* subdirMessages = 0;
+      InternalScanPluginDir (subdirMessages, docsys, fullPath, plugins,
+	metadata, recursive);
+      
+      if (subdirMessages != 0)
+      {
+	for (int i = 0; i < subdirMessages->Length(); i++)
+	{
+	  AppendStrVecString (messages, subdirMessages->Get (i));
+	}
+
+	subdirMessages->DecRef();
+      }
     }
   }
 }
@@ -366,7 +521,7 @@ csRef<iStrVector> csScanPluginDirs (csPluginPaths* dirs,
     if (dirMessages != 0)
     {
       csString tmp;
-      tmp.Format ("The following error(s) occured while scanning '%s':",
+      tmp.Format ("The following issue(s) came up while scanning '%s':",
 	(*dirs)[i].path);
 
       AppendStrVecString (messages, tmp);

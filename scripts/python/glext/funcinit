@@ -1,7 +1,1 @@
-      funcTest = ((%Name% = (cs%NAME%) gl->GetProcAddress ("%Name%")) != NULL);
-      if (!funcTest && config->GetBool ("Video.OpenGL.ReportMissingEntries", 
-        REPORT_MISSING_ENTRIES))
-      {
-        Report ("Failed to retrieve %%s", "%Name%");
-      }
-      allclear &= funcTest;
+      EXTMGR_FUNC_INIT(%Name%, %NAME%);
