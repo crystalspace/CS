@@ -33,9 +33,6 @@ PLUGINS += video/format/avi
 #PLUGINS += video/format/codecs/divx4
 PLUGINS += video/format/codecs/rle
 
-# Uncomment the following to build SDL 2D canvas
-#PLUGINS + =video/canvas/sdl
-
 # Sound drivers.
 ifeq ($(OSS.AVAILABLE),yes)
 PLUGINS += sound/driver/oss sound/renderer/software
@@ -71,7 +68,7 @@ endif
 
 # General flags for the linker which are used in any case.
 # <cs-config>
-LFLAGS.GENERAL = $(LFLAGS.L)/usr/local/lib $(CSTHREAD.LFLAGS)
+LFLAGS.GENERAL = $(LFLAGS.L)/usr/local/lib $(LFLAGS.SYSTEM) $(CSTHREAD.LFLAGS)
 # </cs-config>
 
 # Flags for the linker which are used when profiling.

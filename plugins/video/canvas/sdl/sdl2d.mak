@@ -30,8 +30,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.SDL2D += `sdl-config --cflags`
-LIB.SDL2D.SYSTEM += `sdl-config --libs` #-ldl
+CFLAGS.SDL2D += $(SDL.CFLAGS)
+LIB.SDL2D.SYSTEM += $(SDL.LFLAGS) $(SDL.LIBS)
 
 ifeq ($(USE_PLUGINS),yes)
   SDL2D = $(OUTDLL)/sdl2d$(DLL)

@@ -86,6 +86,7 @@ AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
 	[CFLAGS.optimize], [COMPILER.CFLAGS.optimize],
 	[CFLAGS.debug], [COMPILER.CFLAGS.debug],
 	[LFLAGS.debug], [COMPILER.LFLAGS.debug],
+	[LFLAGS.SYSTEM], [COMPILER.LFLAGS],
 	[LIBS.EXE], [COMPILER.LFLAGS],
 	[LIBS.SYSTEM], [COMPILER.LFLAGS],
 	[USE_XFREE86VM], [XFREE86VM.AVAILABLE],
@@ -289,6 +290,59 @@ AS_IF([test $cs_cv_prog_makedep_ok = yes],
     CS_MAKEFILE_PROPERTY([CMD.MAKEDEP], [$MAKEDEP])
     CS_MAKEFILE_PROPERTY([DEPEND_TOOL], [mkdep])],
     [CS_MAKEFILE_PROPERTY([DEPEND_TOOL], [cc])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for pthread.  Also check if pthread implementation supports the
+# recursive mutex extension.
+#------------------------------------------------------------------------------
+m4_define([cs_pthread_flags],
+    [CS_CREATE_TUPLE() \
+    CS_CREATE_TUPLE([], [], [-lpthread]) \
+    CS_CREATE_TUPLE([-pthread], [-pthread], []) \
+    CS_CREATE_TUPLE([-pthread], [-pthread], [-lpthread]) \
+    CS_CREATE_TUPLE([-pthread], [-pthread], [-lc_r])])
+
+AC_DEFUN([CS_CHECK_PTHREAD],
+    [AC_REQUIRE([AC_CANONICAL_HOST])
+    case $host_os in
+	cygwin*)
+	    cs_cv_sys_pthread=no
+	    ;;
+	*)
+	    CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
+		[AC_LANG_PROGRAM(
+		    [#include <pthread.h>
+		    void* worker(void* p) { (void)p; return p; }],
+		    [pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
+		[cs_pthread_flags], [],
+		[CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])
+	    ;;
+    esac])
+
+CS_CHECK_PTHREAD
+
+AS_IF([test $cs_cv_sys_pthread = yes],
+    [AC_CACHE_CHECK([for pthread recursive mutexes],
+	[cs_cv_sys_pthread_recursive],
+	[CS_BUILD_IFELSE(
+	    [AC_LANG_PROGRAM(
+		[#include <pthread.h>],
+		[pthread_mutexattr_t attr;
+		pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
+	    [CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
+	    CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
+	    [C++],
+	    [cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
+		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`],
+	    [cs_cv_sys_pthread_recursive=no],
+	    [$cs_cv_sys_pthread_cflags -D_GNU_SOURCE],
+	    [$cs_cv_sys_pthread_lflags],
+	    [$cs_cv_sys_pthread_libs])])
+    AS_IF([test $cs_cv_sys_pthread_recursive != no],
+	[CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
+	    [$cs_cv_sys_pthread_recursive])])])
 
 
 
@@ -509,8 +563,9 @@ CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
     [AC_LANG_PROGRAM([#include <Python.h>],[Py_Initialize(); Py_Finalize();])],
     [CS_CREATE_TUPLE([],[],[$cs_pylib1]) CS_CREATE_TUPLE([],[],[$cs_pylib2])],
     [], [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
-    [$cs_cv_python_base_cflags], [$cs_cv_python_base_lflags],
-    [$cs_cv_python_base_libs])
+    [$cs_cv_python_base_cflags $cs_cv_sys_pthread_cflags],
+    [$cs_cv_python_base_lflags $cs_cv_sys_pthread_lflags],
+    [$cs_cv_python_base_libs   $cs_cv_sys_pthread_libs])
 
 
 
@@ -523,7 +578,7 @@ CXXFLAGS=`echo "$CXXFLAGS" | sed 's/-O.//g;s/-g.//g'`
 
 CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [$CPPFLAGS $CFLAGS])
 CS_BUILD_PROPERTY([CXXFLAGS.SYSTEM], [$CPPFLAGS $CXXFLAGS])
-CS_BUILD_PROPERTY([LIBS.SYSTEM], [$LDFLAGS])
+CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [$LDFLAGS])
 
 
 
@@ -708,21 +763,32 @@ AS_IF([test $cs_cv_prog_cxx_debug != no],
 # complain if it is already in the built-in search path, and we would like to
 # avoid the complaint, if possible.
 #------------------------------------------------------------------------------
-AS_IF([test -d /usr/local/include],
-    [AS_IF([test $cs_cv_prog_cxx_enable_warnings != no && \
-	test $cs_cv_prog_cxx_enable_errors != no],
-	[AC_CACHE_CHECK([checking if -I/usr/local/include is usable],
-	    [cs_cv_prog_cxx_local_include],
-	    [CS_BUILD_IFELSE([],
-		[CS_CREATE_TUPLE([-I/usr/local/include \
-		    $cs_cv_prog_cxx_enable_warnings \
-		    $cs_cv_prog_cxx_enable_errors],[],[])], [C++],
-		    [cs_cv_prog_cxx_local_include=yes],
-		    [cs_cv_prog_cxx_local_include=no])])],
-	[cs_cv_prog_cxx_local_include=yes])
-
+AC_DEFUN([CS_CHECK_LOCAL_INCLUDE],
+    [AS_IF([test -d /usr/local/include],
+	[AS_IF([test $cs_cv_prog_cxx_enable_warnings != no && \
+	    test $cs_cv_prog_cxx_enable_errors != no],
+	    [AC_CACHE_CHECK([if -I/usr/local/include is usable],
+		[cs_cv_prog_cxx_local_include],
+		[CS_BUILD_IFELSE([],
+		    [CS_CREATE_TUPLE([-I/usr/local/include \
+			$cs_cv_prog_cxx_enable_warnings \
+			$cs_cv_prog_cxx_enable_errors],[],[])], [C++],
+			[cs_cv_prog_cxx_local_include=yes],
+			[cs_cv_prog_cxx_local_include=no])])],
+	    [cs_cv_prog_cxx_local_include=yes])],
+	[cs_cv_prog_cxx_local_include=no])
+    
     AS_IF([test $cs_cv_prog_cxx_local_include = yes],
-	[CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])])])
+	[CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])
+	cs_use_local_include=-I/usr/local/include],
+	[cs_use_local_include=''])])
+
+CS_CHECK_LOCAL_INCLUDE
+
+AS_IF([test -d /usr/local/lib],
+    [CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [-L/usr/local/include], [+])
+    cs_use_local_lib=-L/usr/local/lib],
+    [cs_use_local_lib=''])
 
 
 
@@ -742,58 +808,6 @@ AC_DEFUN([CS_CHECK_COMMON_LIBS],
     AC_LANG_POP([C])])
 
 CS_CHECK_COMMON_LIBS
-
-
-
-#------------------------------------------------------------------------------
-# Check for pthread.  Also check if pthread implementation supports the
-# recursive mutex extension.
-#------------------------------------------------------------------------------
-m4_define([cs_pthread_flags],
-    [CS_CREATE_TUPLE() \
-    CS_CREATE_TUPLE([], [], [-lpthread]) \
-    CS_CREATE_TUPLE([-pthread], [], []) \
-    CS_CREATE_TUPLE([-pthread], [], [-lpthread])])
-
-AC_DEFUN([CS_CHECK_PTHREAD],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    case $host_os in
-	cygwin*)
-	    cs_cv_sys_pthread=no
-	    ;;
-	*)
-	    CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
-		[AC_LANG_PROGRAM(
-		    [#include <pthread.h>
-		    void* worker(void* p) { (void)p; return p; }],
-		    [pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
-		[cs_pthread_flags], [],
-		[CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])
-	    ;;
-    esac])
-
-CS_CHECK_PTHREAD
-
-AS_IF([test $cs_cv_sys_pthread = yes],
-    [AC_CACHE_CHECK([for pthread recursive mutexes],
-	[cs_cv_sys_pthread_recursive],
-	[CS_BUILD_IFELSE(
-	    [AC_LANG_PROGRAM(
-		[#include <pthread.h>],
-		[pthread_mutexattr_t attr;
-		pthread_mutexattr_settype (&attr, CS_RECURSIVE);])],
-	    [CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE]) \
-	    CS_CREATE_TUPLE([-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP])],
-	    [C++],
-	    [cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
-		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`],
-	    [cs_cv_sys_pthread_recursive=no],
-	    [$cs_cv_sys_pthread_cflags -D_GNU_SOURCE],
-	    [$cs_cv_sys_pthread_lflags],
-	    [$cs_cv_sys_pthread_libs])])
-    AS_IF([test $cs_cv_sys_pthread_recursive != no],
-	[CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
-	    [$cs_cv_sys_pthread_recursive])])])
 
 
 
@@ -1069,7 +1083,10 @@ CS_CHECK_LIB_WITH([mikmod],
 	[#include <mikmod.h>],
 	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
     [$srcdir/libs/libmikmod*], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])], [],
+    [$cs_cv_sys_pthread_cflags],
+    [$cs_cv_sys_pthread_lflags],
+    [$cs_cv_sys_pthread_libs])
 
 
 
@@ -1178,16 +1195,23 @@ AC_DEFUN([CS_AL_INCLUDE],
     @%:@include <$2/$3>
     @%:@endif])
 
-CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
-    [AC_LANG_PROGRAM(
-	[CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
-	[alutInit(0,0);])],
-    [CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
-    CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
-    CS_CREATE_TUPLE([],[],[-lalut -lopenal]) \
-    CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
-    CS_CREATE_TUPLE([],[],[-lopenal])], [],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])])
+AC_DEFUN([CS_CHECK_LIBOPENAL],
+    [AC_REQUIRE([CS_CHECK_LOCAL_INCLUDE])
+    CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
+	[AC_LANG_PROGRAM(
+	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
+	    [alutInit(0,0);])],
+	[CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
+	CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
+	CS_CREATE_TUPLE([],[],[-lalut -lopenal]) \
+	CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
+	CS_CREATE_TUPLE([],[],[-lopenal])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])], [], [],
+	[$cs_use_local_include $cs_cv_sys_pthread_cflags],
+	[$cs_use_local_lib $cs_cv_sys_pthread_lflags],
+	[$cs_cv_sys_pthread_libs])])
+
+CS_CHECK_LIBOPENAL
 
 
 
@@ -1266,20 +1290,16 @@ AS_IF([test $cs_cv_libcal3d = yes],
 
 #------------------------------------------------------------------------------
 # Check for SDL.
-# @@@ FIXME We should probably use sdl-config.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_SDL],
-    [AC_REQUIRE([CS_CHECK_PTHREAD])
-    CS_CHECK_LIB_WITH([SDL],
-	[AC_LANG_PROGRAM([#include <SDL/SDL.h>], [SDL_Init(0);])],
-	[], [C++],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libSDL], [SDL])
-	    CS_MAKEFILE_PROPERTY([HAS_SDL], [yes])], [],
-	[$cs_cv_sys_pthread_cflags],
-	[$cs_cv_sys_pthread_lflags],
-	[$cs_cv_sys_pthread_libs])])
+AC_CHECK_PROGS([SDLCONFIG], [sdl12-config sdl11-config sdl-config])
+AS_IF([test -n "$SDLCONFIG"],
+    [cs_cv_libsdl=yes
+    cs_cv_libsdl_cflags=`AC_RUN_LOG([$SDLCONFIG --cflags])`
+    cs_cv_libsdl_lflags=''
+    cs_cv_libsdl_libs=`AC_RUN_LOG([$SDLCONFIG --libs])`
+    CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])
+    CS_MAKEFILE_PROPERTY([HAS_SDL], [yes])])
 
-CS_CHECK_SDL
 
 
 #------------------------------------------------------------------------------

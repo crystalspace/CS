@@ -41,6 +41,27 @@ chronological order.
 	  pointer to a string, but a string itself.
 	- Anders Stenberg made sure all loaded shaders get prepared at
 	  iEngine::Prepare ()
+	- Eric Sunshine made the following changes:
+	    - Augmented configure.ac so that pthread check uses -pthread at
+	      link time (not just compile time).  If that fails, then it will
+	      manually attempt to link against libc_r.a.  This should allow
+	      pthread checking and utilization to work correctly on FreeBSD.
+	    - Augmented Python, OpenAL, and mikmod checks in configure.ac so
+	      that they utilizes results of pthread check.  Needed for FreeBSD.
+	    - Augmented OpenAL check in configure.ac so that it also consults
+	      /usr/local since this is not done automatically on FreeBSD.
+	    - Rewrote the SDL check in configure.ac so that it employs
+	      sdl-config rather than trying manually to guess appropriate
+	      build flags.  This eliminates the problem where it assumed that
+	      SDL headers existed in a directory named "SDL", which was
+	      incorrect for at least some installations (where the header
+	      directory might be named "SDL11", for instance).
+	    - Fixed bug: Unix and MacOS/X makefiles were not respecting LDFLAGS
+	      passed by user to configure script.
+	    - Enabled SDL canvas in Jam build (if SDL available).  Previously,
+	      this was unconditionally disabled, but it works now that
+	      configure emits the proper SDL build flags.
+	    - Fixed compilation errors in SDL canvas.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.
@@ -66,12 +87,12 @@ chronological order.
 	- Eric Sunshine fixed SDL check in configure.ac so that works correctly
 	  for platforms on which SDL requires pthread.
 	- Anders Stenberg did the following changes to the new renderer:
-	    - Changed materials in to store textures in variables instead, and 
-	      updated to shader manager to fetch the textures as variables 
-	      instead of from the material directly. This allows to specify 
+	    - Changed materials in to store textures in variables instead, and
+	      updated to shader manager to fetch the textures as variables
+	      instead of from the material directly. This allows to specify
 	      textures at other scopes than the material.
-	    - Updated the new renderer to give an example of the new 
-	      functionality by creating a "standardtex fog" fog lookup 
+	    - Updated the new renderer to give an example of the new
+	      functionality by creating a "standardtex fog" fog lookup
 	      texture in the shader manager scope. Note that we cannot yet
 	      duplicate the old fog system though.
 	    - Updated texture cache to use the CS_TEXTURE_NOMIPMAPS flag. This
@@ -79,15 +100,15 @@ chronological order.
 	    - Updated texture handler to implement GetCanvas correctly for
 	      textures.
 	    - Removed "mtex" shader plugin and added "fixed" instead, which
-	      contains a (slightly cleaned up) copy of mtex fragment program, 
+	      contains a (slightly cleaned up) copy of mtex fragment program,
 	      plus a fixed function vertex program. Currently it does nothing,
-	      but will eventually have similar functionality as Quake 3 
+	      but will eventually have similar functionality as Quake 3
 	      shader scripts.
 	    - Updated all shaders to compy to the plugin changes.
 	    - Fixed an error in the glshader_arb makefile.
 	    - Made handling of mixing general and conventional attributes
 	      ("attribute 3" vs "color") in shaders more safe. Note that
-	      since some attribute aliasing properties are undefined in 
+	      since some attribute aliasing properties are undefined in
 	      the extension specification, shaders should preferably not mix.
 	- Jorrit removed iPolygonTexture::RecalculateDynamicLights() and
 	  DynamicLightsDirty(). They no longer need to be public as the

@@ -61,7 +61,7 @@ CFLAGS.DLL =
 
 # General flags for the linker which are used in any case.
 # <cs-config>
-LFLAGS.GENERAL = 
+LFLAGS.GENERAL = $(LFLAGS.SYSTEM)
 # </cs-config>
 
 # Flags for the linker which are used when optimizing.

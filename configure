@@ -314,7 +314,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL RANLIB ac_ct_RANLIB SWIGBIN MAKE JAM SET_MAKE NASM MAKEDEP PERL PYTHON CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2_CONFIG FT2_CFLAGS FT2_LIBS OBJCOPY CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL RANLIB ac_ct_RANLIB SWIGBIN MAKE JAM SET_MAKE NASM MAKEDEP PERL PYTHON CPP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS EGREP FT2_CONFIG FT2_CFLAGS FT2_LIBS SDLCONFIG OBJCOPY CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -946,9 +946,6 @@ Optional Packages:
                           automatically; searches dir, dir/include, and
                           dir/lib
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
-  --with-libSDL=dir       specify location of libSDL if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
   --with-libbfd=dir       specify location of libbfd if not detected
@@ -3657,6 +3654,491 @@ fi
 
 
 #------------------------------------------------------------------------------
+# Check for pthread.  Also check if pthread implementation supports the
+# recursive mutex extension.
+#------------------------------------------------------------------------------
+
+
+
+
+
+
+    case $host_os in
+	cygwin*)
+	    cs_cv_sys_pthread=no
+	    ;;
+	*)
+	    if test "" != yes; then
+  echo "$as_me:$LINENO: checking for pthread" >&5
+echo $ECHO_N "checking for pthread... $ECHO_C" >&6
+if test "${cs_cv_sys_pthread+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+    `echo @@@-lpthread | sed 'y% %#%'` \
+    `echo @-pthread@-pthread@ | sed 'y% %#%'` \
+    `echo @-pthread@-pthread@-lpthread | sed 'y% %#%'` \
+    `echo @-pthread@-pthread@-lc_r | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+		    void* worker(void* p) { (void)p; return p; }
+int
+main ()
+{
+pthread_t tid; pthread_create(&tid, 0, worker, 0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_sys_pthread=yes
+		cs_cv_sys_pthread_cflags=$cs_build_cflags
+		cs_cv_sys_pthread_lflags=$cs_build_lflags
+		cs_cv_sys_pthread_libs=$cs_build_libs
+else
+  cs_cv_sys_pthread=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_sys_pthread" >&5
+echo "${ECHO_T}$cs_cv_sys_pthread" >&6
+else
+  echo "$as_me:$LINENO: checking for pthread" >&5
+echo $ECHO_N "checking for pthread... $ECHO_C" >&6
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
+    `echo @@@-lpthread | sed 'y% %#%'` \
+    `echo @-pthread@-pthread@ | sed 'y% %#%'` \
+    `echo @-pthread@-pthread@-lpthread | sed 'y% %#%'` \
+    `echo @-pthread@-pthread@-lc_r | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test  $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+		    void* worker(void* p) { (void)p; return p; }
+int
+main ()
+{
+pthread_t tid; pthread_create(&tid, 0, worker, 0);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_sys_pthread=yes
+		cs_cv_sys_pthread_cflags=$cs_build_cflags
+		cs_cv_sys_pthread_lflags=$cs_build_lflags
+		cs_cv_sys_pthread_libs=$cs_build_libs
+else
+  cs_cv_sys_pthread=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_sys_pthread" >&5
+echo "${ECHO_T}$cs_cv_sys_pthread" >&6
+fi
+
+    if test $cs_cv_sys_pthread = yes; then
+  if test "$cs_cv_sys_pthread" = yes; then
+  cs_makefile_text="${cs_makefile_text}PTHREAD.AVAILABLE = yes
+"
+    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE ?= \"yes\" ;
+"
+	cs_result_cflags=`echo x$cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_result_lflags=`echo x$cs_cv_sys_pthread_lflags $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	if test -n "$cs_result_cflags"; then
+  cs_makefile_text="${cs_makefile_text}PTHREAD.CFLAGS = $cs_result_cflags
+"
+    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS ?= \"$cs_result_cflags\" ;
+"
+fi
+
+	if test -n "$cs_result_lflags"; then
+  cs_makefile_text="${cs_makefile_text}PTHREAD.LFLAGS = $cs_result_lflags
+"
+    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS ?= \"$cs_result_lflags\" ;
+"
+fi
+
+fi
+
+else
+  cs_cv_sys_pthread_cflags=''
+	cs_cv_sys_pthread_lflags=''
+	cs_cv_sys_pthread_libs=''
+	:
+fi
+
+	    ;;
+    esac
+
+if test $cs_cv_sys_pthread = yes; then
+
+echo "$as_me:$LINENO: checking for pthread recursive mutexes" >&5
+echo $ECHO_N "checking for pthread recursive mutexes... $ECHO_C" >&6
+if test "${cs_cv_sys_pthread_recursive+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=cc
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+    cs_cflags_save="$CXXFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE@@ | sed 'y% %#%'` \
+	    `echo @-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP@@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CXXFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <pthread.h>
+int
+main ()
+{
+pthread_mutexattr_t attr;
+		pthread_mutexattr_settype (&attr, CS_RECURSIVE);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CXXFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
+		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`
+else
+  cs_cv_sys_pthread_recursive=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_sys_pthread_recursive" >&5
+echo "${ECHO_T}$cs_cv_sys_pthread_recursive" >&6
+    if test $cs_cv_sys_pthread_recursive != no; then
+  cs_header_text="${cs_header_text}#define CS_PTHREAD_MUTEX_RECURSIVE $cs_cv_sys_pthread_recursive
+"
+fi
+
+fi
+
+
+
+
+#------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
@@ -4182,7 +4664,6 @@ echo "${ECHO_T}$cs_cv_python_sdk" >&6
 # both variations.
 cs_pylib1="-l$cs_cv_python_base"
 cs_pylib2=`echo "-l$cs_cv_python_base" | sed 's/\.//g'`
-
 if test "" != yes; then
   echo "$as_me:$LINENO: checking if python SDK is usable" >&5
 echo $ECHO_N "checking if python SDK is usable... $ECHO_C" >&6
@@ -4256,9 +4737,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_python_base_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_python_base_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_python_base_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_python_base_cflags $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_python_base_lflags $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_python_base_libs   $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -4308,9 +4789,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_python_base_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_python_base_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_python_base_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_python_base_cflags $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_python_base_lflags $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_python_base_libs   $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_python=yes
 		cs_cv_python_cflags=$cs_build_cflags
 		cs_cv_python_lflags=$cs_build_lflags
@@ -4392,9 +4873,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test $cs_cv_python_base_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_python_base_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_python_base_libs $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_python_base_cflags $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_python_base_lflags $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_python_base_libs   $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -4444,9 +4925,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_python_base_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_python_base_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_python_base_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_python_base_cflags $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_python_base_lflags $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_python_base_libs   $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_python=yes
 		cs_cv_python_cflags=$cs_build_cflags
 		cs_cv_python_lflags=$cs_build_lflags
@@ -4508,7 +4989,7 @@ cs_makefile_text="${cs_makefile_text}CXXFLAGS.SYSTEM = $CPPFLAGS $CXXFLAGS
 "
     cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS ?= \"$CPPFLAGS $CXXFLAGS\" ;
 "
-cs_makefile_text="${cs_makefile_text}LIBS.SYSTEM = $LDFLAGS
+cs_makefile_text="${cs_makefile_text}LFLAGS.SYSTEM = $LDFLAGS
 "
     cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS ?= \"$LDFLAGS\" ;
 "
@@ -4520,7 +5001,6 @@ cs_makefile_text="${cs_makefile_text}LIBS.SYSTEM = $LDFLAGS
 # more appropriate to use -Wmost rather than -Wall even if the compiler
 # understands both, thus we attempt -Wmost before -Wall.
 #------------------------------------------------------------------------------
-
 echo "$as_me:$LINENO: checking how to enable compilation warnings" >&5
 echo $ECHO_N "checking how to enable compilation warnings... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_enable_warnings+set}" = set; then
@@ -7171,11 +7651,13 @@ fi
 # complain if it is already in the built-in search path, and we would like to
 # avoid the complaint, if possible.
 #------------------------------------------------------------------------------
+
+
 if test -d /usr/local/include; then
   if test $cs_cv_prog_cxx_enable_warnings != no && \
-	test $cs_cv_prog_cxx_enable_errors != no; then
-  echo "$as_me:$LINENO: checking checking if -I/usr/local/include is usable" >&5
-echo $ECHO_N "checking checking if -I/usr/local/include is usable... $ECHO_C" >&6
+	    test $cs_cv_prog_cxx_enable_errors != no; then
+  echo "$as_me:$LINENO: checking if -I/usr/local/include is usable" >&5
+echo $ECHO_N "checking if -I/usr/local/include is usable... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_local_include+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -7191,8 +7673,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @-I/usr/local/include \
-		    $cs_cv_prog_cxx_enable_warnings \
-		    $cs_cv_prog_cxx_enable_errors@@ | sed 'y% %#%'`
+			$cs_cv_prog_cxx_enable_warnings \
+			$cs_cv_prog_cxx_enable_errors@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -7315,14 +7797,30 @@ else
   cs_cv_prog_cxx_local_include=yes
 fi
 
+else
+  cs_cv_prog_cxx_local_include=no
+fi
+
 
     if test $cs_cv_prog_cxx_local_include = yes; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += -I/usr/local/include
 "
     cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"-I/usr/local/include\" ;
 "
+	cs_use_local_include=-I/usr/local/include
+else
+  cs_use_local_include=''
 fi
 
+
+if test -d /usr/local/lib; then
+  cs_makefile_text="${cs_makefile_text}LFLAGS.SYSTEM += -L/usr/local/include
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"-L/usr/local/include\" ;
+"
+    cs_use_local_lib=-L/usr/local/lib
+else
+  cs_use_local_lib=''
 fi
 
 
@@ -7530,487 +8028,6 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-
-
-#------------------------------------------------------------------------------
-# Check for pthread.  Also check if pthread implementation supports the
-# recursive mutex extension.
-#------------------------------------------------------------------------------
-
-
-
-
-
-    case $host_os in
-	cygwin*)
-	    cs_cv_sys_pthread=no
-	    ;;
-	*)
-	    if test "" != yes; then
-  echo "$as_me:$LINENO: checking for pthread" >&5
-echo $ECHO_N "checking for pthread... $ECHO_C" >&6
-if test "${cs_cv_sys_pthread+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-    `echo @@@-lpthread | sed 'y% %#%'` \
-    `echo @-pthread@@ | sed 'y% %#%'` \
-    `echo @-pthread@@-lpthread | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <pthread.h>
-		    void* worker(void* p) { (void)p; return p; }
-int
-main ()
-{
-pthread_t tid; pthread_create(&tid, 0, worker, 0);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-	    break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_sys_pthread=yes
-		cs_cv_sys_pthread_cflags=$cs_build_cflags
-		cs_cv_sys_pthread_lflags=$cs_build_lflags
-		cs_cv_sys_pthread_libs=$cs_build_libs
-else
-  cs_cv_sys_pthread=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_sys_pthread" >&5
-echo "${ECHO_T}$cs_cv_sys_pthread" >&6
-else
-  echo "$as_me:$LINENO: checking for pthread" >&5
-echo $ECHO_N "checking for pthread... $ECHO_C" >&6
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` \
-    `echo @@@-lpthread | sed 'y% %#%'` \
-    `echo @-pthread@@ | sed 'y% %#%'` \
-    `echo @-pthread@@-lpthread | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <pthread.h>
-		    void* worker(void* p) { (void)p; return p; }
-int
-main ()
-{
-pthread_t tid; pthread_create(&tid, 0, worker, 0);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-	    break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_sys_pthread=yes
-		cs_cv_sys_pthread_cflags=$cs_build_cflags
-		cs_cv_sys_pthread_lflags=$cs_build_lflags
-		cs_cv_sys_pthread_libs=$cs_build_libs
-else
-  cs_cv_sys_pthread=no
-fi
-
-	    echo "$as_me:$LINENO: result: $cs_cv_sys_pthread" >&5
-echo "${ECHO_T}$cs_cv_sys_pthread" >&6
-fi
-
-    if test $cs_cv_sys_pthread = yes; then
-  if test "$cs_cv_sys_pthread" = yes; then
-  cs_makefile_text="${cs_makefile_text}PTHREAD.AVAILABLE = yes
-"
-    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.AVAILABLE ?= \"yes\" ;
-"
-	cs_result_cflags=`echo x$cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_result_lflags=`echo x$cs_cv_sys_pthread_lflags $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	if test -n "$cs_result_cflags"; then
-  cs_makefile_text="${cs_makefile_text}PTHREAD.CFLAGS = $cs_result_cflags
-"
-    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.CFLAGS ?= \"$cs_result_cflags\" ;
-"
-fi
-
-	if test -n "$cs_result_lflags"; then
-  cs_makefile_text="${cs_makefile_text}PTHREAD.LFLAGS = $cs_result_lflags
-"
-    cs_jamconfig_text="${cs_jamconfig_text}PTHREAD.LFLAGS ?= \"$cs_result_lflags\" ;
-"
-fi
-
-fi
-
-else
-  cs_cv_sys_pthread_cflags=''
-	cs_cv_sys_pthread_lflags=''
-	cs_cv_sys_pthread_libs=''
-	:
-fi
-
-	    ;;
-    esac
-
-if test $cs_cv_sys_pthread = yes; then
-  echo "$as_me:$LINENO: checking for pthread recursive mutexes" >&5
-echo $ECHO_N "checking for pthread recursive mutexes... $ECHO_C" >&6
-if test "${cs_cv_sys_pthread_recursive+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=cc
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-    cs_cflags_save="$CXXFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in `echo @-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE@@ | sed 'y% %#%'` \
-	    `echo @-DCS_RECURSIVE=PTHREAD_MUTEX_RECURSIVE_NP@@ | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CXXFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <pthread.h>
-int
-main ()
-{
-pthread_mutexattr_t attr;
-		pthread_mutexattr_settype (&attr, CS_RECURSIVE);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-	    break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CXXFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags -D_GNU_SOURCE | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_sys_pthread_recursive=`echo $cs_build_cflags | \
-		sed 's/.*\(PTHREAD_MUTEX_RECURSIVE_*N*P*\).*/\1/'`
-else
-  cs_cv_sys_pthread_recursive=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_sys_pthread_recursive" >&5
-echo "${ECHO_T}$cs_cv_sys_pthread_recursive" >&6
-    if test $cs_cv_sys_pthread_recursive != no; then
-  cs_header_text="${cs_header_text}#define CS_PTHREAD_MUTEX_RECURSIVE $cs_cv_sys_pthread_recursive
-"
-fi
-
-fi
 
 
 
@@ -14381,9 +14398,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -14433,9 +14450,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libmikmod=yes
 		cs_cv_libmikmod_cflags=$cs_build_cflags
 		cs_cv_libmikmod_lflags=$cs_build_lflags
@@ -14517,9 +14534,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -14569,9 +14586,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libmikmod=yes
 		cs_cv_libmikmod_cflags=$cs_build_cflags
 		cs_cv_libmikmod_lflags=$cs_build_lflags
@@ -17910,7 +17927,10 @@ fi
 # CS_AL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
 
 
-if test "" != yes; then
+
+
+
+    if test "" != yes; then
   echo "$as_me:$LINENO: checking for OpenAL" >&5
 echo $ECHO_N "checking for OpenAL... $ECHO_C" >&6
 if test "${cs_cv_libopenal+set}" = set; then
@@ -17928,10 +17948,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'` \
-    `echo @@@-lalut -lopenal -ldsound | sed 'y% %#%'` \
-    `echo @@@-lalut -lopenal | sed 'y% %#%'` \
-    `echo @@@-lopenal -ldsound | sed 'y% %#%'` \
-    `echo @@@-lopenal | sed 'y% %#%'`
+	`echo @@@-lalut -lopenal -ldsound | sed 'y% %#%'` \
+	`echo @@@-lalut -lopenal | sed 'y% %#%'` \
+	`echo @@@-lopenal -ldsound | sed 'y% %#%'` \
+	`echo @@@-lopenal | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -17987,9 +18007,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_use_local_include $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_use_local_lib $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -18047,9 +18067,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_use_local_include $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_use_local_lib $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libopenal=yes
 		cs_cv_libopenal_cflags=$cs_build_cflags
 		cs_cv_libopenal_lflags=$cs_build_lflags
@@ -18076,10 +18096,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'` \
-    `echo @@@-lalut -lopenal -ldsound | sed 'y% %#%'` \
-    `echo @@@-lalut -lopenal | sed 'y% %#%'` \
-    `echo @@@-lopenal -ldsound | sed 'y% %#%'` \
-    `echo @@@-lopenal | sed 'y% %#%'`
+	`echo @@@-lalut -lopenal -ldsound | sed 'y% %#%'` \
+	`echo @@@-lalut -lopenal | sed 'y% %#%'` \
+	`echo @@@-lopenal -ldsound | sed 'y% %#%'` \
+	`echo @@@-lopenal | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -18135,9 +18155,9 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test  $cs_libs_save"
+	CFLAGS="$cs_cflags_test $cs_use_local_include $cs_cv_sys_pthread_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_use_local_lib $cs_cv_sys_pthread_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -18195,9 +18215,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_use_local_include $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_use_local_lib $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libopenal=yes
 		cs_cv_libopenal_cflags=$cs_build_cflags
 		cs_cv_libopenal_lflags=$cs_build_lflags
@@ -19835,432 +19855,67 @@ fi
 
 #------------------------------------------------------------------------------
 # Check for SDL.
-# @@@ FIXME We should probably use sdl-config.
 #------------------------------------------------------------------------------
-
-
-
-
-# Check whether --with-libSDL or --without-libSDL was given.
-if test "${with_libSDL+set}" = set; then
-  withval="$with_libSDL"
-
-fi;
-
-    if test -z "$with_libSDL"; then
-  with_libSDL=yes
-fi
-
-    if test "$with_libSDL" != no; then
-  # If --with-lib value is same as cached value, then assume other
-	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libSDL" != "$cs_cv_with_libSDL"; then
-  cs_ignore_cache=yes
-else
-  cs_ignore_cache=no
-fi
-
-
-	if test $with_libSDL != yes; then
-  cs_check_lib_paths=$with_libSDL
-else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
-fi
-
-
-	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
-    do
-	case $cs_lib_item in
-	    *\|*)
-    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_check_incdir=''
-else
-  if test "$1" = filler; then
-  cs_check_incdir=''
-else
-  cs_check_incdir=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_check_libdir=''
-else
-  if test "$1" = filler; then
-  cs_check_libdir=''
-else
-  cs_check_libdir=$1
-fi
-
-	shift
-fi
-
-		if test -n "$cs_check_incdir"; then
-  cs_check_lib_cflag="-I$cs_check_incdir"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_check_libdir"; then
-  cs_check_lib_lflag="-L$cs_check_libdir"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "SDL"; then
-  cs_check_lib_libs="-lSDL"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "SDL"; then
-  cs_check_lib_libs="-lSDL"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "SDL"; then
-  cs_check_lib_libs="-lSDL"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	esac
-    done
-
-	if test "$cs_ignore_cache" != yes; then
-  echo "$as_me:$LINENO: checking for libSDL" >&5
-echo $ECHO_N "checking for libSDL... $ECHO_C" >&6
-if test "${cs_cv_libSDL+set}" = set; then
+for ac_prog in sdl12-config sdl11-config sdl-config
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_SDLCONFIG+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_ext=cc
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-    cs_cflags_save="$CXXFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in $cs_check_lib_flags
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
+  if test -n "$SDLCONFIG"; then
+  ac_cv_prog_SDLCONFIG="$SDLCONFIG" # Let the user override the test.
 else
-  if test "$1" = filler; then
-  cs_dummy=''
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_SDLCONFIG="$ac_prog"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+SDLCONFIG=$ac_cv_prog_SDLCONFIG
+if test -n "$SDLCONFIG"; then
+  echo "$as_me:$LINENO: result: $SDLCONFIG" >&5
+echo "${ECHO_T}$SDLCONFIG" >&6
 else
-  cs_dummy=$1
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
 fi
 
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
+  test -n "$SDLCONFIG" && break
+done
 
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CXXFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <SDL/SDL.h>
-int
-main ()
-{
-SDL_Init(0);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
+if test -n "$SDLCONFIG"; then
+  cs_cv_libsdl=yes
+    cs_cv_libsdl_cflags=`{ (echo "$as_me:$LINENO: \$SDLCONFIG --cflags") >&5
+  ($SDLCONFIG --cflags) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
+  (exit $ac_status); }`
+    cs_cv_libsdl_lflags=''
+    cs_cv_libsdl_libs=`{ (echo "$as_me:$LINENO: \$SDLCONFIG --libs") >&5
+  ($SDLCONFIG --libs) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-	    break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CXXFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libSDL=yes
-		cs_cv_libSDL_cflags=$cs_build_cflags
-		cs_cv_libSDL_lflags=$cs_build_lflags
-		cs_cv_libSDL_libs=$cs_build_libs
-else
-  cs_cv_libSDL=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_libSDL" >&5
-echo "${ECHO_T}$cs_cv_libSDL" >&6
-else
-  echo "$as_me:$LINENO: checking for libSDL" >&5
-echo $ECHO_N "checking for libSDL... $ECHO_C" >&6
-	    ac_ext=cc
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-    cs_cflags_save="$CXXFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in $cs_check_lib_flags
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CXXFLAGS="$cs_cflags_test $cs_cv_sys_pthread_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_sys_pthread_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_sys_pthread_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <SDL/SDL.h>
-int
-main ()
-{
-SDL_Init(0);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-	    break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CXXFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_sys_pthread_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_sys_pthread_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_sys_pthread_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libSDL=yes
-		cs_cv_libSDL_cflags=$cs_build_cflags
-		cs_cv_libSDL_lflags=$cs_build_lflags
-		cs_cv_libSDL_libs=$cs_build_libs
-else
-  cs_cv_libSDL=no
-fi
-
-	    echo "$as_me:$LINENO: result: $cs_cv_libSDL" >&5
-echo "${ECHO_T}$cs_cv_libSDL" >&6
-fi
-
-    if test $cs_cv_libSDL = yes; then
-  :
-else
-  cs_cv_libSDL_cflags=''
-	cs_cv_libSDL_lflags=''
-	cs_cv_libSDL_libs=''
-	:
-fi
-
-else
-  cs_cv_libSDL=no
-fi
-
-    cs_cv_with_libSDL="$with_libSDL"
-
-    if test "$cs_cv_libSDL" = yes; then
-  if test "$cs_cv_libSDL" = yes; then
+  (exit $ac_status); }`
+    if test "$cs_cv_libsdl" = yes; then
   cs_makefile_text="${cs_makefile_text}SDL.AVAILABLE = yes
 "
     cs_jamconfig_text="${cs_jamconfig_text}SDL.AVAILABLE ?= \"yes\" ;
 "
-	cs_result_cflags=`echo x$cs_cv_libSDL_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_result_lflags=`echo x$cs_cv_libSDL_lflags $cs_cv_libSDL_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_result_cflags=`echo x$cs_cv_libsdl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_result_lflags=`echo x$cs_cv_libsdl_lflags $cs_cv_libsdl_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test -n "$cs_result_cflags"; then
   cs_makefile_text="${cs_makefile_text}SDL.CFLAGS = $cs_result_cflags
 "
@@ -20277,11 +19932,10 @@ fi
 
 fi
 
-	    cs_makefile_text="${cs_makefile_text}HAS_SDL = yes
+    cs_makefile_text="${cs_makefile_text}HAS_SDL = yes
 "
-else
-  :
 fi
+
 
 
 
@@ -26211,6 +25865,7 @@ s,@EGREP@,$EGREP,;t t
 s,@FT2_CONFIG@,$FT2_CONFIG,;t t
 s,@FT2_CFLAGS@,$FT2_CFLAGS,;t t
 s,@FT2_LIBS@,$FT2_LIBS,;t t
+s,@SDLCONFIG@,$SDLCONFIG,;t t
 s,@OBJCOPY@,$OBJCOPY,;t t
 s,@CXXCPP@,$CXXCPP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t

@@ -91,7 +91,7 @@ CFLAGS.DLL =
 # General flags for the linker which are used in any case.  The "config" flags
 # are determined at configuration time and come from CS/config.mak.
 # <cs-config>
-LFLAGS.GENERAL = $(MACOSX.LFLAGS.CONFIG) $(CSTHREAD.LFLAGS)
+LFLAGS.GENERAL = $(LFLAGS.SYSTEM) $(MACOSX.LFLAGS.CONFIG) $(CSTHREAD.LFLAGS)
 # </cs-config>
 
 # Flags for the linker which are used when profiling.

@@ -1,7 +1,6 @@
 SubDir TOP plugins video canvas sdl ;
 
-# disabled for now
-if $(SDL.AVAILABLE) = "yes" && ! DISABLED
+if $(SDL.AVAILABLE) = "yes"
 {
 Plugin sdl2d
 	: [ Wildcard *.cpp *.h ]
@@ -13,4 +12,3 @@ Help sdl2d : "Crystal Space SDL 2D driver" ;
 CompileGroups sdl2d :  drivers2d ;
 
 }
-

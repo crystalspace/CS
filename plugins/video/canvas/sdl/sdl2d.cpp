@@ -188,12 +188,9 @@ void csGraphics2DSDL::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.canvas.sdl", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -223,8 +220,8 @@ void csGraphics2DSDL::fixlibrary()
 
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Library %s locked.",dlip.dli_fname);
 #elif defined(OS_WIN32)
-	Report (CS_REPORTER_SEVERITY_NOTIFY, "SDL generic Win32 support by Crystal"
-		" Space Development Team.");
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "SDL generic Win32 support by Crystal Space Development Team.");
 #else
     Report (CS_REPORTER_SEVERITY_NOTIFY,
               "WARNING: Your operating system is not tested\n"
@@ -285,7 +282,8 @@ bool csGraphics2DSDL::Initialize (iObjectRegistry *object_reg)
         pfmt.PixelBytes = 4;
         break;
       default:
-        Report (CS_REPORTER_SEVERITY_ERROR, "Pixel depth %d not supported", Depth);
+        Report (CS_REPORTER_SEVERITY_ERROR, "Pixel depth %d not supported",
+	  Depth);
     }
 
     return true;
@@ -368,7 +366,7 @@ bool csGraphics2DSDL::Open()
       _GetPixelAt = GetPixelAt32;
       break;
     default:
-      Report (CS_REPORTER_SEVERITY_ERROR, "Pixel depth %d not supported", Depth);
+      Report(CS_REPORTER_SEVERITY_ERROR,"Pixel depth %d not supported",Depth);
   }
 
   pfmt.complete ();
