@@ -393,6 +393,11 @@ struct iSpriteCal3DState : public iBase
   virtual bool SetVelocity(float vel,csRandomGen *rng=0) = 0;
 
   /**
+   * This function sets the name to use when SetVelocity(0) is called.
+   */
+  virtual void SetDefaultIdleAnim(const char *name) = 0;
+
+  /**
    * This function sets the Level of Detail used by the sprite.  This is used
    * to reduce the polygon count and simplify the scene for the renderer.
    */

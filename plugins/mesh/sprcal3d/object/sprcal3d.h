@@ -485,6 +485,7 @@ private:
   csArray<csCal3DAnimation*> active_anims;
   csArray<float>             active_weights;
   bool is_idling;
+  int  default_idle_anim;
   float idle_override_interval;
   int   idle_action;
 
@@ -791,6 +792,7 @@ public:
   bool SetAnimAction(const char *name, float delayIn, float delayOut);
   bool SetAnimAction(int idx, float delayIn, float delayOut);
   bool SetVelocity(float vel,csRandomGen *rng=0);
+  void SetDefaultIdleAnim(const char *name);
   void SetLOD(float lod);
   void SetTimeFactor(float timeFactor);
   float GetTimeFactor();
@@ -900,6 +902,10 @@ public:
     virtual bool SetVelocity(float vel,csRandomGen *rng=0)
     {
 	return scfParent->SetVelocity(vel,rng);
+    }
+    virtual void SetDefaultIdleAnim(const char *name)
+    {
+      scfParent->SetDefaultIdleAnim(name);
     }
 
     virtual void SetLOD(float lod)

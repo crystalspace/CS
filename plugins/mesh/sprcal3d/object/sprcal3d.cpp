@@ -713,16 +713,17 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 #endif
   meshVersion = 0;
   bboxVersion = (uint)-1;
+  default_idle_anim = -1;
 }
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
 {
-  if(vertices_allocated)
+  if (vertices_allocated)
   {
     int m;
     for (m=0;m<vertices.Length();m++)
     {
-      int s;
+      int s; 
       for (s=0;s<vertices[m].Length();s++)
       {
 	delete[] vertices[m][s];
@@ -2044,6 +2045,11 @@ void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
   }
 }
 
+void csSpriteCal3DMeshObject::SetDefaultIdleAnim(const char *name)
+{
+    default_idle_anim = FindAnim(name);
+}
+
 bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
 {
   int count = GetAnimCount();
@@ -2051,6 +2057,13 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
   ClearAllAnims();
   if (!vel)
   {
+    if (default_idle_anim != -1)
+    {
+      AddAnimCycle(default_idle_anim,1,0);
+      if (rng)
+        SetIdleOverrides (rng,default_idle_anim);
+      return true;
+    }
     for (i=0; i<count; i++)
     {
       if (factory->anims[i]->type == iSpriteCal3DState::C3D_ANIM_TYPE_IDLE)
