@@ -34,6 +34,7 @@
 #include "csgfx/renderbuffer.h"
 #include "csgfx/rgbpixel.h"
 #include "csgfx/shaderexp.h"
+#include "csgfx/shaderexpaccessor.h"
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 #include "csgfx/vertexlight.h"
