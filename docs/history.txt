@@ -13,6 +13,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+20-Oct-1999
+	- Fixes to landscape engine from Alex Pfaffe. Uses camera space
+	  coordinates instead of world space.
+	- Various changes to quadtree stuff.
 19-Oct-1999
 	- Michael Dale Long added major CrystalClear updates (InputHandler
 	  and PlayerEntity).
@@ -24,6 +28,10 @@ Short-term cleanups that need to be done:
 	  files for this.
 	- Fixed endian reading for terrain loading which Alex Pfaffe did.
 	- Fixed init bug in csWorld for current_camera.
+	- Thomas Hieber improved robustness of map2cs.
+	- Thomas also changed Win/VC project files for quadcube move.
+	- Changes to Mac project files from Robert Bate.
+	- Changes to Windows GCC Makefile from Seth Galbraith.
 18-Oct-1999
 	- Scott Wood <scott@geekland.cx> sent me patches to allow CS
 	  to compile on Alpha machines.
