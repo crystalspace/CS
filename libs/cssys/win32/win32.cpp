@@ -500,7 +500,7 @@ void SysSystemDriver::NextFrame ()
   {
     if (!GetMessage (&msg, NULL, 0, 0))
     {
-      EventQueue.Put (new csEvent (csGetClicks (),
+      EventQueue.Put (new csEvent (csGetTicks (),
       	csevBroadcast, cscmdQuit, NULL));
       return;
     }

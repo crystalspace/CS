@@ -955,7 +955,7 @@ csTime time0 = (csTime)-1;
 void WalkTest::PrepareFrame (csTime elapsed_time, csTime current_time)
 {
   static csTime prev_time = 0;
-  if (prev_time == 0) prev_time = csGetClicks () - 10;
+  if (prev_time == 0) prev_time = csGetTicks () - 10;
 
   // If the time interval is too big, limit to something reasonable
   // This will help a little for software OpenGL :-)
@@ -1033,14 +1033,14 @@ void perf_test (int num)
   Sys->busy_perf_test = true;
   csTime t1, t2, t;
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Performance test busy...");
-  t = t1 = csGetClicks ();
+  t = t1 = csGetTicks ();
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    Sys->DrawFrame (csGetClicks ()-t, csGetClicks ());
-    t = csGetClicks ();
+    Sys->DrawFrame (csGetTicks ()-t, csGetTicks ());
+    t = csGetTicks ();
   }
-  t2 = csGetClicks ();
+  t2 = csGetTicks ();
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "%f secs to render %d frames: %f fps",
         (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
   Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "%f secs to render %d frames: %f fps",
@@ -1545,8 +1545,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   // Wait one second before starting.
-  csTime t = csGetClicks ()+1000;
-  while (csGetClicks () < t) ;
+  csTime t = csGetTicks ()+1000;
+  while (csGetTicks () < t) ;
 
   // Allocate the palette as calculated by the texture manager.
   txtmgr->SetPalette ();

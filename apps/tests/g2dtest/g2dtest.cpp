@@ -134,7 +134,7 @@ void G2DTestSystemDriver::EnterState (appState newstate, int arg)
   switch (newstate)
   {
     case stPause:
-      timer = csGetClicks () + arg;
+      timer = csGetTicks () + arg;
       break;
     case stTestLinePerf:
       lastkey2 = 0;
@@ -278,7 +278,7 @@ void G2DTestSystemDriver::NextFrame ()
       break;
     }
     case stPause:
-      if (int (csGetClicks () - timer) > 0)
+      if (int (csGetTicks () - timer) > 0)
         LeaveState ();
       else
         Sleep (1);
@@ -651,8 +651,8 @@ void G2DTestSystemDriver::DrawLinePerf ()
   // Test line drawing performance for 1/4 seconds
   sx += 20; sw -= 40;
   sy += 30; sh -= 40;
-  csRandomGen rng (csGetClicks ());
-  csTime start_time = csGetClicks (), delta_time;
+  csRandomGen rng (csGetTicks ());
+  csTime start_time = csGetTicks (), delta_time;
   float pix_count = 0;
   do
   {
@@ -667,7 +667,7 @@ void G2DTestSystemDriver::DrawLinePerf ()
       pix_count += sqrt (x2 * x2 + y2 * y2);
     }
     myG2D->PerformExtension ("flush");
-    delta_time = csGetClicks () - start_time;
+    delta_time = csGetTicks () - start_time;
   } while (delta_time < 500);
   pix_count = pix_count * (1000.0 / delta_time);
   WriteCentered (0, 16*1, green, black, " Performance: %20.1f pixels/second ", pix_count);
@@ -706,8 +706,8 @@ void G2DTestSystemDriver::DrawTextTest ()
   int colors [4] = { red, green, blue, yellow };
   sx += 20; sw -= 40 + tw;
   sy += 10; sh -= 20 + th;
-  csRandomGen rng (csGetClicks ());
-  csTime start_time = csGetClicks (), delta_time;
+  csRandomGen rng (csGetTicks ());
+  csTime start_time = csGetTicks (), delta_time;
   int char_count = 0;
   do
   {
@@ -719,7 +719,7 @@ void G2DTestSystemDriver::DrawTextTest ()
       char_count += cc;
     }
     myG2D->PerformExtension ("flush");
-    delta_time = csGetClicks () - start_time;
+    delta_time = csGetTicks () - start_time;
   } while (delta_time < 500);
   float perf = char_count * (1000.0 / delta_time);
   SetFont (CSFONT_LARGE);
@@ -756,8 +756,8 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   int colors [4] = { red, green, blue, yellow };
   sx += 20; sw -= 40 + tw;
   sy += 10; sh -= 20 + th;
-  csRandomGen rng (csGetClicks ());
-  csTime start_time = csGetClicks (), delta_time;
+  csRandomGen rng (csGetTicks ());
+  csTime start_time = csGetTicks (), delta_time;
   int char_count = 0;
   do
   {
@@ -769,7 +769,7 @@ void G2DTestSystemDriver::DrawTextTest2 ()
       char_count += cc;
     }
     myG2D->PerformExtension ("flush");
-    delta_time = csGetClicks () - start_time;
+    delta_time = csGetTicks () - start_time;
   } while (delta_time < 500);
   float perf = char_count * (1000.0 / delta_time);
   SetFont (CSFONT_LARGE);

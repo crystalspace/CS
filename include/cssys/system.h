@@ -477,6 +477,6 @@ extern int csPrintf (const char* str, ...);
 extern int csVPrintf (const char* str, va_list arg);
 
 // Get the time.
-extern csTime csGetClicks ();
+extern csTime csGetTicks ();
 
 #endif // __CS_SYSTEM_H__

@@ -22,7 +22,7 @@
 #include "cssys/sysdriv.h"
 
 // This function should return milliseconds since some specific time
-csTime csGetClicks ()
+csTime csGetTicks ()
 {
 #if 0
   struct timeval tv;

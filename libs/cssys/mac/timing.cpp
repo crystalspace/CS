@@ -24,7 +24,7 @@
 // time. If you don't have milliseconds easily just rewrite by
 // using 'time (NULL)*1000' or something like that.
 
-csTime csGetClicks ()
+csTime csGetTicks ()
 {
   UnsignedWide	theMicroSeconds;
   Microseconds( &theMicroSeconds );

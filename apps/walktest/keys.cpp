@@ -247,9 +247,9 @@ void WalkTest::strafe (float speed,int keep_old)
   if (move_3d || map_mode) return;
   static bool pressed = false;
   static float strafe_speed = 0;
-  static long start_time = csGetClicks ();
+  static long start_time = csGetTicks ();
 
-  long cur_time = csGetClicks ();
+  long cur_time = csGetTicks ();
   if (!keep_old)
   {
     bool new_pressed = ABS (speed) > 0.001;
@@ -289,9 +289,9 @@ void WalkTest::step (float speed,int keep_old)
 
   static bool pressed = false;
   static float step_speed = 0;
-  static long start_time = csGetClicks ();
+  static long start_time = csGetTicks ();
 
-  long cur_time = csGetClicks ();
+  long cur_time = csGetTicks ();
   if (!keep_old)
   {
     bool new_pressed = ABS (speed) > 0.001;
@@ -335,9 +335,9 @@ void WalkTest::rotate (float speed,int keep_old)
 
   static bool pressed = false;
   static float angle_accel = 0;
-  static long start_time = csGetClicks ();
+  static long start_time = csGetTicks ();
 
-  long cur_time = csGetClicks ();
+  long cur_time = csGetTicks ();
   if (!keep_old)
   {
     bool new_pressed = ABS (speed) > 0.001;

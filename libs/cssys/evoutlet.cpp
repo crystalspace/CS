@@ -92,12 +92,12 @@ void csSystemDriver::csEventOutlet::Joystick (int iNumber, int iButton,
 
 void csSystemDriver::csEventOutlet::Broadcast (int iCode, void *iInfo)
 {
-  System->EventQueue.Put (new csEvent (csGetClicks (), csevBroadcast,
+  System->EventQueue.Put (new csEvent (csGetTicks (), csevBroadcast,
     iCode, iInfo));
 }
 
 void csSystemDriver::csEventOutlet::ImmediateBroadcast (int iCode, void *iInfo)
 {
-  csEvent Event (csGetClicks (), csevBroadcast, iCode, iInfo);
+  csEvent Event (csGetTicks (), csevBroadcast, iCode, iInfo);
   System->HandleEvent (Event);
 }

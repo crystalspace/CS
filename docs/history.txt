@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+29-Jul-2001
+	- Eric Sunshine renamed csGetClicks() to csGetTicks().
+	- Eric Sunshine eliminated the now unnecessary inclusion of
+	  cssys/system.h from NeXTTime.cpp.  Also changed file's comment so
+	  that it no longer mentions csSystemDriver.
 27-Jul-2001
 	- Removed csSystemDriver::Warn() and Alert().
 	- Removed the console pointer in csSystemDriver.

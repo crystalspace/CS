@@ -529,7 +529,7 @@ bool csSystemDriver::Open ()
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Opening the drivers now!\n");
 
   // Now pass the open event to all plugins
-  csEvent Event (csGetClicks (), csevBroadcast, cscmdSystemOpen);
+  csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
   HandleEvent (Event);
 
   return true;
@@ -540,7 +540,7 @@ void csSystemDriver::Close ()
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Closing the drivers now!\n");
 
   // Warn all plugins the system is going down
-  csEvent Event (csGetClicks (), csevBroadcast, cscmdSystemClose);
+  csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemClose);
   HandleEvent (Event);
 }
 
@@ -549,7 +549,7 @@ void csSystemDriver::NextFrame ()
   int i;
 
   // Update elapsed time first
-  csTime cur_time = csGetClicks ();
+  csTime cur_time = csGetTicks ();
   ElapsedTime = (CurrentTime == csTime (-1)) ? 0 : cur_time - CurrentTime;
   CurrentTime = cur_time;
 
@@ -559,7 +559,7 @@ void csSystemDriver::NextFrame ()
     csPlugin *plugin = Plugins.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
-      csEvent Event (csGetClicks (), csevBroadcast, cscmdPreProcess);
+      csEvent Event (csGetTicks (), csevBroadcast, cscmdPreProcess);
       plugin->Plugin->HandleEvent (Event);
     }
   }
@@ -577,7 +577,7 @@ void csSystemDriver::NextFrame ()
     csPlugin *plugin = Plugins.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
-      csEvent Event (csGetClicks (), csevBroadcast, cscmdPostProcess);
+      csEvent Event (csGetTicks (), csevBroadcast, cscmdPostProcess);
       plugin->Plugin->HandleEvent (Event);
     }
   }
@@ -694,7 +694,7 @@ void csSystemDriver::Help (iConfig* Config)
 
 void csSystemDriver::Help ()
 {
-  csEvent HelpEvent (csGetClicks (), csevBroadcast, cscmdCommandLineHelp);
+  csEvent HelpEvent (csGetTicks (), csevBroadcast, cscmdCommandLineHelp);
   for (int i = 0; i < Plugins.Length (); i++)
   {
     csPlugin *plugin = Plugins.Get (i);
@@ -794,7 +794,7 @@ void csSystemDriver::RequestPlugin (const char *iPluginName)
 
 csTime csSystemDriver::GetTime ()
 {
-  return csGetClicks ();
+  return csGetTicks ();
 }
 
 bool csSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
