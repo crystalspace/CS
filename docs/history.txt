@@ -5,6 +5,14 @@ The history order has been reversed so that new features are at the top.
 	  compiles on VC.
 	- Luca Pancallo extended ASE importer in impexp. Luca also added
 	  a CS sprite exporter.
+	- Fixed a VERY old bug in all 3D renderers with DrawTriangleMesh.
+	  The bug was that triangles that are very close to the camera (i.e.
+	  one or more vertices are behind the view plane) were simply rejected.
+	  But this means that triangles could get clipped away completely
+	  even when visible. This badly affected the terrain engines (both
+	  DDG as terrfunc). At this moment the problem seems 95% solved. There
+	  are still situations where polygons disappear when close to the
+	  camera but it is rare now. I will look at this later.
 12-Apr-2001
 	- Philip Wyett fixed a couple of function declaration redefinition
 	  compile errors under VC6.

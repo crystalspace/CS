@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -190,13 +190,99 @@ static DECLARE_GROWING_ARRAY (z_verts, float);
 static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
 /// The perspective corrected vertices.
 static DECLARE_GROWING_ARRAY (persp, csVector2);
-/// Array which indicates which vertices are visible and which are not.
-static DECLARE_GROWING_ARRAY (visible, bool);
 /// Array with colors.
 static DECLARE_GROWING_ARRAY (color_verts, csColor);
 
+static void DrawTriangle (
+	iGraphics3D* g3d,
+	csClipper* clipper,
+	G3DTriangleMesh& mesh,
+	G3DPolygonDPFX& poly,
+	const csVector2& pa, const csVector2& pb, const csVector2& pc,
+        int* trivert,
+	float* z_verts,
+	csVector2* uv_verts,
+	csColor* colors,
+	G3DFogInfo* fog)
+{
+  // The triangle in question
+  csVector2 triangle[3];
+  csVector2 clipped_triangle[MAX_OUTPUT_VERTICES];	//@@@BAD HARCODED!
+  csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
+  UByte clip_result;
+
+  //-----
+  // Do backface culling. Note that this depends on the
+  // mirroring of the current view.
+  //-----
+  float area = csMath2::Area2 (pa, pb, pc);
+  int j, idx, dir;
+  if (!area) return;
+  if (mesh.do_mirror)
+  {
+    if (area <= -SMALL_EPSILON) return;
+    triangle[2] = pa; triangle[1] = pb; triangle[0] = pc;
+    // Setup loop variables for later.
+    idx = 2; dir = -1;
+  }
+  else
+  {
+    if (area >= SMALL_EPSILON) return;
+    triangle[0] = pa; triangle[1] = pb; triangle[2] = pc;
+    // Setup loop variables for later.
+    idx = 0; dir = 1;
+  }
+
+  // Clip triangle. Note that the clipper doesn't care about the
+  // orientation of the triangle vertices. It works just as well in
+  // mirrored mode.
+  int rescount = 0;
+  if (mesh.do_clip && clipper)
+  {
+    clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount,
+		  clipped_vtstats);
+    if (clip_result == CS_CLIP_OUTSIDE) return;
+    poly.num = rescount;
+  }
+  else
+  {
+    clip_result = CS_CLIP_INSIDE;
+    poly.num = 3;
+  }
+
+  // If mirroring we store the vertices in the other direction.
+  for (j = 0; j < 3; j++)
+  {
+    poly.vertices [idx].z = z_verts[trivert [j]];
+    poly.vertices [idx].u = uv_verts[trivert [j]].x;
+    poly.vertices [idx].v = uv_verts[trivert [j]].y;
+    if (colors)
+    {
+      poly.vertices [idx].r = colors[trivert[j]].red;
+      poly.vertices [idx].g = colors[trivert[j]].green;
+      poly.vertices [idx].b = colors[trivert[j]].blue;
+    }
+    if (poly.use_fog) poly.fog_info [idx] = fog[trivert[j]];
+    idx += dir;
+  }
+  if (clip_result != CS_CLIP_INSIDE)
+    G3DPreparePolygonFX (&poly, clipped_triangle, rescount, clipped_vtstats,
+		(csVector2 *)triangle, poly.use_fog, colors != NULL);
+  else
+  {
+    poly.vertices [0].sx = triangle [0].x;
+    poly.vertices [0].sy = triangle [0].y;
+    poly.vertices [1].sx = triangle [1].x;
+    poly.vertices [1].sy = triangle [1].y;
+    poly.vertices [2].sx = triangle [2].x;
+    poly.vertices [2].sy = triangle [2].y;
+  }
+  g3d->DrawPolygonFX (poly);
+}
+
 void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
-  csReversibleTransform& o2c, csClipper* clipper, float aspect, int width2, int height2)
+  csReversibleTransform& o2c, csClipper* clipper, float aspect,
+  int width2, int height2)
 {
   int i;
 
@@ -210,7 +296,6 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     z_verts.SetLimit (mesh.num_vertices);
     uv_verts.SetLimit (mesh.num_vertices);
     persp.SetLimit (mesh.num_vertices);
-    visible.SetLimit (mesh.num_vertices);
     color_verts.SetLimit (mesh.num_vertices);
   }
 
@@ -221,7 +306,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   csVector2* uv1 = mesh.texels[0][0];
   csVector3* work_verts;
   csVector2* work_uv_verts;
-  csColor* work_colors;
+  csColor* work_col;
   csColor* col1 = NULL;
   if (mesh.use_vertex_color)
     col1 = mesh.vertex_colors[0];
@@ -268,9 +353,9 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     else
       work_uv_verts = uv1;
     if (mesh.do_morph_colors)
-      work_colors = color_verts.GetArray ();
+      work_col = color_verts.GetArray ();
     else
-      work_colors = col1;
+      work_col = col1;
   }
   else
   {
@@ -283,7 +368,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     else
       work_verts = f1;
     work_uv_verts = uv1;
-    work_colors = col1;
+    work_col = col1;
   }
 
   // Perspective project.
@@ -295,10 +380,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       float iz = aspect * z_verts[i];
       persp[i].x = work_verts[i].x * iz + width2;
       persp[i].y = work_verts[i].y * iz + height2;
-      visible[i] = true;
     }
-    else
-      visible[i] = false;
   }
 
   // Clipped polygon (assume it cannot have more than 64 vertices)
@@ -313,12 +395,6 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 
   poly.use_fog = mesh.do_fog;
 
-  // The triangle in question
-  csVector2 triangle[3];
-  csVector2 clipped_triangle[MAX_OUTPUT_VERTICES];	//@@@BAD HARCODED!
-  csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
-  UByte clip_result;
-
   g3d->StartPolygonFX (mesh.mat_handle[0], mesh.fxmode);
 
   // Draw all triangles.
@@ -328,85 +404,211 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     int a = triangles[i].a;
     int b = triangles[i].b;
     int c = triangles[i].c;
-    if (visible[a] && visible[b] && visible[c])
+    int cnt_vis = int (work_verts[a].z >= SMALL_Z) + 
+    		  int (work_verts[b].z >= SMALL_Z) + 
+    		  int (work_verts[c].z >= SMALL_Z);
+    if (cnt_vis == 0)
     {
-      //-----
-      // Do backface culling. Note that this depends on the
-      // mirroring of the current view.
-      //-----
-      float area = csMath2::Area2 (persp [a], persp [b], persp [c]);
-      int j, idx, dir;
-      if (!area) continue;
-      if (mesh.do_mirror)
-      {
-        if (area <= -SMALL_EPSILON) continue;
-        triangle [2] = persp[a];
-        triangle [1] = persp[b];
-        triangle [0] = persp[c];
-	// Setup loop variables for later.
-        idx = 2;
-	dir = -1;
-      }
-      else
-      {
-        if (area >= SMALL_EPSILON) continue;
-        triangle [0] = persp[a];
-        triangle [1] = persp[b];
-        triangle [2] = persp[c];
-	// Setup loop variables for later.
-        idx = 0;
-	dir = 1;
-      }
-
-      // Clip triangle. Note that the clipper doesn't care about the
-      // orientation of the triangle vertices. It works just as well in
-      // mirrored mode.
-      int rescount = 0;
-      if (mesh.do_clip && clipper)
-      {
-        clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount,
-		clipped_vtstats);
-        if (clip_result == CS_CLIP_OUTSIDE) continue;
-        poly.num = rescount;
-      }
-      else
-      {
-        clip_result = CS_CLIP_INSIDE;
-        poly.num = 3;
-      }
-
-      int trivert [3] = { a, b, c };
-      // If mirroring we store the vertices in the other direction.
-      for (j = 0; j < 3; j++)
-      {
-        poly.vertices [idx].z = z_verts[trivert [j]];
-        poly.vertices [idx].u = work_uv_verts[trivert [j]].x;
-        poly.vertices [idx].v = work_uv_verts[trivert [j]].y;
-        if (work_colors)
-        {
-          poly.vertices [idx].r = work_colors[trivert[j]].red;
-          poly.vertices [idx].g = work_colors[trivert[j]].green;
-          poly.vertices [idx].b = work_colors[trivert[j]].blue;
-        }
-	if (poly.use_fog)
-	  poly.fog_info [idx] = mesh.vertex_fog[trivert[j]];
-	idx += dir;
-      }
-      if (clip_result != CS_CLIP_INSIDE)
-	G3DPreparePolygonFX (&poly, clipped_triangle, rescount, clipped_vtstats,
-		(csVector2 *)triangle, poly.use_fog, work_colors != NULL);
-      else
-      {
-        poly.vertices [0].sx = triangle [0].x;
-        poly.vertices [0].sy = triangle [0].y;
-        poly.vertices [1].sx = triangle [1].x;
-        poly.vertices [1].sy = triangle [1].y;
-        poly.vertices [2].sx = triangle [2].x;
-        poly.vertices [2].sy = triangle [2].y;
-      }
-
-      g3d->DrawPolygonFX (poly);
+      //=====
+      // Easy case: the triangle is completely not visible.
+      //=====
+      continue;
     }
+    else if (cnt_vis == 3)
+    {
+      //=====
+      // Another easy case: all vertices are visible.
+      //=====
+      int trivert [3] = { a, b, c };
+      DrawTriangle (g3d, clipper, mesh, poly,
+      	persp[a], persp[b], persp[c], trivert,
+	z_verts.GetArray (), work_uv_verts, work_col, mesh.vertex_fog);
+    }
+    else if (cnt_vis == 1)
+    {
+      //=====
+      // A reasonably complex case: one vertex is visible. We need
+      // to clip to the Z-plane but fortunatelly this will result in
+      // another triangle.
+      //=====
+
+      // The following com_iz is valid for all points on Z-plane.
+      float com_zv = 1. / (SMALL_Z*10);
+      float com_iz = aspect * (1. / (SMALL_Z*10));
+
+      csVector3 va = work_verts[a];
+      csVector3 vb = work_verts[b];
+      csVector3 vc = work_verts[c];
+      csVector3 v;
+      csVector2 pa, pb, pc;
+      float zv[3];
+      csVector2 uv[3];
+      csColor col[3];
+      G3DFogInfo fog[3];
+#undef COPYVT
+#define COPYVT(id,idl,i) \
+	p##idl## = persp[i]; zv[id] = z_verts[i]; uv[id] = work_uv_verts[i]; \
+	if (work_col) col[id] = work_col[i]; \
+	if (poly.use_fog) fog[id] = mesh.vertex_fog[i];
+#undef INTERPOL
+#define INTERPOL(id,idl,i1,i2) \
+	uv[id] = work_uv_verts[i1] + r*(work_uv_verts[i2]-work_uv_verts[i1]); \
+        zv[id] = com_zv; \
+	p##idl##.x = v.x * com_iz + width2; p##idl##.y = v.y * com_iz + width2; \
+	if (work_col) \
+	{ \
+	  col[id].red = work_col[i1].red+r*(work_col[i2].red-work_col[i1].red); \
+	  col[id].green = work_col[i1].green+r*(work_col[i2].green-work_col[i1].green); \
+	  col[id].blue = work_col[i1].blue+r*(work_col[i2].blue-work_col[i1].blue); \
+	} \
+	if (poly.use_fog) \
+	{ \
+	  fog[id].r = mesh.vertex_fog[i1].r + r*(mesh.vertex_fog[i2].r-mesh.vertex_fog[i1].r); \
+	  fog[id].g = mesh.vertex_fog[i1].g + r*(mesh.vertex_fog[i2].g-mesh.vertex_fog[i1].g); \
+	  fog[id].b = mesh.vertex_fog[i1].b + r*(mesh.vertex_fog[i2].b-mesh.vertex_fog[i1].b); \
+	  fog[id].intensity = mesh.vertex_fog[i1].intensity + r*(mesh.vertex_fog[i2].intensity-mesh.vertex_fog[i1].intensity); \
+	}
+
+      if (va.z >= SMALL_Z)
+      {
+	// Point a is visible.
+	COPYVT(0,a,a)
+
+	// Calculate intersection between a-b and Z=SMALL_Z*10.
+	// p = a + r * (b-a) (parametric line equation between a and b).
+	float r = (SMALL_Z*10-va.z)/(vb.z-va.z);
+	v.Set (va.x + r * (vb.x-va.x), va.y + r * (vb.y-va.y), SMALL_Z*10);
+	INTERPOL(1,b,a,b)
+	// Calculate intersection between a-c and Z=SMALL_Z*10.
+	r = (SMALL_Z*10-va.z)/(vc.z-va.z);
+	v.Set (va.x + r * (vc.x-va.x), va.y + r * (vc.y-va.y), SMALL_Z*10);
+	INTERPOL(2,c,a,c)
+      }
+      else if (vb.z >= SMALL_Z)
+      {
+	// Point b is visible.
+	COPYVT(1,b,b)
+
+	// Calculate intersection between b-a and Z=SMALL_Z*10.
+	float r = (SMALL_Z*10-vb.z)/(va.z-vb.z);
+	v.Set (vb.x + r * (va.x-vb.x), vb.y + r * (va.y-vb.y), SMALL_Z*10);
+	INTERPOL(0,a,b,a)
+	// Calculate intersection between b-c and Z=SMALL_Z*10.
+	r = (SMALL_Z*10-vb.z)/(vc.z-vb.z);
+	v.Set (vb.x + r * (vc.x-vb.x), vb.y + r * (vc.y-vb.y), SMALL_Z*10);
+	INTERPOL(2,c,b,c)
+      }
+      else
+      {
+	// Point c is visible.
+	COPYVT(2,c,c)
+
+	// Calculate intersection between c-a and Z=SMALL_Z*10.
+	float r = (SMALL_Z*10-vc.z)/(va.z-vc.z);
+	v.Set (vc.x + r * (va.x-vc.x), vc.y + r * (va.y-vc.y), SMALL_Z*10);
+	INTERPOL(0,a,c,a)
+	// Calculate intersection between c-b and Z=SMALL_Z*10.
+	r = (SMALL_Z*10-vc.z)/(vb.z-vc.z);
+	v.Set (vc.x + r * (vb.x-vc.x), vc.y + r * (vb.y-vc.y), SMALL_Z*10);
+	INTERPOL(1,b,c,b)
+      }
+
+      // Now pa, pb, pc will be a triangle that is completely visible.
+      // uv[0..2] contains the texture coordinates.
+      // zv[0..2] contains 1/z
+      // col[0..2] contains color information
+      // fog[0..2] contains fog information
+
+      int trivert [3] = { 0, 1, 2 };
+      DrawTriangle (g3d, clipper, mesh, poly,
+      	pa, pb, pc, trivert,
+	zv, uv, work_col ? col : NULL, fog);
+    }
+    else
+    {
+      //=====
+      // The most complicated case: two vertices are visible. In this
+      // case clipping to the Z-plane does not result in a triangle.
+      // So we have to triangulate.
+      // We will triangulate to triangles a,b,c, and a,c,d.
+      //=====
+
+      // The following com_iz is valid for all points on Z-plane.
+      float com_zv = 1. / (SMALL_Z*10);
+      float com_iz = aspect * (1. / (SMALL_Z*10));
+
+      csVector3 va = work_verts[a];
+      csVector3 vb = work_verts[b];
+      csVector3 vc = work_verts[c];
+      csVector3 v;
+      csVector2 pa, pb, pc, pd;
+      float zv[4];
+      csVector2 uv[4];
+      csColor col[4];
+      G3DFogInfo fog[4];
+      if (va.z < SMALL_Z)
+      {
+	// Point a is not visible.
+	COPYVT(1,b,b)
+	COPYVT(2,c,c)
+
+	// Calculate intersection between a-b and Z=SMALL_Z*10.
+	// p = a + r * (b-a) (parametric line equation between a and b).
+	float r = (SMALL_Z*10-va.z)/(vb.z-va.z);
+	v.Set (va.x + r * (vb.x-va.x), va.y + r * (vb.y-va.y), SMALL_Z*10);
+	INTERPOL(0,a,a,b)
+	// Calculate intersection between a-c and Z=SMALL_Z*10.
+	r = (SMALL_Z*10-va.z)/(vc.z-va.z);
+	v.Set (va.x + r * (vc.x-va.x), va.y + r * (vc.y-va.y), SMALL_Z*10);
+	INTERPOL(3,d,a,c)
+      }
+      else if (vb.z < SMALL_Z)
+      {
+	// Point b is not visible.
+	COPYVT(0,a,a)
+	COPYVT(3,d,c)
+
+	// Calculate intersection between b-a and Z=SMALL_Z*10.
+	float r = (SMALL_Z*10-vb.z)/(va.z-vb.z);
+	v.Set (vb.x + r * (va.x-vb.x), vb.y + r * (va.y-vb.y), SMALL_Z*10);
+	INTERPOL(1,b,b,a)
+	// Calculate intersection between b-c and Z=SMALL_Z*10.
+	r = (SMALL_Z*10-vb.z)/(vc.z-vb.z);
+	v.Set (vb.x + r * (vc.x-vb.x), vb.y + r * (vc.y-vb.y), SMALL_Z*10);
+	INTERPOL(2,c,b,c)
+      }
+      else
+      {
+	// Point c is not visible.
+	COPYVT(0,a,a)
+	COPYVT(1,b,b)
+
+	// Calculate intersection between c-a and Z=SMALL_Z*10.
+	float r = (SMALL_Z*10-vc.z)/(va.z-vc.z);
+	v.Set (vc.x + r * (va.x-vc.x), vc.y + r * (va.y-vc.y), SMALL_Z*10);
+	INTERPOL(3,d,c,a)
+	// Calculate intersection between c-b and Z=SMALL_Z*10.
+	r = (SMALL_Z*10-vc.z)/(vb.z-vc.z);
+	v.Set (vc.x + r * (vb.x-vc.x), vc.y + r * (vb.y-vc.y), SMALL_Z*10);
+	INTERPOL(2,c,c,b)
+      }
+
+      // Now pa,pb,pc and pa,pc,pd will be triangles that are visible.
+      // uv[0..3] contains the texture coordinates.
+      // zv[0..3] contains 1/z
+      // col[0..3] contains color information
+      // fog[0..3] contains fog information
+
+      int trivert1[3] = { 0, 1, 2 };
+      DrawTriangle (g3d, clipper, mesh, poly,
+      	pa, pb, pc, trivert1,
+	zv, uv, work_col ? col : NULL, fog);
+      int trivert2[3] = { 0, 2, 3 };
+      DrawTriangle (g3d, clipper, mesh, poly,
+      	pa, pc, pd, trivert2,
+	zv, uv, work_col ? col : NULL, fog);
+    }
+
   }
 
   g3d->FinishPolygonFX ();
