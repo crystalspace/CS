@@ -265,6 +265,21 @@ void csGraphics2DGLX::Close(void)
 
 void csGraphics2DGLX::Clear(int color)
 {
+  switch (pfmt.PixelBytes)
+  {
+  case 1: // paletted colors
+    glClearColor(Palette[color].red,
+    		Palette[color].green,
+		Palette[color].blue,0.);
+    break;
+  case 2: // 16bit color
+  case 4: // truecolor
+    glClearColor( ( (color & pfmt.RedMask) >> pfmt.RedShift )     / (float)pfmt.RedBits,
+               ( (color & pfmt.GreenMask) >> pfmt.GreenShift ) / (float)pfmt.GreenBits,
+               ( (color & pfmt.BlueMask) >> pfmt.BlueShift )   / (float)pfmt.BlueBits,
+	       0. );
+    break;
+  }
   glClear(GL_COLOR_BUFFER_BIT);
 }
 
