@@ -1,6 +1,26 @@
 The history order has been reversed so that new features are at the top.
 
+9-Oct-2000
+	- Brandon Ehle fixed some compile errors in imotion.h and
+	  also restructured the API a bit.
+	- Brandon also added CS_ASSERT to some calls in csVector.
+8-Oct-2000
+	- Brandon Ehle added the motion interface for sprites to the CVS tree.
+	  The SCF interfaces & the loader are 90% done, but the plugin and
+	  rendering loop still need to be implemented.
+7-Oct-2000
+	- Martin Geisse also updated the VC project files.
 6-Oct-2000
+	- Thomas Hieber added a macro for safe ADD_REF and DEC_REF
+	  to scf.h.
+	- Thomas also fixed a few warnings in CSWS and updated the VC
+	  project files.
+	- Thomas did some small changes to the gamecore plugin.
+	- Wouter Wijngaards fixed a bug in the image loader:
+	  Sometimes imgloaders were registered twice (double linking?),
+	  and the list of loaders becomes a ring. And if loading fails it
+	  gets into an infinite loop. I fixed the problem by having Register
+	  check if the loader is already present.
 	- Andrew Zabolotny added a check for empty scf.cfg file so that
 	  it will not bomb out.
 	- Wouter Wijngaards added scripts/python/*.py for installation.
