@@ -15,6 +15,9 @@ chronological order.
 	  to freed memory. Fixed by using an index into an array instead.
 	- res made csbench work again. Issues were above Thing problem but also
 	  that wrong mesh objects were used for the light_bumpmap shader test.
+	- res undid the csuctransform.h tweak and disabled "builtin wchar_t"
+	  for CS. Also disables wchar_t overloads for 
+	  csUnicodeTransform::Encode()/Decode() on VC.
 10-Mar-2005
 	- Fixed flarge so that the name of the 'fire' texture plugin
 	  no longer conflicts with the name of the 'fire' mesh loader plugin

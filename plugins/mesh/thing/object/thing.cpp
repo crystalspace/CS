@@ -2660,7 +2660,6 @@ void csThing::PrepareLMs ()
       pg->polys.SetLength (slpg.polys.Length ());
       for (j = 0; j < slpg.polys.Length(); j++)
       {
-	//pg->polys.Put (j, &polygons[slpg.polys[j]]);
 	pg->polys.Put (j, slpg.polys[j]);
       }
       //pg->polys.ShrinkBestFit();
