@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- csperl5.csplugin -->
+<plugin>
+  <name>csperl5</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.script.perl5</name>
+        <description>Crystal Space Perl v5 Scripting Plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

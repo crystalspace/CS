@@ -119,6 +119,31 @@ endif
 INSTALL_DATA.DIR = $(addprefix $(INSTALL_DIR)/, \
   $(patsubst %/,%,$(sort $(dir $(subst $(SRCDIR)/,,$(TO_INSTALL.DATA))))))
 
+# Command to copy a plugin module to the installation directory.  The plugin to
+# be copied must be stored in a variable named F.  This default implementation
+# copies the named file to the installation directory for plugins along with a
+# second file of the same name but with extension .csplugin.  This is suitable
+# for platforms where a plugin's meta information resides in a separate file
+# alongside the plugin itself.  Other platforms may have to override this
+# command with a more suitable one.  For instance, on MacOS/X, meta information
+# might be bundled inside the plugin's "wrapper", rather than living alongside
+# the plugin.  It is also the responsibility of this command to make an
+# appropriate entry (or multiple entries) in the install log, $(INSTALL_LOG),
+# for each installed plugin.  Assumes that the target directory tree already
+# exists.  The empty line in this macro is important since it results in
+# inclusion of a newline.  This is desirable because we expect this macro to be
+# invoked from $(foreach) for a set of files, and we want the expansion to be a
+# series of copy commands, one per line.
+ifeq (,$(strip $(INSTALL.DO_PLUGIN)))
+define INSTALL.DO_PLUGIN
+  $(CP) $(F) $(INSTALL_DLL.DIR)
+  $(CP) $(patsubst %$(DLL),%.csplugin,$(F)) $(INSTALL_DLL.DIR)
+  @echo $(addprefix $(INSTALL_DLL.DIR)/, \
+    $(notdir $(F) $(patsubst %$(DLL),%.csplugin,$(F)))) >> $(INSTALL_LOG)
+
+endef
+endif
+
 # Command to copy a potentially deeply nested file to the installation
 # directory even while preserving the nesting.  The file to be copied must be
 # stored in a variable named F.  Assumes that the target directory tree
@@ -188,9 +213,7 @@ install_data: $(INSTALL_DATA.DIR)
 # Install dynamic libraries (plug-in modules).
 ifeq ($(USE_PLUGINS),yes)
 install_dynamiclibs: $(INSTALL_DLL.DIR)
-	$(CP) -r $(TO_INSTALL.DYNAMIC_LIBS) $(INSTALL_DLL.DIR)
-	@echo $(addprefix $(INSTALL_DLL.DIR)/, \
-	  $(notdir $(TO_INSTALL.DYNAMIC_LIBS))) >> $(INSTALL_LOG)
+	$(foreach F,$(TO_INSTALL.DYNAMIC_LIBS),$(INSTALL.DO_PLUGIN))
 endif
 
 # Install static libraries.

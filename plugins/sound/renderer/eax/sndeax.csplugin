@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- sndeax.csplugin -->
+<plugin>
+  <name>sndeax</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sound.render.eax</name>
+        <description>EAX on Direct Sound Driver for Crystal Space</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GTREELDR)
 endif
 
+INF.GTREELDR = $(SRCDIR)/plugins/mesh/genmesh/persist/tree/gtreeldr.csplugin
 INC.GTREELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/tree/*.h))
 SRC.GTREELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/tree/*.cpp))
 OBJ.GTREELDR = $(addprefix $(OUT)/,$(notdir $(SRC.GTREELDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(GTREELDR): $(OBJ.GTREELDR) $(LIB.GTREELDR)
 
 clean: gtreeldrclean
 gtreeldrclean:
-	-$(RM) $(GTREELDR) $(OBJ.GTREELDR)
+	-$(RMDIR) $(GTREELDR) $(OBJ.GTREELDR) $(OUTDLL)/$(notdir $(INF.GTREELDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/gtreeldr.dep

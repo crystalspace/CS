@@ -56,6 +56,8 @@ $main::opt_xml_protect = 0;
 $main::opt_X = 0;	# Alias for 'xml-protect'.
 $main::opt_target = '';
 $main::opt_g = '';	# Alias for 'target'.
+$main::opt_meta_file = '';
+$main::opt_M = '';	# Alias for 'meta-file'.
 @main::opt_library = ();
 @main::opt_L = ();	# Alias for 'library'.
 @main::opt_delaylib = ();
@@ -96,6 +98,8 @@ my @script_options = (
     'X',		# Alias for 'xml-protect'.
     'target=s',
     'g=s',		# Alias for 'target'.
+    'meta-file=s',
+    'M=s',		# Alias for 'meta-file'.
     'library=s@',
     'L=s@',		# Alias for 'library'.
     'delaylib=s@',
@@ -354,11 +358,13 @@ sub interpolate_project_group {
     my $files = $main::groups->{$group};
     my $files_buffer =
 	interpolate_items($files, '%file%', $main::project_file_template);
+    interpolate('%name%', $main::opt_name, \$files_buffer);
+    interpolate('%metafile%', $main::opt_meta_file, \$files_buffer);
 
     my $group_name = $main::patterns->{$group}->{'name'};
     my $result = $main::project_group_template;
-    interpolate('%name%', $main::opt_name, \$files_buffer);
     interpolate('%name%', $main::opt_name, \$result);
+    interpolate('%metafile%', $main::opt_meta_file, \$result);
     interpolate('%group%', $group_name, \$result);
     interpolate('%files%', $files_buffer, \$result);
     return $result;
@@ -385,12 +391,14 @@ sub interpolate_project {
     my $delaylib;
     foreach $delaylib (@main::opt_delaylib) {
     	$delaylibs .= $main::project_delaylib_template;
+    	interpolate('%name%', $main::opt_name, \$delaylibs);
     	interpolate('%delaylib%', $delaylib, \$delaylibs);
     }
     interpolate('%name%',      xmlprotect($main::opt_name),         \$result);
     interpolate('%project%',   xmlprotect($main::opt_project_name), \$result);
     interpolate('%makefile%',  xmlprotect($main::makefile),         \$result);
     interpolate('%target%',    xmlprotect($main::opt_target),       \$result);
+    interpolate('%metafile%',  xmlprotect($main::opt_meta_file),    \$result);
     interpolate('%libs%',      xmlprotect(\@main::opt_library),     \$result);
     interpolate('%delaylibs%', xmlprotect($delaylibs), 	            \$result);
     interpolate('%lflags%',    xmlprotect(\@main::opt_lflags),      \$result);
@@ -533,6 +541,9 @@ Project:   $main::opt_project_name
 Target:    $main::opt_target
 Makefile:  $main::makefile
 EOT
+    print <<"EOT" if $main::opt_meta_file;
+Libraries: $main::opt_meta_file
+EOT
     print <<"EOT" if @main::opt_library;
 Libraries: @main::opt_library
 EOT
@@ -582,6 +593,8 @@ sub validate_workspace_options {
 	if $main::opt_template;
     usage_error("The --target option can be used only with --project.")
 	if $main::opt_target;
+    usage_error("The --meta-file option can be used only with --project.")
+	if $main::opt_meta_file;
     usage_error("The --library option can be used only with --project.")
 	if @main::opt_library;
     usage_error("The --lflags option can be used only with --project.")
@@ -642,6 +655,7 @@ sub process_option_aliases {
 	unless $main::opt_workspace_extension;
     $main::opt_name = $main::opt_N unless $main::opt_name;
     $main::opt_target = $main::opt_g unless $main::opt_target;
+    $main::opt_meta_file = $main::opt_M unless $main::opt_meta_file;
     $main::opt_template = $main::opt_t unless $main::opt_template;
     $main::opt_template_dir = $main::opt_T unless $main::opt_template_dir;
     push(@main::opt_library, @main::opt_L);
@@ -694,9 +708,14 @@ sub process_project_options {
     }
     @main::opt_strip_root = @roots;
 
+    my @infiles = @ARGV;
+    push(@infiles, $main::opt_meta_file)
+	if ($main::opt_meta_file && !grep(/$main::opt_meta_file/, @infiles));
+    $main::opt_meta_file =~ tr:/:\\:;
+
     my @files;
     my $file;
-    foreach $file (@ARGV) {
+    foreach $file (@infiles) {
 	$file =~ tr:/:\\:;
 	foreach $root (@main::opt_strip_root) {
 	    last if $file =~ s/^$root//;
@@ -787,13 +806,14 @@ Template files are loaded from the current working directory or from the
 directory named via --template-dir.  The template files appgui.tpl, appcon.tpl,
 plugin.tpl, library.tpl, and group.tpl correspond to the project types
 available via the --template option.  Template files may contain the variables
-\%name\%, \%project\%, \%target\%, \%makefile\%, \%groups\%, \%libs\%,
-%delaylibs%, \%lflags\%, and \%cflags\%.  The variables \%name\%, \%project\%,
-\%target\%, \%libs\%, \%cflags\%, and \%lflags\% are replaced with values
-specified via the --name, --projectname, --target, --library, --cflags, and
---lflags options, respectively.  The \%name\% variable can be used in any
-template file.  The replacement value for \%makefile\% is the same as the name
-of the generated project file except that .mak is substituted for the suffix.
+\%name\%, \%project\%, \%target\%, \%metafile\%, \%makefile\%, \%groups\%,
+\%libs\%, %delaylibs%, \%lflags\%, and \%cflags\%.  The variables \%name\%,
+\%project\%, \%target\%, \%metafile\%, \%libs\%, \%cflags\%, and \%lflags\% are
+replaced with values specified via the --name, --project-name, --target,
+--meta-file, --library, --cflags, and --lflags options, respectively.  The
+\%name\% variable can be used in any template file.  The replacement value for
+\%makefile\% is the same as the name of the generated project file except that
+.mak is substituted for the suffix.
 
 The template prjgroup.tpi is used multiple times to build a value for the
 \%groups\% variable mentioned above.  This template is used to create the file
@@ -931,6 +951,21 @@ Project Options:
                  with --name is used as the target name.  If the name does not
                  end with an appropriate suffix (one of .exe, .dll, or .lib),
                  then the suffix is added automatically.
+    -M <path>
+    --meta-file=<path>
+                 Specifies the path of a file containing meta-data related to
+                 this target.  This is the replacement value for the
+                 \%metafile\% variable in template files.  For convenience, the
+                 named file is also inserted into the "Resource Files" group
+                 within the generated project file.  If not specified, then no
+                 meta-data file is associated with the generated project.  The
+                 meta-data file for a "plugin", for example, might contain
+                 information about the interfaces published by the plugin
+                 module.  How the project utilizes this information is specific
+                 to the template, however one typical scheme is to copy the
+                 meta-data file alongside the generated target.  It is common
+                 for the meta-data file to have the same base name as the
+                 generated target, but a different file extension.
     -L <name>
     --library=<name>
                  Specifies the name of an extra Windows library with which the
@@ -952,7 +987,9 @@ Project Options:
                  prjdelay.tpi, \%delaylib\% is replaced with this value.  The
                  concatentation of each invocation of prjdelay.tpi becomes the
                  value of the \%delaylibs\% variable in the project template
-                 (see --template).
+                 (see --template).  The --delaylib option may be given any
+                 number of times to specify any number of delay-loaded DLLs, or
+                 not at all if no such DLLs are required.
     -l <flags>
     --lflags=<flags>
                  Specifies extra linker options which should be used in
@@ -1076,7 +1113,7 @@ sub print_help {
 sub usage_error {
     my $msg = shift;
     print STDERR "ERROR: $msg\n" if $msg;
-    print_usage(\*STDERR);
+    print STDERR "ERROR: Use the --help option for instructions.\n";
     exit(1);
 }
 

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(EXPLOLDR)
 endif
 
+INF.EXPLOLDR = $(SRCDIR)/plugins/mesh/explo/persist/standard/exploldr.csplugin
 INC.EXPLOLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/persist/standard/*.h))
 SRC.EXPLOLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/persist/standard/*.cpp))
 OBJ.EXPLOLDR = $(addprefix $(OUT)/,$(notdir $(SRC.EXPLOLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(EXPLOLDR): $(OBJ.EXPLOLDR) $(LIB.EXPLOLDR)
 
 clean: exploldrclean
 exploldrclean:
-	-$(RM) $(EXPLOLDR) $(OBJ.EXPLOLDR)
+	-$(RMDIR) $(EXPLOLDR) $(OBJ.EXPLOLDR) $(OUTDLL)/$(notdir $(INF.EXPLOLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/exploldr.dep

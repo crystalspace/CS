@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- xmlread.csplugin -->
+<plugin>
+  <name>xmlread</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.documentsystem.xmlread</name>
+        <description>Crystal Space XmlRead document system</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

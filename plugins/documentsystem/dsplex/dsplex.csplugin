@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- dsplex.csplugin -->
+<plugin>
+  <name>dsplex</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.documentsystem.multiplex</name>
+        <description>Document system multiplexer</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSAVI)
 endif
 
+INF.CSAVI = $(SRCDIR)/plugins/video/format/avi/csavi.csplugin
 INC.CSAVI = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/avi/*.h))
 SRC.CSAVI = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/avi/*.cpp))
 #SRC.CSAVI += $(wildcard plugins/video/format/avi/*.asm)
@@ -67,7 +68,7 @@ $(CSAVI): $(OBJ.CSAVI) $(LIB.CSAVI)
 
 clean: csaviclean
 csaviclean:
-	-$(RM) $(CSAVI) $(OBJ.CSAVI)
+	-$(RMDIR) $(CSAVI) $(OBJ.CSAVI) $(OUTDLL)/$(notdir $(INF.CSAVI))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csavi.dep

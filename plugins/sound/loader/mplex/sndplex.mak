@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDPLEX)
 endif
 
+INF.SNDPLEX = $(SRCDIR)/plugins/sound/loader/mplex/sndplex.csplugin
 INC.SNDPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mplex/*.h))
 SRC.SNDPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mplex/*.cpp))
 OBJ.SNDPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.SNDPLEX:.cpp=$O)))
@@ -65,7 +66,7 @@ $(SNDPLEX): $(OBJ.SNDPLEX) $(LIB.SNDPLEX)
 
 clean: sndplexclean
 sndplexclean:
-	$(RM) $(SNDPLEX) $(OBJ.SNDPLEX)
+	-$(RMDIR) $(SNDPLEX) $(OBJ.SNDPLEX) $(OUTDLL)/$(notdir $(INF.SNDPLEX))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndplex.dep

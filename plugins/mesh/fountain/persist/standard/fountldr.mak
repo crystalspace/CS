@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(FOUNTLDR)
 endif
 
+INF.FOUNTLDR = $(SRCDIR)/plugins/mesh/fountain/persist/standard/fountldr.csplugin
 INC.FOUNTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/persist/standard/*.h))
 SRC.FOUNTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/persist/standard/*.cpp))
 OBJ.FOUNTLDR = $(addprefix $(OUT)/,$(notdir $(SRC.FOUNTLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(FOUNTLDR): $(OBJ.FOUNTLDR) $(LIB.FOUNTLDR)
 
 clean: fountldrclean
 fountldrclean:
-	-$(RM) $(FOUNTLDR) $(OBJ.FOUNTLDR)
+	-$(RMDIR) $(FOUNTLDR) $(OBJ.FOUNTLDR) $(OUTDLL)/$(notdir $(INF.FOUNTLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/fountldr.dep

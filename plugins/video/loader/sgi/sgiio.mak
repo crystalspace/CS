@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSSGIIMG)
 endif
 
+INF.CSSGIIMG = $(SRCDIR)/plugins/video/loader/sgi/cssgiimg.csplugin
 INC.CSSGIIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/sgi/*.h))
 SRC.CSSGIIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/sgi/*.cpp))
 
@@ -63,7 +64,7 @@ $(CSSGIIMG): $(OBJ.CSSGIIMG) $(LIB.CSSGIIMG)
 
 clean: cssgiimgclean
 cssgiimgclean:
-	$(RM) $(CSSGIIMG) $(OBJ.CSSGIIMG)
+	-$(RMDIR) $(CSSGIIMG) $(OBJ.CSSGIIMG) $(OUTDLL)/$(notdir $(INF.CSSGIIMG))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sgiimg.dep

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- oglglide.csplugin -->
+<plugin>
+  <name>oglglide</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.glx.disp.glide</name>
+        <description>Glide Displaydriver for Crystal Space GL/X</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

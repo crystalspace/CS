@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(NULL3D)
 endif
 
+INF.NULL3D = $(SRCDIR)/plugins/video/renderer/null/null3d.csplugin
 INC.NULL3D = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/renderer/null/*.h \
   plugins/video/renderer/common/txtmgr.h \
@@ -80,7 +81,7 @@ $(NULL3D): $(OBJ.NULL3D) $(LIB.NULL3D)
 	$(DO.PLUGIN)
 
 null3dclean:
-	$(RM) $(NULL3D) $(OBJ.NULL3D)
+	-$(RMDIR) $(NULL3D) $(OBJ.NULL3D) $(OUTDLL)/$(notdir $(INF.NULL3D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/null3d.dep

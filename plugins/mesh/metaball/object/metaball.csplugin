@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- metaball.csplugin -->
+<plugin>
+  <name>metaball</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.metaball</name>
+        <description>Metaball mesh object for crystal space</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -26,7 +26,6 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 MACOSX.APP_EXE  = $@/Contents/MacOS/$(notdir $(basename $@))
 MACOSX.APP_ICON = $(SRCDIR)/libs/cssys/macosx/appicon.icns
 MACOSX.APP_DIR  = .
-MACOSX.APP_EXT  = .app
 # </cs-config>
 
 # Apple can not use the x86 assembly in CS.
@@ -55,10 +54,10 @@ MACOSX.SOURCE_PATHS = $(SRCDIR)/libs/cssys/macosx
 TO_INSTALL.CONFIG += $(SRCDIR)/data/config/macosx.cfg
 
 # Extension for applications on this system
-EXE = $(MACOSX.APP_EXT)
+EXE = .app
 
 # Extension for dynamic libraries on this system.
-DLL = $(MACOSX.PLUGIN_EXT)
+DLL = .csbundle
 
 # Extra libraries needed on this system.
 LIBS.EXE =

@@ -32,6 +32,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(FREEFNT2)
 endif
 
+INF.FREEFNT2 = $(SRCDIR)/plugins/font/server/freefnt2/freefnt2.csplugin
 INC.FREEFNT2 = \
   $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/freefnt2/*.h))
 SRC.FREEFNT2 = \
@@ -67,7 +68,7 @@ $(FREEFNT2): $(OBJ.FREEFNT2) $(LIB.FREEFNT2)
 
 clean: freefnt2clean
 freefnt2clean:
-	-$(RM) $(FREEFNT2) $(OBJ.FREEFNT2)
+	-$(RMDIR) $(FREEFNT2) $(OBJ.FREEFNT2) $(OUTDLL)/$(notdir $(INF.FREEFNT2))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/freefnt2.dep

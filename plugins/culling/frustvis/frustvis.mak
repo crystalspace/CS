@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(FRUSTVIS)
 endif
 
+INF.FRUSTVIS = $(SRCDIR)/plugins/culling/frustvis/frustvis.csplugin
 INC.FRUSTVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/frustvis/*.h))
 SRC.FRUSTVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/frustvis/*.cpp))
 OBJ.FRUSTVIS = $(addprefix $(OUT)/,$(notdir $(SRC.FRUSTVIS:.cpp=$O)))
@@ -65,7 +66,7 @@ $(FRUSTVIS): $(OBJ.FRUSTVIS) $(LIB.FRUSTVIS)
 
 clean: frustvisclean
 frustvisclean:
-	$(RM) $(FRUSTVIS) $(OBJ.FRUSTVIS)
+	-$(RMDIR) $(FRUSTVIS) $(OBJ.FRUSTVIS) $(OUTDLL)/$(notdir $(INF.FRUSTVIS))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/frustvis.dep

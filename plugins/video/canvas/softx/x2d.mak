@@ -45,6 +45,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(X2D)
 endif
 
+INF.X2D = $(SRCDIR)/plugins/video/canvas/softx/x2d.csplugin
 INC.X2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/softx/*.h $(INC.COMMON.DRV2D)))
 SRC.X2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.X2D = $(addprefix $(OUT)/,$(notdir $(SRC.X2D:.cpp=$O)))
@@ -67,7 +68,7 @@ $(X2D): $(OBJ.X2D) $(LIB.X2D)
 
 clean: x2dclean
 x2dclean:
-	$(RM) $(X2D) $(OBJ.X2D)
+	-$(RMDIR) $(X2D) $(OBJ.X2D) $(OUTDLL)/$(notdir $(INF.X2D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/x2d.dep

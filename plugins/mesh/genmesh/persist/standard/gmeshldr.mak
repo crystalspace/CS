@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GMESHLDR)
 endif
 
+INF.GMESHLDR = $(SRCDIR)/plugins/mesh/genmesh/persist/standard/gmeshldr.csplugin
 INC.GMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/standard/*.h))
 SRC.GMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/persist/standard/*.cpp))
 OBJ.GMESHLDR = $(addprefix $(OUT)/,$(notdir $(SRC.GMESHLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(GMESHLDR): $(OBJ.GMESHLDR) $(LIB.GMESHLDR)
 
 clean: gmeshldrclean
 gmeshldrclean:
-	-$(RM) $(GMESHLDR) $(OBJ.GMESHLDR)
+	-$(RMDIR) $(GMESHLDR) $(OBJ.GMESHLDR) $(OUTDLL)/$(notdir $(INF.GMESHLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/gmeshldr.dep

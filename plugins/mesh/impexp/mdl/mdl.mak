@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(MDLIE)
 endif
 
+INF.MDLIE = $(SRCDIR)/plugins/mesh/impexp/mdl/mdlie.csplugin
 INC.MDLIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/mdl/*.h))
 SRC.MDLIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/mdl/*.cpp))
 OBJ.MDLIE = $(addprefix $(OUT)/,$(notdir $(SRC.MDLIE:.cpp=$O)))
@@ -56,7 +57,7 @@ $(MDLIE): $(OBJ.MDLIE) $(LIB.MDLIE)
 
 clean: mdlieclean
 mdlieclean:
-	-$(RM) $(MDLIE) $(OBJ.MDLIE)
+	-$(RMDIR) $(MDLIE) $(OBJ.MDLIE) $(OUTDLL)/$(notdir $(INF.MDLIE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/mdlie.dep

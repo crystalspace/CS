@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPIRAL)
 endif
 
+INF.SPIRAL = $(SRCDIR)/plugins/mesh/spiral/object/spiral.csplugin
 INC.SPIRAL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/object/*.h plugins/mesh/partgen/*.h))
 SRC.SPIRAL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.SPIRAL = $(addprefix $(OUT)/,$(notdir $(SRC.SPIRAL:.cpp=$O)))
@@ -56,7 +57,7 @@ $(SPIRAL): $(OBJ.SPIRAL) $(LIB.SPIRAL)
 
 clean: spiralclean
 spiralclean:
-	-$(RM) $(SPIRAL) $(OBJ.SPIRAL)
+	-$(RMDIR) $(SPIRAL) $(OBJ.SPIRAL) $(OUTDLL)/$(notdir $(INF.SPIRAL))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/spiral.dep

@@ -37,6 +37,7 @@ endif
 
 DIR.PTANIMIMG = plugins/proctex/ptanimimg
 OUT.PTANIMIMG = $(OUT)/$(DIR.PTANIMIMG)
+INF.PTANIMIMG = $(SRCDIR)/$(DIR.PTANIMIMG)/ptanimimg.csplugin
 INC.PTANIMIMG = $(wildcard $(SRCDIR)/$(DIR.PTANIMIMG)/*.h)
 SRC.PTANIMIMG = $(wildcard $(SRCDIR)/$(DIR.PTANIMIMG)/*.cpp)
 OBJ.PTANIMIMG = $(addprefix $(OUT.PTANIMIMG)/,$(notdir $(SRC.PTANIMIMG:.cpp=$O)))
@@ -65,7 +66,7 @@ $(PTANIMIMG): $(OBJ.PTANIMIMG) $(LIB.PTANIMIMG)
 
 clean: ptanimimgclean
 ptanimimgclean:
-	$(RM) $(PTANIMIMG) $(OBJ.PTANIMIMG)
+	-$(RMDIR) $(PTANIMIMG) $(OBJ.PTANIMIMG) $(OUTDLL)/$(notdir $(INF.PTANIMIMG))
 
 cleandep: ptanimimgcleandep
 ptanimimgcleandep:

@@ -19832,18 +19832,13 @@ echo "${ECHO_T}no (assume MacOS/X)" >&6
 	cs_host_os_normalized='MacOS/X'
 	cs_header_text="${cs_header_text}#define OS_MACOSX
 "
-	cs_header_text="${cs_header_text}#define OS_MACOSX_PLUGIN_EXT \".csplugin\"
+	cs_header_text="${cs_header_text}#define CS_24BIT_PIXEL_LAYOUT CS_24BIT_PIXEL_ARGB
 "
-	cs_makefile_text="${cs_makefile_text}MACOSX.PLUGIN_EXT = .csplugin
-"
-    cs_jamconfig_text="${cs_jamconfig_text}MACOSX.PLUGIN_EXT ?= \".csplugin\" ;
-"
-	# We assume that we always have CoreAudio available on macosx
+
+	# We assume that we always have CoreAudio available on MacOS/X.
 	cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.AVAILABLE ?= \"yes\" ;
 "
 	cs_jamconfig_text="${cs_jamconfig_text}COREAUDIO.LFLAGS ?= \"-framework CoreAudio\" ;
-"
-	cs_header_text="${cs_header_text}#define CS_24BIT_PIXEL_LAYOUT CS_24BIT_PIXEL_ARGB
 "
 
 	echo "$as_me:$LINENO: checking for Objective-C compiler" >&5

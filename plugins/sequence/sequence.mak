@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SEQUENCE)
 endif
 
+INF.SEQUENCE = $(SRCDIR)/plugins/sequence/sequence.csplugin
 INC.SEQUENCE = $(wildcard $(addprefix $(SRCDIR)/,plugins/sequence/*.h))
 SRC.SEQUENCE = $(wildcard $(addprefix $(SRCDIR)/,plugins/sequence/*.cpp))
 OBJ.SEQUENCE = $(addprefix $(OUT)/,$(notdir $(SRC.SEQUENCE:.cpp=$O)))
@@ -65,7 +66,7 @@ $(SEQUENCE): $(OBJ.SEQUENCE) $(LIB.SEQUENCE)
 
 clean: sequenceclean
 sequenceclean:
-	$(RM) $(SEQUENCE) $(OBJ.SEQUENCE)
+	-$(RMDIR) $(SEQUENCE) $(OBJ.SEQUENCE) $(OUTDLL)/$(notdir $(INF.SEQUENCE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sequence.dep

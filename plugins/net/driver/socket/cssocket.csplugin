@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cssocket.csplugin -->
+<plugin>
+  <name>cssocket</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.network.driver.sockets</name>
+        <description>Crystal Space BSD Sockets Network Driver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

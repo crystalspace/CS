@@ -40,6 +40,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSSOCKET)
 endif
 
+INF.CSSOCKET = $(SRCDIR)/plugins/net/driver/socket/cssocket.csplugin
 INC.CSSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/socket/*.h))
 SRC.CSSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/socket/*.cpp))
 OBJ.CSSOCKET = $(addprefix $(OUT)/,$(notdir $(SRC.CSSOCKET:.cpp=$O)))
@@ -66,7 +67,7 @@ $(CSSOCKET): $(OBJ.CSSOCKET) $(LIB.CSSOCKET)
 
 clean: cssocketclean
 cssocketclean:
-	$(RM) $(CSSOCKET) $(OBJ.CSSOCKET)
+	-$(RMDIR) $(CSSOCKET) $(OBJ.CSSOCKET) $(OUTDLL)/$(notdir $(INF.CSSOCKET))
 
 ifdef DO_DEPEND
 depend: $(OUTOS)/socket.dep

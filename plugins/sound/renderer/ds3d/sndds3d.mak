@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDDS3D)
 endif
 
+INF.SNDDS3D = $(SRCDIR)/plugins/sound/renderer/ds3d/sndds3d.csplugin
 INC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/renderer/ds3d/*.h plugins/sound/renderer/common/*.h))
 SRC.SNDDS3D = $(wildcard $(addprefix $(SRCDIR)/, \
@@ -65,7 +66,7 @@ $(SNDDS3D): $(OBJ.SNDDS3D) $(LIB.SNDDS3D)
 
 clean: sndds3dclean
 sndds3dclean:
-	$(RM) $(SNDDS3D) $(OBJ.SNDDS3D)
+	-$(RMDIR) $(SNDDS3D) $(OBJ.SNDDS3D) $(OUTDLL)/$(notdir $(INF.SNDDS3D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndds3d.dep

@@ -37,6 +37,7 @@ endif
 
 DIR.PHYSLDR = plugins/physics/loader
 OUT.PHYSLDR = $(OUT)/$(DIR.PHYSLDR)
+INF.PHYSLDR = $(SRCDIR)/$(DIR.PHYSLDR)/physldr.csplugin
 INC.PHYSLDR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PHYSLDR)/*.h))
 SRC.PHYSLDR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.PHYSLDR)/*.cpp))
 OBJ.PHYSLDR = $(addprefix $(OUT.PHYSLDR)/,$(notdir $(SRC.PHYSLDR:.cpp=$O)))
@@ -66,7 +67,7 @@ $(PHYSLDR): $(OBJ.PHYSLDR) $(LIB.PHYSLDR)
 
 clean: physldrclean
 physldrclean:
-	-$(RM) $(PHYSLDR) $(OBJ.PHYSLDR)
+	-$(RMDIR) $(PHYSLDR) $(OBJ.PHYSLDR) $(OUTDLL)/$(notdir $(INF.PHYSLDR))
 
 cleandep: physldrcleandep
 physldrcleandep:

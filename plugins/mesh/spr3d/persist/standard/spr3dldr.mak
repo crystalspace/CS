@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPR3DLDR)
 endif
 
+INF.SPR3DLDR = $(SRCDIR)/plugins/mesh/spr3d/persist/standard/spr3dldr.csplugin
 INC.SPR3DLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/persist/standard/*.h))
 SRC.SPR3DLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/persist/standard/*.cpp))
 OBJ.SPR3DLDR = $(addprefix $(OUT)/,$(notdir $(SRC.SPR3DLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(SPR3DLDR): $(OBJ.SPR3DLDR) $(LIB.SPR3DLDR)
 
 clean: spr3dldrclean
 spr3dldrclean:
-	-$(RM) $(SPR3DLDR) $(OBJ.SPR3DLDR)
+	-$(RMDIR) $(SPR3DLDR) $(OBJ.SPR3DLDR) $(OUTDLL)/$(notdir $(INF.SPR3DLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/spr3dldr.dep

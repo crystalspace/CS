@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- netman.csplugin -->
+<plugin>
+  <name>netman</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.network.manager.standard</name>
+        <description>Crystal Space Standard Network Manager</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

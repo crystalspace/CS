@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSWALIMG)
 endif
 
+INF.CSWALIMG = $(SRCDIR)/plugins/video/loader/wal/cswalimg.csplugin
 INC.CSWALIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/wal/*.h))
 SRC.CSWALIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/wal/*.cpp))
 
@@ -63,7 +64,7 @@ $(CSWALIMG): $(OBJ.CSWALIMG) $(LIB.CSWALIMG)
 
 clean: cswalimgclean
 cswalimgclean:
-	$(RM) $(CSWALIMG) $(OBJ.CSWALIMG)
+	-$(RMDIR) $(CSWALIMG) $(OBJ.CSWALIMG) $(OUTDLL)/$(notdir $(INF.CSWALIMG))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/walimg.dep

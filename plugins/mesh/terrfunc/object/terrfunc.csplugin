@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- terrfunc.csplugin -->
+<plugin>
+  <name>terrfunc</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.terrfunc</name>
+        <description>Crystal Space Function Terrain Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPR2D)
 endif
 
+INF.SPR2D = $(SRCDIR)/plugins/mesh/spr2d/object/spr2d.csplugin
 INC.SPR2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr2d/object/*.h))
 SRC.SPR2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr2d/object/*.cpp))
 OBJ.SPR2D = $(addprefix $(OUT)/,$(notdir $(SRC.SPR2D:.cpp=$O)))
@@ -56,7 +57,7 @@ $(SPR2D): $(OBJ.SPR2D) $(LIB.SPR2D)
 
 clean: spr2dclean
 spr2dclean:
-	-$(RM) $(SPR2D) $(OBJ.SPR2D)
+	-$(RMDIR) $(SPR2D) $(OBJ.SPR2D) $(OUTDLL)/$(notdir $(INF.SPR2D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/spr2d.dep

@@ -34,6 +34,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(FONTPLEX)
 endif
 
+INF.FONTPLEX = $(SRCDIR)/plugins/font/server/fontplex/fontplex.csplugin
 INC.FONTPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/fontplex/*.h))
 SRC.FONTPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/fontplex/*.cpp))
 OBJ.FONTPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.FONTPLEX:.cpp=$O)))
@@ -55,7 +56,7 @@ $(FONTPLEX): $(OBJ.FONTPLEX) $(LIB.FONTPLEX)
 
 clean: fontplexclean
 fontplexclean:
-	-$(RM) $(FONTPLEX) $(OBJ.FONTPLEX)
+	-$(RMDIR) $(FONTPLEX) $(OBJ.FONTPLEX) $(OUTDLL)/$(notdir $(INF.FONTPLEX))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/fontplex.dep

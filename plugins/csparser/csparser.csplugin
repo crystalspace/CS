@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!-- csparser.csplugin -->
+<plugin>
+  <name>csparser</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.level.loader</name>
+        <description>Level and library file loader</description>
+        <requires>
+          <class>crystalspace.kernel.</class>
+          <class>crystalspace.sound.loader.</class>
+          <class>crystalspace.image.loader</class>
+          <class>crystalspace.mesh.loader.</class>
+          <class>crystalspace.engine.3d</class>
+          <class>crystalspace.graphics3d.</class>
+          <class>crystalspace.sound.render.</class>
+          <class>crystalspace.motion.manager.</class>
+          <class>crystalspace.mesh.crossbuilder</class>
+          <class>crystalspace.modelconverter.</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.checkerboard</name>
+        <description>Checkerboard texture loader</description>
+        <requires>
+          <class>crystalspace.level.loader</class>
+        </requires>
+      </class>
+      <class>
+        <name>crystalspace.texture.loader.image</name>
+        <description>Image texture loader</description>
+        <requires>
+          <class>crystalspace.level.loader</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(LGHTNG)
 endif
 
+INF.LGHTNG = $(SRCDIR)/plugins/mesh/lghtng/object/lghtng.csplugin
 INC.LGHTNG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/lghtng/object/*.h))
 SRC.LGHTNG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/lghtng/object/*.cpp))
 OBJ.LGHTNG = $(addprefix $(OUT)/,$(notdir $(SRC.LGHTNG:.cpp=$O)))
@@ -56,7 +57,7 @@ $(LGHTNG): $(OBJ.LGHTNG) $(LIB.LGHTNG)
 
 clean: lghtngclean
 lghtngclean:
-	-$(RM) $(LGHTNG) $(OBJ.LGHTNG)
+	-$(RMDIR) $(LGHTNG) $(OBJ.LGHTNG) $(OUTDLL)/$(notdir $(INF.LGHTNG))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/lghtng.dep

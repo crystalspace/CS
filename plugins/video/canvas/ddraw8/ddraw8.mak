@@ -46,6 +46,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(DDRAW8)
 endif
 
+INF.DDRAW8 = $(SRCDIR)/plugins/video/canvas/ddraw8/ddraw8.csplugin
 INC.DDRAW8 = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/canvas/ddraw8/*.h plugins/video/canvas/directxcommon/*.h \
   $(INC.COMMON.DRV2D)))
@@ -73,7 +74,7 @@ $(DDRAW8): $(OBJ.DDRAW8) $(LIB.DDRAW8)
 
 clean: ddraw8clean
 ddraw8clean:
-	$(RM) $(DDRAW8) $(OBJ.DDRAW8)
+	-$(RMDIR) $(DDRAW8) $(OBJ.DDRAW8) $(OUTDLL)/$(notdir $(INF.DDRAW8))
 
 ifdef DO_DEPEND
 depend: $(OUTOS)/ddraw8.dep

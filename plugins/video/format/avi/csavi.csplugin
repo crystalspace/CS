@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- csavi.csplugin -->
+<plugin>
+  <name>csavi</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.video.format.avi</name>
+        <description>CrystalSpace AVI format interface</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -33,6 +33,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(IE3DS)
 endif
 
+INF.IE3DS = $(SRCDIR)/plugins/mesh/impexp/3ds/ie3ds.csplugin
 INC.IE3DS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/3ds/*.h))
 SRC.IE3DS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/3ds/*.cpp))
 OBJ.IE3DS = $(addprefix $(OUT)/,$(notdir $(SRC.IE3DS:.cpp=$O)))
@@ -60,7 +61,7 @@ $(OUT)/%$O: $(SRCDIR)/plugins/mesh/impexp/3ds/%.cpp
 
 clean: ie3dsclean
 ie3dsclean:
-	-$(RM) $(IE3DS) $(OBJ.IE3DS)
+	-$(RMDIR) $(IE3DS) $(OBJ.IE3DS) $(OUTDLL)/$(notdir $(INF.IE3DS))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/ie3ds.dep

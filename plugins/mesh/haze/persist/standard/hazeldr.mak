@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(HAZELDR)
 endif
 
+INF.HAZELDR = $(SRCDIR)/plugins/mesh/haze/persist/standard/hazeldr.csplugin
 INC.HAZELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/persist/standard/*.h))
 SRC.HAZELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/persist/standard/*.cpp))
 OBJ.HAZELDR = $(addprefix $(OUT)/,$(notdir $(SRC.HAZELDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(HAZELDR): $(OBJ.HAZELDR) $(LIB.HAZELDR)
 
 clean: hazeldrclean
 hazeldrclean:
-	-$(RM) $(HAZELDR) $(OBJ.HAZELDR)
+	-$(RMDIR) $(HAZELDR) $(OBJ.HAZELDR) $(OUTDLL)/$(notdir $(INF.HAZELDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/hazeldr.dep

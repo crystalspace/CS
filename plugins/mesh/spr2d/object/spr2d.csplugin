@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- spr2d.csplugin -->
+<plugin>
+  <name>spr2d</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.sprite.2d</name>
+        <description>Crystal Space Sprite2D Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

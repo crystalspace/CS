@@ -43,6 +43,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLSHADER_ARB)
 endif
 
+INF.GLSHADER_ARB = $(SRCDIR)/plugins/video/render3d/shaderplugins/glshader_arb/glshader_arb.csplugin
 INC.GLSHADER_ARB = \
   $(wildcard plugins/video/render3d/shaderplugins/glshader_arb/*.h) 
 SRC.GLSHADER_ARB = \
@@ -80,7 +81,7 @@ $(GLSHADER_ARB): $(OBJ.GLSHADER_ARB) $(LIB.GLSHADER_ARB)
 	$(DO.PLUGIN.POSTAMBLE)
 
 glshader_arbclean:
-	$(RM) $(GLSHADER_ARB) $(OBJ.GLSHADER_ARB)
+	-$(RMDIR) $(GLSHADER_ARB) $(OBJ.GLSHADER_ARB) $(OUTDLL)/$(notdir $(INF.GLSHADER_ARB))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/glshader_arb.dep

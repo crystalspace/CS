@@ -43,6 +43,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(OSSDRV)
 endif
 
+INF.OSSDRV = $(SRCDIR)/plugins/sound/driver/oss/ossdrv.csplugin
 INC.OSSDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/oss/*.h))
 SRC.OSSDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/oss/*.cpp))
 OBJ.OSSDRV = $(addprefix $(OUT)/,$(notdir $(SRC.OSSDRV:.cpp=$O)))
@@ -62,7 +63,7 @@ $(OSSDRV): $(OBJ.OSSDRV) $(LIB.OSSDRV)
 
 clean: ossdrvclean
 ossdrvclean:
-	$(RM) $(OSSDRV) $(OBJ.OSSDRV)
+	-$(RMDIR) $(OSSDRV) $(OBJ.OSSDRV) $(OUTDLL)/$(notdir $(INF.OSSDRV))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/oss.dep

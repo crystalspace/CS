@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(REPORTER)
 endif
 
+INF.REPORTER = $(SRCDIR)/plugins/reporter/reporter.csplugin
 INC.REPORTER = $(wildcard $(addprefix $(SRCDIR)/,plugins/reporter/*.h))
 SRC.REPORTER = $(wildcard $(addprefix $(SRCDIR)/,plugins/reporter/*.cpp))
 OBJ.REPORTER = $(addprefix $(OUT)/,$(notdir $(SRC.REPORTER:.cpp=$O)))
@@ -65,7 +66,7 @@ $(REPORTER): $(OBJ.REPORTER) $(LIB.REPORTER)
 
 clean: reporterclean
 reporterclean:
-	$(RM) $(REPORTER) $(OBJ.REPORTER)
+	-$(RMDIR) $(REPORTER) $(OBJ.REPORTER) $(OUTDLL)/$(notdir $(INF.REPORTER))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/reporter.dep

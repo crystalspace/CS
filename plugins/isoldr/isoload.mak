@@ -37,6 +37,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(ISOLOAD)
 endif
 
+INF.ISOLOAD = $(SRCDIR)/plugins/isoldr/isoload.csplugin
 INC.ISOLOAD = $(wildcard $(addprefix $(SRCDIR)/,plugins/isoldr/*.h))
 SRC.ISOLOAD = $(wildcard $(addprefix $(SRCDIR)/,plugins/isoldr/*.cpp))
 OBJ.ISOLOAD = $(addprefix $(OUT)/,$(notdir $(SRC.ISOLOAD:.cpp=$O)))
@@ -58,7 +59,7 @@ $(ISOLOAD): $(OBJ.ISOLOAD) $(LIB.ISOLOAD)
 
 clean: isoloadclean
 isoloadclean:
-	-$(RM) $(ISOLOAD) $(OBJ.ISOLOAD)
+	-$(RMDIR) $(ISOLOAD) $(OBJ.ISOLOAD) $(OUTDLL)/$(notdir $(INF.ISOLOAD))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/isoload.dep

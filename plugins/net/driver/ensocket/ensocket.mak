@@ -40,6 +40,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(ENSOCKET)
 endif
 
+INF.ENSOCKET = $(SRCDIR)/plugins/net/driver/ensocket/ensocket.csplugin
 INC.ENSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/ensocket/*.h))
 SRC.ENSOCKET = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/driver/ensocket/*.cpp))
 OBJ.ENSOCKET = $(addprefix $(OUT)/,$(notdir $(SRC.ENSOCKET:.cpp=$O)))
@@ -64,7 +65,7 @@ $(ENSOCKET): $(OBJ.ENSOCKET) $(LIB.ENSOCKET)
 
 clean: ensocketclean
 ensocketclean:
-	$(RM) $(ENSOCKET) $(OBJ.ENSOCKET)
+	-$(RMDIR) $(ENSOCKET) $(OBJ.ENSOCKET) $(OUTDLL)/$(notdir $(INF.ENSOCKET))
 
 ifdef DO_DEPEND
 depend: $(OUTOS)/ensocket.dep

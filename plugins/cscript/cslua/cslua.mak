@@ -61,6 +61,7 @@ SWIG.INTERFACE = $(SRCDIR)/include/ivaria/cs.i
 SWIG.CSLUA = $(SRCDIR)/plugins/cscript/cslua/cs_lua.cpp
 SWIG.CSLUA.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSLUA:.cpp=$O)))
 
+INF.CSLUA = $(SRCDIR)/plugins/cscript/cslua/cslua.csplugin
 INC.CSLUA = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/cslua/*.h))
 SRC.CSLUA = \
   $(sort $(wildcard $(SRCDIR)/plugins/cscript/cslua/*.cpp) $(SWIG.CSLUA))
@@ -105,7 +106,7 @@ $(CSLUA): $(OBJ.CSLUA) $(LIB.CSLUA)
 	$(DO.PLUGIN.POSTAMBLE)
 
 csluaclean:
-	-$(RM) $(CSLUA) $(OBJ.CSLUA)
+	-$(RMDIR) $(CSLUA) $(OBJ.CSLUA) $(OUTDLL)/$(notdir $(INF.CSLUA))
 
 csluaswig: csluaswigclean cslua
 

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(OPCODE)
 endif
 
+INF.OPCODE = $(SRCDIR)/plugins/collide/opcode/opcode.csplugin
 INC.OPCODE = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/opcode/*.h))
 SRC.OPCODE = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/opcode/*.cpp))
 OBJ.OPCODE = $(addprefix $(OUT)/,$(notdir $(SRC.OPCODE:.cpp=$O)))
@@ -56,7 +57,7 @@ $(OPCODE): $(OBJ.OPCODE) $(LIB.OPCODE)
 
 clean: opcodeclean
 opcodeclean:
-	-$(RM) $(OPCODE) $(OBJ.OPCODE)
+	-$(RMDIR) $(OPCODE) $(OBJ.OPCODE) $(OUTDLL)/$(notdir $(INF.OPCODE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/opcode.dep

@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDWAV)
 endif
 
+INF.SNDWAV = $(SRCDIR)/plugins/sound/loader/wav/sndwav.csplugin
 INC.SNDWAV = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/loader/wav/*.h plugins/sound/loader/common/*.h))
 SRC.SNDWAV = $(wildcard $(addprefix $(SRCDIR)/, \
@@ -64,7 +65,7 @@ $(SNDWAV): $(OBJ.SNDWAV) $(LIB.SNDWAV)
 
 clean: sndwavclean
 sndwavclean:
-	$(RM) $(SNDWAV) $(OBJ.SNDWAV)
+	-$(RMDIR) $(SNDWAV) $(OBJ.SNDWAV) $(OUTDLL)/$(notdir $(INF.SNDWAV))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndwav.dep

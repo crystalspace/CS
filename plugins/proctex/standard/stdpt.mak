@@ -37,6 +37,7 @@ endif
 
 DIR.STDPT = plugins/proctex/standard
 OUT.STDPT = $(OUT)/$(DIR.STDPT)
+INF.STDPT = $(SRCDIR)/$(DIR.STDPT)/stdpt.csplugin
 INC.STDPT = $(wildcard $(SRCDIR)/$(DIR.STDPT)/*.h)
 SRC.STDPT = $(wildcard $(SRCDIR)/$(DIR.STDPT)/*.cpp)
 OBJ.STDPT = $(addprefix $(OUT.STDPT)/,$(notdir $(SRC.STDPT:.cpp=$O)))
@@ -65,7 +66,7 @@ $(STDPT): $(OBJ.STDPT) $(LIB.STDPT)
 
 clean: stdptclean
 stdptclean:
-	$(RM) $(STDPT) $(OBJ.STDPT)
+	-$(RMDIR) $(STDPT) $(OBJ.STDPT) $(OUTDLL)/$(notdir $(INF.STDPT))
 
 cleandep: stdptcleandep
 stdptcleandep:

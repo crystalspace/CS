@@ -1315,12 +1315,11 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
 	CS_HEADER_PROPERTY([OS_MACOSX])
-	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_EXT],[AS_ESCAPE([".csplugin"])])
-	CS_BUILD_PROPERTY([MACOSX.PLUGIN_EXT], [.csplugin])
-	# We assume that we always have CoreAudio available on macosx
+	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT], [CS_24BIT_PIXEL_ARGB])
+
+	# We assume that we always have CoreAudio available on MacOS/X.
 	CS_JAMCONFIG_PROPERTY([COREAUDIO.AVAILABLE], [yes])
 	CS_JAMCONFIG_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])
-	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT], [CS_24BIT_PIXEL_ARGB])
 
 	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
 	    [cs_cv_prog_objc="$CC"])

@@ -48,6 +48,16 @@
 #	  which this module depends.  Each item in this list is the core name
 #	  of some other module, such as "CSGEOM", "CSUTIL", or "CSSYS".
 #
+#	o INF.PROJECT -- The meta-data file for this project.  This optional
+#	  file contains information related to this project which can be
+#	  accessed at run-time.  For example, for plugin modules, the meta-data
+#	  file (in XML format) contains information about the SCF classes
+#	  published by the plugin, in addition to other information the plugin
+#	  might want to publish.  Typically, the meta-data file has the same
+#	  basename as the generated target (see DSP.PROJECT.NAME), but with a
+#	  different file extension.  For instance, .csplugin is the extension
+#	  used for meta-data files for plugin modules.
+#
 #	o CFG.PROJECT -- List of configuration files related to this module.
 #
 #	Furthermore, the following variables specifically control DSW and
@@ -173,6 +183,7 @@
 #	  alter its behavior.  For instance, in rare circumstances, a makefile
 #	  may need to use a different $(wildcard) expression during the
 #	  generation process.
+#
 #	o MSVCGEN_VERSION is either '6' or '7' and is used internally to
 #	  determine the right behaviour for either MSVC 6 or 7 projects.
 #
@@ -368,6 +379,10 @@ MSVC.MERGERC = $(MSVC.MERGERC.$(DSP.$*.TYPE))
 MSVC.CONTENTS = $(subst $(SRCDIR)/,, \
   $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) $(MSVC.VERSIONRC.CVS))
 
+# Macro to compose the optional --meta-file option from INF.PROJECT.
+MSVC.METAFILE.DIRECTIVE = \
+  $(subst $(SRCDIR)/,,$(foreach m,$(INF.$*),--meta-file=$m))
+
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
 # DEP.PROJECT, and MSVC.DEPEND.TYPE where "PROJECT" represents the current
@@ -469,7 +484,6 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 	$(MSVC.SILENT)$(MSVCGEN) \
 	--quiet \
 	--project \
-	$(MSVCGEN.EXTRA) \
 	--project-extension=$(MSVC.EXT.PROJECT) \
 	--name=$(DSP.$*.NAME) \
 	--template=$(DSP.$*.TYPE) \
@@ -477,10 +491,12 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 	--project-name=$(MSVC.PROJECT) \
 	--output=$(MSVC.OUTPUT) \
 	--fragment=$(MSVC.FRAGMENT) \
+	$(MSVC.METAFILE.DIRECTIVE) \
 	$(MSVC.DEPEND.DIRECTIVES) \
 	$(MSVC.LIBRARY.DIRECTIVES) \
 	$(MSVC.LFLAGS.DIRECTIVE) \
 	$(MSVC.CFLAGS.DIRECTIVE) \
+	$(MSVCGEN.EXTRA) \
 	$(MSVC.CONTENTS)
 
 # Build the project-wide workspace file (csall.dsw/.sln).
@@ -488,10 +504,10 @@ workspacegen:
 	$(MSVC.SILENT)$(MSVCGEN) \
 	--quiet \
 	--workspace \
-	$(MSVCGEN.EXTRA) \
 	--workspace-extension=$(MSVC.EXT.WORKSPACE) \
 	--output=$(MSVC.OUT.DIR)/$(MSVC.WORKSPACE) \
 	--template-dir=$(MSVC.TEMPLATE.DIR) \
+	$(MSVCGEN.EXTRA) \
 	$(MSVC.FRAG.FILES)
 
 # Build all Visual C++ DSW/SLN workspace and DSP/VCPROJ project files.  The

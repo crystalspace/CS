@@ -2,7 +2,7 @@
 # Rules for installation
 #============================================================================
 
-# override crappy jam defaults
+# Override Jam defaults.
 EXEMODE = 0755 ;
 FILEMODE = 0644 ;
 
@@ -49,27 +49,45 @@ rule InstallApplicationConsole
 
 
 ##  InstallPlugin pluginname [ : subdir ]
-##    Install a plugin into the plugindir directory. A subdirectory relative
-##    to the plugindir can be specified. After installing the plugin a .scf
-##    file with metainformation about the plugin is generated.
-##    This rule is already invoked by the Plugin rule, so usually there's no
-##    need to call it manually.
+##    Install a plugin into the plugindir directory.  A subdirectory relative
+##    to the plugindir can be specified.  This rule is already invoked by the
+##    Plugin rule, so usually there's no need to call it manually.
 rule InstallPlugin
 {
   local dir = [ FDirName $(INSTALLDIR.PLUGIN) $(2) ] ;
   local target = $(<:R=$(dir):G=install) ;
 
-  Install $(target) : $(<) ;
-  MODE on $(target) = $(EXEMODE) ;
-  
+  InstallPluginPlatform $(target) : $(<) ;
+  Depends install_plugins : $(target) ;
+
+  # @@@ Remove this once new .csplugins are utilized.  Presently, .csplugin
+  # files are present, but not consulted at run-time.
   if $(CMD.SCFREG)
   {
     local scf = $(<:R=$(dir):S=.scf:G=installscf) ;
     ScfFileGen $(scf) : $(target) ;
     Depends install_plugins : $(scf) ;
   }
+}
 
-  Depends install_plugins : $(target) ;
+##  InstallPluginPlatform installplugin : plugin
+##    Utility rule for InstallPlugin which performs the actual installation.
+##    This default implementations invokes the Install rule for the plugin
+##    executable and the associated meta-data file.  Platforms with special
+##    installation requirements may override this implementation.  (For
+##    example, a platform on which the meta-data information is bundled within
+##    the plugin itself, could simply install the plugin, without having to
+##    deal with an external meta-data file.)
+rule InstallPluginPlatform
+{
+  Install $(<) : $(>) ;
+  MODE on $(<) = $(EXEMODE) ;
+  
+  local metasrc = $(>:S=$(SUFMETA):G=$(GRISTMETA)) ;
+  local metadst = $(metasrc:R=$(dir):G=installmeta) ;
+  Install $(metadst) : $(metasrc) ;
+  MODE on $(metadst) = $(FILEMODE) ;
+  Depends install_plugins : $(metadst) ;
 }
 
 ##  InstallLibrary libraryname [ : subdir ]
@@ -275,6 +293,8 @@ actions Install
   $(CMD.INSTALL) -m$(MODE) $(>) $(<) $(INSTALLFLAGS) ;
 }
 
+# @@@ Remove this rule once new .csplugins are utilized.  Presently, .csplugin
+# files are present, but not consulted at run-time.
 rule ScfFileGen
 {
   Depends $(<) : $(>) ;
@@ -289,10 +309,3 @@ actions CopyDirs
 {
   cp -R $(>) $(<)
 }
-
-# disabled for now as this doesn't work reliable yet
-#actions CsLight
-#{
-#  unset CRYSTAL
-#  $(BINDIR)/cslight $(<)
-#}

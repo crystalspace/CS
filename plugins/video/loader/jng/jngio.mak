@@ -38,6 +38,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSJNGIMG)
 endif
 
+INF.CSJNGIMG = $(SRCDIR)/plugins/video/loader/jng/csjngimg.csplugin
 INC.CSJNGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jng/*.h))
 SRC.CSJNGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jng/*.cpp))
 
@@ -70,7 +71,7 @@ $(CSJNGIMG): $(OBJ.CSJNGIMG) $(LIB.CSJNGIMG)
 
 clean: csjngimgclean
 csjngimgclean:
-	$(RM) $(CSJNGIMG) $(OBJ.CSJNGIMG)
+	-$(RMDIR) $(CSJNGIMG) $(OBJ.CSJNGIMG) $(OUTDLL)/$(notdir $(INF.CSJNGIMG))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/jngimg.dep

@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(ENGSEQ)
 endif
 
+INF.ENGSEQ = $(SRCDIR)/plugins/engseq/engseq.csplugin
 INC.ENGSEQ = $(wildcard $(addprefix $(SRCDIR)/,plugins/engseq/*.h))
 SRC.ENGSEQ = $(wildcard $(addprefix $(SRCDIR)/,plugins/engseq/*.cpp))
 OBJ.ENGSEQ = $(addprefix $(OUT)/,$(notdir $(SRC.ENGSEQ:.cpp=$O)))
@@ -65,7 +66,7 @@ $(ENGSEQ): $(OBJ.ENGSEQ) $(LIB.ENGSEQ)
 
 clean: engseqclean
 engseqclean:
-	$(RM) $(ENGSEQ) $(OBJ.ENGSEQ)
+	-$(RMDIR) $(ENGSEQ) $(OBJ.ENGSEQ) $(OUTDLL)/$(notdir $(INF.ENGSEQ))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/engseq.dep

@@ -45,6 +45,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(XEXTSHM)
 endif
 
+INF.XEXTSHM = $(SRCDIR)/plugins/video/canvas/xextshm/xextshm.csplugin
 INC.XEXTSHM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextshm/*.h))
 SRC.XEXTSHM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextshm/*.cpp))
 OBJ.XEXTSHM = $(addprefix $(OUT)/,$(notdir $(SRC.XEXTSHM:.cpp=$O)))
@@ -67,7 +68,7 @@ $(XEXTSHM): $(OBJ.XEXTSHM) $(LIB.XEXTSHM)
 
 clean: xextshmclean
 xextshmclean:
-	$(RM) $(XEXTSHM) $(OBJ.XEXTSHM)
+	-$(RMDIR) $(XEXTSHM) $(OBJ.XEXTSHM) $(OUTDLL)/$(notdir $(INF.XEXTSHM))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/xextshm.dep

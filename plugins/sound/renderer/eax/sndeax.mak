@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDEAX)
 endif
 
+INF.SNDEAX = $(SRCDIR)/plugins/sound/renderer/eax/sndeax.csplugin
 INC.SNDEAX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/renderer/eax/*.h) \)
   $(wildcard plugins/sound/renderer/common/*.h)
 SRC.SNDEAX = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/renderer/eax/*.cpp) \)
@@ -65,7 +66,7 @@ $(SNDEAX): $(OBJ.SNDEAX) $(LIB.SNDEAX)
 
 clean: sndeaxclean
 sndeaxclean:
-	$(RM) $(SNDEAX) $(OBJ.SNDEAX)
+	-$(RMDIR) $(SNDEAX) $(OBJ.SNDEAX) $(OUTDLL)/$(notdir $(INF.SNDEAX))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndeax.dep

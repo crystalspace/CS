@@ -130,6 +130,7 @@ TO_INSTALL.EXE += $(FOOBAR.EXE)
 # This section defines files used by this module.
 DIR.FOOBAR = path/to/foobar
 OUT.FOOBAR = $(OUT)/$(DIR.FOOBAR)
+INF.FOOBAR = $(SRCDIR)/$(DIR.FOOBAR)/foobar.csplugin
 INC.FOOBAR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.FOOBAR)/*.h))
 SRC.FOOBAR = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.FOOBAR)/*.cpp))
 OBJ.FOOBAR = $(addprefix $(OUT.FOOBAR)/,$(notdir $(SRC.FOOBAR:.cpp=$O)))
@@ -198,7 +199,7 @@ foobarclean:
 # Cleanup generated resources for plugins (omit for applications)
 clean: foobarclean
 foobarclean:
-	$(RM) $(FOOBAR) $(OBJ.FOOBAR)
+	-$(RMDIR) $(FOOBAR) $(OBJ.FOOBAR) $(OUTDLL)/$(notdir $(INF.FOOBAR))
 
 # This takes care of creating and including the dependency file.
 cleandep: foobarcleandep

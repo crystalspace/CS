@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- engseq.csplugin -->
+<plugin>
+  <name>engseq</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.sequence.engine</name>
+        <description>Engine Sequence Manager</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

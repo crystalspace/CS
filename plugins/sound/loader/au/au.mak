@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDAU)
 endif
 
+INF.SNDAU = $(SRCDIR)/plugins/sound/loader/au/sndau.csplugin
 INC.SNDAU = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/loader/au/*.h plugins/sound/loader/common/*.h))
 SRC.SNDAU = $(wildcard $(addprefix $(SRCDIR)/, \
@@ -64,7 +65,7 @@ $(SNDAU): $(OBJ.SNDAU) $(LIB.SNDAU)
 
 clean: sndauclean
 sndauclean:
-	$(RM) $(SNDAU) $(OBJ.SNDAU)
+	-$(RMDIR) $(SNDAU) $(OBJ.SNDAU) $(OUTDLL)/$(notdir $(INF.SNDAU))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndau.dep

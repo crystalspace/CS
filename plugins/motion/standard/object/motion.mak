@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(MOTION)
 endif
 
+INF.MOTION = $(SRCDIR)/plugins/motion/standard/object/motion.csplugin
 INC.MOTION = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/object/*.h))
 SRC.MOTION = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/object/*.cpp))
 OBJ.MOTION = $(addprefix $(OUT)/,$(notdir $(SRC.MOTION:.cpp=$O)))
@@ -62,7 +63,7 @@ $(MOTION): $(OBJ.MOTION) $(LIB.MOTION)
 
 clean: motionclean
 motionclean:
-	$(RM) $(MOTION) $(OBJ.MOTION)
+	-$(RMDIR) $(MOTION) $(OBJ.MOTION) $(OUTDLL)/$(notdir $(INF.MOTION))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/motion.dep

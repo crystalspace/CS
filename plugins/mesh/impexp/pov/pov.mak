@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(POVIE)
 endif
 
+INF.POVIE = $(SRCDIR)/plugins/mesh/impexp/pov/povie.csplugin
 INC.POVIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/pov/*.h))
 SRC.POVIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/pov/*.cpp))
 OBJ.POVIE = $(addprefix $(OUT)/,$(notdir $(SRC.POVIE:.cpp=$O)))
@@ -56,7 +57,7 @@ $(POVIE): $(OBJ.POVIE) $(LIB.POVIE)
 
 clean: povieclean
 povieclean:
-	-$(RM) $(POVIE) $(OBJ.POVIE)
+	-$(RMDIR) $(POVIE) $(OBJ.POVIE) $(OUTDLL)/$(notdir $(INF.POVIE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/povie.dep

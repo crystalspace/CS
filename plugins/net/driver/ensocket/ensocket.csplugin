@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- ensocket.csplugin -->
+<plugin>
+  <name>ensocket</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.network.driver.sockets2</name>
+        <description>Crystal Space TCP/IP-specific network driver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

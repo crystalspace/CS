@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- thing.csplugin -->
+<plugin>
+  <name>thing</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.thing</name>
+        <description>Crystal Space Thing Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

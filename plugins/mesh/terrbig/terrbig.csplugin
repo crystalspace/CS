@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- terrbig.csplugin -->
+<plugin>
+  <name>terrbig</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.terrbig</name>
+        <description>Crystal Space Big Terrain Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

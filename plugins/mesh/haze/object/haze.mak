@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(HAZE)
 endif
 
+INF.HAZE = $(SRCDIR)/plugins/mesh/haze/object/haze.csplugin
 INC.HAZE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/object/*.h))
 SRC.HAZE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/haze/object/*.cpp))
 OBJ.HAZE = $(addprefix $(OUT)/,$(notdir $(SRC.HAZE:.cpp=$O)))
@@ -56,7 +57,7 @@ $(HAZE): $(OBJ.HAZE) $(LIB.HAZE)
 
 clean: hazeclean
 hazeclean:
-	-$(RM) $(HAZE) $(OBJ.HAZE)
+	-$(RMDIR) $(HAZE) $(OBJ.HAZE) $(OUTDLL)/$(notdir $(INF.HAZE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/haze.dep

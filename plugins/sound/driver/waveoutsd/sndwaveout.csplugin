@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- sndwaveout.csplugin -->
+<plugin>
+  <name>sndwaveout</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sound.driver.waveout</name>
+        <description>Crystal Space waveOut Sound Driver</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

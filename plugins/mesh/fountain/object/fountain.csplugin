@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- fountain.csplugin -->
+<plugin>
+  <name>fountain</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.fountain</name>
+        <description>Crystal Space Fountain Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

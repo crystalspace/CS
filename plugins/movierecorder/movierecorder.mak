@@ -42,6 +42,7 @@ endif
 
 DIR.MOVIERECORDER = plugins/movierecorder
 OUT.MOVIERECORDER = $(OUT)/$(DIR.MOVIERECORDER)
+INF.MOVIERECORDER = $(SRCDIR)/$(DIR.MOVIERECORDER)/movierecorder.csplugin
 INC.MOVIERECORDER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MOVIERECORDER)/*.h))
 SRC.MOVIERECORDER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.MOVIERECORDER)/*.cpp) )
 OBJ.MOVIERECORDER = \
@@ -74,7 +75,7 @@ $(MOVIERECORDER): $(OBJ.MOVIERECORDER) $(LIB.MOVIERECORDER)
 
 clean: movierecorderclean
 movierecorderclean:
-	-$(RM) $(MOVIERECORDER) $(OBJ.MOVIERECORDER)
+	-$(RMDIR) $(MOVIERECORDER) $(OBJ.MOVIERECORDER) $(OUTDLL)/$(notdir $(INF.MOVIERECORDER))
 
 cleandep: movierecordercleandep
 movierecordercleandep:

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- memory.csplugin -->
+<plugin>
+  <name>memory</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.memory</name>
+        <description>Crystal Space Image Exporter</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

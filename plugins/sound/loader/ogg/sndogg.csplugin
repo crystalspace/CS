@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- sndogg.csplugin -->
+<plugin>
+  <name>sndogg</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sound.loader.ogg</name>
+        <description>Ogg Vorbis Sound Loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

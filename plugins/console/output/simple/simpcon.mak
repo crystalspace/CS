@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SIMPCON)
 endif
 
+INF.SIMPCON = $(SRCDIR)/plugins/console/output/simple/simpcon.csplugin
 INC.SIMPCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/simple/*.h))
 SRC.SIMPCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/simple/*.cpp))
 OBJ.SIMPCON = $(addprefix $(OUT)/,$(notdir $(SRC.SIMPCON:.cpp=$O)))
@@ -68,7 +69,7 @@ $(SIMPCON): $(OBJ.SIMPCON) $(LIB.SIMPCON)
 
 clean: simpconclean
 simpconclean:
-	$(RM) $(SIMPCON) $(OBJ.SIMPCON)
+	-$(RMDIR) $(SIMPCON) $(OBJ.SIMPCON) $(OUTDLL)/$(notdir $(INF.SIMPCON))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/simpcon.dep

@@ -36,6 +36,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(ODIVX4)
 endif
 
+INF.ODIVX4 = $(SRCDIR)/plugins/video/format/codecs/divx4/odivx4.csplugin
 INC.ODIVX4 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/divx4/*.h))
 SRC.ODIVX4 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/divx4/*.cpp))
 OBJ.ODIVX4 = $(addprefix $(OUT)/,$(notdir $(SRC.ODIVX4:.cpp=$O)))
@@ -62,7 +63,7 @@ $(ODIVX4): $(OBJ.ODIVX4) $(LIB.ODIVX4)
 
 clean: odivx4clean
 odivx4clean:
-	-$(RM) $(ODIVX4) $(OBJ.ODIVX4)
+	-$(RMDIR) $(ODIVX4) $(OBJ.ODIVX4) $(OUTDLL)/$(notdir $(INF.ODIVX4))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/odivx4.dep

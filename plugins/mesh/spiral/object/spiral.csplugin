@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- spiral.csplugin -->
+<plugin>
+  <name>spiral</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.spiral</name>
+        <description>Crystal Space Spiral Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

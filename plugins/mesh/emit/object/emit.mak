@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(EMIT)
 endif
 
+INF.EMIT = $(SRCDIR)/plugins/mesh/emit/object/emit.csplugin
 INC.EMIT = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/emit/object/*.h plugins/mesh/partgen/*.h))
 SRC.EMIT = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/emit/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.EMIT = $(addprefix $(OUT)/,$(notdir $(SRC.EMIT:.cpp=$O)))
@@ -56,7 +57,7 @@ $(EMIT): $(OBJ.EMIT) $(LIB.EMIT)
 
 clean: emitclean
 emitclean:
-	-$(RM) $(EMIT) $(OBJ.EMIT)
+	-$(RMDIR) $(EMIT) $(OBJ.EMIT) $(OUTDLL)/$(notdir $(INF.EMIT))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/emit.dep

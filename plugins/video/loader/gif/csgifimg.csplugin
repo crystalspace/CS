@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- csgifimg.csplugin -->
+<plugin>
+  <name>csgifimg</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphic.image.io.gif</name>
+        <description>CrystalSpace GIF image format I/O plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(THING)
 endif
 
+INF.THING = $(SRCDIR)/plugins/mesh/thing/object/thing.csplugin
 INC.THING = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/thing/object/*.h))
 SRC.THING = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/thing/object/*.cpp))
 OBJ.THING = $(addprefix $(OUT)/,$(notdir $(SRC.THING:.cpp=$O)))
@@ -56,7 +57,7 @@ $(THING): $(OBJ.THING) $(LIB.THING)
 
 clean: thingclean
 thingclean:
-	-$(RM) $(THING) $(OBJ.THING)
+	-$(RMDIR) $(THING) $(OBJ.THING) $(OUTDLL)/$(notdir $(INF.THING))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/thing.dep

@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SOFT3D)
 endif
 
+INF.SOFT3D = $(SRCDIR)/plugins/video/renderer/software/soft3d.csplugin
 INC.SOFT3D = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/renderer/software/*.h \
   plugins/video/renderer/common/txtmgr.h \
@@ -105,7 +106,7 @@ $(SOFT3D): $(OBJ.SOFT3D) $(LIB.SOFT3D)
 	$(DO.PLUGIN)
 
 soft3dclean:
-	$(RM) $(SOFT3D) $(OBJ.SOFT3D)
+	-$(RMDIR) $(SOFT3D) $(OBJ.SOFT3D) $(OUTDLL)/$(notdir $(INF.SOFT3D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/soft3d.dep

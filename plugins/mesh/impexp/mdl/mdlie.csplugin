@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- mdlie.csplugin -->
+<plugin>
+  <name>mdlie</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.modelconverter.mdl</name>
+        <description>MDL Model Converter</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -38,6 +38,7 @@ endif
 
 DIR.XMLTINY = plugins/documentsystem/xmltiny
 OUT.XMLTINY = $(OUT)/$(DIR.XMLTINY)
+INF.XMLTINY = $(SRCDIR)/$(DIR.XMLTINY)/xmltiny.csplugin
 INC.XMLTINY = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLTINY)/*.h))
 SRC.XMLTINY = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLTINY)/*.cpp))
 OBJ.XMLTINY = $(addprefix $(OUT.XMLTINY)/,$(notdir $(SRC.XMLTINY:.cpp=$O)))
@@ -64,7 +65,7 @@ $(XMLTINY): $(OBJ.XMLTINY) $(LIB.XMLTINY)
 
 clean: xmltinyclean
 xmltinyclean:
-	-$(RM) $(XMLTINY) $(OBJ.XMLTINY)
+	-$(RMDIR) $(XMLTINY) $(OBJ.XMLTINY) $(OUTDLL)/$(notdir $(INF.XMLTINY))
 
 cleandep: xmltinycleandep
 xmltinycleandep:

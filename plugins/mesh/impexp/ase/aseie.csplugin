@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- aseie.csplugin -->
+<plugin>
+  <name>aseie</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.modelconverter.ase</name>
+        <description>ASE Model Converter</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

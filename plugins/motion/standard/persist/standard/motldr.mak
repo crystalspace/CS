@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(MOTLDR)
 endif
 
+INF.MOTLDR = $(SRCDIR)/plugins/motion/standard/persist/standard/motldr.csplugin
 INC.MOTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/persist/standard/*.h))
 SRC.MOTLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/motion/standard/persist/standard/*.cpp))
 OBJ.MOTLDR = $(addprefix $(OUT)/,$(notdir $(SRC.MOTLDR:.cpp=$O)))
@@ -62,7 +63,7 @@ $(MOTLDR): $(OBJ.MOTLDR) $(LIB.MOTLDR)
 
 clean: motldrclean
 motldrclean:
-	$(RM) $(MOTLDR) $(OBJ.MOTLDR)
+	-$(RMDIR) $(MOTLDR) $(OBJ.MOTLDR) $(OUTDLL)/$(notdir $(INF.MOTLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/motldr.dep

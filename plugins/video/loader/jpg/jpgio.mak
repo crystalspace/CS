@@ -41,6 +41,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSJPGIMG)
 endif
 
+INF.CSJPGIMG = $(SRCDIR)/plugins/video/loader/jpg/csjpgimg.csplugin
 INC.CSJPGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jpg/*.h))
 SRC.CSJPGIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/jpg/*.cpp))
 
@@ -71,7 +72,7 @@ $(CSJPGIMG): $(OBJ.CSJPGIMG) $(LIB.CSJPGIMG)
 
 clean: csjpgimgclean
 csjpgimgclean:
-	$(RM) $(CSJPGIMG) $(OBJ.CSJPGIMG)
+	-$(RMDIR) $(CSJPGIMG) $(OBJ.CSJPGIMG) $(OUTDLL)/$(notdir $(INF.CSJPGIMG))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/jpgimg.dep

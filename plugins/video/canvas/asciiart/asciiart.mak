@@ -51,6 +51,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(ASCIIART)
 endif
 
+INF.ASCIIART = $(SRCDIR)/plugins/video/canvas/asciiart/asciiart.csplugin
 INC.ASCIIART = $(wildcard $(addprefix $(SRCDIR)/,
   plugins/video/canvas/asciiart/*.h $(INC.COMMON.DRV2D)))
 SRC.ASCIIART = $(wildcard $(addprefix $(SRCDIR)/, \
@@ -81,7 +82,7 @@ $(ASCIIART): $(OBJ.ASCIIART) $(LIB.ASCIIART)
 	$(DO.PLUGIN) $(LIB.ASCIIART.SPECIAL)
 
 asciiartclean:
-	$(RM) $(ASCIIART) $(OBJ.ASCIIART)
+	-$(RMDIR) $(ASCIIART) $(OBJ.ASCIIART) $(OUTDLL)/$(notdir $(INF.ASCIIART))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/asciiart.dep

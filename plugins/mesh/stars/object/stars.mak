@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(STARS)
 endif
 
+INF.STARS = $(SRCDIR)/plugins/mesh/stars/object/stars.csplugin
 INC.STARS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/object/*.h))
 SRC.STARS = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/object/*.cpp))
 OBJ.STARS = $(addprefix $(OUT)/,$(notdir $(SRC.STARS:.cpp=$O)))
@@ -56,7 +57,7 @@ $(STARS): $(OBJ.STARS) $(LIB.STARS)
 
 clean: starsclean
 starsclean:
-	-$(RM) $(STARS) $(OBJ.STARS)
+	-$(RMDIR) $(STARS) $(OBJ.STARS) $(OUTDLL)/$(notdir $(INF.STARS))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/stars.dep

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- imgplex.csplugin -->
+<plugin>
+  <name>imgplex</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphic.image.io.multiplex</name>
+        <description>Image file format multiplex plug-in.</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

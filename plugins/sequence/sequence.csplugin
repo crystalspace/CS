@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- sequence.csplugin -->
+<plugin>
+  <name>sequence</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.sequence</name>
+        <description>Sequence Manager</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

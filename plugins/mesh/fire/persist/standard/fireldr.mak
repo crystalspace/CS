@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(FIRELDR)
 endif
 
+INF.FIRELDR = $(SRCDIR)/plugins/mesh/fire/persist/standard/fireldr.csplugin
 INC.FIRELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/persist/standard/*.h))
 SRC.FIRELDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/persist/standard/*.cpp))
 OBJ.FIRELDR = $(addprefix $(OUT)/,$(notdir $(SRC.FIRELDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(FIRELDR): $(OBJ.FIRELDR) $(LIB.FIRELDR)
 
 clean: fireldrclean
 fireldrclean:
-	-$(RM) $(FIRELDR) $(OBJ.FIRELDR)
+	-$(RMDIR) $(FIRELDR) $(OBJ.FIRELDR) $(OUTDLL)/$(notdir $(INF.FIRELDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/fireldr.dep

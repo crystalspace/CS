@@ -64,6 +64,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLOSX2D)
 endif
 
+INF.GLOSX2D = $(SRCDIR)/plugins/video/canvas/macosx/opengl/glosx2d.csplugin
 INC.GLOSX2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D) $(INC.COMMON.DRV2D.OPENGL) \
   $(addsuffix /*.h,$(MACOSX.SOURCE_GLOSX2D_PATHS))))
 SRC.GLOSX2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) $(SRC.COMMON.DRV2D.OPENGL) \
@@ -103,7 +104,7 @@ $(GLOSX2D): $(OBJ.GLOSX2D) $(LIB.GLOSX2D)
 
 clean: glosx2dclean
 glosx2dclean:
-	$(RM) $(GLOSX2D) $(OBJ.GLOSX2D)
+	-$(RMDIR) $(GLOSX2D) $(OBJ.GLOSX2D) $(OUTDLL)/$(notdir $(INF.GLOSX2D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/glosx2d.dep

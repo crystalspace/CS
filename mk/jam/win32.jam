@@ -109,6 +109,7 @@ rule LinkVersionRc
   Win32Resource $(<) : $(versionrc) ;
 }    
 
+# SystemLinkApplication target : objects : options
 rule SystemLinkApplication
 {
   local target = $($(<)_TARGET) ;
@@ -122,6 +123,7 @@ rule SystemLinkApplication
   LinkVersionRc $(<) ;
 }
 
+# SystemLinkPlugin target : objects : options : metafile
 rule SystemLinkPlugin
 {
   local target = $($(<)_TARGET) ;
@@ -137,6 +139,7 @@ rule SystemLinkPlugin
   Depends $(target) : $(>) ;
   EXPORTDEFS on $(target) = $(exportdefs) ;
   LinkPlugin $(target) : $(>) ;
+  PluginMetaData $(<) : $(4) ;
   # setup clean rules
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(RAIN)
 endif
 
+INF.RAIN = $(SRCDIR)/plugins/mesh/rain/object/rain.csplugin
 INC.RAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/rain/object/*.h plugins/mesh/partgen/*.h))
 SRC.RAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/rain/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.RAIN = $(addprefix $(OUT)/,$(notdir $(SRC.RAIN:.cpp=$O)))
@@ -56,7 +57,7 @@ $(RAIN): $(OBJ.RAIN) $(LIB.RAIN)
 
 clean: rainclean
 rainclean:
-	-$(RM) $(RAIN) $(OBJ.RAIN)
+	-$(RMDIR) $(RAIN) $(OBJ.RAIN) $(OUTDLL)/$(notdir $(INF.RAIN))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/rain.dep

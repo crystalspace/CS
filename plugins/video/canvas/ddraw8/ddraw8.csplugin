@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- ddraw8.csplugin -->
+<plugin>
+  <name>ddraw8</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics2d.direct3d.dx8</name>
+        <description>DirectDraw DX8 2D graphics driver for Crystal Space</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

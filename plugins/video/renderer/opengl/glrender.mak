@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GL3D)
 endif
 
+INF.GL3D = $(SRCDIR)/plugins/video/renderer/opengl/gl3d.csplugin
 INC.GL3D = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/renderer/opengl/*.h \
   plugins/video/renderer/common/txtmgr.h \
@@ -92,7 +93,7 @@ $(GL3D): $(OBJ.GL3D) $(LIB.GL3D)
 	$(DO.PLUGIN.POSTAMBLE)
 
 gl3dclean:
-	$(RM) $(GL3D) $(OBJ.GL3D)
+	-$(RMDIR) $(GL3D) $(OBJ.GL3D) $(OUTDLL)/$(notdir $(INF.GL3D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/gl3d.dep

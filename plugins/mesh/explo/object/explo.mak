@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(EXPLO)
 endif
 
+INF.EXPLO = $(SRCDIR)/plugins/mesh/explo/object/explo.csplugin
 INC.EXPLO = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/object/*.h plugins/mesh/partgen/*.h))
 SRC.EXPLO = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/explo/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.EXPLO = $(addprefix $(OUT)/,$(notdir $(SRC.EXPLO:.cpp=$O)))
@@ -56,7 +57,7 @@ $(EXPLO): $(OBJ.EXPLO) $(LIB.EXPLO)
 
 clean: exploclean
 exploclean:
-	-$(RM) $(EXPLO) $(OBJ.EXPLO)
+	-$(RMDIR) $(EXPLO) $(OBJ.EXPLO) $(OUTDLL)/$(notdir $(INF.EXPLO))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/explo.dep

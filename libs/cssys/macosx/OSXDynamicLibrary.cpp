@@ -71,7 +71,7 @@ static OSXPluginArray& get_loaded_plugins()
 //-----------------------------------------------------------------------------
 csLibraryHandle csFindLoadLibrary(char const* name)
 {
-  return csFindLoadLibrary(0, name, OS_MACOSX_PLUGIN_EXT);
+  return csFindLoadLibrary(0, name, ".csbundle");
 }
 
 

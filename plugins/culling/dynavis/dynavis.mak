@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(DYNAVIS)
 endif
 
+INF.DYNAVIS = $(SRCDIR)/plugins/culling/dynavis/dynavis.csplugin
 INC.DYNAVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/dynavis/*.h))
 SRC.DYNAVIS = $(wildcard $(addprefix $(SRCDIR)/,plugins/culling/dynavis/*.cpp))
 OBJ.DYNAVIS = $(addprefix $(OUT)/,$(notdir $(SRC.DYNAVIS:.cpp=$O)))
@@ -65,7 +66,7 @@ $(DYNAVIS): $(OBJ.DYNAVIS) $(LIB.DYNAVIS)
 
 clean: dynavisclean
 dynavisclean:
-	$(RM) $(DYNAVIS) $(OBJ.DYNAVIS)
+	-$(RMDIR) $(DYNAVIS) $(OBJ.DYNAVIS) $(OUTDLL)/$(notdir $(INF.DYNAVIS))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/dynavis.dep

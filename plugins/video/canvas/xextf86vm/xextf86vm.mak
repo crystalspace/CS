@@ -47,6 +47,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(XEXT86VM)
 endif
 
+INF.XEXT86VM = $(SRCDIR)/plugins/video/canvas/xextf86vm/xext86vm.csplugin
 INC.XEXT86VM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextf86vm/*.h))
 SRC.XEXT86VM = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/xextf86vm/*.cpp))
 OBJ.XEXT86VM = $(addprefix $(OUT)/,$(notdir $(SRC.XEXT86VM:.cpp=$O)))
@@ -69,7 +70,7 @@ $(XEXT86VM): $(OBJ.XEXT86VM) $(LIB.XEXT86VM)
 
 clean: xext86vmclean
 xext86vmclean:
-	$(RM) $(XEXT86VM) $(OBJ.XEXT86VM)
+	-$(RMDIR) $(XEXT86VM) $(OBJ.XEXT86VM) $(OUTDLL)/$(notdir $(INF.XEXT86VM))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/xext86vm.dep

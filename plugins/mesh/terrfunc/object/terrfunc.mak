@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(TERRFUNC)
 endif
 
+INF.TERRFUNC = $(SRCDIR)/plugins/mesh/terrfunc/object/terrfunc.csplugin
 INC.TERRFUNC = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrfunc/object/*.h))
 SRC.TERRFUNC = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrfunc/object/*.cpp))
 OBJ.TERRFUNC = $(addprefix $(OUT)/,$(notdir $(SRC.TERRFUNC:.cpp=$O)))
@@ -55,7 +56,7 @@ terrfunc: $(OUTDIRS) $(TERRFUNC)
 
 clean: terrfuncclean
 terrfuncclean:
-	-$(RM) $(TERRFUNC) $(OBJ.TERRFUNC)
+	-$(RMDIR) $(TERRFUNC) $(OBJ.TERRFUNC) $(OUTDLL)/$(notdir $(INF.TERRFUNC))
 
 $(OUT)/%$O: $(SRCDIR)/plugins/mesh/terrfunc/object/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.TERRFUNC)

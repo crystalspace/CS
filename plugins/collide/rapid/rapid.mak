@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(RAPID)
 endif
 
+INF.RAPID = $(SRCDIR)/plugins/collide/rapid/rapid.csplugin
 INC.RAPID = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/rapid/*.h))
 SRC.RAPID = $(wildcard $(addprefix $(SRCDIR)/,plugins/collide/rapid/*.cpp))
 OBJ.RAPID = $(addprefix $(OUT)/,$(notdir $(SRC.RAPID:.cpp=$O)))
@@ -56,7 +57,7 @@ $(RAPID): $(OBJ.RAPID) $(LIB.RAPID)
 
 clean: rapidclean
 rapidclean:
-	-$(RM) $(RAPID) $(OBJ.RAPID)
+	-$(RMDIR) $(RAPID) $(OBJ.RAPID) $(OUTDLL)/$(notdir $(INF.RAPID))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/rapid.dep

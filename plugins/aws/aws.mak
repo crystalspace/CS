@@ -38,6 +38,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(AWS)
 endif
 
+INF.AWS = $(SRCDIR)/plugins/aws/aws.csplugin
 INC.AWS = $(wildcard $(addprefix $(SRCDIR)/,plugins/aws/*.h include/iaws/*.h))
 # We add skinlex.cpp and skinpars.cpp explicitly since they might not be
 # present (thus need to be regenerated automatically).  We use $(sort) for its
@@ -87,7 +88,7 @@ endif
 endif
 clean: awsclean
 awsclean:
-	-$(RM) $(AWS) $(OBJ.AWS)
+	-$(RMDIR) $(AWS) $(OBJ.AWS) $(OUTDLL)/$(notdir $(INF.AWS))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/aws.dep

@@ -8,9 +8,8 @@ DEEPCOPY ?= "cp -R" ;
 APPLICATION.LFLAGS += "-framework AppKit -framework Foundation" ;
 APPLICATION.CONSOLE.LFLAGS += "-framework AppKit -framework Foundation" ;
 PLUGIN.LFLAGS += "-bundle -framework AppKit -framework Foundation" ;
-SUFPLUGIN ?= $(MACOSX.PLUGIN_EXT) ;
-MACOSX.APP_ICON = ;
 MACOSX.ENVIRON = "export MACOSX_DEPLOYMENT_TARGET=10.2" ;
+MACOSX.APP_ICON = ;
 
 # Experience seems to indicate that library scanning misbehaves on MacOS/X with
 # Jam 2.4, consequently we disable it.
@@ -26,84 +25,76 @@ actions Archive
 # Public rules.
 #------------------------------------------------------------------------------
 
-##  ConstructApplicationTarget target : options
-##    Constructs the application atrget name (ie. foo.exe for foo)
+# ConstructApplicationTarget target : options
+#    Constructs the application target name (ie. foo.app for foo)
 rule ConstructApplicationTarget
 {
-  if [ IsElem console : $(>) ]
-  {
-    return $(<) ;
-  }
-  else
-  {
-    return $(<) ;
-  }
+  if [ IsElem console : $(>) ] { return $(<) ; }
+  else { return $(<) ; }
 }
-##  ConstructLibraryTarget target : options
+
+# ConstructLibraryTarget target : options
 rule ConstructLibraryTarget
 {
       return lib$(<)$(SUFLIB) ;
 }
-##  ConstructPluginTarget : options
+
+# ConstructPluginTarget : options
 rule ConstructPluginTarget
 {
-  # don't use $(MACOSX_PLUGIN_EXT) yet until we can be sure that external
-  # projects set that value as well
-  return $(<).csplugin ;
+  return $(<).csbundle ;
 }
 
+# SystemLinkApplication target : objects : options
 rule SystemLinkApplication
 {
   local target = $($(<)_TARGET) ;
-
+  Depends $(target) : $(>) ;
   if [ IsElem console : $(3) ]
   {
-    Depends $(target) : $(>) ;
     LinkApplicationConsole $(target) : $(>) ;
     Clean clean : $(target) ;
     Clean $(<)clean : $(target) ;
   }
   else
   {
-    Depends $(target) : $(>) ;
     CreateApplicationWrapper $(target) : $(>) ;
     CleanDir clean : [ Wrapper $(<) : app ] ;
     CleanDir $(<)clean : [ Wrapper $(<) : app ] ;
   }
 }
 
+# SystemLinkPlugin target : objects : options : metafile
 rule SystemLinkPlugin
 {
   local target = $($(<)_TARGET) ;
-
   Depends $(target) : $(>) ;
   LinkPlugin $(target) : $(>) ;
-  # setup clean rules
+  PluginMetaData $(<) : $(4) ;
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
 }
 
-
-## LinkPlugin plugin : objects
-##    Link a plugin module from a set of object files.
+# LinkPlugin plugin : objects
+#    Link a plugin module from a set of object files.
 actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(MACOSX.ENVIRON)
   $(CMD.LINK) -bundle -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
-## LinkApplicationConsole exe : objects
-##    Link a console (non-GUI) appliation from a set of object files.
+# LinkApplicationConsole exe : objects
+#    Link a console (non-GUI) appliation from a set of object files.
 actions LinkApplicationConsole bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(MACOSX.ENVIRON)
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
-## CreateApplicationWrapper basename : objects
-##    Create a complete, though minimal, application wrapper given a set of
-##    object files.  The rules ApplicationIconDefaultOSX and ApplicationIconOSX
-##    control the icon associated with the application wrapper.
+# CreateApplicationWrapper basename : objects
+#    Create a complete, though minimal, application wrapper given a set of
+#    object files.  The rules ApplicationIconDefaultOSX and ApplicationIconOSX
+#    control the icon associated with the application wrapper.
 rule CreateApplicationWrapper
 {
   WrapFile $(<) : $(<) : Contents MacOS : AppExe : $(>) ;
@@ -118,9 +109,9 @@ rule CreateApplicationWrapper
   }
 }
 
-## ApplicationIconDefaultOSX icon [ : pathcomponents ]
-##    Specify the default icon for GUI applications.  This setting can be
-##    overriden for a individual application with the ApplicationIconOSX rule.
+# ApplicationIconDefaultOSX icon [ : pathcomponents ]
+#    Specify the default icon for GUI applications.  This setting can be
+#    overriden for a individual application with the ApplicationIconOSX rule.
 rule ApplicationIconDefaultOSX
 {
   MACOSX.APP_ICON = $(<) ;
@@ -131,7 +122,10 @@ rule ApplicationIconDefaultOSX
 }
 
 # ApplicationIconOSX basename : icon [ : pathcomponents ]
-#    See resource.jam for docu
+#    Specify the icon for the application given by basename.  If
+#    pathcomponents is omitted, SEARCH_SOURCE is used.  If this rule is not
+#    invoked, then the icon specified via ApplicationIconDefaultOSX is used.
+#    If ApplicationIconDefaultOSX was never invoked, then no icon is used.
 #
 #    Implementation note: The logic to get the icon copied into the wrapper is
 #    complicated by the fact that it is possible to specify no icon at all (by
@@ -153,11 +147,6 @@ rule ApplicationIconOSX
   $(<)_APPICON = $(>) ;
   AppIcon $(<) : $(>) ;
 }
-
-
-#------------------------------------------------------------------------------
-# Private utility rules.
-#------------------------------------------------------------------------------
 
 # Wrapper basename : suffix [ : pathcomponents ]
 #    Returns wrapper name in the directory specified by pathcomponents for
@@ -212,20 +201,20 @@ rule WrapFile
   Clean $(1)clean : [ FDirName $(dir) $(target) ] ;
 }
 
-#  LinkApplication exe : objects
+# LinkApplication exe : objects
 actions AppExe bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(MACOSX.ENVIRON)
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
-#  AppPkgInfo file
+# AppPkgInfo file
 actions AppPkgInfo
 {
   echo 'APPL???' > $(<) ;
 }
 
-#  AppInfoPlistStrings file
+# AppInfoPlistStrings file
 actions AppInfoPlistStrings
 {
   cat << EOT > $(<)
@@ -235,7 +224,7 @@ CFBundleGetInfoString = "$(BASENAME), $(PACKAGE.VERSION)";
 EOT
 }
 
-#  AppVersionPlist file
+# AppVersionPlist file
 actions AppVersionPlist
 {
   cat << EOT > $(<)
@@ -254,7 +243,7 @@ actions AppVersionPlist
 EOT
 }
 
-#  AppInfoPlist filename : placeholder : basename
+# AppInfoPlist filename : placeholder : basename
 #    If client did not invoke ApplicationIconOSX, then use the default icon
 #    specified via ApplicationIconDefaultOSX.
 #
@@ -305,7 +294,7 @@ actions AppInfoPlist
 EOT
 }
 
-#  AppIcon <basename> : <icon>
+# AppIcon <basename> : <icon>
 #    Copy an icon into the wrapper.  It is assumed that some other agent has
 #    already set SEARCH on the icon, if necessary.
 #
@@ -319,7 +308,8 @@ rule AppIcon
   Depends $(icon) : $(>) ;
   MakeLocate $(icon) : [ FDirName [ Wrapper $(<) : app ] Contents Resources ] ;
   AppIcon1 $(icon) : $(>) ;
-  Clean clean $(<)clean : $(icon) ;
+  Clean clean : $(icon) ;
+  Clean $(<)clean : $(icon) ;
 }
 
 actions AppIcon1
@@ -327,7 +317,7 @@ actions AppIcon1
     $(CP) $(>) $(<)
 }
 
-#  InstallApplicationGUI installapp : app
+# InstallApplicationGUI installapp : app
 #    Overrides InstallApplicationGUI from install.jam.  Unlike applications
 #    on other platforms which exist as a single executable file, on MacOS/X,
 #    an application is wrapped in a directory hierarchy, thus a deep copy is
@@ -352,4 +342,3 @@ actions InstallApplicationWrapper
   $(DELTREE) $(<) ;
   $(DEEPCOPY) $(>) $(<) ;
 }
-

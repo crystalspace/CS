@@ -41,6 +41,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(PGSERVER)
 endif
 
+INF.PGSERVER = $(SRCDIR)/plugins/picogui/server/pgserver.csplugin
 INC.PGSERVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/picogui/server/*.h))
 SRC.PGSERVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/picogui/server/*.cpp))
 OBJ.PGSERVER = $(addprefix $(OUT)/,$(notdir $(SRC.PGSERVER:.cpp=$O)))
@@ -66,7 +67,7 @@ $(PGSERVER): $(OBJ.PGSERVER) $(LIB.PGSERVER)
 
 clean: pgserverclean
 pgserverclean:
-	$(RM) $(PGSERVER) $(OBJ.PGSERVER)
+	-$(RMDIR) $(PGSERVER) $(OBJ.PGSERVER) $(OUTDLL)/$(notdir $(INF.PGSERVER))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/pgserver.dep

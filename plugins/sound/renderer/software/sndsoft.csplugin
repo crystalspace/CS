@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- sndsoft.csplugin -->
+<plugin>
+  <name>sndsoft</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sound.render.software</name>
+        <description>Software Sound Renderer for Crystal Space</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

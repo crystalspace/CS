@@ -44,6 +44,7 @@ else
   SCF.STATIC += oglglide
 endif
 
+INF.OGLGLIDE = $(SRCDIR)/plugins/video/canvas/openglx/glide/oglglide.csplugin
 INC.OGLGLIDE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/glide/*.h))
 SRC.OGLGLIDE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/glide/*.cpp))
 OBJ.OGLGLIDE = $(addprefix $(OUT)/,$(notdir $(SRC.OGLGLIDE:.cpp=$O)))
@@ -66,7 +67,7 @@ $(OGLGLIDE): $(OBJ.OGLGLIDE) $(LIB.OGLGLIDE)
 
 clean: oglglideclean
 oglglideclean:
-	$(RM) $(OGLGLIDE) $(OBJ.OGLGLIDE)
+	-$(RMDIR) $(OGLGLIDE) $(OBJ.OGLGLIDE) $(OUTDLL)/$(notdir $(INF.OGLGLIDE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/oglglide.dep

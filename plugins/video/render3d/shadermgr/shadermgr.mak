@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SHADERMGR)
 endif
 
+INF.SHADERMGR = $(SRCDIR)/plugins/video/render3d/shadermgr/shadermgr.csplugin
 INC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shadermgr/*.h))
 SRC.SHADERMGR = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/render3d/shadermgr/*.cpp))
 OBJ.SHADERMGR = $(addprefix $(OUT)/,$(notdir $(SRC.SHADERMGR:.cpp=$O)))
@@ -67,7 +68,7 @@ $(SHADERMGR): $(OBJ.SHADERMGR) $(LIB.SHADERMGR)
 
 clean: shadermgrclean
 shadermgrclean:
-	$(RM) $(SHADERMGR) $(OBJ.SHADERMGR)
+	-$(RMDIR) $(SHADERMGR) $(OBJ.SHADERMGR) $(OUTDLL)/$(notdir $(INF.SHADERMGR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/shadermgr.dep

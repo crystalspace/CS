@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(BEZIERLDR)
 endif
 
+INF.BEZIERLDR = $(SRCDIR)/plugins/mesh/bezier/persist/standard/bezierldr.csplugin
 INC.BEZIERLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bezier/persist/standard/*.h))
 SRC.BEZIERLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bezier/persist/standard/*.cpp))
 OBJ.BEZIERLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BEZIERLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(BEZIERLDR): $(OBJ.BEZIERLDR) $(LIB.BEZIERLDR)
 
 clean: bezierldrclean
 bezierldrclean:
-	-$(RM) $(BEZIERLDR) $(OBJ.BEZIERLDR)
+	-$(RMDIR) $(BEZIERLDR) $(OBJ.BEZIERLDR) $(OUTDLL)/$(notdir $(INF.BEZIERLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/bezierldr.dep

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNOWLDR)
 endif
 
+INF.SNOWLDR = $(SRCDIR)/plugins/mesh/snow/persist/standard/snowldr.csplugin
 INC.SNOWLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/snow/persist/standard/*.h))
 SRC.SNOWLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/snow/persist/standard/*.cpp))
 OBJ.SNOWLDR = $(addprefix $(OUT)/,$(notdir $(SRC.SNOWLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(SNOWLDR): $(OBJ.SNOWLDR) $(LIB.SNOWLDR)
 
 clean: snowldrclean
 snowldrclean:
-	-$(RM) $(SNOWLDR) $(OBJ.SNOWLDR)
+	-$(RMDIR) $(SNOWLDR) $(OBJ.SNOWLDR) $(OUTDLL)/$(notdir $(INF.SNOWLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/snowldr.dep

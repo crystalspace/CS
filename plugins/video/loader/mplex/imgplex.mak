@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(IMGPLEX)
 endif
 
+INF.IMGPLEX = $(SRCDIR)/plugins/video/loader/mplex/imgplex.csplugin
 INC.IMGPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/mplex/*.h))
 SRC.IMGPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/mplex/*.cpp))
 OBJ.IMGPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.IMGPLEX:.cpp=$O)))
@@ -65,7 +66,7 @@ $(IMGPLEX): $(OBJ.IMGPLEX) $(LIB.IMGPLEX)
 
 clean: imgplexclean
 imgplexclean:
-	$(RM) $(IMGPLEX) $(OBJ.IMGPLEX)
+	-$(RMDIR) $(IMGPLEX) $(OBJ.IMGPLEX) $(OUTDLL)/$(notdir $(INF.IMGPLEX))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/imgplex.dep

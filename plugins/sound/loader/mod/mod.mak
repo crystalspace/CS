@@ -37,6 +37,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDMOD)
 endif
 
+INF.SNDMOD = $(SRCDIR)/plugins/sound/loader/mod/sndmod.csplugin
 INC.SNDMOD = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mod/*.h))
 SRC.SNDMOD = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/mod/*.cpp))
 OBJ.SNDMOD = $(addprefix $(OUT)/,$(notdir $(SRC.SNDMOD:.cpp=$O)))
@@ -65,7 +66,7 @@ $(SNDMOD): $(OBJ.SNDMOD) $(LIB.SNDMOD)
 
 clean: sndmodclean
 sndmodclean:
-	$(RM) $(SNDMOD) $(OBJ.SNDMOD)
+	-$(RMDIR) $(SNDMOD) $(OBJ.SNDMOD) $(OUTDLL)/$(notdir $(INF.SNDMOD))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndmod.dep

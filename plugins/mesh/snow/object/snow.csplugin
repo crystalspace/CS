@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- snow.csplugin -->
+<plugin>
+  <name>snow</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.snow</name>
+        <description>Crystal Space Snow Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- gl3d.csplugin -->
+<plugin>
+  <name>gl3d</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphics3d.opengl</name>
+        <description>OpenGL 3D graphics driver for Crystal Space</description>
+        <requires>
+          <class>crystalspace.font.server.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

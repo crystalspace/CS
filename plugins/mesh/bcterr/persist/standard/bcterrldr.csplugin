@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- bcterrldr.csplugin -->
+<plugin>
+  <name>bcterrldr</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.bcterr</name>
+        <description>Crystal Space Bezier Curve Terrain Loader</description>
+      </class>
+      <class>
+        <name>crystalspace.mesh.loader.factory.bcterr</name>
+        <description>Crystal Space Bezier Curve Terrain Factory Loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

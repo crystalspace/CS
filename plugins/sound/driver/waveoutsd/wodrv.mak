@@ -45,6 +45,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDWAVEOUT)
 endif
 
+INF.SNDWAVEOUT = $(SRCDIR)/plugins/sound/driver/waveoutsd/sndwaveout.csplugin
 INC.SNDWAVEOUT = \
   $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/waveoutsd/*.h))
 SRC.SNDWAVEOUT = \
@@ -71,7 +72,7 @@ $(SNDWAVEOUT): $(OBJ.SNDWAVEOUT) $(LIB.SNDWAVEOUT)
 
 clean: sndwaveoutclean
 sndwaveoutclean:
-	$(RM) $(SNDWAVEOUT) $(OBJ.SNDWAVEOUT)
+	-$(RMDIR) $(SNDWAVEOUT) $(OBJ.SNDWAVEOUT) $(OUTDLL)/$(notdir $(INF.SNDWAVEOUT))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndwaveout.dep

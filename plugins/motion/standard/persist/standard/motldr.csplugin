@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- motldr.csplugin -->
+<plugin>
+  <name>motldr</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.motion.loader.default</name>
+        <description>Skeletal MotionLoader for Crystal Space</description>
+      </class>
+      <class>
+        <name>crystalspace.motion.saver.default</name>
+        <description>Skeletal Motion Manager Saver for Crystal Space</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

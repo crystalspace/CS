@@ -20,6 +20,93 @@ The history order is reversed so that new features are at the top.
 	  facility which caused installation of console applications to fail on
 	  MacOS/X.  (It attempted to install them as fully wrapped GUI
 	  applications.)
+	- Eric Sunshine performed Phase One of the elimination of the
+	  monolithic scf.cfg:
+	    - Plugin modules are now self-describing.  This information can be
+	      queried at run-time without having to actually load the module.
+	    - The plugin maintainer now manages the plugin's meta-information
+	      in an external .csplugin file, rather than hard-coding the
+	      information into the plugin's source code.  The mechanism by
+	      which the meta-information is bound to the plugin is
+	      platform-dependent.  Presently, all platforms simply lay down the
+	      meta-information in a plain text file alongside the plugin
+	      itself; with the same basename and extension .csplugin.  This may
+	      change in the future.  For example, on MacOS/X, the
+	      meta-information will probably be encapsulated within the
+	      plugin's bundle wrapper.
+	    - Plugin meta-information is now maintained in XML format.  Here is
+	      an example:
+		<?xml version="1.0"?>
+		<!-- gl3d.csplugin -->
+		<plugin>
+		  <name>gl3d</name>
+		  <scf>
+		    <classes>
+		      <class>
+			<name>crystalspace.graphics3d.opengl</name>
+			<description>OpenGL 3D graphics driver</description>
+			<requires>
+			  <class>crystalspace.font.server.</class>
+			</requires>
+		      </class>
+		    </classes>
+		  </scf>
+		</plugin>
+	    - Since meta-information is now extensible, maintainers can choose
+	      to publish supplementary information about plugins (in addition
+	      to the SCF information already published).  For example, image
+	      loading plugins could publish "image indendification" information
+	      which would allow the image loading multiplexor to selectively
+	      request image loading plugins on-demand, rather than requesting
+	      all plugins unconditionally, even if they are not needed.  Here
+	      is an example of a possible meta-information table for the PNG
+	      loader:
+		<?xml version="1.0"?>
+		<!-- cspngimg.csplugin -->
+		<plugin>
+		  <name>cspngimg</name>
+		  <scf>...</scf>
+		  <imageloader>
+		    <imagetype>
+		      <class>crystalspace.graphic.image.io.png</class>
+		      <identify>
+			<mimetype>image/png</mimetype>
+			<extension>png</extension>
+			<extension>PNG</extension>
+			<scan length="4" bytes="\0x89PNG"/>
+		     </identify>
+		    </imagetype>
+		  </imageloader>
+		</plugin>
+	      In this example, the PNG loader meta-information tells the
+	      multiplexor several different ways to identify a PNG image: by
+	      checking file extension, if available; by checking MIME type, if
+	      available; by checking for the magic-string "\0x89PNG" in the raw
+	      image data.  If the multiplexor identifies the image as PNG, only
+	      then will it actually request the PNG loader.
+	    - Added the --meta-file directive to msvcgen.pl to allow
+	      specification of the meta-information file for a module.  The
+	      value of this option is interpolated into template files via the
+	      new %metafile% variable.  msvcgen.mak now utilizes this flag with
+	      the value of the new INC.PROJECT makefile variable.  Augmented
+	      the MSVC6 and MSVC7 plugin template files (plugin.tpl) to make
+	      use of %metafile%.
+	    - Changed the file extension for plugins on MacOS/X from .csplugin
+	      to .csbundle to avoid conflict with new meta-information resource
+	      which uses the extension .csplugin.
+	    - Still To-Do:
+		- Augment SCF to utilize the new meta-information resources,
+		  and to understand the new XML format.  Presently, these
+		  resources are ignored at run-time.
+		- Add platform-specific function to scan and locate plugins
+		  automatically, rather than relying upon a monolithic registry
+		  such as scf.cfg.
+		- Add platform-specific function to query a plugin's
+		  meta-information.
+		- Eliminate the monolithic scf.cfg.
+		- Augment static linking to work with the new facility.
+		- Eliminate the hard-coded SCF registration information in each
+		  plugin's source code.
 25-May-2003
 	- Jorrit optimized ball->HitBeamObject() considerably by moving an
 	  expensive operation out the inner loop. Same optimization for

@@ -50,7 +50,7 @@ rule Library
     }
     else
     {
-      Depends libs : $(target) ;
+      Depends libs : $(<) ;
     }
   }
 

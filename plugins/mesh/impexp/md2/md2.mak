@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(MD2IE)
 endif
 
+INF.MD2IE = $(SRCDIR)/plugins/mesh/impexp/md2/md2ie.csplugin
 INC.MD2IE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/md2/*.h))
 SRC.MD2IE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/md2/*.cpp))
 OBJ.MD2IE = $(addprefix $(OUT)/,$(notdir $(SRC.MD2IE:.cpp=$O)))
@@ -56,7 +57,7 @@ $(MD2IE): $(OBJ.MD2IE) $(LIB.MD2IE)
 
 clean: md2ieclean
 md2ieclean:
-	-$(RM) $(MD2IE) $(OBJ.MD2IE)
+	-$(RMDIR) $(MD2IE) $(OBJ.MD2IE) $(OUTDLL)/$(notdir $(INF.MD2IE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/md2ie.dep

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(TERRBIG)
 endif
 
+INF.TERRBIG = $(SRCDIR)/plugins/mesh/terrbig/terrbig.csplugin
 INC.TERRBIG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrbig/*.h))
 SRC.TERRBIG = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrbig/*.cpp))
 OBJ.TERRBIG = $(addprefix $(OUT)/,$(notdir $(SRC.TERRBIG:.cpp=$O)))
@@ -55,7 +56,7 @@ terrbig: $(OUTDIRS) $(TERRBIG)
 
 clean: terrbigclean
 terrbigclean:
-	-$(RM) $(TERRBIG) $(OBJ.TERRBIG)
+	-$(RMDIR) $(TERRBIG) $(OBJ.TERRBIG) $(OUTDLL)/$(notdir $(INF.TERRBIG))
 
 $(OUT)/%$O: $(SRCDIR)/plugins/mesh/terrbig/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.TERRBIG)

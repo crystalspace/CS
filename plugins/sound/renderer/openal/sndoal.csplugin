@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- sndoal.csplugin -->
+<plugin>
+  <name>sndoal</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sound.render.openal</name>
+        <description>OpenAL 3D Sound Driver for Crystal Space</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

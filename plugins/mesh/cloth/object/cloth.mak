@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CLOTH)
 endif
 
+INF.CLOTH = $(SRCDIR)/plugins/mesh/cloth/object/cloth.csplugin
 INC.CLOTH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/cloth/object/*.h))
 SRC.CLOTH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/cloth/object/*.cpp))
 OBJ.CLOTH = $(addprefix $(OUT)/,$(notdir $(SRC.CLOTH:.cpp=$O)))
@@ -56,7 +57,7 @@ $(CLOTH): $(OBJ.CLOTH) $(LIB.CLOTH)
 
 clean: clothclean
 clothclean:
-	-$(RM) $(CLOTH) $(OBJ.CLOTH)
+	-$(RMDIR) $(CLOTH) $(OBJ.CLOTH) $(OUTDLL)/$(notdir $(INF.CLOTH))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cloth.dep

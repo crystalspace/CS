@@ -42,6 +42,7 @@ endif
 
 DIR.BINDOC = plugins/documentsystem/binary
 OUT.BINDOC = $(OUT)/$(DIR.BINDOC)
+INF.BINDOC = $(SRCDIR)/$(DIR.BINDOC)/bindoc.csplugin
 INC.BINDOC = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BINDOC)/*.h))
 SRC.BINDOC = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BINDOC)/*.cpp))
 OBJ.BINDOC = $(addprefix $(OUT.BINDOC)/,$(notdir $(SRC.BINDOC:.cpp=$O)))
@@ -70,7 +71,7 @@ $(BINDOC): $(OBJ.BINDOC) $(LIB.BINDOC)
 
 clean: bindocclean
 bindocclean:
-	-$(RM) $(BINDOC) $(OBJ.BINDOC)
+	-$(RMDIR) $(BINDOC) $(OBJ.BINDOC) $(OUTDLL)/$(notdir $(INF.BINDOC))
 
 cleandep: bindoccleandep
 bindoccleandep:

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(RLECODEC)
 endif
 
+INF.RLECODEC = $(SRCDIR)/plugins/video/format/codecs/rle/rlecodec.csplugin
 INC.RLECODEC = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.h))
 SRC.RLECODEC = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.cpp))
 OBJ.RLECODEC = $(addprefix $(OUT)/,$(notdir $(SRC.RLECODEC:.cpp=$O)))
@@ -60,7 +61,7 @@ $(RLECODEC): $(OBJ.RLECODEC) $(LIB.RLECODEC)
 
 clean: rlecodecclean
 rlecodecclean:
-	-$(RM) $(RLECODEC) $(OBJ.RLECODEC)
+	-$(RMDIR) $(RLECODEC) $(OBJ.RLECODEC) $(OUTDLL)/$(notdir $(INF.RLECODEC))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/rlecodec.dep

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- effects.csplugin -->
+<plugin>
+  <name>effects</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.video.effects.stdserver</name>
+        <description>Effects system</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

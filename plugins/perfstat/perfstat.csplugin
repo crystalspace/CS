@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- perfstat.csplugin -->
+<plugin>
+  <name>perfstat</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.utilities.perfstat</name>
+        <description>Performance statistics utility</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

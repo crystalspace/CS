@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(FOUNTAIN)
 endif
 
+INF.FOUNTAIN = $(SRCDIR)/plugins/mesh/fountain/object/fountain.csplugin
 INC.FOUNTAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/object/*.h plugins/mesh/partgen/*.h))
 SRC.FOUNTAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fountain/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.FOUNTAIN = $(addprefix $(OUT)/,$(notdir $(SRC.FOUNTAIN:.cpp=$O)))
@@ -56,7 +57,7 @@ $(FOUNTAIN): $(OBJ.FOUNTAIN) $(LIB.FOUNTAIN)
 
 clean: fountainclean
 fountainclean:
-	-$(RM) $(FOUNTAIN) $(OBJ.FOUNTAIN)
+	-$(RMDIR) $(FOUNTAIN) $(OBJ.FOUNTAIN) $(OUTDLL)/$(notdir $(INF.FOUNTAIN))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/fount.dep

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(FIRE)
 endif
 
+INF.FIRE = $(SRCDIR)/plugins/mesh/fire/object/fire.csplugin
 INC.FIRE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/object/*.h plugins/mesh/partgen/*.h))
 SRC.FIRE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/fire/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.FIRE = $(addprefix $(OUT)/,$(notdir $(SRC.FIRE:.cpp=$O)))
@@ -56,7 +57,7 @@ $(FIRE): $(OBJ.FIRE) $(LIB.FIRE)
 
 clean: fireclean
 fireclean:
-	-$(RM) $(FIRE) $(OBJ.FIRE)
+	-$(RMDIR) $(FIRE) $(OBJ.FIRE) $(OUTDLL)/$(notdir $(INF.FIRE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/fire.dep

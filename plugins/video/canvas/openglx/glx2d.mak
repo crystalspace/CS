@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLX2D)
 endif
 
+INF.GLX2D = $(SRCDIR)/plugins/video/canvas/openglx/glx2d.csplugin
 INC.GLX2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/*.h \
   $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D)))
 SRC.GLX2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglx/*.cpp \
@@ -71,7 +72,7 @@ $(GLX2D): $(OBJ.GLX2D) $(LIB.GLX2D)
 
 clean: glx2dclean
 glx2dclean:
-	$(RM) $(GLX2D) $(OBJ.GLX2D)
+	-$(RMDIR) $(GLX2D) $(OBJ.GLX2D) $(OUTDLL)/$(notdir $(INF.GLX2D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/glx2d.dep

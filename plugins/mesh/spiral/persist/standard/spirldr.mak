@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPIRLDR)
 endif
 
+INF.SPIRLDR = $(SRCDIR)/plugins/mesh/spiral/persist/standard/spirldr.csplugin
 INC.SPIRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/persist/standard/*.h))
 SRC.SPIRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spiral/persist/standard/*.cpp))
 OBJ.SPIRLDR = $(addprefix $(OUT)/,$(notdir $(SRC.SPIRLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(SPIRLDR): $(OBJ.SPIRLDR) $(LIB.SPIRLDR)
 
 clean: spirldrclean
 spirldrclean:
-	-$(RM) $(SPIRLDR) $(OBJ.SPIRLDR)
+	-$(RMDIR) $(SPIRLDR) $(OBJ.SPIRLDR) $(OUTDLL)/$(notdir $(INF.SPIRLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/spirldr.dep

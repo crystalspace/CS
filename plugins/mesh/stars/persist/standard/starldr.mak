@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(STARLDR)
 endif
 
+INF.STARLDR = $(SRCDIR)/plugins/mesh/stars/persist/standard/starldr.csplugin
 INC.STARLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/persist/standard/*.h))
 SRC.STARLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/stars/persist/standard/*.cpp))
 OBJ.STARLDR = $(addprefix $(OUT)/,$(notdir $(SRC.STARLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(STARLDR): $(OBJ.STARLDR) $(LIB.STARLDR)
 
 clean: starldrclean
 starldrclean:
-	-$(RM) $(STARLDR) $(OBJ.STARLDR)
+	-$(RMDIR) $(STARLDR) $(OBJ.STARLDR) $(OUTDLL)/$(notdir $(INF.STARLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/starldr.dep

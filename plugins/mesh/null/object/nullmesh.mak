@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(NULLMESH)
 endif
 
+INF.NULLMESH = $(SRCDIR)/plugins/mesh/null/object/nullmesh.csplugin
 INC.NULLMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/object/*.h))
 SRC.NULLMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/object/*.cpp))
 OBJ.NULLMESH = $(addprefix $(OUT)/,$(notdir $(SRC.NULLMESH:.cpp=$O)))
@@ -56,7 +57,7 @@ $(NULLMESH): $(OBJ.NULLMESH) $(LIB.NULLMESH)
 
 clean: nullmeshclean
 nullmeshclean:
-	-$(RM) $(NULLMESH) $(OBJ.NULLMESH)
+	-$(RMDIR) $(NULLMESH) $(OBJ.NULLMESH) $(OUTDLL)/$(notdir $(INF.NULLMESH))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/nullmesh.dep

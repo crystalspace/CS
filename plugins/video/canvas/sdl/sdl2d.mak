@@ -46,6 +46,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SDL2D)
 endif
 
+INF.SDL2D = $(SRCDIR)/plugins/video/canvas/sdl/sdl2d.csplugin
 INC.SDL2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/sdl/*.h   $(INC.COMMON.DRV2D)))
 SRC.SDL2D = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/sdl/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.SDL2D = $(addprefix $(OUT)/,$(notdir $(SRC.SDL2D:.cpp=$O)))
@@ -73,7 +74,7 @@ $(SDL2D): $(OBJ.SDL2D) $(LIB.SDL2D)
 
 clean: sdl2dclean
 sdl2dclean:
-	$(RM) $(SDL2D) $(OBJ.SDL2D)
+	-$(RMDIR) $(SDL2D) $(OBJ.SDL2D) $(OUTDLL)/$(notdir $(INF.SDL2D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sdl2d.dep

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(IEPLEX)
 endif
 
+INF.IEPLEX = $(SRCDIR)/plugins/mesh/impexp/ieplex/ieplex.csplugin
 INC.IEPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ieplex/*.h))
 SRC.IEPLEX = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ieplex/*.cpp))
 OBJ.IEPLEX = $(addprefix $(OUT)/,$(notdir $(SRC.IEPLEX:.cpp=$O)))
@@ -56,7 +57,7 @@ $(IEPLEX): $(OBJ.IEPLEX) $(LIB.IEPLEX)
 
 clean: ieplexclean
 ieplexclean:
-	-$(RM) $(IEPLEX) $(OBJ.IEPLEX)
+	-$(RMDIR) $(IEPLEX) $(OBJ.IEPLEX) $(OUTDLL)/$(notdir $(INF.IEPLEX))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/ieplex.dep

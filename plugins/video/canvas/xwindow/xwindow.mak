@@ -51,6 +51,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(XWIN)
 endif
 
+INF.XWIN = $(SRCDIR)/plugins/video/canvas/xwindow/xwin.csplugin
 INC.XWIN = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/video/canvas/xwindow/*.h plugins/video/canvas/common/scancode.h))
 SRC.XWIN = $(wildcard $(addprefix $(SRCDIR)/, \
@@ -75,7 +76,7 @@ $(XWIN): $(OBJ.XWIN) $(LIB.XWIN)
 
 clean: xwinclean
 xwinclean:
-	$(RM) $(XWIN) $(OBJ.XWIN)
+	-$(RMDIR) $(XWIN) $(OBJ.XWIN) $(OUTDLL)/$(notdir $(INF.XWIN))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/xwin.dep

@@ -38,6 +38,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(NETMAN)
 endif
 
+INF.NETMAN = $(SRCDIR)/plugins/net/manager/netman.csplugin
 INC.NETMAN = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/manager/*.h))
 SRC.NETMAN = $(wildcard $(addprefix $(SRCDIR)/,plugins/net/manager/*.cpp))
 OBJ.NETMAN = $(addprefix $(OUT)/,$(notdir $(SRC.NETMAN:.cpp=$O)))
@@ -61,7 +62,7 @@ $(NETMAN): $(OBJ.NETMAN) $(LIB.NETMAN)
 
 clean: netmanclean
 netmanclean:
-	$(RM) $(NETMAN) $(OBJ.NETMAN)
+	-$(RMDIR) $(NETMAN) $(OBJ.NETMAN) $(OUTDLL)/$(notdir $(INF.NETMAN))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/netman.dep

@@ -58,7 +58,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 TargetPath=".\csrelease\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Release Bin.	copy "$(TargetPath)"  csrelease\bin
+PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)" ..\..	copy "..\..\%metafile%" ..\..	echo Moving output to MSVC Release Bin.	copy "$(TargetPath)" csrelease\bin
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "%project% - Win32 Debug"
@@ -91,7 +91,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 TargetPath=".\csdebug\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csdebug\bin
+PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	copy "..\..\%metafile%" ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csdebug\bin
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "%project% - Win32 ExtensiveMemDebug"
@@ -124,7 +124,7 @@ LINK32=link.exe
 # Begin Special Build Tool
 TargetPath=".\csmemdbg\temp\%project%\%target%"
 SOURCE="$(InputPath)"
-PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csmemdbg\bin
+PostBuild_Cmds=echo Moving output to CS root.	copy "$(TargetPath)"  ..\..	copy "..\..\%metafile%" ..\..	echo Moving output to MSVC Debug Bin.	copy "$(TargetPath)"  csmemdbg\bin
 # End Special Build Tool
 
 !ENDIF 

@@ -67,6 +67,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CGDRIVER2D)
 endif
 
+INF.CGDRIVER2D = $(SRCDIR)/plugins/video/canvas/macosx/coregraphics/cgdriver2d.csplugin
 INC.CGDRIVER2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D) \
   $(addsuffix /*.h,$(MACOSX.SOURCE_CG2D_PATHS))))
 SRC.CGDRIVER2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) \
@@ -90,7 +91,7 @@ $(CGDRIVER2D): $(OBJ.CGDRIVER2D) $(LIB.CGDRIVER2D)
 
 clean: cgdriver2dclean
 cgdriver2dclean:
-	$(RM) $(CGDRIVER2D) $(OBJ.CGDRIVER2D)
+	-$(RMDIR) $(CGDRIVER2D) $(OBJ.CGDRIVER2D) $(OUTDLL)/$(notdir $(INF.CGDRIVER2D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cgdriver2d.dep

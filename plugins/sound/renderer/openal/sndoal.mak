@@ -41,6 +41,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDOAL)
 endif
 
+INF.SNDOAL = $(SRCDIR)/plugins/sound/renderer/openal/sndoal.csplugin
 INC.SNDOAL = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/renderer/openal/*.h plugins/sound/renderer/common/*.h))
 SRC.SNDOAL = $(wildcard $(addprefix $(SRCDIR)/, \
@@ -72,7 +73,7 @@ $(SNDOAL): $(OBJ.SNDOAL) $(LIB.SNDOAL)
 
 clean: sndoalclean
 sndoalclean:
-	$(RM) $(SNDOAL) $(OBJ.SNDOAL)
+	-$(RMDIR) $(SNDOAL) $(OBJ.SNDOAL) $(OUTDLL)/$(notdir $(INF.SNDOAL))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndoal.dep

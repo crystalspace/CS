@@ -67,6 +67,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLSHADER_MTEX)
 endif
 
+INF.GLSHADER_MTEX = $(SRCDIR)/plugins/video/render3d/shaderplugins/glshader_mtex/glshader_mtex.csplugin
 INC.GLSHADER_MTEX = $(wildcard plugins/video/render3d/shaderplugins/glshader_mtex/*.h) 
 SRC.GLSHADER_MTEX = $(wildcard plugins/video/render3d/shaderplugins/glshader_mtex/*.cpp)
 OBJ.GLSHADER_MTEX = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_MTEX:.cpp=$O)))
@@ -102,7 +103,7 @@ $(GLSHADER_MTEX): $(OBJ.GLSHADER_MTEX) $(LIB.GLSHADER_MTEX)
 	$(DO.PLUGIN.POSTAMBLE)
 
 glshader_mtexclean:
-	$(RM) $(GLSHADER_MTEX) $(OBJ.GLSHADER_MTEX)
+	-$(RMDIR) $(GLSHADER_MTEX) $(OBJ.GLSHADER_MTEX) $(OUTDLL)/$(notdir $(INF.GLSHADER_MTEX))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/glshader_mtex.dep

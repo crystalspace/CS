@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- odivx.csplugin -->
+<plugin>
+  <name>odivx</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.video.codec.avi.dvx1</name>
+        <description>CrystalSpace OpenDivX codec</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

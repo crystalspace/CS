@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(BALL)
 endif
 
+INF.BALL = $(SRCDIR)/plugins/mesh/ball/object/ball.csplugin
 INC.BALL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/ball/object/*.h))
 SRC.BALL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/ball/object/*.cpp))
 OBJ.BALL = $(addprefix $(OUT)/,$(notdir $(SRC.BALL:.cpp=$O)))
@@ -56,7 +57,7 @@ $(BALL): $(OBJ.BALL) $(LIB.BALL)
 
 clean: ballclean
 ballclean:
-	-$(RM) $(BALL) $(OBJ.BALL)
+	-$(RMDIR) $(BALL) $(OBJ.BALL) $(OUTDLL)/$(notdir $(INF.BALL))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/ball.dep

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- metagen.csplugin -->
+<plugin>
+  <name>metagen</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.factory.metagen</name>
+        <description>MetaGen Mesh factory for crystal space</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

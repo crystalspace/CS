@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cstgaimg.csplugin -->
+<plugin>
+  <name>cstgaimg</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphic.image.io.tga</name>
+        <description>CrystalSpace TGA image format I/O plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

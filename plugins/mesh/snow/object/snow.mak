@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNOW)
 endif
 
+INF.SNOW = $(SRCDIR)/plugins/mesh/snow/object/snow.csplugin
 INC.SNOW = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/snow/object/*.h plugins/mesh/partgen/*.h))
 SRC.SNOW = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/snow/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.SNOW = $(addprefix $(OUT)/,$(notdir $(SRC.SNOW:.cpp=$O)))
@@ -56,7 +57,7 @@ $(SNOW): $(OBJ.SNOW) $(LIB.SNOW)
 
 clean: snowclean
 snowclean:
-	-$(RM) $(SNOW) $(OBJ.SNOW)
+	-$(RMDIR) $(SNOW) $(OBJ.SNOW) $(OUTDLL)/$(notdir $(INF.SNOW))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/snow.dep

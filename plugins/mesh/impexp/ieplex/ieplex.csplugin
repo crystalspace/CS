@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- ieplex.csplugin -->
+<plugin>
+  <name>ieplex</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.modelconverter.multiplexer</name>
+        <description>Multiplexer for Model Converters</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDIFF)
 endif
 
+INF.SNDIFF = $(SRCDIR)/plugins/sound/loader/iff/sndiff.csplugin
 INC.SNDIFF = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/loader/iff/*.h plugins/sound/loader/common/*.h))
 SRC.SNDIFF = $(wildcard $(addprefix $(SRCDIR)/, \
@@ -64,7 +65,7 @@ $(SNDIFF): $(OBJ.SNDIFF) $(LIB.SNDIFF)
 
 clean: sndiffclean
 sndiffclean:
-	$(RM) $(SNDIFF) $(OBJ.SNDIFF)
+	-$(RMDIR) $(SNDIFF) $(OBJ.SNDIFF) $(OUTDLL)/$(notdir $(INF.SNDIFF))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndiff.dep

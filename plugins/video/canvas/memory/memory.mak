@@ -43,6 +43,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(MEMORY)
 endif
 
+INF.MEMORY = $(SRCDIR)/plugins/video/canvas/memory/memory.csplugin
 INC.MEMORY = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/memory/*.h   $(INC.COMMON.DRV2D)))
 SRC.MEMORY = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/memory/*.cpp $(SRC.COMMON.DRV2D)))
 OBJ.MEMORY = $(addprefix $(OUT)/,$(notdir $(SRC.MEMORY:.cpp=$O)))
@@ -70,7 +71,7 @@ $(MEMORY): $(OBJ.MEMORY) $(LIB.MEMORY)
 	$(DO.PLUGIN) $(LIB.MEMORY.SYSTEM)
 
 memoryclean:
-	$(RM) $(MEMORY) $(OBJ.MEMORY) $(OUTOS)/memory.dep
+	-$(RMDIR) $(MEMORY) $(OBJ.MEMORY) $(OUTDLL)/$(notdir $(INF.MEMORY)) $(OUTOS)/memory.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/memory.dep

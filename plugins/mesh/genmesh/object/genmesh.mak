@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GENMESH)
 endif
 
+INF.GENMESH = $(SRCDIR)/plugins/mesh/genmesh/object/genmesh.csplugin
 INC.GENMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/object/*.h))
 SRC.GENMESH = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/genmesh/object/*.cpp))
 OBJ.GENMESH = $(addprefix $(OUT)/,$(notdir $(SRC.GENMESH:.cpp=$O)))
@@ -56,7 +57,7 @@ $(GENMESH): $(OBJ.GENMESH) $(LIB.GENMESH)
 
 clean: genmeshclean
 genmeshclean:
-	-$(RM) $(GENMESH) $(OBJ.GENMESH)
+	-$(RMDIR) $(GENMESH) $(OBJ.GENMESH) $(OUTDLL)/$(notdir $(INF.GENMESH))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/genmesh.dep

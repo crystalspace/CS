@@ -38,6 +38,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSSYNLDR)
 endif
 
+INF.CSSYNLDR = $(SRCDIR)/plugins/csparser/services/cssynldr.csplugin
 INC.CSSYNLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/services/*.h))
 SRC.CSSYNLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/services/*.cpp))
 OBJ.CSSYNLDR = $(addprefix $(OUT)/,$(notdir $(SRC.CSSYNLDR:.cpp=$O)))
@@ -59,7 +60,7 @@ $(CSSYNLDR): $(OBJ.CSSYNLDR) $(LIB.CSSYNLDR)
 
 clean: cssynldrclean
 cssynldrclean:
-	-$(RM) $(CSSYNLDR) $(OBJ.CSSYNLDR)
+	-$(RMDIR) $(CSSYNLDR) $(OBJ.CSSYNLDR) $(OUTDLL)/$(notdir $(INF.CSSYNLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cssynldr.dep

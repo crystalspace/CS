@@ -37,6 +37,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDOGG)
 endif
 
+INF.SNDOGG = $(SRCDIR)/plugins/sound/loader/ogg/sndogg.csplugin
 INC.SNDOGG = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/ogg/*.h))
 SRC.SNDOGG = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/loader/ogg/*.cpp))
 OBJ.SNDOGG = $(addprefix $(OUT)/,$(notdir $(SRC.SNDOGG:.cpp=$O)))
@@ -66,7 +67,7 @@ $(OUT)/%$O: $(SRCDIR)/plugins/sound/loader/ogg/%.cpp
 
 clean: sndoggclean
 sndoggclean:
-	$(RM) $(SNDOGG) $(OBJ.SNDOGG)
+	-$(RMDIR) $(SNDOGG) $(OBJ.SNDOGG) $(OUTDLL)/$(notdir $(INF.SNDOGG))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndogg.dep

@@ -1,9 +1,8 @@
 EXE = .app
-DLL = .csplugin
+DLL = .csbundle
 MACOSX.APP_EXE  = $@/Contents/MacOS/$(notdir $(basename $@))
 MACOSX.APP_ICON = libs/cssys/macosx/appicon.icns
 MACOSX.APP_DIR  = .
-MACOSX.APP_EXT  = .app
 CFLAGS.GENERAL = -force_cpusubtype_ALL -Wno-precomp -fno-common -pipe
 LFLAGS.GENERAL = $(MACOSX.LFLAGS.CONFIG) -lpthread
 LFLAGS.EXE = -framework AppKit -framework Foundation

@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(METAGEN)
 endif
 
+INF.METAGEN = $(SRCDIR)/plugins/mesh/metagen/object/metagen.csplugin
 INC.METAGEN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metagen/object/*.h))
 SRC.METAGEN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metagen/object/*.cpp))
 OBJ.METAGEN = $(addprefix $(OUT)/,$(notdir $(SRC.METAGEN:.cpp=$O)))
@@ -68,7 +69,7 @@ $(METAGEN): $(OBJ.METAGEN) $(LIB.METAGEN)
 	$(DO.PLUGIN)
 
 metagenclean:
-	$(RM) $(METAGEN) $(OBJ.METAGEN)
+	-$(RMDIR) $(METAGEN) $(OBJ.METAGEN) $(OUTDLL)/$(notdir $(INF.METAGEN))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/metagen.dep

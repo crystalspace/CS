@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- casnddrv.csplugin -->
+<plugin>
+  <name>casnddrv</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sound.driver.coreaudio</name>
+        <description>Crystal Space CoreAudio sound driver for MacOS/X</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

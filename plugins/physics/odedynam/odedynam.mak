@@ -40,6 +40,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(ODEDYNAM)
 endif
 
+INF.ODEDYNAM = $(SRCDIR)/plugins/physics/odedynam/odedynam.csplugin
 INC.ODEDYNAM = $(wildcard $(addprefix $(SRCDIR)/,plugins/physics/odedynam/*.h))
 SRC.ODEDYNAM = $(wildcard $(addprefix $(SRCDIR)/,plugins/physics/odedynam/*.cpp))
 OBJ.ODEDYNAM = $(addprefix $(OUT)/,$(notdir $(SRC.ODEDYNAM:.cpp=$O)))
@@ -68,7 +69,7 @@ $(ODEDYNAM): $(OBJ.ODEDYNAM) $(LIB.ODEDYNAM)
 
 clean: odedynamclean
 odedynamclean:
-	$(RM) $(ODEDYNAM) $(OBJ.ODEDYNAM)
+	-$(RMDIR) $(ODEDYNAM) $(OBJ.ODEDYNAM) $(OUTDLL)/$(notdir $(INF.ODEDYNAM))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/odedynam.dep

@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(STDREP)
 endif
 
+INF.STDREP = $(SRCDIR)/plugins/stdrep/stdrep.csplugin
 INC.STDREP = $(wildcard $(addprefix $(SRCDIR)/,plugins/stdrep/*.h))
 SRC.STDREP = $(wildcard $(addprefix $(SRCDIR)/,plugins/stdrep/*.cpp))
 OBJ.STDREP = $(addprefix $(OUT)/,$(notdir $(SRC.STDREP:.cpp=$O)))
@@ -65,7 +66,7 @@ $(STDREP): $(OBJ.STDREP) $(LIB.STDREP)
 
 clean: stdrepclean
 stdrepclean:
-	$(RM) $(STDREP) $(OBJ.STDREP)
+	-$(RMDIR) $(STDREP) $(OBJ.STDREP) $(OUTDLL)/$(notdir $(INF.STDREP))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/stdrep.dep

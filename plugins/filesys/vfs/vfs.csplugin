@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- vfs.csplugin -->
+<plugin>
+  <name>vfs</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.kernel.vfs</name>
+        <description>Crystal Space Virtual File System</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

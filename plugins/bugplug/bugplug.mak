@@ -42,6 +42,7 @@ endif
 
 DIR.BUGPLUG = plugins/bugplug
 OUT.BUGPLUG = $(OUT)/$(DIR.BUGPLUG)
+INF.BUGPLUG = $(SRCDIR)/$(DIR.BUGPLUG)/bugplug.csplugin
 INC.BUGPLUG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUGPLUG)/*.h))
 SRC.BUGPLUG = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.BUGPLUG)/*.cpp))
 OBJ.BUGPLUG = $(addprefix $(OUT.BUGPLUG)/,$(notdir $(SRC.BUGPLUG:.cpp=$O)))
@@ -73,7 +74,7 @@ $(BUGPLUG): $(OBJ.BUGPLUG) $(LIB.BUGPLUG)
 
 clean: bugplugclean
 bugplugclean:
-	-$(RM) $(BUGPLUG) $(OBJ.BUGPLUG)
+	-$(RMDIR) $(BUGPLUG) $(OBJ.BUGPLUG) $(OUTDLL)/$(notdir $(INF.BUGPLUG))
 
 cleandep: bugplugcleandep
 bugplugcleandep:

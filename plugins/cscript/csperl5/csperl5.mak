@@ -45,6 +45,7 @@ else
 endif
 
 SCF.CSPERL5 = $(SRCDIR)/plugins/cscript/csperl5/csperl5.scf
+INF.CSPERL5 = $(SRCDIR)/plugins/cscript/csperl5/csperl5.csplugin
 INC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.h))
 SRC.CSPERL5 = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/csperl5/*.cpp))
 OBJ.CSPERL5 = $(addprefix $(OUT)/,$(notdir $(SRC.CSPERL5:.cpp=$O)))
@@ -157,7 +158,7 @@ clean: csperl5clean
 maintainerclean: csperl5maintainerclean
 
 csperl5clean:
-	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) $(OUTDLL)/$(notdir $(SCF.CSPERL5)) \
+	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) $(OUTDLL)/$(notdir $(INF.CSPERL5)) $(OUTDLL)/$(notdir $(SCF.CSPERL5)) \
 $(PERLXSI.O) $(PERLXSI.C) $(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
 swigperl5clean:

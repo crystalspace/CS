@@ -69,6 +69,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(COCOA2D)
 endif
 
+INF.COCOA2D = $(SRCDIR)/plugins/video/canvas/macosx/cocoa/cocoa2d.csplugin
 INC.COCOA2D = $(wildcard $(addprefix $(SRCDIR)/,$(INC.COMMON.DRV2D) \
   $(addsuffix /*.h,$(MACOSX.SOURCE_COCOA2D_PATHS))))
 SRC.COCOA2D = $(wildcard $(addprefix $(SRCDIR)/,$(SRC.COMMON.DRV2D) \
@@ -92,7 +93,7 @@ $(COCOA2D): $(OBJ.COCOA2D) $(LIB.COCOA2D)
 
 clean: cocoa2dclean
 cocoa2dclean:
-	$(RM) $(COCOA2D) $(OBJ.COCOA2D)
+	-$(RMDIR) $(COCOA2D) $(OBJ.COCOA2D) $(OUTDLL)/$(notdir $(INF.COCOA2D))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cocoa2d.dep

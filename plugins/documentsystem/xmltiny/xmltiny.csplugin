@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- xmltiny.csplugin -->
+<plugin>
+  <name>xmltiny</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.documentsystem.tinyxml</name>
+        <description>Crystal Space TinyXML document system</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

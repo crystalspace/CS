@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSTGAIMG)
 endif
 
+INF.CSTGAIMG = $(SRCDIR)/plugins/video/loader/tga/cstgaimg.csplugin
 INC.CSTGAIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/tga/*.h))
 SRC.CSTGAIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/tga/*.cpp))
 
@@ -63,7 +64,7 @@ $(CSTGAIMG): $(OBJ.CSTGAIMG) $(LIB.CSTGAIMG)
 
 clean: cstgaimgclean
 cstgaimgclean:
-	$(RM) $(CSTGAIMG) $(OBJ.CSTGAIMG)
+	-$(RMDIR) $(CSTGAIMG) $(OBJ.CSTGAIMG) $(OUTDLL)/$(notdir $(INF.CSTGAIMG))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/tgaimg.dep

@@ -34,6 +34,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSFONT)
 endif
 
+INF.CSFONT = $(SRCDIR)/plugins/font/server/csfont/csfont.csplugin
 INC.CSFONT = $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/csfont/*.h))
 SRC.CSFONT = \
   $(wildcard $(addprefix $(SRCDIR)/,plugins/font/server/csfont/*.cpp))
@@ -57,7 +58,7 @@ $(CSFONT): $(OBJ.CSFONT) $(LIB.CSFONT)
 
 clean: csfontclean
 csfontclean:
-	-$(RM) $(CSFONT) $(OBJ.CSFONT)
+	-$(RMDIR) $(CSFONT) $(OBJ.CSFONT) $(OUTDLL)/$(notdir $(INF.CSFONT))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csfont.dep

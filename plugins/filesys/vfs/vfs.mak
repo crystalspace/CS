@@ -43,6 +43,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(VFS)
 endif
 
+INF.VFS = $(SRCDIR)/plugins/filesys/vfs/vfs.csplugin
 INC.VFS = $(wildcard $(addprefix $(SRCDIR)/,plugins/filesys/vfs/*.h))
 SRC.VFS = $(wildcard $(addprefix $(SRCDIR)/,plugins/filesys/vfs/*.cpp))
 OBJ.VFS = $(addprefix $(OUT)/,$(notdir $(SRC.VFS:.cpp=$O)))
@@ -76,7 +77,7 @@ $(VFS): $(OBJ.VFS) $(LIB.VFS)
 	$(DO.PLUGIN.POSTAMBLE)
 
 vfsclean:
-	$(RM) $(VFS) $(OBJ.VFS)
+	-$(RMDIR) $(VFS) $(OBJ.VFS) $(OUTDLL)/$(notdir $(INF.VFS))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/vfs.dep

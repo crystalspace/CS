@@ -124,17 +124,34 @@ DO.COMPILE.S = \
   $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a NASM source
 DO.COMPILE.ASM = $(NASM.BIN) $(NASM.@) $(NASMFLAGS) $(<<)
+
 # How to make a static library
 DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
 # How to make a shared/dynamic library
 DO.SHARED.LIBRARY = \
   $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
+
 # How to make a static plugin
 DO.STATIC.PLUGIN.PREAMBLE =
 DO.STATIC.PLUGIN.CORE = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
 DO.STATIC.PLUGIN.POSTAMBLE =
+
 # How to make a shared plugin
-DO.SHARED.PLUGIN.PREAMBLE =
+INF.INFILE = $(INF.$(basename $(notdir $(UPCASE))))
+INF.OUTFILE = $(OUTDLL)/$(basename $(notdir $@)).csplugin
+# Blank line in this macro is significant.  Do not remove it.  It ensures that
+# the "preamble" is a distinct command from the "core".  This means that if the
+# preamble fails for some reason, it will abort the build, thus the remaining
+# commands (core and postamble) will not be invoked (which is the correct
+# behavior).
+define DO.SHARED.PLUGIN.PREAMBLE
+  if ! diff $(INF.INFILE) $(INF.OUTFILE) > /dev/null 2>&1 ; \
+  then \
+    $(RM) $(INF.OUTFILE) ; \
+    $(CP) $(INF.INFILE) $(INF.OUTFILE) ; \
+  fi
+
+endef
 DO.SHARED.PLUGIN.CORE = \
   $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
 DO.SHARED.PLUGIN.POSTAMBLE =

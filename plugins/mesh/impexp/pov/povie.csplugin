@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- povie.csplugin -->
+<plugin>
+  <name>povie</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.modelconverter.pov</name>
+        <description>POV Model Converter</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

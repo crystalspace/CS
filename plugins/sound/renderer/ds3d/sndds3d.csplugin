@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- sndds3d.csplugin -->
+<plugin>
+  <name>sndds3d</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sound.render.ds3d</name>
+        <description>Crystal Space DirectSound3D Sound Render</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(RAINLDR)
 endif
 
+INF.RAINLDR = $(SRCDIR)/plugins/mesh/rain/persist/standard/rainldr.csplugin
 INC.RAINLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/rain/persist/standard/*.h))
 SRC.RAINLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/rain/persist/standard/*.cpp))
 OBJ.RAINLDR = $(addprefix $(OUT)/,$(notdir $(SRC.RAINLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(RAINLDR): $(OBJ.RAINLDR) $(LIB.RAINLDR)
 
 clean: rainldrclean
 rainldrclean:
-	-$(RM) $(RAINLDR) $(OBJ.RAINLDR)
+	-$(RMDIR) $(RAINLDR) $(OBJ.RAINLDR) $(OUTDLL)/$(notdir $(INF.RAINLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/rainldr.dep

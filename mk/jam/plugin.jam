@@ -2,6 +2,9 @@
 # Rules for plugin creation
 #============================================================================
 
+SUFMETA ?= .csplugin ;
+GRISTMETA ?= pluginmeta ;
+
 ##  Plugin pluginname : sources [ : options ]
 ##    Build a plugin out of sourcefiles. All sourcefiles will be passed
 ##    to the Objects rule which tries to compile them into object-files. You
@@ -21,6 +24,10 @@ rule Plugin
 {
   # check options
   CheckOptions noinstall independent : $(3) : $(<) ;
+
+  local metafile ;
+  metafile = [ FAppendSuffix $(<) : $(SUFMETA) ] ;
+  SEARCH on $(metafile) = $(SEARCH_SOURCE) ;
 
   local target = [ ConstructPluginTarget $(<) : $(3) ] ;
   local sources = [ DoSourceGrist $(>) ] ;
@@ -43,7 +50,8 @@ rule Plugin
   LFlags $(<)_static : $(LINKLIBS) ;
   SubVariant ;
 
-  # so 'jam foo' works when it's really foo.exe (Windows) or foo.app (MacOS/X)
+  # so 'jam foo' works when it's really foo.dll (Windows) or foo.csbundle
+  # (MacOS/X)
   if $(target) != $(<)
   {
     Depends $(<) : $(target) ;
@@ -52,7 +60,7 @@ rule Plugin
 
   if ! [ IsElem independent : $(3) ]
   {
-    Depends plugins : $(target) ;
+    Depends plugins : $(<) ;
   }
 
   # construct install atrget
@@ -63,7 +71,7 @@ rule Plugin
 
   # Link
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
-  SystemLinkPlugin $(<) : $(objects) : $(3) ;
+  SystemLinkPlugin $(<) : $(objects) : $(3) : $(metafile) ;
 
   CFlags $(<) : $(PLUGIN.CFLAGS) ;
   LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
@@ -72,7 +80,23 @@ rule Plugin
 #----------------------------------------------------------------------------
 # private rules
 
+#  PluginMetaData pluginname : metafile
+#    Copy a plugin's meta file so that it resides alongside the generated
+#    plugin module.  This utility rule may be used by SystemLinkPlugin rules
+#    which employ the default behavior of having a plugin's meta-data file
+#    reside alongside the plugin executable (as opposed to bundling the
+#    metadata directly into the plugin).
+rule PluginMetaData
+{
+  local target = $(>:G=$(GRISTMETA)) ;
+  Depends $(<) : $(target) ;
+  Depends $(target) : $(>) ;
+  MakeLocate $(target) : $(LOCATE.TARGETS) ;
+  File $(target) : $(>) ;
+  Clean clean : $(target) ;
+  Clean $(<)clean : $(target) ;
+}
+
 # Construct pseudo target plugins
 Depends exe : plugins ;
 NotFile plugins ;
-

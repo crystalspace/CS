@@ -37,6 +37,7 @@ endif
 
 DIR.ISO = plugins/engine/iso
 OUT.ISO = $(OUT)/$(DIR.ISO)
+INF.ISO = $(SRCDIR)/$(DIR.ISO)/iso.csplugin
 INC.ISO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISO)/*.h))
 SRC.ISO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.ISO)/*.cpp))
 OBJ.ISO = $(addprefix $(OUT.ISO)/,$(notdir $(SRC.ISO:.cpp=$O)))
@@ -64,7 +65,7 @@ $(ISO): $(OBJ.ISO) $(LIB.ISO)
 
 clean: isoclean
 isoclean:
-	-$(RM) $(ISO) $(OBJ.ISO)
+	-$(RMDIR) $(ISO) $(OBJ.ISO) $(OUTDLL)/$(notdir $(INF.ISO))
 
 cleandep: isocleandep
 isocleandep:

@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(METABALL)
 endif
 
+INF.METABALL = $(SRCDIR)/plugins/mesh/metaball/object/metaball.csplugin
 INC.METABALL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metaball/object/*.h))
 SRC.METABALL = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metaball/object/*.cpp))
 OBJ.METABALL = $(addprefix $(OUT)/,$(notdir $(SRC.METABALL:.cpp=$O)))
@@ -68,7 +69,7 @@ $(METABALL): $(OBJ.METABALL) $(LIB.METABALL)
 	$(DO.PLUGIN)
 
 metaballclean:
-	$(RM) $(METABALL) $(OBJ.METABALL)
+	-$(RMDIR) $(METABALL) $(OBJ.METABALL) $(OUTDLL)/$(notdir $(INF.METABALL))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/metaball.dep

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!-- aws.csplugin -->
+<plugin>
+  <name>aws</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.window.alternatemanager</name>
+        <description>Crystal Space alternate window manager</description>
+      </class>
+      <class>
+        <name>crystalspace.window.preferencemanager</name>
+        <description>Crystal Space window preference manager</description>
+      </class>
+      <class>
+        <name>crystalspace.window.sinkmanager</name>
+        <description>Crystal Space window sink manager</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

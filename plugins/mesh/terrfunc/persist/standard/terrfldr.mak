@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(TERRFLDR)
 endif
 
+INF.TERRFLDR = $(SRCDIR)/plugins/mesh/terrfunc/persist/standard/terrfldr.csplugin
 INC.TERRFLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrfunc/persist/standard/*.h))
 SRC.TERRFLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrfunc/persist/standard/*.cpp))
 OBJ.TERRFLDR = $(addprefix $(OUT)/,$(notdir $(SRC.TERRFLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(TERRFLDR): $(OBJ.TERRFLDR) $(LIB.TERRFLDR)
 
 clean: terrfldrclean
 terrfldrclean:
-	-$(RM) $(TERRFLDR) $(OBJ.TERRFLDR)
+	-$(RMDIR) $(TERRFLDR) $(OBJ.TERRFLDR) $(OUTDLL)/$(notdir $(INF.TERRFLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/terrfldr.dep

@@ -51,7 +51,7 @@ rule Application
   # make dependency on apps target
   if ! [ IsElem independent : $(3) ]
   {
-    Depends apps : $(target) ;
+    Depends apps : $(<) ;
   }
 
   # construct Install target

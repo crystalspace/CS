@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- rlecodec.csplugin -->
+<plugin>
+  <name>rlecodec</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.video.codec.avi.rle</name>
+        <description>CrystalSpace RLE codec</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

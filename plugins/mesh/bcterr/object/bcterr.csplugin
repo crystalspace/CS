@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- bcterr.csplugin -->
+<plugin>
+  <name>bcterr</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.bcterr</name>
+        <description>Crystal Space Bezier Curve Terrain Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

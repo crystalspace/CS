@@ -38,6 +38,7 @@ endif
 
 DIR.XMLREAD = plugins/documentsystem/xmlread
 OUT.XMLREAD = $(OUT)/$(DIR.XMLREAD)
+INF.XMLREAD = $(SRCDIR)/$(DIR.XMLREAD)/xmlread.csplugin
 INC.XMLREAD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLREAD)/*.h))
 SRC.XMLREAD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.XMLREAD)/*.cpp))
 OBJ.XMLREAD = $(addprefix $(OUT.XMLREAD)/,$(notdir $(SRC.XMLREAD:.cpp=$O)))
@@ -64,7 +65,7 @@ $(XMLREAD): $(OBJ.XMLREAD) $(LIB.XMLREAD)
 
 clean: xmlreadclean
 xmlreadclean:
-	-$(RM) $(XMLREAD) $(OBJ.XMLREAD)
+	-$(RMDIR) $(XMLREAD) $(OBJ.XMLREAD) $(OUTDLL)/$(notdir $(INF.XMLREAD))
 
 cleandep: xmlreadcleandep
 xmlreadcleandep:

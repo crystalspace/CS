@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- ball.csplugin -->
+<plugin>
+  <name>ball</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.ball</name>
+        <description>Crystal Space Ball Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

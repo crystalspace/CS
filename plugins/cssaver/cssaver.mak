@@ -38,6 +38,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSSAVER)
 endif
 
+INF.CSSAVER = $(SRCDIR)/plugins/cssaver/cssaver.csplugin
 INC.CSSAVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/cssaver/*.h))
 SRC.CSSAVER = $(wildcard $(addprefix $(SRCDIR)/,plugins/cssaver/*.cpp))
 OBJ.CSSAVER = $(addprefix $(OUT)/,$(notdir $(SRC.CSSAVER:.cpp=$O)))
@@ -59,7 +60,7 @@ $(CSSAVER): $(OBJ.CSSAVER) $(LIB.CSSAVER)
 
 clean: cssaverclean
 cssaverclean:
-	-$(RM) $(CSSAVER) $(OBJ.CSSAVER)
+	-$(RMDIR) $(CSSAVER) $(OBJ.CSSAVER) $(OUTDLL)/$(notdir $(INF.CSSAVER))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/cssaver.dep

@@ -57,6 +57,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDSOFT)
 endif
 
+INF.SNDSOFT = $(SRCDIR)/plugins/sound/renderer/software/sndsoft.csplugin
 INC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/, \
   plugins/sound/renderer/software/*.h plugins/sound/renderer/common/*.h))
 SRC.SNDSOFT = $(wildcard $(addprefix $(SRCDIR)/, \
@@ -82,7 +83,7 @@ $(SNDSOFT): $(OBJ.SNDSOFT) $(LIB.SNDSOFT)
 
 clean: sndsoftclean
 sndsoftclean:
-	$(RM) $(SNDSOFT) $(OBJ.SNDSOFT)
+	-$(RMDIR) $(SNDSOFT) $(OBJ.SNDSOFT) $(OUTDLL)/$(notdir $(INF.SNDSOFT))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndsoft.dep

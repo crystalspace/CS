@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPRIE)
 endif
 
+INF.SPRIE = $(SRCDIR)/plugins/mesh/impexp/spr/sprie.csplugin
 INC.SPRIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/spr/*.h))
 SRC.SPRIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/spr/*.cpp))
 OBJ.SPRIE = $(addprefix $(OUT)/,$(notdir $(SRC.SPRIE:.cpp=$O)))
@@ -56,7 +57,7 @@ $(SPRIE): $(OBJ.SPRIE) $(LIB.SPRIE)
 
 clean: sprieclean
 sprieclean:
-	-$(RM) $(SPRIE) $(OBJ.SPRIE)
+	-$(RMDIR) $(SPRIE) $(OBJ.SPRIE) $(OUTDLL)/$(notdir $(INF.SPRIE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/sprie.dep

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- rapid.csplugin -->
+<plugin>
+  <name>rapid</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.collisiondetection.rapid</name>
+        <description>CrystalSpace RAPID CD System</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

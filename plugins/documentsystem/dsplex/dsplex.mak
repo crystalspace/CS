@@ -38,6 +38,7 @@ endif
 
 DIR.DSPLEX = plugins/documentsystem/dsplex
 OUT.DSPLEX = $(OUT)/$(DIR.DSPLEX)
+INF.DSPLEX = $(SRCDIR)/$(DIR.DSPLEX)/dsplex.csplugin
 INC.DSPLEX = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.DSPLEX)/*.h))
 SRC.DSPLEX = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.DSPLEX)/*.cpp))
 OBJ.DSPLEX = $(addprefix $(OUT.DSPLEX)/,$(notdir $(SRC.DSPLEX:.cpp=$O)))
@@ -64,7 +65,7 @@ $(DSPLEX): $(OBJ.DSPLEX) $(LIB.DSPLEX)
 
 clean: dsplexclean
 dsplexclean:
-	-$(RM) $(DSPLEX) $(OBJ.DSPLEX)
+	-$(RMDIR) $(DSPLEX) $(OBJ.DSPLEX) $(OUTDLL)/$(notdir $(INF.DSPLEX))
 
 cleandep: dsplexcleandep
 dsplexcleandep:

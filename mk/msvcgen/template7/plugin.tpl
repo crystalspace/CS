@@ -69,6 +69,7 @@
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
 copy &quot;$(TargetPath)&quot;  ..\..
+copy &quot;..\..\%metafile%&quot;  ..\..
 echo Moving output to MSVC Release Bin.
 copy &quot;$(TargetPath)&quot;  csrelease\bin
 "/>
@@ -141,6 +142,7 @@ copy &quot;$(TargetPath)&quot;  csrelease\bin
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
 copy &quot;$(TargetPath)&quot;  ..\..
+copy &quot;..\..\%metafile%&quot;  ..\..
 echo Moving output to MSVC Debug Bin.
 copy &quot;$(TargetPath)&quot;  csdebug\bin
 "/>
@@ -213,6 +215,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				Name="VCPostBuildEventTool"
 				CommandLine="echo Moving output to CS root.
 copy &quot;$(TargetPath)&quot;  ..\..
+copy &quot;..\..\%metafile%&quot;  ..\..
 echo Moving output to MSVC Debug Bin.
 copy &quot;$(TargetPath)&quot;  csmemdbg\bin
 "/>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- sndplex.csplugin -->
+<plugin>
+  <name>sndplex</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.sound.loader.multiplexer</name>
+        <description>Sound Loader Multiplexer</description>
+        <requires>
+          <class>crystalspace.sound.loader.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- objie.csplugin -->
+<plugin>
+  <name>objie</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.modelconverter.obj</name>
+        <description>OBJ Model Converter</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -39,6 +39,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSDDSIMG)
 endif
 
+INF.CSDDSIMG = $(SRCDIR)/plugins/video/loader/dds/csddsimg.csplugin
 INC.CSDDSIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/dds/*.h))
 SRC.CSDDSIMG = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/loader/dds/*.cpp))
 
@@ -63,7 +64,7 @@ $(CSDDSIMG): $(OBJ.CSDDSIMG) $(LIB.CSDDSIMG)
 
 clean: csddsimgclean
 csddsimgclean:
-	$(RM) $(CSDDSIMG) $(OBJ.CSDDSIMG)
+	-$(RMDIR) $(CSDDSIMG) $(OBJ.CSDDSIMG) $(OUTDLL)/$(notdir $(INF.CSDDSIMG))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/ddsimg.dep

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSCONOUT)
 endif
 
+INF.CSCONOUT = $(SRCDIR)/plugins/console/output/standard/csconout.csplugin
 INC.CSCONOUT = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/standard/*.h))
 SRC.CSCONOUT = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/standard/*.cpp))
 OBJ.CSCONOUT = $(addprefix $(OUT)/,$(notdir $(SRC.CSCONOUT:.cpp=$O)))
@@ -56,7 +57,7 @@ $(CSCONOUT): $(OBJ.CSCONOUT) $(LIB.CSCONOUT)
 
 clean: csconoutclean
 csconoutclean:
-	-$(RM) $(CSCONOUT) $(OBJ.CSCONOUT)
+	-$(RMDIR) $(CSCONOUT) $(OBJ.CSCONOUT) $(OUTDLL)/$(notdir $(INF.CSCONOUT))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csconout.dep

@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(BCTERR)
 endif
 
+INF.BCTERR = $(SRCDIR)/plugins/mesh/bcterr/object/bcterr.csplugin
 INC.BCTERR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/object/*.h))
 SRC.BCTERR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/object/*.cpp))
 OBJ.BCTERR = $(addprefix $(OUT)/,$(notdir $(SRC.BCTERR:.cpp=$O)))
@@ -55,7 +56,7 @@ bcterr: $(OUTDIRS) $(BCTERR)
 
 clean: bcterrclean
 bcterrclean:
-	-$(RM) $(BCTERR) $(OBJ.BCTERR)
+	-$(RMDIR) $(BCTERR) $(OBJ.BCTERR) $(OUTDLL)/$(notdir $(INF.BCTERR))
 
 $(OUT)/%$O: $(SRCDIR)/plugins/mesh/bcterr/object/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.BCTERR)

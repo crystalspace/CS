@@ -38,6 +38,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSPARSER)
 endif
 
+INF.CSPARSER = $(SRCDIR)/plugins/csparser/csparser.csplugin
 INC.CSPARSER = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/*.h))
 SRC.CSPARSER = $(wildcard $(addprefix $(SRCDIR)/,plugins/csparser/*.cpp))
 OBJ.CSPARSER = $(addprefix $(OUT)/,$(notdir $(SRC.CSPARSER:.cpp=$O)))
@@ -59,7 +60,7 @@ $(CSPARSER): $(OBJ.CSPARSER) $(LIB.CSPARSER)
 
 clean: csparserclean
 csparserclean:
-	-$(RM) $(CSPARSER) $(OBJ.CSPARSER)
+	-$(RMDIR) $(CSPARSER) $(OBJ.CSPARSER) $(OUTDLL)/$(notdir $(INF.CSPARSER))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csparser.dep

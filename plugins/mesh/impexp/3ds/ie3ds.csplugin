@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- ie3ds.csplugin -->
+<plugin>
+  <name>ie3ds</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.modelconverter.3ds</name>
+        <description>3ds Model Converter</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

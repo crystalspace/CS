@@ -33,6 +33,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(JOYLIN)
 endif
 
+INF.JOYLIN = $(SRCDIR)/plugins/device/joystick/linux/joylin.csplugin
 INC.JOYLIN = \
   $(wildcard $(addprefix $(SRCDIR)/,plugins/device/joystick/linux/*.h))
 SRC.JOYLIN = \
@@ -55,7 +56,7 @@ $(JOYLIN): $(OBJ.JOYLIN) $(LIB.JOYLIN)
 
 clean: joylinclean
 joylinclean:
-	-$(RM) $(JOYLIN) $(OBJ.JOYLIN)
+	-$(RMDIR) $(JOYLIN) $(OBJ.JOYLIN) $(OUTDLL)/$(notdir $(INF.JOYLIN))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/joylin.dep

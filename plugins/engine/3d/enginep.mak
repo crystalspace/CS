@@ -37,6 +37,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(ENGINE)
 endif
 
+INF.ENGINE = $(SRCDIR)/plugins/engine/3d/engine.csplugin
 INC.ENGINE = $(wildcard $(addprefix $(SRCDIR)/,plugins/engine/3d/*.h))
 SRC.ENGINE = $(wildcard $(addprefix $(SRCDIR)/,plugins/engine/3d/*.cpp))
 OBJ.ENGINE = $(addprefix $(OUT)/,$(notdir $(SRC.ENGINE:.cpp=$O)))
@@ -60,7 +61,7 @@ $(ENGINE): $(OBJ.ENGINE) $(LIB.ENGINE)
 
 clean: engineclean
 engineclean:
-	-$(RM) $(ENGINE) $(OBJ.ENGINE)
+	-$(RMDIR) $(ENGINE) $(OBJ.ENGINE) $(OUTDLL)/$(notdir $(INF.ENGINE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/engine.dep

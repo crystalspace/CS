@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(ASEIE)
 endif
 
+INF.ASEIE = $(SRCDIR)/plugins/mesh/impexp/ase/aseie.csplugin
 INC.ASEIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ase/*.h))
 SRC.ASEIE = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/impexp/ase/*.cpp))
 OBJ.ASEIE = $(addprefix $(OUT)/,$(notdir $(SRC.ASEIE:.cpp=$O)))
@@ -56,7 +57,7 @@ $(ASEIE): $(OBJ.ASEIE) $(LIB.ASEIE)
 
 clean: aseieclean
 aseieclean:
-	-$(RM) $(ASEIE) $(OBJ.ASEIE)
+	-$(RMDIR) $(ASEIE) $(OBJ.ASEIE) $(OUTDLL)/$(notdir $(INF.ASEIE))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/aseie.dep

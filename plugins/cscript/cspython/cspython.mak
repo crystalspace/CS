@@ -86,6 +86,7 @@ SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 
 TRASH.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/scripts/python/,*.pyc *.pyo))
 
+INF.CSPYTHON = $(SRCDIR)/plugins/cscript/cspython/cspython.csplugin
 INC.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/cspython/*.h))
 SRC.CSPYTHON = $(filter-out $(SRCDIR)/plugins/cscript/cspython/pythmod.cpp, \
   $(sort $(wildcard $(SRCDIR)/plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)))
@@ -192,7 +193,7 @@ $(SRCDIR)/scripts/python/cspace.py: $(SWIG.OUTDIR)/cspace.py
 endif
 
 cspythonclean:
-	-$(RM) $(CSPYTHON) $(SWIG.CSPYTHON) $(OBJ.CSPYTHON) $(TRASH.CSPYTHON) python.cex
+	-$(RMDIR) $(CSPYTHON) $(SWIG.CSPYTHON) $(OBJ.CSPYTHON) $(OUTDLL)/$(notdir $(INF.CSPYTHON)) $(TRASH.CSPYTHON) python.cex
 
 swigpythgen: swigpythclean cspython
 

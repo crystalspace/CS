@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(MBALLLDR)
 endif
 
+INF.MBALLLDR = $(SRCDIR)/plugins/mesh/metaball/persist/standard/mballldr.csplugin
 INC.MBALLLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metaball/persist/standard/*.h))
 SRC.MBALLLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/metaball/persist/standard/*.cpp))
 OBJ.MBALLLDR = $(addprefix $(OUT)/,$(notdir $(SRC.MBALLLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(MBALLLDR): $(OBJ.MBALLLDR) $(LIB.MBALLLDR)
 
 clean: mballldrclean
 mballldrclean:
-	-$(RM) $(MBALLLDR) $(OBJ.MBALLLDR)
+	-$(RMDIR) $(MBALLLDR) $(OBJ.MBALLLDR) $(OUTDLL)/$(notdir $(INF.MBALLLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/mballldr.dep

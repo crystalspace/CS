@@ -137,7 +137,7 @@ COMPILE_RES = windres --use-temp-file --include-dir include $(RCFLAGS)
 MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mkverres.sh
 MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/cssys/win32/mergeres.sh
 
-DO.SHARED.PLUGIN.PREAMBLE = \
+DO.SHARED.PLUGIN.PREAMBLE += \
   $(MAKEVERSIONINFO) $(OUT)/$(@:$(DLL)=-version.rc) \
     "$(DESCRIPTION.$(TARGET.RAW))" $(COMMAND_DELIM) \
   $(MERGERES) $(OUT)/$(@:$(DLL)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \

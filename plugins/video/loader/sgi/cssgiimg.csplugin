@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cssgiimg.csplugin -->
+<plugin>
+  <name>cssgiimg</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.graphic.image.io.sgi</name>
+        <description>CrystalSpace SGI image format I/O plugin</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(PERFSTAT)
 endif
 
+INF.PERFSTAT = $(SRCDIR)/plugins/perfstat/perfstat.csplugin
 INC.PERFSTAT = $(wildcard $(addprefix $(SRCDIR)/,plugins/perfstat/*.h))
 SRC.PERFSTAT = $(wildcard $(addprefix $(SRCDIR)/,plugins/perfstat/*.cpp))
 OBJ.PERFSTAT = $(addprefix $(OUT)/,$(notdir $(SRC.PERFSTAT:.cpp=$O)))
@@ -65,7 +66,7 @@ $(PERFSTAT): $(OBJ.PERFSTAT) $(LIB.PERFSTAT)
 
 clean: perfstatclean
 perfstatclean:
-	$(RM) $(PERFSTAT) $(OBJ.PERFSTAT)
+	-$(RMDIR) $(PERFSTAT) $(OBJ.PERFSTAT) $(OUTDLL)/$(notdir $(INF.PERFSTAT))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/perfstat.dep

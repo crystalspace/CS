@@ -43,6 +43,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CASNDDRV)
 endif
 
+INF.CASNDDRV = $(SRCDIR)/plugins/sound/driver/coreaudio/casnddrv.csplugin
 INC.CASNDDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/coreaudio/*.h))
 SRC.CASNDDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/coreaudio/*.cpp))
 OBJ.CASNDDRV = $(addprefix $(OUT)/,$(notdir $(SRC.CASNDDRV:.cpp=$O)))
@@ -63,7 +64,7 @@ $(CASNDDRV): $(OBJ.CASNDDRV) $(LIB.CASNDDRV)
 
 clean: casnddrvclean
 casnddrvclean:
-	$(RM) $(CASNDDRV) $(OBJ.CASNDDRV)
+	-$(RMDIR) $(CASNDDRV) $(OBJ.CASNDDRV) $(OUTDLL)/$(notdir $(INF.CASNDDRV))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/casnddrv.dep

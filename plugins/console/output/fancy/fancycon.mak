@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(FANCYCON)
 endif
 
+INF.FANCYCON = $(SRCDIR)/plugins/console/output/fancy/fancycon.csplugin
 INC.FANCYCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/fancy/*.h))
 SRC.FANCYCON = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/output/fancy/*.cpp))
 OBJ.FANCYCON = $(addprefix $(OUT)/,$(notdir $(SRC.FANCYCON:.cpp=$O)))
@@ -60,7 +61,7 @@ $(FANCYCON): $(OBJ.FANCYCON) $(LIB.FANCYCON)
 
 clean: fancyconclean
 fancyconclean:
-	-$(RM) $(FANCYCON) $(OBJ.FANCYCON)
+	-$(RMDIR) $(FANCYCON) $(OBJ.FANCYCON) $(OUTDLL)/$(notdir $(INF.FANCYCON))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/fancycon.dep

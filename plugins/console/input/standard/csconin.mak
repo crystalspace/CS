@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSCONIN)
 endif
 
+INF.CSCONIN = $(SRCDIR)/plugins/console/input/standard/csconin.csplugin
 INC.CSCONIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/input/standard/*.h))
 SRC.CSCONIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/console/input/standard/*.cpp))
 OBJ.CSCONIN = $(addprefix $(OUT)/,$(notdir $(SRC.CSCONIN:.cpp=$O)))
@@ -65,7 +66,7 @@ $(CSCONIN): $(OBJ.CSCONIN) $(LIB.CSCONIN)
 
 clean: csconinclean
 csconinclean:
-	$(RM) $(CSCONIN) $(OBJ.CSCONIN)
+	-$(RMDIR) $(CSCONIN) $(OBJ.CSCONIN) $(OUTDLL)/$(notdir $(INF.CSCONIN))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csconin.dep

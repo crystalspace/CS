@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- explo.csplugin -->
+<plugin>
+  <name>explo</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.explosion</name>
+        <description>Crystal Space Explosion Mesh Type</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

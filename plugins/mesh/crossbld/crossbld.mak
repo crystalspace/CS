@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(CROSSBLD)
 endif
 
+INF.CROSSBLD = $(SRCDIR)/plugins/mesh/crossbld/crossbld.csplugin
 INC.CROSSBLD = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/crossbld/*.h))
 SRC.CROSSBLD = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/crossbld/*.cpp))
 OBJ.CROSSBLD = $(addprefix $(OUT)/,$(notdir $(SRC.CROSSBLD:.cpp=$O)))
@@ -56,7 +57,7 @@ $(CROSSBLD): $(OBJ.CROSSBLD) $(LIB.CROSSBLD)
 
 clean: crossbldclean
 crossbldclean:
-	-$(RM) $(CROSSBLD) $(OBJ.CROSSBLD)
+	-$(RMDIR) $(CROSSBLD) $(OBJ.CROSSBLD) $(OUTDLL)/$(notdir $(INF.CROSSBLD))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/crossbld.dep

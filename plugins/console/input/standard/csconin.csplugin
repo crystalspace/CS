@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- csconin.csplugin -->
+<plugin>
+  <name>csconin</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.console.input.standard</name>
+        <description>Crystal Space standard input console</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

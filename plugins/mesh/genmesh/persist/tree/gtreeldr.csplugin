@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- gtreeldr.csplugin -->
+<plugin>
+  <name>gtreeldr</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.loader.factory.genmesh.tree</name>
+        <description>Crystal Space General/Tree Mesh Factory Loader</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

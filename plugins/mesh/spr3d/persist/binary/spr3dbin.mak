@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPR3DBIN)
 endif
 
+INF.SPR3DBIN = $(SRCDIR)/plugins/mesh/spr3d/persist/binary/spr3dbin.csplugin
 INC.SPR3DBIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/persist/binary/*.h))
 SRC.SPR3DBIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/persist/binary/*.cpp))
 OBJ.SPR3DBIN = $(addprefix $(OUT)/,$(notdir $(SRC.SPR3DBIN:.cpp=$O)))
@@ -56,7 +57,7 @@ $(SPR3DBIN): $(OBJ.SPR3DBIN) $(LIB.SPR3DLDR)
 
 clean: spr3dbinclean
 spr3dbinclean:
-	-$(RM) $(SPR3DBIN) $(OBJ.SPR3DBIN)
+	-$(RMDIR) $(SPR3DBIN) $(OBJ.SPR3DBIN) $(OUTDLL)/$(notdir $(INF.SPR3DBIN))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/spr3dbin.dep

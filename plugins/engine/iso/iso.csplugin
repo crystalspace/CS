@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!-- iso.csplugin -->
+<plugin>
+  <name>iso</name>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.engine.iso</name>
+        <description>Crystal Space Isometric Engine</description>
+        <requires>
+          <class>crystalspace.kernel.</class>
+          <class>crystalspace.graphics3d.</class>
+          <class>crystalspace.graphics2d.</class>
+        </requires>
+      </class>
+    </classes>
+  </scf>
+</plugin>

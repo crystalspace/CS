@@ -42,6 +42,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(GLWIN32)
 endif
 
+INF.GLWIN32 = $(SRCDIR)/plugins/video/canvas/openglwin/glwin32.csplugin
 INC.GLWIN32 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglwin/*.h \
   $(INC.COMMON.DRV2D.OPENGL) $(INC.COMMON.DRV2D)))
 SRC.GLWIN32 = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/canvas/openglwin/*.cpp \
@@ -76,7 +77,7 @@ $(GLWIN32): $(OBJ.GLWIN32) $(LIB.GLWIN32)
 
 clean: glwin32clean
 glwin32clean:
-	$(RM) $(GLWIN32) $(OBJ.GLWIN32)
+	-$(RMDIR) $(GLWIN32) $(OBJ.GLWIN32) $(OUTDLL)/$(notdir $(INF.GLWIN32))
 
 ifdef DO_DEPEND
 depend: $(OUTOS)/glwin32.dep

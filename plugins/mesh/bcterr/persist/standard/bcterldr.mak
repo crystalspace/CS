@@ -35,6 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(BCTERRLDR)
 endif
 
+INF.BCTERRLDR = $(SRCDIR)/plugins/mesh/bcterr/persist/standard/bcterrldr.csplugin
 INC.BCTERRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/persist/standard/*.h))
 SRC.BCTERRLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/bcterr/persist/standard/*.cpp))
 OBJ.BCTERRLDR = $(addprefix $(OUT)/,$(notdir $(SRC.BCTERRLDR:.cpp=$O)))
@@ -56,7 +57,7 @@ $(BCTERRLDR): $(OBJ.BCTERRLDR) $(LIB.BCTERRLDR)
 
 clean: bcterrldrclean
 bcterrldrclean:
-	-$(RM) $(BCTERRLDR) $(OBJ.BCTERRLDR)
+	-$(RMDIR) $(BCTERRLDR) $(OBJ.BCTERRLDR) $(OUTDLL)/$(notdir $(INF.BCTERRLDR))
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/bcterrldr.dep
