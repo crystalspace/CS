@@ -4,6 +4,8 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 13-Jun-2003
+	- Gregory Block added support for OS X's NSUserDefaults system to replace
+	  user.cfg with the standard user preferences system on OS X. 
 	- Oktal renamed the function AutoLoad slightly, to avoid conflict with
 	  the Windows API identifier of the same name, in perlpost.i.
 	- Oktal added #ifndef directives to math2d.h and plane.h in
