@@ -22,9 +22,12 @@
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
+#include "csgfx/shadervar.h"
+#include "csgfx/shadervarcontext.h"
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
+#include "cstool/rendermeshholder.h"
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
 #include "imesh/particle.h"
@@ -59,6 +62,30 @@ protected:
   };
 
   uvAnimationControl* uvani;
+
+#ifdef CS_USE_NEW_RENDERER
+  class eiShaderVariableAccessor : public iShaderVariableAccessor
+  {
+  public:
+    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
+    virtual void PreGetValue (csShaderVariable* variable)
+    {
+      scfParent->PreGetShaderVariableValue (variable);
+    }
+  } scfiShaderVariableAccessor;
+  friend class eiShaderVariableAccessor;
+
+  void PreGetShaderVariableValue (csShaderVariable* variable);
+
+  csRef<csShaderVariableContext> svcontext;
+  csRenderMeshHolderSingle rmHolder;
+  static csStringID vertex_name, texel_name, color_name, index_name;
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> texel_buffer;
+  csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> index_buffer;
+ 
+#endif
 
 private:
   csRef<iMeshObjectFactory> ifactory;
@@ -127,7 +154,7 @@ public:
   virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView* rview, 
-    iMovable* movable) { n = 0; return 0; }
+    iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
@@ -287,7 +314,8 @@ public:
   G3DPolygonDPFX g3dpolyfx;
 
   csRef<iLightManager> light_mgr;
-
+  csRef<iObjectRegistry> object_reg;
+  csRef<iGraphics3D> g3d;
 public:
   /// Constructor.
   csSprite2DMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
@@ -377,7 +405,6 @@ class csSprite2DMeshObjectType : public iMeshObjectType
 {
 public:
   iObjectRegistry* object_reg;
-
 public:
   SCF_DECLARE_IBASE;
 
@@ -388,13 +415,14 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
+  bool Initialize (iObjectRegistry* object_reg);
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite2DMeshObjectType);
     virtual bool Initialize (iObjectRegistry* object_reg)
     {
-      scfParent->object_reg = object_reg;
-      return true;
+      return scfParent->Initialize (object_reg);
     }
   } scfiComponent;
 };

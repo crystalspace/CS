@@ -67,6 +67,13 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="softgl">
+      <Video>
+	<OpenGL>
+	  <TextureFilter>none</TextureFilter>
+	</OpenGL>
+      </Video>
+    </config>
   </configs>
   <rules>
     <!-- rule description="Some more examples">
@@ -110,6 +117,15 @@
       </conditions>
       <applicable>
 	<usecfg>texturecompression</usecfg>
+      </applicable>
+    </rule>
+    <rule description="Software GL tweaks">
+      <conditions fulfill="one">
+	<regexp string="renderer" pattern="^Mesa" />
+	<regexp string="renderer" pattern="^GDI" />
+      </conditions>
+      <applicable>
+	<usecfg>softgl</usecfg>
       </applicable>
     </rule>
     <!--

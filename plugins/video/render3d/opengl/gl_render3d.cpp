@@ -767,8 +767,52 @@ bool csGLGraphics3D::Open ()
     object_reg->Register (shadermgr, "iShaderManager");
   }
 
+  int texCacheSize = 1024*1024*64;
+  const char* texCacheSizeStr = config->GetStr (
+    "Video.OpenGL.MaxTextureCache", "64m");
+  const char* end = texCacheSizeStr + strspn (texCacheSizeStr,
+    "0123456789");
+  int texSizeFactor = 1;
+  if ((*end == 'k') || (*end == 'K')) 
+    texSizeFactor = 1024;
+  else if ((*end == 'm') || (*end == 'M')) 
+    texSizeFactor = 1024*1024;
+  else 
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Unknown suffix '%s' in maximum texture cache size.", end);
+    texSizeFactor = 0;
+  }
+  if (texSizeFactor != 0)
+  {
+    if (sscanf (texCacheSizeStr, "%d", &texCacheSize) != 0)
+      texCacheSize *= texSizeFactor;
+    else
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Invalid texture cache size '%s'.", texCacheSizeStr);
+  }
+
   txtcache = csPtr<csGLTextureCache> (new csGLTextureCache (
-  	1024*1024*64, this)); // @@@ hardcoded cache size
+  	texCacheSize, this)); 
+
+  const char* filterModeStr = config->GetStr (
+    "Video.OpenGL.TextureFilter", "trilinear");
+  int filterMode = 2;
+  if (strcmp (filterModeStr, "none") == 0)
+    filterMode = 0;
+  else if (strcmp (filterModeStr, "nearest") == 0)
+    filterMode = 0;
+  else if (strcmp (filterModeStr, "bilinear") == 0)
+    filterMode = 1;
+  else if (strcmp (filterModeStr, "trilinear") == 0)
+    filterMode = 2;
+  else
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Invalid texture filter mode '%s'.", filterModeStr);
+  }
+  txtcache->SetBilinearMapping (filterMode);
+
   txtmgr.AttachNew (new csGLTextureManager (
   	object_reg, GetDriver2D (), config, this, txtcache));
 

@@ -1494,11 +1494,13 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
       *rm = *allRenderMeshes[m];
     }
 
+    rm->inUse = true;
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = camera->IsMirrored ();
     rm->object2camera = tr_o2c;
+    rm->geometryInstance = this;
   }
   currentMovable = movable;
   // @@@ One movable for all meshes... not good.

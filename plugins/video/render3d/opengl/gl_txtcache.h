@@ -37,7 +37,7 @@ struct csTxtCacheData
   /// The size of this texture.
   long Size;
   /// iTextureHandle.
-  iTextureHandle* Source;
+  csRef<iTextureHandle> Source; // @@@ Why does * crash?
   /// GL texture handle.
   GLuint Handle;
   /// Linked list.
@@ -64,7 +64,7 @@ class csGLTextureCache : iGLTextureCache
 private:
   csGLGraphics3D* G3D;
 protected:
-  bool rstate_bilinearmap;
+  int rstate_bilinearmap;
 
   /// the head and tail of the cache data
   csTxtCacheData *head, *tail;
@@ -91,9 +91,9 @@ public:
   void Clear ();
 
   ///
-  void SetBilinearMapping (bool m) { rstate_bilinearmap = m; }
+  void SetBilinearMapping (int m) { rstate_bilinearmap = m; }
   ///
-  bool GetBilinearMapping () const { return rstate_bilinearmap; }
+  int GetBilinearMapping () const { return rstate_bilinearmap; }
 
 protected:
 
@@ -102,9 +102,6 @@ protected:
   ///
   void Unload (csTxtCacheData *d);
 };
-
-#define DEFAULT_SUPER_LM_SIZE 256
-#define DEFAULT_SUPER_LM_NUM 10
 
 #endif // __CS_GL_TEXTURECACHE_H__
 

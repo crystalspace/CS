@@ -79,7 +79,7 @@ void csGLTextureCache::Unload (csTxtCacheData *d)
 csGLTextureCache::csGLTextureCache (int max_size, csGLGraphics3D* G3D)
 {
   SCF_CONSTRUCT_IBASE(0);
-  rstate_bilinearmap = true;
+  rstate_bilinearmap = 2;
   cache_size = max_size;
   num = 0;
   head = tail = 0;
@@ -173,6 +173,11 @@ void csGLTextureCache::Uncache (iTextureHandle *texh)
 
 void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 {
+  static const textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
+    GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
+  static const textureMagFilters[3] = {GL_NEAREST, GL_LINEAR, 
+    GL_LINEAR};
+
   iTextureHandle *txt_handle = (iTextureHandle *)d->Source;
   csGLTextureHandle *txt_mm = (csGLTextureHandle *)
     txt_handle->GetPrivateObject ();
@@ -194,6 +199,8 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     glGenTextures (1, &texturehandle);
 
     d->Handle = texturehandle;
+    const int texFilter = txt_mm->flags & CS_TEXTURE_NOFILTER ? 0 : 
+      rstate_bilinearmap;
 
     if(txt_mm->target == iTextureHandle::CS_TEX_IMG_1D)
     {
@@ -208,12 +215,10 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       }
 
       glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER,
-        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR : GL_NEAREST);
+	textureMagFilters[texFilter]);
 
       glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER,
-        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+        textureMinFilters[texFilter]);
 
       if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
       {
@@ -236,15 +241,11 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       }
 
       glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR : GL_NEAREST);
+        textureMagFilters[texFilter]);
 
       glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-        (txt_mm->flags & CS_TEXTURE_NOMIPMAPS)?
-          (!(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR : GL_NEAREST):
-          (!(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST));
+        (txt_mm->flags & CS_TEXTURE_NOMIPMAPS) ?
+          textureMagFilters[texFilter] : textureMinFilters[texFilter]);
 
       if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
       {
@@ -271,12 +272,10 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
       // @@@ Not sure if the following makes sense with 3D textures.
       glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR : GL_NEAREST);
+        textureMagFilters[texFilter]);
 
       glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST);
+        textureMinFilters[texFilter]);
 
       if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
       {
@@ -307,15 +306,12 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
       // @@@ Not sure if the following makes sense with cubemaps.
       glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER,
-        !(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR : GL_NEAREST);
+        textureMinFilters[texFilter]);
 
       glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,
         (txt_mm->flags & CS_TEXTURE_NOMIPMAPS)?
-          (!(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR : GL_NEAREST):
-          (!(txt_mm->flags & CS_TEXTURE_NOFILTER && rstate_bilinearmap) ? 
-          GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST));
+          textureMagFilters[texFilter] :
+          textureMinFilters[texFilter]);
 
       if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
       {

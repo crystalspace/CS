@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2004 by Jorrit Tyberghein
 	      (C) 2004 by Frank Richter
+	      (C) 2004 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,6 +22,47 @@
 
 #include "cstool/rendermeshholder.h"
 #include "ivideo/rendermesh.h"
+  
+csRenderMeshHolderSingle::csRenderMeshHolderSingle ()
+{
+  lastMesh = meshes.Push (new csRenderMesh);
+}
+
+csRenderMeshHolderSingle::~csRenderMeshHolderSingle ()
+{
+  while (meshes.Length () > 0)
+  {
+    csRenderMesh *mesh = meshes.Pop ();
+    CS_ASSERT (mesh->inUse == false);
+    delete mesh;
+  }
+}
+
+csRenderMesh*& csRenderMeshHolderSingle::GetUnusedMesh()
+{
+  if (meshes[lastMesh]->inUse == true)
+  {
+    lastMesh = -1;
+    //check the list
+    int i;
+    for(i = 0; i<meshes.Length (); i++)
+    {
+      if (meshes[i]->inUse == false)
+      {
+        lastMesh = i;
+        break;
+      }
+    }
+    if (lastMesh == -1)
+    {
+      lastMesh = meshes.Push (new csRenderMesh);
+    }
+  }
+
+  return meshes[lastMesh];
+}
+
+//---------------------------------------------------------------------------
 
 csRenderMeshHolderMultiple::csRenderMeshHolderMultiple ()
 {

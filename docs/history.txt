@@ -11,6 +11,10 @@ chronological order.
 	  return "false" from GetRenderMeshes (which is supposed to return
 	  a pointer), and didn't initialize the "number of meshes returned"
 	  variable. This could cause the culler to crash.
+	- res changed glrender3d to support changing the texture filter mode
+	  and texture cache size via a config setting.
+	- res started on converting spr2d to NR. Still needs work, tho.
+	- res added a GL driver DB entry for software GL implementations.
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 

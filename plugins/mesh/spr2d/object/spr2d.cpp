@@ -20,6 +20,8 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
+#include "csgeom/transfrm.h"
+#include "cstool/rbuflock.h"
 #include "spr2d.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -41,6 +43,7 @@ SCF_IMPLEMENT_IBASE (csSprite2DMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::ObjectModel)
@@ -55,12 +58,22 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Particle)
   SCF_IMPLEMENTS_INTERFACE (iParticle)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::eiShaderVariableAccessor)
+  SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csStringID csSprite2DMeshObject::vertex_name = csInvalidStringID;
+csStringID csSprite2DMeshObject::texel_name = csInvalidStringID;
+csStringID csSprite2DMeshObject::color_name = csInvalidStringID;
+csStringID csSprite2DMeshObject::index_name = csInvalidStringID;
+
 csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
   csSprite2DMeshObject::factory = factory;
   logparent = 0;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
@@ -81,6 +94,7 @@ csSprite2DMeshObject::~csSprite2DMeshObject ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticle);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -108,6 +122,33 @@ void csSprite2DMeshObject::SetupObject ()
     }
     float max_dist = qsqrt (max_sq_dist);
     radius.Set (max_dist, max_dist, max_dist);
+
+#ifdef CS_USE_NEW_RENDERER
+    if ((vertex_name == csInvalidStringID) ||
+      (color_name == csInvalidStringID) ||
+      (texel_name == csInvalidStringID) ||
+      (index_name  == csInvalidStringID))
+    {
+      csRef<iStringSet> strings = 
+	CS_QUERY_REGISTRY_TAG_INTERFACE (factory->object_reg,
+	"crystalspace.shared.stringset", iStringSet);
+      vertex_name = strings->Request ("vertices");
+      texel_name = strings->Request ("texture coordinates");
+      color_name = strings->Request ("colors");
+      index_name = strings->Request ("indices");
+    }
+    
+    svcontext.AttachNew (new csShaderVariableContext ());
+    csShaderVariable* sv;
+    sv = svcontext->GetVariableAdd (index_name);
+    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv = svcontext->GetVariableAdd (vertex_name);
+    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv = svcontext->GetVariableAdd (texel_name);
+    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv = svcontext->GetVariableAdd (color_name);
+    sv->SetAccessor (&scfiShaderVariableAccessor);
+#endif
   }
 }
 
@@ -388,6 +429,137 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   g3d->DrawPolygonFX (g3dpolyfx);
   return true;
 }
+
+csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n, 
+						      iRenderView* rview, 
+						      iMovable* movable) 
+{ 
+  SetupObject ();
+
+  iCamera* camera = rview->GetCamera ();
+
+  // Camera transformation for the single 'position' vector.
+  cam = rview->GetCamera ()->GetTransform ().Other2This (
+  	movable->GetFullPosition ());
+  if (cam.z < SMALL_Z) 
+  {
+    n = 0;
+    return 0;
+  }
+
+  if (factory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+    	->GetRelevantLights (logparent, -1, false);
+    UpdateLighting (relevant_lights, movable);
+  }
+
+  csRenderMesh*& rm = rmHolder.GetUnusedMesh();
+
+  csReversibleTransform tr_o2c = camera->GetTransform ();
+  //tr_o2c.
+
+  if (!movable->IsFullTransformIdentity ())
+    tr_o2c /= movable->GetFullTransform ();
+
+  rm->inUse = true;
+  rm->mixmode = MixMode;
+  rm->clip_portal = 0;//clip_portal;
+  rm->clip_plane = 0;//clip_plane;
+  rm->clip_z_plane = 0;//clip_z_plane;
+  rm->do_mirror = camera->IsMirrored ();
+  rm->meshtype = CS_MESHTYPE_TRIANGLES;
+  rm->indexstart = 0;
+  rm->indexend = (vertices.Length() - 2) * 3;
+  rm->material = material;
+  rm->object2camera = movable->GetFullTransform();
+  rm->variablecontext = svcontext;
+  rm->geometryInstance = this;
+
+  n = 1; 
+  return &rm; 
+}
+
+#ifdef CS_USE_NEW_RENDERER
+void csSprite2DMeshObject::PreGetShaderVariableValue (csShaderVariable* variable)
+{
+  const csStringID name = variable->GetName ();
+  if (name == index_name)
+  {
+    if (!index_buffer.IsValid())
+    {
+      index_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	sizeof (uint) * (vertices.Length() - 2) * 3, CS_BUF_STATIC, 
+	CS_BUFCOMP_UNSIGNED_INT, 1, true));
+
+      csRenderBufferLock<uint> indexLock (index_buffer);
+      uint* ptr = indexLock;
+
+      for (int i = 2; i < vertices.Length(); i++)
+      {
+	*ptr++ = 0;
+	*ptr++ = i - 1;
+	*ptr++ = i;
+      }
+    }
+    variable->SetValue (index_buffer);
+  }
+  else if (name == texel_name)
+  {
+    if (!texel_buffer.IsValid())
+    {
+      texel_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	sizeof (float) * vertices.Length() * 2, CS_BUF_STATIC, 
+	CS_BUFCOMP_FLOAT, 2, true));
+
+      csRenderBufferLock<csVector2> texelLock (texel_buffer);
+
+      for (int i = 0; i < vertices.Length(); i++)
+      {
+	csVector2& v = texelLock[i];
+	v.x = vertices[i].u;
+	v.y = vertices[i].v;
+      }
+    }
+    variable->SetValue (texel_buffer);
+  }
+  else if (name == color_name)
+  {
+    if (!color_buffer.IsValid())
+    {
+      color_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	sizeof (float) * vertices.Length() * 3, CS_BUF_STATIC, 
+	CS_BUFCOMP_FLOAT, 3, true));
+
+      csRenderBufferLock<csColor> colorLock (color_buffer);
+
+      for (int i = 0; i < vertices.Length(); i++)
+      {
+	colorLock[i] = vertices[i].color;
+      }
+    }
+    variable->SetValue (color_buffer);
+  }
+  else if (name == vertex_name)
+  {
+    if (!vertex_buffer.IsValid())
+    {
+      vertex_buffer.AttachNew (factory->g3d->CreateRenderBuffer (
+	sizeof (float) * vertices.Length() * 3, CS_BUF_STATIC, 
+	CS_BUFCOMP_FLOAT, 3, true));
+
+      csRenderBufferLock<csVector3> vertexLock (vertex_buffer);
+
+      for (int i = 0; i < vertices.Length(); i++)
+      {
+	vertexLock[i].Set (vertices[i].pos.x, vertices[i].pos.y,
+	  0.0f);
+      }
+    }
+    variable->SetValue (vertex_buffer);
+  }
+}
+#endif
 
 void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
@@ -723,7 +895,9 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iBase *pParent,
   MixMode = 0;
   lighting = true;
   logparent = 0;
+  csSprite2DMeshObjectFactory::object_reg = object_reg;
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()
@@ -776,3 +950,8 @@ csPtr<iMeshObjectFactory> csSprite2DMeshObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
+bool csSprite2DMeshObjectType::Initialize (iObjectRegistry* object_reg)
+{
+  csSprite2DMeshObjectType::object_reg = object_reg;
+  return true;
+}

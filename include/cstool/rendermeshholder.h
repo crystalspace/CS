@@ -29,6 +29,13 @@ struct csRenderMesh;
 
 class CS_CSTOOL_EXPORT csRenderMeshHolderSingle
 {
+  csArray<csRenderMesh*> meshes;
+  int lastMesh;
+public:
+  csRenderMeshHolderSingle ();
+  ~csRenderMeshHolderSingle ();
+
+  csRenderMesh*& GetUnusedMesh();
 };
 
 class CS_CSTOOL_EXPORT csRenderMeshHolderMultiple

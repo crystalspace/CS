@@ -7,7 +7,7 @@ Help sprcal3d : "Cal3D Sprite mesh object plug-in" ;
 Plugin sprcal3d
 	: [ Wildcard *.cpp *.h ]
 ;
-LinkWith sprcal3d : csgfx csgeom csutil cstool ;
+LinkWith sprcal3d : cstool csgfx csgeom csutil ;
 ExternalLibs sprcal3d : CAL3D ;
 
 CompileGroups sprcal3d :  meshes ;
