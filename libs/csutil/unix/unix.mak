@@ -64,27 +64,29 @@ endif
 NASMFLAGS.SYSTEM = -f elf
 
 # System dependent source files included into csutil library
-INC.SYS_CSUTIL = $(wildcard $(SRCDIR)/libs/csutil/unix/*.h) $(CSTHREAD.INC)
+INC.SYS_CSUTIL = $(wildcard \
+  $(SRCDIR)/$(DIR.CSUTIL)/unix/*.h $(SRCDIR)/include/csutil/unix/*.h) \
+  $(CSTHREAD.INC)
 UNIX_SRC.SYS_CSUTIL = \
-  $(wildcard $(SRCDIR)/libs/csutil/unix/*.cpp) \
-  $(SRCDIR)/libs/csutil/generic/appdir.cpp \
-  $(SRCDIR)/libs/csutil/generic/apppath.cpp \
-  $(SRCDIR)/libs/csutil/generic/csprocessorcap.cpp \
-  $(SRCDIR)/libs/csutil/generic/findlib.cpp \
-  $(SRCDIR)/libs/csutil/generic/getopt.cpp \
-  $(SRCDIR)/libs/csutil/generic/pathutil.cpp \
-  $(SRCDIR)/libs/csutil/generic/platformconfig.cpp \
-  $(SRCDIR)/libs/csutil/generic/printf.cpp \
-  $(SRCDIR)/libs/csutil/generic/resdir.cpp \
-  $(SRCDIR)/libs/csutil/generic/runloop.cpp \
-  $(SRCDIR)/libs/csutil/generic/sysroot.cpp \
+  $(wildcard $(SRCDIR)/$(DIR.CSUTIL)/unix/*.cpp) \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/appdir.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/apppath.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/csprocessorcap.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/findlib.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/getopt.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/pathutil.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/platformconfig.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/printf.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/resdir.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/runloop.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/sysroot.cpp \
   $(CSTHREAD.SRC)
 
 ifeq ($(EMBED_META)$(LIBBFD.AVAILABLE)$(OBJCOPY.AVAILABLE),yesyesyes)
   SRC.SYS_CSUTIL = $(UNIX_SRC.SYS_CSUTIL)
 else
-  SRC.SYS_CSUTIL = $(filter-out $(SRCDIR)/libs/csutil/unix/bfdplugins.cpp, \
-    $(UNIX_SRC.SYS_CSUTIL)) $(SRCDIR)/libs/csutil/generic/scanplugins.cpp
+  SRC.SYS_CSUTIL = $(filter-out $(SRCDIR)/$(DIR.CSUTIL)/unix/bfdplugins.cpp, \
+    $(UNIX_SRC.SYS_CSUTIL)) $(SRCDIR)/$(DIR.CSUTIL)/generic/scanplugins.cpp
 endif
 
 # Use makedep to build dependencies
@@ -105,7 +107,14 @@ ifeq ($(EMBED_META)$(LIBBFD.AVAILABLE)$(OBJCOPY.AVAILABLE),yesyesyes)
   endef
 endif
 
-$(OUT)/instpath$O: $(SRCDIR)/libs/csutil/unix/instpath.cpp
+ifndef DIR.CSUTIL
+DIR.CSUTIL = libs/csutil
+endif
+ifndef OUT.CSUTIL
+OUT.CSUTIL = $(OUT)/$(DIR.CSUTIL)
+endif
+
+$(OUT.CSUTIL)/%$O: $(SRCDIR)/$(DIR.CSUTIL)/unix/%.cpp
 	$(DO.COMPILE.CPP) \
 	$(CFLAGS.D)CS_CONFIGDIR='"$(CS_CONFIGDIR)"' \
 	$(CFLAGS.D)CS_PLUGINDIR='"$(CS_PLUGINDIR)"'

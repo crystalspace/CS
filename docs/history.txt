@@ -39,6 +39,10 @@ chronological order.
 	  occurance of a lib has to remain when filtering out duplicates from
 	  the list of libs later passed to the linker; instead, it preserved 
 	  the first.
+	- Eric Sunshine converted csutil.mak, macosx.mak, unix.mak, and
+	  win32gcc.mak to the new style where built resources are placed in a
+	  target-specific subdirectory of $(OUT) rather than directly polluting
+	  $(OUT).
 29-Feb-2004
 	- Eric Sunshine augmented the configure.ac Python check so that it can
 	  detect a working Python installation on MacOS/X despite the fact that

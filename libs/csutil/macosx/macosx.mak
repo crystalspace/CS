@@ -24,7 +24,7 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 # Application wrapper support.
 # <cs-config>
 MACOSX.APP_EXE  = $@/Contents/MacOS/$(notdir $(basename $@))
-MACOSX.APP_ICON = $(SRCDIR)/libs/csutil/macosx/appicon.icns
+MACOSX.APP_ICON = $(SRCDIR)/$(DIR.CSUTIL)/macosx/appicon.icns
 MACOSX.APP_DIR  = .
 # </cs-config>
 
@@ -47,9 +47,6 @@ DO.COMPILE.M = $(DO.OBJC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile an Objective-C++ .mm source
 DO.COMPILE.MM = $(DO.OBJCXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 
-# Directories containing platform-specific source code.
-MACOSX.SOURCE_PATHS = $(SRCDIR)/libs/csutil/macosx
-
 # Select MacOS/X config file for inclusion with install.
 TO_INSTALL.CONFIG += $(SRCDIR)/data/config/macosx.cfg
 
@@ -70,7 +67,7 @@ LIBS.EXE.PLATFORM =
 # </cs-config>
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE = $(addprefix $(CFLAGS.I),$(MACOSX.SOURCE_PATHS))
+CFLAGS.INCLUDE = $(CFLAGS.I)$(SRCDIR)/$(DIR.CSUTIL)/macosx
 
 # General flags for the compiler which are used in any case.  The "config"
 # flags are determined at configuration time and come from CS/config.mak.
@@ -119,22 +116,23 @@ NASMFLAGS.SYSTEM =
 
 # System dependent source files included into csutil library
 SRC.SYS_CSUTIL = $(wildcard \
-  $(addsuffix /*.cpp,$(MACOSX.SOURCE_PATHS)) \
-  $(addsuffix /*.c,$(MACOSX.SOURCE_PATHS)) \
-  $(addsuffix /*.m,$(MACOSX.SOURCE_PATHS)) \
-  $(addsuffix /*.mm,$(MACOSX.SOURCE_PATHS))) \
-  $(SRCDIR)/libs/csutil/generic/apppath.cpp \
-  $(SRCDIR)/libs/csutil/generic/csprocessorcap.cpp \
-  $(SRCDIR)/libs/csutil/generic/findlib.cpp \
-  $(SRCDIR)/libs/csutil/generic/getopt.cpp \
-  $(SRCDIR)/libs/csutil/generic/pathutil.cpp \
-  $(SRCDIR)/libs/csutil/generic/pluginpaths.cpp \
-  $(SRCDIR)/libs/csutil/generic/printf.cpp \
-  $(SRCDIR)/libs/csutil/generic/scanplugins.cpp \
-  $(SRCDIR)/libs/csutil/generic/sysroot.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/macosx/*.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/macosx/*.c \
+  $(SRCDIR)/$(DIR.CSUTIL)/macosx/*.m \
+  $(SRCDIR)/$(DIR.CSUTIL)/macosx/*.mm) \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/apppath.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/csprocessorcap.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/findlib.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/getopt.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/pathutil.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/pluginpaths.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/printf.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/scanplugins.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/sysroot.cpp \
   $(CSTHREAD.SRC)
-INC.SYS_CSUTIL = \
-  $(wildcard $(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))) $(CSTHREAD.INC)
+INC.SYS_CSUTIL = $(wildcard \
+  $(SRCDIR)/$(DIR.CSUTIL)/macosx/*.h $(SRCDIR)/include/csutil/macosx/*.h) \
+  $(CSTHREAD.INC)
 
 # Where to put dynamic libraries on this system?
 OUTDLL =
@@ -167,25 +165,37 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+ifndef DIR.CSUTIL
+DIR.CSUTIL = libs/csutil
+endif
+ifndef OUT.CSUTIL
+OUT.CSUTIL = $(OUT)/$(DIR.CSUTIL)
+endif
+
 # Add support for Objective-C (.m) source code.
+$(OUT.CSUTIL)/%$O: $(SRCDIR)/$(DIR.CSUTIL)/macosx/%.m
+	$(DO.COMPILE.M)
+
 $(OUT)/%$O: %.m
 	$(DO.COMPILE.M)
 
 # Add support for Objective-C++ (.mm) source code.
+$(OUT.CSUTIL)/%$O: $(SRCDIR)/$(DIR.CSUTIL)/macosx/%.mm
+	$(DO.COMPILE.MM)
+
 $(OUT)/%$O: %.mm
 	$(DO.COMPILE.MM)
 
-OBJ.SYS_CSUTIL = $(addprefix $(OUT)/,$(notdir $(subst .s,$O,$(subst .c,$O,\
-  $(subst .cpp,$O,$(subst .mm,$O,$(SRC.SYS_CSUTIL:.m=$O)))))))
-
-vpath %.m  $(SRCDIR)/libs/csutil $(filter-out $(SRCDIR)/libs/csutil/generic/,$(sort $(dir $(SRC.SYS_CSUTIL)))) $(SRCDIR)/libs/csutil/generic
-vpath %.mm $(SRCDIR)/libs/csutil $(filter-out $(SRCDIR)/libs/csutil/generic/,$(sort $(dir $(SRC.SYS_CSUTIL)))) $(SRCDIR)/libs/csutil/generic
+# Override the default setting of OBJ.SYS_CSUTIL since we must include object
+# files from Objective-C and Objective-C++ sources.
+OBJ.SYS_CSUTIL = $(addprefix $(OUT.CSUTIL)/,$(notdir $(subst .s,$O,\
+  $(subst .c,$O,$(subst .cpp,$O,$(subst .mm,$O,$(SRC.SYS_CSUTIL:.m=$O)))))))
 
 # Override default method of creating a GUI application.  For Cocoa, we need
 # to place the executable inside an application wrapper.
 # <cs-config>
 define DO.LINK.EXE
-  sh $(SRCDIR)/libs/csutil/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(SRCDIR)/include/csver.h
+  sh $(SRCDIR)/$(DIR.CSUTIL)/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(SRCDIR)/include/csver.h
   $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^^) $(L^) $(LIBS)
   touch $@
 endef

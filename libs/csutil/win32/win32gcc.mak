@@ -95,16 +95,18 @@ ARFLAGS = cr
 NASMFLAGS.SYSTEM = -f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 
 # System dependent source files included into csutil library
-SRC.SYS_CSUTIL = $(wildcard $(SRCDIR)/libs/csutil/win32/*.cpp) \
-  $(SRCDIR)/libs/csutil/generic/appdir.cpp \
-  $(SRCDIR)/libs/csutil/generic/csprocessorcap.cpp \
-  $(SRCDIR)/libs/csutil/generic/findlib.cpp \
-  $(SRCDIR)/libs/csutil/generic/getopt.cpp \
-  $(SRCDIR)/libs/csutil/generic/pluginpaths.cpp \
-  $(SRCDIR)/libs/csutil/generic/resdir.cpp \
-  $(SRCDIR)/libs/csutil/generic/runloop.cpp \
+SRC.SYS_CSUTIL = $(wildcard $(SRCDIR)/$(DIR.CSUTIL)/win32/*.cpp) \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/appdir.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/csprocessorcap.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/findlib.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/getopt.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/pluginpaths.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/resdir.cpp \
+  $(SRCDIR)/$(DIR.CSUTIL)/generic/runloop.cpp \
   $(CSTHREAD.SRC)
-INC.SYS_CSUTIL = $(wildcard $(SRCDIR)/libs/csutil/win32/*.h) $(CSTHREAD.INC)
+INC.SYS_CSUTIL = $(wildcard \
+  $(SRCDIR)/$(DIR.CSUTIL)/win32/*.h $(SRCDIR)/include/csutil/win32/*.h) \
+  $(CSTHREAD.INC)
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND = -e "s/\.ob*j*\:/\$$O:/g"
@@ -136,9 +138,9 @@ else
 endif
 
 COMPILE_RES = $(CMD.WINDRES) --use-temp-file --include-dir include $(RCFLAGS) 
-MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mkverres.sh
-MERGERES = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mergeres.sh
-MAKEMETADATA = $(RUN_SCRIPT) $(SRCDIR)/libs/csutil/win32/mkmetadatares.sh
+MAKEVERSIONINFO = $(RUN_SCRIPT) $(SRCDIR)/$(DIR.CSUTIL)/win32/mkverres.sh
+MERGERES = $(RUN_SCRIPT) $(SRCDIR)/$(DIR.CSUTIL)/win32/mergeres.sh
+MAKEMETADATA = $(RUN_SCRIPT) $(SRCDIR)/$(DIR.CSUTIL)/win32/mkmetadatares.sh
 
 ifeq ($(EMBED_META),yes)
 METARC = $(OUT)/$(@:$(DLL)=-meta.rc)
@@ -186,5 +188,15 @@ DO.LINK.EXE = \
     $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS)
 
 DO.LINK.CONSOLE.EXE = $(DO.LINK.EXE)
+
+ifndef DIR.CSUTIL
+DIR.CSUTIL = libs/csutil
+endif
+ifndef OUT.CSUTIL
+OUT.CSUTIL = $(OUT)/$(DIR.CSUTIL)
+endif
+
+$(OUT.CSUTIL)/%$O: $(SRCDIR)/$(DIR.CSUTIL)/win32/%.cpp
+	$(DO.COMPILE.CPP)
 
 endif # ifeq ($(MAKESECTION),postdefines)
