@@ -362,6 +362,11 @@ bool csPolygon3DStatic::Overlaps (csPolygon3DStatic *overlapped)
   return false;
 }
 
+const csVector3& csPolygon3DStatic::Vobj (int idx) const
+{
+  return thing_static->Vobj (polygon_data.vertices[idx]);
+}
+
 void csPolygon3DStatic::SetMaterial (iMaterialWrapper *material)
 {
   csPolygon3DStatic::material = material;
@@ -1047,6 +1052,11 @@ void csPolygon3D::RemovePolyTexture ()
   }
 }
 
+int csPolygon3D::GetPolyIdx () const
+{
+  return thing->polygons.GetIndex (this);
+}
+
 csPolygon3DStatic* csPolygon3D::GetStaticPoly () const
 {
   return thing->GetStaticData ()->GetPolygon3DStatic (
@@ -1496,5 +1506,3 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   if (maybeItsVisible)
     return;
 }
-
-

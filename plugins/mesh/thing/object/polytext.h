@@ -23,6 +23,8 @@
 #include "csutil/array.h"
 #include "csutil/cscolor.h"
 #include "iengine/light.h"
+#include "ivideo/polyrender.h"
+#include "ivideo/txtmgr.h"
 
 struct iFrustumView;
 struct iMaterialHandle;
@@ -32,6 +34,7 @@ struct csRGBpixel;
 struct iFrustumView;
 struct csLightingPolyTexQueue;
 class csPolygon3D;
+class csPolygon3DStatic;
 class csPolyTexture;
 class csLightMap;
 class csLightPatch;

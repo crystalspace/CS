@@ -22,11 +22,9 @@
 #define __CS_PARRAYS_H__
 
 #include "csutil/array.h"
-//#include "polygon.h"
+#include "polygon.h"
 
 class csThingObjectType;
-class csPolygon3D;
-class csPolygon3DStatic;
 
 /**
  * An dynamic array of csPolygon3DStatic objects.

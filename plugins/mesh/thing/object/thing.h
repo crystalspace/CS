@@ -50,13 +50,13 @@
 #include "ivideo/txtmgr.h"
 #include "lghtmap.h"
 #include "parrays.h"
+#include "polygon.h"
 
 class csThing;
 class csThingStatic;
 class csThingObjectType;
 class csLightPatchPool;
 class csPolyTexLightMap;
-class csPolygon3D;
 struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;

@@ -26,8 +26,8 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
-#include "thing.h"
 #include "polytext.h"
+#include "iengine/movable.h"
 #include "iengine/sector.h"
 #include "ivideo/polyrender.h"
 
@@ -304,8 +304,7 @@ public:
    * This index is translated to the index in the parent container and
    * a reference to the vertex in object-space is returned.
    */
-  const csVector3& Vobj (int idx) const
-  { return thing_static->Vobj (polygon_data.vertices[idx]); }
+  const csVector3& Vobj (int idx) const;
 
   /**
    * Set the material for this polygon.
@@ -549,7 +548,7 @@ public:
   /**
    * Get index of this polygon.
    */
-  int GetPolyIdx () const { return thing->polygons.GetIndex (this); }
+  int GetPolyIdx () const;
 
   /**
    * Get static polygon.

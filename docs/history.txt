@@ -37,6 +37,10 @@ chronological order.
 	  the thing mesh plugin because they break compilation. This will
 	  now most likely break compilation on the older compiler but I'm
 	  uncertain how to fix this.
+	- Eric Sunshine re-applied Eric's changes which Jorrit reverted, but
+	  this time with sufficient changes to work around the incredible
+	  number of circular dependencies between Thing headers which tripped
+	  it up the first time.
 	- Eric Sunshine added a few more csGeom classes and interfaces to
 	  cspace.i at user request.
 	- Eric Sunshine augmented msvcgen/required.mak to ensure that null3d
