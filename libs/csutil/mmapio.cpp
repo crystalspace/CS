@@ -19,7 +19,7 @@
 #define CS_SYSDEF_PROVIDE_HARDWARE_MMIO 1
 
 #include "cssysdef.h"
-#include "cssys/csmmap.h"
+#include "csutil/csmmap.h"
 #include "csutil/mmapio.h"
 #include "iutil/vfs.h"
 #include "csutil/ref.h"

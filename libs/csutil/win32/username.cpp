@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2002 by Eric Sunshine <sunshine@sunshineco.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,44 +16,40 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "csutil/virtclk.h"
-#include "iutil/virtclk.h"
+#include "csutil/util.h"
+#include <windows.h>
+#include <lmcons.h>
 
-SCF_IMPLEMENT_IBASE (csVirtualClock)
-  SCF_IMPLEMENTS_INTERFACE (iVirtualClock)
-SCF_IMPLEMENT_IBASE_END
+#include "csutil/win32/wintools.h"
 
-csVirtualClock::csVirtualClock ()
+csString csGetUsername()
 {
-  SCF_CONSTRUCT_IBASE (0);
-  CurrentTime = csTicks (-1);
-  ElapsedTime = csTicks (0);
-}
-
-csVirtualClock::~csVirtualClock ()
-{
-  SCF_DESTRUCT_IBASE ();
-}
-
-void csVirtualClock::Advance ()
-{
-  csTicks last = CurrentTime;
-  CurrentTime = csGetTicks ();
-  if (last == csTicks(-1))
-    ElapsedTime = 0;
+  csString username;
+  wchar_t* wname = 0;
+  if (cswinIsWinNT ())
+  {
+    WCHAR buff[UNLEN + 1];
+    DWORD sz = sizeof(buff) / sizeof (WCHAR);
+    if (GetUserNameW (buff, &sz))
+    {
+      wname = csStrNewW (buff);
+    }
+  }
   else
   {
-      if (CurrentTime < last)
-          // csTicks(-1) is the period for a unsigend value
-          ElapsedTime = CurrentTime + (csTicks(-1) - last) + 1;
-      else
-          ElapsedTime = CurrentTime - last;
+    char buff[UNLEN + 1];
+    DWORD sz = sizeof(buff);
+    if (GetUserNameA (buff, &sz))
+    {
+      wname = cswinAnsiToWide (buff);
+    }
   }
+  char* name = csStrNew (wname);
+  username.Replace (name);
+  delete[] name;
+  delete[] wname;
+  username.Trim();
+  return username;
 }
-

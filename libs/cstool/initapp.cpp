@@ -18,8 +18,8 @@
 
 #define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
-#include "cssys/csshlib.h"
-#include "cssys/sysfunc.h"
+#include "csutil/csshlib.h"
+#include "csutil/sysfunc.h"
 #include "cstool/initapp.h"
 #include "csutil/cfgacc.h"
 #include "csutil/cfgfile.h"

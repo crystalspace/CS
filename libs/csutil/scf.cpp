@@ -17,9 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "cssys/csshlib.h"
-#include "cssys/sysfunc.h"
-#include "cssys/syspath.h"
+#include "csutil/csshlib.h"
+#include "csutil/sysfunc.h"
+#include "csutil/syspath.h"
 #include "csutil/csstring.h"
 #include "csutil/parray.h"
 #include "csutil/memfile.h"

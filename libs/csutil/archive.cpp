@@ -24,7 +24,7 @@
 #define CS_SYSDEF_PROVIDE_UNLINK
 #define CS_SYSDEF_PROVIDE_ACCESS
 #include "cssysdef.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "csutil/archive.h"
 #include "csutil/csstring.h"
 #include "csutil/hash.h"

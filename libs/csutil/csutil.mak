@@ -1,3 +1,11 @@
+#
+# This submakefile requires the following variables to be defined by
+# each platform-specific makefile:
+#
+# SRC.SYS_CSUTIL
+#   - All system-dependent source files that should be included in csutil
+#     library
+
 # Library description
 DESCRIPTION.csutil = Crystal Space utility library
 
@@ -26,17 +34,29 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/libs/csutil
-vpath %.c $(SRCDIR)/libs/csutil
+vpath %.cpp $(SRCDIR)/libs/csutil $(filter-out $(SRCDIR)/libs/csutil/generic/, $(sort $(dir $(SRC.SYS_CSUTIL)))) $(SRCDIR)/libs/csutil/generic
+vpath %.c   $(SRCDIR)/libs/csutil $(filter-out $(SRCDIR)/libs/csutil/generic/, $(sort $(dir $(SRC.SYS_CSUTIL)))) $(SRCDIR)/libs/csutil/generic
 
 CSUTIL.LIB = $(OUT)/$(LIB_PREFIX)csutil$(LIB_SUFFIX)
-INC.CSUTIL = $(INC.CSSYS) \
+
+INC.CSUTIL = $(INC.SYS_CSUTIL) \
   $(wildcard $(addprefix $(SRCDIR)/,include/csutil/*.h))
+
 SRC.CSUTIL.LOCAL = \
   $(wildcard $(addprefix $(SRCDIR)/,libs/csutil/*.cpp libs/csutil/*.c))
-SRC.CSUTIL = $(SRC.CSSYS) $(SRC.CSUTIL.LOCAL)
-OBJ.CSUTIL = $(OBJ.CSSYS) $(addprefix $(OUT)/, \
+SRC.CSUTIL = $(SRC.SYS_CSUTIL) $(SRC.CSUTIL.LOCAL)
+
+# Platform-specific makefiles may want to provide their own value for
+# OBJ.SYS_CSUTIL (for instance, they might recognize other file types in
+# addition to .s, .c, and .cpp), so we set OBJ.SYS_CSUTIL only if not already
+# set by the platform-specific makefile.
+ifeq (,$(strip $(OBJ.SYS_CSUTIL)))
+OBJ.SYS_CSUTIL = $(addprefix $(OUT)/,$(notdir \
+  $(subst .s,$O,$(subst .c,$O,$(SRC.SYS_CSUTIL:.cpp=$O)))))
+endif
+OBJ.CSUTIL = $(OBJ.SYS_CSUTIL) $(addprefix $(OUT)/, \
   $(notdir $(patsubst %.c,%$O,$(SRC.CSUTIL.LOCAL:.cpp=$O))))
+
 CFG.CSUTIL = $(SRCDIR)/data/config/mouse.cfg
 
 TO_INSTALL.CONFIG += $(CFG.CSUTIL)

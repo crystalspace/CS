@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/syspath.h"
+#include "csutil/syspath.h"
 #include "csutil/cmdline.h"
 
 SCF_IMPLEMENT_IBASE (csCommandLineParser)

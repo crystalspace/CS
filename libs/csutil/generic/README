@@ -1,0 +1,5 @@
+This directory contains generic versions of potentially platform-specific
+functionality.  If a port to some platform can successfully utilize a generic
+implementation from this directory then it should do so, otherwise it will
+have to provide its own implementation of some particular bit of
+functionality.

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 1998 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,44 +16,20 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <time.h>
+#include <sys/timeb.h>
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "csutil/virtclk.h"
-#include "iutil/virtclk.h"
 
-SCF_IMPLEMENT_IBASE (csVirtualClock)
-  SCF_IMPLEMENTS_INTERFACE (iVirtualClock)
-SCF_IMPLEMENT_IBASE_END
+// This function should return milliseconds since some specific
+// time. If you don't have milliseconds easily just rewrite by
+// using 'time (0)*1000' or something like that.
 
-csVirtualClock::csVirtualClock ()
+csTicks csGetTicks ()
 {
-  SCF_CONSTRUCT_IBASE (0);
-  CurrentTime = csTicks (-1);
-  ElapsedTime = csTicks (0);
+  timeb tp;
+  ftime (&tp);
+  return tp.time * 1000 + tp.millitm;
 }
-
-csVirtualClock::~csVirtualClock ()
-{
-  SCF_DESTRUCT_IBASE ();
-}
-
-void csVirtualClock::Advance ()
-{
-  csTicks last = CurrentTime;
-  CurrentTime = csGetTicks ();
-  if (last == csTicks(-1))
-    ElapsedTime = 0;
-  else
-  {
-      if (CurrentTime < last)
-          // csTicks(-1) is the period for a unsigend value
-          ElapsedTime = CurrentTime + (csTicks(-1) - last) + 1;
-      else
-          ElapsedTime = CurrentTime - last;
-  }
-}
-

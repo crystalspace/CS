@@ -24,8 +24,8 @@
 #define CS_SYSDEF_PROVIDE_EXPAND_PATH
 #include "cssysdef.h"
 
-#include "cssys/csunicode.h"
-#include "cssys/csuctransform.h"
+#include "csutil/csunicode.h"
+#include "csutil/csuctransform.h"
 
 static const size_t shortStringChars = 64;
 

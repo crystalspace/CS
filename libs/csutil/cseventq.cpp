@@ -23,7 +23,7 @@
 #include "cssysdef.h"
 #include "csutil/cseventq.h"
 #include "iutil/eventh.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 
 SCF_IMPLEMENT_IBASE (csEventQueue)
   SCF_IMPLEMENTS_INTERFACE (iEventQueue)

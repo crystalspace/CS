@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Generic Console Output Support
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,42 +19,27 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
-
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
-#include "csutil/virtclk.h"
-#include "iutil/virtclk.h"
 
-SCF_IMPLEMENT_IBASE (csVirtualClock)
-  SCF_IMPLEMENTS_INTERFACE (iVirtualClock)
-SCF_IMPLEMENT_IBASE_END
-
-csVirtualClock::csVirtualClock ()
+// Replacement for printf(); exact same prototype/functionality as printf()
+int csPrintf(char const* str, ...)
 {
-  SCF_CONSTRUCT_IBASE (0);
-  CurrentTime = csTicks (-1);
-  ElapsedTime = csTicks (0);
+  va_list args;
+  va_start (args, str);
+  int const rc = vprintf(str, args);
+  va_end (args);
+  return rc;
 }
 
-csVirtualClock::~csVirtualClock ()
+// Replacement for vprintf()
+int csPrintfV(char const* str, va_list args)
 {
-  SCF_DESTRUCT_IBASE ();
+  return vprintf(str, args);
 }
 
-void csVirtualClock::Advance ()
+int csFPutErr (const char* str)
 {
-  csTicks last = CurrentTime;
-  CurrentTime = csGetTicks ();
-  if (last == csTicks(-1))
-    ElapsedTime = 0;
-  else
-  {
-      if (CurrentTime < last)
-          // csTicks(-1) is the period for a unsigend value
-          ElapsedTime = CurrentTime + (csTicks(-1) - last) + 1;
-      else
-          ElapsedTime = CurrentTime - last;
-  }
+  return fputs (str, stderr);
 }
 

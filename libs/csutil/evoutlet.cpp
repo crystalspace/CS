@@ -22,7 +22,7 @@
 #include "csutil/csevent.h"
 #include "csutil/cseventq.h"
 #include "csutil/csevcord.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "iutil/csinput.h"
 #include "iutil/objreg.h"
 
