@@ -55,7 +55,7 @@ public:
   /// constructor
   csSectorLightList ();
   /// destructor
-  ~csSectorLightList ();
+  virtual ~csSectorLightList () { RemoveAll (); }
   /// Set the sector.
   void SetSector (csSector* s) { sector = s; }
 
@@ -75,7 +75,7 @@ public:
   /// constructor
   csSectorMeshList ();
   /// destructor
-  ~csSectorMeshList ();
+  virtual ~csSectorMeshList () { RemoveAll (); }
   /// Set the sector.
   void SetSector (csSector* sec) { sector = sec; }
 
@@ -201,7 +201,7 @@ public:
   //----------------------------------------------------------------------
 
   iMeshList* GetMeshes ()
-    { return &(meshes.scfiMeshList); }
+    { return &meshes; }
 
   /**
    * Register a mesh and all children to the visibility culler.
@@ -240,7 +240,7 @@ public:
    * Get the list of lights in this sector.
    */
   iLightList* GetLights ()
-    { return &lights.scfiLightList; }
+    { return &lights; }
 
   //----------------------------------------------------------------------
   // Callbacks
@@ -524,8 +524,11 @@ public:
 };
 
 /// List of 3D engine sectors.
-class csSectorList : public csRefArrayObject<iSector>
+class csSectorList : public iSectorList
 {
+private:
+  csRefArrayObject<iSector> list;
+
 public:
   SCF_DECLARE_IBASE;
   bool CleanupReferences;
@@ -533,25 +536,19 @@ public:
   /// constructor
   csSectorList (bool CleanupReferences);
   /// destructor
-  virtual ~csSectorList ();
+  virtual ~csSectorList () { RemoveAll (); }
 
   /// Override FreeItem.
   virtual void FreeItem (iSector* item);
 
-  class SectorList : public iSectorList
-  {
-  public:
-    SCF_DECLARE_EMBEDDED_IBASE (csSectorList);
-
-    virtual int GetCount () const;
-    virtual iSector *Get (int n) const;
-    virtual int Add (iSector *obj);
-    virtual bool Remove (iSector *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iSector *obj) const;
-    virtual iSector *FindByName (const char *Name) const;
-  } scfiSectorList;
+  virtual int GetCount () const { return list.Length (); }
+  virtual iSector *Get (int n) const { return list.Get (n); }
+  virtual int Add (iSector *obj);
+  virtual bool Remove (iSector *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iSector *obj) const;
+  virtual iSector *FindByName (const char *Name) const;
 };
 
 #endif // __CS_SECTOR_H__

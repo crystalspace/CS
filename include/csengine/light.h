@@ -485,37 +485,32 @@ public:
 /**
  * List of lights for a sector. This class implements iLightList.
  */
-class csLightList : public csRefArrayObject<iLight>
+class csLightList : public iLightList
 {
+private:
+  csRefArrayObject<iLight> list;
+
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csLightList ();
-  virtual ~csLightList () { }
+  virtual ~csLightList () { RemoveAll (); }
 
   /// Override PrepareItem
   virtual void PrepareItem (iLight*) { }
   /// Override FreeItem
   virtual void FreeItem (iLight*) { }
 
-  /// Find a light by ID
-  iLight *FindByID (unsigned long id) const;
-
-  /// iLightList implementation.
-  class LightList : public iLightList
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csLightList);
-    virtual int GetCount () const;
-    virtual iLight *Get (int n) const;
-    virtual int Add (iLight *obj);
-    virtual bool Remove (iLight *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iLight *obj) const;
-    virtual iLight *FindByName (const char *Name) const;
-    virtual iLight *FindByID (unsigned long id) const;
-  } scfiLightList;
+  virtual int GetCount () const { return list.Length (); }
+  virtual iLight *Get (int n) const { return list.Get (n); }
+  virtual int Add (iLight *obj);
+  virtual bool Remove (iLight *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iLight *obj) const;
+  virtual iLight *FindByName (const char *Name) const;
+  virtual iLight *FindByID (unsigned long id) const;
 };
 
 /**

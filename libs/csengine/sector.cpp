@@ -53,11 +53,6 @@ csSectorLightList::csSectorLightList ()
   sector = NULL;
 }
 
-csSectorLightList::~csSectorLightList ()
-{
-  DeleteAll ();
-}
-
 void csSectorLightList::PrepareItem (iLight* item)
 {
   item->SetSector (&(sector->scfiSector));
@@ -72,11 +67,6 @@ void csSectorLightList::FreeItem (iLight* item)
 csSectorMeshList::csSectorMeshList ()
 {
   sector = NULL;
-}
-
-csSectorMeshList::~csSectorMeshList ()
-{
-  DeleteAll ();
 }
 
 void csSectorMeshList::PrepareItem (iMeshWrapper* item)
@@ -129,7 +119,7 @@ csSector::~csSector ()
   // sector is destructed.
   CS_ASSERT (references.Length () == 0);
 
-  lights.DeleteAll ();
+  lights.RemoveAll ();
 }
 
 void csSector::CleanupReferences ()
@@ -219,7 +209,7 @@ bool csSector::UseCullerPlugin (const char *plugname)
 
   // Loop through all meshes and register them to the visibility culler.
   int i;
-  for (i = 0; i < meshes.Length (); i++)
+  for (i = 0; i < meshes.GetCount (); i++)
   {
     iMeshWrapper* m = meshes.Get (i);
     m->GetMovable ()->UpdateMove ();
@@ -646,7 +636,7 @@ void csSector::Draw (iRenderView *rview)
    * draw it clipped (in 3D) to the portal polygon. This is currently not
    * done.
    */
-  if (meshes.Length () > 0)
+  if (meshes.GetCount () > 0)
   {
     // Mark visible objects.
     culler->VisTest (rview);
@@ -703,7 +693,7 @@ void csSector::Draw (iRenderView *rview)
   }
 
   // queue all halos in this sector to be drawn.
-  for (i = lights.Length () - 1; i >= 0; i--)
+  for (i = lights.GetCount () - 1; i >= 0; i--)
     // Tell the engine to try to add this light into the halo queue
     csEngine::current_engine->AddHalo (lights.Get (i)->GetPrivateObject ());
 
@@ -786,7 +776,7 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
 void csSector::ShineLights (csProgressPulse *pulse)
 {
   int i;
-  for (i = 0; i < lights.Length (); i++)
+  for (i = 0; i < lights.GetCount (); i++)
   {
     if (pulse != 0) pulse->Step ();
 
@@ -798,7 +788,7 @@ void csSector::ShineLights (csProgressPulse *pulse)
 void csSector::ShineLights (iMeshWrapper *mesh, csProgressPulse *pulse)
 {
   int i;
-  for (i = 0; i < lights.Length (); i++)
+  for (i = 0; i < lights.GetCount (); i++)
   {
     if (pulse != 0) pulse->Step ();
 
@@ -828,7 +818,7 @@ void csSector::CalculateSectorBBox (csBox3 &bbox, bool do_meshes) const
   int i;
   if (do_meshes)
   {
-    for (i = 0; i < meshes.Length (); i++)
+    for (i = 0; i < meshes.GetCount (); i++)
     {
       iMeshWrapper *mesh = meshes.Get (i);
       mesh->GetTransformedBoundingBox (
@@ -914,24 +904,14 @@ void csSector::ReferencedObject::RemoveReference (iReference *ref)
 }
 
 SCF_IMPLEMENT_IBASE(csSectorList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSectorList)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSectorList::SectorList)
   SCF_IMPLEMENTS_INTERFACE(iSectorList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csSectorList::csSectorList (bool cr)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSectorList);
 
   CleanupReferences = cr;
-}
-
-csSectorList::~csSectorList ()
-{
-  DeleteAll ();
 }
 
 void csSectorList::FreeItem (iSector* item)
@@ -940,49 +920,40 @@ void csSectorList::FreeItem (iSector* item)
     item->GetPrivateObject ()->CleanupReferences ();
 }
 
-int csSectorList::SectorList::GetCount () const
+int csSectorList::Add (iSector *obj)
 {
-  return scfParent->Length ();
+  return list.Push (obj);
 }
 
-iSector *csSectorList::SectorList::Get (int n) const
+bool csSectorList::Remove (iSector *obj)
 {
-  return scfParent->Get (n);
+  FreeItem (obj);
+  return list.Delete (obj);
 }
 
-int csSectorList::SectorList::Add (iSector *obj)
+bool csSectorList::Remove (int n)
 {
-  return scfParent->Push (obj);
+  FreeItem (list[n]);
+  return list.Delete (n);
 }
 
-bool csSectorList::SectorList::Remove (iSector *obj)
-{
-  scfParent->FreeItem (obj);
-  return scfParent->Delete (obj);
-}
-
-bool csSectorList::SectorList::Remove (int n)
-{
-  scfParent->FreeItem ((*scfParent)[n]);
-  return scfParent->Delete (n);
-}
-
-void csSectorList::SectorList::RemoveAll ()
+void csSectorList::RemoveAll ()
 {
   int i;
-  for (i = 0 ; i < scfParent->Length () ; i++)
+  for (i = 0 ; i < list.Length () ; i++)
   {
-    scfParent->FreeItem ((*scfParent)[i]);
+    FreeItem (list[i]);
   }
-  scfParent->DeleteAll ();
+  list.DeleteAll ();
 }
 
-int csSectorList::SectorList::Find (iSector *obj) const
+int csSectorList::Find (iSector *obj) const
 {
-  return scfParent->Find (obj);
+  return list.Find (obj);
 }
 
-iSector *csSectorList::SectorList::FindByName (const char *Name) const
+iSector *csSectorList::FindByName (const char *Name) const
 {
-  return scfParent->FindByName (Name);
+  return list.FindByName (Name);
 }
+

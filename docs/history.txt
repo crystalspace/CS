@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+19-Jan-2003
+	- Fixed a problem where RemoveObject() would not properly remove
+	  objects from the sectors so memory leaks would occur.
+	- Changed the way the mesh, factory, light and sector lists are
+	  implemented so that it is no longer possible to misuse them (the
+	  array has been made private).
 18-Jan-2003
 	- Fixed the engine so it no longer tries to load the thing_type
 	  immediatelly in initialization. Instead it tries to load it

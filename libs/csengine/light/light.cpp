@@ -393,82 +393,62 @@ void csDynLight::SetColor (const csColor &col)
 
 // --- csLightList -----------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csLightList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightList)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csLightList::LightList)
   SCF_IMPLEMENTS_INTERFACE(iLightList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csLightList::csLightList ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightList);
 }
 
 iLight *csLightList::FindByID (unsigned long id) const
 {
   int i;
-  for (i = 0; i < Length (); i++)
+  for (i = 0; i < list.Length (); i++)
   {
-    iLight *l = Get (i);
+    iLight *l = list.Get (i);
     if (l->GetLightID () == id) return l;
   }
 
   return NULL;
 }
 
-int csLightList::LightList::GetCount () const
+int csLightList::Add (iLight *obj)
 {
-  return scfParent->Length ();
+  PrepareItem (obj);
+  return list.Push (obj);
 }
 
-iLight *csLightList::LightList::Get (int n) const
+bool csLightList::Remove (iLight *obj)
 {
-  return scfParent->Get (n);
+  FreeItem (obj);
+  return list.Delete (obj);
 }
 
-int csLightList::LightList::Add (iLight *obj)
+bool csLightList::Remove (int n)
 {
-  scfParent->PrepareItem (obj);
-  return scfParent->Push (obj);
+  FreeItem (list[n]);
+  return list.Delete (n);
 }
 
-bool csLightList::LightList::Remove (iLight *obj)
-{
-  scfParent->FreeItem (obj);
-  return scfParent->Delete (obj);
-}
-
-bool csLightList::LightList::Remove (int n)
-{
-  scfParent->FreeItem ((*scfParent)[n]);
-  return scfParent->Delete (n);
-}
-
-void csLightList::LightList::RemoveAll ()
+void csLightList::RemoveAll ()
 {
   int i;
-  for (i = 0 ; i < scfParent->Length () ; i++)
+  for (i = 0 ; i < list.Length () ; i++)
   {
-    scfParent->FreeItem ((*scfParent)[i]);
+    FreeItem (list[i]);
   }
-  scfParent->DeleteAll ();
+  list.DeleteAll ();
 }
 
-int csLightList::LightList::Find (iLight *obj) const
+int csLightList::Find (iLight *obj) const
 {
-  return scfParent->Find (obj);
+  return list.Find (obj);
 }
 
-iLight *csLightList::LightList::FindByName (const char *Name) const
+iLight *csLightList::FindByName (const char *Name) const
 {
-  return scfParent->FindByName (Name);
-}
-
-iLight *csLightList::LightList::FindByID (unsigned long id) const
-{
-  return scfParent->FindByID (id);
+  return list.FindByName (Name);
 }
 
 // --- csLightingProcessInfo --------------------------------------------------

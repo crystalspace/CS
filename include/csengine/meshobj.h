@@ -48,14 +48,17 @@ class csLight;
  * Subclasses of this class can override FreeItem(), AddMesh(),
  * and RemoveMesh() for more specific functionality.
  */
-class csMeshList : public csRefArrayObject<iMeshWrapper>
+class csMeshList : public iMeshList
 {
+private:
+  csRefArrayObject<iMeshWrapper> list;
+
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csMeshList ();
-  virtual ~csMeshList () { }
+  virtual ~csMeshList ();
 
   /// Find a mesh in <name>:<childname>:<childname> notation.
   iMeshWrapper *FindByNameWithChild (const char *Name) const;
@@ -65,18 +68,14 @@ public:
   /// Override FreeItem
   virtual void FreeItem (iMeshWrapper*) { }
 
-  class MeshList : public iMeshList
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMeshList);
-    virtual int GetCount () const;
-    virtual iMeshWrapper *Get (int n) const;
-    virtual int Add (iMeshWrapper *obj);
-    virtual bool Remove (iMeshWrapper *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iMeshWrapper *obj) const;
-    virtual iMeshWrapper *FindByName (const char *Name) const;
-  } scfiMeshList;
+  virtual int GetCount () const { return list.Length () ; }
+  virtual iMeshWrapper *Get (int n) const { return list.Get (n); }
+  virtual int Add (iMeshWrapper *obj);
+  virtual bool Remove (iMeshWrapper *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iMeshWrapper *obj) const;
+  virtual iMeshWrapper *FindByName (const char *Name) const;
 };
 
 /**
@@ -89,7 +88,7 @@ private:
 
 public:
   csMeshMeshList () : mesh (NULL) { }
-  ~csMeshMeshList () { DeleteAll (); }
+  virtual ~csMeshMeshList () { RemoveAll (); }
   void SetMesh (csMeshWrapper* m) { mesh = m; }
   virtual void PrepareItem (iMeshWrapper* item);
   virtual void FreeItem (iMeshWrapper* item);
@@ -98,29 +97,28 @@ public:
 /**
  * A list of mesh factories.
  */
-class csMeshFactoryList : public csRefArrayObject<iMeshFactoryWrapper>
+class csMeshFactoryList : public iMeshFactoryList
 {
+private:
+  csRefArrayObject<iMeshFactoryWrapper> list;
+
 public:
   SCF_DECLARE_IBASE;
 
   /// constructor
   csMeshFactoryList ();
-  virtual ~csMeshFactoryList () { }
+  virtual ~csMeshFactoryList () { RemoveAll (); }
   virtual void PrepareItem (iMeshFactoryWrapper*) { }
   virtual void FreeItem (iMeshFactoryWrapper*) { }
 
-  class MeshFactoryList : public iMeshFactoryList
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMeshFactoryList);
-    virtual int GetCount () const;
-    virtual iMeshFactoryWrapper *Get (int n) const;
-    virtual int Add (iMeshFactoryWrapper *obj);
-    virtual bool Remove (iMeshFactoryWrapper *obj);
-    virtual bool Remove (int n);
-    virtual void RemoveAll ();
-    virtual int Find (iMeshFactoryWrapper *obj) const;
-    virtual iMeshFactoryWrapper *FindByName (const char *Name) const;
-  } scfiMeshFactoryList;
+  virtual int GetCount () const { return list.Length (); }
+  virtual iMeshFactoryWrapper *Get (int n) const { return list.Get (n); }
+  virtual int Add (iMeshFactoryWrapper *obj);
+  virtual bool Remove (iMeshFactoryWrapper *obj);
+  virtual bool Remove (int n);
+  virtual void RemoveAll ();
+  virtual int Find (iMeshFactoryWrapper *obj) const;
+  virtual iMeshFactoryWrapper *FindByName (const char *Name) const;
 };
 
 /**
@@ -133,7 +131,7 @@ private:
 
 public:
   csMeshFactoryFactoryList () : meshfact (NULL) {}
-  ~csMeshFactoryFactoryList () { DeleteAll (); }
+  virtual ~csMeshFactoryFactoryList () { RemoveAll (); }
   void SetMeshFactory (csMeshFactoryWrapper* m) { meshfact = m; }
   virtual void PrepareItem (iMeshFactoryWrapper* item);
   virtual void FreeItem (iMeshFactoryWrapper* item);
@@ -640,7 +638,7 @@ public:
   	csBox3& cbox);
     virtual iMeshList* GetChildren ()
     {
-      return &(scfParent->children.scfiMeshList);
+      return &scfParent->children;
     }
     virtual iMeshWrapper* GetParentContainer ()
     {
@@ -806,7 +804,7 @@ public:
     virtual void SetParentContainer (iMeshFactoryWrapper *p)
       { scfParent->parent = p; }
     virtual iMeshFactoryList* GetChildren ()
-      { return &(scfParent->children.scfiMeshFactoryList); }
+      { return &scfParent->children; }
     virtual csReversibleTransform& GetTransform ()
       { return scfParent->GetTransform (); }
     virtual void SetTransform (const csReversibleTransform& tr)

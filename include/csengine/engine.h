@@ -177,8 +177,8 @@ public:
 class csEngineMeshList : public csMeshList
 {
 public:
-  virtual ~csEngineMeshList ();
-  virtual bool FreeItem (csSome Item);
+  virtual ~csEngineMeshList () { RemoveAll (); }
+  virtual void FreeItem (iMeshWrapper*);
 };
 
 /**
@@ -897,13 +897,13 @@ public:
 
   /// Return the list of sectors
   virtual iSectorList *GetSectors ()
-    { return &sectors.scfiSectorList; }
+    { return &sectors; }
   /// Return the list of mesh factories
   virtual iMeshFactoryList *GetMeshFactories ()
-    { return &mesh_factories.scfiMeshFactoryList; }
+    { return &mesh_factories; }
   /// Return the list of meshes
   virtual iMeshList *GetMeshes ()
-    { return &meshes.scfiMeshList; }
+    { return &meshes; }
   /// Return the list of collections
   virtual iCollectionList *GetCollections ()
     { return &collections.scfiCollectionList; }

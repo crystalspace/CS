@@ -138,7 +138,7 @@ csMeshWrapper::~csMeshWrapper ()
 void csMeshWrapper::UpdateMove ()
 {
   int i;
-  for (i = 0; i < children.Length (); i++)
+  for (i = 0; i < children.GetCount (); i++)
   {
     iMeshWrapper *spr = children.Get (i);
     spr->GetMovable ()->UpdateMove ();
@@ -302,7 +302,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
     }
   }
 
-  for (i = 0; i < children.Length (); i++)
+  for (i = 0; i < children.GetCount (); i++)
   {
     iMeshWrapper *spr = children.Get (i);
     spr->Draw (rview);
@@ -349,7 +349,7 @@ void csMeshWrapper::UpdateLighting (iLight **lights, int num_lights)
   meshobj->UpdateLighting (lights, num_lights, &movable.scfiMovable);
 
   int i;
-  for (i = 0; i < children.Length (); i++)
+  for (i = 0; i < children.GetCount (); i++)
   {
     iMeshWrapper *spr = children.Get (i);
     spr->UpdateLighting (lights, num_lights);
@@ -495,7 +495,7 @@ void csMeshWrapper::HardTransform (const csReversibleTransform &t)
   meshobj->HardTransform (t);
 
   int i;
-  for (i = 0; i < children.Length (); i++)
+  for (i = 0; i < children.GetCount (); i++)
   {
     iMeshWrapper *spr = children.Get (i);
     spr->HardTransform (t);
@@ -535,7 +535,7 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
 void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
 {
   meshobj->GetObjectModel ()->GetRadius (rad, cent);
-  if (children.Length () > 0)
+  if (children.GetCount () > 0)
   {
     float max_radius = rad.x;
     if (max_radius < rad.y) max_radius = rad.y;
@@ -543,7 +543,7 @@ void csMeshWrapper::GetRadius (csVector3 &rad, csVector3 &cent) const
 
     csSphere sphere (cent, max_radius);
     int i;
-    for (i = 0; i < children.Length (); i++)
+    for (i = 0; i < children.GetCount (); i++)
     {
       iMeshWrapper *spr = children.Get (i);
       csVector3 childrad, childcent;
@@ -679,7 +679,7 @@ iMeshWrapper *csMeshFactoryWrapper::NewMeshObject ()
   mesh->SetFactory (&scfiMeshFactoryWrapper);
 
   int i;
-  for (i = 0; i < children.Length (); i++)
+  for (i = 0; i < children.GetCount (); i++)
   {
     iMeshFactoryWrapper *childfact = children.Get (i);
     iMeshWrapper *child = childfact->CreateMeshWrapper ();
@@ -701,28 +701,28 @@ void csMeshFactoryWrapper::HardTransform (const csReversibleTransform &t)
 // csMeshList
 //--------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csMeshList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshList)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshList::MeshList)
   SCF_IMPLEMENTS_INTERFACE(iMeshList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csMeshList::csMeshList ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshList);
+}
+
+csMeshList::~csMeshList ()
+{
+  RemoveAll ();
 }
 
 iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
 {
   char* p = strchr (Name, ':');
-  if (!p) return FindByName (Name);
+  if (!p) return list.FindByName (Name);
 
   int i;
-  for (i = 0 ; i < Length () ; i++)
+  for (i = 0 ; i < list.Length () ; i++)
   {
-    iMeshWrapper* m = Get (i);
+    iMeshWrapper* m = list.Get (i);
     if (!strncmp (m->QueryObject ()->GetName (), Name, p-Name))
     {
       return m->GetChildren ()->FindByName (p+1);
@@ -731,58 +731,48 @@ iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
   return NULL;
 }
 
-int csMeshList::MeshList::GetCount () const
+int csMeshList::Add (iMeshWrapper *obj)
 {
-  return scfParent->Length ();
-}
-
-iMeshWrapper *csMeshList::MeshList::Get (int n) const
-{
-  return scfParent->Get (n);
-}
-
-int csMeshList::MeshList::Add (iMeshWrapper *obj)
-{
-  scfParent->PrepareItem (obj);
-  scfParent->Push (obj);
+  PrepareItem (obj);
+  list.Push (obj);
   return true;
 }
 
-bool csMeshList::MeshList::Remove (iMeshWrapper *obj)
+bool csMeshList::Remove (iMeshWrapper *obj)
 {
-  scfParent->FreeItem (obj);
-  scfParent->Delete (obj);
+  FreeItem (obj);
+  list.Delete (obj);
   return true;
 }
 
-bool csMeshList::MeshList::Remove (int n)
+bool csMeshList::Remove (int n)
 {
-  scfParent->FreeItem ((*scfParent)[n]);
-  scfParent->Delete (n);
+  FreeItem (list[n]);
+  list.Delete (n);
   return true;
 }
 
-void csMeshList::MeshList::RemoveAll ()
+void csMeshList::RemoveAll ()
 {
   int i;
-  for (i = 0 ; i < scfParent->Length () ; i++)
+  for (i = 0 ; i < list.Length () ; i++)
   {
-    scfParent->FreeItem ((*scfParent)[i]);
+    FreeItem (list[i]);
   }
-  scfParent->DeleteAll ();
+  list.DeleteAll ();
 }
 
-int csMeshList::MeshList::Find (iMeshWrapper *obj) const
+int csMeshList::Find (iMeshWrapper *obj) const
 {
-  return scfParent->Find (obj);
+  return list.Find (obj);
 }
 
-iMeshWrapper *csMeshList::MeshList::FindByName (const char *Name) const
+iMeshWrapper *csMeshList::FindByName (const char *Name) const
 {
   if (strchr (Name, ':'))
-    return scfParent->FindByNameWithChild (Name);
+    return FindByNameWithChild (Name);
   else
-    return scfParent->FindByName (Name);
+    return list.FindByName (Name);
 }
 
 //--------------------------------------------------------------------------
@@ -826,69 +816,54 @@ void csMeshMeshList::FreeItem (iMeshWrapper* item)
 // csMeshFactoryList
 //--------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csMeshFactoryList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshFactoryList)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryList::MeshFactoryList)
   SCF_IMPLEMENTS_INTERFACE(iMeshFactoryList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csMeshFactoryList::csMeshFactoryList ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryList);
 }
 
-int csMeshFactoryList::MeshFactoryList::GetCount () const
+int csMeshFactoryList::Add (iMeshFactoryWrapper *obj)
 {
-  return scfParent->Length ();
-}
-
-iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::Get (int n) const
-{
-  return scfParent->Get (n);
-}
-
-int csMeshFactoryList::MeshFactoryList::Add (iMeshFactoryWrapper *obj)
-{
-  scfParent->PrepareItem (obj);
-  scfParent->Push (obj);
+  PrepareItem (obj);
+  list.Push (obj);
   return true;
 }
 
-bool csMeshFactoryList::MeshFactoryList::Remove (iMeshFactoryWrapper *obj)
+bool csMeshFactoryList::Remove (iMeshFactoryWrapper *obj)
 {
-  scfParent->FreeItem (obj);
-  scfParent->Delete (obj);
+  FreeItem (obj);
+  list.Delete (obj);
   return true;
 }
 
-bool csMeshFactoryList::MeshFactoryList::Remove (int n)
+bool csMeshFactoryList::Remove (int n)
 {
-  scfParent->FreeItem ((*scfParent)[n]);
-  scfParent->Delete (scfParent->Get (n));
+  FreeItem (list[n]);
+  list.Delete (Get (n));
   return true;
 }
 
-void csMeshFactoryList::MeshFactoryList::RemoveAll ()
+void csMeshFactoryList::RemoveAll ()
 {
   int i;
-  for (i = 0 ; i < scfParent->Length () ; i++)
+  for (i = 0 ; i < list.Length () ; i++)
   {
-    scfParent->FreeItem ((*scfParent)[i]);
+    FreeItem (list[i]);
   }
-  scfParent->DeleteAll ();
+  list.DeleteAll ();
 }
 
-int csMeshFactoryList::MeshFactoryList::Find (iMeshFactoryWrapper *obj) const
+int csMeshFactoryList::Find (iMeshFactoryWrapper *obj) const
 {
-  return scfParent->Find (obj);
+  return list.Find (obj);
 }
 
-iMeshFactoryWrapper *csMeshFactoryList::MeshFactoryList::FindByName (
+iMeshFactoryWrapper *csMeshFactoryList::FindByName (
   const char *Name) const
 {
-  return scfParent->FindByName (Name);
+  return list.FindByName (Name);
 }
 
 //--------------------------------------------------------------------------

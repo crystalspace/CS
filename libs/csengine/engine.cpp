@@ -292,17 +292,10 @@ iCollection *csCollectionList::CollectionList::FindByName (
 }
 
 //---------------------------------------------------------------------------
-csEngineMeshList::~csEngineMeshList ()
-{
-  DeleteAll ();
-}
 
-bool csEngineMeshList::FreeItem (csSome Item)
+void csEngineMeshList::FreeItem (iMeshWrapper* mesh)
 {
-  iMeshWrapper *mesh = (iMeshWrapper *)Item;
   mesh->GetMovable ()->ClearSectors ();
-  mesh->DecRef ();
-  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -411,10 +404,10 @@ bool csLightIt::NextSector ()
 {
   sector_idx++;
   if (region)
-    while ( sector_idx < engine->sectors.Length () &&
+    while ( sector_idx < engine->sectors.GetCount () &&
       	!region->IsInRegion (GetLastSector ()->GetPrivateObject ()))
       sector_idx++;
-  if (sector_idx >= engine->sectors.Length ()) return false;
+  if (sector_idx >= engine->sectors.GetCount ()) return false;
   return true;
 }
 
@@ -433,8 +426,8 @@ iLight *csLightIt::Fetch ()
     light_idx = -1;
   }
 
-  if (sector_idx >= engine->sectors.Length ()) return NULL;
-  sector = engine->sectors[sector_idx]->GetPrivateObject ();
+  if (sector_idx >= engine->sectors.GetCount ()) return NULL;
+  sector = engine->sectors.Get (sector_idx)->GetPrivateObject ();
 
   // Try next light.
   light_idx++;
@@ -454,7 +447,7 @@ iLight *csLightIt::Fetch ()
 
 iSector *csLightIt::GetLastSector ()
 {
-  return engine->sectors[sector_idx];
+  return engine->sectors.Get (sector_idx);
 }
 
 //---------------------------------------------------------------------------
@@ -831,16 +824,16 @@ void csEngine::DeleteAll ()
 
   GetMeshes ()->RemoveAll ();
 
-  mesh_factories.DeleteAll ();
+  mesh_factories.RemoveAll ();
 
   // @@@ I suppose the loop below is no longer needed?
-  for (i = 0; i < sectors.Length (); i++)
+  for (i = 0; i < sectors.GetCount (); i++)
   {
-    csSector *sect = sectors[i]->GetPrivateObject ();
+    csSector *sect = sectors.Get (i)->GetPrivateObject ();
     if (sect) sect->CleanupReferences ();
   }
 
-  sectors.DeleteAll ();
+  sectors.RemoveAll ();
 
   camera_positions.DeleteAll ();
 
@@ -1006,14 +999,12 @@ void csEngine::PrepareTextures ()
   txtmgr->PrepareMaterials ();
 }
 
-// If a STAT_BSP level the loader call to UpdateMove is redundant when called
-// before csEngine::Prepare().
 void csEngine::PrepareMeshes ()
 {
   int i;
-  for (i = 0; i < meshes.Length (); i++)
+  for (i = 0; i < meshes.GetCount (); i++)
   {
-    iMeshWrapper *sp = (iMeshWrapper *)meshes[i];
+    iMeshWrapper *sp = meshes.Get (i);
     sp->GetMovable ()->UpdateMove ();
   }
 }
@@ -1032,7 +1023,7 @@ bool csEngine::Prepare (iProgressMeter *meter)
 #endif // CS_USE_NEW_RENDERER
 
   // Prepare lightmaps if we have any sectors
-  if (sectors.Length ()) ShineLights (NULL, meter);
+  if (sectors.GetCount ()) ShineLights (NULL, meter);
 
   CheckConsistency ();
 
@@ -1209,7 +1200,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   while (lit->Fetch()) light_count++;
 
   int sn = 0;
-  int num_meshes = meshes.Length();
+  int num_meshes = meshes.GetCount ();
 
   if (do_relight)
   {
@@ -1228,7 +1219,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   int failed = 0;
   for (sn = 0; sn < num_meshes; sn++)
   {
-    iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
+    iMeshWrapper *s = meshes.Get (sn);
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
@@ -1316,7 +1307,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
 
   for (sn = 0; sn < num_meshes; sn++)
   {
-    iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
+    iMeshWrapper *s = meshes.Get (sn);
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
       iLightingInfo* linfo = s->GetLightingInfo ();
@@ -1562,9 +1553,9 @@ void csEngine::RemoveHalo (csLight *Light)
 
 iStatLight *csEngine::FindLight (unsigned long light_id) const
 {
-  for (int i = 0; i < sectors.Length (); i++)
+  for (int i = 0; i < sectors.GetCount (); i++)
   {
-    iLight *l = sectors[i]->GetLights ()->FindByID (light_id);
+    iLight *l = sectors.Get (i)->GetLights ()->FindByID (light_id);
     if (l)
     {
       csRef<iStatLight> sl (SCF_QUERY_INTERFACE (l, iStatLight));
@@ -1582,9 +1573,9 @@ iStatLight *csEngine::FindLight (const char *name, bool regionOnly) const
 
   // @@@### regionOnly
   int i;
-  for (i = 0; i < sectors.Length (); i++)
+  for (i = 0; i < sectors.GetCount (); i++)
   {
-    iLight *l = sectors[i]->GetLights ()->FindByName (name);
+    iLight *l = sectors.Get (i)->GetLights ()->FindByName (name);
     if (l)
     {
       csRef<iStatLight> sl (SCF_QUERY_INTERFACE (l, iStatLight));
@@ -1628,10 +1619,10 @@ void csEngine::ControlMeshes ()
   // Delete particle systems that self-destructed now.
 
   // @@@ Need to optimize this?
-  int i = meshes.Length () - 1;
+  int i = meshes.GetCount () - 1;
   while (i >= 0)
   {
-    iMeshWrapper *sp = (iMeshWrapper *)meshes[i];
+    iMeshWrapper *sp = meshes.Get (i);
     if (sp->WantToDie ()) GetMeshes ()->Remove (sp);
     i--;
   }
@@ -2303,7 +2294,7 @@ iSector *csEngine::CreateSector (const char *iName)
 {
   iSector *sector = &(new csSector (this))->scfiSector;
   sector->QueryObject ()->SetName (iName);
-  sectors.Push (sector);
+  sectors.Add (sector);
   sector->DecRef ();
 
   return sector;
@@ -2761,7 +2752,7 @@ bool csEngine::RemoveObject (iBase *object)
     {
       if (region)
         region->QueryObject ()->ObjRemove (sector->QueryObject ());
-      sectors.scfiSectorList.Remove (sector);
+      sectors.Remove (sector);
       return true;
     }
   }
@@ -2820,7 +2811,7 @@ bool csEngine::RemoveObject (iBase *object)
     {
       if (region)
         region->QueryObject ()->ObjRemove (factwrap->QueryObject ());
-      mesh_factories.scfiMeshFactoryList.Remove (factwrap);
+      mesh_factories.Remove (factwrap);
       return true;
     }
   }
@@ -2830,7 +2821,7 @@ bool csEngine::RemoveObject (iBase *object)
     {
       if (region)
         region->QueryObject ()->ObjRemove (meshwrap->QueryObject ());
-      meshes.scfiMeshList.Remove (meshwrap);
+      meshes.Remove (meshwrap);
       return true;
     }
   }
