@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef LPPOOL_H
-#define LPPOOL_H
+#ifndef __CS_LPPOOL_H__
+#define __CS_LPPOOL_H__
 
 #include "csengine/light.h"
 
@@ -123,4 +123,4 @@ public:
   }
 };
 
-#endif /*LPPOOL_H*/
+#endif // __CS_LPPOOL_H__

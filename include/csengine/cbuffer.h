@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CBUFFER_H
-#define CBUFFER_H
+#ifndef __CS_CBUFFER_H__
+#define __CS_CBUFFER_H__
 
 #include "csgeom/math2d.h"
 
@@ -227,4 +227,4 @@ public:
   void GfxDump (iGraphics2D* ig2d, iGraphics3D* ig3d);
 };
 
-#endif /*CBUFFER_H*/
+#endif // __CS_CBUFFER_H__

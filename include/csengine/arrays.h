@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ARRAYS_H__
-#define __ARRAYS_H__
+#ifndef __CS_ARRAYS_H__
+#define __CS_ARRAYS_H__
 
 #include "csutil/typedvec.h"
 
@@ -68,4 +68,4 @@ public:
   { return (csPolygonInt **)root; }
 };
 
-#endif // __ARRAYS_H__
+#endif // __CS_ARRAYS_H__

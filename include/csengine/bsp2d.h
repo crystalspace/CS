@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BSP2D_H
-#define BSP2D_H
+#ifndef __CS_BSP2D_H__
+#define __CS_BSP2D_H__
 
 #include "csgeom/math2d.h"
 #include "csgeom/segment.h"
@@ -144,5 +144,5 @@ public:
   void* Front2Back (const csVector2& pos, csTree2DVisitFunc* func, void* data);
 };
 
-#endif /*BSP2D_H*/
+#endif // __CS_BSP2D_H__
 

@@ -153,5 +153,5 @@ public:
   }
 };
 
-#endif /*_CS_POLEDGES_H*/
+#endif // __CS_POLEDGES_H__
 

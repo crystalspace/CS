@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __BEZIER_H__
-#define __BEZIER_H__
+#ifndef __CS_BEZIER_H__
+#define __CS_BEZIER_H__
 
 //////////////////////////////////////////////
 //////////////////////////////////////////////
@@ -134,4 +134,4 @@ public:
                             double (*func)(double, int, double, int) = NULL );
 };
 
-#endif
+#endif // __CS_BEZIER_H__

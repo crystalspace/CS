@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef WIREFRM_H
-#define WIREFRM_H
+#ifndef __CS_WIREFRM_H__
+#define __CS_WIREFRM_H__
 
 #include "csutil/scf.h"
 #include "csgeom/math3d.h"
@@ -285,5 +285,5 @@ public:
   void KeyPgUp (float speed, bool slow, bool fast);
 };
 
-#endif /*WIREFRM_H*/
+#endif // __CS_WIREFRM_H__
 

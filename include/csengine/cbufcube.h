@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CBUFCUBE_H
-#define CBUFCUBE_H
+#ifndef __CS_CBUFCUBE_H__
+#define __CS_CBUFCUBE_H__
 
 class csClipper;
 
@@ -103,5 +103,5 @@ public:
   bool TestPolygon (csVector3* verts, int num_verts);
 };
 
-#endif /*CBUFCUBE_H*/
+#endif // __CS_CBUFCUBE_H__
 

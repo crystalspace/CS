@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CRYSBALL_H_
-#define _CRYSBALL_H_
+#ifndef __CS_CRYSBALL_H__
+#define __CS_CRYSBALL_H__
 
 /**
  * This is an attempt to provide a  massdetection of backfaced polygons.
@@ -124,4 +124,4 @@ class csCrystalBall
   void Transform (const csTransform &t, csVector &indexVector, int useSign, long cookie);
 };
 
-#endif
+#endif // __CS_CRYSBALL_H__

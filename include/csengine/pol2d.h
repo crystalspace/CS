@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef POL2D_H
-#define POL2D_H
+#ifndef __CS_POL2D_H__
+#define __CS_POL2D_H__
 
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"
@@ -164,4 +164,4 @@ public:
 };
 
 
-#endif /*POL2D_H*/
+#endif // __CS_POL2D_H__
