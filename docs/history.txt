@@ -15,6 +15,8 @@ chronological order.
 	  to the reflective cubemapping code.
 	- res fixed a few flaws in the waterdemo Jamfile: some superflous
 	  CompileGroup statements and the wrong Help.
+	- Marten applied a fix to csSet::GetIterator and the 
+	  csSet::GlobalIterator
 3-Oct-2003
 	- Jorrit changed syntax services->ParsePortal() into
 	  HandlePortalParameter(). This is a more general function which can

@@ -437,8 +437,14 @@ public:
   {
   protected:
     GlobalIterator () {}
+    GlobalIterator (const csSet<T, KeyHandler> *set0) : 
+      csHash<T, T, KeyHandler>::GlobalIterator(&set0->map)
+    { }
+
   public:
+    friend class csSet<T, KeyHandler>;
   };
+  friend class csSet<T, KeyHandler>::GlobalIterator;
 
   /**
    * Construct a new empty set.
@@ -511,7 +517,7 @@ public:
    */
   GlobalIterator GetIterator () const
   {
-    return map.GlobalIterator (this);
+    return GlobalIterator(this);
   }
 };
 
