@@ -3,29 +3,39 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+2-May-2003
+	- Eric Sunshine augmented jobber.pl to make it possible to associate
+	  multiple directories with a single "target" (in @TARGETS).  All of
+	  the current updating targets modify files in a single directory
+	  hierarchy (for instance, "htmldoc" modifies the "out/docs/html"
+	  hierarchy, but touches nothing outside of this directory).  With this
+	  change, however, future targets can modify, add, remove files in
+	  multiple directories.  For instance, the upcoming Swig re-generation
+	  target will touch files in several directories.
 1-May-2003
-    - res made the following changes to VFS:
-        - added iFile::SetPos() to complement iFile::GetPos()
-        - added a new parameter to iFile::GetAllData() and 
-          iVFS::ReadFile() whether the returned data buffer should
-          feature a null terminator. Default is 'no' resp. 'yes'.
-        - implemented GetAllData() for VFS disk files. When supported
-          by hardware and no null terminator is requested, nothing is read
-          but a file mapping is created. The created buffer is also saved
-          and all subsequent reads are copied from this buffer.
-        - added the possibility to map a disk file into memory on opening 
-          when it is in a specific size range, but disabled for now as I'm
-          not sure whether this is really advantageous.
-        - fixed the document system plexer to seek in a file to the initial
-          position prior passing it to the "real" document system.
-        - changed binary loader to take advantage of iFile::GetAllData().
-        - parser now requests buffers w/o null termination for image 
-          loading.
-        - changed TinyXML plugin to use iFile::GetAllData().
-    - res changed the VFS cache manager to return data w/o null terminator.
-    - res added a new constructor to csDataBuffer, copying from an existing
-      data buffer (and adding a null terminator.)
-    - res fixed precalc info reader for the changed cache manager behaviour.
+	- res made the following changes to VFS:
+	    - Added iFile::SetPos() to complement iFile::GetPos().
+	    - Added a new parameter to iFile::GetAllData() and iVFS::ReadFile()
+	      whether the returned data buffer should feature a null
+	      terminator.  Default is 'no' resp.  'yes'.
+	    - Implemented GetAllData() for VFS disk files.  When supported by
+	      hardware and no null terminator is requested, nothing is read but
+	      a file mapping is created.  The created buffer is also saved and
+	      all subsequent reads are copied from this buffer.
+	    - Added the possibility to map a disk file into memory on opening
+	      when it is in a specific size range, but disabled for now as I'm
+	      not sure whether this is really advantageous.
+	    - Fixed the document system plexer to seek in a file to the initial
+	      position prior passing it to the "real" document system.
+	    - Changed binary loader to take advantage of iFile::GetAllData().
+	    - Parser now requests buffers w/o null termination for image
+	      loading.
+	    - Changed TinyXML plugin to use iFile::GetAllData().
+	- res changed the VFS cache manager to return data w/o null terminator.
+	- res added a new constructor to csDataBuffer, copying from an existing
+	  data buffer (and adding a null terminator.)
+	- res fixed precalc info reader for the changed cache manager
+	  behaviour.
 30-Apr-2003
 	- Philip Wyett removed MSVC external references to /MT and /MTd as
 	  these params are not valid and will cause problems if used when
