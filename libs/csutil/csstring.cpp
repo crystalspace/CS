@@ -241,7 +241,6 @@ csString &csString::Collapse()
   return *this;
 }
 
-#if 0 // Disabled due to lack of vsnprintf on some OSes
 csString &csString::Format(const char *format, ...)
 {
   va_list args;
@@ -252,7 +251,7 @@ csString &csString::Format(const char *format, ...)
   // Keep trying until the buffer is big enough to hold the entire string
   while(NewSize < 0)
   {
-    NewSize = vsnprintf(Data, MaxSize, format, args);
+    NewSize = cs_vsnprintf(Data, MaxSize, format, args);
     // Increasing by the size of the format streams seems logical enough
     if(NewSize < 0)
       SetCapacity(MaxSize + strlen(format));
@@ -270,7 +269,6 @@ csString &csString::Format(const char *format, ...)
   return *this;
 
 }
-#endif // DISABLED
 
 #define STR_FORMAT(TYPE,FMT,SZ) \
 csString csString::Format (TYPE v) \

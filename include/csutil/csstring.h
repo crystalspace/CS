@@ -218,6 +218,8 @@ public:
   /// Calls Trim() and collapses internal whitespace to a single space.
   csString &Collapse();
 
+  csString &Format(const char *format, ...);
+
 #define STR_FORMAT(TYPE,FMT,SZ) \
   static csString Format (TYPE v);
   STR_FORMAT(short, %hd, 32)
