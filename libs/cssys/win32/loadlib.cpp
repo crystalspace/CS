@@ -334,7 +334,12 @@ void InternalScanPluginDir (iStrVector*& messages,
   csStringHash dirs;
 
   csString filemask;
-  filemask << dir << PATH_SEPARATOR << "*.*";
+
+  // The directory sometimes has a trailing path separator attached.
+  if (!strlen(dir) || dir[strlen(dir)-1]==PATH_SEPARATOR)
+      filemask << dir  << "*.*";
+  else
+      filemask << dir << PATH_SEPARATOR << "*.*";
 
   WIN32_FIND_DATA findData;
   HANDLE hSearch = FindFirstFile (filemask, &findData);
@@ -409,7 +414,11 @@ void InternalScanPluginDir (iStrVector*& messages,
       if ((strcasecmp (ext, ".dll") == 0))
       {
 	fullPath.Clear();
-	fullPath << dir << PATH_SEPARATOR << fileName;
+	// The directory sometimes has a trailing path separator attached.
+	if (!strlen(dir) || dir[strlen(dir)-1]==PATH_SEPARATOR)
+	  fullPath << dir << fileName;
+	else
+	  fullPath << dir << PATH_SEPARATOR << fileName;
 
 	msg = InternalGetPluginMetadata (fullPath, pluginMetadata, docsys);
 	if (msg != 0)
@@ -421,12 +430,16 @@ void InternalScanPluginDir (iStrVector*& messages,
 	  Check whether the DLL has a companion .csplugin.
 	 */
 	char cspluginPath [MAX_PATH + 10];
+	char cspluginFile [MAX_PATH + 10];
 
-	strcpy (cspluginPath, fileName);
+	strcpy (cspluginPath, fullPath);
+	strcpy (cspluginFile, fileName);
 	char* dot = strrchr (cspluginPath, '.');
 	strcpy (dot, ".csplugin");
+	dot = strrchr (cspluginFile, '.');
+	strcpy (dot, ".csplugin");
 
-	csStringID cspID = files.Request (cspluginPath);
+	csStringID cspID = files.Request (cspluginFile);
 	if (cspID != csInvalidStringID)
 	{
 	  if (pluginMetadata != 0)
@@ -434,7 +447,7 @@ void InternalScanPluginDir (iStrVector*& messages,
 	    csString errstr;
 	    errstr.Format ("'%s' contains embedded metadata, "
 	      "but external '%s' exists as well. Ignoring the latter.",
-	      fileName, cspluginPath);
+	      fullPath.GetData(), cspluginPath);
 
 	    AppendStrVecString (messages, errstr);
 	  }
