@@ -14,6 +14,8 @@
 class awsStandardSink :
   public awsSink
 {
+  iAws *wmgr;
+
   /// Hides the source component
   static void Hide (void *sink, iAwsSource *source);
 
@@ -25,8 +27,21 @@ class awsStandardSink :
 
   /// Invalidates the source component
   static void Invalidate (void *sink, iAwsSource *source);
+
+  /// Slides a window down and out
+  static void WindowSlideOutDown (void *sink, iAwsSource *source);
+
+  /// Slides a window up and out
+  static void WindowSlideOutUp (void *sink, iAwsSource *source);
+
+  /// Slides a window left and out
+  static void WindowSlideOutLeft (void *sink, iAwsSource *source);
+  
+  /// Slides a window right and out
+  static void WindowSlideOutRight (void *sink, iAwsSource *source);
+
 public:
-  awsStandardSink ();
+  awsStandardSink (iAws *_wmgr);
   virtual ~awsStandardSink ();
 };
 #endif

@@ -397,9 +397,14 @@ void awsManager::CreateTransitionEx(iAwsWindow *win, unsigned transition_type, f
     t->start=user;
     break;
 
+  case AWS_TRANSITION_SLIDE_LEFT:    
+  case AWS_TRANSITION_SLIDE_RIGHT:  
+  case AWS_TRANSITION_SLIDE_DOWN:
+  case AWS_TRANSITION_SLIDE_UP:
   case AWS_TRANSITION_SLIDE_OUT_LEFT:    
   case AWS_TRANSITION_SLIDE_OUT_RIGHT:  
   case AWS_TRANSITION_SLIDE_OUT_DOWN:
+  case AWS_TRANSITION_SLIDE_OUT_UP:
     t->start=win->Frame();
     t->end=user;
     break;
@@ -441,6 +446,29 @@ awsManager::PerformTransition(awsWindowTransition *t)
 
   if (t->morph==1.0)
   {
+    switch(t->transition_type)
+    {
+    case AWS_TRANSITION_SLIDE_IN_LEFT:
+    case AWS_TRANSITION_SLIDE_IN_RIGHT:
+    case AWS_TRANSITION_SLIDE_IN_UP:
+    case AWS_TRANSITION_SLIDE_IN_DOWN:
+    default:
+      break;
+
+    case AWS_TRANSITION_SLIDE_OUT_LEFT:    
+    case AWS_TRANSITION_SLIDE_OUT_RIGHT:  
+    case AWS_TRANSITION_SLIDE_OUT_UP:
+    case AWS_TRANSITION_SLIDE_OUT_DOWN:
+      // Fix frame back to start
+      t->win->Move(t->win->Frame().xmin-t->start.xmin,
+	           t->win->Frame().ymin-t->start.ymin);
+
+      // Hide window (an out transition means out of view)
+      t->win->Hide();
+      
+      break;
+    }
+
     transitions.Delete(t);
     delete t;
     return;
@@ -1132,7 +1160,7 @@ void awsManager::RegisterCommonComponents ()
   (void)new awsNotebookButtonFactory (this);
 
   // Standard sink
-  GetSinkMgr ()->RegisterSink ("awsStandardSink", new awsStandardSink ());
+  GetSinkMgr ()->RegisterSink ("awsStandardSink", new awsStandardSink (this));
 
   // Global constants
   GetPrefMgr ()->RegisterConstant ("True", 1);
