@@ -56,6 +56,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
   iAwsComponent *comp = source->GetComponent();
   
   iAwsParmList *pl=0;
+  int parent;
 
   printf("awstest: Filling list box.\n");
 
@@ -96,6 +97,38 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
   // Add it into the list
   comp->Execute("InsertItem", *pl);
 
+  // Get the id of the last item for hierarchical support.
+  pl->GetInt("id", &parent);
+  pl->Clear();
+
+  //////////////////////////
+  // Setup third row (hierarchical)
+  pl->AddString("text0", new scfString("Ship"));
+
+  pl->AddString("text1", new scfString("Active"));
+  pl->AddBool("stateful1", true);
+  pl->AddBool("state1", true);
+
+  pl->AddString("text2", new scfString("Daedalus"));
+  pl->AddInt("parent", parent);
+
+  // Add it into the list
+  comp->Execute("InsertItem", *pl);
+  pl->Clear();
+
+  //////////////////////////
+  // Setup fourth row (hierarchical)
+  pl->AddString("text0", new scfString("Ship"));
+
+  pl->AddString("text1", new scfString("Active"));
+  pl->AddBool("stateful1", true);
+  pl->AddBool("state1", false);
+
+  pl->AddString("text2", new scfString("Temtor"));
+  pl->AddInt("parent", parent);
+
+  // Add it into the list
+  comp->Execute("InsertItem", *pl);
 
   pl->Clear();
   pl->DecRef();
