@@ -20,6 +20,8 @@ chronological order.
 	  -ansi -pedantic.
 	- res changed some places to use the newly supported cs_snprintf()
 	  formats (mostly correct formatting of pointers).
+	- Eric Sunshine added csRef<>::Invalidate() to complement the existing
+	  IsValid() method.
 5-Mar-2005
 	- res added some terrain-related interfaces to cspace.i.
 	- res made more -ansi -pedantic compile fixes on Win32. 

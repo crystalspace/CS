@@ -333,6 +333,11 @@ public:
    */
   bool IsValid () const
   { return (obj != 0); }
+
+  /// Invalidate the smart pointer by setting it to null.
+  void Invalidate()
+  { *this = (T*)0; }
+
 };
 
 #undef CSREF_TRACK_INCREF
