@@ -46,7 +46,6 @@
 #include "csgeom/math3d.h"
 
 #include "igraph3d.h"
-//#include "walktest/physics.h"
 
 csKeyMap* mapping = NULL;
 
