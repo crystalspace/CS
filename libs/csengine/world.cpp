@@ -1341,6 +1341,20 @@ csStatLight* csWorld::FindLight (float x, float y, float z, float dist)
   return NULL;
 }
 
+csStatLight* csWorld::FindLight (CS_ID id)
+{
+  csStatLight* l;
+  int sn = sectors.Length ();
+  while (sn > 0)
+  {
+    sn--;
+    csSector* s = (csSector*)sectors[sn];
+    l = s->FindLight (id);
+    if (l) return l;
+  }
+  return NULL;
+}
+
 void csWorld::AddDynLight (csDynLight* dyn)
 {
   dyn->SetNext (first_dyn_lights);

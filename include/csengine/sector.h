@@ -236,6 +236,11 @@ public:
   csStatLight* FindLight (float x, float y, float z, float dist);
 
   /**
+   * Find the light with the given object id.
+   */
+  csStatLight* FindLight (CS_ID id);
+
+  /**
    * Find a thing with the given name.
    */
   csThing* GetThing (const char* name);

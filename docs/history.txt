@@ -9,7 +9,15 @@ The history order has been reversed so that new features are at the top.
 	  more reliable for TestPolygon.
 	- Norman Kramer fixed csFrustum::Classify(): corrected the
 	  CS_FRUST_PART, still in #if 0 - i guess jorrit want to double
-	  check this :)
+	  check this :) 
+	- Fixed csFrustrum::Classify() again!!
+	- Changed lightmap caching to make it more robust and system
+	  independent. This means that the format has changed completely.
+	  If you don't do -relight or -recalc CS will simply ignore
+	  the old lightmaps (i.e. everything becomes black).
+	- Added csSector/csWorld::FindLight() with CS_ID as a parameter.
+	  This can be used to locate a light with a given id.
+	  This is mainly useful for the lightmap cache.
 19-Jul-2000
 	- Updated 'simple' tutorial and 'simple' application a little bit.
 	- Extended 'simple' application to load a 'sprite1' template from

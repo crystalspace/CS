@@ -185,15 +185,15 @@ void csLightMap::CopyLightMap (csLightMap* source)
 struct PolySave
 {
   char header[4];
-  float x1, y1, z1;	// Coordinate of vertex 1
-  float x2, y2, z2;	// Coordinate of vertex 2
+  short x1, y1, z1;	// Coordinate of vertex 1
+  short x2, y2, z2;	// Coordinate of vertex 2
   long lm_size;		// Size of lightmap
   long lm_cnt;		// Number of non-dynamic lightmaps (normally 3)
 };
 
 struct LightSave
 {
-  float x, y, z, dist;
+  CS_ID id;
 };
 
 struct LightHeader
@@ -223,7 +223,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
   csObject* obj, bool isPolygon, int index, csWorld* world)
 {
   char buf[200];
-  PolySave ps;
+  PolySave ps, pswanted;
   LightHeader lh;
   LightSave ls;
   csLight* light;
@@ -234,8 +234,19 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
   if (isPolygon)
     poly = (csPolygon3D*)obj;
 
-
   SetSize (w, h);
+
+  strcpy (pswanted.header, "LM02");
+  if (poly)
+  {
+    pswanted.x1 = convert_endian (float2short (poly->Vobj (0).x));
+    pswanted.y1 = convert_endian (float2short (poly->Vobj (0).y));
+    pswanted.z1 = convert_endian (float2short (poly->Vobj (0).z));
+    pswanted.x2 = convert_endian (float2short (poly->Vobj (1).x));
+    pswanted.y2 = convert_endian (float2short (poly->Vobj (1).y));
+    pswanted.z2 = convert_endian (float2short (poly->Vobj (1).z));
+  }
+  pswanted.lm_size = convert_endian (lm_size);
 
   CacheName (buf, owner, index, "");
 
@@ -245,34 +256,27 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
 
   char *d = data;
   memcpy (ps.header, d, 4); d += 4;
-  memcpy (&ps.x1, d, 4); d += 4;
-  memcpy (&ps.y1, d, 4); d += 4;
-  memcpy (&ps.z1, d, 4); d += 4;
-  memcpy (&ps.x2, d, 4); d += 4;
-  memcpy (&ps.y2, d, 4); d += 4;
-  memcpy (&ps.z2, d, 4); d += 4;
-  memcpy (&ps.lm_size, d, 4); d += 4;
-  memcpy (&ps.lm_cnt, d, 4); d += 4;
-  ps.x1 = convert_endian (ps.x1);
-  ps.y1 = convert_endian (ps.y1);
-  ps.z1 = convert_endian (ps.z1);
-  ps.x2 = convert_endian (ps.x2);
-  ps.y2 = convert_endian (ps.y2);
-  ps.z2 = convert_endian (ps.z2);
-  ps.lm_size = convert_endian (ps.lm_size);
-  ps.lm_cnt = convert_endian (ps.lm_cnt);
+  memcpy (&ps.x1, d, sizeof (ps.x1)); d += sizeof (ps.x1);
+  memcpy (&ps.y1, d, sizeof (ps.x1)); d += sizeof (ps.x1);
+  memcpy (&ps.z1, d, sizeof (ps.x1)); d += sizeof (ps.x1);
+  memcpy (&ps.x2, d, sizeof (ps.x1)); d += sizeof (ps.x1);
+  memcpy (&ps.y2, d, sizeof (ps.x1)); d += sizeof (ps.x1);
+  memcpy (&ps.z2, d, sizeof (ps.x1)); d += sizeof (ps.x1);
+  memcpy (&ps.lm_size, d, sizeof (ps.lm_size)); d += sizeof (ps.lm_size);
+  memcpy (&ps.lm_cnt, d, sizeof (ps.lm_size)); d += sizeof (ps.lm_size);
 
   //-------------------------------
   // Check if cached item is still valid.
   //-------------------------------
-  if (poly &&
-     (ABS (ps.x1 - poly->Vobj (0).x) > EPSILON ||
-      ABS (ps.y1 - poly->Vobj (0).y) > EPSILON ||
-      ABS (ps.z1 - poly->Vobj (0).z) > EPSILON ||
-      ABS (ps.x2 - poly->Vobj (1).x) > EPSILON ||
-      ABS (ps.y2 - poly->Vobj (1).y) > EPSILON ||
-      ABS (ps.z2 - poly->Vobj (1).z) > EPSILON ||
-      ps.lm_size != lm_size))
+  if (strncmp (ps.header, pswanted.header, 4) != 0 || (
+	poly && (
+	ps.x1 != pswanted.x1 ||
+	ps.y1 != pswanted.y1 ||
+	ps.z1 != pswanted.z1 ||
+	ps.x2 != pswanted.x2 ||
+	ps.y2 != pswanted.y2 ||
+	ps.z2 != pswanted.z2 ||
+        ps.lm_size != pswanted.lm_size)))
   {
     // Invalid.
     delete [] data;
@@ -304,16 +308,10 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
 
   for (i = 0; i < lh.dyn_cnt; i++)
   {
-    memcpy (&ls.x, d, 4); d += 4;
-    memcpy (&ls.y, d, 4); d += 4;
-    memcpy (&ls.z, d, 4); d += 4;
-    memcpy (&ls.dist, d, 4); d += 4;
-    ls.x = convert_endian (ls.x);
-    ls.y = convert_endian (ls.y);
-    ls.z = convert_endian (ls.z);
-    ls.dist = convert_endian (ls.dist);
+    memcpy (&ls.id, d, sizeof (CS_ID)); d += sizeof (CS_ID);
+    ls.id = convert_endian (ls.id);
 
-    light = world->FindLight (ls.x, ls.y, ls.z, ls.dist);
+    light = world->FindLight (ls.id);
     if (light)
     {
       if (light->GetType () == csStatLight::Type && obj)
@@ -335,6 +333,10 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
       csShadowMap* smap = NewShadowMap (light, w, h);
       memcpy (smap->map, d, lm_size);
     }
+    else
+    {
+      CsPrintf (MSG_WARNING, "Warning! Light (%ld) not found!\n", ls.id);
+    }
     d += lm_size;
   }
 
@@ -349,23 +351,24 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   char buf[200];
   PolySave ps;
   long l;
-  float f;
+  short s;
 
-  strcpy (ps.header, "MAPL");
+  strcpy (ps.header, "LM02");
   if (poly)
   {
-    ps.x1 = poly->Vobj (0).x;
-    ps.y1 = poly->Vobj (0).y;
-    ps.z1 = poly->Vobj (0).z;
-    ps.x2 = poly->Vobj (1).x;
-    ps.y2 = poly->Vobj (1).y;
-    ps.z2 = poly->Vobj (1).z;
+    ps.x1 = convert_endian (float2short (poly->Vobj (0).x));
+    ps.y1 = convert_endian (float2short (poly->Vobj (0).y));
+    ps.z1 = convert_endian (float2short (poly->Vobj (0).z));
+    ps.x2 = convert_endian (float2short (poly->Vobj (1).x));
+    ps.y2 = convert_endian (float2short (poly->Vobj (1).y));
+    ps.z2 = convert_endian (float2short (poly->Vobj (1).z));
   }
-  ps.lm_size = lm_size;
+  ps.lm_size = convert_endian (lm_size);
   ps.lm_cnt = 0;
   if (static_lm.GetRed ()) ps.lm_cnt++;
   if (static_lm.GetGreen ()) ps.lm_cnt++;
   if (static_lm.GetBlue ()) ps.lm_cnt++;
+  ps.lm_cnt = convert_endian (ps.lm_cnt);
 
   //-------------------------------
   // Write the normal lightmap data.
@@ -373,14 +376,14 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   CacheName (buf, owner, index, "");
   iFile *cf = world->VFS->Open (buf, VFS_FILE_WRITE);
   cf->Write (ps.header, 4);
-  f = convert_endian (ps.x1);      cf->Write ((char*)&f, 4);
-  f = convert_endian (ps.y1);      cf->Write ((char*)&f, 4);
-  f = convert_endian (ps.z1);      cf->Write ((char*)&f, 4);
-  f = convert_endian (ps.x2);      cf->Write ((char*)&f, 4);
-  f = convert_endian (ps.y2);      cf->Write ((char*)&f, 4);
-  f = convert_endian (ps.z2);      cf->Write ((char*)&f, 4);
-  l = convert_endian (ps.lm_size); cf->Write ((char*)&l, 4);
-  l = convert_endian (ps.lm_cnt);  cf->Write ((char*)&l, 4);
+  s = ps.x1;      cf->Write ((char*)&s, sizeof (s));
+  s = ps.y1;      cf->Write ((char*)&s, sizeof (s));
+  s = ps.z1;      cf->Write ((char*)&s, sizeof (s));
+  s = ps.x2;      cf->Write ((char*)&s, sizeof (s));
+  s = ps.y2;      cf->Write ((char*)&s, sizeof (s));
+  s = ps.z2;      cf->Write ((char*)&s, sizeof (s));
+  l = ps.lm_size; cf->Write ((char*)&l, sizeof (l));
+  l = ps.lm_cnt;  cf->Write ((char*)&l, sizeof (l));
 
   if (static_lm.GetRed ()) cf->Write ((char*)static_lm.GetRed (), lm_size);
   if (static_lm.GetGreen ()) cf->Write ((char*)static_lm.GetGreen (), lm_size);
@@ -413,14 +416,8 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
       if (smap->map)
       {
         LightSave ls;
-        ls.x = light->GetCenter ().x;
-        ls.y = light->GetCenter ().y;
-        ls.z = light->GetCenter ().z;
-        ls.dist = light->GetRadius ();
-        f = convert_endian (ls.x);    cf->Write ((char*)&f, 4);
-        f = convert_endian (ls.y);    cf->Write ((char*)&f, 4);
-        f = convert_endian (ls.z);    cf->Write ((char*)&f, 4);
-        f = convert_endian (ls.dist); cf->Write ((char*)&f, 4);
+	ls.id = convert_endian (light->GetID ());
+        cf->Write ((char*)&ls.id, sizeof (CS_ID));
         cf->Write ((char*)(smap->map), lm_size);
       }
       smap = smap->next;

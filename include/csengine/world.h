@@ -702,6 +702,11 @@ public:
   csStatLight* FindLight (float x, float y, float z, float dist);
 
   /**
+   * Find the light with the given object id.
+   */
+  csStatLight* FindLight (CS_ID id);
+
+  /**
    * Advance the frames of all sprites given the current time.
    */
   void AdvanceSpriteFrames (time_t current_time);
