@@ -32,7 +32,7 @@ IMPLEMENT_IBASE (csView)
 IMPLEMENT_IBASE_END
 
 csView::csView (iEngine *e, iGraphics3D* ig3d) :
-  Clipper (NULL), G3D (ig3d), RectView (NULL), PolyView (NULL), Engine (e)
+  Engine (e), G3D (ig3d), RectView (NULL), PolyView (NULL), Clipper (NULL)
 {
   CONSTRUCT_IBASE (NULL);
 

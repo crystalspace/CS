@@ -149,7 +149,6 @@ void csLightMap::Alloc (int w, int h, int r, int g, int b)
   real_lm.Alloc (lm_size);
 
   UByte* map = static_lm.GetMap ();
-  int i;
   ULong v;
   *(0+(UByte*)&v) = r;
   *(1+(UByte*)&v) = g;
