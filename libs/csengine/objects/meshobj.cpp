@@ -262,7 +262,7 @@ void csMeshWrapper::DrawShadow (iRenderView* rview, iLight* light)
   float sqd_dist = (light->GetCenter() - movable.GetPosition()).SquaredNorm();
   in_light = sqd_dist <= light->GetRadius() * light->GetRadius();
   if (in_light)
-    meshobj->DrawShadow (rview, &movable.scfiMovable, zbufMode);
+    meshobj->DrawShadow (rview, &movable.scfiMovable, zbufMode, light);
 }
 
 void csMeshWrapper::DrawLight (iRenderView* rview, iLight* light)
