@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2001 by W.C.A. Wijngaards
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,6 +29,11 @@
 #include "imesh/imcube.h"
 #include "ivideo/igraph3d.h"
 #include "qint.h"
+#include "iutil/istrvec.h"
+#include "csutil/util.h"
+#include "iobject/iobject.h"
+#include "iengine/imater.h"
+#include "csengine/material.h"
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ADD)
@@ -50,19 +56,35 @@ IMPLEMENT_IBASE (csCubeFactoryLoader)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csCubeFactorySaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_IBASE (csCubeLoader)
   IMPLEMENTS_INTERFACE (iLoaderPlugIn)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csCubeSaver)
+  IMPLEMENTS_INTERFACE (iSaverPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
 IMPLEMENT_FACTORY (csCubeFactoryLoader)
+IMPLEMENT_FACTORY (csCubeFactorySaver)
 IMPLEMENT_FACTORY (csCubeLoader)
+IMPLEMENT_FACTORY (csCubeSaver)
 
 EXPORT_CLASS_TABLE (cubeldr)
   EXPORT_CLASS (csCubeFactoryLoader, "crystalspace.mesh.loader.factory.cube",
     "Crystal Space Cube Mesh Factory Loader")
+  EXPORT_CLASS (csCubeFactorySaver, "crystalspace.mesh.saver.factory.cube",
+    "Crystal Space Cube Mesh Factory Saver")
   EXPORT_CLASS (csCubeLoader, "crystalspace.mesh.loader.cube",
     "Crystal Space Cube Mesh Loader")
+  EXPORT_CLASS (csCubeSaver, "crystalspace.mesh.saver.cube",
+    "Crystal Space Cube Mesh Saver")
 EXPORT_CLASS_TABLE_END
 
 csCubeFactoryLoader::csCubeFactoryLoader (iBase* pParent)
@@ -208,6 +230,75 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
 
 //---------------------------------------------------------------------------
 
+csCubeFactorySaver::csCubeFactorySaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csCubeFactorySaver::~csCubeFactorySaver ()
+{
+}
+
+bool csCubeFactorySaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+#define MAXLINE 100 /* max number of chars per line... */
+
+static void WriteMixmode(iStrVector *str, UInt mixmode)
+{
+  str->Push(strnew("  MIXMODE ("));
+  if(mixmode&CS_FX_COPY) str->Push(strnew(" COPY ()"));
+  if(mixmode&CS_FX_ADD) str->Push(strnew(" ADD ()"));
+  if(mixmode&CS_FX_MULTIPLY) str->Push(strnew(" MULTIPLY ()"));
+  if(mixmode&CS_FX_MULTIPLY2) str->Push(strnew(" MULTIPLY2 ()"));
+  if(mixmode&CS_FX_KEYCOLOR) str->Push(strnew(" KEYCOLOR ()"));
+  if(mixmode&CS_FX_TRANSPARENT) str->Push(strnew(" TRANSPARENT ()"));
+  if(mixmode&CS_FX_ALPHA) {
+    char buf[MAXLINE];
+    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
+    str->Push(strnew(buf));
+  }
+  str->Push(strnew(")"));
+}
+
+void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
+  iEngine* /*engine*/)
+{
+  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  iCubeFactoryState *cubelook = QUERY_INTERFACE(obj, iCubeFactoryState);
+  if(!cubelook)
+  {
+    printf("Error: non-cubefactorystate given to %s.\n",
+      fact->QueryDescription () );
+    fact->DecRef();
+    return;
+  }
+  
+  if(cubelook->GetMixMode() != CS_FX_COPY)
+  {
+    WriteMixmode(str, cubelook->GetMixMode());
+  }
+
+  char buf[MAXLINE];
+  sprintf(buf, "MATERIAL (%s)\n", cubelook->GetMaterialWrapper()->
+    GetPrivateObject()->GetName());
+  str->Push(strnew(buf));
+  sprintf(buf, "SIZE (%g, %g, %g)\n", cubelook->GetSizeX (),
+    cubelook->GetSizeY (), cubelook->GetSizeZ ());
+  str->Push(strnew(buf));
+  sprintf(buf, "SHIFT (%g, %g, %g)\n", cubelook->GetShiftX (),
+    cubelook->GetShiftY (), cubelook->GetShiftZ ());
+  str->Push(strnew(buf));
+  
+  cubelook->DecRef();
+  fact->DecRef();
+}
+
+//---------------------------------------------------------------------------
+
 csCubeLoader::csCubeLoader (iBase* pParent)
 {
   CONSTRUCT_IBASE (pParent);
@@ -264,4 +355,32 @@ iBase* csCubeLoader::Parse (const char* string, iEngine* engine)
 
 //---------------------------------------------------------------------------
 
+csCubeSaver::csCubeSaver (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csCubeSaver::~csCubeSaver ()
+{
+}
+
+bool csCubeSaver::Initialize (iSystem* system)
+{
+  sys = system;
+  return true;
+}
+
+void csCubeSaver::WriteDown (iBase* /*obj*/, iStrVector *str,
+  iEngine* /*engine*/)
+{
+  iFactory *fact = QUERY_INTERFACE (this, iFactory);
+  char buf[MAXLINE];
+  char name[MAXLINE];
+  csFindReplace(name, fact->QueryDescription (), "Saver", "Loader", MAXLINE);
+  sprintf(buf, "FACTORY ('%s')\n", name);
+  str->Push(strnew(buf));
+  fact->DecRef();
+}
+
+//---------------------------------------------------------------------------
 
