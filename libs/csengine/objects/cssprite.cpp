@@ -392,9 +392,10 @@ void csSpriteTemplate::MergeNormals (const char * action, int frame)
   // Create a new norm_mesh with indices to new vertex array
 }
 
-void csSpriteTemplate::MergeTexels ()
+int csSpriteTemplate::MergeTexels ()
 {
   // Merge identical texel frames:
+  int same_count = 0;
 
   // start a count and a list of unique texel maps
   int unique_texel_map_count;
@@ -432,6 +433,8 @@ void csSpriteTemplate::MergeTexels ()
       }
       if (same)
       {
+        same_count++;
+
         // delete this redundant texel map
         CHK (delete [] texels);
 
@@ -450,6 +453,7 @@ void csSpriteTemplate::MergeTexels ()
       unique_texel_map_count ++;
     }
   }
+
 /*
   // now you can compare the frame count to the unique texel map count
   System->Printf (MSG_INITIALIZATION, "Merged %d/%d texel maps, saving %d bytes.\n",
@@ -458,7 +462,10 @@ void csSpriteTemplate::MergeTexels ()
     // to determine the number of bytes saved.
     (frames.Length() - unique_texel_map_count) * num_vertices * sizeof(csVector2));
 */
+
   delete[] unique_texel_maps;
+
+  return same_count;
 }
 
 //=============================================================================

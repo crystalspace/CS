@@ -318,8 +318,9 @@ public:
 
   /**
    * Merge identical texel frames
+   * Returns number of redundant texel maps deleted
    */
-  void MergeTexels ();
+  int MergeTexels ();
 
   CSOBJTYPE;
 };
