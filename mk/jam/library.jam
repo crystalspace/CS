@@ -227,7 +227,7 @@ rule ConstructLibraryTarget
 {
   if ( ! [ IsElem shared : $(>) ] ) || ( $(BUILD_SHARED_LIBS) != "yes" )
   {
-    return [ ConstructStaticLibraryTarget $(<) : $(>) ] ; 
+    return [ ConstructStaticLibraryTarget $(<) : [ Filter $(>) : shared ] ] ; 
   }
   else
   {
@@ -239,7 +239,7 @@ rule ConstructLibraryLinkTarget
 {
   if ( ! [ IsElem shared : $(>) ] ) || ( $(BUILD_SHARED_LIBS) != "yes" )
   {
-    return [ ConstructStaticLibraryTarget $(<) : $(>) ] ; 
+    return [ ConstructStaticLibraryTarget $(<) : [ Filter $(>) : shared ] ] ; 
   }
   else
   {
