@@ -58,6 +58,21 @@ The history order is reversed so that new features are at the top.
 	- Wouter added new method to iAws: GetKeyboardFocusedComponent.
 	  It is useful when trying to determine if Aws is interested
 	  in keyboard events.
+	- Eric Sunshine reverted the reversion to stringarray.h, so that the
+	  public API once again deals with (char const*), rather than (char*).
+	  It is said that the earlier reversion was made because PlaneShift
+	  modifies the strings stored in the array, however modifying (char*)
+	  strings owned by some other object is highly dangerous and extremely
+	  questionable behavior.  There are other much safer ways to accomplish
+	  this.  We should not allow the API of csStringArray to be corrupted
+	  simply because some project employs dangerous coding practices.  (If
+	  PlaneShift really insists upon relying upon this unsafe coding
+	  practice, then it can use the manifestly unsafe const_cast<> to make
+	  the returned strings non-const.  However, such practice is not
+	  recommended.)  Also reverted the earlier changes in revision 1.3
+	  because they were incorrect.  Instead, fixed the actual problem (a
+	  misplaced `const') which prompted the 1.3 changes.  (And, yes, the
+	  present changes have been tested. :-)
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,
