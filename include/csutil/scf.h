@@ -68,7 +68,7 @@
 #define SCF_VERSION(Name,Major,Minor,Micro)				\
   const int VERSION_##Name = SCF_CONSTRUCT_VERSION (Major, Minor, Micro)
 
-SCF_VERSION (iBase, 0, 0, 1);
+SCF_VERSION (iBase, 0, 1, 0);
 
 /**
  * This is the basic interface: all other interfaces should be
@@ -82,12 +82,12 @@ struct iBase
   /// Decrement the reference count.
   virtual void DecRef () = 0;
   /// Query a particular interface embedded into this object.
-  virtual void *QueryInterface (const char *iInterfaceID, int iVersion) = 0;
+  virtual void *QueryInterface (uint32 iInterfaceID, int iVersion) = 0;
   /**
    * Query a particular interface embedded into an object.
    * This version will test if 'ibase' is NULL.
    */
-  static void* QueryInterfaceSafe (iBase* ibase, const char* iInterfaceID,
+  static void* QueryInterfaceSafe (iBase* ibase, uint32 iInterfaceID,
   	int iVersion)
   {
     if (ibase == NULL) return NULL;
@@ -119,7 +119,7 @@ public:									\
   OuterClass *scfParent;	/* The parent object */			\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
-  virtual void *QueryInterface (const char *iInterfaceID, int iVersion)
+  virtual void *QueryInterface (uint32 iInterfaceID, int iVersion)
 
 /**
  * The CONSTRUCT_IBASE macro should be invoked inside the constructor
@@ -168,9 +168,9 @@ void Class::DecRef ()							\
   else									\
     SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfRefCount));\
 }									\
-void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
+void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
 {									\
-  SCF_TRACE (("  (%s *)%p->QueryInterface (%s, %08X)\n",		\
+  SCF_TRACE (("  (%s *)%p->QueryInterface (%lu, %08X)\n",		\
     #Class, this, iInterfaceID, iVersion));				\
 
 /**
@@ -194,9 +194,9 @@ void Class::DecRef ()							\
     scfParent->DecRef ();						\
   SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, scfRefCount));	\
 }									\
-void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
+void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
 {									\
-  SCF_TRACE (("  (%s *)%p->QueryInterface (%s, %08X)\n",		\
+  SCF_TRACE (("  (%s *)%p->QueryInterface (%lu, %08X)\n",		\
     #Class, this, iInterfaceID, iVersion));				\
 
 /**
@@ -231,8 +231,11 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
  * This is a common macro used in all IMPLEMENTS_XXX_INTERFACE macros
  */
 #define IMPLEMENTS_INTERFACE_COMMON(Interface,Object)			\
-  if (scfCompatibleVersion (iVersion, VERSION_##Interface)		\
-   && !strcmp (iInterfaceID, #Interface))				\
+  static scfID_##Interface = -1;					\
+  if (scfID_##Interface == -1)						\
+    scfID_##Interface = iSCF::SCF->GetInterfaceID (#Interface);		\
+  if (iInterfaceID == scfID_##Interface &&				\
+    scfCompatibleVersion (iVersion, VERSION_##Interface))		\
   {									\
     (Object)->IncRef ();						\
     return STATIC_CAST(Interface*, Object);				\
@@ -252,7 +255,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
   typedef ParentClass __scf_superclass;					\
   virtual void IncRef ();						\
   virtual void DecRef ();						\
-  virtual void *QueryInterface (const char *iInterfaceID, int iVersion)
+  virtual void *QueryInterface (uint32 iInterfaceID, int iVersion)
 
 /**
  * This macro implements same functionality as IMPLEMENT_IBASE
@@ -267,7 +270,7 @@ void Class::DecRef ()							\
 {									\
   __scf_superclass::DecRef ();						\
 }									\
-void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
+void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
 {
 
 /**
@@ -445,7 +448,16 @@ struct iConfigFile;
  * This is a wrapper around iBase::QueryInterface method.
  */
 #define QUERY_INTERFACE(Object,Interface)				\
-  (Interface *)(Object)->QueryInterface (#Interface, VERSION_##Interface)
+  (Interface *)(Object)->QueryInterface (				\
+    iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface)
+
+/**
+ * Shortcut macro to query given interface from given object. This is a
+ * wrapper around iBase::QueryInterface method that uses an ID number to
+ * identify the requested interface instead of its name.
+ */
+#define QUERY_INTERFACE_FAST(Object,Interface,InterfaceID)		\
+  (Interface *)(Object)->QueryInterface (InterfaceID, VERSION_##Interface)
 
 /**
  * Shortcut macro to query given interface from given object.
@@ -453,7 +465,8 @@ struct iConfigFile;
  * This version tests if Object is NULL and will return NULL in that case.
  */
 #define QUERY_INTERFACE_SAFE(Object,Interface)				\
-  (Interface *)(iBase::QueryInterfaceSafe ((Object), #Interface, VERSION_##Interface))
+  (Interface *)(iBase::QueryInterfaceSafe ((Object),			\
+    iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
 
 /**
  * This function should be called to initialize client SCF library.
@@ -520,7 +533,7 @@ struct iSCF : public iBase
    * increment the reference counter).
    */
   virtual void *CreateInstance (const char *iClassID,
-	const char *iInterfaceID, int iVersion) = 0;
+	const char *iInterface, int iVersion) = 0;
 
   /**
    * Query the description of a class.

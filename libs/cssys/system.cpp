@@ -1017,7 +1017,8 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
     {
       iBase *ret;
       if (iInterface)
-        ret = (iBase *)p->QueryInterface (iInterface, iVersion);
+        ret = (iBase *)p->QueryInterface (
+	  iSCF::SCF->GetInterfaceID (iInterface), iVersion);
       else
         ret = p;
       if (ret)
@@ -1066,7 +1067,8 @@ iBase *csSystemDriver::QueryPlugIn (const char *iInterface, int iVersion)
   for (int i = 0; i < PlugIns.Length (); i++)
   {
     iBase *ret =
-      (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (iInterface, iVersion);
+      (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (
+        iSCF::SCF->GetInterfaceID (iInterface), iVersion);
     if (ret)
       return ret;
   }
@@ -1080,7 +1082,8 @@ iBase *csSystemDriver::QueryPlugIn (const char *iFuncID, const char *iInterface,
   if (idx < 0)
     return NULL;
 
-  return (iBase *)PlugIns.Get (idx)->PlugIn->QueryInterface (iInterface, iVersion);
+  return (iBase *)PlugIns.Get (idx)->PlugIn->QueryInterface (
+    iSCF::SCF->GetInterfaceID (iInterface), iVersion);
 }
 
 iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID, const char *iInterface,
@@ -1096,7 +1099,8 @@ iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID, c
 	if (pl->FuncID)
 	  if (pl->FuncID == iFuncID || !strcmp (pl->FuncID, iFuncID))
 	  {
-	    return (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (iInterface, iVersion);
+	    return (iBase *)PlugIns.Get (i)->PlugIn->QueryInterface (
+	      iSCF::SCF->GetInterfaceID (iInterface), iVersion);
 	  }
       }
   }

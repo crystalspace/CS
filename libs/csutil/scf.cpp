@@ -319,7 +319,7 @@ void scfFactory::DecRef ()
 #endif
 }
 
-void *scfFactory::QueryInterface (const char *iInterfaceID, int iVersion)
+void *scfFactory::QueryInterface (uint32 iInterfaceID, int iVersion)
 {
   IMPLEMENTS_INTERFACE (iFactory);
   return NULL;
@@ -436,7 +436,7 @@ void csSCF::Finish ()
   delete this;
 }
 
-void *csSCF::CreateInstance (const char *iClassID, const char *iInterfaceID,
+void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
   int iVersion)
 {
   // Pre-sort class registry for doing binary searches
@@ -455,7 +455,7 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterfaceID,
     iBase *object = (iBase *)cf->CreateInstance ();
     if (object)
     {
-      instance = object->QueryInterface (iInterfaceID, iVersion);
+      instance = object->QueryInterface (GetInterfaceID (iInterface), iVersion);
       object->DecRef ();
     }
   } /* endif */
