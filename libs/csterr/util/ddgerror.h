@@ -72,7 +72,7 @@ public:
 	#define ddgErrorSet(a,b)
 #endif
 
-#if ( _DEBUG && DDG )
+#if defined(_DEBUG) && defined(DDG)
 	/// Generate warning only.
 	#define ddgAssertw(a)    if (!(a)) {ddgErrorSet(Warning,"Assert failed!\n" #a);ddgError::report(); }
 	/// Generate warning with string.

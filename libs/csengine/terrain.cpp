@@ -17,20 +17,24 @@
 */
 #include "sysdef.h"
 
+#define DDG_FIXME 0
+
 #include "csengine/terrain.h"
 #include "csengine/pol2d.h"
 #include "csengine/texture.h"
-#include "struct/ddgcntxt.h"
-#include "struct/ddgtmesh.h"
-#include "struct/ddgbtree.h"
-#include "struct/ddgvarr.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
 #include "igraph3d.h"
 
-IMPLEMENT_CSOBJTYPE (csTerrain,csObject);
+#if DDG_FIXME
+#include "csterr/struct/ddgcntxt.h"
+#include "csterr/struct/ddgtmesh.h"
+#include "csterr/struct/ddgbtree.h"
+#include "csterr/struct/ddgvarr.h"
+#endif
 
+IMPLEMENT_CSOBJTYPE (csTerrain,csObject);
 
 csTerrain::csTerrain () : csObject()
 {
@@ -42,25 +46,32 @@ csTerrain::csTerrain () : csObject()
 
 csTerrain::~csTerrain ()
 {
+#if DDG_FIXME
   delete mesh;
   delete heightMap;
   delete clipbox;
   delete vbuf;
+#endif
 }
 
 void csTerrain::SetDetail( unsigned int detail)
 {
+#if DDG_FIXME
   mesh->minDetail(detail);
-  mesh->maxDetail(detail*1.1);
+  mesh->maxDetail((unsigned int)(detail*1.1));
   mesh->absMaxDetail((unsigned int)(detail * 1.25));
   mesh->nearClip(1.0);
   mesh->farClip(150.0);
+#endif
 }
 
+#if DDG_FIXME
 static csRenderView *grview = NULL;
+#endif
 
 bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 {
+#if DDG_FIXME
   grview = NULL;
   heightMap = new ddgHeightMap ();
   if (heightMap->readTGN (heightMapFile, size))
@@ -78,7 +89,6 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
   vbuf->reset ();
   mesh->init (context);
 
-/*
 JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
          and put them in an array so I can reach them in the 
 		 Draw method.
@@ -138,13 +148,13 @@ JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
       c = 0;
 	}
   }
-*/
 
   // We are going to get texture coords from the terrain engine
   // ranging from 0 to rows and 0 to cols.
   // CS wants them to range from 0 to 1.
   _pos = csVector3(0,0,0);
   _size = csVector3(heightMap->cols(),mesh->wheight(mesh->absMaxHeight()),heightMap->rows());
+#endif
   return true;
 }
 
@@ -153,6 +163,10 @@ JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
  *  Retrieve info for a single triangle.
  *  Returns true if triangle should be rendered at all.
  */
+#if !DDG_FIXME
+bool csTerrain::drawTriangle(ddgTBinTree *bt, unsigned int tvc, ddgVArray *vbuf)
+  { return false; }
+#else
 bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 {
 	if ( !bt->visible(tvc))
@@ -188,11 +202,11 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 
     return ddgSuccess;
 }
+#endif
 
 void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 {
-/*
-
+#if DDG_FIXME
   G3DPolygonDPFX poly;
 
   bool moved = false;
@@ -399,9 +413,10 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   }
 
   rview.g3d->FinishPolygonFX ();
-*/
+#endif
 }
-/*
+
+#if DDG_FIXME
 // Define a player object which can handle collision detection against
 // the terrain.
 class ddgPlayer : public ddgControl
@@ -440,12 +455,14 @@ public:
 			return false;
 	}
 };
-ddgPlayer *player = 0;
-*/
+static ddgPlayer *player = 0;
+#endif
+
 // If we hit this terrain adjust our position to be on top of it.
 int csTerrain::CollisionDetect( csTransform *transform )
 {
-
+  return 0;
+#if DDG_FIXME
   float h;
   // Translate us into terrain coordinate space.
   csVector3 p = transform->GetOrigin () - _pos;
@@ -463,5 +480,5 @@ int csTerrain::CollisionDetect( csTransform *transform )
   p = p + _pos;
   transform->SetOrigin (p);
   return 1;
-
+#endif
 }

@@ -32,6 +32,7 @@ vpath %.cpp libs/csengine libs/csengine/2d libs/csengine/basic \
 CSENGINE.LIB = $(OUT)$(LIB_PREFIX)csengine$(LIB_SUFFIX)
 SRC.CSENGINE = $(wildcard libs/csengine/*.cpp libs/csengine/*/*.cpp)
 OBJ.CSENGINE = $(addprefix $(OUT),$(notdir $(SRC.CSENGINE:.cpp=$O)))
+CFLAGS.CSENGINE = -Ilibs/csterr
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -44,6 +45,9 @@ all: $(CSENGINE.LIB)
 csengine: $(OUTDIRS) $(CSENGINE.LIB)
 clean: csengineclean
 
+$(OUT)terrain$O: libs/csengine/terrain.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.CSENGINE)
+
 $(CSENGINE.LIB): $(OBJ.CSENGINE)
 	$(DO.LIBRARY)
 
@@ -53,7 +57,7 @@ csengineclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)csengine.dep
 $(OUTOS)csengine.dep: $(SRC.CSENGINE)
-	$(DO.DEP)
+	$(DO.DEP1) $(CFLAGS.CSENGINE) $(DO.DEP2)
 else
 -include $(OUTOS)csengine.dep
 endif

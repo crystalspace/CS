@@ -86,12 +86,13 @@ public:
 	char *findChar( const char target );
 };
 
+#ifdef DDGSTREAM
 ///
 WEXP ostream& WFEXP operator << ( ostream&s, const ddgStr v );
 ///
 WEXP ostream& WFEXP operator << ( ostream&s, const ddgStr* v );
 ///
 WEXP istream& WFEXP operator >> ( istream& s, ddgStr& v);
-
+#endif // DDGSTREAM
 
 #endif

@@ -51,9 +51,9 @@ class WEXP ddgColor3 {
 	/// Linearly Interpolate a new color from two other colors.
 	void linterp(const ddgColor3 *a, const ddgColor3 *b, float t)
 	{
-		set(ddgUtil::linterp(a->v[0],b->v[0],t),
-		ddgUtil::linterp(a->v[1],b->v[1],t),
-		ddgUtil::linterp(a->v[2],b->v[2],t));
+		set((unsigned char)ddgUtil::linterp(a->v[0],b->v[0],t),
+		(unsigned char)ddgUtil::linterp(a->v[1],b->v[1],t),
+		(unsigned char)ddgUtil::linterp(a->v[2],b->v[2],t));
 	}
 	/// Exponentially Interpolate a new color from two other colors.
 	void einterp(const ddgColor3 *a, const ddgColor3 *b, float t)
@@ -112,10 +112,10 @@ class WEXP ddgColor4 {
 	/// Interpolate a new color from two other colors.
 	void linterp(const ddgColor4 *a, const ddgColor4 *b, float t)
 	{
-	   set(ddgUtil::linterp(a->v[0],b->v[0],t),
-		ddgUtil::linterp(a->v[1],b->v[1],t),
-		ddgUtil::linterp(a->v[2],b->v[2],t),
-		ddgUtil::linterp(a->v[3],b->v[3],t));
+	   set((unsigned char)ddgUtil::linterp(a->v[0],b->v[0],t),
+		(unsigned char)ddgUtil::linterp(a->v[1],b->v[1],t),
+		(unsigned char)ddgUtil::linterp(a->v[2],b->v[2],t),
+		(unsigned char)ddgUtil::linterp(a->v[3],b->v[3],t));
 	}
 	/// Exponentially Interpolate a new color from two other colors.
 	void einterp(const ddgColor4 *a, const ddgColor4 *b, float t)
@@ -147,6 +147,7 @@ class WEXP ddgColor4 {
 	unsigned char a(void) { return v[3]; }
 };
 
+#ifdef DDGSTREAM
 /// Stream operator for outputting of color.
 WEXP ostream& WFEXP operator << ( ostream&s, ddgColor3 v );
 /// Stream operator for outputting of color.
@@ -160,6 +161,7 @@ WEXP ostream& WFEXP operator << ( ostream&s, ddgColor4 v );
 WEXP ostream& WFEXP operator << ( ostream&s, ddgColor4* v );
 /// Stream operator for inputting of color.
 WEXP istream& WFEXP operator >> ( istream& s, ddgColor4& v);
+#endif // DDGSTREAM
 
 /// A ddgColor3 object which can be added to a ddgColorSet.
 class WEXP ddgColorNode : public ddgListNode {
@@ -195,6 +197,7 @@ public:
 };
 
 
+#ifdef DDGSTREAM
 /// Stream operator for outputting of colornodes.
 WEXP ostream& WFEXP operator << ( ostream&s, ddgColorNode v );
 /// Stream operator for outputting of color.
@@ -203,6 +206,7 @@ WEXP ostream& WFEXP operator << ( ostream&s, ddgColorNode* v );
 /// Input stream for color nodes.
 WEXP istream& WFEXP operator >> ( istream& s, ddgColorNode& v);
 */
+#endif // DDGSTREAM
 /**
  *  Maintain a set of colors which can be indexed.
  *  A ddgColorSet can maintains a set of ddgColor3 or ddgColor4 objects.

@@ -130,7 +130,7 @@ public:
 	inline int priority(void) { return _priority; }
 
 	///
-	inline void vis(float v ) { _vis = v; }
+	inline void vis(float v ) { _vis = ddgVisState(v); }
 	///
 	inline ddgVisState vis(void) { return _vis; }
 

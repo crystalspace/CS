@@ -30,6 +30,7 @@ vpath %.cpp libs/csparser libs/csparser/impexp
 CSPARSER.LIB = $(OUT)$(LIB_PREFIX)csparser$(LIB_SUFFIX)
 SRC.CSPARSER = $(wildcard libs/csparser/*.cpp libs/csparser/impexp/*.cpp)
 OBJ.CSPARSER = $(addprefix $(OUT),$(notdir $(SRC.CSPARSER:.cpp=$O)))
+CFLAGS.CSPARSER = -Ilibs/csterr
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -42,6 +43,9 @@ all: $(CSPARSER.LIB)
 csparser: $(OUTDIRS) $(CSPARSER.LIB)
 clean: csparserclean
 
+$(OUT)csloader$O: libs/csparser/csloader.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.CSPARSER)
+
 $(CSPARSER.LIB): $(OBJ.CSPARSER)
 	$(DO.LIBRARY)
 
@@ -51,7 +55,7 @@ csparserclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)csparser.dep
 $(OUTOS)csparser.dep: $(SRC.CSPARSER)
-	$(DO.DEP)
+	$(DO.DEP1) $(CFLAGS.CSPARSER) $(DO.DEP2)
 else
 -include $(OUTOS)csparser.dep
 endif

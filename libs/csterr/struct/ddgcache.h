@@ -302,7 +302,7 @@ public:
 		// We are now the head of the list.
 		_bucket[b] = ci;
 		// Reset the head and tail of the queue if need be.
-		if (_head < b)
+		if (_head < ddgCacheIndex(b))
 			_head = b;
 		ddgAssert(ci);
 		return ci;

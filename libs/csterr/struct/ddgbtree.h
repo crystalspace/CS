@@ -155,8 +155,7 @@ public:
     /// Get vertex location in world space from the cache, return the cache index if we have it.
     inline unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout)
     {
-		ddgVector3 tmp = 
-        *vout = ddgVector3(mrow(tindex),height(tindex),mcol(tindex));
+	// ddgVector3 tmp = *vout = ddgVector3(mrow(tindex),height(tindex),mcol(tindex));
 
         if (vbufferIndex(tindex))
 			return 0;
@@ -457,10 +456,12 @@ public:
 	bool rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int depth = -1 );
 };
 
+#ifdef DDGSTREAM
 ///
 WEXP ostream& WFEXP operator << ( ostream&s, ddgTBinTree v );
 ///
 WEXP ostream& WFEXP operator << ( ostream&s, ddgTBinTree* v );
+#endif // DDGSTREAM
 
 WEXP void WFEXP incrframe(void);
 #ifdef _DEBUGLOG

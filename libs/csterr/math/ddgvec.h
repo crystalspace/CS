@@ -153,12 +153,14 @@ public:
 	{ return ddgVector2(u[0]/d,u[1]/d); }
 };
 
+#ifdef DDGSTREAM
 ///
 WEXP ostream& WFEXP operator << ( ostream&s, ddgVector2 v );
 ///
 WEXP ostream& WFEXP operator << ( ostream&s, const ddgVector2* v );
 ///
 WEXP istream& WFEXP operator >> ( istream& s, ddgVector2& v);
+#endif // DDGSTREAM
 
 ///
 class Matrix3;

@@ -41,7 +41,6 @@
 #include "csengine/terrain.h"
 #include "csengine/dumper.h"
 #include "csengine/keyval.h"
-#include "struct/ddgtmesh.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"
