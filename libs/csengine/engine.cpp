@@ -20,6 +20,10 @@
 #include "qint.h"
 #include "csutil/scf.h"
 #include "ivaria/pmeter.h"
+#ifdef CS_USE_NEW_RENDERER
+#include "iengine/renderloop.h"
+#include "csengine/renderloop.h"
+#endif
 #include "csengine/engine.h"
 #include "csengine/halo.h"
 #include "csengine/camera.h"
@@ -35,7 +39,6 @@
 #include "csengine/region.h"
 #include "csengine/radiosty.h"
 #include "csengine/objwatch.h"
-#include "csengine/renderloop.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/sphere.h"
 #include "csgeom/kdtree.h"
@@ -646,6 +649,10 @@ csEngine::csEngine (iBase *iParent) :
 
   BuildSqrtTable ();
   resize = false;
+
+#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
+  DefaultRenderLoop.AttachNew (new csRenderLoop (this));
+#endif
 
   ClearRenderPriorities ();
 }

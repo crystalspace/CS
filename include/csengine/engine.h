@@ -40,7 +40,6 @@
 #include "iutil/dbghelp.h"
 #include "ivideo/graph3d.h"
 
-
 class csPoly2DPool;
 //class csRadiosity;
 class csRegion;
@@ -70,6 +69,7 @@ struct iVirtualClock;
 struct iCacheManager;
 struct iString;
 struct iEngineSequenceManager;
+struct iRenderLoop;
 
 /**
  * Iterator to iterate over all static lights in the engine.
@@ -208,6 +208,10 @@ struct csEngineConfig : public iConfig
  */
 class csEngine : public iEngine
 {
+#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
+  friend class csRenderLoop;
+#endif
+
 public:
   /**
    * This is the Virtual File System object where all the files
@@ -331,6 +335,11 @@ public:
   long render_priority_wall;
   long render_priority_object;
   long render_priority_alpha;
+
+#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
+  /// Default render loop
+  csRef<iRenderLoop> DefaultRenderLoop;
+#endif
 
   /// Option variable: force lightmap recalculation?
   static int lightcache_mode;

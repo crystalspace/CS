@@ -114,11 +114,11 @@ bool csGraphics2DGLCommon::Open ()
     {
       if ((vMajor >= 1) || ((vMajor == 1) && (vMinor >= 2)))
       {
-	ext.InitGL_version_1_2 ();
+	//ext.InitGL_version_1_2 ();
       }
       if ((vMajor >= 1) || ((vMajor == 1) && (vMinor >= 3)))
       {
-	ext.InitGL_version_1_3 ();
+	//ext.InitGL_version_1_3 ();
       }
     }
   }

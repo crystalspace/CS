@@ -52,7 +52,15 @@ void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
   //enable it
   glEnable(GL_VERTEX_PROGRAM_ARB);
   ext->glBindProgramARB(GL_VERTEX_PROGRAM_ARB, program_num);
+}
 
+void csShaderGLAVP::Deactivate(iShaderPass* current)
+{
+  glDisable (GL_VERTEX_PROGRAM_ARB);
+}
+
+void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
+{
     // set variables
   int i;
   for(i = 0; i < variablemap.Length(); ++i)
@@ -101,16 +109,6 @@ void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
       }
     }
   }
-}
-
-void csShaderGLAVP::Deactivate(iShaderPass* current)
-{
-  glDisable (GL_VERTEX_PROGRAM_ARB);
-}
-
-void csShaderGLAVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
-{
-
 }
 
 void csShaderGLAVP::ResetState ()

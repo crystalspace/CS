@@ -21,7 +21,59 @@
 #define __CS_CSENGINE_RENDERLOOP_H__
 
 #ifdef CS_USE_NEW_RENDERER
-//#define CS_NR_ALTERNATE_RENDERLOOP
+#define CS_NR_ALTERNATE_RENDERLOOP
+
+#ifdef CS_NR_ALTERNATE_RENDERLOOP
+
+#include "iengine/renderloop.h"
+#include "csengine/engine.h"
+
+class csRenderView;
+class csRenderLoop;
+
+class csAmbientRenderStep : public iRenderStep
+{
+private:
+  csRenderLoop* rl;
+public:
+  SCF_DECLARE_IBASE;
+
+  csAmbientRenderStep (csRenderLoop* rl);
+
+  virtual void Perform (csRenderView* rview, csRenderMeshList* meshes);
+};
+
+class csLightingRenderStep : public iRenderStep
+{
+private:
+  csRenderLoop* rl;
+public:
+  SCF_DECLARE_IBASE;
+
+  csLightingRenderStep (csRenderLoop* rl);
+
+  virtual void Perform (csRenderView* rview, csRenderMeshList* meshes);
+};
+
+class csRenderLoop : public iRenderLoop
+{
+protected:
+  friend class csAmbientRenderStep;
+  friend class csLightingRenderStep;
+
+  csEngine* engine;
+
+  csRefArray<iRenderStep> steps;
+public:
+  SCF_DECLARE_IBASE;
+
+  csRenderLoop (csEngine* engine);
+
+  void StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview);
+  virtual void Draw (iCamera* c, iClipper2D* clipper);
+};
+
+#endif
 #endif
 
 #endif
