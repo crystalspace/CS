@@ -250,6 +250,7 @@ bool csIniFile::_Load (const char *Data, size_t DataSize)
       break;
     LineNo++;
     const char* buff = record;
+    if (!buff) continue;
     const char* cur = buff + strspn (buff, CS_INISPACE);
 
     if (b64mode)                        // Base64 mode
