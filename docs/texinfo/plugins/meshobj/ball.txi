@@ -92,6 +92,9 @@ Reverse the order of the triangles so that the ball is visible from the
 inside instead of the outside.
 @item TOPONLY
 Only generate the top triangles instead of two halves.
+@item CYLINDRICAL
+Use cylindrical texture mapping instead of only a circle from the
+texture (default off).
 @item LIGHTING
 Enable/disable lighting. Default on.
 @item COLOR

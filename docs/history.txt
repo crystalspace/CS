@@ -17,9 +17,21 @@ The history order has been reversed so that new features are at the top.
 	  take corrective measures. The reason that operations are not always
 	  executed at the right time is that frame rate can be low and
 	  the sequence manager only gets executed once every frame.
+	- Added cylindrical texture mapping option to the ball mesh plugin.
+	  Normally the ball will only use a circle in the texture for both
+	  the top and bottom halves. This is good for skydomes and so on but
+	  not very useful for planets. So with cylindrical mapping the entire
+	  texture is used. There is a new CYLINDRICAL keyword in the ball
+	  loader as well.
 	- Eric Sunshine reverted Philip Wyett's changes to blocks.cpp.  Philip
 	  was trying to eliminate a hang at termination time on Win2000, but
 	  only ended up side-stepping the issue by leaking the csSystemDriver.
+	- Norman Kramer added a few missing DecRef()'s from WalkTest.
+	- Wouter Wijngaards says:
+	  Although Jorrit's fix for the out of bounds error in procedural
+	  plasma, (an exact value of 256 could be generated) was correct,
+	  I moved the fix to another, precalculated phase. This moves the
+	  bounds test from the inner loop to the table precalculation.
 18-Apr-2001
 	- Removed the test for stencil buffer since it seems that just doing
 	  that test is enough to break significant parts of OpenGL on some

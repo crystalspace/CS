@@ -64,6 +64,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   shapenr = 0;
   reversed = false;
   toponly = false;
+  cyl_mapping = false;
   do_lighting = true;
   color.red = 0;
   color.green = 0;
@@ -178,9 +179,15 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   float radius_step = 180. / num;
   float vert_radius = radius;
 
+  // If cylindrical mapping is used we duplicate the last column of
+  // vertices. That is because we need to connect the two sides of the
+  // texture and a vertex can only have one texture coordinate.
+  int num2 = num;
+  if (cyl_mapping) num2++;
+
   // Generate the first series of vertices (the outer circle).
   // Calculate u,v for them.
-  for (j = 0 ; j < num ; j++)
+  for (j = 0 ; j < num2 ; j++)
   {
     float new_radius = radius;
     float new_height = 0;
@@ -191,8 +198,16 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
                          new_radius * cos (angle),
                          new_height,
                          new_radius * sin (angle));
-    u = cos (angle) * .5 + .5;
-    v = sin (angle) * .5 + .5;
+    if (cyl_mapping)
+    {
+      u = float (j) / float (num);
+      v = .5;
+    }
+    else
+    {
+      u = cos (angle) * .5 + .5;
+      v = sin (angle) * .5 + .5;
+    }
     uvverts[num_vertices].Set (u, v);
     num_vertices++;
   }
@@ -215,11 +230,19 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     float new_height = vert_radius * sin (new_angle);
     // UV radius.
     float uv_radius = (1. - 2.*(float)i/(float)num) * .5;
-    for (j = 0 ; j < num ; j++)
+    for (j = 0 ; j < num2 ; j++)
     {
       float angle = j*2.*radius_step * 2.*M_PI/360.;
-      u = uv_radius * cos (angle) + .5;
-      v = uv_radius * sin (angle) + .5;
+      if (cyl_mapping)
+      {
+        u = float (j) / float (num);
+        v = 1. - float (i+num/2) / float (num);
+      }
+      else
+      {
+        u = uv_radius * cos (angle) + .5;
+        v = uv_radius * sin (angle) + .5;
+      }
       new_verticesT[j] = num_vertices;
       vertices[num_vertices].Set (
                          new_radius * cos (angle),
@@ -235,6 +258,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
                            new_radius * cos (angle),
                            -new_height,
                            new_radius * sin (angle));
+	if (cyl_mapping) v = 1.-v;
         uvverts[num_vertices].Set (u, v);
         num_vertices++;
       }
@@ -245,23 +269,26 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     //-----
     for (j = 0 ; j < num ; j++)
     {
+      int j1num;
+      if (cyl_mapping) j1num = j+1;
+      else j1num = (j+1)%num;
       triangles[num_triangles].c = prev_verticesT[j];
-      triangles[num_triangles].b = new_verticesT[(j+1)%num];
+      triangles[num_triangles].b = new_verticesT[j1num];
       triangles[num_triangles].a = new_verticesT[j];
       num_triangles++;
       triangles[num_triangles].c = prev_verticesT[j];
-      triangles[num_triangles].b = prev_verticesT[(j+1)%num];
-      triangles[num_triangles].a = new_verticesT[(j+1)%num];
+      triangles[num_triangles].b = prev_verticesT[j1num];
+      triangles[num_triangles].a = new_verticesT[j1num];
       num_triangles++;
       if (!toponly)
       {
         triangles[num_triangles].a = prev_verticesB[j];
-        triangles[num_triangles].b = new_verticesB[(j+1)%num];
+        triangles[num_triangles].b = new_verticesB[j1num];
         triangles[num_triangles].c = new_verticesB[j];
         num_triangles++;
         triangles[num_triangles].a = prev_verticesB[j];
-        triangles[num_triangles].b = prev_verticesB[(j+1)%num];
-        triangles[num_triangles].c = new_verticesB[(j+1)%num];
+        triangles[num_triangles].b = prev_verticesB[j1num];
+        triangles[num_triangles].c = new_verticesB[j1num];
         num_triangles++;
       }
     }
@@ -269,7 +296,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     //-----
     // Copy the new vertex array to prev_vertices.
     //-----
-    for (j = 0 ; j < num ; j++)
+    for (j = 0 ; j < num2 ; j++)
     {
       prev_verticesT[j] = new_verticesT[j];
       if (!toponly) prev_verticesB[j] = new_verticesB[j];
@@ -279,14 +306,20 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   // Create the top and bottom vertices.
   int top_vertex = num_vertices;
   vertices[num_vertices].Set (0, vert_radius, 0);
-  uvverts[num_vertices].Set (.5, .5);
+  if (cyl_mapping)
+    uvverts[num_vertices].Set (.5, 0);
+  else
+    uvverts[num_vertices].Set (.5, .5);
   num_vertices++;
   int bottom_vertex = 0;
   if (!toponly)
   {
     bottom_vertex = num_vertices;
     vertices[num_vertices].Set (0, -vert_radius, 0);
-    uvverts[num_vertices].Set (.5, .5);
+    if (cyl_mapping)
+      uvverts[num_vertices].Set (.5, 1);
+    else
+      uvverts[num_vertices].Set (.5, .5);
     num_vertices++;
   }
 
@@ -295,9 +328,12 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   //-----
   for (j = 0 ; j < num ; j++)
   {
+    int j1num;
+    if (cyl_mapping) j1num = j+1;
+    else j1num = (j+1)%num;
     triangles[num_triangles].c = top_vertex;
     triangles[num_triangles].b = prev_verticesT[j];
-    triangles[num_triangles].a = prev_verticesT[(j+1)%num];
+    triangles[num_triangles].a = prev_verticesT[j1num];
     num_triangles++;
   }
 
@@ -307,9 +343,12 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   if (!toponly)
     for (j = 0 ; j < num ; j++)
     {
+      int j1num;
+      if (cyl_mapping) j1num = j+1;
+      else j1num = (j+1)%num;
       triangles[num_triangles].a = bottom_vertex;
       triangles[num_triangles].b = prev_verticesB[j];
-      triangles[num_triangles].c = prev_verticesB[(j+1)%num];
+      triangles[num_triangles].c = prev_verticesB[j1num];
       num_triangles++;
     }
 

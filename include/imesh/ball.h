@@ -26,7 +26,7 @@ class csColor;
 
 struct iMaterialWrapper;
 
-SCF_VERSION (iBallState, 0, 0, 2);
+SCF_VERSION (iBallState, 0, 0, 3);
 
 /**
  * This interface describes the API for the ball mesh object.
@@ -72,6 +72,10 @@ struct iBallState : public iBase
   virtual void SetColor (const csColor& col) = 0;
   /// Get the color.
   virtual csColor GetColor () = 0;
+  /// Use cylindrical texture mapping.
+  virtual void SetCylindricalMapping (bool m) = 0;
+  /// Test if cylindrical texture mapping is used.
+  virtual bool IsCylindricalMapping () = 0;
 };
 
 #endif

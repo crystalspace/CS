@@ -45,6 +45,7 @@ private:
   void* vis_cbData;
   bool reversed;
   bool toponly;
+  bool cyl_mapping;
   bool do_lighting;
   csColor color;
 
@@ -151,6 +152,17 @@ public:
   void SetColor (const csColor& col) { color = col; }
   /// Get the color.
   csColor GetColor () { return color; }
+  /// Use cylindrical texture mapping.
+  void SetCylindricalMapping (bool m)
+  {
+    cyl_mapping = m;
+    initialized = false;
+  }
+  /// Test if cylindrical texture mapping is used.
+  bool IsCylindricalMapping ()
+  {
+    return cyl_mapping;
+  }
 
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
@@ -223,6 +235,14 @@ public:
     virtual bool IsLighting () { return scfParent->IsLighting (); }
     virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
     virtual csColor GetColor () { return scfParent->GetColor (); }
+    virtual void SetCylindricalMapping (bool m)
+    {
+      scfParent->SetCylindricalMapping (m);
+    }
+    virtual bool IsCylindricalMapping ()
+    {
+      return scfParent->IsCylindricalMapping ();
+    }
   } scfiBallState;
   friend class BallState;
 };

@@ -55,6 +55,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SHIFT)
   CS_TOKEN_DEF (REVERSED)
   CS_TOKEN_DEF (TOPONLY)
+  CS_TOKEN_DEF (CYLINDRICAL)
 CS_TOKEN_DEF_END
 
 IMPLEMENT_IBASE (csBallFactoryLoader)
@@ -231,6 +232,7 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
     CS_TOKEN_TABLE (TOPONLY)
     CS_TOKEN_TABLE (LIGHTING)
     CS_TOKEN_TABLE (COLOR)
+    CS_TOKEN_TABLE (CYLINDRICAL)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -266,6 +268,13 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 	  bool r;
 	  ScanStr (params, "%b", &r);
 	  ballstate->SetTopOnly (r);
+	}
+	break;
+      case CS_TOKEN_CYLINDRICAL:
+	{
+	  bool r;
+	  ScanStr (params, "%b", &r);
+	  ballstate->SetCylindricalMapping (r);
 	}
 	break;
       case CS_TOKEN_LIGHTING:
@@ -426,6 +435,8 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
     str->Push (strnew ("REVERSED (yes)\n"));
   if (state->IsTopOnly ())
     str->Push (strnew ("TOPONLY (yes)\n"));
+  if (state->IsCylindricalMapping ())
+    str->Push (strnew ("CYLINDRICAL (yes)\n"));
   csColor col = state->GetColor ();
   sprintf(buf, "COLOR (%g,%g,%g)\n", col.red, col.green, col.blue);
   str->Push(strnew(buf));
