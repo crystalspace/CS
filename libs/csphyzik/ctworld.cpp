@@ -24,6 +24,9 @@
 #include "csphyzik/world.h"
 #include "csphyzik/rigidbod.h"
 #include "csphyzik/debug.h"
+#include "csphyzik/ctcat.h"
+
+//#define __CT_NOREWINDENABLED__
 
 static ctWorld *gcurrent_world = NULL;
 
@@ -106,9 +109,15 @@ void ctWorld::resize_state_vector( long new_size )
   y_save = new real[max_state_size];
 }
 
-
+void ctWorld::register_catastrophe_manager( ctCatastropheManager *pcm )
+{
+  if( pcm != NULL ){
+    catastrophe_list.add_link( pcm );
+  }
+}
+ 
 // calculate new positions of world objects after time dt
-errorcode ctWorld::evolve( real t0, real t1 )
+errorcode ctWorld::do_time_step( real t0, real t1 )
 {
   long arr_size = 0;
   ctEntity *pe = body_list.get_first();
@@ -151,9 +160,102 @@ errorcode ctWorld::evolve( real t0, real t1 )
     fsm_state = CTWS_NORMAL;
     rewound_from = 0;
   }
-
+  
   return WORLD_NOERR;
 
+}
+
+void fcn_set_no_rewind( ctEntity *ppe )
+{
+  ppe->set_rewind(false);
+}
+
+// using sloooooooow but accurate collision detection.
+// this can be sped up in many ways.
+// - use eulers method or mid-point for ODE just during CD
+// - use prune and sweep algorithm with axis aligned, sorted bounding boxes
+// - only evolve objects related to colliding objects when searching for c-time
+// - don't forget to handle 'tunneling' problem as well.
+errorcode ctWorld::evolve( real t1, real t2 )
+{
+  static real collision_epsilon = 0.02;
+  static real time_epsilon = 0.001;
+  real ta, tb;
+  ctCatastropheManager *cat;
+  ctLinkList_ctCatastropheManager recent_cat;
+
+  long loops = 300;  //make sure we don't go into an infinite loop
+
+  ta = t1;
+  tb = t2;
+  real max_cat_dist, this_cat_dist;
+
+//!me no rewind option is probably a bad idea...
+#ifdef __CT_NOREWINDENABLED__
+  apply_function_to_body_list( fcn_set_no_rewind );
+#endif
+  
+  while( ta < t2 && loops-- > 0){
+ 
+    do_time_step( ta, tb );
+
+    //!me min_col_dist = collision_check( space_world );
+    max_cat_dist = 0;
+    recent_cat.remove_all();
+    cat = catastrophe_list.get_first();
+    while( cat != NULL ){
+      this_cat_dist = cat->check_catastrophe();
+      if( this_cat_dist > 0 ){
+        recent_cat.add_link( cat );
+        if( this_cat_dist > max_cat_dist ){
+          max_cat_dist = this_cat_dist;
+        }
+      }
+      cat = catastrophe_list.get_next();
+    }
+    
+    // if there are objects intersecting
+    if( max_cat_dist > 0 ){
+      // if interpenetrations distance is very small => time of impact found
+      // or if the time step is really small
+      if( max_cat_dist <= collision_epsilon || ( tb - ta ) <= time_epsilon ){
+        // respond to collision
+        //!me collision_response( space_world );
+
+        // resolve all catastrophes that occurred at this approx point in time.
+        cat = recent_cat.get_first();
+        while( cat ){
+          cat->handle_catastrophe();
+        }
+
+        ta = tb;
+        tb = t2;
+      }else{
+        // bisect time backwards to search for time of impact
+        rewind(ta, tb);   // rewind state back to ta
+        tb -= (tb - ta)*0.5;
+      }
+    // if we have not arrived at the end of our time interval 
+    }else if( tb < t2 ){
+      // search forward in time for time of impact for collision(s)
+      ta = tb;
+      // if we are at our min time step, just finish this time step, collision
+      // will get resolved next time.
+      if( (t2 - ta) <= time_epsilon ){
+        tb = t2;
+        do_time_step( ta, tb );
+
+        ta = tb;
+      }else{
+        tb += (t2 - tb)*0.5;
+      }
+    }else{
+      ta = tb;
+      tb = t2;
+    }
+  }
+
+  return WORLD_NOERR;
 }
 
 errorcode ctWorld::rewind( real /*t1*/, real t2 )
