@@ -26,6 +26,7 @@ endif
 ifeq ($(MAKESECTION),postdefines)
 
 CSCONFIG.EXE = cs-config
+CSCONFIG.TMP = $(OUT)csconfig.tmp
 
 TO_INSTALL.EXE	+= $(CSCONFIG.EXE)
 
@@ -37,35 +38,35 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: csconfig csconfigclean $(CSCONFIG.EXE)
 
 all: $(CSCONFIG.EXE)
-csconfig: $(CSCONFIG.EXE)
+csconfig: $(OUTDIRS) $(CSCONFIG.EXE)
 clean: csconfigclean
 
-# create out/csconfig.tmp for the makevars that need to be transferred
+# Create csconfig.tmp for the make variables that need to be transferred.
 $(CSCONFIG.EXE):
 	@echo Generating cs-config script...
-	@echo $"# Crystal Space config make variables for $(DESCRIPTION.$(TARGET)).$" > out/csconfig.tmp
-	@echo $"# Note: automatically generated. $" >> out/csconfig.tmp
-	@echo $"EXE=$(EXE)$" >> out/csconfig.tmp
-	@echo $"DLL=$(DLL)$" >> out/csconfig.tmp
-	@echo $"LFLAGS.EXE=$(LFLAGS.EXE)$" >> out/csconfig.tmp
-	@echo $"DO.SHARED.PLUGIN.PREAMBLE=$(DO.SHARED.PLUGIN.PREAMBLE)$" >> out/csconfig.tmp
-	@echo $"DO.SHARED.PLUGIN.POSTAMBLE=$(DO.SHARED.PLUGIN.POSTAMBLE)$" >> out/csconfig.tmp
-	@echo $"LIBS.EXE.PLATFORM=$(LIBS.EXE.PLATFORM)$" >> out/csconfig.tmp
+	@echo $"# Crystal Space config make variables for $(DESCRIPTION.$(TARGET)).$" > $(CSCONFIG.TMP)
+	@echo $"# Note: automatically generated. $" >> $(CSCONFIG.TMP)
+	@echo $"EXE=$(EXE)$" >> $(CSCONFIG.TMP)
+	@echo $"DLL=$(DLL)$" >> $(CSCONFIG.TMP)
+	@echo $"LFLAGS.EXE=$(LFLAGS.EXE)$" >> $(CSCONFIG.TMP)
+	@echo $"DO.SHARED.PLUGIN.PREAMBLE=$(DO.SHARED.PLUGIN.PREAMBLE)$" >> $(CSCONFIG.TMP)
+	@echo $"DO.SHARED.PLUGIN.POSTAMBLE=$(DO.SHARED.PLUGIN.POSTAMBLE)$" >> $(CSCONFIG.TMP)
+	@echo $"LIBS.EXE.PLATFORM=$(LIBS.EXE.PLATFORM)$" >> $(CSCONFIG.TMP)
 ifneq ($(LINK.PLUGIN),)
-	@echo $"LINK.PLUGIN=$(LINK.PLUGIN)$" >> out/csconfig.tmp
-	@echo $"LFLAGS.DLL=$(LFLAGS.DLL) \$$@$" >> out/csconfig.tmp
+	@echo $"LINK.PLUGIN=$(LINK.PLUGIN)$" >> $(CSCONFIG.TMP)
+	@echo $"LFLAGS.DLL=$(LFLAGS.DLL) \$$@$" >> $(CSCONFIG.TMP)
 else
-	@echo $"LINK.PLUGIN=$" >> out/csconfig.tmp
-	@echo $"LFLAGS.DLL=$(LFLAGS.DLL)$" >> out/csconfig.tmp
+	@echo $"LINK.PLUGIN=$" >> $(CSCONFIG.TMP)
+	@echo $"LFLAGS.DLL=$(LFLAGS.DLL)$" >> $(CSCONFIG.TMP)
 endif
-	@echo $"PLUGIN.POSTFLAGS=$(PLUGIN.POSTFLAGS)$" >> out/csconfig.tmp
+	@echo $"PLUGIN.POSTFLAGS=$(PLUGIN.POSTFLAGS)$" >> $(CSCONFIG.TMP)
 
 	$(RUN_SCRIPT) scripts/cs-config/genscript.sh $"$(INSTALL_DIR)$" \
-	$"$(CXXFLAGS)$" $"$(CFLAGS)$" $"$(LIBS.EXE)$" scripts/cs-config
-	$(RM) out/csconfig.tmp
+	$"$(CXXFLAGS)$" $"$(CFLAGS)$" $"$(LIBS.EXE)$" scripts/cs-config \
+	$"$(CSCONFIG.TMP)$"
+	$(RM) $(CSCONFIG.TMP)
 
 csconfigclean:
-	-$(RM) $(CSCONFIG.EXE) out/csconfig.tmp
+	-$(RM) $(CSCONFIG.EXE) $(CSCONFIG.TMP)
 
 endif
-

@@ -7,6 +7,7 @@
 # $3: $(CFLAGS)
 # $4: $(LIBS.EXE)
 # $5: scripts/cs-config (location of script source dir)
+# $6: csconfig.tmp (location of temporary make-variables file)
 
 verfile=include/csver.h
 vmajor=`sed -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/!d' -e '/#define[ 	][ 	]*CS_VERSION_MAJOR/s/\(#define[ 	][ 	]*CS_VERSION_MAJOR[ 	][ 	]*"\)\([^\"]*\)"\(.*\)/\2/' < ${verfile}`
@@ -35,7 +36,7 @@ echo				>> cs-config
 echo "makevars()"		>> cs-config
 echo "{"			>> cs-config
 echo "	cat <<EOF"		>> cs-config
-cat out/csconfig.tmp | sed -e 's/cs-config/\\\$@/g' >> cs-config
+cat $6 | sed -e 's/cs-config/\\\$@/g' >> cs-config
 echo "EOF"			>> cs-config
 echo "}"			>> cs-config
 echo				>> cs-config
