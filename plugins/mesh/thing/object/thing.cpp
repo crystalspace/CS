@@ -2519,7 +2519,6 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   Prepare ();
 
   iCamera *icam = rview->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
 
   // Only get the transformation if this thing can move.
   bool can_move = false;
