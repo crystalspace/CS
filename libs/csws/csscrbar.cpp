@@ -41,7 +41,7 @@
 // Scroll time interval in milliseconds
 #define SCROLL_REPEAT_INTERVAL  100
 
-#define SCROLLBAR_TEXTURE_NAME  "img/CSWS/scrollbar.png"
+#define SCROLLBAR_TEXTURE_NAME  "tex/scrollbar.png"
 
 csSprite2D *csScrollBar::sprarrows[12] =
 { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };

@@ -27,7 +27,7 @@
 #include "csengine/texture.h"
 
 // Spin box texture name
-#define SPINBOX_TEXTURE_NAME		"img/CSWS/spinbox.png"
+#define SPINBOX_TEXTURE_NAME		"tex/spinbox.png"
 // Automatical spinning period in milliseconds
 #define AUTO_SPIN_INTERVAL		100
 // The pause between first click and autorepeat

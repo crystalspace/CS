@@ -29,7 +29,7 @@
 #include "csengine/texture.h"
 
 // Menu texture name
-#define MENU_TEXTURE_NAME       "img/CSWS/menu.png"
+#define MENU_TEXTURE_NAME       "tex/menu.png"
 // Amount of space at left and at right of each menu item
 #define MENUITEM_XSPACE         (9+2)
 // Amount of space at top and at bottom of each menu item

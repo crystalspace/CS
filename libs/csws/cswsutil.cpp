@@ -32,7 +32,7 @@
 #include "csinput/csinput.h"
 #include "csengine/texture.h"
 
-#define MSGBOX_TEXTURE "img/CSWS/msgicons.png"
+#define MSGBOX_TEXTURE "tex/msgicons.png"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ Window list --//--
 
@@ -441,7 +441,7 @@ void FindCFGBitmap (csStrVector &sv, char *id, int *x, int *y, int *w, int *h)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--// File choose dialog --//--
 
-#define FILEDLG_TEXTURE_NAME "img/CSWS/filedlg.png"
+#define FILEDLG_TEXTURE_NAME "tex/filedlg.png"
 
 // private class
 class cspFileDialog : public csDialog
