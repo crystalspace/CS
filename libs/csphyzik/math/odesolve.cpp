@@ -142,3 +142,60 @@ void OdeRungaKutta4::ode_realloc(int new_size)
 	k3 = new real[state_size];
 	k4 = new real[state_size];
 }
+
+
+// euler integration.  Real dumb. Real fast.
+OdeEuler::OdeEuler()
+{
+	ode_realloc(ODE_INITIAL_STATE_SIZE);
+}
+
+void OdeEuler::calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt)
+{
+	unsigned int i;
+  // reallocate if necessary
+  if (len > state_size)
+    ode_realloc(len);
+
+  real h = t1 - t0;
+
+  dydt(t0, y0, dy );
+ 
+  for (i = 0; i < len; i++) {
+    y1[i] = y0[i] + dy[i] * h;
+  }
+}
+
+// mid-point
+
+// mid-point integration.  Not so dumb. pretty fast.
+OdeMidPoint::OdeMidPoint()
+{
+	ode_realloc(ODE_INITIAL_STATE_SIZE);
+}
+
+// k1 = f( t, x )  : eval F and T at (t, x)
+// k2 = f( t + dt/2, x + dt/2*k1 ) 
+//		x + dt/2*k1 -> take step of size dt/2 from x. AddRB( k2, k1, dt/2,  
+//      f()         -> eval F and T at stepped ( t + dt/2, x + dt/2*k1 ) postion  
+// y' = y + dt*k2   -> take step of size dt from x
+void OdeMidPoint::calc_step(real y0[], real y1[], unsigned int len, real t0, real t1, dydt_function dydt)
+{
+	unsigned int i;
+  // reallocate if necessary
+  if (len > state_size)
+    ode_realloc(len);
+
+  real h = (t1 - t0) * 0.5;
+
+  dydt(t0, y0, dy );
+  for (i = 0; i < len; i++) {    // first iteration
+    Iy[i] = y0[i] + dy[i] * h;
+  }
+  dydt(t0 + h, Iy, dy );
+  
+  h *= 2.0;
+  for (i = 0; i < len; i++) {
+    y1[i] = y0[i] + dy[i] * h;
+  }
+}
