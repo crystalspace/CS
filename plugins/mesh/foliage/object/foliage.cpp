@@ -367,7 +367,8 @@ void csFoliageMeshObject::SetupBufferHolder ()
   // for those because they are not always needed.
   // Colors are fetched from the object because we need to add the mesh
   // base color to the static colors in the factory.
-  bufferHolder->SetAccessor (scfiRenderBufferAccessor, CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
+  bufferHolder->SetAccessor (scfiRenderBufferAccessor,
+    CS_BUFFER_NORMAL_MASK | CS_BUFFER_COLOR_MASK);
 }
   
 void csFoliageMeshObject::SetupObject ()
@@ -391,7 +392,7 @@ csRenderMesh** csFoliageMeshObject::GetRenderMeshes (
 {
   n = 0;
 
-  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return 0;
 
   SetupObject ();
 
@@ -517,7 +518,8 @@ iObjectModel* csFoliageMeshObject::GetObjectModel ()
   return factory->GetObjectModel ();
 }
 
-void csFoliageMeshObject::PreGetBuffer (csRenderBufferHolder *holder, csRenderBufferName buffer)
+void csFoliageMeshObject::PreGetBuffer (csRenderBufferHolder *holder,
+  csRenderBufferName buffer)
 {
   if (buffer == CS_BUFFER_COLOR)
   {
@@ -703,7 +705,8 @@ void csFoliageMeshObjectFactory::SetupFactory ()
   }
 }
 
-void csFoliageMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+void csFoliageMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder,
+  csRenderBufferName buffer)
 {
   if (buffer == CS_BUFFER_NORMAL)
   {
@@ -876,4 +879,3 @@ bool csFoliageMeshObjectType::Initialize (iObjectRegistry* object_reg)
   csFoliageMeshObjectType::object_reg = object_reg;
   return true;
 }
-
