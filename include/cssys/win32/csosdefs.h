@@ -71,7 +71,6 @@
 // The 2D graphics driver used by software renderer on this platform
 #define CS_SOFTWARE_2D_DRIVER "crystalspace.graphics2d.directdraw"
 #define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glwin32"
-#define CS_GLIDE_2D_DRIVER	"crystalspace.graphics2d.glidewin"
 
 // The sound driver
 #define CS_SOUND_DRIVER "crystalspace.sound.driver.waveout"
