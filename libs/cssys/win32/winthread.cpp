@@ -40,7 +40,8 @@ csRef<csMutex> csMutex::Create ()
   return csPtr<csMutex>(new csWinMutex ());
 }
 
-csWinMutex::csWinMutex ()
+// ignore recursive switch... windows mutexes are always recursive.
+csWinMutex::csWinMutex (bool /*needrecursive*/)
 {
   lasterr = NULL;
   mutex = CreateMutex (NULL, false, NULL);
