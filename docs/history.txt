@@ -46,6 +46,8 @@ The history order is reversed so that new features are at the top.
 	      Added custom headerscanpatterns to the nasm and swig rules.
 	    - Improved the swig rules.
 	    - Cleaned the bison and flex rules a bit.
+	- Matze added some scripts which create a basic external CS
+	  application with a jam build system.
 26-Apr-2003
 	- Norman Kraemer added a swig.jam file for custom swig rules and
 	  used the new power to rebuild the cs_pyth.cpp from cspace.i if
