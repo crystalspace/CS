@@ -23,6 +23,12 @@ The history order is reversed so that new features are at the top.
 	  visibility culler were actually not relevant.
 	- Added an entry to the FAQ about states and mesh wrappers.
 	- Added an entry to the FAQ to clarify reference counting.
+	- Fixed a bug in the TestRectangle of the tiled coverage buffer. This
+	  bug would accidently mark some rectangles as visible even if they
+	  were not.
+	- Optimized TestRectangle for Dynavis. Profiling shows that the
+	  test of rectangle visibility is currently the function that
+	  takes most time to calculate.
 18-Jun-2002
 	- Extended iBugPlug interface with functions to setup a debug
 	  view. This is a 2D view on which you can render one general

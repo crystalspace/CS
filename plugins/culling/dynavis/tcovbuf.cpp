@@ -353,27 +353,35 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
   }
 
   // Test depth where appropriate.
-  for (i = 0 ; i < 4 ; i++)
+  for (i = (start>>3) ; i <= (end>>3) ; i++)
   {
     float* ld = &depth[i];
+    // Here we create a mask which will be set to eight 1 bits wherever
+    // the corresponding depth value is relevant (i.e. testdepth < the
+    // depth in the depth value). Only where the mask is true do we have
+    // to check the coverage_cache.
+    uint32 b1 = 0, b2 = 0;
+    if (testdepth < ld[0]) b1 |= 0xff;
+    if (testdepth < ld[4]) b1 |= 0xff00;
+    if (testdepth < ld[8]) b1 |= 0xff0000;
+    if (testdepth < ld[12]) b1 |= 0xff000000;
+    if (testdepth < ld[16]) b2 |= 0xff;
+    if (testdepth < ld[20]) b2 |= 0xff00;
+    if (testdepth < ld[24]) b2 |= 0xff0000;
+    if (testdepth < ld[28]) b2 |= 0xff000000;
+    if (!b1 && !b2) continue;	// Nothing to do.
+    csBits64 testmask;
+    testmask.Set (b1, b2);
+
     int idx = i << 3;
-    int j = 1;
-    csBits64 mods = coverage_cache[idx];
+    int j = 0;
+    csBits64* cc = coverage_cache+idx;
     while (j < 8)
     {
-      mods |= coverage_cache[idx++];
+      if (testmask.TestMask (*cc))
+        return true;
+      cc++;
       j++;
-    }
-    if (!mods.IsEmpty ())
-    {
-      if (mods.CheckByte0 ()) { if (testdepth <= ld[0]) return true; }
-      if (mods.CheckByte1 ()) { if (testdepth <= ld[4]) return true; }
-      if (mods.CheckByte2 ()) { if (testdepth <= ld[8]) return true; }
-      if (mods.CheckByte3 ()) { if (testdepth <= ld[12]) return true; }
-      if (mods.CheckByte4 ()) { if (testdepth <= ld[16]) return true; }
-      if (mods.CheckByte5 ()) { if (testdepth <= ld[20]) return true; }
-      if (mods.CheckByte6 ()) { if (testdepth <= ld[24]) return true; }
-      if (mods.CheckByte7 ()) { if (testdepth <= ld[28]) return true; }
     }
   }
   return false;
@@ -406,27 +414,35 @@ bool csCoverageTile::TestRect (const csBits64& vermask, int start, int end,
   }
 
   // Test depth where appropriate.
-  for (i = 0 ; i < 4 ; i++)
+  for (i = (start>>3) ; i <= (end>>3) ; i++)
   {
     float* ld = &depth[i];
+    // Here we create a mask which will be set to eight 1 bits wherever
+    // the corresponding depth value is relevant (i.e. testdepth < the
+    // depth in the depth value). Only where the mask is true do we have
+    // to check the coverage_cache.
+    uint32 b1 = 0, b2 = 0;
+    if (testdepth < ld[0]) b1 |= 0xff;
+    if (testdepth < ld[4]) b1 |= 0xff00;
+    if (testdepth < ld[8]) b1 |= 0xff0000;
+    if (testdepth < ld[12]) b1 |= 0xff000000;
+    if (testdepth < ld[16]) b2 |= 0xff;
+    if (testdepth < ld[20]) b2 |= 0xff00;
+    if (testdepth < ld[24]) b2 |= 0xff0000;
+    if (testdepth < ld[28]) b2 |= 0xff000000;
+    if (!b1 && !b2) continue;	// Nothing to do.
+    csBits64 testmask;
+    testmask.Set (b1, b2);
+
     int idx = i << 3;
-    int j = 1;
-    csBits64 mods = coverage_cache[idx];
+    int j = 0;
+    csBits64* cc = coverage_cache+idx;
     while (j < 8)
     {
-      mods |= coverage_cache[idx++];
+      if (testmask.TestMask (*cc))
+        return true;
+      cc++;
       j++;
-    }
-    if (!mods.IsEmpty ())
-    {
-      if (mods.CheckByte0 ()) { if (testdepth <= ld[0]) return true; }
-      if (mods.CheckByte1 ()) { if (testdepth <= ld[4]) return true; }
-      if (mods.CheckByte2 ()) { if (testdepth <= ld[8]) return true; }
-      if (mods.CheckByte3 ()) { if (testdepth <= ld[12]) return true; }
-      if (mods.CheckByte4 ()) { if (testdepth <= ld[16]) return true; }
-      if (mods.CheckByte5 ()) { if (testdepth <= ld[20]) return true; }
-      if (mods.CheckByte6 ()) { if (testdepth <= ld[24]) return true; }
-      if (mods.CheckByte7 ()) { if (testdepth <= ld[28]) return true; }
     }
   }
   return false;
@@ -1281,7 +1297,7 @@ bool csTiledCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
     {
       int sx = 0, ex = 31;
       bool do_hor = false;
-      if (tx == 0 && start_x != 0)
+      if (tx == startcol && start_x != 0)
       {
         sx = start_x;
 	do_hor = true;

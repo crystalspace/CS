@@ -30,6 +30,11 @@ public:
   uint32 b1, b2;
 
 public:
+  inline void Set (uint32 b1, uint32 b2)
+  {
+    csBits64::b1 = b1;
+    csBits64::b2 = b2;
+  }
   inline csBits64& operator |= (const csBits64& b)
   {
     b1 |= b.b1;
@@ -62,6 +67,11 @@ public:
   {
     if (b1 & ~b.b1) return true;
     return b2 & ~b.b2;
+  }
+  inline bool TestMask (const csBits64& b)
+  {
+    if (b1 & b.b1) return true;
+    return b2 & b.b2;
   }
   inline void XorBit (int b)
   {
