@@ -862,7 +862,12 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   {
     iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
   	iThingEnvironment);
-    poly3d->SetTextureSpace (te->FindPolyTxtPlane (plane_name));
+    iPolyTxtPlane* pl = te->FindPolyTxtPlane (plane_name);
+    if (!pl)
+    {
+      printf ("Can't find plane '%s' for polygon '%s'\n", plane_name, polyname);
+    }
+    poly3d->SetTextureSpace (pl);
     te->DecRef ();
   }
   else if (tx_len)
