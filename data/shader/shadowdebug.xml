@@ -6,7 +6,6 @@
 			<streammapping stream="shadow vertices" destination="attribute 0" />
 			<streammapping stream="shadow normals" destination="attribute 1" />
 			<vp type="gl_arb_vp" file="/shader/shadowextrude.avp"/>
-      <texturemapping unit="0" name="tex diffuse" />
 			<fp type="gl_fixed_fp" file="/shader/primarycolor.ffp"/>
 		</pass>
 	</technique>

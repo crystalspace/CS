@@ -55,6 +55,8 @@ chronological order.
 	  "EnableFastObjects") not yet implemented
 	  Fixed a bug where somehow the line to rotate the mesh mass correctly
 	  was moved
+	- res removed the <texturemapping> statement from the shadow debug
+	  shader. Apparently, it caused crashes.
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now
