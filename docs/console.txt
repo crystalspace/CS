@@ -602,6 +602,18 @@ Type:    boolean command
 Action:  Toggle c-buffer rendering on/off. In some levels (especially levels
          with many non-moving things) enabling the c-buffer for the engine can
 	 improve performance considerably. By default it is off (currently).
+	 Note that the level needs to be prepared for this (octree needs
+	 to be added using STATBSP command). Enabling the c-buffer
+	 disables the quadtree automatically.
+
+Command: quadtree
+Type:    boolean command
+Action:  Toggle quadtree rendering on/off. In some levels (especially levels
+         with many non-moving things) enabling the quadtree for the engine can
+	 improve performance considerably. By default it is off (currently).
+	 Note that the level needs to be prepared for this (octree needs
+	 to be added using STATBSP command). Enabling the quadtree
+	 disables the c-buffer automatically.
 
 Command: lod
 Type:    value command
