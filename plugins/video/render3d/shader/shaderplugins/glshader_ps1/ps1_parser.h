@@ -27,53 +27,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "ps1_instr.h"
 
-enum csInstructionModifier
-{
-  CS_PS_IMOD_NONE = 0,
-  CS_PS_IMOD_X2 = 1,
-  CS_PS_IMOD_X4 = 2,
-  CS_PS_IMOD_X8 = 4,
-  CS_PS_IMOD_D2 = 8,
-  CS_PS_IMOD_D4 = 16,
-  CS_PS_IMOD_D8 = 32,
-  CS_PS_IMOD_SAT = 64
-};
-
-enum csSrcRegisterModifier
-{
-  CS_PS_RMOD_NONE = 0x00,
-  CS_PS_RMOD_BIAS = 0x01,
-  CS_PS_RMOD_INVERT = 0x02,
-  CS_PS_RMOD_NEGATE = 0x04,
-  CS_PS_RMOD_SCALE = 0x08,
-  CS_PS_RMOD_REP_RED = 0x10,
-  CS_PS_RMOD_REP_GREEN = 0x20,
-  CS_PS_RMOD_REP_BLUE = 0x40,
-  CS_PS_RMOD_REP_ALPHA = 0x80,
-  CS_PS_RMOD_XYZ = 0x100,
-  CS_PS_RMOD_XYW = 0x200,
-  CS_PS_RMOD_DZ = 0x400,
-  CS_PS_RMOD_DW = 0x800
-};
-
-enum csDestRegisterWriteMask
-{
-  CS_PS_WMASK_NONE = 0x00,
-  CS_PS_WMASK_RED = 0x01,
-  CS_PS_WMASK_BLUE = 0x02,
-  CS_PS_WMASK_GREEN = 0x04,
-  CS_PS_WMASK_ALPHA = 0x08
-};
-
-enum csPSRegisterType
-{
-  CS_PS_REG_TEX,
-  CS_PS_REG_CONSTANT,
-  CS_PS_REG_TEMP,
-  CS_PS_REG_COLOR,
-  CS_PS_REG_NONE = 0xFF
-};
-
 struct csPSProgramInstruction
 {
   int instruction;
@@ -84,6 +37,12 @@ struct csPSProgramInstruction
   csPSRegisterType src_reg[3];
   int src_reg_num[3];
   unsigned short src_reg_mods[3];
+
+  csPSProgramInstruction() 
+  { 
+    memset (this, 0, sizeof (*this)); 
+    dest_reg = src_reg[0] = src_reg[1] = src_reg[2] = CS_PS_REG_NONE;
+  }
 };
 
 struct csPSConstant

@@ -136,7 +136,7 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
   if(instr.dest_reg_mods & CS_PS_WMASK_BLUE) dstMask |= GL_BLUE_BIT_ATI;
 
   if(instr.dest_reg_mods == CS_PS_WMASK_NONE ||
-    (instr.dest_reg & CS_PS_WMASK_ALPHA)) alpha = true;
+    (instr.dest_reg_mods & CS_PS_WMASK_ALPHA)) alpha = true;
 
   if(instr.dest_reg_mods == CS_PS_WMASK_ALPHA) color = false;
 
@@ -181,48 +181,48 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
 
   switch(instr.instruction)
   {
-  default:
-    break;
-  case CS_PS_INS_ADD: op = GL_ADD_ATI; break;
-  case CS_PS_INS_CMP: op = GL_CND0_ATI; break;
-  case CS_PS_INS_CND: op = GL_CND_ATI; break;
-  case CS_PS_INS_DP3: op = GL_DOT3_ATI; break;
-  case CS_PS_INS_DP4: op = GL_DOT4_ATI; break;
-  case CS_PS_INS_LRP: op = GL_LERP_ATI; break;
-  case CS_PS_INS_MAD: op = GL_MAD_ATI; break;
-  case CS_PS_INS_MOV: op = GL_MOV_ATI; break;
-  case CS_PS_INS_MUL: op = GL_MUL_ATI; break;
-  case CS_PS_INS_SUB: op = GL_SUB_ATI; break;
+    default:
+      break;
+    case CS_PS_INS_ADD: op = GL_ADD_ATI; break;
+    case CS_PS_INS_CMP: op = GL_CND0_ATI; break;
+    case CS_PS_INS_CND: op = GL_CND_ATI; break;
+    case CS_PS_INS_DP3: op = GL_DOT3_ATI; break;
+    case CS_PS_INS_DP4: op = GL_DOT4_ATI; break;
+    case CS_PS_INS_LRP: op = GL_LERP_ATI; break;
+    case CS_PS_INS_MAD: op = GL_MAD_ATI; break;
+    case CS_PS_INS_MOV: op = GL_MOV_ATI; break;
+    case CS_PS_INS_MUL: op = GL_MUL_ATI; break;
+    case CS_PS_INS_SUB: op = GL_SUB_ATI; break;
   }
   switch(args)
   {
-  default:
-    return false;
-  case 1:
-    if(color) ext->glColorFragmentOp1ATI (op, dst, dstMask, dstMod,
-      arg[0], argrep[0], argmod[0]);
-    if(alpha) ext->glAlphaFragmentOp1ATI (op, dst, dstMod, arg[0],
-      argrep[0], argmod[0]);
-    break;
-  case 2:
-    if(color) ext->glColorFragmentOp2ATI (op, dst, dstMask, dstMod,
-      arg[0], argrep[0], argmod[0], arg[1], argrep[1], argmod[1]);
-    if(alpha) ext->glAlphaFragmentOp2ATI (op, dst, dstMod, arg[0],
-      argrep[0], argmod[0], arg[1], argrep[1], argmod[1]);
-    break;
-  case 3:
-    if(color) ext->glColorFragmentOp3ATI (op, dst, dstMask, dstMod,
-      arg[0], argrep[0], argmod[0], arg[1], argrep[1], argmod[1],
-      arg[2], argrep[2], argmod[2]);
-    if(alpha) ext->glAlphaFragmentOp3ATI (op, dst, dstMod, arg[0],
-      argrep[0], argmod[0], arg[1], argrep[1], argmod[1], arg[2],
-      argrep[2], argmod[2]);
-    break;
+    default:
+      return false;
+    case 1:
+      if(color) ext->glColorFragmentOp1ATI (op, dst, dstMask, dstMod,
+	arg[0], argrep[0], argmod[0]);
+      if(alpha) ext->glAlphaFragmentOp1ATI (op, dst, dstMod, arg[0],
+	argrep[0], argmod[0]);
+      break;
+    case 2:
+      if(color) ext->glColorFragmentOp2ATI (op, dst, dstMask, dstMod,
+	arg[0], argrep[0], argmod[0], arg[1], argrep[1], argmod[1]);
+      if(alpha) ext->glAlphaFragmentOp2ATI (op, dst, dstMod, arg[0],
+	argrep[0], argmod[0], arg[1], argrep[1], argmod[1]);
+      break;
+    case 3:
+      if(color) ext->glColorFragmentOp3ATI (op, dst, dstMask, dstMod,
+	arg[0], argrep[0], argmod[0], arg[1], argrep[1], argmod[1],
+	arg[2], argrep[2], argmod[2]);
+      if(alpha) ext->glAlphaFragmentOp3ATI (op, dst, dstMod, arg[0],
+	argrep[0], argmod[0], arg[1], argrep[1], argmod[1], arg[2],
+	argrep[2], argmod[2]);
+      break;
   }
   GLenum error;
   if((error = glGetError())) 
   {
-    Report(CS_REPORTER_SEVERITY_ERROR, "ATI_fragment_shader error!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "ATI_fragment_shader error %d!", error);
     return false;
   }
   return true;

@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/ref.h"
 #include "csutil/scf.h"
 #include "csutil/scfstr.h"
+#include "csutil/stringreader.h"
 #include "csutil/csmd5.h"
 #include "csgeom/vector3.h"
 #include "csutil/xmltiny.h"
@@ -240,12 +241,12 @@ bool csPixelShaderParser::GetInstruction (const char *str,
 
   inst.inst_mods = CS_PS_IMOD_NONE;
 
-  if(strstr(istr, "_x2")) inst.inst_mods |= CS_PS_IMOD_X2;
-  else if(strstr(istr, "_x4")) inst.inst_mods |= CS_PS_IMOD_X4;
-  else if(strstr(istr, "_x8")) inst.inst_mods |= CS_PS_IMOD_X8;
-  else if(strstr(istr, "_d2")) inst.inst_mods |= CS_PS_IMOD_D2;
-  else if(strstr(istr, "_d4")) inst.inst_mods |= CS_PS_IMOD_D4;
-  else if(strstr(istr, "_d8")) inst.inst_mods |= CS_PS_IMOD_D8;
+  if(strstr(istr, "_X2")) inst.inst_mods |= CS_PS_IMOD_X2;
+  else if(strstr(istr, "_X4")) inst.inst_mods |= CS_PS_IMOD_X4;
+  else if(strstr(istr, "_X8")) inst.inst_mods |= CS_PS_IMOD_X8;
+  else if(strstr(istr, "_D2")) inst.inst_mods |= CS_PS_IMOD_D2;
+  else if(strstr(istr, "_D4")) inst.inst_mods |= CS_PS_IMOD_D4;
+  else if(strstr(istr, "_D8")) inst.inst_mods |= CS_PS_IMOD_D8;
   // _sat can be combined with _xn or _dn
   if(strstr(istr, "_sat")) inst.inst_mods |= CS_PS_IMOD_SAT;
 
@@ -372,21 +373,15 @@ bool csPixelShaderParser::ParseProgram (const char *program)
     return false;
   }
 
-  prog.SubString (version_string, 0, 6);
+  prog.DeleteAt (0, 6);
 
-  // Start position at 8 to skip version inst
-  int pos = 8, len = prog.Length ();
-  while(pos < len)
+  csStringReader reader (prog);
+  csString line;
+  while (reader.HasMoreLines ())
   {
-    if(pos >= len) break;
-    csString line;
-    int end = prog.FindFirst ('\n', pos);
-    if(end<0) end = len;
-    prog.SubString (line, pos, end - pos);
+    if (!reader.GetLine (line)) break;
     csPSProgramInstruction inst;
     if(!GetInstruction (line, inst)) return false;
-
-    pos = end + 1;
 
     // Probably a blank line or comment ... ignore
     if(inst.instruction == CS_PS_INS_INVALID) continue;

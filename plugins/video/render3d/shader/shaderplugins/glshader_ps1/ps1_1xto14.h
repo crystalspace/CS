@@ -29,8 +29,15 @@ class csPS1xTo14Converter
 protected:
   csArray<csPSProgramInstruction> newInstructions;
   csString lastError;
+  csArray<uint> neededRegs;
+
+  int tempRegisterMap[2];
 
   const char* SetLastError (const char* fmt, ...);
+  void ResetState();
+
+  const char* GetTempReg (int oldReg, int instrIndex, int& newReg);
+  const char* GetTexTempReg (int oldReg, int instrIndex, int& newReg);
 
   const char* AddInstruction (const csPSProgramInstruction &instr,
     int instrIndex);
@@ -39,6 +46,8 @@ protected:
     int instrIndex);
   const char* AddTEX (const csPSProgramInstruction &instr,
     int instrIndex);
+
+  const char* CollectUsage (const csArray<csPSProgramInstruction>*& instrs);
 public:
   const char* GetNewInstructions (
     const csArray<csPSProgramInstruction>*& instrs);
