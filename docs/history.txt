@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+2-Mar-2003
+	- Philip Wyett, added OpenAL plugin to MSVC build process. He also
+	  updated msvc_libs and the links too msvc_libs in the docs. 
 1-Mar-2003
 	- Greg Block changed the makefile for the xml documentsystem plugin to
 	  not override the values for the link flags to use when linking libxml

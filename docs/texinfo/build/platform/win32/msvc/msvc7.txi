@@ -36,11 +36,11 @@ The latest version of this archive can be downloaded from:
 
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.96.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.97dev001.zip}
 @end ifnottex
 @iftex
 @code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/}@*
-@code{msvc7_libs_0.96.zip}
+@code{msvc7_libs_0.97dev001.zip}
 @end iftex
 
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
@@ -88,57 +88,6 @@ can see those files. If you wish to compile with Python support you must install
 Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
-
-@subsubheading BisonFlex - Required
-
-The Alternate Window System (AWS) plugin will build correctly under MSVC.
-However, if you wish to make modifications to it's structure and or lexer, it will
-require you re-generate @emph{sllex.cpp, slparse.cpp, slparse.cpp.h and slparse.h}.
-If you need todo this will require you have Bison and Flex on your system. The
-suggested and supported version can be obtained via the link below.
-
-For Visual C++ 7:
-
-@ifnottex
-@uref{ftp://sunsite.dk/projects/crystal/support/msvc/bison_flex/bfwizard-1.6.zip}
-@end ifnottex
-@iftex
-@code{ftp://sunsite.dk/projects/crystal/support/msvc/bison_flex/}@*
-@code{bfwizard-1.6.zip}
-@end iftex
-
-Install this package to a location of your choice on your system. During the install
-process, it will detect MSVC and install itself in the appropriate directories and
-the executables in the system path. Being that BisonFlex was released for MSVC 6. You
-will have to ignore the auto-detection and point to the correct locations. When prompted
-for the @emph{common} directory, direct it to the @emph{X:\msvc_install_dir\Common7} dir.
-Proceed to the next prompt where you will be asked the location of VC7, so point it
-to the @emph{X:\msvc_install_dir\Vc7}. Now just continue with the install.
-
-@subsubheading Setting up and building the AWS plugin
-
-To re-generate the files mentioned above. Open a @emph{MS-DOS Prompt/Command Prompt} and
-navigate to the @emph{CS\} root directory. Next, just enter the command lines listed
-below.
-
-@ifnottex
-@code{flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlang.flx > plugins/aws/sllex.cpp}
-@end ifnottex
-@iftex
-@code{flex -L -Splugins/aws/flex.skl -t plugins/aws/skinlang.flx >}@*
-@code{plugins/aws/sllex.cpp}
-@end iftex
-
-@ifnottex
-@code{bison --no-lines -d -p aws -o plugins/aws/slparse.cpp plugins/aws/skinlang.bsn}
-@end ifnottex
-@iftex
-@code{bison --no-lines -d -p aws -o plugins/aws/slparse.cpp}@*
-@code{ plugins/aws/skinlang.bsn}
-@end iftex
-
-Now just follow the @emph{Compiling Crystal Space} instructions to again re-build AWS
-with your modifications included.
 
 @subsubheading Creative EAX 2.0
 
