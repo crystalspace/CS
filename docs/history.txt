@@ -1,6 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
 5-Sep-2000
+	- Norman Kramer corrected writestring function signature in glide
+	  canvas.
 	- Eric Sunshine made the following changes to spoofdir.php:
 	    - The $indexfile[] array is now specified as a set of regular-
 	      expressions rather than a fixed set of filenames.
