@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+12-Aug-2002
+	- Renamed the XML version of ParseTexture() to ParseTextureMapping()
+	  as that more accuratelly reflects what happens (in syntax
+	  services).
+	- Renamed the XML version of ParseWarp() to ParsePortal() and
+	  also added parsing of the destination sector there (syntax
+	  services).
+	- Implemented ParsePortal() in syntax services.
+	- Removed XML version of ParseShading() in syntax services. It
+	  doesn't do much useful.
+	- Added XML version of ParseBool() to syntax services.
+	- Partially implemented XML version of ParsePoly3d() for syntax
+	  services. This means that syntax services nearly completely
+	  supports XML now.
 9-Aug-2002
 	- Added conveniance functions to get a value from a node (iXmlNode).
 	  This will basically search for the first TEXT child in the node and

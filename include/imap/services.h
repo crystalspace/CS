@@ -29,6 +29,7 @@ class csVector;
 class csParser;
 struct iPolygon3D;
 struct iEngine;
+struct iSector;
 struct iMaterialWrapper;
 struct iThingState;
 struct iLoaderContext;
@@ -173,27 +174,38 @@ struct iSyntaxService : public iBase
   //========================================================================
 
   /**
-   * Parse a MATRIX description. Returns true if successful.
+   * Parse the value of this node and return a boolean depending
+   * on this value. The following mapping happens (case insensitive):
+   * <ul>
+   * <li>yes -> true
+   * <li>no -> false
+   * <li>true -> true
+   * <li>false -> false
+   * <li>on -> true
+   * <li>off -> false
+   * <li>(empty value) -> (def_result)
+   * <li>(everyting else) -> error
+   * </ul>
+   */
+  virtual bool ParseBool (iXmlNode* node, bool& result, bool def_result) = 0;
+  
+  /**
+   * Parse a matrix description. Returns true if successful.
    */
   virtual bool ParseMatrix (iXmlNode* node, csMatrix3 &m) = 0;
 
   /**
-   * Parse a VECTOR description. Returns true if successful.
+   * Parse a vector description. Returns true if successful.
    */
   virtual bool ParseVector (iXmlNode* node, csVector3 &v) = 0;
 
   /**
-   * Parse a MIXMODE description. Returns true if successful.
+   * Parse a mixmode description. Returns true if successful.
    */
   virtual bool ParseMixmode (iXmlNode* node, uint &mixmode) = 0;
 
   /**
-   * Parse a SHADING description. Returns true if successful.
-   */
-  virtual bool ParseShading (iXmlNode* node, int &shading) = 0;
-
-  /**
-   * Parse a texture description.
+   * Parse a texture mapping specification.
    * <ul>
    * <li>vref: is the array containing vertices which can be referenced
    *     by indices in the description.
@@ -213,7 +225,7 @@ struct iSyntaxService : public iBase
    *     This is used to make errormessages more verbose.
    * </ul>
    */
-  virtual bool ParseTexture (iXmlNode* node,
+  virtual bool ParseTextureMapping (iXmlNode* node,
   			     const csVector3* vref, uint &texspec,
 			     csVector3 &tx_orig, csVector3 &tx1,
 			     csVector3 &tx2, csVector3 &len,
@@ -225,10 +237,12 @@ struct iSyntaxService : public iBase
 			     char *plane, const char *polyname) = 0;
 
   /**
-   * Parses a WARP () specification.
+   * Parses a portal definition specification.
    * flags: contains all flags found in the description.
    */
-  virtual  bool ParseWarp (iXmlNode* node, csVector &flags, bool &mirror,
+  virtual  bool ParsePortal (iXmlNode* node, iLoaderContext* ldr_context,
+		  	   iPolygon3D* poly3d,
+		  	   csVector &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after) = 0;

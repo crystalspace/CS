@@ -161,9 +161,8 @@ enum
   XMLTOKEN_LIGHTING,
   XMLTOKEN_PORTAL,
   XMLTOKEN_WARP,
-  XMLTOKEN_TEXTURE,
+  XMLTOKEN_TEXMAP,
   XMLTOKEN_SHADING,
-  XMLTOKEN_VERTICES,
   XMLTOKEN_UVA,
   XMLTOKEN_UV,
   XMLTOKEN_COLORS,
@@ -190,7 +189,8 @@ enum
   XMLTOKEN_MIRROR,
   XMLTOKEN_STATIC,
   XMLTOKEN_ZFILL,
-  XMLTOKEN_CLIP
+  XMLTOKEN_CLIP,
+  XMLTOKEN_SECTOR
 };
 
 static void ReportError (iReporter* reporter, const char* id,
@@ -262,9 +262,8 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
   xmltokens.Register ("portal", XMLTOKEN_PORTAL);
   xmltokens.Register ("warp", XMLTOKEN_WARP);
-  xmltokens.Register ("texture", XMLTOKEN_TEXTURE);
+  xmltokens.Register ("texmap", XMLTOKEN_TEXMAP);
   xmltokens.Register ("shading", XMLTOKEN_SHADING);
-  xmltokens.Register ("vertices", XMLTOKEN_VERTICES);
   xmltokens.Register ("uva", XMLTOKEN_UVA);
   xmltokens.Register ("uv", XMLTOKEN_UV);
   xmltokens.Register ("colors", XMLTOKEN_COLORS);
@@ -292,6 +291,7 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("static", XMLTOKEN_STATIC);
   xmltokens.Register ("zfill", XMLTOKEN_ZFILL);
   xmltokens.Register ("clip", XMLTOKEN_CLIP);
+  xmltokens.Register ("sector", XMLTOKEN_SECTOR);
   return true;
 }
 
@@ -398,7 +398,7 @@ bool csTextSyntaxService::ParseMatrix (csParser *parser, char *buf, csMatrix3 &m
   return true;
 }
 
-bool csTextSyntaxService::ParseVector (csParser* parser, char *buf, csVector3 &v)
+bool csTextSyntaxService::ParseVector (csParser*, char *buf, csVector3 &v)
 {
   csScanStr (buf, "%F", list, &num);
   if (num == 3)
@@ -671,7 +671,6 @@ bool csTextSyntaxService::ParseWarp (
 	int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after)
 {
-
   CS_TOKEN_TABLE_START (portal_commands)
     CS_TOKEN_TABLE (MATRIX)
     CS_TOKEN_TABLE (V)
@@ -1448,6 +1447,20 @@ const char* csTextSyntaxService::MixmodeToText (
   return text;
 }
 
+bool csTextSyntaxService::ParseBool (iXmlNode* node, bool& result,
+		bool def_result)
+{
+  const char* v = node->GetContentsValue ();
+  if (!v) { result = def_result; return true; }
+  if (!strcasecmp (v, "yes"))   { result = true; return true; }
+  if (!strcasecmp (v, "no"))    { result = false; return true; }
+  if (!strcasecmp (v, "true"))  { result = true; return true; }
+  if (!strcasecmp (v, "false")) { result = false; return true; }
+  if (!strcasecmp (v, "on"))    { result = true; return true; }
+  if (!strcasecmp (v, "off"))   { result = false; return true; }
+  return false;
+}
+
 bool csTextSyntaxService::ParseMatrix (iXmlNode* node, csMatrix3 &m)
 {
   csRef<iXmlNodeIterator> it = node->GetNodes ();
@@ -1554,12 +1567,7 @@ bool csTextSyntaxService::ParseMixmode (iXmlNode* node, uint &mixmode)
   return true;
 }
 
-bool csTextSyntaxService::ParseShading (iXmlNode* node, int &shading)
-{
-  return true;
-}
-
-bool csTextSyntaxService::ParseTexture (
+bool csTextSyntaxService::ParseTextureMapping (
 	iXmlNode* node, const csVector3* vref, uint &texspec,
 	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
 	csMatrix3 &tx_m, csVector3 &tx_v,
@@ -1739,11 +1747,83 @@ bool csTextSyntaxService::ParseTexture (
   return true;
 }
 
-bool csTextSyntaxService::ParseWarp (
-	iXmlNode* node, csVector &flags, bool &mirror, bool &warp,
-	int& msv,
+bool csTextSyntaxService::ParsePortal (
+	iXmlNode* node, iLoaderContext* ldr_context,
+	iPolygon3D* poly3d,
+	csVector &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after)
 {
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_MAXVISIT:
+	msv = child->GetContentsValueAsInt ();
+	break;
+      case XMLTOKEN_MATRIX:
+	ParseMatrix (child, m);
+	mirror = false;
+	warp = true;
+        break;
+      case XMLTOKEN_V:
+        ParseVector (child, before);
+        after = before;
+        mirror = false;
+        warp = true;
+        break;
+      case XMLTOKEN_W:
+        ParseVector (child, after);
+        mirror = false;
+        warp = true;
+        break;
+      case XMLTOKEN_MIRROR:
+	if (!ParseBool (child, mirror, true))
+	{
+          ReportError (reporter, "crystalspace.syntax.portal",
+            "Bad value for 'mirror' in 'portal'!");
+	  return false;
+	}
+        break;
+      case XMLTOKEN_STATIC:
+        flags.Push ((csSome)CS_PORTAL_STATICDEST);
+        break;
+      case XMLTOKEN_ZFILL:
+        flags.Push ((csSome)CS_PORTAL_ZFILL);
+        break;
+      case XMLTOKEN_CLIP:
+        flags.Push ((csSome)CS_PORTAL_CLIPDEST);
+        break;
+      case XMLTOKEN_SECTOR:
+	{
+	  iSector* sector = ldr_context->
+	  	FindSector (child->GetContentsValue ());
+	  if (sector)
+	  {
+            poly3d->CreatePortal (sector);
+	  }
+	  else
+	  {
+	    poly3d->CreateNullPortal ();
+	    iPortal* portal = poly3d->GetPortal ();
+	    MissingSectorCallback* mscb = new MissingSectorCallback (
+	    	ldr_context, child->GetContentsValue ());
+	    portal->SetMissingSectorCallback (mscb);
+	    mscb->DecRef ();
+	  }
+	}
+	break;
+      default:
+        ReportError (reporter, "crystalspace.syntax.portal",
+          "Unknown token '%s' for 'portal'!", value);
+        return false;
+    }
+  }
+
   return true;
 }
 
@@ -1754,6 +1834,405 @@ bool csTextSyntaxService::ParsePoly3d (
 	float default_texlen,
 	iThingState* thing_state, int vt_offset)
 {
+  iMaterialWrapper* mat = NULL;
+
+  if (!thing_type)
+  {
+    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    CS_ASSERT (plugin_mgr != NULL);
+    thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	  "crystalspace.mesh.object.thing", iMeshObjectType);
+    if (!thing_type)
+      thing_type = CS_LOAD_PLUGIN (plugin_mgr,
+    	  "crystalspace.mesh.object.thing", iMeshObjectType);
+    plugin_mgr->DecRef ();
+  }
+
+  CS_ASSERT (thing_type != NULL);
+  csRef<iThingEnvironment> te;
+  te.Take (SCF_QUERY_INTERFACE (thing_type, iThingEnvironment));
+
+  uint texspec = 0;
+  int tx_uv_i1 = 0;
+  int tx_uv_i2 = 0;
+  int tx_uv_i3 = 0;
+  csVector2 tx_uv1;
+  csVector2 tx_uv2;
+  csVector2 tx_uv3;
+
+  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
+  csVector3 tx_len (default_texlen, default_texlen, default_texlen);
+
+  csMatrix3 tx_matrix;
+  csVector3 tx_vector (0, 0, 0);
+  char plane_name[100];
+  plane_name[0] = 0;
+  csVector2 uv_shift (0, 0);
+
+  bool do_mirror = false;
+  int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
+
+  char str[255];
+
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_MATERIAL:
+        mat = ldr_context->FindMaterial (child->GetContentsValue ());
+        if (mat == NULL)
+        {
+          ReportError (reporter, "crystalspace.syntax.polygon",
+            "Couldn't find material named '%s'!", str);
+          return false;
+        }
+        poly3d->SetMaterial (mat);
+        break;
+      case XMLTOKEN_LIGHTING:
+        {
+          bool do_lighting;
+	  if (!ParseBool (child, do_lighting, true))
+	  {
+            ReportError (reporter, "crystalspace.syntax.portal",
+              "Bad value for 'lighting' in 'polygon'!");
+	    return false;
+	  }
+          poly3d->GetFlags ().Set (CS_POLY_LIGHTING,
+	  	do_lighting ? CS_POLY_LIGHTING : 0);
+        }
+        break;
+      case XMLTOKEN_COSFACT:
+        poly3d->SetCosinusFactor (child->GetContentsValueAsFloat ());
+        break;
+      case CS_TOKEN_ALPHA:
+        poly3d->SetAlpha (child->GetContentsValueAsInt () * 655 / 256);
+        break;
+      case CS_TOKEN_COLLDET:
+        {
+          bool do_colldet;
+	  if (!ParseBool (child, do_colldet, true))
+	  {
+            ReportError (reporter, "crystalspace.syntax.portal",
+              "Bad value for 'colldet' in 'polygon'!");
+	    return false;
+	  }
+	  if (do_colldet) set_colldet = 1;
+	  else set_colldet = -1;
+        }
+        break;
+      case XMLTOKEN_PORTAL:
+        {
+          csMatrix3 m_w; m_w.Identity ();
+          csVector3 v_w_before (0, 0, 0);
+          csVector3 v_w_after (0, 0, 0);
+	  csVector flags;
+	  bool do_warp = false;
+	  int msv = -1;
+
+	  if (ParsePortal (child, ldr_context,
+	      poly3d, flags, do_mirror, do_warp, msv,
+	      m_w, v_w_before, v_w_after))
+	  {
+	    for (int i = 0; i < flags.Length (); i++)
+	      poly3d->GetPortal ()->GetFlags ().Set ((uint)flags.Get (i));
+
+	    if (do_mirror)
+	    {
+	      if (!set_colldet) set_colldet = 1;
+	    }
+	    else if (do_warp)
+	      poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
+
+	    if (msv != -1)
+	    {
+	      poly3d->GetPortal ()->SetMaximumSectorVisit (msv);
+	    }
+	  }
+        }
+        break;
+      case XMLTOKEN_TEXMAP:
+	if (!ParseTextureMapping (child, thing_state->GetVertices (), texspec,
+			   tx_orig, tx1, tx2, tx_len,
+			   tx_matrix, tx_vector,
+			   uv_shift,
+			   tx_uv_i1, tx_uv1,
+			   tx_uv_i2, tx_uv2,
+			   tx_uv_i3, tx_uv3,
+			   plane_name, poly3d->QueryObject ()->GetName ()))
+	{
+	  return false;
+	}
+        break;
+      case XMLTOKEN_V:
+        {
+	  int* vts = poly3d->GetVertexIndices ();
+	  int vt_idx = child->GetContentsValueAsInt ();
+	  bool ignore = false;
+	  for (int i = 0 ; i < poly3d->GetVertexCount () ; i++)
+	  {
+	    if (vts[i] == vt_idx+vt_offset)
+	    {
+	      csPrintf ("Duplicate vertex-index found! "
+			"(polygon '%s') ignored ...\n",
+			poly3d->QueryObject ()->GetName ());
+	      ignore = true;
+	    }
+	  }
+	  if (!ignore)
+	    poly3d->CreateVertex (vt_idx+vt_offset);
+        }
+        break;
+      case XMLTOKEN_SHADING:
+	{
+	  int shading;
+	  const char* shad = child->GetContentsValue ();
+          if (!strcasecmp (shad, "none"))
+	    shading = POLYTXT_NONE;
+	  else if (!strcasecmp (shad, "flat"))
+	    shading = POLYTXT_FLAT;
+	  else if (!strcasecmp (shad, "gouraud"))
+	    shading = POLYTXT_GOURAUD;
+	  else if (!strcasecmp (shad, "lightmap"))
+	    shading = POLYTXT_LIGHTMAP;
+	  else
+	  {
+	    ReportError (reporter, "crystalspace.syntax.polygon",
+	      "Bad 'shading' specification '%s'!", shad);
+            return false;
+	  }
+          poly3d->SetTextureType (shading);
+	}
+        break;
+      case XMLTOKEN_MIXMODE:
+        {
+          uint mixmode;
+	  if (ParseMixmode (child, mixmode))
+	  {
+	    iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	    ptt->SetMixMode (mixmode);
+	    if (mixmode & CS_FX_MASK_ALPHA)
+	      poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
+	  }
+	}
+        break;
+#if 0
+	// @@@ TODO
+      case XMLTOKEN_UV:
+        {
+          poly3d->SetTextureType (POLYTXT_GOURAUD);
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
+          int num, nv = poly3d->GetVertexCount ();
+	  fs->Setup (poly3d);
+          float list [2 * 100];
+          csScanStr (params, "%F", list, &num);
+          if (num > nv)
+	    num = nv;
+          for (int i = 0; i < num; i++)
+            fs->SetUV (i, list [i * 2], list [i * 2 + 1]);
+	  fs->DecRef ();
+        }
+        break;
+      case CS_TOKEN_COLORS:
+        {
+          poly3d->SetTextureType (POLYTXT_GOURAUD);
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	  iPolyTexGouraud* gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
+          int num, nv = poly3d->GetVertexCount ();
+	  gs->Setup (poly3d);
+          float list [3 * 100];
+          csScanStr (params, "%F", list, &num);
+          if (num > nv)
+	    num = nv;
+          for (int i = 0; i < num; i++)
+            gs->SetColor (i, csColor (list [i * 3], list [i * 3 + 1],
+				      list [i * 3 + 2]));
+	  gs->DecRef ();
+        }
+        break;
+      case CS_TOKEN_UVA:
+        {
+          poly3d->SetTextureType (POLYTXT_GOURAUD);
+	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
+	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
+          int num, nv = poly3d->GetVertexCount ();
+	  fs->Setup (poly3d);
+          float list [3 * 100];
+          csScanStr (params, "%F", list, &num);
+          if (num > nv)
+	    num = nv;
+          for (int i = 0; i < num; i++)
+          {
+            float a = list [i * 3] * TWO_PI / 360.;
+            fs->SetUV (i, cos (a) * list [i * 3 + 1] + list [i * 3 + 2],
+                          sin (a) * list [i * 3 + 1] + list [i * 3 + 2]);
+          }
+	  fs->DecRef ();
+        }
+        break;
+#endif
+      default:
+        ReportError (reporter, "crystalspace.syntax.polygon",
+          "Unknown token '%s' for 'polygon'!", value);
+        return false;
+    }
+  }
+
+  if (poly3d->GetVertexCount () < 3)
+  {
+    ReportError (reporter, "crystalspace.syntax.polygon",
+      "Polygon '%s' contains just %d vertices!",
+      poly3d->QueryObject()->GetName(),
+      poly3d->GetVertexCount ());
+    return false;
+  }
+
+  if (set_colldet == 1)
+    poly3d->GetFlags ().Set (CS_POLY_COLLDET);
+  else if (set_colldet == -1)
+    poly3d->GetFlags ().Reset (CS_POLY_COLLDET);
+
+  if (texspec & CSTEX_UV)
+  {
+    poly3d->SetTextureSpace (
+			     poly3d->GetVertex (tx_uv_i1), tx_uv1,
+			     poly3d->GetVertex (tx_uv_i2), tx_uv2,
+			     poly3d->GetVertex (tx_uv_i3), tx_uv3);
+  }
+  else if (texspec & CSTEX_V1)
+  {
+    if (texspec & CSTEX_V2)
+    {
+      if ((tx1-tx_orig) < SMALL_EPSILON)
+      {
+        ReportError (reporter, "crystalspace.syntax.polygon",
+          "Bad texture specification!");
+	return false;
+      }
+      else if ((tx2-tx_orig) < SMALL_EPSILON)
+      {
+        ReportError (reporter, "crystalspace.syntax.polygon",
+          "Bad texture specification!");
+	return false;
+      }
+      else poly3d->SetTextureSpace (tx_orig, tx1, tx_len.y, tx2, tx_len.z);
+    }
+    else
+    {
+      if ((tx1-tx_orig) < SMALL_EPSILON)
+      {
+        ReportError (reporter, "crystalspace.syntax.polygon",
+          "Bad texture specification!");
+	return false;
+      }
+      else poly3d->SetTextureSpace (tx_orig, tx1, tx_len.x);
+    }
+  }
+  else if (plane_name[0])
+  {
+    iPolyTxtPlane* pl = te->FindPolyTxtPlane (plane_name);
+    if (!pl)
+    {
+      ReportError (reporter, "crystalspace.syntax.polygon",
+        "Can't find plane '%s' for polygon '%s'",
+      	plane_name, poly3d->QueryObject ()->GetName ());
+      return false;
+    }
+    poly3d->SetTextureSpace (pl);
+  }
+  else if (tx_len.x)
+  {
+    // If a length is given (with 'LEN') we will first see if the polygon
+    // is coplanar with the X, Y, or Z plane. In that case we will use
+    // a standard plane. Otherwise we will just create a plane specific
+    // for this case given the first two vertices.
+    bool same_x = true, same_y = true, same_z = true;
+    const csVector3& v = poly3d->GetVertex (0);
+    for (int i = 1 ; i < poly3d->GetVertexCount () ; i++)
+    {
+      const csVector3& v2 = poly3d->GetVertex (i);
+      if (same_x && ABS (v.x-v2.x) >= SMALL_EPSILON) same_x = false;
+      if (same_y && ABS (v.y-v2.y) >= SMALL_EPSILON) same_y = false;
+      if (same_z && ABS (v.z-v2.z) >= SMALL_EPSILON) same_z = false;
+    }
+    if (same_x)
+    {
+      char buf[200];
+      sprintf (buf, "__X_%g,%g__", v.x, tx_len.x);
+      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      if (!pl)
+      {
+        pl = te->CreatePolyTxtPlane ();
+        pl->QueryObject()->SetName (buf);
+        pl->SetTextureSpace (csVector3 (v.x, 0, 0), csVector3 (v.x, 0, 1),
+			     tx_len.x, csVector3 (v.x, 1, 0), tx_len.x);
+      }
+      poly3d->SetTextureSpace (pl);
+    }
+    else if (same_y)
+    {
+      char buf[200];
+      sprintf (buf, "__Y_%g,%g__", v.y, tx_len.x);
+      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      if (!pl)
+      {
+        pl = te->CreatePolyTxtPlane ();
+        pl->QueryObject()->SetName (buf);
+        pl->SetTextureSpace (csVector3 (0, v.y, 0), csVector3 (1, v.y, 0),
+			     tx_len.x, csVector3 (0, v.y, 1), tx_len.x);
+      }
+      poly3d->SetTextureSpace (pl);
+    }
+    else if (same_z)
+    {
+      char buf[200];
+      sprintf (buf, "__Z_%g,%g__", v.z, tx_len.x);
+      iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+      if (!pl)
+      {
+        pl = te->CreatePolyTxtPlane ();
+        pl->QueryObject()->SetName (buf);
+        pl->SetTextureSpace (csVector3 (0, 0, v.z), csVector3 (1, 0, v.z),
+			     tx_len.x, csVector3 (0, 1, v.z), tx_len.x);
+      }
+      poly3d->SetTextureSpace (pl);
+    }
+    else
+      poly3d->SetTextureSpace (poly3d->GetVertex (0), poly3d->GetVertex (1),
+			       tx_len.x);
+  }
+  else
+    poly3d->SetTextureSpace (tx_matrix, tx_vector);
+
+  if (texspec & CSTEX_UV_SHIFT)
+  {
+    iPolyTexType* ptt = poly3d->GetPolyTexType ();
+    iPolyTexLightMap* plm = SCF_QUERY_INTERFACE (ptt, iPolyTexLightMap);
+    if (plm)
+    {
+      plm->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
+      // T = Mot * (O - Vot)
+      // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
+      // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
+      // T = Mot * (O - Vot + Mot-1 * Vuv)
+      csVector3 shift (uv_shift.x, uv_shift.y, 0);
+      tx_vector -= tx_matrix.GetInverse () * shift;
+      poly3d->SetTextureSpace (tx_matrix, tx_vector);
+      plm->DecRef ();
+    }
+  }
+
+  if (do_mirror)
+    poly3d->GetPortal ()->SetWarp (csTransform::GetReflect (
+    	poly3d->GetWorldPlane () ));
+
+  OptimizePolygon (poly3d);
+
   return true;
 }
 

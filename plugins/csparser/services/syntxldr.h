@@ -110,11 +110,11 @@ public:
   virtual const char* MixmodeToText (
   	uint mixmode, int indent, bool newline = true);
 
+  virtual bool ParseBool (iXmlNode* node, bool& result, bool def_result);
   virtual bool ParseMatrix (iXmlNode* node, csMatrix3 &m);
   virtual bool ParseVector (iXmlNode* node, csVector3 &v);
   virtual bool ParseMixmode (iXmlNode* node, uint &mixmode);
-  virtual bool ParseShading (iXmlNode* node, int &shading);
-  virtual bool ParseTexture (iXmlNode* node,
+  virtual bool ParseTextureMapping (iXmlNode* node,
   			     const csVector3* vref, uint &texspec,
 			     csVector3 &tx_orig, csVector3 &tx1,
 			     csVector3 &tx2, csVector3 &len,
@@ -124,7 +124,9 @@ public:
 			     int &idx2, csVector2 &uv2,
 			     int &idx3, csVector2 &uv3,
 			     char *plane, const char *polyname);
-  virtual  bool ParseWarp (iXmlNode* node, csVector &flags, bool &mirror,
+  virtual  bool ParsePortal (iXmlNode* node, iLoaderContext* ldr_context,
+		  	   iPolygon3D* poly_3d,
+		  	   csVector &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after);
