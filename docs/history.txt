@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+5-Mar-2002
+	- Oktal added new csParseInputDef and csGetInputDesc functions
+	  which replace the old functions in cskeys.h. With these functions
+	  you can parse a key/mouse/joystick event into a csEvent or
+	  vice versa.
+	- Fixed the csParseInputDef and csGetInputDesc so that they now
+	  return bool on success/failure of conversion.
 4-Mar-2002
 	- Fixed the tutorials in the docs so that they are up-to-date with
 	  regards to changes that happened a long time ago in csInitializer.

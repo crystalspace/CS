@@ -87,7 +87,7 @@ static struct csKeyMaskDef
   { NULL,	0		}
 };
 
-iEvent* csParseInputDef (const char *name, iEvent* ev, bool use_modifiers = true)
+bool csParseInputDef (const char *name, iEvent* ev, bool use_modifiers = true)
 {
   int mod = 0;
   bool ismask;
@@ -129,17 +129,15 @@ iEvent* csParseInputDef (const char *name, iEvent* ev, bool use_modifiers = true
     if (code) *ev = csEvent (0, csevKeyDown, code, 0, mod);
     else *ev = csEvent (0, csevKeyDown, 0, (int)*name, mod);
   }
-
-  return ev;
+  return true;
 }
 
-csEvent& csParseInputDef (const char* name, csEvent& ev, bool use_modifiers = true)
+bool csParseInputDef (const char* name, csEvent& ev, bool use_modifiers = true)
 {
-  csParseInputDef (name, &ev, use_modifiers);
-  return ev;
+  return csParseInputDef (name, &ev, use_modifiers);
 }
 
-char* csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true)
+bool csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true)
 {
   (void) use_modifiers;
   char *ret = buf;
@@ -185,14 +183,14 @@ char* csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true)
         if (key)
         {
           strcpy (buf, key);
-          return ret;
+          return true;
         }
       }
       if (ev->Key.Char < 255)
       {
         *buf = (char)ev->Key.Char;
         *++buf = 0;
-        return ret;
+        return true;
       }
       break;
 
@@ -200,13 +198,13 @@ char* csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true)
     case csevMouseDown:
       strcpy (buf, "Mouse");
       sprintf (strchr (buf, 0), "%i", ev->Mouse.Button);
-      return ret;
+      return true;
 
     case csevJoystickUp:
     case csevJoystickDown:
       strcpy (buf, "Joystick");
       sprintf (strchr (buf, 0), "%i", ev->Joystick.Button);
-      return ret;
+      return true;
 
     case csevMouseMove:
       strcpy (buf, "Mouse");
@@ -214,7 +212,7 @@ char* csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true)
       if (ev->Mouse.x > ev->Mouse.y) *buf++ = 'X';
       else if (ev->Mouse.x < ev->Mouse.y) *buf++ = 'Y';
       *buf = 0;
-      return ret;
+      return true;
 
     case csevJoystickMove:
       strcpy (buf, "Joystick");
@@ -222,15 +220,15 @@ char* csGetInputDesc (iEvent *ev, char *buf, bool use_modifiers = true)
       if (ev->Joystick.x > ev->Joystick.y) *buf++ = 'X';
       else if (ev->Joystick.x < ev->Joystick.y) *buf++ = 'Y';
       *buf = 0;
-      return ret;
+      return true;
 
     default:
       break;
   }
-  return NULL;
+  return false;
 }
 
-char* csGetInputDesc (csEvent &ev, char *buf, bool use_modifiers = true)
+bool csGetInputDesc (csEvent &ev, char *buf, bool use_modifiers = true)
 {
   return csGetInputDesc (&ev, buf, use_modifiers);
 }
