@@ -170,7 +170,7 @@ PLUGINS.DYNAMIC += cscript/cspython
 endif
 
 ifeq ($(PERL5.AVAILABLE),yes)
-PLUGINS.DYNAMIC += cscript/csperl5
+#PLUGINS.DYNAMIC += cscript/csperl5
 endif
 
 #PLUGINS.DYNAMIC += cscript/cslua
