@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh explo persist standard ;
 
-Help exploldr : "Explosion mesh object loader" ;
+Description exploldr : "Explosion mesh object loader" ;
 
 Plugin exploldr
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins console output simple ;
 
-Help simpcon : "Crystal Space simple output console" ;
+Description simpcon : "simple output console" ;
 
 Plugin simpcon
 	: [ Wildcard *.cpp *.h ]

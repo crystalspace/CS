@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh snow object ;
 
-Help snow : "Snow mesh object plug-in" ;
+Description snow : "Snow mesh object plugin" ;
 
 Plugin snow
 	: [ Wildcard *.cpp *.h ]

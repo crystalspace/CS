@@ -1,6 +1,6 @@
 SubDir TOP plugins collide opcode ;
 
-Help opcode : "OPCODE collision detection plug-in" ;
+Description opcode : "OPCODE collision detection plugin" ;
 
 Plugin opcode
 	: [ Wildcard *.cpp *.h ]

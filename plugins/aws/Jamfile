@@ -33,12 +33,12 @@ if ! [ Property build : projgen ]
     }
 
     NotFile awsfreeze ;
-    Help awsfreeze : "Copy generated Bison/Flex files to source directory" :
-      verbatim ;
+    Help awsfreeze :
+      "Copy generated Bison/Flex files to source directory" ;
   }
 }
 
-Help aws : "Alternate Windowing System plug-in" ;
+Description aws : "Alternate Windowing System plugin" ;
 Plugin aws : $(FILES) ;
 LinkWith aws : cstool csgfx csgeom csutil ;
 

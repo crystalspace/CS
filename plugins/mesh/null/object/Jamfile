@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh null object ;
 
-Help nullmesh : "General mesh object plug-in" ;
+Description nullmesh : "General mesh object plugin" ;
 
 Plugin nullmesh
 	: [ Wildcard *.cpp *.h ]

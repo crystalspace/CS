@@ -1,6 +1,6 @@
 SubDir TOP plugins console input standard ;
 
-Help csconin : "Crystal Space standard input console" ;
+Description csconin : "standard input console" ;
 
 Plugin csconin
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh spiral object ;
 
-Help spiral : "Spiral mesh object plug-in" ;
+Description spiral : "Spiral mesh object plugin" ;
 
 Plugin spiral
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh terrfunc persist standard ;
 
-Help terrfldr : "TerrFunc Terrain object loader" ;
+Description terrfldr : "TerrFunc Terrain object loader" ;
 
 Plugin terrfldr
 	: [ Wildcard *.cpp *.h ]

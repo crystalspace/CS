@@ -1,6 +1,6 @@
 SubDir TOP plugins video loader sgi ;
 
-Help cssgiimg : "Crystal Space sgi image loader" ;
+Description cssgiimg : "sgi image loader" ;
 
 Plugin cssgiimg
 	: [ Wildcard *.cpp *.h ]

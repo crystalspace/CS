@@ -1,6 +1,6 @@
 SubDir TOP plugins sound renderer software ;
 
-Help sndsoft : "Crystal Space software sound renderer" ;
+Description sndsoft : "software sound renderer" ;
 
 Plugin sndsoft
 	: [ Wildcard *.cpp *.h ]

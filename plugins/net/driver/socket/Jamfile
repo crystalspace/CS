@@ -2,7 +2,7 @@ SubDir TOP plugins net driver socket ;
 
 if $(SOCKET.AVAILABLE) = "yes" 
 {
-Help cssocket : "Crystal Space socket network driver" ;
+Description cssocket : "socket network driver" ;
 
 Plugin cssocket
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh thing object ;
 
-Help thing : "Thing mesh object plug-in" ;
+Description thing : "Thing mesh object plugin" ;
 
 Plugin thing
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh impexp spr ;
 
-Help sprie : "SPR Import/Export plug-in" ;
+Description sprie : "SPR Import/Export plugin" ;
 
 Plugin sprie
 	: [ Wildcard *.cpp *.h ]

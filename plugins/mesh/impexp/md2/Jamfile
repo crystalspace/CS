@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh impexp md2 ;
 
-Help md2ie : "MD2 Import/Export plug-in" ;
+Description md2ie : "MD2 Import/Export plugin" ;
 
 Plugin md2ie
 	: [ Wildcard *.cpp *.h ]

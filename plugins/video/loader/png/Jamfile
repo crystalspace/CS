@@ -2,7 +2,7 @@ SubDir TOP plugins video loader png ;
 
 if $(PNG.AVAILABLE) = "yes"
 {
-Help cspngimg : "Crystal Space png image loader" ;
+Description cspngimg : "png image loader" ;
 Plugin cspngimg : [ Wildcard *.cpp *.h ] ;
 LinkWith cspngimg : csgfx csutil ;
 ExternalLibs cspngimg : PNG ;

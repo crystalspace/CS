@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh fountain object ;
 
-Help fountain : "Fountain mesh object plug-in" ;
+Description fountain : "Fountain mesh object plugin" ;
 
 Plugin fountain
 	: [ Wildcard *.cpp *.h ]

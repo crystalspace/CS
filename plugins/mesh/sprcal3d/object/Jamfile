@@ -2,7 +2,7 @@ SubDir TOP plugins mesh sprcal3d object ;
 
 if $(CAL3D.AVAILABLE) = "yes"
 {
-Help sprcal3d : "Cal3D Sprite mesh object plug-in" ;
+Description sprcal3d : "Cal3D Sprite mesh object plugin" ;
 Plugin sprcal3d : [ Wildcard *.cpp *.h ] ;
 LinkWith sprcal3d : cstool csgfx csgeom csutil ;
 ExternalLibs sprcal3d : CAL3D ;

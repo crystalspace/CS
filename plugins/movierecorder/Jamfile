@@ -1,6 +1,6 @@
 SubDir TOP plugins movierecorder ;
 
-Help movierecorder : "Crystal Space realtime movie recorder" ;
+Description movierecorder : "realtime movie recorder" ;
 
 Plugin movierecorder
 	: [ Wildcard *.cpp *.h ]

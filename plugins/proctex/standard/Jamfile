@@ -1,6 +1,6 @@
 SubDir TOP plugins proctex standard ;
 
-Help stdpt : "Crystal Space standard procedural textures" ;
+Description stdpt : "standard procedural textures" ;
 
 Plugin stdpt
 	: [ Wildcard *.cpp *.h ]

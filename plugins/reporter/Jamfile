@@ -1,6 +1,6 @@
 SubDir TOP plugins reporter ;
 
-Help reporter : "Crystal Space Reporter plug-in" ;
+Description reporter : "Reporter plugin" ;
 
 Plugin reporter
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins sound loader iff ;
 
-Help sndiff : "Crystal Space iff sound loader" ;
+Description sndiff : "iff sound loader" ;
 
 Plugin sndiff
 	: [ Wildcard *.cpp *.h ]

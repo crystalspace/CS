@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh stars object ;
 
-Help stars : "Stars mesh object plug-in" ;
+Description stars : "Stars mesh object plugin" ;
 
 Plugin stars
 	: [ Wildcard *.cpp *.h ]

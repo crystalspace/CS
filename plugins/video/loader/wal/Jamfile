@@ -1,6 +1,6 @@
 SubDir TOP plugins video loader wal ;
 
-Help cswalimg : "Crystal Space wal image loader" ;
+Description cswalimg : "wal image loader" ;
 
 Plugin cswalimg
 	: [ Wildcard *.cpp *.h ]

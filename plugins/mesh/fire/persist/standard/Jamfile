@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh fire persist standard ;
 
-Help fireldr : "Fire mesh object loader" ;
+Description fireldr : "Fire mesh object loader" ;
 
 Plugin fireldr
 	: [ Wildcard *.cpp *.h ]

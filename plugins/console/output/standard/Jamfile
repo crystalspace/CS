@@ -1,6 +1,6 @@
 SubDir TOP plugins console output standard ;
 
-Help csconout : "Crystal Space standard output console" ;
+Description csconout : "standard output console" ;
 
 Plugin csconout
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh thing persist standard ;
 
-Help thingldr : "Thing mesh object loader" ;
+Description thingldr : "Thing mesh object loader" ;
 
 Plugin thingldr
 	: [ Wildcard *.cpp *.h ]

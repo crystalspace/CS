@@ -1,6 +1,6 @@
 SubDir TOP plugins font server fontplex ;
 
-Help fontplex : "Crystal Space multiplexing font server" ;
+Description fontplex : "multiplexing font server" ;
 
 Plugin fontplex
 	: [ Wildcard *.cpp *.h ]

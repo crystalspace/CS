@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh spr3d persist standard ;
 
-Help spr3dldr : "Sprite 3D mesh object loader" ;
+Description spr3dldr : "Sprite 3D mesh object loader" ;
 
 Plugin spr3dldr
 	: [ Wildcard *.cpp *.h ]

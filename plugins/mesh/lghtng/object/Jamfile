@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh lghtng object ;
 
-Help lghtng : "Lightning mesh object plug-in" ;
+Description lghtng : "Lightning mesh object plugin" ;
 
 Plugin lghtng
 	: [ Wildcard *.cpp *.h ]

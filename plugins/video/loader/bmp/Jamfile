@@ -1,6 +1,6 @@
 SubDir TOP plugins video loader bmp ;
 
-Help csbmpimg : "Crystal Space bmp image loader" ;
+Description csbmpimg : "bmp image loader" ;
 
 Plugin csbmpimg
 	: [ Wildcard *.cpp *.h ]

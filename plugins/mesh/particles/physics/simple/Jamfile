@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh particles physics simple ;
 
-Help partphys_simple : "Particle Simple Physics plug-in" ;
+Description partphys_simple : "Particle Simple Physics plugin" ;
 
 Plugin partphys_simple
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh impexp ieplex ;
 
-Help ieplex : "Model Import/Export multiplexer plug-in" ;
+Description ieplex : "Model Import/Export multiplexer plugin" ;
 
 Plugin ieplex
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh terrfunc object ;
 
-Help terrfunc : "Function Terrain plug-in" ;
+Description terrfunc : "Function Terrain plugin" ;
 
 Plugin terrfunc
 	: [ Wildcard *.cpp *.h ]

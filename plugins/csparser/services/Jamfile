@@ -1,6 +1,6 @@
 SubDir TOP plugins csparser services ;
 
-Help cssynldr : "Crystal Space format loader services" ;
+Description cssynldr : "format loader services" ;
 
 Plugin cssynldr
 	: [ Wildcard *.cpp *.h ]

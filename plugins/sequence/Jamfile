@@ -1,6 +1,6 @@
 SubDir TOP plugins sequence ;
 
-Help sequence : "Crystal Space Sequence Manager Plug-In" ;
+Description sequence : "Sequence Manager plugin" ;
 
 Plugin sequence
 	: [ Wildcard *.cpp *.h ]

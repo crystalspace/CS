@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh genmesh object ;
 
-Help genmesh : "General mesh object plug-in" ;
+Description genmesh : "General mesh object plugin" ;
 
 Plugin genmesh
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins sound loader au ;
 
-Help sndau : "Crystal Space au sound loader" ;
+Description sndau : "au sound loader" ;
 
 Plugin sndau
 	: [ Wildcard *.cpp *.h ]

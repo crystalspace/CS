@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh spr2d persist standard ;
 
-Help spr2dldr : "Sprite 2D mesh object loader" ;
+Description spr2dldr : "Sprite 2D mesh object loader" ;
 
 Plugin spr2dldr
 	: [ Wildcard *.cpp *.h ]

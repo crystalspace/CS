@@ -4,19 +4,21 @@ BUILDTOP ?= "@top_builddir@" ;
 SubDir TOP ;
 
 # Define our compile groups
+Description sounddrivers : "sound drivers" ;
+Description soundloaders : "sound loaders" ;
+Description imageloaders : "image loaders" ;
+Description netdrivers	 : "network drivers" ;
+Description drivers2d	 : "2D canvases" ;
+Description drivers3d	 : "3D renderers" ;
+Description meshes	 : "mesh plugins and mesh loader" ;
+Description walkall  	 : "Walktest application and all required plugins" ;
+Description openglcanvas : "canvases for the OpenGL renderer" ;
+Description softcanvas   : "canvases for the software renderer" ;
+Description proctexes    : "procedural texture plugins" ;
+Description nrall        : "new-renderer-related modules" ;
 RegisterCompileGroups sounddrivers soundloaders imageloaders netdrivers
 		      drivers2d drivers3d meshes walkall openglcanvas 
 		      softcanvas proctexes nrall ;
-Help sounddrivers : "sound drivers" ;
-Help soundloaders : "sound loaders" ;
-Help imageloaders : "image loaders" ;
-Help netdrivers	  : "network drivers" ;
-Help drivers2d	  : "2D canvases" ;
-Help drivers3d	  : "3D renderers" ;
-Help meshes	  : "mesh plugins and mesh loader" ;
-Help walkall  	  : "Walktest application and all required plugins" ;
-Help openglcanvas : "canvases for the OpenGL renderer" ;
-Help softcanvas   : "canvases for the software renderer" ;
 
 # Create some clean targets
 CleanDir clean : out ;
@@ -30,7 +32,7 @@ Clean distclean : Jamconfig Jamfile
 		  [ Wildcard *.cex ] ;
 CleanDir distclean : autom4te.cache ;
 Depends distclean : clean ;
-Help distclean : "Remove configuration information and built targets" :
+Description distclean : "Remove configuration information and built targets" :
   verbatim ;
 
 Clean maintainerclean : aclocal.m4 configure configure.scan ;

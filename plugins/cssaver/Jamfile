@@ -1,6 +1,6 @@
 SubDir TOP plugins cssaver ;
 
-Help cssaver : "Crystal Space map file saver" ;
+Description cssaver : "map file saver" ;
 
 Plugin cssaver
 	: [ Wildcard *.cpp *.h ]

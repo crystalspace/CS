@@ -1,6 +1,6 @@
 SubDir TOP plugins documentsystem binary ;
 
-Help bindoc : "Crystal Space binary document system" ;
+Description bindoc : "binary document system" ;
 
 Plugin bindoc
 	: [ Wildcard *.cpp *.h ]

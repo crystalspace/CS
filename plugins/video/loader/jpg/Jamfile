@@ -2,7 +2,7 @@ SubDir TOP plugins video loader jpg ;
 
 if $(JPEG.AVAILABLE) = "yes"
 {
-Help csjpgimg : "Crystal Space jpg image loader" ;
+Description csjpgimg : "jpg image loader" ;
 Plugin csjpgimg : [ Wildcard *.cpp *.h ] ;
 LinkWith csjpgimg : csgfx csutil ;
 ExternalLibs csjpgimg : JPEG ;

@@ -2,7 +2,7 @@ SubDir TOP plugins physics loader ;
 
 if $(ODE.AVAILABLE) = "yes" 
 {
-Help physldr : "Crystal Space Physics Loader plug-in" ;
+Description physldr : "Physics Loader plugin" ;
 
 Plugin physldr
 	: [ Wildcard *.cpp *.h ]

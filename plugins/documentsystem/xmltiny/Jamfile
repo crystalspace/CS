@@ -1,6 +1,6 @@
 SubDir TOP plugins documentsystem xmltiny ;
 
-Help xmltiny : "Crystal Space TinyXML document system" ;
+Description xmltiny : "TinyXML document system" ;
 
 Plugin xmltiny
 	: [ Wildcard *.cpp *.h ]

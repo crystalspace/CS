@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh rain persist standard ;
 
-Help rainldr : "Rain mesh object loader" ;
+Description rainldr : "Rain mesh object loader" ;
 
 Plugin rainldr
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh rain object ;
 
-Help rain : "Rain mesh object plug-in" ;
+Description rain : "Rain mesh object plugin" ;
 
 Plugin rain
 	: [ Wildcard *.cpp *.h ]

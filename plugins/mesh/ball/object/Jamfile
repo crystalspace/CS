@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh ball object ;
 
-Help ball : "Ball mesh object plug-in" ;
+Description ball : "Ball mesh object plugin" ;
 
 Plugin ball
 	: [ Wildcard *.cpp *.h ]

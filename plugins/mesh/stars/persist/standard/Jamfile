@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh stars persist standard ;
 
-Help starldr : "Star mesh object loader" ;
+Description starldr : "Star mesh object loader" ;
 
 Plugin starldr
 	: [ Wildcard *.cpp *.h ]

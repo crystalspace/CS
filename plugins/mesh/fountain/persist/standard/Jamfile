@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh fountain persist standard ;
 
-Help fountldr : "Fountain mesh object loader" ;
+Description fountldr : "Fountain mesh object loader" ;
 
 Plugin fountldr
 	: [ Wildcard *.cpp *.h ]

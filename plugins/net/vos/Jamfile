@@ -2,7 +2,7 @@ SubDir TOP plugins net vos ;
 
 if $(VOS.AVAILABLE) = "yes"
 {
-Help csvosa3dl : "Virtual Object System abstract 3D layer" ;
+Description csvosa3dl : "Virtual Object System abstract 3D layer" ;
 
 Plugin csvosa3dl : [ Wildcard *.cpp *.h ] ;
 

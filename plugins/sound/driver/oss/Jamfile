@@ -2,7 +2,7 @@ SubDir TOP plugins sound driver oss ;
 
 if $(OSS.AVAILABLE) = "yes"
 {
-Help ossdrv : "Crystal Space OSS sound driver" ;
+Description ossdrv : "OSS sound driver" ;
 Plugin ossdrv : [ Wildcard *.cpp *.h ] ;
 LinkWith ossdrv : csutil ;
 ExternalLibs ossdrv : OSS ;

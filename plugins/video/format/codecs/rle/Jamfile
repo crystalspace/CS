@@ -1,6 +1,6 @@
 SubDir TOP plugins video format codecs rle ;
 
-Help rlecodec : "Crystal Space RLE codec" ;
+Description rlecodec : "RLE codec" ;
 
 Plugin rlecodec
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins bugplug ;
 
-Help bugplug : "Crystal Space debugging plug-in" ;
+Description bugplug : "debugging plugin" ;
 
 Plugin bugplug
 	: [ Wildcard *.cpp *.h ]

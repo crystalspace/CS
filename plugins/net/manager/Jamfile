@@ -1,6 +1,6 @@
 SubDir TOP plugins net manager ;
 
-Help netman : "Crystal Space network manager" ;
+Description netman : "network manager" ;
 
 Plugin netman
 	: [ Wildcard *.cpp *.h ]

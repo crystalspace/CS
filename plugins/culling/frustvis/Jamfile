@@ -1,6 +1,6 @@
 SubDir TOP plugins culling frustvis ;
 
-Help frustvis : "Crystal Space Frustum Visibility System" ;
+Description frustvis : "Frustum Visibility System" ;
 
 Plugin frustvis
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins sound loader wav ;
 
-Help sndwav : "Crystal Space wav sound loader" ;
+Description sndwav : "wav sound loader" ;
 
 Plugin sndwav
 	: [ Wildcard *.cpp *.h ]

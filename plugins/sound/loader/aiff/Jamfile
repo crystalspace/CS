@@ -1,6 +1,6 @@
 SubDir TOP plugins sound loader aiff ;
 
-Help sndaiff : "Crystal Space aiff sound loader" ;
+Description sndaiff : "aiff sound loader" ;
 
 Plugin sndaiff
 	: [ Wildcard *.cpp *.h ]

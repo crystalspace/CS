@@ -1,6 +1,6 @@
 SubDir TOP plugins video format avi ;
 
-Help csavi : "Crystal Space AVI Streamformat" ;
+Description csavi : "AVI Streamformat" ;
 
 Plugin csavi
 	: [ Wildcard *.cpp *.h ]

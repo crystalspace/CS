@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh terrbig ;
 
-Help terrbig : "Large terrain plugin" ;
+Description terrbig : "Large terrain plugin" ;
 
 Plugin terrbig
 	: [ Wildcard *.cpp *.h ]

@@ -2,7 +2,7 @@ SubDir TOP plugins filesys vfs ;
 
 if $(ZLIB.AVAILABLE) = "yes"
 {
-Help vfs : "Virtual File System plug-in" ;
+Description vfs : "Virtual File System plugin" ;
 Plugin vfs : [ Wildcard *.cpp *.h ] ;
 LinkWith vfs : csutil ;
 

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh cloth object ;
 
-Help cloth : "Cloth mesh object plug-in" ;
+Description cloth : "Cloth mesh object plugin" ;
 
 Plugin cloth
 	: [ Wildcard *.cpp *.h ]

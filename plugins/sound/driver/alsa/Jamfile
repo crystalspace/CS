@@ -2,7 +2,7 @@ SubDir TOP plugins sound driver alsa ;
 
 if $(ALSA.AVAILABLE) = "yes"
 {
-Help alsadrv : "Crystal Space ALSA sound driver" ;
+Description alsadrv : "ALSA sound driver" ;
 Plugin alsadrv : [ Wildcard *.cpp *.h ] ;
 LinkWith alsadrv : csutil ;
 ExternalLibs alsadrv : ALSA ;

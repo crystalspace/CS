@@ -1,6 +1,6 @@
 SubDir TOP plugins console output fancy ;
 
-Help fancycon : "Crystal Space fancy output console" ;
+Description fancycon : "fancy output console" ;
 
 Plugin fancycon
 	: [ Wildcard *.cpp *.h ]

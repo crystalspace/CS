@@ -1,6 +1,6 @@
 SubDir TOP plugins isoldr ;
 
-Help isoload : "Crystal Space isometric world loader plug-in" ;
+Description isoload : "isometric world loader plugin" ;
 
 Plugin isoload
 	: [ Wildcard *.cpp *.h ]

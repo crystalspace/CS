@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh bezier object ;
 
-Help bezier : "Bezier mesh object plug-in" ;
+Description bezier : "Bezier mesh object plugin" ;
 
 Plugin bezier
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins collide rapid ;
 
-Help rapid : "RAPID collision detection plug-in" ;
+Description rapid : "RAPID collision detection plugin" ;
 
 Plugin rapid
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh fire object ;
 
-Help fire : "Fire mesh object plug-in" ;
+Description fire : "Fire mesh object plugin" ;
 
 Plugin fire
 	: [ Wildcard *.cpp *.h ]

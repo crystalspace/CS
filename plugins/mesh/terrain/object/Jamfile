@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh terrain object ;
 
-Help chunklod : "CLOD Terrain plug-in" ;
+Description chunklod : "CLOD Terrain plugin" ;
 
 Plugin chunklod
 	: [ Wildcard *.cpp *.h ]

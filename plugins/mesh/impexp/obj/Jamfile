@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh impexp obj ;
 
-Help objie : "OBJ Import/Export plug-in" ;
+Description objie : "OBJ Import/Export plugin" ;
 
 Plugin objie
 	: [ Wildcard *.cpp *.h ]

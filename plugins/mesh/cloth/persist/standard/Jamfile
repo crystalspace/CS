@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh cloth persist standard ;
 
-Help clothldr : "Cloth mesh object factory loader plug-in" ;
+Description clothldr : "Cloth mesh object factory loader plugin" ;
 
 Plugin clothldr
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh genmesh persist standard ;
 
-Help gmeshldr : "General mesh object loader" ;
+Description gmeshldr : "General mesh object loader" ;
 
 Plugin gmeshldr
 	: [ Wildcard *.cpp *.h ]

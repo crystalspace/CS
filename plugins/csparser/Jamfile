@@ -1,6 +1,6 @@
 SubDir TOP plugins csparser ;
 
-Help csparser : "Crystal Space map file parser" ;
+Description csparser : "map file parser" ;
 
 Plugin csparser
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins engine renderloop loader ;
 
-Help rendloop_loader : "Crystal Space render loop loader" ;
+Description rendloop_loader : "render loop loader" ;
 
 Plugin rendloop_loader
 	: [ Wildcard *.cpp *.h ]

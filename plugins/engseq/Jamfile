@@ -1,6 +1,6 @@
 SubDir TOP plugins engseq ;
 
-Help engseq : "Crystal Space Engine Sequence Manager Plug-In" ;
+Description engseq : "Engine Sequence Manager plugin" ;
 
 Plugin engseq
 	: [ Wildcard *.cpp *.h ]

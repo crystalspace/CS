@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh lghtng persist standard ;
 
-Help lghtngldr : "Lightning mesh object loader" ;
+Description lghtngldr : "Lightning mesh object loader" ;
 Plugin lghtngldr : [ Wildcard *.cpp *.h ] ;
 LinkWith lghtngldr : csgeom csutil ;
 CompileGroups lghtngldr :  meshes ;

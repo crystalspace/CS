@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh impexp mdl ;
 
-Help mdlie : "MDL Import/Export plug-in" ;
+Description mdlie : "MDL Import/Export plugin" ;
 
 Plugin mdlie
 	: [ Wildcard *.cpp *.h ]

@@ -1,6 +1,6 @@
 SubDir TOP plugins stdrep ;
 
-Help stdrep : "Crystal Space Standard Report Listener Plugin" ;
+Description stdrep : "Standard Report Listener Plugin" ;
 
 Plugin stdrep
 	: [ Wildcard *.cpp *.h ]

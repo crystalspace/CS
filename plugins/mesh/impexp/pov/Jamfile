@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh impexp pov ;
 
-Help povie : "POV Import/Export plug-in" ;
+Description povie : "POV Import/Export plugin" ;
 
 Plugin povie
 	: [ Wildcard *.cpp *.h ]

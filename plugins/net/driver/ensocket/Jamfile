@@ -2,7 +2,7 @@ SubDir TOP plugins net driver ensocket ;
 
 if $(SOCKET.AVAILABLE) = "yes" 
 {
-Help ensocket : "Crystal Space ensocket network driver" ;
+Description ensocket : "ensocket network driver" ;
 
 Plugin ensocket
 	: [ Wildcard *.cpp *.h ]

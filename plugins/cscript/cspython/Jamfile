@@ -43,7 +43,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # cspython -- Crystal Space plugin
   #--------
-  Help cspython : "Crystal Script Python plug-in" ;
+  Description cspython : "Python plugin" ;
   Plugin cspython : $(common) cspython.h cspython.cpp pytocs.h pytocs.cpp ;
   LinkWith cspython : cstool csgfx csgeom csutil ;
   ExternalLibs cspython : PYTHON ;
@@ -56,7 +56,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   # pythmod -- Pure Python module
   #--------
-  Help pythmod : "Crystal Space pure Python module" ;
+  Description pythmod : "pure Python module" ;
 
   # Plugin rule above already invokes CompileObject for $(common). We do not
   # invoking it again because we want to avoid compiling the same (large) file

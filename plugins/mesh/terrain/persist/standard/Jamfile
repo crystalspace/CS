@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh terrain persist standard ;
 
-Help terrainldr : "CLOD Terrain object loader" ;
+Description terrainldr : "CLOD Terrain object loader" ;
 
 Plugin terrainldr
 	: [ Wildcard *.cpp *.h ]

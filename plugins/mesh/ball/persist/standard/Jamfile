@@ -1,6 +1,6 @@
 SubDir TOP plugins mesh ball persist standard ;
 
-Help ballldr : "Ball mesh object loader" ;
+Description ballldr : "Ball mesh object loader" ;
 
 Plugin ballldr
 	: [ Wildcard *.cpp *.h ]
