@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Feb-2005
+	- res applied (a variation of) patch #1152721, "Cygwin compatability 
+	  with _X and _C", from Michael D. Adams.
+	- res fixed a printf() format warning in vfscache.cpp on Cygwin.
 26-Feb-2005
 	- res renamed "anonymous render buffers" to user render buffers,
 	  simplified csUserRenderBufferManager, added a render buffer parser

@@ -117,4 +117,9 @@
 		#define for if(0){}	else for
 	#endif
 
+	// Silly Cygwin defines _X in ctypes.h
+	#ifdef _X
+	#undef _X
+	#endif
+
 #endif // __ICEPREPROCESSOR_H__
