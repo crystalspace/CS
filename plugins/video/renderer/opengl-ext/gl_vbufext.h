@@ -53,8 +53,8 @@ class csVertexBufferEXT {
   // Public Constructors and Destructors
   // -------------------------------------------------------
   public:
-    csVertexBuffer ( );
-    ~csVertexBuffer( );
+    csVertexBufferEXT ( );
+    ~csVertexBufferEXT ( );
 
   // -------------------------------------------------------
   // Public Member Functions
