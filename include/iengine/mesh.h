@@ -405,7 +405,7 @@ struct iMeshWrapper : public iBase
    * This pass can also be used to draw objects which don't use lighting
    * or cast shadows
    */
-  virtual void DrawZ (iRenderView* rview) = 0;
+  virtual csRenderMesh *GetRenderMesh (iRenderView* rview) = 0;
   /**
    * Draws the shadow buffer pass.  This sets of the stencil for the lights
    */

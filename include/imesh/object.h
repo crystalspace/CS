@@ -73,8 +73,8 @@ struct iMeshObject : public iBase
 
 #ifdef CS_USE_NEW_RENDERER
   /// The following enable/disable shadow caps for stencil shadow rendering
-  virtual void EnableShadowCaps () = 0;
-  virtual void DisableShadowCaps () = 0;
+  // virtual void EnableShadowCaps () = 0;
+  // virtual void DisableShadowCaps () = 0;
 #endif
 
   /**
@@ -94,14 +94,16 @@ struct iMeshObject : public iBase
   	csZBufMode zbufMode) = 0;
 
 #ifdef CS_USE_NEW_RENDERER
-  virtual bool DrawZ (iRenderView* rview, iMovable* movable,
+  virtual csRenderMesh *GetRenderMesh (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode) = 0;
 
+  /*
   virtual bool DrawShadow (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode, iLight *light) = 0;
 
   virtual bool DrawLight (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode, iLight *light) = 0;
+  */
 #endif // CS_USE_NEW_RENDERER
 
   /**
