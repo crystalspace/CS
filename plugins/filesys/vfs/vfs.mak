@@ -37,6 +37,7 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
   VFS=$(OUTDLL)vfs$(DLL)
   DEP.VFS=$(CSSYS.LIB) $(CSUTIL.LIB)
   TO_INSTALL.DYNAMIC_LIBS+=$(VFS)
+  LDFLAGS.VFS += $(LIBS.EXE)
 else
   VFS=$(OUT)$(LIB_PREFIX)vfs$(LIB)
   DEP.EXE+=$(VFS)
@@ -60,7 +61,7 @@ clean: vfsclean
 vfs: $(OUTDIRS) $(VFS)
 
 $(VFS): $(OBJ.VFS) $(DEP.VFS)
-	$(DO.PLUGIN)
+	$(DO.PLUGIN) $(LDFLAGS.VFS)
 
 vfsclean:
 	$(RM) $(VFS) $(OBJ.VFS) $(OUTOS)vfs.dep
