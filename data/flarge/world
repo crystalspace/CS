@@ -39,7 +39,7 @@ WORLD (
       LAYER (
 	TEXTURE ('spark')
 	SCALE (10,10)
-	MIXMODE (ALPHA (.25))
+	MIXMODE (ALPHA (.75))
       )
     )
     MATERIAL 'mosaic' (TEXTURE ('mosaic.gif'))
