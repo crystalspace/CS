@@ -23,6 +23,16 @@
 	
 ----------------------------------------------------------------*/
 
+// We define our own versions of these
+#define fopen mac_fopen
+#define fgets mac_fgets
+#define access mac_access
+#define mkdir mac_mkdir
+#define unlink mac_unlink
+#define rmdir mac_rmdir
+#define chdir mac_chdir
+#define getcwd mac_getcwd
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ansi_files.h>
@@ -41,6 +51,14 @@
 
 #include <console.h>
 
+#undef getcwd
+#undef chdir
+#undef rmdir
+#undef unlink
+#undef mkdir
+#undef access
+#undef fgets
+#undef fopen
 
 /*
  *	FixupFilePath
@@ -424,6 +442,7 @@ char *getcwd(char *buf, int size)
 		errno = error;
 	return (error == noErr ? buf : NULL);
 }
+
 
 #ifdef __cplusplus
 	}
