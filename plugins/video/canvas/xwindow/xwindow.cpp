@@ -75,6 +75,7 @@ csXWindow::csXWindow (iBase* parent)
 
   wm_width = wm_height = 0;
 
+  dpy = NULL;
   xvis = NULL;
   gc = 0;
   screen_num = 0;
