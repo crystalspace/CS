@@ -39,6 +39,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	  awsCheckBox::OnKeypress and awsCmdButton::OnKeypress. Now those methods
 	  return true iff the key event is really "eaten". Before they were 
 	  returning always true, even if the key event was not used at all.
+	- Luca has fixed the method csQuaternion::GetEulerAngles accordingly to the
+	  patch provided by Troy Chard (troy.chard@shaw.ca).
 26-Jul-2003
 	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed
 	  'static' from enums and put initializers for a constructor

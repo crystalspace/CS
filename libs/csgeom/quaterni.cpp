@@ -237,7 +237,19 @@ void csQuaternion::SetWithAxisAngle(csVector3 axis, float phi)
 
 void csQuaternion::GetEulerAngles (csVector3& angles)
 {
-  angles.y = atan (2.0f * (x*y + r*z) / (r*r + x*x - y*y - z*z));
-  angles.x = asin (-2.0f * (x*z - r*y));
-  angles.z = atan (2.0f * (r*x + y*z) / (r*r - x*x - y*y + z*z));
+  static float rad2deg = 180.0f / PI;
+  static float case1 = PI / 2.0f * 180.0f / rad2deg;
+  static float case2 = -PI / 2.0f * rad2deg;
+
+  angles.z = atan2 (2.0f * (x*y + r*z), (r*r + x*x - y*y - z*z)) * rad2deg;
+  float sine = -2.0f * (x*z - r*y);
+
+  if(sine >= 1)     //cases where value is 1 or -1 cause NAN
+    angles.y = case1; //PI / 2 * 180.0f / rad2deg;
+  else if ( sine <= -1 )
+    angles.y = case2;//-PI / 2 * rad2deg;
+  else
+    angles.y = asin (sine) * rad2deg;
+
+  angles.x = atan2 (2.0f * (r*x + y*z), (r*r - x*x - y*y + z*z)) * rad2deg;
 }
