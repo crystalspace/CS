@@ -34,6 +34,10 @@ The history order is reversed so that new features are at the top.
 	      means that one line of the procedural texture will remain
 	      whatever contents the screen has at that moment.
 	      I have no clue on how to solve this yet.
+	- Fixed the bug with one line of the proc texture not rendering
+	  properly.
+	- Fixed the flame in flarge to be right orientation again.
+	- Removed several more procedural texture related things.
 15-Oct-2002
 	- Started work on the OpenGL implementation of SetRenderTarget().
 	  Added code in BeginDraw() to copy the texture to the display.

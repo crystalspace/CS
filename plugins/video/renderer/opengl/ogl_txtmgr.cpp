@@ -629,18 +629,6 @@ csTextureManagerOpenGL::~csTextureManagerOpenGL ()
 
 void csTextureManagerOpenGL::read_config (iConfigFile *config)
 {
-  const char *proc_texture_type =
-    config->GetStr ("Video.OpenGL.ProceduralTexture");
-
-  if (!strcmp (proc_texture_type, "software"))
-    proc_tex_type = SOFTWARE_TEXTURE;
-  else if (!strcmp (proc_texture_type, "back_buffer"))
-    proc_tex_type = BACK_BUFFER_TEXTURE;
-  else if (!strcmp (proc_texture_type, "auxiliary_buffer"))
-    proc_tex_type = AUXILIARY_BUFFER_TEXTURE;
-  else // default
-    proc_tex_type = BACK_BUFFER_TEXTURE;
-
   sharpen_mipmaps = config->GetInt
         ("Video.OpenGL.SharpenMipmaps", 0);
 

@@ -28,13 +28,6 @@
 class csGraphics3DOGLCommon;
 class csTextureManagerOpenGL;
 
-enum csGLProcTexType
-{
-  SOFTWARE_TEXTURE = 1,
-  BACK_BUFFER_TEXTURE = 2,
-  AUXILIARY_BUFFER_TEXTURE = 3
-};
-
 /**
  * csTextureOpenGL is a class derived from csTexture that implements
  * all the additional functionality required by the OpenGL renderer.
@@ -165,7 +158,6 @@ public:
   /// A pointer to the 3D driver object
   csGraphics3DOGLCommon *G3D;
   int max_tex_size;
-  csGLProcTexType proc_tex_type;
   /// Sharpen mipmaps?
   int sharpen_mipmaps;
   /// downsample textures?

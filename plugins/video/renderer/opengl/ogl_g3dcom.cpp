@@ -1265,6 +1265,24 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
 #endif
 }
 
+void csGraphics3DOGLCommon::SetGlOrtho (bool inverted)
+{
+  if (render_target)
+  {
+    if (inverted)
+      glOrtho (0., (GLdouble) (width+1), (GLdouble) (height+1), 0., -1.0, 10.0);
+    else
+      glOrtho (0., (GLdouble) (width+1), 0., (GLdouble) (height+1), -1.0, 10.0);
+  }
+  else
+  {
+    if (inverted)
+      glOrtho (0., (GLdouble) width, (GLdouble) height, 0., -1.0, 10.0);
+    else
+      glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
+  }
+}
+
 bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 {
   if ((G2D->GetWidth() != width) ||
@@ -1302,7 +1320,10 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
       G2D->SetClipRect (-1, -1, txt_w+1, txt_h+1);
       rt_cliprectset = true;
 
-      glViewport (1, -1, width, height);
+      glMatrixMode (GL_PROJECTION);
+      glLoadIdentity ();
+      SetGlOrtho (false);
+      glViewport (1, -1, width+1, height+1);
     }
 
     if (!rt_onscreen)
@@ -1364,6 +1385,9 @@ void csGraphics3DOGLCommon::FinishDraw ()
     {
       rt_cliprectset = false;
       G2D->SetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
+      glMatrixMode (GL_PROJECTION);
+      glLoadIdentity ();
+      glOrtho (0., width, 0., height, -1.0, 10.0);
       glViewport (0, 0, width, height);
     }
 
@@ -3898,10 +3922,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
   // With the back buffer procedural textures the orthographic projection
   // matrix is inverted.
-  if (inverted)
-    glOrtho (0., (GLdouble) width, (GLdouble) height, 0., -1.0, 10.0);
-  else
-    glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
+  SetGlOrtho (inverted);
 
   glTranslatef (asp_center_x, asp_center_y, 0);
   for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
@@ -4476,11 +4497,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
 
   // With the back buffer procedural textures the orthographic projection
   // matrix is inverted.
-  if (inverted)
-    glOrtho (0., (GLdouble) width, (GLdouble) height, 0., -1.0, 10.0);
-  else
-    glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
-
+  SetGlOrtho (inverted);
 
   glTranslatef (asp_center_x, asp_center_y, 0);
   for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;

@@ -234,6 +234,12 @@ public:
    */
   static void SetMirrorMode (bool mirror);
 
+  /**
+   * Set glOrtho() settings depending on current render
+   * target and inverted mode.
+   */
+  void SetGlOrtho (bool inverted);
+
 private:
 
   csRef<iEffectServer> effectserver;

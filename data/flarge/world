@@ -4938,6 +4938,11 @@
                     <v>2</v>
                     <v>6</v>
                     <lighting>no</lighting>
+		    <texmap>
+		        <uv idx="0" u="0" v="0" />
+		        <uv idx="1" u="1" v="0" />
+		        <uv idx="2" u="1" v="1" />
+		    </texmap>
                 </p>
                 <material>dots</material>
                 <p name="west">
@@ -4946,6 +4951,11 @@
                     <v>3</v>
                     <v>2</v>
                     <lighting>no</lighting>
+		    <texmap>
+		        <uv idx="0" u="0" v="0" />
+		        <uv idx="1" u="1" v="0" />
+		        <uv idx="2" u="1" v="1" />
+		    </texmap>
                 </p>
                 <material>dots</material>
                 <p name="up">
@@ -4954,6 +4964,11 @@
                     <v>6</v>
                     <v>2</v>
                     <lighting>no</lighting>
+		    <texmap>
+		        <uv idx="0" u="0" v="0" />
+		        <uv idx="1" u="1" v="0" />
+		        <uv idx="2" u="1" v="1" />
+		    </texmap>
                 </p>
                 <material>plasma</material>
                 <p name="down">
@@ -18654,19 +18669,11 @@
                     <v>0</v>
                     <v>4</v>
                     <material>fire</material>
+		    <lighting>no</lighting>
                     <texmap>
-                        <matrix>
-                            <m11>-0.2</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>-0.2</m22>
-                            <m23>0</m23>
-                            <m31>0</m31>
-                            <m32>0</m32>
-                            <m33>-0.2</m33>
-                        </matrix>
-                        <v x="10" y="-14" z="-13" />
+		        <uv idx="2" u="0.02" v="0.02" />
+		        <uv idx="1" u="0.02" v="0.98" />
+		        <uv idx="0" u="0.98" v="0.98" />
                     </texmap>
                 </p>
                 <p name="west">

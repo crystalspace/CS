@@ -269,8 +269,7 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
     // prepare for 2D drawing--so we need no fancy GL effects!
     bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
     if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
-    setGLColorfromint(color);
-
+    setGLColorfromint (color);
     glBegin (GL_POINTS);
     glVertex2i (x, Height - y);
     glEnd ();
