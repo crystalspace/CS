@@ -24,6 +24,10 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine removed the following modules and resources from the
 	  project.  Also removed all references to these modules from
 	  documentation, source and header files, configuration files, etc.
+	  All removed resources were tagged with the name "PURGE_1" just before
+	  being purged to CVS's "Attic".  This tag may be used to easily
+	  recover any module or resource back to the state it was in just prior
+	  to removal.
 	    - Defunct NetSpace project and its supporting modules:
 		apps/demonets
 		apps/nstp
