@@ -19,14 +19,15 @@
 #ifndef __CSUTIL_ARRAY_H__
 #define __CSUTIL_ARRAY_H__
 
-// For csArrayCompareFunction.
-#include "csutil/parray.h"
-
 // hack: work around problems caused by #defining 'new'
 #ifdef CS_EXTENSIVE_MEMDEBUG
 # undef new
 #endif
 #include <new>
+
+/// This function prototype is used for csArray::InsertSorted()
+typedef int csArrayCompareFunction (void const* item1, void* item2);
+
 
 /**
  * A templated array class.  The objects in this class are constructed via
@@ -406,7 +407,8 @@ public:
    * Insert an element at a sorted position.
    * Assumes array is already sorted.
    */
-  int InsertSorted (T item, csArrayCompareFunction* compare)
+  int InsertSorted (T item, csArrayCompareFunction* compare,
+	int* equal_index = 0)
   {
     int m = 0, l = 0, r = Length () - 1;
     while (l <= r)
@@ -416,6 +418,7 @@ public:
 
       if (cmp == 0)
       {
+	if (equal_index) *equal_index = m;
         Insert (++m, item);
         return m;
       }
@@ -426,6 +429,7 @@ public:
     }
     if (r == m)
       m++;
+    if (equal_index) *equal_index = -1;
     Insert (m, item);
     return m;
   }

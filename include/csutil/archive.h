@@ -84,10 +84,10 @@ private:
   {
   public:
     ArchiveEntryVector () : csPDelArray<ArchiveEntry> (256, 256) {}
-    static int Compare (void const* Item1, void const* Item2)
+    static int Compare (void const* Item1, void* Item2)
     { return strcmp (((ArchiveEntry *)Item1)->filename,
 	((ArchiveEntry *)Item2)->filename); }
-    static int CompareKey (void const* Item, void const* Key)
+    static int CompareKey (void const* Item, void* Key)
     { return strcmp (((ArchiveEntry *)Item)->filename, (char *)Key); }
   };
 

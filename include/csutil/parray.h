@@ -22,7 +22,11 @@
 
 #include "csutil/ref.h"
 
-typedef int csArrayCompareFunction (void const* item1, void const* item2);
+/// This function prototype is used for csPDelArray::Sort()
+typedef int csPDelArraySortCompareFunction (void const* item1,
+	void const* item2);
+/// This function prototype is used for csPDelArray::InsertSorted()
+typedef int csPDelArrayCompareFunction (void const* item1, void* item2);
 
 /**
  * An array of pointers. No ref counting is done on the elements in this
@@ -286,7 +290,7 @@ public:
   /**
    * Find an element based on some key.
    */
-  int FindSortedKey (void* key, csArrayCompareFunction* comparekey) const
+  int FindSortedKey (void* key, csPDelArrayCompareFunction* comparekey) const
   {
     int l = 0, r = Length () - 1;
     while (l <= r)
@@ -311,7 +315,7 @@ public:
    * to the index of a duplicate item (if found). If no such
    * duplicate item exists it will be set to -1.
    */
-  int InsertSorted (T* item, csArrayCompareFunction* compare,
+  int InsertSorted (T* item, csPDelArrayCompareFunction* compare,
 	int* equal_index = 0)
   {
     int m = 0, l = 0, r = Length () - 1;
@@ -341,7 +345,7 @@ public:
   /**
    * Sort array.
    */
-  void Sort (csArrayCompareFunction* compare)
+  void Sort (csPDelArraySortCompareFunction* compare)
   {
     qsort (root, Length (), sizeof (T*), compare);
   }
