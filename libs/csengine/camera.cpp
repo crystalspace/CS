@@ -66,8 +66,8 @@ csPolygon3D* csCamera::GetHit (csVector3& v)
 void csCamera::MoveWorld (const csVector3& v)
 {
   csVector3 new_position = GetOrigin () + v;
-  //if (sector)
-    //sector = sector->FollowSegment (*this, new_position, mirror);
+  if (sector)
+    sector = sector->FollowSegment (*this, new_position, mirror);
   SetOrigin (new_position);
 }
 
