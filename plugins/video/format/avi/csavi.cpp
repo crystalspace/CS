@@ -67,7 +67,7 @@ csAVIFormat::~csAVIFormat ()
     Unload ();
     pFile->DecRef ();
     delete [] pData;
-    if (pChunkList) delete pChunkList;
+    delete pChunkList;
   }
 }
 

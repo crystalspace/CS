@@ -83,7 +83,7 @@ void csProcBump::SetHSI (csColor& col, float H, float S, float I)
 void csProcBump::MakePalette (int max)
 {
   int i;
-  if (palette) delete[] palette;
+  delete[] palette;
   palsize = max;
   palette = new int[palsize];
   palette[0] = g3d->GetDriver2D ()->FindRGB(0,0,0);

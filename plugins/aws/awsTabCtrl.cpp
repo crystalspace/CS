@@ -329,7 +329,7 @@ awsTabCtrl::awsTabCtrl ():
 
 awsTabCtrl::~awsTabCtrl ()
 {
-  if(sink) delete sink;
+  delete sink;
 }
 
 bool awsTabCtrl::Setup (iAws *_wmgr, iAwsComponentNode *settings)

@@ -375,7 +375,7 @@ bool csNewParticleSystem::GetLighting () const
 
 void csNewParticleSystem::SetLighting (bool enable)
 {
-  if (Lighting) delete[] LitColors;
+  delete[] LitColors;
   Lighting = enable;
   if (Lighting) LitColors = new csColor [StorageCount];
   else LitColors = 0;

@@ -39,7 +39,7 @@ csGenerateImageTextureBlend::~csGenerateImageTextureBlend()
   while(p)
   {
     np = p->next;
-    if(p->tex) delete p->tex;
+    delete p->tex;
     delete p;
     p = np;
   }
@@ -245,7 +245,7 @@ csGenerateImage::csGenerateImage()
 
 csGenerateImage::~csGenerateImage()
 {
-  if(tex) delete tex;
+  delete tex;
 }
 
 iImage *csGenerateImage::Generate(int totalw, int totalh,
@@ -288,7 +288,7 @@ iImage *csGenerateImage::Generate(int totalw, int totalh,
 //------------------ csGenerateImageValueFunc -----------------
 csGenerateImageValueFuncTex::~csGenerateImageValueFuncTex()
 {
-  if(tex) delete tex;
+  delete tex;
 }
 
 float csGenerateImageValueFuncTex::GetValue(float x, float y)

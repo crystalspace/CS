@@ -39,7 +39,7 @@ csPrefixConfig::csPrefixConfig(const char *fName, iVFS *vfs, const char *prf,
 csPrefixConfig::~csPrefixConfig()
 {
   delete[] Prefix;
-  if (Alias) delete[] Alias;
+  delete[] Alias;
 }
 
 bool csPrefixConfig::LoadNow(const char *Filename, iVFS *vfs, bool overwrite)

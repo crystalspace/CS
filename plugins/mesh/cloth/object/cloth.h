@@ -203,16 +203,16 @@ class           Integrator {
     };
     ~Integrator() 
     {
-      if (velocities)  delete[]velocities;
-      if (forces)      delete[]forces;
+      delete[]velocities;
+      delete[]forces;
 #if defined(AMPC_PROVOT)
-      if (tempvertices)   delete[]tempvertices;
-      if (velocities1)    delete[]velocities1;
-      if (velocities2)    delete[]velocities2;
-      if (velocities3)    delete[]velocities3;
-      if (forces1)     delete[]forces1;
-      if (forces2)     delete[]forces2;
-      if (forces3)     delete[]forces3;
+      delete[]tempvertices;
+      delete[]velocities1;
+      delete[]velocities2;
+      delete[]velocities3;
+      delete[]forces1;
+      delete[]forces2;
+      delete[]forces3;
 #endif
     };
 inline void     Swap() 

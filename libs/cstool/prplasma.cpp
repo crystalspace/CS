@@ -99,7 +99,7 @@ void csProcPlasma::MakeTable ()
 void csProcPlasma::MakePalette (int max)
 {
   int i;
-  if (palette) delete[] palette;
+  delete[] palette;
   palsize = max;
   palette = new unsigned char[palsize*4];
   memset (palette, 0, 4*palsize);

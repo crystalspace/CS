@@ -61,7 +61,7 @@ ceImageView::ceImageView (csComponent *iParent, iGraphics3D * /*G3D*/)
 
 ceImageView::~ceImageView ()
 {
-  if (image) delete image;
+  delete image;
 }
 
 bool ceImageView::HandleEvent (iEvent &Event)

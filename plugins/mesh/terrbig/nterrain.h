@@ -247,8 +247,8 @@ public:
 
   ~nTerrain()
   {
-    if (hm) delete hm;
-    if (materials) delete [] materials;
+    delete hm;
+    delete [] materials;
   }
 
 };

@@ -880,7 +880,7 @@ bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
   // Don't read PNGs 
   if (mng_get_sigtype (handle) == mng_it_png)
   {
-    if (NewImage) delete[] NewImage;
+    delete[] NewImage;
     mng_cleanup (&handle);
     return false;
   }

@@ -96,8 +96,8 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
 
 ViewMesh::~ViewMesh ()
 {
-  if (menu) delete menu;
-  if (dialog) delete dialog;
+  delete menu;
+  delete dialog;
 }
 
 void ViewMesh::Help ()

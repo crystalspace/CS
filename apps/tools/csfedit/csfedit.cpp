@@ -864,8 +864,8 @@ csEditChar::csEditChar(int w, int h, uint8 *bitmap)
 
 csEditChar::~csEditChar()
 {
-  if(view) delete view;
-  if(pixels) delete[] pixels;
+  delete view;
+  delete[] pixels;
 }
 
 
@@ -1117,9 +1117,9 @@ csEditFont::~csEditFont()
   //}
   /// delete font from memory
   ((CsfEdit*)app)->SetEditFont(0);
-  if(view) delete view;
-  if(filename) delete[] filename;
-  if(fontname) delete[] fontname;
+  delete view;
+  delete[] filename;
+  delete[] fontname;
   if(chars) {
 	int i;
     for(i=0; i<numchars; i++) delete chars[i];
@@ -1257,7 +1257,7 @@ void csEditFont::Save()
 
 void csEditFont::SetFontName(const char *val)
 {
-  if(fontname) delete[] fontname;
+  delete[] fontname;
   fontname = csStrNew(val);
 }
 

@@ -112,14 +112,14 @@ csSprite2DUVAnimation::csSprite2DUVAnimation (iBase* pParent)
 
 csSprite2DUVAnimation::~csSprite2DUVAnimation ()
 {
-  if (name) delete [] name;
+  delete [] name;
 }
 
 void csSprite2DUVAnimation::SetName (const char *name)
 {
   if (name)
   {
-    if (this->name) delete [] this->name;
+    delete [] this->name;
     this->name = csStrNew (name);
   }
 }

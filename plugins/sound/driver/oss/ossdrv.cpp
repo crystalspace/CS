@@ -221,7 +221,7 @@ csSoundDriverOSS::csSoundDriverOSS(iBase *piBase)
 
 csSoundDriverOSS::~csSoundDriverOSS()
 {
-  // if (memory) delete [] memory;
+  // delete [] memory;
   Close ();
 }
 

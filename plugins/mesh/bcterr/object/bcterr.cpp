@@ -224,7 +224,7 @@ void csBCTerrBlock::FreeLOD ()
       owner->vbufmgr->UnlockBuffer (current_lod->buf);
     current_lod->buf = 0;
   }
-  if (current_lod->mesh->vertex_fog) delete current_lod->mesh->vertex_fog;
+  delete current_lod->mesh->vertex_fog;
   owner->factory_state->FreeShared (this, current_lod->level);
   current_lod = 0;
 }
@@ -239,7 +239,7 @@ bool csBCTerrBlock::FreeSharedLOD ()
       owner->vbufmgr->UnlockBuffer (current_lod->buf);
     current_lod->buf = 0;
   }
-  if (current_lod->mesh->vertex_fog) delete current_lod->mesh->vertex_fog;
+  delete current_lod->mesh->vertex_fog;
   current_lod = 0;
   return true;
 }
@@ -289,16 +289,16 @@ csBCTerrBlock::~csBCTerrBlock ()
     if (default_lod->mesh->vertex_fog)
       delete default_lod->mesh->vertex_fog;
   }
-  if (default_lod) delete default_lod;
+  delete default_lod;
   FreeLOD ();
   if (buf)
     buf->DecRef ();
-  if (draw_mesh.vertex_fog) delete draw_mesh.vertex_fog;
-  if (large_tri) delete [] large_tri;
-  if (verts) delete [] verts;
-  if (normals) delete [] normals;
-  if (texels) delete [] texels;
-  if (color) delete [] color;
+  delete draw_mesh.vertex_fog;
+  delete [] large_tri;
+  delete [] verts;
+  delete [] normals;
+  delete [] texels;
+  delete [] color;
   if (material) material->DecRef ();
 }
 
@@ -317,12 +317,12 @@ void csBCTerrBlock::AddMaterial (iMaterialWrapper* mat)
 void csBCTerrBlock::RebuildBlock (csBCTerrBlock* up_neighbor, csBCTerrBlock* left_neighbor)
 {
   Build (controlpoint, up_neighbor, left_neighbor); 
-  if (draw_mesh.vertex_fog) delete draw_mesh.vertex_fog;
-  if (large_tri) delete [] large_tri;
-  if (verts) delete [] verts;
-  if (normals) delete [] normals;
-  if (texels) delete [] texels;
-  if (color) delete [] color;
+  delete draw_mesh.vertex_fog;
+  delete [] large_tri;
+  delete [] verts;
+  delete [] normals;
+  delete [] texels;
+  delete [] color;
   SetupBaseMesh ();
 }
 
@@ -1451,8 +1451,8 @@ csBCTerrObject::csBCTerrObject (iObjectRegistry* object_reg,
 csBCTerrObject::~csBCTerrObject ()
 {
   // int x, z;
-  if (control_points) delete [] control_points;
-  if (blocks) delete [] blocks;
+  delete [] control_points;
+  delete [] blocks;
   if (vis_cb) vis_cb->DecRef ();
 }
 
@@ -1868,7 +1868,7 @@ void csBCTerrObject::SetupCollisionQuads ()
     shortest = size->y;
   else
     shortest = size->x;
-  if (collision) delete collision;
+  delete collision;
   collision = new csBCCollisionQuad (control_points, x_blocks, 
       z_blocks, shortest, object_reg );
   end = x_blocks * z_blocks;
@@ -1991,7 +1991,7 @@ void csBCTerrObject::BuildCullMesh ()
   {
     if (culling_mesh.culling_mesh[0].vertices)
       delete [] culling_mesh.culling_mesh[0].vertices;
-    if (culling_mesh.square_verts) delete culling_mesh.square_verts;
+    delete culling_mesh.square_verts;
     delete culling_mesh.culling_mesh;
   }
   culling_mesh.culling_mesh = new csMeshedPolygon;  
@@ -2272,7 +2272,7 @@ csBCTerrObjectFactory::~csBCTerrObjectFactory ()
   {
     object_list[i] = 0;
   }
-  if (object_list) delete [] object_list;
+  delete [] object_list;
 }
 
 void csBCTerrObjectFactory::AddTerrObject (csBCTerrObject* obj)

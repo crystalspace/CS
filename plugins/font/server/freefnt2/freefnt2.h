@@ -45,7 +45,7 @@ class csFreeType2Font : public iFont
 
     GlyphBitmap (){isOk=false; bitmap = 0; alphabitmap = 0; }
     ~GlyphBitmap ()
-    { if (isOk) { delete [] bitmap; if (alphabitmap) delete[] alphabitmap; } }
+    { if (isOk) { delete [] bitmap; delete[] alphabitmap; } }
   };
 
   // A set of glyphs with same point size

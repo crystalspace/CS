@@ -83,7 +83,7 @@ void csProcWater::SetHSI (csColor& col, float H, float S, float I)
 void csProcWater::MakePalette (int max)
 {
   int i;
-  if (palette) delete[] palette;
+  delete[] palette;
   palsize = max;
   palette = new int[palsize];
   palette[0] = g2d->FindRGB(0,0,0);

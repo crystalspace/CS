@@ -95,19 +95,19 @@ awsGridBagLayout::GridBagLayoutInfo::GridBagLayoutInfo () :
 
 awsGridBagLayout::GridBagLayoutInfo::~GridBagLayoutInfo ()
 {
-  if (minWidth) delete[] minWidth;
-  if (minHeight) delete[] minHeight;
-  if (weightX) delete[] weightX;
-  if (weightY) delete[] weightY;
+  delete[] minWidth;
+  delete[] minHeight;
+  delete[] weightX;
+  delete[] weightY;
 }
 
 void awsGridBagLayout::GridBagLayoutInfo::Set (
   awsGridBagLayout::GridBagLayoutInfo &l2)
 {
-  if (minWidth) delete[] minWidth;
-  if (minHeight) delete[] minHeight;
-  if (weightX) delete[] weightX;
-  if (weightY) delete[] weightY;
+  delete[] minWidth;
+  delete[] minHeight;
+  delete[] weightX;
+  delete[] weightY;
 
   width = l2.width;
   height = l2.height;
@@ -841,13 +841,13 @@ void awsGridBagLayout::ArrangeGrid (iAwsComponent *parent)
     parent->Frame ().Width () < d.Width () ||
     parent->Frame ().Height () < d.Height ())
   {
-    if (info) delete info;
+    delete info;
 
     info = GetLayoutInfo (parent, MINSIZE);
     d = GetMinSize (parent, info);
   }
 
-  if (layoutInfo) delete layoutInfo;
+  delete layoutInfo;
 
   layoutInfo = info;
 

@@ -556,7 +556,7 @@ csTerrFuncObject::~csTerrFuncObject ()
   if (vis_cb) vis_cb->DecRef ();
   if (height_func) height_func->DecRef ();
   if (normal_func) normal_func->DecRef ();
-  if (quad_height) delete quad_height;
+  delete quad_height;
 }
 
 void csTerrFuncObject::CorrectSeams (int tw, int th)

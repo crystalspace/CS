@@ -184,7 +184,7 @@ static inline bool AddToPathEnv (char *dir, char **pathEnv)
       strcpy (newpath, dir);
       strcat (newpath, ";");
       if (*pathEnv) strcat (newpath, *pathEnv);
-      if (*pathEnv) delete[] *pathEnv;
+      delete[] *pathEnv;
       *pathEnv = newpath;
       return true;
     }

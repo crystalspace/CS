@@ -1207,7 +1207,7 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
   top_mesh.triangles = new csTriangle [top_mesh.num_triangles];
 #else
   num_mesh_triangles = n;
-  if (mesh_triangles) delete [] mesh_triangles;
+  delete [] mesh_triangles;
   mesh_triangles = new csTriangle [num_mesh_triangles];
 #endif
 

@@ -892,7 +892,7 @@ timer(0)
 
 awsPopupMenu::~awsPopupMenu()
 {
-  if(timer) delete timer;
+  delete timer;
 }
 
 

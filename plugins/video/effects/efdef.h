@@ -70,7 +70,7 @@ public:
   }
   virtual ~csEffectDefinition ()
   { 
-    if (techniquename) delete[] techniquename;
+    delete[] techniquename;
   }
 
   csPtr<iEffectTechnique> CreateTechnique();

@@ -71,7 +71,7 @@ PathTut::PathTut (iObjectRegistry* object_reg)
 
 PathTut::~PathTut ()
 {
-  if (m_Path) delete m_Path;
+  delete m_Path;
 }
 
 void PathTut::SetupFrame ()

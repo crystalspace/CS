@@ -596,7 +596,7 @@ csBCCollisionQuad::csBCCollisionQuad ()
 
 csBCCollisionQuad::~csBCCollisionQuad ()
 {
-  if (root_quad) delete root_quad;
+  delete root_quad;
 }
 
 csBCCollisionQuad::csBCCollisionQuad (csVector3 *cntrl_pt,

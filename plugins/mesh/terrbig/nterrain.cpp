@@ -435,7 +435,7 @@ void nTerrain::AssembleTerrain(iRenderView *rv, iMovable*m, nTerrainInfo *terrin
 void nTerrain::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
 {
   unsigned int i;
-  if (materials) delete [] materials;
+  delete [] materials;
 
   materials = new iMaterialWrapper *[nMaterials];
   for(i=0; i<nMaterials; ++i)
@@ -532,12 +532,12 @@ csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFac
 
 csBigTerrainObject::~csBigTerrainObject()
 {
-  if (terrain) delete terrain;
+  delete terrain;
   if (info->light_list)
   {
     delete [] info->light_list;
   }
-  if (info)    delete info;
+  delete info;
 }
 
 bool csBigTerrainObject::LoadHeightMapFile (const char *filename) 

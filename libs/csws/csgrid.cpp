@@ -743,7 +743,7 @@ csGrid::~csGrid ()
     for (j = 0; j < r->Length (); j++)
     {
       csString *str = (csString*)r->Get (j)->data;
-      if (str) delete str;
+      delete str;
     }
     delete r;
   }

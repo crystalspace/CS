@@ -450,7 +450,7 @@ public:
   {element = n; left=l; right=r;}
 
   /// delete the tree, does not delete the elements.
-  inline ~csRadTree() {if (left) delete left; if (right) delete right;}
+  inline ~csRadTree() {delete left; delete right;}
 
   /// Insert RadElement into tree;
   void Insert(csRadElement *e);

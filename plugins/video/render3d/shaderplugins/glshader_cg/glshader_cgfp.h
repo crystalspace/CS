@@ -46,7 +46,7 @@ private:
   struct variablemapentry
   {
     variablemapentry() { name = csInvalidStringID; cgvarname = 0; }
-    ~variablemapentry() { if (cgvarname) delete[] cgvarname; }
+    ~variablemapentry() { delete[] cgvarname; }
     csStringID name;
     char* cgvarname;
     CGparameter parameter;
@@ -55,7 +55,7 @@ private:
   struct texturemapentry
   {
     texturemapentry() { name = 0; layer = -1; }
-    ~texturemapentry() { if(name) delete name; if(cgvarname) delete cgvarname; }
+    ~texturemapentry() { delete name; delete cgvarname; }
     char* name;
     int layer;
     char* cgvarname;

@@ -43,8 +43,8 @@
 
 Md2::md2vertexset::~md2vertexset()
 {
-  if (xyzcoordindices) delete [] xyzcoordindices;
-  if (texcoordindices) delete [] texcoordindices;
+  delete [] xyzcoordindices;
+  delete [] texcoordindices;
 }
 
 // go from xyz_index and texcoord_index to a single cs vertex_index

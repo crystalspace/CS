@@ -35,7 +35,7 @@ const int hsRow = 2;
 //
 awsListRow::~awsListRow ()
 {
-  if (cols) delete[] cols;
+  delete[] cols;
 }
 
 int awsListRow::GetHeight (iAwsPrefManager *pm, int colcount)
@@ -271,7 +271,7 @@ void awsListBox::UpdateMap ()
 
     map_dirty = false;
     map_size = 0;
-    if (map) delete[] map;
+    delete[] map;
 
     // Traverse once for the count of visible items
     map_size = CountVisibleItems (&rows);

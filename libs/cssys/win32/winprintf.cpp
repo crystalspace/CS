@@ -79,7 +79,7 @@ int _cs_vfprintf (FILE* stream, const char* format, va_list args)
   
   do
   {
-    if (str) delete[] str;
+    delete[] str;
     bufsize = newsize + 1;
     str = new char[bufsize];
     // use cs_vsnprintf() for consistency across all platforms.

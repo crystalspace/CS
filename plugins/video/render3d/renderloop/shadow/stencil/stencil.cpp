@@ -308,14 +308,15 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     int NextEdge = 0;
     int TriIndex = 0;
 
-    if (edge_indices) delete [] edge_indices;
-      edge_indices = new int[new_triangle_count*9];
-    if (edge_normals) delete [] edge_normals;
-      edge_normals = new csVector3[new_triangle_count*3];
-    if (edge_midpoints) delete [] edge_midpoints;
-      edge_midpoints = new csVector3[new_triangle_count*3];
+    delete [] edge_indices;
+    edge_indices = new int[new_triangle_count*9];
+    delete [] edge_normals;
+    edge_normals = new csVector3[new_triangle_count*3];
+    delete [] edge_midpoints;
+    edge_midpoints = new csVector3[new_triangle_count*3];
 
-    for (int i = 0; i < mesh->GetPolygonCount(); i ++) {
+    for (int i = 0; i < mesh->GetPolygonCount(); i ++)
+    {
       csMeshedPolygon *poly = &mesh->GetPolygons()[i];
       csVector3 ab = mesh->GetVertices()[poly->vertices[1]] -
                      mesh->GetVertices()[poly->vertices[0]];

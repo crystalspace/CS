@@ -150,6 +150,6 @@ csOPCODECollider::~csOPCODECollider ()
     m_pCollisionModel = 0;
   }
 
-  if (indexholder) delete[] indexholder;
-  if (vertholder)  delete[] vertholder;
+  delete[] indexholder;
+  delete[] vertholder;
 }

@@ -43,7 +43,7 @@ private:
   struct variablemapentry
   {
     variablemapentry() { name = csInvalidStringID; cgvarname = 0; }
-    ~variablemapentry() { if (cgvarname) delete[] cgvarname; }
+    ~variablemapentry() { delete[] cgvarname; }
     csStringID name;
     char* cgvarname;
     CGparameter parameter;

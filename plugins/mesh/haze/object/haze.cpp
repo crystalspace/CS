@@ -118,8 +118,8 @@ void csHazeHull::ComputeEdges()
         total_edge++;
     }
   /// fill edgept tables.
-  if(edgept1) delete[] edgept1;
-  if(edgept2) delete[] edgept2;
+  delete[] edgept1;
+  delete[] edgept2;
   edgept1 = new int[total_edge];
   edgept2 = new int[total_edge];
   int edge_now = 0;

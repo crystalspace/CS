@@ -123,7 +123,7 @@ public:
   {
     Config->RemoveIterator(this);
     Config->DecRef();
-    if (Subsection) delete[] Subsection;
+    delete[] Subsection;
     ClearIterated();
   }
   virtual iConfigFile *GetConfigFile() const
