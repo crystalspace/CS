@@ -55,7 +55,6 @@
 #include "isound/loader.h"
 #include "isound/renderer.h"
 #include "iterrain/object.h"
-#include "iterrain/ddg.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
