@@ -523,9 +523,27 @@ csRef<iDocumentNode> csTinyXmlDocument::GetRoot ()
   return root;
 }
 
-const char* csTinyXmlDocument::Parse (iFile*)
+const char* csTinyXmlDocument::Parse (iFile* file)
 {
-  return "Not implemented yet!";
+  size_t want_size = file->GetSize ();
+  char *data = new char [want_size + 1];
+  size_t real_size = file->Read (data, want_size);
+  if (want_size != real_size)
+  {
+    delete[] data;
+    return "Unexpected EOF encountered";
+  }
+  data[real_size] = '\0';
+#ifdef CS_DEBUG
+  if (strlen (data) != real_size)
+  {
+    delete[] data;
+    return "File contains one or more null characters";
+  }
+#endif
+  const char *error = Parse (data);
+  delete[] data;
+  return error;
 }
 
 const char* csTinyXmlDocument::Parse (iDataBuffer* buf)
