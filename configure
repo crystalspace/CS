@@ -18745,7 +18745,7 @@ fi
 #------------------------------------------------------------------------------
 # Check for libode.  In addition to the standard installed locations, we also
 # search CS/libs/libode*.  Also check if it is a sufficiently recent version
-# (0.035 as of this writing).
+# (0.039 as of this writing).
 #------------------------------------------------------------------------------
 
 # Check whether --with-libode or --without-libode was given.
@@ -19255,8 +19255,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-dWorldCreate();
+dWorldID w = dWorldCreate();
 	    dBodySetGravityMode(0,0);
+	    dWorldStepFast1(w,0,0);
 	    dCloseODE();
   ;
   return 0;
@@ -19393,8 +19394,9 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-dWorldCreate();
+dWorldID w = dWorldCreate();
 	    dBodySetGravityMode(0,0);
+	    dWorldStepFast1(w,0,0);
 	    dCloseODE();
   ;
   return 0;

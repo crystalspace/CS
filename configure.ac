@@ -1368,7 +1368,7 @@ AS_IF([test $cs_cv_lib3ds = yes],
 #------------------------------------------------------------------------------
 # Check for libode.  In addition to the standard installed locations, we also
 # search CS/libs/libode*.  Also check if it is a sufficiently recent version
-# (0.035 as of this writing).
+# (0.039 as of this writing).
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ode],
     [AC_LANG_PROGRAM([#include <ode/ode.h>], [dWorldCreate()])],
@@ -1378,8 +1378,9 @@ AS_IF([test $cs_cv_libode = yes],
     [CS_CHECK_BUILD([if libode is sufficiently recent], [cs_cv_libode_recent],
 	[AC_LANG_PROGRAM(
 	    [#include <ode/ode.h>],
-	    [dWorldCreate();
+	    [dWorldID w = dWorldCreate();
 	    dBodySetGravityMode(0,0);
+	    dWorldStepFast1(w,0,0);
 	    dCloseODE();])],
 	[], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])])

@@ -13,6 +13,8 @@ chronological order.
 	- Eric Sunshine eliminated gobs and gobs of compilation warnings from
 	  throughout the project which were emitted with the new renderer
 	  enabled.
+	- Eric Sunshine upgraded ODE check in configure.ac to require 0.039
+	  rather than 0.035 since `odedynam' now requires 0.039.
 29-Sep-2003
 	- Jorrit moved ParseTextureMapping() and ParsePoly3d() from syntax
 	  services to thing loader. It doesn't make much sense to make those
