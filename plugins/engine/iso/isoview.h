@@ -154,7 +154,6 @@ public:
   virtual void SetFarPlane(csPlane3*) { }
   virtual csPlane3* GetFarPlane() const {return 0;}
   virtual long GetCameraNumber() const {return camnum;}
-  virtual iMeshWrapper *GetHit (csVector3 &, int*) {return 0;}
 
   /// but in isometric space :-)
   virtual void Perspective (const csVector3& v, csVector2& p) const

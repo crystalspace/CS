@@ -177,15 +177,6 @@ struct iCamera : public iBase
   virtual void SetMirrored (bool m) = 0;
 
   /**
-   * Check if there is a polygon in front of us in the direction
-   * defined by 'v' (world space coordinates). Return the nearest polygon
-   * index or -1 if no polygon was hit.
-   * Note that this function will not check beyond 'v'. So only the
-   * vector between the current position of the camera and 'v' is checked.
-   */
-  virtual iMeshWrapper* GetHit (csVector3& v, int* polygon_idx) = 0;
-
-  /**
    * Get the 3D far plane that should be used to clip all geometry.
    * If this function returns 0 no far clipping is required.
    * Otherwise it must be used to clip the object before

@@ -99,12 +99,6 @@ void csCamera::SetFarPlane (const csPlane3 *farplane)
     fp = 0;
 }
 
-iMeshWrapper* csCamera::GetHit (csVector3 &v, int* polygon_idx)
-{
-  csVector3 isect;
-  return sector->HitBeamPortals (v_o2t, v, isect, polygon_idx);
-}
-
 void csCamera::MoveWorld (const csVector3 &v, bool cd)
 {
   csVector3 new_position = GetOrigin () + v;

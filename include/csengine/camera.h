@@ -99,12 +99,6 @@ public:
     return cameranr;
   }
 
-  /**
-   * Check if there is a polygon in front of us in the direction
-   * defined by 'v' (world space coordinates). Return the nearest polygon.
-   */
-  iMeshWrapper* GetHit (csVector3& v, int* polygon_index);
-
   /// Set the default FOV for new cameras.
   static void SetDefaultFOV (int fov, int width)
   {
@@ -381,10 +375,6 @@ public:
     virtual iSector* GetSector () const { return scfParent->GetSector(); }
     virtual void SetSector (iSector *s) { scfParent->SetSector (s); }
 
-    virtual iMeshWrapper* GetHit (csVector3& v, int* polygon_idx)
-    {
-      return scfParent->GetHit (v, polygon_idx);
-    }
     virtual void Correct (int n)
     {
       scfParent->Correct (n);
