@@ -1292,9 +1292,10 @@ unsigned long converter::tds_read_obj_section ( FILE *filein ) {
         num_face_inc = ( int ) tds_read_u_short_int ( filein );
  
         for ( i = num_face; i < num_face + num_face_inc; i++ ) {
-          face[0][i] = tds_read_u_short_int ( filein ) + num_cor3_base;
-          face[1][i] = tds_read_u_short_int ( filein ) + num_cor3_base;
+	  // reverse winding of polygons for proper baackface culling
           face[2][i] = tds_read_u_short_int ( filein ) + num_cor3_base;
+          face[1][i] = tds_read_u_short_int ( filein ) + num_cor3_base;
+          face[0][i] = tds_read_u_short_int ( filein ) + num_cor3_base;
           face_order[i] = 3;
           face_flags[i] = tds_read_u_short_int ( filein );
         }
@@ -1322,7 +1323,15 @@ unsigned long converter::tds_read_obj_section ( FILE *filein ) {
           fprintf ( logfile,  "        TEX_VERTS section tag of %0X\n", 
             temp_int );
         }
-        teller = teller + tds_read_unknown_section ( filein );
+        temp_pointer2 = tds_read_u_long_int ( filein );
+        num_cor3_inc =  ( int ) tds_read_u_short_int ( filein );
+	for (i = 0; i < num_cor3_inc; i++) {
+	  cor3_uv[0][i] = tds_read_float( filein );
+	  cor3_uv[1][i] = tds_read_float( filein );
+	}
+	teller = teller + temp_pointer2;
+
+//        teller = teller + tds_read_unknown_section ( filein );
         break;
 
       case 0x4150:
