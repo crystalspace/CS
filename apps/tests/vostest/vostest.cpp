@@ -1,4 +1,4 @@
-/*
+/*  -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
     Copyright (C) 2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
@@ -55,6 +55,8 @@
 
 #include "inetwork/vosa3dl.h"
 
+#include <iostream>
+
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
@@ -110,7 +112,7 @@ void Vostest::SetupFrame ()
 
 
   // Tell 3D driver we're going to display 3D things.
-  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS))
+  if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN))
     return;
 
   // Tell the camera to render into the frame buffer.
@@ -127,11 +129,13 @@ bool Vostest::HandleEvent (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
+    std::cout << "HandleEvent SetupFrame\n";
     vostest->SetupFrame ();
     return true;
   }
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
   {
+    std::cout << "HandleEvent FinishFrame\n";
     vostest->FinishFrame ();
     return true;
   }
@@ -268,40 +272,21 @@ bool Vostest::Initialize ()
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
+  engine->Prepare ();
+
   csRef<iVosSector> vossector = vosa3dl->GetSector("vop://localhost/world");
   vossector->Load();
   room = vossector->GetSector();
 
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> ws =
-    SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
-  csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  walls_state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
-  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
-  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
-
-  csRef<iLight> light;
-  iLightList* ll = room->GetLights ();
-
-  light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
-    csColor (1, 0, 0));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
-    csColor (0, 0, 1));
-  ll->Add (light);
-
-  light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
-    csColor (0, 1, 0));
-  ll->Add (light);
-
-  engine->Prepare ();
+  std::cout << "yearg 1\n";
 
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  std::cout << "yearg 2\n";
 
   return true;
 }
