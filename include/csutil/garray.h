@@ -35,6 +35,7 @@
  */
 #define CS_GARRAY_SHRINKLIMIT 1000
 
+
 /// \internal Common macro for declarations in this file.
 #define CS_TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra) \
   class Name								\
@@ -75,7 +76,7 @@
     { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
     void Delete (int n)							\
     { CS_ASSERT (n >= 0 && n < limit);					\
-      memmove (root + n, root + n + 1, (limit - n - 1) * sizeof (ga_type)); \
+      memmove (root + n, root + n + 1, (length - n - 1) * sizeof (ga_type)); \
       SetLength (length-1); }						\
     ga_type *GetArray ()						\
     { return root; }							\
@@ -94,7 +95,36 @@
     }									\
     Extra								\
   }
-
+/** A Set of Availables Extra for CS_TYPEDEF_GROWING_ARRAY_EXT
+  *
+  *  
+  */
+// HANDLECHUNKS allows to insert or delete segments arrays into the array
+#define HANDLECHUNKS                                                             \
+bool InsertChunk (int n, int size , Type* Item)                                  \
+{ /* no run-time checks here, just in debug mode   */                            \
+  CS_ASSERT( n <= count );                                                       \
+  CS_ASSERT( size>0 );                                                           \
+  SetLength ( length + size); /* Increments 'count' as a side-effect */          \
+  const int nmove = (length - (n + size));                                       \ 
+  if (nmove > 0)                                                                 \
+    memmove ( &root [ n + size ] , &root [ n ] , nmove * sizeof (Type) );        \
+                                                                                 \
+   memcpy  ( &root [ n ] , Item , size * sizeof (Type) );                        \
+  return true;                                                                   \
+}                                                                                \
+bool DeleteChunk (int n, int size)                                               \
+{ /* no run-time checks here, just in debug mode */                              \
+  CS_ASSERT( (n >= 0) && (n < length) );                                         \
+  CS_ASSERT( (size > 0) && ( n + size <= length ) );                             \
+  const int nmove  = length - n - size;                                          \
+  if ( nmove > 0 )                                                               \
+    memmove (&root [ n ] , &root [ n + size ] , nmove * sizeof (Type) );         \
+                                                                                 \
+  SetLength ( length - size );                                                   \
+  return true;                                                                   \
+}           
+  
 /**
  * This is a macro that will declare a growable array variable that is able to
  * contain a number of elements of given type.<p>
