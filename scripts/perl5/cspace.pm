@@ -10405,6 +10405,9 @@ package cspace::iFont;
 *GetDescent = *cspacec::iFont_GetDescent;
 *GetAscent = *cspacec::iFont_GetAscent;
 *HasGlyph = *cspacec::iFont_HasGlyph;
+*GetTextHeight = *cspacec::iFont_GetTextHeight;
+*GetUnderlinePosition = *cspacec::iFont_GetUnderlinePosition;
+*GetUnderlineThickness = *cspacec::iFont_GetUnderlineThickness;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
