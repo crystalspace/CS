@@ -69,6 +69,7 @@ The history order is reversed so that new features are at the top.
 	  driver" (in preparation of the system driver's ultimate removal).
 	- Jorge Acereda added NetBSD alias in vfs.cfg.
 	- Jorge Acereda removed unneeded includes in csfont.cpp.
+	- Creation of R0_90 branch.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.
