@@ -17,14 +17,20 @@ chronological order.
 	  a 'profclear' command to bugplug (assigned to 'ctrl-shift-p').
 	- Jorrit added the ability to the profiler to remember minimum and
 	  maximum elapsed time.
-	- Jorrit enhanced PrecacheCulling() in Dynavis so that it also traverses
-	  the kdtree now. That improves efficiency a bit more.
+	- Jorrit enhanced PrecacheCulling() in Dynavis so that it also
+	  traverses the kdtree now. That improves efficiency a bit more.
 	- res changed genmesh to let not tris facing the light, but rather 
 	  those facing away cast shadows. This seems to give better results.
 	- res fixed DrawPixmap() alpha support in the software renderer.
 	- res fixed spr2d texture coordinate vertex buffer not getting 
 	  properly filled when NextFrame() was called, but the mesh wasn't
 	  rendered any time before.
+	- Eric Sunshine fixed crasher reported by Lukas Erlinghagen in
+	  csStringSet::Contains() when csSCF::RegisterClassesInt() is invoked
+	  with `pluginPath' as a null pointer, which can occur when the
+	  SCF_REGISTER_STATIC_LIBRARY() and SCF_REGISTER_STATIC_CLASS() are
+	  invoked. (This problem was supposed to have been addressed on
+	  17-Jan-2005 but the original problem report was mis-read.)
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this
