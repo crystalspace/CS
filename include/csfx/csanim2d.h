@@ -84,9 +84,9 @@ public:
   virtual int Height();
   virtual iTextureHandle *GetTextureHandle();
   virtual void DrawScaled (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
-    uint8 Alpha);
+    uint8 Alpha = 0);
   virtual void DrawTiled (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
-    int orgx, int orgy, uint8 Alpha);
+    int orgx, int orgy, uint8 Alpha = 0);
   virtual void Advance(cs_time ElapsedTime);
 
 private:

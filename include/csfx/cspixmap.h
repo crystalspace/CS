@@ -100,11 +100,11 @@ public:
   inline void SetTextureRectangle (int x, int y, int w, int h)
   { tx = x; ty = y; tw = w; th = h; }
 
-  // implementation of csPimap methods
+  // implementation of csPixmap methods
   virtual void DrawScaled (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
-    uint8 Alpha);
+    uint8 Alpha = 0);
   virtual void DrawTiled (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
-    int orgx, int orgy, uint8 Alpha);
+    int orgx, int orgy, uint8 Alpha = 0);
   virtual int Width ();
   virtual int Height ();
   virtual void Advance(cs_time /*ElapsedTime*/) {}
