@@ -877,6 +877,13 @@ void csGraphics3DGlide2x::RenderPolygonSinglePass (GrVertex * verts, int num, bo
  */
 
   GlideLib_grDrawPlanarPolygonVertexList(num,verts);
+/*
+  GlideLib_grColorCombine( GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE, 
+                             GR_COMBINE_LOCAL_CONSTANT, GR_COMBINE_OTHER_NONE, FXFALSE );
+  GlideLib_grConstantColorValue ( 0xffffffff );
+  for ( i=0; i < num; i++ )
+    grDrawLine( &verts[i], &verts[ (i+1)%num ] );
+  */
 }
 
 void csGraphics3DGlide2x::RenderPolygonMultiPass (GrVertex* verts, int num, bool haslight,
@@ -1265,6 +1272,13 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
   UByte r, g, b;
   r=g=b=255;
 
+  if ( mode & CS_FX_KEYCOLOR )
+  {
+    // makes color 0 ( BLACK ) transparent
+    GlideLib_grChromakeyMode (GR_CHROMAKEY_ENABLE);
+    GlideLib_grChromakeyValue (0xff000000);
+  }
+  
   // if we draw a flat shaded polygon we gonna use the mean color
   if ( !m_renderstate.textured && handle)
   {
@@ -1292,6 +1306,9 @@ void csGraphics3DGlide2x::FinishPolygonFX ()
   
   if (m_dpfx.mixmode & CS_FX_MASK_MIXMODE)
     GlideLib_grDepthMask( FXTRUE );
+    
+  if (m_dpfx.mixmode & CS_FX_KEYCOLOR )
+    GlideLib_grChromakeyMode (GR_CHROMAKEY_DISABLE);
 }
 
 void csGraphics3DGlide2x::DrawPolygonFX (G3DPolygonDPFX& poly)
@@ -1408,23 +1425,22 @@ void csGraphics3DGlide2x::DrawLine (csVector3& v1, csVector3& v2, float fov, int
 
 bool csGraphics3DGlide2x::SetRenderState (G3D_RENDERSTATEOPTION option, long value)
 {
+  G3DZBufMode newzmode = m_ZBufMode;
   switch (option)
   {
     case G3DRENDERSTATE_NOTHING:
       return true;
 
     case G3DRENDERSTATE_ZBUFFERTESTENABLE:
-      if (value)
-        GlideLib_grDepthBufferFunction(GR_CMP_LEQUAL);
-      else
-        GlideLib_grDepthBufferFunction(GR_CMP_ALWAYS);
+      newzmode = (G3DZBufMode)(newzmode & ~CS_ZBUF_TEST);
+      newzmode = (G3DZBufMode)(newzmode | value ? CS_ZBUF_TEST : CS_ZBUF_NONE);
+      SetZBufMode ( newzmode );
       break;
       
     case G3DRENDERSTATE_ZBUFFERFILLENABLE:
-      if (value)
-        GlideLib_grDepthMask(FXTRUE);
-      else
-        GlideLib_grDepthMask(FXFALSE);
+      newzmode = (G3DZBufMode)(newzmode & ~CS_ZBUF_FILL);
+      newzmode = (G3DZBufMode)(newzmode | value ? CS_ZBUF_FILL : CS_ZBUF_NONE);
+      SetZBufMode ( newzmode );
       break;
     
     case G3DRENDERSTATE_DITHERENABLE:

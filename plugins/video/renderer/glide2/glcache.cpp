@@ -90,7 +90,6 @@ void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
       printf( "Knock knock, you try to load a texture of size %d (incl. mipmaps) but your TMU can only handle %ld\n", size, cache_size );
       exit(1);
     }
-
     // unit is not in memory. load it into the cache
     while ((total_size + size >= cache_size) || !manager->hasFreeSpace(size))
     {
