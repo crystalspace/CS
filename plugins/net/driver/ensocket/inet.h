@@ -74,13 +74,8 @@ class csNetworkSocket2 : public iNetworkSocket2
   struct sockaddr_in local_addr;
   struct sockaddr_in remote_addr;
   struct hostent *host_ent;
-#ifdef WIN32
-  int sin_size;
-  int addr_len;
-#else
-  size_t sin_size;
-  size_t addr_len;
-#endif
+  socklen_t sin_size;
+  socklen_t addr_len;
 
   virtual int set( SOCKET socket_fd, bool bConnected, struct sockaddr_in saddr );
   virtual int SELECT( int fds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds );
