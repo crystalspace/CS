@@ -1,18 +1,18 @@
 # Application description
-DESCRIPTION.pysimp = Crystal Space Python simple example
+DESCRIPTION.pysimple = Crystal Space Python simple example
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make pysimp         Make the $(DESCRIPTION.pysimp)$"
+APPHELP += $(NEWLINE)echo $"  make pysimple     Make the $(DESCRIPTION.pysimple)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: pysimp
+.PHONY: pysimple
 
 all apps: pysimple
 pysimple:
@@ -29,14 +29,14 @@ PYSIMP.EXE=pysimp$(EXE)
 SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp) \
   apps/support/static.cpp
 OBJ.PYSIMP = $(addprefix $(OUT),$(notdir $(SRC.PYSIMP:.cpp=$O)))
-DESCRIPTION.$(PYSIMP.EXE) = $(DESCRIPTION.pysimp)
+DESCRIPTION.$(PYSIMP.EXE) = $(DESCRIPTION.pysimple)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: pysimp pysimpclean
+.PHONY: pysimple pysimpleclean
 
 all: $(PYSIMP.EXE)
 pysimple: $(OUTDIRS) $(PYSIMP.EXE)
@@ -44,8 +44,8 @@ clean: pysimpleclean
 
 $(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) \
   $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSTERR.LIB) $(CSSCRIPT.LIB) \
-  $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) $(CSGEOM.LIB) $(CSINPUT.LIB) \
-  $(CSOBJECT.LIB) $(CSUTIL.LIB)
+  $(CSSFXLDR.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) $(CSGEOM.LIB) \
+  $(CSINPUT.LIB) $(CSOBJECT.LIB) $(CSUTIL.LIB)
 	$(DO.LINK.EXE)
 
 pysimpleclean:
