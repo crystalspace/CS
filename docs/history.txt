@@ -6,6 +6,8 @@ The history order has been reversed so that new features are at the top.
           loading a world for which the octree isn't valid anymore. The
 	  partially loaded octree was not cleaned up properly.
 	- Fixed a compile bug in DDraw61::GetClipper().
+	- Norman Kramer fixed CSWS (cstree) so that it compiles on Windows
+	  now.
 26-Jun-2000
 	- Fixed memory leak while building BSP/octree.
 	- Eric Sunshine eliminated a slew of compilation warning in cstree.cpp
