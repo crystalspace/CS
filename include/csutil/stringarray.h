@@ -36,6 +36,49 @@ private:
   int count, limit, threshold;
   char** root;
 
+  // Set vector length to n.  If 'dealloc' is true and the array is being
+  // shortened, then the excess items are deallocated.  If it is false, then
+  // the items are not deallocated.  Passing false for this argument is unsafe.
+  // Do so only if you know precisely what you are doing.  Obvious examples of
+  // functions which might want to partake of this unsafe behavior are those
+  // which return the excess strings to the caller with the expectation that
+  // the caller will be responsible for freeing them with delete[].
+  void SetLength (int n, bool dealloc = true)
+  {
+    // Free all items between new count and old count.
+    int i;
+    for (i = n ; i < count ; i++)
+    {
+      if (dealloc)
+	  delete[] root[i];
+      root[i] = 0;
+    }
+
+    int old_count = count;
+    count = n;
+
+    if (n > limit || (limit > threshold && n < limit - threshold))
+    {
+      n = ((n + threshold - 1) / threshold ) * threshold;
+      if (!n)
+      {
+        DeleteAll ();
+      }
+      else if (root == 0)
+      {
+        root = (char**)calloc (n, sizeof(char*));
+      }
+      else
+      {
+        char** newroot = (char**)calloc (n, sizeof(char*));
+	memcpy (newroot, root, old_count * sizeof (char*));
+	free (root);
+	root = newroot;
+      }
+      limit = n;
+    }
+  }
+
 public:
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
@@ -96,36 +139,7 @@ public:
   /// Set vector length to n.
   void SetLength (int n)
   {
-    // Clear all items between new count and old count.
-    int i;
-    for (i = n ; i < count ; i++)
-    { 
-      root[i] = 0;
-    }
-
-    int old_count = count;
-    count = n;
-
-    if (n > limit || (limit > threshold && n < limit - threshold))
-    {
-      n = ((n + threshold - 1) / threshold ) * threshold;
-      if (!n)
-      {
-        DeleteAll ();
-      }
-      else if (root == 0)
-      {
-        root = (char**)calloc (n, sizeof(char*));
-      }
-      else
-      {
-        char** newroot = (char**)calloc (n, sizeof(char*));
-	memcpy (newroot, root, old_count * sizeof (char*));
-	free (root);
-	root = newroot;
-      }
-      limit = n;
-    }
+    SetLength(n);
   }
 
   /// Query vector length.
@@ -221,8 +235,8 @@ public:
   char* Pop ()
   {
     char* ret = root [count - 1];
-    root [count-1] = 0;
-    SetLength (count - 1);
+    root [count - 1] = 0;
+    SetLength (count - 1, false);
     return ret;
   }
 
@@ -263,7 +277,7 @@ public:
         memmove (&root [n], &root [n + 1], nmove * sizeof (char*));
 	root[count-1] = 0;	// Clear last element to prevent deletion.
       }
-      SetLength (ncount);
+      SetLength (ncount, false);
     }
     return rc;
   }
