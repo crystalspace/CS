@@ -26,6 +26,7 @@ chronological order.
 	      header files, such as cssysdef.h, scf.h, etc.
 	- res added an example on how to obtain the global string set to the
 	  iStringSet doxygen docu.
+        - Matze fixed a jam install bug for commandlinetools on OS/X
 13-Jul-2004
 	- Eric Sunshine changed cspace.i so that it no longer exports any
 	  va_list functions, such as csPrintfV(), PerformExtensionV(),
