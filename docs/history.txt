@@ -31,6 +31,13 @@ The history order is reversed so that new features are at the top.
 	    - Added several new useful methods.
 	    - Generally cleaned up and unified the code.
 	- Updated documentation about the new csArray class.
+	- Anders Stenberg added first version of CG shader plugin. It can 
+	  currently handle both vertex and fragment programs, and use textures 
+	  supplied by the material. Shader variables can be bound to CG variables. 
+	  Features missing include:
+	  * Better handling of passing matrices into CG
+	  * Fetching "global" textures directly from the engine by name
+	  * Effective code (totally unoptimized now)
 1-Feb-2003
 	- Marten Svanfeldt completly rewrote the renderbuffer manager using
 	  the VAR extension on Nvidia-cards

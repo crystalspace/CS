@@ -129,6 +129,7 @@ struct iShaderVariable : iBase
   virtual VariableType GetType() = 0;
   virtual void SetType(VariableType) = 0;
 
+  virtual void SetName(const char*) = 0;
   virtual const char* GetName() = 0;
   virtual bool GetValue(int& value) = 0;
   virtual bool GetValue(float& value) = 0;
@@ -278,7 +279,7 @@ struct iShaderProgram : iBase
 SCF_VERSION(iShaderProgramPlugin, 0,0,1);
 struct iShaderProgramPlugin : iBase
 {
-  virtual csPtr<iShaderProgram> CreateProgram() = 0  ;
+  virtual csPtr<iShaderProgram> CreateProgram(const char* type) = 0  ;
   virtual bool SupportType(const char* type) = 0;
   virtual void Open() = 0;
 };
