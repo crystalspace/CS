@@ -21,6 +21,7 @@
 #include "iutil/cfgmgr.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
+#include "iutil/cmdline.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include <stdarg.h>
@@ -467,9 +468,29 @@ bool csPlatformShutdown(iObjectRegistry* r)
 }
 
 Win32Assistant::Win32Assistant (iObjectRegistry* r) :
-  need_console(false), EventOutlet(0)
+#ifdef CS_DEBUG
+  need_console(true), 
+#else
+  need_console(false), 
+#endif
+  EventOutlet(0)
 {
   SCF_CONSTRUCT_IBASE(0);
+
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (r,
+						   iCommandLineParser);
+  if (cmdline->GetOption ("console")) need_console = true;
+  if (cmdline->GetOption ("noconsole")) need_console = false;
+  cmdline->DecRef ();
+
+  if (need_console)
+  {
+    // @@@ if we are started from the command prompt, is there a way
+    //     to use that console ?
+    AllocConsole();
+    freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
+    freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
+  }
 
   registry = r;
   registry->IncRef();
@@ -479,7 +500,10 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 
   WNDCLASS wc;
   wc.hCursor        = NULL;
-  wc.hIcon          = LoadIcon (NULL, IDI_APPLICATION);
+  // try the app icon...
+  wc.hIcon          = LoadIcon (ModuleHandle, MAKEINTRESOURCE(1));
+  // not?
+  if (!wc.hIcon) wc.hIcon = LoadIcon (NULL, IDI_APPLICATION);
   wc.lpszMenuName   = NULL;
   wc.lpszClassName  = CS_WIN32_WINDOW_CLASS_NAME;
   wc.hbrBackground  = 0;
