@@ -11,6 +11,7 @@ The history order is reversed so that new features are at the top.
 	    - Added csString to those classes wrapped by Swig (same change
 	      also made to Python module).
 	    - Uncommented the plugin from user.mak.
+	- Oktal fixed a typo and a missing #include in unix/instpath.cpp.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.

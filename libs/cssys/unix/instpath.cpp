@@ -26,6 +26,7 @@
 #include "csutil/util.h"
 
 #include "cssys/sysfunc.h"
+#include "cssys/syspath.h"
 
 // these defines should be set by the configure script
 
@@ -91,7 +92,7 @@ char* csGetConfigPath ()
   return 0;
 }
 
-csPluginPath* csGetPluginPaths ()
+csPluginPaths* csGetPluginPaths ()
 {
   csPluginPaths* paths = new csPluginPaths;
   const char* crystal = getenv ("CRYSTAL");
