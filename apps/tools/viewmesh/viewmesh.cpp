@@ -42,6 +42,7 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
+#include "iengine/region.h"
 #include "imesh/thing.h"
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
@@ -122,7 +123,7 @@ void ViewMesh::Help ()
   printf ("  -L=<file>          Load a library file (for textures/materials)\n");
   printf ("  -Scale=<ratio>     Scale the Object\n");
   printf ("  -RoomSize=<units>  Radius and height (4*) of the room (default 5)\n");
-  printf ("  <meshfile>         Load the specified mesh object\n");
+  printf ("  <file>             Load the specified mesh object (meshfact or library)\n");
 }
 
 /* This is the data we keep for modal processing */
@@ -552,12 +553,35 @@ bool ViewMesh::LoadSprite (const char *filename, float scale)
     VFS->ChDir (dir);
   }
 
-  csRef<iMeshFactoryWrapper> imeshfactwrap (
-  	loader->LoadMeshObjectFactory (fn));
+  iBase* result;
+  iRegion* region = engine->CreateRegion ("viewmesh_region");
+  bool rc = loader->Load (fn, result, region, false, false);
   delete[] path;
 
-  if (!imeshfactwrap)
+  if (!rc)
     return false;
+
+  csRef<iMeshFactoryWrapper> imeshfactwrap;
+  if (result == 0)
+  {
+    // Library file. Find the first factory in our region.
+    iMeshFactoryList* factories = engine->GetMeshFactories ();
+    int i;
+    for (i = 0 ; i < factories->GetCount () ; i++)
+    {
+      iMeshFactoryWrapper* f = factories->Get (i);
+      if (region->IsInRegion (f->QueryObject ()))
+      {
+        imeshfactwrap = f;
+	break;
+      }
+    }
+  }
+  if (!imeshfactwrap)
+  {
+    imeshfactwrap = SCF_QUERY_INTERFACE (result, iMeshFactoryWrapper);
+  }
+  if (!imeshfactwrap) return false;
 
   // eventually remove the old sprite
   // FIXME: This badly fails if you load the same object again!

@@ -6,7 +6,7 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-03-Dec-2004
+3-Dec-2004
 	- Jorrit removed the GetValueNames() from iKeyValuePair again as it
 	  is illegal to return a csArray directly in an SCF interface (due
 	  to inter-plugin memory management issues).
@@ -18,7 +18,9 @@ chronological order.
 	  back into iKeyValuePair using the proper iStringArray and re-enabled
 	  WriteKey() in the syntax service.
 	- Squee changed GetShades() in csGradientShades to return a reference.
-02-Dec-2004
+	- Jorrit added support for loading library files to viewmesh. In
+	  that case the first mesh factory in that library will be shown.
+2-Dec-2004
 	- Eric Sunshine fixed the various extension checks in glextmanager.h so
 	  that they won't crash if glGetString(GL_EXTENSIONS) and/or
 	  wglGetExtensionsStringARB() return a null pointer for some reason.
@@ -33,7 +35,7 @@ chronological order.
 	  fixed some bugs in cssaver, though there's plenty more to be done.
 	- Squee added 'saveworld' command to the walktest console to easily test
 	  cssaver plugin.
-01-Dec-2004
+1-Dec-2004
 	- res added a patch from Brendan Costa adding support for underline
 	  position, underline thickness and line height to iFont.
 	- res fixed the Win32 keyboard handling to emit Shift autorepeat 
@@ -57,7 +59,7 @@ chronological order.
 	  render speed. You can enable this option in thing.cfg (uncomment
 	  the EnableLightmaps=false line) or you can use the
 	  '-nolightmapping' commandline option.
-        - res added shared libs support for unix platforms.
+	- res added shared libs support for unix platforms.
 29-Nov-2004
 	- res changed the static variable cleanup code to employ a variable
 	  with a pointer to the cleanup function instead of using it directly.
