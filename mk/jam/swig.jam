@@ -26,7 +26,7 @@ if $(CMD.SWIG)
     local cppfile = $(<:S=.cpp) ;
     
     C++ $(object) : $(cppfile) ;
-    SwigHelp $(cppfile) : $(<) ;
+    Swig $(cppfile) : $(<) ;
 
     return $(object) ;
   }
