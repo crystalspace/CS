@@ -2,7 +2,7 @@
 # to build the a shaderpgrogram plugin for fixed function pipeline -- softshader
 
 # Driver description
-DESCRIPTION.softshader = Crystal Space Render3d Shaderplugin for software renderer
+DESCRIPTION.softshader = Crystal Space software renderer shader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
