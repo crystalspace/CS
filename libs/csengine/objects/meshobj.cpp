@@ -394,7 +394,9 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
       }
     }
   }
+  c->SetParentContainer ((csMeshWrapper*)scfParent);
   scfParent->GetChildren ().Push (c);
+  c->GetMovable ().SetParent (&scfParent->movable);
 }
 
 //--------------------------------------------------------------------------
