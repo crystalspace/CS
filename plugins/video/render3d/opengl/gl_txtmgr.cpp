@@ -1,3 +1,4 @@
+
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
 
@@ -28,70 +29,111 @@
 #include "csgfx/memimage.h"
 #include "ivaria/reporter.h"
 #include "csgfx/xorpat.h"
+#include "csutil/util.h"
+#include "csgfx/csimgvec.h"
 
 #include "glextmanager.h"
-//---------------------------------------------------------------------------
 
-csGLTexture::csGLTexture (csTextureHandle *Parent, iImage *Image)
-  : csTexture (Parent)
+// csGLTexture stuff
+
+csGLTexture::csGLTexture(csGLTextureHandle *p)
 {
-  DG_TYPE (this, "csGLTexture");
+  w = h = d = size = 0;
+  image_data = 0;
+  Parent = p;
   image_data = NULL;
-  w = Image->GetWidth ();
-  h = Image->GetHeight ();
-  compute_masks ();
   size = 0;
   compressed = GL_FALSE;
 }
 
-csGLTexture::~csGLTexture ()
+csGLTexture::~csGLTexture()
 {
-  delete [] image_data;
+  if(image_data)
+    delete[] image_data;
+}
+/*
+*
+* New iTextureHandle Implementation
+* done by Phil Aumayr (phil@rarebyte.com)
+*
+*/
+SCF_IMPLEMENT_IBASE(csGLTextureHandle)
+  SCF_IMPLEMENTS_INTERFACE(iTextureHandle)
+SCF_IMPLEMENT_IBASE_END
+
+csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
+    GLenum sourceFormat, csGLRender3D *iR3D)
+{
+  this->sourceFormat = sourceFormat;
+  this->R3D = iR3D;
+  this->flags = flags;
+  this->target = target;
+  cachedata = 0;
+  
+
+  images = new csImageVector();
+  (*images)[0] = image;
 }
 
-//---------------------------------------------------------------------------
+csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int target,
+    GLenum sourceFormat, csGLRender3D *iR3D)
+{
+  images = image;
+  
+  this->flags = flags;
+  this->target = target;
+  this->sourceFormat = sourceFormat;
+  this->R3D = iR3D;
+}
 
-// make sure the lenient versions are listed ahead of specific ones
-CS_GL_FORMAT_TABLE (csGLTextureManager::glformats)
-  CS_GL_FORMAT (GL_RGBA, GL_RGBA, 4, 0)
-  CS_GL_FORMAT (GL_RGBA8,GL_RGBA,  4, 4)
-  CS_GL_FORMAT (GL_RGB5_A1, GL_RGBA, 4, 2)
-  CS_GL_FORMAT (GL_RGB10_A2, GL_RGBA, 4, 4)
-  CS_GL_FORMAT (GL_RGBA16,GL_RGBA, 4, 8)
-  CS_GL_FORMAT (GL_RGB, GL_RGB, 3, 0)
-  CS_GL_FORMAT (GL_RGB8, GL_RGB, 3, 3)
-  CS_GL_FORMAT (GL_RGB10, GL_RGB, 3, 4)
-  CS_GL_FORMAT (GL_RGB16, GL_RGB, 3, 6)
-  CS_GL_FORMAT (GL_RGB4, GL_RGB, 3, 2)
-  CS_GL_FORMAT (GL_RGB5, GL_RGB, 3, 2)
-  CS_GL_FORMAT (GL_R3_G3_B2, GL_RGB, 3, 1)
-  CS_GL_FORMAT (GL_RGBA2, GL_RGBA, 4, 1)
-  CS_GL_FORMAT (GL_ALPHA, GL_ALPHA, 1, 1)
-  CS_GL_FORMAT (GL_ALPHA4, GL_ALPHA, 1, 1)
-  CS_GL_FORMAT (GL_ALPHA8, GL_ALPHA, 1, 1)
-  CS_GL_FORMAT (GL_ALPHA12, GL_ALPHA, 1, 2)
-  CS_GL_FORMAT (GL_ALPHA16, GL_ALPHA, 1, 2)
-  CS_GL_FORMAT (GL_BLUE, GL_BLUE, 1, 1)
-  CS_GL_FORMAT (GL_GREEN, GL_GREEN, 1, 1)
-  CS_GL_FORMAT (GL_RED, GL_RED, 1, 1)
-  CS_GL_FORMAT (GL_INTENSITY, GL_INTENSITY, 1, 1)
-  CS_GL_FORMAT (GL_INTENSITY4, GL_INTENSITY, 1, 1)
-  CS_GL_FORMAT (GL_INTENSITY8, GL_INTENSITY, 1, 1)
-  CS_GL_FORMAT (GL_INTENSITY12, GL_INTENSITY, 1, 2)
-  CS_GL_FORMAT (GL_INTENSITY16, GL_INTENSITY, 1, 2)
-  CS_GL_FORMAT (GL_LUMINANCE, GL_LUMINANCE, 1, 1)
-  CS_GL_FORMAT (GL_LUMINANCE4, GL_LUMINANCE, 1, 1)
-  CS_GL_FORMAT (GL_LUMINANCE8, GL_LUMINANCE, 1, 1)
-  CS_GL_FORMAT (GL_LUMINANCE12, GL_LUMINANCE, 1, 2)
-  CS_GL_FORMAT (GL_LUMINANCE16, GL_LUMINANCE, 1, 2)
-  CS_GL_FORMAT (GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, 2, 2)
-  CS_GL_FORMAT (GL_LUMINANCE4_ALPHA4, GL_LUMINANCE_ALPHA, 2, 1)
-  CS_GL_FORMAT (GL_LUMINANCE6_ALPHA2, GL_LUMINANCE_ALPHA, 2, 1)
-  CS_GL_FORMAT (GL_LUMINANCE8_ALPHA8, GL_LUMINANCE_ALPHA, 2, 2)
-  CS_GL_FORMAT (GL_LUMINANCE12_ALPHA4, GL_LUMINANCE_ALPHA, 2, 2)
-  CS_GL_FORMAT (GL_LUMINANCE12_ALPHA12, GL_LUMINANCE_ALPHA, 2, 3)
-  CS_GL_FORMAT (GL_LUMINANCE16_ALPHA16, GL_LUMINANCE_ALPHA, 2, 4)
-CS_GL_FORMAT_TABLE_END
+void csGLTextureManager::DetermineStorageSizes ()
+{
+  int i=-1;
+  int d = pfmt.PixelBytes;
+  while (glformats[++i].components)
+  {
+    if (glformats[i].texelbytes == 0)
+    {
+      //glformats[i].texelbytes = glformats[i].components * 8; // @@@ why *8?
+      glformats[i].texelbytes = glformats[i].components;
+      if (glformats[i].texelbytes > d) glformats[i].texelbytes = d;
+    }
+  }
+}
+
+void csGLTextureHandle::Clear()
+{
+}
+
+void csGLTextureHandle::FreeImage ()
+{
+  images = NULL;
+}
+
+int csGLTextureHandle::GetFlags ()
+{
+  return flags;
+}
+
+void csGLTextureHandle::SetKeyColor (bool Enable)
+{
+  transp_color.alpha = (uint8) Enable;
+  texupdate_needed = true;
+}
+
+void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
+{
+  transp_color.red = red;
+  transp_color.green = green;
+  transp_color.blue = blue;
+  transp_color.alpha = 1;
+  texupdate_needed = true;
+}
+
+bool csGLTextureHandle::GetKeyColor ()
+{
+  return(transp_color.alpha == 1);
+}
 
 bool csGLTextureHandle::FindFormatType ()
 {
@@ -143,9 +185,9 @@ bool csGLTextureHandle::FindFormatType ()
 
     if (sourceFormat == GL_RGBA)
     {
-      if (!transp)
+      if (!has_alpha)
       {
-	if (!(image->GetFormat () & CS_IMGFMT_ALPHA))
+	if (!((*images)[0]->GetFormat () & CS_IMGFMT_ALPHA))
 	{
 	  sourceFormat = GL_RGB;
 	  // Again determine the formatidx and possible change it if we
@@ -179,8 +221,8 @@ bool csGLTextureHandle::FindFormatType ()
 	  != targetFormat; i++);
 	formatidx = i;
 
-	int pixels = image->GetWidth () * image->GetHeight ();
-	csRGBpixel *_src = (csRGBpixel *)image->GetImageData ();
+	int pixels = (*images)[0]->GetWidth () * (*images)[0]->GetHeight ();
+	csRGBpixel *_src = (csRGBpixel *)(*images)[0]->GetImageData ();
 
 	while (pixels--)
 	{
@@ -194,9 +236,9 @@ bool csGLTextureHandle::FindFormatType ()
 	// Now we draw borders inside all keycolored areas.
 	// This removes the halos of keycolor when using bilinear filtering
 	int h, rows, w, cols;
-	h = rows = image->GetHeight ();
-	w = image->GetWidth();
-	_src = (csRGBpixel *)image->GetImageData ();
+	h = rows = (*images)[0]->GetHeight ();
+	w = (*images)[0]->GetWidth();
+	_src = (csRGBpixel *)(*images)[0]->GetImageData ();
 	while (rows--)
 	{
 	  cols = w;
@@ -279,407 +321,344 @@ bool csGLTextureHandle::FindFormatType ()
   return true;
 }
 
-bool csGLTextureHandle::transform (iImage *Image, csGLTexture *tex)
+void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue)
 {
-  uint8 *h;
-  uint8 *&image_data = tex->get_image_data ();
-  csRGBpixel *data = (csRGBpixel *)Image->GetImageData ();
-  int n = Image->GetWidth ()*Image->GetHeight ();;
-  int i=0;
-  int nCompo;
+  red = transp_color.red;
+  green = transp_color.green;
+  blue = transp_color.blue;
+}
 
-  // First we determine the exact sourceformat if targetformat is given
-  // without bit specifications.
-  switch (csGLTextureManager::glformats[formatidx].sourceFormat)
+bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh)
+{
+  if(cachedata)
   {
-    case GL_ALPHA: i++;  // Fall thru
-    case GL_BLUE: i++;  // Fall thru
-    case GL_GREEN: i++;  // Fall thru
-    case GL_RED:
-      image_data = new uint8 [n];
-      h = (uint8*)data;
-      h += i;
-      for (i=0; i<n; i++, h += 4)
-        *image_data++ = *h;
-      break;
-    case GL_INTENSITY:
-      image_data = new uint8 [n];
-      for (i=0; i<n; i++, data++)
-        *image_data++ = data->Intensity ();
-      break;
-    case GL_LUMINANCE:
-      image_data = new uint8 [n];
-      for (i=0; i<n; i++, data++)
-        *image_data++ = data->Luminance ();
-      break;
-    case GL_LUMINANCE_ALPHA:
-      image_data = new uint8 [n*2];
-      for (i=0; i<n; i++, data++)
-      {
-        *image_data++ = data->Luminance ();
-        *image_data++ = data->alpha;
-      }
-      break;
-    default: // RGB/RGBA branch
-      switch (sourceType)
-      {
-        case GL_UNSIGNED_BYTE:
-	  nCompo = csGLTextureManager::glformats[formatidx].components;
-	  h = image_data = new uint8 [n*nCompo];
-	  for (i=0; i<n; i++, data++, h+=nCompo)
-	    memcpy (h, data, nCompo);
-	  break;
-        case GL_UNSIGNED_BYTE_3_3_2:
-	  h = image_data = new uint8 [n];
-	  for (i=0; i<n; i++, data++)
-	    *h++ = (data->red & 0xe0) | (data->green & 0xe0)>>5
-	      | (data->blue >> 6);
-	  break;
-        case GL_UNSIGNED_SHORT_4_4_4_4:
-	  {
-	    image_data = new uint8 [n*2];
-	    unsigned short *ush = (unsigned short *)image_data;
-	    for (i=0; i<n; i++, data++)
-	      *ush++ = ((unsigned short)(data->red & 0xf0))<<8
-		| ((unsigned short)(data->green & 0xf0))<<4
-		| (unsigned short)(data->blue & 0xf0)
-		| (unsigned short)(data->alpha >> 4) ;
-	  }
-	  break;
-        case GL_UNSIGNED_SHORT_5_5_5_1:
-	  {
-	    image_data = new uint8 [n*2];
-	    unsigned short *ush = (unsigned short *)image_data;
-	    for (i=0; i<n; i++, data++)
-	    *ush++ = ((unsigned short)(data->red & 0xf8))<<8
-		| ((unsigned short)(data->green & 0xf8))<<3
-		| ((unsigned short)(data->blue & 0xf8))>>2
-		| (unsigned short)(data->alpha >> 7) ;
-	  }
-	  break;
-        case GL_UNSIGNED_SHORT_5_6_5:
-	  {
-	    image_data = new uint8 [n*2];
-	    unsigned short *ush = (unsigned short *)image_data;
-	    for (i=0; i<n; i++, data++)
-	      *ush++ = ((unsigned short)(data->red & 0xf8))<<8
-		| ((unsigned short)(data->green & 0xfc))<<3
-		| (unsigned short)(data->blue >> 3);
-	  }
-	  break;
-        default:
-	  printf ("OpenGL Warning: no sourceType %x\n",
-	  	(unsigned int)sourceType);
-      }
-  }
+    csGLTexture *real_tex = (csGLTexture*) cachedata;
 
-  if (csGLTextureManager::glformats[formatidx].compressedFormat != 0
-    && tex->Compressable ())
-  {
-    GLuint t;
-    glGenTextures (1, &t);
-    glBindTexture (GL_TEXTURE_2D, t);
-    glTexImage2D (GL_TEXTURE_2D, 0,
-      csGLTextureManager::glformats[formatidx].compressedFormat,
-      Image->GetWidth (), Image->GetHeight (), 0,
-      csGLTextureManager::glformats[formatidx].sourceFormat,
-      sourceType, image_data);
-    glGetTexLevelParameteriv (GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_ARB,
-      &tex->compressed);
-
-    /* if the compression has been successful */
-    if (tex->compressed == GL_TRUE)
-    {
-      glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT,
-        &tex->internalFormat);
-      glGetTexLevelParameteriv(GL_TEXTURE_2D, 0,
-        GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB, &tex->size);
-      delete [] image_data;
-      image_data = new uint8 [tex->size];
-      R3D->ext.glGetCompressedTexImageARB (GL_TEXTURE_2D, 0,
-        image_data);
-    }
-    else
-    {
-      tex->size = n * csGLTextureManager::glformats[formatidx].texelbytes;
-    }
-
-    glDeleteTextures (1, &t);
+    // real_tex size has to be multiple of 2
+    mw = real_tex->get_width() >> mipmap;
+    mh = real_tex->get_height() >> mipmap;
   }
   else
+  if(images.IsValid() && (*images)[0].IsValid())
   {
-    tex->size = n * csGLTextureManager::glformats[formatidx].texelbytes;
+    // TODO: implement to get size from image array
   }
+  else
+    return false;
 
-  size += tex->size;
-  return true;
+  return true; 
 }
 
-csGLTextureHandle::csGLTextureHandle (
-  iImage *image, int flags, GLenum sourceFormat, int bpp,
-  csGLRender3D *R3D) : csTextureHandle (image, flags)
+void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 {
-  (csGLTextureHandle::R3D = R3D)->IncRef ();
-  (txtmgr = R3D->txtmgr)->IncRef ();
-  has_alpha = false;
-  this->sourceFormat = sourceFormat;
-  this->bpp = bpp;
-  size = 0;
-  was_render_target = false;
-  DG_TYPE (this, "csGLTextureHandle");
-}
-
-csGLTextureHandle::~csGLTextureHandle ()
-{
-  if (R3D->txtcache)
-    R3D->txtcache->Uncache (this);
-  txtmgr->UnregisterTexture (this);
-  txtmgr->DecRef ();
-  R3D->DecRef ();
-  int i;
-  for (i = vTex.Length ()-1; i >= 0; i--)
+  if(images.IsValid() && (*images)[0].IsValid())
   {
-    if (vTex [i])
-    {
-      DG_UNLINK (this, vTex[i]);
-      delete vTex [i];
-    }
+    mw = (*images)[0]->GetWidth();
+    mh = (*images)[0]->GetHeight();
   }
-  vTex.DeleteAll ();
 }
 
-void csGLTextureHandle::Clear ()
+bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
 {
-}
-
-csTexture *csGLTextureHandle::NewTexture (iImage *Image, bool ismipmap)
-{
-  ismipmap = false;
-  return new csGLTexture (this, Image);
-}
-
-void csGLTextureHandle::ShowFormat ()
-{
-  printf ("TargetFormat: %s, size: %ld\n",
-    csGLTextureManager::glformats[formatidx].name, size);
-}
-
-void csGLTextureHandle::InitTexture (csGLTextureManager *texman,
-           csPixelFormat *pfmt)
-{
-  // Preserve original width/height so that in DrawPixmap subregions of
-  // textures are calculated correctly. In other words, the app writer need
-  // not know about opengl texture size adjustments. smgh
-  if (!image) return;
-
-  orig_width = image->GetWidth ();
-  orig_height = image->GetHeight ();
-
-  // If necessary rescale if bigger than maximum texture size
-  if ((orig_width > texman->max_tex_size) ||
-      (orig_height > texman->max_tex_size))
+  if(cachedata)
   {
-    int nwidth = orig_width;
-    int nheight = orig_height;
-    if (orig_width > texman->max_tex_size) nwidth = texman->max_tex_size;
-    if (orig_height > texman->max_tex_size) nheight = texman->max_tex_size;
-    image->Rescale (nwidth, nheight);
-  }
+    csGLTexture *real_tex = (csGLTexture*) cachedata;
 
+    // real_tex size has to be multiple of 2
+    mw = real_tex->get_width() >> mipmap;
+    mh = real_tex->get_height() >> mipmap;
+    md = real_tex->get_depth() >> mipmap;
+  }
+  else
+  if(images.IsValid() && (*images)[0].IsValid())
+  {
+    // TODO: implement to get size from image array
+  }
+  else
+    return false;
+
+  return true; 
+}
+
+void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
+{
+  if(images.IsValid() && (*images)[0].IsValid())
+  {
+    mw = (*images)[0]->GetWidth();
+    mh = (*images)[0]->GetHeight();
+    md = images->Length();
+  }
+}
+
+void csGLTextureHandle::SetTextureTarget(int target)
+{
+  this->target = target;
+}
+
+void csGLTextureHandle::GetMeanColor (uint8 &red, uint8 &green, uint8 &blue)
+{
+}
+
+void *csGLTextureHandle::GetCacheData ()
+{
+  return cachedata;
+}
+
+void csGLTextureHandle::SetCacheData (void *d)
+{
+  cachedata = d;
+}
+
+void *csGLTextureHandle::GetPrivateObject ()
+{
+  return (csGLTextureHandle *)this;
+}
+
+bool csGLTextureHandle::GetAlphaMap ()
+{
+  return has_alpha;
+}
+
+void csGLTextureHandle::Prepare ()
+{
   // In opengl all textures, even non-mipmapped textures are required
   // to be powers of 2.
   AdjustSizePo2 ();
 
   // Determine the format and type of the source we gonna tranform the data to.
   FindFormatType ();
-  CreateMipmaps ();
+  CreateMipMaps ();
+
 }
 
-void csGLTextureHandle::CreateMipmaps ()
+void csGLTextureHandle::AdjustSizePo2 ()
 {
-  if (!image) return;
+  int i;
+  for(i = 0; i < images->Length(); i++)
+  {
+    int newwidth  = (*images)[i]->GetWidth();
+    int newheight = (*images)[i]->GetHeight();
 
-  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)NULL;
+    if (!csIsPowerOf2(newwidth))
+      newwidth = csFindNearestPowerOf2 ((*images)[i]->GetWidth ()) / 2;
 
-  //  printf ("delete old\n");
+    if (!csIsPowerOf2 (newheight))
+      newheight = csFindNearestPowerOf2 ((*images)[i]->GetHeight ()) / 2;
+
+    if (newwidth != (*images)[i]->GetWidth () || newheight != (*images)[i]->GetHeight ())
+      (*images)[i]->Rescale (newwidth, newheight);
+  }
+}
+
+void csGLTextureHandle::CreateMipMaps()
+{
+
   // Delete existing mipmaps, if any
   int i;
   for (i = vTex.Length ()-1; i >= 0; i--)
   {
     if (vTex [i])
     {
-      DG_UNLINK (this, vTex[i]);
       delete vTex [i];
     }
   }
   vTex.DeleteAll ();
+  
+  // This function assumes that alle images in images have the same dimension / bpp
+  // Calculate how many mip map levels we will need
+  int mipmaplevelcount = 0;
 
-  size = 0;
-  //  printf ("push 0\n");
-  csTexture* ntex = NewTexture (image, false);
-  vTex.Push (ntex);
-  DG_LINK (this, ntex);
-
-  //  printf ("transform 0\n");
-  transform (image, vTex[0]);
-
-  // 2D textures uses just the top-level mipmap
-  if ((flags & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) == CS_TEXTURE_3D)
+  int lwidth, lheight, ldepth;
+  GetOriginalDimensions(lwidth, lheight, ldepth);
+  int ltemp = MAX(lwidth, MAX(lheight, ldepth));
+  while(ltemp)
   {
-    // Create each new level by creating a level 2 mipmap from previous level
-    // we do this down to 1x1 as opengl defines it
+    ltemp >>= 1;
+    mipmaplevelcount++;
+  };
+  // lmipmaplevels now contains the number of mipmaplevels we need
 
-    iImage *prevImage = image;
-    csRef<iImage> thisImage;
+  // For every Mipmaplevel we have to create a csGLTexture
+  // and store it in vTex
+  int lcurmip; 
 
-    int w = prevImage->GetWidth ();
-    int h = prevImage->GetHeight ();
-    int nTex = 0;
+  for(lcurmip = 0; lcurmip < mipmaplevelcount; lcurmip++)
+  {
+    csGLTexture *newtex = new csGLTexture(this);
 
-/*    ComputeMeanColor (vTex[nTex]->get_width (), vTex[nTex]->get_height (),
-          (csRGBpixel *)prevImage->GetImageData ());*/
+    newtex->w = (lwidth > 1) ? lwidth >> lcurmip : 1;
+    newtex->h = (lheight > 1) ? lheight >> lcurmip : 1;
+    newtex->d = (ldepth > 1) ? ldepth >> lcurmip : 1;
 
-    prevImage->IncRef ();
-    while (w != 1 || h != 1)
+    newtex->size = lwidth * lheight * ldepth * csGLTextureManager::glformats[sourceFormat].components;
+    newtex->image_data = new uint8[newtex->size];
+    newtex->internalFormat = csGLTextureManager::glformats[sourceFormat].targetFormat;
+
+
+    int lcurdepth;
+    for(lcurdepth = 0; lcurdepth < ldepth; lcurdepth++)
     {
-      nTex++;
-      //  printf ("make mipmap %d\n", nTex);
-      thisImage = prevImage->MipMap (1, tc);
-      if (txtmgr->sharpen_mipmaps)
-      {
-	thisImage = thisImage->Sharpen (tc, txtmgr->sharpen_mipmaps);
-      }
-      //  printf ("push %d\n", nTex);
-      csTexture* ntex = NewTexture (thisImage, true);
-      vTex.Push (ntex);
-      DG_LINK (this, ntex);
-      //  printf ("transform %d\n", nTex);
-      transform (thisImage, vTex[nTex]);
-      w = thisImage->GetWidth ();
-      h = thisImage->GetHeight ();
-      prevImage->DecRef ();
-      thisImage->IncRef ();
-      prevImage = thisImage;
+      csRef<iImage> tmpimg = (*images)[lcurdepth]->MipMap(lcurmip, 0);
+
+      memcpy(newtex->image_data, 
+        tmpimg->GetImageData(), 
+        tmpimg->GetWidth() * tmpimg->GetHeight() * csGLTextureManager::glformats[sourceFormat].components);
+
+//      tmpimg->DecRef();
     }
-
-    prevImage->DecRef ();
+    vTex.Push (newtex);
   }
-/*  else
-    ComputeMeanColor (vTex[0]->get_width (), vTex[0]->get_height (),
-      (csRGBpixel *)image->GetImageData ());*/
-
 }
-
-void csGLTextureHandle::ComputeMeanColor (int w, int h, csRGBpixel *src)
-{
-  int pixels = w * h;
-  unsigned r = 0, g = 0, b = 0;
-  int count = pixels;
-  CS_ASSERT (pixels > 0);
-  has_alpha = false;
-  while (count--)
-  {
-    csRGBpixel &pix = *src++;
-    r += pix.red;
-    g += pix.green;
-    b += pix.blue;
-    if (pix.alpha < 255)
-      has_alpha = true;
-  }
-  mean_color.red   = r / pixels;
-  mean_color.green = g / pixels;
-  mean_color.blue  = b / pixels;
-}
-
-bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &w, int &h)
-{
-  if (mipmap < vTex.Length ())
-  {
-    w = vTex[mipmap]->get_width ();
-    h = vTex[mipmap]->get_height ();
-    return true;
-  }
-  return false;
-}
-
-void csGLTextureHandle::Prepare ()
-{
-  InitTexture (txtmgr, &txtmgr->pfmt);
-}
-
-class csOFSCbOpenGL : public iOffscreenCanvasCallback
-{
-private:
-  csGLTextureHandle* txt;
-
-public:
-  csOFSCbOpenGL (csGLTextureHandle* txt)
-  {
-    SCF_CONSTRUCT_IBASE (NULL);
-    csOFSCbOpenGL::txt = txt;
-  }
-  virtual ~csOFSCbOpenGL ()
-  {
-  }
-  SCF_DECLARE_IBASE;
-  virtual void FinishDraw (iGraphics2D*)
-  {
-    txt->UpdateTexture ();
-  }
-  virtual void SetRGB (iGraphics2D*, int, int, int, int)
-  {
-  }
-};
-
-
-SCF_IMPLEMENT_IBASE(csOFSCbOpenGL)
-  SCF_IMPLEMENTS_INTERFACE(iOffscreenCanvasCallback)
-SCF_IMPLEMENT_IBASE_END
 
 iGraphics2D* csGLTextureHandle::GetCanvas ()
 {
-  if (!canvas)
-  {
-    csOFSCbOpenGL* ofscb = new csOFSCbOpenGL (this);
-    csGLTexture *t = vTex[0];
-    canvas = txtmgr->R3D->GetDriver2D ()->CreateOffscreenCanvas (
-  	t->get_image_data (), t->get_width (), t->get_height (), 32,
-	ofscb);
-    ofscb->DecRef ();
-  }
-  return canvas;
+  return R3D->GetDriver2D();
 }
 
-void csGLTextureHandle::UpdateTexture ()
+/*
+*
+*New iMaterialHandle Implementation
+*done by Phil Aumayr (phil@rarebyte.com)
+*
+*/
+
+SCF_IMPLEMENT_IBASE (csGLMaterialHandle)
+  SCF_IMPLEMENTS_INTERFACE (iMaterialHandle)
+SCF_IMPLEMENT_IBASE_END
+
+csGLMaterialHandle::csGLMaterialHandle (iMaterial* m, csGLTextureManager *parent)
 {
-  if (R3D->txtcache)
-    R3D->txtcache->Uncache (this);
+  SCF_CONSTRUCT_IBASE (NULL);
+
+  num_texture_layers = 0;
+  material = m;
+  if (material != 0)
+  {
+    texture = material->GetTexture ();
+    material->GetReflection (diffuse, ambient, reflection);
+    material->GetFlatColor (flat_color);
+    num_texture_layers = material->GetTextureLayerCount ();
+    if (num_texture_layers > CS_MATERIAL_MAX_TEXTURE_LAYERS) num_texture_layers = CS_MATERIAL_MAX_TEXTURE_LAYERS;
+    int i;
+    for (i = 0 ; i < num_texture_layers ; i++)
+    {
+      texture_layers[i] = *(material->GetTextureLayer (i));
+      texture_layer_translate[i] =
+	texture_layers[i].uscale != 1 ||
+	texture_layers[i].vscale != 1 ||
+	texture_layers[i].ushift != 0 ||
+	texture_layers[i].vshift != 0;
+    }
+  }
+  texman = parent;
 }
 
-//---------------------------------------------------------------------------
+csGLMaterialHandle::csGLMaterialHandle (iTextureHandle* t, csGLTextureManager *parent)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  num_texture_layers = 0;
+  diffuse = 0.7; ambient = 0; reflection = 0;
+  texture = t;
+  texman = parent;
+}
+
+csGLMaterialHandle::~csGLMaterialHandle ()
+{
+  FreeMaterial ();
+  texman->UnregisterMaterial (this);
+}
+
+void csGLMaterialHandle::FreeMaterial ()
+{
+  material = 0;
+}
+
+void csGLMaterialHandle::Prepare ()
+{
+  if (material)
+  {
+    if (texture != material->GetTexture())
+    {
+      texture = material->GetTexture ();
+    }
+    material->GetReflection (diffuse, ambient, reflection);
+    material->GetFlatColor (flat_color);
+  }
+}
+
+/*
+*
+* New iTextureManager Implementation
+* done by Phil Aumayr (phil@rarebyte.com)
+*
+*/
+
+
+// make sure the lenient versions are listed ahead of specific ones
+CS_GL_FORMAT_TABLE (csGLTextureManager::glformats)
+  CS_GL_FORMAT (GL_RGBA, GL_RGBA, 4, 0)
+  CS_GL_FORMAT (GL_RGBA8,GL_RGBA,  4, 4)
+  CS_GL_FORMAT (GL_RGB5_A1, GL_RGBA, 4, 2)
+  CS_GL_FORMAT (GL_RGB10_A2, GL_RGBA, 4, 4)
+  CS_GL_FORMAT (GL_RGBA16,GL_RGBA, 4, 8)
+  CS_GL_FORMAT (GL_RGB, GL_RGB, 3, 0)
+  CS_GL_FORMAT (GL_RGB8, GL_RGB, 3, 3)
+  CS_GL_FORMAT (GL_RGB10, GL_RGB, 3, 4)
+  CS_GL_FORMAT (GL_RGB16, GL_RGB, 3, 6)
+  CS_GL_FORMAT (GL_RGB4, GL_RGB, 3, 2)
+  CS_GL_FORMAT (GL_RGB5, GL_RGB, 3, 2)
+  CS_GL_FORMAT (GL_R3_G3_B2, GL_RGB, 3, 1)
+  CS_GL_FORMAT (GL_RGBA2, GL_RGBA, 4, 1)
+  CS_GL_FORMAT (GL_ALPHA, GL_ALPHA, 1, 1)
+  CS_GL_FORMAT (GL_ALPHA4, GL_ALPHA, 1, 1)
+  CS_GL_FORMAT (GL_ALPHA8, GL_ALPHA, 1, 1)
+  CS_GL_FORMAT (GL_ALPHA12, GL_ALPHA, 1, 2)
+  CS_GL_FORMAT (GL_ALPHA16, GL_ALPHA, 1, 2)
+  CS_GL_FORMAT (GL_BLUE, GL_BLUE, 1, 1)
+  CS_GL_FORMAT (GL_GREEN, GL_GREEN, 1, 1)
+  CS_GL_FORMAT (GL_RED, GL_RED, 1, 1)
+  CS_GL_FORMAT (GL_INTENSITY, GL_INTENSITY, 1, 1)
+  CS_GL_FORMAT (GL_INTENSITY4, GL_INTENSITY, 1, 1)
+  CS_GL_FORMAT (GL_INTENSITY8, GL_INTENSITY, 1, 1)
+  CS_GL_FORMAT (GL_INTENSITY12, GL_INTENSITY, 1, 2)
+  CS_GL_FORMAT (GL_INTENSITY16, GL_INTENSITY, 1, 2)
+  CS_GL_FORMAT (GL_LUMINANCE, GL_LUMINANCE, 1, 1)
+  CS_GL_FORMAT (GL_LUMINANCE4, GL_LUMINANCE, 1, 1)
+  CS_GL_FORMAT (GL_LUMINANCE8, GL_LUMINANCE, 1, 1)
+  CS_GL_FORMAT (GL_LUMINANCE12, GL_LUMINANCE, 1, 2)
+  CS_GL_FORMAT (GL_LUMINANCE16, GL_LUMINANCE, 1, 2)
+  CS_GL_FORMAT (GL_LUMINANCE_ALPHA, GL_LUMINANCE_ALPHA, 2, 2)
+  CS_GL_FORMAT (GL_LUMINANCE4_ALPHA4, GL_LUMINANCE_ALPHA, 2, 1)
+  CS_GL_FORMAT (GL_LUMINANCE6_ALPHA2, GL_LUMINANCE_ALPHA, 2, 1)
+  CS_GL_FORMAT (GL_LUMINANCE8_ALPHA8, GL_LUMINANCE_ALPHA, 2, 2)
+  CS_GL_FORMAT (GL_LUMINANCE12_ALPHA4, GL_LUMINANCE_ALPHA, 2, 2)
+  CS_GL_FORMAT (GL_LUMINANCE12_ALPHA12, GL_LUMINANCE_ALPHA, 2, 3)
+  CS_GL_FORMAT (GL_LUMINANCE16_ALPHA16, GL_LUMINANCE_ALPHA, 2, 4)
+CS_GL_FORMAT_TABLE_END
+
+
+SCF_IMPLEMENT_IBASE(csGLTextureManager)
+  SCF_IMPLEMENTS_INTERFACE(iTextureManager)
+SCF_IMPLEMENT_IBASE_END
 
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
-  iGraphics2D* iG2D, iConfigFile *config, csGLRender3D *iR3D)
-  : csTextureManager (object_reg, iG2D)
+        iGraphics2D* iG2D, iConfigFile *config,
+        csGLRender3D *iR3D) : textures (16, 16), materials (16, 16)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
+  csGLTextureManager::object_reg = object_reg;
+  verbose = false;
+
+  pfmt = *iG2D->GetPixelFormat ();
+
   R3D = iR3D;
-  R3D->IncRef ();
   max_tex_size = R3D->GetMaxTextureSize ();
   read_config (config);
   Clear ();
 }
 
-csGLTextureManager::~csGLTextureManager ()
-{
-  csTextureManager::Clear ();
-  R3D->DecRef ();
-}
-
 void csGLTextureManager::read_config (iConfigFile *config)
 {
-  sharpen_mipmaps = config->GetInt
-        ("Video.OpenGL.SharpenMipmaps", 0);
-
   csRef<iConfigIterator> it (config->Enumerate ("Video.OpenGL.TargetFormat"));
   while (it->Next ())
     AlterTargetFormat (it->GetKey (true)+1, it->GetStr ());
@@ -687,7 +666,7 @@ void csGLTextureManager::read_config (iConfigFile *config)
 
 void csGLTextureManager::AlterTargetFormat (const char *oldTarget, const char *newTarget)
 {
-  // first find the old target
+    // first find the old target
   int theOld=0;
   while (glformats[theOld].name && strcmp (glformats[theOld].name, oldTarget))
     theOld++;
@@ -743,27 +722,44 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget, const char *n
     }
   }
 }
-
-void csGLTextureManager::DetermineStorageSizes ()
+void csGLTextureManager::Clear()
 {
-  int i=-1;
-  int d = pfmt.PixelBytes;
-  while (glformats[++i].components)
-  {
-    if (glformats[i].texelbytes == 0)
-    {
-      //glformats[i].texelbytes = glformats[i].components * 8; // @@@ why *8?
-      glformats[i].texelbytes = glformats[i].components;
-      if (glformats[i].texelbytes > d) glformats[i].texelbytes = d;
-    }
-  }
+  for (int i=0; i < textures.Length (); i++)
+    ((csGLTextureHandle *)textures.Get (i))->Clear ();
 }
 
-void csGLTextureManager::SetPixelFormat (csPixelFormat &PixelFormat)
+void csGLTextureManager::UnregisterMaterial (csGLMaterialHandle* handle)
 {
-  pfmt = PixelFormat;
-  max_tex_size = R3D->GetMaxTextureSize ();
-  DetermineStorageSizes ();
+  int idx = materials.Find (handle);
+  if (idx >= 0) materials.Delete (idx);
+}
+
+csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image, int flags)
+{
+  if (!image)
+  {
+    R3D->Report(CS_REPORTER_SEVERITY_BUG,
+      "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with NULL image!");
+    return NULL;
+  }
+
+  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, iTextureHandle::CS_TEX_IMG_2D, GL_RGBA, R3D);
+  textures.Push(txt);
+  return csPtr<iTextureHandle> (txt);
+}
+
+csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image, int flags, int target)
+{
+  if (!image)
+  {
+    R3D->Report(CS_REPORTER_SEVERITY_BUG,
+      "BAAAAAAAD!!! csGLTextureManager::RegisterTexture with NULL image array!");
+    return NULL;
+  }
+
+  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, target, GL_RGBA, R3D);
+  textures.Push(txt);
+  return csPtr<iTextureHandle> (txt);
 }
 
 void csGLTextureManager::PrepareTextures ()
@@ -774,45 +770,57 @@ void csGLTextureManager::PrepareTextures ()
     textures.Get (i)->Prepare ();
 }
 
-csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (
-	iImage* image, int flags)
-{
-  if (!image)
-  {
-    R3D->Report(CS_REPORTER_SEVERITY_BUG,
-      "BAAAD!!! csGLTextureManager::RegisterTexture with NULL image!");
-
-    csRef<iImage> im (csCreateXORPatternImage (32, 32, 5));
-    image = im;
-    im->IncRef ();	// Prevent smart pointer release.
-  }
-
-  csGLTextureHandle* txt = new csGLTextureHandle (
-  	image, flags, GL_RGBA, pfmt.PixelBytes*8, R3D);
-  textures.Push (txt);
-  return csPtr<iTextureHandle> (txt);
-}
-
-void csGLTextureManager::UnregisterTexture (csGLTextureHandle *handle)
-{
-  int idx = textures.Find (handle);
-  if (idx >= 0) textures.Delete (idx);
-}
-
-void csGLTextureManager::Clear ()
-{
-  for (int i=0; i < textures.Length (); i++)
-    ((csGLTextureHandle *)textures.Get (i))->Clear ();
-
-  csTextureManager::Clear ();
-}
-
 void csGLTextureManager::FreeImages ()
 {
   int i;
   for (i = 0 ; i < textures.Length () ; i++)
-  {
     textures.Get (i)->FreeImage ();
-  }
 }
 
+csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (iMaterial* material)
+{
+  if (!material) return 0;
+  csGLMaterialHandle *mat = new csGLMaterialHandle (material, this);
+  materials.Push (mat);
+  return csPtr<iMaterialHandle> (mat);
+}
+
+csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
+      iTextureHandle* txthandle)
+{
+  if (!txthandle) return 0;
+  csGLMaterialHandle *mat = new csGLMaterialHandle (txthandle, this);
+  materials.Push (mat);
+  return csPtr<iMaterialHandle> (mat);
+}
+
+void csGLTextureManager::PrepareMaterials ()
+{
+  int i;
+  for (i = 0; i < materials.Length (); i++)
+    materials.Get (i)->Prepare ();
+}
+
+void csGLTextureManager::FreeMaterials ()
+{
+  int i;
+  for (i = 0; i < materials.Length (); i++)
+    materials.Get (i)->FreeMaterial ();
+}
+
+void csGLTextureManager::SetVerbose (bool vb)
+{
+  verbose = vb;
+}
+
+int csGLTextureManager::GetTextureFormat ()
+{
+  return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;
+}
+
+void csGLTextureManager::SetPixelFormat (csPixelFormat &PixelFormat)
+{
+  pfmt = PixelFormat;
+  max_tex_size = R3D->GetMaxTextureSize ();
+  DetermineStorageSizes ();
+}

@@ -53,6 +53,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "gl_txtmgr.h"
 #include "glextmanager.h"
 
+#include "../common/txtmgr.h"
+
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
 
 
