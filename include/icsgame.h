@@ -458,6 +458,16 @@ struct iGameCore : public iBase
                                 double delay, bool Persistant) = 0;
 
   /**
+   * Send an event directly to all entitie within a radius around a 
+   * position.
+   */
+  virtual void SendEventToGroup(iPosition* pCenter, 
+                                csVector3  Radius,
+                                const char* EventName,
+                                iAttributeList* InPar) = 0;
+
+
+  /**
    * Revoke an event that has been sent delayed to an entity and that
    * has not yet arrived. If there are multiple Events with the same
    * name, that wait to be delivered, all of them are removed.
@@ -471,6 +481,11 @@ struct iGameCore : public iBase
    */
   virtual iEntityIterator* GetAllObjectsWithinBox (iPosition* Center,
   	const csVector3& Radius) = 0;
+
+  /**
+   * Redirect the all user input to go as events to the specified entity
+   */
+  virtual void SetInputFocus(iEntity* pEntity) = 0;
 
   /// Try to store all relevant data to the DataSaver
   virtual void StoreState(iDataSaver* pSaver) = 0;
