@@ -735,27 +735,26 @@ void csGraphics3DOGLCommon::PerfTest ()
   Report (CS_REPORTER_SEVERITY_NOTIFY, "    Video.OpenGL.ClipOptional = %c%c%c",
     clip_optional[0], clip_optional[1], clip_optional[2]);
   
-  char buf[3];
-  for (i = 0; i < 3; i++)
-    buf[i] = 0;
+  char buf[4];
+  buf[3] = 0;
   
   for (i = 0; i < 3; i++)
   {
     buf[i] = clip_required[i];
-    config->SetStr ("Video.OpenGL.ClipRequired", buf);
   }
+  config->SetStr ("Video.OpenGL.ClipRequired", buf);
   
   for (i = 0; i < 3; i++)
   {
     buf[i] = clip_outer[i];
-    config->SetStr ("Video.OpenGL.ClipOuter", buf);
   }
+  config->SetStr ("Video.OpenGL.ClipOuter", buf);
   
   for (i = 0; i < 3; i++)
   {
     buf[i] = clip_optional[i];
-    config->SetStr ("Video.OpenGL.ClipOptional", buf);
   }
+  config->SetStr ("Video.OpenGL.ClipOptional", buf);
   config->Save ();
 
   SetClipper (NULL, CS_CLIPPER_NONE);
@@ -5242,6 +5241,13 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique( G3DTriangleMesh& mes
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
+#if 1
+  // The new effects support is atm not perfect. it supports not everything
+  // correctly yet (like, transparency in mixmode) and thus
+  // is faster, but looks worse than OldDrawTriangleMesh(). 
+  OldDrawTriangleMesh (mesh);
+  return;
+#else
   int i, l;
   if (!mesh.mat_handle)
   {
@@ -5893,6 +5899,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glMatrixMode (GL_MODELVIEW);
   glPopMatrix ();
 
+#endif
   //glPopClientAttrib();
   //glPopAttrib();
 }
