@@ -1,6 +1,6 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-    16-bit scanmap routines definition
+    32-bit scanmap routines definition
     Written by Andrew Zabolotny
   
     This library is free software; you can redistribute it and/or
