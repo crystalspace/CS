@@ -217,6 +217,9 @@ void csODEParticlePhysics::Execute (float stepsize)
         break;
       case CS_PART_EMIT_BOX:
         break;
+      case CS_PART_EMIT_CYLINDER:
+        // @@@ FIXME: Implement this?
+        break;
       }
       point.position = start;
       point.velocity = csVector3 ();
@@ -428,4 +431,3 @@ void csODEParticlePhysics::Stop (iParticlesObjectState *particles)
   po->new_particles = 0.0;
   po->total_elapsed_time = particles->GetEmitTime ();
 }
-
