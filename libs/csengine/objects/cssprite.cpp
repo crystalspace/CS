@@ -47,10 +47,7 @@ csFrame::csFrame ()
 
 csFrame::~csFrame ()
 {
-  if (name != NULL)
-  {
-    CHK (delete [] name);
-  }
+  CHK (delete [] name);
 }
 
 void csFrame::SetName (char * n)
@@ -154,23 +151,28 @@ void csSpriteTemplate::AddVertices (int num)
   int frame, vertex;
   for (frame = 0; frame < frames.Length(); frame++)
   {
+    csFrame* fr = (csFrame*)frames[frame];
+
     CHK (csVector3* new_normals = new csVector3 [num_normals + num]);
     for (vertex = 0; vertex < num_normals; vertex++)
       new_normals[vertex] = ((csVector3*)normals[frame])[vertex];
     CHK (delete[] normals[frame]);
     normals[frame] = new_normals;
+    fr->SetNormals (new_normals);
 
     CHK (csVector2* new_texels = new csVector2 [num_texels + num]);
     for (vertex = 0; vertex < num_texels; vertex++)
       new_texels[vertex] = ((csVector2*)texels[frame])[vertex];
     CHK (delete[] texels[frame]);
     texels[frame] = new_texels;
+    fr->SetTexels (new_texels);
 
     CHK (csVector3* new_vertices = new csVector3 [num_vertices + num]);
     for (vertex = 0; vertex < num_vertices; vertex++)
       new_vertices[vertex] = ((csVector3*)vertices[frame])[vertex];
     CHK (delete[] vertices[frame]);
     vertices[frame] = new_vertices;
+    fr->SetVertices (new_vertices);
   }
 
   CHK (int* ttn = new int [num_texels + num]);
@@ -193,8 +195,10 @@ void csSpriteTemplate::AddVertices (int num)
 
   for (vertex = 0; vertex < num; vertex++)
   {
-    texel_to_normal [num_texels + num] = num_normals + num;
-    texel_to_vertex [num_texels + num] = num_vertices + num;
+    //texel_to_normal [num_texels + num] = num_normals + num;
+    //texel_to_vertex [num_texels + num] = num_vertices + num;
+    texel_to_normal [num_texels + vertex] = num_normals + vertex;
+    texel_to_vertex [num_texels + vertex] = num_vertices + vertex;
   }
 
   num_normals  += num;
@@ -297,9 +301,12 @@ void csSpriteTemplate::ComputeBoundingBox ()
 csFrame* csSpriteTemplate::AddFrame ()
 {
   CHK (csFrame* fr = new csFrame ());
-  CHK (csVector3* nr = new csVector3 [num_normals]);
-  CHK (csVector2* tx = new csVector2 [num_texels]);
-  CHK (csVector3* vr = new csVector3 [num_vertices]);
+  csVector3* nr = NULL;
+  csVector2* tx = NULL;
+  csVector3* vr = NULL;
+  CHK (nr = new csVector3 [num_normals ? num_normals : 1]);
+  CHK (tx = new csVector2 [num_texels ? num_texels : 1]);
+  CHK (vr = new csVector3 [num_vertices ? num_vertices : 1]);
 
   frames.Push (fr);
   normals.Push (nr);
@@ -639,6 +646,7 @@ csSprite3D::csSprite3D () : csObject (), bbox (NULL)
   force_otherskin = false;
   cur_action = NULL;
   vertex_colors = NULL;
+  object_vertices = NULL;
   dynamiclights = NULL;
   skeleton_state = NULL;
   MixMode = CS_FX_COPY;

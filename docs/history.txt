@@ -12,6 +12,22 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+10-Feb-2000
+	- Michael Ewert did some fixes in physiks code.
+	- Fix to sprite modifications from Seth Galbraith.
+	- Fixed sprites so that they at least load again.
+	  But they are still completely wrong.
+9-Feb-2000
+	- Andrew Zabolotny did some changes:
+	    - Renamed DEBUG to CS_DEBUG. On various systems many
+	      system-dependent files use the DEBUG macro to do weird things.
+	    - Serious fix to SCF. The refcount on factories was going nuts
+	      since the last change to refcounts being initialized to zero
+	      rather than to one.  Now the warnings on unreleased object
+	      instances during application shutdown is indeed meaningful.
+	    - Fix to scftutor. The Worm was incorrectly split into two
+	      (well, it was correct at the time refcount was initialized to
+	      zero).
 8-Feb-2000
 	- Seth Galbraith contributed big changes to sprite format.
 	- Norman Kramer added screenshot support to Glide rasterizer.
