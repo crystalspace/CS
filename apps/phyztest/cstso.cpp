@@ -41,6 +41,9 @@
 //#include "csengine/collider.h"
 #include "cstso.h"
 
+ctCollidingContact contact_heap[1024];  // no more than that
+int contact_heap_index = 0;
+
 csRigidSpaceTimeObj *csRigidSpaceTimeObj::space_time_continuum[ MAX_SPACE_TIME_NUM ];
 long csRigidSpaceTimeObj::continuum_end = 0;
 
@@ -66,6 +69,11 @@ csRigidSpaceTimeObj::csRigidSpaceTimeObj( csSprite3D *psprt, ctRigidBody *prb )
 
 }
 
+void set_no_rewind( ctPhysicalEntity *ppe )
+{
+  ppe->flags |= CTF_NOREWIND;
+}
+
 // using sloooooooow but accurate collision detection.
 // this can be sped up in many ways.
 // - use eulers method or mid-point for ODE just during CD
@@ -78,11 +86,13 @@ static real collision_epsilon = 0.02;
 static real time_epsilon = 0.001;
 real ta, tb;
  
-long loops = 200;  //make sure we don't go into an infinite loop
+long loops = 300;  //make sure we don't go into an infinite loop
 
   ta = t1;
   tb = t2;
   real min_col_dist;
+
+  time_world->apply_fuction_to_body_list( set_no_rewind );
 
   while( ta < t2 && loops-- > 0){
  
@@ -100,10 +110,10 @@ long loops = 200;  //make sure we don't go into an infinite loop
         tb = t2;
       }else{
         // bisect time backwards to search for time of impact
+        time_world->rewind(ta, tb);   // rewind state back to ta
         tb -= (tb - ta)*0.5;
-        ctVector3 px = space_time_continuum[0]->rb->get_pos();
-        time_world->rewind();   // rewind state back to ta
-        px = space_time_continuum[0]->rb->get_pos();
+  //      ctVector3 px = space_time_continuum[0]->rb->get_pos();
+    //    px = space_time_continuum[0]->rb->get_pos();
       }
     // if we have not arrived at the end of our time interval 
     }else if( tb < t2 ){
@@ -169,7 +179,10 @@ CDTriangle *htri;
 real max_depth;
 real current_depth;
 csOrthoTransform tfm;
+ctCollidingContact *this_contact;
+//ctCollidingContact *prev_contact;
 collision_pair *CD_contact = NULL;
+//bool hit_found;
 
   max_depth = 0;
 
@@ -202,81 +215,90 @@ collision_pair *CD_contact = NULL;
     }
 
     space_time_continuum[i]->num_collisions = csCollider::numHits;
+    space_time_continuum[i]->contact = NULL;
+    contact_heap_index = 0;
     // determine type of collision and penetration depth
     if( space_time_continuum[i]->num_collisions == 0 ){
       // no collision
     }else{
+      //IMPORTANT: turn NOREWIND off if there is a collision!
+      space_time_continuum[i]->rb->flags &= (~CTF_NOREWIND);
+      this_contact = &(contact_heap[contact_heap_index]);
+      this_contact->next = NULL;
+      
       for( int acol = 0; acol < csCollider::numHits; acol++ ){
         space_time_continuum[i]->cd_contact[acol] = CD_contact[acol];
 
-        space_time_continuum[i]->contact.body_a = space_time_continuum[i]->rb;
         // here is where the body hit should be recorded as well
-        space_time_continuum[i]->contact.body_b = NULL;
+        // NULL means we hit an immovable object, like a wall
+        this_contact->body_b = NULL;
 
-        space_time_continuum[i]->contact.restitution = 0.75;
+        this_contact->restitution = 0.75;
 
         wall = CD_contact[acol].tr2;
         n = ((wall->p2-wall->p1)%(wall->p3-wall->p2)).Unit();
       //  CsPrintf( MSG_DEBUG_1, "n %f, %f, %f\n", n.x, n.y, n.z );
-        space_time_continuum[i]->contact.n =
+        this_contact->n =
           ctVector3(n.x, n.y, n.z );
 
-    // ignore ojbects that aren't really moving towards collision.  
-    // they may "seep" though floor.
-    if( fabs(space_time_continuum[i]->rb->get_v() * space_time_continuum[i]->contact.n)  < MIN_REAL*1000.0)
-      return 0;
+      // just one collision at a time here.
+//      this_contact->next = NULL;
 
+ /*   // ignore ojbects that aren't really moving towards collision.  
+    // they may "seep" though floor.
+    if( fabs(space_time_continuum[i]->rb->get_v() * this_contact->n)  < MIN_REAL*1000.0)
+      return 0;
+*/
 
         htri = CD_contact[acol].tr1;
 
         // check each point of this triangle to see which penetrated the most
-       // trime = (m * (htri->p1)) + x;
-        trime = tfm.This2Other( htri->p1 );
-        current_depth = -(trime - wall->p1)*n;
-        // this is the collision point
-        if( current_depth > max_depth ){
-          max_depth = current_depth;
-          space_time_continuum[i]->contact.contact_p = 
-            ctVector3( trime.x, trime.y, trime.z );
-          // add collision point to other object as well, here
-        }// else if( current_depth == max_depth ){
-        // simultaneous collision.  add to collision list
-        //}
+  
+        for( int j = 0; j < 3 ; j++ ){
+          if( j == 0 )
+            trime = tfm.This2Other( htri->p1 );
+          else if ( j == 1 )
+            trime = tfm.This2Other( htri->p2 );
+          else
+            trime = tfm.This2Other( htri->p3 );
 
-      //  trime = (m * (htri->p2)) + x;
-        trime = tfm.This2Other( htri->p2 );
-        current_depth = -(trime - wall->p1)*n;
-       // this is the collision point
-        if( current_depth > max_depth ){
-          max_depth = current_depth;
-          space_time_continuum[i]->contact.contact_p = 
-            ctVector3( trime.x, trime.y, trime.z );
-          
-          // add collision point to other object as well, here
-        }// else if( current_depth == max_depth ){
-        // simultaneous collision.  add to collision list
-        //}
-
-       // trime = (m * (htri->p3)) + x;
-        trime = tfm.This2Other( htri->p3 );
-        current_depth = -(trime - wall->p1)*n;
-        // this is the collision point
-        if( current_depth > max_depth ){
-          max_depth = current_depth;
-          space_time_continuum[i]->contact.contact_p = 
-            ctVector3( trime.x, trime.y, trime.z );
-          
-          // add collision point to other object as well, here
-        }// else if( current_depth == max_depth ){
-        // simultaneous collision.  add to collision list
-        //}
+          current_depth = -(trime - wall->p1)*n;
+          // this is the collision point
+          if( current_depth > max_depth ){
+            max_depth = current_depth;
+          }
+         
+          if( current_depth > 0.0 ){
+            this_contact->contact_p = 
+              ctVector3( trime.x, trime.y, trime.z );
         
+            ctCollidingContact *chk = space_time_continuum[i]->contact;
+            bool duplicate = false;
+            while( chk != NULL && !duplicate ){
+              if( chk->contact_p[0] == this_contact->contact_p[0] &&
+                chk->contact_p[1] == this_contact->contact_p[1] &&
+                chk->contact_p[2] == this_contact->contact_p[2] ){
+                duplicate = true;
+              }
+              chk = chk->next;
+            }
+            if( !duplicate ){
+              this_contact->next = space_time_continuum[i]->contact;
+              space_time_continuum[i]->contact = this_contact;
+              this_contact = &(contact_heap[++contact_heap_index]);
+              this_contact->body_b = NULL;
+              this_contact->restitution = space_time_continuum[i]->contact->restitution;
+              this_contact->n = space_time_continuum[i]->contact->n;
+
+            }
+            // add collision point to other object as well, here
+          }
+        } 
       }
 
     }
 
   }
-
   return sqrt(max_depth);
 
 }
@@ -288,7 +310,7 @@ csRigidSpaceTimeObj *sto;
 
   for( int i = 0; i < continuum_end; i++ ){
     sto = space_time_continuum[i];
-    if( sto->num_collisions > 0 ){
+    if( sto->num_collisions > 0 && sto->contact != NULL ){
       sto->rb->resolve_collision( sto->contact );
     }
   }
