@@ -83,6 +83,9 @@ void csStarsMeshObject::UpdateLighting (iLight**, int,
   return;
 }
 
+/*
+ * Commented this out because it was not used -- mgeisse
+ *
 static void Perspective (const csVector3& v, csVector2& p, float fov,
     	float sx, float sy)
 {
@@ -90,6 +93,7 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
   p.x = v.x * iz + sx;
   p.y = v.y * iz + sy;
 }
+*/
 
 bool csStarsMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	csZBufMode mode)

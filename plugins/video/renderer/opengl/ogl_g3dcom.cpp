@@ -1667,7 +1667,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   // If we have multi-texturing or fog we set the second pass Z-buffer
   // mode here.
-  if (multitex > 0 || mesh.do_fog)
+  if (multitex || mesh.do_fog)
     SetGLZBufferFlagsPass2 (true);
 
   // Here we perform multi-texturing.
