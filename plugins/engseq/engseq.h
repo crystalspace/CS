@@ -47,6 +47,8 @@ public:
   iSequence* GetSequence () { return sequence; }
   void AddOperationSetMaterial (csTicks time, iMeshWrapper* mesh,
 		  iMaterialWrapper* mat);
+  void AddOperationSetMaterial (csTicks time, iPolygon3D* polygon,
+		  iMaterialWrapper* mat);
   void AddOperationSetLight (csTicks time, iLight* light,
 		  const csColor& color);
   void AddOperationFadeLight (csTicks time, iLight* light,
@@ -99,6 +101,11 @@ public:
     {
       return scfParent->GetSequence ();
     }
+    virtual void AddOperationSetMaterial (csTicks time, iPolygon3D* polygon,
+		  iMaterialWrapper* mat)
+    {
+      scfParent->AddOperationSetMaterial (time, polygon, mat);
+    }
     virtual void AddOperationSetMaterial (csTicks time, iMeshWrapper* mesh,
 		  iMaterialWrapper* mat)
     {
@@ -134,26 +141,6 @@ public:
     {
       scfParent->AddOperationFadeFog (time, sector, color, density,
       	duration);
-    }
-    virtual void AddOperationAbsoluteMove (csTicks time, iMeshWrapper* mesh,
-		  iSector* sector, const csReversibleTransform& trans)
-    {
-      scfParent->AddOperationAbsoluteMove (time, mesh, sector, trans);
-    }
-    virtual void AddOperationAbsoluteMove (csTicks time, iMeshWrapper* mesh,
-		  iSector* sector, const csVector3& pos)
-    {
-      scfParent->AddOperationAbsoluteMove (time, mesh, sector, pos);
-    }
-    virtual void AddOperationRelativeMove (csTicks time, iMeshWrapper* mesh,
-		  const csReversibleTransform& trans)
-    {
-      scfParent->AddOperationRelativeMove (time, mesh, trans);
-    }
-    virtual void AddOperationRelativeMove (csTicks time, iMeshWrapper* mesh,
-		  const csVector3& pos)
-    {
-      scfParent->AddOperationRelativeMove (time, mesh, pos);
     }
     virtual void AddOperationRotateDuration (csTicks time, iMeshWrapper* mesh,
   		int axis1, float tot_angle1,
@@ -250,9 +237,6 @@ public:
 
   void AddConditionInSector (iSector* sector, bool insideonly,
 		  const csBox3* box, const csSphere* sphere);
-  void AddConditionInMeshSphere (iMeshWrapper* mesh);
-  void AddConditionInMeshBox (iMeshWrapper* mesh);
-  void AddConditionMeshVisible (iMeshWrapper* mesh);
   void AddConditionMeshClick (iMeshWrapper* mesh);
   void AddConditionManual ();
 
@@ -304,18 +288,6 @@ public:
     virtual void AddConditionSectorVisible (iSector* sector)
     {
       scfParent->AddConditionInSector (sector, false, NULL, NULL);
-    }
-    virtual void AddConditionInMeshSphere (iMeshWrapper* mesh)
-    {
-      scfParent->AddConditionInMeshSphere (mesh);
-    }
-    virtual void AddConditionInMeshBox (iMeshWrapper* mesh)
-    {
-      scfParent->AddConditionInMeshBox (mesh);
-    }
-    virtual void AddConditionMeshVisible (iMeshWrapper* mesh)
-    {
-      scfParent->AddConditionMeshVisible (mesh);
     }
     virtual void AddConditionMeshClick (iMeshWrapper* mesh)
     {

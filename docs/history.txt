@@ -8,6 +8,11 @@ The history order is reversed so that new features are at the top.
 	  to the sequence parser. This new command is able to
 	  change the material of genmesh, ball, sprite3d, cloth,
 	  and particle systems.
+	- Extended new material operation so you can set a material
+	  for an individual polygon too.
+	- Cleaned up all unimplemented functions (can always add them
+	  later while implementing them) and also removed all warnings
+	  in engine sequence manager.
 27-Sep-2002
 	- Added new set and fade color operations to the engine
 	  sequence manager. Also added the appropriate commands

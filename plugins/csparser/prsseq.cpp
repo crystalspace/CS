@@ -28,6 +28,9 @@
 #include "iengine/region.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
+#include "iengine/mesh.h"
+#include "imesh/thing/thing.h"
+#include "imesh/object.h"
 #include "ivaria/sequence.h"
 
 static iSequenceWrapper* FindCreateSequence (iEngineSequenceManager* eseqmgr,
@@ -346,6 +349,14 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_MATERIAL:
         {
 	  const char* meshname = child->GetAttributeValue ("mesh");
+	  if (!meshname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find attribute 'mesh' in sequence '%s'!",
+		seqname);
+	    return NULL;
+	  }
 	  iMeshWrapper* mesh = Engine->FindMeshObject (meshname);
 	  if (!mesh)
 	  {
@@ -355,7 +366,41 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 		seqname);
 	    return NULL;
 	  }
+
+	  const char* polyname = child->GetAttributeValue ("polygon");
+	  iPolygon3D* polygon = NULL;
+	  if (polyname)
+	  {
+	    csRef<iThingState> st (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+			iThingState));
+	    if (!st)
+	    {
+	      SyntaxService->ReportError (
+		  "crystalspace.maploader.parse.sequence",
+		  child, "Only use 'polygon' when the mesh is a thing in sequence '%s'!",
+		  seqname);
+	      return NULL;
+	    }
+	    polygon = st->GetPolygon (polyname);
+	    if (!polygon)
+	    {
+	      SyntaxService->ReportError (
+		  "crystalspace.maploader.parse.sequence",
+		  child, "Couldn't find polygon '%s' in sequence '%s'!\n",
+		  polyname, seqname);
+	      return NULL;
+	    }
+	  }
+
 	  const char* matname = child->GetAttributeValue ("material");
+	  if (!matname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find attribute 'material' in sequence '%s'!",
+		seqname);
+	    return NULL;
+	  }
 	  iMaterialWrapper* mat = Engine->FindMaterial (matname);
 	  if (!mat)
 	  {
@@ -365,12 +410,23 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 		seqname);
 	    return NULL;
 	  }
-	  sequence->AddOperationSetMaterial (cur_time, mesh, mat);
+	  if (polygon)
+	    sequence->AddOperationSetMaterial (cur_time, polygon, mat);
+	  else
+	    sequence->AddOperationSetMaterial (cur_time, mesh, mat);
 	}
         break;
       case XMLTOKEN_FADECOLOR:
         {
 	  const char* meshname = child->GetAttributeValue ("mesh");
+	  if (!meshname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find attribute 'mesh' in sequence '%s'!",
+		seqname);
+	    return NULL;
+	  }
 	  iMeshWrapper* mesh = Engine->FindMeshObject (meshname);
 	  if (!mesh)
 	  {
@@ -392,6 +448,14 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_SETCOLOR:
         {
 	  const char* meshname = child->GetAttributeValue ("mesh");
+	  if (!meshname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find attribute 'mesh' in sequence '%s'!",
+		seqname);
+	    return NULL;
+	  }
 	  iMeshWrapper* mesh = Engine->FindMeshObject (meshname);
 	  if (!mesh)
 	  {
@@ -411,6 +475,14 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_FADELIGHT:
         {
 	  const char* lightname = child->GetAttributeValue ("light");
+	  if (!lightname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find attribute 'light' in sequence '%s'!",
+		seqname);
+	    return NULL;
+	  }
 	  iStatLight* light = Engine->FindLight (lightname);
 	  if (!light)
 	  {
@@ -432,6 +504,14 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_SETLIGHT:
         {
 	  const char* lightname = child->GetAttributeValue ("light");
+	  if (!lightname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find attribute 'light' in sequence '%s'!",
+		seqname);
+	    return NULL;
+	  }
 	  iStatLight* light = Engine->FindLight (lightname);
 	  if (!light)
 	  {
@@ -451,6 +531,14 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_FADEFOG:
         {
 	  const char* sectname = child->GetAttributeValue ("sector");
+	  if (!sectname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find attribute 'sector' in sequence '%s'!",
+		seqname);
+	    return NULL;
+	  }
 	  iSector* sector = ldr_context->FindSector (sectname);
 	  if (!sector)
 	  {
@@ -474,6 +562,14 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
       case XMLTOKEN_SETFOG:
         {
 	  const char* sectname = child->GetAttributeValue ("sector");
+	  if (!sectname)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find attribute 'sector' in sequence '%s'!",
+		seqname);
+	    return NULL;
+	  }
 	  iSector* sector = ldr_context->FindSector (sectname);
 	  if (!sector)
 	  {

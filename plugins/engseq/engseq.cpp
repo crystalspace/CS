@@ -49,6 +49,7 @@
 #include "imesh/partsys.h"
 #include "imesh/stars.h"
 #include "imesh/terrfunc.h"
+#include "imesh/thing/polygon.h"
 #include "engseq.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -109,7 +110,7 @@ public:
     OpSetFog::density = density;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks /*dt*/)
   {
     if (density < 0.001)
       sector->DisableFog ();
@@ -197,6 +198,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 #define SETMATERIALTYPE_CLOTH 4
 #define SETMATERIALTYPE_UNKNOWN 5
 
+#define SETMATERIALTYPE_POLYGON 6
+
 /**
  * Set material operation.
  */
@@ -211,6 +214,7 @@ private:
   csRef<iParticleState> partsys;
   csRef<iClothMeshState> cloth;
   int type;
+  csRef<iPolygon3D> polygon;
 
   csRef<iMaterialWrapper> material;
 
@@ -232,8 +236,14 @@ public:
     cloth = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iClothMeshState);
     if (cloth) return; type++;
   }
+  OpSetMaterial (iPolygon3D* polygon, iMaterialWrapper* material)
+  {
+    OpSetMaterial::polygon = polygon;
+    OpSetMaterial::material = material;
+    type = SETMATERIALTYPE_POLYGON;
+  }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks /*dt*/)
   {
     switch (type)
     {
@@ -242,6 +252,7 @@ public:
       case SETMATERIALTYPE_SPRITE3D: sprite3d->SetMaterialWrapper (material); break;
       case SETMATERIALTYPE_PARTSYS: partsys->SetMaterialWrapper (material); break;
       case SETMATERIALTYPE_CLOTH: cloth->SetMaterialWrapper (material); break;
+      case SETMATERIALTYPE_POLYGON: polygon->SetMaterial (material); break;
       case SETMATERIALTYPE_UNKNOWN: break;
     }
   }
@@ -265,7 +276,7 @@ public:
     OpSetLight::color = color;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks /*dt*/)
   {
     light->SetColor (color);
   }
@@ -381,7 +392,7 @@ public:
     if (stars) return; type++;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks /*dt*/)
   {
     switch (type)
     {
@@ -698,7 +709,7 @@ public:
     OpTriggerState::en = en;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks /*dt*/)
   {
     trigger->SetEnabled (en);
   }
@@ -722,7 +733,7 @@ public:
     OpCheckTrigger::delay = delay;
   }
 
-  virtual void Do (csTicks dt)
+  virtual void Do (csTicks /*dt*/)
   {
     trigger->TestConditions (delay);
   }
@@ -744,7 +755,7 @@ public:
     CondTestTrigger::trigger = trigger;
   }
 
-  virtual bool Condition (csTicks dt)
+  virtual bool Condition (csTicks /*dt*/)
   {
     return trigger->CheckState ();
   }
@@ -770,6 +781,14 @@ csSequenceWrapper::csSequenceWrapper (csEngineSequenceManager* eseqmgr,
 
 csSequenceWrapper::~csSequenceWrapper ()
 {
+}
+
+void csSequenceWrapper::AddOperationSetMaterial (csTicks time,
+	iPolygon3D* polygon, iMaterialWrapper* material)
+{
+  OpSetMaterial* op = new OpSetMaterial (polygon, material);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationSetMaterial (csTicks time,
@@ -827,27 +846,6 @@ void csSequenceWrapper::AddOperationFadeFog (csTicks time,
   OpFadeFog* op = new OpFadeFog (sector, color, density, duration, eseqmgr);
   sequence->AddOperation (time, op);
   op->DecRef ();
-}
-
-void csSequenceWrapper::AddOperationAbsoluteMove (csTicks time,
-	iMeshWrapper* mesh, iSector* sector,
-	const csReversibleTransform& trans)
-{
-}
-
-void csSequenceWrapper::AddOperationAbsoluteMove (csTicks time,
-	iMeshWrapper* mesh, iSector* sector, const csVector3& pos)
-{
-}
-
-void csSequenceWrapper::AddOperationRelativeMove (csTicks time,
-	iMeshWrapper* mesh, const csReversibleTransform& trans)
-{
-}
-
-void csSequenceWrapper::AddOperationRelativeMove (csTicks time,
-	iMeshWrapper* mesh, const csVector3& pos)
-{
 }
 
 void csSequenceWrapper::AddOperationRotateDuration (csTicks time,
@@ -947,7 +945,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual void Traverse (iSector* sector, iBase* context)
+  virtual void Traverse (iSector* /*sector*/, iBase* context)
   {
     csRef<iRenderView> rview (SCF_QUERY_INTERFACE (context, iRenderView));
     if (rview)
@@ -1057,18 +1055,6 @@ void csSequenceTrigger::AddConditionInSector (iSector* sector,
   trig->DecRef ();
 
   total_conditions++;
-}
-
-void csSequenceTrigger::AddConditionInMeshSphere (iMeshWrapper* mesh)
-{
-}
-
-void csSequenceTrigger::AddConditionInMeshBox (iMeshWrapper* mesh)
-{
-}
-
-void csSequenceTrigger::AddConditionMeshVisible (iMeshWrapper* mesh)
-{
 }
 
 void csSequenceTrigger::AddConditionMeshClick (iMeshWrapper* mesh)
@@ -1191,7 +1177,7 @@ public:
     CondTestConditions::delay = delay;
   }
 
-  virtual bool Condition (csTicks dt)
+  virtual bool Condition (csTicks /*dt*/)
   {
     // The sequence which loops this condition will end
     // automatically when the delay in the trigger is

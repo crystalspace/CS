@@ -27,6 +27,7 @@ struct iSequenceTrigger;
 struct iMaterialWrapper;
 struct iSector;
 struct iMeshWrapper;
+struct iPolygon3D;
 struct iObject;
 struct iLight;
 struct iCamera;
@@ -65,6 +66,12 @@ struct iSequenceWrapper : public iBase
 		  iMaterialWrapper* mat) = 0;
 
   /**
+   * Operation: set a material on a polygon.
+   */
+  virtual void AddOperationSetMaterial (csTicks time, iPolygon3D* mesh,
+		  iMaterialWrapper* mat) = 0;
+
+  /**
    * Operation: set a light color.
    */
   virtual void AddOperationSetLight (csTicks time, iLight* light,
@@ -99,30 +106,6 @@ struct iSequenceWrapper : public iBase
    */
   virtual void AddOperationFadeFog (csTicks time, iSector* sector,
 		  const csColor& color, float density, csTicks duration) = 0;
-
-  /**
-   * Operation: absolute move of object.
-   */
-  virtual void AddOperationAbsoluteMove (csTicks time, iMeshWrapper* mesh,
-		  iSector* sector, const csReversibleTransform& trans) = 0;
-
-  /**
-   * Operation: absolute move of object.
-   */
-  virtual void AddOperationAbsoluteMove (csTicks time, iMeshWrapper* mesh,
-		  iSector* sector, const csVector3& pos) = 0;
-
-  /**
-   * Operation: relative move of object.
-   */
-  virtual void AddOperationRelativeMove (csTicks time, iMeshWrapper* mesh,
-		  const csReversibleTransform& trans) = 0;
-
-  /**
-   * Operation: relative move of object.
-   */
-  virtual void AddOperationRelativeMove (csTicks time, iMeshWrapper* mesh,
-		  const csVector3& pos) = 0;
 
   /**
    * Operation: rotate object during some time. After the time has elapsed
@@ -204,21 +187,6 @@ struct iSequenceTrigger : public iBase
    * Condition: true if (part of) sector is visible.
    */
   virtual void AddConditionSectorVisible (iSector* sector) = 0;
-
-  /**
-   * Condition: true if camera is in bouding sphere of some mesh.
-   */
-  virtual void AddConditionInMeshSphere (iMeshWrapper* mesh) = 0;
-
-  /**
-   * Condition: true if camera is in bouding box of some mesh.
-   */
-  virtual void AddConditionInMeshBox (iMeshWrapper* mesh) = 0;
-
-  /**
-   * Condition: true if (part of) mesh object is visible.
-   */
-  virtual void AddConditionMeshVisible (iMeshWrapper* mesh) = 0;
 
   /**
    * Condition: true if clicked on a mesh.
