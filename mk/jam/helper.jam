@@ -102,7 +102,7 @@ rule Wildcard
 ##    of path components which will be prepended to rule's second argument.
 rule Recurse
 {
-  local rule = $(1) ;
+  local innerrule = $(1) ;
   local types = $(2) ;
   local prefix = $(3) ;
   local files = [ GLOB $(SUBDIR) : * ] ;
@@ -112,14 +112,14 @@ rule Recurse
   {
     if [ IsElem $(i:S) : $(types) ]
     {
-      $(rule) $(i:BS) : $(prefix) ;
+      $(innerrule) $(i:BS) : $(prefix) ;
     }
     else
     {
       if ! [ IsElem $(i:BS) : $(DOT) $(DOTDOT) ]
       {
         local SUBDIR = $(i) ; # Called rules see this new temporary value.
-	Recurse $(rule) : $(types) : $(prefix) $(i:BS) ;
+	Recurse $(innerrule) : $(types) : $(prefix) $(i:BS) ;
       }
     }
   }

@@ -24,6 +24,11 @@ chronological order.
 	  exposed to the outside (methods like CreateRenderContext and so on).
 	  This has the nice benefit of making the engine a bit faster again
 	  (less virtual function calls).
+	- Eric Sunshine eliminated Cygwin compiler warnings about types not
+	  matching printf-format directives in win32/callstack.cpp.
+	- Eric Sunshine fixed problem in Recurse rule in helper.jam where it
+	  was using 'rule' as a variable name. This confused Jam 2.4 since
+	  'rule' is also a keyword.
 20-Apr-2004
 	- Jorrit added 'camera_origin' to csRenderMesh. The meshes will
 	  fill this field with the origin of that mesh in camera space. This
