@@ -112,8 +112,8 @@ else
 endif
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/general/printf.cpp support/general/timing.cpp \
-  support/general/fopen.cpp libs/cssys/os2/csos2.cpp \
+SRC.SYS_CSSYS = libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
+  libs/cssys/general/fopen.cpp libs/cssys/os2/csos2.cpp \
   libs/cssys/os2/loadlib.cpp libs/cssys/os2/scancode.cpp \
   support/gnu/getopt.c support/gnu/getopt1.c
 SRC.SYS_CSSYS_DLL=libs/cssys/os2/dllentry.cpp
@@ -156,7 +156,7 @@ RMDIR=rm -rf
 NETSOCK_LIBS=-lsocket
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND=-e 's|\.ob*j*\:|$$O:|g'
+SYS_SED_DEPEND=-e 's/\.ob*j*\:/$$O:/g'
 
 # Override linker with os2link.cmd
 LINK=@cmd /c bin\\os2link.cmd OUT=$(OUT) DESCRIPTION=[$(DESCRIPTION.$@)]

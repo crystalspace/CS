@@ -111,7 +111,7 @@ LFLAGS.DLL=-Wl,-shared
 # System dependent source files included into CSSYS library
 # TODO: system/amiga/loadlib.cpp  and  system/amiga/graphics2d.cpp
 SRC.SYS_CSSYS=libs/cssys/amiga/Amiga.cpp libs/cssys/general/printf.cpp \
-  support/general/fopen.cpp libs/cssys/amiga/loadlib.cpp
+  libs/cssys/general/fopen.cpp libs/cssys/amiga/loadlib.cpp
 # libs/cssys/amiga/Scanm68k.S
 
 # Where to put the dynamic libraries on this system?
