@@ -23,7 +23,6 @@
 #include "sysdef.h"
 #include "cs3d/common/imgtools.h"
 #include "csutil/csvector.h"
-static FILE *fp = fopen("error.txt", "w+t");
 
 //---------------------------------------------------------------------------
 
