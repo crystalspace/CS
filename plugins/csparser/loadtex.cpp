@@ -66,7 +66,7 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
     ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format));
   if (!image)
   {
-    ReportError (
+    ReportWarning (
 	"crystalspace.maploader.parse.image",
 	"Could not load image '%s'. Unknown format!",
 	fname);

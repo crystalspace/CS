@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+30-Oct-2002
+	- Replaced ReportError() with ReportWarning() when an image couldn't
+	  be loaded in the main loader.
 29-Oct-2002
 	- Eric Sunshine updated the MinGW build instructions in the user manual
 	  to discuss the new preferred MinGW+MSYS procedure for building
