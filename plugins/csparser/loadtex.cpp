@@ -37,7 +37,7 @@
 #include "ivideo/texture.h"
 #include "csgfx/xorpat.h"
 
-csPtr<iImage> csLoader::LoadImage (const char* name, int Format)
+csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
 {
   if (!ImageLoader)
      return NULL;
@@ -45,151 +45,38 @@ csPtr<iImage> csLoader::LoadImage (const char* name, int Format)
   if (Format & CS_IMGFMT_INVALID)
   {
     if (Engine)
-    {
       Format = Engine->GetTextureFormat ();
-    }
     else if (G3D)
-    {
       Format = G3D->GetTextureManager()->GetTextureFormat();
-    }
     else
-    {
       Format = CS_IMGFMT_TRUECOLOR;
-    }
   }
 
-  csRef<iImage> ifile;
-  char textureFileName[VFS_MAX_PATH_LEN];
-  strcpy (textureFileName, name);
-  bool found = VFS->Exists (textureFileName);
-  if (!found)
+  csRef<iDataBuffer> buf (VFS->ReadFile (fname));
+  if (!buf || !buf->GetSize ())
   {
-    ReportWarning (
-	      "crystalspace.maploader.parse.image",
-    	      "Could not find image file '%s' on VFS!", name);
-    ReportNotify2 (
-      "crystalspace.maploader.parse.image",
-      " Attempting alternative filenames...");
-
-    char* dot = strchr (textureFileName, '.');
-    if (dot == NULL) dot = strchr (textureFileName, 0);
-
-    const csVector& formats = ImageLoader->GetDescription ();
-    int i = formats.Length();
-    const char* lastMime = NULL;
-
-    while ((i >= 0) && !found)
-    {
-#define CHECK_EXISTS				\
-	if (VFS->Exists (textureFileName))	\
-	{					\
-	  found = true;				\
-	  break;				\
-	}					\
-
-// jiggle extension case
-#define JIGGLE_EXT(func)			\
-	pos = dot;				\
-	while (*pos) *pos++ = func(*pos);	\
-	CHECK_EXISTS
-
-// jiggle the filename case
-#define JIGGLE_FN(func)				\
-	pos = textureFileName;			\
-	while (*pos) *pos++ = func(*pos);	\
-	CHECK_EXISTS
-
-	CHECK_EXISTS
-	char* pos;
-	JIGGLE_EXT(tolower)
-	JIGGLE_EXT(toupper)
-	JIGGLE_FN(tolower)
-	JIGGLE_EXT(toupper)
-	JIGGLE_FN(toupper)
-	JIGGLE_EXT(tolower)
-
-#undef JIGGLE_EXT
-#undef JIGGLE_FN
-#undef CHECK_EXISTS
-
-      if (i == 0) break;
-
-      iImageIO::FileFormatDescription *format;
-      do
-      {
-	format = 
-	  (iImageIO::FileFormatDescription*) formats[i-1];
-	i--;
-      }
-      while ((i > 0) && 
-	((lastMime != NULL) && !strcmp (lastMime, format->mime)));
-      lastMime = format->mime;
-
-      strcpy (textureFileName, name);
-      if (*dot == 0) *dot = '.';
-      if (i > 0)
-      {
-	const char* defext = strchr (format->mime, '/');
-	if (defext)
-	{
-	  defext++;
-	  // skip a leading "x-" in the mime type (eg "image/x-jng")
-	  if (!strncmp (defext, "x-", 2)) defext += 2; 
-	  strcpy (dot + 1, defext);
-	}
-	else
-	  *(dot + 1) = 0;
-      }
-    }
-    if (found)
-    {
-      ReportNotify2 (
+    ReportError (
 	"crystalspace.maploader.parse.image",
-	" ...using '%s'", &textureFileName[0]);
-    }
-    else
-    {
-      ReportNotify2 (
+    	"Could not open image file '%s' on VFS!", fname);
+    return NULL;
+  }
+
+  // we don't use csRef because we need to return an Increfed object later
+  iImage* image =
+    ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
+  if (!image)
+  {
+    ReportError (
 	"crystalspace.maploader.parse.image",
-	" ...no alternative found.", &textureFileName[0]);
-      strcpy (textureFileName, name);
-    }
+	"Could not load image '%s'. Unknown format!",
+	fname);
+    return NULL;
   }
+  
+  csRef<iDataBuffer> xname (VFS->ExpandPath (fname));
+  image->SetName (**xname);
 
-  if (found)
-  {
-    csRef<iDataBuffer> buf (VFS->ReadFile (textureFileName));
-
-    if (!buf || !buf->GetSize ())
-    {
-      ReportError (
-		"crystalspace.maploader.parse.image",
-    		"Could not open image file '%s' on VFS!", 
-		&textureFileName[0]);
-    }
-    else
-    {
-      ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
-
-      if (!ifile)
-      {
-	ReportError (
-		  "crystalspace.maploader.parse.image",
-    		  "Could not load image '%s'. Unknown format or wrong extension!",
-		  &textureFileName[0]);
-      }
-    }
-  }
-  if (!ifile)
-  {
-    ifile = csPtr<iImage> (csCreateXORPatternImage(32, 32, 5));
-  }
-
-  csRef<iDataBuffer> xname (VFS->ExpandPath (name));
-  ifile->SetName (**xname);
-
-  ifile->IncRef ();	// IncRef() so that smart pointer will not clean it up.
-  return csPtr<iImage> (ifile);
+  return image;
 }
 
 csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
@@ -205,24 +92,32 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
   else
     Format = CS_IMGFMT_TRUECOLOR;
 
-  csRef<iImage> Image (LoadImage (fname, Format));
+  csRef<iImage> Image = LoadImage (fname, Format);
   if (!Image)
-    return NULL;
-
-  csRef<iTextureHandle> TexHandle;
-  if (tm)
   {
-    TexHandle = tm->RegisterTexture (Image, Flags);
-    if (!TexHandle)
-    {
-      ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      "Cannot create texture from '%s'!", fname);
-    }
+    ReportError (
+	"crystalspace.maploader.parse.texture",
+	"Couldn't load image '%s', using checkerboard instead!",
+	fname);
+    Image = csCreateXORPatternImage (32, 32, 5);
+    if (!Image)
+      return NULL;
   }
 
-  if (TexHandle) TexHandle->IncRef ();	// To avoid smart pointer release.
-  return csPtr<iTextureHandle> (TexHandle);
+  if (!tm)
+    return NULL;
+  
+  // we need to return an IncRefed object, so no csRef here
+  iTextureHandle* TexHandle = tm->RegisterTexture (Image, Flags);
+  if (!TexHandle)
+  {
+    ReportError (
+	"crystalspace.maploader.parse.texture",
+	"Cannot create texture from '%s'!", fname);
+    return NULL;
+  }
+
+  return TexHandle;
 }
 
 iTextureWrapper* csLoader::LoadTexture (const char *name,
