@@ -12,6 +12,22 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+21-Jun-99:
+	- I fixed the Linux makefile for Shooter since the 'csgame' library
+	  has changed.
+	- I received a large patch from Andrew Zabolotny. He is busy porting
+	  all the assembler code for the software renderer to NASM. The new
+	  code is not enabled by default yet.
+	- Andrew also moved the csCleanable sub-classes outside the functions.
+	  This should fix a few compilation problems for some compilers.
+20-Jun-99:
+	- Thomas Hieber added a quick tutorial for MazeD (received from Andrew).
+	- Thomas added a number of new files to the 'csgame' library.
+19-Jun-99:
+	- Added new GetFlags/SetFlags/CheckFlags to csPolygon3D and csThing. Also
+	  added CheckFlags to csLight. This is going to be a new system which
+	  I will add to many classes. It is a consistant interface to set/query
+	  boolean settings for objects in the engine.
 18-Jun-99:
 	- Fixed bug in shadow calculation for things. I think it is now
 	  correct. This basicly means that the new lighting algorithm is
@@ -26,6 +42,14 @@ Short-term cleanups that need to be done:
 	  used by things for now). Those bounding boxes are now also used by
 	  the lighting routines to optimize lighting even more (things which
 	  are not in the light frustrum are quickly rejected that way).
+	- Thomas Hieber added a new DrawPolygonFX function to the 3D
+	  subsystem. This is a new variant of DrawPolygon which supports a
+	  number of nice and new features. Thomas added DrawPolygonFX for the
+	  Direct3D, OpenGL and software (16-bit only) renderers (and stub
+	  support for Glide).
+	- Thomas also fixed a bug in PreparePolygon (bad triangle clipping
+	  for gouraud shaded triangles).
+	- Robert Bate added support for RAVE for the Macintosh.
 17-Jun-99:
 	- Further optimizations on the new lighting system. Reordered a few
 	  relevant calculations to discover more rapidly when lighting should
