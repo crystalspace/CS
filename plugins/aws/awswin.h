@@ -21,7 +21,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
-#include "aws/awscomp.h"
+#include "awscomp.h"
 
 /***************************************************************************************************************************
 *   This file details the interface of awsWindow components.  Windows, while they are just normal components, have some    *

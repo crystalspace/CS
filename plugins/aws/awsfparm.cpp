@@ -1,6 +1,6 @@
 #include "cssysdef.h"
-#include "aws/awsfparm.h"
-#include "aws/awsadler.h"
+#include "awsfparm.h"
+#include "awsadler.h"
 
 #include <string.h>
 

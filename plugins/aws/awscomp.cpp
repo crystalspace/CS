@@ -1,8 +1,8 @@
 #include "cssysdef.h"
-#include "aws/awsprefs.h"
-#include "aws/awscomp.h"
-#include "aws/awsslot.h"
-#include "aws/awsfparm.h"
+#include "awsprefs.h"
+#include "awscomp.h"
+#include "awsslot.h"
+#include "awsfparm.h"
 #include "iutil/event.h"
 #include "csutil/scfstr.h"
 

@@ -21,8 +21,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csgeom/csrect.h"
-#include "aws/awsprefs.h"
-#include "aws/awsslot.h"
+#include "awsprefs.h"
+#include "awsslot.h"
 
 class awsCanvas;
 

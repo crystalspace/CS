@@ -1,6 +1,6 @@
 #include "cssysdef.h"
-#include "aws/awsstdsk.h"
-#include "aws/awscomp.h"
+#include "awsstdsk.h"
+#include "awscomp.h"
 
 #include <stdio.h>
 

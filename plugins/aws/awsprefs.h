@@ -23,7 +23,7 @@
 #include "csutil/csdllist.h"
 #include "csutil/csvector.h"
 
-#include "aws/awstex.h"
+#include "awstex.h"
 
 struct iString;
 

@@ -4,8 +4,8 @@
 #include "csgeom/csrect.h"
 #include "csutil/csdllist.h"
 #include "aws/iaws.h"
-#include "aws/awsprefs.h"
-#include "aws/awsadler.h"
+#include "awsprefs.h"
+#include "awsadler.h"
 
 awsKey *
 awsKeyContainer::Find(iString *n)

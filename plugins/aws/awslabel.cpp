@@ -1,5 +1,5 @@
 #include "cssysdef.h"
-#include "aws/awslabel.h"
+#include "awslabel.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"

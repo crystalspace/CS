@@ -1,6 +1,6 @@
 #include "cssysdef.h"
-#include "aws/awsslot.h"
-#include "aws/awsadler.h"
+#include "awsslot.h"
+#include "awsadler.h"
 #include <string.h>
 
 #define callRefMemberFunction(object,ptrToMember)  ((object).*(ptrToMember))

@@ -10,7 +10,7 @@
  ************************************************************************************/
 
 #include "aws/iaws.h"
-#include "aws/awsslot.h"
+#include "awsslot.h"
 
 class awsStandardSink : public awsSink
 {

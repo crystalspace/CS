@@ -1,7 +1,7 @@
 #include "cssysdef.h"
 #include "iutil/plugin.h"
-#include "aws/aws.h"
-#include "aws/awsprefs.h"
+#include "aws.h"
+#include "awsprefs.h"
 #include "ivideo/txtmgr.h"
 #include "iengine/engine.h"
 #include "iutil/eventh.h"
@@ -11,11 +11,11 @@
 #include "ivaria/reporter.h"
 
 // includes for registration/embedding
-#include "aws/awscomp.h"
-#include "aws/awsstdsk.h"
-#include "aws/awscmdbt.h"
-#include "aws/awslabel.h"
-#include "aws/awstxtbx.h"
+#include "awscomp.h"
+#include "awsstdsk.h"
+#include "awscmdbt.h"
+#include "awslabel.h"
+#include "awstxtbx.h"
 
 
 #include <stdio.h>

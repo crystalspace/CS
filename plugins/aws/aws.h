@@ -26,8 +26,8 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "igraphic/imageio.h"
-#include "aws/awscomp.h"
-#include "aws/awswin.h"
+#include "awscomp.h"
+#include "awswin.h"
 
 const int awsNumRectBuckets = 32;
 
