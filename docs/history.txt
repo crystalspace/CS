@@ -13,9 +13,27 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+25-Oct-1999
+	- CrystalClear updates from Michael Dale Long.
+	- FINALLY fixed the bug in the quadcube!!! Lighting shadow
+	  frustrum culling finally works well. There were actually two
+	  unrelated bugs.
+24-Oct-1999
+	- Fixes and modifications to landscape engine from Alex Pfaffe.
+	  Landscape engine is closer to working now.
+23-Oct-1999
+	- Added csWorld::CheckConsistancy() to test consistancy of the world.
+	  Using this we can more quickly detect problems with either the world
+	  loader or the BSP/octree splitter.
+	- Thomas Hieber added support for line numbers in parser and
+	  additional error checks for empty polygons.
+	- Seth Galbraith added sprite vertex animation tweening.
 22-Oct-1999
 	- Various fixes to quadtree again. Now it seems to work correctly
 	  for rendering but I still got errors for lighting.
+	- Small change to makefiles forom Andrew Zabolotny.
+	- Thomas also removed some warnings.
+	- Change to makeman.py from Brandon Ehle.
 21-Oct-1999
 	- Significantly rewrote the quadtree handling. It is now much more
 	  efficient (both memory and speed) and it does seem to work a
@@ -25,6 +43,8 @@ Short-term cleanups that need to be done:
 	- Probably fixed DOS port compile.
 	- Seth Galbraith fixed font selection for console so that
 	  it better fits the requested display width.
+	- Makefile fixes from Michael Dale Long.
+	- Makefile fixes from Seth Galbraith.
 20-Oct-1999
 	- Fixes to landscape engine from Alex Pfaffe. Uses camera space
 	  coordinates instead of world space.
