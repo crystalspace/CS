@@ -81,7 +81,8 @@ bool issymbolic (char *dir, char *component)
 void remove_dotdot (char *path)
 {
   register char *end, *from, *to, **cp;
-  char *components[MAXFILES], newpath[BUFSIZ];
+  char newpath[BUFSIZ];
+  char **components = (char**)malloc(sizeof(char*) * MAXFILES);
   bool component_copied;
 
   /* slice path up into components. */
@@ -140,6 +141,7 @@ void remove_dotdot (char *path)
 
   /* copy the reconstituted path back to our pointer. */
   strcpy (path, newpath);
+  free(components);
 }
 
 /*

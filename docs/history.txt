@@ -10,6 +10,11 @@ The history order is reversed so that new features are at the top.
 	  CreateSystem() in walktest.cpp which was both a local function and
 	  declared "extern".
 	- 'make clean' no longer deletes all .txt files.
+	- Eric Sunshine worked around a Mingw gcc 3.2 optimization bug which
+	  afflicted makedep and caused it to crash.  The problem would occur at
+	  any optimization level above -O in remove_dotdot() which was
+	  allocating about 4.5 kilobytes on the stack.  Allocating via the heap
+	  rather than the stack worked around the problem.
 13-Oct-2002
 	- Fixed OpenGL/backbuffer implementation of the procedural
 	  textures so that it at least doesn't crash anymore. It also
