@@ -39,6 +39,34 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a bug in Blocks which caused crashes if no network driver
 	  was present. Now it simply doesn't attempt to open a connection
 	  if there is no network driver.
+	- Implemented 'onlyRegion' support in csLoader by using the new
+	  FindXxx() routines that were added to csEngine.
+	- Extended csPObject thus that it correctly unlinks itself from its
+	  parent at destruction time. Previously it didn't care which could
+	  cause bad problems.
+	- Also fixed csObject::ObjRelease() so that it actually resets the
+	  parent to NULL at release time.
+	- In addition fixed the csObject destructor so that the children
+	  are destroyed the correct way now (given that destroying a child
+	  will automatically remove it from the 'children' array).
+	- The csObjectNoDel destructor has also been fixed so that it
+	  sets the parent of all children to NULL (since they are now
+	  unlinked).
+	- All engine classes that can be added to a region now extend
+	  csPObject instead of csObject. This is to make sure that they
+	  actually maintain the parent (which is the region they are in).
+	  When such an object is then deleted it will safely unlink itself
+	  from the parent (region).
+	- Added iRegion/csRegion::PrepareTextures() to prepare all textures
+	  and materials that were loaded in the context of this region.
+	- Renamed iRegion::Prepare() to PrepareSectors() and added a new
+	  Prepare() which calls PrepareTextures() followed by PrepareSectors().
+	  This way it works more like csEngine does.
+	- All the above changes done today result in the 'portal' console
+	  command not crashing anymore and loading the world given as a
+	  parameter (probably) correctly in a new region. The 'portal' command
+	  still doesn't work though because something is still wrong with
+	  the portal.
 8-Dec-2000
 	- Samuel Humphreys did the following changes to phyztest:
 	    - First stage of reformatting csphyziks to be more consistent

@@ -21,6 +21,7 @@
 
 #include "cstypes.h"
 #include "csobject/csobject.h"
+#include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
 #include "igraph2d.h"
 
@@ -32,7 +33,7 @@ struct iImage;
  * csTextureWrapper represents a texture and its link
  * to the iTextureHandle as returned by iTextureManager.
  */
-class csTextureWrapper : public csObject
+class csTextureWrapper : public csPObject
 {
 private:
   /// The corresponding iImage.

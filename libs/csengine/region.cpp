@@ -30,6 +30,7 @@
 #include "csengine/curve.h"
 #include "csobject/objiter.h"
 #include "csutil/csvector.h"
+#include "itxtmgr.h"
 
 //---------------------------------------------------------------------------
 
@@ -209,7 +210,42 @@ Object name is '%s', object type is '%s'\n",
 #endif // CS_DEBUG
 }
 
-bool csRegion::Prepare ()
+bool csRegion::PrepareTextures ()
+{
+  iTextureManager* txtmgr = csEngine::current_engine->G3D->GetTextureManager ();
+  txtmgr->ResetPalette ();
+
+  // First register all textures to the texture manager.
+  {
+    for (csObjIterator iter = GetIterator (csTextureWrapper::Type, false);
+  	!iter.IsFinished () ; ++iter)
+    {
+      csTextureWrapper* csth = (csTextureWrapper*)iter.GetObj ();
+      if (!csth->GetTextureHandle ())
+        csth->Register (txtmgr);
+    }
+  }
+
+  // Prepare all the textures.
+  txtmgr->PrepareTextures ();
+
+  // Then register all materials to the texture manager.
+  {
+    for (csObjIterator iter = GetIterator (csMaterialWrapper::Type, false);
+  	!iter.IsFinished () ; ++iter)
+    {
+      csMaterialWrapper* csmh = (csMaterialWrapper*)iter.GetObj ();
+      if (!csmh->GetMaterialHandle ())
+        csmh->Register (txtmgr);
+    }
+  }
+
+  // Prepare all the materials.
+  txtmgr->PrepareMaterials ();
+  return true;
+}
+
+bool csRegion::PrepareSectors ()
 {
   for (csObjIterator iter = GetIterator (csSector::Type);
   	!iter.IsFinished () ; ++iter)
@@ -217,6 +253,13 @@ bool csRegion::Prepare ()
     csSector* s = (csSector*)iter.GetObj ();
     s->Prepare (s);
   }
+  return true;
+}
+
+bool csRegion::Prepare ()
+{
+  if (!PrepareTextures ()) return false;
+  if (!PrepareSectors ()) return false;
   return true;
 }
 

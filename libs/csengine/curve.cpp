@@ -34,7 +34,7 @@
 static csBezier2 bezierCache;
 
 IMPLEMENT_CSOBJTYPE (csCurve,csObject);
-IMPLEMENT_CSOBJTYPE (csCurveTemplate,csObject);
+IMPLEMENT_CSOBJTYPE (csCurveTemplate,csPObject);
 IMPLEMENT_CSOBJTYPE (csBezierCurve,csCurve);
 IMPLEMENT_CSOBJTYPE (csBezierTemplate,csCurveTemplate);
 
@@ -817,7 +817,7 @@ void csBezierCurve::Normal (csVector3& vec, double u, double v)
 
 //------------------------------------------------------------------
 
-csCurveTemplate::csCurveTemplate () : csObject ()
+csCurveTemplate::csCurveTemplate () : csPObject ()
 {
   csEngine::current_engine->AddToCurrentRegion (this);
 }

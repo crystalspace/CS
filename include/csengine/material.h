@@ -21,6 +21,7 @@
 
 #include "csgfxldr/rgbpixel.h"
 #include "csobject/csobject.h"
+#include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
 #include "imater.h"
 
@@ -100,7 +101,7 @@ public:
  * csMaterialWrapper represents a texture and its link
  * to the iMaterialHandle as returned by iTextureManager.
  */
-class csMaterialWrapper : public csObject, public iMaterialWrapper
+class csMaterialWrapper : public csPObject, public iMaterialWrapper
 {
 private:
   /// The corresponding iMaterial.

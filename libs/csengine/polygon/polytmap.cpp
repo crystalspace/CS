@@ -24,9 +24,9 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csPolyTxtPlane,csObject);
+IMPLEMENT_CSOBJTYPE (csPolyTxtPlane,csPObject);
 
-csPolyTxtPlane::csPolyTxtPlane () : csObject ()
+csPolyTxtPlane::csPolyTxtPlane () : csPObject ()
 {
   ref_count = 1;
   csEngine::current_engine->AddToCurrentRegion (this);

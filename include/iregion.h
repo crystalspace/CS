@@ -28,7 +28,7 @@ struct iSprite;
 struct iSpriteTemplate;
 struct iMaterialWrapper;
 
-SCF_VERSION (iRegion, 0, 1, 0);
+SCF_VERSION (iRegion, 0, 1, 1);
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -48,8 +48,20 @@ struct iRegion : public iBase
   virtual void DeleteAll () = 0;
 
   /**
+   * Prepare all textures and materials in this region.
+   */
+  virtual bool PrepareTextures () = 0;
+
+  /**
+   * Prepare all sectors in this region.
+   */
+  virtual bool PrepareSectors () = 0;
+
+  /**
    * Prepare all objects in this region. This has to be called
    * directly after loading new objects.
+   * This function is equivalent to calling PrepareTextures()
+   * followed by PrepareSectors().
    */
   virtual bool Prepare () = 0;
 

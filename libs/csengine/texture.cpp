@@ -26,10 +26,10 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csTextureWrapper,csObject);
+IMPLEMENT_CSOBJTYPE (csTextureWrapper,csPObject);
 
 csTextureWrapper::csTextureWrapper (iImage* Image) :
-  csObject (), handle (NULL), flags (CS_TEXTURE_3D)
+  csPObject (), handle (NULL), flags (CS_TEXTURE_3D)
 {
   (image = Image)->IncRef ();
   key_col_r = -1;
@@ -39,7 +39,7 @@ csTextureWrapper::csTextureWrapper (iImage* Image) :
 }
 
 csTextureWrapper::csTextureWrapper (csTextureWrapper &th) :
-  csObject (), handle (NULL)
+  csPObject (), handle (NULL)
 {
   flags = th.flags;
   (image = th.image)->IncRef ();
@@ -54,7 +54,7 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &th) :
 }
 
 csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
-  csObject (), image (NULL)
+  csPObject (), image (NULL)
 {
   ith->IncRef ();
   flags = ith->GetFlags ();

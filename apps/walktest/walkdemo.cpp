@@ -1083,6 +1083,7 @@ void OpenPortal (csView* view, char* lev)
   thing->GetMovable ().SetSector (room);
   float dx = 1, dy = 3, dz = .3;
 
+  csPolygon3D* portalPoly;
   csPolygon3D* p;
   p = thing->NewPolygon (tm);
   p->AddVertex (-dx, -1, dz);
@@ -1104,6 +1105,7 @@ void OpenPortal (csView* view, char* lev)
   p->AddVertex (dx, -1, dz);
   p->AddVertex (-dx, -1, dz);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  portalPoly = p;
 
   p = thing->NewPolygon (tm);
   p->AddVertex (dx, dy-1, dz);
@@ -1141,6 +1143,14 @@ void OpenPortal (csView* view, char* lev)
   Sys->VFS->ChDir (buf);
   csLoader::AppendMapFile (Sys->engine, "world");
   Sys->engine->GetCsCurrentRegion ()->Prepare ();
+
+  // First make a portal to the new level.
+  iSector* start_sector = Sys->engine->GetCsCurrentRegion ()->FindSector ("room");
+  if (start_sector)
+  {
+    portalPoly->SetCSPortal (start_sector->GetPrivateObject ());
+  }
+
   Sys->engine->SelectRegion (NULL);
 }
 

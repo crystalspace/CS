@@ -82,8 +82,20 @@ public:
   virtual void DeleteAll ();
 
   /**
+   * Prepare all textures and materials in this region.
+   */
+  virtual bool PrepareTextures ();
+
+  /**
+   * Prepare all sectors in this region.
+   */
+  virtual bool PrepareSectors ();
+
+  /**
    * Prepare all objects in this region. This has to be called
    * directly after loading new objects.
+   * This function is equivalent to calling PrepareTextures()
+   * followed by PrepareSectors().
    */
   virtual bool Prepare ();
 

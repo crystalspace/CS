@@ -38,6 +38,8 @@ public:
   /// Initialize the object
   csPObject () : csObject (), parent (NULL)
   { }
+  /// Destroy this object and unlink from the parent
+  virtual ~csPObject ();
   /// Query the parent object
   virtual csObject *GetObjectParent () const
   { return parent; }

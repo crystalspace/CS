@@ -25,6 +25,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 #include "csobject/csobject.h"
+#include "csobject/pobject.h"
 #include "csengine/tranman.h"
 #include "csengine/arrays.h"
 #include "csutil/cscolor.h"
@@ -97,7 +98,7 @@ struct csPolygonSetBBox
  * <li> Things do not require portals but can use them. 
  * </ul>
  */
-class csPolygonSet : public csObject
+class csPolygonSet : public csPObject
 {
   friend class Dumper;
 

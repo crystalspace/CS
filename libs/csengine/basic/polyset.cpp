@@ -43,7 +43,7 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csPolygonSet,csObject);
+IMPLEMENT_CSOBJTYPE (csPolygonSet,csPObject);
 
 IMPLEMENT_IBASE_EXT (csPolygonSet)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonSet)
@@ -60,7 +60,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 
 long csPolygonSet::current_light_frame_number = 0;
 
-csPolygonSet::csPolygonSet (csEngine* engine) : csObject(),
+csPolygonSet::csPolygonSet (csEngine* engine) : csPObject(),
   polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygonSet);

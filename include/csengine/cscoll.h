@@ -21,6 +21,7 @@
 
 #include "csgeom/matrix3.h"
 #include "csobject/csobject.h"
+#include "csobject/pobject.h"
 #include "csutil/csvector.h"
 #include "csengine/movable.h"
 
@@ -34,7 +35,7 @@ class csEngine;
  * operations like 'move' and 'transform' on all the objects in
  * the collection together.
  */
-class csCollection : public csObject
+class csCollection : public csPObject
 {
   friend class csMovable;
 

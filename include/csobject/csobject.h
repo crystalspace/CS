@@ -42,6 +42,7 @@ class csObject : public csBase, public iObject
 {
 protected:
   friend class csObjIterator;
+  friend class csObjectNoDel;
   /// Each object have a unique ID associated with it
   CS_ID csid;
 

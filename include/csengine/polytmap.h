@@ -21,6 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
+#include "csobject/pobject.h"
 
 class Dumper;
 
@@ -29,7 +30,7 @@ class Dumper;
  * that defines the orientation and offset of a texture. It can
  * be used by several polygons to let the textures fit perfectly.
  */
-class csPolyTxtPlane : public csObject
+class csPolyTxtPlane : public csPObject
 {
   ///
   friend class csPolygon2D;

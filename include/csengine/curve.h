@@ -273,7 +273,7 @@ public:
 /**
  * A curve template.
  */
-class csCurveTemplate : public csObject
+class csCurveTemplate : public csPObject
 {
 protected:
   csMaterialWrapper* cstxt;

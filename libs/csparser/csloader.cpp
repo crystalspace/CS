@@ -64,6 +64,8 @@ typedef char ObName[30];
 static csEngine* Engine;
 /// Loader flags
 static int flags = 0;
+/// If true the we only load in the current region
+bool onlyRegion = false;
 
 //---------------------------------------------------------------------------
 
@@ -585,25 +587,25 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_THING:
         {
           ScanStr (params, "%s", str);
-          csThing* th = (csThing*)Engine->things.FindByName (str);
+	  iThing* th = Engine->FindThing (str, onlyRegion);
           if (!th)
           {
             CsPrintf (MSG_FATAL_ERROR, "Thing '%s' not found!\n", str);
             fatal_exit (0, false);
           }
-          collection->AddObject ((csObject*)th);
+          collection->AddObject ((csObject*)(th->GetPrivateObject ()));
         }
         break;
       case CS_TOKEN_SPRITE:
         {
           ScanStr (params, "%s", str);
-          csSprite* spr = (csSprite*)Engine->sprites.FindByName (str);
+	  iSprite* spr = Engine->FindSprite (str, onlyRegion);
           if (!spr)
           {
             CsPrintf (MSG_FATAL_ERROR, "Sprite '%s' not found!\n", str);
             fatal_exit (0, false);
           }
-          collection->AddObject ((csObject*)spr);
+          collection->AddObject ((csObject*)(spr->GetPrivateObject ()));
         }
         break;
       case CS_TOKEN_LIGHT:
@@ -619,18 +621,19 @@ csCollection* csLoader::load_collection (char* name, char* buf)
       case CS_TOKEN_SECTOR:
         {
           ScanStr (params, "%s", str);
-          csSector* s = (csSector*)Engine->sectors.FindByName (str);
+	  iSector* s = Engine->FindSector (str, onlyRegion);
           if (!s)
           {
             CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found!\n", str);
             fatal_exit (0, false);
           }
-          collection->AddObject ((csObject*)s);
+          collection->AddObject ((csObject*)(s->GetPrivateObject ()));
         }
         break;
       case CS_TOKEN_COLLECTION:
         {
           ScanStr (params, "%s", str);
+	  //@@@$$$ TODO: Collection in regions.
           csCollection* th = (csCollection*)Engine->collections.FindByName (str);
           if (!th)
           {
@@ -1884,7 +1887,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
       case CS_TOKEN_CLONE:
         {
           ScanStr (params, "%s", str);
-          csThing* t = (csThing*)Engine->things.FindByName (str);
+	  iThing* t = Engine->FindThing (str, onlyRegion);
           if (!t)
           {
             CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing '%s'!\n", str);
@@ -1892,14 +1895,14 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec,
           }
 	  if (info.use_mat_set)
           {
-            thing->MergeTemplate (t, sec, Engine->GetMaterials (), info.mat_set_name,
+            thing->MergeTemplate (t->GetPrivateObject (), sec, Engine->GetMaterials (), info.mat_set_name,
               info.default_material, info.default_texlen, true);
             info.use_mat_set = false;
 	  }
           else
-            thing->MergeTemplate (t, sec, info.default_material, info.default_texlen,
+            thing->MergeTemplate (t->GetPrivateObject (), sec, info.default_material, info.default_texlen,
 		true);
-          csLoaderStat::polygons_loaded += t->GetNumPolygons ();
+          csLoaderStat::polygons_loaded += t->GetPrivateObject ()->GetNumPolygons ();
         }
         break;
       case CS_TOKEN_KEY:
@@ -3992,7 +3995,7 @@ csSoundDataObject *csLoader::LoadSoundObject (csEngine* engine,
 
 bool csLoader::LoadMap (char* buf, bool onlyRegion)
 {
-  (void)onlyRegion;
+  ::onlyRegion = onlyRegion;
 
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (WORLD)
@@ -4102,7 +4105,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
             Engine->thing_templates.Push (load_sixface (name, params, NULL, true));
           break;
         case CS_TOKEN_SECTOR:
-          if (!Engine->sectors.FindByName (name))
+          if (!Engine->FindSector (name, onlyRegion))
             Engine->sectors.Push (load_sector (name, params));
           break;
         case CS_TOKEN_PLANE:
@@ -4139,7 +4142,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
           break;
         case CS_TOKEN_ROOM:
           // Not an object but it is translated to a special sector.
-          if (!Engine->sectors.FindByName (name))
+          if (!Engine->FindSector (name, onlyRegion))
             Engine->sectors.Push (load_room (name, params));
           break;
         case CS_TOKEN_LIGHTX:
@@ -4171,10 +4174,13 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
   }
 
   int sn = Engine->sectors.Length ();
+  csRegion* cur_region = Engine->GetCsCurrentRegion ();
   while (sn > 0)
   {
     sn--;
     csSector* s = (csSector*)(Engine->sectors)[sn];
+    if (onlyRegion && cur_region && s->GetObjectParent () != cur_region)
+      continue;
     int st = s->things.Length ();
     int j = -1;
     while (j < st)
@@ -4190,7 +4196,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
         {
           csPortal *portal = p->GetPortal ();
           csSector *stmp = portal->GetSector ();
-          csSector *snew = (csSector*)(Engine->sectors).FindByName(stmp->GetName ());
+	  iSector *snew = Engine->FindSector (stmp->GetName (), onlyRegion);
           if (!snew)
           {
             CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found for portal in"
@@ -4199,7 +4205,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
                       p->GetName ());
             fatal_exit (0, false);
           }
-          portal->SetSector (snew);
+          portal->SetSector (snew->GetPrivateObject ());
           delete stmp;
         }
       }

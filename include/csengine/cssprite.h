@@ -143,7 +143,7 @@ private:
  * This class represents a template from which a csSprite3D
  * class can be made.
  */
-class csSpriteTemplate : public csObject, public iSpriteTemplate
+class csSpriteTemplate : public csPObject, public iSpriteTemplate
 {
   friend class Dumper;
 
@@ -358,7 +358,7 @@ typedef void (csSpriteCallback2) (csSprite3D* spr, csRenderView* rview, csObject
 /**
  * The base class for all types of sprites.
  */
-class csSprite : public csObject
+class csSprite : public csPObject
 {
   friend class Dumper;
   friend class csMovable;

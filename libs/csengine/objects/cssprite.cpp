@@ -106,10 +106,10 @@ IMPLEMENT_IBASE (csSpriteTemplate)
 IMPLEMENT_IBASE_END
 
 
-IMPLEMENT_CSOBJTYPE (csSpriteTemplate, csObject)
+IMPLEMENT_CSOBJTYPE (csSpriteTemplate, csPObject)
 
 csSpriteTemplate::csSpriteTemplate ()
-  : csObject (), frames (8, 8), actions (8, 8),
+  : csPObject (), frames (8, 8), actions (8, 8),
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
   CONSTRUCT_IBASE (NULL);
@@ -480,7 +480,7 @@ void csSpriteTemplate::HardTransform (const csReversibleTransform& t)
 
 //=============================================================================
 
-IMPLEMENT_CSOBJTYPE (csSprite, csObject)
+IMPLEMENT_CSOBJTYPE (csSprite, csPObject)
 
 IMPLEMENT_IBASE_EXT (csSprite)
   IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
@@ -495,7 +495,7 @@ IMPLEMENT_EMBEDDED_IBASE (csSprite::Sprite)
   IMPLEMENTS_INTERFACE (iSprite)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csSprite::csSprite (csObject* theParent) : csObject ()
+csSprite::csSprite (csObject* theParent) : csPObject ()
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
   CONSTRUCT_EMBEDDED_IBASE (scfiSprite);

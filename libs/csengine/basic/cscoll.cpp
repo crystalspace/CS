@@ -22,10 +22,10 @@
 #include "csengine/engine.h"
 #include "csengine/sector.h"
 
-IMPLEMENT_CSOBJTYPE (csCollection,csObject);
+IMPLEMENT_CSOBJTYPE (csCollection,csPObject);
 
 csCollection::csCollection (csEngine* engine) :
-  csObject(), objects (8,8), movable ()
+  csPObject(), objects (8,8), movable ()
 {
   movable.SetObject (this);
   csCollection::engine = engine;

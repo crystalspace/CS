@@ -74,14 +74,14 @@ void csMaterial::GetReflection (float &oDiffuse, float &oAmbient,
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csMaterialWrapper, csObject);
+IMPLEMENT_CSOBJTYPE (csMaterialWrapper, csPObject);
 
 IMPLEMENT_IBASE (csMaterialWrapper)
   IMPLEMENTS_INTERFACE (iMaterialWrapper)
 IMPLEMENT_IBASE_END
 
 csMaterialWrapper::csMaterialWrapper (iMaterial* material) :
-  csObject (), handle (NULL)
+  csPObject (), handle (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   csMaterialWrapper::material = material;
@@ -90,7 +90,7 @@ csMaterialWrapper::csMaterialWrapper (iMaterial* material) :
 }
 
 csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
-  csObject (), iMaterialWrapper (), handle (NULL)
+  csPObject (), iMaterialWrapper (), handle (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   (material = th.material)->IncRef ();
@@ -100,7 +100,7 @@ csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
 }
 
 csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
-  csObject (), material (NULL)
+  csPObject (), material (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   ith->IncRef ();

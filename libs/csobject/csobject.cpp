@@ -94,12 +94,27 @@ csObject::csObject (csObject& iObj) : csBase (), iObject (iObj), csid (iObj.csid
 
 csObject::~csObject ()
 {
-  if (children)
+  int idx = 0;
+  while (children && children->count > idx)
   {
-    for (int i = 0; i < children->count; i++)
-      delete (children->obj [i]);
-    free (children);
+    csObject* child = children->obj[idx];
+    // If the parent of the child is equal to this object
+    // then we know that deleting the child will do the needed
+    // cleanup of the 'children' array. Otherwise we have to do
+    // this ourselves.
+    if (child->GetObjectParent () == this)
+      delete child;
+    else
+    {
+      delete child;
+      idx++;	// Skip this index.
+    }
   }
+  // If there is still a 'children' array (possible if some
+  // of the children didn't have this object as a parent) then
+  // we delete this array here.
+  if (children) free (children);
+
   delete [] Name;
 }
 
@@ -107,6 +122,15 @@ csObjectNoDel::~csObjectNoDel ()
 {
   if (children)
   {
+    int i;
+    // First we unlink all children from this parent. But
+    // only if the parent is equal to this.
+    for (i = 0 ; i < children->count ; i++)
+    {
+      csObject* child = children->obj[i];
+      if (child->GetObjectParent () == this)
+        child->SetObjectParent (NULL);
+    }
     free (children);
     children = NULL;
   }
@@ -153,6 +177,7 @@ void csObject::ObjRelease (csObject *obj)
   for (int i = 0; i < children->count; i++)
     if (children->obj [i] == obj)
     {
+      obj->SetObjectParent (NULL);
       memmove (&children->obj [i], &children->obj [i + 1],
         (children->limit - (i + 1)) * sizeof (csObject *));
       if (--children->count <= children->limit - CONTAINER_LIMIT_DELTA)
@@ -228,3 +253,12 @@ bool csObjIterator::FindName(const char* name)
 
 IMPLEMENT_CSOBJTYPE (csDataObject, csObject);
 IMPLEMENT_CSOBJTYPE (csPObject, csObject);
+
+csPObject::~csPObject ()
+{
+  if (parent)
+  {
+    parent->ObjRelease (this);
+  }
+}
+
