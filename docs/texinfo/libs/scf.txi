@@ -152,8 +152,8 @@ a pointer to the @code{Create_MyDog()} function, call it and get a new
 to an @samp{iDog} object:
 
 @example
-handle = LoadLibrary("libdog.so");
-iDog (*Create_iDog)() = GetLibrarySymbol("Create_IDog");
+handle = csFindLoadLibrary("libdog.so");
+iDog (*Create_iDog)() = csGetLibrarySymbol(handle, "Create_iDog");
 iDog* dog = Create_iDog();
 printf("Doggy's name is %s\n", dog->GetName());
 dog->Shout(100);
@@ -469,7 +469,7 @@ if we know class @samp{MyGraphics3D} implements the @samp{iGraphics3D}
 interface, you should write:
 
 @example
-iGraphics3D* G3D = SCF_CREATE_INSTANCE(MyGraphics3D, iGraphics3D);
+iGraphics3D* G3D = SCF_CREATE_INSTANCE("MyGraphics3D", iGraphics3D);
 if (!G3D)
 @{
   fprintf(stderr,
@@ -521,7 +521,7 @@ embedded into our class).
 @emph{File}: @file{idog.h}
 
 @example
-#include "scf.h"
+#include "csutil/scf.h"
 
 // Version number of our interface.
 SCF_VERSION(iDog, 0, 0, 1)
@@ -537,7 +537,7 @@ struct iDog : public iBase
 @emph{File}: @file{iname.h}
 
 @example
-#include "scf.h"
+#include "csutil/scf.h"
 
 // Version number of our interface.
 SCF_VERSION(iName, 0, 0, 1);
@@ -556,11 +556,14 @@ interfaces:
 @emph{File}: @file{dog.cpp}
 
 @example
-#include "idog.h"
-#include "iname.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include "cssysdef.h"
+
+#include "idog.h"
+#include "iname.h"
 
 class csDog : public iDog
 @{
@@ -630,33 +633,37 @@ void csDog::csName::SetName(char const* iName)
 SCF_IMPLEMENT_FACTORY(csDog)
 
 SCF_EXPORT_CLASS_TABLE(Dog)
-  SCF_EXPORT_CLASS(csDog, "A Dog that shouts")
+  SCF_EXPORT_CLASS(csDog, "csDog", "A Dog that shouts")
 SCF_EXPORT_CLASS_TABLE_END
 @end example
 
 The above three files should be compiled together to get a shared library.
 The shared library should export the @code{Create_csDog()} function
 (implemented with the @code{SCF_IMPLEMENT_FACTORY()} macro).  On most platforms
-this is achieved automatically, however on @sc{os}/2 you will need to write a
-@file{.def} file for this.  Finally, here is the source code for a client
-application that uses the @samp{csDog} class:
+this is achieved automatically, however on Windows you may need to write a
+@file{.def} file for this.  Finally, here is the source code for a
+simple client application that uses the @samp{csDog} class:
 
 @noindent
 @emph{File}: @file{doggy.cpp}
 
 @example
 #include <stdio.h>
-#include "scf.h"
+
+#include "cssysdef.h"
+
+#include "csutil/scf.h"
+#include "csutil/cfgfile.h"
+
 #include "idog.h"
 #include "iname.h"
-#include "inifile.h"
 
 int main ()
 @{
-  csIniFile config("scf.cfg");
+  csConfigFile config("scf.cfg");
   scfInitialize(&config);
 
-  iDog *dog = SCF_CREATE_INSTANCE(csDog, iDog);
+  iDog *dog = SCF_CREATE_INSTANCE("csDog", iDog);
   if (!dog)
     fprintf(stderr, "No csDog shared class!\n");
   else
@@ -689,7 +696,7 @@ the @code{[SCF.Registry]} section of the configuration file @file{scf.cfg}.
 Alternatively, you can register classes at run time:
 
 @example
-iSCF::SCF->RegisterClass("csDog", "dog");
+iSCF::SCF->RegisterClass("csDog", "Dog");
 @end example
 
 @node SCF Advanced, SCF Smart Pointers, SCF Example, SCF

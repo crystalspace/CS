@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	      portals to any mesh object). However later on most functions
 	      still query for iThingState so this promise of more generality
 	      is not fulfilled yet.
+	- DeSigna brought manual section 6.4.6 (SCF Examples)
+	  up-to-date with current SCF workings.
 20-May-2003
 	- Philip Wyett worked around problem of incorrect pathed cs_pyth.cpp
           being included in the cspython MSVC project file. Added variable
