@@ -220,6 +220,7 @@ void csMaterialHandle::FreeMaterial ()
 {
   if (material)
   {
+    DEC_REF (texture);
     material->DecRef ();
     material = NULL;
   }
@@ -339,3 +340,4 @@ void csTextureManager::FreeMaterials ()
   for (int i = 0; i < materials.Length (); i++)
     materials.Get (i)->FreeMaterial ();
 }
+

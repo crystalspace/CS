@@ -353,7 +353,10 @@ public:
 
   /// Clear (free) all textures
   virtual void Clear ()
-  { textures.DeleteAll (); }
+  { 
+    textures.DeleteAll (); 
+    materials.DeleteAll (); 
+  }
 
   /// Toggle verbose mode
   virtual void SetVerbose (bool enable)
