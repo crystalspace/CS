@@ -202,7 +202,7 @@ public:
     int i;
     for (i = 0 ; i < num_els ; i++)
     {
-      if (els[i].object == object) return &els[i];
+      if (els[i].used && els[i].object == object) return &els[i];
     }
     return NULL;
   }
