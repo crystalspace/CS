@@ -72,6 +72,7 @@ PLUGINS += culling/dynavis
 PLUGINS += culling/frustvis
 PLUGINS += csparser
 PLUGINS += csparser/services
+PLUGINS += cssaver
 PLUGINS += video/effects
 
 PLUGINS.DYNAMIC += engine/iso
