@@ -3,6 +3,10 @@ The history order is reversed so that new features are at the top.
 30-Oct-2002
 	- Replaced ReportError() with ReportWarning() when an image couldn't
 	  be loaded in the main loader.
+	- Fixed a very bad bug in the bounding box calculation of things.
+	  In some cases this calculation could go totally wrong.
+	  This had an effect on various subsystems in CS like Dynavis which
+	  heavily depend on bounding boxes.
 29-Oct-2002
 	- Eric Sunshine updated the MinGW build instructions in the user manual
 	  to discuss the new preferred MinGW+MSYS procedure for building

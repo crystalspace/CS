@@ -2283,15 +2283,12 @@ void csThing::CreateBoundingBox ()
   bbox = NULL;
   if (num_vertices <= 0 && num_curve_vertices <= 0) return ;
   bbox = new csThingBBox ();
-  minx = 100000000.;
-  miny = 100000000.;
-  minz = 100000000.;
-  maxx = -100000000.;
-  maxy = -100000000.;
-  maxz = -100000000.;
+  minx = maxx = obj_verts[0].x;
+  miny = maxy = obj_verts[0].y;
+  minz = maxz = obj_verts[0].z;
 
   int i;
-  for (i = 0; i < num_vertices; i++)
+  for (i = 1; i < num_vertices; i++)
   {
     if (obj_verts[i].x < minx)
       minx = obj_verts[i].x;
