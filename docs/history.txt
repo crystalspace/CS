@@ -24,6 +24,7 @@ chronological order.
 	- res made the DDS buffer use unpooled parasitic databuffers. Pooled 
 	  ones aren't that sensible there.
 	- res fixed the TGA loader to properly load 16bpp TGAs.
+	- res fixed messed-up stencil shadows on some NVidia cards.
 28-Jan-2005
 	- Andrew Mann fixed bugs in the software sound renderer which prevented
 	  looping from working, and which caused a gap in the looping process.

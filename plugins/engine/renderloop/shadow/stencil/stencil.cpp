@@ -121,7 +121,8 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
     { 
       entry->shadow_index_buffer = parent->g3d->CreateIndexRenderBuffer (
         sizeof (unsigned int)*triangle_count*12, CS_BUF_DYNAMIC,
-        CS_BUFCOMP_UNSIGNED_INT, 0, vertex_count - 1);
+        CS_BUFCOMP_UNSIGNED_INT, 0, triangle_count*12); 
+	// @@@ Is the upper range correct?
     }
 
     unsigned int *buf = (unsigned int *)entry->shadow_index_buffer->Lock (
@@ -798,7 +799,7 @@ iShader* csStencilShadowType::GetShadow ()
     
     csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
     csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadow.xml");
-    // csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
+    //csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
     csRef<iDocumentSystem> docsys (
       CS_QUERY_REGISTRY(object_reg, iDocumentSystem));
     if (docsys == 0)
