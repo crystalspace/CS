@@ -20,6 +20,8 @@ chronological order.
 	  resides alongside the terrain loader.
 	- Eric Sunshine added a missing csShaderVariable::TRANSFORM case to
 	  csShaderVariable::operator=().
+	- res fixed some more VC7 compilation warnings.
+	- res added a few new extensions to the GL extension manager.
 27-Mar-2005
 	- Eric Sunshine added FStripCommon to jamcompatibility.jam since Jam
 	  2.4 lacks it and it is needed by StripCommon in helper.jam.

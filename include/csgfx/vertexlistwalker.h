@@ -23,7 +23,7 @@ template<class T>
 class csVertexListWalker
 {
 public:
-  csVertexListWalker (void *listPointer, uint elements, uint stride = sizeof(T))
+  csVertexListWalker (void *listPointer, size_t elements, size_t stride = sizeof(T))
     : list ((uint8*)listPointer), elements (elements), stride (stride), currElement (0)
   {
     if (stride == 0)
@@ -49,8 +49,8 @@ public:
 
 private:
   uint8 *list;
-  uint elements, stride;
-  uint currElement;
+  size_t elements, stride;
+  size_t currElement;
 };
 
 #endif

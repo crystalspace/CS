@@ -2838,8 +2838,6 @@ iTextureWrapper *csEngine::CreateBlackTexture (
   csColor *iTransp,
   int iFlags)
 {
-  if (!ImageLoader) return 0;
-
   csRef<iImage> ifile = csPtr<iImage>(new csImageMemory (w, h));
   ifile->SetName (name);
 

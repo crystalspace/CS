@@ -9471,6 +9471,253 @@ typedef GLint (csAPIENTRY* csGLGETATTRIBLOCATIONARB) (GLhandleARB programObj, co
  * @{ */
 
 /** @} */
+/**\name GL_EXT_framebuffer_object constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/framebuffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/framebuffer_object.txt</a>.
+ * @{ */
+#ifndef GL_FRAMEBUFFER_EXT
+#define GL_FRAMEBUFFER_EXT                                           0x8D40
+#endif
+
+#ifndef GL_RENDERBUFFER_EXT
+#define GL_RENDERBUFFER_EXT                                          0x8D41
+#endif
+
+#ifndef GL_STENCIL_INDEX_EXT
+#define GL_STENCIL_INDEX_EXT                                         0x8D45
+#endif
+
+#ifndef GL_STENCIL_INDEX1_EXT
+#define GL_STENCIL_INDEX1_EXT                                        0x8D46
+#endif
+
+#ifndef GL_STENCIL_INDEX4_EXT
+#define GL_STENCIL_INDEX4_EXT                                        0x8D47
+#endif
+
+#ifndef GL_STENCIL_INDEX8_EXT
+#define GL_STENCIL_INDEX8_EXT                                        0x8D48
+#endif
+
+#ifndef GL_STENCIL_INDEX16_EXT
+#define GL_STENCIL_INDEX16_EXT                                       0x8D49
+#endif
+
+#ifndef GL_RENDERBUFFER_WIDTH_EXT
+#define GL_RENDERBUFFER_WIDTH_EXT                                    0x8D42
+#endif
+
+#ifndef GL_RENDERBUFFER_HEIGHT_EXT
+#define GL_RENDERBUFFER_HEIGHT_EXT                                   0x8D43
+#endif
+
+#ifndef GL_RENDERBUFFER_INTERNAL_FORMAT_EXT
+#define GL_RENDERBUFFER_INTERNAL_FORMAT_EXT                          0x8D44
+#endif
+
+#ifndef GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT
+#define GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT                    0x8CD0
+#endif
+
+#ifndef GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT
+#define GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT                    0x8CD1
+#endif
+
+#ifndef GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL_EXT
+#define GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL_EXT                  0x8CD2
+#endif
+
+#ifndef GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE_EXT
+#define GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE_EXT          0x8CD3
+#endif
+
+#ifndef GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_EXT
+#define GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_EXT             0x8CD4
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT0_EXT
+#define GL_COLOR_ATTACHMENT0_EXT                                     0x8CE0
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT1_EXT
+#define GL_COLOR_ATTACHMENT1_EXT                                     0x8CE1
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT2_EXT
+#define GL_COLOR_ATTACHMENT2_EXT                                     0x8CE2
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT3_EXT
+#define GL_COLOR_ATTACHMENT3_EXT                                     0x8CE3
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT4_EXT
+#define GL_COLOR_ATTACHMENT4_EXT                                     0x8CE4
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT5_EXT
+#define GL_COLOR_ATTACHMENT5_EXT                                     0x8CE5
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT6_EXT
+#define GL_COLOR_ATTACHMENT6_EXT                                     0x8CE6
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT7_EXT
+#define GL_COLOR_ATTACHMENT7_EXT                                     0x8CE7
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT8_EXT
+#define GL_COLOR_ATTACHMENT8_EXT                                     0x8CE8
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT9_EXT
+#define GL_COLOR_ATTACHMENT9_EXT                                     0x8CE9
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT10_EXT
+#define GL_COLOR_ATTACHMENT10_EXT                                    0x8CEA
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT11_EXT
+#define GL_COLOR_ATTACHMENT11_EXT                                    0x8CEB
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT12_EXT
+#define GL_COLOR_ATTACHMENT12_EXT                                    0x8CEC
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT13_EXT
+#define GL_COLOR_ATTACHMENT13_EXT                                    0x8CED
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT14_EXT
+#define GL_COLOR_ATTACHMENT14_EXT                                    0x8CEE
+#endif
+
+#ifndef GL_COLOR_ATTACHMENT15_EXT
+#define GL_COLOR_ATTACHMENT15_EXT                                    0x8CEF
+#endif
+
+#ifndef GL_DEPTH_ATTACHMENT_EXT
+#define GL_DEPTH_ATTACHMENT_EXT                                      0x8D00
+#endif
+
+#ifndef GL_STENCIL_ATTACHMENT_EXT
+#define GL_STENCIL_ATTACHMENT_EXT                                    0x8D20
+#endif
+
+#ifndef GL_FRAMEBUFFER_COMPLETE_EXT
+#define GL_FRAMEBUFFER_COMPLETE_EXT                                  0x8CD5
+#endif
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT
+#define GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT                     0x8CD6
+#endif
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT
+#define GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT             0x8CD7
+#endif
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT
+#define GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT           0x8CD8
+#endif
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT
+#define GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT                     0x8CD9
+#endif
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT
+#define GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT                        0x8CDA
+#endif
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT
+#define GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT                    0x8CDB
+#endif
+
+#ifndef GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT
+#define GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT                    0x8CDC
+#endif
+
+#ifndef GL_FRAMEBUFFER_UNSUPPORTED_EXT
+#define GL_FRAMEBUFFER_UNSUPPORTED_EXT                               0x8CDD
+#endif
+
+#ifndef GL_FRAMEBUFFER_STATUS_ERROR_EXT
+#define GL_FRAMEBUFFER_STATUS_ERROR_EXT                              0x8CDE
+#endif
+
+#ifndef GL_FRAMEBUFFER_BINDING_EXT
+#define GL_FRAMEBUFFER_BINDING_EXT                                   0x8CA6
+#endif
+
+#ifndef GL_RENDERBUFFER_BINDINGS_EXT
+#define GL_RENDERBUFFER_BINDINGS_EXT                                 0x8CA7
+#endif
+
+#ifndef GL_MAX_COLOR_ATTACHMENTS_EXT
+#define GL_MAX_COLOR_ATTACHMENTS_EXT                                 0x8CA8
+#endif
+
+#ifndef GL_RENDERBUFFER_SIZE_EXT
+#define GL_RENDERBUFFER_SIZE_EXT                                     0x8CA9
+#endif
+
+#ifndef GL_INVALID_FRAMEBUFFER_OPERATION_EXT
+#define GL_INVALID_FRAMEBUFFER_OPERATION_EXT                         0x0506
+#endif
+
+
+/** @} */
+
+/**\name GL_EXT_framebuffer_object functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/framebuffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/framebuffer_object.txt</a>.
+ * @{ */
+typedef GLboolean (csAPIENTRY* csGLISRENDERBUFFEREXT) (GLuint renderbuffer);
+typedef GLvoid (csAPIENTRY* csGLBINDRENDERBUFFEREXT) (GLenum target, GLuint renderbuffer);
+typedef GLvoid (csAPIENTRY* csGLDELETERENDERBUFFERSEXT) (GLsizei n, const GLuint* renderbuffers);
+typedef GLvoid (csAPIENTRY* csGLGENRENDERBUFFERSEXT) (GLsizei n, GLuint* renderbuffers);
+typedef GLvoid (csAPIENTRY* csGLRENDERBUFFERSTORAGEEXT) (GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+typedef GLvoid (csAPIENTRY* csGLGETRENDERBUFFERPARAMETERIVEXT) (GLenum target, GLenum pname, GLint* params);
+typedef GLboolean (csAPIENTRY* csGLISFRAMEBUFFEREXT) (GLuint framebuffer);
+typedef GLvoid (csAPIENTRY* csGLBINDFRAMEBUFFEREXT) (GLenum target, GLuint framebuffer);
+typedef GLvoid (csAPIENTRY* csGLDELETEFRAMEBUFFERSEXT) (GLsizei n, const GLuint* framebuffers);
+typedef GLvoid (csAPIENTRY* csGLGENFRAMEBUFFERSEXT) (GLsizei n, GLuint* framebuffers);
+typedef GLenum (csAPIENTRY* csGLCHECKFRAMEBUFFERSTATUSEXT) (GLenum target);
+typedef GLvoid (csAPIENTRY* csGLFRAMEBUFFERTEXTURE1DEXT) (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+typedef GLvoid (csAPIENTRY* csGLFRAMEBUFFERTEXTURE2DEXT) (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+typedef GLvoid (csAPIENTRY* csGLFRAMEBUFFERTEXTURE3DEXT) (GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset);
+typedef GLvoid (csAPIENTRY* csGLFRAMEBUFFERRENDERBUFFEREXT) (GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+typedef GLvoid (csAPIENTRY* csGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXT) (GLenum target, GLenum attachment, GLenum pname, GLint* params);
+typedef GLvoid (csAPIENTRY* csGLGENERATEMIPMAPEXT) (GLenum target);
+
+/** @} */
+/**\name GL_EXT_pixel_buffer_object constants
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/pixel_buffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/pixel_buffer_object.txt</a>.
+ * @{ */
+#ifndef GL_PIXEL_PACK_BUFFER_EXT
+#define GL_PIXEL_PACK_BUFFER_EXT                                     0x88EB
+#endif
+
+#ifndef GL_PIXEL_UNPACK_BUFFER_EXT
+#define GL_PIXEL_UNPACK_BUFFER_EXT                                   0x88EC
+#endif
+
+#ifndef GL_PIXEL_PACK_BUFFER_BINDING_EXT
+#define GL_PIXEL_PACK_BUFFER_BINDING_EXT                             0x88ED
+#endif
+
+#ifndef GL_PIXEL_UNPACK_BUFFER_BINDING_EXT
+#define GL_PIXEL_UNPACK_BUFFER_BINDING_EXT                           0x88EF
+#endif
+
+
+/** @} */
+
+/**\name GL_EXT_pixel_buffer_object functions
+ * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/pixel_buffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/pixel_buffer_object.txt</a>.
+ * @{ */
+
+/** @} */
 
 
 // end of definitions
@@ -14235,6 +14482,101 @@ public:
    * @{ */
 
   /** @} */
+  /**\name GL_EXT_framebuffer_object functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/framebuffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/framebuffer_object.txt</a>.
+   * @{ */
+  #ifndef GLISRENDERBUFFEREXT_DECL
+  #define GLISRENDERBUFFEREXT_DECL
+  csGLISRENDERBUFFEREXT glIsRenderbufferEXT;
+  #endif
+
+  #ifndef GLBINDRENDERBUFFEREXT_DECL
+  #define GLBINDRENDERBUFFEREXT_DECL
+  csGLBINDRENDERBUFFEREXT glBindRenderbufferEXT;
+  #endif
+
+  #ifndef GLDELETERENDERBUFFERSEXT_DECL
+  #define GLDELETERENDERBUFFERSEXT_DECL
+  csGLDELETERENDERBUFFERSEXT glDeleteRenderbuffersEXT;
+  #endif
+
+  #ifndef GLGENRENDERBUFFERSEXT_DECL
+  #define GLGENRENDERBUFFERSEXT_DECL
+  csGLGENRENDERBUFFERSEXT glGenRenderbuffersEXT;
+  #endif
+
+  #ifndef GLRENDERBUFFERSTORAGEEXT_DECL
+  #define GLRENDERBUFFERSTORAGEEXT_DECL
+  csGLRENDERBUFFERSTORAGEEXT glRenderbufferStorageEXT;
+  #endif
+
+  #ifndef GLGETRENDERBUFFERPARAMETERIVEXT_DECL
+  #define GLGETRENDERBUFFERPARAMETERIVEXT_DECL
+  csGLGETRENDERBUFFERPARAMETERIVEXT glGetRenderbufferParameterivEXT;
+  #endif
+
+  #ifndef GLISFRAMEBUFFEREXT_DECL
+  #define GLISFRAMEBUFFEREXT_DECL
+  csGLISFRAMEBUFFEREXT glIsFramebufferEXT;
+  #endif
+
+  #ifndef GLBINDFRAMEBUFFEREXT_DECL
+  #define GLBINDFRAMEBUFFEREXT_DECL
+  csGLBINDFRAMEBUFFEREXT glBindFramebufferEXT;
+  #endif
+
+  #ifndef GLDELETEFRAMEBUFFERSEXT_DECL
+  #define GLDELETEFRAMEBUFFERSEXT_DECL
+  csGLDELETEFRAMEBUFFERSEXT glDeleteFramebuffersEXT;
+  #endif
+
+  #ifndef GLGENFRAMEBUFFERSEXT_DECL
+  #define GLGENFRAMEBUFFERSEXT_DECL
+  csGLGENFRAMEBUFFERSEXT glGenFramebuffersEXT;
+  #endif
+
+  #ifndef GLCHECKFRAMEBUFFERSTATUSEXT_DECL
+  #define GLCHECKFRAMEBUFFERSTATUSEXT_DECL
+  csGLCHECKFRAMEBUFFERSTATUSEXT glCheckFramebufferStatusEXT;
+  #endif
+
+  #ifndef GLFRAMEBUFFERTEXTURE1DEXT_DECL
+  #define GLFRAMEBUFFERTEXTURE1DEXT_DECL
+  csGLFRAMEBUFFERTEXTURE1DEXT glFramebufferTexture1DEXT;
+  #endif
+
+  #ifndef GLFRAMEBUFFERTEXTURE2DEXT_DECL
+  #define GLFRAMEBUFFERTEXTURE2DEXT_DECL
+  csGLFRAMEBUFFERTEXTURE2DEXT glFramebufferTexture2DEXT;
+  #endif
+
+  #ifndef GLFRAMEBUFFERTEXTURE3DEXT_DECL
+  #define GLFRAMEBUFFERTEXTURE3DEXT_DECL
+  csGLFRAMEBUFFERTEXTURE3DEXT glFramebufferTexture3DEXT;
+  #endif
+
+  #ifndef GLFRAMEBUFFERRENDERBUFFEREXT_DECL
+  #define GLFRAMEBUFFERRENDERBUFFEREXT_DECL
+  csGLFRAMEBUFFERRENDERBUFFEREXT glFramebufferRenderbufferEXT;
+  #endif
+
+  #ifndef GLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXT_DECL
+  #define GLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXT_DECL
+  csGLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXT glGetFramebufferAttachmentParameterivEXT;
+  #endif
+
+  #ifndef GLGENERATEMIPMAPEXT_DECL
+  #define GLGENERATEMIPMAPEXT_DECL
+  csGLGENERATEMIPMAPEXT glGenerateMipmapEXT;
+  #endif
+
+
+  /** @} */
+  /**\name GL_EXT_pixel_buffer_object functions
+   * For a description of what this ext does, see <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/pixel_buffer_object.txt">http://oss.sgi.com/projects/ogl-sample/registry/EXT/pixel_buffer_object.txt</a>.
+   * @{ */
+
+  /** @} */
 
 // end of functions
 };
@@ -14715,6 +15057,12 @@ public:
   /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/ARB/texture_rectangle.txt">GL_ARB_texture_rectangle</a> extension was found. 
    * Set by csGLExtensionManager::InitGL_ARB_texture_rectangle(). */
   bool CS_GL_ARB_texture_rectangle;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/framebuffer_object.txt">GL_EXT_framebuffer_object</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_framebuffer_object(). */
+  bool CS_GL_EXT_framebuffer_object;
+  /** Whether the <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/pixel_buffer_object.txt">GL_EXT_pixel_buffer_object</a> extension was found. 
+   * Set by csGLExtensionManager::InitGL_EXT_pixel_buffer_object(). */
+  bool CS_GL_EXT_pixel_buffer_object;
 
 protected:
   bool tested_CS_GL_version_1_2;
@@ -14875,6 +15223,8 @@ protected:
   bool tested_CS_GL_ARB_vertex_shader;
   bool tested_CS_GL_ARB_pixel_buffer_object;
   bool tested_CS_GL_ARB_texture_rectangle;
+  bool tested_CS_GL_EXT_framebuffer_object;
+  bool tested_CS_GL_EXT_pixel_buffer_object;
 
 };
 
@@ -20450,6 +20800,86 @@ public:
     {
 
       EXTMGR_REPORT_INIT_RESULT("GL", GL_ARB_texture_rectangle)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/framebuffer_object.txt">GL_EXT_framebuffer_object</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_framebuffer_object. */
+  void InitGL_EXT_framebuffer_object ()
+  {
+    if (tested_CS_GL_EXT_framebuffer_object) return;
+    if (!extstrGL) return;
+    tested_CS_GL_EXT_framebuffer_object = true;
+    const char* ext = "GL_EXT_framebuffer_object";
+
+    char cfgkey[26 + 25 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_EXT_framebuffer_object = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_EXT_framebuffer_object;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+      EXTMGR_FUNC_INIT(glIsRenderbufferEXT, GLISRENDERBUFFEREXT);
+      EXTMGR_FUNC_INIT(glBindRenderbufferEXT, GLBINDRENDERBUFFEREXT);
+      EXTMGR_FUNC_INIT(glDeleteRenderbuffersEXT, GLDELETERENDERBUFFERSEXT);
+      EXTMGR_FUNC_INIT(glGenRenderbuffersEXT, GLGENRENDERBUFFERSEXT);
+      EXTMGR_FUNC_INIT(glRenderbufferStorageEXT, GLRENDERBUFFERSTORAGEEXT);
+      EXTMGR_FUNC_INIT(glGetRenderbufferParameterivEXT, GLGETRENDERBUFFERPARAMETERIVEXT);
+      EXTMGR_FUNC_INIT(glIsFramebufferEXT, GLISFRAMEBUFFEREXT);
+      EXTMGR_FUNC_INIT(glBindFramebufferEXT, GLBINDFRAMEBUFFEREXT);
+      EXTMGR_FUNC_INIT(glDeleteFramebuffersEXT, GLDELETEFRAMEBUFFERSEXT);
+      EXTMGR_FUNC_INIT(glGenFramebuffersEXT, GLGENFRAMEBUFFERSEXT);
+      EXTMGR_FUNC_INIT(glCheckFramebufferStatusEXT, GLCHECKFRAMEBUFFERSTATUSEXT);
+      EXTMGR_FUNC_INIT(glFramebufferTexture1DEXT, GLFRAMEBUFFERTEXTURE1DEXT);
+      EXTMGR_FUNC_INIT(glFramebufferTexture2DEXT, GLFRAMEBUFFERTEXTURE2DEXT);
+      EXTMGR_FUNC_INIT(glFramebufferTexture3DEXT, GLFRAMEBUFFERTEXTURE3DEXT);
+      EXTMGR_FUNC_INIT(glFramebufferRenderbufferEXT, GLFRAMEBUFFERRENDERBUFFEREXT);
+      EXTMGR_FUNC_INIT(glGetFramebufferAttachmentParameterivEXT, GLGETFRAMEBUFFERATTACHMENTPARAMETERIVEXT);
+      EXTMGR_FUNC_INIT(glGenerateMipmapEXT, GLGENERATEMIPMAPEXT);
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_framebuffer_object)
+    }
+    else
+    {
+      Report (msgExtNotFound, "GL", ext);
+    }
+  }
+  
+  /** Initialize <a href="http://oss.sgi.com/projects/ogl-sample/registry/EXT/pixel_buffer_object.txt">GL_EXT_pixel_buffer_object</a> extension. 
+   * Check presence with csGLExtensionFlags::CS_GL_EXT_pixel_buffer_object. */
+  void InitGL_EXT_pixel_buffer_object ()
+  {
+    if (tested_CS_GL_EXT_pixel_buffer_object) return;
+    if (!extstrGL) return;
+    tested_CS_GL_EXT_pixel_buffer_object = true;
+    const char* ext = "GL_EXT_pixel_buffer_object";
+    InitGL_ARB_vertex_buffer_object();
+    if (!CS_GL_ARB_vertex_buffer_object)
+    {
+      Report (msgDependencyNotFound, "GL", ext, "GL_ARB_vertex_buffer_object");
+      return;
+    }
+    char cfgkey[26 + 26 + 1];
+    sprintf (cfgkey, "Video.OpenGL.UseExtension.%s", ext);
+    
+    CS_GL_EXT_pixel_buffer_object = (strstr (extstrGL, ext) != 0);
+
+    bool allclear, funcTest;
+    (void)funcTest; // shut up "variable unused" warnings
+    bool init = CS_GL_EXT_pixel_buffer_object;
+    allclear = true;
+    if (init)	// Don't check the functions if ext isn't reported anyway
+    {
+
+      EXTMGR_REPORT_INIT_RESULT("GL", GL_EXT_pixel_buffer_object)
     }
     else
     {

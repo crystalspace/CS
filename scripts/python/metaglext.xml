@@ -6246,4 +6246,143 @@
     <token name="GL_PROXY_TEXTURE_RECTANGLE_ARB" value="0x84F7" />
     <token name="GL_MAX_RECTANGLE_TEXTURE_SIZE_ARB" value="0x84F8" />
   </extension>
+  <extension name="GL_EXT_framebuffer_object" type="GL">
+    <token name="GL_FRAMEBUFFER_EXT" value="0x8D40" />
+    <token name="GL_RENDERBUFFER_EXT" value="0x8D41" />
+    <token name="GL_STENCIL_INDEX_EXT" value="0x8D45" />
+    <token name="GL_STENCIL_INDEX1_EXT" value="0x8D46" />
+    <token name="GL_STENCIL_INDEX4_EXT" value="0x8D47" />
+    <token name="GL_STENCIL_INDEX8_EXT" value="0x8D48" />
+    <token name="GL_STENCIL_INDEX16_EXT" value="0x8D49" />
+    <token name="GL_RENDERBUFFER_WIDTH_EXT" value="0x8D42" />
+    <token name="GL_RENDERBUFFER_HEIGHT_EXT" value="0x8D43" />
+    <token name="GL_RENDERBUFFER_INTERNAL_FORMAT_EXT" value="0x8D44" />
+    <token name="GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT" value="0x8CD0" />
+    <token name="GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME_EXT" value="0x8CD1" />
+    <token name="GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL_EXT" value="0x8CD2" />
+    <token name="GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_CUBE_MAP_FACE_EXT" value="0x8CD3" />
+    <token name="GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_3D_ZOFFSET_EXT" value="0x8CD4" />
+    <token name="GL_COLOR_ATTACHMENT0_EXT" value="0x8CE0" />
+    <token name="GL_COLOR_ATTACHMENT1_EXT" value="0x8CE1" />
+    <token name="GL_COLOR_ATTACHMENT2_EXT" value="0x8CE2" />
+    <token name="GL_COLOR_ATTACHMENT3_EXT" value="0x8CE3" />
+    <token name="GL_COLOR_ATTACHMENT4_EXT" value="0x8CE4" />
+    <token name="GL_COLOR_ATTACHMENT5_EXT" value="0x8CE5" />
+    <token name="GL_COLOR_ATTACHMENT6_EXT" value="0x8CE6" />
+    <token name="GL_COLOR_ATTACHMENT7_EXT" value="0x8CE7" />
+    <token name="GL_COLOR_ATTACHMENT8_EXT" value="0x8CE8" />
+    <token name="GL_COLOR_ATTACHMENT9_EXT" value="0x8CE9" />
+    <token name="GL_COLOR_ATTACHMENT10_EXT" value="0x8CEA" />
+    <token name="GL_COLOR_ATTACHMENT11_EXT" value="0x8CEB" />
+    <token name="GL_COLOR_ATTACHMENT12_EXT" value="0x8CEC" />
+    <token name="GL_COLOR_ATTACHMENT13_EXT" value="0x8CED" />
+    <token name="GL_COLOR_ATTACHMENT14_EXT" value="0x8CEE" />
+    <token name="GL_COLOR_ATTACHMENT15_EXT" value="0x8CEF" />
+    <token name="GL_DEPTH_ATTACHMENT_EXT" value="0x8D00" />
+    <token name="GL_STENCIL_ATTACHMENT_EXT" value="0x8D20" />
+    <token name="GL_FRAMEBUFFER_COMPLETE_EXT" value="0x8CD5" />
+    <token name="GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT" value="0x8CD6" />
+    <token name="GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT" value="0x8CD7" />
+    <token name="GL_FRAMEBUFFER_INCOMPLETE_DUPLICATE_ATTACHMENT_EXT" value="0x8CD8" />
+    <token name="GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT" value="0x8CD9" />
+    <token name="GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT" value="0x8CDA" />
+    <token name="GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT" value="0x8CDB" />
+    <token name="GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT" value="0x8CDC" />
+    <token name="GL_FRAMEBUFFER_UNSUPPORTED_EXT" value="0x8CDD" />
+    <token name="GL_FRAMEBUFFER_STATUS_ERROR_EXT" value="0x8CDE" />
+    <token name="GL_FRAMEBUFFER_BINDING_EXT" value="0x8CA6" />
+    <token name="GL_RENDERBUFFER_BINDINGS_EXT" value="0x8CA7" />
+    <token name="GL_MAX_COLOR_ATTACHMENTS_EXT" value="0x8CA8" />
+    <token name="GL_RENDERBUFFER_SIZE_EXT" value="0x8CA9" />
+    <token name="GL_INVALID_FRAMEBUFFER_OPERATION_EXT" value="0x0506" />
+
+    <function name="glIsRenderbufferEXT" return="GLboolean" pointer="false">
+      <arg name="renderbuffer" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glBindRenderbufferEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="renderbuffer" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glDeleteRenderbuffersEXT" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="renderbuffers" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glGenRenderbuffersEXT" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="renderbuffers" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glRenderbufferStorageEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="internalformat" type="GLenum" const="false" pointer="false" />
+      <arg name="width" type="GLsizei" const="false" pointer="false" />
+      <arg name="height" type="GLsizei" const="false" pointer="false" />
+    </function>
+    <function name="glGetRenderbufferParameterivEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glIsFramebufferEXT" return="GLboolean" pointer="false">
+      <arg name="framebuffer" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glBindFramebufferEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="framebuffer" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glDeleteFramebuffersEXT" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="framebuffers" type="GLuint" const="true" pointer="true" />
+    </function>
+    <function name="glGenFramebuffersEXT" return="GLvoid" pointer="false">
+      <arg name="n" type="GLsizei" const="false" pointer="false" />
+      <arg name="framebuffers" type="GLuint" const="false" pointer="true" />
+    </function>
+    <function name="glCheckFramebufferStatusEXT" return="GLenum" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+    </function>
+    <function name="glFramebufferTexture1DEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="attachment" type="GLenum" const="false" pointer="false" />
+      <arg name="textarget" type="GLenum" const="false" pointer="false" />
+      <arg name="texture" type="GLuint" const="false" pointer="false" />
+      <arg name="level" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glFramebufferTexture2DEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="attachment" type="GLenum" const="false" pointer="false" />
+      <arg name="textarget" type="GLenum" const="false" pointer="false" />
+      <arg name="texture" type="GLuint" const="false" pointer="false" />
+      <arg name="level" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glFramebufferTexture3DEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="attachment" type="GLenum" const="false" pointer="false" />
+      <arg name="textarget" type="GLenum" const="false" pointer="false" />
+      <arg name="texture" type="GLuint" const="false" pointer="false" />
+      <arg name="level" type="GLint" const="false" pointer="false" />
+      <arg name="zoffset" type="GLint" const="false" pointer="false" />
+    </function>
+    <function name="glFramebufferRenderbufferEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="attachment" type="GLenum" const="false" pointer="false" />
+      <arg name="renderbuffertarget" type="GLenum" const="false" pointer="false" />
+      <arg name="renderbuffer" type="GLuint" const="false" pointer="false" />
+    </function>
+    <function name="glGetFramebufferAttachmentParameterivEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+      <arg name="attachment" type="GLenum" const="false" pointer="false" />
+      <arg name="pname" type="GLenum" const="false" pointer="false" />
+      <arg name="params" type="GLint" const="false" pointer="true" />
+    </function>
+    <function name="glGenerateMipmapEXT" return="GLvoid" pointer="false">
+      <arg name="target" type="GLenum" const="false" pointer="false" />
+    </function>
+  </extension>
+  <extension name="GL_EXT_pixel_buffer_object" type="GL">
+    <depends ext="GL_ARB_vertex_buffer_object" />
+    <token name="GL_PIXEL_PACK_BUFFER_EXT" value="0x88EB" />
+    <token name="GL_PIXEL_UNPACK_BUFFER_EXT" value="0x88EC" />
+    <token name="GL_PIXEL_PACK_BUFFER_BINDING_EXT" value="0x88ED" />
+    <token name="GL_PIXEL_UNPACK_BUFFER_BINDING_EXT" value="0x88EF" />
+  </extension>
 </extensionlist>

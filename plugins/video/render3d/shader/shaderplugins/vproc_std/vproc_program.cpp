@@ -84,7 +84,7 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
     stacks[shaderPlugin->string_object2world].Top()->GetValue (object2world);
 
     iLight* light = 0;
-    uint elementCount = vbuf->GetElementCount ();
+    size_t elementCount = vbuf->GetElementCount ();
 
     if (lightMixMode == LIGHTMIXMODE_NONE)
     {
@@ -108,16 +108,20 @@ void csVProcStandardProgram::SetupState (const csRenderMesh* mesh,
         case LIGHTMIXMODE_ADD:
           {
             calc->CalculateLightingAdd (light, object2world, elementCount,
-              csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),elementCount,vbuf->GetStride ()),
-              csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),elementCount,nbuf->GetStride ()), 
+              csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ), 
+		elementCount, vbuf->GetStride ()),
+              csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
+		elementCount, nbuf->GetStride ()), 
               tmpColor);
             break;
           }
         case LIGHTMIXMODE_MUL:
           {
             calc->CalculateLightingMul (light, object2world, elementCount,
-              csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),elementCount,vbuf->GetStride ()),
-              csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),elementCount,nbuf->GetStride ()), 
+              csVertexListWalker<csVector3> (vbuf->Lock (CS_BUF_LOCK_READ),
+		elementCount, vbuf->GetStride ()),
+              csVertexListWalker<csVector3> (nbuf->Lock (CS_BUF_LOCK_READ),
+	        elementCount, nbuf->GetStride ()), 
               tmpColor);
             break;
           }
