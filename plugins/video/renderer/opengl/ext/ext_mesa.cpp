@@ -17,13 +17,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+
 #define NUM_EXTENSIONS 3
 
 const char *knownExtensions[] = {"GL_ARB_multitexture", 
                                  "GL_EXT_compiled_vertex_array",
 				 "GLX_ARB_get_proc_address"};
 
-void csGraphics3DOpenGL::DetectExtensions()
+void csGraphics3DOGLCommon::DetectExtensions()
 {
 	SysPrintf (MSG_INITIALIZATION, "Detecting Mesa Driver extensions...\n");
 	const unsigned char * extensions;

@@ -246,7 +246,7 @@ bool setupARBmultitexture()
 // This function detects which extensions that is available on this platform. This function 
 // should be implemented on all OpenGL platforms (or maybe we should share this, move it
 // into ogl_g3d.cpp prehaps)
-void csGraphics3DOpenGL::DetectExtensions()
+void csGraphics3DOGLCommon::DetectExtensions()
 {
   //The SysPrintf is just for debugging, but it writes which extensions you have into
   //debug.txt. Made me jealous when I ran it on a TnT2 :-(

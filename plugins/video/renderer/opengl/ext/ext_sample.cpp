@@ -24,7 +24,7 @@
 // some code to ext_auto.cpp in order to include this file for appropriate
 // platforms. -GJH
 
-void csGraphics3DOpenGL::DetectExtensions()
+void csGraphics3DOGLCommon::DetectExtensions()
 {
 	SysPrintf (MSG_INITIALIZATION, "Detecting yer gnarly OpenGL extensions.\n");
 	const unsigned char * extensions;
