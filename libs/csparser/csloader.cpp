@@ -56,13 +56,35 @@ typedef char ObName[30];
 
 //---------------------------------------------------------------------------
 
-int csLoader::LoadStat::polygons_loaded = 0;
-int csLoader::LoadStat::portals_loaded = 0;
-int csLoader::LoadStat::sectors_loaded = 0;
-int csLoader::LoadStat::things_loaded = 0;
-int csLoader::LoadStat::lights_loaded = 0;
-int csLoader::LoadStat::curves_loaded = 0;
-int csLoader::LoadStat::sprites_loaded = 0;
+class csLoaderStat
+{
+public:
+  static int polygons_loaded;
+  static int portals_loaded;
+  static int sectors_loaded;
+  static int things_loaded;
+  static int lights_loaded;
+  static int curves_loaded;
+  static int sprites_loaded;
+  static void Init()
+  {
+    polygons_loaded = 0;
+    portals_loaded  = 0;
+    sectors_loaded  = 0;
+    things_loaded   = 0;
+    lights_loaded   = 0;
+    curves_loaded   = 0;
+    sprites_loaded  = 0;
+  }
+};
+
+int csLoaderStat::polygons_loaded = 0;
+int csLoaderStat::portals_loaded  = 0;
+int csLoaderStat::sectors_loaded  = 0;
+int csLoaderStat::things_loaded   = 0;
+int csLoaderStat::lights_loaded   = 0;
+int csLoaderStat::curves_loaded   = 0;
+int csLoaderStat::sprites_loaded  = 0;
 
 // Define all tokens used through this file
 TOKEN_DEF_START
@@ -577,7 +599,7 @@ csStatLight* csLoader::load_statlight (char* buf)
   long cmd;
   char* params;
 
-  LoadStat::lights_loaded++;
+  csLoaderStat::lights_loaded++;
   float x, y, z, dist = 0, r, g, b;
   int dyn, attenuation = CS_ATTN_LINEAR;
   bool halo = false;
@@ -705,7 +727,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
 	if (poly3d)
 	{
 	  ps.AddPolygon (poly3d);
-	  LoadStat::polygons_loaded++;
+	  csLoaderStat::polygons_loaded++;
 	}
       }
       break;
@@ -715,7 +737,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
       ps.AddCurve ( load_bezier(name, info.w, params,
                       info.textures, info.default_texture, info.default_texlen,
                       info.default_lightx, ps.GetSector (), &ps) );
-      LoadStat::curves_loaded++;
+      csLoaderStat::curves_loaded++;
       break;
 
     case TOKEN_TEXNR:
@@ -820,7 +842,7 @@ csThing* csLoader::load_sixface (char* name, csWorld* /*w*/, char* buf,
   CHK (csThing* thing = new csThing ());
   thing->SetName (name);
 
-  LoadStat::things_loaded++;
+  csLoaderStat::things_loaded++;
 
   thing->SetSector (sec);
   csReversibleTransform obj;
@@ -1120,7 +1142,7 @@ csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
   CHK( csThing* thing = new csThing() );
   thing->SetName (name);
 
-  LoadStat::things_loaded++;
+  csLoaderStat::things_loaded++;
   PSLoadInfo info(w, textures);
   thing->SetSector (sec);
 
@@ -1178,7 +1200,7 @@ csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
           }
           thing->MergeTemplate (t, info.default_texture, info.default_texlen,
             info.default_lightx);
-          LoadStat::polygons_loaded += t->GetNumPolygon ();
+          csLoaderStat::polygons_loaded += t->GetNumPolygon ();
         }
         break;
       default:
@@ -1337,7 +1359,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           CHK(csSector *s = new csSector());
           s->SetName (str);
           poly3d->SetCSPortal (s);
-          LoadStat::portals_loaded++;
+          csLoaderStat::portals_loaded++;
         }
         break;
       case TOKEN_CLIP:
@@ -2793,7 +2815,7 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
 
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
 
-  LoadStat::sectors_loaded++;
+  csLoaderStat::sectors_loaded++;
 
   csMatrix3 mm;
   csVector3 vm (0, 0, 0);
@@ -3278,7 +3300,7 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
     CHK( portal = new csSector () );
     portal->SetName (portals[i].sector);
     p->SetCSPortal (portal);
-    LoadStat::portals_loaded++;
+    csLoaderStat::portals_loaded++;
     if (portals[i].is_warp)
     {
       if (portals[i].do_mirror)
@@ -3328,7 +3350,7 @@ csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
   CHK( csSector* sector = new csSector() );
   sector->SetName (secname);
 
-  LoadStat::sectors_loaded++;
+  csLoaderStat::sectors_loaded++;
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
 
   PSLoadInfo info(w,textures);
@@ -3504,7 +3526,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
 
       p->SetTextureSpace (t_m, t_v);
       sector.AddPolygon (p);
-      LoadStat::polygons_loaded++;
+      csLoaderStat::polygons_loaded++;
       sprintf (end_poly_name, "%d_%d_B", i, j);
       CHK (p = new csPolygon3D (texture));
       p->SetName (poly_name);
@@ -3524,7 +3546,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       gs->SetUV (2, new_u[(j+1)%num], new_v[(j+1)%num]);
       p->SetTextureSpace (t_m, t_v);
       sector.AddPolygon (p);
-      LoadStat::polygons_loaded++;
+      csLoaderStat::polygons_loaded++;
     }
 
     //-----
@@ -3567,7 +3589,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     gs->SetUV (2, prev_u[(j+1)%num], prev_v[(j+1)%num]);
     p->SetTextureSpace (t_m, t_v);
     sector.AddPolygon (p);
-    LoadStat::polygons_loaded++;
+    csLoaderStat::polygons_loaded++;
   }
 }
 
@@ -3803,7 +3825,7 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
 bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* file)
 {
   world->StartWorld ();
-  LoadStat::Init ();
+  csLoaderStat::Init ();
 
   size_t size;
   char *buf = System->VFS->ReadFile (file, size);
@@ -3829,15 +3851,15 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
 
   if (!LoadWorld (world, layer, buf)) return false;
 
-  if (LoadStat::polygons_loaded)
+  if (csLoaderStat::polygons_loaded)
   {
     CsPrintf (MSG_INITIALIZATION, "Loaded world file:\n");
-    CsPrintf (MSG_INITIALIZATION, "  %d polygons (%d portals),\n", LoadStat::polygons_loaded,
-      LoadStat::portals_loaded);
-    CsPrintf (MSG_INITIALIZATION, "  %d sectors, %d things, %d sprites, \n", LoadStat::sectors_loaded,
-      LoadStat::things_loaded, LoadStat::sprites_loaded);
-    CsPrintf (MSG_INITIALIZATION, "  %d curves and %d lights.\n", LoadStat::curves_loaded,
-      LoadStat::lights_loaded);
+    CsPrintf (MSG_INITIALIZATION, "  %d polygons (%d portals),\n", csLoaderStat::polygons_loaded,
+      csLoaderStat::portals_loaded);
+    CsPrintf (MSG_INITIALIZATION, "  %d sectors, %d things, %d sprites, \n", csLoaderStat::sectors_loaded,
+      csLoaderStat::things_loaded, csLoaderStat::sprites_loaded);
+    CsPrintf (MSG_INITIALIZATION, "  %d curves and %d lights.\n", csLoaderStat::curves_loaded,
+      csLoaderStat::lights_loaded);
   } /* endif */
 
   CHK (delete [] buf);
@@ -4320,7 +4342,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList
   char str[255], str2[255];
   csSpriteTemplate* tpl;
 
-  LoadStat::sprites_loaded++;
+  csLoaderStat::sprites_loaded++;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {

@@ -50,39 +50,7 @@ enum { kTokenPSetVertex = 1, kTokenPSetPolygon, kTokenPSetBezier,
  */
 class csLoader
 {
-protected:
-  ///
-  class LoadStat
-  {
-    public:
-    ///
-    static int polygons_loaded;
-    ///
-    static int portals_loaded;
-    ///
-    static int sectors_loaded;
-    ///
-    static int things_loaded;
-    ///
-    static int lights_loaded;
-    ///
-    static int curves_loaded;
-    ///
-    static int sprites_loaded;
-    ///
-    static void Init()
-    {
-      polygons_loaded = portals_loaded = sectors_loaded = 0;
-      things_loaded = lights_loaded = 0;
-      curves_loaded = sprites_loaded = 0;
-    }
-  };
-
 public:
-
-//  csWorld * world;
-//  void Initialize (csWorld * w) {world = w;}
-
   ///
   static csMatrix3 load_matrix (char* buf);
   ///
