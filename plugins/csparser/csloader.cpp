@@ -385,10 +385,10 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   ldr_context = NULL;
 
   csTicks startticks = csGetTicks();
-  ReportWarning ("crystalspace.maploader.perf","Started load here.",startticks);
+//  ReportWarning ("crystalspace.maploader.perf","Started load here.",startticks);
   csRef<iDataBuffer> buf (VFS->ReadFile (file));
   csTicks loadticks = csGetTicks();
-  ReportWarning ("crystalspace.maploader.perf","Loading the file took %d ticks",loadticks-startticks);
+//  ReportWarning ("crystalspace.maploader.perf","Loading the file took %d ticks",loadticks-startticks);
 
   if (!buf || !buf->GetSize ())
   {
@@ -404,14 +404,14 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   bool er = TestXml (file, buf, doc);
 
   csTicks xmlticks = csGetTicks();
-  ReportWarning ("crystalspace.maploader.perf","Parsing the xml took %d ticks",xmlticks-loadticks);
+//  ReportWarning ("crystalspace.maploader.perf","Parsing the xml took %d ticks",xmlticks-loadticks);
 
   if (!er) return false;
   if (doc)
   {
     if (!LoadMap (doc->GetRoot ())) return false;
     csTicks lastticks = csGetTicks();
-    ReportWarning ("crystalspace.maploader.perf","Loading the map into the engine took %d ticks",lastticks-xmlticks);
+//    ReportWarning ("crystalspace.maploader.perf","Loading the map into the engine took %d ticks",lastticks-xmlticks);
   }
   else
   {
