@@ -10,29 +10,29 @@ chronological order.
 	- res fixed some VC7.0 warnings.
 	- res fixed crashes when making screenshots of render targets.
 	- res fixed text not showing up when drawing to a render target.
-	- res removed the clear-with-DrawBox() workarounf again. It caused 
+	- res removed the clear-with-DrawBox() workaround again. It caused 
 	  issues in other places, and the Clear() problem manifests itself 
 	  only in one place (PS labels), so it can be worked around there.
 	- res removed an entry from gldrivers.xml that became obsolete (and
 	  non-functional) after the last texture manager changes (texture
 	  class introduction etc.)
-	- res fixed an unitialized var in csGraphics2DGLCommon which caused a
-	  crash in simpcon. (Although, that var was set when the canvas was 
-	  opened. So simpcon operates on an unopened canvas, which isn't good
-	  either.)
+	- res fixed an unitialized variable in csGraphics2DGLCommon which
+	  caused a crash in simpcon. (Although, that variable was set when the
+	  canvas was opened. So simpcon operates on an unopened canvas, which
+	  isn't good either.)
 	- res added an (somewhat experimental) optimization to gl3d; when 
-	  Print() is called, the video buffers are not swapped immediately, but 
+	  Print() is called, the video buffers are not swapped immediately, but
 	  the swap is delayed until the next draw call. This is because a 
 	  buffer swap is stalling, it causes all pending geometry to be drawn 
 	  out. The idea behind the change is now to allow the drawing to 
 	  continue, while the engine itself does rendering preparations 
 	  (culling etc.), and avoid the stalling buffer swap until we really 
-	  have no other choice. Works fine in flarge at gives a small but 
+	  have no other choice. Works fine in flarge and gives a small but 
 	  measurable FPS boost. If it breaks somewhere, disable it in 
 	  glrender3d.h by #undefining DELAYED_SWAP.
 	- res fixed screen clearing with delayed swap.
 	- res fixed msvcgen/config.jam to not contain dxguid.lib in the DirectX
-	  libs list. This lib is not used by CS.
+	  library list. This library is not used by CS.
 	- res made delayed swapping runtime-switchable. Configuration setting 
 	  is "Video.OpenGL.DelaySwap".
 	- res enabled VBO by default. New VBO management code is worth some
@@ -42,7 +42,7 @@ chronological order.
 	  shaders when it should be. Fixes crash in waterdemo.
 	- res ported Anders Reggestad's last fix to xmlread. Fixes an infinite
 	  loop.
-	- res changed the XML plugins to strip whitespaces before <![CDATA[
+	- res changed the XML plugins to strip whitespace before <![CDATA[
 	  elements, fixes some shader parsing issues.
 1-Apr-2005
 	- Eric Sunshine fixed some unportable uses of #warning directives in
