@@ -84,7 +84,7 @@ enum
   XMLTOKEN_NAME,
   XMLTOKEN_UVEC,
   XMLTOKEN_VVEC,
-	XMLTOKEN_SMOOTH
+  XMLTOKEN_SMOOTH
 };
 
 SCF_IMPLEMENT_IBASE (csThingLoader)
@@ -200,7 +200,7 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("moveable", XMLTOKEN_MOVEABLE);
   xmltokens.Register ("part", XMLTOKEN_PART);
   xmltokens.Register ("p", XMLTOKEN_P);
-	xmltokens.Register ("smooth", XMLTOKEN_SMOOTH);
+  xmltokens.Register ("smooth", XMLTOKEN_SMOOTH);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
   xmltokens.Register ("texlen", XMLTOKEN_TEXLEN);
   xmltokens.Register ("vistree", XMLTOKEN_VISTREE);
@@ -428,9 +428,9 @@ Nag to Jorrit about this feature if you want it.");
         info.SetTextureSet (child->GetContentsValue ());
         info.use_mat_set = true;
         break;
-			case XMLTOKEN_SMOOTH:
-				thing_state->SetSmoothingFlag (true);
-				break;
+      case XMLTOKEN_SMOOTH:
+	thing_state->SetSmoothingFlag (true);
+	break;
       default:
         synldr->ReportBadToken (child);
 	return false;

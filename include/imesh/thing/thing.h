@@ -285,16 +285,20 @@ struct iThingState : public iBase
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, bool only_portals = false) = 0;
 
-  // Normals Handling functions
+  /**
+   * Sets the smoothing flag.
+   */
+  virtual void SetSmoothingFlag (bool smoothing) = 0;
 
-  ///Sets the smoothing flag
-  virtual void SetSmoothingFlag(bool smoothing) = 0;
-
-  ///Sets the smoothing flag
-  virtual bool GetSmoothingFlag() = 0;
+  /**
+   * Gets the smoothing flag.
+   */
+  virtual bool GetSmoothingFlag () = 0;
   
-  ///Sets the smoothing flag
-  virtual csVector3* GetNormals() = 0;
+  /**
+   * Gets the normals.
+   */
+  virtual csVector3* GetNormals () = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 0, 2);

@@ -595,13 +595,13 @@ public:
   // Smoothing handling Functions
 
   /// Returns the smothing flag
-  bool GetSmoothingFlag() {return smoothed;};
+  bool GetSmoothingFlag () { return smoothed; }
 
   /// Sets the smoothing flag
-  void SetSmoothingFlag(bool smooth);
+  void SetSmoothingFlag (bool smooth);
 
   ///Returns the normals array
-  csVector3* GetNormals(){ return obj_normals;};
+  csVector3* GetNormals () { return obj_normals; }
 
 
 
@@ -1181,24 +1181,23 @@ public:
 
     // Normals Handling functions
 
-    ///Sets the smoothing flag
-    virtual void SetSmoothingFlag(bool smoothing)
+    /// Sets the smoothing flag
+    virtual void SetSmoothingFlag (bool smoothing)
     { 
-      scfParent->SetSmoothingFlag(smoothing);
-    };
+      scfParent->SetSmoothingFlag (smoothing);
+    }
 
-    ///Sets the smoothing flag
-    virtual bool GetSmoothingFlag()
+    /// Sets the smoothing flag
+    virtual bool GetSmoothingFlag ()
     { 
-      return scfParent->GetSmoothingFlag();
-    };
+      return scfParent->GetSmoothingFlag ();
+    }
   
-    ///Sets the smoothing flag
-    virtual csVector3* GetNormals()
+    /// Sets the smoothing flag
+    virtual csVector3* GetNormals ()
     {
-      return scfParent->GetNormals();
-    };
-
+      return scfParent->GetNormals ();
+    }
   } scfiThingState;
   friend struct ThingState;
 

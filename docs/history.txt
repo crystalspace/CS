@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+2-Oct-2002
+	- Cleaned up new thing smoothing code (code style, please people
+	  a tab == 8 spaces but indentation MUST be with 2 spaces!!!).
+	- Optimized thing smoothing a little bit.
+	- Added a few <smooth /> options in flarge.
 1-Oct-2002
 	- Added the notion of parameters to the base sequence manager.
 	  A parameter is a generic iBase* parameter which can be any

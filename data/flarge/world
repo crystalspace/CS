@@ -6907,6 +6907,7 @@
             <params>
                 <factory>circle</factory>
                 <moveable />
+		<smooth />
             </params>
             <move>
                 <v x="-16" y="1" z="30" />
@@ -6917,6 +6918,7 @@
             <params>
                 <factory>band</factory>
                 <moveable />
+		<smooth />
             </params>
             <move>
                 <matrix>
@@ -6930,6 +6932,7 @@
             <params>
                 <factory>band</factory>
                 <moveable />
+		<smooth />
             </params>
             <move>
                 <matrix>

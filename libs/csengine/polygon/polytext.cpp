@@ -1278,135 +1278,136 @@ void csShadowBitmap::UpdateLightMap (
 
       d = qsqrt (d);
 
-			// Initialize normal with the flat one
-			csVector3 normal = poly->GetPolyPlane()->Normal ();
-			if ( poly->GetParent ()->GetSmoothingFlag() ) 
-			{
-				int* vertexs = poly->GetVertexIndices ();
-				csVector3* normals = poly->GetParent ()->GetNormals ();
-				int vCount = poly->GetVertexCount ();
-				csSegment3* segments = new csSegment3[vCount];
+      // Initialize normal with the flat one
+      csVector3 normal = poly->GetPolyPlane()->Normal ();
+      if (poly->GetParent ()->GetSmoothingFlag())
+      {
+	int* vertexs = poly->GetVertexIndices ();
+	csVector3* normals = poly->GetParent ()->GetNormals ();
+	int vCount = poly->GetVertexCount ();
+	csSegment3* segments = new csSegment3[vCount];
 
-				// int nearest; 
-				csVector3* nearest = new csVector3[vCount];
-				csVector3* nearestNormals = new csVector3[vCount];
-				float *distances = new float[vCount];
-				float shortestDistance = 10000000.0f;  // Big enought?
-				int nearestNormal;
+	// int nearest; 
+	csVector3* nearest = new csVector3[vCount];
+	csVector3* nearestNormals = new csVector3[vCount];
+	float *distances = new float[vCount];
+	float shortestDistance = 10000000.0f;  // Big enought?
+	int nearestNormal;
 
-				for (act = 0; act < vCount ; act++)
-				{
-					// Create the 3D Segments
-					segments[act].SetStart ( poly->GetParent()->Vwor(vertexs[act]) );
-					segments[act].SetEnd ( poly->GetParent()->Vwor(vertexs[(act+1)%vCount]) );
+	for (act = 0; act < vCount ; act++)
+	{
+	  // Create the 3D Segments
+	  segments[act].SetStart (poly->GetParent()->Vwor(vertexs[act]));
+	  segments[act].SetEnd (poly->GetParent()
+	  	->Vwor(vertexs[(act+1)%vCount]));
+
+	  // Find the nearest point from v to the segment
+	  // a: Start
+	  // b: End
+	  // c: point
+	  csVector3 v_a = segments[act].Start ();
+	  csVector3 v_b = segments[act].End ();
+	  csVector3 v_c = v;
+	  float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) + 
+		(v_c.y - v_a.y) * (v_b.y - v_a.y) +
+		(v_c.z - v_a.z) * (v_b.z - v_a.z);
+	  float dt_b = (v_c.x - v_b.x) * (v_a.x - v_b.x) + 
+		(v_c.y - v_b.y) * (v_a.y - v_b.y) +
+		(v_c.z - v_b.z) * (v_a.z - v_b.z);
+
+	  if (dt_a <= 0)
+	  {
+	    nearest[act] = v_a;
+	  }
+	  else
+	  {
+	    if (dt_b <=0)
+	    {
+	      nearest[act] = v_b;
+	    }
+	    else
+	    {
+	      nearest[act] = v_a + ((v_b - v_a) * dt_a)/(dt_a + dt_b);
+	    }
+	  }
+
+	  // Find the normal in the nearest point of the segment
+	  // ==> Linear interpolation between vertexs
+	  float AllDistance = qsqrt (
+	  	csSquaredDist::PointPoint(segments[act].Start (),
+		segments[act].End()));
+	  float factorA = 1.0 - (qsqrt (csSquaredDist::PointPoint (
+	  	segments[act].Start (),nearest[act]) ) / AllDistance);
+	  float factorB = 1.0 - (qsqrt (csSquaredDist::PointPoint
+	  	(segments[act].End (),nearest[act]) ) / AllDistance);
+	  nearestNormals[act] = factorA * normals[vertexs[act]]
+	  	+ factorB * normals[vertexs[((act+1)%vCount)]];
+
+	  // Get the distance
+	  distances[act] = qsqrt (csSquaredDist::PointPoint(v,nearest[act]));
+	  if (distances[act] < shortestDistance)
+	  {
+	    nearestNormal = act;
+	    shortestDistance = distances[act];
+	  }
+	}
+
+	float *weights = new float[vCount];
+	// Get the weights of vertexes
+	for (act = 0; act < vCount ; act++)
+	{
+	  if (distances[act] < 0.001f)
+	    weights[act] = 1.0f;
+	  else
+	    weights[act] = shortestDistance / distances[act];
+	}
 	
-					// Find the nearest point from v to the segment
-					// a: Start
-					// b: End
-					// c: point
-					csVector3 v_a = segments[act].Start ();
-					csVector3 v_b = segments[act].End ();
-					csVector3 v_c = v;
-					float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) + 
-						(v_c.y - v_a.y) * (v_b.y - v_a.y) +
-						(v_c.z - v_a.z) * (v_b.z - v_a.z);
-					float dt_b = (v_c.x - v_b.x) * (v_a.x - v_b.x) + 
-						(v_c.y - v_b.y) * (v_a.y - v_b.y) +
-						(v_c.z - v_b.z) * (v_a.z - v_b.z);
+	if (!poly->PointOnPolygon (v))
+	{
+	  normal = nearestNormals[nearestNormal];
+	}
+	else
+	{
+	  normal.x = normal.y = normal.z = 0.0f;
+	  for (act = 0; act < vCount ; act++)
+	  {
+	    normal += weights[act]*nearestNormals[act];
+	  }
+	}
 
-					if (dt_a <= 0)
-					{
-						nearest[act] = v_a;
-					}
-					else
-					{
-						if (dt_b <=0)
-						{
-							nearest[act] = v_b;
-						}
-						else
-						{
-							nearest[act] = v_a + ((v_b - v_a) * dt_a)/(dt_a + dt_b);
-						}
-					}
-	
-					// Find the normal in the nearest point of the segment
-					// ==> Linear interpolation between vertexs
-					float AllDistance = qsqrt( csSquaredDist::PointPoint(segments[act].Start (),segments[act].End() ) );
-					float factorA = 1.0 - ( qsqrt( csSquaredDist::PointPoint(segments[act].Start (),nearest[act]) ) / AllDistance );
-					float factorB = 1.0 - ( qsqrt( csSquaredDist::PointPoint(segments[act].End (),nearest[act]) ) / AllDistance );
-					nearestNormals[act] = factorA * normals[vertexs[act]] + factorB * normals[vertexs[((act+1)%vCount)]];
+	normal.Normalize();
 
-					// Get the distance
-					distances[act] = qsqrt( csSquaredDist::PointPoint(v,nearest[act]) );
-					if (distances[act] < shortestDistance)
-					{
-						nearestNormal = act;
-						shortestDistance = distances[act];
-					}
-				}
+	delete [] nearest;
+	delete [] nearestNormals;
+	delete [] distances;
+	delete [] weights;
+	delete [] segments;
+      }
 
-				float *weights = new float[vCount];
-				// Get the weights of vertexes
-				for (act = 0; act < vCount ; act++)
-				{
-					if (distances[act] < 0.001f)
-						weights[act] = 1.0f;
-					else
-						weights[act] = shortestDistance / distances[act];
-				}
-	
-				if ( !poly->PointOnPolygon (v) )
-				{
-					normal = nearestNormals[nearestNormal];
-				}
-				else
-				{
-					normal.x = normal.y = normal.z = 0.0f;
-					for (act = 0; act < vCount ; act++)
-					{
-						normal += weights[act]*nearestNormals[act];
-					}
-				}
+      float cosinus = (v - lightpos) * normal;
+      cosinus /= d;
+      cosinus += cosfact;
+      if (cosinus < 0)
+	continue;
+      else if (cosinus > 1)
+	cosinus = 1;
 
-				normal.Normalize();
+      float scale = cosinus * light->GetBrightnessAtDistance (d) * lightness;
 
-				delete [] nearest;
-				delete [] nearestNormals;
-				delete [] distances;
-				delete [] weights;
-				delete [] segments;
-	
-			}
-
-			float cosinus = (v - lightpos) * normal;
-			cosinus /= d;
-			cosinus += cosfact;
-		  if (cosinus < 0)
-				continue;
-			else if (cosinus > 1)
-				cosinus = 1;
-
-			float scale = cosinus * light->GetBrightnessAtDistance (d) * lightness;
-
-			int l;
-			csRGBpixel &lumel = lightmap[uv];
-			l = lumel.red + QRound (light_r * scale);
-//			if (l<20) l = 20;
-			lumel.red = l < 255 ? l : 255;
-			l = lumel.green + QRound (light_g * scale);
-//			if (l<20) l = 20;
-			lumel.green = l < 255 ? l : 255;
-			l = lumel.blue + QRound (light_b * scale);
-//			if (l<20) l = 20;
-			lumel.blue = l < 255 ? l : 255;
-
+      int l;
+      csRGBpixel &lumel = lightmap[uv];
+      l = lumel.red + QRound (light_r * scale);
+//    if (l<20) l = 20;
+      lumel.red = l < 255 ? l : 255;
+      l = lumel.green + QRound (light_g * scale);
+//    if (l<20) l = 20;
+      lumel.green = l < 255 ? l : 255;
+      l = lumel.blue + QRound (light_b * scale);
+//    if (l<20) l = 20;
+      lumel.blue = l < 255 ? l : 255;
     }
   }
 }
-
-
-
 
 void csShadowBitmap::UpdateShadowMap (
   unsigned char *shadowmap,
@@ -1469,105 +1470,109 @@ void csShadowBitmap::UpdateShadowMap (
 
       d = qsqrt (d);
 
-			csVector3 normal = poly->GetPolyPlane()->Normal ();
-			if ( poly->GetParent ()->GetSmoothingFlag() ) 
-			{
-				int* vertexs = poly->GetVertexIndices ();
-				csVector3* normals = poly->GetParent ()->GetNormals ();
-				int vCount = poly->GetVertexCount ();
-				csSegment3* segments = new csSegment3[vCount];
+      csVector3 normal = poly->GetPolyPlane()->Normal ();
+      if ( poly->GetParent ()->GetSmoothingFlag() ) 
+      {
+	int* vertexs = poly->GetVertexIndices ();
+	csVector3* normals = poly->GetParent ()->GetNormals ();
+	int vCount = poly->GetVertexCount ();
+	csSegment3* segments = new csSegment3[vCount];
 
-				// int nearest; 
-				csVector3* nearest = new csVector3[vCount];
-				csVector3* nearestNormals = new csVector3[vCount];
-				float *distances = new float[vCount];
-				float shortestDistance = 10000000.0f;  // Big enought?
-				int nearestNormal;
+	// int nearest; 
+	csVector3* nearest = new csVector3[vCount];
+	csVector3* nearestNormals = new csVector3[vCount];
+	float *distances = new float[vCount];
+	float shortestDistance = 10000000.0f;  // Big enought?
+	int nearestNormal;
 
-				for (act = 0; act < vCount ; act++)
-				{
-					// Create the 3D Segments
-					segments[act].SetStart ( poly->GetParent()->Vwor(vertexs[act]) );
-					segments[act].SetEnd ( poly->GetParent()->Vwor(vertexs[(act+1)%vCount]) );
+	for (act = 0; act < vCount ; act++)
+	{
+	  // Create the 3D Segments
+	  segments[act].SetStart (poly->GetParent()->Vwor(vertexs[act]));
+	  segments[act].SetEnd (poly->GetParent()
+	  	->Vwor(vertexs[(act+1)%vCount]));
+
+	  // Find the nearest point from v to the segment
+	  // a: Start
+	  // b: End
+	  // c: point
+	  csVector3 v_a = segments[act].Start ();
+	  csVector3 v_b = segments[act].End ();
+	  csVector3 v_c = v;
+	  float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) + 
+		(v_c.y - v_a.y) * (v_b.y - v_a.y) +
+		(v_c.z - v_a.z) * (v_b.z - v_a.z);
+	  float dt_b = (v_c.x - v_b.x) * (v_a.x - v_b.x) + 
+		(v_c.y - v_b.y) * (v_a.y - v_b.y) +
+		(v_c.z - v_b.z) * (v_a.z - v_b.z);
+
+	  if (dt_a <= 0)
+	  {
+	    nearest[act] = v_a;
+	  }
+	  else
+	  {
+	    if (dt_b <=0)
+	    {
+	      nearest[act] = v_b;
+	    }
+	    else
+	    {
+	      nearest[act] = v_a + ((v_b - v_a) * dt_a)/(dt_a + dt_b);
+	    }
+	  }
+
+	  // Find the normal in the nearest point of the segment
+	  // ==> Linear interpolation between vertexs
+	  float AllDistance = qsqrt (csSquaredDist::PointPoint
+	  	(segments[act].Start (),segments[act].End()));
+	  float factorA = 1.0 - (qsqrt (csSquaredDist::PointPoint
+	  	(segments[act].Start (),nearest[act]) ) / AllDistance);
+	  float factorB = 1.0 - (qsqrt (csSquaredDist::PointPoint
+	  	(segments[act].End (),nearest[act]) ) / AllDistance);
+	  nearestNormals[act] = factorA * normals[vertexs[act]]
+	  	+ factorB * normals[vertexs[((act+1)%vCount)]];
+
+	  // Get the distance
+	  distances[act] = qsqrt (csSquaredDist::PointPoint(v,nearest[act]));
+	  if (distances[act] < shortestDistance)
+	  {
+	    nearestNormal = act;
+	    shortestDistance = distances[act];
+	  }
+	}
+
+	float *weights = new float[vCount];
+	// Get the weights of vertexes
+	for (act = 0; act < vCount ; act++)
+	{
+	  if (distances[act] < 0.001f)
+	    weights[act] = 1.0f;
+	  else
+	    weights[act] = shortestDistance / distances[act];
+	}
 	
-					// Find the nearest point from v to the segment
-					// a: Start
-					// b: End
-					// c: point
-					csVector3 v_a = segments[act].Start ();
-					csVector3 v_b = segments[act].End ();
-					csVector3 v_c = v;
-					float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) + 
-						(v_c.y - v_a.y) * (v_b.y - v_a.y) +
-						(v_c.z - v_a.z) * (v_b.z - v_a.z);
-					float dt_b = (v_c.x - v_b.x) * (v_a.x - v_b.x) + 
-						(v_c.y - v_b.y) * (v_a.y - v_b.y) +
-						(v_c.z - v_b.z) * (v_a.z - v_b.z);
+	if (!poly->PointOnPolygon (v))
+	{
+	  normal = nearestNormals[nearestNormal];
+	}
+	else
+	{
+	  normal.x = normal.y = normal.z = 0.0f;
+	  for (act = 0; act < vCount ; act++)
+	  {
+	    normal += weights[act]*nearestNormals[act];
+	  }
+	}
 
-					if (dt_a <= 0)
-					{
-						nearest[act] = v_a;
-					}
-					else
-					{
-						if (dt_b <=0)
-						{
-							nearest[act] = v_b;
-						}
-						else
-						{
-							nearest[act] = v_a + ((v_b - v_a) * dt_a)/(dt_a + dt_b);
-						}
-					}
-	
-					// Find the normal in the nearest point of the segment
-					// ==> Linear interpolation between vertexs
-					float AllDistance = qsqrt( csSquaredDist::PointPoint(segments[act].Start (),segments[act].End() ) );
-					float factorA = 1.0 - ( qsqrt( csSquaredDist::PointPoint(segments[act].Start (),nearest[act]) ) / AllDistance );
-					float factorB = 1.0 - ( qsqrt( csSquaredDist::PointPoint(segments[act].End (),nearest[act]) ) / AllDistance );
-					nearestNormals[act] = factorA * normals[vertexs[act]] + factorB * normals[vertexs[((act+1)%vCount)]];
+	normal.Normalize();
 
-					// Get the distance
-					distances[act] = qsqrt( csSquaredDist::PointPoint(v,nearest[act]) );
-					if (distances[act] < shortestDistance)
-					{
-						nearestNormal = act;
-						shortestDistance = distances[act];
-					}
-				}
-
-				float *weights = new float[vCount];
-				// Get the weights of vertexes
-				for (act = 0; act < vCount ; act++)
-				{
-					if (distances[act] < 0.001f)
-						weights[act] = 1.0f;
-					else
-						weights[act] = shortestDistance / distances[act];
-				}
-	
-				if ( !poly->PointOnPolygon (v) )
-				{
-					normal = nearestNormals[nearestNormal];
-				}
-				else
-				{
-					normal.x = normal.y = normal.z = 0.0f;
-					for (act = 0; act < vCount ; act++)
-					{
-						normal += weights[act]*nearestNormals[act];
-					}
-				}
-
-				normal.Normalize();
-
-				delete [] nearest;
-				delete [] nearestNormals;
-				delete [] distances;
-				delete [] weights;
-				delete [] segments;
-	
-			}
+	delete [] nearest;
+	delete [] nearestNormals;
+	delete [] distances;
+	delete [] weights;
+	delete [] segments;
+      }
 
       float cosinus = (v - lightpos) * normal;
       cosinus /= d;
