@@ -3827,7 +3827,7 @@
       <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
       <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
     </FUNCTION>
-    <FUNCTION name="glDeleteObjectBufferATI" return="GLvoid" pointer="FALSE">
+    <FUNCTION name="glFreeObjectBufferATI" return="GLvoid" pointer="FALSE">
       <ARG name="buffer" type="GLuint" const="FALSE" pointer="FALSE" />
     </FUNCTION>
     <FUNCTION name="glArrayObjectATI" return="GLvoid" pointer="FALSE">
@@ -3865,6 +3865,27 @@
       <ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE" />
       <ARG name="params" type="GLint" const="FALSE" pointer="TRUE" />
     </FUNCTION>
+  </EXTENSION>
+  <EXTENSION name="GL_ATI_vertex_attrib_array_object" type="GL">
+	<FUNCTION name="glVertexAttribArrayObjectATI" return="GLvoid" pointer="FALSE">
+		<ARG name="index" type="GLuint" const="FALSE" pointer="FALSE"/>
+		<ARG name="size" type="GLint" const="FALSE" pointer="FALSE"/>
+		<ARG name="type" type="GLenum" const="FALSE" pointer="FALSE"/>
+		<ARG name="normalized" type="GLboolean" const="FALSE" pointer="FALSE"/>
+		<ARG name="stride" type="GLsizei" const="FALSE" pointer="FALSE"/>
+		<ARG name="buffer" type="GLuint" const="FALSE" pointer="FALSE"/>
+		<ARG name="offset" type="GLuint" const="FALSE" ponter="FALSE"/>
+	</FUNCTION>
+	<FUNCTION name="glGetVertexAttribArrayObjectfvATI" return="GLvoid" pointer="FALSE">
+		<ARG name="index" type="GLuint" const="FALSE" pointer="FALSE"/>
+		<ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE"/>
+		<ARG name="params" type="GLfloat" const="FALSE" pointer="TRUE"/>
+	</FUNCTION>
+	<FUNCTION name="glGetVertexAttribArrayObjectivATI" return="GLvoid" pointer="FALSE">
+		<ARG name="index" type="GLuint" const="FALSE" pointer="FALSE"/>
+		<ARG name="pname" type="GLenum" const="FALSE" pointer="FALSE"/>
+		<ARG name="params" type="GLint" const="FALSE" pointer="TRUE"/>
+	</FUNCTION>
   </EXTENSION>
   <EXTENSION name="GL_ATI_vertex_streams" type="GL">
     <TOKEN name="GL_MAX_VERTEX_STREAMS_ATI" value="34667" />
