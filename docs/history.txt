@@ -40,6 +40,10 @@ The history order is reversed so that new features are at the top.
 	  plugins/video/canvas/openglcommon to respect the OpenGL path
 	  specified via CS_OPENGL_PATH by utilizing the new CS_HEADER_GLOBAL()
 	  macro when including OpenGL headers.
+	- Eric Sunshine eliminated several Texinfo mark-up problems which were
+	  introduced into apimod19.txi.  Also rewrite and clarified several
+	  portions of the new SCF, csObject, and RTTI documentation in
+	  apimod19.txi.
 26-Jun-2001
 	- Philip updated the win32gcc.txi doc to add explanation about
 	  PYTHONPATH environment variable.
