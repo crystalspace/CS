@@ -270,7 +270,7 @@ public:
     Iterator (const csHash<T, K, KeyHandler>* hash0, const K& key0)
     : hash (hash0), key (key0), 
       bucket (KeyHandler::ComputeHash (key) % hash->Modulo),
-      size (hash->Elements[bucket].Length ()) { Return (); }
+      size (hash->Elements[bucket].Length ()) { Reset (); }
 
     friend class csHash<T, K, KeyHandler>;
   public:
@@ -299,7 +299,7 @@ public:
     }
 
     /// Move the iterator back to the first element.
-    void Return () { element = 0; Seek (); }
+    void Reset () { element = 0; Seek (); }
   };
   friend class csHash<T, K, KeyHandler>::Iterator;
 
@@ -372,7 +372,7 @@ public:
     }
 
     /// Move the iterator back to the first element.
-    void Return () { Zero (); Init (); }
+    void Reset () { Zero (); Init (); }
   };
   friend class csHash<T, K, KeyHandler>::GlobalIterator;
 

@@ -29,6 +29,9 @@ chronological order.
 	  future, the configure script should be updated to check for the
 	  actual FeeType features CS requires, rather than checking for
 	  specific version numbers.)
+	- Eric Sunshine renamed csHash<>::Iterator::Return() and
+	  csHash<>::GlobalIterator::Return() to Reset() for consistency with
+	  other iterators and because Reset() is a more sensible name.
 10-Sep-2003
 	- Philip Wyett made struct ShadowDrawVisCallback a friend to class
 	  csStencilShadowStep.  This works round C2248 MSVC 6 compiler error
