@@ -13,6 +13,8 @@ chronological order.
 	  sector. Unfortunatelly this breaks bumpmapping for some reason.
 	  To be investigated.
 	- Jorrit fixed a z-fighting issue in the multi-object room.
+	- Jorrit added CS_SYSDEF_PROVIDE_UNLINK to csbench in order to
+	  compile on VC which doesn't have unistd.h.
 22-Jul-2004
 	- Jorrit started work on adding a new test to csbench to test lots
 	  of smaller objects.
