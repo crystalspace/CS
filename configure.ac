@@ -37,10 +37,13 @@ m4_define([cs_install_dir_default], [/usr/local/crystal])
 #	"/proj|/proj /proj/include|/proj/lib".
 #
 # Present Cases:
+#	/usr/local -- Not all compilers search here by default, so we specify
+#		it manually.
 #	/sw -- Fink, the MacOS/X manager of Unix packages installs here by
 #		default.
 #------------------------------------------------------------------------------
-m4_define([cs_lib_paths_default], [/sw/include|/sw/lib])
+m4_define([cs_lib_paths_default],
+    [/usr/local/include|/usr/local/lib /sw/include|/sw/lib])
 
 
 
@@ -1057,9 +1060,7 @@ AS_IF([test -d /usr/local/include],
 	[cs_cv_prog_cxx_local_include=yes])
 
     AS_IF([test $cs_cv_prog_cxx_local_include = yes],
-	[cs_lib_paths_default="$cs_lib_paths_default \
-	    /usr/local/include|/usr/local/lib"
-	CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])])])
+	[CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])])])
 
 
 
