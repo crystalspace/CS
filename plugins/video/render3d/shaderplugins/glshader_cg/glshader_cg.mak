@@ -45,9 +45,11 @@ endif
 
 INF.GLSHADER_CG = $(SRCDIR)/plugins/video/render3d/shaderplugins/glshader_cg/glshader_cg.csplugin
 INC.GLSHADER_CG = \
-  $(wildcard plugins/video/render3d/shaderplugins/glshader_cg/*.h) 
+  $(wildcard $(addprefix $(SRCDIR)/,\
+  plugins/video/render3d/shaderplugins/glshader_cg/*.h))
 SRC.GLSHADER_CG = \
-  $(wildcard plugins/video/render3d/shaderplugins/glshader_cg/*.cpp)
+  $(wildcard $(addprefix $(SRCDIR)/,\
+  plugins/video/render3d/shaderplugins/glshader_cg/*.cpp))
 OBJ.GLSHADER_CG = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_CG:.cpp=$O)))
 DEP.GLSHADER_CG = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
 CFG.GLSHADER_CG =

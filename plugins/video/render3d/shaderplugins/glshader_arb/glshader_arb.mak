@@ -45,9 +45,11 @@ endif
 
 INF.GLSHADER_ARB = $(SRCDIR)/plugins/video/render3d/shaderplugins/glshader_arb/glshader_arb.csplugin
 INC.GLSHADER_ARB = \
-  $(wildcard plugins/video/render3d/shaderplugins/glshader_arb/*.h) 
+  $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/render3d/shaderplugins/glshader_arb/*.h))
 SRC.GLSHADER_ARB = \
-  $(wildcard plugins/video/render3d/shaderplugins/glshader_arb/*.cpp)
+  $(wildcard $(addprefix $(SRCDIR)/, \
+  plugins/video/render3d/shaderplugins/glshader_arb/*.cpp))
 OBJ.GLSHADER_ARB = $(addprefix $(OUT)/,$(notdir $(SRC.GLSHADER_ARB:.cpp=$O)))
 DEP.GLSHADER_ARB = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
 CFG.GLSHADER_ARB =

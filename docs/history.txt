@@ -98,6 +98,8 @@ chronological order.
 	      however, items were removed from this array and inserted into
 	      other arrays. The deletion of the data in the process caused
 	      trouble.
+	- res fixed some makefiles to allow compilation from non-source root
+	  directories.
 26-Aug-2003
         - Philip Wyett eliminated warning suggesting adding parentheses
           around truth value in csGLShaderFFP::LoadLayer (...);.
