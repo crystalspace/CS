@@ -21,6 +21,7 @@
 #define __GAME_DYNAMICS_H__
 
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 
 class csVector3;
 class csOrthoTransform;
@@ -157,7 +158,7 @@ struct iRigidBody : public iBase
   virtual bool IsStatic (void) = 0;
 
   /// Returns which group a body belongs to
-  virtual iBodyGroup *GetGroup (void) = 0;
+  virtual csRef<iBodyGroup> GetGroup (void) = 0;
 
   /// Add a collider with a associated friction coefficient
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
@@ -255,11 +256,11 @@ struct iRigidBody : public iBase
   /// Attach a iMeshWrapper to this body
   virtual void AttachMesh (iMeshWrapper* mesh) = 0;
   /// Returns the attached MeshWrapper
-  virtual iMeshWrapper *GetAttachedMesh () = 0;
+  virtual csRef<iMeshWrapper> GetAttachedMesh () = 0;
   /// Attach a bone to this body
   virtual void AttachBone (iSkeletonBone* bone) = 0;
   /// Returns the attached bone
-  virtual iSkeletonBone *GetAttachedBone () = 0;
+  virtual csRef<iSkeletonBone> GetAttachedBone () = 0;
 
   /**
    * Set a callback to be executed when this body moves.
@@ -293,7 +294,7 @@ struct iJoint : public iBase
   /// Set which two bodies to be affected by this joint
   virtual void Attach (iRigidBody* body1, iRigidBody* body2) = 0;
   /// Get an attached body (valid values for body are 0 and 1)
-  virtual iRigidBody* GetAttachedBody (int body) = 0;
+  virtual csRef<iRigidBody> GetAttachedBody (int body) = 0;
   /**
    * Set the local transformation of the joint.  This transform 
    * sets the position of the constraining axes in the world 
