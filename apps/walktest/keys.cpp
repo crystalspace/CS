@@ -1663,7 +1663,7 @@ void WalkTest::Help ()
   Sys->Printf (MSG_STDOUT, "  -infinite          special infinite level generation (ignores world file!)\n");
   Sys->Printf (MSG_STDOUT, "  -huge              special huge level generation (ignores world file!)\n");
   Sys->Printf (MSG_STDOUT, "  -bots              allow random generation of bots\n");
-  Sys->Printf (MSG_STDOUT, "  <path>             load world from VFS <path> (default '%s')\n", world_dir);
+  Sys->Printf (MSG_STDOUT, "  <path>             load world from VFS <path> (default '%s')\n", Config->GetStr ("World", "WORLDFILE", "world"));
 }
 
 /*------------------------------------------------------------------
