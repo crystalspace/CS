@@ -244,6 +244,7 @@ csTextureManagerLine::csTextureManagerLine (iSystem *iSys,
   ResetPalette ();
   read_config (config);
   G2D = iG2D;
+  inv_cmap = NULL;
 }
 
 void csTextureManagerLine::SetPixelFormat (csPixelFormat &PixelFormat)
