@@ -8,6 +8,14 @@ DESCRIPTION.OS.freebsd = FreeBSD
 # Choose which drivers you want to build/use
 PLUGINS+=video/canvas/softx sound/renderer/software sound/driver/oss
 
+# video support
+# formats (this is the wrapping format for the video data)
+# Microsofts AVI
+PLUGINS+=video/format/avi
+# CODECS (some formats are dynamic, that is they need codecs to encod/decode data)
+# OpenDivX : you need an additional library you can get from www.projectmayo.com
+#PLUGINS+=video/format/codecs/opendivx                                                                  
+
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 

@@ -10,9 +10,17 @@ PLUGINS+=video/canvas/softx
 PLUGINS+=video/renderer/opengl video/canvas/openglx
 PLUGINS+=video/canvas/linex
 
+# video support
+# formats (this is the wrapping format for the video data)
+# Microsofts AVI
+PLUGINS+=video/format/avi
+# CODECS (some formats are dynamic, that is they need codecs to encod/decode data)
+# OpenDivX : you need an additional library you can get from www.projectmayo.com
+#PLUGINS+=video/format/codecs/opendivx                                                                  
 # Uncomment some of the following if you have a special MESA version that uses
 # some of the following hardware/software renderers. Also set the entry Driver
 # in section Display of opengl.cfg
+
 #PLUGINS+=video/canvas/openglx/glide
 #PLUGINS+=video/canvas/openglx/svga
 #PLUGINS+=video/canvas/openglx/empty
