@@ -61,6 +61,8 @@ chronological order.
 	- res added a texture loader to generate a (static) texture from a 
 	  shader expression.
 	- res added a sanity check to csShaderVariableContext::PopVariables().
+	- res fixed the shader expressions so atomic expressions are accepted
+	  and added pow, min and max functions.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

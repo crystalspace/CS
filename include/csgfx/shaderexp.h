@@ -42,7 +42,8 @@ public:
   { 
     uint8 type;
     
-    union {
+    union 
+    {
       float num;
       csStringID var;
       
@@ -140,6 +141,10 @@ private:
   bool eval_cross(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
   bool eval_vec_len(const oper_arg & arg1, oper_arg & output) const;
   bool eval_normal(const oper_arg & arg1, oper_arg & output) const;
+
+  bool eval_pow(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_min(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
+  bool eval_max(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const;
 
   /// Time function
   bool eval_time(oper_arg & output) const;

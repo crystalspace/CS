@@ -39,7 +39,8 @@
 #define DEBUG_PRINTF while(0) csPrintf
 #endif
 
-enum {
+enum 
+{
   OP_INVALID = 0,
     
   // Arith operations
@@ -66,6 +67,10 @@ enum {
   OP_FUNC_VEC_LEN, 
   OP_FUNC_NORMAL,
 
+  OP_FUNC_POW,
+  OP_FUNC_MIN,
+  OP_FUNC_MAX,
+
   OP_FUNC_TIME,
   OP_FUNC_FRAME,
 
@@ -84,7 +89,8 @@ enum {
   OP_INT_LOAD,
 };
   
-enum {
+enum 
+{
   TYPE_INVALID = 0,
     
   TYPE_NUMBER,
@@ -103,13 +109,15 @@ enum {
   TYPE_ACCUM,
 };
 
-struct cons {
+struct cons 
+{
   csShaderExpression::oper_arg car;
   cons * cdr; // That's all it can be
   cons * cdr_rev; // Double-linked list for CDR.
 };
 
-struct op_args_info {
+struct op_args_info 
+{
   int min_args; /* -1 means no limit */
   int max_args;
   bool can_fold; /* if args < minimum, can this op be folded back into 
@@ -124,7 +132,8 @@ struct op_args_info {
   x, y  - This will not do anything to atomic arguments. x <= y. Most of these will
           require special handling during the compile stage.
 */
-static op_args_info optimize_arg_table[] = {
+static op_args_info optimize_arg_table[] = 
+{
   { 0, 0, false }, //  OP_INVALID
     
   { 2, -1, true }, //  OP_ADD
@@ -146,6 +155,10 @@ static op_args_info optimize_arg_table[] = {
   { 1, 1, false }, // OP_FUNC_VEC_LEN
   { 1, 1, false }, // OP_FUNC_NORMAL
 
+  { 2, 2, false }, // OP_FUNC_POW
+  { 2, -1, true }, // OP_FUNC_MIN
+  { 2, -1, true }, // OP_FUNC_MAX
+
   { 0, 0, false }, // OP_FUNC_TIME
   { 0, 0, false }, // OP_FUNC_FRAME
 
@@ -166,7 +179,8 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
 {
   obj_reg = objr;
 
-  if (!loaded) {
+  if (!loaded)
+  {
     loaded = true;
     
     xmltokens.Register("add", OP_ADD);
@@ -187,6 +201,10 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     xmltokens.Register("vec-len", OP_FUNC_VEC_LEN);
     xmltokens.Register("norm", OP_FUNC_NORMAL);
     
+    xmltokens.Register("pow", OP_FUNC_POW);
+    xmltokens.Register("min", OP_FUNC_MIN);
+    xmltokens.Register("max", OP_FUNC_MAX);
+
     xmltokens.Register("time", OP_FUNC_TIME);
     xmltokens.Register("frame", OP_FUNC_FRAME);
 
@@ -218,6 +236,10 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     sexptokens.Register("cross", OP_FUNC_CROSS);
     sexptokens.Register("vec-len", OP_FUNC_VEC_LEN);
     sexptokens.Register("norm", OP_FUNC_NORMAL);
+
+    sexptokens.Register("pow", OP_FUNC_POW);
+    sexptokens.Register("min", OP_FUNC_MIN);
+    sexptokens.Register("max", OP_FUNC_MAX);
     
     sexptokens.Register("time", OP_FUNC_TIME);
     sexptokens.Register("frame", OP_FUNC_FRAME);
@@ -253,24 +275,29 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
   }
 }
 
-csShaderExpression::~csShaderExpression() {
+csShaderExpression::~csShaderExpression()
+{
   
 }
 
-bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * stab) {
+bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * stab)
+{
   cons * head = new cons;
 
   if (stab)
     varContext = stab;
 
-  strset = CS_QUERY_REGISTRY(obj_reg, iStringSet);
-  if (!strset) {
+  strset = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    obj_reg, "crystalspace.shared.stringset", iStringSet);
+  if (!strset) 
+  {
     DEBUG_PRINTF("Can't find string registry.\n");
 
     return false;
   }
   
-  if (!parse_xml(head, node)) {
+  if (!parse_xml(head, node)) 
+  {
     destruct_cons(head);
 
     DEBUG_PRINTF("Failed to construct cons list.\n");
@@ -283,7 +310,8 @@ bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * st
   printf("\n***************\n");
 #endif
 
-  if (!eval_const(head)) {
+  if (!eval_const(head))
+  {
     destruct_cons(head);
 
     DEBUG_PRINTF("Failed to constant-eval cons list.\n");
@@ -297,7 +325,8 @@ bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * st
 #endif
 
   int acc_top = 0;
-  if (!compile_cons(head, acc_top)) {
+  if (!compile_cons(head, acc_top))
+  {
     destruct_cons(head);
 
     DEBUG_PRINTF("Failed to compile cons list to opcode array.\n");
@@ -313,29 +342,36 @@ bool csShaderExpression::Parse(iDocumentNode * node, iShaderVariableContext * st
 
   oper_arg tmp;
   tmp.type = TYPE_INVALID;
-  accstack.SetLength(acc_top + 1, tmp);
+  accstack.SetLength(MAX(acc_top, accstack_max) + 1, tmp);
 
   destruct_cons(head);
 
   return true;
 }
 
-bool csShaderExpression::Evaluate(csShaderVariable * var) {
+bool csShaderExpression::Evaluate(csShaderVariable * var)
+{
   if (!opcodes.Length())
     return false;
 
   oper_array::Iterator iter = opcodes.GetIterator();
 
-  while (iter.HasNext()) {
+  while (iter.HasNext())
+  {
     const oper & op = iter.Next();
 
-    if (op.arg1.type == TYPE_INVALID) {
+    if (op.arg1.type == TYPE_INVALID)
+    {
       if (!eval_oper(op.opcode, accstack.Get(op.acc)))
 	return false;
-    } else if (op.arg2.type == TYPE_INVALID) {
+    } 
+    else if (op.arg2.type == TYPE_INVALID)
+    {
       if (!eval_oper(op.opcode, op.arg1, accstack.Get(op.acc)))
 	return false;
-    } else {
+    } 
+    else 
+    {
       if (!eval_oper(op.opcode, op.arg1, op.arg2, accstack.Get(op.acc)))
 	return false;
     }
@@ -347,7 +383,8 @@ bool csShaderExpression::Evaluate(csShaderVariable * var) {
   return true;
 }
 
-bool csShaderExpression::eval_const(cons *& head) {
+bool csShaderExpression::eval_const(cons *& head)
+{
   /* This pass is expected to do the following:
       - Ensure that arguments are correct. No arg-less ops or multiple-arg
         operators with single arguments.
@@ -368,8 +405,11 @@ bool csShaderExpression::eval_const(cons *& head) {
   cons * cell = head, * last = NULL;
   int oper;
 
+  if (cell->car.type <= TYPE_LIMIT) return true;
+
   if (cell->car.type != TYPE_OPER 
-      && cell->cdr) {
+      && cell->cdr)
+  {
     DEBUG_PRINTF("Cons head is not an operator, can't evaluate.\n");
     
     return false;
@@ -378,25 +418,31 @@ bool csShaderExpression::eval_const(cons *& head) {
   oper = head->car.oper;
   cell = head->cdr;
 
-  if ((oper >= OP_LIMIT || oper <= OP_INVALID)) {
+  if ((oper >= OP_LIMIT || oper <= OP_INVALID))
+  {
     DEBUG_PRINTF("Unknown operator type in optimizer: %i.\n", oper);
 
     return false;
   }    
 
-  if (!cell) {
-    if (optimize_arg_table[oper].min_args != 0) {
+  if (!cell)
+  {
+    if (optimize_arg_table[oper].min_args != 0)
+    {
       DEBUG_PRINTF("Operator with no arguments?\n");
       
       return false;
-    } else {
+    } 
+    else 
+    {
       return true;
     }
   }
 
   /* Special case: (- 45) is functionally equiv to -45 or 0 - 45 */
   if (oper == OP_SUB &&
-      !cell->cdr) {
+      !cell->cdr)
+  {
     cons * zero = new cons;
     
     zero->car.type = TYPE_NUMBER;
@@ -412,147 +458,183 @@ bool csShaderExpression::eval_const(cons *& head) {
   }
 
   /* @@@ this is begging to be broken up into functions */
-  if (optimize_arg_table[oper].min_args == 1) {
+  if (optimize_arg_table[oper].min_args == 1)
+  {
     /* It is assumed in here that the output opcodes require only 1 argument. */
 
-    if (cell->cdr) {
+    if (cell->cdr)
+    {
       DEBUG_PRINTF("Single argument operator \'%s\' has more than 1 argument.\n", sexptokens.Request(oper));
 
       return false;
     }
 
-    switch (cell->car.type) {
-    case TYPE_CONS: {
-      if (!eval_const(cell->car.cell))
-	return false;
+    switch (cell->car.type)
+    {
+      case TYPE_CONS: 
+	{
+	  if (!eval_const(cell->car.cell))
+	    return false;
 
-      cons * subcell = cell->car.cell;
-      
-      if (!subcell->cdr && subcell->car.type != TYPE_OPER) {
-	CS_ASSERT(subcell->car.type == TYPE_NUMBER  ||
-		  subcell->car.type == TYPE_VECTOR2 ||
-		  subcell->car.type == TYPE_VECTOR3 ||
-		  subcell->car.type == TYPE_VECTOR4);
-	
-	cell->car = subcell->car;
-	destruct_cons(subcell);
-
-      } else {
-	break;
-      }
-
-      CS_ASSERT(cell->car.type == TYPE_NUMBER  ||
-		cell->car.type == TYPE_VECTOR2 ||
-		cell->car.type == TYPE_VECTOR3 ||
-		cell->car.type == TYPE_VECTOR4);
-    } /* fallthrough */
-
-    case TYPE_NUMBER:  case TYPE_VECTOR2:  case TYPE_VECTOR3:  case TYPE_VECTOR4: {
-      if (!eval_oper(oper, cell->car, head->car))
-	return false;
-
-      head->cdr = NULL;
-      destruct_cons(cell);
-    } break;
-
-    case TYPE_VARIABLE:
-      break;
-
-    default:
-      DEBUG_PRINTF("Unknown type in optimizer for argument: %i.\n", cell->car.type);
-      
-      return false;
-    }
-
-  } else if (optimize_arg_table[oper].min_args > 1 && optimize_arg_table[oper].max_args < 0) {
-    /* No limit to arguments. It is assumed that (op 1 2 3 4) can be chained, 
-       eg: (op 1 (op 2 (op 3 4))), and that opcodes require 2 arguments */
-
-    while (cell) {
-      switch (cell->car.type) {
-      case TYPE_CONS: {
-	if (!eval_const(cell->car.cell))
-	  return false;
-	
-	cons * subcell = cell->car.cell;
-      
-	if (!subcell->cdr) {
-	  if (subcell->car.type == TYPE_OPER) {
-	    cell = cell->cdr;
-	    last = NULL;
-	  } else {
+	  cons * subcell = cell->car.cell;
+          
+	  if (!subcell->cdr && subcell->car.type != TYPE_OPER)
+	  {
 	    CS_ASSERT(subcell->car.type == TYPE_NUMBER  ||
 		      subcell->car.type == TYPE_VECTOR2 ||
 		      subcell->car.type == TYPE_VECTOR3 ||
 		      subcell->car.type == TYPE_VECTOR4);
-	    
+    	
 	    cell->car = subcell->car;
 	    destruct_cons(subcell);
-	    
-	    last = cell->cdr_rev;
-	    
-	    if (last->car.type == TYPE_OPER ||
-		last->car.type == TYPE_VARIABLE ||
-		last->car.type == TYPE_CONS) {
-	      last = NULL;
-	    } 
+
+	  } 
+	  else 
+	  {
+	    break;
 	  }
-	} else {
-	  cell = cell->cdr;
-	}
-      
-      } break;
-      
-      case TYPE_OPER:
-	DEBUG_PRINTF("Shouldn't be an operator anywhere but the cons head.\n");
 
-	return false;
+	  CS_ASSERT(cell->car.type == TYPE_NUMBER  ||
+		    cell->car.type == TYPE_VECTOR2 ||
+		    cell->car.type == TYPE_VECTOR3 ||
+		    cell->car.type == TYPE_VECTOR4);
+	} /* fallthrough */
 
-      case TYPE_NUMBER:  case TYPE_VECTOR2:
-      case TYPE_VECTOR3: case TYPE_VECTOR4:
-	if (!last) {
-	  last = cell;
-	  cell = cell->cdr;
-	} else {
-	  if (!eval_oper(oper, last->car, cell->car, last->car))
+      case TYPE_NUMBER:  
+      case TYPE_VECTOR2:  
+      case TYPE_VECTOR3:  
+      case TYPE_VECTOR4: 
+	{
+	  if (!eval_oper(oper, cell->car, head->car))
 	    return false;
 
-	  cons * cptr = cell;
-	  cell = cell->cdr;
-	  cptr->cdr = NULL;
-	  destruct_cons(cptr);
-	  if (cell)
-	    cell->cdr_rev = last;
-	  last->cdr = cell;
-	
-	} break;
+	  head->cdr = NULL;
+	  destruct_cons(cell);
+	} 
+	break;
 
       case TYPE_VARIABLE:
-	last = NULL;
-	cell = cell->cdr;
-
 	break;
 
       default:
-	DEBUG_PRINTF("Unknown type-id: %i\n", cell->car.type);
-
+	DEBUG_PRINTF("Unknown type in optimizer for argument: %i.\n", cell->car.type);
+        
 	return false;
-      }
     }
-  } else if (optimize_arg_table[oper].min_args <= optimize_arg_table[oper].max_args) {
+
+  } 
+  else if (optimize_arg_table[oper].min_args > 1 && optimize_arg_table[oper].max_args < 0)
+  {
+    /* No limit to arguments. It is assumed that (op 1 2 3 4) can be chained, 
+       eg: (op 1 (op 2 (op 3 4))), and that opcodes require 2 arguments */
+
+    while (cell)
+    {
+      switch (cell->car.type)
+      {
+	case TYPE_CONS: 
+	  {
+	    if (!eval_const(cell->car.cell))
+	      return false;
+    	
+	    cons * subcell = cell->car.cell;
+          
+	    if (!subcell->cdr)
+	    {
+	      if (subcell->car.type == TYPE_OPER)
+	      {
+		cell = cell->cdr;
+		last = NULL;
+	      } 
+	      else 
+	      {
+		CS_ASSERT(subcell->car.type == TYPE_NUMBER  ||
+			  subcell->car.type == TYPE_VECTOR2 ||
+			  subcell->car.type == TYPE_VECTOR3 ||
+			  subcell->car.type == TYPE_VECTOR4);
+    	    
+		cell->car = subcell->car;
+		destruct_cons(subcell);
+    	    
+		last = cell->cdr_rev;
+    	    
+		if (last->car.type == TYPE_OPER ||
+		    last->car.type == TYPE_VARIABLE ||
+		    last->car.type == TYPE_CONS)
+		{
+		  last = NULL;
+		} 
+	      }
+	    } 
+	    else 
+	    {
+	      cell = cell->cdr;
+	    }
+          
+	  } 
+	  break;
+        
+	case TYPE_OPER:
+	  DEBUG_PRINTF("Shouldn't be an operator anywhere but the cons head.\n");
+
+	  return false;
+
+	case TYPE_NUMBER:  
+	case TYPE_VECTOR2:
+	case TYPE_VECTOR3: 
+	case TYPE_VECTOR4:
+	  if (!last)
+	  {
+	    last = cell;
+	    cell = cell->cdr;
+	  } 
+	  else 
+	  {
+	    if (!eval_oper(oper, last->car, cell->car, last->car))
+	      return false;
+
+	    cons * cptr = cell;
+	    cell = cell->cdr;
+	    cptr->cdr = NULL;
+	    destruct_cons(cptr);
+	    if (cell)
+	      cell->cdr_rev = last;
+	    last->cdr = cell;
+  	
+	  } 
+	  break;
+
+	case TYPE_VARIABLE:
+	  last = NULL;
+	  cell = cell->cdr;
+
+	  break;
+
+	default:
+	  DEBUG_PRINTF("Unknown type-id: %i\n", cell->car.type);
+
+	  return false;
+	}
+    }
+  } 
+  else if (optimize_arg_table[oper].min_args <= optimize_arg_table[oper].max_args)
+  {
     int argcount = 0;
 
     /* x, x where both X's are equal. Will not reduce arguments using the parent op, 
        but will try to optimize arguments to constant atoms. */
 
-    while (cell) {
-      if (cell->car.type == TYPE_CONS) {
+    while (cell)
+    {
+      if (cell->car.type == TYPE_CONS)
+      {
 	if (!eval_const(cell->car.cell))
 	  return false;
 
 	cons * subcell = cell->car.cell;
 
-	if (!subcell->cdr && subcell->car.type != TYPE_OPER) {
+	if (!subcell->cdr && subcell->car.type != TYPE_OPER)
+	{
 	  CS_ASSERT(subcell->car.type == TYPE_NUMBER  ||
 		    subcell->car.type == TYPE_VECTOR2 ||
 		    subcell->car.type == TYPE_VECTOR3 ||
@@ -567,15 +649,18 @@ bool csShaderExpression::eval_const(cons *& head) {
       cell = cell->cdr;
     }
 
-    if (argcount < optimize_arg_table[oper].min_args || argcount > optimize_arg_table[oper].max_args) {
-      DEBUG_PRINTF("Incorrect # of args (%i) to operator %s.\n", argcount, sexptokens.Request(oper));
+    if (argcount < optimize_arg_table[oper].min_args || argcount > optimize_arg_table[oper].max_args)
+    {
+      DEBUG_PRINTF("Incorrect # of args (%i) to operator %s.\n", argcount, 
+	sexptokens.Request(oper));
 
       return false;
     }
   }
 
   if (optimize_arg_table[oper].can_fold &&
-      head && head->cdr && !head->cdr->cdr) { // operator + single argument
+      head && head->cdr && !head->cdr->cdr)
+  { // operator + single argument
     head->car = head->cdr->car;
     destruct_cons(head->cdr);
     head->cdr = NULL;
@@ -584,136 +669,164 @@ bool csShaderExpression::eval_const(cons *& head) {
   return true;
 }
 
-bool csShaderExpression::eval_variable(csShaderVariable * var, oper_arg & out) {
+bool csShaderExpression::eval_variable(csShaderVariable * var, oper_arg & out)
+{
   csShaderVariable::VariableType type = var->GetType();
 
-  switch (type) {
-  case csShaderVariable::INT: {
-    int tmp;
-    
-    out.type = TYPE_NUMBER;
-    var->GetValue(tmp);
-    out.num = (float)tmp;
-  } break;
+  switch (type)
+  {
+    case csShaderVariable::INT: 
+      {
+	int tmp;
+        
+	out.type = TYPE_NUMBER;
+	var->GetValue(tmp);
+	out.num = (float)tmp;
+      } 
+      break;
 
-  case csShaderVariable::FLOAT: 
-    out.type = TYPE_NUMBER;
-    var->GetValue(out.num);
-    break;
-    
-  case csShaderVariable::VECTOR2:
-    out.type = TYPE_VECTOR2;
-    var->GetValue(out.vec4); // @@@ relies on the fact that csShaderVariables don't check type.
-    out.vec4.z = 0;
-    out.vec4.w = 0;
-    break;
+    case csShaderVariable::FLOAT: 
+      out.type = TYPE_NUMBER;
+      var->GetValue(out.num);
+      break;
+      
+    case csShaderVariable::VECTOR2:
+      out.type = TYPE_VECTOR2;
+      var->GetValue(out.vec4); // @@@ relies on the fact that csShaderVariables don't check type.
+      out.vec4.z = 0;
+      out.vec4.w = 0;
+      break;
 
-  case csShaderVariable::VECTOR3:
-    out.type = TYPE_VECTOR3;
-    var->GetValue(out.vec4);
-    out.vec4.w = 0;
-    break;
-    
-  case csShaderVariable::VECTOR4:
-    out.type = TYPE_VECTOR4;
-    var->GetValue(out.vec4);
-    break;
+    case csShaderVariable::VECTOR3:
+      out.type = TYPE_VECTOR3;
+      var->GetValue(out.vec4);
+      out.vec4.w = 0;
+      break;
+      
+    case csShaderVariable::VECTOR4:
+      out.type = TYPE_VECTOR4;
+      var->GetValue(out.vec4);
+      break;
 
-  default:
-    DEBUG_PRINTF("Unknown type %i in shader variable, not usable in an expression.\n", type);
-    return false;
+    default:
+      DEBUG_PRINTF("Unknown type %i in shader variable, not usable in an expression.\n", type);
+      return false;
   }
   
   return true;
 }
 
-bool csShaderExpression::eval_argument(const oper_arg & arg, csShaderVariable * out) {
-  switch (arg.type) {
-  case TYPE_NUMBER:
-    out->SetValue(arg.num);
-    break;
+bool csShaderExpression::eval_argument(const oper_arg & arg, csShaderVariable * out)
+{
+  switch (arg.type)
+  {
+    case TYPE_NUMBER:
+      out->SetValue(arg.num);
+      break;
 
-  case TYPE_VECTOR2: {
-    csVector2 tmp;
+    case TYPE_VECTOR2: 
+      {
+	csVector2 tmp;
 
-    tmp.x = arg.vec4.x;
-    tmp.y = arg.vec4.y;
+	tmp.x = arg.vec4.x;
+	tmp.y = arg.vec4.y;
 
-    out->SetValue(tmp);
-  } break;
-  
-  case TYPE_VECTOR3: {
-    csVector3 tmp;
+	out->SetValue(tmp);
+      } 
+      break;
+    
+    case TYPE_VECTOR3: 
+      {
+	csVector3 tmp;
 
-    tmp.x = arg.vec4.x;
-    tmp.y = arg.vec4.y;
-    tmp.z = arg.vec4.z;
+	tmp.x = arg.vec4.x;
+	tmp.y = arg.vec4.y;
+	tmp.z = arg.vec4.z;
 
-    out->SetValue(tmp);
-  } break;
-  
-  case TYPE_VECTOR4:
-    out->SetValue(arg.vec4);
-    break;
-  
-  default:
-    DEBUG_PRINTF("Unknown type %i when converting arg to shader variable.\n", arg.type);
-    return false;
+	out->SetValue(tmp);
+      } 
+      break;
+    
+    case TYPE_VECTOR4:
+      out->SetValue(arg.vec4);
+      break;
+    
+    default:
+      DEBUG_PRINTF("Unknown type %i when converting arg to shader variable.\n", arg.type);
+      return false;
   }
 
   return true;
 }
 
-bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_arg & output) {
-  if (arg1.type == TYPE_VARIABLE) {
+bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg arg2, oper_arg & output)
+{
+  if (arg1.type == TYPE_VARIABLE)
+  {
     csShaderVariable * var = varContext->GetVariable(arg1.var);
-    if (!var) {
-      DEBUG_PRINTF("Cannot resolve variable name %s in symbol table.\n", strset->Request(arg1.var));
+    if (!var)
+    {
+      DEBUG_PRINTF("Cannot resolve variable name %s in symbol table.\n", 
+	strset->Request(arg1.var));
 
       return false;
     }
 
     if (!eval_variable(var, arg1))
       return false;
-  } else if (arg1.type == TYPE_ACCUM) {
+  } 
+  else if (arg1.type == TYPE_ACCUM)
+  {
     arg1 = accstack.Get(arg1.acc);
   }
 
-  if (arg2.type == TYPE_VARIABLE) {
+  if (arg2.type == TYPE_VARIABLE)
+  {
     csShaderVariable * var = varContext->GetVariable(arg2.var);
-    if (!var) {
-      DEBUG_PRINTF("Cannot resolve variable name %s in symbol table.\n", strset->Request(arg2.var));
+    if (!var)
+    {
+      DEBUG_PRINTF("Cannot resolve variable name %s in symbol table.\n", 
+	strset->Request(arg2.var));
 
       return false;
     }
 
     if (!eval_variable(var, arg2))
       return false;
-  } else if (arg2.type == TYPE_ACCUM) {
+  } 
+  else if (arg2.type == TYPE_ACCUM)
+  {
     arg2 = accstack.Get(arg2.acc);
   }
 
-  switch (oper) {
-  case OP_ADD:  return eval_add(arg1, arg2, output);
-  case OP_SUB:  return eval_sub(arg1, arg2, output);
-  case OP_MUL:  return eval_mul(arg1, arg2, output);
-  case OP_DIV:  return eval_div(arg1, arg2, output);
-  case OP_FUNC_DOT:  return eval_dot(arg1, arg2, output);
-  case OP_FUNC_CROSS: return eval_cross(arg1, arg2, output);
-  case OP_INT_SELT12: return eval_selt12(arg1, arg2, output);
-  case OP_INT_SELT34: return eval_selt34(arg1, arg2, output);
+  switch (oper)
+  {
+    case OP_ADD:  return eval_add(arg1, arg2, output);
+    case OP_SUB:  return eval_sub(arg1, arg2, output);
+    case OP_MUL:  return eval_mul(arg1, arg2, output);
+    case OP_DIV:  return eval_div(arg1, arg2, output);
+    case OP_FUNC_DOT:  return eval_dot(arg1, arg2, output);
+    case OP_FUNC_CROSS: return eval_cross(arg1, arg2, output);
+    case OP_FUNC_POW: return eval_pow(arg1, arg2, output);
+    case OP_FUNC_MIN: return eval_min(arg1, arg2, output);
+    case OP_FUNC_MAX: return eval_max(arg1, arg2, output);
+    case OP_INT_SELT12: return eval_selt12(arg1, arg2, output);
+    case OP_INT_SELT34: return eval_selt34(arg1, arg2, output);
 
-  default:
-    DEBUG_PRINTF("Unknown multi-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
+    default:
+      DEBUG_PRINTF("Unknown multi-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
   }
 
   return false;
 }
 
-bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output) {
-  if (arg1.type == TYPE_VARIABLE) {
+bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output)
+{
+  if (arg1.type == TYPE_VARIABLE)
+  {
     csShaderVariable * var = varContext->GetVariable(arg1.var);
-    if (!var) {
+    if (!var)
+    {
       DEBUG_PRINTF("Cannot resolve variable name %s in symbol table.\n", strset->Request(arg1.var));
 
       return false;
@@ -721,47 +834,56 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output) {
 
     if (!eval_variable(var, arg1))
       return false;
-  } else if (arg1.type == TYPE_ACCUM) {
+  } 
+  else if (arg1.type == TYPE_ACCUM)
+  {
     arg1 = accstack.Get(arg1.acc);
   }
 
-  switch (oper) {
-  case OP_VEC_ELT1:  return eval_elt1(arg1, output);
-  case OP_VEC_ELT2:  return eval_elt2(arg1, output);
-  case OP_VEC_ELT3:  return eval_elt3(arg1, output);
-  case OP_VEC_ELT4:  return eval_elt4(arg1, output);
-  case OP_FUNC_SIN:  return eval_sin(arg1, output);
-  case OP_FUNC_COS:  return eval_cos(arg1, output);
-  case OP_FUNC_TAN:  return eval_tan(arg1, output);
-  case OP_FUNC_VEC_LEN: return eval_vec_len(arg1, output);
-  case OP_FUNC_NORMAL: return eval_normal(arg1, output);
+  switch (oper)
+  {
+    case OP_VEC_ELT1:  return eval_elt1(arg1, output);
+    case OP_VEC_ELT2:  return eval_elt2(arg1, output);
+    case OP_VEC_ELT3:  return eval_elt3(arg1, output);
+    case OP_VEC_ELT4:  return eval_elt4(arg1, output);
+    case OP_FUNC_SIN:  return eval_sin(arg1, output);
+    case OP_FUNC_COS:  return eval_cos(arg1, output);
+    case OP_FUNC_TAN:  return eval_tan(arg1, output);
+    case OP_FUNC_VEC_LEN: return eval_vec_len(arg1, output);
+    case OP_FUNC_NORMAL: return eval_normal(arg1, output);
 
-  case OP_INT_LOAD: return eval_load(arg1, output);
-    
-  default:
-    DEBUG_PRINTF("Unknown single-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
+    case OP_INT_LOAD: return eval_load(arg1, output);
+      
+    default:
+      DEBUG_PRINTF("Unknown single-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
   }
    
   return false;
 }
 
-bool csShaderExpression::eval_oper(int oper, oper_arg & output) {
-  switch (oper) {
-  case OP_FUNC_TIME: return eval_time(output);
-  case OP_FUNC_FRAME: return eval_frame(output);
+bool csShaderExpression::eval_oper(int oper, oper_arg & output)
+{
+  switch (oper)
+  {
+    case OP_FUNC_TIME: return eval_time(output);
+    case OP_FUNC_FRAME: return eval_frame(output);
 
-  default:
-    DEBUG_PRINTF("Unknown single-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
+    default:
+      DEBUG_PRINTF("Unknown single-arg operator %s (%i).\n", sexptokens.Request(oper), oper);
   }
    
   return false;
 }
 
-bool csShaderExpression::eval_add(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
-  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER) {
+bool csShaderExpression::eval_add(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
+  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER)
+  {
     output.type = TYPE_NUMBER;
     output.num = arg1.num + arg2.num;
-  } else if (arg1.type != TYPE_NUMBER && arg2.type != TYPE_NUMBER) {
+  } 
+  else if (arg1.type != TYPE_NUMBER && arg2.type != TYPE_NUMBER)
+  {
     CS_ASSERT(arg1.type == TYPE_VECTOR2 ||
 	      arg1.type == TYPE_VECTOR3 ||
 	      arg1.type == TYPE_VECTOR4);
@@ -772,8 +894,12 @@ bool csShaderExpression::eval_add(const oper_arg & arg1, const oper_arg & arg2, 
 
     output.type = (arg1.type > arg2.type) ? arg1.type : arg2.type; // largest vector type, 
     output.vec4 = arg1.vec4 + arg2.vec4;                           // you can coerce a vector up, eg. vec2->vec3, using a dummy expr, but not down.
-  } else {
-    DEBUG_PRINTF("Invalid types for operator, %s(%i) + %s(%i).\n", get_type_name(arg1.type), arg1.type, get_type_name(arg2.type), arg2.type);
+  } 
+  else 
+  {
+    DEBUG_PRINTF("Invalid types for operator, %s(%i) + %s(%i).\n", 
+      get_type_name(arg1.type), arg1.type, get_type_name(arg2.type), 
+      arg2.type);
 
     return false;
   }
@@ -781,11 +907,15 @@ bool csShaderExpression::eval_add(const oper_arg & arg1, const oper_arg & arg2, 
   return true;
 }
 
-bool csShaderExpression::eval_sub(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
-  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER) {
+bool csShaderExpression::eval_sub(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
+  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER)
+  {
     output.type = TYPE_NUMBER;
     output.num = arg1.num - arg2.num;
-  } else if (arg1.type != TYPE_NUMBER && arg2.type != TYPE_NUMBER) {
+  } 
+  else if (arg1.type != TYPE_NUMBER && arg2.type != TYPE_NUMBER)
+  {
     CS_ASSERT(arg1.type == TYPE_VECTOR2 ||
 	      arg1.type == TYPE_VECTOR3 ||
 	      arg1.type == TYPE_VECTOR4);
@@ -796,8 +926,11 @@ bool csShaderExpression::eval_sub(const oper_arg & arg1, const oper_arg & arg2, 
 
     output.type = (arg1.type > arg2.type) ? arg1.type : arg2.type;
     output.vec4 = arg1.vec4 - arg2.vec4;
-  } else {
-    DEBUG_PRINTF("Invalid types for operator, %s - %s.\n", get_type_name(arg1.type), get_type_name(arg2.type));
+  } 
+  else 
+  {
+    DEBUG_PRINTF("Invalid types for operator, %s - %s.\n", 
+      get_type_name(arg1.type), get_type_name(arg2.type));
 
     return false;
   }
@@ -805,12 +938,16 @@ bool csShaderExpression::eval_sub(const oper_arg & arg1, const oper_arg & arg2, 
   return true;
 }
 
-bool csShaderExpression::eval_mul(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
-  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER) {
+bool csShaderExpression::eval_mul(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
+  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER)
+  {
     output.type = TYPE_NUMBER;
     output.num = arg1.num * arg2.num;
 
-  } else if (arg2.type == TYPE_NUMBER) { // obviously, arg1 doesn't
+  } 
+  else if (arg2.type == TYPE_NUMBER)
+  { // obviously, arg1 doesn't
     CS_ASSERT(arg1.type == TYPE_VECTOR2 ||
 	      arg1.type == TYPE_VECTOR3 ||
 	      arg1.type == TYPE_VECTOR4);
@@ -818,7 +955,9 @@ bool csShaderExpression::eval_mul(const oper_arg & arg1, const oper_arg & arg2, 
     output.type = arg1.type;
     output.vec4 = arg1.vec4 * arg2.num;
 
-  } else if (arg1.type == TYPE_NUMBER) { // obviously, arg2 doesn't :)
+  } 
+  else if (arg1.type == TYPE_NUMBER)
+  { // obviously, arg2 doesn't :)
     CS_ASSERT(arg2.type == TYPE_VECTOR2 ||
 	      arg2.type == TYPE_VECTOR3 ||
 	      arg2.type == TYPE_VECTOR4);
@@ -826,7 +965,9 @@ bool csShaderExpression::eval_mul(const oper_arg & arg1, const oper_arg & arg2, 
     output.type = arg2.type;
     output.vec4 = arg2.vec4 * arg1.num;
 
-  } else {
+  } 
+  else 
+  {
     DEBUG_PRINTF("Invalid types for operator, %s * %s.\n", get_type_name(arg1.type), get_type_name(arg2.type));
 
     return false;
@@ -836,11 +977,14 @@ bool csShaderExpression::eval_mul(const oper_arg & arg1, const oper_arg & arg2, 
 }
 
 bool csShaderExpression::eval_div(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
-  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER) {
+  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER)
+{
     output.type = TYPE_NUMBER;
     output.num = arg1.num / arg2.num;
 
-  } else if (arg2.type == TYPE_NUMBER) { 
+  } 
+  else if (arg2.type == TYPE_NUMBER)
+  { 
     CS_ASSERT(arg1.type == TYPE_VECTOR2 ||
 	      arg1.type == TYPE_VECTOR3 ||
 	      arg1.type == TYPE_VECTOR4);
@@ -848,7 +992,9 @@ bool csShaderExpression::eval_div(const oper_arg & arg1, const oper_arg & arg2, 
     output.type = arg1.type;
     output.vec4 = arg1.vec4 / arg2.num;
 
-  } else {
+  } 
+  else 
+  {
     DEBUG_PRINTF("Invalid types for operator, %s / %s.\n", get_type_name(arg1.type), get_type_name(arg2.type));
 
     return false;
@@ -857,8 +1003,10 @@ bool csShaderExpression::eval_div(const oper_arg & arg1, const oper_arg & arg2, 
   return true;  
 }
 
-bool csShaderExpression::eval_elt1(const oper_arg & arg1, oper_arg & output) const {
-  if (arg1.type < TYPE_VECTOR2 || arg1.type > TYPE_VECTOR4) {
+bool csShaderExpression::eval_elt1(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type < TYPE_VECTOR2 || arg1.type > TYPE_VECTOR4)
+  {
     DEBUG_PRINTF("Invalid type for first argument to elt1, %s.\n", get_type_name(arg1.type));
 
     return false;
@@ -870,8 +1018,10 @@ bool csShaderExpression::eval_elt1(const oper_arg & arg1, oper_arg & output) con
   return true;  
 }
 
-bool csShaderExpression::eval_elt2(const oper_arg & arg1, oper_arg & output) const {
-  if (arg1.type < TYPE_VECTOR2 || arg1.type > TYPE_VECTOR4) {
+bool csShaderExpression::eval_elt2(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type < TYPE_VECTOR2 || arg1.type > TYPE_VECTOR4)
+  {
     DEBUG_PRINTF("Invalid type for first argument to elt2, %s.\n", get_type_name(arg1.type));
 
     return false;
@@ -883,8 +1033,10 @@ bool csShaderExpression::eval_elt2(const oper_arg & arg1, oper_arg & output) con
   return true;  
 }
 
-bool csShaderExpression::eval_elt3(const oper_arg & arg1, oper_arg & output) const {
-  if (arg1.type < TYPE_VECTOR3 || arg1.type > TYPE_VECTOR4) {
+bool csShaderExpression::eval_elt3(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type < TYPE_VECTOR3 || arg1.type > TYPE_VECTOR4)
+  {
     DEBUG_PRINTF("Invalid type for first argument to elt3, %s.\n", get_type_name(arg1.type));
 
     return false;
@@ -896,8 +1048,10 @@ bool csShaderExpression::eval_elt3(const oper_arg & arg1, oper_arg & output) con
   return true;  
 }
 
-bool csShaderExpression::eval_elt4(const oper_arg & arg1, oper_arg & output) const {
-  if (arg1.type != TYPE_VECTOR4) {
+bool csShaderExpression::eval_elt4(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type != TYPE_VECTOR4)
+  {
     DEBUG_PRINTF("Invalid type for first argument to elt4, %s.\n", get_type_name(arg1.type));
 
     return false;
@@ -909,8 +1063,10 @@ bool csShaderExpression::eval_elt4(const oper_arg & arg1, oper_arg & output) con
   return true;  
 }
 
-bool csShaderExpression::eval_sin(const oper_arg & arg1, oper_arg & output) const {
-  if (arg1.type != TYPE_NUMBER) {
+bool csShaderExpression::eval_sin(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type != TYPE_NUMBER)
+  {
     DEBUG_PRINTF("Invalid type for first argument to sin, %s.\n", get_type_name(arg1.type));
 
     return false;
@@ -922,8 +1078,10 @@ bool csShaderExpression::eval_sin(const oper_arg & arg1, oper_arg & output) cons
   return true;  
 }
 
-bool csShaderExpression::eval_cos(const oper_arg & arg1, oper_arg & output) const {
-  if (arg1.type != TYPE_NUMBER) {
+bool csShaderExpression::eval_cos(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type != TYPE_NUMBER)
+  {
     DEBUG_PRINTF("Invalid type for first argument to cos, %s.\n", get_type_name(arg1.type));
 
     return false;
@@ -935,8 +1093,10 @@ bool csShaderExpression::eval_cos(const oper_arg & arg1, oper_arg & output) cons
   return true;  
 }
 
-bool csShaderExpression::eval_tan(const oper_arg & arg1, oper_arg & output) const {
-  if (arg1.type != TYPE_NUMBER) {
+bool csShaderExpression::eval_tan(const oper_arg & arg1, oper_arg & output) const 
+{
+  if (arg1.type != TYPE_NUMBER)
+  {
     DEBUG_PRINTF("Invalid type for first argument to tan, %s.\n", get_type_name(arg1.type));
 
     return false;
@@ -948,10 +1108,12 @@ bool csShaderExpression::eval_tan(const oper_arg & arg1, oper_arg & output) cons
   return true;  
 }
 
-bool csShaderExpression::eval_dot(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
+bool csShaderExpression::eval_dot(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
   if (arg1.type != TYPE_VECTOR2 ||
       arg1.type != TYPE_VECTOR3 ||
-      arg1.type != TYPE_VECTOR4) {
+      arg1.type != TYPE_VECTOR4)
+  {
     DEBUG_PRINTF("Argument 1 to dot is not a vector.\n");
 
     return false;
@@ -959,7 +1121,8 @@ bool csShaderExpression::eval_dot(const oper_arg & arg1, const oper_arg & arg2, 
 
   if (arg2.type != TYPE_VECTOR2 ||
       arg2.type != TYPE_VECTOR3 ||
-      arg2.type != TYPE_VECTOR4) {
+      arg2.type != TYPE_VECTOR4)
+{
     DEBUG_PRINTF("Argument 2 to dot is not a vector.\n");
 
     return false;
@@ -971,16 +1134,19 @@ bool csShaderExpression::eval_dot(const oper_arg & arg1, const oper_arg & arg2, 
   return true;
 }
 
-bool csShaderExpression::eval_cross(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
+bool csShaderExpression::eval_cross(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
   if (arg1.type != TYPE_VECTOR2 ||
       arg1.type != TYPE_VECTOR3 ||
-      arg1.type != TYPE_VECTOR4) {
+      arg1.type != TYPE_VECTOR4)
+  {
     DEBUG_PRINTF("Argument 1 to cross is not a vector.\n");
 
     return false;
   }
 
-  if (arg1.type != arg2.type) {
+  if (arg1.type != arg2.type)
+  {
     DEBUG_PRINTF("Argument 2 to cross doesn't match type of arg 1.\n");
 
     return false;
@@ -998,10 +1164,12 @@ bool csShaderExpression::eval_cross(const oper_arg & arg1, const oper_arg & arg2
   return true;
 }
 
-bool csShaderExpression::eval_vec_len(const oper_arg & arg1, oper_arg & output) const {
+bool csShaderExpression::eval_vec_len(const oper_arg & arg1, oper_arg & output) const 
+{
   if (arg1.type != TYPE_VECTOR2 ||
       arg1.type != TYPE_VECTOR3 ||
-      arg1.type != TYPE_VECTOR4) {
+      arg1.type != TYPE_VECTOR4)
+  {
     DEBUG_PRINTF("Argument to vec-len is not a vector.\n");
 
     return false;
@@ -1013,10 +1181,12 @@ bool csShaderExpression::eval_vec_len(const oper_arg & arg1, oper_arg & output) 
   return true;
 }
 
-bool csShaderExpression::eval_normal(const oper_arg & arg1, oper_arg & output) const {
+bool csShaderExpression::eval_normal(const oper_arg & arg1, oper_arg & output) const 
+{
   if (arg1.type != TYPE_VECTOR2 ||
       arg1.type != TYPE_VECTOR3 ||
-      arg1.type != TYPE_VECTOR4) {
+      arg1.type != TYPE_VECTOR4)
+  {
     DEBUG_PRINTF("Argument to norm is not a vector.\n");
 
     return false;
@@ -1028,22 +1198,80 @@ bool csShaderExpression::eval_normal(const oper_arg & arg1, oper_arg & output) c
   return true;
 }
 
-bool csShaderExpression::eval_time(oper_arg & output) const {
+bool csShaderExpression::eval_pow(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
+  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER)
+  {
+    output.type = TYPE_NUMBER;
+    output.num = pow(arg1.num, arg2.num);
+  } 
+  else 
+  {
+    DEBUG_PRINTF("Invalid types for operator, pow(%s, %s).\n", 
+      get_type_name(arg1.type), get_type_name(arg2.type));
+
+    return false;
+  }
+
+  return true;
+}
+
+bool csShaderExpression::eval_min(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
+  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER)
+  {
+    output.type = TYPE_NUMBER;
+    output.num = MIN(arg1.num, arg2.num);
+  } 
+  else 
+  {
+    DEBUG_PRINTF("Invalid types for operator, min(%s, %s).\n", 
+      get_type_name(arg1.type), get_type_name(arg2.type));
+
+    return false;
+  }
+
+  return true;
+}
+
+bool csShaderExpression::eval_max(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
+  if (arg1.type == TYPE_NUMBER && arg2.type == TYPE_NUMBER)
+  {
+    output.type = TYPE_NUMBER;
+    output.num = MAX(arg1.num, arg2.num);
+  } 
+  else 
+  {
+    DEBUG_PRINTF("Invalid types for operator, max(%s, %s).\n", 
+      get_type_name(arg1.type), get_type_name(arg2.type));
+
+    return false;
+  }
+
+  return true;
+}
+
+bool csShaderExpression::eval_time(oper_arg & output) const 
+{
   output.type = TYPE_NUMBER;
   output.num = 128;
 
   return true;
 }
 
-bool csShaderExpression::eval_frame(oper_arg & output) const {
+bool csShaderExpression::eval_frame(oper_arg & output) const 
+{
   output.type = TYPE_NUMBER;
   output.num = 256;
 
   return true;
 }
 
-bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
-  if (arg1.type != TYPE_NUMBER || arg2.type != TYPE_NUMBER) {
+bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
+  if (arg1.type != TYPE_NUMBER || arg2.type != TYPE_NUMBER)
+  {
     DEBUG_PRINTF("Arguments to selt12 aren't numbers.\n");
 
     return false;
@@ -1056,8 +1284,10 @@ bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg
   return true;
 }
 
-bool csShaderExpression::eval_selt34(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
-  if (arg1.type != TYPE_NUMBER) {
+bool csShaderExpression::eval_selt34(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const 
+{
+  if (arg1.type != TYPE_NUMBER)
+  {
     DEBUG_PRINTF("Arguments to selt34 aren't numbers.\n");
 
     return false;
@@ -1069,7 +1299,8 @@ bool csShaderExpression::eval_selt34(const oper_arg & arg1, const oper_arg & arg
   if (arg2.type == TYPE_INVALID) 
     return true;
 
-  if (arg2.type != TYPE_NUMBER) {
+  if (arg2.type != TYPE_NUMBER)
+  {
     DEBUG_PRINTF("Arguments to selt34 aren't numbers.\n");
 
     return false;
@@ -1080,7 +1311,8 @@ bool csShaderExpression::eval_selt34(const oper_arg & arg1, const oper_arg & arg
   return true;
 }
 
-bool csShaderExpression::eval_load(const oper_arg & arg1, oper_arg & output) const {
+bool csShaderExpression::eval_load(const oper_arg & arg1, oper_arg & output) const 
+{
   /* I really hope this is optimized by the compiler. */
 
   output = arg1;
@@ -1088,7 +1320,8 @@ bool csShaderExpression::eval_load(const oper_arg & arg1, oper_arg & output) con
   return true;
 }
 
-bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node) {
+bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node)
+{
   csRef<iDocumentNodeIterator> iter (node->GetNodes());
   cons * cptr = head;
   csStringID tok = xmltokens.Request(node->GetValue());
@@ -1159,13 +1392,15 @@ bool csShaderExpression::parse_xml(cons * head, iDocumentNode * node) {
   return true;
 }
 
-bool csShaderExpression::parse_sexp(cons * head, iDocumentNode * node) {
+bool csShaderExpression::parse_sexp(cons * head, iDocumentNode * node)
+{
   /* @@@ todo */
   
   return false;
 }
 
-bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const char * type_str, const char * val_str) {
+bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const char * type_str, const char * val_str)
+{
   char * tmp = NULL;
   
   arg.type = type;
@@ -1198,68 +1433,90 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
     }
     break;
 
-  case TYPE_VECTOR2:
-  {
-    float v1, v2;
-
-    if (sscanf(val_str, "%f,%f", &v1, &v2) < 2)
+    case TYPE_VECTOR2:
     {
-      DEBUG_PRINTF("Couldn't parse vector2: %s.\n", val_str);
+      float v1, v2;
+
+      if (sscanf(val_str, "%f,%f", &v1, &v2) < 2)
+      {
+	DEBUG_PRINTF("Couldn't parse vector2: %s.\n", val_str);
+
+	return false;
+      }
+
+      arg.vec4.Set(v1, v2, 0, 0);
+
+    } break;
+
+    case TYPE_VECTOR3:
+    {
+      float v1, v2, v3;
+
+      if (sscanf(val_str, "%f,%f,%f", &v1, &v2, &v3) < 3)
+      {
+	DEBUG_PRINTF("Couldn't parse vector3: %s.\n", val_str);
+
+	return false;
+      }
+
+      arg.vec4.Set(v1, v2, v3, 0);
+
+    } break;
+
+    case TYPE_VECTOR4:
+    {
+      float v1, v2, v3, v4;
+
+      if (sscanf(val_str, "%f,%f,%f,%f", &v1, &v2, &v3, &v4) < 4)
+      {
+	DEBUG_PRINTF("Couldn't parse vector4: %s.\n", val_str);
+
+	return false;
+      }
+
+      arg.vec4.Set(v1, v2, v3, v4);
+
+    } break;
+
+    case TYPE_VARIABLE:
+      arg.var = strset->Request(val_str);
+
+      break;
+        
+    default:
+      DEBUG_PRINTF("Invalid type in atom: %s.\n", type_str);
 
       return false;
-    }
-
-    arg.vec4.Set(v1, v2, 0, 0);
-
-  } break;
-
-  case TYPE_VECTOR3:
-  {
-    float v1, v2, v3;
-
-    if (sscanf(val_str, "%f,%f,%f", &v1, &v2, &v3) < 3) {
-      DEBUG_PRINTF("Couldn't parse vector3: %s.\n", val_str);
-
-      return false;
-    }
-
-    arg.vec4.Set(v1, v2, v3, 0);
-
-  } break;
-
-  case TYPE_VECTOR4:
-  {
-    float v1, v2, v3, v4;
-
-    if (sscanf(val_str, "%f,%f,%f,%f", &v1, &v2, &v3, &v4) < 4) {
-      DEBUG_PRINTF("Couldn't parse vector4: %s.\n", val_str);
-
-      return false;
-    }
-
-    arg.vec4.Set(v1, v2, v3, v4);
-
-  } break;
-
-  case TYPE_VARIABLE:
-    arg.var = strset->Request(val_str);
-
-    break;
-      
-  default:
-    DEBUG_PRINTF("Invalid type in atom: %s.\n", type_str);
-
-    return false;
   }
 
   return true;
 }
 
-bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
-  CS_ASSERT(cell->car.type == TYPE_OPER); /* should be guaranteed by preceeding passes */
+bool csShaderExpression::compile_cons(const cons * cell, int & acc_top)
+{
+  int this_acc = acc_top;
+
+  if (cell->car.type < TYPE_LIMIT)
+  {
+    oper tmp;
+
+    tmp.opcode = OP_INT_LOAD;
+    tmp.acc = this_acc;
+    acc_top++;
+    
+    tmp.arg1 = cell->car;
+    tmp.arg2.type = TYPE_INVALID;
+    
+    opcodes.Push(tmp);
+
+    return true;
+  }
+  else
+  {
+    CS_ASSERT(cell->car.type == TYPE_OPER); /* should be guaranteed by preceeding passes */
+  }
 
   int op = cell->car.oper;
-  int this_acc = acc_top;
   const cons * cptr = cell->cdr;
 
   if (this_acc > accstack_max)
@@ -1299,7 +1556,8 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
       if (!compile_cons(cptr->car.cell, acc_top)) 
 	return false;
 
-      if (acc_top > this_acc + 1) {
+      if (acc_top > this_acc + 1)
+      {
 	tmp.arg1.type = TYPE_ACCUM;
 	tmp.arg1.acc = this_acc;
 	tmp.arg2.type = TYPE_ACCUM;
