@@ -10,6 +10,10 @@ The history order is reversed so that new features are at the top.
 	- Jorrit added a new howto about creating a thing mesh.
 	- Jorrit added the beginnings for the genmesh mesh object
 	  documentation.
+	- Jorrit removed mention of the meshobjects implementing iPolygonMesh
+	  from the mesh object documentation. The mesh objects still do that
+	  but that's supposed to be secret :-)  The real method is to use
+	  the iObjectModel now.
 19-Jul-2003
 	- Jorrit added howto about adding game data to Crystal Space objects
 	  in map files.

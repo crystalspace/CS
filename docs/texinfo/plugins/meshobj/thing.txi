@@ -8,7 +8,6 @@
 @cindex @code{iMeshObjectType}
 @cindex @code{iThingState}
 @cindex @code{iThingFactoryState}
-@cindex @code{iPolygonMesh}
 @cindex @code{iVisibilityCuller}
 @cindex @code{iLightingInfo}
 @cindex @code{iThingEnvironment}
@@ -58,8 +57,6 @@ Implements @samp{iThingFactoryState}
 Implements @samp{iMeshObject}
 @item
 Implements @samp{iThingState}
-@item
-Implements @samp{iPolygonMesh}
 @item
 Implements @samp{iVisibilityCuller}
 @item

@@ -8,7 +8,6 @@
 @cindex @code{iMeshObjectType}
 @cindex @code{iSprite3DState}
 @cindex @code{iSprite3DFactoryState}
-@cindex @code{iPolygonMesh}
 @cindex @code{iConfig}
 @cindex @code{iSpriteFrame}
 @cindex @code{iSpriteAction}
@@ -49,8 +48,6 @@ with @code{SCF_QUERY_INTERFACE()}):
 Implements @samp{iMeshObject}
 @item
 Implements @samp{iSprite3DState}
-@item
-Implements @samp{iPolygonMesh}
 @end itemize
 @item
 @emph{MeshObjectFactory}

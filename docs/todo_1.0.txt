@@ -349,5 +349,4 @@ Documentation Updates:
 	- Go over the API documentation (doxygen comments) and see if they can
 	  be improved.
 	- Complete the features lists.
-	- Remove iPolygonMesh from mesh object documentation.
 
