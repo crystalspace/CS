@@ -585,6 +585,12 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsWindow *win, iAwsComponent *pa
         
       } // end for count of connections
 
+      //  Now that we've processed the connection map, we use a trick and send out
+      // a creation signal for the component.  Note that we can't do this until the
+      // connection map has been created, or the signal won't go anywhere!
+
+      parent->Broadcast(0xefffffff);
+
     } // end else
       
   } // end for count of keys
@@ -787,6 +793,8 @@ awsManager::RegisterCommonComponents()
   GetPrefMgr()->RegisterConstant("False", 0);
   GetPrefMgr()->RegisterConstant("Yes", 1);
   GetPrefMgr()->RegisterConstant("No", 0);
+
+  GetPrefMgr()->RegisterConstant("signalComponentCreated", 0xefffffff);
 }
 
 iGraphics2D *

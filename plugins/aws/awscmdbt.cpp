@@ -18,6 +18,7 @@ const int awsCmdButton::fsBitmap =0x2;
 const int awsCmdButton::signalClicked=0x1;
 
 awsCmdButton::awsCmdButton():is_down(false), mouse_is_over(false), 
+                             is_switch(false), was_down(false),
                              frame_style(0), alpha_level(92),
                              caption(NULL)
 {
@@ -35,6 +36,8 @@ awsCmdButton::Type()
 bool
 awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
+ int switch_style=0;
+
  if (!awsComponent::Setup(_wmgr, settings)) return false;
 
  iAwsPrefManager *pm=WindowManager()->GetPrefMgr();
@@ -42,7 +45,10 @@ awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
  pm->LookupIntKey("ButtonTextureAlpha", alpha_level); // global get
  pm->GetInt(settings, "Style", frame_style);
  pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
+ pm->GetInt(settings, "Toggle", switch_style);
  pm->GetString(settings, "Caption", caption);
+
+ is_switch=switch_style;
 
  switch(frame_style)
  {
@@ -87,6 +93,14 @@ awsCmdButton::GetProperty(char *name, void **parm)
 
     iString *s = new scfString(st);
     *parm = (void *)s;
+    return true;
+  }
+  else if (strcmp("State", name)==0)
+  {
+    // in this case, the parm should point to a bool.
+    bool **pb = (bool**)parm;
+
+    *pb = &is_down;
     return true;
   }
 
@@ -240,20 +254,35 @@ awsCmdButton::OnDraw(csRect clip)
 bool 
 awsCmdButton::OnMouseDown(int button, int x, int y)
 {
-  is_down=true;
+  was_down=is_down;
+
+  if (!is_switch || is_down==false)
+    is_down=true;
+  
   Invalidate();
-  return false;
+  return true;
 }
     
 bool 
 awsCmdButton::OnMouseUp(int button, int x, int y)
 {
-  if (is_down)
-    Broadcast(signalClicked);
+  if (!is_switch)
+  {
+    if (is_down)
+      Broadcast(signalClicked);
 
-  is_down=false;
+    is_down=false;
+  }
+  else
+  {
+    if (was_down)
+      is_down=false;
+
+    Broadcast(signalClicked);
+  }
+
   Invalidate();
-  return false;
+  return true;
 }
     
 bool
