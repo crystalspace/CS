@@ -66,6 +66,9 @@ chronological order.
 	- Jorrit made iRenderView->ClipBBox() return a modified frustum
 	  mask so it can be used for hierarchically culling bbox trees.
 	  Chunklod now uses this.
+	- Eric Sunshine fixed bug in the SetProperty rule in property.jam.  It
+	  was ignoring the incoming value and unconditionally setting the
+	  property to 'true'.
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
 	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there
