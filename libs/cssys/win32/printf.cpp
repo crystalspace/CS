@@ -61,7 +61,7 @@ void pprintf_close(void)
 }
 
 // to be called instead of printf (exact same prototype/functionality of printf)
-int pprintf(char *str, ...)
+int pprintf(const char *str, ...)
 {
   va_list arg;
   int nResult;

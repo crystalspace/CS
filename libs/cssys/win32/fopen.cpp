@@ -20,10 +20,11 @@
 #include "cssys/common/system.h"
 #include <stdio.h>
 
-FILE* csSystemDriver::fopen (char* filename, char* mode)
+FILE* csSystemDriver::fopen (const char* filename, const char* mode)
 {
   char new_filename[256];
-  char* s = filename, * d = new_filename;
+  const char* s = filename;
+  char*       d = new_filename;
   while (*s)
   {
     if (*s == '/') *d++ = '\\';

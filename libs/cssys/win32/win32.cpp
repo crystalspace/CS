@@ -401,22 +401,22 @@ long FAR PASCAL WindowProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
     
   case WM_MBUTTONDOWN:
     if (System)
-      System->Mouse->do_buttonpress(SysGetTime (), 2, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
+      System->Mouse->do_buttonpress(SysGetTime (), 3, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
     break;
     
   case WM_MBUTTONUP:
     if (System)
-      System->Mouse->do_buttonrelease(SysGetTime (), 2, LOWORD(lParam), HIWORD(lParam));
+      System->Mouse->do_buttonrelease(SysGetTime (), 3, LOWORD(lParam), HIWORD(lParam));
     break;
     
   case WM_RBUTTONDOWN:
     if (System)
-      System->Mouse->do_buttonpress(SysGetTime (), 3, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
+      System->Mouse->do_buttonpress(SysGetTime (), 2, LOWORD(lParam), HIWORD(lParam), wParam & MK_SHIFT , GetAsyncKeyState(VK_MENU), wParam & MK_CONTROL);
     break;
     
   case WM_RBUTTONUP:
     if (System)
-      System->Mouse->do_buttonrelease(SysGetTime (), 3, LOWORD(lParam), HIWORD(lParam));
+      System->Mouse->do_buttonrelease(SysGetTime (), 2, LOWORD(lParam), HIWORD(lParam));
     break;
     
   case WM_MOUSEMOVE:
