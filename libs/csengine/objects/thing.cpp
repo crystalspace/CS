@@ -2997,7 +2997,6 @@ csThingObjectType::csThingObjectType (iBase* pParent)
 
 csThingObjectType::~csThingObjectType ()
 {
-  printf ("*** thingobjecttype dtor\n");
   int i;
   for (i = 0 ; i < planes.Length () ; i++)
   {
