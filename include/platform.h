@@ -25,7 +25,7 @@
 #elif defined (MACOS_VOLATILE)
 #  include "cssys/mac/volatile.h"
 #else
-#  include "cssys/win32/volatile.h"
+#  include "volatile.h"
 #endif
 
 #endif // __CS_PLATFORM_H__
