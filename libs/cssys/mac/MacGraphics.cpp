@@ -107,7 +107,20 @@ void csGraphics2DMac::Initialize()
 	OSErr					err;
 	Boolean					showDialogFlag;
 
-	csGraphics2D::Initialize ();
+	csGraphics2D::Initialize();
+
+	/*
+	 *	Check to see if the depth requested is 15 bits,
+	 *	while this is the depth we use, apple called it 16 bits.
+	 */
+
+	if ( Depth == 15 )
+		Depth = 16;
+
+	/*
+	 *	If the game is to be created in fullscreen mode and
+	 *	DrawSprockets is available, then use it.
+	 */
 
 	if (( FullScreen ) && ( DSpStartup() == noErr )) {
 		// Create the display
@@ -166,7 +179,7 @@ void csGraphics2DMac::Initialize()
 		} else {
 			err = DSpUserSelectContext( &mDisplayAttributes, 0, NULL, &mDisplayContext );
 			if ( err ) {
-				::ExitToShell();
+				ExitToShell();
 			}
 		}
 
@@ -206,7 +219,7 @@ void csGraphics2DMac::Initialize()
 			else
 				ParamText( "\p256", "\p", "\p", "\p" );
 			if ( StopAlert( kAskForDepthChangeDialog, NULL ) != 1 ) {
-				::ExitToShell();
+				ExitToShell();
 			}
 		}
 
@@ -245,7 +258,7 @@ void csGraphics2DMac::Initialize()
 			else
 				ParamText( "\p256", "\p", "\p", "\p" );
 			if ( StopAlert( kAskForDepthChangeDialog, NULL ) != 1 ) {
-				::ExitToShell();
+				ExitToShell();
 			}
 		}
 
@@ -296,7 +309,14 @@ void csGraphics2DMac::Initialize()
 		 *	The 8 bit pixel data was filled in by csGraphics2D
 		 *	so all we need to do is get the default 8 bit color table.
 		 */
+#if 1
 		mColorTable = GetCTable( 72 );
+#else
+		mColorTable = (CTabHandle)NewHandleClear( sizeof(ColorSpec) * 256 + 8 );
+		(*mColorTable)->ctSeed = GetCTSeed();
+		(*mColorTable)->ctFlags = 0;
+		(*mColorTable)->ctSize = 255;
+#endif
 	}
 
 	if ( mDrawSprocketsEnabled ) {
@@ -343,15 +363,15 @@ bool csGraphics2DMac::Open(char* Title)
 		theBounds.top = 0;
 		theBounds.right = Width;
 		theBounds.bottom = Height;
-		theError = ::NewGWorld( &mOffscreen, Depth, &theBounds, mColorTable, NULL, 0 );
+		theError = NewGWorld( &mOffscreen, Depth, &theBounds, mColorTable, NULL, 0 );
 		if (( theError != noErr ) || ( mOffscreen == NULL ))
-			::ExitToShell();
+			ExitToShell();
 
 		/*
 		 *	lock it and get its address
 		 */
-		mPixMap = ::GetGWorldPixMap( mOffscreen );
-		::LockPixels(mPixMap);
+		mPixMap = GetGWorldPixMap( mOffscreen );
+		LockPixels(mPixMap);
 
 		/*
 		 *	Create the main window with the given title
@@ -369,25 +389,25 @@ bool csGraphics2DMac::Open(char* Title)
 
 		strcpy( (char *)&theTitle[1], Title );
 		theTitle[0] = strlen( Title );
-		mMainWindow = (CWindowPtr)::NewCWindow( nil, &theBounds, theTitle, true, noGrowDocProc, 
+		mMainWindow = (CWindowPtr)::NewCWindow( NULL, &theBounds, theTitle, true, noGrowDocProc, 
 												(WindowPtr) -1, false, 0 );
 
 		// set the color table into the video card
-		::SetGWorld( (CGrafPtr)mMainWindow, NULL );
+		SetGWorld( (CGrafPtr)mMainWindow, mMainGDevice );
 		if ( Depth == 8 ) {
 			mMainPalette = ::NewPalette( 256, mColorTable, pmTolerant, 0x2000 );
-			::SetPalette( (WindowPtr)mMainWindow, mMainPalette, true );
+			SetPalette( (WindowPtr)mMainWindow, mMainPalette, false );
 			mPaletteChanged = true;
 		} else {
 			mPaletteChanged = false;
 		}
-		::ShowWindow( (WindowPtr)mMainWindow );
-		::SelectWindow( (WindowPtr)mMainWindow );
+		ShowWindow( (WindowPtr)mMainWindow );
+		SelectWindow( (WindowPtr)mMainWindow );
 
 		mDoubleBuffering = true;
 	}
 
-	Memory = (unsigned char*)::GetPixBaseAddr(mPixMap);
+	Memory = (unsigned char*)GetPixBaseAddr(mPixMap);
 	theRowBytes = (**mPixMap).rowBytes & 0x7fff;
 
 	/*
@@ -403,7 +423,6 @@ bool csGraphics2DMac::Open(char* Title)
 	 */
 	for (i = 0, theOffset = 0; i < Height; i++, theOffset += theRowBytes )
 		LineAddress[i] = theOffset;
-
 
 	Clear( 0 );
 
@@ -428,9 +447,14 @@ void csGraphics2DMac::Close(void)
 		}
 		DSpShutdown();
 	} else {
+		if ( Depth == 8 )
+			::RestoreDeviceClut( NULL );
+
 		if ( mOffscreen ) {
+			UnlockPixels( GetGWorldPixMap( mOffscreen ) );
 			DisposeGWorld( mOffscreen );
 			mOffscreen = NULL;
+			mPixMap = NULL;
 		}
 
 		if ( mMainWindow ) {
@@ -438,12 +462,13 @@ void csGraphics2DMac::Close(void)
 			mMainWindow = NULL;
 		}
 
-		::RestoreDeviceClut( NULL );
+		if ( mMainPalette ) {
+			DisposePalette( mMainPalette );
+			mMainPalette = NULL;
+		}
 
 		if ( mOldDepth ) {
-			GDHandle	theMainDevice;
-			theMainDevice = ::GetMainDevice();
-			SetDepth( theMainDevice, mOldDepth, (**theMainDevice).gdFlags, 1 );
+			SetDepth( mMainGDevice, mOldDepth, (**mMainGDevice).gdFlags, 1 );
 			mOldDepth = 0;
 		}
 	}
@@ -516,7 +541,7 @@ void csGraphics2DMac::GetColorfromInt( int color, RGBColor *outColor )
 ----------------------------------------------------------------*/
 bool csGraphics2DMac::BeginDraw()
 {
-	::GetGWorld( &mSavedPort, &mSavedGDHandle );
+	GetGWorld( &mSavedPort, &mSavedGDHandle );
 
 	if ( mDrawSprocketsEnabled ) {
 		CGrafPtr port;
@@ -532,10 +557,10 @@ bool csGraphics2DMac::BeginDraw()
 			mGetBufferAddress = false;
 		}
 	} else {
-		if ( mDoubleBuffering )
-			::SetGWorld( mOffscreen, NULL );
-		else
-			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+//		if ( mDoubleBuffering )
+//			SetGWorld( mOffscreen, NULL );
+//		else
+//			SetGWorld( (GWorldPtr)mMainWindow, mMainGDevice );
 	}
 
   return true;
@@ -547,7 +572,7 @@ bool csGraphics2DMac::BeginDraw()
 ----------------------------------------------------------------*/
 void csGraphics2DMac::FinishDraw()
 {
-	::SetGWorld( (GWorldPtr)mSavedPort, mSavedGDHandle );
+	SetGWorld( (GWorldPtr)mSavedPort, mSavedGDHandle );
 
 	if ( mActivePage == 0 )
 		mActivePage = 1;
@@ -584,10 +609,10 @@ void csGraphics2DMac::Print( csRect * area )
 		CGrafPtr	thePort;
 		GDHandle	theGDHandle;
 
-		if ( mDoubleBuffering ) {
-			::GetGWorld( &thePort, &theGDHandle );
+		if ( mDoubleBuffering && mMainWindow ) {
+			GetGWorld( &thePort, &theGDHandle );
 
-			::SetGWorld((GWorldPtr)mMainWindow, nil);
+			SetGWorld((GWorldPtr)mMainWindow, mMainGDevice );
 
 			/*
 			 *	If area is not null, then use it to select the
@@ -604,10 +629,10 @@ void csGraphics2DMac::Print( csRect * area )
 				theRect = mOffscreen->portRect;
 			}
 
-			::CopyBits((BitMap*)*mPixMap, &((WindowPtr)mMainWindow)->portBits,
+			CopyBits((BitMap*)*mPixMap, &((WindowPtr)mMainWindow)->portBits,
 				&theRect, &theRect, srcCopy, NULL );
 
-			::SetGWorld( thePort, theGDHandle );
+			SetGWorld( thePort, theGDHandle );
 		}
 	}
 }
@@ -617,16 +642,22 @@ void csGraphics2DMac::Clear( int color )
 {
 	RGBColor	theColor;
 	Rect		theRect;
+	CGrafPtr	thePort;
+	GDHandle	theGDHandle;
+
+	GetGWorld( &thePort, &theGDHandle );
 
 	if ( mDoubleBuffering )
-		::SetGWorld( mOffscreen, NULL );
+		SetGWorld( mOffscreen, NULL );
 	else
-		::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+		SetGWorld( (GWorldPtr)mMainWindow, mMainGDevice );
 
 	GetColorfromInt( color, &theColor );
 	RGBBackColor( &theColor );
 	SetRect( &theRect, 0, 0, Width, Height );
 	EraseRect( &theRect );
+
+	SetGWorld( thePort, theGDHandle );
 }
 
 
@@ -732,16 +763,14 @@ bool csGraphics2DMac::SetMouseCursor( int iShape, ITextureHandle* iBitmap )
 ----------------------------------------------------------------*/
 void csGraphics2DMac::ActivateWindow( WindowPtr inWindow, bool active )
 {
-	CGrafPtr	thePort;
-	GDHandle	theGDHandle;
-
 	if ( ! mDrawSprocketsEnabled ) {
 		if ( inWindow != (WindowPtr)mMainWindow )
 			return;
 
 		if ( active ) {
-			::SelectWindow( (WindowPtr)mMainWindow );
-			::ActivatePalette( (WindowPtr)mMainWindow );
+			SelectWindow( (WindowPtr)mMainWindow );
+			if ( mColorTable )
+				ActivatePalette( (WindowPtr)mMainWindow );
 		}
 	}
 	return;
@@ -758,25 +787,25 @@ void csGraphics2DMac::UpdateWindow( WindowPtr inWindow, bool *updated )
 
 	*updated = false;
 
-	if ( ! mDrawSprocketsEnabled ) {
+	if ( ! mDrawSprocketsEnabled && mMainWindow ) {
 		if ( inWindow != (WindowPtr)mMainWindow )
 			return;
 
-		::GetGWorld( &thePort, &theGDHandle );
+		GetGWorld( &thePort, &theGDHandle );
 
-		::SetGWorld((GWorldPtr)mMainWindow, nil);
+		SetGWorld((GWorldPtr)mMainWindow, mMainGDevice );
 
-		::BeginUpdate( (WindowPtr)mMainWindow );
+		BeginUpdate( (WindowPtr)mMainWindow );
 
 		if ( mDoubleBuffering ) {
-			::CopyBits((BitMap*)*mPixMap, &((WindowPtr)mMainWindow)->portBits,
+			CopyBits((BitMap*)*mPixMap, &((WindowPtr)mMainWindow)->portBits,
 					&mOffscreen->portRect, &mOffscreen->portRect,
 					srcCopy, NULL );
 		}
 
-		::EndUpdate( (WindowPtr)mMainWindow );
+		EndUpdate( (WindowPtr)mMainWindow );
 
-		::SetGWorld( thePort, theGDHandle );
+		SetGWorld( thePort, theGDHandle );
 
 		*updated = true;
 	}
@@ -798,13 +827,14 @@ void csGraphics2DMac::PointInWindow( Point *thePoint, bool *inWindow )
 		}
 		*inWindow = false;
 	} else {
-		GrafPtr	thePort;
+		CGrafPtr	thePort;
+		GDHandle	theGDHandle;
 
-		if ( PtInRgn( *thePoint, ((WindowPeek)mMainWindow)->strucRgn )) {
-			::GetPort( &thePort );
-			::SetPort( (WindowPtr)mMainWindow );
-			::GlobalToLocal( thePoint );
-			::SetPort( thePort );
+		if ( mMainWindow && PtInRgn( *thePoint, ((WindowPeek)mMainWindow)->strucRgn )) {
+			GetGWorld( &thePort, &theGDHandle );
+			SetGWorld( (CGrafPtr)mMainWindow, mMainGDevice );
+			GlobalToLocal( thePoint );
+			SetGWorld( thePort, theGDHandle );
 
 			*inWindow = true;
 			return;
@@ -873,25 +903,36 @@ void csGraphics2DMac::HandleEvent( EventRecord *inEvent, bool *outEventWasProces
 
 void csGraphics2DMac::SetColorPalette( void )
 {
-	if ( ! mDrawSprocketsEnabled ) {
+	CGrafPtr	thePort;
+	GDHandle	theGDHandle;
+
+	if ( ! mDrawSprocketsEnabled && mMainPalette ) {
 		/*
 		 *	If the palette has changed, make sure the offscreen gworld
 		 *	(if there is one)and the window are correctly set up.
 		 */
 		if ( mPaletteChanged ) {
-			::SelectWindow( (WindowPtr)mMainWindow );
+			SelectWindow( (WindowPtr)mMainWindow );
 
-			::GetGWorld( &mSavedPort, &mSavedGDHandle );
+			GetGWorld( &thePort, &theGDHandle );
 
-			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+			SetGWorld( (GWorldPtr)mMainWindow, mMainGDevice );
 
-			if ( mMainPalette ) {
-				CTab2Palette( mColorTable, mMainPalette, pmTolerant, 0x2000 );
+			if ( mOffscreen ) {
+				Rect	theBounds;
+
+				theBounds.left = 0;
+				theBounds.top = 0;
+				theBounds.right = Width;
+				theBounds.bottom = Height;
+				UpdateGWorld( &mOffscreen, Depth, &theBounds, mColorTable, NULL, 0 );
 			}
-			::ActivatePalette( (WindowPtr)mMainWindow );
+			SetGWorld( thePort, theGDHandle );
+
+			CTab2Palette( mColorTable, mMainPalette, pmTolerant, 0x2000 );
+			ActivatePalette( (WindowPtr)mMainWindow );
 
 			mPaletteChanged = false;
-			::SetGWorld( mSavedPort, mSavedGDHandle );
 		}
 	}
 
@@ -912,5 +953,5 @@ void csGraphics2DMac::DisplayErrorDialog( short errorIndex )
 	GetIndString( theString, kErrorStrings, errorIndex );
 	ParamText( theString, "\p",  "\p", "\p" );
 	StopAlert( kGeneralErrorDialog, NULL );
-	::ExitToShell();
+	ExitToShell();
 }
