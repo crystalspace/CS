@@ -209,11 +209,12 @@ nomem2:
       // This is a grayscale image, build a grayscale palette
       palette = graypal;
       int entries = (1 << bit_depth) - 1;
+      colors = entries + 1;
       for (int i = 0; i <= entries; i++)
         palette [i].red = palette [i].green = palette [i].blue =
           (i * 255) / entries;
     }
-    convert_8bit ((UByte *)NewImage, palette);
+    convert_8bit ((UByte *)NewImage, palette, colors);
   }
   else // grayscale + alpha
   {

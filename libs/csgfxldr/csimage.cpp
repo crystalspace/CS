@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
     Contributions made by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 #include "csgfxldr/quantize.h"
 #include "csutil/util.h"
 
-//------------------------------------------------------- Helper functions -----
+//------------------------------------------------------ Helper functions -----
 
 #define MIPMAP_NAME	mipmap_0
 #define MIPMAP_LEVEL	0
@@ -130,7 +130,7 @@
 #define MIPMAP_ALPHA
 #include "mipmap.inc"
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csImageFile)
   IMPLEMENTS_INTERFACE (iImage)
@@ -301,13 +301,13 @@ iImage *csImageFile::MipMap (int steps, RGBPixel *transp)
         else
 	{
 	  if (steps == 0)
-	    mipmap_0_pt (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+	    mipmap_0_pt(Width,Height,(UByte*)Image,mipmap,Palette,transpidx);
 	  else if (steps == 1)
-	    mipmap_1_pt (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+	    mipmap_1_pt(Width,Height,(UByte*)Image,mipmap,Palette,transpidx);
 	  else if (steps == 2)
-	    mipmap_2_pt (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+	    mipmap_2_pt(Width,Height,(UByte*)Image,mipmap,Palette,transpidx);
 	  else
-	    mipmap_3_pt (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+	    mipmap_3_pt(Width,Height,(UByte*)Image,mipmap,Palette,transpidx);
 	}
       if (Alpha)
       {
@@ -410,7 +410,7 @@ void csImageFile::convert_rgb (RGBPixel *iImage)
   }
 }
 
-void csImageFile::convert_8bit (UByte *iImage, RGBPixel *iPalette)
+void csImageFile::convert_8bit(UByte *iImage, RGBPixel *iPalette, int /*npal*/)
 {
   int pixels = Width * Height;
   switch (Format & CS_IMGFMT_MASK)
@@ -450,10 +450,10 @@ void csImageFile::convert_8bit (UByte *iImage, RGBPixel *iPalette)
   } /* endif */
 }
 
-void csImageFile::convert_8bit (UByte *iImage, RGBcolor *iPalette)
+void csImageFile::convert_8bit(UByte *iImage,RGBcolor *iPalette,int nPalColors)
 {
   RGBPixel *newpal = new RGBPixel [256];
-  for (int i = 0; i < 256; i++)
-    newpal [i] = iPalette [i];
+  for (int i = 0; i < nPalColors; i++) // Default RGBPixel constructor ensures
+    newpal [i] = iPalette [i];         // palette past nPalColors is sane.
   convert_8bit (iImage, newpal);
 }

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
     Contributions made by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef IMAGE_H
-#define IMAGE_H
+#ifndef __CS_IMAGE_H__
+#define __CS_IMAGE_H__
 
 #include <stdio.h>
 #include "csgfxldr/rgbpixel.h"
@@ -87,14 +87,14 @@ protected:
    * the buffer itself if it is appropiate (or wont if the buffer
    * size/contents are appropiate for target format). Same about palette.
    */
-  void convert_8bit (UByte *iImage, RGBPixel *iPalette);
+  void convert_8bit (UByte *iImage, RGBPixel *iPalette, int nPalColors = 256);
 
   /**
    * Same as above but accepts an array of RGBcolor's as palette.
    * The RGBcolor array is never freed, so its your responsability
    * if you did it.
    */
-  void convert_8bit (UByte *iImage, RGBcolor *iPalette);
+  void convert_8bit (UByte *iImage, RGBcolor *iPalette, int nPalColors = 256);
 
   /**
    * Free all image data: pixels and palette. Takes care of image data format.
@@ -110,7 +110,7 @@ public:
   /// Destroy the image file object and free all associated storage
   virtual ~csImageFile ();
 
-  /***************************** iImage interface *****************************/
+  /**************************** iImage interface *****************************/
   /**
    * Get image data: returns either (RGBPixel *) or (unsigned char *)
    * depending on format. Note that for RGBA images the RGBPixel structure
@@ -194,4 +194,4 @@ public:
   static iImage *Load (UByte* iBuffer, ULong iSize, int iFormat);
 };
 
-#endif
+#endif // __CS_IMAGE_H__
