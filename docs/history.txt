@@ -21,6 +21,10 @@ chronological order.
 	  to bindoc.
 	- Eric Sunshine fixed some Texinfo mark-up problems and typographical
 	  errors in apimod98.txi.
+	- Eric Sunshine fixed bugs in awstut.mak where it was referencing
+	  CSWS makefile variables.
+	- Eric Sunshine fixed awstut.mak and awstut/Jamfile so that they
+	  mention the new awstut.cfg file which Andreas Busch added.
 7-Nov-2003
 	- res reverted the behaviour of setting the alpha of keycolored pixels
 	  of textures in GL: just drop the alpha of KCed pixels to 0, but don't
