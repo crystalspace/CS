@@ -4255,7 +4255,6 @@ package cspace::iLight;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*GetPrivateObject = *cspacec::iLight_GetPrivateObject;
 *GetLightID = *cspacec::iLight_GetLightID;
 *QueryObject = *cspacec::iLight_QueryObject;
 *GetDynamicType = *cspacec::iLight_GetDynamicType;
@@ -4484,13 +4483,44 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iSectorMeshCallback ##############
+
+package cspace::iSectorMeshCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*NewMesh = *cspacec::iSectorMeshCallback_NewMesh;
+*RemoveMesh = *cspacec::iSectorMeshCallback_RemoveMesh;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iSectorMeshCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iSector ##############
 
 package cspace::iSector;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*GetPrivateObject = *cspacec::iSector_GetPrivateObject;
 *QueryObject = *cspacec::iSector_QueryObject;
 *SetRenderLoop = *cspacec::iSector_SetRenderLoop;
 *GetRenderLoop = *cspacec::iSector_GetRenderLoop;
@@ -4519,6 +4549,8 @@ package cspace::iSector;
 *RemoveSectorCallback = *cspacec::iSector_RemoveSectorCallback;
 *GetSectorCallbackCount = *cspacec::iSector_GetSectorCallbackCount;
 *GetSectorCallback = *cspacec::iSector_GetSectorCallback;
+*AddSectorMeshCallback = *cspacec::iSector_AddSectorMeshCallback;
+*RemoveSectorMeshCallback = *cspacec::iSector_RemoveSectorMeshCallback;
 *CheckFrustum = *cspacec::iSector_CheckFrustum;
 *GetPortalMeshes = *cspacec::iSector_GetPortalMeshes;
 *RegisterPortalMesh = *cspacec::iSector_RegisterPortalMesh;
