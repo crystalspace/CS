@@ -21555,7 +21555,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-std::string s(""); CalCoreModel m; m.addAnimHelper(s,0);
+CalCoreModel m; m.addCoreMorphAnimation(new CalCoreMorphAnimation());
   ;
   return 0;
 }
@@ -21692,7 +21692,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-std::string s(""); CalCoreModel m; m.addAnimHelper(s,0);
+CalCoreModel m; m.addCoreMorphAnimation(new CalCoreMorphAnimation());
   ;
   return 0;
 }

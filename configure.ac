@@ -1525,7 +1525,7 @@ AS_IF([test $cs_cv_libcal3d = yes],
 	[AC_LANG_PROGRAM(
 	    [#include <cal3d/cal3d.h>
 	    @%:@include <string>],
-	    [std::string s(""); CalCoreModel m; m.addAnimHelper(s,0);])],
+	    [CalCoreModel m; m.addCoreMorphAnimation(new CalCoreMorphAnimation());])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
 	    CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])],

@@ -29,6 +29,8 @@ chronological order.
         - Old_Belge added support for the newest cvs of CAL3D.
         - Old_Belge added a menu to viewmesh for using the morph animations 
           of CAL3D.
+        - Old_Belge changed configure.ac and configure to detect if a 
+          sufficiently recent version of CAL3D is used.
 26-Oct-2003
 	- Eric Sunshine updated `simple1' tutorial in the user manual to
 	  reflect recent changes to keyboard-related event handling.
