@@ -106,13 +106,15 @@ PLUGINS += sequence
 PLUGINS += engseq
 PLUGINS += documentsystem/xmlread
 
-#PLUGINS.DYNAMIC += video/render3d/opengl
-#PLUGINS.DYNAMIC += video/render3d/shadermgr
-#PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb
-#PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_cg
-#PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_mtex
-#PLUGINS.DYNAMIC += video/render3d/renderloop/loader
-#PLUGINS.DYNAMIC += video/render3d/renderloop/stdsteps
+ifeq ($(USE_NEW_RENDERER),yes)
+PLUGINS.DYNAMIC += video/render3d/opengl
+PLUGINS.DYNAMIC += video/render3d/shadermgr
+PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb
+PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_cg
+PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_mtex
+PLUGINS.DYNAMIC += video/render3d/renderloop/loader
+PLUGINS.DYNAMIC += video/render3d/renderloop/stdsteps
+endif
 
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr

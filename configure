@@ -865,82 +865,106 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-cpu-specific-instructions
                           enable CPU-specific code generation (default YES);
-                          use with caution since code for one CPU will not
+                          use with caution
+ since code for one CPU will not
                           work with earlier CPUs (for example,
                           Pentium-specific code will not run on an Intel 486)
   --disable-freetypetest  Do not try to compile and run
                           a test FreeType program
-  --enable-optimize       build with optimizations enabled (default YES); same
-                          as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO); same
+  --enable-optimize       build with optimizations enabled (default YES);
+                          same as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO);
+ same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO); same
+  --enable-profile        build with profiling information (default NO);
+ same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile' (default OPTIMIZE)
+                          `debug', `profile'
+ (default OPTIMIZE)
   --enable-plugins        create plugin modules instead of static link
                           libraries (default YES)
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory management mistakes (default NO)
+                          common memory
+ management mistakes (default NO)
+  --enable-new-renderer   enable use of new renderer (_EXPERIMENTAL_!)
+                          (default NO)
   --enable-makefile-cache enable caching of makefile information to speed up
-                          build process; (default YES)
+                          build process;
+ (default YES)
   --enable-makefile-cache-monitor
                           auto-refresh makefile cache when source makefiles
-                          change (default YES); auto-refresh entails very
-                          slight performance penalty but is more robust
+                          change
+ (default YES); auto-refresh entails very
+                          slight performance
+ penalty but is more robust
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-libz=dir         specify location of libz if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libpng=dir       specify location of libpng if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libjpeg=dir      specify location of libjpeg if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libmng=dir       specify location of libmng if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libmikmod=dir    specify location of libmikmod if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libogg=dir       specify location of libogg if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libvorbis=dir    specify location of libvorbis if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libvorbisfile=dir
                           specify location of libvorbisfile if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libpgserver=dir  specify location of libpgserver if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-lib3ds=dir       specify location of lib3ds if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libode=dir       specify location of libode if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-ft-prefix=PREFIX
                           Prefix where FreeType is installed (optional)
   --with-ft-exec-prefix=PREFIX
                           Exec prefix where FreeType is installed (optional)
   --with-libvga=dir       specify location of libvga if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches dir, dir/include, and
+                          automatically; searches dir,
+ dir/include, and
                           dir/lib
 
 Some influential environment variables:
@@ -21237,6 +21261,12 @@ done
 
 
 
+
+
+
+
+
+
 for ac_header in unistd.h \
     sys/types.h \
     sys/socket.h \
@@ -22527,9 +22557,11 @@ if test "${enable_mode+set}" = set; then
   enableval="$enable_mode"
   case $enableval in
 	optimize|debug|profile) cs_build_mode=$enableval ;;
-	*) { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval; use
+	*) { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error: unrecognized mode --enable-mode=$enableval; use
+echo "$as_me: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac
@@ -22598,6 +22630,32 @@ cs_makefile_text="${cs_makefile_text}EXTENSIVE_MEMDEBUG = $enable_extensive_memo
 "
 if test $enable_extensive_memory_debugger = yes; then
   cs_header_text="${cs_header_text}#define CS_EXTENSIVE_MEMDEBUG
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Determine whether the new renderer should be activated.
+#------------------------------------------------------------------------------
+echo "$as_me:$LINENO: checking whether to use new renderer" >&5
+echo $ECHO_N "checking whether to use new renderer... $ECHO_C" >&6
+# Check whether --enable-new-renderer or --disable-new-renderer was given.
+if test "${enable_new_renderer+set}" = set; then
+  enableval="$enable_new_renderer"
+
+else
+  enable_new_renderer=no
+fi;
+echo "$as_me:$LINENO: result: $enable_new_renderer" >&5
+echo "${ECHO_T}$enable_new_renderer" >&6
+cs_makefile_text="${cs_makefile_text}USE_NEW_RENDERER = $enable_new_renderer
+"
+    cs_jamconfig_text="${cs_jamconfig_text}USE_NEW_RENDERER ?= \"$enable_new_renderer\" ;
+"
+if test $enable_new_renderer = yes; then
+  cs_header_text="${cs_header_text}#define CS_USE_NEW_RENDERER
 "
 fi
 

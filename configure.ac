@@ -1702,6 +1702,20 @@ AS_IF([test $enable_extensive_memory_debugger = yes],
 
 
 #------------------------------------------------------------------------------
+# Determine whether the new renderer should be activated.
+#------------------------------------------------------------------------------
+AC_MSG_CHECKING([whether to use new renderer])
+AC_ARG_ENABLE([new-renderer], [AC_HELP_STRING([--enable-new-renderer],
+    [enable use of new renderer (_EXPERIMENTAL_!) (default NO)])],
+    [], [enable_new_renderer=no])
+AC_MSG_RESULT([$enable_new_renderer])
+CS_BUILD_PROPERTY([USE_NEW_RENDERER], [$enable_new_renderer])
+AS_IF([test $enable_new_renderer = yes], 
+  [CS_HEADER_PROPERTY([CS_USE_NEW_RENDERER])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine installation directory for GNU make build system.
 #------------------------------------------------------------------------------
 AS_IF([test $prefix = NONE],

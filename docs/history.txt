@@ -23,6 +23,9 @@ The history order is reversed so that new features are at the top.
 	  manager invoked those methods.
 	- duhprey fixed a dependency problem with the common area in the 
 	  renderloop plugins
+	- res augmented configure to accept an --enable-new-renderer option,
+	  emitting CS_USE_NEW_RENDERER to volatile.h and setting an 
+	  USE_NEW_RENDERER makefile var.
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
 	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday
