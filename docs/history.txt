@@ -1,23 +1,134 @@
 The history order has been reversed so that new features are at the top.
 
+1-Mar-2001
+	- Brandon Ehle added modifications for Lua scripting language:
+	  The SWIGLua modifications were fairly easy, so here's the "goop."
+	  Everything, SHOULD work now.  I don't know much about LUA, but it
+	  appears to Query the system driver just fine and use it to make
+	  function calls.
+	- Martin Geisse did the following changes:
+	    - Moved the default graphics configuration to video.cfg.
+	    - Added iSystem::RemoveConfig to remove config files from the
+	      config manager.
+	    - Fixed a wrong header protector in cfgacc.h.
+	    - Restructured csConfigFile a bit to make overloading the
+	      core Load() and Save() methods easier.
+	    - Added csPrefixConfig. This works like csConfigFile, except
+	      that it only works with those keys in a config file that
+	      begin with a certain substring, and leaves the other keys
+	      untouched.
+	    - Changed most modules to correctly remove any added config
+	      files (using the csConfigAccess class).
+	    - Changed the system driver to remove its private config file
+	      as well.
+	- Robert Bate did some work setting up the TARGET_API_* flags.
+	- Robert removed the quit and the seperator from the file menu if
+	  running on OSX.
+	- Robert renamed timing.cpp to avoid name collision.
+	- Robert did some updates on the Mac project files.
 27-Feb-2001
 	- Eric Sunshine eliminated numerous mark-up (and other) errors which
 	  were reported by Doxygen throughout the headers.
+	- Brandon Ehle checked in PS2 specific port stuff.
+	  Everything works excepts lightmaps, only you need a couple of
+	  external libraries that will be available soon.
+	- Norman Kramer did the following change: when determining the
+	  crystal dir it now looks up the scf.cfg instead of vfs.cfg.
+	  Before this you could run an app w/o the CRYSTAL var set and no
+	  vfs.cfg around.
+	- Norman Kramer: now additional codec initdata chunks and stream
+	  naming chunks are recognized (strd and strn).
+	- Paul Garceau added flarge.zip and stdtex.zip to CVS.
 26-Feb-2001
+	- Wouter Wijngaards fixed the procedural texture blending mode
+	  bug where procedural textures would corrupt the blending table
+	  used for alpha blending (only for software rendering).
+	- Fixed Simple for the latest thing changes (SetMovingOption()).
+	- Fixed Blocks for the latest thing changes.
+	- Fixed PtLab for the latest thing changes.
+	- Fixed 'portal' command in WalkTest for latest thing changes.
+	- Added new version of csPooledVertexArrayPool.
+	- Changed csFrustum so that it will now use a pool to allocate
+	  vertex arrays. Which pool is used depends on the frustum user.
+	  By default it will now use the default pool which means that
+	  vertex arrays are still allocated with new[] and delete[].
+	- Continued work on a new CheckFrustum.
+	- Philip Wyett added EAX 2.0 plugin for Windows developed by
+	  Nathaniel Saint Martin. This plugin will require for
+	  compilation the Creative Labs EAX 2.0 SDK from either Creative
+	  Labs website or you can obtain a cut down version from:
+		http://noote.multimania.com/CrystalSpace/sdk/eax20.zip
 	- Eric Sunshine moved specification of the special EAX sound libraries
 	  from mk/msvcgen/plugin.tpl to sndeax.mak.
 	- Eric Sunshine added extra clarification to the various discussions of
 	  scfreg to further indicate that its use is entirely optional.
 25-Feb-2001
 	- Added csVertexArrayPool, csPooledVertexArrayPool, and
-	  csDefaultVertexArrayPool.  These will be used for pooled vertex
-	  arrays.
+	  csDefaultVertexArrayPool. These will be used for pooled
+	  vertex arrays.
+	- Renamed csPooledVertexArrayPool to csStackedVertexArrayPool.
+	- Started work on a completely redesigned CheckFrustum routine.
+	  I will start by making it a seperate function first and mark
+	  every thing I have to modify with FRUSTNEW. If all works well
+	  I can later remove the old routines.
+	- Wouter Wijngaards did the following:
+	    - Touched up the flare a little.
+	    - Removed the second engine::Prepare call, it is no longer
+	      needed. This also makes the flare work in 8 bit mode -
+	      try simple -sdepth=8 16 and 32 bit are still dark though.
+	    - Sized the flare in simple to more modest (non-debugging)
+	      proportions.
+	    - Fixed a bug in the halo drawing code of the software
+	      renderer. Due to Qrounding the scan could go on for one more
+	      line, below the actual height of the halo. I changed those
+	      relevant QRound calls to QInt, in order to round down. This
+	      skips this line, preventing the appearance of a line with
+	      small random dots below a halo.
+	- Norman Kramer added support for index list (this solves the
+	  weird pictures in ToolSober.avi).
+24-Feb-2001
+	- Wouter Wijngaards did the following:
+	    - Enabled the existing halos to fade out. This was disabled.
+	      Not sure if this was intentional. Seems to work fine in
+	      software/opengl.
+	    - Added a 'flare' halo. This type of halo is a lensflare.
+	      You can design your own flares, stateing pixmaps and mixmodes.
+	      Added classes csFlareHalo, csLightFlareHalo to deal with this.
+	      Added support in the engine for the FlareHalo.
+	    - Added a 2 halos and a lensflare to simple.
+	      The lensflare works fine in opengl, but software mode not
+	      seem to work right (the pictures look wrong, it is a 'black'
+	      flare).
+	- Philip Wyett removed very restrictive code which forces
+	  DIRECTINPUT_VERSION to 0x0300 and replaced it with test statement
+	  block which uses WINVER to set DIRECTINPUT_VERSION.
+	    - For Win 98/SE/ME/2000 or above DIRECTINPUT_VERSION is set to
+  	      0x0800. Don't worry if your using a lower DX SDK as any
+	      DX SDK 5 or above in <dinput.h> uses the '#if
+	      DIRECTINPUT_VERSION >=' thus makes this method totally
+	      backward compatible.
+	    - For Win95 and NT4. DIRECTINPUT_VERSION is set to 0x0300 as
+	      it's the highest NT4 supports and you cannot seperate NT4
+	      and 95 by version so have to be set to the same value.
+	  Have tested on most flavors of Windows and both VC and MingW...
+	- Norman Kramer added dummy audio stream and did further work on AVI.
 23-Feb-2001
 	- Started work on a big change to the way that things control movement.
 	  The CS_ENTITY_MOVEABLE flag is gone.  Instead there are now three
 	  options.  But they don't work yet.
 	- Added csThing::SetMovingOption()/GetMovingOption().
 	- Added csThing::WorUpdate().
+	- Wouter Wijngaards did the following improvements to demosky:
+	    - Fixed procedural sky and demosky. You can now control the
+	      animated better. You can stop the animation whenever you
+	      like, and later on, have it continue either where it would
+	      have been if it had been running, or where it would was when
+	      you stopped the animation. Demosky resumes where it left off.
+	    - Added a flock of seagulls to demosky. They fly around the
+	      center. Added seagull texture to standard.zip (6.5Kb).
+	    - Fixes crash at exit.
+	- Robert Bate moved some files from libs/cssys/mac.
+	- Robert also enhanced carbon compatibility for the Mac port.
 22-Feb-2001
 	- Martin Geisse added iConfigManager::SetDynamicDomain().
 	- Wouter Wijngaards made clouds blow across the sky by a
