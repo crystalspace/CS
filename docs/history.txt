@@ -11,6 +11,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	      and related headerfiles.
 	    - Fixed some uninitialized variables in csRenderMesh
 	    - Added a check for VBO before trying to use it in DeactivateBuffer
+	- Keith Fulton changed thing.cpp so that deallocation of lightmaps
+          doesn't crash the system when using a null renderer.
 
 26-Jul-2003
 	- Wouter Wijngaards fixed the partedit awssink.cpp file, removed

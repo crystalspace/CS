@@ -2880,6 +2880,8 @@ void csThingObjectType::FreeLightmaps (csArray<csLitPolyGroup>& polys)
 
     for (j = 0; j < curPolys.polys.Length(); j++)
     {
+      if (!curPolys.lightmaps[j])
+	continue;
       int l, t, w, h;
       curPolys.lightmaps[j]->GetSLMCoords (l, t, w, h);
       curPolys.thingTypeSLM->freeLumels += ((w + LM_BORDER) * (h + LM_BORDER));
