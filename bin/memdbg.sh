@@ -103,7 +103,7 @@ findgnu AWK gawk
 
 # Try to find a suitable method for building the map file
 case `uname` in
-	Linux* | Solaris*)
+	Linux* | SunOS*)
 		find CXXFILT c++filt
 		findgnu OBJDUMP objdump
 		filter="$AWK -f bin/memdbg-elf.awk"
