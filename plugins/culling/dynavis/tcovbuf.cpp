@@ -265,9 +265,15 @@ void csCoverageTile::FlushForEmptyConstFValue (csTileCol& fvalue,
   test = fvalue;
   do // We know fvalue != 0 so we can test at end of loop.
   {
+    float* ldepth_end = ldepth + NUM_DEPTHCOL;
     if (test & 0xff)
-    { i = NUM_DEPTHCOL; while (i > 0) { *ldepth++ = maxdepth; i--; } }
-    else ldepth += NUM_DEPTHCOL;
+      do
+      {
+        *ldepth++ = maxdepth;
+	i--;
+      }
+      while (ldepth < ldepth_end);
+    else ldepth = ldepth_end;
     test >>= 8;
   }
   while (test);
@@ -475,7 +481,6 @@ void csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth,
   // We will initialize it to full and then and it with every column. If
   // 'fulltest' is still full after the loop then we know the tile is full.
   csTileCol fulltest = TILECOL_FULL;
-  //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
   // Now do the depth update. Here we will use the coverage (instead of
   // coverage_cache which is used in the general case) to see where we
@@ -502,14 +507,10 @@ void csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth,
     if (mods)
     {
       modified = true;
-      float* ldepth = &depth[i];
-      if (mods & 0xff) *ldepth = maxdepth;
-      ldepth += NUM_DEPTHCOL;
-      if (mods & 0xff00) *ldepth = maxdepth;
-      ldepth += NUM_DEPTHCOL;
-      if (mods & 0xff0000) *ldepth = maxdepth;
-      ldepth += NUM_DEPTHCOL;
-      if (mods & 0xff000000) *ldepth = maxdepth;
+      if (mods & 0xff) depth[i] = maxdepth;
+      if (mods & 0xff00) depth[i+NUM_DEPTHCOL] = maxdepth;
+      if (mods & 0xff0000) depth[i+NUM_DEPTHCOL*2] = maxdepth;
+      if (mods & 0xff000000) depth[i+NUM_DEPTHCOL*3] = maxdepth;
     }
   }
 
