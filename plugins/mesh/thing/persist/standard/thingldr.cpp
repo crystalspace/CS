@@ -338,7 +338,8 @@ Nag to Jorrit about this feature if you want it.");
 				    info.default_texlen, info.thing_fact_state,
 				    vt_offset))
 	  {
-	    poly3d->DecRef ();
+	    info.thing_fact_state->RemovePolygon (
+	      info.thing_fact_state->FindPolygonIndex (poly3d));
 	    return false;
 	  }
         }

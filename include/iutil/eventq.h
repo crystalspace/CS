@@ -135,6 +135,9 @@ struct iEventQueue : public iBase
    * queue via an iEventOutlet rather than directly via Post(), however there
    * may be certain circumanstances where posting directly to the queue is
    * preferred.
+   * \remark Post() takes ownership of the event. That means that you MUST NOT
+   * DecRef() the event after passing it to Post(). Instead, if you want to 
+   * keep it, IncRef() it.
    */
   virtual void Post (iEvent*) = 0;
 

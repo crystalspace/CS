@@ -500,8 +500,11 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
 void csStatLight::AddAffectedLightingInfo (iLightingInfo* li)
 {
   if (!dynamic) return ;
-  lightinginfos.Add (li);
-  li->IncRef ();
+  if (!lightinginfos.In (li))
+  {
+    lightinginfos.Add (li);
+    li->IncRef ();
+  }
 }
 
 void csStatLight::SetColor (const csColor &col)
@@ -590,8 +593,11 @@ void csDynLight::Setup ()
 
 void csDynLight::AddAffectedLightingInfo (iLightingInfo* li)
 {
-  lightinginfos.Add (li);
-  li->IncRef ();
+  if (!lightinginfos.In (li))
+  {
+    lightinginfos.Add (li);
+    li->IncRef ();
+  }
 }
 
 void csDynLight::RemoveAffectedLightingInfo (iLightingInfo* li)

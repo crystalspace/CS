@@ -68,10 +68,25 @@ CS_IMPLEMENT_PLUGIN
 SCF_IMPLEMENT_IBASE(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iLightingInfo)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
+  {
+    static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
+    if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
+      iPolygonMesh_scfID = iSCF::SCF->GetInterfaceID ("iPolygonMesh");		
+    if (iInterfaceID == iPolygonMesh_scfID &&				
+      scfCompatibleVersion (iVersion, iPolygonMesh_VERSION))		
+    {
+#ifdef CS_DEBUG
+      printf ("Deprecated feature use: iPolygonMesh queried from Thing "
+	"object; use iMeshObject->GetObjectModel()->"
+	"GetPolygonMeshColldet() instead.\n");
+#endif
+      (&scfiPolygonMesh)->IncRef ();						
+      return STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
+    }
+  }
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ThingState)
