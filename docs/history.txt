@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+17-Jan-2004
+	- Eric Sunshine applied patch from Lukas Erlinghagen <erluk@web.de>
+	  which fixes crash in csSCF::RegisterClassesInt() triggered by the
+	  SCF_REGISTER_STATIC_CLASS() and SCF_REGISTER_STATIC_LIBRARY() macros.
+	  These macros cause RegisterClassesInt() to be called very, very early
+	  (before main()), thus before the `libraryNames' string set has been
+	  initialized.  (Problem was introduced on 25-Nov-2004 when SCF was
+	  changed to make it legal to scan the same directory multiple times.)
 16-Jan-2004
 	- res reduced the iImage interface to a container for pixel data,
 	  merged csImageFile and csImageMemory and moved the image 

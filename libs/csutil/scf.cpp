@@ -682,7 +682,10 @@ static char const* get_node_value(csRef<iDocumentNode> parent, char const* key)
 void csSCF::RegisterClassesInt(char const* pluginPath, iDocumentNode* scfnode, 
 			       const char* context)
 {
-  bool const seen = libraryNames->Contains(pluginPath);
+  // Statically linked classes are registered very early (before main()) via
+  // SCF_REGISTER_STATIC_FOO() macros. In these cases, `libraryNames' has not
+  // yet been initialized, so don't invoke its methods blindly.
+  bool const seen = libraryNames != 0 && libraryNames->Contains(pluginPath);
 
   if (verbose)
   {
