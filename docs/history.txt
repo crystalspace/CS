@@ -41,6 +41,9 @@ The history order is reversed so that new features are at the top.
 	  installed resources toward which CS is moving.  This change should
 	  allow the plugins to be located when built and installed via the Jam
 	  build facility, which uses an LFS organization.
+	- res removed all member access control directives from the classes
+	  generated when using cstool/tokenlist.h since this seems to cause
+	  problems on some platforms.
 18-May-2003
 	- res made the following changes in and around render3d:
 	    - ATI/NV only exts can be disabled all at once via cfg.

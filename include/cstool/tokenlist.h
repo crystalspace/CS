@@ -114,7 +114,7 @@
 #define CS_TOKEN_LIST_BEGIN_EXT(Parent, Classname) \
   class Classname \
   { \
-  private: \
+  public: \
     \
     static inline csStringHash* GetHash() \
     { \
@@ -138,9 +138,7 @@
  * internally. However, it's suggested that uppercase is used.
  */
 #define CS_TOKEN_LIST_TOKEN(token) \
-  public: \
     static const csStringID token = __LINE__; /* line = unique ID */ \
-  private: \
     struct _tokenClass##token { \
       _tokenClass##token () \
       { \
@@ -157,7 +155,6 @@
  * something like 'tokens'.
  */
 #define CS_TOKEN_LIST_END_EXT(Membername, Classname) \
-  public: \
     Classname() \
     { } \
     \
