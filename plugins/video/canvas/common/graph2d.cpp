@@ -48,8 +48,10 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
     FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
 #ifdef CS_DEBUG
   if (!FontServer)
-    System->Printf (MSG_WARNING, "WARNING: Canvas driver couldn't find a font server plugin!\n"
-      "This is normal if you don't want one (warning displays only in debug mode)");
+    System->Printf (MSG_WARNING, "WARNING: Canvas driver couldn't find a "
+      "font server plugin!\n"
+      "This is normal if you don't want one (warning displays only in "
+      "debug mode)\n");
 #endif
 
   Palette = new csRGBpixel [256];
