@@ -290,7 +290,7 @@ int main (int argc, char * argv[])
                " -v        Verbose mode on\n"
                " -vv       Very verbose mode on\n"
                " -l        Don't convert but list objects in 3ds file\n"
-	       " -n	   don't optimize (no combining of triangles to polys)\n"
+	       " -n	   optimize (combine every two triangles into polys)\n"
                " -s x y z  Scale objects (x,y,z = floats)\n"
                " -r x y z  Relocate objects (x,y,z = floats)\n"
                " -pl       Make polygons lit\n"

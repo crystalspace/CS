@@ -21,6 +21,7 @@ The history order is reversed so that new features are at the top.
 	  of the mesh wrapper and containing sector to guarantee more
 	  uniqueness. Previously the name of the csThing itself was used
 	  but this is almost always NULL.
+	- Fixed description of -n in 3ds2lev so it is now correct.
 31-Mar-2002
 	- Christian Bayle added $MACHINE error message for not found arch.
 30-Mar-2002
