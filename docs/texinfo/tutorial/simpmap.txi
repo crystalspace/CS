@@ -373,6 +373,7 @@ bool Simple::LoadMap ()
   txtmgr->SetPalette ();
   return true;
 @}
+@end example
 
 This code will first use @code{iVFS::ChDir()} to set the current
 directory in the virtual file system to @file{/lev/flarge}. In the
