@@ -20,6 +20,7 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "csparser/csloader.h"
+#include "csparser/crossbld.h"
 #include "csengine/sysitf.h"
 #include "csengine/cscoll.h"
 #include "csengine/triangle.h"
@@ -1956,6 +1957,7 @@ enum {
   kTokenThingTMove = kTokenPSetLast,
   kTokenThingCurveCenter, 
   kTokenThingCurveScale,
+  kTokenThingFile,
   kTokenTSetCurveVertex
  };
 
@@ -1971,6 +1973,7 @@ csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf,
         {kTokenPSetTexlen, "TEXLEN"},
         {kTokenPSetFog, "FOG"},
         {kTokenThingTMove, "MOVE"},
+        {kTokenThingFile, "FILE"},
 
         {kTokenThingCurveCenter, "CURVECENTER"},
         {kTokenThingCurveScale, "CURVESCALE"},
@@ -2050,26 +2053,25 @@ csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf,
                         default_texture, default_texlen, tmpl)  );
         break;
 
-    case kTokenThingCurveCenter:
-      {
-        csVector3 c;
-        ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
-        tmpl->curves_center = c;
-      }
-      break;
-    case kTokenThingCurveScale:
-      ScanStr (params, "%f", &tmpl->curves_scale);
-      break;
+      case kTokenThingCurveCenter:
+        {
+          csVector3 c;
+          ScanStr (params, "%f,%f,%f", &c.x, &c.y, &c.z);
+          tmpl->curves_center = c;
+        }
+        break;
+      case kTokenThingCurveScale:
+        ScanStr (params, "%f", &tmpl->curves_scale);
+        break;
 
-    case kTokenTSetCurveVertex:
-      {
-        csVector3 v;
-        csVector2 t;
-        ScanStr (params, "%f,%f,%f:%f,%f", &v.x, &v.y, &v.z,&t.x,&t.y);
-        tmpl->AddCurveVertex (v,t);
-      }
-      break;
-
+      case kTokenTSetCurveVertex:
+        {
+          csVector3 v;
+          csVector2 t;
+          ScanStr (params, "%f,%f,%f:%f,%f", &v.x, &v.y, &v.z,&t.x,&t.y);
+          tmpl->AddCurveVertex (v,t);
+        }
+        break;
 
       case kTokenPSetTexNr:
         ScanStr (params, "%s", str);
@@ -2093,6 +2095,21 @@ csThingTemplate* CSLoader::load_thingtpl (char* tname, char* buf,
           v_move = CSLoader::load_vector(params2);
         }
         break;
+      case kTokenThingFile:
+        {
+          ScanStr (params, "%s", str);
+	  CHK (converter* filedata = new converter);
+	  if (filedata->ivcon (str) == ERROR)
+	  {
+	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
+	    CHK (delete filedata);
+	    fatal_exit (0, false);
+	  }
+	  csCrossBuild_ThingTemplateFactory builder;
+	  builder.CrossBuild (tmpl, *filedata);
+	  CHK (delete filedata);
+	}
+	break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)
@@ -3985,7 +4002,7 @@ bool CSLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
 
 enum { kTokenSTplTexNr = 1, kTokenSTplFrame,
        kTokenSTplTriangle, kTokenSTplAction,
-       kTokenSTplSkeleton };
+       kTokenSTplSkeleton, kTokenSTplFile };
 
 bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTextureList* textures)
 {
@@ -3995,6 +4012,7 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
     {kTokenSTplAction, "ACTION"},
     {kTokenSTplTriangle, "TRIANGLE"},
     {kTokenSTplSkeleton, "SKELETON"},
+    {kTokenSTplFile, "FILE"},
     {0,0}};
   static tokenDesc tok_frame[] = {{2, "V"}, {0,0}};
   static tokenDesc tok_frameset[] = {{2, "F"}, {0,0}};
@@ -4122,6 +4140,22 @@ bool CSLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
           stemp->GetBaseMesh ()->AddTriangle (a, b, c);
         }
         break;
+
+      case kTokenSTplFile:
+        {
+          ScanStr (params, "%s", str);
+	  CHK (converter* filedata = new converter);
+	  if (filedata->ivcon (str) == ERROR)
+	  {
+	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
+	    CHK (delete filedata);
+	    fatal_exit (0, false);
+	  }
+	  csCrossBuild_SpriteTemplateFactory builder;
+	  builder.CrossBuild (stemp, *filedata);
+	  CHK (delete filedata);
+	}
+	break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)
@@ -4197,13 +4231,9 @@ bool CSLoader::LoadSprite (csSprite3D* spr, csWorld* w, char* buf, csTextureList
           CsPrintf (MSG_FATAL_ERROR, "Couldn't find template named '%s'!\n", str);
           fatal_exit (0, false);
         }
-        if (tpl->FindAction (str2) == NULL)
-        {
-          CsPrintf (MSG_FATAL_ERROR, "Couldn't find action named '%s' in %s template !\n", str2, str);
-          fatal_exit (0, false);
-        }
         spr->SetTemplate (tpl);
-        spr->SetAction (str2);
+        if (tpl->FindAction (str2) != NULL)
+          spr->SetAction (str2);
         break;
 
       case kTokenSpriteTexnr:

@@ -97,6 +97,15 @@ csCrossBuild_SpriteTemplateFactory::~csCrossBuild_SpriteTemplateFactory()
 csBase *csCrossBuild_SpriteTemplateFactory::CrossBuild(converter &buildsource)
 {
   csSpriteTemplate *newtemplate = new csSpriteTemplate();
+  CrossBuild ((csBase*)newtemplate, buildsource);
+  newtemplate->GenerateLOD ();
+  return newtemplate;
+}
+
+/// full sprite template builder (second variant)
+void csCrossBuild_SpriteTemplateFactory::CrossBuild(csBase* object, converter &buildsource)
+{
+  csSpriteTemplate *newtemplate = (csSpriteTemplate*)object;
   buildsource.set_animation_frame(0);
 
   newtemplate->SetNumVertices(buildsource.num_cor3);
@@ -124,12 +133,7 @@ csBase *csCrossBuild_SpriteTemplateFactory::CrossBuild(converter &buildsource)
   // --This is a temporary hack.  Model-specific stuff should and
   // will go into model-specific cross builder classes -GJH
   ivconbuild_Quake2Actions(*newtemplate);
-
-  newtemplate->GenerateLOD ();
-
-  return newtemplate;
 }
-
 
 /// frame build method
 void csCrossBuild_SpriteTemplateFactory::Build_Frame(csSpriteTemplate &framesource, converter& buildsource)
@@ -320,4 +324,75 @@ void ivconload_Quake2ModelPack(csWorld *world, char *packfilename)
 
 
 #endif 0
+
+//
+// method definitions for csCrossBuild_ThingTemplateFactory
+//
+
+/// constructor
+csCrossBuild_ThingTemplateFactory::csCrossBuild_ThingTemplateFactory()
+  : csCrossBuild_Factory()
+{
+}
+
+/// destructor
+csCrossBuild_ThingTemplateFactory::~csCrossBuild_ThingTemplateFactory()
+{
+}
+
+/// full thing template builder
+csBase *csCrossBuild_ThingTemplateFactory::CrossBuild(converter &buildsource)
+{
+  csThingTemplate *newtemplate = new csThingTemplate();
+  CrossBuild ((csBase*)newtemplate, buildsource);
+  return newtemplate;
+}
+
+/// full thing template builder (second variant)
+void csCrossBuild_ThingTemplateFactory::CrossBuild(csBase* object, converter &buildsource)
+{
+  csThingTemplate *newtemplate = (csThingTemplate*)object;
+  buildsource.set_animation_frame(0);
+
+  // Add the vertices
+  Add_Vertices(*newtemplate, buildsource);
+
+  // Build the triangle mesh
+  Build_TriangleMesh(*newtemplate, buildsource);
+}
+
+/// frame build method
+void csCrossBuild_ThingTemplateFactory::Add_Vertices (csThingTemplate &framesource, converter& buildsource)
+{
+  for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
+  {
+    // standard 3D coords seem to swap y and z axis compared to CS
+    framesource.AddVertex(
+    		buildsource.cor3[0][coordindex]/20.0,
+    		buildsource.cor3[2][coordindex]/20.0,
+    		buildsource.cor3[1][coordindex]/20.0);
+  }
+}
+
+
+/// triangle mesh builder
+void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThingTemplate& meshsource,converter& buildsource)
+{
+  for (int triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
+  {
+    CHK (csPolygonTemplate* ptemp = new csPolygonTemplate (&meshsource, "x"));
+    int a = buildsource.face[0][triangleindex];
+    int b = buildsource.face[1][triangleindex];
+    int c = buildsource.face[2][triangleindex];
+    ptemp->UseGouraud ();
+    ptemp->AddVertex (a);
+    ptemp->AddVertex (b);
+    ptemp->AddVertex (c);
+    ptemp->SetUV (0, buildsource.cor3_uv[0][a], buildsource.cor3_uv[1][a]);
+    ptemp->SetUV (1, buildsource.cor3_uv[0][b], buildsource.cor3_uv[1][b]);
+    ptemp->SetUV (2, buildsource.cor3_uv[0][c], buildsource.cor3_uv[1][c]);
+    meshsource.AddPolygon (ptemp);
+  }
+}
+
 
