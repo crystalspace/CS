@@ -34,6 +34,7 @@ chronological order.
 	  optionally specify alpha value.
 	- Anders Stenberg reworked the shader variable system, and hopefully
 	  improved the performance of it quite a lot.
+	- Anders Stenberg fixed a broken shader (lightmap.xml)
 24-Feb-2004
 	- Fritz Elfert fixed conversion of bezier mesh factories in map2cs
 	  and re-enabled them (With wrong cvs log-message: "Before big
