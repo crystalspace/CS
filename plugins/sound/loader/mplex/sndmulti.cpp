@@ -84,9 +84,6 @@ csSoundLoaderMultiplexer::csSoundLoaderMultiplexer(iBase *iParent)
 
 csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()
 {
-  if (list)
-    list->DeleteAll ();
-  list = 0;
   plugin_mgr = 0;
   SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_DESTRUCT_IBASE();
@@ -97,40 +94,44 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // grab the sound loader list
-  list = csPtr<iStringArray> (
-    iSCF::SCF->QueryClassList ("crystalspace.sound.loader."));
-  int i = 0;
-  while (i < list->Length())
+  list = iSCF::SCF->QueryClassList ("crystalspace.sound.loader.");
+  if (list.IsValid())
   {
-    char const* classname = list->Get(i);
-    if (!strcasecmp (classname, SNDPLEX_CLASSNAME))
+    int i = 0;
+    while (i < list->Length())
     {
-      list->DeleteIndex (i);
+      char const* classname = list->Get(i);
+      if (!strcasecmp (classname, SNDPLEX_CLASSNAME))
+      {
+	list->DeleteIndex (i);
+      }
+      else if (strstr (classname, "mp3") && (i < (list->Length() - 1)))
+      {
+	// ok the following is a bit hacky, but since the mp3 loader skips junk
+	// until it finds something useful chances are high it finds some
+	// "good" header the bigger the input gets, so we give all other
+	// loaders a chance to look at it first
+	list->Push (csStrNew (classname));
+	list->DeleteIndex (i);
+      }
+      else
+	i++;
     }
-    else if (strstr (classname, "mp3") && (i < (list->Length() - 1)))
-    {
-      // ok the following is a bit hacky, but since the mp3 loader skips junk
-      // until it finds something useful chances are high it finds some "good"
-      // header the bigger the input gets, so we give all other loaders a
-      // chance to look at it first
-      list->Push (csStrNew (classname));
-      list->DeleteIndex (i);
-    }
-    else
-      i++;
   }
   return true;
 }
 
 bool csSoundLoaderMultiplexer::LoadNextPlugin ()
 {
-  if (!list) return false;
+  if (!list.IsValid())
+    return false;
+
   csRef<iSoundLoader> plugin;
-  while (list && !plugin)
+  while (list.IsValid() && !plugin.IsValid())
   {
     char const* classname = list->Get(0);
     plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iSoundLoader);
-    if (plugin)
+    if (plugin.IsValid())
     {
       // remember the plugin
       Loaders.Push (plugin);

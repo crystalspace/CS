@@ -63,9 +63,9 @@ bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
     csRef<iPluginManager> plugin_mgr (
     	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-    csRef<iStringArray> classlist = csPtr<iStringArray>(
-            iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io."));
-    int const nmatches = classlist->Length();
+    csRef<iStringArray> classlist =
+      iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io.");
+    int const nmatches = classlist.IsValid() ? classlist->Length() : 0;
     if (nmatches != 0)
     {
       int i;

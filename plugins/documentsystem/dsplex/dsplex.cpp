@@ -307,8 +307,7 @@ bool csMplexDocumentSystem::Initialize (iObjectRegistry* object_reg)
       defaultDocSys = SCF_QUERY_INTERFACE (b, iDocumentSystem);
     }
 
-    classlist = csPtr<iStringArray> (
-      iSCF::SCF->QueryClassList (DSCLASSPREFIX));
+    classlist = iSCF::SCF->QueryClassList (DSCLASSPREFIX);
     return true;
   }
   return false;
@@ -330,9 +329,9 @@ csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (int num)
     }
     else
     {
-      if (classlist)
+      if (classlist.IsValid())
       {
-	while (classlist && !res)
+	while (classlist.IsValid() && !res.IsValid())
 	{
 	  char const* classname = 0;
 	  do
@@ -348,7 +347,7 @@ csRef<iDocumentSystem> csMplexDocumentSystem::LoadNextPlugin (int num)
 	  } while (!strcasecmp (classname, DOCPLEX_CLASSNAME));
           
 	  res = CS_LOAD_PLUGIN (plugin_mgr, classname, iDocumentSystem);
-	  if (res)
+	  if (res.IsValid())
 	  {
 	    // remember the plugin
 	    autolist.Push (res);

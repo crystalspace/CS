@@ -55,6 +55,9 @@ chronological order.
 	  directory was flawed, and it was possible to fool it into deleting
 	  the entire CS/include.  Now, 'distclean' deletes the 'include'
 	  directory if and only if the directory contains one file: volatile.h.
+	- Eric Sunshine updated several modules to reflect the fact that
+	  iSCF::QueryClassList() now returns a csRef<> rather than a raw
+	  pointer.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it

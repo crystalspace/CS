@@ -86,9 +86,6 @@ csModelConverterMultiplexer::csModelConverterMultiplexer (iBase *p)
 
 csModelConverterMultiplexer::~csModelConverterMultiplexer ()
 {
-  if (classlist) classlist->DeleteAll ();
-  // don't delete the elements of the 'formats' vector. We don't own them!
-  classlist = 0;
   plugin_mgr = 0;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE ();
@@ -97,46 +94,40 @@ csModelConverterMultiplexer::~csModelConverterMultiplexer ()
 bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
 {
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
-  // collect converter plugins
-  classlist = csPtr<iStringArray> (
-      iSCF::SCF->QueryClassList ("crystalspace.modelconverter."));
-
+  classlist = iSCF::SCF->QueryClassList ("crystalspace.modelconverter.");
   return true;
 }
 
 bool csModelConverterMultiplexer::LoadNextPlugin ()
 {
-  if (!classlist) return false;
+  if (!classlist.IsValid())
+    return false;
   
-  csRef<iModelConverter> plugin;
-  if (classlist && !plugin)
+  char const* classname = 0;
+  do
   {
-    char const* classname = 0;
-    do
+    if (classname)
+      classlist->DeleteIndex (0);
+    if (classlist->Length() == 0)
     {
-      if (classname) classlist->DeleteIndex (0);
-      if (classlist->Length() == 0)
-      {
-	classlist = 0;
-	plugin_mgr = 0;
-	return false;
-      }
-      classname = classlist->Get(0);
-    } while (!strcasecmp (classname, MDLPLEX_CLASSNAME));
-    
-    plugin = CS_LOAD_PLUGIN (plugin_mgr, classname, iModelConverter);
-    if (plugin)
-    {
-      // remember the plugin
-      Converters.Push (plugin);
-      // and load its description, since we gonna return it on request
-      int i;
-      for (i=0; i<plugin->GetFormatCount (); i++)
-	Formats.Push (plugin->GetFormat (i));
+      classlist = 0;
+      plugin_mgr = 0;
+      return false;
     }
-    classlist->DeleteIndex (0);
+    classname = classlist->Get(0);
+  } while (!strcasecmp (classname, MDLPLEX_CLASSNAME));
+  
+  csRef<iModelConverter> plugin =
+    CS_LOAD_PLUGIN (plugin_mgr, classname, iModelConverter);
+  if (plugin.IsValid())
+  {
+    // remember the plugin
+    Converters.Push (plugin);
+    // and load its description, since we gonna return it on request
+    for (int i=0; i<plugin->GetFormatCount (); i++)
+      Formats.Push (plugin->GetFormat (i));
   }
+  classlist->DeleteIndex (0);
   return true;
 }
 

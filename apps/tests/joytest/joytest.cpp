@@ -187,9 +187,9 @@ bool Simple::Initialize ()
   }
   
   // Attempt to load a joystick plugin.
-  iStringArray* joystickClasses = iSCF::SCF->QueryClassList (
-    "crystalspace.device.joystick.");
-  if (joystickClasses != 0)
+  csRef<iStringArray> joystickClasses =
+    iSCF::SCF->QueryClassList ("crystalspace.device.joystick.");
+  if (joystickClasses.IsValid())
   {
     csRef<iPluginManager> plugmgr = CS_QUERY_REGISTRY (object_reg,
       iPluginManager);
@@ -203,8 +203,6 @@ bool Simple::Initialize ()
 	className, (b != 0) ? "successful" : "failed");
       if (b != 0) b->DecRef ();
     }
-  
-    joystickClasses->DecRef ();
   }
 
   // The virtual clock.

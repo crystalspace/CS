@@ -116,9 +116,9 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY  (objectreg,
 	iPluginManager);
 
-  csRef<iStringArray> classlist = csPtr<iStringArray> 
-    (iSCF::SCF->QueryClassList("crystalspace.graphics3d.shadercompiler."));
-  int const nmatches = classlist->Length();
+  csRef<iStringArray> classlist =
+    iSCF::SCF->QueryClassList("crystalspace.graphics3d.shadercompiler.");
+  int const nmatches = classlist.IsValid() ? classlist->Length() : 0;
   if (nmatches != 0)
   {
     int i;
