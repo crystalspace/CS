@@ -41,6 +41,8 @@ public:
 	ctVector3 get_linear_a(){ return ctVector3(0.0, 0.0, 0.0); }
 	ctVector3 get_angular_a(){ return ctVector3(0.0, 0.0, 0.0); }
 
+  void apply_impulse( ctVector3 impulse_point,
+    ctVector3 impulse_vector ){};
 
 protected:
 	void solve_IK( real t, ctVector3 &the_goal, ctVector3 &end_effector );
