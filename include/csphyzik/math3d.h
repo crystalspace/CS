@@ -1,5 +1,5 @@
-#ifndef __MATH3D_H__
-#define __MATH3D_H__
+#ifndef __PHYZIKS_MATH3D_H__
+#define __PHYZIKS_MATH3D_H__
 
 #ifndef ABS
 #define ABS(A) ((A < 0) ? (-A):(A))
@@ -9,5 +9,5 @@
 #include "csphyzik/ctvector.h"
 #include "csphyzik/ctmatrix.h"
 
-#endif /*__MATH3D_H__*/
+#endif /*__PHYZIKS_MATH3D_H__*/
 
