@@ -29,7 +29,7 @@
 #include "csengine/polyint.h"
 #include "csengine/bspbbox.h"
 #include "csengine/rview.h"
-#include "csengine/texture.h"
+#include "csengine/material.h"
 #include "csengine/tranman.h"
 #include "csengine/triangle.h"
 #include "igraph3d.h"
@@ -37,8 +37,8 @@
 #include "ipolmesh.h"
 
 class Dumper;
-class csTextureList;
-class csTextureHandle;
+class csMaterialList;
+class csMaterialHandle;
 class csLightHitsSprite;
 class csSkeleton;
 class csSkeletonState;
@@ -146,8 +146,8 @@ class csSpriteTemplate : public csObject
 private:
   friend class csSprite3D;
 
-  /// Texture handle as returned by iTextureManager.
-  csTextureHandle* cstxt;
+  /// Material handle as returned by iTextureManager.
+  csMaterialHandle* cstxt;
 
   /// An optional skeleton.
   csSkeleton* skeleton;
@@ -300,12 +300,12 @@ public:
   csSpriteAction* GetAction (int No)
   { return (csSpriteAction *)actions [No]; }
 
-  /// Get the texture
-  csTextureHandle* GetTexture () const { return cstxt; }
-  /// Get the texture handle.
-  iTextureHandle* GetTextureHandle () const { return cstxt->GetTextureHandle (); }
-  /// Set the texture used for this sprite
-  void SetTexture (csTextureList* textures, const char *texname);
+  /// Get the material
+  csMaterialHandle* GetMaterial () const { return cstxt; }
+  /// Get the material handle.
+  iMaterialHandle* GetMaterialHandle () const { return cstxt->GetMaterialHandle (); }
+  /// Set the material used for this sprite
+  void SetMaterial (csMaterialList* materials, const char *matname);
 
   /**
    * Compute all normals in a frame.
@@ -623,8 +623,8 @@ private:
   /// The template.
   csSpriteTemplate* tpl;
 
-  /// The texture handle as returned by iTextureManager.
-  csTextureHandle* cstxt;
+  /// The material handle as returned by iTextureManager.
+  csMaterialHandle* cstxt;
 
   /// The current frame number.
   int cur_frame;
@@ -683,8 +683,8 @@ public:
   /// Get the skeleton state for this sprite.
   csSkeletonState* GetSkeletonState () { return skeleton_state; }
 
-  /// force a new texture skin other than default
-  void SetTexture (const char* name, csTextureList* textures);
+  /// force a new material skin other than default
+  void SetMaterial (const char* name, csMaterialList* materials);
 
   /// Enable or disable tweening frames (default false).
   void EnableTweening (bool en) { do_tweening = en; }

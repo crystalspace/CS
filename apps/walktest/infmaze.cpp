@@ -25,6 +25,7 @@
 #include "csengine/polygon.h"
 #include "csengine/world.h"
 #include "csengine/texture.h"
+#include "csengine/material.h"
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
 #include "csengine/collider.h"
@@ -42,7 +43,7 @@ InfiniteMaze::~InfiniteMaze ()
 }
 
 void InfiniteMaze::create_one_side (csSector* room, char* pname,
-	csTextureHandle* tm, csTextureHandle* tm2,
+	csMaterialHandle* tm, csMaterialHandle* tm2,
 	float x1, float y1, float z1,
 	float x2, float y2, float z2,
 	float x3, float y3, float z3,
@@ -128,8 +129,8 @@ InfRoomData* InfiniteMaze::create_six_room (csWorld* world, int x, int y, int z)
   dx = 2.0*(float)x;
   dy = 2.0*(float)y;
   dz = 2.0*(float)z;
-  csTextureHandle* t = world->GetTextures ()->FindByName ("txt");
-  csTextureHandle* t2 = world->GetTextures ()->FindByName ("txt2");
+  csMaterialHandle* t = world->GetMaterials ()->FindByName ("txt");
+  csMaterialHandle* t2 = world->GetMaterials ()->FindByName ("txt2");
   float s = 1;
 
   create_one_side (room, "n", t, t2, dx-s,dy+s,dz+s,  dx+s,dy+s,dz+s,  dx+s,dy-s,dz+s,  dx-s,dy-s,dz+s, 0,0,-.1);

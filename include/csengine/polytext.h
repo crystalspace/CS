@@ -30,7 +30,7 @@ class csLightMap;
 class csLightPatch;
 class csBitSet;
 class Dumper;
-struct iTextureHandle;
+struct iMaterialHandle;
 struct LightInfo;
 
 
@@ -66,8 +66,8 @@ private:
   /// The corresponding polygon.
   csPolygon3D* polygon;
 
-  /// The corresponding unlighted texture.
-  iTextureHandle* txt_handle;
+  /// The corresponding unlighted material.
+  iMaterialHandle* mat_handle;
 
   /**
    * Bounding box of corresponding polygon in 2D texture space.
@@ -149,8 +149,8 @@ public:
   /// Get the cslightmap, for engine internal use (users see GetLightMap below)
   csLightMap *GetCSLightMap() { return lm; }
 
-  /// Set the texture to be used for this polytexture.
-  void SetTextureHandle (iTextureHandle* th) { txt_handle = th; }
+  /// Set the material to be used for this polytexture.
+  void SetMaterialHandle (iMaterialHandle* th) { mat_handle = th; }
 
   /**
    * Calculate the bounding box in (u,v) space for the lighted texture.
@@ -192,7 +192,7 @@ public:
   //--------------------- iPolygonTexture implementation ---------------------
   DECLARE_IBASE;
   ///
-  virtual iTextureHandle *GetTextureHandle ();
+  virtual iMaterialHandle *GetMaterialHandle ();
   ///
   virtual float GetFDU ();
   ///

@@ -629,7 +629,7 @@ void WalkTest::DrawFrameMap ()
 	  {
     	    static G3DPolygonDP g3dpoly;
 	    g3dpoly.num = clip->GetNumVertices ();
-    	    g3dpoly.txt_handle = p->GetTextureHandle ();
+    	    g3dpoly.mat_handle = p->GetMaterialHandle ();
     	    g3dpoly.inv_aspect = view->GetCamera ()->GetInvFOV ();
 	    for (i = 0 ; i <g3dpoly.num ; i++)
 	    {

@@ -248,9 +248,9 @@ void move_sprite (csSprite3D* sprite, csSector* where, csVector3 const& pos)
 void load_sprite (char *filename, char *templatename, char* txtname)
 {
   // First check if the texture exists.
-  if (!Sys->view->GetWorld ()->GetTextures ()->FindByName (txtname))
+  if (!Sys->view->GetWorld ()->GetMaterials ()->FindByName (txtname))
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", txtname);
     return;
   }
 
@@ -270,7 +270,7 @@ void load_sprite (char *filename, char *templatename, char* txtname)
 
   // add this sprite to the world
   result->SetName (templatename);
-  result->SetTexture (Sys->view->GetWorld ()->GetTextures (), txtname);
+  result->SetMaterial (Sys->view->GetWorld ()->GetMaterials (), txtname);
 
   Sys->view->GetWorld ()->sprite_templates.Push (result);
 }

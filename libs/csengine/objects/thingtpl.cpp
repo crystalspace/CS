@@ -99,14 +99,14 @@ void csThingTemplate::AddCurveVertex (csVector3& v, csVector2& t)
 //---------------------------------------------------------------------------
 
 csPolygonTemplate::csPolygonTemplate (csThingTemplate* iParent, char* iName,
-  csTextureHandle* iTexture)
+  csMaterialHandle* iMaterial)
 {
   vertices_idx = NULL;
   max_vertices = num_vertices = 0;
 
   parent = iParent;
   name = strnew (iName);
-  texture = iTexture;
+  material = iMaterial;
 
   no_lighting = false;
 

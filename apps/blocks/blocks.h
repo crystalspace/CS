@@ -28,7 +28,7 @@
 #include "csgeom/matrix3.h"
 
 class csThingTemplate;
-class csTextureHandle;
+class csMaterialHandle;
 class csSector;
 class csWorld;
 class csThing;
@@ -159,13 +159,13 @@ private:
   csThingTemplate* pillar_tmpl;
   csThingTemplate* vrast_tmpl;
   csThingTemplate* hrast_tmpl;
-  csTextureHandle* cube_txt;
-  csTextureHandle* cubef1_txt;
-  csTextureHandle* cubef2_txt;
-  csTextureHandle* cubef3_txt;
-  csTextureHandle* cubef4_txt;
-  csTextureHandle* pillar_txt;
-  csTextureHandle* raster_txt;
+  csMaterialHandle* cube_mat;
+  csMaterialHandle* cubef1_mat;
+  csMaterialHandle* cubef2_mat;
+  csMaterialHandle* cubef3_mat;
+  csMaterialHandle* cubef4_mat;
+  csMaterialHandle* pillar_mat;
+  csMaterialHandle* raster_mat;
   csSector* room;
   csSector* demo_room;
   csDynLight* dynlight;
@@ -369,15 +369,15 @@ public:
   void add_hrast_template ();
 
   // Default textures for geometry.
-  void set_cube_texture (csTextureHandle* ct) { cube_txt = ct; }
-  void set_cube_f1_texture (csTextureHandle* ct) { cubef1_txt = ct; }
-  void set_cube_f2_texture (csTextureHandle* ct) { cubef2_txt = ct; }
-  void set_cube_f3_texture (csTextureHandle* ct) { cubef3_txt = ct; }
-  void set_cube_f4_texture (csTextureHandle* ct) { cubef4_txt = ct; }
-  void set_pillar_texture (csTextureHandle* ct) { pillar_txt = ct; }
-  void set_raster_texture (csTextureHandle* ct) { raster_txt = ct; }
-  void ChangeThingTexture (csThing* thing, csTextureHandle* txt);
-  csTextureHandle* GetTextureForHeight (int z);
+  void set_cube_material (csMaterialHandle* ct) { cube_mat = ct; }
+  void set_cube_f1_material (csMaterialHandle* ct) { cubef1_mat = ct; }
+  void set_cube_f2_material (csMaterialHandle* ct) { cubef2_mat = ct; }
+  void set_cube_f3_material (csMaterialHandle* ct) { cubef3_mat = ct; }
+  void set_cube_f4_material (csMaterialHandle* ct) { cubef4_mat = ct; }
+  void set_pillar_material (csMaterialHandle* ct) { pillar_mat = ct; }
+  void set_raster_material (csMaterialHandle* ct) { raster_mat = ct; }
+  void ChangeThingMaterial (csThing* thing, csMaterialHandle* mat);
+  csMaterialHandle* GetMaterialForHeight (int z);
 
   // Handle all time dependent movement of the game and menu.
   // This function will call some of the Handle... routines below.

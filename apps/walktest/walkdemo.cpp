@@ -80,14 +80,14 @@ extern void move_sprite (csSprite3D* sprite, csSector* where,
 //===========================================================================
 // Demo particle system (rain).
 //===========================================================================
-void add_particles_rain (csSector* sector, char* txtname, int num, float speed)
+void add_particles_rain (csSector* sector, char* matname, int num, float speed)
 {
-  // First check if the texture exists.
-  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
-  	FindByName (txtname);
-  if (!txt)
+  // First check if the material exists.
+  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  	FindByName (matname);
+  if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
@@ -128,7 +128,7 @@ void add_particles_rain (csSector* sector, char* txtname, int num, float speed)
 
     csRainParticleSystem* exp = new csRainParticleSystem (
     	  Sys->view->GetWorld (), num,
-  	  txt, CS_FX_ADD, false, .3/50., .3,
+  	  mat, CS_FX_ADD, false, .3/50., .3,
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0));
     exp->MoveToSector (sector);
@@ -139,14 +139,14 @@ void add_particles_rain (csSector* sector, char* txtname, int num, float speed)
 //===========================================================================
 // Demo particle system (snow).
 //===========================================================================
-void add_particles_snow (csSector* sector, char* txtname, int num, float speed)
+void add_particles_snow (csSector* sector, char* matname, int num, float speed)
 {
-  // First check if the texture exists.
-  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
-  	FindByName (txtname);
-  if (!txt)
+  // First check if the material exists.
+  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  	FindByName (matname);
+  if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
@@ -187,7 +187,7 @@ void add_particles_snow (csSector* sector, char* txtname, int num, float speed)
 
     csSnowParticleSystem* exp = new csSnowParticleSystem (
     	  Sys->view->GetWorld (), num,
-  	  txt, CS_FX_ADD, false, .07, .07,
+  	  mat, CS_FX_ADD, false, .07, .07,
 	  bbox.Min (), bbox.Max (),
 	  csVector3 (0, -speed, 0), .2);
     exp->MoveToSector (sector);
@@ -198,20 +198,20 @@ void add_particles_snow (csSector* sector, char* txtname, int num, float speed)
 //===========================================================================
 // Demo particle system (fire).
 //===========================================================================
-void add_particles_fire (csSector* sector, char* txtname, int num,
+void add_particles_fire (csSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
-  // First check if the texture exists.
-  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
-  	FindByName (txtname);
-  if (!txt)
+  // First check if the material exists.
+  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  	FindByName (matname);
+  if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
    csFireParticleSystem* exp = new csFireParticleSystem(
-     Sys->view->GetWorld (), num, txt,
+     Sys->view->GetWorld (), num, mat,
      CS_FX_ADD, false, 0.1, 0.1,
      3.0, csVector3(0,0.5,0), origin,
      0.3, 0.40);
@@ -221,20 +221,20 @@ void add_particles_fire (csSector* sector, char* txtname, int num,
 //===========================================================================
 // Demo particle system (fountain).
 //===========================================================================
-void add_particles_fountain (csSector* sector, char* txtname, int num,
+void add_particles_fountain (csSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
-  // First check if the texture exists.
-  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
-  	FindByName (txtname);
-  if (!txt)
+  // First check if the material exists.
+  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  	FindByName (matname);
+  if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
   csFountainParticleSystem* exp = new csFountainParticleSystem(
-      Sys->view->GetWorld (), num, txt,
+      Sys->view->GetWorld (), num, mat,
       CS_FX_ADD, false, 0.1, 0.1,
       origin, csVector3(0, -1.0, 0), 5.0,
       3.0, 0.2,
@@ -248,20 +248,20 @@ void add_particles_fountain (csSector* sector, char* txtname, int num,
 //===========================================================================
 // Demo particle system (explosion).
 //===========================================================================
-void add_particles_explosion (csSector* sector, const csVector3& center, char* txtname)
+void add_particles_explosion (csSector* sector, const csVector3& center, char* matname)
 {
-  // First check if the texture exists.
-  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
-  	FindByName (txtname);
-  if (!txt)
+  // First check if the material exists.
+  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  	FindByName (matname);
+  if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
   csParSysExplosion* exp = new csParSysExplosion (
   	Sys->view->GetWorld (), 100,
-  	center, csVector3 (0, 0, 0), txt, 6, 0.15, true, .6, 2., 2.);
+  	center, csVector3 (0, 0, 0), mat, 6, 0.15, true, .6, 2., 2.);
   exp->MoveToSector (sector);
   exp->SetSelfDestruct (3000);
   exp->SetMixmode (CS_FX_SETALPHA (0.50));
@@ -276,20 +276,20 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* t
 //===========================================================================
 // Demo particle system (spiral).
 //===========================================================================
-void add_particles_spiral (csSector* sector, const csVector3& bottom, char* txtname)
+void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matname)
 {
-  // First check if the texture exists.
-  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
-  	FindByName (txtname);
-  if (!txt)
+  // First check if the material exists.
+  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  	FindByName (matname);
+  if (!mat)
   {
-    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    Sys->Printf (MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
     return;
   }
 
   csSpiralParticleSystem* exp = new csSpiralParticleSystem (
   	Sys->view->GetWorld (), 500,
-  	bottom, txt);
+  	bottom, mat);
   exp->MoveToSector (sector);
   //exp->SetSelfDestruct (3000);
   exp->SetMixmode (CS_FX_SETALPHA (0.50));
@@ -473,7 +473,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
     tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetTexture (Sys->world->GetTextures (), "white.gif");
+    tmpl->SetMaterial (Sys->world->GetMaterials (), "white.gif");
     int vertex_idx = 0;
     csFrame* fr = tmpl->AddFrame ();
     fr->SetName ("f");
@@ -670,7 +670,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
     tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetTexture (Sys->world->GetTextures (), "green.gif");
+    tmpl->SetMaterial (Sys->world->GetMaterials (), "green.gif");
     int vertex_idx = 0;
     csFrame* fr = tmpl->AddFrame ();
     fr->SetName ("f");

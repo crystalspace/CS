@@ -109,7 +109,7 @@ void csParticleSystem::UpdateInPolygonTrees ()
 
 
 void csParticleSystem :: AppendRectSprite(float width, float height, 
-  csTextureHandle *txt, bool lighted)
+  csMaterialHandle *mat, bool lighted)
 {
   csSprite2D *part = new csSprite2D(this);
   //csWorld::current_world->sprites.Push(part);
@@ -122,20 +122,20 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
   vs[3].pos.Set(+width,-height); vs[3].u=1.; vs[3].v=1.;
   part->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
-  part->SetTexture(txt);
+  part->SetMaterial (mat);
   AppendParticle(QUERY_INTERFACE(part, iParticle));
   part->DecRef(); 
 }
 
 
 void csParticleSystem :: AppendRegularSprite(int n, float radius, 
-  csTextureHandle* txt, bool lighted)
+  csMaterialHandle* mat, bool lighted)
 {
   csSprite2D *part = new csSprite2D(this);
   //csWorld::current_world->sprites.Push(part);
   part->CreateRegularVertices(n, true);
   part->ScaleBy(radius);
-  part->SetTexture(txt);
+  part->SetMaterial (mat);
   part->SetLighting( lighted );
   part->SetColor( csColor(1.0, 1.0, 1.0) );
   AppendParticle(QUERY_INTERFACE(part, iParticle));
@@ -283,11 +283,11 @@ static csVector3& GetRandomDirection (const csVector3& magnitude,
 //-- csSpiralParticleSystem ------------------------------------------
 
 csSpiralParticleSystem::csSpiralParticleSystem (csObject* theParent, int max,
-	const csVector3& source, csTextureHandle* txt) : csNewtonianParticleSystem (theParent, max)
+	const csVector3& source, csMaterialHandle* mat) : csNewtonianParticleSystem (theParent, max)
 {
   csSpiralParticleSystem::max = max;
   csSpiralParticleSystem::source = source;
-  csSpiralParticleSystem::txt = txt;
+  csSpiralParticleSystem::mat = mat;
   time_before_new_particle = 0;
   last_reuse = 0;
   float radius = 10.0; // guessed radius of the spiral;
@@ -337,7 +337,7 @@ void csSpiralParticleSystem::Update (time_t elapsed_time)
     }
     else
     {
-      AppendRegularSprite (3, .02, txt, false);	// @@@ PARAMETER
+      AppendRegularSprite (3, .02, mat, false);	// @@@ PARAMETER
       part_idx = GetNumParticles ()-1;
       //GetParticle (part_idx)->MoveToSector (this_sector);
     }
@@ -393,7 +393,7 @@ void csNewtonianParticleSystem :: Update(time_t elapsed_time)
 
 csParSysExplosion :: csParSysExplosion(csObject* theParent, int number_p, 
     const csVector3& explode_center, const csVector3& push, 
-    csTextureHandle *txt, int nr_sides, float part_radius,
+    csMaterialHandle *mat, int nr_sides, float part_radius,
     bool lighted_particles,
     float spread_pos, float spread_speed, float spread_accel)
     : csNewtonianParticleSystem(theParent, number_p)
@@ -417,7 +417,7 @@ csParSysExplosion :: csParSysExplosion(csObject* theParent, int number_p,
   // calculate it again.
   for(i=0; i<number_p; i++)
   {
-    AppendRegularSprite(nr_sides, part_radius, txt, lighted_particles);
+    AppendRegularSprite(nr_sides, part_radius, mat, lighted_particles);
     pos = center + GetRandomDirection() * spread_pos;
     GetParticle(i)->SetPosition (pos);
     part_speed[i] = push + spread_speed * GetRandomDirection();
@@ -504,7 +504,7 @@ void csParSysExplosion :: RemoveLight()
 
 //-- csRainParticleSystem --------------------------------------------------
 
-csRainParticleSystem :: csRainParticleSystem(csObject* theParent, int number, csTextureHandle* txt, 
+csRainParticleSystem :: csRainParticleSystem(csObject* theParent, int number, csMaterialHandle* mat, 
   UInt mixmode, bool lighted_particles, float drop_width, float drop_height,
   const csVector3& rainbox_min, const csVector3& rainbox_max, 
   const csVector3& fall_speed)
@@ -519,7 +519,7 @@ csRainParticleSystem :: csRainParticleSystem(csObject* theParent, int number, cs
   csVector3 pos;
   for(int i=0; i<number; i++)
   {
-    AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
+    AppendRectSprite(drop_width, drop_height, mat, lighted_particles);
     GetParticle(i)->SetMixmode(mixmode);
     pos = GetRandomDirection(size, rainbox.Min()) ;
     GetParticle(i)->SetPosition(pos);
@@ -576,7 +576,7 @@ void csRainParticleSystem :: Update(time_t elapsed_time)
 
 //-- csSnowParticleSystem --------------------------------------------------
 
-csSnowParticleSystem :: csSnowParticleSystem(csObject* theParent, int number, csTextureHandle* txt, 
+csSnowParticleSystem :: csSnowParticleSystem(csObject* theParent, int number, csMaterialHandle* mat, 
   UInt mixmode, bool lighted_particles, float drop_width, float drop_height,
   const csVector3& rainbox_min, const csVector3& rainbox_max, 
   const csVector3& fall_speed, float swirl)
@@ -593,7 +593,7 @@ csSnowParticleSystem :: csSnowParticleSystem(csObject* theParent, int number, cs
   csVector3 pos;
   for(int i=0; i<number; i++)
   {
-    AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
+    AppendRectSprite(drop_width, drop_height, mat, lighted_particles);
     GetParticle(i)->SetMixmode(mixmode);
     pos = GetRandomDirection(size, rainbox.Min()) ;
     GetParticle(i)->SetPosition(pos);
@@ -659,7 +659,7 @@ void csSnowParticleSystem :: Update(time_t elapsed_time)
 //-- csFountainParticleSystem --------------------------------------------------
 
 csFountainParticleSystem :: csFountainParticleSystem(csObject* theParent, 
-  int number, csTextureHandle* txt, UInt mixmode, 
+  int number, csMaterialHandle* mat, UInt mixmode, 
   bool lighted_particles, float drop_width, float drop_height,
   const csVector3& spot, const csVector3& accel, float fall_time,
   float speed, float opening, float azimuth, float elevation)
@@ -685,7 +685,7 @@ csFountainParticleSystem :: csFountainParticleSystem(csObject* theParent,
   // create particles
   for(int i=0; i<number; i++)
   {
-    AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
+    AppendRectSprite(drop_width, drop_height, mat, lighted_particles);
     GetParticle(i)->SetMixmode(mixmode);
     RestartParticle(i, (fall_time / float(number)) * float(number-i));
     bbox.AddBoundingVertexSmart( part_pos[i] );
@@ -773,7 +773,7 @@ void csFountainParticleSystem :: Update(time_t elapsed_time)
 //-- csFireParticleSystem --------------------------------------------------
 
 csFireParticleSystem :: csFireParticleSystem(csObject* theParent, 
-  int number, csTextureHandle* txt, UInt mixmode, 
+  int number, csMaterialHandle* mat, UInt mixmode, 
   bool lighted_particles, float drop_width, float drop_height,
   float total_time, const csVector3& dir, const csVector3& origin,
   float swirl, float color_scale
@@ -801,7 +801,7 @@ csFireParticleSystem :: csFireParticleSystem(csObject* theParent,
   // create particles
   for(int i=0; i<number; i++)
   {
-    AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
+    AppendRectSprite(drop_width, drop_height, mat, lighted_particles);
     GetParticle(i)->SetMixmode(mixmode);
     RestartParticle(i, (total_time / float(number)) * float(number-i));
     bbox.AddBoundingVertexSmart( part_pos[i] );

@@ -28,6 +28,7 @@ class csGraphics3DSoftwareCommon;
 class csTextureManagerSoftware;
 class csTextureMMSoftware;
 struct csPixelFormat;
+struct iTextureHandle;
 
 /// The default texture cache size.
 #define DEFAULT_CACHE_SIZE	8*1024*1024

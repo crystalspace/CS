@@ -20,7 +20,7 @@
 #ifndef _LOADINFO_H_
 #define _LOADINFO_H_
 
-class csTextureHandle;
+class csMaterialHandle;
 class CLights;
 class csWorld;
 class csTextureList;
@@ -28,14 +28,14 @@ class csTextureList;
 class PSLoadInfo
 {
 public:
-  csTextureHandle* default_texture;
+  csMaterialHandle* default_material;
   float default_texlen;
   CLights* default_lightx;
   bool use_tex_set;
   char* tex_set_name;
   
   ///
-  PSLoadInfo () : default_texture(NULL),
+  PSLoadInfo () : default_material(NULL),
    default_texlen(1), default_lightx(NULL),
    use_tex_set(false), tex_set_name(NULL) {}
 

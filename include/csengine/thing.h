@@ -23,14 +23,14 @@
 #include "csengine/polyset.h"
 #include "csengine/bspbbox.h"
 #include "csengine/rview.h"
-#include "csengine/texture.h"
 #include "csutil/flags.h"
 #include "ithing.h"
 
 class csSector;
 class csWorld;
 class csStatLight;
-class csTextureHandle;
+class csMaterialHandle;
+class csMaterialList;
 class csPolygon3D;
 class CLights;
 class csThingTemplate;
@@ -273,14 +273,16 @@ public:
   /**
    * Add polygons and vertices from the specified template.
    */
-  void MergeTemplate (csThingTemplate* tpl, csTextureHandle* default_texture = NULL,
+  void MergeTemplate (csThingTemplate* tpl, csMaterialHandle* default_material = NULL,
   	float default_texlen = 1, CLights* default_lightx = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
-  /// Add polygons and vertices from the specified template. Replace the textures if they 
-  ///match one in the txtList
-  void MergeTemplate (csThingTemplate* tpl, csTextureList* txtList, const char* prefix, 
-	csTextureHandle* default_texture = NULL,
+  /**
+   * Add polygons and vertices from the specified template. Replace the materials if they 
+   * match one in the matList.
+   */
+  void MergeTemplate (csThingTemplate* tpl, csMaterialList* matList, const char* prefix, 
+	csMaterialHandle* default_material = NULL,
   	float default_texlen = 1, CLights* default_lightx = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 

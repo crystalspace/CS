@@ -54,6 +54,26 @@ struct txt_handles
   iTextureHandle *ogl_txt;
 };
 
+// A new material that is used to replace textures.
+// @@@ Samuel: Look if this is ok!
+class dummyMaterial : public iMaterialHandle
+{
+public:
+  iTextureHandle* handle;
+  dummyMaterial ();
+  DECLARE_IBASE;
+  virtual iTextureHandle* GetTexture () { return handle; }
+};
+
+IMPLEMENT_IBASE (dummyMaterial)
+  IMPLEMENTS_INTERFACE (iMaterialHandle)
+IMPLEMENT_IBASE_END
+
+dummyMaterial::dummyMaterial ()
+{
+  CONSTRUCT_IBASE (NULL);
+}
+
 class TxtHandleVector : public csVector
 {
   iSystem *system;
@@ -331,30 +351,34 @@ void csOpenGLProcSoftware::DrawPolygon (G3DPolygonDP& poly)
   G3DPolygonDP cpoly;
   memcpy (&cpoly, &poly, sizeof (G3DPolygonDP));
   txt_handles *handles;
-  int idx = txts_vector->FindKey ((void*)poly.txt_handle);
+  dummyMaterial dmat;
+  cpoly.mat_handle = &dmat;
+  int idx = txts_vector->FindKey ((void*)poly.mat_handle->GetTexture ());
   if (idx == -1)
   {
-    cpoly.txt_handle = txts_vector->RegisterAndPrepare (poly.txt_handle);
-    handles = txts_vector->Get(txts_vector->FindKey ((void*)poly.txt_handle));
+    dmat.handle = txts_vector->RegisterAndPrepare (poly.mat_handle->GetTexture ());
+    handles = txts_vector->Get(txts_vector->FindKey ((void*)poly.mat_handle->GetTexture ()));
   }
   else
   {
     handles = txts_vector->Get (idx);
-    cpoly.txt_handle = (iTextureHandle*) handles->soft_txt;
+    dmat.handle = (iTextureHandle*) handles->soft_txt;
   }
   g3d->DrawPolygon (cpoly);
 }
 
 void csOpenGLProcSoftware::DrawPolygonDebug (G3DPolygonDP& poly)
 {
-  iTextureHandle *ogl_txt_handle = poly.txt_handle;
-  int idx = txts_vector->FindKey ((void*)ogl_txt_handle);
+#if 0
+  iMaterialHandle *ogl_mat_handle = poly.mat_handle;
+  int idx = txts_vector->FindKey ((void*)ogl_mat_handle);
   if (idx == -1)
-    poly.txt_handle = txts_vector->RegisterAndPrepare (ogl_txt_handle);
+    poly.mat_handle = txts_vector->RegisterAndPrepare (ogl_mat_handle);
   else
-    poly.txt_handle = (iTextureHandle*) txts_vector->Get (idx)->soft_txt;
+    poly.mat_handle = (iMaterialHandle*) txts_vector->Get (idx)->soft_txt;
   g3d->DrawPolygonDebug (poly);
-  poly.txt_handle = ogl_txt_handle;
+  poly.mat_handle = ogl_mat_handle;
+#endif
 }
 
 void csOpenGLProcSoftware::DrawLine (const csVector3& v1, const csVector3& v2, float fov, int color)
@@ -362,15 +386,17 @@ void csOpenGLProcSoftware::DrawLine (const csVector3& v1, const csVector3& v2, f
   g3d->DrawLine (v1, v2, fov, color); 
 }
 
-void csOpenGLProcSoftware::StartPolygonFX (iTextureHandle* handle, UInt mode)
+void csOpenGLProcSoftware::StartPolygonFX (iMaterialHandle* handle, UInt mode)
 { 
   iTextureHandle *soft_txt_handle;
-  int idx = txts_vector->FindKey ((void*)handle);
+  int idx = txts_vector->FindKey ((void*)handle->GetTexture ());
   if (idx == -1)
-    soft_txt_handle = txts_vector->RegisterAndPrepare (handle);
+    soft_txt_handle = txts_vector->RegisterAndPrepare (handle->GetTexture ());
   else
     soft_txt_handle = (iTextureHandle*)txts_vector->Get (idx)->soft_txt;
-  g3d->StartPolygonFX (soft_txt_handle, mode);
+  dummyMaterial dmat;
+  dmat.handle = soft_txt_handle;
+  g3d->StartPolygonFX (&dmat, mode);
 }
 
 void csOpenGLProcSoftware::FinishPolygonFX ()
@@ -380,59 +406,67 @@ void csOpenGLProcSoftware::FinishPolygonFX ()
 
 void csOpenGLProcSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
 { 
-  iTextureHandle *ogl_txt_handle = poly.txt_handle;
-  int idx = txts_vector->FindKey ((void*)ogl_txt_handle);
+  dummyMaterial dmat;
+  iMaterialHandle* old_handle = poly.mat_handle;
+  poly.mat_handle = &dmat;
+  int idx = txts_vector->FindKey ((void*)old_handle->GetTexture ());
   if (idx == -1)
-    poly.txt_handle = txts_vector->RegisterAndPrepare (ogl_txt_handle);
+    dmat.handle = txts_vector->RegisterAndPrepare (old_handle->GetTexture ());
   else
-    poly.txt_handle = (iTextureHandle*) txts_vector->Get (idx)->soft_txt;
+    dmat.handle = (iTextureHandle*) txts_vector->Get (idx)->soft_txt;
   g3d->DrawPolygonFX (poly);
-  poly.txt_handle = ogl_txt_handle;
+  poly.mat_handle = old_handle;
 }
 
 void csOpenGLProcSoftware::DrawTriangleMesh (G3DTriangleMesh& mesh)
-{ 
+{
   G3DTriangleMesh cmesh;
   memcpy (&cmesh, &mesh, sizeof(G3DTriangleMesh));
-  for (int i = 0; i < mesh.num_textures; i++)
+  dummyMaterial dmat[2];
+  cmesh.mat_handle[0] = &dmat[0];
+  cmesh.mat_handle[1] = &dmat[1];
+  for (int i = 0; i < mesh.num_materials; i++)
   {
-    int idx = txts_vector->FindKey ((void*)mesh.txt_handle[i]);
+    int idx = txts_vector->FindKey ((void*)mesh.mat_handle[i]->GetTexture ());
     if (idx == -1)
-	cmesh.txt_handle[i]=txts_vector->RegisterAndPrepare(mesh.txt_handle[i]);
+	dmat[i].handle=txts_vector->RegisterAndPrepare(mesh.mat_handle[i]->GetTexture ());
     else
-      cmesh.txt_handle[i] =(iTextureHandle*) txts_vector->Get (idx)->soft_txt;
+      dmat[i].handle =(iTextureHandle*) txts_vector->Get (idx)->soft_txt;
   }
   g3d->DrawTriangleMesh (cmesh);
 }
 
 void csOpenGLProcSoftware::DrawPolygonMesh (G3DPolygonMesh& mesh)
 { 
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@ TODO MAT
+#if 0
   G3DPolygonMesh cmesh;
   memcpy (&cmesh, &mesh, sizeof(G3DPolygonMesh));
-  if (!mesh.master_txt_handle)
+  if (!mesh.master_mat_handle)
   {
     for (int i = 0; i < mesh.num_polygons; i++)
     {
-      int idx = txts_vector->FindKey ((void*)mesh.txt_handle[i]);
+      int idx = txts_vector->FindKey ((void*)mesh.mat_handle[i]);
       if (idx == -1)
-	cmesh.txt_handle[i] = 
-	  txts_vector->RegisterAndPrepare(mesh.txt_handle[i]);
+	cmesh.mat_handle[i] = 
+	  txts_vector->RegisterAndPrepare(mesh.mat_handle[i]);
       else
-	cmesh.txt_handle[i] = 
-	  (iTextureHandle*) txts_vector->Get (idx)->soft_txt;
+	cmesh.mat_handle[i] = 
+	  (iMaterialHandle*) txts_vector->Get (idx)->soft_txt;
     }
   }
   else
   {
-    int idx = txts_vector->FindKey ((void*)mesh.master_txt_handle);
+    int idx = txts_vector->FindKey ((void*)mesh.master_mat_handle);
     if (idx == -1)
-      cmesh.master_txt_handle = 
-	txts_vector->RegisterAndPrepare(mesh.master_txt_handle);
+      cmesh.master_mat_handle = 
+	txts_vector->RegisterAndPrepare(mesh.master_mat_handle);
     else
-      cmesh.master_txt_handle = 
-	(iTextureHandle*) txts_vector->Get (idx)->soft_txt;
+      cmesh.master_mat_handle = 
+	(iMaterialHandle*) txts_vector->Get (idx)->soft_txt;
   }
   g3d->DrawPolygonMesh (cmesh);
+#endif
 }
 
 void csOpenGLProcSoftware::OpenFogObject (CS_ID id, csFog* fog)

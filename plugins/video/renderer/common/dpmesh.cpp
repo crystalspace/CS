@@ -100,8 +100,8 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   poly.alpha = 0;
   poly.plane.m_cam2tex = &m_cam2tex;
   poly.plane.v_cam2tex = &v_cam2tex;
-  if (mesh.master_txt_handle)
-    poly.txt_handle = mesh.master_txt_handle;
+  if (mesh.master_mat_handle)
+    poly.mat_handle = mesh.master_mat_handle;
 # ifdef DO_HW_UVZ
   //csVector3* uvz; @@@ Where do I get this?
   poly.mirror = mesh.do_mirror;
@@ -112,8 +112,8 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   for (i = 0 ; i < mesh.num_polygons ; i++)
   {
     poly.num = mesh.polygons[i].vertices;
-    if (!mesh.master_txt_handle)
-      poly.txt_handle = mesh.txt_handle[i];
+    if (!mesh.master_mat_handle)
+      poly.mat_handle = mesh.mat_handle[i];
     
     // Transform world to texture transform to
     // camera to texture transformation here.

@@ -336,7 +336,7 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
     INTERPOLATE(g3dpoly->vertices [j].z,
                 inpoly [vtl].z, inpoly [vbl].z,
                 inpoly [vtr].z, inpoly [vbr].z);
-    if (g3dpoly->txt_handle)
+    if (g3dpoly->mat_handle)
     {
       // Calculate U
       INTERPOLATE(g3dpoly->vertices [j].u,
@@ -770,11 +770,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     csGouraudShaded* gs = poly->GetGouraudInfo ();
 
     g3dpolyfx.num = num_vertices;
-    g3dpolyfx.txt_handle = poly->GetTextureHandle ();
+    g3dpolyfx.mat_handle = poly->GetMaterialHandle ();
     g3dpolyfx.inv_aspect = rview->GetInvFOV ();
 
     csColor* po_colors = do_light && gs ? gs->GetColors () : NULL;
-    if (poly->flags.Check (CS_POLY_FLATSHADING)) g3dpolyfx.txt_handle = NULL;
+    if (poly->flags.Check (CS_POLY_FLATSHADING)) g3dpolyfx.mat_handle = NULL;
 
     // We are going to use DrawPolygonFX.
     // Here we have to do a little messy thing because PreparePolygonFX()
@@ -798,7 +798,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     orig_triangle[2].x = unsplit->Vcam (2).x * iz + rview->GetShiftX ();
     orig_triangle[2].y = unsplit->Vcam (2).y * iz + rview->GetShiftY ();
 
-    if (g3dpolyfx.txt_handle)
+    if (g3dpolyfx.mat_handle)
     {
       g3dpolyfx.vertices[0].u = gs->GetUVCoords ()[0].x;
       g3dpolyfx.vertices[0].v = gs->GetUVCoords ()[0].y;
@@ -806,7 +806,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
       g3dpolyfx.vertices[1].v = gs->GetUVCoords ()[1].y;
       g3dpolyfx.vertices[2].u = gs->GetUVCoords ()[2].x;
       g3dpolyfx.vertices[2].v = gs->GetUVCoords ()[2].y;
-      g3dpolyfx.txt_handle->GetMeanColor (g3dpolyfx.flat_color_r,
+      g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,
         g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
     }
     else
@@ -831,7 +831,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     	orig_triangle, po_colors != NULL);
     UInt mixmode = CS_FX_COPY;
     if (gs) mixmode = gs->GetMixmode ();
-    rview->g3d->StartPolygonFX (g3dpolyfx.txt_handle,
+    rview->g3d->StartPolygonFX (g3dpolyfx.mat_handle,
     	mixmode | ( po_colors ? CS_FX_GOURAUD : 0));
     CalculateFogPolygon (rview, g3dpolyfx);
     rview->g3d->DrawPolygonFX (g3dpolyfx);
@@ -842,7 +842,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     static G3DPolygonDP g3dpoly;
 
     g3dpoly.num = num_vertices;
-    g3dpoly.txt_handle = poly->GetTextureHandle ();
+    g3dpoly.mat_handle = poly->GetMaterialHandle ();
     g3dpoly.inv_aspect = rview->GetInvFOV ();
 
     // We are going to use DrawPolygon.

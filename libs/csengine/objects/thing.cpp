@@ -32,6 +32,7 @@
 #include "csengine/covcube.h"
 #include "csengine/curve.h"
 #include "csengine/texture.h"
+#include "csengine/material.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "itexture.h"
@@ -212,7 +213,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   G3DTriangleMesh mesh;
   mesh.morph_factor = 0;
   mesh.num_vertices_pool = 1;
-  mesh.num_textures = 1;
+  mesh.num_materials = 1;
   mesh.do_mirror = rview.IsMirrored ();
   mesh.do_morph_texels = false;
   mesh.do_morph_colors = false;
@@ -272,7 +273,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
       fog_verts.SetLimit (tess->GetNumVertices ());
     }
 
-    mesh.txt_handle[0] = c->GetTextureHandle ();
+    mesh.mat_handle[0] = c->GetMaterialHandle ();
     mesh.num_vertices = tess->GetNumVertices ();
     mesh.vertices[0] = tess->GetVertices ();
     mesh.texels[0][0] = tess->GetTxtCoords ();
@@ -284,9 +285,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     bool gouraud = !!c->lightmap;
     mesh.fxmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
     mesh.use_vertex_color = gouraud;
-    if (mesh.txt_handle[0] == NULL)
+    if (mesh.mat_handle[0] == NULL)
     {
-      CsPrintf (MSG_STDOUT, "Warning! Curve without texture!\n");
+      CsPrintf (MSG_STDOUT, "Warning! Curve without material!\n");
       continue;
     }
     extern void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
@@ -533,7 +534,7 @@ void csThing::Merge (csThing* other)
 
 
 void csThing::MergeTemplate (csThingTemplate* tpl,
-  csTextureHandle* default_texture, float default_texlen,
+  csMaterialHandle* default_material, float default_texlen,
   CLights* default_lightx,
   csVector3* shift, csMatrix3* transform)
 {
@@ -559,9 +560,9 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
   {
     csPolygonTemplate* pt = tpl->GetPolygon (i);
     csPolygon3D* p;
-    p = NewPolygon (pt->GetTexture ());
+    p = NewPolygon (pt->GetMaterial ());
     p->SetName (pt->GetName());
-    if (!pt->GetTexture ()) p->SetTexture (default_texture);
+    if (!pt->GetMaterial ()) p->SetMaterial (default_material);
     csLightMapped* pol_lm = p->GetLightMapInfo ();
     if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
     int* idx = pt->GetVerticesIdx ();
@@ -602,7 +603,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     p->SetParent (this);
     p->SetSector( GetSector() );
 
-    if (!pt->GetTextureHandle ()) p->SetTextureHandle (default_texture);
+    if (!pt->GetMaterialHandle ()) p->SetMaterialHandle (default_material);
     for (j = 0 ; j < pt->NumVertices () ; j++)
     {
       p->SetControlPoint (j, pt->GetVertex (j));
@@ -613,27 +614,27 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
   delete [] merge_vertices;
 }
 
-void csThing::MergeTemplate (csThingTemplate* tpl, csTextureList* txtList,
-  const char* prefix, csTextureHandle* default_texture, float default_texlen,
+void csThing::MergeTemplate (csThingTemplate* tpl, csMaterialList* matList,
+  const char* prefix, csMaterialHandle* default_material, float default_texlen,
   CLights* default_lightx, csVector3* shift, csMatrix3* transform)
 {
   int i;
   const char *txtname;
   char *newname=NULL;
     
-  MergeTemplate (tpl, default_texture, default_texlen, default_lightx,
+  MergeTemplate (tpl, default_material, default_texlen, default_lightx,
     shift, transform);
     
-  // now replace the textures
+  // Now replace the materials.
   for (i = 0; i < GetNumPolygons (); i++)
   {
     csPolygon3D *p = GetPolygon3D (i);
-    txtname = p->GetCsTextureHandle ()->GetName ();
+    txtname = p->GetCsMaterialHandle ()->GetName ();
     newname = new char [strlen (prefix) + strlen (txtname) + 2];
     sprintf (newname, "%s_%s", prefix, txtname);
-    csTextureHandle *th = txtList->FindByName (newname);
+    csMaterialHandle *th = matList->FindByName (newname);
     if (th != NULL)
-      p->SetTexture (th);
+      p->SetMaterial (th);
     delete [] newname;
   }
 }

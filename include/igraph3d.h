@@ -36,6 +36,7 @@ struct iGraphics2D;
 struct iPolygonTexture;
 struct iTextureManager;
 struct iTextureHandle;
+struct iMaterialHandle;
 struct iHalo;
 struct RGBPixel;
 struct csPixelFormat;
@@ -121,10 +122,10 @@ struct G3DPolygonDPFX
   /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
   float inv_aspect;
 
-  /// The texture handle as returned by iTextureManager.
-  iTextureHandle* txt_handle;
+  /// The material handle as returned by iTextureManager.
+  iMaterialHandle* mat_handle;
 
-  /// Use this color for drawing (if txt_handle == NULL) instead of a texture.
+  /// Use this color for drawing (if txt_handle == NULL) instead of a material.
   UByte flat_color_r;
   UByte flat_color_g;
   UByte flat_color_b;
@@ -153,8 +154,8 @@ struct G3DPolygonDP : public G3DPolygonDFP
   /// Use fog info?
   bool use_fog;
 
-  /// The texture handle as returned by iTextureManager.
-  iTextureHandle* txt_handle;
+  /// The material handle as returned by iTextureManager.
+  iMaterialHandle* mat_handle;
 
   /// Transformation matrices for the texture. @@@ BAD NAME
   G3DTexturePlane plane;
@@ -283,16 +284,16 @@ struct G3DTriangleMesh
   {
     /// Maximum number of vertex pool, used for vertex weighting/morphing.
     MAX_VERTEXPOOL = 2,
-    /// Maximum number of textures, used to apply multiple pass.
-    MAX_TEXTURE = 2
+    /// Maximum number of materials, used to apply multiple pass.
+    MAX_MATERIAL = 2
   };
 
   /// Number of vertices for each pool.
   int num_vertices;
   /// Number of vertex sets, if > 1, morphing will be applied.
   int num_vertices_pool;
-  /// Number of texturing passes.
-  int num_textures;
+  /// Number of material passes.
+  int num_materials;
 
   /// Number of triangles.
   int num_triangles;
@@ -325,8 +326,8 @@ struct G3DTriangleMesh
   UInt fxmode;
   float morph_factor;
   csVector3* vertices[MAX_VERTEXPOOL];
-  csVector2* texels[MAX_VERTEXPOOL][MAX_TEXTURE];
-  iTextureHandle* txt_handle[MAX_TEXTURE];
+  csVector2* texels[MAX_VERTEXPOOL][MAX_MATERIAL];
+  iMaterialHandle* mat_handle[MAX_MATERIAL];
   /// Precalculated vertex color list.
   csColor* vertex_colors[MAX_VERTEXPOOL];
   /// Information for fogging the vertices.
@@ -368,13 +369,17 @@ struct G3DPolygonMesh
   /// Pointer to array of polygons
   csPolygonDPM* polygons;
 
-  /// Texture for all polygons.  If this is NULL, each polygon has it's
-  /// own texture handle in the txt_handle array.
-  iTextureHandle *master_txt_handle;
+  /**
+   * Material for all polygons.  If this is NULL, each polygon has it's
+   * own material handle in the mat_handle array.
+   */
+  iMaterialHandle *master_mat_handle;
 
-  /// Pointer to an array of texture handles (one for for each polygon)
-  /// Only valid if master_txt_handle is NULL
-  iTextureHandle **txt_handle;
+  /**
+   * Pointer to an array of material handles (one for for each polygon)
+   * Only valid if master_mat_handle is NULL
+   */
+  iMaterialHandle **mat_handle;
 
   /// Transformation matrices for the texture
   G3DTexturePlane *plane;
@@ -563,12 +568,12 @@ struct iGraphics3D : public iPlugIn
    * create the image, but that would be very expensive.<p>
    * 
    * parameters:
-   * handle:  The texture handle as returned by iTextureManager.
+   * handle:  The material handle as returned by iTextureManager.
    * mode:    How shall the new polygon be combined with the current 
    *          screen content. This is any legal combination of CS_FX_XXX
    *          flags including alpha value (if CS_FX_ALPHA flag is set)
    */
-  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode) = 0;
+  virtual void StartPolygonFX (iMaterialHandle* handle, UInt mode) = 0;
 
   /**
    * Finish drawing a series of Polygon FX.

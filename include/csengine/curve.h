@@ -26,12 +26,13 @@
 #include "csgeom/box.h"
 #include "csengine/bezier.h"
 #include "csengine/texture.h"
+#include "csengine/material.h"
 #include "csengine/lghtmap.h"
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
 #include "igraph3d.h"
 
-struct iTextureHandle;
+struct iMaterialHandle;
 class csBspContainer;
 
 /**
@@ -116,7 +117,7 @@ private:
   // sector of this curve
   csSector* sector;
 
-  csTextureHandle* cstxt;
+  csMaterialHandle* cstxt;
   // Pointer to the parent template.
   csCurveTemplate* parent_template;
   
@@ -207,9 +208,9 @@ public:
   virtual void SetControlPoint (int index, int control_id) = 0;
 
   ///
-  iTextureHandle* GetTextureHandle () { return cstxt ? cstxt->GetTextureHandle () : (iTextureHandle*)NULL; }
+  iMaterialHandle* GetMaterialHandle () { return cstxt ? cstxt->GetMaterialHandle () : (iMaterialHandle*)NULL; }
   ///
-  void SetTextureHandle (csTextureHandle* h) { cstxt = h; }
+  void SetMaterialHandle (csMaterialHandle* h) { cstxt = h; }
 
   /// Return a bounding box in object space for this curve.
   virtual void GetObjectBoundingBox (csBox3& bbox) = 0;
@@ -277,7 +278,7 @@ class csCurveTemplate : public csObject
 protected:
   csThingTemplate *parent;
 
-  csTextureHandle* cstxt;
+  csMaterialHandle* cstxt;
 
 public:
   ///
@@ -296,9 +297,9 @@ public:
   ///
   virtual int NumVertices () = 0;
   ///
-  csTextureHandle* GetTextureHandle () { return cstxt; }
+  csMaterialHandle* GetMaterialHandle () { return cstxt; }
   ///
-  void SetTextureHandle (csTextureHandle* h) { cstxt = h; }
+  void SetMaterialHandle (csMaterialHandle* h) { cstxt = h; }
 
   CSOBJTYPE;
 };

@@ -842,6 +842,6 @@ int csBezierTemplate::NumVertices ()
 csCurve* csBezierTemplate::MakeCurve ()
 {
   csBezierCurve* p = new csBezierCurve (this);
-  p->SetTextureHandle (cstxt);
+  p->SetMaterialHandle (cstxt);
   return p;
 }

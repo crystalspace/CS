@@ -132,7 +132,7 @@ void csTextureCacheSoftware::uncache_texture (int MipMap, iTextureHandle *itexh)
   {
     next_cached_texture = cached_texture->next;
     if ((cached_texture->mipmap == MipMap) && 
-	(cached_texture->source->GetTextureHandle () == itexh))
+	(cached_texture->source->GetMaterialHandle ()->GetTexture () == itexh))
     {
       if (cached_texture->next)
 	cached_texture->next->prev = cached_texture->prev;

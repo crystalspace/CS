@@ -317,9 +317,9 @@ iPolygon3D *csPolygonSet::PolySet::GetPolygon (int idx)
   return QUERY_INTERFACE(scfParent->GetPolygon3D (idx), iPolygon3D);
 }
 
-csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
+csPolygon3D* csPolygonSet::NewPolygon (csMaterialHandle* material)
 {
-  csPolygon3D* p = new csPolygon3D (texture);
+  csPolygon3D* p = new csPolygon3D (material);
   p->SetSector (sector);
   AddPolygon (p);
   return p;
@@ -327,7 +327,7 @@ csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
 
 iPolygon3D *csPolygonSet::PolySet::CreatePolygon (const char *iName)
 {
-  csPolygon3D *p = new csPolygon3D ((csTextureHandle *)NULL);
+  csPolygon3D *p = new csPolygon3D ((csMaterialHandle *)NULL);
   p->SetName (iName);
   p->SetSector (scfParent->sector);
   scfParent->AddPolygon (p);
@@ -484,14 +484,14 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   G3DPolygonMesh mesh;
   mesh.num_vertices = GetNumVertices ();
   mesh.num_polygons = GetNumPolygons ();
-  mesh.master_txt_handle = NULL;
+  mesh.master_mat_handle = NULL;
   // @@@ It would be nice if we could avoid this allocate.
   // Even nicer would be if we didn't have to copy the data
   // to this structure every time. Maybe hold this array native
   // in every detail object?
   // IMPORTANT OPT!!! CACHE THIS ARRAY IN EACH ENTITY!
   mesh.polygons = new csPolygonDPM [GetNumPolygons ()];
-  mesh.txt_handle = new iTextureHandle* [GetNumPolygons ()];
+  mesh.mat_handle = new iMaterialHandle* [GetNumPolygons ()];
   mesh.plane = new G3DTexturePlane [GetNumPolygons ()];
   mesh.normal = new csPlane3 [GetNumPolygons ()];
   mesh.poly_texture = new iPolygonTexture* [GetNumPolygons ()];
@@ -514,7 +514,7 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
       printf ("INTERNAL ERROR! Don't use gouraud shaded polygons on DETAIL objects right now!\n");
       goto cleanup;
     }
-    mesh.txt_handle[i] = p->GetTextureHandle ();
+    mesh.mat_handle[i] = p->GetMaterialHandle ();
 
     csPolyTxtPlane* txt_plane = lmi->GetTxtPlane ();
     csMatrix3* m_wor2tex;
@@ -544,7 +544,7 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
 
 cleanup:
   delete [] mesh.polygons;
-  delete [] mesh.txt_handle;
+  delete [] mesh.mat_handle;
   delete [] mesh.plane;
   delete [] mesh.normal;
   delete [] mesh.poly_texture;

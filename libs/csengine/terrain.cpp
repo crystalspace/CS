@@ -20,6 +20,7 @@
 #include "csengine/terrain.h"
 #include "csengine/pol2d.h"
 #include "csengine/texture.h"
+#include "csengine/material.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
@@ -37,7 +38,7 @@ csTerrain::csTerrain () : csObject()
   heightMap = NULL;
   mesh = NULL;
   vbuf = NULL;
-  _textureMap = NULL;
+  _materialMap = NULL;
 }
 
 csTerrain::~csTerrain ()
@@ -45,7 +46,7 @@ csTerrain::~csTerrain ()
   delete mesh;
   delete heightMap;
   delete vbuf;
-  delete _textureMap;
+  delete _materialMap;
 }
 
 void csTerrain::SetDetail( unsigned int detail)
@@ -57,7 +58,7 @@ void csTerrain::SetDetail( unsigned int detail)
   mesh->farClip(200.0);
 }
 
-int csTerrain::GetNumTextures ()
+int csTerrain::GetNumMaterials ()
 {
   return mesh->getBinTreeNo ()/2;
 }
@@ -91,7 +92,7 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
   _size = csVector3(heightMap->cols(),mesh->wheight(mesh->absMaxHeight()),heightMap->rows());
 
   // This is  code that allocates the texture array for the terrain.
-  _textureMap = new csTextureHandle* [GetNumTextures ()];
+  _materialMap = new csMaterialHandle* [GetNumMaterials ()];
   return true;
 }
 
@@ -298,7 +299,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     g3dmesh.vertex_colors[0] = NULL;			 // pointer to array of csColor for color information.
     g3dmesh.morph_factor = 0;
     g3dmesh.num_vertices_pool = 1;
-    g3dmesh.num_textures = 1;
+    g3dmesh.num_materials = 1;
     g3dmesh.use_vertex_color = false;
     g3dmesh.do_mirror = rview.IsMirrored ();
     g3dmesh.do_morph_texels = false;
@@ -320,8 +321,8 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     if (d > 0)
     {
       nd = mesh->getBinTree(i)->uniqueVertex() + mesh->getBinTree(i+1)->uniqueVertex();
-      if (_textureMap && _textureMap[i/2])
-	    g3dmesh.txt_handle[0] = _textureMap[i/2]->GetTextureHandle ();
+      if (_materialMap && _materialMap[i/2])
+	    g3dmesh.mat_handle[0] = _materialMap[i/2]->GetMaterialHandle ();
       // Render this block.
       // For software renderer we need to pass in a little bit at a time.
       g3dmesh.num_vertices = nd;	  // number of shared vertices for all triangles

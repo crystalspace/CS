@@ -36,7 +36,7 @@ class csPolygonInt;
 class csSector;
 class csWorld;
 class csCamera;
-class csTextureHandle;
+class csMaterialHandle;
 class CLights;
 class csPolygon2D;
 class csPolygon2DQueue;
@@ -290,7 +290,7 @@ public:
   void AddPolygon (csPolygonInt* spoly);
 
   /// Create a new polygon in this polygonset and add it.
-  csPolygon3D* NewPolygon (csTextureHandle* texture);
+  csPolygon3D* NewPolygon (csMaterialHandle* material);
 
   /// Get the number of polygons in this polygonset.
   int GetNumPolygons ()

@@ -28,7 +28,7 @@ class ddgTBinTree;
 class ddgHeightMap;
 class ddgVArray;
 class ddgContext;
-class csTextureHandle;
+class csMaterialHandle;
 class csVector3;
 typedef int ddgVBIndex;
 
@@ -48,7 +48,7 @@ private:
   ///
   ddgContext *context;
   /// Terrain handle.
-  csTextureHandle **_textureMap;
+  csMaterialHandle **_materialMap;
   /// Texture scale factor.
   float _texturescale;
   /// Terrain's location offset in world space.
@@ -78,10 +78,10 @@ public:
    */
   void Draw (csRenderView& rview, bool use_z_buf = true);
 
-  /// Set a texture for this surface.
-  void SetTexture (int i, csTextureHandle *texture) { _textureMap[i] = texture; }
-  /// Get the number of textures required.
-  int GetNumTextures ();
+  /// Set a material for this surface.
+  void SetMaterial (int i, csMaterialHandle *material) { _materialMap[i] = material; }
+  /// Get the number of materials required.
+  int GetNumMaterials ();
   /// Set the amount of triangles
   void SetDetail(unsigned int detail);
   /// Put a triangle into the vertex buffer.

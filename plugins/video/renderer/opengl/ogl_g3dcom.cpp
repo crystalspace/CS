@@ -655,7 +655,9 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   }
 
   iPolygonTexture *tex = poly.poly_texture;
-  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
+  csMaterialMM* mat = (csMaterialMM*)poly.mat_handle;
+  iTextureHandle* txt_handle = mat->GetTexture ();
+  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any
   iLightMap *thelightmap = tex->GetLightMap ();
@@ -794,7 +796,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     {
       glDisable (GL_TEXTURE_2D);
       UByte r, g, b;
-      poly.txt_handle->GetMeanColor (r, g, b);
+      poly.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
       flat_r = float (r) / 255.;
       flat_g = float (g) / 255.;
       flat_b = float (b) / 255.;
@@ -831,7 +833,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   {
     glDisable (GL_TEXTURE_2D);
     UByte r, g, b;
-    poly.txt_handle->GetMeanColor (r, g, b);
+    poly.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
     flat_r = float (r) / 255.;
     flat_g = float (g) / 255.;
     flat_b = float (b) / 255.;
@@ -1041,7 +1043,7 @@ round16 (long f)
 //static iTextureHandle* prev_handle = NULL;
 //static UInt prev_mode = ~0;
 
-void csGraphics3DOGLCommon::StartPolygonFX (iTextureHandle * handle, UInt mode)
+void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
 {
   end_draw_poly ();
 
@@ -1065,8 +1067,9 @@ void csGraphics3DOGLCommon::StartPolygonFX (iTextureHandle * handle, UInt mode)
   GLuint texturehandle = 0;
   if (handle && m_renderstate.textured)
   {
-    csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) handle->GetPrivateObject ();
-    texture_cache->cache_texture (handle);
+    iTextureHandle* txt_handle = handle->GetTexture ();
+    csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) txt_handle->GetPrivateObject ();
+    texture_cache->cache_texture (txt_handle);
     csGLCacheData *cachedata = (csGLCacheData *)txt_mm->GetCacheData ();
     texturehandle = cachedata->Handle;
   }
@@ -1420,7 +1423,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   // Fill flat color if renderer decide to paint it flat-shaded
   G3DPolygonDPFX poly;
-  mesh.txt_handle[0]->GetMeanColor (poly.flat_color_r,
+  mesh.mat_handle[0]->GetTexture ()->GetMeanColor (poly.flat_color_r,
     poly.flat_color_g, poly.flat_color_b);
 
   if (mesh.do_fog)
@@ -1454,7 +1457,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
 
   // Draw all triangles.
-  StartPolygonFX (mesh.txt_handle[0], mesh.fxmode);
+  StartPolygonFX (mesh.mat_handle[0], mesh.fxmode);
 
   if (m_gouraud && work_colors)
   {
@@ -1556,7 +1559,7 @@ void csGraphics3DOGLCommon::CloseFogObject (CS_ID /*id*/)
 
 void csGraphics3DOGLCommon::CacheTexture (iPolygonTexture *texture)
 {
-  iTextureHandle* txt_handle = texture->GetTextureHandle ();
+  iTextureHandle* txt_handle = texture->GetMaterialHandle ()->GetTexture ();
   texture_cache->cache_texture (txt_handle);
   if (m_renderstate.lighting)
     lightmap_cache->cache_lightmap (texture);
@@ -1800,7 +1803,9 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   }
 
   tex = poly.poly_texture;
-  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) poly.txt_handle->GetPrivateObject ();
+  csMaterialMM* mat = (csMaterialMM*)poly.mat_handle;
+  iTextureHandle* txt_handle = mat->GetTexture ();
+  csTextureMMOpenGL *txt_mm = (csTextureMMOpenGL *) txt_handle->GetPrivateObject ();
 
   // find lightmap information, if any
   thelightmap = tex->GetLightMap ();

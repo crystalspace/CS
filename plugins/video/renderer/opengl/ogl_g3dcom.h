@@ -73,7 +73,7 @@ private:
   /// a StartPolygonFX call returns 'true', then calls to DrawPolygonFX and
   /// FinishPolygonFX must also return 'true' until the next time StartPolygonFX
   /// is called.
-  bool (csGraphics3DOGLCommon::*ShortcutStartPolygonFX)(iTextureHandle *handle,UInt mode);
+  bool (csGraphics3DOGLCommon::*ShortcutStartPolygonFX)(iMaterialHandle *handle,UInt mode);
 
   /// Shortcut tried before executing standard DrawPolygonFX code.  The
   /// value returned by this must match the most recent return value of
@@ -251,7 +251,7 @@ public:
   	float fov, int color);
 
   /// Start a series of DrawPolygonFX
-  virtual void StartPolygonFX (iTextureHandle* handle, UInt mode);
+  virtual void StartPolygonFX (iMaterialHandle* handle, UInt mode);
 
   /// Finish a series of DrawPolygonFX
   virtual void FinishPolygonFX ();

@@ -309,7 +309,7 @@ void csPolyTexture::CreateBoundingTextureBox ()
   Fmax_v = max_v;
 
   int ww, hh;
-  txt_handle->GetMipMapDimensions (0, ww, hh);
+  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   Imin_u = QRound (min_u * ww);
   Imin_v = QRound (min_v * hh);
   Imax_u = QRound (max_u * ww);
@@ -398,7 +398,7 @@ bool csPolyTexture::GetLightmapBounds (csFrustumView *lview, csVector3 *bounds)
   csVector3 &lightpos = lview->light_frustum->GetOrigin ();
 
   int ww, hh;
-  txt_handle->GetMipMapDimensions (0, ww, hh);
+  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   float inv_ww = 1.0 / ww;
   float inv_hh = 1.0 / hh;
 
@@ -569,7 +569,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   if (!lm) return;
 
   int ww, hh;
-  txt_handle->GetMipMapDimensions (0, ww, hh);
+  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
 
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
 
@@ -729,7 +729,7 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   csShadowMap *smap = NULL;
 
   int ww, hh;
-  txt_handle->GetMipMapDimensions (0, ww, hh);
+  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   float inv_ww = 1.0 / ww;
   float inv_hh = 1.0 / hh;
 
@@ -836,7 +836,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   float d;
 
   int ww, hh;
-  txt_handle->GetMipMapDimensions (0, ww, hh);
+  mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
 
   csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
   float cosfact = polygon->GetCosinusFactor ();
@@ -1106,7 +1106,7 @@ void csPolyTexture::MakeDirtyDynamicLights ()
 }
 
 iLightMap *csPolyTexture::GetLightMap () { return lm; }
-iTextureHandle *csPolyTexture::GetTextureHandle () { return txt_handle; }
+iMaterialHandle *csPolyTexture::GetMaterialHandle () { return mat_handle; }
 int csPolyTexture::GetWidth () { return w; }
 int csPolyTexture::GetHeight () { return h; }
 float csPolyTexture::GetFDU () { return fdu; }

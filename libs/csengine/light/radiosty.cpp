@@ -28,6 +28,7 @@
 #include "csengine/csppulse.h"
 #include "csengine/polytmap.h"
 #include "csengine/texture.h"
+#include "csengine/material.h"
 #include "csengine/rview.h"
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
@@ -238,13 +239,15 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   }
 
   // get texture of element
-  csTextureHandle* txthandle = GetTextureHandle();
+  csMaterialHandle* mathandle = GetMaterialHandle ();
 
-  if(txthandle == NULL) // no texture: flatcol is enough.
+  if(mathandle == NULL) // no material: flatcol is enough.
     return map;
   
   int transr=0, transg=0, transb=0; // transparent color
   
+  csMaterial* mat = (csMaterial*)mathandle->GetMaterial ();
+  csTextureHandle* txthandle = mat->GetTextureHandle ();
   txthandle->GetKeyColor(transr, transg, transb);
   
   iImage *txtimage = txthandle->GetImageFile();
@@ -401,7 +404,7 @@ void csRadPoly::CalcLumel2World(csVector3& res, int x, int y)
 
   // see polytext.cpp for more info.
   int ww=0, hh=0;
-  polygon->GetTextureHandle()->GetMipMapDimensions (0, ww, hh);
+  polygon->GetMaterialHandle ()->GetTexture ()->GetMipMapDimensions (0, ww, hh);
   float invww = 1. / (float)ww;
   float invhh = 1. / (float)hh;
 

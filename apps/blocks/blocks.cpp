@@ -37,6 +37,7 @@
 #include "csgfxldr/csimage.h"
 #include "csengine/dumper.h"
 #include "csengine/texture.h"
+#include "csengine/material.h"
 #include "csengine/sector.h"
 #include "csengine/polytext.h"
 #include "csengine/polygon.h"
@@ -424,11 +425,11 @@ csMatrix3 Blocks::create_rotate_z (float angle)
 }
 
 csPolygonTemplate* add_polygon_template (csThingTemplate* tmpl,
-	char* name, csTextureHandle* texture,
+	char* name, csMaterialHandle* material,
 	int vt0, int vt1, int vt2, int vt3 = -1)
 {
   csPolygonTemplate* p;
-  p = new csPolygonTemplate (tmpl, name, texture);
+  p = new csPolygonTemplate (tmpl, name, material);
   tmpl->AddPolygon (p);
   p->AddVertex (vt0);
   p->AddVertex (vt1);
@@ -456,37 +457,37 @@ void Blocks::add_pillar_template ()
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = add_polygon_template (pillar_tmpl, "d", pillar_txt, 3, 2, 1, 0);
+  p = add_polygon_template (pillar_tmpl, "d", pillar_mat, 3, 2, 1, 0);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pillar_tmpl->Vtex (0), pillar_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "b", pillar_txt, 0, 1, 5, 4);
+  p = add_polygon_template (pillar_tmpl, "b", pillar_mat, 0, 1, 5, 4);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pillar_tmpl->Vtex (0), pillar_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "t", pillar_txt, 4, 5, 6, 7);
+  p = add_polygon_template (pillar_tmpl, "t", pillar_mat, 4, 5, 6, 7);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pillar_tmpl->Vtex (4), pillar_tmpl->Vtex (5), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "f", pillar_txt, 7, 6, 2, 3);
+  p = add_polygon_template (pillar_tmpl, "f", pillar_mat, 7, 6, 2, 3);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pillar_tmpl->Vtex (7), pillar_tmpl->Vtex (6), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "l", pillar_txt, 4, 7, 3, 0);
+  p = add_polygon_template (pillar_tmpl, "l", pillar_mat, 4, 7, 3, 0);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pillar_tmpl->Vtex (7), pillar_tmpl->Vtex (3), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (pillar_tmpl, "r", pillar_txt, 6, 5, 1, 2);
+  p = add_polygon_template (pillar_tmpl, "r", pillar_mat, 6, 5, 1, 2);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pillar_tmpl->Vtex (6), pillar_tmpl->Vtex (5), 1, A, B, C);
@@ -510,14 +511,14 @@ void Blocks::add_vrast_template ()
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = add_polygon_template (vrast_tmpl, "f", raster_txt, 0, 1, 3, 2);
+  p = add_polygon_template (vrast_tmpl, "f", raster_mat, 0, 1, 3, 2);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	vrast_tmpl->Vtex (0), vrast_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
 #if 0
-  p = add_polygon_template (vrast_tmpl, "b", raster_txt, 2, 3, 1, 0);
+  p = add_polygon_template (vrast_tmpl, "b", raster_mat, 2, 3, 1, 0);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	vrast_tmpl->Vtex (0), vrast_tmpl->Vtex (1), 1, A, B, C);
@@ -550,14 +551,14 @@ void Blocks::add_hrast_template ()
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = add_polygon_template (hrast_tmpl, "f", raster_txt, 0, 1, 3, 2);
+  p = add_polygon_template (hrast_tmpl, "f", raster_mat, 0, 1, 3, 2);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	hrast_tmpl->Vtex (0), hrast_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
 #if 0
-  p = add_polygon_template (hrast_tmpl, "b", raster_txt, 2, 3, 1, 0);
+  p = add_polygon_template (hrast_tmpl, "b", raster_mat, 2, 3, 1, 0);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	hrast_tmpl->Vtex (0), hrast_tmpl->Vtex (1), 1, A, B, C);
@@ -575,7 +576,7 @@ void Blocks::add_pillar (int x, int y)
   pillar->SetName ("pillar");
   pillar->SetSector (room);
   pillar->flags.Set (CS_ENTITY_MOVEABLE, 0);
-  pillar->MergeTemplate (pillar_tmpl, pillar_txt, 1);
+  pillar->MergeTemplate (pillar_tmpl, pillar_mat, 1);
   room->AddThing (pillar);
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
@@ -590,7 +591,7 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   vrast->SetName ("vrast");
   vrast->SetSector (room);
   vrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
-  vrast->MergeTemplate (vrast_tmpl, raster_txt, 1);
+  vrast->MergeTemplate (vrast_tmpl, raster_mat, 1);
   room->AddThing (vrast);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -607,7 +608,7 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast->SetName ("hrast");
   hrast->SetSector (room);
   hrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
-  hrast->MergeTemplate (hrast_tmpl, raster_txt, 1);
+  hrast->MergeTemplate (hrast_tmpl, raster_mat, 1);
   room->AddThing (hrast);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -617,12 +618,12 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast->Transform ();
 }
 
-void Blocks::ChangeThingTexture (csThing* thing, csTextureHandle* txt)
+void Blocks::ChangeThingMaterial (csThing* thing, csMaterialHandle* mat)
 {
   for (int i = 0 ; i < thing->GetNumPolygons () ; i++)
   {
     csPolygon3D* p = thing->GetPolygon3D (i);
-    p->SetTexture (txt);
+    p->SetMaterial (mat);
   }
 }
 
@@ -644,34 +645,34 @@ void Blocks::add_cube_template ()
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = add_polygon_template (cube_tmpl, "d1", cube_txt, 3, 2, 1);
+  p = add_polygon_template (cube_tmpl, "d1", cube_mat, 3, 2, 1);
   p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "d2", cube_txt, 3, 1, 0);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = add_polygon_template (cube_tmpl, "b1", cube_txt, 0, 1, 5);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "b2", cube_txt, 0, 5, 4);
+  p = add_polygon_template (cube_tmpl, "d2", cube_mat, 3, 1, 0);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (cube_tmpl, "t1", cube_txt, 4, 5, 6);
+  p = add_polygon_template (cube_tmpl, "b1", cube_mat, 0, 1, 5);
   p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "t2", cube_txt, 4, 6, 7);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = add_polygon_template (cube_tmpl, "f1", cube_txt, 7, 6, 2);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "f2", cube_txt, 7, 2, 3);
+  p = add_polygon_template (cube_tmpl, "b2", cube_mat, 0, 5, 4);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (cube_tmpl, "l1", cube_txt, 4, 7, 3);
+  p = add_polygon_template (cube_tmpl, "t1", cube_mat, 4, 5, 6);
   p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "l2", cube_txt, 4, 3, 0);
+  p = add_polygon_template (cube_tmpl, "t2", cube_mat, 4, 6, 7);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = add_polygon_template (cube_tmpl, "r1", cube_txt, 6, 5, 1);
+  p = add_polygon_template (cube_tmpl, "f1", cube_mat, 7, 6, 2);
   p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_tmpl, "r2", cube_txt, 6, 1, 2);
+  p = add_polygon_template (cube_tmpl, "f2", cube_mat, 7, 2, 3);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+
+  p = add_polygon_template (cube_tmpl, "l1", cube_mat, 4, 7, 3);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_tmpl, "l2", cube_mat, 4, 3, 0);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+
+  p = add_polygon_template (cube_tmpl, "r1", cube_mat, 6, 5, 1);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_tmpl, "r2", cube_mat, 6, 1, 2);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   world->thing_templates.Push (cube_tmpl);
@@ -702,7 +703,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  cube->MergeTemplate (tmpl, cube_txt, 1, NULL, &shift, NULL);
+  cube->MergeTemplate (tmpl, cube_mat, 1, NULL, &shift, NULL);
 
   csPolygon3D* p;
   p = cube->GetPolygon3D ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);
@@ -1418,16 +1419,16 @@ void Blocks::rotate_shape_internal (const csMatrix3& rot)
   shift_rotate = new_shift_rot;
 }
 
-csTextureHandle* Blocks::GetTextureForHeight (int z)
+csMaterialHandle* Blocks::GetMaterialForHeight (int z)
 {
   switch (z % 4)
   {
-    case 0: return cubef1_txt;
-    case 1: return cubef2_txt;
-    case 2: return cubef3_txt;
-    case 3: return cubef4_txt;
+    case 0: return cubef1_mat;
+    case 1: return cubef2_mat;
+    case 2: return cubef3_mat;
+    case 3: return cubef4_mat;
   }
-  return cube_txt;
+  return cube_mat;
 }
 
 void Blocks::freeze_shape ()
@@ -1449,7 +1450,7 @@ void Blocks::freeze_shape ()
     // Before we let go of the shape (lose the pointer to it) we set it's
     // name according to it's position.
     cube_info[i].thing->SetName (cubename);
-    ChangeThingTexture (cube_info[i].thing, GetTextureForHeight (z));
+    ChangeThingMaterial (cube_info[i].thing, GetMaterialForHeight (z));
     if (screen != SCREEN_GAMEOVER && z >= GAMEOVER_HEIGHT)
     {
       screen = SCREEN_GAMEOVER;
@@ -1722,23 +1723,24 @@ void Blocks::InitTextures ()
 {
   if (world) world->Clear ();
 
-  Sys->set_pillar_texture (
-    csLoader::LoadTexture (Sys->world, "pillar", "stone4.png"));
-  Sys->set_cube_texture (
-    csLoader::LoadTexture (Sys->world, "cube", "cube.png"));
-  Sys->set_raster_texture (
-    csLoader::LoadTexture (Sys->world, "raster", "clouds_thick1.jpg"));
+  csLoader::LoadTexture (Sys->world, "pillar", "stone4.png");
+  Sys->set_pillar_material (Sys->world->GetMaterials ()->FindByName ("pillar"));
+
+  csLoader::LoadTexture (Sys->world, "cube", "cube.png");
+  Sys->set_cube_material (Sys->world->GetMaterials ()->FindByName ("cube"));
+  csLoader::LoadTexture (Sys->world, "raster", "clouds_thick1.jpg");
+  Sys->set_raster_material (Sys->world->GetMaterials ()->FindByName ("raster"));
   csLoader::LoadTexture (Sys->world, "room", "mystone2.png");
   csLoader::LoadTexture (Sys->world, "clouds", "clouds.jpg");
 
-  Sys->set_cube_f1_texture (
-    csLoader::LoadTexture (Sys->world, "cubef1", "cubef1.png"));
-  Sys->set_cube_f2_texture (
-    csLoader::LoadTexture (Sys->world, "cubef2", "cubef2.png"));
-  Sys->set_cube_f3_texture (
-    csLoader::LoadTexture (Sys->world, "cubef3", "cubef3.png"));
-  Sys->set_cube_f4_texture (
-    csLoader::LoadTexture (Sys->world, "cubef4", "cubef4.png"));
+  csLoader::LoadTexture (Sys->world, "cubef1", "cubef1.png");
+  Sys->set_cube_f1_material (Sys->world->GetMaterials ()->FindByName ("cubef1"));
+  csLoader::LoadTexture (Sys->world, "cubef2", "cubef2.png");
+  Sys->set_cube_f2_material (Sys->world->GetMaterials ()->FindByName ("cubef2"));
+  csLoader::LoadTexture (Sys->world, "cubef3", "cubef3.png");
+  Sys->set_cube_f3_material (Sys->world->GetMaterials ()->FindByName ("cubef3"));
+  csLoader::LoadTexture (Sys->world, "cubef4", "cubef4.png");
+  Sys->set_cube_f4_material (Sys->world->GetMaterials ()->FindByName ("cubef4"));
 
   csLoader::LoadTexture (Sys->world, "menu_novice", "novice.png");
   csLoader::LoadTexture (Sys->world, "menu_back", "back.png");
@@ -1828,9 +1830,9 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
   }
 }
 
-void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
+void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 {
-  csTextureHandle* tm_front = world->GetTextures ()->FindByName (txt);
+  csMaterialHandle* tm_front = world->GetMaterials ()->FindByName (mat);
   csThing* thing = new csThing (world);
 
   thing->AddVertex (-1, .25, 0);
@@ -1861,7 +1863,7 @@ void Blocks::CreateMenuEntry (const char* txt, int menu_nr)
 
 csThing* Blocks::CreateMenuArrow (bool left)
 {
-  csTextureHandle* tm_front = world->GetTextures ()->FindByName ("menu_back");
+  csMaterialHandle* tm_front = world->GetMaterials ()->FindByName ("menu_back");
   csThing* thing = new csThing (world);
 
   float pointx;
@@ -1975,7 +1977,7 @@ void Blocks::StartKeyConfig ()
 
 void Blocks::InitGameRoom ()
 {
-  csTextureHandle* tm = world->GetTextures ()->FindByName ("room");
+  csMaterialHandle* tm = world->GetMaterials ()->FindByName ("room");
   room = Sys->world->NewSector ();
   room->SetName ("room");
   Sys->set_cube_room (room);
@@ -2050,7 +2052,7 @@ void Blocks::InitGameRoom ()
 
 void Blocks::InitDemoRoom ()
 {
-  csTextureHandle* demo_tm = world->GetTextures ()->FindByName ("clouds");
+  csMaterialHandle* demo_tm = world->GetMaterials ()->FindByName ("clouds");
   demo_room = Sys->world->NewSector ();
   demo_room->SetName ("room");
 
@@ -2253,7 +2255,7 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
 	  {
             sprintf (temp, "cubeAt%d%d%d", x, y, z-1);
 	    t->SetName (temp);
-	    ChangeThingTexture (t, GetTextureForHeight (z-1));
+	    ChangeThingMaterial (t, GetMaterialForHeight (z-1));
 	  }
 	}
 

@@ -38,7 +38,7 @@
 class csSector;
 class StatLight;
 class CLights;
-class csTextureHandle;
+class csMaterialHandle;
 class csPolyPlane;
 class csPolyTxtPlane;
 class csPolygon2D;
@@ -187,8 +187,8 @@ private:
   virtual ~csLightMapped ();
 
 public:
-  /// Setup for the given polygon and texture.
-  void Setup (csPolygon3D* poly3d, csTextureHandle* texh);
+  /// Setup for the given polygon and material.
+  void Setup (csPolygon3D* poly3d, csMaterialHandle* math);
 
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
@@ -423,7 +423,7 @@ private:
    * reference (contains the handle as returned
    * by iTextureManager interface). And more.
    */
-  csMaterial* material;
+  csMaterialHandle* material;
 
   /**
    * General lighting information for this polygon.
@@ -501,15 +501,7 @@ public:
   /**
    * Construct a new polygon with the given material. 
    */
-  csPolygon3D (csMaterial *mat);
-
-  /**
-   * Construct a new polygon with the given texture.
-   * This will create a new material specifically for this polygon.
-   * If the texture is NULL the polygon is untextured (or you can
-   * set the texture later using the SetTexture method).
-   */
-  csPolygon3D (csTextureHandle* texture);
+  csPolygon3D (csMaterialHandle *mat);
 
   /**
    * Construct a new polygon and copy from the given polygon.
@@ -741,28 +733,18 @@ public:
   void CamUpdate () { poly_set->CamUpdate (); }
 
   /**
-   * Set the texture for this polygon.
-   * This texture handle will only be used as soon as 'Finish()'
-   * is called. So you can safely wait preparing the textures
+   * Set the material for this polygon.
+   * This material handle will only be used as soon as 'Finish()'
+   * is called. So you can safely wait preparing the materials
    * until finally csWorld::Prepare() is called (which in the end
    * calls Finish() for every polygon).
    */
-  void SetTexture (csTextureHandle* texture);
+  void SetMaterial (csMaterialHandle* material);
 
   /**
-   * Get the texture.
+   * Get the material.
    */
-  csTextureHandle* GetCsTextureHandle () {return material->GetTextureHandle();}
-
-  /**
-   * Set the material
-   */
-  void SetMaterial (csMaterial *mat);
-
-  /**
-   * Get the material
-   */
-  inline csMaterial* GetMaterial () const { return material; }
+  csMaterialHandle* GetCsMaterialHandle () { return material; }
 
   /**
    * Return true if this polygon or the texture it uses is transparent.
@@ -1162,8 +1144,8 @@ public:
   virtual void SetAlpha (int iAlpha)
   { if (GetLightMapInfo ()) GetLightMapInfo ()->SetAlpha (iAlpha); }
 
-  /// Get the texture handle for the texture manager.
-  virtual iTextureHandle *GetTextureHandle ();
+  /// Get the material handle for the texture manager.
+  virtual iMaterialHandle *GetMaterialHandle ();
   /// Get the handle to the polygon texture object
   virtual iPolygonTexture *GetTexture ()
   {
@@ -1210,9 +1192,9 @@ public:
     /// Get the handle to the polygon texture object
     virtual iPolygonTexture *GetTexture ()
     { return scfParent->GetTexture(); }
-    /// Get the texture handle for the texture manager.
-    virtual iTextureHandle *GetTextureHandle ()
-    { return scfParent->GetTextureHandle (); }
+    /// Get the material handle for the texture manager.
+    virtual iMaterialHandle *GetMaterialHandle ()
+    { return scfParent->GetMaterialHandle (); }
 
     /// Query number of vertices in this polygon
     virtual int GetVertexCount ()

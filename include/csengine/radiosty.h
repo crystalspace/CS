@@ -141,8 +141,8 @@ protected:
 
 protected:
 
-  /// return the texture handle
-  virtual csTextureHandle* GetTextureHandle() = 0;
+  /// return the material handle
+  virtual csMaterialHandle* GetMaterialHandle() = 0;
   
   /// return the flat color value
   virtual csColor GetFlatColor() const = 0;
@@ -293,9 +293,9 @@ private:
   csVector3 lumel_origin, lumel_x_axis, lumel_y_axis;
 
 protected:
-  /// return the texture handle for this polygon
-  virtual csTextureHandle* GetTextureHandle()
-  { return polygon->GetCsTextureHandle(); }
+  /// return the material handle for this polygon
+  virtual csMaterialHandle* GetMaterialHandle()
+  { return polygon->GetCsMaterialHandle(); }
 
   /// return the flat color for the polygons texture
   virtual csColor GetFlatColor() const 
@@ -341,7 +341,7 @@ private:
 
 protected:
   /// return the texture handle for this curve
-  virtual csTextureHandle* GetTextureHandle()
+  virtual csMaterialHandle* GetMaterialHandle()
   { return curve->cstxt; }
 
   /// return the flat color for the polygons texture

@@ -69,10 +69,10 @@ csLightMapped::~csLightMapped ()
   if (txt_plane) txt_plane->DecRef ();
 }
 
-void csLightMapped::Setup (csPolygon3D* poly3d, csTextureHandle* texh)
+void csLightMapped::Setup (csPolygon3D* poly3d, csMaterialHandle* mat)
 {
   tex->SetPolygon (poly3d);
-  tex->SetTextureHandle (texh->GetTextureHandle ());
+  tex->SetMaterialHandle (mat->GetMaterialHandle ());
   tex->CreateBoundingTextureBox ();
 }
 
@@ -218,51 +218,13 @@ IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
   IMPLEMENTS_INTERFACE (iPolygon3D)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csPolygon3D::csPolygon3D (csMaterial* mat) : csPolygonInt (),
+csPolygon3D::csPolygon3D (csMaterialHandle* material) : csPolygonInt (),
   csObject (), vertices (4)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
 
-  material = mat;
-
-  txt_info = NULL;
-  txt_share_list = NULL;
-
-  plane = NULL;
-
-  portal = NULL;
-
-  sector = NULL;
-  orig_poly = NULL;
-  txt_share_list = NULL;
-
-  flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET);
-
-  light_info.cosinus_factor = -1;
-  light_info.lightpatches = NULL;
-  light_info.dyn_dirty = true;
-  light_info.flat_color.red = 0;
-  light_info.flat_color.green = 0;
-  light_info.flat_color.blue = 0;
-
-  SetTextureType (POLYTXT_LIGHTMAP);
-
-  VectorArray.IncRef ();
-#ifdef DO_HW_UVZ
-  uvz = NULL;
-  isClipped=false;
-#endif
-}
-
-csPolygon3D::csPolygon3D (csTextureHandle* texture) : csPolygonInt (),
-  csObject (), vertices (4)
-{
-  CONSTRUCT_IBASE (NULL);
-  CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
-
-  material = new csMaterial();
-  if (texture) SetTexture (texture);
+  if (material) SetMaterial (material);
 
   txt_info = NULL;
   txt_share_list = NULL;
@@ -500,15 +462,14 @@ bool csPolygon3D::Overlaps (csPolygonInt* overlapped)
   return false;
 }
 
-void csPolygon3D::SetTexture (csTextureHandle* texture)
+void csPolygon3D::SetMaterial (csMaterialHandle* material)
 {
-  material->SetTextureHandle(texture);
+  csPolygon3D::material = material;
 }
 
-iTextureHandle* csPolygon3D::GetTextureHandle ()
+iMaterialHandle* csPolygon3D::GetMaterialHandle ()
 {
-  return material->GetTextureHandle() ? 
-    material->GetTextureHandle()->GetTextureHandle () : (iTextureHandle*)NULL;
+  return material->GetMaterialHandle ();
 }
 
 void csPolygon3D::eiPolygon3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
@@ -527,9 +488,10 @@ bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
 
 bool csPolygon3D::IsTransparent ()
 {
+  iTextureHandle* txt_handle = GetMaterialHandle ()->GetTexture ();
   return (GetAlpha ()
-       || GetTextureHandle ()->GetAlphaMap ()
-       || GetTextureHandle ()->GetKeyColor ());
+       || txt_handle->GetAlphaMap ()
+       || txt_handle->GetKeyColor ());
 }
 
 int csPolygon3D::Classify (const csPlane3& pl)
@@ -642,10 +604,10 @@ void csPolygon3D::Finish ()
     CsPrintf (MSG_INTERNAL_ERROR, "No txt_info in polygon!\n");
     fatal_exit (0, false);
   }
-  lmi->Setup (this, material->GetTextureHandle());
+  lmi->Setup (this, material);
   lmi->tex->SetLightMap (NULL);
   if (portal)
-    portal->SetTexture (material->GetTextureHandle()->GetTextureHandle ());
+    portal->SetTexture (material->GetMaterialHandle ()->GetTexture ());
 
   if (flags.Check (CS_POLY_LIGHTING)
   	&& csLightMap::CalcLightMapWidth (lmi->tex->w_orig) <= 256
@@ -1850,7 +1812,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
     csPortal mirror;
     mirror.SetSector (GetSector ());
     UByte r, g, b;
-    GetTextureHandle ()->GetMeanColor (r, g, b);
+    material->GetMaterialHandle ()->GetTexture ()->GetMeanColor (r, g, b);
     mirror.SetFilter (r/1000., g/1000., b/1000.);
     mirror.SetWarp (csTransform::GetReflect (*GetPolyPlane ()));
     mirror.CheckFrustum (new_lview, 10);

@@ -274,22 +274,22 @@ csSpriteAction* csSpriteTemplate::AddAction ()
   return a;
 }
 
-void csSpriteTemplate::SetTexture (csTextureList* textures, const char *texname)
+void csSpriteTemplate::SetMaterial (csMaterialList* materials, const char *matname)
 {
-  if (!textures)
+  if (!materials)
   {
-    CsPrintf (MSG_FATAL_ERROR, "There are no textures defined in this world file!\n");
+    CsPrintf (MSG_FATAL_ERROR, "There are no materials defined in this world file!\n");
     fatal_exit (0, true);
     return;
   }
-  csTextureHandle* texture = textures->FindByName (texname);
-  if (texture == NULL)
+  csMaterialHandle* material = materials->FindByName (matname);
+  if (material == NULL)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n", texname);
+    CsPrintf (MSG_FATAL_ERROR, "Couldn't find material named '%s'!\n", matname);
     fatal_exit (0, true);
     return;
   }
-  cstxt = texture;
+  cstxt = material;
 }
 
 void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
@@ -629,16 +629,16 @@ void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
   EnableTweening (tmpl->IsTweeningEnabled ());
 }
 
-void csSprite3D::SetTexture (const char* name, csTextureList* textures)
+void csSprite3D::SetMaterial (const char* name, csMaterialList* materials)
 {
   force_otherskin = true;
-  csTextureHandle* texture = textures->FindByName (name);
-  if (texture == NULL)
+  csMaterialHandle* material = materials->FindByName (name);
+  if (material == NULL)
   {
-    CsPrintf (MSG_FATAL_ERROR, "Couldn't find texture named '%s'!\n", name);
+    CsPrintf (MSG_FATAL_ERROR, "Couldn't find material named '%s'!\n", name);
     exit (0);
   }
-  cstxt = texture;
+  cstxt = material;
 }
 
 
@@ -1058,9 +1058,9 @@ void csSprite3D::Draw (csRenderView& rview)
   // Setup the structure for DrawTriangleMesh.
   G3DTriangleMesh mesh;
   if (force_otherskin)
-    mesh.txt_handle[0] = cstxt->GetTextureHandle ();
+    mesh.mat_handle[0] = cstxt->GetMaterialHandle ();
   else
-    mesh.txt_handle[0] = tpl->cstxt->GetTextureHandle ();
+    mesh.mat_handle[0] = tpl->cstxt->GetMaterialHandle ();
   mesh.num_vertices = num_verts;
   mesh.vertices[0] = verts;
   mesh.texels[0][0] = real_uv_verts;
@@ -1078,7 +1078,7 @@ void csSprite3D::Draw (csRenderView& rview)
     mesh.morph_factor = 0;
     mesh.num_vertices_pool = 1;
   }
-  mesh.num_textures = 1;
+  mesh.num_materials = 1;
 
   mesh.num_triangles = m->GetNumTriangles ();
   mesh.triangles = m->GetTriangles ();

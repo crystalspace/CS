@@ -174,9 +174,9 @@ void csSprite2D::Draw (csRenderView& rview)
 
   static G3DPolygonDPFX g3dpolyfx;
   g3dpolyfx.num = vertices.Length ();
-  g3dpolyfx.txt_handle = cstxt->GetTextureHandle ();
+  g3dpolyfx.mat_handle = cstxt->GetMaterialHandle ();
   g3dpolyfx.inv_aspect = rview.GetInvFOV ();
-  g3dpolyfx.txt_handle->GetMeanColor (g3dpolyfx.flat_color_r,
+  g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,
     g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
 
   ALLOC_STACK_ARRAY (poly2d, csVector2, vertices.Length ());
@@ -213,7 +213,7 @@ void csSprite2D::Draw (csRenderView& rview)
 
   extern void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly);
   CalculateFogPolygon (&rview, g3dpolyfx);
-  rview.g3d->StartPolygonFX (g3dpolyfx.txt_handle,
+  rview.g3d->StartPolygonFX (g3dpolyfx.mat_handle,
     	MixMode | CS_FX_GOURAUD);
   rview.g3d->DrawPolygonFX (g3dpolyfx);
   rview.g3d->FinishPolygonFX ();

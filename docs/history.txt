@@ -1,6 +1,40 @@
 The history order has been reversed so that new features are at the top.
 
+4-Aug-2000
+	- Alex Pfaffe fixed various things in the landscape engine
+	  again. Now it is mostly working again except for a few small
+	  strange bugs.
+	- Continued work on the API for materials. Started replacing
+	  all communication between csengine and g3d with iMaterialHandle
+	  instead of iTextureHandle. This means that txt_handle in
+	  G3DPolygonFX has been replaced with mat_handle for example.
+	- Replaced SetTexture and SetTextureHandle everywhere with
+	  SetMaterial and SetMaterialHandle. This is a huge change which
+	  will no doubt break ALL apps using CS and textures.
+	  Also replaced most iTextureHandle variables with iMaterialHandle
+	  and most csTextureHandle's with csMaterialHandle.
+	- Fixed the software renderer to use the new material API.
+	- Fixed the OpenGL renderer to use the new material API.
+	  (temporarily broke DrawPolygonMesh for procedural textures in
+	  software mode. Will fix this later).
+	- Fixed WalkTest to work with new materials.
+	- Fixed Blocks to work with new materials.
 3-Aug-2000
+	- Norman Kramer added clipping code to openglcommon canvas code,
+	  especially to font drawing.
+	- Norman also added missing GetFlags() method for glide renderer.
+	- Thomas Hieber made ndrvdemo compileable again on MSVC.
+	- Thomas also fixed prototype of ResetCollisionPairs() in
+	  iCollideSystem.
+	- Thomas worked a bit on creating a new CD system in csgame.
+	  csgame is currently broken though.
+	- Thomas split csVector in csBasicVector and csVector to have au
+	  more lightweight baseclass, that can be used, where csVector
+	  is to big. (memory footprint)
+	  To make it smaller, csBasicVector has no virtual methods and
+	  defaults to create an empty array. (csBasicVector will be used
+	  in the new csgame CD system in very large numbers - up to
+	  100000 instaces will not be impossible!)
 	- Samuel Humphreys did the following:
 	    - Rearranged perftest for 2d testing aswell. Added tests for
 	      pixmaps, lines, pixels and text.

@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "igraph3d.h"
 #include "itexture.h"
+#include "imater.h"
 #include "qint.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
@@ -303,7 +304,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   memset (&poly, 0, sizeof(poly));
 
   // Fill flat color if renderer decide to paint it flat-shaded
-  mesh.txt_handle[0]->GetMeanColor (poly.flat_color_r,
+  iTextureHandle* txt_handle = mesh.mat_handle[0]->GetTexture ();
+  txt_handle->GetMeanColor (poly.flat_color_r,
     poly.flat_color_g, poly.flat_color_b);
 
   poly.use_fog = mesh.do_fog;
@@ -314,7 +316,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
   UByte clip_result;
 
-  g3d->StartPolygonFX (mesh.txt_handle[0], mesh.fxmode);
+  g3d->StartPolygonFX (mesh.mat_handle[0], mesh.fxmode);
 
   // Draw all triangles.
   csTriangle* triangles = mesh.triangles;

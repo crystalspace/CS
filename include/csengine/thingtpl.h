@@ -27,7 +27,7 @@
 #include "igraph3d.h"
 
 class csPolygonTemplate;
-class csTextureHandle;
+class csMaterialHandle;
 class csCurveTemplate;
 
 /**
@@ -157,8 +157,8 @@ private:
    * 0 = default from polygon, 1 = yes, -1 = no
    */
   int colldet;
-  /// The texture used for this polygon.
-  csTextureHandle* texture;
+  /// The material used for this polygon.
+  csMaterialHandle* material;
   /// The transformation from object space to texture space.
   csMatrix3 m_obj2tex;
   /// The transformation from object space to texture space.
@@ -180,7 +180,7 @@ private:
 
 public:
   ///
-  csPolygonTemplate (csThingTemplate* iParent, char* iName, csTextureHandle* iTexture = NULL);
+  csPolygonTemplate (csThingTemplate* iParent, char* iName, csMaterialHandle* iMaterial = NULL);
   ///
   virtual ~csPolygonTemplate ();
 
@@ -246,13 +246,13 @@ public:
   void PlaneNormal (float* A, float* B, float* C);
 
   ///
-  void SetTexture (csTextureHandle* texture) { csPolygonTemplate::texture = texture; }
+  void SetMaterial (csMaterialHandle* material) { csPolygonTemplate::material = material; }
   /// Set the transformation from object to texture space.
   void SetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
   /// Transform the texture tranformation using the given matrix/vector.
   void Transform (csMatrix3& m, csVector3& v);
   ///
-  csTextureHandle* GetTexture () { return texture; }
+  csMaterialHandle* GetMaterial () { return material; }
   ///
   csMatrix3& GetTextureMatrix () { return m_obj2tex; }
   ///

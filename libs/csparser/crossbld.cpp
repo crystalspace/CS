@@ -24,6 +24,7 @@
 #include "cssysdef.h"
 #include "csparser/crossbld.h"
 #include "csengine/world.h"
+#include "csengine/texture.h"
 #include "csgfxldr/csimage.h"
 #include "cssys/system.h"
 #include "csutil/scfstrv.h"

@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 
-struct iTextureHandle;
+struct iMaterialHandle;
 struct iPolygonSet;
 struct iPolygon3D;
 struct iPolygonTexture;
@@ -71,8 +71,8 @@ struct iPolygon3D : public iBase
   virtual iLightMap *GetLightMap () = 0;
   /// Get the handle to the polygon texture object
   virtual iPolygonTexture *GetTexture () = 0;
-  /// Get the texture handle for the texture manager.
-  virtual iTextureHandle *GetTextureHandle () = 0;
+  /// Get the material handle for the texture manager.
+  virtual iMaterialHandle *GetMaterialHandle () = 0;
 
   /// Query number of vertices in this polygon
   virtual int GetVertexCount () = 0;
@@ -126,8 +126,8 @@ SCF_VERSION (iPolygonTexture, 1, 0, 0);
  */
 struct iPolygonTexture : public iBase
 {
-  /// Get the texture handle associated with this polygon
-  virtual iTextureHandle *GetTextureHandle () = 0;
+  /// Get the material handle associated with this polygon
+  virtual iMaterialHandle *GetMaterialHandle () = 0;
   /// Get FDU :-)
   virtual float GetFDU () = 0;
   /// Get FDV :-)

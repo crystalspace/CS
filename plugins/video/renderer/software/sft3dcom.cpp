@@ -1034,7 +1034,8 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   }
 
   UByte mean_r, mean_g, mean_b;
-  poly.txt_handle->GetMeanColor (mean_r, mean_g, mean_b);
+  iTextureHandle* txt_handle = poly.mat_handle->GetTexture ();
+  txt_handle->GetMeanColor (mean_r, mean_g, mean_b);
 
   if (lm)
   {
@@ -1063,8 +1064,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   Scan.M = M;
 
   // Select the right scanline drawing function.
-  if (do_alpha
-   && (poly.alpha || (poly.txt_handle && poly.txt_handle->GetKeyColor ())))
+  if (do_alpha && (poly.alpha || txt_handle->GetKeyColor ()))
     return;
   int scan_index = SCANPROC_FLAT_ZFIL;
   if (z_buf_mode == CS_ZBUF_USE)
@@ -1334,7 +1334,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 
   iPolygonTexture *tex = poly.poly_texture;
   csTextureMMSoftware *tex_mm =
-    (csTextureMMSoftware *)poly.txt_handle->GetPrivateObject ();
+    (csTextureMMSoftware *)poly.mat_handle->GetTexture ()->GetPrivateObject ();
 
   float fdu, fdv;
   if (tex)
@@ -2098,7 +2098,7 @@ static struct
 
 #define EPS   0.0001
 
-void csGraphics3DSoftwareCommon::StartPolygonFX (iTextureHandle* handle,
+void csGraphics3DSoftwareCommon::StartPolygonFX (iMaterialHandle* handle,
   UInt mode)
 {
   if (!do_gouraud || !do_lighting)
@@ -2106,7 +2106,9 @@ void csGraphics3DSoftwareCommon::StartPolygonFX (iTextureHandle* handle,
 
   if (handle)
   {
-    csTextureMMSoftware *tex_mm = (csTextureMMSoftware*)handle->GetPrivateObject ();
+    csMaterialMM* mat = (csMaterialMM*)handle;
+    iTextureHandle* txt_handle = mat->GetTexture ();
+    csTextureMMSoftware *tex_mm = (csTextureMMSoftware*)txt_handle->GetPrivateObject ();
     csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (0);
     pqinfo.bm = txt_unl->get_bitmap ();
     pqinfo.tw = txt_unl->get_width ();

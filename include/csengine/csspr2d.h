@@ -30,7 +30,7 @@
 #include "csengine/cssprite.h"
 #include "igraph3d.h"
 
-class csTextureHandle;
+class csMaterialHandle;
 class csPolyTreeObject;
 
 struct csSprite2DVertex
@@ -59,8 +59,8 @@ private:
    */
   csColoredVertices vertices;
 
-  /// The texture handle as returned by iTextureManager.
-  csTextureHandle* cstxt;
+  /// The material handle as returned by iTextureManager.
+  csMaterialHandle* cstxt;
 
   /**
    * If false then we don't do lighting but instead use
@@ -80,8 +80,8 @@ public:
   ///
   virtual ~csSprite2D ();
 
-  /// Set a new texture.
-  void SetTexture (csTextureHandle* txt) { cstxt = txt; }
+  /// Set a new material.
+  void SetMaterial (csMaterialHandle* mat) { cstxt = mat; }
 
   /// Get the vertex array.
   csColoredVertices& GetVertices () { return vertices; }
