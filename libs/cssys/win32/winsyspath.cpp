@@ -57,8 +57,3 @@ char* csGetAppDir (const char* argv0)
   delete[] apppath;
   return appdir;
 }
-
-char* csGetResourcePath (const char* argv0)
-{
-  return csGetAppDir(argv0);
-}
