@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "csutil/ref.h"
+#include "csutil/csstring.h"
 #include "iutil/strvec.h"
 struct iObjectRegistry;
 
@@ -44,7 +45,7 @@ struct iObjectRegistry;
  * able to run.  If there was a problem starting the run-loop, then `false' is
  * returned, otherwise `true' is returned.
  */
-extern bool csDefaultRunLoop(iObjectRegistry*);
+bool csDefaultRunLoop(iObjectRegistry*);
 
 /**
  * Platform-specific startup.<p>
@@ -57,7 +58,7 @@ extern bool csDefaultRunLoop(iObjectRegistry*);
  * yourself.  Returns `true' if startup initialization was successful,
  * otherwise `false'.
  */
-extern bool csPlatformStartup(iObjectRegistry*);
+bool csPlatformStartup(iObjectRegistry*);
 
 /**
  * Platform-specific shutdown.<p>
@@ -67,15 +68,15 @@ extern bool csPlatformStartup(iObjectRegistry*);
  * performing application shutdown manually, you should call it yourself.
  * Returns `true' if shutdown processing was successful, otherwise `false'.
  */
-extern bool csPlatformShutdown(iObjectRegistry*);
+bool csPlatformShutdown(iObjectRegistry*);
 
 /// CS version of printf
-extern int csPrintf (const char* str, ...) CS_GNUC_PRINTF (1, 2);
+int csPrintf (const char* str, ...) CS_GNUC_PRINTF (1, 2);
 /// CS version of vprintf
-extern int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
+int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 
 /// Get the current tick count.
-extern csTicks csGetTicks ();
+csTicks csGetTicks ();
 
 /**
  * Get the installation path.<p>
@@ -84,7 +85,7 @@ extern csTicks csGetTicks ();
  * through VFS which is installation directory - independent; but
  * some initialization tasks still need this.
  */
-extern bool csGetInstallPath (char *oInstallPath, size_t iBufferSize);
+bool csGetInstallPath (char *oInstallPath, size_t iBufferSize);
 
 /**
  * This function will freeze your application for given number of 1/1000
@@ -92,13 +93,20 @@ extern bool csGetInstallPath (char *oInstallPath, size_t iBufferSize);
  * timing. It may be useful when the application is idle, to explicitly
  * release CPU for other tasks in multi-tasking operating systems.
  */
-extern void csSleep (int /*SleepTime*/);
+void csSleep (int /*SleepTime*/);
 
 /**
  * Get the list of root directories.<p>
  * For instance in Unix it simply returns '/' but for Windows it may return a
  * list of available drive letters.
  */
-extern csRef<iStrVector> csFindSystemRoots();
+csRef<iStrVector> csFindSystemRoots();
+
+/**
+ * Get the username of the account running the program.<p>
+ * Returns the username of the owner of the process running the program.
+ * If the username can not be determined, then an empty string is returned.
+ */
+csString csGetUsername();
 
 #endif // __CS_SYSFUNC_H__

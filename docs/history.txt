@@ -15,6 +15,10 @@ The history order is reversed so that new features are at the top.
 	    - Added libs/cssys/next/shared/NeXTInstallPath.h.
 	    - Cleaned up the code comprising the Apple/NeXT csGetInstallPath()
 	      and NeXTInstallPath().
+	- Eric Sunshine added new csGetUsername() to cssys/sysfunc.h which
+	  returns the name of the user running the application.  Added
+	  implementations of csGetUsername() for Unix, Windows, MacOS/X,
+	  MacOS/X Server (Rhapsody), OpenStep, and NextStep.
 3-Oct-2002
 	- Finalized the implementation of the indexed operations in the engine
 	  sequence manager.
