@@ -1,0 +1,131 @@
+modelling.txt 9/22/1999 Gary Haussmann
+
+Table of Contents
+
+1. Introduction
+
+2. MODEL CONVERSION
+2.1 MDL2SPR, MD22SPR
+2.2 MAP2CS
+
+3. MODEL RUN TIME IMPORTING
+3.1 Importing Quake MDL or MD2 files
+3.2 Importing 3D Studio 3DS files
+3.3 Importing Half-life MDL files
+
+
+1. INTRODUCTION
+
+While MaZeD can be used to create native Crystal Space models, many people
+prefer to create models using their own favorite creation tools and then
+somehow import them into Crystal Space.  This document attempts to spell
+out the differents methods and pitfalls of incorporating your model into
+Crystal Space.
+
+External 3D models can be used in Crystal Space in two ways:
+
+- Convert the models to a Crystal Space native object, either a
+  csThing (generally used for detailing immobile objects, such as
+  statues) or a csSpriteTemplate (used for highly mobile and dynamic
+  objects, such as humans and missiles)
+
+- Record the model in its native format and use the Crystal Space import
+  library (in csutil) to load and convert the model at run time.  The model
+  is read in and converted to native Crystal Space format in memory, but
+  remains stored on disk in its original format
+
+The following chapters discuss these two methods, conversion and importing.
+
+2. MODEL CONVERSION
+
+2.1 MDL2SPR, MD22SPR
+
+2.2 MAP2CS
+
+3. MODEL RUN TIME IMPORTING
+
+Most run time importing is done through a combination of the 'converter'
+class and some other code.  The converter class will read in geometry
+data from numerous formats, and only the geometry portion.  Any format
+specific data (such as keyframes in 3DS files or textures in MDL files)
+are uncerimoniously thrown away, so you will have to write some support
+code to get that info.  Typically, any data geometry that the converter
+throws away is not too useful in Crystal Space structures anyway, but
+many times this data can be used for other purposes in your engine.
+
+
+3.1 Importing Quake MDL or MD2 files
+
+The converter will read in both MDL and MD2 geometry data, which can be
+converted into either a csThing or csSpriteTemplate.  If converted to
+a csThing, the first frame of animation is used for the thing's geometry,
+since things cannot animate.
+
+Typical code usage, assuming geometry data in 'tris.md2', and
+the skin in a texture named 'myskin':
+========================================================
+// imports and converts the md2 file to neutral format
+converter filedata;
+filedata.ivcon('tris.md2');
+
+//  converts from neutral format to Crystal Space format
+csCrossBuild_SpriteTemplateFactory builder;
+
+csSpriteTemplate *result = build.CrossBuild(filedata);
+result->SetTexture(Sys-view->GetWorld()->GetTextures, 'myskin');
+========================================================
+
+The last line set the skin texture.  Note that skin textures are not
+read in by either the converter or the builder.  You are responsible
+for reading in the skins and telling the csSpriteTemplate about them.
+
+Next you must set the sprite actions.  You need to construct actions
+such as 'walk', 'run' or whatever using csSpriteTemplate::AddAction(actioname).
+Then you will add frames to each action using 
+csSpriteAction::AddFrame(frame,delay).  Typically modellers will follow
+the standard Quake format and name their frames with an action and frame
+number, like 'stand000', 'stand001', etc.  In this case you can use the
+following code to build an action by concatinating frames with the 
+same prefix.  The following code uses this method to add an action named 
+by "prefixstring" to the sprite template "frameholder":
+========================================================
+									
+csSpriteAction *newaction = frameholder.AddAction();
+newaction->SetName(prefixstring);
+		    
+// check all the frame names, do any match?
+for (int frameindex=0; frameindex < frameholder.GetNumFrames(); frameindex++)
+{
+  csFrame *curframe = frameholder.GetFrame(frameindex);
+  char *framename = curframe->GetName();
+  if ( strncmp( prefixstring,framename,strlen(prefixstring) ) == 0 )
+  {
+    newaction->AddFrame(curframe,delay);
+  }
+}
+
+==========================================================
+
+If you are using a Quake 2 model with the standard actions and frame
+names, you can use this code to set up all the standard actions, assuming
+the previous code is in a function called 
+"Make_NamedAction":
+==========================================================
+char *actionnames[] = {
+  "stand", "run", "attack", "pain1", "pain2",
+  "pain3", "jump", "flip",  "salute", "taunt",
+  "wave", "point", "crstand", "crwalk", "crattack",
+  "crpain", "crdeath", "death1", "death2", "death3", NULL };
+
+for (char **actionname=actionnames; *actionname != NULL; actionname++)
+{
+  Make_NamedAction(frameholder,*actionname,delay);
+}
+==========================================================
+
+
+
+3.2 Importing 3D Studio 3DS files
+
+3.3 Importing Half-life MDL files
+
