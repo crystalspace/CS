@@ -48,6 +48,10 @@ chronological order.
 	- Eric Sunshine attempted to work around compile failure of glwin32 on
 	  some Cygwin installations where it complained about missing
 	  SetupWGLextStr(), and `extstrWGL'.
+	- Eric Sunshine attempted to work around problem reported by Martin
+	  Henne <martin.henne@web.de> where Flex on Debian 'sid' does not seem
+	  to emit a #define for YY_PROTO().  This macro is used by the YY_DECL
+	  macro in aws/skinlex.ll.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied

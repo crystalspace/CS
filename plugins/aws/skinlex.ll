@@ -19,7 +19,11 @@
 
 #include "skinpars.hpp"
 
+#ifdef YY_PROTO
 #define YY_DECL int yylex YY_PROTO(( YYSTYPE *awslval ))
+#else
+#define YY_DECL int yylex ( YYSTYPE *awslval )
+#endif
 
 /* change input to read from vfs */
 #define YY_INPUT(buf, result, max_size)			\
