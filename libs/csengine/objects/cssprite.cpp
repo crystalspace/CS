@@ -144,10 +144,15 @@ csActionVector::~csActionVector ()
 
 IMPLEMENT_IBASE (csSpriteTemplate)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSpriteTemplate)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DFactoryState)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE (csSpriteTemplate::SpriteTemplate)
   IMPLEMENTS_INTERFACE (iSpriteTemplate)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csSpriteTemplate::Sprite3DFactoryState)
+  IMPLEMENTS_INTERFACE (iSprite3DFactoryState)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_CSOBJTYPE (csSpriteTemplate, csPObject)
@@ -157,6 +162,7 @@ csSpriteTemplate::csSpriteTemplate ()
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSpriteTemplate);
+  CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
   cstxt = NULL;
   emerge_from = NULL;
   skeleton = NULL;
@@ -323,7 +329,7 @@ csFrame* csSpriteTemplate::AddFrame ()
   return fr;
 }
 
-csFrame* csSpriteTemplate::FindFrame (char *n)
+csFrame* csSpriteTemplate::FindFrame (const char *n)
 {
   for (int i = GetNumFrames () - 1; i >= 0; i--)
     if (strcmp (GetFrame (i)->GetName (), n) == 0)
@@ -529,6 +535,17 @@ void csSpriteTemplate::HardTransform (const csReversibleTransform& t)
     for (j = 0 ; j < num ; j++)
       verts[j] = t.This2Other (verts[j]);
   }
+}
+
+void csSpriteTemplate::Sprite3DFactoryState::EnableSkeletalAnimation ()
+{
+  csSkeleton* skel = new csSkeleton ();
+  scfParent->SetSkeleton (skel);
+}
+
+iSkeleton* csSpriteTemplate::Sprite3DFactoryState::GetSkeleton ()
+{
+  return QUERY_INTERFACE_SAFE (scfParent->GetSkeleton (), iSkeleton);
 }
 
 //=============================================================================

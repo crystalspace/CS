@@ -152,6 +152,10 @@ public:
   struct MaterialWrapper : public iMaterialWrapper
   {
     DECLARE_EMBEDDED_IBASE (csMaterialWrapper);
+    virtual csMaterialWrapper* GetPrivateObject ()
+    {
+      return (csMaterialWrapper*)scfParent;
+    }
     virtual iMaterialHandle* GetMaterialHandle ()
     {
       return scfParent->GetMaterialHandle ();

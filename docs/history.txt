@@ -1,6 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
 31-Jan-2001
+	- Added GetPrivateObject() to iMaterialWrapper.
+	- Added QUERY_INTERFACE_SAFE() which will first test if the given
+	  object is NULL. In that case it will return NULL. Otherwise
+	  equivalent to QUERY_INTERFACE().
+	- Let csSpriteTemplate implement iSprite3DFactoryState. This is in
+	  preparation of the csSprite3D move to a plugin.
 	- Norman Kramer did further work on the video plugins:
 	    - Extended PLUGIN var to build AVI and optionally opendivx.
 	    - Added output of what is currently done when trying to load video.

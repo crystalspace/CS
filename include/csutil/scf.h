@@ -431,6 +431,14 @@ struct iConfigFileNew;
   (Interface *)(Object)->QueryInterface (#Interface, VERSION_##Interface)
 
 /**
+ * Shortcut macro to query given interface from given object.
+ * This is a wrapper around iBase::QueryInterface method.
+ * This version tests if Object is NULL and will return NULL in that case.
+ */
+#define QUERY_INTERFACE_SAFE(Object,Interface)				\
+  ((Interface *)(((Object)==NULL) ? NULL : (Object)->QueryInterface (#Interface, VERSION_##Interface)))
+
+/**
  * This function should be called to initialize client SCF library.
  * If you provide a iConfig object, the SCF-related registry section
  * will be read from it. It is legal to call scfInitialize more than once

@@ -37,6 +37,7 @@
 #include "ipolmesh.h"
 #include "isprite.h"
 #include "imspr3d.h"
+#include "imater.h"
 
 class Dumper;
 class csMaterialList;
@@ -395,7 +396,7 @@ public:
   /// Create and add a new frame to the sprite.
   csFrame* AddFrame ();
   /// find a named frame into the sprite.
-  csFrame* FindFrame (char * name);
+  csFrame* FindFrame (const char * name);
   /// Query the number of frames
   int GetNumFrames () { return frames.Length (); }
   /// Query the frame number f
@@ -464,10 +465,159 @@ public:
   DECLARE_IBASE_EXT (csPObject);
 
   //--------------------- iSpriteTemplate implementation --------------------//
+  // @@@ iSpriteTemplate obsolete? Probably yes.
   struct SpriteTemplate : public iSpriteTemplate
   {
     DECLARE_EMBEDDED_IBASE (csSpriteTemplate);
   } scfiSpriteTemplate;
+
+  //--------------------- iSprite3DFactoryState implementation -------------//
+  struct Sprite3DFactoryState : public iSprite3DFactoryState
+  {
+    DECLARE_EMBEDDED_IBASE (csSpriteTemplate);
+    virtual void SetMaterialWrapper (iMaterialWrapper* material)
+    {
+      scfParent->SetMaterial (material->GetPrivateObject ());
+    }
+    virtual iMaterialWrapper* GetMaterialWrapper ()
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->GetMaterial (), iMaterialWrapper);
+    }
+    virtual void AddVertices (int num)
+    {
+      scfParent->AddVertices (num);
+    }
+    virtual int GetNumTexels ()
+    {
+      return scfParent->GetNumTexels ();
+    }
+    virtual csVector2& GetTexel (int frame, int vertex)
+    {
+      return scfParent->GetTexel (frame, vertex);
+    }
+    virtual csVector2* GetTexels (int frame)
+    {
+      return scfParent->GetTexels (frame);
+    }
+    virtual int GetNumVertices ()
+    {
+      return scfParent->GetNumVertices ();
+    }
+    virtual csVector3& GetVertex (int frame, int vertex)
+    {
+      return scfParent->GetVertex (frame, vertex);
+    }
+    virtual csVector3* GetVertices (int frame)
+    {
+      return scfParent->GetVertices (frame);
+    }
+    virtual int GetNumNormals ()
+    {
+      return scfParent->GetNumNormals ();
+    }
+    virtual csVector3& GetNormal (int frame, int vertex)
+    {
+      return scfParent->GetNormal (frame, vertex);
+    }
+    virtual csVector3* GetNormals (int frame)
+    {
+      return scfParent->GetNormals (frame);
+    }
+    virtual void AddTriangle (int a, int b, int c)
+    {
+      scfParent->AddTriangle (a, b, c);
+    }
+    virtual csTriangle GetTriangle (int x)
+    {
+      return scfParent->GetTriangle (x);
+    }
+    virtual csTriangle* GetTriangles ()
+    {
+      return scfParent->GetTriangles ();
+    }
+    virtual int GetNumTriangles ()
+    {
+      return scfParent->GetNumTriangles ();
+    }
+    virtual iSpriteFrame* AddFrame ()
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->AddFrame (), iSpriteFrame);
+    }
+    virtual iSpriteFrame* FindFrame (const char* name)
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->FindFrame (name), iSpriteFrame);
+    }
+    virtual int GetNumFrames ()
+    {
+      return scfParent->GetNumFrames ();
+    }
+    virtual iSpriteFrame* GetFrame (int f)
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->GetFrame (f), iSpriteFrame);
+    }
+    virtual iSpriteAction* AddAction ()
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->AddAction (), iSpriteAction);
+    }
+    virtual iSpriteAction* FindAction (const char* name)
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->FindAction (name), iSpriteAction);
+    }
+    virtual iSpriteAction* GetFirstAction ()
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->GetFirstAction (), iSpriteAction);
+    }
+    virtual int GetNumActions ()
+    {
+      return scfParent->GetNumActions ();
+    }
+    virtual iSpriteAction* GetAction (int No)
+    {
+      return QUERY_INTERFACE_SAFE (scfParent->GetAction (No), iSpriteAction);
+    }
+    virtual void EnableSkeletalAnimation ();
+    virtual iSkeleton* GetSkeleton ();
+    virtual void EnableTweening (bool en)
+    {
+      scfParent->EnableTweening (en);
+    }
+    virtual bool IsTweeningEnabled ()
+    {
+      return scfParent->IsTweeningEnabled ();
+    }
+    virtual void SetLightingQuality (int qual)
+    {
+      scfParent->SetLightingQuality (qual);
+    }
+    virtual int GetLightingQuality ()
+    {
+      return scfParent->GetLightingQuality ();
+    }
+    virtual void SetLightingQualityConfig (int qual)
+    {
+      scfParent->SetLightingQualityConfig (qual);
+    }
+    virtual int GetLightingQualityConfig ()
+    {
+      return scfParent->GetLightingQualityConfig ();
+    }
+    virtual float GetLodLevel ()
+    {
+      return scfParent->GetLodLevel ();
+    }
+    virtual void SetLodLevel (float level)
+    {
+      scfParent->SetLodLevel (level);
+    }
+    virtual void SetLodLevelConfig (int config_flag)
+    {
+      scfParent->SetLodLevelConfig (config_flag);
+    }
+    virtual int GetLodLevelConfig ()
+    {
+      return scfParent->GetLodLevelConfig ();
+    }
+  } scfiSprite3DFactoryState;
 };
 
 /// A callback function for csSprite3D::Draw().
