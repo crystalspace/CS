@@ -118,9 +118,9 @@ float csConfigNode::GetFloat()
 bool csConfigNode::GetBool()
 {
   if (!Data) return false;
-  if (stricmp(Data, "yes") == 0) return true;
-  if (stricmp(Data, "true") == 0) return true;
-  if (stricmp(Data, "on") == 0) return true;
+  if (strcasecmp(Data, "yes") == 0) return true;
+  if (strcasecmp(Data, "true") == 0) return true;
+  if (strcasecmp(Data, "on") == 0) return true;
   return false;
 }
 
