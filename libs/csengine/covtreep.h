@@ -43,7 +43,7 @@ private:
   Child children[CS_CM_BITS];
 
   /// The visibility mask for this node.
-  csCovMask mask;
+  csCovMaskTriage mask;
 
 public:
   /**
@@ -63,7 +63,7 @@ public:
  * A subclass of csCovMaskSingle also implementing
  * TestPolygon/InsertPolygon.
  */
-class csCovTreeNode0 : public csCovMaskSingle
+class csCovTreeNode0 : public csCovMask
 {
 public:
   /**

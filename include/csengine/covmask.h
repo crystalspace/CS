@@ -23,9 +23,11 @@
 #define CS_CM mask4x4
 
 /**
- * Class representing one coverage mask.
+ * Class representing a triage coverage mask
+ * (a triage coverage masks holds three states:
+ * in, out, partial).
  */
-class csCovMask
+class csCovMaskTriage
 {
 private:
 # if CS_CM == mask4x4
@@ -87,7 +89,7 @@ public:
  * only have inside/outside information and not 'on
  * the edge' information.
  */
-class csCovMaskSingle
+class csCovMask
 {
 protected:
 # if CS_CM == mask4x4
@@ -154,12 +156,21 @@ private:
   // Shift value to use instead of multiplying with num_edge_points.
   int dim_shift;
   // LUT.
-  csCovMask* masks;
+  csCovMaskTriage* triage_masks;
   // LUT.
-  csCovMaskSingle* masks_single;
+  csCovMask* masks;
 
   /// Build the lookup tables.
   void BuildTables ();
+
+  /**
+   * Take a line given as a start point and the two
+   * gradients dx/dy and dy/dz. Also take a box at position
+   * (0,0)-(box,box) (box must be a power of two).
+   * Return the index in the masks tables for the
+   * intersection of the line with the box.
+   */
+  int GetIndex (const csVector2& start, float dxdy, float dydx, int box) const;
 
 public:
   /**
@@ -173,13 +184,13 @@ public:
   ~csCovMaskLUT ();
 
   /**
-   * Return a coverage mask for the given line.
+   * Return a triage coverage mask for the given line.
    * 'from' and 'to' are indices of the intersection between
    * the line and the box edges (between 0 and num_edge_points-1).
    */
-  csCovMask& GetMask (int from, int to)
+  csCovMaskTriage& GetTriageMask (int from, int to) const
   {
-    return masks[(from<<dim_shift) + to];
+    return triage_masks[(from<<dim_shift) + to];
   }
 
   /**
@@ -187,9 +198,33 @@ public:
    * 'from' and 'to' are indices of the intersection between
    * the line and the box edges (between 0 and num_edge_points-1).
    */
-  csCovMaskSingle& GetMaskSingle (int from, int to)
+  csCovMask& GetMask (int from, int to) const
   {
-    return masks_single[(from<<dim_shift) + to];
+    return masks[(from<<dim_shift) + to];
+  }
+
+  /**
+   * Take a line given as a start point and the two
+   * gradients dx/dy and dy/dz. Also take a box at position
+   * (0,0)-(box,box) (box must be a power of two).
+   * Return the triage mask for the intersection of the line with the box.
+   */
+  csCovMaskTriage& GetTriageMask (const csVector2& start,
+  	float dxdy, float dydx, int box) const
+  {
+    return (triage_masks[GetIndex (start, dxdy, dydx, box)]);
+  }
+
+  /**
+   * Take a line given as a start point and the two
+   * gradients dx/dy and dy/dz. Also take a box at position
+   * (0,0)-(box,box) (box must be a power of two).
+   * Return the mask for the intersection of the line with the box.
+   */
+  csCovMask& GetMask (const csVector2& start,
+  	float dxdy, float dydx, int box) const
+  {
+    return (masks[GetIndex (start, dxdy, dydx, box)]);
   }
 };
 

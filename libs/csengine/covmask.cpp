@@ -24,8 +24,8 @@ csCovMaskLUT::csCovMaskLUT (int dimension)
 {
   csCovMaskLUT::dimension = dimension;
   num_edge_points = dimension*4;
+  CHK (triage_masks = new csCovMaskTriage[num_edge_points*num_edge_points]);
   CHK (masks = new csCovMask[num_edge_points*num_edge_points]);
-  CHK (masks_single = new csCovMaskSingle[num_edge_points*num_edge_points]);
   switch (dimension)
   {
     case 1: dim_shift = 0+2; break;
@@ -44,8 +44,8 @@ csCovMaskLUT::csCovMaskLUT (int dimension)
 
 csCovMaskLUT::~csCovMaskLUT ()
 {
+  CHK (delete [] triage_masks);
   CHK (delete [] masks);
-  CHK (delete [] masks_single);
 }
 
 void calc_from_point (int from, int dimension, int& from_ix1, int& from_iy1,
@@ -203,8 +203,8 @@ void csCovMaskLUT::BuildTables ()
       // Now we are going to calculate the normal and single coverage
       // masks based on the 'left' and 'right' tables.
       int mask_idx = (from << dim_shift) + to;
+      triage_masks[mask_idx].Clear ();
       masks[mask_idx].Clear ();
-      masks_single[mask_idx].Clear ();
       // For every bit in the mask.
       for (bit = 0 ; bit < CS_CM_BITS ; bit++)
       {
@@ -222,8 +222,8 @@ void csCovMaskLUT::BuildTables ()
 	// mask that are completely right of L2.
 	int s = right[iy*dimhor1+ix] || right[iy*dimhor1+ix+1] ||
 		right[(iy+1)*dimhor1+ix] || right[(iy+1)*dimhor1+ix+1];
-	masks[mask_idx].SetState (bit, so, si);
-	masks_single[mask_idx].SetState (bit, s);
+	triage_masks[mask_idx].SetState (bit, so, si);
+	masks[mask_idx].SetState (bit, s);
       }
     }
   }
@@ -231,4 +231,33 @@ void csCovMaskLUT::BuildTables ()
   CHK (delete [] left);
   CHK (delete [] right);
 }
+
+int csCovMaskLUT::GetIndex (const csVector2& start,
+	float dxdy, float dydx, int box) const
+{
+  float x, y;
+  float fbox = (float)box;	// Optimal?@@@
+
+  // We're going to create a bitmask with four bits to represent
+  // all intersections. The bits are tblr (top, bottom, left,
+  // right). For example, if the mask is 1001 then there is an
+  // intersection through the top and right edges of the box.
+  int mask = 0;
+
+  // Top horizontal side.
+  x = dxdy * (0-start.y) + start.x;
+  if (x >= 0 && x <= fbox) mask |= 0x8;
+  // Bottom horizontal side.
+  x = dxdy * (fbox-start.y) + start.x;
+  if (x >= 0 && x <= fbox) mask |= 0x4;
+  // Left vertical side.
+  y = dydx * (0-start.x) + start.y;
+  if (y >= 0 && y <= fbox) mask |= 0x2;
+  // Right vertical side.
+  y = dydx * (fbox-start.x) + start.y;
+  if (y >= 0 && y <= fbox) mask |= 0x1;
+
+  return 0;
+}
+
 
