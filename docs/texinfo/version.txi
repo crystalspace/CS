@@ -1,4 +1,4 @@
 @c -*-texinfo-*-
-@set UPDATED 8 April 2002
-@set EDITION 94.001.1
-@set VERSION 94.001
+@set UPDATED 16 April 2002
+@set EDITION 94.002.1
+@set VERSION 94.002
