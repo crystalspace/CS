@@ -20,6 +20,13 @@
 #include "csgeom/math3d.h"
 #include "csengine/collider.h"
 
+/**
+ * Located in eigen.cpp, this function returns the eigenvectors of M,
+ * Sorted so that the vector corresponding to the largest eigenvalue
+ * is first.
+ */
+int SortedEigen (csMatrix3& M, csMatrix3& evecs);
+
 CD_model::CD_model (int n_triangles)
 {
   b = 0;
@@ -130,7 +137,7 @@ int CD_model::build_hierarchy ()
 
   _M.covariance (&_C);
 
-  _C.Eigens1 (&(b [0].pR));
+  SortedEigen(_C, b[0].pR);
 
   // create the index list
   CHK (int *t = new int [num_tris]);
@@ -289,7 +296,7 @@ int BBox::split_recurse (int *t, int n)
     _M1.mean (&P->pT);
     _M1.covariance (&C);
 
-    int nn = C.Eigens1 (&tR);
+    int nn = SortedEigen(C, tR);
     if ( nn > 30 || nn == -1)
     {
       // unable to find an orientation.  We'll just pick identity.
@@ -315,7 +322,7 @@ int BBox::split_recurse (int *t, int n)
   {      
     _M2.mean (&N->pT);
     _M2.covariance (&C);
-    int nn = C.Eigens1 (&tR);
+    int nn = SortedEigen(C, tR);
 
     if (nn > 30 || nn == -1)
     {

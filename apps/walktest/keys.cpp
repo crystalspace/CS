@@ -187,9 +187,8 @@ void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* par
   {
     CHK (con = new csSkeletonConnection ());
     parent->AddChild (con);
-    csMatrix3 tr = csMatrix3::GetYRotation (0) *
-    	csMatrix3::GetZRotation (.15) *
-	csMatrix3::GetXRotation (.15);
+    csMatrix3 tr = csYRotMatrix3 (0) * csZRotMatrix3(.15) *
+                                                 csXRotMatrix3(.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
     add_tree_limbs (tmpl, frame, con, vertex_idx, par_vertex_idx, maxdepth, width, recursion+1);
@@ -264,9 +263,9 @@ void animate_skeleton_tree (csSkeletonLimbState* limb)
 
     // @@@ Don't use the code below in a real-time environment.
     // This is only demo code and HIGHLY inefficient.
-    csMatrix3 tr = csMatrix3::GetYRotation (o->y_angle) *
-    	csMatrix3::GetZRotation (o->z_angle + o->z_angle_base) *
-	csMatrix3::GetXRotation (o->x_angle + o->x_angle_base);
+    csMatrix3 tr = csYRotMatrix3 (o->y_angle) *
+    	csZRotMatrix3 (o->z_angle + o->z_angle_base) *
+	csXRotMatrix3 (o->x_angle + o->x_angle_base);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
     animate_skeleton_tree (con);
@@ -389,9 +388,9 @@ void add_ghost_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* pa
   {
     CHK (con = new csSkeletonConnection ());
     parent->AddChild (con);
-    csMatrix3 tr = csMatrix3::GetYRotation (0) *
-    	csMatrix3::GetZRotation (.15) *
-	csMatrix3::GetXRotation (.15);
+    csMatrix3 tr = csYRotMatrix3 (0) *
+    	csZRotMatrix3 (.15) *
+	csXRotMatrix3 (.15);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
     add_ghost_limbs (tmpl, frame, con, vertex_idx, par_vertex_idx, maxdepth, 1, recursion+1, dim * .7);
@@ -448,9 +447,9 @@ void animate_skeleton_ghost (csSkeletonLimbState* limb)
 
     // @@@ Don't use the code below in a real-time environment.
     // This is only demo code and HIGHLY inefficient.
-    csMatrix3 tr = csMatrix3::GetYRotation (o->y_angle) *
-    	csMatrix3::GetZRotation (o->z_angle + o->z_angle_base) *
-	csMatrix3::GetXRotation (o->x_angle + o->x_angle_base);
+    csMatrix3 tr = csYRotMatrix3 (o->y_angle) *
+    	csZRotMatrix3 (o->z_angle + o->z_angle_base) *
+	csXRotMatrix3 (o->x_angle + o->x_angle_base);
     csTransform trans (tr, -tr.GetInverse () * csVector3 (0, .5, 0));
     con->SetTransformation (trans);
     animate_skeleton_ghost (con);
@@ -560,18 +559,18 @@ void move_ghost (csSprite3D* spr)
   if (vel < 0.01)
   {
     // We did not move much. Turn around quickly.
-    csMatrix3 m = csMatrix3::GetYRotation (gh_info->dir*.2);
+    csMatrix3 m = csYRotMatrix3 (gh_info->dir*.2);
     spr->Transform (m);
   }
   else if (vel < 0.05)
   {
     // We did a bit. Turn around slightly.
-    csMatrix3 m = csMatrix3::GetYRotation (gh_info->dir*.1);
+    csMatrix3 m = csYRotMatrix3 (gh_info->dir*.1);
     spr->Transform (m);
   }
   else
   {
-    csMatrix3 m = csMatrix3::GetYRotation (gh_info->dir*.01);
+    csMatrix3 m = csYRotMatrix3 (gh_info->dir*.01);
     spr->Transform (m);
   }
 }

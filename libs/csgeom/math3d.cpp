@@ -126,201 +126,6 @@ float csMatrix3::Determinant () const
    +m13 * (m21*m32 - m22*m31);
 }
 
-
-// this is the matrix for which we seek to find the eigen values.
-// vout is the matrix of eigen vectors.
-// dout is the vector of dominant eigen values.
-// returns:  -1   - error failed to converge within 50 iterations.
-//           0-50 - number of iterations.
-int csMatrix3::Eigen (csMatrix3* vout, csVector3* dout)
-{
-#define rotate(a1,a2) g=a1; h=a2; a1=g-s*(h+g*tau); a2=h+s*(g-h*tau);
-#define rfabs(x) ((x < 0) ? -x : x)
-  int i;
-  float tresh,theta,tau,t,sm,s,h,g,c;
-  int nrot;
-
-  csMatrix3 v;
-  csVector3 z (0, 0, 0);
-
-  // Load b and d with the diagonals of a.
-  csVector3 b (m11, m22, m33), d (m11, m22, m33);
-
-  nrot = 0;
-  
-  // Try up to 50 times.
-  for(i=0; i<50; i++)
-    {
-      // See if bottom half of matrix a is non zero.
-      sm=0.0; sm+=fabs(m12); sm+=fabs(m13); sm+=fabs(m23);
-      // If it is 0 we are done.  Return the current vector v and d.
-      if (sm == 0.0)
-	{
-	  *vout = v;
-	  *dout = d;
-	  return i;
-	}
-      
-      if (i < 3) tresh=0.2*sm/(3*3); else tresh=0.0;
-      
-      // Try rotations in 1st dimension
-      {
-	g = 100.0*rfabs(m12);  
-	// Does this make sense??
-	// equiv to   if (i>3 && g == 0) 
-	if (i>3 && rfabs(d.x)+g==rfabs(d.x) && rfabs(d.y)+g==rfabs(d.y))
-	  m12 =0.0;
-	else if (rfabs(m12)>tresh)
-	  {
-	    h = d.y-d.x;
-	    if (rfabs(h)+g == rfabs(h)) t=(m12)/h;
-	    else
-	      {
-		theta=0.5*h/(m12);
-		t=1.0/(rfabs(theta)+sqrt(1.0+theta*theta));
-		if (theta < 0.0) t = -t;
-	      }
-	    c=1.0/sqrt(1+t*t); s=t*c; tau=s/(1.0+c); h=t*m12;
-	    z.x -= h; z.y += h; d.x -= h; d.y += h;
-	    m12=0.0;
-	    rotate(m13,m23); rotate(v.m11,v.m12);
-            rotate(v.m21,v.m22); rotate(v.m31,v.m32); 
-	    nrot++;
-	  }
-      }
-
-      // Try rotations in the 2nd dimension.
-      {
-	g = 100.0*rfabs(m13);
-	// See above, can be simplified.
-	if (i>3 && rfabs(d.x)+g==rfabs(d.x) && rfabs(d.z)+g==rfabs(d.z))
-	  m13=0.0;
-	else if (rfabs(m13)>tresh)
-	  {
-	    h = d.z-d.x;
-	    if (rfabs(h)+g == rfabs(h)) t=(m13)/h;
-	    else
-	      {
-		theta=0.5*h/(m13);
-		t=1.0/(rfabs(theta)+sqrt(1.0+theta*theta));
-		if (theta < 0.0) t = -t;
-	      }
-	    c=1.0/sqrt(1+t*t); s=t*c; tau=s/(1.0+c); h=t*m13;
-	    z.x -= h; z.z += h; d.x -= h; d.z += h;
-	    m13=0.0;
-	    rotate(m12,m23); rotate(v.m11,v.m13);
-            rotate(v.m21,v.m23); rotate(v.m31,v.m33); 
-	    nrot++;
-	  }
-      }
-
-
-      // Try rotations in 3rd dimension.
-      {
-	g = 100.0*rfabs(m23);
-	if (i>3 && rfabs(d.y)+g==rfabs(d.y) && rfabs(d.z)+g==rfabs(d.z))
-	  m23=0.0;
-	else if (rfabs(m23)>tresh)
-	  {
-	    h = d.z-d.y;
-	    if (rfabs(h)+g == rfabs(h)) t=(m23)/h;
-	    else
-	      {
-		theta=0.5*h/(m23);
-		t=1.0/(rfabs(theta)+sqrt(1.0+theta*theta));
-		if (theta < 0.0) t = -t;
-	      }
-	    c=1.0/sqrt(1+t*t); s=t*c; tau=s/(1.0+c); h=t*m23;
-	    z.y -= h; z.z += h; d.y -= h; d.z += h;
-	    m23=0.0;
-	    rotate(m12,m13); rotate(v.m12,v.m13);
-            rotate(v.m22,v.m23); rotate(v.m32,v.m33); 
-	    nrot++;
-	  }
-      }
-
-      b = b + z; d = b; z.Set( 0, 0, 0);      
-    }
-
-  return -1;
-#undef rotate
-#undef rfabs
-}
-
-// Find eigen vectors of matrix and sort them to have the largest
-// eigen vector in the first column.
-int csMatrix3::Eigens1 (csMatrix3 *evecs)
-{
-#define swap(a,b) { float t = a; a = b; b = t; }
-  int n;
-  csVector3 evals (0, 0, 0);
-
-  n = Eigen (evecs, &evals);
-
-  if (evals.z > evals.x)
-    {
-      if (evals.z > evals.y)
-	{
-	  // 3 is largest, swap with column 1
-	  swap(evecs->m13,evecs->m11);
-	  swap(evecs->m23,evecs->m21);
-	  swap(evecs->m33,evecs->m31);
-	}
-      else
-	{
-	  // 2 is largest, swap with column 1
-	  swap(evecs->m12,evecs->m11);
-	  swap(evecs->m22,evecs->m21);
-	  swap(evecs->m32,evecs->m31);
-	}
-    }
-  else
-    {
-      if (evals.x > evals.y)
-	{
-	  // 1 is largest, do nothing
-	}
-      else
-	{
-  	  // 2 is largest
-	  swap(evecs->m12,evecs->m11);
-	  swap(evecs->m22,evecs->m21);
-	  swap(evecs->m32,evecs->m31);
-	}
-    }
-  // we are returning the number of iterations Meigen took.
-  // too many iterations means our chosen orientation is bad.
-  return n; 
-#undef swap
-}
-
-csMatrix3 csMatrix3::GetXRotation (float angle)
-{
-  csMatrix3 N;
-  N.m11 = 1; N.m12 = 0;           N.m13 = 0;
-  N.m21 = 0; N.m22 = cos (angle); N.m23 = -sin(angle);
-  N.m31 = 0; N.m32 = sin (angle); N.m33 =  cos(angle);
-  return N;
-}
-
-csMatrix3 csMatrix3::GetYRotation (float angle)
-{
-  csMatrix3 N;
-  N.m11 = cos (angle); N.m12 = 0; N.m13 = -sin(angle);
-  N.m21 = 0;           N.m22 = 1; N.m23 = 0;
-  N.m31 = sin (angle); N.m32 = 0; N.m33 =  cos(angle);
-  return N;
-}
-
-csMatrix3 csMatrix3::GetZRotation (float angle)
-{
-  csMatrix3 N;
-  N.m11 = cos (angle); N.m12 = -sin(angle); N.m13 = 0;
-  N.m21 = sin (angle); N.m22 =  cos(angle); N.m23 = 0;
-  N.m31 = 0;           N.m32 = 0;           N.m33 = 1;
-  return N;
-}
-
 csMatrix3 operator+ (const csMatrix3& m1, const csMatrix3& m2) 
 {
   return csMatrix3 (m1.m11+m2.m11, m1.m12+m2.m12, m1.m13+m2.m13,
@@ -397,6 +202,29 @@ bool operator> (float f, const csMatrix3& m)
   return ABS(m.m11)<f && ABS(m.m12)<f && ABS(m.m13)<f &&
          ABS(m.m21)<f && ABS(m.m22)<f && ABS(m.m23)<f &&
          ABS(m.m31)<f && ABS(m.m32)<f && ABS(m.m33)<f;
+}
+
+//---------------------------------------------------------------------------
+
+csXRotMatrix3::csXRotMatrix3 (float angle)
+{
+  m11 = 1; m12 = 0;           m13 = 0;
+  m21 = 0; m22 = cos (angle); m23 = -sin(angle);
+  m31 = 0; m32 = sin (angle); m33 =  cos(angle);
+}
+
+csYRotMatrix3::csYRotMatrix3 (float angle)
+{
+  m11 = cos (angle); m12 = 0; m13 = -sin(angle);
+  m21 = 0;           m22 = 1; m23 = 0;
+  m31 = sin (angle); m32 = 0; m33 =  cos(angle);
+}
+
+csZRotMatrix3::csZRotMatrix3 (float angle)
+{
+  m11 = cos (angle); m12 = -sin(angle); m13 = 0;
+  m21 = sin (angle); m22 =  cos(angle); m23 = 0;
+  m31 = 0;           m32 = 0;           m33 = 1;
 }
 
 //---------------------------------------------------------------------------

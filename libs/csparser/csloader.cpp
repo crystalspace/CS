@@ -82,15 +82,15 @@ csMatrix3 CSLoader::load_matrix (char* buf)
       {
         case 1:
           ScanStr (params, "%f", &angle);
-          M *= csMatrix3::GetXRotation (angle);
+          M *= csXRotMatrix3 (angle);
           break;
         case 2:
           ScanStr (params, "%f", &angle);
-          M *= csMatrix3::GetYRotation (angle);
+          M *= csYRotMatrix3 (angle);
           break;
         case 3:
           ScanStr (params, "%f", &angle);
-          M *= csMatrix3::GetZRotation (angle);
+          M *= csZRotMatrix3 (angle);
           break;
       }
     }
