@@ -23,10 +23,10 @@ chronological order.
 	- Eric Sunshine eliminated numerous compilation warnings.
 27-Nov-2004
 	- Jorrit did a few minor changes to foliage. Nothing significant.
-	- Jorrit submitted a patch from Marc Prüßmeier which adds the following
-	  three functions to iImage: Copy, CopyScale, and CopyTile. Only
-	  csImage implements those. The other implementations of iImage
-	  simply return false here.
+	- Jorrit submitted a patch from Marc Prussmeier which adds the
+	  following three functions to iImage: Copy, CopyScale, and
+	  CopyTile. Only csImage implements those. The other implementations of
+	  iImage simply return false here.
 	- Andrew Robberts fixed a bug in particles simpphys where a for loop
 	  iterated the wrong way.
 	- res fixed compiling for non-debug builds of win32kbd.cpp.
