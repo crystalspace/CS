@@ -19,6 +19,7 @@ The history order is reversed so that new features are at the top.
         - Philip Wyett removed the references in the docs that offered
           people to contact me directly re MSVC related build issues and
           updated authors info to indicate my current inactive status.
+	- res fixed the sndds3d makefile to work on MinGW/MSYS.
 24-Jun-2003
 	- Oktal added an iGraphicsMemory interface with which to access
 	  the csGraphicsMemory plugin.

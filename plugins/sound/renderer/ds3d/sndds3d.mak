@@ -31,10 +31,12 @@ vpath %.cpp $(SRCDIR)/plugins/sound/renderer/ds3d
 ifeq ($(USE_PLUGINS),yes)
   SNDDS3D = $(OUTDLL)/sndds3d$(DLL)
   LIB.SNDDS3D = $(foreach d,$(DEP.SNDDS3D),$($d.LIB))
+  LIB.SNDDS3D.SPECIAL = $(DIRECTX.LFLAGS)
   TO_INSTALL.DYNAMIC_LIBS += $(SNDDS3D)
 else
   SNDDS3D = $(OUT)/$(LIB_PREFIX)sndds3d$(LIB)
   DEP.EXE += $(SNDDS3D)
+  LIB.EXE += $(DIRECTX.LFLAGS)
   SCF.STATIC += sndds3d
   TO_INSTALL.STATIC_LIBS += $(SNDDS3D)
 endif
@@ -61,8 +63,11 @@ ifeq ($(MAKESECTION),targets)
 
 sndds3d: $(OUTDIRS) $(SNDDS3D)
 
+$(OUT)/%$O: $(SRC.SNDDS3D)
+	$(DO.COMPILE.CPP) $(DIRECTX.CFLAGS)
+
 $(SNDDS3D): $(OBJ.SNDDS3D) $(LIB.SNDDS3D)
-	$(DO.PLUGIN)
+	$(DO.PLUGIN) $(LIB.SNDDS3D.SPECIAL)
 
 clean: sndds3dclean
 sndds3dclean:
