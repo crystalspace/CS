@@ -187,8 +187,9 @@ void cswsSystemDriver::Warn (const char *msg)
 
 void cswsSystemDriver::NextFrame (time_t elapsed_time, time_t current_time)
 {
+  application->StartFrame (elapsed_time, current_time);
   SysSystemDriver::NextFrame (elapsed_time, current_time);
-  application->NextFrame (elapsed_time, current_time);
+  application->FinishFrame ();
 }
 
 bool cswsSystemDriver::ProcessEvents ()

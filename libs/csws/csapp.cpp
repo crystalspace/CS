@@ -162,33 +162,29 @@ void csApp::Loop ()
   System->Loop();
 }
 
-void csApp::NextFrame (time_t elapsed_time, time_t current_time)
+void csApp::StartFrame (time_t elapsed_time, time_t current_time)
 {
   (void)elapsed_time;
   CurrentTime = current_time;
-
-  // Now update screen
-  if (GfxPpl->BeginDraw ())
-  {
-    Update ();
-    GfxPpl->FinishDraw ();
-  }
+  GfxPpl->StartFrame (GetPage ());
 }
 
-void csApp::Update ()
+void csApp::FinishFrame ()
 {
+  // Now update screen
   if (OldMouseCursorID != MouseCursorID)
   {
     Mouse->SetCursor (MouseCursorID);
     OldMouseCursorID = MouseCursorID;
   }
 
+  // Flush application graphics operations
+  GfxPpl->FinishFrame ();
+
   // Save background/draw mouse cursor
   Mouse->Draw ();
-
-  // Flush application graphics operations
-  GfxPpl->Flush (GetPage ());
-
+  // Switch the backbuffer
+  GfxPpl->FinishDraw ();
   // Restore previous background under mouse
   Mouse->Undraw ();
 }
@@ -414,7 +410,7 @@ bool csApp::ProcessEvents ()
      && !PostHandleEvent (*ev))
     {
       // nobody handled the event, do nothing
-    }  
+    }
     delete ev;
   }
 
@@ -627,5 +623,6 @@ void csApp::Dismiss (int iCode)
 void csApp::FlushEvents ()
 {
   ProcessEvents ();
-  NextFrame (0, GetCurrentTime ());
+  StartFrame (0, GetCurrentTime ());
+  FinishFrame ();
 }

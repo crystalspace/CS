@@ -395,7 +395,7 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
     {
       // The distance from plane to polygon vertex
       float d = fn * poly [pv];
-      if (all_inside && d < 0) all_inside = false;
+      if (all_inside && d > 0) all_inside = false;
 
       if ((prev_d < 0 && d > 0)
        || (prev_d > 0 && d < 0))

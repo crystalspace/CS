@@ -71,7 +71,7 @@ protected:
   int DismissCode;
   /// This is equal to 8 if any of physical r,g,b masks is 0xff000000
   int PhysColorShift;
-  /// Current time (passed by systemdriver to NextFrame())
+  /// Current time (passed by systemdriver to StartFrame())
   time_t CurrentTime;
 
   /// Set up initial application layout (read configs, create windows, menus etc)
@@ -116,7 +116,9 @@ public:
   virtual void Draw ();
 
   /// This should be called once per frame by system driver
-  virtual void NextFrame (time_t ElapsedTime, time_t CurrentTime);
+  virtual void StartFrame (time_t ElapsedTime, time_t CurrentTime);
+  /// This is called at the end of each frame
+  virtual void FinishFrame ();
 
   /// Process all events in event queue
   virtual bool ProcessEvents ();
@@ -212,8 +214,7 @@ public:
 
 /*
  * The following methods are simple redirectors to csGraphicsPipeline
- * object (which is private property of csApp class). All operations
- * are deferred until Update () is called.
+ * object (which is private property of csApp class).
  */
 
   /// Return a color identifier given R,G,B (each 0..255)
@@ -298,8 +299,6 @@ protected:
   virtual void LoadConfig ();
   /// setup palette
   void SetupPalette ();
-  /// Flush graphics pipeline
-  void Update ();
 };
 
 #endif // __CSAPP_H__

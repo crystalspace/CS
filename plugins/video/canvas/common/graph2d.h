@@ -207,12 +207,10 @@ public:
   { Font = FontID; }
 
   /// Gets the font size.
-  virtual int GetFontSize ()
-  { long s; bool b = FontServer->GetFontProperty (Font, CS_FONTSIZE, s); return (b?s:-1);}
+  virtual int GetFontSize ();
   
   /// Sets the font size.
-  virtual bool SetFontSize (int FontSize)
-  { long s=FontSize; return FontServer->SetFontProperty (Font, CS_FONTSIZE, s, false ); }
+  virtual bool SetFontSize (int FontSize);
 
   /// Gets the font server
   virtual iFontServer *GetFontServer ()

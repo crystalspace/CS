@@ -308,7 +308,8 @@ bool csComponent::SetZorder (csComponent *comp, csComponent *below)
     } /* endwhile */
     inv.Move (-top->bound.xmin, -top->bound.ymin);
     top->Invalidate (inv, true);
-  } else
+  }
+  else
   {
     // otherwise it has lowered
     csRect inv;
@@ -408,7 +409,7 @@ bool csComponent::HandleEvent (csEvent &Event)
         if (Event.Key.Code != CSKEY_ESC)
           break;
         if (app->MouseOwner != this)
-          return (ForEach (do_handle_event, &Event, false) != NULL);
+          return (ForEach (do_handle_event, &Event, true) != NULL);
 AbortDrag:
         SetRect (dragBound.xmin, dragBound.ymin, dragBound.xmax, dragBound.ymax);
         dragMode = 0;
@@ -826,7 +827,8 @@ void csComponent::Hide ()
       clipparent->GlobalToLocal (clipbound.xmax, clipbound.ymax);
       clipparent->Invalidate (clipbound, true);
     } /* endif */
-  } else
+  }
+  else
     parent->Invalidate (bound, true);
 }
 
@@ -839,7 +841,7 @@ bool csComponent::SetRect (int xmin, int ymin, int xmax, int ymax)
   if (parent)
   {
     inv.Exclude (xmin, ymin, xmax, ymax);
-    parent->Invalidate (inv, true);
+    parent->Invalidate (inv, true, this);
   }
   Invalidate (true);
   return true;
@@ -863,38 +865,56 @@ bool csComponent::SetDragRect (int xmin, int ymin, int xmax, int ymax)
   return SetRect (xmin, ymin, xmax, ymax);
 }
 
+// private structure used when invalidating child windows
+struct inv_struct
+{
+  csRect inv;
+  csComponent *below;
+  inv_struct (int w, int h, csComponent *b) : inv (0, 0, w, h), below (b)
+  { }
+};
+
 static bool do_invalidate (csComponent *child, void *param)
 {
-  csRect dr (*((csRect *)param));
+  inv_struct *is = (inv_struct *)param;
+  if (is->below)
+  {
+    if (is->below == child)
+      is->below = NULL;
+    return false;
+  }
+  csRect dr (is->inv);
   dr.Move (-child->bound.xmin, -child->bound.ymin);
   child->Invalidate (dr, true);
   return false;
 }
 
-void csComponent::Invalidate (csRect &area, bool IncludeChildren)
+void csComponent::Invalidate (csRect &area, bool fIncludeChildren,
+  csComponent *below)
 {
   if (!GetState (CSS_VISIBLE))
     return;
 
-  csRect inv (0, 0, bound.Width (), bound.Height ());
-  inv.Intersect (area);
-  if (inv.IsEmpty ())
+  inv_struct is (bound.Width (), bound.Height (), below);
+  is.inv.Intersect (area);
+  if (is.inv.IsEmpty ())
     return;
 
-  dirty.Union (inv);
+  dirty.Union (is.inv);
   if (app)
     app->RedrawFlag = true;
 
+  csRect dr;
   if (parent && GetState (CSS_TRANSPARENT))
   {
-    inv.Move (bound.xmin, bound.ymin);
-    parent->Invalidate (inv);
+    dr.Set (is.inv);
+    dr.Move (bound.xmin, bound.ymin);
+    parent->Invalidate (dr);
   } /* endif */
 
-  if (IncludeChildren)
+  if (fIncludeChildren)
   {
-    ForEach (do_invalidate, &dirty);
-    csRect dr;
+    ForEach (do_invalidate, &is, true);
     for (int i = clipchildren.Length () - 1; i >= 0; i--)
     {
       csComponent *child = (csComponent *)clipchildren [i];
@@ -903,7 +923,7 @@ void csComponent::Invalidate (csRect &area, bool IncludeChildren)
         int dX = 0, dY = 0;
         LocalToGlobal (dX, dY);
         child->GlobalToLocal (dX, dY);
-        dr.Set (dirty);
+        dr.Set (is.inv);
         dr.Move (dX, dY);
         child->Invalidate (dr, true);
       } /* endif */
@@ -936,7 +956,8 @@ void csComponent::ClipAlienChildren (csObjVector &rect, csComponent *child)
         inv.Move (dX, dY);
         nb->Invalidate (inv, true);
       } /* endfor */
-    } else if (nb->GetState (CSS_VISIBLE))
+    }
+    else if (nb->GetState (CSS_VISIBLE))
       for (i = rect.Length () - 1; i >= 0; i--)
       {
         csRect *cur = (csRect *)rect[i];
@@ -1114,7 +1135,7 @@ int csComponent::GetFontSize ()
 
 int csComponent::TextWidth (const char *text)
 {
-  return app->TextWidth (text, GetFont (), GetFontSize () );
+  return app->TextWidth (text, GetFont (), GetFontSize ());
 }
 
 int csComponent::TextHeight ()
@@ -1291,6 +1312,39 @@ void csComponent::ObliqueRect3D (int xmin, int ymin, int xmax, int ymax,
   Line (xmin, ymax - 1, xmin, ymin + cornersize, lightindx);
   Line (xmin, ymin + cornersize - 1, xmin + cornersize - 1, ymin, lightindx);
   Line (xmin + cornersize, ymin, xmax - 1, ymin, lightindx);
+}
+
+void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
+{
+ /* Do clipping as follows: create a minimal rectangle which fits the polygon,
+  * clip the rectangle against children & parents, then clip the poly against
+  * all resulting rectangles.
+  */
+  csObjVector rect (8, 4);
+  int i, x = QInt (poly.vertices[0].sx), y = QInt (poly.vertices[0].sy);
+  csRect *lb = new csRect (x, y, x, y);
+  for (i = 1; i < poly.num; i++)
+    lb->Extend (QInt (poly.vertices[i].sx), QInt (poly.vertices[i].sy));
+
+  lb->xmax++;
+  lb->ymax++;
+  lb->Intersect (dirty);
+  if (!clip.IsEmpty ())
+    lb->Intersect (clip);
+  rect.Push (lb);
+  Clip (rect, this);
+
+  for (int i = rect.Length () - 1; i >= 0; i--)
+  {
+    csRect *cur = (csRect *)rect[i];
+// not implemented yet - todo clipping
+/*
+    app->pplPolygon3D (poly, mode);
+    if (!app->ClipLine (xx1, yy1, xx2, yy2,
+        cur->xmin, cur->ymin, cur->xmax, cur->ymax))
+      app->pplLine (xx1, yy1, xx2, yy2, color);
+*/
+  }
 }
 
 void csComponent::SetState (int mask, bool enable)

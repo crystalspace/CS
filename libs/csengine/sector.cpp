@@ -1138,7 +1138,7 @@ void CompressShadowFrustums (csFrustumList* list)
 
 //@@@ Needs to be part of sector?
 void* CheckFrustumPolygonsFB (csSector*,
-	csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
+  csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
   csPolygon3D* p;
   csFrustumView* lview = (csFrustumView*)data;
@@ -1205,7 +1205,7 @@ void* CheckFrustumPolygonsFB (csSector*,
       if (frust_cnt < 0)
       {
         frust_cnt = 200;
-	CompressShadowFrustums (&(lview->shadows));
+        CompressShadowFrustums (&(lview->shadows));
       }
     }
   }
@@ -1221,7 +1221,7 @@ static int count_cull_not;
 // @@@ This function needs to use the PVS. However, this function itself
 // is used for the PVS so we need to take care!
 bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
-	const csVector3& /*pos*/, void* data)
+  const csVector3& /*pos*/, void* data)
 {
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;

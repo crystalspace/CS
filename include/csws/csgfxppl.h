@@ -34,10 +34,28 @@ struct iSystem;
 #define MAX_SYNC_PAGES 8
 
 /**
- * Graphics System pipeline class<p>
- * This class implements all drawing operations (which are then passed to
- * System->G2D object). All drawing operations are put on hold until
- * Flush() is called. This routine is usually called once per frame.<p>
+ * Graphics System pipeline class
+ *<p>
+ * This class implements all actual drawing operations (which are then
+ * passed to iGraphics2D/iGraphics3D objects). The rectangle which
+ * encapsulates all changes made to the screen is tracked. Upon frame
+ * completion, this rectangle is kept in a memory buffer and then
+ * propagated to all other videopages, thus for optimal performance
+ * you should switch to single-buffered mode, if possible.
+ *<p>
+ * At the end of each frame, application object calls FinishFrame() method.
+ * It will remember the dirty rectangle for current frame and call
+ * iGraphics3D::Print() method to update the screen.
+ *<p>
+ * Since all drawing is made in real-time, the pipeline should call
+ * BeginDraw with appropiate flags when needed. The graphics pipeline
+ * tracks whenever the BeginDraw() with appropiate flags has been already
+ * called, and doesn't do that again if it was done already. But if you
+ * are doing interleaved drawing of 2D/3D primitives BeginDraw/FinishDraw
+ * will be often called, thus reducing performance. That's why you should
+ * try to group all 3D primitives together (like polygons) and draw all
+ * them in one shot.
+ *<p>
  * All methods and variables of this class are private. Only csApp should
  * have access to its internals, all graphics pipeline management is done
  * through main application object.
@@ -47,87 +65,25 @@ class csGraphicsPipeline : public csBase
 private:
   /// Only csApp can manipulate the graphics pipeline
   friend class csApp;
-  /// Graphics pipeline operations
-  enum
-  {
-    pipeopNOP,
-    pipeopBOX,
-    pipeopLINE,
-    pipeopPIXEL,
-    pipeopTEXT,
-    pipeopSPR2D,
-    pipeopSAVAREA,
-    pipeopRESAREA,
-    pipeopSETCLIP,
-    pipeopRESCLIP,
-    pipeopPOLY3D
-  };
-  /**
-   * Graphics pipeline entry.
-   * WARNING! Keep the size of this structure AS LOW AS POSSIBLE.
-   * The gfx pipeline is an static array that contains VERY many
-   * elements of this type.
-   */
-  typedef struct
-  {
-    unsigned char Op;
-    unsigned char font, fontsize;	// this is a part of Text struct (below)
-    union
-    {
-      struct
-      {
-        int xmin,ymin,xmax,ymax;
-        int color;
-      } Box;
-      struct
-      {
-        float x1,y1,x2,y2;
-        int color;
-      } Line;
-      struct
-      {
-        int x,y,color;
-      } Pixel;
-      struct
-      {
-        int x,y,fg,bg;
-        char *string;
-      } Text;
-      struct
-      {
-        csPixmap *s2d;
-        int x, y, w, h;
-      } Spr2D;
-      struct
-      {
-        csImageArea **Area;
-        int x, y, w, h;
-      } SavArea;
-      struct
-      {
-        csImageArea *Area;
-        bool Free;
-      } ResArea;
-      struct
-      {
-        int xmin, ymin, xmax, ymax;
-      } ClipRect;
-      struct
-      {
-        void *poly;	/* A pointer to packed G3DPolygonDPFX structure */
-        int mode;
-      } Poly3D;
-    };
-  } csPipeEntry;
 
-  int pipelen;
-  csPipeEntry pipeline [MAX_CSWS_PIPELINE_LENGTH];
-  // Used to propagate changes to all pages
+  /// Used to propagate changes to all pages
+  /// The contents of dirty area on each page
   csImageArea *SyncArea [MAX_SYNC_PAGES];
-  csRect SyncRect [MAX_SYNC_PAGES];
+  /// The rectangle we should refresh for current page (incremental)
   csRect RefreshRect;
+  /// Maximum video pages in system
   int MaxPage;
+  /// Current video page
   int CurPage;
+
+  /// Current draw mode (used to exclude rendundant BeginDraw's)
+  int DrawMode;
+  /// Current clipping rectangle
+  csRect ClipRect;
+  /// The original clipping rectangle (set by user manually)
+  csRect OrigClip;
+  /// The original font set by user (before drawing with CSWS)
+  int OrigFont, OrigFontSize;
 
   // Frame width and height
   int FrameWidth, FrameHeight;
@@ -136,9 +92,6 @@ private:
   iGraphics2D *G2D;
   // The 3D graphics driver
   iGraphics3D *G3D;
-
-  // Used to clear screen
-  int ClearPage,ClearColor;
 
   /// Initialize pipeline
   csGraphicsPipeline (iSystem *System);
@@ -150,9 +103,6 @@ private:
 
   /// Drop all synchronization rectangles
   void Desync ();
-
-  /// Flush graphics pipeline
-  void Flush (int iCurPage);
 
   /// Draw a box
   void Box (int xmin, int ymin, int xmax, int ymax, int color);
@@ -181,7 +131,7 @@ private:
   /// Clear screen with specified color
   void Clear (int color);
 
-  /// Set clipping rectangle: SHOULD CALL RestoreClipRect() AFTER DRAWING!
+  /// Set clipping rectangle
   void SetClipRect (int xmin, int ymin, int xmax, int ymax);
 
   /// Restore clipping rectangle to (0, 0, ScreenW, ScreenH);
@@ -189,18 +139,6 @@ private:
 
   /// Draw a 3D polygon using DrawPolygonFX
   void Polygon3D (G3DPolygonDPFX &poly, UInt mode);
-
-  /// Allocate a new slot in graphics pipeline
-  csPipeEntry *AllocOp(int pipeOp)
-  {
-    if (pipelen < MAX_CSWS_PIPELINE_LENGTH)
-    {
-      pipeline[pipelen].Op = pipeOp;
-      return &pipeline[pipelen++];
-    }
-    else
-      return NULL;
-  }
 
   /// Clip a line against a rectangle and return true if its clipped out
   bool ClipLine (float &x1, float &y1, float &x2, float &y2,
@@ -218,8 +156,18 @@ private:
   /// Return the height of selected font and size
   int TextHeight (int Font, int FontSize);
 
-  /// Begin painting
-  bool BeginDraw ();
+  /// Called at the start of every frame
+  void StartFrame (int iCurPage);
+
+  /// Flush graphics pipeline
+  void FinishFrame ();
+
+  /// Begin painting: no-op if we're already in draw mode
+  bool BeginDraw (int iMode)
+  { return (iMode != DrawMode) ? BeginDrawImp (iMode) : true; }
+
+  /// Do the actual work for BeginDraw ()
+  bool BeginDrawImp (int iMode);
 
   /// Finish painting
   void FinishDraw ();

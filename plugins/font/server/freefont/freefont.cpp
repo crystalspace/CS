@@ -252,8 +252,8 @@ bool csFreeTypeServer::CreateGlyphBitmaps (FT *font, int size)
   return succ;
 }
 
-bool csFreeTypeServer::SetFontProperty (int fontId, CS_FONTPROPERTY propertyId, long& property, 
-					bool /*autoApply*/ )
+bool csFreeTypeServer::SetFontProperty (int fontId, CS_FONTPROPERTY propertyId,
+  long &property, bool autoApply)
 {
   bool succ = false;
   if ( fontId >= 0 && fontId < fonts.Length() ){

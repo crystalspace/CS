@@ -68,7 +68,7 @@ void csKeyboardDriver::do_key (int key, bool down)
             | (GetKeyState (CSKEY_CTRL) ? CSMASK_CTRL : 0)
             | (GetKeyState (CSKEY_ALT) ? CSMASK_ALT : 0);
 
-  if (down && !GetKeyState (key))
+  if (down != GetKeyState (key))
     smask |= CSMASK_FIRST;
 
   if ((key >= 32) && (key < 128))

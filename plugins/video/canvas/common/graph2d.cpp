@@ -496,7 +496,7 @@ bool csGraphics2D::PerformExtension (const char* args)
 
 int csGraphics2D::GetTextWidth (int Font, const char *text)
 {
-  int w=0, h=0;
+  int w = 0, h = 0;
   FontServer->GetTextDimensions (Font, text, w, h);
   return w;
 }
@@ -504,6 +504,18 @@ int csGraphics2D::GetTextWidth (int Font, const char *text)
 int csGraphics2D::GetTextHeight (int Font)
 {
   return FontServer->GetMaximumHeight (Font);
+}
+
+int csGraphics2D::GetFontSize ()
+{
+  long s;
+  return FontServer->GetFontProperty (Font, CS_FONTSIZE, s) ? s : -1;
+}
+  
+bool csGraphics2D::SetFontSize (int FontSize)
+{
+  long s = FontSize;
+  return FontServer->SetFontProperty (Font, CS_FONTSIZE, s, false);
 }
 
 void csGraphics2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)

@@ -472,17 +472,24 @@ public:
   /// Restore window if it is maximized and if DragStyle has CS_DRAG_SIZEABLE
   virtual bool Restore ();
 
-  /// Invalidate a area of component (force a redraw of this area)
-  void Invalidate (csRect &area, bool IncludeChildren = false);
+  /**
+   * Invalidate a area of component (force a redraw of this area).
+   * If fIncludeChildren is true, all child components that covers
+   * this area of parent will be partially invalidated as well.
+   * Additionaly, if 'below' is non-NULL, only the child components
+   * that are below 'below' in Z-order will be invalidated.
+   */
+  void Invalidate (csRect &area, bool IncludeChildren = false,
+    csComponent *below = NULL);
 
   /// Same, but with coordinates instead of rectangle
   void Invalidate (int xmin, int ymin, int xmax, int ymax,
-    bool IncludeChildren = false)
-  { csRect inv (xmin, ymin, xmax, ymax); Invalidate (inv, IncludeChildren); }
+    bool IncludeChildren = false, csComponent *below = NULL)
+  { csRect inv (xmin, ymin, xmax, ymax); Invalidate (inv, IncludeChildren, below); }
 
   /// Same, but invalidates entire component
-  void Invalidate (bool IncludeChildren = false)
-  { Invalidate (0, 0, bound.Width (), bound.Height (), IncludeChildren); }
+  void Invalidate (bool IncludeChildren = false, csComponent *below = NULL)
+  { Invalidate (0, 0, bound.Width (), bound.Height (), IncludeChildren, below); }
 
   /// Set/clear given component state flags
   virtual void SetState (int mask, bool enable);
@@ -631,6 +638,9 @@ public:
   /// Draw a 3D rectangle with two oblique corners (used for buttons, for example)
   void ObliqueRect3D (int xmin, int ymin, int xmax, int ymax, int cornersize,
     int darkindx, int lightindx);
+
+  /// Draw a 3D polygon
+  void Polygon3D (G3DPolygonDPFX &poly, UInt mode);
 
 protected:
   /**

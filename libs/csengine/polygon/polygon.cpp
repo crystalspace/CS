@@ -1586,33 +1586,6 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
         case CS_FRUST_COVERED:
           return false;
       }
-
-#if 0
-  int i;
-      // Assume that the shadow frustum is relevant.
-      sf->relevant = true;
-
-      // First we test a special case. If all vertices of the light
-      // frustum are contained in the shadow frustum then we don't
-      // need to process the light frustum at all. In that case we
-      // return false (e.g. light frustum itself is not relevant).
-      bool fully_shadowed = true;
-      for (i = lview.light_frustum->GetNumVertices () - 1; i >= 0; i--)
-        if (!sf->Contains (lview.light_frustum->GetVertex (i)))
-        {
-          fully_shadowed = false;
-          break;
-        }
-      if (fully_shadowed) return false;
-
-// The following test is buggy (but it is highly needed)
-#if 1
-      // @@@ Replace with a less accurate but faster test.
-      sf->relevant = csFrustum::IsVisible (lview.light_frustum->GetVertices (),
-        lview.light_frustum->GetNumVertices (), sf->GetVertices (),
-        sf->GetNumVertices ());
-#endif
-#endif
     }
     sf = sf->next;
   }
@@ -1654,12 +1627,13 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   csLightMapped *lmi = GetLightMapInfo ();
   bool rectangle_frust;
   bool fill_lightmap = true;
+  bool calc_lmap = lmi && lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date;
 
   // Calculate the new frustum for this polygon.
   if ((GetTextureType () == POLYTXT_LIGHTMAP)
    && !flags.Check (CS_POLY_FLATSHADING)
    && !lview->dynamic
-   && lmi && lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date)
+   && calc_lmap)
   {
     // For lightmapped polygons we will compute the lighting of the
     // entire lightmap as a whole. This removes any problems that existed
@@ -1731,7 +1705,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   // FillLightMap() will use this information and
   // csPortal::CalculateLighting() will also use it!!
   po = GetPortal ();
-  if (po || new_lview.dynamic || (lmi && !lmi->lightmap_up_to_date))
+  if (po || new_lview.dynamic || calc_lmap)
     if (!MarkRelevantShadowFrustums (new_lview))
       return;
 
@@ -1764,7 +1738,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
     if (!new_light_frustum) return;
 
     // Mark the shadow frustums that hit THE polygon (and not the lightmap)
-    if (po || new_lview.dynamic || (lmi && !lmi->lightmap_up_to_date))
+    if (po || new_lview.dynamic || calc_lmap)
       if (!MarkRelevantShadowFrustums (new_lview))
         return;
   }
