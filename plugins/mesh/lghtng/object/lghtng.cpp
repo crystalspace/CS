@@ -130,9 +130,13 @@ bool csLightningMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
 void csLightningMeshObject::GetObjectBoundingBox (csBox3& retbbox, int type)
 {
-  
+  GenMesh->GetObjectModel ()->GetObjectBoundingBox (retbbox, type);
 }
 
+void csLightningMeshObject::GetRadius (csVector3& rad, csVector3& cent)
+{
+  GenMesh->GetObjectModel ()->GetRadius (rad, cent);
+}
 
 void csLightningMeshObject::HardTransform (const csReversibleTransform& t)
 {

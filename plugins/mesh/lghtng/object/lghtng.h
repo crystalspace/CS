@@ -55,7 +55,6 @@ class csLightningMeshObject : public iMeshObject
   uint MixMode;
   bool initialized;
   iMeshObjectDrawCallback* vis_cb;
-  csVector3 radius;
   float length;  
   float wildness;
   float vibration;
@@ -78,8 +77,7 @@ public:
   /// Destructor.
   virtual ~csLightningMeshObject ();
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
-  void GetRadius (csVector3& rad, csVector3& cent)
-  { rad =  radius; cent.Set(0,0,0); }
+  void GetRadius (csVector3& rad, csVector3& cent);
 
   ///--------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
