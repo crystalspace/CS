@@ -167,7 +167,7 @@ in a seperate thing mesh.
 
 It is also no longer possible to get camera space information from polygons.
 
-The @samp{<shading>} keyword in polygons in map files now accepts a boolean
+The @code{<shading>} keyword in polygons in map files now accepts a boolean
 value instead of @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}.
 With this you can enable/disable lightmapping.
 
@@ -249,23 +249,15 @@ other meshes.
 The @samp{csSome}, @samp{csConstSome} and @samp{uint} types have been removed.
 Use @samp{void*}, @samp{const void*} and @samp{unsigned int} instead.
 
-@subheading csHashMap Changes
-@cindex @code{csHashMap}
-@cindex @code{csHashIterator}
-@cindex @code{csGlobalHashIterator}
-
-@samp{csHashIterator} can no longer iterate over all objects. To do that
-you need to use @samp{csGlobalHashIterator}.
-
 @subheading Procedural Textures
 
 Instead of only built-in types, procedural textures have been moved into 
-plugins. That means that the @samp{<type>} token now works the same way
-as the @samp{<plugin>} token for meshes. That is, either specify a full
+plugins. That means that the @code{<type>} token now works the same way
+as the @code{<plugin>} token for meshes. That is, either specify a full
 class ID (e.g. @samp{crystalspace.proctex.loader.fire}), or a shortcut
-specified in the @samp{<plugins>} token of the world. To simulate the
-old @samp{<type>} behaviour, paste the following lines into a map's 
-@samp{<plugin>} section:
+specified in the @code{<plugins>} token of the world. To simulate the
+old @code{<type>} behaviour, paste the following lines into a map's 
+@code{<plugin>} section:
 
 @example
 <plugin name="dots">crystalspace.texture.loader.dots</plugin>
@@ -274,18 +266,18 @@ old @samp{<type>} behaviour, paste the following lines into a map's
 <plugin name="plasma">crystalspace.texture.loader.plasma</plugin>
 @end example
 
-This requires that you move the @samp{<plugin>} block in front of the 
-@samp{<textures>} block, as otherwise the shortcuts won't be recognised.
+This requires that you move the @code{<plugin>} block in front of the 
+@code{<textures>} block, as otherwise the shortcuts won't be recognised.
 
 The behaviour of procedural textures also differs as a material of the same
 name was created along with the texture; this isn't the case any more, you
 have to create a material which uses the procedural texture manually.
 
 In addition, the loader now doesn't distinguish between normal and procedural
-textures any more, both are loaded with the same @samp{<texture>} block. The 
-syntax recognized is a combination of both old @samp{<texture>} and 
-@samp{<proctex>} tokens---so renaming all @samp{<proctex>} to @samp{<texture>}
-tags is sufficient to convert a level (apart from fixing the @samp{<type>}
+textures any more, both are loaded with the same @code{<texture>} block. The 
+syntax recognized is a combination of both old @code{<texture>} and 
+@code{<proctex>} tokens---so renaming all @code{<proctex>} to @code{<texture>}
+tags is sufficient to convert a level (apart from fixing the @code{<type>}
 tokens.)
 
 @subheading Regions
@@ -317,7 +309,7 @@ In @samp{iLoader} the functions @code{LoadMapFile()} and
 @code{ThreadedLoadMapFile()} now expect an optional pointer to a region
 in addition with a boolean to restrict searching to that region.
 
-In addition to all these changes the @samp{<region>} keyword in map files is no
+In addition to all these changes the @code{<region>} keyword in map files is no
 longer supported.
 
 @subheading Mesh Objects/Factories and iPolygonMesh
@@ -407,6 +399,27 @@ void Reset()             // resets iterator (not all implement this).
 @code{iAWS::CreateCustomCanvas()} was removed.  To set up the @sc{aws} with a
 cavas, use @code{iAWS::SetupCanvas()} instead. 
 
+@subheading Array Changes
+@cindex @code{csArray}
+@cindex @code{csPDelArray}
+@cindex @code{csRefArray}
+@cindex @code{csStringArray}
+@cindex @code{csGrowingArray}
+@cindex @code{csDirtyAccessArray}
+
+All arrays have been modified to inherit from @samp{csArray}. This means
+that there are some slight @sc{api} changes because some methods were
+not consistent with @samp{csArray}.
+
+@samp{csGrowingArray} has been renamed to @samp{csDirtyAccessArray} in order to
+better reflect its intention, which is that it publishes a method allowing the
+client to obtain access to the raw memory block containing the items in
+contiguous memory.  This potentially unsafe operation is not available in the
+other array templates.  Use this class only in very special-purpose cases where
+you need to construct a list of objects dynamically and then pass the address
+of the raw memory containing those objects to some foreign function which does
+not understand @code{csArray<>}.
+
 @subheading csPArray Removed
 @cindex @code{csPArray}
 @cindex @code{csArray}
@@ -422,9 +435,10 @@ So, use @code{csArray<T*>} instead of @code{csPArray<T>}.
 @cindex @code{FindFiles}
 @cindex @code{MountRoot}
 
-@samp{csStrVector} has been removed in favor of @samp{csStringArray}.
-This means that functions like @code{iVFS::MountRoot()} and
-@code{iVFS::FindFiles()} now return an @samp{iStringArray}.
+@samp{csStrVector} and @samp{iStrVector} have been removed in favor of
+@samp{csStringArray} and @samp{iStringArray}.  This means that functions like
+@code{iVFS::MountRoot()} and @code{iVFS::FindFiles()} now return an
+@samp{iStringArray}.
 
 @subheading csVector and csBasicVector Removed
 @cindex @code{csVector}
@@ -498,27 +512,6 @@ public:
 In the calls to @code{InsertSorted()}, @code{FindKey()}, etc., you would then
 pass in one of the static functions to use.
 
-@subheading Array Changes
-@cindex @code{csArray}
-@cindex @code{csPDelArray}
-@cindex @code{csRefArray}
-@cindex @code{csStringArray}
-@cindex @code{csGrowingArray}
-@cindex @code{csDirtyAccessArray}
-
-All arrays have been modified to inherit from @samp{csArray}. This means
-that there are some slight @sc{api} changes because some methods were
-not consistent with @samp{csArray}.
-
-@samp{csGrowingArray} has been renamed to @samp{csDirtyAccessArray} in order to
-better reflect its intention, which is that it publishes a method allowing the
-client to obtain access to the raw memory block containing the items in
-contiguous memory.  This potentially unsafe operation is not available in the
-other array templates.  Use this class only in very special-purpose cases where
-you need to construct a list of objects dynamically and then pass the address
-of the raw memory containing those objects to some foreign function which does
-not understand @code{csArray<>}.
-
 @subheading Hash and Set Templates
 @cindex @code{csHash}
 @cindex @code{csSet}
@@ -527,6 +520,14 @@ The new template classes @code{csHash<>} and @code{csSet<>} are available for
 use by new code; and older code will be upgraded over time to use these
 template classes.  The older @samp{csHashMap} and @samp{csHashSet} classes are
 now deprecated.
+
+@subheading csHashMap Changes
+@cindex @code{csHashMap}
+@cindex @code{csHashIterator}
+@cindex @code{csGlobalHashIterator}
+
+The deprecated @samp{csHashIterator} can no longer iterate over all objects.
+To do that you need to use @samp{csGlobalHashIterator}.
 
 @subheading iEventQueue Client References
 @cindex @code{csEventQueue}
@@ -590,9 +591,9 @@ layers now expects a @samp{csStringID} instead of an integer.
 
 The monolithic and inflexible plugin-registry database, @file{scf.cfg}, has
 been eliminated.  Instead, plugin modules are now self-describing via a
-meta-information resource associated with each module.  More importantly, it is
-possible to access this meta-information without actually loading the plugin,
-thus avoiding a time-consuming and costly operation.
+meta-information resource associated with each module.  It is possible to
+access this meta-information without actually loading the plugin, thus avoiding
+a time-consuming and costly operation.
 
 A plugin's meta-information is now stored in an @sc{xml}-format file rather
 than being hard-coded via the plugin's C++ code.  The meta-information file is
@@ -726,8 +727,8 @@ raw image data.
 @end itemize
 
 @noindent
-If the multiplexor identifies the image as @sc{png}, only then will it actually
-request the @sc{png} loader plugin.
+If the hypothetical multiplexor identifies the image as @sc{png}, only then
+will it actually request the @sc{png} loader plugin.
 
 At program launch time, @sc{scf} discovers plugins automatically by searching a
 set of directories, and creates an internal database associating available
@@ -810,7 +811,17 @@ meta-information.  If this option is disabled, or if embedding is not supported
 by the platform, then the meta-information is laid down alongside the built
 plugin module (@file{.so} or @file{.dll}) in a text file with the same name as
 the plugin module, except with extension @file{.csplugin}.  The
-meta-information embedding option is enabled, by default.
+meta-information embedding option is enabled by default for most platforms, but
+is disabled by default for Unix platforms.
+
+@emph{Warning}: Meta-information embedding on Unix is accomplished via the
+@file{libbfd} library which carries a @sc{gpl} license.  This license is
+incompatible with Crystal Space's @sc{lgpl} license.  Unlike the @sc{lgpl}
+which is compatible with closed-source projects, the @sc{gpl} license is not.
+For this reason, embedding is disabled by default on Unix, and must be enabled
+explicitly with the @file{configure} script's
+@samp{--enable-meta-info-embedding} option.  Enable this option on Unix only if
+you are certain that your project is compatible with the @sc{gpl} license.
 
 The platform-specific plugin loaders are capable of reading embedded plugin
 meta-information, as well as meta-information in stand-alone @file{.csplugin}
@@ -818,7 +829,7 @@ files.  Even when configured for embedding, the plugin loaders will still be
 able to recognize and utilize external @file{.csplugin} resources.  This means
 that Crystal Space-based projects with unsophisticated build systems, which are
 incapable of embedding meta-information into the plugin module, can still
-create usable plugins by simply placing a copy of the @file{.csplugin} file
+create usable plugins simply by placing a copy of the @file{.csplugin} file
 alongside the plugin executable (@file{.so} or @file{.dll}).
 
 External projects which are based upon Crystal Space's Jam build system
@@ -845,15 +856,6 @@ required at the time of writing:
 @code{EMBED_META = yes}
 @end table
 
-@emph{Warning}: Meta-information embedding on Unix is accomplished via the
-@file{libbfd} library which carries a @sc{gpl} license.  This license is
-incompatible with Crystal Space's @sc{lgpl} license.  Unlike the @sc{lgpl}
-which is compatible with closed-source projects, the @sc{gpl} license is not.
-For this reason, embedding is disabled by default on Unix, and must be enabled
-explicitly with the @file{configure} script's
-@samp{--enable-meta-info-embedding} option.  Enable this option on Unix only if
-you are certain that your project is compatible with the @sc{gpl} license.
-
 The @file{scfreg} tool whose job was to manipulate the monolithic @sc{scf}
 plugin-registry database, @file{scf.cfg}, has been eliminated since it is no
 longer required.
@@ -877,10 +879,12 @@ makefiles, or project files.
 
 The @code{csString::strlwr()} method was renamed to @code{Downcase()}.  A
 complementary @code{Upcase()} method was added for completeness.  These methods
-were also added to @samp{iString}.  Added a @code{Slice()} method to
+were also added to @samp{iString}.  A @code{Slice()} method was added to
 @samp{iString} and @samp{csString} which copies a sub-portion of a string.
-Several @samp{iString} methods which were incorrectly returning raw
-@samp{iString*} or @samp{iString&} now correctly return @code{csRef<iString>}.
+@code{Slice()} is similar to the existing @code{SubString()} method, but
+follows a more natural calling convention.  Several @samp{iString} methods
+which were incorrectly returning raw @samp{iString*} or @samp{iString&} now
+correctly return @code{csRef<iString>}.
 
 @subheading csMD5 Changes
 
@@ -911,3 +915,78 @@ equivalent function @code{iSector::HitBeamPortals()}.
 
 @code{iVisibilityCuller::IntersectSegment()} now returns a polygon index
 instead of a portal.
+
+@subheading Directory and Path Queries
+
+The following low-level functions, declared in @file{cssys/syspath.h} can be
+used to query various directories and paths.  Each of these functions expects
+to be passed @code{argv[0]} obtained from the program's @code{main()} function.
+
+@table @code
+@item csGetAppPath()
+Returns the absolute path of the application executable file.
+
+@item csGetAppDir()
+Returns the absolute path of the directory containing the application
+executable file; or the path of the directory containing the Cocoa application
+wrapper on MacOS/X for @sc{gui} applications.
+
+@item csGetResourceDir()
+Returns the absolute path of the directory in which the application's resources
+reside.  On many platforms, resources, such as configuration files, data files,
+etc., reside in the same directory as the application itself.  On such
+platforms, this function will typically return the same directory as
+@code{csGetAppDir()}.  On MacOS/X, however, for @sc{gui} applications, this
+function will return the @file{Resources} directory within the Cocoa
+application wrapper.
+@end table
+
+Since it is rarely convenient to squirrel-away @code{argv[0]}, the following
+higher-level methods, declared in @file{iutil/cmdline.h}, are also available
+for obtaining the same information once the application has been initialized.
+These methods do not require access to @code{argv[0]}.  You can obtain a handle
+to the shared @samp{iCommandLineParser} from the object registry,
+@samp{iObjectRegistry}, which is declared in @file{iutil/objreg.h}.
+
+@itemize @bullet
+@item
+@code{iCommandLineParser::GetAppPath()}
+@item
+@code{iCommandLineParser::GetAppDir()}
+@item
+@code{iCommandLineParser::GetResourceDir()}
+@end itemize
+
+@subheading @sc{vfs} Changes
+
+@sc{vfs} (@pxref{VFS}) now understands two new pseudo-variables, @samp{$*} and
+@samp{$^}, in its configuration file, @file{vfs.cfg}, and during programmatic
+mounts.  The full list of pseudo-variables is:
+
+@table @code
+@item $/
+Platform-specific path delimiter (@file{/} on Unix and MacOS/X; @file{\} on
+Windows).
+
+@item $@@
+Crystal Space installation directory; same as @code{csGetConfigPath()}.
+
+@item $*
+Application resource directory; same as @code{csGetResourceDir()}.
+
+@item $^
+Directory where application resides, or directory containing Cocoa application
+wrapper on MacOS/X; same as @code{csGetAppDir()}.
+@end table
+
+@noindent
+The expansions of the @samp{$@@}, @samp{$*}, and @samp{$^} variables always
+contain a trailing path delimiter.
+
+At initialization time, @sc{vfs} now searches for its configuration file,
+@file{vfs.cfg}, in the application resource directory
+(@code{csGetResourceDir()}), then in the directory containing the application
+(@code{csGetAppDir()}), and finally in the Crystal Space installation directory
+(@code{csGetConfigPath()}).  The first @file{vfs.cfg} file found during this
+search is the one used to initialize the facility.  In the past, @sc{vfs}
+searched for @file{vfs.cfg} only in the Crystal Space installation diretory.
