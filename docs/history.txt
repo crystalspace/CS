@@ -13,6 +13,9 @@ chronological order.
 	  off at least things will work but slower.
 	- Eric Sunshine documented the semantic and syntactic changes to
 	  csList<>::Iterator in apimod100.txi.
+	- Eric Sunshine worked around problem where Doxygen became hightly
+	  confused early in csutil/array.h, with the result that the majority
+	  of methods were not reflected in the generated documentation.
 24-Oct-2004
 	- Eric Sunshine simplified the 22-Oct-2004 change to DDS loader so that
 	  it no longer Clone()'s the image when returning a mipmap.  It is

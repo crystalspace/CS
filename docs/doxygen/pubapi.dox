@@ -285,7 +285,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces. 
 
-INPUT                  = $(TOP)/docs/doxygen/doxygrps $(TOP)/include
+INPUT                  = $(TOP)/docs/doxygen/doxygrps $(TOP)/include/csutil/array.h
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -639,6 +639,9 @@ PREDEFINED             = CS_COMPILER_GCC \
 			 "CS_CSUTIL_EXPORT=" \
 			 "CS_CSWS_EXPORT=" \
 			 "SCF_VERSION(a,b,c,d)=" \
+			 "csArrayTemplate(K)=template <class K>" \
+			 "csArrayCmpDecl(T1,T2)=csArrayCmp<T1,T2>" \
+			 "csArrayCmpInvoke(C,R)=C(R)" \
 			 "UCTF_CONVERTER(a,b,c,d,e)=inline static size_t a \
 			   (d* dest, size_t destSize, \
 			    const b* source, size_t srcSize = (size_t)-1) {}"
