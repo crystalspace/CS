@@ -21,14 +21,17 @@ AC_DEFUN([CS_OUTPUT_INSTALLDIRS],[
 # Handle the case when no prefix is given. And the special case when a path
 # contains more than 2 slashes, these paths seem to be correct but jam fails
 # on them.
-AS_IF([test $prefix = NONE], [prefix="$ac_default_prefix"],
-    [prefix=`echo "$prefix" | sed -e 's:///*:/:g'`])
+AS_IF([test $prefix = NONE],
+    [jam_prefix="$ac_default_prefix"],
+    [jam_prefix=`echo "$prefix" | sed -e 's:///*:/:g'`])
 AS_IF([test $exec_prefix = NONE],
-    [exec_prefix="AS_ESCAPE([$(INSTALLDIR.PREFIX)])"],
-    [exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`])
+    [jam_exec_prefix="AS_ESCAPE([$(INSTALLDIR.PREFIX)])"],
+    [jam_exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`])
 
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.PREFIX], [CS_PREPARE_INSTALLPATH([$prefix])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.EXEC_PREFIX], [CS_PREPARE_INSTALLPATH([$exec_prefix])])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.PREFIX],
+    [CS_PREPARE_INSTALLPATH([$jam_prefix])])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.EXEC_PREFIX],
+    [CS_PREPARE_INSTALLPATH([$jam_exec_prefix])])
 
 # Hack: Unfortunately, values of the other directories often contain references
 # to prefix and exec_prefix in lowercase, thus we duplicate the above values.

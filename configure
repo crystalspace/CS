@@ -276,7 +276,6 @@ PACKAGE_STRING='crystal 0.97'
 PACKAGE_BUGREPORT='crystal-main@lists.sourceforge.net'
 
 ac_unique_file="libs/csutil/Jamfile"
-ac_default_prefix=/usr/local/crystal
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -1432,7 +1431,6 @@ fi
 ac_config_guess="$SHELL $ac_aux_dir/config.guess"
 ac_config_sub="$SHELL $ac_aux_dir/config.sub"
 ac_configure="$SHELL $ac_aux_dir/configure" # This should be Cygnus configure.
-
 
 # Make sure we can run config.sub.
 $ac_config_sub sun4 >/dev/null 2>&1 ||
@@ -28460,7 +28458,7 @@ fi
 # Determine installation directory for GNU make build system.
 #------------------------------------------------------------------------------
 if test $prefix = NONE; then
-  cs_install_dir=/usr/local/crystal
+  cs_install_dir="$ac_default_prefix/crystal"
 else
   cs_install_dir=$prefix
 fi
@@ -28478,21 +28476,21 @@ cs_makefile_text="${cs_makefile_text}INSTALL_DIR = $cs_install_dir
 # contains more than 2 slashes, these paths seem to be correct but jam fails
 # on them.
 if test $prefix = NONE; then
-  prefix="$ac_default_prefix"
+  jam_prefix="$ac_default_prefix"
 else
-  prefix=`echo "$prefix" | sed -e 's:///*:/:g'`
+  jam_prefix=`echo "$prefix" | sed -e 's:///*:/:g'`
 fi
 
 if test $exec_prefix = NONE; then
-  exec_prefix="\$(INSTALLDIR.PREFIX)"
+  jam_exec_prefix="\$(INSTALLDIR.PREFIX)"
 else
-  exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`
+  jam_exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`
 fi
 
 
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.PREFIX ?= \"`echo "$prefix" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.PREFIX ?= \"`echo "$jam_prefix" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
 "
-cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.EXEC_PREFIX ?= \"`echo "$exec_prefix" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
+cs_jamconfig_text="${cs_jamconfig_text}INSTALLDIR.EXEC_PREFIX ?= \"`echo "$jam_exec_prefix" | sed -e 's/\${\([a-zA-Z_][a-zA-Z_]*\)}/$(\1)/g' -e 's/\\\\/\\\\\\\\/g'`\" ;
 "
 
 # Hack: Unfortunately, values of the other directories often contain references

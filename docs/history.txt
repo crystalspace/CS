@@ -9,6 +9,16 @@ chronological order.
 5-Dec-2003
 	- res fixed the iEvent::Find() renaming in cspace.i after his recent
 	  constness changes.
+	- Eric sunshine changed configure.ac so that it no longer invokes
+	  AC_PREFIX_DEFAULT(["/usr/local/crystal"]).  This fixes problem where
+	  'jam install' was installing into /usr/local/crystal/share/crystal,
+	  etc., by default rather than /usr/local/share/crystal, etc., if user
+	  did not specify --prefix.  ('make install' still correctly installs
+	  into /usr/local/crystal, by default.)
+	- Eric Sunshine augmented installdir.m4 so that it now keeps its
+	  Jam-specific modifications to "prefix" and "exec_prefix" local to
+	  itself, rather than polluting the global $prefix and $exec_prefix
+	  variables, which might needed unmolested elsewhere.
 4-Dec-2003
         - Steven Geens added a odedynam function for mesh<->plane collisions.
 3-Dec-2003

@@ -17,14 +17,6 @@ m4_define([cs_version_number], [0.97])
 
 
 #------------------------------------------------------------------------------
-# cs_install_dir_default
-#	Default installation directory.
-#------------------------------------------------------------------------------
-m4_define([cs_install_dir_default], [/usr/local/crystal])
-
-
-
-#------------------------------------------------------------------------------
 # cs_lib_paths_default
 #	Whitespace delimited list of directory tuples in which to search, by
 #	default, for external libraries.  Each list item can specify an
@@ -167,7 +159,6 @@ CS_PACKAGEINFO([Crystal Space],
     [http://crystal.sourceforge.net/])
 AC_CONFIG_SRCDIR([libs/csutil/Jamfile])
 AC_CONFIG_AUX_DIR([mk/autoconf])
-AC_PREFIX_DEFAULT([cs_install_dir_default])
 AC_CANONICAL_HOST
 
 
@@ -2166,7 +2157,7 @@ AS_IF([test $enable_new_renderer = yes],
 # Determine installation directory for GNU make build system.
 #------------------------------------------------------------------------------
 AS_IF([test $prefix = NONE],
-    [cs_install_dir=cs_install_dir_default], [cs_install_dir=$prefix])
+    [cs_install_dir="$ac_default_prefix/crystal"], [cs_install_dir=$prefix])
 CS_MAKEFILE_PROPERTY([INSTALL_DIR], [$cs_install_dir])
 
 
