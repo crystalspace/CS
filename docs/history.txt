@@ -13,15 +13,11 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 15-Feb-2000
-	- Seth Galbraith changed the arrays of vertices, normals, and
-	  vertices in each frame into vectors.
-	- Gary Haussmann added halo code written by FragDance.
-	- Gary also added extension detection code written by FragDance,
-	  with some modifications to support different platforms.
-	- Gary also fixed indentation a little and tried to fix some
-	  mipmap problems.
-	- Norman Kramer did some optimization of the ClipToPlane method.
-	- Norman also did an optimization of csMatrix3*=.
+	- Eric Sunshine worked around an OpenStep compiler bug which was
+	  triggeredy by ctLinkList.  The compiler generates unlinkable code
+	  when an inline method calls a second inline method before the
+	  compiler has seen the second method.  A simple textual
+	  reorganization of the file solves the problem.
 14-Feb-2000
 	- Fixed a bug in highscore handling of Blocks.
 	- Fixed rotation center of a few shapes in Blocks.
@@ -34,21 +30,55 @@ Short-term cleanups that need to be done:
 	  file are now loaded via VFS.  He also temporarily added height.ter
 	  to terrain.zip since automatic height map generation is currently
 	  broken (thus a pre-existing height map is required).
+	- Eric Sunshine added documentation to "worldfmt" for new csLoader
+	  keywords MERGE_TEXELS, MERGE_VERTICES, and MERGE_NORMALS which Seth
+	  Galbraith added.
+	- Eric Sunshine fixed the reference to IRC in resources.tex to point
+	  at irc.linux.com rather than irc.icq.com.
+	- Eric Sunshine performed a fairly major overhaul of mdl2spr, the
+	  Quake model conversion tool.  Details are as follows:
+	    - Combined the programs mdl2spr (for MDL models) and md22spr (for
+	      MD2 models) into a single application.
+	    - No longer requires an external "palette.lmp" resource for
+	      extracting skins from MDL files, thus simplifying usage.
+	    - Cleaned up and organized the project.  Cleaned up the code
+	      considerably (though it can still use more cleaning).  Folded
+	      out redundant code.
+	    - Skins extracted from Quake 1 MDL files are now written as PNG
+	      files rather than PCX files, and are thus immediately usable by
+	      CS (unlike PCX images which CS can not deal with).  Eliminated
+	      the old PCX code.
+	    - Added a CS makefile so that it can be built easily on all
+	      platforms which are supported by CS.
+	    - Improved the documentation and moved it to the standard 'docs'
+	      directory.
+	- Eric Sunshine fixed warnings on Irix related to extra semi-colons
+	  following CSOBJTYPE.
+	- Eric Sunshine fixed a couple problems with usage of the 'which'
+	  command in unixconf.sh which afflicted the Irix platform.
+	- Seth Galbraith changed the arrays of vertices, normals, and vertices
+	  in each frame into vectors.
+	- Gary Haussmann added halo code written by FragDance.
+	- Gary also added extension detection code written by FragDance, with
+	  some modifications to support different platforms.
+	- Gary also fixed indentation a little and tried to fix some mipmap
+	  problems.
+	- Norman Kramer did some optimization of the ClipToPlane method.
+	- Norman also did an optimization of csMatrix3*=.
+	- Eric Sunshine rewrote an optimization which Norman Kramer made to
+	  csMatrix3::operator*=() such that it is robust and safe rather than
+	  fragile and potentially unsafe (in a multi-threaded environment).
 	- Michael Ewert did some changes to csPhyzik:
 	    - Catastrophe support added.
 	    - Evolve loop moved into ctworld.
 	    - Collision detection/response handled by callbacks of the
 	      catastrophe system.
 	    - Added CD catastrophe manager at init.
-	    - Daniel Gudbjartsson pointed out an error in
-	      ctMatrix3::cofactor.
+	    - Daniel Gudbjartsson pointed out an error in ctMatrix3::cofactor.
 	    - No longer multiplying return value by (i,j).
-	- Thomas Hieber did further documentation and cleanup of CD
-	  code.
+	- Thomas Hieber did further documentation and cleanup of CD code.
 	- Thomas also did some small changes to VC project files.
-	- Robert Bate did some small fix to the new csIniFile stuff
-	  by making sure all the friend declarations have a class
-	  keyword after them.
+	- Robert Bate made a small fix to csIniFile to compile on Macintosh.
 	- Robert also did some other changes.
 13-Feb-2000
 	- Eric Sunshine performed a fairly extensive overhaul of csIniFile.
