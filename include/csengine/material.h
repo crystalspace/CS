@@ -26,7 +26,10 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "ivideo/effects/efdef.h"
-#include "ivideo/shader/shader.h"
+
+#ifdef CS_USE_NEW_RENDERER
+  #include "ivideo/shader/shader.h"
+#endif
 
 struct iTextureWrapper;
 struct iTextureManager;
@@ -62,8 +65,10 @@ private:
   /// The effect associated with this material
   iEffectDefinition* effect;
 
+#ifdef CS_USE_NEW_RENDERER
   /// Shader assoiciated with material
   csRef<iShader> shader;
+#endif
 
 public:
   /**
