@@ -49,6 +49,10 @@ LIBS.FREETYPE.SYSTEM = $(LFLAGS.l)ttf
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL = $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
 
+# Indicate where special include files can be found.
+# for instance where your dx includes are
+CFLAGS.INCLUDE= $(CFLAGS.I)/usr/include/directx
+
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile = -pg -O -g
 
