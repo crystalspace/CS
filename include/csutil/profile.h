@@ -102,7 +102,7 @@ if (!tok##__prof__init) \
     obj_reg->Register (profiler, "iProfiler"); \
   } \
   if (profiler) \
-    profiler->RegisterProfilePoint (__FILE__, __LINE__, &tok##__prof__cnt, &tok##__prof__time); \
+    profiler->RegisterProfilePoint (#tok,__FILE__, __LINE__, &tok##__prof__cnt, &tok##__prof__time); \
 } \
 static uint32 tok##__prof__starttime; \
 CS_PROFTIME(tok##__prof__starttime)
