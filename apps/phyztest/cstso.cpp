@@ -31,9 +31,9 @@ csRigidSpaceTimeObj::csRigidSpaceTimeObj( csSprite3D *psprt, ctRigidBody *prb )
 
 }
 
-void set_no_rewind( ctPhysicalEntity *ppe )
+void set_no_rewind( ctEntity *ppe )
 {
-  ppe->flags |= CTF_NOREWIND;
+  ppe->set_rewind(false);
 }
 
 // using sloooooooow but accurate collision detection.
@@ -44,17 +44,17 @@ void set_no_rewind( ctPhysicalEntity *ppe )
 // - don't forget to handle 'tunneling' problem as well.
 void csRigidSpaceTimeObj::evolve_system( real t1, real t2, ctWorld *time_world, csWorld *space_world )
 {
-static real collision_epsilon = 0.02;
-static real time_epsilon = 0.001;
-real ta, tb;
+  static real collision_epsilon = 0.02;
+  static real time_epsilon = 0.001;
+  real ta, tb;
  
-long loops = 300;  //make sure we don't go into an infinite loop
+  long loops = 300;  //make sure we don't go into an infinite loop
 
   ta = t1;
   tb = t2;
   real min_col_dist;
 
-  time_world->apply_fuction_to_body_list( set_no_rewind );
+  time_world->apply_function_to_body_list( set_no_rewind );
 
   while( ta < t2 && loops-- > 0){
  

@@ -57,7 +57,7 @@ ctWorld phyz_world;
 // data for mass on spring demo
 csSprite3D *bot = NULL;
 ctRigidBody *rb_bot = NULL;
-	
+  
 // data for swinging chain demo
 bool chain_added = false;
 
@@ -65,16 +65,16 @@ bool chain_added = false;
 class ChainLink
 {
 public:
-	ChainLink( csSprite3D *psprt, ctRigidBody *prb, ctArticulatedBody *pab )
-	{
-		sprt = psprt;
-		rb = prb;
-		ab = pab;   
-	}
+  ChainLink( csSprite3D *psprt, ctRigidBody *prb, ctArticulatedBody *pab )
+  {
+    sprt = psprt;
+    rb = prb;
+    ab = pab;   
+  }
 
-	csSprite3D *sprt;         // sprite that represents a link
-	ctRigidBody *rb;          // rigidbody object for this link
-	ctArticulatedBody * ab;   // articulated body ( jointed body ) for this link
+  csSprite3D *sprt;         // sprite that represents a link
+  ctRigidBody *rb;          // rigidbody object for this link
+  ctArticulatedBody * ab;   // articulated body ( jointed body ) for this link
 };
 
 // increasing to more will cause instability for low frame-rates
@@ -87,30 +87,30 @@ ChainLink *chain[NUM_LINKS];
 ctRigidBody *add_test_body( ctVector3 ppos )
 {
 
-ctRigidBody *arb;
+  ctRigidBody *arb;
 
-	arb = ctRigidBody::new_ctRigidBody();
-	arb->set_m( 2.0 );
-	arb->set_pos( ppos[0],ppos[1],ppos[2] );
-	arb->calc_simple_I_tensor( .1,0.2,.1 );
-	return arb;
+  arb = ctRigidBody::new_ctRigidBody();
+  arb->set_m( 2.0 );
+  arb->set_pos( ppos[0],ppos[1],ppos[2] );
+  arb->calc_simple_I_tensor( .1,0.2,.1 );
+  return arb;
 }
 
 csSprite3D *add_test_sprite( csSpriteTemplate *tmpl, csSector *aroom, csView *view )
 {
-csSprite3D *tsprt;
+  csSprite3D *tsprt;
   
-	CHK (tsprt = new csSprite3D());
-	tsprt->SetTemplate( tmpl );
-	view->GetWorld ()->sprites.Push (tsprt);
-	tsprt->MoveToSector (aroom);
-	csMatrix3 m; m.Identity ();
-	tsprt->SetTransform (m);
-	tsprt->SetMove (csVector3( 0, 10, 0 ));    // only matters for root in chain demo
-	tsprt->SetAction ("default");
-	tsprt->InitSprite ();
+  CHK (tsprt = new csSprite3D());
+  tsprt->SetTemplate( tmpl );
+  view->GetWorld ()->sprites.Push (tsprt);
+  tsprt->MoveToSector (aroom);
+  csMatrix3 m; m.Identity ();
+  tsprt->SetTransform (m);
+  tsprt->SetMove (csVector3( 0, 10, 0 ));    // only matters for root in chain demo
+  tsprt->SetAction ("default");
+  tsprt->InitSprite ();
 
-	return tsprt;
+  return tsprt;
 }
 
 //-------------- Phyztest
@@ -259,10 +259,10 @@ bool Phyztest::Initialize (int argc, char *argv[], const char *iConfigName)
 
 void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
 {
-int i;
-csMatrix3 m; 
-ctMatrix3 M;
-ctVector3 px;
+  int i;
+  csMatrix3 m; 
+  ctMatrix3 M;
+  ctVector3 px;
 
   superclass::NextFrame (elapsed_time, current_time);
 
@@ -284,50 +284,50 @@ ctVector3 px;
 
   // add a chain
   if (GetKeyState (CSKEY_DEL) && !chain_added ){
-  	
-  	// use box template
+    
+    // use box template
     csSpriteTemplate* bxtmpl = view->GetWorld ()->GetSpriteTemplate ("box");
-    if (!bxtmpl){	    
+    if (!bxtmpl){     
       Printf (MSG_INITIALIZATION, "couldn't load template 'box'\n");
       return;
     }
 
-  	// root of chain.  invisible ( no sprite )
-  	// this body doesn't rotate or translate if it is rooted. 
-  	csSprite3D *sprt;
-  	ctArticulatedBody *ab_parent;
-  	ctArticulatedBody *ab_child;
-  	// each link of chain has a rigid body 
-  	ctRigidBody *rb = add_test_body( ctVector3( 0.0,8.0,0.0 ));
-  	// which is used in the creation of an articulated body ( linked to others via a joint )
-  	ab_parent = new ctArticulatedBody( rb );
-  	// the world only needs to have a pointer to the root of the articulated body tree.
-  	phyz_world.add_articulatedbodybase( ab_parent );
-  	ab_parent->make_grounded();  // make the root fixed to the world. can be non-rooted as well
+    // root of chain.  invisible ( no sprite )
+    // this body doesn't rotate or translate if it is rooted. 
+    csSprite3D *sprt;
+    ctArticulatedBody *ab_parent;
+    ctArticulatedBody *ab_child;
+    // each link of chain has a rigid body 
+    ctRigidBody *rb = add_test_body( ctVector3( 0.0,8.0,0.0 ));
+    // which is used in the creation of an articulated body ( linked to others via a joint )
+    ab_parent = new ctArticulatedBody( rb );
+    // the world only needs to have a pointer to the root of the articulated body tree.
+    phyz_world.add_entity( ab_parent );
+    ab_parent->make_grounded();  // make the root fixed to the world. can be non-rooted as well
   
     // add all the links that will be seen swinging.
-  	for( i = 0; i < NUM_LINKS; i++ ){
-  		// position is irrelevent. it will be determined by root offset and joint angles
+    for( i = 0; i < NUM_LINKS; i++ ){
+      // position is irrelevent. it will be determined by root offset and joint angles
       rb = add_test_body( ctVector3( 0.0,1.0,0.0 ) );  
-  	  ab_child = new ctArticulatedBody( rb );
-  	  // link this body to the previous one.  first 2 vectors are joint offsets, 
-  	  // the 3rd is the line the joint revolves around
-  	  ctVector3 joint_offset( 0, -0.1, 0 );
-  	  ctVector3 joint_action( 0,0,1 );
-  	  ab_parent->link_revolute( ab_child, joint_offset, joint_offset, joint_action );
+      ab_child = new ctArticulatedBody( rb );
+      // link this body to the previous one.  first 2 vectors are joint offsets, 
+      // the 3rd is the line the joint revolves around
+      ctVector3 joint_offset( 0, -0.1, 0 );
+      ctVector3 joint_action( 0,0,1 );
+      ab_parent->link_revolute( ab_child, joint_offset, joint_offset, joint_action );
   
       // make something to draw
       sprt = add_test_sprite( bxtmpl, room, view );
       chain[i] = new ChainLink( sprt, rb, ab_child );
-  	  
-  	  // this will be parent of next body
-  	  ab_parent = ab_child;
-  	}
-  	
-  	// rotate them so we can see some action.
-  	chain[0]->ab->rotate_around_axis( degree_to_rad(80) );
+      
+      // this will be parent of next body
+      ab_parent = ab_child;
+    }
+    
+    // rotate them so we can see some action.
+    chain[0]->ab->rotate_around_axis( degree_to_rad(80) );
     //!me uncomment if you have a good frame-rate
-	// chain[2]->ab->rotate_around_axis( degree_to_rad(60) );
+  // chain[2]->ab->rotate_around_axis( degree_to_rad(60) );
     chain_added = true;
   }
 
@@ -335,7 +335,7 @@ ctVector3 px;
   if( GetKeyState (CSKEY_TAB) && bot == NULL ){
     // add a sprite
     csSpriteTemplate* tmpl = view->GetWorld ()->GetSpriteTemplate ("box");
-    if (!tmpl){	    
+    if (!tmpl){     
       Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
       return;
     }
@@ -355,7 +355,7 @@ ctVector3 px;
     rb_bot->set_pos( 0,10,0);
     rb_bot->set_v( ctVector3( 1.0,0, 0));
     rb_bot->calc_simple_I_tensor( 0.2,0.4, 0.2 );
-    phyz_world.add_rigidbody( rb_bot );
+    phyz_world.add_entity( rb_bot );
 
     // create a spring force object and add it to our test body
     ctSpringF *sf = new ctSpringF( rb_bot, ctVector3( 0, 0.2, 0 ) , &phyz_world, ctVector3( 0,12, 0 ) );
@@ -383,7 +383,7 @@ ctVector3 px;
 
   // if we have a spring and mass demo started
   if( bot ){
-  	// note: ctVector3 and csVector3 are not directly compatable yet
+    // note: ctVector3 and csVector3 are not directly compatable yet
     px = rb_bot->get_pos();
 
     csVector3 new_p( px[0], px[1], px[2] );   
@@ -396,17 +396,17 @@ ctVector3 px;
  
   // if we have a swinging chain demo started
   if( chain_added == true ){
-	  csLight* lights[2];
-	  csVector3 new_p;
+    csLight* lights[2];
+    csVector3 new_p;
     int num_lights;
 
     // update position and orientation of all sprites for the chain.
     // queries the physics world for rigidbody data then sets the sprites properties accordingly
     for( i = 0; i < NUM_LINKS; i++ ){
-  		if( chain[i] != NULL ){
-  			//  get the position of this link
-  	    px = chain[i]->rb->get_pos();
-  	    new_p.x = px[0]; new_p.y = px[1]; new_p.z = px[2];   
+      if( chain[i] != NULL ){
+        //  get the position of this link
+        px = chain[i]->rb->get_pos();
+        new_p.x = px[0]; new_p.y = px[1]; new_p.z = px[2];   
         chain[i]->sprt->SetMove ( new_p );
         M = chain[i]->rb->get_R();   // get orientation for this link
         // ctMatrix3 and csMatrix3 not directly compatable yet
@@ -417,11 +417,11 @@ ctVector3 px;
         M_scale.Identity();
         M_scale *= 0.5;
         m *= M_scale;
-  			chain[i]->sprt->SetTransform(m);
-  			num_lights = world->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
-              chain[i]->sprt->UpdateLighting (lights, num_lights);  		
-  		}
-	  }
+        chain[i]->sprt->SetTransform(m);
+        num_lights = world->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+              chain[i]->sprt->UpdateLighting (lights, num_lights);      
+      }
+    }
   }
 
   // Tell 3D driver we're going to display 3D things.
