@@ -606,23 +606,23 @@ endproc
 		shl	ebx,1			; ebx = dz * 2		; 4
 
 %$zloop8:	mov	[edi+4*0],eax					; 0
-		mov	[edi+4*1],edx					; 0
-		add	eax,ebx						; 1
+		add	eax,ebx						; 0
+		mov	[edi+4*1],edx					; 1
 		add	edx,ebx						; 1
 
 		mov	[edi+4*2],eax					; 2
-		mov	[edi+4*3],edx					; 2
-		add	eax,ebx						; 3
+		add	eax,ebx						; 2
+		mov	[edi+4*3],edx					; 3
 		add	edx,ebx						; 3
 
 		mov	[edi+4*4],eax					; 4
-		mov	[edi+4*5],edx					; 4
-		add	eax,ebx						; 5
+		add	eax,ebx						; 4
+		mov	[edi+4*5],edx					; 5
 		add	edx,ebx						; 5
 
 		mov	[edi+4*6],eax					; 6
-		mov	[edi+4*7],edx					; 6
-		add	eax,ebx						; 7
+		add	eax,ebx						; 6
+		mov	[edi+4*7],edx					; 7
 		add	edx,ebx						; 7
 
 		add	edi,8*4						; 8
