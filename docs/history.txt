@@ -18,6 +18,14 @@ chronological order.
 	- Eric Sunshine simplified the unnecessarily obfuscated map2cs
 	  prototype for CMapPolygon::CheckIfInside() since it caused grief for
 	  gcc 3.4.x which considered one invocation of the method ambiguous.
+	- Eric Sunshine fixed a couple problems reported by Andres Freund
+	  <andres@anarazel.de> in maya2spr's BinaryTreeIterator<> template.
+	  (1) Last() was modifying the non-existent variable 'bWentLeft'. (2)
+	  Prev() calls printf() in a non-dependent manner, which caused gcc
+	  2.4.x to fail with a compiler error since <stdio.h> had not been
+	  #included. See http://gcc.gnu.org/onlinedocs/gcc/Name-lookup.html for
+	  an explanation of why printf() must be declared before it is used in
+	  a non-dependent template context.
 8-Apr-2004
 	- Jorrit committed a patch to map2cs from Aren Blondahl:
 	    - Added Support for "_color" tag in light entities for support

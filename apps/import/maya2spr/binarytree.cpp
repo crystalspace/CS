@@ -19,8 +19,9 @@
 #ifndef __BINARYTREE_CPP__
 #define __BINARYTREE_CPP__
 
-#ifndef __BINARYTREE_H__
+#include <stdio.h>
 
+#ifndef __BINARYTREE_H__
 #include "binarytree.h"
 #endif
 
@@ -414,7 +415,6 @@ T *BinaryTreeIterator<T>::Last(void)
     	pNodeList[++iDepth] = pNodeList[iDepth-1]->pRight;
     
     lIndex = pMyTree->lCount;
-    bWentLeft = 1;
     return pNodeList[iDepth]->pObj;
 }
 
@@ -519,4 +519,3 @@ T *BinaryTreeIterator<T>::Curr(void)
 }
 
 #endif
-
