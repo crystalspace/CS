@@ -24,6 +24,8 @@
 #include "csgeom/math3d.h"
 #include "bmpimage.h"
 #include "cssys/csendian.h"
+#include "csgfx/rgbpixel.h"
+#include "csutil/databuf.h"
 
 IMPLEMENT_IBASE (csBMPImageIO)
   IMPLEMENTS_INTERFACE (iImageIO)
@@ -36,55 +38,14 @@ EXPORT_CLASS_TABLE (csbmpimg)
   EXPORT_CLASS (csBMPImageIO, "crystalspace.graphic.image.io.bmp", "CrystalSpace BMP image format I/O plugin")
 EXPORT_CLASS_TABLE_END
 
+#define BMP_MIME "image/bmp"
+
 static iImageIO::FileFormatDescription formatlist[] =
 {
-  { "image/bmp", "8 bit, palettized, RGB", CS_IMAGEIO_LOAD},
-  { "image/bmp", "8 bit, palettized, RLE8", CS_IMAGEIO_LOAD},
-  { "image/bmp", "24 bit, RGB", CS_IMAGEIO_LOAD}
+  { BMP_MIME, "8 bit, palettized, RGB", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE},
+  { BMP_MIME, "8 bit, palettized, RLE8", CS_IMAGEIO_LOAD},
+  { BMP_MIME, "24 bit, RGB", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE}
 };
-
-csBMPImageIO::csBMPImageIO (iBase *pParent)
-{
-  CONSTRUCT_IBASE (pParent);
-  formats.Push (&formatlist[0]);
-  formats.Push (&formatlist[1]);
-  formats.Push (&formatlist[2]);
-}
-
-bool csBMPImageIO::Initialize (iSystem *)
-{
-  return true;
-}
-
-const csVector& csBMPImageIO::GetDescription ()
-{
-  return formats;
-}
-
-iImage *csBMPImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
-{
-  ImageBMPFile* i = new ImageBMPFile (iFormat);
-  if (i && !i->Load (iBuffer, iSize))
-  {
-    delete i;
-    return NULL;
-  }
-  return i;
-}
-
-void csBMPImageIO::SetDithering (bool)
-{
-}
-
-iDataBuffer *csBMPImageIO::Save (iImage *, iImageIO::FileFormatDescription *)
-{
-  return NULL;
-}
-
-iDataBuffer *csBMPImageIO::Save (iImage *, const char *)
-{
-  return NULL;
-}
 
 //-----------------------------------------------------------------------------
 // Some platforms require strict-alignment, which means that values of
@@ -159,7 +120,155 @@ static inline long l_endian (const UByte* ptr)
 #define BI_BITFIELDS  3  // Bitfields
 #endif
 
+struct bmpHeader
+{
+  UShort pad;
+  UByte bfTypeLo;
+  UByte bfTypeHi;
+  ULong bfSize;
+  UShort bfRes1;
+  UShort bfRes2;
+  ULong bfOffBits;
+  ULong biSize;
+  ULong biWidth;
+  ULong biHeight;
+  UShort biPlanes;
+  UShort biBitCount;
+  ULong biCompression;
+  ULong biSizeImage;
+  ULong biXPelsPerMeter;
+  ULong biYPelsPerMeter;
+  ULong biClrUsed;
+  ULong biClrImportant;
+};
+
 //---------------------------------------------------------------------------
+
+
+csBMPImageIO::csBMPImageIO (iBase *pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+  formats.Push (&formatlist[0]);
+  formats.Push (&formatlist[1]);
+  formats.Push (&formatlist[2]);
+}
+
+bool csBMPImageIO::Initialize (iSystem *)
+{
+  return true;
+}
+
+const csVector& csBMPImageIO::GetDescription ()
+{
+  return formats;
+}
+
+iImage *csBMPImageIO::Load (UByte* iBuffer, ULong iSize, int iFormat)
+{
+  ImageBMPFile* i = new ImageBMPFile (iFormat);
+  if (i && !i->Load (iBuffer, iSize))
+  {
+    delete i;
+    return NULL;
+  }
+  return i;
+}
+
+void csBMPImageIO::SetDithering (bool)
+{
+}
+
+iDataBuffer *csBMPImageIO::Save (iImage *Image, iImageIO::FileFormatDescription *)
+{
+  if (!Image || !Image->GetImageData ())
+    return NULL;
+
+  // check if we have a format we support saving
+  int format = Image->GetFormat ();
+  bool palette = false;
+
+  switch (format & CS_IMGFMT_MASK)
+  {
+  case CS_IMGFMT_PALETTED8:
+    palette = true;
+  case CS_IMGFMT_TRUECOLOR:
+    break;
+  default:
+      // unknown format
+      return NULL;
+  } /* endswitch */
+
+  if (palette && !Image->GetPalette ())
+    return NULL;
+
+  // calc size
+  int w = Image->GetWidth ();
+  int h = Image->GetHeight ();
+  size_t len = sizeof (bmpHeader)-2 + w*h*(palette?1:3) + 256*(palette?4:0);
+  bmpHeader hdr;
+  hdr.bfTypeLo = 'B';
+  hdr.bfTypeHi = 'M';
+  hdr.bfSize = little_endian_long (len);
+  hdr.bfRes1 = 0;
+  hdr.bfRes2 = 0;
+  hdr.bfOffBits = little_endian_long (sizeof (bmpHeader)-2 + 256*(palette?4:0));
+  hdr.biSize = little_endian_long (40);
+  hdr.biWidth = little_endian_long (w);
+  hdr.biHeight = little_endian_long (h);
+  hdr.biPlanes = little_endian_short (1);
+  hdr.biBitCount = little_endian_short (palette?8:24);
+  hdr.biCompression = little_endian_long (0);
+  hdr.biSizeImage = little_endian_long (0);
+  hdr.biXPelsPerMeter = little_endian_long (0);
+  hdr.biYPelsPerMeter = little_endian_long (0);
+  hdr.biClrUsed = little_endian_long (0);
+  hdr.biClrImportant = little_endian_long (0);
+  
+
+  csDataBuffer *db = new csDataBuffer (len);
+  unsigned char *p = (unsigned char *)db->GetData ();
+  memcpy (p, &hdr.bfTypeLo, sizeof (bmpHeader)-2);
+
+  p += sizeof (bmpHeader)-2;
+
+  if (palette)
+  {
+    csRGBpixel *pal = Image->GetPalette ();
+    for (int i= 0; i < 256; i++)
+    {
+      *p++ = pal[i].blue;
+      *p++ = pal[i].green;
+      *p++ = pal[i].red;
+      p++;
+    }
+
+    unsigned char *data = (unsigned char *)Image->GetImageData ();
+    for (int y=h-1; y >= 0; y--)
+      for (int x=0; x < w; x++)
+	*p++ = data[y*w+x];
+  }
+  else
+  {
+    csRGBpixel *pixel = (csRGBpixel *)Image->GetImageData ();
+    for (int y=h-1; y >= 0; y--)
+      for (int x=0; x < w; x++)
+      {
+	unsigned char *c = (unsigned char *)&pixel[y*w+x];
+	*p++ = *(c+2);
+	*p++ = *(c+1);
+	*p++ = *c;
+      }
+  }
+
+  return db;
+}
+
+iDataBuffer *csBMPImageIO::Save (iImage *Image, const char *mime)
+{
+  if (!strcasecmp (mime, BMP_MIME))
+    return Save (Image, (iImageIO::FileFormatDescription *)NULL);
+  return NULL;
+}
 
 bool ImageBMPFile::Load (UByte* iBuffer, ULong iSize)
 {
