@@ -392,7 +392,8 @@ rule SystemLinkApplication
 
 rule SystemInstallApplication
 {
-  Depends install_bin : [ DoInstall $(<) : $(bindir) $(2) ] ; 
+  Depends install_bin :
+    [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
 }
 
 rule SystemInstallPlugin

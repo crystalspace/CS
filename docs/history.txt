@@ -21,6 +21,10 @@ chronological order.
 	  #1152178.)  In addition, the sed expression used non-portable
 	  regular-expression features which are not available everywhere (such
 	  as MacOS/X and modern BSD platforms).
+	- Eric Sunshine applied patch #1153486 from Michael D. Adams
+	  <mdmkolbe@users.sf.net> which fixes SystemInstallApplication in
+	  win32.jam so that it installs programs with proper execute permission
+	  on Cygwin.
 27-Feb-2005
 	- res applied (a variation of) patch #1152721, "Cygwin compatability 
 	  with _X and _C", from Michael D. Adams.
