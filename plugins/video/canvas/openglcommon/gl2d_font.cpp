@@ -358,6 +358,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
 
   float x1 = 0.0;
 
+  glBegin (GL_QUADS);
   for (; *text; ++text)
   {
     GLGlyph &glyph = glyphs [*text];

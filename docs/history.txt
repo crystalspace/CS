@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+10-Oct-2002
+	- Fixed a bug in the OpenGL canvases where a glEnd() was called
+	  (when writing text) without a corresponding glBegin().
+	  Thanks to Mihai Ganea <miaig2@myrealbox.com> for spotting and
+	  fixing this bug.
 9-Oct-2002
 	- For some reason include/cssys/win32/csosdefs.h was full of
 	  ^M (carriage return) characters. This failed the compilation.
