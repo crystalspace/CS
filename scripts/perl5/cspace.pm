@@ -4613,6 +4613,7 @@ package cspace::iEngine;
 *GetTextureList = *cspacec::iEngine_GetTextureList;
 *GetMaterialList = *cspacec::iEngine_GetMaterialList;
 *GetVariableList = *cspacec::iEngine_GetVariableList;
+*AddMeshAndChildren = *cspacec::iEngine_AddMeshAndChildren;
 *CreateRegion = *cspacec::iEngine_CreateRegion;
 *GetRegions = *cspacec::iEngine_GetRegions;
 *FindMaterial = *cspacec::iEngine_FindMaterial;
