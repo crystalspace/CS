@@ -15,6 +15,10 @@ The history order is reversed so that new features are at the top.
 	  quickly detect that. At this moment this test program is non
 	  graphical and only calls csXORBuffer::Debug_UnitTest().
 	- Added a few more test to csXORBuffer::Debug_UnitTest().
+	- Again improved performance of the XOR buffer by only clearing
+	  the part of the polygon buffer that will actually be needed.
+	  This optimization brings the performance of the XOR buffer
+	  rather close to the c-buffer now.
 25-Apr-2002
 	- Removed the 'togglecull' and 'togglexor' commands from BugPlug.
 	  Instead added the ability to have arguments with bugplug commands

@@ -50,7 +50,7 @@ int main (int argc, char* argv[])
   // Initialize the random number generator
   srand (time (NULL));
 
-  bool rc = csXORBuffer::Debug_UnitTest ();
+  bool rc = csXORBuffer::Debug_UnitTest (10000);
   printf ("csXORBuffer unit testing %s\n", rc ? "succeeded." : "failed!");
 
   return 0;

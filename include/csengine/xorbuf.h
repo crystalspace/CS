@@ -72,6 +72,12 @@ public:
    */
   void InitializePolygonBuffer ();
 
+  /**
+   * Initialize the XOR polygon buffer to empty.
+   * This function is normally not called by user code.
+   */
+  void InitializePolygonBuffer (const csBox2Int& bbox);
+
   /// Initialize the XOR buffer to empty.
   void Initialize ();
 

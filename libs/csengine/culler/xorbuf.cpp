@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "cssys/sysfunc.h"
 #include "qint.h"
 #include "qsqrt.h"
 #include "csgeom/math3d.h"
@@ -60,7 +61,38 @@ csXORBuffer::~csXORBuffer ()
 
 void csXORBuffer::InitializePolygonBuffer ()
 {
-  memset (buffer, 0, bufsize << 2);
+  if (width_po2 == width)
+    memset (buffer, 0, bufsize << 2);
+  else
+  {
+    int i;
+    for (i = 0 ; i < numrows ; i++)
+    {
+      memset (buffer+(i<<w_shift), 0, width << 2);
+    }
+  }
+}
+
+void csXORBuffer::InitializePolygonBuffer (const csBox2Int& bbox)
+{
+  // @@@ Make a special case for po2 width? (1024 for example)
+
+  int startcol = bbox.minx-40;
+  if (startcol < 0) startcol = 0;
+  int endcol = bbox.maxx+40;
+  if (endcol >= width) endcol = width-1;
+  int horsize = endcol-startcol+1;
+
+  int startrow = bbox.miny >> 5;
+  if (startrow < 0) startrow = 0;
+  int endrow = bbox.maxy >> 5;
+  if (endrow >= numrows) endrow = numrows-1;
+
+  int i;
+  for (i = startrow ; i <= endrow ; i++)
+  {
+    memset (buffer+(i<<w_shift)+startcol, 0, horsize << 2);
+  }
 }
 
 void csXORBuffer::Initialize ()
@@ -397,6 +429,8 @@ void csXORBuffer::DrawPolygon (csVector2* verts, int num_verts,
     }
   }
 
+  InitializePolygonBuffer (bbox);
+
   //---------
   // First find out in which direction the 'right' lines go.
   //---------
@@ -475,8 +509,6 @@ void csXORBuffer::XORSweep ()
 
 bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
 {
-  InitializePolygonBuffer ();
-
   csBox2Int bbox;
   DrawPolygon (verts, num_verts, bbox, 1);
 
@@ -548,8 +580,6 @@ bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
 
 bool csXORBuffer::TestPolygon (csVector2* verts, int num_verts)
 {
-  InitializePolygonBuffer ();
-
   csBox2Int bbox;
   DrawPolygon (verts, num_verts, bbox, 0);
 
@@ -702,7 +732,6 @@ bool csXORBuffer::Debug_ExtensiveTest (int num_iterations, csVector2* verts,
   int i;
   for (i = 0 ; i < num_iterations ; i++)
   {
-    InitializePolygonBuffer ();
     num_verts = ((rand () >> 4) % 1)+3;
     switch (num_verts)
     {
@@ -741,6 +770,7 @@ bool csXORBuffer::Debug_UnitTest (int num_iterations)
 {
   csXORBuffer* b = new csXORBuffer (640, 480);
   csVector2 poly[6];
+  csTicks start = csGetTicks ();
   int i;
   for (i = 0 ; i < num_iterations ; i++)
   {
@@ -867,6 +897,8 @@ bool csXORBuffer::Debug_UnitTest (int num_iterations)
     poly[3].Set (331, 248);
     XOR_ASSERT (b->TestPolygon (poly, 4) == false, t25);
   }
+  csTicks end = csGetTicks ();
+  printf ("Total time %d\n", end-start);
   delete b;
   return true;
 }
