@@ -20,14 +20,12 @@
 
 #include "sysdef.h"
 #include "csphyzik/entity.h"
-//#include "csphyzik/contact.h"
-//#include "csphyzik/refframe.h"
-//#include "csphyzik/mathutil.h"
 #include "csphyzik/solver.h"
 #include "csphyzik/debug.h"
 
 ctEntity::ctEntity()
 {
+  state_offset = -1;
   solver = NULL;
   flags = 0;
 }
@@ -37,7 +35,6 @@ ctEntity::~ctEntity()
   if( solver )
     delete solver;
 }
-
 
 // pass control to solver
 void ctEntity::solve( real t )

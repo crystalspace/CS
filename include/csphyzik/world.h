@@ -26,6 +26,7 @@
 #include "csphyzik/phyzent.h"
 #include "csphyzik/linklist.h"
 #include "csphyzik/odesolve.h"
+#include "csutil/csdllist.h"
 
 enum worldstate { CTWS_NORMAL, CTWS_REWOUND };
 
@@ -35,8 +36,14 @@ enum errorcode { WORLD_NOERR, WORLD_ERR_NULLPARAMETER, WORLD_ERR_NOODE,
 #define DEFAULT_INIT_MAX_STATE_SIZE  1024
 #define STATE_RESIZE_EXTRA 256
 
-class ctArticulatedBody;
 class ctForce;
+
+// State-alloc tracking structure:
+class AllocNode {
+ public:
+  int offset;
+  int size;
+};
 
 class ctWorld : public ctPhysicalEntity
 {
@@ -58,7 +65,7 @@ public:
   errorcode add_entity( ctEntity *pe );
   errorcode add_enviro_force( ctForce *f );
 
-  errorcode delete_articulatedbody( ctArticulatedBody *pbase );
+  errorcode delete_entity( ctEntity *pb );
 
   // set the ODE solver used to evolve the system
   void set_ODE_solver( OdeSolver *pode ){ 
@@ -73,6 +80,34 @@ public:
   // ctWorld objects that use nondefault derivatives (like catastrophes,
   // constraints, and certain forces) can be created.
   virtual void dydt_eval(real t, const real y[], real dy[]);
+
+  // Static state-alloc stuff
+  int            state_size;
+  csDLinkList    free_blocks;
+  csDLinkList    used_blocks;
+
+  //**********  State vector interface *********
+  virtual int  state_alloc(int size);
+  virtual void state_free(int offset);
+  virtual int  state_realloc(int offset, int newsize) {
+    int newloc = state_alloc(newsize);
+    if(!newloc) return 0;
+    // Okay, got state-space -- free old loc, return new one
+    state_free(offset);
+    return newloc;
+  }
+
+  // State-alloc helper functions
+
+  // Removes a block from the used_blocks list
+  // Returns the block if successful, 0 if a block with that offset
+  //   wasn't found.
+  AllocNode *sa_make_unused(int offset);
+
+  // Adds a block at its appropriate place in the used_blocks list
+  // Returns true if successful, false otherwise
+  bool       sa_make_used(AllocNode *block);
+
 protected:
   // take state values( position, velocity, orientation, ... ) from 
   // this world's entities and put them into the array

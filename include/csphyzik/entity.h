@@ -25,6 +25,7 @@
 #include "csphyzik/force.h"
 #include "csphyzik/linklist.h"
 #include "csphyzik/refframe.h"
+#include "csphyzik/linklist.h"
 
 // flags
 #define CTF_NOREWIND 0x1
@@ -54,19 +55,21 @@ class ctEntity
   // Set the class responsible for solving change in state wrt time.
   void set_solver( ctSolver *pslv ){ solver = pslv; }
 
-
   //**********  ODE interface ****************
   // Init values that will influence the calculation of the change in state.
+  // These are normally forces, torques, etc.
   virtual void init_state() {}
   // Return the size of this enities state vector
-  virtual int get_state_size() = 0;
+  virtual int get_state_size() { return 0; }
   // Add this body's state to the state vector buffer passed in. 
-  // Increment state buffer to point after added state.  Upload.
   virtual int set_state( real *sa ) = 0;
   // download state from buffer into this entity
   virtual int get_state( const real *sa ) = 0;
   // add change in state vector over time to state buffer parameter.
   virtual int set_delta_state( real *state_array ) = 0;
+
+  int  get_state_offset() { return state_offset; }
+  void set_state_offset(int of) { state_offset = of; }
 
   void add_force( ctForce *f ){ forces.add_link( f ); }
   void remove_force( ctForce *f ){ forces.remove_link( f ); }
@@ -94,6 +97,7 @@ class ctEntity
   unsigned long flags;
 
 protected:
+  int state_offset;
 
   // object responsible for calculating the change in state wrt time 
   // uses forces list and current state to do this.

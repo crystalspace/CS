@@ -263,6 +263,9 @@ void ctWorld::load_delta_state( real *state_array )
 // add an entity to this world
 errorcode ctWorld::add_entity( ctEntity *pe )
 {
+  if(pe->get_state_offset() < 0) {
+    pe->set_state_offset(state_alloc(pe->get_state_size()));
+  }
   if( pe ){
     body_list.add_link( pe );
     return WORLD_NOERR;
@@ -282,10 +285,13 @@ errorcode ctWorld::add_enviro_force( ctForce *f )
   }
 }
 
-errorcode ctWorld::delete_articulatedbody( ctArticulatedBody *pbase )
+errorcode ctWorld::delete_entity( ctEntity *pb )
 {
-  if( pbase ){
-    body_list.delete_link( pbase );
+  if(pb->get_state_offset() >= 0) {
+    state_free(pb->get_state_offset());
+  }
+  if( pb ){
+    body_list.delete_link( pb );
     return WORLD_NOERR;
   }else{
     return WORLD_ERR_NULLPARAMETER;
@@ -304,4 +310,143 @@ void ctWorld::apply_function_to_body_list( void(*fcn)( ctEntity *ppe ) )
     pe = body_list.get_next();
   } 
 
+}
+
+// Remove block matching "offset" from the used_blocks list and return it
+AllocNode *ctWorld::sa_make_unused(int offset) {
+  AllocNode *node = (AllocNode*) used_blocks.GetFirstItem();
+  while(node) {
+    if(node->offset == offset) {
+      used_blocks.RemoveItem();
+      return node;
+    }
+    node = (AllocNode*) used_blocks.GetNextItem();
+    if(node == (AllocNode*)used_blocks.PeekFirstItem()) node = NULL;
+  }
+  return NULL;  //  Couldn't find block
+}
+
+// Add block to the used_blocks list, inserted in its proper location
+bool ctWorld::sa_make_used(AllocNode *block) {
+  AllocNode *index = (AllocNode*)used_blocks.GetFirstItem();
+  if(!index || index->offset > block->offset) {
+    return used_blocks.AddItem((void*)block);
+  }
+  while(index) {
+    if(index->offset > block->offset) {
+      used_blocks.GetPrevItem();
+      return used_blocks.AddCurrentItem((void*)block);
+    }
+    index = (AllocNode*)used_blocks.GetNextItem();
+    if(index == (AllocNode*)used_blocks.PeekFirstItem()) index = NULL;
+  }
+
+  // Assert that we're back at the beginning -- csDLinkList is circular
+  assert(!index);
+
+  // Add elt to end of list
+  used_blocks.GetPrevItem(); // Back to end of list
+  return used_blocks.AddCurrentItem((void*)block);
+  return false;
+}
+
+int ctWorld::state_alloc(int size) {
+  if(size <= 0) return -1;
+
+  int maxsize = 0;
+  int bestfit = 0;
+  AllocNode *index = (AllocNode*)free_blocks.GetFirstItem();
+  while(index) {
+    if(index->size > maxsize) maxsize = index->size;
+    if((index->size >= size) && (index->size < bestfit)) bestfit = index->size;
+    index = (AllocNode*)free_blocks.GetNextItem();
+    if(index == (AllocNode*)free_blocks.PeekFirstItem()) index = NULL;
+  }
+
+  // Combination of best-fit and worst-fit algorithms that seem to me to
+  // fill the bill nicely
+  int blocksize;
+  if(bestfit == size) blocksize = bestfit;
+  else blocksize = maxsize;
+
+  if(blocksize < size) {
+    // No already-allocated block fits
+    AllocNode node;
+    node.offset = state_size;
+    node.size = size;
+    state_size += size;
+    assert(sa_make_used(&node));
+    return node.offset;
+  }
+
+  // Grab first block of size blocksize and make it used, not free
+  index = (AllocNode*)free_blocks.GetFirstItem();
+  while(index) {
+    if(index->size == blocksize) {
+      free_blocks.RemoveItem();     // Block isn't free
+      assert(sa_make_used(index));  // Block is now used
+      return index->offset;
+    }
+    index = (AllocNode*)free_blocks.GetNextItem();
+    assert(index != (AllocNode*)free_blocks.PeekFirstItem());
+  }
+  // This should never happen -- our blocksize should be guaranteed valid
+  assert(0 && "Invalid blocksize got through in state_alloc!  Dying!");
+  return -1;
+}
+
+void ctWorld::state_free(int offset) {
+  AllocNode    *freenode;
+
+  freenode = sa_make_unused(offset);
+  if(!freenode) {
+    // Wasn't in used_blocks list, state_free() of invalid offset
+    return;
+  }
+
+  if(freenode->offset + freenode->size == state_size) {
+    // If this is the last block in the free & used lists, reduce state_size
+    state_size -= freenode->size;
+    delete freenode;
+    return;
+  }
+
+  AllocNode *index = (AllocNode*)free_blocks.GetFirstItem();
+  bool handled = false;
+  if(!index || (index->offset > freenode->offset)) {
+    // Tack it onto the beginning
+    free_blocks.AddItem((void*)freenode);
+    handled = true;
+  }
+  while(!handled && index) {
+    if(index->offset > freenode->offset) {
+      if(freenode->offset + freenode->size >= index->offset) {
+	assert(freenode->offset + freenode->size == index->offset);
+	index->offset = freenode->offset;
+	index->size += freenode->size;
+	delete freenode;
+	handled = true;
+	break;
+      } else {
+	// Blocks are separate, just need to insert before current block
+	// if() statement before while guarantees this isn't first list elt
+	free_blocks.GetPrevItem();
+	free_blocks.AddCurrentItem((void*)freenode);
+      }
+    }
+
+    index = (AllocNode*)free_blocks.GetNextItem();
+    if(index == (AllocNode*)free_blocks.PeekFirstItem()) index = NULL;
+  }
+  if(!handled) {
+    // Block wasn't inserted before the end of the list, so it presumably
+    // goes at the end of the list, but before the end of the state vector.
+    // It's all so complicated...  :)
+    free_blocks.GetFirstItem();  // Beginning of list
+    free_blocks.GetPrevItem();   // End of list -- it's circular
+    free_blocks.AddCurrentItem((void*)freenode);
+  }
+
+  // Mark as freed
+  state_offset = -1;
 }
