@@ -173,9 +173,9 @@ void csGLTextureCache::Uncache (iTextureHandle *texh)
 
 void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
 {
-  static const textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
+  static const GLenum textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
     GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
-  static const textureMagFilters[3] = {GL_NEAREST, GL_LINEAR, 
+  static const GLenum textureMagFilters[3] = {GL_NEAREST, GL_LINEAR, 
     GL_LINEAR};
 
   iTextureHandle *txt_handle = (iTextureHandle *)d->Source;

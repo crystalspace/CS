@@ -18,6 +18,12 @@ chronological order.
 	- Jorrit fixed spr2d so that it compiles again with OR.
 	- Jorrit fixed spr2d Jamfile so that it no longer trys to use
 	  the bcsgeom library (whatever that is :-).
+	- Jorrit fixed a harmless initialization error in Frustvis and
+	  Dynavis.
+	- Jorrit fixed the NR glrender3d target. You can't declare variables
+	  without a type like this:
+		static const textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
+		GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 
