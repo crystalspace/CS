@@ -36,7 +36,9 @@ enum csDialogFrameStyle
   /// Dialog has two 3D vertical lines at left and right
   csdfsVertical,
   /// Dialog has a 3D frame around perimeter
-  csdfsAround
+  csdfsAround,
+  /// Dialog's frame and background are defined entirely by a bitmap
+  csdfsBitmap
 };
 
 /**
@@ -69,10 +71,17 @@ protected:
   int BorderWidth, BorderHeight;
   /// Dialog transparency (if CSS_TRANSPARENT is set)
   uint8 Alpha;
+  /// Frame bitmap, if there is one
+  csPixmap *FrameBitmap;
+  /// Set if this component should delete the frame bitmap when it is done
+  bool delFrameBitmap;
 
 public:
   /// Create dialog object
   csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle = csdfsNone);
+  
+  /// Destroy a dialog object
+  virtual ~csDialog();
 
   /// Handle input events
   virtual bool HandleEvent (iEvent &Event);
@@ -116,6 +125,12 @@ public:
   /// Query dialog transparency level
   uint8 GetAlpha ()
   { return GetState (CSS_TRANSPARENT) ? Alpha : 0; }
+
+	/// Set the bitmap for the frame (only useful if the framestyle is csdfsBitmap)
+	void SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap);
+	/// Get the frame bitmap
+	csPixmap *GetFrameBitmap()
+	{ return FrameBitmap; }
 
 protected:
   /// Adjust focused control by switching back or forth if it is disabled

@@ -108,7 +108,11 @@ enum csButtonFrameStyle
   /// Button has a thin rectangular frame
   csbfsThinRect,
   /// Button has no frame in unpressed state and a thin frame when it is pressed
-  csbfsVeryThinRect
+  csbfsVeryThinRect,
+  /// Button has a thin rectangular frame, and is textured
+  csbfsTextured,
+  /// Button has no frame, and is drawn by user-set bitmaps (text and button image still appear)
+  csbfsBitmap
 };
 
 /**
@@ -118,22 +122,37 @@ enum csButtonFrameStyle
 class csButton : public csComponent
 {
 protected:
-  // Button images in normal and pressed state
+  /// Button images in normal and pressed state
   csPixmap *ImageNormal, *ImagePressed;
-  // Should images be automatically deleted?
+  
+  /**
+   *	Images for button's frame in normal, pressed, and mouseover state
+   * also used for textures if mode is csbfsTextured.
+   */
+  csPixmap *FrameNormal, *FramePressed, *FrameHighlighted;
+  
+  /// Should images be automatically deleted?
   bool delImages;
-  // Command code emmited when button is pressed
+  /// Should frame images be automatically deleted?
+  bool delFrameImages;
+  /// Command code emmited when button is pressed
   int CommandCode;
-  // Character number that should be underlined (-1 == none)
+  /// Character number that should be underlined (-1 == none)
   int underline_pos;
   /// Button style
   int ButtonStyle;
-  // Button frame style
+  /// Button frame style
   csButtonFrameStyle FrameStyle;
-
+  /// Origin of the texture
+  int TexOrgX, TexOrgY;
+  /// Alpha-ness of the texture or frame bitmaps
+  uint8 ButtonAlpha;
+  
 public:
   /// Current button state
   bool Pressed;
+  /// Highlight state
+  bool Highlighted;
 
   /// Create button object
   csButton (csComponent *iParent, int iCommandCode, int iButtonStyle =
@@ -148,15 +167,36 @@ public:
   /**
    * Set button bitmaps in normal and pressed states<p>
    * If iDelete is true, bitmaps will be automatically deleted when they
-   * will not be needed anymore (i.e. button disposal or another SetBitmap)
+   * are no longer needed (i.e. button disposal or another SetBitmap)
    */
   void SetBitmap (csPixmap *iNormal, csPixmap *iPressed, bool iDelete = true);
 
+  /**
+   * Sets the button's frame bitmaps in normal, pressed, and highlighted (mouseover) states<p>
+   * If iDelete is true, bitmaps will be automatically deleted when they
+   * are no longer needed (i.e. button disposal or another SetButtonBitmaps)
+   */
+  void SetFrameBitmaps (csPixmap *iNormal, csPixmap *iPressed, csPixmap *iHighlighted, bool iDelete = true);
+
+  /**
+   * Sets the button's texture in normal and pressed states<p>
+   * If iDelete is true, bitmaps will be automatically deleted when they
+   * are no longer needed (i.e. button disposal or another SetButtonBitmaps)
+   */
+  void SetButtonTexture (csPixmap *iNormal, csPixmap *iPressed, bool iDelete = true);
+	
+
   /// Query button bitmaps
   void GetBitmap (csPixmap **iNormal, csPixmap **iPressed);
+  
+  /// Query button bitmaps
+  void GetFrameBitmaps (csPixmap **iNormal, csPixmap **iPressed, csPixmap **iHighlighted);
 
   /// Delete image bitmaps if iDelete was true on SetBitmap
   void FreeBitmaps ();
+  
+  /// Delete frame image bitmaps if iDelete was true on SetBitmap
+  void FreeFrameBitmaps ();
 
   /// Handle external events
   virtual bool HandleEvent (iEvent &Event);
@@ -192,7 +232,20 @@ public:
   /// Get the character number to be underlined (hotkey)
   inline int GetUnderlinePos ()
   { return underline_pos; }
-
+  
+  /// Get the alpha-ness of the button
+  inline uint8 GetAlpha()
+  { return ButtonAlpha; }
+  
+  /// Set the alpha-ness of the button (only useful with csbfsTextured and csbfsBitmap)
+  void SetAlpha(uint8 iAlpha);
+  
+  /// Set the origin of the texture
+  void SetTextureOrigin(int iOrgX, int iOrgy);
+  
+  /// Get the texture origins
+  void GetTextureOrigin(int *iOrgx, int *iOrgy);
+ 
   /// Get the name of the skip slice for this component
   virtual char *GetSkinName ()
   { return "Button"; }

@@ -1,5 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
+3-Apr-2001
+	- Christopher Nelson <paradox@BBHC.ORG> did the following changes
+	  to CSWS:
+	    - Fixed silly problems in csButton with textures and bitmaps
+	      drawing wrong.  
+	    - Fixed ugliness with texturing not moving with the button on
+	      shiftable buttons. 
+	    - Fixed artifacting problem with csButton not drawing correctly
+	      when the whole parent window is a transparent bitmap.
+	    - Fixed bug with button not immediately redrawing when
+	      highlighted (in case there's a visual change) .
+	    - Changed drawing of all buttons so that the currently
+	      highlighted button's text draws in a lighter color than
+	      other buttons.
 2-Apr-2001
 	- Norman Kramer did the following to CSWS:
 	    - csGrid now has a cursor (3 types: row, column or cell cursor).

@@ -26,7 +26,7 @@
 #define SKIN ((csDialogSkin *)skinslice)
 
 csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
-  : csComponent (iParent)
+  : csComponent (iParent), FrameBitmap(NULL), delFrameBitmap(false)
 {
   SetPalette (CSPAL_DIALOG);
   state |= CSS_SELECTABLE;
@@ -46,9 +46,20 @@ csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
       SetAlpha (255);
   }
 
+	if (FrameStyle == csdfsBitmap)
+		SetState (CSS_TRANSPARENT, true);
+
   ApplySkin (GetSkin ());
   SetFrameStyle (iFrameStyle);
 }
+
+
+csDialog::~csDialog()
+{
+ if (delFrameBitmap && FrameBitmap) delete FrameBitmap;
+}
+
+
 
 bool csDialog::HandleEvent (iEvent &Event)
 {
@@ -262,5 +273,30 @@ void csDialog::SetFrameStyle (csDialogFrameStyle iFrameStyle)
 
 void csDialog::SetAlpha (uint8 iAlpha)
 {
-  SetState (CSS_TRANSPARENT, !!(Alpha = iAlpha));
+	Alpha = iAlpha;
+	
+	if (Alpha || FrameStyle == csdfsBitmap)
+  	SetState (CSS_TRANSPARENT, true);
+  else
+  	SetState (CSS_TRANSPARENT, false);
 }
+
+void 
+csDialog::SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap)
+{
+	// Delete the previous bitmap, if it needs to be
+	if (delFrameBitmap && FrameBitmap)
+	{
+		delete FrameBitmap;
+		delFrameBitmap=false;
+		FrameBitmap=NULL;
+	}
+	
+	// Set the new one only	if there's something to set
+	if (iFrameBitmap) {
+		FrameBitmap = iFrameBitmap;
+		delFrameBitmap = iDelFrameBitmap;
+	}
+}
+
+

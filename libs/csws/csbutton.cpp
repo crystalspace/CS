@@ -31,15 +31,17 @@
 
 csButton::csButton (csComponent *iParent, int iCommandCode,
   int iButtonStyle, csButtonFrameStyle iFrameStyle) : csComponent (iParent),
-  ImageNormal (NULL), ImagePressed (NULL), delImages (false),
+  ImageNormal (NULL), ImagePressed (NULL),
+  FrameNormal (NULL), FramePressed (NULL), FrameHighlighted (NULL),
+  delImages (false), delFrameImages(false),
   CommandCode (iCommandCode), underline_pos (-1),
   ButtonStyle (iButtonStyle), FrameStyle (iFrameStyle),
-  Pressed (false)
+  ButtonAlpha(0), Pressed (false), Highlighted (false) 
 {
   SetPalette (CSPAL_BUTTON);
   if (ButtonStyle & CSBS_SELECTABLE)
     SetState (CSS_SELECTABLE, true);
-  if (FrameStyle == csbfsOblique)
+  if (FrameStyle == csbfsOblique || FrameStyle == csbfsTextured || FrameStyle == csbfsBitmap)
     SetState (CSS_TRANSPARENT, true);
   id = iCommandCode;
   ApplySkin (GetSkin ());
@@ -48,6 +50,7 @@ csButton::csButton (csComponent *iParent, int iCommandCode,
 csButton::~csButton ()
 {
   FreeBitmaps ();
+  FreeFrameBitmaps();
 }
 
 void csButton::SetBitmap (csPixmap *iNormal, csPixmap *iPressed,
@@ -71,6 +74,76 @@ void csButton::GetBitmap (csPixmap **iNormal, csPixmap **iPressed)
     *iPressed = ImagePressed;
 }
 
+void csButton::GetFrameBitmaps(csPixmap **iNormal, csPixmap **iPressed, csPixmap **iHighlighted)
+{
+  if (iNormal)
+  	*iNormal = FrameNormal;
+  	
+  if (iPressed)
+  	*iPressed = FramePressed;
+  	
+  if (iHighlighted)
+  	*iHighlighted = FrameHighlighted;
+}
+
+void csButton::SetFrameBitmaps(csPixmap *iNormal, csPixmap *iPressed, csPixmap *iHighlighted, bool iDelete)
+{
+	FreeFrameBitmaps();
+	
+	FrameNormal = iNormal;
+	if (iPressed)
+		FramePressed = iPressed;
+	else
+		FramePressed = iNormal;
+		
+	if (iHighlighted)
+		FrameHighlighted = iHighlighted;
+	else
+		FrameHighlighted = iNormal;
+		
+	delFrameImages = iDelete;
+	
+	Invalidate();
+}
+
+void csButton::SetButtonTexture(csPixmap *iNormal, csPixmap *iPressed, bool iDelete)
+{
+	FreeFrameBitmaps();
+	
+	FrameNormal = iNormal;
+	if (iPressed)
+		FramePressed = iPressed;
+	else
+		FramePressed = iNormal;
+		
+	FrameHighlighted = NULL;
+		
+	delFrameImages = iDelete;
+	
+	Invalidate();
+}
+
+void csButton::SetAlpha(uint8 iAlpha)
+{
+	ButtonAlpha=iAlpha;
+}
+
+void csButton::SetTextureOrigin(int iOrgX, int iOrgY)
+{
+ TexOrgX = iOrgX;
+ TexOrgY = iOrgY;
+}
+
+void 
+csButton::GetTextureOrigin(int *iOrgX, int *iOrgY)
+{
+ if (iOrgX)
+ 	*iOrgX = TexOrgX;
+ 	
+ if (iOrgY)
+ 	*iOrgY = TexOrgY;
+}
+
 void csButton::FreeBitmaps ()
 {
   if (delImages)
@@ -84,6 +157,27 @@ void csButton::FreeBitmaps ()
   ImageNormal = NULL;
   ImagePressed = NULL;
 }
+
+void csButton::FreeFrameBitmaps ()
+{
+  if (delFrameImages)
+  {
+  	if (FramePressed && FramePressed != FrameNormal)
+      delete FramePressed;
+      
+   	if (FrameHighlighted && FrameHighlighted != FrameNormal)
+      delete FrameHighlighted;
+
+    if (FrameNormal)
+      delete FrameNormal;
+  } /* endif */
+      
+  delFrameImages = false;
+  FrameNormal = NULL;
+  FramePressed = NULL;
+  FrameHighlighted = NULL;
+}
+
 
 bool csButton::HandleEvent (iEvent &Event)
 {
@@ -168,6 +262,7 @@ bool csButton::HandleEvent (iEvent &Event)
         return true;
       }
       break;
+      
     case csevMouseMove:
       if ((app->MouseOwner == this)
        && !(ButtonStyle & CSBS_MULTICHOOSE))
@@ -178,6 +273,22 @@ bool csButton::HandleEvent (iEvent &Event)
         return true;
       } /* endif */
       return true;
+      break;
+      
+    case csevMouseEnter:
+    	Highlighted=true;
+    	Invalidate();
+    	if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
+    	return true;
+    	break;
+    	
+    case csevMouseExit:
+    	Highlighted=false;
+    	Invalidate();
+    	if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
+    	return true;
+    	break;
+    	
     case csevKeyDown:
       return HandleKeyPress (Event);
     case csevKeyUp:
@@ -256,8 +367,15 @@ void csButton::SetPressed (bool state)
 
   Pressed = state;
   if (parent)
+  {
     parent->SendCommand (Pressed ? cscmdButtonDown : cscmdButtonUp,
       (void *)this);
+   
+    if (GetState(CSS_TRANSPARENT)) parent->Invalidate();
+      
+  }
+      
+      
 
   Invalidate ();
 }
