@@ -12445,12 +12445,13 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check if compiler recognizes -fPIC directive, which is needed by some
-# platforms when building plugin modules and shared libraries.
+# Check if compiler can be instructed to produce position-independent-code
+# (PIC).  This feature is required by some platforms when building plugin
+# modules and shared libraries.
 #------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking if -fPIC is accepted" >&5
-echo $ECHO_N "checking if -fPIC is accepted... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_fpic+set}" = set; then
+echo "$as_me:$LINENO: checking if C++ compiler supports PIC generation" >&5
+echo $ECHO_N "checking if C++ compiler supports PIC generation... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_pic+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -12590,22 +12591,21 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_fpic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_pic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 else
-  cs_cv_prog_cxx_fpic=no
+  cs_cv_prog_cxx_pic=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_fpic" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_fpic" >&6
-    if test "$cs_cv_prog_cxx_fpic" != no; then
-  cs_build_prop_val="$cs_cv_prog_cxx_fpic"
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_pic" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_pic" >&6
+    if test "$cs_cv_prog_cxx_pic" != no; then
+  cs_build_prop_val="$cs_cv_prog_cxx_pic"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
-  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.PIC ?= \"$cs_build_prop_val\" ;
+  cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.PIC ?= \"$cs_build_prop_val\" ;
 "
 fi
-
 
 fi
 
@@ -49783,7 +49783,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CppUnit::BriefTestProgressListener briefListener;
+CppUnit::BriefTestProgressListener b; b.startTest(0);
   ;
   return 0;
 }
@@ -49836,9 +49836,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libcppunit_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libcppunit_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libcppunit_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libcppunit_recent=yes
 		cs_cv_libcppunit_recent_cflags=$cs_build_cflags
 		cs_cv_libcppunit_recent_lflags=$cs_build_lflags
@@ -49934,7 +49934,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CppUnit::BriefTestProgressListener briefListener;
+CppUnit::BriefTestProgressListener b; b.startTest(0);
   ;
   return 0;
 }
@@ -49987,9 +49987,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libcppunit_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libcppunit_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libcppunit_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libcppunit_recent=yes
 		cs_cv_libcppunit_recent_cflags=$cs_build_cflags
 		cs_cv_libcppunit_recent_lflags=$cs_build_lflags

@@ -769,11 +769,12 @@ CS_CHECK_BUILD([if --kill-at is accepted], [cs_cv_prog_link_kill_at], [],
 
 
 #------------------------------------------------------------------------------
-# Check if compiler recognizes -fPIC directive, which is needed by some
-# platforms when building plugin modules and shared libraries.
+# Check if compiler can be instructed to produce position-independent-code
+# (PIC).  This feature is required by some platforms when building plugin
+# modules and shared libraries.
 #------------------------------------------------------------------------------
-CS_EMIT_BUILD_FLAGS([if -fPIC is accepted], [cs_cv_prog_cxx_fpic],
-   [CS_CREATE_TUPLE([-fPIC])], [C++], [COMPILER.CFLAGS.PIC])
+CS_CHECK_COMPILER_PIC([C++], [cs_cv_prog_cxx_pic],
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.PIC], [$cs_cv_prog_cxx_pic])])
 
 
 

@@ -51,6 +51,9 @@ chronological order.
 	  in CS/mk/autoconf from the master copies at
 	  ftp://ftp.gnu.org/pub/gnu/config/.  Also updated install-sh from the
 	  Automake master copy.
+	- Eric Sunshine added a CS_CHECK_COMPILER_PIC() macro in checkpic.m4.
+	  This macro figures out how to enable PIC generation (position
+	  independent code) in the specified compiler.
 2-Mar-2005
 	- Jorrit changed pvscalc to use the Description() method to print
 	  out boxes and vectors instead of the ugly B2F and other macros.

@@ -60,8 +60,9 @@ AC_DEFUN([CS_PROG_CXX],[
         CXXFLAGS=`echo "$CXXFLAGS" | sed 's/\-O.//g;s/-g.//g'`
 	CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
 
-	CS_EMIT_BUILD_FLAGS([if -fPIC is accepted], [cs_cv_prog_cxx_fpic],
-	   [CS_CREATE_TUPLE([-fPIC])], [C++], [COMPILER.CFLAGS.PIC])
+	CS_CHECK_COMPILER_PIC([C++], [cs_cv_prog_cxx_pic],
+	    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.PIC],
+		[$cs_cv_prog_cxx_pic])])
     ])
 ])
 
