@@ -446,7 +446,7 @@ struct csCovEdgeInfo
  * masks. It is used by the coverage mask tree. The input
  * for this LUT is a line crossing a box. The two intersections
  * of the line with the box are given with two edge indices.
- * An edge index is a number between 0 and n-1 with n beingu
+ * An edge index is a number between 0 and n-1 with n being
  * equal to dimension*2+dimension*2.
  * The returned mask indicates the 'outside' of the line,
  * the 'inside' of the line, and everything on the line.
