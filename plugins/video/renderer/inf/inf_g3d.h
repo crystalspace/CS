@@ -339,7 +339,7 @@ public:
 
   virtual void DrawLine (float, float, float, float, int) { }
   virtual void Clear (int) { }
-  virtual void Write (int, int, int, int, const char *) { }
+  virtual void Write (iFont *, int, int, int, int, const char *) { }
 
   virtual bool SetMousePosition (int, int) { return true; }
   virtual bool SetMouseCursor (csMouseCursorID) { return true; }
