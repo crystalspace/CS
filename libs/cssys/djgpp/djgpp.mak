@@ -73,7 +73,7 @@ JPG_LIBS=-ljpeg$(LIBJPEG.SUFFIX)
 SOUND_LIBS=
 
 # Indicate where special include files can be found.
-CFLAGS.INCLUDE=
+CFLAGS.INCLUDE=-Ilibs/cssys/djgpp/libs/libpng -Ilibs/cssys/djgpp/libs/libjpeg -Ilibs/cssys/djgpp/libs/zlib
 
 # General flags for the compiler which are used in any case.
 CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
@@ -91,7 +91,7 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=
+LFLAGS.GENERAL=-Llibs/cssys/djgpp/libs/libpng -Llibs/cssys/djgpp/libs/libjpeg -Llibs/cssys/djgpp/libs/zlib
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=-s
@@ -112,13 +112,13 @@ NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
 SRC.SYS_CSSYS = \
   libs/cssys/djgpp/djgpp.cpp \
   libs/cssys/djgpp/printf.cpp \
+  libs/cssys/djgpp/djtimer.cpp \
   libs/cssys/djgpp/djmousys.s \
   libs/cssys/djgpp/djkeysys.s \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/instpath.cpp \
   libs/cssys/general/runloop.cpp \
-  libs/cssys/general/sysinit.cpp \
-  libs/cssys/general/timing.cpp
+  libs/cssys/general/sysinit.cpp 
 ifeq ($(USE_PLUGINS),yes)
 SRC.SYS_CSSYS += libs/cssys/djgpp/loadlib.cpp libs/cssys/general/findlib.cpp
 endif
@@ -159,6 +159,7 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #--------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
 
+#SYSCONFIG=cmd /E:8192 /C libs\cssys\djgpp\dosconf.bat
 SYSCONFIG=command /E:8192 /C libs\cssys\djgpp\dosconf.bat
 # Check if "echo" executable is not installed (thus using dumb COMMAND.COM's echo)
 ifeq ($(shell echo ""),"")
