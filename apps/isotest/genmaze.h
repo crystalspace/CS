@@ -66,7 +66,7 @@ public:
   {
     CS_ASSERT(x>=0 && x<width);
     CS_ASSERT(y>=0 && y<height);
-    return maze[y*height+x];
+    return maze[y*width+x];
   }
 
   /** Set a position at an edge to be an 'access point' to the maze.
