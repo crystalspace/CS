@@ -154,12 +154,19 @@ DO.PLUGIN = $(DO.PLUGIN.PREAMBLE) $(DO.PLUGIN.CORE) $(DO.PLUGIN.POSTAMBLE)
 
 # The sed script used to build dependencies
 SED_DEPEND=-e "s:^\([^ \#].*\):$(BUCK)\(OUT\)/\1:" $(SYS_SED_DEPEND)
+SED_DEPEND_NEW= \
+  -e "s:^\([^ \#].*\):$(BUCK)\(OUT.$(basename $(notdir $(UPCASE)))\)/\1:" \
+  $(SYS_SED_DEPEND)
+
 # How to build a source dependency file
 ifndef DO.DEP
   ifeq ($(DEPEND_TOOL),cc)
     DO.DEP1 = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE)
     DO.DEP2 = $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
     DO.DEP = $(DO.DEP1) $(DO.DEP2)
+    DO.DEPEND1 = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE)
+    DO.DEPEND2 = $(filter-out %.asm,$^) | sed $(SED_DEPEND_NEW) >$@
+    DO.DEPEND = $(DO.DEPEND1) $(DO.DEPEND2)
   else
     ifeq ($(DEPEND_TOOL),mkdep)
       # If mkdep is already installed, don't build it
@@ -177,8 +184,17 @@ dep: build.makedep
       DO.DEP2 = \
         $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\)/ -r -c -f $@
       DO.DEP = $(DO.DEP1) $(DO.DEP2)
+      DO.DEPEND1 = $(MAKEDEP) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
+      DO.DEPEND2 = $(filter-out %.asm,$^) -o $(BUCK)O \
+        -p $(BUCK)\(OUT.$(basename $(notdir $(UPCASE)))\)/ -r -c -f $@
+      DO.DEPEND = $(DO.DEPEND1) $(DO.DEPEND2)
     else
       DO.DEP = echo Building dependencies is not supported on this platform
+      DO.DEP1 = :
+      DO.DEP2 = ; $(DO.DEP)
+      DO.DEPEND = $(DO.DEP)
+      DO.DEPEND1 = :
+      DO.DEPEND2 = ; $(DO.DEPEND)
     endif
   endif
 endif
@@ -221,7 +237,7 @@ endif
 
 cleanlib:
 
-cleandep: $(OUTBASE) $(OUTOS)
+cleandep:
 	-$(RM) $(OUTOS)/*.dep
 
 $(OUT)/%$O: %.cpp

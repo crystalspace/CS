@@ -29,12 +29,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/pysimp apps/support
-
 PYSIMP.EXE = pysimp$(EXE)
-INC.PYSIMP = $(wildcard apps/pysimp/*.h)
-SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp)
-OBJ.PYSIMP = $(addprefix $(OUT)/,$(notdir $(SRC.PYSIMP:.cpp=$O)))
+DIR.PYSIMP = apps/pysimp
+OUT.PYSIMP = $(OUT)/$(DIR.PYSIMP)
+INC.PYSIMP = $(wildcard $(DIR.PYSIMP)/*.h)
+SRC.PYSIMP = $(wildcard $(DIR.PYSIMP)/*.cpp)
+OBJ.PYSIMP = $(addprefix $(OUT.PYSIMP)/,$(notdir $(SRC.PYSIMP:.cpp=$O)))
 DEP.PYSIMP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.PYSIMP = $(foreach d,$(DEP.PYSIMP),$($d.LIB))
 
@@ -49,24 +49,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.pysimp pysimpclean
+.PHONY: build.pysimp pysimpclean pysimpcleandep
 
 all: $(PYSIMP.EXE)
-build.pysimp: $(OUTDIRS) $(PYSIMP.EXE)
+build.pysimp: $(OUT.PYSIMP) $(PYSIMP.EXE)
 clean: pysimpclean
+
+$(OUT.PYSIMP)/%$O: $(DIR.PYSIMP)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) $(LIB.PYSIMP)
 	$(DO.LINK.EXE)
 
+$(OUT.PYSIMP):
+	$(MKDIRS)
+
 pysimpclean:
 	-$(RMDIR) $(PYSIMP.EXE) $(OBJ.PYSIMP)
 
+cleandep: pysimpcleandep
+pysimpcleandep:
+	-$(RM) $(OUT.PYSIMP)/pysimp.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/pysimp.dep
-$(OUTOS)/pysimp.dep: $(SRC.PYSIMP)
-	$(DO.DEP)
+dep: $(OUT.PYSIMP) $(OUT.PYSIMP)/pysimp.dep
+$(OUT.PYSIMP)/pysimp.dep: $(SRC.PYSIMP)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/pysimp.dep
+-include $(OUT.PYSIMP)/pysimp.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

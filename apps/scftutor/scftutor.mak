@@ -29,27 +29,27 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/scftutor
-
+DIR.SCFTUTOR = apps/scftutor
+OUT.SCFTUTOR = $(OUT)/$(DIR.SCFTUTOR)
 DEP.SCFTUTOR = CSUTIL CSSYS CSUTIL CSGEOM
 LIB.SCFTUTOR = $(foreach d,$(DEP.SCFTUTOR),$($d.LIB))
 
 ZOO.EXE = zoo$(EXE.CONSOLE)
-INC.ZOO = $(wildcard apps/scftutor/*.h)
-SRC.ZOO = apps/scftutor/zoo.cpp apps/scftutor/frog.cpp
-OBJ.ZOO = $(addprefix $(OUT)/,$(notdir $(SRC.ZOO:.cpp=$O)))
+INC.ZOO = $(wildcard $(DIR.SCFTUTOR)/*.h)
+SRC.ZOO = $(DIR.SCFTUTOR)/zoo.cpp $(DIR.SCFTUTOR)/frog.cpp
+OBJ.ZOO = $(addprefix $(OUT.SCFTUTOR)/,$(notdir $(SRC.ZOO:.cpp=$O)))
 DEP.ZOO = $(DEP.SCFTUTOR)
 LIB.ZOO = $(LIB.SCFTUTOR)
 
-INC.DOG = apps/scftutor/idog.h apps/scftutor/iname.h
-SRC.DOG = apps/scftutor/dog.cpp
-OBJ.DOG = $(addprefix $(OUT)/,$(notdir $(SRC.DOG:.cpp=$O)))
+INC.DOG = $(DIR.SCFTUTOR)/idog.h $(DIR.SCFTUTOR)/iname.h
+SRC.DOG = $(DIR.SCFTUTOR)/dog.cpp
+OBJ.DOG = $(addprefix $(OUT.SCFTUTOR)/,$(notdir $(SRC.DOG:.cpp=$O)))
 DEP.DOG = $(DEP.SCFTUTOR)
 LIB.DOG = $(LIB.SCFTUTOR)
 
-INC.WORM = apps/scftutor/iworm.h
-SRC.WORM = apps/scftutor/worm.cpp
-OBJ.WORM = $(addprefix $(OUT)/,$(notdir $(SRC.WORM:.cpp=$O)))
+INC.WORM = $(DIR.SCFTUTOR)/iworm.h
+SRC.WORM = $(DIR.SCFTUTOR)/worm.cpp
+OBJ.WORM = $(addprefix $(OUT.SCFTUTOR)/,$(notdir $(SRC.WORM:.cpp=$O)))
 DEP.WORM = $(DEP.SCFTUTOR)
 LIB.WORM = $(LIB.SCFTUTOR)
 
@@ -62,7 +62,7 @@ else
   OBJ.ZOO += $(OBJ.DOG) $(OBJ.WORM)
 endif
 
-#TO_INSTALL.EXE+=$(ZOO.EXE)
+#TO_INSTALL.EXE += $(ZOO.EXE)
 
 MSVC.DSP += ZOO
 DSP.ZOO.NAME = zoo
@@ -85,12 +85,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: scftut scftutclean
+.PHONY: scftut scftutclean scftutcleandep
 
 all: $(ZOO.EXE) $(DOG.DLL) $(WORM.DLL)
-scftut: $(OUTDIRS) $(ZOO.EXE)
-scftutdlls: $(OUTDIRS) $(DOG.DLL) $(WORM.DLL)
+scftut: $(OUT.SCFTUTOR) $(ZOO.EXE)
+scftutdlls: $(OUT.SCFTUTOR) $(DOG.DLL) $(WORM.DLL)
 clean: scftutclean
+
+$(OUT.SCFTUTOR)/%$O: $(DIR.SCFTUTOR)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(ZOO.EXE): $(OBJ.ZOO) $(LIB.ZOO)
 	$(DO.LINK.CONSOLE.EXE)
@@ -103,16 +106,23 @@ $(WORM.DLL): $(OBJ.WORM) $(LIB.WORM)
 	$(DO.PLUGIN.CORE) \
 	$(DO.PLUGIN.POSTAMBLE)
 
+$(OUT.SCFTUTOR):
+	$(MKDIRS)
+
 scftutclean:
 	-$(RMDIR) $(ZOO.EXE) $(DOG.DLL) $(WORM.DLL) $(OBJ.ZOO) $(OBJ.DOG) \
 	$(OBJ.WORM)
 
+cleandep: scftutcleandep
+scftutcleandep:
+	-$(RM) $(OUT.SCFTUTOR)/scftutor.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/scftut.dep
-$(OUTOS)/scftut.dep: $(SRC.ZOO) $(SRC.DOG) $(SRC.WORM)
-	$(DO.DEP)
+dep: $(OUT.SCFTUTOR) $(OUT.SCFTUTOR)/scftutor.dep
+$(OUT.SCFTUTOR)/scftutor.dep: $(SRC.ZOO) $(SRC.DOG) $(SRC.WORM)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/scftut.dep
+-include $(OUT.SCFTUTOR)/scftutor.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -26,12 +26,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/mdltest
-
 MDLTEST.EXE = mdltest$(EXE)
-INC.MDLTEST = $(wildcard apps/mdltest/*.h)
-SRC.MDLTEST = $(wildcard apps/mdltest/*.cpp)
-OBJ.MDLTEST = $(addprefix $(OUT)/,$(notdir $(SRC.MDLTEST:.cpp=$O)))
+DIR.MDLTEST = apps/mdltest
+OUT.MDLTEST = $(OUT)/$(DIR.MDLTEST)
+INC.MDLTEST = $(wildcard $(DIR.MDLTEST)/*.h)
+SRC.MDLTEST = $(wildcard $(DIR.MDLTEST)/*.cpp)
+OBJ.MDLTEST = $(addprefix $(OUT.MDLTEST)/,$(notdir $(SRC.MDLTEST:.cpp=$O)))
 DEP.MDLTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.MDLTEST = $(foreach d,$(DEP.MDLTEST),$($d.LIB))
 
@@ -46,24 +46,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.mdltest mdltestclean
+.PHONY: build.mdltest mdltestclean mdltestcleandep
 
 all: $(MDLTEST.EXE)
-build.mdltest: $(OUTDIRS) $(MDLTEST.EXE)
+build.mdltest: $(OUT.MDLTEST) $(MDLTEST.EXE)
 clean: mdltestclean
+
+$(OUT.MDLTEST)/%$O: $(DIR.MDLTEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(MDLTEST.EXE): $(DEP.EXE) $(OBJ.MDLTEST) $(LIB.MDLTEST)
 	$(DO.LINK.EXE)
 
+$(OUT.MDLTEST):
+	$(MKDIRS)
+
 mdltestclean:
 	-$(RMDIR) $(MDLTEST.EXE) $(OBJ.MDLTEST)
 
+cleandep: mdltestcleandep
+mdltestcleandep:
+	-$(RM) $(OUT.MDLTEST)/mdltest.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/mdltest.dep
-$(OUTOS)/mdltest.dep: $(SRC.MDLTEST)
-	$(DO.DEP)
+dep: $(OUT.MDLTEST) $(OUT.MDLTEST)/mdltest.dep
+$(OUT.MDLTEST)/mdltest.dep: $(SRC.MDLTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/mdltest.dep
+-include $(OUT.MDLTEST)/mdltest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -25,14 +25,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/examples/cswseng
-
 CSWSENG.EXE = cswseng$(EXE)
-INC.CSWSENG = $(wildcard apps/examples/cswseng/*.h)
-SRC.CSWSENG = $(wildcard apps/examples/cswseng/*.cpp)
-OBJ.CSWSENG = $(addprefix $(OUT)/,$(notdir $(SRC.CSWSENG:.cpp=$O)))
-DEP.CSWSENG = \
-  CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DIR.CSWSENG = apps/examples/cswseng
+OUT.CSWSENG = $(OUT)/$(DIR.CSWSENG)
+INC.CSWSENG = $(wildcard $(DIR.CSWSENG)/*.h)
+SRC.CSWSENG = $(wildcard $(DIR.CSWSENG)/*.cpp)
+OBJ.CSWSENG = $(addprefix $(OUT.CSWSENG)/,$(notdir $(SRC.CSWSENG:.cpp=$O)))
+DEP.CSWSENG = CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSWSENG = $(foreach d,$(DEP.CSWSENG),$($d.LIB))
 
 #TO_INSTALL.EXE    += $(CSWSENG.EXE)
@@ -47,24 +46,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.cswseng cswsengclean
+.PHONY: build.cswseng cswsengclean cswsengcleandep
 
 all: $(CSWSENG.EXE)
-build.cswseng: $(OUTDIRS) $(CSWSENG.EXE)
+build.cswseng: $(OUT.CSWSENG) $(CSWSENG.EXE)
 clean: cswsengclean
+
+$(OUT.CSWSENG)/%$O: $(DIR.CSWSENG)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSWSENG.EXE): $(DEP.EXE) $(OBJ.CSWSENG) $(LIB.CSWSENG)
 	$(DO.LINK.EXE)
 
+$(OUT.CSWSENG):
+	$(MKDIRS)
+
 cswsengclean:
 	-$(RMDIR) $(CSWSENG.EXE) $(OBJ.CSWSENG)
 
+cleandep: cswsengcleandep
+cswsengcleandep:
+	-$(RM) $(OUT.CSWSENG)/cswseng.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/cswseng.dep
-$(OUTOS)/cswseng.dep: $(SRC.CSWSENG)
-	$(DO.DEP)
+dep: $(OUT.CSWSENG) $(OUT.CSWSENG)/cswseng.dep
+$(OUT.CSWSENG)/cswseng.dep: $(SRC.CSWSENG)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/cswseng.dep
+-include $(OUT.CSWSENG)/cswseng.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

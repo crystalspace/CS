@@ -25,12 +25,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/bumptest apps/support
-
 BUMPTEST.EXE=bumptest$(EXE)
-INC.BUMPTEST = $(wildcard apps/bumptest/*.h)
-SRC.BUMPTEST = $(wildcard apps/bumptest/*.cpp)
-OBJ.BUMPTEST = $(addprefix $(OUT)/,$(notdir $(SRC.BUMPTEST:.cpp=$O)))
+DIR.BUMPTEST = apps/bumptest
+OUT.BUMPTEST = $(OUT)/$(DIR.BUMPTEST)
+INC.BUMPTEST = $(wildcard $(DIR.BUMPTEST)/*.h)
+SRC.BUMPTEST = $(wildcard $(DIR.BUMPTEST)/*.cpp)
+OBJ.BUMPTEST = $(addprefix $(OUT.BUMPTEST)/,$(notdir $(SRC.BUMPTEST:.cpp=$O)))
 DEP.BUMPTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.BUMPTEST = $(foreach d,$(DEP.BUMPTEST),$($d.LIB))
 CFG.BUMPTEST = data/config/csbumptest.cfg
@@ -46,24 +46,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.bumptest bumptestclean
+.PHONY: build.bumptest bumptestclean bumptestcleandep
 
 all: $(BUMPTEST.EXE)
-build.bumptest: $(OUTDIRS) $(BUMPTEST.EXE)
+build.bumptest: $(OUT.BUMPTEST) $(BUMPTEST.EXE)
 clean: bumptestclean
+
+$(OUT.BUMPTEST)/%$O: $(DIR.BUMPTEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(BUMPTEST.EXE): $(DEP.EXE) $(OBJ.BUMPTEST) $(LIB.BUMPTEST)
 	$(DO.LINK.EXE)
 
+$(OUT.BUMPTEST):
+	$(MKDIRS)
+
 bumptestclean:
 	-$(RMDIR) $(BUMPTEST.EXE) $(OBJ.BUMPTEST)
 
+cleandep: bumptestcleandep
+bumptestcleandep:
+	-$(RM) $(OUT.BUMPTEST)/bumptest.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/bumptest.dep
-$(OUTOS)/bumptest.dep: $(SRC.BUMPTEST)
-	$(DO.DEP)
+dep: $(OUT.BUMPTEST) $(OUT.BUMPTEST)/bumptest.dep
+$(OUT.BUMPTEST)/bumptest.dep: $(SRC.BUMPTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/bumptest.dep
+-include $(OUT.BUMPTEST)/bumptest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -25,12 +25,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------ postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/perftest apps/support
-
 PERFTEST.EXE = perftest$(EXE)
-INC.PERFTEST = $(wildcard apps/perftest/*.h)
-SRC.PERFTEST = $(wildcard apps/perftest/*.cpp)
-OBJ.PERFTEST = $(addprefix $(OUT)/,$(notdir $(SRC.PERFTEST:.cpp=$O)))
+DIR.PERFTEST = apps/perftest
+OUT.PERFTEST = $(OUT)/$(DIR.PERFTEST)
+INC.PERFTEST = $(wildcard $(DIR.PERFTEST)/*.h)
+SRC.PERFTEST = $(wildcard $(DIR.PERFTEST)/*.cpp)
+OBJ.PERFTEST = $(addprefix $(OUT.PERFTEST)/,$(notdir $(SRC.PERFTEST:.cpp=$O)))
 DEP.PERFTEST = CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSGFX
 LIB.PERFTEST = $(foreach d,$(DEP.PERFTEST),$($d.LIB))
 
@@ -45,24 +45,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #---------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.perftest perftestclean
+.PHONY: build.perftest perftestclean perftestcleandep
 
 all: $(PERFTEST.EXE)
-build.perftest: $(OUTDIRS) $(PERFTEST.EXE)
+build.perftest: $(OUT.PERFTEST) $(PERFTEST.EXE)
 clean: perftestclean
+
+$(OUT.PERFTEST)/%$O: $(DIR.PERFTEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(PERFTEST.EXE): $(DEP.EXE) $(OBJ.PERFTEST) $(LIB.PERFTEST)
 	$(DO.LINK.EXE)
 
+$(OUT.PERFTEST):
+	$(MKDIRS)
+
 perftestclean:
 	-$(RMDIR) $(PERFTEST.EXE) $(OBJ.PERFTEST)
 
+cleandep: perftestcleandep
+perftestcleandep:
+	-$(RM) $(OUT.PERFTEST)/perftest.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/perftest.dep
-$(OUTOS)/perftest.dep: $(SRC.PERFTEST)
-	$(DO.DEP)
+dep: $(OUT.PERFTEST) $(OUT.PERFTEST)/perftest.dep
+$(OUT.PERFTEST)/perftest.dep: $(SRC.PERFTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/perftest.dep
+-include $(OUT.PERFTEST)/perftest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -25,12 +25,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/demo
-
 CSDEMO.EXE=csdemo$(EXE)
-INC.CSDEMO = $(wildcard apps/demo/*.h)
-SRC.CSDEMO = $(wildcard apps/demo/*.cpp)
-OBJ.CSDEMO = $(addprefix $(OUT)/,$(notdir $(SRC.CSDEMO:.cpp=$O)))
+DIR.CSDEMO = apps/demo
+OUT.CSDEMO = $(OUT)/$(DIR.CSDEMO)
+INC.CSDEMO = $(wildcard $(DIR.CSDEMO)/*.h)
+SRC.CSDEMO = $(wildcard $(DIR.CSDEMO)/*.cpp)
+OBJ.CSDEMO = $(addprefix $(OUT.CSDEMO)/,$(notdir $(SRC.CSDEMO:.cpp=$O)))
 DEP.CSDEMO = CSGFX CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSSYS
 LIB.CSDEMO = $(foreach d,$(DEP.CSDEMO),$($d.LIB))
 CFG.CSDEMO = data/config/csdemo.cfg
@@ -48,24 +48,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.csdemo csdemoclean
+.PHONY: build.csdemo csdemoclean csdemocleandep
 
 all: $(CSDEMO.EXE)
-build.csdemo: $(OUTDIRS) $(CSDEMO.EXE)
+build.csdemo: $(OUT.CSDEMO) $(CSDEMO.EXE)
 clean: csdemoclean
+
+$(OUT.CSDEMO)/%$O: $(DIR.CSDEMO)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSDEMO.EXE): $(DEP.EXE) $(OBJ.CSDEMO) $(LIB.CSDEMO)
 	$(DO.LINK.EXE)
 
+$(OUT.CSDEMO):
+	$(MKDIRS)
+
 csdemoclean:
 	-$(RMDIR) $(CSDEMO.EXE) $(OBJ.CSDEMO)
 
+cleandep: csdemocleandep
+csdemocleandep:
+	-$(RM) $(OUT.CSDEMO)/csdemo.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/csdemo.dep
-$(OUTOS)/csdemo.dep: $(SRC.CSDEMO)
-	$(DO.DEP)
+dep: $(OUT.CSDEMO) $(OUT.CSDEMO)/csdemo.dep
+$(OUT.CSDEMO)/csdemo.dep: $(SRC.CSDEMO)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/csdemo.dep
+-include $(OUT.CSDEMO)/csdemo.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

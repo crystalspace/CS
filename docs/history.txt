@@ -6,6 +6,13 @@ The history order is reversed so that new features are at the top.
 	- Changed the way the mesh, factory, light and sector lists are
 	  implemented so that it is no longer possible to misuse them (the
 	  array has been made private).
+	- Eric Sunshine began converting the makefiles so that object-files for
+	  each module are placed in a module-specific object-file directory,
+	  rather than in the common out/PLATFORM/CPU/mode directory.  This
+	  change corrects the broken and monolithic design limitation of the
+	  makefile system where no two source files in the entire project can
+	  have the same name even if they reside in different module
+	  directories.
 18-Jan-2003
 	- Fixed the engine so it no longer tries to load the thing_type
 	  immediatelly in initialization. Instead it tries to load it

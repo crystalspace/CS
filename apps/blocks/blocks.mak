@@ -25,12 +25,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/blocks apps/support
-
 BLOCKS.EXE = blocks$(EXE)
-INC.BLOCKS = $(wildcard apps/blocks/*.h)
-SRC.BLOCKS = $(wildcard apps/blocks/*.cpp)
-OBJ.BLOCKS = $(addprefix $(OUT)/,$(notdir $(SRC.BLOCKS:.cpp=$O)))
+DIR.BLOCKS = apps/blocks
+OUT.BLOCKS = $(OUT)/$(DIR.BLOCKS)
+INC.BLOCKS = $(wildcard $(DIR.BLOCKS)/*.h)
+SRC.BLOCKS = $(wildcard $(DIR.BLOCKS)/*.cpp)
+OBJ.BLOCKS = $(addprefix $(OUT.BLOCKS)/,$(notdir $(SRC.BLOCKS:.cpp=$O)))
 DEP.BLOCKS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.BLOCKS = $(foreach d,$(DEP.BLOCKS),$($d.LIB))
 CFG.BLOCKS = data/config/blocks.cfg
@@ -48,24 +48,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #---------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.blocks blocksclean
+.PHONY: build.blocks blocksclean blockscleandep
 
 all: $(BLOCKS.EXE)
-build.blocks: $(OUTDIRS) $(BLOCKS.EXE)
+build.blocks: $(OUT.BLOCKS) $(BLOCKS.EXE)
 clean: blocksclean
+
+$(OUT.BLOCKS)/%$O: $(DIR.BLOCKS)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(BLOCKS.EXE): $(DEP.EXE) $(OBJ.BLOCKS) $(LIB.BLOCKS)
 	$(DO.LINK.EXE)
 
+$(OUT.BLOCKS):
+	$(MKDIRS)
+
 blocksclean:
 	-$(RMDIR) $(BLOCKS.EXE) $(OBJ.BLOCKS)
 
+cleandep: blockscleandep
+blockscleandep:
+	-$(RM) $(OUT.BLOCKS)/blocks.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/blocks.dep
-$(OUTOS)/blocks.dep: $(SRC.BLOCKS)
-	$(DO.DEP)
+dep: $(OUT.BLOCKS) $(OUT.BLOCKS)/blocks.dep
+$(OUT.BLOCKS)/blocks.dep: $(SRC.BLOCKS)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/blocks.dep
+-include $(OUT.BLOCKS)/blocks.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -5,7 +5,8 @@ DESCRIPTION.demosky = Crystal Space sky demo
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make demosky      Make the $(DESCRIPTION.demosky)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make demosky      Make the $(DESCRIPTION.demosky)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -25,12 +26,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/demosky apps/support
-
 DEMOSKY.EXE=demosky$(EXE)
-INC.DEMOSKY = $(wildcard apps/demosky/*.h)
-SRC.DEMOSKY = $(wildcard apps/demosky/*.cpp)
-OBJ.DEMOSKY = $(addprefix $(OUT)/,$(notdir $(SRC.DEMOSKY:.cpp=$O)))
+DIR.DEMOSKY = apps/demosky
+OUT.DEMOSKY = $(OUT)/$(DIR.DEMOSKY)
+INC.DEMOSKY = $(wildcard $(DIR.DEMOSKY)/*.h)
+SRC.DEMOSKY = $(wildcard $(DIR.DEMOSKY)/*.cpp)
+OBJ.DEMOSKY = $(addprefix $(OUT.DEMOSKY)/,$(notdir $(SRC.DEMOSKY:.cpp=$O)))
 DEP.DEMOSKY = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.DEMOSKY = $(foreach d,$(DEP.DEMOSKY),$($d.LIB))
 
@@ -45,24 +46,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.demosky demoskyclean
+.PHONY: build.demosky demoskyclean demoskycleandep
 
 all: $(DEMOSKY.EXE)
-build.demosky: $(OUTDIRS) $(DEMOSKY.EXE)
+build.demosky: $(OUT.DEMOSKY) $(DEMOSKY.EXE)
 clean: demoskyclean
+
+$(OUT.DEMOSKY)/%$O: $(DIR.DEMOSKY)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(DEMOSKY.EXE): $(DEP.EXE) $(OBJ.DEMOSKY) $(LIB.DEMOSKY)
 	$(DO.LINK.EXE)
 
+$(OUT.DEMOSKY):
+	$(MKDIRS)
+
 demoskyclean:
 	-$(RMDIR) $(DEMOSKY.EXE) $(OBJ.DEMOSKY)
 
+cleandep: demoskycleandep
+demoskycleandep:
+	-$(RM) $(OUT.DEMOSKY)/demosky.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/demosky.dep
-$(OUTOS)/demosky.dep: $(SRC.DEMOSKY)
-	$(DO.DEP)
+dep: $(OUT.DEMOSKY) $(OUT.DEMOSKY)/demosky.dep
+$(OUT.DEMOSKY)/demosky.dep: $(SRC.DEMOSKY)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/demosky.dep
+-include $(OUT.DEMOSKY)/demosky.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -31,12 +31,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/walktest apps/support
-
 WALKTEST.EXE = walktest$(EXE)
-INC.WALKTEST = $(wildcard apps/walktest/*.h)
-SRC.WALKTEST = $(wildcard apps/walktest/*.cpp)
-OBJ.WALKTEST = $(addprefix $(OUT)/,$(notdir $(SRC.WALKTEST:.cpp=$O)))
+DIR.WALKTEST = apps/walktest
+OUT.WALKTEST = $(OUT)/$(DIR.WALKTEST)
+INC.WALKTEST = $(wildcard $(DIR.WALKTEST)/*.h)
+SRC.WALKTEST = $(wildcard $(DIR.WALKTEST)/*.cpp)
+OBJ.WALKTEST = $(addprefix $(OUT.WALKTEST)/,$(notdir $(SRC.WALKTEST:.cpp=$O)))
 DEP.WALKTEST = CSTOOL CSENGINE CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.WALKTEST = $(foreach d,$(DEP.WALKTEST),$($d.LIB))
 CFG.WALKTEST = data/config/walktest.cfg data/config/autoexec.cfg
@@ -57,24 +57,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.walktest walktestclean
+.PHONY: build.walktest walktestclean walktestcleandep
 
 all: $(WALKTEST.EXE)
-build.walktest: $(OUTDIRS) $(WALKTEST.EXE)
+build.walktest: $(OUT.WALKTEST) $(WALKTEST.EXE)
 clean: walktestclean
+
+$(OUT.WALKTEST)/%$O: $(DIR.WALKTEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) $(LIB.WALKTEST)
 	$(DO.LINK.EXE)
 
+$(OUT.WALKTEST):
+	$(MKDIRS)
+
 walktestclean:
 	-$(RMDIR) $(WALKTEST.EXE) $(OBJ.WALKTEST)
 
+cleandep: walktestcleandep
+walktestcleandep:
+	-$(RM) $(OUT.WALKTEST)/walktest.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/walktest.dep
-$(OUTOS)/walktest.dep: $(SRC.WALKTEST)
-	$(DO.DEP)
+dep: $(OUT.WALKTEST) $(OUT.WALKTEST)/walktest.dep
+$(OUT.WALKTEST)/walktest.dep: $(SRC.WALKTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/walktest.dep
+-include $(OUT.WALKTEST)/walktest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

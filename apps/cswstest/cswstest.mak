@@ -25,12 +25,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/cswstest apps/support
-
 CSWSTEST.EXE = cswstest$(EXE)
-INC.CSWSTEST = $(wildcard apps/cswstest/*.h)
-SRC.CSWSTEST = $(wildcard apps/cswstest/*.cpp)
-OBJ.CSWSTEST = $(addprefix $(OUT)/,$(notdir $(SRC.CSWSTEST:.cpp=$O)))
+DIR.CSWSTEST = apps/cswstest
+OUT.CSWSTEST = $(OUT)/$(DIR.CSWSTEST)
+INC.CSWSTEST = $(wildcard $(DIR.CSWSTEST)/*.h)
+SRC.CSWSTEST = $(wildcard $(DIR.CSWSTEST)/*.cpp)
+OBJ.CSWSTEST = $(addprefix $(OUT.CSWSTEST)/,$(notdir $(SRC.CSWSTEST:.cpp=$O)))
 DEP.CSWSTEST = CSWS CSGFX CSGEOM CSSYS CSGEOM CSUTIL CSTOOL CSUTIL CSSYS CSUTIL
 LIB.CSWSTEST = $(foreach d,$(DEP.CSWSTEST),$($d.LIB))
 CFG.CSWSTEST = data/config/cswstest.cfg
@@ -47,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.cswstest cswstestclean
+.PHONY: build.cswstest cswstestclean cswstestcleandep
 
 all: $(CSWSTEST.EXE)
-build.cswstest: $(OUTDIRS) $(CSWSTEST.EXE)
+build.cswstest: $(OUT.CSWSTEST) $(CSWSTEST.EXE)
 clean: cswstestclean
+
+$(OUT.CSWSTEST)/%$O: $(DIR.CSWSTEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSWSTEST.EXE): $(DEP.EXE) $(OBJ.CSWSTEST) $(LIB.CSWSTEST)
 	$(DO.LINK.EXE)
 
+$(OUT.CSWSTEST):
+	$(MKDIRS)
+
 cswstestclean:
 	-$(RMDIR) $(CSWSTEST.EXE) $(OBJ.CSWSTEST)
 
+cleandep: cswstestcleandep
+cswstestcleandep:
+	-$(RM) $(OUT.CSWSTEST)/cswstest.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/cswstest.dep
-$(OUTOS)/cswstest.dep: $(SRC.CSWSTEST)
-	$(DO.DEP)
+dep: $(OUT.CSWSTEST) $(OUT.CSWSTEST)/cswstest.dep
+$(OUT.CSWSTEST)/cswstest.dep: $(SRC.CSWSTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/cswstest.dep
+-include $(OUT.CSWSTEST)/cswstest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

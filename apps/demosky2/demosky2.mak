@@ -25,12 +25,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/demosky2 apps/support
-
 DEMOSKY2.EXE=demosky2$(EXE)
-INC.DEMOSKY2 = $(wildcard apps/demosky2/*.h)
-SRC.DEMOSKY2 = $(wildcard apps/demosky2/*.cpp)
-OBJ.DEMOSKY2 = $(addprefix $(OUT)/,$(notdir $(SRC.DEMOSKY2:.cpp=$O)))
+DIR.DEMOSKY2 = apps/demosky2
+OUT.DEMOSKY2 = $(OUT)/$(DIR.DEMOSKY2)
+INC.DEMOSKY2 = $(wildcard $(DIR.DEMOSKY2)/*.h)
+SRC.DEMOSKY2 = $(wildcard $(DIR.DEMOSKY2)/*.cpp)
+OBJ.DEMOSKY2 = $(addprefix $(OUT.DEMOSKY2)/,$(notdir $(SRC.DEMOSKY2:.cpp=$O)))
 DEP.DEMOSKY2 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.DEMOSKY2 = $(foreach d,$(DEP.DEMOSKY2),$($d.LIB))
 
@@ -45,24 +45,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.demosky2 demosky2clean
+.PHONY: build.demosky2 demosky2clean demosky2cleandep
 
 all: $(DEMOSKY2.EXE)
-build.demosky2: $(OUTDIRS) $(DEMOSKY2.EXE)
+build.demosky2: $(OUT.DEMOSKY2) $(DEMOSKY2.EXE)
 clean: demosky2clean
+
+$(OUT.DEMOSKY2)/%$O: $(DIR.DEMOSKY2)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(DEMOSKY2.EXE): $(DEP.EXE) $(OBJ.DEMOSKY2) $(LIB.DEMOSKY2)
 	$(DO.LINK.EXE)
 
+$(OUT.DEMOSKY2):
+	$(MKDIRS)
+
 demosky2clean:
 	-$(RMDIR) $(DEMOSKY2.EXE) $(OBJ.DEMOSKY2)
 
+cleandep: demosky2cleandep
+demosky2cleandep:
+	-$(RM) $(OUT.DEMOSKY2)/demosky2.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/demosky2.dep
-$(OUTOS)/demosky2.dep: $(SRC.DEMOSKY2)
-	$(DO.DEP)
+dep: $(OUT.DEMOSKY2) $(OUT.DEMOSKY2)/demosky2.dep
+$(OUT.DEMOSKY2)/demosky2.dep: $(SRC.DEMOSKY2)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/demosky2.dep
+-include $(OUT.DEMOSKY2)/demosky2.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

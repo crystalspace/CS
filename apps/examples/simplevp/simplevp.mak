@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.simplevp = Effects and vertex programs demonstration
+DESCRIPTION.simplevp = effects and vertex programs demonstration
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -26,16 +26,16 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/examples/simplevp
+SIMPLEVP.EXE = simplevp$(EXE)
+DIR.SIMPLEVP = apps/examples/simplevp
+OUT.SIMPLEVP = $(OUT)/$(DIR.SIMPLEVP)
+INC.SIMPLEVP = $(wildcard $(DIR.SIMPLEVP)/*.h)
+SRC.SIMPLEVP = $(wildcard $(DIR.SIMPLEVP)/*.cpp)
+OBJ.SIMPLEVP = $(addprefix $(OUT.SIMPLEVP)/,$(notdir $(SRC.SIMPLEVP:.cpp=$O)))
+DEP.SIMPLEVP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
+LIB.SIMPLEVP = $(foreach d,$(DEP.SIMPLEVP),$($d.LIB))
 
-simplevp.EXE = simplevp$(EXE)
-INC.simplevp = $(wildcard apps/examples/simplevp/*.h)
-SRC.simplevp = $(wildcard apps/examples/simplevp/*.cpp)
-OBJ.simplevp = $(addprefix $(OUT)/,$(notdir $(SRC.simplevp:.cpp=$O)))
-DEP.simplevp = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
-LIB.simplevp = $(foreach d,$(DEP.simplevp),$($d.LIB))
-
-#TO_INSTALL.EXE += $(simplevp.EXE)
+#TO_INSTALL.EXE += $(SIMPLEVP.EXE)
 
 MSVC.DSP += simplevp
 DSP.simplevp.NAME = simplevp
@@ -46,24 +46,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.simplevp simplevpclean
+.PHONY: build.simplevp simplevpclean simplevpcleandep
 
-all: $(simplevp.EXE)
-build.simplevp: $(OUTDIRS) $(simplevp.EXE)
+all: $(SIMPLEVP.EXE)
+build.simplevp: $(OUT.SIMPLEVP) $(SIMPLEVP.EXE)
 clean: simplevpclean
 
-$(simplevp.EXE): $(DEP.EXE) $(OBJ.simplevp) $(LIB.simplevp)
+$(OUT.SIMPLEVP)/%$O: $(DIR.SIMPLEVP)/%.cpp
+	$(DO.COMPILE.CPP)
+
+$(SIMPLEVP.EXE): $(DEP.EXE) $(OBJ.SIMPLEVP) $(LIB.SIMPLEVP)
 	$(DO.LINK.EXE)
 
+$(OUT.SIMPLEVP):
+	$(MKDIRS)
+
 simplevpclean:
-	-$(RMDIR) $(simplevp.EXE) $(OBJ.simplevp)
+	-$(RMDIR) $(SIMPLEVP.EXE) $(OBJ.SIMPLEVP)
+
+cleandep: simplevpcleandep
+simplevpcleandep:
+	-$(RM) $(OUT.SIMPLEVP)/simplevp.dep
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/simplevp.dep
-$(OUTOS)/simplevp.dep: $(SRC.simplevp)
-	$(DO.DEP)
+dep: $(OUT.SIMPLEVP) $(OUT.SIMPLEVP)/simplevp.dep
+$(OUT.SIMPLEVP)/simplevp.dep: $(SRC.SIMPLEVP)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/simplevp.dep
+-include $(OUT.SIMPLEVP)/simplevp.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -28,12 +28,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/video
-
 CSVID.EXE=csvid$(EXE)
-INC.CSVID = $(wildcard apps/video/*.h)
-SRC.CSVID = $(wildcard apps/video/*.cpp)
-OBJ.CSVID = $(addprefix $(OUT)/,$(notdir $(SRC.CSVID:.cpp=$O)))
+DIR.CSVID = apps/video
+OUT.CSVID = $(OUT)/$(DIR.CSVID)
+INC.CSVID = $(wildcard $(DIR.CSVID)/*.h)
+SRC.CSVID = $(wildcard $(DIR.CSVID)/*.cpp)
+OBJ.CSVID = $(addprefix $(OUT.CSVID)/,$(notdir $(SRC.CSVID:.cpp=$O)))
 DEP.CSVID = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSVID = $(foreach d,$(DEP.CSVID),$($d.LIB))
 
@@ -48,24 +48,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.csvid csvidclean
+.PHONY: build.csvid csvidclean csvidcleandep
 
 all: $(CSVID.EXE)
-build.csvid: $(OUTDIRS) $(CSVID.EXE)
+build.csvid: $(OUT.CSVID) $(CSVID.EXE)
 clean: csvidclean
+
+$(OUT.CSVID)/%$O: $(DIR.CSVID)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(CSVID.EXE): $(DEP.EXE) $(OBJ.CSVID) $(LIB.CSVID)
 	$(DO.LINK.EXE)
 
+$(OUT.CSVID):
+	$(MKDIRS)
+
 csvidclean:
 	-$(RMDIR) $(CSVID.EXE) $(OBJ.CSVID)
 
+cleandep: csvidcleandep
+csvidcleandep:
+	-$(RM) $(OUT.CSVID)/csvid.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/csvid.dep
-$(OUTOS)/csvid.dep: $(SRC.CSVID)
-	$(DO.DEP)
+dep: $(OUT.CSVID) $(OUT.CSVID)/csvid.dep
+$(OUT.CSVID)/csvid.dep: $(SRC.CSVID)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/csvid.dep
+-include $(OUT.CSVID)/csvid.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

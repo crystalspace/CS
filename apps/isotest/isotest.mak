@@ -25,12 +25,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/isotest
-
 ISOTEST.EXE = isotest$(EXE)
-INC.ISOTEST = $(wildcard apps/isotest/*.h)
-SRC.ISOTEST = $(wildcard apps/isotest/*.cpp)
-OBJ.ISOTEST = $(addprefix $(OUT)/,$(notdir $(SRC.ISOTEST:.cpp=$O)))
+DIR.ISOTEST = apps/isotest
+OUT.ISOTEST = $(OUT)/$(DIR.ISOTEST)
+INC.ISOTEST = $(wildcard $(DIR.ISOTEST)/*.h)
+SRC.ISOTEST = $(wildcard $(DIR.ISOTEST)/*.cpp)
+OBJ.ISOTEST = $(addprefix $(OUT.ISOTEST)/,$(notdir $(SRC.ISOTEST:.cpp=$O)))
 DEP.ISOTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL
 LIB.ISOTEST = $(foreach d,$(DEP.ISOTEST),$($d.LIB))
 #CFG.ISOTEST = data/config/isotest.cfg
@@ -47,24 +47,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.isotest isotestclean
+.PHONY: build.isotest isotestclean isotestcleandep
 
 all: $(ISOTEST.EXE)
-build.isotest: $(OUTDIRS) $(ISOTEST.EXE)
+build.isotest: $(OUT.ISOTEST) $(ISOTEST.EXE)
 clean: isotestclean
+
+$(OUT.ISOTEST)/%$O: $(DIR.ISOTEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(ISOTEST.EXE): $(DEP.EXE) $(OBJ.ISOTEST) $(LIB.ISOTEST)
 	$(DO.LINK.EXE)
 
+$(OUT.ISOTEST):
+	$(MKDIRS)
+
 isotestclean:
 	-$(RMDIR) $(ISOTEST.EXE) $(OBJ.ISOTEST)
 
+cleandep: isotestcleandep
+isotestcleandep:
+	-$(RM) $(OUT.ISOTEST)/isotest.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/isotest.dep
-$(OUTOS)/isotest.dep: $(SRC.ISOTEST)
-	$(DO.DEP)
+dep: $(OUT.ISOTEST) $(OUT.ISOTEST)/isotest.dep
+$(OUT.ISOTEST)/isotest.dep: $(SRC.ISOTEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/isotest.dep
+-include $(OUT.ISOTEST)/isotest.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
