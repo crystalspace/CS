@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	- Marten fixed jamfiles for glshader_. They need to link to GL.
         - Philip Wyett updated cs_pyth.cpp and associated .py in cvs and also
           fixed a typo in a csvector.h comment.
+	- Eric Sunshine fixed a lot of const versus non-const char* problems in
+	  csStringArray.  (Bug #755721)
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older
