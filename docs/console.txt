@@ -557,7 +557,8 @@ Action:  Load a sprite from a model file (currently 3DS version 3
 	 you can use 'addsprite' to really add the sprite visually.
 	 Parameters are 'filename','templatename','texturename'. The
 	 texture should be one which is already loaded in memory. This
-	 is a current limitation.
+	 is a current limitation.  The filename represents a file within
+	 the VFS directory hierarchy.
 
 Command: addsprite
 Type:    general command
