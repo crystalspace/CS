@@ -456,12 +456,12 @@ public:
   /**
    * Absolute move
    */
-  bool MoveTo(const csVector3& v);
+  bool MoveTo (const csVector3& v);
 
   /**
    * The same as above
    */
-  bool MoveTo(float x,float y,float z) {return MoveTo(csVector3(x,y,z));}
+  bool MoveTo (float x, float y, float z) { return MoveTo (csVector3 (x, y, z)); }
 
   /**
    * Relative transform.
@@ -537,6 +537,17 @@ public:
 
   /// Remove this sprite from all sectors it is in (but not from the world).
   void RemoveFromSectors ();
+
+  /**
+   * Get an array of object vertices which is valid for the given frame.
+   * This function correcty acounts for sprites which use skeletons. In
+   * that case it will use the current transformation state of the skeleton
+   * to compute object space vertices.<br>
+   * Warning! The returned array should be used immediatelly or copied. It
+   * points to a private static array in the sprite class and can be reused
+   * if other calls to the sprite happen.
+   */
+  csVector3* GetObjectVerts (csFrame* fr);
 
   /**
    * Unlink a light-hits-sprite from the list.

@@ -746,6 +746,18 @@ void csSprite3D::RemoveFromSectors ()
   }
 }
 
+csVector3* csSprite3D::GetObjectVerts (csFrame* fr)
+{
+  if (skeleton_state)
+  {
+    UpdateWorkTables (tpl->num_vertices);
+    skeleton_state->Transform (csTransform (), fr, tr_verts);
+    return tr_verts;
+  }
+  else
+    return fr->GetVertices ();
+}
+
 void csSprite3D::DeferUpdateLighting (int flags, int num_lights)
 {
   defered_num_lights = num_lights;
@@ -759,15 +771,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   defered_num_lights = 0;
 
   csFrame* this_frame = tpl->GetFrame (cur_frame);
-  csVector3* object_vertices;
-  if (skeleton_state)
-  {
-    UpdateWorkTables (tpl->num_vertices);
-    skeleton_state->Transform (csTransform (), this_frame, tr_verts);
-    object_vertices = tr_verts;
-  }
-  else
-    object_vertices = this_frame->GetVertices ();
+  csVector3* object_vertices = GetObjectVerts (this_frame);;
 
   if (!this_frame->HasNormals ())
     this_frame->ComputeNormals (tpl->GetBaseMesh (), object_vertices, tpl->GetNumVertices ());
