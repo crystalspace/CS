@@ -357,7 +357,7 @@ void csPolyTexture::InitLightmaps ()
 void csPolyTexture::ShineLightmaps (csLightView& lview)
 {
   if (!lm) return;
-  DBCHECK ("moor", "southU");
+  DBCHECK ("room4", "southU");
   csStatLight* light = (csStatLight*)lview.l;
   DB ((MSG_DEBUG_0, "#### shine_lightmaps #### light:(%f,%f,%f)\n", light->GetCenter ().x, light->GetCenter ().y, light->GetCenter ().z));
 
@@ -444,6 +444,7 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
   // Calculate the uv's for all points of the frustrum (the
   // frustrum is actually a clipped version of the polygon).
   csVector2* f_uv = NULL;
+
   if (lview.frustrum)
   {
     int mi;
@@ -463,6 +464,11 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
       DB ((MSG_DEBUG_0, "frust+lcenter:(%f,%f,%f)\n", lview.frustrum[mi].x+lview.center.x, lview.frustrum[mi].y+lview.center.y, lview.frustrum[mi].z+lview.center.z));
     }
   }
+  else
+  {
+    /* hm, what else? but something else has to exist (or we'll run into crush few statements later) */
+    return;
+  }
 
   float r200d = lview.r * NORMAL_LIGHT_LEVEL / light->GetRadius ();
   float g200d = lview.g * NORMAL_LIGHT_LEVEL / light->GetRadius ();
@@ -475,7 +481,7 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
 
   sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
   scanL2 = scanR2 = MaxIndex;
-  sy = fyL = fyR = (QRound (f_uv[scanL2].y)>lh-1)?lh-1:QRound (f_uv[scanL2].y);
+  sy = fyL = fyR = (QRound (ceil(f_uv[scanL2].y))>lh-1)?lh-1:QRound (ceil(f_uv[scanL2].y));
 
   for ( ; ; )
   {
@@ -489,11 +495,18 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
       if (sy <= fyR)
       {
         // Check first if polygon has been finished
-        if (scanR2 == MinIndex) goto finish;
+a:      if (scanR2 == MinIndex) goto finish;
         scanR1 = scanR2;
         scanR2 = (scanR2 + 1) % lview.num_frustrum;
 
-        fyR = QRound(f_uv[scanR2].y);
+        if(fabs(f_uv[scanR2].y-f_uv[MaxIndex].y)<0.00001)
+        {
+          // oops! we have a flat bottom!
+          goto a;
+        }
+
+        fyR = QRound(floor(f_uv[scanR2].y));
+
         float dyR = (f_uv[scanR1].y - f_uv[scanR2].y);
 	sxR = f_uv[scanR1].x;
         if (dyR != 0)
@@ -507,10 +520,17 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
       }
       if (sy <= fyL)
       {
+b:      if (scanL2 == MinIndex) goto finish;
         scanL1 = scanL2;
         scanL2 = (scanL2 - 1 + lview.num_frustrum) % lview.num_frustrum;
 
-        fyL = QRound(f_uv[scanL2].y);
+        if(fabs(f_uv[scanL2].y-f_uv[MaxIndex].y)<0.00001)
+        {
+          // oops! we have a flat bottom!
+          goto b;
+        }
+
+        fyL = QRound(floor(f_uv[scanL2].y));
         float dyL = (f_uv[scanL1].y - f_uv[scanL2].y);
 	sxL = f_uv[scanL1].x;
         if (dyL != 0)
@@ -533,9 +553,17 @@ void csPolyTexture::ShineLightmaps (csLightView& lview)
     while (sy >= fin_y)
     {
       // Compute the rounded screen coordinates of horizontal strip
-      xL = QRound (sxL)+1;
-      xR = QRound (sxR);
-      if (xR > xL) { int xswap = xR; xR = xL; xL = xswap; }
+
+      float _l=sxL,_r=sxR;
+
+      if(_r>_l) {float _=_r; _r=_l; _l=_;}
+		
+      xL = QRound (ceil(_l))+1;
+      xR = QRound (floor(_r));
+
+/*    xL = QRound (_l)+1;
+      xR = QRound (_r);
+      if (xR > xL) { int xswap = xR; xR = xL; xL = xswap; }*/
 
       if (xR < 0) xR = 0;
       if (xL > lw) xL = lw;
