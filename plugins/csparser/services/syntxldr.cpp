@@ -2361,7 +2361,7 @@ void csTextSyntaxService::ReportV (const char* msgid, int severity,
 void csTextSyntaxService::ReportBadToken (iDocumentNode* badtokennode)
 {
   Report ("crystalspace.syntax.badtoken",
-        CS_REPORTER_SEVERITY_WARNING,
+        CS_REPORTER_SEVERITY_ERROR,
   	badtokennode, "Unexpected token '%s'!",
 	badtokennode->GetValue ());
 }
