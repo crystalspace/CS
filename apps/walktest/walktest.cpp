@@ -1302,23 +1302,23 @@ void init_sig ()
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-  //csVector3 rectfr[4];
+  csVector3 rectfr[4];
   // VS 1
   //rectfr[0].Set(0,1,1);
   //rectfr[1].Set(1,1,1);
   //rectfr[2].Set(1,0,1);
   //rectfr[3].Set(0,0,1);
   // VS 2
-  //rectfr[0].Set(0.5,-0.5,1);
-  //rectfr[1].Set(1,-0.5,1);
-  //rectfr[2].Set(1,-1,1);
-  //rectfr[3].Set(0.5,-1,1);
-  //csVector3 trifr[4];
-  //trifr[0].Set(0,0,2);
-  //trifr[1].Set(8,8,2);
-  //trifr[2].Set(8,0,2);
-  //int classres = csFrustum::Classify(rectfr, 4, trifr, 3);
-  //printf("Classify says %d  (0=out, 1=in, 2=cover, 3=part)\n", classres);
+  rectfr[0].Set(0.5,-0.5,1);
+  rectfr[1].Set(1,-0.5,1);
+  rectfr[2].Set(1,-1,1);
+  rectfr[3].Set(0.5,-1,1);
+  csVector3 trifr[4];
+  trifr[0].Set(0,0,2);
+  trifr[1].Set(8,8,2);
+  trifr[2].Set(8,0,2);
+  int classres = csFrustum::Classify(rectfr, 4, trifr, 3);
+  printf("Classify says %d  (0=out, 1=in, 2=cover, 3=part)\n", classres);
 
 #ifdef OS_UNIX
   init_sig ();
