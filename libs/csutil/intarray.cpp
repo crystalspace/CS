@@ -21,7 +21,8 @@
 
 int csIntArray::Find (int val) const
 {
-  for (int i=0; i<Length (); i++)
+  int i;
+  for (i=0; i<Length (); i++)
     if ((*this) [i] == val)
       return i;
   return -1;
@@ -29,13 +30,15 @@ int csIntArray::Find (int val) const
 
 void csIntArray::PushFill (int val, int n)
 {
-  for (int i=0; i<n; i++)
+  int i;
+  for (i=0; i<n; i++)
     Push (val);
 }
 
 void csIntArray::PushIdentityMapping (int n, int offset)
 {
-  for (int i=0; i<n; i++)
+  int i;
+  for (i=0; i<n; i++)
     Push (offset + i);
 }
 

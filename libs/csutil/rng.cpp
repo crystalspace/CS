@@ -128,7 +128,8 @@ bool csRandomGen::SelfTest ()
               6172232.0  8354498.0   10633180.0
   */
   InitRANMAR (1802, 9373);
-  for (int i = 0; i < 20000; i++)
+  int i;
+  for (i = 0; i < 20000; i++)
     RANMAR ();
   if ((RANMAR () * 4096 * 4096 != 6533892.0)
    || (RANMAR () * 4096 * 4096 != 14220222.0)

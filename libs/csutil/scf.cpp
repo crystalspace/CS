@@ -164,7 +164,8 @@ scfSharedLibrary::~scfSharedLibrary ()
 
 scfClassInfo *scfSharedLibrary::Find (const char *iClassID)
 {
-  for (scfClassInfo *cur = ClassTable; cur->ClassID; cur++)
+  scfClassInfo *cur;
+  for (cur = ClassTable; cur->ClassID; cur++)
     if (strcmp (iClassID, cur->ClassID) == 0)
       return cur;
   return NULL;
@@ -581,7 +582,8 @@ iStrVector* csSCF::QueryClassList (char const* pattern)
   if (rlen != 0)
   {
     int const plen = (pattern ? strlen(pattern) : 0);
-    for (int i = 0; i < rlen; i++)
+	int i;
+    for (i = 0; i < rlen; i++)
     {
       char const* s = ((iFactory*)ClassRegistry->Get(i))->QueryClassID();
       if (plen == 0 || strncasecmp(pattern, s, plen) == 0)
