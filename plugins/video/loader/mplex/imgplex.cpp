@@ -128,8 +128,8 @@ csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize,
  */
 void csMultiplexImageIO::SetDithering (bool iEnable)
 {
-  extern bool csImage_dither;
-  csImage_dither = iEnable;
+  //extern bool csImage_dither;
+  //csImage_dither = iEnable;
 }
 
 csPtr<iDataBuffer> csMultiplexImageIO::Save (

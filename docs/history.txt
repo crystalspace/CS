@@ -38,6 +38,8 @@ chronological order.
 	  out why CS is now broken.
 	- Jorrit added better error reporting to the csparser plugin. From
 	  this I discovered that the image loader plugins are not working.
+	- Jorrit fixed a compile error in the image loader multiplexer. This
+	  fixes CS again.
 17-Mar-2004
 	- Duhprey added a simple terraformer loader plugin
 	- Eric Sunshine fixed copy/paste error in terraformer loader makefile
