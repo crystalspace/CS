@@ -55,9 +55,9 @@ nTerrainInfo::~nTerrainInfo ()
   delete mesh;
   if (triangle_count) { delete [] triangles; }
   if (vertex_count) {
-    delete vertices;
-	delete texels;
-    delete colors;
+    delete [] vertices;
+	delete [] texels;
+    delete [] colors;
   }
 }
 
