@@ -57,6 +57,8 @@ chronological order.
 	  was moved
 	- res removed the <texturemapping> statement from the shadow debug
 	  shader. Apparently, it caused crashes.
+	- Oktal moved BFD reading and conflict checking in bfdplugins.cpp to
+	  follow the standard of other implementations.
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now

@@ -48,6 +48,12 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
 				    csRef<iDocument>& metadata)
 {
   iString* result = 0;
+  bool conflict = false;
+
+  int len = strlen (fullPath);
+  csString cspluginPath (fullPath);
+  cspluginPath.Truncate (len - 3);
+  cspluginPath += ".csplugin";
 
   if (!metadata)
   {
@@ -58,57 +64,47 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
     metadata = docsys->CreateDocument ();
   }
   char const* errmsg;
-
-  int len = strlen (fullPath);
-  if (len >= 3 && strcasecmp (fullPath + len - 3, ".so") == 0)
+  bool usebfd = false;
+  bfd *abfd = bfd_openr (fullPath, 0);
+  if (abfd)
   {
-    bfd *abfd = bfd_openr (fullPath, 0);
-    if (! abfd) errmsg = "libbfd can't open file";
-    else
+    if (bfd_check_format (abfd, bfd_object))
     {
-      if (! bfd_check_format (abfd, bfd_object))
-        errmsg = "libbfd can't parse file";
-      else
+      asection *sect = bfd_get_section_by_name (abfd, ".crystal");
+      if (sect)
       {
-        asection *sect = bfd_get_section_by_name (abfd, ".crystal");
-        if (! sect) errmsg = "libbfd can't find '.crystal' section";
-        else
+        int size = bfd_section_size (abfd, sect);
+        char *buf = (char *) malloc (size + 1);
+        if (buf)
         {
-          int size = bfd_section_size (abfd, sect);
-          char *buf = (char *) malloc (size + 1);
-          if (!buf)
-	    errmsg = "can't allocate memory for metadata";
+          if (! bfd_get_section_contents (abfd, sect, buf, 0, size))
+            errmsg = "libbfd can't get '.crystal' section contents";
           else
-	  {
-	    if (! bfd_get_section_contents (abfd, sect, buf, 0, size))
-	      errmsg = "libbfd can't get section contents";
-	    else
-	    {
-	      buf[size] = 0;
-	      errmsg = metadata->Parse (buf);
-	    }
-            free (buf);
+          {
+            buf[size] = 0;
+            errmsg = metadata->Parse (buf);
+            usebfd = true;
           }
+          free (buf);
         }
       }
-      bfd_close (abfd);
     }
+    bfd_close (abfd);
   }
-  else
-  {
-    csPhysicalFile file (fullPath, "rb");
-    errmsg = metadata->Parse (&file);
-  }
-  if (errmsg != 0)
-  {
-    metadata = 0;
 
-    csString errstr;
-    errstr.Format ("Error parsing metadata from %s: %s",
-      fullPath, errmsg);
-
-    result = new scfString (errstr);
+  csPhysicalFile file (cspluginPath, "rb");
+  if (file.GetStatus () == VFS_STATUS_OK)
+  {
+    if (usebfd) conflict = true;
+    else errmsg = metadata->Parse (&file);
   }
+
+  csString errstr;
+  if (conflict) errstr += csString().Format ("Warning: %s has embedded data and"
+    " .csplugin file, using embedded.%s", fullPath, errmsg ? "\n" : "");
+  if (errmsg) errstr += csString().Format ("Error parsing metadata in %s: %s",
+    usebfd ? fullPath : cspluginPath.GetData (), errmsg);
+  if (errstr.Length ()) result = new scfString (errstr);
 
   return csPtr<iString> (result);
 }
@@ -127,64 +123,12 @@ void InternalScanPluginDir (iStringArray*& messages,
       if (!isdir(dir, de))
       {
         int const n = strlen(de->d_name);
-        if (n >= 9 && strcasecmp(de->d_name + n - 9, ".csplugin") == 0)
+        if (n >= 3 && strcasecmp(de->d_name + n - 3, ".so") == 0)
         {
-          csString csp (de->d_name);
-          csp.Truncate (n - 9);
-          csp.Append (".so");
-          csp.Insert (0, PATH_SEPARATOR);
-          csp.Insert (0, dir);
-
-          if (plugins->Find (csp) == -1)
-          {
 	    csString scffilepath;
 	    scffilepath << dir << PATH_SEPARATOR << de->d_name;
-	  
+
 	    plugins->Push (scffilepath);
-          }
-        }
-        else if (n >= 3 && strcasecmp(de->d_name + n - 3, ".so") == 0)
-        {
-          static bool init = true;
-          if (init)
-          {
-            bfd_init ();
-            init = false;
-          }
-
-          bfd *abfd = bfd_openr (de->d_name, 0);
-          if (abfd)
-          {
-            if (bfd_check_format (abfd, bfd_object)
-             && bfd_get_section_by_name (abfd, ".crystal"))
-            {
-              csString csp (de->d_name);
-              csp.Truncate (n - 3);
-              csp.Append (".csplugin");
-              csString cspath (csp);
-              cspath.Insert (0, PATH_SEPARATOR);
-              cspath.Insert (0, dir);
-
-              struct stat tmp;
-              if (stat (cspath, & tmp) == 0)
-              {
-                if (! messages) messages = new scfStringArray;
-                csString message;
-                message.Format ("Warning: both %s and %s found, using %s.",
-                  de->d_name, csp.GetData (), de->d_name);
-                messages->Push (message);
-                int index = plugins->Find (csp);
-                if (index != -1) plugins->DeleteIndex (index);
-              }
-
-	      csString scffilepath;
-	      scffilepath << dir << PATH_SEPARATOR << de->d_name;
-	  
-	      plugins->Push (scffilepath);
-            }
-
-            bfd_close (abfd);
-          }
         }
       }
       else
