@@ -82,7 +82,7 @@ bool appSystemDriver::Initialize (int argc, char *argv[], IConfig *config)
   } /* endfor */
 
   // Now open temporary console
-  world->Initialize (GetISystemFromSystem (System), piGI, ::config);
+  world->Initialize (GetISystemFromSystem (System), piG3D, ::config);
 
   // Open the visual, initialize keyboard and mouse
   Open (application->GetText ());

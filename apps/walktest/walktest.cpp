@@ -1195,7 +1195,7 @@ void start_demo ()
   ITextureManager* txtmgr;
   Gfx3D->GetTextureManager (&txtmgr);
 //Gfx2D->DoubleBuffer (false);
-  demo_info->world->Initialize (GetISystemFromSystem (System), System->piGI, config);
+  demo_info->world->Initialize (GetISystemFromSystem (System), Gfx3D, config);
 
   // Initialize the texture manager
   txtmgr->Initialize ();
@@ -1372,7 +1372,7 @@ int main (int argc, char* argv[])
 
   // Initialize our world now that the system is ready.
   Sys->world = world;
-  world->Initialize (GetISystemFromSystem (System), System->piGI, config);
+  world->Initialize (GetISystemFromSystem (System), Gfx3D, config);
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -1530,7 +1530,13 @@ int main (int argc, char* argv[])
   // Initialize our 3D view.
   Sys->view->SetSector (room);
   Sys->view->GetCamera ()->SetPosition (world->start_vec);
-  Sys->view->SetRectangle (2, 2, FRAME_WIDTH - 4, FRAME_HEIGHT - 4);
+  // We use the width and height from the 3D renderer because this
+  // can be different from the frame size (rendering in less res than real window
+  // for example).
+  int w3d, h3d;
+  Gfx3D->GetWidth (w3d);
+  Gfx3D->GetHeight (h3d);
+  Sys->view->SetRectangle (2, 2, w3d - 4, h3d - 4);
 
   // Stop the demo.
   stop_demo ();

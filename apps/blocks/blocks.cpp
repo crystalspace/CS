@@ -868,7 +868,7 @@ int main (int argc, char* argv[])
   txtmgr->SetVerbose (true);
 
   // Initialize our world.
-  Sys->world->Initialize (GetISystemFromSystem (System), System->piGI, config);
+  Sys->world->Initialize (GetISystemFromSystem (System), Gfx3D, config);
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by

@@ -219,7 +219,7 @@ public:
    * you do anything else with this world. It will read the configuration
    * file (ReadConfig()) and start a new empty world (StartWorld()).
    */
-  bool Initialize (ISystem* sys, IGraphicsInfo* ginfo, csIniFile* config);
+  bool Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config);
 
   /**
    * Prepare the world. This function must be called after

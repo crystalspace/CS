@@ -175,10 +175,10 @@ csThing* csWorld::GetThing (const char* name)
   return NULL;
 }
 
-bool csWorld::Initialize (ISystem* sys, IGraphicsInfo* ginfo, csIniFile* config)
+bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config)
 {
-  ginfo->GetWidth (frame_width);
-  ginfo->GetHeight (frame_height);
+  g3d->GetWidth (frame_width);
+  g3d->GetHeight (frame_height);
   shift_x = (float)(frame_width/2);
   shift_y = (float)(frame_height/2);
   isys = sys;
