@@ -312,12 +312,15 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     // close last PART
     fprintf (o, "      )\n\n");
 
-    // close PARAMS tag
-    fprintf (o, "      )\n\n");
-
-    // close MESHOBJ tag
     if (part)
-        fprintf (o, "    )\n\n");
+    {
+       // close PARAMS tag
+       fprintf (o, "      )\n\n");
+
+       // close MESHOBJ tag
+       fprintf (o, "    )\n\n");
+       part = false;
+    }
 
     // increment mesh count
     numMesh++;
