@@ -51,7 +51,8 @@ static iImageIO::FileFormatDescription formatlist[] =
 {
   { BMP_MIME, "8 bit, palettized, RGB", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE},
   { BMP_MIME, "8 bit, palettized, RLE8", CS_IMAGEIO_LOAD},
-  { BMP_MIME, "24 bit, RGB", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE}
+  { BMP_MIME, "24 bit, RGB", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE},
+  { BMP_MIME, "32 bit, RGBA", CS_IMAGEIO_LOAD|CS_IMAGEIO_SAVE}
 };
 
 //-----------------------------------------------------------------------------

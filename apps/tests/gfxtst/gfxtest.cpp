@@ -48,24 +48,25 @@ csRef<iImageIO> ImageLoader;
 static struct option long_options[] =
 {
   {"help", no_argument, 0, 'h'},
+  {"verbose", no_argument, 0, 'v'},
+  {"version", no_argument, 0, 'V'},
+  {"formats", no_argument, 0, 'F'},
   {"dither", no_argument, 0, 'd'},
   {"scale", required_argument, 0, 's'},
   {"mipmap", required_argument, 0, 'm'},
   {"transp", required_argument, 0, 't'},
   {"paletted", no_argument, 0, '8'},
   {"truecolor", no_argument, 0, 'c'},
-  {"verbose", no_argument, 0, 'v'},
-  {"version", no_argument, 0, 'V'},
+  {"strip-alpha", no_argument, 0, 'a'},
+  {"sharpen", required_argument, 0, 'p'},
   {"save", optional_argument, 0, 'S'},
+  {"mime", required_argument, 0, 'M'},
+  {"options", required_argument, 0, 'O'},
   {"prefix", required_argument, 0, 'P'},
   {"suffix", required_argument, 0, 'U'},
   {"display", optional_argument, 0, 'D'},
   {"heightmap", optional_argument, 0, 'H'},
   {"info", no_argument, 0, 'I'},
-  {"strip-alpha", no_argument, 0, 'a'},
-  {"sharpen", required_argument, 0, 'p'},
-  {"mime", required_argument, 0, 'M'},
-  {"options", required_argument, 0, 'O'},
   {0, no_argument, 0, 0}
 };
 
@@ -113,21 +114,23 @@ static int display_help ()
   printf ("Crystal Space Graphics File Loader test application v%s\n", programversion);
   printf ("Copyright (C) 2000 Andrew Zabolotny\n\n");
   printf ("Usage: %s {option/s} [image file] [...]\n\n", programname);
+  printf ("  -h   --help          Display this help text\n");
+  printf ("  -v   --verbose       Comment on what's happening\n");
+  printf ("  -V   --version       Display program version\n");
+  printf ("  -F   --formats       Display a list of supported image formats\n");
+  printf ("------------------ Image manipulation:  ----------------------------------------\n");
   printf ("  -d   --dither        Apply Floyd-Steinberg dithering when reducing to 8 bpp\n");
   printf ("  -s   --scale=#[,#]   Re-scale the image to given size #\n");
   printf ("  -m   --mipmap=#      Create mipmap level # (>=0) from image\n");
   printf ("  -t   --transp=#,#,#  Treat color (R,G,B) as transparent\n");
   printf ("  -8   --paletted      Convert image to 8 bits-per-pixel paletted format\n");
   printf ("  -c   --truecolor     Convert image to truecolor format\n");
-  printf ("  -h   --help          Display this help text\n");
-  printf ("  -v   --verbose       Comment on what's happening\n");
-  printf ("  -V   --version       Display program version\n");
   printf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
   printf ("  -p   --sharpen=#     Sharpen the image, strength #\n");
   printf ("------------------ Output options (-S, -D, -H are exclusive):  -----------------\n");
   printf ("  -S   --save[=#]      Output an image (default)\n");
-  printf ("  -M   --mime=#	  Output file mime type (default: image/png)\n");
-  printf ("  -O   --options=#	  Optional output format options (e.g. \"progressive\")\n");
+  printf ("  -M   --mime=#        Output file mime type (default: image/png)\n");
+  printf ("  -O   --options=#     Optional output format options (e.g. \"progressive\")\n");
   printf ("  -P   --prefix=#      Add prefix before output filename\n");
   printf ("  -U   --suffix=#      Add suffix after output filename\n");
   printf ("  -D   --display=#,#   Display the image in ASCII format :-)\n");
@@ -137,35 +140,26 @@ static int display_help ()
   return 1;
 }
 
-#if 0
-// PNM is a very simple format that is handy for quick-and-dirty programs.
-// Many image processing programs understands it...
-static bool SavePNM (const char *fname, void *image, int w, int h, bool rgb)
+static int list_supported_formats (iObjectRegistry *r)
 {
-  FILE *f = fopen (fname, "wb");
-  if (!f)
+  const char *mask =
+    "%-20s %-40s %-5s %-5s\n";
+
+  const csVector& descr = ImageLoader->GetDescription ();
+  int i;
+  printf (mask, "MIME", "description", "load?", "save?");
+  printf (mask, "----", "-----------", "-----", "-----");
+  for (i = 0; i < descr.Length (); i++)
   {
-    fprintf (stderr, "%s: cannot open output file %s\n", programname, fname);
-    return false;
+    iImageIO::FileFormatDescription *format =
+      (iImageIO::FileFormatDescription*) descr.Get (i);
+
+    printf (mask, format->mime, format->subtype,
+      (format->cap & CS_IMAGEIO_LOAD)?"yes":"no",
+      (format->cap & CS_IMAGEIO_SAVE)?"yes":"no");
   }
-  char header [100];
-  sprintf (header, "P%c\n%d %d\n%d\n", rgb ? '6' : '5', w, h, 255);
-  fwrite (header, 1, strlen (header), f);
-  if (rgb)
-  {
-	int i;
-    for (i = w * h; i > 0; i--)
-    {
-      fwrite (image, 1, 3, f);
-      image = ((csRGBpixel *)image) + 1;
-    }
-  }
-  else
-    fwrite (image, 1, w * h, f);
-  fclose (f);
-  return true;
+  return 1;
 }
-#endif
 
 static bool output_picture (const char *fname, const char *suffix, iImage *ifile)
 {
@@ -207,7 +201,6 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
 
   printf ("Saving output file %s\n", outname);
 
-#if 1
   csRef<iDataBuffer> db (ImageLoader->Save (ifile, output_mime, output_opts));
   if (db)
   {
@@ -220,11 +213,7 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
   {
     printf ("Failed to save %s. Plugin returned no data.\n", outname);
   }
-#else
-    SavePNM (outname, ifile->GetImageData (), ifile->GetWidth (), ifile->GetHeight (),
-       (ifile->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR));
-#endif
-return true;
+  return true;
 }
 
 static bool display_picture (iImage *ifile)
@@ -498,42 +487,12 @@ static bool process_file (const char *fname)
   return success;
 }
 
-int main (int argc, char *argv[])
+int gfxtest_main (iObjectRegistry* object_reg, int argc, char *argv[])
 {
-  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return -1;
-
-  if (!csInitializer::SetupConfigManager (object_reg, NULL))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.graphics3d.gfxtest",
-	"Error initializing system !");
-    return -1;
-  }
-
-  if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_SOFTWARE3D,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_END))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.graphics3d.gfxtest",
-	"Error initializing system !");
-    return -1;
-  }
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csCommandLineHelper::Help (object_reg);
-    exit (0);
-  }
-
   programname = argv [0];
 
-  int c;
-  while ((c = getopt_long (argc, argv, "8cdas:m:t:p:D:S::M:O:P:U::H::IhvV", long_options, NULL)) != EOF)
+  int c, ret;
+  while ((c = getopt_long (argc, argv, "8cdas:m:t:p:D:S::M:O:P:U::H::IhvVF", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -642,7 +601,7 @@ int main (int argc, char *argv[])
         opt.info = true;
         break;
       case 'h':
-        return display_help ();
+	return display_help ();
       case 'v':
         opt.verbose = true;
         break;
@@ -660,17 +619,15 @@ int main (int argc, char *argv[])
         printf ("GNU Library General Public License for more details.\n");
         return 0;
 	break;
+      case 'F':
+	return list_supported_formats (object_reg);
     } /* endswitch */
 
   if (optind >= argc)
-    return display_help ();
-
-  ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
-  if (!ImageLoader)
   {
-    printf("could not load image loader");
-    return -1;
+    return display_help ();
   }
+
   ImageLoader->SetDithering (opt.dither);
 
   for (; optind < argc; ++optind)
@@ -678,4 +635,53 @@ int main (int argc, char *argv[])
   ImageLoader = NULL;
 
   return 0;
+}
+
+int main (int argc, char *argv[])
+{
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) return -1;
+
+  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.gfxtest",
+	"Error initializing system !");
+    return -1;
+  }
+
+  if (!csInitializer::RequestPlugins (object_reg,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_END))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.gfxtest",
+	"Error initializing system !");
+    return -1;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    ImageLoader = NULL;
+    csInitializer::DestroyApplication (object_reg);
+    exit (0);
+  }
+
+  ImageLoader = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  if (!ImageLoader)
+  {
+    printf("could not load image loader\n");
+    csInitializer::DestroyApplication (object_reg);
+    return -1;
+  }
+
+  int ret = gfxtest_main (object_reg, argc, argv);
+  
+  ImageLoader = NULL;
+  csInitializer::DestroyApplication (object_reg);
+  return ret;
 }
