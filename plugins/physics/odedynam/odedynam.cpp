@@ -27,7 +27,6 @@
 #include "iutil/virtclk.h"
 #include "ivaria/collider.h"
 #include "ivaria/reporter.h"
-#include "csgeom/polytree.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "iengine/engine.h"
@@ -846,8 +845,7 @@ void DestroyGeoms( csGeomList & geoms )
 
     if( dGeomGetClass (tempID) == csODEDynamics::GetGeomClassNum() )
     {
-      MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (tempID);
-      delete gdata->tree;
+      //MeshInfo *gdata = (MeshInfo*)dGeomGetClassData (tempID);
     }
 
     //for transform geoms, only need to destroy the container,

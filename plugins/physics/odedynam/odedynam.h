@@ -37,7 +37,6 @@
 struct iObjectRegistry;
 struct iVirtualClock;
 struct iMeshWrapper;
-class csPolygonTree;
 struct iODEFrameUpdateCallback;
 
 ////////////////////////////////////////////
@@ -82,7 +81,6 @@ struct ContactEntry
 struct MeshInfo
 {
   iMeshWrapper* mesh;
-  csPolygonTree* tree;
 };
 
 typedef csDirtyAccessArray<ContactEntry> csContactList;
