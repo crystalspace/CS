@@ -1051,6 +1051,7 @@ static bool CommandHandler (char *cmd, char *arg)
     Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw\n");
     Sys->Printf (MSG_CONSOLE, " i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz\n");
+    Sys->Printf (MSG_CONSOLE, " clrlights, setlight\n");
   }
   else if (!strcasecmp (cmd, "coordsave"))
   {
@@ -1390,6 +1391,28 @@ static bool CommandHandler (char *cmd, char *arg)
       first_bot = bot->next;
       Sys->view->GetWorld ()->RemoveSprite (bot);
     }
+  }
+  else if (!strcasecmp (cmd, "clrlights"))
+  {
+    csLightIt* lit = Sys->view->GetWorld ()->NewLightIterator ();
+    csLight* l;
+    while ((l = lit->Fetch ()) != NULL)
+    {
+      l->SetColor (csColor (0, 0, 0));
+    }
+  }
+  else if (!strcasecmp (cmd, "setlight"))
+  {
+    if (Sys->selected_light)
+    {
+      float r, g, b;
+      if (arg && ScanStr (arg, "%f,%f,%f", &r, &g, &b) == 3)
+        Sys->selected_light->SetColor (csColor (r, g, b));
+      else
+        CsPrintf (MSG_CONSOLE, "Arguments missing or invalid!\n");
+    }
+    else
+      CsPrintf (MSG_CONSOLE, "No light selected!\n");
   }
   else if (!strcasecmp (cmd, "addlight"))
   {
