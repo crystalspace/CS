@@ -427,6 +427,7 @@ csTriangle* csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
       }
     }
     bool isdel = vt_to->DelVertex (from);
+    (void)isdel; // Pacify compiler in non-debug mode.
     CS_ASSERT (isdel == true);
     vt_from->deleted = true;
     num--;
@@ -533,7 +534,8 @@ csTriangle* csTriangleMeshLOD::CalculateLODFast (csTriangleMesh* mesh,
       }
     }
     bool isdel = vt_to->DelVertex (from);
-    CS_ASSERT (isdel == true);
+    (void)isdel; // Pacify compiler in non-debug mode.
+    CS_ASSERT (isdel);
     vt_from->deleted = true;
     num--;
 
