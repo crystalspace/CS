@@ -291,7 +291,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   if (Textures.FindTexture (iTexName))
     return false;
 
-  const char *filename = NULL;
+  char *filename = NULL;
   float tr = -1, tg = -1, tb = -1;
 
   while (*iTexParams)
