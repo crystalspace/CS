@@ -134,24 +134,15 @@ bool PicViewApp::Initialize ()
   if (!csApp::Initialize ())
     return false;
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
-  image_loader = CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.graphic.image.io.multiplex",
-    iImageIO);
+  image_loader = CS_QUERY_REGISTRY (object_reg, iImageIO);
   if (!image_loader)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.picview", "No image loader plugin!");
     return false;
   }
-  if (!object_reg->Register (image_loader, "iImageIO"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.picview", "Unable to register image loader!");
-    return false;
-  }
-  
+  image_loader->IncRef ();
+
   pG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   pG3D->IncRef ();
   // Disable double buffering since it kills performance
