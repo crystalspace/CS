@@ -54,6 +54,7 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
   memorysize = 0;
 //  Sources = NULL;
   VFS = NULL;
+  MusicSource = NULL;
 }
 
 bool csSoundRenderSoftware::Initialize (iSystem *iSys)
@@ -92,6 +93,7 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 
 csSoundRenderSoftware::~csSoundRenderSoftware()
 {
+  StopMusic();
   Close();
   if (SoundDriver) SoundDriver->DecRef();
 
@@ -241,4 +243,18 @@ void csSoundRenderSoftware::Update()
 
 const csSoundFormat *csSoundRenderSoftware::GetLoadFormat() {
   return &LoadFormat;
+}
+
+void csSoundRenderSoftware::PlayMusic(iSoundData *snd) {
+  StopMusic();
+  MusicSource = CreateSource(snd, false);
+  MusicSource->Play();
+}
+
+void csSoundRenderSoftware::StopMusic() {
+  if (MusicSource) {
+    MusicSource->Stop();
+    MusicSource->DecRef();
+    MusicSource = NULL;
+  }
 }

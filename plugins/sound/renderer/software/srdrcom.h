@@ -58,6 +58,8 @@ public:
 	virtual void MixingFunction ();
     virtual void Update();
     virtual const csSoundFormat *GetLoadFormat();
+    virtual void PlayMusic(iSoundData *snd);
+    virtual void StopMusic();
 
     // add a sound source
     void AddSource(csSoundSourceSoftware *src);
@@ -95,6 +97,9 @@ private:
 
     // format for loading sounds
     csSoundFormat LoadFormat;
+
+    // the sound source for music
+    iSoundSource *MusicSource;
 };
 
 #endif	//__NETWORK_DRIVER_SOFTWARE_H__
