@@ -12,7 +12,7 @@
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 
-#include "csa3dl.h"
+#include "csvosa3dl.h"
 
 class csVosObject3D : public iVosObject3D
 {

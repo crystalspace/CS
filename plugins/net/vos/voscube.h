@@ -12,8 +12,8 @@
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 
-#include "csa3dl.h"
-#include "csvosobject3d.h"
+#include "csvosa3dl.h"
+#include "vosobject3d.h"
 
 class csMetaCube : public virtual csMetaObject3D, A3DL::Cube
 {

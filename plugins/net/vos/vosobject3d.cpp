@@ -1,7 +1,7 @@
 #include "cssysdef.h"
 #include "iengine/mesh.h"
 
-#include "csvosobject3d.h"
+#include "vosobject3d.h"
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
