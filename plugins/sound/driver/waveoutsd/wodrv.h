@@ -72,6 +72,8 @@ protected:
   bool Bit16;
   bool Stereo;
 
+  // switch to activate/deactivate the sound proc
+  bool ActivateSoundProc;
   // is the sound proc locked?
   bool SoundProcLocked;
   // number of sound blocks to write

@@ -67,6 +67,7 @@ bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
   System->Printf (MSG_INITIALIZATION, "Wave-Out Sound Driver selected.\n");
+  ActivateSoundProc = false;
 
   // store pointer to sound renderer
   if (!render) return false;
@@ -120,6 +121,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   // write empty sound blocks to start playback. Three sound blocks should
   // be enough to prevent sound gaps; if not, make this an option in the
   // config file.
+  ActivateSoundProc = true;
   SoundProc(NULL);
   SoundProc(NULL);
   SoundProc(NULL);
@@ -129,6 +131,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
 
 void csSoundDriverWaveOut::Close()
 {
+  ActivateSoundProc = false;
   if (WaveOut)
   {
     waveOutSetVolume(WaveOut, OldVolume);
@@ -199,6 +202,9 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
     GlobalFree(Block->DataHandle);
     delete Block;
   }
+
+  // look if sound proc is activated
+  if (!ActivateSoundProc) return;
 
   // if there is already an instance of this function, tell it to write our
   // block as well and return

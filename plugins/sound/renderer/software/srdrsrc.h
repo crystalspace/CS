@@ -31,7 +31,7 @@ class csSoundSourceSoftware : public iSoundSource
 public:
   DECLARE_IBASE;
 	
-  csSoundSourceSoftware(csSoundRenderSoftware *srdr, iSoundStream *str, bool snd3d);
+  csSoundSourceSoftware(csSoundRenderSoftware *srdr, iSoundStream *str, int snd3d);
   virtual ~csSoundSourceSoftware();
 	
   virtual void Stop();

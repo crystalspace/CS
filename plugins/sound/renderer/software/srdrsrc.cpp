@@ -30,7 +30,7 @@ IMPLEMENT_IBASE(csSoundSourceSoftware)
 IMPLEMENT_IBASE_END;
 
 csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
-    iSoundStream *Stream, bool m3d) {
+    iSoundStream *Stream, int m3d) {
   CONSTRUCT_IBASE(srdr);
 
   SoundRender = srdr;
