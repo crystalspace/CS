@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+1-Jul-2002
+	- Extended both iShadowCaster and iShadowReceiver with iMovable
+	  parameter.
+	- Enabled the use of iShadowReceiver instead of iThingState
+	  by the lighting routines. csThing now implements iShadowReceiver.
 30-Jun-2002
 	- Thing mesh objects now implement iShadowCaster.
 	  csSector::CheckFrustum() will now use that instead of directly

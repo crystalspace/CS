@@ -1010,19 +1010,18 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
     {
       for (i = 0; i < num_visible_objects; i++)
       {
-        // @@@ unify with other mesh objects as soon as possible
         csObject *o = visible_objects[i];
         csMeshWrapper *mesh = (csMeshWrapper *)o;
-
-        iShadowCaster *shadcast = SCF_QUERY_INTERFACE_FAST (
-            mesh->GetMeshObject (),
-            iShadowCaster);
-        if (shadcast)
-        {
-          // Only if the thing has right flags do we consider it for shadows.
-          if (lview->CheckShadowMask (mesh->flags.Get ()))
-            shadcast->AppendShadows (shadows, center);
-          shadcast->DecRef ();
+        // Only if the thing has right flags do we consider it for shadows.
+        if (lview->CheckShadowMask (mesh->flags.Get ()))
+	{
+          iShadowCaster *shadcast = SCF_QUERY_INTERFACE_FAST (
+            mesh->GetMeshObject (), iShadowCaster);
+          if (shadcast)
+          {
+            shadcast->AppendShadows (&(mesh->GetMovable ().scfiMovable), shadows, center);
+            shadcast->DecRef ();
+	  }
         }
       }
     }
@@ -1030,24 +1029,19 @@ void csSector::RealCheckFrustum (iFrustumView *lview)
     // Calculate lighting for all objects in the current sector.
     for (i = 0; i < num_visible_objects; i++)
     {
-      // @@@ unify with other mesh objects as soon as possible
-      // @@@ Use shadow receiver interface!!!
       csObject *o = visible_objects[i];
       csMeshWrapper *mesh = (csMeshWrapper *)o;
-
-      // @@@ should not be known in engine.
-      // @@@ UGLY
-      iThingState *ithing = SCF_QUERY_INTERFACE_FAST (
-          mesh->GetMeshObject (),
-          iThingState);
-      if (ithing)
+      // Only if the thing has right flags do we consider it for shadows.
+      if (lview->CheckProcessMask (mesh->flags.Get ()))
       {
-        csThing *sp = (csThing *) (ithing->GetPrivateObject ());
-
-        // Only if the thing has right flags do we consider it for shadows.
-        if (lview->CheckProcessMask (mesh->flags.Get ()))
-          sp->RealCheckFrustum (lview, &(mesh->GetMovable ().scfiMovable));
-        ithing->DecRef ();
+        iShadowReceiver *shadrcv = SCF_QUERY_INTERFACE_FAST (
+          mesh->GetMeshObject (),
+          iShadowReceiver);
+        if (shadrcv)
+        {
+          shadrcv->CastShadows (&(mesh->GetMovable ().scfiMovable), lview);
+          shadrcv->DecRef ();
+	}
       }
     }
 

@@ -66,6 +66,7 @@ SCF_IMPLEMENT_IBASE_EXT(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iVisibilityCuller)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowCaster)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_EXT_END
@@ -94,6 +95,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ShadowCaster)
   SCF_IMPLEMENTS_INTERFACE(iShadowCaster)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::ShadowReceiver)
+  SCF_IMPLEMENTS_INTERFACE(iShadowReceiver)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 SCF_IMPLEMENT_EMBEDDED_IBASE (csThing::MeshObject)
   SCF_IMPLEMENTS_INTERFACE(iMeshObject)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
@@ -115,6 +120,7 @@ csThing::csThing (iBase *parent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVisibilityCuller);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObject);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshObjectFactory);
   DG_TYPE (this, "csThing");
@@ -2046,9 +2052,14 @@ void *csThing::TestQueuePolygonArray (
 // shadowing while a convex outline may have no correspondance to internal
 // shadows.
 void csThing::AppendShadows (
+  iMovable* movable,
   iShadowBlockList *shadows,
   const csVector3 &origin)
 {
+  //@@@ Ok?
+  cached_movable = movable;
+  WorUpdate ();
+
   iShadowBlock *list = shadows->NewShadowBlock (
       polygons.Length ());
   csFrustum *frust;
@@ -3557,7 +3568,7 @@ static void *CheckFrustumPolygonsFB (
                 {
                   if ((!mesh->GetFlags ().Check (CS_ENTITY_CAMERA)) &&
                       fview->CheckShadowMask (mesh->GetFlags ().Get ()))
-                    shadcast->AppendShadows (shadows, center);
+                    shadcast->AppendShadows (mesh->GetMovable (), shadows, center);
                 }
               }
 
@@ -3747,30 +3758,22 @@ void csThing::CastShadows (iFrustumView *fview)
   csHashIterator it (fdata.visible_things.GetHashMap ());
   iMeshWrapper *mesh;
 
-  // @@@ THIS SHOULD USE THE SHADOW RECEIVERS!!!
   while (it.HasNext ())
   {
     mesh = (iMeshWrapper *) (it.Next ());
-
-    // @@@ should not be known in engine.
-    // @@@ UGLY
-    iThingState *ithing = SCF_QUERY_INTERFACE_FAST (
-        mesh->GetMeshObject (),
-        iThingState);
-    if (ithing)
+    // Only if the thing has right flags do we consider it for shadows.
+    if (fview->CheckProcessMask (mesh->GetFlags ().Get ()))
     {
-      ithing->DecRef ();
-
-      csThing *sp = (csThing *) (ithing->GetPrivateObject ());
-      if (sp == this)
+      iShadowReceiver *shadrcv = SCF_QUERY_INTERFACE_FAST (
+        mesh->GetMeshObject (),
+        iShadowReceiver);
+      if (shadrcv)
       {
         // Skip doing lighting for the thing containing the culler itself.
-        continue;
+        if (shadrcv != &(scfiShadowReceiver))
+          shadrcv->CastShadows (mesh->GetMovable (), fview);
+        shadrcv->DecRef ();
       }
-
-      // Only if the thing has right flags do we consider it for shadows.
-      if (fview->CheckProcessMask (mesh->GetFlags ().Get ()))
-        sp->RealCheckFrustum (fview, mesh->GetMovable ());
     }
   }
 }

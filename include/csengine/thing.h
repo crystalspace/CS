@@ -917,7 +917,7 @@ public:
    * Append a list of shadow frustums which extend from
    * this thing. The origin is the position of the light.
    */
-  void AppendShadows (iShadowBlockList* shadows, const csVector3& origin);
+  void AppendShadows (iMovable* movable, iShadowBlockList* shadows, const csVector3& origin);
 
   //----------------------------------------------------------------------
   // Transformation
@@ -1211,12 +1211,23 @@ public:
   struct ShadowCaster : public iShadowCaster
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
-    virtual void AppendShadows (iShadowBlockList* shadows, const csVector3& origin)
+    virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows, const csVector3& origin)
     {
-      scfParent->AppendShadows (shadows, origin);
+      scfParent->AppendShadows (movable, shadows, origin);
     }
   } scfiShadowCaster;
   friend struct ShadowCaster;
+
+  //-------------------- iShadowReceiver interface implementation ----------
+  struct ShadowReceiver : public iShadowReceiver
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csThing);
+    virtual void CastShadows (iMovable* movable, iFrustumView* fview)
+    {
+      scfParent->RealCheckFrustum (fview, movable);
+    }
+  } scfiShadowReceiver;
+  friend struct ShadowReceiver;
 
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public iObjectModel

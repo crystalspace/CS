@@ -27,9 +27,10 @@ struct iShadowReceiver;
 struct iShadowBlock;
 struct iShadowBlockList;
 struct iMovable;
+struct iFrustumView;
 class csBox3;
 
-SCF_VERSION (iShadowCaster, 0, 0, 2);
+SCF_VERSION (iShadowCaster, 0, 0, 3);
 
 /**
  * An object that can cast shadows. An object implementing this interface
@@ -42,10 +43,10 @@ struct iShadowCaster : public iBase
    * Append a list of shadow frustums which extend from
    * this shadow caster. The origin is the position of the light.
    */
-  virtual void AppendShadows (iShadowBlockList* shadows, const csVector3& origin) = 0;
+  virtual void AppendShadows (iMovable* movable, iShadowBlockList* shadows, const csVector3& origin) = 0;
 };
 
-SCF_VERSION (iShadowReceiver, 0, 0, 1);
+SCF_VERSION (iShadowReceiver, 0, 0, 2);
 
 /**
  * An object that is interested in getting shadow information.
@@ -53,7 +54,7 @@ SCF_VERSION (iShadowReceiver, 0, 0, 1);
 struct iShadowReceiver : public iBase
 {
   /// Cast shadows on this receiver.
-  virtual void CastShadows (iShadowBlockList* shadows) = 0;
+  virtual void CastShadows (iMovable* movable, iFrustumView* fview) = 0;
 };
 
 #endif // __I_SHADCAST_H__
