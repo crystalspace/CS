@@ -36,10 +36,64 @@ extern const GUID IID_INetworkManager;
 interface INetworkManager : public IUnknown
 {
 public:
-  /// Open the network manager
+  /// Open the network manager (should not be called by user)
   STDMETHOD (Open) () PURE;
-  /// Close the network manager
+  /// Close the network manager (should not be called by user)
   STDMETHOD (Close) () PURE;
+
+  /// Should be called every frame
+  STDMETHOD (DoFrame) () PURE;
+
+  /// Game management
+  STDMETHOD (CreateGame) (unsigned short iNumOfPlayers) PURE;
+
+  STDMETHOD (KillGame) () PURE;
+
+  STDMETHOD (JoinGame) () PURE;
+
+  STDMETHOD (LeaveGame) () PURE;
+
+  STDMETHOD (EnumerateGames) () PURE;
+
+  STDMETHOD (GetGameData) () PURE;
+
+  STDMETHOD (SetGameData) () PURE;
+
+  /// Player management
+  STDMETHOD (CreatePlayer) () PURE;
+
+  STDMETHOD (KillPlayer) () PURE;
+
+  STDMETHOD (GetPlayerData) () PURE;
+
+  STDMETHOD (SetPlayerData) () PURE;
+
+  STDMETHOD (AddPlayerToGroup) () PURE;
+
+  STDMETHOD (RemovePlayerFromGroup) () PURE;
+
+  /// Group management
+  STDMETHOD (CreateGroup) () PURE;
+
+  STDMETHOD (KillGroup) () PURE;
+
+  STDMETHOD (GetGroupData) () PURE;
+
+  STDMETHOD (SetGroupData) () PURE;
+
+  /// Message management
+  STDMETHOD (Send) () PURE;
+
+  STDMETHOD (Receive) () PURE;
+
+  STDMETHOD (GetMessageCount) () PURE;
+
+  STDMETHOD (PeekMessage) () PURE;
+
+  /// Utility stuff
+  STDMETHOD (GetLastError) () PURE;
+
+  STDMETHOD (GetCaps) () PURE;
 };
 
 extern const IID IID_INetworkManagerFactory;
