@@ -180,10 +180,10 @@ struct terrdata {
   /// traingle mesh to draw for block
   G3DTriangleMesh mesh;
   /// keep track of tris, verts, tex, color
-  csGrowingArray<csTriangle> triangles;
-  csGrowingArray<csVector3> vertices;
-  csGrowingArray<csVector2> texels;
-  csGrowingArray<csColor> colors;
+  csDirtyAccessArray<csTriangle> triangles;
+  csDirtyAccessArray<csVector3> vertices;
+  csDirtyAccessArray<csVector2> texels;
+  csDirtyAccessArray<csColor> colors;
   /// the block
   csTerrBlock *block;
   /// texture correction

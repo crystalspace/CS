@@ -47,7 +47,7 @@ private:
   // may be available, making it hard to get the vertex count from the lists.
   int Count;
   // the lists
-  csGrowingArray<int> *Vertices, *Normals, *Colors, *Texels;
+  csDirtyAccessArray<int> *Vertices, *Normals, *Colors, *Texels;
 
 public:
   /**
@@ -64,9 +64,9 @@ public:
    * all elements of the given lists because the lists will be kept and
    * modified every time a vertex is added to the set.
    */
-  csSingleIndexVertexSet (csGrowingArray<int> *Vertices,
-    csGrowingArray<int> *Normals, csGrowingArray<int> *Colors,
-    csGrowingArray<int> *Texels, bool DeleteLists);
+  csSingleIndexVertexSet (csDirtyAccessArray<int> *Vertices,
+    csDirtyAccessArray<int> *Normals, csDirtyAccessArray<int> *Colors,
+    csDirtyAccessArray<int> *Texels, bool DeleteLists);
 
   /// Destructor
   ~csSingleIndexVertexSet ();
@@ -171,9 +171,9 @@ struct csModelDataTools
    * this function that vertices with different colors may be merged.
    */
   static void BuildVertexArray (iModelDataPolygon* poly,
-	csGrowingArray<int>* SpriteVertices, csGrowingArray<int>* SpriteNormals,
-	csGrowingArray<int>* SpriteColors, csGrowingArray<int>* SpriteTexels,
-	csGrowingArray<int>* PolyVertices);
+	csDirtyAccessArray<int>* SpriteVertices, csDirtyAccessArray<int>* SpriteNormals,
+	csDirtyAccessArray<int>* SpriteColors, csDirtyAccessArray<int>* SpriteTexels,
+	csDirtyAccessArray<int>* PolyVertices);
 };
 
 #endif // __CS_MDLTOOL_H__

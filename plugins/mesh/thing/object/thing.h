@@ -400,7 +400,7 @@ public:
 #ifdef CS_USE_NEW_RENDERER
   iRenderBuffer *GetRenderBuffer (csStringID name);
 
-  void FillRenderMeshes (csGrowingArray<csRenderMesh*>& rmeshes,
+  void FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes,
     const csArray<RepMaterial>& repMaterials);
 #endif
 
@@ -540,7 +540,7 @@ private:
   uint32 current_features;
 
 #ifdef CS_USE_NEW_RENDERER
-  csGrowingArray<csRenderMesh*> renderMeshes;
+  csDirtyAccessArray<csRenderMesh*> renderMeshes;
   csReversibleTransform tr_o2c; //@@@
 
   void PrepareRenderMeshes ();

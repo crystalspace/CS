@@ -260,7 +260,7 @@ int csODEDynamics::CollideMeshMesh (dGeomID o1, dGeomID o2, int flags,
 extern int dCollideBoxPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
 extern int dCollideCCylinderPlane (dxGeom *o1, dxGeom *o2, int flags, dContactGeom *outcontacts, int skip);
 
-typedef csGrowingArray<csMeshedPolygon> csPolyMeshList;
+typedef csDirtyAccessArray<csMeshedPolygon> csPolyMeshList;
 
 int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
     dContactGeom *outcontacts, int skip)

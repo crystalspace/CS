@@ -33,7 +33,7 @@ class csTriangleMesh
 {
 protected:
   /// The triangles.
-  csGrowingArray<csTriangle> triangles;
+  csDirtyAccessArray<csTriangle> triangles;
 
 public:
   ///

@@ -28,7 +28,7 @@ class csSprite2DUVAnimationFrame : public iSprite2DUVAnimationFrame
  protected:
   char *name;
   int duration;
-  typedef csGrowingArray<csVector2> UVArray;
+  typedef csDirtyAccessArray<csVector2> UVArray;
   UVArray vCoo;
 
  public:

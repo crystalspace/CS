@@ -158,7 +158,7 @@ int csCrystalBall::csTriNode::Classify (
 
 void csCrystalBall::csTriNode::Transform (
   const csMatrix3 &m,
-  csGrowingArray<int> &indexVector,
+  csDirtyAccessArray<int> &indexVector,
   int useSign,
   long cookie,
   const csArray<csCrystalBallVec*> *vP,
@@ -334,7 +334,7 @@ void csCrystalBall::Build (iPolygonMesh *polyset)
 
 void csCrystalBall::Transform (
   const csTransform &o2c,
-  csGrowingArray<int> &indexVector,
+  csDirtyAccessArray<int> &indexVector,
   int useSign,
   long cookie)
 {

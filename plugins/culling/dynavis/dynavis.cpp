@@ -554,10 +554,10 @@ end:
   return vis;
 }
 
-typedef csGrowingArray<csVector2> dynavis_tr_verts;
+typedef csDirtyAccessArray<csVector2> dynavis_tr_verts;
 CS_IMPLEMENT_STATIC_VAR (GetTrVerts, dynavis_tr_verts, ())
 
-typedef csGrowingArray<csVector3> dynavis_tr_cam;
+typedef csDirtyAccessArray<csVector3> dynavis_tr_cam;
 CS_IMPLEMENT_STATIC_VAR (GetTrCam, dynavis_tr_cam, ())
 
 void csDynaVis::UpdateCoverageBuffer (iCamera* camera,

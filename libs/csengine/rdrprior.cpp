@@ -94,7 +94,7 @@ struct comp_mesh_comp
   iMeshWrapper *mesh;
 };
 
-typedef csGrowingArray<comp_mesh_comp> engine3d_comp_mesh_z;
+typedef csDirtyAccessArray<comp_mesh_comp> engine3d_comp_mesh_z;
 CS_IMPLEMENT_STATIC_VAR (GetStaticComp_Mesh_Comp, engine3d_comp_mesh_z,())
 
 static int comp_mesh (const void *el1, const void *el2)

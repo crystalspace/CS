@@ -88,7 +88,7 @@ struct csEmitCompPart
 };
 
 /// growing drawing sort array
-typedef csGrowingArray<csEmitCompPart> csCompPartArray;
+typedef csDirtyAccessArray<csEmitCompPart> csCompPartArray;
 CS_IMPLEMENT_STATIC_VAR (GetStaticCompPartArray,csCompPartArray,())
 
 /// utility function

@@ -59,7 +59,7 @@ private:
     iEventHandler* object;
     unsigned int trigger;
   };
-  typedef csGrowingArray<Listener> ListenerVector;
+  typedef csDirtyAccessArray<Listener> ListenerVector;
 
   int EventCordsFind (int cat, int subcat);
 

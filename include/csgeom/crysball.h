@@ -97,7 +97,7 @@ class csCrystalBall
 
     // rotate the unitsphere by matrix <m>. Add all polygon indices to <indexVector>
     // which normlals point to the <useSign> side
-    void Transform (const csMatrix3 &m, csGrowingArray<int> &indexVector,
+    void Transform (const csMatrix3 &m, csDirtyAccessArray<int> &indexVector,
 		    int useSign, long cookie,
 		    const csArray<csCrystalBallVec*> *vP,
 		    const csArray<csVector3*> *vTP,
@@ -126,7 +126,7 @@ class csCrystalBall
 
   // rotate the unitsphere by <t>. Add all polygon indices to <indexVector>
   // which normlals point to the <useSign> side
-  void Transform (const csTransform &t, csGrowingArray<int> &indexVector, int useSign, long cookie);
+  void Transform (const csTransform &t, csDirtyAccessArray<int> &indexVector, int useSign, long cookie);
 };
 
 #endif // __CS_CRYSBALL_H__

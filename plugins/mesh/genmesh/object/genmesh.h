@@ -426,8 +426,8 @@ private:
 
   csAnonRenderBufferManager anon_buffers;
   /*csRefArray<iRenderBuffer> anon_buffers;
-  csGrowingArray<csStringID> anon_names;
-  csGrowingArray<int> anon_size;*/
+  csDirtyAccessArray<csStringID> anon_names;
+  csDirtyAccessArray<int> anon_size;*/
 #endif
 
   csVector3 radius;

@@ -35,8 +35,8 @@ struct iCacheManager;
 struct iFile;
 struct iEngine;
 
-typedef csGrowingArray<csRGBpixel> csRGBMap;
-typedef csGrowingArray<unsigned char> csCurveShadowMapHelper;
+typedef csDirtyAccessArray<csRGBpixel> csRGBMap;
+typedef csDirtyAccessArray<unsigned char> csCurveShadowMapHelper;
 
 /// Shadow map.
 class csCurveShadowMap : public csCurveShadowMapHelper

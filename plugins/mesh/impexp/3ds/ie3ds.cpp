@@ -228,7 +228,7 @@ typedef struct {
   int normal;
 } AdjacentFace;
 
-typedef csGrowingArray<AdjacentFace> Faces;
+typedef csDirtyAccessArray<AdjacentFace> Faces;
 typedef csPDelArray<Faces> FacesVector;
 typedef csPDelArray<csVector3> csVector3Vector;
 

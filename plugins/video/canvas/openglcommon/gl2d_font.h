@@ -82,8 +82,8 @@ protected:
   iFontDeleteNotify* delete_callback;
 
   // quad buffer
-  csGrowingArray<csVector2> verts2d;
-  csGrowingArray<csVector2> texcoords;
+  csDirtyAccessArray<csVector2> verts2d;
+  csDirtyAccessArray<csVector2> texcoords;
 
   // Graphics2D
   csRef<iGraphics2D> g2d;

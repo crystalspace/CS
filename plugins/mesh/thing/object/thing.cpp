@@ -839,7 +839,7 @@ iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
   }
 }
 
-void csThingStatic::FillRenderMeshes (csGrowingArray<csRenderMesh*>& rmeshes,
+void csThingStatic::FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes,
     const csArray<RepMaterial>& repMaterials)
 {
   csHashMap material_polys;
@@ -1726,7 +1726,7 @@ void csThing::PreparePolygonBuffer ()
     GetVertexBufferManager ();
   polybuf = vbufmgr->CreatePolygonBuffer ();
 
-  csGrowingArray<int> verts;
+  csDirtyAccessArray<int> verts;
 
   polybuf->SetVertexArray (static_data->obj_verts, static_data->num_vertices);
 

@@ -138,10 +138,10 @@ public:
 class csModelDataVertices : public iModelDataVertices
 {
 private:
-  csGrowingArray<csVector3> Vertices;
-  csGrowingArray<csVector3> Normals;
-  csGrowingArray<csColor> Colors;
-  csGrowingArray<csVector2> Texels;
+  csDirtyAccessArray<csVector3> Vertices;
+  csDirtyAccessArray<csVector3> Normals;
+  csDirtyAccessArray<csColor> Colors;
+  csDirtyAccessArray<csVector2> Texels;
 
 public:
   SCF_DECLARE_IBASE;
@@ -174,7 +174,7 @@ public:
 class csModelDataAction : public iModelDataAction
 {
 private:
-  csGrowingArray<float> Times;
+  csDirtyAccessArray<float> Times;
   csObjectVector States;
 
 public:
@@ -208,10 +208,10 @@ public:
 class csModelDataPolygon : public iModelDataPolygon
 {
 private:
-  csGrowingArray<int> Vertices;
-  csGrowingArray<int> Normals;
-  csGrowingArray<int> Colors;
-  csGrowingArray<int> Texels;
+  csDirtyAccessArray<int> Vertices;
+  csDirtyAccessArray<int> Normals;
+  csDirtyAccessArray<int> Colors;
+  csDirtyAccessArray<int> Texels;
   iModelDataMaterial *Material;
 
 public:

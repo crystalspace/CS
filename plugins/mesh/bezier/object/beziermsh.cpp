@@ -806,7 +806,7 @@ void csBezierMesh::UpdateCurveTransform ()
 
 /// The list of fog vertices
 #ifndef CS_USE_NEW_RENDERER
-typedef csGrowingArray<G3DFogInfo> engine3d_StaticFogVerts;
+typedef csDirtyAccessArray<G3DFogInfo> engine3d_StaticFogVerts;
 CS_IMPLEMENT_STATIC_VAR (GetStaticFogVerts, engine3d_StaticFogVerts,())
 
 bool csBezierMesh::DrawCurves (

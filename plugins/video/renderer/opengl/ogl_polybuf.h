@@ -45,7 +45,7 @@ public:
   // We're duplicating info, but we need the number of vertices per
   // material, so later we can call ClipTriangleMesh
 
-  csGrowingArray<csTriangle> triangles;
+  csDirtyAccessArray<csTriangle> triangles;
 
   csTrianglesPerMaterial ();
 
@@ -89,13 +89,13 @@ public:
   csTrianglesPerSuperLightmap* prev;
 
   /// triangles which shares the same superlightmap
-  csGrowingArray<csTriangle> triangles;
+  csDirtyAccessArray<csTriangle> triangles;
 
   /// The lightmaps in the superlightmap
   csRefArray<iPolygonTexture> lightmaps;
-  csGrowingArray<csRGBpixel*> lm_info;
+  csDirtyAccessArray<csRGBpixel*> lm_info;
 
-  csGrowingArray<csRect> rectangles;
+  csDirtyAccessArray<csRect> rectangles;
 
   csSubRectangles* region;
 
@@ -187,7 +187,7 @@ private:
   //int AddSingleVertexLM (const csVector2& uvLightmap, int& cur_vt_idx);
 
   // Queue with lightmaps we still have to process.
-  //csGrowingArray<csLmQueue> lmqueue;
+  //csDirtyAccessArray<csLmQueue> lmqueue;
 
   //void ClearLmQueue ();
   //void AddLmQueue (iPolygonTexture* polytext, const csVector2* uv,
@@ -209,14 +209,14 @@ protected:
    * Vertices per triangle (every vertex is duplicated here for every
    * triangle in the list).
    */
-  csGrowingArray<csVector3> vec_vertices;
+  csDirtyAccessArray<csVector3> vec_vertices;
   /// Texels for those triangles
-  csGrowingArray<csVector2> texels;
+  csDirtyAccessArray<csVector2> texels;
   /// Lumels for those triangles
-  csGrowingArray<csVector2> lumels;
+  csDirtyAccessArray<csVector2> lumels;
 
   int matCount;
-  csGrowingArray<csTriangle> orig_triangles;
+  csDirtyAccessArray<csTriangle> orig_triangles;
   csVector3* vertices;
   int num_vertices;
 

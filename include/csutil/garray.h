@@ -37,7 +37,7 @@
  * if you want to access some external module (like OpenGL).
  */
 template <class T>
-class csGrowingArray : public csArray<T>
+class csDirtyAccessArray : public csArray<T>
 {
 private:
   int RefCount;
@@ -47,7 +47,7 @@ public:
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csGrowingArray (int ilimit = 0, int ithreshold = 0)
+  csDirtyAccessArray (int ilimit = 0, int ithreshold = 0)
   	: csArray<T> (ilimit, ithreshold)
   {
     RefCount = 0;

@@ -77,7 +77,7 @@ public:
   }
 };
 
-typedef csGrowingArray<dGeomID> csGeomList;
+typedef csDirtyAccessArray<dGeomID> csGeomList;
 
 struct ContactEntry {
   dGeomID o1, o2;
@@ -85,7 +85,7 @@ struct ContactEntry {
   csVector3 dir;
 };
 
-typedef csGrowingArray<ContactEntry> csContactList;
+typedef csDirtyAccessArray<ContactEntry> csContactList;
 
 /**
  * This is the implementation for the actual plugin.

@@ -968,21 +968,21 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::LODControl)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.
-typedef csGrowingArray<csVector3> spr3d_tr_verts;
+typedef csDirtyAccessArray<csVector3> spr3d_tr_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, spr3d_tr_verts, ())
 /// Static uv array.
-typedef csGrowingArray<csVector2> spr3d_uv_verts;
+typedef csDirtyAccessArray<csVector2> spr3d_uv_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, spr3d_uv_verts, ())
 /// The list of fog vertices
 #ifndef CS_USE_NEW_RENDERER
-typedef csGrowingArray<G3DFogInfo> spr3d_fog_verts;
+typedef csDirtyAccessArray<G3DFogInfo> spr3d_fog_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_fog_verts, spr3d_fog_verts, ())
 #endif // CS_USE_NEW_RENDERER
 /// The list of object vertices.
-typedef csGrowingArray<csVector3> spr3d_obj_verts;
+typedef csDirtyAccessArray<csVector3> spr3d_obj_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_obj_verts, spr3d_obj_verts, ())
 /// The list of tween vertices.
-typedef csGrowingArray<csVector3> spr3d_tween_verts;
+typedef csDirtyAccessArray<csVector3> spr3d_tween_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tween_verts, spr3d_tween_verts, ())
 
 spr3d_tr_verts *tr_verts = 0;

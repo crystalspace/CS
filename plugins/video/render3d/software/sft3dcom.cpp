@@ -3466,19 +3466,19 @@ void csSoftwareRender3DCommon::SetRenderTarget (iTextureHandle* handle,
 }*/
 
 /// Static vertex array.
-typedef csGrowingArray<csVector3> dtmesh_tr_verts;
+typedef csDirtyAccessArray<csVector3> dtmesh_tr_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, dtmesh_tr_verts, ())
 /// Static z array.
-typedef csGrowingArray<float> dtmesh_z_verts;
+typedef csDirtyAccessArray<float> dtmesh_z_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_z_verts, dtmesh_z_verts, ())
 /// Static uv array.
-typedef csGrowingArray<csVector2> dtmesh_uv_verts;
+typedef csDirtyAccessArray<csVector2> dtmesh_uv_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, dtmesh_uv_verts, ())
 /// The perspective corrected vertices.
-typedef csGrowingArray<csVector2> dtmesh_persp;
+typedef csDirtyAccessArray<csVector2> dtmesh_persp;
 CS_IMPLEMENT_STATIC_VAR (Get_persp, dtmesh_persp, ())
 /// Array with colors.
-typedef csGrowingArray<csColor> dtmesh_color_verts;
+typedef csDirtyAccessArray<csColor> dtmesh_color_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_color_verts, dtmesh_color_verts, ())
 
 

@@ -29,16 +29,16 @@
 
 // ---------------------------------------------------------------------------
 
-static void PushIdentityMapping (csGrowingArray<int>& array, int n, int offset)
+static void PushIdentityMapping (csDirtyAccessArray<int>& array, int n, int offset)
 {
   int i;
   for (i=0; i<n; i++)
     array.Push (offset + i);
 }
 
-static csGrowingArray<int> *CreateIdentityMapping (int n, int offset = 0)
+static csDirtyAccessArray<int> *CreateIdentityMapping (int n, int offset = 0)
 {
-  csGrowingArray<int> *a = new csGrowingArray<int> ();
+  csDirtyAccessArray<int> *a = new csDirtyAccessArray<int> ();
   PushIdentityMapping (*a, n, offset);
   return a;
 }
@@ -51,19 +51,19 @@ csSingleIndexVertexSet::csSingleIndexVertexSet (bool v, bool n, bool c, bool t)
 {
   Delete = true;
   Count = 0;
-  if (v) Vertices = new csGrowingArray<int> ();
+  if (v) Vertices = new csDirtyAccessArray<int> ();
   else Vertices = 0;
-  if (n) Normals = new csGrowingArray<int> ();
+  if (n) Normals = new csDirtyAccessArray<int> ();
   else Normals = 0;
-  if (c) Colors = new csGrowingArray<int> ();
+  if (c) Colors = new csDirtyAccessArray<int> ();
   else Colors = 0;
-  if (t) Texels = new csGrowingArray<int> ();
+  if (t) Texels = new csDirtyAccessArray<int> ();
   else Texels = 0;
 }
 
 csSingleIndexVertexSet::csSingleIndexVertexSet (
-	csGrowingArray<int> *v, csGrowingArray<int> *n,
-	csGrowingArray<int> *c, csGrowingArray<int> *t, bool del)
+	csDirtyAccessArray<int> *v, csDirtyAccessArray<int> *n,
+	csDirtyAccessArray<int> *c, csDirtyAccessArray<int> *t, bool del)
 {
   Delete = del;
   Count = 0;
@@ -159,10 +159,10 @@ CS_DECLARE_OBJECT_ITERATOR (csModelDataActionIterator, iModelDataAction);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataTextureIterator, iModelDataTexture);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataMaterialIterator, iModelDataMaterial);
 
-typedef csGrowingArray<csVector3> csVector3ArrayType;
-typedef csGrowingArray<csVector2> csVector2Array;
-typedef csGrowingArray<csColor> csColorArray;
-typedef csPDelArray<csGrowingArray<int> > csIntArrayVector;
+typedef csDirtyAccessArray<csVector3> csVector3ArrayType;
+typedef csDirtyAccessArray<csVector2> csVector2Array;
+typedef csDirtyAccessArray<csColor> csColorArray;
+typedef csPDelArray<csDirtyAccessArray<int> > csIntArrayVector;
 
 typedef csRefArrayObject<iModelDataAction> csModelDataActionVector;
 typedef csRefArrayObject<iModelDataMaterial> csModelDataMaterialVector;
@@ -742,7 +742,7 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
     {
       csModelDataPolygonVector Polygons;
       csModelDataMaterialVector Materials;
-      csGrowingArray<int> PolygonToNewObject;
+      csDirtyAccessArray<int> PolygonToNewObject;
       csModelDataObjectVector NewObjects;
 
       // build the Polygons, Materials and PolygonToNewObject lists
@@ -772,22 +772,22 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
 
       // build the vertex mapping table and move the polygons
       int i;
-      csGrowingArray<int> *VertexMap = new csGrowingArray<int> [
+      csDirtyAccessArray<int> *VertexMap = new csDirtyAccessArray<int> [
       	Materials.Length ()];
-      csGrowingArray<int> *NormalMap = new csGrowingArray<int> [
+      csDirtyAccessArray<int> *NormalMap = new csDirtyAccessArray<int> [
       	Materials.Length ()];
-      csGrowingArray<int> *ColorMap = new csGrowingArray<int> [
+      csDirtyAccessArray<int> *ColorMap = new csDirtyAccessArray<int> [
       	Materials.Length ()];
-      csGrowingArray<int> *TexelMap = new csGrowingArray<int> [
+      csDirtyAccessArray<int> *TexelMap = new csDirtyAccessArray<int> [
       	Materials.Length ()];
       for (i=0; i<Polygons.Length (); i++)
       {
         iModelDataPolygon *Polygon = Polygons.Get (i);
         int NewObjIndex = PolygonToNewObject.Get (i);
-	csGrowingArray<int> *VertexIndexTable = &(VertexMap [NewObjIndex]);
-	csGrowingArray<int> *NormalIndexTable = &(NormalMap [NewObjIndex]);
-	csGrowingArray<int> *ColorIndexTable = &(ColorMap [NewObjIndex]);
-	csGrowingArray<int> *TexelIndexTable = &(TexelMap [NewObjIndex]);
+	csDirtyAccessArray<int> *VertexIndexTable = &(VertexMap [NewObjIndex]);
+	csDirtyAccessArray<int> *NormalIndexTable = &(NormalMap [NewObjIndex]);
+	csDirtyAccessArray<int> *ColorIndexTable = &(ColorMap [NewObjIndex]);
+	csDirtyAccessArray<int> *TexelIndexTable = &(TexelMap [NewObjIndex]);
 	iModelDataObject *Object = NewObjects.Get (NewObjIndex);
 
         Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
@@ -991,23 +991,23 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
   DumpVertices (ver, &VertexList, &NormalList, &ColorList, &TexelList);
 
   // build the initial 'potential mergeable vertices' list
-  csGrowingArray<int> *VertexListIndices = CreateIdentityMapping (VertexList.Length ());
-  csGrowingArray<int> *NormalListIndices = CreateIdentityMapping (NormalList.Length ());
-  csGrowingArray<int> *ColorListIndices = CreateIdentityMapping (ColorList.Length ());
-  csGrowingArray<int> *TexelListIndices = CreateIdentityMapping (TexelList.Length ());
+  csDirtyAccessArray<int> *VertexListIndices = CreateIdentityMapping (VertexList.Length ());
+  csDirtyAccessArray<int> *NormalListIndices = CreateIdentityMapping (NormalList.Length ());
+  csDirtyAccessArray<int> *ColorListIndices = CreateIdentityMapping (ColorList.Length ());
+  csDirtyAccessArray<int> *TexelListIndices = CreateIdentityMapping (TexelList.Length ());
   csIntArrayVector VertexSets;
   csIntArrayVector NormalSets;
   csIntArrayVector ColorSets;
   csIntArrayVector TexelSets;
-  csGrowingArray<int> UniqueVertexList;
-  csGrowingArray<int> UniqueNormalList;
-  csGrowingArray<int> UniqueColorList;
-  csGrowingArray<int> UniqueTexelList;
+  csDirtyAccessArray<int> UniqueVertexList;
+  csDirtyAccessArray<int> UniqueNormalList;
+  csDirtyAccessArray<int> UniqueColorList;
+  csDirtyAccessArray<int> UniqueTexelList;
 
 #define CS_MDLTOOL_HELPER(type,obj,comp)				\
   while (obj##List.Length () > 0)					\
   {									\
-    csGrowingArray<int> *Set = new csGrowingArray<int> ();		\
+    csDirtyAccessArray<int> *Set = new csDirtyAccessArray<int> ();		\
     type o1 = obj##List [0];						\
     int Index1 = obj##ListIndices->Get (0);				\
     Set->Push (Index1);							\
@@ -1045,14 +1045,14 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
 #define CS_MDLTOOL_HELPER(type,obj,comp)				\
   for (i=0; i<obj##Sets.Length (); i++)					\
   {									\
-    csGrowingArray<int> *Set = obj##Sets [i];				\
-    csGrowingArray<int> *Removed = 0;					\
+    csDirtyAccessArray<int> *Set = obj##Sets [i];				\
+    csDirtyAccessArray<int> *Removed = 0;					\
     type o1 = ver->Get##obj (Set->Get (0));				\
     for (j=1; j<Set->Length (); j++)					\
     {									\
       type o2 = ver->Get##obj (Set->Get (j));				\
       if (!(comp)) {							\
-        if (!Removed) Removed = new csGrowingArray<int> ();		\
+        if (!Removed) Removed = new csDirtyAccessArray<int> ();		\
         Removed->Push (Set->Get (j));					\
         Set->DeleteIndex (j); j--;					\
       }									\
@@ -1080,8 +1080,8 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
 #undef CS_MDLTOOL_HELPER
 
   // build the final mapping tables
-  csGrowingArray<int> VertexMapN2O, NormalMapN2O, ColorMapN2O, TexelMapN2O;
-  csGrowingArray<int> VertexMapO2N, NormalMapO2N, ColorMapO2N, TexelMapO2N;
+  csDirtyAccessArray<int> VertexMapN2O, NormalMapN2O, ColorMapN2O, TexelMapN2O;
+  csDirtyAccessArray<int> VertexMapO2N, NormalMapO2N, ColorMapO2N, TexelMapO2N;
   VertexMapO2N.SetLength (VertexFrames[0]->GetVertexCount ());
   NormalMapO2N.SetLength (VertexFrames[0]->GetNormalCount ());
   ColorMapO2N.SetLength (VertexFrames[0]->GetColorCount ());
@@ -1151,11 +1151,11 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
 
 void csModelDataTools::BuildVertexArray (
 	iModelDataPolygon* poly,
-	csGrowingArray<int>* SpriteVertices,
-	csGrowingArray<int>* SpriteNormals,
-	csGrowingArray<int>* SpriteColors,
-	csGrowingArray<int>* SpriteTexels,
-	csGrowingArray<int>* PolyVertices)
+	csDirtyAccessArray<int>* SpriteVertices,
+	csDirtyAccessArray<int>* SpriteNormals,
+	csDirtyAccessArray<int>* SpriteColors,
+	csDirtyAccessArray<int>* SpriteTexels,
+	csDirtyAccessArray<int>* PolyVertices)
 {
   int i;
   PolyVertices->SetLength (0);

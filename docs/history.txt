@@ -36,6 +36,7 @@ chronological order.
 	- Jorrit similarly replaced csBitSet with csArray<bool> in csinput.h.
 	- Jorrit removed csBitSet since nothing is now using it. If you really
 	  need a bit array then use csBitArray instead.
+	- Jorrit renamed csGrowingArray to csDirtyAccessArray.
 10-Aug-2003
 	- Peter Amstutz added a check to "scan.cpp" of the software
 	  renderer so that it would not defer a null pointer (and hence crash)

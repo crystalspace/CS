@@ -43,7 +43,7 @@ class csAnonRenderBufferManager
 
   };
 
-  csGrowingArray<anonbuffer *> anon_buffers;
+  csDirtyAccessArray<anonbuffer *> anon_buffers;
   iObjectRegistry *object_reg;
 
 public:

@@ -36,7 +36,7 @@ struct UsedVertexInfo
   int vidx;
 };
 
-typedef csGrowingArray<UsedVertexInfo> UsedVerticesInfo;
+typedef csDirtyAccessArray<UsedVertexInfo> UsedVerticesInfo;
 
 bool csSpriteBuilder::Build (iModelDataObject *Object)
 {
@@ -82,9 +82,9 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
    * (model data normal) and (model data texel) mappings. This means that
    * they are indexed by the sprite vertex and must be of the same size.
    */
-  csGrowingArray<int> SpriteVertices;
-  csGrowingArray<int> SpriteNormals;
-  csGrowingArray<int> SpriteTexels;
+  csDirtyAccessArray<int> SpriteVertices;
+  csDirtyAccessArray<int> SpriteNormals;
+  csDirtyAccessArray<int> SpriteTexels;
 
 #if 0
   int vertices=0;
@@ -114,7 +114,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
     if (poly)
     {
       // build the vertex array
-      csGrowingArray<int> PolyVertices;
+      csDirtyAccessArray<int> PolyVertices;
       csModelDataTools::BuildVertexArray (poly, &SpriteVertices,
         &SpriteNormals, 0, &SpriteTexels, &PolyVertices);
 
@@ -155,7 +155,7 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       SCF_QUERY_INTERFACE (it1->Next (), iModelDataPolygon));
     if (poly)
     {
-      csGrowingArray<int> PolyVertices;
+      csDirtyAccessArray<int> PolyVertices;
       for (i=0; i<poly->GetVertexCount(); i++)
       {
 	int vertex = poly->GetVertex (i);

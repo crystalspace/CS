@@ -78,44 +78,44 @@
 // dynamic textures will utilise multiple instances of csGraphics3DOGLCommon
 
 /// Static vertex array.
-typedef csGrowingArray<csVector3> ogl_g3dcom_tr_verts;
+typedef csDirtyAccessArray<csVector3> ogl_g3dcom_tr_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_tr_verts, ogl_g3dcom_tr_verts, ())
 /// Static uv array.
-typedef csGrowingArray<csVector2> ogl_g3dcom_uv_verts;
+typedef csDirtyAccessArray<csVector2> ogl_g3dcom_uv_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_uv_verts, ogl_g3dcom_uv_verts, ())
 /// Static uv array for multi-texture.
-typedef csGrowingArray<csVector2> ogl_g3dcom_uv_mul_verts;
+typedef csDirtyAccessArray<csVector2> ogl_g3dcom_uv_mul_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_uv_mul_verts, ogl_g3dcom_uv_mul_verts, ())
 /// Array with colors.
-typedef csGrowingArray<csColor> ogl_g3dcom_color_verts;
+typedef csDirtyAccessArray<csColor> ogl_g3dcom_color_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_color_verts, ogl_g3dcom_color_verts, ())
 /// Array with RGBA colors.
-typedef csGrowingArray<GLfloat> ogl_g3dcom_rgba_verts;
+typedef csDirtyAccessArray<GLfloat> ogl_g3dcom_rgba_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_rgba_verts, ogl_g3dcom_rgba_verts, ())
 
 /// Array for clipping.
-typedef csGrowingArray<csTriangle> ogl_g3dcom_clipped_triangles;
+typedef csDirtyAccessArray<csTriangle> ogl_g3dcom_clipped_triangles;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_triangles, ogl_g3dcom_clipped_triangles, ())
 /// Array for clipping.
-typedef csGrowingArray<int> ogl_g3dcom_clipped_translate;
+typedef csDirtyAccessArray<int> ogl_g3dcom_clipped_translate;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_translate, ogl_g3dcom_clipped_translate, ())
-typedef csGrowingArray<int> ogl_g3dcom_clipped_plane;
+typedef csDirtyAccessArray<int> ogl_g3dcom_clipped_plane;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_plane, ogl_g3dcom_clipped_plane, ())
 /// Array for clipping.
-typedef csGrowingArray<csVector3> ogl_g3dcom_clipped_vertices;
+typedef csDirtyAccessArray<csVector3> ogl_g3dcom_clipped_vertices;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_vertices, ogl_g3dcom_clipped_vertices, ())
 /// Array for clipping.
-typedef csGrowingArray<csVector2> ogl_g3dcom_clipped_texels;
+typedef csDirtyAccessArray<csVector2> ogl_g3dcom_clipped_texels;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_texels, ogl_g3dcom_clipped_texels, ())
 /// Array for clipping.
-typedef csGrowingArray<csColor> ogl_g3dcom_clipped_colors;
+typedef csDirtyAccessArray<csColor> ogl_g3dcom_clipped_colors;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_colors, ogl_g3dcom_clipped_colors, ())
 /// Array for clipping.
-typedef csGrowingArray<G3DFogInfo> ogl_g3dcom_clipped_fog;
+typedef csDirtyAccessArray<G3DFogInfo> ogl_g3dcom_clipped_fog;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_fog, ogl_g3dcom_clipped_fog, ())
 
 /// Array for clipping.
-typedef csGrowingArray<float> ogl_g3dcom_clipped_user;
+typedef csDirtyAccessArray<float> ogl_g3dcom_clipped_user;
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_user0, ogl_g3dcom_clipped_user, ())
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_user1, ogl_g3dcom_clipped_user, ())
 CS_IMPLEMENT_STATIC_VAR (Get_clipped_user2, ogl_g3dcom_clipped_user, ())
@@ -3729,13 +3729,13 @@ void csGraphics3DOGLCommon::ClipTriangleMeshExact (
 
 //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
 /// Static vertex array.
-typedef csGrowingArray<csVector3> dpmesh_tr_verts;
+typedef csDirtyAccessArray<csVector3> dpmesh_tr_verts;
 CS_IMPLEMENT_STATIC_VAR (Get_dpmesh_tr_verts, dpmesh_tr_verts, ())
 /// The perspective corrected vertices.
-typedef csGrowingArray<csVector2> dpmesh_persp;
+typedef csDirtyAccessArray<csVector2> dpmesh_persp;
 CS_IMPLEMENT_STATIC_VAR (Get_dpmesh_persp, dpmesh_persp, ())
 /// Array which indicates which vertices are visible and which are not.
-typedef csGrowingArray<bool> dpmesh_visible;
+typedef csDirtyAccessArray<bool> dpmesh_visible;
 CS_IMPLEMENT_STATIC_VAR (Get_dpmesh_visible, dpmesh_visible, ())
 
 #if 0
