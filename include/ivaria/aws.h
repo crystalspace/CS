@@ -39,6 +39,9 @@ public:
   /// Get a pointer to the preference manager
   virtual iAwsPrefManager *GetPrefMgr()=0;
 
+  /// Get a pointer to the sink manager
+  virtual iAwsSinkManager *GetSinkMgr()=0;
+
   /// Set the preference manager used by the window system
   virtual void             SetPrefMgr(iAwsPrefManager *pmgr)=0;
 
