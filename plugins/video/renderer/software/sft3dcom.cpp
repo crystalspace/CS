@@ -1598,7 +1598,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (do_alpha && (alpha || txt_handle->GetKeyColor ()))
     return;
   int scan_index = SCANPROC_FLAT_ZNONE;
-  if (z_buf_size == CS_ZBUF_FILL) scan_index++;
+  if (z_buf_mode == CS_ZBUF_FILL) scan_index++;
   else if (z_buf_mode == CS_ZBUF_USE) scan_index += 2;
   else if (z_buf_mode == CS_ZBUF_TEST) scan_index += 3;
   csDrawScanline* dscan = ScanProc [scan_index];

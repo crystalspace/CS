@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	  blend tables not to be set up correctly. This bug causes
 	  the partsys level to crash in the room at the far left (software
 	  renderer only).
+	- Fixed a bug with the software renderer where flat rendering
+	  (without texture) would not correctly check which z-buffer
+	  mode (NONE, FILL, TEST, or USE) to use.
 	- Michael H. Voase did the following:
 	  HitBeam updates:
 	    Fleshed out HitBeam interface. HitBeamBBox
