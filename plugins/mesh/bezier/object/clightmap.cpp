@@ -47,21 +47,14 @@ void csCurveShadowMap::Alloc (iLight *l, int w, int h)
 
   int lw = csCurveLightMap::CalcLightMapWidth (w);
   int lh = csCurveLightMap::CalcLightMapHeight (h);
-  csCurveShadowMapHelper::Alloc (lw * lh);
-  memset (GetArray (), 0, GetSize ());
-}
-
-void csCurveShadowMap::Copy (const csCurveShadowMap *source)
-{
-  csCurveShadowMapHelper::Copy (source);
-  Light = source->Light;
-  max_shadow = source->max_shadow;
+  csCurveShadowMapHelper::SetLength (lw * lh);
+  memset (GetArray (), 0, Length ());
 }
 
 void csCurveShadowMap::CalcMaxShadow()
 {
   max_shadow=0;
-  int len = GetSize();
+  int len = Length ();
   for (int i=0; i<len; i++)
     if (GetArray()[i] > max_shadow)
       max_shadow = GetArray()[i];
@@ -96,8 +89,8 @@ csCurveLightMap::~csCurveLightMap ()
     first_smap = smap;
   }
 
-  static_lm.Clear ();
-  real_lm.Clear ();
+  static_lm.DeleteAll ();
+  real_lm.DeleteAll ();
 }
 
 void csCurveLightMap::SetLightCellSize (int size)
@@ -162,11 +155,11 @@ void csCurveLightMap::SetSize (int w, int h)
 void csCurveLightMap::Alloc (int w, int h, int r, int g, int b)
 {
   SetSize (w, h);
-  static_lm.Clear ();
-  real_lm.Clear ();
+  static_lm.DeleteAll ();
+  real_lm.DeleteAll ();
 
-  static_lm.Alloc (lm_size);
-  real_lm.Alloc (lm_size);
+  static_lm.SetLength (lm_size);
+  real_lm.SetLength (lm_size);
 
   csRGBpixel *map = static_lm.GetArray ();
   csRGBpixel def (r, g, b);
@@ -176,36 +169,6 @@ void csCurveLightMap::Alloc (int w, int h, int r, int g, int b)
 
   int i;
   for (i = 0; i < lm_size; i++) map[i] = def;
-}
-
-void csCurveLightMap::CopyLightMap (csCurveLightMap *source)
-{
-  lm_size = source->lm_size;
-  static_lm.Copy (&source->static_lm);
-  real_lm.Copy (&source->real_lm);
-  lwidth = source->lwidth;
-  lheight = source->lheight;
-  rwidth = source->rwidth;
-  rheight = source->rheight;
-
-  csCurveShadowMap *smap, *smap2;
-  while (first_smap)
-  {
-    smap = first_smap->next;
-    delete first_smap;
-    first_smap = smap;
-  }
-
-  smap = source->first_smap;
-  while (smap)
-  {
-    smap2 = new csCurveShadowMap ();
-    smap2->next = first_smap;
-    first_smap = smap2;
-    smap2->Copy (smap);
-    smap = smap->next;
-  }
-  max_static_color_values = source->max_static_color_values;
 }
 
 struct PolySave
@@ -319,8 +282,8 @@ const char* csCurveLightMap::ReadFromCache (
   //-------------------------------
   // The cached item is valid.
   //-------------------------------
-  static_lm.Clear ();
-  static_lm.Alloc (lm_size);
+  static_lm.DeleteAll ();
+  static_lm.SetLength (lm_size);
 
   int n = lm_size;
   char *lm_ptr = (char*)static_lm.GetArray ();
@@ -710,13 +673,13 @@ void csCurveLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
 
   // Move the old data to o_stat and o_real.
   csRGBMap o_stat, o_real;
-  o_stat.TakeOver (&static_lm);
-  o_real.TakeOver (&real_lm);
+  static_lm.TransferTo (o_stat);
+  real_lm.TransferTo (o_real);
 
   lm_size = lwidth * lheight;
 
   // Allocate new data and transform old to new.
-  static_lm.Alloc (lm_size);
+  static_lm.SetLength (lm_size);
   ResizeMap2 (
     o_stat.GetArray (),
     oldw,
@@ -725,7 +688,7 @@ void csCurveLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
     lwidth,
     lheight);
 
-  real_lm.Alloc (lm_size);
+  real_lm.SetLength (lm_size);
   ResizeMap2 (
     o_real.GetArray (),
     oldw,
@@ -738,8 +701,8 @@ void csCurveLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   csCurveShadowMap *smap = first_smap;
   while (smap)
   {
-    unsigned char *old_map = smap->GetArray ();
-    smap->TakeOver (new unsigned char[lm_size], smap->GetSize (), false);
+    unsigned char *old_map = new unsigned char[smap->Length ()];
+    memcpy (old_map, smap->GetArray (), smap->Length ());
     ResizeMap (old_map, oldw, oldh, smap->GetArray (), lwidth, lheight);
     delete[] old_map;
     smap = smap->next;

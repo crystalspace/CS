@@ -20,7 +20,7 @@
 #define __CS_BEZIER_LIGHTMAP_H__
 
 #include "csutil/scf.h"
-#include "csutil/sarray.h"
+#include "csutil/garray.h"
 #include "csgfx/rgbpixel.h"
 #include "imesh/thing/lightmap.h"
 
@@ -35,8 +35,8 @@ struct iCacheManager;
 struct iFile;
 struct iEngine;
 
-CS_DECLARE_STATIC_ARRAY (csRGBMap, csRGBpixel);
-CS_DECLARE_STATIC_ARRAY (csCurveShadowMapHelper, unsigned char);
+typedef csGrowingArray<csRGBpixel> csRGBMap;
+typedef csGrowingArray<unsigned char> csCurveShadowMapHelper;
 
 /// Shadow map.
 class csCurveShadowMap : public csCurveShadowMapHelper
@@ -49,7 +49,6 @@ public:
   csCurveShadowMap ();
   virtual ~csCurveShadowMap ();
   void Alloc (iLight *l, int w, int h);
-  void Copy (const csCurveShadowMap *other);
   void CalcMaxShadow();
 };
 
@@ -178,9 +177,6 @@ public:
    * r,g,b is the ambient light color used to initialize the lightmap.
    */
   void Alloc (int w, int h, int r, int g, int b);
-
-  /// Copy a lightmap.
-  void CopyLightMap (csCurveLightMap* source);
 
   /**
    * Create a ShadowMap for this LightMap.

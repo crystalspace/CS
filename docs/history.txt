@@ -12,6 +12,10 @@ chronological order.
           all the makedep warnings.
         - Philip Wyett removed caltocs due to lack of general support
           and maintenance.
+	- Jorrit added csGrowingArray::TransferTo().
+	- Jorrit removed all usages of csStaticArray (only in thing and
+	  bezier meshes). Instead they are now using csGrowingArray.
+	  Also removed the actual csStaticArray class.
 	- Keith Fulton enabled new feature in sprcal3d.  It now keeps the
 	  iMaterialWrapper for each submesh in the model's calCoreMaterialId
 	  member.  cal3d never uses these values, so it is ok.  This enables

@@ -20,7 +20,7 @@
 #define __CS_LIGHTMAP_H__
 
 #include "csutil/scf.h"
-#include "csutil/sarray.h"
+#include "csutil/garray.h"
 #include "csgfx/rgbpixel.h"
 #include "imesh/thing/lightmap.h"
 
@@ -34,8 +34,8 @@ struct iCacheManager;
 struct iFile;
 struct iEngine;
 
-CS_DECLARE_STATIC_ARRAY (csRGBMap, csRGBpixel);
-CS_DECLARE_STATIC_ARRAY (csShadowMapHelper, unsigned char);
+typedef csGrowingArray<csRGBpixel> csRGBMap;
+typedef csGrowingArray<unsigned char> csShadowMapHelper;
 
 /// Shadow map.
 class csShadowMap : public csShadowMapHelper
@@ -48,7 +48,6 @@ public:
   csShadowMap ();
   virtual ~csShadowMap ();
   void Alloc (iLight *l, int w, int h);
-  void Copy (const csShadowMap *other);
   void CalcMaxShadow();
 };
 

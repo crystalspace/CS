@@ -113,6 +113,25 @@ public:
       SetLimit (newlimit);
   }
 
+  /**
+   * Transfer the entire contents of one array to the other. The end
+   * result will be that this array will be completely empty and the
+   * other array will have all items that originally were in this array.
+   * This operation is very efficient.
+   */
+  void TransferTo (csGrowingArray& destination)
+  {
+    if (&destination == this) return;
+    destination.DeleteAll ();
+    destination.root = root;
+    destination.count = count;
+    destination.limit = limit;
+    destination.threshold = threshold;
+    destination.shrinklimit = shrinklimit;
+    root = 0;
+    limit = count = 0;
+  }
+
   /// Query vector length.
   int Length () const
   {

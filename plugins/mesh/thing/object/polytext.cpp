@@ -785,7 +785,7 @@ b:
             l1 = QRound (color.red * brightness);
             if (l1)
             {
-              CS_ASSERT (uv >= 0 && uv < remap.GetSize ());
+              CS_ASSERT (uv >= 0 && uv < remap.Length ());
               l1 += map[uv].red;
               if (l1 > 255) l1 = 255;
               map[uv].red = l1;
@@ -797,7 +797,7 @@ b:
             l2 = QRound (color.green * brightness);
             if (l2)
             {
-              CS_ASSERT (uv >= 0 && uv < remap.GetSize ());
+              CS_ASSERT (uv >= 0 && uv < remap.Length ());
               l2 += map[uv].green;
               if (l2 > 255) l2 = 255;
               map[uv].green = l2;
@@ -809,7 +809,7 @@ b:
             l3 = QRound (color.blue * brightness);
             if (l3)
             {
-              CS_ASSERT (uv >= 0 && uv < remap.GetSize ());
+              CS_ASSERT (uv >= 0 && uv < remap.Length ());
               l3 += map[uv].blue;
               if (l3 > 255) l3 = 255;
               map[uv].blue = l3;

@@ -46,21 +46,14 @@ void csShadowMap::Alloc (iLight *l, int w, int h)
 
   int lw = csLightMap::CalcLightMapWidth (w);
   int lh = csLightMap::CalcLightMapHeight (h);
-  csShadowMapHelper::Alloc (lw * lh);
-  memset (GetArray (), 0, GetSize ());
-}
-
-void csShadowMap::Copy (const csShadowMap *source)
-{
-  csShadowMapHelper::Copy (source);
-  Light = source->Light;
-  max_shadow = source->max_shadow;
+  csShadowMapHelper::SetLength (lw * lh);
+  memset (GetArray (), 0, Length ());
 }
 
 void csShadowMap::CalcMaxShadow()
 {
   max_shadow=0;
-  int len = GetSize();
+  int len = Length ();
   for (int i=0; i<len; i++)
       if (GetArray()[i] > max_shadow)
           max_shadow = GetArray()[i];
@@ -95,8 +88,8 @@ csLightMap::~csLightMap ()
     first_smap = smap;
   }
 
-  static_lm.Clear ();
-  real_lm.Clear ();
+  static_lm.DeleteAll ();
+  real_lm.DeleteAll ();
 }
 
 void csLightMap::SetLightCellSize (int size)
@@ -160,20 +153,19 @@ void csLightMap::SetSize (int w, int h)
 void csLightMap::Alloc (int w, int h, int r, int g, int b)
 {
   SetSize (w, h);
-  static_lm.Clear ();
-  real_lm.Clear ();
+  static_lm.DeleteAll ();
+  real_lm.DeleteAll ();
 
-  static_lm.Alloc (lm_size);
-  real_lm.Alloc (lm_size);
+  static_lm.SetLength (lm_size);
+  real_lm.SetLength (lm_size);
 
-  csRGBpixel *map = static_lm.GetArray ();
   csRGBpixel def (r, g, b);
 
   // don't know why, but the previous implementation did this:
   def.alpha = 128;
 
   int i;
-  for (i = 0; i < lm_size; i++) map[i] = def;
+  for (i = 0; i < lm_size; i++) static_lm[i] = def;
 }
 
 struct PolySave
@@ -310,8 +302,8 @@ const char* csLightMap::ReadFromCache (
   //-------------------------------
   // The cached item is valid.
   //-------------------------------
-  static_lm.Clear ();
-  static_lm.Alloc (lm_size);
+  static_lm.DeleteAll ();
+  static_lm.SetLength (lm_size);
 
   int n = lm_size;
   char *lm_ptr = (char*)static_lm.GetArray ();
@@ -711,13 +703,13 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
 
   // Move the old data to o_stat and o_real.
   csRGBMap o_stat, o_real;
-  o_stat.TakeOver (&static_lm);
-  o_real.TakeOver (&real_lm);
+  static_lm.TransferTo (o_stat);
+  real_lm.TransferTo (o_real);
 
   lm_size = lwidth * lheight;
 
   // Allocate new data and transform old to new.
-  static_lm.Alloc (lm_size);
+  static_lm.SetLength (lm_size);
   ResizeMap2 (
     o_stat.GetArray (),
     oldw,
@@ -726,7 +718,7 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
     lwidth,
     lheight);
 
-  real_lm.Alloc (lm_size);
+  real_lm.SetLength (lm_size);
   ResizeMap2 (
     o_real.GetArray (),
     oldw,
@@ -739,8 +731,8 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   csShadowMap *smap = first_smap;
   while (smap)
   {
-    unsigned char *old_map = smap->GetArray ();
-    smap->TakeOver (new unsigned char[lm_size], smap->GetSize (), false);
+    unsigned char *old_map = new unsigned char[smap->Length ()];
+    memcpy (old_map, smap->GetArray (), smap->Length ());
     ResizeMap (old_map, oldw, oldh, smap->GetArray (), lwidth, lheight);
     delete[] old_map;
     smap = smap->next;
