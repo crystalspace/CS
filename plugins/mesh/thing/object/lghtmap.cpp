@@ -256,19 +256,18 @@ const char* csLightMap::ReadFromCache (
   SetSize (w, h);
 
   strcpy (pswanted.header, LMMAGIC);
-
-  // Prep our pswanted data.
-  if (poly) {
-  	pswanted.x1 = float2short(poly->Vobj(0).x);
-  	pswanted.y1 = float2short(poly->Vobj(0).y);
-  	pswanted.z1 = float2short(poly->Vobj(0).z);
-  	pswanted.x2 = float2short(poly->Vobj(1).x);
-  	pswanted.y2 = float2short(poly->Vobj(1).y);
-  	pswanted.z2 = float2short(poly->Vobj(1).z);
+  if (poly)
+  {
+    pswanted.x1 = convert_endian (float2short (poly->Vobj (0).x));
+    pswanted.y1 = convert_endian (float2short (poly->Vobj (0).y));
+    pswanted.z1 = convert_endian (float2short (poly->Vobj (0).z));
+    pswanted.x2 = convert_endian (float2short (poly->Vobj (1).x));
+    pswanted.y2 = convert_endian (float2short (poly->Vobj (1).y));
+    pswanted.z2 = convert_endian (float2short (poly->Vobj (1).z));
   }
 
-  pswanted.lm_size = lm_size;
-  pswanted.lm_cnt = 111;
+  pswanted.lm_size = convert_endian (lm_size);
+  pswanted.lm_cnt = convert_endian ((int32) 111);
 
   char type[5];
   if (file->Read (type, 4) != 4)
@@ -279,16 +278,6 @@ const char* csLightMap::ReadFromCache (
 
   if (file->Read ((char*)&ps, sizeof (ps)) != sizeof (ps))
     return "File too short while reading lightmap info header!";
-
-  // Endian-convert the file header.
-  ps.x1 = convert_endian(ps.x1);
-  ps.y1 = convert_endian(ps.y1);
-  ps.z1 = convert_endian(ps.z1);
-  ps.x2 = convert_endian(ps.x2);
-  ps.y2 = convert_endian(ps.y2);
-  ps.z2 = convert_endian(ps.z2);
-  ps.lm_size = convert_endian(ps.lm_size);
-  ps.lm_cnt = convert_endian(ps.lm_cnt);
 
   //-------------------------------
   // From this point on we will try to skip the wrong lightmap
@@ -470,6 +459,7 @@ void csLightMap::Cache (
     return;
 
   ps.lm_size = convert_endian (lm_size);
+  ps.lm_cnt = 0;
   ps.lm_cnt = 111;          // Dummy!
   ps.lm_cnt = convert_endian (ps.lm_cnt);
 
@@ -513,8 +503,7 @@ void csLightMap::Cache (
 
     // unsigned long == ls.light_id.
     uint32 size = lh.dyn_cnt * (sizeof (LightSave) + lm_size);
-    uint32 s = convert_endian(size);
-    file->Write ((char*)&s, sizeof (s));
+    file->Write ((char*)&size, sizeof (size));
 
     while (smap)
     {
