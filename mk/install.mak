@@ -273,6 +273,13 @@ install_all: \
   install_scripts \
   install_root \
   install_logfile
+	@echo $"$"
+	@echo $"Calculating Lightmaps...$"
+	@echo $"------------------------$"
+	CRYSTAL=$"$(INSTALL_DIR)$" && \
+	    $(INSTALL_DIR)/bin/cslight -video=null flarge ; \
+	    $(INSTALL_DIR)/bin/cslight -video=null partsys
+	@echo $"$"
 	@echo $"Installation complete$"
 	@echo $"---------------------$"
 	@echo $"Now set up the following definition in your environment to$"
