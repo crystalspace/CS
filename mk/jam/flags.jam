@@ -17,15 +17,16 @@ rule LinkWith
   # we do not destroy the overall library ordering since Unix linkers are
   # order-sensitive.
   libs = [ Reverse [ RemoveDups [ Reverse $(libs) ] ] ] ;
+  if $($(<)_TYPE) = library
+  {
+    LibDepends $(<) : $(libs) ;
+  }                           
+  
   libs = lib$(libs)$(SUFLIB) ;
       
   DEPENDS $($(<)_TARGET) : $(libs) ;
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;
 
-  if $($(<)_TYPE) = library
-  {
-    LibDepends $(<) : $(>) ;   
-  }
   if $($(<)_TYPE) = plugin
   {
     $(<)_static.NEEDLIBS += $(>) ;
