@@ -51,7 +51,7 @@ void csStaticArray::ReAlloc (int s)
   void *OldMap = Map;
   Map = AllocateArray (s);
   CopyArray (Map, OldMap, s>Size ? Size : s);
-  delete[] OldMap;
+  DeleteArray (OldMap);
   Size = s;
 }
 

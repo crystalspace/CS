@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine implemented iNativeWindow::SetTitle() in NeXTDriver2D.
 	- Eric Sunshine eliminated the now unnecessary inclusion of
 	  cssys/system.h from cssys/general/printf.cpp.
+	- Eric Sunshine fixed a bug in csStaticArray::ReAlloc() where it was
+	  applying delete[] to a void pointer, which is an illegal operation.
 27-Jul-2001
 	- Removed csSystemDriver::Warn() and Alert().
 	- Removed the console pointer in csSystemDriver.
