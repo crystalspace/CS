@@ -125,6 +125,10 @@ struct iConfigFileNew : public iBase
   virtual bool SetComment (const char *Key, const char *Text) = 0;
   /// Delete a key and its value and comment.
   virtual void DeleteKey(const char *Key) = 0;
+  /// return the final comment at the end of the configuration file
+  virtual const char *GetEOFComment() const = 0;
+  /// set the final comment at the end of the configuration file
+  virtual void SetEOFComment(const char *Text) = 0;
 };
 
 

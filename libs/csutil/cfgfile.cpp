@@ -369,6 +369,7 @@ csConfigFile::csConfigFile(const char *file, iVFS *vfs)
   Filename = NULL;
   VFS = NULL;
   Dirty = false;
+  EOFComment = NULL;
 
   if (file)
     Load(file, vfs);
@@ -480,6 +481,28 @@ bool csConfigFile::Save(const char *file, iVFS *vfs)
   return SaveNow(file, vfs);
 }
 
+void WriteComment(csString &Filedata, const char *s)
+{
+  if (s != 0)
+  {
+    for (const char* b = strchr(s,'\n'); b != NULL; b = strchr(s,'\n'))
+    {
+      if (*s != '\n' && *s != ';') // Prepend comment character if absent.
+        Filedata << "; ";
+      Filedata.Append(s, b - s + 1);
+      s = b + 1;
+    }
+    if (*s)
+    {
+      if (*s != ';')
+        Filedata << "; ";
+      Filedata << s;
+    }
+    if (!Filedata.IsEmpty() && Filedata.GetAt(Filedata.Length()-1) != '\n')
+      Filedata << '\n';
+  }
+}
+
 bool csConfigFile::SaveNow(const char *file, iVFS *vfs) const
 {
   // @@@ handle different newline codes on different systems
@@ -493,29 +516,13 @@ bool csConfigFile::SaveNow(const char *file, iVFS *vfs) const
     if (n->GetName() == NULL) continue;
 
     // write comment
-    const char* s = n->GetComment();
-    if (s != 0)
-    {
-      for (const char* b = strchr(s,'\n'); b != NULL; b = strchr(s,'\n'))
-      {
-        if (*s != '\n' && *s != ';') // Prepend comment character if absent.
-          Filedata << "; ";
-        Filedata.Append(s, b - s + 1);
-        s = b + 1;
-      }
-      if (*s)
-      {
-        if (*s != ';')
-          Filedata << "; ";
-        Filedata << s;
-      }
-      if (!Filedata.IsEmpty() && Filedata.GetAt(Filedata.Length()-1) != '\n')
-        Filedata << '\n';
-    }
+    WriteComment(Filedata, n->GetComment());
 
     // write key line
     Filedata << n->GetName() << " = " << n->GetStr() << '\n';
   }
+  // write end-of-file comment
+  WriteComment(Filedata, EOFComment);
 
   if (vfs)
   {
@@ -541,6 +548,7 @@ void csConfigFile::Clear()
     csConfigIterator *it = (csConfigIterator*)Iterators->Get(i);
     it->Rewind();
   }
+  if (EOFComment) delete[] EOFComment;
   Dirty = true;
 }
 
@@ -740,6 +748,8 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
       Dirty = true;
     }
   }
+  if (!CurrentComment.IsEmpty())
+    SetEOFComment(CurrentComment);
 }
 
 csConfigNode *csConfigFile::FindNode(const char *Name, bool isSubsection) const
@@ -774,4 +784,16 @@ void csConfigFile::RemoveIterator(csConfigIterator *it) const
   int n = Iterators->Find(it);
   CS_ASSERT(n != -1);
   Iterators->Delete(n);
+}
+
+void csConfigFile::SetEOFComment(const char *text)
+{
+  if (EOFComment) delete[] EOFComment;
+  if (text) EOFComment = strnew(text);
+  else EOFComment = NULL;
+}
+
+const char *csConfigFile::GetEOFComment() const
+{
+  return EOFComment;
 }

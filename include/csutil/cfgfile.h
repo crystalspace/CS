@@ -131,6 +131,10 @@ public:
   virtual bool SetComment (const char *Key, const char *Text);
   /// Delete a key and its comment.
   virtual void DeleteKey(const char *Key);
+  /// set the final comment at the end of the configuration file
+  virtual void SetEOFComment(const char *Text);
+  /// return the final comment at the end of the configuration file
+  virtual const char *GetEOFComment() const;
 
 private:
   friend class csConfigIterator;
@@ -150,6 +154,8 @@ private:
   // are the current contents of this object different from the contents
   // stored in the config file?
   bool Dirty;
+  // final comment at the end of the configuration file
+  char *EOFComment;
 
   // load the configuration from a data buffer and add it to the current
   // configuration. This may modify the contents of the file buffer but
