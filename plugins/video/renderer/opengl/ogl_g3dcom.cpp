@@ -7186,7 +7186,6 @@ bool csGraphics3DOGLCommon::Validate (iEffectTechnique* technique)
     iEffectPass* pass = technique->GetPass(p);
     csStringID pass_state = pass->GetFirstState();
     csStringID pass_statestring;
-		csStringID string;
 
     while(pass_state != csInvalidStringID )
     {
