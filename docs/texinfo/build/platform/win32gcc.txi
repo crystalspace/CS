@@ -77,7 +77,7 @@ Reboot your computer.
 
 @subsubheading Building
 
-From within the Crystal Space directory (@file{CS/}), run the @samp{make}
+From within the Crystal Space directory (@file{CS\}), run the @samp{make}
 command and follow the instructions.  Typically, you would issue the following
 commands:
 
@@ -97,7 +97,7 @@ make -k clean all
 @subsubheading Customizing
 
 You may need to customize settings in @file{CS\libs\cssys\win32\win32gcc.mak},
-the Minw32 makefile.  Check the the following variables:
+the Mingw32 makefile.  Check the the following variables:
 
 @itemize @bullet
 @item
