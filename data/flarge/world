@@ -42,10 +42,10 @@ WORLD (
     MATERIAL 'misty' (TEXTURE ('misty.gif'))
   )
   RENDERPRIORITIES (
-    PRIORITY 'sky' (1)
-    PRIORITY 'wall' (2)
-    PRIORITY 'object' (3)
-    PRIORITY 'alpha' (4)
+    PRIORITY 'sky' (1,NONE)
+    PRIORITY 'wall' (2,NONE)
+    PRIORITY 'object' (3,NONE)
+    PRIORITY 'alpha' (4,BACK2FRONT)
   )
   PLUGINS (
     PLUGIN 'thing' ('crystalspace.mesh.loader.thing')
@@ -2277,6 +2277,8 @@ WORLD (
         OPENING (.2)
         MIXMODE (ADD ())
       )
+      ZTEST ()
+      PRIORITY ('alpha')
       MOVE (V (-10,-1,14))
     )
     LIGHT (3.5,2,12.5:5,.7,.7,.8, 0)
@@ -5497,6 +5499,8 @@ WORLD (
 	COLOR (.25,.25,.25)
       )
       MOVE (V (0,0,0))
+      ZTEST ()
+      PRIORITY ('alpha')
     )
     MESHOBJ 'tunnel_1' (
       PLUGIN ('thing')
