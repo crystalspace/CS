@@ -140,7 +140,7 @@ void csEmitSphere::GetValue(csVector3& value, csVector3 & /*given*/)
   // is the dist*dist(*pi..) in size. Taking random min..max will
   // cause an uneven spread of points in the sphere.
   float sqdist = GetRandomFloat( min*min*min, max*max*max );
-  float dist = pow(sqdist, 1./3.);
+  float dist = pow(sqdist, (float)(1./3.));
   value.Set(dist, 0, 0);
   float rotz_open = 2.0 * PI * (rand() / (1.0+RAND_MAX));
   csZRotMatrix3 openrot(rotz_open);
