@@ -1,20 +1,7 @@
 @c -*-texinfo-*-
-@node MSVC6, MINGW, MSVC5, Windows
-@subsection Microsoft Visual C++ 6
+@node MSVC6, MSVC5, MSVC, MSVC
+@subsubsection Microsoft Visual C++ 6
 @cindex Windows, Building
-
-@menu
-* MSVC6 Intro:: Introduction
-* MSVC6 Required:: Required/Optional External Libraries and Software
-* MSVC6 Compile:: Compiling Crystal Space
-* MSVC6 Rundemo:: Running the Demonstration Applications
-* MSVC6 Workspace:: Structure of the Workspace
-* MSVC6 User App:: Compiling Your Own Program Using Crystal Space
-* MSVC6 FAQ:: Frequently Asked Questions (@sc{faq})
-@end menu
-
-@node MSVC6 Intro, MSVC6 Required, MSVC6, MSVC6
-@subsubsection Introduction
 
 In order to successfully compile the Crystal Space 3D Software Development
 Kit (@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio 6}
@@ -33,8 +20,7 @@ Alternatively you can email the Win32 port maintainer directly at the following:
 
 @email{philipwyett@@dsl.pipex.com}.
 
-@node MSVC6 Required, MSVC6 Compile, MSVC6 Intro, MSVC6
-@subsubsection Required/Optional External Libraries and Software
+@subsubheading Required/Optional External Libraries and Software
 
 All the following libraries and Software Development Kits (@sc{sdk}) unless
 stated are not required.  However, if you choose not to install them, at
@@ -44,16 +30,16 @@ projects from the Crystal Space build process.
 @subsubheading Winlibs - Required
 
 Before you attempt to compile Crystal Space, you must download
-and install @emph{winlibs}.  Winlibs is a package containing all
+and install @file{winlibs}.  Winlibs is a package containing all
 third party header, pre-built library and dll files used by Crystal
-Space, i.e. @samp{zlib.dll}, @samp{libjpeg.dll}, @samp{png.dll} and
-@samp{xmlparse.dll}.  The latest version of the winlibs package
-@samp{winlibs0.19c.zip} can be downloaded from:
+Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
+@file{xmlparse.dll}.  The latest version of the winlibs package
+@file{winlibs0.19c.zip} can be downloaded from:
 
 @noindent
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19c.zip}
 
-Once you have downloaded the winlbs package, extract it too your @samp{CS\}
+Once you have downloaded the winlbs package, extract it too your @file{CS\}
 root directory.
 
 @subsubheading OpenGL
@@ -118,16 +104,16 @@ Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
 can be used as an alternative to the default Direct Draw canvas for use with
 the Crystal Space software 3D renderer.  To compile the SDL2D canvas you must
 have the supported 1.2.1 development runtime for your version of @sc{msvc} be
-it 5 or 6.  Please remeber to add the @emph{indlude} and @emph{lib} directories
+it 5 or 6.  Please remeber to add the @file{indlude} and @file{lib} directories
 to the global MSVC options, so @sc{msvc} can see them.
 
 @uref{http://www.libsdl.org}
 
-Also remember to copy the @emph{SDL.dll} into the @emph{CS\} root directory
+Also remember to copy the @file{sdl.dll} into the @file{CS\} root directory
 or at it to your systems path before using the SDL2D canvas.
 
 For instructon on using a specific canvas including
-the @emph{sdl2d} canvas @ref{Common Command Line Options}
+the @sc{sdl2d} canvas @ref{Common Command Line Options}
 
 @subsubheading Python
 
@@ -150,8 +136,7 @@ want to use DirectX (DDRAW/D3D) for graphics or have Python scripting support,
 then you don't have to compile it.  See the compilation instructions on how to
 remove the projects.
 
-@node MSVC6 Compile, MSVC6 Rundemo, MSVC6 Required, MSVC6
-@subsubsection Compiling Crystal Space
+@subsubheading Compiling Crystal Space
 
 To compile Crystal Space, you'll have to perform the following steps.  If
 anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC6 FAQ}.
@@ -169,7 +154,7 @@ the Python @sc{sdk} installed.
 
 @item
 Make @samp{grpall} your active project.  This is done by right clicking on it
-and then clicking on @samp{Set as Active Project}.
+and then clicking on @emph{Set as Active Project}.
 
 @item
 From the file menu selct @emph{Build->Rebuild All} or alernatively hit your
@@ -187,8 +172,7 @@ grpall.lib - 0 error(s), 0 warning(s)
 @end example
 @end enumerate
 
-@node MSVC6 Rundemo, MSVC6 Workspace, MSVC6 Compile, MSVC6
-@subsubsection Running the Demonstration Applications
+@subsubheading Running the Demonstration Applications
 
 The first app you should try is Walktest.  This program shows many of the
 features of the 3D engine.  You can run it by starting it from the windows
@@ -198,7 +182,7 @@ if you do.
 
 If you want to run a debug session, you first have to set the working
 directory.  Open @emph{Project/Settings}, select the appWalktest project,
-switch to the @emph{Debug} tab and enter the base @file{CS} directory as the
+switch to the @emph{Debug} tab and enter the base @file{CS\} directory as the
 working directory for debug sessions (for example, @file{C:\CS\}).  Be sure to
 to this for @emph{Debug} and @emph{Release} builds.
 
@@ -206,8 +190,7 @@ You can now continue with the next platform-independent step.  The remaining
 Windows-specific sections are only important when you want to compile your own
 application using Crystal Space.
 
-@node MSVC6 Workspace, MSVC6 User App, MSVC6 Rundemo, MSVC6
-@subsubsection Structure of the Workspace
+@subsubheading Structure of the Workspace
 
 @emph{Note}: If you find bugs in the @sc{msvc} project or workspace files
 coming with Crystal Space, don't send fixes for these files to the developers.
@@ -242,8 +225,7 @@ section of this manual dealing with plug-in modules.  @xref{Plug-In Drivers}.
 The @emph{Applications} are programs using some of these libraries, so they
 produce @file{.exe} files.
 
-@node MSVC6 User App, MSVC6 FAQ, MSVC6 Workspace, MSVC6
-@subsubsection Compiling Your Own Program Using Crystal Space
+@subsubheading Compiling Your Own Program Using Crystal Space
 
 It is assumed that you have set up @sc{msvc} projects before.  If you want to
 create a project using Crystal Space, you have two possibilities how to do
@@ -254,7 +236,7 @@ following steps.
 
 @itemize @bullet
 @item
-Set the output path to the @file{CS} root directory.  Any Crystal Space
+Set the output path to the @file{CS\} root directory.  Any Crystal Space
 application must be executed in this directory.  If you want to run it in
 another directory, you must copy the files @file{scf.cfg} and @file{vfs.cfg},
 the data directory and all plugins (@file{.dll}) into this new directory, or
@@ -262,7 +244,7 @@ set the CRYSTAL environment variable to your Crystal Space directory.
 
 @item
 Set the include paths.  Simply open one of the application projects coming with
-Crystal Space, for example @samp{Walktest}, select
+Crystal Space, for example WalkTest, select
 @emph{Project Settings/C/C++} and copy all command line options that look like
 this: @samp{/I "../../anything"}.
 
@@ -282,8 +264,8 @@ They can be added just like the Crystal Space libraries, except that you can
 not use project dependencies.
 @end itemize
 
-@node MSVC6 FAQ, , MSVC6 User App, MSVC6
-@subsubsection Frequently Asked Questions (@sc{faq})
+@subsubheading Frequently Asked Questions (@sc{faq})
+@anchor{MSVC6 FAQ}
 
 This is the list of frequently asked questions for the Win32 port of Crsytal
 Space.  Please consult this list if you are having difficulty building or using

@@ -39,6 +39,10 @@ a single @sc{ids} sub-object, the second function does the same for sprites,
 and the third one creates a hierarchy of sprites from all objects in an
 @sc{ids}.
 
+@menu
+* Model Data Structure:: Common Model Data Structure (@code{iModelData})
+@end menu
+
 @node Model Data Structure, , Model Conversion, Model Conversion
 @subsection Common Model Data Structure (@code{iModelData})
 @cindex @code{iModelData}
@@ -53,8 +57,8 @@ This is the main object. It contains any number of @dfn{objects},
 @dfn{light sources}, @dfn{cameras}, @dfn{materials} and @dfn{textures}.
 
 @item Texture
-An image, which can be stored as a file name, an @code{iImage} or an
-@code{iTextureWrapper}.
+An image, which can be stored as an @code{iImage}, an @code{iTextureWrapper},
+or a filename.
 
 @item Material
 A material, which can be stored as an @code{iMaterial} or an

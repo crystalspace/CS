@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MacOS/9, OS2, NeXT, Windows
+@node MacOS/9, OS2, NeXT, Platform Instructions
 @subsection MacOS/9
 @cindex MacOS/9
 

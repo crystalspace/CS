@@ -1,16 +1,18 @@
 @c -*-texinfo-*-
-@node MSVC, MSVC5, Windows, Windows
-@subsection Microsoft Visual C++ 
+@node MSVC, MingW, Unix, Platform Instructions
+@subsection Windows using Microsoft Visual C++ 
 @cindex Windows, Building
 
 Crystal Space currently supports compilation primarily with
-Microsoft Visual C++ 6. However, CS has been compiled fairly
+Microsoft Visual C++ 6. However, Crystal Space has been compiled fairly
 successfully with vesrion 5. Please select the link to the
-version you wish to compile CS with for info, compile
-instructions and FAQ.
+version you wish to compile Crystal Space with for info, compile
+instructions and @sc{faq}.
 
 @menu
+* MSVC6:: Microsoft Visual C++ 6
+* MSVC5:: Microsoft Visual C++ 5
 @end menu
 
-@importssss{build,platform,win32,msvc,msvc5.txi}
 @importssss{build,platform,win32,msvc,msvc6.txi}
+@importssss{build,platform,win32,msvc,msvc5.txi}

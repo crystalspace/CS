@@ -222,7 +222,7 @@ to a new @sc{scf} system.
 He also rewrote the @file{csfgen} application.
 @item
 He contributed to the engine, the level loader, the event system and various
-other parts of CS.
+other parts of Crystal Space.
 @item
 He wrote a nice memory debugger.
 @end itemize
@@ -517,21 +517,29 @@ more extensive than this tiny entry implies. His contributions include:
 @item
 Eric ported Crystal Space to MacOS/X, MacOS/X Server, OpenStep 4.2, and
 NextStep 3.3!
+
 @item
 He has also fixed numerous bugs and problems throughout the system and has
-provided a number of updates to the makefile system. He did a lot of work in
-cleaning up the CS source code and the makefile structure.
+provided a number of significant updates to the makefile system.  He did a lot
+of work in cleaning up the Crystal Space source code and the makefile
+structure.
+
 @item
 He added an automated rebuild process for the Windows/@sc{msvc} project files.
-The nessecary information is taken from the @sc{gnu} makefiles.
+This process gleans nessecary information from the @sc{gnu} makefiles
+throughout the project in order to entirely eliminate manual maintenance of
+these files.
+
 @item
 He added automated generation of @sc{cvs} ``snapshots''. They are packages
 (archive files) containing the complete @sc{cvs} tree. Also, log files and
-@file{diff} files are generated. Eric also set up automatic notification of
-all changes to @email{crystal-cvs@lists.sourceforge.net}.
+@dfn{diff} files are generated. Eric also set up automatic notification of
+all changes to @email{crystal-cvs@@lists.sourceforge.net}.
+
 @item
 Eric designed most of the current configuration system (for example the
 idea of a configuration manager) and helped a lot with the implementation.
+
 @item
 Additionally, he fixed the long standing problem with the console blanking
 out all but the most recently printed line of text which occurs on ports such
@@ -539,6 +547,7 @@ as Windows, MacOS/X Server, OpenStep, and NextStep. As part of this patch he
 replaced the ill-conceived progress meter code in the lighting routines with
 very localized and simple classes. He repaired the broken console in MazeD,
 so that it is once again functional.
+
 @item
 On the documentation front, Eric took on the task of acting as master editor
 of the Crystal Space documentation.  As part of this job, he has written much
@@ -551,16 +560,21 @@ easily and automatically on all supported platforms. He set up the automated
 source and conversion texinfo to various other formats. He fixed lots of bugs
 in the @sc{html} conversion script, @file{texi2html}. He has also pored
 through the documentation and updated many out of date references.
+
 @item
 Eric rewrote and re-engineered the BeOS port of Crystal Space almost entirely
 from scratch with the result that it is now about 98% functional as compared
 to being only about 15% functional before his effort.
+
 @item
 Eric re-engineered Crystal Space's network driver architecture and completely
 rewrote the network drivers from scratch.  The new architecture is far more
 robust, generalized, and usable than the old.
+
 @item
-Together with Jorrit he wroked on the decomposition of the system driver.
+Eric, a long time opponent of the monolithic @emph{system driver} concept,
+designed the modular and flexible replacement infrastructure which he and
+others then proceeded to implement.
 @end itemize
 
 @item
@@ -839,8 +853,8 @@ and also allow shadows.
 @item
 Bob Ham (@email{node@@users.sourceforge.net})
 
-Bob submitted the Makefile changes need to compile on @sc{gnu}/Hurd.  He proof-
-read much of this manual.  He also started working on a level editor for
+Bob submitted the Makefile changes need to compile on @sc{gnu}/Hurd.  He
+proof-read much of this manual.  He also started working on a level editor for
 Crystal Space but ceased work on it:
 
 @uref{http://sourceforge.net/projects/ticle/}
@@ -865,7 +879,7 @@ the ports. He also creates installable packets for Windows from time to time
 and helps with maintenance in general.
 
 @item
-Justin Miller (@email{dyad@fuse.net})
+Justin Miller (@email{dyad@@fuse.net})
 
 Justin added @code{csString::Format()}. He also contributed to the
 documentation and sent a few fixes.
@@ -873,8 +887,8 @@ documentation and sent a few fixes.
 @item
 Luca Pancallo
 
-Luca extended the @sc{ase} importer in impexp and added a CS sprite exporter.
-He also sent a patch for @file{mdl2spr}.
+Luca extended the @sc{ase} importer in impexp and added a Crystal Space sprite
+exporter.  He also sent a patch for @file{mdl2spr}.
 
 @item
 Mike Bond (@email{mbond@@cox.rr.com})
@@ -917,7 +931,7 @@ Jerry A. Segler Jr
 Jerry added theme support to @sc{csws}.
 
 @item
-Roland Reckel (@email{luxx@yahoo.com})
+Roland Reckel (@email{luxx@@yahoo.com})
 
 Roland contributed a simple terrain engine.
 
@@ -931,7 +945,7 @@ a mesh object plugin and added a blobby texture for them. He wrote the
 motion manager and contributed a shuttle model for ``csdemo''. 
 
 @item
-Sebastian Duell (@email{wastel7@gmx.de})
+Sebastian Duell (@email{wastel7@@gmx.de})
 
 Sebastian contributed a Blender export script.
 
@@ -956,32 +970,51 @@ engine to a plug-in.
 @item
 Dan Bogdanov
 
-Dan became port maintainer for @sc{dos} recently.
-
-@item
-The following people have contributed to the project by minor patches or by
-their suggestions and ideas: Duane McDonnel, Ryan J. Evans,
-Jaroslav Benkovsky (@email{benkovsk@@www.pvtnet.cz}), Sebestyen Zoltan
-(@email{szoli@@valerie.inf.elte.hu}),  @email{wormzstudios@@iname.com},
-Frederick A. Niles, Branimir Karadzic, Jason McKnight, Michael Robellard
-(@email{miker@@vetechno.com}), Charles Duffy (@email{cduffy@@bigfoot.com}),
-Walt Armour (@email{walt@@armour.cx}), David Fox, Donald Ryan Willhoit
-(@email{willhoit@mail1.andrew.cmu.edu}), @email{simonb@telisphere.com},
-Artur Biesiadowski (@email{abies@pg.gda.pl}), Jason Platt, Furqan Ullah
-(@email{furqan@@writeme.com}), @email{garrett@@memesis.org}, Thomthee Besset
-(@email{Besset@sugar-land.dowell.slb.com}), Adam Bailey, Jonathan Hudson
-(@email{nathanoj@realmail.2ndmail.com}), Ed Halley, Denis Oliver Kropp
-(@email{dok@@master.fischlustig.de}), Terrence Stewart, Paul Snively
-(@email{psnively@@earthlink.net}), Jan Dvorak (@email{johnydog@go.cz}),
-Paulo Candido, Jonathon Doran (@email{jon.doran@nsc.com}), Harald Fielker
-(@email{fielker@@informatik.fh-augsburg.de}), Travis McLane
-(@email{tmclane@@swt.edu}), Matt Keith (@email{keith@@www.keithcom.com}),
-Malcolm Peacock (@email{malcolm@@mpeacock.demon.co.uk}), E.Allen Soard
-(@email{esp@@espsw.net}), Gregory Austwick (@email{g.austwick@@virgin.net}),
-Alistair Leslie (@email{AlistairL@optushome.com.au}), Michael Knorr
-(@email{damage-list@@freenet.de}), Thiago Ramon.
+Dan recently became port maintainer for @sc{djgpp}.
 @end itemize
 
+@noindent
+The following people have contributed to the project by minor patches or by
+their suggestions and ideas:
+
+@noindent
+Adam Bailey@*
+Alistair Leslie (@email{AlistairL@@optushome.com.au})@*
+Artur Biesiadowski (@email{abies@@pg.gda.pl})@*
+Branimir Karadzic@*
+Charles Duffy (@email{cduffy@@bigfoot.com})@*
+David Fox@*
+Denis Oliver Kropp (@email{dok@@master.fischlustig.de})@*
+Donald Ryan Willhoit (@email{willhoit@@mail1.andrew.cmu.edu})@*
+Duane McDonnel@*
+E. Allen Soard (@email{esp@@espsw.net})@*
+Ed Halley@*
+Frederick A. Niles@*
+Furqan Ullah (@email{furqan@@writeme.com})@*
+Garrett (@email{garrett@@memesis.org})@*
+Gregory Austwick (@email{g.austwick@@virgin.net})@*
+Harald Fielker (@email{fielker@@informatik.fh-augsburg.de})@*
+Jan Dvorak (@email{johnydog@@go.cz})@*
+Jaroslav Benkovsky (@email{benkovsk@@www.pvtnet.cz})@*
+Jason McKnight@*
+Jason Platt@*
+Jonathan Hudson (@email{nathanoj@@realmail.2ndmail.com})@*
+Jonathon Doran (@email{jon.doran@@nsc.com})@*
+Malcolm Peacock (@email{malcolm@@mpeacock.demon.co.uk})@*
+Matt Keith (@email{keith@@www.keithcom.com})@*
+Michael Knorr (@email{damage-list@@freenet.de})@*
+Michael Robellard (@email{miker@@vetechno.com})@*
+Paul Snively (@email{psnively@@earthlink.net})@*
+Paulo Candido@*
+Ryan J. Evans@*
+Sebestyen Zoltan (@email{szoli@@valerie.inf.elte.hu})@*
+Simon B. (@email{simonb@@telisphere.com})@*
+Terrence Stewart@*
+Thiago Ramon
+Thomthee Besset (@email{Besset@@sugar-land.dowell.slb.com})@*
+Travis McLane (@email{tmclane@@swt.edu})@*
+Walt Armour (@email{walt@@armour.cx})@*
+Wormz Studios (@email{wormzstudios@@iname.com})
 
 Many thanks also for the people at @uref{http://www.grimmware.com, GrimmWare}
 for being the first to offer web space for Crystal Space.

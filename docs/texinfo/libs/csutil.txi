@@ -23,6 +23,10 @@ comments in the @sc{api} reference and the header files should also help.
 One exception should be made here for the @code{csObject} class. This class
 will be explained in the next section.
 
+@menu
+* csObject:: @code{csObject}
+@end menu
+
 @node csObject, , csUtil, csUtil
 @subsection @code{csObject}
 @cindex @code{csObject}

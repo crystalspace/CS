@@ -4,7 +4,7 @@
 @sc{b}e@sc{os}
 @end macro
 
-@node BeOS, MS-DOS, OS2, Windows
+@node BeOS, MS-DOS, OS2, Platform Instructions
 @subsection @sc{b}e@sc{os}
 @cindex @sc{b}e@sc{os}
 

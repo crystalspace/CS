@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Problems, Quick Start, Windows, Building
+@node Problems, Quick Start, Platform Instructions, Building
 @section Platform Specific Problems
 
 These problems are relevant for both compiling and running.  Crystal Space is

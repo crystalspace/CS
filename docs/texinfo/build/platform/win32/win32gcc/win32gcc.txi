@@ -1,13 +1,13 @@
 @c -*-texinfo-*-
-@node MINGW, NeXT, MSVC6, Windows
-@subsection CS MingW Free Compiler Package
+@node MingW, NeXT, MSVC, Platform Instructions
+@subsection Windows using MingW
 
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
 @emph{Last updated 26 June 2001}
 
-These instructions are for building Crystal Space with Mingw --- a @sc{gnu}
+These instructions are for building Crystal Space with Mingw---a @sc{gnu}
 compiler for Windows.  There are many different versions of the @sc{gnu}
 Windows compiler and problems arise with some Windows header files
 containing non-standard code used by Microsoft, so we recommend
@@ -27,7 +27,7 @@ releases (i.e. all the files necessary to compile Crystal Space successfully).
 @uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.50.exe}
 
 @item
-@sc{nasm} (Netwide Assembler) for Windows @samp{nasm-0.98e-bin-w32.zip}
+@sc{nasm} (Netwide Assembler) for Windows @file{nasm-0.98e-bin-w32.zip}
 
 @iftex
 @noindent

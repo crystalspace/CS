@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Unix, , Platform Instructions, Platform Instructions
+@node Unix, MSVC, Platform Instructions, Platform Instructions
 @subsection Unix
 @cindex Unix
 

@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+16-Aug-2001
+	- Eric Sunshine made the following changes to the Texinfo user's
+	  manual:
+	    - Repaired the seriously broken navigational structure which
+	      resulted from changes made to the Windows build instructions.
+	      The navigational links were so messed up that links for most
+	      other platforms actually appeared within the documentation for
+	      Windows.  It was very difficult to even locate information
+	      specific to a particular platform (other than Windows).
+	    - Repaired a lot of Texinfo mark-up errors which were recently
+	      introduced into the documentation; especially into portions of
+	      the Windows build instructions.  Also fixed a lot of email
+	      addresses in contrib.txi so that they correctly use `@@' rather
+	      than the bare `@'.
+	    - Added some missing @menu blocks, the absence of which made
+	      navigation difficult.
+	    - Eliminated all of the overfull and underfull `hbox' warnings
+	      reported by TeX.
 15-Aug-2001
 	- Philip Wyett removed the cslua plugin from the MSVC port.
 	- Christopher Nelson added awsdef.zip which is the binary resource
@@ -32,11 +50,11 @@ The history order is reversed so that new features are at the top.
 	       to be extended into the constant-ref so that they can be
 	       looked up.  I also need to extend options fields so that
 	       we can make lists of options like:
-			Window "My Window"
-			{
-                          ...
-                          FrameOptions: Control, Zoom, Minimize, Beveled
-			}
+		    Window "My Window"
+		    {
+		      ...
+		      FrameOptions: Control, Zoom, Minimize, Beveled
+		    }
 	- Philip Wyett fixed a missing variable "i" in for loop for
 	  awsmgr.cpp.
 	- Fixed a bug in the lighting code which prevented the falling
@@ -79,14 +97,14 @@ The history order is reversed so that new features are at the top.
 	    the outline for faster processing.
 13-Aug-2001
 	- Philip Wyett started the beginings of a optimization schedule.
-		- Loop optimization.
-		- Removed over-use and bad use of variables in some code.
-		- Altered some code code to use bitwise shifting for
-		  "if ( var == 1)" etc. testing. This is an optimization
-		  which eliminates assembler level CMP in speed critical
-		  code. Some may not like this and can be removed if it
-		  makes people un-comfortable.
-		- Did some altering of code to bring within CS coding style.
+	    - Loop optimization.
+	    - Removed over-use and bad use of variables in some code.
+	    - Altered some code code to use bitwise shifting for
+	      "if ( var == 1)" etc. testing. This is an optimization
+	      which eliminates assembler level CMP in speed critical
+	      code. Some may not like this and can be removed if it
+	      makes people un-comfortable.
+	    - Did some altering of code to bring within CS coding style.
 	  Work in progress. The benefits of changes can been seen in
 	  Windows port with faster apps starts (by-product), more efficient
 	  proc textures i.e. animation speed of certain elements improved.

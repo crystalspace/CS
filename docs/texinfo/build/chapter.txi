@@ -16,7 +16,6 @@ read the Quick Start section.  @xref{Quick Start}.
 * Requirements::
 * External Libraries::
 * Platform Instructions:: Platform Specific Instructions
-* Windows:: Windows (Win32)
 * Problems:: Platform Specific Problems
 * Quick Start::
 @end menu
