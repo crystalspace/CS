@@ -1,31 +1,27 @@
-# Makefile for Crystal Space Console Plugin
-# This is an auto-generated file.  Do not edit.
-
-ifneq (,$(findstring cscon,$(PLUGINS)))
 DESCRIPTION.cscon = Crystal Space Console Plugin
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-PLUGINHELP+=$(NEWLINE)echo $"  make cscon        Make the $(DESCRIPTION.cscon)$"
+PLUGINHELP += \
+  $(NEWLINE)echo $"  make cscon        Make the $(DESCRIPTION.cscon)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cscon csconclean csconclob
-csconclob: csconclean cscon
+.PHONY: cscon csconclean
 plugins all: cscon
-csconclean:
-	$(MAKE_CLEAN)
 cscon:
 	$(MAKE_TARGET) MAKE_DLL=yes
+csconclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-CFLAGS.CSCON+=
+CFLAGS.CSCON +=
 SRC.CSCON = $(wildcard plugins/cscon/*.cpp)
 OBJ.CSCON = $(addprefix $(OUT),$(notdir $(SRC.CSCON:.cpp=$O)))
 LIB.CSCON = $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
@@ -33,23 +29,20 @@ LIB.EXTERNAL.CSCON =
 DESCRIPTION.$(CSCON.EXE) = $(DESCRIPTION.cscon)
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-CSCON=$(OUTDLL)cscon$(DLL)
-DEP.CSCON=$(LIB.CSCON)
+  CSCON=$(OUTDLL)cscon$(DLL)
+  DEP.CSCON=$(LIB.CSCON)
 else
-CSCON=$(OUT)$(LIB_PREFIX)cscon$(LIB)
-DEP.EXE+=$(CSCON)
-CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSCON
+  CSCON=$(OUT)$(LIB_PREFIX)cscon$(LIB)
+  DEP.EXE+=$(CSCON)
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSCON
 endif
 
 endif # ifeq ($(MAKESECTION),postdefines)
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: cscon csconclean
 cscon: $(OUTDIRS) $(CSCON)
-
-#Begin User Defined
-#End User Defined
 
 $(OUT)%$O: plugins/cscon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.CSCON)
@@ -70,5 +63,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
-endif # ifneq (,$(findstring cscon,$(PLUGINS)))
