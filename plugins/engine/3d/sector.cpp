@@ -817,7 +817,8 @@ mov_trans.SetOrigin (csVector3 (0));
 void csSector::Draw (iRenderView *rview)
 {
 #ifndef CS_USE_NEW_RENDERER
-  ((csRenderView*)rview)->SetupClipPlanes ();
+  csRenderView* csrview = (csRenderView*)rview;
+  csrview->SetupClipPlanes ();
 
   PrepareDraw (rview);
   iCamera *icam = rview->GetCamera ();
@@ -831,7 +832,7 @@ void csSector::Draw (iRenderView *rview)
     if (fogmethod == G3DFOGMETHOD_VERTEX)
     {
       csFogInfo *fog_info = new csFogInfo ();
-      fog_info->next = rview->GetFirstFogInfo ();
+      fog_info->next = csrview->GetFirstFogInfo ();
 
       iPortal* last_portal = rview->GetLastPortal ();
       if (last_portal)
@@ -847,7 +848,7 @@ void csSector::Draw (iRenderView *rview)
       }
       fog_info->fog = &GetFog ();
       fog_info->has_outgoing_plane = true;
-      rview->SetFirstFogInfo (fog_info);
+      csrview->SetFirstFogInfo (fog_info);
     }
     else if (fogmethod != G3DFOGMETHOD_NONE)
     {
@@ -855,8 +856,8 @@ void csSector::Draw (iRenderView *rview)
     }
   }
 
-  if (rview->AddedFogInfo ())
-    rview->GetFirstFogInfo ()->has_outgoing_plane = false;
+  if (csrview->AddedFogInfo ())
+    csrview->GetFirstFogInfo ()->has_outgoing_plane = false;
 #endif // CS_USE_NEW_RENDERER
 
   /*
@@ -952,7 +953,7 @@ void csSector::Draw (iRenderView *rview)
       else
       {
         // We must add a FRONT fog polygon for the clipper to this sector.
-        rview->GetClipPlane (g3dpoly.normal);
+        csrview->GetClipPlane (g3dpoly.normal);
         g3dpoly.normal.Invert ();
         rview->GetGraphics3D ()->DrawFogPolygon (
             GetID (), g3dpoly, CS_FOG_FRONT);

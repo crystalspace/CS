@@ -293,6 +293,13 @@ public:
       //clip_plane, clip_z_plane);
     return true;
   }
+  virtual void CalculateClipSettings (uint32,
+    int &clip_portal, int &clip_plane, int &clip_z_plane)
+  {
+    clip_plane = CS_CLIP_NOT;
+    clip_portal = CS_CLIP_NOT;
+    clip_z_plane = CS_CLIP_NOT;
+  }
   virtual bool ClipBBox (const csBox3& /*cbox*/,
           int& clip_portal, int& clip_plane, int& clip_z_plane)
   {
@@ -301,7 +308,7 @@ public:
     clip_z_plane = CS_CLIP_NOT;
     return true;
   }
-  virtual bool ClipBBox (csPlane3*, uint32&, csPlane3*, const csBox3& /*obox*/,
+  virtual bool ClipBBox (csPlane3*, uint32&, const csBox3& /*obox*/,
           int& clip_portal, int& clip_plane, int& clip_z_plane)
   {
     clip_plane = CS_CLIP_NOT;
@@ -310,7 +317,7 @@ public:
     return true;
   }
   virtual void SetupClipPlanes (const csReversibleTransform&,
-  	csPlane3*, uint32& frustum_mask, csPlane3*)
+  	csPlane3*, uint32& frustum_mask)
   {
     frustum_mask = 0;
   }

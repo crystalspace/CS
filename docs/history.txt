@@ -31,6 +31,8 @@ chronological order.
 	  inadvertently interpreting $'s in Jamconfig creation code.  Also
 	  installed on shell.sf.net the new version of jobber.pl which utilizes
 	  Jam for its maintenance tasks, rather than GNU make.
+	- Jorrit fixed two compile errors in CS: one in iso engine and one
+	  in OR/engine.
 21-Apr-2004
 	- Jorrit fixed compilation of the engine plugin with OR after
 	  breaking it yesterday.
