@@ -21,7 +21,7 @@
 #include "sysdef.h"
 #include "csphyzik/force.h"
 #include "csphyzik/phyzent.h"
-#include "csphyzik/bodyforce.h"
+#include "csphyzik/bodyforc.h"
 #include "csphyzik/refframe.h"
 
 ctForce::ctForce() :
