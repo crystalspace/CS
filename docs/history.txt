@@ -2,6 +2,21 @@ The history order has been reversed so that new features are at the top.
 
 19-Apr-2001
 	- Martin Geisse did further work on csparser.
+	- Added a new sequence manager plugin. With this plugin you can manage
+	  operations that have to be done at specific times. You define
+	  sequences containing sequence operations. Sequences can be inserted
+	  in the sequence manager which will perform the operations in that
+	  sequence at the right time. Sequences can also contain operations
+	  to spawn new sequences and sequences also have conditional
+	  statements. The main purpose of this sequence manager is to allow
+	  demos or intros which are controlled by this system.
+	  The sequence manager is completely time correct (if it has no bugs
+	  of course). The 'Do' function which you have to provide for
+	  every sequence operation will get the difference between the time
+	  now and the time that the operation had to be executed so you can
+	  take corrective measures. The reason that operations are not always
+	  executed at the right time is that frame rate can be low and
+	  the sequence manager only gets executed once every frame.
 18-Apr-2001
 	- Removed the test for stencil buffer since it seems that just doing
 	  that test is enough to break significant parts of OpenGL on some
