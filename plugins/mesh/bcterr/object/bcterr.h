@@ -229,6 +229,18 @@ public:
         }
       }
     }
+    virtual void SetBlockMaterialNum (int num, iMaterialWrapper* mat)
+    {
+      if (scfParent->initialized)
+      {
+        int size;
+        size = scfParent->x_blocks * scfParent->z_blocks;
+        if ( (num < size) && (num > -1) )
+        {
+          scfParent->blocks[num].material = mat;
+        }
+      }
+    }
     virtual void SetHeightMap (iImage* im)
     {
       if (!scfParent->initialized)
@@ -240,6 +252,17 @@ public:
     {
       if (!scfParent->initialized) return 0;
       return scfParent->HeightTest (point);
+    }
+    virtual int CameraHeightTest (csVector3 *point)
+    {
+      return 0;
+    }
+    virtual void CollideBBox (const csBox3 bbox, const csVector3 start,
+        csVector3 &end)
+    {
+    }
+    virtual void CollideRay (const csVector3 start, csVector3 &end)
+    {
     }
   } scfiBCTerrState;
   //------------------------- iObjectModel implementation ----------------
