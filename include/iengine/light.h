@@ -209,36 +209,48 @@ struct iLight : public iBase
   * csVector3(constant, linear, quadric)
   * FIXME: examples
   */
-  virtual void SetAttenuationVector(csVector3 &pattenv) = 0;
+  virtual void SetAttenuationVector(csVector3 attenv) = 0;
 
   /**
   * Get attenuation vector
   * csVector3(constant, linear, quadric)
   */
-  virtual csVector3 &GetAttenuationVector() = 0;
+  virtual const csVector3 &GetAttenuationVector() = 0;
 
   /** 
-   * Get the influenceradius of the light
+   * Get the influence radius of the light
    */
   virtual float GetInfluenceRadius () = 0;
 
   /** 
-   * Get the squared influenceradius of the light.
+   * Get the squared influence radius of the light.
    */
   virtual float GetInfluenceRadiusSq () = 0;
   
   /**
-   * Set the influenceradius
+   * Override the influence radius.
    */
   virtual void SetInfluenceRadius (float radius) = 0;
 
   /**
-   * Calculate the influenceradius from the attenuation vector.
-   * If we only have constant attenuation the influence radius will be
-   * the same as the usual radius;
+   * Calculate the attenuation vector for a given attenuation type.
+   * \param atttype Attenuation type constant - #CS_ATTN_NONE,
+   *   #CS_ATTN_INVERSE, #CS_ATTN_REALISTIC
+   * \param radius Radius where the light is \p brightness bright
+   * \param brightness Brightness of the light at \p radius
    */
-  virtual void CalculateInfluenceRadius () = 0;
+  virtual void CalculateAttenuationVector (int atttype, float radius = 1.0f,
+    float brightness = 1.0f) = 0;
 
+  /**
+   * Get the distance for a given light brightness.
+   * \return Returns whether the distance could be calculated. E.g.
+   * when attenuation vector only has a constant part. \p distance is
+   * unaltered in this case.
+   * \remarks 
+   * \li Might fail when \p brightness <= 0.
+   */
+  virtual bool GetDistanceForBrightness (float brightness, float& distance) = 0;
 #endif
   /// Create a cross halo for this light.
   virtual iCrossHalo* CreateCrossHalo (float intensity, float cross) = 0;

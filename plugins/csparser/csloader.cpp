@@ -731,6 +731,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("halo", XMLTOKEN_HALO);
   xmltokens.Register ("hardmove", XMLTOKEN_HARDMOVE);
   xmltokens.Register ("heightgen", XMLTOKEN_HEIGHTGEN);
+  xmltokens.Register ("influenceradius", XMLTOKEN_INFLUENCERADIUS);
   xmltokens.Register ("invisible", XMLTOKEN_INVISIBLE);
   xmltokens.Register ("key", XMLTOKEN_KEEPIMAGE);
   xmltokens.Register ("key", XMLTOKEN_KEY);
@@ -2913,10 +2914,12 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
   csVector3 pos;
 
 #ifdef CS_USE_NEW_RENDERER
-  csVector3 attenvec (0, 1, 0);
-#else
-  int attenuation = CS_ATTN_LINEAR;
+  csVector3 attenvec (0, 0, 0);
+  float distbright = 1;
+  float influenceRadius = 0;
+  bool influenceOverride = false;
 #endif
+  int attenuation = CS_ATTN_LINEAR;
   float dist = 0;
 
   csColor color;
@@ -2956,9 +2959,11 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 
   // New format.
   pos.x = pos.y = pos.z = 0;
-  dist = 1;
   color.red = color.green = color.blue = 1;
   dyn = false;
+#ifdef CS_USE_NEW_RENDERER
+  dist = 1;
+#endif
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -2970,7 +2975,16 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_RADIUS:
-	dist = child->GetContentsValueAsFloat ();
+	{
+	  dist = child->GetContentsValueAsFloat ();
+  #ifdef CS_USE_NEW_RENDERER
+	  csRef<iDocumentAttribute> attr;
+	  if (attr = child->GetAttribute ("brightness"))
+	  {
+	    distbright = attr->GetValueAsFloat();
+	  }
+  #endif
+	}
         break;
       case XMLTOKEN_CENTER:
 	if (!SyntaxService->ParseVector (child, pos))
@@ -3111,26 +3125,18 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
       case XMLTOKEN_ATTENUATION:
 	{
 	  const char* att = child->GetContentsValue();
-#ifdef CS_USE_NEW_RENDERER
 	  if (att)
 	  {
-	    if (dist == 0)
-	    {
-	      // implicit radius
-	      if (color.red > color.green && color.red > color.blue) dist = color.red;
-	      else if (color.green > color.blue) dist = color.green;
-	      else dist = color.blue;
-	    }
-	    if (!strcasecmp (att, "none")) attenvec = csVector3 (1, 0, 0);
-	    else if ((!strcasecmp (att, "linear")) || (!strcasecmp (att, "inverse"))) 
-	      attenvec = csVector3 (0, 1/dist, 0);
-	    else if (!strcasecmp (att, "realistic")) attenvec = 
-	      csVector3 (0, 0, 1/(dist*dist));
+	    if (!strcasecmp (att, "none")     ) attenuation = CS_ATTN_NONE;
+	    else if (!strcasecmp (att, "linear")   ) attenuation = CS_ATTN_LINEAR;
+	    else if (!strcasecmp (att, "inverse")  ) attenuation = CS_ATTN_INVERSE;
+	    else if (!strcasecmp (att, "realistic")) attenuation = CS_ATTN_REALISTIC;
 	    else
 	    {
 	      SyntaxService->ReportBadToken (child);
 	      return NULL;
 	    }
+#ifdef CS_USE_NEW_RENDERER
 	  }
 	  else
 	  {
@@ -3138,20 +3144,16 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	    attenvec.y = child->GetAttributeValueAsFloat ("l");
 	    attenvec.z = child->GetAttributeValueAsFloat ("q");
 	  }
-#else
-          if (!strcasecmp (att, "none")     ) attenuation = CS_ATTN_NONE;
-          else if (!strcasecmp (att, "linear")   ) attenuation = CS_ATTN_LINEAR;
-          else if (!strcasecmp (att, "inverse")  ) attenuation = CS_ATTN_INVERSE;
-          else if (!strcasecmp (att, "realistic")) attenuation = CS_ATTN_REALISTIC;
-	  else
-	  {
-	    SyntaxService->ReportBadToken (child);
-	    return NULL;
-	  }
 #endif
 	}
 	break;
       #ifdef CS_USE_NEW_RENDERER
+      case XMLTOKEN_INFLUENCERADIUS:
+	{
+	  influenceRadius = child->GetContentsValueAsFloat();
+	  influenceOverride = true;
+	}
+	break;
       case XMLTOKEN_ATTENUATIONVECTOR:
         {
 	  //@@@ should be scrapped in favor of specification via
@@ -3167,25 +3169,17 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
     }
   }
 
-#ifndef CS_USE_NEW_RENDERER
   // implicit radius
   if (dist == 0)
   {
     if (color.red > color.green && color.red > color.blue) dist = color.red;
     else if (color.green > color.blue) dist = color.green;
     else dist = color.blue;
-    switch (attenuation)
-    {
-      case CS_ATTN_NONE      : dist = 100000000; break;
-      case CS_ATTN_LINEAR    : break;
-      case CS_ATTN_INVERSE   : dist = 16.0f * qsqrt (dist); break;
-      case CS_ATTN_REALISTIC : dist = 256.0f * dist; break;
-    }
   }
-#endif
 
   csRef<iStatLight> l (Engine->CreateLight (lightname, pos,
   	dist, color, dyn));
+
   switch (halo.type)
   {
     case 1:
@@ -3228,7 +3222,17 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 #ifndef CS_USE_NEW_RENDERER
   l->QueryLight ()->SetAttenuation (attenuation);
 #else
-  l->QueryLight ()->SetAttenuationVector (attenvec);
+  if (attenvec.IsZero())
+  {
+    l->QueryLight ()->CalculateAttenuationVector 
+      (attenuation, dist, distbright);
+  }
+  else
+  {
+    l->QueryLight ()->SetAttenuationVector (attenvec);
+  }
+  if (influenceOverride)
+    l->QueryLight()->SetInfluenceRadius (influenceRadius);
 #endif
 
   // Move the key-value pairs from 'Keys' to the light object

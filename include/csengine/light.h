@@ -83,6 +83,9 @@ protected:
   /// Squared influence radius
   float influenceRadiusSq; 
 
+  /// Is the influence radius valid?
+  bool influenceValid;
+
   /**
    * Config value: The intensity at the influenceRadius in parts of the 
    * main light intensity.
@@ -101,6 +104,10 @@ protected:
   /// Get a unique ID for this light. Generate it if needed.
   const char* GenerateUniqueID ();
 
+  /**
+   * Calculate the influenceradius from the attenuation vector.
+   */
+  void CalculateInfluenceRadius ();
 public:
   /// Set of flags
   csFlags flags;
@@ -224,35 +231,47 @@ public:
   * Set attenuation vector 
   * csVector3(constant, linear, quadric)
   */
-  void SetAttenuationVector (csVector3 &pattenv);
+  void SetAttenuationVector (csVector3 pattenv);
 
   /**
   * Get attenuation vector
   * csVector3(constant, linear, quadric)
   */
-  csVector3 &GetAttenuationVector();
+  const csVector3 &GetAttenuationVector();
 
   /** 
-   * Get the influenceradius of the light
+   * Get the influence radius of the light
    */
   float GetInfluenceRadius ();
 
   /** 
-   * Get the squared influenceradius of the light
+   * Get the squared influence radius of the light
    */
   float GetInfluenceRadiusSq ();
 
   /**
-   * Set the influenceradius
+   * Override the influence radius.
    */
   void SetInfluenceRadius (float radius);
 
   /**
-   * Calculate the influenceradius from the attenuation vector.
-   * If we only have constant attenuation the influence radius will be
-   * the same as the usual radius;
+   * Calculate the attenuation vector for a given attenuation type.
+   * \param atttype Attenuation type constant - #CS_ATTN_NONE,
+   *   #CS_ATTN_INVERSE, #CS_ATTN_REALISTIC
+   * \param radius Radius where the light is \p brightness bright
+   * \param brightness Brightness of the light at \p radius
    */
-  void CalculateInfluenceRadius ();
+  void CalculateAttenuationVector (int atttype, float radius = 1.0f,
+    float brightness = 1.0f);
+
+  /**
+   * Get the distance for a given light brightness.
+   * \return Returns whether the distance could be calculated. E.g.
+   * when attenuation vector only has a constant part.
+   * \remarks 
+   * \li Might fail when \p brightness <= 0.
+   */
+  bool GetDistanceForBrightness (float brightness, float& distance);
 #endif
 
   /**
@@ -322,12 +341,17 @@ public:
       return scfParent->GetBrightnessAtDistance (d);
     }
 #ifdef CS_USE_NEW_RENDERER
-    virtual void SetAttenuationVector(csVector3 &pattenv) { scfParent->SetAttenuationVector(pattenv); }
-    virtual csVector3 &GetAttenuationVector() { return scfParent->GetAttenuationVector(); }
+    virtual void SetAttenuationVector(csVector3 attenv) 
+    { scfParent->SetAttenuationVector(attenv); }
+    virtual const csVector3 &GetAttenuationVector() { return scfParent->GetAttenuationVector(); }
     virtual float GetInfluenceRadius () { return scfParent->GetInfluenceRadius(); }
     virtual float GetInfluenceRadiusSq () { return scfParent->GetInfluenceRadiusSq(); }
     virtual void SetInfluenceRadius (float radius) { scfParent->SetInfluenceRadius (radius); }
-    virtual void CalculateInfluenceRadius () { scfParent->CalculateInfluenceRadius (); }
+    virtual void CalculateAttenuationVector (int atttype, float radius,
+      float brightness) { return scfParent->CalculateAttenuationVector 
+        (atttype, radius, brightness); }
+    virtual bool GetDistanceForBrightness (float brightness, float& distance)
+    { return scfParent->GetDistanceForBrightness (brightness, distance); }
 #endif
     virtual iCrossHalo* CreateCrossHalo (float intensity, float cross);
     virtual iNovaHalo* CreateNovaHalo (int seed, int num_spokes,

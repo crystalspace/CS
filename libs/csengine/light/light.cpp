@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "qsqrt.h"
 #include "csgeom/frustum.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
@@ -239,32 +240,36 @@ void csLight::SetAttenuation (int a)
 
 #else
 
-void csLight::SetAttenuationVector(csVector3 &pattenv)
+void csLight::SetAttenuationVector(csVector3 attenv)
 {
-  attenuationvec = pattenv;
+  attenuationvec.Set (attenv);
   
-  if (attenuationvec.x < 0)
+/*  if (attenuationvec.x < 0)
     attenuationvec.x = 0;
   if (attenuationvec.y < 0)
     attenuationvec.y = 0;
   if (attenuationvec.z < 0)
-    attenuationvec.z = 0;
+    attenuationvec.z = 0;*/
 
-  CalculateInfluenceRadius ();
+  influenceValid = false;
 }
 
-csVector3 &csLight::GetAttenuationVector()
+const csVector3 &csLight::GetAttenuationVector()
 {
   return attenuationvec;
 }
 
 float csLight::GetInfluenceRadius ()
 {
+  if (!influenceValid)
+    CalculateInfluenceRadius ();
   return influenceRadius;
 }
 
 float csLight::GetInfluenceRadiusSq ()
 {
+  if (!influenceValid)
+    CalculateInfluenceRadius ();
   return influenceRadiusSq;
 }
 
@@ -274,26 +279,46 @@ void csLight::SetInfluenceRadius (float radius)
   {
     influenceRadius = radius;
     influenceRadiusSq = radius*radius;
+    influenceValid = true;
   }
 }
 
-void csLight::CalculateInfluenceRadius ()
+void csLight::CalculateAttenuationVector (int atttype, float radius,
+  float brightness)
+{
+  if (brightness < EPSILON)
+    brightness = EPSILON;
+  switch (atttype)
+  {
+  case CS_ATTN_NONE:
+    SetAttenuationVector (csVector3 (1, 0, 0));
+    return;
+  case CS_ATTN_LINEAR:
+  case CS_ATTN_INVERSE:
+    SetAttenuationVector (csVector3 (0, 1 / (brightness * radius), 0));
+    return;
+  case CS_ATTN_REALISTIC:
+    SetAttenuationVector (csVector3 (0, 0, 1 / (brightness * radius * radius)));
+    return;
+  }
+}
+
+bool csLight::GetDistanceForBrightness (float brightness, float& distance)
 {
   // simple cases
   if (attenuationvec.z == 0)
   {
     if (attenuationvec.y == 0)
     {
-      //no solution - brightness constant, infinite radius
-      SetInfluenceRadius (100000000); 
-      return;
+      //no solution
+      return false;
     }
     else
     {
       float kc = attenuationvec.x;
       float kl = attenuationvec.y;
-      float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
-      SetInfluenceRadius ((influenceIntensityFraction*y - kc) / kl);
+      distance = (1 / brightness - kc) / kl;
+      return true;
     }
   }
 
@@ -301,34 +326,44 @@ void csLight::CalculateInfluenceRadius ()
    calculate radius where the light has the intensity of 
    influenceIntensityFraction using the standard light model:    
 
-     brightness = y*1/(kc + kl*d + kq*d^2)
+     brightness = 1/(kc + kl*d + kq*d^2)
 
    solving equation:
-           /-kl +- sqrt( kl^2 - 4*kc*kq + 4*kq*y*brightness)\
-   d = 0.5*|------------------------------------------------|
-           \                       kq                       /
+           /-kl +- sqrt( kl^2 - 4*kc*kq - 4*kq/brightness)\
+   d = 0.5*|----------------------------------------------|
+           \                       kq                     /
   */
   float kc = attenuationvec.x;
   float kl = attenuationvec.y;
   float kq = attenuationvec.z;
   float discr;
-  float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
   
-  discr = kl*kl - 4*kq*(kc + influenceIntensityFraction*y);
+  discr = kl*kl - 4*kq*(kc - 1/brightness);
   if (discr < 0)
   {
-    //no solution - brightness constant, infinite radius
-    SetInfluenceRadius (100000000); 
+    //no solution
+    return false;
   }
   else 
   {
     float radius1, radius2, det;
-    det = sqrtf (discr);
+    det = qsqrt (discr);
     float denom = 0.5 / kq;
     radius1 = denom * (-kl + det);
     radius2 = denom * (-kl - det);
-    SetInfluenceRadius (MAX (radius1,radius2));
+    distance = MAX (radius1,radius2);
+    return true;
   }
+}
+
+void csLight::CalculateInfluenceRadius ()
+{
+  float y = 0.28*color.red + 0.59*color.green + 0.13*color.blue;
+  float radius;
+  if (!GetDistanceForBrightness (1 / (y * influenceIntensityFraction), radius))
+    // can't determine distance
+    radius = 100000000;
+  SetInfluenceRadius (radius);
 }
 
 #endif
