@@ -157,6 +157,7 @@ class csMotionManager : public iMotionManager
   csAppliedMotionVector skels;
   csAppliedMotionVector cache;
   cs_time oldtime;
+  bool slerp;
   iSystem* iSys;
   
 public:
@@ -241,12 +242,18 @@ public:
 
   virtual void UpdateAll(int time);
   ///
+  virtual void SetSlerp( bool setting ) { slerp = setting; }
   
   csMotion* FindClassByName (const char* name);
   void UpdateTransform(iSkeletonBone *bone, csQuaternion *quat);
+  void UpdateTransform(iSkeletonBone *bone, csQuaternion *quat1, 
+		csQuaternion *quat2, float ratio );
   void UpdateTransform(iSkeletonBone *bone, csMatrix3 *mat);
   void UpdateTransform(iSkeletonBone *bone, csVector3 *vec);
-  void UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame *next);
+  void UpdateTransform(iSkeletonBone *bone, csVector3 vec, 
+		csVector3 vec2, float ratio );
+  void UpdateAppliedFrame(csAppliedFrame *fr);
+  void UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame *next, float ratio);
   bool UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedtime);
   void CompileMotion( csAppliedMotion *motion );
 };

@@ -57,7 +57,7 @@ struct iMotion : public iBase
   
 };
 
-SCF_VERSION (iMotionManager, 0, 9, 2);
+SCF_VERSION (iMotionManager, 0, 9, 3);
 
 /**
  * The motion manager.
@@ -120,6 +120,8 @@ struct iMotionManager : public iPlugIn
   virtual void UpdateAll () = 0;
   
   virtual void UpdateAll ( int time ) = 0;
+  
+  virtual void SetSlerp ( bool setting ) = 0;
 };
 
 #endif

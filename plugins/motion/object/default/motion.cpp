@@ -58,6 +58,7 @@ csMotionManager::~csMotionManager()
 bool csMotionManager::Initialize (iSystem* TiSys)
 {
   iSys=TiSys;
+  slerp = true;
   return true;
 }
 
@@ -362,12 +363,31 @@ void csMotionManager::DeleteAppliedMotion( int idx, bool cached )
   (cached) ? cache.Delete(idx) : skels.Delete(idx);
 }
 
+
+void csMotionManager::UpdateTransform( iSkeletonBone *bone, csQuaternion *quat1, csQuaternion *quat2, float ratio )
+{
+  csVector3 vec = bone->GetTransformation().GetO2TTranslation();
+  csQuaternion quat = quat1->Slerp(*quat2, ratio);
+#ifdef MOTION_DEBUG
+    printf("UpdateTransform Q(%g,%g,%g,%g)\n", quat.x, quat.y, quat.z, quat.r);
+#endif
+  bone->SetTransformation(csTransform(csMatrix3(quat), vec));
+}
+
+void csMotionManager::UpdateTransform( iSkeletonBone *bone, csVector3 vec1, csVector3 vec2, float ratio )
+{
+  csMatrix3 mat = bone->GetTransformation().GetO2T();
+  csVector3 vec = ( vec2 - vec1 ) * ratio;
+  vec += vec1;
+  bone->SetTransformation( csTransform( mat, vec ));
+}
+
 void csMotionManager::UpdateTransform( iSkeletonBone *bone, csQuaternion *quat )
 {
   csVector3 vec = bone->GetTransformation().GetO2TTranslation();
   bone->SetTransformation(csTransform(csMatrix3(*quat), vec));
-  
 }
+
 void csMotionManager::UpdateTransform( iSkeletonBone *bone, csMatrix3 *mat )
 {
   csVector3 vec = bone->GetTransformation().GetO2TTranslation();
@@ -380,9 +400,20 @@ void csMotionManager::UpdateTransform( iSkeletonBone *bone, csVector3 *vec )
   bone->SetTransformation( csTransform( mat, *vec ));
 }
 
-void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame * /* next */)
+void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame *next, float ratio )
 {
   int i;
+  for ( i = 0; i < fr->numqlinks; i++ )
+	UpdateTransform( fr->qaffector[i], fr->qlinks[i], next->qlinks[i], ratio );
+  for ( i = 0; i < fr->nummlinks; i++ )
+	UpdateTransform( fr->maffector[i], fr->mlinks[i] );
+  for ( i = 0; i < fr->numvlinks;  i++ )
+	UpdateTransform( fr->vaffector[i], *fr->vlinks[i] , *next->vlinks[i], ratio );
+}
+
+void csMotionManager::UpdateAppliedFrame(csAppliedFrame *fr)
+{
+  int i;  
   for ( i = 0; i < fr->numqlinks; i++ )
 	UpdateTransform( fr->qaffector[i], fr->qlinks[i] );
   for ( i = 0; i < fr->nummlinks; i++ )
@@ -449,11 +480,19 @@ bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, cs_time elapsedti
 	if ((i == size - 1) && (am->Rate > 0)) 
 	  am->nextframe = (am->Loop) ? 0 : size - 1;
 
+  if ( slerp && (am->nextframe != am->curframe))
+  {
+	float dist1= (float)( am->curtime ) - (float)(am->frames[am->curframe]->keyframe);
+	float dist2= (float)(am->frames[am->nextframe]->keyframe) - (float)(am->frames[am->curframe]->keyframe);
+	float ratio = dist1 / dist2;
+	UpdateAppliedFrame(am->frames[am->curframe], am->frames[am->nextframe], ratio);
+	return true;
+  }
 #ifdef MOTION_DEBUG
   printf("UpdateAppliedMotion %d %d\n", am->curtime, am->frames[am->curframe]->keyframe); 
 #endif
 
-  UpdateAppliedFrame(am->frames[am->curframe], am->frames[am->nextframe]);
+  UpdateAppliedFrame(am->frames[am->curframe]);
   return true;
 }
 
