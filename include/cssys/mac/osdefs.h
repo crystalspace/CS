@@ -9,6 +9,7 @@
 int strcasecmp (const char *str1, const char *str2);
 int strncasecmp (char const *dst, char const *src, int maxLen);
 char *strdup (const char *str);
+#define stricmp strcasecmp
 
 #ifdef SYSDEF_ACCESS
 int access (const char *path, int mode);
