@@ -27,6 +27,9 @@ chronological order.
 	  csstring.h for 64-bit platforms.
 	- Eric Sunshine fixed some issues in csstring.h which caused MSVC7 to
 	  barf at compile-time.
+	- Eric Sunshine added a couple missing `operator=(char const*)' methods
+	  to csstring.h which were omitted accidentally from yesterday's added
+	  batch of assignment operators.
 14-Mar-2005
 	- Eric Sunshine propagated yesterday's csString ShrinkBestFit() and
 	  Empty() additions to iString and scfString for API consistency.

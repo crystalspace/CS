@@ -569,7 +569,7 @@ public:
    * \remarks Internally uses the various flavours of Append().
    */
   template<typename T>
-  csStringBase& Replace (T val) { Size = 0; return Append (val); }
+  csStringBase& Replace (T const& val) { Size = 0; return Append (val); }
 
   /**
    * Check if another string is equal to this one.
@@ -748,13 +748,13 @@ public:
    * Assign a formatted value to this string.
    */
   template<typename T>
-  const csStringBase& operator = (T s) { return Replace (s); }
+  const csStringBase& operator = (T const& s) { return Replace (s); }
 
   /**
    * Append a formatted value to this string.
    */
   template<typename T>
-  csStringBase &operator += (T s) { return Append (s); }
+  csStringBase &operator += (T const& s) { return Append (s); }
 
   /// Add another string to this one and return the result as a new string.
   csStringBase operator + (const csStringBase &iStr) const
@@ -888,7 +888,8 @@ inline csStringBase operator + (const csStringBase& iStr1, const char* iStr2)
  * \endcode
  */
 template <typename T>
-inline csStringBase &operator <<(csStringBase &s, T v) { return s.Append (v); }
+inline csStringBase &operator <<(csStringBase &s, T const& v)
+{ return s.Append (v); }
 
 /**
  * Subclass of csStringBase that contains an internal buffer which is faster
@@ -975,7 +976,7 @@ public:
 
   /// Assign a formatted value to this string.
   template<typename T>
-  const csStringFast& operator = (T s) { Replace (s); return *this; }
+  const csStringFast& operator = (T const& s) { Replace (s); return *this; }
 
   virtual char* GetData ()
   { return (miniused == 0 && Data == 0 ? 0 : (Data != 0 ? Data : minibuff)); }
@@ -1039,6 +1040,8 @@ public:
   csStringFast (unsigned char c) : csStringBase(c) { }
   const csStringFast& operator = (const csStringBase& copy)
   { Replace(copy); return *this; }
+  const csStringFast& operator = (const char* copy)
+  { Replace(copy); return *this; }
   const csStringFast& operator = (char x)
   { Replace(x); return *this; }
   const csStringFast& operator = (unsigned char x)
@@ -1100,6 +1103,8 @@ public:
   const csString& operator = (const csString& copy)
   { Replace(copy); return *this; }
   const csString& operator = (const csStringBase& copy)
+  { Replace(copy); return *this; }
+  const csString& operator = (const char* copy)
   { Replace(copy); return *this; }
   const csString& operator = (char x)
   { Replace(x); return *this; }
