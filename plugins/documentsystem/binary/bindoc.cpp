@@ -231,7 +231,7 @@ const char* csBinaryDocAttribute::GetValue ()
 	{
   	  char buf[50];
 	  cs_snprintf (buf, sizeof (buf) - 1, "%d", 
-	    (int)little_endian_long (attrPtr->value));
+	    (int)((int32)little_endian_long (attrPtr->value)));
 	  delete[] vstr; 
 	  vstr = csStrNew (buf);
 	  vsptr = attrPtr;
@@ -295,7 +295,7 @@ float csBinaryDocAttribute::GetValueAsFloat ()
       }
     case BD_VALUE_TYPE_INT:
       {
-	return (float)((int)little_endian_long (attrPtr->value));
+	return (float)((int32)little_endian_long (attrPtr->value));
       }
     case BD_VALUE_TYPE_FLOAT:
       {
