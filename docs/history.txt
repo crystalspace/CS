@@ -9,6 +9,8 @@ The history order is reversed so that new features are at the top.
 	  if adding __volatile__ has a bad effect and I didn't notice an
 	  obvious speed decrease. Thanks to Matt Reda for suggesting
 	  the __volatile__ keyword.
+	- Matt Reda did a similar change to the PowerPC versions of
+	  qsqrt() and qisqrt().
 	- Norman Kramer replaced two new occurences of static
 	  csClipInfo blah[100] with the CS_STATIC_* macros and
 	  magically it does no longer segfault at exit in walktest (OpenGL

@@ -141,7 +141,7 @@ static inline float qsqrt(float x)
   {
     float x0 = x * 0.5f;
 
-    asm ("frsqrte %0,%1" : "=f" (y0) : "f" (x));
+    __asm__ __volatile__ ("frsqrte %0,%1" : "=f" (y0) : "f" (x));
     
     y0 = y0 * (1.5f - x0 * y0 * y0);
     y0 = (y0 * (1.5f - x0 * y0 * y0)) * x;
@@ -158,7 +158,7 @@ static inline float qisqrt(float x)
 {
   float x0 = x * 0.5f;
   float y0;
-  asm ("frsqrte %0,%1" : "=f" (y0) : "f" (x));
+  __asm__ __volatile__ ("frsqrte %0,%1" : "=f" (y0) : "f" (x));
     
   y0 = y0 * (1.5f - x0 * y0 * y0);
   y0 = y0 * (1.5f - x0 * y0 * y0);
