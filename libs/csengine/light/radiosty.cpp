@@ -781,17 +781,10 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
     new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vert);
     // empty intersection, none covered (will be skipped)
     if(!new_lview.light_frustum) return;
-
-    /// radiosity to this polygon.
-    csRadiosity *rad = (csRadiosity*)lview->userdata;
-    rad->ProcessDest(dest, &new_lview);
   }
-
-  /// portal?
 
   // uses polygon3d of *base* polygon...
   csPortal *po = destpoly3d->GetPortal();
-  if(!po) return;
 
   csVector3& center = lview->light_frustum->GetOrigin ();
   csPlane3 poly_plane = *destpoly3d->GetPolyPlane ();
@@ -800,7 +793,16 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   poly_plane.Invert ();
   if (!destpoly3d->MarkRelevantShadowFrustums (new_lview, poly_plane))
     return;
+
+  if(dest)
+  {
+    /// radiosity to this polygon.
+    csRadiosity *rad = (csRadiosity*)lview->userdata;
+    rad->ProcessDest(dest, &new_lview);
+  }
   
+  /// portal?
+  if(!po) return;
   int num_vertices = destpoly3d->GetVertices ().GetNumVertices ();
   /// @@@ hope that poly array is big enough
   int j;
