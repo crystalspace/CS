@@ -102,11 +102,14 @@ Simple::~Simple ()
   // which is now related to lightmap caching. I give up! My knowledge
   // about the texture cache is not enough to fix that.       -- mgeisse
 
-  engine->SetContext(g3d);
-  engine->GetSectors()->Remove(engine->GetSectors()->FindByName("room"));
+  if (engine && g3d)
+  {
+    engine->SetContext(g3d);
+    engine->GetSectors()->Remove(engine->GetSectors()->FindByName("room"));
 
-  engine->SetContext(
-    ProcTexture->GetTextureHandle()->GetProcTextureInterface());
+    engine->SetContext(
+      ProcTexture->GetTextureHandle()->GetProcTextureInterface());
+  }
 
   if (view) view->DecRef ();
   if (engine) engine->DecRef ();
