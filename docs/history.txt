@@ -13,6 +13,71 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+22-Nov-1999
+	- Alex Pfaffe added support for Z sorted triangles to terrain
+	  engine.
+21-Nov-1999
+	- Michael Dale Long added some changes to CrystalClear:
+	    - Fixed rotation skew in cctest.
+	    - Added skeleton for writing mouselook code.
+	    - Added bool world parameter to iEntity::Rotate(). Specifies
+	      whether to rotate according to world coordinates or relative
+	      coordinates. Defaults to false (relative).
+	    - Fixed bug left by Andrew when he changed scfInterface to
+	      struct.
+	- Changes to LaTeX docs from Brandon Ehle (and Wyatt Miller).
+20-Nov-1999
+	- More work on cspython and SWIG from Brandon Ehle.
+	- Brandon Ehle fixed the unix load library function to display
+	  missing symbols correctly.
+	- Updates to CrystalClear and addition of MD5 class from Michael
+	  Dale Long.
+	- Updates from Andrew Zabolotny: 
+	     - Small fixes to DOS port (Allegro).
+	     - Modified SCF a little such that each SCF class has an
+	       associated dependency string. The string format is
+	       application-specific, and its the responsability of the
+	       application to parse and use it. The scf.cfg file
+               contains the dependency string in the form:
+	       class.subclass.subsubclass = library:dependencies
+             - Modified the system driver such that plugins are sorted
+	       depending on their dependencies :-) The dependency string
+	       is expected to have the format:
+               "class.one, class.two, ..."
+               If the class ID ends in a '.' (i.e. "class.") the class is
+	       considered on any other class which's ID begins with that
+	       substring. Otherwise a exact string match is performed.
+	       For example, the csWorld class (which's id is
+               "crystalspace.engine.core") depends on
+	       "crystalspace.graphics3d." (that is, on any 3D graphics
+	       driver) and on "crystalspace.kernel.vfs" class.
+             - Added the AddOptionCL(), AddNameCL() and RequirePlugIn()
+	       methods to the iSystem interface. You can "emulate" any
+	       options as if they were specified on command line, thus in
+	       simple cases you can avoid using a configuration file. For
+	       example, the simple app doesn't require the simple.cfg file
+               anymore.
+     	     - Removed SCF_INTERFACE macro, updated scf.html. From now on
+	       an interface should be usually declared this way:
+         	  SCF_VERSION (iSomething, 0, 0, 1);
+         	  struct iSomething : public iBase
+         	  ...
+               This was done because many tools that parse C code can't
+	       preprocess it (thus they don't know that SCF_VERSION
+	       contains an "struct" inside).  For the same reason I have
+	       removed the scfInterface macro (which used to expand into
+	       "struct"). Also I modified the scf.h header file so that
+	       it is properly parsed by doc++.
+     	     - Modified scftutor to show how iFactory interface can be
+	       used. iFactory can be used to clone objects without even
+	       knowing the actual class they belong. This is a kinda
+	       "advanced technique" :-)
+19-Nov-1999
+	- Fixed static compilation of OpenGL renderer.
+	- Started implementation of coverage mask lookup table.
+	- Impulse ID design modification for CrystalClear from Michael
+	  Dale Long.
+	- Robert Bate updated to Mac port to SCF.
 18-Nov-1999
 	- Eric Sunshine reverted changes which Brandon Ehle had made to SCF.
 	  Brandon totally botched it and completely broke the reference
@@ -29,7 +94,26 @@ Short-term cleanups that need to be done:
 	  introduced with the SCF conversion (except for a termination-time
 	  crash which is of an entirely different nature).  It also re-
 	  enables text on the start-up console.
+	- Updates to cspython from Brandon Ehle.
+	- Changes to scfstr from Andrew Zabolotny.
+	- Brandon Ehle fixes the OpenGL exit crash and added a error
+	  condition to scf's DecRef.
+	- Bugfix to terrain engine from Alex Pfaffe. He was rendering
+	  z as 1/(z*z). Alex also started to implement queue to
+	  maintain z-ordered list of triangles to avoid need for zbuffer.
+	- Updates to map2cs from Thomas Hieber.
 17-Nov-1999
+	- Brandon Ehle fixed python plugin so that it works now.
+	- Brandon also added CSSH (Crystal Space Shell).
+	- Minar CrystalClear update from Michael Dale Long.
+	- Update to MazeD from Andrew Zabolotny. Texture manager is almost
+	  finished.
+	- Andrew moved all the plugins (csclear and cspython for now) to
+	  the plugins directory.
+	- Andrew also moved the impexp directory from csutil to csparser
+	  where it belongs.
+	- Andrew also did some cleanups on the engine (removed obsolete
+	  cleanup class).
 	- Eric Sunshine performed the SCF conversion on the BeOS port.  He
 	  also reformatted, removed unused / unneeded code, and generally
 	  cleaned up on the port.
@@ -41,11 +125,19 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed the help message in WalkTest.
 	- Eric Sunshine fixed a potential crasher recently introduced into
 	  cctest.
+	- Thomas Hieber adjusted new directories for impexp in VC project
+	  files.
 16-Nov-1999
+	- Update to landscape engine from Alex Pfaffe. Mainly for
+	  cleanup purposes.
 	- Eric Sunshine worked around some additional severe bugs in the
 	  NextStep compiler which were triggered by the SCF conversion.  The
 	  NextStep port is once again on par with the other ports (including
 	  OpenStep).
+	- Fixes to VC project files from Thomas Hieber.
+	- Andrew Zabolotny added enhancements for the MazeD texture
+	  manager.
+	- Update to Map2CS from Thomas Hieber.
 15-Nov-1999
 	- Eric Sunshine renamed the Python test program from cspythontest to
 	  pytest in order to appease DOS's 8.3 requirement.
@@ -74,6 +166,16 @@ Short-term cleanups that need to be done:
 	  were triggered by the global SCF conversion.
 	- Thomas Hieber and Eric Sunshine fixed Blocks so that it compiles
 	  again (following some changes by Andrew).
+	- Andrew Zabolotny added a new growing array implementation. This is
+	  a macro that defines a static object that can grow and that
+	  contains an array of given type elements. Some engine parts
+	  use a similar technique for growing some static arrays, so he
+	  thought it would be best to put all that into a seperate
+	  file (and add an automatic cleanup mechanism to avoid memory
+	  leaks).
+	- Andrew also fixed VSH. Now it compiles and runs again.
+	- Fix to DJGPP port from Andrew.
+	- Thomas Hieber fixed the Windows OpenGL version.
 14-Nov-1999
 	- Updates to CrystalClear from Michael Dale Long and fixes for SCF to
 	  cctest.
