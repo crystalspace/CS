@@ -104,7 +104,7 @@ public:
    * \deprecated Use Empty() instead.
    */
   /*CS_DEPRECATED_METHOD*/ virtual void Clear()
-  { return Empty(); }
+  { Empty(); }
 
   /// Get the number of elements in the hash.
   virtual size_t GetSize () const
