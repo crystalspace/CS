@@ -8739,7 +8739,7 @@ wrap_iSystem_Query_iGraphics3D(lua_State *L)
 }
 	return 1;
 }
-
+/*
 static void  iSystem_Print(iSystem *self,int  mode,const char * format) {
       self->Printf(mode, format); 
     }
@@ -8780,7 +8780,7 @@ wrap_iSystem_Print(lua_State *L)
     iSystem_Print(_arg0,_arg1,_arg2);
 	return 0;
 }
-
+*/
 int
 cspace_initialize(lua_State *L)
 {
@@ -9176,7 +9176,7 @@ cspace_initialize(lua_State *L)
 
 	lua_register(L, "iSystem_Query_iEngine", wrap_iSystem_Query_iEngine);
 	lua_register(L, "iSystem_Query_iGraphics3D", wrap_iSystem_Query_iGraphics3D);
-	lua_register(L, "iSystem_Print", wrap_iSystem_Print);
+//	lua_register(L, "iSystem_Print", wrap_iSystem_Print);
 	lua_register(L, "iSystem_DecRef", wrap_iBase_DecRef);
 	iSystem_tag = lua_newtag(L);
 	lua_pushnumber(L, iSystem_tag);
