@@ -43,6 +43,7 @@ CFG.WALKTEST = data/config/walktest.cfg data/config/autoexec.cfg
 
 TO_INSTALL.EXE    += $(WALKTEST.EXE)
 TO_INSTALL.CONFIG += $(CFG.WALKTEST)
+TO_INSTALL.DATA   += data/stdtex.zip
 
 MSVC.DSP += WALKTEST
 DSP.WALKTEST.NAME = walktest
