@@ -804,6 +804,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 %define WRAP_FUNC(TYPE, FUNC, ARGS, PUSHARGS, POPRETVAL)
   virtual TYPE FUNC ARGS
   {
+    dTARG;
     dSP;
     ENTER;
     SAVETMPS;
@@ -828,6 +829,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 %define WRAP_VOID(FUNC, ARGS, PUSHARGS)
   virtual void FUNC ARGS
   {
+    dTARG;
     dSP;
     ENTER;
     SAVETMPS;
@@ -852,23 +854,40 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 WRAP_SCRIPT_CLASS (iEventHandler,
   WRAP_FUNC (bool, HandleEvent, (iEvent &ev),
     SV *ev_rv = newSViv (0);
-    sv_setref_iv (ev_rv, "cspace::iEvent", & ev);
+    sv_setref_iv (ev_rv, "cspace::iEvent", (int) & ev);
     XPUSHs (sv_2mortal (ev_rv));,
 
     POPi
   )
 )
 
+WRAP_SCRIPT_CLASS (iEventPlug,
+  WRAP_FUNC (unsigned int, GetPotentiallyConflictingEvents, (),
+    /**/,
+
+    POPu
+  )
+  WRAP_FUNC (unsigned int, QueryEventPriority, (unsigned int type),
+    XPUSHu (type);,
+
+    POPu
+  )
+  WRAP_VOID (EnableEvents, (unsigned int type, bool enabled),
+    XPUSHu (type);
+    XPUSHi (enabled ? 1 : 0);
+  )
+)
+
 WRAP_SCRIPT_CLASS (iAwsSink,
   WRAP_FUNC (unsigned long, GetTriggerID, (const char *name),
-    XPUSHp (name);,
+    XPUSHp (name, strlen (name));,
 
     POPu
   )
   WRAP_VOID (HandleTrigger, (int id, iAwsSource *src),
     XPUSHi (id);
     SV *ev_rv = newSViv (0);
-    sv_setref_iv (ev_rv, "cspace::iAwsSource", src);
+    sv_setref_iv (ev_rv, "cspace::iAwsSource", (int) src);
     XPUSHs (sv_2mortal (ev_rv));
   )
   WRAP_VOID (RegisterTrigger, (const char *n, void (*t) (void*, iAwsSource*)),
