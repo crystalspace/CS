@@ -458,13 +458,6 @@ private:
    */
   void TokenError (const char *Object);
 
-  /**
-   * Print an error about an unknown token. 'object' is the type of object
-   * that was just being parsed, e.g. "a sector". This function will get
-   * the unknown token from 'Token'.
-   */
-  void TokenError (const char *Object, const char* Token);
-
   /// Report any error.
   void ReportError (const char* id, const char* description, ...);
   /// Report a notification.

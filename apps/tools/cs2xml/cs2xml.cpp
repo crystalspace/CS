@@ -122,6 +122,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (WARP)
   CS_TOKEN_DEF (TRIANGLES)
   CS_TOKEN_DEF (ORIGINBOX)
+  CS_TOKEN_DEF (Q)
 CS_TOKEN_DEF_END
 
 //-----------------------------------------------------------------------------
@@ -509,6 +510,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (VERTICES)
     CS_TOKEN_TABLE (W)
     CS_TOKEN_TABLE (WARP)
+    CS_TOKEN_TABLE (Q)
   CS_TOKEN_TABLE_END
 
   char *name, *params;
@@ -563,6 +565,20 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    child->SetValue ("p");
 	    if (name) child->SetAttribute ("name", name);
             ParseGeneral ("p", parser, child, params);
+	  }
+	  break;
+	case CS_TOKEN_Q:
+	  {
+	    float x, y, z, r;
+	    csScanStr (params, "%f,%f,%f,%f", &x, &y, &z, &r);
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    child->SetAttributeAsFloat ("x", x);
+	    child->SetAttributeAsFloat ("y", y);
+	    child->SetAttributeAsFloat ("z", z);
+	    child->SetAttributeAsFloat ("r", r);
+	    if (name) child->SetAttribute ("name", name);
 	  }
 	  break;
         case CS_TOKEN_W:
@@ -916,15 +932,6 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    if (name) child->SetAttribute ("name", name);
 	  }
 	  break;
-        case CS_TOKEN_ROT:
-	  {
-	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
-	  	CS_NODE_ELEMENT, NULL);
-	    child->SetValue (tokname);
-	    if (name) child->SetAttribute ("name", name);
-	    // @@@ TODO
-	  }
-          break;
         case CS_TOKEN_HALO:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -1379,6 +1386,70 @@ void Cs2Xml::ConvertDir (const char* vfspath, bool backup)
 
 bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
 {
+  if (!TestCSFile (vfspath)) return false;
+
+  printf ("Trying to convert '%s' ... \n", vfspath); fflush (stdout);
+  csRef<iDataBuffer> buf;
+  buf.Take (vfs->ReadFile (vfspath));
+  if (!buf || !buf->GetSize ())
+  {
+    ReportError ("Could not read file '%s'!", vfspath);
+    return false;
+  }
+
+  // First make backup
+  if (backup)
+  {
+    char* newname = new char [strlen (vfspath)+4];
+    strcpy (newname, vfspath);
+    strcat (newname, ".bak");
+    vfs->WriteFile (newname, **buf, buf->GetSize ());
+    delete[] newname;
+  }
+
+  csParser* parser = new csParser (true);
+  parser->ResetParserLine ();
+
+  CS_TOKEN_TABLE_START (tokens)
+  CS_TOKEN_TABLE_END
+
+  char *data = **buf;
+  char *name, *params;
+  long cmd;
+
+  if ((cmd = parser->GetObject (&data, tokens, &name, &params))
+  	!= CS_PARSERR_EOF)
+  {
+    if (params)
+    {
+      char* tokname = ToLower (parser->GetUnknownToken (), true);
+      bool is_cs = !strcmp (tokname, "world") ||
+      		   !strcmp (tokname, "library") ||
+      		   !strcmp (tokname, "meshobj") ||
+      		   !strcmp (tokname, "meshfact");
+      csRef<iDocumentSystem> xml;
+      xml.Take (new csTinyDocumentSystem ());
+      csRef<iDocument> doc = xml->CreateDocument ();
+      csRef<iDocumentNode> root = doc->CreateRoot ();
+      csRef<iDocumentNode> parent = root->CreateNodeBefore (
+    	    CS_NODE_ELEMENT, NULL);
+      parent->SetValue (tokname);
+      // If not one of world, library, meshobj, or meshfact we
+      // assume this is a PARAMSFILE in which case we use 'params'
+      // as the logical parent.
+      ParseGeneral (is_cs ? "" : "params", parser, parent, params);
+
+      doc->Write (vfs, vfspath);
+      delete[] tokname;
+    }
+  }
+
+  delete parser;
+  return true;
+}
+
+bool Cs2Xml::TestCSFile (const char* vfspath)
+{
   char* ext = strrchr (vfspath, '.');
   if (ext)
   {
@@ -1398,14 +1469,9 @@ bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
     if (!strcasecmp (ext, ".bak")) return false;
   }
 
-  printf ("Trying to convert '%s' ... ", vfspath); fflush (stdout);
   csRef<iDataBuffer> buf;
   buf.Take (vfs->ReadFile (vfspath));
-  if (!buf || !buf->GetSize ())
-  {
-    ReportError ("Could not read file '%s'!", vfspath);
-    return false;
-  }
+  if (!buf || !buf->GetSize ()) return false;
 
   csParser* parser = new csParser (true);
   parser->ResetParserLine ();
@@ -1417,7 +1483,6 @@ bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
   char *name, *params;
   long cmd;
 
-  bool is_converted = false;
   if ((cmd = parser->GetObject (&data, tokens, &name, &params))
   	!= CS_PARSERR_EOF)
   {
@@ -1430,34 +1495,9 @@ bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
         cmd = parser->GetObject (&params, tokens, &name, &params2);
         if (cmd != CS_PARSERR_EOF && params2 != NULL)
         {
-          bool is_cs = !strcmp (tokname, "world") ||
-      		   !strcmp (tokname, "library") ||
-      		   !strcmp (tokname, "meshobj") ||
-      		   !strcmp (tokname, "meshfact");
-          csRef<iDocumentSystem> xml;
-          xml.Take (new csTinyDocumentSystem ());
-          csRef<iDocument> doc = xml->CreateDocument ();
-          csRef<iDocumentNode> root = doc->CreateRoot ();
-          csRef<iDocumentNode> parent = root->CreateNodeBefore (
-    	    CS_NODE_ELEMENT, NULL);
-          parent->SetValue (tokname);
-	  // If not one of world, library, meshobj, or meshfact we
-	  // assume this is a PARAMSFILE in which case we use 'params'
-	  // as the logical parent.
-          ParseGeneral (is_cs ? "" : "params", parser, parent, params);
-
-	  // First make backup
-	  if (backup)
-	  {
-	    char* newname = new char [strlen (vfspath)+4];
-	    strcpy (newname, vfspath);
-	    strcat (newname, ".bak");
-	    vfs->WriteFile (newname, **buf, buf->GetSize ());
-	    delete[] newname;
-	  }
-
-          doc->Write (vfs, vfspath);
-	  is_converted = true;
+	  delete parser;
+          delete[] tokname;
+	  return true;
         }
       }
       delete[] tokname;
@@ -1465,16 +1505,7 @@ bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
   }
 
   delete parser;
-  if (is_converted)
-  {
-    printf ("CONVERTED\n");
-  }
-  else
-  {
-    printf ("Not a CS file\n");
-  }
-  fflush (stdout);
-  return true;
+  return false;
 }
 
 //----------------------------------------------------------------------------

@@ -68,6 +68,9 @@ public:
   // Convert a VFS directory.
   void ConvertDir (const char* vfspath, bool backup);
 
+  // Test if a file is a CS file that can be converted to XML.
+  bool TestCSFile (const char* vfspath);
+
 public:
   Cs2Xml (iObjectRegistry* object_reg);
   ~Cs2Xml ();

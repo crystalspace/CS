@@ -514,7 +514,7 @@ bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
 	  return false;
         break;
       default:
-        TokenError ("materials", value);
+        SyntaxService->ReportBadToken (child);
 	return false;
     }
   }
@@ -548,7 +548,7 @@ bool csLoader::ParseTextureList (iDocumentNode* node)
 	  return false;
 	break;
       default:
-	TokenError ("textures", value);
+        SyntaxService->ReportBadToken (child);
 	return false;
     }
   }
@@ -579,12 +579,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	{
 	  bool for2d;
 	  if (!SyntaxService->ParseBool (child, for2d, true))
-	  {
-	    ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      "Invalid 'for2d' value, 'yes' or 'no' expected!");
 	    return NULL;
-	  }
           if (for2d)
             flags |= CS_TEXTURE_2D;
           else
@@ -595,12 +590,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	{
 	  bool for3d;
 	  if (!SyntaxService->ParseBool (child, for3d, true))
-	  {
-	    ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      "Invalid 'for3d' value, 'yes' or 'no' expected!");
 	    return NULL;
-	  }
           if (for3d)
             flags |= CS_TEXTURE_3D;
           else
@@ -623,9 +613,9 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	  const char* fname = child->GetContentsValue ();
 	  if (!fname)
 	  {
-	    ReportError (
+	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.texture",
-	      "Expected VFS filename for 'file'!");
+	      child, "Expected VFS filename for 'file'!");
 	    return NULL;
 	  }
           strcpy (filename, fname);
@@ -635,12 +625,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	{
 	  bool mm;
 	  if (!SyntaxService->ParseBool (child, mm, true))
-	  {
-	    ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      "Invalid 'mipmap' value, 'yes' or 'no' expected!");
 	    return NULL;
-	  }
           if (mm)
             flags &= ~CS_TEXTURE_NOMIPMAPS;
           else
@@ -651,12 +636,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	{
 	  bool di;
 	  if (!SyntaxService->ParseBool (child, di, true))
-	  {
-	    ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      "Invalid 'dither' value, 'yes' or 'no' expected!");
 	    return NULL;
-	  }
           if (di)
             flags |= CS_TEXTURE_DITHER;
           else
@@ -664,7 +644,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	}
         break;
       default:
-	TokenError ("a texture specification", value);
+        SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -680,9 +660,9 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 
   if (!tex)
   {
-    ReportError (
+    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.texture",
-	      "Could not load texture '%s'\n", txtname);
+	      node, "Could not load texture '%s'\n", txtname);
   }
 
   return tex;
@@ -706,9 +686,9 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
       case XMLTOKEN_TYPE:
         if (pt)
 	{
-	  ReportError (
+	  SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.proctex",
-	      "'type' of proctex already specified!");
+	      child, "'type' of proctex already specified!");
 	  return NULL;
 	}
 	else
@@ -724,24 +704,24 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
 	    pt = new csProcFire ();
 	  else
 	  {
-	    ReportError (
+	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.proctex",
-	      "Unknown 'type' '%s' of proctex!", type);
+	      child, "Unknown 'type' '%s' of proctex!", type);
 	    return NULL;
 	  }
 	}
         break;
       default:
-	TokenError ("a proctex specification", value);
+        SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
 
   if (pt == NULL)
   {
-    ReportError (
+    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.proctex",
-	      "'type' of proctex not given!");
+	      node, "'type' of proctex not given!");
     return NULL;
   }
 
@@ -753,7 +733,8 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
   return pt->GetTextureWrapper ();
 }
 
-iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *prefix)
+iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
+	const char *prefix)
 {
   if (!Engine) return NULL;
 
@@ -787,9 +768,10 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *pref
             texh = Engine->GetTextureList ()->FindByName (txtname);
           if (!texh)
           {
-	    ReportError (
+	    SyntaxService->ReportError (
 	        "crystalspace.maploader.parse.material",
-	        "Cannot find texture '%s' for material `%s'", txtname, matname);
+	        child, "Cannot find texture '%s' for material `%s'",
+		txtname, matname);
 	    return NULL;
           }
 	}
@@ -818,9 +800,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *pref
 	{
 	  if (num_txt_layer >= 4)
 	  {
-	    ReportError (
+	    SyntaxService->ReportError (
 	      "crystalspace.maploader.parse.material",
-	      "Only four texture layers supported!");
+	      child, "Only four texture layers supported!");
 	    return NULL;
 	  }
 	  txt_layers[num_txt_layer] = NULL;
@@ -851,9 +833,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *pref
                     txt_layers[num_txt_layer] = texh;
                   else
                   {
-		    ReportError (
+		    SyntaxService->ReportError (
 			"crystalspace.maploader.parse.material",
-		    	"Cannot find texture `%s' for material `%s'!",
+		    	child, "Cannot find texture `%s' for material `%s'!",
 			txtname, matname);
 		    return NULL;
                   }
@@ -873,7 +855,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *pref
 		  return NULL;
 	        break;
 	      default:
-		TokenError ("a layer specification", layer_value);
+	        SyntaxService->ReportBadToken (layer_child);
 		return NULL;
 	    }
 	  }
@@ -881,7 +863,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *pref
 	}
         break;
       default:
-        TokenError ("a material specification", value);
+	SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }

@@ -504,7 +504,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	}
 	break;
       default:
-	TokenError ("a texture specification", value);
+	SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -620,7 +620,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 	  	}
 	        break;
 	      default:
-		TokenError ("a blend specification", blend_value);
+		SyntaxService->ReportBadToken (blend_child);
 		return NULL;
 	    }
 	  }
@@ -628,7 +628,7 @@ csGenerateImageTexture* csLoader::ParseHeightgenTexture (iDocumentNode* node)
 	}
 	break;
       default:
-	TokenError ("a texture specification", value);
+	SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -699,7 +699,7 @@ bool csLoader::ParseHeightgen (iDocumentNode* node)
 	}
 	break;
       default:
-	TokenError ("a heightgen specification", value);
+	SyntaxService->ReportBadToken (child);
 	delete gen;
 	return false;
     }

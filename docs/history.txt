@@ -8,6 +8,19 @@ The history order is reversed so that new features are at the top.
 	  convert all CS files it can find in that zip file (including
 	  subdirectories). In addition it will make backups of all the
 	  files that it converts (.bak extension).
+	- iLoader::LoadLibraryFile() now detects XML and switches accordingly.
+	- iLoader::LoadMeshObjectFactory() now detects XML and switches
+	  accordingly.
+	- iLoader::LoadMeshObject() now detects XML and switches
+	  accordingly.
+	- Improved error handling in the standard loader again (using
+	  more of the new syntax services ReportError() and ReportBadToken()).
+	- Fixed a bad bug in cs2xml. The created backup file was corrupt
+	  because it was already being treated by the old CS parser which
+	  overwrites the string that was read.
+	- Fixed another related bug in cs2xml.
+	- Converted standard.zip to XML.
+	- Added support for ROT and Q (quaternions) in cs2xml.
 21-Aug-2002
 	- Implemented XML version of the spiral loader.
 	- Fixed a bug in cs2xml with parsing of the RADIUS

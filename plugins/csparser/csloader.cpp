@@ -472,10 +472,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
     // we'll use tinyxml.
     csRef<iDocumentSystem> xml;
     xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
-    if (!xml)
-    {
-      xml.Take (new csTinyDocumentSystem ());
-    }
+    if (!xml) xml.Take (new csTinyDocumentSystem ());
     csRef<iDocument> doc = xml->CreateDocument ();
     const char* error = doc->Parse (buf);
     if (error == NULL)
@@ -676,11 +673,11 @@ bool csLoader::LoadLibrary (char* buf)
 
 bool csLoader::LoadLibraryFile (const char* fname)
 {
-  iDataBuffer *buf = VFS->ReadFile (fname);
+  csRef<iDataBuffer> buf;
+  buf.Take (VFS->ReadFile (fname));
 
   if (!buf || !buf->GetSize ())
   {
-    if (buf) buf->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.library",
     	      "Could not open library file '%s' on VFS!", fname);
@@ -689,11 +686,41 @@ bool csLoader::LoadLibraryFile (const char* fname)
 
   ResolveOnlyRegion = false;
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
-  bool retcode = LoadLibrary (**buf);
 
-  buf->DecRef ();
-
-  return retcode;
+  // XML: temporary code to detect if we have an XML file. If that's
+  // the case then we will use the XML parsers.
+  // @@@
+  char* b = **buf;
+  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
+  if (*b == '<')
+  {
+    // XML.
+    // First try to find out if there is an iDocumentSystem registered in the
+    // object registry. If that's the case we will use that. Otherwise
+    // we'll use tinyxml.
+    csRef<iDocumentSystem> xml;
+    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+    if (!xml) xml.Take (new csTinyDocumentSystem ());
+    csRef<iDocument> doc = xml->CreateDocument ();
+    const char* error = doc->Parse (buf);
+    if (error == NULL)
+    {
+      if (!LoadLibrary (doc->GetRoot ()))
+	return false;
+    }
+    else
+    {
+      ReportError (
+	      "crystalspace.maploader.parse.map",
+    	      "XML error '%s' for file '%s'!", error, fname);
+      return false;
+    }
+  }
+  else
+  {
+    return LoadLibrary (**buf);
+  }
+  return true;
 }
 
 //---------------------------------------------------------------------------
@@ -806,53 +833,101 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
   ResolveOnlyRegion = false;
   SCF_DEC_REF (ldr_context); ldr_context = NULL;
 
-  iDataBuffer *databuff = VFS->ReadFile (fname);
+  csRef<iDataBuffer> databuff;
+  databuff.Take (VFS->ReadFile (fname));
 
   if (!databuff || !databuff->GetSize ())
   {
-    if (databuff) databuff->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.meshfactory",
     	      "Could not open mesh object file '%s' on VFS!", fname);
     return NULL;
   }
 
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (MESHFACT)
-  CS_TOKEN_TABLE_END
-
-  char *name, *data;
-  char *buf = **databuff;
-
-  if (parser.GetObject (&buf, tokens, &name, &data))
+  // XML: temporary code to detect if we have an XML file. If that's
+  // the case then we will use the XML parsers.
+  // @@@
+  char* b = **databuff;
+  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
+  if (*b == '<')
   {
-    if (!data)
+    // XML.
+    // First try to find out if there is an iDocumentSystem registered in the
+    // object registry. If that's the case we will use that. Otherwise
+    // we'll use tinyxml.
+    csRef<iDocumentSystem> xml;
+    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+    if (!xml) xml.Take (new csTinyDocumentSystem ());
+    csRef<iDocument> doc = xml->CreateDocument ();
+    const char* error = doc->Parse (databuff);
+    if (error == NULL)
     {
-      ReportError (
-	  "crystalspace.maploader.parse.badformat",
-	  "Expected parameters instead of '%s' while parsing mesh factory!",
-	  buf);
-      databuff->DecRef ();
-      return NULL;
-    }
-
-    iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
-    if (LoadMeshObjectFactory (t, data))
-    {
-      databuff->DecRef ();
-      return t;
+      csRef<iDocumentNode> meshfactnode = doc->GetRoot ()->GetNode ("meshfact");
+      if (!meshfactnode)
+      {
+        ReportError (
+	      "crystalspace.maploader.parse.map",
+    	      "File '%s' does not seem to contain a 'meshfact'!", fname);
+        return NULL;
+      }
+      iMeshFactoryWrapper* t = Engine->CreateMeshFactory (
+      	meshfactnode->GetAttributeValue ("name"));
+      if (LoadMeshObjectFactory (t, meshfactnode))
+      {
+        return t;
+      }
+      else
+      {
+        // Error is already reported.
+        iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
+      	  ->FindByName (meshfactnode->GetAttributeValue ("name"));
+        Engine->GetMeshFactories ()->Remove (factwrap);
+        return NULL;
+      }
     }
     else
     {
-      // Error is already reported.
-      iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
-      	->FindByName (name);
-      Engine->GetMeshFactories ()->Remove (factwrap);
-      databuff->DecRef ();
-      return NULL;
+      ReportError (
+	      "crystalspace.maploader.parse.map",
+    	      "XML error '%s' for file '%s'!", error, fname);
+      return false;
     }
   }
-  databuff->DecRef ();
+  else
+  {
+    CS_TOKEN_TABLE_START (tokens)
+      CS_TOKEN_TABLE (MESHFACT)
+    CS_TOKEN_TABLE_END
+
+    char *name, *data;
+    char *buf = **databuff;
+
+    if (parser.GetObject (&buf, tokens, &name, &data))
+    {
+      if (!data)
+      {
+        ReportError (
+	    "crystalspace.maploader.parse.badformat",
+	    "Expected parameters instead of '%s' while parsing mesh factory!",
+	    buf);
+        return NULL;
+      }
+
+      iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
+      if (LoadMeshObjectFactory (t, data))
+      {
+        return t;
+      }
+      else
+      {
+        // Error is already reported.
+        iMeshFactoryWrapper* factwrap = Engine->GetMeshFactories ()
+      	  ->FindByName (name);
+        Engine->GetMeshFactories ()->Remove (factwrap);
+        return NULL;
+      }
+    }
+  }
   return NULL;
 }
 
@@ -2200,45 +2275,89 @@ iMeshWrapper* csLoader::LoadMeshObject (const char* fname)
 {
   if (!Engine) return NULL;
 
-  iDataBuffer *databuff = VFS->ReadFile (fname);
+  csRef<iDataBuffer> databuff;
+  databuff.Take (VFS->ReadFile (fname));
   iMeshWrapper* mesh = NULL;
 
   if (!databuff || !databuff->GetSize ())
   {
-    if (databuff) databuff->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.meshobject",
     	      "Could not open mesh object file '%s' on VFS!", fname);
     return NULL;
   }
 
-  CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (MESHOBJ)
-  CS_TOKEN_TABLE_END
-
-  char *name, *data;
-  char *buf = **databuff;
-
-  if (parser.GetObject (&buf, tokens, &name, &data))
+  // XML: temporary code to detect if we have an XML file. If that's
+  // the case then we will use the XML parsers.
+  // @@@
+  char* b = **databuff;
+  while (*b == ' ' || *b == '\n' || *b == '\t') b++;
+  if (*b == '<')
   {
-    if (!data)
+    // XML.
+    // First try to find out if there is an iDocumentSystem registered in the
+    // object registry. If that's the case we will use that. Otherwise
+    // we'll use tinyxml.
+    csRef<iDocumentSystem> xml;
+    xml.Take (CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+    if (!xml) xml.Take (new csTinyDocumentSystem ());
+    csRef<iDocument> doc = xml->CreateDocument ();
+    const char* error = doc->Parse (databuff);
+    if (error == NULL)
     {
-      ReportError (
-	  "crystalspace.maploader.parse.badformat",
-	  "Expected parameters instead of '%s' while parsing mesh object!",
-	  buf);
-    }
-    else
-    {
-      mesh = Engine->CreateMeshWrapper (name);
-      if (!LoadMeshObject (mesh, data))
+      csRef<iDocumentNode> meshobjnode = doc->GetRoot ()->GetNode ("meshobj");
+      if (!meshobjnode)
+      {
+        ReportError (
+	      "crystalspace.maploader.parse.map",
+    	      "File '%s' does not seem to contain a 'meshobj'!", fname);
+        return NULL;
+      }
+      mesh = Engine->CreateMeshWrapper (
+      	meshobjnode->GetAttributeValue ("name"));
+      if (!LoadMeshObject (mesh, meshobjnode))
       {
 	// Error is already reported.
 	mesh->DecRef ();
       }
     }
+    else
+    {
+      ReportError (
+	      "crystalspace.maploader.parse.map",
+    	      "XML error '%s' for file '%s'!", error, fname);
+      return false;
+    }
   }
-  databuff->DecRef ();
+  else
+  {
+    CS_TOKEN_TABLE_START (tokens)
+      CS_TOKEN_TABLE (MESHOBJ)
+    CS_TOKEN_TABLE_END
+
+    char *name, *data;
+    char *buf = **databuff;
+
+    if (parser.GetObject (&buf, tokens, &name, &data))
+    {
+      if (!data)
+      {
+        ReportError (
+	    "crystalspace.maploader.parse.badformat",
+	    "Expected parameters instead of '%s' while parsing mesh object!",
+	    buf);
+      }
+      else
+      {
+        mesh = Engine->CreateMeshWrapper (name);
+        if (!LoadMeshObject (mesh, data))
+        {
+	  // Error is already reported.
+	  mesh->DecRef ();
+        }
+      }
+    }
+  }
   return mesh;
 }
 
@@ -2477,14 +2596,6 @@ void csLoader::TokenError (const char *Object)
     "crystalspace.maploader.parse.badtoken",
     "Token '%s' not recognized while parsing %s!",
     parser.GetLastOffender (), Object);
-}
-
-void csLoader::TokenError (const char *Object, const char* Token)
-{
-  ReportError (
-    "crystalspace.maploader.parse.badtoken",
-    "Token '%s' not recognized while parsing %s!",
-    Token, Object);
 }
 
 //--- Parsing of Engine Objects ---------------------------------------------
@@ -3331,7 +3442,7 @@ bool csLoader::LoadMap (iDocumentNode* node)
 	  }
           break;
 	default:
-	  TokenError ("a map", value);
+	  SyntaxService->ReportBadToken (child);
 	  return false;
       }
     }
@@ -3433,7 +3544,7 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
 	    return false;
           break;
 	default:
-          TokenError ("a library file", value);
+	  SyntaxService->ReportBadToken (child);
           return false;
       }
     }
@@ -3465,7 +3576,7 @@ bool csLoader::LoadPlugins (iDocumentNode* node)
 			child->GetContentsValue ());
         break;
       default:
-	TokenError ("plugin descriptors", value);
+	SyntaxService->ReportBadToken (child);
 	return false;
     }
   }
@@ -3500,7 +3611,7 @@ bool csLoader::LoadSounds (iDocumentNode* node)
         }
         break;
       default:
-        TokenError ("the list of sounds", value);
+	SyntaxService->ReportBadToken (child);
         return false;
     }
   }
@@ -3525,7 +3636,7 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 	level = child->GetContentsValueAsFloat ();
         break;
       default:
-        TokenError ("a LOD control", value);
+	SyntaxService->ReportBadToken (child);
         return false;
     }
   }
@@ -3831,7 +3942,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
         }
         break;
       default:
-        TokenError ("a mesh factory", value);
+	SyntaxService->ReportBadToken (child);
         return false;
     }
   }
@@ -4115,7 +4226,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	}
         break;
       default:
-        TokenError ("a mesh object", value);
+	SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -4450,7 +4561,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	}
         break;
       default:
-	TokenError ("a mesh object", value);
+	SyntaxService->ReportBadToken (child);
 	return false;
     }
   }
@@ -4492,7 +4603,7 @@ bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 	plug = loaded_plugins.FindPlugin (child->GetContentsValue ());
         break;
       default:
-	TokenError ("an add-on", value);
+	SyntaxService->ReportBadToken (child);
 	return false;
     }
   }
@@ -4573,7 +4684,7 @@ bool csLoader::LoadSettings (iDocumentNode* node)
         }
 	break;
       default:
-        TokenError ("the settings", value);
+	SyntaxService->ReportBadToken (child);
         return false;
     }
   }
@@ -4635,7 +4746,7 @@ bool csLoader::LoadRenderPriorities (iDocumentNode* node)
         break;
       }
       default:
-        TokenError ("the render priorities", value);
+	SyntaxService->ReportBadToken (child);
 	return false;
     }
   }
@@ -4738,7 +4849,7 @@ iCollection* csLoader::ParseCollection (iDocumentNode* node)
         }
         break;
       default:
-        TokenError ("a collection", value);
+	SyntaxService->ReportBadToken (child);
 	collection->DecRef ();
 	return NULL;
     }
@@ -4789,7 +4900,7 @@ bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
         }
 	break;
       default:
-	TokenError ("a camera position", value);
+	SyntaxService->ReportBadToken (child);
 	return false;
     }
   }
@@ -5004,13 +5115,13 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
           if (!strcasecmp (att, "realistic")) attenuation = CS_ATTN_REALISTIC;
 	  else
 	  {
-	    TokenError ("attenuation", att);
+	    SyntaxService->ReportBadToken (child);
 	    return NULL;
 	  }
 	}
 	break;
       default:
-	TokenError ("a light", value);
+	SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -5140,7 +5251,7 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
 	  return NULL;
         break;
       default:
-        TokenError ("a node", value);
+	SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
@@ -5342,7 +5453,7 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
         }
         break;
       default:
-	TokenError ("a sector", value);
+	SyntaxService->ReportBadToken (child);
 	return NULL;
     }
   }
