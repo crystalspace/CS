@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+21-Dec-2001
+	- Fixed the JPG loader so that it actually fails instead of just
+	  hanging on JPG images that are too short.
+	- Fixed gfxtest so that it no longer stops if it encounters
+	  an error while processing multiple images. It will just skip
+	  that image.
+	- Added --prefix and --suffix options (-P and -U) for gfxtest.
+	  The prefix will be prepended to the output filename and the
+	  suffix will be appended.
 20-Dec-2001
 	- Fixed gfxtest so it will actually write out the PNG file correctly
 	  on windows (i.e. use binary mode for writing the file).

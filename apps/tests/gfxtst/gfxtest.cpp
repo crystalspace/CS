@@ -57,6 +57,8 @@ static struct option long_options[] =
   {"verbose", no_argument, 0, 'v'},
   {"version", no_argument, 0, 'V'},
   {"save", optional_argument, 0, 'S'},
+  {"prefix", required_argument, 0, 'P'},
+  {"suffix", required_argument, 0, 'U'},
   {"display", optional_argument, 0, 'D'},
   {"heightmap", optional_argument, 0, 'H'},
   {"info", no_argument, 0, 'I'},
@@ -96,6 +98,8 @@ static struct
 // Dont move inside the struct!
 static csRGBpixel transpcolor;
 char output_name[512] = "";
+char prefix_name[512] = "";
+char suffix_name[512] = "";
 
 static int display_help ()
 {
@@ -114,7 +118,9 @@ static int display_help ()
   printf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
   printf ("------------------- Output options (reciprocally exclusive): ------------------\n");
   printf ("  -S   --save[=#]      Output a PNG output image (default)\n");
-  printf ("  -D   --display[=#,#] Display the image in ASCII format :-)\n");
+  printf ("  -P   --prefix=#      Add prefix before output filename\n");
+  printf ("  -U   --suffix=#      Add suffix after output filename\n");
+  printf ("  -D   --display=#,#   Display the image in ASCII format :-)\n");
   printf ("  -H   --heightmap[=#] Output a 3D heightmap in Crystal Space format\n");
   printf ("                       An optional scale argument may be specified\n");
   printf ("  -I   --info          Display image info (and don't do anything more)\n");
@@ -154,17 +160,33 @@ static bool SavePNM (const char *fname, void *image, int w, int h, bool rgb)
 static bool output_picture (const char *fname, const char *suffix, iImage *ifile)
 {
   char outname [CS_MAXPATHLEN + 1];
+  char* eol;
+  if (prefix_name[0])
+  {
+    strcpy (outname, prefix_name);
+    eol = strchr (outname, 0);
+  }
+  else eol = outname;
+
   if (output_name[0])
-    strcpy (outname, output_name);
+    strcpy (eol, output_name);
   else
   {
-    strcpy (outname, fname);
-    char *eol = strchr (outname, 0);
-    while (eol > outname && *eol != '.') eol--;
-    if (eol == outname) eol = strchr (outname, 0);
-    strcpy (eol, suffix);
-    strcat (eol, ".png");
+    strcpy (eol, fname);
+    if (!suffix_name[0])
+    {
+      eol = strchr (eol, 0);
+      while (eol > outname && *eol != '.') eol--;
+      if (eol == outname) eol = strchr (outname, 0);
+      strcpy (eol, suffix);
+      strcat (eol, ".png");
+    }
   }
+  if (suffix_name[0])
+  {
+    strcat (eol, suffix_name);
+  }
+
   printf ("Saving output file %s\n", outname);
 
 #if 1
@@ -475,7 +497,7 @@ int main (int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdas:m:t:D:S::H::IhvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdas:m:t:D:S:P:U::H::IhvV", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -493,11 +515,25 @@ int main (int argc, char *argv[])
       case 'a':
         opt.stripalpha = true;
         break;
+      case 'P':
+	if (optarg && sscanf (optarg, "%s", prefix_name) != 1)
+	{
+          printf ("%s: expecting <prefix> after -P\n", programname);
+          return -1;
+	}
+        break;
+      case 'U':
+	if (optarg && sscanf (optarg, "%s", suffix_name) != 1)
+	{
+          printf ("%s: expecting <suffix> after -U\n", programname);
+          return -1;
+	}
+        break;
       case 'S':
         opt.outputmode = 0;
 	if (optarg && sscanf (optarg, "%s", output_name) != 1)
 	{
-          printf ("%s: expecting optional <filename> -S\n", programname);
+          printf ("%s: expecting optional <filename> after -S\n", programname);
           return -1;
 	}
 	break;
@@ -585,11 +621,7 @@ int main (int argc, char *argv[])
   ImageLoader->SetDithering (opt.dither);
 
   for (; optind < argc; ++optind)
-    if (!process_file (argv [optind]))
-    {
-      ImageLoader->DecRef();
-      return -1;
-    }
+    process_file (argv [optind]);
   ImageLoader->DecRef();
 
   return 0;

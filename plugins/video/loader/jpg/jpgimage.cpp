@@ -294,7 +294,7 @@ static void init_source (j_decompress_ptr cinfo)
 static boolean fill_input_buffer (j_decompress_ptr cinfo)
 {
   /* no-op */ (void)cinfo;
-  return TRUE;
+  return FALSE;
 }
 
 /*
