@@ -860,6 +860,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("position", XMLTOKEN_POSITION);
   xmltokens.Register ("polymesh", XMLTOKEN_POLYMESH);
   xmltokens.Register ("portal", XMLTOKEN_PORTAL);
+  xmltokens.Register ("portals", XMLTOKEN_PORTALS);
   xmltokens.Register ("priority", XMLTOKEN_PRIORITY);
   xmltokens.Register ("proctex", XMLTOKEN_PROCTEX);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
@@ -2148,20 +2149,26 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 
 bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
-	csStringID id, bool& handled, const char*& priority)
+	csStringID id, bool& handled, const char*& priority,
+	bool do_portal_container)
 {
+#undef TEST_MISSING_MESH
+#define TEST_MISSING_MESH \
+  if (!mesh) \
+  { \
+    SyntaxService->ReportError ( \
+	"crystalspace.maploader.load.meshobject", \
+	child, do_portal_container ? "Specify at least one portal first!" : \
+	"First specify the parent factory with 'factory'!"); \
+    return false; \
+  }
+
   handled = true;
   switch (id)
   {
     case XMLTOKEN_STATICLOD:
       {
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	  "crystalspace.maploader.load.meshobject",
-	  	  child, "First specify the parent factory with 'factory'!");
-	  return false;
-	}
+	TEST_MISSING_MESH
 	iLODControl* lodctrl = mesh->CreateStaticLOD ();
 	if (!LoadLodControl (lodctrl, child))
 	  return false;
@@ -2169,13 +2176,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_LODLEVEL:
       {
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	  "crystalspace.maploader.load.meshobject",
-	  	  child, "First specify the parent factory with 'factory'!");
-	  return false;
-	}
+	TEST_MISSING_MESH
         if (!parent)
 	{
 	  SyntaxService->ReportError (
@@ -2195,13 +2196,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_LOD:
       {
-        if (!mesh)
-	{
-	  SyntaxService->ReportError (
-	  	  "crystalspace.maploader.load.meshobject",
-	  	  child, "First specify the parent factory with 'factory'!");
-	  return false;
-	}
+	TEST_MISSING_MESH
 	if (!mesh->GetMeshObject ())
 	{
           SyntaxService->ReportError (
@@ -2227,130 +2222,58 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       priority = child->GetContentsValue ();
       break;
     case XMLTOKEN_ADDON:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       if (!LoadAddOn (ldr_context, child, mesh))
 	return false;
       break;
     case XMLTOKEN_NOLIGHTING:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       mesh->GetFlags().Set (CS_ENTITY_NOLIGHTING);
       break;
     case XMLTOKEN_NOSHADOWS:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
       break;
     case XMLTOKEN_INVISIBLE:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       mesh->GetFlags().Set (CS_ENTITY_INVISIBLE);
       break;
     case XMLTOKEN_DETAIL:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       mesh->GetFlags().Set (CS_ENTITY_DETAIL);
       break;
     case XMLTOKEN_IMPOSTER:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       if (!ParseImposterSettings (mesh, child))
         return false;
       break;
     case XMLTOKEN_ZFILL:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       if (!priority) priority = "wall";
       mesh->SetZBufMode (CS_ZBUF_FILL);
       break;
     case XMLTOKEN_ZUSE:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       if (!priority) priority = "object";
       mesh->SetZBufMode (CS_ZBUF_USE);
       break;
     case XMLTOKEN_ZNONE:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       if (!priority) priority = "sky";
       mesh->SetZBufMode (CS_ZBUF_NONE);
       break;
     case XMLTOKEN_ZTEST:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       if (!priority) priority = "alpha";
       mesh->SetZBufMode (CS_ZBUF_TEST);
       break;
     case XMLTOKEN_CAMERA:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       if (!priority) priority = "sky";
       mesh->GetFlags().Set (CS_ENTITY_CAMERA);
       break;
     case XMLTOKEN_BADOCCLUDER:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       else
       {
         csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
@@ -2359,13 +2282,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_GOODOCCLUDER:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       else
       {
         csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE (mesh,
@@ -2374,13 +2291,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_CLOSED:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       else
       {
 	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
@@ -2396,13 +2307,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_CONVEX:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       else
       {
 	iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
@@ -2418,13 +2323,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_KEY:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       else
       {
         iKeyValuePair* kvp = ParseKey (child, mesh->QueryObject());
@@ -2435,18 +2334,12 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_HARDMOVE:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       if (!mesh->GetMeshObject())
       {
 	SyntaxService->ReportError (
 		"crystalspace.maploader.load.meshobject",
-		child, "Please sepcify the params of the meshobject fist!");
+		child, "Please specify the params of the meshobject fist!");
 	return false;
       }
       else if (!mesh->GetMeshObject ()->SupportsHardTransform ())
@@ -2479,13 +2372,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       }
       break;
     case XMLTOKEN_MOVE:
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      }
+      TEST_MISSING_MESH
       else
       {
         mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
@@ -2511,13 +2398,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_CAST_HW_SHADOW:
 #ifdef CS_USE_NEW_RENDERER
-      if (!mesh)
-      {
-	SyntaxService->ReportError (
-	  	"crystalspace.maploader.load.meshobject",
-	  	child, "First specify the parent factory with 'factory'!");
-	return false;
-      } 
+      TEST_MISSING_MESH 
       else
       {
         if (strcasecmp (child->GetAttributeValue ("enable"), "true") == 0)
@@ -2532,6 +2413,7 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       return true;
   }
   return true;
+#undef TEST_MISSING_MESH
 }
 
 iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
@@ -2552,7 +2434,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, mesh, 0, child, id,
-    	handled, priority))
+    	handled, priority, false))
       return 0;
     if (!handled) switch (id)
     {
@@ -2726,10 +2608,21 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, mesh, parent, child, id,
-    	handled, priority))
+    	handled, priority, false))
       return false;
     if (!handled) switch (id)
     {
+      case XMLTOKEN_PORTAL:
+        {
+	  iMeshWrapper* container_mesh = 0;
+          if (!ParsePortal (ldr_context, child, 0, 0, container_mesh, mesh))
+	    return 0;
+	}
+        break;
+      case XMLTOKEN_PORTALS:
+        if (!ParsePortals (ldr_context, child, 0, mesh))
+	  return 0;
+        break;
       case XMLTOKEN_MESHREF:
         {
           iMeshWrapper* sp = LoadMeshObjectFromFactory (ldr_context, child);
@@ -3947,9 +3840,9 @@ SCF_IMPLEMENT_IBASE (csMissingSectorCallback)
 SCF_IMPLEMENT_IBASE_END
 
 bool csLoader::ParsePortal (iLoaderContext* ldr_context,
-	iDocumentNode* node, iSector* sourceSector)
+	iDocumentNode* node, iSector* sourceSector, const char* container_name,
+	iMeshWrapper*& container_mesh, iMeshWrapper* parent)
 {
-// @@@ Need to use syntax services::ParsePortal()!
   const char* name = node->GetAttributeValue ("name");
   iSector* destSector = 0;
   csPoly3D poly;
@@ -3998,10 +3891,35 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
 
   iPortal* portal;
   destSector = ldr_context->FindSector (destSectorName.GetData ());
-  csRef<iMeshWrapper> mesh = Engine->CreatePortal (
-  	name,
-  	sourceSector, csVector3 (0), destSector,
-  	poly.GetVertices (), poly.GetVertexCount (), portal);
+  csRef<iMeshWrapper> mesh;
+  if (container_mesh)
+  {
+    mesh = container_mesh;
+    csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+    	iPortalContainer);
+    CS_ASSERT (pc != 0);
+    portal = pc->CreatePortal (poly.GetVertices (), poly.GetVertexCount ());
+    portal->SetSector (destSector);
+  }
+  else if (parent)
+  {
+    CS_ASSERT (sourceSector == 0);
+    mesh = Engine->CreatePortal (
+  	  container_name ? container_name : name,
+  	  parent, destSector,
+  	  poly.GetVertices (), poly.GetVertexCount (), portal);
+  }
+  else
+  {
+    CS_ASSERT (sourceSector != 0);
+    mesh = Engine->CreatePortal (
+  	  container_name ? container_name : name,
+  	  sourceSector, csVector3 (0), destSector,
+  	  poly.GetVertices (), poly.GetVertexCount (), portal);
+  }
+  container_mesh = mesh;
+  if (name)
+    portal->SetName (name);
   if (!destSector)
   {
     // Create a callback to find the sector at runtime when the
@@ -4026,6 +3944,43 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
   {
     portal->SetMaximumSectorVisit (msv);
   }
+
+  return true;
+}
+
+bool csLoader::ParsePortals (iLoaderContext* ldr_context,
+	iDocumentNode* node, iSector* sourceSector,
+	iMeshWrapper* parent)
+{
+  const char* container_name = node->GetAttributeValue ("name");
+  iMeshWrapper* container_mesh = 0;
+  const char* priority = 0;
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    bool handled;
+    if (!HandleMeshParameter (ldr_context, container_mesh, parent, child, id,
+    	handled, priority, true))
+      return false;
+    if (!handled) switch (id)
+    {
+      case XMLTOKEN_PORTAL:
+        if (!ParsePortal (ldr_context, child, sourceSector,
+		container_name, container_mesh, parent))
+	  return false;
+        break;
+      default:
+	SyntaxService->ReportBadToken (child);
+	return false;
+    }
+  }
+
+  if (!priority) priority = "object";
+  container_mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
 
   return true;
 }
@@ -4059,7 +4014,14 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  return 0;
       	break;
       case XMLTOKEN_PORTAL:
-        if (!ParsePortal (ldr_context, child, sector))
+	{
+	  iMeshWrapper* container_mesh = 0;
+          if (!ParsePortal (ldr_context, child, sector, 0, container_mesh, 0))
+	    return 0;
+	}
+        break;
+      case XMLTOKEN_PORTALS:
+        if (!ParsePortals (ldr_context, child, sector, 0))
 	  return 0;
         break;
       case XMLTOKEN_CULLER:

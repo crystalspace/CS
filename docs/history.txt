@@ -6,6 +6,19 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Oct-2003
+	- Jorrit changed the main loader for portals:
+	    - New <portals> statement that can group several portals and
+	      also allows the keywords 'lodlevel', 'move', 'hardmove', ...
+	    - The ability to specify <portals> or <portal> as a child of
+	      another mesh.
+	    - Some notes: if you have a standalone <portal> then the optional
+	      name of that portal will be used for both the portal container
+	      and the portal. In that case portals sharing the same name
+	      will be grouped on the same portal container. If you use
+	      a manually specified <portals> statement then the names
+	      of the individual portals will no longer be used for the portal
+	      container (only for the portals).
 6-Oct-2003
         - Philip Wyett added 'waterdemo' to CS root .cvsignore file.
 	- Jorrit fixed waterdemo so it no longer uses '/this/data'. It is

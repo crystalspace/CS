@@ -170,6 +170,7 @@ enum
   XMLTOKEN_PLUGINS,
   XMLTOKEN_POLYMESH,
   XMLTOKEN_PORTAL,
+  XMLTOKEN_PORTALS,
   XMLTOKEN_POSITION,
   XMLTOKEN_PRIORITY,
   XMLTOKEN_PROCTEX,
@@ -505,9 +506,18 @@ private:
   iKeyValuePair* ParseKey (iDocumentNode* node, iObject* pParent);
   /// Parse a map node definition and add the node to the given sector
   iMapNode* ParseNode (iDocumentNode* node, iSector* sec);
-  /// Parse a portal definition.
+  /**
+   * Parse a portal definition. 'container_name' is the name of the portal
+   * container to use. If 0 then the name of the portal itself will be
+   * used instead.
+   */
   bool ParsePortal (iLoaderContext* ldr_context,
-	iDocumentNode* node, iSector* sourceSector);
+	iDocumentNode* node, iSector* sourceSector, const char* container_name,
+	iMeshWrapper*& container_mesh, iMeshWrapper* parent);
+  /// Parse a portals definition.
+  bool ParsePortals (iLoaderContext* ldr_context,
+	iDocumentNode* node, iSector* sourceSector,
+	iMeshWrapper* parent);
   /// Parse a sector definition and add the sector to the engine
   iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Find the named shared variable and verify its type if specified
@@ -570,7 +580,8 @@ private:
    */
   bool HandleMeshParameter (iLoaderContext* ldr_context,
   	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
-	csStringID id, bool& handled, const char*& priority);
+	csStringID id, bool& handled, const char*& priority,
+	bool do_portal_container);
   /**
    * Load the mesh object from the map file.
    * The parent is not 0 if this mesh is going to be part of a hierarchical
