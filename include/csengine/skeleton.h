@@ -23,7 +23,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 #include "csgeom/transfrm.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 
 class csFrame;
 class csSkeletonLimbState;

@@ -299,7 +299,7 @@ void CmdSequence::compile_pass2 (char** buf)
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(PrimScript,csScript);
+IMPLEMENT_CSOBJTYPE (PrimScript,csScript);
 
 PrimScript::PrimScript (LanguageLayer* layer) : csScript (layer)
 {
@@ -438,16 +438,16 @@ bool PrimScriptRun::step ()
 	{
 	  csLight* l = NULL;
 	  csIdType t = attached->GetType ();
-	  if (t == csStatLight::Type() || t == csDynLight::Type())
+	  if (t == csStatLight::Type || t == csDynLight::Type)
 	    l = (csLight*)attached;
-	  else if (attached->GetType () == csCollection::Type())
+	  else if (attached->GetType () == csCollection::Type)
 	  {
 	    csCollection* col = (csCollection*)attached;
 	    int i;
 	    for (i = 0 ; i < col->GetNumObjects () ; i++)
 	    {
 	      t = (*col)[i]->GetType ();
-	      if (t == csStatLight::Type() || t == csDynLight::Type())
+	      if (t == csStatLight::Type || t == csDynLight::Type)
 	      {
 	        l = (csLight*)((*col)[i]);
 		break;

@@ -1224,11 +1224,7 @@ bool csPolyTexture::CleanIfDirty (int lu, int lv)
   return retval;
 }
 
-iLightMap *csPolyTexture::GetLightMap ()
-{
-  return lm;
-}
-
+iLightMap *csPolyTexture::GetLightMap () { return lm; }
 iTextureHandle *csPolyTexture::GetTextureHandle () { return txt_handle; }
 int csPolyTexture::GetWidth () { return w; }
 int csPolyTexture::GetHeight () { return h; }

@@ -71,7 +71,7 @@ IntScriptFunc* IntScriptRegister::find_function (char* name)
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(IntScript,csScript);
+IMPLEMENT_CSOBJTYPE (IntScript,csScript);
 
 IntScript::IntScript (LanguageLayer* layer) : csScript (layer)
 {

@@ -21,8 +21,9 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"  // texel coords
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 #include "csengine/cscolor.h"
+#include "csengine/arrays.h"
 #include "igraph3d.h"
 
 class csPolygonTemplate;
@@ -43,24 +44,11 @@ private:
   /// Maximum number of vertices.
   int max_vertices;
 
-  /**
-   * List of polygontemplates.
-   */
-  csPolygonTemplate** polygon;
-  /// Number of polygons.
-  int num_polygon;
-  /// Maximum number of polygons.
-  int max_polygon;
+  /// List of polygontemplates.
+  csPolygonTemplateArray polygons;
 
-  /**
-   * List of curve templates.
-   */
-  csCurveTemplate** curves;
-  /// Number of curves.
-  int num_curves;
-  /// Maximum number of polygons.
-  int max_curves;
-
+  /// List of curve templates.
+  csCurveTemplateArray curves;
 
   /// Vertices to be used by curves
   csVector3* curve_vertices;
@@ -83,29 +71,39 @@ private:
   csVector3 curves_center;
   /// scale param (the larger this param it, the more 
   /// the curves are tesselated)
-  float   curves_scale;  
+  float curves_scale;  
 
 public:
   /// Add a vertex to this template.
   void AddVertex (float x, float y, float z);
   /// Add a vertex to this template.
-  void AddVertex (const csVector3& v) { AddVertex (v.x, v.y, v.z); }
+  void AddVertex (const csVector3& v)
+  { AddVertex (v.x, v.y, v.z); }
   /// Add a polygon template to this thing template.
-  void AddPolygon (csPolygonTemplate* p);
+  void AddPolygon (csPolygonTemplate* poly)
+  { polygons.Push (poly); }
 
-  void AddCurve (csCurveTemplate* p);
-  int GetNumCurves () { return num_curves; }
-  csCurveTemplate* GetCurve (int i) { return curves[i]; }
+  /// Add a curve surface template
+  void AddCurve (csCurveTemplate* curve)
+  { curves.Push (curve); }
+  /// Get number of curve surface templates
+  int GetNumCurves ()
+  { return curves.Length (); }
+  /// Get Nth curve surface template
+  csCurveTemplate* GetCurve (int i)
+  { return curves.Get (i); }
 
   ///
-  int GetNumCurveVertices () { return num_curve_vertices; }
+  int GetNumCurveVertices ()
+  { return num_curve_vertices; }
   ///
-  csVector3& CurveVertex (int i) { return curve_vertices[i]; }
+  csVector3& CurveVertex (int i)
+  { return curve_vertices[i]; }
   ///
-  csVector2& CurveTexel (int i) { return curve_texels[i]; }
+  csVector2& CurveTexel (int i)
+  { return curve_texels[i]; }
   ///
   void AddCurveVertex (csVector3& v, csVector2& t);
-  ///
 
 public:
   ///
@@ -114,13 +112,18 @@ public:
   virtual ~csThingTemplate ();
 
   ///
-  int GetNumVertices () { return num_vertices; }
+  int GetNumVertices ()
+  { return num_vertices; }
   ///
-  csVector3& Vtex (int i) { return vertices[i]; }
+  csVector3& Vtex (int i)
+  { return vertices[i]; }
+
   ///
-  int GetNumPolygon () { return num_polygon; }
-  ///
-  csPolygonTemplate* GetPolygon (int i) { return polygon[i]; }
+  int GetNumPolygon ()
+  { return polygons.Length (); }
+  /// Get the Nth polygon
+  csPolygonTemplate* GetPolygon (int i)
+  { return polygons.Get (i); }
 
   /// Return true if this has fog.
   bool HasFog () { return fog.enabled; }
@@ -144,8 +147,8 @@ private:
   int num_vertices;
   /// Maximum number of vertices.
   int max_vertices;
-  ///
-  char name[30];
+  /// Polygon name
+  char *name;
 
   /// Should mipmapping be used for this polygon?
   int no_mipmap;
@@ -174,7 +177,7 @@ private:
 
 public:
   ///
-  csPolygonTemplate (csThingTemplate* parent, char* name, csTextureHandle* texture = NULL);
+  csPolygonTemplate (csThingTemplate* iParent, char* iName, csTextureHandle* iTexture = NULL);
   ///
   virtual ~csPolygonTemplate ();
 

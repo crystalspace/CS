@@ -22,6 +22,7 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "csws/csgfxppl.h"
+#include "csutil/util.h"
 #include "isystem.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
@@ -112,8 +113,7 @@ void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, const cha
   pe->Text.fg = fg;
   pe->Text.bg = bg;
   pe->font = font;
-  CHK (pe->Text.string = new char[strlen (s) + 1]);
-  strcpy (pe->Text.string, s);
+  CHK (pe->Text.string = strnew (s));
 }
 
 void csGraphicsPipeline::Sprite2D (csSprite2D *s2d, int x, int y, int w, int h)

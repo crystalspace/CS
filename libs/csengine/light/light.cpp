@@ -35,7 +35,7 @@ int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_white = DEFAULT_LIGHT_LEVEL;
 
-CSOBJTYPE_IMPL(csLight,csObject);
+IMPLEMENT_CSOBJTYPE (csLight,csObject);
 
 csLight::csLight (float x, float y, float z, float d,
 	      float red, float green, float blue) : csObject()
@@ -157,7 +157,7 @@ void csLight::CorrectForNocolor (float* rp, float* gp, float* bp)
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csStatLight,csLight);
+IMPLEMENT_CSOBJTYPE (csStatLight,csLight);
 
 csStatLight::csStatLight (float x, float y, float z, float dist,
 	      float red, float green, float blue, bool dynamic)
@@ -314,7 +314,7 @@ void csLightPatch::Initialize (int n)
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csDynLight,csLight);
+IMPLEMENT_CSOBJTYPE (csDynLight,csLight);
 
 csDynLight::csDynLight (float x, float y, float z, float dist,
 	      float red, float green, float blue)

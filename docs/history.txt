@@ -13,6 +13,84 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+20-Dec-1999
+	- Fixed a bug in specifying the gouraud shading coordinates in the
+	  world loader.
+	- Applied a patch from Andrew Zabolotny (who hasn't managed to get
+	  ssh working on OS/2 yet) with the following changes:
+	    - New memory debugger. The old memory debugger is still
+	      available (the one which requires CHK) but might be removed
+	      in the future. The new debugger is enabled by specifying
+	      MEMDBG=1 on the make command line. The new memory debugger
+	      is completely autonomous (doesn't require recompilation).
+	      The new debugger gives most information when program is
+	      compiled in debug mode. For checking if you have memory
+	      leaks it is not needed to compile with debug mode.
+    	      The debugger uses a file called memdbg.map that contains the
+	      memory map of the examined executable. The format is pretty
+	      simple; currently memdbg.map can be created only using `nm'
+	      program; the output of nm is parsed with a simple awk program
+	      (bin/memdbg.awk) and written to memdbg.awk.
+    	      The program being debugged can be run through bin/memdbg.sh
+	      script, that will automatically detect whenever the
+	      executable has a newer date than memdbg.map and refresh the
+	      map if it is the case.
+    	    - Upon exit memory debugger outputs a log file called (you
+	      guessed) memdbg.log.
+	    - Fixed a lot of memory leaks that arised due to
+	      "scfRefCount = 1" change. There were a lot of places that
+	      assumed that refcount is zero, thus they were incrementing
+	      the refcount right after allocating an SCF class. They
+	      were mostly related to images, lightmaps, textures and
+	      texture handles, thus the actual memory leaks were huge.
+	      Also fixed a bug with the csPolygonTextureType class, the
+	      refcount for it was never initialized thus polygon texture
+	      could be freed at the unexpected times, although most often
+	      it was not freed at all :-) Also csPolygon3D::GetLightmap
+	      used to increment lightmap's refcount, although nobody
+	      decremented it after GetLightmap (GetLightmap is used mostly
+	      inside 3D driver).
+	    - Fixed a bug with curve surfaces in things being never
+	      freed upon thing template deletion. The curve surfaces are
+	      now stored in a class derived from csVector, thus are
+	      automatically freed.
+	    - Reimplemented the csObject library. Since the hierarchical
+	      child objects are seldom used (we use specialized csVectors
+	      for this which is faster and more handy), the csObjTree class
+	      was removed at all. All child objects are stored in a single
+	      list and the child object iterator just searches
+    	      for the next object of given type in the list. The GetName
+	      and SetName methods have been added to csObject, and the
+	      object's name is stored in a pointer right in the csObject.
+	      This allows for much faster GetName (previously each
+	      GetName involved a new and a delete (!!!)) and also for
+	      more optimal memory allocation (there are lots of objects
+	      that have nothing but a name - previously an entire csObjTree
+	      would be allocated for that).
+    	    - Also I implemented a much cheaper pseudo-RTTI system that
+	      involves no memory allocation at all. Previously some
+	      memory was allocated for storing class names that was never
+	      freed; this is not the case anymore.
+    	    - The csObject library simplified a lot; previously it occupied
+	      six files with 16K overall size; now its just two files and
+	      6K respectively, with absolutely same functionality. The
+	      memory cost for a instance of csObject is also lower in most
+	      cases (the only case when current csObject will occupy more
+	      memory (+4 bytes) is when a object has neither name or
+    	      child objects).
+19-Dec-1999
+	- Thomas Hieber updated map2cs with a major change in texture
+	  handling.
+18-Dec-1999
+	- Michael Dale Long added movement fixes to cctest.
+	- Thomas Hieber updated map2cs with automatic extraction of
+	  textures from WAD3 (Pk3 is to follow).
+	- Brandon Ehle fixed the python makefile for multiline &
+	  custom postdefine's.
+	- Seth Galbraith did some fixes in the allegro 2D driver.
+	- Norman Kramer did some cleanup in the glide destructor and
+	  now creates mipmaps even for 2d textures.
+	- More debugging on coverage mask tree stuff.
 17-Dec-1999
 	- Moved CVS to SourceForge!
 	- Michael Dale Long merged CrystalClear updates into the new
@@ -23,6 +101,7 @@ Short-term cleanups that need to be done:
 	  on Entity code.
 	- Michael also added fixes from Brandon for makefile.py.
 	- Michael added a 2D sprite display fix thanks to FragDance.
+	- More debugging on coverage mask tree stuff.
 16-Dec-1999
 	- Further work on coverage mask tree. It is almost working now.
 	  I still have performance problems and occasional bugs. The

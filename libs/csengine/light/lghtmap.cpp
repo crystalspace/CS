@@ -108,6 +108,8 @@ csLightMap::~csLightMap ()
     CHK (delete first_smap);
     first_smap = smap;
   }
+  static_lm.Clear ();
+  real_lm.Clear ();
 }
 
 void csLightMap::DelShadowMap (csShadowMap* smap)
@@ -285,7 +287,7 @@ void CacheName (char* buf, csPolygonSet* owner, int index, char* suffix)
   if (!name)
     CsPrintf (MSG_WARNING, "Lighting cache is used while some objects don't have names!\n");
 
-  if (owner->GetType () == csThing::Type())
+  if (owner->GetType () == csThing::Type)
   {
     const char* pname = owner->GetSector ()->GetName ();
     if (!pname)
@@ -397,7 +399,7 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
     light = world->FindLight (ls.x, ls.y, ls.z, ls.dist);
     if (light)
     {
-      if (light->GetType () == csStatLight::Type() && poly)
+      if (light->GetType () == csStatLight::Type && poly)
       {
         csStatLight* slight = (csStatLight*)light;
         slight->RegisterPolygon (poly);

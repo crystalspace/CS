@@ -23,7 +23,7 @@
 #include "cssfxldr/common/snddata.h"
 #include "csparser/snddatao.h"
 
-CSOBJTYPE_IMPL(csSoundDataObject,csObject);
+IMPLEMENT_CSOBJTYPE (csSoundDataObject,csObject);
 
 csSoundDataObject::~csSoundDataObject ()
 {
@@ -32,7 +32,7 @@ csSoundDataObject::~csSoundDataObject ()
 
 csSoundData* csSoundDataObject::GetSound (csObject& csobj, const char* name)
 {
-  csObjIterator i = csobj.ObjGet (csSoundDataObject::Type ());
+  csObjIterator i = csobj.GetIterator (csSoundDataObject::Type);
   while (!i.IsNull ())
   {
     if (strcmp (name, (*i).GetName ()) == 0)

@@ -37,7 +37,7 @@
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csThing,csPolygonSet);
+IMPLEMENT_CSOBJTYPE (csThing,csPolygonSet);
 
 csThing::csThing () : csPolygonSet (), obj()
 {

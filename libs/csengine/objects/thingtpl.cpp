@@ -24,36 +24,26 @@
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csThingTemplate,csObject);
+IMPLEMENT_CSOBJTYPE (csThingTemplate,csObject);
 
-csThingTemplate::csThingTemplate () : csObject ()
+csThingTemplate::csThingTemplate () : csObject (),
+  polygons (32, 32), curves (16, 16)
 {
-  max_vertices = num_vertices = 0;
-  max_polygon = num_polygon = 0;
+  num_vertices = max_vertices = 0;
+  vertices = NULL;
 
-  num_curves = max_curves = 0;
-  curves=NULL;
-
+  num_curve_vertices = max_curve_vertices = 0;
   curves_center.x = curves_center.y = curves_center.z = 0.0;
   curves_scale = 40;
   curve_vertices = NULL;
   curve_texels = NULL;
-  num_curve_vertices = max_curve_vertices = 0;
 
-  vertices = NULL;
-  polygon = NULL;
   fog.enabled = false;
 }
 
 csThingTemplate::~csThingTemplate ()
 {
   CHK (delete [] vertices);
-  if (polygon)
-  {
-    for (int i = 0; i < num_polygon; i++)
-      CHKB (delete polygon [i]);
-    CHK (delete [] polygon);
-  }
   CHK (delete [] curve_vertices);
   CHK (delete [] curve_texels);
 }
@@ -106,62 +96,17 @@ void csThingTemplate::AddCurveVertex (csVector3& v, csVector2& t)
   num_curve_vertices++;
 }
 
-
-void csThingTemplate::AddCurve (csCurveTemplate* poly)
-{
-  if (!curves)
-  {
-    max_curves = 6;
-    CHK (curves = new csCurveTemplate* [max_curves]);
-  }
-  while (num_curves >= max_curves)
-  {
-    max_curves += 6;
-    CHK (csCurveTemplate** new_curves = new csCurveTemplate* [max_curves]);
-    memcpy (new_curves, curves, sizeof (csCurveTemplate*)*num_curves);
-    CHK (delete [] curves);
-    curves = new_curves;
-  }
-
-  // Here we could try to include a test for the right orientation
-  // of the polygon.
-  curves[num_curves++] = poly;
-}
-
-
-void csThingTemplate::AddPolygon (csPolygonTemplate* poly)
-{
-  if (!polygon)
-  {
-    max_polygon = 6;
-    CHK (polygon = new csPolygonTemplate* [max_polygon]);
-  }
-  while (num_polygon >= max_polygon)
-  {
-    max_polygon += 6;
-    CHK (csPolygonTemplate** new_polygon = new csPolygonTemplate* [max_polygon]);
-    memcpy (new_polygon, polygon, sizeof (csPolygonTemplate*)*num_polygon);
-    CHK (delete [] polygon);
-    polygon = new_polygon;
-  }
-
-  // Here we could try to include a test for the right orientation
-  // of the polygon.
-  polygon[num_polygon++] = poly;
-}
-
 //---------------------------------------------------------------------------
 
-csPolygonTemplate::csPolygonTemplate (csThingTemplate* parent, char* name,
-	csTextureHandle* texture)
+csPolygonTemplate::csPolygonTemplate (csThingTemplate* iParent, char* iName,
+  csTextureHandle* iTexture)
 {
   vertices_idx = NULL;
   max_vertices = num_vertices = 0;
 
-  if (name) strcpy (csPolygonTemplate::name, name);
-  else csPolygonTemplate::name[0] = 0;
-  csPolygonTemplate::texture = texture;
-  csPolygonTemplate::parent = parent;
+  parent = iParent;
+  name = strnew (iName);
+  texture = iTexture;
 
   no_mipmap = false;
   no_lighting = false;
@@ -173,6 +118,7 @@ csPolygonTemplate::csPolygonTemplate (csThingTemplate* parent, char* name,
 
 csPolygonTemplate::~csPolygonTemplate ()
 {
+  CHK (delete [] name);
   CHK (delete [] vertices_idx);
   CHK (delete [] uv_coords);
 }
@@ -252,6 +198,3 @@ void csPolygonTemplate::Transform (csMatrix3& m, csVector3& v)
   (void)m; (void)v;
   // ??? @@@ What needs to be done here?
 }
-
-//---------------------------------------------------------------------------
-

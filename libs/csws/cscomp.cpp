@@ -1501,14 +1501,10 @@ int csComponent::WordRight (const char *iText, int StartPos)
 
 void csComponent::SetText (const char *iText)
 {
-  if (!text)
-    CHKB (delete[] text);
-
   if (!iText)
     iText = "";
-  int sl = strlen (iText);
-  CHK (text = new char [sl + 1]);
-  memcpy (text, iText, sl + 1);
+  CHKB (delete [] text);
+  text = strnew (iText);
   Invalidate ();
 }
 

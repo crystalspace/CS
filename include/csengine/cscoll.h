@@ -20,7 +20,7 @@
 #define CSCOLL_H
 
 #include "csgeom/math3d.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 #include "csutil/csvector.h"
 
 class csSector;

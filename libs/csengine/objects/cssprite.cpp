@@ -191,7 +191,7 @@ void csSpriteAction::AddFrame (csFrame * f, int d)
 
 //--------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL (csSpriteTemplate, csObject)
+IMPLEMENT_CSOBJTYPE (csSpriteTemplate, csObject)
 
 csSpriteTemplate::csSpriteTemplate ()
   : csObject (), frames (8, 8), actions (8, 8)
@@ -315,7 +315,7 @@ csSpriteAction* csSpriteTemplate::FindAction (const char *n)
 
 //=============================================================================
 
-CSOBJTYPE_IMPL (csSprite3D, csObject)
+IMPLEMENT_CSOBJTYPE (csSprite3D, csObject)
 
 /// Static vertex array.
 DECLARE_GROWING_ARRAY (static, tr_verts, csVector3)

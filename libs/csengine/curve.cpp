@@ -31,10 +31,10 @@
 
 static csBezierCache theBezierCache;
 
-CSOBJTYPE_IMPL(csCurve,csObject);
-CSOBJTYPE_IMPL(csCurveTemplate,csObject);
-CSOBJTYPE_IMPL(csBezier,csCurve);
-CSOBJTYPE_IMPL(csBezierTemplate,csCurveTemplate);
+IMPLEMENT_CSOBJTYPE (csCurve,csObject);
+IMPLEMENT_CSOBJTYPE (csCurveTemplate,csObject);
+IMPLEMENT_CSOBJTYPE (csBezier,csCurve);
+IMPLEMENT_CSOBJTYPE (csBezierTemplate,csCurveTemplate);
 
 csCurveTesselated::csCurveTesselated (int num_v, int num_t)
 {
@@ -351,5 +351,3 @@ csCurve* csBezierTemplate::MakeCurve ()
   p->SetTextureHandle (cstxt);
   return p;
 }
-
-

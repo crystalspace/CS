@@ -64,6 +64,8 @@
     }									\
     Type &operator [] (int n)						\
     { return root [n]; }						\
+    void Delete (int n)							\
+    { memmove (&root [n], &root [n + 1], (Limit - n - 1) * sizeof (Type)); }\
     Type *GetArray ()							\
     { return root; }							\
     __##Name ()								\

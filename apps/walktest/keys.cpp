@@ -283,7 +283,7 @@ public:
   CSOBJTYPE;
 };
 
-CSOBJTYPE_IMPL (TreeSkelSpriteInfo, csObject);
+IMPLEMENT_CSOBJTYPE (TreeSkelSpriteInfo, csObject);
 
 // Animate a skeleton.
 void animate_skeleton_tree (csSkeletonLimbState* limb)
@@ -291,7 +291,7 @@ void animate_skeleton_tree (csSkeletonLimbState* limb)
   csSkeletonConnectionState* con = (csSkeletonConnectionState*)limb->GetChildren ();
   while (con)
   {
-    TreeSkelSpriteInfo* o = (TreeSkelSpriteInfo*)con->GetObj (TreeSkelSpriteInfo::Type ());
+    TreeSkelSpriteInfo* o = (TreeSkelSpriteInfo*)con->GetChild (TreeSkelSpriteInfo::Type);
     if (!o)
     {
       CHK (o = new TreeSkelSpriteInfo ());
@@ -389,7 +389,7 @@ public:
   CSOBJTYPE;
 };
 
-CSOBJTYPE_IMPL (GhostSkelSpriteInfo, csObject);
+IMPLEMENT_CSOBJTYPE (GhostSkelSpriteInfo, csObject);
 
 // Object added to the ghost sprite itself to hold some information
 // about movement.
@@ -400,7 +400,7 @@ public:
   CSOBJTYPE;
 };
 
-CSOBJTYPE_IMPL (GhostSpriteInfo, csObject);
+IMPLEMENT_CSOBJTYPE (GhostSpriteInfo, csObject);
 
 // Recursive function to add limbs to a skeletal ghost. This also builds
 // the sprite template.
@@ -475,7 +475,7 @@ void animate_skeleton_ghost (csSkeletonLimbState* limb)
   csSkeletonConnectionState* con = (csSkeletonConnectionState*)limb->GetChildren ();
   while (con)
   {
-    GhostSkelSpriteInfo* o = (GhostSkelSpriteInfo*)con->GetObj (GhostSkelSpriteInfo::Type ());
+    GhostSkelSpriteInfo* o = (GhostSkelSpriteInfo*)con->GetChild (GhostSkelSpriteInfo::Type);
     if (!o)
     {
       CHK (o = new GhostSkelSpriteInfo ());
@@ -614,7 +614,7 @@ void move_ghost (csSprite3D* spr)
   }
 
   // Turn around at random intervals.
-  GhostSpriteInfo* gh_info = (GhostSpriteInfo*)spr->GetObj (GhostSpriteInfo::Type ());
+  GhostSpriteInfo* gh_info = (GhostSpriteInfo*)spr->GetChild (GhostSpriteInfo::Type);
   if (rand () % 40 == 1) gh_info->dir = -gh_info->dir;
 
   // OpenStep compiler bug prevents Transform(GetYRotation()), which is why
@@ -744,7 +744,7 @@ void HandleDynLight (csDynLight* dyn)
 	  ms->sprite->RemoveFromSectors ();
 	  Sys->view->GetWorld ()->RemoveSprite (ms->sprite);
 	}
-        dyn->ObjRemove(dyn->GetObj(csDataObject::Type()));
+        dyn->ObjRemove(dyn->GetChild (csDataObject::Type));
         CHK (delete ms);
         CHK (ExplosionStruct* es = new ExplosionStruct);
         if (Sys->Sound)

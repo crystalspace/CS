@@ -20,7 +20,7 @@
 #define LIGHT_H
 
 #include "csgeom/transfrm.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 #include "csengine/cscolor.h"
 #include "csengine/rview.h"
 #include "lightdef.h"

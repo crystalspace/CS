@@ -135,9 +135,9 @@ csSkeletonLimbState* csSkeleton::CreateState ()
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csSkeletonLimbState,csObject);
-CSOBJTYPE_IMPL(csSkeletonConnectionState,csSkeletonLimbState);
-CSOBJTYPE_IMPL(csSkeletonState,csSkeletonLimbState);
+IMPLEMENT_CSOBJTYPE (csSkeletonLimbState,csObject);
+IMPLEMENT_CSOBJTYPE (csSkeletonConnectionState,csSkeletonLimbState);
+IMPLEMENT_CSOBJTYPE (csSkeletonState,csSkeletonLimbState);
 
 csSkeletonLimbState::~csSkeletonLimbState ()
 {

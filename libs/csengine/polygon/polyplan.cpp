@@ -23,7 +23,7 @@
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csPolyPlane,csObject);
+IMPLEMENT_CSOBJTYPE (csPolyPlane,csObject);
 
 csPolyPlane::csPolyPlane () : csObject ()
 {

@@ -17,62 +17,45 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __TREEITR_H_
-#define __TREEITR_H_
+#ifndef __OBJITER_H__
+#define __OBJITER_H__
 
-#include "csobject/objtree.h"
+class csObject;
+class csObjContainer;
 
 /**
  * An iterator for a node in a csObject tree.
- * Used by the csObject::ObjGet() call.  This object behaves similar to
- * a pointer, and is used to traverse through several csObjects in the
- * tree.  
- *  
+ * This object behaves similar to a pointer, and is used to traverse
+ * through several csObjects in the tree.  
+ * <p>
  * Example usage:
+ * <pre>
  * csObjIterator i;
  * *i;   (returns a csObject&)
  * ++i;  (moves to the next csObject)
  * i.IsNull() (returns true if i has reached the end of the list)
+ * </pre>
  */
 class csObjIterator
 {
 protected:
-  ///
-  class csObjItrNode
-  {
-  public:
-    ///
-    csObjItrNode* next;
-    ///
-    csObjTree* treenode;
-    ///
-    int child_ind, subnode_ind;
-    ///
-    csObjItrNode(csObjTree* node);
-    ///
-    ~csObjItrNode();
-  };
-  ///
-  csObjItrNode* top; 
-
-  /// Seeks the first node in the tree that contains at least one csObject.
-  void NodeSeek();
+  /// The type of objects this iterator handles
+  const csIdType *Type; 
+  /// A pointer to the container of the object which we are iterating
+  csObjContainer *Container;
+  /// The last index of child we examined
+  int Index;
 
 public:
-
-  ///
-  csObjIterator(csObjTree* node);
-  ///
-  csObjIterator(const csObjIterator& iter);
-
-  ///
-  ~csObjIterator();
-  ///
-  bool IsNull() const;
-  ///
-  csObject& operator* ();
-  ///
+  /// Create the iterator
+  csObjIterator (const csIdType &iType, const csObject &iObject);
+  /// Check if we have any children of requested type
+  bool IsNull () const
+  { return Container == NULL; }
+  /// Get the object we are pointing at
+  csObject& operator* () const;
+  /// Move forward
   csObjIterator& operator++ ();
 };
 
-#endif /* __TREEITR_H_ */
+#endif // __OBJITER_H__

@@ -100,14 +100,13 @@ csMenuItem::~csMenuItem ()
     CHK (delete sprchecked); sprchecked = NULL;
     CHK (delete sprsubmenu); sprsubmenu = NULL;
   }
+  CHKB (delete [] info)
 }
 
 void csMenuItem::SetText (const char *iText)
 {
-  if (text)
-    CHKB (delete[] text)
-  if (info)
-    CHKB (delete[] info)
+  CHKB (delete [] text)
+  CHKB (delete [] info)
 
   text = NULL;
   info = NULL;
@@ -127,10 +126,7 @@ void csMenuItem::SetText (const char *iText)
       cc++;
   CHK (text = new char [cc + 1]);
   if (i < sl)
-  {
-    CHK (info = new char [sl - i]);
-    strcpy (info, (char *)&iText [i + 1]);
-  }
+    info = strnew (iText + i + 1);
 
   cc = 0;
   for (i = 0; i < sl; i++)

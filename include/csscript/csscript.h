@@ -20,7 +20,7 @@
 #define csScript_H
 
 #include "csgeom/math3d.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 
 class csScript;
 class csRunScript;

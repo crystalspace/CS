@@ -629,10 +629,7 @@ csTextureMMSoftware* csTextureManagerSoftware::new_texture (iImageFile* image)
 {
   CHK (csTextureMMSoftware* tm = new csTextureMMSoftware (image));
   if (tm->loaded_correctly ())
-  {
-    tm->IncRef ();
     textures.Push (tm);
-  }
   else
   {
     delete tm;

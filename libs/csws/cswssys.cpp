@@ -54,6 +54,11 @@ cswsSystemDriver::cswsSystemDriver (csApp *ParentApp) :
 
 cswsSystemDriver::~cswsSystemDriver ()
 {
+  CHK (delete [] linecolor);
+  if (textline)
+    for (int i = 0; i < maxlines; i++)
+      CHKB (delete [] textline [i]);
+  CHK (delete [] textline);
   application = NULL;
 }
 

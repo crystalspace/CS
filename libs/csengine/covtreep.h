@@ -67,12 +67,6 @@ public:
   	float* dxdy, float* dydx,
   	int hor_offs, int ver_offs);
 
-  /// Return the horizontal number of pixels for this node.
-  static int GetHorizontalSize ()
-  {
-    return Child::GetHorizontalSize ()*csCovMaskTriage::GetHorizontalSize ();
-  }
-
   /**
    * Update this node and all children to a polygon.
    * This function is similar to InsertPolygon() but it does
@@ -94,6 +88,33 @@ public:
   bool TestPolygonNotEmpty (csVector2* poly, int num_verts,
   	float* dxdy, float* dydx,
   	int hor_offs, int ver_offs) const;
+
+  /**
+   * Make this tree invalid. This will set the state of
+   * this node to 'invalid' and also the state of all children.
+   * This can be used for debugging purposes but serves no other
+   * useful purpose.
+   */
+  void MakeInvalid ();
+
+  /**
+   * Test consistancy for this node. Consistance can be broken
+   * in the following cases:<br>
+   * <ul>
+   * <li>Mask is invalid.
+   * <li>A bit is partial while the corresponding child isn't.
+   * </ul>
+   * The results are printed on standard output.
+   * This function returns false if it found an error. In that case
+   * it will stop searching for further errors.
+   */
+  bool TestConsistency (int hor_offs, int ver_offs) const;
+
+  /// Return the horizontal number of pixels for this node.
+  static int GetHorizontalSize ()
+  {
+    return Child::GetHorizontalSize ()*csCovMaskTriage::GetHorizontalSize ();
+  }
 
   /// Return the vertical number of pixels for this node.
   static int GetVerticalSize ()
@@ -158,6 +179,18 @@ public:
   bool TestPolygonNotEmpty (csVector2* poly, int num_verts,
   	float* dxdy, float* dydx,
   	int hor_offs, int ver_offs) const;
+
+  /**
+   * Make this node invalid. This is a do-nothing function
+   * here because a csCovMask does not have an invalid state.
+   */
+  void MakeInvalid () { }
+
+  /**
+   * Test consistancy for this node. This is an empty function
+   * as a csCovMask cannot be inconsistant.
+   */
+  bool TestConsistency (int, int) const { return true; }
 
   /**
    * Do a graphical dump of the coverage mask tree

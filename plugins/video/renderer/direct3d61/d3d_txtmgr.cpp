@@ -200,10 +200,7 @@ csTextureMMDirect3D* csTextureManagerDirect3D::new_texture (iImageFile* image)
 {
   CHK (csTextureMMDirect3D* tm = new csTextureMMDirect3D (image));
   if (tm->loaded_correctly ())
-  {
-    tm->IncRef ();
     textures.Push (tm);
-  }
   else
   {
     delete tm;

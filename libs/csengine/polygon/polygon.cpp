@@ -58,18 +58,7 @@ DECLARE_GROWING_ARRAY (static, VectorArray, csVector3)
 
 //---------------------------------------------------------------------------
 
-csPolygonTextureType::csPolygonTextureType() 
-{
-	CONSTRUCT_IBASE(NULL)
-	IncRef();
-}
-
-IMPLEMENT_IBASE(csPolygonTextureType);
-IMPLEMENT_IBASE_END
-
-//---------------------------------------------------------------------------
-
-csLightMapped::csLightMapped ()
+csLightMapped::csLightMapped () : csPolygonTextureType ()
 {
   lightmap = lightmap1 = lightmap2 = lightmap3 = NULL;
   theDynLight = NULL;
@@ -131,7 +120,7 @@ csPolyTexture* csLightMapped::GetPolyTex (int mipmap)
 
 //---------------------------------------------------------------------------
 
-csGouraudShaded::csGouraudShaded ()
+csGouraudShaded::csGouraudShaded () : csPolygonTextureType ()
 {
   uv_coords = NULL;
   colors = NULL;
@@ -241,14 +230,14 @@ void csGouraudShaded::SetDynamicColor (int i, float r, float g, float b)
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csPolygon3D,csObject);
+IMPLEMENT_CSOBJTYPE (csPolygon3D,csObject);
 
 IMPLEMENT_IBASE (csPolygon3D)
   IMPLEMENTS_INTERFACE (iPolygon3D)
 IMPLEMENT_IBASE_END
 
-csPolygon3D::csPolygon3D (csTextureHandle* texture)
-	: csObject (), csPolygonInt (), vertices (4)
+csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
+  csPolygonInt (), vertices (4)
 {
   CONSTRUCT_IBASE (NULL);
   txtMM = texture;
@@ -281,7 +270,7 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
-	vertices (4)
+  vertices (4)
 {
   const char* tname = poly.GetName ();
   if (tname) SetName (tname);
@@ -299,7 +288,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
 
   // Share txt_info with original polygon.
   txt_info = poly.txt_info;
-  txt_info->IncRef();
+  txt_info->IncRef ();
 
   poly.dont_draw = true;
   dont_draw = false;
@@ -317,12 +306,12 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
 
 csPolygon3D::~csPolygon3D ()
 {
-  if(txt_info) {
-    txt_info->DecRef(); 
-    txt_info = NULL;
-  }
-  if (delete_plane) CHKB (delete plane);
-  if (delete_portal) CHKB (delete portal);
+  if (txt_info)
+    txt_info->DecRef (); 
+  if (delete_plane)
+    CHKB (delete plane);
+  if (delete_portal)
+    CHKB (delete portal);
   while (light_info.lightpatches)
     csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
   VectorArray.DecRef ();
@@ -330,18 +319,18 @@ csPolygon3D::~csPolygon3D ()
 
 void csPolygon3D::SetTextureType (int type)
 {
-  if(txt_info)
-  	if(txt_info->GetTextureType () == type) 
-  		return;	// Already that type
-  else
-  	txt_info->DecRef();
+  if (txt_info)
+    if (txt_info->GetTextureType () == type) 
+      return;	// Already that type
+    else
+      txt_info->DecRef ();
   switch (type)
   {
     case POLYTXT_LIGHTMAP:
-      CHK (txt_info = (csPolygonTextureType*)new csLightMapped ());
+      CHK (txt_info = (csPolygonTextureType *)new csLightMapped ());
       break;
     case POLYTXT_GOURAUD:
-      CHK (txt_info = (csPolygonTextureType*)new csGouraudShaded ());
+      CHK (txt_info = (csPolygonTextureType *)new csGouraudShaded ());
       break;
   }
 }
@@ -548,7 +537,7 @@ void csPolygon3D::Finish ()
   if (orig_poly) return;
   if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
   	return;
-  csLightMapped* lmi = GetLightMapInfo ();
+  csLightMapped *lmi = GetLightMapInfo ();
   if (!lmi)
   {
     CsPrintf (MSG_INTERNAL_ERROR, "No txt_info in polygon!\n");
@@ -559,16 +548,18 @@ void csPolygon3D::Finish ()
   lmi->tex1->lm = NULL;
   lmi->tex2->lm = NULL;
   lmi->tex3->lm = NULL;
-  if (portal) portal->SetTexture (txtMM->GetTextureHandle ());
+  if (portal)
+    portal->SetTexture (txtMM->GetTextureHandle ());
 
   if (CheckFlags (CS_POLY_LIGHTING) && TEXW(lmi->tex)*TEXH(lmi->tex) < 1000000)
   {
     CHK (lmi->lightmap = new csLightMap ());
     int r, g, b;
     GetSector ()->GetAmbientColor (r, g, b);
-    lmi->lightmap->Alloc (TEXW(lmi->tex), TEXH(lmi->tex), def_mipmap_size,
-    	r, g, b);
-    lmi->tex->SetMipmapSize (def_mipmap_size); lmi->tex->lm = lmi->lightmap;
+    lmi->lightmap->Alloc (TEXW(lmi->tex), TEXH(lmi->tex),
+      def_mipmap_size, r, g, b);
+    lmi->tex->SetMipmapSize (def_mipmap_size);
+    lmi->tex->lm = lmi->lightmap;
   }
 }
 
@@ -1655,12 +1646,5 @@ bool csPolygon3D::UsesMipMaps ()
 iLightMap *csPolygon3D::GetLightMap ()
 {
   csLightMapped *lmi = GetLightMapInfo ();
-  csLightMap *lm = lmi ? lmi->GetLightMap () : NULL;
-  if (lm)
-  {
-    lm->IncRef ();
-    return lm;
-  }
-  else
-    return NULL;
+  return lmi ? lmi->GetLightMap () : NULL;
 }

@@ -20,7 +20,7 @@
 #ifndef __CDOBJ_H_
 #define __CDOBJ_H_
 
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 
 class csCollider;
 

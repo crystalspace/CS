@@ -40,9 +40,8 @@ csMousePointer::csMousePointer (csComponent *iParent, int ID, int x, int y,
 
 csMousePointer::~csMousePointer ()
 {
-  if (Cursor)
-    CHKB (delete Cursor);
-  CHK (Free ());
+  CHK (delete Cursor);
+  Free ();
 }
 
 void csMousePointer::Draw (int x, int y)
@@ -75,8 +74,7 @@ void csMousePointer::Free ()
 
 void csMousePointer::SetTexture (iTextureHandle *tex)
 {
-  if (Cursor)
-    CHKB (delete Cursor);
+  CHK (delete Cursor);
   CHK (Cursor = new csSprite2D (tex, tX, tY, tW, tH));
   if (!Cursor->ok ())
   {

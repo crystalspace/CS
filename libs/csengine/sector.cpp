@@ -55,7 +55,7 @@ bool csSector::do_radiosity = false;
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL (csSector,csPolygonSet);
+IMPLEMENT_CSOBJTYPE (csSector,csPolygonSet);
 
 csSector::csSector () : csPolygonSet ()
 {
@@ -396,6 +396,10 @@ static int count_cull_node_notvis_behind;
 static int count_cull_node_notvis_cbuffer;
 static int count_cull_node_vis;
 
+//@@@@@@@
+bool stop_processing = false;
+csPolygon2D debug_poly2d;
+
 // @@@ This routine need to be cleaned up!!! It probably needs to
 // be part of the class.
 
@@ -474,6 +478,10 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
         i1 = i;
       }
     }
+    //@@@@@@@@@@@@@@@
+csPolygon2D copy_persp; copy_persp.MakeRoom (persp.GetNumVertices ());
+copy_persp.SetVertices (persp.GetVertices (), persp.GetNumVertices ());
+
     if (!persp.ClipAgainst (rview->view)) return false;
 
     // c-buffer test.
@@ -481,6 +489,43 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     if (quadtree)
       vis = quadtree->TestPolygon (persp.GetVertices (),
 	persp.GetNumVertices (), persp.GetBoundingBox ());
+    //@@@@@@@@@@@@@@
+    else if (covtree && c_buffer)
+    {
+      bool vis1;
+      vis = covtree->TestPolygon (persp.GetVertices (),
+	persp.GetNumVertices (), persp.GetBoundingBox ());
+      vis1 = c_buffer->TestPolygon (persp.GetVertices (),
+      	persp.GetNumVertices ());
+      if (vis != vis1)
+      {
+        printf ("MISMATCH CullOctreeNode covtree=%d cbuffer=%d!\n", vis, vis1);
+	printf ("min=(%f,%f,%f) max=(%f,%f,%f)\n",
+		onode->GetMinCorner ().x, onode->GetMinCorner ().y,
+		onode->GetMinCorner ().z, onode->GetMaxCorner ().x,
+		onode->GetMaxCorner ().y, onode->GetMaxCorner ().z
+		);
+	printf ("pos=(%f,%f,%f)\n", pos.x, pos.y, pos.z);
+	int i;
+	for (i = 0 ; i < num_array ; i++)
+	{
+	  printf ("  %d (%f,%f,%f) cam:(%f,%f,%f)\n", i, array[i].x, array[i].y,
+	  	array[i].z, cam[i].x, cam[i].y, cam[i].z);
+	}
+	for (i = 0 ; i < persp.GetNumVertices () ; i++)
+	{
+	  printf ("  persp:%d (%f,%f)\n", i, persp[i].x, persp[i].y);
+	}
+	for (i = 0 ; i < copy_persp.GetNumVertices () ; i++)
+	{
+	  printf ("  copyp:%d (%f,%f)\n", i, copy_persp[i].x, copy_persp[i].y);
+	}
+	stop_processing = true;
+	debug_poly2d.MakeRoom (persp.GetNumVertices ());
+	debug_poly2d.SetVertices (persp.GetVertices (), persp.GetNumVertices ());
+	return false;
+      }
+    }
     else if (covtree)
       vis = covtree->TestPolygon (persp.GetVertices (),
 	persp.GetNumVertices (), persp.GetBoundingBox ());
@@ -744,7 +789,7 @@ void csSector::Draw (csRenderView& rview)
       {
         if (
 	  ((csPolygonSet*)rview.portal_polygon->GetParent ())->GetType ()
-	  	== csThing::Type () ||
+	  	== csThing::Type ||
 	  previous_sector->HasFog () ||
 	  rview.portal_polygon->IsTransparent () ||
 	  rview.portal_polygon->GetPortal ()->IsSpaceWarped ()

@@ -24,8 +24,9 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h" // texel coords
 #include "csgeom/polyint.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 #include "csengine/tranman.h"
+#include "csengine/arrays.h"
 #include "igraph3d.h"
 #include "ipolygon.h"
 
@@ -42,7 +43,6 @@ class csBspTree;
 class Dumper;
 class csRenderView;
 class csFrustrumList;
-class csPolygon3D;
 class csCurve;
 struct iPolygonSet;
 
@@ -112,7 +112,9 @@ protected:
    */
   csPolygonSet* next;
 
+  /// Number of vertices
   int num_vertices;
+  /// Maximal number of vertices
   int max_vertices;
   
   /// Vertices in world space.
@@ -125,33 +127,10 @@ protected:
   csTransformedSet cam_verts_set;
 
   /// The array of polygons forming the outside of the set
-  class csPolygonArray : public csVector
-  {
-  public:
-    csPolygonArray () : csVector (16, 16) {}
-    virtual ~csPolygonArray ()
-    { DeleteAll (); }
-    virtual bool FreeItem (csSome Item);
-    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-    csPolygon3D *Get (int iNum) const;
-    csPolygonInt **GetArray ()
-    { return (csPolygonInt **)root; }
-  } polygons;
+  csPolygonArray polygons;
 
   /// The array of curves forming the outside of the set
-  class csCurvesArray : public csVector
-  {
-  public:
-    csCurvesArray () : csVector (16, 16) {}
-    virtual ~csCurvesArray ()
-    { DeleteAll (); }
-    virtual bool FreeItem (csSome Item);
-    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-    csCurve *Get (int iNum) const
-    { return (csCurve *)csVector::Get (iNum); }
-    csCurve **GetArray ()
-    { return (csCurve **)root; }
-  } curves;
+  csCurvesArray curves;
 
   /// csSector where this polyset belongs (pointer to 'this' if it is a sector).
   csSector* sector;

@@ -20,7 +20,7 @@
 #ifndef __POBJECT_H_
 #define __POBJECT_H_
 
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 
 /**
  * A csObject which maintains a reference to the parent csObject.
@@ -28,16 +28,19 @@
 class csPObject : public csObject
 {
 protected:
-  ///
-  csObject* parent;
-  ///
-  virtual void SetObjectParent(csObject* p) { parent = p; }
+  /// The pointer to parent object
+  csObject *parent;
+  /// Set the parent object pointer
+  virtual void SetObjectParent (csObject *p)
+  { parent = p; }
 
 public:
-  /// 
-  csPObject() : csObject(), parent(NULL) {}
-  ///
-  virtual csObject* GetObjectParent() const { return parent; }
+  /// Initialize the object
+  csPObject () : csObject (), parent (NULL)
+  { }
+  /// Query the parent object
+  virtual csObject *GetObjectParent () const
+  { return parent; }
   
   CSOBJTYPE;
 };

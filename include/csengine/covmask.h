@@ -162,6 +162,25 @@ public:
 #   endif
   }
 
+  /**
+   * Return true if this mask is partial.
+   * For a csCovMask this is always false.
+   */
+  bool IsPartial () const
+  {
+    return false;
+  }
+
+  /**
+   * Return true if this mask contains invalid bits.
+   * For csCovMask this always returns false as
+   * a csCovMask cannot be invalid.
+   */
+  bool IsInvalid () const
+  {
+    return false;
+  }
+
   /// Return the horizontal number of pixels for a mask.
   static int GetHorizontalSize ()
   {
@@ -324,6 +343,15 @@ public:
   }
 
   /**
+   * Return true if this mask is partial.
+   * A mask is partial if it is not empty or full.
+   */
+  bool IsPartial () const
+  {
+    return (!IsFull ()) && (!IsEmpty ());
+  }
+
+  /**
    * Combine this mask with another triage mask so that you get
    * the intersection of 'in' space.
    */
@@ -360,6 +388,37 @@ public:
       out2 = 0;
 #   endif
   }
+
+  /**
+   * Make this mask invalid.
+   * This can be used for debugging purposes but serves no other
+   * useful purpose.
+   */
+  void MakeInvalid ()
+  {
+    in = (csMask)~0;
+    out = (csMask)~0;
+#   if defined(CS_CM_8x8)
+      in2 = (csMask)~0;
+      out2 = (csMask)~0;
+#   endif
+  }
+
+  /**
+   * Return true if this mask contains invalid bits.
+   * This function is not the complementary of MakeInvalid().
+   * MakeInvalid() makes ALL bits invalid while this function
+   * tests if there is at least one bit that is invalid.
+   */
+  bool IsInvalid () const
+  {
+    if (in & out) return true;
+#   if defined(CS_CM_8x8)
+      if (in2 & out2) return true;
+#   endif
+    return false;
+  }
+
 };
 
 /**

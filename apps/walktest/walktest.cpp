@@ -460,7 +460,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
     {
       extern void HandleDynLight (csDynLight*);
       csDynLight* dn = dyn->GetNext ();
-      if (dyn->GetObj(csDataObject::Type())) HandleDynLight (dyn);
+      if (dyn->GetChild (csDataObject::Type)) HandleDynLight (dyn);
       dyn = dn;
     }
     // Apply lighting to all sprites
@@ -534,8 +534,15 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
       {
         Gfx2D->Clear (0);
 #	if 0
+	extern csPolygon2D debug_poly2d;
 	covtree->GfxDump (Gfx2D, covtree_level);
+	debug_poly2d.Draw (Gfx2D, 0xf800);
+	int i;
+	printf ("-----\n");
+	for (i = 0 ; i < debug_poly2d.GetNumVertices () ; i++)
+	  printf ("%d %f,%f\n", i, debug_poly2d[i].x, debug_poly2d[i].y);
 #	else
+	covtree->MakeInvalid ();
 	covtree->MakeEmpty ();
 	csCamera* c = view->GetCamera ();
 	csPolygon2D poly1, poly2, poly3;
@@ -545,6 +552,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 	poly1.AddPerspective (c->Other2This (csVector3 (-1, -1.3, 5)));
 	covtree->InsertPolygon (poly1.GetVertices (),
 		poly1.GetNumVertices (), poly1.GetBoundingBox ());
+	covtree->TestConsistency ();
 	poly2.AddPerspective (c->Other2This (csVector3 (-1.5, .5, 6)));
 	poly2.AddPerspective (c->Other2This (csVector3 (.5, .5, 6)));
 	poly2.AddPerspective (c->Other2This (csVector3 (.5, -1.5, 6)));
@@ -564,6 +572,7 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
 	poly1.Draw (Gfx2D, 0xf800);
 	poly2.Draw (Gfx2D, 0x07e0);
 	poly3.Draw (Gfx2D, 0x008f);
+	covtree->TestConsistency ();
 #	endif
       }
     }

@@ -21,7 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csengine/rview.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 class csTextureHandle;
 
 class ddgTBinMesh;

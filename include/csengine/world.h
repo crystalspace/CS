@@ -25,7 +25,7 @@
 #include "csengine/rview.h"
 #include "csengine/tranman.h"
 #include "csengine/halo.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 #include "iworld.h"
 #include "iconfig.h"
 

@@ -21,7 +21,7 @@
 #if !defined(__CSSOUNDDATAOBJECT_H__)
 #define __CSSOUNDDATAOBJECT_H__
 
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 
 class csSoundData;
 

@@ -24,100 +24,79 @@
  * Pseudo-RTTI, to avoid using "normal" rtti which is a serious size overhead.
  * We need rtti only for a few objects and a limited set of functions only.
  * Because of this we provide a fake RTTI system that does everything we need;
- * it is suggested to compile the engine without RTTI to conserve space.
+ * it is suggested to compile the engine without RTTI to create much smaller
+ * executables.<p>
+ * The most noticeable limitation is that it does not support multiple
+ * inheritance for objects with fake RTTI. You still can derive classes from
+ * multiple parents, but you should take care to not derive a class from more
+ * than one class that inherits from csObject.
  */
-
-typedef const char* csIdStr;
 
 /**
  * A class that represents the dynamic type of an object.
  * Under the pseudo RTTI system, this class represents the type of
- * an object, which can be retrieved via the Type() or GetType() calls.
+ * an object, which can be retrieved via the Type field or GetType() call.
+ * The csIdType is designed to occupy minimal possible storage as there
+ * can be lots of RTTI objects (for example, thousands of polygons).
+ * In fact, the overhead of our RTTI is just the size of one method entry
+ * in each object's vtable plus size of one csIdType object (two pointers)
+ * for each existing RTTI class.
  */
 class csIdType
 {
-private:
-  ///
-  unsigned char length;
-  ///
-  csIdStr* entries;
-  ///
-  const csIdType* base;
-  ///
-  static csIdStr default_idstr;
-
 public:
-  ///
-  csIdType() : length(0), entries(&default_idstr), base(NULL) {}
-  ///
-  csIdType(const csIdType& id) : 
-    length(id.length), entries(id.entries), base(id.base) {}
+  /// A pointer to the base type
+  const csIdType *Base;
+  /// The object type ID string
+  const char *ID;
 
-  ///
-  friend class csIdFunc;
+  /// Create a csIdType object given parent and class ID string
+  csIdType (const csIdType &iParent, const char *iID) : Base (&iParent), ID (iID)
+  { }
 
-  ///
-  ~csIdType() {}
+  /// Create the top-level csIdType object (with no parent)
+  csIdType (const char *iID) : Base (NULL), ID (iID)
+  { }
 
   /// Returns the level of polymorphism of this object
-  int Length() const { return length; }
+  int Length () const
+  {
+    int depth = 0;
+    for (const csIdType *c = Base; c; c = c->Base, depth++)
+      ;
+    return depth;
+  }
 
-  /// Get the base type of this type.
-  const csIdType* GetBase() const { return base; }
-
-  /// Returns the csIdStr of this object, which represents name of the class.
-  csIdStr operator*() const { return entries[length]; }
-
-  /// Compares whether one object's type is derived from the other.
-  bool operator< (const csIdType& id) const 
-  { return length < id.length && entries[length] == id.entries[length]; }
-
-  /// Compares whether one object's type is derived from the other.
-  bool operator<= (const csIdType& id) const 
-  { return length <= id.length && entries[length] == id.entries[length]; }
+#define COMPARE_TYPE(startval,stopval)			\
+  const csIdType *c;					\
+  for (c = startval; c && c != stopval; c = c->Base) ;	\
+  return (c != NULL);
 
   /// Compares whether one object's type is derived from the other.
-  bool operator> (const csIdType& id) const 
-  { return length > id.length && entries[id.length] == id.entries[id.length]; }
+  bool operator < (const csIdType& id) const
+  { COMPARE_TYPE (id.Base, this); }
 
   /// Compares whether one object's type is derived from the other.
-  bool operator>= (const csIdType& id) const
-  { return length >= id.length && entries[id.length] == id.entries[id.length]; }
+  bool operator <= (const csIdType& id) const 
+  { COMPARE_TYPE (&id, this); }
+
+  /// Compares whether one object's type is derived from the other.
+  bool operator > (const csIdType& id) const 
+  { COMPARE_TYPE (Base, &id); }
+
+  /// Compares whether one object's type is derived from the other.
+  bool operator >= (const csIdType& id) const
+  { COMPARE_TYPE (this, &id); }
+
+#undef COMPARE_TYPE
 
   /// Compares whether the two objects have the same dynamic type.
-  bool operator==(const csIdType& id) const 
-  { return length==id.length && entries[length]==id.entries[length]; }
+  bool operator == (const csIdType& id) const 
+  { return ID == id.ID; }
 
   /// Compares whether neither object is derived from the other.
-  bool operator!=(const csIdType& id) const 
-  { return !(*this<=id) && !(id<=*this); }
-};
-
-/**
- * A static class with static member functions, for manipulating csIdType
- */
-class csIdFunc
-{
-public:
-  /**
-   * The following function is used to allocate static csIdType instances.
-   * Since it allocates an array that is never freed, it should only be
-   * invoked for static variables that exist for the duration of the program.
-   */
-  static csIdType Allocate(csIdStr s, const csIdType& id);
-
-  /**
-   * Returns the csIdType common to both entries.
-   * This function will return the csIdType representing the highest-derived
-   * class which is common to both.
-   */
-  static csIdType GetCommon(const csIdType& t1, const csIdType& t2);
-};
-
-class NULLCLASS
-{
-public:
-  static const csIdType& Type();
+  bool operator != (const csIdType& id) const
+  { return !(*this <= id) && !(id <= *this); }
 };
 
 /**
@@ -127,23 +106,17 @@ public:
  */
 #define CSOBJTYPE							\
   public:								\
-    static csIdStr IdStr ();						\
-    static const csIdType& Type ();					\
-    virtual csIdStr GetIdStr () const { return IdStr(); }		\
-    virtual const csIdType& GetType () const { return Type(); }
+    static const csIdType Type;						\
+    virtual const csIdType& GetType () const;
 
 /**
- * The function implementations for a psuedoRTTI class.
- * For every class using the psuedoRTTI system, include this define
+ * The function implementations for a pseudoRTTI class.
+ * For every class using the pseudoRTTI system, include this define
  * with the class name and parent class name in the corresponding .cpp file.
  */
-#define CSOBJTYPE_IMPL(thisclass,parentclass)				\
-  csIdStr thisclass::IdStr ()						\
-  { static csIdStr t = #thisclass; return t; }				\
-  const csIdType& thisclass::Type ()					\
-  {									\
-    static csIdType t = csIdFunc::Allocate (IdStr (), parentclass::Type ());\
-    return t;								\
-  }
+#define IMPLEMENT_CSOBJTYPE(thisclass,parentclass)			\
+  const csIdType thisclass::Type (parentclass::Type, #thisclass);	\
+  const csIdType& thisclass::GetType () const				\
+  { return Type; }
 
 #endif

@@ -25,7 +25,7 @@
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csTextureHandle,csObject);
+IMPLEMENT_CSOBJTYPE (csTextureHandle,csObject);
 
 csTextureHandle::csTextureHandle (iImageFile* image) :
   csObject (), txt_handle (NULL), for_2d (false), for_3d (true)

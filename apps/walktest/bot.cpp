@@ -23,7 +23,7 @@
 #include "csengine/light.h"
 #include "csengine/world.h"
 
-CSOBJTYPE_IMPL(Bot,csSprite3D);
+IMPLEMENT_CSOBJTYPE (Bot,csSprite3D);
 
 Bot::Bot (csSpriteTemplate* tmpl) : csSprite3D ()
 {

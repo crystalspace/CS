@@ -30,7 +30,7 @@
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csTerrain,csObject);
+IMPLEMENT_CSOBJTYPE (csTerrain,csObject);
 
 csTerrain::csTerrain () : csObject()
 {

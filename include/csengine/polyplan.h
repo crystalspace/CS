@@ -20,7 +20,7 @@
 #define POLYPLANE_H
 
 #include "csgeom/transfrm.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 
 class Dumper;
 

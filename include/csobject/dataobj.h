@@ -20,14 +20,14 @@
 #ifndef __DATAOBJ_H_
 #define __DATAOBJ_H_
 
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 
 /**
  * A generic data object.
  * This class contains a pointer to a generic, untyped block of data which
  * is not destroyed when the csObject is freed.  Users are encouraged to 
  * implement their own custom csObjects, but this one can be used as a 
- * fallback.
+ * general enough and simple data storage that can be added to any object.
  */
 class csDataObject : public csObject
 {
@@ -36,16 +36,17 @@ protected:
   void* data;
 
 public:
-  /// Initialize this object with name 'n'
-  csDataObject(void* d) : csObject(), data(d) {}
-  ///
-  void* GetData() const { return data; }
-  ///
-  static void* GetData(csObject& csobj)
+  /// Initialize this object with data pointer initialized to 'd'
+  csDataObject (void *d) : csObject (), data (d)
+  { }
+  /// Get the data associated with this object
+  void* GetData () const
+  { return data; }
+  /// Get first data pointer associated with other object
+  static void* GetData (csObject& csobj)
   {
-    csDataObject* d = (csDataObject*)(csobj.GetObj(csDataObject::Type()));
-    if (d) return d->GetData();
-    else return NULL;
+    csDataObject *d = (csDataObject*)(csobj.GetChild (csDataObject::Type));
+    return d ? d->GetData () : NULL;
   }
   
   CSOBJTYPE;

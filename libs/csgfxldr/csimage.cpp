@@ -151,21 +151,18 @@ RGBPixel *csImageFile::GetImageData ()
 iImageFile *csImageFile::MipMap (int steps, Filter3x3* filt1, Filter5x5* filt2)
 {
   csImageFile* ifile = mipmap (steps, filt1, filt2);
-  ifile->IncRef ();
   return ifile;
 }
 
 iImageFile *csImageFile::MipMap (int steps)
 {
   csImageFile* ifile = mipmap (steps);
-  ifile->IncRef ();
   return ifile;
 }
 
 iImageFile *csImageFile::Blend (Filter3x3* filter)
 {
   csImageFile* ifile = blend (filter);
-  ifile->IncRef ();
   return ifile;
 }
 

@@ -74,6 +74,14 @@ public:
   /// Make the tree empty.
   void MakeEmpty ();
 
+  /// Make the tree invalid (for debugging).
+  void MakeInvalid ();
+
+  /**
+   * Test consistancy for the tree (for debugging).
+   */
+  void TestConsistency ();
+
   /**
    * Do a graphical dump of the coverage mask tree
    * upto the specified level.

@@ -25,7 +25,7 @@
 #include "csgeom/poly3d.h"
 #include "csgeom/transfrm.h"
 #include "csengine/pol2d.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 
 class csBspContainer;
 

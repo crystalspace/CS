@@ -21,7 +21,7 @@
 #define __ALPHA_H__
 
 #include "types.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 #include "csgfxldr/boxfilt.h"
 #include "igraph2d.h"
 

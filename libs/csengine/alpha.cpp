@@ -4,10 +4,10 @@
 
 #include "sysdef.h"
 #include "csengine/alpha.h"
-#include "csobject/nameobj.h"
+#include "csobject/csobject.h"
 #include "ialphamg.h"
 
-CSOBJTYPE_IMPL(csAlphaMapHandle,csObject);
+IMPLEMENT_CSOBJTYPE (csAlphaMapHandle,csObject);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

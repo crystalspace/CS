@@ -20,7 +20,7 @@
 #include "csscript/objtrig.h"
 #include "csscript/csscript.h"
 
-CSOBJTYPE_IMPL(csObjectTrigger,csPObject);
+IMPLEMENT_CSOBJTYPE (csObjectTrigger,csPObject);
 
 csObjectTrigger::csObjectTrigger () : csPObject(),activate_triggers() {}
 
@@ -42,5 +42,5 @@ void csObjectTrigger::DoActivateTriggers (csObject& obj)
 
 csObjectTrigger* csObjectTrigger::GetTrigger(csObject& obj)
 {
-  return (csObjectTrigger*)obj.GetObj(csObjectTrigger::Type());
+  return (csObjectTrigger*)obj.GetChild (csObjectTrigger::Type);
 }

@@ -20,7 +20,7 @@
 #include "csengine/cscoll.h"
 #include "csengine/thing.h"
 
-CSOBJTYPE_IMPL(csCollection,csObject);
+IMPLEMENT_CSOBJTYPE (csCollection,csObject);
 
 csCollection::csCollection () : csObject(), objects(8,8) {}
 
@@ -37,35 +37,35 @@ csObject* csCollection::FindObject (char* name)
 void csCollection::Transform ()
 {
   for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type())
+    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
       ((csThing*)(objects[i]))->Transform ();
 }
 
 void csCollection::SetMove (csSector* home, float x, float y, float z)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type())
+    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
       ((csThing*)(objects[i]))->SetMove (home, x, y, z);
 }
 
 void csCollection::SetTransform (const csMatrix3& matrix)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type())
+    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
       ((csThing*)(objects[i]))->SetTransform (matrix);
 }
 
 void csCollection::Move (float dx, float dy, float dz)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type())
+    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
       ((csThing*)(objects[i]))->Move (dx, dy, dz);
 }
 
 void csCollection::Transform (csMatrix3& matrix)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
-    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type())
+    if ( ((csObject*)(objects[i]))->GetType () == csThing::Type)
       ((csThing*)(objects[i]))->Transform (matrix);
 }
 

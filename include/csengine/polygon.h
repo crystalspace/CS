@@ -49,24 +49,25 @@ struct iGraphics3D;
  * If CS_POLY_MIPMAP is set for a polygon then mipmapping will be used.
  * It is set by default.
  */
-#define CS_POLY_MIPMAP 1
+#define CS_POLY_MIPMAP		0x00000001
 
 /**
  * If CS_POLY_LIGHTING is set for a polygon then the polygon will be lit.
  * It is set by default.
  */
-#define CS_POLY_LIGHTING 2
+#define CS_POLY_LIGHTING	0x00000002
 
 /**
  * If CS_POLY_FLATSHADING is set for a polygon then the polygon will not
  * be texture mapped but instead it will be flat shaded (possibly with gouraud).
  * It is unset by default.
  */
-#define CS_POLY_FLATSHADING 4
+#define CS_POLY_FLATSHADING	0x00000004
 
-// Types of texturing.
-#define POLYTXT_LIGHTMAP 1
-#define POLYTXT_GOURAUD 2
+/// Texture type is lightmapped
+#define POLYTXT_LIGHTMAP	1
+/// Gouraud Shaded texture
+#define POLYTXT_GOURAUD		2
 
 /**
  * Structure containing lighting information valid
@@ -105,18 +106,25 @@ struct csPolygonLightInfo
  */
 class csPolygonTextureType
 {
-  friend class csPolygon3D;
-
+protected:
+  /// Common constructor for derived classes
+  csPolygonTextureType ()
+  { RefCount = 1; }
+  /// Destructor is virtual to be able to delete derived objects
+  virtual ~csPolygonTextureType ()
+  { }
+private:
+  /// Reference counter
+  int RefCount;
 public:
-	csPolygonTextureType();
-
-  /// Destructor
-  virtual ~csPolygonTextureType () { }
-
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () = 0;
-
-  DECLARE_IBASE;
+  /// Maintain a reference counter for texture type objects
+  void IncRef ()
+  { RefCount++; }
+  /// Decrement usage counter
+  void DecRef ()
+  { if (!--RefCount) delete this; }
 };
 
 /**
@@ -500,8 +508,10 @@ public:
    */
   csGouraudShaded* GetGouraudInfo ()
   {
-    if (txt_info && txt_info->GetTextureType () == POLYTXT_GOURAUD) return (csGouraudShaded*)txt_info;
-    else return NULL;
+    if (txt_info && txt_info->GetTextureType () == POLYTXT_GOURAUD)
+      return (csGouraudShaded*)txt_info;
+    else
+      return NULL;
   }
 
   /// Set all flags with the given mask.

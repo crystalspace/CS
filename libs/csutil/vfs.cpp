@@ -188,11 +188,15 @@ public:
     CHK (delete (VfsArchive *)Item);
     return true;
   }
+  VfsArchive *Get (int iIndex)
+  {
+    return (VfsArchive *)csVector::Get (iIndex);
+  }
   void CheckUp ()
   {
     for (int i = Length () - 1; i >= 0; i--)
     {
-      VfsArchive *a = (VfsArchive *)Get (i);
+      VfsArchive *a = Get (i);
       if (a->CheckUp ())
         Delete (i);
     }
@@ -249,7 +253,7 @@ private:
 };
 
 // The global archive cache
-static VfsArchiveCache ArchiveCache;
+static VfsArchiveCache *ArchiveCache;
 
 // --------------------------------------------------------------- csFile --- //
 
@@ -271,7 +275,7 @@ csFile::csFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffi
 csFile::~csFile ()
 {
   CHK (delete [] Name);
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
 }
 
 int csFile::GetStatus ()
@@ -527,7 +531,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
   fpos = 0;
 
   Archive->UpdateTime ();
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
 
 #ifdef VFS_DEBUG
   printf ("VFS: Trying to open file \"%s\" from archive \"%s\"\n", NameSuffix, Archive->GetName ());
@@ -803,7 +807,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask, iStrVector *FileL
     else
     {
       // rpath is an archive
-      int idx = ArchiveCache.FindKey (rpath);
+      int idx = ArchiveCache->FindKey (rpath);
       // archive not in cache?
       if (idx < 0)
       {
@@ -811,11 +815,11 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask, iStrVector *FileL
         if (access (rpath, F_OK) != 0)
           continue;
 
-        idx = ArchiveCache.Length ();
-        CHK (ArchiveCache.Push (new VfsArchive (rpath, System)));
+        idx = ArchiveCache->Length ();
+        CHK (ArchiveCache->Push (new VfsArchive (rpath, System)));
       }
 
-      VfsArchive *a = (VfsArchive *)ArchiveCache [idx];
+      VfsArchive *a = ArchiveCache->Get (idx);
       // Flush all pending operations
       a->UpdateTime ();
       if (a->Writing == 0)
@@ -877,7 +881,7 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
     else
     {
       // rpath is an archive
-      int idx = ArchiveCache.FindKey (rpath);
+      int idx = ArchiveCache->FindKey (rpath);
       // archive not in cache?
       if (idx < 0)
       {
@@ -888,11 +892,11 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
             continue;
 	}
 
-        idx = ArchiveCache.Length ();
-        CHK (ArchiveCache.Push (new VfsArchive (rpath, System)));
+        idx = ArchiveCache->Length ();
+        CHK (ArchiveCache->Push (new VfsArchive (rpath, System)));
       }
 
-      CHK (f = new ArchiveFile (Mode, this, i, FileName, (VfsArchive *)ArchiveCache [idx]));
+      CHK (f = new ArchiveFile (Mode, this, i, FileName, ArchiveCache->Get (idx)));
       if (f->GetStatus () == VFS_STATUS_OK)
         break;
       else
@@ -924,7 +928,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath, csArchive *&Archive)
     else
     {
       // rpath is an archive
-      int idx = ArchiveCache.FindKey (rpath);
+      int idx = ArchiveCache->FindKey (rpath);
       // archive not in cache?
       if (idx < 0)
       {
@@ -932,11 +936,11 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath, csArchive *&Archive)
         if (access (rpath, F_OK) != 0)
           continue;
 
-        idx = ArchiveCache.Length ();
-        CHK (ArchiveCache.Push (new VfsArchive (rpath, System)));
+        idx = ArchiveCache->Length ();
+        CHK (ArchiveCache->Push (new VfsArchive (rpath, System)));
       }
 
-      VfsArchive *a = (VfsArchive *)ArchiveCache [idx];
+      VfsArchive *a = ArchiveCache->Get (idx);
       a->UpdateTime ();
       if (a->FileExists (Suffix, NULL))
       {
@@ -1068,12 +1072,14 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
   cnode = NULL;
   cnsufx [0] = 0;
   config = NULL;
+  CHK (ArchiveCache = new VfsArchiveCache ());
 }
 
 csVFS::~csVFS ()
 {
   CHK (delete config);
   CHK (delete cwd);
+  CHK (delete ArchiveCache);
 }
 
 bool csVFS::Initialize (iSystem *iSys)
@@ -1238,7 +1244,7 @@ bool csVFS::ChDir (const char *Path)
   CHK (delete [] cwd);
   cwd = newwd;
 
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
   return true;
 }
 
@@ -1268,7 +1274,7 @@ bool csVFS::Exists (const char *Path) const
   PreparePath (Path, false, node, suffix, sizeof (suffix));
   bool exists = (node && (!suffix [0] || node->Exists (suffix)));
 
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
   return exists;
 }
 
@@ -1342,7 +1348,7 @@ iStrVector *csVFS::FindFiles (const char *Path) const
     fl = NULL;
   }
 
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
   return fl;
 }
 
@@ -1358,14 +1364,14 @@ iFile *csVFS::Open (const char *FileName, int Mode)
 
   iFile *f = node->Open (Mode, suffix);
 
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
   return f;
 }
 
 bool csVFS::Sync ()
 {
-  ArchiveCache.DeleteAll ();
-  return (ArchiveCache.Length () == 0);
+  ArchiveCache->DeleteAll ();
+  return (ArchiveCache->Length () == 0);
 }
 
 char *csVFS::ReadFile (const char *FileName, size_t &Size)
@@ -1406,14 +1412,9 @@ bool csVFS::WriteFile (const char *FileName, const char *Data, size_t Size)
   if (!F)
     return false;
 
-  if (F->Write (Data, Size) != Size)
-  {
-    CHK (delete F);
-    return false;
-  }
-
-  CHK (delete F);
-  return true;
+  bool success = (F->Write (Data, Size) == Size);
+  F->DecRef ();
+  return success;
 }
 
 bool csVFS::DeleteFile (const char *FileName)
@@ -1428,13 +1429,13 @@ bool csVFS::DeleteFile (const char *FileName)
 
   bool rc = node->Delete (suffix);
 
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
   return rc;
 }
 
 bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 {
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
 
   if (!VirtualPath || !RealPath)
     return false;
@@ -1463,7 +1464,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
 
 bool csVFS::Unmount (const char *VirtualPath, const char *RealPath)
 {
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
 
   if (!VirtualPath)
     return false;
@@ -1532,7 +1533,7 @@ bool csVFS::GetFileTime (const char *FileName, tm &ztime) const
 
   bool success = node ? node->GetFileTime (suffix, ztime) : false;
 
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
   return success;
 }
 
@@ -1547,6 +1548,6 @@ bool csVFS::SetFileTime (const char *FileName, tm &ztime)
 
   bool success = node ? node->SetFileTime (suffix, ztime) : false;
 
-  ArchiveCache.CheckUp ();
+  ArchiveCache->CheckUp ();
   return success;
 }

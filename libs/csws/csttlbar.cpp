@@ -52,7 +52,7 @@ void csTitleBar::Draw ()
 
   // Hash title bar (a-la Macintosh)
   int bdy = bound.Height () / 4;
-  if ((bdy > 2) && (tx > 16))
+  if ((bdy > 2) && (tx > 8 + bound.Height ()))
     for (int by = 1 + bdy / 2; by < bound.Height () - 2; by += 4)
     {
       Line (8, by, tx - 8, by, indx + 2);

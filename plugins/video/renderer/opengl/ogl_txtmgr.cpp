@@ -194,10 +194,7 @@ csTextureMMOpenGL* csTextureManagerOpenGL::new_texture (iImageFile* image)
 {
   CHK (csTextureMMOpenGL* tm = new csTextureMMOpenGL (image));
   if (tm->loaded_correctly ())
-  {
-    tm->IncRef ();
     textures.Push (tm);
-  }
   else
   {
     delete tm;

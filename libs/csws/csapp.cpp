@@ -241,6 +241,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   }
 
   csWSTexture *tex = new csWSTexture (iTexName, image, i2D, i3D);
+  image->DecRef ();
   if (transp)
     tex->SetTransparent (QInt (tr * 255.), QInt (tg * 255.), QInt (tb * 255.));
   Textures.Push (tex);

@@ -127,7 +127,7 @@ csVector3 LanguageLayer::camera_vector ()
 
 void LanguageLayer::transform (csObject* obj, csMatrix3& m, csVector3& v)
 {
-  if (obj->GetType () == csThing::Type())
+  if (obj->GetType () == csThing::Type)
   {
     csThing* th = (csThing*)obj;
     th->Transform (m);
@@ -135,7 +135,7 @@ void LanguageLayer::transform (csObject* obj, csMatrix3& m, csVector3& v)
     th->Transform (); // @@@ This should be delayed until it is sure that the
     		      // thing is visible.
   }
-  else if (obj->GetType () == csCollection::Type())
+  else if (obj->GetType () == csCollection::Type)
   {
     csCollection* col = (csCollection*)obj;
     col->Transform (m);
@@ -147,14 +147,14 @@ void LanguageLayer::transform (csObject* obj, csMatrix3& m, csVector3& v)
 
 void LanguageLayer::transform (csObject* obj, csMatrix3& m)
 {
-  if (obj->GetType () == csThing::Type())
+  if (obj->GetType () == csThing::Type)
   {
     csThing* th = (csThing*)obj;
     th->Transform (m);
     th->Transform (); // @@@ This should be delayed until it is sure that the
     		      // thing is visible.
   }
-  else if (obj->GetType () == csCollection::Type())
+  else if (obj->GetType () == csCollection::Type)
   {
     csCollection* col = (csCollection*)obj;
     col->Transform (m);
@@ -170,14 +170,14 @@ void LanguageLayer::transform (csObject* obj, csVector3& v)
 
 void LanguageLayer::transform (csObject* obj, float dx, float dy, float dz)
 {
-  if (obj->GetType () == csThing::Type())
+  if (obj->GetType () == csThing::Type)
   {
     csThing* th = (csThing*)obj;
     th->Move (dx, dy, dz);
     th->Transform (); // @@@ This should be delayed until it is sure that the
     		      // thing is visible.
   }
-  else if (obj->GetType () == csCollection::Type())
+  else if (obj->GetType () == csCollection::Type)
   {
     csCollection* col = (csCollection*)obj;
     col->Move (dx, dy, dz);
@@ -232,14 +232,14 @@ void LanguageLayer::set_light_intensity(
   csLight* light, float l1, float l2, float l3)
 {
   csIdType t = light->GetType ();
-  if (t == csStatLight::Type() || t == csDynLight::Type())
+  if (t == csStatLight::Type || t == csDynLight::Type)
     light->SetColor (csColor (l1, l2, l3));
 }
 
 float LanguageLayer::get_lightmap1_intensity (csLight* light)
 {
   csIdType t = light->GetType ();
-  if (t == csStatLight::Type() || t == csDynLight::Type())
+  if (t == csStatLight::Type || t == csDynLight::Type)
     return light->GetColor ().red;
   return 0;
 }
@@ -247,7 +247,7 @@ float LanguageLayer::get_lightmap1_intensity (csLight* light)
 float LanguageLayer::get_lightmap2_intensity (csLight* light)
 {
   csIdType t = light->GetType ();
-  if (t == csStatLight::Type() || t == csDynLight::Type())
+  if (t == csStatLight::Type || t == csDynLight::Type)
     return light->GetColor ().green;
   return 0;
 }
@@ -255,7 +255,7 @@ float LanguageLayer::get_lightmap2_intensity (csLight* light)
 float LanguageLayer::get_lightmap3_intensity (csLight* light)
 {
   csIdType t = light->GetType ();
-  if (t == csStatLight::Type() || t == csDynLight::Type())
+  if (t == csStatLight::Type || t == csDynLight::Type)
     return light->GetColor ().blue;
   return 0;
 }
@@ -298,7 +298,7 @@ void LanguageLayer::suspend (csRunScript* run, long milli)
 
 //-----------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csScript,csObject);
+IMPLEMENT_CSOBJTYPE (csScript,csObject);
 
 csScript::csScript (LanguageLayer* layer) : csObject ()
 {
@@ -311,7 +311,7 @@ csScript::~csScript ()
 
 //-----------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csRunScript,csObject);
+IMPLEMENT_CSOBJTYPE (csRunScript,csObject);
 
 csRunScript::csRunScript (csScript* script, csObject* attached) : csObject ()
 {

@@ -22,7 +22,7 @@
 #include "csengine/cdobj.h"
 #include "csengine/collider.h"
 
-CSOBJTYPE_IMPL(csColliderPointerObject,csObject);
+IMPLEMENT_CSOBJTYPE (csColliderPointerObject,csObject);
 
 csColliderPointerObject::csColliderPointerObject(csCollider* pCollider, bool AutoDelete)
 {
@@ -38,7 +38,7 @@ csColliderPointerObject::~csColliderPointerObject()
 
 csCollider* csColliderPointerObject::GetCollider(csObject& csobj)
 {
-  csObject *o = csobj.GetObj (csColliderPointerObject::Type ());
+  csObject *o = csobj.GetChild (csColliderPointerObject::Type);
   if (o) return ((csColliderPointerObject*) o)->m_pCollider;
   return NULL;
 }

@@ -76,8 +76,16 @@ ifeq ($(MAKE_DLL),yes)
   CFLAGS+=$(CFLAGS.DLL)
 endif
 
+# Memory debugger
+ifdef MEMDBG
+  # This should be filtered out
+  DEP.EXE += $(OUT)memdbg$O
+  # This is here because it should be the latest on the command line
+  LIBS += $(OUT)memdbg$O
+endif
+
 # Use $(^^) instead of $^ when you need all dependencies except libraries
-^^=$(filter-out %$(LIB_SUFFIX),$^)
+^^=$(filter-out %memdbg$O,$(filter-out %$(LIB_SUFFIX),$^))
 # Use $(<<) instead of $< to allow system-dependent makefiles to override
 <<=$<
 # Use $(L^) to link with all libraries specified as dependencies
@@ -155,9 +163,7 @@ clean: cleandoc
 ifneq ($(strip $(OUTDLL)),)
 	-$(RMDIR) $(subst /,,$(OUTDLL))
 endif
-	-$(RM) debug.txt
-	-$(RM) ivcon.log
-	-$(RM) precalc.zip
+	-$(RM) debug.txt ivcon.log precalc.zip
 
 cleanlib:
 
@@ -178,7 +184,7 @@ api: csapi/index.html pics
 
 csdoc/index.html: $(CSDOC) newdoc/html/docxxbanner.html
 	doc++ -F -T newdoc/html/docxxbanner.html -j -H -d csdoc -f $(CSDOC)
-	rm -f csdoc/HIERjava.html
+	$(RM) csdoc/HIERjava.html
 	
 doc: csdoc/index.html pics
 
@@ -233,19 +239,9 @@ doczips: cs-help-html.zip cs-help-pdf.zip cs-help-book.zip cs-help-txt.zip
 #	lacheck 
 
 cleandoc:
-	rm -f *.aux
-	rm -f *.log
-	rm -f *.pdf
-	rm -f *.idx
-	rm -f *.toc
-	rm -f *.ttx
-	rm -f *.txt
-	rm -rf csdoc
-	rm -rf csapi
-	rm -rf html
-	rm -f crystal.hhc
-	rm -f crystal.hhk
-	rm -f crystal.hhp
+	$(RM) *.aux *.log *.pdf *.idx *.toc *.ttx *.txt
+	$(RM) crystal.hhc crystal.hhk crystal.hhp
+	$(RMDIR) csdoc csapi html
 
 $(OUT)static$O: static.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.STATIC_SCF)

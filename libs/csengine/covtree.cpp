@@ -52,6 +52,15 @@ bool csCovTreeNode<Child>::UpdatePolygon (csVector2* poly, int num_poly,
   // Compute a combined mask of in and out so that we can
   // quickly discover all partial childs.
   csMask partial = ~(in | out);
+
+  // Mask for setting this mask to inside for all children that
+  // are full after traversing.
+  csMask setinside = 0;
+
+  // Mask for setting this mask to outside for all children that
+  // are empty after traversing.
+  csMask setoutside = 0;
+
   int bits;
   int idx = 0;		// Index for computing column/row in mask.
   int col, row, new_hor_offs, new_ver_offs;
@@ -77,7 +86,18 @@ again:
         new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
 	if (children[idx].UpdatePolygon (poly, num_poly, dxdy, dydx,
 		new_hor_offs, new_ver_offs))
+	{
+	  if (children[idx].IsFull ())
+	    setinside |= 1 << (CS_CM_MASKBITS-bits);
 	  modified = true;
+	}
+	else
+	{
+	  // If no modification then it is possible that child
+	  // is empty.
+	  if (children[idx].IsEmpty ())
+	    setoutside |= 1 << (CS_CM_MASKBITS-bits);
+	}
       }
 
       // Go to next bit.
@@ -90,10 +110,52 @@ again:
 # if defined(CS_CM_8x8)
   if (!looped)
   {
+    if (setinside != 0)
+    {
+      // Set 'inside' mode for all bits in 'setinside'.
+      in |= setinside;
+      out &= ~setinside;
+    }
+    if (setoutside != 0)
+    {
+      // Set 'outside' mode for all bits in 'setoutside'.
+      in &= ~setoutside;
+      out |= setoutside;
+    }
     partial = ~(in2 | out2);
+    setinside = 0;
+    setoutside = 0;
     idx = CS_CM_MASKBITS;
     looped = true;
     goto again;
+  }
+  else
+  {
+    if (setinside != 0)
+    {
+      // Set 'inside' mode for all bits in 'setinside'.
+      in2 |= setinside;
+      out2 &= ~setinside;
+    }
+    if (setoutside != 0)
+    {
+      // Set 'outside' mode for all bits in 'setoutside'.
+      in2 &= ~setoutside;
+      out2 |= setoutside;
+    }
+  }
+# else
+  if (setinside != 0)
+  {
+    // Set 'inside' mode for all bits in 'setinside'.
+    in |= setinside;
+    out &= ~setinside;
+  }
+  if (setoutside != 0)
+  {
+    // Set 'outside' mode for all bits in 'setoutside'.
+    in &= ~setoutside;
+    out |= setoutside;
   }
 # endif
 
@@ -518,6 +580,80 @@ again:
 # endif
 }
 
+template <class Child>
+void csCovTreeNode<Child>::MakeInvalid ()
+{
+  int i;
+
+  for (i = 0 ; i < CS_CM_BITS ; i++)
+    children[i].MakeInvalid ();
+  csCovMaskTriage::MakeInvalid ();
+}
+
+template <class Child>
+bool csCovTreeNode<Child>::TestConsistency (int hor_offs, int ver_offs) const
+{
+  if (IsInvalid ())
+  {
+    printf ("Node at %dx%d (size %dx%d) has invalid bits!\n",
+    	hor_offs, ver_offs, GetHorizontalSize (), GetVerticalSize ());
+    return false;
+  }
+
+  // Test all bits.
+  int bits, idx, col, row, new_hor_offs, new_ver_offs;
+  csMask msk_in, msk_out;
+
+  idx = 0;		// Index for computing column/row in mask.
+  msk_in = in;
+  msk_out = out;
+
+# if defined(CS_CM_8x8)
+  bool looped = false;
+again:
+# endif
+  bits = CS_CM_MASKBITS;
+  while (bits > 0)
+  {
+    if (PARTIAL (msk_in, msk_out) && !children[idx].IsPartial ())
+    {
+      printf ("Child %d for node %dx%d (size %dx%d) is %s while mask\n\
+bit says it should be partial!\n", idx, hor_offs, ver_offs,
+	GetHorizontalSize (), GetVerticalSize (),
+		children[idx].IsFull () ? "full" : children[idx].IsEmpty () ? "empty" :
+		children[idx].IsInvalid () ? "invalid" : "unknown");
+      return false;
+    }
+    if (PARTIAL (msk_in, msk_out))
+    {
+      col = idx & CS_CM_HORMASK;
+      row = idx >> CS_CM_HORSHIFT;
+      new_hor_offs = hor_offs + col * Child::GetHorizontalSize ();
+      new_ver_offs = ver_offs + row * Child::GetVerticalSize ();
+      if (!children[idx].TestConsistency (new_hor_offs, new_ver_offs))
+        return false;
+    }
+    msk_in >>= 1;
+    msk_out >>= 1;
+    bits--;
+    idx++;
+  }
+
+# if defined(CS_CM_8x8)
+  if (!looped)
+  {
+    idx = CS_CM_MASKBITS;
+    bits = CS_CM_MASKBITS;
+    msk_in = in2;
+    msk_out = out2;
+    looped = true;
+    goto again;
+  }
+# endif
+  return true;
+}
+
+
 //-------------------------------------------------------------------
 
 bool csCovTreeNode0::UpdatePolygon (csVector2* poly, int num_poly,
@@ -835,6 +971,29 @@ void csCoverageMaskTree::GfxDump (iGraphics2D* ig2d, int level)
 # endif
   tree3->GfxDump (ig2d, level, 0, 0);
 }
+
+void csCoverageMaskTree::MakeInvalid ()
+{
+  // @@@ Configurable!
+# if defined(CS_CM_8x8)
+  csCovTreeNode3* tree3 = (csCovTreeNode3*)tree;
+# else
+  csCovTreeNode4* tree3 = (csCovTreeNode4*)tree;
+# endif
+  tree3->MakeInvalid ();
+}
+
+void csCoverageMaskTree::TestConsistency ()
+{
+  // @@@ Configurable!
+# if defined(CS_CM_8x8)
+  csCovTreeNode3* tree3 = (csCovTreeNode3*)tree;
+# else
+  csCovTreeNode4* tree3 = (csCovTreeNode4*)tree;
+# endif
+  tree3->TestConsistency (0, 0);
+}
+
 
 //---------------------------------------------------------------------------
 

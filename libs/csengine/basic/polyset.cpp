@@ -42,7 +42,7 @@
 
 //---------------------------------------------------------------------------
 
-CSOBJTYPE_IMPL(csPolygonSet,csObject);
+IMPLEMENT_CSOBJTYPE (csPolygonSet,csObject);
 
 IMPLEMENT_IBASE (csPolygonSet)
   IMPLEMENTS_INTERFACE (iPolygonSet)
@@ -50,7 +50,8 @@ IMPLEMENT_IBASE_END
 
 long csPolygonSet::current_light_frame_number = 0;
 
-csPolygonSet::csPolygonSet () : csObject(), csPolygonParentInt ()
+csPolygonSet::csPolygonSet () : csObject(), csPolygonParentInt (),
+  polygons (64, 64), curves (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
 
@@ -468,9 +469,14 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   }
 }
 
+//@@@@@@
+extern bool stop_processing;
+
 void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	csRenderView* d, csPolygon2DQueue* poly_queue)
 {
+//@@@@@@
+if (stop_processing) return (void*)1;
   csPolygon3D* p;
   csPortal* po;
   csVector3* verts;
@@ -554,12 +560,29 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  if (quadtree)
             visible = quadtree->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
+	  //@@@@@@@@@@@@
+	  else if (covtree && c_buffer)
+	  {
+	    bool visible1;
+            visible = covtree->InsertPolygon (clip->GetVertices (),
+		  clip->GetNumVertices (), clip->GetBoundingBox ());
+            visible1 = c_buffer->InsertPolygon (clip->GetVertices (),
+		  clip->GetNumVertices ());
+	    if (visible1 != visible)
+	    {
+	      printf ("MISMATCH TestQueuePolygonArray covtree=%d cbuffer=%d\n",
+	      	visible, visible1);
+	      return (void*)1;
+	    }
+	  }
 	  else if (covtree)
             visible = covtree->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else
             visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
+	//@@@@@@@@@
+	if (covtree) covtree->TestConsistency ();
         }
       }
       if (visible)
@@ -896,35 +919,4 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
   if (num_pts) { CHK (delete data); }
 
   return final_data;
-}
-
-//--------------------------------------------------------- helper classes -----
-
-bool csPolygonSet::csPolygonArray::FreeItem (csSome Item)
-{
-  CHK (delete (csPolygon3D *)(csPolygonInt *)Item);
-  return true;
-}
-
-int csPolygonSet::csPolygonArray::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-{
-  const char *name = ((csPolygon3D *)(csPolygonInt *)Item)->GetName ();
-  return name ? strcmp (name, (char *)Key) : -1;
-}
-
-csPolygon3D *csPolygonSet::csPolygonArray::Get (int iNum) const
-{
-  return (csPolygon3D *)(csPolygonInt *)csVector::Get (iNum);
-}
-
-bool csPolygonSet::csCurvesArray::FreeItem (csSome Item)
-{
-  CHK (delete (csCurve *)Item);
-  return true;
-}
-
-int csPolygonSet::csCurvesArray::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
-{
-  const char *name = ((csCurve *)Item)->GetName ();
-  return name ? strcmp (name, (char *)Key) : -1;
 }

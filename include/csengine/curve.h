@@ -20,13 +20,14 @@
 #define CURVE_H
 
 #include "csutil/scf.h"
+#include "csutil/csvector.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csengine/bezier.h"
 #include "csengine/texture.h"
 #include "csengine/lghtmap.h"
 #include "csengine/rview.h"
-#include "csobject/csobj.h"
+#include "csobject/csobject.h"
 
 struct iTextureHandle;
 
@@ -171,7 +172,6 @@ public:
   CSOBJTYPE;
 };
 
-
 /**
  * A specific curve implementation for Bezier curve template.
  */
@@ -193,9 +193,6 @@ public:
 
   CSOBJTYPE;
 };
-
-
-
 
 /**
  * A specific curve implementation for Bezier curves.
@@ -238,6 +235,4 @@ public:
   CSOBJTYPE;
 };
 
-
 #endif /*CURVE_H*/
-

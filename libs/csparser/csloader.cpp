@@ -1521,8 +1521,9 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           float list [2 * 100];
           ScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
-          for (int i = 0; i < num; i++)
-            gs->SetUV (0, list [i * 2], list [i * 2 + 1]);
+	  int j;
+          for (j = 0; j < num; j++)
+            gs->SetUV (j, list [j * 2], list [j * 2 + 1]);
         }
         break;
       case TOKEN_COLORS:
@@ -1534,8 +1535,9 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           float list [3 * 100];
           ScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
-          for (int i = 0; i < num; i++)
-            gs->SetColor (i, list [i * 3], list [i * 3 + 1], list [i * 3 + 2]);
+	  int j;
+          for (j = 0; j < num; j++)
+            gs->SetColor (j, list [j * 3], list [j * 3 + 1], list [j * 3 + 2]);
         }
         break;
       case TOKEN_UVA:
@@ -1547,11 +1549,12 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
           float list [3 * 100];
           ScanStr (params, "%F", list, &num);
           if (num > nv) num = nv;
-          for (int i = 0; i < num; i++)
+	  int j;
+          for (j = 0; j < num; j++)
           {
-            float a = list [i * 3] * 2 * M_PI / 360.;
-            gs->SetUV (0, cos (a) * list [i * 3 + 1] + list [i * 3 + 2],
-                          sin (a) * list [i * 3 + 1] + list [i * 3 + 2]);
+            float a = list [j * 3] * 2 * M_PI / 360.;
+            gs->SetUV (j, cos (a) * list [j * 3 + 1] + list [j * 3 + 2],
+                          sin (a) * list [j * 3 + 1] + list [j * 3 + 2]);
           }
         }
         break;
@@ -1846,6 +1849,8 @@ void csLoader::txt_process (char *name, char* buf, csTextureList* textures, csWo
 
   csTextureHandle *tex = textures->NewTexture (image);
   tex->SetName (name);
+  // dereference image pointer since tex already incremented it
+  image->DecRef ();
 
   if (do_transp)
     tex->SetTransparent (QInt (transp.red * 255.),
@@ -4015,6 +4020,8 @@ csTextureHandle* csLoader::LoadTexture (csWorld* world, const char* name, const 
   csImageFile *image = load_image (fname);
   csTextureHandle *tm = world->GetTextures ()->NewTexture (image);
   tm->SetName (name);
+  // dereference image pointer since tm already incremented it
+  image->DecRef ();
   return tm;
 }
 

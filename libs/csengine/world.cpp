@@ -180,7 +180,7 @@ int csWorld::frame_height;
 iSystem* csWorld::System = NULL;
 csWorld* csWorld::current_world = NULL;
 
-CSOBJTYPE_IMPL(csWorld,csObject);
+IMPLEMENT_CSOBJTYPE (csWorld,csObject);
 
 IMPLEMENT_IBASE (csWorld)
   IMPLEMENTS_INTERFACE (iPlugIn)
@@ -287,57 +287,6 @@ bool csWorld::HandleEvent (csEvent &Event)
 
         StartWorld ();
 
-#if 0
-        bool vis;
-        csBox box (0, 0, frame_width, frame_height);
-        CHK (csQuadtree* qt = new csQuadtree (box, 5));
-        qt->MakeEmpty ();
-        csPoly2D po;
-        po.MakeEmpty ();
-        po.AddVertex (30, 170);
-        po.AddVertex (290, 170);
-        po.AddVertex (30, 30);
-        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-          CsPrintf (MSG_DEBUG_0, "Error 1\n");
-        Dumper::dump (qt);
-        po.MakeEmpty ();
-        po.AddVertex (290, 170);
-        po.AddVertex (290, 30);
-        po.AddVertex (30, 30);
-        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-          CsPrintf (MSG_DEBUG_0, "Error 2\n");
-        Dumper::dump (qt);
-        po.MakeEmpty ();
-        po.AddVertex (150, 110);
-        po.AddVertex (170, 110);
-        po.AddVertex (170, 90);
-        po.AddVertex (150, 90);
-        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-          CsPrintf (MSG_DEBUG_0, "Error 3\n");
-        Dumper::dump (qt);
-        po.MakeEmpty ();
-        po.AddVertex (50, 150);
-        po.AddVertex (250, 150);
-        po.AddVertex (250, 50);
-        po.AddVertex (50, 50);
-        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-          CsPrintf (MSG_DEBUG_0, "Error 4\n");
-        Dumper::dump (qt);
-        po.MakeEmpty ();
-        po.AddVertex (150, 110);
-        po.AddVertex (170, 110);
-        po.AddVertex (170, 90);
-        po.AddVertex (150, 90);
-        vis = qt->TestPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ());
-        if (vis != qt->InsertPolygon (po.GetVertices (), po.GetNumVertices (), po.GetBoundingBox ()))
-          CsPrintf (MSG_DEBUG_0, "Error 5 (vis=%d)\n", vis);
-        Dumper::dump (qt);
-        CHK (delete qt);
-#endif
         return true;
       } /* endif */
     } /* endswitch */
@@ -354,6 +303,7 @@ void csWorld::Clear ()
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
   planes.DeleteAll ();
+  CLights::DeleteAll ();
 
   while (first_dyn_lights)
   {
@@ -418,7 +368,7 @@ void csWorld::EnableCovtree (bool en)
   if (en)
   {
     CHK (delete quadtree); quadtree = NULL;
-    CHK (delete c_buffer); c_buffer = NULL;
+    //@@@@@@@@@@@@CHK (delete c_buffer); c_buffer = NULL;
     if (covtree) return;
     csBox box (0, 0, frame_width, frame_height);
     if (!covtree_lut)
@@ -822,6 +772,10 @@ void csWorld::Draw (csCamera* c, csClipper* view)
 
   tr_manager.NewFrame ();
 
+//@@@@@@
+extern bool stop_processing;
+stop_processing = false;
+
   if (c_buffer)
   {
     c_buffer->Initialize ();
@@ -834,7 +788,11 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   if (quadtree)
     quadtree->MakeEmpty ();
   if (covtree)
+  {
+  //@@@@@@@@@@@@
+  covtree->MakeInvalid ();
     covtree->MakeEmpty ();
+  }
 
   csSector* s = c->GetSector ();
   s->Draw (rview);
