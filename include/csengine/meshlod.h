@@ -95,7 +95,7 @@ public:
   /// Get the mesh array for the numerical lod.
   csArray<iMeshWrapper*>& GetMeshesForLOD (int lod)
   {
-    if (lod > meshes_for_lod.Length ())
+    if (lod >= meshes_for_lod.Length ())
     {
       meshes_for_lod.SetLength (lod+1);
     }
@@ -158,7 +158,7 @@ public:
   /// Get the mesh array for the numerical lod.
   csArray<iMeshFactoryWrapper*>& GetMeshesForLOD (int lod)
   {
-    if (lod > meshes_for_lod.Length ())
+    if (lod >= meshes_for_lod.Length ())
     {
       meshes_for_lod.SetLength (lod+1);
     }
