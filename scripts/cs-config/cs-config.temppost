@@ -72,7 +72,7 @@ EOF
 
 includedeps()
 {
-#we have to rememver vars here because on older shells $1,$2... are global
+#we have to remember vars here because on older shells $1,$2... are global
     id_first=$1
     id_all=$@
     shift
@@ -292,7 +292,9 @@ if test -n "$show_libs"; then
         addlib "-lcsutil"
         addlib "-lcssys"
     fi
-    the_libs="${lflags} $the_libs ${syslibs}"
+    # There are multiple levels of circular dependencies between csutil and
+    # cssys, so we need to ensure that they appear multiple times.
+    the_libs="${lflags} $the_libs $the_libs $the_libs ${syslibs}"
 
     echo "$the_libs"
 fi
