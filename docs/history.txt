@@ -1,10 +1,17 @@
 The history order has been reversed so that new features are at the top.
 8-Jul-2000
         - Samuel did the following changes:
+            - Upped the res on the level_texture, and changed the start position 
+              to look at it
+            - The shared open code in the software driver now properly sets the 
+              z_buf_mode variable
+            - Cleaned out all the csCamera->SetPerspective calls from the engine..
+              its now the app writers responsibility to update the camera on
+              context resize events.
             - Added preliminary documentation for the procedural texture subsystem.
             - Small corrections to some txi files.
             - Added new flags to itxtmgr which I have written documentation for.
-            -  Now all I need to do is write the code for it :)
+              Now all I need to do is write the code for it :)
 7-Jul-2000
 	- Moved alpha setting from portals to polygons. In most cases this
 	  setting only makes sense for portals but you can use it on a thing
