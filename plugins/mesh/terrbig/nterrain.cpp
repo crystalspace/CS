@@ -263,12 +263,12 @@ void nTerrain::AssembleTerrain(iRenderView *rv, nTerrainInfo *terrinfo)
   }
 }
 
-void nTerrain::SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
+void nTerrain::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
 {
   unsigned int i;
   if (materials) delete [] materials;
 
-  materials = new iMaterialHandle *[nMaterials];
+  materials = new iMaterialWrapper *[nMaterials];
   for(i=0; i<nMaterials; ++i)
     materials[i]=matlist[i];
 
@@ -472,10 +472,10 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
 
   for(i=0; i<nTextures; ++i)
   {
-    info->mesh[i].mat_handle = terrain->GetMaterialsList()[i];
     info->mesh[i].morph_factor = 0;
     info->mesh[i].num_vertices_pool = 1;
     info->mesh[i].use_vertex_color = false;
+	info->mesh[i].do_mirror = false;
     info->mesh[i].do_morph_texels = false;
     info->mesh[i].do_morph_colors = false;
     info->mesh[i].do_fog = false;
@@ -540,11 +540,13 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbuf
 
   for(i=0; i<nTextures; i++)
   {
+    info->mesh[i].mat_handle = terrain->GetMaterialsList()[i]->GetMaterialHandle();
+	terrain->GetMaterialsList()[i]->Visit ();
     info->mesh[i].triangles = info->triq[i].triangles.GetArray();
-		info->mesh[i].vertex_fog = new G3DFogInfo[info->vertices.Length()]; 
+    info->mesh[i].vertex_fog = new G3DFogInfo[info->vertices.Length()]; 
     info->mesh[i].buffers[0]=vbuf;
     info->mesh[i].num_triangles = info->triq[i].triangles.Length();
-		rview->CalculateFogMesh( pG3D->GetObjectToCamera(), info->mesh[i] );
+    rview->CalculateFogMesh( pG3D->GetObjectToCamera(), info->mesh[i] );
     pG3D->DrawTriangleMesh(info->mesh[i]);
 		delete[] info->mesh[i].vertex_fog;
   }
@@ -585,7 +587,7 @@ csBigTerrainObject::HitBeamObject (const csVector3&, const csVector3&, csVector3
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 void 
-csBigTerrainObject::SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
+csBigTerrainObject::SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
 {
   if (terrain) terrain->SetMaterialsList(matlist, nMaterials);
 	nTextures = nMaterials;

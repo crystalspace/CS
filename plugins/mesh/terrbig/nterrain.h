@@ -201,7 +201,7 @@ class nTerrain
   csVector3 cam;
 
   /// List of textures
-  iMaterialHandle **materials;
+  iMaterialWrapper **materials;
   
   /// Color mappings for terrain tile texturing. (RGB)
   csRGBVector rgb_colors;
@@ -263,9 +263,9 @@ public:
   { cam=camv; }
 
   /// Set the materials list, copies the passed in list.
-  void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials);
+  void SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials);
 
-  iMaterialHandle **GetMaterialsList()
+  iMaterialWrapper **GetMaterialsList()
   {
     return materials;
   }
@@ -353,7 +353,7 @@ public:
     { return scfParent->LoadHeightMapFile (hm); }
     virtual bool ConvertImageToMapFile (iFile *input, iImageIO *imageio, const char *hm)
     { return scfParent->ConvertImageToMapFile (input, imageio, hm); }
-    virtual void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials)
+    virtual void SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials)
     { scfParent->SetMaterialsList(matlist, nMaterials); }
   } scfiTerrBigState;
   friend struct eiTerrBigState;
@@ -467,7 +467,7 @@ public:
   ///////////////////////////////////////////////////////////////////
 
   /// Set the materials list, copies the passed in list.
-  void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials);
+  void SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials);
 };
 
 

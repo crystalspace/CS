@@ -240,8 +240,7 @@ bool TerrBigTut::Initialize ()
     return false;
   }
   iMaterialWrapper *mat = engine->GetMaterialList()->FindByName ("wood");
-  iMaterialHandle *mathandle = mat->GetMaterialHandle ();
-  terrbigstate->SetMaterialsList (&mathandle, 1);
+  terrbigstate->SetMaterialsList (&mat, 1);
   terrbigstate->LoadHeightMapFile ("./data/terrain/test.map");
 
   mesh->SetRenderPriority (engine->GetRenderPriority ("object"));

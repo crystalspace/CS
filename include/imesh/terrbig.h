@@ -23,6 +23,7 @@
 
 struct iFile;
 struct iImageIO;
+struct iMaterialWrapper;
 
 SCF_VERSION (iTerrBigState, 0, 0, 1);
 
@@ -40,7 +41,7 @@ struct iTerrBigState : public iBase
    */
   virtual bool ConvertImageToMapFile (iFile *image, iImageIO *imageio, const char *hm) = 0;
   /// Set the materials list, copies the passed in list.
-  virtual void SetMaterialsList(iMaterialHandle **matlist, unsigned int nMaterials) = 0;
+  virtual void SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials) = 0;
 };
 
 #endif
