@@ -329,6 +329,1254 @@
         <position x="0" y="0" z="0" />
 	<!-- <farplane a="0" b="0" c="1" d="10" /> -->
     </start>
+
+  <meshfact name="SkelFact">
+    <plugin>meshFact</plugin>
+    <params>
+      <material>parket.gif</material>
+      <numvt>120</numvt>
+      <numtri>164</numtri>
+        <v x="-0.0481071" y="0.481185" z="0.0224578" u="1.0" v="1.0" />
+        <v x="0.0170056" y="0.487546" z="0.0277641" u="0.5" v="1.0" />
+        <v x="-0.038265" y="0.67202" z="0.0305593" u="1.0" v="0.5" />
+        <v x="0.012666" y="0.674578" z="0.0305593" u="0.5" v="0.5" />
+        <v x="-0.0366759" y="0.853178" z="0.0316248" u="1.0" v="0.0" />
+        <v x="0.0160805" y="0.851846" z="0.0316248" u="0.5" v="0.0" />
+        <v x="-0.0481071" y="0.496275" z="-0.0433992" u="0.0" v="1.0" />
+        <v x="0.0170055" y="0.496643" z="-0.0389107" u="0.5" v="1.0" />
+        <v x="-0.0382651" y="0.672021" z="-0.0273745" u="0.0" v="0.5" />
+        <v x="0.0126659" y="0.674578" z="-0.0273745" u="0.5" v="0.5" />
+        <v x="-0.0366759" y="0.853178" z="-0.0283395" u="0.0" v="0.0" />
+        <v x="0.0160805" y="0.851846" z="-0.0283395" u="0.5" v="0.0" />
+        <v x="0.0170056" y="0.487546" z="0.0277641" u="0.5" v="1.0" />
+        <v x="0.0170055" y="0.496643" z="-0.0389107" u="0.5" v="0.0" />
+        <v x="-0.0366759" y="0.853178" z="0.0316248" u="1.0" v="1.0" />
+        <v x="-0.0366759" y="0.853178" z="-0.0283395" u="1.0" v="0.0" />
+        <v x="-0.038265" y="0.67202" z="0.0305593" u="0.5" v="1.0" />
+        <v x="-0.0481071" y="0.481185" z="0.0224578" u="1.0" v="1.0" />
+        <v x="-0.0382651" y="0.672021" z="-0.0273745" u="0.5" v="0.0" />
+        <v x="-0.0481071" y="0.496275" z="-0.0433992" u="1.0" v="0.0" />
+        <v x="-0.0441075" y="0.804307" z="0.0351417" u="1.0" v="0.141433" />
+        <v x="-0.0441075" y="0.804307" z="0.0351417" u="0.141433" v="1.0" />
+        <v x="-0.0441446" y="0.803478" z="-0.0314902" u="0.0" v="0.143786" />
+        <v x="-0.0441446" y="0.803478" z="-0.0314902" u="0.143786" v="0.0" />
+        <v x="0.00177039" y="0.496275" z="-0.0433993" u="0.419308" v="1.0" />
+        <v x="0.00177039" y="0.496275" z="-0.0433993" u="0.419308" v="0.0" />
+        <v x="0.00135928" y="0.481185" z="0.0224578" u="0.584148" v="1.0" />
+        <v x="0.00135928" y="0.481185" z="0.0224578" u="0.415852" v="1.0" />
+        <v x="-0.00430291" y="0.300353" z="-0.0879393" u="0.419308" v="0.0" />
+        <v x="-0.0541791" y="0.300353" z="-0.0879393" u="0.0" v="0.0" />
+        <v x="-0.0541791" y="0.28714" z="-0.0216827" u="0.0" v="1.0" />
+        <v x="-0.00471402" y="0.28714" z="-0.0216827" u="0.415852" v="1.0" />
+        <v x="-0.00847598" y="0.0962058" z="-0.128373" u="0.419308" v="0.0" />
+        <v x="-0.0583535" y="0.0962058" z="-0.128373" u="0.0" v="0.0" />
+        <v x="-0.0583535" y="0.0935246" z="-0.0583856" u="0.0" v="1.0" />
+        <v x="-0.00888711" y="0.0935246" z="-0.0583856" u="0.415852" v="1.0" />
+        <v x="-0.00847626" y="0.00632816" z="-0.128402" u="0.419308" v="0.0" />
+        <v x="-0.0583531" y="0.00632816" z="-0.128402" u="0.0" v="0.0" />
+        <v x="-0.0583534" y="0.00420695" z="-0.0661939" u="0.0" v="1.0" />
+        <v x="-0.0088871" y="0.00420701" z="-0.0661939" u="0.415852" v="1.0" />
+        <v x="-0.00847599" y="0.0962058" z="-0.166617" u="0.419308" v="0.0" />
+        <v x="-0.0583535" y="0.0962058" z="-0.166617" u="0.0" v="0.0" />
+        <v x="-0.0583535" y="0.00620561" z="-0.166617" u="0.0" v="0.0" />
+        <v x="-0.00847598" y="0.00620561" z="-0.166617" u="0.419308" v="0.0" />
+        <v x="-0.0610853" y="0.656164" z="0.0240486" u="0.143786" v="0.0" />
+        <v x="-0.111643" y="0.660092" z="0.0242841" u="0.0" v="0.0" />
+        <v x="-0.110292" y="0.673559" z="0.0896952" u="0.0" v="1.0" />
+        <v x="-0.0605618" y="0.669695" z="0.0894636" u="0.141433" v="1.0" />
+        <v x="-0.0886515" y="0.469085" z="0.0300587" u="0.143786" v="0.0" />
+        <v x="-0.137549" y="0.482424" z="0.0297511" u="0.0" v="0.0" />
+        <v x="-0.137009" y="0.4855" z="0.0972361" u="0.0" v="1.0" />
+        <v x="-0.0889119" y="0.47238" z="0.0975387" u="0.141433" v="1.0" />
+        <v x="0.0161411" y="0.968406" z="0.0276169" u="0.5" v="1.0" />
+        <v x="-0.0299553" y="0.968406" z="0.0276168" u="1.0" v="1.0" />
+        <v x="-0.0299553" y="0.968406" z="-0.024748" u="1.0" v="0.0" />
+        <v x="0.0161411" y="0.968406" z="-0.024748" u="0.5" v="0.0" />
+        <v x="0.0821182" y="0.493908" z="0.0330703" u="1.0" v="1.0" />
+        <v x="0.063597" y="0.677135" z="0.0305593" u="1.0" v="0.5" />
+        <v x="0.012666" y="0.674578" z="0.0305593" u="0.5" v="0.5" />
+        <v x="0.0170056" y="0.487546" z="0.0277641" u="0.5" v="1.0" />
+        <v x="0.0326518" y="0.493908" z="0.0330704" u="0.584148" v="1.0" />
+        <v x="0.0716794" y="0.799117" z="0.0351417" u="1.0" v="0.141433" />
+        <v x="0.0688369" y="0.850514" z="0.0316248" u="1.0" v="0.0" />
+        <v x="0.0160805" y="0.851846" z="0.0316248" u="0.5" v="0.0" />
+        <v x="0.0821182" y="0.497012" z="-0.0344221" u="0.0" v="1.0" />
+        <v x="0.0322407" y="0.497012" z="-0.0344221" u="0.419308" v="1.0" />
+        <v x="0.0170055" y="0.496643" z="-0.0389107" u="0.5" v="1.0" />
+        <v x="0.0126659" y="0.674578" z="-0.0273745" u="0.5" v="0.5" />
+        <v x="0.0635969" y="0.677135" z="-0.0273745" u="0.0" v="0.5" />
+        <v x="0.0160805" y="0.851846" z="-0.0283395" u="0.5" v="0.0" />
+        <v x="0.0688369" y="0.850514" z="-0.0283395" u="0.0" v="0.0" />
+        <v x="0.0716422" y="0.798288" z="-0.0314902" u="0.0" v="0.143786" />
+        <v x="0.0326518" y="0.493908" z="0.0330704" u="0.415852" v="1.0" />
+        <v x="0.0170056" y="0.487546" z="0.0277641" u="0.5" v="1.0" />
+        <v x="0.0170055" y="0.496643" z="-0.0389107" u="0.5" v="0.0" />
+        <v x="0.0322407" y="0.497012" z="-0.0344221" u="0.419308" v="0.0" />
+        <v x="0.0161411" y="0.968406" z="0.0276169" u="0.5" v="1.0" />
+        <v x="0.0622376" y="0.968406" z="0.0276168" u="1.0" v="1.0" />
+        <v x="0.0622376" y="0.968406" z="-0.024748" u="1.0" v="0.0" />
+        <v x="0.0161411" y="0.968406" z="-0.024748" u="0.5" v="0.0" />
+        <v x="0.160139" y="0.481444" z="-0.111867" u="0.0" v="1.0" />
+        <v x="0.110489" y="0.476651" z="-0.111735" u="0.141433" v="1.0" />
+        <v x="0.105792" y="0.515155" z="-0.167061" u="0.143786" v="0.0" />
+        <v x="0.156268" y="0.520028" z="-0.167195" u="0.0" v="0.0" />
+        <v x="0.063597" y="0.677135" z="0.0305593" u="0.5" v="1.0" />
+        <v x="0.0821182" y="0.493908" z="0.0330703" u="1.0" v="1.0" />
+        <v x="0.0821182" y="0.497012" z="-0.0344221" u="1.0" v="0.0" />
+        <v x="0.0635969" y="0.677135" z="-0.0273745" u="0.5" v="0.0" />
+        <v x="0.0716794" y="0.799117" z="0.0351417" u="0.141433" v="1.0" />
+        <v x="0.0716422" y="0.798288" z="-0.0314902" u="0.143786" v="0.0" />
+        <v x="0.0406892" y="0.0303562" z="0.101188" u="0.419308" v="0.0" />
+        <v x="0.0905661" y="0.0303564" z="0.101188" u="0.0" v="0.0" />
+        <v x="0.0905664" y="0.058785" z="0.167137" u="0.0" v="1.0" />
+        <v x="0.0411" y="0.058785" z="0.167137" u="0.415852" v="1.0" />
+        <v x="0.0884791" y="0.286093" z="-0.0380246" u="0.0" v="0.0" />
+        <v x="0.0386029" y="0.286093" z="-0.0380245" u="0.419308" v="0.0" />
+        <v x="0.0884791" y="0.30698" z="0.0260047" u="0.0" v="1.0" />
+        <v x="0.039014" y="0.30698" z="0.0260047" u="0.415852" v="1.0" />
+        <v x="0.0905664" y="0.110676" z="0.0676236" u="0.0" v="0.0" />
+        <v x="0.040689" y="0.110676" z="0.0676236" u="0.419308" v="0.0" />
+        <v x="0.0905664" y="0.139752" z="0.128406" u="0.0" v="1.0" />
+        <v x="0.0411001" y="0.139752" z="0.128406" u="0.415852" v="1.0" />
+        <v x="0.040689" y="0.100362" z="0.0327714" u="0.419308" v="0.0" />
+        <v x="0.0905664" y="0.100362" z="0.0327715" u="0.0" v="0.0" />
+        <v x="0.0905664" y="0.016523" z="0.0654991" u="0.0" v="0.0" />
+        <v x="0.0406889" y="0.0165229" z="0.065499" u="0.419308" v="0.0" />
+        <v x="0.142551" y="0.665488" z="-0.0561465" u="0.0" v="0.0" />
+        <v x="0.0920726" y="0.660636" z="-0.0560641" u="0.143786" v="0.0" />
+        <v x="0.0688369" y="0.850514" z="-0.0283395" u="1.0" v="0.0" />
+        <v x="0.0688369" y="0.850514" z="0.0316248" u="1.0" v="1.0" />
+        <v x="0.144938" y="0.641698" z="0.00499538" u="0.0" v="1.0" />
+        <v x="0.0952858" y="0.636925" z="0.00507643" u="0.141433" v="1.0" />
+        <v x="-0.0990906" y="0.820179" z="0.0397164" u="0.792659" v="1.0" />
+        <v x="-0.0990906" y="0.820179" z="0.0397164" u="0.792659" v="0.207341" />
+        <v x="-0.102014" y="0.78913" z="-0.020781" u="0.0" v="0.0" />
+        <v x="-0.102014" y="0.78913" z="-0.020781" u="0.749377" v="0.0" />
+        <v x="0.132948" y="0.766778" z="0.0290539" u="0.638759" v="1.0" />
+        <v x="0.132948" y="0.766778" z="0.0290539" u="0.638759" v="0.361241" />
+        <v x="0.131041" y="0.786282" z="-0.0364767" u="0.0" v="0.0" />
+        <v x="0.131041" y="0.786282" z="-0.0364767" u="0.694816" v="0.0" />
+
+        <t v1="0" v2="3" v3="2" />
+        <t v1="3" v2="26" v3="1" />
+        <t v1="0" v2="26" v3="3" />
+        <t v1="20" v2="5" v3="4" />
+        <t v1="2" v2="5" v3="20" />
+        <t v1="2" v2="3" v3="5" />
+        <t v1="24" v2="9" v3="7" />
+        <t v1="6" v2="9" v3="24" />
+        <t v1="6" v2="8" v3="9" />
+        <t v1="8" v2="11" v3="9" />
+        <t v1="11" v2="22" v3="10" />
+        <t v1="8" v2="22" v3="11" />
+        <t v1="12" v2="25" v3="13" />
+        <t v1="25" v2="12" v3="27" />
+        <t v1="52" v2="54" v3="53" />
+        <t v1="54" v2="52" v3="55" />
+        <t v1="51" v2="49" v3="48" />
+        <t v1="49" v2="51" v3="50" />
+        <t v1="16" v2="19" v3="17" />
+        <t v1="19" v2="16" v3="18" />
+        <t v1="16" v2="23" v3="18" />
+        <t v1="23" v2="16" v3="21" />
+        <t v1="37" v2="39" v3="38" />
+        <t v1="39" v2="37" v3="36" />
+        <t v1="24" v2="29" v3="6" />
+        <t v1="29" v2="24" v3="28" />
+        <t v1="19" v2="30" v3="17" />
+        <t v1="30" v2="19" v3="29" />
+        <t v1="0" v2="31" v3="26" />
+        <t v1="31" v2="0" v3="30" />
+        <t v1="27" v2="28" v3="25" />
+        <t v1="28" v2="27" v3="31" />
+        <t v1="28" v2="33" v3="29" />
+        <t v1="33" v2="28" v3="32" />
+        <t v1="29" v2="34" v3="30" />
+        <t v1="34" v2="29" v3="33" />
+        <t v1="30" v2="35" v3="31" />
+        <t v1="35" v2="30" v3="34" />
+        <t v1="31" v2="32" v3="28" />
+        <t v1="32" v2="31" v3="35" />
+        <t v1="40" v2="42" v3="41" />
+        <t v1="42" v2="40" v3="43" />
+        <t v1="33" v2="38" v3="34" />
+        <t v1="38" v2="33" v3="37" />
+        <t v1="34" v2="39" v3="35" />
+        <t v1="39" v2="34" v3="38" />
+        <t v1="35" v2="36" v3="32" />
+        <t v1="36" v2="35" v3="39" />
+        <t v1="32" v2="41" v3="33" />
+        <t v1="41" v2="32" v3="40" />
+        <t v1="33" v2="42" v3="37" />
+        <t v1="42" v2="33" v3="41" />
+        <t v1="37" v2="43" v3="36" />
+        <t v1="43" v2="37" v3="42" />
+        <t v1="36" v2="40" v3="32" />
+        <t v1="40" v2="36" v3="43" />
+        <t v1="22" v2="114" v3="10" />
+        <t v1="22" v2="45" v3="114" />
+        <t v1="22" v2="44" v3="45" />
+        <t v1="15" v2="112" v3="14" />
+        <t v1="112" v2="15" v3="115" />
+        <t v1="4" v2="47" v3="20" />
+        <t v1="47" v2="113" v3="46" />
+        <t v1="4" v2="113" v3="47" />
+        <t v1="21" v2="44" v3="23" />
+        <t v1="44" v2="21" v3="47" />
+        <t v1="44" v2="49" v3="45" />
+        <t v1="49" v2="44" v3="48" />
+        <t v1="45" v2="50" v3="46" />
+        <t v1="50" v2="45" v3="49" />
+        <t v1="46" v2="51" v3="47" />
+        <t v1="51" v2="46" v3="50" />
+        <t v1="47" v2="48" v3="44" />
+        <t v1="48" v2="47" v3="51" />
+        <t v1="5" v2="53" v3="4" />
+        <t v1="53" v2="5" v3="52" />
+        <t v1="14" v2="54" v3="15" />
+        <t v1="54" v2="14" v3="53" />
+        <t v1="10" v2="55" v3="11" />
+        <t v1="55" v2="10" v3="54" />
+        <t v1="60" v2="58" v3="59" />
+        <t v1="56" v2="58" v3="60" />
+        <t v1="56" v2="57" v3="58" />
+        <t v1="57" v2="63" v3="58" />
+        <t v1="63" v2="61" v3="62" />
+        <t v1="57" v2="61" v3="63" />
+        <t v1="64" v2="67" v3="68" />
+        <t v1="67" v2="65" v3="66" />
+        <t v1="64" v2="65" v3="67" />
+        <t v1="71" v2="69" v3="70" />
+        <t v1="68" v2="69" v3="71" />
+        <t v1="68" v2="67" v3="69" />
+        <t v1="73" v2="75" v3="72" />
+        <t v1="75" v2="73" v3="74" />
+        <t v1="76" v2="78" v3="79" />
+        <t v1="78" v2="76" v3="77" />
+        <t v1="81" v2="83" v3="80" />
+        <t v1="83" v2="81" v3="82" />
+        <t v1="84" v2="86" v3="87" />
+        <t v1="86" v2="84" v3="85" />
+        <t v1="84" v2="89" v3="88" />
+        <t v1="89" v2="84" v3="87" />
+        <t v1="91" v2="93" v3="90" />
+        <t v1="93" v2="91" v3="92" />
+        <t v1="65" v2="94" v3="95" />
+        <t v1="94" v2="65" v3="64" />
+        <t v1="86" v2="96" v3="94" />
+        <t v1="96" v2="86" v3="85" />
+        <t v1="56" v2="97" v3="96" />
+        <t v1="97" v2="56" v3="60" />
+        <t v1="72" v2="95" v3="97" />
+        <t v1="95" v2="72" v3="75" />
+        <t v1="95" v2="98" v3="99" />
+        <t v1="98" v2="95" v3="94" />
+        <t v1="94" v2="100" v3="98" />
+        <t v1="100" v2="94" v3="96" />
+        <t v1="96" v2="101" v3="100" />
+        <t v1="101" v2="96" v3="97" />
+        <t v1="97" v2="99" v3="101" />
+        <t v1="99" v2="97" v3="95" />
+        <t v1="102" v2="104" v3="105" />
+        <t v1="104" v2="102" v3="103" />
+        <t v1="98" v2="92" v3="91" />
+        <t v1="92" v2="98" v3="100" />
+        <t v1="100" v2="93" v3="92" />
+        <t v1="93" v2="100" v3="101" />
+        <t v1="101" v2="90" v3="93" />
+        <t v1="90" v2="101" v3="99" />
+        <t v1="99" v2="103" v3="102" />
+        <t v1="103" v2="99" v3="98" />
+        <t v1="98" v2="104" v3="103" />
+        <t v1="104" v2="98" v3="91" />
+        <t v1="91" v2="105" v3="104" />
+        <t v1="105" v2="91" v3="90" />
+        <t v1="90" v2="102" v3="105" />
+        <t v1="102" v2="90" v3="99" />
+        <t v1="71" v2="106" v3="107" />
+        <t v1="71" v2="118" v3="106" />
+        <t v1="71" v2="70" v3="118" />
+        <t v1="106" v2="116" v3="110" />
+        <t v1="116" v2="106" v3="119" />
+        <t v1="117" v2="111" v3="110" />
+        <t v1="62" v2="111" v3="117" />
+        <t v1="62" v2="61" v3="111" />
+        <t v1="88" v2="107" v3="111" />
+        <t v1="107" v2="88" v3="89" />
+        <t v1="107" v2="83" v3="82" />
+        <t v1="83" v2="107" v3="106" />
+        <t v1="106" v2="80" v3="83" />
+        <t v1="80" v2="106" v3="110" />
+        <t v1="110" v2="81" v3="80" />
+        <t v1="81" v2="110" v3="111" />
+        <t v1="111" v2="82" v3="81" />
+        <t v1="82" v2="111" v3="107" />
+        <t v1="63" v2="77" v3="76" />
+        <t v1="77" v2="63" v3="62" />
+        <t v1="109" v2="78" v3="77" />
+        <t v1="78" v2="109" v3="108" />
+        <t v1="70" v2="79" v3="78" />
+        <t v1="79" v2="70" v3="69" />
+        <t v1="46" v2="115" v3="45" />
+        <t v1="115" v2="46" v3="112" />
+        <t v1="109" v2="119" v3="108" />
+        <t v1="119" v2="109" v3="116" />
+    <autonormals />
+
+    <animcontrol plugin="crystalspace.mesh.anim.skeleton">
+      <bone name="Bip01">
+        <move>
+          <v x="0.0170055" y="0.546578" z="0.0" />
+          <matrix>
+            <rotx>0.0</rotx>
+            <roty>1.5708</roty>
+            <rotz>0.0</rotz>
+          </matrix>
+        </move>
+        <bone name="Bip01 Footsteps">
+          <move>
+            <v x="0.0" y="-0.536602" z="0.0" />
+            <matrix>
+              <rotx>0.0</rotx>
+              <roty>-1.5708</roty>
+              <rotz>0.0</rotz>
+            </matrix>
+          </move>
+        </bone>
+        <bone name="Bip01 Pelvis">
+          <move>
+            <v x="0.0" y="0.0" z="0.0" />
+            <matrix>
+              <rotx>-1.5708</rotx>
+              <roty>0.0797232</roty>
+              <rotz>-1.5708</rotz>
+            </matrix>
+          </move>
+          <bone name="Bip01 Spine">
+            <move>
+              <v x="0.055648" y="0.00444586" z="-5.0224e-005" />
+              <matrix>
+                <rotx>-4.16046e-006</rotx>
+                <roty>-0.000796233</roty>
+                <rotz>-0.0181572</rotz>
+              </matrix>
+            </move>
+            <vertex idx="2" weight="1" col_weight="1"/>
+            <vertex idx="3" weight="1" col_weight="1"/>
+            <vertex idx="8" weight="1" col_weight="1"/>
+            <vertex idx="9" weight="1" col_weight="1"/>
+            <vertex idx="16" weight="1" col_weight="1"/>
+            <vertex idx="18" weight="1" col_weight="1"/>
+            <vertex idx="57" weight="1" col_weight="1"/>
+            <vertex idx="58" weight="1" col_weight="1"/>
+            <vertex idx="67" weight="1" col_weight="1"/>
+            <vertex idx="68" weight="1" col_weight="1"/>
+            <vertex idx="84" weight="1" col_weight="1"/>
+            <vertex idx="87" weight="1" col_weight="1"/>
+            <bone name="Bip01 Spine1">
+              <move>
+                <v x="0.0631067" y="0.0" z="-3.47866e-005" />
+                <matrix>
+                  <rotx>-1.87464e-005</rotx>
+                  <roty>-1.55355e-007</roty>
+                  <rotz>-0.0235439</rotz>
+                </matrix>
+              </move>
+              <vertex idx="2" weight="1" col_weight="1"/>
+              <vertex idx="3" weight="1" col_weight="1"/>
+              <vertex idx="8" weight="1" col_weight="1"/>
+              <vertex idx="9" weight="1" col_weight="1"/>
+              <vertex idx="16" weight="1" col_weight="1"/>
+              <vertex idx="18" weight="1" col_weight="1"/>
+              <vertex idx="57" weight="1" col_weight="1"/>
+              <vertex idx="58" weight="1" col_weight="1"/>
+              <vertex idx="67" weight="1" col_weight="1"/>
+              <vertex idx="68" weight="1" col_weight="1"/>
+              <vertex idx="84" weight="1" col_weight="1"/>
+              <vertex idx="87" weight="1" col_weight="1"/>
+              <bone name="Bip01 Spine2">
+                <move>
+                  <v x="0.0436868" y="0.0" z="-3.64593e-005" />
+                  <matrix>
+                    <rotx>-3.4133e-005</rotx>
+                    <roty>-6.12934e-007</roty>
+                    <rotz>-0.0428758</rotz>
+                  </matrix>
+                </move>
+                <bone name="Bip01 Spine3">
+                  <move>
+                    <v x="0.0457872" y="0.0" z="-5.02503e-005" />
+                    <matrix>
+                      <rotx>-3.18022e-005</rotx>
+                      <roty>-5.24484e-007</roty>
+                      <rotz>-0.0399466</rotz>
+                    </matrix>
+                  </move>
+                  <vertex idx="20" weight="1" col_weight="1"/>
+                  <vertex idx="21" weight="1" col_weight="1"/>
+                  <vertex idx="22" weight="1" col_weight="1"/>
+                  <vertex idx="23" weight="1" col_weight="1"/>
+                  <vertex idx="61" weight="1" col_weight="1"/>
+                  <vertex idx="71" weight="1" col_weight="1"/>
+                  <vertex idx="88" weight="1" col_weight="1"/>
+                  <vertex idx="89" weight="1" col_weight="1"/>
+                  <bone name="Bip01 Neck">
+                    <move>
+                      <v x="0.0631068" y="0.0" z="-2.89906e-005" />
+                      <matrix>
+                        <rotx>0.0</rotx>
+                        <roty>0.0</roty>
+                        <rotz>0.0</rotz>
+                      </matrix>
+                    </move>
+                    <vertex idx="4" weight="1" col_weight="1"/>
+                    <vertex idx="5" weight="1" col_weight="1"/>
+                    <vertex idx="10" weight="1" col_weight="1"/>
+                    <vertex idx="11" weight="1" col_weight="1"/>
+                    <vertex idx="14" weight="1" col_weight="1"/>
+                    <vertex idx="15" weight="1" col_weight="1"/>
+                    <vertex idx="62" weight="1" col_weight="1"/>
+                    <vertex idx="63" weight="1" col_weight="1"/>
+                    <vertex idx="69" weight="1" col_weight="1"/>
+                    <vertex idx="70" weight="1" col_weight="1"/>
+                    <vertex idx="108" weight="1" col_weight="1"/>
+                    <vertex idx="109" weight="1" col_weight="1"/>
+                    <bone name="Bip01 Head">
+                      <move>
+                        <v x="0.0364078" y="0.0" z="0.0" />
+                        <matrix>
+                          <rotx>3.56586e-005</rotx>
+                          <roty>0.000796738</roty>
+                          <rotz>0.0448003</rotz>
+                        </matrix>
+                      </move>
+                      <vertex idx="4" weight="1" col_weight="1"/>
+                      <vertex idx="5" weight="1" col_weight="1"/>
+                      <vertex idx="10" weight="1" col_weight="1"/>
+                      <vertex idx="11" weight="1" col_weight="1"/>
+                      <vertex idx="14" weight="1" col_weight="1"/>
+                      <vertex idx="15" weight="1" col_weight="1"/>
+                      <vertex idx="52" weight="1.0" col_weight="1"/>
+                      <vertex idx="53" weight="1.0" col_weight="1"/>
+                      <vertex idx="54" weight="1.0" col_weight="1"/>
+                      <vertex idx="55" weight="1.0" col_weight="1"/>
+                      <vertex idx="62" weight="1" col_weight="1"/>
+                      <vertex idx="63" weight="1" col_weight="1"/>
+                      <vertex idx="69" weight="1" col_weight="1"/>
+                      <vertex idx="70" weight="1" col_weight="1"/>
+                      <vertex idx="76" weight="1.0" col_weight="1"/>
+                      <vertex idx="77" weight="1.0" col_weight="1"/>
+                      <vertex idx="78" weight="1.0" col_weight="1"/>
+                      <vertex idx="79" weight="1.0" col_weight="1"/>
+                      <vertex idx="108" weight="1" col_weight="1"/>
+                      <vertex idx="109" weight="1" col_weight="1"/>
+                      <bone name="Bip01 HeadNub">
+                        <move>
+                          <v x="0.114078" y="0.0" z="0.0" />
+                          <matrix>
+                            <rotx>0.0</rotx>
+                            <roty>0.0</roty>
+                            <rotz>0.0</rotz>
+                          </matrix>
+                        </move>
+                      </bone>
+                    </bone>
+                    <bone name="Bip01 L Clavicle">
+                      <move>
+                        <v x="0.0" y="0.0169903" z="2.89434e-005" />
+                        <matrix>
+                          <rotx>3.1408</rotx>
+                          <roty>2.77359e-006</roty>
+                          <rotz>-1.5708</rotz>
+                        </matrix>
+                      </move>
+                      <vertex idx="61" weight="1" col_weight="1"/>
+                      <vertex idx="71" weight="1" col_weight="1"/>
+                      <vertex idx="88" weight="1" col_weight="1"/>
+                      <vertex idx="89" weight="1" col_weight="1"/>
+                      <bone name="Bip01 L UpperArm">
+                        <move>
+                          <v x="0.0631068" y="0.0" z="0.0" />
+                          <matrix>
+                            <rotx>0.0</rotx>
+                            <roty>0.117924</roty>
+                            <rotz>1.426</rotz>
+                          </matrix>
+                        </move>
+                        <vertex idx="106" weight="1" col_weight="1"/>
+                        <vertex idx="107" weight="1" col_weight="1"/>
+                        <vertex idx="110" weight="1" col_weight="1"/>
+                        <vertex idx="111" weight="1" col_weight="1"/>
+                        <vertex idx="116" weight="1.0" col_weight="1"/>
+                        <vertex idx="117" weight="1.0" col_weight="1"/>
+                        <vertex idx="118" weight="1.0" col_weight="1"/>
+                        <vertex idx="119" weight="1.0" col_weight="1"/>
+                        <bone name="Bip01 L Forearm">
+                          <move>
+                            <v x="0.145631" y="0.0" z="0.0" />
+                            <matrix>
+                              <rotx>0.0</rotx>
+                              <roty>0.497355</roty>
+                              <rotz>0.0</rotz>
+                            </matrix>
+                          </move>
+                          <vertex idx="106" weight="1" col_weight="1"/>
+                          <vertex idx="107" weight="1" col_weight="1"/>
+                          <vertex idx="110" weight="1" col_weight="1"/>
+                          <vertex idx="111" weight="1" col_weight="1"/>
+                          <bone name="Bip01 L Hand">
+                            <move>
+                              <v x="0.145631" y="0.0" z="0.0" />
+                              <matrix>
+                                <rotx>-1.57</rotx>
+                                <roty>0.0</roty>
+                                <rotz>0.0</rotz>
+                              </matrix>
+                            </move>
+                            <vertex idx="80" weight="1" col_weight="1"/>
+                            <vertex idx="81" weight="1" col_weight="1"/>
+                            <vertex idx="82" weight="1" col_weight="1"/>
+                            <vertex idx="83" weight="1" col_weight="1"/>
+                            <bone name="Bip01 L Finger0">
+                              <move>
+                                <v x="0.0606796" y="0.0" z="0.0" />
+                                <matrix>
+                                  <rotx>-0.000807042</rotx>
+                                  <roty>-0.163171</roty>
+                                  <rotz>0.000131134</rotz>
+                                </matrix>
+                              </move>
+                              <vertex idx="80" weight="1" col_weight="1"/>
+                              <vertex idx="81" weight="1" col_weight="1"/>
+                              <vertex idx="82" weight="1" col_weight="1"/>
+                              <vertex idx="83" weight="1" col_weight="1"/>
+                              <bone name="Bip01 L Finger0Nub">
+                                <move>
+                                  <v x="0.0151699" y="0.0" z="0.0" />
+                                  <matrix>
+                                    <rotx>0.0</rotx>
+                                    <roty>0.0</roty>
+                                    <rotz>0.0</rotz>
+                                  </matrix>
+                                </move>
+                              </bone>
+                            </bone>
+                          </bone>
+                        </bone>
+                      </bone>
+                    </bone>
+                    <bone name="Bip01 R Clavicle">
+                      <move>
+                        <v x="0.0" y="-0.0169903" z="2.90377e-005" />
+                        <matrix>
+                          <rotx>-3.1408</rotx>
+                          <roty>-2.77363e-006</roty>
+                          <rotz>1.5708</rotz>
+                        </matrix>
+                      </move>
+                      <vertex idx="20" weight="1" col_weight="1"/>
+                      <vertex idx="21" weight="1" col_weight="1"/>
+                      <vertex idx="22" weight="1" col_weight="1"/>
+                      <vertex idx="23" weight="1" col_weight="1"/>
+                      <bone name="Bip01 R UpperArm">
+                        <move>
+                          <v x="0.0631068" y="0.0" z="0.0" />
+                          <matrix>
+                            <rotx>-1.50134e-007</rotx>
+                            <roty>-0.360637</roty>
+                            <rotz>-1.5156</rotz>
+                          </matrix>
+                        </move>
+                        <vertex idx="44" weight="1" col_weight="1"/>
+                        <vertex idx="45" weight="1" col_weight="1"/>
+                        <vertex idx="46" weight="1" col_weight="1"/>
+                        <vertex idx="47" weight="1" col_weight="1"/>
+                        <vertex idx="112" weight="1.0" col_weight="1"/>
+                        <vertex idx="113" weight="1.0" col_weight="1"/>
+                        <vertex idx="114" weight="1.0" col_weight="1"/>
+                        <vertex idx="115" weight="1.0" col_weight="1"/>
+                        <bone name="Bip01 R Forearm">
+                          <move>
+                            <v x="0.145631" y="0.0" z="0.0" />
+                            <matrix>
+                              <rotx>0.0</rotx>
+                              <roty>0.32196</roty>
+                              <rotz>0.0</rotz>
+                            </matrix>
+                          </move>
+                          <vertex idx="44" weight="1" col_weight="1"/>
+                          <vertex idx="45" weight="1" col_weight="1"/>
+                          <vertex idx="46" weight="1" col_weight="1"/>
+                          <vertex idx="47" weight="1" col_weight="1"/>
+                          <bone name="Bip01 R Hand">
+                            <move>
+                              <v x="0.145631" y="0.0" z="0.0" />
+                              <matrix>
+                                <rotx>1.57</rotx>
+                                <roty>0.0</roty>
+                                <rotz>0.0</rotz>
+                              </matrix>
+                            </move>
+                            <vertex idx="48" weight="1" col_weight="1"/>
+                            <vertex idx="49" weight="1" col_weight="1"/>
+                            <vertex idx="50" weight="1" col_weight="1"/>
+                            <vertex idx="51" weight="1" col_weight="1"/>
+                            <bone name="Bip01 R Finger0">
+                              <move>
+                                <v x="0.0606796" y="0.0" z="0.0" />
+                                <matrix>
+                                  <rotx>0.000811109</rotx>
+                                  <roty>-0.191263</roty>
+                                  <rotz>-0.000154189</rotz>
+                                </matrix>
+                              </move>
+                              <vertex idx="48" weight="1" col_weight="1"/>
+                              <vertex idx="49" weight="1" col_weight="1"/>
+                              <vertex idx="50" weight="1" col_weight="1"/>
+                              <vertex idx="51" weight="1" col_weight="1"/>
+                              <bone name="Bip01 R Finger0Nub">
+                                <move>
+                                  <v x="0.0151699" y="0.0" z="0.0" />
+                                  <matrix>
+                                    <rotx>0.0</rotx>
+                                    <roty>0.0</roty>
+                                    <rotz>0.0</rotz>
+                                  </matrix>
+                                </move>
+                              </bone>
+                            </bone>
+                          </bone>
+                        </bone>
+                      </bone>
+                    </bone>
+                  </bone>
+                </bone>
+              </bone>
+            </bone>
+            <bone name="Bip01 L Thigh">
+              <move>
+                <v x="-0.0548382" y="0.0451009" z="9.37915e-005" />
+                <matrix>
+                  <rotx>4.61738e-005</rotx>
+                  <roty>-0.0401897</roty>
+                  <rotz>3.08002</rotz>
+                </matrix>
+              </move>
+              <vertex idx="1" weight="1" col_weight="1"/>
+              <vertex idx="7" weight="1" col_weight="1"/>
+              <vertex idx="12" weight="1" col_weight="1"/>
+              <vertex idx="13" weight="1" col_weight="1"/>
+              <vertex idx="56" weight="1.0" col_weight="1"/>
+              <vertex idx="59" weight="1" col_weight="1"/>
+              <vertex idx="60" weight="1.0" col_weight="1"/>
+              <vertex idx="64" weight="1.0" col_weight="1"/>
+              <vertex idx="65" weight="1.0" col_weight="1"/>
+              <vertex idx="66" weight="1" col_weight="1"/>
+              <vertex idx="72" weight="1.0" col_weight="1"/>
+              <vertex idx="73" weight="1" col_weight="1"/>
+              <vertex idx="74" weight="1" col_weight="1"/>
+              <vertex idx="75" weight="1.0" col_weight="1"/>
+              <vertex idx="85" weight="1.0" col_weight="1"/>
+              <vertex idx="86" weight="1.0" col_weight="1"/>
+              <vertex idx="94" weight="1" col_weight="1"/>
+              <vertex idx="95" weight="1" col_weight="1"/>
+              <vertex idx="96" weight="1" col_weight="1"/>
+              <vertex idx="97" weight="1" col_weight="1"/>
+              <bone name="Bip01 L Calf">
+                <move>
+                  <v x="0.242718" y="0.0" z="0.0" />
+                  <matrix>
+                    <rotx>0.0</rotx>
+                    <roty>0.583471</roty>
+                    <rotz>0.0</rotz>
+                  </matrix>
+                </move>
+                <vertex idx="92" weight="1" col_weight="1"/>
+                <vertex idx="93" weight="1" col_weight="1"/>
+                <vertex idx="94" weight="1" col_weight="1"/>
+                <vertex idx="95" weight="1" col_weight="1"/>
+                <vertex idx="96" weight="1" col_weight="1"/>
+                <vertex idx="97" weight="1" col_weight="1"/>
+                <vertex idx="98" weight="1" col_weight="1"/>
+                <vertex idx="99" weight="1" col_weight="1"/>
+                <vertex idx="100" weight="1" col_weight="1"/>
+                <vertex idx="101" weight="1" col_weight="1"/>
+                <bone name="Bip01 L Foot">
+                  <move>
+                    <v x="0.242718" y="0.0" z="0.0" />
+                    <matrix>
+                      <rotx>0.0</rotx>
+                      <roty>-0.171905</roty>
+                      <rotz>0.0</rotz>
+                    </matrix>
+                  </move>
+                  <vertex idx="90" weight="1.0" col_weight="1"/>
+                  <vertex idx="91" weight="1.0" col_weight="1"/>
+                  <vertex idx="92" weight="1" col_weight="1"/>
+                  <vertex idx="93" weight="1" col_weight="1"/>
+                  <vertex idx="98" weight="1" col_weight="1"/>
+                  <vertex idx="99" weight="1" col_weight="1"/>
+                  <vertex idx="100" weight="1" col_weight="1"/>
+                  <vertex idx="101" weight="1" col_weight="1"/>
+                  <bone name="Bip01 L Toe0">
+                    <move>
+                      <v x="0.0558252" y="0.0" z="0.0718447" />
+                      <matrix>
+                        <rotx>0.0</rotx>
+                        <roty>-1.5708</roty>
+                        <rotz>0.0</rotz>
+                      </matrix>
+                    </move>
+                    <vertex idx="102" weight="1" col_weight="1"/>
+                    <vertex idx="103" weight="1" col_weight="1"/>
+                    <vertex idx="104" weight="1" col_weight="1"/>
+                    <vertex idx="105" weight="1" col_weight="1"/>
+                    <bone name="Bip01 L Toe01">
+                      <move>
+                        <v x="0.00728155" y="0.0" z="0.0" />
+                        <matrix>
+                          <rotx>0.0</rotx>
+                          <roty>0.0</roty>
+                          <rotz>0.0</rotz>
+                        </matrix>
+                      </move>
+                      <vertex idx="102" weight="1" col_weight="1"/>
+                      <vertex idx="103" weight="1" col_weight="1"/>
+                      <vertex idx="104" weight="1" col_weight="1"/>
+                      <vertex idx="105" weight="1" col_weight="1"/>
+                      <bone name="Bip01 L Toe02">
+                        <move>
+                          <v x="0.00728155" y="0.0" z="0.0" />
+                          <matrix>
+                            <rotx>0.0</rotx>
+                            <roty>0.0</roty>
+                            <rotz>0.0</rotz>
+                          </matrix>
+                        </move>
+                        <bone name="Bip01 L Toe0Nub">
+                          <move>
+                            <v x="0.00728156" y="0.0" z="0.0" />
+                            <matrix>
+                              <rotx>0.0</rotx>
+                              <roty>0.0</roty>
+                              <rotz>0.0</rotz>
+                            </matrix>
+                          </move>
+                        </bone>
+                      </bone>
+                    </bone>
+                  </bone>
+                </bone>
+              </bone>
+            </bone>
+            <bone name="Bip01 R Thigh">
+              <move>
+                <v x="-0.0566008" y="-0.0519705" z="9.54643e-005" />
+                <matrix>
+                  <rotx>4.72699e-005</rotx>
+                  <roty>-0.219484</roty>
+                  <rotz>3.08002</rotz>
+                </matrix>
+              </move>
+              <vertex idx="0" weight="1.0" col_weight="1"/>
+              <vertex idx="1" weight="1" col_weight="1"/>
+              <vertex idx="6" weight="1.0" col_weight="1"/>
+              <vertex idx="7" weight="1" col_weight="1"/>
+              <vertex idx="12" weight="1" col_weight="1"/>
+              <vertex idx="13" weight="1" col_weight="1"/>
+              <vertex idx="17" weight="1.0" col_weight="1"/>
+              <vertex idx="19" weight="1.0" col_weight="1"/>
+              <vertex idx="24" weight="1.0" col_weight="1"/>
+              <vertex idx="25" weight="1.0" col_weight="1"/>
+              <vertex idx="26" weight="1.0" col_weight="1"/>
+              <vertex idx="27" weight="1.0" col_weight="1"/>
+              <vertex idx="28" weight="1" col_weight="1"/>
+              <vertex idx="29" weight="1" col_weight="1"/>
+              <vertex idx="30" weight="1" col_weight="1"/>
+              <vertex idx="31" weight="1" col_weight="1"/>
+              <vertex idx="59" weight="1" col_weight="1"/>
+              <vertex idx="66" weight="1" col_weight="1"/>
+              <vertex idx="73" weight="1" col_weight="1"/>
+              <vertex idx="74" weight="1" col_weight="1"/>
+              <bone name="Bip01 R Calf">
+                <move>
+                  <v x="0.242718" y="0.0" z="0.0" />
+                  <matrix>
+                    <rotx>0.0</rotx>
+                    <roty>0.0681596</roty>
+                    <rotz>0.0</rotz>
+                  </matrix>
+                </move>
+                <vertex idx="28" weight="1" col_weight="1"/>
+                <vertex idx="29" weight="1" col_weight="1"/>
+                <vertex idx="30" weight="1" col_weight="1"/>
+                <vertex idx="31" weight="1" col_weight="1"/>
+                <vertex idx="34" weight="1" col_weight="1"/>
+                <vertex idx="35" weight="1" col_weight="1"/>
+                <vertex idx="38" weight="1" col_weight="1"/>
+                <vertex idx="39" weight="1" col_weight="1"/>
+                <bone name="Bip01 R Foot">
+                  <move>
+                    <v x="0.242718" y="0.0" z="0.0" />
+                    <matrix>
+                      <rotx>0.0</rotx>
+                      <roty>0.15053</roty>
+                      <rotz>0.0</rotz>
+                    </matrix>
+                  </move>
+                  <vertex idx="32" weight="1.0" col_weight="1"/>
+                  <vertex idx="33" weight="1.0" col_weight="1"/>
+                  <vertex idx="34" weight="1" col_weight="1"/>
+                  <vertex idx="35" weight="1" col_weight="1"/>
+                  <vertex idx="36" weight="1.0" col_weight="1"/>
+                  <vertex idx="37" weight="1.0" col_weight="1"/>
+                  <vertex idx="38" weight="1" col_weight="1"/>
+                  <vertex idx="39" weight="1" col_weight="1"/>
+                  <bone name="Bip01 R Toe0">
+                    <move>
+                      <v x="0.0558252" y="0.0" z="0.0718447" />
+                      <matrix>
+                        <rotx>0.0</rotx>
+                        <roty>-1.5708</roty>
+                        <rotz>0.0</rotz>
+                      </matrix>
+                    </move>
+                    <vertex idx="40" weight="1" col_weight="1"/>
+                    <vertex idx="41" weight="1" col_weight="1"/>
+                    <vertex idx="42" weight="1" col_weight="1"/>
+                    <vertex idx="43" weight="1" col_weight="1"/>
+                    <bone name="Bip01 R Toe01">
+                      <move>
+                        <v x="0.00728155" y="0.0" z="0.0" />
+                        <matrix>
+                          <rotx>0.0</rotx>
+                          <roty>0.0</roty>
+                          <rotz>0.0</rotz>
+                        </matrix>
+                      </move>
+                      <vertex idx="40" weight="1" col_weight="1"/>
+                      <vertex idx="41" weight="1" col_weight="1"/>
+                      <vertex idx="42" weight="1" col_weight="1"/>
+                      <vertex idx="43" weight="1" col_weight="1"/>
+                      <bone name="Bip01 R Toe02">
+                        <move>
+                          <v x="0.00728156" y="0.0" z="0.0" />
+                          <matrix>
+                            <rotx>0.0</rotx>
+                            <roty>0.0</roty>
+                            <rotz>0.0</rotz>
+                          </matrix>
+                        </move>
+                        <bone name="Bip01 R Toe0Nub">
+                          <move>
+                            <v x="0.00728156" y="0.0" z="0.0" />
+                            <matrix>
+                              <rotx>0.0</rotx>
+                              <roty>0.0</roty>
+                              <rotz>0.0</rotz>
+                            </matrix>
+                          </move>
+                        </bone>
+                      </bone>
+                    </bone>
+                  </bone>
+                </bone>
+              </bone>
+            </bone>
+          </bone>
+        </bone>
+      </bone>
+
+
+      <script name="main">
+
+        <rotx bone="Bip01" duration="280" angle="0.0" />
+        <roty bone="Bip01" duration="280" angle="1.5708" />
+        <rotz bone="Bip01" duration="280" angle="0.0" />
+        <rotx bone="Bip01 Footsteps" duration="280" angle="0.0" />
+        <roty bone="Bip01 Footsteps" duration="280" angle="-1.5708" />
+        <rotz bone="Bip01 Footsteps" duration="280" angle="0.0" />
+        <rotx bone="Bip01 Pelvis" duration="280" angle="-1.5708" />
+        <roty bone="Bip01 Pelvis" duration="280" angle="-0.00816425" />
+        <rotz bone="Bip01 Pelvis" duration="280" angle="-1.5708" />
+        <rotx bone="Bip01 Spine" duration="280" angle="-4.1601e-006" />
+        <roty bone="Bip01 Spine" duration="280" angle="-0.000796327" />
+        <rotz bone="Bip01 Spine" duration="280" angle="0.00185827" />
+        <rotx bone="Bip01 Spine1" duration="280" angle="1.92023e-006" />
+        <roty bone="Bip01 Spine1" duration="280" angle="0.0" />
+        <rotz bone="Bip01 Spine1" duration="280" angle="0.00241153" />
+        <rotx bone="Bip01 Spine2" duration="280" angle="3.49691e-006" />
+        <roty bone="Bip01 Spine2" duration="280" angle="0.0" />
+        <rotz bone="Bip01 Spine2" duration="280" angle="0.00439164" />
+        <rotx bone="Bip01 Spine3" duration="280" angle="3.25801e-006" />
+        <roty bone="Bip01 Spine3" duration="280" angle="0.0" />
+        <rotz bone="Bip01 Spine3" duration="280" angle="0.00409161" />
+        <rotx bone="Bip01 Neck" duration="280" angle="0.0" />
+        <roty bone="Bip01 Neck" duration="280" angle="0.0" />
+        <rotz bone="Bip01 Neck" duration="280" angle="0.0" />
+        <rotx bone="Bip01 Head" duration="280" angle="-3.65393e-006" />
+        <roty bone="Bip01 Head" duration="280" angle="0.000797665" />
+        <rotz bone="Bip01 Head" duration="280" angle="-0.00458876" />
+        <rotx bone="Bip01 L Clavicle" duration="280" angle="3.1408" />
+        <roty bone="Bip01 L Clavicle" duration="280" angle="2.77359e-006" />
+        <rotz bone="Bip01 L Clavicle" duration="280" angle="-1.5708" />
+        <rotx bone="Bip01 L UpperArm" duration="280" angle="0.0" />
+        <roty bone="Bip01 L UpperArm" duration="280" angle="-0.145865" />
+        <rotz bone="Bip01 L UpperArm" duration="280" angle="1.47539" />
+        <rotx bone="Bip01 L Forearm" duration="280" angle="0.0" />
+        <roty bone="Bip01 L Forearm" duration="280" angle="0.400675" />
+        <rotz bone="Bip01 L Forearm" duration="280" angle="0.0" />
+        <rotx bone="Bip01 L Hand" duration="280" angle="-1.57" />
+        <roty bone="Bip01 L Hand" duration="280" angle="0.0" />
+        <rotz bone="Bip01 L Hand" duration="280" angle="0.0" />
+        <rotx bone="Bip01 L Finger0" duration="280" angle="-0.000807038" />
+        <roty bone="Bip01 L Finger0" duration="280" angle="-0.163171" />
+        <rotz bone="Bip01 L Finger0" duration="280" angle="0.000131087" />
+        <rotx bone="Bip01 R Clavicle" duration="280" angle="-3.1408" />
+        <roty bone="Bip01 R Clavicle" duration="280" angle="-2.77362e-006" />
+        <rotz bone="Bip01 R Clavicle" duration="280" angle="1.5708" />
+        <rotx bone="Bip01 R UpperArm" duration="280" angle="0.0" />
+        <roty bone="Bip01 R UpperArm" duration="280" angle="-0.0968476" />
+        <rotz bone="Bip01 R UpperArm" duration="280" angle="-1.46621" />
+        <rotx bone="Bip01 R Forearm" duration="280" angle="0.0" />
+        <roty bone="Bip01 R Forearm" duration="280" angle="0.418641" />
+        <rotz bone="Bip01 R Forearm" duration="280" angle="0.0" />
+        <rotx bone="Bip01 R Hand" duration="280" angle="1.57" />
+        <roty bone="Bip01 R Hand" duration="280" angle="0.0" />
+        <rotz bone="Bip01 R Hand" duration="280" angle="0.0" />
+        <rotx bone="Bip01 R Finger0" duration="280" angle="0.000811112" />
+        <roty bone="Bip01 R Finger0" duration="280" angle="-0.191263" />
+        <rotz bone="Bip01 R Finger0" duration="280" angle="-0.000154188" />
+        <rotx bone="Bip01 L Thigh" duration="280" angle="-9.16829e-006" />
+        <roty bone="Bip01 L Thigh" duration="280" angle="-0.536092" />
+        <rotz bone="Bip01 L Thigh" duration="280" angle="-3.13528" />
+        <rotx bone="Bip01 L Calf" duration="280" angle="0.0" />
+        <roty bone="Bip01 L Calf" duration="280" angle="1.06035" />
+        <rotz bone="Bip01 L Calf" duration="280" angle="0.0" />
+        <rotx bone="Bip01 L Foot" duration="280" angle="0.0" />
+        <roty bone="Bip01 L Foot" duration="280" angle="-0.0993778" />
+        <rotz bone="Bip01 L Foot" duration="280" angle="0.0" />
+        <rotx bone="Bip01 L Toe0" duration="280" angle="0.0" />
+        <roty bone="Bip01 L Toe0" duration="280" angle="-1.5708" />
+        <rotz bone="Bip01 L Toe0" duration="280" angle="0.0" />
+        <rotx bone="Bip01 L Toe01" duration="280" angle="0.0" />
+        <roty bone="Bip01 L Toe01" duration="280" angle="0.0" />
+        <rotz bone="Bip01 L Toe01" duration="280" angle="0.0" />
+        <rotx bone="Bip01 L Toe02" duration="280" angle="0.0" />
+        <roty bone="Bip01 L Toe02" duration="280" angle="0.0" />
+        <rotz bone="Bip01 L Toe02" duration="280" angle="0.0" />
+        <rotx bone="Bip01 R Thigh" duration="280" angle="-7.93465e-006" />
+        <roty bone="Bip01 R Thigh" duration="280" angle="-0.11499" />
+        <rotz bone="Bip01 R Thigh" duration="280" angle="-3.13529" />
+        <rotx bone="Bip01 R Calf" duration="280" angle="0.0" />
+        <roty bone="Bip01 R Calf" duration="280" angle="0.368491" />
+        <rotz bone="Bip01 R Calf" duration="280" angle="0.0" />
+        <rotx bone="Bip01 R Foot" duration="280" angle="0.0" />
+        <roty bone="Bip01 R Foot" duration="280" angle="-0.196269" />
+        <rotz bone="Bip01 R Foot" duration="280" angle="0.0" />
+        <rotx bone="Bip01 R Toe0" duration="280" angle="0.0" />
+        <roty bone="Bip01 R Toe0" duration="280" angle="-1.5708" />
+        <rotz bone="Bip01 R Toe0" duration="280" angle="0.0" />
+        <rotx bone="Bip01 R Toe01" duration="280" angle="0.0" />
+        <roty bone="Bip01 R Toe01" duration="280" angle="0.0" />
+        <rotz bone="Bip01 R Toe01" duration="280" angle="0.0" />
+        <rotx bone="Bip01 R Toe02" duration="280" angle="0.0" />
+        <roty bone="Bip01 R Toe02" duration="280" angle="0.0" />
+        <rotz bone="Bip01 R Toe02" duration="280" angle="0.0" />
+        <delay time="280" />
+
+        <rotx bone="Bip01" duration="320" angle="0.0" />
+        <roty bone="Bip01" duration="320" angle="1.5708" />
+        <rotz bone="Bip01" duration="320" angle="0.0" />
+        <rotx bone="Bip01 Footsteps" duration="320" angle="0.0" />
+        <roty bone="Bip01 Footsteps" duration="320" angle="-1.5708" />
+        <rotz bone="Bip01 Footsteps" duration="320" angle="0.0" />
+        <rotx bone="Bip01 Pelvis" duration="320" angle="-1.57079" />
+        <roty bone="Bip01 Pelvis" duration="320" angle="-0.0797204" />
+        <rotz bone="Bip01 Pelvis" duration="320" angle="-1.5708" />
+        <rotx bone="Bip01 Spine" duration="320" angle="-4.15509e-006" />
+        <roty bone="Bip01 Spine" duration="320" angle="-0.000796403" />
+        <rotz bone="Bip01 Spine" duration="320" angle="0.0181544" />
+        <rotx bone="Bip01 Spine1" duration="320" angle="1.87449e-005" />
+        <roty bone="Bip01 Spine1" duration="320" angle="-2.8596e-007" />
+        <rotz bone="Bip01 Spine1" duration="320" angle="0.0235439" />
+        <rotx bone="Bip01 Spine2" duration="320" angle="3.41279e-005" />
+        <roty bone="Bip01 Spine2" duration="320" angle="-8.50691e-007" />
+        <rotz bone="Bip01 Spine2" duration="320" angle="0.0428758" />
+        <rotx bone="Bip01 Spine3" duration="320" angle="3.17978e-005" />
+        <roty bone="Bip01 Spine3" duration="320" angle="-7.46033e-007" />
+        <rotz bone="Bip01 Spine3" duration="320" angle="0.0399466" />
+        <rotx bone="Bip01 Neck" duration="320" angle="0.0" />
+        <roty bone="Bip01 Neck" duration="320" angle="0.0" />
+        <rotz bone="Bip01 Neck" duration="320" angle="0.0" />
+        <rotx bone="Bip01 Head" duration="320" angle="-3.56642e-005" />
+        <roty bone="Bip01 Head" duration="320" angle="0.000796986" />
+        <rotz bone="Bip01 Head" duration="320" angle="-0.0448003" />
+        <rotx bone="Bip01 L Clavicle" duration="320" angle="3.1408" />
+        <roty bone="Bip01 L Clavicle" duration="320" angle="2.77359e-006" />
+        <rotz bone="Bip01 L Clavicle" duration="320" angle="-1.5708" />
+        <rotx bone="Bip01 L UpperArm" duration="320" angle="0.0" />
+        <roty bone="Bip01 L UpperArm" duration="320" angle="-0.360637" />
+        <rotz bone="Bip01 L UpperArm" duration="320" angle="1.5156" />
+        <rotx bone="Bip01 L Forearm" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Forearm" duration="320" angle="0.32196" />
+        <rotz bone="Bip01 L Forearm" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Hand" duration="320" angle="-1.57" />
+        <roty bone="Bip01 L Hand" duration="320" angle="0.0" />
+        <rotz bone="Bip01 L Hand" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Finger0" duration="320" angle="-0.000807038" />
+        <roty bone="Bip01 L Finger0" duration="320" angle="-0.163171" />
+        <rotz bone="Bip01 L Finger0" duration="320" angle="0.0001311" />
+        <rotx bone="Bip01 R Clavicle" duration="320" angle="-3.1408" />
+        <roty bone="Bip01 R Clavicle" duration="320" angle="-2.77363e-006" />
+        <rotz bone="Bip01 R Clavicle" duration="320" angle="1.5708" />
+        <rotx bone="Bip01 R UpperArm" duration="320" angle="0.0" />
+        <roty bone="Bip01 R UpperArm" duration="320" angle="0.117924" />
+        <rotz bone="Bip01 R UpperArm" duration="320" angle="-1.426" />
+        <rotx bone="Bip01 R Forearm" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Forearm" duration="320" angle="0.497355" />
+        <rotz bone="Bip01 R Forearm" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Hand" duration="320" angle="1.57" />
+        <roty bone="Bip01 R Hand" duration="320" angle="0.0" />
+        <rotz bone="Bip01 R Hand" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Finger0" duration="320" angle="0.000811111" />
+        <roty bone="Bip01 R Finger0" duration="320" angle="-0.191263" />
+        <rotz bone="Bip01 R Finger0" duration="320" angle="-0.000154214" />
+        <rotx bone="Bip01 L Thigh" duration="320" angle="-5.31224e-005" />
+        <roty bone="Bip01 L Thigh" duration="320" angle="-0.219484" />
+        <rotz bone="Bip01 L Thigh" duration="320" angle="-3.08002" />
+        <rotx bone="Bip01 L Calf" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Calf" duration="320" angle="0.0681596" />
+        <rotz bone="Bip01 L Calf" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Foot" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Foot" duration="320" angle="0.15053" />
+        <rotz bone="Bip01 L Foot" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Toe0" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Toe0" duration="320" angle="-1.5708" />
+        <rotz bone="Bip01 L Toe0" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Toe01" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Toe01" duration="320" angle="0.0" />
+        <rotz bone="Bip01 L Toe01" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Toe02" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Toe02" duration="320" angle="0.0" />
+        <rotz bone="Bip01 L Toe02" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Thigh" duration="320" angle="-5.18901e-005" />
+        <roty bone="Bip01 R Thigh" duration="320" angle="-0.0401893" />
+        <rotz bone="Bip01 R Thigh" duration="320" angle="-3.08002" />
+        <rotx bone="Bip01 R Calf" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Calf" duration="320" angle="0.583471" />
+        <rotz bone="Bip01 R Calf" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Foot" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Foot" duration="320" angle="-0.171904" />
+        <rotz bone="Bip01 R Foot" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Toe0" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Toe0" duration="320" angle="-1.5708" />
+        <rotz bone="Bip01 R Toe0" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Toe01" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Toe01" duration="320" angle="0.0" />
+        <rotz bone="Bip01 R Toe01" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Toe02" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Toe02" duration="320" angle="0.0" />
+        <rotz bone="Bip01 R Toe02" duration="320" angle="0.0" />
+        <delay time="320" />
+
+        <rotx bone="Bip01" duration="320" angle="0.0" />
+        <roty bone="Bip01" duration="320" angle="1.5708" />
+        <rotz bone="Bip01" duration="320" angle="0.0" />
+        <rotx bone="Bip01 Footsteps" duration="320" angle="0.0" />
+        <roty bone="Bip01 Footsteps" duration="320" angle="-1.5708" />
+        <rotz bone="Bip01 Footsteps" duration="320" angle="0.0" />
+        <rotx bone="Bip01 Pelvis" duration="320" angle="-1.5708" />
+        <roty bone="Bip01 Pelvis" duration="320" angle="0.0132057" />
+        <rotz bone="Bip01 Pelvis" duration="320" angle="-1.5708" />
+        <rotx bone="Bip01 Spine" duration="320" angle="-4.16078e-006" />
+        <roty bone="Bip01 Spine" duration="320" angle="-0.000796304" />
+        <rotz bone="Bip01 Spine" duration="320" angle="-0.00300853" />
+        <rotx bone="Bip01 Spine1" duration="320" angle="-3.10513e-006" />
+        <roty bone="Bip01 Spine1" duration="320" angle="0.0" />
+        <rotz bone="Bip01 Spine1" duration="320" angle="-0.00389956" />
+        <rotx bone="Bip01 Spine2" duration="320" angle="-5.65477e-006" />
+        <roty bone="Bip01 Spine2" duration="320" angle="0.0" />
+        <rotz bone="Bip01 Spine2" duration="320" angle="-0.0071015" />
+        <rotx bone="Bip01 Spine3" duration="320" angle="-5.26844e-006" />
+        <roty bone="Bip01 Spine3" duration="320" angle="0.0" />
+        <rotz bone="Bip01 Spine3" duration="320" angle="-0.00661634" />
+        <rotx bone="Bip01 Neck" duration="320" angle="0.0" />
+        <roty bone="Bip01 Neck" duration="320" angle="0.0" />
+        <rotz bone="Bip01 Neck" duration="320" angle="0.0" />
+        <rotx bone="Bip01 Head" duration="320" angle="5.90843e-006" />
+        <roty bone="Bip01 Head" duration="320" angle="0.000797619" />
+        <rotz bone="Bip01 Head" duration="320" angle="0.00742025" />
+        <rotx bone="Bip01 L Clavicle" duration="320" angle="3.1408" />
+        <roty bone="Bip01 L Clavicle" duration="320" angle="2.77359e-006" />
+        <rotz bone="Bip01 L Clavicle" duration="320" angle="-1.5708" />
+        <rotx bone="Bip01 L UpperArm" duration="320" angle="0.0" />
+        <roty bone="Bip01 L UpperArm" duration="320" angle="-0.0817244" />
+        <rotz bone="Bip01 L UpperArm" duration="320" angle="1.46338" />
+        <rotx bone="Bip01 L Forearm" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Forearm" duration="320" angle="0.424183" />
+        <rotz bone="Bip01 L Forearm" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Hand" duration="320" angle="-1.57" />
+        <roty bone="Bip01 L Hand" duration="320" angle="0.0" />
+        <rotz bone="Bip01 L Hand" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Finger0" duration="320" angle="-0.00080704" />
+        <roty bone="Bip01 L Finger0" duration="320" angle="-0.163171" />
+        <rotz bone="Bip01 L Finger0" duration="320" angle="0.00013111" />
+        <rotx bone="Bip01 R Clavicle" duration="320" angle="-3.1408" />
+        <roty bone="Bip01 R Clavicle" duration="320" angle="-2.77363e-006" />
+        <rotz bone="Bip01 R Clavicle" duration="320" angle="1.5708" />
+        <rotx bone="Bip01 R UpperArm" duration="320" angle="0.0" />
+        <roty bone="Bip01 R UpperArm" duration="320" angle="-0.160988" />
+        <rotz bone="Bip01 R UpperArm" duration="320" angle="-1.47822" />
+        <rotx bone="Bip01 R Forearm" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Forearm" duration="320" angle="0.395133" />
+        <rotz bone="Bip01 R Forearm" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Hand" duration="320" angle="1.57" />
+        <roty bone="Bip01 R Hand" duration="320" angle="0.0" />
+        <rotz bone="Bip01 R Hand" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Finger0" duration="320" angle="0.000811106" />
+        <roty bone="Bip01 R Finger0" duration="320" angle="-0.191263" />
+        <rotz bone="Bip01 R Finger0" duration="320" angle="-0.00015419" />
+        <rotx bone="Bip01 L Thigh" duration="320" angle="5.29361e-006" />
+        <roty bone="Bip01 L Thigh" duration="320" angle="-0.11499" />
+        <rotz bone="Bip01 L Thigh" duration="320" angle="3.1314" />
+        <rotx bone="Bip01 L Calf" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Calf" duration="320" angle="0.368491" />
+        <rotz bone="Bip01 L Calf" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Foot" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Foot" duration="320" angle="-0.196269" />
+        <rotz bone="Bip01 L Foot" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Toe0" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Toe0" duration="320" angle="-1.5708" />
+        <rotz bone="Bip01 L Toe0" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Toe01" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Toe01" duration="320" angle="0.0" />
+        <rotz bone="Bip01 L Toe01" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Toe02" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Toe02" duration="320" angle="0.0" />
+        <rotz bone="Bip01 L Toe02" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Thigh" duration="320" angle="6.11665e-006" />
+        <roty bone="Bip01 R Thigh" duration="320" angle="-0.536092" />
+        <rotz bone="Bip01 R Thigh" duration="320" angle="3.13139" />
+        <rotx bone="Bip01 R Calf" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Calf" duration="320" angle="1.06035" />
+        <rotz bone="Bip01 R Calf" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Foot" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Foot" duration="320" angle="-0.0993778" />
+        <rotz bone="Bip01 R Foot" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Toe0" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Toe0" duration="320" angle="-1.5708" />
+        <rotz bone="Bip01 R Toe0" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Toe01" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Toe01" duration="320" angle="0.0" />
+        <rotz bone="Bip01 R Toe01" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Toe02" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Toe02" duration="320" angle="0.0" />
+        <rotz bone="Bip01 R Toe02" duration="320" angle="0.0" />
+        <delay time="320" />
+
+        <rotx bone="Bip01" duration="320" angle="0.0" />
+        <roty bone="Bip01" duration="320" angle="1.5708" />
+        <rotz bone="Bip01" duration="320" angle="0.0" />
+        <rotx bone="Bip01 Footsteps" duration="320" angle="0.0" />
+        <roty bone="Bip01 Footsteps" duration="320" angle="-1.5708" />
+        <rotz bone="Bip01 Footsteps" duration="320" angle="0.0" />
+        <rotx bone="Bip01 Pelvis" duration="320" angle="-1.5708" />
+        <roty bone="Bip01 Pelvis" duration="320" angle="0.0797232" />
+        <rotz bone="Bip01 Pelvis" duration="320" angle="-1.5708" />
+        <rotx bone="Bip01 Spine" duration="320" angle="-4.16046e-006" />
+        <roty bone="Bip01 Spine" duration="320" angle="-0.000796233" />
+        <rotz bone="Bip01 Spine" duration="320" angle="-0.0181572" />
+        <rotx bone="Bip01 Spine1" duration="320" angle="-1.87464e-005" />
+        <roty bone="Bip01 Spine1" duration="320" angle="-1.55355e-007" />
+        <rotz bone="Bip01 Spine1" duration="320" angle="-0.0235439" />
+        <rotx bone="Bip01 Spine2" duration="320" angle="-3.4133e-005" />
+        <roty bone="Bip01 Spine2" duration="320" angle="-6.12934e-007" />
+        <rotz bone="Bip01 Spine2" duration="320" angle="-0.0428758" />
+        <rotx bone="Bip01 Spine3" duration="320" angle="-3.18022e-005" />
+        <roty bone="Bip01 Spine3" duration="320" angle="-5.24484e-007" />
+        <rotz bone="Bip01 Spine3" duration="320" angle="-0.0399466" />
+        <rotx bone="Bip01 Neck" duration="320" angle="0.0" />
+        <roty bone="Bip01 Neck" duration="320" angle="0.0" />
+        <rotz bone="Bip01 Neck" duration="320" angle="0.0" />
+        <rotx bone="Bip01 Head" duration="320" angle="3.56586e-005" />
+        <roty bone="Bip01 Head" duration="320" angle="0.000796738" />
+        <rotz bone="Bip01 Head" duration="320" angle="0.0448003" />
+        <rotx bone="Bip01 L Clavicle" duration="320" angle="3.1408" />
+        <roty bone="Bip01 L Clavicle" duration="320" angle="2.77359e-006" />
+        <rotz bone="Bip01 L Clavicle" duration="320" angle="-1.5708" />
+        <rotx bone="Bip01 L UpperArm" duration="320" angle="0.0" />
+        <roty bone="Bip01 L UpperArm" duration="320" angle="0.117924" />
+        <rotz bone="Bip01 L UpperArm" duration="320" angle="1.426" />
+        <rotx bone="Bip01 L Forearm" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Forearm" duration="320" angle="0.497355" />
+        <rotz bone="Bip01 L Forearm" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Hand" duration="320" angle="-1.57" />
+        <roty bone="Bip01 L Hand" duration="320" angle="0.0" />
+        <rotz bone="Bip01 L Hand" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Finger0" duration="320" angle="-0.000807042" />
+        <roty bone="Bip01 L Finger0" duration="320" angle="-0.163171" />
+        <rotz bone="Bip01 L Finger0" duration="320" angle="0.000131134" />
+        <rotx bone="Bip01 R Clavicle" duration="320" angle="-3.1408" />
+        <roty bone="Bip01 R Clavicle" duration="320" angle="-2.77363e-006" />
+        <rotz bone="Bip01 R Clavicle" duration="320" angle="1.5708" />
+        <rotx bone="Bip01 R UpperArm" duration="320" angle="-1.50134e-007" />
+        <roty bone="Bip01 R UpperArm" duration="320" angle="-0.360637" />
+        <rotz bone="Bip01 R UpperArm" duration="320" angle="-1.5156" />
+        <rotx bone="Bip01 R Forearm" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Forearm" duration="320" angle="0.32196" />
+        <rotz bone="Bip01 R Forearm" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Hand" duration="320" angle="1.57" />
+        <roty bone="Bip01 R Hand" duration="320" angle="0.0" />
+        <rotz bone="Bip01 R Hand" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Finger0" duration="320" angle="0.000811109" />
+        <roty bone="Bip01 R Finger0" duration="320" angle="-0.191263" />
+        <rotz bone="Bip01 R Finger0" duration="320" angle="-0.000154189" />
+        <rotx bone="Bip01 L Thigh" duration="320" angle="4.61738e-005" />
+        <roty bone="Bip01 L Thigh" duration="320" angle="-0.0401897" />
+        <rotz bone="Bip01 L Thigh" duration="320" angle="3.08002" />
+        <rotx bone="Bip01 L Calf" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Calf" duration="320" angle="0.583471" />
+        <rotz bone="Bip01 L Calf" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Foot" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Foot" duration="320" angle="-0.171905" />
+        <rotz bone="Bip01 L Foot" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Toe0" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Toe0" duration="320" angle="-1.5708" />
+        <rotz bone="Bip01 L Toe0" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Toe01" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Toe01" duration="320" angle="0.0" />
+        <rotz bone="Bip01 L Toe01" duration="320" angle="0.0" />
+        <rotx bone="Bip01 L Toe02" duration="320" angle="0.0" />
+        <roty bone="Bip01 L Toe02" duration="320" angle="0.0" />
+        <rotz bone="Bip01 L Toe02" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Thigh" duration="320" angle="4.72699e-005" />
+        <roty bone="Bip01 R Thigh" duration="320" angle="-0.219484" />
+        <rotz bone="Bip01 R Thigh" duration="320" angle="3.08002" />
+        <rotx bone="Bip01 R Calf" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Calf" duration="320" angle="0.0681596" />
+        <rotz bone="Bip01 R Calf" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Foot" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Foot" duration="320" angle="0.15053" />
+        <rotz bone="Bip01 R Foot" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Toe0" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Toe0" duration="320" angle="-1.5708" />
+        <rotz bone="Bip01 R Toe0" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Toe01" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Toe01" duration="320" angle="0.0" />
+        <rotz bone="Bip01 R Toe01" duration="320" angle="0.0" />
+        <rotx bone="Bip01 R Toe02" duration="320" angle="0.0" />
+        <roty bone="Bip01 R Toe02" duration="320" angle="0.0" />
+        <rotz bone="Bip01 R Toe02" duration="320" angle="0.0" />
+        <delay time="320" />
+
+        <repeat />
+      </script>
+      <run script="main"/>
+    </animcontrol>
+  </params>
+</meshfact>
+
     <meshfact name="prototest">
         <plugin>protoFact</plugin>
         <params>
@@ -6480,6 +7728,19 @@
 	    <ztest />
             <move>
                 <v x="-8" y="-1" z="11" />
+            </move>
+        </meshref>
+        <meshref name="Skelobj">
+            <factory>SkelFact</factory>
+            <priority>object</priority>
+	         <zuse />
+            <move>
+                <v x="0" y="-0.2" z="10" />
+                    <matrix>
+                        <rotx>0</rotx>
+                        <roty>0</roty>
+                        <rotz>0</rotz>
+                    </matrix>
             </move>
         </meshref>
         <meshref name="cubeHierarchy">
