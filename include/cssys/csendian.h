@@ -19,6 +19,15 @@
 #ifndef __CS_CSENDIAN_H__
 #define __CS_CSENDIAN_H__
 
+/**\file
+ */
+/**\addtogroup util
+ * @{
+ */
+/**\name Helpers for dealing with endianness
+ * @{
+ */
+
 #include <math.h>
 #include "cstypes.h"
 #include "qint.h"
@@ -224,5 +233,9 @@ inline void set_le_float32 (void *buff, float f)
 /// Set a little-endian 16-bit float on a address
 inline void set_le_float16 (void *buff, float f)
 { set_le_short (buff, float2short (f)); }
+
+/** @} */
+
+/** @} */
 
 #endif // __CS_CSENDIAN_H__
