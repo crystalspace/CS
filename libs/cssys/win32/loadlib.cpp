@@ -29,10 +29,10 @@ CS_HLIBRARY SysLoadLibrary (char* szLibName)
 
 PROC SysGetProcAddress (CS_HLIBRARY Handle, char* szProcName)
 {
-  return GetProcAddress ((void*)Handle, szProcName);
+  return GetProcAddress ((HMODULE)Handle, szProcName);
 }
 
 bool SysFreeLibrary (CS_HLIBRARY Handle)
 {
-  return FreeLibrary ((void*)Handle);
+  return FreeLibrary ((HMODULE)Handle);
 }

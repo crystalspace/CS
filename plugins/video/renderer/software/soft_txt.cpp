@@ -136,6 +136,8 @@ void csTextureMMSoftware::convert_to_internal_global (csTextureManagerSoftware* 
 void csTextureMMSoftware::convert_to_internal_24bit (csTextureManagerSoftware *tex,
   IImageFile* imfile, unsigned char* bm)
 {
+  (void)tex;
+
   int s;
   imfile->GetSize (s);
   RGBPixel* bmsrc;

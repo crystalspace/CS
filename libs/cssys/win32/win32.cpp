@@ -709,6 +709,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
 {
   ModuleHandle = hInstance;
   ApplicationShow = nCmdShow;
+  (void)lpCmdLine;
+  (void)hPrevInstance;
 
 #ifdef COMP_BC
   csMain ( _argc,  _argv);
