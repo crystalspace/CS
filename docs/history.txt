@@ -3,18 +3,19 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
-22-Jun-2003
+21-Jun-2003
+        - Philip Wyett updated win32.mak to reflect changes/additions in
+          the general cssys library affecting MSVC port(s).
+        - Philip changed all foo <= 63 to foo < 64 to add some
+          consistency and make for easier reading of the file.
         - Andrew Mann fixed a bug in the Win32 loadlib function
           InternalScanPluginDir() that could cause double path delimeters
           to be included in the full path and filename of a file.
           Also fixed a bug in the same location that attempted to load all
           plugins from the current working directory regardless of where
           the plugin scan found them.
-21-Jun-2003
-        - Philip Wyett updated win32.mak to reflect changes/additions in
-          the general cssys library affecting MSVC port(s).
-        - Philip changed all foo <= 63 to foo < 64 to add some
-          consistency and make for easier reading of the file.
+        - Philip Wyett initialized the un-initialized 'clipportal_dirty'
+          at construction in csGraphics3DOGLCommon.
 20-Jun-2003
 	- Marten fixed an error in the inline assembly in tcovbuf.cpp 
 	  which prevented it from compiling on msvc6

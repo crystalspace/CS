@@ -241,6 +241,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   stencil_init = false;
   planes_init = false;
   frustum_valid = false;
+  clipportal_dirty = false;
 
   if (!tr_verts)
   {
