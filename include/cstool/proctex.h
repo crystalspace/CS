@@ -137,7 +137,7 @@ public:
 
   /// get dimension
   virtual void GetDimension (int &w, int &h)
-  { w = w; h = mat_h; }
+  { w = mat_w; h = mat_h; }
 
   static int GetRandom (int max)
   {
