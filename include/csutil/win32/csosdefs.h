@@ -197,7 +197,6 @@
 #include <winbase.h>
 #include <malloc.h>
 #include <sys/types.h>
-#include <sys/select.h>
 #include <sys/stat.h>
 #ifndef __CYGWIN32__
 #include <direct.h>
@@ -324,18 +323,6 @@ struct csMemMapInfo
 #  define CS_MKDIR(path) _mkdir(path)
 #endif
 
-// Although CS_COMPILER_GCC has opendir(), readdir(), etc., we prefer the CS
-// versions of these functions.
-#define CS_WIN32_USE_CUSTOM_OPENDIR
-
-# if defined(CS_WIN32_USE_CUSTOM_OPENDIR)
-struct DIR;
-struct dirent;
-extern "C" CS_CSUTIL_EXPORT DIR *opendir (const char *name);
-extern "C" CS_CSUTIL_EXPORT dirent *readdir (DIR *dirp);
-extern "C" CS_CSUTIL_EXPORT int closedir (DIR *dirp);
-# endif
-
 // Directory read functions, file access, etc.
 #include <io.h>
 #ifndef F_OK
@@ -368,6 +355,12 @@ struct dirent
   long dwFileAttributes; // File attributes (Windows-specific)
 };
 
+// Although CS_COMPILER_GCC has opendir(), readdir(), etc., we prefer the CS
+// versions of these functions.
+#define CS_WIN32_USE_CUSTOM_OPENDIR
+
+# if defined(CS_WIN32_USE_CUSTOM_OPENDIR)
+  struct DIR;
 # ifdef CS_CSUTIL_LIB
   extern "C" CS_EXPORT_SYM DIR *opendir (const char *name);
   extern "C" CS_EXPORT_SYM dirent *readdir (DIR *dirp);
