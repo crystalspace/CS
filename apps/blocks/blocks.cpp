@@ -2995,7 +2995,7 @@ void Blocks::TerminateConnection()
 void cleanup ()
 {
   Sys->console_out ("Cleaning up...\n");
-  view;
+  delete view;
   Sys->DecRef ();
   Sys = NULL;
 }
