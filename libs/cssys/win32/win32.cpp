@@ -49,8 +49,8 @@
 // Cygwin doesn't understand _argc or _argv, so we define them here.
 // These are borrowed from Mingw32 includes (see stdlib.h)
 // Cygwin Purists, forgive the corruption, Cygwin means Cygnus for Win32.
-extern int _argc;
-extern char** _argv;
+extern int CS_WIN32_ARGC;
+extern char** CS_WIN32_ARGV;
 #endif
 
 void SystemFatalError (char *s)
@@ -543,7 +543,7 @@ bool csPlatformStartup(iObjectRegistry* r)
   char* pathEnv = csStrNew (getenv("PATH"));
   bool pathChanged = false;
 
-  csPluginPaths* pluginpaths = csGetPluginPaths (__argv[0]);
+  csPluginPaths* pluginpaths = csGetPluginPaths (CS_WIN32_ARGV[0]);
   for (int i = 0; i < pluginpaths->GetCount(); i++)
   {
     // @@@ deal with path recursion here?
