@@ -23,6 +23,7 @@ Short-term cleanups that need to be done:
 	- I moved csQuadcube from csgeom to csengine. Update the project
 	  files for this.
 	- Fixed endian reading for terrain loading which Alex Pfaffe did.
+	- Fixed init bug in csWorld for current_camera.
 18-Oct-1999
 	- Scott Wood <scott@geekland.cx> sent me patches to allow CS
 	  to compile on Alpha machines.
