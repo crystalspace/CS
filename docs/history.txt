@@ -36,6 +36,11 @@ chronological order.
 	- Matze removed the pointer sized integer types as it is very hacky and
 	  unnatural to do arithmetics with pointers. (I couldn't imagine a case
 	  where this would make real sense)
+	- res changed winthread.cpp to use _beginthreadex() instead of
+	  _beginthread(). _beginthreadex() acts a bit more like CreateHandle().
+	  However, it also requires a manual CloseHandle(), which is done
+	  at destruction time. Thus, threads that don't run any more should be 
+	  destructed as soon as possible.
 17-Aug-2003
 	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
 	  some cases it would fail to register a hit.

@@ -187,6 +187,7 @@ void csSoundRenderDS3D::Close()
     bRunning=false;
     bgThread->Wait();
   }
+  bgThread = 0;
 
   mutex_ActiveSources->LockWait();
   while (ActiveSources.Length()>0)

@@ -57,7 +57,7 @@ class csWinThread : public csThread
   virtual char const* GetLastError ();
 
  protected:
-  static void ThreadRun (void* param);
+  static uint __stdcall ThreadRun (void* param);
  protected:
   HANDLE thread;
   csRef<csRunnable> runnable;

@@ -20,11 +20,6 @@
 #include "winthread.h"
 #include <process.h>
 
-#ifndef _UINTPTR_T_DEFINED
-typedef ptr_uint uintptr_t;
-#define _UINTPTR_T_DEFINED
-#endif
-
 #include "cssys/win32/wintools.h"
 
 #ifdef CS_DEBUG
@@ -231,14 +226,17 @@ csWinThread::~csWinThread ()
 {
   if (running)
     Stop ();
+  CloseHandle (thread);
 }
 
 bool csWinThread::Start ()
 {
-  uintptr_t thdl = _beginthread (ThreadRun, 0, (void*)this);
-  running = (thdl != (uintptr_t)-1);
+  thread = (HANDLE)_beginthreadex (0, 0, ThreadRun, (void*)this, 
+    CREATE_SUSPENDED, 0);
+  bool created = (thread != 0);
+  CS_TEST (created);
+  running = (ResumeThread (thread) != (DWORD)-1);
   CS_TEST (running);
-  thread = (HANDLE)thdl;
   return running;
 }
 
@@ -268,12 +266,13 @@ char const* csWinThread::GetLastError ()
   return (char const*)lasterr;
 }
 
-void csWinThread::ThreadRun (void* param)
+uint csWinThread::ThreadRun (void* param)
 {
   csWinThread *thread = (csWinThread*)param;
   thread->runnable->Run ();
   thread->running = false;
-  _endthread();
+  _endthreadex (0);
+  return 0;
 }
 
 #undef CS_TEST
