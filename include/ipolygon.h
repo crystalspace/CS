@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 
 struct iMaterialHandle;
+struct iMaterialWrapper;
 struct iPolygonSet;
 struct iPolygon3D;
 struct iPolygonTexture;
@@ -66,6 +67,8 @@ struct iPolygon3D : public iBase
   virtual iPolygonTexture *GetTexture () = 0;
   /// Get the material handle for the texture manager.
   virtual iMaterialHandle *GetMaterialHandle () = 0;
+  /// Set the material for this polygon.
+  virtual void SetMaterial (iMaterialWrapper* mat) = 0;
 
   /// Query number of vertices in this polygon
   virtual int GetVertexCount () = 0;
@@ -107,6 +110,9 @@ struct iPolygon3D : public iBase
 
   /// Create a portal object pointing to given sector
   virtual iPortal *CreatePortal (iSector *iTarget) = 0;
+
+  /// Set texture space mapping (if using lightmapping) for this polygon.
+  virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1) = 0;
 };
 
 SCF_VERSION (iPolygonTexture, 1, 0, 0);

@@ -1977,6 +1977,11 @@ iSprite *csWorld::FindSprite (const char *iName)
   return NULL; /*not implemented yet*/
 }
 
+iMaterialWrapper* csWorld::FindMaterial (const char* iName)
+{
+  return (iMaterialWrapper*)materials->FindByName (iName);
+}
+
 //----------------Begin-Multi-Context-Support------------------------------
 
 void csWorld::Resize ()

@@ -58,6 +58,7 @@ class csPoly2DPool;
 class csLightPatchPool;
 struct iSystem;
 struct iVFS;
+struct iMaterialWrapper;
 
 
 /**
@@ -1090,6 +1091,9 @@ public:
   virtual iThing *FindThing (const char *iName);
   /// Find a sprite by name
   virtual iSprite *FindSprite (const char *iName);
+
+  /// Find a loaded material by name.
+  virtual iMaterialWrapper* FindMaterial (const char* iName);
 
   //--------------------- iConfig interface implementation --------------------
 

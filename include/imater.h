@@ -71,4 +71,15 @@ struct iMaterialHandle : public iBase
   virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection) = 0;
 };
 
+SCF_VERSION (iMaterialWrapper, 0, 0, 1);
+
+/**
+ * This class represents a material wrapper which holds
+ * the mapping between a material in the engine and a material
+ * in the 3D rasterizer.
+ */
+struct iMaterialWrapper : public iBase
+{
+};
+
 #endif // __IMATER_H__

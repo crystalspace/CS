@@ -317,7 +317,6 @@ iPolygon3D *csPolygonSet::PolySet::GetPolygon (int idx)
 csPolygon3D* csPolygonSet::NewPolygon (csMaterialWrapper* material)
 {
   csPolygon3D* p = new csPolygon3D (material);
-  //p->SetSector (sector);
   AddPolygon (p);
   return p;
 }
@@ -326,7 +325,6 @@ iPolygon3D *csPolygonSet::PolySet::CreatePolygon (const char *iName)
 {
   csPolygon3D *p = new csPolygon3D ((csMaterialWrapper *)NULL);
   p->SetName (iName);
-  //p->SetSector (scfParent->sector);
   scfParent->AddPolygon (p);
   iPolygon3D *ip = QUERY_INTERFACE (p, iPolygon3D);
   p->DecRef ();

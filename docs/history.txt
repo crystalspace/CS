@@ -1,5 +1,25 @@
 The history order has been reversed so that new features are at the top.
 
+5-Oct-2000
+	- Extended iPolygon3D interface with one of the SetTextureSpace
+	  functions so that I can get the python script pysimp.py working.
+	- Added iMaterialWrapper interface so that there is now an SCF
+	  interface for csMaterialWrapper.
+	- Added iWorld::FindMaterial() to look for a loaded material.
+	- Fixed iPolygon3D::GetVertex (and the W/C versions). They were
+	  completely broken.
+	- Updated cs.i input file for SWIG so that it is more up-to-date
+	  with regards to the current state in CS. The interface is far
+	  from complete. First we need more and better defined SCF interfaces
+	  for the engine itself and second we need to extend cs.i to actually
+	  use all those interfaces. At this moment cs.i is extended
+	  just enough so that I could get pysimp.py working.
+	- The pysimple test application now behaves almost exactly like
+	  simple (without the sprite though) but the geometry of the
+	  room is created in python instead of C++. Check out
+	  scripts/python/pysimp.py to see how this works.
+	- SWIG generates a file called cs_wrap.doc. I also added this file
+	  to CVS since it is useful to read and not everybody has SWIG.
 4-Oct-2000
 	- Norman Kramer updated config access in freefont plugin according
 	  to Andrew's latest changes.
@@ -19,6 +39,12 @@ The history order has been reversed so that new features are at the top.
 	  Glide canvas.  By all accounts, it appears that this driver has
 	  never worked.  Most of the content of these source files is actually
 	  old code left over from X-windows and Win32.
+	- Andrew Zabolotny did a few remaining fixes so that all the
+	  apps compile again.
+	- Wouter Wijngaards added a LoadFont(name,file) method to G2D.
+	  It returns the new fontid or -1 on failure. Use this to load
+	  fonts.
+	- Thomas Hieber continued work on the gamecore plugin.
 3-Oct-2000
 	- Fixed a bug in the 3dslev convertor where it would accidently
 	  remove small polygons.

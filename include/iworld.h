@@ -31,6 +31,7 @@ class csColor;
 struct iSector;
 struct iThing;
 struct iSprite;
+struct iMaterialWrapper;
 
 SCF_VERSION (iWorld, 0, 1, 1);
 
@@ -89,6 +90,9 @@ struct iWorld : public iPlugIn
   virtual void EnableLightingCache (bool do_cache) = 0;
   /// Return true if lighting cache is enabled.
   virtual bool IsLightingCacheEnabled () = 0;
+
+  /// Find a loaded material.
+  virtual iMaterialWrapper* FindMaterial (const char* iName) = 0;
 };
 
 #endif // __IWORLD_H__

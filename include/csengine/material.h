@@ -100,7 +100,7 @@ public:
  * csMaterialWrapper represents a texture and its link
  * to the iMaterialHandle as returned by iTextureManager.
  */
-class csMaterialWrapper : public csObject
+class csMaterialWrapper : public csObject, public iMaterialWrapper
 {
 private:
   /// The corresponding iMaterial.
@@ -136,6 +136,7 @@ public:
   void Register (iTextureManager *txtmng);
 
   CSOBJTYPE;
+  DECLARE_IBASE;
 };
 
 /**

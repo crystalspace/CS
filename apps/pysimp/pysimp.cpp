@@ -97,7 +97,6 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   iScript* is = LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
 
   csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
-  csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("stone");
 
   // Load a python module (scripts/python/pysimp.py).
   if (!is->LoadModule ("pysimp"))
@@ -106,54 +105,15 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // Set up our room.
   csSector *room = world->CreateCsSector ("room");
 
-  csPolygon3D* p;
-  //p = room->NewPolygon (tm);
-  //p->AddVertex (-5, 0, 5);
-  //p->AddVertex (5, 0, 5);
-  //p->AddVertex (5, 0, -5);
-  //p->AddVertex (-5, 0, -5);
-  //p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (-5, 20, 5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, 5);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (5, 0, 5);
-  p->AddVertex (-5, 0, 5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (5, 0, -5);
-  p->AddVertex (5, 0, 5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5, 20, 5);
-  p->AddVertex (-5, 0, 5);
-  p->AddVertex (-5, 0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5, 0, -5);
-  p->AddVertex (5, 0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
   // Execute one method defined in pysimp.py
-  if (!is->RunText ("pysimp.TestMe('data/entry')"))
+  // This will create the polygons in the room.
+  if (!is->RunText ("pysimp.CreateRoom('stone')"))
     return 0;
 
   is->DecRef ();
+
+printf ("verts:%d\n", room->GetNumVertices ());
+printf ("poly:%d\n", room->GetNumPolygons ());
 
   room->CompressVertices ();
 

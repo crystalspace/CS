@@ -1264,19 +1264,24 @@ public:
     /// Get the material handle for the texture manager.
     virtual iMaterialHandle *GetMaterialHandle ()
     { return scfParent->GetMaterialHandle (); }
+    /// Set material.
+    virtual void SetMaterial (iMaterialWrapper* mat)
+    {
+      scfParent->SetMaterial ((csMaterialWrapper*)mat);
+    }
 
     /// Query number of vertices in this polygon
     virtual int GetVertexCount ()
     { return scfParent->vertices.GetNumVertices (); }
     /// Get the given polygon vertex coordinates in object space
     virtual csVector3 &GetVertex (int idx)
-    { return GetContainer ()->GetVertex (scfParent->vertices.GetVertex (idx)); }
+    { return scfParent->Vobj (idx); }
     /// Get the given polygon vertex coordinates in world space
     virtual csVector3 &GetVertexW (int idx)
-    { return GetContainer ()->GetVertexW (scfParent->vertices.GetVertex (idx)); }
+    { return scfParent->Vwor (idx); }
     /// Get the given polygon vertex coordinates in camera space
     virtual csVector3 &GetVertexC (int idx)
-    { return GetContainer ()->GetVertexC (scfParent->vertices.GetVertex (idx)); }
+    { return scfParent->Vcam (idx); }
     /// Create a polygon vertex given his index in parent polygon set
     virtual int CreateVertex (int idx)
     { return scfParent->AddVertex (idx); }
@@ -1312,6 +1317,12 @@ public:
     {
       scfParent->SetCSPortal (iTarget->GetPrivateObject ());
       return scfParent->GetPortal ();
+    }
+
+    ///
+    virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1)
+    {
+      scfParent->SetTextureSpace (v_orig, v1, len1);
     }
   } scfiPolygon3D;
   friend struct eiPolygon3D;

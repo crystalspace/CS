@@ -10,8 +10,9 @@
 
 #include "isystem.h"
 #include "csparser/csloader.h"
+#include "cspython.h"
 iSystem* GetSystem() {
-	return NULL;
+	return thisclass->Sys;
 }
 
 void* GetMyPtr() { return NULL; }
@@ -127,8 +128,14 @@ struct iPolygonSet:public iBase {
 };
 
 struct iSector:public iBase {
+public:
   void CreateBSP();
 
+  %addmethods {
+    iPolygonSet* Query_iPolygonSet() {
+      return QUERY_INTERFACE(self, iPolygonSet);
+    }
+  }
 }
 
 struct iThing:public iPolygonSet {
@@ -140,6 +147,7 @@ struct iPolygon3D : public iBase {
   iPolygonSet *GetContainer ();
   iLightMap *GetLightMap ();
   iMaterialHandle *GetMaterialHandle ();
+  void SetMaterial (iMaterialWrapper* material);
 //  iPolygonTexture *GetTexture ();
 //  iTextureHandle *GetTextureHandle ();
   int GetVertexCount ();
@@ -153,6 +161,7 @@ struct iPolygon3D : public iBase {
   void CreatePlane (const csVector3 &iOrigin,
     const csMatrix3 &iMatrix);
   bool SetPlane (const char *iName);
+  void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1);
 };
 
 struct iImage : public iBase
@@ -225,26 +234,29 @@ struct iWorld:public iPlugIn {
   virtual bool CreatePlane (const char *iName, const csVector3 &iOrigin,
     const csMatrix3 &iMatrix) = 0;
   virtual iSector *CreateSector (const char *iName) = 0;
+  virtual iSector *FindSector (const char *iName) = 0;
   virtual iThing *CreateThing (const char *iName, iSector *iParent) = 0;
+  virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
 };
 
 //****** System Interface
 struct iSystem:public iBase {
 public:
-/*
   %addmethods {
+/*
     iSCF* GetSCF() {
       iSCF *scf = QUERY_INTERFACE (self, iSCF);
       scf->DecRef (); // ugly kludge
       return scf;
     }
+  */
     iWorld* Query_iWorld() {
       return QUERY_PLUGIN(self, iWorld);
     }
     iGraphics3D* Query_iGraphics3D() {
       return QUERY_PLUGIN(self, iGraphics3D);
     }
-  }*/
+  }
 };
 
 iSystem* GetSystem();
