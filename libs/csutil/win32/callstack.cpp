@@ -435,7 +435,7 @@ bool cswinCallStack::GetLineNumber (int num, csString& str)
   if (DbgHelp::SymGetLineFromAddr64 (GetCurrentProcess (), 
     entries[num].instrPtr, &displacement, &line))
   {
-    str.Format ("%s:%ud", line.FileName, (uint)line.LineNumber);
+    str.Format ("%s:%u", line.FileName, (uint)line.LineNumber);
     return true;
   }
   return false;
