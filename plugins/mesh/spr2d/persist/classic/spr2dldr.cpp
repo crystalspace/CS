@@ -533,7 +533,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
 	  num /= 2;
 	  verts->SetLength (num);
 	  int i;
-      for (i = 0 ; i < num ; i++)
+          for (i = 0 ; i < num ; i++)
 	  {
 	    (*verts)[i].pos.x = list[i*2+0];
 	    (*verts)[i].pos.y = list[i*2+1];
@@ -550,7 +550,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
 	  num /= 2;
 	  verts->SetLength (num);
 	  int i;
-      for (i = 0 ; i < num ; i++)
+          for (i = 0 ; i < num ; i++)
 	  {
 	    (*verts)[i].u = list[i*2+0];
 	    (*verts)[i].v = list[i*2+1];
@@ -572,7 +572,7 @@ iBase* csSprite2DLoader::Parse (const char* string, iMaterialList* matlist,
 	  num /= 3;
 	  verts->SetLength (num);
 	  int i;
-      for (i = 0 ; i < num ; i++)
+          for (i = 0 ; i < num ; i++)
 	  {
 	    (*verts)[i].color_init.red = list[i*3+0];
 	    (*verts)[i].color_init.green = list[i*3+1];

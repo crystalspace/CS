@@ -21,6 +21,9 @@ The history order is reversed so that new features are at the top.
 	- The csdemo app now loads materials and factories from a library
 	  instead of hardcoding this in the code. This makes it a little
 	  bit more general (but still not general enough).
+	- Added loader plugin for loading mesh objects of type 'stars'.
+	- Generalized csdemo a bit more. It now loads a file called 'world'
+	  in demodata.zip which setups the sector and all objects.
 11-Feb-2002
 	- Added csMath3::SpherePosition() which calculates the position
 	  on a unit sphere given two angles.

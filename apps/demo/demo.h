@@ -89,9 +89,6 @@ public:
 
   void ShowMessage (const char* msg, ...);
   void ShowError (const char* msg, ...);
-
-  void SetupSector ();
-  void SetupObjects ();
 };
 
 #endif // DEMO_H
