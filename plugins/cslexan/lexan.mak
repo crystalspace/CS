@@ -34,7 +34,7 @@ ifeq ($(USE_PLUGINS),yes)
 else
   LEXAN = $(OUT)$(LIB_PREFIX)cslexan$(LIB)
   DEP.EXE += $(LEXAN)
-  SCF.STATIC += lexan
+  SCF.STATIC += cslexan
   TO_INSTALL.STATIC_LIBS += $(LEXAN)
 endif
 

@@ -97,7 +97,10 @@ WalkTest *Sys;
 
 CS_IMPLEMENT_APPLICATION
 
+// need to register the engine explicit here when not building static
+#if !defined(CS_STATIC_LINKED)
 SCF_REGISTER_STATIC_LIBRARY (engine)
+#endif
 
 //-----------------------------------------------------------------------------
 

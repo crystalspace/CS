@@ -63,7 +63,9 @@
 
 CS_IMPLEMENT_APPLICATION
 
+#if !defined(CS_STATIC_LINKED)
 SCF_REGISTER_STATIC_LIBRARY (engine)
+#endif
 
 //-----------------------------------------------------------------------------
 

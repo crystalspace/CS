@@ -21,6 +21,7 @@ The history order is reversed so that new features are at the top.
 	  Why this bug only presented itself now I don't know.
 	- At this moment my changes cause big leaks in SCF at exit. I have
 	  not yet been able to find out why.
+	- Matze Braun fixed static build with linux
 16-Oct-2001
 	- iObjectRegistry::Register() will now return false if something
 	  is registered with a duplicate tag (exception is the NULL tag).
