@@ -356,6 +356,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	    newspr->ReportLastError();
 	    return 0;
 	  }
+
           csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
           while (child_it->HasNext ())
           {
@@ -444,8 +445,11 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       return 0;
     }
   }
+
   if (scale)
-    newspr->RescaleFactory(scale);
+    newspr->RescaleFactory(scale);  // this calls the function below itself
+  else
+    newspr->CalculateAllBoneBoundingBoxes();
 
   // Wrapup cal3d initialization
   newspr->BindMaterials();

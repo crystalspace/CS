@@ -2021,25 +2021,25 @@ bool csSpriteCal3DMeshObject::SetAnimAction(int idx, float delayIn,
     return false;
 
   calModel.getMixer()->executeAction(idx,delayIn,delayOut,
-    1  ,factory->anims[idx]->lock  );
+                                     1,
+                                     factory->anims[idx]->lock  );
+
+  if (factory->anims[idx]->lock)
+  {
+     last_locked_anim = idx;
+  }
 
   return true;
 }
 
 bool csSpriteCal3DMeshObject::SetAnimAction(const char *name, float delayIn,
 	float delayOut)
-{
+{ 
   int idx = FindAnim(name);
   if (idx == -1)
     return false;
 
-  calModel.getMixer()->executeAction(idx,delayIn,delayOut,
-                                     1  ,factory->anims[idx]->lock  );
-
-  if (factory->anims[idx]->lock)
-      last_locked_anim = idx;
- 
-  return true;
+  return SetAnimAction(idx,delayIn, delayOut);
 }
 
 void csSpriteCal3DMeshObject::SetIdleOverrides(csRandomGen *rng,int which)
