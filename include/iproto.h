@@ -22,7 +22,7 @@ struct iProto: public iBase
 };
 
 
-SCF_VERSION (iPROTO, 0, 0, 2);
+SCF_VERSION (iPROTO, 0, 0, 3);
 
 struct iPROTO: public iPlugIn
 {
@@ -30,30 +30,24 @@ struct iPROTO: public iPlugIn
   virtual bool Open()=0;
   virtual bool Close()=0;
 
-  ///
   /// Various Network Events coming from network that need to be handled
-  ///
   virtual int OnServerStart(int NetPort) = 0;
   virtual int OnServerStop(int NetPort) = 0;
   virtual int OnConnect(int NetPort) = 0;
   virtual int OnAccept(int NetPort) = 0;
-  virtual int OnReceive(int NetPort, size_t len, char *msg) = 0;
+  virtual int OnReceive(int NetPort, size_t len, const char *msg) = 0;
   virtual int OnDisconnect(int port) = 0;
 
-  ///
   /// Command processor - for things coming from above
-  ///
   virtual int OnCmd(int NetPort, iNetCmd *cmd) = 0;
 
-  ///
   /// Create an outbound protocol "pipe" connection
-  ///
-  virtual int InitiateClient(char *hostname, int port, int clienttype) = 0;
+  virtual int InitiateClient(const char *hostname,
+			     int port,
+			     int clienttype) = 0;
 
-  ///
   /// Create a server that listens
-  ///
-  virtual int InitiateServer(char *hostname, 
+  virtual int InitiateServer(const char *hostname, 
 			     int ipPortNumber,
 			     int ServerType,
 			     int MaxConnections) = 0;
@@ -65,14 +59,19 @@ struct iPROTO: public iPlugIn
   /// Utility stuff
   virtual int GetLastError() = 0;
 
-  // Get an integer associated with protocol.
+  /// Get an integer associated with protocol.
   virtual int GetProtocolVersion() =0;
 
+  /// Create a new net-command object
+  virtual iNetCmd *NewCommand(int nodetype) const = 0;
+  /// Create a new net-command object
+  virtual iNetCmd *NewCommand(int nodetype, const char *name) const = 0;
+  /// Create a new net-command object
+  virtual iNetCmd *NewCommand(int nodetype, const char *name, int value) const = 0;
+  /// Create a new net-command object
+  virtual iNetCmd *NewCommand(int nodetype, const char *name, const char *value) const = 0;
+  /// Create a new net-command object
+  virtual iNetCmd *NewCommand(int nodetype, const char *name, float value) const = 0;
 };
 
-
 #endif 
-
-
-
-

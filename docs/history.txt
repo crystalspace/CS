@@ -10,6 +10,55 @@ The history order has been reversed so that new features are at the top.
 	      inline method before the compiler has seen the second method.
 	      Working around this problem is as simple as textually reordering
 	      the file.
+	- Eric Sunshine once again renamed instance variable Protocol to
+	  NetProtocol in NSMGR to avoid name collision with Objective-C class
+	  of same name.  Apparently Thomas Riemer reverted this change after
+	  the last time the patch was applied.
+	- Eric Sunshine fixed a couple typographical errors in cvs.txi and
+	  updated anatomy/chapter.txi.
+	- Eric Sunshine made the following changes to the NSTP plugin and its
+	  interfaces:
+	    - Cleaned up the relationship between iNetCmd and csNetCmd.  Many
+	      places in the code made the potentially dangerous assumption
+	      that iNetCmd was always implemented by csNetCmd.  This is no
+	      longer the case.  Access to this type of object is now performed
+	      via the iNetCmd interface exclusively except for actual creation
+	      (at which time it is necessary to interact directly with
+	      csNetCmd).
+	    - Cleaned up ownership issues (to some extent).  Now invokes
+	      IncRef() and DecRef() as appropriate.
+	    - Added a lot of missing 'const' qualifiers.
+	    - Published methods in the SCF interface for creating objects of
+	      type iNetCmd.
+	    - Fixed several instances where CONSTRUCT_IBASE() was not being
+	      invoked, or not being invoked for all execution paths.
+	    - Added CS_NETCMD_* variations to csNetCmd for all of the
+	      represented types.  No longer makes dangerous assumptions about
+	      when it is safe to access or free the string pointer 'sval'.
+	    - Fixed memory leaks of strings and other objects.
+	    - Now uses 'delete[]' where appropriate rather than 'delete'.
+	    - Implemented all the missing cases of csNetCmd::Stringify().
+	- Eric Sunshine made the following changes to the NSMGR plugin:
+	    - Fixed it so that it is now completely self-contained.  No longer
+	      directly accesses classes (such as csNetCmd) from the NSTP
+	      plugin.  Now access to NSTP (and iNetCmd) is done strictly
+	      through the published SCF interfaces (some of which I had to
+	      augment in order to allow this type of proper abstraction).
+	    - No longer makes the potentially dangerous assumption that
+	      iNetCmd is always implemented by csNetCmd.
+	    - Removed the special-case hack from the makefile which forcibly
+	      linked NSTP object files into the NSMGR plugin (which was
+	      required because NSMGR was incorrectly accessing NSTP objects
+	      directly rather than through an SCF interface).
+	    - Now access engine objects indirectly through their published SCF
+	      interfaces iWorld and iSector rather than referencing them
+	      directly via csWorld and csSector.
+	    - Cleaned up ownership issues (to some extent).  Now invokes
+	      IncRef() and DecRef() as appropriate.
+	    - Fixed several instances where CONSTRUCT_IBASE() was not being
+	      invoked.
+	    - Fixed memory leaks of strings and other objects.
+	    - Now uses 'delete[]' where appropriate rather than 'delete'.
 19-May-2000
 	- Alex Pfaffe did various changes to terrain engine again.
 	- Various small changes to csTerrain to help Alex integrate his
