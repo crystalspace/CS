@@ -887,7 +887,12 @@ bool csDynaVis::VisTest (iRenderView* rview)
   static csTicks t2 = 0;
   csTicks t1 = csGetTicks ();
   debug_camera = rview->GetOriginalCamera ();
-  rview->GetFrustum (debug_lx, debug_rx, debug_ty, debug_by);
+  float lx, rx, ty, by;
+  rview->GetFrustum (lx, rx, ty, by);
+  debug_lx = lx;
+  debug_rx = rx;
+  debug_ty = ty;
+  debug_by = by;
 
   // Just keep vis information from last frame.
   if (do_freeze_vis)
@@ -916,8 +921,6 @@ bool csDynaVis::VisTest (iRenderView* rview)
   VisTest_Front2BackData data;
 
   // First get the current view frustum from the rview.
-  float lx, rx, ty, by;
-  rview->GetFrustum (lx, rx, ty, by);
   csVector3 p0 (lx, by, 1);
   csVector3 p1 (lx, ty, 1);
   csVector3 p2 (rx, ty, 1);

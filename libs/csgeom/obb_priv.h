@@ -43,7 +43,7 @@ public:
     return *this;
   }
   float Length () const { return mLength; }
-  const csVector3 Direction () const { return mDir; }
+  const csVector3& Direction () const { return mDir; }
 };
 
 class csOBBTreeNode
@@ -57,7 +57,7 @@ public:
   csOBBTreeNode (csVector3 **left, csVector3 **right);
   ~csOBBTreeNode ();
 
-  const csBox3 &GetBox () { return mBox; }
+  const csBox3& GetBox () { return mBox; }
   const csVector3 &GetLeftPoint () { return **mLeftPoint; }
   csVector3 **GetLeftPointRef () { return mLeftPoint; }
   const csVector3 &GetRightPoint () { return **mRightPoint; }
@@ -120,9 +120,8 @@ public:
   csOBBTree(const csVector3 *vertex_table, int num);
   ~csOBBTree ();
 
-  const csOBBLine3 Compute (csOBBTreePair *p, float eps);
-  const csOBBLine3 Diameter (float eps);
-  const csOBBLine3 DiameterProjection (float eps, const csVector3 &projection);
+  void Compute (csOBBLine3& line, csOBBTreePair *p, float eps);
+  void Diameter (csOBBLine3& line, float eps);
 };
 
 #endif

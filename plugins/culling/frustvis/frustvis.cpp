@@ -1,0 +1,581 @@
+/*
+    Copyright (C) 2002 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include <string.h>
+#include "cssysdef.h"
+#include "csver.h"
+#include "cssys/sysfunc.h"
+#include "csutil/scf.h"
+#include "csutil/util.h"
+#include "csutil/scfstr.h"
+#include "csgeom/matrix3.h"
+#include "csgeom/math3d.h"
+#include "csgeom/obb.h"
+#include "csgeom/segment.h"
+#include "csgeom/sphere.h"
+#include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
+#include "csutil/flags.h"
+#include "iutil/objreg.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
+#include "ivideo/txtmgr.h"
+#include "ivideo/fontserv.h"
+#include "iengine/movable.h"
+#include "iengine/rview.h"
+#include "iengine/camera.h"
+#include "iengine/mesh.h"
+#include "imesh/object.h"
+#include "imesh/thing/thing.h"
+#include "iutil/object.h"
+#include "ivaria/reporter.h"
+#include "frustvis.h"
+#include "fkdtree.h"
+
+CS_IMPLEMENT_PLUGIN
+
+SCF_IMPLEMENT_FACTORY (csFrustumVis)
+
+SCF_EXPORT_CLASS_TABLE (frustvis)
+  SCF_EXPORT_CLASS (csFrustumVis, "crystalspace.culling.frustvis",
+    "Simple Frustum Visibility System")
+SCF_EXPORT_CLASS_TABLE_END
+
+SCF_IMPLEMENT_IBASE (csFrustumVis)
+  SCF_IMPLEMENTS_INTERFACE (iVisibilityCuller)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csFrustumVis::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csFrustumVis::csFrustumVis (iBase *iParent)
+{
+  SCF_CONSTRUCT_IBASE (iParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  object_reg = NULL;
+  kdtree = NULL;
+}
+
+csFrustumVis::~csFrustumVis ()
+{
+  int i;
+  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  {
+    csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+    	visobj_vector[i];
+    visobj_wrap->visobj->DecRef ();
+    delete visobj_wrap;
+  }
+  delete kdtree;
+}
+
+bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
+{
+  csFrustumVis::object_reg = object_reg;
+
+  delete kdtree;
+
+  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (g3d)
+  {
+    scr_width = g3d->GetWidth ();
+    scr_height = g3d->GetHeight ();
+    g3d->DecRef ();
+  }
+  else
+  {
+    // If there is no g3d we currently assume we are testing.
+    scr_width = 640;
+    scr_height = 480;
+  }
+
+  kdtree = new csSimpleKDTree (NULL);
+
+  return true;
+}
+
+void csFrustumVis::Setup (const char* /*name*/)
+{
+}
+
+void csFrustumVis::CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox)
+{
+  iMovable* movable = visobj->GetMovable ();
+  csBox3 box;
+  visobj->GetObjectModel ()->GetObjectBoundingBox (box, CS_BBOX_MAX);
+  csReversibleTransform trans = movable->GetFullTransform ();
+  bbox.StartBoundingBox (trans.This2Other (box.GetCorner (0)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (1)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (2)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (3)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (4)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (5)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (6)));
+  bbox.AddBoundingVertexSmart (trans.This2Other (box.GetCorner (7)));
+}
+
+void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
+{
+  csFrustVisObjectWrapper* visobj_wrap = new csFrustVisObjectWrapper ();
+  visobj_wrap->visobj = visobj;
+  visobj->IncRef ();
+  iMovable* movable = visobj->GetMovable ();
+  visobj_wrap->update_number = movable->GetUpdateNumber ();
+  visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
+
+  csBox3 bbox;
+  CalculateVisObjBBox (visobj, bbox);
+  visobj_wrap->child = kdtree->AddObject (bbox, (void*)visobj_wrap);
+
+  visobj_vector.Push (visobj_wrap);
+}
+
+void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
+{
+  int i;
+  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  {
+    csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      visobj_vector[i];
+    if (visobj_wrap->visobj == visobj)
+    {
+      kdtree->RemoveObject (visobj_wrap->child);
+      visobj->DecRef ();
+      delete visobj_wrap;
+      visobj_vector.Delete (i);
+      return;
+    }
+  }
+}
+
+void csFrustumVis::UpdateObjects ()
+{
+  int i;
+  for (i = 0 ; i < visobj_vector.Length () ; i++)
+  {
+    csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      visobj_vector[i];
+    iVisibilityObject* visobj = visobj_wrap->visobj;
+    iMovable* movable = visobj->GetMovable ();
+    if (visobj->GetObjectModel ()->GetShapeNumber ()
+    	!= visobj_wrap->shape_number ||
+    	movable->GetUpdateNumber () != visobj_wrap->update_number)
+    {
+      csBox3 bbox;
+      CalculateVisObjBBox (visobj, bbox);
+      kdtree->MoveObject (visobj_wrap->child, bbox);
+      visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
+      visobj_wrap->update_number = movable->GetUpdateNumber ();
+    }
+    visobj->MarkInvisible ();
+  }
+}
+
+static void Perspective (const csVector3& v, csVector2& p, float fov,
+    	float sx, float sy)
+{
+  float iz = fov / v.z;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
+struct FrustTest_Front2BackData
+{
+  csVector3 pos;
+  iRenderView* rview;
+  csFrustumVis* frustvis;
+
+  // During VisTest() we use the current frustum as five planes.
+  // Associated with this frustum we also have a clip mask which
+  // is maintained recursively during VisTest() and indicates the
+  // planes that are still active for the current kd-tree node.
+  csPlane3 frustum[32];
+  uint32 frustum_mask;
+};
+
+bool csFrustumVis::TestNodeVisibility (csSimpleKDTree* treenode,
+	FrustTest_Front2BackData* data)
+{
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+
+  if (node_bbox.Contains (data->pos))
+  {
+    return true;
+  }
+
+  uint32 new_mask;
+  if (!csIntersect3::BoxFrustum (node_bbox, data->frustum, data->frustum_mask,
+  	new_mask))
+  {
+    return false;
+  }
+  data->frustum_mask = new_mask;
+  return true;
+}
+
+bool csFrustumVis::TestObjectVisibility (csFrustVisObjectWrapper* obj,
+  	FrustTest_Front2BackData* data)
+{
+  if (!obj->visobj->IsVisible ())
+  {
+    const csBox3& obj_bbox = obj->child->GetBBox ();
+    if (obj_bbox.Contains (data->pos))
+    {
+      return true;
+    }
+  
+    uint32 new_mask;
+    if (!csIntersect3::BoxFrustum (obj_bbox, data->frustum,
+		data->frustum_mask, new_mask))
+    {
+      return false;
+    }
+
+    obj->MarkVisible ();
+  }
+
+  return true;
+}
+
+//======== VisTest =========================================================
+
+static bool FrustTest_Front2Back (csSimpleKDTree* treenode, void* userdata,
+	uint32 cur_timestamp)
+{
+  FrustTest_Front2BackData* data = (FrustTest_Front2BackData*)userdata;
+  csFrustumVis* frustvis = data->frustvis;
+
+  // Visible or not...
+  bool vis = false;
+
+  // Remember current frustum mask.
+  uint32 old_frustum_mask = data->frustum_mask;
+
+  // In the first part of this test we are going to test if the node
+  // itself is visible. If it is not then we don't need to continue.
+  if (!frustvis->TestNodeVisibility (treenode, data))
+  {
+    vis = false;
+    goto end;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csSimpleKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	objects[i]->GetObject ();
+      frustvis->TestObjectVisibility (visobj_wrap, data);
+    }
+  }
+
+  vis = true;
+
+end:
+  // Restore the frustum mask.
+  data->frustum_mask = old_frustum_mask;
+
+  return vis;
+}
+
+bool csFrustumVis::VisTest (iRenderView* rview)
+{
+  // Update all objects (mark them invisible and update in kdtree if needed).
+  UpdateObjects ();
+
+  // Data for the vis tester.
+  FrustTest_Front2BackData data;
+
+  // First get the current view frustum from the rview.
+  float lx, rx, ty, by;
+  rview->GetFrustum (lx, rx, ty, by);
+  csVector3 p0 (lx, by, 1);
+  csVector3 p1 (lx, ty, 1);
+  csVector3 p2 (rx, ty, 1);
+  csVector3 p3 (rx, by, 1);
+  const csReversibleTransform& trans = rview->GetCamera ()->GetTransform ();
+  csVector3 origin = trans.This2Other (csVector3 (0));
+  p0 = trans.This2Other (p0);
+  p1 = trans.This2Other (p1);
+  p2 = trans.This2Other (p2);
+  p3 = trans.This2Other (p3);
+  data.frustum[0].Set (origin, p0, p1);
+  data.frustum[1].Set (origin, p2, p3);
+  data.frustum[2].Set (origin, p1, p2);
+  data.frustum[3].Set (origin, p3, p0);
+  //data.frustum[4].Set (origin, p0, p1);	// @@@ DO z=0 plane too!
+  data.frustum_mask = 0xf;
+
+  // The big routine: traverse from front to back and mark all objects
+  // visible that are visible.
+  data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  data.rview = rview;
+  data.frustvis = this;
+  kdtree->Front2Back (data.pos, FrustTest_Front2Back, (void*)&data);
+
+  return true;
+}
+
+//======== VisTest box =====================================================
+
+struct FrustTestBox_Front2BackData
+{
+  csBox3 box;
+};
+
+static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
+	uint32 cur_timestamp)
+{
+  FrustTestBox_Front2BackData* data = (FrustTestBox_Front2BackData*)userdata;
+
+  // In the first part of this test we are going to test if the
+  // box vector intersects with the node. If not then we don't
+  // need to continue.
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  if (!node_bbox.TestIntersect (data->box))
+  {
+    return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csSimpleKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	objects[i]->GetObject ();
+
+      // Test the bounding box of the object.
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      if (obj_bbox.TestIntersect (data->box))
+      {
+	visobj_wrap->visobj->MarkVisible ();
+      }
+    }
+  }
+
+  return true;
+}
+
+bool csFrustumVis::VisTest (const csBox3& box)
+{
+  UpdateObjects ();
+  FrustTestBox_Front2BackData data;
+  data.box = box;
+  kdtree->Front2Back (box.GetCenter (), FrustTestBox_Front2Back, (void*)&data);
+  return true;
+}
+
+//======== VisTest sphere ==================================================
+
+struct FrustTestSphere_Front2BackData
+{
+  csVector3 pos;
+  float sqradius;
+};
+
+static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
+	void* userdata, uint32 cur_timestamp)
+{
+  FrustTestSphere_Front2BackData* data =
+  	(FrustTestSphere_Front2BackData*)userdata;
+
+  // In the first part of this test we are going to test if the
+  // box vector intersects with the node. If not then we don't
+  // need to continue.
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  if (!csIntersect3::BoxSphere (node_bbox, data->pos, data->sqradius))
+  {
+    return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csSimpleKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	objects[i]->GetObject ();
+
+      // Test the bounding box of the object.
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+      if (csIntersect3::BoxSphere (obj_bbox, data->pos, data->sqradius))
+      {
+	visobj_wrap->visobj->MarkVisible ();
+      }
+    }
+  }
+
+  return true;
+}
+
+bool csFrustumVis::VisTest (const csSphere& sphere)
+{
+  UpdateObjects ();
+  FrustTestSphere_Front2BackData data;
+  data.pos = sphere.GetCenter ();
+  data.sqradius = sphere.GetRadius () * sphere.GetRadius ();
+  kdtree->Front2Back (data.pos, FrustTestSphere_Front2Back, (void*)&data);
+  return true;
+}
+
+//======== IntersectSegment ================================================
+
+struct IntersectSegment_Front2BackData
+{
+  csSegment3 seg;
+  csVector3 isect;
+  float r;
+  iMeshWrapper* mesh;
+  iPolygon3D* polygon;
+};
+
+static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
+	void* userdata, uint32 cur_timestamp)
+{
+  IntersectSegment_Front2BackData* data
+  	= (IntersectSegment_Front2BackData*)userdata;
+
+  // If mesh != NULL then we have already found our mesh and we
+  // stop immediatelly.
+  if (data->mesh) return false;
+
+  // In the first part of this test we are going to test if the
+  // start-end vector intersects with the node. If not then we don't
+  // need to continue.
+  csVector3 box_isect;
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  if (csIntersect3::BoxSegment (node_bbox, data->seg, box_isect) == -1)
+  {
+    return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csSimpleKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  data->r = 10000000000.;
+  data->polygon = NULL;
+
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
+      	objects[i]->GetObject ();
+
+      // First test the bounding box of the object.
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+
+      if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
+      {
+      //@@@@@@@@@@@@ USE SCF_QUERY_INTERFACE_FAST @@@@@@@@@
+        // This object is possibly intersected by this beam.
+	iMeshWrapper* mesh = SCF_QUERY_INTERFACE (visobj_wrap->visobj,
+		iMeshWrapper);
+	if (mesh)
+	{
+	  printf ("GOT mesh!\n"); fflush (stdout);
+	  if (!mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
+	  {
+	    iThingState* st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	      	iThingState);
+	    if (st)
+	    {
+	      // Transform our vector to object space.
+	      //@@@ Consider the ability to check if
+	      // object==world space for objects in general?
+	      csReversibleTransform movtrans (visobj_wrap->visobj->
+		  GetMovable ()->GetFullTransform ());
+	      csVector3 obj_start = movtrans.Other2This (data->seg.Start ());
+	      csVector3 obj_end = movtrans.Other2This (data->seg.End ());
+	      csVector3 obj_isect;
+	      float r;
+	      iPolygon3D* p = st->IntersectSegment (
+			obj_start, obj_end,
+			obj_isect, &r, false);
+	      if (p && r < data->r)
+	      {
+		data->r = r;
+		data->polygon = p;
+		data->isect = movtrans.This2Other (obj_isect);
+		data->mesh = mesh;
+	      }
+
+	      st->DecRef ();
+	    }
+	  }
+	  mesh->DecRef ();
+	}
+      }
+    }
+  }
+
+  if (data->mesh) return false;
+  return true;
+}
+
+iPolygon3D* csFrustumVis::IntersectSegment (const csVector3& start,
+    const csVector3& end, csVector3& isect, float* pr,
+    iMeshWrapper** p_mesh)
+{
+  IntersectSegment_Front2BackData data;
+  data.seg.Set (start, end);
+  data.r = 0;
+  data.mesh = NULL;
+  data.polygon = NULL;
+  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
+
+  if (p_mesh) *p_mesh = data.mesh;
+  if (pr) *pr = data.r;
+  isect = data.isect;
+
+  return data.polygon;
+}
+

@@ -2,6 +2,12 @@ The history order is reversed so that new features are at the top.
 
 25-Jun-2002
 	- Added howto for a very simple map.
+	- Optimized csOBB code a bit and fixed a huge number of rather
+	  big memory leaks there. There is still a big bug in OBB code
+	  somewhere though. It sometimes crashes with division by zero.
+	- Added an (untested) frustum view culler. This culler is a simpler
+	  version of Dynavis that will be used as the default culler in
+	  the future for all sectors.
 23-Jun-2002
 	- Added csIntersect3::BoxSphere() function which tests intersection
 	  between a box and a sphere.

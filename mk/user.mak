@@ -62,6 +62,7 @@ PLUGINS += mesh/thing/object       mesh/thing/persist/classic
 PLUGINS += motion/standard/object  motion/standard/persist/classic
 PLUGINS += engine/3d
 PLUGINS += culling/dynavis
+PLUGINS += culling/frustvis
 PLUGINS += csparser
 PLUGINS += csparser/services
 

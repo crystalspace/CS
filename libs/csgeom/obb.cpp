@@ -98,12 +98,9 @@ csVector3 csOBB::GetCorner (int corner) const
 
 float csOBB::Volume ()
 {
-  float vol = 1;
-  int i;
-  for (i = 0; i < 3; i ++)
-  {
-    vol *= csBox3::Max(i) - csBox3::Min (i);
-  }
+  float vol = csBox3::MaxX () - csBox3::MinX ();
+  vol *= csBox3::MaxY () - csBox3::MinY ();
+  vol *= csBox3::MaxZ () - csBox3::MinZ ();
   return vol;
 }
 
@@ -140,17 +137,12 @@ bool csOBBTreeNode::Split ()
   if (mLeftPoint == mRightPoint) { return false; }
   if (mLeft != NULL || mRight != NULL) { return true; }
   int dim = 0;
-  float max = 0;
-  int i;
-  for (i = 0; i < 3; i ++)
-  {
-    float d = mBox.Max(i) - mBox.Min(i);
-    if (d > max)
-    {
-      max = d;
-      dim = i;
-    }
-  }
+  float max = mBox.MaxX () - mBox.MinX ();
+  float d = mBox.MaxY () - mBox.MinY ();
+  if (d > max) { max = d; dim = 1; }
+  d = mBox.MaxZ () - mBox.MinZ ();
+  if (d > max) { max = d; dim = 2; }
+
   max = (mBox.Max(dim) + mBox.Min(dim)) / 2;
   csVector3 **lr = mLeftPoint, **rl = mRightPoint;
   CS_ASSERT (rl > lr);
@@ -189,20 +181,17 @@ csOBBTreePair::csOBBTreePair (csOBBTreePairHeap &heap,
   CS_ASSERT (a && b);
   mA = a; mB = b;
   csBox3 box = a->GetBox() + b->GetBox();
-  mDiameter = 0;
-  float max = 0.0;
+
+  float max = box.MaxX () - box.MinX ();
+  mDiameter = max * max;
   int dim = 0;
-  int i;
-  for (i = 0; i < 3; i ++)
-  {
-    float d = box.Max(i) - box.Min (i);
-    mDiameter += d * d;
-    if (d > max)
-    {
-      max = d;
-      dim = i;
-    }
-  }
+  float d = box.MaxY () - box.MinY ();
+  mDiameter += d * d;
+  if (d > max) { max = d; dim = 1; }
+  d = box.MaxZ () - box.MinZ ();
+  mDiameter += d * d;
+  if (d > max) { max = d; dim = 2; }
+
   csVector3 vmax = a->GetLeftPoint(), vmin = b->GetRightPoint();
   csVector3 **c;
   for (c = a->GetLeftPointRef(); c < a->GetRightPointRef(); c ++)
@@ -239,6 +228,10 @@ void csOBBTreePair::MakePair (csOBBTreeNode *l, csOBBTreeNode *r,
   if (n->Diameter () > dist_bound)
   {
     mHeap.Push (n);
+  }
+  else
+  {
+    delete n;
   }
 }
 
@@ -280,11 +273,14 @@ void csOBBTreePairHeap::Push (csOBBTreePair *pair)
 {
   CS_ASSERT (pair);
   if (mCount == mSize) { Resize (); }
+  CS_ASSERT (mCount < mSize);
   mArray[mCount] = pair;
   int i = mCount;
   int p = (i-1)>>1;
   while (i > 0 && mArray[i]->Diameter() > mArray[p]->Diameter())
   {
+    CS_ASSERT (i >= 0 && i < mSize);
+    CS_ASSERT (p >= 0 && p < mSize);
     CS_ASSERT (mArray[p] && mArray[i]);
     csOBBTreePair *tmp = mArray[p];
     mArray[p] = mArray[i];
@@ -299,12 +295,13 @@ csOBBTreePair *csOBBTreePairHeap::Pop ()
 {
   CS_ASSERT (mCount > 0);
   mCount --;
+  CS_ASSERT (mCount < mSize);
   CS_ASSERT (mArray[0] && mArray[mCount]);
   csOBBTreePair *res = mArray[0];
   mArray[0] = mArray[mCount];
   mArray[mCount] = NULL;
+  if (mCount <= 2) { return res; }
   int i = 0, l = 1, r = 2;
-  if (l >= mCount || r >= mCount) { return res; }
   int m = (mArray[l]->Diameter() > mArray[r]->Diameter()) ?  l : r;
   while (i < mCount && m < mCount)
   {
@@ -313,7 +310,7 @@ csOBBTreePair *csOBBTreePairHeap::Pop ()
     csOBBTreePair *tmp = mArray[m];
     mArray[m] = mArray[i];
     mArray[i] = tmp;
-    i = m; l = i<<1 + 1; r = i<<1 + 2;
+    i = m; l = (i<<1) + 1; r = (i<<1) + 2;
     if (l >= mCount || r >= mCount) { break; }
     CS_ASSERT (mArray[l] && mArray[i]);
     m = (mArray[l]->Diameter() > mArray[r]->Diameter()) ?  l : r;
@@ -334,6 +331,7 @@ void csOBBTreePairHeap::Resize ()
     mSize <<= 1;
     mArray = new csOBBTreePair*[mSize];
     memcpy (mArray, tmp, (mSize >> 1) * sizeof (csOBBTreePair *));
+    delete[] tmp;
   }
 }
 
@@ -356,10 +354,11 @@ csOBBTree::~csOBBTree ()
   delete [] mArray;
 }
 
-const csOBBLine3 csOBBTree::Compute (csOBBTreePair *p, float eps)
+void csOBBTree::Compute (csOBBLine3& res,
+	csOBBTreePair *p, float eps)
 {
   CS_ASSERT (p);
-  csOBBLine3 res = p->GetPointPair();
+  res = p->GetPointPair();
   p->Split ((1.0 + eps) * res.Length());
   while (!mHeap.IsEmpty ())
   {
@@ -372,14 +371,14 @@ const csOBBLine3 csOBBTree::Compute (csOBBTreePair *p, float eps)
     p->Split ((1.0 + eps) * res.Length());
     delete p;
   }
-  return res;
 }
 
-const csOBBLine3 csOBBTree::Diameter (float eps)
+void csOBBTree::Diameter (csOBBLine3& line, float eps)
 {
   CS_ASSERT (eps >= 0);
   csOBBTreePair *p = new csOBBTreePair (mHeap, mRoot, mRoot);
-  return Compute (p, eps);
+  Compute (line, p, eps);
+  delete p;
 }
 
 void csOBB::FindOBB (const csVector3 *vertex_table, int num, float eps)
@@ -388,7 +387,8 @@ void csOBB::FindOBB (const csVector3 *vertex_table, int num, float eps)
   int i;
 
   csOBBTree *tree = new csOBBTree (vertex_table, num);
-  csOBBLine3 l1 = tree->Diameter (eps);
+  csOBBLine3 l1;
+  tree->Diameter (l1, eps);
   csVector3 dir1 = l1.Direction();
   delete tree;
 
@@ -398,10 +398,11 @@ void csOBB::FindOBB (const csVector3 *vertex_table, int num, float eps)
     proj_vt[i] = vertex_table[i] - ((dir1 * vertex_table[i])*dir1);
   }
   tree = new csOBBTree (proj_vt, num);
-  csOBBLine3 l2 = tree->Diameter (eps);
+  csOBBLine3 l2;
+  tree->Diameter (l2, eps);
   csVector3 dir2 = l2.Direction();
   delete tree;
-  delete proj_vt;
+  delete[] proj_vt;
 
   csVector3 dir3 = dir1 % dir2;
 
