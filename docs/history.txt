@@ -27,6 +27,8 @@ The history order is reversed so that new features are at the top.
 	  mention "configure" rather than "make platform".
 	- Eric Sunshine added libmng to "external libraries" section of user
 	  manual.
+	- Eric Sunshine updated jobber.pl so that it no longer uses the
+	  old-style "make linux" in preparation for its processing.
 5-Jan-2002
 	- Applied a patch from Rene Jager (renej.frog@yucom.be) which does
 	  the following:

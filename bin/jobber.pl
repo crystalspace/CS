@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    Automated Processing, Publishing, and CVS Update Script
-#    Copyright (C) 2000,2001,2002 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000-2003 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -62,9 +62,9 @@
 # To-Do List
 #    * Generalize into a "job" processing mechanism.  Each job should reside
 #      within its own source file.  There can be jobs to check out files from
-#      CVS, run the various `make' commands (make platform, make htmldoc, make
-#      repairdoc, make msvcgen, etc.), and perform the comparision and commit
-#      of generated files.
+#      CVS, run the various `make' commands (make htmldoc, make repairdoc, make
+#      msvcgen, etc.), and perform the comparision and commit of generated
+#      files.
 #    * The mechanism used to publish packages for download and online browsing
 #      needs to be generalized further.  It is still somewhat geared toward
 #      the publication of documentation packages and is, thus, not flexible
@@ -84,7 +84,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '17';
+my $PROG_VERSION = '18';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000,2001,2002 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -106,13 +106,6 @@ my $COPYRIGHT = "Copyright (C) 2000,2001,2002 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #    OWNER_GROUP - Group to which to assign all directories which will exist
 #        after script's termination (such as the "browseable" directory).  May
 #        be 'undef' if no special group should be assigned.
-#    PLATFORM - An essentially arbitrary platform name for the makefile
-#        configuration step.  The rules for building the documentation and
-#        re-building Visual-C++ project files do not actually care about the
-#        platform, but the makefile architecture expects the makefiles to have
-#        been configured before a makefile target can be invoked.  For
-#        instance, if this script runs on Linux, then this value should be
-#        "linux".
 #    TEMPDIR - The temporary working directory where all processing should
 #        occur.  The script cleans up after itself, so nothing will be left in
 #        this directory after the script terminates.
@@ -178,18 +171,6 @@ $ENV{'CVS_RSH'} = 'ssh';
 # Ensure that Doxygen can be found.
 $ENV{'PATH'} .= ':/usr/local/bin';
 
-# The SourceForge shell machine has no developer tools.  Nothing in this script
-# requires a compiler, but this script does need to configure the makefiles by
-# invoking `make platform'.  Unfortunately, unixconf.sh which is invoked by
-# `make platform' does expect to find a compiler.  We can fake out unixconf.sh
-# by pretending that a compiler is present.  We specifically invoke the `false'
-# program instead of the non-existent compiler so that the tests performed by
-# unixconf.sh run cleanly.  (Using `true' rather than `false' would cause some
-# tests to fail since the script would try to run test programs which it
-# thought had built correctly.)
-$ENV{'CC' } = 'false';
-$ENV{'CXX'} = 'false';
-
 # The Visual-C++ DSW and DSP generation process is a bit too noisy.
 $ENV{'MSVC_QUIET'} = 'yes';
 
@@ -201,7 +182,6 @@ my $PUBLIC_DOC_DIR = '/home/groups/c/cr/crystal/htdocs/docs';
 my $BROWSEABLE_DIR = "$PUBLIC_DOC_DIR/online";
 my $PACKAGE_DIR = "$PUBLIC_DOC_DIR/download";
 my $OWNER_GROUP = 'crystal';
-my $PLATFORM = 'linux';
 my $TEMPDIR = '/home/groups/c/cr/crystal';
 my @BINARY = ('(?i)\.(dsw|dsp)$');
 
@@ -276,6 +256,19 @@ my $TESTING = undef;
 my $CONV_DIR = temporary_name($TEMPDIR);
 my $CAPTURED_OUTPUT = '';
 my $MAKE = 'make';
+
+# In order to invoke the various actions performed by this script, the project
+# needs to be configured, however the SourceForge shell machine does not have
+# compilers installed, thus we can not configure the project with the
+# "configure" script.  Instead, we fake up project configuration by creating a
+# minimal "config.mak"
+my $CONFIGURE = "cat << EOF > config.mak\n" .
+    "TARGET = unix\n" .
+    "TARGET_MAKEFILE = libs/cssys/unix/unix.mak\n" .
+    "CMD.MKDIR = mkdir\n" .
+    "CMD.MKDIRS = mkdir -p\n" .
+    "PROC = UNKNOWN\n" .
+    "EOF\n";
 
 my @SCRIPT_OPTIONS = (
     'test!'     => \$TESTING,
@@ -568,8 +561,8 @@ sub cvs_commit {
 # makefile targets since they will not work prior to configuration.
 #------------------------------------------------------------------------------
 sub run_tasks {
-    print "Configuring makefile system.\n";
-    run_command("$MAKE $PLATFORM");
+    print "Configuring project.\n";
+    run_command($CONFIGURE);
     foreach my $target (@TARGETS) {
 	print "$target->{'action'} $target->{'name'}.\n";
 	run_command("$MAKE $target->{'make'}");
