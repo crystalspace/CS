@@ -4,7 +4,7 @@
 #include <stdarg.h>
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
-#include "aws/iaws.h"
+#include "iaws/iaws.h"
 
 struct iEngine;
 struct iSector;

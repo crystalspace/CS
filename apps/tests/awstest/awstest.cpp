@@ -400,7 +400,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (test)  test->Show();
   //if (test2) test2->Show();
   s->SetTestWin(test2);
-  
+  s->SetWindowManager(aws);
   /////////
   
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Init done.");

@@ -1,14 +1,14 @@
 #include "cssysdef.h"
 #include "awssktst.h"
 #include "csutil/scfstr.h"
-#include "aws/awsfparm.h"
+#include "iaws/iawsparm.h"
 
 #include <stdio.h>
 
 static char *names[10] = { "Yellow", "Green", "Blue", "Orange", "Purple", "Red", "White", "Teal", "Black" };
 static int   namec = 0;
 
-awsTestSink::awsTestSink():sink(NULL), user(NULL), pass(NULL), test(NULL)
+awsTestSink::awsTestSink():wmgr(NULL), sink(NULL), user(NULL), pass(NULL), test(NULL)
 {  
 }
 
@@ -35,10 +35,17 @@ awsTestSink::SetSink(iAwsSink *s)
  }
 }
 
+
 void 
 awsTestSink::SetTestWin(iAwsWindow *testwin)
 {
   test=testwin;
+}
+
+void 
+awsTestSink::SetWindowManager(iAws *_wmgr)
+{
+  wmgr=_wmgr;
 }
 
 void 
@@ -96,10 +103,13 @@ awsTestSink::Login(void *sk, iAwsSource *source)
   else {
     printf("awstest: Logging in as %s with password: %s  (not really.)\n", sink->user->GetData(), sink->pass->GetData());
     iAwsComponent *comp = source->GetComponent();
-    awsParmList pl;
+    iAwsParmList *pl;
 
-    comp->Execute("HideWindow", pl);
+    if (sink->wmgr) pl = sink->wmgr->CreateParmList();
+
+    comp->Execute("HideWindow", *pl);
     if (sink->test) sink->test->Show();
-  }
 
+    pl->DecRef();
+  }
 }

@@ -1,13 +1,13 @@
 #ifndef __AWS_SINK_TEST_H
 #define __AWS_SINK_TEST_H
 
-#include "aws/iaws.h"
-#include "aws/awsslot.h"
+#include "iaws/iaws.h"
 #include "iutil/string.h"
 
 class awsTestSink 
 {
 
+  iAws     *wmgr;
   iAwsSink *sink;
   iString  *user;
   iString  *pass;
@@ -31,6 +31,7 @@ public:
   iAwsSink *GetSink() { return sink; }
 
   void SetTestWin(iAwsWindow *testwin);
+  void SetWindowManager(iAws *_wmgr);
 };
 
 #endif
