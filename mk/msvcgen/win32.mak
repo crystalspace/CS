@@ -59,8 +59,10 @@ DSP.WIN32SYS.NAME = cssys
 DSP.WIN32SYS.TYPE = library
 DSP.WIN32SYS.RESOURCES = \
   $(wildcard libs/cssys/*.cpp libs/cssys/win32/*.cpp \
-  libs/cssys/win32/*.h include/cssys/*.h include/cssys/win32/*.h) \
+  include/cssys/win32/csosdefs.h include/cssys/win32/volatile.h \
+  include/cssys/win32/win32.h include/cssys/win32/win32itf.h) \
   libs/cssys/general/findlib.cpp libs/cssys/general/getopt.cpp
+
 
 # grpall -- represents all other projects indirectly through grpapps,
 # grpplugins, and grplibs.
