@@ -17,22 +17,6 @@ $$$ beziers) the legacy world files should be converted and the old
 $$$ loader should be deprecated.
 $$$
 
--*- The scripts should be enclosed in quotes. E.g. instead of
-
-	SCRIPT (prim: loop 40 { wait })
-
-    you should now write:
-
-	SCRIPT (prim: 'loop 40 { wait }')
-
-    This is related to tokenizer, not to the parser itself. The problem is
-    that tokenizer was developed to deal with world scripts, not with
-    abstract scripts (to parse the script is the responsability of the
-    interpreter, not of the geometry loader). Thus the script is passed
-    as a whole string to the interpreter. A string can span across multiple
-    lines (note that if you forget to close a quote somewhere you can get
-    an actual error message at the end of the file!).
-
 -*- Whenever possible, enclose strings in quotes. Quotes are accepted
     everywhere, both ' and " quotes are accepted. If the string has no
     quotes, it can start with any alphabet or "_/!@$#~" characters and
@@ -50,6 +34,22 @@ $$$
     symbols between numbers are removed to conserve space, you can ommit
     these symbols even in the input file, e.g. VERTEX (1.25 2.34).
 
+-*- The TEXTURES and TEXTURE keywords have been changed into MATERIAL.
+    The MATERIAL keyword can have not only a texture assigned, but a flat
+    color as well, along with many other parameters. For example:
+
+	MATERIAL 'marble floor' (TEXTURE ('/tex/marble.png'))
+	MATERIAL 'white plastic' (FLATCOL (1,1,1))
+	SECTOR 'room'
+	(
+	  POLYGON (MATERIAL ('marble floor') ...)
+	  POLYGON (MATERIAL ('white plastic') ...)
+	)
+
+    Because of this, TEXTURES and TEXTURE keywords are not accepted anymore
+    (TEXTURE() is accepted only inside MATERIAL() context and stands for
+    former FILE(), TEXTURES() is considered syntax error).
+
 -*- Obsolete keywords are considered syntax error. I think now it's the right
     time to get rid of old stuff :-) Obsolete keywords:
 
@@ -60,6 +60,13 @@ $$$
 	  They are unused anyway, and I doubt the old way of describing
 	  bezier texture is useful - it has to be done somewhat differently.
 	- ROOM and SIXFACE are not supported anymore.
+	- LIGHTX
+	- SCRIPT
+	- TRIGGER
+	- ACTIVATE (due to Jorrit's changes in the old loader)
+	- TEXTURES (replaced by MATERIAL())
+        - COSFACT (don't see a real need to specify per-polygon cosinus factor)
+	- WARP (see below about portal specification format change)
 
 -*- Added CAMERA keyword. The format for this command is:
 
@@ -110,3 +117,36 @@ $$$
     The new format is:
 
 	'KEY' <key-name> '(' <key-value> ')'
+
+-*- LIBRARY keyword is absolutely equivalent to WORLD now. Both WORLD and
+    LIBRARY can have a name assigned:
+
+	WORLD 'one'
+	(
+	  ...
+	)
+
+	and
+
+	LIBRARY 'one'
+	(
+	  ...
+	)
+
+    are absolutely equivalent.
+
+-*- POLYGON (TEXTURE (...)) keyword has been renamed into
+    POLYGON (TEXMAP (...)). TEXTURE() was a bad name for what it means,
+    since TEXTURE() was really used for defining texture mapping parameters.
+
+-*- Portal syntax has been changed a little. Instead of
+
+	POLYGON ( PORTAL ('sector_name') WARP ( MATRIX (...) V (...) W (...)
+		MIRROR (...) ZFILL (...) ...) )
+
+    the format is now:
+
+	POLYGON ( PORTAL ( SECTOR ('sector_name') MATRIX (...) V (...) W (...)
+		MIRROR (...) ZFILL (...) ...) )
+
+    e.g. the WARP keyword is obsolete now.

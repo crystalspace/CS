@@ -48,6 +48,7 @@
 #include "itxtmgr.h"
 #include "itexture.h"
 #include "ivfs.h"
+#include "istlight.h"
 
 // Option variable: render portals?
 bool csSector::do_portals = true;
@@ -66,7 +67,7 @@ IMPLEMENT_IBASE_EXT (csSector)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSector)
 IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csSector::SectorInterface)
+IMPLEMENT_EMBEDDED_IBASE (csSector::eiSector)
   IMPLEMENTS_INTERFACE (iSector)
 IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -1795,3 +1796,47 @@ csStatLight* csSector::FindLight (CS_ID id)
 }
 
 //---------------------------------------------------------------------------
+
+bool csSector::eiSector::RemoveSkyThing (iThing *thing)
+{
+  return scfParent->RemoveSky (thing->GetPrivateObject ());
+}
+
+iThing *csSector::eiSector::GetSkyThing (const char *name)
+{
+  return &scfParent->GetSky (name)->scfiThing;
+}
+
+iThing *csSector::eiSector::GetSkyThing (int iIndex)
+{
+  csThing *t = scfParent->GetFirstSky ();
+  while (iIndex--) t = (csThing *)t->GetNext ();
+  return &t->scfiThing;
+}
+
+bool csSector::eiSector::RemoveThing (iThing* thing)
+{
+  return scfParent->RemoveThing (thing->GetPrivateObject ());
+}
+
+iThing *csSector::eiSector::GetThing (const char *name)
+{
+  return &scfParent->GetThing (name)->scfiThing;
+}
+
+iThing *csSector::eiSector::GetThing (int iIndex)
+{
+  csThing *t = scfParent->GetFirstThing ();
+  while (iIndex--) t = (csThing *)t->GetNext ();
+  return &t->scfiThing;
+}
+
+void csSector::eiSector::AddLight (iStatLight *light)
+{
+  scfParent->AddLight (light->GetPrivateObject ());
+}
+
+iStatLight *csSector::eiSector::FindLight (float x, float y, float z, float dist)
+{
+  return &scfParent->FindLight (x, y, z, dist)->scfiStatLight;
+}

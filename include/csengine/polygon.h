@@ -31,8 +31,9 @@
 #include "csengine/portal.h"
 #include "csengine/polytext.h"
 #include "csengine/octree.h"
-#include "ipolygon.h"
 #include "csengine/material.h"
+#include "ipolygon.h"
+#include "isector.h"
 
 class csSector;
 class StatLight;
@@ -171,7 +172,7 @@ private:
    * 0 is no alpha, 25 is 25% see through and
    * 75% texture, ... Possible values are 0, 25, 50, and 75.
    */
-  int cfg_alpha;
+  int Alpha;
 
 private:
   /// Constructor.
@@ -188,9 +189,9 @@ public:
   virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
 
   ///
-  int GetAlpha () { return cfg_alpha; }
+  int GetAlpha () { return Alpha; }
   ///
-  void SetAlpha (int a) { cfg_alpha = a; }
+  void SetAlpha (int a) { Alpha = a; }
 
   /// Get the polytexture (lighted texture)
   csPolyTexture* GetPolyTex ();
@@ -375,7 +376,10 @@ public:
  * the texture is filtered in which case it is drawn on top of the other
  * sector.
  */
-class csPolygon3D : public iBase, public csObject, public csPolygonInt
+class csPolygon3D : public csPolygonInt, public iBase, public csObject
+// NOTE: DO NOT MOVE csPolygonInt FROM FIRST PLACE! THERE ARE LOTS OF PLACES
+// WHERE CODE BLATANTLY SWITCHES BETWEEN csPolygon3D AND csPolygonInt TYPES
+// WITHOUT GIVING TO THE C++ COMPILER EVEN A CHANCE TO ADJUST THE POINTER!!!
 {
   friend class Dumper;
   friend class csPolyTexture;
@@ -1174,9 +1178,13 @@ public:
 
   //-------------------- iPolygon3D interface implementation -------------------
 
-  struct Poly3D : public iPolygon3D
+  struct eiPolygon3D : public iPolygon3D
   {
     DECLARE_EMBEDDED_IBASE (csPolygon3D);
+
+    /// Used by engine to retrieve internal object structure
+    virtual csPolygon3D *GetPrivateObject ()
+    { return scfParent; }
 
     /// Get polygon name
     virtual const char *GetName () const
@@ -1231,8 +1239,29 @@ public:
     virtual void CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix);
     /// Set polygon texture mapping plane
     virtual bool SetPlane (const char *iName);
+
+    /// Get the flags for this polygon
+    virtual unsigned GetFlags ()
+    { return scfParent->flags.Get (); }
+    /// Set any number of flags for this polygon
+    virtual void SetFlags (unsigned iMask, unsigned iValue)
+    { scfParent->flags.Set (iMask, iValue); }
+
+    /// Set flat color for polygon
+    virtual void SetFlatColor (csColor &iColor)
+    { scfParent->SetFlatColor (iColor); }
+    /// Set Gouraud vs lightmap polygon lighting
+    virtual void SetLightingMode (bool iGouraud)
+    { scfParent->SetTextureType (iGouraud ? POLYTXT_GOURAUD : POLYTXT_LIGHTMAP); }
+
+    /// Create a portal object pointing to given sector
+    virtual iPortal *CreatePortal (iSector *iTarget)
+    {
+      scfParent->SetCSPortal (iTarget->GetPrivateObject ());
+      return scfParent->GetPortal ();
+    }
   } scfiPolygon3D;
-  friend struct Poly3D;
+  friend struct eiPolygon3D;
 };
 
 #endif // __CS_POLYGON_H__

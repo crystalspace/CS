@@ -321,19 +321,19 @@ csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
 
 iPolygon3D *csPolygonSet::PolySet::CreatePolygon (const char *iName)
 {
-  csPolygon3D *p = new csPolygon3D ( (csTextureHandle*)NULL);
+  csPolygon3D *p = new csPolygon3D ((csTextureHandle *)NULL);
   p->SetName (iName);
   p->SetSector (scfParent->sector);
   scfParent->AddPolygon (p);
-  iPolygon3D* ip = QUERY_INTERFACE(p, iPolygon3D);
-  p->DecRef();
+  iPolygon3D *ip = QUERY_INTERFACE (p, iPolygon3D);
+  p->DecRef ();
   return ip;
 }
 
 void csPolygonSet::AddPolygon (csPolygonInt* poly)
 {
-  ((csPolygon3D*)poly)->SetParent (this);
-  polygons.Push (poly);
+  ((csPolygon3D *)poly)->SetParent (this);
+  polygons.Push ((csPolygon3D *)poly);
 }
 
 csCurve* csPolygonSet::GetCurve (char* name)

@@ -24,6 +24,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csutil/csstrvec.h"
+#include "csutil/flags.h"
 
 struct iWorld;
 struct iVFS;
@@ -36,6 +37,12 @@ typedef char *csTokenList;
 
 // Maximal number of recursive LIBRARY()'es
 #define MAX_RECURSION_DEPTH	10
+
+// Macros for transforming private types below to `normal' types
+#define CSCOLOR(x)	(*(csColor *)&x)
+#define CSVECTOR2(x)	(*(csVector2 *)&x)
+#define CSVECTOR3(x)	(*(csVector3 *)&x)
+#define CSMATRIX3(x)	(*(csMatrix3 *)&x)
 
 // We can't use csColor since it has a constructor :-(
 struct csPColor
@@ -97,6 +104,35 @@ struct csPMatrix3
     m21 = iM.m21; m22 = iM.m22; m23 = iM.m23;
     m31 = iM.m31; m32 = iM.m32; m33 = iM.m33;
   }
+};
+
+struct csPPortal
+{
+  // polygon this portal should belong to
+  iPolygon3D *polygon;
+  // Destination sector
+  char *destsec;
+  // portal mode
+  enum { pmNone, pmMirror, pmWarp } mode;
+  // portal flags
+  csFlags flags;
+  // Warp transformation
+  csPMatrix3 matrix;
+  // Warp translation
+  csPVector3 before, after;
+
+  // initialize portal
+  csPPortal (iPolygon3D *owner) : polygon (owner), destsec (NULL),
+    mode (pmNone), flags ()
+  { matrix.Identity (); before.Set (0,0,0); after.Set (0,0,0); }
+
+  // set portal flags
+  void SetFlags (unsigned iFlag, bool iState)
+  { flags.SetBool (iFlag, iState); }
+
+  // check if portal definition is okay
+  bool Check ()
+  { return (polygon && destsec); }
 };
 
 // These bits are set during texture plane loading
@@ -162,6 +198,9 @@ private:
     { return (char *)csVector::Get (idx); }
   } *strings;
 
+  // The list of portals encountered during loading (resolved at end)
+  DECLARE_TYPED_VECTOR (csPortalList, csPPortal) *portals;
+
   // The token offsets for each tokenized line (for error reporting)
   csVector *lineoffs;
   // Input data (incremented as parser goes along)
@@ -184,7 +223,7 @@ private:
   // Prepare the parser
   bool yyinit (csTokenList iInput, size_t iSize);
   // Finalize the parser
-  void yydone ();
+  void yydone (bool iSuccess);
   // The standard Bison error reporting function
   void yyerror (char *s);
   // The standard Bison tokenizer function
@@ -285,6 +324,8 @@ private:
     float first_len,second_len;
     // Texture plane definition mode
     int mode;
+    // Current portal object
+    csPPortal *portal;
   } polygon;
 
   // Used while processing THING (...) statements

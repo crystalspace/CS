@@ -297,9 +297,13 @@ public:
   DECLARE_IBASE_EXT (csPolygonSet);
 
   //------------------------- iSector interface --------------------------------
-  struct ThingInterface : public iThing
+  struct eiThing : public iThing
   {
     DECLARE_EMBEDDED_IBASE (csThing);
+
+    /// Used by the engine to retrieve internal sector object (ugly)
+    virtual csThing *GetPrivateObject ()
+    { return scfParent; }
 
     /// Set the position of the thing
     virtual void SetPosition (const csVector3 &iPos);
@@ -309,7 +313,7 @@ public:
     virtual void SetTransform (const csMatrix3 &iMatrix)
     { scfParent->SetTransform (iMatrix); }
   } scfiThing;
-  friend struct ThingInterface;
+  friend struct eiThing;
 };
 
 #endif /*THING_H*/

@@ -30,8 +30,9 @@ class csColor;
 
 struct iSector;
 struct iThing;
+struct iSprite;
 
-SCF_VERSION (iWorld, 0, 1, 0);
+SCF_VERSION (iWorld, 0, 1, 1);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -71,6 +72,18 @@ struct iWorld : public iPlugIn
   virtual iSector *CreateSector (const char *iName) = 0;
   /// Create a empty thing with given name
   virtual iThing *CreateThing (const char *iName, iSector *iParent) = 0;
+
+  /// Query number of sectors in world
+  virtual int GetSectorCount () = 0;
+  /// Get a sector by index
+  virtual iSector *GetSector (int iIndex) = 0;
+  /// Find a sector by name
+  virtual iSector *FindSector (const char *iName) = 0;
+
+  /// Find a thing by name
+  virtual iThing *FindThing (const char *iName) = 0;
+  /// Find a sprite by name
+  virtual iSprite *FindSprite (const char *iName) = 0;
 };
 
 #endif // __IWORLD_H__

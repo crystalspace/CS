@@ -31,12 +31,17 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # The Allegro 2D DOS driver
-ALLEG2D=$(OUT)$(LIB_PREFIX)alg2d$(LIB)
-DEP.EXE+=$(ALLEG2D)
+ifeq ($(USE_SHARED_PLUGINS),yes)
+  ALLEG2D=$(OUTDLL)alg2d$(DLL)
+  DEP.ALLEG2D=
+else
+  ALLEG2D=$(OUT)$(LIB_PREFIX)alg2d$(LIB)
+  DEP.EXE+=$(ALLEG2D)
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DOSALLEGRO
+endif
 DESCRIPTION.$(ALLEG2D) = $(DESCRIPTION.alleg2d)
 SRC.ALLEG2D=$(wildcard plugins/video/canvas/dosalleg/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.ALLEG2D = $(addprefix $(OUT),$(notdir $(SRC.ALLEG2D:.cpp=$O)))
-CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DOSALLEGRO
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -51,8 +56,8 @@ vpath %.cpp plugins/video/canvas/dosalleg
 clean: alleg2dclean
 alleg2d: $(OUTDIRS) $(ALLEG2D)
 
-$(ALLEG2D): $(OBJ.ALLEG2D)
-	$(DO.LIBRARY)
+$(ALLEG2D): $(OBJ.ALLEG2D) $(DEP.ALLEG2D)
+	$(DO.PLUGIN)
 
 alleg2dclean:
 	$(RM) $(ALLEG2D) $(OBJ.ALLEG2D)

@@ -17,14 +17,19 @@
 
 :djgppok
 
+  echo ###------------------------------------------------------------
   echo ### The configuration script expects the following tools to be
   echo ### installed on your system:
   echo ### nasm (optional)
   echo ### makedep (optional)
+  echo ### libdl (optional, for dynamic loader support, djgppdl-0.1.0.zip)
   echo ### sleep (GNU shell utilites, shl112b.zip)
   echo ### cmp (GNU diff utilites, dif271b.zip)
   echo ### cp (GNU file utilites, fil316b.zip)
+  echo ###------------------------------------------------------------
+  echo ###      ... press any alphanumeric key to continue ...
   echo.
+  pause >nul
 
   echo int main () {} >conftest.cpp
   echo %%xdefine TEST >conftest.asm
@@ -64,8 +69,8 @@
   if not exist conftest.o goto nonasm
 
   del conftest.o >nul
-  echo $$$ O.K., setting USE_NASM to "yes"
-  echo USE_NASM = yes>>config.tmp
+  echo $$$ O.K., setting NASM.INSTALLED to "yes"
+  echo NASM.INSTALLED = yes>>config.tmp
 
 :nonasm
 
@@ -73,10 +78,53 @@
   makedep -h >conftest.o
   if not exist conftest.o goto nomakedep
 
-  echo $$$ O.K., setting DEPEND_TOOL.INSTALLED to "yes"
-  echo DEPEND_TOOL.INSTALLED = yes>>config.tmp
+  del conftest.o >nul
+  echo $$$ O.K., setting MAKEDEP.INSTALLED to "yes"
+  echo MAKEDEP.INSTALLED = yes>>config.tmp
 
 :nomakedep
+
+  echo ### Checking whenever you have libdl installed (dynamic module loader) ...
+  set SHPLUGINS=no
+  dxe2gen --help >conftest.o
+  if not exist conftest.o goto nodxe2gen
+
+  del conftest.o >nul
+  echo $$$ O.K., setting USE_SHARED_PLUGINS to "yes"
+  set SHPLUGINS=yes
+
+    echo ### Checking if you have dynamic version of Zlib ...
+    gcc conftest.cpp -o conftest.exe -lz_i
+    if not exist conftest.exe goto nozlib_i
+
+    del conftest.exe >nul
+    echo $$$ O.K., will use dynamic version of Zlib
+    echo ZLIB.SUFFIX = _i>>config.tmp
+
+  :nozlib_i
+
+    echo ### Checking if you have dynamic version of libPNG ...
+    gcc conftest.cpp -o conftest.exe -lpng_i
+    if not exist conftest.exe goto nopng_i
+
+    del conftest.exe >nul
+    echo $$$ O.K., will use dynamic version of libPNG
+    echo LIBPNG.SUFFIX = _i>>config.tmp
+
+  :nopng_i
+
+    echo ### Checking if you have dynamic version of libJPEG ...
+    gcc conftest.cpp -o conftest.exe -ljpeg_i
+    if not exist conftest.exe goto nojpeg_i
+
+    del conftest.exe >nul
+    echo $$$ O.K., will use dynamic version of libJPEG
+    echo LIBJPEG.SUFFIX = _i>>config.tmp
+
+  :nojpeg_i
+
+:nodxe2gen
+  echo USE_SHARED_PLUGINS = %SHPLUGINS%>>config.tmp
   del conftest.* >nul
 
   rem Under windoze we do a 2-sec pause, otherwise it will tell us

@@ -37,9 +37,14 @@ int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
 
 IMPLEMENT_CSOBJTYPE (csLight,csObject);
 
+IMPLEMENT_IBASE (csLight)
+  IMPLEMENTS_INTERFACE (iLight)
+IMPLEMENT_IBASE_END
+
 csLight::csLight (float x, float y, float z, float d,
   float red, float green, float blue) : csObject()
 {
+  CONSTRUCT_IBASE (NULL);
   center.x = x;
   center.y = y;
   center.z = z;
@@ -160,10 +165,19 @@ void csLight::CorrectForNocolor (float* rp, float* gp, float* bp)
 
 IMPLEMENT_CSOBJTYPE (csStatLight,csLight);
 
+IMPLEMENT_IBASE_EXT (csStatLight)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iStatLight)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csStatLight::eiStaticLight)
+  IMPLEMENTS_INTERFACE (iStatLight)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csStatLight::csStatLight (float x, float y, float z, float dist,
   float red, float green, float blue, bool dynamic)
   : csLight (x, y, z, dist, red, green, blue)
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiStatLight);
   csStatLight::dynamic = dynamic;
   lightmaps = NULL;
   flags.SetAll (CS_LIGHT_THINGSHADOWS);

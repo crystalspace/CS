@@ -59,7 +59,7 @@ bool csGraphics2DMGL::Initialize (iSystem *pSystem)
 
   if (MGL_init (".", NULL) == 0)
   {
-    System->Printf (MSG_FATAL_ERROR, MGL_errorMsg (MGL_result ()));
+    System->Printf (MSG_FATAL_ERROR, "%s\n", MGL_errorMsg (MGL_result ()));
     return false;
   }
 
@@ -113,7 +113,7 @@ bool csGraphics2DMGL::Open (const char *Title)
 
   if ((dc = MGL_createDisplayDC (video_mode, numPages, MGL_DEFAULT_REFRESH)) == NULL)
   {
-    System->Printf (MSG_FATAL_ERROR, MGL_errorMsg (MGL_result ()));
+    System->Printf (MSG_FATAL_ERROR, "%s\n", MGL_errorMsg (MGL_result ()));
     return false;
   }
   MGL_makeCurrentDC (dc);

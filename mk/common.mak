@@ -31,12 +31,12 @@ OUTSUFX.yes = .pic
 
 # Depending on the type of optimization choosen we disable assembler support.
 ifneq ($(MODE),optimize)
-ifneq ($(USE_NASM),yes)
+ifneq ($(NASM.INSTALLED),yes)
   DO_ASM=no
 endif
 endif
 ifeq ($(DO_ASM),no)
-  USE_NASM=no
+  NASM.INSTALLED=no
   DO_MMX=no
 endif
 

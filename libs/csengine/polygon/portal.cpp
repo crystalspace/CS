@@ -26,8 +26,13 @@
 #include "csengine/stats.h"
 #include "itexture.h"
 
+IMPLEMENT_IBASE (csPortal)
+  IMPLEMENTS_INTERFACE (iPortal)
+IMPLEMENT_IBASE_END
+
 csPortal::csPortal ()
 {
+  CONSTRUCT_IBASE (NULL);
   filter_texture = NULL;
   filter_r = 1;
   filter_g = 1;
@@ -245,4 +250,18 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   }
 }
 
+iSector *csPortal::GetPortal ()
+{
+  return &GetSector ()->scfiSector;
+}
 
+void csPortal::SetPortal (iSector *iDest)
+{
+  SetSector (iDest->GetPrivateObject ());
+}
+
+void csPortal::SetMirror (iPolygon3D *iPoly)
+{
+  csPolygon3D *poly = iPoly->GetPrivateObject ();
+  SetWarp (csTransform::GetReflect (*(poly->GetPolyPlane ())));
+}

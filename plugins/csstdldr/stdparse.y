@@ -31,6 +31,7 @@
 #include "ipolyset.h"
 #include "ipolygon.h"
 #include "ithing.h"
+#include "iportal.h"
 
 /* Define this to debug parser */
 //#define YYDEBUG	1
@@ -42,12 +43,6 @@
 #define YYERROR_VERBOSE	1
 /* Avoid some "signed vs unsigned comparison" warnings */
 #define sizeof	(int)sizeof
-
-// Macros for accessing yylval as different data types
-#define CSCOLOR(x)	(*(csColor *)&x)
-#define CSVECTOR2(x)	(*(csVector2 *)&x)
-#define CSVECTOR3(x)	(*(csVector3 *)&x)
-#define CSMATRIX3(x)	(*(csMatrix3 *)&x)
 
 // More shortcuts
 #define TEX		storage.tex
@@ -120,7 +115,6 @@
     slight changes to tokenizer. Currently only 130 are used.
 */
 %token KW_ACTION
-%token KW_ACTIVATE
 %token KW_ADD
 %token KW_ALPHA
 %token KW_ATTENUATION
@@ -134,7 +128,6 @@
 %token KW_COLORS
 %token KW_CONVEX
 %token KW_COPY
-%token KW_COSFACT
 %token KW_CURVECENTER
 %token KW_CURVECONTROL
 %token KW_CURVESCALE
@@ -162,10 +155,8 @@
 %token KW_LIGHT
 %token KW_LIGHTING
 %token KW_LIMB
+%token KW_MATERIAL
 %token KW_MATRIX
-%token KW_MERGE_NORMALS
-%token KW_MERGE_TEXELS
-%token KW_MERGE_VERTICES
 %token KW_MIPMAP
 %token KW_MIRROR
 %token KW_MIXMODE
@@ -205,6 +196,7 @@
 %token KW_TERRAIN
 %token KW_TEX
 %token KW_TEXLEN
+%token KW_TEXMAP
 %token KW_TEXNR
 %token KW_TEXTURE
 %token KW_TEXTURES
@@ -217,7 +209,6 @@
 %token KW_TRANSFORM
 %token KW_TRANSPARENT
 %token KW_TRIANGLE
-%token KW_TRIGGER
 %token KW_UPWARD
 %token KW_UV
 %token KW_UVA
@@ -228,8 +219,8 @@
 %token KW_VERTICES
 %token KW_VVEC
 %token KW_W
-%token KW_WARP
 %token KW_WORLD
+%token KW_ZFILL
 
 /* yes/no tokens */
 %token KW_yes
@@ -253,6 +244,7 @@
 /* Non-terminal symbol types */
 %type <string>	name
 %type <ival>	yesno
+%type <ival>	yesno_onearg
 %type <color>	color
 %type <vect>	vect_idx
 %type <vect>	vector
@@ -311,12 +303,6 @@ world_op:
   {
     SECTOR.object = world->CreateSector ($2);
     SECTOR.polyset = QUERY_INTERFACE (SECTOR.object, iPolygonSet);
-    if (!SECTOR.polyset)
-    {
-      SECTOR.object->DecRef ();
-      yyerror ("engine created an invalid iSector object!");
-      YYABORT;
-    }
     SECTOR.texname = NULL;
     SECTOR.texlen = 1.0;
     SECTOR.statbsp = false;
@@ -326,7 +312,6 @@ world_op:
     SECTOR.polyset->CompressVertices ();
     if (SECTOR.statbsp) SECTOR.object->CreateBSP ();
     SECTOR.polyset->DecRef ();
-    SECTOR.object->DecRef ();
   }
 | KW_KEY STRING '(' STRING ')'
   { if (!world->CreateKey ($2, $4)) ABORTMSG; }
@@ -360,16 +345,16 @@ texture_ops:
 ;
 
 texture_op:
-  KW_MIPMAP '(' yesno ')'		{ printf ("MIPMAP (%d)\n", $3); }
+  KW_MIPMAP yesno_onearg
   {
-    if ($3)
+    if ($2)
       TEX.flags = (TEX.flags & ~CS_TEXTURE_NOMIPMAPS);
     else
       TEX.flags |= CS_TEXTURE_NOMIPMAPS;
   }
-| KW_DITHER '(' yesno ')'
+| KW_DITHER yesno_onearg
   {
-    if ($3)
+    if ($2)
       TEX.flags |= CS_TEXTURE_DITHER;
     else
       TEX.flags = (TEX.flags & ~CS_TEXTURE_DITHER);
@@ -378,16 +363,16 @@ texture_op:
   { TEX.filename = $3; }
 | KW_TRANSPARENT '(' color ')'
   { TEX.transp = $3; TEX.do_transp = true; }
-| KW_FOR_3D '(' yesno ')'
+| KW_FOR_3D yesno_onearg
   {
-    if ($3)
+    if ($2)
       TEX.flags |= CS_TEXTURE_3D;
     else
       TEX.flags = (TEX.flags & ~CS_TEXTURE_3D);
   }
-| KW_FOR_2D '(' yesno ')'
+| KW_FOR_2D yesno_onearg
   {
-    if ($3)
+    if ($2)
       TEX.flags |= CS_TEXTURE_2D;
     else
       TEX.flags = (TEX.flags & ~CS_TEXTURE_2D);
@@ -431,38 +416,22 @@ sector_op:
     polygon.texlen = SECTOR.texlen;
   }
   polygon_ops ')'
-  {
-    if (!CreateTexturePlane (polygon.object))
-    { polygon.object->DecRef (); YYABORT; }
-    polygon.object->DecRef ();
-  }
 | KW_TEXNR '(' STRING ')'
   { SECTOR.texname = $3; }
 | KW_TEXLEN '(' NUMBER ')'
   { SECTOR.texlen = $3; }
-| KW_ACTIVATE '(' STRING ')'
-  { printf ("ACTIVATE (%s)\n", $3); }
-| KW_TRIGGER '(' STRING ',' STRING ')'
-  { printf ("TRIGGER (%s, %s)\n", $3, $5); }
-| KW_STATBSP noargs
-  { SECTOR.statbsp = true; }
+| KW_STATBSP yesno_onearg
+  { SECTOR.statbsp = $2; }
 | KW_THING name '('
   {
     thing.object = world->CreateThing ($2, SECTOR.object);
     thing.polyset = QUERY_INTERFACE (thing.object, iPolygonSet);
-    if (!thing.polyset)
-    {
-      thing.object->DecRef ();
-      yyerror ("engine created an invalid iThing object!");
-      YYABORT;
-    }
     thing.texname = NULL;
     thing.texlen = 1.0;
   }
   thing_ops ')'
   {
     thing.polyset->DecRef ();
-    thing.object->DecRef ();
   }
 | KW_LIGHT name '(' light_ops ')'
   { printf ("LIGHT '%s' (...)\n", $2); }
@@ -491,8 +460,8 @@ skydome_op:
   { printf ("RADIUS (%g)\n", $3); }
 | KW_VERTICES '(' vertex_indices ')'
   { printf ("VERTICES (...)\n"); }
-| KW_LIGHTING '(' yesno ')'
-  { printf ("LIGHTING (%d)\n", $3); }
+| KW_LIGHTING yesno_onearg
+  { printf ("LIGHTING (%d)\n", $2); }
 ;
 
 vertex_indices:
@@ -585,8 +554,8 @@ light_op:
   { printf ("CENTER (...)\n"); }
 | KW_RADIUS '(' NUMBER ')'
   { printf ("RADIUS (%g)\n", $3); }
-| KW_DYNAMIC noargs
-  { printf ("DYNAMIC ()\n"); }
+| KW_DYNAMIC yesno_onearg
+  { printf ("DYNAMIC (%d)\n", $2); }
 | KW_COLOR '(' color ')'
   { printf ("COLOR ( ... )\n"); }
 | KW_HALO '(' NUMBER NUMBER ')'
@@ -615,8 +584,6 @@ collection_op:
   { printf ("COLLECTION ('%s')\n", $3); }
 | KW_LIGHT '(' STRING ',' NUMBER ')'
   { printf ("LIGHT ('%s':%g)\n", $3, $5); }
-| KW_TRIGGER '(' STRING ',' STRING '-' '>' STRING ')'
-  { printf ("TRIGGER ('%s', '%s' -> '%s')\n", $3, $5, $8); }
 | KW_SECTOR '(' STRING ')'
   { printf ("SECTOR ('%s')\n", $3); }
 ;
@@ -636,11 +603,6 @@ thing_tpl_op:
     polygon.texlen = thing.texlen;
   }
   polygon_ops ')'
-  {
-    if (!CreateTexturePlane (polygon.object))
-    { polygon.object->DecRef (); YYABORT; }
-    polygon.object->DecRef ();
-  }
 | KW_VERTEX '(' vector ')'
   { thing.polyset->CreateVertex (CSVECTOR3 ($3)); }
 | KW_TEXNR '(' STRING ')'
@@ -656,8 +618,8 @@ thing_tpl_op:
   }
 | KW_FOG '(' color NUMBER ')'
   { printf ("FOG (%g,%g,%g : %g)\n", $3.red, $3.green, $3.blue, $4); }
-| KW_CONVEX noargs
-  { printf ("CONVEX ()\n"); }
+| KW_CONVEX yesno_onearg
+  { printf ("CONVEX (%d)\n", $2); }
 | KW_CIRCLE '(' vector ':' vector NUMBER ')'
   /* <coordinate> ':' <radius> <num-verts> */
   { printf ("CIRCLE (...)\n"); }
@@ -680,14 +642,10 @@ thing_op:
   thing_tpl_op
 | KW_KEY '(' STRING ',' STRING ')'
   { printf ("KEY ('%s', '%s')\n", $3, $5); }
-| KW_ACTIVATE '(' STRING ')'
-  { printf ("ACTIVATE (%s)\n", $3); }
-| KW_TRIGGER '(' STRING ',' STRING ')'
-  { printf ("TRIGGER (%s, %s)\n", $3, $5); }
 | KW_TEMPLATE '(' STRING ')'
   { printf ("TEMPLATE ('%s')\n", $3); }
-| KW_MOVEABLE noargs
-  { printf ("MOVEABLE ()\n"); }
+| KW_MOVEABLE yesno_onearg
+  { printf ("MOVEABLE (%d)\n", $2); }
 | KW_TEX_SET_SELECT '(' STRING ')'
   { printf ("TEX_SET_SELECT ('%s')\n", $3); }
 | KW_FILE '(' STRING ')'
@@ -738,13 +696,6 @@ sprite_tpl_op:
   { printf ("TRIANGLE (%g,%g,%g)\n", $3, $4, $5); }
 | KW_FILE '(' STRING ')'
   { printf ("FILE ('%s')\n", $3); }
-| KW_MERGE_TEXELS '(' yesno ')'
-  { printf ("MERGE_TEXELS (%d)\n", $3); }
-/*
-@@todo: can't really understand how it all works
-| KW_MERGE_NORMALS '(' <sprite-merge> ')'
-| KW_MERGE_VERTICES '(' <sprite-merge> ')'
-*/
 /*
 @@todo:
 | <sprite-skeleton>
@@ -843,6 +794,16 @@ yesno:
   { $$ = true; }
 | KW_no
   { $$ = false; }
+;
+
+/* Yes or no, one argument, possibly no arguments at all */
+yesno_onearg:
+  /* empty - true by default */
+  { $$ = true; }
+| '(' ')'
+  { $$ = true; }
+| '(' yesno ')'
+  { $$ = $2; }
 ;
 
 /* The definition of a color - red, green, blue from 0 to 1 */
@@ -962,36 +923,41 @@ polygon_ops:
 polygon_op:
   KW_TEXNR '(' STRING ')'
   { polygon.texname = $3; }
-| KW_LIGHTING '(' yesno ')'
-  { printf ("LIGHTING (%d)\n", $3); }
-| KW_TEXTURE '('
+| KW_LIGHTING yesno_onearg
+  { polygon.object->SetFlags (CS_POLY_LIGHTING, $2 ? CS_POLY_LIGHTING : 0); }
+| KW_TEXMAP '('
   {
     polygon.mode = pmNONE;
     polygon.first_len = polygon.second_len = polygon.texlen;
   }
   polygon_texture_ops ')'
-  { if (!CreateTexturePlane (polygon.object)) YYABORT; }
+  {
+    if (!CreateTexturePlane (polygon.object))
+      YYABORT;
+  }
 | KW_VERTICES '(' polygon_vertex_indices ')'
-| KW_GOURAUD noargs
-  { printf ("GOURAUD ()\n"); }
+| KW_GOURAUD yesno_onearg
+  { polygon.object->SetLightingMode ($2); }
 | KW_FLATCOL '(' color ')'
-  { printf ("FLATCOL (%g,%g,%g)\n", $3.red, $3.green, $3.blue); }
+  { polygon.object->SetFlatColor (CSCOLOR ($3)); }
 | KW_ALPHA '(' NUMBER ')'
-  { printf ("ALPHA (%g)\n", $3); }
+  { polygon.object->SetAlpha ($3); }
 | KW_UV '(' tex_coordinates ')'
   { printf ("UV (...)\n"); }
 | KW_UVA '(' uva_coordinates ')'
   { printf ("UVA (...)\n"); }
 | KW_COLORS '(' colors ')'
   { printf ("COLORS (...)\n"); }
-| KW_COSFACT '(' NUMBER ')'
-  { printf ("COSFACT (%g)\n", $3); }
-| KW_CLIP noargs
-  { printf ("CLIP ()\n"); }
-| KW_PORTAL '(' STRING ')'
-  { printf ("PORTAL (%s)\n", $3); }
-| KW_WARP '(' warp_ops ')'
-  { printf ("WARP (...)\n"); }
+| KW_PORTAL '('
+  { portals->Push (polygon.portal = new csPPortal (polygon.object)); }
+  portal_ops ')'
+  {
+    if (!polygon.portal->Check ())
+    {
+      yyerror ("invalid portal definition");
+      YYABORT;
+    }
+  }
 ;
 
 colors:
@@ -1018,23 +984,29 @@ uva_coordinates:
   /* <angle> <uva-scale> <uva-offset> */
 ;
 
-/* WARP ( ... ) */
-warp_ops:
-  warp_op
-| warp_ops warp_op
+/* PORTAL ( ... ) */
+portal_ops:
+  portal_op
+| portal_ops portal_op
 ;
 
-warp_op:
-  KW_MATRIX '(' matrix ')'
-  { printf ("MATRIX (...)\n"); }
+portal_op:
+  KW_SECTOR '(' STRING ')'
+  { polygon.portal->destsec = $3; }
+| KW_MATRIX '(' matrix ')'
+  { polygon.portal->mode = csPPortal::pmWarp; }
 | KW_V '(' vector ')'
-  { printf ("V (...)\n"); }
+  { polygon.portal->mode = csPPortal::pmWarp; }
 | KW_W '(' vector ')'
-  { printf ("W (...)\n"); }
-| KW_MIRROR noargs
-  { printf ("MIRROR ()\n"); }
-| KW_STATIC noargs
-  { printf ("STATIC ()\n"); }
+  { polygon.portal->mode = csPPortal::pmWarp; }
+| KW_MIRROR yesno_onearg
+  { polygon.portal->mode = csPPortal::pmMirror; }
+| KW_STATIC yesno_onearg
+  { polygon.portal->SetFlags (CS_PORTAL_STATICDEST, $2); }
+| KW_CLIP yesno_onearg
+  { polygon.portal->SetFlags (CS_PORTAL_CLIPDEST, $2); }
+| KW_ZFILL yesno_onearg
+  { polygon.portal->SetFlags (CS_PORTAL_ZFILL, $2); }
 ;
 
 /* TEXTURE (...) */

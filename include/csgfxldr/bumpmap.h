@@ -49,7 +49,7 @@ protected:
   /// Height of bumpmap.
   int height;
   /// The bumpmap data.
-  void *bumpmap;
+  uint8 *bumpmap;
   /// BumpMap format (see CS_BUMPFMT_XXX above)
   int format;
 

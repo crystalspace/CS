@@ -892,6 +892,19 @@ public:
   /// Create a empty thing with given name
   virtual iThing *CreateThing (const char *iName, iSector *iParent);
 
+  /// Query number of sectors in world
+  virtual int GetSectorCount ()
+  { return sectors.Length (); }
+  /// Get a sector by index
+  virtual iSector *GetSector (int iIndex);
+  /// Find a sector by name
+  virtual iSector *FindSector (const char *iName);
+
+  /// Find a thing by name
+  virtual iThing *FindThing (const char *iName);
+  /// Find a sprite by name
+  virtual iSprite *FindSprite (const char *iName);
+
   //--------------------- iConfig interface implementation --------------------
 
   struct csWorldConfig : public iConfig
@@ -961,7 +974,6 @@ private:
 
     // Dispose of world state dependent on g2d
     void Close (iGraphics2D *g2d);
-
   };
 
   csWorldStateVector *world_states;

@@ -256,10 +256,6 @@ yyparse(YYPARSE_PARAM_ARG)
   YYSTYPE yyval;		/*  the variable used to return		*/
 				/*  semantic values from the action	*/
 				/*  routines				*/
-#ifndef YY_NO_NULLIFY_YYVAL
-  yyval = 0;  /*  Avoid warning about uninitialized variable. */
-#endif
-
   int yylen;
 
 #if YYDEBUG != 0

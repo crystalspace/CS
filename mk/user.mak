@@ -54,8 +54,8 @@ ifndef MODE
 endif
 
 # Should we use NASM for assembly?
-ifndef USE_NASM
-  USE_NASM=no
+ifndef NASM.INSTALLED
+  NASM.INSTALLED=no
 endif
 
 # If 'yes' include assembly optimizations in Crystal Space.  On systems that

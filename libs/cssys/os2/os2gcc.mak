@@ -54,7 +54,7 @@ Z_LIBS=-lz
 PNG_LIBS=-lpng
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpegdll
+JPG_LIBS=-ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -228,7 +228,7 @@ OS2LINK = ./os2link$(EXE)
 libs/cssys/os2/os2gcc.mak: $(OS2LINK)
 
 $(OS2LINK): libs/cssys/os2/support/os2link.cpp
-	$(LD) $(LFLAGS.@) $(CFLAGS.optimize) $(LFLAGS.optimize) -Zomf -Zlinker /PM:VIO $^
+	$(LD) $(LFLAGS.@) $(CFLAGS.GENERAL) $(CFLAGS.optimize) $(LFLAGS.optimize) $^ -Zomf -Zlinker /PM:VIO
 
 endif
 
@@ -240,7 +240,7 @@ STARTFS = ./startfs$(EXE)
 mgl2d: $(STARTFS)
 
 $(STARTFS): libs/cssys/os2/support/startfs.cpp
-	$(LD) $(LFLAGS.@) $(CFLAGS.optimize) $(LFLAGS.optimize) $^ -Zomf -Zlinker /PM:NOVIO
+	$(LD) $(LFLAGS.@) $(CFLAGS.GENERAL) $(CFLAGS.optimize) $(LFLAGS.optimize) $^ -Zomf -Zlinker /PM:NOVIO
 
 endif
 

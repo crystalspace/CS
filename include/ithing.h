@@ -23,6 +23,7 @@
 
 class csVector3;
 class csMatrix3;
+class csThing;
 struct iSector;
 
 SCF_VERSION (iThing, 0, 0, 1);
@@ -36,6 +37,9 @@ SCF_VERSION (iThing, 0, 0, 1);
  */
 struct iThing : public iBase
 {
+  /// Used by the engine to retrieve internal sector object (ugly)
+  virtual csThing *GetPrivateObject () = 0;
+
   /// Set the position of the thing
   virtual void SetPosition (const csVector3 &iPos) = 0;
   /// Set the sector of the thing

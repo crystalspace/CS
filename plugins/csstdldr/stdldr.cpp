@@ -35,6 +35,7 @@
 #include "iworld.h"
 #include "ivfs.h"
 #include "ipolygon.h"
+#include "iportal.h"
 
 // This character, if encountered, is considered to start either a keyword
 // or a non-quoted string. Having too much symbols here can hurt since these
@@ -141,6 +142,7 @@ csStandardLoader::csStandardLoader (iBase *iParent)
   line = -1;
   strings = NULL;
   lineoffs = NULL;
+  portals = NULL;
   recursion_depth = 0;
 }
 
@@ -220,7 +222,7 @@ bool csStandardLoader::Load (const char *iName)
     return false;
   }
   bool rc = (yyparse () == 0);
-  yydone ();
+  yydone (rc);
 
   // Free the token data
   if (csw_valid)
@@ -247,7 +249,7 @@ bool csStandardLoader::Parse (char *iData)
     return false;
   }
   bool rc = (yyparse () == 0);
-  yydone ();
+  yydone (rc);
 
   free (tl);
   return rc;
@@ -525,6 +527,7 @@ bool csStandardLoader::yyinit (csTokenList iInput, size_t iSize)
   storage.tex_prefix = NULL;
 
   if (!strings) strings = new csStringList ();
+  if (!portals) portals = new csPortalList (64, 64);
 
   // Get the string table
   size_t stofs = get_le_long (iInput + sizeof (long));
@@ -537,11 +540,41 @@ bool csStandardLoader::yyinit (csTokenList iInput, size_t iSize)
     strings->Push (iInput + stofs);
     stofs += sl;
   }
+
   return true;
 }
 
-void csStandardLoader::yydone ()
+void csStandardLoader::yydone (bool iSuccess)
 {
+  // Resolve all the portals
+  if (iSuccess)
+    for (int i = portals->Length () - 1; i >= 0; i--)
+    {
+      csPPortal *port = portals->Get (i);
+      iSector *isect = world->FindSector (port->destsec);
+      if (!isect)
+      {
+        system->Printf (MSG_WARNING, "invalid sector `%s' for portal target!", port->destsec);
+        continue;
+      }
+
+      iPortal *iport = polygon.object->CreatePortal (isect);
+      iport->SetFlags (port->flags.Get (), -1U);
+      switch (port->mode)
+      {
+        case csPPortal::pmNone:
+          break;
+        case csPPortal::pmWarp:
+          iport->SetWarp (CSMATRIX3 (port->matrix), CSVECTOR3 (port->before),
+            CSVECTOR3 (port->after));
+          break;
+        case csPPortal::pmMirror:
+          iport->SetMirror (polygon.object);
+          break;
+      }
+    }
+
+  delete portals; portals = NULL;
   delete strings; strings = NULL;
   delete lineoffs; lineoffs = NULL;
 }

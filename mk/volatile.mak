@@ -22,7 +22,7 @@ endif
 ifeq ($(DO_SOUND),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
 endif
-ifeq ($(USE_NASM),yes)
+ifeq ($(NASM.INSTALLED),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_NASM$">>volatile.tmp
 endif
 ifeq ($(DO_MMX),yes)

@@ -69,8 +69,8 @@ CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
   
 CFLAGS=$(CFLAGS.GENERAL) $(CFLAGS.$(MODE)) $(MEM)
 LFLAGS=$(LFLAGS.GENERAL) $(LFLAGS.$(MODE)) $(LFLAGS.L)$(OUT)
-LIBS=$(LIBS.EXE) $(Z_LIBS)
-YFLAGS=
+LIBS.EXE+=$(Z_LIBS)
+LIBS=$(LIBS.EXE)
 
 ifeq ($(MAKE_DLL),yes)
   CFLAGS+=$(CFLAGS.DLL)
@@ -137,7 +137,7 @@ ifndef DO.DEP
   else
     ifeq ($(DEPEND_TOOL),mkdep)
       # If mkdep is already installed, don't build it
-      ifneq ($(DEPEND_TOOL.INSTALLED),yes)
+      ifneq ($(MAKEDEP.INSTALLED),yes)
         dep: mkdep
       endif
       DO.DEP = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) ) \
@@ -160,6 +160,15 @@ include mk/subs.mak
 # Now remove duplicate include dirs and duplicate libraries
 CFLAGS.INCLUDE := $(sort $(CFLAGS.INCLUDE))
 LIBS.EXE := $(sort $(LIBS.EXE))
+
+# If some libraries should always come last in a specific order, define the
+# LIBS.SORT variable to equal these libraries in the order they are neede.
+# For example, if LIBS.SORT = -ldl -lm -lsomething these libraries will be
+# made the last ones (in the exact sequence) but only if they are already
+# present in LIBS.EXE
+ifdef LIBS.SORT
+  LIBS.EXE := $(filter-out $(LIBS.SORT),$(LIBS.EXE)) $(foreach LIB,$(LIBS.SORT),$(filter $(LIB),$(LIBS.EXE)))
+endif
 
 all: $(OUTDIRS)
 

@@ -26,9 +26,13 @@ struct iPolygonSet;
 struct iPolygon3D;
 struct iPolygonTexture;
 struct iLightMap;
+struct iPortal;
+struct iSector;
 
+class csPolygon3D;
 class csVector3;
 class csMatrix3;
+class csColor;
 
 /**
  * If CS_POLY_LIGHTING is set for a polygon then the polygon will be lit.
@@ -43,13 +47,16 @@ class csMatrix3;
  */
 #define CS_POLY_FLATSHADING	0x00000002
 
-SCF_VERSION (iPolygon3D, 0, 1, 1);
+SCF_VERSION (iPolygon3D, 0, 1, 3);
 
 /**
  * This is the interface to 3D polygons.
  */
 struct iPolygon3D : public iBase
 {
+  /// Used by engine to retrieve internal object structure
+  virtual csPolygon3D *GetPrivateObject () = 0;
+
   /// Get polygon name
   virtual const char *GetName () const = 0;
   /// Set polygon name
@@ -96,11 +103,27 @@ struct iPolygon3D : public iBase
     const csMatrix3 &iMatrix) = 0;
   /// Set polygon texture mapping plane
   virtual bool SetPlane (const char *iName) = 0;
+
+  /// Get the flags for this polygon
+  virtual unsigned GetFlags () = 0;
+  /// Set any number of flags for this polygon
+  virtual void SetFlags (unsigned iMask, unsigned iValue) = 0;
+
+  /// Set flat color for polygon
+  virtual void SetFlatColor (csColor &iColor) = 0;
+  /// Set Gouraud vs lightmap polygon lighting
+  virtual void SetLightingMode (bool iGouraud) = 0;
+
+  /// Create a portal object pointing to given sector
+  virtual iPortal *CreatePortal (iSector *iTarget) = 0;
 };
 
 SCF_VERSION (iPolygonTexture, 1, 0, 0);
 
-/// temporary - subject to change
+/**
+ * This is a interface to an object responsible for containing
+ * the data required for a lighted texture on a polygon.
+ */
 struct iPolygonTexture : public iBase
 {
   /// Get the texture handle associated with this polygon

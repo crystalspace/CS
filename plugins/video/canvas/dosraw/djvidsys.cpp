@@ -184,6 +184,9 @@ VideoSystem::VideoSystem ()
   __dpmi_int (0x10, &regs);
   if (regs.x.ax == 0x004f)
   {
+#ifdef CS_DEBUG
+    printf ("VESA VBE2 BIOS detected\n");
+#endif
     // Retrieve mode info structure from lower megabyte of dos memory.
     dosmemget (__tb, sizeof (VESAInformation), &vi);
     VESAversion = vi.Version;
@@ -451,13 +454,13 @@ int VideoSystem::Open ()
   // that can arise is that limit(DS) can be less than resulting value;
   // this is resolved by trying to rise the limit of DS
   unsigned long flatsel, flatbase;
-  asm ("movw %%ds, %%ax; movzwl %%ax, %%eax" : "=a" (flatsel));
+  flatsel = _my_ds ();
   if (__dpmi_get_segment_base_address(flatsel, &flatbase) == 0)
   {
     VRAM = (unsigned char *)(info.address - flatbase);
     unsigned long minlimit = ((unsigned long)VRAM) + AppertureSize - 1;
-    if (__dpmi_get_segment_limit(flatsel) < minlimit)
-      if (__dpmi_set_segment_limit(flatsel, minlimit | 0xfff))
+    if (__dpmi_get_segment_limit (flatsel) < minlimit)
+      if (__dpmi_set_segment_limit (flatsel, minlimit | 0xfff))
         VRAM = NULL;
       else
       {

@@ -31,8 +31,8 @@ ifeq ($(MAKESECTION),postdefines)
 export BISON_SIMPLE = support/gnu/bison.sim
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  STDLDR = $(OUTDLL)stdldr$(DLL)
-# STDLDR = testldr$(EXE)
+# STDLDR = $(OUTDLL)stdldr$(DLL)
+  STDLDR = testldr$(EXE)
   DEP.STDLDR = $(CSUTIL.LIB) $(CSGEOM.LIB)
 else
   STDLDR = $(OUT)$(LIB_PREFIX)stdld$(LIB)

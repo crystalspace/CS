@@ -2,27 +2,27 @@
 # to build DOS raw framebuffer access 2D driver raw2d
 
 # Driver description
-DESCRIPTION.raw2d = Crystal Space raw DOS SVGA driver
+DESCRIPTION.dosraw = Crystal Space raw DOS SVGA driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make raw2d        Make the $(DESCRIPTION.raw2d)$"
+  $(NEWLINE)echo $"  make dosraw        Make the $(DESCRIPTION.dosraw)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: raw2d raw2dclean
+.PHONY: dosraw dosrawclean
 
-all plugins drivers drivers2d: raw2d
+all plugins drivers drivers2d: dosraw
 
-raw2d:
+dosraw:
 	$(MAKE_TARGET) MAKE_DLL=yes
-raw2dclean:
+dosrawclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -31,12 +31,18 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # The raw 2D DOS SVGA driver
-RAW2D=$(OUT)$(LIB_PREFIX)raw2d$(LIB)
-DEP.EXE+=$(RAW2D)
-DESCRIPTION.$(RAW2D) = $(DESCRIPTION.raw2d)
+ifeq ($(USE_SHARED_PLUGINS),yes)
+  RAW2D=$(OUTDLL)dosraw$(DLL)
+  DEP.RAW2D=$(CSUTIL.LIB)
+# $(CSSYS.LIB)
+else
+  RAW2D=$(OUT)$(LIB_PREFIX)dosraw$(LIB)
+  DEP.EXE+=$(RAW2D)
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_RAW2D
+endif
+DESCRIPTION.$(RAW2D) = $(DESCRIPTION.dosraw)
 SRC.RAW2D=$(wildcard plugins/video/canvas/dosraw/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.RAW2D = $(addprefix $(OUT),$(notdir $(SRC.RAW2D:.cpp=$O)))
-CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_RAW2D
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -45,16 +51,16 @@ ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/dosraw
 
-.PHONY: raw2d raw2dclean
+.PHONY: dosraw dosrawclean
 
 # Chain rules
-clean: raw2dclean
-raw2d: $(OUTDIRS) $(RAW2D)
+clean: dosrawclean
+dosraw: $(OUTDIRS) $(RAW2D)
 
-$(RAW2D): $(OBJ.RAW2D)
-	$(DO.LIBRARY)
+$(RAW2D): $(OBJ.RAW2D) $(DEP.RAW2D)
+	$(DO.PLUGIN)
 
-raw2dclean:
+dosrawclean:
 	$(RM) $(RAW2D) $(OBJ.RAW2D) $(OUTOS)raw2d.dep
 
 ifdef DO_DEPEND

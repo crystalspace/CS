@@ -4,10 +4,10 @@
 
 # NASM works only on x86
 ifneq ($(PROC),INTEL)
-override USE_NASM=no
+override NASM.INSTALLED = no
 endif
 
-ifeq ($(USE_NASM),yes)
+ifeq ($(NASM.INSTALLED),yes)
 
 # The executable name
 NASM = nasm

@@ -29,13 +29,14 @@ LIB.EXTERNAL.FREEFONT = -lttf
 CFLAGS.FREEFONT = -I/usr/local/include/freetype
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-FREEFONT=$(OUTDLL)freefont$(DLL)
-DEP.FREEFONT=$(LIB.FREEFONT)
+  FREEFONT=$(OUTDLL)freefont$(DLL)
+  DEP.FREEFONT=$(LIB.FREEFONT)
 else
-FREEFONT=$(OUT)$(LIB_PREFIX)freefont$(LIB)
-DEP.EXE+=$(FREEFONT)
-CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_FREEFONT
+  FREEFONT=$(OUT)$(LIB_PREFIX)freefont$(LIB)
+  DEP.EXE+=$(FREEFONT)
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_FREEFONT
 endif
+DESCRIPTION.$(FREEFONT) = $(DESCRIPTION.freefont)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#

@@ -46,7 +46,7 @@ SRC.SOFT3D += $(wildcard plugins/video/renderer/software/*.cpp) \
 	plugins/video/renderer/common/dtmesh.cpp \
 	plugins/video/renderer/common/dpmesh.cpp
 
-ifeq ($(USE_NASM),yes)
+ifeq ($(NASM.INSTALLED),yes)
 SRC.SOFT3D += $(wildcard plugins/video/renderer/software/i386/*.asm)
 endif
 OBJ.SOFT3D = $(addprefix $(OUT),$(notdir $(subst .asm,$O,$(SRC.SOFT3D:.cpp=$O))))

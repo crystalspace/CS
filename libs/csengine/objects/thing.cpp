@@ -45,7 +45,7 @@ IMPLEMENT_IBASE_EXT (csThing)
   IMPLEMENTS_EMBEDDED_INTERFACE (iThing)
 IMPLEMENT_IBASE_EXT_END
 
-IMPLEMENT_EMBEDDED_IBASE (csThing::ThingInterface)
+IMPLEMENT_EMBEDDED_IBASE (csThing::eiThing)
   IMPLEMENTS_INTERFACE (iThing)
 IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -672,12 +672,12 @@ void csThing::UpdateInPolygonTrees ()
 
 //---------------------------------------------------------------------------
 
-void csThing::ThingInterface::SetPosition (const csVector3 &iPos)
+void csThing::eiThing::SetPosition (const csVector3 &iPos)
 {
   scfParent->obj.SetOrigin (iPos);
 }
 
-void csThing::ThingInterface::SetPosition (iSector *iSec)
+void csThing::eiThing::SetPosition (iSector *iSec)
 {
   iSec->GetPrivateObject ()->AddThing (scfParent);
 }

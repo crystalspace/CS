@@ -1583,19 +1583,45 @@ iSector* csWorld::CreateSector (const char *iName)
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
   sector->SetName (iName);
   sectors.Push (sector);
-  return QUERY_INTERFACE (sector, iSector);
+  iSector *s = QUERY_INTERFACE (sector, iSector);
+  sector->DecRef ();
+  return s;
 }
 
 iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
 {
   csThing *thing = new csThing (this);
   thing->SetName (iName);
-  thing->SetSector (iParent->GetPrivateObject ());
-  iThing* p = QUERY_INTERFACE (thing, iThing);
+  csSector *sector = iParent->GetPrivateObject ();
+  thing->SetSector (sector);
+  sector->AddThing (thing);
+  iThing *p = QUERY_INTERFACE (thing, iThing);
   thing->DecRef ();
   return p;
 }
 
+iSector *csWorld::GetSector (int iIndex)
+{
+  return &((csSector *)sectors.Get (iIndex))->scfiSector;
+}
+
+iSector *csWorld::FindSector (const char *iName)
+{
+  csSector *sec = (csSector *)sectors.FindByName (iName);
+  return sec ? &sec->scfiSector : NULL;
+}
+
+iThing *csWorld::FindThing (const char *iName)
+{
+  csThing *thing = GetThing (iName);
+  return thing ? &thing->scfiThing : NULL;
+}
+
+iSprite *csWorld::FindSprite (const char *iName)
+{
+  (void)iName;
+  return NULL; /*not implemented yet*/
+}
 
 //----------------Begin-Multi-Context-Support------------------------------
 

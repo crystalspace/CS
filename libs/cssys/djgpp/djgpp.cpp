@@ -28,6 +28,7 @@
 #include <sys/timeb.h>
 #include <sys/nearptr.h>
 #include <sys/farptr.h>
+#include <crt0.h>
 
 #include "cssysdef.h"
 #include "djgpp.h"

@@ -23,8 +23,10 @@
 #include "csutil/scf.h"
 
 class csSector;
+struct iThing;
+struct iStatLight;
 
-SCF_VERSION (iSector, 0, 1, 0);
+SCF_VERSION (iSector, 0, 1, 1);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -40,6 +42,29 @@ struct iSector : public iBase
   virtual csSector *GetPrivateObject () = 0;
   /// Create the static BSP or octree for this sector.
   virtual void CreateBSP () = 0;
+
+  /// Find a sky with the given name.
+  virtual iThing *GetSkyThing (const char *name) = 0;
+  /// Remove a sky from this sector.
+  virtual bool RemoveSkyThing (iThing *thing) = 0;
+  /// Get the number of sky things in this sector.
+  virtual int GetNumSkyThings () = 0;
+  /// Get a sky thing by index
+  virtual iThing *GetSkyThing (int iIndex) = 0;
+
+  /// Find a thing with the given name.
+  virtual iThing *GetThing (const char *name) = 0;
+  /// Remove a thing from this sector.
+  virtual bool RemoveThing (iThing* thing) = 0;
+  /// Get the number of things in this sector.
+  virtual int GetNumThings () = 0;
+  /// Get a thing by index
+  virtual iThing *GetThing (int iIndex) = 0;
+
+  /// Add a static or pseudo-dynamic light to this sector.
+  virtual void AddLight (iStatLight *light) = 0;
+  /// Find a light with the given position and radius.
+  virtual iStatLight *FindLight (float x, float y, float z, float dist) = 0;
 };
 
 #endif // __ISECTOR_H__

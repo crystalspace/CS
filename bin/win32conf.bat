@@ -11,8 +11,8 @@
   if not exist conftest.o goto nonasm
 
   del conftest.o
-  echo $$$ O.K., setting USE_NASM to "yes"
-  echo USE_NASM = yes>>config.tmp
+  echo $$$ O.K., setting NASM.INSTALLED to "yes"
+  echo NASM.INSTALLED = yes>>config.tmp
 
 :nonasm
   del conftest.asm

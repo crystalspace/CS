@@ -607,8 +607,7 @@ void csGraphics3DSoftwareCommon::ScanSetup ()
       break;
   } /* endswitch */
 
-  //static
-  int o_rbits = -1, o_gbits, o_bbits;
+  static int o_rbits = -1, o_gbits, o_bbits;
   if ((o_rbits != pfmt.RedBits)
    || (o_gbits != pfmt.GreenBits)
    || (o_bbits != pfmt.BlueBits))

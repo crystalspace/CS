@@ -43,7 +43,7 @@ vpath %.s libs/cssys/djgpp
 O=.o
 
 # Typical extension for dynamic libraries on this system.
-DLL=
+DLL=.dxe
 
 # Typical extension for static libraries
 LIB=.a
@@ -54,16 +54,21 @@ ARFLAGS=cr
 LIB_PREFIX=lib
 
 # Extra libraries needed on this system.
-LIBS.EXE=-lm
+LIBS.EXE = -lm
+LIBS.SORT = -lm
+ifeq ($(USE_SHARED_PLUGINS),yes)
+LIBS.EXE += -ldl
+LIBS.SORT += -ldl
+endif
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-Llibs/zlib -lz
+Z_LIBS=-Llibs/zlib -lz$(ZLIB.SUFFIX)
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-Llibs/libpng -lpng
+PNG_LIBS=-Llibs/libpng -lpng$(LIBPNG.SUFFIX)
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-Llibs/libjpeg -ljpeg
+JPG_LIBS=-Llibs/libjpeg -ljpeg$(LIBJPEG.SUFFIX)
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -105,9 +110,10 @@ LFLAGS.DLL=
 NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = libs/cssys/djgpp/djgpp.cpp libs/cssys/general/printf.cpp \
-	libs/cssys/djgpp/djmousys.s libs/cssys/djgpp/djkeysys.s \
-	libs/cssys/general/timing.cpp support/gnu/getopt*.c
+SRC.SYS_CSSYS = libs/cssys/djgpp/djgpp.cpp \
+	libs/cssys/general/printf.cpp libs/cssys/general/timing.cpp \
+	libs/cssys/djgpp/loadlib.cpp support/gnu/getopt*.c \
+	libs/cssys/djgpp/djmousys.s libs/cssys/djgpp/djkeysys.s
 
 # The C compiler.
 CC=gcc -c
@@ -126,6 +132,14 @@ DEPEND_TOOL=mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
+#-------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+# How to make a shared/dynamic library
+DO.SHARED.PLUGIN = dxe2gen -o $@ $(^^) $(L^) -U -E $(patsubst %.dxe,%,$(notdir $@))_GetClassTable -E djgpp $(LFLAGS.L)$(OUT)
+
+endif # ifeq ($(MAKESECTION),postdefines)
+
 #--------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
@@ -136,9 +150,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 
 #---------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
-
-# Always override USE_SHARED_PLUGINS for DOS to "no"
-override USE_SHARED_PLUGINS = no
 
 SYSCONFIG=bin/dosconf.bat
 # Check if "echo" executable is not installed (thus using dumb COMMAND.COM's echo)

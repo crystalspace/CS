@@ -28,8 +28,8 @@ class csTextureHandle;
  * A material class.
  */
 
-class csMaterial {
-
+class csMaterial
+{
 private:
   /// flat shading color
   csColor flat_color;
@@ -48,43 +48,42 @@ public:
   /**
    * create an empty material
    */
-  csMaterial();
+  csMaterial ();
   /**
    * create a material with only the texture given.
    */
-  csMaterial(csTextureHandle *txt);
+  csMaterial (csTextureHandle *txt);
 
   /**
    * destroy material
    */
-  ~csMaterial();
+  ~csMaterial ();
 
 
   /// Get the flat shading color
-  inline const csColor& GetFlatColor() const {return flat_color;}
+  inline const csColor& GetFlatColor () const {return flat_color;}
   /// Set the flat shading color
-  inline void SetFlatColor(const csColor& col) {flat_color = col;}
+  inline void SetFlatColor (const csColor& col) {flat_color = col;}
 
   /// Get the texture (if none NULL is returned)
-  inline csTextureHandle *GetTextureHandle() const {return texture;}
+  inline csTextureHandle *GetTextureHandle () const {return texture;}
   /// Set the texture (pass NULL to set no texture)
-  inline void SetTextureHandle(csTextureHandle *tex) {texture = tex;}
+  inline void SetTextureHandle (csTextureHandle *tex) {texture = tex;}
 
   /// Get diffuse reflection constant for the material
-  inline float GetDiffuse() const { return diffuse; }
+  inline float GetDiffuse () const { return diffuse; }
   /// Set diffuse reflection constant for the material
-  inline void SetDiffuse(float val) { diffuse = val; }
+  inline void SetDiffuse (float val) { diffuse = val; }
 
   /// Get ambient lighting for the material
-  inline float GetAmbient() const { return ambient; }
+  inline float GetAmbient () const { return ambient; }
   /// Set ambient lighting for the material
-  inline void SetAmbient(float val) { ambient = val; }
+  inline void SetAmbient (float val) { ambient = val; }
 
   /// Get reflection of the material
-  inline float GetReflection() const { return reflection; }
+  inline float GetReflection () const { return reflection; }
   /// Set reflection of the material
-  inline void SetReflection(float val) { reflection = val; }
+  inline void SetReflection (float val) { reflection = val; }
 };
-
 
 #endif // __CS_MATERIAL_H__

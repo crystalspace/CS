@@ -60,7 +60,7 @@ csLightMapped::csLightMapped () : csPolygonTextureType ()
   theDynLight = NULL;
   tex = new csPolyTexture ();
   lightmap_up_to_date = false;
-  cfg_alpha = 0;
+  Alpha = 0;
 }
 
 csLightMapped::~csLightMapped ()
@@ -214,16 +214,16 @@ IMPLEMENT_IBASE (csPolygon3D)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygon3D)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::Poly3D)
+IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
   IMPLEMENTS_INTERFACE (iPolygon3D)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-
-csPolygon3D::csPolygon3D (csMaterial* mat) : csObject (),
-  csPolygonInt (), vertices (4)
+csPolygon3D::csPolygon3D (csMaterial* mat) : csPolygonInt (),
+  csObject (), vertices (4)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
+
   material = mat;
 
   txt_info = NULL;
@@ -255,11 +255,12 @@ csPolygon3D::csPolygon3D (csMaterial* mat) : csObject (),
 #endif
 }
 
-csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
-  csPolygonInt (), vertices (4)
+csPolygon3D::csPolygon3D (csTextureHandle* texture) : csPolygonInt (),
+  csObject (), vertices (4)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
+
   material = new csMaterial();
   if (texture) SetTexture (texture);
 
@@ -292,9 +293,12 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
 #endif
 }
 
-csPolygon3D::csPolygon3D (csPolygon3D& poly) : iBase(), csObject (),
-  csPolygonInt (), vertices (4)
+csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
+  csObject (), vertices (4)
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
+
   const char* tname = poly.GetName ();
   if (tname) SetName (tname);
 
@@ -505,12 +509,12 @@ iTextureHandle* csPolygon3D::GetTextureHandle ()
     material->GetTextureHandle()->GetTextureHandle () : (iTextureHandle*)NULL;
 }
 
-void csPolygon3D::Poly3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
+void csPolygon3D::eiPolygon3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
 {
   scfParent->SetTextureSpace (iMatrix, iOrigin);
 }
 
-bool csPolygon3D::Poly3D::SetPlane (const char *iName)
+bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
 {
   csPolyTxtPlane *ppl =
     (csPolyTxtPlane *)csWorld::current_world->planes.FindByName (iName);

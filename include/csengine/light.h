@@ -25,6 +25,8 @@
 #include "csutil/flags.h"
 #include "csengine/rview.h"
 #include "lightdef.h"
+#include "ilight.h"
+#include "istlight.h"
 
 class csSector;
 class csSprite;
@@ -89,7 +91,7 @@ class csLightPatchPool;
  * Note that static and pseudo-dynamic lights are represented by the
  * same csStatLight class.
  */
-class csLight : public csObject
+class csLight : public csObject, public iLight
 {
 protected:
   /// Home sector of the light.
@@ -261,6 +263,7 @@ public:
   static void CorrectForNocolor (float* rp, float* gp, float* bp);  
 
   CSOBJTYPE;
+  DECLARE_IBASE;
 };
 
 /**
@@ -356,6 +359,19 @@ public:
   void LightingFunc (csLightingFunc* callback, void* callback_data = NULL);
 
   CSOBJTYPE;
+
+  //------------------------ iStatLight interface -----------------------------
+  DECLARE_IBASE_EXT (csLight);
+
+  struct eiStaticLight : public iStatLight
+  {
+    DECLARE_EMBEDDED_IBASE (csStatLight);
+
+    /// Used by the engine to retrieve internal static light object (ugly)
+    virtual csStatLight *GetPrivateObject ()
+    { return scfParent; }
+  } scfiStatLight;
+  friend struct eiStaticLight;
 };
 
 /**

@@ -4493,7 +4493,7 @@ bool csLoader::LoadWorld (char* buf)
         csPolygon3D* p = ps->GetPolygon3D (i);
         if (p && p->GetPortal ())
         {
-          csPortal* portal = p->GetPortal ();
+          csPortal *portal = p->GetPortal ();
           csSector *stmp = portal->GetSector ();
           csSector *snew = (csSector*)(World->sectors).FindByName(stmp->GetName ());
           if (!snew)
@@ -4505,7 +4505,7 @@ bool csLoader::LoadWorld (char* buf)
             fatal_exit (0, false);
           }
           portal->SetSector (snew);
-           delete stmp ;
+          delete stmp;
         }
       }
   }

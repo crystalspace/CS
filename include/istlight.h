@@ -1,44 +1,38 @@
 /*
-    Copyright (C) 2000 by W.C.A. Wijngaards
-  
+    Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __ISTLIGHT_H__
+#define __ISTLIGHT_H__
 
-#include "cssysdef.h"
-#include "csengine/material.h"
-#include "csengine/texture.h"
+#include "csutil/scf.h"
 
-csMaterial::csMaterial ()
+class csStatLight;
+
+SCF_VERSION (iStatLight, 0, 0, 1);
+
+/**
+ * The iStatLight interface is the SCF interface
+ * for the csStatLight class. 
+ */
+struct iStatLight : public iBase
 {
-  // set defaults
-  // black flat shaded.
-  flat_color.Set(0.f,0.f,0.f);
-  texture = NULL;
-  diffuse = 0.7;
-  ambient = 0.0;
-  reflection = 0.0;
-}
+  /// Used by the engine to retrieve internal sector object (ugly)
+  virtual csStatLight *GetPrivateObject () = 0;
+};
 
-csMaterial::csMaterial (csTextureHandle *txt)
-{
-  csMaterial ();
-  texture = txt;
-}
-
-csMaterial::~csMaterial () 
-{
-  delete texture;
-}
+#endif // __ISTLIGHT_H__

@@ -139,7 +139,7 @@ LFLAGS.profile=-p
 ASM=.asm
 
 
-ifneq ($(USE_NASM),no)
+ifneq ($(NASM.INSTALLED),no)
 #
 # System-dependent flags to pass to NASM
 #

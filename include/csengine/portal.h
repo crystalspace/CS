@@ -22,6 +22,7 @@
 #include "csgeom/transfrm.h"
 #include "csengine/rview.h"
 #include "csutil/flags.h"
+#include "iportal.h"
 
 class csSector;
 class csPolygon2D;
@@ -30,50 +31,10 @@ class csStatLight;
 struct iTextureHandle;
 
 /**
- * If this flag is set then this portal will clip all geometry in
- * the destination sector. This must be used for portals which arrive
- * in the middle of a sector.
- */
-#define CS_PORTAL_CLIPDEST 0x00000001
-
-/**
- * If this flag is set then this portal will do a Z-fill after
- * rendering the contents. This is mainly useful for floating portals
- * where it is possible that there is geometry in the same sector
- * that will be rendered behind the portal (and does could accidently
- * get written in the portal sector because the Z-buffer cannot
- * be trusted).
- */
-#define CS_PORTAL_ZFILL 0x00000002
-
-/**
- * If this flag is set then this portal will do space warping.
- * You can use this to implement mirrors or other weird portal effects.
- * Don't set this flag directly. Use SetWarp() instead. It is safe
- * to disable and query this flag though.
- */
-#define CS_PORTAL_WARP 0x00000004
-
-/**
- * If this flag is set then this portal mirrors space (changes order
- * of the vertices of polygons). Don't set this flag directly. It will
- * be automatically set if a mirroring space warp is used with SetWarp().
- */
-#define CS_PORTAL_MIRROR 0x00000008
-
-/**
- * A flag which indicates if the destination of this portal should not be
- * transformed from object to world space. For mirrors you should
- * disable this flag because you want the destination to move with the
- * source.
- */
-#define CS_PORTAL_STATICDEST 0x00000010
-
-/**
  * This class represents a portal. It belongs to some polygon
  * which is then considered a portal to another sector.
  */
-class csPortal
+class csPortal : public iPortal
 {
 private:
   /// The sector that this portal points to.
@@ -84,14 +45,6 @@ public:
   csFlags flags;
 
 protected:
-  /**
-   * A flag which indicates if the destination of this portal should not be
-   * transformed from object to world space. For mirrors you should
-   * disable this flag because you want the destination to move with the
-   * source.
-   */
-  bool static_dest;
-
   /// Warp transform in object space.
   csReversibleTransform warp_obj;
   /// Warp transform in world space.
@@ -144,11 +97,6 @@ public:
    * Set the warping transformation for this portal in object space and world space.
    */
   void SetWarp (const csTransform& t);
-
-  /**
-   * Set the warping transformation for this portal in object space and world space.
-   */
-  void SetWarp (const csMatrix3& m_w, const csVector3& v_w_before, const csVector3& v_w_after);
 
   /**
    * Get the warping transformation in object space.
@@ -222,7 +170,24 @@ public:
    * portal (0 is no completely transparent, 100 is complete opaque).
    */
   virtual void CheckFrustum (csFrustumView& lview, int alpha);
+
+  //---------------------------- iPortal interface -----------------------------
+  DECLARE_IBASE;
+
+  /// Set portal flags (see CS_PORTAL_XXX values)
+  virtual void SetFlags (int iMask, int iValue)
+  { flags.Set (iMask, iValue); }
+
+  /// Get the sector that the portal points to
+  virtual iSector *GetPortal ();
+  /// Set portal to point to specified sector
+  virtual void SetPortal (iSector *iDest);
+
+  /// Set the warping transformation for this portal in object space and world space.
+  virtual void SetWarp (const csMatrix3 &m_w, const csVector3 &v_w_before,
+    const csVector3 &v_w_after);
+  /// Set warping transformation to mirror
+  virtual void SetMirror (iPolygon3D *iPoly);
 };
 
 #endif /*PORTAL_H*/
-

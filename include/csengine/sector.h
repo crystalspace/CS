@@ -41,6 +41,7 @@ class csPolygonTree;
 class csPolygon2DQueue;
 class csProgressPulse;
 struct iGraphics3D;
+struct iStatLight;
 
 /**
  * A sector is a convex hull of polygons. It is
@@ -425,7 +426,7 @@ public:
   DECLARE_IBASE_EXT (csPolygonSet);
 
   //------------------------- iSector interface -------------------------------
-  struct SectorInterface : public iSector
+  struct eiSector : public iSector
   {
     DECLARE_EMBEDDED_IBASE (csSector);
 
@@ -435,6 +436,31 @@ public:
     /// Create the static BSP or octree for this sector.
     virtual void CreateBSP ()
     { scfParent->UseStaticTree (); }
+
+    /// Find a sky with the given name.
+    virtual iThing *GetSkyThing (const char *name);
+    /// Remove a sky from this sector.
+    virtual bool RemoveSkyThing (iThing *thing);
+    /// Get the number of sky things in this sector.
+    virtual int GetNumSkyThings ()
+    { return scfParent->GetNumSkyThings (); }
+    /// Get a sky thing by index
+    virtual iThing *GetSkyThing (int iIndex);
+
+    /// Find a thing with the given name.
+    virtual iThing *GetThing (const char *name);
+    /// Remove a thing from this sector.
+    virtual bool RemoveThing (iThing* thing);
+    /// Get the number of things in this sector.
+    virtual int GetNumThings ()
+    { return scfParent->GetNumThings (); }
+    /// Get a thing by index
+    virtual iThing *GetThing (int iIndex);
+
+    /// Add a static or pseudo-dynamic light to this sector.
+    virtual void AddLight (iStatLight *light);
+    /// Find a light with the given position and radius.
+    virtual iStatLight *FindLight (float x, float y, float z, float dist);
   } scfiSector;
 };
 

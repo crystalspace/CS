@@ -106,7 +106,7 @@ if [ -n "${NASM}" ]; then
   echo "NASM = "`basename ${NASM}`
   # Well, we really should check here for obj format...
   # but we'll use ELF as it really doesn't matter
-  ${NASM} -f elf conftest.asm -o conftest.o 2>/dev/null && echo "USE_NASM = yes"
+  ${NASM} -f elf conftest.asm -o conftest.o 2>/dev/null && echo "NASM.INSTALLED = yes"
 fi
 
 # Remove dummy remains
@@ -118,7 +118,7 @@ if [ -n "${MAKEDEP}" ]; then
   echo "DEPEND_TOOL = mkdep"
   MAKEDEP_VERSION=`makedep -V | sed -e "s/.*Version *//"`
   if [ `expr "${MAKEDEP_VERSION}" ">" 0.0.0` = "1" ]; then
-    echo "DEPEND_TOOL.INSTALLED = yes"
+    echo "MAKEDEP.INSTALLED = yes"
   fi
 fi
 
