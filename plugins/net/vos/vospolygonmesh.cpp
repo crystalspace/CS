@@ -395,15 +395,16 @@ void ConstructPolygonMeshTask::doTask()
       collider->SetProperties (1, csVector3 (0), csMatrix3 ());
       collider->SetPosition (csVector3(0, 0, 0));
       collider->AttachMesh (meshwrapper);
-      //collider->SetMoveCallback (this);
 
       const csMatrix3 tm;
       const csVector3 tv (0);
       csOrthoTransform t (tm, tv);
       collider->AttachColliderMesh (meshwrapper, t, 0, 1, 0);
-      //if (isRemote()) collider->MakeStatic();
 
-    polygonmesh->GetCSinterface()->SetCollider (collider);
+      if (polygonmesh->isLocal()) 
+		collider->SetMoveCallback (polygonmesh->GetCSinterface());
+
+      polygonmesh->GetCSinterface()->SetCollider (collider);
     }
 
     LOG("ConstructPolygonMeshTask", 3, "done with " << name);

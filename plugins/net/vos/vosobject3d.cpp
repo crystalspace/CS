@@ -36,6 +36,7 @@ using namespace VOS;
 SCF_IMPLEMENT_IBASE (csVosObject3D)
   SCF_IMPLEMENTS_INTERFACE (iVosObject3D)
   SCF_IMPLEMENTS_INTERFACE (iVosApi)
+  SCF_IMPLEMENTS_INTERFACE (iDynamicsMoveCallback)
 SCF_IMPLEMENT_IBASE_END
 
 /// csVosObject3D ///
@@ -76,6 +77,22 @@ void csVosObject3D::SetCollider (iRigidBody *col)
 VOS::vRef<VOS::Vobject> csVosObject3D::GetVobject()
 {
   return object3d;
+}
+
+void csVosObject3D::Execute(iMeshWrapper *, csOrthoTransform &t)
+{
+  LOG ("csVosObject3D", 2, "Received Execute callback 2 args");
+  this->Execute(t);
+}
+
+void csVosObject3D::Execute(csOrthoTransform &)
+{
+  LOG ("csVosObject3D", 2, "Received Execute callback 1 arg");
+  csVector3 pos = collider->GetPosition();
+  //csVector3 vel = collider->GetLinearVelocity();
+  //csVector3 acc = collider->GetForce();
+
+  object3d->setPosition (pos.x, pos.y, pos.z);
 }
 
 /// Construct an object3d
@@ -161,7 +178,7 @@ public:
     : obj(o, true), ori(m) {}
   ~OrientateTask () {}
 
-  void doTask() { obj->changeTransform (ori); }
+  void doTask() { obj->changeOrientation (ori); }
 };
 
 
@@ -365,20 +382,32 @@ void csMetaObject3D::changePosition (const csVector3 &pos)
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
   LOG("vosobject3d", 2, "changePosition: " << getURLstr() <<
       " to " << pos.x << " " << pos.y << " " << pos.z);
-  if(mw.IsValid())
+  if (mw.IsValid())
   {
     mw->GetMovable()->SetPosition(pos);
     mw->GetMovable()->UpdateMove();
   }
+
+  if (csvobj3d->GetCollider().IsValid())
+  {
+	csvobj3d->GetCollider()->SetPosition(pos);
+  }
 }
 
-void csMetaObject3D::changeTransform (const csMatrix3 &trans)
+void csMetaObject3D::changeOrientation (const csMatrix3 &ori)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
-  if(mw.IsValid())
+  if (mw.IsValid())
   {
-    mw->GetMovable()->SetTransform(trans);
+	// NOTE:Movable doesn't support scaling, if it did we'd need to incorporate
+	// it into the matrix
+    mw->GetMovable()->SetTransform(ori);
     mw->GetMovable()->UpdateMove();
+  }
+
+  if (csvobj3d->GetCollider().IsValid())
+  {
+	csvobj3d->GetCollider()->SetOrientation(ori);
   }
 }
 

@@ -34,7 +34,8 @@
 #include "csvosa3dl.h"
 #include "vossector.h"
 
-class csVosObject3D : public iVosObject3D, public iVosApi
+class csVosObject3D : public iVosObject3D, public iVosApi,
+	                  public iDynamicsMoveCallback
 {
 private:
   csRef<iMeshWrapper> meshwrapper;
@@ -55,6 +56,9 @@ public:
   void SetCollider (iRigidBody *col);
 
   virtual VOS::vRef<VOS::Vobject> GetVobject();
+
+  virtual void Execute (csOrthoTransform &t);
+  virtual void Execute (iMeshWrapper *mesh, csOrthoTransform &t);
 };
 
 class csMetaObject3D : public virtual A3DL::Object3D,
@@ -85,9 +89,15 @@ public:
   virtual void notifyPropertyChange(const VOS::PropertyEvent &event);
 
   // Call these from CS run loop.  Derived objects can override if they
-  // do not correctly observe movable interface
-  virtual void changePosition(const csVector3 &pos);
-  virtual void changeTransform(const csMatrix3 &trans);
+  // do not correctly use movable interface
+  virtual void changePosition (const csVector3 &pos);
+  virtual void changeOrientation (const csMatrix3 &ori);
+
+  // This is commented out because CS does not support dynamically changing
+  // scaling of objects
+  //virtual void changeScaling (const csMatrix3 &scaling)
+  
+  
 };
 
 #endif

@@ -227,6 +227,7 @@ void csVosSector::notifyChildInserted (VobjectEvent &event)
 
   if(obj3d.isValid())
   {
+    LOG("SectorChildInserted", 2, "Calling obj3d->Setup()");
     obj3d->Setup(vosa3dl, this);
   }
   else

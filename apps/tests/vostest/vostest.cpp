@@ -302,7 +302,11 @@ bool Vostest::Initialize ()
 
   csRef<iVosApi> vosapi = SCF_QUERY_INTERFACE(vosa3dl, iVosApi);
   VOS::vRef<VOS::Vobject> vobject = vosapi->GetVobject();
-  printf("Connected to site is %s\n", vobject->getURLstr().c_str());
+
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        "crystalspace.application.vostest",
+        "Connected to site is %s\n", vobject->getURLstr().c_str());
+
 
   vossector->IncRef(); // otherwise it gets deleted, which would be bad.
 

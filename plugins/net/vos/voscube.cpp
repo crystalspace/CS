@@ -89,13 +89,16 @@ void ConstructCubeTask::doTask()
       collider->SetProperties (1, csVector3 (0), csMatrix3 ());
       collider->SetPosition (csVector3(0, 0, 0));
       collider->AttachMesh (meshwrapper);
-      //collider->SetMoveCallback(this);
+
+
       const csMatrix3 tm;
       const csVector3 tv (0);
       csOrthoTransform t (tm, tv);
-
       collider->AttachColliderBox (size, t, 0, 1, 0);
-      //if(isRemote()) collider->MakeStatic();
+
+      if (cube->isLocal()) 
+		collider->SetMoveCallback (cube->GetCSinterface());
+
 	  cube->GetCSinterface()->SetCollider (collider);
     }
 

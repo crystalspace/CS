@@ -24,6 +24,7 @@
 #include "csutil/ref.h"
 #include "iengine/mesh.h"
 #include "iengine/sector.h"
+#include "ivaria/dynamics.h"
 
 /** @file 
     This defines the plugin interface for the Crystal Space
@@ -102,6 +103,14 @@ struct iVosObject3D : public iBase
 {
   /** Get the iMeshWrapper for this Object3D. */
   virtual csRef<iMeshWrapper> GetMeshWrapper() = 0;
+
+  /** Get the iRigidBody collider for this Object3D. This can be used to
+   *  control the forces o the object - useful for avatars
+   *
+   *  This will return no object if there is no iDynamicsSystem registered in
+   *  the object registry
+   */
+  virtual csRef<iRigidBody> GetCollider() = 0;
 };
 
 #endif
