@@ -531,6 +531,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   do_dirlight = false;
   do_vis_test = true;
   dirlight_number = 0;
+  dirlight.Set (0, 1, 0);
   base_color.red = 0;
   base_color.green = 0;
   base_color.blue = 0;
