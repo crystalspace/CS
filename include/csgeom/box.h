@@ -64,7 +64,7 @@ class csBox2
 private:
   struct bEdge
   {
-    UByte v1, v2;	// Indices of vertex in bounding box (BOX_CORNER_...)
+    uint8 v1, v2;	// Indices of vertex in bounding box (BOX_CORNER_...)
   };
   // Index by edge number. Edge e and e+1 with e even are opposite edges.
   // (BOX_EDGE_...)
@@ -408,10 +408,10 @@ protected:
 
   struct bEdge
   {
-    UByte v1, v2; // Indices of vertex in bounding box (BOX_CORNER_...)
-    UByte fl, fr; // Indices of left/right faces sharing edge (BOX_SIDE_...)
+    uint8 v1, v2; // Indices of vertex in bounding box (BOX_CORNER_...)
+    uint8 fl, fr; // Indices of left/right faces sharing edge (BOX_SIDE_...)
   };
-  typedef UByte bFace[4];	// Indices of four clock-wise edges (0..23)
+  typedef uint8 bFace[4];	// Indices of four clock-wise edges (0..23)
   // Index by edge number. Edge e and e+1 with e even are opposite edges.
   // (BOX_EDGE_...)
   static bEdge edges[24];

@@ -125,7 +125,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op);
   virtual csGraphics3DCaps *GetCaps ();
-  virtual unsigned long *GetZBuffAt (int x, int y);
+  virtual uint32 *GetZBuffAt (int x, int y);
   virtual float GetZBuffValue (int x, int y);
   virtual void DumpCache ();
   virtual void ClearCache ();

@@ -46,12 +46,12 @@
 #ifndef NO_scan_flat_zfil
 
 void SCAN_NAME (SCAN_BPP, scan_flat_zfil) (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
-  long izz = QInt24 (inv_z);
-  long dzz = QInt24 (Scan.M);
+  int32 izz = QInt24 (inv_z);
+  int32 dzz = QInt24 (Scan.M);
   PIXTYPE *_dest = (PIXTYPE *)d;
   PIXTYPE *_destend = _dest + xx - 1;
   do
@@ -70,7 +70,7 @@ void SCAN_NAME (SCAN_BPP, scan_flat_zfil) (int xx, unsigned char* d,
 #ifndef NO_scan_flat_znone
 
 void SCAN_NAME (SCAN_BPP, scan_flat_znone) (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
   int color = Scan.FlatColor;
@@ -90,12 +90,12 @@ void SCAN_NAME (SCAN_BPP, scan_flat_znone) (int xx, unsigned char* d,
 #ifndef NO_scan_flat_zuse
 
 void SCAN_NAME (SCAN_BPP, scan_flat_zuse) (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
-  unsigned long izz = QInt24 (inv_z);
-  unsigned long dzz = QInt24 (Scan.M);
+  uint32 izz = QInt24 (inv_z);
+  uint32 dzz = QInt24 (Scan.M);
   PIXTYPE *_dest = (PIXTYPE *)d;
   PIXTYPE *_destend = _dest + xx - 1;
   do
@@ -119,12 +119,12 @@ void SCAN_NAME (SCAN_BPP, scan_flat_zuse) (int xx, unsigned char* d,
 #ifndef NO_scan_flat_ztest
 
 void SCAN_NAME (SCAN_BPP, scan_flat_ztest) (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
-  unsigned long izz = QInt24 (inv_z);
-  unsigned long dzz = QInt24 (Scan.M);
+  uint32 izz = QInt24 (inv_z);
+  uint32 dzz = QInt24 (Scan.M);
   PIXTYPE *_dest = (PIXTYPE *)d;
   PIXTYPE *_destend = _dest + xx - 1;
   do

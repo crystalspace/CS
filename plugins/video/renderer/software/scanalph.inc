@@ -164,8 +164,8 @@
 
 #else // A_PI
 
-void A_SCANFUNC (void *dest, int len, unsigned long *zbuff,
-  long u, long du, long v, long dv, unsigned long z, long dz,
+void A_SCANFUNC (void *dest, int len, uint32 *zbuff,
+  int32 u, int32 du, int32 v, int32 dv, uint32 z, int32 dz,
   unsigned char *bitmap, int bitmap_log2w)
 {
   A_PIXTYPE *_dest = (A_PIXTYPE *)dest;

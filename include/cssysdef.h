@@ -209,7 +209,7 @@
 # endif
 // Generic ISDIR needed for COMP_GCC
 #  ifdef __NEED_GENERIC_ISDIR
-#    if !defined (OS_UNIX) && !defined (OS_MACOS)
+#    if !defined (OS_UNIX) && !defined (OS_MACOS) && !defined(OS_PS2)
 #      include <io.h>
 #    endif
 #    if defined(OS_MACOS)

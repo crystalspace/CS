@@ -1030,8 +1030,8 @@ void csGraphics3DSoftwareCommon::SetDimensions (int nwidth, int nheight)
   }
 
   delete [] z_buffer;
-  z_buffer = new unsigned long [width*height];
-  z_buf_size = sizeof (unsigned long)*width*height;
+  z_buffer = new uint32 [width*height];
+  z_buf_size = sizeof (uint32)*width*height;
 
   delete [] line_table;
   line_table = new UByte* [height+1];
@@ -1231,7 +1231,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   int max_i, min_i;
   float max_y, min_y;
   unsigned char *d;
-  unsigned long *z_buf;
+  uint32 *z_buf;
   float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3) return;
@@ -1507,7 +1507,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   float max_y, min_y;
   float min_z;
   unsigned char *d;
-  unsigned long *z_buf;
+  uint32 *z_buf;
   float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3)
@@ -2172,7 +2172,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
   int max_i, min_i;
   float max_y, min_y;
   unsigned char *d;
-  unsigned long *z_buf;
+  uint32 *z_buf;
   float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3)
@@ -2884,7 +2884,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             clamp |= (bb > pqinfo.max_b) || (tmp > pqinfo.max_b);
           }
 
-          unsigned long *zbuff = z_buffer + width * screenY + xl;
+          uint32 *zbuff = z_buffer + width * screenY + xl;
           unsigned char *dest = line_table [screenY] + (xl << pixel_shift);
 
           if (do_gouraud)

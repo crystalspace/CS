@@ -337,7 +337,7 @@
     }                                                                   \
     while ((_dest <= _destend)&&!((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
     {									\
-      if ((((long)_dest) & csGraphics3DSoftwareCommon::filter_bf) != 0)				\
+      if ((((int32)_dest) & csGraphics3DSoftwareCommon::filter_bf) != 0)				\
       {									\
         if ((uu&0xffff) < 64*256) filter_du = -1;			\
         else if ((uu&0xffff) > 192*256) filter_du = 1;			\
@@ -691,21 +691,21 @@
 #ifndef NO_555_scan_fog
 
 void csScan_16_555_scan_fog (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
   UShort *_dest = (UShort *)d;
   UShort *_destend = _dest + xx;
-  unsigned long izz = QInt24 (inv_z);
+  uint32 izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
   UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
-  ULong fog_dens = Scan.FogDensity;
+  uint32 fog_dens = Scan.FogDensity;
 
   do
   {
     int fd;
-    unsigned long izb = *z_buf;
+    uint32 izb = *z_buf;
     if (izz >= 0x1000000)
     {
       // izz exceeds our 1/x table, so compute fd aproximatively and go on.
@@ -746,21 +746,21 @@ fd_done:
 #ifndef NO_565_scan_fog
 
 void csScan_16_565_scan_fog (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
   UShort *_dest = (UShort *)d;
   UShort *_destend = _dest + xx;
-  unsigned long izz = QInt24 (inv_z);
+  uint32 izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
   UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
-  ULong fog_dens = Scan.FogDensity;
+  uint32 fog_dens = Scan.FogDensity;
 
   do
   {
     int fd;
-    unsigned long izb = *z_buf;
+    uint32 izb = *z_buf;
     if (izz >= 0x1000000)
     {
       // izz exceeds our 1/x table, so compute fd aproximatively and go on.
@@ -801,18 +801,18 @@ fd_done:
 #ifndef NO_555_scan_fog_view
 
 void csScan_16_555_scan_fog_view (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
   UShort* _dest = (UShort*)d;
   UShort* _destend = _dest + xx;
   UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
-  ULong fog_dens = Scan.FogDensity;
+  uint32 fog_dens = Scan.FogDensity;
 
   do
   {
-    unsigned long izb = *z_buf;
+    uint32 izb = *z_buf;
     if (izb < 0x1000000)
     {
       int fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;
@@ -840,18 +840,18 @@ void csScan_16_555_scan_fog_view (int xx, unsigned char* d,
 #ifndef NO_565_scan_fog_view
 
 void csScan_16_565_scan_fog_view (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
   UShort* _dest = (UShort*)d;
   UShort* _destend = _dest + xx;
   UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
-  ULong fog_dens = Scan.FogDensity;
+  uint32 fog_dens = Scan.FogDensity;
 
   do
   {
-    unsigned long izb = *z_buf;
+    uint32 izb = *z_buf;
     if (izb < 0x1000000)
     {
       int fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;

@@ -505,7 +505,7 @@ csGraphics3DCaps *csOpenGLProcSoftware::GetCaps ()
   return g3d->GetCaps (); 
 }
 
-unsigned long *csOpenGLProcSoftware::GetZBuffAt (int x, int y)
+uint32 *csOpenGLProcSoftware::GetZBuffAt (int x, int y)
 { 
   return g3d->GetZBuffAt (x, y); 
 }

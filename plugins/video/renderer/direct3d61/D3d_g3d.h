@@ -274,7 +274,7 @@ public:
   virtual long GetRenderState (G3D_RENDERSTATEOPTION);
   
   /// Get a z-buffer point
-  virtual unsigned long *GetZBuffAt (int, int) { return NULL; }
+  virtual uint32 *GetZBuffAt (int, int) { return NULL; }
   
   /// Get the width
   virtual int GetWidth () { return m_nWidth; }

@@ -92,7 +92,7 @@ struct csRGBpixel
   /// The red, green, blue and alpha components
   unsigned char red, green, blue, alpha;
   /// Constructor (initialize to zero, alpha to 255)
-  csRGBpixel () /* : red(0), green(0), blue(0), alpha(255) {} */
+  csRGBpixel () 
   { *(uint32 *)this = (uint32)~RGB_MASK; }
   /// Copy constructor
   csRGBpixel (const csRGBpixel& p)

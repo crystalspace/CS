@@ -36,7 +36,9 @@
 #  include "cssys/os2/csosdefs.h"
 #elif defined(OS_DOS) && defined(COMP_GCC)
 #  include "cssys/djgpp/csosdefs.h"
-#else
+#elif defined(OS_PS2)
+#  include "cssys/ps2/csosdefs.h"
+# else
 #  error Unable to locate platform-specific "csosdefs.h" file.
 #endif
 

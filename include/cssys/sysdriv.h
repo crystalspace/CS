@@ -35,6 +35,8 @@
 #  include "cssys/os2/csos2.h"
 #elif defined(OS_DOS) && defined(COMP_GCC)
 #  include "cssys/djgpp/djgpp.h"
+#elif defined(OS_PS2)
+#  include "cssys/ps2/ps2.h"
 #else
 #  error Unable to locate platform-specific driver interface.
 #endif

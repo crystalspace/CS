@@ -23,7 +23,7 @@
 #include "sttest.h"
 
 #define SCAN32
-#define COLORMAP	((ULong *)Scan.PaletteTable)
+#define COLORMAP	((uint32 *)Scan.PaletteTable)
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
@@ -43,21 +43,21 @@
 #ifndef NO_scan_fog
 
 void csScan_32_scan_fog (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
-  ULong* _dest = (ULong*)d;
-  ULong* _destend = _dest + xx;
-  unsigned long izz = QInt24 (inv_z);
+  uint32* _dest = (uint32*)d;
+  uint32* _destend = _dest + xx;
+  uint32 izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
-  ULong fog_pix = R8G8B8_PIXEL_POSTPROC(Scan.FogR | Scan.FogG | Scan.FogB);
-  ULong fog_dens = Scan.FogDensity;
+  uint32 fog_pix = R8G8B8_PIXEL_POSTPROC(Scan.FogR | Scan.FogG | Scan.FogB);
+  uint32 fog_dens = Scan.FogDensity;
 
   do
   {
     int fd;
-    unsigned long izb = *z_buf;
+    uint32 izb = *z_buf;
     if (izz >= 0x1000000)
     {
       // izz exceeds our 1/x table, so compute fd aproximatively and go on.
@@ -76,10 +76,10 @@ fd_done:
       if (fd < EXP_256_SIZE)
       {
         fd = Scan.exp_256 [fd];
-        ULong pix = R8G8B8_PIXEL_PREPROC (*_dest);
-        register ULong r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
-        register ULong g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-        register ULong b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
+        uint32 pix = R8G8B8_PIXEL_PREPROC (*_dest);
+        register uint32 r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
+        register uint32 g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
+        register uint32 b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
         *_dest = R8G8B8_PIXEL_POSTPROC ((r & 0x00ff0000) | (g & 0x0000ff00) | (b & 0x000000ff));
       }
       else
@@ -99,28 +99,28 @@ fd_done:
 #ifndef NO_scan_fog_view
 
 void csScan_32_scan_fog_view (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
-  ULong* _dest = (ULong*)d;
-  ULong* _destend = _dest + xx;
-  ULong fog_pix = R8G8B8_PIXEL_POSTPROC(Scan.FogR | Scan.FogG | Scan.FogB);
-  ULong fog_dens = Scan.FogDensity;
+  uint32* _dest = (uint32*)d;
+  uint32* _destend = _dest + xx;
+  uint32 fog_pix = R8G8B8_PIXEL_POSTPROC(Scan.FogR | Scan.FogG | Scan.FogB);
+  uint32 fog_dens = Scan.FogDensity;
 
   do
   {
-    unsigned long izb = *z_buf;
+    uint32 izb = *z_buf;
     if (izb < 0x1000000)
     {
       int fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;
       if (fd < EXP_256_SIZE)
       {
         fd = Scan.exp_256 [fd];
-        ULong pix = R8G8B8_PIXEL_PREPROC (*_dest);
-        register ULong r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
-        register ULong g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
-        register ULong b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
+        uint32 pix = R8G8B8_PIXEL_PREPROC (*_dest);
+        register uint32 r = (fd * ((pix & 0x00ff0000) - Scan.FogR) >> 8) + Scan.FogR;
+        register uint32 g = (fd * ((pix & 0x0000ff00) - Scan.FogG) >> 8) + Scan.FogG;
+        register uint32 b = (fd * ((pix & 0x000000ff) - Scan.FogB) >> 8) + Scan.FogB;
         *_dest = R8G8B8_PIXEL_POSTPROC ((r & 0x00ff0000) | (g & 0x0000ff00) | (b & 0x000000ff));
       }
       else
@@ -143,8 +143,8 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #define SCANLOOP \
     do									\
     {									\
-      ULong a = *_dest;							\
-      ULong b = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
+      uint32 a = *_dest;							\
+      uint32 b = srcTex [((vv >> 16) << shifter) + (uu >> 16)];		\
       *_dest++ = ((a & 0xfefefefe) >> 1) + ((b & 0xfefefefe) >> 1);	\
       uu += duu;							\
       vv += dvv;							\
@@ -167,7 +167,7 @@ void csScan_32_scan_fog_view (int xx, unsigned char* d,
 #define SCANLOOP \
     do									\
     {									\
-      ULong tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      uint32 tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
       int tr = *_dest & 0xff0000;					\
       int tg = *_dest & 0x00ff00;					\
       int tb = *_dest & 0x0000ff;					\

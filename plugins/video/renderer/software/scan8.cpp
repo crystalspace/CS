@@ -55,7 +55,7 @@
     }                                                                   \
     while ((_dest <= _destend)&&!((vv<BAILOUT_CONSTANT||uu<BAILOUT_CONSTANT)||(vv>=Scan.th2fp-BAILOUT_CONSTANT||uu>=Scan.tw2fp-BAILOUT_CONSTANT)))\
     {                                                                   \
-      if (((((long)_dest)) & filter_bf_shifted) != 0)                   \
+      if (((((int32)_dest)) & filter_bf_shifted) != 0)                   \
       {                                                                 \
         if ((uu&0xffff) < 64*256) filter_du = -1;                       \
         else if ((uu&0xffff) > 192*256) filter_du = 1;                  \
@@ -132,21 +132,21 @@
 #ifndef NO_scan_fog
 
 void csScan_8_scan_fog (int xx, unsigned char* d,
-  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32 *z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
   unsigned char *_dest = (unsigned char *)d;
   unsigned char *_destend = _dest + xx;
-  unsigned long izz = QInt24 (inv_z);
-  unsigned long dzz = QInt24 (Scan.M);
-  ULong fog_dens = Scan.FogDensity;
+  uint32 izz = QInt24 (inv_z);
+  uint32 dzz = QInt24 (Scan.M);
+  uint32 fog_dens = Scan.FogDensity;
   unsigned char fog_pix = Scan.FogPix;
 
   do
   {
     int fd;
-    unsigned long izb = *z_buf;
+    uint32 izb = *z_buf;
     if (izz >= 0x1000000)
     {
       // izz exceeds our 1/x table, so compute fd aproximatively and go on.
@@ -181,18 +181,18 @@ fd_done:
 #ifndef NO_scan_fog_view
 
 void csScan_8_scan_fog_view (int xx, unsigned char* d,
-  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32 *z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
   unsigned char *_dest = (unsigned char *)d;
   unsigned char *_destend = _dest + xx;
-  ULong fog_dens = Scan.FogDensity;
+  uint32 fog_dens = Scan.FogDensity;
   unsigned char fog_pix = Scan.FogPix;
 
   do
   {
-    unsigned long izb = *z_buf;
+    uint32 izb = *z_buf;
     if (izb < 0x1000000)
     {
       int fd = fog_dens * Scan.one_div_z [izb >> 12] >> 12;

@@ -17,12 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_GRAPH3D_H__
-#define __IVIDEO_GRAPH3D_H__
+#ifndef __IGRAPH3D_H__
+#define __IGRAPH3D_H__
 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
-#include "isys/plugin.h"
+#include "iplugin.h"
 
 class csMatrix3;
 class csVector3;
@@ -119,10 +119,7 @@ struct G3DPolygonDPFX
   /// Use fog info?
   bool use_fog;
 
-  /**
-   * Invert aspect ratio that was used to perspective project the
-   * vertices (1/fov)
-   */
+  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
   float inv_aspect;
 
   /// The material handle as returned by iTextureManager.
@@ -171,9 +168,6 @@ struct G3DPolygonDP : public G3DPolygonDFP
    * 0 means opaque, 255 is completely transparent.
    */
   int alpha;
-
-  /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
-  UInt mixmode;
 
   /// Z value (in camera space) of vertex[0].
   float z_value;
@@ -677,4 +671,4 @@ struct iGraphics3D : public iPlugIn
 
 };
 
-#endif // __IVIDEO_GRAPH3D_H__
+#endif // __IGRAPH3D_H__

@@ -294,7 +294,7 @@ public:
   { return &Caps; }
 
   /// Get address of Z-buffer at specific point
-  virtual unsigned long *GetZBuffAt (int, int)
+  virtual uint32 *GetZBuffAt (int, int)
   { return NULL; }
 
   /// Dump the texture cache.

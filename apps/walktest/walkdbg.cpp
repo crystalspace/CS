@@ -55,18 +55,18 @@ void DrawZbuffer ()
   {
     int gi_pixelbytes = System->G2D->GetPixelBytes ();
 
-    ULong *zbuf = Gfx3D->GetZBuffAt (0, y);
+    uint32 *zbuf = (uint32*)Gfx3D->GetZBuffAt (0, y);
 
     if (zbuf)
       if (gi_pixelbytes == 4)
       {
-        ULong *dest = (ULong *)Gfx2D->GetPixelAt (0, y);
+        uint32 *dest = (uint32 *)Gfx2D->GetPixelAt (0, y);
         for (int x = 0; x < FRAME_WIDTH; x++)
           *dest++ = *zbuf++ >> 10;
       }
       else if (gi_pixelbytes == 2)
       {
-        UShort *dest = (UShort *)Gfx2D->GetPixelAt(0, y);
+        uint16 *dest = (uint16 *)Gfx2D->GetPixelAt(0, y);
         for (int x = 0; x < FRAME_WIDTH; x++)
           *dest++ = (unsigned short)(*zbuf++ >> 13);
       }

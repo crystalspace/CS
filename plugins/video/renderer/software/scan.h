@@ -96,11 +96,11 @@ struct csScanSetup
   int InterpolMode;
 
   /// Fog color
-  unsigned long FogR;
-  unsigned long FogG;
-  unsigned long FogB;
+  uint32 FogR;
+  uint32 FogG;
+  uint32 FogB;
   /// The fog pixel (R|G|B for true/hicolor) or index into palette of fog color
-  unsigned long FogPix;
+  uint32 FogPix;
   /// Fog density
   unsigned int FogDensity;
   /// The fog table for paletted (currently only 8-bit) modes
@@ -233,17 +233,17 @@ extern csScanSetup Scan;
 
 /// The interface definition for all scan_XXX routines
 typedef void (csDrawScanline)
-  (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
+  (int xx, unsigned char* d, uint32* z_buf, float inv_z,
    float u_div_z, float v_div_z);
 /// The interface definition for all scan_pi_XXX routines
 typedef void (csDrawPIScanline)
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+  (void *dest, int len, uint32 *zbuff, int32 u, int32 du, int32 v, int32 dv,
+   uint32 z, int32 dz, unsigned char *bitmap, int bitmap_log2w);
 /// The interface definition for all scan_pi_XXX_gou_XXX routines
 typedef void (csDrawPIScanlineGouraud)
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   ULong r, ULong g, ULong b, long dr, long dg, long db, bool clamp);
+  (void *dest, int len, uint32 *zbuff, int32 u, int32 du, int32 v, int32 dv,
+   uint32 z, int32 dz, unsigned char *bitmap, int bitmap_log2w,
+   uint32 r, uint32 g, uint32 b, int32 dr, int32 dg, int32 db, bool clamp);
 
 //---//---//---//---//---//---//---//---//---//---//---//---//- Routines //---//
 

@@ -160,7 +160,7 @@
 #if defined (PI_ZUSE) || defined (PI_ZFILL) || defined (PI_ZTEST)
     zbuff++;
     z += dz;
-#endif;
+#endif
 #ifdef PI_GOURAUD
     r += dr; g += dg; b += db;
 #endif

@@ -65,8 +65,8 @@ typedef unsigned char uint8;
 typedef char int8;
 typedef unsigned short uint16;
 typedef short int16;
-typedef unsigned long uint32;
-typedef long int32;
+typedef unsigned int uint32;
+typedef int int32;
 #endif
 
 //------------------------------
@@ -78,7 +78,7 @@ typedef unsigned int uint;
 typedef unsigned long ulong;
 
 // Time in milli (1/1000) seconds
-typedef unsigned long cs_time;
+typedef unsigned int cs_time;
 
 // A pointer to something
 typedef void *csSome;

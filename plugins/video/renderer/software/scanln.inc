@@ -60,7 +60,7 @@
 #  error "WARNING: no pixel size defined before including scanln.inc!"
 #endif
 
-void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
+void SCANFUNC (int xx, unsigned char* d, uint32* z_buf, float inv_z,
   float u_div_z, float v_div_z)
 {
   (void)z_buf;
@@ -68,7 +68,7 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
 
   float u1, v1, z, z1, u, v;
   int uu1, vv1, duu, dvv, uu, vv;
-  unsigned long izz, dzz;
+  uint32 izz, dzz;
 
   z = 1 / inv_z;
   u = u_div_z * z;
@@ -80,16 +80,16 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
   // Some optimizations for processors with many registers (PowerPC, 680x0).
   // Get global variables into registers.
 # ifdef SCANMAP
-  ULong shifter = Scan.shf_u;
+  uint32 shifter = Scan.shf_u;
   PIXTYPE *srcTex = (PIXTYPE *)Scan.bitmap2;
 # else
-  ULong shifter_h = Scan.shf_h;
-  ULong ander_w = Scan.and_w;
-  ULong ander_h = Scan.and_h;
+  uint32 shifter_h = Scan.shf_h;
+  uint32 ander_w = Scan.and_w;
+  uint32 ander_h = Scan.and_h;
   UByte *srcTex = Scan.bitmap;
 # endif // SCANMAP
-  ULong *z_buffer = z_buf; (void)z_buffer;
-  ULong *lastZbuf = z_buffer + xx-1; (void)lastZbuf;
+  uint32 *z_buffer = z_buf; (void)z_buffer;
+  uint32 *lastZbuf = z_buffer + xx-1; (void)lastZbuf;
   PIXTYPE *_destend;
   PIXTYPE *_dest = (PIXTYPE *)d;
 

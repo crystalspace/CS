@@ -68,7 +68,7 @@ protected:
   const char *title;
 
   /// Z buffer.
-  unsigned long* z_buffer;
+  uint32* z_buffer;
   /// Size of Z buffer.
   long z_buf_size;
 
@@ -335,7 +335,7 @@ public:
   { return &Caps; }
 
   /// Get address of Z-buffer at specific point
-  virtual unsigned long *GetZBuffAt (int x, int y)
+  virtual uint32 *GetZBuffAt (int x, int y)
   { return z_buffer + x + y*width; }
 
   /// Dump the texture cache.

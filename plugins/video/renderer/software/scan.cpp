@@ -35,10 +35,10 @@ csScanSetup Scan;
 #ifndef NO_scan_zfil
 
 void csScan_scan_zfil (int xx, unsigned char* d,
-  ULong* z_buf, float inv_z, float u_div_z, float v_div_z)
+  uint32* z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)d;
-  ULong* lastZbuf = z_buf + xx-1;
+  uint32* lastZbuf = z_buf + xx-1;
   int dzz, izz;
   izz = QInt24 (inv_z);
   dzz = QInt24 (Scan.M);
@@ -55,13 +55,13 @@ void csScan_scan_zfil (int xx, unsigned char* d,
 
 //------------------------------------------------------------------
 
-void csScan_scan_pi_zfil (void *dest, int len, unsigned long *zbuff,
-  long u, long du, long v, long dv, unsigned long z, long dz,
+void csScan_scan_pi_zfil (void *dest, int len, uint32 *zbuff,
+  int32 u, int32 du, int32 v, int32 dv, uint32 z, int32 dz,
   unsigned char *bitmap, int bitmap_log2w)
 {
   (void)u; (void)du; (void)v; (void)dv;
   (void)bitmap; (void)bitmap_log2w; (void)dest;
-  ULong *lastZbuf = zbuff + len - 1;
+  uint32 *lastZbuf = zbuff + len - 1;
 
   do
   {

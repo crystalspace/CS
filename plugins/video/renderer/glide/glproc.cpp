@@ -155,7 +155,7 @@ csGraphics3DCaps *csGlideProcedural::GetCaps ()
   return g3d->GetCaps (); 
 }
 
-unsigned long *csGlideProcedural::GetZBuffAt (int x, int y)
+uint32 *csGlideProcedural::GetZBuffAt (int x, int y)
 { 
   return g3d->GetZBuffAt (x, y); 
 }
