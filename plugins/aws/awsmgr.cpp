@@ -51,13 +51,10 @@ const int proctex_width = 512;
 const int proctex_height = 512;
 const int DEBUG_MANAGER = false;
 
-static FILE *aws_log;
-
 // Implementation //////////////////////////////////////////////////////
 awsManager::awsComponentFactoryMap::~awsComponentFactoryMap ()
 {
   factory->DecRef ();
-  fclose(aws_log);
 }
 
 awsManager::awsManager (iBase *p) :
@@ -78,8 +75,6 @@ awsManager::awsManager (iBase *p) :
   SCF_CONSTRUCT_IBASE (p);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   scfiEventHandler = NULL;
-
-  aws_log = fopen("aws.log", "w");
 }
 
 awsManager::~awsManager ()
@@ -491,8 +486,8 @@ awsManager::PerformTransition(awsWindowTransition *t)
     transitions.Delete(t);
     delete t;
 
-    fprintf(aws_log, "returning false from transition.\n");
-    fflush(aws_log);
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
+      "returning false from transition.\n");
 
     return false;
   }
