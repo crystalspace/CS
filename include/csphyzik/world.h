@@ -28,6 +28,8 @@
 #include "csphyzik/odesolve.h"
 #include "csutil/csdllist.h"
 
+class ctCatastropheManager;
+
 enum worldstate { CTWS_NORMAL, CTWS_REWOUND };
 
 enum errorcode { WORLD_NOERR, WORLD_ERR_NULLPARAMETER, WORLD_ERR_NOODE,
@@ -61,6 +63,8 @@ public:
   // pass in the correct time frame.
   errorcode rewind( real t1, real t2 );  
 
+  void register_catastrophe_manager( ctCatastropheManager *pcm );
+  
   void solve( real t );
   errorcode add_entity( ctEntity *pe );
   errorcode add_enviro_force( ctForce *f );
@@ -109,6 +113,9 @@ public:
   bool       sa_make_used(AllocNode *block);
 
 protected:
+  // take a step forward in time
+  errorcode do_time_step( real t1, real t2 );
+
   // take state values( position, velocity, orientation, ... ) from 
   // this world's entities and put them into the array
   void load_state( real *state_array );
@@ -133,7 +140,8 @@ protected:
 
   ctLinkList_ctEntity body_list;
   ctLinkList_ctForce enviro_force_list;
-
+  ctLinkList_ctCatastropheManager catastrophe_list;
+  
   OdeSolver *ode_to_math;  // would an equation by any other name smell as sweet?
 
   // state vectors for ODE interface
