@@ -569,8 +569,6 @@ bool CCSWorld::WritePlugins(csRef<iDocumentNode> node)
   plugin->SetAttribute ("name", "thingFact");
   plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.thing.plane");
   plugin->SetAttribute ("name", "plane");
-  plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.thing.bezier");
-  plugin->SetAttribute ("name", "bezier");
 
   return true;
 }

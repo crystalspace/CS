@@ -129,40 +129,6 @@ bool CMapCurve::Write(csRef<iDocumentNode> node, CCSWorld* pWorld)
 
   if (pTexture->IsVisible())
   {
-    int y, x;
-    for (y=0; y<(pCurve->GetNumRows()-1)/2; y++)
-    {
-      for (x=0; x<(pCurve->GetNumCols()-1)/2; x++)
-      {
-        DocNode addon = CreateNode (node, "addon");
-	CreateNode (addon, "plugin", "bezier");
-	DocNode params = CreateNode (addon, "params");
-	CreateNode (params, "name", 
-	  csString().Format ("bezier_%s_%d_%d", (const char*) m_Name, y, x));
-	CreateNode (params, "material", pTexture->GetTexturename());
-
-        int numcols = pCurve->GetNumCols();
-        int row1 = y*2+2;
-        int row2 = y*2+1;
-        int row3 = y*2+0;
-        int col1 = x*2+0;
-        int col2 = x*2+1;
-        int col3 = x*2+2;
-
-        CreateNode (addon, "v", col1 + row1*numcols);
-        CreateNode (addon, "v", col2 + row1*numcols);
-        CreateNode (addon, "v", col3 + row1*numcols);
-
-        CreateNode (addon, "v", col1 + row2*numcols);
-        CreateNode (addon, "v", col2 + row2*numcols);
-        CreateNode (addon, "v", col3 + row2*numcols);
-
-        CreateNode (addon, "v", col1 + row3*numcols);
-        CreateNode (addon, "v", col2 + row3*numcols);
-        CreateNode (addon, "v", col3 + row3*numcols);
-      }
-    }
-
     DocNode meshfact = CreateNode (node, "meshfact");
     meshfact->SetAttribute ("name", 
       csString().Format ("curve_%s", m_Name));
@@ -199,13 +165,38 @@ bool CMapCurve::Write(csRef<iDocumentNode> node, CCSWorld* pWorld)
     cc->SetAttributeAsFloat ("z", Center.y*pWorld->GetScalefactor());
     CreateNode (params, "curvescale", 80);
 
+    int y, x;
     for (y=0; y<(pCurve->GetNumRows()-1)/2; y++)
     {
       for (x=0; x<(pCurve->GetNumCols()-1)/2; x++)
       {
 	csString tmp;
 	tmp.Format ("bez_%s_%d_%d", m_Name, y, x);
-	CreateNode (params, "curve", tmp)->SetAttribute ("name", tmp);
+
+        DocNode curve = CreateNode (params, "curve");
+	curve->SetAttribute ("name", tmp);
+
+	CreateNode (curve, "material", pTexture->GetTexturename());
+
+        int numcols = pCurve->GetNumCols();
+        int row1 = y*2+2;
+        int row2 = y*2+1;
+        int row3 = y*2+0;
+        int col1 = x*2+0;
+        int col2 = x*2+1;
+        int col3 = x*2+2;
+
+        CreateNode (curve, "v", col1 + row1*numcols);
+        CreateNode (curve, "v", col2 + row1*numcols);
+        CreateNode (curve, "v", col3 + row1*numcols);
+
+        CreateNode (curve, "v", col1 + row2*numcols);
+        CreateNode (curve, "v", col2 + row2*numcols);
+        CreateNode (curve, "v", col3 + row2*numcols);
+
+        CreateNode (curve, "v", col1 + row3*numcols);
+        CreateNode (curve, "v", col2 + row3*numcols);
+        CreateNode (curve, "v", col3 + row3*numcols);
       }
     }
 

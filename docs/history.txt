@@ -44,6 +44,7 @@ The history order is reversed so that new features are at the top.
 			</curve>
 		    </params>
 		</meshfact>
+	- Fixed map2cs to output the new curve format.
 5-Mar-2003
 	- Worked a bit further on blocks: now no longer uses gouraud shaded
 	  polygons.
