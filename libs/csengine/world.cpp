@@ -211,7 +211,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   current_camera = NULL;
   current_world = this;
 
-  CHK (quadcube = new csQuadcube (8));
+  CHK (quadcube = new csQuadcube (5));
   CHK (textures = new csTextureList ());
 
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));

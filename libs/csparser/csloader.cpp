@@ -373,9 +373,15 @@ csPolyPlane* csLoader::load_polyplane (char* buf, char* name)
   }
 
   if (tx1_given)
-    if (tx2_given) ppl->SetTextureSpace (tx1_orig, tx1, tx1_len, tx2, tx2_len);
-    else { CsPrintf (MSG_FATAL_ERROR, "Not supported!\n"); fatal_exit (0, false); }
-  else ppl->SetTextureSpace (tx_matrix, tx_vector);
+    if (tx2_given)
+      ppl->SetTextureSpace (tx1_orig, tx1, tx1_len, tx2, tx2_len);
+    else
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Not supported!\n");
+      fatal_exit (0, true);
+    }
+  else
+    ppl->SetTextureSpace (tx_matrix, tx_vector);
 
   return ppl;
 }
@@ -1510,43 +1516,43 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
-	  gs->Setup (poly3d->GetVertices ().GetNumVertices ());
-          float list[6];
-          int num;
+          int num, nv = poly3d->GetVertices ().GetNumVertices ();
+	  gs->Setup (nv);
+          float list [2 * 100];
           ScanStr (params, "%F", list, &num);
-          gs->SetUV (0, list[0], list[1]);
-          gs->SetUV (1, list[2], list[3]);
-          gs->SetUV (2, list[4], list[5]);
+          if (num > nv) num = nv;
+          for (int i = 0; i < num; i++)
+            gs->SetUV (0, list [i * 2], list [i * 2 + 1]);
         }
         break;
       case TOKEN_COLORS:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
-	  gs->Setup (poly3d->GetVertices ().GetNumVertices ());
-          float list[9];
-          int num;
+          int num, nv = poly3d->GetVertices ().GetNumVertices ();
+	  gs->Setup (nv);
+          float list [3 * 100];
           ScanStr (params, "%F", list, &num);
-          gs->SetColor (0, list[0], list[1], list[2]);
-          gs->SetColor (1, list[3], list[4], list[5]);
-          gs->SetColor (2, list[6], list[7], list[8]);
+          if (num > nv) num = nv;
+          for (int i = 0; i < num; i++)
+            gs->SetColor (i, list [i * 3], list [i * 3 + 1], list [i * 3 + 2]);
         }
         break;
       case TOKEN_UVA:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  csGouraudShaded* gs = poly3d->GetGouraudInfo ();
-	  gs->Setup (poly3d->GetVertices ().GetNumVertices ());
-          float list[9];
-          int num;
+          int num, nv = poly3d->GetVertices ().GetNumVertices ();
+	  gs->Setup (nv);
+          float list [3 * 100];
           ScanStr (params, "%F", list, &num);
-          float a;
-          a = list[0]*2*M_PI/360.;
-          gs->SetUV (0, cos (a)*list[1]+list[2], sin (a)*list[1]+list[2]);
-          a = list[3]*2*M_PI/360.;
-          gs->SetUV (1, cos (a)*list[4]+list[5], sin (a)*list[4]+list[5]);
-          a = list[6]*2*M_PI/360.;
-          gs->SetUV (2, cos (a)*list[7]+list[8], sin (a)*list[7]+list[8]);
+          if (num > nv) num = nv;
+          for (int i = 0; i < num; i++)
+          {
+            float a = list [i * 3] * 2 * M_PI / 360.;
+            gs->SetUV (0, cos (a) * list [i * 3 + 1] + list [i * 3 + 2],
+                          sin (a) * list [i * 3 + 1] + list [i * 3 + 2]);
+          }
         }
         break;
     }

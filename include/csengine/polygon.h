@@ -319,16 +319,16 @@ public:
  * that the camera position is at (0,0,0) and the Z-axis is forward).
  * Polygons cannot be transformed in 2D. That's what csPolygon2D is for.
  * It is possible to convert a csPolygon3D to a csPolygon2D though, at
- * which point processing continues with the csPolygon2D object.<p>
- *
+ * which point processing continues with the csPolygon2D object.
+ *<p>
  * Polygons have a texture and lie on a plane. The plane does not
  * define the orientation of the polygon but is derived from it. The plane
  * does define how the texture is scaled and translated accross the surface
  * of the polygon (in case we are talking about lightmapped polygons, gouraud
  * shaded polygons have u,v coordinates at every vertex).
  * Several planes can be shared for different polygons. As a result of this
- * their textures will be correctly aligned.<p>
- *
+ * their textures will be correctly aligned.
+ *<p>
  * If a polygon is part of a sector it can be a portal to another sector.
  * A portal-polygon is a see-through polygon that defines a view to another
  * sector. Normally the texture for a portal-polygon is not drawn unless
@@ -725,27 +725,19 @@ public:
    */
   void SetAlpha (int da) { if (portal) portal->SetAlpha (da); }
 
-  /*
-   * One of the SetTextureSpace functions should be called after
-   * adding all vertices to the polygon (not before) and before
-   * doing any processing on the polygon (not after)!
-   * It makes sure that the plane normal is correctly computed and
-   * the texture and plane are correctly initialized.<p>
-   *
-   * Internally the transformation from 3D to texture space is
-   * represented by a matrix and a vector. You can supply this
-   * matrix directly or let it be calculated from other parameters.
-   * If you supply another Polygon or a csPolyPlane to this function
-   * it will automatically share the plane.
-   */
-
   /**
    * One of the SetTextureSpace functions should be called after
    * adding all vertices to the polygon (not before) and before
    * doing any processing on the polygon (not after)!
    * It makes sure that the plane normal is correctly computed and
-   * the texture and plane are correctly initialized.<p>
-   *
+   * the texture and plane are correctly initialized.
+   *<p>
+   * Internally the transformation from 3D to texture space is
+   * represented by a matrix and a vector. You can supply this
+   * matrix directly or let it be calculated from other parameters.
+   * If you supply another Polygon or a csPolyPlane to this function
+   * it will automatically share the plane.
+   *<p>
    * This version copies the plane from the other polygon. The plane
    * is shared with that other plane and this allows the engine to
    * do some optimizations. This polygon is not responsible for
@@ -754,12 +746,6 @@ public:
   void SetTextureSpace (csPolygon3D* copy_from);
 
   /**
-   * One of the SetTextureSpace functions should be called after
-   * adding all vertices to the polygon (not before) and before
-   * doing any processing on the polygon (not after)!
-   * It makes sure that the plane normal is correctly computed and
-   * the texture and plane are correctly initialized.<p>
-   *
    * This version takes the given plane. Using this function you
    * can use the same plane for several polygons. This polygon
    * is not responsible for cleaning this plane.
@@ -767,71 +753,45 @@ public:
   void SetTextureSpace (csPolyPlane* plane);
 
   /**
-   * One of the SetTextureSpace functions should be called after
-   * adding all vertices to the polygon (not before) and before
-   * doing any processing on the polygon (not after)!
-   * It makes sure that the plane normal is correctly computed and
-   * the texture and plane are correctly initialized.<p>
-   *
    * Calculate the matrix using two vertices (which are preferably on the
    * plane of the polygon and are possibly (but not necessarily) two vertices
    * of the polygon). The first vertex is seen as the origin and the second
    * as the u-axis of the texture space coordinate system. The v-axis is
    * calculated on the plane of the polygon and orthogonal to the given
    * u-axis. The length of the u-axis and the v-axis is given as the 'len1'
-   * parameter.<p>
-   *
-   * For example, if 'len1' is equal to 2 this means that texture will
-   * be tiled exactly two times between vertex 'v_orig' and 'v1'.
+   * parameter.
+   *<p>
+   * For example, if 'len1' is equal to 2 this means that texture will be
+   * tiled exactly two times between vertex 'v_orig' and 'v1'.
+   *<p>
    * I hope this explanation is clear since I can't seem to make it
    * any clearer :-)
    */
   void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1);
 
   /**
-   * One of the SetTextureSpace functions should be called after
-   * adding all vertices to the polygon (not before) and before
-   * doing any processing on the polygon (not after)!
-   * It makes sure that the plane normal is correctly computed and
-   * the texture and plane are correctly initialized.<p>
-   *
    * Calculate the matrix using two vertices (which are preferably on the
    * plane of the polygon and are possibly (but not necessarily) two vertices
    * of the polygon). The first vertex is seen as the origin and the second
    * as the u-axis of the texture space coordinate system. The v-axis is
    * calculated on the plane of the polygon and orthogonal to the given
    * u-axis. The length of the u-axis and the v-axis is given as the 'len1'
-   * parameter.<p>
-   *
-   * For example, if 'len1' is equal to 2 this means that texture will
-   * be tiled exactly two times between vertex 'v_orig' and 'v1'.
-   * I hope this explanation is clear since I can't seem to make it
-   * any clearer :-)
+   * parameter.
    */
-  void SetTextureSpace (float xo, float yo, float zo,
-			  float x1, float y1, float z1, float len1);
+  void SetTextureSpace (
+    float xo, float yo, float zo,
+    float x1, float y1, float z1, float len1);
 
   /**
-   * One of the SetTextureSpace functions should be called after
-   * adding all vertices to the polygon (not before) and before
-   * doing any processing on the polygon (not after)!
-   * It makes sure that the plane normal is correctly computed and
-   * the texture and plane are correctly initialized.<p>
-   *
-   * Use 'v1' and 'len1' for the u-axis and 'v2' and 'len2' for the
-   * v-axis.
+   * Calculate the matrix using 'v1' and 'len1' for the u-axis and
+   * 'v2' and 'len2' for the v-axis.
    */
-  void SetTextureSpace (float xo, float yo, float zo,
-			  float x1, float y1, float z1, float len1,
-			  float x2, float y2, float z2, float len2);
+  void SetTextureSpace (
+    float xo, float yo, float zo,
+    float x1, float y1, float z1, float len1,
+    float x2, float y2, float z2, float len2);
 
   /**
-   * One of the SetTextureSpace functions should be called after
-   * adding all vertices to the polygon (not before) and before
-   * doing any processing on the polygon (not after)!
-   * It makes sure that the plane normal is correctly computed and
-   * the texture and plane are correctly initialized.<p>
-   *
    * The most general function. With these you provide the matrix
    * directly.
    */

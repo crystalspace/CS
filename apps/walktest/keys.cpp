@@ -1586,11 +1586,11 @@ void WalkTest::SetSystemDefaults (csIniFile *Config)
   do_fps = Config->GetYesNo ("WalkTest", "FPS", true);
   do_stats = Config->GetYesNo ("WalkTest", "STATS", false);
   do_cd = Config->GetYesNo ("WalkTest", "COLLDET", true);
-  sprintf (world_dir, "/lev/%s", Config->GetStr ("World", "WORLDFILE", "world"));
 
   const char *val;
-  if ((val = GetNameCL ()))
-    sprintf (world_dir, "/lev/%s", val);
+  if (!(val = GetNameCL ()))
+    val = Config->GetStr ("World", "WORLDFILE", "world");
+  sprintf (world_dir, "/lev/%s", val);
 
   if (GetOptionCL ("clear"))
   {

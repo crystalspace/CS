@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define SYSDEF_PATH
 #define SYSDEF_ACCESS
 #include "sysdef.h"
 #include "walktest/walktest.h"
@@ -1386,6 +1387,27 @@ bool WalkTest::Initialize (int argc, char *argv[], const char *iConfigName)
   {
     // Load from a world file.
     Printf (MSG_INITIALIZATION, "Loading world '%s'...\n", world_dir);
+
+    // Check the world and mount it if required
+    char tmp [100];
+    sprintf (tmp, "%s/", world_dir);
+    if (!VFS->Exists (world_dir))
+    {
+      char *name = strrchr (world_dir, '/');
+      if (name)
+      {
+        name++;
+        sprintf (tmp, "data%c%s.zip", PATH_SEPARATOR, name);
+        if (access (tmp, F_OK) != 0)
+        {
+          sprintf (tmp, "%s.zip", name);
+          if (access (tmp, F_OK) != 0)
+            sprintf (tmp, "..%cdata%c%s.zip", PATH_SEPARATOR, PATH_SEPARATOR, name);
+        }
+        VFS->Mount (world_dir, tmp);
+      }
+    }
+
     if (!VFS->ChDir (world_dir))
     {
       Printf (MSG_FATAL_ERROR, "The directory on VFS for world file does not exist!\n");

@@ -1357,8 +1357,6 @@ iFile *csVFS::Open (const char *FileName, int Mode)
     return NULL;
 
   iFile *f = node->Open (Mode, suffix);
-  if (f)
-    f->IncRef ();
 
   ArchiveCache.CheckUp ();
   return f;
