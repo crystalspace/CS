@@ -1211,9 +1211,9 @@ class csPoly2D(csPoly2DUnbounded):
     def ClipAgainst(*args): return _cspace.csPoly2D_ClipAgainst(*args)
     def __getitem__(*args): return _cspace.csPoly2D___getitem__(*args)
     def __setitem__ (self, i, v):
-    	own_v = self.__getitem__(i)
-    	for i in range(2):
-    		own_v[i] = v[i]
+      own_v = self.__getitem__(i)
+      for i in range(2):
+        own_v[i] = v[i]
 
     def __del__(self, destroy=_cspace.delete_csPoly2D):
         try:
@@ -1575,9 +1575,9 @@ class csPoly3D(_object):
     def GetCenter(*args): return _cspace.csPoly3D_GetCenter(*args)
     def __getitem__(*args): return _cspace.csPoly3D___getitem__(*args)
     def __setitem__ (self, i, v):
-    	own_v = self.__getitem__(i)
-    	for i in range(3):
-    		own_v[i] = v[i]
+      own_v = self.__getitem__(i)
+      for i in range(3):
+        own_v[i] = v[i]
 
 
 class csPoly3DPtr(csPoly3D):
@@ -5113,31 +5113,26 @@ class iGeneralFactoryState(iGeneralMeshCommonState):
     def SetVertexCount(*args): return _cspace.iGeneralFactoryState_SetVertexCount(*args)
     def GetVertexCount(*args): return _cspace.iGeneralFactoryState_GetVertexCount(*args)
     def GetVertices(self):
-        return CSMutableArrayHelper(self.GetVertexByIndex,
-                                    self.GetVertexCount)
+      return CSMutableArrayHelper(self.GetVertexByIndex, self.GetVertexCount)
 
 
     def GetTexels(self):
-        return CSMutableArrayHelper(self.GetTexelByIndex,
-                                    self.GetVertexCount)
+      return CSMutableArrayHelper(self.GetTexelByIndex, self.GetVertexCount)
 
 
     def GetNormals(self):
-        # iGeneralFactoryState::GetVertices()
-        return CSMutableArrayHelper(self.GetNormalByIndex,
-                                    self.GetVertexCount)
+      # iGeneralFactoryState::GetVertices()
+      return CSMutableArrayHelper(self.GetNormalByIndex, self.GetVertexCount)
 
 
     def SetTriangleCount(*args): return _cspace.iGeneralFactoryState_SetTriangleCount(*args)
     def GetTriangleCount(*args): return _cspace.iGeneralFactoryState_GetTriangleCount(*args)
     def GetTriangles(self):
-        return CSMutableArrayHelper(self.GetTriangleByIndex,
-                                    self.GetTriangleCount)
+      return CSMutableArrayHelper(self.GetTriangleByIndex, self.GetTriangleCount)
 
 
     def GetColors(self):
-        return CSMutableArrayHelper(self.GetNormalByIndex,
-                                    self.GetVertexCount)
+      return CSMutableArrayHelper(self.GetNormalByIndex, self.GetVertexCount)
 
 
     def Invalidate(*args): return _cspace.iGeneralFactoryState_Invalidate(*args)
@@ -5882,8 +5877,6 @@ class iMeshObject(iBase):
     def GetFactory(*args): return _cspace.iMeshObject_GetFactory(*args)
     def GetFlags(*args): return _cspace.iMeshObject_GetFlags(*args)
     def Clone(*args): return _cspace.iMeshObject_Clone(*args)
-    def DrawTest(*args): return _cspace.iMeshObject_DrawTest(*args)
-    def Draw(*args): return _cspace.iMeshObject_Draw(*args)
     def GetRenderMeshes(*args): return _cspace.iMeshObject_GetRenderMeshes(*args)
     def SetVisibleCallback(*args): return _cspace.iMeshObject_SetVisibleCallback(*args)
     def GetVisibleCallback(*args): return _cspace.iMeshObject_GetVisibleCallback(*args)
@@ -8324,7 +8317,7 @@ class iGraphics2D(iBase):
     if _newclass:scfGetVersion = staticmethod(_cspace.iGraphics2D_scfGetVersion)
     def _PerformExtension(*args): return _cspace.iGraphics2D__PerformExtension(*args)
     def PerformExtension (self, command, *args):
-              self._PerformExtension(self.__class__.__name__, command, args);
+      self._PerformExtension(self.__class__.__name__, command, args);
 
 
 class iGraphics2DPtr(iGraphics2D):
@@ -8554,350 +8547,6 @@ class csGraphics3DCapsPtr(csGraphics3DCaps):
         _swig_setattr(self, csGraphics3DCaps,self.__class__,csGraphics3DCaps)
 _cspace.csGraphics3DCaps_swigregister(csGraphics3DCapsPtr)
 
-CS_FOG_FRONT = _cspace.CS_FOG_FRONT
-CS_FOG_BACK = _cspace.CS_FOG_BACK
-CS_FOG_VIEW = _cspace.CS_FOG_VIEW
-CS_FOGTABLE_SIZE = _cspace.CS_FOGTABLE_SIZE
-CS_FOGTABLE_MEDIANDISTANCE = _cspace.CS_FOGTABLE_MEDIANDISTANCE
-CS_FOGTABLE_MAXDISTANCE = _cspace.CS_FOGTABLE_MAXDISTANCE
-CS_FOGTABLE_DISTANCESCALE = _cspace.CS_FOGTABLE_DISTANCESCALE
-CS_FOGTABLE_CLAMPVALUE = _cspace.CS_FOGTABLE_CLAMPVALUE
-CS_FOG_MAXVALUE = _cspace.CS_FOG_MAXVALUE
-class G3DFogInfo(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, G3DFogInfo, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, G3DFogInfo, name)
-    def __repr__(self):
-        return "<C G3DFogInfo instance at %s>" % (self.this,)
-    __swig_setmethods__["r"] = _cspace.G3DFogInfo_r_set
-    __swig_getmethods__["r"] = _cspace.G3DFogInfo_r_get
-    if _newclass:r = property(_cspace.G3DFogInfo_r_get, _cspace.G3DFogInfo_r_set)
-    __swig_setmethods__["g"] = _cspace.G3DFogInfo_g_set
-    __swig_getmethods__["g"] = _cspace.G3DFogInfo_g_get
-    if _newclass:g = property(_cspace.G3DFogInfo_g_get, _cspace.G3DFogInfo_g_set)
-    __swig_setmethods__["b"] = _cspace.G3DFogInfo_b_set
-    __swig_getmethods__["b"] = _cspace.G3DFogInfo_b_get
-    if _newclass:b = property(_cspace.G3DFogInfo_b_get, _cspace.G3DFogInfo_b_set)
-    __swig_setmethods__["intensity"] = _cspace.G3DFogInfo_intensity_set
-    __swig_getmethods__["intensity"] = _cspace.G3DFogInfo_intensity_get
-    if _newclass:intensity = property(_cspace.G3DFogInfo_intensity_get, _cspace.G3DFogInfo_intensity_set)
-    __swig_setmethods__["intensity2"] = _cspace.G3DFogInfo_intensity2_set
-    __swig_getmethods__["intensity2"] = _cspace.G3DFogInfo_intensity2_get
-    if _newclass:intensity2 = property(_cspace.G3DFogInfo_intensity2_get, _cspace.G3DFogInfo_intensity2_set)
-    def __init__(self, *args):
-        _swig_setattr(self, G3DFogInfo, 'this', _cspace.new_G3DFogInfo(*args))
-        _swig_setattr(self, G3DFogInfo, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_G3DFogInfo):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class G3DFogInfoPtr(G3DFogInfo):
-    def __init__(self, this):
-        _swig_setattr(self, G3DFogInfo, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, G3DFogInfo, 'thisown', 0)
-        _swig_setattr(self, G3DFogInfo,self.__class__,G3DFogInfo)
-_cspace.G3DFogInfo_swigregister(G3DFogInfoPtr)
-
-class G3DCam2TextureTransform(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, G3DCam2TextureTransform, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, G3DCam2TextureTransform, name)
-    def __repr__(self):
-        return "<C G3DCam2TextureTransform instance at %s>" % (self.this,)
-    __swig_setmethods__["m_cam2tex"] = _cspace.G3DCam2TextureTransform_m_cam2tex_set
-    __swig_getmethods__["m_cam2tex"] = _cspace.G3DCam2TextureTransform_m_cam2tex_get
-    if _newclass:m_cam2tex = property(_cspace.G3DCam2TextureTransform_m_cam2tex_get, _cspace.G3DCam2TextureTransform_m_cam2tex_set)
-    __swig_setmethods__["v_cam2tex"] = _cspace.G3DCam2TextureTransform_v_cam2tex_set
-    __swig_getmethods__["v_cam2tex"] = _cspace.G3DCam2TextureTransform_v_cam2tex_get
-    if _newclass:v_cam2tex = property(_cspace.G3DCam2TextureTransform_v_cam2tex_get, _cspace.G3DCam2TextureTransform_v_cam2tex_set)
-    def __init__(self, *args):
-        _swig_setattr(self, G3DCam2TextureTransform, 'this', _cspace.new_G3DCam2TextureTransform(*args))
-        _swig_setattr(self, G3DCam2TextureTransform, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_G3DCam2TextureTransform):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class G3DCam2TextureTransformPtr(G3DCam2TextureTransform):
-    def __init__(self, this):
-        _swig_setattr(self, G3DCam2TextureTransform, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, G3DCam2TextureTransform, 'thisown', 0)
-        _swig_setattr(self, G3DCam2TextureTransform,self.__class__,G3DCam2TextureTransform)
-_cspace.G3DCam2TextureTransform_swigregister(G3DCam2TextureTransformPtr)
-
-class G3DPolygonDPFX(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, G3DPolygonDPFX, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, G3DPolygonDPFX, name)
-    def __repr__(self):
-        return "<C G3DPolygonDPFX instance at %s>" % (self.this,)
-    __swig_setmethods__["num"] = _cspace.G3DPolygonDPFX_num_set
-    __swig_getmethods__["num"] = _cspace.G3DPolygonDPFX_num_get
-    if _newclass:num = property(_cspace.G3DPolygonDPFX_num_get, _cspace.G3DPolygonDPFX_num_set)
-    __swig_setmethods__["vertices"] = _cspace.G3DPolygonDPFX_vertices_set
-    __swig_getmethods__["vertices"] = _cspace.G3DPolygonDPFX_vertices_get
-    if _newclass:vertices = property(_cspace.G3DPolygonDPFX_vertices_get, _cspace.G3DPolygonDPFX_vertices_set)
-    __swig_setmethods__["z"] = _cspace.G3DPolygonDPFX_z_set
-    __swig_getmethods__["z"] = _cspace.G3DPolygonDPFX_z_get
-    if _newclass:z = property(_cspace.G3DPolygonDPFX_z_get, _cspace.G3DPolygonDPFX_z_set)
-    __swig_setmethods__["texels"] = _cspace.G3DPolygonDPFX_texels_set
-    __swig_getmethods__["texels"] = _cspace.G3DPolygonDPFX_texels_get
-    if _newclass:texels = property(_cspace.G3DPolygonDPFX_texels_get, _cspace.G3DPolygonDPFX_texels_set)
-    __swig_setmethods__["colors"] = _cspace.G3DPolygonDPFX_colors_set
-    __swig_getmethods__["colors"] = _cspace.G3DPolygonDPFX_colors_get
-    if _newclass:colors = property(_cspace.G3DPolygonDPFX_colors_get, _cspace.G3DPolygonDPFX_colors_set)
-    __swig_setmethods__["fog_info"] = _cspace.G3DPolygonDPFX_fog_info_set
-    __swig_getmethods__["fog_info"] = _cspace.G3DPolygonDPFX_fog_info_get
-    if _newclass:fog_info = property(_cspace.G3DPolygonDPFX_fog_info_get, _cspace.G3DPolygonDPFX_fog_info_set)
-    __swig_setmethods__["use_fog"] = _cspace.G3DPolygonDPFX_use_fog_set
-    __swig_getmethods__["use_fog"] = _cspace.G3DPolygonDPFX_use_fog_get
-    if _newclass:use_fog = property(_cspace.G3DPolygonDPFX_use_fog_get, _cspace.G3DPolygonDPFX_use_fog_set)
-    __swig_setmethods__["tex_handle"] = _cspace.G3DPolygonDPFX_tex_handle_set
-    __swig_getmethods__["tex_handle"] = _cspace.G3DPolygonDPFX_tex_handle_get
-    if _newclass:tex_handle = property(_cspace.G3DPolygonDPFX_tex_handle_get, _cspace.G3DPolygonDPFX_tex_handle_set)
-    __swig_setmethods__["mixmode"] = _cspace.G3DPolygonDPFX_mixmode_set
-    __swig_getmethods__["mixmode"] = _cspace.G3DPolygonDPFX_mixmode_get
-    if _newclass:mixmode = property(_cspace.G3DPolygonDPFX_mixmode_get, _cspace.G3DPolygonDPFX_mixmode_set)
-    __swig_setmethods__["flat_color_r"] = _cspace.G3DPolygonDPFX_flat_color_r_set
-    __swig_getmethods__["flat_color_r"] = _cspace.G3DPolygonDPFX_flat_color_r_get
-    if _newclass:flat_color_r = property(_cspace.G3DPolygonDPFX_flat_color_r_get, _cspace.G3DPolygonDPFX_flat_color_r_set)
-    __swig_setmethods__["flat_color_g"] = _cspace.G3DPolygonDPFX_flat_color_g_set
-    __swig_getmethods__["flat_color_g"] = _cspace.G3DPolygonDPFX_flat_color_g_get
-    if _newclass:flat_color_g = property(_cspace.G3DPolygonDPFX_flat_color_g_get, _cspace.G3DPolygonDPFX_flat_color_g_set)
-    __swig_setmethods__["flat_color_b"] = _cspace.G3DPolygonDPFX_flat_color_b_set
-    __swig_getmethods__["flat_color_b"] = _cspace.G3DPolygonDPFX_flat_color_b_get
-    if _newclass:flat_color_b = property(_cspace.G3DPolygonDPFX_flat_color_b_get, _cspace.G3DPolygonDPFX_flat_color_b_set)
-    def __init__(self, *args):
-        _swig_setattr(self, G3DPolygonDPFX, 'this', _cspace.new_G3DPolygonDPFX(*args))
-        _swig_setattr(self, G3DPolygonDPFX, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_G3DPolygonDPFX):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class G3DPolygonDPFXPtr(G3DPolygonDPFX):
-    def __init__(self, this):
-        _swig_setattr(self, G3DPolygonDPFX, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, G3DPolygonDPFX, 'thisown', 0)
-        _swig_setattr(self, G3DPolygonDPFX,self.__class__,G3DPolygonDPFX)
-_cspace.G3DPolygonDPFX_swigregister(G3DPolygonDPFXPtr)
-
-class G3DPolygonDFP(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, G3DPolygonDFP, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, G3DPolygonDFP, name)
-    def __repr__(self):
-        return "<C G3DPolygonDFP instance at %s>" % (self.this,)
-    __swig_setmethods__["num"] = _cspace.G3DPolygonDFP_num_set
-    __swig_getmethods__["num"] = _cspace.G3DPolygonDFP_num_get
-    if _newclass:num = property(_cspace.G3DPolygonDFP_num_get, _cspace.G3DPolygonDFP_num_set)
-    __swig_setmethods__["vertices"] = _cspace.G3DPolygonDFP_vertices_set
-    __swig_getmethods__["vertices"] = _cspace.G3DPolygonDFP_vertices_get
-    if _newclass:vertices = property(_cspace.G3DPolygonDFP_vertices_get, _cspace.G3DPolygonDFP_vertices_set)
-    __swig_setmethods__["normal"] = _cspace.G3DPolygonDFP_normal_set
-    __swig_getmethods__["normal"] = _cspace.G3DPolygonDFP_normal_get
-    if _newclass:normal = property(_cspace.G3DPolygonDFP_normal_get, _cspace.G3DPolygonDFP_normal_set)
-    def __init__(self, *args):
-        _swig_setattr(self, G3DPolygonDFP, 'this', _cspace.new_G3DPolygonDFP(*args))
-        _swig_setattr(self, G3DPolygonDFP, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_G3DPolygonDFP):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class G3DPolygonDFPPtr(G3DPolygonDFP):
-    def __init__(self, this):
-        _swig_setattr(self, G3DPolygonDFP, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, G3DPolygonDFP, 'thisown', 0)
-        _swig_setattr(self, G3DPolygonDFP,self.__class__,G3DPolygonDFP)
-_cspace.G3DPolygonDFP_swigregister(G3DPolygonDFPPtr)
-
-class G3DPolygonDP(G3DPolygonDFP):
-    __swig_setmethods__ = {}
-    for _s in [G3DPolygonDFP]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, G3DPolygonDP, name, value)
-    __swig_getmethods__ = {}
-    for _s in [G3DPolygonDFP]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, G3DPolygonDP, name)
-    def __repr__(self):
-        return "<C G3DPolygonDP instance at %s>" % (self.this,)
-    __swig_setmethods__["fog_info"] = _cspace.G3DPolygonDP_fog_info_set
-    __swig_getmethods__["fog_info"] = _cspace.G3DPolygonDP_fog_info_get
-    if _newclass:fog_info = property(_cspace.G3DPolygonDP_fog_info_get, _cspace.G3DPolygonDP_fog_info_set)
-    __swig_setmethods__["use_fog"] = _cspace.G3DPolygonDP_use_fog_set
-    __swig_getmethods__["use_fog"] = _cspace.G3DPolygonDP_use_fog_get
-    if _newclass:use_fog = property(_cspace.G3DPolygonDP_use_fog_get, _cspace.G3DPolygonDP_use_fog_set)
-    __swig_setmethods__["mat_handle"] = _cspace.G3DPolygonDP_mat_handle_set
-    __swig_getmethods__["mat_handle"] = _cspace.G3DPolygonDP_mat_handle_get
-    if _newclass:mat_handle = property(_cspace.G3DPolygonDP_mat_handle_get, _cspace.G3DPolygonDP_mat_handle_set)
-    __swig_setmethods__["cam2tex"] = _cspace.G3DPolygonDP_cam2tex_set
-    __swig_getmethods__["cam2tex"] = _cspace.G3DPolygonDP_cam2tex_get
-    if _newclass:cam2tex = property(_cspace.G3DPolygonDP_cam2tex_get, _cspace.G3DPolygonDP_cam2tex_set)
-    __swig_setmethods__["texmap"] = _cspace.G3DPolygonDP_texmap_set
-    __swig_getmethods__["texmap"] = _cspace.G3DPolygonDP_texmap_get
-    if _newclass:texmap = property(_cspace.G3DPolygonDP_texmap_get, _cspace.G3DPolygonDP_texmap_set)
-    __swig_setmethods__["rlm"] = _cspace.G3DPolygonDP_rlm_set
-    __swig_getmethods__["rlm"] = _cspace.G3DPolygonDP_rlm_get
-    if _newclass:rlm = property(_cspace.G3DPolygonDP_rlm_get, _cspace.G3DPolygonDP_rlm_set)
-    __swig_setmethods__["do_fullbright"] = _cspace.G3DPolygonDP_do_fullbright_set
-    __swig_getmethods__["do_fullbright"] = _cspace.G3DPolygonDP_do_fullbright_get
-    if _newclass:do_fullbright = property(_cspace.G3DPolygonDP_do_fullbright_get, _cspace.G3DPolygonDP_do_fullbright_set)
-    __swig_setmethods__["mixmode"] = _cspace.G3DPolygonDP_mixmode_set
-    __swig_getmethods__["mixmode"] = _cspace.G3DPolygonDP_mixmode_get
-    if _newclass:mixmode = property(_cspace.G3DPolygonDP_mixmode_get, _cspace.G3DPolygonDP_mixmode_set)
-    __swig_setmethods__["z_value"] = _cspace.G3DPolygonDP_z_value_set
-    __swig_getmethods__["z_value"] = _cspace.G3DPolygonDP_z_value_get
-    if _newclass:z_value = property(_cspace.G3DPolygonDP_z_value_get, _cspace.G3DPolygonDP_z_value_set)
-    __swig_setmethods__["txt_handle"] = _cspace.G3DPolygonDP_txt_handle_set
-    __swig_getmethods__["txt_handle"] = _cspace.G3DPolygonDP_txt_handle_get
-    if _newclass:txt_handle = property(_cspace.G3DPolygonDP_txt_handle_get, _cspace.G3DPolygonDP_txt_handle_set)
-    def __init__(self, *args):
-        _swig_setattr(self, G3DPolygonDP, 'this', _cspace.new_G3DPolygonDP(*args))
-        _swig_setattr(self, G3DPolygonDP, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_G3DPolygonDP):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class G3DPolygonDPPtr(G3DPolygonDP):
-    def __init__(self, this):
-        _swig_setattr(self, G3DPolygonDP, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, G3DPolygonDP, 'thisown', 0)
-        _swig_setattr(self, G3DPolygonDP,self.__class__,G3DPolygonDP)
-_cspace.G3DPolygonDP_swigregister(G3DPolygonDPPtr)
-
-class G3DTriangleMesh(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, G3DTriangleMesh, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, G3DTriangleMesh, name)
-    def __repr__(self):
-        return "<C G3DTriangleMesh instance at %s>" % (self.this,)
-    MAX_VERTEXPOOL = _cspace.G3DTriangleMesh_MAX_VERTEXPOOL
-    __swig_setmethods__["num_vertices_pool"] = _cspace.G3DTriangleMesh_num_vertices_pool_set
-    __swig_getmethods__["num_vertices_pool"] = _cspace.G3DTriangleMesh_num_vertices_pool_get
-    if _newclass:num_vertices_pool = property(_cspace.G3DTriangleMesh_num_vertices_pool_get, _cspace.G3DTriangleMesh_num_vertices_pool_set)
-    __swig_setmethods__["num_triangles"] = _cspace.G3DTriangleMesh_num_triangles_set
-    __swig_getmethods__["num_triangles"] = _cspace.G3DTriangleMesh_num_triangles_get
-    if _newclass:num_triangles = property(_cspace.G3DTriangleMesh_num_triangles_get, _cspace.G3DTriangleMesh_num_triangles_set)
-    __swig_setmethods__["triangles"] = _cspace.G3DTriangleMesh_triangles_set
-    __swig_getmethods__["triangles"] = _cspace.G3DTriangleMesh_triangles_get
-    if _newclass:triangles = property(_cspace.G3DTriangleMesh_triangles_get, _cspace.G3DTriangleMesh_triangles_set)
-    __swig_setmethods__["clip_portal"] = _cspace.G3DTriangleMesh_clip_portal_set
-    __swig_getmethods__["clip_portal"] = _cspace.G3DTriangleMesh_clip_portal_get
-    if _newclass:clip_portal = property(_cspace.G3DTriangleMesh_clip_portal_get, _cspace.G3DTriangleMesh_clip_portal_set)
-    __swig_setmethods__["clip_plane"] = _cspace.G3DTriangleMesh_clip_plane_set
-    __swig_getmethods__["clip_plane"] = _cspace.G3DTriangleMesh_clip_plane_get
-    if _newclass:clip_plane = property(_cspace.G3DTriangleMesh_clip_plane_get, _cspace.G3DTriangleMesh_clip_plane_set)
-    __swig_setmethods__["clip_z_plane"] = _cspace.G3DTriangleMesh_clip_z_plane_set
-    __swig_getmethods__["clip_z_plane"] = _cspace.G3DTriangleMesh_clip_z_plane_get
-    if _newclass:clip_z_plane = property(_cspace.G3DTriangleMesh_clip_z_plane_get, _cspace.G3DTriangleMesh_clip_z_plane_set)
-    __swig_setmethods__["use_vertex_color"] = _cspace.G3DTriangleMesh_use_vertex_color_set
-    __swig_getmethods__["use_vertex_color"] = _cspace.G3DTriangleMesh_use_vertex_color_get
-    if _newclass:use_vertex_color = property(_cspace.G3DTriangleMesh_use_vertex_color_get, _cspace.G3DTriangleMesh_use_vertex_color_set)
-    __swig_setmethods__["do_fog"] = _cspace.G3DTriangleMesh_do_fog_set
-    __swig_getmethods__["do_fog"] = _cspace.G3DTriangleMesh_do_fog_get
-    if _newclass:do_fog = property(_cspace.G3DTriangleMesh_do_fog_get, _cspace.G3DTriangleMesh_do_fog_set)
-    __swig_setmethods__["do_mirror"] = _cspace.G3DTriangleMesh_do_mirror_set
-    __swig_getmethods__["do_mirror"] = _cspace.G3DTriangleMesh_do_mirror_get
-    if _newclass:do_mirror = property(_cspace.G3DTriangleMesh_do_mirror_get, _cspace.G3DTriangleMesh_do_mirror_set)
-    __swig_setmethods__["do_morph_texels"] = _cspace.G3DTriangleMesh_do_morph_texels_set
-    __swig_getmethods__["do_morph_texels"] = _cspace.G3DTriangleMesh_do_morph_texels_get
-    if _newclass:do_morph_texels = property(_cspace.G3DTriangleMesh_do_morph_texels_get, _cspace.G3DTriangleMesh_do_morph_texels_set)
-    __swig_setmethods__["do_morph_colors"] = _cspace.G3DTriangleMesh_do_morph_colors_set
-    __swig_getmethods__["do_morph_colors"] = _cspace.G3DTriangleMesh_do_morph_colors_get
-    if _newclass:do_morph_colors = property(_cspace.G3DTriangleMesh_do_morph_colors_get, _cspace.G3DTriangleMesh_do_morph_colors_set)
-    VM_WORLDSPACE = _cspace.G3DTriangleMesh_VM_WORLDSPACE
-    VM_VIEWSPACE = _cspace.G3DTriangleMesh_VM_VIEWSPACE
-    __swig_setmethods__["vertex_mode"] = _cspace.G3DTriangleMesh_vertex_mode_set
-    __swig_getmethods__["vertex_mode"] = _cspace.G3DTriangleMesh_vertex_mode_get
-    if _newclass:vertex_mode = property(_cspace.G3DTriangleMesh_vertex_mode_get, _cspace.G3DTriangleMesh_vertex_mode_set)
-    __swig_setmethods__["mixmode"] = _cspace.G3DTriangleMesh_mixmode_set
-    __swig_getmethods__["mixmode"] = _cspace.G3DTriangleMesh_mixmode_get
-    if _newclass:mixmode = property(_cspace.G3DTriangleMesh_mixmode_get, _cspace.G3DTriangleMesh_mixmode_set)
-    __swig_setmethods__["morph_factor"] = _cspace.G3DTriangleMesh_morph_factor_set
-    __swig_getmethods__["morph_factor"] = _cspace.G3DTriangleMesh_morph_factor_get
-    if _newclass:morph_factor = property(_cspace.G3DTriangleMesh_morph_factor_get, _cspace.G3DTriangleMesh_morph_factor_set)
-    __swig_setmethods__["buffers"] = _cspace.G3DTriangleMesh_buffers_set
-    __swig_getmethods__["buffers"] = _cspace.G3DTriangleMesh_buffers_get
-    if _newclass:buffers = property(_cspace.G3DTriangleMesh_buffers_get, _cspace.G3DTriangleMesh_buffers_set)
-    __swig_setmethods__["mat_handle"] = _cspace.G3DTriangleMesh_mat_handle_set
-    __swig_getmethods__["mat_handle"] = _cspace.G3DTriangleMesh_mat_handle_get
-    if _newclass:mat_handle = property(_cspace.G3DTriangleMesh_mat_handle_get, _cspace.G3DTriangleMesh_mat_handle_set)
-    __swig_setmethods__["vertex_fog"] = _cspace.G3DTriangleMesh_vertex_fog_set
-    __swig_getmethods__["vertex_fog"] = _cspace.G3DTriangleMesh_vertex_fog_get
-    if _newclass:vertex_fog = property(_cspace.G3DTriangleMesh_vertex_fog_get, _cspace.G3DTriangleMesh_vertex_fog_set)
-    def __init__(self, *args):
-        _swig_setattr(self, G3DTriangleMesh, 'this', _cspace.new_G3DTriangleMesh(*args))
-        _swig_setattr(self, G3DTriangleMesh, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_G3DTriangleMesh):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class G3DTriangleMeshPtr(G3DTriangleMesh):
-    def __init__(self, this):
-        _swig_setattr(self, G3DTriangleMesh, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, G3DTriangleMesh, 'thisown', 0)
-        _swig_setattr(self, G3DTriangleMesh,self.__class__,G3DTriangleMesh)
-_cspace.G3DTriangleMesh_swigregister(G3DTriangleMeshPtr)
-
-class G3DPolygonMesh(_object):
-    __swig_setmethods__ = {}
-    __setattr__ = lambda self, name, value: _swig_setattr(self, G3DPolygonMesh, name, value)
-    __swig_getmethods__ = {}
-    __getattr__ = lambda self, name: _swig_getattr(self, G3DPolygonMesh, name)
-    def __repr__(self):
-        return "<C G3DPolygonMesh instance at %s>" % (self.this,)
-    __swig_setmethods__["polybuf"] = _cspace.G3DPolygonMesh_polybuf_set
-    __swig_getmethods__["polybuf"] = _cspace.G3DPolygonMesh_polybuf_get
-    if _newclass:polybuf = property(_cspace.G3DPolygonMesh_polybuf_get, _cspace.G3DPolygonMesh_polybuf_set)
-    __swig_setmethods__["do_fog"] = _cspace.G3DPolygonMesh_do_fog_set
-    __swig_getmethods__["do_fog"] = _cspace.G3DPolygonMesh_do_fog_get
-    if _newclass:do_fog = property(_cspace.G3DPolygonMesh_do_fog_get, _cspace.G3DPolygonMesh_do_fog_set)
-    __swig_setmethods__["mixmode"] = _cspace.G3DPolygonMesh_mixmode_set
-    __swig_getmethods__["mixmode"] = _cspace.G3DPolygonMesh_mixmode_get
-    if _newclass:mixmode = property(_cspace.G3DPolygonMesh_mixmode_get, _cspace.G3DPolygonMesh_mixmode_set)
-    __swig_setmethods__["clip_portal"] = _cspace.G3DPolygonMesh_clip_portal_set
-    __swig_getmethods__["clip_portal"] = _cspace.G3DPolygonMesh_clip_portal_get
-    if _newclass:clip_portal = property(_cspace.G3DPolygonMesh_clip_portal_get, _cspace.G3DPolygonMesh_clip_portal_set)
-    __swig_setmethods__["clip_plane"] = _cspace.G3DPolygonMesh_clip_plane_set
-    __swig_getmethods__["clip_plane"] = _cspace.G3DPolygonMesh_clip_plane_get
-    if _newclass:clip_plane = property(_cspace.G3DPolygonMesh_clip_plane_get, _cspace.G3DPolygonMesh_clip_plane_set)
-    __swig_setmethods__["clip_z_plane"] = _cspace.G3DPolygonMesh_clip_z_plane_set
-    __swig_getmethods__["clip_z_plane"] = _cspace.G3DPolygonMesh_clip_z_plane_get
-    if _newclass:clip_z_plane = property(_cspace.G3DPolygonMesh_clip_z_plane_get, _cspace.G3DPolygonMesh_clip_z_plane_set)
-    __swig_setmethods__["do_mirror"] = _cspace.G3DPolygonMesh_do_mirror_set
-    __swig_getmethods__["do_mirror"] = _cspace.G3DPolygonMesh_do_mirror_get
-    if _newclass:do_mirror = property(_cspace.G3DPolygonMesh_do_mirror_get, _cspace.G3DPolygonMesh_do_mirror_set)
-    VM_WORLDSPACE = _cspace.G3DPolygonMesh_VM_WORLDSPACE
-    VM_VIEWSPACE = _cspace.G3DPolygonMesh_VM_VIEWSPACE
-    __swig_setmethods__["vertex_mode"] = _cspace.G3DPolygonMesh_vertex_mode_set
-    __swig_getmethods__["vertex_mode"] = _cspace.G3DPolygonMesh_vertex_mode_get
-    if _newclass:vertex_mode = property(_cspace.G3DPolygonMesh_vertex_mode_get, _cspace.G3DPolygonMesh_vertex_mode_set)
-    __swig_setmethods__["vertex_fog"] = _cspace.G3DPolygonMesh_vertex_fog_set
-    __swig_getmethods__["vertex_fog"] = _cspace.G3DPolygonMesh_vertex_fog_get
-    if _newclass:vertex_fog = property(_cspace.G3DPolygonMesh_vertex_fog_get, _cspace.G3DPolygonMesh_vertex_fog_set)
-    def __init__(self, *args):
-        _swig_setattr(self, G3DPolygonMesh, 'this', _cspace.new_G3DPolygonMesh(*args))
-        _swig_setattr(self, G3DPolygonMesh, 'thisown', 1)
-    def __del__(self, destroy=_cspace.delete_G3DPolygonMesh):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class G3DPolygonMeshPtr(G3DPolygonMesh):
-    def __init__(self, this):
-        _swig_setattr(self, G3DPolygonMesh, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, G3DPolygonMesh, 'thisown', 0)
-        _swig_setattr(self, G3DPolygonMesh,self.__class__,G3DPolygonMesh)
-_cspace.G3DPolygonMesh_swigregister(G3DPolygonMeshPtr)
-
 CS_MESHTYPE_TRIANGLES = _cspace.CS_MESHTYPE_TRIANGLES
 CS_MESHTYPE_QUADS = _cspace.CS_MESHTYPE_QUADS
 CS_MESHTYPE_TRIANGLESTRIP = _cspace.CS_MESHTYPE_TRIANGLESTRIP
@@ -9025,23 +8674,11 @@ class iGraphics3D(iBase):
     def EnableZOffset(*args): return _cspace.iGraphics3D_EnableZOffset(*args)
     def DisableZOffset(*args): return _cspace.iGraphics3D_DisableZOffset(*args)
     def SetShadowState(*args): return _cspace.iGraphics3D_SetShadowState(*args)
-    def GetZBuffAt(*args): return _cspace.iGraphics3D_GetZBuffAt(*args)
     def GetZBuffValue(*args): return _cspace.iGraphics3D_GetZBuffValue(*args)
-    def DrawPolygon(*args): return _cspace.iGraphics3D_DrawPolygon(*args)
-    def DrawPolygonDebug(*args): return _cspace.iGraphics3D_DrawPolygonDebug(*args)
-    def DrawPolygonFX(*args): return _cspace.iGraphics3D_DrawPolygonFX(*args)
-    def DrawTriangleMesh(*args): return _cspace.iGraphics3D_DrawTriangleMesh(*args)
-    def DrawPolygonMesh(*args): return _cspace.iGraphics3D_DrawPolygonMesh(*args)
-    def OpenFogObject(*args): return _cspace.iGraphics3D_OpenFogObject(*args)
-    def DrawFogPolygon(*args): return _cspace.iGraphics3D_DrawFogPolygon(*args)
-    def CloseFogObject(*args): return _cspace.iGraphics3D_CloseFogObject(*args)
     def OpenPortal(*args): return _cspace.iGraphics3D_OpenPortal(*args)
     def ClosePortal(*args): return _cspace.iGraphics3D_ClosePortal(*args)
     def CreateHalo(*args): return _cspace.iGraphics3D_CreateHalo(*args)
-    def DumpCache(*args): return _cspace.iGraphics3D_DumpCache(*args)
-    def ClearCache(*args): return _cspace.iGraphics3D_ClearCache(*args)
     def RemoveFromCache(*args): return _cspace.iGraphics3D_RemoveFromCache(*args)
-    def GetVertexBufferManager(*args): return _cspace.iGraphics3D_GetVertexBufferManager(*args)
     def IsLightmapOK(*args): return _cspace.iGraphics3D_IsLightmapOK(*args)
     def CreatePolygonRenderer(*args): return _cspace.iGraphics3D_CreatePolygonRenderer(*args)
     def SetWorldToCamera(*args): return _cspace.iGraphics3D_SetWorldToCamera(*args)
@@ -9620,124 +9257,6 @@ class iTextureManagerPtr(iTextureManager):
 _cspace.iTextureManager_swigregister(iTextureManagerPtr)
 
 iTextureManager_scfGetVersion = _cspace.iTextureManager_scfGetVersion
-
-class iVertexBuffer(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iVertexBuffer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iVertexBuffer, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iVertexBuffer instance at %s>" % (self.this,)
-    def GetPriority(*args): return _cspace.iVertexBuffer_GetPriority(*args)
-    def IsLocked(*args): return _cspace.iVertexBuffer_IsLocked(*args)
-    def GetVertices(*args): return _cspace.iVertexBuffer_GetVertices(*args)
-    def GetTexels(*args): return _cspace.iVertexBuffer_GetTexels(*args)
-    def GetColors(*args): return _cspace.iVertexBuffer_GetColors(*args)
-    def GetUserArray(*args): return _cspace.iVertexBuffer_GetUserArray(*args)
-    def GetUserArrayComponentCount(*args): return _cspace.iVertexBuffer_GetUserArrayComponentCount(*args)
-    def GetVertexCount(*args): return _cspace.iVertexBuffer_GetVertexCount(*args)
-    def GetBoundingBox(*args): return _cspace.iVertexBuffer_GetBoundingBox(*args)
-    def __del__(self, destroy=_cspace.delete_iVertexBuffer):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iVertexBufferPtr(iVertexBuffer):
-    def __init__(self, this):
-        _swig_setattr(self, iVertexBuffer, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iVertexBuffer, 'thisown', 0)
-        _swig_setattr(self, iVertexBuffer,self.__class__,iVertexBuffer)
-_cspace.iVertexBuffer_swigregister(iVertexBufferPtr)
-
-class iPolygonBuffer(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iPolygonBuffer, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iPolygonBuffer, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iPolygonBuffer instance at %s>" % (self.this,)
-    def SetVertexArray(*args): return _cspace.iPolygonBuffer_SetVertexArray(*args)
-    def GetVertexCount(*args): return _cspace.iPolygonBuffer_GetVertexCount(*args)
-    def GetVertices(*args): return _cspace.iPolygonBuffer_GetVertices(*args)
-    def AddMaterial(*args): return _cspace.iPolygonBuffer_AddMaterial(*args)
-    def GetMaterialCount(*args): return _cspace.iPolygonBuffer_GetMaterialCount(*args)
-    def GetMaterial(*args): return _cspace.iPolygonBuffer_GetMaterial(*args)
-    def SetMaterial(*args): return _cspace.iPolygonBuffer_SetMaterial(*args)
-    def Clear(*args): return _cspace.iPolygonBuffer_Clear(*args)
-    def Prepare(*args): return _cspace.iPolygonBuffer_Prepare(*args)
-    def MarkLightmapsDirty(*args): return _cspace.iPolygonBuffer_MarkLightmapsDirty(*args)
-    def GetBoundingBox(*args): return _cspace.iPolygonBuffer_GetBoundingBox(*args)
-    def AddPolygon(*args): return _cspace.iPolygonBuffer_AddPolygon(*args)
-    def __del__(self, destroy=_cspace.delete_iPolygonBuffer):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iPolygonBufferPtr(iPolygonBuffer):
-    def __init__(self, this):
-        _swig_setattr(self, iPolygonBuffer, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iPolygonBuffer, 'thisown', 0)
-        _swig_setattr(self, iPolygonBuffer,self.__class__,iPolygonBuffer)
-_cspace.iPolygonBuffer_swigregister(iPolygonBufferPtr)
-
-class iVertexBufferManagerClient(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iVertexBufferManagerClient, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iVertexBufferManagerClient, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iVertexBufferManagerClient instance at %s>" % (self.this,)
-    def ManagerClosing(*args): return _cspace.iVertexBufferManagerClient_ManagerClosing(*args)
-    def __del__(self, destroy=_cspace.delete_iVertexBufferManagerClient):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iVertexBufferManagerClientPtr(iVertexBufferManagerClient):
-    def __init__(self, this):
-        _swig_setattr(self, iVertexBufferManagerClient, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iVertexBufferManagerClient, 'thisown', 0)
-        _swig_setattr(self, iVertexBufferManagerClient,self.__class__,iVertexBufferManagerClient)
-_cspace.iVertexBufferManagerClient_swigregister(iVertexBufferManagerClientPtr)
-
-class iVertexBufferManager(iBase):
-    __swig_setmethods__ = {}
-    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
-    __setattr__ = lambda self, name, value: _swig_setattr(self, iVertexBufferManager, name, value)
-    __swig_getmethods__ = {}
-    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
-    __getattr__ = lambda self, name: _swig_getattr(self, iVertexBufferManager, name)
-    def __init__(self): raise RuntimeError, "No constructor defined"
-    def __repr__(self):
-        return "<C iVertexBufferManager instance at %s>" % (self.this,)
-    def CreateBuffer(*args): return _cspace.iVertexBufferManager_CreateBuffer(*args)
-    def ChangePriority(*args): return _cspace.iVertexBufferManager_ChangePriority(*args)
-    def LockBuffer(*args): return _cspace.iVertexBufferManager_LockBuffer(*args)
-    def LockUserArray(*args): return _cspace.iVertexBufferManager_LockUserArray(*args)
-    def UnlockBuffer(*args): return _cspace.iVertexBufferManager_UnlockBuffer(*args)
-    def CreatePolygonBuffer(*args): return _cspace.iVertexBufferManager_CreatePolygonBuffer(*args)
-    def AddClient(*args): return _cspace.iVertexBufferManager_AddClient(*args)
-    def RemoveClient(*args): return _cspace.iVertexBufferManager_RemoveClient(*args)
-    def __del__(self, destroy=_cspace.delete_iVertexBufferManager):
-        try:
-            if self.thisown: destroy(self)
-        except: pass
-
-class iVertexBufferManagerPtr(iVertexBufferManager):
-    def __init__(self, this):
-        _swig_setattr(self, iVertexBufferManager, 'this', this)
-        if not hasattr(self,"thisown"): _swig_setattr(self, iVertexBufferManager, 'thisown', 0)
-        _swig_setattr(self, iVertexBufferManager,self.__class__,iVertexBufferManager)
-_cspace.iVertexBufferManager_swigregister(iVertexBufferManagerPtr)
 
 CS_DEFMAT_DIFFUSE = _cspace.CS_DEFMAT_DIFFUSE
 CS_DEFMAT_AMBIENT = _cspace.CS_DEFMAT_AMBIENT
@@ -10679,11 +10198,11 @@ class iCollideSystem(iBase):
     if _newclass:scfGetVersion = staticmethod(_cspace.iCollideSystem_scfGetVersion)
     def GetCollisionPairByIndex(*args): return _cspace.iCollideSystem_GetCollisionPairByIndex(*args)
     def GetCollisionPairs (self):
-    	num = self.GetCollisionPairCount()
-    	pairs = []
-    	for i in range(num):
-    		pairs.append(self.GetCollisionPairByIndex(i))
-    	return pairs
+      num = self.GetCollisionPairCount()
+      pairs = []
+      for i in range(num):
+        pairs.append(self.GetCollisionPairByIndex(i))
+      return pairs
 
 
 class iCollideSystemPtr(iCollideSystem):
@@ -11529,9 +11048,9 @@ CSMASK_Command = (1 << csevCommand)
 CSMASK_Broadcast = (1 << csevBroadcast)
 
 CSMASK_Mouse = (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp
-	| CSMASK_MouseClick | CSMASK_MouseDoubleClick)
+  | CSMASK_MouseClick | CSMASK_MouseDoubleClick)
 CSMASK_Joystick = (CSMASK_JoystickMove | CSMASK_JoystickDown
-	| CSMASK_JoystickUp)
+  | CSMASK_JoystickUp)
 CSMASK_Input = (CSMASK_Keyboard | CSMASK_Mouse | CSMASK_Joystick)
 
 
@@ -11577,50 +11096,51 @@ class _csPyEventHandlerPtr(_csPyEventHandler):
 _cspace._csPyEventHandler_swigregister(_csPyEventHandlerPtr)
 
 class csPyEventHandler (_csPyEventHandler):
-	"""Python version of iEventHandler implementation.
-	   This class can be used as base class for event handlers in Python.
-	   Call csPyEventHandler.__init__(self) in __init__ of derived class.
-	"""
-	def __init__ (self):
-		_csPyEventHandler.__init__(self, self)
+  """Python version of iEventHandler implementation.
+     This class can be used as base class for event handlers in Python.
+     Call csPyEventHandler.__init__(self) in __init__ of derived class.
+  """
+  def __init__ (self):
+    _csPyEventHandler.__init__(self, self)
 
 class _EventHandlerFuncWrapper (csPyEventHandler):
-	def __init__ (self, func):
-		csPyEventHandler.__init__(self)
-		self._func = func
-		# Make sure a reference keeps to this wrapper instance.
-		self._func._cs_event_handler_wrapper = self
-	def HandleEvent (self, event):
-		return self._func(event)
+  def __init__ (self, func):
+    csPyEventHandler.__init__(self)
+    self._func = func
+    # Make sure a reference keeps to this wrapper instance.
+    self._func._cs_event_handler_wrapper = self
+  def HandleEvent (self, event):
+    return self._func(event)
 
 def _csInitializer_SetupEventHandler (reg, obj,
-		mask=(CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast)):
-	"""Replacement of C++ versions."""
-	if callable(obj):
-		# obj is a function
-		hdlr = _EventHandlerFuncWrapper(obj)
-		hdlr.thisown = 1
-	else:
-		# assume it is a iEventHandler
-		hdlr = obj
-	return csInitializer._SetupEventHandler(reg, hdlr, mask)
+    mask=(CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast)):
+  """Replacement of C++ versions."""
+  if callable(obj):
+    # obj is a function
+    hdlr = _EventHandlerFuncWrapper(obj)
+    hdlr.thisown = 1
+  else:
+    # assume it is a iEventHandler
+    hdlr = obj
+  return csInitializer._SetupEventHandler(reg, hdlr, mask)
 
-csInitializer.SetupEventHandler = staticmethod(_csInitializer_SetupEventHandler)
+csInitializer.SetupEventHandler = \
+  staticmethod(_csInitializer_SetupEventHandler)
 
 
 def _csInitializer_RequestPlugins (reg, plugins):
-	"""Replacement of C++ version."""
-	def _get_tuple (x):
-		if callable(x):
-			return tuple(x())
-		else:
-			return tuple(x)
-	requests = csPluginRequestArray()
-	for cls, intf, ident, ver in map(
-			lambda x: _get_tuple(x), plugins):
-		requests.Push(csPluginRequest(
-			csString(cls), csString(intf), ident, ver))
-	return csInitializer._RequestPlugins(reg, requests)
+  """Replacement of C++ version."""
+  def _get_tuple (x):
+    if callable(x):
+      return tuple(x())
+    else:
+      return tuple(x)
+  requests = csPluginRequestArray()
+  for cls, intf, ident, ver in map(
+      lambda x: _get_tuple(x), plugins):
+    requests.Push(csPluginRequest(
+      csString(cls), csString(intf), ident, ver))
+  return csInitializer._RequestPlugins(reg, requests)
 
 csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
@@ -11645,136 +11165,112 @@ _CS_GET_NAMED_CHILD_OBJECT = _cspace._CS_GET_NAMED_CHILD_OBJECT
 _CS_GET_FIRST_NAMED_CHILD_OBJECT = _cspace._CS_GET_FIRST_NAMED_CHILD_OBJECT
 csReport = csReporterHelper.Report
 
-
 def _GetIntfId (intf):
-	return cvar.iSCF_SCF.GetInterfaceID(intf.__name__)
+  return cvar.iSCF_SCF.GetInterfaceID(intf.__name__)
 def _GetIntfVersion (intf):
-	return eval('%s_scfGetVersion()' % intf.__name__, locals(), globals())
+  return eval('%s_scfGetVersion()' % intf.__name__, locals(), globals())
 
 def CS_QUERY_REGISTRY (reg, intf):
-	return _CS_QUERY_REGISTRY (reg, intf.__name__, _GetIntfVersion(intf))
+  return _CS_QUERY_REGISTRY (reg, intf.__name__, _GetIntfVersion(intf))
 
 def CS_QUERY_REGISTRY_TAG_INTERFACE (reg, tag, intf):
-	return _CS_QUERY_REGISTRY_TAG_INTERFACE (reg, tag, intf.__name__,
-		_GetIntfVersion(intf))
+  return _CS_QUERY_REGISTRY_TAG_INTERFACE (reg, tag, intf.__name__,
+    _GetIntfVersion(intf))
 
 def SCF_QUERY_INTERFACE (obj, intf):
-	return _SCF_QUERY_INTERFACE (obj, intf.__name__, _GetIntfVersion(intf))
+  return _SCF_QUERY_INTERFACE (obj, intf.__name__, _GetIntfVersion(intf))
 
 def SCF_QUERY_INTERFACE_SAFE (obj, intf):
-	return _SCF_QUERY_INTERFACE_SAFE(obj, intf.__name__,
-		_GetIntfVersion(intf))
+  return _SCF_QUERY_INTERFACE_SAFE(obj, intf.__name__,
+    _GetIntfVersion(intf))
 
 def CS_GET_CHILD_OBJECT (obj, intf):
-	return _CS_GET_CHILD_OBJECT(obj, intf.__name__, _GetIntfVersion(intf))
+  return _CS_GET_CHILD_OBJECT(obj, intf.__name__, _GetIntfVersion(intf))
 
 def CS_GET_NAMED_CHILD_OBJECT (obj, intf, name):
-	return _CS_GET_NAMED_CHILD_OBJECT(obj, intf.__name__,
-		_GetIntfVersion(intf), name)
+  return _CS_GET_NAMED_CHILD_OBJECT(obj, intf.__name__,
+    _GetIntfVersion(intf), name)
 
 def CS_GET_FIRST_NAMED_CHILD_OBJECT (obj, intf, name):
-	return CS_GET_FIRST_NAMED_CHILD_OBJECT (obj, intf.__name__,
-		_GetIntfVersion(intf), name)
+  return CS_GET_FIRST_NAMED_CHILD_OBJECT (obj, intf.__name__,
+    _GetIntfVersion(intf), name)
 
 def CS_QUERY_PLUGIN_CLASS (obj, class_id, intf):
-	return _CS_QUERY_PLUGIN_CLASS(obj, class_id, intf.__name__,
-		_GetIntfVersion(intf))
+  return _CS_QUERY_PLUGIN_CLASS(obj, class_id, intf.__name__,
+    _GetIntfVersion(intf))
 
 def CS_LOAD_PLUGIN (obj, class_id, intf):
-	return _CS_LOAD_PLUGIN(obj, class_id, intf.__name__,
-		_GetIntfVersion(intf))
+  return _CS_LOAD_PLUGIN(obj, class_id, intf.__name__,
+    _GetIntfVersion(intf))
 
 def CS_REQUEST_PLUGIN (name, intf):
-	return (
-		name, intf.__name__, cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
-		eval('%s_scfGetVersion()' % intf.__name__, locals(), globals())
-	)
+  return (name, intf.__name__, cvar.iSCF_SCF.GetInterfaceID(intf.__name__),
+    eval('%s_scfGetVersion()' % intf.__name__, locals(), globals()))
 
 def CS_REQUEST_VFS ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.kernel.vfs", iVFS
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.kernel.vfs", iVFS)
 
 def CS_REQUEST_FONTSERVER ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.font.server.default", iFontServer
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.font.server.default", iFontServer)
 
 def CS_REQUEST_IMAGELOADER ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.graphic.image.io.multiplex", iImageIO
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.graphic.image.io.multiplex",
+    iImageIO)
 
 def CS_REQUEST_NULL3D ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.graphics3d.null", iGraphics3D
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.graphics3d.null", iGraphics3D)
 
 def CS_REQUEST_SOFTWARE3D ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.graphics3d.software", iGraphics3D
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.graphics3d.software", iGraphics3D)
 
 def CS_REQUEST_OPENGL3D ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.graphics3d.opengl", iGraphics3D
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.graphics3d.opengl", iGraphics3D)
 
 def CS_REQUEST_ENGINE ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.engine.3d", iEngine
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.engine.3d", iEngine)
 
 def CS_REQUEST_LEVELLOADER ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.level.loader", iLoader
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.level.loader", iLoader)
 
 def CS_REQUEST_LEVELSAVER ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.level.saver", iSaver
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.level.saver", iSaver)
 
 def CS_REQUEST_REPORTER ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.utilities.reporter", iReporter
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.utilities.reporter", iReporter)
 
 def CS_REQUEST_REPORTERLISTENER ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.utilities.stdrep", iStandardReporterListener
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.utilities.stdrep",
+    iStandardReporterListener)
 
 def CS_REQUEST_CONSOLEOUT ():
-	return CS_REQUEST_PLUGIN(
-		"crystalspace.console.output.simple", iConsoleOutput
-	)
+  return CS_REQUEST_PLUGIN("crystalspace.console.output.simple",
+    iConsoleOutput)
 
 
 class CSMutableArrayHelper:
-    def __init__(self, getFunc, lenFunc):
-        self.getFunc = getFunc
-        self.lenFunc = lenFunc
+  def __init__(self, getFunc, lenFunc):
+    self.getFunc = getFunc
+    self.lenFunc = lenFunc
 
-    def __len__(self):
-        return self.lenFunc()
+  def __len__(self):
+    return self.lenFunc()
 
-    def __getitem__(self, key):
-        if type(key) != type(0):
-	    raise TypeError()
-        arrlen = self.lenFunc()
-        if key < 0 or key >= arrlen:
-            raise IndexError('Length is ' + str(arrlen) + ', you asked for ' 
-                             + str(key))
-        return self.getFunc(key)
+  def __getitem__(self, key):
+    if type(key) != type(0):
+      raise TypeError()
+    arrlen = self.lenFunc()
+    if key < 0 or key >= arrlen:
+      raise IndexError('Length is ' + str(arrlen) + ', you asked for ' +
+        str(key))
+    return self.getFunc(key)
 
-    # We do not implement __setitem__ because the only legal action is to
-    #  overwrite the object at the given location.  (The contents of the
-    #  array are mutable, but the array is a single allocation of a single
-    #  type.)  Callers should be using the contained objects' own
-    #  __setitem__ or mutation methods.
+  # We do not implement __setitem__ because the only legal action is to
+  #  overwrite the object at the given location.  (The contents of the
+  #  array are mutable, but the array is a single allocation of a single
+  #  type.)  Callers should be using the contained objects' own
+  #  __setitem__ or mutation methods.
 
-    # We do not implement __delitem__ because we cannot delete items.
+  # We do not implement __delitem__ because we cannot delete items.
 
 CS_VEC_FORWARD = csVector3(0,0,1)
 CS_VEC_BACKWARD = csVector3(0,0,-1)
