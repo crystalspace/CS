@@ -2729,6 +2729,73 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   }
 }
 
+void csBugPlug::DebugSectorMesh (
+	csVector3* vertices, int vertex_count,
+	csTriangle* triangles, int tri_count,
+	float r, float g, float b, uint mixmode)
+{
+  if (!debug_sector.sector) return;
+
+  iMaterialWrapper* mat = FindColor (r, g, b);
+  // Create the box and add it to the engine.
+  csVector3 pos = vertices[0];
+
+  csRef<iMeshFactoryWrapper> mf (Engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "__BugPlug_mesh__"));
+  csRef<iGeneralFactoryState> gfs (
+  	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
+  	iGeneralFactoryState));
+  CS_ASSERT (gfs != 0);
+  gfs->SetMaterialWrapper (mat);
+  gfs->SetVertexCount (vertex_count);
+  int i;
+  for (i = 0 ; i < vertex_count ; i++)
+  {
+    gfs->GetVertices ()[i] = vertices[i]-pos;
+    switch (i%9)
+    {
+      case 0: gfs->GetTexels ()[i].Set (0, 0); break;
+      case 1: gfs->GetTexels ()[i].Set (1, 0); break;
+      case 2: gfs->GetTexels ()[i].Set (1, 1); break;
+      case 3: gfs->GetTexels ()[i].Set (0, 1); break;
+      case 4: gfs->GetTexels ()[i].Set (.5, .5); break;
+      case 5: gfs->GetTexels ()[i].Set (0, .5); break;
+      case 6: gfs->GetTexels ()[i].Set (1, .5); break;
+      case 7: gfs->GetTexels ()[i].Set (.5, 0); break;
+      case 8: gfs->GetTexels ()[i].Set (.5, 1); break;
+    }
+    gfs->GetColors ()[i].Set (1, 1, 1);
+  }
+  gfs->SetTriangleCount (tri_count);
+  for (i = 0 ; i < tri_count ; i++)
+  {
+    gfs->GetTriangles ()[i] = triangles[i];
+  }
+
+  gfs->CalculateNormals ();
+
+  csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
+  	mf, "__BugPlug_mesh__", debug_sector.sector, pos));
+  csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
+  	iGeneralMeshState));
+  CS_ASSERT (gms != 0);
+  gms->SetLighting (false);
+  gms->SetColor (csColor (0, 0, 0));
+  gms->SetManualColors (true);
+  gms->SetMixMode (mixmode);
+
+  if (mixmode == CS_FX_COPY)
+  {
+    mw->SetZBufMode (CS_ZBUF_USE);
+    mw->SetRenderPriority (Engine->GetObjectRenderPriority ());
+  }
+  else
+  {
+    mw->SetZBufMode (CS_ZBUF_TEST);
+    mw->SetRenderPriority (Engine->GetAlphaRenderPriority ());
+  }
+}
+
 void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans,
 	bool clear)
 {

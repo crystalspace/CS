@@ -440,6 +440,10 @@ public:
   void DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   	const csVector3& s3, float r, float g, float b,
 	uint mixmode = CS_FX_ADD);
+  void DebugSectorMesh (
+	csVector3* vertices, int vertex_count,
+	csTriangle* triangles, int tri_count,
+	float r, float g, float b, uint mixmode = CS_FX_COPY);
   void SwitchDebugSector (const csReversibleTransform& trans,
   	bool clear = true);
   bool CheckDebugSector () const { return debug_sector.show; }
@@ -498,6 +502,14 @@ public:
 	uint mixmode = CS_FX_ADD)
     {
       scfParent->DebugSectorTriangle (s1, s2, s3, r, g, b, mixmode);
+    }
+    virtual void DebugSectorMesh (
+	csVector3* vertices, int vertex_count,
+	csTriangle* triangles, int tri_count,
+	float r, float g, float b, uint mixmode = CS_FX_COPY)
+    {
+      scfParent->DebugSectorMesh (vertices, vertex_count,
+      	triangles, tri_count, r, g, b, mixmode);
     }
     virtual void SwitchDebugSector (const csReversibleTransform& trans,
     	bool clear = true)

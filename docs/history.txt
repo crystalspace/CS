@@ -18,6 +18,11 @@ chronological order.
 	  rewriting code because Cg 1.3 generates vertex programs that ATI 
 	  drivers don't understand.
 	- res updated the sprcal3d plugin for the latest CVS of Cal3d.
+	- Jorrit added a new method to bugplug to add a generic mesh to the
+	  debug sector.
+	- Jorrit added csSolidSpace class in csgeom. This is a class that will
+	  maintain a sparse 3D matrix of solid space. Currently untested
+	  and unused.
 22-Mar-2005
 	- Jorrit removed the slow RAPID and memory consuming collision
 	  detection plugin. OPCODE is now a lot better.
