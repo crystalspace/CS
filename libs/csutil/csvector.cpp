@@ -1,5 +1,5 @@
 /*
-  Crystal Space Windowing System: vector class
+  Crystal Space Vector class
   Copyright (C) 1998 by Jorrit Tyberghein
   Written by Andrew Zabolotny <bit@eltech.ru>
 
@@ -39,11 +39,9 @@ csVector::~csVector ()
 
 void csVector::DeleteAll ()
 {
-  int idx = count - 1;
-  while (idx >= 0)
-    if (FreeItem (root [idx]))
-      idx--;
-    else
+  int idx;
+  for (idx = count - 1; idx >= 0; idx--)
+    if (!FreeItem (root [idx]))
       break;
   SetLength (idx + 1);
   while (idx >= 0)
@@ -56,8 +54,7 @@ void csVector::SetLength (int n)
   if ((n > limit) || ((limit > threshold) && (n < limit - threshold)))
   {
     n = ((n + threshold - 1) / threshold) * threshold;
-    if (n > 0)
-      root = (csSome *)realloc (root, n * sizeof (csSome));
+    root = n ? (csSome *)realloc (root, n * sizeof (csSome)) : NULL;
     limit = n;
   }
 }
@@ -104,15 +101,89 @@ int csVector::Find (csSome which) const
   return -1;
 }
 
-int csVector::FindKey (csConstSome Key) const
+int csVector::FindKey (csConstSome Key, int Mode) const
 {
   for (int i = 0; i < Length (); i++)
-    if (Equal (root [i], Key))
+    if (CompareKey (root [i], Key, Mode) == 0)
       return i;
   return -1;
 }
 
-bool csVector::Equal (csSome Item, csConstSome Key) const
+int csVector::FindSortedKey (csConstSome Key, int Mode) const
 {
-  return (Item == Key);
+  int l = 0, r = Length () - 1;
+  while (l <= r)
+  {
+    int m = (l + r) / 2;
+    int cmp = CompareKey (root [m], Key, Mode);
+
+    if (cmp == 0)
+      return m;
+    else if (cmp < 0)
+      l = m + 1;
+    else
+      r = m - 1;
+  }
+  return -1;
+}
+
+void csVector::QuickSort (int Left, int Right, int Mode)
+{
+recurse:
+  int i = Left, j = Right;
+  int x = (Left + Right) / 2;
+  do
+  {
+    while ((i != x) && (Compare (Get (i), Get (x), Mode) < 0))
+      i++;
+    while ((j != x) && (Compare (Get (j), Get (x), Mode) > 0))
+      j--;
+    if (i < j)
+    {
+      Exchange (i, j);
+      if (x == i)
+        x = j;
+      else if (x == j)
+        x = i;
+    }
+    if (i <= j)
+    {
+      i++;
+      if (j > Left)
+        j--;
+    }
+  } while (i <= j);
+
+  if (j - Left < Right - i)
+  {
+    if (Left < j)
+      QuickSort (Left, j, Mode);
+    if (i < Right)
+    {
+      Left = i;
+      goto recurse;
+    }
+  }
+  else
+  {
+    if (i < Right)
+      QuickSort (i, Right, Mode);
+    if (Left < j)
+    {
+      Right = j;
+      goto recurse;
+    }
+  }
+}
+
+int csVector::Compare (csSome Item1, csSome Item2, int Mode) const
+{
+  (void)Mode;
+  return ((int)Item1 > (int)Item2) ? +1 : ((int)Item1 == (int)Item2) ? 0 : -1;
+}
+
+int csVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
+{
+  (void)Mode;
+  return (Item > Key) ? +1 : (Item == Key) ? 0 : -1;
 }
