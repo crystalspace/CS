@@ -1,5 +1,51 @@
 The history order has been reversed so that new features are at the top.
 
+27-Nov-2000
+	- Fixed a bug in sprites recently introduced by Seth. The problem
+	  was a divide by zero when normalizing the null vector.
+	- Andrew Zabolotny did the following changes:
+	    - Removed all inline assembly code (GAS and MSVC): both were
+	      broken (GAS because of gcc 2.95.2 and MSVC because it was
+	      unmaintained). The only working assembly code now is NASM
+	      code. We should think of a way to make NASM assembly available
+	      to MSVC users.
+	    - Removed outdated drline.h file (which wasn't used anyway).
+	      Line drawing should be very accurate; I doubt this assembly
+	      routine is as accurate as the C version is (and I'm not sure
+	      it is faster).
+	    - Removed outdated m68k assembly code; I doubt it was in a
+	      working state.
+	    - VERY nice hack borrowed from FreeType OS/2-specific source
+	      code: now all OS/2 executables are compiled as console
+	      executable (rather than GUI executables); the canvases that
+	      need GUI (such as csdive or OpenGL) will call
+	      System->SystemExtension ("StartGUI") and the executable will be
+	      re-qualified (at runtime!) as a GUI executable. This is
+	      simply VERY VERY nice for debugging since it allows to use
+	      normal console for debugging now (like in X11). Also it
+	      allows for autodetection of canvas - if the program is
+	      launched in full screen, the MGL driver is used; if it is
+	      launched from a GUI console, the GUI canvas is used. Also
+	      this means that ASCIIART canvas (and any other non-GUI canvas)
+	      can be used without any bother.
+	    - Fixed a bug in freetype font server that caused sometimes
+	      characters to be displayed out of character cell (shifted
+	      vertically too much). It was caused by the incorrect (I
+	      believe) usage of the OS/2 TTF header.
+	    - Rewrote from scratch the ttf2fnt converter. Now it is called
+	      csfgen, it doesn't use the engine and unneeded plugins (it
+	      uses only VFS and freetype plugins), uses normal command
+	      line interface (and getopt()).
+	    - I have changed the format of .csf files (which are binary
+	      bitmap fonts), so that they are easier to parse. Also I have
+	      changed the format of binary fonts so that they are a lot
+	      smaller, esp. for proportional fonts - every character is
+	      stored separately rather than using a fixed NxM grid. This is
+	      also used for C++ format fonts. Also added ability to use a
+	      subset of the entire character set; for example you can create
+	      fonts which contains only characters 32-127, if you need
+	      only basic Latin character set.
+	    - Further progress of Material Manager dialog in MazeD.
 26-Nov-2000
 	- Martin Geisse modified the dungeon plugin:
 		- Now uses the old parser again.
