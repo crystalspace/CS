@@ -479,13 +479,17 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
 
 csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 {
-#ifndef GL_VERSION_1_2
+/*#ifndef GL_VERSION_1_2
   if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)
     return NULL;
-#endif
+#endif*/
 
   // Need to resolve pixel alignment issues
+#ifdef GL_VERSION_1_2
   int screen_width = Width * pfmt.PixelBytes;
+#else
+  int screen_width = Width * (pfmt.PixelBytes == 1? 1 : 4);
+#endif
   screen_shot = new uint8 [screen_width * Height];
   if (!screen_shot) return NULL;
 
@@ -513,7 +517,11 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
 // cast it to a 32 bit integer we have to deal with endianess, so convert
 // to big endian and convert RGBA to ARGB
 // On ABGR machines, we also need to swap B/R bytes
+#ifdef GL_VERSION_1_2
   if (pfmt.PixelBytes == 4)
+#else
+  if (pfmt.PixelBytes > 1)
+#endif
   {
     uint32* s = (uint32*)screen_shot;
     int i;
@@ -530,7 +538,34 @@ csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()
     }
   }
 
+#ifndef GL_VERSION_1_2
+  /* kludge: the data is already captured in the right format
+    (RGBA). However, pfmt may contain the correct 16-bit
+    masks and shift which csScreenShot will use to convert the
+    data and thus totally garble it. 
+   */
+  csPixelFormat oldpfmt;
+  memcpy (&oldpfmt, &pfmt, sizeof(csPixelFormat));
+
+#if (CS_24BIT_PIXEL_LAYOUT == CS_24BIT_PIXEL_ABGR)
+    pfmt.RedMask = 0x000000FF;
+    pfmt.GreenMask = 0x0000FF00;
+    pfmt.BlueMask = 0x00FF0000;
+#else 
+    pfmt.RedMask = 0x00FF0000;
+    pfmt.GreenMask = 0x0000FF00;
+    pfmt.BlueMask = 0x000000FF;
+#endif
+  pfmt.PixelBytes = 4;
+  pfmt.PalEntries = 0;
+  pfmt.complete ();
+#endif
+
   csScreenShot *ss = new csScreenShot (this);
+
+#ifndef GL_VERSION_1_2
+  memcpy (&pfmt, &oldpfmt, sizeof(csPixelFormat));
+#endif
 
   delete [] screen_shot;
   screen_shot = NULL;

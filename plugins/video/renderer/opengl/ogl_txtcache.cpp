@@ -425,7 +425,7 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
     csRect r = rectangleArray[i];
     csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
     glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
-      lmwidth, lmheigth, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
+      lmwidth, lmheigth, GL_RGBA8, GL_UNSIGNED_BYTE, lm_data);
   }
   s->initialized = true;
 }
