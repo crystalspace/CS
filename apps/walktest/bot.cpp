@@ -23,7 +23,7 @@
 #include "iengine/light.h"
 #include "iengine/sector.h"
 
-Bot::Bot (csEngine* Engine, iMeshObject* botmesh) :
+Bot::Bot (iEngine* Engine, iMeshObject* botmesh) :
   csMeshWrapper (NULL, botmesh)
 {
   engine = Engine;

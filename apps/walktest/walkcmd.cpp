@@ -331,7 +331,7 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   wrap->QueryObject ()->SetName (templatename);
 }
 
-iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,
+iMeshWrapper* add_meshobj (const char* tname, char* sname, iSector* where,
 	csVector3 const& pos, float size)
 {
   iMeshFactoryWrapper* tmpl = Sys->Engine->GetMeshFactories ()
@@ -342,15 +342,14 @@ iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,
     	"Unknown mesh factory '%s'!", tname);
     return NULL;
   }
-  iSector* isector = SCF_QUERY_INTERFACE (where, iSector);
   iMeshWrapper* spr = Sys->Engine->CreateMeshWrapper (tmpl, sname,
-  	isector, pos);
-  isector->DecRef ();
+						      where, pos);
   csMatrix3 m; m.Identity (); m = m * size;
   spr->GetMovable ()->SetTransform (m);
   spr->GetMovable ()->UpdateMove ();
 
   spr->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  spr->DecRef (); // its now held by a ref inside the engine
   return spr;
 }
 
@@ -2019,7 +2018,10 @@ bool CommandHandler (const char *cmd, const char *arg)
       iSoundWrapper *sb = CS_GET_NAMED_CHILD_OBJECT_FAST (Sys->view->GetEngine ()->
         QueryObject (), iSoundWrapper, arg);
       if (sb)
+      {
         sb->GetSound ()->Play();
+	sb->DecRef ();
+      }
       else
         Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
 		"Sound '%s' not found!", arg);

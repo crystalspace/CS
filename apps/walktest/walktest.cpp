@@ -183,6 +183,7 @@ WalkTest::WalkTest () :
   myVFS = NULL;
   mySound = NULL;
   myMotionMan = NULL;
+  collide_system = NULL;
 
   debug_box1.Set (csVector3 (-1, -1, -1), csVector3 (1, 1, 1));
   debug_box2.Set (csVector3 (2, 2, 2), csVector3 (3, 3, 3));
@@ -197,12 +198,12 @@ WalkTest::~WalkTest ()
   SCF_DEC_REF (myG3D);
   SCF_DEC_REF (mySound);
   SCF_DEC_REF (myMotionMan);
-  if (ConsoleInput) ConsoleInput->DecRef ();
-  if (collide_system) collide_system->DecRef ();
-  if (Font) Font->DecRef ();
+  SCF_DEC_REF (ConsoleInput)
+  SCF_DEC_REF (collide_system);
+  SCF_DEC_REF (Font);
   delete wf;
   delete [] auto_script;
-  delete view;
+  SCF_DEC_REF (view);
   delete infinite_maze;
   delete huge_room;
   delete cslogo;
@@ -212,10 +213,12 @@ WalkTest::~WalkTest ()
     if (pllegs) Engine->GetMeshes ()->RemoveMesh (pllegs);
   }
   delete [] recorded_perf_stats_name;
-  if (perf_stats) perf_stats->DecRef ();
-  if (Engine) Engine->DecRef ();
-  if (LevelLoader) LevelLoader->DecRef();
-  if (kbd) kbd->DecRef();
+  SCF_DEC_REF (perf_stats);
+  SCF_DEC_REF (Engine);
+  SCF_DEC_REF (LevelLoader);
+  SCF_DEC_REF (kbd);
+  SCF_DEC_REF (CrossBuilder);
+  SCF_DEC_REF (ModelConverter);
 }
 
 void WalkTest::Report (int severity, const char* msg, ...)
@@ -1126,54 +1129,57 @@ void start_console ()
 
 void WalkTest::EndEngine ()
 {
-  delete view; view = NULL;
+  //  delete view; view = NULL;
 }
 
 void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 {
-  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
-
-  iPolygonMesh* mesh;
-  int sn = engine->GetSectors ()->GetSectorCount ();
-  while (sn > 0)
+  if (do_cd)
   {
-    sn--;
-    iSector* sp = engine->GetSectors ()->GetSector (sn);
-    if (region && !region->IsInRegion (sp->QueryObject ())) continue;
-    // Initialize the things in this sector.
-    int i;
-    iMeshList* ml = sp->GetMeshes ();
-    for (i = 0 ; i < ml->GetMeshCount () ; i++)
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
+
+    iPolygonMesh* mesh;
+    int sn = engine->GetSectors ()->GetSectorCount ();
+    while (sn > 0)
     {
-      iMeshWrapper* tp = ml->GetMesh (i);
-      mesh = SCF_QUERY_INTERFACE (tp->GetMeshObject (), iPolygonMesh);
-      if (mesh)
+      sn--;
+      iSector* sp = engine->GetSectors ()->GetSector (sn);
+      if (region && !region->IsInRegion (sp->QueryObject ())) continue;
+      // Initialize the things in this sector.
+      int i;
+      iMeshList* ml = sp->GetMeshes ();
+      for (i = 0 ; i < ml->GetMeshCount () ; i++)
       {
-        (void)new csColliderWrapper (tp->QueryObject (), collide_system, mesh);
-        mesh->DecRef ();
+	iMeshWrapper* tp = ml->GetMesh (i);
+	mesh = SCF_QUERY_INTERFACE (tp->GetMeshObject (), iPolygonMesh);
+	if (mesh)
+	{
+	  (void)new csColliderWrapper (tp->QueryObject (), collide_system, mesh);
+	  mesh->DecRef ();
+	}
       }
     }
-  }
-  // Initialize all mesh objects for collision detection.
-  int i;
-  iMeshList* meshes = engine->GetMeshes ();
-  for (i = 0 ; i < meshes->GetMeshCount () ; i++)
-  {
-    iMeshWrapper* sp = meshes->GetMesh (i);
-    if (region && !region->IsInRegion (sp->QueryObject ())) continue;
-    mesh = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
-    if (mesh)
+    // Initialize all mesh objects for collision detection.
+    int i;
+    iMeshList* meshes = engine->GetMeshes ();
+    for (i = 0 ; i < meshes->GetMeshCount () ; i++)
     {
-      (void)new csColliderWrapper (sp->QueryObject (), collide_system, mesh);
-      mesh->DecRef ();
+      iMeshWrapper* sp = meshes->GetMesh (i);
+      if (region && !region->IsInRegion (sp->QueryObject ())) continue;
+      mesh = SCF_QUERY_INTERFACE (sp->GetMeshObject (), iPolygonMesh);
+      if (mesh)
+      {
+	(void)new csColliderWrapper (sp->QueryObject (), collide_system, mesh);
+	mesh->DecRef ();
+      }
     }
+
+    // Create a player object that follows the camera around.
+    //  player = csBeing::PlayerSpawn("Player");
+
+    //  init = true;
+    //  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "DONE");
   }
-
-  // Create a player object that follows the camera around.
-//  player = csBeing::PlayerSpawn("Player");
-
-//  init = true;
-//  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "DONE");
 }
 
 void WalkTest::LoadLibraryData (void)
@@ -1548,12 +1554,13 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   if (mySound)
   {
     iSoundWrapper *w = CS_GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
-      iSoundWrapper, "boom.wav");
+						       iSoundWrapper, "boom.wav");
     wMissile_boom = w ? w->GetSound () : NULL;
-
+    w->DecRef ();
     w = CS_GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
-      iSoundWrapper, "whoosh.wav");
+					iSoundWrapper, "whoosh.wav");
     wMissile_whoosh = w ? w->GetSound () : NULL;
+    w->DecRef ();
    }
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");

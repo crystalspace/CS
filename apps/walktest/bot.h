@@ -51,7 +51,7 @@ public:
 
 public:
   /// Constructor.
-  Bot (csEngine *Engine, iMeshObject* botmesh);
+  Bot (iEngine *Engine, iMeshObject* botmesh);
   /// Destructor.
   virtual ~Bot ();
 
