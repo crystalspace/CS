@@ -125,6 +125,7 @@ bool Video::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
+  engine->IncRef ();
 
   // Find the pointer to level loader plugin
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
@@ -133,6 +134,7 @@ bool Video::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
+  LevelLoader->IncRef ();
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
@@ -140,6 +142,7 @@ bool Video::Initialize (int argc, const char* const argv[],
     Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
+  myG3D->IncRef ();
 
   kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
   if (!kbd)
