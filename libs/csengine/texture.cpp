@@ -34,25 +34,21 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csTextureWrapper::TextureWrapper)
   SCF_IMPLEMENTS_INTERFACE(iTextureWrapper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csTextureWrapper::csTextureWrapper (
-  iImage *Image) :
+csTextureWrapper::csTextureWrapper (iImage *Image) :
     csObject(),
-    handle(NULL),
     flags(CS_TEXTURE_3D),
     use_callback(NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
-  (image = Image)->IncRef ();
+  image = Image;
   DG_LINK (this, image);
   UpdateKeyColorFromImage ();
 
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
-csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
-  csObject(),
-  image(NULL),
+csTextureWrapper::csTextureWrapper (iTextureHandle *ith) : csObject(),
   use_callback(NULL)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
@@ -61,7 +57,6 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   handle = ith;
   if (handle)
   {
-    ith->IncRef ();
     flags = ith->GetFlags ();
     DG_LINK (this, handle);
   }
@@ -82,9 +77,9 @@ csTextureWrapper::csTextureWrapper (csTextureWrapper &t) :
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
   DG_TYPE (this, "csTextureWrapper");
-  (handle = t.handle)->IncRef ();
+  handle = t.handle;
   DG_LINK (this, handle);
-  (image = t.image)->IncRef ();
+  image = t.image;
   DG_LINK (this, image);
 
   UpdateKeyColorFromImage ();
@@ -97,13 +92,11 @@ csTextureWrapper::~csTextureWrapper ()
   if (handle)
   {
     DG_UNLINK (this, handle);
-    handle->DecRef ();
   }
 
   if (image)
   {
     DG_UNLINK (this, image);
-    image->DecRef ();
   }
 
   if (use_callback) use_callback->DecRef ();
@@ -113,14 +106,12 @@ void csTextureWrapper::SetImageFile (iImage *Image)
 {
   if (Image)
   {
-    Image->IncRef ();
     DG_LINK (this, Image);
   }
 
   if (image)
   {
     DG_UNLINK (this, image);
-    image->DecRef ();
   }
 
   image = Image;
@@ -133,15 +124,12 @@ void csTextureWrapper::SetTextureHandle (iTextureHandle *tex)
   if (image)
   {
     DG_UNLINK (this, image);
-    image->DecRef ();
     image = NULL;
   }
 
-  if (tex) tex->DecRef ();
   if (handle)
   {
     DG_UNLINK (this, handle);
-    handle->DecRef ();
   }
 
   handle = tex;
@@ -172,7 +160,6 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   if (handle)
   {
     DG_UNLINK (this, handle);
-    handle->DecRef ();
     handle = NULL;
   }
 

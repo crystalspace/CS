@@ -386,13 +386,13 @@ public:
    * by calling DecRef on it enough times. If you want to keep the input
    * material make sure you have called IncRef yourselves.
    */
-  virtual iMaterialHandle* RegisterMaterial (iMaterial* material);
+  virtual csPtr<iMaterialHandle> RegisterMaterial (iMaterial* material);
 
   /**
    * Register a material based on a texture handle. This is a short-cut
    * to quickly make materials based on a single texture.
    */
-  virtual iMaterialHandle* RegisterMaterial (iTextureHandle* txthandle);
+  virtual csPtr<iMaterialHandle> RegisterMaterial (iTextureHandle* txthandle);
 
   /**
    * Default stub implementation until the

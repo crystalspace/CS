@@ -757,7 +757,7 @@ void csTextureManagerSoftware::PrepareTextures ()
     main_txtmgr->Reprepare8BitProcs ();
 }
 
-iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,
+csPtr<iTextureHandle> csTextureManagerSoftware::RegisterTexture (iImage* image,
   int flags)
 {
   if (!image)
@@ -768,9 +768,10 @@ iTextureHandle *csTextureManagerSoftware::RegisterTexture (iImage* image,
     image = csCreateXORPatternImage(32, 32, 5);
   }
 
-  csTextureHandleSoftware *txt = new csTextureHandleSoftware (this, image, flags);
+  csTextureHandleSoftware *txt = new csTextureHandleSoftware (
+  	this, image, flags);
   textures.Push (txt);
-  return txt;
+  return csPtr<iTextureHandle> (txt);
 }
 
 void csTextureManagerSoftware::UnregisterTexture (csTextureHandleSoftware* handle)

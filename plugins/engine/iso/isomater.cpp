@@ -27,7 +27,6 @@ SCF_IMPLEMENT_IBASE (csIsoMaterial)
 SCF_IMPLEMENT_IBASE_END
 
 csIsoMaterial::csIsoMaterial () :
-  texture(0),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
@@ -37,18 +36,17 @@ csIsoMaterial::csIsoMaterial () :
 }
 
 csIsoMaterial::csIsoMaterial (iTextureHandle* w) :
-  texture(w),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
   reflection(CS_DEFMAT_REFLECTION)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
+  texture = w;
 }
 
 csIsoMaterial::~csIsoMaterial ()
 {
-//  delete texture;
 }
 
 void csIsoMaterial::SetEffect (iEffectDefinition *ed)
@@ -100,22 +98,21 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialWrapper::IsoMaterialWrapperIndex)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterial* material) :
-  csObject (), handle (NULL)
+  csObject ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
   csIsoMaterialWrapper::material = material;
-  material->IncRef ();
   index = 0;
   //csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csIsoMaterialWrapper::csIsoMaterialWrapper (csIsoMaterialWrapper &th) :
-  csObject (), handle (NULL)
+  csObject ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
-  (material = th.material)->IncRef ();
+  material = th.material;
   handle = th.GetMaterialHandle ();
   SetName (th.GetName ());
   index = th.index;
@@ -123,11 +120,10 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (csIsoMaterialWrapper &th) :
 }
 
 csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterialHandle *ith) :
-  csObject (), material (NULL)
+  csObject ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
-  ith->IncRef ();
   handle = ith;
   index = 0;
   //csEngine::current_engine->AddToCurrentRegion (this);
@@ -135,30 +131,17 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterialHandle *ith) :
 
 csIsoMaterialWrapper::~csIsoMaterialWrapper ()
 {
-  if (handle)
-    handle->DecRef ();
-  if (material)
-    material->DecRef ();
 }
 
 void csIsoMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
 {
-  if (handle)
-    handle->DecRef ();
-  if (material)
-    material->DecRef ();
-
   material = NULL;
   handle = m;
-  handle->IncRef ();
 }
 
 void csIsoMaterialWrapper::SetMaterial (iMaterial *material)
 {
-  if (csIsoMaterialWrapper::material)
-    csIsoMaterialWrapper::material->DecRef ();
   csIsoMaterialWrapper::material = material;
-  material->IncRef ();
 }
 
 void csIsoMaterialWrapper::Register (iTextureManager *txtmgr)

@@ -25,6 +25,7 @@
 #include "csgfx/rgbpixel.h"
 #include "cstool/gentrtex.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
 #include "iengine/engine.h"
 #include "iengine/texture.h"
 #include "iutil/object.h"
@@ -377,8 +378,8 @@ bool csLoader::ParseHeightgen (char* buf)
 	  csScanStr (params, "%d,%d", &startx, &starty);
 	  iImage* img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
 	  	partw, parth);
-	  iTextureHandle *TexHandle = G3D->GetTextureManager ()
-	  	->RegisterTexture (img, CS_TEXTURE_3D);
+	  csRef<iTextureHandle> TexHandle (G3D->GetTextureManager ()
+	  	->RegisterTexture (img, CS_TEXTURE_3D));
 	  if (!TexHandle)
 	  {
 	    ReportError (
@@ -686,8 +687,8 @@ bool csLoader::ParseHeightgen (iDocumentNode* node)
 	  int starty = child->GetAttributeValueAsInt ("y");
 	  iImage* img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
 	  	partw, parth);
-	  iTextureHandle *TexHandle = G3D->GetTextureManager ()
-	  	->RegisterTexture (img, CS_TEXTURE_3D);
+	  csRef<iTextureHandle> TexHandle (G3D->GetTextureManager ()
+	  	->RegisterTexture (img, CS_TEXTURE_3D));
 	  if (!TexHandle)
 	  {
 	    ReportError (

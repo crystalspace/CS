@@ -42,7 +42,6 @@ csAVIStreamVideo::csAVIStreamVideo (iBase *pBase): memimage (1,1)
   pG3D = NULL;
   pG2D = NULL;
   pCodec = NULL;
-  pMaterial = NULL;
 
   pIA = new csImageArea (1,1,1,1);
 }
@@ -115,7 +114,6 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
     polyfx.vertices[i].z = 1;
   }
 
-  if (pMaterial) pMaterial->DecRef ();
   pMaterial = NULL;
   return LoadCodec (pInitData, nInitDataLen, pFormatEx, nFormatEx);
 }
@@ -125,7 +123,6 @@ csAVIStreamVideo::~csAVIStreamVideo ()
   delete pChunk;
   delete pIA->data;
   delete pIA;
-  if (pMaterial) pMaterial->DecRef ();
   if (pCodec) pCodec->DecRef ();
   if (pG2D) pG2D->DecRef ();
   if (pG3D) pG3D->DecRef ();
@@ -435,11 +432,9 @@ void csAVIStreamVideo::rgba_channel_2_rgba_interleave (char *data[4])
 
 void csAVIStreamVideo::makeMaterial ()
 {
-  if (pMaterial)
-    pMaterial->DecRef ();
-
   iTextureManager *txtmgr = pG3D->GetTextureManager();
-  iTextureHandle *pFrameTex = txtmgr->RegisterTexture (&memimage, CS_TEXTURE_NOMIPMAPS);
+  csRef<iTextureHandle> pFrameTex (
+  	txtmgr->RegisterTexture (&memimage, CS_TEXTURE_NOMIPMAPS));
   pFrameTex->Prepare ();
   pMaterial = txtmgr->RegisterMaterial (pFrameTex);
   pMaterial->Prepare ();

@@ -465,14 +465,14 @@ void csTextureManagerLine::PrepareTextures ()
     ((csTextureHandleLine*)textures[i])->remap_texture (this);
 }
 
-iTextureHandle *csTextureManagerLine::RegisterTexture (iImage* image,
+csPtr<iTextureHandle> csTextureManagerLine::RegisterTexture (iImage* image,
   int flags)
 {
-  if (!image) return NULL;
+  if (!image) return csPtr<iTextureHandle> (NULL);
 
   csTextureHandleLine *txt = new csTextureHandleLine (this, image, flags);
   textures.Push (txt);
-  return txt;
+  return csPtr<iTextureHandle> (txt);
 }
 
 void csTextureManagerLine::UnregisterTexture (csTextureHandleLine* handle)

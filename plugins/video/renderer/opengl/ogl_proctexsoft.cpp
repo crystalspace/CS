@@ -80,7 +80,8 @@ dummyMaterial::dummyMaterial ()
 
 //----------------------------------------------------------------------------
 
-iTextureHandle *csOpenGLProcSoftware::TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
+iTextureHandle *csOpenGLProcSoftware::TxtHandleVector::RegisterAndPrepare (
+	iTextureHandle *ogl_txt)
 {
   csTextureHandleOpenGL *txtmm = (csTextureHandleOpenGL*)
   	ogl_txt->GetPrivateObject();

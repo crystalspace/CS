@@ -40,7 +40,7 @@ class awsTextureManager
   {
     ~awsTexture();
     csRef<iImage> img;
-    iTextureHandle *tex;
+    csRef<iTextureHandle> tex;
     unsigned long id;
   };
 private:

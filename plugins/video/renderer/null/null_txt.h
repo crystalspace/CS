@@ -268,7 +268,7 @@ public:
   ///
   virtual void PrepareTextures ();
   ///
-  virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   ///
   virtual void UnregisterTexture (csTextureHandleNull* handle);
   /// Clear the palette (including all reserved colors)

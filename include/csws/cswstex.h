@@ -40,7 +40,7 @@ class csWSTexture
   // Reference count
   int RefCount;
   // texture image
-  iImage *Image;
+  csRef<iImage> Image;
   // Will be this texture used for 3D and/or for 2D operations?
   int Flags;
   // Red,Green and Blue components of key color
@@ -50,7 +50,7 @@ class csWSTexture
   // Has transparent color changed?
   bool KeyChanged;
   // texture handle for the 3D/2D driver
-  iTextureHandle *Handle;
+  csRef<iTextureHandle> Handle;
   // texture name
   char *Name;
   // VFS file name

@@ -136,7 +136,7 @@ struct iTextureManager : public iBase
    * The texture is unregistered at destruction, i.e. as soon as the last
    * reference to the texture handle is released.
    */
-  virtual iTextureHandle *RegisterTexture (iImage *image, int flags) = 0;
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
 
   /**
    * After all textures have been added, this function does all
@@ -165,7 +165,7 @@ struct iTextureManager : public iBase
    * The material is unregistered at destruction, i.e. as soon as the last
    * reference to the material handle is released.
    */
-  virtual iMaterialHandle* RegisterMaterial (iMaterial* material) = 0;
+  virtual csPtr<iMaterialHandle> RegisterMaterial (iMaterial* material) = 0;
 
   /**
    * Register a material based on a texture handle. This is a short-cut
@@ -174,7 +174,8 @@ struct iTextureManager : public iBase
    * The material is unregistered at destruction, i.e. as soon as the last
    * reference to the material handle is released.
    */
-  virtual iMaterialHandle* RegisterMaterial (iTextureHandle* txthandle) = 0;
+  virtual csPtr<iMaterialHandle> RegisterMaterial (
+  	iTextureHandle* txthandle) = 0;
 
   /**
    * Prepare all materials.

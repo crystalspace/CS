@@ -43,9 +43,9 @@ class csTextureWrapper : public csObject
 {
 private:
   /// The corresponding iImage.
-  iImage* image;
+  csRef<iImage> image;
   /// The handle as returned by iTextureManager.
-  iTextureHandle* handle;
+  csRef<iTextureHandle> handle;
   // key color
   int key_col_r, key_col_g, key_col_b;
   /// Texture registration flags

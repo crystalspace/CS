@@ -34,7 +34,6 @@
 
 csEngineProcTex::csEngineProcTex()
 {
-  TexHandle = NULL;
   ptG3D = NULL;
   Engine = NULL;
   View = NULL;
@@ -42,7 +41,6 @@ csEngineProcTex::csEngineProcTex()
 
 csEngineProcTex::~csEngineProcTex ()
 {
-  SCF_DEC_REF (TexHandle);
   SCF_DEC_REF (View);
 }
 
@@ -62,7 +60,8 @@ bool csEngineProcTex::Initialize (iGraphics3D *g3d, iEngine *engine,
   // create a procedural texture
   iImage *Image = new csImageMemory (256, 256);
   TexHandle = g3d->GetTextureManager ()->RegisterTexture (Image,
-    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_PROC /*| CS_TEXTURE_PROC_ALONE_HINT*/);
+    CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS |
+    CS_TEXTURE_PROC /*| CS_TEXTURE_PROC_ALONE_HINT*/);
   TexHandle->Prepare ();
   Image->DecRef ();
   ptG3D = TexHandle->GetProcTextureInterface ();
@@ -82,7 +81,8 @@ void csEngineProcTex::Update (csTicks CurrentTime)
 {
   // move the camera
   csVector3 Position (-0.5, 0, 3 + sin (CurrentTime / 1000.0)*3);
-  View->GetCamera ()->Move (Position - View->GetCamera ()->GetTransform ().GetOrigin ());
+  View->GetCamera ()->Move (Position - View->GetCamera ()
+  	->GetTransform ().GetOrigin ());
 
   // switch to the context of the procedural texture
   iGraphics3D *oldContext = Engine->GetContext ();

@@ -261,13 +261,13 @@ iIsoLight* csIsoEngine::CreateLight()
 iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 	          const char *materialname)
 {
-  iImageIO *imgloader = NULL;
-  iVFS *VFS = NULL;
+  csRef<iImageIO> imgloader;
+  csRef<iVFS> VFS;
   csRef<iDataBuffer> buf;
   csRef<iImage> image;
-  iTextureHandle *handle = NULL;
+  csRef<iTextureHandle> handle;
   csIsoMaterial *material = NULL;
-  iMaterialHandle *math = NULL;
+  csRef<iMaterialHandle> math;
   iMaterialWrapper *mat_wrap = NULL;
 
   imgloader = CS_QUERY_REGISTRY (object_reg, iImageIO);
@@ -275,7 +275,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not get image loader plugin. "
     	"Failed to load file %s.", vfsfilename);
-    goto create_out;
+    return NULL;
   }
 
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
@@ -283,7 +283,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not get VFS plugin. "
     	"Failed to load file %s.", vfsfilename);
-    goto create_out;
+    return NULL;
   }
 
   buf = VFS->ReadFile (vfsfilename);
@@ -291,7 +291,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not read vfs file %s\n",
       vfsfilename);
-    goto create_out;
+    return NULL;
   }
 
   image = imgloader->Load(buf->GetUint8 (), buf->GetSize (),
@@ -300,20 +300,20 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "The imageloader could not load image %s", vfsfilename);
-    goto create_out;
+    return NULL;
   }
 
-  handle = txtmgr->RegisterTexture(image, CS_TEXTURE_2D | CS_TEXTURE_3D);
+  handle = txtmgr->RegisterTexture (image, CS_TEXTURE_2D | CS_TEXTURE_3D);
   if(!handle)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Texturemanager could not register texture %s", vfsfilename);
-    goto create_out;
+    return NULL;
   }
 
   material = new csIsoMaterial(handle);
   math = txtmgr->RegisterMaterial(material);
-  if(math)
+  if (math)
   {
     mat_wrap = materials.scfiMaterialList.NewMaterial (math);
     mat_wrap->IncRef ();	// Jorrit: @@@ Not sure why this is needed?
@@ -323,13 +323,8 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
       "Texturemanager could not register material %s", materialname);
-    goto create_out;
+    return NULL;
   }
-
-create_out:
-  if (math) math->DecRef ();
-  if (imgloader) imgloader->DecRef ();
-  if (VFS) VFS->DecRef ();
 
   return mat_wrap;
 }

@@ -63,7 +63,7 @@ public:
 class csEngineProcTex
 {
 private:
-  iTextureHandle *TexHandle;
+  csRef<iTextureHandle> TexHandle;
   iGraphics3D *ptG3D;
   iEngine *Engine;
   iView *View;

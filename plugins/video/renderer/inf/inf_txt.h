@@ -125,7 +125,7 @@ public:
   virtual int FindRGB (int r, int g, int b) { return encode_rgb (r, g, b); }
 
   virtual void PrepareTextures ();
-  virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   virtual void UnregisterTexture (csTextureHandleInfinite* handle);
 };
 

@@ -240,7 +240,7 @@ void csFancyConsole::Draw3D (csRect *oArea)
   // first draw the background
   // do we draw gouraud/flat or with texture ?
 
-  bool with_color = deco.bgnd.mat == NULL;
+  bool with_color = (deco.bgnd.mat == NULL);
 
   csRect size (outersize);
   size.xmin +=  bordersize.xmin - deco.p2lx - deco.lx;
@@ -518,10 +518,9 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
         ImageLoader->Load ((uint8 *)data, len, tm->GetTextureFormat ()));
       if (image)
       {
-	iTextureHandle* txt =
-	  tm->RegisterTexture ( image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS );
-	iMaterialHandle* mat = tm->RegisterMaterial (txt);
-	border.mat = mat;
+	csRef<iTextureHandle> txt (
+	  tm->RegisterTexture (image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS));
+	border.mat = tm->RegisterMaterial (txt);
 
         Keyname.Clear() << "FancyConsole." << sect << ".x";
 	border.offx = ini->GetInt (Keyname, 0);

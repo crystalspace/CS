@@ -32,7 +32,7 @@ struct iImageIO;
 
 struct ConDecoBorder
 {
-  iMaterialHandle *mat;
+  csRef<iMaterialHandle> mat;
   bool do_keycolor;
   uint8 kr, kg, kb;
   bool do_stretch;

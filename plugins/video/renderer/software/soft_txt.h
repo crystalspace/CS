@@ -371,7 +371,7 @@ public:
   ///
   virtual void PrepareTextures ();
   ///
-  virtual iTextureHandle *RegisterTexture (iImage* image, int flags);
+  virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
   /// Clear the palette (including all reserved colors)
   virtual void ResetPalette ();
   /// Reserve a color in palette (if any)

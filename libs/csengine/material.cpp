@@ -157,43 +157,33 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::MaterialWrapper)
   SCF_IMPLEMENTS_INTERFACE(iMaterialWrapper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csMaterialWrapper::csMaterialWrapper (
-  iMaterial *m) :
-    csObject(),
-    handle(NULL)
+csMaterialWrapper::csMaterialWrapper (iMaterial *m) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   DG_TYPE (this, "csMaterialWrapper");
   material = m;
-  material->IncRef ();
 
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
-csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
-  csObject(),
-  material(NULL)
+csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) : csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   DG_TYPE (this, "csMaterialWrapper");
 
   handle = ith;
-  handle->IncRef ();
   DG_LINK (this, handle);
 
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
-csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) :
-  csObject(w)
+csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &w) : csObject(w)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
   DG_TYPE (this, "csMaterialWrapper");
 
   material = w.material;
-  material->IncRef ();
   handle = w.handle;
-  handle->IncRef ();
   DG_LINK (this, handle);
 
   csEngine::current_engine->AddToCurrentRegion (this);
@@ -204,32 +194,21 @@ csMaterialWrapper::~csMaterialWrapper ()
   if (handle)
   {
     DG_UNLINK (this, handle);
-    handle->DecRef ();
   }
-
-  if (material) material->DecRef ();
 }
 
 void csMaterialWrapper::SetMaterial (iMaterial *m)
 {
-  if (m) m->IncRef ();
-  if (material) material->DecRef ();
   material = m;
 }
 
 void csMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
 {
-  if (m) m->IncRef ();
-  if (material)
-  {
-    material->DecRef ();
-    material = NULL;
-  }
+  material = NULL;
 
   if (handle)
   {
     DG_UNLINK (this, handle);
-    handle->DecRef ();
   }
 
   handle = m;
@@ -241,7 +220,6 @@ void csMaterialWrapper::Register (iTextureManager *txtmgr)
   if (handle)
   {
     DG_UNLINK (this, handle);
-    handle->DecRef ();
   }
 
   handle = txtmgr->RegisterMaterial (material);
@@ -252,7 +230,7 @@ void csMaterialWrapper::Visit ()
 {
   // @@@ This is not very clean! We shouldn't cast from iMaterial to csMaterial.
   // @@@ This is also not up-to-date because it doesn't deal with layers
-  csMaterial *mat = (csMaterial *)material;
+  csMaterial *mat = (csMaterial *)(iMaterial*)material;
   if (mat && mat->GetTextureWrapper ()) mat->GetTextureWrapper ()->Visit ();
 }
 

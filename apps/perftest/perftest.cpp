@@ -108,7 +108,8 @@ iMaterialHandle* PerfTest::LoadMaterial (char* file)
   image = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (),
   	txtmgr->GetTextureFormat ());
   if (!image) exit (-1);
-  iTextureHandle* texture = txtmgr->RegisterTexture (image, CS_TEXTURE_3D);
+  csRef<iTextureHandle> texture (
+  	txtmgr->RegisterTexture (image, CS_TEXTURE_3D));
   if (!texture) exit (-1);
   iMaterialHandle* mat = txtmgr->RegisterMaterial (texture);
   return mat;

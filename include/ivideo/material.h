@@ -132,7 +132,8 @@ struct iMaterialHandle : public iBase
   /**
    * Get light reflection parameters for this material.
    */
-  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection) = 0;
+  virtual void GetReflection (float &oDiffuse, float &oAmbient,
+  	float &oReflection) = 0;
 
   /**
    * Prepare this material. The material wrapper (remembered during

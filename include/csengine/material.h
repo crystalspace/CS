@@ -157,9 +157,9 @@ class csMaterialWrapper : public csObject
 {
 private:
   /// The corresponding iMaterial.
-  iMaterial* material;
+  csRef<iMaterial> material;
   /// The handle as returned by iTextureManager.
-  iMaterialHandle* handle;
+  csRef<iMaterialHandle> handle;
 
 private:
   /// Release material handle

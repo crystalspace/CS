@@ -43,7 +43,7 @@ class csAVIStreamVideo : public iVideoStream
   csAVIFormat *pAVI;
   csImageArea *pIA;
 
-  iMaterialHandle *pMaterial;
+  csRef<iMaterialHandle> pMaterial;
   iGraphics3D *pG3D;
   iGraphics2D *pG2D;
   iObjectRegistry *object_reg;

@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+9-Sep-2002
+	- iTextureManager->RegisterTexture() and RegisterMaterial()
+	  now return csPtr. This also fixes several ref counting bugs
+	  throughout CS with regards to this.
+	- Fixed iso engine so it now incref()'s the given texture
+	  handle in an iso material.
+	- Engine material and texture wrappers now use csRef's to keep
+	  track of their internal image/handle/texture references.
 8-Sep-2002
 	- Changed iModelConverter->Load() to return csPtr.
 	- Changed iModelConverter->Save() to return csPtr.

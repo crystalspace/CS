@@ -373,20 +373,21 @@ void csTextureManager::ResetPalette ()
 {
 }
 
-iMaterialHandle* csTextureManager::RegisterMaterial (iMaterial* material)
+csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (iMaterial* material)
 {
-  if (!material) return NULL;
+  if (!material) return csPtr<iMaterialHandle> (NULL);
   csMaterialHandle *mat = new csMaterialHandle (material, this);
   materials.Push (mat);
-  return mat;
+  return csPtr<iMaterialHandle> (mat);
 }
 
-iMaterialHandle* csTextureManager::RegisterMaterial (iTextureHandle* txthandle)
+csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (
+	iTextureHandle* txthandle)
 {
-  if (!txthandle) return NULL;
+  if (!txthandle) return csPtr<iMaterialHandle> (NULL);
   csMaterialHandle *mat = new csMaterialHandle (txthandle, this);
   materials.Push (mat);
-  return mat;
+  return csPtr<iMaterialHandle> (mat);
 }
 
 void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)

@@ -123,17 +123,19 @@ void csTextureManagerInfinite::PrepareTextures ()
   }
 }
 
-iTextureHandle *csTextureManagerInfinite::RegisterTexture (iImage* image,
+csPtr<iTextureHandle> csTextureManagerInfinite::RegisterTexture (iImage* image,
   int flags)
 {
-  if (!image) return NULL;
+  if (!image) return csPtr<iTextureHandle> (NULL);
 
-  csTextureHandleInfinite *txt = new csTextureHandleInfinite (this, image, flags);
+  csTextureHandleInfinite *txt = new csTextureHandleInfinite (
+  	this, image, flags);
   textures.Push (txt);
-  return txt;
+  return csPtr<iTextureHandle> (txt);
 }
 
-void csTextureManagerInfinite::UnregisterTexture (csTextureHandleInfinite* handle)
+void csTextureManagerInfinite::UnregisterTexture (
+	csTextureHandleInfinite* handle)
 {
   int idx = textures.Find (handle);
   if (idx >= 0) textures.Delete (idx);

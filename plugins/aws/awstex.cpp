@@ -25,7 +25,6 @@ static unsigned long NameToId (const char *txt)
 
 awsTextureManager::awsTexture::~awsTexture ()
 {
-  tex->DecRef ();
 }
 
 awsTextureManager::awsTextureManager () :
@@ -196,10 +195,6 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   {
     awstxt = new awsTexture;
     memset (awstxt, 0, sizeof (awsTexture));
-  }
-  else
-  {
-    awstxt->tex->DecRef ();
   }
 
   awstxt->img = ifile;

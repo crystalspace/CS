@@ -209,7 +209,7 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
   if (!Image)
     return csPtr<iTextureHandle> (NULL);
 
-  iTextureHandle *TexHandle;
+  csRef<iTextureHandle> TexHandle;
   if (tm)
   {
     TexHandle = tm->RegisterTexture (Image, Flags);
@@ -220,10 +220,9 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 	      "Cannot create texture from '%s'!", fname);
     }
   }
-  else
-    TexHandle = NULL;
   Image->DecRef ();
 
+  if (TexHandle) TexHandle->IncRef ();	// To avoid smart pointer release.
   return csPtr<iTextureHandle> (TexHandle);
 }
 

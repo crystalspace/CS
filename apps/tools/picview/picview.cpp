@@ -278,8 +278,8 @@ void PicViewApp::LoadNextImage (int idx, int step)
   {
     int w = ifile->GetWidth ();
     int h = ifile->GetHeight ();
-    iTextureHandle* txt = txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D
-    	| CS_TEXTURE_DITHER);
+    csRef<iTextureHandle> txt (txtmgr->RegisterTexture (ifile, CS_TEXTURE_2D
+    	| CS_TEXTURE_DITHER));
     txtmgr->ResetPalette ();
     txtmgr->PrepareTextures ();
     txtmgr->SetPalette ();

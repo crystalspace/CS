@@ -802,7 +802,7 @@ void csTextureManagerOpenGL::PrepareTextures ()
     textures.Get (i)->Prepare ();
 }
 
-iTextureHandle *csTextureManagerOpenGL::RegisterTexture (
+csPtr<iTextureHandle> csTextureManagerOpenGL::RegisterTexture (
 	iImage* image, int flags)
 {
   if (!image)
@@ -816,7 +816,7 @@ iTextureHandle *csTextureManagerOpenGL::RegisterTexture (
   csTextureHandleOpenGL* txt = new csTextureHandleOpenGL (
   	image, flags, GL_RGBA, pfmt.PixelBytes*8, G3D);
   textures.Push (txt);
-  return txt;
+  return csPtr<iTextureHandle> (txt);
 }
 
 void csTextureManagerOpenGL::UnregisterTexture (csTextureHandleOpenGL *handle)

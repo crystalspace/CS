@@ -40,7 +40,7 @@ private:
   /// flat shading color
   csRGBcolor flat_color;
   /// the texture of the material (can be NULL)
-  iTextureHandle *texture;
+  csRef<iTextureHandle> texture;
 
   /// The diffuse reflection value of the material
   float diffuse;
@@ -129,9 +129,9 @@ class csIsoMaterialWrapper : public csObject
 {
 private:
   /// The corresponding iMaterial.
-  iMaterial* material;
+  csRef<iMaterial> material;
   /// The handle as returned by iTextureManager.
-  iMaterialHandle* handle;
+  csRef<iMaterialHandle> handle;
   /// the material number (index in the materiallist)
   int index;
 
@@ -140,9 +140,9 @@ public:
   csIsoMaterialWrapper (iMaterial* Image);
 
   /**
-   * Construct a csIsoMaterialWrapper from a pre-registered AND prepared material
-   * handle. The engine takes over responsibility for destroying the material
-   * handle. To prevent this IncRef () the material handle.
+   * Construct a csIsoMaterialWrapper from a pre-registered AND prepared
+   * material handle. The engine takes over responsibility for destroying
+   * the material handle. To prevent this IncRef () the material handle.
    */
   csIsoMaterialWrapper (iMaterialHandle *ith);
 
