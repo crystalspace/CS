@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+23-Jan-2002 
+        - Jorge Acereda fixed LoadCamera() (crashed if the sector
+	  wasn't found). Rewrote it to be more robust and coherent
+	  (either loads all parameters or none).
 22-Jan-2002
 	- Created a crystal-docs mailing list. The doc annotation script
 	  will now send mail to that mailing list.
