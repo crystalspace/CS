@@ -50,7 +50,8 @@ enum
   XMLTOKEN_MATERIALPALETTE,
   XMLTOKEN_MATERIALMAP,
   XMLTOKEN_LODDISTANCE,
-  XMLTOKEN_ERRORTOLERANCE
+  XMLTOKEN_ERRORTOLERANCE,
+  XMLTOKEN_STATICLIGHTING
 };
 
 SCF_IMPLEMENT_IBASE (csTerrainFactoryLoader)
@@ -271,6 +272,7 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("materialmap", XMLTOKEN_MATERIALMAP);
   xmltokens.Register ("loddistance", XMLTOKEN_LODDISTANCE);
   xmltokens.Register ("errortolerance", XMLTOKEN_ERRORTOLERANCE);
+  xmltokens.Register ("staticlighting", XMLTOKEN_STATICLIGHTING);
   return true;
 }
 
@@ -397,6 +399,14 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 	state->SetErrorTolerance (error);
 	break;
       }
+      case XMLTOKEN_STATICLIGHTING:
+	{
+	  bool staticLighting;
+	  if (!synldr->ParseBool (child, staticLighting, false))
+	    return false;
+	  state->SetStaticLighting (staticLighting);
+	}
+	break;
       default:
         synldr->ReportError ("crystalspace.terrain.object.loader",
           child, "Unknown token");

@@ -17,7 +17,10 @@
 */
 
 #include "cssysdef.h"
+#include "qsqrt.h"
 
+#include "iutil/cache.h"
+#include "iutil/object.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 
@@ -26,6 +29,8 @@
 #include "iengine/rview.h"
 #include "iengine/camera.h"
 #include "iengine/movable.h"
+#include "iengine/mesh.h"
+#include "iengine/sector.h"
 
 #include "ivideo/graph3d.h"
 #include "ivideo/rndbuf.h"
@@ -34,10 +39,14 @@
 #include "ivideo/texture.h"
 
 #include "igraphic/image.h"
+#include "ivaria/reporter.h"
 
 #include "csgfx/rgbpixel.h"
 #include "csgfx/memimage.h"
 
+#include "csutil/csendian.h"
+#include "csutil/csmd5.h"
+#include "csutil/memfile.h"
 #include "csutil/util.h"
 
 #include "cstool/rbuflock.h"
@@ -104,6 +113,8 @@ csChunkLodTerrainFactory::csChunkLodTerrainFactory (csChunkLodTerrainType* p,
 
   r3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   shmgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
+  light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   csRef<iStringSet> strings = 
 	CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
@@ -187,6 +198,7 @@ bool csChunkLodTerrainFactory::SetHeightMap (const csArray<float>& data,
   CS_ASSERT (w == h);
   CS_ASSERT (w >= MIN_TERRAIN);
   datamap.SetLength (w * h);
+
   hm_x = w; hm_y = h;
   int i, j;
   for (j = 0; j < h; j ++)
@@ -214,7 +226,7 @@ bool csChunkLodTerrainFactory::SetHeightMap (const csArray<float>& data,
 
       datamap[pos].tex = csVector2 (i, j);
 
-      datamap[pos].col = csColor (1, 1, 1);
+      datamap[pos].col = pos;
     }
   }
   int a, b, c, s;
@@ -550,35 +562,6 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
     if (!texcors_buffer)
     {
       unsigned int len = texcors.Length();
-/*
-      if (pFactory->hm_x < UCHAR_MAX && pFactory->hm_y < UCHAR_MAX) 
-      {
-        texcors_buffer = pFactory->r3d->CreateRenderBuffer (
-	  sizeof (unsigned char)*2 * len, CS_BUF_STATIC, 
-	  CS_BUFCOMP_UNSIGNED_BYTE, 2, false);
-        unsigned char *tbuf = (unsigned char*)texcors_buffer->Lock (CS_BUF_LOCK_NORMAL);
-        for (int i = 0; i < len; i ++) 
-        {
-          tbuf[i*2+0] = (unsigned char)texcors[i].x;
-          tbuf[i*2+1] = (unsigned char)texcors[i].y;
-        }
-        texcors_buffer->Release ();
-      }
-      else if (pFactory->hm_x < USHRT_MAX && pFactory->hm_y < USHRT_MAX) 
-      {
-        texcors_buffer = pFactory->r3d->CreateRenderBuffer (
-	  sizeof (unsigned short)*2 * len, CS_BUF_STATIC, 
-	  CS_BUFCOMP_UNSIGNED_SHORT, 2, false);
-        unsigned short *tbuf = (unsigned short*)texcors_buffer->Lock (CS_BUF_LOCK_NORMAL);
-        for (int i = 0; i < len; i ++) 
-        {
-          tbuf[i*2+0] = (unsigned short)texcors[i].x;
-          tbuf[i*2+1] = (unsigned short)texcors[i].y;
-        }
-        texcors_buffer->Release ();
-      }
-      else 
-*/
       {
         texcors_buffer = pFactory->r3d->CreateRenderBuffer (
 	  sizeof (csVector2) * len, CS_BUF_STATIC, 
@@ -615,21 +598,6 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
       }
     }
     return texcoords_norm_buffer;
-  }
-  else if (name == pFactory->color_name) 
-  {
-    if (!color_buffer)
-    {
-      unsigned int len = colors.Length();
-      color_buffer = pFactory->r3d->CreateRenderBuffer (
-	sizeof (csColor) * len, CS_BUF_STATIC, 
-	CS_BUFCOMP_FLOAT, 3, false);
-
-      csColor *cbuf = (csColor*)color_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      memcpy (cbuf, &colors[0], len * sizeof (csColor));
-      color_buffer->Release ();
-    }
-    return color_buffer;
   }
   else if (name == pFactory->compressed_color_name)
   {
@@ -679,27 +647,6 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   return 0;
 }
 
-void csChunkLodTerrainFactory::MeshTreeNode::UpdateBufferSV ()
-{
-  csShaderVariable *sv;
-  sv = svcontext.GetVariableAdd(pFactory->vertex_name);
-  sv->SetValue(GetRenderBuffer(pFactory->vertex_name));
-  sv = svcontext.GetVariableAdd(pFactory->normal_name);
-  sv->SetValue(GetRenderBuffer(pFactory->normal_name));
-  sv = svcontext.GetVariableAdd(pFactory->tangent_name);
-  sv->SetValue(GetRenderBuffer(pFactory->tangent_name));
-  sv = svcontext.GetVariableAdd(pFactory->binormal_name);
-  sv->SetValue(GetRenderBuffer(pFactory->binormal_name));
-  sv = svcontext.GetVariableAdd(pFactory->texcors_name);
-  sv->SetValue(GetRenderBuffer(pFactory->texcors_name));
-  sv = svcontext.GetVariableAdd(pFactory->texcoords_norm_name);
-  sv->SetValue(GetRenderBuffer(pFactory->texcoords_norm_name));
-  sv = svcontext.GetVariableAdd(pFactory->color_name);
-  sv->SetValue(GetRenderBuffer(pFactory->color_name));
-  sv = svcontext.GetVariableAdd(pFactory->index_name);
-  sv->SetValue(GetRenderBuffer(pFactory->index_name));
-}
-
 void csChunkLodTerrainFactory::MeshTreeNode::InitBuffer (const Data& d, int p)
 {
   vertices.Push(d.pos); vertices.Push(d.pos);
@@ -718,18 +665,12 @@ void csChunkLodTerrainFactory::MeshTreeNode::AddVertex (const Data& d, int p)
     return;
   if (p == parity)
   {
-    csVector3 v = vertices[len - 2];
-    vertices.Push(v);
-    v = normals[len - 2];
-    normals.Push(v);
-    v = tangents[len - 2];
-    tangents.Push(v);
-    v = binormals[len - 2];
-    binormals.Push(v);
-    csVector2 t = texcors[len - 2];
-    texcors.Push(t);
-    csColor c = colors[len - 2];
-    colors.Push(c);
+    vertices.Push (vertices[len - 2]);
+    normals.Push (normals[len - 2]);
+    tangents.Push (tangents[len - 2]);
+    binormals.Push (binormals[len - 2]);
+    texcors.Push (texcors[len - 2]);
+    colors.Push (colors[len - 2]);
   }
   vertices.Push(d.pos);
   normals.Push(d.norm);
@@ -791,10 +732,14 @@ void csChunkLodTerrainFactory::MeshTreeNode::ProcessEdge (int start, int end,
   }
 }
 
+//---------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csChunkLodTerrainObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainObjectState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csChunkLodTerrainObject::eiTerrainObjectState)
@@ -805,24 +750,38 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csChunkLodTerrainObject::eiObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csChunkLodTerrainObject::LightingInfo)
+  SCF_IMPLEMENTS_INTERFACE (iLightingInfo)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csChunkLodTerrainObject::ShadowReceiver)
+  SCF_IMPLEMENTS_INTERFACE (iShadowReceiver)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csChunkLodTerrainObject::csChunkLodTerrainObject (csChunkLodTerrainFactory* p)
-	: logparent (p), pFactory (p)
+	: logparent (p), pFactory (p), returnMeshesHolder (false)
 {
   SCF_CONSTRUCT_IBASE (p)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel)
-
-  meshpp = 0;
-  meshppsize = 0;
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo)
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver)
 
   error_tolerance = 1.0;
   lod_distance = 200.0;
+
+  staticLighting = false;
+  colorVersion = 0;
+  dynamic_ambient.Set (0.0f, 0.0f, 0.0f);
+  staticLights.SetLength (pFactory->hm_x * pFactory->hm_y);
+
+  rootNode.AttachNew (new MeshTreeNodeWrapper (this, p->root));
 }
 
 csChunkLodTerrainObject::~csChunkLodTerrainObject ()
 {
-  delete [] meshpp;
-
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiLightingInfo)
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShadowReceiver)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState)
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel)
   SCF_DESTRUCT_IBASE ()
@@ -831,9 +790,11 @@ csChunkLodTerrainObject::~csChunkLodTerrainObject ()
 int optimized_meshes;
 
 bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv, 
-	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa,
+	MeshTreeNodeWrapper* nodeWrapper, float kappa,
 	uint32 frustum_mask)
 {
+  csChunkLodTerrainFactory::MeshTreeNode* node = nodeWrapper->factoryNode;
+
   int clip_portal, clip_plane, clip_z_plane;
   if (!rv->ClipBBox (planes, frustum_mask,
   	node->BBox (), clip_portal, clip_plane, clip_z_plane))
@@ -845,30 +806,31 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
   error_projection *= error_projection;
   if (error_projection > sq_dist && node->GetChild(0) != 0)
   {
-    DrawTestQuad (rv, node->GetChild (0), kappa, frustum_mask);
-    DrawTestQuad (rv, node->GetChild (1), kappa, frustum_mask);
-    DrawTestQuad (rv, node->GetChild (2), kappa, frustum_mask);
-    DrawTestQuad (rv, node->GetChild (3), kappa, frustum_mask);
+    DrawTestQuad (rv, nodeWrapper->GetChild (0), kappa, frustum_mask);
+    DrawTestQuad (rv, nodeWrapper->GetChild (1), kappa, frustum_mask);
+    DrawTestQuad (rv, nodeWrapper->GetChild (2), kappa, frustum_mask);
+    DrawTestQuad (rv, nodeWrapper->GetChild (3), kappa, frustum_mask);
   } 
   else 
   {
-    int len = meshes.Length();
-    meshes.GetExtend(len).object2camera = tr_o2c;
-    meshes[len].camera_origin = camera_origin;
-    meshes[len].clip_portal = clip_portal;
-    meshes[len].clip_plane = clip_plane;
-    meshes[len].clip_z_plane = clip_z_plane;
-    meshes[len].do_mirror = rv->GetCamera()->IsMirrored();
+    bool meshCreated;
+    csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated);
+    rm->object2camera = tr_o2c;
+    rm->camera_origin = camera_origin;
+    rm->clip_portal = clip_portal;
+    rm->clip_plane = clip_plane;
+    rm->clip_z_plane = clip_z_plane;
+    rm->do_mirror = rv->GetCamera()->IsMirrored();
     matwrap->Visit ();
-    meshes[len].material = matwrap;
-    meshes[len].z_buf_mode = CS_ZBUF_TEST;
-    meshes[len].mixmode = CS_FX_COPY;
-    node->UpdateBufferSV();
-    meshes[len].variablecontext = &node->svcontext;
-    meshes[len].indexstart = 0;
-    meshes[len].indexend = node->Count ();
-    meshes[len].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
+    rm->material = matwrap;
+    rm->z_buf_mode = CS_ZBUF_TEST;
+    rm->mixmode = CS_FX_COPY;
+    rm->variablecontext = nodeWrapper->svcontext;
+    rm->indexstart = 0;
+    rm->indexend = node->Count ();
+    rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
     // meshes[len].meshtype = CS_MESHTYPE_LINESTRIP;
+    returnMeshes->Push (rm);
 
     float texel_error_projection = node->Radius() + lod_distance;
     texel_error_projection *= texel_error_projection;
@@ -876,22 +838,22 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
     {
       for (int i = 0; i < palette.Length(); i ++)
       {
-        int len = palette_meshes[i].Length();
-        palette_meshes[i].GetExtend(len).object2camera = tr_o2c;
-        palette_meshes[i][len].camera_origin = camera_origin;
-        palette_meshes[i][len].clip_portal = clip_portal;
-        palette_meshes[i][len].clip_plane = clip_plane;
-        palette_meshes[i][len].clip_z_plane = clip_z_plane;
-        palette_meshes[i][len].do_mirror = rv->GetCamera()->IsMirrored();
+	csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated);
+        rm->object2camera = tr_o2c;
+        rm->camera_origin = camera_origin;
+        rm->clip_portal = clip_portal;
+        rm->clip_plane = clip_plane;
+        rm->clip_z_plane = clip_z_plane;
+        rm->do_mirror = rv->GetCamera()->IsMirrored();
         palette[i]->Visit ();
-        palette_meshes[i][len].material = palette[i];
-        palette_meshes[i][len].z_buf_mode = CS_ZBUF_TEST;
-        palette_meshes[i][len].mixmode = CS_FX_COPY;
-        node->UpdateBufferSV();
-        palette_meshes[i][len].variablecontext = &node->svcontext;
-        palette_meshes[i][len].indexstart = 0;
-        palette_meshes[i][len].indexend = node->Count ();
-        palette_meshes[i][len].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
+        rm->material = palette[i];
+        rm->z_buf_mode = CS_ZBUF_TEST;
+        rm->mixmode = CS_FX_COPY;
+	rm->variablecontext = nodeWrapper->svcontext;
+        rm->indexstart = 0;
+        rm->indexend = node->Count ();
+        rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
+	returnMeshes->Push (rm);
         // palette_meshes[i][len].meshtype = CS_MESHTYPE_LINESTRIP;
       }
     }
@@ -909,17 +871,14 @@ bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   float kappa = error_tolerance * cam->GetInvFOV() * 
 	2*tan(cam->GetFOVAngle()/180.0*PI/2);
-  meshes.SetLength (0);
-  for (int i = 0; i < palette_meshes.Length (); i ++) 
-  {
-    palette_meshes[i].SetLength(0);
-  }
+  returnMeshes = &returnMeshesHolder.GetUnusedMeshes ();
+  returnMeshes->Empty ();
   tricount = 0;
   uint32 frustum_mask;
   rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
-  if (!DrawTestQuad (rview, pFactory->root, kappa, frustum_mask)) 
+  if (!DrawTestQuad (rview, rootNode, kappa, frustum_mask)) 
     return false;
-  if (meshes.Length () == 0)
+  if (returnMeshes->Length () == 0)
     return false;
 // printf ("avg triangle per mesh %f\n", (float)tricount/(float)meshes.Length());
 // printf ("tricount %d, meshcount %d\n", tricount, meshes.Length());
@@ -935,51 +894,39 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
     n = 0;
     return 0;
   }
-  int i;
-  n = meshes.Length();
-  for (i = 0; i < palette_meshes.Length(); i ++)
-  {
-    n += palette_meshes[i].Length();
-  }
+
+  n = returnMeshes->Length();
   if (n == 0) 
   {
     // pass back root node as default always
-    meshes.GetExtend(0).z_buf_mode = CS_ZBUF_TEST;
-    meshes[0].mixmode = CS_FX_COPY;
-    pFactory->root->UpdateBufferSV ();
-    meshes[0].variablecontext = &pFactory->root->svcontext;
-    meshes[0].indexstart = 0;
-    meshes[0].indexend = pFactory->root->Count ();
-    meshes[0].meshtype = CS_MESHTYPE_TRIANGLESTRIP;
+    bool meshCreated;
+    csRenderMesh*& rm = rmHolder.GetUnusedMesh (meshCreated);
+    rm->z_buf_mode = CS_ZBUF_TEST;
+    rm->mixmode = CS_FX_COPY;
+    rm->variablecontext = rootNode->svcontext;
+    rm->indexstart = 0;
+    rm->indexend = rootNode->factoryNode->Count ();
+    rm->meshtype = CS_MESHTYPE_TRIANGLESTRIP;
+    returnMeshes->Push (rm);
     n ++;
   }
 
-  if (n > meshppsize)
-  {
-    delete [] meshpp;
-    meshpp = new csRenderMesh*[n];
-    meshppsize = n;
-  }
+  light_movable = movable;
+  /*
+    @@@ In theory it can happen that GetRenderMeshes() is consecutively called
+    with different movables, causing that for later lighting updates a wrong
+    movable is used.
+   */
 
-  int index = 0;
-  for (i = 0; i < meshes.Length(); i ++) 
-  {
-    meshpp[index++] = &meshes[i];
-  }
-  for (i = 0; i < palette_meshes.Length(); i ++)
-  {
-    for (int j = 0; j < palette_meshes[i].Length(); j++)
-    {
-      meshpp[index++] = &palette_meshes[i][j];
-    }
-  }
-  return meshpp;
+  return returnMeshes->GetArray();;
 }
 
 bool csChunkLodTerrainObject::HitBeamOutline (const csVector3& start, 
 	const csVector3& end, csVector3& isect, float* pr)
 {
-printf ("ChunkLOD: HitBeamOutline called, but not implemented\n");
+  csReport (pFactory->object_reg, CS_REPORTER_SEVERITY_DEBUG, 
+    "crystalspace.mesh.object.terrain.chunklod",
+    "HitBeamOutline called, but not implemented");
   return false;
 }
 
@@ -988,7 +935,9 @@ bool csChunkLodTerrainObject::HitBeamObject (const csVector3& start,
 	int* polygon_idx)
 {
   if (polygon_idx) *polygon_idx = -1;
-printf ("ChunkLOD: HitBeamObject called, but not implemented\n");
+  csReport (pFactory->object_reg, CS_REPORTER_SEVERITY_DEBUG, 
+    "crystalspace.mesh.object.terrain.chunklod",
+    "HitBeamObject called, but not implemented");
   return false;
 }
 
@@ -1000,7 +949,6 @@ bool csChunkLodTerrainObject::SetMaterialPalette (
   {
     palette[i] = pal[i];
   }
-  palette_meshes.SetLength (pal.Length());
   return true;
 }
 
@@ -1111,4 +1059,605 @@ int csChunkLodTerrainObject::CollisionDetect (iMovable *m, csTransform *t)
   {
     return 0;
   }
+}
+
+struct QueuedLight
+{
+  iLight* light;
+  bool isPseudo;
+
+  csVector3 obj_light_pos;
+  float inflRadSq;
+  csColor lightcol;
+
+  float* intensities;
+};
+CS_IMPLEMENT_STATIC_VAR (GetLightQueue, csArray<QueuedLight>, ())
+
+void csChunkLodTerrainObject::UpdateColors (const csArray<int>& colors,
+					    const csVector3* vertices, 
+					    const csVector3* normals,
+					    const csBox3& box,
+					    csColor* staticColors)
+{
+  const float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
+  csReversibleTransform trans = light_movable->GetFullTransform ();
+
+  csArray<QueuedLight>& lightQueue = *GetLightQueue();
+  lightQueue.Empty();
+
+  csSet<iLight*>::GlobalIterator it = affecting_lights.GetIterator ();
+  while (it.HasNext ())
+  {
+    QueuedLight ql;
+    ql.light = it.Next ();
+
+    csVector3 wor_light_pos = ql.light->GetCenter ();
+    ql.obj_light_pos = trans.Other2This (wor_light_pos);
+
+    if (!csIntersect3::BoxSphere (box, ql.obj_light_pos,
+      (ql.inflRadSq = ql.light->GetInfluenceRadiusSq()))) continue;
+
+    ql.isPseudo = false;
+    ql.lightcol = ql.light->GetColor () * lightScale;
+
+    lightQueue.Push (ql);
+  }
+  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt =
+	pseudoDynInfo.GetIterator ();
+  while (pdlIt.HasNext ())
+  {
+    QueuedLight ql;
+    csShadowArray* shadowArr = pdlIt.Next (ql.light);
+
+    csVector3 wor_light_pos = ql.light->GetCenter ();
+    csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
+
+    if (!csIntersect3::BoxSphere (box, obj_light_pos,
+      (ql.light->GetInfluenceRadiusSq()))) continue;
+
+    ql.isPseudo = true;
+    ql.intensities = shadowArr->shadowmap;
+    ql.lightcol = ql.light->GetColor ();
+
+    lightQueue.Push (ql);
+  }
+
+  csColor baseColor (dynamic_ambient);
+  if (!staticLighting)
+  {
+    csColor amb;
+    pFactory->engine->GetAmbientLight (amb);
+    baseColor += amb;
+  }
+      
+  for (int i = 0; i < colors.Length(); i++)
+  {
+    csColor col (baseColor);
+    if (staticLighting)
+    {
+      col += staticLights[colors[i]];
+    }
+    staticColors[i] = col;
+  }
+
+  for (int l = 0; l < lightQueue.Length(); l++)
+  {
+    const QueuedLight& ql = lightQueue[l];
+
+    if (ql.isPseudo)
+    {
+      for (int i = 0; i < colors.Length(); i++)
+      {
+	staticColors[i] += ql.lightcol * ql.intensities[colors[i]];
+      }
+    }
+    else
+    {
+      for (int i = 0; i < colors.Length(); i++)
+      {
+	float obj_sq_dist = csSquaredDist::PointPoint (ql.obj_light_pos, 
+	  vertices[i]);
+	if (obj_sq_dist >= ql.inflRadSq) continue;
+
+	csColor light_color = ql.lightcol * 
+	  ql.light->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
+
+	float cosinus;
+	if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
+	else cosinus = ql.obj_light_pos * normals[i];
+
+	if (cosinus > 0)
+	{
+	  csColor newcol = light_color;
+	  if (obj_sq_dist >= SMALL_EPSILON) 
+	    cosinus *= (obj_sq_dist >= SMALL_EPSILON) ? 
+	      qisqrt (obj_sq_dist) : 1.0f;
+	  if (cosinus < 1) newcol *= cosinus;
+	  staticColors[i] += newcol;
+	}
+      }
+    }
+  }
+}
+
+char* csChunkLodTerrainObject::GenerateCacheName ()
+{
+  csBox3 b;
+  pFactory->GetObjectBoundingBox (b);
+
+  csMemFile mf;
+  mf.Write ("chunklod", 8);
+  uint32 l;
+  l = convert_endian ((uint32)pFactory->hm_x);
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((uint32)pFactory->hm_y);
+  mf.Write ((char*)&l, 4);
+
+  if (logparent)
+  {
+    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
+    if (mw)
+    {
+      if (mw->QueryObject ()->GetName ())
+        mf.Write (mw->QueryObject ()->GetName (),
+        strlen (mw->QueryObject ()->GetName ()));
+      iMovable* movable = mw->GetMovable ();
+      iSector* sect = movable->GetSectors ()->Get (0);
+      if (sect && sect->QueryObject ()->GetName ())
+        mf.Write (sect->QueryObject ()->GetName (),
+        strlen (sect->QueryObject ()->GetName ()));
+      csVector3 pos = movable->GetFullPosition ();
+      l = convert_endian ((int32)QInt ((pos.x * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((pos.y * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((pos.z * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      csReversibleTransform tr = movable->GetFullTransform ();
+      const csMatrix3& o2t = tr.GetO2T ();
+      l = convert_endian ((int32)QInt ((o2t.m11 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((o2t.m12 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((o2t.m13 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((o2t.m21 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((o2t.m22 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((o2t.m23 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((o2t.m31 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((o2t.m32 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+      l = convert_endian ((int32)QInt ((o2t.m33 * 1000)+.5));
+      mf.Write ((char*)&l, 4);
+    }
+  }
+
+  l = convert_endian ((int32)QInt ((b.MinX () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)QInt ((b.MinY () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)QInt ((b.MinZ () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)QInt ((b.MaxX () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)QInt ((b.MaxY () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+  l = convert_endian ((int32)QInt ((b.MaxZ () * 1000)+.5));
+  mf.Write ((char*)&l, 4);
+
+  csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
+  csString hex(digest.HexString());
+  return hex.Detach();
+}
+
+void csChunkLodTerrainObject::InitializeDefault (bool clear)
+{
+  if (!staticLighting) return;
+
+  if (clear)
+  {
+    csColor amb;
+    float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
+    pFactory->engine->GetAmbientLight (amb);
+    amb *= lightScale;
+    for (int i = 0 ; i < staticLights.Length(); i++)
+    {
+      staticLights[i] = amb;
+    }
+  }
+  colorVersion++;
+}
+
+const char CachedLightingMagic[] = "chunky";
+const int CachedLightingMagicSize = sizeof (CachedLightingMagic) - 1;
+
+#define STATIC_LIGHT_SCALE	255.0f
+
+bool csChunkLodTerrainObject::ReadFromCache (iCacheManager* cache_mgr)
+{
+  if (!staticLighting) return true;
+
+  colorVersion++;
+  char* cachename = GenerateCacheName ();
+  cache_mgr->SetCurrentScope (cachename);
+  delete[] cachename;
+
+  bool rc = false;
+  csRef<iDataBuffer> db = cache_mgr->ReadCache ("chunklod_lm", 0, ~0);
+  if (db)
+  {
+    csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
+    char magic[CachedLightingMagicSize + 1];
+    if (mf.Read (magic, CachedLightingMagicSize) != CachedLightingMagicSize) 
+      goto stop;
+    magic[CachedLightingMagicSize] = 0;
+    if (strcmp (magic, CachedLightingMagic) == 0)
+    {
+      int v;
+      for (v = 0; v < staticLights.Length(); v++)
+      {
+	csColor& c = staticLights[v];
+	uint8 b;
+	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
+	c.red = (float)b / STATIC_LIGHT_SCALE;
+	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
+	c.green = (float)b / STATIC_LIGHT_SCALE;
+	if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
+	c.blue = (float)b / STATIC_LIGHT_SCALE;
+      }
+
+      uint8 c;
+      if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
+      while (c != 0)
+      {
+	char lid[16];
+	if (mf.Read (lid, 16) != 16) goto stop;
+	iLight *l = pFactory->engine->FindLightID (lid);
+	if (!l) goto stop;
+	l->AddAffectedLightingInfo (&scfiLightingInfo);
+
+	csShadowArray* shadowArr = new csShadowArray();
+	float* intensities = new float[staticLights.Length()];
+	shadowArr->shadowmap = intensities;
+	for (int n = 0; n < staticLights.Length(); n++)
+	{
+          uint8 b;
+          if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b))
+          {
+            delete shadowArr;
+            goto stop;
+          }
+          intensities[n] = (float)b / STATIC_LIGHT_SCALE;
+	}
+	pseudoDynInfo.Put (l, shadowArr);
+
+        if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
+      }
+      rc = true;
+    }
+  }
+
+stop:
+  cache_mgr->SetCurrentScope (0);
+  return rc;
+}
+
+bool csChunkLodTerrainObject::WriteToCache (iCacheManager* cache_mgr)
+{
+  if (!staticLighting) return true;
+  char* cachename = GenerateCacheName ();
+  cache_mgr->SetCurrentScope (cachename);
+  delete[] cachename;
+
+  bool rc = false;
+  csMemFile mf;
+  mf.Write (CachedLightingMagic, CachedLightingMagicSize);
+  for (int v = 0; v < staticLights.Length(); v++)
+  {
+    const csColor& c = staticLights[v];
+    int i; uint8 b;
+
+    i = QInt (c.red * STATIC_LIGHT_SCALE);
+    if (i < 0) i = 0; if (i > 255) i = 255; b = i;
+    mf.Write ((char*)&b, sizeof (b));
+
+    i = QInt (c.green * STATIC_LIGHT_SCALE);
+    if (i < 0) i = 0; if (i > 255) i = 255; b = i;
+    mf.Write ((char*)&b, sizeof (b));
+
+    i = QInt (c.blue * STATIC_LIGHT_SCALE);
+    if (i < 0) i = 0; if (i > 255) i = 255; b = i;
+    mf.Write ((char*)&b, sizeof (b));
+  }
+  uint8 c = 1;
+
+  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt (
+    pseudoDynInfo.GetIterator ());
+  while (pdlIt.HasNext ())
+  {
+    mf.Write ((char*)&c, sizeof (c));
+
+    iLight* l;
+    csShadowArray* shadowArr = pdlIt.Next (l);
+    const char* lid = l->GetLightID ();
+    mf.Write ((char*)lid, 16);
+
+    float* intensities = shadowArr->shadowmap;
+    for (int n = 0; n < staticLights.Length(); n++)
+    {
+      int i; uint8 b;
+      i = QInt (intensities[n] * STATIC_LIGHT_SCALE);
+      if (i < 0) i = 0; if (i > 255) i = 255; b = i;
+      mf.Write ((char*)&b, sizeof (b));
+    }
+  }
+  c = 0;
+  mf.Write ((char*)&c, sizeof (c));
+
+
+  rc = cache_mgr->CacheData ((void*)(mf.GetData ()), mf.GetSize (),
+    "chunklod_lm", 0, ~0);
+  cache_mgr->SetCurrentScope (0);
+  return rc;
+}
+
+void csChunkLodTerrainObject::PrepareLighting ()
+{
+  if (!staticLighting && pFactory->light_mgr)
+  {
+    const csArray<iLight*>& relevant_lights = pFactory->light_mgr
+      ->GetRelevantLights (logparent, -1, false);
+    for (int i = 0; i < relevant_lights.Length(); i++)
+      affecting_lights.Add (relevant_lights[i]);
+  }
+}
+
+void csChunkLodTerrainObject::SetDynamicAmbientLight (const csColor& color)
+{
+  dynamic_ambient = color;
+  colorVersion++;
+}
+
+void csChunkLodTerrainObject::LightChanged (iLight* light)
+{
+  colorVersion++;
+}
+
+void csChunkLodTerrainObject::LightDisconnect (iLight* light)
+{
+  affecting_lights.Delete (light);
+  colorVersion++;
+}
+
+#define VERTEX_OFFSET       (10.0f * SMALL_EPSILON)
+
+void csChunkLodTerrainObject::CastShadows (iMovable* movable, 
+					   iFrustumView* fview)
+{
+  iBase* b = (iBase *)fview->GetUserdata ();
+  iLightingProcessInfo* lpi = (iLightingProcessInfo*)b;
+  CS_ASSERT (lpi != 0);
+
+  iLight* li = lpi->GetLight ();
+  bool dyn = lpi->IsDynamic ();
+
+  if (!dyn)
+  {
+    if (!staticLighting || 
+      li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO)
+    {
+      li->AddAffectedLightingInfo (&scfiLightingInfo);
+      if (li->GetDynamicType () != CS_LIGHT_DYNAMICTYPE_PSEUDO)
+        affecting_lights.Add (li);
+    }
+  }
+  else
+  {
+    if (!affecting_lights.In (li))
+    {
+      li->AddAffectedLightingInfo (&scfiLightingInfo);
+      affecting_lights.Add (li);
+    }
+    if (staticLighting) return;
+  }
+
+  if (!staticLighting) return;
+
+  csReversibleTransform o2w (movable->GetFullTransform ());
+
+  csFrustum *light_frustum = fview->GetFrustumContext ()->GetLightFrustum ();
+  iShadowBlockList* shadows = fview->GetFrustumContext ()->GetShadows ();
+  iShadowIterator* shadowIt = shadows->GetShadowIterator ();
+
+  // Compute light position in object coordinates
+  csVector3 wor_light_pos = li->GetCenter ();
+  csVector3 obj_light_pos = o2w.Other2This (wor_light_pos);
+
+  bool pseudoDyn = li->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_PSEUDO;
+  csShadowArray* shadowArr;
+  if (pseudoDyn)
+  {
+    shadowArr = new csShadowArray ();
+    pseudoDynInfo.Put (li, shadowArr);
+    shadowArr->shadowmap = new float[staticLights.Length()];
+    memset(shadowArr->shadowmap, 0, staticLights.Length() * sizeof(float));
+  }
+
+  float lightScale = CS_NORMAL_LIGHT_LEVEL / 256.0f;
+  csColor light_color = li->GetColor () * lightScale /* * (256. / CS_NORMAL_LIGHT_LEVEL)*/;
+
+  csColor col;
+  int i;
+  for (i = 0 ; i < staticLights.Length() ; i++)
+  {
+    const csChunkLodTerrainFactory::Data& data = pFactory->datamap[i];
+    /*
+      A small fraction of the normal is added to prevent unwanted
+      self-shadowing (due small inaccuracies, the tri(s) this vertex
+      lies on may shadow it.)
+     */
+    csVector3 v = o2w.This2Other (data.pos + (data.norm * VERTEX_OFFSET)) -
+      wor_light_pos;
+
+    if (!light_frustum->Contains (v))
+    {
+      continue;
+    }
+    bool inShadow = false;
+    shadowIt->Reset ();
+    while (shadowIt->HasNext ())
+    {
+      csFrustum* shadowFrust = shadowIt->Next ();
+      if (shadowFrust->Contains (v))
+      {
+	inShadow = true;
+	break;
+      }
+    }
+    if (inShadow) continue;
+
+    float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
+      data.pos);
+    if (vrt_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
+    float in_vrt_dist =
+      (vrt_sq_dist >= SMALL_EPSILON) ? qisqrt (vrt_sq_dist) : 1.0f;
+
+    float cosinus;
+    if (vrt_sq_dist < SMALL_EPSILON) cosinus = 1;
+    else cosinus = (obj_light_pos - data.pos) * data.norm;
+    // because the vector from the object center to the light center
+    // in object space is equal to the position of the light
+
+    if (cosinus > 0)
+    {
+      if (vrt_sq_dist >= SMALL_EPSILON) cosinus *= in_vrt_dist;
+      float bright = li->GetBrightnessAtDistance (qsqrt (vrt_sq_dist));
+      if (cosinus < 1) bright *= cosinus;
+      if (pseudoDyn)
+      {
+	// Pseudo-dynamic
+	bright *= lightScale;
+	if (bright > 1.0f) bright = 1.0f; // @@@ clamp here?
+	shadowArr->shadowmap[i] = bright;
+      }
+      else
+      {
+	col = light_color * bright;
+	staticLights[i] += col;
+      }
+    }
+  }
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csChunkLodTerrainObject::MeshTreeNodeWrapper)
+SCF_IMPLEMENT_IBASE_END
+
+csChunkLodTerrainObject::MeshTreeNodeWrapper::MeshTreeNodeWrapper (
+  csChunkLodTerrainObject* obj, csChunkLodTerrainFactory::MeshTreeNode* node)
+{
+  SCF_CONSTRUCT_IBASE(0);
+  MeshTreeNodeWrapper::obj = obj;
+  factoryNode = node;
+
+  svcontext.AttachNew (new csShaderVariableContext ());
+  csRef<iShaderVariableAccessor> sva;
+  sva.AttachNew (new MeshTreeNodeSVA (this));
+
+  csShaderVariable *sv;
+  sv = svcontext->GetVariableAdd (obj->pFactory->vertex_name);
+  sv->SetAccessor (sva);
+  sv = svcontext->GetVariableAdd (obj->pFactory->normal_name);
+  sv->SetAccessor (sva);
+  sv = svcontext->GetVariableAdd (obj->pFactory->tangent_name);
+  sv->SetAccessor (sva);
+  sv = svcontext->GetVariableAdd (obj->pFactory->binormal_name);
+  sv->SetAccessor (sva);
+  sv = svcontext->GetVariableAdd (obj->pFactory->texcors_name);
+  sv->SetAccessor (sva);
+  sv = svcontext->GetVariableAdd (obj->pFactory->texcoords_norm_name);
+  sv->SetAccessor (sva);
+  sv = svcontext->GetVariableAdd (obj->pFactory->color_name);
+  sv->SetAccessor (sva);
+  sv = svcontext->GetVariableAdd (obj->pFactory->index_name);
+  sv->SetAccessor (sva);
+}
+
+csChunkLodTerrainObject::MeshTreeNodeWrapper::~MeshTreeNodeWrapper()
+{
+  SCF_DESTRUCT_IBASE();
+}
+
+csChunkLodTerrainObject::MeshTreeNodeWrapper* 
+csChunkLodTerrainObject::MeshTreeNodeWrapper::GetChild (int n)
+{
+  if (children[n] == 0)
+  {
+    children[n].AttachNew (
+      new MeshTreeNodeWrapper (obj, factoryNode->GetChild (n)));
+  }
+  return children[n];
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(csChunkLodTerrainObject::MeshTreeNodeSVA)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE_END
+
+csChunkLodTerrainObject::MeshTreeNodeSVA::MeshTreeNodeSVA (
+  MeshTreeNodeWrapper* wrapper)
+{
+  SCF_CONSTRUCT_IBASE(0);
+
+  MeshTreeNodeSVA::wrapper = wrapper;
+  colorVersion = ~0;
+}
+
+csChunkLodTerrainObject::MeshTreeNodeSVA::~MeshTreeNodeSVA ()
+{
+  SCF_DESTRUCT_IBASE();
+}
+
+void csChunkLodTerrainObject::MeshTreeNodeSVA::PreGetValue (
+  csShaderVariable *variable)
+{
+  const csStringID name = variable->GetName ();
+  csChunkLodTerrainObject* obj = wrapper->obj;
+  csChunkLodTerrainFactory* factory = obj->pFactory;
+  if (name == factory->color_name)
+  {
+    if (!colorBuffer || (colorVersion != obj->colorVersion))
+    {
+      const csArray<int>& colors = wrapper->factoryNode->colors;
+      unsigned int len = colors.Length();
+      if (!colorBuffer)
+      {
+	colorBuffer = factory->r3d->CreateRenderBuffer (
+	  sizeof (csColor) * len, CS_BUF_DYNAMIC, 
+	  CS_BUFCOMP_FLOAT, 3, false);
+      }
+
+      csChunkLodTerrainFactory::MeshTreeNode* node = 
+	wrapper->factoryNode;
+      CS_ALLOC_STACK_ARRAY(csColor, newColors, len);
+
+      obj->UpdateColors (colors, node->GetVertices(), node->GetNormals(), 
+	node->BBox(), newColors);
+
+      colorBuffer->CopyToBuffer (newColors, sizeof (csColor) * len);
+
+      colorVersion = obj->colorVersion;
+    }
+    variable->SetValue (colorBuffer);
+  }
+  else
+    variable->SetValue (
+      wrapper->factoryNode->GetRenderBuffer (name));
 }

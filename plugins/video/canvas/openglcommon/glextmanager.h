@@ -13158,7 +13158,7 @@ public:
     if (init)
     {
       EXTMGR_FUNC_INIT(wglGetExtensionsStringARB, WGLGETEXTENSIONSSTRINGARB);
-
+      
       EXTMGR_REPORT_INIT_RESULT("WGL", WGL_ARB_extensions_string)
       CS_WGL_ARB_extensions_string &= allclear;
     }

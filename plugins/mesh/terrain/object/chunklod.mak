@@ -39,7 +39,7 @@ INF.CHUNKLOD = $(SRCDIR)/plugins/mesh/terrain/object/chunklod.csplugin
 INC.CHUNKLOD = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrain/object/chunklod.h))
 SRC.CHUNKLOD = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/terrain/object/chunklod.cpp))
 OBJ.CHUNKLOD = $(addprefix $(OUT)/,$(notdir $(SRC.CHUNKLOD:.cpp=$O)))
-DEP.CHUNKLOD = CSGFX CSGEOM CSUTIL CSSYS CSUTIL
+DEP.CHUNKLOD = CSTOOL CSGFX CSGEOM CSUTIL
 CFLAGS.CHUNKLOD = $(CFLAGS.I)plugins/mesh/terrain/object
 
 MSVC.DSP += CHUNKLOD

@@ -21,18 +21,25 @@
 
 #include "csutil/cscolor.h"
 #include "csutil/garray.h"
+#include "csutil/weakref.h"
 
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
 
 #include "imesh/object.h"
 #include "imesh/terrain.h"
+#include "imesh/lighting.h"
 
 #include "iutil/comp.h"
 
 #include "ivideo/rendermesh.h"
 
+#include "iengine/lightmgr.h"
+#include "iengine/shadcast.h"
+
 #include "csgfx/shadervarcontext.h"
+
+#include "cstool/rendermeshholder.h"
 
 struct iMaterialWrapper;
 struct iImage;
@@ -41,7 +48,6 @@ struct iGraphics3D;
 class csChunkLodTerrainType;
 class csChunkLodTerrainFactory;
 class csChunkLodTerrainObject;
-
 
 /**
  * ChunkLod terrain type, instantiates factories which create meshes
@@ -79,10 +85,12 @@ public:
 class csChunkLodTerrainFactory : public iMeshObjectFactory
 {
   friend class csChunkLodTerrainObject;
-private:
+public:
   iBase* parent;
   iObjectRegistry *object_reg;
   csFlags flags;
+  csRef<iEngine> engine;
+  csRef<iLightManager> light_mgr;
 
   csVector3 scale;
   struct Data
@@ -92,7 +100,7 @@ private:
     csVector3 tan;
     csVector3 bin;
     csVector2 tex;
-    csColor col;
+    int col;
     float error;
     Data ()
     {
@@ -101,7 +109,7 @@ private:
       tan.Set (0);
       bin.Set (0);
       tex.Set (0, 0);
-      col.Set (0, 0, 0);
+      col = 0;
       error = 0.0;
     }
   };
@@ -129,10 +137,10 @@ private:
     float radius;
     float error;
 
-    csArray<csVector3> vertices;
+    csDirtyAccessArray<csVector3> vertices;
     csRef<iRenderBuffer> vertex_buffer;
     csRef<iRenderBuffer> compressed_vertex_buffer;
-    csArray<csVector3> normals;
+    csDirtyAccessArray<csVector3> normals;
     csRef<iRenderBuffer> normal_buffer;
     csRef<iRenderBuffer> compressed_normal_buffer;
     csArray<csVector3> tangents;
@@ -145,7 +153,6 @@ private:
     csRef<iRenderBuffer> texcors_buffer;
     csRef<iRenderBuffer> compressed_texcors_buffer;
     csRef<iRenderBuffer> texcoords_norm_buffer;
-    csArray<csColor> colors;
     csRef<iRenderBuffer> color_buffer;
     csRef<iRenderBuffer> compressed_color_buffer;
     csRef<iRenderBuffer> index_buffer;
@@ -162,7 +169,7 @@ private:
     void ProcessEdge (int start, int end, int move, const Data& mod);
     
   public:
-    csShaderVariableContext svcontext;
+    csArray<int> colors;
   
     MeshTreeNode (csChunkLodTerrainFactory* p, int x, int y, int w, int h,
     	float error);
@@ -179,8 +186,9 @@ private:
     float Error () { return error; }
 
     int Count () { return vertices.Length(); }
-    
-    void UpdateBufferSV ();
+
+    const csVector3* GetVertices() const { return vertices.GetArray(); }
+    const csVector3* GetNormals() const { return normals.GetArray(); }
   } *root;
   friend class MeshTreeNode;
 
@@ -243,6 +251,23 @@ public:
 
 
 /**
+ * An array giving shadow information for a pseudo-dynamic light.
+ */
+class csShadowArray
+{
+public:
+  iLight* light;
+  // For every vertex of the mesh a value.
+  float* shadowmap;
+
+  csShadowArray () : shadowmap (0) { }
+  ~csShadowArray ()
+  {
+    delete[] shadowmap;
+  }
+};
+
+/**
  * Instance of an implementation of Thatcher Ulritch's Chunked LOD algorithm
  * for terrain rendering.  http://www.tulrich.com/geekstuff/chunklod.html
  * The factory is responsible for the preprocessing step on the quad-tree
@@ -262,13 +287,20 @@ private:
   csArray<iMaterialWrapper*> palette;
   csRefArray<iImage> alphas;
 
+  csDirtyAccessArray<csColor> staticLights;
+  uint colorVersion;
+  csColor dynamic_ambient;
+  // If we are using the iLightingInfo lighting system then this
+  // is an array of lights that affect us right now.
+  csSet<iLight*> affecting_lights;
+  csHash<csShadowArray*, iLight*> pseudoDynInfo;
+
   float error_tolerance;
   float lod_distance;
 
-  csArray<csRenderMesh> meshes;
-  csArray< csArray<csRenderMesh> > palette_meshes;
-  csRenderMesh **meshpp;
-  int meshppsize;
+  csRenderMeshHolderSingle rmHolder;
+  csRenderMeshHolderMultiple returnMeshesHolder;
+  csDirtyAccessArray<csRenderMesh*>* returnMeshes;
   csReversibleTransform tr_o2c;
 
   // Use for clipping during rendering.
@@ -276,7 +308,41 @@ private:
 
   int tricount;
   csFlags flags;
+  bool staticLighting;
 
+  class MeshTreeNodeWrapper : public iBase
+  {
+    csRef<MeshTreeNodeWrapper> children[4];
+  public:
+    csWeakRef<csChunkLodTerrainObject> obj;
+    csChunkLodTerrainFactory::MeshTreeNode* factoryNode;
+    csRef<csShaderVariableContext> svcontext;
+
+    SCF_DECLARE_IBASE;
+
+    MeshTreeNodeWrapper (csChunkLodTerrainObject* obj,
+      csChunkLodTerrainFactory::MeshTreeNode* node);
+    virtual ~MeshTreeNodeWrapper();
+    MeshTreeNodeWrapper* GetChild (int n);
+  };
+  class MeshTreeNodeSVA : public iShaderVariableAccessor
+  {
+    csWeakRef<MeshTreeNodeWrapper> wrapper;
+    csRef<iRenderBuffer> colorBuffer;
+    uint colorVersion;
+  public:
+    SCF_DECLARE_IBASE;
+
+    MeshTreeNodeSVA (MeshTreeNodeWrapper* wrapper);
+    virtual ~MeshTreeNodeSVA ();
+
+    virtual void PreGetValue (csShaderVariable *variable);
+  };
+  
+  csRef<MeshTreeNodeWrapper> rootNode;
+  iMovable* light_movable; 
+  void UpdateColors (const csArray<int>& colors, const csVector3* vertices, 
+    const csVector3* normals, const csBox3& box, csColor* staticColors);
 public: 
   SCF_DECLARE_IBASE;
 
@@ -295,8 +361,8 @@ public:
    * Does all pre-render calculation.  Determines which LOD children in the 
    * tree should be drawn
    */
-  bool DrawTestQuad (iRenderView* rv, 
-	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa,
+  bool DrawTestQuad (iRenderView* rv, MeshTreeNodeWrapper* node
+	/*csChunkLodTerrainFactory::MeshTreeNode* node*/, float kappa,
 	uint32 frustum_mask);
   bool DrawTest (iRenderView* rview, iMovable* movable);
 
@@ -368,6 +434,21 @@ public:
   bool SaveState (const char *filename);
   bool RestoreState (const char *filename);
   int CollisionDetect (iMovable *m, csTransform *p);
+  void SetStaticLighting (bool enable)
+  { staticLighting = enable; }
+  bool GetStaticLighting ()
+  { return staticLighting; }
+
+  char* GenerateCacheName ();
+  void InitializeDefault (bool clear);
+  bool ReadFromCache (iCacheManager* cache_mgr);
+  bool WriteToCache (iCacheManager* cache_mgr);
+  void PrepareLighting ();
+  void SetDynamicAmbientLight (const csColor& color);
+  const csColor& GetDynamicAmbientLight ();
+  void LightChanged (iLight* light);
+  void LightDisconnect (iLight* light);
+  virtual void CastShadows (iMovable* movable, iFrustumView* fview);
 
   struct eiTerrainObjectState : public iTerrainObjectState
   {
@@ -394,6 +475,10 @@ public:
     { return scfParent->RestoreState (filename); }
     virtual int CollisionDetect (iMovable *m, csTransform *p)
     { return scfParent->CollisionDetect (m, p); }
+    virtual void SetStaticLighting (bool enable)
+    { scfParent->SetStaticLighting (enable); }
+    virtual bool GetStaticLighting ()
+    { return scfParent->GetStaticLighting (); }
   } scfiTerrainObjectState;
   friend struct eiTerrainObjectState;
 
@@ -407,6 +492,55 @@ public:
   } scfiObjectModel;
   friend struct eiObjectModel;
 
+  //-------------------- iShadowReceiver interface implementation ----------
+  struct ShadowReceiver : public iShadowReceiver
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainObject);
+    virtual void CastShadows (iMovable* movable, iFrustumView* fview)
+    {
+      scfParent->CastShadows (movable, fview);
+    }
+  } scfiShadowReceiver;
+  friend struct ShadowReceiver;
+
+  //------------------------- iLightingInfo interface -------------------------
+  struct LightingInfo : public iLightingInfo
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainObject);
+    virtual void InitializeDefault (bool clear)
+    {
+      scfParent->InitializeDefault (clear);
+    }
+    virtual bool ReadFromCache (iCacheManager* cache_mgr)
+    {
+      return scfParent->ReadFromCache (cache_mgr);
+    }
+    virtual bool WriteToCache (iCacheManager* cache_mgr)
+    {
+      return scfParent->WriteToCache (cache_mgr);
+    }
+    virtual void PrepareLighting ()
+    {
+      scfParent->PrepareLighting ();
+    }
+    virtual void SetDynamicAmbientLight (const csColor& color)
+    {
+      scfParent->SetDynamicAmbientLight (color);
+    }
+    virtual const csColor& GetDynamicAmbientLight ()
+    {
+      return scfParent->dynamic_ambient;
+    }
+    virtual void LightChanged (iLight* light)
+    {
+      scfParent->LightChanged (light);
+    }
+    virtual void LightDisconnect (iLight* light)
+    {
+      scfParent->LightDisconnect (light);
+    }
+  } scfiLightingInfo;
+  friend struct LightingInfo;
 };
 
 #endif // __CS_CHNKLOD_H__

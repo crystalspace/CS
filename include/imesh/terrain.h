@@ -31,7 +31,7 @@ struct iImage;
 struct iMovable;
 class csTransform;
 
-SCF_VERSION (iTerrainObjectState, 0, 0, 1);
+SCF_VERSION (iTerrainObjectState, 0, 0, 2);
 
 /**
  * This will override the settings for material in the parent
@@ -84,6 +84,15 @@ struct iTerrainObjectState : public iBase
 
   /// Detects collision with a specific transform
   virtual int CollisionDetect (iMovable *m, csTransform *p) = 0;
+
+  /**
+   * Enable or disable the use of static lighting.
+   */
+  virtual void SetStaticLighting (bool enable) = 0;
+  /**
+   * Retrieve whether static lighting is enabled.
+   */
+  virtual bool GetStaticLighting () = 0;
 };
 
 SCF_VERSION (iTerrainFactoryState, 0, 0, 1);
@@ -115,7 +124,6 @@ struct iTerrainFactoryState : public iBase
    */
   virtual bool SaveState (const char *filename) = 0;
   virtual bool RestoreState (const char *filename) = 0;
-
 };
 
 #endif // __CS_IMESH_TERRAIN_H__

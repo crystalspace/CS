@@ -20,6 +20,10 @@ chronological order.
 	- res changed the render mesh holder to automatically set the inUse
 	  flag of the returned mesh.
 	- res added a fallback to csGLGraphics3D::SetAlphaType().
+	- res augmented the chunklod mesh to support static lighting.
+	  Is enabled by specifying "<staticlighting>yes</staticlighting>" in
+	  the mesh object params. Although the terrain can receive shadows,
+	  it can't cast them yet.
 23-Apr-2004
 	- Eric Sunshine fixed crasher in csSimpleConsole::Initialize()
 	  (simpcon.cpp) where it would blindly access its G2D member without
