@@ -22,6 +22,8 @@
 #ifndef __DDS_DDS_H__
 #define __DDS_DDS_H__
 
+#include "csgfx/rgbpixel.h"
+
 namespace dds
 {
 
@@ -139,11 +141,11 @@ public:
   // Loads the main Image and returns a buffer which has to be deleted with
   // delete[] later.
   // Note that you MUST call IsDDS before calling this function
-  uint8* LoadImage ();
+  csRGBpixel* LoadImage ();
 
   // Loads mipmap number n. Returns a buffer which has to be deleted with
   // delete[] later
-  uint8* LoadMipmap (int n);
+  csRGBpixel* LoadMipmap (int n);
 
 private:
   bool ReadHeader ();
@@ -152,15 +154,22 @@ private:
 
   uint32 GetUInt32 ();
 
-  void Decompress(uint8* buffer, uint8* source, int w, int h, uint32 size);
-  void DecompressRGBA(uint8* buffer, uint8* source, int w, int h, uint32 size);
-  void DecompressDXT1(uint8* buffer, uint8* source, int w, int h, uint32 size);
-  void DecompressDXT2(uint8* buffer, uint8* source, int w, int h, uint32 size);
-  void DecompressDXT3(uint8* buffer, uint8* source, int w, int h, uint32 size);
-  void DecompressDXT4(uint8* buffer, uint8* source, int w, int h, uint32 size);
-  void DecompressDXT5(uint8* buffer, uint8* source, int w, int h, uint32 size);
+  bool Decompress (csRGBpixel* buffer, uint8* source, int w, int h, 
+    uint32 size);
+  void DecompressRGBA (csRGBpixel* buffer, uint8* source, int w, int h, 
+    uint32 size);
+  void DecompressDXT1 (csRGBpixel* buffer, uint8* source, int w, int h, 
+    uint32 size);
+  void DecompressDXT2 (csRGBpixel* buffer, uint8* source, int w, int h, 
+    uint32 size);
+  void DecompressDXT3 (csRGBpixel* buffer, uint8* source, int w, int h, 
+    uint32 size);
+  void DecompressDXT4 (csRGBpixel* buffer, uint8* source, int w, int h, 
+    uint32 size);
+  void DecompressDXT5 (csRGBpixel* buffer, uint8* source, int w, int h, 
+    uint32 size);
 
-  void CorrectPremult(uint8* buffer, uint32 planesize);
+  void CorrectPremult (csRGBpixel* buffer, uint32 planesize);
 
   int format, blocksize;
   int depth; // depth of volume textures

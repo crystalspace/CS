@@ -108,21 +108,21 @@ csDDSImageFile::~csDDSImageFile ()
 bool csDDSImageFile::Load (dds::Loader* loader)
 {
   set_dimensions (loader->GetWidth(), loader->GetHeight());
-  if (loader->GetBytesPerPixel() != 4)
+  /*if (loader->GetBytesPerPixel() != 4)
   {
     Report (CS_REPORTER_SEVERITY_WARNING, 
       "DDS loader only supports 32 bit images at the moment.");
     return false;
-  }
-  uint8* img = loader->LoadImage ();
+  }*/
+  csRGBpixel* img = loader->LoadImage ();
   if (!img)
     return false;
-  convert_rgba ((csRGBpixel*) img);
+  convert_rgba (img);
 
   mipmapcount = loader->GetMipmapCount () - 1;
   for (int i=0;i<mipmapcount;i++)
   {
-    uint8* img = loader->LoadMipmap(i);
+    csRGBpixel* img = loader->LoadMipmap(i);
     if (!img)
       return false;
     csDDSImageFile* image = new csDDSImageFile (object_reg, Format);
@@ -131,7 +131,7 @@ bool csDDSImageFile::Load (dds::Loader* loader)
     int newH = loader->GetHeight() >> (i+1);
     newH = MAX(newH, 1);
     image->set_dimensions (newW, newH);
-    image->convert_rgba((csRGBpixel*) img);
+    image->convert_rgba(img);
     mipmaps.Push (image);
   }
 
