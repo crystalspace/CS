@@ -9,8 +9,15 @@ chronological order.
 28-Mar-2005
 	- Marten changed how transforms are sent from meshobjects to the
 	  renderer.
-	- Marten added a "vertex preprocessor" (vproc) shaderprogramplugin-type.
+	- Marten added a "vertex preprocessor" (vproc) shader program plugin
+	  type.
 	- Marten removed chunklod terrain engine. Instead use bruteblock.
+	- Eric Sunshine cleaned up a small bit of fallout from today's earlier
+	  changes. Also removed some remaining references to the retired
+	  chunklod plugin.
+	- Eric Sunshine relocated the bruteblock implementation from
+	  CS/plugins/mesh/terrain_brute to mesh/terrain/brute so that it
+	  resides alongside the terrain loader.
 27-Mar-2005
 	- Eric Sunshine added FStripCommon to jamcompatibility.jam since Jam
 	  2.4 lacks it and it is needed by StripCommon in helper.jam.

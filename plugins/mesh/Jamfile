@@ -22,6 +22,5 @@ SubInclude TOP plugins mesh spr3d ;
 SubInclude TOP plugins mesh sprcal3d ;
 SubInclude TOP plugins mesh stars ;
 SubInclude TOP plugins mesh terrain ;
-SubInclude TOP plugins mesh terrain_brute ;
 SubInclude TOP plugins mesh thing ;
 SubInclude TOP plugins mesh protomesh ;

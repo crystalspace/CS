@@ -119,7 +119,6 @@
   <meshfact name="TerrainFact">
     <plugin>terrainFact</plugin>
     <params>
-      <!--<plugin>crystalspace.mesh.object.terrain.chunklod</plugin>-->
       <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
       <terraformer>simple</terraformer>
       <sampleregion>
@@ -207,14 +206,10 @@
 	  <material>Stone</material>
 	</materialpalette>
 	<lodvalue name="splatting distance">200</lodvalue>
-  	<!--For chunklod-->
-	<lodvalue name="error tolerance">1</lodvalue>
-	<!--For bruteblock-->
   	<lodvalue name="block resolution">16</lodvalue>
   	<lodvalue name="block split distance">8</lodvalue>
   	<lodvalue name="minimum block size">32</lodvalue>
   	<lodvalue name="cd resolution">256</lodvalue>
-  	<!--<lodvalue name="cd lod cost">.02</lodvalue>-->
 	<materialmap image="/lev/terrain/materialmap.png" />
 	<staticlighting>yes</staticlighting>
 	<castshadows>yes</castshadows>
