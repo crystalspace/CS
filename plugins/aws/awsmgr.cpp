@@ -222,7 +222,7 @@ awsManager::WindowIsDirty(awsWindow *win)
   else
   {
 	int i;
-    for(=0; i<dirty_lid; ++i)
+    for(i=0; i<dirty_lid; ++i)
       if (win->Overlaps(dirty[i])) return true;
   }
 
