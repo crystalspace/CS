@@ -15,6 +15,7 @@ should send mail to the Crystal Space mailing list and ask for help.
 @xref{Mailing Lists}.
 
 @menu
+* Release Notes 100:: Release Notes from 0.98 to 1.00
 * Release Notes 98:: Release Notes from 0.96 to 0.98
 * Release Notes 96:: Release Notes from 0.94 to 0.96
 * Release Notes 94:: Release Notes from 0.92 to 0.94
@@ -24,6 +25,7 @@ should send mail to the Crystal Space mailing list and ask for help.
 * Release Notes 17:: Release Notes from 0.16 to 0.17
 @end menu
 
+@imports{appendix,apimod100.txi}
 @imports{appendix,apimod98.txi}
 @imports{appendix,apimod96.txi}
 @imports{appendix,apimod94.txi}

@@ -32,6 +32,11 @@ chronological order.
 	- res fixed cube map texture uploading on display modes <= 16bpp; an
 	  incorrect size was calculated, causing wrong data to be sent to GL
 	  and eventually a crash.
+	- Eric Sunshine performed some clean up of the new apimod100.txi. Also
+	  linked it into the documentation hierarchy via @import{}.
+	- Eric Sunshine added a bunch of missing entries to
+	  plugins/filesys/vfs/vfs.cfg.template, which is the vfs.cfg that
+	  actually gets installed by "jam install".
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.

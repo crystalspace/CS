@@ -1,35 +1,33 @@
 @c -*-texinfo-*-
+@node Release Notes 100, Release Notes 98, Release Notes, Release Notes
 @appendixsec Release Notes from 0.98 to 1.00
 @cindex Release Notes
 
 This section documents the major changes between versions 0.98 and 1.00 of
 Crystal Space.
 
-@subheading @code{csArray<>} index and size type change
+@subheading @code{csArray<>} Index and Size Type Change
 
-@code{csArray<>} has been changed to use the @code{size_t} instead of 
-@code{int} for array sizes and indices. The probably most significant 
-difference is that @code{size_t} is @emph{unsigned} as opposed to the 
-@emph{signed} @code{int}.
+@code{csArray<>} has been changed to use the @code{size_t} instead of
+@samp{int} for array sizes and indices.  Probably, the most significant
+semantic difference of this change is that @samp{size_t} is @emph{unsigned} as
+opposed to @samp{int} which is @emph{signed}.
 
 @strong{Read this paragraph carefully.} In actual code, this change may result
-in nothing more than a simple-looking compiler warning. However, it may have
-caused @emph{semantics} to subtly change.
+in nothing more than simple-looking compiler warnings. However, it may have
+caused @emph{semantics} to change subtly.
 
-This has the most impact on the following areas:
+This has the greatest impact in the following areas:
 
-@subsubheading Iterating over @code{csArray<>} contents
+@subsubheading Iterating Over @code{csArray<>} Contents
 
-For this purpose, usually, @code{int} typed variables were used for keeping 
-track of the index of the current item of an array iterated over.
-
-Fixing forward iteration over a @code{csArray<>} to use @code{size_t} is a
-no-brainer:
+For this purpose, usually, @samp{int} typed variables were used for keeping
+track of the index of the current item of an array iteration.  Fixing forward
+iteration over a @code{csArray<>} to instead use @samp{size_t} is simple:
 
 @example
-int i;
 csArray<@dots{}> someArray;
-for (i = 0; i < someArray.Length(); i++)
+for (int i = 0, n = someArray.Length(); i < n; i++)
 @{
   @dots{}
 @}
@@ -39,75 +37,74 @@ for (i = 0; i < someArray.Length(); i++)
 Is changed to:
 
 @example
-size_t i;
+@dots{}
+for (size_t i = 0, n = someArray.Length(); i < n; i++)
 @dots{}
 @end example
 
 Backward iteration is a bit more problematic. As mentioned before, 
-@code{size_t} is unsigned, so you don't have negative values. This can be a
+@samp{size_t} is unsigned, so you do not have negative values. This can be a
 problem in constructs like:
 
 @example
-int i;
 csArray<@dots{}> someArray;
-for (i = someArray.Length() - 1; i >= 0; i--)
+for (int i = someArray.Length() - 1; i >= 0; i--)
 @{
   @dots{}
 @}
 @end example
 
-If the @code{int} is straightforwardly changes to a @code{size_t}, this 
-@code{for}-loop misbehaves unexpectedly. When @samp{i} gets 0, the body 
+If the @samp{int} is changed simply to a @samp{size_t}, this 
+@code{for}-loop misbehaves unexpectedly. When @samp{i} becomes 0, the body 
 of the loop is executed correctly. However, decrementing @samp{i} will 
-@strong{not} cause @samp{i} to have a negative value - after all, @code{size_t}
+@strong{not} cause @samp{i} to have a negative value---after all, @samp{size_t}
 is unsigned. Instead, decreasing will make @samp{i} wrap around from 0 to
-something like @samp{0xffffffff} (on 32-bit machines). Clearly, this is greater
+something like 0xffffffff (on 32-bit machines). Clearly, this is greater
 than 0, effectively causing an infinite loop. The same thing also happens when
-@samp{someArray} has no items (i.e. @code{someArray.Length() == 0}). Here the
-@samp{- 1} in the initialization of @samp{i} causes the wrap-around.
+@samp{someArray} has no items (i.e. @samp{someArray.Length() == 0}). Here the
+-1 in the initialization of @samp{i} causes wrap-around.
 
-Possible solutions are:
+Possible solutions include:
+
 @itemize @bullet
 @item
-Keep an @code{int}-typed counter variable, cast the array length to @code{int}.
-Not elegant, but "does the job" in most cases.
+Use an @code{int}-typed counter variable and cast the array length to
+@samp{int}.  This is not entirely elegant, but it does the job in most cases.
+
 @item
-Slightly rewrite the loop to properly deal with the unsignedness of 
-@code{size_t}:
+Re-write the loop to deal properly with the unsigned nature of @samp{size_t}:
 
 @example
-size_t i;
 csArray<@dots{}> someArray;
-for (i = someArray.Length(); i-- > 0;)
+for (size_t i = someArray.Length(); i-- > 0;)
 @{
   @dots{}
 @}
 @end example
 
-This code does the same as the @code{int} version above, iterating from 
-@samp{someArray.Length() - 1} to @code{0}, inclusively. It also correctly works
-in the case @code{someArray.Length() == 0}. The "trick" is to put the 
-decrementation of @samp{i} as a post-decrement into the loop condition. This 
-way, as soon as @samp{i} gets @code{0}, the loop is terminated. The 
-post-decrement makes sure @samp{i} has the expected value in the loop body.
+This code does the same as the @samp{int} version above, iterating from 
+@samp{someArray.Length() - 1} to 0, inclusively. It also correctly works
+in the case @samp{someArray.Length() == 0}. The ``trick'' is to place the 
+modification of @samp{i} as a post-decrement in the loop condition. This 
+way, as soon as @samp{i} becomes 0, the loop is terminated. The 
+post-decrement ensures that @samp{i} has the expected value in the loop body.
 
 @end itemize
 
-@subsubheading Finding items
+@subsubheading Searching
 
-Functions like @samp{csArray<>::FindSortedKey()} and @samp{csArray<>::Find()}
-used to return @code{-1} to signify that an item was not found. 
+Functions like @code{csArray<>::FindSortedKey()} and @code{csArray<>::Find()}
+used to return -1 to signify that an item was not found.  This is still the
+case, but with a twist.  Now, @samp{(size_t)-1} is returned.  For convenience,
+a constant, @samp{csArrayItemNotFound}, has been added, which has this exact
+value.  It can be used in comparions to make it clear what is actually being
+checked.
 
-This is still the case, with a twist: now, @samp{(size_t)-1} is returned. For
-your convenience, a constant @samp{csArrayItemNotFound} was added that has
-this exact value. It can be used in comparions to make clearer what you're
-actually checking.
-
-Apropros comparisons: recall that @code{size_t} is @emph{unsigned}, so checking
+Apropros comparisons: Recall that @samp{size_t} is @emph{unsigned}, so checking
 whether an index returned by @samp{FindSortedKey()} or @samp{Find()} is 
-actually a valid index by testing if it is @samp{>= 0} does not work as
+actually a valid index by testing with @samp{>= 0} no longer works since
 @samp{(size_t)-1} is always @code{>= 0}. Replace such checks with tests of
-equality with @samp{csArrayItemNotFound}:
+equality against @samp{csArrayItemNotFound}:
 
 @example
 csArray<@dots{}> someArray;
@@ -140,4 +137,3 @@ else
   @dots{}
 @}
 @end example
-

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Release Notes 98, Release Notes 96, Release Notes, Release Notes
+@node Release Notes 98, Release Notes 96, Release Notes 100, Release Notes
 @appendixsec Release Notes from 0.96 to 0.98
 @cindex Release Notes
 
