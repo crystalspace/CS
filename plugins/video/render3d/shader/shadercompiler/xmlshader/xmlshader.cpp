@@ -334,7 +334,7 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
         {
           sourceName = CS_BUFFER_COLOR;
         }
-        else if (strcasecmp (source, "lighted color") == 0)
+        else if (strcasecmp (source, "lit color") == 0)
         {
           sourceName = CS_BUFFER_COLOR_LIGHTING;
         }
