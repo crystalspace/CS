@@ -102,7 +102,6 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Options:: Configuring Crystal Space
 * Applications::
 * Tutorials::
-* Anatomy:: Project Anatomy
 * Libraries::
 * Plug-In Drivers:: Plug-In Modules and Drivers
 * Internals:: The Internal Structure of the Project
@@ -128,7 +127,6 @@ For a list of available topics, see the
 @imports{options,chapter.txi}
 @imports{apps,chapter.txi}
 @imports{tutorial,chapter.txi}
-@imports{anatomy,chapter.txi}
 @imports{libs,chapter.txi}
 @imports{plugins,chapter.txi}
 @imports{internal,chapter.txi}
