@@ -514,12 +514,12 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   // Setup perspective vertex, invert mouse Y axis.
   csVector2 p (mouse_x, camera->GetShiftY() * 2 - mouse_y);
 
-  camera->InvPerspective (p, 1, v);
-  csVector3 vw = camera->GetTransform ().This2Other (v);
+  camera->InvPerspective (p, 100, v);
+  csVector3 end = camera->GetTransform ().This2Other (v);
 
   iSector* sector = camera->GetSector ();
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
-  csVector3 isect, end = origin + (vw - origin) * 60;
+  csVector3 isect;
 
   iPolygon3D* poly = 0;
   iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &poly);
@@ -534,7 +534,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
     poly_name = 0;
   }
 
-  vw = isect;
+  csVector3 vw = isect;
   v = camera->GetTransform ().Other2This (vw);
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'",
