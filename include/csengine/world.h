@@ -279,6 +279,10 @@ public:
   static bool do_not_force_relight;
   /// Option variable: force lightmap recalculation?
   static bool do_force_relight;
+  /// Option variable: inhibit visibility recalculation?
+  static bool do_not_force_revis;
+  /// Option variable: force visibility recalculation?
+  static bool do_force_revis;
 
 private:
   /// Texture and color information object.

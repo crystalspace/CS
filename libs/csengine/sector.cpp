@@ -18,6 +18,7 @@
 
 #include "sysdef.h"
 #include "qint.h"
+#include "csutil/csstring.h"
 #include "csengine/dumper.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
@@ -45,6 +46,7 @@
 #include "igraph2d.h"
 #include "itxtmgr.h"
 #include "itexture.h"
+#include "ivfs.h"
 
 // Option variable: render portals?
 bool csSector::do_portals = true;
@@ -192,8 +194,26 @@ void csSector::UseStaticTree (int mode, bool octree)
   {
     CHK (static_tree = new csBspTree (this, mode));
   }
-  CsPrintf (MSG_INITIALIZATION, "Calculate bsp/octree...\n");
-  static_tree->Build (static_thing->GetPolygonArray ());
+
+  csString str ("vis/octree_");
+  str += GetName ();
+  csWorld* w = csWorld::current_world;
+  bool recalc_octree = true;
+  if (!csWorld::do_force_revis && w->VFS->Exists ((const char*)str))
+  {
+    recalc_octree = false;
+    CsPrintf (MSG_INITIALIZATION, "Loading bsp/octree...\n");
+    recalc_octree = !((csOctree*)static_tree)->ReadFromCache (
+    	w->VFS, (const char*)str, static_thing->GetPolygonArray ().GetArray (),
+	static_thing->GetPolygonArray ().Length ());
+  }
+  if (recalc_octree)
+  {
+    CsPrintf (MSG_INITIALIZATION, "Calculate bsp/octree...\n");
+    static_tree->Build (static_thing->GetPolygonArray ());
+    CsPrintf (MSG_INITIALIZATION, "Caching bsp/octree...\n");
+    ((csOctree*)static_tree)->Cache (w->VFS, (const char*)str);
+  }
   static_tree->Statistics ();
   CsPrintf (MSG_INITIALIZATION, "Compress vertices...\n");
   static_thing->CompressVertices ();

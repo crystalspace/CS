@@ -187,6 +187,8 @@ int csWorld::cur_process_polygons = 0;
 bool csWorld::do_lighting_cache = true;
 bool csWorld::do_not_force_relight = false;
 bool csWorld::do_force_relight = false;
+bool csWorld::do_not_force_revis = false;
+bool csWorld::do_force_revis = false;
 
 IMPLEMENT_CSOBJTYPE (csWorld,csObject);
 

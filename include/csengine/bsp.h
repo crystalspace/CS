@@ -127,15 +127,13 @@ private:
 private:
   /**
    * Build the tree from the given node and number of polygons.
-   * The 'was_splitter' array contains 'true' for all polygons that
-   * have already been used as a splitter previously.
    */
-  void Build (csBspNode* node, csPolygonInt** polygons, bool* was_splitter, int num);
+  void Build (csBspNode* node, csPolygonInt** polygons, int num);
 
   /**
    * Select a splitter from a list of polygons and return the index.
    */
-  int SelectSplitter (csPolygonInt** polygons, bool* was_splitter, int num);
+  int SelectSplitter (csPolygonInt** polygons, int num);
 
   /// Traverse the tree from back to front starting at 'node' and 'pos'.
   void* Back2Front (csBspNode* node, const csVector3& pos,
@@ -169,6 +167,10 @@ private:
 
   /// Cache this node and children.
   void Cache (csBspNode* node, iFile* cf);
+
+  /// Read this tree from cache.
+  bool ReadFromCache (iFile* cf, csBspNode* node,
+  	csPolygonInt** polygons, int num);
 
 public:
   /**
@@ -237,6 +239,9 @@ public:
 
   /// Cache this tree.
   void Cache (iFile* cf);
+
+  /// Read this tree from cache.
+  bool ReadFromCache (iFile* cf, csPolygonInt** polygons, int num);
 };
 
 #endif /*BSP_H*/

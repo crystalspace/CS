@@ -1305,14 +1305,17 @@ void csOctree::Statistics (csOctreeNode* node, int depth,
 void csOctree::Cache (csOctreeNode* node, iFile* cf)
 {
   if (!node) return;
-  WriteString (cf, "ONODE", 5);
-  WriteLong (cf, node->unsplit_polygons.GetNumPolygons ());	// Consistency check
-  WriteBox3 (cf, node->bbox);
+  // Consistency check
+  WriteLong (cf, node->unsplit_polygons.GetNumPolygons ());
   WriteVector3 (cf, node->GetCenter ());
   WriteBool (cf, node->leaf);
   WriteBool (cf, node->minibsp != NULL);
   if (node->minibsp)
+  {
     node->minibsp->Cache (cf);
+    return;
+  }
+  if (node->leaf) return;
   int i;
   for (i = 0 ; i < 8 ; i++)
     if (node->children[i])
@@ -1323,45 +1326,251 @@ void csOctree::Cache (csOctreeNode* node, iFile* cf)
   WriteByte (cf, 255);		// No more children.
 }
 
-void csOctree::Cache (iVFS* vfs, char* name)
+void csOctree::Cache (iVFS* vfs, const char* name)
 {
   iFile* cf = vfs->Open (name, VFS_FILE_WRITE);
-  WriteString (cf, "OCTREE", 6);
+  WriteString (cf, "OCTR", 4);
+  // Version number.
+  WriteLong (cf, 100001);
   WriteBox3 (cf, bbox);
   WriteLong (cf, (long)bsp_num);
   WriteLong (cf, (long)mode);
   Cache ((csOctreeNode*)root, cf);
+  cf->DecRef ();
 }
 
 bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
 	const csVector3& bmin, const csVector3& bmax,
   	csPolygonInt** polygons, int num)
 {
-  (void)cf; (void)node; (void)bmin; (void)bmax; (void)polygons; (void)num;
-  //@@@@@@@@@
-  return false;
+  if (ReadLong (cf) != num)
+  {
+    CsPrintf (MSG_WARNING, "Octree does not match with loaded level!\n");
+    return false;
+  }
+
+  node->SetBox (bmin, bmax);
+  ReadVector3 (cf, node->center);
+  node->leaf = ReadBool (cf);
+  bool do_minibsp = ReadBool (cf);
+
+  if (num == 0) return true;
+
+  int i;
+  for (i = 0 ; i < num ; i++)
+    node->unsplit_polygons.AddPolygon (polygons[i]);
+
+  if (do_minibsp)
+  {
+    csBspTree* bsp;
+    CHK (bsp = new csBspTree (sector, mode));
+    bool rc = bsp->ReadFromCache (cf, polygons, num);
+    node->SetMiniBsp (bsp);
+    if (!rc) return false;
+    node->leaf = true;
+    return true;
+  }
+
+  const csVector3& center = node->GetCenter ();
+
+  int k;
+
+  // Now we split the node according to the planes.
+  csPolygonInt** polys[8];
+  int idx[8];
+  for (i = 0 ; i < 8 ; i++)
+  {
+    CHK (polys[i] = new csPolygonInt* [num]);
+    idx[i] = 0;
+  }
+
+  for (k = 0 ; k < num ; k++)
+  {
+    // The following is approach is most likely not the best way
+    // to do it. We should have a routine which can split a polygon
+    // immediatelly to the eight octree nodes.
+    // But since polygons will not often be split that heavily
+    // it probably doesn't really matter much.
+    csPolygonInt* npF, * npB, * npFF, * npFB, * npBF, * npBB;
+    csPolygonInt* nps[8];
+    SplitOptPlane (polygons[k], &npF, &npB, 0, center.x);
+    SplitOptPlane (npF, &npFF, &npFB, 1, center.y);
+    SplitOptPlane (npB, &npBF, &npBB, 1, center.y);
+    SplitOptPlane (npFF, &nps[OCTREE_FFF], &nps[OCTREE_FFB], 2, center.z);
+    SplitOptPlane (npFB, &nps[OCTREE_FBF], &nps[OCTREE_FBB], 2, center.z);
+    SplitOptPlane (npBF, &nps[OCTREE_BFF], &nps[OCTREE_BFB], 2, center.z);
+    SplitOptPlane (npBB, &nps[OCTREE_BBF], &nps[OCTREE_BBB], 2, center.z);
+    for (i = 0 ; i < 8 ; i++)
+      if (nps[i])
+        polys[i][idx[i]++] = nps[i];
+  }
+
+  for (i = 0 ; i < 8 ; i++)
+  {
+    int nr = ReadByte (cf);
+    if (nr != i)
+    {
+      int j;
+      for (j = i ; j < 8 ; j++)
+        CHKB (delete [] polys[j]);
+      CsPrintf (MSG_WARNING, "Corrupt cached octree! Wrong node number!\n");
+      return false;
+    }
+    // Even if there are no polygons in the node we create
+    // a child octree node because some of the visibility stuff
+    // depends on that (i.e. adding dynamic objects).
+    CHK (node->children[i] = new csOctreeNode);
+    csVector3 new_bmin;
+    csVector3 new_bmax;
+    if (i & 4) { new_bmin.x = center.x; new_bmax.x = bmax.x; }
+    else { new_bmin.x = bmin.x; new_bmax.x = center.x; }
+    if (i & 2) { new_bmin.y = center.y; new_bmax.y = bmax.y; }
+    else { new_bmin.y = bmin.y; new_bmax.y = center.y; }
+    if (i & 1) { new_bmin.z = center.z; new_bmax.z = bmax.z; }
+    else { new_bmin.z = bmin.z; new_bmax.z = center.z; }
+    bool rc = ReadFromCache (cf, (csOctreeNode*)node->children[i],
+    	new_bmin, new_bmax, polys[i], idx[i]);
+    if (!rc)
+    {
+      int j;
+      for (j = i ; j < 8 ; j++)
+        CHKB (delete [] polys[j]);
+      return false;
+    }
+
+    CHK (delete [] polys[i]);
+  }
+
+  // Read and ignore the 255 that should be here.
+  if (ReadByte (cf) != 255)
+  {
+    CsPrintf (MSG_WARNING, "Cached octree corrupt! Expected end marker!\n");
+    return false;
+  }
+  return true;
 }
 
-bool csOctree::ReadFromCache (iVFS* vfs, char* name,
-	csPolygonInt** polygons, int /*num*/)
+bool csOctree::ReadFromCache (iVFS* vfs, const char* name,
+	csPolygonInt** polygons, int num)
 {
   iFile* cf = vfs->Open (name, VFS_FILE_READ);
   if (!cf) return false;		// File doesn't exist
   char buf[10];
-  ReadString (cf, buf, 6);
-  if (strncmp (buf, "OCTREE", 6))
+  ReadString (cf, buf, 4);
+  if (strncmp (buf, "OCTR", 4))
   {
-    CsPrintf (MSG_WARNING, "Cached octree '%s' is not valid! Will be ignored.\n", name);
+    CsPrintf (MSG_WARNING, "Cached octree '%s' not valid! Will be ignored.\n",
+    	name);
+    cf->DecRef ();
     return false;	// Bad format!
   }
+  long format_version = ReadLong (cf);
+  if (format_version != 100001)
+  {
+    CsPrintf (MSG_WARNING, "Unknown format version (%ld)!\n", format_version);
+    cf->DecRef ();
+    return false;
+  }
+
   ReadBox3 (cf, bbox);
   bsp_num = ReadLong (cf);
   mode = ReadLong (cf);
-  (void)polygons;
-  //@@@@@@@@@@@
-  //return ReadFromCache (cf, (csOctreeNode*)root, bmin, bmax,
-  	//polygons, num);
+
+  CHK (root = new csOctreeNode);
+  CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
+  int i;
+  for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
+  bool rc = ReadFromCache (cf, (csOctreeNode*)root, bbox.Min (), bbox.Max (),
+  	new_polygons, num);
+  CHK (delete [] new_polygons);
+  cf->DecRef ();
+  return rc;
+}
+
+bool csOctree::ReadFromCachePVS (iFile* cf, csOctreeNode* node)
+{
+  (void)cf; (void)node;
+  //csPVS& pvs = node->GetPVS ();
+  //pvs.Clear ();
+  //csOctreeVisible* ovis = pvs.Add ();
+  //ovis->SetOctreeNode (occludee);
   return false;
+}
+
+bool csOctree::ReadFromCachePVS (iVFS* vfs, const char* name)
+{
+  iFile* cf = vfs->Open (name, VFS_FILE_READ);
+  if (!cf) return false;		// File doesn't exist
+  char buf[10];
+  ReadString (cf, buf, 4);
+  if (strncmp (buf, "OPVS", 4))
+  {
+    CsPrintf (MSG_WARNING, "Cached PVS '%s' not valid! Will be ignored.\n",
+    	name);
+    cf->DecRef ();
+    return false;	// Bad format!
+  }
+  long format_version = ReadLong (cf);
+  if (format_version != 100001)
+  {
+    CsPrintf (MSG_WARNING, "Unknown format version (%ld)!\n", format_version);
+    cf->DecRef ();
+    return false;
+  }
+
+  bool rc = ReadFromCachePVS (cf, (csOctreeNode*)root);
+  cf->DecRef ();
+  return rc;
+}
+
+void csOctree::GetNodePath (csOctreeNode* node, csOctreeNode* child,
+	unsigned char* path, int& path_len)
+{
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+    if (node->children[i])
+    {
+      csOctreeNode* onode = (csOctreeNode*)node->children[i];
+      if (onode == child)
+      {
+        path[path_len++] = i;
+	return;
+      }
+      if (onode->bbox.In (child->GetCenter ()))
+      {
+        path[path_len++] = i;
+	GetNodePath (onode, child, path, path_len);
+	return;
+      }
+    }
+}
+
+void csOctree::CachePVS (csOctreeNode* node, iFile* cf)
+{
+  WriteString (cf, "NPVS", 4);
+  csPVS& pvs = node->GetPVS ();
+  csOctreeVisible* ovis = pvs.GetFirst ();
+  unsigned char path[255];
+  int path_len;
+  while (ovis)
+  {
+    path_len = 0;
+    GetNodePath ((csOctreeNode*)root, node, path, path_len);
+    WriteByte (cf, path_len+1);		// First write length of path + 1
+    WriteString (cf, (char*)path, path_len);
+    ovis = pvs.GetNext (ovis);
+  }
+  WriteByte (cf, 0);	// End marker
+}
+
+void csOctree::CachePVS (iVFS* vfs, const char* name)
+{
+  iFile* cf = vfs->Open (name, VFS_FILE_WRITE);
+  WriteString (cf, "OPVS", 4);
+  // Version number.
+  WriteLong (cf, 100001);
+  CachePVS ((csOctreeNode*)root, cf);
+  cf->DecRef ();
 }
 
 //---------------------------------------------------------------------------

@@ -1,5 +1,22 @@
 The history order has been reversed so that new features are at the top.
 
+9-May-2000
+	- -revis commandline option will now work to force recalculation
+	  of the octree. -norevis will not work for this as CS cannot
+	  live with an octree that is invalid. If the octree is found
+	  not to match with the level it HAS to be recalculated.
+	  This is different with the PVS. When we cache this then
+	  -norevis will be useful there.
+	- Frank O'Connor changed directory and naming scheme of normans
+	  font plugins to maintain consistency among the new plugins.
+	- Frank also fixed bug in blocks where current menu item was not
+	  visible on win32. This was because of improper intialization.
+	- Norman Kramer added FontRender entries to all the config files.
+	- Norman also added FUNC_ID for fontrenderer to isystem.h.
+	- Norman disabled freetype engine plugin to prevent default
+	  compilation, user should enable it itself.
+	- Thomas Riemer did a minor fix for initialization of name for
+	  command for NetSpace.
 8-May-2000
 	- Eric Sunshine re-enabled -kb flag and re-added CRLF line terminators
 	  for all .dsp files so that they will work even from CVS snapshot
@@ -47,6 +64,21 @@ The history order has been reversed so that new features are at the top.
 	  Change icmdmgr.h and iproto.h to use NetCmd interface.
 	  Added first nstp implementation documentation.
 	  Upgrade nstp client demo - now it allows login to server.
+	- More work on saving/loading octree. The octree save/load
+	  now seems to work perfectly. PVS is not cached yet.
+	  The cached octree format contains a few consistency checks
+	  to make sure that the octree is really valid for the current
+	  level. If it fails then the octree will be recalculated
+	  again.
+	- Martin Geisse changed standard textures in dungeon plugin from
+	  GIF to JPG. Martin also fixed a bug in the dungeon sample input
+	  files.
+	- Frank O'Connor changed csAll.dsw to binary.
+	- Frank also removed very outdated glide projects for Win32.
+	- Frank also redid some of cspace project to put all interfaces
+	  under one logic group.
+	- Frank also did various other VC project file changes.
+	- Frank converted legacy SysPrintf to m_piSystem->Printf.
 7-May-2000
 	- More work on PVS. Still not working properly though.
 	- Started working on saving and loading of octree and PVS.

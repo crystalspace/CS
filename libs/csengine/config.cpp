@@ -47,10 +47,11 @@ static void config_relight (bool flag)
   csWorld::do_not_force_relight = !flag;
 }
 
-static bool config_revis () { return false; } // @@@ A no-op for now.
-static void config_revis (bool)
+static bool config_revis () { return csWorld::do_force_revis; }
+static void config_revis (bool flag)
 {
-  // @@@ A no-op until visibility information is cached.
+  csWorld::do_force_revis = flag;
+  csWorld::do_not_force_revis = !flag;
 }
 
 static bool config_recalc () { return config_relight() || config_revis(); }

@@ -335,6 +335,20 @@ private:
   bool ReadFromCache (iFile* cf, csOctreeNode* node,
   	const csVector3& bmin, const csVector3& bmax,
   	csPolygonInt** polygons, int num);
+
+  /// Read the PVS for this node and children from VFS.
+  bool ReadFromCachePVS (iFile* cf, csOctreeNode* node);
+  /// Cache the PVS for this node and children to VFS.
+  void CachePVS (csOctreeNode* node, iFile* cf);
+
+  /**
+   * Get the path to a node in the tree.
+   * The length should be set to 0 before calling this function.
+   * The returned length will be the length of the path in 'path'.
+   */
+  void GetNodePath (csOctreeNode* node, csOctreeNode* child,
+	unsigned char* path, int& path_len);
+
 public:
   /**
    * Create an empty tree for the given parent, a bounding box defining the
@@ -414,15 +428,27 @@ public:
   void Statistics ();
 
   /**
-   * Cache this entire octree and PVS to disk (VFS).
+   * Cache this entire octree to disk (VFS).
    */
-  void Cache (iVFS* vfs, char* name);
+  void Cache (iVFS* vfs, const char* name);
 
   /**
-   * Read this entire octree and PVS from disk (VFS).
-   * Returns false if not cache, or cache not valid.
+   * Read this entire octree from disk (VFS).
+   * Returns false if not cached, or cache not valid.
    */
-  bool ReadFromCache (iVFS* vfs, char* name, csPolygonInt** polygons, int num);
+  bool ReadFromCache (iVFS* vfs, const char* name,
+  	csPolygonInt** polygons, int num);
+
+  /**
+   * Cache the PVS to VFS.
+   */
+  void CachePVS (iVFS* vfs, const char* name);
+
+  /**
+   * Read the PVS from VFS.
+   * Return false if not cached, or cache not valid.
+   */
+  bool ReadFromCachePVS (iVFS* vfs, const char* name);
 };
 
 #endif /*OCTREE_H*/

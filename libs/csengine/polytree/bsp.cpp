@@ -102,19 +102,14 @@ void csBspTree::Build (csPolygonInt** polygons, int num)
   CHK (root = new csBspNode);
 
   CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
-  CHK (bool* was_splitter = new bool [num]);
   int i;
   for (i = 0 ; i < num ; i++)
-  {
     new_polygons[i] = polygons[i];
-    was_splitter[i] = false;
-  }
-  Build ((csBspNode*)root, new_polygons, was_splitter, num);
+  Build ((csBspNode*)root, new_polygons, num);
   CHK (delete [] new_polygons);
-  CHK (delete [] was_splitter);
 }
 
-int csBspTree::SelectSplitter (csPolygonInt** polygons, bool* was_splitter, int num)
+int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
 {
   int i, j, poly_idx;
 
@@ -167,7 +162,6 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, bool* was_splitter, int 
     int same_poly = 0;
     for (i = 0 ; i < num ; i++)
     {
-      if (was_splitter[i]) continue;
       csPlane3* plane_i = polygons[i]->GetPolyPlane ();
       int cnt = 1;
       for (j = i+1 ; j < num ; j++)
@@ -192,7 +186,6 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, bool* was_splitter, int 
         ii = rand () % num;
       else
         ii = i;
-      if (was_splitter[ii]) continue;
       int front = 0, back = 0;
       int splits = 0;
       for (j = 0 ; j < n ; j++)
@@ -226,7 +219,7 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, bool* was_splitter, int 
 }
 
 void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
-	bool* was_splitter, int num)
+	int num)
 {
   int i;
   if (!Covers (polygons, num))
@@ -238,33 +231,12 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
     return;
   }
 
-#if 0
-  // If the set is not convex and all polygons have
-  // been used as splitters then we temporarily
-  // consider this a convex node too. This is not right@@@@@@
-  bool all_splitter = true;
-  for (i = 0 ; i < num ; i++)
-  {
-    if (!was_splitter[i]) { all_splitter = false; break; }
-  }
-  if (all_splitter)
-  {
-    // @@@@@
-    printf ("FALSE CONVEX %d\n", num);
-    for (i = 0 ; i < num ; i++)
-      node->AddPolygon (polygons[i]);
-    return;
-  }
-#endif
-
-  csPolygonInt* split_poly = polygons[SelectSplitter (polygons, was_splitter, num)];
+  csPolygonInt* split_poly = polygons[SelectSplitter (polygons, num)];
   node->splitter = *(split_poly->GetPolyPlane ());
 
   // Now we split the node according to the plane of that polygon.
   CHK (csPolygonInt** front_poly = new csPolygonInt* [num]);
   CHK (csPolygonInt** back_poly = new csPolygonInt* [num]);
-  CHK (bool* front_splitter = new bool [num]);
-  CHK (bool* back_splitter = new bool [num]);
   int front_idx = 0, back_idx = 0;
 
   for (i = 0 ; i < num ; i++)
@@ -274,24 +246,18 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
     {
       case POL_SAME_PLANE:
       	node->AddPolygon (polygons[i]);
-	//front_splitter[front_idx] = true;
-	//front_poly[front_idx++] = polygons[i];
 	break;
       case POL_FRONT:
-	front_splitter[front_idx] = was_splitter[i];
         front_poly[front_idx++] = polygons[i];
 	break;
       case POL_BACK:
-	back_splitter[back_idx] = was_splitter[i];
         back_poly[back_idx++] = polygons[i];
 	break;
       case POL_SPLIT_NEEDED:
 	{
 	  csPolygonInt* np1, * np2;
 	  polygons[i]->SplitWithPlane (&np1, &np2, node->splitter);
-	  front_splitter[front_idx] = false;
 	  front_poly[front_idx++] = np1;
-	  back_splitter[back_idx] = false;
 	  back_poly[back_idx++] = np2;
 	}
 	break;
@@ -301,18 +267,16 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
   if (front_idx)
   {
     CHK (node->front = new csBspNode);
-    Build (node->front, front_poly, front_splitter, front_idx);
+    Build (node->front, front_poly, front_idx);
   }
   if (back_idx)
   {
     CHK (node->back = new csBspNode);
-    Build (node->back, back_poly, back_splitter, back_idx);
+    Build (node->back, back_poly, back_idx);
   }
 
   CHK (delete [] front_poly);
   CHK (delete [] back_poly);
-  CHK (delete [] front_splitter);
-  CHK (delete [] back_splitter);
 }
 
 void csBspTree::ProcessTodo (csBspNode* node)
@@ -558,26 +522,109 @@ void csBspTree::AddToPVS (csBspNode* node, csPolygonArrayNoFree* polygons)
 void csBspTree::Cache (csBspNode* node, iFile* cf)
 {
   if (!node) return;
-  WriteString (cf, "BNODE", 5);
   WriteLong (cf, node->polygons.GetNumPolygons ());	// Consistency check
   WriteBool (cf, node->polygons_on_splitter);
+  if (!node->polygons_on_splitter) return;
   WritePlane3 (cf, node->splitter);
   if (node->front)
-  {
-    WriteByte (cf, 0);	// Indicate front node.
     Cache ((csBspNode*)node->front, cf);
-  }
   if (node->back)
-  {
-    WriteByte (cf, 1);	// Indicate back node.
     Cache ((csBspNode*)node->back, cf);
-  }
-  WriteByte (cf, 255);	// No more nodes.
 }
 
 void csBspTree::Cache (iFile* cf)
 {
   Cache ((csBspNode*)root, cf);
+}
+
+bool csBspTree::ReadFromCache (iFile* cf, csBspNode* node,
+	csPolygonInt** polygons, int num)
+{
+  int i;
+  int check_num_polygons = ReadLong (cf);
+
+  node->polygons_on_splitter = ReadBool (cf);
+  if (!node->polygons_on_splitter)
+  {
+    // We have a convex set.
+    for (i = 0 ; i < num ; i++)
+      node->AddPolygon (polygons[i]);
+    if (check_num_polygons != num)
+    {
+      CsPrintf (MSG_WARNING, "Bsp does not match with loaded level (1)!\n");
+      return false;
+    }
+    return true;
+  }
+
+  ReadPlane3 (cf, node->splitter);
+
+  // Now we split the node according to the plane of that polygon.
+  CHK (csPolygonInt** front_poly = new csPolygonInt* [num]);
+  CHK (csPolygonInt** back_poly = new csPolygonInt* [num]);
+  int front_idx = 0, back_idx = 0;
+
+  for (i = 0 ; i < num ; i++)
+  {
+    int c = polygons[i]->Classify (node->splitter);
+    switch (c)
+    {
+      case POL_SAME_PLANE:
+      	node->AddPolygon (polygons[i]);
+	break;
+      case POL_FRONT:
+        front_poly[front_idx++] = polygons[i];
+	break;
+      case POL_BACK:
+        back_poly[back_idx++] = polygons[i];
+	break;
+      case POL_SPLIT_NEEDED:
+	{
+	  csPolygonInt* np1, * np2;
+	  polygons[i]->SplitWithPlane (&np1, &np2, node->splitter);
+	  front_poly[front_idx++] = np1;
+	  back_poly[back_idx++] = np2;
+	}
+	break;
+    }
+  }
+
+  if (check_num_polygons != node->polygons.GetNumPolygons ())
+  {
+    CsPrintf (MSG_WARNING, "Bsp does not match with loaded level (2)!\n");
+    return false;
+  }
+
+  if (front_idx)
+  {
+    CHK (node->front = new csBspNode);
+    bool rc = ReadFromCache (cf, node->front, front_poly, front_idx);
+    if (!rc) return false;
+  }
+  if (back_idx)
+  {
+    CHK (node->back = new csBspNode);
+    bool rc = ReadFromCache (cf, node->back, back_poly, back_idx);
+    if (!rc) return false;
+  }
+
+  CHK (delete [] front_poly);
+  CHK (delete [] back_poly);
+  return true;
+}
+
+bool csBspTree::ReadFromCache (iFile* cf,
+	csPolygonInt** polygons, int num)
+{
+  CHK (root = new csBspNode);
+
+  CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
+  int i;
+  for (i = 0 ; i < num ; i++)
+    new_polygons[i] = polygons[i];
+  bool rc = ReadFromCache (cf, (csBspNode*)root, new_polygons, num);
+  CHK (delete [] new_polygons);
+  return rc;
 }
 
 //---------------------------------------------------------------------------
