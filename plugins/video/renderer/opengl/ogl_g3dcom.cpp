@@ -3021,7 +3021,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     trimesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 
   TrianglesNode *t = polbuf->GetFirst();
-  for (i=0; i<polbuf->GetMaterialCount(); i++)
+  for (i=0 ; i < polbuf->GetMaterialCount () ; i++)
   {
     trimesh.mat_handle = polbuf->GetMaterialPolygon (t);
     vbman->LockBuffer (vb, 
@@ -3052,10 +3052,10 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   TrianglesSuperLightmapNode *sln = polbuf->GetFirstTrianglesSLM ();
   bool dirty = polbuf->superLM.GetLightmapsDirtyState();
   bool modified = false;
-  for (i=0; i<polbuf->GetSuperLMCount (); i++)
+  for (i=0 ; i<polbuf->GetSuperLMCount () ; i++)
   {
-    lightmap_cache->Cache (sln->info,dirty,&modified);
-    if (!sln->info->cacheData->IsUnlit())
+    lightmap_cache->Cache (sln->info, dirty, &modified);
+    if (!sln->info->cacheData->IsUnlit ())
     {   
       vbman->LockBuffer (vb, 
         polbuf->GetVerticesPerSuperLightmap (sln),
@@ -3472,24 +3472,25 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   {
     material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
     effect = material->GetEffect();
-    technique = effectserver->SelectAppropriateTechnique(
-      effect );
-  } else {
+    technique = effectserver->SelectAppropriateTechnique (effect);
+  }
+  else
+  {
     effect = SeparateLightmapStockEffect;
     technique = effectserver->SelectAppropriateTechnique (effect);
   }
 
-  if( !technique )
+  if (!technique)
   {
-    technique = GetStockTechnique( mesh );
-    if( !technique )
+    technique = GetStockTechnique (mesh);
+    if (!technique)
     {
       OldDrawTriangleMesh (mesh); // Should never get here.
       return;
     }
   }
 
-  FlushDrawPolygon ();        //@@@ Should do checks here since
+  FlushDrawPolygon ();
 
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
   int num_triangles = mesh.num_triangles;
@@ -3640,7 +3641,6 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     work_userarrays[i] = mesh.buffers[0]->GetUserArray (i);
     userarraycomponents[i] = mesh.buffers[0]->GetUserArrayComponentCount (i);
   }
-
 
   if (mesh.num_vertices_pool > 1)
   {
@@ -3794,7 +3794,6 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   else
     glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
 
-
   glTranslatef (asp_center_x, asp_center_y, 0);
   for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
   matrixholder[0] = matrixholder[5] = 1.0;
@@ -3815,39 +3814,38 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   //@@@EXPERIMENTAL!!
   //CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
 
-
   int maxlayers = 0;
-  for( int p=0; p<technique->GetPassCount(); p++ )
+  for (int p=0 ; p<technique->GetPassCount () ; p++)
   {
-    iEffectPass* pass = technique->GetPass(p);
+    iEffectPass* pass = technique->GetPass (p);
 
     //get rendererdata to use
     csRef<csOpenGlEffectPassData> pass_data =
-      SCF_QUERY_INTERFACE(pass->GetRendererData(), csOpenGlEffectPassData);
+      SCF_QUERY_INTERFACE (pass->GetRendererData(), csOpenGlEffectPassData);
 
-    if( p == 0 )
+    if (p == 0)
       SetGLZBufferFlags (z_buf_mode);
-    else if( p == 1 )
+    else if (p == 1)
       SetGLZBufferFlagsPass2 (z_buf_mode, true);
 
-    if( pass_data->vertex_program > 0)
+    if (pass_data->vertex_program > 0)
     {
       ///@@@HACK.. THESE SHOULD BE CHANEGD
-      glTrackMatrixNV( GL_VERTEX_PROGRAM_NV, 0, GL_MODELVIEW_PROJECTION_NV,
-        GL_IDENTITY_NV );
+      glTrackMatrixNV (GL_VERTEX_PROGRAM_NV, 0, GL_MODELVIEW_PROJECTION_NV,
+        GL_IDENTITY_NV);
       //set all constants
-      for(int i = 0; i<pass_data->vertex_constants.Length(); i++)
+      for (int i = 0 ; i<pass_data->vertex_constants.Length() ; i++)
       {
         csOpenGlVPConstant* c = (csOpenGlVPConstant*)pass_data
 		->vertex_constants[i];
-        if( c->efvariableType == CS_EFVARIABLETYPE_FLOAT )
+        if (c->efvariableType == CS_EFVARIABLETYPE_FLOAT)
         {
           //set a float
           float var = effect->GetVariableFloat(c->variableID);
           glProgramParameter4fNV( GL_VERTEX_PROGRAM_NV,
 	  	c->constantNumber, var, var, var, var);
         }
-        else if ( c->efvariableType == CS_EFVARIABLETYPE_VECTOR4 )
+        else if  (c->efvariableType == CS_EFVARIABLETYPE_VECTOR4)
         { 
           //set a vec4
           csEffectVector4 vec = effect->GetVariableVector4(c->variableID);
@@ -3859,42 +3857,44 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       statecache->EnableState( GL_VERTEX_PROGRAM_NV);
     }
 
-    if( pass_data->doblending )
+    if (pass_data->doblending)
     {
-      statecache->EnableState( GL_BLEND );
-      statecache->SetBlendFunc( pass_data->sblend, pass_data->dblend );
+      statecache->EnableState (GL_BLEND);
+      statecache->SetBlendFunc (pass_data->sblend, pass_data->dblend);
     }
     else
     {
-      statecache->DisableState( GL_BLEND );
+      statecache->DisableState (GL_BLEND);
     }
 
-    statecache->SetShadeModel( pass_data->shade_state );
+    statecache->SetShadeModel (pass_data->shade_state);
 
-    if( pass_data->vcsource == ED_SOURCE_FOG )
+    if (pass_data->vcsource == ED_SOURCE_FOG)
     {
       glColorPointer (3, GL_FLOAT, sizeof(G3DFogInfo), & work_fog[0].r);
-      glEnableClientState(GL_COLOR_ARRAY);
+      glEnableClientState (GL_COLOR_ARRAY);
     }
     else
     {
       if (mesh.buffers[0]->GetColors())
       {
         glColorPointer (3, GL_FLOAT, 0, work_colors);
-        glEnableClientState(GL_COLOR_ARRAY);
-      } else {
-        glDisableClientState(GL_COLOR_ARRAY);
+        glEnableClientState (GL_COLOR_ARRAY);
+      }
+      else
+      {
+        glDisableClientState (GL_COLOR_ARRAY);
         glColor4f (1,1,1,1);
       }
     }
 
 
-    if( pass->GetLayerCount() > maxlayers ) maxlayers = pass->GetLayerCount();
-    for( l=0; l<pass->GetLayerCount(); l++ )
+    if (pass->GetLayerCount() > maxlayers) maxlayers = pass->GetLayerCount();
+    for (l=0 ; l<pass->GetLayerCount() ; l++ )
     {
-      iEffectLayer* layer = pass->GetLayer(l);
+      iEffectLayer* layer = pass->GetLayer (l);
 
-      csRef<csOpenGlEffectLayerData> layer_data = SCF_QUERY_INTERFACE(
+      csRef<csOpenGlEffectLayerData> layer_data = SCF_QUERY_INTERFACE (
         layer->GetRendererData(), csOpenGlEffectLayerData);
 
       if (ARB_multitexture && (ARB_texture_env_combine
@@ -3904,69 +3904,69 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         glClientActiveTextureARB( GL_TEXTURE0_ARB + l );
       }
 
-      if( layer_data->ccsource == ED_SOURCE_FOG )
+      if (layer_data->ccsource == ED_SOURCE_FOG)
       {
         //float tmp[4] = {1, 0, 0, 1};
         glTexEnvfv( GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, & work_fog[0].r );
       }
 
-      if( layer_data->vcord_source == ED_SOURCE_FOG )
+      if (layer_data->vcord_source == ED_SOURCE_FOG)
       {
         glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo),
 		&work_fog[0].intensity);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
       }
-      else if( layer_data->vcord_source == ED_SOURCE_LIGHTMAP )
+      else if (layer_data->vcord_source == ED_SOURCE_LIGHTMAP)
       {
         if (!lightmapcoords)
         {
           glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
-          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+          glEnableClientState (GL_TEXTURE_COORD_ARRAY);
         }
 	else
 	{
 	  /*glTexCoordPointer (2, GL_FLOAT, sizeof(csVector2),
 	    &((csVector2*)work_userarrays[CS_GL_LIGHTMAP_USERA])->x);
 	    glEnableClientState(GL_TEXTURE_COORD_ARRAY);*/
-	  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
         }
       }
-      else if( layer_data->vcord_source == ED_SOURCE_MESH )
+      else if (layer_data->vcord_source == ED_SOURCE_MESH)
       {
         glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
-        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
       }
       else if ((layer_data->vcord_source >= ED_SOURCE_USERARRAY(0)) &&
 	       (layer_data->vcord_source
 	       	< ED_SOURCE_USERARRAY(CS_VBUF_TOTAL_USERA)))
       {
         int idx = layer_data->vcord_source-ED_SOURCE_USERARRAY(0);
-        if( work_userarrays[idx] )
+        if (work_userarrays[idx])
         {
           glTexCoordPointer (userarraycomponents[idx],
             GL_FLOAT, 0, work_userarrays[idx]);
-          glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+          glEnableClientState (GL_TEXTURE_COORD_ARRAY);
         }
       }
 
       GLuint texturehandle = 0;
       iTextureHandle* txt_handle = NULL;
 
-      if( layer_data->inputtex==-1 )
+      if (layer_data->inputtex==-1)
       {
         statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
         statecache->EnableState (GL_TEXTURE_2D, l);
       } 
-      else if( layer_data->inputtex==-2 )
+      else if (layer_data->inputtex==-2)
       {
         statecache->SetTexture (GL_TEXTURE_2D, lightmap);
         statecache->EnableState (GL_TEXTURE_2D, l);
       } 
-      else if( layer_data->inputtex==0 )
+      else if (layer_data->inputtex==0)
       {
         txt_handle = 0;
       }
-      else if( layer_data->inputtex==1 )
+      else if (layer_data->inputtex==1)
       {
         CacheTexture (mesh.mat_handle);
         txt_handle = mesh.mat_handle->GetTexture ();
@@ -3982,7 +3982,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       if (txt_handle)
       {
         csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
-    txt_handle->GetPrivateObject ();
+		txt_handle->GetPrivateObject ();
         csTxtCacheData *cachedata = (csTxtCacheData *)txt_mm->GetCacheData ();
         texturehandle = cachedata->Handle;
 
@@ -3992,14 +3992,13 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
       if (ARB_texture_env_combine || EXT_texture_env_combine)
       {
-
         glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
 
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, layer_data->colorsource[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_RGB_ARB, layer_data->colormod[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, layer_data->colorsource[1]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_RGB_ARB, layer_data->colormod[1]);
-        if( layer_data->colorsource[2] != -1 )
+        if (layer_data->colorsource[2] != -1)
         {
           glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_RGB_ARB, layer_data->colorsource[2]);
           glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_RGB_ARB, layer_data->colormod[2]);
@@ -4010,7 +4009,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA_ARB, layer_data->alphamod[0]);
         glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, layer_data->alphasource[1]);
         glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA_ARB, layer_data->alphamod[1]);
-        if( layer_data->colorsource[2] != -1 )
+        if (layer_data->colorsource[2] != -1)
         {
           glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE2_ALPHA_ARB, layer_data->alphasource[2]);
           glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND2_ALPHA_ARB, layer_data->alphamod[2]);
@@ -4020,20 +4019,19 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     }
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
-
-  if(pass_data->vertex_program > 0)
-    statecache->DisableState (GL_VERTEX_PROGRAM_NV);
-
+    if (pass_data->vertex_program > 0)
+      statecache->DisableState (GL_VERTEX_PROGRAM_NV);
   }
+
   if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
   {
-    for( l=maxlayers-1; l>=0; l-- )
+    for (l=maxlayers-1 ; l>=0 ; l--)
     {
-      glActiveTextureARB( GL_TEXTURE0_ARB+l );
-      glClientActiveTextureARB( GL_TEXTURE0_ARB+l );
-      if( l>0 )
+      glActiveTextureARB (GL_TEXTURE0_ARB+l);
+      glClientActiveTextureARB (GL_TEXTURE0_ARB+l);
+      if (l>0)
         statecache->DisableState (GL_TEXTURE_2D, l);
-      glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+      glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
   }
 

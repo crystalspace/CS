@@ -355,7 +355,7 @@ int OpenGLLightmapCache::FindFreeSuperLightmap()
  * Basically we have to blit all the lightmaps in a free super
  * lightmap
  */
-void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
+void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   bool* modified)
 {
   Setup ();
@@ -370,18 +370,18 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
   int i;
   int numLightmaps = s->lightmaps.Length ();
   GLuint SLMHandle;
-  if(s->cacheData)
+  if (s->cacheData)
   {
     //The data is already in cache, let's see
     // if we need to recalculate the lightmaps
     // due the effect of dynamic lights
 
-    if(dirty || !s->initialized)
+    if (dirty || !s->initialized)
     {
       SLMHandle = s->cacheData->Handle;
-      for(i = 0; i < numLightmaps; i++)
+      for (i = 0; i < numLightmaps; i++)
       {
-        if(lmArray[i]->RecalculateDynamicLights())
+        if (lmArray[i]->RecalculateDynamicLights ())
         {
           iLightMap* lm = lmArray[i]->GetLightMap();
           int lmwidth = lm->GetWidth();
@@ -390,7 +390,7 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
           csRect r = rectangleArray[i];
           csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D,
 	  	SLMHandle);
-          glTexSubImage2D(GL_TEXTURE_2D, 0,r.xmin,r.ymin,
+          glTexSubImage2D (GL_TEXTURE_2D, 0,r.xmin,r.ymin,
             lmwidth, lmheight,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
         }
       }
@@ -400,16 +400,15 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
     return;
   }
 
-  //The superlightmap isn't in the cache, so we have to cache it
-
-  int index = FindFreeSuperLightmap();
-  if(index < 0)
+  // The superlightmap isn't in the cache, so we have to cache it.
+  int index = FindFreeSuperLightmap ();
+  if (index < 0)
   {
     // Clear one lightmap
     // Temporaly i will clear the following lightmap (it would be nice to
     // implement a LRU algorithm here)
     cur_lm = (cur_lm + 1) % super_lm_num;
-    suplm[cur_lm].Clear();
+    suplm[cur_lm].Clear ();
     index = cur_lm;
   }
   s->initialized = false;
@@ -422,16 +421,16 @@ void OpenGLLightmapCache::Cache(csTrianglesPerSuperLightmap* s, bool dirty,
   superLMData->Handle = SLMHandle = suplm[index].Handle;
   s->slId = index;
 
-  for(i = 0; i < numLightmaps; i++)
+  for (i = 0; i < numLightmaps; i++)
   {
     lmArray[i]->RecalculateDynamicLights();
     iLightMap* lm = lmArray[i]->GetLightMap();
-    int lmwidth = lm->GetWidth();
-    int lmheigth = lm->GetHeight();
-    csRGBpixel* lm_data = lm->GetMapData();
+    int lmwidth = lm->GetWidth ();
+    int lmheigth = lm->GetHeight ();
+    csRGBpixel* lm_data = lm->GetMapData ();
     csRect r = rectangleArray[i];
     csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
-    glTexSubImage2D(GL_TEXTURE_2D, 0,r.xmin,r.ymin,
+    glTexSubImage2D (GL_TEXTURE_2D, 0,r.xmin,r.ymin,
       lmwidth, lmheigth,GL_RGBA,GL_UNSIGNED_BYTE,lm_data);
   }
   s->initialized = true;
