@@ -347,17 +347,17 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
-  ll->AddLight (light->QueryLight ());
+  ll->Add (light->QueryLight ());
   light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
-  ll->AddLight (light->QueryLight ());
+  ll->Add (light->QueryLight ());
   light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
-  ll->AddLight (light->QueryLight ());
+  ll->Add (light->QueryLight ());
   light->DecRef ();
 
   engine->Prepare ();
@@ -387,8 +387,11 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   
   printf("aws-debug: Creating splash window...\n");
   awsWindow *test = aws->CreateWindowFrom("Splash");
+  awsWindow *test2 = aws->CreateWindowFrom("Another");
 
-  test->Show();
+
+  if (test)  test->Show();
+  if (test2) test2->Show();
   
   /////////
   
