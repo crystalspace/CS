@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Animation, , csPython, Plug-In Drivers
+@node Animation, Model Conversion, csPython, Plug-In Drivers
 @section Animation
 @cindex Animation
 

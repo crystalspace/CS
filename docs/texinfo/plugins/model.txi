@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Model Conversion
+@node Model Conversion, , Animation, Plug-In Drivers
 @section Importing Model Files
 @cindex Model Importing
 @cindex Importing Model Files
@@ -39,7 +39,7 @@ a single @sc{ids} sub-object, the second function does the same for sprites,
 and the third one creates a hierarchy of sprites from all objects in an
 @sc{ids}.
 
-@node Model Data Structure
+@node Model Data Structure, , Model Conversion, Model Conversion
 @subsection Common Model Data Structure (@code{iModelData})
 @cindex @code{iModelData}
 
