@@ -51,6 +51,7 @@ enum csNetworkDriverError
 
 /**
  * Network driver capabilities structure.
+ * \deprecated
  * This is deprecated since the reliable flag is deprecated,
  * and all drivers should support blocking and non-blocking.
  */
@@ -66,16 +67,21 @@ struct csNetworkDriverCapabilities
 SCF_VERSION (iNetworkEndPoint, 0, 1, 1);
 
 /**
- * This is the network end-point interface for CS.  It represents one end of
+ * This is a network end-point interface.  It represents one end of
  * a network connection or potential connection (such as a listener).  All
  * network end-points must implement this interface.
  */
 struct iNetworkEndPoint : public iBase
 {
-  /// Terminates the connection; destroying the object also auto-terminates.
+  /// Terminate the connection.  Destroying the object also auto-terminates.
   virtual void Terminate() = 0;
 
-  /// Set an option in the network implementation. See development API docs.
+  /**
+   * Set an driver-specific option for the end-point.  Each driver may support
+   * options beyond those provided by these abstract interfaces.  For example,
+   * the cssocket driver supports 'ttl' and 'loop' options.  Consult
+   * driver-specific documentation as necessary.
+   */
   virtual bool SetOption (const char *name, int value) = 0;
 
   /// Retrieve the code for the last error encountered.
@@ -86,7 +92,7 @@ struct iNetworkEndPoint : public iBase
 SCF_VERSION (iNetworkConnection, 0, 1, 1);
 
 /**
- * This is the network connection interface for CS.  It represents a single
+ * This is a network connection interface.  It represents a single
  * network connection.  All network connections must implement this interface.
  */
 struct iNetworkConnection : public iNetworkEndPoint
@@ -98,11 +104,11 @@ struct iNetworkConnection : public iNetworkEndPoint
   virtual bool IsConnected () const = 0;
 
   /**
-   * Receive data from the connection.  If the endpoint is in blocking
-   * mode, then the function does not return until data has been read, an
-   * error has occurred, or the connection was closed.  In non-blocking mode,
-   * Receive returns immediately.  If data is available then it returns the
-   * number of bytes (<= maxbytes) which was read.  If data is not available
+   * Receive data from the connection.  If the endpoint is conifgured to block,
+   * then the function does not return until data has been read, an
+   * error has occurred, or the connection was closed.  If non-blocking, then
+   * Receive() returns immediately.  If data is available then, it returns the
+   * number of bytes read (<= maxbytes).  If data is not available
    * and the connection is non-blocking, then it returns 0 and GetLastError()
    * returns CS_NET_ERR_NO_ERROR.
    */
@@ -110,15 +116,15 @@ struct iNetworkConnection : public iNetworkEndPoint
 
   /**
    * This version of Receive() is valid only for multicast connections.
-   *
    * It returns a 'from' parameter indicating the sender of the data.
    */
-  virtual size_t Receive(void* buff, size_t maxbytes, csRef<iString> &from) = 0;
+  virtual size_t Receive(void* buff, size_t maxbytes, csRef<iString>& from)=0;
 
   /**
-   * This provides a lightweight alternative to bruteforce polling Receive
-   * in case there are any data to read. You should call this function first
-   * to see if there are data waiting, and only call Receive if it returns true.
+   * This provides a lightweight alternative to performing brute-force polling
+   * of Receive() to find out if any data is available.  This method will never
+   * block.  You should call this function first to see if data is available,
+   * and only call Receive() if true is returned.
    */
   virtual bool IsDataWaiting() const = 0;
 };
@@ -127,16 +133,16 @@ struct iNetworkConnection : public iNetworkEndPoint
 SCF_VERSION (iNetworkListener, 0, 1, 1);
 
 /**
- * This is the network listener interface for CS.  It represents a single
+ * This is a network listener interface.  It represents a single
  * network listening post.  All network listeners must implement this
  * interface.
  */
 struct iNetworkListener : public iNetworkEndPoint
 {
   /**
-   * Accepts a connection request.  If the listener is in blocking mode, then
+   * Accepts a connection request.  If the listener is configured to block,
    * the function does not return until a connection has been established or
-   * an error has occurred.  If in non-blocking mode, then it returns
+   * an error has occurred.  If non-blocking, then it returns
    * immediately.  The return value is either an accepted connection or 0.
    * If the connection is non-blocking, 0 is returned, and GetLastError()
    * returns CS_NET_ERR_NO_ERROR then no connection was pending.  Otherwise
@@ -149,7 +155,7 @@ struct iNetworkListener : public iNetworkEndPoint
 SCF_VERSION (iNetworkDriver, 0, 0, 2);
 
 /**
- * This is the network driver interface for CS.  It represents a plug-in
+ * This is a network driver interface.  It represents a plug-in
  * network driver module.  All network drivers must implement this interface.
  */
 struct iNetworkDriver : public iBase
@@ -159,14 +165,21 @@ struct iNetworkDriver : public iBase
    * dependent.
    *
    * For example, with a socket driver, the target might be
-   * "host:port/protocol"; with a modem driver it might be
-   * "Device:PhoneNumber"; etc. The current main socket driver supports the
-   * TCP, UDP and Multicast protocols.
+   * "host:port/protocol" (i.e. "server.game.net:666/tcp"); etc.  with a modem
+   * driver it might be "device:phone-number" (i.e. "com1:555-1234"); The
+   * cssocket driver, for instance, supports protcols "tcp", "udp", and
+   * "multicast".
    *
-   * The 'reliable' flag is deprecated. The 'blocking' flag determines whether
-   * operations on the connection return immediately in all cases or wait
-   * until the operation can be completed successfully. Returns the new
-   * connection object or 0 if the connection failed.
+   * The 'blocking' flag determines whether operations on the connection return
+   * immediately in all cases or wait until the operation can be completed
+   * successfully.
+   *
+   * \return the new connection object or 0 if the connection failed.
+   *
+   * \deprecated
+   * The 'reliable' flag is deprecated.  This feature is now specified as part
+   * of the target string.  (For instance, with the cssocket driver, a protocol
+   * of "tcp" is reliable, whereas "udp" is not.)
    */
   virtual csPtr<iNetworkConnection> NewConnection(const char* target,
     bool reliable = true, bool blocking = false) = 0;
@@ -175,14 +188,21 @@ struct iNetworkDriver : public iBase
    * Create a new network listener.  The 'source' parameter is driver
    * dependent.
    *
-   * For example, with a socket driver, the source might be "port/protocol";
-   * with a modem driver it might be "comport"; etc. The current main socket
-   * driver supports the TCP, UDP and Multicast protocols.
+   * For example, with a socket driver, the source might be "port/protocol"
+   * (i.e. "666/tcp"); with a modem driver it might be "device" (i.e. "com1");
+   * etc.  The cssocket driver, for instance, supports protcols "tcp", "udp",
+   * and "multicast".
    * 
-   * The 'reliable' flag is deprecated. The 'blockingListener' flag
-   * determines whether or not the Accept() method blocks while being called.
-   * The 'blockingConnection' flag determines whether or not methods in the
-   * resulting connection object block.
+   * The 'blockingListener' flag determines whether or not the Accept() method
+   * blocks while being called.  The 'blockingConnection' flag determines
+   * whether or not methods in the resulting connection object block.
+   * 
+   * \return the new listener object or 0 if the operation failed.
+   *
+   * \deprecated
+   * The 'reliable' flag is deprecated.  This feature is now specified as part
+   * of the target string.  (For instance, with the cssocket driver, a protocol
+   * of "tcp" is reliable, whereas "udp" is not.)
    */
   virtual csPtr<iNetworkListener> NewListener(const char* source,
     bool reliable = true, bool blockingListener = false,
@@ -191,6 +211,8 @@ struct iNetworkDriver : public iBase
   /**
    * Get network driver capabilities.  This function returns information
    * describing the capabilities of the driver.
+   *
+   * \deprecated
    * This function is deprecated since the reliable flag is deprecated,
    * and all drivers should support blocking and non-blocking.
    */
