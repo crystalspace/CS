@@ -14,7 +14,9 @@ const unsigned int awsCmdButton::fsNormal =0x0;
 const unsigned int awsCmdButton::fsToolbar=0x1;
 const unsigned int awsCmdButton::fsBitmap =0x2;
 
-awsCmdButton::awsCmdButton():is_down(false), mouse_is_over(false), frame_style(0), alpha_level(0)
+awsCmdButton::awsCmdButton():is_down(false), mouse_is_over(false), 
+                             frame_style(0), alpha_level(0),
+                             caption(NULL)
 {
   tex[0]=tex[1]=tex[2]=NULL;
 }
@@ -27,6 +29,12 @@ bool
 awsCmdButton::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
  if (!awsComponent::Setup(_wmgr, settings)) return false;
+
+ iAwsPrefs *pm=WindowManager()->GetPrefMgr();
+     
+ pm->GetInt(settings, "Style", frame_style);
+ pm->GetInt(settings, "Style", alpha_level);
+ pm->GetString(settings, "Caption", caption);
 
  return true;
 }
@@ -77,6 +85,27 @@ awsCmdButton::OnDraw(csRect clip)
       g2d->DrawLine(Frame().xmin+1, Frame().ymin+1, Frame().xmin+1, Frame().ymax-2, hi2);
       g2d->DrawLine(Frame().xmin+1, Frame().ymax-2, Frame().xmax-2, Frame().ymax-2, lo2);
       g2d->DrawLine(Frame().xmax-2, Frame().ymin+1, Frame().xmax-2, Frame().ymax-2, lo2);
+    }
+
+    // Draw the caption, if there is one and the style permits it.
+    if (caption && frame_style==fsNormal)
+    {     
+      int tw, th, tx, ty;
+
+      // Get the size of the text
+      WindowManager()->GetPrefMgr()->GetDefaultFont()->GetMaxSize(tw, th);
+
+      // Calculate the center
+      tx = (Frame().Width()>>1) - ((tw*caption->Length())>>1);
+      ty = (Frame().Height()>>1) - (th>>1);
+
+      // Draw the text
+        g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
+                   Frame().xmin+tx+is_down,
+                   Frame().ymin+ty+is_down,
+                   WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
+                   -1,
+                   caption->GetData());
     }
     break;
 

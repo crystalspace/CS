@@ -298,11 +298,9 @@ awsWindow::OnMouseMove(int button, int x, int y)
       delta_y=-Frame().ymin;
     else if (delta_y+Frame().ymax > WindowManager()->G2D()->GetHeight())
       delta_y=WindowManager()->G2D()->GetHeight() - Frame().ymax;
-      
-      
+         
     csRect dirty1(Frame());
    
-
     // Move frame
     Frame().xmin+=delta_x;
     Frame().ymin+=delta_y;

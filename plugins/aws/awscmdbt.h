@@ -38,6 +38,9 @@ class awsCmdButton : public awsComponent
 
    /// Alpha level for this component
    int alpha_level;
+
+   /// Caption text for this component
+   iString *caption;
    
 public:
     awsCmdButton();
