@@ -30,16 +30,18 @@
 
 #include <vos/metaobjects/a3dl/a3dl.hh>
 
+class csMetaSector;
+
 class csVosSector : public iVosSector, public iVosApi,
                     public VOS::ChildChangeListener
 {
 private:
-  char* url;
+  bool didLoad;
   iObjectRegistry* objreg;
   csRef<iEngine> engine;
   csRef<iSector> sector;
   csVosA3DL* vosa3dl;
-  VOS::vRef<A3DL::Sector> sectorvobj;
+  VOS::vRef<csMetaSector> sectorvobj;
 
   csSet <iVosObject3D *> loadedObjects;
 
@@ -53,7 +55,7 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csVosSector(iObjectRegistry *o, csVosA3DL* vosa3dl, const char* s);
+  csVosSector(iObjectRegistry *o, csVosA3DL* vosa3dl, csMetaSector* sec);
   virtual ~csVosSector();
 
   virtual void Load();
@@ -72,5 +74,22 @@ public:
   friend class LoadSectorTask;
   friend class RelightTask;
 };
+
+class csMetaSector : public virtual A3DL::Sector
+{
+private:
+	csRef<csVosSector> csvossector;
+
+public:
+	csMetaSector(VOS::VobjectBase* superobject);
+	virtual ~csMetaSector() { }
+
+	static VOS::MetaObject* new_csMetaSector(VOS::VobjectBase* superobject,
+		const std::string& type);
+
+	csRef<csVosSector> GetCsVosSector() { return csvossector; }
+	void SetCsVosSector(csRef<csVosSector> s) { csvossector = s; }
+};
+
 
 #endif

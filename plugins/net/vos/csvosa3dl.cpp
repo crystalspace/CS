@@ -95,8 +95,13 @@ csVosA3DL::~csVosA3DL()
 
 csRef<iVosSector> csVosA3DL::GetSector(const char* s)
 {
-  csRef<iVosSector> r;
-  r.AttachNew(new csVosSector(objreg, this, s));
+  vRef<Vobject> v = Vobject::findObjectFromRoot(s);
+  vRef<csMetaSector> sec = meta_cast<csMetaSector>(v);
+  if(! sec) return csRef<iVosSector>();
+
+  csRef<iVosSector> r = sec->GetCsVosSector();
+  if(! r.IsValid()) r.AttachNew(new csVosSector(objreg, this, sec));
+
   return r;
 }
 
@@ -128,6 +133,8 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
                 &A3DL::Material::new_Material);
   Site::removeRemoteMetaObjectFactory("a3dl:light",
                 &A3DL::Light::new_Light);
+  Site::removeRemoteMetaObjectFactory("a3dl:sector",
+                &A3DL::Sector::new_Sector);
 
   Site::addRemoteMetaObjectFactory("a3dl:object3D", "a3dl:object3D",
                                    &csMetaObject3D::new_csMetaObject3D);
@@ -158,6 +165,8 @@ bool csVosA3DL::Initialize (iObjectRegistry *o)
                                    &csMetaMaterial::new_csMetaMaterial);
   Site::addRemoteMetaObjectFactory("a3dl:light", "a3dl:light",
                                    &csMetaLight::new_csMetaLight);
+  Site::addRemoteMetaObjectFactory("a3dl:sector", "a3dl:sector",
+                                   &csMetaSector::new_csMetaSector);
 
   objreg = o;
 

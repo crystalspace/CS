@@ -102,8 +102,6 @@ void ConstructTextureTask::doTask()
     return;
   }
 
-//  texture->Register (txtmgr);
-
   metatxt->texturewrapper = texture;
 }
 

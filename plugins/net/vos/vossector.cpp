@@ -122,10 +122,10 @@ void LoadObjectTask::doTask()
   {
     if (toRemove)
     {
-    sector->removeObject3D (obj3d->GetCSinterface());
+      sector->removeObject3D (obj3d->GetCSinterface());
       sector->GetSector()->GetMeshes()->Remove (wrapper);
       //wrapper->GetMovable()->GetSectors()->Remove (sector->GetSector());
-    //wrapper->GetMovable()->UpdateMove();
+      //wrapper->GetMovable()->UpdateMove();
     }
     else
     {
@@ -137,8 +137,10 @@ void LoadObjectTask::doTask()
       else
       {
         LOG("LoadObjectTask", 3, "Object already setup, setting sector");
-        wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
-        wrapper->GetMovable()->UpdateMove();
+		if( wrapper->GetMovable()->GetSectors()->Find(sector->GetSector()) < 0) {
+			wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
+			wrapper->GetMovable()->UpdateMove();
+		}
       }
     }
   }
@@ -263,21 +265,22 @@ void LoadSectorTask::doTask()
 
 /// csVosSector ///
 
-csVosSector::csVosSector(iObjectRegistry *o, csVosA3DL* va, const char* s)
+csVosSector::csVosSector(iObjectRegistry *o, csVosA3DL* va, csMetaSector* sec)
 {
   SCF_CONSTRUCT_IBASE(0);
+  didLoad = false;
   objreg = o;
-  url = strdup(s);
+  sectorvobj.assign(sec, true);
+  sec->SetCsVosSector(this);
   vosa3dl = va;
   engine = CS_QUERY_REGISTRY (objreg, iEngine);
-  sector = engine->CreateSector(s);
+  sector = engine->CreateSector(sec->getURLstr().c_str());
   isLit = false;
   waitingForChildren = 0;
 }
 
 csVosSector::~csVosSector()
 {
-  free(url);
   SCF_DESTRUCT_IBASE();
 }
 
@@ -298,10 +301,11 @@ void csVosSector::removeObject3D (iVosObject3D *obj)
 
 void csVosSector::Load()
 {
-  sectorvobj = meta_cast<A3DL::Sector>(Vobject::findObjectFromRoot(url));
-  waitingForChildren = sectorvobj->numChildren();
-
-  TaskQueue::defaultTQ().addTask(new LoadSectorTask(vosa3dl, this));
+  if(! didLoad) {
+	didLoad = true;
+    waitingForChildren = sectorvobj->numChildren();
+    TaskQueue::defaultTQ().addTask(new LoadSectorTask(vosa3dl, this));
+  }
 }
 
 void csVosSector::notifyChildInserted (VobjectEvent &event)
@@ -382,3 +386,15 @@ VOS::vRef<VOS::Vobject> csVosSector::GetVobject()
 }
 
 
+/// csMetaSector ///
+
+csMetaSector::csMetaSector(VOS::VobjectBase* superobject)
+	: A3DL::Sector(superobject)
+{
+}
+
+VOS::MetaObject* csMetaSector::new_csMetaSector(VOS::VobjectBase* superobject,
+									  const std::string& type)
+{
+	return new csMetaSector(superobject);
+}
