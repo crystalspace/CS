@@ -2563,6 +2563,9 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     glTexCoordPointer (2, GL_FLOAT, 0, gltxttrans);
     glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
   }
+
+  // If we don't do this then objects can disappear later.
+  statecache->Disable_GL_ALPHA_TEST ();
 }
 
 static bool dp_flatlighting = false;
@@ -3869,6 +3872,9 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
 
   RestoreDTMTransforms ();
   RestoreDTMClipping ();
+
+  // If we don't do this then objects can disappear later.
+  statecache->Disable_GL_ALPHA_TEST ();
 }
 
 csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
@@ -4659,6 +4665,10 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
   SetClientStates (CS_CLIENTSTATE_ALL);
 
+  // This is added here because otherwise objects disappear
+  // when a previous object has an alpha channel.
+  statecache->Disable_GL_ALPHA_TEST ();
+
   //@@@EXPERIMENTAL!!
   //CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
 
@@ -5033,6 +5043,10 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   float m_alpha = 1.0f - BYTE_TO_FLOAT (m_mixmode & CS_FX_MASK_ALPHA);
   bool m_gouraud = m_renderstate.lighting && m_renderstate.gouraud &&
     ((m_mixmode & CS_FX_GOURAUD) != 0);
+
+  // This is added here because otherwise objects disappear
+  // when a previous object has an alpha channel.
+  statecache->Disable_GL_ALPHA_TEST ();
 
   GLuint texturehandle = 0;
   bool txt_alpha = false;

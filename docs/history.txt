@@ -9,11 +9,19 @@ The history order is reversed so that new features are at the top.
 	  to not having a map file.
 	- Possibly fixed the bug in cs2xml with converting of LEN keyword
 	  in a polygon. Didn't test this yet.
+	- Fixed a bug in the OpenGL renderer which causes one of the objects
+	  in flarge to disappear. It was related to the rendering of
+	  transparent polygons not cleaning up properly. Unfortunatelly
+	  this doesn't seem to fix all bugs in this area. Some of the
+	  PlaneShift levels still suffer from disappearing objects and
+	  I'm sure it isn't caused by wrong visibility culling.
 	- Eric Sunshine cleaned up the pthread and qsqrt() tests in
 	  configure.ac.
 	- res enhanced the map loader so that when loading a <library>
 	  a VFS->ChDir() into the lib's dir is performed so that relative
 	  paths in the library are work as expected.
+	- Jorrit then proceeded to revert the automatic VFS dir setting.
+	  This takes away control from the application and that is not good.
 6-Feb-2003
 	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
 	  and MinTexHeight options in opengl.cfg. Instead there is now the
