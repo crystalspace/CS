@@ -444,6 +444,7 @@ public:
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
+static bool is_console_app = false;
 
 SCF_IMPLEMENT_IBASE (Win32Assistant)
   SCF_IMPLEMENTS_INTERFACE (iWin32Assistant)
@@ -561,8 +562,16 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   if (cmdline->GetOption ("console")) console_window = true;
   if (cmdline->GetOption ("noconsole")) console_window = false;
 
-  if (!console_window)
+  if (is_console_app && !console_window)
+  {
     DisableConsole ();
+  }
+  else if (!is_console_app && console_window)
+  {
+    AllocConsole ();
+    freopen("CONOUT$", "a", stderr);
+    freopen("CONOUT$", "a", stdout);
+  }
 
   registry = r;
   registry->IncRef();
@@ -574,7 +583,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   wc.hCursor        = NULL;
   // try the app icon...
   wc.hIcon          = LoadIcon (ModuleHandle, MAKEINTRESOURCE(1));
-  // not? may executable.ico?
+  // not? maybe executable.ico?
   if (!wc.hIcon) 
   {
     char apppath[MAX_PATH];
@@ -1044,6 +1053,8 @@ extern int _cs_main (int argc, char* argv[]);
 
 int main (int argc, char* argv[]) 
 { 
+  is_console_app = true;
+
   CS_DEBUG_MSVC_INIT_GOOP; 
   int ret = _cs_main(CS_WIN32_ARGC, CS_WIN32_ARGV); 
   CS_DEBUG_MSVC_EXIT_GOOP; 
