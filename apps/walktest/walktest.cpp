@@ -1566,11 +1566,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     iSoundWrapper *w = CS_GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
 						       iSoundWrapper, "boom.wav");
     wMissile_boom = w ? w->GetSound () : NULL;
-    w->DecRef ();
+    SCF_DEC_REF (w);
     w = CS_GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
 					iSoundWrapper, "whoosh.wav");
     wMissile_whoosh = w ? w->GetSound () : NULL;
-    w->DecRef ();
+    SCF_DEC_REF (w);
    }
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");

@@ -103,7 +103,8 @@ iPolygon3D* HugeRoom::create_polygon (iThingState* thing_state,
   iMaterialWrapper* tm = NULL;
   switch (txt)
   {
-    case 0: tm = NULL; break;
+    //    case 0: tm = NULL; break;
+    case 0: tm = engine->GetMaterialList ()->FindByName ("txt2"); break;
     case 1: tm = engine->GetMaterialList ()->FindByName ("txt"); break;
     case 2: tm = engine->GetMaterialList ()->FindByName ("txt2"); break;
   }
@@ -111,7 +112,7 @@ iPolygon3D* HugeRoom::create_polygon (iThingState* thing_state,
   char polname[10];
   sprintf (polname, "p%d", pol_nr);
   iPolygon3D* p = thing_state->CreatePolygon (polname);
-  p->SetMaterial (tm);
+  if (tm) p->SetMaterial (tm);
   pol_nr++;
 
   p->CreateVertex (p1);
@@ -147,6 +148,7 @@ static iMeshWrapper* CreateMeshWrapper (const char* name)
   thing_fact->DecRef ();
   iMeshWrapper* mesh_wrap = Sys->Engine->CreateMeshWrapper (mesh_obj, name);
   mesh_obj->DecRef ();
+  mesh_wrap->DecRef ();
   return mesh_wrap;
 }
 
