@@ -138,6 +138,7 @@ SRC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.cpp) \
   libs/cssys/general/runloop.cpp \
   libs/cssys/general/sysinit.cpp \
   $(CSTHREAD.SRC)
+INC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.h) $(CSTHREAD.INC)
 
 # Command sequence for creating a directory, and command for creating a
 # directory as well as any missing parents.

@@ -129,6 +129,7 @@ SRC.SYS_CSSYS= $(wildcard libs/cssys/unix/*.cpp) \
   libs/cssys/general/runloop.cpp \
   libs/cssys/general/sysinit.cpp \
   $(CSTHREAD.SRC)
+INC.SYS_CSSYS = $(wildcard libs/cssys/unix/*.h) $(CSTHREAD.INC)
 
 # Use makedep to build dependencies
 DEPEND_TOOL = mkdep

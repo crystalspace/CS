@@ -147,6 +147,7 @@ SRC.SYS_CSSYS = $(wildcard \
   libs/cssys/general/printf.cpp \
   libs/cssys/general/sysroot.cpp \
   $(CSTHREAD.SRC)
+INC.SYS_CSSYS = $(wildcard $(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))) $(CSTHREAD.INC)
 
 # Where to put dynamic libraries on this system?
 OUTDLL = $(MACOSX.PLUGIN_DIR)
