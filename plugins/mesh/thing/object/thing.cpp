@@ -1187,6 +1187,16 @@ int csThingStatic::FindPolygonByName (const char* name)
   return static_polygons.FindKey ((void*)name, static_polygons.CompareKey);
 }
 
+int csThingStatic::GetRealIndex (int requested_index) const
+{
+  if (requested_index == -1)
+  {
+    CS_ASSERT (last_range.end != -1);
+    return last_range.end;
+  }
+  return requested_index;
+}
+
 void csThingStatic::GetRealRange (const csPolygonRange& requested_range,
 	int& start, int& end)
 {
@@ -1358,7 +1368,7 @@ void csThingStatic::SetPolygonName (const csPolygonRange& range,
 
 const char* csThingStatic::GetPolygonName (int polygon_idx)
 {
-  return static_polygons[polygon_idx]->GetName ();
+  return static_polygons[GetRealIndex (polygon_idx)]->GetName ();
 }
 
 void csThingStatic::SetPolygonMaterial (const csPolygonRange& range,
@@ -1372,7 +1382,7 @@ void csThingStatic::SetPolygonMaterial (const csPolygonRange& range,
 
 iMaterialWrapper* csThingStatic::GetPolygonMaterial (int polygon_idx)
 {
-  return static_polygons[polygon_idx]->GetMaterialWrapper ();
+  return static_polygons[GetRealIndex (polygon_idx)]->GetMaterialWrapper ();
 }
 
 void csThingStatic::AddPolygonVertex (const csPolygonRange& range,
@@ -1394,12 +1404,17 @@ void csThingStatic::AddPolygonVertex (const csPolygonRange& range, int vt)
 
 int csThingStatic::GetPolygonVertexCount (int polygon_idx)
 {
-  return static_polygons[polygon_idx]->GetVertexCount ();
+  return static_polygons[GetRealIndex (polygon_idx)]->GetVertexCount ();
 }
 
 const csVector3& csThingStatic::GetPolygonVertex (int polygon_idx, int vertex_idx)
 {
-  return static_polygons[polygon_idx]->Vobj (vertex_idx);
+  return static_polygons[GetRealIndex (polygon_idx)]->Vobj (vertex_idx);
+}
+
+int* csThingStatic::GetPolygonVertexIndices (int polygon_idx)
+{
+  return static_polygons[GetRealIndex (polygon_idx)]->GetVertexIndices ();
 }
 
 void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
@@ -1480,7 +1495,7 @@ void csThingStatic::SetPolygonTextureMapping (const csPolygonRange& range,
 void csThingStatic::GetPolygonTextureMapping (int polygon_idx,
   	csMatrix3& m, csVector3& v)
 {
-  static_polygons[polygon_idx]->GetTextureSpace (m, v);
+  static_polygons[GetRealIndex (polygon_idx)]->GetTextureSpace (m, v);
 }
 
 void csThingStatic::SetPolygonTextureMappingEnabled (const csPolygonRange& range,
@@ -1497,7 +1512,7 @@ void csThingStatic::SetPolygonTextureMappingEnabled (const csPolygonRange& range
 
 bool csThingStatic::IsPolygonTextureMappingEnabled (int polygon_idx) const
 {
-  return static_polygons[polygon_idx]->IsTextureMappingEnabled ();
+  return static_polygons[GetRealIndex (polygon_idx)]->IsTextureMappingEnabled ();
 }
 
 void csThingStatic::SetPolygonFlags (const csPolygonRange& range, uint32 flags)
@@ -1508,6 +1523,17 @@ void csThingStatic::SetPolygonFlags (const csPolygonRange& range, uint32 flags)
   {
     csPolygon3DStatic* sp = static_polygons[i];
     sp->flags.Set (flags);
+  }
+}
+
+void csThingStatic::SetPolygonFlags (const csPolygonRange& range, uint32 mask, uint32 flags)
+{
+  int i, start, end;
+  GetRealRange (range, start, end);
+  for (i = start ; i <= end ; i++)
+  {
+    csPolygon3DStatic* sp = static_polygons[i];
+    sp->flags.Set (mask, flags);
   }
 }
 
@@ -1524,17 +1550,17 @@ void csThingStatic::ResetPolygonFlags (const csPolygonRange& range, uint32 flags
 
 csFlags& csThingStatic::GetPolygonFlags (int polygon_idx)
 {
-  return static_polygons[polygon_idx]->flags;
+  return static_polygons[GetRealIndex (polygon_idx)]->flags;
 }
 
 const csPlane3& csThingStatic::GetPolygonObjectPlane (int polygon_idx)
 {
-  return static_polygons[polygon_idx]->GetObjectPlane ();
+  return static_polygons[GetRealIndex (polygon_idx)]->GetObjectPlane ();
 }
 
 bool csThingStatic::IsPolygonTransparent (int polygon_idx)
 {
-  return static_polygons[polygon_idx]->IsTransparent ();
+  return static_polygons[GetRealIndex (polygon_idx)]->IsTransparent ();
 }
 
 

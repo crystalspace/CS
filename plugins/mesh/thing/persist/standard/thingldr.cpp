@@ -411,7 +411,7 @@ bool csThingLoader::ParsePortal (
 bool csThingLoader::ParsePoly3d (
         iDocumentNode* node,
 	iLoaderContext* ldr_context,
-	iEngine* engine, iPolygon3DStatic* poly3d,
+	iEngine* engine,
 	float default_texlen,
 	iThingFactoryState* thing_fact_state, int vt_offset,
 	bool& poly_delete, iMeshWrapper* mesh)
@@ -421,8 +421,8 @@ bool csThingLoader::ParsePoly3d (
 
   if (!thing_type)
   {
-    csRef<iPluginManager> plugin_mgr (
-    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+    csRef<iPluginManager> plugin_mgr =
+    	CS_QUERY_REGISTRY (object_reg, iPluginManager);
     CS_ASSERT (plugin_mgr != 0);
     thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	  "crystalspace.mesh.object.thing", iMeshObjectType);
@@ -474,15 +474,15 @@ bool csThingLoader::ParsePoly3d (
             "Couldn't find material named '%s'!", child->GetContentsValue ());
           return false;
         }
-        poly3d->SetMaterial (mat);
+	thing_fact_state->SetPolygonMaterial (CS_POLYRANGE_LAST, mat);
         break;
       case XMLTOKEN_LIGHTING:
         {
           bool do_lighting;
 	  if (!synldr->ParseBool (child, do_lighting, true))
 	    return false;
-          poly3d->GetFlags ().Set (CS_POLY_LIGHTING,
-	  	do_lighting ? CS_POLY_LIGHTING : 0);
+	  thing_fact_state->SetPolygonFlags (CS_POLYRANGE_LAST,
+          	CS_POLY_LIGHTING, do_lighting ? CS_POLY_LIGHTING : 0);
         }
         break;
       case XMLTOKEN_VISCULL:
@@ -522,28 +522,29 @@ bool csThingLoader::ParsePoly3d (
 		tx_uv_i1, tx_uv1,
 		tx_uv_i2, tx_uv2,
 		tx_uv_i3, tx_uv3,
-		poly3d->GetName ()))
+		thing_fact_state->GetPolygonName (CS_POLYINDEX_LAST)))
 	{
 	  return false;
 	}
         break;
       case XMLTOKEN_V:
         {
-	  int* vts = poly3d->GetVertexIndices ();
+	  int* vts = thing_fact_state->GetPolygonVertexIndices (CS_POLYINDEX_LAST);
 	  int vt_idx = child->GetContentsValueAsInt ();
 	  bool ignore = false;
-	  for (int i = 0 ; i < poly3d->GetVertexCount () ; i++)
+	  int cnt = thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST);
+	  for (int i = 0 ; i < cnt ; i++)
 	  {
 	    if (vts[i] == vt_idx+vt_offset)
 	    {
 	      csPrintf ("Duplicate vertex-index found! "
 			"(polygon '%s') ignored ...\n",
-			poly3d->GetName ());
+			thing_fact_state->GetPolygonName (CS_POLYINDEX_LAST));
 	      ignore = true;
 	    }
 	  }
 	  if (!ignore)
-	    poly3d->CreateVertex (vt_idx+vt_offset);
+	    thing_fact_state->AddPolygonVertex (CS_POLYRANGE_LAST, vt_idx+vt_offset);
         }
         break;
       case XMLTOKEN_SHADING:
@@ -551,7 +552,7 @@ bool csThingLoader::ParsePoly3d (
 	  bool shading;
 	  if (!synldr->ParseBool (child, shading, true))
 	    return false;
-	  poly3d->EnableTextureMapping (shading);
+	  thing_fact_state->SetPolygonTextureMappingEnabled (CS_POLYRANGE_LAST, shading);
 	}
         break;
       case XMLTOKEN_ALPHA:
@@ -571,16 +572,16 @@ bool csThingLoader::ParsePoly3d (
     }
   }
 
-  if (poly3d->GetVertexCount () < 3)
+  if (thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST) < 3)
   {
     synldr->ReportError ("crystalspace.thingldr.polygon", node,
       "Polygon '%s' contains just %d vertices!",
-      poly3d->GetName(),
-      poly3d->GetVertexCount ());
+      thing_fact_state->GetPolygonName (CS_POLYINDEX_LAST),
+      thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST));
     return false;
   }
 
-  mat = poly3d->GetMaterial ();
+  mat = thing_fact_state->GetPolygonMaterial (CS_POLYINDEX_LAST);
   csRef<iMaterialEngine> mateng = SCF_QUERY_INTERFACE (mat->GetMaterial (),
   	iMaterialEngine);
   bool is_texture_transparent = false;
@@ -607,28 +608,30 @@ bool csThingLoader::ParsePoly3d (
 
   if (texspec & CSTEX_UV)
   {
-    if (tx_uv_i1 > poly3d->GetVertexCount())
+    int cnt = thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST);
+    if (tx_uv_i1 > cnt)
     {
-        synldr->ReportError ("crystalspace.thingldr.polygon", node,
+      synldr->ReportError ("crystalspace.thingldr.polygon", node,
 	  "Bad texture specification: vertex index 1 doesn't exist!");
-	return false;
+      return false;
     }
-    if (tx_uv_i2 > poly3d->GetVertexCount())
+    if (tx_uv_i2 > cnt)
     {
-        synldr->ReportError ("crystalspace.thingldr.polygon", node,
+      synldr->ReportError ("crystalspace.thingldr.polygon", node,
 	  "Bad texture specification: vertex index 2 doesn't exist!");
-	return false;
+      return false;
     }
-    if (tx_uv_i3 > poly3d->GetVertexCount())
+    if (tx_uv_i3 > cnt)
     {
-        synldr->ReportError ("crystalspace.thingldr.polygon", node,
+      synldr->ReportError ("crystalspace.thingldr.polygon", node,
 	  "Bad texture specification: vertex index 3 doesn't exist!");
-	return false;
+      return false;
     }
-    poly3d->SetTextureSpace (
-			     poly3d->GetVertex (tx_uv_i1), tx_uv1,
-			     poly3d->GetVertex (tx_uv_i2), tx_uv2,
-			     poly3d->GetVertex (tx_uv_i3), tx_uv3);
+    thing_fact_state->SetPolygonTextureMapping (
+    	CS_POLYRANGE_LAST,
+        thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, tx_uv_i1), tx_uv1,
+        thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, tx_uv_i2), tx_uv2,
+        thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, tx_uv_i3), tx_uv3);
   }
   else if (texspec & CSTEX_V1)
   {
@@ -646,7 +649,8 @@ bool csThingLoader::ParsePoly3d (
           "Bad texture specification!");
 	return false;
       }
-      else poly3d->SetTextureSpace (tx_orig, tx1, tx_len.y, tx2, tx_len.z);
+      else thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
+        tx_orig, tx1, tx_len.y, tx2, tx_len.z);
     }
     else
     {
@@ -656,7 +660,8 @@ bool csThingLoader::ParsePoly3d (
           "Bad texture specification!");
 	return false;
       }
-      else poly3d->SetTextureSpace (tx_orig, tx1, tx_len.x);
+      else thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST,
+      	tx_orig, tx1, tx_len.x);
     }
   }
   else if (tx_len.x)
@@ -666,48 +671,55 @@ bool csThingLoader::ParsePoly3d (
     // a standard offset. Otherwise we will just create a plane specific
     // for this case given the first two vertices.
     bool same_x = true, same_y = true, same_z = true;
-    const csVector3& v = poly3d->GetVertex (0);
-    for (int i = 1 ; i < poly3d->GetVertexCount () ; i++)
+    const csVector3& v = thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, 0);
+    for (int i = 1 ; i < thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST) ; i++)
     {
-      const csVector3& v2 = poly3d->GetVertex (i);
+      const csVector3& v2 = thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, i);
       if (same_x && ABS (v.x-v2.x) >= SMALL_EPSILON) same_x = false;
       if (same_y && ABS (v.y-v2.y) >= SMALL_EPSILON) same_y = false;
       if (same_z && ABS (v.z-v2.z) >= SMALL_EPSILON) same_z = false;
     }
     if (same_x)
     {
-      poly3d->SetTextureSpace (csVector3 (v.x, 0, 0), csVector3 (v.x, 0, 1),
-			     tx_len.x, csVector3 (v.x, 1, 0), tx_len.x);
+      thing_fact_state->SetPolygonTextureMapping (
+        CS_POLYRANGE_LAST,
+      	csVector3 (v.x, 0, 0), csVector3 (v.x, 0, 1),
+	tx_len.x, csVector3 (v.x, 1, 0), tx_len.x);
     }
     else if (same_y)
     {
-      poly3d->SetTextureSpace (csVector3 (0, v.y, 0), csVector3 (1, v.y, 0),
-			     tx_len.x, csVector3 (0, v.y, 1), tx_len.x);
+      thing_fact_state->SetPolygonTextureMapping (
+        CS_POLYRANGE_LAST,
+      	csVector3 (0, v.y, 0), csVector3 (1, v.y, 0),
+	tx_len.x, csVector3 (0, v.y, 1), tx_len.x);
     }
     else if (same_z)
     {
-      poly3d->SetTextureSpace (csVector3 (0, 0, v.z), csVector3 (1, 0, v.z),
-			     tx_len.x, csVector3 (0, 1, v.z), tx_len.x);
+      thing_fact_state->SetPolygonTextureMapping (
+      	CS_POLYRANGE_LAST,
+	csVector3 (0, 0, v.z), csVector3 (1, 0, v.z),
+	tx_len.x, csVector3 (0, 1, v.z), tx_len.x);
     }
     else
-      poly3d->SetTextureSpace (poly3d->GetVertex (0), poly3d->GetVertex (1),
-			       tx_len.x);
+      thing_fact_state->SetPolygonTextureMapping (
+      	CS_POLYRANGE_LAST,
+	tx_len.x);
   }
   else
-    poly3d->SetTextureSpace (tx_matrix, tx_vector);
+    thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, tx_matrix, tx_vector);
 
   if (texspec & CSTEX_UV_SHIFT)
   {
-    if (poly3d->IsTextureMappingEnabled ())
+    if (thing_fact_state->IsPolygonTextureMappingEnabled (CS_POLYINDEX_LAST))
     {
-      poly3d->GetTextureSpace (tx_matrix, tx_vector);
+      thing_fact_state->GetPolygonTextureMapping (CS_POLYINDEX_LAST, tx_matrix, tx_vector);
       // T = Mot * (O - Vot)
       // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
       // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv
       // T = Mot * (O - Vot + Mot-1 * Vuv)
       csVector3 shift (uv_shift.x, uv_shift.y, 0);
       tx_vector -= tx_matrix.GetInverse () * shift;
-      poly3d->SetTextureSpace (tx_matrix, tx_vector);
+      thing_fact_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, tx_matrix, tx_vector);
     }
   }
 
@@ -727,10 +739,11 @@ bool csThingLoader::ParsePoly3d (
 	      m_w, v_w_before, v_w_after, &destSectorName))
     {
       iSector* destSector = ldr_context->FindSector (destSectorName.GetData ());
-      csVector3* portal_verts = new csVector3[poly3d->GetVertexCount ()];
+      int cnt = thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST);
+      csVector3* portal_verts = new csVector3[cnt];
       int i;
-      for (i = 0 ; i < poly3d->GetVertexCount () ; i++)
-        portal_verts[i] = poly3d->GetVertex (i);
+      for (i = 0 ; i < cnt ; i++)
+        portal_verts[i] = thing_fact_state->GetPolygonVertex (CS_POLYINDEX_LAST, i);
 
       int portal_pri = portal_pri = engine->GetPortalRenderPriority ();
       if (portal_pri == 0)
@@ -741,12 +754,12 @@ bool csThingLoader::ParsePoly3d (
       iPortal* portal;
       csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
       	pc_name, mesh, destSector,
-      	portal_verts, poly3d->GetVertexCount (), portal);
+      	portal_verts, cnt, portal);
       delete[] portal_verts;
 
       portal_mesh->SetRenderPriority (portal_pri);
-      if (poly3d->GetName ())
-        portal->SetName (poly3d->GetName ());
+      if (thing_fact_state->GetPolygonName (CS_POLYINDEX_LAST))
+        portal->SetName (thing_fact_state->GetPolygonName (CS_POLYINDEX_LAST));
 
       if (!destSector)
       {
@@ -774,7 +787,8 @@ bool csThingLoader::ParsePoly3d (
       if (do_mirror)
       {
         if (!set_colldet) set_colldet = 1;
-        portal->SetWarp (csTransform::GetReflect (poly3d->GetObjectPlane ()));
+        portal->SetWarp (csTransform::GetReflect (
+		thing_fact_state->GetPolygonObjectPlane (CS_POLYINDEX_LAST)));
       }
       else if (do_warp)
       {
@@ -794,14 +808,14 @@ bool csThingLoader::ParsePoly3d (
       set_viscull = -1;
   }
   if (set_viscull == 1)
-    poly3d->GetFlags ().Set (CS_POLY_VISCULL);
+    thing_fact_state->SetPolygonFlags (CS_POLYRANGE_LAST, CS_POLY_VISCULL);
   else if (set_viscull == -1)
-    poly3d->GetFlags ().Reset (CS_POLY_VISCULL);
+    thing_fact_state->ResetPolygonFlags (CS_POLYRANGE_LAST, CS_POLY_VISCULL);
 
   if (set_colldet == 1)
-    poly3d->GetFlags ().Set (CS_POLY_COLLDET);
+    thing_fact_state->SetPolygonFlags (CS_POLYRANGE_LAST, CS_POLY_COLLDET);
   else if (set_colldet == -1)
-    poly3d->GetFlags ().Reset (CS_POLY_COLLDET);
+    thing_fact_state->ResetPolygonFlags (CS_POLYRANGE_LAST, CS_POLY_COLLDET);
 
   return true;
 }
@@ -1003,25 +1017,24 @@ Nag to Jorrit about this feature if you want it.");
 	CHECK_DONTEXTENDFACTORY;
 	CREATE_FACTORY_IF_NEEDED;
         {
-	  iPolygon3DStatic* poly3d = info.thing_fact_state->CreatePolygon (
+	  int idx = info.thing_fact_state->AddEmptyPolygon ();
+	  info.thing_fact_state->SetPolygonName (CS_POLYRANGE_LAST,
 			  child->GetAttributeValue ("name"));
 	  if (info.default_material)
-	    poly3d->SetMaterial (info.default_material);
+	    info.thing_fact_state->SetPolygonMaterial (CS_POLYRANGE_LAST,
+	    	info.default_material);
 	  bool poly_delete = false;
 	  bool success = ParsePoly3d (child, ldr_context,
-	  			    engine, poly3d,
-				    info.default_texlen, info.thing_fact_state,
+	  			    engine, info.default_texlen, info.thing_fact_state,
 				    vt_offset, poly_delete, mesh);
 	  if (!success)
 	  {
-	    info.thing_fact_state->RemovePolygon (
-	      info.thing_fact_state->FindPolygonIndex (poly3d));
+	    info.thing_fact_state->RemovePolygon (idx);
 	    return false;
 	  }
 	  if (poly_delete)
 	  {
-	    polygons_to_delete.Push (
-	    	info.thing_fact_state->FindPolygonIndex (poly3d));
+	    polygons_to_delete.Push (idx);
 	  }
         }
         break;

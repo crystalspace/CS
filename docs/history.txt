@@ -60,6 +60,14 @@ chronological order.
 	  changes.
 	- Jorrit renamed iThingFactoryState->SetTextureMappingEnabled() to
 	  SetPolygonTextureMappingEnabled() to be more consistent.
+	- Jorrit added a new version of iThingFactoryState->SetPolygonFlags() that
+	  also accepts a mask.
+	- Jorrit added iThingFactoryState->GetPolygonVertexIndices().
+	- Jorrit added CS_POLYINDEX_LAST which can be used to get information about
+	  the last created polygon in all functions that accept a single polygon
+	  index. In case of AddInsideBox() and AddOutsideBox() this will actually
+	  return the index of the last polygon of that box.
+	- Jorrit converted thing loader to the new API.
 8-Oct-2003
 	- Jorrit fixed keycolor rendering in the old OpenGL renderer in case
 	  DrawPolygonMesh was used (fastmesh).

@@ -116,7 +116,7 @@ public:
   // the polygon. This is used in case the polygon is only a portal.
   bool ParsePoly3d (iDocumentNode* node,
    	iLoaderContext* ldr_context,
-  	iEngine* engine, iPolygon3DStatic* poly3d,
+  	iEngine* engine,
 	float default_texlen,
 	iThingFactoryState* thing_fact_state,
 	int vt_offset, bool& poly_delete,

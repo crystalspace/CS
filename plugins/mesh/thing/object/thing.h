@@ -198,6 +198,10 @@ public:
    */
   void GetRealRange (const csPolygonRange& requested_range, int& start,
   	int& end);
+  /**
+   * Function to calculate real individual polygon index.
+   */
+  int GetRealIndex (int requested_index) const;
 
   /// Bounding box in object space.
   csBox3 obj_bbox;
@@ -464,6 +468,7 @@ public:
   virtual void AddPolygonVertex (const csPolygonRange& range, int vt);
   virtual int GetPolygonVertexCount (int polygon_idx);
   virtual const csVector3& GetPolygonVertex (int polygon_idx, int vertex_idx);
+  virtual int* GetPolygonVertexIndices (int polygon_idx);
   virtual void SetPolygonTextureMapping (const csPolygonRange& range,
   	const csMatrix3& m, const csVector3& v);
   virtual void SetPolygonTextureMapping (const csPolygonRange& range,
@@ -486,6 +491,7 @@ public:
   	bool enabled);
   virtual bool IsPolygonTextureMappingEnabled (int polygon_idx) const;
   virtual void SetPolygonFlags (const csPolygonRange& range, uint32 flags);
+  virtual void SetPolygonFlags (const csPolygonRange& range, uint32 mask, uint32 flags);
   virtual void ResetPolygonFlags (const csPolygonRange& range, uint32 flags);
   virtual csFlags& GetPolygonFlags (int polygon_idx);
   virtual const csPlane3& GetPolygonObjectPlane (int polygon_idx);

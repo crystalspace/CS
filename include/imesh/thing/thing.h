@@ -78,6 +78,11 @@ struct csPolygonRange
 /** @} */
 
 /**
+ * Last created polygon index (used where a single polygon index is required).
+ */
+#define CS_POLYINDEX_LAST -1
+
+/**
  * If CS_THING_FASTMESH is set then this thing will be drawn using
  * the faster DrawPolygonMesh.
  */
@@ -228,6 +233,7 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get the name of the specified polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
    */
   virtual const char* GetPolygonName (int polygon_idx) = 0;
 
@@ -241,6 +247,7 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get the material for the specified polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
    */
   virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx) = 0;
 
@@ -261,13 +268,21 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get number of vertices for polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
    */
   virtual int GetPolygonVertexCount (int polygon_idx) = 0;
 
   /**
    * Get a vertex from a polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
    */
   virtual const csVector3& GetPolygonVertex (int polygon_idx, int vertex_idx) = 0;
+
+  /**
+   * Get table with vertex indices from polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
+   */
+  virtual int* GetPolygonVertexIndices (int polygon_idx) = 0;
 
   /**
    * Set texture mapping of all polygons in the given range to use the
@@ -355,6 +370,7 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get the texture space information for the specified polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
    */
   virtual void GetPolygonTextureMapping (int polygon_idx,
   	csMatrix3& m, csVector3& v) = 0;
@@ -369,6 +385,7 @@ struct iThingFactoryState : public iBase
 
   /**
    * Check if texture mapping is enabled for the specified polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
    */
   virtual bool IsPolygonTextureMappingEnabled (int polygon_idx) const = 0;
 
@@ -380,6 +397,13 @@ struct iThingFactoryState : public iBase
   virtual void SetPolygonFlags (const csPolygonRange& range, uint32 flags) = 0;
 
   /**
+   * Set the given flags to all polygons in the range.
+   * \param range is one of the #CS_POLYRANGE defines to specify a polygon
+   * range.
+   */
+  virtual void SetPolygonFlags (const csPolygonRange& range, uint32 mask, uint32 flags) = 0;
+
+  /**
    * Reset the given flags to all polygons in the range.
    * \param range is one of the #CS_POLYRANGE defines to specify a polygon
    * range.
@@ -388,16 +412,19 @@ struct iThingFactoryState : public iBase
 
   /**
    * Get the flags of the specified polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
    */
   virtual csFlags& GetPolygonFlags (int polygon_idx) = 0;
 
   /**
    * Get object space plane of the specified polygon.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
    */
   virtual const csPlane3& GetPolygonObjectPlane (int polygon_idx) = 0;
 
   /**
    * Return true if this polygon or the texture it uses is transparent.
+   * \param polygon_idx is a polygon index or #CS_POLYINDEX_LAST for last created polygon.
    */
   virtual bool IsPolygonTransparent (int polygon_idx) = 0;
 
@@ -557,11 +584,13 @@ struct iThingState : public iBase
 
   /**
    * Get world space plane of the specified polygon.
+   * \param polygon_idx is a polygon index. #CS_POLYINDEX_LAST is NOT supported here!
    */
   virtual const csPlane3& GetPolygonWorldPlane (int polygon_idx) = 0;
 
   /**
    * Get the material for the specified polygon.
+   * \param polygon_idx is a polygon index. #CS_POLYINDEX_LAST is NOT supported here!
    */
   virtual iMaterialWrapper* GetPolygonMaterial (int polygon_idx) = 0;
 
