@@ -206,8 +206,8 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
     Scan.FogB = QRound (B * ((1 << pfmt.BlueBits ) - 1))
       << (pfmt.BlueShift - pixel_adjust);
 
-    // halo intensity (0..127)
-    Scan.FogDensity = QRound (iIntensity * 127);
+    // halo intensity (0..64)
+    Scan.FogDensity = QRound (iIntensity * 64);
     // Detect when the halo will possibly overflow
     clamp = (Scan.FogR > (pfmt.RedMask >> pixel_adjust))
          || (Scan.FogG > (pfmt.GreenMask >> pixel_adjust))
