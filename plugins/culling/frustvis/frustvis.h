@@ -32,7 +32,7 @@
 #include "iengine/movable.h"
 #include "iengine/shadcast.h"
 #include "iengine/mesh.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 
 class csKDTree;
 class csKDTreeChild;

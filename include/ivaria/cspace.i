@@ -791,7 +791,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "imesh/spritecal3d.h"
 %include "imesh/ball.h"
 %include "imesh/genmesh.h"
-%include "imesh/thing/thing.h"
+%include "imesh/thing.h"
 
 %extend iSprite2DState
 {

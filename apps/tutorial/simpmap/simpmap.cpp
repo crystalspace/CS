@@ -37,7 +37,7 @@
 #include "iengine/movable.h"
 #include "iengine/material.h"
 #include "iengine/campos.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"

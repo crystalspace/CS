@@ -66,7 +66,7 @@
 #include "imap/reader.h"
 #include "imap/ldrctxt.h"
 #include "imesh/lighting.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "ivaria/reporter.h"
 #include "ivaria/engseq.h"
 #include "iutil/plugin.h"

@@ -45,7 +45,7 @@
 #include <iengine/light.h>
 
 #include <imesh/object.h>
-#include <imesh/thing/thing.h>
+#include <imesh/thing.h>
 #include <imesh/ball.h>
 
 #include <ivideo/graph3d.h>

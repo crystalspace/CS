@@ -29,7 +29,7 @@
 #include "iengine/mesh.h"
 #include "imesh/genmesh.h"
 #include "imesh/object.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix2.h"
 #include "csgeom/matrix3.h"

@@ -31,7 +31,7 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "imesh/object.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "ivaria/reporter.h"
 #include "csutil/cscolor.h"
 #include "csgeom/path.h"

@@ -30,7 +30,7 @@
 #include "iengine/light.h"
 #include "iengine/sharevar.h"
 #include "iengine/mesh.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "ivaria/sequence.h"
 

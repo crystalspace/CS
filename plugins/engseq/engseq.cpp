@@ -51,7 +51,7 @@
 #include "imesh/partsys.h"
 #include "imesh/stars.h"
 #include "imesh/terrfunc.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "iengine/sharevar.h"
 #include "engseq.h"
 

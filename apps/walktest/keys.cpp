@@ -23,7 +23,7 @@
 #include "bot.h"
 #include "infmaze.h"
 #include "command.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
 #include "iengine/sector.h"

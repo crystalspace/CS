@@ -130,7 +130,7 @@
 #include "imesh/stars.h"
 #include "imesh/terrfunc.h"
 #include "imesh/bezier.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "inetwork/driver.h"
 #include "inetwork/socket.h"
 #include "isound/data.h"

@@ -37,7 +37,7 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "imesh/crossbld.h"
 #include "imesh/mdlconv.h"

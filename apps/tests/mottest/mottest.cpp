@@ -37,7 +37,7 @@
 #include "iengine/movable.h"
 #include "iengine/material.h"
 #include "iengine/motion.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
 #include "imesh/skeleton.h"

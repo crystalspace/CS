@@ -40,7 +40,7 @@
 #include "iengine/portal.h"
 #include "iengine/portalcontainer.h"
 #include "imesh/object.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"

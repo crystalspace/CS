@@ -71,7 +71,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "imesh/nullmesh.h"
 #include "imesh/mdlconv.h"
 #include "imesh/mdldata.h"

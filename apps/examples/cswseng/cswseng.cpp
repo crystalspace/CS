@@ -39,7 +39,7 @@
 #include "iengine/material.h"
 #include "igraphic/imageio.h"
 #include "imesh/object.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

@@ -41,7 +41,7 @@
 #include "iengine/texture.h"
 #include "iengine/material.h"
 #include "igraphic/imageio.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "iutil/eventq.h"
 #include "iutil/eventh.h"

@@ -44,7 +44,7 @@
 #include "iengine/camera.h"
 #include "iengine/movable.h"
 #include "iengine/material.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "ivaria/reporter.h"
 #include "igraphic/imageio.h"
 #include "iutil/comp.h"

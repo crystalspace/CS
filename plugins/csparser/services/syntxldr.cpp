@@ -39,7 +39,7 @@
 #include "iengine/texture.h"
 #include "iengine/portal.h"
 #include "ivideo/material.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "iutil/plugin.h"

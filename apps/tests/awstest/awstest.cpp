@@ -37,7 +37,7 @@
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "imesh/particle.h"
 #include "imesh/sprite2d.h"
 #include "imesh/sprite3d.h"

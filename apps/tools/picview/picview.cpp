@@ -30,7 +30,7 @@
 #include "iutil/event.h"
 #include "picview.h"
 #include "imesh/object.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

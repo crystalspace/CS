@@ -37,7 +37,7 @@
 #include "iengine/mesh.h"
 #include "iengine/rview.h"
 #include "iengine/shadcast.h"
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iutil/eventh.h"
