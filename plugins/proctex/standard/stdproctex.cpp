@@ -53,19 +53,19 @@ SCF_IMPLEMENT_FACTORY(csPtWaterLoader);
 
 SCF_EXPORT_CLASS_TABLE (stdpt)
   SCF_EXPORT_CLASS_DEP (csPtDotsLoader, 
-    "crystalspace.proctex.loader.dots",
+    "crystalspace.texture.loader.dots",
     "'Dots' procedural texture loader", 
     "crystalspace.graphics3d., ")
   SCF_EXPORT_CLASS_DEP (csPtFireLoader, 
-    "crystalspace.proctex.loader.fire",
+    "crystalspace.texture.loader.fire",
     "'Fire' procedural texture loader", 
     "crystalspace.graphics3d., ")
   SCF_EXPORT_CLASS_DEP (csPtWaterLoader, 
-    "crystalspace.proctex.loader.water",
+    "crystalspace.texture.loader.water",
     "'Water' procedural texture loader", 
     "crystalspace.graphics3d., ")
   SCF_EXPORT_CLASS_DEP (csPtPlasmaLoader, 
-    "crystalspace.proctex.loader.plasma",
+    "crystalspace.texture.loader.plasma",
     "'Plasma' procedural texture loader", 
     "crystalspace.graphics3d., ")
 SCF_EXPORT_CLASS_TABLE_END

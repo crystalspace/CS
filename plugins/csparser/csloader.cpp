@@ -80,6 +80,8 @@
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 
+#include "loadtex.h"
+
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/shader/shader.h"
 #endif //CS_USE_NEW_RENDERER
@@ -603,6 +605,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csLoader::eiComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY(csLoader);
+SCF_IMPLEMENT_FACTORY(csImageTextureLoader);
+SCF_IMPLEMENT_FACTORY(csCheckerTextureLoader);
 
 SCF_EXPORT_CLASS_TABLE (csparser)
   SCF_EXPORT_CLASS_DEP (csLoader, "crystalspace.level.loader",
@@ -612,6 +616,14 @@ SCF_EXPORT_CLASS_TABLE (csparser)
     "crystalspace.engine.3d, crystalspace.graphics3d., "
     "crystalspace.sound.render., crystalspace.motion.manager., "
     "crystalspace.mesh.crossbuilder, crystalspace.modelconverter. ")
+  SCF_EXPORT_CLASS_DEP (csImageTextureLoader,
+    PLUGIN_TEXTURELOADER_IMAGE,
+    "Image texture loader",
+    "crystalspace.level.loader, ")
+  SCF_EXPORT_CLASS_DEP (csCheckerTextureLoader,
+    PLUGIN_TEXTURELOADER_CHECKERS,
+    "Checkerboard texture loader",
+    "crystalspace.level.loader, ")
 SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
@@ -870,6 +882,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("shaders", XMLTOKEN_SHADERS);
   xmltokens.Register ("shader", XMLTOKEN_SHADER);
 #endif
+
   return true;
 }
 
@@ -2955,7 +2968,7 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
   pos.x = pos.y = pos.z = 0;
   color.red = color.green = color.blue = 1;
   dyn = false;
-#ifdef CS_USE_NEW_RENDERER
+#ifndef CS_USE_NEW_RENDERER
   dist = 1;
 #endif
 

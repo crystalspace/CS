@@ -15,8 +15,8 @@
         <plugin name="metablob">crystalspace.mesh.loader.metaball</plugin>
         <plugin name="emitFact">crystalspace.mesh.loader.factory.emit</plugin>
         <plugin name="emit">crystalspace.mesh.loader.emit</plugin>
-        <plugin name="dots">crystalspace.proctex.loader.dots</plugin>
-        <plugin name="fire">crystalspace.proctex.loader.fire</plugin>
+        <plugin name="dots">crystalspace.texture.loader.dots</plugin>
+        <plugin name="fire">crystalspace.texture.loader.fire</plugin>
     </plugins>
     <textures>
         <texture name="tree">
@@ -98,18 +98,18 @@
         <texture name="blobby.jpg">
             <file>/lib/stdtex/blobby.jpg</file>
         </texture>
-        <proctex name="fire">
+        <texture name="fire">
             <type>fire</type>
-        </proctex>
-        <proctex name="water">
-            <type>crystalspace.proctex.loader.water</type>
-        </proctex>
-        <proctex name="dots">
+        </texture>
+        <texture name="water">
+            <type>crystalspace.texture.loader.water</type>
+        </texture>
+        <texture name="dots">
             <type>dots</type>
-        </proctex>
-        <proctex name="plasma">
-            <type>crystalspace.proctex.loader.plasma</type>
-        </proctex>
+        </texture>
+        <texture name="plasma">
+            <type>crystalspace.texture.loader.plasma</type>
+        </texture>
         <texture name="billboard">
             <file>/lib/std/cslogods.png</file>
         </texture>
@@ -119,12 +119,19 @@
         <texture name="flickernote">
             <file>/lib/stdtex/flicker-note1.png</file>
         </texture>
-	<proctex name="cube256">
-	    <type>crystalspace.proctex.loader.animimg</type>
+	<texture name="cube256">
+	    <file>/lib/stdtex/cube256.mng</file>
+	</texture>
+	<texture name="yellowcheckers">
+	    <!-- Our favorite 'not found' texture - 
+	         just yellow & wanted this time :) -->
+	    <type>crystalspace.texture.loader.checkerboard</type>
+	    <size width="16" height="16" />
 	    <params>
-		<file>/lib/stdtex/cube256.mng</file>
+		<depth>4</depth>
+		<color red="1" green="0.8" blue="0.1" />
 	    </params>
-	</proctex>
+	</texture>
     </textures>
     <settings>
         <fastmesh>10</fastmesh>
@@ -266,6 +273,9 @@
         </material>
 	<material name="cube256">
 	    <texture>cube256</texture>
+	</material>
+	<material name="yellowcheckers">
+	    <texture>yellowcheckers</texture>
 	</material>
     </materials>
     <renderpriorities>
@@ -6666,7 +6676,7 @@
                     <v>13</v>
                     <v>12</v>
                     <v>0</v>
-                    <material>mosaic</material>
+                    <material>yellowcheckers</material>
                     <alpha>50</alpha>
                     <portal>
                         <sector>shapes</sector>

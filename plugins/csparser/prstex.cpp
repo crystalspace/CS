@@ -39,10 +39,15 @@
 #include "iengine/region.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "igraphic/animimg.h"
+
+#include "loadtex.h"
 
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/shader/shader.h"
 #endif //CS_USE_NEW_RENDERER
+
+#define PLUGIN_LEGACY_TEXTYPE_PREFIX  "crystalspace.texture.loader."
 
 bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
 {
@@ -75,6 +80,7 @@ bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
 bool csLoader::ParseTextureList (iDocumentNode* node)
 {
   if (!Engine || !ImageLoader) return false;
+  static bool proctex_deprecated_warned = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -85,6 +91,20 @@ bool csLoader::ParseTextureList (iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_PROCTEX:
+/*        if (!ParseProcTex (child))
+	  return false;
+	break;*/
+	if (!proctex_deprecated_warned)
+	{
+	  SyntaxService->Report (
+	    "crystalspace.maploader.parse.texture",
+	    CS_REPORTER_SEVERITY_NOTIFY,
+	    child,
+	    "Use of <proctex> is deprecated. "
+	    "Procedural textures can now be specified with the <texture> node as well.");
+	  proctex_deprecated_warned = true;
+	}
       case XMLTOKEN_TEXTURE:
         if (!ParseTexture (child))
 	  return false;
@@ -93,10 +113,6 @@ bool csLoader::ParseTextureList (iDocumentNode* node)
         if (!ParseHeightgen (child))
 	  return false;
         break;
-      case XMLTOKEN_PROCTEX:
-        if (!ParseProcTex (child))
-	  return false;
-	break;
       default:
         SyntaxService->ReportBadToken (child);
 	return false;
@@ -115,12 +131,15 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
     if (t) return t;
   }
 
-  char filename[256];
-  strcpy (filename, txtname);
+  //char filename[256];
+  //strcpy (filename, txtname);
+  const char* filename = NULL;
   csColor transp (0, 0, 0);
   bool do_transp = false;
   bool keep_image = false;
-  int flags = CS_TEXTURE_3D;
+  TextureLoaderContext context;
+  csRef<iDocumentNode> ParamsNode;
+  const char* type = NULL;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -137,9 +156,9 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	  if (!SyntaxService->ParseBool (child, for2d, true))
 	    return NULL;
           if (for2d)
-            flags |= CS_TEXTURE_2D;
+	    context.SetFlags (context.GetFlags() | CS_TEXTURE_2D);
           else
-            flags &= ~CS_TEXTURE_2D;
+	    context.SetFlags (context.GetFlags() & ~CS_TEXTURE_2D);
 	}
         break;
       case XMLTOKEN_FOR3D:
@@ -148,9 +167,9 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	  if (!SyntaxService->ParseBool (child, for3d, true))
 	    return NULL;
           if (for3d)
-            flags |= CS_TEXTURE_3D;
+	    context.SetFlags (context.GetFlags() | CS_TEXTURE_3D);
           else
-            flags &= ~CS_TEXTURE_3D;
+	    context.SetFlags (context.GetFlags() & ~CS_TEXTURE_3D);
 	}
         break;
       case XMLTOKEN_TRANSPARENT:
@@ -168,7 +187,8 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	      child, "Expected VFS filename for 'file'!");
 	    return NULL;
 	  }
-          strcpy (filename, fname);
+          //strcpy (filename, fname);
+	  filename = fname;
 	}
         break;
       case XMLTOKEN_MIPMAP:
@@ -177,9 +197,9 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	  if (!SyntaxService->ParseBool (child, mm, true))
 	    return NULL;
           if (mm)
-            flags &= ~CS_TEXTURE_NOMIPMAPS;
+	    context.SetFlags (context.GetFlags() | CS_TEXTURE_NOMIPMAPS);
           else
-            flags |= CS_TEXTURE_NOMIPMAPS;
+	    context.SetFlags (context.GetFlags() & ~CS_TEXTURE_NOMIPMAPS);
 	}
         break;
       case XMLTOKEN_DITHER:
@@ -188,9 +208,9 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	  if (!SyntaxService->ParseBool (child, di, true))
 	    return NULL;
           if (di)
-            flags |= CS_TEXTURE_DITHER;
+	    context.SetFlags (context.GetFlags() | CS_TEXTURE_DITHER);
           else
-            flags &= ~CS_TEXTURE_DITHER;
+	    context.SetFlags (context.GetFlags() & ~CS_TEXTURE_DITHER);
 	}
         break;
       case XMLTOKEN_KEEPIMAGE:
@@ -199,102 +219,29 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	    return NULL;
 	}
 	break;
-      default:
-        SyntaxService->ReportBadToken (child);
-	return NULL;
-    }
-  }
-
-  // The size of image should be checked before registering it with
-  // the 3D or 2D driver... if the texture is used for 2D only, it can
-  // not have power-of-two dimensions...
-
-  csRef<iTextureWrapper> tex (LoadTexture (txtname, filename, flags,
-  	NULL, false, false));	// Do not create a default material.
-  if (tex && do_transp)
-    tex->SetKeyColor (QInt (transp.red * 255.99),
-      QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
-
-  if (!tex)
-  {
-    SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.texture",
-	      node, "Could not load texture '%s'\n", txtname);
-  }
-
-  if (tex)
-  {
-    tex->SetKeepImage (keep_image);
-  }
-  return tex;
-}
-
-iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
-{
-  if (!Engine) return NULL;
-
-  static bool deprecated_warned = false;
-
-  csProcTexture* pt = NULL;
-  iLoaderPlugin* plug = NULL;
-  iBinaryLoaderPlugin* binplug = NULL;
-
-  csRef<iDocumentNode> ParamsNode;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_TYPE:
-        if (pt || plug)
-	{
-	  SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.proctex",
-	      child, "'type' of proctex already specified!");
-	  return NULL;
-	}
-	else
-	{
-	  const char* type = child->GetContentsValue ();
-
-	  if (!loaded_plugins.FindPlugin (type, plug, binplug))
-	  {
-	    if (!strcasecmp (type, "dots"))
-	      pt = new csProcDots ();
-	    else if (!strcasecmp (type, "plasma"))
-	      pt = new csProcPlasma ();
-	    else if (!strcasecmp (type, "water"))
-	      pt = new csProcWater ();
-	    else if (!strcasecmp (type, "fire"))
-	      pt = new csProcFire ();
-	    else
-	    {
-	      SyntaxService->ReportError (
-		"crystalspace.maploader.parse.proctex",
-		child, "Unknown 'type' '%s' of proctex!", type);
-	      return NULL;
-	    }
-	    if (!deprecated_warned)
-	    {
-	      SyntaxService->Report (
-		"crystalspace.maploader.parse.proctex",
-		CS_REPORTER_SEVERITY_NOTIFY,
-		node,
-		"Deprecated syntax used for proctex! "
-		"Specify a plugin classid or map the old types to their "
-		"plugin counterparts in the 'plugins' node.");
-	      deprecated_warned = true;
-	    }
-	  }
-	}
-        break;
       case XMLTOKEN_PARAMS:
 	ParamsNode = child;
+	break;
+      case XMLTOKEN_TYPE:
+	type = child->GetContentsValue ();
+	  if (!type)
+	  {
+	    SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.texture",
+	      child, "Expected plugin ID for <type>!");
+	    return NULL;
+	  }
+	break;
+      case XMLTOKEN_SIZE:
+	{
+	  csRef<iDocumentAttribute> attr_w, attr_h;
+	  if ((attr_w = child->GetAttribute ("width")) &&
+	    (attr_h = child->GetAttribute ("height")))
+	  {
+	    context.SetSize (attr_w->GetValueAsInt(),
+	      attr_h->GetValueAsInt());
+	  }
+	}
 	break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -302,31 +249,125 @@ iTextureWrapper* csLoader::ParseProcTex (iDocumentNode* node)
     }
   }
 
-  if (plug)
-  {
-    csRef<iBase> b = plug->Parse (ParamsNode,
-      GetLoaderContext (), NULL);
-    csRef<iTextureWrapper> tw = SCF_QUERY_INTERFACE (b, iTextureWrapper);
-    tw->QueryObject ()->SetName (node->GetAttributeValue ("name"));
-    return tw;
-  }
-  else
-  {
-    if (pt == NULL)
-    {
-      SyntaxService->ReportError (
-		"crystalspace.maploader.parse.proctex",
-		node, "'type' of proctex not given!");
-      return NULL;
-    }
+  csRef<iLoaderPlugin> plugin;
 
-    iMaterialWrapper *mw = pt->Initialize (object_reg, Engine,
-	  G3D ? G3D->GetTextureManager () : NULL,
-	  node->GetAttributeValue ("name"));
-    mw->QueryObject ()->ObjAdd (pt);
-    pt->DecRef ();
-    return pt->GetTextureWrapper ();
+  iTextureManager* tm = G3D ? G3D->GetTextureManager() : NULL;
+  int Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
+  if (filename && (*filename != 0))
+  {
+    csRef<iImage> image = LoadImage (filename, Format);
+    context.SetImage (image);
+    if (image && !type)
+    {
+      // special treatment for animated textures
+      csRef<iAnimatedImage> anim = csPtr<iAnimatedImage>
+	(SCF_QUERY_INTERFACE (image, iAnimatedImage));
+      if (anim && anim->IsAnimated())
+      {
+	type = PLUGIN_TEXTURELOADER_ANIMIMG;
+      }
+      else
+      {
+	// shortcut, no need to go through the plugin list facility
+	if (!BuiltinImageTexLoader)
+	{
+	  csImageTextureLoader* itl = new csImageTextureLoader (NULL);
+	  itl->Initialize (object_reg);
+	  BuiltinImageTexLoader.AttachNew (itl);
+	}
+	plugin = BuiltinImageTexLoader;
+      }
+    }
   }
+  csRef<iTextureWrapper> tex;
+  
+  static bool deprecated_warned = false;
+
+  iLoaderPlugin* Plug = NULL;
+  iBinaryLoaderPlugin* Binplug;
+  if (type && !plugin)
+  {
+    if (!loaded_plugins.FindPlugin (type, Plug, Binplug))
+    {
+      if ((!strcasecmp (type, "dots")) ||
+	  (!strcasecmp (type, "plasma")) ||
+	  (!strcasecmp (type, "water")) ||
+	  (!strcasecmp (type, "fire")))
+      {
+	// old style proctex type
+	if (!deprecated_warned)
+	{
+	  SyntaxService->Report (
+	    "crystalspace.maploader.parse.texture",
+	    CS_REPORTER_SEVERITY_NOTIFY,
+	    node,
+	    "Deprecated syntax used for proctex! "
+	    "Specify a plugin classid or map the old types to their "
+	    "plugin counterparts in the <plugins> node.");
+	  deprecated_warned = true;
+	}
+
+	CS_ALLOC_STACK_ARRAY (char, newtype, strlen (PLUGIN_LEGACY_TEXTYPE_PREFIX) +
+	  strlen (type) + 1);
+	strcpy (newtype, PLUGIN_LEGACY_TEXTYPE_PREFIX);
+	strcat (newtype, type);
+	type = newtype;
+
+	loaded_plugins.FindPlugin (type, Plug, Binplug);
+      }
+    }
+    plugin = Plug;
+  }
+
+  if (type && !plugin)
+  {
+    SyntaxService->Report (
+      "crystalspace.maploader.parse.texture",
+      CS_REPORTER_SEVERITY_WARNING,
+      node, "Could not get plugin '%s', using default", type);
+
+    if (!BuiltinImageTexLoader)
+    {
+      csImageTextureLoader* itl = new csImageTextureLoader (NULL);
+      itl->Initialize (object_reg);
+      BuiltinImageTexLoader.AttachNew (itl);
+    }
+    plugin = BuiltinImageTexLoader;
+  }
+  if (plugin)
+  {
+    csRef<iBase> b = plugin->Parse (ParamsNode,
+      GetLoaderContext (), STATIC_CAST(iBase*, &context));
+    if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+  }
+
+  if (!tex)
+  {
+    SyntaxService->Report (
+      "crystalspace.maploader.parse.texture",
+      CS_REPORTER_SEVERITY_WARNING,
+      node, "Could not load texture '%s', using checkerboard instead", txtname);
+
+    if (!BuiltinCheckerTexLoader)
+    {
+      csCheckerTextureLoader* ctl = new csCheckerTextureLoader (NULL);
+      ctl->Initialize (object_reg);
+      BuiltinCheckerTexLoader.AttachNew (ctl);
+    }
+    csRef<iBase> b = BuiltinCheckerTexLoader->Parse (ParamsNode,
+      GetLoaderContext (), STATIC_CAST(iBase*, &context));
+    tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
+  }
+
+  if (tex)
+  {
+    tex->QueryObject ()->SetName (txtname);
+    tex->SetKeepImage (keep_image);
+    if (do_transp)
+      tex->SetKeyColor (QInt (transp.red * 255.99),
+        QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
+  }
+  return tex;
 }
 
 iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,

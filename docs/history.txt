@@ -26,8 +26,31 @@ The history order is reversed so that new features are at the top.
 	  since it employs csRect.
 	- Oktal added iSprite2DState to the list of interfaces wrapped by
 	  cspace.i, and added a GetVertexByIndex function to it with %extend.
-	- res fixed the NULL pointer access bug in TinyXML writing intrduced
+	- res fixed the NULL pointer access bug in TinyXML writing introduced
 	  after my recent leak fix.
+	- res made the following changes:
+	      - To the map loader:
+		  - Procedural textures and normal textures are parsed from 
+		    the same tag, <texture>.
+		  - Both kinds of textures are loaded in the same manner, 
+		    through plugin interfaces ('normal' images are handled by 
+		    a loader built into csloader.)
+		  - A 'texture loading context' is passed to a loader, 
+		    containing some info such as the image specified in <file> 
+		    and texture flags.
+		  - Built a checkerboard texture loader into csloader (this 
+		    one is used in case a texture couldn't be loaded 
+		    otherwise.)
+		  - Animated images are detected and the ptanimimg plugin is 
+		    tried for loading.
+	    - Changed the ClassIDs of the standard PT & animation texture 
+	      plugins.
+	    - Fixed the JNG/MNG plugin to better recognize animated real-world
+	      MNGs.
+	    - Augmented csCreateXORPatternImage() to accept an optional color.
+	    - Changed flarge according to the loader changes and added a 
+	      yellow checkerboard texture.
+	    - Updated the API mod docs.
 12-May-2003
 	- Philip Wyett brought warning level in MSVC 7 project files down
           to 3 to match MSVC 6 ones. Also cleaned up 'group.tpl' for

@@ -93,6 +93,7 @@ private:
   csTicks time_elapsed, total_time_elapsed;
   bool doWait;
   csRect* dirtyrect;
+  bool animated;
 
   /// stream read callback for libmng
   static mng_bool MNG_DECL cb_readdata(mng_handle hHandle, mng_ptr pBuf,

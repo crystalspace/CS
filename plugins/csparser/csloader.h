@@ -275,6 +275,11 @@ private:
   /// Pointer to the engine sequencer (optional module).
   csRef<iEngineSequenceManager> eseqmgr;
 
+  /// Pointer to built-in image texture loader.
+  csRef<iLoaderPlugin> BuiltinImageTexLoader;
+  /// Pointer to built-in checkerboard texture loader.
+  csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
+
   class csLoaderStats
   {
   public:
@@ -382,7 +387,7 @@ private:
   /// Parse a texture definition and add the texture to the engine
   iTextureWrapper* ParseTexture (iDocumentNode* node);
   /// Parse a proc texture definition and add the texture to the engine
-  iTextureWrapper* ParseProcTex (iDocumentNode* node);
+  //iTextureWrapper* ParseProcTex (iDocumentNode* node);
   /// Parse a material definition and add the material to the engine
   iMaterialWrapper* ParseMaterial (iDocumentNode* node, const char* prefix = NULL);
   /// Parse a collection definition and add the collection to the engine

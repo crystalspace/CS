@@ -33,9 +33,15 @@
  * \param width Width of the image to create
  * \param height Height of the image to create
  * \param recdepth "recursion depth", clamped to range 1-8.
+ * \param red Maximum value of red component
+ * \param green Maximum value of green component
+ * \param blue Maximum value of blue component
  */
 extern csPtr<iImage> csCreateXORPatternImage(int width, int height,
-					     int recdepth);
+					     int recdepth,
+					     float red = 1.0f,
+					     float green = 1.0f,
+					     float blue = 1.0f);
 
 /** @} */
 

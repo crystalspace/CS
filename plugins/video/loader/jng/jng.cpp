@@ -905,6 +905,7 @@ bool ImageJngFile::Load (uint8 *iBuffer, uint32 iSize)
     return false;
   }
   doWait = (retcode == MNG_NEEDTIMERWAIT);
+  animated = doWait;
 
   if (NewImage)
   {
@@ -955,6 +956,11 @@ bool ImageJngFile::Animate (csTicks time, csRect* dirtyrect)
 bool ImageJngFile::IsAnimated ()
 {
   return ((mng_get_sigtype (handle) == mng_it_mng)
-    && (mng_get_framecount (handle) > 1)); 
+    && animated/*(mng_get_framecount (handle) > 1)*/); 
+  /*
+    A lot of MNGs seem to have improper framecounts in their header.
+    So instead we treat an image as 'animated' in case there was a
+    non-immediate timer set at the start.
+   */
 }
 

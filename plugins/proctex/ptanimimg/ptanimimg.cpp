@@ -29,7 +29,7 @@
 #include "imap/loader.h"
 #include "imap/services.h"
 #include "ivaria/reporter.h"
-#include "csgfx/xorpat.h"
+#include "itexture/itexloaderctx.h"
 #include "csutil/csstring.h"
 
 #include "ptanimimg.h"
@@ -47,7 +47,7 @@ SCF_IMPLEMENT_FACTORY(csAnimateProctexLoader);
 
 SCF_EXPORT_CLASS_TABLE (ptanimimg)
   SCF_EXPORT_CLASS_DEP (csAnimateProctexLoader, 
-    "crystalspace.proctex.loader.animimg",
+    "crystalspace.texture.loader.animimg",
     "Animated image procedural texture loader", 
     "crystalspace.graphics3d., crystalspace.level.loader, ")
 SCF_EXPORT_CLASS_TABLE_END
@@ -74,36 +74,53 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
 					    iLoaderContext* ldr_context,
   					    iBase* context)
 {
-  if (!node) return NULL;
-
-  csRef<iLoader> LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (!LevelLoader) 
+  int w = 64, h = 64, depth = 6;
+  csRef<iTextureLoaderContext> ctx;
+  if (context)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, NULL, "No level loader");
-    return NULL;
+    ctx = csPtr<iTextureLoaderContext>
+      (SCF_QUERY_INTERFACE (context, iTextureLoaderContext));
   }
 
-  csRef<iDocumentNode> file = node->GetNode ("file");
-  if (!file) 
+  csRef<iImage> img = (ctx && ctx->HasImage()) ? ctx->GetImage() : NULL;
+  if (!img)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, node, "No 'file' token");
-    return NULL;
-  }
-  const char* fname;
-  if (!(fname = file->GetContentsValue())) 
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, file, "Empty 'file' token");
-    return NULL;
-  }
+    if (!node)
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, node, 
+	"Please provide a <file> node in the <texture> or <params> block");
+      return NULL;
+    }
 
-  csRef<iImage> img = LevelLoader->LoadImage (fname,
-    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
-  if (!img) 
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING, file, 
-      "Couldn't load image '%s', using checkerboard instead",
-      fname);
-    img = csCreateXORPatternImage (64, 64, 6);
+    csRef<iLoader> LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
+    if (!LevelLoader) 
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, NULL, "No level loader");
+      return NULL;
+    }
+
+    csRef<iDocumentNode> file = node->GetNode ("file");
+    if (!file) 
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, node, 
+	"Please provide a <file> node in the <texture> or <params> block");
+      return NULL;
+    }
+    const char* fname;
+    if (!(fname = file->GetContentsValue())) 
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, file, "Empty <file> node");
+      return NULL;
+    }
+
+    img = LevelLoader->LoadImage (fname,
+      CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
+    if (!img) 
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, file, 
+	"Couldn't load image '%s'", fname);
+      return NULL;
+    }
   }
 
   csRef<csProcTexture> pt = csPtr<csProcTexture> (new csProcAnimated (img));

@@ -188,10 +188,10 @@ old @code{<type>} behaviour, paste the following lines into a map's
 @code{<plugin>} section:
 
 @example
-<plugin name="dots">crystalspace.proctex.loader.dots</plugin>
-<plugin name="fire">crystalspace.proctex.loader.fire</plugin>
-<plugin name="water">crystalspace.proctex.loader.water</plugin>
-<plugin name="plasma">crystalspace.proctex.loader.plasma</plugin>
+<plugin name="dots">crystalspace.texture.loader.dots</plugin>
+<plugin name="fire">crystalspace.texture.loader.fire</plugin>
+<plugin name="water">crystalspace.texture.loader.water</plugin>
+<plugin name="plasma">crystalspace.texture.loader.plasma</plugin>
 @end example
 
 This requires that you move the @code{<plugin>} block in front of the 
@@ -200,6 +200,13 @@ This requires that you move the @code{<plugin>} block in front of the
 The behaviour of procedural textures also differs as a material of the same
 name was created along with the texture; this isn't the case any more, you
 have to create a material which uses the procedural texture manually.
+
+In addition, the loader now doesn't distinguish between normal and procedural
+textures any more, both are loaded with the same @code{<texture>} block. The 
+syntax recognized is a combination of both old @code{<texture>} and 
+@code{<proctex>} tokens - so renaming all @code{<proctex>} to @code{<texture>}
+tags is sufficient to convert a level (apart from fixing the @code{<type>}
+tokens.)
 
 @subheading Mesh objects/factories and iPolygonMesh
 
