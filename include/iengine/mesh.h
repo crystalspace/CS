@@ -27,6 +27,7 @@
 struct iMeshObject;
 struct iMeshObjectFactory;
 struct iMeshWrapper;
+class csMeshWrapper;
 class csMeshFactoryWrapper;
 struct iMeshFactoryWrapper;
 struct iRenderView;
@@ -95,7 +96,7 @@ class csFlags;
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 7);
+SCF_VERSION (iMeshWrapper, 0, 0, 8);
 
 /**
  * This interface corresponds to the object in the engine
@@ -103,6 +104,8 @@ SCF_VERSION (iMeshWrapper, 0, 0, 7);
  */
 struct iMeshWrapper : public iBase
 {
+  /// UGLY!!!@@@
+  virtual csMeshWrapper* GetPrivateObject () = 0;
   /// Get the iMeshObject.
   virtual iMeshObject* GetMeshObject () = 0;
   /// Get the iObject for this mesh object.
@@ -225,6 +228,12 @@ struct iMeshWrapper : public iBase
    */
   virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
   	csBox3& cbox) = 0;
+
+  /**
+   * Add a child to this object. The transform of that child will be
+   * interpreted relative to this object.
+   */
+  virtual void AddChild (iMeshWrapper* child) = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 3);

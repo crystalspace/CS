@@ -127,6 +127,12 @@ void csMeshWrapper::UpdateMove ()
 void csMeshWrapper::MoveToSector (csSector* s)
 {
   s->AddMesh (this);
+  int i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    csMeshWrapper* spr = (csMeshWrapper*)children[i];
+    spr->MoveToSector (s);
+  }
 }
 
 void csMeshWrapper::RemoveFromSectors ()
@@ -139,6 +145,11 @@ void csMeshWrapper::RemoveFromSectors ()
     csSector* ss = (csSector*)sectors[i];
     if (ss)
       ss->UnlinkMesh (this);
+  }
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    csMeshWrapper* spr = (csMeshWrapper*)children[i];
+    spr->RemoveFromSectors ();
   }
 }
 
@@ -361,6 +372,29 @@ float csMeshWrapper::GetScreenBoundingBox (
 void csMeshWrapper::MeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
 {
   scfParent->SetFactory (factory->GetPrivateObject ());
+}
+
+void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
+{
+  // First unlink the mesh from the engine or another parent.
+  csMeshWrapper* c = child->GetPrivateObject ();
+  csObject* par = c->GetParentContainer ();
+  if (par)
+  {
+    if (par->GetType () == csEngine::Type)
+      ((csEngine*)par)->UnlinkMesh (c);
+    else
+    {
+      csMeshWrapper* old_mesh = (csMeshWrapper*)par;
+      csNamedObjVector& ch = old_mesh->GetChildren ();
+      int idx = ch.Find (c);
+      if (idx != -1)
+      {
+        ch.Delete (idx, false);		// Unlink object
+      }
+    }
+  }
+  scfParent->GetChildren ().Push (c);
 }
 
 //--------------------------------------------------------------------------

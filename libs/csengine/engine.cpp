@@ -63,6 +63,8 @@
 #include "ivideo/graph3d.h"
 #include "isys/event.h"
 #include "iutil/cfgmgr.h"
+#include "iutil/databuff.h"
+#include "imap/reader.h"
 
 //---------------------------------------------------------------------------
 
@@ -2045,6 +2047,87 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* classId,
   iMeshFactoryWrapper* imfw = QUERY_INTERFACE (mfactwrap, iMeshFactoryWrapper);
   imfw->DecRef ();
   return imfw;
+}
+
+
+void csEngine::DeleteMeshFactory (const char* iName, bool regionOnly)
+{
+  csMeshFactoryWrapper* fact;
+  if (regionOnly && region)
+  {
+    fact = (csMeshFactoryWrapper*)FindObjectInRegion (region,
+    	mesh_factories, iName);
+    if (fact) region->ReleaseFromRegion (fact);
+  }
+  else
+  {
+    int i;
+    for (i = 0 ; i < mesh_factories.Length () ; i++)
+    {
+      csMeshFactoryWrapper* fact = (csMeshFactoryWrapper*)mesh_factories[i];
+      if (fact->GetName () && !strcmp (fact->GetName (), iName))
+      {
+        mesh_factories.Delete (i);
+	return;
+      }
+    }
+  }
+}
+
+iMeshFactoryWrapper* csEngine::LoadMeshFactory (
+  	const char* classId, const char* name,
+	const char* loaderClassId,
+	iDataBuffer* input)
+{
+  iLoaderPlugIn* plug = QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
+  	iLoaderPlugIn);
+  if (!plug)
+    plug = LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugIn);
+  if (!plug)
+    return NULL;
+
+  iMeshFactoryWrapper* fact = CreateMeshFactory (classId, name);
+  if (!fact) return NULL;
+
+  char* buf = **input;
+  iBase* mof = plug->Parse (buf, this, fact);
+  plug->DecRef ();
+  if (!mof) { DeleteMeshFactory (name); return NULL; }
+  fact->SetMeshObjectFactory ((iMeshObjectFactory*)mof);
+  return fact;
+}
+
+iMeshWrapper* csEngine::LoadMeshObject (
+  	const char* classId, const char* name,
+	const char* loaderClassId,
+	iDataBuffer* input, iSector* sector, const csVector3& pos)
+{
+  iLoaderPlugIn* plug = QUERY_PLUGIN_CLASS (System, loaderClassId, "MeshLdr",
+  	iLoaderPlugIn);
+  if (!plug)
+    plug = LOAD_PLUGIN (System, loaderClassId, "MeshLdr", iLoaderPlugIn);
+  if (!plug)
+    return NULL;
+
+  csMeshWrapper* meshwrap = new csMeshWrapper (this);
+  if (name) meshwrap->SetName (name);
+  meshes.Push (meshwrap);
+  if (sector)
+  {
+    meshwrap->GetMovable ().SetSector (sector->GetPrivateObject ());
+    meshwrap->GetMovable ().SetPosition (pos);
+    meshwrap->GetMovable ().UpdateMove ();
+  }
+  iMeshWrapper* imw = QUERY_INTERFACE (meshwrap, iMeshWrapper);
+  imw->DecRef ();
+
+  char* buf = **input;
+  iBase* mof = plug->Parse (buf, this, imw);
+  plug->DecRef ();
+  if (!mof) { delete meshwrap; return NULL; }
+  meshwrap->SetMeshObject ((iMeshObject*)mof);
+
+  return imw;
 }
 
 iMeshWrapper* csEngine::CreateMeshObject (iMeshFactoryWrapper* factory,

@@ -50,6 +50,7 @@ struct iPolyTxtPlane;
 struct iCurveTemplate;
 struct iObject;
 struct iCollection;
+struct iDataBuffer;
 
 /**
  * Flag for GetNearbyLights().
@@ -122,7 +123,7 @@ struct iCollection;
 #define CS_CULLER_COVTREE 2
 
 
-SCF_VERSION (iEngine, 0, 1, 21);
+SCF_VERSION (iEngine, 0, 1, 22);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -249,6 +250,14 @@ struct iEngine : public iPlugIn
    */
   virtual iMeshWrapper *FindMeshObject (const char *iName,
   	bool regionOnly = false) = 0;
+
+  /**
+   * Delete a mesh factory by name. ONLY call this when you're sure
+   * no objects are actually using this factory!
+   */
+  virtual void DeleteMeshFactory (const char* iName,
+  	bool regionOnly = false) = 0;
+
   /**
    * Find a mesh factory by name. If regionOnly is true then the returned
    * factory will belong to the current region. Note that this is different
@@ -365,6 +374,14 @@ struct iEngine : public iPlugIn
   	const char* name) = 0;
 
   /**
+   * Conveniance function to load a mesh factory from a given loader plugin.
+   */
+  virtual iMeshFactoryWrapper* LoadMeshFactory (
+  	const char* classId, const char* name,
+	const char* loaderClassId,
+	iDataBuffer* input) = 0;
+
+  /**
    * Conveniance function to create a mesh object for a given factory.
    * If 'sector' is NULL then the mesh object will not be set to a position.
    * Returns NULL on failure. The object will be given the specified name.
@@ -373,6 +390,14 @@ struct iEngine : public iPlugIn
    */
   virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector, const csVector3& pos) = 0;
+  /**
+   * Conveniance function to load a mesh object from a given loader plugin.
+   * If sector == NULL the object will not be placed in a sector.
+   */
+  virtual iMeshWrapper* LoadMeshObject (
+  	const char* classId, const char* name,
+	const char* loaderClassId,
+	iDataBuffer* input, iSector* sector, const csVector3& pos) = 0;
   /**
    * Conveniance function to create a terrain factory from a given type.
    * The type plugin will only be loaded if needed. 'classId' is the

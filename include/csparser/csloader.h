@@ -132,7 +132,7 @@ class csLoader : public iLoader
   /**
    * Load the mesh object from the map file.
    */
-  bool LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector);
+  bool LoadMeshObject (csMeshWrapper* mesh, char* buf);
 
   /// Load a Terrain Object Factory from the map file.
   bool LoadTerrainObjectFactory (csTerrainFactoryWrapper* pTerrFact, char* buf);

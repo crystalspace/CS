@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+26-Apr-2001
+	- Extended the fire particle system loader with a new ORIGINBOX
+	  keyword which allows the origin to be specified as a box. The
+	  fire particle system could already do that but the loader didn't
+	  support it. Fixed saver to save to ORIGINBOX instead of ORIGIN.
+	- Additionally added support for DIRECTION keyword in fire loader
+	  and saver.
+	- Updated documentation to reflect above changes and also added
+	  BASECOLOR keyword to the spr3d doc.
+	- Added iEngine::DeleteMeshFactory(), LoadMeshFactory(), and
+	  LoadMeshObject() conveniance functions. The last two are especially
+	  nice as they give an easy way to load a mesh object or factory from
+	  a loader plugin.
+	- Added iMeshWrapper::AddChild() to add a child mesh to some parent
+	  mesh. This routine correctly unlinks the mesh from its previous
+	  parent (can be the engine or another mesh).
+	- Fixed sector handling in mesh wrapper so that children will now
+	  automatically be moved to the correct sector when the parent is.
 25-Apr-2001
 	- Philip Wyett cleaned up formatting in ptlab.cfg.
 	- Martin Geisse added an SCF interface for collection (iCollection).

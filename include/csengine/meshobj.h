@@ -322,6 +322,10 @@ public:
   struct MeshWrapper : public iMeshWrapper
   {
     DECLARE_EMBEDDED_IBASE (csMeshWrapper);
+    virtual csMeshWrapper* GetPrivateObject ()
+    {
+      return (csMeshWrapper*)scfParent;
+    }
     virtual iMeshObject* GetMeshObject ()
     {
       return scfParent->GetMeshObject ();
@@ -394,6 +398,7 @@ public:
     {
       scfParent->GetTransformedBoundingBox (trans, cbox);
     }
+    virtual void AddChild (iMeshWrapper* child);
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 

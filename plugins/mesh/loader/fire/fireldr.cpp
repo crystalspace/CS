@@ -48,6 +48,7 @@ CS_TOKEN_DEF_START
 
   CS_TOKEN_DEF (COLORSCALE)
   CS_TOKEN_DEF (COLOR)
+  CS_TOKEN_DEF (DIRECTION)
   CS_TOKEN_DEF (DROPSIZE)
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (LIGHTING)
@@ -55,6 +56,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MIXMODE)
   CS_TOKEN_DEF (NUMBER)
   CS_TOKEN_DEF (ORIGIN)
+  CS_TOKEN_DEF (ORIGINBOX)
   CS_TOKEN_DEF (SWIRL)
   CS_TOKEN_DEF (TOTALTIME)
 CS_TOKEN_DEF_END
@@ -244,6 +246,8 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (FACTORY)
+    CS_TOKEN_TABLE (DIRECTION)
+    CS_TOKEN_TABLE (ORIGINBOX)
     CS_TOKEN_TABLE (ORIGIN)
     CS_TOKEN_TABLE (SWIRL)
     CS_TOKEN_TABLE (TOTALTIME)
@@ -293,11 +297,27 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
 	  firestate->SetDropSize (dw, dh);
 	}
 	break;
+      case CS_TOKEN_ORIGINBOX:
+	{
+	  csVector3 o1, o2;
+	  ScanStr (params, "%f,%f,%f,%f,%f,%f",
+	  	&o1.x, &o1.y, &o1.z,
+		&o2.x, &o2.y, &o2.z);
+	  firestate->SetOrigin (csBox3 (o1, o2));
+	}
+	break;
       case CS_TOKEN_ORIGIN:
 	{
 	  csVector3 origin;
 	  ScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
 	  firestate->SetOrigin (origin);
+	}
+	break;
+      case CS_TOKEN_DIRECTION:
+	{
+	  csVector3 dir;
+	  ScanStr (params, "%f,%f,%f", &dir.x, &dir.y, &dir.z);
+	  firestate->SetDirection (dir);
 	}
 	break;
       case CS_TOKEN_SWIRL:
@@ -344,6 +364,7 @@ iBase* csFireLoader::Parse (const char* string, iEngine* engine,
           iMaterialWrapper* mat = engine->FindMaterial (str);
 	  if (!mat)
 	  {
+	    printf ("Could not find material '%s'!\n", str);
             // @@@ Error handling!
             mesh->DecRef ();
 	    if (partstate) partstate->DecRef ();
@@ -420,14 +441,22 @@ void csFireSaver::WriteDown (iBase* obj, iStrVector *str,
     partstate->GetColor().green, partstate->GetColor().blue);
   str->Push(strnew(buf));
 
-   
   printf(buf, "NUMBER (%d)\n", state->GetNumberParticles());
   str->Push(strnew(buf));
   sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
   str->Push(strnew(buf));
-  // REDEYE: Temp hack to fix compile errors
-  sprintf(buf, "ORIGIN (%g, %g, %g)\n", state->GetOrigin().MinX (),
-    state->GetOrigin().MinY (), state->GetOrigin().MinZ ());
+  sprintf(buf, "ORIGINBOX (%g,%g,%g, %g,%g,%g)\n",
+    state->GetOrigin ().MinX (),
+    state->GetOrigin ().MinY (),
+    state->GetOrigin ().MinZ (),
+    state->GetOrigin ().MaxX (),
+    state->GetOrigin ().MaxY (),
+    state->GetOrigin ().MaxZ ());
+  str->Push(strnew(buf));
+  sprintf(buf, "DIRECTION (%g,%g,%g)\n",
+    state->GetDirection ().x,
+    state->GetDirection ().y,
+    state->GetDirection ().z);
   str->Push(strnew(buf));
   sprintf(buf, "SWIRL (%g)\n", state->GetSwirl());
   str->Push(strnew(buf));

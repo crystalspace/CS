@@ -1044,23 +1044,33 @@ public:
   virtual iSector *FindSector (const char *iName, bool regionOnly = false);
 
   /// Find a mesh by name
-  virtual iMeshWrapper *FindMeshObject (const char *iName, bool regionOnly = false);
+  virtual iMeshWrapper *FindMeshObject (const char *iName,
+  	bool regionOnly = false);
   /// Find a mesh factory by name
-  virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName, bool regionOnly = false);
+  virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
+  	bool regionOnly = false);
+  /// Delete a mesh factory by name
+  virtual void DeleteMeshFactory (const char* iName, bool regionOnly = false);
 
   /// Find a terrain by name
-  virtual iTerrainWrapper *FindTerrainObject (const char *iName, bool regionOnly = false);
+  virtual iTerrainWrapper *FindTerrainObject (const char *iName,
+  	bool regionOnly = false);
   /// Find a terrain factory by name
-  virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName, bool regionOnly);
+  virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName,
+  	bool regionOnly);
 
   /// Find a loaded texture by name.
-  virtual iTextureWrapper* FindTexture (const char* iName, bool regionOnly = false);
+  virtual iTextureWrapper* FindTexture (const char* iName,
+  	bool regionOnly = false);
   /// Find a loaded material by name.
-  virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false);
+  virtual iMaterialWrapper* FindMaterial (const char* iName,
+  	bool regionOnly = false);
   /// Find a loaded camera position by name.
-  virtual iCameraPosition* FindCameraPosition (const char* iName, bool regionOnly = false);
+  virtual iCameraPosition* FindCameraPosition (const char* iName,
+  	bool regionOnly = false);
   /// Find a collection by name
-  virtual iCollection* FindCollection (const char* iName, bool regionOnly = false);
+  virtual iCollection* FindCollection (const char* iName,
+  	bool regionOnly = false);
   /// Create a new collection.
   virtual iCollection* CreateCollection (const char* iName);
 
@@ -1079,9 +1089,19 @@ public:
   /// Create mesh factory.
   virtual iMeshFactoryWrapper* CreateMeshFactory (const char* classId,
   	const char* name);
+  /// Load mesh factory.
+  virtual iMeshFactoryWrapper* LoadMeshFactory (
+  	const char* classId, const char* name,
+	const char* loaderClassId,
+	iDataBuffer* input);
   /// Create mesh object.
   virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector, const csVector3& pos);
+  /// Load mesh object.
+  virtual iMeshWrapper* LoadMeshObject (
+  	const char* classId, const char* name,
+	const char* loaderClassId,
+	iDataBuffer* input, iSector* sector, const csVector3& pos);
 
   /// Create terrain factory.
   virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* pClassId,
