@@ -700,6 +700,8 @@ void csTerrainObject::SetupPolyMeshData ()
   delete[] polymesh_triangles;
   delete[] polymesh_polygons; polymesh_polygons = 0;
 
+// @@@ TODO: CD is talking most time right now. Optimize this by
+// simplifying the CD mesh for flat areas.
   int res = cd_resolution;
   csRef<iTerraSampler> terrasampler = terraformer->GetSampler (
       csBox2 (rootblock->center.x - rootblock->size / 2.0,
