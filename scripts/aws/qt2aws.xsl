@@ -24,7 +24,6 @@
   <xsl:strip-space elements="*"/>
 
   <xsl:template match="/UI">
-
     <xsl:choose>
       <xsl:when test="./class">
         <xsl:text>window "</xsl:text><xsl:value-of select="./class"/><xsl:text>"</xsl:text>
@@ -33,68 +32,60 @@
         <xsl:text>window "</xsl:text><xsl:value-of select="./widget/property[name[text()='name']]/cstring"/><xsl:text>"</xsl:text>
       </xsl:otherwise>
     </xsl:choose>
+    <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <xsl:apply-templates />
+    <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
 
   </xsl:template>
-
+  
   <xsl:template match="widget[class[text()='QDialog']]">
-    <xsl:text>{</xsl:text>
     <!-- set the title if any -->
     <xsl:call-template name="style"/>
     <xsl:call-template name="options"/>
     <xsl:apply-templates select="widget"/>
-    <xsl:text>}</xsl:text>
   </xsl:template>
 
-  <xsl:template match="widget[class[text()='QPushButton']]">
-    <xsl:call-template name="component_header"/>
-    <xsl:text>{</xsl:text>
-    <xsl:call-template name="style"/>
+  <xsl:template match="widget[class[text()='QRadioButton' or text()='QRadioButton' or text()='QButtonGroup' or text()='QGroupBox' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
+    <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
+    <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <xsl:apply-templates/>
-    <xsl:text>}</xsl:text>
-  </xsl:template>
-
-  <xsl:template match="widget[class[text()='QRadioButton' or text()='QButtonGroup' or text()='QGroupBox' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
-    <xsl:call-template name="component_header"/>
-    <xsl:text>{</xsl:text>
-    <xsl:apply-templates/>
-    <xsl:text>}</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
   </xsl:template>
   
   <xsl:template match="property[name[text()='caption']]">
-    <xsl:text>Title: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>Title: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
   </xsl:template>
 
   <xsl:template match="property[name[text()='text' or text()='title'] and ../class[text() != 'QLineEdit']]">
-    <xsl:text>Caption: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>Caption: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
   </xsl:template>
 
   <xsl:template match="property[name[text()='text'] and ../class[text()='QLineEdit']]">
-    <xsl:text>Text: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>Text: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
   </xsl:template>
 
   <xsl:template match="property[name[text()='pixmap'] and ../class[text()='QLabel']]">
-    <xsl:text>Texture: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>Texture: "</xsl:text><xsl:value-of select="string"/><xsl:text>"</xsl:text>
   </xsl:template>
 
   <xsl:template match="property[name[text()='geometry']]">
-    <xsl:text>Frame: (</xsl:text><xsl:value-of select="rect/x"/><xsl:text>,</xsl:text><xsl:value-of select="rect/y"/><xsl:text>) - (</xsl:text><xsl:value-of select="number(rect/x)+number(rect/width)"/><xsl:text>,</xsl:text><xsl:value-of select="number(rect/y)+number(rect/height)"/><xsl:text>)</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>Frame: (</xsl:text><xsl:value-of select="rect/x"/><xsl:text>,</xsl:text><xsl:value-of select="rect/y"/><xsl:text>) - (</xsl:text><xsl:value-of select="number(rect/x)+number(rect/width)"/><xsl:text>,</xsl:text><xsl:value-of select="number(rect/y)+number(rect/height)"/><xsl:text>)</xsl:text>
   </xsl:template>
 
   <xsl:template match="property[name[text()='echoMode']]">
     <xsl:choose>
       <xsl:when test="enum='NoEcho'">
-        <xsl:text>Masked: Yes</xsl:text>
+        <xsl:call-template name="spacer"/><xsl:text>Masked: Yes</xsl:text>
       </xsl:when>
       <xsl:when test="enum='Password'">
-        <xsl:text>Masked: Yes</xsl:text>
-        <xsl:text>MaskChar: "*"</xsl:text>
+        <xsl:call-template name="spacer"/><xsl:text>Masked: Yes</xsl:text>
+        <xsl:call-template name="spacer"/><xsl:text>MaskChar: "*"</xsl:text>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
 
   <xsl:template match="property[name[text()='frameShadow']]">
-    <xsl:text>Style: </xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>Style: </xsl:text>
     <xsl:choose>
       <xsl:when test="enum='Raised'">
         <xsl:call-template name="prefix"/><xsl:text>fsRaised</xsl:text>
@@ -109,7 +100,7 @@
   </xsl:template>
 
   <xsl:template match="property[name[text()='alignment']]">
-    <xsl:text>Align: </xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>Align: </xsl:text>
     <xsl:choose>
       <xsl:when test="contains(set,'AlignCenter')">
         <xsl:call-template name="prefix"/><xsl:text>AlignCenter</xsl:text>
@@ -124,16 +115,16 @@
   </xsl:template>
     
   <xsl:template name="style">
-    <xsl:text>Style: </xsl:text><xsl:call-template name="prefix"/><xsl:text>fsNormal</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>Style: </xsl:text><xsl:call-template name="prefix"/><xsl:text>fsNormal</xsl:text>
   </xsl:template>
 
   <xsl:template name="options">
     <xsl:choose>
       <xsl:when test="class[text()='QDialog']">
-        <xsl:text>Options: wfoBeveledBorder+wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl</xsl:text>
+        <xsl:call-template name="spacer"/><xsl:text>Options: wfoBeveledBorder+wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl</xsl:text>
       </xsl:when>
       <xsl:when test="class[text()='QWidget']">
-        <xsl:text>Options: wfoTitle+wfoClose</xsl:text>
+        <xsl:call-template name="spacer"/><xsl:text>Options: wfoTitle+wfoClose</xsl:text>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -165,6 +156,19 @@
       <xsl:when test="../class='QLabel' and ../property/name='pixmap'"><xsl:text>iv</xsl:text></xsl:when>
       <xsl:when test="../class='QLabel' and ../property/name='text'"><xsl:text>lbl</xsl:text></xsl:when>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="spacer">
+    <xsl:param name="here" select="."/>
+    <xsl:param name="prefix"><xsl:text>&#10;</xsl:text></xsl:param>
+    <xsl:value-of select="$prefix"/>
+    <xsl:if test="$here/../..">
+      <xsl:text>  </xsl:text>
+      <xsl:call-template name="spacer">
+        <xsl:with-param name="here" select="$here/.."/>
+        <xsl:with-param name="prefix"></xsl:with-param>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="widget"/>
