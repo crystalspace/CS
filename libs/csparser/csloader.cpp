@@ -4074,6 +4074,7 @@ bool csLoader::LoadLibrary (char* buf)
     TOKEN_TABLE (THING)
     TOKEN_TABLE (SPRITE)
     TOKEN_TABLE (SOUNDS)
+    TOKEN_TABLE (PLANE)
   TOKEN_TABLE_END
 
   char *name, *data;
@@ -4096,6 +4097,9 @@ bool csLoader::LoadLibrary (char* buf)
 
       switch (cmd)
       {
+        case TOKEN_PLANE:
+          World->planes.Push ( load_polyplane (params, name) );
+          break;
         case TOKEN_TEXTURES:
           // Append textures to world.
           if (!LoadTextures (params))
