@@ -128,8 +128,12 @@ void csTextureList::AddTexture (csTextureHandle* tm)
 int csTextureList::GetTextureIdx (const char* name)
 {
   int i;
+  const char* texture_name;
   for (i = 0 ; i < num_textures ; i++)
-    if (!strcmp (csNameObject::GetName(*(textures[i])), name)) return i;
+  {
+    texture_name = csNameObject::GetName(*(textures[i]));
+    if (texture_name && !strcmp (texture_name, name)) return i;
+  }
   return -1;
 }
 
