@@ -15,8 +15,9 @@ The history order is reversed so that new features are at the top.
 	  on the queue to explicitly release an event handler.
 	- Modified csInitializer::DestroyApplication to call
 	  RemoveAllListeners() method of system event queue.
-8-Apr-2003
 	- Philip Wyett eliminated some more MSVC compiler warnings.
+	    - Changed define logic in csendian.h and removed the
+              unnecessary #endif
 	- Fixed two bugs in dynamic ambient for things:
 	    - Overflow wasn't checked so if you used a value that was too
 	      high it would wrap instead of clamp.

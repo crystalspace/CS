@@ -170,7 +170,7 @@ static inline float long2float (int32 l)
   return (float) ldexp (mant, exp);
 }
 
-#ifdef COMP_GCC // GCC likes LL for 64bit values
+#ifdef COMP_GCC
 /// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
 static inline int64 double2longlong (double d)
 {
@@ -191,8 +191,7 @@ static inline double longlong2double (int64 i)
   if (i & 0x8000000000000000LL) mant = -mant;
   return ldexp (mant, exp);
 }
-#else
-# ifdef COMP_VC
+#elif defined COMP_VC
 /// Convert a double to a cross-platform 64-bit format (no endianess adjustments!)
 static inline int64 double2longlong (double d)
 {
@@ -215,8 +214,7 @@ static inline double longlong2double (int64 i)
 }
 # else
 #  warning CS cannot determine how to handle 64bit values in code, please report this.
-# endif
-#endif // COMP_GCC
+#endif
 
 
 /**
