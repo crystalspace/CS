@@ -46,7 +46,7 @@ class csPolygonInt;
 class csPolygonTree;
 class csPolygon2D;
 class csPolygon2DQueue;
-class csVisObjInfo;
+struct csVisObjInfo;
 struct iGraphics3D;
 struct iRenderView;
 class Dumper;
