@@ -68,19 +68,22 @@ void csPolygonBufferEXT::AddMaterial (iMaterialHandle* mat_handle)
 
 int csPolygonBufferEXT::GetMaterialCount () const
 {
- return 0;
+  return 0;
 }
 
 iMaterialHandle* csPolygonBufferEXT::GetMaterial (int idx) const
 {
+  return NULL; // Done only to fix compile errors. Change when necesary.
 }
 
 int csPolygonBufferEXT::GetVertexCount() const
 {
+  return 0; // Done only to fix compile errors. Change when necesary.
 }
 
 csVector3* csPolygonBufferEXT::GetVertices() const
 {
+  return NULL;// Done only to fix compile errors. Change when necesary.
 }
 
 void csPolygonBufferEXT::SetMaterial (int idx, iMaterialHandle* mat_handle)
