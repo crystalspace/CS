@@ -233,6 +233,16 @@ int csSpriteCal3DMeshObjectFactory::LoadCoreMorphTarget(int mesh_index,
     submeshes[mesh_index]->morph_target_name.Push(name);
     return morph_index;
 }
+
+int csSpriteCal3DMeshObjectFactory::GetMorphTargetCount(int mesh_id)
+{
+    if(mesh_id < 0|| submeshes.Length() <= mesh_id)
+    {
+      return -1;
+    }
+    return submeshes[mesh_id]->morph_target_name.Length();
+}
+
 const char *csSpriteCal3DMeshObjectFactory::GetMeshName(int idx)
 {
     if (idx >= submeshes.Length())
@@ -1074,6 +1084,51 @@ bool csSpriteCal3DMeshObject::DetachCoreMesh (int mesh_id)
   }
   return true;
 }
+
+bool csSpriteCal3DMeshObject::BlendMorphTarget(int mesh_id, int morph_id, float weight, float delay)
+{
+  if(mesh_id < 0|| factory->submeshes.Length() <= mesh_id)
+  {
+    return false;
+  }
+  if(morph_id < 0|| factory->submeshes[mesh_id]->morph_target_name.Length() <= morph_id)
+  {
+    return false;
+  }
+  return calModel.getMesh(mesh_id)->getMorphTargetMixer()->blend(morph_id,weight,delay);
+}
+
+bool csSpriteCal3DMeshObject::ClearMorphTarget(int mesh_id, int morph_id, float delay)
+{
+  if(mesh_id < 0|| factory->submeshes.Length() <= mesh_id)
+  {
+    return false;
+  }
+  if(morph_id < 0|| factory->submeshes[mesh_id]->morph_target_name.Length() <= morph_id)
+  {
+    return false;
+  }
+  return calModel.getMesh(mesh_id)->getMorphTargetMixer()->clear(morph_id,delay);
+}
+
+bool csSpriteCal3DMeshObject::BlendBase(int mesh_id, float weight, float delay)
+{
+  if(mesh_id < 0|| factory->submeshes.Length() <= mesh_id)
+  {
+    return false;
+  }
+  return calModel.getMesh(mesh_id)->getMorphTargetMixer()->blendBase(weight,delay);
+}
+
+bool csSpriteCal3DMeshObject::ClearBase(int mesh_id, float delay)
+{
+  if(mesh_id < 0|| factory->submeshes.Length() <= mesh_id)
+  {
+    return false;
+  }
+  return calModel.getMesh(mesh_id)->getMorphTargetMixer()->clearBase(delay);
+}
+
 
 //----------------------------------------------------------------------
 

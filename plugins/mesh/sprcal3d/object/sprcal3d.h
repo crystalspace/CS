@@ -137,6 +137,7 @@ public:
   void BindMaterials();
 
   int  GetMeshCount() { return submeshes.Length(); }
+  int GetMorphTargetCount(int mesh_id);
   const char *GetMeshName(int idx);
   int  FindMeshName(const char *meshName);
   bool IsMeshDefault(int idx);
@@ -266,6 +267,9 @@ public:
 
     virtual int  GetMeshCount()
     { return scfParent->GetMeshCount(); }
+
+    virtual int GetMorphTargetCount(int mesh_id)
+    { return scfParent->GetMorphTargetCount(mesh_id);}
 
     virtual const char *GetMeshName(int idx)
     { return scfParent->GetMeshName(idx); }
@@ -485,6 +489,11 @@ public:
   bool DetachCoreMesh(const char *meshname);
   bool DetachCoreMesh(int mesh_id);
 
+  bool BlendMorphTarget(int mesh_id, int morph_id, float weight, float delay);
+  bool ClearMorphTarget(int mesh_id, int morph_id, float delay);
+  bool BlendBase(int mesh_id, float weight, float delay);
+  bool ClearBase(int mesh_id, float delay);
+
   struct SpriteCal3DState : public iSpriteCal3DState
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpriteCal3DMeshObject);
@@ -546,6 +555,17 @@ public:
     virtual bool DetachCoreMesh(int mesh_id)
     {  return scfParent->DetachCoreMesh(mesh_id); }
 
+    virtual bool BlendMorphTarget(int mesh_id, int morph_id, float weight, float delay)
+    {  return scfParent->BlendMorphTarget(mesh_id, morph_id, weight, delay); }
+
+    virtual bool ClearMorphTarget(int mesh_id, int morph_id, float delay)
+    { return scfParent->ClearMorphTarget(mesh_id, morph_id, delay); }
+
+    virtual bool BlendBase(int mesh_id, float weight, float delay)
+    { return scfParent->BlendBase(mesh_id, weight, delay); }
+
+    virtual bool ClearBase(int mesh_id, float delay)
+    { return scfParent->ClearBase(mesh_id, delay); }
   } scfiSpriteCal3DState;
   friend struct SpriteCal3DState;
 
