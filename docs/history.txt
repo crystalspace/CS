@@ -5,6 +5,25 @@ The history order is reversed so that new features are at the top.
 	  cvs to Crystal Space.
 	- Made a makefile for maya2spr and fixed it so it compiles cleanly.
 20-Jan-2003
+	- Marten Svanfeldt did the following:
+	    - Added two methods to iRenderBuffer allow discardable buffers.
+	    - Modified genmesh to correctly handle buffers which can be
+	      discarded.
+	    - Fixed indexbuffer lockingproblems when using multiple
+	      texturepasses.
+	    - Updated glshader_mtex.cpp to follow newest interface. Added
+	      iRenderMesh* to Deactivate.
+	- Norman Kramer renamed PLUGINS.DYNAMIC to PLUGINS in win32gcc.mak.
+	- 'res' did the following:
+	    - Small change to the LoadLibrary error reporting: instead of
+	      GetLastError() calling twice, its return value is now stored
+	      (theoretically, FormatMessage() could change the last error
+	      code, so a wrong error number would be used in the sprintf()).
+	    - Reduced number of spaces in csPrintLibraryError() (caused
+	      linebreaks at least for german 'file not found'... two should be
+	      enough for visual grouping of the messages).
+	- Christian Bayle did more Debian updates.
+	  Smaller icons to respect policy.
 	- Removed the obsolete and non-working iRenderView callback system
 	  and the associated iEngine->DrawFunc().
 	- Eric Sunshine reverted the recent change to the general
@@ -35,6 +54,23 @@ The history order is reversed so that new features are at the top.
 	  the appzoo project.  (These files should have appeared only in the
 	  plgdog and plgworm projects.)
 19-Jan-2003
+	- Philip Wyett fixed mismatched delete vs. delete [] at
+	  destruction of 'nTerrainInfo' (terrbig).
+	- Christian Bayle added new debian package files mostly moved
+	  from debian to deb dir.
+	- Marten Svanfeldt did the following:
+	    - Made csGLTextureCache a interface so that shaderplugins can
+	      access it.
+	    - Added so that
+	      eiShadercsGLRender3D::eiShaderRenderInterface::GetObject
+	      returns the texturecache.
+	    - Completed multitexturing plugin, including the loader.
+	    - Added examplefile for multitexturing plugin.
+	- Anders Stenberg adding the first steps towards lighting to the
+	  new renderer. Also added support for stream mapping in the
+	  vertex program plugin.
+	- Anders also cleaned r3dtest up some more.
+	- Philip Wyett fixed for MSVC generation failure (simplevp.mak).
 	- Fixed a problem where RemoveObject() would not properly remove
 	  objects from the sectors so memory leaks would occur.
 	- Changed the way the mesh, factory, light and sector lists are
@@ -51,6 +87,17 @@ The history order is reversed so that new features are at the top.
 	  configure.ac, as suggested by Matze, which obviates the need for
 	  CS_ESCAPE().  Also removed CS_ESCAPE().
 18-Jan-2003
+	- Daniel Duhprey optimized terrbig (about 10%).
+	- Anders Stenberg did some optimizations in the new render3d
+	  OpenGL.
+	- Anders also improved error reporting in vertex programs.
+	- Norman Kramer did the following:
+	    - Included util.h in cspython.cpp for csStrNew declaration.
+	    - Commented out shader.h and associated definition from
+	      cspace.i, so no conflict between new and old renderer
+	      anymore which means the plugin compiles with
+	      US_NEW_CSPYTHON_PLUGIN.
+	- Marten Svanfeldt fixed multitexturing shaderplugin.
 	- Fixed the engine so it no longer tries to load the thing_type
 	  immediatelly in initialization. Instead it tries to load it
 	  the first time really required. This solves a bug with awstest
@@ -64,6 +111,27 @@ The history order is reversed so that new features are at the top.
 	- Fixed an assert error at exit when cleaning up materials in the
 	  iso engine. This fixes crash at exit for isotest and isomap.
 17-Jan-2003
+	- Marten Svanfeldt did the following:
+	    - Added DrawLine to render3d interface.
+	    - Cleaned up shader interface.
+	    - Added prepare step.
+	    - Extended bugplug to compile under render3d.
+	    - Fixed dynavis to compile with render3d.
+	    - Fixed a small error in VAR buffer manager.
+	    - Added first version of opengl-multitexturing pseudo-fragment
+	      program.
+	    - Fixed compilation error related to shaders with old renderer.
+	    - Fixed an error which caused render-stall.
+	- Philip Wyett did the following:
+	    - Removed appgui.tpl due to problems it's re-insertion is
+	      causing.
+	    - Removed EAX plugin. Those needing it, which seems to
+	      be virtually none can manually re-generate it back into
+	      the build process.
+	    - Fix for Cygwin in sockets.h.
+	    - Added include dir for DirectX headers that get installed
+	      into Cygwin. This will hopefully be part of the autoconfig
+	      eventually.
 	- Fixed a bug in the OpenGL renderer where attempts were made to
 	  clip fog information even if no fog is present. This resulted
 	  in valgrind errors (use of uninitialized variables) and also
@@ -99,6 +167,10 @@ The history order is reversed so that new features are at the top.
 	- Fixed an initialization bug with bounding box creation in genmesh
 	  for new renderer.
 16-Jan-2003
+	- Philipp Aumayr did the following:
+	    - Killed char mod_name[strlen(name)]; bug in cspython.cpp.
+	- Marten Svanfeldt fixed a small bugg in GetBuffer which caused
+	  buffers to be regenerated each call (genmesh).
 	- 'reverse_action' in 3D sprites was not initialized to false.
 	- Fixed odedynam plugin so it compiles again.
 	- Fixed ie3ds plugin so it compiles again.
@@ -136,6 +208,12 @@ The history order is reversed so that new features are at the top.
 	  to mdltool.cpp to work around MSVC6 internal compiler error.
 	- Eric Sunshine eliminated some compilation warnings.
 15-Jan-2003
+	- Anders Stenberg did various small fixes and updates for the
+	  new renderer. Also cleaned up r3dtest a bit, and added more
+	  "FPSish" camera control.
+	- Christian Bayle updated the Debian scripts.
+	- Peter Amstutz converts csObjVector to csRefArray in ODE
+	  dynamics plugin.
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:
 	    - csCrysBall
@@ -190,6 +268,33 @@ The history order is reversed so that new features are at the top.
 	- Added InsertSorted() and FindSortedKey() to csPArray and
 	  csPDelArray. Fixed motion plugin with that.
 13-Jan-2003
+	- 'res' did the following:
+	    - Fixed 'entry point not found' for MSVC6/ExtMemDebug config.
+	    - Reverted commit of my 'personal' csall.dsw.
+	- Philip Wyett did the following:
+	    - Fixed MSVC templates.
+	- Steven Geens fixed msmodel.cpp so that a 0,0,0 normal is not
+	  used.
+	- Andreas Busch modified meshobj documents from old syntax to XML.
+	- 'res' did the following:
+	    - Re-added appgui MSVC template. The difference is just in
+	      Release buils; creates a GUI subsystem app instead of a
+	      binary app.
+	    - Changed way console/GUI subsystem apps are detected.
+	    - Hack: console window for GUI apps is kept open when command
+	      line -help is wanted.
+	    - Milk2spr: ALLOC_STACK_ARRAY instead of GCC-style stack
+	      alloc.
+	    - Walktest: csInitializer::DestroyApplication() inserted after
+	      cmd line help (required so console window is kept open after
+	      help).
+	    - Commented out a DecRef() which seemed to cause a crash in 
+	      csThingObjectType::FindCurveTemplate().
+	- Keith Fulton did the following:
+	    - Fixed bug in DeleteAll of csPArray and csRefArray which
+	      prevented the freed vector from being realloc'd if the array
+	      was used again.
+	    - Fixed crash on unnamed objects in csRefArrayObject.
 	- Further work on XML doc.
 	- Added support for <key> in mesh factories and collections.
 	- Enhanced the new XML document a lot. Also some other smaller
@@ -233,6 +338,13 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine repaired overfull hbox warnings reported by TeX in
 	  xmlfmt.txi.
 12-Jan-2003
+	- Steven Geens reports:
+	  milk2spr now uses the normals given by milkshape.
+	  Because CS only allows one normal per vertex the amount of
+	  vertices, I had to add multiple vertices with same coordinates.
+	  The amount of vertices is nearly tripled.
+	  This results in much larger model files.
+	- Andreas Busch modified documents from old syntax to XML.
 	- Started work on new map format document.
 	- Eric Sunshine silenced some warning messages from ActiveState Perl
 	  during configuration process.
@@ -242,6 +354,16 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed some Texinfo mark-up errors and eliminated a
 	  number of overfull and underfull hbox warnings reported by TeX.
 11-Jan-2003
+	- Keith Fulton added GetReverseAction() to get whether the current
+	  action is operating in reverse or not.
+	- 'res' did the following:
+	    - Memdebug.cpp compiles again on MSVC.
+	    - MSVC6 projects now have 'ExtensiveMemDebug' configuration as
+	      well.
+	    - Added facility to msvcgen to support DLL delay loading.
+	    - JNG plugin now checks first 8 bytes of the supplied data for
+	      the MNG/JNG sig before invoking libmng.
+	    - Some comments about delay loading to MSVC templates.
 	- Fixed a problem in genmesh where
 	  iObjectModel->GetPolygonMeshColldet() was not returning the
 	  polygon mesh implementation of the object.
@@ -256,6 +378,16 @@ The history order is reversed so that new features are at the top.
 	    - Modified all map file examples from old syntax to XML.
 	    - Used csRef where appropriate.
 10-Jan-2003
+	- Charlls Al'Quarra started better indenting of cloth plugins.
+	- Charlls also added 2 methods to iPolygonMesh:
+		virtual bool IsDeformable () const = 0;
+		virtual uint32 GetChangeNumber() const = 0;
+	- Philip Wyett did the following:
+	    - Fixed clothobj.cpp - No more comment as this is just not
+	      paying attention!
+	    - Changed lib MSVC links with from png.lib to libpng.lib.
+	    - Updated docs to reflect a new versions of msvc_libs.
+	    - Fixed xwindow.cpp.
 	- Made the calling of the movable callbacks safe so that they now
 	  can delete themselves from the movable. This basically amounts
 	  to walking the callback list in reverse order.
@@ -281,11 +413,41 @@ The history order is reversed so that new features are at the top.
 	  outside array bounds if the number of vertices in the factory
 	  changed after objects made from that factory were being used.
 	  Now the objects will constantly check if the factory is still ok.
-	- Keith Fulton added SetOverrideAction to sprite3dobject.  This
-	  plays the named animation one time, while saving the prior
-	  animation.  When the override animation is completed, the prior
-	  animation is restore to operation.
+	- Keith Fulton did the following:
+	    - Added SetOverrideAction, which allows the sprite to run a
+	      named animation one time, then auto-reverts back to
+	      whatever action was going on before.
+	    - Also added SetSingleStepAction, which forces the frame
+	      advancing to never skip key frames no matter how slow the
+	      CS framerate is. This feature already existed, but it was
+	      using the looping flag as the flag on when to single-step
+	      the anim also, which is wrong.
+	    - Added another menu of Actions to viewmesh to view anims
+	      usign SetOverrideAction, which allows the sprite to run
+	      a named animation one time, then auto-reverts back to
+	      whatever action was going on before.
+	- 'res' changed param 'type' to 'value' in
+	  iDocumentNode::GetNode[s].
+	- 'res' changed configuration name "ExtensiveDebug" to
+	  "ExtensiveMemDebug".
+	- Philip Wyett fixed iso engine and viewmesh.
+	- Charlls Al'Quarra added GetBitArray() to csBitArray to get the
+	  full array so specialized (sequential) manipulations/reading
+	  can be done without the overhead of calling for individual bits.
 8-Jan-2003
+	- 'res' did the following:
+	    - Moved shellstuff.h from include/cssys/win32 to
+	      libs/cssys/win32.
+	    - Put #ifndef around #define CSIDL_PROGRAM_FILES.
+	    - BMP plugin can now read/write 32bit w/ alpha files.
+	    - INC.SYS_CSSYS makefile var.
+	- Philip Wyett did the following:
+	    - Removed shellstuff.h.
+	- Paul Garceau did the following:
+	    - Eliminated CFLAGS.INCLUDE in win32gcc.mak.
+	      Moved /directx -I references to ddraw.mak, ddraw8.mak.
+	    - Relocate -I /directx references for Win32gcc (Mingw-Msys).
+	- Peter Amstutz fixed negative array index crash in awsgbl.cpp.
 	- Committed a 'backwards compatibility' set from Rene Jager for the
 	  Python plugin and SWIG 1.1. The new cspython plugin is built when
 	  USE_NEW_CSPYTHON_PLUGIN=yes during make. It is now put in
@@ -315,6 +477,10 @@ The history order is reversed so that new features are at the top.
 	  was actually not true. Changed the loops in light code to make
 	  it really safe.
 7-Jan-2003
+	- Matthias Braun added macos/x rules to jam build.
+	- Philip Wyett did the following:
+	    - Fixed caltocs so it compiles again.
+	    - Manual update of MSVC 6 project files.
 	- Keith Fulton added SetReverseAction to the Sprite3d so that
 	  they can walk backwards without defining a new action.  Call this
 	  just after setting the action.  Also he made it reset to forward
@@ -343,6 +509,22 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine updated aged entries in Contributors section of user
 	  manual.
 6-Jan-2003
+	- 'res' did the following:
+	    - Removed ChangeDisplaySettings() from win32.cpp.
+	    - Added code to glwin32 canvas to prevent unnecessary mode
+	      switches, as inspired by Ben Thomas
+	      <ben.thomas@wickedstudios.com>. DirectX seems to be smart
+	      enough to avoid them on its own.
+	    - Inserted ALLOC_STACK_ARRAY so python compiles on MSVC.
+	- Wouter Wijngaards did the following:
+	    - Possible fix for a bug (reported by Michael O'Shea). The
+	      haze mesh object would cause a stack overflow in the
+	      recursive DrawPolyAdapt routine. Fix is to clamp the max
+	      recursion depth, since I can't reproduce.
+	- Norman Kramer did the following:
+	    - Made system includes instead of project includes (jng plugin)
+	      ( <> vs. "" ) now "make dep" shuts up about missing zlib.h
+	      and libmng.h.
 	- Fixed a stupid bug in Dynavis. Dynavis wasn't correctly updating
 	  the kdtree when objects moved. The reason was that UpdateObjects()
 	  wasn't called when needed. Frustvis didn't suffer from this
@@ -381,6 +563,8 @@ The history order is reversed so that new features are at the top.
 	    - The -I/usr/local/include viability test is now performed only if
 	      /usr/local/include is present on the build host.
 5-Jan-2003
+	- Andreas Busch did some minor typographical corrections on
+	  md32spr.txi.
 	- Applied a patch from Rene Jager (renej.frog@yucom.be) which does
 	  the following:
 	    - Added include/ivaria/cspace.i which is a SWIG 1.3 version of
@@ -393,6 +577,13 @@ The history order is reversed so that new features are at the top.
 	  source files and correcty named the multiple-include-protection
 	  define in shadervar.h.
 3-Jan-2003
+	- Philip Wyett did the following:
+	    - Added forceable build settings for the following cpu/arch
+	      - Athlon XP, Pentium 3, Pentium 4. Note, compiling for
+	      these specific platforms make your binaries non-backward
+	      compatible.
+	    - Removed allocations to MNG.LFLAGS in jng makefile, which
+	      cause recursion error.
 	- Eric Sunshine made the following changes:
 	    - Configuration phase now detects libmng automatically.  Added
 	      bin/chkmng.sh.
@@ -442,9 +633,21 @@ The history order is reversed so that new features are at the top.
 	      should be placed.  For example, static.mak places cslibref.cpp in
 	      OUTDERIVED, and csperl5.mak places csperlxs.c there, as well.
 1-Jan-2003
+	- Philip Wyett did the following:
+	    - Eliminated a uninitialized variable warning in prsseq.cpp,
+	      under optimize build.
 	- Eric Sunshine merged cygwin.mak into win32gcc.mak.  Now there is a
 	  single makefile configuration target for Cygwin and Mingw users.
 31-Dec-2002
+	- Philip Wyett did the following:
+	    - Changed linux.mak to use 03 rather than 02 optimization
+	      flag. The 03 settings is supported by GCC 2.95.x and above,
+	      which we generally expect developers to be using.
+	    - Removed -finline-functions flag as 03 setting automatically
+	      turns it on.
+	    - Removed -finline-functions from debug build as we don't
+	      really want such an optmization in debug builds and
+	      possibly causing problems.
 	- Eric Sunshine made the following configuration and makefile changes:
 	    - chkxfree.sh now publishes the additonal makefile variables
 	      X11.AVAILABLE, X_CFLAGS, X_LIBS, X_PRE_LIBS, and X_EXTRA_LIBS.
@@ -453,6 +656,19 @@ The history order is reversed so that new features are at the top.
 	      elsewhere.  This logic was suggested by Rudolf Potucek
 	      <potucek@ucalgary.ca>.
 30-Dec-2002
+	- Matthias Braun did the following:
+	    - Improved DecRef() function. The old function did first
+	      decrement the refcount and delete the object then. This
+	      resulted in problems when an Inc/DecRef happened in the
+	      destructor of the object (resulting in a 2nd delete). Now
+	      we check the refcount first and decrement after the check.
+	      So that Inc/Decreffing in the destructor should be safe now.
+	    - Fixed leak at texture loading.
+	    - Fixed wrong memset in csinput.cpp reported by Groton.
+	- Keith Fulton did the following:
+	    - Added function to csString to convert string to lowercase,
+	      strlwr().
+	    - Fixed missing prototype warning for linux (csString).
 	- Eric Sunshine added "-Xlinker --export-all-symbols" to DFLAGS.debug
 	  in win32gcc.mak, as suggested by Paul Garceau <pgarceau@attbi.com>.
 	  Hopefully, this change will allow DLLs to be once again debugged
@@ -460,10 +676,32 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed obsolete DO_SOUND makefile and header
 	  variables.
 28-Dec-2002
+	- Andreas Busch did the following:
+	    - Fixed typo "AVAILABLE" in python plugin.
+	    - Removed duplicate isound/source.h in walktest.
 	- Eric Sunshine changed chktools.sh so that it records the path of
 	  makedep in config.mak, if found.  This is consistent with its
 	  treatment of other detected tools.  cs.mak now respects this setting.
+27-Dec-2002
+	- Daniel Duhprey fixed a problem with the ./ path ptr
+	  when tbtut is used outside the CS dir.
+26-Dec-2002
+	- Andreas Busch fixed a typo in netmtst.cpp.
+	- Philip Wyett added newline at end of fþu80x86.h.
+25-Dec-2002
+	- Philip Wyett did a minor MSVC documentation update.
 24-Dec-2002
+	- 'res' did the following:
+	    - Fixed wrong #ifndef in win32.cpp reported by Lukas
+	      Erlinghagen <Erluk@web.de>.
+	- Keith Fulton fixed a compile error in directdetection.cpp.
+	- Wouter Wijngaards added RPM spec file for crystalspace install.
+	  Donated by Rudolf Kastl (che666@uni.de).
+	- Norman Kramer did the following to those RPM specs:
+	  updates from che: cleanup and some fixes.
+	- Norman Kramer also added iImage() call in the constructor,
+	  gcc 3.2.1 would not generate a not-in-charge constructor
+	  otherwise.
 	- Eric Sunshine added a patch to the canvas class which allows the
 	  configuration key "Video.DisplayNumber" to select the display
 	  (monitor) number.  If the configuration key is absent, or is set to
@@ -492,6 +730,20 @@ The history order is reversed so that new features are at the top.
 	  define at the moment.  See renderer/txtmgr.h, render3d/txtmgr.h,
 	  aws/av3dtxtm.h)
 21-Dec-2002
+	- Mathew Sutcliffe did the following:
+	    - Changed 'return false;' to 'return NULL;' in functions which
+	      returns a pointer, not a bool (csloader.cpp).
+	- Philip Wyett did the following:
+	    - Added ability for people with GCC 3.0 or above to specify
+	      'athlon' at config time.
+	      e.g. make linux CPU=athlon ARCH=athlon MODE=debug
+	    - Eliminated some compiler warnings under optimize build. 
+	    - Some minor code cleaning in lview.cpp.
+	    - Some code cleaning and tweaks. Including case where csColor
+	      ... c.red and c.green were being * by 255 and c.blue was
+	      being * by 255.0. All are now being * by 255.0f.
+	    - Lowered memory usage and need for casts to float in existing
+	      halo processing and in what will be the new renderer.
 	- Eric Sunshine removed the NextStep, OpenStep, and MacOS/X Server 1.0
 	  (Rhapsody) ports of Crystal Space.  Implementation files which were
 	  shared with the remaining MacOS/X port were relocated from "next"
@@ -519,6 +771,13 @@ The history order is reversed so that new features are at the top.
 	    plugins/video/canvas/common/pc-keys.cpp
 	    plugins/video/canvas/dosraw
 20-Dec-2002
+	- Philip Wyett did the following:
+	    - Minor Fix in sector.h.
+	    - Fixed a struct vs. class in polytext.h.
+	    - Disabled warning 4711 and quieter release builds for users,
+	      ready for next CS release.
+	    - Eliminated some un-initialized variables in cscomp.cpp.
+	    - Cleaned md32spr code so that MSVC does not warn against it.
 	- Clarified a few Doxygen comments in the engine.
 	- Added iLightingInfo->StaticLightChanged() to notify a mesh
 	  object that a pseudo-dynamic light has changed intensity.
@@ -576,6 +835,19 @@ The history order is reversed so that new features are at the top.
 	    plugins/video/canvas/csdive
 	    plugins/video/canvas/openglos2
 19-Dec-2002
+	- Philip Wyett did the following:
+	    - Changed message when preferred visual cannot be used and now
+	      indicates a generic visual will be used (OpenGL/X canvas).
+	    - Moved XSync() out of Print() and to the window creation
+	      point, where it should only be needed to force events to
+	      X Server. This has not been tested with all cards and a
+	      case may arise that forces a revert. If so could the person
+	      please supply info on that case for future reference.
+	    - Moved back too msvc_libs 0.95dev003. Until Freetype problem
+	      can be fixed.
+	- Norman Kramer did the following:
+	  Update from Manju for md32spr:
+	  Now this tutorial does not depend on any external depenencies.
 	- Added iDynLight->AddAffectedLightingInfo(). The plan is to make
 	  dynamic lights work on a base of meshes instead of curves and
 	  polygons directly.
@@ -607,6 +879,20 @@ The history order is reversed so that new features are at the top.
 	  before thing can be moved outside. Of course these few
 	  dependencies still require some work.
 18-Dec-2002
+	- Daniel Duhprey did the following:
+	    - Ported genmesh to new renderer, but ifdef'd to maintain
+	      compatibility with the old.
+	    - Also corrected for degenerate triangle error.
+	    - Updated r3dtest to use genmesh.
+	    - Fixed render3d to compile on linux without warnings.
+	      Added csTriangle to render3d.h.
+	    - Removed referrence to r3dtest.zip.
+	- Anders Stenberg did the following:
+	    - Fix thing.cpp for new renderer. CS_QUERY_REGISTRY can't
+	      handle the iRender3D->iGraphics3D #define, and must be
+	      explicitly changed when CS_USE_NEW_RENDERER is defined.
+	    - Fixes engseq and frustvis compiling errors with new renderer.
+	- Keith Fulton fixed errant return on void function in thingmsh.h.
 	- Fixed the sprite socket vector. FreeItem() casted the item
 	  to delete to the wrong type (csSpriteSocketVector instead
 	  of csSpriteSocket).
@@ -692,6 +978,15 @@ The history order is reversed so that new features are at the top.
 	  could be assigned to a socket across all parent meshes from a 
 	  certain factory.
 16-Dec-2002
+	- Peter Amstutz did the following:
+	    - When an object is reparented to another object with 
+	      iMeshWrapper()->GetChildren()->Add(), the child gets
+	      removed from the culler entirely.  This is bad.  This
+	      change fixes that so that the object is added back to the
+	      culler (which is necessary for culling and HitBeam to work).
+	    - Comments out an annoying debugging log msg in thing.cpp.
+	- Daniel Duhprey did the following:
+	    - Fix from John Harger for fopen on windows (terrbig).
 	- Completely removed the old octree culler. This has a great impact
 	  on the internal engine structure. It greatly simplifies both
 	  csThing and csPolygon3D and it also makes sure they are a bit
@@ -717,10 +1012,63 @@ The history order is reversed so that new features are at the top.
 	    - Updated the viscull.txi document a bit. But this still needs
 	      more work for Dynavis and Frustvis.
 	    - Removed mention of VISTREE from thing mesh object documentation.
+15-Dec-2002
+	- Daniel Duhprey did the following:
+	    - Fixed to remove warnings and errors in linux (glshader_arb).
+	    - Fix for the for (int i ...) problem in terrbig.
+	- Peter Amstutz did the following:
+	  Fixed ClipLine in common canvas code. Hopefully for the last
+	  time :-)
+	- Peter also fixed sector.h: uses iObject but doesn't actually
+	  bring in the include, which can cause a few problems...
+14-Dec-2002
+	- Matthias Braun did the following:
+	    - Cleaned up csvector code a bit.
+	    - Removed some obsolete mesh removal code and replaced
+	      with GetMeshes()->RemoveAll().
+	    - Fixed it above correctly by changing csvector behaviour.
+	    - Removed compilation warning in cspixmap.cpp.
+	- Anders Stenberg did the following:
+	    - Fixed some issues with the material rendering in new
+	      render3d.
+	- Marten Svanfeldt did the following:
+	    - Added variables to shadermanager.
+	    - Improved the demo of shaders.
+	    - Changed fileformat for ARB_vertex_program plugin.
+	    - Fixed bug with mixmode not being set.
+	    - Added basic CDATA support to XML parser. CData sections will
+	      be threated as text, just that <![CDATA[ is starttag and ]]>
+	      is endtag.
+	    - Changed into a enum for constants.
+	- Daniel Duhprey did the following:
+	    - Modified terrbig to take scale as a parameter to the
+	      preprocessing.
+	    - Must faster/cleaner version of the terrain.
+	    - Newest version of test.map to match latest terrbig.
 13-Dec-2002
         - Andreas Busch cleaned up some old/unused prototypes and outdated
           comments in walktest/handle_keys.
 12-Dec-2002
+	- Matthias Braun did the following:
+	    - Removed opengl-ext renderer, since work is going on in
+	      render3d now.
+	- Anders Stenberg did the following:
+	    - Various updates to render3d. Materials are implemented and
+	      seem to be drawn correctly.
+	- Christopher Nelson did the following:
+	    - Added new function MouseInComponent to aws. Takes x and y
+	      and tests to see if they're inside any top-level components.
+	      Returns true if the mouse is inside, otherwise false.
+	- Daniel Duhprey did the following:
+	    - Fixed vpath definition of shadermgr makefile to point to the
+	      correct spot.
+	    - Added vpath definition to find .cpp files for
+	      glshader_arb makefile.
+	- Philip Wyett did the following:
+	    - Eliminated the 6000+ compiler warnings generated under MSVC 6
+	      by the opcode plugin. Also fixed redefiniton of EPSILON.
+	    - Updated link to new version of msvc_libs for MSVC 6, which
+	      now incorporate Freetype 2.1.3.
 	- Keith Fulton changed format of sequence delay tag from
 	  <delay>1000</delay> to <delay time="1000" />.
 	- Keith Fulton added min and max attributes (optional) to
@@ -738,6 +1086,17 @@ The history order is reversed so that new features are at the top.
 	- Andreas Busch corrected wrong/missing header definition in the
 	  python and lua scripting plugins.
 11-Dec-2002
+	- Matthias Braun did the following:
+	    - Fixed a bug in csBasicVector::Pop which wasn't testing if
+	      root==NULL. Opengl should work again.
+	    - Fixed a bug where CS crashs when a curve has no lightmap
+	      assigned.
+	    - Fixed a circular Ref: TxtMgr->texture->TxtMgr. Opengl plugin
+	      unloads correctly now and software should leak less...
+	    - Fixed g2dtest - however it seems the line clipping routines
+	      behave wrong (or the test... someone should investigate this).
+	    - Fixed yet another bug in csBasicVector::Pop.
+	    - Fixed refcounting smartpointer issue in dynavis unit test.
 	- Optimization in frustvis where the updates of objects in the
 	  visibility culler are put on a queue and only performed when
 	  actually needed. This means that movable->UpdateMove() no longer
@@ -780,6 +1139,16 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed incorrect run-time dependency from netmtst.mak
 	  target.  Only compile-time dependencies should be specified.
 10-Dec-2002
+	- Matthias Braun did the following:
+	    - Fixed a big memory leak in the engine (MeshWrappers have
+	      been never released).
+	    - Made the opengl plugin abort if it wasn't able to find the
+	      effectserver plugin.
+	    - Cleaned SCF usage of effects code a bit.
+	    - Cleaned up effects server code.
+	    - Fixed a refcount bug in the opengl canvas.
+	- Philip Wyett did the following:
+	    - Removed SCF_DEBUG define in OpenGL renderer.
 	- Fixed a bug I introduced yesterday in parsing of HardMove.
 	  The transform was inverted.
 	- Apparently the meaning of HARDMOVE was inverted for factories.
@@ -865,15 +1234,36 @@ The history order is reversed so that new features are at the top.
 	- Keith Fulton fixed a timing bug in spr3d animations when mixing
 	  displacement frames with delay frames.
 8-Dec-2002
+	- Matthias Braun did the following:
+	    - Made 3ds2lev output XML - WARNING: This isn't really tested
+	      as I had no proper .3ds files here...
+	- Marten Svanfeldt did the following:
+	    - Added activate/deactivate to iShaderPass.
+	    - Added shader-support to user.mak.
+	    - Some bugfixes in shaderprogram loading.
+	    - Implemented ARB_vertex_program.
+	    - Added test for ARB_vertex_program.
+	    - Added new objects for render3d-shaders.
 	- Experimental optimation in Dynavis for clamp in polygon mode (not
 	  yet outline mode). Not enabled yet since it isn't working properly
 	  yet.
 7-Dec-2002
+	- Philip Wyett did the following:
+	    - Updated links to point to new msvc_libs for MSVC 6. Thanks
+	      to Lukas Erlinghagen for submitting updated ode.lib.
+	- Matthias Braun did the following:
+	    - Fixed fontplex font server (it was looking for FontServer
+	      instead of iFontServer in the object registry). Also changed
+	      it's name to multiplexer instead of multiplexor.
 	- Made the following modifications to levtool:
 	    - Added -splitpoly and -analyzep options. With this it is possible
 	      to seperate large polygons in seperate objects.
   	    - Fixed bug with -minsize. That option was simply ignored.
 6-Dec-2002
+	- Norman Kramer did the following:
+	  Fixed an out of bound memory error that would prevent loading of
+	  certain models. Now you don't have to remove the line in
+	  animation.cfg (md32spr).
 	- Fixed a bug in the engine where children of mesh objects wouldn't
 	  get registered to the visibility culler. This could cause culling
 	  errors and it would also cause HitBeam to fail on mesh children.
@@ -893,6 +1283,14 @@ The history order is reversed so that new features are at the top.
 	- New Schema from Javier Santos. Is now able to validate flarge
 	  and partsys fully. Not finished yet.
 5-Dec-2002
+	- Philip Wyett did the following:
+	    - Updated msvc7_libs links.
+	    - Eliminated crash at exit under MSVC/Windows (awsmain).
+	    - Eliminated compiler warning (aws).
+	    - Eliminated linker problem under MSVC 7 (netmtst).
+	    - Hacked the world file to remove old token 'lmcache'.
+	      Remember to use '-reclac' on first run to generate
+	      lightmap data.
 	- 'levtool' will now split all parts in seperate units. A unit
 	  is defined as a set of polygons that are connected and that
 	  doesn't connect with any other polygon from the same part.
@@ -909,6 +1307,12 @@ The history order is reversed so that new features are at the top.
 	  dynamic ambient light.  New commands are <setambient> and
 	  <fadeambient>.  See flarge world for examples of usage.
 4-Dec-2002
+	- Philip Wyett did the following:
+	    - Eliminated struct vs. class warnings under MSVC 7 (netman.h).
+	    - Removed stray IncRef() and DecRef(), fixing crash at exit
+	      (isomesh.cpp).
+	    - Added csperl5 project for testing.
+	    - Removed csperl5 for time being. Many things need fixing.
 	- Added iDocumentNode->Equals() to compare two nodes. Comparing
 	  the pointers doesn't work because these are only wrappers
 	  on top of the real nodes.
@@ -937,6 +1341,15 @@ The history order is reversed so that new features are at the top.
 	  even if CS_ENGINE_CACHE_WRITE was not set (but if
 	  CS_ENGINE_CACHE_NOUPDATE was not set).
 2-Dec-2002
+	- Charlls Al'Quarra did the following:
+	  Fixed the prototype of CS_TYPEDEF_GROWING_ARRAY_EXT on 79: the
+	  move must be of size length - n - 1 instead of limit - n - 1. 
+	  Also added a Macro Extra called HANDLECHUNKS that allow to
+	  handle segments of arrays in one insert/delete call.
+	  I hope i didnt break something this time =^)
+	- Daniel Duhprey did the following:
+	    - Fix for SetPosition/GetPosition in ODE dynamics.
+	    - Revert fix, and parameter fix as well.
 	- Moved the dynamic ambient functions from iThingState to
 	  iLightingInfo. That means dynamic ambient can now also be used
 	  by other objects (i.e. like genmesh). Genmesh already implements
@@ -957,9 +1370,22 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a quoting problem in python.cex synthesis
 	  reported by Steven Geens <steven.geens@student.kuleuven.ac.be>.
 1-Dec-2002
+	- Norman Kramer did the following:
+	  Submitted by Manju: There was a bug in which some files would
+	  come up with negative numbered frames. That has been fixed.
+	- Peter Amstutz did the following:
+	  Fixed clipping bug in graph2d.cpp.
 	- Fixed initialization plugin in the explosion mesh object. This
 	  could cause crashes in some cases.
 30-Nov-2002
+	- Peter Amstutz did the following:
+	    - ODE dynamics: does left handed -> right handed coord
+	      transform for AttachColliderPlane.
+	    - Fixes bug in SetPosition when object is static (need to
+	      update the static joint using dJointSetFixed()).
+	- Norman Kramer did the following:
+	  Samplecount computation in wavfile.cpp didnt honor the channel
+	  count.
 	- Simplified the iLightingInfo interface. The concept of cache name
 	  is now removed (it was totally unused). This also removes about 52
 	  bytes of memory for every thing instance.
@@ -995,6 +1421,13 @@ The history order is reversed so that new features are at the top.
 	  way to recalculate lighting is by using -relight or -recalc.
 	- Implemented GenerateCacheName() in genmesh.
 29-Nov-2002
+	- Peter Amstutz did the following:
+	    - Fixes planes in ODE plugin. Phystut works correctly now.
+	    - The avatar (camera) is now represented by a dynamic object
+	      as well :-)
+	    - A bit more hacking; the box avatar now behaves more like the
+	      way you'd want for a first person application.
+	    - You don't need to compile ODE with any special flags any more.
 	- Possibly fixed a bug in HardTransform for skeletal sprites. Instead
 	  of transforming all vertices only the vertices in the root are
 	  transformed and also the transforms of all children of the root.
@@ -1030,6 +1463,24 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a slew of makefile bugs in csperl5.mak,
 	  netman.mak, netmtst.mak, perl5tst.mak, and template.mak.
 27-Nov-2002
+	- Marten Svanfeldt did the following:
+	    - Fixed some errors in shader stuff.
+	    - Added shader to material.
+	    - Implementation of iShaderRenderInterface.
+	    - Added first shaderprogram-plugin, which is a OpenGL
+	      ARB_*_program shaderplugin.
+	- Mathew Sutcliffe did the following:
+	  Added the network manager plugin and interface. It polls sockets
+	  for data each frame, and posts csevNetwork events when data is
+	  received.
+	- Matthew made the perl build even nicer and added proper MSVC
+	  support.
+	- Philip Wyett did the following:
+	    - Added newline to end of shader.h.
+	    - Eliminated re-ordering (aws).
+	    - Elimated bad return in netman.h.
+	    - Eliminated const char* vs char* in netman.h.
+	    - Eliminated a couple of warnings under MSVC 7 in lghtmap.cpp.
 	- Keith Fulton added movement commands to viewmesh to allow testing
 	  of displacement-based anims.
 	- Jeremy Williams fixed a bug in the explosion particle system
@@ -1049,6 +1500,20 @@ The history order is reversed so that new features are at the top.
 	- Fixed Dynavis and Frustvis so they now clean up properly after
 	  destruction.
 25-Nov-2002
+	- Marten Svanfeldt fixed new renderer so that it compiles when
+	  CS_USE_NEW_RENDER isn't defined.
+	- Daniel Duhprey did the following:
+	  Fixed ODE dynamics plugin for the dCollideBP problem.
+	- Anders Stenberg did the following:
+	    - Addition of vertex lighting in hardware if supported.
+	- Marten Svanfeldt fixed problems created by dentoids
+	  commit-problems.
+	- Peter Amstutz did the following to ODE dynamics plugin:
+	  Properly initializes contact joints, including the 
+	  EXTREMELY important flag dContactSoftCFM, which is
+	  necessary to avoid instability (phystut is stable now!)
+	- Charlls Al'Quarra did the following:
+	    - Small fix to csvector.cpp. Thanks Eric.
 	- Added a new CS_POLY_VISCULL flag with which it is possible to
 	  enable/disable visibility culling for individual polygons (thing
 	  mesh only). By default this flag is enabled except in the following
@@ -1069,16 +1534,45 @@ The history order is reversed so that new features are at the top.
 	  purpose is of this polygon mesh.
 	- Renamed iObjectModel->GetPolygonMesh() to GetPolygonMeshColldet().
 24-Nov-2002
+	- 'res' did the following:
+	    - Devapi extracts static members as well now.
+	    - SCF_VERSION isn't listed as a function in devapi now.
+	    - Added some doxgen '\file' commands.
+	    - Added a quirk to getopt.h so the word 'option' doesn't get
+	      linked everywhere.
+	- Charlls Al'Quarra did the following:
+	  I suspect that i fixed some bugs on InsertChunk and DeleteChunk
+	  pointed out by sunshineco. I'm not liable by any bugs introduced
+	  in this fix =)
 	- Thanks to groton I managed to fix the bug that newsky crashes
 	  with recent versions of CS. The reason was that the default
 	  visibility culler was not initialized.
 23-Nov-2002
+	- Charlls Al'Quarra fixed the bug in MSVC where cloth doesn't show
+	  up. Now the cloth can be seen also compiled with MSVC.
+	  Thanks to Groton for the remote debugging.
 	- Removed the meta manager again. This is a totally unneeded
 	  addition since it is already possible to attach name/value
 	  data to any thing that supports iObject. Just use the following
 	  syntax:
 	  	<key name="editor_bla" value="whatever" />
 22-Nov-2002
+	- Philip Wyett did the following:
+	    - Removed a couple of dead links and fixed the BisonFlex links
+	      for those who use it.
+	    - Removed link to ssh package on CS ftp, as SF have updated
+	      their software and that version no longer works correctly.
+	- Norman Kramer did the following:
+	    - Added an "-include mk/local.mak" so developers can leave the
+	      user.mak and <system>.mak unaltered.  ( I usually end up
+	      removing the "<<<<<<" and ">>>>>>" after an update from cvs).
+	- Mathew Sutcliffe did the following:
+	    - Added Perl interpreter error reporting through iReporter.
+	- Mike Handverger did the following:
+ 	    - Extended text box functionality (aws):
+		- Left/right/home/end keys.
+		- Inserting chars and delete key.
+		- Selecting cursor pos with mouse.
 	- All spr2d instances used to have their own local copy of
 	  G3DPolygonDPFX. Since this structure is more than 4K big I decided
 	  to move this to the factory so that all instances created from
@@ -1089,9 +1583,46 @@ The history order is reversed so that new features are at the top.
 	- Implemented the start for a new optimization to make recalculating
 	  lighting on huge levels faster (a lot I hope). Not ready yet!
 21-Nov-2002
+	- 'res' did the following:
+	    - Removed call to efed.pl after doxygen run; isn't needed
+	      because a custom footer w/o date is used.
+	    - Added some eyecandy to pubapi docs.
+	    - Added some more doc modules.
+	    - Tweaked the alphabetical index.
+	    - Added some eyecandy to pubapi docs.
+	    - Added csgeom headers to Geometry Utils doc module.
+	    - Tweaked the doc stylesheet a bit.
+	- Marten Svanfeldt did the following:
+	    - Added shaders for the new renderer. A CS shader today is
+	      a combination of vertex and fragment processing instructions.
+	    - Added support for shaderprogram plugins.
+	- Mathew Sutcliffe did the following:
+	    - Added support for putting meta-data in map files, for
+	      level editors and such.
+	- Anders Stenberg did the following:
+	    - Fixed a case where glShadeModel was called instead of
+	      statecache->SetShadeModel, which broke the state caching
+	      (in openglcommon).
 	- Fixed CastShadows() implementation in Dynavis and Frustvis
 	  so that it shadow casting is now correct (I hope).
 20-Nov-2002
+	- Mathew Sutcliffe did the following:
+	    - Made same changes to libs/cssys/{next,win32}/*conf.sh
+	      as I did to unixconf.sh for the Perl5 plugin.
+	- Anders Stenberg did the following:
+	    - Some changes to the new renderer API, and work on clipping.
+	- Paul Garceau did the following:
+	    - Minor cleanup -- eliminated comments re: "dllwrap" as
+	      gcc -shared is now being used for plugin generation (.dlls)
+	      instead of "dllwrap".
+	- Mike Handverger did the following:
+ 	    - Initialized title_bar_height to 0 (aws) to stop randomly
+	      sized title bars.
+	- Philip Wyett did the following:
+	    - Removed FTP mirror link until the machines relocation is
+	      complete.
+	    - Added test for csperl5 plugins existence in build to stop
+	      the test app being built if it is not.
 	- Fixed csVfsCacheManager so it no longer tries to use 'scope' if
 	  that is NULL. This has an effect on 'precalc_info' which will now
 	  be placed in that file instead of in '(null)'.
@@ -1111,10 +1642,26 @@ The history order is reversed so that new features are at the top.
 	- Added <keepimage> option for textures so that you can indicate
 	  in a map file that you want to keep the image.
 19-Nov-2002
+	- 'res' did the following:
+	    - Octree and lm_precalc_info now use cache id ~0 as well.
+	    - iCacheManager docs mention the possibility of using ~0 as ID.
+	    - Added a line about the online FAQ in the Wiki.
+	- Mathew Sutcliffe did the following:
+	    - Added Perl v5 Scripting Plugin and Test Application.
+	    - Furthermore: Changed private member csTimer::pause to
+	      csTimer::pausetime to fix case-insensitive conflict with
+	      iTimer::Pause(). Perl headers define macros that conflict
+	      with names of some things in CS, so added #undef's to
+	      ivaria/cs.i. Added a template internal-project sub-makefile.
 	- 'genmesh' objects now also cast shadows (they don't receive
 	  shadows yet). Generalized the shadow casting system in the engine
 	  so that this is actually possible.
 18-Nov-2002
+	- Daniel Duhprey did the following:
+	    - Brought ODE plugin up to date with latest ode cvs.
+	- Norman Kramer did the following:
+	    - if you build the latest ode library you have to set
+	      ODE_OLD_COLLISION in ode/config/user-settings.
 	- Fixed software renderer procedural textures in 16-bit display
 	  mode. They worked fine in 32-bit display mode and that's why
 	  I didn't notice the bug :-)
@@ -1148,6 +1695,18 @@ The history order is reversed so that new features are at the top.
 	  to iEngine->CreateTexture(). Instead of creating a texture from
 	  a file it will create a black texture with the given dimensions.
 	  This is mainly useful for procedural textures.
+12-Nov-2002
+	- Marten Svanfeldt did the following:
+	    - Fixed infinite loop-problem in GetTopmostVariableID (efdef.h).
+	    - Effectloading problem.
+	- Norman Kramer did the following:
+	    - Changed shielding define names of writer.h (they were used in
+	      another include already).
+	    - iEventCord now inherits from iBase again. Michael D. Long
+	      changed that on Sun Oct 15 22:55:52 2000 but gave no reason.
+	      Now you can do csRef<iEventCord> again.
+	    - Added newline to end of awsdoc.h, some compiler actually do
+	      care.
 11-Nov-2002
 	- Norman Kramer disabled default compilation of the new opengl
 	  render3d implementation and the r3dtest program.
