@@ -40,11 +40,22 @@ public:
     reverse.Put (value, key);
   }
 
-  /// Get the first key matching the given value, or 0 if there is none.
-  const K& GetKey (const T& key) const
+  /**
+   * Get a pointer to the first key matching the given value, 
+   * or 0 if there is none.
+   */
+  const K* GetKey (const T& key) const
   {
     return reverse.Get (key);
   }
  
+  /**
+   * Get the first key matching the given value, or \p fallback if there is 
+   * none.
+   */
+  const K& GetKey (const T& key, const K& fallback) const
+  {
+    return reverse.Get (key, fallback);
+  }
 };
 

@@ -88,7 +88,7 @@ bool csDriverDBReader::Apply (iDocumentNode* node)
       case csGLDriverDatabase::XMLTOKEN_USECFG:
 	{
 	  const char* cfgname = child->GetContentsValue ();
-	  csRef<csConfigDocument> cfg (configs.Get (cfgname));
+	  csRef<csConfigDocument> cfg (configs.Get (cfgname, 0));
 	  if (!cfg.IsValid ())
 	  {
 	    synsrv->Report (
@@ -371,7 +371,7 @@ bool csDriverDBReader::ParseConfigs (iDocumentNode* node)
 	      "<config> has no name");
 	    return false;
 	  }
-	  csRef<csConfigDocument> cfg (configs.Get (name));
+	  csRef<csConfigDocument> cfg (configs.Get (name, 0));
 	  if (!cfg.IsValid ())
 	  {
 	    cfg.AttachNew (new csConfigDocument ());

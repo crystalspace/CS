@@ -108,9 +108,9 @@ csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename, int size)
       return font;
     }
   }*/
-  if (fonts.In (filename))
+  csDefaultFont* font = fonts.Get (filename, 0);
+  if (font != 0)
   {
-    const csDefaultFont* font = fonts.Get (filename);
     return csPtr<iFont> (csRef<iFont> ((iFont*)font));
   }
 

@@ -99,7 +99,7 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
 						int& active_edge_start)
 {
   //check if this light exists in cache, and if it is ok
-  csLightCacheEntry *entry = lightcache.Get (light);
+  csLightCacheEntry *entry = lightcache.Get (light, 0);
 
   if (entry == 0)
   {
@@ -459,7 +459,7 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
 void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, 
 				      iMeshWrapper *mesh, iShader* shader, int pass)
 {
-  csRef<csStencilShadowCacheEntry> shadowCacheEntry = shadowcache.Get(mesh);
+  csRef<csStencilShadowCacheEntry> shadowCacheEntry = shadowcache.Get(mesh, 0);
   if (shadowCacheEntry == 0) 
   {
     /* need the extra reference for the hashmap */
@@ -605,7 +605,8 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   {
     iMeshWrapper* obj = objInShadow->Next ()->GetMeshWrapper ();
     
-    csRef<csStencilShadowCacheEntry> shadowCacheEntry = shadowcache.Get(obj);
+    csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
+      shadowcache.Get(obj, 0);
 
     if (shadowCacheEntry == 0) 
     {
@@ -674,7 +675,8 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
   while (!objInShadow->HasNext() )
   {
     iMeshWrapper* sp = objInShadow->Next()->GetMeshWrapper ();
-    csRef<csStencilShadowCacheEntry> shadowCacheEntry = shadowcache.Get (sp);
+    csRef<csStencilShadowCacheEntry> shadowCacheEntry = 
+      shadowcache.Get (sp, 0);
     if (shadowCacheEntry != 0)
       shadowCacheEntry->DisableShadowCaps ();
   }  

@@ -68,11 +68,7 @@ public:
     @@@ Somewhat ugly. The glyph metrics will be stored twice, in the font and
     the font cache itself.
    */
-  struct HackAroundHashZeroInitializer : public csGlyphMetrics
-  {
-    HackAroundHashZeroInitializer(int x = 0) { }
-  };
-  csHash<HackAroundHashZeroInitializer, utf32_char> glyphMetrics;
+  csHash<csGlyphMetrics, utf32_char> glyphMetrics;
   //
   csRef<csFt2FaceWrapper> face;
   FT_Size size;

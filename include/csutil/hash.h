@@ -208,8 +208,30 @@ public:
     return false;
   }
 
-  /// Get the first element matching the given key, or 0 if there is none.
-  const T& Get (const K& key) const
+  /**
+   * Get a pointer to the first element matching the given key, 
+   * or 0 if there is none.
+   */
+  const T* Get (const K& key) const
+  {
+    const csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
+    const int len = values.Length ();
+    for (int i = 0; i < len; ++i)
+    {
+      const Element& v = values[i];
+      if (KeyHandler::CompareKeys (v.key, key))
+	return &v.value;
+    }
+
+    return 0;
+  }
+
+  /**
+   * Get the first element matching the given key, or \p fallback if there is 
+   * none.
+   */
+  const T& Get (const K& key, const T& fallback) const
   {
     const csArray<Element> &values = 
       Elements[KeyHandler::ComputeHash (key) % Modulo];
@@ -221,8 +243,7 @@ public:
 	return v.value;
     }
 
-    static const T zero (0);
-    return zero;
+    return fallback;
   }
 
   /// Delete all the elements.

@@ -315,7 +315,7 @@ void csThingStatic::PrepareLMLayout ()
 
     iMaterialWrapper* mat = sp->GetMaterialWrapper ();
 
-    csStaticPolyGroup* lp = polysSorted.Get (mat);
+    csStaticPolyGroup* lp = polysSorted.Get (mat, 0);
     if (lp == 0)
     {
       lp = new csStaticPolyGroup;
@@ -2711,15 +2711,6 @@ csRenderMesh **csThing::GetRenderMeshes (int &num)
 #endif
 }
 
-struct PolyGroupSLM
-{
-  csRef<iSuperLightmap> SLM;
-  bool slmCreated;
-
-  // ctor has a parameter so csHash<> can construct this struct from 0
-  PolyGroupSLM (int x = 0) { (void)x; slmCreated = false; }
-};
-
 void csThing::PrepareLMs ()
 {
   if (lightmapsPrepared) return;
@@ -2727,7 +2718,7 @@ void csThing::PrepareLMs ()
   csThingObjectType* thing_type = static_data->thing_type;
   iTextureManager* txtmgr = thing_type->G3D->GetTextureManager ();
 
-  csHash<PolyGroupSLM, csThingStatic::StaticSuperLM*> superLMs;
+  csHash<csRef<iSuperLightmap>, csThingStatic::StaticSuperLM*> superLMs;
 
   int i;
   for (i = 0; i < static_data->litPolys.Length(); i++)
@@ -2735,20 +2726,20 @@ void csThing::PrepareLMs ()
     const csThingStatic::csStaticLitPolyGroup& slpg = 
       *(static_data->litPolys[i]);
 
+    const csRef<iSuperLightmap>* SLMptr = superLMs.Get (slpg.staticSLM);
     csRef<iSuperLightmap> SLM;
 
-    PolyGroupSLM pgSLM = superLMs.Get (slpg.staticSLM);
-
-    if (!pgSLM.slmCreated)
+    if (SLMptr == 0)
     {
-      pgSLM.SLM = txtmgr->CreateSuperLightmap (slpg.staticSLM->width, 
+      SLM = txtmgr->CreateSuperLightmap (slpg.staticSLM->width, 
         slpg.staticSLM->height);
-      pgSLM.slmCreated = true;
-      superLMs.Put (slpg.staticSLM, pgSLM);
+      superLMs.Put (slpg.staticSLM, SLM);
     }
+    else
+      SLM = *SLMptr;
 
     // SLM creation failed for some reason. The polys will be drawn unlit.
-    if ((SLM = pgSLM.SLM) == 0)
+    if (SLM == 0)
     {
       csPolyGroup* pg = new csPolyGroup;
       pg->material = FindRealMaterial (slpg.material);

@@ -394,9 +394,14 @@ struct AdjacencyCounter
 {
   int adjNormal, adjFlipped;
 
-  AdjacencyCounter (int x = 0)
+  AdjacencyCounter () : adjNormal(0), adjFlipped(0)
   {
-    adjNormal = adjFlipped = 0;
+  }
+  AdjacencyCounter (const AdjacencyCounter* other) : adjNormal(0), 
+    adjFlipped(0)
+  {
+    if (other)
+      *this = *other;
   }
 };
 

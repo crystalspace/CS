@@ -24,8 +24,8 @@
  * This is a class which provides basic reference-counting semantics.  It can
  * be used in conjunction with the smart pointer template class csRef (see
  * <ref.h>).  This class itself provides no functionality beyond
- * reference counting.  It is intended that you should subclass csRef and add
- * needed functionality.
+ * reference counting.  It is intended that you should subclass csRefCount and 
+ * add needed functionality.
  */
 class csRefCount
 {

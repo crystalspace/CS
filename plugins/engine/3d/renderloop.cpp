@@ -177,27 +177,25 @@ csPtr<iRenderLoop> csRenderLoopManager::Create ()
 bool csRenderLoopManager::Register (const char* name, iRenderLoop* loop)
 {
   const char* myName = strings.Request (strings.Request (name));
-  if (loops.Get (myName) != 0) return false;
-  //loop->IncRef();
+  if (loops.In (myName)) return false;
   loops.Put (myName, loop);
   return true;
 }
  
 iRenderLoop* csRenderLoopManager::Retrieve (const char* name)
 {
-  return (loops.Get (name));
+  return (loops.Get (name, 0));
 }
 
 const char* csRenderLoopManager::GetName (iRenderLoop* loop)
 {
-  return loops.GetKey (loop);
+  return loops.GetKey (loop, 0);
 }
 
 bool csRenderLoopManager::Unregister (iRenderLoop* loop)
 {
   const char* key;
-  if ((key = loops.GetKey (loop)) == 0) return false;
-  //loop->DecRef();
+  if ((key = loops.GetKey (loop, 0)) == 0) return false;
   loops.Delete (key, loop);
   return true;
 }

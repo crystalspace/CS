@@ -94,6 +94,7 @@ bool csCursor::ParseConfigFile (const char *iFile)
       return false;
 
   csConfigAccess ini (reg, iFile);
+  //csRef<iConfigManager> ini (CS_QUERY_REGISTRY (reg, iConfigManager));
 
   const char *dir = ini->GetStr ("CursorSystem.General.Directory");
 
@@ -212,7 +213,7 @@ bool csCursor::HandleEvent (iEvent &ev)
   {
     if (ev.Type == csevBroadcast && ev.Command.Code == cscmdPostProcess)
     {
-      CursorInfo *ci = cursors.Get (current);
+      CursorInfo* ci = cursors.Get (current, 0);
       if (!ci)
         return false;
 
@@ -228,13 +229,13 @@ bool csCursor::HandleEvent (iEvent &ev)
 
   if (ev.Type == csevMouseDown)
   {
-    if (current == CSCURSOR_Default) current = CSCURSOR_MouseDown;
+    if (strcmp (current, CSCURSOR_Default) == 0) current = CSCURSOR_MouseDown;
     return false;
   }
   
   if (ev.Type == csevMouseUp)
   {
-    if (current == CSCURSOR_MouseDown) current = CSCURSOR_Default;
+    if (strcmp (current, CSCURSOR_MouseDown) == 0) current = CSCURSOR_Default;
     return false;
   }
 
@@ -244,6 +245,7 @@ bool csCursor::HandleEvent (iEvent &ev)
 // Deactivates system cursor, activates event handling
 bool csCursor::Setup (iGraphics3D *ig3d, bool forceEmulation)
 {
+  if (!ig3d) return false;
   g3d = ig3d;
   txtmgr = g3d->GetTextureManager();
   if (!txtmgr) return false;
@@ -267,7 +269,7 @@ bool csCursor::SwitchCursor (const char *name)
     return true;
 
   // Get CursorInfo and return false if we can't get it
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (!ci) return false;
 
   iGraphics2D *g2d = g3d->GetDriver2D();
@@ -347,7 +349,7 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
 
 void csCursor::SetHotspot (const char *name, csPoint hotspot)
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
     SetCursor (name, ci->image, ci->keycolor, hotspot, ci->alpha, 
@@ -358,7 +360,7 @@ void csCursor::SetHotspot (const char *name, csPoint hotspot)
 
 void csCursor::SetAlpha (const char *name, uint8 alpha)
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
     SetCursor (name, ci->image, ci->keycolor, ci->hotspot, alpha,
@@ -369,7 +371,7 @@ void csCursor::SetAlpha (const char *name, uint8 alpha)
 
 void csCursor::SetKeyColor (const char *name, csRGBcolor color)
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
     SetCursor (name, ci->image, color, ci->hotspot, ci->alpha, ci->fg, ci->bg);
@@ -379,7 +381,7 @@ void csCursor::SetKeyColor (const char *name, csRGBcolor color)
 
 void csCursor::SetColor (const char *name, csRGBcolor fg, csRGBcolor bg)
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
     SetCursor (name, ci->image, ci->keycolor, ci->hotspot, ci->alpha,
@@ -390,7 +392,7 @@ void csCursor::SetColor (const char *name, csRGBcolor fg, csRGBcolor bg)
 
 const csRef<iImage> csCursor::GetCursorImage (const char *name) const
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci) return ci->image;
 
   return 0;
@@ -398,7 +400,7 @@ const csRef<iImage> csCursor::GetCursorImage (const char *name) const
 
 csPoint csCursor::GetHotspot (const char *name) const
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci) return ci->hotspot;
 
   return csPoint (0,0);
@@ -406,7 +408,7 @@ csPoint csCursor::GetHotspot (const char *name) const
 
 uint8 csCursor::GetAlpha (const char *name) const
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci) return ci->alpha;
 
   return 0;
@@ -414,7 +416,7 @@ uint8 csCursor::GetAlpha (const char *name) const
 
 csRGBcolor csCursor::GetKeyColor (const char *name) const
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci) return ci->keycolor;
 
   return csRGBcolor (0,0,0);
@@ -422,7 +424,7 @@ csRGBcolor csCursor::GetKeyColor (const char *name) const
 
 csRGBcolor csCursor::GetFGColor (const char *name) const
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci) return ci->fg;
 
   return csRGBcolor (255,255,255);
@@ -430,7 +432,7 @@ csRGBcolor csCursor::GetFGColor (const char *name) const
 
 csRGBcolor csCursor::GetBGColor (const char *name) const
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci) return ci->bg;
 
   return csRGBcolor (0,0,0);
@@ -438,7 +440,7 @@ csRGBcolor csCursor::GetBGColor (const char *name) const
 
 bool csCursor::RemoveCursor (const char *name)
 {
-  CursorInfo *ci = cursors.Get (name);
+  CursorInfo *ci = cursors.Get (name, 0);
   if (ci)
   {
     cursors.Delete (name, ci);

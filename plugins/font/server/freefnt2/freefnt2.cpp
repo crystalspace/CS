@@ -208,14 +208,14 @@ csPtr<iFont> csFreeType2Server::LoadFont (const char *filename, int size)
   csString fontid;
   fontid.Format ("%d:%s", size, filename);
   // see if we already loaded that face/size pair
-  csRef<iFont> font = fonts.Get ((const char*)fontid);
+  csRef<iFont> font = fonts.Get ((const char*)fontid, 0);
   if (font)
   {
     return csPtr<iFont> (font);
   }
 
   // see if we already loaded that face
-  csRef<csFt2FaceWrapper> face = ftfaces.Get (filename);
+  csRef<csFt2FaceWrapper> face = ftfaces.Get (filename, 0);
   if (face == 0)
   {
     // not yet loaded, so do it now
@@ -361,9 +361,10 @@ void csFreeType2Font::GetMaxSize (int &oW, int &oH)
 
 bool csFreeType2Font::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
 {
-  if (glyphMetrics.In (c))
+  const csGlyphMetrics* cachedMetrics;
+  if ((cachedMetrics = glyphMetrics.Get (c)) != 0)
   {
-    metrics = glyphMetrics.Get (c);
+    metrics = *cachedMetrics;
     return true;
   }
 
@@ -379,6 +380,7 @@ bool csFreeType2Font::GetGlyphMetrics (utf32_char c, csGlyphMetrics& metrics)
   }
   
   metrics.advance = face->face->glyph->advance.x >> 6;
+  glyphMetrics.Put (c, metrics);
 
   return true;
 }
@@ -506,10 +508,10 @@ void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &de
     text += skip;
     textLen -= skip;
 
-    if (glyphMetrics.In (glyph))
+    const csGlyphMetrics* metrics = glyphMetrics.Get (glyph);
+    if (metrics != 0)
     {
-      const csGlyphMetrics& metrics = glyphMetrics.Get (glyph);
-      oW += metrics.advance;
+      oW += metrics->advance;
       continue;
     }
 
@@ -519,7 +521,7 @@ void csFreeType2Font::GetDimensions (const char *text, int &oW, int &oH, int &de
       FT_LOAD_DEFAULT),
       "Could not load glyph %d for %s", ci, name))
     {
-      HackAroundHashZeroInitializer metrics;
+      csGlyphMetrics metrics;
       metrics.advance = (face->face->glyph->advance.x >> 6);
       glyphMetrics.Put (glyph, metrics);
 
@@ -565,11 +567,9 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
     textLen -= skip;
 
     int glyphW = defW;
-    if (glyphMetrics.In (glyph))
-    {
-      const csGlyphMetrics& metrics = glyphMetrics.Get (glyph);
-      glyphW = metrics.advance;
-    }
+    const csGlyphMetrics* metrics = glyphMetrics.Get (glyph);
+    if (metrics != 0)
+      glyphW = metrics->advance;
     else
     {
       FT_UInt ci = FT_Get_Char_Index (face->face, (FT_ULong)glyph);
@@ -578,7 +578,7 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
 	FT_LOAD_DEFAULT),
 	"Could not load glyph %d for %s", ci, name))
       {
-	HackAroundHashZeroInitializer metrics;
+	csGlyphMetrics metrics;
 	metrics.advance = (face->face->glyph->advance.x >> 6);
 	glyphMetrics.Put (glyph, metrics);
 
