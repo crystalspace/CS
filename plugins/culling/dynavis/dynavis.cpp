@@ -825,7 +825,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     {
       printf ("CovOutIns of object %s (max_depth=%g)\n",
       	iobj->GetName () ? iobj->GetName () : "<noname>",
-	max_depth);
+	0);//max_depth);
     }
     printf ("  campos_obj=%g,%g,%g\n",
     	campos_object.x, campos_object.y, campos_object.z);
