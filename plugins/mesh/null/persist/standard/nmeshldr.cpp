@@ -131,7 +131,7 @@ bool csNullFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
   if(!children.IsValid()) return false; // empty renderbuffer..
   
   const char *comptype = node->GetAttributeValue("type");
-  const char *name = node->GetAttributeValue("name");
+  //@@@ Jorrit:foo:  const char *name = node->GetAttributeValue("name");
   int compcount = node->GetAttributeValueAsInt("compcount");
   //@@@ Jorrit: why is this here? int length = state->GetVertexCount();
   int length = 0;

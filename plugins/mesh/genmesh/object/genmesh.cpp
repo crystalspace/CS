@@ -444,8 +444,6 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   CheckLitColors ();
 #endif
 
-  iGraphics3D* g3d = rview->GetGraphics3D ();
-//#endif
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -475,6 +473,7 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     return false;
 
 #ifndef CS_USE_NEW_RENDERER
+  iGraphics3D* g3d = rview->GetGraphics3D ();
   g3d->SetObjectToCamera (&tr_o2c);
   G3DTriangleMesh& m = factory->GetMesh ();
   m.clip_portal = clip_portal;
@@ -671,10 +670,10 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
+#ifndef CS_USE_NEW_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
 
   // Prepare for rendering.
-#ifndef CS_USE_NEW_RENDERER
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
   G3DTriangleMesh& m = factory->GetMesh ();

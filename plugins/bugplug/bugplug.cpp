@@ -491,7 +491,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
 
   int polyidx = -1;
   iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &polyidx);
-  const char* poly_name;
+  const char* poly_name = 0;
   if (polyidx != -1)
   {
     csRef<iThingState> ts = SCF_QUERY_INTERFACE (sel->GetMeshObject (),

@@ -651,7 +651,6 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
       ball_triangle_dirty_flag = false;
       unsigned int *ibuf = (unsigned int *)index_buffer->Lock(
         CS_BUF_LOCK_NORMAL);
-      int i;
       memcpy (ibuf, ball_indices, sizeof (unsigned int) * ball_triangles *3);
       index_buffer->Release ();
     }
@@ -723,7 +722,6 @@ void csBallMeshObject::SetupVertexBuffer ()
 bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
-  iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -758,6 +756,7 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   mesh.clip_z_plane = clip_z_plane;
   mesh.do_mirror = camera->IsMirrored ();  
 #else
+  iGraphics3D* g3d = rview->GetGraphics3D ();
   g3d->SetObjectToCamera (&tr_o2c);
   top_mesh.clip_portal = clip_portal;
   top_mesh.clip_plane = clip_plane;
@@ -855,9 +854,9 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
+#ifndef CS_USE_NEW_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
 
-#ifndef CS_USE_NEW_RENDERER
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 

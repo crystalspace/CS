@@ -1152,12 +1152,12 @@ void csThingStatic::FillRenderMeshes (
     int j;
     for (j = 0; j< pg.polys.Length(); j++)
     {
-      csPolygon3DStatic* static_data = static_polygons[pg.polys[j]];
       csRef<iPolygon3DStatic> iStatic = 
         SCF_QUERY_INTERFACE(static_polygons[pg.polys[j]], iPolygon3DStatic);
       polyRenderer->AddPolygon (iStatic);
 
 #if 0
+      csPolygon3DStatic* static_data = static_polygons[pg.polys[j]];
       int* poly_indices = static_data->GetVertexIndices ();
 
       csVector3 polynormal;

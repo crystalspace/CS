@@ -439,9 +439,11 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
   float diffuse = CS_DEFMAT_DIFFUSE;
   float ambient = CS_DEFMAT_AMBIENT;
   float reflection = CS_DEFMAT_REFLECTION;
+#ifndef CS_USE_NEW_RENDERER
   int num_txt_layer = 0;
-  csTextureLayer layers[4];
   iTextureWrapper* txt_layers[4];
+  csTextureLayer layers[4];
+#endif
   
   csRef<iEffectDefinition> efdef ;
 #ifdef CS_USE_NEW_RENDERER

@@ -3224,7 +3224,7 @@ bool csLoader::LoadSettings (iDocumentNode* node)
 	      "crystalspace.maploader.parse.settings",
 	      CS_REPORTER_SEVERITY_WARNING,
 	      child,
-	      "Expected render loop name",
+	      "Expected render loop name: %s",
 	      loopName);
 	  }
 	}
@@ -3782,6 +3782,7 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
       break;
     case 3:
       {
+#ifndef CS_USE_NEW_RENDERER
 	iMaterialWrapper* ifmc = halo.flare.mat_center;
 	iMaterialWrapper* ifm1 = halo.flare.mat_spark1;
 	iMaterialWrapper* ifm2 = halo.flare.mat_spark2;
@@ -3789,7 +3790,6 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	iMaterialWrapper* ifm4 = halo.flare.mat_spark4;
 	iMaterialWrapper* ifm5 = halo.flare.mat_spark5;
         iFlareHalo* flare = l->QueryLight ()->CreateFlareHalo ();
-#ifndef CS_USE_NEW_RENDERER
 	flare->AddComponent (0.0, 1.2, 1.2, CS_FX_ADD, ifmc);
 	flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifm3);
 	flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifm4);

@@ -10,6 +10,9 @@ chronological order.
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the
 	  polygon mesh helper is locked.
+	- Eric Sunshine eliminated gobs and gobs of compilation warnings from
+	  throughout the project which were emitted with the new renderer
+	  enabled.
 29-Sep-2003
 	- Jorrit moved ParseTextureMapping() and ParsePoly3d() from syntax
 	  services to thing loader. It doesn't make much sense to make those

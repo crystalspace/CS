@@ -211,10 +211,10 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     color_name = strings->Request ("colors");
     index_name = strings->Request ("indices");
 
-    bool rndbuf_verts_dirty = true;
-    bool rndbuf_texels_dirty = true;
-    bool rndbuf_colors_dirty = true;
-    bool rndbuf_index_dirty = true;
+    rndbuf_verts_dirty = true;
+    rndbuf_texels_dirty = true;
+    rndbuf_colors_dirty = true;
+    rndbuf_index_dirty = true;
 #endif
   }
   return true;
@@ -437,7 +437,6 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
 
 #else
 
-  iGraphics3D * g3d = rview->GetGraphics3D();
   iCamera *cam = rview->GetCamera();
 
   // Shouldn't this be done in the renderer?
@@ -458,6 +457,7 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
     return false;
 
 #ifndef CS_USE_NEW_RENDERER
+  iGraphics3D * g3d = rview->GetGraphics3D();
   g3d->SetObjectToCamera( &tr_o2c );
 #endif
  
