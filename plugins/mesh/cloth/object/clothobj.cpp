@@ -68,9 +68,7 @@ void csStuffObject::SetupVertexBuffer ()
  if (!vbuf)
  {
 	 printf(" SETUPVERTEX BUFFER %u \n",count++);
-	 iObjectRegistry* object_reg = ((StuffFactory*)factory)->object_reg;
-	 printf(" SETUPVERTEX BUFFER %u \n",count++);
-	 csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
+	 csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (Obj_Reg, iGraphics3D));
 	 // @@@ priority should be a parameter.
 	 printf(" %u \n",count++);
 	 
@@ -113,7 +111,7 @@ void csStuffObject::SetupMesh()
 	printf( " setting up the mesh... \n");	
 	setup      = true;
 	fact_state = SCF_QUERY_INTERFACE ( factory , iClothFactoryState );
-	Fabric     = new Cloth ( fact_state , shift , object_bbox , csVector3( 0.1 , 0 , 0 ) );
+	Fabric     = new Cloth ( fact_state , shift , object_bbox , csVector3( 0.03, 0.01, 0.01 ) );
 	
 	// after initializing a Cloth, all triangulation and eventually refinement is already done,
 	// and i want to copy that to factory just once (and maybe save/cache it)
@@ -137,11 +135,11 @@ void csStuffObject::SetupMesh()
 	mesh.do_morph_texels = false;
 	mesh.do_morph_colors = false;
 	mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-    /*
-    Integrator->ComputeInitial();
-    Integrator->ComputeInitial();
-    Integrator->ComputeInitial();
-    // Integrator->ComputeInitial();  */
+    
+    Dynamics->ComputeInitial();
+    Dynamics->ComputeInitial();
+    Dynamics->ComputeInitial();
+    Dynamics->ComputeInitial();  
 	
 	printf( " finished setting up the mesh... \n");	
 	

@@ -30,7 +30,7 @@
 #include "iutil/comp.h"
 #include "igeom/objmodel.h"
 #include "ivideo/vbufmgr.h"
-
+ 
 class csMaterialHandle;
 struct G3DTriangleMesh;
 struct iObjectRegistry;
@@ -104,8 +104,8 @@ iMeshObjectDrawCallback* vis_cb;
   
   //--------------------------END iVertexBufferManagerClient implementation--------//
   
-  iMeshObjectFactory* factory;
-  iClothFactoryState* fact_state;
+  csRef<iMeshObjectFactory> factory;
+  csRef<iClothFactoryState> fact_state;
   iBase* logparent;
   csBox3 camera_bbox;
   csBox3 object_bbox;
@@ -365,24 +365,14 @@ class StuffFactory : public iMeshObjectFactory
    * Automatically generate a square cloth
    */
   virtual void GenerateFabric ( uint Xsize , uint Ysize )
-{
-	 
-	
-	//hardcoded for now
-	scfParent->num_vertices=( Xsize + 1 )*( Ysize + 1 );
-	scfParent->num_triangles=4 * Xsize * Ysize;
+{ 
+	SetVertexCount  ( ( Xsize + 1 )*( Ysize + 1 ) );
+	SetTriangleCount( 4 * Xsize * Ysize ); 
 	uint nverts = scfParent->num_vertices;
 	uint ntris  = scfParent->num_triangles;
 	int count;
 	printf(" %u \n",count++);
-	if (scfParent->factory_vertices) delete[] scfParent->factory_vertices;
-	if (scfParent->factory_texels) delete[] scfParent->factory_texels;
-	if (scfParent->factory_colors) delete[] scfParent->factory_colors;
-	//vertices=new csVector3[num_vertices];
-	scfParent->factory_vertices = new csVector3[nverts];
-	scfParent->factory_texels   = new csVector2[nverts];
-	scfParent->factory_colors   = new csColor[nverts];
-		
+			
 	float xindex=0.0;
 	float yindex=0.0;
 	int i;
@@ -398,10 +388,9 @@ class StuffFactory : public iMeshObjectFactory
 		 xindex+=2.0/Xsize;
 		 if ( ((i+1)%(Xsize+1))==0 ) { xindex=0.0; yindex+=2.0/Ysize;  };
 		 	 };	
-	 	printf(" %u \n",count++);
+	 	printf(" on %u \n",count++);
 	
-        scfParent->factory_triangles = new csTriangle[ntris];
-   k=0;
+        k=0;
    for (i=0;i<Xsize;i++) {
 	for (j=0;j<Ysize;j++) {
 				
