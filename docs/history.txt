@@ -24,6 +24,10 @@ chronological order.
 	  ctrl-d 8 key to that command.
 	- Jorrit enhanced the Dynavis debug mode so that it now shows which
 	  of the optimizations are enabled and which are disabled.
+	- res updated a comment in ogl_txtmgr.cpp. Just dropping the alpha of
+	  keycolored pixels to 0 and leaving other pixels as is is indeed the
+	  desired behaviour.
+	- res added a paragraph about iGraphics2D::WriteBaseline().
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated
 	  some doxygen comments in include/graph2d.h. (Basically the 

@@ -1070,7 +1070,6 @@ Canvas
 @itemize @bullet
 @item
 @code{iGraphics2D::Write()}
-@item @code{iGraphics2D::WriteBaseline()}
 @end itemize
 @item
 Reporter
@@ -1088,11 +1087,11 @@ Reporter
 Native Window
 @itemize @bullet
 @item
-@code{iNativeWindowManager->Alert()}
+@code{iNativeWindowManager::Alert()}
 @item
-@code{iNativeWindowManager->AlertV()}
+@code{iNativeWindowManager::AlertV()}
 @item
-@code{iNativeWindow->SetTitle()}
+@code{iNativeWindow::SetTitle()}
 @end itemize
 @end itemize
 
@@ -1171,3 +1170,10 @@ switch (e.Type)
     break;
 @}
 @end example
+
+@subheading @code{iGraphics2D::WriteBaseline()} deprecated
+
+The functionality provided by @code{WriteBaseline()} is now available by 
+specifying the @code{CS_WRITE_BASELINE} flag when calling 
+@code{iGraphics2D::Write()}. Hence, @code{WriteBaseline()} is superflouos and
+has been deprecated.
