@@ -294,6 +294,32 @@ int csMatrix3::Eigens1 (csMatrix3 *evecs)
 #undef swap
 }
 
+csMatrix3 csMatrix3::GetXRotation (float angle)
+{
+  csMatrix3 N;
+  N.m11 = 1; N.m12 = 0;           N.m13 = 0;
+  N.m21 = 0; N.m22 = cos (angle); N.m23 = -sin(angle);
+  N.m31 = 0; N.m32 = sin (angle); N.m33 =  cos(angle);
+  return N;
+}
+
+csMatrix3 csMatrix3::GetYRotation (float angle)
+{
+  csMatrix3 N;
+  N.m11 = cos (angle); N.m12 = 0; N.m13 = -sin(angle);
+  N.m21 = 0;           N.m22 = 1; N.m23 = 0;
+  N.m31 = sin (angle); N.m32 = 0; N.m33 =  cos(angle);
+  return N;
+}
+
+csMatrix3 csMatrix3::GetZRotation (float angle)
+{
+  csMatrix3 N;
+  N.m11 = cos (angle); N.m12 = -sin(angle); N.m13 = 0;
+  N.m21 = sin (angle); N.m22 =  cos(angle); N.m23 = 0;
+  N.m31 = 0;           N.m32 = 0;           N.m33 = 1;
+  return N;
+}
 
 csMatrix3 operator+ (const csMatrix3& m1, const csMatrix3& m2) 
 {

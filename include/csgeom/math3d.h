@@ -293,6 +293,24 @@ public:
   /// Set this matrix to the identity matrix.
   void Identity ();
 
+  /**
+   * Return a rotation matrix around the X axis.
+   * 'angle' is given in radians.
+   */
+  static csMatrix3 GetXRotation (float angle);
+
+  /**
+   * Return a rotation matrix around the Y axis.
+   * 'angle' is given in radians.
+   */
+  static csMatrix3 GetYRotation (float angle);
+
+  /**
+   * Return a rotation matrix around the Z axis.
+   * 'angle' is given in radians.
+   */
+  static csMatrix3 GetZRotation (float angle);
+
   /// Add two matricies.
   friend csMatrix3 operator+ (const csMatrix3& m1, const csMatrix3& m2);
   /// Subtract two matricies.
