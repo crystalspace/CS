@@ -26,6 +26,7 @@
 #include "csutil/scf.h"
 #include "isystem.h"
 #include "icfgnew.h"
+#include "ievent.h"
 
 #include "sndrdr.h"
 #include "sndlstn.h"
@@ -54,6 +55,7 @@ csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase) {
 
 bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
   System = iSys;
+  System->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
@@ -205,3 +207,22 @@ const char *csSoundRenderDS3D::GetError(HRESULT r) {
     case DSERR_GENERIC: default: return "unknown DirectSound error";
   }
 }
+
+bool csSoundRenderDS3D::HandleEvent (iEvent &e)
+{
+  if (e.Type == csevCommand || e.Type == csevBroadcast) {
+    switch (e.Command.Code) {
+    case cscmdPreProcess:
+      Update();
+      return true;
+    case cscmdSystemOpen:
+      Open();
+      return true;
+    case cscmdSystemClose:
+      Close();
+      return true;
+    }
+  }
+  return false;
+}
+

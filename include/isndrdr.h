@@ -50,11 +50,6 @@ SCF_VERSION (iSoundRender, 1, 0, 0);
 struct iSoundRender : public iPlugIn
 {
 public:
-  /// Open the sound render
-  virtual bool Open () = 0;
-  /// Close the sound render
-  virtual void Close () = 0;
-
   /// Set Volume [0, 1]
   virtual void SetVolume (float vol) = 0;
   /// Get Volume [0, 1]
@@ -91,8 +86,6 @@ public:
   /// return the sound format to load a sound
   virtual const csSoundFormat *GetLoadFormat() = 0;
 
-  /// update the renderer (must be called regularly).
-  virtual void Update() = 0;
   /// Internal use : mixing function (needed if your renderer uses a driver)
   virtual void MixingFunction () = 0;
 };

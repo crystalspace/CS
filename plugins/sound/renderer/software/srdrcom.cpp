@@ -26,6 +26,7 @@
 #include "icfgnew.h"
 #include "isnddrv.h"
 #include "isnddata.h"
+#include "ievent.h"
 
 #include "srdrcom.h"
 #include "srdrlst.h"
@@ -59,6 +60,9 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 {
   // copy the system pointer
   System = iSys;
+
+  // set event callback
+  System->CallOnEvents(this, CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
 
   // read the config file
   Config = System->CreateConfigNew ("/config/sound.cfg");
@@ -234,6 +238,24 @@ void csSoundRenderSoftware::MixingFunction()
   }  
 
   SoundDriver->UnlockMemory();
+}
+
+bool csSoundRenderSoftware::HandleEvent (iEvent &e)
+{
+  if (e.Type == csevCommand || e.Type == csevBroadcast) {
+    switch (e.Command.Code) {
+    case cscmdPreProcess:
+      Update();
+      return true;
+    case cscmdSystemOpen:
+      Open();
+      return true;
+    case cscmdSystemClose:
+      Close();
+      return true;
+    }
+  }
+  return false;
 }
 
 void csSoundRenderSoftware::Update()

@@ -46,8 +46,6 @@ public:
   virtual bool Initialize (iSystem *iSys);
 
   // implementation of iSoundRender
-  virtual bool Open ();
-  virtual void Close ();
   virtual void SetVolume (float vol);
   virtual float GetVolume ();
   virtual void PlaySound(iSoundData *Data, bool Loop);
@@ -57,7 +55,11 @@ public:
   virtual iSoundListener *GetListener ();
   virtual const csSoundFormat *GetLoadFormat();
   virtual void MixingFunction ();
-  virtual void Update();
+  virtual bool HandleEvent (iEvent &e);
+
+  void Update();
+  bool Open ();
+  void Close ();
 
   // add a sound source
   void AddSource(csSoundSourceSoftware *src);

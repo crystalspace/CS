@@ -40,9 +40,6 @@ public:
   virtual ~csSoundRenderDS3D();
   virtual bool Initialize (iSystem *iSys);
 
-  virtual bool Open ();
-  virtual void Close ();
-
   virtual void SetVolume (float vol);
   virtual float GetVolume ();
 
@@ -53,8 +50,12 @@ public:
 
   virtual iSoundListener *GetListener ();
   virtual const csSoundFormat *GetLoadFormat();
-  virtual void Update();
   virtual void MixingFunction ();
+  virtual bool HandleEvent (iEvent &e);
+
+  bool Open ();
+  void Close ();
+  void Update();
 
   void SetDirty();
   void AddSource(csSoundSourceDS3D *src);

@@ -501,9 +501,6 @@ bool csSystemDriver::Open (const char *Title)
     Depth *= 8;
   }
 
-  if (Sound)
-    if (!Sound->Open ())
-      return false;
   if (NetDrv)
     if (!NetDrv->Open ())
       return false;
@@ -521,8 +518,6 @@ void csSystemDriver::Close ()
   csEvent Event (GetTime (), csevBroadcast, cscmdSystemClose);
   HandleEvent (Event);
 
-  if (Sound)
-    Sound->Close ();
   if (NetDrv)
     NetDrv->Close ();
   if (G3D)
@@ -577,15 +572,6 @@ void csSystemDriver::NextFrame ()
     HandleEvent (*ev);
     ev->DecRef ();
   }
-
-//@@@@@@@@@@@@@ TO DO @@@@@@@@@@@@@@@
-// these plugins should really register for being called every
-// frame - then they may do whatever they want inside their handleevent
-// function
-//@@@@@@@@@@@@@
-  if (Sound)
-    Sound->Update ();
-//@@@@@@@@@@@@@@ END @@@@@@@@@@@@@@@@
 
   // If a plugin has set CSMASK_Nothing, it receives cscmdPostProcess events too
   for (i = 0; i < PlugIns.Length (); i++)
