@@ -390,7 +390,7 @@ protected:
   /// Current 2D clipper.
   iClipper2D* clipper;
   /// Clipper type.
-  bool cliptype;
+  int cliptype;
   /// 3D Frustum calculated from clipper.
   csPoly3D frustum;
   /**

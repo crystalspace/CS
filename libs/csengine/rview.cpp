@@ -640,7 +640,7 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   //------
   if (tr_center.z+radius <= 0)
     return false;
-  
+
   //------
   // Test against far plane if needed.
   //------

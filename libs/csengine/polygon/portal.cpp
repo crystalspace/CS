@@ -271,7 +271,11 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   rview->SetPreviousSector (rview->GetThisSector ());
   rview->SetClipPlane (portal_polygon->GetPlane ()->GetCameraPlane());
   rview->GetClipPlane ().Invert ();
-  if (flags.Check (CS_PORTAL_CLIPDEST)) rview->UseClipPlane (true);
+  if (flags.Check (CS_PORTAL_CLIPDEST))
+  {
+    rview->UseClipPlane (true);
+    rview->UseClipFrustum (true);
+  }
 
   // When going through a portal we first remember the old clipper
   // and clip plane (if any). Then we set a new one. Later we restore.

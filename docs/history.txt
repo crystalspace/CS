@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+5-Jan-2002
+	- Fixed a bug with the OpenGL renderer where it was trying to
+	  store a value of 0, 1, or 2 in a boolean :-)
+	  The result of this bug was that portals which required clipping
+	  (like for the console portal command) didn't actually clip at
+	  all.
 4-Jan-2002
 	- Eric Sunshine fixed a bad booboo from some time ago which clobbered
 	  csTimer by mutating it into csTicksr.
