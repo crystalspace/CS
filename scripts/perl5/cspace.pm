@@ -10128,6 +10128,9 @@ package cspace::iShaderManager;
 *RegisterCompiler = *cspacec::iShaderManager_RegisterCompiler;
 *GetCompiler = *cspacec::iShaderManager_GetCompiler;
 *GetShaderVariableStack = *cspacec::iShaderManager_GetShaderVariableStack;
+*SetTagOptions = *cspacec::iShaderManager_SetTagOptions;
+*GetTagOptions = *cspacec::iShaderManager_GetTagOptions;
+*GetTags = *cspacec::iShaderManager_GetTags;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
@@ -12980,6 +12983,9 @@ sub CSFONT_ITALIC () { $cspacec::CSFONT_ITALIC }
 sub CSFONT_COURIER () { $cspacec::CSFONT_COURIER }
 sub CSFONT_SMALL () { $cspacec::CSFONT_SMALL }
 sub CS_FONT_DEFAULT_GLYPH () { $cspacec::CS_FONT_DEFAULT_GLYPH }
+sub TagNeutral () { $cspacec::TagNeutral }
+sub TagForbidden () { $cspacec::TagForbidden }
+sub TagRequired () { $cspacec::TagRequired }
 sub CS_TEXTURE_2D () { $cspacec::CS_TEXTURE_2D }
 sub CS_TEXTURE_3D () { $cspacec::CS_TEXTURE_3D }
 sub CS_TEXTURE_DITHER () { $cspacec::CS_TEXTURE_DITHER }
