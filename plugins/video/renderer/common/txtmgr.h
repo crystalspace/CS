@@ -256,8 +256,6 @@ public:
   { CONSTRUCT_IBASE (NULL); in_memory = false; hicolorcache = NULL;}
 
   ///
-  virtual void remap_texture(csTextureManager *new_palette) { remap_palette_24bit(new_palette); }
-  ///
   virtual csHighColorCacheData *GetHighColorCacheData () { return hicolorcache; }
   ///
   virtual void SetHighColorCacheData (csHighColorCacheData *d) { hicolorcache = d; }
