@@ -382,6 +382,12 @@ void ddgTBinTree::reset(ddgTriIndex tvc, unsigned int level)
 		{
 			reset(left(tvc),level-1);
 			reset(right(tvc),level-1);
+	        assert( tri(tvc)->_state.flags.merged==false);	
+	        assert( tri(tvc)->_state.flags.split==false);
+	        assert( tri(tvc)->_state.flags.coord==false);
+	        assert( tri(tvc)->_state.flags.priority==false);
+	        assert( tri(tvc)->_state.flags.dirty==false);       
+	        assert( tri(tvc)->_state.flags.vbuffer==false);
 		}
 		else if (level>1)
 		{
