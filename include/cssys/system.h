@@ -396,22 +396,22 @@ public:
   virtual bool GetInstallPath (char *oInstallPath, size_t iBufferSize);
 
   /// Load a plugin and initialize it
-  virtual iBase *LoadPlugIn (const char *iClassID, const char *iFuncID,
+  virtual iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
     const char *iInterface, int iVersion);
   /// Get first of the loaded plugins that supports given interface ID
-  virtual iBase *QueryPlugIn (const char *iInterface, int iVersion);
+  virtual iBase *QueryPlugin (const char *iInterface, int iVersion);
   /// Find a plugin given his functionality ID
-  virtual iBase *QueryPlugIn (const char *iFuncID, const char *iInterface, int iVersion);
+  virtual iBase *QueryPlugin (const char *iFuncID, const char *iInterface, int iVersion);
   /// Find a plugin given his class ID and functionality ID
-  virtual iBase *QueryPlugIn (const char* iClassID, const char *iFuncID, const char *iInterface, int iVersion);
+  virtual iBase *QueryPlugin (const char* iClassID, const char *iFuncID, const char *iInterface, int iVersion);
   /// Remove a plugin from system driver's plugin list
-  virtual bool UnloadPlugIn (iPlugin *iObject);
+  virtual bool UnloadPlugin (iPlugin *iObject);
   /// Register a object that implements the iPlugin interface as a plugin
-  virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID, iPlugin *iObject);
+  virtual bool RegisterPlugin (const char *iClassID, const char *iFuncID, iPlugin *iObject);
   /// Get the number of loaded plugins in the plugin manager.
-  virtual int GetPlugInCount ();
+  virtual int GetPluginCount ();
   /// Get the specified plugin from the plugin manager.
-  virtual iBase* GetPlugIn (int idx);
+  virtual iBase* GetPlugin (int idx);
 
   /// Get the system configuration file: this does NOT IncRef the object
   virtual iConfigManager *GetConfig ();

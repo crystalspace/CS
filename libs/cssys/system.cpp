@@ -480,7 +480,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     // If plugin is VFS then skip if already loaded earlier.
     if (VFS && r.FuncID && strcmp (r.FuncID, CS_FUNCID_VFS) == 0)
       continue;
-    LoadPlugIn (r.ClassID, r.FuncID, NULL, 0);
+    LoadPlugin (r.ClassID, r.FuncID, NULL, 0);
   }
 
   // See if user wants help
@@ -929,7 +929,7 @@ void csSystemDriver::Printf (int mode, char const* format, ...)
   va_end (args);
 }
 
-iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
+iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)
 {
   iPlugin *p = SCF_CREATE_INSTANCE (iClassID, iPlugin);
@@ -958,7 +958,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
   return NULL;
 }
 
-bool csSystemDriver::RegisterPlugIn (const char *iClassID,
+bool csSystemDriver::RegisterPlugin (const char *iClassID,
   const char *iFuncID, iPlugin *iObject)
 {
   int index = Plugins.Push (new csPlugin (iObject, iClassID, iFuncID));
@@ -976,18 +976,18 @@ bool csSystemDriver::RegisterPlugIn (const char *iClassID,
   }
 }
 
-int csSystemDriver::GetPlugInCount ()
+int csSystemDriver::GetPluginCount ()
 {
   return Plugins.Length ();
 }
 
-iBase* csSystemDriver::GetPlugIn (int idx)
+iBase* csSystemDriver::GetPlugin (int idx)
 {
   csPlugin* pl = Plugins.Get (idx);
   return pl->Plugin;
 }
 
-iBase *csSystemDriver::QueryPlugIn (const char *iInterface, int iVersion)
+iBase *csSystemDriver::QueryPlugin (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
   for (int i = 0; i < Plugins.Length (); i++)
@@ -1000,7 +1000,7 @@ iBase *csSystemDriver::QueryPlugIn (const char *iInterface, int iVersion)
   return NULL;
 }
 
-iBase *csSystemDriver::QueryPlugIn (const char *iFuncID, const char *iInterface,
+iBase *csSystemDriver::QueryPlugin (const char *iFuncID, const char *iInterface,
   int iVersion)
 {
   int idx = Plugins.FindKey (iFuncID, 1);
@@ -1011,7 +1011,7 @@ iBase *csSystemDriver::QueryPlugIn (const char *iFuncID, const char *iInterface,
     iSCF::SCF->GetInterfaceID (iInterface), iVersion);
 }
 
-iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID, 
+iBase *csSystemDriver::QueryPlugin (const char* iClassID, const char *iFuncID, 
 				    const char *iInterface, int iVersion)
 {
   int i;
@@ -1031,7 +1031,7 @@ iBase *csSystemDriver::QueryPlugIn (const char* iClassID, const char *iFuncID,
   return NULL;
 }
 
-bool csSystemDriver::UnloadPlugIn (iPlugin *iObject)
+bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
 {
   int idx = Plugins.FindKey (iObject);
   if (idx < 0)

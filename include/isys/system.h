@@ -77,7 +77,7 @@
  * <pre>
  * System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
  * </pre>
- * If you load a plugin via the ::LoadPlugIn method you just specify the
+ * If you load a plugin via the ::LoadPlugin method you just specify the
  * functionality ID as one of arguments.
  */
 
@@ -114,7 +114,7 @@
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
 #define CS_QUERY_PLUGIN(Object,Interface)					\
-  (Interface *)(Object)->QueryPlugIn (#Interface, VERSION_##Interface)
+  (Interface *)(Object)->QueryPlugin (#Interface, VERSION_##Interface)
 
 /**
  * Find a plugin by his functionality ID. First the plugin with requested
@@ -126,7 +126,7 @@
  * for some basic interface, say iBase or iPlugin.
  */
 #define CS_QUERY_PLUGIN_ID(Object,FuncID,Interface)			\
-  (Interface *)(Object)->QueryPlugIn (FuncID, #Interface, VERSION_##Interface)
+  (Interface *)(Object)->QueryPlugin (FuncID, #Interface, VERSION_##Interface)
 
 /**
  * Find a plugin by his class ID and functionality ID. First the plugin
@@ -139,7 +139,7 @@
  * say iBase or iPlugin.
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,FuncID,Interface)			\
-  (Interface *)(Object)->QueryPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
+  (Interface *)(Object)->QueryPlugin (ClassID, FuncID, #Interface, VERSION_##Interface)
 
 /**
  * Tell system driver to load a plugin.
@@ -150,14 +150,14 @@
  * `Interface' is a interface name (iGraphics2D, iVFS and so on).
  */
 #define CS_LOAD_PLUGIN(Object,ClassID,FuncID,Interface)			\
-  (Interface *)(Object)->LoadPlugIn (ClassID, FuncID, #Interface, VERSION_##Interface)
+  (Interface *)(Object)->LoadPlugin (ClassID, FuncID, #Interface, VERSION_##Interface)
 
 /**
  * Same as CS_LOAD_PLUGIN but don't bother asking for a interface.
  * This is useful for unconditionally loading plugins.
  */
 #define _CS_LOAD_PLUGIN(Object,ClassID,FuncID)				\
-  (Object)->LoadPlugIn (ClassID, FuncID, NULL, 0)
+  (Object)->LoadPlugin (ClassID, FuncID, NULL, 0)
 
 struct iPlugin;
 struct iVFS;
@@ -293,23 +293,23 @@ struct iSystem : public iBase
   //---------------------------- Plug-in manager -----------------------------//
 
   /// Load a plugin and initialize it
-  virtual iBase *LoadPlugIn (const char *iClassID, const char *iFuncID,
+  virtual iBase *LoadPlugin (const char *iClassID, const char *iFuncID,
     const char *iInterface = NULL, int iVersion = 0) = 0;
   /// Get first of the loaded plugins that supports given interface ID
-  virtual iBase *QueryPlugIn (const char *iInterface, int iVersion) = 0;
+  virtual iBase *QueryPlugin (const char *iInterface, int iVersion) = 0;
   /// Find a plugin given his functionality ID
-  virtual iBase *QueryPlugIn (const char *iFuncID, const char *iInterface, int iVersion) = 0;
+  virtual iBase *QueryPlugin (const char *iFuncID, const char *iInterface, int iVersion) = 0;
   /// Find a plugin given his class ID and functionality ID
-  virtual iBase *QueryPlugIn (const char* iClassID, const char *iFuncID, const char *iInterface, int iVersion) = 0;
+  virtual iBase *QueryPlugin (const char* iClassID, const char *iFuncID, const char *iInterface, int iVersion) = 0;
   /// Remove a plugin from system driver's plugin list
-  virtual bool UnloadPlugIn (iPlugin *iObject) = 0;
+  virtual bool UnloadPlugin (iPlugin *iObject) = 0;
   /// Register a object that implements the iPlugin interface as a plugin
-  virtual bool RegisterPlugIn (const char *iClassID, const char *iFuncID,
+  virtual bool RegisterPlugin (const char *iClassID, const char *iFuncID,
     iPlugin *iObject) = 0;
   /// Get the number of loaded plugins in the plugin manager.
-  virtual int GetPlugInCount () = 0;
+  virtual int GetPluginCount () = 0;
   /// Get the specified plugin from the plugin manager.
-  virtual iBase* GetPlugIn (int idx) = 0;
+  virtual iBase* GetPlugin (int idx) = 0;
 
   //----------------------- Configuration file interface ---------------------//
 

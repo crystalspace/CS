@@ -696,11 +696,11 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "plugins"))
   {
-    int num = Sys->GetPlugInCount ();
+    int num = Sys->GetPluginCount ();
     int i;
     for (i = 0 ; i < num ; i++)
     {
-      iBase* plugin = Sys->GetPlugIn (i);
+      iBase* plugin = Sys->GetPlugin (i);
       iFactory* fact = SCF_QUERY_INTERFACE (plugin, iFactory);
       CsPrintf (CS_MSG_CONSOLE, "%d: %s\n", i, fact->QueryDescription ());
       fact->DecRef ();
@@ -712,11 +712,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       int idx;
       sscanf (arg, "%d", &idx);
-      if (idx < 0 || idx >= Sys->GetPlugInCount ())
+      if (idx < 0 || idx >= Sys->GetPluginCount ())
 	CsPrintf (CS_MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
       else
       {
-        iBase* plugin = Sys->GetPlugIn (idx);
+        iBase* plugin = Sys->GetPlugin (idx);
         iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
 	if (!config)
 	  CsPrintf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
@@ -763,11 +763,11 @@ bool CommandHandler (const char *cmd, const char *arg)
       char val[256];
       int idx;
       csScanStr (arg, "%d,%s,%s", &idx, name, val);
-      if (idx < 0 || idx >= Sys->GetPlugInCount ())
+      if (idx < 0 || idx >= Sys->GetPluginCount ())
 	CsPrintf (CS_MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
       else
       {
-        iBase* plugin = Sys->GetPlugIn (idx);
+        iBase* plugin = Sys->GetPlugin (idx);
 	SetConfigOption (plugin, name, val);
       }
     }

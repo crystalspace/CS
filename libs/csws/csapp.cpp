@@ -126,7 +126,7 @@ csApp::~csApp ()
     delete mi;
   }
 
-  System->UnloadPlugIn (scfiPlugin);
+  System->UnloadPlugin (scfiPlugin);
 
   // Delete all children prior to shutting down the system
   DeleteAll ();
@@ -156,7 +156,7 @@ csApp::~csApp ()
 
 bool csApp::Initialize ()
 {
-  if (!System->RegisterPlugIn ("crystalspace.windowing.system", "CSWS", scfiPlugin))
+  if (!System->RegisterPlugin ("crystalspace.windowing.system", "CSWS", scfiPlugin))
     return false;
 
   // Create the graphics pipeline
