@@ -62,7 +62,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 3, 0);
+SCF_VERSION (iThingState, 0, 3, 1);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -282,6 +282,16 @@ struct iThingState : public iBase
    * Gets the normals.
    */
   virtual csVector3* GetNormals () = 0;
+
+  /**
+   * Prepare the thing to be ready for use. Normally this doesn't have
+   * to be called as the engine will call this function automatically
+   * as soon as the object is rendered. However, to avoid the (sometimes long)
+   * setup time for an object while walking around an application can choose
+   * to call this function manually in order to increase load time but
+   * decrease the time need to setup things later.
+   */
+  virtual void Prepare () = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 1, 1);

@@ -18,6 +18,13 @@ The history order is reversed so that new features are at the top.
 	  to 0 and then use UnsafeAdd(csRGBpixel) instead.
 	- The fix above may fix some issues with wrong lightmaps after
 	  a pseudo-dynamic light changed intensity.
+	- Added iThingState->Prepare(). This function will prepare the thing
+	  to be ready for use. Normally this doesn't have to be called as the
+	  engine will call this function automatically as soon as the object
+	  is rendered. However, to avoid the (sometimes long) setup time for
+	  an object while walking around an application can choose to call
+	  this function manually in order to increase load time but decrease
+	  the time need to setup things later.
 2-Mar-2003
         - Rudolf Potucek updated makefiles in the apps/ directory to 
 	  remove vpath and generate object files in individual 

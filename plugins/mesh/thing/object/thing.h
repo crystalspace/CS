@@ -1103,6 +1103,14 @@ public:
     {
       return scfParent->GetNormals ();
     }
+    
+    /// Prepare.
+    virtual void Prepare ()
+    {
+      scfParent->Prepare ();
+      if (scfParent->flags.Check (CS_THING_FASTMESH))
+        scfParent->PreparePolygonBuffer ();
+    }
   } scfiThingState;
   friend struct ThingState;
 
