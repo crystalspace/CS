@@ -231,7 +231,18 @@ awsListBox::Execute(char *action, iAwsParmList &parmlist)
       parmlist.GetInt(buf, &(row->cols[i].txt_align));
     }
 
-    rows.Push(row);
+    // Add the item
+    if (row->parent) 
+    {
+      if (row->parent->children==NULL)
+        row->parent->children = new awsListRowVector();
+
+      row->parent->children->Push(row);
+    }
+    else rows.Push(row);
+
+    // Pass back the id of this row, in case they want it.
+    parmlist.AddInt("id", (int)row);
   }
   return false;
 }
@@ -450,30 +461,73 @@ awsListBox::OnDraw(csRect clip)
     x=startx;
     awsListRow *row = (awsListRow *)rows[j];
 
-    int ith=row->GetHeight(WindowManager()->GetPrefMgr(), ncolumns);
+    if (DrawItemsRecursively(row, x, y, border, false))
+      break;
+        
+  } // end for j (number of rows)
+}
 
-    for(i=0; i<ncolumns; ++i)
+bool
+awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, bool child)
+{
+  iGraphics2D *g2d = WindowManager()->G2D();
+  iGraphics3D *g3d = WindowManager()->G3D();
+
+  int ith=row->GetHeight(WindowManager()->GetPrefMgr(), ncolumns);
+  int i;
+
+  int tbh=0, tbw=0;
+  int orgx=x;
+
+  // Find out if we need to leave now.
+  if (y+ith > Frame().ymax) return true;
+
+  // Draw tree box if needed
+  if (row->children)
+  {
+    tree_expanded->GetOriginalDimensions(tbw, tbh);
+    g3d->DrawPixmap(tree_expanded, x+2, y, tbw, tbh, 0,0, tbw, tbh);
+  }
+
+  // Draw child lines if needed and figure out where to draw stuff at.
+  if (child)
+  {
+    tree_expanded->GetOriginalDimensions(tbw, tbh);
+    g3d->DrawPixmap(tree_vline, x+2+tbw, y, tbw, ith+2, 0,0, tbw, tbh);    
+    g3d->DrawPixmap(tree_hline, x+2+tbw, y, tbw, tbh, 0,0, tbw, tbh);
+  }
+
+  // Draw columns
+  for(i=0; i<ncolumns; ++i)
     {
+      int tw=0, th=0, tx, ty, mcc;
+      int cw;
+
+      int iw=0, ih=0; // stateful image width and height
+      int iws=0;      // stateful image spacer
+
+      iTextureHandle *si=0; // stateful image
+
+      // Text to truncate
+      scfString tmp(row->cols[i].text->GetData());
+        
+      // Get column width
+      if (i==ncolumns-1)
+        cw = Frame().xmax-x-border;
+      else if (i==0 && (child || row->children))
+        cw = columns[i].width-tbw;
+      else
+        cw = columns[i].width;
+
+      // If this has state, get the size of the state image
+      if (row->cols[i].has_state)
+        tree_chke->GetOriginalDimensions(iw, ih);
+
+      // Get the size of the text and truncate it
       if (row->cols[i].text)
       {
-        int tw, th, tx, ty, mcc;
-        int cw;
-
-        int iw=0, ih=0; // stateful image width and height
-        int iws=0;      // stateful image spacer
-
-        if (i==ncolumns-1)
-          cw = Frame().xmax-x-border;
-        else
-          cw = columns[i].width;
-
-        // If this has state, fix it up.
-        if (row->cols[i].has_state)
-          tree_chke->GetOriginalDimensions(iw, ih);
-                   
         mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(row->cols[i].text->GetData(), cw-5-iw);
-
-        scfString tmp(row->cols[i].text->GetData());
+        
         tmp.Truncate(mcc);
 
         // Get the size of the text
@@ -481,24 +535,31 @@ awsListBox::OnDraw(csRect clip)
 
         // Calculate the center
         ty = (ith>>1) - (th>>1);
+      } // end if text is good
 
-        switch(row->cols[i].txt_align)
-        {
-          case alignRight:
-            tx = cw-tw-2;
-            iws=-iw+2;
-            break;
+      // Perform alignment of text/state
+      switch(row->cols[i].txt_align)
+      {
+        case alignRight:
+          tx = cw-tw-2;
+          iws=-iw+2;
+          break;
 
-          case alignCenter:
-            tx = (cw>>1) -  ((tw+iw)>>1);
-            break;
+        case alignCenter:
+          tx = (cw>>1) -  ((tw+iw)>>1);
+          break;
 
-          default:
-            tx = 2;
-            iws = iw+2; 
-            break;
-        }
+        default:
+          if (row->children && i==0)   tx = 2+tbw;
+          else if (child && i==0)      tx = 2+(tbw<<1);
+          else                         tx = 2;
 
+          iws = iw+2; 
+          break;
+      } // end switch text alignment
+
+      if (row->cols[i].text)
+      {
         // Draw the text
         g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
                     x+tx+iws,
@@ -506,25 +567,48 @@ awsListBox::OnDraw(csRect clip)
                     WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
                     -1,
                     tmp.GetData());
+      } // end if text is good
 
-        if (row->cols[i].has_state)
+      // Draw state if there is some
+      if (row->cols[i].has_state)
+      {
+        if (row->cols[i].group_state)
         {
-          if (row->cols[i].state)
-            g3d->DrawPixmap(tree_chkf, x+tx, y, iw, ih, 0,0, iw, ih);
-          else
-            g3d->DrawPixmap(tree_chke, x+tx, y, iw, ih, 0,0, iw, ih);
+          if (row->cols[i].state) si=tree_grpf;
+          else                    si=tree_grpe;
         }
-       }
+        else
+        {
+          if (row->cols[i].state) si=tree_chkf;
+          else                    si=tree_chke;
+        }
 
-        // Next column
-        x+=columns[i].width;
+        g3d->DrawPixmap(si, x+tx, y, iw, ih, 0,0, iw, ih);
+      } // end if stateful
+
+      // Next column
+      x+=columns[i].width;
 
     } // end for i (number of cols)
 
     // next row.
     y+=ith+2;
 
-  } // end for j (number of rows)
+    // Draw children
+    if (row->children)
+    {
+      for(i=0; i<row->children->Length(); ++i)
+      {
+        int cx=orgx;
+        awsListRow *newrow = (awsListRow *)row->children->Get(i);
+
+        if (DrawItemsRecursively(newrow, cx, y, border, true))
+          return true;
+      }
+    }
+
+  // false means that we've not yet hit the bottom of the barrel.
+  return false;
 }
 
 bool 

@@ -167,6 +167,7 @@ class awsListBox : public awsComponent
 
 protected:
    void ClearGroup();
+   bool DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, bool child);
    
 public:
     awsListBox();
