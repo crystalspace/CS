@@ -368,16 +368,16 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
       prev = cur;
     }
 
-    __rect v;
-    v.left = visible.left;
-    v.right = sub_x;
-    v.top = visible.top;
-    v.bottom = visible.bottom;
-    poly_fill (n2 [0], p2 [0], v);
+    __rect u;
+    u.left = visible.left;
+    u.right = sub_x;
+    u.top = visible.top;
+    u.bottom = visible.bottom;
+    poly_fill (n2 [0], p2 [0], u);
 
-    v.left = sub_x;
-    v.right = visible.right;
-    poly_fill (n2[1], p2[1], v);
+    u.left = sub_x;
+    u.right = visible.right;
+    poly_fill (n2[1], p2[1], u);
   }
   else
   {
@@ -413,16 +413,16 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
       prev = cur;
     }
 
-    __rect v;
-    v.left = visible.left;
-    v.right = visible.right;
-    v.top = visible.top;
-    v.bottom = sub_y;
-    poly_fill (n2[0], p2[0], v);
+    __rect u;
+    u.left = visible.left;
+    u.right = visible.right;
+    u.top = visible.top;
+    u.bottom = sub_y;
+    poly_fill (n2[0], p2[0], u);
 
-    v.top = sub_y;
-    v.bottom = visible.bottom;
-    poly_fill (n2 [1], p2 [1], v);
+    u.top = sub_y;
+    u.bottom = visible.bottom;
+    poly_fill (n2 [1], p2 [1], u);
   }
 
   depth--;
