@@ -19,8 +19,6 @@
 
 #include "CGDriver2D.h"
 
-#include "OSXDelegate2D_CGBlit.h"
-
 #include <ApplicationServices/ApplicationServices.h>
 
 
@@ -38,6 +36,9 @@ SCF_IMPLEMENT_FACTORY(CGDriver2D)
 // Construct a graphics object for drawing
 CGDriver2D::CGDriver2D(iBase *p) : csGraphics2D(p), OSXDriver2D(this)
 {
+    prov = 0;
+    image = 0;
+    colorSpace = 0;
 }
 
 
@@ -46,6 +47,12 @@ CGDriver2D::CGDriver2D(iBase *p) : csGraphics2D(p), OSXDriver2D(this)
 CGDriver2D::~CGDriver2D()
 {
     Close();		// Just in case it hasn't been called
+
+    if (prov != 0)
+    {
+        CGDataProviderRelease(prov);
+        CGImageRelease(image);            
+    }
 }
 
 
@@ -121,7 +128,7 @@ void CGDriver2D::Close()
 // Set window title
 void CGDriver2D::SetTitle(char *title)
 {
-    OSXDelegate2D_setTitle(delegate, title);
+    OSXDriver2D::SetTitle(title);
     csGraphics2D::SetTitle(title);
 }
 
@@ -130,24 +137,43 @@ void CGDriver2D::SetTitle(char *title)
 // Flip video page (or dump to framebuffer)
 void CGDriver2D::Print(csRect const* area)
 {
-    OSXDelegate2D_blitToWindow(delegate, Memory, Width, Height, Depth);
-}
+    NSView *contentView = [window contentView];
 
+    if (window == nil)
+        return;
 
-// SetMousePosition
-// Set the mouse position
-bool CGDriver2D::SetMousePosition(int x, int y)
-{
-    OSXDelegate2D_setMousePosition(delegate, CGPointMake(x, y));
-    return true;
-}
+    if (colorSpace == 0)
+        colorSpace = CGColorSpaceCreateDeviceRGB();
 
+    if ([contentView lockFocusIfCanDraw] == YES)
+    {
+        if ((prov == 0) || 
+            (Width != rect.size.width) || (Height != rect.size.height))
+        {
+            size_t bytesPerPixel = Depth / 8;
+            size_t bitsPerComponent = (Depth == 32) ? 8 : 5;
+            size_t bytesPerRow = bytesPerPixel * Width;
+            size_t bufferSize = Height * bytesPerRow;
 
-// SetMouseCursor
-// Set the mouse cursor
-bool CGDriver2D::SetMouseCursor(csMouseCursorID cursor)
-{
-    return OSXDelegate2D_setMouseCursor(delegate, cursor);
+            if (prov != 0)
+            {
+                CGDataProviderRelease(prov);
+                CGImageRelease(image);            
+            }
+
+            prov = CGDataProviderCreateWithData(0, Memory, bufferSize, 0);
+            image = CGImageCreate(Width, Height, bitsPerComponent, Depth, 
+                                bytesPerRow, colorSpace, kCGImageAlphaNoneSkipFirst, 
+                                prov, 0, NO, kCGRenderingIntentDefault);
+            rect = CGRectMake(0, 0, Width, Height);
+        }
+        
+        CGContextDrawImage((CGContextRef) [[NSGraphicsContext currentContext] graphicsPort], 
+                            rect, image);
+
+        [window flushWindow];
+        [contentView unlockFocus];
+    }
 }
 
 

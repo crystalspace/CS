@@ -1,16 +1,18 @@
 //
-//  OSXView.m
+//  OSXCanvasView.m
 //  
 //
 //  Created by Matt Reda on Mon Feb 11 2002.
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
 //
 
-#import "OSXView.h"
-#import "OSXDelegate2D.h"
+#include "cssysdef.h"
+
+#import "OSXCanvasView.h"
+#import "OSXDriver2D.h"
 
 
-@implementation OSXView
+@implementation OSXCanvasView
 
 // initWithFrame
 // Initialize object and superclass
@@ -19,9 +21,7 @@
     self = [super initWithFrame:frame];
     
     if (self != nil)
-    {
-        delegate = nil;
-    };
+        driver = nil;
     
     return self;
 }
@@ -31,16 +31,13 @@
 // Deallocate object and instance variables
 - (void) dealloc
 {
-    [delegate release];
     [super dealloc];
 }
 
-// Set the delegate
-- (void) setDelegate:(OSXDelegate2D *) inDelegate
+// Set the corrsponding driver
+- (void) setDriver:(OSXDriver2D *) inDriver
 {
-    [inDelegate retain];
-    [delegate release];
-    delegate = inDelegate;
+    driver = inDriver;
 }
 
 
@@ -56,67 +53,67 @@
 // All these methods just relay the event to the assistant
 - (void) keyDown:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) keyUp:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) flagsChanged:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) mouseMoved:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) mouseDown:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) mouseUp:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) mouseDragged:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) rightMouseDown:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) rightMouseUp:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) rightMouseDragged:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) otherMouseDown:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) otherMouseUp:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 - (void) otherMouseDragged:(NSEvent *) ev
 {
-    [delegate dispatchEvent:ev forView:self];
+    driver->DispatchEvent(ev, self);
 }
 
 @end

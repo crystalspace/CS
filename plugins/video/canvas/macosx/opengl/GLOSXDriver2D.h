@@ -12,15 +12,10 @@
 
 #include "video/canvas/macosx/common/OSXDriver2D.h"
 
-
-#if defined(__cplusplus)
-
 #include "csutil/macosx/OSXAssistant.h"
 #include "csutil/scf.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
 #include "video/canvas/openglcommon/iogl.h"
-
-#include "OSXDelegate2D_OpenGL.h"
 
 #include <CoreFoundation/CoreFoundation.h>
 
@@ -47,17 +42,11 @@ public:
     // Close drawing operations
     virtual void Close();
 
-    // Set window title
-    virtual void SetTitle(char *title);
+    // Set the window's title
+    virtual void SetTitle(char *newTitle);
 
     // Flip video page (or dump to framebuffer)
     virtual void Print(csRect const* area = 0);
-
-    // Set mouse position
-    virtual bool SetMousePosition(int x, int y);
-
-    // Set the mouse cursor
-    virtual bool SetMouseCursor(csMouseCursorID cursor);
 
     // Enable/disable canvas resize
     virtual void AllowResize(bool allow);
@@ -92,12 +81,15 @@ protected:
     // Set up the function pointers for drawing based on the current Depth
     virtual void SetupDrawingFunctions();
 
+    // Create an OpenGL contexts
+    NSOpenGLContext *createOpenGLContext(int depth, CGDirectDisplayID display);
+    
+    // Bind the given context to our window
+    void updateOpenGLContext();
+
     // OpenGL context for drawing
-    CGLContextObj context;
+    NSOpenGLContext *context;
 };
 
-
-
-#endif // __cplusplus
 
 #endif // __CS_GLOSXDRIVER2D_H__

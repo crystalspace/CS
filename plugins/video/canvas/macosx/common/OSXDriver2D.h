@@ -7,16 +7,8 @@
 //
 
 
-// This code must be callable from the ObjC delegate.  Since that uses the
-// standard C compiler, it doesn't like C++ classes, so we create a C API to
-// some functions of this object
-
 #ifndef __CS_OSXDRIVER2D_H__
 #define __CS_OSXDRIVER2D_H__
-
-#if defined(__cplusplus)
-
-#include "OSXDelegate2D.h"
 
 #include "csgeom/csrect.h"
 #include "csutil/macosx/OSXAssistant.h"
@@ -24,9 +16,11 @@
 #include "ivideo/graph2d.h"
 #include "plugins/video/canvas/common/graph2d.h"
 
-#include <CoreFoundation/CoreFoundation.h>
-#include <ApplicationServices/ApplicationServices.h>
+#import <Cocoa/Cocoa.h>
+#import <CoreFoundation/CoreFoundation.h>
 
+@class OSXDelegate2D;
+@class OSXCanvasView;
 
 // Table for storing gamma values
 struct GammaTable
@@ -65,12 +59,13 @@ public:
   virtual bool HandleEvent(iEvent &ev);
 
   // Dispatch an event to the assistant
-  inline void DispatchEvent(OSXEvent ev, OSXView view);
+  void DispatchEvent(NSEvent *ev, OSXCanvasView *view);
 
   // Show/Hide the mouse
   virtual void HideMouse();
   virtual void ShowMouse();
-
+  bool MouseIsHidden();
+  
   // Event handler
   struct EventHandler : public iEventHandler
   {
@@ -118,6 +113,19 @@ protected:
   // Choose which display to use
   void ChooseDisplay();
 
+  // Set the window's title
+  void SetTitle(char *newTitle);
+
+  // Set the mouse position
+  bool SetMousePosition(int x, int y);
+
+  // Set the mouse cursor
+  bool OSXDriver2D::SetMouseCursor(csMouseCursorID cursor);
+  
+  // Create the window with the specified properties
+  BOOL openWindow(char *winTitle, int w, int h, int d, BOOL fs, 
+                  CGDirectDisplayID display, int screen);
+  
   CFDictionaryRef originalMode;		// Original display mode
   GammaTable originalGamma;		// Original gamma values
   bool inFullscreenMode;		// In full-screen mode
@@ -127,30 +135,26 @@ protected:
   int origWidth, origHeight;		// Original dimensions kept so they can
 					// be restored when switching modes
 
-  OSXDelegate2D delegate;		// Delegate for ObjC stuff
+  OSXDelegate2D *delegate;		// Delegate
   csGraphics2D *canvas;			// Canvas (parent class)
 
   csRef<iOSXAssistant> assistant;	// Assistant for dispatching events
   iObjectRegistry *objectReg;		// Object registry
+  
+  BOOL hideMouse;                       // YES if mouse is not visible
+
+  // Window - created even in fullscreen mode to get events (but with a different style)
+  // Window can have one of two titles - Paused or active
+  NSWindow *window;
+  int style;
+  NSString *title, *pausedTitle;
+
+  // Is window paused (out of focus, etc)
+  BOOL isPaused;
+
+  // Last processed event type.
+  int lastEventType;
+  
 };
-
-#else // __cplusplus
-
-#define DRV2D_FUNC(ret, func) __private_extern__ inline ret OSXDriver2D_##func
-
-typedef void *OSXDriver2D;
-typedef void *OSXEventHandle;
-typedef void *OSXViewHandle;
-
-// C API to driver class
-DRV2D_FUNC(void, DispatchEvent)(OSXDriver2D driver, OSXEventHandle ev,
-  OSXViewHandle view);
-DRV2D_FUNC(bool, Resize)(OSXDriver2D driver, int w, int h);
-DRV2D_FUNC(void, HideMouse)(OSXDriver2D driver);
-DRV2D_FUNC(void, ShowMouse)(OSXDriver2D driver);
-
-#undef DRV2D_FUNC
-
-#endif // __cplusplus
 
 #endif // __CS_OSXDRIVER2D_H__

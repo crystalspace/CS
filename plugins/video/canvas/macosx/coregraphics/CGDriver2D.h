@@ -18,8 +18,6 @@
 #include "video/canvas/macosx/common/OSXDriver2D.h"
 
 
-#if defined(__cplusplus)
-
 #include "csutil/macosx/OSXAssistant.h"
 #include "video/canvas/common/graph2d.h"
 
@@ -50,12 +48,6 @@ public:
     // Flip video page (or dump to framebuffer)
     virtual void Print(csRect const* area = 0);
 
-    // Set mouse position
-    virtual bool SetMousePosition(int x, int y);
-
-    // Set the mouse cursor
-    virtual bool SetMouseCursor(csMouseCursorID cursor);
-
     // Enable/disable canvas resize
     virtual void AllowResize(bool allow);
 
@@ -66,8 +58,12 @@ protected:
 
     // Set up the function pointers for drawing based on the current Depth
     virtual void SetupDrawingFunctions();
+    
+    // CoreGraphics data used for displaying a frame
+    CGDataProviderRef prov;
+    CGImageRef image;
+    CGRect rect;
+    CGColorSpaceRef colorSpace;
 };
-
-#endif // __cplusplus
 
 #endif // __CS_CGDRIVER2D_H__

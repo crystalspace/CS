@@ -5,7 +5,7 @@ if $(TARGET.OS) = "MACOS_X"
 Help cgdriver2d : "Crystal Space MacOS/X CoreGraphics 2D driver" ;
 
 Plugin cgdriver2d
-	: [ Wildcard *.cpp *.m *.h ]
+	: [ Wildcard *.c *.cpp *.C *.m *.mm *.M *.h ]
 ;
 LinkWith cgdriver2d : canvascommon osxcanvascommon csutil ;
 

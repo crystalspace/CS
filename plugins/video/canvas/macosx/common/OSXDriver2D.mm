@@ -16,7 +16,10 @@
 #include "csver.h"
 #include "csutil/event.h"
 
+#include "OSXWindow.h"
+#include "OSXCanvasView.h"
 #include "OSXDriver2D.h"
+#include "OSXDelegate2D.h"
 
 #include <sys/time.h>
 
@@ -39,7 +42,13 @@ OSXDriver2D::OSXDriver2D(csGraphics2D *inCanvas)
     origHeight = 0;
     display = kCGDirectMainDisplay;
 
-    delegate = OSXDelegate2D_new(this);
+    window = nil;
+    title = nil;
+    pausedTitle = nil;
+    isPaused = NO;
+    lastEventType = NSMouseMoved;
+
+    delegate = [[OSXDelegate2D alloc] initWithDriver:this];
 }
 
 
@@ -57,7 +66,7 @@ OSXDriver2D::~OSXDriver2D()
 
     Close();	// Just in case it hasn't been called
 
-    OSXDelegate2D_delete(delegate);
+    [delegate release];
 }
 
 
@@ -117,9 +126,8 @@ bool OSXDriver2D::Open()
             return false;
 
     // Create window
-    if (OSXDelegate2D_openWindow(delegate, canvas->win_title,
-	canvas->Width, canvas->Height, canvas->Depth,
-	canvas->FullScreen, display, screen) == false)
+    if (openWindow(canvas->win_title, canvas->Width, canvas->Height, 
+                canvas->Depth, canvas->FullScreen, display, screen) == false)
         return false;
 
     return true;
@@ -131,8 +139,12 @@ bool OSXDriver2D::Open()
 void OSXDriver2D::Close()
 {
     // Close window
-    OSXDelegate2D_closeWindow(delegate);
-
+    if (window != nil)
+    {
+        [delegate stopTrackingMouseInWindow:window];
+        [window release];
+    }
+    
     // If we're in fullscreen mode, get out of it
     if (inFullscreenMode == true)
     {
@@ -153,8 +165,12 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
     {
         if (ev.Command.Code == cscmdFocusChanged)
         {
-            bool shouldPause = !assistant->always_runs();
-            OSXDelegate2D_focusChanged(delegate, ev.Command.Info, shouldPause);
+            isPaused = (!ev.Command.Info && !assistant->always_runs());
+            [window setTitle:(isPaused == YES) ? pausedTitle : title];    
+            if (ev.Command.Info == NO)
+                [delegate stopTrackingMouseInWindow:window];
+            else
+                [delegate startTrackingMouseInWindow:window];
             handled = true;
         }
         if (ev.Command.Code == cscmdCommandLineHelp)
@@ -178,8 +194,9 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
 
 // DispatchEvent
 // Dispatch an event to the assistant
-void OSXDriver2D::DispatchEvent(OSXEvent ev, OSXView view)
+void OSXDriver2D::DispatchEvent(NSEvent *ev, OSXCanvasView *view)
 {
+    lastEventType = [ev type];
     assistant->dispatch_event(ev, view);
 }
 
@@ -197,6 +214,12 @@ void OSXDriver2D::HideMouse()
 void OSXDriver2D::ShowMouse()
 {
     assistant->show_mouse_pointer();
+}
+
+// Return true if mouse is not visible
+bool OSXDriver2D::MouseIsHidden()
+{
+    return hideMouse;
 }
 
 
@@ -288,7 +311,9 @@ bool OSXDriver2D::ToggleFullscreen()
     bool oldAllowResizing = canvas->AllowResizing;
     bool success = true;
 
-    OSXDelegate2D_closeWindow(delegate);
+    [delegate stopTrackingMouseInWindow:window];
+    [window release];
+    window = nil;
 
     if (canvas->FullScreen == true)
     {
@@ -302,16 +327,15 @@ bool OSXDriver2D::ToggleFullscreen()
     canvas->Resize(origWidth, origHeight);
     canvas->AllowResizing = oldAllowResizing;
 
-    if ((success == true) && (canvas->FullScreen == true))
+    if (canvas->FullScreen == true)
     {
         inFullscreenMode = EnterFullscreenMode();
         success = inFullscreenMode;
     }
 
     if (success == true)
-        OSXDelegate2D_openWindow(delegate, canvas->win_title,
-                                canvas->Width, canvas->Height, canvas->Depth, 
-                                canvas->FullScreen, display, screen);
+        openWindow(canvas->win_title, canvas->Width, canvas->Height, 
+                    canvas->Depth, canvas->FullScreen, display, screen);
 
     return success;
 }
@@ -436,35 +460,123 @@ void OSXDriver2D::ChooseDisplay()
     }
 }
 
-
-/// C API to driver class
-#define DRV2D_FUNC(ret, func) __private_extern__ "C" ret OSXDriver2D_##func
-
-typedef void *OSXDriver2DHandle;
-typedef void *OSXEventHandle;
-typedef void *OSXViewHandle;
-
-
-// C API to driver class
-DRV2D_FUNC(void, DispatchEvent)(OSXDriver2DHandle driver, OSXEventHandle ev,
-    OSXViewHandle view)
+// Set the window's title
+void OSXDriver2D::SetTitle(char *newTitle)
 {
-    ((OSXDriver2D *) driver)->DispatchEvent(ev, view);
+    // Release the old titles and construct our new strings
+    [title release];
+    [pausedTitle release];
+    title = [[NSString alloc] initWithCString:newTitle];
+    pausedTitle = [[title stringByAppendingString:@"  [Paused]"] retain];
+
+    // Set the appropriate title
+    [window setTitle:(isPaused == YES) ? pausedTitle : title];    
 }
 
-DRV2D_FUNC(bool, Resize)(OSXDriver2DHandle driver, int w, int h)
+// Set the mouse position
+bool OSXDriver2D::SetMousePosition(int x, int y)
 {
-    return ((OSXDriver2D *) driver)->Resize(w, h);
+    NSPoint windowPoint;
+    CGPoint screenPoint;
+    windowPoint.x = x;
+    windowPoint.y = [[window contentView] frame].size.height - y;
+    windowPoint = [window convertBaseToScreen:windowPoint];
+    screenPoint.x = windowPoint.x;
+    screenPoint.y = [[window screen] frame].size.height - windowPoint.y + 1;
+    CGSetLocalEventsFilterDuringSupressionState(
+	kCGEventFilterMaskPermitAllEvents,
+	kCGEventSupressionStateSupressionInterval);
+    switch (lastEventType)
+    {
+	case NSLeftMouseDown:
+	case NSLeftMouseDragged:
+	    CGPostMouseEvent(screenPoint, YES, 2, YES, NO, nil);
+	    break;
+	case NSRightMouseDown:
+	case NSRightMouseDragged:
+	    CGPostMouseEvent(screenPoint, YES, 2, NO, YES, nil);
+	    break;
+	default:
+	    CGPostMouseEvent(screenPoint, YES, 2, NO, NO, nil);
+	    break;
+    }
+    return true;
 }
 
-DRV2D_FUNC(void, HideMouse)(OSXDriver2DHandle driver)
+
+// Set the mouse cursor
+bool OSXDriver2D::SetMouseCursor(csMouseCursorID cursor)
 {
-    ((OSXDriver2D *) driver)->HideMouse();
+    hideMouse = YES;
+    if (cursor == csmcArrow)
+    {
+        [[NSCursor arrowCursor] set];
+        hideMouse = NO;
+    }
+
+    if (hideMouse == YES)
+        HideMouse();
+    else
+        ShowMouse();
+
+    return !hideMouse;
 }
 
-DRV2D_FUNC(void, ShowMouse)(OSXDriver2DHandle driver)
+
+// Create the window with the specified properties
+BOOL OSXDriver2D::openWindow(char *winTitle, int w, int h, int d, BOOL fs, 
+                              CGDirectDisplayID display, int screen)
 {
-    ((OSXDriver2D *) driver)->ShowMouse();
+    OSXCanvasView *view;
+    NSScreen *scr = [[NSScreen screens] objectAtIndex:screen];
+    NSRect rect = NSZeroRect;
+
+    if (window != nil)
+        return YES;
+
+    // Position window in upper left in fullscreen mode, because although CG will 
+    // switch resolutions, NSScreen does not reflect this change, and I don't think
+    // whatever mechanism NSWindow uses to position itself reflects this change either, 
+    // because putting the rect at 0,0 puts it off the bottom of the screen
+    // Center rect in Windowed mode (using CG to get correct screen dimensions)
+    if (fs == YES)
+        rect = NSMakeRect(0, [scr frame].size.height - h, w - 1, h - 1);
+    else
+    {
+        int dispWidth = CGDisplayPixelsWide(display);
+        int dispHeight = CGDisplayPixelsHigh(display);
+        rect = NSMakeRect((dispWidth - w) / 2, (dispHeight - h) / 2, w - 1, h - 1);
+    }
+
+    // Create window with correct style
+    style = (fs == YES) ? NSBorderlessWindowMask : 
+                        (NSTitledWindowMask | NSResizableWindowMask);
+    window = [[OSXWindow alloc] initWithContentRect:rect styleMask:style
+                backing:NSBackingStoreBuffered defer:NO screen:scr];
+
+    if (window == nil)
+        return NO;
+
+    // Create and add view
+    view = [[OSXCanvasView alloc] initWithFrame:rect];
+    [window setContentView:view];
+    [view release];
+
+    // Set up window stuff
+    if (fs == YES)
+        [window setLevel:CGShieldingWindowLevel()];
+
+    SetTitle(winTitle);
+
+    [window useOptimizedDrawing:YES];
+    [window setDelegate:delegate];
+    [view setDriver:this];
+    [window makeFirstResponder:view];
+    [window makeKeyAndOrderFront:nil];
+
+    // Start tracking mouse
+    [delegate startTrackingMouseInWindow:window];
+
+    return YES;
 }
 
-#undef DRV2D_FUNC

@@ -17,8 +17,6 @@
 #include "video/canvas/common/scrshot.h"
 #include "GLOSXDriver2D.h"
 
-#include <ApplicationServices/ApplicationServices.h>
-
 #define GLOSXDRIVER_REPORTER_ID "crystalspace.canvas.glosx"
 
 // Plugin stuff - create factory functions, etc
@@ -67,8 +65,7 @@ bool GLOSXDriver2D::Initialize(iObjectRegistry *reg)
   // (including things like glString() - the OpenGL renderer was using this
   // before this driver had been Open()'d) When the driver is actually Open()'d
   // all we need to do is bind the context to our window
-  if ((context = OSXDelegate2D_createOpenGLContext(delegate, Depth, display))
-    == 0)
+  if ((context = createOpenGLContext(Depth, display)) == 0)
   {
     fprintf(stderr, "Failed to create OpenGL context\n");
     return false;
@@ -105,7 +102,7 @@ bool GLOSXDriver2D::Open()
 
   // Context was created in initialize, window was created in
   // OSXDriver2D::Open() - bind them
-  OSXDelegate2D_updateOpenGLContext(delegate);
+  updateOpenGLContext();
 
   // Initialize OpenGL base class
   if (csGraphics2DGLCommon::Open() == false)
@@ -127,43 +124,26 @@ void GLOSXDriver2D::Close()
 
   // Close window/context
   OSXDriver2D::Close();
-  CGLClearDrawable(context);
-  CGLDestroyContext(context);
+  [context clearDrawable];
+  [context release];
+  context = nil;
 }
 
 
 // SetTitle
 // Set window title
-void GLOSXDriver2D::SetTitle(char *title)
+void GLOSXDriver2D::SetTitle(char *newTitle)
 {
-  OSXDelegate2D_setTitle(delegate, title);
-  csGraphics2DGLCommon::SetTitle(title);
+  OSXDriver2D::SetTitle(newTitle);
+  csGraphics2DGLCommon::SetTitle(newTitle);
 }
-
 
 // Print
 // Swap OpenGL buffers
 void GLOSXDriver2D::Print(csRect const* area)
 {
-  CGLSetCurrentContext(context);
-  CGLFlushDrawable(context);
-}
-
-
-// SetMousePosition
-// Set the mouse position
-bool GLOSXDriver2D::SetMousePosition(int x, int y)
-{
-  OSXDelegate2D_setMousePosition(delegate, CGPointMake(x, y));
-  return true;
-}
-
-
-// SetMouseCursor
-// Set the mouse cursor
-bool GLOSXDriver2D::SetMouseCursor(csMouseCursorID cursor)
-{
-  return OSXDelegate2D_setMouseCursor(delegate, cursor);
+  [context makeCurrentContext];
+  [context flushBuffer];
 }
 
 
@@ -189,7 +169,7 @@ bool GLOSXDriver2D::ToggleFullscreen()
 {
   bool success = OSXDriver2D::ToggleFullscreen();
   if (success == true)
-    OSXDelegate2D_updateOpenGLContext(delegate);
+    updateOpenGLContext();
   return success;
 }
 
@@ -208,4 +188,66 @@ void GLOSXDriver2D::SetupDrawingFunctions()
     _DrawPixel = DrawPixel16;
     _GetPixelAt = GetPixelAt16;
   }
+}
+
+// Create an OpenGL contexts
+NSOpenGLContext *GLOSXDriver2D::createOpenGLContext(int depth, 
+                                                    CGDirectDisplayID display)
+{
+    NSOpenGLPixelFormat *pixelFormat;
+
+    // Attributes for OpenGL contexts
+    NSOpenGLPixelFormatAttribute attribs[] = {
+        NSOpenGLPFAWindow, NSOpenGLPFADoubleBuffer, NSOpenGLPFAAccelerated,
+        NSOpenGLPFAColorSize, (NSOpenGLPixelFormatAttribute) depth, 
+        NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute) depthBits,
+#ifndef CS_USE_NEW_RENDERER
+        NSOpenGLPFAStencilSize, (NSOpenGLPixelFormatAttribute) 1,
+#else
+        NSOpenGLPFAStencilSize, (NSOpenGLPixelFormatAttribute) 8,
+#endif
+        NSOpenGLPFAScreenMask, 
+        (NSOpenGLPixelFormatAttribute) CGDisplayIDToOpenGLDisplayMask(display), 
+        (NSOpenGLPixelFormatAttribute) nil
+    };
+
+    // Create a pixel format
+    pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
+    if (pixelFormat == nil)
+        return 0;
+
+    // Create a GL context
+    context = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
+    [pixelFormat release];
+    if (context == nil)
+        return 0;
+
+    // Need to know when window is resized so we can update the OpenGL context
+    if (window != nil)
+    {
+        [[NSNotificationCenter defaultCenter] addObserver:delegate 
+                selector:@selector(windowResized:)
+                name:NSWindowDidResizeNotification object:window];
+
+        // Bind context
+        [context setView:[window contentView]];
+    }
+
+    // Make the context we created be the current GL context
+    [context makeCurrentContext];
+
+    return context;
+}
+
+// Bind the given context to our window
+void GLOSXDriver2D::updateOpenGLContext()
+{
+    // Listen for resizes on new window
+    [[NSNotificationCenter defaultCenter] addObserver:delegate 
+                            selector:@selector(windowResized:)
+                            name:NSWindowDidResizeNotification object:window];
+
+    [context setView:[window contentView]];
+    [context makeCurrentContext];
+    [context update];
 }

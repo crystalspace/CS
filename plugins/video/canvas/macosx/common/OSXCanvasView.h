@@ -1,5 +1,5 @@
 //
-//  OSXView.h
+//  OSXCanvasView.h
 //  
 //
 //  Created by Matt Reda on Mon Feb 11 2002.
@@ -8,13 +8,13 @@
 
 #import <AppKit/AppKit.h>
 
-@class OSXDelegate2D;
+class OSXDriver2D;
 
 
-@interface OSXView : NSView
+@interface OSXCanvasView : NSView
 {
     // Delegate passes along events
-    OSXDelegate2D *delegate;
+    OSXDriver2D *driver;
 }
 
 // Initialize object
@@ -23,8 +23,8 @@
 // Deallocate object
 - (void) dealloc;
 
-// Set the delegate
-- (void) setDelegate:(OSXDelegate2D *) inDelegate;
+// Set the driver
+- (void) setDriver:(OSXDriver2D *) driver;
 
 // Returns YES to indicate that it will become the first responder
 - (BOOL) acceptsFirstResponder;
