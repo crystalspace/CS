@@ -1091,6 +1091,7 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   thing->SetName (name);
   thing->GetMovable ().SetSector (room);
   float dx = 1, dy = 3, dz = .3;
+  float border = 0.3; // width of border around the portal
 
   // bottom
   csPolygon3D* p;
@@ -1153,13 +1154,108 @@ csThing* CreatePortalThing (const char* name, csSector* room,
       p->Vobj (1), csVector2 (0.25, 0.75),
       p->Vobj (2), csVector2 (0.25, 0.25));
 
-  // front
+  // front border
+  // border top
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
-  p->AddVertex (dx, 0, -dz);
-  p->AddVertex (-dx, 0, -dz);
+  p->AddVertex (-dx+border, dy, -dz);
+  p->AddVertex (dx-border, dy, -dz);
+  p->AddVertex (dx-border, dy-border, -dz);
+  p->AddVertex (-dx+border, dy-border, -dz);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0.125, 0.125),
+      p->Vobj (1), csVector2 (0.875, 0.125),
+      p->Vobj (2), csVector2 (0.875, 0.0));
+  // border right
+  p = thing->NewPolygon (tm);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (dx-border, dy-border, -dz);
+  p->AddVertex (dx, dy-border, -dz);
+  p->AddVertex (dx, border, -dz);
+  p->AddVertex (dx-border, border, -dz);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (1.0, 0.125),
+      p->Vobj (1), csVector2 (0.875, 0.125),
+      p->Vobj (2), csVector2 (0.875, 0.875));
+  // border bottom
+  p = thing->NewPolygon (tm);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (-dx+border, border, -dz);
+  p->AddVertex (+dx-border, border, -dz);
+  p->AddVertex (+dx-border, 0.0, -dz);
+  p->AddVertex (-dx+border, 0.0, -dz);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0.125, 1.0),
+      p->Vobj (1), csVector2 (0.875, 1.0),
+      p->Vobj (2), csVector2 (0.875, 0.875));
+  // border left
+  p = thing->NewPolygon (tm);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (-dx, dy-border, -dz);
+  p->AddVertex (-dx+border, dy-border, -dz);
+  p->AddVertex (-dx+border, border, -dz);
+  p->AddVertex (-dx, border, -dz);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0.125, 0.125),
+      p->Vobj (1), csVector2 (0.0, 0.125),
+      p->Vobj (2), csVector2 (0.0, 0.875));
+  // border topleft
+  p = thing->NewPolygon (tm);
+  p->flags.Reset (CS_POLY_COLLDET);
   p->AddVertex (-dx, dy, -dz);
+  p->AddVertex (-dx+border, dy, -dz);
+  p->AddVertex (-dx+border, dy-border, -dz);
+  p->AddVertex (-dx, dy-border, -dz);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0.125, 0.125),
+      p->Vobj (1), csVector2 (0.0, 0.125),
+      p->Vobj (2), csVector2 (0.0, 0.0));
+  // border topright
+  p = thing->NewPolygon (tm);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (dx-border, dy, -dz);
   p->AddVertex (dx, dy, -dz);
+  p->AddVertex (dx, dy-border, -dz);
+  p->AddVertex (dx-border, dy-border, -dz);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (1.0, 0.125),
+      p->Vobj (1), csVector2 (0.875, 0.125),
+      p->Vobj (2), csVector2 (0.875, 0.0));
+  // border botright
+  p = thing->NewPolygon (tm);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (dx-border, border, -dz);
+  p->AddVertex (dx, border, -dz);
+  p->AddVertex (dx, 0.0, -dz);
+  p->AddVertex (dx-border, 0.0, -dz);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (1.0, 1.0),
+      p->Vobj (1), csVector2 (0.875, 1.0),
+      p->Vobj (2), csVector2 (0.875, 0.875));
+  // border botleft
+  p = thing->NewPolygon (tm);
+  p->flags.Reset (CS_POLY_COLLDET);
+  p->AddVertex (-dx, border, -dz);
+  p->AddVertex (-dx+border, border, -dz);
+  p->AddVertex (-dx+border, 0.0, -dz);
+  p->AddVertex (-dx, 0.0, -dz);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0.125, 1.0),
+      p->Vobj (1), csVector2 (0.0, 1.0),
+      p->Vobj (2), csVector2 (0.0, 0.875));
+
+  // front - the portal
+  p = thing->NewPolygon (tm);
+  p->flags.Reset (CS_POLY_COLLDET);
+  // old
+  //p->AddVertex (dx, 0, -dz);
+  //p->AddVertex (-dx, 0, -dz);
+  //p->AddVertex (-dx, dy, -dz);
+  //p->AddVertex (dx, dy, -dz);
+  p->AddVertex (dx-border, border, -dz);
+  p->AddVertex (-dx+border, border, -dz);
+  p->AddVertex (-dx+border, dy-border, -dz);
+  p->AddVertex (dx-border, dy-border, -dz);
   p->SetTextureSpace (
       p->Vobj (0), csVector2 (0, 0),
       p->Vobj (1), csVector2 (1, 0),
