@@ -37,6 +37,9 @@ chronological order.
 	  normal static lights and have to be added to the sector list.
 	  CreateDynLight() has been removed. The last parameter of
 	  CreateLight() is now one of the dynamic types (instead of a boolean).
+	- Jorrit removed iLight->SetSector(). It is not valid to manually set
+	  the sector of a light. This is done automatically when you add
+	  a light to a sector by calling sector->GetLights()->Add().
 15-Jan-2004
 	- Peter Amstutz changed the keyboard movement in the "simple" tutorials
 	  (along with the associated texinfo documentation) to follow more

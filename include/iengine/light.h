@@ -203,8 +203,6 @@ struct iLight : public iBase
 
   /// Get the sector for this light.
   virtual iSector *GetSector () = 0;
-  /// Set the sector for this light.
-  virtual void SetSector (iSector* sector) = 0;
 
   /// Get the color of this light.
   virtual const csColor& GetColor () = 0;

@@ -75,7 +75,7 @@ csSectorLightList::~csSectorLightList ()
 void csSectorLightList::PrepareLight (iLight* item)
 {
   csLightList::PrepareLight (item);
-  item->SetSector (&(sector->scfiSector));
+  item->GetPrivateObject ()->SetSector (&(sector->scfiSector));
 
   const csVector3& center = item->GetCenter ();
   float radius = item->GetInfluenceRadius ();
@@ -86,7 +86,7 @@ void csSectorLightList::PrepareLight (iLight* item)
 
 void csSectorLightList::FreeLight (iLight* item)
 {
-  item->SetSector (0);
+  item->GetPrivateObject ()->SetSector (0);
   kdtree->RemoveObject (item->GetPrivateObject ()->GetChildNode ());
   csLightList::FreeLight (item);
 }

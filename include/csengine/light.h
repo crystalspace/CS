@@ -194,7 +194,7 @@ public:
   /**
    * Set the current sector for this light.
    */
-  virtual void SetSector (iSector* sector);
+  void SetSector (iSector* sector);
 
   /**
    * Get the current sector for this light.
@@ -355,7 +355,6 @@ public:
       scfParent->SetCenter (pos);
     }
     virtual iSector *GetSector () { return scfParent->GetSector (); }
-    virtual void SetSector (iSector* sector) { scfParent->SetSector (sector); }
     virtual float GetInfluenceRadius ()
     {
       return scfParent->GetInfluenceRadius();

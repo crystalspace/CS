@@ -97,7 +97,13 @@ void Bot::move (csTicks elapsed_time)
     UpdateLighting (lights, num_lights);
     if (light)
     {
-      light->SetSector (s);
+      if (s != light->GetSector ())
+      {
+        light->IncRef ();
+        light->GetSector ()->GetLights ()->Remove (light);
+        s->GetLights ()->Add (light);
+        light->DecRef ();
+      }
       light->SetCenter (new_p);
       light->Setup ();
     }
