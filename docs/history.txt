@@ -29,6 +29,8 @@ chronological order.
 	  csPolyTexture. This makes some operations a small bit slower (like
 	  static + dynamic lighting in case the object has moved) but it
 	  saves a lot of memory again.
+	- Eric Sunshine upgraded comment in configure.ac regarding filtering
+	  out of Autoconf's default -O and -g flags.
 12-Oct-2003
 	- Eric Sunshine clarified documentation for csGetResourceDir(),
 	  iCommandLineParser::GetResourceDir(), and

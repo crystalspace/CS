@@ -6002,8 +6002,11 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Use the CXXFLAGS and CFLAGS passed to configure Autoconf has defaults which
-# are not suitable for CS, so we need to filter out all -O and -g flags.
+# Use the CPPFLAGS, CXXFLAGS, CFLAGS, and LDFLAGS passed to configure.
+# Further, Autoconf insists upon issuing optimization flags (-O) and debug
+# flags (-g) at one and the same time, but this is not suitable for Crystal
+# Space's build system, which makes a distinction between `optimize' and
+# `debug' builds, so we must filter out these flags.
 #------------------------------------------------------------------------------
 CFLAGS=`echo "$CFLAGS" | sed 's/-O.//g;s/-g.//g'`
 CXXFLAGS=`echo "$CXXFLAGS" | sed 's/-O.//g;s/-g.//g'`
