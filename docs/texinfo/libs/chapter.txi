@@ -25,9 +25,13 @@ Utility Library (@code{csutil})
 @end itemize
 
 @menu
+* SCF:: Shared Class Facility (@sc{scf})
+* VFS:: Virtual File System (@sc{vfs})
 * CSWS:: Crystal Space Windowing System (@sc{csws})
 * csPhyziks:: csPhyziks Library (@code{csphyzik})
 @end menu
 
+@imports{libs,scf.txi}
+@imports{libs,vfs.txi}
 @imports{libs,csws.txi}
 @imports{libs,phyziks.txi}

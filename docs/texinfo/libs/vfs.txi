@@ -11,11 +11,11 @@ Since many even basic concepts in file systems on different operating systems
 often differ, you often should take care to use the right path separators on
 the right platform, search on different ``drives'', ``mounts'' and so on for
 required files.  This library achieves the goal of making the file system
-appear ``the same'' on various operating systems, and adds many bonus features
-such as archive support and overlaid directories.
+appear ``the same'' on various operating systems, and adds many bonus
+features such as archive support and overlaid directories.
 
 Each ``directory'' on the @sc{vfs} @dfn{virtual volume} is mapped to some
-@dfn{real-world} directory or @sc{zip} archive.  Additionally, you can make
+@dfn{real-world} directory or @sc{zip} archive. Additionally, you can make
 one ``virtual directory'' map to several real-world directories (and/or
 @sc{zip} files) at one time, thus covering such cases as having files either
 on compact disc (@sc{cd}) or hard disk (depending upon the user's choice),
@@ -30,10 +30,10 @@ The Virtual File System is driven by a configuration file.
 @cindex Details, @sc{vfs}
 
 To make difference between @sc{zip} archives and physical disk directories
-@sc{vfs} uses a simple convention: directories ends with a path separator
-character (@samp{$/}) while archives do not.  @samp{$/} is a special
+@sc{vfs} uses a simple convention: directories end with a path separator
+character (@samp{$/}) while archives do not. @samp{$/} is a special
 configuration file variable which represents the path separator on any
-particular platform (@pxref{VFS Configuration File}).  For example
+particular platform (@pxref{VFS Configuration File}). For example
 @samp{$/data} refers to an archive, while @samp{$/data$/} refers to an actual
 directory named @file{data}.  Failure to understand this distinction is often
 the major cause of errors; so if you're getting unexpected results check in
@@ -41,7 +41,7 @@ the first place if directories have trailing path separators.
 
 There are several differences between filesystems between operating systems
 that you should always keep in mind because @sc{vfs} doesn't hide these
-details from you.  To avoid inconsistencies between different file systems you
+details from you. To avoid inconsistencies between different file systems you
 should follow this list of guidelines:
 
 @itemize @bullet
@@ -70,7 +70,7 @@ name, @file{GaMe.DaT}, when opening it.
 
 @item
 Keep in mind that Unix @emph{can} delete currently opened files while
-@sc{dos}, @sc{os/2}, Windows and possibly others can not.  So you should avoid
+@sc{dos}, @sc{os/2}, Windows and possibly others can not. So you should avoid
 deleting open files.  (@emph{Technical Note}: Actually this should work for
 files which are located in archives but is not advisable to do so---and has
 not been tested.)
@@ -82,7 +82,7 @@ not been tested.)
 @cindex @file{vfs.cfg}, @sc{vfs} Configuration File
 
 The main @code{[VFS]} section describes the layout of the ``virtual'' file
-system.  Imagine a clean disk drive onto which you start to create directories
+system. Imagine a clean disk drive onto which you start to create directories
 by making links to existing ``real'' directories and archive (@file{.zip})
 files.  An archive is treated exactly like a subdirectory; you even can link
 one ``virtual directory'' to several ``real'' paths and archives; however if
@@ -104,13 +104,13 @@ the value of a variable in a @sc{vfs} path use the
 @samp{@var{variable-name}} consists of a single letter, you can omit the
 parenthesese, as in @code{$@var{variable-name}} (for example @samp{$A}).
 
-Variables that are defined in the environment overrides those defined in this
+Variables that are defined in the environment override those defined in this
 file.  For example, the @samp{$HOME} environment variable is set in all
 Unixes, but is undefined in many other operating systems.  They can define
 their own values for these variables in system-dependent sections, but if the
-user defines the @samp{$HOME} environment variable it will always override the
-one from this file.  You also can refer the variables in the following way:
-@samp{$(@var{var}:@var{expr})} which means ``use the contents of
+user defines the @samp{$HOME} environment variable it will always override
+the one from this file. You also can refer the variables in the following
+way: @samp{$(@var{var}:@var{expr})} which means ``use the contents of
 @samp{@var{var}} if @samp{@var{var}} is set (usually in environment), or use
 @samp{@var{expr}} if not''.  This can be used for more complex expressions,
 for example:

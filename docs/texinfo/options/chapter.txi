@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Options, Applications, Building, Top
-@chapter Options
+@chapter Configuring Crystal Space
 @cindex Options
 
 Crystal Space is a large project containing many applications and support

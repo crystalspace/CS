@@ -194,10 +194,10 @@ order to coordinate your efforts with those of other people.
 @item
 How does Crystal Space work?
 
-@strong{A1}: This is a short question with a long answer.  You should
-definitely read the chapter which deals with concepts used in Crystal Space,
-@ref{Concepts}.  It would also be useful to read the chapter which details
-specific implementation of those concepts, @ref{Anatomy}.
+@strong{A1} If you want to know how you can use CS, you can look at the chapters
+describing the libraries of which CS consists, @xref{Libraries}. Or you can
+look at the plug-ins, @xref{Plug-In Drivers}. If you want to know how it
+works internally, @xref{Internals}.
 
 @strong{A2}: Read any other documentation related to this project as mentioned
 earlier in this @sc{faq}.
