@@ -266,6 +266,8 @@ public:
 class csVector3Array : public csPoly3D
 {
 public:
+  csVector3Array (int start_size = 10) : csPoly3D (start_size) { }
+
   /**
    * Add a vertex but first check if it isn't already present
    * in the array. Return the index that the vertex was added too.

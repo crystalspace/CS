@@ -23,6 +23,7 @@
 
 csPoly3D::csPoly3D (int start_size)
 {
+  CS_ASSERT (start_size > 0);
   max_vertices = start_size;
   vertices = new csVector3 [max_vertices];
   MakeEmpty ();
@@ -31,6 +32,7 @@ csPoly3D::csPoly3D (int start_size)
 csPoly3D::csPoly3D (const csPoly3D& copy)
 {
   max_vertices = copy.max_vertices;
+  CS_ASSERT (max_vertices > 0);
   vertices = new csVector3 [max_vertices];
   num_vertices = copy.num_vertices;
   memcpy (vertices, copy.vertices, sizeof (csVector3)*num_vertices);
@@ -73,6 +75,7 @@ bool csPoly3D::In (csVector3* poly, int num_poly, const csVector3& v)
 void csPoly3D::MakeRoom (int new_max)
 {
   if (new_max <= max_vertices) return;
+  CS_ASSERT (new_max > 0);
   csVector3* new_vertices = new csVector3 [new_max];
   memcpy (new_vertices, vertices, num_vertices*sizeof (csVector3));
   delete [] vertices;
@@ -82,6 +85,7 @@ void csPoly3D::MakeRoom (int new_max)
 
 int csPoly3D::AddVertex (float x, float y, float z)
 {
+  CS_ASSERT (vertices != NULL);
   if (num_vertices >= max_vertices)
     MakeRoom (max_vertices+5);
   vertices[num_vertices].x = x;
