@@ -25,6 +25,7 @@
 #include "cstypes.h"
 #include <stdio.h>
 #include "csgeom/transfrm.h"
+#include "csgeom/quaterni.h"
 
 #define MS_MAX_NAME             32
 #define MS_MAX_PATH             256
@@ -90,6 +91,12 @@ struct Transform
   class csMatrix3 matrix;
 };
 
+struct KeyData
+{
+  scalar_t time;
+  csVector3 data;
+};
+
 struct Joint
 {
   struct Transform* transform;
@@ -101,6 +108,10 @@ struct Joint
   {
     delete[] children;
   }
+  int nbPositionKeys;
+  struct KeyData* positionKeys;
+  int nbRotationKeys;
+  struct KeyData* rotationKeys;
 };
 
 class MsModel
@@ -113,8 +124,11 @@ private:
   int nbFrames;
   struct TriangleList* triangleList;
   char material[MS_MAX_NAME];
+  char materialFile[MS_MAX_NAME];
   struct Joint** joints;
   int nbJoints;
+  
+  float frameDuration;
   
   void printJoint(struct Joint* joint, FILE* f);
   void transform(csReversibleTransform* trans, int boneIndex,int parent);

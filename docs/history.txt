@@ -3,6 +3,10 @@ The history order is reversed so that new features are at the top.
 2-Aug-2002
 	- Eric Sunshine eliminated several unnecessary, and inadvertently
 	  inserted, event dispatch loops from csEventQueue::Process().
+	- Steven Geens updated the milk2spr convertor so it also converts
+	  the motions (for the motion manager). This works mostly but there
+	  are still a few bugs. For example, sometimes there is a 360
+	  degree rotation and sometimes it mirrors the model along Y-axis.
 1-Aug-2002
 	- Added == and != operators to compare csRef& and T* instances.
 31-Jul-2002

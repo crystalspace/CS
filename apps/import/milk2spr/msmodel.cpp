@@ -49,8 +49,11 @@ MsModel::MsModel(const char* msfile) : sError(NULL)
   nbFrames = 0;
   triangleList = NULL;
   strcpy(material,"spark");
+  strcpy(materialFile,"spark.gif");
   joints = NULL;
   nbJoints = 0;
+  
+  frameDuration = 1.0;
   
   clearError();
   ReadMsFile(msfile);
@@ -62,13 +65,15 @@ MsModel::~MsModel()
     free(sError);
   clearMemory();
   free(material);
+  free(materialFile);
 }
 
 void MsModel::clearMemory()
 {
   if(frames!=NULL)
   {
-    for(int i=0;i<nbFrames;i++)
+    int i;
+    for(i=0;i<nbFrames;i++)
     {
       if(frames[i] != NULL)
       {
@@ -85,10 +90,12 @@ void MsModel::clearMemory()
   nbFrames = 0;
   
   strcpy(material,"spark");
+  strcpy(materialFile,"spark.gif");
     
   if(joints !=NULL)
   {
-    for(int i=0;i<nbJoints;i++)
+    int i;
+    for(i=0;i<nbJoints;i++)
     {
       if(joints[i] != NULL)
       {
@@ -473,12 +480,17 @@ bool MsModel::ReadMsFile(const char* msfile)
     {
       if (strcmp(szLine,"\"\"\n") == 0)
       {
-        strcpy (szName, "");
+        strcpy (szName, "spark.gif");
       }
       else
       {
         return setError("Couldn't extract diffuse texture.",file);
       }
+    }
+    //We only use the first material.
+    if(materialIndex==0)
+    {
+      strcpy(materialFile,szName);
     }
     
     // alpha texture
@@ -584,7 +596,7 @@ bool MsModel::ReadMsFile(const char* msfile)
     }
     struct Transform* transform = new Transform();
     transform->matrix = csZRotMatrix3(Rotation.z) *
-                        csYRotMatrix3(- Rotation.y) * //Why oh why is this necessary, I have no clue. It must have to do with the differences in the axis systems of CS and MS.
+                        csYRotMatrix3(-Rotation.y) * //Why oh why is this necessary, I have no clue. It must have to do with the differences in the axis systems of CS and MS.
                         csXRotMatrix3(Rotation.x);
     transform->move = Position;
     joints[jointIndex] = new Joint();
@@ -593,18 +605,17 @@ bool MsModel::ReadMsFile(const char* msfile)
     strcpy(joints[jointIndex]->name,names[jointIndex]);
     
     // Scanning for position key count.
-    // Unneeded by CS.
-    // Animation happens in game.
-    int nbPositionKeys = 0;
+    joints[jointIndex]->nbPositionKeys = 0;
     if (!fgets (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }  
-    if (sscanf (szLine, "%d", &nbPositionKeys) != 1)
+    if (sscanf (szLine, "%d", &(joints[jointIndex]->nbPositionKeys)) != 1)
     {
       return setError("Couldn't scan for the number of position keys.",file);
     }
-    for (int positionKeyIndex = 0; positionKeyIndex < nbPositionKeys; positionKeyIndex++)
+    joints[jointIndex]->positionKeys = new struct KeyData[joints[jointIndex]->nbPositionKeys];
+    for (int positionKeyIndex = 0; positionKeyIndex < joints[jointIndex]->nbPositionKeys; positionKeyIndex++)
     {
       //Scanning for the positionKey time and position.
       scalar_t time = 0;
@@ -619,20 +630,22 @@ bool MsModel::ReadMsFile(const char* msfile)
       {
         return setError("Couldn't scan for position key data.",file);
       }
+      joints[jointIndex]->positionKeys[positionKeyIndex].time = time;
+      joints[jointIndex]->positionKeys[positionKeyIndex].data = csVector3(x,y,z);
     }
     
     // Scanning for rotation key count
-    // Unneeded by CS
-    int nbRotationKeys = 0;
+    joints[jointIndex]->nbRotationKeys = 0;
     if (!fgets (szLine, 256, file))
     {
       return setError("Unexpected ending of file.",file);
     }
-    if (sscanf (szLine, "%d", &nbRotationKeys) != 1)
+    if (sscanf (szLine, "%d", &(joints[jointIndex]->nbRotationKeys)) != 1)
     {
       return setError("Couldn't scan for number rotation keys.",file);
     }
-    for (int rotationKeyIndex = 0; rotationKeyIndex < nbRotationKeys; rotationKeyIndex++)
+    joints[jointIndex]->rotationKeys = new struct KeyData[joints[jointIndex]->nbRotationKeys];
+    for (int rotationKeyIndex = 0; rotationKeyIndex < joints[jointIndex]->nbRotationKeys; rotationKeyIndex++)
     {
       //Scanning for the positionKey time and rotation.
       scalar_t time = 0;
@@ -647,15 +660,16 @@ bool MsModel::ReadMsFile(const char* msfile)
       {
         return setError("Couldn't scan for rotation key data.",file);
       }
+      joints[jointIndex]->rotationKeys[rotationKeyIndex].time = time;
+      joints[jointIndex]->rotationKeys[rotationKeyIndex].data = csVector3(x,y,z);
     }
   }
   
   //Initializing all children indices to -1.
-  int j;
   for(i = 0;i<nbJoints;i++)
   {
     joints[i]->children = new int[nbJoints];
-    for(j = 0;j<nbJoints;j++)
+    for(int j = 0;j<nbJoints;j++)
     {
       joints[i]->children[j]=-1;
     }
@@ -691,17 +705,14 @@ bool MsModel::ReadMsFile(const char* msfile)
 
 void MsModel::dumpstats(FILE* s)
 {
-  /*
   fprintf(s, "\nMS ASCII Model (TXT) Statistics:\n");
-  fprintf(s, "No statistics implemented");
-  */
+  fprintf(s, "Number of Joints: %d",nbJoints);
 }
 
 bool MsModel::WriteSPR(const char* spritename)
 {
   FILE *f;
   char *spritefilename;
-  int i;
 
   if (spritename == NULL || strlen(spritename) == 0)
   {
@@ -721,13 +732,16 @@ bool MsModel::WriteSPR(const char* spritename)
   
   //Make the inverse transforms.
   csReversibleTransform* inv = new csReversibleTransform[nbJoints];
+  csReversibleTransform* orig = new csReversibleTransform[nbJoints];
   if(nbJoints>0)
   {
+    int i;
     for(i = 0;i<nbJoints;i++)
     {
       csMatrix3 m = joints[i]->transform->matrix;
       csVector3 v = joints[i]->transform->move;
-      inv[i] = csReversibleTransform (m, -m.GetInverse () * v);
+      orig[i] = csReversibleTransform (m, -m.GetInverse () * v);
+      inv[i] = orig[i];
     }
     for(i = 0;i<nbJoints;i++)
     {
@@ -743,7 +757,14 @@ bool MsModel::WriteSPR(const char* spritename)
     }
   }
   
+  fprintf(f, "LIBRARY \n(\n");
   // begin hard work now
+  fprintf(f, "TEXTURES (\n");
+  fprintf(f, "  TEXTURE '%s' ( FILE(/lib/std/%s))\n",material,materialFile);
+  fprintf(f, ")\n");
+  fprintf(f, "MATERIALS (\n");
+  fprintf(f, "  MATERIAL '%s' ( TEXTURE('%s'))\n",material,material);
+  fprintf(f, ")\n");
   fprintf(f, "MESHFACT '%s' \n(\n", spritename);
   fprintf(f, "  PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')\n");
   fprintf(f, "  PARAMS \n  (\n");
@@ -751,7 +772,8 @@ bool MsModel::WriteSPR(const char* spritename)
   
   if(frames!=NULL)
   {
-    for(int i = 0; i < nbFrames;i++)
+    int i;
+    for(i = 0; i < nbFrames;i++)
     {
       if(frames[i]!=NULL)
       {
@@ -778,11 +800,12 @@ bool MsModel::WriteSPR(const char* spritename)
   fprintf(f, "    ACTION 'default' (");  
   if(frames!=NULL)
   {
-    for(int i = 0; i < nbFrames;i++)
+    int i;
+    for(i = 0; i < nbFrames;i++)
     {
       if(frames[i]!=NULL)
       {
-        fprintf(f, "F('%d',100) ",i);
+        fprintf(f, "F('%d',%d) ",i,(int)(frameDuration*1000.0));
       }
     }
   }
@@ -801,7 +824,8 @@ bool MsModel::WriteSPR(const char* spritename)
   if(nbJoints>0)
   {
     fprintf(f,"    SKELETON 'skeleton' ( \n");
-    for(int i = 0;i<nbJoints;i++)
+    int i;
+    for(i = 0;i<nbJoints;i++)
     {
       //find out if it's a root joint.
       if(joints[i]->parent==-1)
@@ -813,6 +837,87 @@ bool MsModel::WriteSPR(const char* spritename)
   }
 
   fprintf(f, "  )\n)\n");
+  
+  //loading the motions.
+  if(nbJoints > 0 )
+  {
+    fprintf(f, "ADDON (\n");
+    fprintf(f, "  PLUGIN ('crystalspace.motion.loader.default')\n");
+    fprintf(f, "  PARAMS (\n");
+    fprintf(f, "    MOTION 'default' (\n");  
+    fprintf(f, "      DURATION '%f' ( LOOP() )\n",((float)nbFrames)*frameDuration); 
+    int i;
+    for(i = 0; i < nbJoints;i++)
+    {
+      if(joints[i]->nbPositionKeys>0||joints[i]->nbRotationKeys>0)
+      {
+        //Some rotation and position keys might be at the same time.
+        //I never encounter a case in which a rotation or position key was on his own.
+        bool* rotUsed = new bool[joints[i]->nbRotationKeys];
+        for(int k = 0;k < joints[i]->nbRotationKeys;k++) rotUsed[k] = false;
+        
+        fprintf(f, "      BONE '%s' (\n",joints[i]->name); 
+        for(int j = 0;j < joints[i]->nbPositionKeys;j++)
+        {
+          bool found = false;
+          for(int k = 0;k < joints[i]->nbRotationKeys;k++)
+          {
+            if(joints[i]->rotationKeys[k].time==joints[i]->positionKeys[j].time)
+            {
+              csMatrix3 matrixy = csZRotMatrix3(joints[i]->rotationKeys[k].data.z) *
+                                  csYRotMatrix3(-joints[i]->rotationKeys[k].data.y) * 
+                                  csXRotMatrix3(joints[i]->rotationKeys[k].data.x);
+              csReversibleTransform transy = orig[i]*csReversibleTransform(matrixy,-matrixy.GetInverse()*joints[i]->positionKeys[j].data);
+              csQuaternion qy = csQuaternion(transy.GetO2T());
+              csVector3 vy = - transy.GetO2T() * transy.GetO2TTranslation();
+              fprintf(f, "        FRAME '%f' ( POS(%f,%f,%f) ROT(Q(%f,%f,%f,%f)))\n",
+                      joints[i]->positionKeys[j].time*frameDuration, 
+                      vy.x,
+                      vy.y,
+                      vy.z,
+                      qy.x,
+                      qy.y,
+                      qy.z,
+                      qy.r);
+              rotUsed[k]=true;
+              found = true;
+              break; //There can only match 1
+            }
+          }
+          if(!found)
+          {
+            fprintf(f, "        FRAME '%f' ( POS(%f,%f,%f))\n",
+                    joints[i]->positionKeys[j].time*frameDuration, 
+                    joints[i]->positionKeys[j].data.x,
+                    joints[i]->positionKeys[j].data.y,
+                    joints[i]->positionKeys[j].data.z);
+          }
+        }
+        for(int k = 0;k < joints[i]->nbRotationKeys;k++)
+        {
+          if(!rotUsed[k])
+          {
+            csMatrix3 matrixy = csZRotMatrix3(joints[i]->rotationKeys[k].data.z) *
+                                  csYRotMatrix3(-joints[i]->rotationKeys[k].data.y) * 
+                                  csXRotMatrix3(joints[i]->rotationKeys[k].data.x);
+            csQuaternion qy = csQuaternion(matrixy);
+            fprintf(f, "        FRAME '%f' ( ROT(Q(%f,%f,%f,%f)))\n",
+                    joints[i]->rotationKeys[k].time*frameDuration, 
+                    qy.x,
+                    qy.y,
+                    qy.z,
+                    qy.r);
+          }
+        }
+        fprintf(f, "      )\n");
+      } 
+    }
+    fprintf(f, "    )\n");
+    fprintf(f, "  )\n");
+    fprintf(f, ")\n");
+  }
+  
+  fprintf(f, ")\n");
   fclose(f);
   return true;
 }
@@ -824,7 +929,8 @@ void MsModel::printJoint(struct Joint* joint,FILE* f)
   bool vertices=false;
   if(frames!=NULL)
   {
-    for(int i = 0; i < nbFrames;i++)
+    int i;
+    for(i = 0; i < nbFrames;i++)
     {
       if(frames[i]!=NULL)
       {
@@ -867,7 +973,8 @@ void MsModel::printJoint(struct Joint* joint,FILE* f)
   fprintf(f, "V( %f, %f, %f  )" ,         
           joint->transform->move.x, joint->transform->move.y, joint->transform->move.z);
   fprintf(f, " )\n");
-  for(int i=0;joint->children[i]!=-1;i++)
+  int i;
+  for(i=0;joint->children[i]!=-1;i++)
   {
     printJoint(joints[joint->children[i]],f);
   }
@@ -881,7 +988,8 @@ void MsModel::transform(csReversibleTransform* trans, int boneIndex,int parent)
   {
     trans[boneIndex] = trans[parent]*trans[boneIndex];
   }
-  for(int i=0;joints[boneIndex]->children[i]!=-1;i++)
+  int i;
+  for(i=0;joints[boneIndex]->children[i]!=-1;i++)
   {
     transform(trans,joints[joints[boneIndex]->children[i]]->index,boneIndex);
   }

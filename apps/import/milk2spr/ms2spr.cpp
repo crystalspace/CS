@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "cssysdef.h"
-#include "msmodel.h"
+#include "msModel.h"
 
 
 CS_IMPLEMENT_APPLICATION
@@ -34,11 +34,35 @@ static void usage(FILE* s, int rc)
   fprintf(s, "Usage: ms2spr <option> [model-file] [sprite-name]\n\n");
   fprintf(s, "Options:\n");
   fprintf(s, "  -h : help (this page)\n");
+  fprintf(s, "  -c : example code for loading\n");
   exit(rc);
 }
 
 static void fatal_usage() { usage(stderr, -1); }
 static void okay_usage()  { usage(stdout,  0); }
+
+static void printCode(FILE* s, int rc)
+{
+  fprintf(s, "An example for loading the file(using variables from simple2):\n\n");
+  fprintf(s, "loader->LoadLibraryFile (\"/lib/std/sprite.spr\")\n");
+  fprintf(s, "...\n");
+  fprintf(s, "engine->Prepare ();//All library loading should be before prepare\n");
+  fprintf(s, "...\n");
+  fprintf(s, "iMeshFactoryWrapper* imeshfact = engine->GetMeshFactories()->FindByName(\"man2\");\n");
+  fprintf(s, "iMeshWrapper* sprite = engine->CreateMeshWrapper ( imeshfact, \"MySprite\", room, pos);\n");
+  fprintf(s, "iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState);\n");
+  fprintf(s, "iSkeletonState *skel_state = spstate->GetSkeletonState();\n");
+  fprintf(s, "limb->DecRef();\n");
+  fprintf(s, "iSkeletonConnectionState *con = SCF_QUERY_INTERFACE (limb, iSkeletonConnectionState );\n");
+  fprintf(s, "iSkeletonBone *bone = SCF_QUERY_INTERFACE (con, iSkeletonBone);\n");
+  fprintf(s, "iMotionTemplate* motion=motman->FindMotionByName(\"default\");\n");
+  fprintf(s, "iMotionController* mc=motman->AddController(bone);\n");
+  fprintf(s, "mc->SetMotion(motion);\n");
+  fprintf(s, "spstate->DecRef ();\n");
+  fprintf(s, "sprite->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);\n");
+  fprintf(s, "sprite->DecRef ();\n");
+  exit(rc);
+}
 
 int main(int argc,char *argv[])
 {
@@ -47,10 +71,18 @@ int main(int argc,char *argv[])
     "By Steven Geens <steven.geens@student.kuleuven.ac.be>\n\n");
 
   if (argc < 3)
-    fatal_usage();
+  {
+    switch (argv[1][1])
+    {
+      case 'c':
+        printCode(stdout,  0);
+      default:
+       fatal_usage();
+    }
+  }
   else
   {
-	int i;
+    int i;
     for (i = 1; i < argc - 2; i++)
     {
       if (argv[i][0] != '-' && argv[i][0] != '/')
@@ -63,6 +95,8 @@ int main(int argc,char *argv[])
       case 'h':
       case '?':
         okay_usage();
+      case 'c':
+        printCode(stdout,  0);
       default:
         fprintf(stderr, "'%s' unreconized option.\n", argv[i]);
         fatal_usage();
