@@ -18,6 +18,7 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/ik.h"
 #include "csphyzik/articula.h"
 #include "csphyzik/joint.h"

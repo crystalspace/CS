@@ -43,7 +43,7 @@ public:
 
 	// apply this force to the given body.  Adds F and Torque components to pe
 	// overload this and add new functionality for new forces
-	virtual ctVector3 apply_F( ctDynamicEntity &pe ){ return *( new ctVector3() );}
+	virtual ctVector3 apply_F( ctDynamicEntity& /*pe*/ ){ return *( new ctVector3() );}
 
 	// generic magnitude and direction to be used by all forces
 	void set_magnitude( real m ){ magnitude = m; }

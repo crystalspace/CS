@@ -18,6 +18,7 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/math3d.h"
 #include "csphyzik/refframe.h"
 #include "csphyzik/rigidbod.h"
@@ -48,7 +49,11 @@ ctReferenceFrame *rf = new ctReferenceFrame();
 ctRigidBody *ctRigidBody::new_ctRigidBody( coord x, coord y, coord z )
 {
 ctReferenceFrame *rf = new ctReferenceFrame();
-//!me set coords
+
+  (void) x;
+  (void) y;
+  (void) z;
+  //!me set coords
   return new ctRigidBody( *rf );
 
 }

@@ -18,10 +18,11 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/phyzent.h"
 #include "csphyzik/solver.h"
 
-void ctSimpleDynamicsSolver::solve( real t )
+void ctSimpleDynamicsSolver::solve( real /*t*/ )
 {
 ctForce *fp;
 

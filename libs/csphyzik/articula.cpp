@@ -23,6 +23,7 @@
 //!me stuff todo
 // uhhhh R_fg, I suspect this could just be selected local vars
 
+#include "sysdef.h"
 #include "csphyzik/articula.h"
 #include "csphyzik/joint.h"
 #include "csphyzik/debug.h"

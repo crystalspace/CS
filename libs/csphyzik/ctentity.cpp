@@ -18,6 +18,7 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/entity.h"
 //#include "csphyzik/contact.h"
 //#include "csphyzik/refframe.h"
@@ -46,7 +47,7 @@ void ctEntity::solve( real t )
   }
 }
 
-void ctEntity::apply_given_F( ctForce &frc )
+void ctEntity::apply_given_F( ctForce& /*frc*/ )
 {
   // notin
 }

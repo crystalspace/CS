@@ -18,6 +18,7 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/joint.h"
 #include "csphyzik/refframe.h"
 #include "csphyzik/articula.h"
@@ -96,7 +97,7 @@ void ctJoint::update_link_RF( ctMatrix3 &R_fg )
 
 
 //!me just a pendulum now, check this friction model in a text book
-real ctJoint::get_actuator_magnitude( real external_f, real inertail_comp )
+real ctJoint::get_actuator_magnitude( real external_f, real /*inertail_comp*/ )
 {
 real internal_f;
 

@@ -19,6 +19,7 @@
 */
 
 #include <stdio.h>
+#include "sysdef.h"
 #include "csphyzik/odesolve.h"
 
 

@@ -18,10 +18,18 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/refframe.h"
 
 ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, angle ppitch, angle proll, angle pyaw, ctReferenceFrame *ref )
 {
+  (void) ref;
+  (void) pyaw;
+  (void) proll;
+  (void) ppitch;
+  (void) px;
+  (void) py;
+  (void) pz;
 	reference_count = 0;
 	is_universe_frame = false;
 //	parent_frame = ref ? ref : &universe();

@@ -18,6 +18,7 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/mathutil.h"
 #include "csphyzik/math3d.h"
 #include <math.h>

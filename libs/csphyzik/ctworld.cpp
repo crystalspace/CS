@@ -19,6 +19,7 @@
 */
 
 
+#include "sysdef.h"
 #include "csphyzik/articula.h"
 #include "csphyzik/world.h"
 #include "csphyzik/rigidbod.h"
@@ -155,7 +156,7 @@ errorcode ctWorld::evolve( real t0, real t1 )
 
 }
 
-errorcode ctWorld::rewind( real t1, real t2 )
+errorcode ctWorld::rewind( real /*t1*/, real t2 )
 {
   fsm_state = CTWS_REWOUND;
   rewound_from = t2;

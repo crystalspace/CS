@@ -18,6 +18,7 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/forces.h"
 #include "csphyzik/phyzent.h"
 #include "csphyzik/refframe.h"

@@ -85,7 +85,7 @@ protected:
 class ctPrismaticJoint : public ctJoint
 {
 public:
-	virtual void calc_vw( ctVector3 &v, ctVector3 &w ){ 
+	virtual void calc_vw( ctVector3 &v, ctVector3& /*w*/ ){ 
 		v = v + joint_axis *qv;
 	}
 

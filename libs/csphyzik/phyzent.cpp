@@ -18,6 +18,7 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/phyzent.h"
 #include "csphyzik/contact.h"
 #include "csphyzik/refframe.h"
@@ -41,7 +42,7 @@ ctPhysicalEntity::~ctPhysicalEntity()
 }
 
 
-void ctPhysicalEntity::apply_given_F( ctForce &frc )
+void ctPhysicalEntity::apply_given_F( ctForce& /*frc*/ )
 {
   // notin
 }
@@ -172,7 +173,7 @@ ctVector3 j;
   }
 }
 
-void ctPhysicalEntity::apply_impulse( ctVector3 jx, ctVector3 jv )
+void ctPhysicalEntity::apply_impulse( ctVector3 /*jx*/, ctVector3 jv )
 {
   set_v( v + jv );
 }
