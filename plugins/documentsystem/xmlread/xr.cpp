@@ -50,7 +50,6 @@ bool TrXmlBase::condenseWhiteSpace = true;
 TrDocumentNode::TrDocumentNode( )
 {
   parent = 0;
-  prev = 0;
   next = 0;
 }
 
@@ -72,18 +71,6 @@ TrDocumentNode* TrDocumentNode::NextSibling( const char * value ) const
   return 0;
 }
 
-
-TrDocumentNode* TrDocumentNode::PreviousSibling( const char * value ) const
-{
-  TrDocumentNode* node;
-  for ( node = prev; node; node = node->prev )
-  {
-    const char* node_val = node->Value ();
-    if (node_val && strcmp (node_val, value) == 0)
-      return node;
-  }
-  return 0;
-}
 
 TrDocumentNode* TrDocumentNodeChildren::Identify( TrDocument* document, const char* p )
 {
@@ -184,7 +171,6 @@ TrDocumentNode* TrDocumentNodeChildren::LinkEndChild( TrDocumentNode* lastChild,
 {
   node->parent = this;
 
-  node->prev = lastChild;
   node->next = 0;
 
   if ( lastChild )
@@ -219,35 +205,6 @@ void TrXmlElement::RemoveAttribute( const char * name )
     attributeSet.set.DeleteIndex (nodeidx);
   }
 }
-
-TrXmlElement* TrDocumentNode::NextSiblingElement() const
-{
-  TrDocumentNode* node;
-
-  for (  node = NextSibling();
-  node;
-  node = node->NextSibling() )
-  {
-    if ( node->ToElement() )
-      return node->ToElement();
-  }
-  return 0;
-}
-
-TrXmlElement* TrDocumentNode::NextSiblingElement( const char * value ) const
-{
-  TrDocumentNode* node;
-
-  for (  node = NextSibling( value );
-  node;
-  node = node->NextSibling( value ) )
-  {
-    if ( node->ToElement() )
-      return node->ToElement();
-  }
-  return 0;
-}
-
 
 
 TrDocument* TrDocumentNode::GetDocument() const

@@ -230,30 +230,10 @@ public:
   TrDocumentNodeChildren* Parent() const{ return parent; }
 
   /// Navigate to a sibling node.
-  TrDocumentNode* PreviousSibling() const { return prev; }
-
-  /// Navigate to a sibling node.
-  TrDocumentNode* PreviousSibling( const char * ) const;
-
-  /// Navigate to a sibling node.
   TrDocumentNode* NextSibling() const { return next; }
 
   /// Navigate to a sibling node with the given 'value'.
   TrDocumentNode* NextSibling( const char * ) const;
-
-  /**
-   * Convenience function to get through elements.
-   * Calls NextSibling and ToElement. Will skip all non-Element
-   * nodes. Returns 0 if there is not another element.
-   */
-  TrXmlElement* NextSiblingElement() const;
-
-  /**
-   * Convenience function to get through elements.
-   * Calls NextSibling and ToElement. Will skip all non-Element
-   * nodes. Returns 0 if there is not another element.
-   */
-  TrXmlElement* NextSiblingElement( const char * ) const;
 
   /// Query the type (as an enumerated value, above) of this node.
   NodeType Type() const { return type; }
@@ -289,8 +269,6 @@ protected:
 
   NodeType type;
   TrDocumentNodeChildren* parent;
-
-  TrDocumentNode* prev;
   TrDocumentNode* next;
 };
 
