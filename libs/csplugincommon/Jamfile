@@ -10,7 +10,8 @@ SubDir TOP libs csplugincommon ;
     render3d
     renderstep
     shader
-    soundloader ;
+    soundloader 
+    soundrenderer ;
   local subinc = $(DOTDOT) $(DOTDOT) include csplugincommon ;
   local i files ;
   for i in $(subs)
