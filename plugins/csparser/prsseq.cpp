@@ -343,6 +343,31 @@ iSequenceWrapper* csLoader::LoadSequence (iDocumentNode* node)
 		offset, duration);
 	}
 	break;
+      case XMLTOKEN_MATERIAL:
+        {
+	  const char* meshname = child->GetAttributeValue ("mesh");
+	  iMeshWrapper* mesh = Engine->FindMeshObject (meshname);
+	  if (!mesh)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find mesh '%s' in sequence '%s'!", meshname,
+		seqname);
+	    return NULL;
+	  }
+	  const char* matname = child->GetAttributeValue ("material");
+	  iMaterialWrapper* mat = Engine->FindMaterial (matname);
+	  if (!mat)
+	  {
+	    SyntaxService->ReportError (
+		"crystalspace.maploader.parse.sequence",
+		child, "Couldn't find material '%s' in sequence '%s'!", matname,
+		seqname);
+	    return NULL;
+	  }
+	  sequence->AddOperationSetMaterial (cur_time, mesh, mat);
+	}
+        break;
       case XMLTOKEN_FADECOLOR:
         {
 	  const char* meshname = child->GetAttributeValue ("mesh");

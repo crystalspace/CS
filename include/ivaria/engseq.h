@@ -24,6 +24,7 @@
 struct iSequence;
 struct iSequenceManager;
 struct iSequenceTrigger;
+struct iMaterialWrapper;
 struct iSector;
 struct iMeshWrapper;
 struct iObject;
@@ -56,6 +57,12 @@ struct iSequenceWrapper : public iBase
    * through the regular iSequence->AddOperation().
    */
   virtual iSequence* GetSequence () = 0;
+
+  /**
+   * Operation: set a material on a mesh.
+   */
+  virtual void AddOperationSetMaterial (csTicks time, iMeshWrapper* mesh,
+		  iMaterialWrapper* mat) = 0;
 
   /**
    * Operation: set a light color.

@@ -45,6 +45,8 @@ public:
   virtual ~csSequenceWrapper ();
 
   iSequence* GetSequence () { return sequence; }
+  void AddOperationSetMaterial (csTicks time, iMeshWrapper* mesh,
+		  iMaterialWrapper* mat);
   void AddOperationSetLight (csTicks time, iLight* light,
 		  const csColor& color);
   void AddOperationFadeLight (csTicks time, iLight* light,
@@ -96,6 +98,11 @@ public:
     virtual iSequence* GetSequence ()
     {
       return scfParent->GetSequence ();
+    }
+    virtual void AddOperationSetMaterial (csTicks time, iMeshWrapper* mesh,
+		  iMaterialWrapper* mat)
+    {
+      scfParent->AddOperationSetMaterial (time, mesh, mat);
     }
     virtual void AddOperationSetLight (csTicks time, iLight* light,
 		  const csColor& color)

@@ -3,6 +3,11 @@ The history order is reversed so that new features are at the top.
 28-Sep-2002
 	- Fixed a new bug with iSector->HitBeam() in octree based
 	  levels.
+	- Added new set material operation to the engine
+	  sequence manager. Also added the appropriate command
+	  to the sequence parser. This new command is able to
+	  change the material of genmesh, ball, sprite3d, cloth,
+	  and particle systems.
 27-Sep-2002
 	- Added new set and fade color operations to the engine
 	  sequence manager. Also added the appropriate commands
