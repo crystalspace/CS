@@ -58,7 +58,7 @@ public:
 
   /**
    * Request the string corresponding to the given ID.
-   * \return Null if the string * has not been requested (yet), else the string
+   * \return Null if the string has not been requested (yet), else the string
    *   corresponding to the ID.
    */
   virtual const char* Request(csStringID id) const
