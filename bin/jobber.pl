@@ -60,9 +60,18 @@
 #    access to the repository.
 #
 # To-Do List
+#    * Batch the CVS `add' and `remove' commands whenever possible.  This
+#      should speed up the script significantly when many files need to be
+#      added and removed since the current method of invoking a CVS command for
+#      each file is quit slow on account of the fact that a new session with
+#      both the SSH and CVS servers must be initiated each time.  Files which
+#      are being added must be batched into three groups: (1) directories, (2)
+#      binary files, and (3) text files.  Furthermore, the directories must be
+#      added to the repository before the other files are added.  Binary and
+#      text files can be added in any order after that.
 #    * Generalize into a "job" processing mechanism.  Each job should reside
 #      within its own source file.  There can be jobs to check out files from
-#      CVS, run the various 'make' commands (make platform, make htmldoc, make
+#      CVS, run the various `make' commands (make platform, make htmldoc, make
 #      repairdoc, make msvcgen, etc.), and perform the comparision and commit
 #      of generated files.
 #    * The mechanism used to publish packages for download and online browsing
