@@ -111,7 +111,7 @@ iIsoSprite* csIsoEngine::CreateFrontSprite(const csVector3& pos, float w,
       float h)
 {
   iIsoSprite *spr = new csIsoSprite(this);
-  float hw = w * 0.5;
+  float hw = w * 0.25;
   spr->AddVertex(csVector3(-hw, 0,-hw), 0, 0);
   spr->AddVertex(csVector3(-hw, h, -hw), 1, 0);
   spr->AddVertex(csVector3(+hw, h, +hw), 1, 1);

@@ -150,6 +150,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     "/lib/std/mystone2.gif");
   iMaterialHandle *snow = LoadTexture(this, txtmgr, VFS, 
     "/lib/std/snow.jpg");
+  iMaterialHandle *halo = LoadTexture(this, txtmgr, VFS, 
+    "/lib/stdtex/flare_purp.jpg");
 
   // create a rectangular grid in the world
   // the grid is 10 units wide (from 0..10 in the +z direction)
@@ -176,7 +178,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   // add the player sprite to the world
   csVector3 startpos(10,0,5);
-  player = engine->CreateFrontSprite(startpos, 0.7, 2.7);
+  player = engine->CreateFrontSprite(startpos, 1.3, 2.7);
   player->SetMaterialHandle(snow);
   player->SetMixmode(CS_FX_ADD);
   world->AddSprite(player);
@@ -184,11 +186,18 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   // add a light to the scene.
   iIsoLight *scenelight = engine->CreateLight();
-  scenelight->SetPosition(csVector3(3,3,6));
+  scenelight->SetPosition(csVector3(3,2,6));
   scenelight->SetGrid(grid);
   scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
   scenelight->SetRadius(5.0);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+
+  // add a glowing halo to the light
+  sprite = engine->CreateFrontSprite(scenelight->GetPosition() -
+    csVector3(0,1.0,0), 2.0, 2.0);
+  sprite->SetMaterialHandle(halo);
+  sprite->SetMixmode(CS_FX_ADD);
+  world->AddSprite(sprite);
 
   // add a light for the player, above players head.
   light = engine->CreateLight();
