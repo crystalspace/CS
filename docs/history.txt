@@ -1,6 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
 23-Mar-2001:
+	- Wouter Wijngaards made 'make win32gcc' correctly detect the
+	  presence of a bash (or other) shell used by the makefile system.
+	  It will then autoconfigure for that. If run from command prompt,
+	  it will configure for that.
+	- Wouter also added Get methods to iParticleState for the
+	  ChangeRotation, ChangeSize, ChangeColor, ChangeAlpha and so.
+	- Philip Wyett did some re-work of MingW docs to take account of
+	  new all in one CS MingW package...
 	- Did an optimization in the CheckFrustum routines. It was apparantly
 	  doing a copy of every polygon without actually using that copy.
 	- Changed the polygon handling functions in CheckFrustum to use object
