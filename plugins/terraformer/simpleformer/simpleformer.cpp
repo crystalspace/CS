@@ -198,7 +198,7 @@ csSimpleSampler::~csSimpleSampler ()
 
 inline int iround(double x)
 {
-  return (int)floor(x + 0.5);
+  return (int)floor(x);
 }
 
 void csSimpleSampler::CachePositions ()
@@ -393,7 +393,7 @@ void csSimpleSampler::CacheHeights ()
 void csSimpleSampler::CacheTexCoords ()
 {
   // Break if we've already cached the data
-  if (heights != 0)
+  if (texCoords != 0)
     return;
 
   // Allocate new data

@@ -11,6 +11,8 @@ chronological order.
 	  textures wasn't called, and is now called on access in the shader
 	  plugin (XMLShader). Not sure that's the correct place, but it works
 	  for now.
+	- Anders Stenberg fixed a bug in SimpleFormer which made it reallocate
+	  texture data on each access, i.e. leak enormous amounts of memory.
 19-Mar-2004
 	- res fixed compilation of the aseie plugin.
 	- duhprey overrided the correct Write in null2d (from Jorrit)
