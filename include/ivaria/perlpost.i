@@ -18,6 +18,12 @@
 
 #ifdef SWIGPERL5
 
+/****************************************************************************
+ * The AUTOLOAD function is called by Perl if the user tries to call a
+ * non-existant object method. We use this to add loads of custom methods
+ * to every class without bloating the module. Specifically, we add object
+ * property accessor methods.
+ ****************************************************************************/
 %native(AUTOLOAD) AutoLoad;
 %{
   void AutoLoad (pTHXo_ CV *thisfunc)
@@ -42,6 +48,9 @@
   }
 %}
 
+/****************************************************************************
+ * This is CS's interface to the Perl script's event handler.
+ ****************************************************************************/
 %{
   static const int csInitializer_SetupEventHandler_DefaultMask
     = CSMASK_Nothing
@@ -81,6 +90,9 @@
   }
 %}
 
+/****************************************************************************
+ * This is the Perl script's interface to SetupEventHandler.
+ ****************************************************************************/
 %native(csInitializer_SetupEventHandler) pl_csInitializer_SetupEventHandler;
 %{
   void pl_csInitializer_SetupEventHandler (pTHXo_ CV *thisfunc)
@@ -113,6 +125,9 @@
   }
 %}
 
+/****************************************************************************
+ * This is a wrapper function for RequestPlugin's variable argument list.
+ ****************************************************************************/
 %native(csInitializer_RequestPlugins) _csInitializer_RequestPlugins;
 %{
   void _csInitializer_RequestPlugins (pTHXo_ CV *thisfunc)
@@ -148,6 +163,11 @@
   }
 %}
 
+/****************************************************************************
+ * This is a hack to get the iBlah_VERSION constant for any interface, given
+ * the "iBlah" is provided as a string.
+ * Used by the macro replacements below.
+ ****************************************************************************/
 %{
   int scfGetVersion (const char *iface)
   {
@@ -164,6 +184,11 @@
   }
 %}
 
+/****************************************************************************
+ * These functions are replacements for CS's macros of the same names.
+ * These functions can be wrapped by Swig.
+ * They use scfGetVersion defined above.
+ ****************************************************************************/
 %inline %{
   #undef CS_QUERY_REGISTRY
   #undef CS_QUERY_REGISTRY_TAG_INTERFACE
@@ -227,6 +252,9 @@
   }
 %}
 
+/****************************************************************************
+ * Helper function for the macros defined below.
+ ****************************************************************************/
 %{
   void csRequestPlugin (char *iface, int &idnum, int &ver)
   {
@@ -235,13 +263,47 @@
   }
 %}
 
-%apply char * OUTPUT { char *& __scfid__ };
-%apply char * OUTPUT { char *& __iface__ };
-%apply char * INOUT { char *& __Iscfid__ };
-%apply char * INOUT { char *& __Iiface__ };
+/****************************************************************************
+ * Custom INPUT/OUTPUT/INOUT typemaps like those imported from typemaps.i,
+ * needed since typemaps.i doesn't define any for strings.
+ ****************************************************************************/
+%typemap(in) char *& INPUT (char * tmp)
+{
+  tmp = (char *) SvPV_nolen ($input);
+  $1 = & tmp;
+}
+%typemap(in, numinputs = 0) char *& OUTPUT (char * tmp)
+{
+  $1 = & tmp;
+}
+%typemap(argout) char *& OUTPUT
+{
+  if (argvi >= items) { EXTEND (sp, 1); }
+  $result = sv_newmortal ();
+  sv_setpvn ($result, * ($1));
+  argvi++;
+}
+%typemap(in) char *& INOUT = char *& INPUT;
+%typemap(argout) char *& INOUT = char *& OUTPUT;
+%typemap(typecheck) char *& INPUT = char *;
+%typemap(typecheck) char *& OUTPUT = char *;
+%typemap(typecheck) char *& INOUT = char *;
+
+/****************************************************************************
+ * Apply typemaps to arguments of macro replacement functions below.
+ ****************************************************************************/
+%apply char *& OUTPUT { char *& __scfid__ };
+%apply char *& OUTPUT { char *& __iface__ };
+%apply char *& INOUT { char *& __Iscfid__ };
+%apply char *& INOUT { char *& __Iiface__ };
 %apply int * OUTPUT { int & __idnum__ };
 %apply int * OUTPUT { int & __ver__ };
 
+/****************************************************************************
+ * These functions are replacements for CS's macros of the same names.
+ * These functions can be wrapped by Swig.
+ * They use csRequestPlugin defined above, and the typemaps.
+ ****************************************************************************/
 %inline %{
   #undef CS_REQUEST_PLUGIN
   #undef CS_REQUEST_VFS
@@ -350,6 +412,9 @@
   }
 %}
 
+/****************************************************************************
+ * Wrapper function to get the array returned by GetCollisionPairs().
+ ****************************************************************************/
 %native(iCollideSystem_GetCollisionPairs) _GetCollisionPairs;
 %{
   void _GetCollisionPairs (pTHXo_ CV *thisfunc)
@@ -383,10 +448,16 @@
   }
 %}
 
+/****************************************************************************
+ * Typemaps used by the csVector2/3 wrappings below.
+ ****************************************************************************/
 %apply float * OUTPUT { float & __v1__ };
 %apply float * OUTPUT { float & __v2__ };
 %apply float * OUTPUT { float & __v3__ };
 
+/****************************************************************************
+ * Some extra operator overloads for csVector2.
+ ****************************************************************************/
 %extend csVector2
 {
   float __abs__ ()
@@ -400,6 +471,9 @@
   }
 }
 
+/****************************************************************************
+ * Some extra operator overloads for csVector3.
+ ****************************************************************************/
 %extend csVector3
 {
   float __abs__ ()
@@ -418,6 +492,10 @@
   }
 }
 
+/****************************************************************************
+ * These functions are replacements for CS's macros of the same names.
+ * These functions can be wrapped by Swig.
+ ****************************************************************************/
 %inline %{
   #undef CS_VEC_FORWARD
   #undef CS_VEC_BACKWARD
@@ -494,8 +572,14 @@
   }
 %}
 
+/****************************************************************************
+ * Create a typemap for the i/csString wrappings below.
+ ****************************************************************************/
 TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
 
+/****************************************************************************
+ * Some extra operator overloads for iString.
+ ****************************************************************************/
 %extend iString
 {
   bool __seq__ (iString *other)
@@ -549,6 +633,9 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   }
 }
 
+/****************************************************************************
+ * Some extra operator overloads for csString.
+ ****************************************************************************/
 %extend csString
 {
   bool __eq__ (const char *other)
@@ -618,6 +705,10 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   }
 }
 
+/****************************************************************************
+ * An extra operator overload for csHashMapReversible.
+ * This one converts it to a native Perl hash.
+ ****************************************************************************/
 %native(csHashMapReversible___hv__) ___hv__;
 %{
   void ___hv__ (pTHXo_ CV *thisfunc)

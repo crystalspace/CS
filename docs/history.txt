@@ -24,6 +24,10 @@ The history order is reversed so that new features are at the top.
 	  Overall, this change fixes the problem where the Jam build system
 	  would never build the DirectDraw canvas(es) because it thought
 	  DirectDraw was unavailable.
+	- Oktal fixed broken %apply directives in the Perl Swig module by
+	  adding his own typemaps like those found in Swig's typemaps.i file
+	  (since typemaps.i doesn't define typemaps for strings), and added
+	  lots of nice comments to perlpre.i and perlpost.i.
 1-June-2003
 	- Philip Wyett started adding MSVC 7 external app HOWTO screenshot
 	  images.

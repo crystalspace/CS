@@ -18,6 +18,10 @@
 
 #ifdef SWIGPERL5
 
+/****************************************************************************
+ * Renaming operators is the first stage of wrapping them.
+ * We ignore operator [] and () since these will have to be wrapped manually.
+ ****************************************************************************/
 %ignore			*::operator[], *::operator();
 
 %rename(__add__)	*::operator+;
@@ -58,83 +62,88 @@
 %rename(__land__)	*::operator&&;
 %rename(__lor__)	*::operator||;
 
+/****************************************************************************
+ * Applying this Perl code is the second and final stage of wrapping
+ * operator overloads. It is commented out since Swig doesn't yet have a
+ * %perl5code directive.
+ ****************************************************************************/
 #if 0
-  %extend T
-  {
-    %perl5code %{
-      use overload (
-        'abs'	=> '__abs__',
-        'bool'	=> '__bool__',
-        '""'	=> '__string__',
-        '0+'	=> '__numer__',
+%perl5code %{
+  use overload (
+    'abs'	=> '__abs__',
+    'bool'	=> '__bool__',
+    '""'	=> '__string__',
+    '0+'	=> '__numer__',
 
-        '+'	=> '__add__',
-        '-'	=> '__subtr__',
-        '*'	=> '__mult__',
-        '/'	=> '__div__',
-        '%'	=> '__modulo__',
-        '**'	=> '__pow__',
+    '+'		=> '__add__',
+    '-'		=> '__subtr__',
+    '*'		=> '__mult__',
+    '/'		=> '__div__',
+    '%'		=> '__modulo__',
+    '**'	=> '__pow__',
 
-        '<<'	=> '__lshift__',
-        '>>'	=> '__rshift__',
-        '&'	=> '__and__',
-        '|'	=> '__or__',
-        '^'	=> '__xor__',
+    '<<'	=> '__lshift__',
+    '>>'	=> '__rshift__',
+    '&'		=> '__and__',
+    '|'		=> '__or__',
+    '^'		=> '__xor__',
 
-        '+='	=> '__add_ass__',
-        '-='	=> '__subtr_ass__',
-        '*='	=> '__mult_ass__',
-        '/='	=> '__div_ass__',
-        '%='	=> '__modulo_ass__',
-        '**='	=> '__pow_ass__',
-        '<<='	=> '__lshift_ass__',
-        '>>='	=> '__rshift_ass__',
-        '&='	=> '__and_ass__',
-        '|='	=> '__or_ass__',
-        '^='	=> '__xor_ass__',
+    '+='	=> '__add_ass__',
+    '-='	=> '__subtr_ass__',
+    '*='	=> '__mult_ass__',
+    '/='	=> '__div_ass__',
+    '%='	=> '__modulo_ass__',
+    '**='	=> '__pow_ass__',
+    '<<='	=> '__lshift_ass__',
+    '>>='	=> '__rshift_ass__',
+    '&='	=> '__and_ass__',
+    '|='	=> '__or_ass__',
+    '^='	=> '__xor_ass__',
 
-        '<'	=> '__lt__',
-        '<='	=> '__le__',
-        '>'	=> '__gt__',
-        '>='	=> '__ge__',
-        '=='	=> '__eq__',
-        '!='	=> '__ne__',
+    '<'		=> '__lt__',
+    '<='	=> '__le__',
+    '>'		=> '__gt__',
+    '>='	=> '__ge__',
+    '=='	=> '__eq__',
+    '!='	=> '__ne__',
 
-        'lt'	=> '__slt__',
-        'le'	=> '__sle__',
-        'gt'	=> '__sgt__',
-        'ge'	=> '__sge__',
-        'eq'	=> '__seq__',
-        'ne'	=> '__sne__',
+    'lt'	=> '__slt__',
+    'le'	=> '__sle__',
+    'gt'	=> '__sgt__',
+    'ge'	=> '__sge__',
+    'eq'	=> '__seq__',
+    'ne'	=> '__sne__',
 
-        '!'	=> '__not__',
-        '~'	=> '__compl__',
-        '++'	=> '__inc__',
-        '--'	=> '__dec__',
+    '!'		=> '__not__',
+    '~'		=> '__compl__',
+    '++'	=> '__inc__',
+    '--'	=> '__dec__',
 
-        'x'	=> '__repeat__',
-        '.'	=> '__concat__',
-        'x='	=> '__repeat_ass__',
-        '.='	=> '__concat_ass__',
-        '='	=> '__copy__',
+    'x'		=> '__repeat__',
+    '.'		=> '__concat__',
+    'x='	=> '__repeat_ass__',
+    '.='	=> '__concat_ass__',
+    '='		=> '__copy__',
 
-        'neg'	=> '__neg__',
+    'neg'	=> '__neg__',
 
-        '${}'	=> '__sv__',
-        '@{}'	=> '__av__',
-        '%{}'	=> '__hv__',
-        '*{}'	=> '__gv__',
-        '&{}'	=> '__cv__',
+    '${}'	=> '__sv__',
+    '@{}'	=> '__av__',
+    '%{}'	=> '__hv__',
+    '*{}'	=> '__gv__',
+    '&{}'	=> '__cv__',
 
-        '<>'	=> '__iter__'
-      );
+    '<>'	=> '__iter__'
+  );
 
-      *and = *__land__;
-      *or = *__lor__;
-    %}
-  }
+  *and = *__land__;
+  *or = *__lor__;
+%}
 #endif // 0
 
+/****************************************************************************
+ * Fix wrapping of int8 so that Perl uses an int instead of a length-1 string.
+ ****************************************************************************/
 %typemap(in) int8
 {
   $1 = SvIV ($input);
@@ -144,6 +153,9 @@
   $result = newSViv ($1);
 }
 
+/****************************************************************************
+ * Define typemaps to get the pointers out of csRef, csPtr and csWrapPtr.
+ ****************************************************************************/
 %define TYPEMAP_OUT_csRef_BODY(pT, cT)
   if (rf.IsValid ())
   {
@@ -186,6 +198,9 @@
   }
 %enddef
 
+/****************************************************************************
+ * Typemaps to convert an argc/argv pair to a Perl array.
+ ****************************************************************************/
 %typemap(in) (int argc, char const * const argv[])
 {
   if (SvTYPE ($input) != SVt_PVAV)
@@ -213,6 +228,9 @@
   $2 = SvPV_nolen ($input);
 }
 
+/****************************************************************************
+ * Typemaps to handle arrays.
+ ****************************************************************************/
 #undef TYPEMAP_OUTARG_ARRAY_BODY
 %define TYPEMAP_OUTARG_ARRAY_BODY(array_type, base_type, cnt, ptr, to_item)
   AV *av = newAV ();
