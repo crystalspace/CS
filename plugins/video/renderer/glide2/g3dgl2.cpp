@@ -1512,7 +1512,7 @@ void csGraphics3DGlide2x::DrawPixmap ( iTextureHandle *hTex,
 
   // Clipping
   if ((sx >= ClipX2) || (sy >= ClipY2) ||
-      (sx + sw <= ClipX1) || (sy + sh <= ClipY1))
+      (sx + sw < ClipX1) || (sy + sh < ClipY1))
     return;                             // Sprite is totally invisible
   if (sx < ClipX1)                      // Left margin crossed?
   {
@@ -1521,9 +1521,9 @@ void csGraphics3DGlide2x::DrawPixmap ( iTextureHandle *hTex,
     _tw = (_tw * nw) / sw;              // Adjust width on texture
     sw = nw; sx = ClipX1;
   } /* endif */
-  if (sx + sw > ClipX2)                 // Right margin crossed?
+  if (sx + sw >= ClipX2)                 // Right margin crossed?
   {
-    int nw = ClipX2 - sx;               // New width
+    int nw = ClipX2 - sx -1;               // New width
     _tw = (_tw * nw) / sw;              // Adjust width on texture
     sw = nw;
   } /* endif */
@@ -1534,9 +1534,9 @@ void csGraphics3DGlide2x::DrawPixmap ( iTextureHandle *hTex,
     _th = (_th * nh) / sh;              // Adjust height on texture
     sh = nh; sy = ClipY1;
   } /* endif */
-  if (sy + sh > ClipY2)                 // Bottom margin crossed?
+  if (sy + sh >= ClipY2)                 // Bottom margin crossed?
   {
-    int nh = ClipY2 - sy;               // New height
+    int nh = ClipY2 - sy-1;               // New height
     _th = (_th * nh) / sh;              // Adjust height on texture
     sh = nh;
   } /* endif */
