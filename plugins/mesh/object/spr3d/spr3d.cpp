@@ -520,7 +520,7 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 }
 
 
-csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n)
+csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n) const
 {
   for (int i = GetNumActions () - 1; i >= 0; i--)
     if (strcmp (GetAction (i)->GetName (), n) == 0)
@@ -549,6 +549,7 @@ void csSprite3DMeshObjectFactory::Sprite3DFactoryState::EnableSkeletalAnimation 
 }
 
 iSkeleton* csSprite3DMeshObjectFactory::Sprite3DFactoryState::GetSkeleton ()
+  const
 {
   iSkeleton* iskel = QUERY_INTERFACE_SAFE (scfParent->GetSkeleton (), iSkeleton);
   if (iskel) iskel->DecRef ();
@@ -1545,7 +1546,7 @@ csMeshedPolygon* csSprite3DMeshObject::PolyMesh::GetPolygons ()
   return polygons;
 }
 
-iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState ()
+iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState () const
 {
   iSkeletonState* iskelstate = QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (), iSkeletonState);
   if (iskelstate) iskelstate->DecRef ();

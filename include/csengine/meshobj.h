@@ -164,12 +164,12 @@ public:
   /// Set owner (actor) for this object.
   void SetMyOwner (csObject* newOwner) { myOwner = newOwner; }
   /// Get owner (actor) for this object.
-  csObject* GetMyOwner () { return myOwner; }
+  csObject* GetMyOwner () const { return myOwner; }
 
   /// Set parent container for this object.
   void SetParentContainer (csObject* newParent) { parent = newParent; }
   /// Get parent container for this object.
-  csObject* GetParentContainer () { return parent; }
+  csObject* GetParentContainer () const { return parent; }
 
   /// Set the mesh factory.
   void SetFactory (csMeshFactoryWrapper* factory)
@@ -177,7 +177,7 @@ public:
     csMeshWrapper::factory = factory;
   }
   /// Get the mesh factory.
-  csMeshFactoryWrapper* GetFactory ()
+  csMeshFactoryWrapper* GetFactory () const
   {
     return factory;
   }
@@ -190,7 +190,7 @@ public:
   /// Set the Z-buf drawing mode to use for this object.
   void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
   /// Get the Z-buf drawing mode.
-  csZBufMode GetZBufMode () { return zbufMode; }
+  csZBufMode GetZBufMode () const { return zbufMode; }
 
   /**
    * Set a callback which is called just before the object is drawn.
@@ -207,7 +207,7 @@ public:
   }
 
   /// Get the draw callback.
-  csDrawCallback* GetDrawCallback ()
+  csDrawCallback* GetDrawCallback () const
   {
     return draw_cb;
   }
@@ -219,7 +219,7 @@ public:
   void MarkInvisible () { is_visible = false; }
 
   /// Return if this object is visible.
-  bool IsVisible () { return is_visible; }
+  bool IsVisible () const { return is_visible; }
 
   /**
    * Light object according to the given array of lights (i.e.
@@ -268,9 +268,11 @@ public:
 
   /// Get the children of this mesh object.
   csNamedObjVector& GetChildren () { return children; }
+  /// Get the children of this mesh object.
+  const csNamedObjVector& GetChildren () const { return children; }
 
   /// Get the radius of this mesh (ignoring children).
-  csVector3 GetRadius () { return mesh->GetRadius (); }
+  csVector3 GetRadius () const { return mesh->GetRadius (); }
 
   /**
    * Do a hard transform of this object.
@@ -321,7 +323,7 @@ public:
   /// Set the render priority for this object.
   void SetRenderPriority (long rp);
   /// Get the render priority for this object.
-  long GetRenderPriority ()
+  long GetRenderPriority () const
   {
     return render_priority;
   }
@@ -336,7 +338,7 @@ public:
     {
       return (csMeshWrapper*)scfParent;
     }
-    virtual iMeshObject* GetMeshObject ()
+    virtual iMeshObject* GetMeshObject () const
     {
       return scfParent->GetMeshObject ();
     }
@@ -344,7 +346,7 @@ public:
     {
       scfParent->SetMeshObject (m);
     }
-    virtual iObject *QueryObject()
+    virtual iObject *QueryObject ()
     {
       return scfParent;
     }
@@ -356,7 +358,7 @@ public:
     {
       scfParent->UpdateLighting (lights, num_lights);
     }
-    virtual iMovable* GetMovable ()
+    virtual iMovable* GetMovable () const
     {
       return &(scfParent->movable.scfiMovable);
     }
@@ -374,7 +376,7 @@ public:
     {
       scfParent->SetDrawCallback (cb, cbData);
     }
-    virtual csDrawCallback* GetDrawCallback ()
+    virtual csDrawCallback* GetDrawCallback () const
     {
       return scfParent->GetDrawCallback ();
     }
@@ -383,7 +385,7 @@ public:
     {
       scfParent->SetRenderPriority (rp);
     }
-    virtual long GetRenderPriority ()
+    virtual long GetRenderPriority () const
     {
       return scfParent->GetRenderPriority ();
     }
@@ -395,7 +397,7 @@ public:
     {
       scfParent->SetZBufMode (mode);
     }
-    virtual csZBufMode GetZBufMode ()
+    virtual csZBufMode GetZBufMode () const
     {
       return scfParent->GetZBufMode ();
     }
@@ -415,9 +417,12 @@ public:
     virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox,
   	csBox3& cbox);
     virtual void AddChild (iMeshWrapper* child);
-    virtual int GetChildCount () { return scfParent->GetChildren ().Length (); }
-    virtual iMeshWrapper* GetChild (int idx);
-    virtual csVector3 GetRadius () { return scfParent->GetRadius (); }
+    virtual int GetChildCount () const
+    {
+      return scfParent->GetChildren ().Length ();
+    }
+    virtual iMeshWrapper* GetChild (int idx) const;
+    virtual csVector3 GetRadius () const { return scfParent->GetRadius (); }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 
@@ -425,11 +430,11 @@ public:
   struct VisObject : public iVisibilityObject
   {
     DECLARE_EMBEDDED_IBASE (csMeshWrapper);
-    virtual iMovable* GetMovable ()
+    virtual iMovable* GetMovable () const
     {
       return &(scfParent->movable.scfiMovable);
     }
-    virtual long GetShapeNumber ()
+    virtual long GetShapeNumber () const
     {
       return scfParent->mesh->GetShapeNumber ();
     }
@@ -439,7 +444,7 @@ public:
     }
     virtual void MarkVisible () { scfParent->MarkVisible (); }
     virtual void MarkInvisible () { scfParent->MarkInvisible (); }
-    virtual bool IsVisible () { return scfParent->IsVisible (); }
+    virtual bool IsVisible () const { return scfParent->IsVisible (); }
   } scfiVisibilityObject;
   friend struct VisObject;
 };
@@ -469,7 +474,7 @@ public:
   void SetMeshObjectFactory (iMeshObjectFactory* meshFact);
 
   /// Get the mesh object factory.
-  iMeshObjectFactory* GetMeshObjectFactory ()
+  iMeshObjectFactory* GetMeshObjectFactory () const
   {
     return meshFact;
   }
@@ -500,7 +505,7 @@ public:
     {
       return (csMeshFactoryWrapper*)scfParent;
     }
-    virtual iMeshObjectFactory* GetMeshObjectFactory ()
+    virtual iMeshObjectFactory* GetMeshObjectFactory () const
     {
       return scfParent->GetMeshObjectFactory ();
     }
@@ -508,7 +513,7 @@ public:
     {
       scfParent->SetMeshObjectFactory (fact);
     }
-    virtual iObject *QueryObject()
+    virtual iObject *QueryObject ()
     {
       return scfParent;
     }

@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "csgeom/frustum.h"
 #include "csengine/cbufcube.h"
-#include "csengine/covcube.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"

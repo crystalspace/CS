@@ -95,7 +95,7 @@ public:
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
-  virtual iMeshObjectFactory* GetFactory () { return ifactory; }
+  virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -105,19 +105,19 @@ public:
     vis_cb = cb;
     vis_cbData = cbData;
   }
-  virtual csMeshCallback* GetVisibleCallback ()
+  virtual csMeshCallback* GetVisibleCallback () const
   {
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual csVector3 GetRadius () { return radius; }
   virtual void NextFrame (cs_time /*current_time*/) { }
-  virtual bool WantToDie () { return false; }
+  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
-  virtual bool SupportsHardTransform () { return true; }
+  virtual bool SupportsHardTransform () const { return true; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
-  virtual long GetShapeNumber () { return shapenr; }
+  virtual long GetShapeNumber () const { return shapenr; }
 };
 
 /**
@@ -141,30 +141,30 @@ public:
   virtual ~csCubeMeshObjectFactory ();
 
   /// Get the x size of this cube.
-  float GetSizeX () { return sizex; }
+  float GetSizeX () const { return sizex; }
   /// Get the y size of this cube.
-  float GetSizeY () { return sizey; }
+  float GetSizeY () const { return sizey; }
   /// Get the z size of this cube.
-  float GetSizeZ () { return sizez; }
+  float GetSizeZ () const { return sizez; }
   /// Get the shift.
-  const csVector3& GetShift () { return shift; }
+  const csVector3& GetShift () const { return shift; }
   /// Get the x shift of this cube.
-  float GetShiftX () { return shift.x; }
+  float GetShiftX () const { return shift.x; }
   /// Get the y shift of this cube.
-  float GetShiftY () { return shift.y; }
+  float GetShiftY () const { return shift.y; }
   /// Get the z shift of this cube.
-  float GetShiftZ () { return shift.z; }
+  float GetShiftZ () const { return shift.z; }
   /// Get the material for this cube.
-  iMaterialWrapper* GetMaterialWrapper () { return material; }
+  iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
-  UInt GetMixMode () { return MixMode; }
+  UInt GetMixMode () const { return MixMode; }
 
   //------------------------ iMeshObjectFactory implementation --------------
   DECLARE_IBASE;
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
-  virtual bool SupportsHardTransform () { return false; }
+  virtual bool SupportsHardTransform () const { return false; }
 
   //------------------------- iCubeFactoryState implementation ----------------
   class CubeFactoryState : public iCubeFactoryState
@@ -176,23 +176,24 @@ public:
       scfParent->sizey = sizey;
       scfParent->sizez = sizez;
     }
-    virtual float GetSizeX () { return scfParent->sizex; }
-    virtual float GetSizeY () { return scfParent->sizey; }
-    virtual float GetSizeZ () { return scfParent->sizez; }
+    virtual float GetSizeX () const { return scfParent->sizex; }
+    virtual float GetSizeY () const { return scfParent->sizey; }
+    virtual float GetSizeZ () const { return scfParent->sizez; }
     virtual void SetShift (float shiftx, float shifty, float shiftz)
     {
       scfParent->shift.Set (shiftx, shifty, shiftz);
     }
-    virtual float GetShiftX () { return scfParent->shift.x; }
-    virtual float GetShiftY () { return scfParent->shift.y; }
-    virtual float GetShiftZ () { return scfParent->shift.z; }
+    virtual float GetShiftX () const { return scfParent->shift.x; }
+    virtual float GetShiftY () const { return scfParent->shift.y; }
+    virtual float GetShiftZ () const { return scfParent->shift.z; }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->material = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper () { return scfParent->material; }
+    virtual iMaterialWrapper* GetMaterialWrapper () const
+    { return scfParent->material; }
     virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () { return scfParent->MixMode; }
+    virtual UInt GetMixMode () const { return scfParent->MixMode; }
   } scfiCubeFactoryState;
   friend class CubeFactoryState;
 };

@@ -97,7 +97,7 @@ class csFlags;
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 10);
+SCF_VERSION (iMeshWrapper, 0, 0, 12);
 
 /**
  * This interface corresponds to the object in the engine
@@ -108,11 +108,11 @@ struct iMeshWrapper : public iBase
   /// UGLY!!!@@@
   virtual csMeshWrapper* GetPrivateObject () = 0;
   /// Get the iMeshObject.
-  virtual iMeshObject* GetMeshObject () = 0;
+  virtual iMeshObject* GetMeshObject () const = 0;
   /// Set the iMeshObject.
   virtual void SetMeshObject (iMeshObject*) = 0;
   /// Get the iObject for this mesh object.
-  virtual iObject *QueryObject() = 0;
+  virtual iObject *QueryObject () = 0;
 
   /**
    * Update lighting as soon as the object becomes visible.
@@ -139,7 +139,7 @@ struct iMeshWrapper : public iBase
    * to make sure that internal data structures are
    * correctly updated.
    */
-  virtual iMovable* GetMovable () = 0;
+  virtual iMovable* GetMovable () const = 0;
 
   /**
    * Check if this object is hit by this object space vector.
@@ -165,7 +165,7 @@ struct iMeshWrapper : public iBase
   virtual void SetDrawCallback (csDrawCallback* cb, void* cbData) = 0;
 
   /// Get the draw callback.
-  virtual csDrawCallback* GetDrawCallback () = 0;
+  virtual csDrawCallback* GetDrawCallback () const = 0;
 
   /// Set the parent factory.
   virtual void SetFactory (iMeshFactoryWrapper* factory) = 0;
@@ -190,7 +190,7 @@ struct iMeshWrapper : public iBase
   /**
    * Get the render priority.
    */
-  virtual long GetRenderPriority () = 0;
+  virtual long GetRenderPriority () const = 0;
 
   /**
    * Get flags for this meshwrapper.
@@ -204,7 +204,7 @@ struct iMeshWrapper : public iBase
   /**
    * Get the Z-buf drawing mode.
    */
-  virtual csZBufMode GetZBufMode () = 0;
+  virtual csZBufMode GetZBufMode () const = 0;
 
   /**
    * Do a hard transform of this object.
@@ -241,19 +241,19 @@ struct iMeshWrapper : public iBase
   	csBox3& cbox) = 0;
 
   /// Get the number of children.
-  virtual int GetChildCount () = 0;
+  virtual int GetChildCount () const = 0;
   /// Get a child.
-  virtual iMeshWrapper* GetChild (int idx) = 0;
+  virtual iMeshWrapper* GetChild (int idx) const = 0;
   /**
    * Add a child to this object. The transform of that child will be
    * interpreted relative to this object.
    */
   virtual void AddChild (iMeshWrapper* child) = 0;
   /// Get the radius of this mesh (ignoring children).
-  virtual csVector3 GetRadius () = 0;
+  virtual csVector3 GetRadius () const = 0;
 };
 
-SCF_VERSION (iMeshFactoryWrapper, 0, 0, 4);
+SCF_VERSION (iMeshFactoryWrapper, 0, 0, 5);
 
 /**
  * This interface corresponds to the object in the engine
@@ -264,9 +264,9 @@ struct iMeshFactoryWrapper : public iBase
   /// UGLY!!!@@@
   virtual csMeshFactoryWrapper* GetPrivateObject () = 0;
   /// Get the iObject for this mesh factory.
-  virtual iObject *QueryObject() = 0;
+  virtual iObject *QueryObject () = 0;
   /// Get the iMeshObjectFactory.
-  virtual iMeshObjectFactory* GetMeshObjectFactory () = 0;
+  virtual iMeshObjectFactory* GetMeshObjectFactory () const = 0;
   /// Set the mesh object factory.
   virtual void SetMeshObjectFactory (iMeshObjectFactory* fact) = 0;
   /**

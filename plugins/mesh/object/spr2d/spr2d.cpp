@@ -495,7 +495,7 @@ void csSprite2DMeshObject::Sprite2DState::PlayUVAnimation (int idx, int style, b
   }
 }
 
-int csSprite2DMeshObject::Sprite2DState::GetUVAnimationCount () 
+int csSprite2DMeshObject::Sprite2DState::GetUVAnimationCount () const
 { return scfParent->factory->GetUVAnimationCount ();}
 iSprite2DUVAnimation *csSprite2DMeshObject::Sprite2DState::CreateUVAnimation ()
 { return scfParent->factory->CreateUVAnimation ();}

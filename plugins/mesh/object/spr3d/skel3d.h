@@ -71,13 +71,13 @@ public:
   virtual void AddVertex (int v);
 
   /// Get the vertex index array.
-  virtual int* GetVertices () { return vertices; }
+  virtual int* GetVertices () const { return vertices; }
 
   /// Get the number of vertices.
-  virtual int GetNumVertices () { return num_vertices; }
+  virtual int GetNumVertices () const { return num_vertices; }
 
   /// Get the bounding box.
-  void GetBoundingBox (csBox3& b) { b = box; }
+  void GetBoundingBox (csBox3& b) const { b = box; }
 
   /// Add a child limb.
   void AddChild (csSkelLimb* child);
@@ -88,9 +88,9 @@ public:
   /// Linked list.
   void SetNext (csSkelLimb* n) { next = n; }
   /// Linked list.
-  csSkelLimb* GetNext () { return next; }
+  csSkelLimb* GetNext () const { return next; }
   /// Linked list.
-  virtual iSkeletonLimb* GetNextSibling () { return (iSkeletonLimb*)next; }
+  virtual iSkeletonLimb* GetNextSibling () const { return (iSkeletonLimb*)next; }
 
   /// Create a csSkelState from this csSkel.
   virtual csSkelLimbState* CreateState ();
@@ -236,12 +236,14 @@ public:
   /// Get first child.
   csSkelLimbState* GetFirstChild () { return children; }
   /// Get first child.
-  iSkeletonLimbState* GetChildren () { return (iSkeletonLimbState*)children; }
+  iSkeletonLimbState* GetChildren () const
+  { return (iSkeletonLimbState*)children; }
 
   /// Get next sibling in list.
   csSkelLimbState* GetNext () { return next; }
   /// Get next sibling in list.
-  iSkeletonLimbState* GetNextSibling () { return (iSkeletonLimbState*)next; }
+  iSkeletonLimbState* GetNextSibling () const
+  { return (iSkeletonLimbState*)next; }
 
   /// Set the name for this limb.
   virtual void SetName (const char* name);
@@ -250,7 +252,7 @@ public:
   /// Set userdata object.
   virtual void SetUserData (void* data) { csSkelLimbState::data = data; }
   /// Get userdata object.
-  virtual void* GetUserData () { return data; }
+  virtual void* GetUserData () const { return data; }
 
 
   DECLARE_IBASE;

@@ -877,7 +877,7 @@ public:
   struct MeshObject : public iMeshObject
   {
     DECLARE_EMBEDDED_IBASE (csThing);
-    virtual iMeshObjectFactory* GetFactory ();
+    virtual iMeshObjectFactory* GetFactory () const;
     virtual bool DrawTest (iRenderView* /*rview*/, iMovable* /*movable*/)
     {
       //@@@ For now!
@@ -891,7 +891,7 @@ public:
       return scfParent->Draw (rview, movable, zMode);
     }
     virtual void SetVisibleCallback (csMeshCallback* /*cb*/, void* /*cbData*/) { }
-    virtual csMeshCallback* GetVisibleCallback () { return NULL; }
+    virtual csMeshCallback* GetVisibleCallback () const { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox,
     	int /*type = CS_BBOX_NORMAL*/)
     {
@@ -899,16 +899,16 @@ public:
     }
     virtual csVector3 GetRadius () { return scfParent->GetRadius (); }
     virtual void NextFrame (cs_time /*current_time*/) { }
-    virtual bool WantToDie () { return false; }
+    virtual bool WantToDie () const { return false; }
     virtual void HardTransform (const csReversibleTransform& t)
     {
       scfParent->HardTransform (t);
     }
-    virtual bool SupportsHardTransform () { return true; }
+    virtual bool SupportsHardTransform () const { return true; }
     virtual bool HitBeamObject (const csVector3& /*start*/,
     	const csVector3& /*end*/,
   	csVector3& /*isect*/, float* /*pr*/) { return false; }
-    virtual long GetShapeNumber () { return 0; /*@@@*/ }
+    virtual long GetShapeNumber () const { return 0; /*@@@*/ }
   } scfiMeshObject;
   friend struct MeshObject;
 
@@ -921,7 +921,7 @@ public:
     {
       scfParent->HardTransform (t);
     }
-    virtual bool SupportsHardTransform () { return true; }
+    virtual bool SupportsHardTransform () const { return true; }
   } scfiMeshObjectFactory;
   friend struct MeshObjectFactory;
 };

@@ -42,8 +42,6 @@
 #include "csengine/cbuffer.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"
-#include "csengine/covtree.h"
-#include "csengine/solidbsp.h"
 #include "csengine/meshobj.h"
 #include "csengine/terrobj.h"
 #include "csparser/impexp.h"

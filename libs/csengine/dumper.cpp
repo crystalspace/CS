@@ -29,8 +29,6 @@
 #include "csengine/bsp.h"
 #include "csengine/bsp2d.h"
 #include "csengine/octree.h"
-#include "csengine/quadtree.h"
-#include "csengine/quadcube.h"
 #include "csengine/lppool.h"
 #include "csengine/camera.h"
 #include "csengine/curve.h"

@@ -99,9 +99,9 @@ public:
 	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
   /// Get the material for this ball.
-  iMaterialWrapper* GetMaterialWrapper () { return material; }
+  iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
-  UInt GetMixMode () { return MixMode; }
+  UInt GetMixMode () const { return MixMode; }
   void SetRadius (float radiusx, float radiusy, float radiusz);
   void GetRadius (float& radx, float& rady, float& radz) const 
   { radx=radiusx; rady=radiusy; radz=radiusz; }
@@ -128,7 +128,7 @@ public:
     shapenr++;
   }
   /// Get reversed mode.
-  bool IsReversed ()
+  bool IsReversed () const
   {
     return reversed;
   }
@@ -140,18 +140,18 @@ public:
     shapenr++;
   }
   /// Only top half.
-  bool IsTopOnly ()
+  bool IsTopOnly () const
   {
     return toponly;
   }
   /// Set lighting.
   void SetLighting (bool l) { do_lighting = l; }
   /// Is lighting enabled.
-  bool IsLighting () { return do_lighting; }
+  bool IsLighting () const { return do_lighting; }
   /// Set the color to use. Will be added to the lighting values.
   void SetColor (const csColor& col) { color = col; }
   /// Get the color.
-  csColor GetColor () { return color; }
+  csColor GetColor () const { return color; }
   /// Use cylindrical texture mapping.
   void SetCylindricalMapping (bool m)
   {
@@ -159,7 +159,7 @@ public:
     initialized = false;
   }
   /// Test if cylindrical texture mapping is used.
-  bool IsCylindricalMapping ()
+  bool IsCylindricalMapping () const
   {
     return cyl_mapping;
   }
@@ -167,7 +167,7 @@ public:
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
-  virtual iMeshObjectFactory* GetFactory () { return factory; }
+  virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -177,19 +177,19 @@ public:
     vis_cb = cb;
     vis_cbData = cbData;
   }
-  virtual csMeshCallback* GetVisibleCallback ()
+  virtual csMeshCallback* GetVisibleCallback () const
   {
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual csVector3 GetRadius () { return max_radius; }
   virtual void NextFrame (cs_time /*current_time*/) { }
-  virtual bool WantToDie () { return false; }
+  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
-  virtual bool SupportsHardTransform () { return true; }
+  virtual bool SupportsHardTransform () const { return true; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
-  virtual long GetShapeNumber () { return shapenr; }
+  virtual long GetShapeNumber () const { return shapenr; }
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState
@@ -223,23 +223,23 @@ public:
     {
       scfParent->material = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper ()
+    virtual iMaterialWrapper* GetMaterialWrapper () const
     { return scfParent->material; }
     virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () { return scfParent->MixMode; }
+    virtual UInt GetMixMode () const { return scfParent->MixMode; }
     virtual void SetReversed (bool r) { scfParent->SetReversed (r); }
-    virtual bool IsReversed () { return scfParent->IsReversed (); }
+    virtual bool IsReversed () const { return scfParent->IsReversed (); }
     virtual void SetTopOnly (bool t) { scfParent->SetTopOnly (t); }
-    virtual bool IsTopOnly () { return scfParent->IsTopOnly (); }
+    virtual bool IsTopOnly () const { return scfParent->IsTopOnly (); }
     virtual void SetLighting (bool l) { scfParent->SetLighting (l); }
-    virtual bool IsLighting () { return scfParent->IsLighting (); }
+    virtual bool IsLighting () const { return scfParent->IsLighting (); }
     virtual void SetColor (const csColor& col) { scfParent->SetColor (col); }
-    virtual csColor GetColor () { return scfParent->GetColor (); }
+    virtual csColor GetColor () const { return scfParent->GetColor (); }
     virtual void SetCylindricalMapping (bool m)
     {
       scfParent->SetCylindricalMapping (m);
     }
-    virtual bool IsCylindricalMapping ()
+    virtual bool IsCylindricalMapping () const
     {
       return scfParent->IsCylindricalMapping ();
     }
@@ -264,7 +264,7 @@ public:
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
-  virtual bool SupportsHardTransform () { return false; }
+  virtual bool SupportsHardTransform () const { return false; }
 };
 
 /**

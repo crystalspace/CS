@@ -41,7 +41,7 @@ class csVector3;
 class csVector2;
 struct iSector;
 
-SCF_VERSION (iCamera, 0, 0, 9);
+SCF_VERSION (iCamera, 0, 0, 10);
 
 /// Camera class.
 struct iCamera : public iBase
@@ -50,20 +50,20 @@ struct iCamera : public iBase
   virtual csCamera* GetPrivateObject () = 0;
 
   ///
-  virtual int GetFOV () = 0;
+  virtual int GetFOV () const = 0;
   ///
-  virtual float GetInvFOV () = 0;
+  virtual float GetInvFOV () const = 0;
   ///
-  virtual float GetFOVAngle () = 0;
+  virtual float GetFOVAngle () const = 0;
   ///
   virtual void SetFOV (int a, int width) = 0;
   ///
   virtual void SetFOVAngle (float a, int width) = 0;
 
   ///
-  virtual float GetShiftX () = 0;
+  virtual float GetShiftX () const = 0;
   ///
-  virtual float GetShiftY () = 0;
+  virtual float GetShiftY () const = 0;
   ///
   virtual void SetPerspectiveCenter (float x, float y) = 0;
 
@@ -101,7 +101,7 @@ struct iCamera : public iBase
   virtual void MoveUnrestricted (const csVector3& v) = 0;
 
   /// Get the current sector.
-  virtual iSector* GetSector () = 0;
+  virtual iSector* GetSector () const = 0;
   /// Move to another sector.
   virtual void SetSector (iSector*) = 0;
 
@@ -112,7 +112,7 @@ struct iCamera : public iBase
   virtual void Correct (int n) = 0;
 
   /// Return true if space is mirrored.
-  virtual bool IsMirrored () = 0;
+  virtual bool IsMirrored () const = 0;
   /// Set mirrored state.
   virtual void SetMirrored (bool m) = 0;
 
@@ -122,7 +122,7 @@ struct iCamera : public iBase
    * not be used. Otherwise it must be used to clip the object before
    * drawing.
    */
-  virtual bool GetFarPlane (csPlane3& pl) = 0;
+  virtual bool GetFarPlane (csPlane3& pl) const = 0;
 
   /**
    * Get the camera number. This number is changed for every new camera
@@ -130,7 +130,7 @@ struct iCamera : public iBase
    * changes. This number can be used to cache camera vertex arrays, for
    * example.
    */
-  virtual long GetCameraNumber () = 0;
+  virtual long GetCameraNumber () const = 0;
 
   /// Calculate perspective corrected point for this camera.
   virtual void Perspective (const csVector3& v, csVector2& p) const = 0;

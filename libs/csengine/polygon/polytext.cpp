@@ -30,7 +30,6 @@
 #include "csengine/light.h"
 #include "csengine/sector.h"
 #include "csengine/engine.h"
-#include "csengine/quadcube.h"
 #include "csengine/lghtmap.h"
 #include "csutil/bitset.h"
 #include "ivideo/graph3d.h"

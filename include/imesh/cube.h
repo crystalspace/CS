@@ -23,7 +23,7 @@
 
 struct iMaterialWrapper;
 
-SCF_VERSION (iCubeFactoryState, 0, 0, 3);
+SCF_VERSION (iCubeFactoryState, 0, 0, 4);
 
 /**
  * This interface describes the API for the cube mesh object.
@@ -36,27 +36,27 @@ struct iCubeFactoryState : public iBase
   /// Set size of cube.
   virtual void SetSize (float sizex, float sizey, float sizez) = 0;
   /// Get size of cube.
-  virtual float GetSizeX () = 0;
+  virtual float GetSizeX () const = 0;
   /// Get size of cube.
-  virtual float GetSizeY () = 0;
+  virtual float GetSizeY () const = 0;
   /// Get size of cube.
-  virtual float GetSizeZ () = 0;
+  virtual float GetSizeZ () const = 0;
   /// Set shift of cube.
   virtual void SetShift (float shiftx, float shifty, float shiftz) = 0;
   /// Get shift of cube.
-  virtual float GetShiftX () = 0;
+  virtual float GetShiftX () const = 0;
   /// Get shift of cube.
-  virtual float GetShiftY () = 0;
+  virtual float GetShiftY () const = 0;
   /// Get shift of cube.
-  virtual float GetShiftZ () = 0;
+  virtual float GetShiftZ () const = 0;
   /// Set material of cube.
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
   /// Get material of cube.
-  virtual iMaterialWrapper* GetMaterialWrapper () = 0;
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
   /// Set mix mode.
   virtual void SetMixMode (UInt mode) = 0;
   /// Get mix mode.
-  virtual UInt GetMixMode () = 0;
+  virtual UInt GetMixMode () const = 0;
 };
 
 #endif

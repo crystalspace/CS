@@ -219,7 +219,7 @@ void csMovable::eiMovable::SetPosition (iSector* home, const csVector3& v)
   scfParent->SetPosition (home->GetPrivateObject (), v);
 }
 
-iSector* csMovable::eiMovable::GetSector (int idx)
+iSector* csMovable::eiMovable::GetSector (int idx) const
 {
   csSector* sect = (csSector*)scfParent->GetSectors ()[idx];
   if (!sect) return NULL;

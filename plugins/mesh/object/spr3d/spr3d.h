@@ -65,7 +65,7 @@ public:
   void SetTexIndex (int tex_idx) { texturing_index = tex_idx; }
 
   /// Return true if normals are already calculated.
-  bool NormalsCalculated () { return normals_calculated; }
+  bool NormalsCalculated () const { return normals_calculated; }
   /// Set normals calculated to value.
   void SetNormalsCalculated (bool n) { normals_calculated = n; }
 
@@ -88,7 +88,7 @@ public:
   /**
    * Get the bounding box in object space.
    */
-  void GetBoundingBox (csBox3& b) { b = box; }
+  void GetBoundingBox (csBox3& b) const { b = box; }
 
   DECLARE_IBASE;
 };
@@ -257,19 +257,19 @@ public:
   void SetSkeleton (csSkel* sk);
 
   /// Get the skeleton for this sprite template.
-  csSkel* GetSkeleton () { return skeleton; }
+  csSkel* GetSkeleton () const { return skeleton; }
 
   /// Get the 'emerge_from' array from which you can construct triangles.
-  int* GetEmergeFrom () { return emerge_from; }
+  int* GetEmergeFrom () const { return emerge_from; }
 
   /// Enable or disable tweening frames (default false).
   void EnableTweening (bool en) { do_tweening = en; }
 
   /// Is tweening enabled?
-  bool IsTweeningEnabled () { return do_tweening; }
+  bool IsTweeningEnabled () const { return do_tweening; }
  
   /// Returns the lighting quality for this template.
-  int GetLightingQuality() { return lighting_quality; }
+  int GetLightingQuality() const { return lighting_quality; }
 
   /// Sets the lighting quality for this template.  See CS_SPR_LIGHTING_* defs.
   void SetLightingQuality(int quality) {lighting_quality = quality; }
@@ -290,11 +290,11 @@ public:
   /**
    * Returns what this template is using for determining the lighting quality.
    */
-  int GetLightingQualityConfig ()
+  int GetLightingQualityConfig () const
   { return lighting_quality_config; };
 
   /// Returns the lod_level for this template.
-  float GetLodLevel() { return lod_level; }
+  float GetLodLevel() const { return lod_level; }
 
   /// Sets the lod level for this template.  See CS_SPR_LOD_* defs.
   void SetLodLevel(float level) {lod_level = level; }
@@ -315,7 +315,7 @@ public:
   /**
    * Returns what this template is using for determining the lighting quality.
    */
-  int GetLodLevelConfig ()
+  int GetLodLevelConfig () const
   { return lod_level_config; };
 
   /**
@@ -333,7 +333,7 @@ public:
   void ComputeBoundingBox ();
 
   ///
-  csTriangleMesh2* GetTexelMesh () {return texel_mesh;}
+  csTriangleMesh2* GetTexelMesh () const {return texel_mesh;}
 
   /// Add some vertices, normals, and texels
   void AddVertices (int num);
@@ -341,30 +341,30 @@ public:
   void AddVertex () { AddVertices (1); }
 
   /// Query the number of texels.
-  int GetNumTexels () { return texels.Get(0)->GetNumVertices (); }
+  int GetNumTexels () const { return texels.Get(0)->GetNumVertices (); }
   /// Get a texel.
-  csVector2& GetTexel (int frame, int vertex)
+  csVector2& GetTexel (int frame, int vertex) const
     { return (*texels.Get(frame)) [vertex]; }
   /// Get array of texels.
-  csVector2* GetTexels (int frame)
+  csVector2* GetTexels (int frame) const
     { return (*texels.Get(frame)).GetVertices (); }
 
   /// Query the number of vertices.
-  int GetNumVertices () { return vertices.Get (0)->GetNumVertices (); }
+  int GetNumVertices () const { return vertices.Get (0)->GetNumVertices (); }
   /// Get a vertex.
-  csVector3& GetVertex (int frame, int vertex)
+  csVector3& GetVertex (int frame, int vertex) const
     { return (*vertices.Get(frame)) [vertex]; }
   /// Get vertex array.
-  csVector3* GetVertices (int frame)
+  csVector3* GetVertices (int frame) const
     { return (*vertices.Get(frame)).GetVertices (); }
 
   /// Query the number of normals.
-  int GetNumNormals () { return normals.Get (0)->GetNumVertices (); }
+  int GetNumNormals () const { return normals.Get (0)->GetNumVertices (); }
   /// Get a normal.
-  csVector3& GetNormal (int frame, int vertex)
+  csVector3& GetNormal (int frame, int vertex) const
     { return (*normals.Get(frame)) [vertex]; }
   /// Get normal array.
-  csVector3* GetNormals (int frame)
+  csVector3* GetNormals (int frame) const
     { return (*normals.Get(frame)).GetVertices (); }
 
   /**
@@ -373,34 +373,34 @@ public:
    */
   void AddTriangle (int a, int b, int c);
   /// returns the texel indices for triangle 'x'
-  csTriangle GetTriangle (int x) { return texel_mesh->GetTriangle(x); }
+  csTriangle GetTriangle (int x) const { return texel_mesh->GetTriangle(x); }
   /// returns the triangles of the texel_mesh
-  csTriangle* GetTriangles ()    { return texel_mesh->GetTriangles(); }
+  csTriangle* GetTriangles () const { return texel_mesh->GetTriangles(); }
   /// returns the number of triangles in the sprite
-  int GetNumTriangles ()         { return texel_mesh->GetNumTriangles(); }
+  int GetNumTriangles () const { return texel_mesh->GetNumTriangles(); }
 
   /// Create and add a new frame to the sprite.
   csSpriteFrame* AddFrame ();
   /// find a named frame into the sprite.
   csSpriteFrame* FindFrame (const char * name);
   /// Query the number of frames
-  int GetNumFrames () { return frames.Length (); }
+  int GetNumFrames () const { return frames.Length (); }
   /// Query the frame number f
-  csSpriteFrame* GetFrame (int f)
+  csSpriteFrame* GetFrame (int f) const
   { return (f < frames.Length ()) ? (csSpriteFrame *)frames [f] : (csSpriteFrame*)NULL; }
 
   /// Create and add a new action frameset to the sprite.
   csSpriteAction2* AddAction ();
   /// find a named action into the sprite.
-  csSpriteAction2* FindAction (const char * name);
+  csSpriteAction2* FindAction (const char * name) const;
   /// Get the first action.
-  csSpriteAction2* GetFirstAction ()
+  csSpriteAction2* GetFirstAction () const
   { return (csSpriteAction2 *)actions [0]; }
   /// Get number of actions in sprite
-  int GetNumActions ()
+  int GetNumActions () const
   { return actions.Length (); }
   /// Get action number No
-  csSpriteAction2* GetAction (int No)
+  csSpriteAction2* GetAction (int No) const
   { return (csSpriteAction2 *)actions [No]; }
 
   /// Get the material
@@ -443,7 +443,7 @@ public:
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform& t);
-  virtual bool SupportsHardTransform () { return true; }
+  virtual bool SupportsHardTransform () const { return true; }
 
   //--------------------- iSprite3DFactoryState implementation -------------//
   struct Sprite3DFactoryState : public iSprite3DFactoryState
@@ -453,7 +453,7 @@ public:
     {
       scfParent->SetMaterial (material);
     }
-    virtual iMaterialWrapper* GetMaterialWrapper ()
+    virtual iMaterialWrapper* GetMaterialWrapper () const
     {
       return scfParent->GetMaterial ();
     }
@@ -461,39 +461,39 @@ public:
     {
       scfParent->AddVertices (num);
     }
-    virtual int GetNumTexels ()
+    virtual int GetNumTexels () const
     {
       return scfParent->GetNumTexels ();
     }
-    virtual csVector2& GetTexel (int frame, int vertex)
+    virtual csVector2& GetTexel (int frame, int vertex) const
     {
       return scfParent->GetTexel (frame, vertex);
     }
-    virtual csVector2* GetTexels (int frame)
+    virtual csVector2* GetTexels (int frame) const
     {
       return scfParent->GetTexels (frame);
     }
-    virtual int GetNumVertices ()
+    virtual int GetNumVertices () const
     {
       return scfParent->GetNumVertices ();
     }
-    virtual csVector3& GetVertex (int frame, int vertex)
+    virtual csVector3& GetVertex (int frame, int vertex) const
     {
       return scfParent->GetVertex (frame, vertex);
     }
-    virtual csVector3* GetVertices (int frame)
+    virtual csVector3* GetVertices (int frame) const
     {
       return scfParent->GetVertices (frame);
     }
-    virtual int GetNumNormals ()
+    virtual int GetNumNormals () const
     {
       return scfParent->GetNumNormals ();
     }
-    virtual csVector3& GetNormal (int frame, int vertex)
+    virtual csVector3& GetNormal (int frame, int vertex) const
     {
       return scfParent->GetNormal (frame, vertex);
     }
-    virtual csVector3* GetNormals (int frame)
+    virtual csVector3* GetNormals (int frame) const
     {
       return scfParent->GetNormals (frame);
     }
@@ -501,15 +501,15 @@ public:
     {
       scfParent->AddTriangle (a, b, c);
     }
-    virtual csTriangle GetTriangle (int x)
+    virtual csTriangle GetTriangle (int x) const
     {
       return scfParent->GetTriangle (x);
     }
-    virtual csTriangle* GetTriangles ()
+    virtual csTriangle* GetTriangles () const
     {
       return scfParent->GetTriangles ();
     }
-    virtual int GetNumTriangles ()
+    virtual int GetNumTriangles () const
     {
       return scfParent->GetNumTriangles ();
     }
@@ -519,17 +519,17 @@ public:
       if (ifr) ifr->DecRef ();
       return ifr;
     }
-    virtual iSpriteFrame* FindFrame (const char* name)
+    virtual iSpriteFrame* FindFrame (const char* name) const
     {
       iSpriteFrame* ifr = QUERY_INTERFACE_SAFE (scfParent->FindFrame (name), iSpriteFrame);
       if (ifr) ifr->DecRef ();
       return ifr;
     }
-    virtual int GetNumFrames ()
+    virtual int GetNumFrames () const
     {
       return scfParent->GetNumFrames ();
     }
-    virtual iSpriteFrame* GetFrame (int f)
+    virtual iSpriteFrame* GetFrame (int f) const
     {
       iSpriteFrame* ifr = QUERY_INTERFACE_SAFE (scfParent->GetFrame (f), iSpriteFrame);
       if (ifr) ifr->DecRef ();
@@ -541,35 +541,35 @@ public:
       if (ia) ia->DecRef ();
       return ia;
     }
-    virtual iSpriteAction* FindAction (const char* name)
+    virtual iSpriteAction* FindAction (const char* name) const
     {
       iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->FindAction (name), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
-    virtual iSpriteAction* GetFirstAction ()
+    virtual iSpriteAction* GetFirstAction () const
     {
       iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->GetFirstAction (), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
-    virtual int GetNumActions ()
+    virtual int GetNumActions () const
     {
       return scfParent->GetNumActions ();
     }
-    virtual iSpriteAction* GetAction (int No)
+    virtual iSpriteAction* GetAction (int No) const
     {
       iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->GetAction (No), iSpriteAction);
       if (ia) ia->DecRef ();
       return ia;
     }
     virtual void EnableSkeletalAnimation ();
-    virtual iSkeleton* GetSkeleton ();
+    virtual iSkeleton* GetSkeleton () const;
     virtual void EnableTweening (bool en)
     {
       scfParent->EnableTweening (en);
     }
-    virtual bool IsTweeningEnabled ()
+    virtual bool IsTweeningEnabled () const
     {
       return scfParent->IsTweeningEnabled ();
     }
@@ -577,7 +577,7 @@ public:
     {
       scfParent->SetLightingQuality (qual);
     }
-    virtual int GetLightingQuality ()
+    virtual int GetLightingQuality () const
     {
       return scfParent->GetLightingQuality ();
     }
@@ -585,11 +585,11 @@ public:
     {
       scfParent->SetLightingQualityConfig (qual);
     }
-    virtual int GetLightingQualityConfig ()
+    virtual int GetLightingQualityConfig () const
     {
       return scfParent->GetLightingQualityConfig ();
     }
-    virtual float GetLodLevel ()
+    virtual float GetLodLevel () const
     {
       return scfParent->GetLodLevel ();
     }
@@ -601,7 +601,7 @@ public:
     {
       scfParent->SetLodLevelConfig (config_flag);
     }
-    virtual int GetLodLevelConfig ()
+    virtual int GetLodLevelConfig () const
     {
       return scfParent->GetLodLevelConfig ();
     }
@@ -739,7 +739,7 @@ public:
   /**
    * Returns what this sprite is using for determining the lighting quality.
    */
-  int GetLightingQualityConfig ()
+  int GetLightingQualityConfig () const
   { return lighting_quality_config; }
 
   /**
@@ -789,7 +789,7 @@ public:
   /**
    * Returns what this sprite is using for determining the lighting quality.
    */
-  int GetLodLevelConfig ()
+  int GetLodLevelConfig () const
   { return lod_level_config; }
 
   /**
@@ -921,28 +921,28 @@ public:
   void SetFactory (csSprite3DMeshObjectFactory* factory);
 
   /// Get the factory.
-  csSprite3DMeshObjectFactory* GetFactory3D () { return factory; }
+  csSprite3DMeshObjectFactory* GetFactory3D () const { return factory; }
 
   /// Get the skeleton state for this sprite.
-  csSkelState* GetSkeletonState () { return skeleton_state; }
+  csSkelState* GetSkeletonState () const { return skeleton_state; }
 
   /// Force a new material skin other than default
   void SetMaterial (iMaterialWrapper *material);
 
   /// Get the material for this sprite.
-  iMaterialWrapper* GetMaterial () { return cstxt; }
+  iMaterialWrapper* GetMaterial () const { return cstxt; }
 
   /// Sets the mode that is used, when drawing that sprite.
   void SetMixMode (UInt m) { MixMode = m; }
 
   /// Gets the mode that is used, when drawing that sprite.
-  UInt GetMixMode () { return MixMode; }
+  UInt GetMixMode () const { return MixMode; }
 
   /// Enable or disable tweening frames (default false).
   void EnableTweening (bool en) { do_tweening = en; }
 
   /// Is tweening enabled?
-  bool IsTweeningEnabled () { return do_tweening; }
+  bool IsTweeningEnabled () const { return do_tweening; }
 
   /// Set lighting.
   void SetLighting (bool l)
@@ -951,7 +951,7 @@ public:
     ResetVertexColors ();
   }
   /// Is lighting enabled?
-  bool IsLighting ()
+  bool IsLighting () const
   {
     return do_lighting;
   }
@@ -966,7 +966,7 @@ public:
   }
 
   /// Get base color.
-  void GetBaseColor (csColor& col)
+  void GetBaseColor (csColor& col) const
   {
     col = base_color;
   }
@@ -1020,17 +1020,17 @@ public:
   /**
    * Get the current frame number.
    */
-  int GetCurFrame () { return cur_frame; }
+  int GetCurFrame () const { return cur_frame; }
 
   /**
    * Get the current frame number.
    */
-  csSpriteAction2* GetCurAction () { return cur_action; }
+  csSpriteAction2* GetCurAction () const { return cur_action; }
 
   /**
    * Get the number of frames.
    */
-  int GetNumFrames () { return cur_action->GetNumFrames (); }
+  int GetNumFrames () const { return cur_action->GetNumFrames (); }
 
   /**
    * Select an action.
@@ -1083,7 +1083,7 @@ public:
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
-  virtual iMeshObjectFactory* GetFactory ()
+  virtual iMeshObjectFactory* GetFactory () const
   {
     iMeshObjectFactory* ifact = QUERY_INTERFACE (factory, iMeshObjectFactory);
     ifact->DecRef ();
@@ -1098,7 +1098,7 @@ public:
     vis_cb = cb;
     vis_cbData = cbData;
   }
-  virtual csMeshCallback* GetVisibleCallback ()
+  virtual csMeshCallback* GetVisibleCallback () const
   {
     return vis_cb;
   }
@@ -1108,12 +1108,12 @@ public:
   {
     OldNextFrame (current_time);
   }
-  virtual bool WantToDie () { return false; }
+  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
-  virtual bool SupportsHardTransform () { return false; }
+  virtual bool SupportsHardTransform () const { return false; }
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
-  virtual long GetShapeNumber () { return shapenr; }
+  virtual long GetShapeNumber () const { return shapenr; }
 
   //------------------ iPolygonMesh interface implementation ----------------//
   struct PolyMesh : public iPolygonMesh
@@ -1164,7 +1164,7 @@ public:
     {
       scfParent->SetMaterial (material);
     }
-    virtual iMaterialWrapper* GetMaterialWrapper ()
+    virtual iMaterialWrapper* GetMaterialWrapper () const
     {
       return scfParent->GetMaterial ();
     }
@@ -1172,7 +1172,7 @@ public:
     {
       scfParent->SetMixMode (mode);
     }
-    virtual UInt GetMixMode ()
+    virtual UInt GetMixMode () const
     {
       return scfParent->GetMixMode ();
     }
@@ -1180,20 +1180,20 @@ public:
     {
       scfParent->SetLighting (l);
     }
-    virtual bool IsLighting ()
+    virtual bool IsLighting () const
     {
       return scfParent->IsLighting ();
     }
-    virtual iSkeletonState* GetSkeletonState ();
+    virtual iSkeletonState* GetSkeletonState () const;
     virtual void SetFrame (int f)
     {
       scfParent->SetFrame (f);
     }
-    virtual int GetCurFrame ()
+    virtual int GetCurFrame () const
     {
       return scfParent->GetCurFrame ();
     }
-    virtual int GetNumFrames ()
+    virtual int GetNumFrames () const
     {
       return scfParent->GetNumFrames ();
     }
@@ -1201,7 +1201,7 @@ public:
     {
       return scfParent->SetAction (name);
     }
-    virtual iSpriteAction* GetCurAction ()
+    virtual iSpriteAction* GetCurAction () const
     {
       iSpriteAction* ia = QUERY_INTERFACE_SAFE (scfParent->GetCurAction (), iSpriteAction);
       if (ia) ia->DecRef ();
@@ -1211,7 +1211,7 @@ public:
     {
       scfParent->EnableTweening (en);
     }
-    virtual bool IsTweeningEnabled ()
+    virtual bool IsTweeningEnabled () const
     {
       return scfParent->IsTweeningEnabled ();
     }
@@ -1231,7 +1231,7 @@ public:
     {
       scfParent->SetLightingQualityConfig (config_flag);
     }
-    virtual int GetLightingQualityConfig ()
+    virtual int GetLightingQualityConfig () const
     {
       return scfParent->GetLightingQualityConfig ();
     }
@@ -1247,11 +1247,11 @@ public:
     {
       scfParent->SetLodLevelConfig (config_flag);
     }
-    virtual int GetLodLevelConfig ()
+    virtual int GetLodLevelConfig () const
     {
       return scfParent->GetLodLevelConfig ();
     }
-    virtual bool IsLodEnabled ()
+    virtual bool IsLodEnabled () const
     {
       return scfParent->GetLodLevel () >= 0;
     }
@@ -1259,7 +1259,7 @@ public:
     {
       scfParent->SetBaseColor (col);
     }
-    virtual void GetBaseColor (csColor& col)
+    virtual void GetBaseColor (csColor& col) const
     {
       scfParent->GetBaseColor (col);
     }

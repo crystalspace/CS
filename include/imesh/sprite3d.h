@@ -128,7 +128,7 @@ struct iSprite3DFactoryState : public iBase
   /// Set material of sprite.
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
   /// Get material of sprite.
-  virtual iMaterialWrapper* GetMaterialWrapper () = 0;
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
 
   /**
    * Add some vertices, normals, and texels. This function
@@ -138,25 +138,25 @@ struct iSprite3DFactoryState : public iBase
   virtual void AddVertices (int num) = 0;
 
   /// Query the number of texels.
-  virtual int GetNumTexels () = 0;
+  virtual int GetNumTexels () const = 0;
   /// Get a texel.
-  virtual csVector2& GetTexel (int frame, int vertex) = 0;
+  virtual csVector2& GetTexel (int frame, int vertex) const = 0;
   /// Get array of texels.
-  virtual csVector2* GetTexels (int frame) = 0;
+  virtual csVector2* GetTexels (int frame) const = 0;
 
   /// Query the number of vertices.
-  virtual int GetNumVertices () = 0;
+  virtual int GetNumVertices () const = 0;
   /// Get a vertex.
-  virtual csVector3& GetVertex (int frame, int vertex) = 0;
+  virtual csVector3& GetVertex (int frame, int vertex) const = 0;
   /// Get vertex array.
-  virtual csVector3* GetVertices (int frame) = 0;
+  virtual csVector3* GetVertices (int frame) const = 0;
 
   /// Query the number of normals.
-  virtual int GetNumNormals () = 0;
+  virtual int GetNumNormals () const = 0;
   /// Get a normal.
-  virtual csVector3& GetNormal (int frame, int vertex) = 0;
+  virtual csVector3& GetNormal (int frame, int vertex) const = 0;
   /// Get normal array.
-  virtual csVector3* GetNormals (int frame) = 0;
+  virtual csVector3* GetNormals (int frame) const = 0;
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes
@@ -164,31 +164,31 @@ struct iSprite3DFactoryState : public iBase
    */
   virtual void AddTriangle (int a, int b, int c) = 0;
   /// returns the texel indices for triangle 'x'
-  virtual csTriangle GetTriangle (int x) = 0;
+  virtual csTriangle GetTriangle (int x) const = 0;
   /// returns the triangles of the texel_mesh
-  virtual csTriangle* GetTriangles () = 0;
+  virtual csTriangle* GetTriangles () const = 0;
   /// returns the number of triangles in the sprite
-  virtual int GetNumTriangles () = 0;
+  virtual int GetNumTriangles () const = 0;
 
   /// Create and add a new frame to the sprite.
   virtual iSpriteFrame* AddFrame () = 0;
   /// Find a named frame.
-  virtual iSpriteFrame* FindFrame (const char* name) = 0;
+  virtual iSpriteFrame* FindFrame (const char* name) const = 0;
   /// Query the number of frames.
-  virtual int GetNumFrames () = 0;
+  virtual int GetNumFrames () const = 0;
   /// Query the frame number f.
-  virtual iSpriteFrame* GetFrame (int f) = 0;
+  virtual iSpriteFrame* GetFrame (int f) const = 0;
 
   /// Create and add a new action frameset to the sprite.
   virtual iSpriteAction* AddAction () = 0;
   /// Find a named action.
-  virtual iSpriteAction* FindAction (const char* name) = 0;
+  virtual iSpriteAction* FindAction (const char* name) const = 0;
   /// Get the first action.
-  virtual iSpriteAction* GetFirstAction () = 0;
+  virtual iSpriteAction* GetFirstAction () const = 0;
   /// Get number of actions in sprite.
-  virtual int GetNumActions () = 0;
+  virtual int GetNumActions () const = 0;
   /// Get action number No
-  virtual iSpriteAction* GetAction (int No) = 0;
+  virtual iSpriteAction* GetAction (int No) const = 0;
 
   /// Enable skeletal animation for this factory.
   virtual void EnableSkeletalAnimation () = 0;
@@ -197,16 +197,16 @@ struct iSprite3DFactoryState : public iBase
    * has been enabled with EnableSkeletalAnimation(). Otherwise
    * it will return NULL.
    */
-  virtual iSkeleton* GetSkeleton () = 0;
+  virtual iSkeleton* GetSkeleton () const = 0;
 
   /// Enable/disable tweening.
   virtual void EnableTweening (bool en) = 0;
   /// Query state of tweening.
-  virtual bool IsTweeningEnabled () = 0;
+  virtual bool IsTweeningEnabled () const = 0;
   /// Set lighting quality (one of CS_SPR_LIGHTING_*).
   virtual void SetLightingQuality (int qual) = 0;
   /// Get lighting quality (one of CS_SPR_LIGHTING_*).
-  virtual int GetLightingQuality () = 0;
+  virtual int GetLightingQuality () const = 0;
   /**
    * Sets which lighting config variable that all new sprites created 
    * from this template will use.
@@ -219,10 +219,10 @@ struct iSprite3DFactoryState : public iBase
    */
   virtual void SetLightingQualityConfig (int qual) = 0;
   /// Get the lighting quality config.
-  virtual int GetLightingQualityConfig () = 0;
+  virtual int GetLightingQualityConfig () const = 0;
 
   /// Returns the lod_level for this template.
-  virtual float GetLodLevel () = 0;
+  virtual float GetLodLevel () const = 0;
 
   /// Sets the lod level for this template.  See CS_SPR_LOD_* defs.
   virtual void SetLodLevel (float level) = 0;
@@ -240,7 +240,7 @@ struct iSprite3DFactoryState : public iBase
   virtual void SetLodLevelConfig (int config_flag) = 0;
 
   /// Returns what this template is using for determining the lod quality.
-  virtual int GetLodLevelConfig () = 0;
+  virtual int GetLodLevelConfig () const = 0;
 
   /**
    * Smooth out the gouraud shading by merging the precalculated
@@ -274,15 +274,15 @@ struct iSprite3DState : public iBase
   /// Set material of sprite.
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
   /// Get material of sprite.
-  virtual iMaterialWrapper* GetMaterialWrapper () = 0;
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
   /// Set mix mode.
   virtual void SetMixMode (UInt mode) = 0;
   /// Get mix mode.
-  virtual UInt GetMixMode () = 0;
+  virtual UInt GetMixMode () const = 0;
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
   /// Get lighting.
-  virtual bool IsLighting () = 0;
+  virtual bool IsLighting () const = 0;
 
   // @@@ TODO: what about conveniance functions to set colors for verts?
 
@@ -291,27 +291,27 @@ struct iSprite3DState : public iBase
    * has been enabled for the factory that this sprite was created from.
    * Otherwise it will return NULL.
    */
-  virtual iSkeletonState* GetSkeletonState () = 0;
+  virtual iSkeletonState* GetSkeletonState () const = 0;
 
   /// Go to a specified frame.
   virtual void SetFrame (int f) = 0;
 
   /// Get the current frame number.
-  virtual int GetCurFrame () = 0;
+  virtual int GetCurFrame () const = 0;
 
   /// Get the number of frames.
-  virtual int GetNumFrames () = 0;
+  virtual int GetNumFrames () const = 0;
 
   /// Select an action.
   virtual bool SetAction (const char * name) = 0;
 
   /// Get the current action.
-  virtual iSpriteAction* GetCurAction () = 0;
+  virtual iSpriteAction* GetCurAction () const = 0;
 
   /// Enable/disable tweening.
   virtual void EnableTweening (bool en) = 0;
   /// Query state of tweening.
-  virtual bool IsTweeningEnabled () = 0;
+  virtual bool IsTweeningEnabled () const = 0;
 
   /// Unset the texture (i.e. use the one from the factory).
   virtual void UnsetTexture () = 0;
@@ -343,7 +343,7 @@ struct iSprite3DState : public iBase
   /**
    * Returns what this sprite is using for determining the lighting quality.
    */
-  virtual int GetLightingQualityConfig () = 0;
+  virtual int GetLightingQualityConfig () const = 0;
 
   /**
    * Returns the lod level used by this sprite.
@@ -370,12 +370,12 @@ struct iSprite3DState : public iBase
   /**
    * Returns what this sprite is using for determining the lighting quality.
    */
-  virtual int GetLodLevelConfig () = 0;
+  virtual int GetLodLevelConfig () const = 0;
 
   /**
    * Returns true if lod is enabled, else false.
    */
-  virtual bool IsLodEnabled () = 0;
+  virtual bool IsLodEnabled () const = 0;
 
   /**
    * Set the base color. This color will be added to the vertex
@@ -387,7 +387,7 @@ struct iSprite3DState : public iBase
   /**
    * Get the base color.
    */
-  virtual void GetBaseColor (csColor& col) = 0;
+  virtual void GetBaseColor (csColor& col) const = 0;
 };
 
 #endif

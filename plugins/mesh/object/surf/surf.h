@@ -102,9 +102,9 @@ public:
   {
     csSurfMeshObject::material = material;
   }
-  iMaterialWrapper* GetMaterialWrapper () { return material; }
+  iMaterialWrapper* GetMaterialWrapper () const { return material; }
   void SetMixMode (UInt mode) { MixMode = mode; }
-  UInt GetMixMode () { return MixMode; }
+  UInt GetMixMode () const { return MixMode; }
   void SetTopLeftCorner (const csVector3& tl)
   {
     initialized = false;
@@ -131,16 +131,16 @@ public:
   /// Set lighting.
   void SetLighting (bool l) { do_lighting = l; }
   /// Is lighting enabled.
-  bool IsLighting () { return do_lighting; }
+  bool IsLighting () const { return do_lighting; }
   /// Set the color to use. Will be added to the lighting values.
   void SetColor (const csColor& col) { color = col; }
   /// Get the color.
-  csColor GetColor () { return color; }
+  csColor GetColor () const { return color; }
 
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
-  virtual iMeshObjectFactory* GetFactory () { return factory; }
+  virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -150,19 +150,19 @@ public:
     vis_cb = cb;
     vis_cbData = cbData;
   }
-  virtual csMeshCallback* GetVisibleCallback ()
+  virtual csMeshCallback* GetVisibleCallback () const
   {
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual csVector3 GetRadius () { return max_radius; }
   virtual void NextFrame (cs_time /*current_time*/) { }
-  virtual bool WantToDie () { return false; }
+  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
-  virtual bool SupportsHardTransform () { return true; }
+  virtual bool SupportsHardTransform () const { return true; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
-  virtual long GetShapeNumber () { return shapenr; }
+  virtual long GetShapeNumber () const { return shapenr; }
 
   //------------------------- iSurfaceState implementation ----------------
   class SurfaceState : public iSurfaceState
@@ -253,7 +253,7 @@ public:
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
-  virtual bool SupportsHardTransform () { return false; }
+  virtual bool SupportsHardTransform () const { return false; }
 };
 
 /**

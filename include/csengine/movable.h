@@ -81,7 +81,7 @@ public:
   void SetParent (csMovable* parent);
 
   /// Get the parent movable.
-  csMovable* GetParent ()
+  csMovable* GetParent () const
   {
     return parent;
   }
@@ -110,7 +110,7 @@ public:
    * This will return the sectors of the parent if there
    * is a parent.
    */
-  csVector& GetSectors ()
+  const csVector& GetSectors () const
   {
     if (parent) return parent->GetSectors ();
     else return sectors;
@@ -120,12 +120,20 @@ public:
    * Get the specified sector where this entity lives.
    * (conveniance function).
    */
-  csSector* GetSector (int idx) { return (csSector*)GetSectors ()[idx]; }
+  csSector* GetSector (int idx) const { return (csSector*)GetSectors ()[idx]; }
+
+  /**
+   * Get the number of sectors.
+   */
+  int GetSectorCount () const
+  {
+    return GetSectors ().Length ();
+  }
 
   /**
    * Return true if we are placed in a sector.
    */
-  bool InSector ()
+  bool InSector () const
   {
     return GetSectors ().Length () > 0;
   }
@@ -155,7 +163,10 @@ public:
    * possible parent transformations).
    * @@@ Currently not very efficient!
    */
-  const csVector3 GetFullPosition () const { return GetFullTransform ().GetOrigin (); }
+  const csVector3 GetFullPosition () const
+  {
+    return GetFullTransform ().GetOrigin ();
+  }
 
   /**
    * Set the transformation matrix for this entity.
@@ -216,7 +227,7 @@ public:
    * One can use this number to see if the position of the object
    * has changed since the last time it was checked.
    */
-  long GetUpdateNumber () { return updatenr; }
+  long GetUpdateNumber () const { return updatenr; }
 
   DECLARE_IBASE;
 
@@ -224,7 +235,7 @@ public:
   struct eiMovable : public iMovable
   {
     DECLARE_EMBEDDED_IBASE (csMovable);
-    virtual iMovable* GetParent ()
+    virtual iMovable* GetParent () const
     {
       return scfParent->iparent;
     }
@@ -234,25 +245,29 @@ public:
       scfParent->ClearSectors ();
     }
     virtual void AddSector (iSector* sector);
-    virtual csVector& GetSectors ()
+    virtual const csVector& GetSectors () const
     {
       return scfParent->GetSectors ();
     }
-    virtual iSector* GetSector (int idx);
-    virtual bool InSector ()
+    virtual iSector* GetSector (int idx) const;
+    virtual bool InSector () const
     {
       return scfParent->InSector ();
+    }
+    virtual int GetSectorCount () const
+    {
+      return scfParent->GetSectorCount ();
     }
     virtual void SetPosition (iSector* home, const csVector3& v);
     virtual void SetPosition (const csVector3& v)
     {
       scfParent->SetPosition (v);
     }
-    virtual const csVector3& GetPosition ()
+    virtual const csVector3& GetPosition () const
     {
       return scfParent->GetPosition ();
     }
-    virtual const csVector3 GetFullPosition ()
+    virtual const csVector3 GetFullPosition () const
     {
       return scfParent->GetFullPosition ();
     }
@@ -268,7 +283,7 @@ public:
     {
       return scfParent->GetTransform ();
     }
-    virtual csReversibleTransform GetFullTransform ()
+    virtual csReversibleTransform GetFullTransform () const
     {
       return scfParent->GetFullTransform ();
     }
@@ -292,7 +307,7 @@ public:
     {
       scfParent->UpdateMove ();
     }
-    virtual long GetUpdateNumber ()
+    virtual long GetUpdateNumber () const
     {
       return scfParent->GetUpdateNumber ();
     }

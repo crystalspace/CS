@@ -26,7 +26,7 @@ class csColor;
 
 struct iMaterialWrapper;
 
-SCF_VERSION (iBallState, 0, 0, 3);
+SCF_VERSION (iBallState, 0, 0, 4);
 
 /**
  * This interface describes the API for the ball mesh object.
@@ -51,31 +51,31 @@ struct iBallState : public iBase
   /// Set material of ball.
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
   /// Get material of ball.
-  virtual iMaterialWrapper* GetMaterialWrapper () = 0;
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
   /// Set mix mode.
   virtual void SetMixMode (UInt mode) = 0;
   /// Get mix mode.
-  virtual UInt GetMixMode () = 0;
+  virtual UInt GetMixMode () const = 0;
   /// Set reversed mode (i.e. sphere visible from inside out).
   virtual void SetReversed (bool r) = 0;
   /// Get reversed mode.
-  virtual bool IsReversed () = 0;
+  virtual bool IsReversed () const = 0;
   /// Only show top half.
   virtual void SetTopOnly (bool t) = 0;
   /// Only top half.
-  virtual bool IsTopOnly () = 0;
+  virtual bool IsTopOnly () const = 0;
   /// Set lighting.
   virtual void SetLighting (bool l) = 0;
   /// Is lighting enabled.
-  virtual bool IsLighting () = 0;
+  virtual bool IsLighting () const = 0;
   /// Set the color to use. Will be added to the lighting values.
   virtual void SetColor (const csColor& col) = 0;
   /// Get the color.
-  virtual csColor GetColor () = 0;
+  virtual csColor GetColor () const = 0;
   /// Use cylindrical texture mapping.
   virtual void SetCylindricalMapping (bool m) = 0;
   /// Test if cylindrical texture mapping is used.
-  virtual bool IsCylindricalMapping () = 0;
+  virtual bool IsCylindricalMapping () const = 0;
 };
 
 #endif

@@ -109,9 +109,9 @@ public:
   virtual ~csParticleSystem ();
 
   /// How many particles the system currently has.
-  inline int GetNumParticles () { return particles.Length();}
+  inline int GetNumParticles () const { return particles.Length();}
   /// Get a particle.
-  inline iParticle* GetParticle (int idx) 
+  inline iParticle* GetParticle (int idx) const
   { return (iParticle*)particles[idx]; }
   /// Remove all particles.
   void RemoveParticles ();
@@ -140,14 +140,14 @@ public:
   /// system will no longer self destruct
   inline void UnSetSelfDestruct () { self_destruct=false; }
   /// returns whether the system will self destruct
-  inline bool GetSelfDestruct () { return self_destruct; }
+  inline bool GetSelfDestruct () const { return self_destruct; }
   /// if the system will self destruct, returns the time to live in msec.
-  inline cs_time GetTimeToLive () { return time_to_live; }
+  inline cs_time GetTimeToLive () const { return time_to_live; }
 
   /// Whether this system should be deleted when possible.
   inline void SetDelete (bool b) { to_delete = b; }
   /// Whether this system should be deleted when possible.
-  inline bool GetDelete () { return to_delete; }
+  inline bool GetDelete () const { return to_delete; }
 
   /// Change color of all particles, by col per second.
   inline void SetChangeColor(const csColor& col) 
@@ -215,7 +215,7 @@ public:
   //------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
-  virtual iMeshObjectFactory* GetFactory () { return factory; }
+  virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -225,7 +225,7 @@ public:
     vis_cb = cb;
     vis_cbData = cbData;
   }
-  virtual csMeshCallback* GetVisibleCallback ()
+  virtual csMeshCallback* GetVisibleCallback () const
   {
     return vis_cb;
   }
@@ -243,10 +243,10 @@ public:
     prev_time = current_time;
     Update (elaps);
   }
-  virtual bool WantToDie () { return to_delete; }
+  virtual bool WantToDie () const { return to_delete; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
-  virtual long GetShapeNumber () { return shapenr; }
+  virtual long GetShapeNumber () const { return shapenr; }
 
   //------------------------- iParticleState implementation ----------------
   class ParticleState : public iParticleState
@@ -257,7 +257,7 @@ public:
       scfParent->initialized = false;
       scfParent->mat = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper ()
+    virtual iMaterialWrapper* GetMaterialWrapper () const
     {
       return scfParent->mat;
     }
@@ -266,7 +266,7 @@ public:
       scfParent->MixMode = mode;
       scfParent->SetupMixMode ();
     }
-    virtual UInt GetMixMode () { return scfParent->MixMode; }
+    virtual UInt GetMixMode () const { return scfParent->MixMode; }
     virtual void SetColor (const csColor& color)
     {
       scfParent->color = color;
@@ -360,13 +360,13 @@ public:
   virtual void Update (cs_time elapsed_time);
 
   /// Get a particles speed. speeds are in metres/second.
-  csVector3& GetSpeed (int idx) { return part_speed[idx]; }
+  csVector3& GetSpeed (int idx) const { return part_speed[idx]; }
   /// Set a particles speed. speeds are in metres/second.
   void SetSpeed (int idx, const csVector3& spd) 
   { part_speed[idx] = spd; }
 
   /// Get a particles acceleration. accelerations are in metres/second.
-  csVector3& GetAccel (int idx) { return part_accel[idx]; }
+  csVector3& GetAccel (int idx) const { return part_accel[idx]; }
   /// Set a particles acceleration. accelerations are in metres/second.
   void SetAccel (int idx, const csVector3& acl) 
   { part_accel[idx] = acl; }

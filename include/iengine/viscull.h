@@ -76,7 +76,7 @@ struct iVisibilityCuller : public iBase
   virtual void UnregisterShadowReceiver (iShadowReceiver* receiver) = 0;
 };
 
-SCF_VERSION (iVisibilityObject, 0, 0, 2);
+SCF_VERSION (iVisibilityObject, 0, 0, 3);
 
 /**
  * An object that wants to know if it is visible or not
@@ -85,9 +85,9 @@ SCF_VERSION (iVisibilityObject, 0, 0, 2);
 struct iVisibilityObject : public iBase
 {
   /// Get the reference to the movable from this object.
-  virtual iMovable* GetMovable () = 0;
+  virtual iMovable* GetMovable () const = 0;
   /// Get the shape number of the underlying object.
-  virtual long GetShapeNumber () = 0;
+  virtual long GetShapeNumber () const = 0;
   /// Get the bounding box of the object in object space.
   virtual void GetBoundingBox (csBox3& bbox) = 0;
   /**
@@ -104,7 +104,7 @@ struct iVisibilityObject : public iBase
    * After running iVisibilityCuller::VisTest() this function can be used
    * to test if the object is visible or not.
    */
-  virtual bool IsVisible () = 0;
+  virtual bool IsVisible () const = 0;
 };
 
 #endif // __IENGINE_VISCULL_H__

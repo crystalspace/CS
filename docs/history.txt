@@ -1,5 +1,21 @@
 The history order is reversed so that new features are at the top.
 
+6-Jun-2001
+	- Removed support for the quadtree, coverage mask tree, coverage mask
+	  cube, and solid tree from CS. I parked the code locally and it will
+	  also be in the CVS attic. Some of that code (especially the 3D
+	  quadtree) will be useful to resurrect later but at this moment
+	  it is just confusing me :-)
+	- Added cs/iMovable::GetSectorCount() and also made a lot of the
+	  functions 'const'.
+	- Made a number of cs/iCamera members const.
+	- Made a number of cs/iMeshWrapper members const.
+	- Made a number of cs/iMeshFactoryWrapper members const.
+	- Made a number of iVisibilityObject members const.
+	- Made a number of iMeshObject members const.
+	- Made a number of iMeshObjectFactory members const.
+	- Added 'const' to a number of mesh object implementations and
+	  state interfaces.
 5-Jun-2001
 	- Reduced the optimization level in linux.mak from -O6 to -O2.  This
 	  will probably not do much anyway and -O6 seems to give problems with
@@ -23,6 +39,8 @@ The history order is reversed so that new features are at the top.
 	- Wouter Wijngaards fixed the isometric transform.  It has a LOT less
 	  distortion now.  The cube is exactly 1x1x1 now, and you can see,
 	  while changing the view that it stays in shape.
+	- Wouter also added mesh factory convenience functions, and a list
+	  of mesh factories is kept by the iso engine (by name).
 	- Philip Wyett fixed MSVC project files which were committed as ASCII.
 	- Avoids the bug with levels with multiple sectors and bsp trees.  The
 	  level itself will now be rendered ok.  But the bug isn't gone for
@@ -104,6 +122,10 @@ The history order is reversed so that new features are at the top.
 	  made private.
 	- Eric Sunshine eliminated several compilation warnings from
 	  portal.cpp.
+	- Norman Kramer removed #ifdef DO_SOUND and replaced it with test
+	  for soundrenderer being not NULL (blocks and walktest).
+	- Justin Miller fixed some bugs in the OpenGL renderer with regards
+	  to trying to cache textures for materials without them.
 4-Jun-2001
 	- Added csTransform This2OtherRelative() and Other2ThisRelative()
 	  which operate on csPlane3.

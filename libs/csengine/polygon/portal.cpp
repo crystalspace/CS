@@ -24,8 +24,6 @@
 #include "csengine/engine.h"
 #include "csengine/stats.h"
 #include "csengine/cbuffer.h"
-#include "csengine/quadtr3d.h"
-#include "csengine/covtree.h"
 #include "csengine/lview.h"
 #include "csengine/light.h"
 #include "ivideo/texture.h"

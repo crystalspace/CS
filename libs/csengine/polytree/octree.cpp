@@ -25,7 +25,6 @@
 #include "csengine/bspbbox.h"
 #include "csengine/thing.h"
 #include "csengine/engine.h"
-#include "csengine/covcube.h"
 #include "csengine/cbufcube.h"
 #include "csengine/cbuffer.h"
 #include "csengine/polygon.h"

@@ -43,7 +43,7 @@ struct iMovableListener : public iBase
   virtual void MovableDestroyed (iMovable* movable, void* userdata) = 0;
 };
 
-SCF_VERSION (iMovable, 0, 0, 8);
+SCF_VERSION (iMovable, 0, 0, 9);
 
 /**
  * This interface describes a movable entity. It is usually
@@ -53,7 +53,7 @@ SCF_VERSION (iMovable, 0, 0, 8);
 struct iMovable : public iBase
 {
   /// Get the parent movable.
-  virtual iMovable* GetParent () = 0;
+  virtual iMovable* GetParent () const = 0;
 
   /**
    * Initialize the list of sectors to one sector where
@@ -81,18 +81,23 @@ struct iMovable : public iBase
    * This will return the sectors of the parent if there
    * is a parent.
    */
-  virtual csVector& GetSectors () = 0;
+  virtual const csVector& GetSectors () const = 0;
 
   /**
    * Get the specified sector where this entity lives.
    * (conveniance function).
    */
-  virtual iSector* GetSector (int idx) = 0;
+  virtual iSector* GetSector (int idx) const = 0;
+
+  /**
+   * Get the number of sectors.
+   */
+  virtual int GetSectorCount () const = 0;
 
   /**
    * Return true if we are placed in a sector.
    */
-  virtual bool InSector () = 0;
+  virtual bool InSector () const = 0;
 
   /**
    * Set the transformation vector and sector to move to
@@ -109,13 +114,13 @@ struct iMovable : public iBase
   /**
    * Get the current position.
    */
-  virtual const csVector3& GetPosition () = 0;
+  virtual const csVector3& GetPosition () const = 0;
 
   /**
    * Get the current position but keep track of hierarchical
    * transformations.
    */
-  virtual const csVector3 GetFullPosition () = 0;
+  virtual const csVector3 GetFullPosition () const = 0;
 
   /**
    * Set the transformation matrix for this entity.
@@ -136,7 +141,7 @@ struct iMovable : public iBase
    * Construct the full world to object transformation given
    * this transformation and possible parents transformations.
    */
-  virtual csReversibleTransform GetFullTransform () = 0;
+  virtual csReversibleTransform GetFullTransform () const = 0;
 
   /**
    * Relative move.
@@ -172,7 +177,7 @@ struct iMovable : public iBase
    * One can use this number to see if the position of the object
    * has changed since the last time it was checked.
    */
-  virtual long GetUpdateNumber () = 0;
+  virtual long GetUpdateNumber () const = 0;
 };
 
 #endif

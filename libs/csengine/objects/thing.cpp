@@ -2414,7 +2414,7 @@ iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
 
 //---------------------------------------------------------------------------
 
-iMeshObjectFactory* csThing::MeshObject::GetFactory ()
+iMeshObjectFactory* csThing::MeshObject::GetFactory () const
 {
   if (!scfParent->ParentTemplate) return NULL;
   return &scfParent->ParentTemplate->scfiMeshObjectFactory;

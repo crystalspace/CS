@@ -122,13 +122,13 @@ public:
 
   //----------- iCamera --------------------------
   virtual csCamera* GetPrivateObject () {return 0;}
-  virtual int GetFOV () {return fov;}
-  virtual float GetInvFOV () {return invfov;}
-  virtual float GetFOVAngle () {return fovangle;}
+  virtual int GetFOV () const {return fov;}
+  virtual float GetInvFOV () const {return invfov;}
+  virtual float GetFOVAngle () const {return fovangle;}
   virtual void SetFOV (int, int) {};
   virtual void SetFOVAngle(float, int) {};
-  virtual float GetShiftX () {return shiftx;}
-  virtual float GetShiftY () {return shifty;}
+  virtual float GetShiftX () const {return shiftx;}
+  virtual float GetShiftY () const {return shifty;}
   virtual void SetPerspectiveCenter(float, float) {}
   virtual csOrthoTransform& GetTransform ()
   { return trans; }
@@ -136,13 +136,13 @@ public:
   virtual void Move (const csVector3&, bool ) {}
   virtual void MoveWorldUnrestricted (const csVector3& ) {}
   virtual void MoveUnrestricted (const csVector3& ) {}
-  virtual iSector *GetSector() {return 0;}
+  virtual iSector *GetSector() const {return 0;}
   virtual void SetSector(struct iSector *) {}
   virtual void Correct(int) {}
-  virtual bool IsMirrored() {return mirror;}
+  virtual bool IsMirrored() const {return mirror;}
   virtual void SetMirrored(bool m) {mirror = m;}
-  virtual bool GetFarPlane(class csPlane3 &) {return false;}
-  virtual long GetCameraNumber() {return camnum;}
+  virtual bool GetFarPlane(class csPlane3 &) const {return false;}
+  virtual long GetCameraNumber() const {return camnum;}
 
   /// but in isometric space :-)
   virtual void Perspective (const csVector3& v, csVector2& p) const

@@ -94,7 +94,7 @@ public:
    * changes. This number can be used to cache camera vertex arrays, for
    * example.
    */
-  long GetCameraNumber ()
+  long GetCameraNumber () const
   {
     return cameranr;
   }
@@ -135,7 +135,7 @@ public:
   /// Set the FOV in angles (degrees).
   void SetFOVAngle (float a, int width);
   /// Get the FOV in angles (degrees).
-  float GetFOVAngle ()
+  float GetFOVAngle () const
   {
     return fov_angle;
   }
@@ -148,10 +148,10 @@ public:
   /// Set farplane, everything behind this will be cut
   void SetFarPlane (csPlaneClip* farplane) { fp = farplane; }
   /// Get the Farplane
-  csPlaneClip* GetFarPlane () { return fp; }
+  csPlaneClip* GetFarPlane () const { return fp; }
   
   /// do we actually use the farplane ?
-  bool UseFarPlane () { return use_farplane; }
+  bool UseFarPlane () const { return use_farplane; }
   /// Set whether we use farplane or not. Farplane must been set before
   void UseFarPlane (bool useit) { use_farplane = fp && useit; }
   
@@ -171,14 +171,14 @@ public:
   /**
    * Get the current sector of the camera.
    */
-  csSector* GetSector () { return sector; }
+  csSector* GetSector () const { return sector; }
 
   /**
    * Returns true if we are in a mirrored world.
    * Basicly this means that back-face culling will
    * be reversed.
    */
-  bool IsMirrored () { return mirror; }
+  bool IsMirrored () const { return mirror; }
 
   /**
    * Set the mirrored state of this camera.
@@ -345,20 +345,20 @@ public:
     virtual csCamera* GetPrivateObject ()
     { return scfParent; }
 
-    virtual int GetFOV ()
+    virtual int GetFOV () const
     { return scfParent->GetFOV (); }
-    virtual float GetInvFOV ()
+    virtual float GetInvFOV () const
     { return scfParent->GetInvFOV (); }
-    virtual float GetFOVAngle ()
+    virtual float GetFOVAngle () const
     { return scfParent->GetFOVAngle (); }
     virtual void SetFOV (int a, int width)
     { scfParent->SetFOV (a, width); }
     virtual void SetFOVAngle (float a, int width)
     { scfParent->SetFOVAngle (a, width); }
 
-    virtual float GetShiftX ()
+    virtual float GetShiftX () const
     { return scfParent->GetShiftX (); }
-    virtual float GetShiftY ()
+    virtual float GetShiftY () const
     { return scfParent->GetShiftY (); }
     virtual void SetPerspectiveCenter (float x, float y)
     { scfParent->SetPerspectiveCenter (x, y); }
@@ -374,7 +374,7 @@ public:
     virtual void MoveUnrestricted (const csVector3& v)
     { scfParent->MoveUnrestricted (v); }
 
-    virtual iSector* GetSector ()
+    virtual iSector* GetSector () const
     { return scfParent->GetSector () ? &scfParent->GetSector()->scfiSector : NULL; }
     virtual void SetSector (iSector *s)
     { scfParent->SetSector (s->GetPrivateObject ()); }
@@ -383,7 +383,7 @@ public:
     {
       scfParent->Correct (n);
     }
-    virtual bool IsMirrored ()
+    virtual bool IsMirrored () const
     {
       return scfParent->IsMirrored ();
     }
@@ -391,12 +391,12 @@ public:
     {
       scfParent->SetMirrored (m);
     }
-    virtual bool GetFarPlane (csPlane3& pl)
+    virtual bool GetFarPlane (csPlane3& pl) const
     {
       if (scfParent->fp) { pl = *scfParent->fp; return scfParent->use_farplane; }
       else return false;
     }
-    virtual long GetCameraNumber ()
+    virtual long GetCameraNumber () const
     {
       return scfParent->GetCameraNumber ();
     }

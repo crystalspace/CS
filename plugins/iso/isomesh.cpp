@@ -47,37 +47,57 @@ public:
   virtual ~csIsoFakeMovable() {}
 
   //----- iMovable -------------------------------
-  virtual iMovable* GetParent () {return 0;}
-  virtual void SetSector (iSector* ) {}
-  virtual void ClearSectors () {}
-  virtual void AddSector (iSector* ) {}
-  virtual csVector& GetSectors () {return *(csVector*)0;}
-  virtual iSector* GetSector (int ) {return 0;}
-  virtual bool InSector () {return true;}
+  virtual iMovable* GetParent () const {return 0;}
+  virtual void SetSector (iSector* ) { updatenumber++; }
+  virtual void ClearSectors () { updatenumber++; }
+  virtual void AddSector (iSector* ) { updatenumber++; }
+  virtual const csVector& GetSectors () const {return *(csVector*)0;}
+  virtual iSector* GetSector (int ) const {return 0;}
+  virtual int GetSectorCount () const { return 0; }
+  virtual bool InSector () const {return true;}
   virtual void SetPosition (iSector*, const csVector3& v)
-  { isomesh->SetPosition(v); }
-  virtual void SetPosition (const csVector3& v) { isomesh->SetPosition(v); }
-  virtual const csVector3& GetPosition () {return isomesh->GetPosition();}
-  virtual const csVector3 GetFullPosition () {return isomesh->GetPosition();}
+  { isomesh->SetPosition(v); updatenumber++; }
+  virtual void SetPosition (const csVector3& v)
+  {
+    isomesh->SetPosition(v);
+    updatenumber++;
+  }
+  virtual const csVector3& GetPosition () const {return isomesh->GetPosition();}
+  virtual const csVector3 GetFullPosition () const {return isomesh->GetPosition();}
   virtual void SetTransform (const csReversibleTransform& t) 
-  { isomesh->SetTransform(t.GetT2O()); isomesh->SetPosition(t.GetOrigin()); }
+  {
+    isomesh->SetTransform(t.GetT2O());
+    isomesh->SetPosition(t.GetOrigin());
+    updatenumber++;
+  }
   virtual csReversibleTransform& GetTransform () 
   { 
     obj.SetT2O(isomesh->GetTransform()); 
     obj.SetOrigin(isomesh->GetPosition());
     return obj;
   }
-  virtual csReversibleTransform GetFullTransform () 
+  virtual csReversibleTransform GetFullTransform () const
   { 
+    csReversibleTransform obj;
     obj.SetT2O(isomesh->GetTransform()); 
     obj.SetOrigin(isomesh->GetPosition());
     return obj;
   }
-  virtual void MovePosition (const csVector3& v) {isomesh->MovePosition(v);}
+  virtual void MovePosition (const csVector3& v)
+  {
+    isomesh->MovePosition(v);
+    updatenumber++;
+  }
   virtual void SetTransform (const csMatrix3& matrix)
-  { isomesh->SetTransform( matrix ); }
+  {
+    isomesh->SetTransform( matrix );
+    updatenumber++;
+  }
   virtual void Transform (const csMatrix3& matrix)
-  { isomesh->SetTransform( matrix * isomesh->GetTransform() ); }
+  {
+    isomesh->SetTransform( matrix * isomesh->GetTransform() );
+    updatenumber++;
+  }
   virtual void AddListener (iMovableListener* /*listener*/, void* /*userdata*/)
   {
      /// does not work
@@ -86,11 +106,10 @@ public:
   {
      /// does not work
   }
-  virtual void UpdateMove () {}
-  virtual long GetUpdateNumber ()
+  virtual void UpdateMove () { updatenumber++; }
+  virtual long GetUpdateNumber () const
   {
-     /// @@@ not very efficient
-     return updatenumber++;
+     return updatenumber;
   }
 
 };

@@ -55,7 +55,7 @@ class csReversibleTransform;
 typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshObject, 0, 0, 14);
+SCF_VERSION (iMeshObject, 0, 0, 15);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -65,7 +65,7 @@ struct iMeshObject : public iBase
   /**
    * Get the reference to the factory that created this mesh object.
    */
-  virtual iMeshObjectFactory* GetFactory () = 0;
+  virtual iMeshObjectFactory* GetFactory () const = 0;
 
   /**
    * First part of Draw. The engine will call this DrawTest() before
@@ -104,7 +104,7 @@ struct iMeshObject : public iBase
   /**
    * Get the current visible callback.
    */
-  virtual csMeshCallback* GetVisibleCallback () = 0;
+  virtual csMeshCallback* GetVisibleCallback () const = 0;
 
   /**
    * Get the bounding box in object space for this mesh object.
@@ -140,7 +140,7 @@ struct iMeshObject : public iBase
    * soonest possible time. This is usally used for things like
    * particle systems that only have a limited time to live.
    */
-  virtual bool WantToDie () = 0;
+  virtual bool WantToDie () const = 0;
 
   /**
    * Do a hard transform of this object.
@@ -156,7 +156,7 @@ struct iMeshObject : public iBase
   /**
    * Return true if HardTransform is supported for this mesh object type.
    */
-  virtual bool SupportsHardTransform () = 0;
+  virtual bool SupportsHardTransform () const = 0;
 
   /**
    * Check if this mesh is hit by this object space vector.
@@ -171,7 +171,7 @@ struct iMeshObject : public iBase
    * this number you can test if you need to get the bounding box again
    * and perform calculations on that.
    */
-  virtual long GetShapeNumber () = 0;
+  virtual long GetShapeNumber () const = 0;
 };
 
 SCF_VERSION (iMeshObjectFactory, 0, 0, 4);
@@ -202,7 +202,7 @@ struct iMeshObjectFactory : public iBase
   /**
    * Return true if HardTransform is supported for this factory.
    */
-  virtual bool SupportsHardTransform () = 0;
+  virtual bool SupportsHardTransform () const = 0;
 };
 
 SCF_VERSION (iMeshObjectType, 0, 0, 1);

@@ -167,7 +167,7 @@ public:
   }
 
   /// Explosion has a dynamic light at the center?
-  bool HasLight () { return has_light; }
+  bool HasLight () const { return has_light; }
   /**
    * Add a light at explosion center. add msec when light starts fading,
    * which is used when time_to_live is set / SelfDestruct is used.
@@ -181,7 +181,7 @@ public:
 
   /// For iMeshObject.
   virtual void HardTransform (const csReversibleTransform& t);
-  virtual bool SupportsHardTransform () { return true; }
+  virtual bool SupportsHardTransform () const { return true; }
 
   DECLARE_IBASE_EXT (csParticleSystem);
 
@@ -297,7 +297,7 @@ public:
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
-  virtual bool SupportsHardTransform () { return false; }
+  virtual bool SupportsHardTransform () const { return false; }
 };
  
 /**

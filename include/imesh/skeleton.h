@@ -24,7 +24,7 @@
 struct iSkeletonConnection;
 class csTransform;
 
-SCF_VERSION (iSkeletonLimb, 0, 0, 1);
+SCF_VERSION (iSkeletonLimb, 0, 0, 2);
 
 /**
  * This interface describes the API for a limb in the skeleton system.
@@ -34,9 +34,9 @@ struct iSkeletonLimb : public iBase
   /// Add a vertex index.
   virtual void AddVertex (int v) = 0;
   /// Get the array of vertex indices.
-  virtual int* GetVertices () = 0;
+  virtual int* GetVertices () const = 0;
   /// Get the number of vertices in the array returned by GetVertices.
-  virtual int GetNumVertices () = 0;
+  virtual int GetNumVertices () const = 0;
   /// Create a new connection and add it as a child.
   virtual iSkeletonConnection* CreateConnection () = 0;
   /// Set the name for this limb.
@@ -44,7 +44,7 @@ struct iSkeletonLimb : public iBase
   /// Get the name for this limb.
   virtual const char* GetName () const = 0;
   /// Get next sibling in list.
-  virtual iSkeletonLimb* GetNextSibling () = 0;
+  virtual iSkeletonLimb* GetNextSibling () const = 0;
   /// Get first child limb
   virtual iSkeletonLimb* GetChildren () const = 0;
 };
@@ -84,9 +84,9 @@ SCF_VERSION (iSkeletonLimbState, 0, 0, 1);
 struct iSkeletonLimbState : public iBase
 {
   /// Get the first child of this limb.
-  virtual iSkeletonLimbState* GetChildren () = 0;
+  virtual iSkeletonLimbState* GetChildren () const = 0;
   /// Get next sibling in list.
-  virtual iSkeletonLimbState* GetNextSibling () = 0;
+  virtual iSkeletonLimbState* GetNextSibling () const = 0;
   /// Set the name for this limb.
   virtual void SetName (const char* name) = 0;
   /// Get the name for this limb.
@@ -94,7 +94,7 @@ struct iSkeletonLimbState : public iBase
   /// Set userdata object.
   virtual void SetUserData (void* data) = 0;
   /// Get userdata object.
-  virtual void* GetUserData () = 0;
+  virtual void* GetUserData () const = 0;
 };
 
 SCF_VERSION (iSkeletonConnectionState, 0, 0, 2);

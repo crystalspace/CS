@@ -31,6 +31,7 @@
 #include "spr2duv.h"
 
 struct iMaterialWrapper;
+struct iSprite2DUVAnimation;
 class csSprite2DMeshObjectFactory;
 
 /**
@@ -109,7 +110,7 @@ public:
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 
-  virtual iMeshObjectFactory* GetFactory () { return ifactory; }
+  virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
@@ -119,33 +120,33 @@ public:
     vis_cb = cb;
     vis_cbData = cbData;
   }
-  virtual csMeshCallback* GetVisibleCallback ()
+  virtual csMeshCallback* GetVisibleCallback () const
   {
     return vis_cb;
   }
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   virtual csVector3 GetRadius () { return radius; }
   virtual void NextFrame (cs_time current_time);
-  virtual bool WantToDie () { return false; }
+  virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform& t);
-  virtual bool SupportsHardTransform () { return false; }
+  virtual bool SupportsHardTransform () const { return false; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
   	csVector3&, float*) { return false; }
-  virtual long GetShapeNumber () { return shapenr; }
+  virtual long GetShapeNumber () const { return shapenr; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState
   {
     DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
     virtual void SetLighting (bool l) { scfParent->initialized = false; scfParent->lighting = l; }
-    virtual bool HasLighting () { return scfParent->lighting; }
+    virtual bool HasLighting () const { return scfParent->lighting; }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->material = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper () { return scfParent->material; }
+    virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
     virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () { return scfParent->MixMode; }
+    virtual UInt GetMixMode () const { return scfParent->MixMode; }
     virtual csColoredVertices& GetVertices ()
     {
       return scfParent->GetVertices ();
@@ -159,7 +160,7 @@ public:
     virtual void StopUVAnimation (int idx);
     virtual void PlayUVAnimation (int idx, int style, bool loop);
 
-    virtual int GetUVAnimationCount ();
+    virtual int GetUVAnimationCount () const;
     virtual iSprite2DUVAnimation *CreateUVAnimation ();
     virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim);
     virtual iSprite2DUVAnimation *GetUVAnimation (const char *name);
@@ -233,13 +234,13 @@ class csSprite2DMeshObjectFactory : public iMeshObjectFactory
   virtual ~csSprite2DMeshObjectFactory ();
 
   /// Has this sprite lighting?
-  bool HasLighting () { return lighting; }
+  bool HasLighting () const { return lighting; }
   /// Get the material for this 2D sprite.
-  iMaterialWrapper* GetMaterialWrapper () { return material; }
+  iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
-  UInt GetMixMode () { return MixMode; }
+  UInt GetMixMode () const { return MixMode; }
   
-  int GetUVAnimationCount () {return vAnims.Length ();}
+  int GetUVAnimationCount () const {return vAnims.Length ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
   { 
     csSprite2DUVAnimation *p = new csSprite2DUVAnimation (this);
@@ -270,23 +271,23 @@ class csSprite2DMeshObjectFactory : public iMeshObjectFactory
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
-  virtual bool SupportsHardTransform () { return false; }
+  virtual bool SupportsHardTransform () const { return false; }
 
   //------------------------- iSprite2DFactoryState implementation ----------------
   class Sprite2DFactoryState : public iSprite2DFactoryState
   {
     DECLARE_EMBEDDED_IBASE (csSprite2DMeshObjectFactory);
     virtual void SetLighting (bool l) { scfParent->lighting = l; }
-    virtual bool HasLighting () { return scfParent->HasLighting (); }
+    virtual bool HasLighting () const { return scfParent->HasLighting (); }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->material = material;
     }
-    virtual iMaterialWrapper* GetMaterialWrapper () { return scfParent->material; }
+    virtual iMaterialWrapper* GetMaterialWrapper () const { return scfParent->material; }
     virtual void SetMixMode (UInt mode) { scfParent->MixMode = mode; }
-    virtual UInt GetMixMode () { return scfParent->MixMode; }
+    virtual UInt GetMixMode () const { return scfParent->MixMode; }
 
-    virtual int GetUVAnimationCount () {return scfParent->GetUVAnimationCount();}
+    virtual int GetUVAnimationCount () const {return scfParent->GetUVAnimationCount();}
     virtual iSprite2DUVAnimation *CreateUVAnimation ()
     { return scfParent->CreateUVAnimation (); }
     virtual void RemoveUVAnimation (iSprite2DUVAnimation *anim)

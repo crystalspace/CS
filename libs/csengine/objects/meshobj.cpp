@@ -179,7 +179,7 @@ void csMeshWrapper::RemoveFromSectors ()
   iEngine *e = QUERY_INTERFACE_FAST (parent, iEngine);
   if (!e) return;
   int i;
-  csVector& sectors = movable.GetSectors ();
+  const csVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
   {
     csSector* ss = (csSector*)sectors[i];
@@ -195,7 +195,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
   iEngine *e = QUERY_INTERFACE_FAST (parent, iEngine);
   if (!e) return;
   int i;
-  csVector& sectors = movable.GetSectors ();
+  const csVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
   {
     csSector* ss = (csSector*)sectors[i];
@@ -439,7 +439,7 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
   c->GetMovable ().SetParent (&scfParent->movable);
 }
 
-iMeshWrapper* csMeshWrapper::MeshWrapper::GetChild (int idx)
+iMeshWrapper* csMeshWrapper::MeshWrapper::GetChild (int idx) const
 {
   csMeshWrapper* child = (csMeshWrapper*)(scfParent->GetChildren ()[idx]);
   return &(child->scfiMeshWrapper);

@@ -162,11 +162,11 @@ struct iSprite2DFactoryState : public iBase
   /// Set material of sprite.
   virtual void SetMaterialWrapper (iMaterialWrapper* material) = 0;
   /// Get material of sprite.
-  virtual iMaterialWrapper* GetMaterialWrapper () = 0;
+  virtual iMaterialWrapper* GetMaterialWrapper () const = 0;
   /// Set mix mode.
   virtual void SetMixMode (UInt mode) = 0;
   /// Get mix mode.
-  virtual UInt GetMixMode () = 0;
+  virtual UInt GetMixMode () const = 0;
 
   /**
    * Set true if this sprite needs lighting (default).
@@ -177,12 +177,12 @@ struct iSprite2DFactoryState : public iBase
   virtual void SetLighting (bool l) = 0;
 
   /// Return the value of the lighting flag.
-  virtual bool HasLighting () = 0;
+  virtual bool HasLighting () const = 0;
 
   /**
    * Get the number of UVAnimations.
    */
-  virtual int GetUVAnimationCount () = 0;
+  virtual int GetUVAnimationCount () const = 0;
 
   /**
    * Create a new UV animation

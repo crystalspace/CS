@@ -163,7 +163,7 @@ public:
 
   /// For iMeshObject.
   virtual void HardTransform (const csReversibleTransform& t);
-  virtual bool SupportsHardTransform () { return true; }
+  virtual bool SupportsHardTransform () const { return true; }
 
   DECLARE_IBASE_EXT (csParticleSystem);
 
@@ -275,7 +275,7 @@ public:
 
   virtual iMeshObject* NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
-  virtual bool SupportsHardTransform () { return false; }
+  virtual bool SupportsHardTransform () const { return false; }
 };
  
 /**

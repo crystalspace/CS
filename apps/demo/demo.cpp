@@ -272,8 +272,6 @@ static void SetTexSpace (iPolygon3D* poly,
   texv += vvector / float(size);
   texulen += ulen * 2. / float(size);
   texvlen += vlen * 2. / float(size);
-  printf ("Orig = (%g, %g, %g), First =(%g, %g, %g, %g), Second =(%g, %g, %g, %g) \n", 
-  texorig.x, texorig.y, texorig.z, texu.x, texu.y, texu.z, texulen,texv.x, texv.y, texv.z, texvlen);
   poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
 }
 

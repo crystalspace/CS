@@ -24,7 +24,7 @@
 class csVector3;
 class csColor;
 
-SCF_VERSION (iStarsState, 0, 0, 1);
+SCF_VERSION (iStarsState, 0, 0, 2);
 
 /**
  * This interface describes the API for the stars mesh object.
@@ -54,7 +54,7 @@ struct iStarsState : public iBase
   /// Set density.
   virtual void SetDensity (float d) = 0;
   /// Get density.
-  virtual float GetDensity () = 0;
+  virtual float GetDensity () const = 0;
   /// Set max distance at which stars are visible.
   virtual void SetMaxDistance (float maxdist) = 0;
   /// Get max distance at which stars are visible.
