@@ -1,8 +1,11 @@
 # This is an include file for all the makefiles which describes system specific
 # settings. Also have a look at mk/user.mak.
 
+# We don't want assembly for now (why? it can be resolved - A.Z.)
+override DO_ASM=no
+
 # Choose which drivers you want to build/use
-DRIVERS=cs2d/next2d cs3d/software csnetdrv/null csnetdrv/sockets \
+DRIVERS=cs2d/next cs3d/software csnetdrv/null csnetdrv/sockets \
   csnetman/null csnetman/simple cssnddrv/null cssndrdr/null
 
 #-------------------------------------------------------------- rootdefines ---#
@@ -56,16 +59,17 @@ ifeq ($(MAKESECTION),defines)
 # Multi-architecture binary (MAB) support.
 NEXT.ARCH_FLAGS=$(foreach arch,$(NEXT.TARGET_ARCHS),-arch $(arch))
 
-# Select appropriate source directories (rhapsody, openstep, nextstep, shared).
+# Select appropriate source directories (macosxs, openstep, nextstep, shared).
 # NOTE: List "shared" directory last so search proceeds: specific -> general.
 NEXT.SHARED=shared
-NEXT.SOURCE_PATHS=$(addprefix libs/cssys/next/,$(NEXT.SOURCE_DIRS) $(NEXT.SHARED))
+NEXT.SEARCH_PATH=$(NEXT.SOURCE_DIRS) $(NEXT.SHARED)
+NEXT.SOURCE_PATHS=$(addprefix libs/cssys/next/,$(NEXT.SEARCH_PATH))
 
 # Typical extension for executables on this system (e.g. EXE=.exe)
 EXE=
 
 # Typical extension for dynamic libraries on this system.
-DLL=.dl
+DLL=.dylib
 
 # Typical extension for static libraries
 LIB=.a
@@ -80,13 +84,13 @@ NEED_SOCKET_LIB=no
 LIBS.EXE=$(NEXT.LIBS)
 
 # Where can the Zlib library be found on this system?
-Z_LIBS=-lz
+Z_LIBS=-Llibs/zlib -lz
 
 # Where can the PNG library be found on this system?
-PNG_LIBS=-lpng
+PNG_LIBS=-Llibs/libpng -lpng
 
 # Where can the JPG library be found on this system?
-JPG_LIBS=-ljpeg
+JPG_LIBS=-Llibs/libjpeg -ljpeg
 
 # Where can the optional sound libraries be found on this system?
 SOUND_LIBS=
@@ -96,17 +100,14 @@ CFLAGS.INCLUDE=$(NEXT.INCLUDE_DIRS) $(addprefix -I,$(NEXT.SOURCE_PATHS)) \
   -Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=$(NEXT.CFLAGS) $(NEXT.ARCH_FLAGS) \
+CFLAGS.GENERAL=$(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) \
   -ObjC++ -fno-common -pipe
 
-# We don't want assembly for now (why? it can be resolved - A.Z.)
-override DO_ASM=no
-
 # Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-O4
+CFLAGS.optimize=-O4 -finline-functions
 
 # Flags for the compiler which are used when debugging.
-CFLAGS.debug=-g
+CFLAGS.debug=-g $(NEXT.CFLAGS.DEBUG)
 
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile=-pg -O -g
@@ -115,7 +116,7 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=-dynamic
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=$(NEXT.ARCH_FLAGS) -Llibs/zlib -Llibs/libpng -Llibs/libjpeg
+LFLAGS.GENERAL=$(NEXT.ARCH_FLAGS) $(NEXT.LFLAGS.GENERAL)
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug=-g
@@ -124,12 +125,13 @@ LFLAGS.debug=-g
 LFLAGS.profile=-pg
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL= # FIXME
+LFLAGS.DLL= -dynamiclib
+
+# System-dependent flags to pass to NASM
+NASMFLAGS.SYSTEM=
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
-  libs/cssys/next/shared/loadlib.cpp \
-  support/gnu/getopt.c support/gnu/getopt1.c
+SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)))
 
 # Where to put the dynamic libraries on this system?
 OUTDLL=
