@@ -188,22 +188,42 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   // which match the true clipping planes as set by the projection
   // matrix.
 
+  // Position of camera.
   const csVector3& translation = rview.GetO2TTranslation();
-  // Compute the camera's foward facing vector in world space.
-  const csVector3 wforward (0,0,1);
-  const csVector3 cforward = rview.This2OtherRelative (wforward);
-  ddgVector3 f(cforward.x,cforward.y,cforward.z);
-  f.normalize();
+  ddgVector3 p(translation.x, translation.y, translation.z);
 
-  ddgControl *control = context->control();
-  control->position(translation.x, translation.y, translation.z);
+  // Compute the camera's foward facing vector in world space.
+  const csVector3 cforward (0,0,-1);
+  const csVector3 wforward = rview.This2OtherRelative (cforward);
+  ddgVector3 f(wforward.x,wforward.y,wforward.z);
+  f.normalize();
+  // Compute the camera's up facing vector in world space.
+  const csVector3 cup (0,1,0);
+  const csVector3 wup = rview.This2OtherRelative (cup);
+  ddgVector3 u(wup.x,wup.y,wup.z);
+  u.normalize();
+  // Compute the camera's right facing vector in world space.
+  const csVector3 cright (1,0,0);
+  const csVector3 wright = rview.This2OtherRelative (cright);
+  ddgVector3 r(wright.x,wright.y,wright.z);
+  r.normalize();
  
+  // Update the DDG context object.
+  ddgControl *control = context->control();
+  control->position (p.v[0],p.v[1],p.v[2]);
   context->forward(&f);
+  context->up (&u);
+  context->right (&r);
+  // TODO: JORRIT IS THIS RIGHT?
+  context->nearfar (1,100);
 
   // Get the FOV in angles.
   context->fov (rview.GetFOVAngle ());
+  // TODO: JORRIT IS THIS RIGHT?
+  context->aspect (1.0 /*rview.GetInvFOV ()*/);
 
-  // context->extractPlanes(context->frustrum());
+  // Construct some clipping planes.
+  context->extractPlanes(context->frustrum());
   // Optimize the mesh w.r.t. the current viewing location.
   modified = mesh->calculate(context);
 
