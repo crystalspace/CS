@@ -3,13 +3,18 @@
 
 #include "csgeom/poly3d.h"
 #include "csgeom/sphere.h"
+#include "csgeom/transfrm.h"
 #include "csutil/mmapio.h"
-#include "bitarray.h"
+#include "csutil/bitarray.h"
+#include "ivideo/graph3d.h"
+#include "iengine/rview.h"
 #include <string.h>
 #include <stdio.h>
 
 struct iMeshObject;
 struct iVertexBufferManager;
+
+const int NTERRAIN_QUADTREE_ROOT=1;
 
 /*******************************************************************************************************************
  
@@ -98,7 +103,7 @@ public:
   { count=0; }
 
   /// Push a triangle
-  void Push(int i1, i2, i3)
+  void Push(int i1, int i2, int i3)
   { 
     // Grow buffer if it needs it.
     if (count+1>=buffer_size)
@@ -178,7 +183,8 @@ private:
   /// Sets the variance and radius of a partially filled in block.
   void SetVarianceAndRadius(nBlock &b, nRect &bounds)
   {
-    unsigned short low=0xffff, unsigned high=0x0;
+    unsigned short low=0xffff;
+    unsigned short high=0x0;
     unsigned short radius;
 
     if (b.ne<low)  low=b.ne;
@@ -204,7 +210,7 @@ private:
     radius = (b.variance>>1);
 
     // Check and see if the width/2 is bigger.
-    if (radius<w>>1) radius=width>>1;
+    if (radius<bounds.w>>1) radius=bounds.w>>1;
 
     // Store radius
     b.radius = radius;
@@ -213,16 +219,16 @@ private:
   /// Does the work of tree building, heightmap is the height data (0..1), w is the edge length of the heightmap, which must be square.
   void BuildTreeNode(FILE *f, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds, float *heightmap, unsigned int w)
   {
-    unsigned int my_index = (parent_index<<2) + child_num + root;
+    unsigned int my_index = (parent_index<<2) + child_num + NTERRAIN_QUADTREE_ROOT;
     unsigned int mid = (bounds.w>>1)+1;
     nBlock b;
 
     // Get heights.
-    b.ne = heightmap[bounds.x +              (bounds.y * w)] * 65535;
-    b.nw = heightmap[bounds.x + bounds.w +   (bounds.y * w)] * 65535;
-    b.se = heightmap[bounds.x +              ((bounds.y + bounds.h) * w)] * 65535;
-    b.sw = heightmap[bounds.x + bounds.w +   ((bounds.y + bounds.h) * w)] * 65535;
-    b.center = heightmap[bounds.x +  mid  +  ((bounds.y + mid) * w)] * 65535;
+    b.ne = STATIC_CAST(unsigned short int, heightmap[bounds.x +              (bounds.y * w)] * 65535);
+    b.nw = STATIC_CAST(unsigned short int, heightmap[bounds.x + bounds.w +   (bounds.y * w)] * 65535);
+    b.se = STATIC_CAST(unsigned short int, heightmap[bounds.x +              ((bounds.y + bounds.h) * w)] * 65535);
+    b.sw = STATIC_CAST(unsigned short int, heightmap[bounds.x + bounds.w +   ((bounds.y + bounds.h) * w)] * 65535);
+    b.center = STATIC_CAST(unsigned short int, heightmap[bounds.x +  mid  +  ((bounds.y + mid) * w)] * 65535);
 
     // Set the variance for this block (the difference between the highest and lowest points.)
     SetVarianceAndRadius(b, bounds);
@@ -234,7 +240,7 @@ private:
     // Expand the quadtree until we get to the max resolution.
     if (level<max_levels)
     {
-      BuildTreeNode(f, level+1, my_index, 0, nRect(bounds.x,y,mid,mid), heightmap, w);
+      BuildTreeNode(f, level+1, my_index, 0, nRect(bounds.x,bounds.y,mid,mid), heightmap, w);
       BuildTreeNode(f, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,mid,mid), heightmap, w);
       BuildTreeNode(f, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,mid,mid), heightmap, w);
       BuildTreeNode(f, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,mid,mid), heightmap, w);
@@ -260,7 +266,7 @@ private:
   /// Processes a node for buffering, checks for visibility and detail levels.
   void ProcessTreeNode(iRenderView *rv, unsigned int level, unsigned int parent_index, unsigned int child_num, nRect bounds)
   {
-    unsigned int my_index = (parent_index<<2) + child_num + root;
+    unsigned int my_index = (parent_index<<2) + child_num + NTERRAIN_QUADTREE_ROOT;
     unsigned int mid = (bounds.w>>1)+1;
     bool render_this=false;
     nBlock *b;
@@ -293,10 +299,10 @@ private:
     // Don't render this block, resolve to the next level.
     if (!render_this)
     {
-      ProcessTreeNode(rv, level+1, my_index, 0, nRect(x,y,mid,mid));
-      ProcessTreeNode(rv, level+1, my_index, 1, nRect(x+mid,y,mid,mid));
-      ProcessTreeNode(rv, level+1, my_index, 2, nRect(x,y+mid,mid,mid));
-      ProcessTreeNode(rv, level+1, my_index, 3, nRect(x+mid,y+mid,mid,mid));
+      ProcessTreeNode(rv, level+1, my_index, 0, nRect(bounds.x,bounds.y,mid,mid));
+      ProcessTreeNode(rv, level+1, my_index, 1, nRect(bounds.x+mid,bounds.y,mid,mid));
+      ProcessTreeNode(rv, level+1, my_index, 2, nRect(bounds.x,bounds.y+mid,mid,mid));
+      ProcessTreeNode(rv, level+1, my_index, 3, nRect(bounds.x+mid,bounds.y+mid,mid,mid));
     }
     // Render this block to the buffer for later drawing.
     else
@@ -330,6 +336,9 @@ public:
     verts.MakeEmpty();
     tris.MakeEmpty();
 
+    unsigned int mid = (terrain_w>>1)+1;
+    unsigned int x=0, y=0;
+
     
     //  Buffer entire viewable terrain by first doing view culling on the block, then checking for the
     // error metric.  If the error metric fails, then we need to drop down another level. Begin that
@@ -347,9 +356,13 @@ public:
   { obj2cam = o2c; }
 
   /// Sets the camera origin
-  void SetCameraOrigin(csVector3 &camv)
+  void SetCameraOrigin(const csVector3 &camv)
   { cam=camv; }
 };
+
+
+//////////////////////////////////////////////// Mesh Object ///////////////////////////////////////////////////
+
 
 class csBigTerrainObject : public iMeshObject
 {
@@ -373,6 +386,9 @@ public:
   ////////////////////////////// iMeshObject implementation ///////////////////////////
   SCF_DECLARE_IBASE;
 
+  csBigTerrainObject();
+  virtual ~csBigTerrainObject();
+
   /// Returns a pointer to the factory that made this.
   virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
 
@@ -386,15 +402,15 @@ public:
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
 
 
-  virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
-  {
-    SCF_SET_REF (vis_cb, cb);
-  }
+  //virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
+  //{
+  //  SCF_SET_REF (vis_cb, cb);
+  //}
 
-  virtual iMeshObjectDrawCallback* GetVisibleCallback () const
-  {
-    return vis_cb;
-  }
+  //virtual iMeshObjectDrawCallback* GetVisibleCallback () const
+  //{
+  //  return vis_cb;
+  //}
 
   /// Gets the bounding box for this terrain.
   virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
@@ -415,10 +431,10 @@ public:
   virtual bool SupportsHardTransform () const { return false; }
 
   /// Set logical parent.
-  virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
+  //virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
 
   /// Get logical parent.
-  virtual iBase* GetLogicalParent () const { return logparent; }
+  //virtual iBase* GetLogicalParent () const { return logparent; }
 
   /// Check if the terrain is hit by the given object space vector
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end, csVector3& isect, float* pr);

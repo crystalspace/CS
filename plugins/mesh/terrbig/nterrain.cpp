@@ -1,5 +1,4 @@
 #include "cssysdef.h"
-#include "nterrain.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
@@ -17,7 +16,8 @@
 #include "igraphic/image.h"
 #include "iutil/objreg.h"
 #include "csgfx/rgbpixel.h"
-
+#include "imesh/object.h"
+#include "nterrain.h"
 
 csBigTerrainObject::csBigTerrainObject():pFactory(NULL), terrain(NULL)
 {
@@ -35,16 +35,16 @@ csBigTerrainObject::SetupVertexBuffer (iVertexBuffer *&vbuf1)
  {
    if (!vbufmgr)
    {
-     iObjectRegistry* object_reg = ((csTerrFuncObjectFactory*)pFactory)->object_reg;
-     iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+     //iObjectRegistry* object_reg = ((csTerrFuncObjectFactory*)pFactory)->object_reg;
+     //iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
 
      // @@@ priority should be a parameter.
-     vbufmgr = g3d->GetVertexBufferManager ();
-     g3d->DecRef ();
+     //vbufmgr = g3d->GetVertexBufferManager ();
+     //g3d->DecRef ();
 
-     vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+     //vbufmgr->AddClient (&scfiVertexBufferManagerClient);
    }
-   vbuf1 = vbufmgr->CreateBuffer (1);
+   //vbuf1 = vbufmgr->CreateBuffer (1);
  }
 }
 
@@ -59,7 +59,11 @@ csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
     terrain->SetObjectToCamera(cam->GetTransform());
     terrain->SetCameraOrigin(cam->GetTransform().GetOrigin());
     terrain->AssembleTerrain(rview);
+
+    return true;
   }
+
+  return false;
 }
 
 void 
@@ -82,6 +86,6 @@ csBigTerrainObject::Draw (iRenderView* rview, iMovable* movable, csZBufMode zbuf
 
   SetupVertexBuffer(vbuf);
 
-
+  return true;
 }
 
