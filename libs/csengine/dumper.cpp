@@ -117,12 +117,22 @@ void Dumper::dump (csPolygon3D* p)
       portal->GetSector()->GetName ());
     CsPrintf (MSG_DEBUG_0, "    Alpha=%d\n", p->GetAlpha ());
   }
-  int i;
-  for (i = 0 ; i < p->GetVertices ().GetNumVertices () ; i++)
-    CsPrintf (MSG_DEBUG_0, "        v[%d]: (%f,%f,%f)  camera:(%f,%f,%f)\n",
+  if (p->poly_set->cam_verts == NULL)
+  {
+    int i;
+    for (i = 0 ; i < p->GetVertices ().GetNumVertices () ; i++)
+      CsPrintf (MSG_DEBUG_0, "        v[%d]: (%f,%f,%f)\n",
+    	i, p->Vwor (i).x, p->Vwor (i).y, p->Vwor (i).z);
+  }
+  else
+  {
+    int i;
+    for (i = 0 ; i < p->GetVertices ().GetNumVertices () ; i++)
+      CsPrintf (MSG_DEBUG_0, "        v[%d]: (%f,%f,%f)  camera:(%f,%f,%f)\n",
     	i,
     	p->Vwor (i).x, p->Vwor (i).y, p->Vwor (i).z,
     	p->Vcam (i).x, p->Vcam (i).y, p->Vcam (i).z);
+  }
   dump (p->plane);
   if (p->GetTextureType () == POLYTXT_LIGHTMAP)
   {
