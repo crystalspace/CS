@@ -146,7 +146,10 @@ class csSparseGrid
     // Free a particular grid row object
     virtual bool FreeItem (csSome Item)
     {
-      delete (csGridRow *)((csGridRowEntry *)Item)->data;
+      // XXX: Don't free the data here. It seems we're missing a good policy
+      // here on who should delete the data in the rows... Sometimes it's
+      // freed sometimes not.
+      //delete (csGridRow *)((csGridRowEntry *)Item)->data;
       delete (csGridRowEntry *)Item;
       return true;
     }

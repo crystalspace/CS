@@ -1352,6 +1352,7 @@ CsfEdit::~CsfEdit ()
 {
   /// first delete the editfont - might save itself.
   delete editfont;
+  csResetPalette();
 }
 
 bool CsfEdit::Initialize ()
