@@ -1,5 +1,24 @@
 The history order is reversed so that new features are at the top.
 
+21-Jun-2002
+	- Fixed a bug in csSector::IntersectSegment() (which is used
+	  in HitBeam() and other functions like that). Apparently if an
+	  octree was used it would test all non-octree objects twice.
+	- Added iThingState::IntersectSegment().
+	- Implemented IntersectSegment() in Dynavis. It is a fairly
+	  optimal implementation that will use the kd-tree for rough
+	  front-to-back sorting and it will also test the segment
+	  against the bounding box of the kdtree nodes and objects.
+	- For reasons totally unknown to me the FindOBB routine suddenly
+	  started crashing. So for Dynavis I have no switched to
+	  FindOBBAccurate(). This function is slower but it only happens
+	  once so that's not a big problem usually. Will investigate later
+	  to see what's going on.
+	- csSector::IntersectSegment() now uses the culler in general
+	  and not only if it is an octree culler. That way all routines
+	  that use csSector::IntersectSegment() are now speed up by
+	  Dynavis.
+	- Some optimizations to Dynavis again.
 20-Jun-2002
 	- Considerably optimized AppendWriteQueue() in Dynavis. Profiling
 	  showed that this is now the function that does most work.

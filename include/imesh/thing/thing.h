@@ -270,6 +270,15 @@ struct iThingState : public iBase
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled).
   virtual csFog* GetFog () const = 0;
+
+  /**
+   * Intersect a segment with this thing and return the first
+   * polygon that is hit. If only_portals == true then only portals
+   * will be checked.
+   */
+  virtual iPolygon3D* IntersectSegment (const csVector3& start,
+	const csVector3& end, csVector3& isect,
+	float* pr = NULL, bool only_portals = false) = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 0, 2);

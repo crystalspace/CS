@@ -4045,6 +4045,15 @@ iPolygon3D *csThing::ThingState::GetPortalPolygon (int idx) const
   return &(p->scfiPolygon3D);
 }
 
+iPolygon3D* csThing::ThingState::IntersectSegment (const csVector3& start,
+	const csVector3& end, csVector3& isect,
+	float* pr, bool only_portals)
+{
+  csPolygon3D* p = scfParent->IntersectSegment (start, end, isect, pr,
+  	only_portals);
+  return p ? &(p->scfiPolygon3D) : NULL;
+}
+
 //---------------------------------------------------------------------------
 iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 {

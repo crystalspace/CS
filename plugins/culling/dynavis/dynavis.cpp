@@ -25,9 +25,11 @@
 #include "csutil/scfstr.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/math3d.h"
+#include "csgeom/obb.h"
+#include "csgeom/segment.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
-#include "csgeom/obb.h"
+#include "csutil/flags.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -38,6 +40,7 @@
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
 #include "imesh/object.h"
+#include "imesh/thing/thing.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
 #include "ivaria/bugplug.h"
@@ -512,21 +515,40 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 
   int i;
   // First transform all vertices.
-  //@@@ Avoid allocate?
-  csVector2* tr_verts = new csVector2[vertex_count];
+  //@@@ MEMORY LEAK!!!
+  static csVector2* tr_verts = NULL;
+  static int max_tr_verts = 0;
+  if (vertex_count > max_tr_verts)
+  {
+    delete[] tr_verts;
+    max_tr_verts = vertex_count+20;
+    tr_verts = new csVector2[max_tr_verts];
+  }
   float max_depth = -1.0;
+  csVector3 camv;
+  const csMatrix3& trans_mat = trans.GetO2T ();
+  const csVector3& trans_vec = trans.GetO2TTranslation ();
   for (i = 0 ; i < vertex_count ; i++)
   {
-    csVector3 camv = trans.Other2This (verts[i]);
+    // Normally we would calculate:
+    //   csVector3 camv = trans.Other2This (verts[i]);
+    // But since we often only need the z of the transformed vertex
+    // we only calculate z and calculate x,y later if needed.
+    csVector3 v = verts[i] - trans_vec;
+    camv.z = trans_mat.m31 * v.x + trans_mat.m32 * v.y + trans_mat.m33 * v.z;
+
     if (camv.z <= 0.0)
     {
       // @@@ Later we should clamp instead of ignoring this outline.
-      delete[] tr_verts;
       return;
     }
     if (camv.z > max_depth) max_depth = camv.z;
     if (outline_info.outline_verts[i])
+    {
+      camv.x = trans_mat.m11 * v.x + trans_mat.m12 * v.y + trans_mat.m13 * v.z;
+      camv.y = trans_mat.m21 * v.x + trans_mat.m22 * v.y + trans_mat.m23 * v.z;
       Perspective (camv, tr_verts[i], fov, sx, sy);
+    }
   }
 
   if (do_state_dump)
@@ -583,8 +605,6 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     printf ("%s\n", str->GetData ());
     str->DecRef ();
   }
-
-  delete[] tr_verts;
 }
 
 void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
@@ -938,6 +958,122 @@ bool csDynaVis::VisTest (iRenderView* rview)
   do_state_dump = false;
 
   return true;
+}
+
+struct IntersectSegment_Front2BackData
+{
+  csSegment3 seg;
+  csVector3 isect;
+  float r;
+  iMeshWrapper* mesh;
+  iPolygon3D* polygon;
+};
+
+static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
+	uint32 cur_timestamp)
+{
+  IntersectSegment_Front2BackData* data
+  	= (IntersectSegment_Front2BackData*)userdata;
+
+  // If mesh != NULL then we have already found our mesh and we
+  // stop immediatelly.
+  if (data->mesh) return false;
+
+  // In the first part of this test we are going to test if the
+  // start-end vector intersects with the node. If not then we don't
+  // need to continue.
+  csVector3 box_isect;
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+  if (csIntersect3::BoxSegment (node_bbox, data->seg, box_isect) == -1)
+  {
+    return false;
+  }
+
+  treenode->Distribute ();
+
+  int num_objects;
+  csKDTreeChild** objects;
+  num_objects = treenode->GetObjectCount ();
+  objects = treenode->GetObjects ();
+
+  data->r = 10000000000.;
+  data->polygon = NULL;
+
+  int i;
+  for (i = 0 ; i < num_objects ; i++)
+  {
+    if (objects[i]->timestamp != cur_timestamp)
+    {
+      objects[i]->timestamp = cur_timestamp;
+      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
+      	objects[i]->GetObject ();
+
+      // First test the bounding box of the object.
+      const csBox3& obj_bbox = visobj_wrap->child->GetBBox ();
+
+      if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
+      {
+      //@@@@@@@@@@@@ USE SCF_QUERY_INTERFACE_FAST @@@@@@@@@
+        // This object is possibly intersected by this beam.
+	iMeshWrapper* mesh = SCF_QUERY_INTERFACE (visobj_wrap->visobj,
+		iMeshWrapper);
+	if (mesh)
+	{
+	  printf ("GOT mesh!\n"); fflush (stdout);
+	  if (!mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
+	  {
+	    iThingState* st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	      	iThingState);
+	    if (st)
+	    {
+	      // Transform our vector to object space.
+	      //@@@ Consider the ability to check if
+	      // object==world space for objects in general?
+	      csReversibleTransform movtrans (visobj_wrap->visobj->
+		  GetMovable ()->GetFullTransform ());
+	      csVector3 obj_start = movtrans.Other2This (data->seg.Start ());
+	      csVector3 obj_end = movtrans.Other2This (data->seg.End ());
+	      csVector3 obj_isect;
+	      float r;
+	      iPolygon3D* p = st->IntersectSegment (
+			obj_start, obj_end,
+			obj_isect, &r, false);
+	      if (p && r < data->r)
+	      {
+		data->r = r;
+		data->polygon = p;
+		data->isect = movtrans.This2Other (obj_isect);
+		data->mesh = mesh;
+	      }
+
+	      st->DecRef ();
+	    }
+	  }
+	  mesh->DecRef ();
+	}
+      }
+    }
+  }
+
+  if (data->mesh) return false;
+  return true;
+}
+
+iPolygon3D* csDynaVis::IntersectSegment (const csVector3& start,
+    const csVector3& end, csVector3& isect, float* pr,
+    iMeshWrapper** p_mesh)
+{
+  IntersectSegment_Front2BackData data;
+  data.seg.Set (start, end);
+  data.r = 0;
+  data.mesh = NULL;
+  data.polygon = NULL;
+  kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data);
+
+  if (p_mesh) *p_mesh = data.mesh;
+  if (pr) *pr = data.r;
+
+  return data.polygon;
 }
 
 iString* csDynaVis::Debug_UnitTest ()

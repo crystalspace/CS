@@ -1152,6 +1152,13 @@ iString* csGeomDebugHelper::UnitTest ()
     printf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
     fflush (stdout);
   }
+  obb.FindOBBAccurate (vertex_table, 4);
+  for (i = 0 ; i < 8 ; i++)
+  {
+    csVector3 v = obb.GetCorner (i);
+    printf ("%d %g,%g,%g\n", i, v.x, v.y, v.z);
+    fflush (stdout);
+  }
 
   rc->DecRef ();
   return NULL;

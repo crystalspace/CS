@@ -1106,6 +1106,10 @@ public:
     { return scfParent->HasFog (); }
     virtual csFog *GetFog () const
     { return &scfParent->GetFog (); }
+
+    virtual iPolygon3D* IntersectSegment (const csVector3& start,
+	const csVector3& end, csVector3& isect,
+	float* pr = NULL, bool only_portals = false);
   } scfiThingState;
   friend struct ThingState;
 

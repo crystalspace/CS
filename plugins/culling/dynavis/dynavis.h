@@ -171,7 +171,7 @@ public:
   virtual bool VisTest (iRenderView* rview);
   virtual iPolygon3D* IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
-    iMeshWrapper** p_mesh = NULL) { return NULL; }
+    iMeshWrapper** p_mesh = NULL);
   virtual bool SupportsShadowCasting () { return false; }
   virtual void CastShadows (iFrustumView* /*fview*/) { }
 

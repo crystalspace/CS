@@ -82,7 +82,7 @@ const csOBB& csObjectModel::GetOBB ()
   {
     int num_vertices = imodel->GetSmallerPolygonMesh ()->GetVertexCount ();
     csVector3* verts = imodel->GetSmallerPolygonMesh ()->GetVertices ();
-    obb.FindOBB (verts, num_vertices);
+    obb.FindOBBAccurate (verts, num_vertices);
     dirty_obb = false;
   }
   return obb;

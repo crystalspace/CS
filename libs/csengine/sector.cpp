@@ -361,10 +361,8 @@ csPolygon3D *csSector::IntersectSegment (
   csVector3 cur_isect;
   csPolygon3D *best_p = NULL;
   csVector3 obj_start, obj_end, obj_isect;
-  csReversibleTransform movtrans;
 
-  //@@@ Should use 'culler' and not 'culler_mesh'!
-  if (culler_mesh && !only_portals)
+  if (culler && !only_portals)
   {
     // culler_mesh has option CS_THING_MOVE_NEVER so
     // object space == world space.
@@ -378,7 +376,11 @@ csPolygon3D *csSector::IntersectSegment (
         *p_mesh = mesh ? mesh->GetPrivateObject ()
 		: culler_mesh ? culler_mesh->GetPrivateObject () : NULL;
     }
+    if (pr) *pr = best_r;
+    return best_p;
   }
+
+  csReversibleTransform movtrans;
 
   int i;
   for (i = 0; i < meshes.Length (); i++)
