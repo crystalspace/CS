@@ -1,5 +1,5 @@
 # This is a subinclude file used to define the rules needed
-# to build the NULL network driver
+# to build the metaball plug-in.
 
 # Driver description
 DESCRIPTION.metaball = Crystal Space MetaBall Renderer Plugin
@@ -16,7 +16,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: metaball
+.PHONY: metaball metaballclean
 
 all plugins: metaball
 
@@ -32,14 +32,13 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp plugins/metaball
 
-# The NULL Network driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
   METABALL=$(OUTDLL)metaball$(DLL)
   DEP.METABALL=$(CSGEOM.LIB) $(CSSYS.LIB) $(CSUTIL.LIB)
 else
-  METABALL=$(OUT)$(LIB_PREFIX)metaball$(LIB)
+  METABALL=$(OUT)$(LIB_PREFIX)meta$(LIB)
   DEP.EXE+=$(METABALL)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_METABALLSIMPLE
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_METABALL
 endif
 DESCRIPTION.$(METABALL) = $(DESCRIPTION.metaball)
 SRC.METABALL = $(wildcard plugins/metaball/*.cpp)
@@ -62,7 +61,7 @@ $(METABALL): $(OBJ.METABALL) $(DEP.METABALL)
 	$(DO.PLUGIN)
 
 metaballclean:
-	$(RM) $(METABALL) $(OBJ.METABALL)
+	$(RM) $(METABALL) $(OBJ.METABALL) $(OUTOS)metaball.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)metaball.dep
