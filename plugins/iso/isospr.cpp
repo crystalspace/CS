@@ -37,6 +37,12 @@ csIsoSprite::csIsoSprite (iBase *iParent)
   position.Set(0,0,0);
   material = NULL;
   g3dpolyfx.mixmode = CS_FX_COPY;
+  g3dpolyfx.use_fog = false;
+  g3dpolyfx.mat_handle = NULL;
+  g3dpolyfx.mixmode = CS_FX_COPY;
+  g3dpolyfx.flat_color_r = 1;
+  g3dpolyfx.flat_color_g = 1;
+  g3dpolyfx.flat_color_b = 1;
   grid = NULL;
   gridcall = NULL;
   gridcalldata = NULL;

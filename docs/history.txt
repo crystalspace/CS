@@ -16,6 +16,9 @@ The history order is reversed so that new features are at the top.
 	  order to work around an OpenStep compiler bug where unlinkable object
 	  files are generated if an inline function calls a second inline
 	  before the compiler has seen the definition of the second function.
+	- Fixed a VERY bad bug in the iso-engine. It was not initializing
+	  a structure correctly. This caused very bad crashes with OpenGL
+	  (because sometimes use_fog was set to true).
 	- Eric Sunshine eliminated a new circular reference which showed up
 	  when the global iSCF::SCF variable was introduced into scf.cpp.  The
 	  problem was that plugin modules require this variable, thus making it
