@@ -20,7 +20,13 @@
 #define __IVIDEO_TEXTURE_H__
 
 /**\file
+ * Texture handle interface
  */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 #include "cstypes.h"
 
@@ -106,5 +112,7 @@ struct iTextureHandle : public iBase
    */
   virtual iGraphics2D* GetCanvas () = 0;
 };
+
+/** @} */
 
 #endif // __IVIDEO_TEXTURE_H__

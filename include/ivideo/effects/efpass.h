@@ -21,7 +21,13 @@
 #define __IEFFECTPASS_H__
 
 /**\file
+ * Effect pass interface
  */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+
 #include "csutil/scf.h"
 #include "cstypes.h"
 #include "csutil/ref.h"
@@ -75,5 +81,7 @@ struct iEffectPass : public iBase
   virtual void SetRendererData(csRef<iBase> data) = 0;
 
 };
+
+/** @} */
 
 #endif // __IEFFECTPASS_H__

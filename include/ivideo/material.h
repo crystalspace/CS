@@ -20,7 +20,12 @@
 #define __IVIDEO_MATERIAL_H__
 
 /**\file
+ * Material interface
  */
+/**
+ * \addtogroup gfx3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 /// Default material `diffuse' parameter
@@ -143,5 +148,7 @@ struct iMaterialHandle : public iBase
    */
   virtual void Prepare () = 0;
 };
+
+/** @} */
 
 #endif // __IVIDEO_MATERIAL_H__

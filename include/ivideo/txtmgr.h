@@ -21,7 +21,13 @@
 #define __IVIDEO_TXTMGR_H__
 
 /**\file
+ * Texture manager interface
  */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+
 #include "csutil/scf.h"
 
 class Vector2;
@@ -172,5 +178,7 @@ struct iTextureManager : public iBase
    */
   virtual int GetTextureFormat () = 0;
 };
+
+/** @} */
 
 #endif // __IVIDEO_TXTMGR_H__

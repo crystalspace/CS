@@ -22,6 +22,13 @@
 
 
 #include "csutil/scf.h"
+/** \file
+ * New 3D graphics interface
+ */
+
+/**
+ * \addtogroup gfx3d
+ * @{ */
 
 class csRect;
 class csReversibleTransform;
@@ -237,6 +244,8 @@ struct iRender3D : public iBase
   /// Get a stringhash to be used by our streamsources etc.
   virtual csStringSet* GetStringContainer () = 0;
 };
+
+/** @} */
 
 #endif // __IVIDEO_RENDER3D_H__
 

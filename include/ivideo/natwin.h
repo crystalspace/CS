@@ -20,7 +20,13 @@
 #define __IVIDEO_NATWIN_H__
 
 /**\file
+ * Native window manager interface
  */
+
+/**
+ * \addtogroup gfx2d
+ * @{ */
+ 
 #include <stdarg.h>
 #include "csutil/scf.h"
 
@@ -71,6 +77,8 @@ struct iNativeWindow : public iBase
    */
   virtual void SetTitle (const char* title) = 0;
 };
+
+/** @} */
 
 #endif // __IVIDEO_NATWIN_H__
 

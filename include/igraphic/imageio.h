@@ -20,6 +20,12 @@
 #define __IGRAPHIC_IMAGEIO_H__
 
 /**\file
+ * Image input/output interface
+ */
+
+/**
+ * \addtogroup gfx2d
+ * @{
  */
 
 #include "csutil/scf.h"
@@ -100,5 +106,7 @@ struct iImageIO : public iBase
   virtual csPtr<iDataBuffer> Save (iImage *image, const char *mime = NULL,
     const char* extraoptions = NULL) = 0;
 };
+
+/** @} */
 
 #endif // __IGRAPHIC_IMAGEIO_H__

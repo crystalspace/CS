@@ -21,7 +21,13 @@
 #define __IEFFECTLAYER_H__
 
 /**\file
+ * Effect layer interface
  */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+
 #include "csutil/scf.h"
 #include "cstypes.h"
 #include "csutil/ref.h"
@@ -62,5 +68,7 @@ struct iEffectLayer : public iBase
 	/// Set renderer specific data
 	virtual void SetRendererData(csRef<iBase> data) = 0;
 };
+
+/** @} */
 
 #endif // __IEFFECTLAYER_H__

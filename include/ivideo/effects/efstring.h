@@ -20,6 +20,9 @@
 #ifndef __EFSTRING_H__
 #define __EFSTRING_H__
 
+/**\file
+ */
+
 struct iEffectServer;
 
 class csEffectStrings

@@ -20,6 +20,14 @@
 #ifndef __IEFFECTCLIENT_H__
 #define __IEFFECTCLIENT_H__
 
+/**\file
+ * Effect client interface
+ */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+
 #include "csutil/scf.h"
 
 struct iEffectTechnique;
@@ -37,5 +45,7 @@ public:
   /// Validate a technique
   virtual bool Validate( iEffectDefinition* effect, iEffectTechnique* technique ) = 0;
 };
+
+/** @} */
 
 #endif // __IEFFECTCLIENT_H__

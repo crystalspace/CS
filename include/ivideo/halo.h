@@ -20,7 +20,13 @@
 #define __IVIDEO_HALO_H__
 
 /**\file
+ * Halo interface
  */
+
+/**
+ * \addtogroup gfx3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 class csVector2;
@@ -58,5 +64,7 @@ struct iHalo : public iBase
   virtual void Draw (float x, float y, float w, float h, float iIntensity,
     csVector2 *iVertices, int iVertCount) = 0;
 };
+
+/** @} */
 
 #endif

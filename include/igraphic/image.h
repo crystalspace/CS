@@ -20,6 +20,12 @@
 #define __IGRAPHIC_IMAGE_H__
 
 /**\file
+ * Image interface
+ */
+
+/**
+ * \addtogroup gfx2d
+ * @{
  */
 
 #include "csutil/scf.h"
@@ -144,5 +150,7 @@ struct iImage : public iBase
    */
   virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength) = 0;
 };
+
+/** @} */
 
 #endif // __IGRAPHIC_IMAGE_H__

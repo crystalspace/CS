@@ -21,7 +21,13 @@
 #define __IEFFECTDEFINITION_H__
 
 /**\file
+ * Effect definition interface
  */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+
 #include "csutil/scf.h"
 #include "cstypes.h"
 #include "efvector4.h"
@@ -65,5 +71,7 @@ struct iEffectDefinition : public iBase
   /// Get all variable stringnames (used when creatingthem)
   virtual csBasicVector GetAllVariableNames() = 0; 
 };
+
+/** @} */
 
 #endif // __IEFFECTDEFINITION_H__

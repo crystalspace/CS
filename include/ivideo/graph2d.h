@@ -21,7 +21,13 @@
 #define __IVIDEO_GRAPH2D_H__
 
 /**\file
+ * 2D graphics interface
  */
+
+/**
+ * \addtogroup gfx2d
+ * @{ */
+ 
 #include <stdarg.h>
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
@@ -36,9 +42,12 @@ struct iFont;
 struct iNativeWindow;
 struct iGraphics2D;
 
+/// Simple 2D pixel coordinate
 struct csPixelCoord
 {
+  /// X component
   int x;
+  /// Y component
   int y;
 };
 
@@ -352,6 +361,8 @@ struct iGraphics2D : public iBase
   	void* memory, int width, int height, int depth,
 	iOffscreenCanvasCallback* ofscb) = 0;
 };
+
+/** @} */
 
 #endif // __IVIDEO_GRAPH2D_H__
 

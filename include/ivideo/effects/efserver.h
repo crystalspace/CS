@@ -21,7 +21,13 @@
 #define __IEFFECTSERVER_H__
 
 /**\file
+ * Effect server interface
  */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 #include "cstypes.h"
@@ -57,5 +63,7 @@ public:
   /// Get our csEffectStrings
   virtual inline csEffectStrings* GetStandardStrings() = 0;
 };
+
+/** @} */
 
 #endif // __IEFFECTSERVER_H__

@@ -194,6 +194,21 @@
 /**
  * \defgroup geom_utils Geometry utilities
  */
+
+/**
+ * \defgroup gfx Graphics
+ * @{
+ */
+ 
+	/**
+	 * \defgroup gfx2d 2D
+	 */
+	 
+	/** 
+	 * \defgroup gfx3d 3D
+	 */ 
+ 
+/** @} */ 
  
 /**
  * \defgroup loadsave Loading & Saving support

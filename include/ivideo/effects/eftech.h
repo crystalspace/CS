@@ -21,7 +21,13 @@
 #define __IEFFECTTECHNIQUE_H__
 
 /**\file
+ * Effect technique interface
  */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+
 #include "csutil/scf.h"
 #include "cstypes.h"
 
@@ -80,5 +86,7 @@ struct iEffectTechnique : public iBase
   // supported by the renderer).
   // --Anders Stenberg
 };
+
+/** @} */
 
 #endif // __IEFFECTTECHNIQUE_H__

@@ -20,6 +20,14 @@
 #ifndef __IVIDEO_RNDBUF_H__
 #define __IVIDEO_RNDBUF_H__
 
+/** \file 
+ * Render buffer interface
+ */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+
 #include "csutil/strset.h"
 
 #include "ivideo/render3d.h"
@@ -193,5 +201,6 @@ public:
   virtual iTextureHandle* GetLightmapHandle () { return NULL; }
 };
 
+/** @} */
 
 #endif //  __IVIDEO_RNDBUF_H__

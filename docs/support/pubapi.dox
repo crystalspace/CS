@@ -611,7 +611,9 @@ PREDEFINED             = "CS_GNUC_PRINTF(a,b)=" \
 			 CS_SYSDEF_PROVIDE_TEMP \
 			 CS_SYSDEF_PROVIDE_MKDIR \
 			 CS_IEEE_DOUBLE_FORMAT \
-			 CS_HAS_MEMORY_MAPPED_IO
+			 CS_HAS_MEMORY_MAPPED_IO \
+			 "CS_STRUCT_ALIGN_4BYTE_BEGIN=" \
+			 "CS_STRUCT_ALIGN_4BYTE_END=" 
 
 # If the MACRO_EXPANSION and EXPAND_PREDEF_ONLY tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 

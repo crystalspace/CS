@@ -21,8 +21,13 @@
 #define __IVIDEO_GRAPH3D_H__
 
 /**\file
+ * 3D graphics interface
  */
 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
 #include "csgeom/vector2.h"
@@ -767,6 +772,8 @@ struct iGraphics3D : public iBase
 #include "ivideo/render3d.h"
 #define iGraphics3D iRender3D
 #endif // CS_USE_NEW_RENDERER
+
+/** @} */
 
 #endif // __IVIDEO_GRAPH3D_H__
 

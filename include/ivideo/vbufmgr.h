@@ -23,7 +23,13 @@
 #ifndef CS_USE_NEW_RENDERER
 
 /**\file
+ * Vertex buffer manager interface
  */
+ 
+/**
+ * \addtogroup gfx3d
+ * @{ */
+ 
 #include "csutil/scf.h"
 
 class csMatrix3;
@@ -236,6 +242,8 @@ struct iVertexBufferManager : public iBase
 };
 
 #endif // CS_USE_NEW_RENDERER
+
+/** @} */
 
 #endif // __IVIDEO_VBUFMGR_H__
 
