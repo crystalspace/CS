@@ -15,6 +15,7 @@
 #include "aws/awsstdsk.h"
 #include "aws/awscmdbt.h"
 #include "aws/awslabel.h"
+#include "aws/awstxtbx.h"
 
 
 #include <stdio.h>
@@ -747,6 +748,7 @@ awsManager::RegisterCommonComponents()
   //  takes care of all the implementation details.  There's nothing else you need to do.
   (void)new awsCmdButtonFactory(this);
   (void)new awsLabelFactory(this);
+  (void)new awsTextBoxFactory(this);
 
   GetSinkMgr()->RegisterSink("awsStandardSink", new awsStandardSink());
 }
