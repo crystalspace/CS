@@ -12,6 +12,9 @@ chronological order.
 	- Eric Sunshine fixed compilation erorr in shadervar.cpp.
 	- Eric Sunshine eliminated compilation warning about unused variables
 	  in glfontcache.cpp.
+	- Eric Sunshine fixed glosx2d makefile and Jamfile so that the plugin
+	  now links against csgeom.  This is necessary as a result of recent
+	  changes (probably the recent work on the font caching machinery).
 16-Aug-2003
 	- Jorrit added more features with references to parts of the
 	  documentation.

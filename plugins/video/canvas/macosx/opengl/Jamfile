@@ -5,7 +5,8 @@ if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
 Plugin glosx2d
 	: [ Wildcard *.c *.cpp *.C *.m *.mm *.M *.h ]
 ;
-LinkWith glosx2d : canvascommon openglcommon osxcanvascommon cssys csutil ;
+LinkWith glosx2d :
+	canvascommon openglcommon osxcanvascommon csgeom cssys csutil ;
 ExternalLibs glosx2d : GL ;
 
 Help glosx2d : "Crystal Space MacOS/X OpenGL 2D driver" ;
