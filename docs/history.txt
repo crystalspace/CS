@@ -13,6 +13,8 @@ chronological order.
 	- Peter Amstutz also improved sector support in the csvosa3dl plugin,
 	  so it won't try and load a sector that has already been loaded
 	  a second time.
+	- Jorrit added a sanity check to the genmesh loader to test if
+	  a triangle is not using a bad vertex index.
 3-Aug-2004
 	- Eric Sunshine changed the install location of Crystal Space headers
 	  from ${includedir} to ${includedir}/crystalspace in order to avoid

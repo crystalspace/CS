@@ -433,6 +433,16 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
 	  tr[num_tri].a = child->GetAttributeValueAsInt ("v1");
 	  tr[num_tri].b = child->GetAttributeValueAsInt ("v2");
 	  tr[num_tri].c = child->GetAttributeValueAsInt ("v3");
+	  if (tr[num_tri].a >= state->GetVertexCount () ||
+	      tr[num_tri].b >= state->GetVertexCount () ||
+	      tr[num_tri].c >= state->GetVertexCount ())
+	  {
+	    synldr->ReportError (
+		      "crystalspace.genmeshfactoryloader.parse.frame.badvt",
+		      child, "Bad vertex index for triangle in genmesh factory!"
+		      );
+	    return 0;
+	  }
 	  num_tri++;
 	}
         break;
