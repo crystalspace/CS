@@ -33,6 +33,9 @@ struct iTextureManager;
 struct iTextureHandle;
 struct iImage;
 
+
+SCF_VERSION (csTextureWrapper, 0, 0, 1);
+
 /**
  * csTextureWrapper represents a texture and its link
  * to the iTextureHandle as returned by iTextureManager.

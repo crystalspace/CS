@@ -41,6 +41,10 @@ IMPLEMENT_OBJECT_INTERFACE_EXT_END
 IMPLEMENT_OBJECT_INTERFACE_EXT (csLightObject, csWalkEntity)
 IMPLEMENT_OBJECT_INTERFACE_EXT_END
 
+IMPLEMENT_IBASE_EXT (csWalkEntity)
+  IMPLEMENTS_INTERFACE (csWalkEntity)
+IMPLEMENT_IBASE_EXT_END
+
 DECLARE_OBJECT_TYPE (csMeshWrapper);
 
 //--------------------------------------------------------------------------

@@ -29,6 +29,9 @@
 class csLight;
 class csMeshWrapper;
 
+
+SCF_VERSION (csWalkEntity, 0, 0, 1);
+
 /**
  * A general WalkTest entity.
  */
@@ -43,6 +46,8 @@ public:
 
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;
+
+  DECLARE_IBASE_EXT (csPObject);
 
   virtual ~csWalkEntity ()
   {}

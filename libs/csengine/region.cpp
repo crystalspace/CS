@@ -77,7 +77,7 @@ void csRegion::Region::DeleteAll ()
   for (iter = scfParent->GetIterator ();
   	!iter->IsFinished () ; iter->Next ())
   {
-    iObject* o = iter->GetiObject ();
+    iObject* o = iter->GetObject ();
     copy.Push (o);
   }
   iter->DecRef ();
@@ -242,12 +242,17 @@ bool csRegion::Region::PrepareTextures ()
 
   // First register all textures to the texture manager.
   {
-    for (iter = scfParent->GetIterator (OBJECT_TYPE_ID(csTextureWrapper));
+    for (iter = scfParent->GetIterator ();
   	!iter->IsFinished () ; iter->Next())
     {
-      csTextureWrapper* csth = (csTextureWrapper*)iter->GetTypedObj ();
-      if (!csth->GetTextureHandle ())
-        csth->Register (txtmgr);
+      iTextureWrapper* csth =
+        QUERY_INTERFACE_FAST (iter->GetObject (), iTextureWrapper);
+      if (csth)
+      {
+        if (!csth->GetTextureHandle ())
+          csth->Register (txtmgr);
+        csth->DecRef ();
+      }
     }
     iter->DecRef ();
   }
@@ -255,23 +260,33 @@ bool csRegion::Region::PrepareTextures ()
   // Prepare all the textures.
   //@@@ Only prepare new textures: txtmgr->PrepareTextures ();
   {
-    for (iter = scfParent->GetIterator (OBJECT_TYPE_ID(csTextureWrapper));
+    for (iter = scfParent->GetIterator ();
   	!iter->IsFinished () ; iter->Next())
     {
-      csTextureWrapper* csth = (csTextureWrapper*)iter->GetTypedObj ();
-      csth->GetTextureHandle ()->Prepare ();
+      iTextureWrapper* csth =
+        QUERY_INTERFACE_FAST (iter->GetObject (), iTextureWrapper);
+      if (csth)
+      {
+        csth->GetTextureHandle ()->Prepare ();
+        csth->DecRef ();
+      }
     }
     iter->DecRef ();
   }
 
   // Then register all materials to the texture manager.
   {
-    for (iter = scfParent->GetIterator (OBJECT_TYPE_ID(csMaterialWrapper));
+    for (iter = scfParent->GetIterator ();
   	!iter->IsFinished () ; iter->Next())
     {
-      csMaterialWrapper* csmh = (csMaterialWrapper*)iter->GetTypedObj ();
-      if (!csmh->GetMaterialHandle ())
-        csmh->Register (txtmgr);
+      iMaterialWrapper* csmh =
+        QUERY_INTERFACE_FAST (iter->GetObject (), iMaterialWrapper);
+      if (csmh)
+      {
+        if (!csmh->GetMaterialHandle ())
+          csmh->Register (txtmgr);
+        csmh->DecRef ();
+      }
     }
     iter->DecRef ();
   }
@@ -279,11 +294,16 @@ bool csRegion::Region::PrepareTextures ()
   // Prepare all the materials.
   //@@@ Only prepare new materials: txtmgr->PrepareMaterials ();
   {
-    for (iter = scfParent->GetIterator (OBJECT_TYPE_ID(csMaterialWrapper));
+    for (iter = scfParent->GetIterator ();
   	!iter->IsFinished () ; iter->Next())
     {
-      csMaterialWrapper* csmh = (csMaterialWrapper*)iter->GetTypedObj ();
-      csmh->GetMaterialHandle ()->Prepare ();
+      iMaterialWrapper* csmh =
+        QUERY_INTERFACE_FAST (iter->GetObject (), iMaterialWrapper);
+      if (csmh)
+      {
+        csmh->GetMaterialHandle ()->Prepare ();
+        csmh->DecRef ();
+      }
     }
     iter->DecRef ();
   }

@@ -26,6 +26,9 @@
 
 class Dumper;
 
+
+SCF_VERSION (csPolyTxtPlane, 0, 0, 1);
+
 /**
  * This class represents a texture plane. This is a plane
  * that defines the orientation and offset of a texture. It can

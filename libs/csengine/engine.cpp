@@ -384,6 +384,16 @@ INTERFACE_ID_VAR (iTextureWrapper);
 INTERFACE_ID_VAR (iCameraPosition);
 INTERFACE_ID_VAR (iPolyTxtPlane);
 INTERFACE_ID_VAR (iStatLight);
+INTERFACE_ID_VAR (iMaterialHandle);
+
+INTERFACE_ID_VAR (csPolyTxtPlane);
+INTERFACE_ID_VAR (csCollection);
+INTERFACE_ID_VAR (csMeshWrapper);
+INTERFACE_ID_VAR (csMeshFactoryWrapper);
+INTERFACE_ID_VAR (csCurveTemplate);
+INTERFACE_ID_VAR (csSector);
+INTERFACE_ID_VAR (csTextureWrapper);
+INTERFACE_ID_VAR (csMaterialWrapper);
 
 ALLOCATE_OBJECT_TYPE (iEngine)
 ALLOCATE_OBJECT_TYPE (csEngine)
@@ -624,6 +634,16 @@ bool csEngine::Initialize (iSystem* sys)
   INITIALIZE_INTERFACE_VAR (iCameraPosition);
   INITIALIZE_INTERFACE_VAR (iPolyTxtPlane);
   INITIALIZE_INTERFACE_VAR (iStatLight);
+  INITIALIZE_INTERFACE_VAR (iMaterialHandle);
+
+  INITIALIZE_INTERFACE_VAR (csPolyTxtPlane);
+  INITIALIZE_INTERFACE_VAR (csCollection);
+  INITIALIZE_INTERFACE_VAR (csMeshWrapper);
+  INITIALIZE_INTERFACE_VAR (csMeshFactoryWrapper);
+  INITIALIZE_INTERFACE_VAR (csCurveTemplate);
+  INITIALIZE_INTERFACE_VAR (csSector);
+  INITIALIZE_INTERFACE_VAR (csTextureWrapper);
+  INITIALIZE_INTERFACE_VAR (csMaterialWrapper);
 
   if (!(G3D = QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
     return false;
@@ -1818,12 +1838,13 @@ bool csEngine::DeleteLibrary (const char *iName)
 
 #define DELETE_ALL_OBJECTS(vector,type)				\
   {								\
-    for (iObjectIterator *iter = lib->GetIterator (OBJECT_TYPE_ID(type)); \
+    for (iObjectIterator *iter = lib->GetIterator ();		\
          !iter->IsFinished (); iter->Next ())			\
     {								\
-      type *x = (type*)iter->GetTypedObj ();			\
+      type *x = QUERY_INTERFACE_FAST (iter->GetObject (), type);\
       int idx = vector.Find (x);				\
       if (idx >= 0) vector.Delete (idx);			\
+      /* x->DecRef (); */					\
     }								\
   }
 
@@ -1837,12 +1858,13 @@ bool csEngine::DeleteLibrary (const char *iName)
 
 #undef DELETE_ALL_OBJECTS
 #define DELETE_ALL_OBJECTS(vector,type)				\
-  for (iObjectIterator *iter = lib->GetIterator (OBJECT_TYPE_ID(type));	\
+  for (iObjectIterator *iter = lib->GetIterator ();		\
        !iter->IsFinished (); iter->Next ())			\
   {								\
-    type *x = (type*)iter->GetTypedObj ();			\
+    type *x = QUERY_INTERFACE_FAST (iter->GetObject (), type);	\
     int idx = vector.Find (x);					\
     if (idx >= 0) { x->DecRef (); vector [idx] = 0; }		\
+    x->DecRef ();						\
   }
 
   DELETE_ALL_OBJECTS (planes, csPolyTxtPlane)

@@ -143,11 +143,10 @@ public:
   virtual iObject *GetChild (const char *Name) const;
 
   /**
-   * Return an iterator for all child objects. You may optionally
-   * request only objects with a given type. Note that you should not
+   * Return an iterator for all child objects. Note that you should not
    * remove child objects while iterating.
    */
-  virtual iObjectIterator *GetIterator (int TypeID = -1);
+  virtual iObjectIterator *GetIterator ();
 
   CSOBJTYPE;
   DECLARE_OBJECT_INTERFACE;

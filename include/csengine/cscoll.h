@@ -29,6 +29,8 @@
 class csSector;
 class csEngine;
 
+SCF_VERSION (csCollection, 0, 0, 1);
+
 /**
  * A collection object is for conveniance of the script language.
  * Objects are (currently) not really hierarchical in Crystal Space.

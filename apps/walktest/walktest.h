@@ -69,6 +69,7 @@ extern INTERFACE_ID_VAR (iSoundWrapper);
 extern INTERFACE_ID_VAR (iTerrainWrapper);
 extern INTERFACE_ID_VAR (iLight);
 extern INTERFACE_ID_VAR (iMeshWrapper);
+extern INTERFACE_ID_VAR (iKeyValuePair);
 
 // Several map modes.
 #define MAP_OFF 0

@@ -28,6 +28,7 @@
 
 IMPLEMENT_IBASE (csTextureWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iTextureWrapper)
+  IMPLEMENTS_INTERFACE (csTextureWrapper)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE (csTextureWrapper::TextureWrapper)

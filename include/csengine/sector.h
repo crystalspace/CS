@@ -48,6 +48,9 @@ struct iRenderView;
 struct iMeshWrapper;
 struct iFrustumView;
 
+
+SCF_VERSION (csSector, 0, 0, 1);
+
 /**
  * A sector is a container for objects. It is one of
  * the base classes for the portal engine.

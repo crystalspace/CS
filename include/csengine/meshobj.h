@@ -37,6 +37,8 @@ class csCamera;
 class csMeshFactoryWrapper;
 class csLight;
 
+SCF_VERSION (csMeshWrapper, 0, 0, 1);
+
 /**
  * The holder class for all implementations of iMeshObject.
  */
@@ -434,6 +436,8 @@ public:
   } scfiVisibilityObject;
   friend struct VisObject;
 };
+
+SCF_VERSION (csMeshFactoryWrapper, 0, 0, 1);
 
 /**
  * The holder class for all implementations of iMeshObjectFactory.

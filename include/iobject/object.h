@@ -89,11 +89,10 @@ struct iObject : public iBase
   virtual iObject *GetChild (const char *Name) const = 0;
 
   /**
-   * Return an iterator for all child objects. You may optionally
-   * request only objects with a given type. Note that you should not
+   * Return an iterator for all child objects. Note that you should not
    * remove child objects while iterating.
    */
-  virtual iObjectIterator *GetIterator (int TypeID = -1) = 0;
+  virtual iObjectIterator *GetIterator () = 0;
 
   DECLARE_ABSTRACT_OBJECT_INTERFACE;
 };
@@ -110,15 +109,8 @@ struct iObjectIterator : public iBase
   /// Reset the iterator to the beginning
   virtual void Reset() = 0;
 
-  /**
-   * Get the object we are pointing at. You should cast this pointer to the
-   * type you requested when you created the iterator. Don't cast it to
-   * another type, not even iObject!
-   */
-  virtual void* GetTypedObj() const = 0;
-
-  /// Get the object we are pointing at as a iObject
-  virtual iObject *GetiObject () const = 0;
+  /// Get the object we are pointing at
+  virtual iObject *GetObject () const = 0;
 
   /// Get the parent object
   virtual iObject* GetParentObj() const = 0;

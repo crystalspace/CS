@@ -34,6 +34,7 @@ IMPLEMENT_OBJECT_INTERFACE_END
 IMPLEMENT_IBASE_EXT (csMeshWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
+  IMPLEMENTS_INTERFACE (csMeshWrapper)
 IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csMeshWrapper::MeshWrapper)
@@ -418,6 +419,7 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
 
 IMPLEMENT_IBASE (csMeshFactoryWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshFactoryWrapper)
+  IMPLEMENTS_INTERFACE (csMeshFactoryWrapper)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryWrapper::MeshFactoryWrapper)

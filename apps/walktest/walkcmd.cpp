@@ -452,10 +452,15 @@ bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 
 void WalkTest::ParseKeyCmds (csObject* src)
 {
-  iObjectIterator *it = src->GetIterator (OBJECT_TYPE_ID(csKeyValuePair));
+  iObjectIterator *it = src->GetIterator ();
   while (!it->IsFinished ())
   {
-    csKeyValuePair* kp = (csKeyValuePair*)it->GetTypedObj ();
+    iKeyValuePair* kp = QUERY_INTERFACE_FAST (it->GetObject (), iKeyValuePair);
+    if (!kp)
+    {
+      it->Next ();
+      continue;
+    }
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
       iSector *Sector = QUERY_INTERFACE_FAST (src, iSector);
@@ -556,6 +561,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
     {
       // Unknown command. Ignore for the moment.
     }
+    kp->DecRef ();
     it->Next ();
   }
   it->DecRef ();
@@ -603,11 +609,15 @@ void WalkTest::ParseKeyCmds ()
 
 void WalkTest::ActivateObject (csObject* src)
 {
-  iObjectIterator *it = src->GetIterator (OBJECT_TYPE_ID (csWalkEntity));
+  iObjectIterator *it = src->GetIterator ();
   while (!it->IsFinished ())
   {
-    csWalkEntity* wentity = (csWalkEntity*)it->GetTypedObj ();
-    wentity->Activate ();
+    csWalkEntity* wentity = QUERY_INTERFACE_FAST (it->GetObject (), csWalkEntity);
+    if (wentity)
+    {
+      wentity->Activate ();
+      wentity->DecRef ();
+    }
     it->Next ();
   }
   it->DecRef ();

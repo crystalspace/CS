@@ -30,6 +30,9 @@
 struct iTextureWrapper;
 struct iTextureManager;
 
+
+SCF_VERSION (csMaterialWrapper, 0, 0, 1);
+
 /**
  * A material class.
  */

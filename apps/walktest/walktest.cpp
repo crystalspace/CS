@@ -111,6 +111,7 @@ INTERFACE_ID_VAR (iSoundWrapper);
 INTERFACE_ID_VAR (iTerrainWrapper);
 INTERFACE_ID_VAR (iLight);
 //INTERFACE_ID_VAR (iMeshWrapper);
+INTERFACE_ID_VAR (iKeyValuePair);
 
 char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
@@ -1368,6 +1369,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   INITIALIZE_INTERFACE_VAR (iTerrainWrapper);
   INITIALIZE_INTERFACE_VAR (iLight);
   INITIALIZE_INTERFACE_VAR (iMeshWrapper);
+  INITIALIZE_INTERFACE_VAR (iKeyValuePair);
 
   // Find the level loader plugin
   LevelLoader = QUERY_PLUGIN_ID (Sys, CS_FUNCID_LVLLOADER, iLoader);

@@ -127,6 +127,7 @@ void csMaterial::GetReflection (float &oDiffuse, float &oAmbient,
 
 IMPLEMENT_IBASE_EXT (csMaterialWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialWrapper)
+  IMPLEMENTS_INTERFACE (csMaterialWrapper)
 IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csMaterialWrapper::MaterialWrapper)

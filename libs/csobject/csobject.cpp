@@ -44,17 +44,9 @@ class csObjectIterator : public iObjectIterator
 public:
   DECLARE_IBASE;
   csObject *Object;
-  void *TypedObject;
-  int Type, Position;
+  int Position;
 
-  bool TypeCheck ()
-  {
-    TypedObject = Object->children->obj [Position]->QueryObjectType (Type);
-    return (TypedObject != NULL);
-  }
-
-  csObjectIterator (csObject *obj, int type_id)
-    : Object (obj), Type (type_id)
+  csObjectIterator (csObject *obj) : Object (obj)
   {
     CONSTRUCT_IBASE (NULL);
     Object->IncRef ();
@@ -76,8 +68,7 @@ public:
         Position = -1;
         return false;
       }
-      if (TypeCheck ())
-        return true;
+      return true;
     }
   }
   virtual void Reset()
@@ -85,17 +76,9 @@ public:
     if (Object->children == NULL)
       Position = -1;
     else
-    {
       Position = 0;
-      if (!TypeCheck ())
-        Next ();
-    }
   }
-  virtual void* GetTypedObj() const
-  {
-    return TypedObject;
-  }
-  virtual iObject *GetiObject () const
+  virtual iObject *GetObject () const
   {
     return Object->children->obj[Position];
   }
@@ -111,7 +94,7 @@ public:
   {
     while (!IsFinished ())
     {
-      if (strcmp (GetiObject ()->GetName (), name) == 0)
+      if (strcmp (GetObject ()->GetName (), name) == 0)
         return true;
       Next ();
     }
@@ -354,9 +337,9 @@ iObject* csObject::GetChild (const char *Name) const
   return NULL;
 }
 
-iObjectIterator *csObject::GetIterator (int TypeID)
+iObjectIterator *csObject::GetIterator ()
 {
-  return new csObjectIterator (this, TypeID);
+  return new csObjectIterator (this);
 }
 
 //----------------------------------------------------- Object iterator -----//

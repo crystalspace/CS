@@ -292,6 +292,9 @@ public:
   friend struct Curve;
 };
 
+
+SCF_VERSION (csCurveTemplate, 0, 0, 1);
+
 /**
  * A curve template.
  */
