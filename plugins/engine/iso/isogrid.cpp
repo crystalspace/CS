@@ -83,6 +83,15 @@ void csIsoGrid::AddSprite(iIsoSprite *sprite, const csVector3& pos)
   //printf("adding sprite at pos (%g, %g, %g) to cell %x\n", pos.x,
     //pos.y, pos.z, cell);
   GetCell(pos)->AddSprite(sprite, pos);
+
+  if(!recalc_staticlight)
+  {
+    // avoid recalc of entire grid by lighting this sprite only.
+    // if recalc of entire grid is scheduled anyway, it isn't needed.
+    sprite->SetAllStaticColors(csColor(0,0,0));
+    for(int l=0; l<lights.Length(); l++)
+      ((iIsoLight*)(lights[l]))->ShineSprite(sprite);
+  }
 }
 
 void csIsoGrid::RemoveSprite(iIsoSprite *sprite)
