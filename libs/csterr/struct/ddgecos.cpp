@@ -110,7 +110,13 @@ unsigned int ddgEcoBlock::vis( ddgPlane *frustrum, ddgVector2 pos)
 	_vis = 0;
 	if (_size)
 	{
-		ddgVector2 c = bbox->centre();
+		//@@@@@@@ JORRIT: IMPORTANT WARNING!
+		// The code below does not compile because
+		// bbox->centre() returns a ddgVector3 while
+		// 'c' is a ddgVector2. I don't know how to fix this.
+		//ddgVector2 c = bbox->centre();
+		ddgVector2 c;	// WRONG!!!
+
 		// See if the triangle is too far from the camera.  Ingore height component.
 		c -= pos;
 

@@ -779,9 +779,13 @@ bool ddgTBinTree::rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int
     vertex(tv0,&v1);
     vertex(tv1,&va);
 	// Find bounding square of this triangle.
-	ddgRect t(ddgVector2(v0[0],v0[2]),ddgVector2(v1[0],v1[2]));
+	ddgVector2 t_1 (v0[0], v0[2]);
+	ddgVector2 t_2 (v1[0], v1[2]);
+	ddgRect t(t_1,t_2);
 	// Find bounding rectangle of ray.
-	ddgRect r(ddgVector2(p1[0],p1[2]),ddgVector2(p2[0],p2[2]));
+	ddgVector2 r_1 (p1[0],p1[2]);
+	ddgVector2 r_2 (p2[0],p2[2]);
+	ddgRect r(r_1,r_2);
 	// See if rectangles intersect.
 	if (!t.intersect(&r))
 		return false;
@@ -812,7 +816,9 @@ bool ddgTBinTree::rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int
 		line.intersect(&diag,s[1]);
 	}
 	// We have the line segment which crosses this triangle in s[0]->s[1].
-	ddgRect sr(ddgVector2(s[0][0],s[0][1]),ddgVector2(s[1][0],s[1][1])),cs;
+	ddgVector2 sr_1 (s[0][0],s[0][1]);
+	ddgVector2 sr_2 (s[1][0],s[1][1]);
+	ddgRect sr(sr_1,sr_2),cs;
 	// Clip the segment to p1 and p2 incase p1 and p2 fall inside this triangle.
 	sr.intersect(&r,&cs);
 	// Now we have a line segment guaranteed to be both in the triangle and within the
