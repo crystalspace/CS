@@ -40,7 +40,6 @@
 #include "imap/parser.h"
 #include "imesh/crossbld.h"
 #include "imesh/mdlconv.h"
-#include "inetwork/driver.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
 #include "iutil/cfgmgr.h"
