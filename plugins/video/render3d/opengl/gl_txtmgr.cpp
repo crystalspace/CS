@@ -125,6 +125,12 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int 
   cachedata = 0;
 }
 
+csGLTextureHandle::~csGLTextureHandle()
+{
+  for(int i=0; i<vTex.Length(); i++)
+    delete vTex[i];
+}
+
 void csGLTextureManager::DetermineStorageSizes ()
 {
   int i=-1;
@@ -371,7 +377,7 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh)
 {
   if(cachedata)
   {
-    csGLTexture *real_tex = (csGLTexture*) cachedata;
+    //csGLTexture *real_tex = (csGLTexture*) cachedata;
 
     mw = orig_width >> mipmap;
     mh = orig_height >> mipmap;
@@ -507,7 +513,7 @@ void csGLTextureHandle::AdjustSizePo2 ()
   }
 }
 
-csGLTexture *csGLTextureHandle::NewTexture (iImage *Image, bool ismipmap)
+csGLTexture* csGLTextureHandle::NewTexture (iImage *Image, bool ismipmap)
 {
   ismipmap = false;
   return new csGLTexture (this, Image);
@@ -515,20 +521,14 @@ csGLTexture *csGLTextureHandle::NewTexture (iImage *Image, bool ismipmap)
 
 void csGLTextureHandle::CreateMipMaps()
 {
-  int thissize;
+  //int thissize;
   csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
 
   //  printf ("delete old\n");
   // Delete existing mipmaps, if any
   int i;
-  for (i = vTex.Length ()-1; i >= 0; i--)
-  {
-    if (vTex [i])
-    {
-      DG_UNLINK (this, vTex[i]);
-      delete vTex [i];
-    }
-  }
+  for(i=0; i<vTex.Length(); i++)
+    delete vTex[i];
   vTex.DeleteAll ();
 
   size = 0;
@@ -545,7 +545,8 @@ void csGLTextureHandle::CreateMipMaps()
   // we do this down to 1x1 as opengl defines it
 
   iImageVector* prevImages = images;
-  csRef<iImageVector> thisImages  (csPtr<iImageVector> (new csImageVector())); 
+  csRef<iImageVector> thisImages =
+      csPtr<iImageVector> (new csImageVector()); 
   csArray<int> nMipmaps;
 
   int w = (*prevImages)[0]->GetWidth ();
@@ -554,7 +555,6 @@ void csGLTextureHandle::CreateMipMaps()
 
   for (i=0; i < prevImages->Length(); i++)
   {
-      (*prevImages)[i]->IncRef();
       nMipmaps.Push ((*prevImages)[i]->HasMipmaps());
   }
   
@@ -588,25 +588,11 @@ void csGLTextureHandle::CreateMipMaps()
     transform (thisImages, ntex);
     w = (*thisImages)[0]->GetWidth ();
     h = (*thisImages)[0]->GetHeight ();
-    for (i=0; i < prevImages->Length(); i++)
-    {
-      (*prevImages)[i]->DecRef();
-    }
-    for (i=0; i < thisImages->Length(); i++)
-    {
-      (*thisImages)[i]->IncRef();
-    }
     for (i=0; i < thisImages->Length(); i++)
     {
       (*prevImages)[i] = (*thisImages)[i];
     }
   }
-
-  for (i=0; i < prevImages->Length(); i++)
-  {
-      (*prevImages)[i]->DecRef();
-  }
-  
 }
 
 

@@ -92,12 +92,11 @@ private:
   static csGLStateCache* statecache;
 
   csGLExtensionManager *ext;
-  csGLTextureCache *txtcache;
-  //csGLTextureManager *txtmgr;
+  csRef<csGLTextureCache> txtcache;
   csRef<csGLTextureManager> txtmgr;
 
   bool color_red_enabled, color_green_enabled, color_blue_enabled, 
-    alpha_enabled;
+       alpha_enabled;
   int current_drawflags;
   int current_shadow_state;
   csZBufMode current_zmode;
@@ -474,7 +473,8 @@ public:
     SCF_DECLARE_IBASE;
     virtual bool HandleEvent (iEvent& ev) 
       { return parent->HandleEvent (ev); }
-  } * scfiEventHandler;
+  };
+  csRef<EventHandler> scfiEventHandler;
 
 
 

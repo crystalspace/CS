@@ -97,23 +97,15 @@ private:
 
   void *cachedata;
 
-  class texVector : public csVector
-  {
-  public:
-    csGLTexture* operator [] (int idx) const
-    { return (csGLTexture*)csVector::Get (idx);}
-    int Push (csGLTexture *t){ return csVector::Push ((void*)t);}
-  };
-  
   bool transform (iImageVector *ImageVec, csGLTexture *tex);
 
-  csGLTexture *NewTexture (iImage *Image, bool ismipmap);
+  csGLTexture* NewTexture (iImage *Image, bool ismipmap);
 
 public:
-    int bpp;
-    int formatidx;
+  int bpp;
+  int formatidx;
   int orig_width, orig_height;
-  texVector vTex;
+  csArray<csGLTexture*> vTex;
   csGLRender3D *R3D;
   long size;
   int flags;
@@ -126,7 +118,7 @@ public:
   csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
     GLenum sourceFormat, csGLRender3D *iR3D);
 
-  virtual ~csGLTextureHandle () { }
+  virtual ~csGLTextureHandle ();
 
   GLenum SourceType () const { return sourceType; }
   GLenum SourceFormat () const { return sourceFormat; }

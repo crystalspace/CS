@@ -151,6 +151,8 @@ public:
 	  RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
 	  lastLock = CS_BUF_LOCK_NORMAL;
 	  return ext->glMapBufferARB (GL_ARRAY_BUFFER_ARB, GL_WRITE_ONLY_ARB);
+	case CS_BUF_LOCK_NOLOCK:
+	  break;
       }
     }
     return (void*)-1;
