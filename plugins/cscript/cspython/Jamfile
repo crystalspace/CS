@@ -83,6 +83,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   LFlags pythmod : $(PLUGIN.LFLAGS) ;
   NotFile pythmod ;
   Depends pythmod : $(pythmod) ;
+  Depends plugins : pythmod ;
   MakeLocate $(pythmod) : $(LOCATE_TARGET) ;
   Depends $(pythmod) : $(pythmodobj) ;
   LinkPlugin $(pythmod) : $(pythmodobj) ;
