@@ -350,6 +350,36 @@ public:
   csZRotMatrix3 (float angle);
 };
 
+/// An instance of csMatrix3 that is initialized to scale the X dimension
+class csXScaleMatrix3 : public csMatrix3
+{
+public:
+  /**
+   * Return a matrix which scales in the X dimension.
+   */
+  csXScaleMatrix3 (float scaler) : csMatrix3(scaler, 0, 0, 0, 1, 0, 0, 0, 1) {}
+};
+
+/// An instance of csMatrix3 that is initialized to scale the Y dimension
+class csYScaleMatrix3 : public csMatrix3
+{
+public:
+  /**
+   * Return a matrix which scales in the Y dimension.
+   */
+  csYScaleMatrix3 (float scaler) : csMatrix3(1, 0, 0, 0, scaler, 0, 0, 0, 1) {}
+};
+
+/// An instance of csMatrix3 that is initialized to scale the Z dimension
+class csZScaleMatrix3 : public csMatrix3
+{
+public:
+  /**
+   * Return a matrix which scales in the Z dimension.
+   */
+  csZScaleMatrix3 (float scaler) : csMatrix3(1, 0, 0, 0, 1, 0, 0, 0, scaler) {}
+};
+
 /**
  * A plane in 3D space.
  * The plane is given by the equation AAx + BBy + CCz + DD = 0,
