@@ -12,6 +12,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+6-Jan-2000
+	- Eric Sunshine added Append(char) to csString.
+	- Michael Dale Long fixed several bugs in makefile.py.
 5-Jan-2000
 	- Some further changes on support for curves in visibility system
 	  (unfinished).
