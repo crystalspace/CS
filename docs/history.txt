@@ -8,18 +8,17 @@ chronological order.
 
 1-Aug-2003
 	- Jorrit changed csPDelArray::Sort() to use a new
-	  csArraySortCompareFunction typedef instead of
-	  csArrayCompareFunction. The reason is to avoid confusion.
-	  csArrayCompareFunction is given pointers to the objects
-	  themselves (pointers) while the csArraySortCompareFunction is
-	  given pointers to pointers to the objects (i.e. pointers inside
-	  the array to sort).
+	  csArraySortCompareFunction typedef instead of csArrayCompareFunction.
+	  The reason is to avoid confusion.  csArrayCompareFunction is given
+	  pointers to the objects themselves (pointers) while the
+	  csArraySortCompareFunction is given pointers to pointers to the
+	  objects (i.e.  pointers inside the array to sort).
 	- Jorrit extended csArray::InsertSorted() with 'equal_index' parameter
 	  like was done yesterday with csPDelArray.
 	- Jorrit renamed csArraySortCompareFunction to
 	  csPDelArraySortCompareFunction and csArrayCompareFunction to
-	  csPDelArrayCompareFunction. Also added csArrayCompareFunction
-	  which is specific to csArray. So csArray no longer has to include
+	  csPDelArrayCompareFunction.  Also added csArrayCompareFunction which
+	  is specific to csArray.  So csArray no longer has to include
 	  "parray.h".
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'csPluginList' for csPluginLoader with a
@@ -51,6 +50,12 @@ chronological order.
 	    - Replaced 'csFontVector' in csFreeType2Server with a
 	      csRefArray<csFreeType2Font>.
 	- Jorrit added csRefArray::FindKey().
+	- Eric Sunshine made the following changes:
+	    - Overhauled the wchar_t checking and configuration since it was
+	      quite broken on MacOS/X.  Now checks for presence of <wchar.h>,
+	      wchar_t, and wcslen(); and fakes up missing items as necessary.
+	    - Removed unportable `#include <wchar.h>' from csutil/util.cpp.
+	    - Replaced usage of csVector with csArray in OSXDynamicLibrary.cpp.
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with

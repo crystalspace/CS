@@ -55,6 +55,7 @@
   #define CS_PLATFORM_IS_64BITS
 #endif
 
+#define CS_HAS_WCHAR_H
 #define CS_WCHAR_T_SIZE 2
 
 #endif // __CS_WIN32_VOLATILE_H__

@@ -1458,19 +1458,36 @@ AS_IF([test $cs_cv_header_stdint_h = yes],
 #------------------------------------------------------------------------------
 # Check for sizeof (long) to determine whether the platform is 32 or 64 bit.
 #------------------------------------------------------------------------------
-AC_CHECK_SIZEOF(long)
-
+AC_CHECK_SIZEOF([long])
 AS_IF([test $ac_cv_sizeof_long = 8],
     [CS_HEADER_PROPERTY([CS_PLATFORM_IS_64BITS])])
 
 
 
 #------------------------------------------------------------------------------
-# Check for sizeof (wchar_t) as they differ among platforms.
+# Check if the type wchar_t is available and determine its size.  It might be
+# built-in, or it might come from the wchar.h header file.  Also determine
+# availability of wsclen().
 #------------------------------------------------------------------------------
-AC_CHECK_SIZEOF(wchar_t, [], [#include <wchar.h>])
+AC_LANG_PUSH([C++])
 
-CS_HEADER_PROPERTY([CS_WCHAR_T_SIZE], [$ac_cv_sizeof_wchar_t])
+AC_CHECK_HEADER([wchar.h], [CS_HEADER_PROPERTY([CS_HAS_WCHAR_H])])
+
+AC_CHECK_TYPE([wchar_t], [cs_type_wchar_t=yes], [cs_type_wchar_t=no],
+    [#if HAVE_WCHAR_H
+    #include <wchar.h>
+    @%:@endif])
+
+AS_IF([test $cs_type_wchar_t = yes],
+    [AC_CHECK_FUNC([wcslen], [], [CS_HEADER_PROPERTY([CS_USE_FAKE_WCSLEN])])
+    AC_CHECK_SIZEOF([wchar_t], []
+	[#if HAVE_WCHAR_H
+	#include <wchar.h>
+	@%:@endif])
+    CS_HEADER_PROPERTY([CS_WCHAR_T_SIZE], [$ac_cv_sizeof_wchar_t])],
+    [CS_HEADER_PROPERTY([CS_USE_FAKE_WCHAR_TYPE])])
+
+AC_LANG_POP([C++])
 
 
 

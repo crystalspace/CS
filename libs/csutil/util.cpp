@@ -19,7 +19,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <wchar.h>
 
 #define CS_SYSDEF_PROVIDE_GETCWD
 #define CS_SYSDEF_PROVIDE_EXPAND_PATH
@@ -29,6 +28,18 @@
 #include "cssys/csuctransform.h"
 
 static const size_t shortStringChars = 64;
+
+#if defined(CS_USE_FAKE_WCSLEN)
+
+static size_t wcslen(wchar_t const* s)
+{
+  size_t n = 0;
+  while (*s++ != 0)
+    n++;
+  return n;
+}
+
+#endif
 
 char *csStrNew (const char *s)
 {
@@ -209,7 +220,8 @@ char *csExpandName (const char *iName)
            || (iName [inp + 1] == PATH_SEPARATOR))
             outname [outp++] = ':';
           else
-            outp += __getcwd (iName [inp - 1], outname + outp - 1, sizeof (outname) - outp + 1) - 1;
+            outp += __getcwd (iName [inp - 1], outname + outp - 1,
+	      sizeof (outname) - outp + 1) - 1;
         if ((outname [outp - 1] != '/')
          && (outname [outp - 1] != PATH_SEPARATOR))
 #endif
@@ -369,4 +381,3 @@ void csFindReplace(char *dest, const char *src, const char *search,
   destpos += todo;
   destpos[0]=0;
 }
-

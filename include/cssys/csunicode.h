@@ -26,16 +26,19 @@
 /**\addtogroup util
  * @{ */
 
-#if (CS_WCHAR_T_SIZE == 0) || !defined(CS_WCHAR_T_SIZE)
-typedef uint16 wchar_t;
-#ifdef CS_WCHAR_T_SIZE
-  #undef CS_WCHAR_T_SIZE
+#if defined(CS_HAS_WCHAR_H)
+#include <wchar.h>
 #endif
+
+#if defined(CS_USE_FAKE_WCHAR_TYPE)
+typedef uint16 wchar_t;
 #define CS_WCHAR_T_SIZE 2
 #endif
- 
-#if (CS_WCHAR_T_SIZE != 1) && (CS_WCHAR_T_SIZE != 2) && (CS_WCHAR_T_SIZE != 4)
-  #error Odd-sized, unsupported wchar_t!
+
+#if !defined(CS_WCHAR_T_SIZE)
+#  error Unknown wchar_t size.
+#elif (CS_WCHAR_T_SIZE != 1) && (CS_WCHAR_T_SIZE != 2) && (CS_WCHAR_T_SIZE != 4)
+#  error Unsupported whcar_t size.
 #endif
 
 /// A single char in a UTF8 encoded string.
@@ -60,8 +63,7 @@ typedef uint32 utf32_char;
 #define CS_UC_IS_LOW_SURROGATE(C)	((C & 0xFC00) == 0xD800)
 
 /// Test whether a character code is invalid.
-#define CS_UC_IS_INVALID(C)		\
-  ((C == CS_UC_INVALID) || (C == 0))
+#define CS_UC_IS_INVALID(C)		((C == CS_UC_INVALID) || (C == 0))
 
 /// First char in the "high surrogate" range.
 #define CS_UC_CHAR_HIGH_SURROGATE_FIRST		0xD800

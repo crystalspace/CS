@@ -30,32 +30,60 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "cssys/sysfunc.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
+#include "csutil/csstring.h"
 #include "csutil/util.h"
 #include "OSXLoadLibrary.h"
+#include <string.h>
 #include <sys/param.h>
 
 #define CSPLUGIN_EXT ".csplugin"
 #define CSBUNDLE_EXT ".csbundle"
 
+
+//-----------------------------------------------------------------------------
+// Loaded-plugin maintenance utilities.
+//-----------------------------------------------------------------------------
 class OSXPluginEntry
 {
 public:
   csLibraryHandle handle;
-  char* path;
-  OSXPluginEntry(csLibraryHandle h, char const* p) :
-    handle(h), path(csStrNew(p)) {}
-  ~OSXPluginEntry() { delete[] path; }
+  csString path;
+  OSXPluginEntry(csLibraryHandle h, csString p) : handle(h), path(p) {}
+  OSXPluginEntry(OSXPluginEntry const& r) : handle(r.handle), path(r.path) {}
+  ~OSXPluginEntry() {}
+  OSXPluginEntry& operator=(OSXPluginEntry const& r)
+  {
+    if (&r != this)
+    {
+      handle = r.handle;
+      path = r.path;
+    }
+    return *this;
+  }
 };
 
-class OSXPluginArray : public csVector
+class OSXPluginArray : public csArray<OSXPluginEntry>
 {
 public:
-  virtual bool FreeItem(void* p) { delete (OSXPluginEntry*)p; return true; }
-  virtual int Compare(void* p1, void* p2, int) const
-  { return strcmp(((OSXPluginEntry*)p1)->path,((OSXPluginEntry*)p2)->path); }
-  virtual int CompareKey(void* p, const void* k, int) const
-  { return strcmp(((OSXPluginEntry*)p)->path, (char const*)k); }
+  OSXPluginEntry const* find(csString path) const
+  {
+    for (int i = 0, n = Length(); i < n; i++)
+      if (Get(i).path == path)
+	return &Get(i);
+    return 0;
+  }
+  void insert(csLibraryHandle handle, csString path)
+  {
+    OSXPluginEntry const e(handle, path);
+    Push(e);
+  }
+  void remove(csLibraryHandle handle)
+  {
+    for (int i = Length() - 1; i >= 0; i--)
+      if (Get(i).handle == handle)
+        { DeleteIndex(i); break; }
+  }
 };
 
 
@@ -95,13 +123,13 @@ csLibraryHandle csLoadLibrary(char const* path)
 
   csLibraryHandle handle = 0;
   OSXPluginArray& loaded_plugins = get_loaded_plugins();
-  int const n = loaded_plugins.FindSortedKey(bin_name);
-  if (n >= 0)
-    handle = ((OSXPluginEntry*)loaded_plugins[n])->handle;
+  OSXPluginEntry const* e = loaded_plugins.find(bin_name);
+  if (e != 0)
+    handle = e->handle;
   else
   {
     handle = (csLibraryHandle)OSXLoadLibrary(bin_name);
-    loaded_plugins.InsertSorted(new OSXPluginEntry(handle, bin_name));	// *2*
+    loaded_plugins.insert(handle, bin_name);				// *2*
   }
 
   delete[] bin_name;
@@ -129,12 +157,7 @@ void* csGetLibrarySymbol(csLibraryHandle handle, char const* s)
 bool csUnloadLibrary(csLibraryHandle handle)
 {
   if (OSXUnloadLibrary(handle))
-  {
-    OSXPluginArray& loaded_plugins = get_loaded_plugins();
-    for (int i = loaded_plugins.Length() - 1; i >= 0; i--)
-      if (((OSXPluginEntry const*)loaded_plugins[i])->handle == handle)
-        { loaded_plugins.Delete(i); break; }
-  }
+    get_loaded_plugins().remove(handle);
   return true;
 }
 
