@@ -20,14 +20,17 @@
 AC_PREREQ([2.56])
 
 #------------------------------------------------------------------------------
-# CS_EMIT_BUILD_PROPERTY(KEY, VALUE, [APPEND], [EMPTY-OKAY])
+# CS_EMIT_BUILD_PROPERTY(KEY, VALUE, [APPEND], [EMPTY-OKAY], [EMITTER])
 #	A utility function which invokes CS_JAMCONFIG_PROPERTY() if VALUE is
 #	not the empty string (after leading and trailing whitespace is
 #	stripped). If EMPTY-OKAY is not an empty string, then the property is
 #	emitted even if VALUE is empty; that is, it is emitted unconditionally.
 #	If APPEND is the empty string, then the value is set via "?=";
 #	otherwise it is appended to the existing value of the Jam variable via
-#	"+=".
+#	"+=". EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
+#	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
+#	KEY/VALUE tuple; it should also accept APPEND as an optional third
+#	argument. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
     [cs_build_prop_val="$2"
@@ -35,12 +38,13 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
     m4_ifval([$4],
 	[CS_JAMCONFIG_PROPERTY([$1], [$cs_build_prop_val], [$3])],
 	AS_IF([test -n "$cs_build_prop_val"],
-	    [CS_JAMCONFIG_PROPERTY([$1], [$cs_build_prop_val], [$3])]))])
+	    [m4_default([$5],[CS_JAMCONFIG_PROPERTY])(
+		[$1], [$cs_build_prop_val], [$3])]))])
 
 
 
 #------------------------------------------------------------------------------
-# CS_EMIT_BUILD_RESULT(CACHE-VAR, PREFIX)
+# CS_EMIT_BUILD_RESULT(CACHE-VAR, PREFIX, [EMITTER])
 #	Record the results of CS_CHECK_BUILD() or CS_CHECK_LIB_WITH() via Jam
 #	variables in the Jam text cache.  If CACHE-VAR indicates that the build
 #	succeeded, then the following properties are emitted:
@@ -48,19 +52,24 @@ AC_DEFUN([CS_EMIT_BUILD_PROPERTY],
 #	PREFIX.AVAILABLE = yes
 #	PREFIX.CFLAGS = $CACHE-VAR_cflags
 #	PREFIX.LFLAGS = $CACHE-VAR_lflags $CACHE-VAR_libs
+#
+#	EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
+#	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
+#	KEY/VALUE tuple. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_RESULT],
     [AS_IF([test "$$1" = yes],
-	[CS_EMIT_BUILD_PROPERTY([$2.AVAILABLE], [yes])
-	CS_EMIT_BUILD_PROPERTY([$2.CFLAGS], [$$1_cflags])
-	CS_EMIT_BUILD_PROPERTY([$2.LFLAGS], [$$1_lflags $$1_libs])])])
+	[CS_EMIT_BUILD_PROPERTY([$2.AVAILABLE], [yes], [], [], [$3])
+	CS_EMIT_BUILD_PROPERTY([$2.CFLAGS], [$$1_cflags], [], [], [$3])
+	CS_EMIT_BUILD_PROPERTY([$2.LFLAGS], [$$1_lflags $$1_libs],
+	    [], [], [$3])])])
 
 
 
 #------------------------------------------------------------------------------
 # CS_EMIT_BUILD_FLAGS(MESSAGE, CACHE-VAR, FLAGS, [LANGUAGE], JAM-VARIABLE,
 #                     [APPEND], [ACTION-IF-RECOGNIZED],
-#                     [ACTION-IF-NOT-RECOGNIZED])
+#                     [ACTION-IF-NOT-RECOGNIZED], [EMITTER])
 #	A convenience wrapper for CS_CHECK_BUILD_FLAGS() which also records the
 #	results via CS_EMIT_BUILD_PROPERTY().  Checks if the compiler or linker
 #	recognizes a command-line option.  MESSAGE is the "checking" message.
@@ -76,10 +85,13 @@ AC_DEFUN([CS_EMIT_BUILD_RESULT],
 #	not the empty string, then the flag is appended to the existing value
 #	of the Jam variable.  If the command-line option was recognized, then
 #	ACTION-IF-RECOGNIZED is invoked, otherwise ACTION-IF-NOT-RECOGNIZED is
-#	invoked.
+#	invoked.  EMITTER is a macro name, such as CS_JAMCONFIG_PROPERTY or
+#	CS_MAKEFILE_PROPERTY, which performs the actual task of emitting the
+#	KEY/VALUE tuple; it should also accept APPEND as an optional third
+#	argument. If EMITTER is omitted, CS_JAMCONFIG_PROPERTY is used.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_BUILD_FLAGS],
     [CS_CHECK_BUILD_FLAGS([$1], [$2], [$3], [$4],
-	[CS_EMIT_BUILD_PROPERTY([$5], [$$2], [$6])
+	[CS_EMIT_BUILD_PROPERTY([$5], [$$2], [$6], [], [$9])
 	    $7],
 	[$8])])

@@ -17,7 +17,12 @@ chronological order.
 	  button and joystick numbers.
 	- Vincent Knecht removed calls to iTextureManager::SetVerbose() and
 	  iMeshWrapper::DeferUpdateLighting in tutorial2.py script.
-
+	- Eric Sunshine generalized the CS_EMIT_BUILD_PROPERTY(),
+	  CS_EMIT_BUILD_RESULT(), and CS_EMIT_BUILD_FLAGS() macros in emit.m4
+	  so that they can work with any suitable emitter macro, rather than
+	  being hardcoded to always use CS_JAMCONFIG_PROPERTY() (though they
+	  still default to CS_JAMCONFIG_PROPERTY() if an emitter is not
+	  specified).
 11-May-2004
 	- Eric Sunshine made some clarifications and corrections to the
 	  'simple' tutorial, AWS "getting started", and iGraphics3D Doxygen
