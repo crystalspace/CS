@@ -153,8 +153,8 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
   if (rendsort == CS_RENDPRI_NONE) return ;
 
   csMeshVectorNodelete *v = Queues[priority];
-  if (v->Length () > comp_mesh_z.Limit ())
-    comp_mesh_z.SetLimit (v->Length ());
+  if (v->Length () > comp_mesh_z.Length ())
+    comp_mesh_z.SetLength (v->Length ());
 
   const csReversibleTransform &camtrans = rview->GetCamera ()->GetTransform ();
   int i;

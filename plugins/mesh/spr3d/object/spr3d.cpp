@@ -1195,15 +1195,15 @@ void csSprite3DMeshObject::GenerateSpriteLOD (int num_vts)
 
 void csSprite3DMeshObject::UpdateWorkTables (int max_size)
 {
-  if (max_size > tr_verts->Limit ())
+  if (max_size > tr_verts->Length ())
   {
-    tr_verts->SetLimit (max_size);
-    uv_verts->SetLimit (max_size);
+    tr_verts->SetLength (max_size);
+    uv_verts->SetLength (max_size);
 #ifndef CS_USE_NEW_RENDERER
-    fog_verts->SetLimit (max_size);
+    fog_verts->SetLength (max_size);
 #endif // CS_USE_NEW_RENDERER
-    obj_verts->SetLimit (max_size);
-    tween_verts->SetLimit (max_size);
+    obj_verts->SetLength (max_size);
+    tween_verts->SetLength (max_size);
   }
 }
 

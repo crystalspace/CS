@@ -2023,8 +2023,8 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   bool fill_lightmap = true;
 
   num_vertices = static_data->GetVertices ().GetVertexCount ();
-  if (num_vertices > VectorArray->Limit ())
-    VectorArray->SetLimit (num_vertices);
+  if (num_vertices > VectorArray->Length ())
+    VectorArray->SetLength (num_vertices);
   poly = VectorArray->GetArray ();
 
   int j;
@@ -2162,8 +2162,8 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
     csFrustumContext *new_ctxt = lview->GetFrustumContext ();
 
     int num_vertices = static_data->GetVertices ().GetVertexCount ();
-    if (num_vertices > VectorArray->Limit ())
-      VectorArray->SetLimit (num_vertices);
+    if (num_vertices > VectorArray->Length ())
+      VectorArray->SetLength (num_vertices);
 
     csVector3 *poly = VectorArray->GetArray ();
 

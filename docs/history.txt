@@ -16,6 +16,9 @@ chronological order.
 	- Jorrit removed all usages of csStaticArray (only in thing and
 	  bezier meshes). Instead they are now using csGrowingArray.
 	  Also removed the actual csStaticArray class.
+	- Jorrit changed csGrowingArray to inherit from csArray.
+	- Jorrit changed engine to use csArray instead of csGrowingArray for
+	  the render priorities.
 	- Keith Fulton enabled new feature in sprcal3d.  It now keeps the
 	  iMaterialWrapper for each submesh in the model's calCoreMaterialId
 	  member.  cal3d never uses these values, so it is ok.  This enables

@@ -393,7 +393,6 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
 {
   double angle_inc = TWO_PI / n;
   double angle = 0.0;
-  vertices.SetLimit (n);
   vertices.SetLength (n);
   int i;
   for (i = 0; i < vertices.Length (); i++, angle += angle_inc)

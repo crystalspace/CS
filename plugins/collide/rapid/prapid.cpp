@@ -763,13 +763,13 @@ bool tri_contact (csVector3 P1, csVector3 P2, csVector3 P3,
 
 int add_collision (csCdTriangle *tr1, csCdTriangle *tr2)
 {
-  int limit = CD_contact->Limit ();
+  int limit = CD_contact->Length ();
   if (csRapidCollider::numHits >= limit)
   {
 //  is this really needed? - A.Z.
 //  if (!limit)
 //    csRapidCollidernumHits = 0;
-    CD_contact->SetLimit (limit + 16);
+    CD_contact->SetLength (limit + 16);
   }
   
   (*CD_contact) [csRapidCollider::numHits].a1 = tr1->p1;

@@ -336,13 +336,13 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   int num_vertices = mesh.buffers[0]->GetVertexCount ();
 
   // Update work tables.
-  if (num_vertices > tr_verts->Limit ())
+  if (num_vertices > tr_verts->Capacity ())
   {
-    tr_verts->SetLimit (num_vertices);
-    z_verts->SetLimit (num_vertices);
-    uv_verts->SetLimit (num_vertices);
-    persp->SetLimit (num_vertices);
-    color_verts->SetLimit (num_vertices);
+    tr_verts->SetCapacity (num_vertices);
+    z_verts->SetCapacity (num_vertices);
+    uv_verts->SetCapacity (num_vertices);
+    persp->SetCapacity (num_vertices);
+    color_verts->SetCapacity (num_vertices);
   }
 
   // Do vertex tweening and/or transformation to camera space

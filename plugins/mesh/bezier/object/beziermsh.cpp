@@ -887,9 +887,9 @@ bool csBezierMesh::DrawCurves (
       tess->UpdateColors (c->LightMap);
 
     // Setup the structure for DrawTriangleMesh.
-    if (tess->GetVertexCount () > fog_verts.Limit ())
+    if (tess->GetVertexCount () > fog_verts.Length ())
     {
-      fog_verts.SetLimit (tess->GetVertexCount ());
+      fog_verts.SetLength (tess->GetVertexCount ());
     }
 
     c->GetMaterial ()->Visit ();

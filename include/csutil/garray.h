@@ -20,28 +20,26 @@
 #ifndef __CS_GARRAY_H__
 #define __CS_GARRAY_H__
 
+#include "csutil/array.h"
+
 /**\file 
  * vector class interface
  */
 
 /**
- * An automatically growing array of objects. Warning! Do NOT use
- * this for objects that require a constructor. Do not use this
- * for pointers. For normal pointers you should use csArray and for
- * reference counted pointers you should use csRefArray instead of this
- * class.
+ * An automatically growing array of objects. The only difference with
+ * csArray is that this class allows you to get the address of the internal
+ * array. This is of course dangerous so use of this class should be
+ * restricted.
  * <p>
  * The main use of this class is when you absolutely need access
  * to the internal array that is in this class. This can be useful
  * if you want to access some external module (like OpenGL).
  */
 template <class T>
-class csGrowingArray
+class csGrowingArray : public csArray<T>
 {
 private:
-  int count, limit, threshold;
-  int shrinklimit;
-  T* root;
   int RefCount;
 
 public:
@@ -49,39 +47,10 @@ public:
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
-  csGrowingArray (int ilimit = 0, int ithreshold = 0, int ishrinklimit = 0)
+  csGrowingArray (int ilimit = 0, int ithreshold = 0)
+  	: csArray<T> (ilimit, ithreshold)
   {
     RefCount = 0;
-    count = 0;
-    limit = (ilimit > 0 ? ilimit : 0);
-    threshold = (ithreshold > 0 ? ithreshold : 16);
-    shrinklimit = (ishrinklimit > 0 ? ishrinklimit : 1000);
-    if (limit != 0)
-      root = (T*)malloc (limit * sizeof(T));
-    else
-      root = 0;
-  }
-
-  /**
-   * Clear entire vector.
-   */
-  void DeleteAll ()
-  {
-    if (root)
-    {
-      free (root);
-      root = 0;
-      count = 0;
-      limit = 0;
-    }
-  }
-
-  /**
-   * Destroy the container.
-   */
-  ~csGrowingArray ()
-  {
-    DeleteAll ();
   }
 
   // Reference counting.
@@ -90,169 +59,27 @@ public:
   // Reference counting. Delete array when reference reaches 0.
   void DecRef ()
   {
-    if (RefCount == 1) { SetLimit (0); count = 0; }
+    if (RefCount == 1) { DeleteAll (); }
     RefCount--;
-  }
-
-  /// Set maximum size of array.
-  void SetLimit (int inlimit)
-  {
-    if (limit == inlimit) return;
-    if ((limit = inlimit) != 0)
-      root = (T*)realloc (root, limit * sizeof (T));
-    else if (root) { free (root); root = 0; }
-    if (count > limit) count = limit;
-  }
-
-  /// Set vector length to n.
-  void SetLength (int n)
-  {
-    count = n;
-    int newlimit = ((count + (threshold - 1)) / threshold) * threshold;
-    if (newlimit > limit || newlimit < limit-shrinklimit)
-      SetLimit (newlimit);
-  }
-
-  /**
-   * Transfer the entire contents of one array to the other. The end
-   * result will be that this array will be completely empty and the
-   * other array will have all items that originally were in this array.
-   * This operation is very efficient.
-   */
-  void TransferTo (csGrowingArray& destination)
-  {
-    if (&destination == this) return;
-    destination.DeleteAll ();
-    destination.root = root;
-    destination.count = count;
-    destination.limit = limit;
-    destination.threshold = threshold;
-    destination.shrinklimit = shrinklimit;
-    root = 0;
-    limit = count = 0;
-  }
-
-  /// Query vector length.
-  int Length () const
-  {
-    return count;
-  }
-
-  /// Query vector limit.
-  int Limit () const
-  {
-    return limit;
   }
 
   /// Get the pointer to the start of the array.
   T* GetArray ()
   {
-    return root;
+    if (Length () > 0)
+      return &Get (0);
+    else
+      return 0;
   }
 
   /// Get the pointer to the start of the array.
   const T* GetArray () const
   {
-    return root;
-  }
-
-  /// Get a const reference.
-  const T& Get (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
-  }
-
-  /// Get a const reference.
-  const T& operator [] (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
-  }
-
-  /// Get a reference.
-  T& operator [] (int n)
-  {
-    CS_ASSERT (n >= 0);
-    if (n >= count)
-      SetLength (n + 1);
-    return root[n];
-  }
-
-  // This will work only for datatypes that have oprator ==
-  int Find (const T& what)
-  {
-    for ( int i = 0; i < count; i++ )
-      if (root[i] == what)
-        return i;
-    return -1;
-  }
-
-  /// Push a element on 'top' of vector.
-  int Push (const T& what)
-  {
-    SetLength (count + 1);
-    root [count - 1] = what;
-    return (count - 1);
-  }
-
-  /// Push a element on 'top' of vector if it is not already there.
-  int PushSmart (const T& what)
-  {
-    int n = Find (what);
-    return (n == -1) ? Push (what) : n;
-  }
-
-  /// Pop an element from vector 'top'.
-  T Pop ()
-  {
-    T ret = root [count - 1];
-    SetLength (count - 1);
-    return ret;
-  }
-
-  /// Return the top element but don't remove it.
-  T& Top () const
-  {
-    return root [count - 1];
-  }
-
-  /// Delete element number 'n' from vector.
-  bool DeleteIndex (int n)
-  {
-    if (n >= 0 && n < count)
-    {
-      const int ncount = count - 1;
-      const int nmove = ncount - n;
-      if (nmove > 0)
-      {
-        memmove (&root [n], &root [n + 1], nmove * sizeof (T));
-      }
-      SetLength (ncount);
-      return true;
-    }
+    if (Length () > 0)
+      return &Get (0);
     else
-      return false;
-  }
-
-  /// Insert element 'Item' before element 'n'.
-  bool Insert (int n, const T& item)
-  {
-    if (n <= count)
-    {
-      SetLength (count + 1); // Increments 'count' as a side-effect.
-      const int nmove = (count - n - 1);
-      if (nmove > 0)
-      {
-        memmove (&root [n + 1], &root [n], nmove * sizeof (T));
-      }
-      root [n] = item;
-      return true;
-    }
-    else
-     return false;
+      return 0;
   }
 };
-
 
 #endif // __CS_GARRAY_H__

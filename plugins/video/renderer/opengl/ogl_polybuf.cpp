@@ -179,8 +179,8 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
 int csTriangleArrayPolygonBuffer::AddSingleVertex (csTrianglesPerMaterial* pol,
 	int* verts, int i, const csVector2& uv, int& cur_vt_idx)
 {
-  vec_vertices[cur_vt_idx] = vertices[verts[i]];
-  texels[cur_vt_idx] = uv;
+  vec_vertices.Put (cur_vt_idx, vertices[verts[i]]);
+  texels.Put (cur_vt_idx, uv);
 
   cur_vt_idx++;
   return cur_vt_idx-1;
@@ -189,7 +189,7 @@ int csTriangleArrayPolygonBuffer::AddSingleVertex (csTrianglesPerMaterial* pol,
 int csTriangleArrayPolygonBuffer::AddSingleVertexLM (
 	const csVector2& uvLightmap, int& cur_vt_idx)
 {
-  lumels[cur_vt_idx] = uvLightmap;
+  lumels.Put (cur_vt_idx, uvLightmap);
   cur_vt_idx++;
   return cur_vt_idx-1;
 }
@@ -363,19 +363,19 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
   csVector3 tc;
   csVector3 lmc;
 
-  vec_vertices[cur_vt_idx] = vertices[verts[0]];
+  vec_vertices.Put (cur_vt_idx, vertices[verts[0]]);
   tc = obj2tex.Other2This (vertices[verts[0]]);
-  texels[cur_vt_idx] = csVector2 (tc.x, tc.y);
+  texels.Put (cur_vt_idx, csVector2 (tc.x, tc.y));
   lmc = tex2lm.Other2This (tc);
-  lumels[cur_vt_idx] = csVector2 (lmc.x, lmc.y);
-  /*texels[cur_vt_idx] = texcoords[0];
+  lumels.Put (cur_vt_idx, csVector2 (lmc.x, lmc.y));
+  /*texels.Put (cur_vt_idx, texcoords[0]);
   if (lmcoords)
   {
-    lumels[cur_vt_idx] = lmcoords[0];
+    lumels.Put (cur_vt_idx, lmcoords[0]);
   }
   else
   {
-    lumels[cur_vt_idx].Set (0, 0);
+    lumels.Put (cur_vt_idx, csVector2 (0, 0));
   }*/
   triangle.a = cur_vt_idx++;
   orig_tri.a = verts[0];
@@ -383,37 +383,37 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int num_verts,
   for (i = 1; i < num_verts - 1; i++)
   {
     //triangle.b = AddSingleVertex (pol, verts, i, uv[i], cur_vt_idx);
-    vec_vertices[cur_vt_idx] = vertices[verts[i]];
+    vec_vertices.Put (cur_vt_idx, vertices[verts[i]]);
     tc = obj2tex.Other2This (vertices[verts[i]]);
-    texels[cur_vt_idx] = csVector2 (tc.x, tc.y);
+    texels.Put (cur_vt_idx, csVector2 (tc.x, tc.y));
     lmc = tex2lm.Other2This (tc);
-    lumels[cur_vt_idx] = csVector2 (lmc.x, lmc.y);
-    /*texels[cur_vt_idx] = texcoords[i];
+    lumels.Put (cur_vt_idx, csVector2 (lmc.x, lmc.y));
+    /*texels.Put (cur_vt_idx, texcoords[i]);
     if (lmcoords)
     {
-      lumels[cur_vt_idx] = lmcoords[i];
+      lumels.Put (cur_vt_idx, lmcoords[i]);
     }
     else
     {
-      lumels[cur_vt_idx].Set (0, 0);
+      lumels.Put (cur_vt_idx, csVector2 (0, 0));
     }*/
     triangle.b = cur_vt_idx++;
     orig_tri.b = verts[i];
 
     //triangle.c = AddSingleVertex (pol, verts, i+1, uv[i+1], cur_vt_idx);
-    vec_vertices[cur_vt_idx] = vertices[verts[i+1]];
+    vec_vertices.Put (cur_vt_idx, vertices[verts[i+1]]);
     tc = obj2tex.Other2This (vertices[verts[i+1]]);
-    texels[cur_vt_idx] = csVector2 (tc.x, tc.y);
+    texels.Put (cur_vt_idx, csVector2 (tc.x, tc.y));
     lmc = tex2lm.Other2This (tc);
-    lumels[cur_vt_idx] = csVector2 (lmc.x, lmc.y);
-    /*texels[cur_vt_idx] = texcoords[i+1];
+    lumels.Put (cur_vt_idx, csVector2 (lmc.x, lmc.y));
+    /*texels.Put (cur_vt_idx, texcoords[i+1]);
     if (lmcoords)
     {
-      lumels[cur_vt_idx] = lmcoords[i+1];
+      lumels.Put (cur_vt_idx, lmcoords[i+1]);
     }
     else
     {
-      lumels[cur_vt_idx].Set (0, 0);
+      lumels.Put (cur_vt_idx, csVector2 (0, 0));
     }*/
     triangle.c = cur_vt_idx++;
     orig_tri.c = verts[i+1];

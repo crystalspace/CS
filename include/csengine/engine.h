@@ -22,7 +22,7 @@
 #include "csutil/scf.h"
 #include "csutil/nobjvec.h"
 #include "csutil/csobject.h"
-#include "csutil/garray.h"
+#include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/stringarray.h"
 #include "csutil/refarr.h"
@@ -335,9 +335,9 @@ public:
   /// The list of all named render priorities.
   csStringArray render_priorities;
   /// Sorting flags for the render priorities.
-  csGrowingArray<int> render_priority_sortflags;
+  csArray<int> render_priority_sortflags;
   /// Do_camera flags for the render priorities.
-  csGrowingArray<bool> render_priority_cameraflags;
+  csArray<bool> render_priority_cameraflags;
   /**
    * The engine knows about the following render priorities and keeps
    * them here:

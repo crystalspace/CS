@@ -147,11 +147,11 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   int num_polygons = polbuf->GetPolygonCount ();
 
   // Update work arrays
-  if (num_vertices > tr_verts->Limit ())
+  if (num_vertices > tr_verts->Capacity ())
   {
-    tr_verts->SetLimit (num_vertices);
-    persp->SetLimit (num_vertices);
-    visible->SetLimit (num_vertices);
+    tr_verts->SetCapacity (num_vertices);
+    persp->SetCapacity (num_vertices);
+    visible->SetCapacity (num_vertices);
   }
 
   csVector3 *f1 = polbuf->GetVertices ();

@@ -997,10 +997,10 @@ void csEngine::RegisterRenderPriority (
   // If our priority goes over the number of defined priorities
   // then we have to initialize.
   int old_pri_len = render_priorities.Length ();
-  if (priority + 1 >= render_priority_sortflags.Limit ())
+  if (priority + 1 >= render_priority_sortflags.Length ())
   {
-    render_priority_sortflags.SetLimit (priority + 2);
-    render_priority_cameraflags.SetLimit (priority + 2);
+    render_priority_sortflags.SetLength (priority + 2);
+    render_priority_cameraflags.SetLength (priority + 2);
     render_priorities.SetLength (priority+2);
   }
   for (i = old_pri_len; i <= priority; i++)
@@ -1076,8 +1076,8 @@ int csEngine::GetRenderPrioritySorting (long priority) const
 void csEngine::ClearRenderPriorities ()
 {
   render_priorities.DeleteAll ();
-  render_priority_sortflags.SetLimit (0);
-  render_priority_cameraflags.SetLimit (0);
+  render_priority_sortflags.SetLength (0);
+  render_priority_cameraflags.SetLength (0);
   RegisterRenderPriority ("sky", 2, true);
   RegisterRenderPriority ("wall", 4);
   RegisterRenderPriority ("object", 6);

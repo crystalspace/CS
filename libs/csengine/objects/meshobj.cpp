@@ -198,8 +198,8 @@ void csMeshWrapper::UpdateDeferedLighting (const csBox3 &box)
   const iSectorList *movable_sectors = movable.GetSectors ();
   if (defered_num_lights && movable_sectors->GetCount () > 0)
   {
-    if (defered_num_lights > light_worktable.Limit ())
-      light_worktable.SetLimit (defered_num_lights);
+    if (defered_num_lights > light_worktable.Length ())
+      light_worktable.SetLength (defered_num_lights);
 
     iSector *sect = movable_sectors->Get (0);
     int num_lights = csEngine::current_iengine->GetNearbyLights (

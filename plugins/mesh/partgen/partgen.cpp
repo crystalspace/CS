@@ -111,7 +111,6 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   csRef<iSprite2DState> state (SCF_QUERY_INTERFACE (sprmesh, iSprite2DState));
   csColoredVertices& vs = state->GetVertices();
 
-  vs.SetLimit (4);
   vs.SetLength (4);
   vs[0].pos.Set (-width,-height); vs[0].u=0.; vs[0].v=1.;
   vs[0].color.Set (0, 0, 0);
