@@ -39,7 +39,7 @@ LIB.VIEWMESH = $(foreach d,$(DEP.VIEWMESH),$($d.LIB))
 
 MSVC.DSP += VIEWMESH
 DSP.VIEWMESH.NAME = viewmesh
-DSP.VIEWMESH.TYPE = appgui
+DSP.VIEWMESH.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

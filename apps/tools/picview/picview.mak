@@ -40,7 +40,7 @@ LIB.PVIEW = $(foreach d,$(DEP.PVIEW),$($d.LIB))
 
 MSVC.DSP += PVIEW
 DSP.PVIEW.NAME = picview
-DSP.PVIEW.TYPE = appgui
+DSP.PVIEW.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -39,7 +39,7 @@ CFG.DEMO = data/config/csdemo.cfg
 
 MSVC.DSP += DEMO
 DSP.DEMO.NAME = csdemo
-DSP.DEMO.TYPE = appgui
+DSP.DEMO.TYPE = appcon
 DSP.DEMO.RESOURCES = libs/cssys/win32/rsrc/cs1.rc
 
 endif # ifeq ($(MAKESECTION),postdefines)

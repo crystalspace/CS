@@ -472,29 +472,18 @@ bool csPlatformShutdown(iObjectRegistry* r)
 }
 
 Win32Assistant::Win32Assistant (iObjectRegistry* r) :
-  EventOutlet(0)
+  EventOutlet (0),
+  console_window (false)
 {
   SCF_CONSTRUCT_IBASE(0);
-
-#if defined(CS_DEBUG) && !defined(COMP_GCC)
-  console_window = true;
-#else
-  console_window = false;
-#endif
 
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (r, iCommandLineParser);
   if (cmdline->GetOption ("console")) console_window = true;
   if (cmdline->GetOption ("noconsole")) console_window = false;
   cmdline->DecRef ();
 
-  if (console_window)
-  {
-    // @@@ if we are started from the command prompt, is there a way
-    //     to use that console ?
-    AllocConsole();
-    freopen("CONOUT$", "a", stderr); // Redirect stderr to console
-    freopen("CONOUT$", "a", stdout); // Redirect stdout to console
-  }
+  if (!console_window)
+    DisableConsole ();
 
   registry = r;
   registry->IncRef();
@@ -899,6 +888,7 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
 //@@@ THIS PART OF CONFIG HELP IS CURRENTLY BROKEN!!!
 void Win32Assistant::Win32Assistant (iConfigManager *Config)
 {
+/*
 #ifdef CS_DEBUG
   console_window = true;
   if (console_window)
@@ -908,6 +898,7 @@ void Win32Assistant::Win32Assistant (iConfigManager *Config)
     freopen("CONOUT$", "a", stdout); // Redirect stdout to console
   }
 #endif
+*/
 }
 #endif
 
@@ -944,9 +935,7 @@ bool Win32Assistant::SetCursor (int cursor)
   HCURSOR cur;
   if (CursorID)
   {
-    cur = ((CursorID != (char *)-1)
-    	? LoadCursor (NULL, CursorID)
-	: NULL);
+    cur = ((CursorID != (char *)-1) ? LoadCursor (NULL, CursorID) : NULL);
     success = true;
   }
   else
@@ -960,16 +949,18 @@ bool Win32Assistant::SetCursor (int cursor)
 
 void Win32Assistant::DisableConsole ()
 {
-  if (console_window) {
+  if (console_window)
+  {
     console_window = false;
-    freopen("_conout.txt", "a", stderr);
-    freopen("_conout.txt", "a", stdout);
-    FreeConsole();
+  }
 
-    struct tm *now;
-    time_t aclock;
-    time( &aclock );
-    now = localtime( &aclock );
-    printf("====== %s", asctime(now));
- }
+  freopen("debug.txt", "a", stderr);
+  freopen("debug.txt", "a", stdout);
+  FreeConsole();
+
+  struct tm *now;
+  time_t aclock;
+  time( &aclock );
+  now = localtime( &aclock );
+  printf("====== %s", asctime(now));
 }

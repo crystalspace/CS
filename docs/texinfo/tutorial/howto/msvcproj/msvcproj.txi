@@ -122,13 +122,13 @@ line below.
 wrapped in this example in order to fit on the printed page.)
 
 @noindent
-@code{WIN32,_DEBUG,_WINDOWS,_MBCS,WIN32_VOLATILE,}@*
+@code{WIN32,_DEBUG,_CONSOLE,_MBCS,WIN32_VOLATILE,}@*
 @code{__CRYSTAL_SPACE__,CS_DEBUG}
 @end iftex
 @ifnottex
 
 @noindent
-@code{WIN32,_DEBUG,_WINDOWS,_MBCS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG}
+@code{WIN32,_DEBUG,_CONSOLE,_MBCS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG}
 @end ifnottex
 
 For a release build it is slightly different.  See the attached sample

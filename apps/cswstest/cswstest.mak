@@ -40,7 +40,7 @@ CFG.CSWSTEST = data/config/cswstest.cfg
 
 MSVC.DSP += CSWSTEST
 DSP.CSWSTEST.NAME = cswstest
-DSP.CSWSTEST.TYPE = appgui
+DSP.CSWSTEST.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

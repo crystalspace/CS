@@ -40,7 +40,7 @@ TO_INSTALL.EXE    += $(ISOMAP.EXE)
 
 MSVC.DSP += ISOMAP
 DSP.ISOMAP.NAME = isomap
-DSP.ISOMAP.TYPE = appgui
+DSP.ISOMAP.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

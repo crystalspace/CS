@@ -38,7 +38,7 @@ LIB.CSFEDIT = $(foreach d,$(DEP.CSFEDIT),$($d.LIB))
 
 MSVC.DSP += CSFEDIT
 DSP.CSFEDIT.NAME = csfedit
-DSP.CSFEDIT.TYPE = appgui
+DSP.CSFEDIT.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

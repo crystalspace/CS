@@ -39,7 +39,7 @@ LIB.PHYZTEST = $(foreach d,$(DEP.PHYZTEST),$($d.LIB))
 
 MSVC.DSP += PHYZTEST
 DSP.PHYZTEST.NAME = phyztest
-DSP.PHYZTEST.TYPE = appgui
+DSP.PHYZTEST.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

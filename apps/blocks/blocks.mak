@@ -41,7 +41,7 @@ TO_INSTALL.DATA   += data/blocks.zip
 
 MSVC.DSP += BLOCKS
 DSP.BLOCKS.NAME = blocks
-DSP.BLOCKS.TYPE = appgui
+DSP.BLOCKS.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

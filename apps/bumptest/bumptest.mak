@@ -39,7 +39,7 @@ CFG.BUMPTEST = data/config/csbumptest.cfg
 
 MSVC.DSP += BUMPTEST
 DSP.BUMPTEST.NAME = bumptest
-DSP.BUMPTEST.TYPE = appgui
+DSP.BUMPTEST.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

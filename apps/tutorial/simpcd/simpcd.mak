@@ -39,7 +39,7 @@ LIB.SIMPCD = $(foreach d,$(DEP.SIMPCD),$($d.LIB))
 
 MSVC.DSP += SIMPCD
 DSP.SIMPCD.NAME = simpcd
-DSP.SIMPCD.TYPE = appgui
+DSP.SIMPCD.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -38,7 +38,7 @@ TO_INSTALL.EXE += $(PERF.EXE)
 
 MSVC.DSP += PERF
 DSP.PERF.NAME = perftest
-DSP.PERF.TYPE = appgui
+DSP.PERF.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

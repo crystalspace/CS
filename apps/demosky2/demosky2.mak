@@ -38,7 +38,7 @@ LIB.DEMOSKY2 = $(foreach d,$(DEP.DEMOSKY2),$($d.LIB))
 
 MSVC.DSP += DEMOSKY2
 DSP.DEMOSKY2.NAME = demosky2
-DSP.DEMOSKY2.TYPE = appgui
+DSP.DEMOSKY2.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

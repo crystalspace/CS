@@ -41,7 +41,7 @@ LIB.CSVID = $(foreach d,$(DEP.CSVID),$($d.LIB))
 
 MSVC.DSP += CSVID
 DSP.CSVID.NAME = csvid
-DSP.CSVID.TYPE = appgui
+DSP.CSVID.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

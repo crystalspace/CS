@@ -43,7 +43,7 @@ CFG.AWSTEST = data/config/awstest.cfg
 
 MSVC.DSP += AWSTEST
 DSP.AWSTEST.NAME = awstest
-DSP.AWSTEST.TYPE = appgui
+DSP.AWSTEST.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

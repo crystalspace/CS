@@ -40,7 +40,7 @@ LIB.CSWSE = $(foreach d,$(DEP.CSWSE),$($d.LIB))
 
 MSVC.DSP += CSWSE
 DSP.CSWSE.NAME = cswseng
-DSP.CSWSE.TYPE = appgui
+DSP.CSWSE.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

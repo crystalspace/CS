@@ -38,7 +38,7 @@ LIB.SIMPMAP = $(foreach d,$(DEP.SIMPMAP),$($d.LIB))
 
 MSVC.DSP += SIMPMAP
 DSP.SIMPMAP.NAME = simpmap
-DSP.SIMPMAP.TYPE = appgui
+DSP.SIMPMAP.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

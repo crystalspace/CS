@@ -43,7 +43,7 @@ CFG.AWSTUT = data/config/awstut.cfg
 
 MSVC.DSP += AWSTUT
 DSP.AWSTUT.NAME = awstut
-DSP.AWSTUT.TYPE = appgui
+DSP.AWSTUT.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -38,7 +38,7 @@ TO_INSTALL.EXE += $(G2DTEST.EXE)
 
 MSVC.DSP += G2DTEST
 DSP.G2DTEST.NAME = g2dtest
-DSP.G2DTEST.TYPE = appgui
+DSP.G2DTEST.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

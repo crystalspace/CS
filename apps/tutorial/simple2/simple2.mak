@@ -39,7 +39,7 @@ LIB.SIMPLE2 = $(foreach d,$(DEP.SIMPLE2),$($d.LIB))
 
 MSVC.DSP += SIMPLE2
 DSP.SIMPLE2.NAME = simple2
-DSP.SIMPLE2.TYPE = appgui
+DSP.SIMPLE2.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

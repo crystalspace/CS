@@ -42,7 +42,7 @@ LIB.PYSIMP = $(foreach d,$(DEP.PYSIMP),$($d.LIB))
 
 MSVC.DSP += PYSIMP
 DSP.PYSIMP.NAME = pysimp
-DSP.PYSIMP.TYPE = appgui
+DSP.PYSIMP.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

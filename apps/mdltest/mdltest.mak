@@ -39,7 +39,7 @@ LIB.MDLTEST = $(foreach d,$(DEP.MDLTEST),$($d.LIB))
 
 MSVC.DSP += MDLTEST
 DSP.MDLTEST.NAME = mdltest
-DSP.MDLTEST.TYPE = appgui
+DSP.MDLTEST.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
