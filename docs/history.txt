@@ -66,6 +66,10 @@ The history order is reversed so that new features are at the top.
 	  a bug that is pestering CEL.
 	- Eric Sunshine fixed snapshot.py so that its removefile() function
 	  correctly removes symbolic links even if the link is invalid.
+	- Fixed a bug in csDebuggingGraph so that it is also able to
+	  remove links between two objects if one or both of the objects are
+	  already deleted. This fixes a number of invalid bad links I got
+	  during debugging csObject.
 13-Nov-2001
 	- Small comment fix in vfs.h.
 	- Fixed a bad bug in csObject destructor. It appears that it could

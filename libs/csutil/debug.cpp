@@ -202,12 +202,12 @@ public:
     return el;
   }
 
-  csDGEL* FindEl (void* object)
+  csDGEL* FindEl (void* object, bool all = false)
   {
     int i;
     for (i = 0 ; i < num_els ; i++)
     {
-      if (els[i]->used && els[i]->object == object) return els[i];
+      if ((all || els[i]->used) && els[i]->object == object) return els[i];
     }
     return NULL;
   }
@@ -364,8 +364,8 @@ void csDebuggingGraph::RemoveParent (iObjectRegistry* object_reg,
 #endif
   CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
-  csDGEL* p_el = dg->FindEl (parent);
-  csDGEL* c_el = dg->FindEl (child);
+  csDGEL* p_el = dg->FindEl (parent, true);
+  csDGEL* c_el = dg->FindEl (child, true);
   if (!p_el) return;
   if (!c_el) return;
   c_el->RemoveParent (p_el);
@@ -379,8 +379,8 @@ void csDebuggingGraph::RemoveChild (iObjectRegistry* object_reg,
 #endif
   CS_ASSERT (object_reg != NULL);
   csDebugGraph* dg = SetupDebugGraph (object_reg);
-  csDGEL* p_el = dg->FindEl (parent);
-  csDGEL* c_el = dg->FindEl (child);
+  csDGEL* p_el = dg->FindEl (parent, true);
+  csDGEL* c_el = dg->FindEl (child, true);
   if (!p_el) return;
   if (!c_el) return;
   p_el->RemoveChild (c_el);
@@ -428,7 +428,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
   {
     if (!els[i]->marker)
     {
-      Dump (object_reg, els[i]->object, true, false);
+      Dump (object_reg, els[i]->object, false);
       i = 0;	// Restart scan.
       printf ("----------------------------------------------------\n");
     }
@@ -492,7 +492,7 @@ static int compare_el (const void* vel1, const void* vel2)
 }
 
 void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
-	bool find_root, bool reset_mark)
+	bool reset_mark)
 {
 #ifdef CS_DEBUG
   if (!object_reg) object_reg = iSCF::SCF->object_reg;

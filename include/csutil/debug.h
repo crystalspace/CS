@@ -152,12 +152,9 @@ public:
   /**
    * Dump the graph containing the given object. You should
    * usually leave reset_mark alone. That's for internal use.
-   * If find_root is true it will try to find the root
-   * for the graph containing the object. The root is defined as
-   * the graph element having the fewest parents.
    */
   static void Dump (iObjectRegistry* object_reg, void* object,
-  	bool find_root = false, bool reset_mark = true);
+  	bool reset_mark = true);
 };
 
 #endif //__CS_UTIL_DEBUG__
