@@ -146,6 +146,11 @@ struct iTextureHandle : public iBase
    * Merge this texture into current palette, compute mipmaps and so on.
    * You should call either Prepare() or iTextureManager::PrepareTextures()
    * before using any texture.
+   * Note that it is in this stage that the original image that is
+   * attached to a texture is scaled so that it fits hardware
+   * requirements. So it is important to realize that calling this
+   * function may actually change the image from which you created
+   * this texture!
    */
   virtual void Prepare () = 0;
 

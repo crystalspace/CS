@@ -159,8 +159,11 @@ struct iTextureManager : public iBase
    * The texture is unregistered at destruction, i.e. as soon as the last
    * reference to the texture handle is released.
    *<p>
-   * If CS_USE_NEW_RENDERER is enabled param target specifies the texture target.
-   * Defines for that can be found in ivideo/texture.h
+   * If CS_USE_NEW_RENDERER is enabled param target specifies the texture
+   * target. Defines for that can be found in ivideo/texture.h
+   *<p>
+   * Note! This function will NOT scale the texture to fit hardware
+   * restrictions. This is done later when Prepare() is called.
    *
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags) = 0;
@@ -172,6 +175,11 @@ struct iTextureManager : public iBase
    * needed calculations (palette, lookup tables, mipmaps, ...).
    * PrepareTextures () must be able to handle being called twice
    * or more without ill effects.
+   * Note that it is in this stage that the original image that is
+   * attached to a texture is scaled so that it fits hardware
+   * requirements. So it is important to realize that calling this
+   * function may actually change the images from which you created
+   * the textures!
    */
   virtual void PrepareTextures () = 0;
 
