@@ -151,6 +151,7 @@ void csIsoView::PreCalc()
 
   //printf("scanw, scasnh %d %d\n", scanw, scanh);
   rview->SetPrecalcGrid(startx, starty, scanw, scanh, celpery);
+  rview->SetMinZ(0.0);
 }
 
 void csIsoView::SetAxes(float xscale, float yscale, float zscale, float zskew, 

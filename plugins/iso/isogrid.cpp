@@ -217,6 +217,10 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
   // other render passes?
   if(rview->GetRenderPass() == CSISO_RENDERPASS_PRE)
   {
+    // check lower bound on Z.
+    float myminz = box.MinZ() - box.MaxX() - 10.;
+    if(myminz < rview->GetMinZ()) rview->SetMinZ(myminz);
+
     // calculate dyn lighting
     SetAllLight(csColor(0.,0.,0.));
     for(int l=0; l<lights.Length(); l++)

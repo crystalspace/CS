@@ -38,6 +38,8 @@ private:
   float celpery;
   /// the clipper
   iClipper2D *clipper;
+  /// lower bound on screen z
+  float minz;
 
 public:
   DECLARE_IBASE;
@@ -67,6 +69,8 @@ public:
   virtual void GetPrecalcGrid(int& sx, int& sy, int& sw, int& sh, 
     float& cpy) const
   { sx = startx; sy = starty; sw = scanw; sh = scanh; cpy = celpery; } 
+  virtual float GetMinZ() const {return minz;}
+  virtual void SetMinZ(float val) {minz = val;}
 };
 
 #endif

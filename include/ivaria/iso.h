@@ -303,6 +303,10 @@ struct iIsoRenderView : public iBase
   /// get precalc grid values
   virtual void GetPrecalcGrid(int& startx, int& starty, int& scanw, 
     int& scanh, float& cellpery) const = 0;
+  /// get minimum z value (screen.z - minz is > 1), a lower bound
+  virtual float GetMinZ() const = 0;
+  /// set the minimum z value.
+  virtual void SetMinZ(float val) = 0;
 };
 
 SCF_VERSION (iIsoSprite, 0, 0, 1);

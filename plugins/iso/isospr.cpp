@@ -213,6 +213,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
 
   csVector3 screenpos;
   int i;
+  float zlowerbound = rview->GetMinZ();
 
   //view->W2S(position, screenpos);
   //printf("position %g,%g,%g to %g,%g,%g\n",
@@ -224,9 +225,10 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   {
     view->W2S(position + poly[i], screenpos);
     //if(screenpos.z == 0.0) g3dpolyfx.vertices [i].z = 0.5; else 
-    if(screenpos.z < 0.0) 
-         g3dpolyfx.vertices [i].z = 1.0-.5/(-screenpos.z+1.);
-    else g3dpolyfx.vertices [i].z = .5/(screenpos.z+1.);
+    //if(screenpos.z < 0.0) 
+         //g3dpolyfx.vertices [i].z = 1.0-.5/(-screenpos.z+1.);
+    //else g3dpolyfx.vertices [i].z = .5/(screenpos.z+1.);
+    g3dpolyfx.vertices [i].z = 1./(screenpos.z-zlowerbound);
     g3dpolyfx.vertices [i].sx = poly2d [i].x = screenpos.x;
     g3dpolyfx.vertices [i].sy = poly2d [i].y = screenpos.y;
     g3dpolyfx.vertices [i].r = colors [i].x;
