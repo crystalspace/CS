@@ -104,19 +104,14 @@ if $(CMD.SWIG)
 
     if ! $(frozenotherdir) { frozenotherdir = $(frozentargetdir) ; }
     if ! $(tag) { tag = $(language) ; }
+    if ! $(outdir) { outdir = $(LOCATE_TARGET) ; }
 
     Depends $(target) : $(swigfile) ;
     MakeLocate $(target) : $(LOCATE_TARGET) ;
     if $(othertargets)
     {
-      if $(outdir)
-      {
-        MakeLocate $(othertargets) : $(outdir) ;
-      }
-      else
-      {
-        MakeLocate $(othertargets) : $(LOCATE_TARGET) ;
-      }
+      MakeLocate $(othertargets) : $(outdir) ;
+
       # If any target, such as an install target, depends upon the other files,
       # we force them to be built with a dependency upon the target.
       Depends $(othertargets) : $(target) ;
