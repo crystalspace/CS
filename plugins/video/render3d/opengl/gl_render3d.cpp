@@ -691,7 +691,7 @@ bool csGLGraphics3D::Open ()
     //no special ati extensions atm
   }
   // check for support of VBO
-  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object && false;
+  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
 
   shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   if( !shadermgr )
@@ -853,7 +853,6 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     }
   }
 
-  glClearColor (0.5, 0.5, 1, 1);
   if (drawflags & CSDRAW_CLEARZBUFFER)
   {
     statecache->SetDepthMask (GL_TRUE);
