@@ -63,6 +63,12 @@ chronological order.
 	  move higher and, until eventually the terrain was considered "out of
 	  influence radius" for the light, causing the diffuse pass not to be
 	  drawn.
+	- res augmented the syntax services to also recognize the <zequal /> 
+	  zmode.
+	- res added edge drawing support (not really all edges, but close 
+	  enough) to the GL NR plugin.
+	- res changed terrainf to use the zequal mode for the splatting 
+	  passes. This reduces the visibility of the seams.
 29-May-2004
 	- Peter Amstutz added a "--with-vos" option to the configure
 	  script to set the PKG_CONFIG_PATH environment variable when

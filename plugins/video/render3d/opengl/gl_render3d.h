@@ -90,6 +90,7 @@ private:
   int current_shadow_state;
   csZBufMode current_zmode;
   bool zmesh;
+  bool forceWireframe;
 
   int asp_center_x, asp_center_y;
   float aspect;

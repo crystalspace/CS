@@ -717,6 +717,9 @@ bool csTextSyntaxService::ParseZMode (iDocumentNode* node,
     case XMLTOKEN_ZUSE:
       zmode = CS_ZBUF_USE;
       break;
+    case XMLTOKEN_ZEQUAL:
+      zmode = CS_ZBUF_EQUAL;
+      break;
     case XMLTOKEN_ZMESH:
       if (!allowZmesh) return false;
       zmode = CS_ZBUF_MESH;

@@ -90,26 +90,19 @@ csPtr<iBase> csGenericRSLoader::Parse (iDocumentNode* node,
 	  step->SetZOffset (result);
 	}
 	break;
-      case XMLTOKEN_ZUSE:
-	step->SetZBufMode (CS_ZBUF_USE);
-	break;
-      case XMLTOKEN_ZTEST:
-	step->SetZBufMode (CS_ZBUF_TEST);
-	break;
-      case XMLTOKEN_ZFILL:
-	step->SetZBufMode (CS_ZBUF_FILL);
-	break;
-      case XMLTOKEN_ZNONE:
-	step->SetZBufMode (CS_ZBUF_NONE);
-	break;
-      case XMLTOKEN_ZMESH:
-        step->SetZBufMode (CS_ZBUF_MESH);
-        break;
       case XMLTOKEN_SHADERTYPE:
 	step->SetShaderType (child->GetContentsValue ());
 	break;
       default:
-	if (synldr) synldr->ReportBadToken (child);
+	{
+	  csZBufMode zmode;
+	  if (synldr->ParseZMode (child, zmode, true))
+	  {
+	    step->SetZBufMode (zmode);
+	    break;
+	  }
+	  synldr->ReportBadToken (child);
+	}
 	return 0;
     }
   }

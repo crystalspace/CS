@@ -96,7 +96,7 @@
         <!-- ambient lighting -->
         <step plugin="crystalspace.renderloop.step.generic">
           <shadertype>ambient</shadertype>
-          <zoffset>yes</zoffset>
+          <!--zoffset>yes</zoffset-->
 	  <portaltraversal/>
           <zuse />
         </step>
@@ -104,7 +104,8 @@
         <step plugin="crystalspace.renderloop.step.generic">
           <shadertype>terrain splat</shadertype>
           <zoffset>no</zoffset>
-          <zuse />
+          <!--zuse /-->
+	  <zequal />
         </step>
         <!-- draws geometry -->
         <step plugin="crystalspace.renderloop.step.generic">

@@ -114,7 +114,11 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   color_green_enabled = false;
   color_blue_enabled = false;
   alpha_enabled = false;
+  current_drawflags = 0;
   current_shadow_state = 0;
+  current_zmode = CS_ZBUF_NONE;
+  zmesh = false;
+  forceWireframe = false;
 
   use_hw_render_buffers = false;
   stencil_threshold = 500;
@@ -137,8 +141,6 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   shadow_stencil_enabled = false;
   clipping_stencil_enabled = false;
   clipportal_dirty = true;
-
-  current_drawflags = 0;
 }
 
 csGLGraphics3D::~csGLGraphics3D()
@@ -1668,13 +1670,13 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
-      primitivetype = GL_QUADS;
+      primitivetype = forceWireframe ? GL_LINES : GL_QUADS;
       break;
     case CS_MESHTYPE_TRIANGLESTRIP:
-      primitivetype = GL_TRIANGLE_STRIP;
+      primitivetype = forceWireframe ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLEFAN:
-      primitivetype = GL_TRIANGLE_FAN;
+      primitivetype = forceWireframe ? GL_LINE_STRIP : GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
       primitivetype = GL_POINTS;
@@ -1719,7 +1721,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     case CS_MESHTYPE_POLYGON:
     case CS_MESHTYPE_TRIANGLES:
     default:
-      primitivetype = GL_TRIANGLES;
+      primitivetype = forceWireframe ? GL_LINES : GL_TRIANGLES;
       break;
   }
 
@@ -2071,12 +2073,25 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
 // left in for now.
 bool csGLGraphics3D::SetRenderState (G3D_RENDERSTATEOPTION op, long val)
 {
-  return false;
+  switch (op)
+  {
+    case G3DRENDERSTATE_EDGES:
+      forceWireframe = (val != 0);
+      return true;
+    default:
+      return false;
+  }
 }
 
 long csGLGraphics3D::GetRenderState (G3D_RENDERSTATEOPTION op) const
 {
-  return 0;
+  switch (op)
+  {
+    case G3DRENDERSTATE_EDGES:
+      return (forceWireframe ? 1 : 0);
+    default:
+      return 0;
+  }
 }
 
 csPtr<iPolygonRenderer> csGLGraphics3D::CreatePolygonRenderer ()
