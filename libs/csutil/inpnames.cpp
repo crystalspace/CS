@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "iutil/event.h"
 #include "csutil/csevent.h"
+#include "csutil/inpnames.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -164,7 +165,7 @@ bool csParseMouseDef (const char *name, int &button, int &shift, bool use_shift 
   return ret;
 }
 
-void csParseJoyDef (const char *name, int &button, int &shift, bool use_shift = true)
+bool csParseJoyDef (const char *name, int &button, int &shift, bool use_shift = true)
 {
   csEvent ev;
   bool ret = csParseInputDef (name, ev, use_shift);
