@@ -207,12 +207,14 @@ void csTextureMMSoftware::ComputeMeanColor ()
     {
       csTextureSoftware *t = (csTextureSoftware *)tex [i];
       if (!t->image) break;
+      UByte* bmap = t->bitmap; // Temp assignment to pacify BeOS compiler.
       if (texman->dither_textures || (flags & CS_TEXTURE_DITHER))
         csQuantizeRemapDither ((csRGBpixel *)t->image->GetImageData (),
-          t->get_size (), t->get_width (), pal, palette_size, t->bitmap, tc);
+          t->get_size (), t->get_width (), pal, palette_size, bmap, tc);
       else
         csQuantizeRemap ((csRGBpixel *)t->image->GetImageData (),
-          t->get_size (), t->bitmap, tc);
+          t->get_size (), bmap, tc);
+      t->bitmap = bmap;
 
       // Get the alpha map for the texture, if present
       if (t->image->GetFormat () & CS_IMGFMT_ALPHA)
