@@ -26,6 +26,8 @@
 #include "csphyzik/linklist.h"
 #include "csphyzik/odesolve.h"
 
+enum worldstate { CTWS_NORMAL, CTWS_REWOUND };
+
 enum errorcode { WORLD_NOERR, WORLD_ERR_NULLPARAMETER, WORLD_ERR_NOODE, WORLD_ERR_SHITHAPPEND, WORLD_ERR_OTHERSTUFF };
 
 #define DEFAULT_INIT_MAX_STATE_SIZE  1024
@@ -48,14 +50,25 @@ public:
 	errorcode evolve( real t1, real t2 );
   
   // rewind the state of the system to the time just before evolve was called.
-  errorcode rewind();  
+  // pass in the correct time frame
+  errorcode rewind( real t1, real t2 );  
 	
   void solve( real t );
+	errorcode add_physicalentity( ctPhysicalEntity *pe );
 	errorcode add_rigidbody( ctRigidBody *rb );
 	errorcode add_articulatedbodybase( ctArticulatedBody *ab );
 	errorcode add_enviro_force( ctForce *f );
 
 	errorcode delete_articulatedbody( ctArticulatedBody *pbase );
+
+  // set the ODE solver used to evolve the system
+  void set_ODE_solver( OdeSolver *pode ){ 
+    if( ode_to_math ) delete ode_to_math;
+    ode_to_math = pode; 
+  }
+
+  // apply the given function to all physical entities in the system.
+  void apply_fuction_to_body_list( void(*fcn)( ctPhysicalEntity *ppe ) );
 
 protected:
 	// take state values( position, velocity, orientation, ... ) from 
@@ -75,6 +88,10 @@ protected:
 	void collide();
 
   void resize_state_vector( long new_size );
+  
+  // the current state of the world. as in finite state machine state
+  worldstate fsm_state;  
+  real rewound_from;
 
 	ctLinkList_ctPhysicalEntity body_list;
 	ctLinkList_ctForce enviro_force_list;
