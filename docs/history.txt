@@ -35,6 +35,10 @@ The history order is reversed so that new features are at the top.
 	  use the standard while (HasNext()) { Next(); ...} construct too.
         - DeSigna corrected a range checking bug in csString::SubString(), 
 	  and made the second range argument a length instead of an index.
+	- Jorrit updated the documentation section about 3D plugins
+	  (plugins/graphics section).
+	- Jorrit updated the section about procedural textures in the
+	  documentation.
 	- Jorrit fixed csProcFile inheritance to use public inheritance
 	  for iFireTexture instead of private inheritance.
 	- Eric Sunshine fixed ddraw8/Jamfile so that it only enables the ddraw8
