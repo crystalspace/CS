@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+28-Jan-2001
+	- Eric Sunshine fixed a crasher in PTLab where it was trying to
+	  access a texture (cslogo.gif) which it had never loaded.
 26-Jan-2001
 	- Norman Kramer did further work on the video plugins.
 	  With exception of yuv2rgb conversion AVI is working.
