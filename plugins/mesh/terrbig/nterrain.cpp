@@ -474,13 +474,13 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
   {
     info->mesh[i].morph_factor = 0;
     info->mesh[i].num_vertices_pool = 1;
-    info->mesh[i].use_vertex_color = false;
+    info->mesh[i].use_vertex_color = 0;
 	info->mesh[i].do_mirror = false;
     info->mesh[i].do_morph_texels = false;
     info->mesh[i].do_morph_colors = false;
     info->mesh[i].do_fog = false;
     info->mesh[i].vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-    info->mesh[i].mixmode = CS_FX_GOURAUD;
+    info->mesh[i].mixmode = 0 /* CS_FX_GOURAUD */;
   }
 }
 }  
