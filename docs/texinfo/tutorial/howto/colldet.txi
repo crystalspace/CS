@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Collision Detection, , ,
+@node HOWTO Collision Detection, , HOWTO, HOWTO
 @subsection Doing Collision Detection
 @cindex iCollideSystem
 @cindex iCollider
