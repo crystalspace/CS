@@ -467,7 +467,7 @@ end of file which are not associated with any property are also preserved.
 
 The order of property declarations from the input file is preserved in the
 output file whenever possible, however, because XML documents are hiearchically
-organized, some re-ording of properties may occur if properties with similar
+organized, some re-ordering of properties may occur if properties with similar
 keys are not listed continguously in the input file.
 
 To illustrate points from the foregoing discussion, given the following input
