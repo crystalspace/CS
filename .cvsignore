@@ -1,4 +1,10 @@
-out
+.cvsignore
+*.cfg
 *.dll
-config.mak
-cache.mak
+*.exe
+*.zip
+*.txt
+config.mak*
+cache.mak*
+coord*
+out
