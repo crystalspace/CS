@@ -12,6 +12,8 @@ The history order has been reversed so that new features are at the top.
 	  linking.
 	- Fixed an internal compiler error for gcc 2.7.2 in the Crystal
 	  Clear code.
+	- Andrew Zabolotny did a few code style fixes for csfont plugin
+	  and misc fixes for OS/2 DIVE canvas.
 9-May-2000
 	- -revis commandline option will now work to force recalculation
 	  of the octree. -norevis will not work for this as CS cannot
