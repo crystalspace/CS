@@ -87,6 +87,9 @@ The history order is reversed so that new features are at the top.
 	    - Eliminated several memory leaks.
 	  Be forewarned that, as usual, my changes to the OpenGL renderer and
 	  canvas are untested since I do not have access to OpenGL hardware.
+	- Eric Sunshine fixed csEventQueue so that it no longer leaks its
+	  "default" iEventOutlet.  This problem was pointed out by Jorge
+	  Acereda Macia <drslump@ono.com>.
 8-Nov-2001
 	- Jorge Acereda fixed a leak in ieplex.cpp where the result of a
 	  SCF::QueryClassList() wasn't DecRef()ed.

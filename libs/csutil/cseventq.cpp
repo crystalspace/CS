@@ -43,13 +43,12 @@ csEventQueue::~csEventQueue ()
 {
   // We don't allow deleting the event queue from within an event handler.
   CS_ASSERT (busy_looping <= 0);
-
   Clear();
   if (EventQueue)
     delete[] EventQueue;
-  int i;
-  for (i = Listeners.Length() - 1; i >= 0; i--)
+  for (int i = Listeners.Length() - 1; i >= 0; i--)
     Listeners[i].object->DecRef();
+  EventOutlets.Get(0)->DecRef(); // The default event outlet which we created.
 }
 
 void csEventQueue::Post (iEvent *Event)
