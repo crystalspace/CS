@@ -73,10 +73,11 @@ next2dcleanlib:
 	$(RM) $(OBJ.NEXT2D) $(NEXT2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)next2d.dep
 $(OUTOS)next2d.dep: $(SRC.NEXT2D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)next2d.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

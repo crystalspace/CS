@@ -1,7 +1,7 @@
 # This is an include file for all the makefiles which describes system specific
 # settings. Also have a look at mk/user.mak.
 
-# We don't want assembly for now (why? it can be resolved - A.Z.)
+# We don't want assembly for now
 override DO_ASM=no
 
 # Choose which drivers you want to build/use
@@ -9,32 +9,26 @@ DRIVERS=cs2d/next cs3d/software csnetdrv/null csnetdrv/sockets \
   csnetman/null csnetman/simple cssnddrv/null cssndrdr/null
 
 #------------------------------------------ rootdefines, defines, configure ---#
+ifneq ($(findstring $(MAKESECTION),defines)$(findstring $(MAKESECTION),configure),)
+
 PROC.m68k  = M68K
 PROC.i386  = INTEL
 PROC.sparc = SPARC
 PROC.hppa  = HPPA
 PROC.ppc   = POWERPC
 
-NEXT.TARGET_ARCHS:=$(sort $(filter $(NEXT.ARCHS),$(TARGET_ARCHS)))
+NEXT.TARGET_ARCHS := $(sort $(filter $(NEXT.ARCHS),$(TARGET_ARCHS)))
 
 ifeq ($(strip $(NEXT.TARGET_ARCHS)),)
-NEXT.TARGET_ARCHS:=$(shell /usr/bin/arch)
+NEXT.TARGET_ARCHS := $(shell /usr/bin/arch)
 endif
+
+endif # MAKESECTION is rootdefines, defines, configure
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-# System-dependent help commands
-define SYSMODIFIERSHELP
-  echo "  TARGET_ARCHS=\"$(NEXT.ARCHS)\""
-  echo "      Target architectures to build.  Default if not specified is `/usr/bin/arch`."
-  echo "      Possible values are: $(NEXT.ARCHS)"
-endef
 SYSMODIFIERS=TARGET_ARCHS="$(NEXT.TARGET_ARCHS)"
-
-# Add required defines to volatile.h
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>$@
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>$@
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -180,28 +174,49 @@ OUTSUFX.yes=
 
 endif # ifeq ($(MAKESECTION),defines)
 
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
+
+# Since this makefile can be included mode than once,
+# don't allow adding help texts more than once
+ifndef ALREADY_INCLUDED
+
+ALREADY_INCLUDED = 1
+
+SYSHELP += \
+  $(NEWLINE)echo $"  make macosxs      Prepare for building under and for $(DESCRIPTION.macosxs)$" \
+  $(NEWLINE)echo $"  make openstep     Prepare for building under and for $(DESCRIPTION.openstep)$" \
+  $(NEWLINE)echo $"  make nextstep     Prepare for building under and for $(DESCRIPTION.nextstep)$"
+
+# System-dependent help commands
+SYSMODIFIERSHELP += \
+  $(NEWLINE)echo $"  TARGET_ARCHS="$(NEXT.ARCHS)" (NextStep, MacOS/X, OpenStep)$" \
+  $(NEWLINE)echo $"      Target architectures to build. If not specified defaults to current.$" \
+  $(NEWLINE)echo $"      Possible values are: $(NEXT.ARCHS)$"
+
+endif # ALREADY_INCLUDED
+
+endif # ifeq ($(MAKESECTION),confighelp)
+
 #---------------------------------------------------------------- configure ---#
-ifeq ($(MAKESECTION),configure)
+ifeq ($(ROOTCONFIG),config)
 
-# Note that TARGET_ARCHS is purposely not "exported" in order to provide the
-# user with a way to clear its value if desired.  For instance:
-# % gnumake openstep TARGETS_ARCHS="i386 m68k sparc"
-# At this point the makefiles will compile for i386, m68k, and sparc.
-# The user can clear the setting with:
-# % gnumake openstep
-# This way TARGETS_ARCHS will also be cleared automatically if the user
-# reconfigures for a different platform.  For instance:
-# % gnumake macosx
-# At this point TARGETS_ARCHS has been cleared, so the MacOS/X Server
-# compiler will not be asked to compile for architectures of which it knows
-# nothing (such as m68k and sparc).
+# Currently this port does not support dynamic libraries
+override USE_DLL = no
 
-.PHONY: configure
-configure:
-	@echo override USE_DLL = no>>config.mak
-	@echo override DO_ASM = $(DO_ASM)>>config.mak
-ifneq ($(strip $(TARGET_ARCHS)),)
-	@echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.mak
-endif
+define SYSCONFIG
+  @echo DO_ASM = $(DO_ASM)>>config.tmp
+  ifneq ($(strip $(TARGET_ARCHS)),)
+    @echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
+  endif
+endef
 
-endif # ifeq ($(MAKESECTION),configure)
+endif # ifeq ($(ROOTCONFIG),config)
+
+ifeq ($(ROOTCONFIG),volatile)
+
+# Add required defines to volatile.h
+MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp
+MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp
+
+endif # ifeq ($(ROOTCONFIG),volatile)

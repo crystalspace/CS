@@ -119,7 +119,6 @@ void csGraphics2DOpenGLFontServer::BuildFont(FontDef &newfont)
 	glEndList();
     }
 
-    printf("font %d, offset=%d\n",Font_Count,newfontoffset);
     Font_Offsets[Font_Count] = newfontoffset;
 
     // need to know there is another font stored here
@@ -169,5 +168,3 @@ void csGraphics2DOpenGLFontServer::WriteCharacter(char writeme, int fontnumber)
  
     glCallList(Font_Offsets[fontnumber] + writeme);
 }
-
-

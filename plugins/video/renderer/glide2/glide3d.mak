@@ -74,10 +74,11 @@ glide3dcleanlib:
 	$(RM) $(OBJ.GLIDE3D) $(GLIDE3D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)glide3d.dep
 $(OUTOS)glide3d.dep: $(SRC.GLIDE3D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)glide3d.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

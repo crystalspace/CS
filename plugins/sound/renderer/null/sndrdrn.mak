@@ -66,10 +66,11 @@ sndrdrncleanlib:
 	$(RM) $(OBJ.SNDRDRN) $(SNDRDRN)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)sndrdrn.dep
 $(OUTOS)sndrdrn.dep: $(SRC.SNDRDRN)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)sndrdrn.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

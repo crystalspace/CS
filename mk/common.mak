@@ -13,22 +13,6 @@ COMMA=,
 EMPTY=
 SPACE=$(EMPTY) $(EMPTY)
 
-# Friendly names for building environments
-DESCRIPTION.linux	= Linux
-DESCRIPTION.solaris	= Solaris
-DESCRIPTION.irix   	= IRIX
-DESCRIPTION.freebsd	= FreeBSD
-DESCRIPTION.beos	= BeOS
-DESCRIPTION.os2gcc	= OS/2 with GCC/EMX
-DESCRIPTION.os2wcc	= OS/2 with Watcom C
-DESCRIPTION.djgpp	= DOS with DJGPP
-DESCRIPTION.macosxs	= MacOS/X Server
-DESCRIPTION.openstep	= OpenStep 4.2
-DESCRIPTION.nextstep	= NextStep 3.3
-DESCRIPTION.amiga	= Amiga with GCC
-DESCRIPTION.win32vc	= Win32 with MSVC
-DESCRIPTION.unknown	= Unknown invalid target
-
 # The suffixes for $(OUT) directory when making PIC and non-PIC code
 # Can be changed from system-dependent makefile
 OUTSUFX. =
@@ -46,43 +30,53 @@ ifeq ($(DO_ASM),no)
   DO_MMX=no
 endif
 
+# This macro should update target only if it has changed
+define UPD
+  cmp -s $@ DEST || cp -f $@ DEST
+  rm -f $@
+endef
+
 # Macro used to build a subtarget
 define MAKE_TARGET
-	@echo $",------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
-	@echo $"$| Compiling $(DESCRIPTION.$@)$"
-	@echo $"$| Compiling for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
-	@echo $"`----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
-	@$(MAKE) --no-print-directory -f mk/cs.mak $@
+  @echo $",------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+  @echo $"$| Compiling $(DESCRIPTION.$@)$"
+  @echo $"$| Compiling for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
+  @echo $"`----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+  @$(MAKE) --no-print-directory -f mk/cs.mak $@
 endef
+
+ifeq ($(ROOTCONFIG),volatile)
 
 # This macro is used to rebuild "volatile.h"
 # You're free to add any commands you want to it in submakefiles
 define MAKE_VOLATILE_H
-	echo $"#define OS_$(OS)$">>$@
-	echo $"#define PROC_$(PROC)$">>$@
-	echo $"#define COMP_$(COMP)$">>$@
+  echo $"#define OS_$(OS)$">>volatile.tmp
+  echo $"#define PROC_$(PROC)$">>volatile.tmp
+  echo $"#define COMP_$(COMP)$">>volatile.tmp
 endef
 ifeq ($(USE_DLL),no)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define CS_STATIC_LINKED$">>$@
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define CS_STATIC_LINKED$">>volatile.tmp
 endif
 ifeq ($(BUGGY_EGCS_COMPILER),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define BUGGY_EGCS_COMPILER$">>$@
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define BUGGY_EGCS_COMPILER$">>volatile.tmp
 endif
 ifeq ($(MODE),debug)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DEBUG$">>$@
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DEBUG$">>volatile.tmp
 endif
 ifneq ($(NATIVE_COM),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define NO_COM_SUPPORT$">>$@
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define NO_COM_SUPPORT$">>volatile.tmp
 endif
 ifeq ($(DO_SOUND),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_SOUND$">>$@
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
 endif
 ifneq ($(DO_ASM),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define NO_ASSEMBLER$">>$@
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define NO_ASSEMBLER$">>volatile.tmp
 endif
 ifeq ($(USE_NASM),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_NASM$">>$@
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_NASM$">>volatile.tmp
 endif
 ifeq ($(DO_MMX),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_MMX$">>$@
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_MMX$">>volatile.tmp
 endif
+
+endif # ifeq ($(ROOTCONFIG),volatile)

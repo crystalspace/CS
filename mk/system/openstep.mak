@@ -26,6 +26,10 @@
 #	directive.
 #
 #-------------------------------------------------------------------------------
+
+# Friendly names for building environment
+DESCRIPTION.openstep = OpenStep 4.2
+
 NEXT.FLAVOR=OPENSTEP
 NEXT.DESCRIPTION=OpenStep
 NEXT.ARCHS=m68k i386 sparc

@@ -47,10 +47,11 @@ cswsclean:
 	-$(RM) $(CSWS.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)csws.dep
 $(OUTOS)csws.dep: $(SRC.CSWS)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)csws.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

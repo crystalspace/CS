@@ -52,10 +52,11 @@ blksclean:
 	-$(RM) $(BLOCKS.EXE)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)blocks.dep
 $(OUTOS)blocks.dep: $(SRC.BLOCKS)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)blocks.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

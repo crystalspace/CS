@@ -72,10 +72,11 @@ netdrvscleanlib:
 	$(RM) $(OBJ.NETDRVS) $(NETDRVS)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)netdrvs.dep
 $(OUTOS)netdrvs.dep: $(SRC.NETDRVS)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)netdrvs.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

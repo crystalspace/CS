@@ -5,12 +5,18 @@
 
 #---------------------------------------------------
 # NOTE: OS/2 makefiles for libjpeg, libpng and zlib
-# can be found in system/os2 subdirectory
+# can be found in libs/cssys/os2 subdirectory
 #---------------------------------------------------
 
+# Friendly names for building environment
+DESCRIPTION.os2gcc = OS/2 with GCC/EMX
+
 # Choose which drivers you want to build/use
-DRIVERS=cs2d/csdive cs3d/software csnetdrv/null csnetman/null csnetman/simple \
-  cssnddrv/null cssndrdr/null cssndrdr/software
+DRIVERS=\
+  csnetdrv/null csnetman/null csnetman/simple \
+  cssnddrv/null cssndrdr/null cssndrdr/software \
+  cs2d/csdive cs3d/software \
+# cs2d/openglos2 cs3d/opengl
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
@@ -30,11 +36,10 @@ OS=OS2
 # Compiler
 COMP=GCC
 
-# System-dependent help commands
-SYSMODIFIERSHELP = \
-  echo $"  USE_OMF=yes$|no    Use OMF object module format (yes) or a.out format (no)$"
-  echo $"  USE_CRTDLL=yes$|no Use EMX C runtime DLLs (default yes) or not$"
 SYSMODIFIERS=USE_OMF=$(USE_OMF) USE_CRTDLL=$(USE_CRTDLL)
+
+# The command to update target
+UPD=cmd /c bin\\os2upd.cmd $@ DEST
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -176,25 +181,51 @@ LFLAGS.CONSOLE.EXE=CONSOLE
 # We don't need separate directories for dynamic libraries
 OUTSUFX.yes=
 
+# Defineds for OpenGL 3D driver
+OPENGL.LIBS.DEFINED=1
+CFLAGS.GL3D+=-I/toolkit/h
+LIBS.LOCAL.GL3D+=-lopengl
+
 endif # ifeq ($(MAKESECTION),defines)
 
-#---------------------------------------------------------------- configure ---#
-ifeq ($(MAKESECTION),configure)
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
 
-export SHELL
+ifneq ($(findstring cmd,$(SHELL)),)
+"=
+|=³
+endif
+
+SYSHELP += \
+  $(NEWLINE)echo $"  make os2gcc       Prepare for building under and for $(DESCRIPTION.os2gcc)$"
+
+# System-dependent help commands
+#  
+SYSMODIFIERSHELP += \
+  $(NEWLINE)echo $"  USE_OMF=yes$|no (OS/2)$" \
+  $(NEWLINE)echo $"      Use OMF object module format (yes) vs a.out format (no)$" \
+  $(NEWLINE)echo $"  USE_CRTDLL=yes$|no (OS/2)$" \
+  $(NEWLINE)echo $"      Use EMX C runtime DLLs (yes: default) or don`t (no)$"
+
+endif # ifeq ($(MAKESECTION),confighelp)
+
+#---------------------------------------------------------------- configure ---#
+ifeq ($(ROOTCONFIG),config)
 
 # Default value for USE_OMF
-ifeq ($(USE_OMF),)
-USE_OMF = yes
+ifndef USE_OMF
+  USE_OMF = yes
 endif
+
 # Default value for USE_CRTDLL
-ifeq ($(USE_CRTDLL),)
-USE_CRTDLL = yes
+ifndef USE_CRTDLL
+  USE_CRTDLL = yes
 endif
 
-configure:
-	@echo export USE_OMF = $(USE_OMF)>>config.mak
-	@echo export USE_CRTDLL = $(USE_CRTDLL)>>config.mak
-	@cmd /c bin\\os2conf.cmd>>config.mak
+define SYSCONFIG
+  @echo USE_OMF = $(USE_OMF)>>config.tmp
+  @echo USE_CRTDLL = $(USE_CRTDLL)>>config.tmp
+  @cmd /c bin\\os2conf.cmd SHELL $(SHELL)>>config.tmp
+endef
 
-endif # ifeq ($(MAKESECTION),configure)
+endif # ifeq ($(ROOTCONFIG),config)

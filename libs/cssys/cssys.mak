@@ -71,10 +71,11 @@ cssysclean:
 	-$(RM) $(CSSYS.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)cssys.dep
 $(OUTOS)cssys.dep: $(SRC.CSSYS)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)cssys.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

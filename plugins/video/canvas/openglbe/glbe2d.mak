@@ -79,10 +79,11 @@ glbecleanlib:
 	$(RM) $(OBJ.GLBE2D) $(GLBE2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)glbe2d.dep
 $(OUTOS)glbe2d.dep: $(SRC.GLBE2D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)glbe2d.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

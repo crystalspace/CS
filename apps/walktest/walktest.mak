@@ -52,10 +52,11 @@ walkclean:
 	-$(RM) $(WALKTEST.EXE)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)walktest.dep
 $(OUTOS)walktest.dep: $(SRC.WALKTEST)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)walktest.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

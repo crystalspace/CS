@@ -83,10 +83,11 @@ csutilclean:
 	-$(RM) $(CSUTIL.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)csutil.dep
 $(OUTOS)csutil.dep: $(SRC.CSUTIL)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)csutil.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -1,6 +1,9 @@
 # This is an include file for all the makefiles which describes system specific
 # settings. Also have a look at mk/user.mak.
 
+# Friendly names for building environment
+DESCRIPTION.freebsd = FreeBSD
+
 # Choose which drivers you want to build/use
 DRIVERS=cs2d/softx cs3d/software csnetdrv/null csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null cssndrdr/software csnetdrv/sockets cssnddrv/oss
@@ -140,10 +143,17 @@ DO_SHM=yes
 
 endif # ifeq ($(MAKESECTION),defines)
 
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
+
+SYSHELP += \
+  $(NEWLINE)echo $"  make freebsd      Prepare for building under and for $(DESCRIPTION.freebsd)$"
+
+endif # ifeq ($(MAKESECTION),confighelp)
+
 #---------------------------------------------------------------- configure --
-ifeq ($(MAKESECTION),configure)
+ifeq ($(ROOTCONFIG),config)
 
-configure:
-	bin/unixconf.sh freebsd >>config.mak
+SYSCONFIG=bin/unixconf.sh freebsd >>config.tmp
 
-endif # ifeq ($(MAKESECTION),configure)
+endif # ifeq ($(ROOTCONFIG),config)

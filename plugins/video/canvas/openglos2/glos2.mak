@@ -86,10 +86,11 @@ gl2dcleanlib:
 	$(RM) $(OBJ.GLOS2) $(GLOS2)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)glos2.dep
 $(OUTOS)glos2.dep: $(SRC.GLOS2)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)glos2.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

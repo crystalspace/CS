@@ -67,10 +67,11 @@ ddrawcleanlib:
 	$(RM) $(OBJ.DDRAW) $(DDRAW)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)ddraw.dep
 $(OUTOS)ddraw.dep: $(SRC.DDRAW)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)ddraw.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -27,6 +27,9 @@
 // The 2D graphics driver used by software renderer on this platform
 #define SOFTWARE_2D_DRIVER "crystalspace.graphics2d.dive"
 
+// The 2D graphics driver used by OpenGL renderer
+#define OPENGL_2D_DRIVER "crystalspace.graphics2d.glos2"
+
 #if defined (SYSDEF_PATH) || defined (SYSDEF_DIR)
 #  include <sys/types.h>
 #  if defined (__EMX__)

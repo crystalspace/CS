@@ -15,6 +15,10 @@
 #	Build-time configuration options for the NextStep platform.
 #
 #-------------------------------------------------------------------------------
+
+# Friendly names for building environment
+DESCRIPTION.nextstep = NextStep 3.3
+
 NEXT.FLAVOR=NEXTSTEP
 NEXT.DESCRIPTION=NextStep
 NEXT.ARCHS=m68k i386 sparc hppa

@@ -71,10 +71,11 @@ svgalib2dcleanlib:
 	$(RM) $(OBJ.SVGA2D) $(SVGA2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)svgalib2d.dep
 $(OUTOS)svgalib2d.dep: $(SRC.SVGA2D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)svgalib2d.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -1,6 +1,9 @@
 # This is an include file for all the makefiles which describes system specific
 # settings. Also have a look at mk/user.mak.
 
+# Friendly names for building environment
+DESCRIPTION.beos = BeOS
+
 # Choose which drivers you want to build/use
 DRIVERS=cs3d/software cs2d/be2d csnetdrv/null csnetman/null \
   cssnddrv/null cssndrdr/null
@@ -128,10 +131,10 @@ OUTSUFX.yes=
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#---------------------------------------------------------------- configure --
-ifeq ($(MAKESECTION),configure)
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
 
-configure:
+SYSHELP += \
+  $(NEWLINE)echo $"  make beos         Prepare for building under and for $(DESCRIPTION.beos)$"
 
-endif # ifeq ($(MAKESECTION),configure)
-
+endif # ifeq ($(MAKESECTION),confighelp)

@@ -67,10 +67,11 @@ becleanlib:
 	$(RM) $(OBJ.BE2D) $(BE2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)be2d.dep
 $(OUTOS)be2d.dep: $(SRC.BE2D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUT)be2d.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

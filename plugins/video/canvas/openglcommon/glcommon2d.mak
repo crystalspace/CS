@@ -46,11 +46,11 @@ glcommon2dclean:
 	$(RM) $(GLX2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)glcommon2d.dep
 $(OUTOS)glcommon2d.dep: $(SRC.GLCOMMON2D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)glcommon2d.dep
-
+endif
 
 endif

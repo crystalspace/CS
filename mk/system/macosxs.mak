@@ -26,6 +26,10 @@
 #	directive.
 #
 #-------------------------------------------------------------------------------
+
+# Friendly names for building environment
+DESCRIPTION.macosxs = MacOS/X Server
+
 NEXT.FLAVOR=MACOSXS
 NEXT.DESCRIPTION=MacOS/X Server
 NEXT.ARCHS=i386 ppc

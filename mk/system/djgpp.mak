@@ -2,6 +2,9 @@
 #                       This is the makefile for DOS/DJGPP
 ################################################################################
 
+# Friendly names for building environment
+DESCRIPTION.djgpp = DOS with DJGPP
+
 DRIVERS=cs2d/dosraw cs3d/software csnetdrv/null csnetman/null \
   cssnddrv/null cssndrdr/null
 
@@ -18,6 +21,9 @@ OS=DOS
 
 # Compiler
 COMP=GCC
+
+# The command to update target
+UPD=bin/dosupd.bat $(subst /,\,$@ DEST)
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -124,11 +130,20 @@ SYS_SED_DEPEND=
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#---------------------------------------------------------------- configure --
-ifeq ($(MAKESECTION),configure)
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
 
-configure:
-	@bin/dosconf.bat
-	@echo override USE_DLL = no>>config.mak
+SYSHELP += \
+  $(NEWLINE)echo $"  make djgpp        Prepare for building under and for $(DESCRIPTION.djgpp)$"
 
-endif # ifeq ($(MAKESECTION),configure)
+endif # ifeq ($(MAKESECTION),confighelp)
+
+#---------------------------------------------------------------- configure ---#
+ifeq ($(ROOTCONFIG),config)
+
+# Always override USE_DLL for DOS to "no"
+override USE_DLL = no
+
+SYSCONFIG=bin/dosconf.bat
+
+endif # ifeq ($(ROOTCONFIG),config)

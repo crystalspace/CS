@@ -1,6 +1,9 @@
 # This is an include file for all the makefiles which describes system specific
 # settings. Also have a look at mk/user.mak.
 
+# Friendly names for building environment
+DESCRIPTION.irix = IRIX
+
 # Choose which drivers you want to build/use
 DRIVERS=cs2d/softx cs3d/software csnetdrv/null csnetdrv/sockets \
   csnetman/null csnetman/simple cssnddrv/null \
@@ -136,12 +139,20 @@ DO_SHM=yes
 
 endif # ifeq ($(MAKESECTION),defines)
 
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
+
+SYSHELP += \
+  $(NEWLINE)echo $"  make irix         Prepare for building under and for $(DESCRIPTION.irix)$"
+
+endif # ifeq ($(MAKESECTION),confighelp)
+
 #---------------------------------------------------------------- configure ---#
-ifeq ($(MAKESECTION),configure)
+ifeq ($(ROOTCONFIG),config)
 
-configure:
-	bin/unixconf.sh irix >>config.mak
+define SYSCONFIG
+  bin/unixconf.sh irix >>config.tmp
+  echo "Don't forget to set USE_MESA=0 in user.mak"
+endef
 
-endif # ifeq ($(MAKESECTION),configure)
-
-echo "Don't forget to set USE_MESA=0 in user.mak"
+endif # ifeq ($(ROOTCONFIG),config)

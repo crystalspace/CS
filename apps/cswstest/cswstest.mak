@@ -52,10 +52,11 @@ wstestclean:
 	-$(RM) $(CSWSTEST.EXE)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)cswstest.dep
 $(OUTOS)cswstest.dep: $(SRC.CSWSTEST)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)cswstest.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

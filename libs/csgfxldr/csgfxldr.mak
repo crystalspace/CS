@@ -11,22 +11,6 @@ ifeq ($(MAKESECTION),rootdefines)
 # Library-specific help commands
 LIBHELP += $(NEWLINE)echo $"  make csgfxldr     Make the $(DESCRIPTION.csgfxldr)$"
 
-ifeq ($(DO_GIF),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_GIF$">>$@
-endif
-ifeq ($(DO_BMP),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_BMP$">>$@
-endif
-ifeq ($(DO_TGA),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_TGA$">>$@
-endif
-ifeq ($(DO_PNG),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_PNG$">>$@
-endif
-ifeq ($(DO_JPG),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_JPG$">>$@
-endif
-
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
@@ -87,10 +71,32 @@ csgfxldrclean:
 	-$(RM) $(CSGFXLDR.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)csgfxldr.dep
 $(OUTOS)csgfxldr.dep: $(SRC.CSGFXLDR)
 	$(DO.DEP)
+else
+-include $(OUTOS)csgfxldr.dep
 endif
 
--include $(OUTOS)csgfxldr.dep
-
 endif # ifeq ($(MAKESECTION),targets)
+
+#------------------------------------------------------------------- config ---#
+ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
+
+ifeq ($(DO_GIF),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_GIF$">>volatile.tmp
+endif
+ifeq ($(DO_BMP),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_BMP$">>volatile.tmp
+endif
+ifeq ($(DO_TGA),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_TGA$">>volatile.tmp
+endif
+ifeq ($(DO_PNG),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_PNG$">>volatile.tmp
+endif
+ifeq ($(DO_JPG),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_JPG$">>volatile.tmp
+endif
+
+endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)

@@ -47,10 +47,11 @@ csparserclean:
 	-$(RM) $(CSPARSER.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)csparser.dep
 $(OUTOS)csparser.dep: $(SRC.CSPARSER)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)csparser.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

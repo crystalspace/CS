@@ -2,6 +2,21 @@
 # global to all Crystal Space programs and libraries. Edit to suit your taste.
 # Also have a look at system-dependent makefile for system settings.
 
+# Should we build drivers/plugins as loadable modules?
+ifndef USE_DLL
+  USE_DLL=yes
+endif
+
+# Default build mode
+ifndef MODE
+  MODE=optimize
+endif
+
+# Should we use NASM for assembly?
+ifndef USE_NASM
+  USE_NASM=no
+endif
+
 # If 'yes' include assembly optimizations in Crystal Space. On systems
 # that don't support this, setting this option to 'yes' does nothing.
 DO_ASM=yes

@@ -47,10 +47,11 @@ csscriptclean:
 	-$(RM) $(CSSCRIPT.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)csscript.dep
 $(OUTOS)csscript.dep: $(SRC.CSSCRIPT)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)csscript.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

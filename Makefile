@@ -4,79 +4,73 @@
 #
 ################################################################################
 
-.PHONY: help all doc api depend clean cleanlib cleandep distclean libs \
-	drivers drivers2d drivers3d snddrivers netdrivers \
-	linux solaris irix beos os2gcc os2wcc djgpp freebsd macosxs openstep \
-	nextstep amiga win32vc
-
-# The default values for configuration variables
-TARGET=unknown
-SYSMAKEFILE=mk/system/unknown.mak
-USE_DLL=yes
-MODE=optimize
-USE_NASM=no
+.PHONY: help all doc api depend configure clean cleanlib cleandep distclean \
+  libs drivers drivers2d drivers3d snddrivers netdrivers
 
 # The following two symbols are intended to be used in "echo" commands
-# System-dependent makefiles can override them
+# config.mak can override them depending on configured system requirements
 "='
 |=|
 -include config.mak
 
-# The initial driver and application targets help text
-DRVHELP = echo $"The following Crystal Space drivers can be built:$"
-APPHELP = echo $"The following Crystal Space applications can be built:$"
-LIBHELP = echo $"The following Crystal Space libraries can be built:$"
-
-MAKESECTION=rootdefines
 include mk/user.mak
 include mk/common.mak
+
+# Find all available system targets
+SYSTARGETS=$(patsubst mk/system/%.mak,%,$(wildcard mk/system/*.mak))
+
+# The initial driver and application targets help text
+DRVHELP = \
+  echo $"The following Crystal Space drivers can be built:$"
+APPHELP = \
+  echo $"The following Crystal Space applications can be built:$"
+LIBHELP = \
+  echo $"The following Crystal Space libraries can be built:$"
+SYSHELP = \
+  echo $"Before anything else, you should configure the makefile system:$"
+SYSMODIFIERSHELP = \
+            echo $"  -*- Modifiers -*-$" \
+  $(NEWLINE)echo $"  USE_DLL=yes$|no$" \
+  $(NEWLINE)echo $"      Build drivers/plugins as dynamic/static modules$" \
+  $(NEWLINE)echo $"  MODE=optimize$|debug$|profile$" \
+  $(NEWLINE)echo $"      Select one of three available compilation modes$"
+
+# If there is no target defined (makefile system were not configured),
+# look which targets are available in mk/system directory.
+ifeq ($(TARGET),)
+
+MAKESECTION=confighelp
+-include $(wildcard mk/system/*.mak)
+
+else
+
+MAKESECTION=rootdefines
 include mk/subs.mak
 
+endif
+
 help:
-	@echo $"+------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
 	@echo $"  Before compiling Crystal Space examine mk/user.mak and see if settings$"
 	@echo $"  are suited for your system. Note that you need at least one renderer and$"
 	@echo $"  at least one 2D driver in order to be able to run the engine.$"
-	@echo $"+----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
-ifeq ($(PROC),invalid)
-	@echo $"Before anything else, you should configure the makefile system as follows:$"
-	@echo $"  make linux        Prepare for building under and for $(DESCRIPTION.linux)$"
-	@echo $"  make solaris      Prepare for building under and for $(DESCRIPTION.solaris)$"
-	@echo $"  make irix         Prepare for building under and for $(DESCRIPTION.irix)$"
-	@echo $"  make freebsd      Prepare for building under and for $(DESCRIPTION.freebsd)$"
-	@echo $"  make beos         Prepare for building under and for $(DESCRIPTION.beos)$"
-	@echo $"  make os2gcc       Prepare for building under and for $(DESCRIPTION.os2gcc)$"
-	@echo $"  make os2wcc       Prepare for building under and for $(DESCRIPTION.os2wcc)$"
-	@echo $"  make djgpp        Prepare for building under and for $(DESCRIPTION.djgpp)$"
-	@echo $"  make macosxs      Prepare for building under and for $(DESCRIPTION.macosxs)$"
-	@echo $"  make openstep     Prepare for building under and for $(DESCRIPTION.openstep)$"
-	@echo $"  make nextstep     Prepare for building under and for $(DESCRIPTION.nextstep)$"
-	@echo $"  make amiga        Prepare for building under and for $(DESCRIPTION.amiga)$"
-	@echo $"  make win32vc      Prepare for building under and for $(DESCRIPTION.win32vc)$"
-	@echo $"  -*- Modifiers -*-$"
+	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+ifeq ($(TARGET),)
+	@$(SYSHELP)
+	@$(SYSMODIFIERSHELP)
+	@echo $"  Example: make linux USE_DLL=yes MODE=debug$"
 else
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
 	@echo $"  USE_DLL=$(USE_DLL) MODE=$(MODE) $(SYSMODIFIERS)$"
-	@echo $"$"
-	@echo $"  Other platforms are: linux, solaris, irix, freebsd, beos, os2gcc, os2wcc,$"
-	@echo $"  macosxs, openstep, nextstep, amiga, djgpp or win32vc.$"
-	@echo $"$"
-	@echo $"  -*- Modifiers -*-$"
 endif
-	@echo $"  USE_DLL=yes$|no    Build dynamic/static modules (drivers, plugins)$"
-	@echo $"  MODE=optimize$|debug$|profile  Select how to compile everything.$"
-ifdef SYSMODIFIERSHELP
-	@$(SYSMODIFIERSHELP)
-endif
-	@echo $"  Example: make linux USE_DLL=yes MODE=debug$"
-	@echo $"+------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
-ifneq ($(PROC),invalid)
+	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+ifneq ($(TARGET),)
 	@$(DRVHELP)
-	@echo $"+------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
 	@$(LIBHELP)
-	@echo $"+------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
 	@$(APPHELP)
-	@echo $"+------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
 	@echo $"  make apps         Make all applications$"
 	@echo $"  make libs         Make all static libraries$"
 	@echo $"  make drivers      Make all drivers$"
@@ -91,7 +85,7 @@ ifneq ($(PROC),invalid)
 	@echo $"  make cleanlib     Clean all dynamic libraries$"
 	@echo $"  make cleandep     Clean all dependency rule files$"
 	@echo $"  make distclean    Clean everything$"
-	@echo $"+----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
 
 depend:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@ DO_DEPEND=yes
@@ -105,32 +99,43 @@ endif
 # WARNING: Try to avoid quotes in most important "echo" statements
 # since several systems (OS/2, DOS and WIN32) have a "echo" that does
 # literal output, i.e. they do not strip quotes from string.
-linux solaris irix beos os2gcc os2wcc djgpp freebsd macosxs openstep nextstep \
-amiga win32vc unknown:
-	@echo TARGET = $@>config.mak
-	@echo SYSMAKEFILE = mk/system/$@.mak>>config.mak
-	@echo MODE = $(MODE)>>config.mak
-	@echo USE_DLL = $(USE_DLL)>>config.mak
-	@echo "+------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------"
-	@echo "| System-dependent configuration pass."
-	@echo "+----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------"
-	@$(MAKE) --no-print-directory -f mk/system/$@.mak MAKESECTION=configure
-	@$(MAKE) --no-print-directory include/volatile.h
-	@echo "+------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------"
-	@echo "| Makefiles are now configured for $(DESCRIPTION.$@)."
-	@echo "+----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------"
+$(SYSTARGETS):
+	@echo TARGET = $@>config.tmp
+	@$(MAKE) --no-print-directory ROOTCONFIG=config configure TARGET=$@
 
-include/volatile.h: config.mak $(SYSMAKEFILE) $(LIBRARY_SUBMAKEFILES) \
-	$(DRIVER_SUBMAKEFILES) $(APPLICATION_SUBMAKEFILES)
-	@echo $",------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
-	@echo $"| Rebuilding $@$"
-	@echo $"`----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
-	@echo $"/* This file is automatically generated, do not change manually! */$">$@
-	@echo $"#ifndef __VOLATILE_H__$">>$@
-	@echo $"#define __VOLATILE_H__$">>$@
+ifeq ($(ROOTCONFIG),config)
+
+# Force config.tmp to be always rebuilt
+.PHONY: config.tmp
+
+configure: config.tmp
+	@$(MAKE) --no-print-directory ROOTCONFIG=volatile configure
+	@echo $"------=======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=======------$"
+	@echo $"  Makefiles are now configured for $(DESCRIPTION.$(TARGET)).$"
+	@echo $"----------==============xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx==============----------$"
+
+config.tmp:
+	@echo MODE = $(MODE)>>config.tmp
+	@echo USE_DLL = $(USE_DLL)>>config.tmp
+ifdef SYSCONFIG
+	@$(SYSCONFIG)
+endif
+	$(subst DEST,config.mak,$(UPD))
+
+endif
+ifeq ($(ROOTCONFIG),volatile)
+
+configure: volatile.tmp
+
+volatile.tmp: config.mak
+	@echo $"/* This file is automatically generated, do not change manually! */$">volatile.tmp
+	@echo $"#ifndef __VOLATILE_H__$">>volatile.tmp
+	@echo $"#define __VOLATILE_H__$">>volatile.tmp
 	@$(MAKE_VOLATILE_H)
-	@echo $"#endif // __VOLATILE_H__$">>$@
-	@echo $"rebuilt: $@$"
+	@echo $"#endif // __VOLATILE_H__$">>volatile.tmp
+	$(subst DEST,include/volatile.h,$(UPD))
+
+endif
 
 MAKESECTION=roottargets
 include mk/subs.mak

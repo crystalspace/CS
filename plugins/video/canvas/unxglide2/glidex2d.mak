@@ -10,10 +10,6 @@ ifeq ($(MAKESECTION),rootdefines)
 # Driver-specific help commands
 DRVHELP += $(NEWLINE)echo $"  make glidex2d        Make the $(DESCRIPTION.glidex2d)$"
 
-ifeq ($(DO_SHM)$(findstring DO_SHM,$(MAKE_VOLATILE_H)),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_SHM$">>$@
-endif
-
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
@@ -75,10 +71,25 @@ glidexcleanlib:
 	$(RM) $(OBJ.GLIDEX2D) $(GLIDEX2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)glidex2d.dep
 $(OUTOS)glidex2d.dep: $(SRC.GLIDEX2D)
 	$(DO.DEP)
+else
+-include $(OUTOS)glidex2d.dep
 endif
 
--include $(OUTOS)glidex2d.dep
-
 endif # ifeq ($(MAKESECTION),targets)
+
+#------------------------------------------------------------------- config ---#
+ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
+
+# Default value for DO_SHM
+ifndef DO_SHM
+  DO_SHM = yes
+endif
+
+ifeq ($(DO_SHM)$(findstring DO_SHM,$(MAKE_VOLATILE_H)),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_SHM$">>volatile.tmp
+endif
+
+endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)

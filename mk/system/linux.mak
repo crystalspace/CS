@@ -1,6 +1,9 @@
 # This is an include file for all the makefiles which describes system specific
 # settings. Also have a look at mk/user.mak.
 
+# Friendly names for building environment
+DESCRIPTION.linux = Linux
+
 # Choose which drivers you want to build/use
 DRIVERS=cs2d/softx cs3d/software csnetdrv/null csnetdrv/sockets \
   csnetman/null csnetman/simple cssnddrv/null cssnddrv/oss \
@@ -154,10 +157,17 @@ DO_SHM=yes
 
 endif # ifeq ($(MAKESECTION),defines)
 
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
+
+SYSHELP += \
+  $(NEWLINE)echo $"  make linux        Prepare for building under and for $(DESCRIPTION.linux)$"
+
+endif # ifeq ($(MAKESECTION),confighelp)
+
 #---------------------------------------------------------------- configure ---#
-ifeq ($(MAKESECTION),configure)
+ifeq ($(ROOTCONFIG),config)
 
-configure:
-	bin/unixconf.sh linux >>config.mak
+SYSCONFIG=bin/unixconf.sh linux >>config.tmp
 
-endif # ifeq ($(MAKESECTION),configure)
+endif # ifeq ($(ROOTCONFIG),config)

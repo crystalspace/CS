@@ -24,7 +24,7 @@ all.
 	The makefile system was designed to be very modular. This means that
 there are separate submakefiles for each unit that have to be built. Besides,
 there is a system-dependent submakefile (referenced through the variable
-$(SYSMAKEFILE)), user settings submakefile (mk/user.mak), common definitions
+$(TARGET)), user settings submakefile (mk/user.mak), common definitions
 submakefile (mk/common.mak) and several other minor submakefiles. The "root"
 makefile (which is located in the root of Crystal Space source tree) cares
 about including all other submakefiles as required.
@@ -38,7 +38,6 @@ a sample of configuration submakefile for Linux:
 
 	# Automatically generated file, do not edit!
 	TARGET = linux
-	SYSMAKEFILE = mk/system/linux.mak
 	MODE = debug
 	USE_DLL = no
 	PROC = INTEL
@@ -76,9 +75,9 @@ including all submakefiles: system-dependent and submakefiles for all
 drivers and applications; in our case we care only about system submakefile;
 effectively "include mk/subs.mak" turns into:
 
--include $(SYSMAKEFILE)
+-include mk/system/$(TARGET).mak
 
-	In $(SYSMAKEFILE) we check the MAKESECTION variable, and execute
+	In $(TARGET) we check the MAKESECTION variable, and execute
 appropiate makefile statements. In our case:
 
 ifeq ($(MAKESECTION),rootdefines)

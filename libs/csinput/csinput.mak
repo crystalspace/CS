@@ -47,10 +47,11 @@ csinputclean:
 	-$(RM) $(CSINPUT.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)csinput.dep
 $(OUTOS)csinput.dep: $(SRC.CSINPUT)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)csinput.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

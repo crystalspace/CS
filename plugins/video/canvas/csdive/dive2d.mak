@@ -28,7 +28,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Resource file for DIVE library
-RES=$(OUTOS)libDIVE.res
+DIVE2D.RES=$(OUTOS)libDIVE.res
 
 # Additional library which contains functions undefined in os2.a
 CSOS2.LIB=$(OUT)$(LIB_PREFIX)csos2$(LIB)
@@ -36,10 +36,10 @@ CSOS2.LIB=$(OUT)$(LIB_PREFIX)csos2$(LIB)
 # The 2D OS/2 DIVE driver
 ifeq ($(USE_DLL),yes)
   CSDIVE=csdive$(DLL)
-  DEP.CSDIVE=$(RES) $(CSOS2.LIB) $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.CSDIVE=$(DIVE2D.RES) $(CSOS2.LIB) $(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   CSDIVE=$(OUT)$(LIB_PREFIX)csdive$(LIB)
-  DEP.EXE+=$(RES) $(CSDIVE) $(CSOS2.LIB)
+  DEP.EXE+=$(DIVE2D.RES) $(CSDIVE) $(CSOS2.LIB)
   CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_DIVE2D
 endif
 DESCRIPTION.$(CSDIVE)=$(DESCRIPTION.csdive)
@@ -67,7 +67,7 @@ $(CSDIVE): $(OBJ.CSDIVE) $(DEP.CSDIVE)
 $(CSOS2.LIB): libs/cs2d/csdive/csdive.imp
 	emximp -o $@ $<
 
-$(RES): libs/cs2d/csdive/libDIVE.rc
+$(DIVE2D.RES): libs/cs2d/csdive/libDIVE.rc
 	$(RC) $(RCFLAGS) $< $@
 
 dive2dclean:
@@ -77,10 +77,11 @@ dive2dcleanlib:
 	$(RM) $(OBJ.CSDIVE) $(CSDIVE)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)csdive.dep
 $(OUTOS)csdive.dep: $(SRC.CSDIVE)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)csdive.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -59,10 +59,11 @@ raw2dcleanlib:
 	$(RM) $(OBJ.RAW2D) $(RAW2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)raw2d.dep
 $(OUTOS)raw2d.dep: $(SRC.RAW2D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)raw2d.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -75,10 +75,11 @@ ggicleanlib:
 	$(RM) $(OBJ.GGI2D) $(GGI2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)ggi2d.dep
 $(OUTOS)ggi2d.dep: $(SRC.GGI2D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)ggi2d.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

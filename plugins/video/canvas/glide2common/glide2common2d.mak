@@ -46,11 +46,11 @@ glide2common2dclean:
 	$(RM) $(GLIDEBE2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)glide2common2d.dep
 $(OUTOS)glide2common2d.dep: $(SRC.GLIDE2COMMON2D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)glide2common2d.dep
-
+endif
 
 endif

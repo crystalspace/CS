@@ -66,10 +66,11 @@ netdrvncleanlib:
 	$(RM) $(OBJ.NETDRVN) $(NETDRVN)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)netdrvn.dep
 $(OUTOS)netdrvn.dep: $(SRC.NETDRVN)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)netdrvn.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

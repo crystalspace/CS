@@ -80,10 +80,11 @@ softcleanlib:
 	$(RM) $(OBJ.SOFT3D) $(SOFT3D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)soft3d.dep
 $(OUTOS)soft3d.dep: $(SRC.SOFT3D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)soft3d.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

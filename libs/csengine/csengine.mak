@@ -49,10 +49,11 @@ csengineclean:
 	-$(RM) $(CSENGINE.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)csengine.dep
 $(OUTOS)csengine.dep: $(SRC.CSENGINE)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)csengine.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

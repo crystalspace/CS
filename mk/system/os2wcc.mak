@@ -8,6 +8,9 @@
 # can be found in system/os2 subdirectory
 #---------------------------------------------------
 
+# Friendly names for building environment
+DESCRIPTION.os2wcc = OS/2 with Watcom C
+
 # Choose which drivers you want to build/use
 DRIVERS=cs2d/csdive cs3d/software csnetdrv/null csnetman/null csnetman/simple \
   cssnddrv/null cssndrdr/null cssndrdr/software
@@ -40,6 +43,9 @@ COMP=WCC
 
 ################################################################## temporary ###
 DO_ASM=no
+
+# The command to update target
+UPD=cmd /c bin\\os2upd.cmd $@ DEST
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -207,12 +213,17 @@ DO.DEP = gcc -MM $(filter-out $(CFLAGS.GENERAL) $(CFLAGS.optimize) $(CFLAGS.debu
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
+
+SYSHELP += \
+  $(NEWLINE)echo $"  make os2wcc       Prepare for building under and for $(DESCRIPTION.os2wcc)$"
+
+endif # ifeq ($(MAKESECTION),confighelp)
+
 #---------------------------------------------------------------- configure ---#
-ifeq ($(MAKESECTION),configure)
+ifeq ($(ROOTCONFIG),config)
 
-export SHELL
+SYSCONFIG=cmd /c bin\\os2conf.cmd SHELL $(SHELL)>>config.tmp
 
-configure:
-	@cmd /c bin\\os2conf.cmd>>config.mak
-
-endif # ifeq ($(MAKESECTION),configure)
+endif # ifeq ($(ROOTCONFIG),config)

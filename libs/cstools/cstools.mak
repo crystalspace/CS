@@ -47,10 +47,11 @@ cstoolsclean:
 	-$(RM) $(CSTOOLS.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)cstools.dep
 $(OUTOS)cstools.dep: $(SRC.CSTOOLS)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)cstools.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

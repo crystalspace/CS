@@ -27,30 +27,33 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# WARNING: Non-Unix OpenGL renderer do not need the X11 libs;
-# TO BE FIXED: For now just comment out the following lines
+# Non-Unix OpenGL renderer do not need the X11 libs
+ifndef OPENGL.LIBS.DEFINED
+
 CFLAGS.GL3D+=-I$(X11_PATH)/include
-LIBS._GL3D+=-L$(X11_PATH)/lib -lXext -lX11
+LIBS.LOCAL.GL3D+=-L$(X11_PATH)/lib -lXext -lX11
 
 ifeq ($(USE_MESA),1)
   ifdef MESA_PATH
     CFLAGS.GL3D+=-I$(MESA_PATH)/include
-    LIBS._GL3D+=-L$(MESA_PATH)/lib
+    LIBS.LOCAL.GL3D+=-L$(MESA_PATH)/lib
   endif
-  LIBS._GL3D+=-lMesaGL -lMesaGLU
+  LIBS.LOCAL.GL3D+=-lMesaGL -lMesaGLU
 else
-  LIBS._GL3D+=-lGL
+  LIBS.LOCAL.GL3D+=-lGL
 endif
+
+endif # OPENGL.LIBS.DEFINED
 
 # The 3D OpenGL driver
 ifeq ($(USE_DLL),yes)
   GL3D=$(OUTDLL)glrender$(DLL)
-  LIBS.GL3D=$(LIBS._GL3D)
+  LIBS.GL3D=$(LIBS.LOCAL.GL3D)
   DEP.GL3D=$(CSCOM.LIB) $(CSGEOM.LIB) $(CSGFXLDR.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
 else
   GL3D=$(OUT)$(LIB_PREFIX)glrender$(LIB)
   DEP.EXE+=$(GL3D)
-  LIBS.EXE+=$(LIBS._GL3D)
+  LIBS.EXE+=$(LIBS.LOCAL.GL3D)
   CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_OPENGL3D
 endif
 DESCRIPTION.$(GL3D) = $(DESCRIPTION.glrender)
@@ -85,10 +88,11 @@ glcleanlib:
 	$(RM) $(OBJ.GL3D) $(GLX2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)glrender.dep
 $(OUTOS)glrender.dep: $(SRC.GL3D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)glrender.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

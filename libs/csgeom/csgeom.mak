@@ -47,10 +47,11 @@ csgeomclean:
 	-$(RM) $(CSGEOM.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)csgeom.dep
 $(OUTOS)csgeom.dep: $(SRC.CSGEOM)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)csgeom.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -119,6 +119,8 @@ LIBS.EXE := $(sort $(LIBS.EXE))
 
 all: $(OUTDIRS)
 
+depend: $(OUTBASE) $(OUTOS)
+
 distclean: clean
 	-$(RM) config.mak include/volatile.h
 
@@ -126,6 +128,7 @@ clean:
 	-$(RMDIR) $(subst /,,$(OUTBASE))
 	-$(RM) debug.txt
 	-$(RM) precalc.zip
+	-$(RM) config.mak
 
 cleanlib:
 
@@ -165,8 +168,3 @@ $(OUTDIRS):
 # The following include should define system-dependent targets
 MAKESECTION=targets
 include mk/subs.mak
-
-ifdef DO_DEPEND
--include not_exists.mak
-not_exists.mak: $(OUTBASE) $(OUTOS)
-endif

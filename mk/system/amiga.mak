@@ -2,6 +2,7 @@
 # settings. Also have a look at mk/user.mak.
 
 # Amiga port, using GCC
+DESCRIPTION.amiga = Amiga with GCC
 
 # Choose which drivers you want to build/use
 DRIVERS=cs3d/software cs2d/x2d csnetdrv/null csnetdrv/sockets \
@@ -153,12 +154,18 @@ DO_SHM=yes
 
 endif # ifeq ($(MAKESECTION),defines)
 
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
+
+SYSHELP += \
+  $(NEWLINE)echo $"  make amiga        Prepare for building under and for $(DESCRIPTION.amiga)$"
+
+endif # ifeq ($(MAKESECTION),confighelp)
+
 #---------------------------------------------------------------- configure ---#
-ifeq ($(MAKESECTION),configure)
+ifeq ($(ROOTCONFIG),config)
 
-# In the future, this will be used to generate a config.mak file.
+# Currently this port does not support dynamic libraries
+override USE_DLL = no
 
-configure:
-	@echo override USE_DLL = no>>config.mak
-
-endif # ifeq ($(MAKESECTION),configure)
+endif # ifeq ($(ROOTCONFIG),config)

@@ -1,7 +1,9 @@
 # This submakefile dynamically compute the name for all
 # driver, libs and apps submakefiles and includes them.
 
--include $(SYSMAKEFILE)
+ifneq ($(TARGET),)
+  include mk/system/$(TARGET).mak
+endif
 
 ifeq ($(LIBRARY_SUBMAKEFILES),)
   LIBRARY_SUBMAKEFILES=$(wildcard libs/*/*.mak)

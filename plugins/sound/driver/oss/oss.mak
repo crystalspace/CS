@@ -65,10 +65,11 @@ osscleanlib:
 	$(RM) $(OBJ.SNDOSS) $(SNDOSS)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)oss.dep
 $(OUTOS)oss.dep: $(SRC.SNDOSS)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)oss.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

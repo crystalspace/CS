@@ -7,19 +7,6 @@ ifeq ($(MAKESECTION),rootdefines)
 # Library-specific help commands
 LIBHELP += $(NEWLINE)echo $"  make cssndldr     Make the $(DESCRIPTION.cssndldr)$"
 
-ifeq ($(DO_AIFF),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_AIFF$">>$@
-endif
-ifeq ($(DO_IFF),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_IFF$">>$@
-endif
-ifeq ($(DO_WAV),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_WAV$">>$@
-endif
-ifeq ($(DO_AU),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_AU$">>$@
-endif
-
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
@@ -75,10 +62,29 @@ cssndldrclean:
 	-$(RM) $(CSSNDLDR.LIB)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)cssndldr.dep
 $(OUTOS)cssndldr.dep: $(SRC.CSSNDLDR)
 	$(DO.DEP)
+else
+-include $(OUTOS)cssndldr.dep
 endif
 
--include $(OUTOS)cssndldr.dep
-
 endif # ifeq ($(MAKESECTION),targets)
+
+#------------------------------------------------------------------- config ---#
+ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
+
+ifeq ($(DO_AIFF),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_AIFF$">>volatile.tmp
+endif
+ifeq ($(DO_IFF),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_IFF$">>volatile.tmp
+endif
+ifeq ($(DO_WAV),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_WAV$">>volatile.tmp
+endif
+ifeq ($(DO_AU),yes)
+  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_AU$">>volatile.tmp
+endif
+
+endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)

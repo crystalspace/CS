@@ -1,5 +1,8 @@
 # The system submakefile for building on Win32 using MSVC
 
+# Friendly names for building environment
+DESCRIPTION.win32vc = Win32 with MSVC
+
 # Choose which drivers you want to build/use
 # cs2d/ddraw6 cs2d/openglwin cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
 #
@@ -194,10 +197,17 @@ DO.DEP = gcc -MM $(filter-out $(CFLAGS.GENERAL) $(CFLAGS.optimize) $(CFLAGS.debu
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
+
+SYSHELP += \
+  $(NEWLINE)echo $"  make win32vc      Prepare for building under and for $(DESCRIPTION.win32vc)$"
+
+endif # ifeq ($(MAKESECTION),confighelp)
+
 #---------------------------------------------------------------- configure ---#
-ifeq ($(MAKESECTION),configure)
+ifeq ($(ROOTCONFIG),config)
 
-configure:
-	@bin\win32conf.bat
+SYSCONFIG=bin\win32conf.bat
 
-endif # ifeq ($(MAKESECTION),configure)
+endif # ifeq ($(ROOTCONFIG),config)

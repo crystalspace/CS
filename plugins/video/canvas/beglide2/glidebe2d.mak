@@ -80,10 +80,11 @@ glidebecleanlib:
 	$(RM) $(OBJ.GLIDEBE2D) $(GLIDEBE2D)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)glidebe2d.dep
 $(OUTOS)glidebe2d.dep: $(SRC.GLIDEBE2D)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)glidebe2d.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)

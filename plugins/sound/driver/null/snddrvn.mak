@@ -66,10 +66,11 @@ snddrvncleanlib:
 	$(RM) $(OBJ.SNDDRVN) $(SNDDRVN)
 
 ifdef DO_DEPEND
+depend: $(OUTOS)snddrvn.dep
 $(OUTOS)snddrvn.dep: $(SRC.SNDDRVN)
 	$(DO.DEP)
-endif
-
+else
 -include $(OUTOS)snddrvn.dep
+endif
 
 endif # ifeq ($(MAKESECTION),targets)
