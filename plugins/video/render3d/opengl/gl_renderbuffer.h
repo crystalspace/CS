@@ -363,6 +363,8 @@ protected:
     else vertexBuffer.TouchSlot (slot);
   }
 
+  struct csGLVBOBuffer;
+  friend struct csGLVBOBuffer; // Borland/VC6: For access to VBO_NUMBER_OF_SLOTS.
   struct csGLVBOBuffer
   {
     ~csGLVBOBuffer();
@@ -465,7 +467,6 @@ protected:
     // List of slots
     slotList slots[VBO_NUMBER_OF_SLOTS];
   };
-  friend struct csGLVBOBuffer; // Borland: For access to VBO_NUMBER_OF_SLOTS.
 
   csGLVBOBuffer vertexBuffer; // List of all VBO buffers for VB storage.
   csGLVBOBuffer indexBuffer;  // List of all VBO buffers for IB storage.

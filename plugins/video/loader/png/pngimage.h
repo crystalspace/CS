@@ -96,6 +96,7 @@ private:
     /// Try to read the PNG file from the buffer and return success status
     virtual bool LoadData ();
   };
+  friend class PngLoader;
 
   /// Initialize the image object
   ImagePngFile (iObjectRegistry* object_reg, int iFormat) 

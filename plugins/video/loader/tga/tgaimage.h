@@ -109,6 +109,7 @@ private:
     bool InitOk();
     virtual bool LoadData ();
   };
+  friend class TgaLoader;
 
   /// Initialize the image object
   ImageTgaFile (iObjectRegistry* object_reg, int iFormat) 
