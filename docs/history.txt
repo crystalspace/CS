@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+31-Aug-2000
+	- Found a bad bug in the loader (related to the recent changes
+	  with things) which caused things to be added twice to the sector
+	  list. This caused crashes when loading levels which had things
+	  with portals, caused things to be lit too much, and also caused
+	  things to be drawn too much.
 30-Aug-2000
      	- Andrew Zabolotny:
 	    - Some fixes to MazeD. Now it works, but is unusabled due to

@@ -3959,10 +3959,10 @@ csSector* csLoader::load_room (char* secname, char* buf)
         }
         break;
       case TOKEN_SKY:
-        sector->skies.Push (load_thing (name, params, sector, true));
+        load_thing (name, params, sector, true);
         break;
       case TOKEN_THING:
-        sector->things.Push (load_thing (name, params, sector, false));
+        load_thing (name, params, sector, false);
         break;
       case TOKEN_PORTAL:
         {
@@ -4334,10 +4334,10 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 	partsys->GetMovable ().UpdateMove ();
         break;
       case TOKEN_SKY:
-        sector->skies.Push (load_thing (name, params, sector, true));
+        load_thing (name, params, sector, true);
         break;
       case TOKEN_THING:
-        sector->things.Push (load_thing (name, params, sector, false));
+        load_thing (name, params, sector, false);
         break;
       case TOKEN_SPRITE:
         {

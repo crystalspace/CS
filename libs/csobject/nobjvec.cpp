@@ -23,12 +23,13 @@
 
 csObject *csNamedObjVector::FindByName (const char* name)
 {
-  for (int i = Length () - 1; i >= 0; i--)
+  csObject* o;
+  int i;
+  for (i = Length () - 1; i >= 0; i--)
   {
-    csObject *o = (csObject *)Get (i);
-    if (name == o->GetName ()
-     || (name && o->GetName ()
-      && !strcmp (o->GetName (), name)))
+    o = (csObject *)Get (i);
+    const char* oname = o->GetName ();
+    if (name == oname || (name && oname && !strcmp (oname, name)))
       return o;
   }
   return NULL;
