@@ -95,7 +95,7 @@ If anything doesn't work, see the Win32 @sc{faq}, @ref{Win32 FAQ}.
 
 @enumerate
 @item
-Load @file{mk/visualc/csall.dsw}.
+Load @file{CS\mk\visualc\csall.dsw}.
 
 @item
 Make @samp{grpAll} your active project.
@@ -104,7 +104,7 @@ Make @samp{grpAll} your active project.
 Select menu @emph{Build/Rebuild All}.
 
 @item
-After a while the compilation should finish without warnings or errors.
+After a while the compilation should finish without errors.
 @end enumerate
 
 @node Win32 Rundemo, Win32 Workspace, Win32 Compile, Win32
