@@ -3,6 +3,10 @@
 #	(until jampeople accept my patches :-/ )
 #============================================================================
 
+LOCATE.OBJECTS ?= $(BUILDTOP)/out/$(OSFULL[1]:L) ;
+LOCATE.TARGETS ?= $(BUILDTOP) ;
+LOCATE.DOCS ?= $(BUILDTOP)/out ;
+
 # Fix our current subdirectory
 if $(LOCATE.OBJECTS)
 {
