@@ -224,11 +224,11 @@ window "Another"
 
   component "Users" is "List Box"
   {
-    Frame: (100, 210) - (300, 300)
+    Frame: (100, 210) - (385, 300)
     Style: lbfsSunken
     Columns: 3
     DefaultSortCOl: 0
-    Column0Width: 50
+    Column0Width: 90
     Column0Caption: "Class"
     Column1Width: 70
     Column1Caption: "Status"
