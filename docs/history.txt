@@ -14,38 +14,40 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 2-Sep-1999
-	- Octree visibility culling works. Preliminary results on a 50000
+	- Octree visibility culling works.  Preliminary results on a 50000
 	  polygon level are encouraging.
+	- Eric Sunshine fixed some compilation warnings in the octree code.
 1-Sep-1999
-	- Made first provisions for culling of octree nodes. Added a function
+	- Made first provisions for culling of octree nodes.  Added a function
 	  to get the outline of an octree node and also added a cull function
 	  which is a user function that is called during tree traversal (also
 	  for bsp trees).
 31-Aug-1999
-	- Further work on octree. Added specific versions for ClassifyX()
-	  to csPolygon3D.
-	- Dumping statistics for csPolygonTree subclasses (csOctree and csBspTree).
-	- Further experimentation with -huge option. I got very good results but
-	  did an interesting observation. Movement is VEEEERRRRYYY slow. The reason
-	  is that movement of the camera does not use the CD system to check if we
-	  have to go to another sector (through a portal). This means that it has
-	  to check all polygons in the sector!
+	- Further work on octree.  Added specific versions for ClassifyX() to
+	  csPolygon3D.
+	- Dumping statistics for csPolygonTree subclasses (csOctree and
+	  csBspTree).
+	- Further experimentation with -huge option.  I got very good results
+	  but did an interesting observation.  Movement is VEEEERRRRYYY slow.
+	  The reason is that movement of the camera does not use the CD system
+	  to check if we have to go to another sector (through a portal).
+	  This means that it has to check all polygons in the sector!
 30-Aug-1999
-	- Changed csPolygonInt::Classify() to use a plane instead
-	  of another csPolygonInt. Also removed csPolygonInt::SamePlane()
-	  because it is not needed.
+	- Changed csPolygonInt::Classify() to use a plane instead of another
+	  csPolygonInt.  Also removed csPolygonInt::SamePlane() because it is
+	  not needed.
 	- Made csPlane::GetNormal() which is a const version of
 	  csPlane::Normal().
 	- csSector::UseStaticBSP() renamed to csSector::UseStaticTree().
-	- Created new apimod.txt document which will list all changes
-	  to the API between 0.14 and 0.16 when that is released.
-	  Please everyone try to keep this document up-to-date!
+	- Created new apimod.txt document which will list all changes to the
+	  API between 0.14 and 0.16 when that is released.  Please everyone
+	  try to keep this document up-to-date!
 	- Added csPolygonSet::GetBoundingBox(min_bbox, max_bbox).
-	- Modified hugeroom to use the octree. Everything seems to work
-	  but I haven't done any heavy testing yet. Node that this does
-	  not mean yet that we have octree visibility culling. It is now
-	  possible to use an octree instead of a bsp tree for organizing
-	  the polygons in the tree.
+	- Modified hugeroom to use the octree.  Everything seems to work but I
+	  haven't done any heavy testing yet.  Node that this does not mean
+	  yet that we have octree visibility culling.  It is now possible to
+	  use an octree instead of a bsp tree for organizing the polygons in
+	  the tree.
 	- Added csPortal::GetWarp().
 	- Eric Sunshine fixed a compilation problem in the BeOS port and also
 	  removed more unused code.

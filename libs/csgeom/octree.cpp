@@ -21,6 +21,58 @@
 #include "csgeom/octree.h"
 #include "csgeom/bsp.h"
 
+// We have a coordinate system around our node which is
+// divided into 27 regions. The center region at coordinate (1,1,1)
+// is the node itself. Every one of the 26 remaining regions
+// defines an number of vertices which are the convex outline
+// as seen from a camera view point in that region.
+// The numbers inside the outlines table are indices from 0 to
+// 7 which describe the 8 vertices outlining the node:
+//	0: left/down/front vertex
+//	1: left/down/back
+//	2: left/up/front
+//	3: left/up/back
+//	4: right/down/front
+//	5: right/down/back
+//	6: right/up/front
+//	7: right/up/back
+struct Outline
+{
+  int num;
+  int vertices[6];
+};
+/// Outline lookup table.
+static const Outline outlines[27] =
+{
+  { 6, { 3, 2, 6, 4, 5, 1 } },		// 0,0,0
+  { 6, { 3, 2, 0, 4, 5, 1 } },		// 0,0,1
+  { 6, { 7, 3, 2, 0, 4, 5 } },		// 0,0,2
+  { 6, { 3, 2, 6, 4, 0, 1 } },		// 0,1,0
+  { 4, { 3, 2, 0, 1, -1, -1 } },	// 0,1,1
+  { 6, { 7, 3, 2, 0, 1, 5 } },		// 0,1,2
+  { 6, { 3, 7, 6, 4, 0, 1 } },		// 0,2,0
+  { 6, { 3, 7, 6, 2, 0, 1 } },		// 0,2,1
+  { 6, { 7, 6, 2, 0, 1, 5 } },		// 0,2,2
+  { 6, { 2, 6, 4, 5, 1, 0 } },		// 1,0,0
+  { 4, { 0, 4, 5, 1, -1, -1 } },	// 1,0,1
+  { 6, { 3, 1, 0, 4, 5, 7 } },		// 1,0,2
+  { 4, { 2, 6, 4, 0, -1, -1 } },	// 1,1,0
+  { 0, { -1, -1, -1, -1, -1, -1 } },	// 1,1,1
+  { 4, { 7, 3, 1, 5, -1, -1 } },	// 1,1,2
+  { 6, { 3, 7, 5, 4, 0, 2 } },		// 1,2,0
+  { 4, { 3, 7, 6, 2, -1, -1 } },	// 1,2,1
+  { 6, { 2, 3, 1, 5, 7, 6 } },		// 1,2,2
+  { 6, { 2, 6, 7, 5, 1, 0 } },		// 2,0,0
+  { 6, { 6, 7, 5, 1, 0, 4 } },		// 2,0,1
+  { 6, { 6, 7, 3, 1, 0, 4 } },		// 2,0,2
+  { 6, { 2, 6, 7, 5, 4, 0 } },		// 2,1,0
+  { 4, { 6, 7, 5, 4, -1, -1 } },	// 2,1,1
+  { 6, { 6, 7, 3, 1, 5, 4 } },		// 2,1,2
+  { 6, { 2, 3, 7, 5, 4, 0 } },		// 2,2,0
+  { 6, { 2, 3, 7, 5, 4, 6 } },		// 2,2,1
+  { 6, { 6, 2, 3, 1, 5, 4 } }		// 2,2,2
+};
+
 //---------------------------------------------------------------------------
 
 csOctreeNode::csOctreeNode ()

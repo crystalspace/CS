@@ -361,7 +361,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     // not visible. If some vertices are behind z plane then we
     // assume the node is visible in order to avoid having to
     // clip the polygon.
-    int num_z_0;
+    int num_z_0 = 0;
     for (i = 0 ; i < num_array ; i++)
     {
       cam = rview->Other2This (array[i]);
