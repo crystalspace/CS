@@ -50,6 +50,9 @@ chronological order.
 	  this when appropriate.
 	- Jorrit optimized Frustvis a bit by doing a manual custom traversal of
 	  the tree instead of calling Front2Back().
+	- Eric Sunshine augmented the CompileGroups rule in groups.jam so that
+	  it complains if handed a compile group which was not registered via
+	  RegisterCompileGroups.
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by

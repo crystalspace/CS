@@ -2,6 +2,8 @@
 # Rules for building compile groups
 #============================================================================
 
+COMPILE_GROUPS = ;
+
 ##  CompileGroups target : groups
 ##    Adds a target to a list of compile groups. A compile group is a virtual
 ##    target which combines several targets. This is useful for things like a
@@ -14,10 +16,13 @@ rule CompileGroups
   {
     Depends $(_i) : $(<) ;
     Depends $(_i)clean : $(<)clean ;
-  }
 
-  # Just in case client forgot to invoke RegisterCompileGroups.
-  NotFile $(>) ;
+    if ! [ IsElem $(_i) : $(COMPILE_GROUPS) ]
+    {
+      NotFile $(_i) ;
+      Echo "Warning: $(_i) not registered via RegisterCompileGroups" ;
+    }
+  }
 }
 
 ##  RegisterCompileGroups
@@ -26,5 +31,5 @@ rule CompileGroups
 rule RegisterCompileGroups
 {
   NotFile $(<) ;
+  COMPILE_GROUPS += $(<) ;
 }
-

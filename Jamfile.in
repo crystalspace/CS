@@ -6,7 +6,7 @@ SubDir TOP ;
 # Define our compile groups
 RegisterCompileGroups sounddrivers soundloaders imageloaders netdrivers
 		      drivers2d drivers3d meshes walkall openglcanvas 
-		      softcanvas ;
+		      softcanvas proctexes nrall ;
 Help sounddrivers : "sound drivers compilegroup" ;
 Help soundloaders : "sound loaders compilegroup" ;
 Help imageloaders : "image loaders compilegroup" ;
