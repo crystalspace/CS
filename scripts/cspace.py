@@ -137,8 +137,8 @@ class csPolygon3DPtr(csObjectPtr):
     def __init__(self,this):
         self.this = this
         self.thisown = 0
-    def AddVertex(self,arg0,arg1,arg2):
-        val = cspacec.csPolygon3D_AddVertex(self.this,arg0,arg1,arg2)
+    def AddVertex(self,arg0):
+        val = cspacec.csPolygon3D_AddVertex(self.this,arg0.this)
         return val
     def SetTextureSpace(self,arg0,arg1,arg2):
         val = cspacec.csPolygon3D_SetTextureSpace(self.this,arg0.this,arg1.this,arg2)
@@ -160,6 +160,9 @@ class csPolygonSetPtr(csObjectPtr):
     def __init__(self,this):
         self.this = this
         self.thisown = 0
+    def AddVertex(self,arg0):
+        val = cspacec.csPolygonSet_AddVertex(self.this,arg0.this)
+        return val
     def NewPolygon(self,arg0):
         val = cspacec.csPolygonSet_NewPolygon(self.this,arg0.this)
         val = csPolygon3DPtr(val)
@@ -173,10 +176,30 @@ class csPolygonSet(csPolygonSetPtr):
 
 
 
+class csThingPtr(csPolygonSetPtr):
+    def __init__(self,this):
+        self.this = this
+        self.thisown = 0
+    def __del__(self):
+        if self.thisown == 1 :
+            cspacec.delete_csThing(self.this)
+    def __repr__(self):
+        return "<C csThing instance>"
+class csThing(csThingPtr):
+    def __init__(self) :
+        self.this = cspacec.new_csThing()
+        self.thisown = 1
+
+
+
+
 class csSectorPtr(csPolygonSetPtr):
     def __init__(self,this):
         self.this = this
         self.thisown = 0
+    def AddThing(self,arg0):
+        val = cspacec.csSector_AddThing(self.this,arg0.this)
+        return val
     def __repr__(self):
         return "<C csSector instance>"
 class csSector(csSectorPtr):
@@ -194,15 +217,6 @@ class csWorldPtr :
         val = cspacec.csWorld_NewSector(self.this)
         val = csSectorPtr(val)
         return val
-    def __setattr__(self,name,value):
-        if name == "view" :
-            cspacec.csWorld_view_set(self.this,value.this)
-            return
-        self.__dict__[name] = value
-    def __getattr__(self,name):
-        if name == "view" : 
-            return csViewPtr(cspacec.csWorld_view_get(self.this))
-        raise AttributeError,name
     def __repr__(self):
         return "<C csWorld instance>"
 class csWorld(csWorldPtr):
@@ -292,9 +306,6 @@ class csViewPtr(csBasePtr):
     def __init__(self,this):
         self.this = this
         self.thisown = 0
-    def __del__(self):
-        if self.thisown == 1 :
-            cspacec.delete_csView(self.this)
     def SetSector(self,arg0):
         val = cspacec.csView_SetSector(self.this,arg0.this)
         return val
@@ -308,9 +319,8 @@ class csViewPtr(csBasePtr):
     def __repr__(self):
         return "<C csView instance>"
 class csView(csViewPtr):
-    def __init__(self,arg0,arg1) :
-        self.this = cspacec.new_csView(arg0.this,arg1.this)
-        self.thisown = 1
+    def __init__(self,this):
+        self.this = this
 
 
 

@@ -29,9 +29,6 @@
 #include "iworld.h"
 #include "iconfig.h"
 
-//TODO cspython hack
-#include "csengine/csview.h"
-
 class csSector;
 class csTextureList;
 class csSprite3D;
@@ -547,9 +544,6 @@ public:
     CHK (it = new csLightIt (this));
     return it;
   }
-
-//TODO cspython hack
-  csView* view;
 
   CSOBJTYPE;
   DECLARE_IBASE;

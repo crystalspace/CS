@@ -31,6 +31,7 @@
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "iscript.h"
+#include "csengine/dumper.h"
 
 //------------------------------ We need the VFS plugin and the 3D engine -----
 
@@ -103,14 +104,30 @@ bool PySimple::Initialize (int argc, char *argv[], const char *iConfigName)
 
   if(!is->RunText("import unrmap"))
     return 0;
-    
+
+//TODO Python HACK
+	csSector *room=world->NewSector();
+
 	is->Store("csTextureHandle *", "unrmap.tmptr", tm);
-	is->Store("csSector *", "unrmap.roomptr", world->NewSector());
+	is->Store("csSector *", "unrmap.roomptr", room);
+	is->Store("csView *", "unrmap.viewptr", view);
 
   if(!is->RunText("unrmap.Load('data/entry')"))
     return 0;
-    
+
+//	is->DecRef();
+
+	room->CompressVertices();
+
+  csStatLight* light;
+  light = new csStatLight (0, 0, 0, 10, 1, 0, 0, false);
+  room->AddLight(light);
+  light = new csStatLight (127, 127, 127, 100, 0, 0, 1, false);
+  room->AddLight (light);
+	
   world->Prepare ();
+
+	Dumper::dump(world);
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
@@ -120,9 +137,9 @@ bool PySimple::Initialize (int argc, char *argv[], const char *iConfigName)
   // easier.
   view = new csView (world, G3D);
   view->SetSector((csSector*)world->sectors[0]);
-  view->GetCamera ()->SetPosition (csVector3 (0, 5, 0));
+  view->GetCamera()->SetPosition (csVector3 (0, 0, 0));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
-  
+
   txtmgr->AllocPalette ();
   return true;
 }
