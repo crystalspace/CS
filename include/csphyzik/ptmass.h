@@ -1,0 +1,99 @@
+/*
+    Dynamics/Kinematics modeling and simulation library.
+    Copyright (C) 1999 by Michael Alexander Ewert and Noah Gibbs
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+*/
+
+#ifndef ctPtMass_H
+#define ctPtMass_H
+
+#include "csphyzik/point.h"
+#include "csphyzik/entity.h"
+
+// This is an Aristotelean (i.e. F=mv) point.
+class ctDampedPointMass : public ctPointObj, public ctEntity {
+ protected:
+  int       mass;
+  ctVector3 x;
+
+  // Temp vars for dealing with derivatives & solver
+  ctVector3 v;
+ public:
+  void set_mass(int newmass) { mass = newmass; }
+  int  mass(void) { return mass; }
+
+  // ctPointObj methods
+  ctVector3 pos() { return x; }
+  ctVector3 vel() { return v; }
+  void apply_force(ctVector3 force) { v += force / mass; }
+
+  // ctEntity methods
+  void init_state { v = ctVector3(0,0,0); }
+  int get_state_size() { return 3; }
+  int set_state(real *sa) {
+    sa[0] = x[0]; sa[1] = x[1]; sa[2] = x[2];
+    return get_state_size();
+  }
+  int get_state(real *sa) {
+    x[0] = sa[0]; x[1] = sa[1]; x[2] = sa[2];
+    return get_state_size();
+  }
+  int set_delta_state(real *sa) {
+    sa[0] = v[0]; sa[1] = v[1]; sa[2] = v[2];
+    return get_state_size();
+  }
+}
+
+// This is a Newtonian (i.e. F=ma) point.
+class ctPointMass : public ctPointObj, public ctEntity {
+ protected:
+  int       mass;
+  ctVector3 x;
+  ctVector3 v;
+
+  // Temp vars for dealing with derivatives & solver
+  ctVector3 F;
+ public:
+  void set_mass(int newmass) { mass = newmass; }
+  int mass(void) { return mass; }
+
+  // ctPointObj methods
+  ctVector3 pos() { return x; }
+  ctVector3 vel() { return v; }
+  void apply_force(ctVector3 force) { F += force / mass; }
+
+  // ctEntity methods
+  void init_state() { F = ctVector3(0,0,0); }
+  int  get_state_size() { return 6; }
+  int  set_state(real *sa) {
+    sa[0] = x[0]; sa[1] = x[1]; sa[2] = x[2];
+    sa[3] = x[3]; sa[4] = x[4]; sa[5] = x[5];
+    return get_state_size();
+  }
+  int  get_state(real *sa) {
+    x[0] = sa[0]; x[1] = sa[1]; x[2] = sa[2];
+    x[3] = sa[3]; x[4] = sa[4]; x[5] = sa[5];
+    return get_state_size();
+  }
+  int set_delta_state(real *sa) {
+    sa[0] = v[0]; sa[1] = v[1]; sa[2] = v[2];
+    sa[0] = F[0]; sa[1] = F[1]; sa[2] = F[2];
+    return get_state_size();
+  }
+};
+
+#endif // ctPtMass_H
