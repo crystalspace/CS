@@ -19,9 +19,9 @@
 */
 
 #include "sysdef.h"
-#include "csscrbar.h"
-#include "csmouse.h"
-#include "csapp.h"
+#include "csws/csscrbar.h"
+#include "csws/csmouse.h"
+#include "csws/csapp.h"
 #include "csengine/texture.h"
 
 // Minimal scroll button size

@@ -22,9 +22,9 @@
 
 #define SYSDEF_CASE
 #include "sysdef.h"
-#include "cscomp.h"
-#include "csmenu.h"
-#include "csapp.h"
+#include "csws/cscomp.h"
+#include "csws/csmenu.h"
+#include "csws/csapp.h"
 #include "csinput/csinput.h"
 #include "csengine/texture.h"
 

@@ -25,10 +25,10 @@
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
 #include "igraph2d.h"
-#include "cscomp.h"
-#include "csmouse.h"
-#include "csapp.h"
-#include "cswsutil.h"
+#include "csws/cscomp.h"
+#include "csws/csmouse.h"
+#include "csws/csapp.h"
+#include "csws/cswsutil.h"
 
 // The csComponent class itself
 csComponent::csComponent (csComponent *iParent) : state (CSS_VISIBLE),

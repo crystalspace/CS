@@ -23,8 +23,8 @@
 #include "csutil/scanstr.h"
 #include "csinput/csevent.h"
 #include "csengine/texture.h"
-#include "csmouse.h"
-#include "csapp.h"
+#include "csws/csmouse.h"
+#include "csws/csapp.h"
 
 #define MOUSE_CFG "sys/mouse.cfg"
 

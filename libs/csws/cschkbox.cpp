@@ -20,10 +20,10 @@
 
 #include <string.h>
 #include "sysdef.h"
-#include "cschkbox.h"
-#include "csstatic.h"
-#include "csapp.h"
-#include "cswsutil.h"
+#include "csws/cschkbox.h"
+#include "csws/csstatic.h"
+#include "csws/csapp.h"
+#include "csws/cswsutil.h"
 #include "csengine/texture.h"
 
 csCheckBox::csCheckBox (csComponent *iParent, int iButtonID, int iButtonStyle)

@@ -19,8 +19,8 @@
 */
 
 #include "sysdef.h"
-#include "cstimer.h"
-#include "csapp.h"
+#include "csws/cstimer.h"
+#include "csws/csapp.h"
 
 csTimer::csTimer (csComponent *iParent, unsigned long iPeriod)
   : csComponent (iParent)

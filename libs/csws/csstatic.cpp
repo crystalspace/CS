@@ -20,8 +20,8 @@
 
 #define SYSDEF_CASE
 #include "sysdef.h"
-#include "csstatic.h"
-#include "csapp.h"
+#include "csws/csstatic.h"
+#include "csws/csapp.h"
 
 csStatic::csStatic (csComponent *iParent, csComponent *iLink, char *iText,
   csStaticStyle iStyle) : csComponent (iParent)

@@ -19,12 +19,12 @@
 */
 
 #include "sysdef.h"
-#include "cswindow.h"
-#include "csttlbar.h"
-#include "csmenu.h"
-#include "csapp.h"
-#include "csdialog.h"
-#include "cswsutil.h"
+#include "csws/cswindow.h"
+#include "csws/csttlbar.h"
+#include "csws/csmenu.h"
+#include "csws/csapp.h"
+#include "csws/csdialog.h"
+#include "csws/cswsutil.h"
 #include "csengine/texture.h"
 
 #define ADD_SYSMENU_ENTRIES(menu) \

@@ -20,9 +20,9 @@
 
 #include <stdio.h>
 #include "sysdef.h"
-#include "cscomp.h"
-#include "cskeyacc.h"
-#include "csapp.h"
+#include "csws/cscomp.h"
+#include "csws/cskeyacc.h"
+#include "csws/csapp.h"
 
 struct csAccElement
 {

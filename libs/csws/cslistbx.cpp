@@ -19,11 +19,11 @@
 */
 
 #include "sysdef.h"
-#include "cslistbx.h"
-#include "cstimer.h"
-#include "csscrbar.h"
-#include "csmouse.h"
-#include "csapp.h"
+#include "csws/cslistbx.h"
+#include "csws/cstimer.h"
+#include "csws/csscrbar.h"
+#include "csws/csmouse.h"
+#include "csws/csapp.h"
 #include "csinput/csinput.h"
 
 // Amount of space at left and at right of each listbox item

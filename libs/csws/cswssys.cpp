@@ -19,7 +19,7 @@
 */
 
 #include "sysdef.h"
-#include "cswssys.h"
+#include "csws/cswssys.h"
 #include "itxtmgr.h"
 
 /*

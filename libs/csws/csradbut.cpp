@@ -20,10 +20,10 @@
 
 #include <string.h>
 #include "sysdef.h"
-#include "csradbut.h"
-#include "csstatic.h"
-#include "csapp.h"
-#include "cswsutil.h"
+#include "csws/csradbut.h"
+#include "csws/csstatic.h"
+#include "csws/csapp.h"
+#include "csws/cswsutil.h"
 #include "csengine/texture.h"
 
 csRadioButton::csRadioButton (csComponent *iParent, int iButtonID, int iButtonStyle)

@@ -19,8 +19,8 @@
 */
 
 #include "sysdef.h"
-#include "cswspal.h"
-#include "cscomp.h"
+#include "csws/cswspal.h"
+#include "csws/cscomp.h"
 
 // Application class default palette
 static int palette_csApp[] =

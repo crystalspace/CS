@@ -22,7 +22,7 @@
 #include <assert.h>
 #include "sysdef.h"
 #include "qint.h"
-#include "csgfxppl.h"
+#include "csws/csgfxppl.h"
 #include "igraph2d.h"
 #include "igraph3d.h"
 

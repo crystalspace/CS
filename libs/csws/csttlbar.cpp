@@ -20,8 +20,8 @@
 
 #include <string.h>
 #include "sysdef.h"
-#include "cscomp.h"
-#include "csttlbar.h"
+#include "csws/cscomp.h"
+#include "csws/csttlbar.h"
 #include "csinput/csevent.h"
 
 csTitleBar::csTitleBar (csComponent *iParent, char *iText)

@@ -20,9 +20,9 @@
 
 #define SYSDEF_ALLOCA
 #include "sysdef.h"
-#include "csiline.h"
-#include "cstimer.h"
-#include "csapp.h"
+#include "csws/csiline.h"
+#include "csws/cstimer.h"
+#include "csws/csapp.h"
 #include "csinput/csinput.h"
 
 // Cursor flashing period in milliseconds

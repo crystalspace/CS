@@ -21,8 +21,8 @@
 #include "sysdef.h"
 #include "csinput/csevent.h"
 #include "csinput/csinput.h"
-#include "cswindow.h"
-#include "csdialog.h"
+#include "csws/cswindow.h"
+#include "csws/csdialog.h"
 
 csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
   : csComponent (iParent)

@@ -21,9 +21,9 @@
 #ifndef __CSWSSYS_H__
 #define __CSWSSYS_H__
 
-#include "libs/cssys/common/sysdriv.h"
-#include "libs/cssys/common/system.h"
-#include "csapp.h"
+#include "cssys/common/sysdriv.h"
+#include "cssys/common/system.h"
+#include "csws/csapp.h"
 
 // A special variation of SysSystemDriver for csApp
 class appSystemDriver : public SysSystemDriver

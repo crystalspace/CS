@@ -22,9 +22,9 @@
 
 #define SYSDEF_CASE
 #include "sysdef.h"
-#include "cscomp.h"
-#include "csapp.h"
-#include "csbutton.h"
+#include "csws/cscomp.h"
+#include "csws/csapp.h"
+#include "csws/csbutton.h"
 
 csButton::csButton (csComponent *iParent, int iCommandCode,
   int iButtonStyle, csButtonFrameStyle iFrameStyle) : csComponent (iParent),

@@ -19,10 +19,10 @@
 */
 
 #include "sysdef.h"
-#include "csspinbx.h"
-#include "cstimer.h"
-#include "csapp.h"
-#include "cswsutil.h"
+#include "csws/csspinbx.h"
+#include "csws/cstimer.h"
+#include "csws/csapp.h"
+#include "csws/cswsutil.h"
 #include "csinput/csinput.h"
 #include "csengine/texture.h"
 
