@@ -228,7 +228,7 @@ struct iReporter : public iBase
 class csReporterHelper
 {
 public:
-  static void CS_GNUC_PRINTF (5, 0)
+  static void CS_GNUC_PRINTF (4, 0)
       ReportV(iObjectRegistry* reg, int severity, char const* msgId,
       char const* description, va_list args)
   {
@@ -245,7 +245,7 @@ public:
     }
   }
 
-  static void CS_GNUC_PRINTF (5, 6)
+  static void CS_GNUC_PRINTF (4, 5)
       Report(iObjectRegistry* reg, int severity, char const* msgId,
       char const* description, ...)
   {
