@@ -320,7 +320,7 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
   if (db)
   {
     csMemFile mf ((const char*)(db->GetData ()), db->GetSize ());
-    char magic[CachedLightingMagicSize - 1];
+    char magic[CachedLightingMagicSize];
     if (mf.Read (magic, CachedLightingMagicSize - 1) != 4) goto stop;
     magic[CachedLightingMagicSize - 1] = 0;
     if (strcmp (magic, CachedLightingMagic) == 0)

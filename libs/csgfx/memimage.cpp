@@ -66,6 +66,9 @@ csImageMemory::~csImageMemory ()
   {
     Image = 0;
     Palette = 0;
+  } else {
+    delete [] Image;
+    delete [] Palette;
   }
   SCF_DESTRUCT_IBASE ();
 }

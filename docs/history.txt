@@ -18,6 +18,13 @@ chronological order.
 	  plugins to pacify Borland compiler which reports an unsatisfied
 	  references to operator-(csVector2,csVector2).  Reported by Randall
 	  Foreman <eidpers@comcast.net>.
+	- Marten Svanfeldt made the following fixes:
+	  - Added a default constructor and initializer for csPolyTextureMapping.
+	  - Fixed a leak in csImageMemory.
+	  - Write outside array in the loading from cache in genmesh.
+	  - Fixed a leaking GDI resource in glwin (2d canvas for opengl)
+	  - Fixed a few leaks in xmlshader.
+	  - Fixed a leak in the glshader_ffp loader.
 7-Jan-2004
         - Andrew Craig fixed the Jamfile for sprcal3dldr to link in the
 	  required CAL3D library.

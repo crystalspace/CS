@@ -36,6 +36,13 @@ class csMatrix3;
  */
 struct csPolyTextureMapping
 {
+  csPolyTextureMapping() : fdu(0.0f), fdv(0.0f), Imin_u(0), Imin_v(0),
+    Fmin_u(0.0f), Fmin_v(0.0f), Fmax_u(0.0f), Fmax_v(0.0f), shf_u(0),
+    w(0.0f), h(0.0f), w_orig(0.0f), 
+    lmu1(0.0f), lmv1(0.0f), lmu2(0.0f), lmv2(0.0f)
+  {
+  }
+
   /// Transformation from object to texture space.
   csMatrix3 m_obj2tex;
   /// Translation from object to texture space.

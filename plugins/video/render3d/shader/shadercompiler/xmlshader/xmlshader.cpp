@@ -388,10 +388,10 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
 
       csShaderVariable *varRef=0;
       //csRef<csShaderVariable>& varRef = pass->bufferRef[a];
-      varRef = pass->GetVariableRecursive(pass->bufferID[a]);
+      varRef = pass->GetVariableRecursive(pass->bufferID[pass->bufferCount]);
 
       if(!varRef)
-        varRef = pass->owner->GetVariableRecursive(pass->bufferID[a]);
+        varRef = pass->owner->GetVariableRecursive(pass->bufferID[pass->bufferCount]);
 
       //pass->bufferRef[a] = varRef; //FETCH REF IF IT EXSISTS AT THIS POINT
       if (!varRef)
@@ -552,10 +552,12 @@ csPtr<iShaderProgram> csXMLShaderCompiler::LoadProgram (
       Report (CS_REPORTER_SEVERITY_WARNING,
 	"Couldn't retrieve shader plugin '%s' for <%s> in shader '%s'",
 	plugin, node->GetValue (), pass->owner->GetName ());
+      delete[] plugin;
       return 0;
     }
   }
 
+  delete[] plugin;
   const char* programType = node->GetAttributeValue("type");
   if (programType == 0)
     programType = node->GetValue ();

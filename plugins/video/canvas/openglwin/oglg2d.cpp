@@ -635,6 +635,7 @@ void csGraphics2DOpenGL::Close (void)
     wglMakeCurrent (0, 0);
   }
 
+  DeleteObject (hWndPalette);
   ReleaseDC (m_hWnd, hDC);
 
   RestoreDisplayMode ();

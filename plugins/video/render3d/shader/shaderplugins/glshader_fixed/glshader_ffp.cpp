@@ -140,10 +140,10 @@ bool csGLShaderFFP::Load(iDocumentNode* node)
       {
         case XMLTOKEN_LAYER:
           {
-            mtexlayer* ml = new mtexlayer();
-            if(!LoadLayer(ml, child))
+            mtexlayer ml;
+            if(!LoadLayer(&ml, child))
               return false;
-            texlayers.Push (*ml);
+            texlayers.Push (ml);
           }
           break;
       }
