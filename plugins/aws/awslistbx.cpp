@@ -756,6 +756,15 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
         }
 
         g3d->DrawPixmap(si, x+tx, y, iw, ih, 0,0, iw, ih);
+
+        // Create hot spot for expand/collapse
+        awsListHotspot *hs = new awsListHotspot;
+
+        hs->obj = &(row->cols[i]);
+        hs->type = hsState;
+        hs->r.Set(x+tx, y, x+tx+iw, y+ih);
+
+        hotspots.Push(hs);
       } // end if stateful
 
       // Next column
@@ -835,6 +844,22 @@ awsListBox::OnMouseUp(int button, int x, int y)
           return true;
         }
         break;
+
+      case hsState:
+        {
+          awsListItem *itm =(awsListItem *)hs->obj;
+          
+          if (itm->group_state)
+            ClearPeers(itm);
+
+          if (itm->state) itm->state=false;
+          else itm->state=true;
+
+          Invalidate();
+          return true;
+        }
+        break;
+
 
       } // end switch type
     } // end if contains
