@@ -41,7 +41,7 @@
   </xsl:template>
 
   <!-- list of widgets we convert -->
-  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QSlider' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel' or text()='QTabWidget'] or (class='QWidget' and ../class='QTabWidget')]">
+  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QSlider' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel' or text()='QTextView' or text()='QTabWidget'] or (class='QWidget' and ../class='QTabWidget')]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <xsl:call-template name="layout"/>
@@ -309,6 +309,7 @@
       <xsl:when test="class='QGroupBox'">"Group Frame"</xsl:when>
       <xsl:when test="class='QFrame'">"Group Frame"</xsl:when>
       <xsl:when test="class='QLineEdit'">"Text Box"</xsl:when>
+      <xsl:when test="class='QTextView'">"Multiline Edit"</xsl:when>
       <xsl:when test="class='QCheckBox'">"Check Box"</xsl:when>
       <xsl:when test="class='QListBox'">"List Box"</xsl:when>
       <xsl:when test="class='QListView'">"List Box"</xsl:when>
@@ -330,6 +331,7 @@
       <xsl:when test="../class='QListBox'"><xsl:text>lb</xsl:text></xsl:when>
       <xsl:when test="../class='QListView'"><xsl:text>lb</xsl:text></xsl:when>
       <xsl:when test="../class='QSlider'"><xsl:text>sb</xsl:text></xsl:when>
+      <xsl:when test="../class='QTextView'"><xsl:text>me</xsl:text></xsl:when>
       <xsl:when test="../class='QLabel' and ../property/name='pixmap'"><xsl:text>iv</xsl:text></xsl:when>
       <xsl:when test="../class='QLabel' and ../property/name='text'"><xsl:text>lbl</xsl:text></xsl:when>
     </xsl:choose>
