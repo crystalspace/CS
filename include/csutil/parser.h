@@ -40,34 +40,43 @@ public:
 
 class csTokenVector : public csVector
 {
-  public:
-    virtual ~csTokenVector () {DeleteAll ();}
-    virtual bool FreeItem (csSome Item){ delete (csTokenDesc*)Item; return true;}
-    csTokenDesc* Get (int idx) const {return (csTokenDesc*)csVector::Get (idx);}
-    virtual int Compare (csSome Item1, csSome Item2, int Mode=0) const
-    { (void)Mode;
-      csTokenDesc *td1 = (csTokenDesc*)Item1;
-      csTokenDesc *td2 = (csTokenDesc*)Item2;
-      int l1 = (td1->token ? strlen(td1->token) : 0);
-      int l2 = (td2->token ? strlen(td2->token) : 0);
-      return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
-    }
-    virtual int CompareKey (csSome Item1, csConstSome Key, int Mode=0) const
-    { (void)Mode;
-      csTokenDesc *td1 = (csTokenDesc*)Item1;
-      csTokenDesc *td2 = (csTokenDesc*)Key;
-      int l1 = (td1->token ? strlen(td1->token) : 0);
-      int l2 = (td2->token ? strlen(td2->token) : 0);
-      return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
-    }
-    csTokenVector *Push (int id, const char *name)
-    {
-      csTokenDesc *td = new csTokenDesc;
-      td->id = id;
-      td->token = (name ? csStrNew (name) : 0);
-      InsertSorted (td);
-      return this;
-    }
+public:
+  virtual ~csTokenVector () {DeleteAll ();}
+  virtual bool FreeItem (csSome Item)
+  {
+    delete (csTokenDesc*)Item;
+    return true;
+  }
+  csTokenDesc* Get (int idx) const
+  {
+    return (csTokenDesc*)csVector::Get (idx);
+  }
+  virtual int Compare (csSome Item1, csSome Item2, int Mode=0) const
+  {
+    (void)Mode;
+    csTokenDesc *td1 = (csTokenDesc*)Item1;
+    csTokenDesc *td2 = (csTokenDesc*)Item2;
+    int l1 = (td1->token ? strlen(td1->token) : 0);
+    int l2 = (td2->token ? strlen(td2->token) : 0);
+    return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
+  }
+  virtual int CompareKey (csSome Item1, csConstSome Key, int Mode=0) const
+  {
+    (void)Mode;
+    csTokenDesc *td1 = (csTokenDesc*)Item1;
+    csTokenDesc *td2 = (csTokenDesc*)Key;
+    int l1 = (td1->token ? strlen(td1->token) : 0);
+    int l2 = (td2->token ? strlen(td2->token) : 0);
+    return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
+  }
+  csTokenVector *Push (int id, const char *name)
+  {
+    csTokenDesc *td = new csTokenDesc;
+    td->id = id;
+    td->token = (name ? csStrNew (name) : 0);
+    InsertSorted (td);
+    return this;
+  }
 };
 
 /**
@@ -121,7 +130,7 @@ class csTokenVector : public csVector
     CS_TOKEN_TOTAL_COUNT		\
   };
 #define CS_TOKEN_TABLE_START(name)	\
-  csTokenVector name ## _hlp, *name;        \
+  csTokenVector name ## _hlp, *name;    \
   name = &name ## _hlp;			\
   name->
 #define CS_TOKEN_TABLE(name)		\
@@ -185,7 +194,8 @@ public:
   /**
    * Pass in a pointer to a buffer of text. This pointer is modified to point
    * to the text after the command description. The token id for the command is
-   * returned. The params pointer will point to the optional data for the object.
+   * returned. The params pointer will point to the optional data for the
+   * object.
    * <i>The text buffer will get modified so BEWARE.</i>
    * <p><b>eg text</b>:
    * <code>
@@ -223,3 +233,4 @@ public:
 };
 
 #endif // __CS_PARSER_H__
+

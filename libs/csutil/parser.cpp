@@ -46,7 +46,8 @@ int csParser::GetParserLine()
   return parser_line; 
 }
 
-long csParser::GetObject (char **buf, csTokenVector * tokens, char **name, char **data)
+long csParser::GetObject (char **buf, csTokenVector * tokens, char **name,
+  char **data)
 {
   SkipCharacters (buf, kWhiteSpace);
 
@@ -66,7 +67,8 @@ long csParser::GetObject (char **buf, csTokenVector * tokens, char **name, char 
   int i=0;
   for (i=0; i < tokens->Length ()-1; i++)
   {
-    if (!strncasecmp (tokens->Get (i)->token, *buf, strlen (tokens->Get (i)->token)))
+    if (!strncasecmp (tokens->Get (i)->token, *buf,
+    	strlen (tokens->Get (i)->token)))
     {
       break;
     }
@@ -166,3 +168,4 @@ char *csParser::GetAssignmentText (char **buf)
     ++*buf;
   return result;
 }
+

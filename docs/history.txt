@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+22-May-2002
+	- Updated apimod96 for new csParser class.
+	- Some minor code cleanup in the new csParser class. It was already
+	  formatted rather well though.
+	- Fixed python plugin.
 21-May-2002
 	- Added include/igeom/polymesh.h to css.h.
 	- Fixed bug with csEvCord not calling SCF_CONSTRUCT_IBASE in
@@ -65,6 +70,7 @@ The history order is reversed so that new features are at the top.
 	- Added PolyMeshHelper class for csThing and put the old
 	  iPolygonMesh implementation there.
 	- Moved iPolygonMesh interface from include/ivaria to include/igeom.
+	- New apimod96 document.
 18-May-2002
 	- Fixed a bug in csCoverageBuffer::TestRectangle() with very
 	  large boxes that exceed integer accuracy.

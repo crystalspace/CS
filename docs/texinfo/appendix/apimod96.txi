@@ -25,3 +25,11 @@ have been removed. Instead there is now a new routine called
 
 A similar change has happened in the @code{iVisibilityObject} interface.
 
+@subheading csParser changes
+@cindex @code{csParser}
+@cindex @code{csGetObject()}
+
+Functions like @code{csGetObject()} and @code{csGetCommand()} which
+were used to implement parsing functionalities in CS have now been put
+into the @code{csParser} class.
+
