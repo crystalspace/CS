@@ -59,6 +59,10 @@ chronological order.
 	  with DeleteIndex (int) in the source code of the csSoundRenderDS3D
 	  class.
 	- Eric Sunshine fixed compilation problems with partedit on MacOS/X.
+	- Anders Stenberg & Oktal did various changes and fixes to the pico
+	  plugin. It still shouldn't and can't be used, since it pretty much
+	  doesn't work at all. Something resembling almost sensible output 
+	  should now be possible to achieve though.
 	- Anders Stenberg added better pixel format handling in csGraphics3D,
 	  since it was needed for the abuse pgserver puts it through.
 2-Aug-2003
