@@ -572,7 +572,7 @@ csPtr<iBase> csSpriteCal3DLoader::Parse (iDocumentNode* node,
 
   return csPtr<iBase> (mesh);
 #endif
-  return NULL;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -597,4 +597,3 @@ bool csSpriteCal3DSaver::Initialize (iObjectRegistry* object_reg)
 void csSpriteCal3DSaver::WriteDown (iBase*, iFile*)
 {
 }
-

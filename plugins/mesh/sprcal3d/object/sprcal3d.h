@@ -384,7 +384,7 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const
   {
-    return NULL; //GetMaterial ();
+    return 0; //GetMaterial ();
   }
   virtual int GetPortalCount () const { return 0; }
   virtual iPortal* GetPortal (int) const { return 0; }
@@ -723,4 +723,3 @@ public:
 };
 
 #endif // __CS_SPRCAL3D_H__
-

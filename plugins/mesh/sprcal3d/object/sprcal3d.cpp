@@ -226,7 +226,7 @@ void csSpriteCal3DMeshObjectFactory::BindMaterials()
 
 csPtr<iMeshObject> csSpriteCal3DMeshObjectFactory::NewInstance ()
 {
-  csSpriteCal3DMeshObject* spr = new csSpriteCal3DMeshObject (NULL, calCoreModel);
+  csSpriteCal3DMeshObject* spr = new csSpriteCal3DMeshObject (0, calCoreModel);
   spr->SetFactory (this);
 
   csRef<iMeshObject> im (SCF_QUERY_INTERFACE (spr, iMeshObject));
@@ -589,7 +589,7 @@ void csSpriteCal3DMeshObject::SetupObject()
         sample.num_vertices_pool = 1;  // no blending
         sample.buffers[0]  = 0; // NULL
         meshes[index].Push(sample);
-        meshes_colors[index].Push(NULL);
+        meshes_colors[index].Push(0);
       }
     }
   }
@@ -791,7 +791,7 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
 
 csMeshedPolygon* csSpriteCal3DMeshObject::PolyMesh::GetPolygons ()
 {
-    return NULL;
+    return 0;
 }
 
 void csSpriteCal3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
@@ -811,7 +811,7 @@ int csSpriteCal3DMeshObject::GetAnimCount()
 const char *csSpriteCal3DMeshObject::GetAnimName(int idx)
 {
     if (idx >= GetAnimCount())
-	return NULL;
+	return 0;
 
     return factory->anims[idx]->name;
 }
@@ -819,7 +819,7 @@ const char *csSpriteCal3DMeshObject::GetAnimName(int idx)
 int csSpriteCal3DMeshObject::GetAnimType(int idx)
 {
     if (idx >= GetAnimCount())
-	return NULL;
+	return 0;
 
     return factory->anims[idx]->type;
 }
