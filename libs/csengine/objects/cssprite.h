@@ -246,7 +246,6 @@ class csSprite3D : public csObject
 public:
   /// List of sectors where this sprite is.
   csObjVector sectors;
-  csSector *currentSector;
 
   /**
    * Configuration value for global LOD. 0 is lowest detail, 1 is maximum.

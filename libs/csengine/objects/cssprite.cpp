@@ -323,7 +323,7 @@ bool csSprite3D::MoveTo(const csVector3 &move_to)
   csSector* pNewSector;//  = currentSector;
 
   bool mirror = false;
-  pNewSector = currentSector->FollowSegment (OldPos, new_pos, mirror);
+  pNewSector = ((csSector*)sectors[0])->FollowSegment (OldPos, new_pos, mirror);
 
   if (pNewSector &&
       ABS (new_pos.x-move_to.x) < SMALL_EPSILON &&
@@ -655,7 +655,6 @@ void csSprite3D::MoveToSector (csSector* s)
   RemoveFromSectors ();
   sectors.Push (s);
   s->sprites.Push (this);
-  currentSector=s;
 }
 
 void csSprite3D::RemoveFromSectors ()
