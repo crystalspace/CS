@@ -327,7 +327,7 @@ error2:
       trans.red = big_endian_short (key_r << 8);
       trans.green = big_endian_short (key_g << 8);
       trans.blue = big_endian_short (key_b << 8);
-      png_set_tRNS (png, info, NULL, NULL, &trans);
+      png_set_tRNS (png, info, NULL, 0, &trans);
     }
   }
 
