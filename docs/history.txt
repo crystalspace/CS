@@ -21,6 +21,9 @@ chronological order.
 	      supports VC debug symbols atm, tho.
 	    - Added a mechanism to track where interfaces and references are 
 	      increased resp. decreased.
+	- Neil Mosafi changed csvosa3dl plugin to listen to children as well
+	  as properties and use child changes to initiate property listening.
+	  This is a more correct way of doing things
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:
