@@ -84,6 +84,9 @@ public:
   /// Make the tree invalid (for debugging).
   void MakeInvalid ();
 
+  /// Test if tree is full.
+  bool IsFull ();
+
   /**
    * Test consistancy for the tree (for debugging).
    */

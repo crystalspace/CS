@@ -36,6 +36,7 @@
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
 #include "csengine/quadcube.h"
+#include "csengine/covcube.h"
 #include "csengine/texture.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
@@ -209,12 +210,20 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   c_buffer = NULL;
   quadtree = NULL;
   quadcube = NULL;
+  covcube = NULL;
   covtree = NULL;
   covtree_lut = NULL;
   current_camera = NULL;
   current_world = this;
 
-  CHK (quadcube = new csQuadcube (8));
+  //@@@
+  //CHK (quadcube = new csQuadcube (8));
+  if (!covtree_lut)
+  {
+    CHK (covtree_lut = new csCovMaskLUT (16));
+  }
+  CHK (covcube = new csCovcube (covtree_lut));
+
   CHK (textures = new csTextureList ());
 
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
@@ -235,6 +244,8 @@ csWorld::~csWorld ()
   CHK (delete render_pol2d_pool);
   CHK (delete lightpatch_pool);
   CHK (delete quadcube);
+  CHK (delete covcube);
+  CHK (delete covtree_lut);
 
   // @@@ temp hack
   CHK (delete camera_hack);
@@ -317,7 +328,6 @@ void csWorld::Clear ()
   CHK (delete c_buffer); c_buffer = NULL;
   CHK (delete quadtree); quadtree = NULL;
   CHK (delete covtree); covtree = NULL;
-  CHK (delete covtree_lut); covtree_lut = NULL;
   CHK (delete render_pol2d_pool);
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (delete lightpatch_pool);

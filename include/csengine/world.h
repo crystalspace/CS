@@ -42,6 +42,7 @@ class csDynLight;
 class csSpriteTemplate;
 class csClipper;
 class csQuadcube;
+class csCovcube;
 class csWorld;
 class Dumper;
 class csLight;
@@ -274,6 +275,9 @@ private:
   /// Quad-cube used for lighting.
   csQuadcube* quadcube;
 
+  /// Coverage mask cube used for lighting.
+  csCovcube* covcube;
+
   ///
   void ShineLights ();
 
@@ -382,6 +386,11 @@ public:
    * Return quad-cube.
    */
   csQuadcube* GetQuadcube () { return quadcube; }
+
+  /**
+   * Return coverage mask cube.
+   */
+  csCovcube* GetCovcube () { return covcube; }
 
   /**
    * Cache lighting. If true (default) then lighting will be cached in

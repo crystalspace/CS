@@ -432,12 +432,12 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
     case 0xe:	// Top, left, and bottom side.
     case 0xd:	// Top, right, and bottom side.
     case 0x7:	// Bottom, left, and right side.
-      CsPrintf (MSG_INTERNAL_ERROR,
-      	"ERROR: Three intersections in csCovMaskLUT::GetIndex()!\n");
+      //CsPrintf (MSG_INTERNAL_ERROR,
+      	//"ERROR: Three intersections in csCovMaskLUT::GetIndex()!\n");
       break;
     case 0xf:	// All sides.
-      CsPrintf (MSG_INTERNAL_ERROR,
-      	"ERROR: Four intersections in csCovMaskLUT::GetIndex()!\n");
+      //CsPrintf (MSG_INTERNAL_ERROR,
+      	//"ERROR: Four intersections in csCovMaskLUT::GetIndex()!\n");
       break;
     case 0x3:	// Left and right side.
       if (sta.x < sto.x)

@@ -16,6 +16,7 @@ Short-term cleanups that need to be done:
 22-Dec-1999
 	- Eric Sunshine fixed the project so that it once again compiles on
 	  NextStep following recent changes.
+	- Started work on coverage mask tree cube for lighting.
 21-Dec-1999
 	- Changes from Michael Dale Long to CrystalClear. Added initial
 	  iPhysicsConfig interface and implementation.  More code to come.

@@ -1192,6 +1192,16 @@ void csCoverageMaskTree::TestConsistency ()
   tree3->TestConsistency (0, 0);
 }
 
+bool csCoverageMaskTree::IsFull ()
+{
+  // @@@ Configurable!
+# if defined(CS_CM_8x8)
+  csCovTreeNode3* tree3 = (csCovTreeNode3*)tree;
+# else
+  csCovTreeNode4* tree3 = (csCovTreeNode4*)tree;
+# endif
+  return tree3->IsFull ();
+}
 
 //---------------------------------------------------------------------------
 

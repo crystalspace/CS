@@ -37,6 +37,7 @@
 #include "csengine/bspbbox.h"
 #include "csengine/terrain.h"
 #include "csengine/quadcube.h"
+#include "csengine/covcube.h"
 #include "csgeom/bsp.h"
 #include "csgeom/octree.h"
 #include "igraph3d.h"
@@ -909,12 +910,17 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*,
 void CompressShadowFrustrums (csFrustrumList* list)
 {
   csQuadcube* qc = csWorld::current_world->GetQuadcube ();
-  qc->MakeEmpty ();
+  csCovcube* cc = csWorld::current_world->GetCovcube ();
+  if (qc) qc->MakeEmpty ();
+  else if (cc) cc->MakeEmpty ();
+
   csShadowFrustrum* sf = list->GetLast ();
 int cnt=0,del=0;
   while (sf)
   {
-    bool vis = qc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
+    bool vis;
+    if (qc) qc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
+    else if (cc) cc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
     if (!vis)
     {
       csShadowFrustrum* sfdel = sf;
@@ -938,6 +944,7 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
   csLightView* lview = (csLightView*)data;
   csVector3& center = lview->light_frustrum->GetOrigin ();
   csQuadcube* qc = csWorld::current_world->GetQuadcube ();
+  csCovcube* cc = csWorld::current_world->GetCovcube ();
   bool cw = true;	// @@@ Mirror flag?
   int i, j;
   static int frust_cnt = 50;
@@ -952,12 +959,15 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
 
 #define QUADTREE_SHADOW 0
 #if QUADTREE_SHADOW
-    vis = qc->TestPolygon (poly, p->GetNumVertices ());
+    if (qc) vis = qc->TestPolygon (poly, p->GetNumVertices ());
+    else vis = cc->TestPolygon (poly, p->GetNumVertices ());
 #else
     if (p->GetPortal ())
-      vis = qc->TestPolygon (poly, p->GetNumVertices ());
+      if (qc) vis = qc->TestPolygon (poly, p->GetNumVertices ());
+      else vis = cc->TestPolygon (poly, p->GetNumVertices ());
     else
-      vis = qc->InsertPolygon (poly, p->GetNumVertices ());
+      if (qc) vis = qc->InsertPolygon (poly, p->GetNumVertices ());
+      else vis = cc->InsertPolygon (poly, p->GetNumVertices ());
 #endif
     if (vis)
     {
@@ -965,7 +975,8 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
 
 #if QUADTREE_SHADOW
       if (!p->GetPortal ())
-        qc->InsertPolygon (poly, p->GetNumVertices ());
+        if (qc) qc->InsertPolygon (poly, p->GetNumVertices ());
+        else cc->InsertPolygon (poly, p->GetNumVertices ());
 #endif
 
       //if (p->GetPlane ()->VisibleFromPoint (center) != cw) continue;
@@ -1039,7 +1050,14 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
     int i;
     for (i = 0 ; i < num_outline ; i++)
       outline[i] -= center;
-    if (!csWorld::current_world->GetQuadcube ()->TestPolygon (outline, num_outline))
+    csQuadcube* qc = csWorld::current_world->GetQuadcube ();
+    csCovcube* cc = csWorld::current_world->GetCovcube ();
+    if (qc && !qc->TestPolygon (outline, num_outline))
+    {
+      count_cull_quad++;
+      return false;
+    }
+    else if (cc && !cc->TestPolygon (outline, num_outline))
     {
       count_cull_quad++;
       return false;
