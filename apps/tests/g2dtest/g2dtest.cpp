@@ -1172,10 +1172,10 @@ int main (int argc, char *argv[])
   iNativeWindow* nw = System.myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle (APP_TITLE);
 
-  System.myG2D->Close();
+  /*System.myG2D->Close();
   System.myG2D = NULL;
   plugin_mgr = NULL;
-  cmdline = NULL;
+  cmdline = NULL;*/
 
   csDefaultRunLoop(object_reg);
   return 0;
