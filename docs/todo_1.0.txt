@@ -102,9 +102,12 @@ Bugs to fix:
 	     down the up arrow for a few seconds), it suddenly locks up."
 	[S]  Some canvases still clip improperly as shown by the clipping tests
 	     in g2dtest.  The Windows OpenGL canvas is one such canvas.
-	     Possibly, the MacOS/X canvases are also flawed. Same is true for
-	     xwindows and glx2d canvas. As Jorrit says probably the test and
+	     Possibly, the MacOS/X canvases are also flawed.  Same is true for
+	     xwindows and glx2d canvas.  As Jorrit says probably the test and
 	     not the canvas is broken as clipping semantics changed recently.
+	     Eric responds: The clipping tests in g2dtest were added after the
+	     semantics changed.  The tests were added specifically to test if
+	     canvases were respecting the new semantics.
 	[S]  cs2xml crashes when trying to convert castle.zip.  (optimize mode)
 	     (note by Jorrit: cannot reproduce).
 	[O]  levtool fails to convert castle.zip (after it has been converted
