@@ -65,7 +65,7 @@ bool awsStatusBar::Setup (iAws *_wmgr, awsComponentNode *settings)
   pm->GetInt (settings, "Style", frame_style);
   pm->GetInt (settings, "BarTextureAlpha", bar_alpha_level);
   pm->GetInt (settings, "Status", stat);
-  pm->GetString (settings, "BarTexture:", bartxt);
+  pm->GetString (settings, "BarTexture", bartxt);
   
   pm->LookupRGBKey("StatusBarColor", r, g, b);
 
@@ -228,8 +228,9 @@ csRect awsStatusBar::getInsets()
     return csRect(1,1,1,1);
 
   case fsRaised:
+    return csRect(1,1,3,3);
   case fsSunken:
-    return csRect(2,2,2,2);
+    return csRect(3,3,1,1);
   
   case fsNone:
   default:
