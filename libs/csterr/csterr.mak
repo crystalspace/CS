@@ -25,11 +25,19 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csterr
+vpath %.cpp libs/csterr/math libs/csterr/struct libs/csterr/util
 
-CSTERR.LIB = $(OUT)$(LIB_PREFIX)csterr$(LIB_SUFFIX)
-SRC.CSTERR = $(wildcard libs/csterr/*/*.cpp)
-OBJ.CSTERR = $(addprefix $(OUT),$(notdir $(SRC.CSTERR:.cpp=$O)))
+# XXX is temporary until this library builds.
+XXXCSTERR.LIB = $(OUT)$(LIB_PREFIX)csterr$(LIB_SUFFIX)
+SRC.CSTERR.MATH   = $(wildcard libs/csterr/math/*.cpp)
+SRC.CSTERR.STRUCT = $(wildcard libs/csterr/struct/*.cpp)
+SRC.CSTERR.UTIL   = $(wildcard libs/csterr/util/*.cpp)
+SRC.CSTERR = $(SRC.CSTERR.MATH) $(SRC.CSTERR.STRUCT) $(SRC.CSTERR.UTIL)
+OBJ.CSTERR.MATH   = $(addprefix $(OUT),$(notdir $(SRC.CSTERR.MATH:.cpp=$O)))
+OBJ.CSTERR.STRUCT = $(addprefix $(OUT),$(notdir $(SRC.CSTERR.STRUCT:.cpp=$O)))
+OBJ.CSTERR.UTIL   = $(addprefix $(OUT),$(notdir $(SRC.CSTERR.UTIL:.cpp=$O)))
+OBJ.CSTERR = $(OBJ.CSTERR.MATH) $(OBJ.CSTERR.STRUCT) $(OBJ.CSTERR.UTIL)
+CFLAGS.CSTERR = -Ilibs/csterr
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -38,15 +46,24 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: csterr csterrclean
 
-all: $(CSTERR.LIB)
-csterr: $(OUTDIRS) $(CSTERR.LIB)
+#all: $(XXXCSTERR.LIB)
+csterr: $(OUTDIRS) $(XXXCSTERR.LIB)
 clean: csterrclean
 
-$(CSTERR.LIB): $(OBJ.CSTERR)
+$(OBJ.CSTERR.MATH): $(SRC.CSTERR.MATH)
+	$(DO.COMPILE.CPP) $(CFLAGS.CSTERR)
+
+$(OBJ.CSTERR.STRUCT): $(SRC.CSTERR.STRUCT)
+	$(DO.COMPILE.CPP) $(CFLAGS.CSTERR)
+
+$(OBJ.CSTERR.UTIL): $(SRC.CSTERR.UTIL)
+	$(DO.COMPILE.CPP) $(CFLAGS.CSTERR)
+
+$(XXXCSTERR.LIB): $(OBJ.CSTERR)
 	$(DO.LIBRARY)
 
 csterrclean:
-	-$(RM) $(CSTERR.LIB) $(OBJ.CSTERR)
+	-$(RM) $(XXXCSTERR.LIB) $(OBJ.CSTERR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csterr.dep
