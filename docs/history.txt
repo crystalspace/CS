@@ -1,6 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
 22-Jan-2001
+	- Norman Kramer added a plugin for opendivx (MP4 decoder), note
+	  that you need the decoder lib from www.projectmayo.com (its
+	  opensource). Plugin compiles now, gonna test it tonite.
 	- Removed support from sprites and lights for an old and never-used
 	  dynamic lighting registration system. If we still need this later
 	  we'll have to redo it another way.
