@@ -67,7 +67,7 @@ cssys: $(OUTDIRS) $(CSSYS.LIB)
 clean: cssysclean
 
 $(CSSYS.LIB): $(OBJ.CSSYS)
-	$(DO.LIBRARY)
+	$(DO.LIBRARY) 
 
 cssysclean:
 	-$(RM) $(CSSYS.LIB) $(OBJ.CSSYS)

@@ -26,6 +26,10 @@
 extern long convert_endian (long l);
 /// Swap the bytes in a short value.
 extern short convert_endian (short l);
+/// Swap the bytes in a ULong value.
+extern ULong convert_endian (ULong l);
+/// Swap the bytes in a short value.
+extern UShort convert_endian (UShort l);
 /// Swap the bytes in a float value.
 extern float convert_endian (float l);
 /// Write a number to a file in an endian independent way.

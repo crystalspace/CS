@@ -30,62 +30,57 @@ inline int test_endian ()
   return (*((unsigned char*)&test_value) == 0x12);
 }
 
-float convert_endian (float l)
-{
-  // @@@ Is this right?
-  if (test_endian ())
-  {
-    union
-    {
-      float l;
-      struct { char a, b, c, d; } s;
-    } swap;
-    char s;
-
-    swap.l = l;
-    s = swap.s.a; swap.s.a = swap.s.d; swap.s.d = s;
-    s = swap.s.b; swap.s.b = swap.s.c; swap.s.c = s;
-    l = swap.l;
-  }
-  return l;
+#define _ENDIAN_4BYTES_(Type)                          \
+Type convert_endian ( Type l)                          \
+{                                                      \
+  /* @@@ Is this right? */                             \
+  if (test_endian ())                                  \
+  {                                                    \
+    union                                              \
+    {                                                  \
+      Type l;                                          \
+      struct { char a, b, c, d; } s;                   \
+    } swap;                                            \
+    char s;                                            \
+                                                       \
+    swap.l = l;                                        \
+    s = swap.s.a; swap.s.a = swap.s.d; swap.s.d = s;   \
+    s = swap.s.b; swap.s.b = swap.s.c; swap.s.c = s;   \
+    l = swap.l;                                        \
+  }                                                    \
+  return l;                                            \
 }
 
-long convert_endian (long l)
-{
-  if (test_endian ())
-  {
-    union
-    {
-      long l;
-      struct { char a, b, c, d; } s;
-    } swap;
-    char s;
-
-    swap.l = l;
-    s = swap.s.a; swap.s.a = swap.s.d; swap.s.d = s;
-    s = swap.s.b; swap.s.b = swap.s.c; swap.s.c = s;
-    l = swap.l;
-  }
-  return l;
+#define _ENDIAN_2BYTES_(Type)                          \
+Type convert_endian ( Type l)                          \
+{                                                      \
+  /* @@@ Is this right? */                             \
+  if (test_endian ())                                  \
+  {                                                    \
+    union                                              \
+    {                                                  \
+      Type l;                                          \
+      struct { char a, b; } s;                         \
+    } swap;                                            \
+    char s;                                            \
+                                                       \
+    swap.l = l;                                        \
+    s = swap.s.a; swap.s.a = swap.s.b; swap.s.b = s;   \
+    l = swap.l;                                        \
+  }                                                    \
+  return l;                                            \
 }
 
-short convert_endian (short l)
-{
-  if (test_endian ())
-  {
-    union
-    {
-      short l;
-      struct { char a, b; } s;
-    } swap;
-    char s;
+_ENDIAN_4BYTES_ ( float )
+_ENDIAN_4BYTES_ ( long )
+_ENDIAN_4BYTES_ ( ULong )
 
-    swap.l = l;
-    s = swap.s.a; swap.s.a = swap.s.b; swap.s.b = s;
-    l = swap.l;
-  }
-  return l;
-}
+_ENDIAN_2BYTES_ ( short )
+_ENDIAN_2BYTES_ ( UShort )
+
+
+#undef _ENDIAN_4BYTES_
+#undef _ENDIAN_2BYTES_
 
 void write_endian (FILE* fp, long l)
 {

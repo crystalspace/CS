@@ -24,6 +24,7 @@
 #include "types.h"
 #include "csgeom/math3d.h"
 #include "csgfxldr/bmpimage.h"
+#include "cssys/csendian.h"
 
 //---------------------------------------------------------------------------
 
@@ -52,6 +53,34 @@ AlphaMapFile *csBMPImageLoader::LoadAlphaMap(UByte* buf,ULong size)
 }
 
 //---------------------------------------------------------------------------
+
+//-----------------
+// very private minihelpers
+class minihelp{
+public:
+UShort* us_endian( char* ptr ){ us = convert_endian( *((UShort*)ptr) ); return &us; }
+ULong* ul_endian( char* ptr ){ ul = convert_endian( *((ULong*)ptr) ); return &ul; }
+long* l_endian( char* ptr ){ l = convert_endian( *((long*)ptr) ); return &l; }
+ULong ul;
+UShort us;
+long l;
+} vpmh;
+
+#define BFTYPE(x)    vpmh.us_endian(((char *) (x)))
+#define BFSIZE(x)    vpmh.ul_endian(((char *) (x))+2)
+#define BFOFFBITS(x) vpmh.ul_endian(((char *) (x))+10)
+#define BISIZE(x)    vpmh.ul_endian(((char *) (x))+14)
+#define BIWIDTH(x)   vpmh.l_endian(((char *) (x))+18)
+#define BIHEIGHT(x)  vpmh.l_endian(((char *) (x))+22)
+#define BITCOUNT(x)  vpmh.us_endian(((char *) (x))+28)
+#define BICOMP(x)    vpmh.ul_endian (((char *) (x))+30)
+#define IMAGESIZE(x) vpmh.ul_endian(((char *) (x))+34)
+#define BICLRUSED(x) vpmh.ul_endian(((char *) (x))+46)
+#define BICLRIMP(x)  vpmh.ul_endian(((char *) (x))+50)
+#define BIPALETTE(x) (char *)  (((char *) (x))+54)
+#define PALENT(x,i)  (char *)  (((ULong *)(x))+i)
+
+//-----------------
 
 // Type ID
 #define BM "BM" // Windows 3.1x, 95, NT, ...
@@ -82,6 +111,7 @@ AlphaMapFile *csBMPImageLoader::LoadAlphaMap(UByte* buf,ULong size)
 #define BI_BITFIELDS  3  // Bitfields
 #endif
 
+/*
 #define BFTYPE(x)    (UShort *)(((char *) (x)))
 #define BFSIZE(x)    (ULong *) (((char *) (x))+2)
 #define BFOFFBITS(x) (ULong *) (((char *) (x))+10)
@@ -95,6 +125,7 @@ AlphaMapFile *csBMPImageLoader::LoadAlphaMap(UByte* buf,ULong size)
 #define BICLRIMP(x)  (ULong *) (((char *) (x))+50)
 #define BIPALETTE(x) (char *)  (((char *) (x))+54)
 #define PALENT(x,i)  (char *)  (((ULong *)(x))+i)
+*/
 
 //---------------------------------------------------------------------------
 
@@ -127,6 +158,7 @@ ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : csImageFile ()
       // The last scanline in BMP corresponds to the top line in the image
      int buffer_y = bmp_width*(bmp_height - 1);
      int buffer_x = 0;
+     bool blip = false;
 /*
      if( (*BITCOUNT(ptr)) == _256Color && (*BICLRUSED(ptr)) && (*BICLRIMP(ptr)) )
      @@@ I dont know why the number of "important colors" ( BICLRIMP )  matters.
@@ -165,9 +197,11 @@ ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : csImageFile ()
 	    if ( rl == 0 )
 	       if ( clridx == 0 ){
 		  // new scanline
-	          pixelIdx += ( bmp_width - buffer_x );
-	          buffer_x  = 0;
-	          buffer_y -= bmp_width;
+		  if ( !blip ){ // if we didnt already jumped to the new line, do it now
+	             pixelIdx += ( bmp_width - buffer_x );
+	             buffer_x  = 0;
+	             buffer_y -= bmp_width;
+		  }     
 	          continue;
 		}else if ( clridx == 1 ){
 		  // end of bitmap
@@ -196,7 +230,9 @@ ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : csImageFile ()
               {
                 buffer_x  = 0;
                 buffer_y -= bmp_width;
-              }
+                blip = true;
+	      }else
+	        blip = false;
 
               pixelIdx++;
 	    }
