@@ -971,13 +971,7 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
      // Next, for the reentry point.
      float rx, ry, rpointx, rpointy;
 
-     // Obligatory ugly hack :)
-     // Can be fixed if someone writes a function something like this:
-     // csVector2 get_perspective(const csVector3&)
-     //@@@
-     //csPolygon2D p(1);
-     //p.AddPerspective (*reentern);
-     //rvert = p.GetFirst ();
+     // Perspective correct the point.
      float iz = csCamera::aspect/reentern->z;
      csVector2 rvert;
      rvert.x = reentern->x * iz + csWorld::shift_x;
@@ -1282,6 +1276,10 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview)
         // All vertices of the light frustrum (polygon we are trying to light)
 	// are outside of the shadow frustrum. In this case the shadow frustrum is
 	// not relevant.
+
+	// @@@ WARNING!!! THIS IS NOT TRUE. There are cases where
+	// it is still possible to have an overlap. We need to
+	// continue the testing here!!!
 	sf->relevant = false;
       }
       else if (count == lview.light_frustrum->GetNumVertices ())
