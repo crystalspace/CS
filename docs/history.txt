@@ -11,6 +11,11 @@ chronological order.
 	- res fixed cssaver plugin so it compiles with NR.
 	- res fixed some error messages in csparser where parameters were
 	  mixed up.
+        - Old_Belge fixed libs/csws/csstddlg.cpp to use 
+          CaseInsensitiveCompareSort so the conversion of char to void wouldn't
+          bother the compiler.
+        - Old_Belge added CaseInsensitiveCompare to include/csutil/stringarray.h
+          , it seemed to be missing.
 26-Oct-2003
 	- Eric Sunshine updated `simple1' tutorial in the user manual to
 	  reflect recent changes to keyboard-related event handling.
