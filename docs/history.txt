@@ -18,6 +18,9 @@ chronological order.
 	  SCF_DESTRUCT_* macros.
 	- res fixed a compile error on odedynam on gcc 3.3, reported by andres
 	  from IRC.
+	- res commented out some #ifdefs in the light loading code 
+	  distinguishing between NR and OR, causing incorrect lighting with NR
+	  in some cases.
 19-Dec-2003
 	- Eric Sunshine added the new method
 	  csInitializer::RequestPlugins(csArray<csPluginRequest> const&) to

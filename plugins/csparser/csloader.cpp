@@ -3520,13 +3520,13 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 
   csVector3 attenvec (0, 0, 0);
   float distbright = 1;
-#ifdef CS_USE_NEW_RENDERER
+//#ifdef CS_USE_NEW_RENDERER
   float influenceRadius = 0;
   bool influenceOverride = false;
-  int attenuation = CS_ATTN_CLQ;
-#else
+/*  int attenuation = CS_ATTN_CLQ;
+#else*/
   int attenuation = CS_ATTN_LINEAR;
-#endif
+//#endif
   float dist = 0;
 
   csColor color;
@@ -3568,9 +3568,9 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   pos.x = pos.y = pos.z = 0;
   color.red = color.green = color.blue = 1;
   dyn = false;
-#ifndef CS_USE_NEW_RENDERER
+//#ifndef CS_USE_NEW_RENDERER
   dist = 1;
-#endif
+//#endif
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
