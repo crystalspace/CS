@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Mar-2004
+	- Anders Stenberg added a first version of a TerraFormer plugin. It will be
+	  responsible for feeding data to other plugins like terrain and vegetation
+	  renderers. Also introduced a new concept to CS: Thoroughly commented
+	  code!
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.

@@ -1,0 +1,120 @@
+/*
+    Copyright (C) 2004 by Anders Stenberg, Daniel Duhprey
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __CS_IVARIA_TERRAFORM_H__
+#define __CS_IVARIA_TERRAFORM_H__
+
+#include "csgeom/box.h"
+#include "csgeom/vector2.h"
+#include "csgeom/vector3.h"
+
+#include "csutil/array.h"
+#include "csutil/refarr.h"
+#include "csutil/scf.h"
+
+#include "iengine/material.h"
+
+struct iTerraSampler;
+
+SCF_VERSION (iTerraFormer, 0, 0, 1);
+
+/**
+ * TerraFormer objects are used to retrieve terrain data.
+ * All data is retrieved in blocks, from sampler regions.
+ */
+struct iTerraFormer : public iBase
+{
+  /**
+   * Get a sampler region from the terraformer. The sampler region will
+   * be used for all actual data retrieval.
+   */
+  virtual csPtr<iTerraSampler> GetSampler (csBox2 region, 
+    unsigned int resolution) = 0;
+};
+
+
+SCF_VERSION (iTerraSampler, 0, 0, 1);
+
+/**
+ * TerraSampler objects are used for the actual queries of terrain data
+ * Sampler regions are requested from the iTerraFormer plugin, and sampled
+ * for data via the Sample methods.
+ */
+struct iTerraSampler : public iBase
+{
+  /**
+   * Sample float data of the specified from the region. Data is sampled in 
+   * a grid (regular or irregular) with the square resolution specified when 
+   * the sampler was created. The "out" argument must be a preallocated
+   * array of sufficient size that will be filled.
+   */
+  virtual bool Sample (csStringID type, float* out) = 0;
+
+  /**
+   * Sample csVector2 data of the specified from the region. Data is sampled in 
+   * a grid (regular or irregular) with the square resolution specified when 
+   * the sampler was created. The "out" argument must be a preallocated
+   * array of sufficient size that will be filled.
+   */
+  virtual bool Sample (csStringID type, csVector2* out) = 0;
+
+  /**
+   * Sample csVector3 data of the specified from the region. Data is sampled in 
+   * a grid (regular or irregular) with the square resolution specified when 
+   * the sampler was created. The "out" argument must be a preallocated
+   * array of sufficient size that will be filled.
+   */
+  virtual bool Sample (csStringID type, csVector3* out) = 0;
+
+  /**
+   * Sample integer data of the specified from the region. Data is sampled in 
+   * a grid (regular or irregular) with the square resolution specified when 
+   * the sampler was created. The "out" argument must be a preallocated
+   * array of sufficient size that will be filled.
+   */
+  virtual bool Sample (csStringID type, int* out) = 0;
+
+  /**
+   * Retrieve the material palette used by this sampler region.
+   * Null entries are allowed.
+   */
+  virtual const csArray<iMaterialWrapper*> &GetMaterialPalette () = 0;
+
+  /// Retrieve the sample region specified when the sampler was created
+  virtual const csBox2 &GetRegion () const = 0;
+
+  /// Retrieve the sampling resolution specified when the sampler was created
+  virtual unsigned int GetResolution () const = 0;
+  
+  /**
+   * Retrieve the version number of this sampler. This will be increased
+   * whenever any terrain data in this region changes, and should thereby
+   * be used as a dirty indicator.
+   */
+  virtual unsigned int GetVersion () const = 0;
+  
+  /**
+   * Hint to the sampler that no data will be retrieved from it for a while. 
+   * This may give the sampler a chance to release data it's been caching for
+   * faster retrieval, and thereby save memory. This is a hint only, and may
+   * be ignored by the underlying implementation.
+   */
+  virtual void Cleanup () = 0; 
+};
+
+#endif // __CS_IVARIA_TERRAFORM_H__
