@@ -89,6 +89,14 @@ long csParser::GetObject (char **buf, csTokenVector * tokens, char **name,
     }
   }
 
+  if (allow_unknown_tokens)
+  {
+    char old_c = (*buf)[toklen];
+    (*buf)[toklen] = 0;
+    strcpy (unknown_token, (*buf));
+    (*buf)[toklen] = old_c;
+  }
+
   if (found_token)
   {
     // Skip the token.
@@ -98,10 +106,6 @@ long csParser::GetObject (char **buf, csTokenVector * tokens, char **name,
   {
     if (allow_unknown_tokens)
     {
-      char old_c = (*buf)[toklen];
-      (*buf)[toklen] = 0;
-      strcpy (unknown_token, (*buf));
-      (*buf)[toklen] = old_c;
       (*buf) += toklen;
     }
     else

@@ -7,6 +7,10 @@ The history order is reversed so that new features are at the top.
 	- Avoided several warnings in ogl_g3dcom.cpp.
 	- Fixed DrawTriangleMesh() in OpenGL renderer so it no longer crashes
 	  if no material is given.
+	- Fixed csParser so it will now also copy the token to
+	  GetUnknownToken() even if the token is not known.
+	- First attempt at making a conversion tool to convert the old
+	  style world files to a new XML format. This is unfinished though.
 	- Eric Sunshine made these additional changes to msvcgen.mak:
 	    - Fixed problem where generated project files were referring to .rc
 	      resource in CS/out/mk directory, rather than CS/mk/visualc[7].
