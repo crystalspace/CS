@@ -283,6 +283,7 @@ iBase* csBCTerrLoader::Parse (const char* pString,
 
   iMeshObject* iTerrObj = NULL;
   iBCTerrState* iState = NULL;
+  int group_iter = 0;
   //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Loader","Parse");
   csParser* parser = ldr_context->GetParser ();
   char* pBuf = (char*)pString;
@@ -379,12 +380,11 @@ iBase* csBCTerrLoader::Parse (const char* pString,
       break;
       case CS_TOKEN_GROUPMATERIAL:
       {
-        int i, rangeStart, rangeEnd, iter;
+        int i, rangeStart, rangeEnd;
         bool done;
         char pMatName[256];
         done = false;
         i = 0;
-        iter = 0;
 	csScanStr (pParams, "%s,%d,%d", pStr, &rangeStart, &rangeEnd);
         for (i = rangeStart; i <= rangeEnd; i++) 
         {
@@ -393,8 +393,8 @@ iBase* csBCTerrLoader::Parse (const char* pString,
           if (mat)
           {
             if (iState)
-              iState->SetBlockMaterialNum (iter, mat);
-            iter++;
+              iState->SetBlockMaterialNum (group_iter, mat);
+            group_iter++;
           }
         }
       }
