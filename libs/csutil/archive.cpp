@@ -814,7 +814,6 @@ void csArchive::ArchiveEntry::FreeBuffer ()
   buffer = NULL;
   buffer_pos = 0;
   buffer_size = 0;
-  info.ucsize = 0;
 }
 
 bool csArchive::ArchiveEntry::Append (const void *data, size_t size)

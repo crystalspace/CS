@@ -66,6 +66,9 @@ The history order has been reversed so that new features are at the top.
 	      although it could be avoided).
 	- Eric Sunshine fixed several compilation problems in MazeD following
 	  Andrew's changes.
+	- Eric Sunshine fixed a long-standing bug in archive.cpp where
+	  csArchive::ArchiveEntry::FreeBuffer() was clobbering the compressed-
+	  size value even though that value may have been used later.
 8-Jan-2001
 	- Wouter Wijngaards fixed procedural sky for OpenGL.
 	- Wouter also optimized it a little to use the new qsqrt().
