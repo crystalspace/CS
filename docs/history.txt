@@ -69,6 +69,9 @@ chronological order.
 	  drawing behind the portal and restored afterwards. Makes the shape
 	  room mirror in flarge work, but a better solution should be 
 	  researched.
+	- John Harger added the beginnings of the macros for the DLL compilation
+	  on Windows. Added include/csextern.h, modified include/csdef.h and
+	  csutil/win32/csosdefs.h
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.

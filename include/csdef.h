@@ -121,4 +121,13 @@
 // The smallest Z at which 3D clipping occurs
 #define SMALL_Z 0.01f
 
+// Defaults for platforms that do not need them
+#ifndef CS_EXPORT_SYM
+  #define CS_EXPORT_SYM
+#endif
+
+#ifndef CS_IMPORT_SYM
+  #define CS_IMPORT_SYM
+#endif
+
 #endif // __CS_CSDEF_H__
