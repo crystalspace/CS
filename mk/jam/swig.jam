@@ -101,8 +101,15 @@ if $(CMD.SWIG)
     SWIG.FLAGS on $(target) +=
       $(SWIG.FLAGS) -$(language) $(swigflags) -I$(swigincdirs) ;
 
-    # Allow Swig input file to reside in a location not indicated by $(SUBDIR).
-    if $(swigfiledir) { SEARCH on $(swigfile) = $(swigfiledir) ; }
+    # Allow Swig input file to reside at location other than $(SEARCH_SOURCE).
+    if $(swigfiledir)
+    {
+      SEARCH on $(swigfile) = $(swigfiledir) ;
+    }
+    else
+    {
+      SEARCH on $(swigfile) = $(SEARCH_SOURCE) ;
+    }
         
     # Scan for special Swig includes.
     HDRGRIST on $(swigfile) = $(HDRGRIST) ;
