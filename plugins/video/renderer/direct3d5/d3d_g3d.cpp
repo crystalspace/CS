@@ -1137,7 +1137,7 @@ STDMETHODIMP csGraphics3DDirect3DDx5::StartPolygonFX (ITextureHandle* handle,
   UInt mode)
 {
   float alpha = float (mode & CS_FX_MASK_ALPHA) / 255.;
-  m_gouraud = rstate_gouraud && (mode & CS_FX_GOURAUD != 0);
+  m_gouraud = rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
   m_alpha   = alpha;
 
