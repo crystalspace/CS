@@ -16,6 +16,19 @@ Contents:
 
 [2] GETTING READY TO DEVELOP
 
+If you are going to build the Open GL Renderer you need to download the OpenGL SDK from Apple.
+ftp://ftp.apple.com/developer/opengl/opengl_sdk.hqx  This will download a self mounting disk image.
+Double click on it.  Create a folder in the "Metrowerks CodeWarrior:MacOS Support" folder called
+"OpenGL SDK".  Copy the folders "Headers", "Libraries" and "Resources" from the "OpenGL SDK" disk
+and place them into the "OpenGL SDK" folder you just created.
+
+If you are going to build the Glide Renderer you need to download the Glide SDK from 3dfx.
+http://www.3dfx.com/downloads/SDK/sdk_glidemacppc/glide2xsdk_sea.hqx  This will download a self
+extracting archive.  Double click on "Glide2x SDK.sea".  No drivers are included. The SDK depends
+upon the operating system, not the cards. The Glide 2x drivers are available from the manufacturer
+of your Voodoo-based Macintosh accelerator card. You will need to place a copy of your driver (library)
+into the LIB folder in order to build your projects.
+
 [3] WORKING WITH THE CRYSTAL SPACE PROJECTS
 
 There are 22 Crystal Space projects in the mwcw folder: 

@@ -1,5 +1,5 @@
 Crystal Space Macintosh Development Readme
-This is up to date as of November 19th, 1999
+This is up to date as of December 8th, 1999
 Written by K. Robert Bate
 If you have any questions or problems, contact me at rbate@ma.ultranet.com.
 
@@ -13,21 +13,25 @@ Contents:
 
 1) Compiler: Metrowerks CodeWarrior Pro 4 or later.
 2) Include Files: Universal Includes 3.2 from Apple
-3) Libraries: libjpeg, linpng, and zlib.  The easiest place to get these is to
-get them from my web site <http://www.ultranet.com/~rbate>.  The libraries
-from my web site already have been built so they are ready to go.
-4) Directory layout:  The three libraries mentioned above need to be placed into "CS"
-if they were not unpacked into this folder.
 
 [2] GETTING READY TO DEVELOP
 
-1. Unpack the includes in libs:cssys:mac:includes.sit.  If you used Stuffit Expander to
-unpack the includes, move the folder that is in "includes Folder" into "mac" then throw
-out "includes Folder".
+If you are going to build the Open GL Renderer you need to download the OpenGL SDK from Apple.
+ftp://ftp.apple.com/developer/opengl/opengl_sdk.hqx  This will download a self mounting disk image.
+Double click on it.  Create a folder in the "Metrowerks CodeWarrior:MacOS Support" folder called
+"OpenGL SDK".  Copy the folders "Headers", "Libraries" and "Resources" from the "OpenGL SDK" disk
+and place them into the "OpenGL SDK" folder you just created.
+
+If you are going to build the Glide Renderer you need to download the Glide SDK from 3dfx.
+http://www.3dfx.com/downloads/SDK/sdk_glidemacppc/glide2xsdk_sea.hqx  This will download a self
+extracting archive.  Double click on "Glide2x SDK.sea".  No drivers are included. The SDK depends
+upon the operating system, not the cards. The Glide 2x drivers are available from the manufacturer
+of your Voodoo-based Macintosh accelerator card. You will need to place a copy of your driver (library)
+into the LIB folder in order to build your projects.
 
 [3] WORKING WITH THE CRYSTAL SPACE PROJECTS
 
-There are 23 Crystal Space projects in the mwcw folder: 
+There are 22 Crystal Space projects in the mwcw folder: 
 
 3 projects that build static libraries:
 CSpace.mcp		- generates the static linked library, which includes the
@@ -37,17 +41,15 @@ CSWS.mcp		- generates the static linked library, which includes the
 impexp.mcp		- generates the static linked library, which includes the
 				  code for the import and export code.
 
-10 projects that build shared libraries:
+7 projects that build shared libraries:
 Driver2D.mcp			- generates the 2D Graphics shared library.
 SftRndr.mcp				- generates the SoftwareRender shared library, which includes the 3D graphics
 						  driver for software rasterization.
 OpenGLRndr.mcp			- generates the OpenGL Render shared library.
+Sound.mcp 				- generates the mac sound driver shared library and
+						  software sound render shared library.
 
-These next 7 projects are not up to date:
-SoundDriver.mcp 		- generates the mac sound driver shared library.
-SoundDriverNull.mcp  	- generates the null sound driver shared library.
-SoundRender.mcp			- generates the software sound render shared library.
-SoundRenderNull.mcp		- generates the null sound render manager shared library.
+These next 3 projects are not up to date:
 GlideRender.mcp			- generates the Glide Render shared library.
 NetworkDriverNull.mcp	- generates the null network driver shared library.
 NetworkMgrNull.mcp  	- generates the null network manager shared library.
@@ -64,8 +66,9 @@ Shooter.mcp  	- A Crystal Space application.
 Squawk.mcp  	- A Crystal Space application.
 Walktest.mcp	- Another Simple Crystal Space application.
 
-and 1 project that builds other projects
+and 2 project that builds other projects
 MakeShared.mcp	- Makes sure all of the shared libraries and CSRegSvr are up to date.
+MakeApps.mcp	- Makes sure all of the applications are up to date.
 
 Generally you will just build an application and all of the other pieces will be built for you.
 All of the resulting libraries and applications will be placed in the src directory.
@@ -77,7 +80,7 @@ in the src folder and drop them on the scfreg application.
 
 3. Choose an application to build.  I generally start with walktest.  Make it.
 
-4. Make sure the world file large.zip is in the src folder.
+4. Make sure the world file flarge.zip is in the data folder.
 
 5. You're all set to run the application.
 
