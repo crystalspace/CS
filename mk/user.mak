@@ -55,6 +55,7 @@ PLUGINS += mesh/stars/object
 PLUGINS += mesh/thing/persist/classic
 PLUGINS += motion/standard/object  motion/standard/persist/classic
 PLUGINS += engine/3d
+PLUGINS += csparser
 
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += cslexan

@@ -59,7 +59,7 @@ $(CSPARSER): $(OBJ.CSPARSER) $(LIB.CSPARSER)
 
 clean: csparserclean
 csparserclean:
-        -$(RM) $(CSPARSER) $(OBJ.CSPARSER)
+	-$(RM) $(CSPARSER) $(OBJ.CSPARSER)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)csparser.dep
