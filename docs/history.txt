@@ -15,6 +15,9 @@ chronological order.
 	- Eric Sunshine augmented the Doxygen comments for iMouseDriver and
 	  iJoystickDriver so that they give an indication of legal values for
 	  button and joystick numbers.
+	- Vincent Knecht removed calls to iTextureManager::SetVerbose() and
+	  iMeshWrapper::DeferUpdateLighting in tutorial2.py script.
+
 11-May-2004
 	- Eric Sunshine made some clarifications and corrections to the
 	  'simple' tutorial, AWS "getting started", and iGraphics3D Doxygen

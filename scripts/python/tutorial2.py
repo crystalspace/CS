@@ -70,7 +70,6 @@ class MyCsApp:
             FatalError("Could not open the application!")
             
         txtmgr=self.g3d.GetTextureManager()
-        txtmgr.SetVerbose(1)
         
         room=self.SetupRoom()   # creates & returns the room
         self.CreateLights(room)
@@ -142,8 +141,7 @@ class MyCsApp:
         sprite.SetZBufMode(CS_ZBUF_USE)
         sprite.SetRenderPriority(self.engine.GetObjectRenderPriority())
 
-        sprite.DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10)
-    
+
     def CreateCamera(self,room,origin):
         self.view = csView(self.engine, self.g3d)
         self.view.GetCamera().SetSector(room)
