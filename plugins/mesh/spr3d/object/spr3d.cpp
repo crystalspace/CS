@@ -1721,6 +1721,7 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
         {
           last_time += csTicks(cur_action->GetFrameDelay (cur_frame)/speedfactor);
           cur_frame+=frame_increment;
+	  cur_displacement = 0;
           if (cur_frame >= cur_action->GetFrameCount ())
           {
             cur_frame = 0;
@@ -1782,7 +1783,7 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
     last_time = current_time;
     tween_ratio = 0;
   }
-//  printf("Disp: %1.4f Frame #%d TweenDisp:%1.4f  Tween:%1.4f\n",save_displacement,cur_frame,last_displacement,tween_ratio);
+//  printf("Disp: %1.4f Frame #%d TweenDisp:%1.4f  Tween:%1.4f\n",cur_displacement,cur_frame,last_displacement,tween_ratio);
 
   return ret;
 }
