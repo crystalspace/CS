@@ -1107,7 +1107,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     glLoadIdentity ();
     SetGlOrtho (false);
     glViewport (0, 0, viewwidth, viewheight);
-    glTranslatef (viewwidth/2, viewheight/2, 0);
+    glTranslatef (asp_center_x, asp_center_y, 0);
 
     GLfloat matrixholder[16];
     for (int i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;

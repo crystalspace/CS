@@ -22,6 +22,8 @@ chronological order.
 	  set). Also slightly changed the way it's drawn, now uses shader var
 	  accessors (instead of setting all the data in GetRenderMeshes()).
 	- res fixed a GCC warning in the PS1 plugin.
+	- res fixed glrender3d to use the actual perspective center instead
+	  of a hardcoded "center of screen".
 29-Mar-2004
 	- Jorrit changed the NR null3d renderer so it uses the soft canvas
 	  instead of the OpenGL canvas by default.
