@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	  key event; however, Windows generates another message containing the 
 	  keycode translated to a character. 
 	- res attempted to update & fix cs-config on win32.
+	- res fixed a usage of GetLongPath() in instpath.cpp. Replaced it with
+	  a call to csExpandPath().
 7-Jul-2003
 	- Peter Amstutz changed iDataBuffer so that it can be instructed 
 	  not to delete the underlying buffer when iDataBuffer is freed.

@@ -71,21 +71,23 @@ GetRegistryInstallPath (const HKEY parentKey, char *oInstallPath, size_t iBuffer
 // ensures that the path as no trailing path delimiter
 static inline char* NewPathWOTrailingDelim (const char *path)
 {
-  char longPath[MAX_PATH];
-  GetLongPathName (path, longPath, sizeof (longPath));
-
-  char *newPath = csStrNew (longPath);
-  if (strlen(path) > 0)
+  char *newPath = csExpandPath (path);
+  if ((newPath != 0) && (strlen (newPath) > 0))
   {
     char *end = &newPath[strlen(newPath) - 1];
     if ((*end == '/') || (*end == '\\'))
       *end = 0;
+    return newPath;
   }
-  return newPath;
+  else
+  {
+    return 0;
+  }
 }
 
 static inline char* FindConfigPath ()
 {
+  char* retPath = 0;
   // override the default to get install path from
   // 1. CRYSTAL environment variable
   // 2. this machine's system registry
@@ -102,14 +104,14 @@ static inline char* FindConfigPath ()
   // called.
   char *envpath = getenv ("CRYSTAL");
   if (envpath && *envpath)
-    return NewPathWOTrailingDelim (envpath);
+    if ((retPath = NewPathWOTrailingDelim (envpath)) != 0) return retPath;
 
   // try the registry
   char path[1024];
   if (GetRegistryInstallPath (HKEY_CURRENT_USER, path, 1024))
-    return NewPathWOTrailingDelim (path);
+    if ((retPath = NewPathWOTrailingDelim (path)) != 0) return retPath;
   if (GetRegistryInstallPath (HKEY_LOCAL_MACHINE, path, 1024))
-    return NewPathWOTrailingDelim (path);
+    if ((retPath = NewPathWOTrailingDelim (path)) != 0) return retPath;
 
   // perhaps current drive/dir?
   FILE *test = fopen("vfs.cfg", "r");
@@ -136,7 +138,7 @@ static inline char* FindConfigPath ()
   {
     // use current dir
     fclose(test);
-    return NewPathWOTrailingDelim (apppath);
+    if ((retPath = NewPathWOTrailingDelim (apppath)) != 0) return retPath;
   }
 
   // retrieve the path of the Program Files folder and append 
