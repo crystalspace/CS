@@ -110,12 +110,12 @@ struct iFoliageObject : public iBase
    * algorithm.
    * \param fromslot is the source mesh to use for the reduction.
    * \param toslot is where the new geometry must be placed.
-   * \param factory is a number between 0 and 1 indicating how
+   * \param factor is a number between 0 and 1 indicating how
    *        many triangles must remain. 0 means none, and 1 means
    *        all.
    */
   virtual csPtr<iFoliageGeometry> CreateGeometryLOD (size_t fromslot,
-      size_t toslot, float factory) = 0;
+      size_t toslot, float factor) = 0;
 
   /**
    * Get the geometry at the specified lodslot.
