@@ -117,21 +117,32 @@ void csSpriteCal3DSocket::SetMeshWrapper (iMeshWrapper* mesh)
   attached_mesh_trans = csReversibleTransform(mat, csVector3(0,0,0));
 }
 
-void csSpriteCal3DSocket::AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans)
+size_t csSpriteCal3DSocket::AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans)
 {
   secondary_meshes.Push(csSpriteCal3DSocketMesh(mesh, trans));
+  return secondary_meshes.Length()-1;
 }
 
 void csSpriteCal3DSocket::DetachSecondary (const csString & mesh_name)
 {
+  size_t a=FindSecondary(mesh_name);
+  if (a < secondary_meshes.Length())
+    secondary_meshes.DeleteIndex(a);
+}
+
+void csSpriteCal3DSocket::DetachSecondary (size_t index)
+{
+  secondary_meshes.DeleteIndex(index);
+}
+
+size_t csSpriteCal3DSocket::FindSecondary (const csString & mesh_name)
+{
   for (size_t a=0; a<secondary_meshes.Length(); ++a)
   {
     if (secondary_meshes[a].mesh->QueryObject()->GetName() == mesh_name)
-    {
-      secondary_meshes.DeleteIndex(a);
-      return;
-    }
+      return a;
   }
+  return secondary_meshes.Length();
 }
 
 //--------------------------------------------------------------------------
@@ -1539,10 +1550,18 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
 	break;
       }
     }
+    for (size_t a=0; a<sockets[i]->GetSecondaryCount(); ++a)
+    {
+      if (sockets[i]->GetSecondaryMesh(a)->GetMeshObject() == child)
+      {
+        socket = sockets[i];
+        break;
+      }
+    }
   }
+  
   if (socket)
   {
-    iMovable* movable = socket->GetMeshWrapper()->GetMovable();
     Advance(current_time);
     int m = socket->GetMeshIndex();
     int s = socket->GetSubmeshIndex();
@@ -1580,13 +1599,17 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
     csVector3 normal = bc % up;
     normal.Normalize();
 
-    csReversibleTransform trans = movable->GetFullTransform();
+    csReversibleTransform trans; //= movable->GetFullTransform();
     trans.SetOrigin(center);
     trans.LookAt(normal, up);
 
-    movable->SetTransform(socket->GetTransform()*trans);
-    movable->UpdateMove();
-
+    if (socket->GetMeshWrapper())
+    {
+      iMovable* movable = socket->GetMeshWrapper()->GetMovable();
+      movable->SetTransform(socket->GetTransform()*trans);
+      movable->UpdateMove();
+    }
+    
     // update secondary meshes
     for (size_t a=0; a<socket->GetSecondaryCount(); ++a)
     {
@@ -2331,8 +2354,15 @@ csSpriteCal3DSocket* csSpriteCal3DMeshObject::FindSocket (
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
+  {
     if (GetSocket (i)->GetMeshWrapper() == mesh)
       return GetSocket (i);
+    for (size_t a=0; a<GetSocket (i)->GetSecondaryCount(); ++a)
+    {
+      if (GetSocket (i)->GetSecondaryMesh(a) == mesh)
+        return GetSocket (i);  
+    }
+  }
 
   return 0;
 }

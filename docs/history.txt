@@ -9,6 +9,7 @@ chronological order.
 23-Oct-2004
 	- res fixed the GL iGraphics3D::DrawPixmap() disabling blending, which
 	  messed up subsequent text writing.
+    - Andrew Robberts fixed some bugs in cal3d sockets
 22-Oct-2004
 	- Eric Sunshine fixed a bug in the replacement MakeLocate rule in
 	  subdir.jam where it failed to set the LOCATE variable for the target

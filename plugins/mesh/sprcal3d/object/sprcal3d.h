@@ -164,10 +164,15 @@ class csSpriteCal3DSocket : public iSpriteCal3DSocket
     virtual iMeshWrapper * GetSecondaryMesh (size_t index) { return secondary_meshes[index].mesh; }
     /// Get the transform of the attached secondary mesh at the given index
     virtual csReversibleTransform GetSecondaryTransform (size_t index) { return secondary_meshes[index].trans; }
+    /// Set the transform of the attached secondary mesh at the given index
+    virtual void SetSecondaryTransform (size_t index, csReversibleTransform trans) { secondary_meshes[index].trans = trans; }
     /// Attach a secondary mesh
-    virtual void AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans);
+    virtual size_t AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans);
     /// Detach a secondary mesh
     virtual void DetachSecondary (const csString & mesh_name);
+    virtual void DetachSecondary (size_t index);
+    /// Searches for the index of the given attached secondary mesh
+    virtual size_t FindSecondary (const csString & mesh_name);
 
     SCF_DECLARE_IBASE;
 };
