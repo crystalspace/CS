@@ -1,3 +1,11 @@
+@node csParser
+@section World File Parser (@code{csParser})
+@cindex World File Parser
+@cindex csParser
+
+This section will describe the world file parser (@code{csParser}). Currently
+there is only a section describing the format of the world files.
+
 @c -*-texinfo-*-
 
 @c ----------------------------------------------------------------------------
@@ -81,7 +89,7 @@
 @end macro
 
 @node World File Format, Memory Debugger, Directory Hierarchy, Anatomy
-@section Format of World File
+@subsection Format of World File
 @cindex Format of World File
 @cindex World File Format
 
@@ -112,7 +120,7 @@ It deals strictly with plain-text files.
 @end menu
 
 @node World File Grammar, World File Syntax, World File Format, World File Format
-@subsection Grammar
+@subsubsection Grammar
 
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
@@ -156,7 +164,7 @@ WAGER (72, 91)
 @end example
 
 @node World File Syntax, World File Hints, World File Grammar, World File Format
-@subsection Syntax
+@subsubsection Syntax
 
 @noindent
 @emph{Written by numerous Crystal Space developers.  Extensive Texinfo
@@ -976,7 +984,7 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
     @token{LIBRARY} @LP{} [ @nonterm{library-comp} @dots{} ] @RP{}}
 
 @node World File Hints, , World File Syntax, World File Format
-@subsection Hints
+@subsubsection Hints
 
 @noindent
 @emph{Written by Jorrit Tyberghein,
@@ -1121,3 +1129,4 @@ it not suited for computer generated output.  Ignore @samp{ROOM} and
 @unmacro COMMA
 @unmacro LP
 @unmacro RP
+

@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node ProcTextures, Platform Details, Memory Debugger, Anatomy
-@section Procedural Texture System
+@subsection Procedural Texture System
 @cindex Procedural Texture System
 
 @noindent

@@ -19,16 +19,10 @@ Scripting
 * Library List:: Quick Overview of Modules and Libraries
 * Dependencies::
 * Directory Hierarchy::
-* World File Format:: Format of World File
 * Memory Debugger:: Crystal Space Memory Debugger
-* ProcTextures:: Procedural Texture System
-* Platform Details:: Platform-Specific Details
 @end menu
 
 @imports{anatomy,liblist.txi}
 @imports{anatomy,depend.txi}
 @imports{anatomy,dirhier.txi}
-@imports{anatomy,worldfmt.txi}
 @imports{anatomy,memdebug.txi}
-@imports{anatomy,proctex.txi}
-@importss{anatomy,platform,details.txi}

@@ -14,5 +14,5 @@ you should read.
 * OS2 Details:: OS/2
 @end menu
 
-@importss{anatomy,platform,next.txi}
-@importss{anatomy,platform,os2.txi}
+@importss{internal,platform,next.txi}
+@importss{internal,platform,os2.txi}

@@ -23,3 +23,5 @@ currently several implementations of this component: Software, OpenGL, Glide,
 and Direct3D, as well as debugging drivers such as Line and Infinite.
 @end itemize
 
+@importss{plugins,graphics,proctex.txi}
+
