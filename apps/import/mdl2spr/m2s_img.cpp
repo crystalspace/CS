@@ -29,7 +29,7 @@ int SkinImage::GetWidth () { return Width; }
 int SkinImage::GetHeight () { return Height; }
 int SkinImage::GetSize () { return Size; }
 void SkinImage::Rescale (int, int) {}
-iImage *SkinImage::MipMap (int, csRGBpixel*) { return NULL; }
+csPtr<iImage> SkinImage::MipMap (int, csRGBpixel*) { return NULL; }
 void SkinImage::SetName (const char*) {}
 const char *SkinImage::GetName () { return NULL; }
 int SkinImage::GetFormat () { return CS_IMGFMT_PALETTED8; }
@@ -37,10 +37,10 @@ csRGBpixel *SkinImage::GetPalette () { return Palette; }
 uint8 *SkinImage::GetAlpha () { return NULL; }
 void SkinImage::CheckAlpha () { }
 void SkinImage::SetFormat (int) {}
-iImage *SkinImage::Clone () { return NULL; }
-iImage *SkinImage::Crop (int, int, int, int) { return NULL; }
+csPtr<iImage> SkinImage::Clone () { return NULL; }
+csPtr<iImage> SkinImage::Crop (int, int, int, int) { return NULL; }
 
-iImage* SkinImage::Sharpen (csRGBpixel *transp, int strength)
+csPtr<iImage> SkinImage::Sharpen (csRGBpixel *transp, int strength)
 {
   // Following block added so silence compiler warnings ONLY
   transp = NULL;

@@ -36,7 +36,7 @@ public:
   virtual int GetHeight ();
   virtual int GetSize ();
   virtual void Rescale (int NewWidth, int NewHeight);
-  virtual iImage *MipMap (int step, csRGBpixel *transp);
+  virtual csPtr<iImage> MipMap (int step, csRGBpixel *transp);
   virtual void SetName (const char*);
   virtual const char *GetName ();
   virtual int GetFormat ();
@@ -44,11 +44,11 @@ public:
   virtual uint8 *GetAlpha ();
   virtual void CheckAlpha ();
   virtual void SetFormat (int iFormat);
-  virtual iImage *Clone ();
-  virtual iImage *Crop (int x, int y, int width, int height);
+  virtual csPtr<iImage> Clone ();
+  virtual csPtr<iImage> Crop (int x, int y, int width, int height);
   virtual bool HasKeycolor () { return 0; }
   virtual void GetKeycolor (int &r, int &g, int &b) { r=0;g=0;b=0; }
-  virtual iImage *Sharpen (csRGBpixel *transp, int strength);
+  virtual csPtr<iImage> Sharpen (csRGBpixel *transp, int strength);
   SCF_DECLARE_IBASE;
 };
 
