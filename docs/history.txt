@@ -3,6 +3,12 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+25-Jun-2003
+	- Oktal manually applied a patch to cssocket that was intended for
+	  ensocket, submitted by Ladislav Foldyna.
+	  The patch adds multicast support.
+	  I also added warnings that are triggered when deprecated functions
+	  are called.
 24-Jun-2003
 	- Oktal added an iGraphicsMemory interface with which to access
 	  the csGraphicsMemory plugin.

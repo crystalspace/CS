@@ -20,6 +20,10 @@
 #ifndef __CS_INETWORK_DRIVER2_H__
 #define __CS_INETWORK_DRIVER2_H__
 
+#ifndef COMP_VC
+# warning Use of iNetworkDriver2 is deprecated. Use iNetworkDriver instead.
+#endif
+
 #include "csutil/scf.h"
 struct iNetworkSocket2;
 

@@ -42,7 +42,9 @@ enum csNetworkDriverError
   CS_NET_ERR_CANNOT_PARSE_ADDRESS,
   CS_NET_ERR_CANNOT_GET_VERSION,
   CS_NET_ERR_WRONG_VERSION,
-  CS_NET_ERR_CANNOT_CLEANUP
+  CS_NET_ERR_CANNOT_CLEANUP,
+  CS_NET_ERR_NO_SUCH_OPTION,
+  CS_NET_ERR_CANNOT_SET_OPTION
 };
 
 /**
@@ -59,7 +61,7 @@ struct csNetworkDriverCapabilities
 };
 
 
-SCF_VERSION (iNetworkEndPoint, 0, 1, 0);
+SCF_VERSION (iNetworkEndPoint, 0, 1, 1);
 
 /**
  * This is the network end-point interface for CS.  It represents one end of
@@ -71,12 +73,15 @@ struct iNetworkEndPoint : public iBase
   /// Terminates the connection; destroying the object also auto-terminates.
   virtual void Terminate() = 0;
 
+  /// Set an option in the network implementation. For example, "TTL".
+  virtual bool SetOption (const char *name, int value) = 0;
+
   /// Retrieve the code for the last error encountered.
   virtual csNetworkDriverError GetLastError() const = 0;
 };
 
 
-SCF_VERSION (iNetworkConnection, 0, 1, 0);
+SCF_VERSION (iNetworkConnection, 0, 1, 1);
 
 /**
  * This is the network connection interface for CS.  It represents a single
@@ -110,7 +115,7 @@ struct iNetworkConnection : public iNetworkEndPoint
 };
 
 
-SCF_VERSION (iNetworkListener, 0, 1, 0);
+SCF_VERSION (iNetworkListener, 0, 1, 1);
 
 /**
  * This is the network listener interface for CS.  It represents a single
@@ -142,25 +147,33 @@ struct iNetworkDriver : public iBase
 {
   /**
    * Create a new network connection.  The 'target' parameter is driver
-   * dependent.  For example, with a socket driver, the target might be
+   * dependent.
+   *
+   * For example, with a socket driver, the target might be
    * "host:port/protocol"; with a modem driver it might be
-   * "Device:PhoneNumber"; etc. The 'reliable' flag is deprecated.
-   * The 'blocking' flag determines whether operations on the connection
-   * return immediately in all cases or wait until the operation can be
-   * completed successfully. Returns the new connection object or 0
-   * if the connection failed.
+   * "Device:PhoneNumber"; etc. The current main socket driver supports the
+   * TCP, UDP and Multicast protocols.
+   *
+   * The 'reliable' flag is deprecated. The 'blocking' flag determines whether
+   * operations on the connection return immediately in all cases or wait
+   * until the operation can be completed successfully. Returns the new
+   * connection object or 0 if the connection failed.
    */
   virtual csPtr<iNetworkConnection> NewConnection(const char* target,
     bool reliable = true, bool blocking = false) = 0;
 
   /**
    * Create a new network listener.  The 'source' parameter is driver
-   * dependent.  For example, with a socket driver, the source might be
-   * "port/protocol"; with a modem driver it might be "comport"; etc.
-   * The 'reliable' flag is deprecated.
-   * The 'blockingListener' flag determines whether or not the Accept() method
-   * blocks while being called.  The 'blockingConnection' flag determines
-   * whether or not methods in the resulting connection object block.
+   * dependent.
+   *
+   * For example, with a socket driver, the source might be "port/protocol";
+   * with a modem driver it might be "comport"; etc. The current main socket
+   * driver supports the TCP, UDP and Multicast protocols.
+   * 
+   * The 'reliable' flag is deprecated. The 'blockingListener' flag
+   * determines whether or not the Accept() method blocks while being called.
+   * The 'blockingConnection' flag determines whether or not methods in the
+   * resulting connection object block.
    */
   virtual csPtr<iNetworkListener> NewListener(const char* source,
     bool reliable = true, bool blockingListener = false,

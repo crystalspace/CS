@@ -27,6 +27,9 @@
 #include "iutil/objreg.h"
 #include "csutil/util.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+
 #define CS_NET_LISTEN_QUEUE_SIZE 5
 
 CS_IMPLEMENT_PLUGIN
@@ -108,6 +111,27 @@ bool csSocketEndPoint::PlatformSetBlocking(bool blocks)
 {
   unsigned long flag = (blocks ? 0 : 1);
   return (CS_IOCTLSOCKET(Socket, FIONBIO, &flag) == 0);
+}
+
+bool csSocketEndPoint::SetOption (const char *name, int value)
+{
+  if (! ValidateSocket ()) return false;
+
+  if (strcasecmp (name, "ttl") == 0)
+  {
+    if (setsockopt (Socket, IPPROTO_IP, IP_MULTICAST_TTL,
+                    (char *) & value, sizeof (value)) == -1)
+    {
+      LastError = CS_NET_ERR_CANNOT_SET_OPTION;
+      return false;
+    }
+  }
+  else 
+  {
+    LastError = CS_NET_ERR_NO_SUCH_OPTION;
+    return false;
+  }
+  return true;
 }
 
 // csSocketConnection ---------------------------------------------------------
@@ -210,7 +234,7 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
 
   struct sockaddr_in addr;
   addr.sin_family = AF_INET;
-  addr.sin_addr.s_addr = INADDR_ANY;
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
   addr.sin_port = htons(port);
 
   bool ok = false;
@@ -309,7 +333,7 @@ csNetworkSocket csSocketDriver::CreateSocket(bool reliable)
   return s;
 }
 
-unsigned long csSocketDriver::ResolveAddress(const char* host)
+unsigned long csSocketDriver::ResolveAddress(const char* host, short *fam)
 {
   if (host == 0 || *host == 0) host = "127.0.0.1";
   unsigned long address = ntohl(inet_addr((char*)host));
@@ -317,7 +341,10 @@ unsigned long csSocketDriver::ResolveAddress(const char* host)
   {
     const struct hostent* const p = gethostbyname((char*)host);
     if (p != 0)
+    {
       address = ntohl(*(unsigned long*)(p->h_addr_list[0]));
+      if (fam) *fam = p->h_addrtype;
+    }
     else
     {
       address = 0;
@@ -338,6 +365,7 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
     unsigned short port = 0;
     const char* p = strchr(target, ':');
     const char* proto = strchr(target, '/');
+    bool mc = false;
     if (p != 0)
     {
       host = strdup(target);
@@ -347,7 +375,11 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
         host[proto - target] = '\0';
         if (strcasecmp (proto + 1, "tcp") == 0) reliable = true;
         else if (strcasecmp (proto + 1, "udp") == 0) reliable = false;
+        else if (strcasecmp (proto + 1, "multicast") == 0) mc = true;
       }
+      else fprintf (stderr, "Warning: the `reliable' and `blocking' flags "
+        "in iNetworkDriver::NewConnection() are deprecated.\n");
+      if (mc) reliable = false;
       port = atoi(p + 1);
     }
 
@@ -355,7 +387,8 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
       LastError = CS_NET_ERR_CANNOT_PARSE_ADDRESS;
     else
     {
-      const unsigned long address = ResolveAddress(host);
+      short family;
+      const unsigned long address = ResolveAddress(host, mc ? &family : 0);
       if (address != 0)
       {
         csNetworkSocket s = CreateSocket(reliable);
@@ -363,9 +396,16 @@ csPtr<iNetworkConnection> csSocketDriver::NewConnection(
         {
 	  struct sockaddr_in addr;
 	  memset(&addr, 0, sizeof(addr));
-	  addr.sin_family = AF_INET;
+	  addr.sin_family = mc ? family : AF_INET;
 	  addr.sin_addr.s_addr = htonl(address);
 	  addr.sin_port = htons(port);
+          if (mc)
+          {
+            int ttl = 1;
+            if (setsockopt (s, IPPROTO_IP, IP_MULTICAST_TTL,
+                            (char *) & ttl, sizeof (ttl)) == -1)
+              LastError = CS_NET_ERR_CANNOT_SET_OPTION;
+          }
 	  if (connect(s, (struct sockaddr*)&addr, sizeof(addr)) != -1)
 	    connection = new csSocketConnection(this, s, blocking, reliable,
               *(struct sockaddr*)&addr);
@@ -386,19 +426,37 @@ csPtr<iNetworkListener> csSocketDriver::NewListener(const char* source,
   ClearError();
   iNetworkListener* listener = 0;
 
+  const char* portstr = strchr(source, ':');
   const char* proto = strchr(source, '/');
+  bool mc = false;
   if (proto)
   {
     if (strcasecmp (proto + 1, "tcp") == 0) reliable = true;
     else if (strcasecmp (proto + 1, "udp") == 0) reliable = false;
+    else if (strcasecmp (proto + 1, "multicast") == 0) mc = true;
   }
-  const unsigned short port = atoi(source);
+  else fprintf (stderr, "Warning: the `reliable' and `blocking' flags "
+    "in iNetworkDriver::NewListener() are deprecated.\n");
+  if (mc) reliable = false;
+  const unsigned short port = atoi(portstr ? portstr + 1 : source);
   if (port == 0)
     LastError = CS_NET_ERR_CANNOT_PARSE_ADDRESS;
 
   else
   {
     csNetworkSocket s = CreateSocket(reliable);
+    if (mc)
+    {
+      struct ip_mreq mreq;
+      char *src = strdup (source);
+      *(src + (portstr - source)) = '\0';
+      mreq.imr_multiaddr.s_addr = ResolveAddress (source);
+      free (src);
+      mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+      if (setsockopt (s, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+                      (char *) & mreq, sizeof (mreq)) == -1)
+        LastError = CS_NET_ERR_CANNOT_SET_OPTION;
+    }
     if (s != CS_NET_SOCKET_INVALID)
       listener = new csSocketListener(this, s, port, blockingListener,
         blockingConnection, reliable);
@@ -408,6 +466,7 @@ csPtr<iNetworkListener> csSocketDriver::NewListener(const char* source,
 
 csNetworkDriverCapabilities csSocketDriver::GetCapabilities() const
 {
+  fprintf (stderr, "iNetworkDriver::GetCapabilities() is deprecated.\n");
   csNetworkDriverCapabilities c;
   c.ConnectionReliable = true;
   c.ConnectionUnreliable = true;
