@@ -273,7 +273,7 @@ bool csIniFile::Load (const char *Data, size_t DataSize)
           finish = true;
         else
           break;
-      record[cur - buff + i] = 0;
+      record.SetAt (cur - buff + i, '\0');
       len = i;
 
       // Check if string is a valid BASE64 string
