@@ -62,13 +62,6 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   int len = strlen (fullPath);
   if (len >= 3 && strcasecmp (fullPath + len - 3, ".so") == 0)
   {
-    static bool init = true;
-    if (init)
-    {
-      bfd_init ();
-      init = false;
-    }
-
     bfd *abfd = bfd_openr (fullPath, 0);
     if (! abfd) errmsg = "libbfd can't open file";
     else
@@ -120,7 +113,6 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   return csPtr<iString> (result);
 }
   
-// Scan a directory for .csplugin files
 void InternalScanPluginDir (iStringArray*& messages,
 			    const char* dir, 
 			    csRef<iStringArray>& plugins,
@@ -135,37 +127,89 @@ void InternalScanPluginDir (iStringArray*& messages,
       if (!isdir(dir, de))
       {
         int const n = strlen(de->d_name);
-        if ((n >= 9 && strcasecmp(de->d_name + n - 9, ".csplugin") == 0)
-         || (n >= 3 && strcasecmp(de->d_name + n - 3, ".so") == 0))
+        if (n >= 9 && strcasecmp(de->d_name + n - 9, ".csplugin") == 0)
         {
-	  csString scffilepath;
-	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
-	  
-	  plugins->Push (csStrNew (scffilepath));
-        }
-        else
-	{
-	  if (recursive && (strcmp (de->d_name, ".") != 0)
-	    && (strcmp (de->d_name, "..") != 0))
-	  {
-	    iStringArray* subdirMessages = 0;
-	    
+          csString csp (de->d_name);
+          csp.Truncate (n - 9);
+          csp.Append (".so");
+          csp.Insert (0, PATH_SEPARATOR);
+          csp.Insert (0, dir);
+
+printf("* %s\n", csp.GetData());
+          if (plugins->FindContent (csp) == -1)
+          {
 	    csString scffilepath;
 	    scffilepath << dir << PATH_SEPARATOR << de->d_name;
 	  
-	    InternalScanPluginDir (subdirMessages, scffilepath,
-	      plugins, recursive);
+	    plugins->Push (csStrNew (scffilepath));
+          }
+        }
+        else if (n >= 3 && strcasecmp(de->d_name + n - 3, ".so") == 0)
+        {
+          static bool init = true;
+          if (init)
+          {
+            bfd_init ();
+            init = false;
+          }
+
+          bfd *abfd = bfd_openr (de->d_name, 0);
+          if (abfd)
+          {
+            if (bfd_check_format (abfd, bfd_object)
+             && bfd_get_section_by_name (abfd, ".crystal"))
+            {
+              csString csp (de->d_name);
+              csp.Truncate (n - 3);
+              csp.Append (".csplugin");
+              csString cspath (csp);
+              cspath.Insert (0, PATH_SEPARATOR);
+              cspath.Insert (0, dir);
+
+              struct stat tmp;
+              if (stat (cspath, & tmp) == 0)
+              {
+                if (! messages) messages = new scfStringArray;
+                csString message;
+                message.Format ("Warning: both %s and %s found, using %s.",
+                  de->d_name, csp.GetData (), de->d_name);
+                messages->Push (csStrNew (message));
+                int index = plugins->Find (csp);
+                if (index != -1) plugins->DeleteIndex (index);
+              }
+
+	      csString scffilepath;
+	      scffilepath << dir << PATH_SEPARATOR << de->d_name;
+	  
+	      plugins->Push (csStrNew (scffilepath));
+            }
+
+            bfd_close (abfd);
+          }
+        }
+      }
+      else
+      {
+	if (recursive && (strcmp (de->d_name, ".") != 0)
+	  && (strcmp (de->d_name, "..") != 0))
+	{
+	  iStringArray* subdirMessages = 0;
+	    
+	  csString scffilepath;
+	  scffilepath << dir << PATH_SEPARATOR << de->d_name;
+	  
+	  InternalScanPluginDir (subdirMessages, scffilepath,
+	    plugins, recursive);
   
-	    if (subdirMessages != 0)
+	  if (subdirMessages != 0)
+	  {
+	    for (int i = 0; i < subdirMessages->Length(); i++)
 	    {
-	      for (int i = 0; i < subdirMessages->Length(); i++)
-	      {
-		AppendStrVecString (messages, subdirMessages->Get (i));
-	      }
-	      subdirMessages->DecRef();
+	      AppendStrVecString (messages, subdirMessages->Get (i));
 	    }
+	    subdirMessages->DecRef();
 	  }
-	}
+        }
       }
     }
     closedir(dh);
@@ -183,7 +227,8 @@ csRef<iStringArray> csScanPluginDir (const char* dir,
 
   InternalScanPluginDir (messages, dir, plugins, 
     recursive);
-	 
+ 
+for (int i = 0; i < plugins->Length (); i++) printf("%s\n", plugins->Get(i));
   return csPtr<iStringArray> (messages);
 }
 
@@ -217,6 +262,7 @@ csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs,
       dirMessages->DecRef();
     }
   }
-	 
+ 
+for (int i = 0; i < plugins->Length (); i++) printf("%s\n", plugins->Get(i));
   return csPtr<iStringArray> (messages);
 }
