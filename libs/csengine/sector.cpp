@@ -155,7 +155,8 @@ void csSector::UseStaticTree (int mode, bool octree)
   while (sp)
   {
     csThing* n = (csThing*)(sp->GetNext ());
-    if (!sp->CheckFlags (CS_ENTITY_MOVEABLE) && !sp->GetFog ().enabled)
+    if (!sp->CheckFlags (CS_ENTITY_MOVEABLE) && !sp->GetFog ().enabled
+    	&& sp->GetNumCurves () == 0)
     {
       static_thing->Merge (sp);
       CHK (delete sp);

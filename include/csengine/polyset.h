@@ -322,8 +322,8 @@ public:
   /// Get the specified curve texture coordinate (texel).
   csVector2& CurveTexel (int i) { return curve_texels[i]; }
 
-  /// Add a curve vertex.
-  void AddCurveVertex (csVector3& v, csVector2& t);
+  /// Add a curve vertex and return the index of the vertex.
+  int AddCurveVertex (csVector3& v, csVector2& t);
 
   /**
    * Enable the optional BSP tree. This should be done AFTER

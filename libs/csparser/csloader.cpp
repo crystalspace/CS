@@ -1654,7 +1654,7 @@ csCurve* csLoader::load_bezier (char* polyname, csWorld* w, char* buf,
 
   (void)w; (void)default_lightx; (void)sec; (void)parent;
 
-  CHK (csBezier *poly3d = new csBezier ());
+  CHK (csBezier *poly3d = new csBezier (NULL));
   poly3d->SetName (polyname);
   poly3d->SetTextureHandle (default_texture);
   csTextureHandle* tex = NULL;

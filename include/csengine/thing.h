@@ -111,10 +111,10 @@ public:
   int GetCenter () { return center_idx; }
 
   /**
-   * Merge the given Thing into this one. The other polygons are removed
-   * from the other thing so that it is ready to be removed.
-   * Warning! All Things are merged in world space coordinates and not
-   * in object space as one could expect!
+   * Merge the given Thing into this one. The other polygons and
+   * curves are removed from the other thing so that it is ready to
+   * be removed. Warning! All Things are merged in world space
+   * coordinates and not in object space as one could expect!
    */
   void Merge (csThing* other);
 

@@ -87,6 +87,7 @@ public:
 
 class csPolygonSet;
 class csThingTemplate;
+class csCurveTemplate;
 
 /**
  * This is an abstract class for all curves in Crystal Space.
@@ -95,31 +96,44 @@ class csCurve : public csObject
 {
 private:
   csTextureHandle* cstxt;
+  // Pointer to the parent template.
+  csCurveTemplate* parent_template;
 
 public:
+  /// The polygon set parent.
   csPolygonSet* parent;
 
-  // This is the lightmap to be placed on the curve.
+  /// This is the lightmap to be placed on the curve.
   csLightMap* lightmap;
   bool lightmap_up_to_date;
 
 public:
-  csCurve () : csObject (),cstxt(NULL),parent(NULL), lightmap (NULL), lightmap_up_to_date (false) {} 
+  ///
+  csCurve (csCurveTemplate* parent_tmpl) : csObject (), cstxt (NULL),
+  	parent_template (parent_tmpl),
+  	parent (NULL), lightmap (NULL), lightmap_up_to_date (false) {} 
   ///
   virtual ~csCurve ();
 
+  ///
   void SetParent (csPolygonSet* p) { parent = p; }
+
+  /// Get the parent template used for this curve.
+  csCurveTemplate* GetParentTemplate () { return parent_template; }
+
   /**
    * Tesselate this curve with the given resolution.
    * This function will allocated and return a csCurveTesselated object.
    * the curve is responsible for clamping res to allowed values itself.
   */
   virtual csCurveTesselated* Tesselate (int res) = 0;
+
   /**
    * set control index for a control point (referring to the controls
    * in the parent csPolygonSet)
    */
   virtual void SetControlPoint (int index, int control_id) = 0;
+
   ///
   iTextureHandle* GetTextureHandle () { return cstxt ? cstxt->GetTextureHandle () : (iTextureHandle*)NULL; }
   ///
@@ -133,10 +147,15 @@ public:
    * want them lighted.
    */
   virtual bool IsLightable ();
+  ///
   virtual void PosInSpace (csVector3& vec, double u, double v);
+  ///
   virtual void Normal (csVector3& vec, double u, double v);
+  ///
   void InitLightMaps (csPolygonSet* owner, bool do_cache, int index);
+  ///
   void CalculateLighting (csLightView& lview);
+  ///
   void CacheLightMaps (csPolygonSet* owner, int index);
   
   CSOBJTYPE;
@@ -153,16 +172,20 @@ protected:
   csTextureHandle* cstxt;
 
 public:
+  ///
   csCurveTemplate() : csObject() {}
 
+  ///
   virtual void SetParent (csThingTemplate *p) { parent=p; }
 
+  ///
   virtual csCurve* MakeCurve () = 0;
 
   /// Tesselate this curve.
   virtual void SetVertex (int index, int ver_ind) = 0;
   ///
   virtual int GetVertex (int index)  = 0;
+  ///
   virtual int NumVertices () = 0;
   ///
   csTextureHandle* GetTextureHandle () { return cstxt; }
@@ -211,7 +234,9 @@ private:
   int previous_resolution;
 
 public:
-  csBezier ();
+  ///
+  csBezier (csBezierTemplate* parent_tmpl);
+  ///
   ~csBezier ();
 
   /// Tesselate this curve.

@@ -503,7 +503,7 @@ void csThing::CacheLightMaps ()
 void csThing::Merge (csThing* other)
 {
   int i, j;
-  CHK (int *merge_vertices = new int [other->GetNumVertices ()+1]);
+  CHK (int* merge_vertices = new int [other->GetNumVertices ()+1]);
   for (i = 0 ; i < other->GetNumVertices () ; i++)
     merge_vertices[i] = AddVertex (other->Vwor (i));
 
@@ -513,9 +513,18 @@ void csThing::Merge (csThing* other)
     int* idx = p->GetVertices ().GetVertexIndices ();
     for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
       idx[j] = merge_vertices[idx[j]];
-    p->SetParent (this);
     AddPolygon (p);
     other->polygons[i] = NULL;
+  }
+
+  for (i = 0 ; i < other->GetNumCurveVertices () ; i++)
+    AddCurveVertex (other->CurveVertex (i), other->CurveTexel (i));
+
+  for (i = 0 ; i < other->curves.Length () ; i++)
+  {
+    csCurve* c = other->GetCurve (i);
+    AddCurve (c);
+    other->curves[i] = NULL;
   }
 
   CHK (delete [] merge_vertices);

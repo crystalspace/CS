@@ -256,8 +256,7 @@ void csCurve::CacheLightMaps (csPolygonSet* owner, int index)
 
 
 
-csBezier::csBezier()
-  : csCurve () 
+csBezier::csBezier (csBezierTemplate* parent_tmpl) : csCurve (parent_tmpl) 
 {
   int i,j;
   for (i=0;i<3;i++)
@@ -347,7 +346,7 @@ int csBezierTemplate::NumVertices ()
 
 csCurve* csBezierTemplate::MakeCurve ()
 {
-  CHK (csBezier* p = new csBezier ());
+  CHK (csBezier* p = new csBezier (this));
   p->SetTextureHandle (cstxt);
   return p;
 }

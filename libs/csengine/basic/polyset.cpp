@@ -97,7 +97,7 @@ void csPolygonSet::Prepare ()
   }
 }
 
-void csPolygonSet::AddCurveVertex (csVector3& v, csVector2& t)
+int csPolygonSet::AddCurveVertex (csVector3& v, csVector2& t)
 {
   if (!curve_vertices)
   {
@@ -121,6 +121,7 @@ void csPolygonSet::AddCurveVertex (csVector3& v, csVector2& t)
   curve_vertices[num_curve_vertices] = v;
   curve_texels[num_curve_vertices] = t;
   num_curve_vertices++;
+  return num_curve_vertices-1;
 }
 
 int csPolygonSet::AddVertex (float x, float y, float z)
