@@ -71,11 +71,11 @@ long csGetObject (char **buf, csTokenDesc * tokens, char **name, char **data)
   SkipCharacters (buf, kWhiteSpace);
 
   // get optional name
-  *name = GetSubText (buf, 0x27, 0x27); // single quotes
+  *name = GetSubText (buf, '\'', '\''); // single quotes
   SkipCharacters (buf, kWhiteSpace);
 
   // get optional data
-  if (**buf == '=')             // hmm, this is an assignment and not a command/object
+  if (**buf == '=') // An assignment rather than a command/object.
     *data = GetAssignmentText (buf);
   else
     *data = GetSubText (buf, '(', ')');
