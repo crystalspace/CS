@@ -28,6 +28,7 @@
 
 #include "cstypes.h"
 #include "csutil/scf.h"
+#include "csutil/hash.h"
 #include "iutil/object.h"
 
 class csVector3;
@@ -50,6 +51,7 @@ struct iPolygon3D;
 struct iRenderView;
 struct iFrustumView;
 struct iSector;
+struct iPortal;
 class csRenderMesh;
 
 SCF_VERSION (iSectorCallback, 0, 0, 1);
@@ -68,7 +70,7 @@ struct iSectorCallback : public iBase
   virtual void Traverse (iSector* sector, iBase* context) = 0;
 };
 
-SCF_VERSION (iSector, 0, 5, 2);
+SCF_VERSION (iSector, 0, 5, 3);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -208,6 +210,38 @@ struct iSector : public iBase
 
   /// Used for portal traversal.
   virtual void CheckFrustum (iFrustumView* lview) = 0;
+
+  /**
+   * Get the set of portals that arrive in this sector.
+   * Note that portals are uni-directional. The portals represented
+   * by this list are portals that arrive in this sector but these are
+   * not always portals that also start in this sector.
+   */
+  virtual const csSet<iPortal*>& GetArrivingPortals () const = 0;
+  /**
+   * Register an arriving portal.
+   */
+  virtual void RegisterArrivingPortal (iPortal* portal) = 0;
+  /**
+   * Unregister an arriving portal.
+   */
+  virtual void UnregisterArrivingPortal (iPortal* portal) = 0;
+
+  /**
+   * Get the set of portals that leave from this sector.
+   * Note that portals are uni-directional. The portals represented
+   * by this list are portals that are on some mesh object that is
+   * actually located in this sector.
+   */
+  virtual const csSet<iPortal*>& GetLeavingPortals () const = 0;
+  /**
+   * Register a leaving portal.
+   */
+  virtual void RegisterLeavingPortal (iPortal* portal) = 0;
+  /**
+   * Unregister a leaving portal.
+   */
+  virtual void UnregisterLeavingPortal (iPortal* portal) = 0;
 };
 
 

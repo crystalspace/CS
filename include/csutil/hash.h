@@ -398,4 +398,88 @@ public:
   }
 };
 
+/**
+ * This class implements a basic set for objects.
+ * You can basicly use this to test for the occurance
+ * of some object quickly.
+ */
+template <class T, class KeyHandler = csIntegralHashKeyHandler<T> > 
+class csSet
+{
+private:
+  csHash<T, T, KeyHandler> map;
+
+public:
+  /**
+   * Construct a new empty set.
+   * The given size will be given to the hasmap.
+   */
+  csSet (int size = 257, int grow_rate = 64, int max_size = 20000)
+  	: map (size, grow_rate, max_size)
+  {
+  }
+
+  /**
+   * Add an object to this set.
+   * This will do nothing is the object is already here.
+   */
+  void Add (const T& object)
+  {
+    if (In (object)) return;
+    AddNoTest (object);
+  }
+
+  /**
+   * Add an object to this set.
+   * This function does not test if the object is already
+   * there. This is used for efficiency reasons. But use
+   * with care!
+   */
+  void AddNoTest (const T& object)
+  {
+    map.Put (object, object);
+  }
+
+  /**
+   * Test if an object is in this set.
+   */
+  bool In (const T& object)
+  {
+    typename csHash<T, T, KeyHandler>::Iterator it = map.GetIterator (object);
+    while (it.HasNext ())
+    {
+      const T& o = it.Next ();
+      if (o == object) return true;
+    }
+    return false;
+  }
+
+  /**
+   * Delete all elements in the set.
+   */
+  void DeleteAll ()
+  {
+    map.DeleteAll ();
+  }
+
+  /**
+   * Delete an object from the set. This function
+   * does nothing if the object is not in the set.
+   */
+  void Delete (const T& object)
+  {
+    map.Delete (object, object);
+  }
+
+  /// Get the number of elements in the set.
+  int GetSize () const
+  {
+    return map.GetSize ();
+  }
+
+  /// Return the hash map for this hash set
+  inline csHash<T, T, KeyHandler> *GetHash () {return &map;}
+};
+
+
 #endif

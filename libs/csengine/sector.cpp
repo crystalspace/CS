@@ -959,6 +959,30 @@ iSector *csSector::eiSector::FollowSegment (
   return s;
 }
 
+//---------------------------------------------------------------------------
+
+void csSector::RegisterArrivingPortal (iPortal* portal)
+{
+  arriving_portals.Add (portal);
+}
+
+void csSector::UnregisterArrivingPortal (iPortal* portal)
+{
+  arriving_portals.Delete (portal);
+}
+
+void csSector::RegisterLeavingPortal (iPortal* portal)
+{
+  leaving_portals.Add (portal);
+}
+
+void csSector::UnregisterLeavingPortal (iPortal* portal)
+{
+  leaving_portals.Delete (portal);
+}
+
+//---------------------------------------------------------------------------
+
 void csSector::ReferencedObject::AddReference (iReference *ref)
 {
   scfParent->references.Push (ref);

@@ -12,6 +12,14 @@ chronological order.
 	  CS_USE_FAKE_TYPENAME_KEYWORD macro is emitted to volatile.h, which
 	  csdef.h recognizes in order to fake up a `typename' keyword.
 	- Eric Sunshine removed a couple useless #defines from csdef.h.
+	- Jorrit added a templated csSet<T> which is to csHash<T> what
+	  csHashSet is to csHashMap (i.e. csSet<T> is a templated version
+	  of csHashSet).
+	- Jorrit added a set of arriving portals and a set of leaving
+	  portals to every sector. This list is maintained by the entities
+	  that create portals (i.e. thing mesh only at this moment) and
+	  also by the movable when objects that contain portals move.
+	  Note that this is not done yet!
 14-Sep-2003
 	- DeSigna made the following changes:
 	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 

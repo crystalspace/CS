@@ -25,6 +25,7 @@
 #include "csutil/refarr.h"
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
+#include "csutil/hash.h"
 #include "iutil/objref.h"
 #include "csengine/light.h"
 #include "csengine/meshobj.h"
@@ -109,6 +110,15 @@ private:
    */
   csSectorMeshList meshes;
 
+  /**
+   * List of portals that arrive in this sector.
+   */
+  csSet<iPortal*> arriving_portals;
+
+  /**
+   * List of portals that leave from this sector.
+   */
+  csSet<iPortal*> leaving_portals;
 
   /**
    * Visibilty number for last VisTest call
@@ -458,6 +468,18 @@ public:
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
+  //----------------------------------------------------------------------
+  // Portal stuff.
+  //----------------------------------------------------------------------
+  const csSet<iPortal*>& GetArrivingPortals () const
+  { return arriving_portals; }
+  void RegisterArrivingPortal (iPortal* portal);
+  void UnregisterArrivingPortal (iPortal* portal);
+  const csSet<iPortal*>& GetLeavingPortals () const
+  { return leaving_portals; }
+  void RegisterLeavingPortal (iPortal* portal);
+  void UnregisterLeavingPortal (iPortal* portal);
+
   //-------------------- iReferencedObject interface --------------------------
   struct ReferencedObject : public iReferencedObject
   {
@@ -546,6 +568,31 @@ public:
     virtual void CheckFrustum (iFrustumView* lview)
     {
       scfParent->CheckFrustum (lview);
+    }
+
+    virtual const csSet<iPortal*>& GetArrivingPortals () const
+    {
+      return scfParent->GetArrivingPortals ();
+    }
+    virtual void RegisterArrivingPortal (iPortal* portal)
+    {
+      scfParent->RegisterArrivingPortal (portal);
+    }
+    virtual void UnregisterArrivingPortal (iPortal* portal)
+    {
+      scfParent->UnregisterArrivingPortal (portal);
+    }
+    virtual const csSet<iPortal*>& GetLeavingPortals () const
+    {
+      return scfParent->GetLeavingPortals ();
+    }
+    virtual void RegisterLeavingPortal (iPortal* portal)
+    {
+      scfParent->RegisterLeavingPortal (portal);
+    }
+    virtual void UnregisterLeavingPortal (iPortal* portal)
+    {
+      scfParent->UnregisterLeavingPortal (portal);
     }
   } scfiSector;
   friend struct eiSector;
