@@ -30,7 +30,7 @@ public:
   /// create a new config manager object
   csConfigManager(iConfigFileNew *DynamicDomain);
   /// delete this config manager
-  ~csConfigManager();
+  virtual ~csConfigManager();
 
   /// add a configuration domain
   virtual void AddDomain(iConfigFileNew*, int priority);

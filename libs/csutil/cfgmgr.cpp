@@ -91,7 +91,7 @@ public:
     CurrentIterator = NULL;
     Subsection = strnew(sub);
   }
-  ~csConfigManagerIterator() {
+  virtual ~csConfigManagerIterator() {
     Config->RemoveIterator(this);
     Config->DecRef();
     if (CurrentIterator) CurrentIterator->DecRef();
@@ -241,13 +241,13 @@ void csConfigManager::SetDomainPriority(iConfigFileNew *cfg, int priority)
 int csConfigManager::GetDomainPriority(char const *path, iVFS *vfs) const
 {
   csConfigDomain *d = FindConfig(path, vfs);
-  return d ? d->Pri : PriorityMedium;
+  return d ? d->Pri : (int)PriorityMedium;
 }
 
 int csConfigManager::GetDomainPriority(iConfigFileNew *cfg) const
 {
   csConfigDomain *d = FindConfig(cfg);
-  return d ? d->Pri : PriorityMedium;
+  return d ? d->Pri : (int)PriorityMedium;
 }
 
 iConfigFileNew *csConfigManager::GetDynamicDomain() const

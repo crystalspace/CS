@@ -15,6 +15,8 @@ The history order has been reversed so that new features are at the top.
 	- Fixed a bug in csMaterialWrapper::Visit(). It would call
 	  visit on the texture even if there is no texture for the material.
 	  This naturally caused a crash.
+	- Eric Sunshine eliminated several compilation warnings in cfgmgr.h
+	  and cfgmgr.h.
 14-Feb-2001
 	- Continued making use of QUERY_INTERFACE in the engine more sensible.
 	  This involves:
