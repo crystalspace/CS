@@ -92,15 +92,25 @@ class csLoader : public iLoader
   bool ResolveOnlyRegion;
   /// Statistics
   class csLoaderStats *Stats;
+
+  /// -----------------------------------------------------------------------
   
   /// Parse a matrix definition
-  bool load_matrix (char* buf, csMatrix3 &m);
+  bool ParseMatrix (char* buf, csMatrix3 &m);
   /// Parse a vector definition
-  bool load_vector (char* buf, csVector3 &v);
+  bool ParseVector (char* buf, csVector3 &v);
   /// Parse a quaternion definition
-  bool load_quaternion (char* buf, csQuaternion &q);
+  bool ParseQuaternion (char* buf, csQuaternion &q);
   /// Parse a color definition
-  bool load_color (char *buf, csRGBcolor &c);
+  bool ParseColor (char *buf, csRGBcolor &c);
+
+  /// Parse a texture definition and add the texture to the engine
+  iTextureWrapper* ParseTexture (char *name, char* buf);
+  /// Parse a material definition and add the material to the engine
+  iMaterialWrapper* ParseMaterial (char *name, char* buf, const char* prefix = NULL);
+
+  /// -----------------------------------------------------------------------
+
   /// Parse a collection definition and add it to the engine
   iCollection* load_collection (char* name, char* buf);
   /// Parse a static light definition and return a new object
@@ -110,16 +120,12 @@ class csLoader : public iLoader
   /// Parse a map node definition and return a new object
   iMapNode* load_node (char* name, char* buf, iSector* sec);
 
-  /// Parse and load a single texture
-  void txt_process (char *name, char* buf);
   /// For heightgen.
   csGenerateImageTexture* heightgen_txt_process (char* buf);
   /// For heightgen.
   csGenerateImageValue* heightgen_value_process (char* buf);
   /// Parse and load a height texture
   void heightgen_process (char* buf);
-  /// Parse and load a single material
-  void mat_process (char *name, char* buf, const char* prefix = NULL);
 
   /// Parse a sector definition and return a new object
   iSector* load_sector (char* secname, char* buf);
