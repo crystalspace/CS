@@ -21,6 +21,7 @@
 #define CSVIEW_H
 
 #include "csutil/csbase.h"
+#include "csgeom/math2d.h"
 #include "csgeom/box.h"
 
 class csPolygon2D;

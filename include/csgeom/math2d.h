@@ -130,7 +130,13 @@ public:
    */
   static float Area2 (float ax, float ay,
                       float bx, float by, 
-                      float cx, float cy);
+                      float cx, float cy)
+  {
+    return
+      ax * by - ay * bx +
+      ay * cx - ax * cy +
+      bx * cy - cx * by;
+  }
 
   /**
    * Calculates whether a point lies to the right of a given line.
@@ -139,7 +145,10 @@ public:
    */
   static bool Right (float ax, float ay,
                      float bx, float by,
-                     float cx, float cy);
+                     float cx, float cy)
+  {
+    return Area2 (ax, ay, bx, by, cx, cy) <= -SMALL_EPSILON;
+  }
 
   /**
    * Calculates whether a point lies to the left of a given line.
@@ -148,7 +157,10 @@ public:
    */
   static bool Left (float ax, float ay,
                     float bx, float by,
-                    float cx, float cy);
+                    float cx, float cy)
+  {
+    return Area2 (ax, ay, bx, by, cx, cy) >= SMALL_EPSILON;
+  }
 
 };
 

@@ -262,10 +262,10 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
 	if (mirror)
 	{
-          if (area <= 0) continue;
+          if (area <= -SMALL_EPSILON) continue;
 	}
 	else
-          if (area >= 0) continue;
+          if (area >= SMALL_EPSILON) continue;
 
         triangle[mirror ? 2 : 0] = persp[ct.i1];
         triangle[1] = persp[ct.i2];

@@ -27,6 +27,7 @@
 #include "csengine/rview.h"
 #include "csengine/cscolor.h"
 #include "csengine/texture.h"
+#include "csengine/tranman.h"
 #include "igraph3d.h"
 
 class Dumper;
@@ -326,6 +327,16 @@ private:
   /// Update defered lighting.
   void UpdateDeferedLighting ();
 
+  /**
+   * Camera space bounding box is cached here.
+   * GetCameraBoundingBox() will check the current cookie from the
+   * transformation manager to see if it needs to recalculate this.
+   */
+  csBox3 camera_bbox;
+
+  /// Current cookie for camera_bbox.
+  csTranCookie camera_cookie;
+
 public:
   /// List of sectors where this sprite is.
   csObjVector sectors;
@@ -336,6 +347,13 @@ public:
    * is done.
    */
   static float cfg_lod_detail;
+
+  /**
+   * Quality setting for sprite lighting. If true this uses
+   * high quality lighting which is more accurate on the vertices.
+   * Otherwise an approximation is used. This is a lot faster though.
+   */
+  static bool do_quality_lighting;
 
 protected:
   UInt MixMode;
@@ -403,6 +421,18 @@ private:
    * for external visibility culling routines.
    */
   bool is_visible;
+
+  /**
+   * High quality version of UpdateLighting() which recalculates
+   * the distance between the light and every vertex.
+   */
+  void UpdateLightingHQ (csLight** lights, int num_lights, csVector3* object_vertices);
+
+  /**
+   * Low quality version of UpdateLighting() which only
+   * calculates the distance once (with the center of the sprite).
+   */
+  void UpdateLightingLQ (csLight** lights, int num_lights, csVector3* object_vertices);
 
 public:
   ///
@@ -539,7 +569,15 @@ public:
   void GenerateSpriteLOD (int num_vts);
 
   /**
-   * Get a 3D bounding box in camera space.
+   * Get a 3D bounding box in object space.
+   */
+  void GetObjectBoundingBox (csBox3& boundingBox);
+
+  /**
+   * Get a 3D bounding box in camera space. This function is smart.
+   * It will only recompute this information if needed. So if you call
+   * this function several times in the same frame it will not recompute
+   * the bounding box.
    */
   void GetCameraBoundingBox (const csCamera& camtrans, csBox3& boundingBox);
 

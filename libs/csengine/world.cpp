@@ -740,6 +740,7 @@ void csWorld::ReadConfig (csIniFile* config)
   csSector::do_radiosity = config->GetYesNo ("Lighting", "RADIOSITY", csSector::do_radiosity);
   csPolyTexture::do_accurate_things = config->GetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);
   csPolyTexture::cfg_cosinus_factor = config->GetFloat ("Lighting", "COSINUS_FACTOR", csPolyTexture::cfg_cosinus_factor);
+  csSprite3D::do_quality_lighting = config->GetYesNo ("Lighting", "SPRITE_HIGHQUAL", csSprite3D::do_quality_lighting);
   //@@@
   //Textures::Gamma = config->GetFloat ("TextureMapper", "GAMMA", 1.0);
 }

@@ -315,6 +315,7 @@ csSprite3D::csSprite3D () : csObject ()
   defered_lighting_flags = 0;
   draw_callback = NULL;
   is_visible = false;
+  camera_cookie = 0;
 }
 
 csSprite3D::~csSprite3D ()
@@ -448,6 +449,7 @@ void csSprite3D::FixVertexColors ()
 
 csTriangleMesh csSprite3D::mesh;
 float csSprite3D::cfg_lod_detail = 1;
+bool csSprite3D::do_quality_lighting = false;
 
 int map (int* emerge_from, int idx, int num_verts)
 {
@@ -615,28 +617,50 @@ void csSprite3D::AddBoundingBox (csBspContainer* container)
   poly->Transform (trans);
 }
 
+void csSprite3D::GetObjectBoundingBox (csBox3& obox)
+{
+  if (skeleton_state)
+  {
+    skeleton_state->ComputeBoundingBox (csTransform (), obox);
+  }
+  else
+  {
+    csFrame* cframe = cur_action->GetFrame (cur_frame);
+    cframe->GetBoundingBox (obox);
+  }
+}
+
 void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
 {
+  csTranCookie cur_cookie = csWorld::current_world->tr_manager.GetCookie ();
+  if (camera_cookie == cur_cookie)
+  {
+    cbox = camera_bbox;
+    return;
+  }
+  camera_cookie = cur_cookie;
+
   csTransform trans = camtrans * csTransform (m_obj2world,
   	m_world2obj * v_obj2world);
   if (skeleton_state)
   {
-    skeleton_state->ComputeBoundingBox (trans, cbox);
+    skeleton_state->ComputeBoundingBox (trans, camera_bbox);
   }
   else
   {
     csFrame* cframe = cur_action->GetFrame (cur_frame);
     csBox3 box;
     cframe->GetBoundingBox (box);
-    cbox.StartBoundingBox (trans * box.GetCorner (0));
-    cbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
-    cbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
-    cbox.AddBoundingVertexSmart (trans * box.GetCorner (3));
-    cbox.AddBoundingVertexSmart (trans * box.GetCorner (4));
-    cbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
-    cbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
-    cbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
+    camera_bbox.StartBoundingBox (trans * box.GetCorner (0));
+    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (1));
+    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (2));
+    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (3));
+    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (4));
+    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (5));
+    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (6));
+    camera_bbox.AddBoundingVertexSmart (trans * box.GetCorner (7));
   }
+  cbox = camera_bbox;
 }
 
 float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox& boundingBox)
@@ -799,11 +823,11 @@ void csSprite3D::Draw (csRenderView& rview)
       uv = (1-fnum)*cframe->GetTexel (emerge_from[i]) + fnum*cframe->GetTexel (i);
     }
 
-    z_verts[i] = v.z;
     uv_verts[i] = uv;
     if (v.z >= SMALL_Z)
     {
-      float iz = rview.aspect/v.z;
+      z_verts[i] = 1. / v.z;
+      float iz = rview.aspect * z_verts[i];
       persp[i].x = v.x * iz + rview.shift_x;
       persp[i].y = v.y * iz + rview.shift_y;
       visible[i] = true;
@@ -854,16 +878,28 @@ void csSprite3D::Draw (csRenderView& rview)
       float area = csMath2::Area2 (persp [a].x, persp [a].y,
                           	   persp [b].x, persp [b].y,
                           	   persp [c].x, persp [c].y);
+      int j, idx, dir;
       if (mirror)
       {
-        if (area <= 0) continue;
+        if (area <= -SMALL_EPSILON) continue;
+        triangle [2] = persp[a];
+        triangle [1] = persp[b];
+        triangle [0] = persp[c];
+	// Setup loop variables for later.
+        idx = 2;
+	dir = -1;
       }
       else
-        if (area >= 0) continue;
+      {
+        if (area >= SMALL_EPSILON) continue;
+        triangle [0] = persp[a];
+        triangle [1] = persp[b];
+        triangle [2] = persp[c];
+	// Setup loop variables for later.
+        idx = 0;
+	dir = 1;
+      }
 
-      triangle [mirror ? 2 : 0] = persp[a];
-      triangle [1] = persp[b];
-      triangle [mirror ? 0 : 2] = persp[c];
       // Clip triangle. Note that the clipper doesn't care about the
       // orientation of the triangle vertices. It works just as well in
       // mirrored mode.
@@ -877,13 +913,10 @@ void csSprite3D::Draw (csRenderView& rview)
         poly.num = 3;
 
       int trivert [3] = { a, b, c };
-      int j, idx, dir;
       // If mirroring we store the vertices in the other direction.
-      if (mirror) { idx = 2; dir = -1; }
-      else { idx = 0; dir = 1; }
       for (j = 0; j < 3; j++)
       {
-        poly.vertices [idx].z = 1 / z_verts[trivert [j]];
+        poly.vertices [idx].z = z_verts[trivert [j]];
         poly.vertices [idx].u = uv_verts[trivert [j]].x;
         poly.vertices [idx].v = uv_verts[trivert [j]].y;
         if (vertex_colors)
@@ -1031,8 +1064,6 @@ void csSprite3D::DeferUpdateLighting (int flags, int num_lights)
 
 void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 {
-  int i, j;
-
   defered_num_lights = 0;
 
   csFrame* this_frame = cur_action->GetFrame (cur_frame);
@@ -1045,6 +1076,82 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
   // this is so that sprite gets blackened if no light strikes it
   AddVertexColor (0, csColor (0, 0, 0));
+  if (do_quality_lighting)
+    UpdateLightingHQ (lights, num_lights, object_vertices);
+  else
+    UpdateLightingLQ (lights, num_lights, object_vertices);
+}
+
+void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* object_vertices)
+{
+  int i, j;
+  csFrame* this_frame = cur_action->GetFrame (cur_frame);
+
+  csBox3 obox;
+  GetObjectBoundingBox (obox);
+  csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
+  csVector3 wor_center = m_obj2world * obj_center - v_obj2world;
+
+  for (i = 0 ; i < num_lights ; i++)
+  {
+    csColor &light_color = lights [i]->GetColor ();
+    float light_radius = lights [i]->GetRadius ();
+    float sq_light_radius = lights [i]->GetSquaredRadius ();
+    float inv_light_radius = (256. / NORMAL_LIGHT_LEVEL) / light_radius;
+    float r2 = light_color.red   * inv_light_radius;
+    float g2 = light_color.green * inv_light_radius;
+    float b2 = light_color.blue  * inv_light_radius;
+
+    // Compute light position in object coordinates
+    csVector3 wor_light_pos = lights [i]->GetCenter ();
+    float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_center);
+    if (wor_sq_dist >= sq_light_radius) continue;
+
+    csVector3 obj_light_pos = m_world2obj * (wor_light_pos + v_obj2world);
+    float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
+    float obj_dist = sqrt (obj_sq_dist);
+    float wor_dist = sqrt (wor_sq_dist);
+
+    for (j = 0 ; j < tpl->GetNumVertices () ; j++)
+    {
+      csVector3& obj_vertex = object_vertices[j];
+
+      float cosinus;
+      if (obj_sq_dist < SMALL_EPSILON)
+        cosinus = 1;
+      else
+        cosinus = (obj_light_pos - obj_vertex) * this_frame->GetNormal (j);
+
+      if (cosinus > 0)
+      {
+        if (obj_sq_dist >= SMALL_EPSILON)
+	  cosinus /= obj_dist;
+        csColor color;
+        if (cosinus >= 1)
+          color.Set (
+            light_color.red   * (256. / NORMAL_LIGHT_LEVEL),
+            light_color.green * (256. / NORMAL_LIGHT_LEVEL),
+            light_color.blue  * (256. / NORMAL_LIGHT_LEVEL));
+        else
+        {
+          cosinus *= light_radius - wor_dist;
+          color.red   = cosinus * r2;
+          color.green = cosinus * g2;
+          color.blue  = cosinus * b2;
+        }
+        AddVertexColor (j, color);
+      }
+    }
+  }
+
+  // Clamp all vertice colors to 2.0
+  FixVertexColors ();
+}
+
+void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* object_vertices)
+{
+  int i, j;
+  csFrame* this_frame = cur_action->GetFrame (cur_frame);
 
   for (i = 0 ; i < num_lights ; i++)
   {
@@ -1090,10 +1197,10 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
             light_color.blue  * (256. / NORMAL_LIGHT_LEVEL));
         else
         {
-          float dist = sqrt (wor_sq_dist);
-          color.red   = cosinus * r2 * (light_radius - dist);
-          color.green = cosinus * g2 * (light_radius - dist);
-          color.blue  = cosinus * b2 * (light_radius - dist);
+          cosinus *= light_radius - sqrt (wor_sq_dist);
+          color.red   = cosinus * r2;
+          color.green = cosinus * g2;
+          color.blue  = cosinus * b2;
         }
         AddVertexColor (j, color);
       }
@@ -1103,6 +1210,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
   // Clamp all vertice colors to 2.0
   FixVertexColors ();
 }
+
 
 void csSprite3D::UnlinkDynamicLight (csLightHitsSprite* lp)
 {

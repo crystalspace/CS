@@ -57,22 +57,6 @@ int csMath2::InPoly2D (const csVector2& v,
   return CS_POLY_IN;
 }
 
-float csMath2::Area2 (float ax, float ay, float bx, float by, float cx, float cy)
-{
-  float rc =
-    ax * by - ay * bx +
-    ay * cx - ax * cy +
-    bx * cy - cx * by;
-  if (ABS (rc) < SMALL_EPSILON) rc = 0;
-  return rc;
-}
-
-bool csMath2::Right (float ax, float ay, float bx, float by, float cx, float cy)
-{ return Area2 (ax, ay, bx, by, cx, cy) < 0; }
-
-bool csMath2::Left (float ax, float ay, float bx, float by, float cx, float cy)
-{ return Area2 (ax, ay, bx, by, cx, cy) > 0; }
-
 //---------------------------------------------------------------------------
 
 float csVector2::Norm (const csVector2& v)
