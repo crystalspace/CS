@@ -52,14 +52,14 @@ csCameraPosition::~csCameraPosition ()
   delete [] far_plane;
 }
 
-void csCameraPosition::Set (const char *sector, const csVector3 &position,
-  const csVector3 &forward, const csVector3 &upward)
+void csCameraPosition::Set (const char *isector, const csVector3 &iposition,
+  const csVector3 &iforward, const csVector3 &iupward)
 {
-  delete [] csCameraPosition::sector;
-  csCameraPosition::sector = csStrNew (sector);
-  csCameraPosition::position = position;
-  csCameraPosition::forward = forward;
-  csCameraPosition::upward = upward;
+  delete [] sector;
+  sector = csStrNew (isector);
+  position = iposition;
+  forward = iforward;
+  upward = iupward;
 }
 
 bool csCameraPosition::Load (iCamera* camera, iEngine *e)
