@@ -42,6 +42,13 @@ struct iFont;
 struct iNativeWindow;
 struct iGraphics2D;
 
+/// iGraphics2D::Write() flags.
+enum
+{
+  CS_WRITE_BASELINE    = (1 << 0), // Write by baseline.
+  CS_WRITE_NOANTIALIAS = (1 << 1), // Disable anti-aliasing.
+};
+
 /// Simple 2D pixel coordinate
 struct csPixelCoord
 {
@@ -50,7 +57,6 @@ struct csPixelCoord
   /// Y component
   int y;
 };
-
 
 /**
  * Structure describing the pixel format.
@@ -272,7 +278,7 @@ struct iGraphics2D : public iBase
    * color will not draw the background.
    */
   virtual void Write (iFont *font, int x, int y, int fg, int bg,
-    const char *str) = 0;
+    const char *str, uint flags) = 0;
 
   /**
    * Write a text string into the back buffer. A negative value for bg

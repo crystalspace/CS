@@ -36,6 +36,9 @@ chronological order.
 	- Eric Sunshine fixed bugs: swigpythinst and swigperl5inst makefile
 	  targets failed to ensure that the appropriate `out' directories
 	  existed before instructing Swig to emit files into those directories.
+	- Eric Sunshine updated ivideo/graph2d.h to hopefully reflect res's
+	  changes (above), since res forgot to commit everything, causing
+	  compilation to fail.
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history
