@@ -130,16 +130,16 @@ of your C++ files once for each @sc{scf} class contained in your library:
 
 @example
 SCF_REGISTER_STATIC_CLASS(
-  @var{plugin-name},
+  @var{cxx-class},
   @var{scf-name},
   @var{description},
   @var{dependencies})
 @end example
 
-Here, @var{plugin-name} is the name of the C++ class which implements the
-factory for this particular @sc{scf} class.  @var{plugin-name} is the same name
+Here, @var{cxx-class} is the name of the C++ class which implements the
+factory for this particular @sc{scf} class.  @var{cxx-class} is the same name
 given to the @code{SCF_IMPLEMENT_FACTORY()} macro.  @var{scf-name} is the
-@sc{scf} class name corrsponding to @var{plugin-name}, @var{description} is a
+@sc{scf} class name corrsponding to @var{cxx-class}, @var{description} is a
 human-readable string describing the purpose of the class, and
 @var{dependencies} is a comma-separated list of other @sc{scf} class upon which
 this class depends.

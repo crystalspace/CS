@@ -743,12 +743,20 @@ struct iGraphics3D : public iBase
   virtual void Close () = 0;
 
   /**
-   * Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
-   * and therefore it shouldn't be decref-ed by caller.
+   * Retrieve the associated canvas.
+   * \remarks This will return a valid canvas only after
+   *   csInitializer::OpenApplication() has been invoked (and if the canvas
+   *   plugin loaded and initialized successfully); otherwise it will return
+   *   null.
    */
   virtual iGraphics2D *GetDriver2D () = 0;
 
-  /// Get the texture manager: do NOT increment the refcount of texture manager
+  /**
+   * Retrieve the texture manager.
+   * \remarks This will return a valid texture manager only after
+   *   csInitializer::OpenApplication() has been invoked; otherwise it will
+   *   return null.
+   */
   virtual iTextureManager *GetTextureManager () = 0;
 
   /// Change the dimensions of the display.

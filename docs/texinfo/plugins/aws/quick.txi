@@ -6,12 +6,23 @@ In order to startup and use @sc{aws}, the following tasks must be performed.
 
 @enumerate
 @item
-Load the @sc{aws} plugin.
+Initialize the Crystal Space facilities in the normal fashion.
+(@pxref{Tutorial Simple}).  In particular,
+@code{csInitializer::OpenApplication()} must be invoked before any of the
+following tasks are performed.  Initializing an @sc{aws} application also
+involves loading the @sc{aws} plugin.  You can do this via the normal
+@code{csInitializer::RequestPlugins()} invocation (the common approach), or you
+can load it separately, if desired:
 
 @example
 csRef<iAws> aws = CS_LOAD_PLUGIN(plugin_mgr,
   "crystalspace.window.alternatemanager", iAws);
 @end example
+
+@noindent
+If you know ahead of time that your application will be using @sc{aws}, then
+loading the plugin via @code{csInitializer::OpenApplication()} is more
+convenient and less error-prone.
 
 @item
 Setup the @sc{aws} canvas.

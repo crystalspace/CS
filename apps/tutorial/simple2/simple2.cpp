@@ -56,7 +56,7 @@ CS_IMPLEMENT_APPLICATION
 //-----------------------------------------------------------------------------
 
 // The global pointer to simple
-Simple *simple;
+Simple* simple = 0;
 
 Simple::Simple (iObjectRegistry* object_reg)
 {
@@ -141,12 +141,12 @@ bool Simple::HandleEvent (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    simple->SetupFrame ();
+    SetupFrame ();
     return true;
   }
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
   {
-    simple->FinishFrame ();
+    FinishFrame ();
     return true;
   }
   else if ((ev.Type == csevKeyboard) &&
@@ -163,7 +163,7 @@ bool Simple::HandleEvent (iEvent& ev)
 
 bool Simple::SimpleEventHandler (iEvent& ev)
 {
-  return simple->HandleEvent (ev);
+  return simple ? simple->HandleEvent (ev) : false;
 }
 
 bool Simple::Initialize ()
@@ -363,6 +363,7 @@ int main (int argc, char* argv[])
   if (simple->Initialize ())
     simple->Start ();
   delete simple;
+  simple = 0;
 
   csInitializer::DestroyApplication (object_reg);
   return 0;
