@@ -33,14 +33,17 @@ csConfigAccess::csConfigAccess()
 csConfigAccess::csConfigAccess(iObjectRegistry *object_reg, const char *fname,
   bool vfs, int priority)
 {
-  AddConfig(object_reg, fname, vfs, priority);
+  AddConfig (object_reg, fname, vfs, priority);
 }
 
 csConfigAccess::~csConfigAccess()
 {
-  iConfigManager* cfgmgr = CS_QUERY_REGISTRY (object_reg, iConfigManager);
-  for (long i=0; i<ConfigFiles.Length(); i++)
-    cfgmgr->RemoveDomain ((iConfigFile*)ConfigFiles.Get(i));
+  if (object_reg)
+  {
+    iConfigManager* cfgmgr = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+    for (int i = 0; i < ConfigFiles.Length (); i++)
+      cfgmgr->RemoveDomain ((iConfigFile *)ConfigFiles.Get (i));
+  }
 }
 
 void csConfigAccess::AddConfig(iObjectRegistry *object_reg, const char *fname,
