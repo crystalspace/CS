@@ -22,6 +22,7 @@ The history order is reversed so that new features are at the top.
 	  only uses python. It is also no longer required to use a commandline
 	  option.
 	- Jorrit removed scripts/lua. This was a left-over from the past.
+	- Jorrit removed a mention of the lua plugin from the documentation.
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild

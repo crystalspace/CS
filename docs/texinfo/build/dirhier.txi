@@ -197,9 +197,6 @@ The Crystal Script plugins. Crystal Script plugins allow programmers to
 interact with the Crystal Space engine in a scripting language.
 
 @table @code
-@item CS/plugins/cscript/cslua
-Lua @sc{swig} interface
-
 @item CS/plugins/cscript/csperl5
 Perl5 interface
 
