@@ -509,13 +509,13 @@ void csRainParticleSystem :: Update(time_t elapsed_time)
 csSnowParticleSystem :: csSnowParticleSystem(csObject* theParent, int number, csTextureHandle* txt, 
   UInt mixmode, bool lighted_particles, float drop_width, float drop_height,
   const csVector3& rainbox_min, const csVector3& rainbox_max, 
-  const csVector3& fall_speed, float dwarrel)
+  const csVector3& fall_speed, float swirl)
   : csParticleSystem(theParent)
 {
   part_pos = new csVector3[number];
   part_speed = new csVector3[number];
   rain_dir = fall_speed;
-  dwarrel_amount = dwarrel;
+  swirl_amount = swirl;
   rainbox.Set(rainbox_min, rainbox_max);
   /// spread particles evenly through box
   csVector3 size = rainbox_max - rainbox_min;
@@ -547,10 +547,10 @@ void csSnowParticleSystem :: Update(time_t elapsed_time)
   for(i=0; i<particles.Length(); i++)
   {
     move = rain_dir * delta_t;
-    /// dwarrel a bit, for snow drifting in the wind...
-    csVector3 dwarrel = GetRandomDirection() * dwarrel_amount;
-    dwarrel.y = 0.0;
-    part_speed[i] += dwarrel * delta_t;
+    /// swirl a bit, for snow drifting in the wind...
+    csVector3 swirl = GetRandomDirection() * swirl_amount;
+    swirl.y = 0.0;
+    part_speed[i] += swirl * delta_t;
     move += part_speed[i] * delta_t;
     part_pos[i] += move;
     GetParticle(i)->SetPosition (part_pos[i]); 

@@ -380,7 +380,7 @@ public:
 
 /**
  * A snow particle system. Particles start falling down.
- * the snow dwarrels around a bit, otherwise much like rain.
+ * the snow swirls around a bit, otherwise much like rain.
  */
 class csSnowParticleSystem : public csParticleSystem {
 protected:
@@ -388,7 +388,7 @@ protected:
   csVector3 rain_dir;
   csVector3 *part_pos;
   csVector3 *part_speed;
-  float dwarrel_amount;
+  float swirl_amount;
 
 public:
   /** creates a rain particle system given parameters.
@@ -402,13 +402,13 @@ public:
     * fall_speed: the direction and speed of the falling raindrops.
     *   You can make slanted rain this way. Although you would also want to
     *   slant the particles in that case...
-    * dwarrel: is the amount of dwarrel for a flake, 0.0 is like rain.
+    * swirl: is the amount of swirl for a flake, 0.0 is like rain.
     */
   csSnowParticleSystem(csObject* theParent, int number, csTextureHandle* txt,
     UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
     const csVector3& rainbox_min, const csVector3& rainbox_max,
-    const csVector3& fall_speed, float dwarrel
+    const csVector3& fall_speed, float swirl
     );
   /// 
   virtual ~csSnowParticleSystem();
