@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+5-Aug-1999
+	- Eric Sunshine fixed a compilation warning in djvidsys.cpp where
+	  XModeCount was declared without a type.  It is now declared as int.
 4-Aug-1999
 	- Eric Sunshine committed Seth Galbraith's latest version of Squawk
 	  to the CVS repository.  He also made the following modifications:
