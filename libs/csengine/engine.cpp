@@ -636,6 +636,9 @@ csEngine::csEngine (iBase *iParent) :
   default_clear_screen = false;
   cache_mgr = NULL;
 
+  default_fastmesh_thresshold = 500;
+  fastmesh_thresshold = 500;
+
   textures = new csTextureList ();
   materials = new csMaterialList ();
   shared_variables = new csSharedVariableList();
@@ -999,6 +1002,7 @@ void csEngine::ResetWorldSpecificSettings()
   	default_ambient_red / 255.0f,
 	default_ambient_green / 255.0f, 
         default_ambient_blue / 255.0f));
+  fastmesh_thresshold = default_fastmesh_thresshold;
 }
 
 void csEngine::PrepareTextures ()
@@ -1784,6 +1788,10 @@ iCollection* csEngine::FindCollection (const char* name,
 
 void csEngine::ReadConfig (iConfigFile *Config)
 {
+  default_fastmesh_thresshold = Config->GetInt (
+      "Engine.FastMeshThresshold",
+      500);
+
   csEngine::lightmap_quality = Config->GetInt (
       "Engine.Lighting.LightmapQuality",
       3);

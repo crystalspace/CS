@@ -688,6 +688,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("diffuse", XMLTOKEN_DIFFUSE);
   xmltokens.Register ("factory", XMLTOKEN_FACTORY);
   xmltokens.Register ("farplane", XMLTOKEN_FARPLANE);
+  xmltokens.Register ("fastmesh", XMLTOKEN_FASTMESH);
   xmltokens.Register ("file", XMLTOKEN_FILE);
   xmltokens.Register ("fog", XMLTOKEN_FOG);
   xmltokens.Register ("forward", XMLTOKEN_FORWARD);
@@ -2207,6 +2208,12 @@ bool csLoader::LoadSettings (iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_FASTMESH:
+        {
+	  int th = child->GetContentsValueAsInt ();
+	  Engine->SetFastMeshThresshold (th);
+	}
+	break;
       case XMLTOKEN_CLEARZBUF:
         {
 	  bool yesno;

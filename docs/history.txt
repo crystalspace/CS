@@ -30,6 +30,18 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a bug recently introduced into csconfig.mak where
 	  it failed to invoke the build.cs-config target in the sub-make
 	  invocation.
+	- Added a new setting to the engine with which you can control the
+	  number of polygons after which CS_THING_FASTMESH is automatically
+	  enabled for things (use DrawPolygonMesh then). The default value
+	  is 500:
+	      - Added Engine.FastMeshThresshold config option.
+	      - Added SetFastMeshThresshold() function to iEngine.
+	      - Added GetFastMeshThresshold() function to iEngine.
+	      - Added <fastmesh> keyword to the <settings> block.
+	  Currently this will only work for things that have no portals and
+	  no curves.
+	- Set the fastmesh thresshold in flarge to 10. That causes a few
+	  objects to use fastmesh now.
 	- Matze Braun added configure tests for: libmikmod, libogg, libvorbis,
 	  libvorbisfile, lib3ds, libode, libopenal, libfreetype2, a switch for
 	  linux joystick drivers.

@@ -537,6 +537,17 @@ void csThing::Prepare ()
   if (prepared) return ;
   prepared = true;
   shapenr++;
+  if (thing_type->engine)
+  {
+    if (polygons.Length () >= thing_type->engine->GetFastMeshThresshold () &&
+	portal_polygons.Length () == 0 &&
+	GetCurveCount () == 0)
+    {
+      flags.Set (CS_THING_FASTMESH);
+      printf ("Switch to FASTMESH '%s'!\n", GetName ()); fflush (stdout);
+    }
+  }
+
   scfiPolygonMeshLOD.Cleanup ();
   scfiPolygonMesh.Cleanup ();
   if (!flags.Check (CS_THING_NOCOMPRESS))

@@ -139,7 +139,7 @@ struct iSharedVariableList;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 14, 0);
+SCF_VERSION (iEngine, 0, 15, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -423,6 +423,16 @@ struct iEngine : public iBase
   virtual void SetLightingCacheMode (int mode) = 0;
   /// Get the mode for the lighting cache.
   virtual int GetLightingCacheMode () = 0;
+
+  /**
+   * Set the thresshold (in number of polygons) after which the thing
+   * mesh plugin will automatically switch to FASTMESH mode. If the number
+   * of polygons is greater or equal compared to this thresshold then
+   * CS_THING_FASTMESH will be made default. 500 is the default.
+   */
+  virtual void SetFastMeshThresshold (int th) = 0;
+  /// Get the fastmesh thresshold.
+  virtual int GetFastMeshThresshold () const = 0;
 
   /**
    * Require that the Z-buffer is cleared every frame. The engine

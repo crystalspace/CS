@@ -515,6 +515,21 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
   const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
   iPolygonTexture* poly_texture)
 {
+#if 0
+// Debug stuff for printing out statistics information.
+if (verts == NULL)
+{
+int cnt_mat = 0;
+TrianglesNode* t = GetFirst ();
+while (t) { cnt_mat++; t = t->next; }
+int cnt_lm = 0;
+TrianglesSuperLightmapNode* sln = GetFirstTrianglesSLM ();
+while (sln) { cnt_lm++; sln = sln->prev; }
+printf ("vtcnt=%d cnt_mat=%d cnt_lm=%d\n", GetVertexCount (), cnt_mat, cnt_lm); fflush (stdout);
+return;
+}
+#endif
+
   /*
    * We have to:
    * Generate triangles

@@ -262,6 +262,7 @@ specify. Here is a complete settings example:
   <lightmapcellsize>16</lightmapcellsize>
   <maxlightmapsize horizontal="256" vertical="256" />
   <ambient red=".1" green=".1" blue=".1" />
+  <fastmesh>300</fastmesh>
 </settings>
 @end example
 
@@ -286,6 +287,11 @@ every object will also get ambient lighting. Ambient lighting is global to
 the engine (at least static ambient lighting). You can set the ambient
 for a level in the settings block. Default ambient is 0.078 for all color
 components.
+
+With @samp{fastmesh} you can control at which point CS will use
+@code{CS_THING_FASTMESH} for a thing. This is a faster routine (in principle)
+but at this moment it only seems to pay off for objects with a high
+number of polygons. The default is 500.
 
 @subsubheading Start Location Section
 @cindex start location (Map File)

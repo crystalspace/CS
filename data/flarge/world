@@ -98,6 +98,9 @@
             <file>/lib/std/seagull.gif</file>
         </texture>
     </textures>
+    <settings>
+        <fastmesh>10</fastmesh>
+    </settings>
     <variables>
 	<variable name="Std Thing Angle" value="0.54321" />
 	<variable name="Std Thing Range" value="50.5" />
