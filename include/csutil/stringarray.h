@@ -24,42 +24,64 @@
 #include "csutil/util.h"
 #include "csutil/arraybase.h"
 
+template <class T>
+class csStringArrayElementHandler
+{
+public:
+  static void Construct (T* address, T const& src)
+  {
+  }
+
+  static void Destroy (T* address)
+  {
+    delete[] *address;
+  }
+
+  static void InitRegion (T* address, int count)
+  {
+    memset (address, 0, count*sizeof (T));
+  }
+};
+
+#undef ElementHandler
+#undef ArraySuper
+#define ElementHandler csStringArrayElementHandler<char*>
+#define ArraySuper csArrayBase<char*, ElementHandler >
+
 typedef int csStringArrayCompareFunction (char const* item1, char const* item2);
 
 /**
  * An array of strings. This array will properly make copies of the strings
  * and delete those copies using delete[] later.
  */
-class csStringArray : private csArrayBase<char*>  // Note! Private.
+class csStringArray : private ArraySuper  // Note! Private.
 {
 public:
   // We take the following public functions from csArrayBase<T> and
   // make them public here.
-  using csArrayBase<char*>::Length;
-  using csArrayBase<char*>::Capacity;
-  // using csArrayBase<char*>::Find; We have our own version
-  using csArrayBase<char*>::Sort;
-  using csArrayBase<char*>::Get;
-  using csArrayBase<char*>::operator[];
+  using ArraySuper::Length;
+  using ArraySuper::Capacity;
+  // using ArraySuper::Find; We have our own version
+  using ArraySuper::Sort;
+  using ArraySuper::Get;
+  using ArraySuper::operator[];
+  using ArraySuper::DeleteAll;
+  using ArraySuper::Truncate;
+  using ArraySuper::Empty;
+  using ArraySuper::SetLength;
+  using ArraySuper::AdjustCapacity;
+  using ArraySuper::ShrinkBestFit;
+  using ArraySuper::DeleteIndex;
+  using ArraySuper::DeleteRange;
+  using ArraySuper::Delete;
 
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csStringArray (int ilimit = 0, int ithreshold = 0)
-  	: csArrayBase<char*> (ilimit, ithreshold)
+  	: ArraySuper (ilimit, ithreshold)
   {
-  }
-
-  /**
-   * Clear entire vector.
-   */
-  void DeleteAll ()
-  {
-    int i;
-    for (i = 0 ; i < count ; i++)
-      delete[] root[i];
-    DeleteRoot ();
   }
 
   /**
@@ -78,55 +100,7 @@ public:
    */
   void TransferTo (csStringArray& destination)
   {
-    destination.DeleteAll ();
-    destination.root = root;
-    destination.count = count;
-    destination.capacity = capacity;
-    destination.threshold = threshold;
-    root = 0;
-    capacity = count = 0;
-  }
-
-  /**
-   * Truncate array to specified number of elements. The new number of
-   * elements cannot exceed the current number of elements. Use SetLength()
-   * for a more general way to enlarge the array.
-   */
-  void Truncate (int n)
-  {
-    CS_ASSERT(n >= 0);
-    CS_ASSERT(n <= count);
-    if (n < count)
-    {
-      for (int i = n; i < count; i++)
-        delete[] root[i];
-      SetLengthUnsafe(n);
-    }
-  }
-
-  /**
-   * Remove all elements.  Similar to DeleteAll(), but does not release memory
-   * used by the array itself, thus making it more efficient for cases when the
-   * number of contained elements will fluctuate.
-   */
-  void Empty ()
-  {
-    Truncate (0);
-  }
-
-  /// Set vector length to n.
-  void SetLength (int n)
-  {
-    if (n <= count)
-    {
-      Truncate (n);
-    }
-    else
-    {
-      int old_len = Length ();
-      SetLengthUnsafe (n);
-      memset (root+old_len, 0, (n-old_len)*sizeof (char*));
-    }
+    ArraySuper::TransferTo ((ArraySuper&)destination);
   }
 
   /// Make a copy of a string and remember it.
@@ -254,32 +228,6 @@ public:
       SetLength (ncount);
     }
     return rc;
-  }
-
-  /// Delete element number 'n' from vector.
-  bool DeleteIndex (int n)
-  {
-    char* p = Extract (n);
-    if (p)
-    {
-      delete[] p;
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  /**
-   * Delete the given element from vector.
-   * This function does a case sensitive string compare to find the element.
-   */
-  bool Delete (char const* item)
-  {
-    int n = Find (item);
-    if (n == -1) return false;
-    else return DeleteIndex (n);
   }
 
   /**

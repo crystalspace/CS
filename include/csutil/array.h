@@ -27,6 +27,32 @@
 #endif
 #include <new>
 
+template <class T>
+class csArrayElementHandler
+{
+public:
+  static void Construct (T* address, T const& src)
+  {
+    new (static_cast<void*>(address)) T(src);
+  }
+
+  static void Destroy (T* address)
+  {
+    address->T::~T();
+  }
+
+  static void InitRegion (T* address, int count)
+  {
+    for (int i = 0 ; i < count ; i++)
+      Construct (root + i, T ());
+  }
+};
+
+#undef ElementHandler
+#undef ArraySuper
+#define ElementHandler csArrayElementHandler<T>
+#define ArraySuper csArrayBase<T, ElementHandler >
+
 /**
  * A templated array class.  The objects in this class are constructed via
  * copy-constructor and are destroyed when they are removed from the array or
@@ -35,28 +61,26 @@
  * of this class.
  */
 template <class T>
-class csArray : private csArrayBase<T>	// Note! Private inheritance here!
+class csArray : private ArraySuper	// Note! Private inheritance!
 {
-private:
-  void ConstructElement (int n, T const& src)
-  {
-    new (static_cast<void*>(root + n)) T(src);
-  }
-
-  void DestroyElement (int n)
-  {
-    (root + n)->T::~T();
-  }
- 
 public:
   // We take the following public functions from csArrayBase<T> and
   // make them public here.
-  using csArrayBase<T>::Length;
-  using csArrayBase<T>::Capacity;
-  using csArrayBase<T>::Find;
-  using csArrayBase<T>::Sort;
-  using csArrayBase<T>::Get;
-  using csArrayBase<T>::operator[];
+  using ArraySuper::Length;
+  using ArraySuper::Capacity;
+  using ArraySuper::Find;
+  using ArraySuper::Sort;
+  using ArraySuper::Get;
+  using ArraySuper::operator[];
+  using ArraySuper::DeleteAll;
+  using ArraySuper::Truncate;
+  using ArraySuper::Empty;
+  using ArraySuper::SetLength;
+  using ArraySuper::AdjustCapacity;
+  using ArraySuper::ShrinkBestFit;
+  using ArraySuper::DeleteIndex;
+  using ArraySuper::DeleteRange;
+  using ArraySuper::Delete;
 
   /// This function prototype is used for csArray::InsertSorted()
   typedef int ArrayCompareFunction (T const& item1, T const& item2);
@@ -68,7 +92,7 @@ public:
    * increase storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csArray (int icapacity = 0, int ithreshold = 0)
-  	: csArrayBase<T> (icapacity, ithreshold)
+  	: ArraySuper (icapacity, ithreshold)
   {
   }
 
@@ -81,7 +105,7 @@ public:
     root = 0;
     SetLengthUnsafe (other.Length ());
     for (int i=0 ; i<other.Length() ; i++)
-      ConstructElement (i, other[i]);
+      ElementHandler::Construct (root + i, other[i]);
   }
 
   /**
@@ -92,13 +116,7 @@ public:
    */
   void TransferTo (csArray<T>& destination)
   {
-    destination.DeleteAll ();
-    destination.root = root;
-    destination.count = count;
-    destination.capacity = capacity;
-    destination.threshold = threshold;
-    root = 0;
-    capacity = count = 0;
+    ArraySuper::TransferTo ((ArraySuper&)destination);
   }
 
   /// Assignment operator.
@@ -110,33 +128,8 @@ public:
     DeleteAll ();
     SetLengthUnsafe (other.Length ());
     for (int i=0 ; i<other.Length() ; i++)
-      ConstructElement (i, other[i]);
+      ElementHandler::Construct (root + i, other[i]);
     return *this;
-  }
-
-  /// Clear entire vector, releasing all memory.
-  void DeleteAll ()
-  {
-    for (int i = 0; i < count; i++)
-      DestroyElement (i);
-    DeleteRoot ();
-  }
-
-  /**
-   * Truncate array to specified number of elements. The new number of
-   * elements cannot exceed the current number of elements. Use SetLength()
-   * for a more general way to enlarge the array.
-   */
-  void Truncate (int n)
-  {
-    CS_ASSERT(n >= 0);
-    CS_ASSERT(n <= count);
-    if (n < count)
-    {
-      for (int i = n; i < count; i++)
-        DestroyElement(i);
-      SetLengthUnsafe(n);
-    }
   }
 
   /**
@@ -157,54 +150,14 @@ public:
       int old_len = Length ();
       SetLengthUnsafe (n);
       for (int i = old_len ; i < n ; i++)
-        ConstructElement (i, what);
+        ElementHandler::Construct (root + i, what);
     }
-  }
-
-  /**
-   * Remove all elements.  Similar to DeleteAll(), but does not release memory
-   * used by the array itself, thus making it more efficient for cases when the
-   * number of contained elements will fluctuate.
-   */
-  void Empty ()
-  {
-    Truncate (0);
   }
 
   /// Destroy the container.
   ~csArray ()
   {
     DeleteAll ();
-  }
-
-  /**
-   * Set vector capacity to approximately 'n' elements.  Never sets the
-   * capacity to fewer than the current number of elements in the array.  See
-   * Truncate() or SetLength() if you need to adjust the number of actual
-   * array elements.
-   */
-  void SetCapacity (int n)
-  {
-    if (n > Length ())
-      AdjustCapacity (n);
-  }
-
-  /**
-   * Make the array just as big as it needs to be. This is useful in cases
-   * where you know the array isn't going to be modified anymore in order
-   * to preserve memory.
-   */
-  void ShrinkBestFit ()
-  {
-    if (count == 0)
-    {
-      DeleteAll ();
-    }
-    else if (count != capacity)
-    {
-      capacity = count;
-      root = (T*)realloc (root, capacity * sizeof(T));
-    }
   }
 
   /// Get an element (non-const).
@@ -237,7 +190,7 @@ public:
   int Push (T const& what)
   {
     SetLengthUnsafe (count + 1);
-    ConstructElement (count - 1, what);
+    ElementHandler::Construct (root + count - 1, what);
     return (count - 1);
   }
 
@@ -256,7 +209,7 @@ public:
   {
     CS_ASSERT (count > 0);
     T ret(root [count - 1]);
-    DestroyElement (count - 1);
+    ElementHandler::Destroy (root + count - 1);
     SetLengthUnsafe (count - 1);
     return ret;
   }
@@ -268,54 +221,6 @@ public:
     return root [count - 1];
   }
 
-  /// Delete element number 'n' from vector.
-  bool DeleteIndex (int n)
-  {
-    if (n >= 0 && n < count)
-    {
-      int const ncount = count - 1;
-      int const nmove = ncount - n;
-      DestroyElement (n);
-      if (nmove > 0)
-        memmove (root + n, root + n + 1, nmove * sizeof(T));
-      SetLengthUnsafe (ncount);
-      return true;
-    }
-    else
-      return false;
-  }
-
-  /**
-   * Delete a given range (inclusive). This routine will clamp start and end
-   * to the size of the array.
-   */
-  void DeleteRange (int start, int end)
-  {
-    if (start >= count) return;
-    if (end < 0) return;
-    if (start < 0) start = 0;
-    if (end >= count) end = count-1;
-    int i;
-    for (i = start ; i < end ; i++)
-      DestroyElement (i);
-
-    int const range_size = end-start+1;
-    int const ncount = count - range_size;
-    int const nmove = count - end - 1;
-    if (nmove > 0)
-      memmove (root + start, root + start + range_size, nmove * sizeof(T));
-    SetLengthUnsafe (ncount);
-  }
-
-  /// Delete the given element from vector.
-  bool Delete (T const& item)
-  {
-    int const n = Find (item);
-    if (n >= 0)
-      return DeleteIndex (n);
-    return false;
-  }
-
   /// Insert element 'item' before element 'n'.
   bool Insert (int n, T const& item)
   {
@@ -325,7 +230,7 @@ public:
       int const nmove = (count - n - 1);
       if (nmove > 0)
         memmove (root + n + 1, root + n, nmove * sizeof(T));
-      ConstructElement (n, item);
+      ElementHandler::Construct (root + n, item);
       return true;
     }
     else
@@ -444,6 +349,9 @@ public:
   Iterator GetIterator() const
   { return Iterator(*this); }
 };
+
+#undef ElementHandler
+#undef ArraySuper
 
 #ifdef CS_EXTENSIVE_MEMDEBUG
 # define new CS_EXTENSIVE_MEMDEBUG_NEW

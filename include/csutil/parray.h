@@ -22,6 +22,30 @@
 
 #include "csutil/arraybase.h"
 
+template <class T>
+class csPDelArrayElementHandler
+{
+public:
+  static void Construct (T* address, T const& src)
+  {
+  }
+
+  static void Destroy (T* address)
+  {
+    delete *address;
+  }
+
+  static void InitRegion (T* address, int count)
+  {
+    memset (address, 0, count*sizeof (T));
+  }
+};
+
+#undef ElementHandler
+#undef ArraySuper
+#define ElementHandler csPDelArrayElementHandler<T*>
+#define ArraySuper csArrayBase<T*, ElementHandler >
+
 /**
  * An array of pointers. No ref counting is done on the elements in this
  * array. Use csRefArray if you want ref counting to happen.
@@ -30,17 +54,26 @@
  * pointer).
  */
 template <class T>
-class csPDelArray : private csArrayBase<T*>  // Note! Private inheritance here!
+class csPDelArray : private ArraySuper  // Note! Private inheritance!
 {
 public:
   // We take the following public functions from csArrayBase<T> and
   // make them public here.
-  using csArrayBase<T*>::Length;
-  using csArrayBase<T*>::Capacity;
-  using csArrayBase<T*>::Find;
-  using csArrayBase<T*>::Sort;
-  using csArrayBase<T*>::Get;
-  using csArrayBase<T*>::operator[];
+  using ArraySuper::Length;
+  using ArraySuper::Capacity;
+  using ArraySuper::Find;
+  using ArraySuper::Sort;
+  using ArraySuper::Get;
+  using ArraySuper::operator[];
+  using ArraySuper::DeleteAll;
+  using ArraySuper::Truncate;
+  using ArraySuper::Empty;
+  using ArraySuper::SetLength;
+  using ArraySuper::AdjustCapacity;
+  using ArraySuper::ShrinkBestFit;
+  using ArraySuper::DeleteIndex;
+  using ArraySuper::DeleteRange;
+  using ArraySuper::Delete;
 
   /// This function prototype is used for csPDelArray::InsertSorted()
   typedef int ArrayCompareFunction (T const* item1, T const* item2);
@@ -52,46 +85,8 @@ public:
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csPDelArray (int ilimit = 0, int ithreshold = 0)
-  	: csArrayBase<T*> (ilimit, ithreshold)
+  	: ArraySuper (ilimit, ithreshold)
   {
-  }
-
-  /**
-   * Clear entire vector.
-   */
-  void DeleteAll ()
-  {
-    int i;
-    for (i = 0 ; i < count ; i++)
-      delete root[i];
-    DeleteRoot ();
-  }
-
-  /**
-   * Truncate array to specified number of elements. The new number of
-   * elements cannot exceed the current number of elements. Use SetLength()
-   * for a more general way to enlarge the array.
-   */
-  void Truncate (int n)
-  {
-    CS_ASSERT(n >= 0);
-    CS_ASSERT(n <= count);
-    if (n < count)
-    {
-      for (int i = n; i < count; i++)
-        delete root[i];
-      SetLengthUnsafe(n);
-    }
-  }
-
-  /**
-   * Remove all elements.  Similar to DeleteAll(), but does not release memory
-   * used by the array itself, thus making it more efficient for cases when the
-   * number of contained elements will fluctuate.
-   */
-  void Empty ()
-  {
-    Truncate (0);
   }
 
   /**
@@ -110,28 +105,7 @@ public:
    */
   void TransferTo (csPDelArray<T>& destination)
   {
-    destination.DeleteAll ();
-    destination.root = root;
-    destination.count = count;
-    destination.capacity = capacity;
-    destination.threshold = threshold;
-    root = 0;
-    capacity = count = 0;
-  }
-
-  /// Set vector length to n.
-  void SetLength (int n)
-  {
-    if (n <= count)
-    {
-      Truncate (n);
-    }
-    else
-    {
-      int old_len = Length ();
-      SetLengthUnsafe (n);
-      memset (root+old_len, 0, (n-old_len)*sizeof (T*));
-    }
+    ArraySuper::TransferTo ((ArraySuper&)destination);
   }
 
   /// Put a pointer.
@@ -211,29 +185,6 @@ public:
       SetLength (ncount);
     }
     return rc;
-  }
-
-  /// Delete element number 'n' from vector.
-  bool DeleteIndex (int n)
-  {
-    T* p = Extract (n);
-    if (p)
-    {
-      delete p;
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
-
-  /// Delete the given element from vector.
-  bool Delete (T* item)
-  {
-    int n = Find (item);
-    if (n == -1) return false;
-    else return DeleteIndex (n);
   }
 
   /// Insert element 'Item' before element 'n'.
@@ -323,6 +274,9 @@ public:
     return m;
   }
 };
+
+#undef ElementHandler
+#undef ArraySuper
 
 #endif // __CS_PTRARR_H__
 

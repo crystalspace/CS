@@ -23,21 +23,54 @@
 #include "csutil/arraybase.h"
 #include "csutil/ref.h"
 
+template <class T>
+class csRefArrayElementHandler
+{
+public:
+  static void Construct (T* address, T const& src)
+  {
+  }
+
+  static void Destroy (T* address)
+  {
+    *address = 0;	// Clear reference.
+  }
+
+  static void InitRegion (T* address, int count)
+  {
+    memset (address, 0, count*sizeof (T));
+  }
+};
+
+#undef ElementHandler
+#undef ArraySuper
+#define ElementHandler csRefArrayElementHandler<csRef<T> >
+#define ArraySuper csArrayBase<csRef<T>, ElementHandler >
+
 /**
  * An array of smart pointers.
  */
 template <class T>
-class csRefArray : private csArrayBase<csRef<T> >	// Note! Private!
+class csRefArray : private ArraySuper	// Note! Private!
 {
 public:
   // We take the following public functions from csArrayBase<T> and
   // make them public here.
-  using csArrayBase<csRef<T> >::Length;
-  using csArrayBase<csRef<T> >::Capacity;
-  //using csArrayBase<csRef<T> >::Find;
-  //using csArrayBase<csRef<T> >::Sort;
-  using csArrayBase<csRef<T> >::Get;
-  using csArrayBase<csRef<T> >::operator[];
+  using ArraySuper::Length;
+  using ArraySuper::Capacity;
+  //using ArraySuper::Find;
+  //using ArraySuper::Sort;
+  using ArraySuper::Get;
+  using ArraySuper::operator[];
+  using ArraySuper::DeleteAll;
+  using ArraySuper::Truncate;
+  using ArraySuper::Empty;
+  using ArraySuper::SetLength;
+  using ArraySuper::AdjustCapacity;
+  using ArraySuper::ShrinkBestFit;
+  using ArraySuper::DeleteIndex;
+  using ArraySuper::DeleteRange;
+  using ArraySuper::Delete;
 
   typedef int ArrayCompareFunction (T* item1, T* item2);
   typedef int ArrayCompareKeyFunction (T* item, void* key);
@@ -47,7 +80,7 @@ public:
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csRefArray (int ilimit = 0, int ithreshold = 0)
-  	: csArrayBase<csRef<T> > (ilimit, ithreshold)
+  	: ArraySuper (ilimit, ithreshold)
   {
   }
 
@@ -70,24 +103,7 @@ public:
    */
   void TransferTo (csRefArray<T>& destination)
   {
-    destination.DeleteAll ();
-    destination.root = root;
-    destination.count = count;
-    destination.capacity = capacity;
-    destination.threshold = threshold;
-    root = 0;
-    capacity = count = 0;
-  }
-
-  /**
-   * Clear entire vector.
-   */
-  void DeleteAll ()
-  {
-    int i;
-    for (i = 0 ; i < count ; i++)
-      root[i] = 0;	// Clear ref
-    DeleteRoot ();
+    ArraySuper::TransferTo ((ArraySuper&)destination);
   }
 
   /**
@@ -97,54 +113,6 @@ public:
   {
     DeleteAll ();
   }
-
-  /**
-   * Truncate array to specified number of elements. The new number of
-   * elements cannot exceed the current number of elements. Use SetLength()
-   * for a more general way to enlarge the array.
-   */
-  void Truncate (int n)
-  {
-    CS_ASSERT(n >= 0);
-    CS_ASSERT(n <= count);
-    if (n < count)
-    {
-      for (int i = n; i < count; i++)
-        root[i]= 0;	// Clear ref.
-      SetLengthUnsafe(n);
-    }
-  }
-
-  /// Set vector length to n.
-  void SetLength (int n)
-  {
-    if (n <= count)
-    {
-      Truncate (n);
-    }
-    else
-    {
-      int old_len = Length ();
-      SetLengthUnsafe (n);
-      memset (root+old_len, 0, (n-old_len)*sizeof (csRef<T>));
-    }
-  }
-
-#if 0
-  /// Get a const reference.
-  const csRef<T>& Get (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
-  }
-
-  /// Get a const reference.
-  const csRef<T>& operator [] (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
-  }
-#endif
 
   /// Get a reference.
   csRef<T>& operator [] (int n)
@@ -205,37 +173,6 @@ public:
   T* Top () const
   {
     return root [count - 1];
-  }
-
-  /// Delete element number 'n' from vector.
-  bool DeleteIndex (int n)
-  {
-    if (n >= 0 && n < count)
-    {
-      root[n] = 0;	// Clear element.
-      const int ncount = count - 1;
-      const int nmove = ncount - n;
-      if (nmove > 0)
-      {
-        memmove (&root [n], &root [n + 1], nmove * sizeof (csRef<T>));
-	// The following manual IncRef() is to make sure that
-	// the element will not get deleted by the SetLength() below.
-	if (root[ncount])
-	  root[ncount]->IncRef ();
-      }
-      SetLength (ncount);
-      return true;
-    }
-    else
-      return false;
-  }
-
-  /// Delete the given element from vector.
-  bool Delete (T* item)
-  {
-    int n = Find (item);
-    if (n == -1) return false;
-    else return DeleteIndex (n);
   }
 
   /// Insert element 'Item' before element 'n'.
@@ -374,6 +311,9 @@ public:
   }
   
 };
+
+#undef ElementHandler
+#undef ArraySuper
 
 #endif // __CS_REFARR_H__
 

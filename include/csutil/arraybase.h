@@ -23,7 +23,7 @@
  * The base for all templated array classes in CS. Note that
  * there are no virtual functions here for performance reasons.
  */
-template <class T>
+template <class T, class ElementHandler>
 class csArrayBase
 {
 protected:
@@ -43,18 +43,6 @@ protected:
         root = (T*)malloc (capacity * sizeof(T));
       else
         root = (T*)realloc (root, capacity * sizeof(T));
-    }
-  }
-
-  // Completely delete the root array and reset the count.
-  // Doesn't delete any items in it.
-  void DeleteRoot ()
-  {
-    if (root)
-    {
-      free (root);
-      root = 0;
-      capacity = count = 0;
     }
   }
 
@@ -81,6 +69,23 @@ protected:
       root = (T*)malloc (capacity * sizeof(T));
     else
       root = 0;
+  }
+
+  /**
+   * Transfer the entire contents of one array to the other. The end
+   * result will be that this array will be completely empty and the
+   * other array will have all items that originally were in this array.
+   * This operation is very efficient.
+   */
+  void TransferTo (csArrayBase<T, ElementHandler>& destination)
+  {
+    destination.DeleteAll ();
+    destination.root = root;
+    destination.count = count;
+    destination.capacity = capacity;
+    destination.threshold = threshold;
+    root = 0;
+    capacity = count = 0;
   }
 
 public:
@@ -131,6 +136,143 @@ public:
     CS_ASSERT (n >= 0 && n < count);
     return root[n];
   }
+
+  /**
+   * Clear entire vector.
+   */
+  void DeleteAll ()
+  {
+    if (root)
+    {
+      int i;
+      for (i = 0 ; i < count ; i++)
+        ElementHandler::Destroy (root + i);
+      free (root);
+      root = 0;
+      capacity = count = 0;
+    }
+  }
+
+  /**
+   * Truncate array to specified number of elements. The new number of
+   * elements cannot exceed the current number of elements. Use SetLength()
+   * for a more general way to enlarge the array.
+   */
+  void Truncate (int n)
+  {
+    CS_ASSERT(n >= 0);
+    CS_ASSERT(n <= count);
+    if (n < count)
+    {
+      for (int i = n; i < count; i++)
+        ElementHandler::Destroy (root + i);
+      SetLengthUnsafe(n);
+    }
+  }
+
+  /**
+   * Remove all elements.  Similar to DeleteAll(), but does not release memory
+   * used by the array itself, thus making it more efficient for cases when the
+   * number of contained elements will fluctuate.
+   */
+  void Empty ()
+  {
+    Truncate (0);
+  }
+
+  /// Set vector length to n.
+  void SetLength (int n)
+  {
+    if (n <= count)
+    {
+      Truncate (n);
+    }
+    else
+    {
+      int old_len = Length ();
+      SetLengthUnsafe (n);
+      ElementHandler::InitRegion (root + old_len, n-old_len);
+    }
+  }
+
+  /**
+   * Set vector capacity to approximately 'n' elements.  Never sets the
+   * capacity to fewer than the current number of elements in the array.  See
+   * Truncate() or SetLength() if you need to adjust the number of actual
+   * array elements.
+   */
+  void SetCapacity (int n)
+  {
+    if (n > Length ())
+      AdjustCapacity (n);
+  }
+
+  /**
+   * Make the array just as big as it needs to be. This is useful in cases
+   * where you know the array isn't going to be modified anymore in order
+   * to preserve memory.
+   */
+  void ShrinkBestFit ()
+  {
+    if (count == 0)
+    {
+      DeleteAll ();
+    }
+    else if (count != capacity)
+    {
+      capacity = count;
+      root = (T*)realloc (root, capacity * sizeof(T));
+    }
+  }
+
+  /// Delete element number 'n' from vector.
+  bool DeleteIndex (int n)
+  {
+    if (n >= 0 && n < count)
+    {
+      int const ncount = count - 1;
+      int const nmove = ncount - n;
+      ElementHandler::Destroy (root + n);
+      if (nmove > 0)
+        memmove (root + n, root + n + 1, nmove * sizeof(T));
+      SetLengthUnsafe (ncount);
+      return true;
+    }
+    else
+      return false;
+  }
+
+  /**
+   * Delete a given range (inclusive). This routine will clamp start and end
+   * to the size of the array.
+   */
+  void DeleteRange (int start, int end)
+  {
+    if (start >= count) return;
+    if (end < 0) return;
+    if (start < 0) start = 0;
+    if (end >= count) end = count-1;
+    int i;
+    for (i = start ; i < end ; i++)
+      ElementHandler::Destroy (root + i);
+
+    int const range_size = end-start+1;
+    int const ncount = count - range_size;
+    int const nmove = count - end - 1;
+    if (nmove > 0)
+      memmove (root + start, root + start + range_size, nmove * sizeof(T));
+    SetLengthUnsafe (ncount);
+  }
+
+  /// Delete the given element from vector.
+  bool Delete (T const& item)
+  {
+    int const n = Find (item);
+    if (n >= 0)
+      return DeleteIndex (n);
+    return false;
+  }
 };
 
 #endif
+

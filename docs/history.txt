@@ -12,6 +12,28 @@ chronological order.
 	- Jorrit fixed makefiles for GIF and PNG image loaders.
 	- Jorrit fixed makefile for BMP image loader.
         - Boyan fixed errors in broadcasting in iNetworkSocket2.
+	- Jorrit made the following array change: There is now an element
+	  handler defined for every array class (csArray, csPDelArray,
+	  csRefArray, and csStringArray). This element handler contains
+	  three static functions, one to create elements, one to destroy
+	  elements, and one to initialize a new region of memory.
+	  csArrayBase is given an additional parameter in the template
+	  section to indicate this element class and will use that to create
+	  and destroy elements. By doing this I managed to move the following
+	  functions to csArrayBase:
+	      - DeleteAll()
+	      - Truncate()
+	      - Empty()
+	      - SetLength()
+	      - TransferTo()
+	      - SetCapacity()
+	      - ShrinkBestFit()
+	      - DeleteIndex()
+	      - DeleteRange()
+	      - Delete()
+	  Thusly a lot of duplicate code got removed. I plan to move a lot
+	  more to csArrayBase so that the sub-classes of csArrayBase will
+	  contain only the really different functionality.
 	- Keith Fulton added support for animation action wrappers in cal3d
 	  plugin and augmented viewmesh to allow user to set/clear/blend
 	  both anim cycles and anim actions.  With a nicer GUI, viewmesh
