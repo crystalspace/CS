@@ -12,6 +12,10 @@ The history order is reversed so that new features are at the top.
 	  degrading.
 	- Added UnitTest() implementation of csKDTree for the current
 	  supported operations.
+	- csKDTree also supports textual dump and state test. Also
+	  changed Dynavis plugin to prepare for the situation in the future
+	  where it will delegate textual dump and state test to the
+	  csKDTree instance it is maintaining.
 30-Apr-2002
 	- Added a new iDebugHelper interface in iutil. This interface defines
 	  a consistant interface for debugging CS modules. It has the following

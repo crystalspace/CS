@@ -53,7 +53,10 @@ public:
   virtual void RegisterShadowReceiver (iShadowReceiver* /*receiver*/) { }
   virtual void UnregisterShadowReceiver (iShadowReceiver* /*receiver*/) { }
 
+  // Debugging functions.
   iString* Debug_UnitTest ();
+  iString* Debug_StateTest ();
+  iString* Debug_Dump ();
 
   struct eiComponent : public iComponent
   {
@@ -67,7 +70,8 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csDynaVis);
     virtual int GetSupportedTests () const
     {
-      return CS_DBGHELP_UNITTEST;
+      return CS_DBGHELP_UNITTEST | CS_DBGHELP_TXTDUMP |
+      	CS_DBGHELP_STATETEST;
     }
     virtual iString* UnitTest ()
     {
@@ -75,7 +79,7 @@ public:
     }
     virtual iString* StateTest ()
     {
-      return NULL;
+      return scfParent->Debug_StateTest ();
     }
     virtual csTicks Benchmark (int /*num_iterations*/)
     {
@@ -83,7 +87,7 @@ public:
     }
     virtual iString* Dump ()
     {
-      return NULL;
+      return scfParent->Debug_Dump ();
     }
     virtual void Dump (iGraphics3D* /*g3d*/)
     {

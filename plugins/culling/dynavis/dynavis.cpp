@@ -85,3 +85,13 @@ iString* csDynaVis::Debug_UnitTest ()
   return NULL;
 }
 
+iString* csDynaVis::Debug_StateTest ()
+{
+  return NULL;
+}
+
+iString* csDynaVis::Debug_Dump ()
+{
+  return NULL;
+}
+

@@ -157,7 +157,8 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csKDTree);
     virtual int GetSupportedTests () const
     {
-      return CS_DBGHELP_UNITTEST | CS_DBGHELP_TXTDUMP;
+      return CS_DBGHELP_UNITTEST |
+      	CS_DBGHELP_STATETEST | CS_DBGHELP_TXTDUMP;
     }
     virtual iString* UnitTest ()
     {
@@ -165,6 +166,10 @@ public:
     }
     virtual iString* StateTest ()
     {
+      scfString* rc = new scfString ();
+      if (!scfParent->Debug_CheckTree (rc->GetCsString ()))
+        return rc;
+      delete rc;
       return NULL;
     }
     virtual csTicks Benchmark (int /*num_iterations*/)
