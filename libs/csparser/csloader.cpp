@@ -1372,7 +1372,13 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, csWorld* w, char* buf,
         {
           int list[100], num;
           ScanStr (params, "%D", list, &num);
-          for (i = 0 ; i < num ; i++) poly3d->AddVertex (list[i]);
+          for (i = 0 ; i < num ; i++)
+	  {
+	    if (list[i] == list[(i-1+num)%num])
+	      CsPrintf (MSG_WARNING, "Duplicate vertex-index found in polygon! Ignored...\n");
+	    else
+	      poly3d->AddVertex (list[i]);
+	  }
         }
         break;
       case TOKEN_FLATCOL:
