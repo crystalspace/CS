@@ -539,7 +539,13 @@ iSector *csSector::FollowSegment (
         return dest_sect->FollowSegment (t, new_position, mirror);
       }
       else
+      {
         new_position = isect;
+      }
+    }
+    else
+    {
+      new_position = isect;
     }
   }
 

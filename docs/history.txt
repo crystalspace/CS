@@ -24,6 +24,10 @@ chronological order.
 	  that move. This wasn't the case in the past.
 	- Jorrit updated the apimod documentation for all recent beam
 	  intersection related changes.
+	- Jorrit fixed a bug in iSector->FollowSegment(). If a polygon was
+	  hit but that polygon was not a portal then the intersection point
+	  was not correctly set. This bug could cause the explosion in walktest
+	  to not appear from time to time.
 30-Sep-2003
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the
