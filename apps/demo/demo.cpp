@@ -403,7 +403,6 @@ void Demo::SetupFrame ()
     // Don't do the demo but print out information about
     // where to get all stuff.
     if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    iTextureManager* txtmgr = myG3D->GetTextureManager ();
     int col_bg = myG2D->FindRGB (200, 180, 180);
     int col_fgdata = myG2D->FindRGB (20, 70, 20);
     int col_bgsel = myG2D->FindRGB (255, 255, 255);

@@ -150,9 +150,6 @@ bool AwsTutorial::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  // Setup the texture manager.
-  iTextureManager* txtmgr = myG3D->GetTextureManager ();
-
   awsCanvas = csPtr<iAwsCanvas> (aws->CreateCustomCanvas (myG2D, myG3D));
 
   // In combination with the g2d->Clear() that happens in SetupFrame()

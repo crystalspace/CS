@@ -334,8 +334,6 @@ bool Simple::Initialize ()
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-
   // Load a sprite template.
   csRef<iMeshFactoryWrapper> imeshfact;
   imeshfact = engine->GetMeshFactories()->FindByName("motion");
