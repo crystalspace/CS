@@ -35,6 +35,7 @@
 #include "igraph3d.h"
 #include "itxtmgr.h"
 #include "itexture.h"
+#include "qint.h"
 
 
 //---------------------------------------------------------------------------
@@ -244,18 +245,17 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
       if (gouraud)
       {
-        control_x[0] = QInt (tess->GetVertex (ct.i1).control.x*lm_width);
-        control_y[0] = QInt (tess->GetVertex (ct.i1).control.y*lm_height);
-        control_x[1] = QInt (tess->GetVertex (ct.i2).control.x*lm_width);
-        control_y[1] = QInt (tess->GetVertex (ct.i2).control.y*lm_height);
-        control_x[2] = QInt (tess->GetVertex (ct.i3).control.x*lm_width);
-        control_y[2] = QInt (tess->GetVertex (ct.i3).control.y*lm_height);
+        control_x[0] = QInt (tess->GetVertex (ct.i1).control.x * lm_width);
+        control_y[0] = QInt (tess->GetVertex (ct.i1).control.y * lm_height);
+        control_x[1] = QInt (tess->GetVertex (ct.i2).control.x * lm_width);
+        control_y[1] = QInt (tess->GetVertex (ct.i2).control.y * lm_height);
+        control_x[2] = QInt (tess->GetVertex (ct.i3).control.x * lm_width);
+        control_y[2] = QInt (tess->GetVertex (ct.i3).control.y * lm_height);
       }
 
       bool visible = true;
       int k;
       for (k = 0 ; k < 3 ; k++)
-      {
   if (varr[k]->z >= SMALL_Z)
   {
     float iz = csCamera::aspect/varr[k]->z;
@@ -264,7 +264,6 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   }
   else
     visible = false;
-      }
 
       // Draw all triangles.
       if (visible)
@@ -384,11 +383,11 @@ void csThing::DrawFoggy (csRenderView& d)
       if (p->dont_draw) continue;
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
-      if ( !front &&
-           p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
-      verts, num_verts, false) &&
-           p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ()) &&
-     csPolygon2D::clipped.ClipAgainst (d.view) )
+      if (!front
+       && p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
+             verts, num_verts, false)
+       && p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ())
+       && csPolygon2D::clipped.ClipAgainst (d.view))
       {
         if (wf)
         {
@@ -402,8 +401,8 @@ void csThing::DrawFoggy (csRenderView& d)
         }
         Stats::polygons_drawn++;
 
-  csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
-    GetID (), CS_FOG_BACK);
+        csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (),
+          d.IsMirrored (), GetID (), CS_FOG_BACK);
 
         long do_edges;
         d.g3d->GetRenderState (G3DRENDERSTATE_EDGESENABLE, do_edges);
@@ -424,11 +423,11 @@ void csThing::DrawFoggy (csRenderView& d)
       if (p->dont_draw) continue;
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
-      if ( front &&
-           p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
-      verts, num_verts, true) &&
-           p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ()) &&
-     csPolygon2D::clipped.ClipAgainst (d.view) )
+      if (front
+       && p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
+          verts, num_verts, true)
+       && p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ())
+       && csPolygon2D::clipped.ClipAgainst (d.view))
       {
         if (wf)
         {
@@ -442,8 +441,8 @@ void csThing::DrawFoggy (csRenderView& d)
         }
         Stats::polygons_drawn++;
 
-  csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (),
-    GetID (), CS_FOG_FRONT);
+        csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (),
+	  d.IsMirrored (), GetID (), CS_FOG_FRONT);
 
         long do_edges;
         d.g3d->GetRenderState (G3DRENDERSTATE_EDGESENABLE, do_edges);

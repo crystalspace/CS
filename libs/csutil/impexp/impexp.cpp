@@ -1893,30 +1893,30 @@ void converter::print_sizes ( ) {
   fprintf ( logfile,  "  Type                Size     Min     Max\n" );
   fprintf ( logfile,  "\n" );
   fprintf ( logfile,  "  char                %d       %d      %d\n", 
-    sizeof ( char ), CHAR_MIN, CHAR_MAX );
+    (int)sizeof ( char ), CHAR_MIN, CHAR_MAX );
   fprintf ( logfile,  "  unsigned char       %d       0       %d\n", 
-    sizeof ( char ),           UCHAR_MAX );
+    (int)sizeof ( char ),           UCHAR_MAX );
   fprintf ( logfile,  "  short int           %d       %d      %d\n", 
-    sizeof ( short int ), SHRT_MIN, SHRT_MAX );
+    (int)sizeof ( short int ), SHRT_MIN, SHRT_MAX );
   fprintf ( logfile,  "  unsigned short int  %d       0       %u\n", 
-    sizeof ( unsigned short int ),           USHRT_MAX );
+    (int)sizeof ( unsigned short int ),           USHRT_MAX );
   fprintf ( logfile,  "  int                 %d       %d      %d\n", 
-    sizeof ( int ), INT_MIN, INT_MAX );
+    (int)sizeof ( int ), INT_MIN, INT_MAX );
   fprintf ( logfile,  "  unsigned int        %d       0       %u\n", 
-    sizeof ( unsigned int ), UINT_MAX );
-  fprintf ( logfile,  "  long int            %d       %d      %d\n", 
-    sizeof ( long int ), LONG_MIN, LONG_MAX );
-  fprintf ( logfile,  "  unsigned long int   %d       0       %u\n", 
-    sizeof ( unsigned long int ), ULONG_MAX );
+    (int)sizeof ( unsigned int ), UINT_MAX );
+  fprintf ( logfile,  "  long int            %d       %ld      %ld\n", 
+    (int)sizeof ( long int ), LONG_MIN, LONG_MAX );
+  fprintf ( logfile,  "  unsigned long int   %d       0       %lu\n", 
+    (int)sizeof ( unsigned long int ), ULONG_MAX );
 /*
   FLT_MIN, FLT_MAX, DBL_MIN, DBL_MAX not defined on Microsoft C.
 */
 
 /*
   fprintf ( logfile,  "  float               %d       %e      %e\n", 
-    sizeof ( float ), FLT_MIN, FLT_MAX );
+    (int)sizeof ( float ), FLT_MIN, FLT_MAX );
   fprintf ( logfile,  "  double              %d       %e      %e\n", 
-    sizeof ( double ), DBL_MIN, DBL_MAX );
+    (int)sizeof ( double ), DBL_MIN, DBL_MAX );
 */
 
   return;

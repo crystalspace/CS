@@ -147,8 +147,8 @@ void csPolyTexture::CreateBoundingTextureBox ()
 
   fdu = min_u*ww;
   fdv = min_v*hh;
-  du = QInt16 (min_u*ww);
-  dv = QInt16 (min_v*hh);
+  du = QInt16 (fdu);
+  dv = QInt16 (fdv);
 
   DB ((MSG_DEBUG_0, "  w_orig=%d w=%d h=%d\n", w_orig, w, h));
   DB ((MSG_DEBUG_0, "  fdu=%f fdv=%f du=%d dv=%d\n", fdu, fdv, du, dv));
@@ -433,15 +433,16 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
   //   1 -- vertical
 
   //@@@Note from Jorrit, I tried to use QInt() here but this didn't work?
-  int height=(int) (visible.bottom-visible.top);
-  int width=(int) (visible.right-visible.left);
+  //@@@Answer from A.Z: there was a BIGBUG{tm} in QInt - 1.0 was rounded to 0.
+  int height = QInt (visible.bottom - visible.top);
+  int width = QInt (visible.right - visible.left);
 
   float a=calc_area (n,p2d);
   if (fabs (a-height*width)<EPS)
   {
     // this area is completely covered
 
-    int x=(int) (visible.left),y=(int) (visible.top);
+    int x = QInt (visible.left), y = QInt (visible.top);
     for (int i=0 ; i<height ; i++)
       for (int j=0 ; j<width ; j++)
   __draw_func (j+x, i+y, 1);
@@ -459,19 +460,17 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 
   if (height==1&&width==1)
   {
-    int x=(int) (visible.left), y=(int) (visible.top);
+    int x = QInt (visible.left), y = QInt (visible.top);
     __draw_func (x, y, a);
 
     depth--;
     return;
   }
 
-  int sub_x = (int) (visible.left+width/2);
-  int sub_y = (int) (visible.top+height/2);
+  int sub_x = QInt (visible.left) + width / 2;
+  int sub_y = QInt (visible.top) + height / 2;
 
-  int how_to_divide=1;
-
-  if (height>width) how_to_divide=0;
+  int how_to_divide = (height > width) ? 0 : 1;
 
   int n2[2];
   csVector2 *p2[2];
@@ -735,8 +734,7 @@ void csPolyTexture::FillLightmap (csLightView& lview)
   poly_fill(rpv,rp,vis);
 
   uv=0;
-  //int __uv;
-  for (int sy=0;sy<lh;sy++)
+  for (int sy=0; sy < lh; sy++)
   {
     for (u=0;u<lw;u++,uv++)
     {

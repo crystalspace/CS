@@ -53,8 +53,6 @@ void csShadowMap::Alloc (csLight*, int w, int h, int lms)
 
 void csShadowMap::MipmapLightmap (int w, int h, int lms, csShadowMap* source, int w2, int h2, int lms2)
 {
-  //int size = w*h;
-
   int lw = w/lms+2;
   int lh = h/lms+2;
   int lw2 = w2/lms2+2;

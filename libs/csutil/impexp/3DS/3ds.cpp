@@ -898,7 +898,7 @@ unsigned long converter::tds_read_matdef_section ( FILE *filein ) {
  
   teller = tds_read_long_name ( filein );
 
-  if ( teller == -1 ) {
+  if ( teller == (unsigned int)-1 ) {
     if ( debug == TRUE ) {
       fprintf ( logfile,  "      No material name found.\n" );
     }
@@ -2270,10 +2270,5 @@ void converter::tds_pre_process ( void ) {
     John Burkardt
 */
   
-  static unsigned short int BIG = 60000;
-
   return;
 }
-
-
-
