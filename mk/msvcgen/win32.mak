@@ -54,14 +54,3 @@ SRC.SYS_CSUTIL = \
   $(SRCDIR)/libs/csutil/generic/resdir.cpp \
   $(SRCDIR)/libs/csutil/generic/runloop.cpp
 endif
-
-#When we are generating the projects files for the VC compilers, in
-#any case we must add the file regex.c to the csutil project.
-#The VisualC++ 6+ have not regex available, so we must override this value to 
-#be "no". The value may be set to "yes" if, for example, we ran
-#the Crystal Space configuring process in a cygwin shell, which provides regex,
-#but VC 6+ don't. Being REGEX.AVAILABLE="no", the regex.c file will be added
-#to the csutil library files list by cs/mk/msvcgen/win32.mak .
-ifeq ($(DO_MSVCGEN),yes)
-  REGEX.AVAILABLE = no
-endif

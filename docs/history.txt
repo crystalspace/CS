@@ -7,7 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 21-Mar-2004
-	- Luca committed the res fix to the problem regarding the lack
+	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 
 	  related to the VisualC++ compiler environments only.
 	- Marten made a new, hopefully permanent, fix for the csRenderMesh 
@@ -24,6 +24,11 @@ chronological order.
 	  state restoration after the CS window gained focus.
 	- res fixed csImageMemory to also not delete the Palette if the image
 	  isn't to be deleted.
+	- Eric Sunshine reverted Luca Cappa's change to msvcgen/win32.mak.  The
+	  file msvcgen/required.mak already forcibly sets REGEX.AVAILABLE=no,
+	  so there should be no need to do so again in win32.mak.  If there is
+	  some configuration in which this is failing, please report so that it
+	  can be fixed correctly.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader
