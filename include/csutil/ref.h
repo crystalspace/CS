@@ -126,8 +126,9 @@ public:
    * Smart pointer validity check.  Returns true if smart pointer is pointing
    * at an actual object, otherwise returns false.
    */
-  bool IsValid() const
+  bool IsValid () const
   { return (obj != 0); }
 };
 
 #endif // __CSREF_H__
+

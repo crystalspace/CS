@@ -1,9 +1,39 @@
 The history order is reversed so that new features are at the top.
 
 31-Jul-2002
+	- Eric Sunshine performed the following tasks.
+	    - Changed csutil/ref.h and the csRef smart pointer template as
+	      follows:
+		o Added a `transfer_ownership' argument to the existing
+		  Assign() method which tells Assign() whether or not
+		  IncRef() has already been invoked upon the the incoming
+		  pointer.  This defaults to false for convenience.
+		o Eliminated the Set() method since Assign()'s new
+		  transfer_ownership argument made Set() redundant.
+		o Added a second Assign() method which accepts a csRef
+		  reference. The presence of this method will smooth the
+		  path for future API upgrades. For example, if
+		  iSector::GetCow() currently returns a pointer to an iCow,
+		  then code such as `ref.Assign(sector->GetCow())' will be
+		  API-compatible even after GetCow() is upgraded to return a
+		  csRef<iCow>.
+		o Added an IsValid() method for checking if the referenced
+		  object is valid (non-null).  This is semantically equivalent
+		  to the existing boolean cast operator, but more explicit.
+		o Fixed the boolean cast operator so that it works with
+		  compilers which do not have a built-in bool type.
+		  Specifically, it now returns (obj != 0), rather than
+		  returning (obj).
+		o Fixed incorrect include protection macros.
+		o Improved class documentation.
+	      For all of the curious folk out there, the csRef template _does_
+	      work with the NextStep compiler, as predicted.
+	    - Fixed incorrect header include protection macros in
+	      csutil/refcount.h and improved the class comments.
 	- Fixed behaviour of csRef::Assign(). By default it will now
 	  transfer owner ship (for pointers) as was intended in the first
 	  place.
+	- Converted simple2 tutorial to use smart pointers.
 30-Jul-2002
 	- Added simple csRefCount class which does reference counting
 	  without the need for iBase.

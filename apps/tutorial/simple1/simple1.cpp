@@ -118,12 +118,8 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q)
-    {
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
 
