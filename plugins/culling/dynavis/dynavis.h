@@ -170,7 +170,11 @@ private:
   csArray<csVisibilityObjectWrapper*> visobj_vector;
   csObjectModelManager* model_mgr;
   csWriteQueue* write_queue;
+
   int scr_width, scr_height;	// Screen dimensions.
+  int reduce_buf;
+  float fov, sx, sy;
+
   uint32 current_vistest_nr;
 
   // For Debug_Dump(g3d): keep the last original camera.

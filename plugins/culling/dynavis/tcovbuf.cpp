@@ -289,8 +289,7 @@ void csCoverageTile::FlushForFullConstFValue (csTileCol&, float)
   // nothing to do here.
 }
 
-void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
-	bool& modified)
+bool csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth)
 {
   // If our new depth is smaller than the minimum depth
   // of this tile then we can do a more optimal routine since
@@ -304,29 +303,15 @@ void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
   // 'fulltest' is still full after the loop then we know the tile is full.
   csTileCol fulltest = TILECOL_FULL;
 
-  if (modified)
+  bool modified = false;
+  do
   {
-    // If 'modified' is already true we avoid the test for modification.
-    do
-    {
-      *c |= fvalue;
-      fulltest &= *c;
-      c++;
-    }
-    while (c < c_end);
+    if (!modified && (fvalue & ~*c)) modified = true;
+    *c |= fvalue;
+    fulltest &= *c;
+    c++;
   }
-  else
-  {
-    // In this case we have to test if the coverage buffer is modified.
-    do
-    {
-      if (!modified && (fvalue & ~*c)) modified = true;
-      *c |= fvalue;
-      fulltest &= *c;
-      c++;
-    }
-    while (c < c_end);
-  }
+  while (c < c_end);
 
   tile_full = (fulltest == TILECOL_FULL);
 
@@ -363,10 +348,10 @@ void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
     if (maxdepth < tile_min_depth) tile_min_depth = maxdepth;
     if (maxdepth > tile_max_depth) tile_max_depth = maxdepth;
   }
+  return modified;
 }
 
-void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
-	bool& modified)
+bool csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth)
 {
   int i;
 
@@ -378,6 +363,7 @@ void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
   // 'fulltest' is still full after the loop then we know the tile is full.
   csTileCol fulltest = TILECOL_FULL;
 
+  bool modified = false;
   csTileCol* c = coverage;      
   // For every 8 columns...
   for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
@@ -443,13 +429,15 @@ void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
 
   if (maxdepth < tile_min_depth) tile_min_depth = maxdepth;
   if (maxdepth > tile_max_depth) tile_max_depth = maxdepth;
+  return modified;
 }
 
-void csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth,
-	bool& modified)
+bool csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth)
 {
   int i;
   MakeEmptyQuick ();
+
+  bool modified = false;
 
   // Special case. Tile is empty.
   // In this special case we don't have to compare with the current contents
@@ -506,16 +494,16 @@ void csCoverageTile::FlushForEmpty (csTileCol& fvalue, float maxdepth,
 
   tile_min_depth = maxdepth;
   tile_max_depth = maxdepth;
+  return modified;
 }
 
-void csCoverageTile::FlushForFull (csTileCol& fvalue, float maxdepth,
-	bool& modified)
+bool csCoverageTile::FlushForFull (csTileCol& fvalue, float maxdepth)
 {
   if (maxdepth >= tile_max_depth)
   {
     // There is no chance we can improve on depth buffer here.
     FlushOperationsOnlyFValue (fvalue);
-    return;
+    return false;
   }
 
   // FlushForFull is called a lot (second most often after
@@ -543,6 +531,7 @@ void csCoverageTile::FlushForFull (csTileCol& fvalue, float maxdepth,
   // to see where we need to update the depth buffer. The coverage_cache
   // will now contain true wherever the coverage buffer was modified.
 
+  bool modified = false;
   // For every 8 columns...
   for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
   {
@@ -582,10 +571,10 @@ void csCoverageTile::FlushForFull (csTileCol& fvalue, float maxdepth,
 
   if (maxdepth < tile_min_depth) tile_min_depth = maxdepth;
   if (maxdepth > tile_max_depth) tile_max_depth = maxdepth;
+  return modified;
 }
 
-void csCoverageTile::FlushNoDepth (csTileCol& fvalue, float maxdepth,
-	bool& modified)
+bool csCoverageTile::FlushNoDepth (csTileCol& fvalue, float maxdepth)
 {
   FlushOperations ();
 
@@ -607,37 +596,23 @@ void csCoverageTile::FlushNoDepth (csTileCol& fvalue, float maxdepth,
   csTileCol* cc = coverage_cache;
   csTileCol* c = coverage;
   csTileCol* c_end = c + NUM_TILECOL;
-  if (modified)
+  bool modified = false;
+  do
   {
-    do
-    {
-      fvalue ^= *cc;
-      *c |= fvalue;
-      fulltest &= *c;
-      cc++;
-      c++;
-    }
-    while (c < c_end);
+    fvalue ^= *cc;
+    if (!modified && (fvalue & ~*c)) modified = true;
+    *c |= fvalue;
+    fulltest &= *c;
+    cc++;
+    c++;
   }
-  else
-  {
-    do
-    {
-      fvalue ^= *cc;
-      if (!modified && (fvalue & ~*c)) modified = true;
-      *c |= fvalue;
-      fulltest &= *c;
-      cc++;
-      c++;
-    }
-    while (c < c_end);
-  }
+  while (c < c_end);
 
   tile_full = (fulltest == TILECOL_FULL);
+  return modified;
 }
 
-void csCoverageTile::FlushGeneral (csTileCol& fvalue, float maxdepth,
-	bool& modified)
+bool csCoverageTile::FlushGeneral (csTileCol& fvalue, float maxdepth)
 {
   FlushOperations ();
   int i;
@@ -665,6 +640,7 @@ void csCoverageTile::FlushGeneral (csTileCol& fvalue, float maxdepth,
 
   // Set to true if we need to update depth later.
   bool update_depth = false;
+  bool modified = false;
 
   // For every 8 columns...
   for (i = 0 ; i < (NUM_TILECOL/8) ; i++)
@@ -712,9 +688,10 @@ void csCoverageTile::FlushGeneral (csTileCol& fvalue, float maxdepth,
     if (maxdepth < tile_min_depth) tile_min_depth = maxdepth;
     if (maxdepth > tile_max_depth) tile_max_depth = maxdepth;
   }
+  return modified;
 }
 
-void csCoverageTile::Flush (csTileCol& fvalue, float maxdepth, bool& modified)
+bool csCoverageTile::Flush (csTileCol& fvalue, float maxdepth)
 {
   if (num_operations == 0)
   {
@@ -734,13 +711,14 @@ void csCoverageTile::Flush (csTileCol& fvalue, float maxdepth, bool& modified)
         tile_min_depth = maxdepth;
         tile_max_depth = maxdepth;
         tile_full = true;
-        modified = true;
+        return true;
       }
       else if (tile_full)
       {
         if (maxdepth >= tile_max_depth)
 	{
 	  // Do nothing in this case.
+	  return false;
 	}
 	else if (maxdepth <= tile_min_depth)
 	{
@@ -748,7 +726,7 @@ void csCoverageTile::Flush (csTileCol& fvalue, float maxdepth, bool& modified)
             depth[i] = maxdepth;
           tile_min_depth = maxdepth;
           tile_max_depth = maxdepth;
-	  modified = true;
+	  return true;
 	}
 	else
 	{
@@ -756,7 +734,7 @@ void csCoverageTile::Flush (csTileCol& fvalue, float maxdepth, bool& modified)
             if (maxdepth < depth[i])
               depth[i] = maxdepth;
           tile_max_depth = maxdepth;
-	  modified = true;
+	  return true;
 	}
       }
       else
@@ -768,14 +746,14 @@ void csCoverageTile::Flush (csTileCol& fvalue, float maxdepth, bool& modified)
           tile_min_depth = maxdepth;
         tile_max_depth = maxdepth;
         tile_full = true;
-	modified = true;
+	return true;
       }
-      return;
+      return false;
     }
     else if (fvalue == TILECOL_EMPTY)
     {
       // fvalue is empty which means that there is nothing to do here.
-      return;
+      return false;
     }
     else
     {
@@ -783,46 +761,40 @@ void csCoverageTile::Flush (csTileCol& fvalue, float maxdepth, bool& modified)
       if (queue_tile_empty)
       {
         FlushForEmptyConstFValue (fvalue, maxdepth);
-	modified = true;
-        return;
+	return true;
       }
 
       if (tile_full)
       {
         FlushForFullConstFValue (fvalue, maxdepth);
-        return;
+        return false;
       }
 
       if (tile_min_depth < INIT_MIN_DEPTH_CMP && maxdepth <= tile_min_depth)
       {
-        FlushNoDepthConstFValue (fvalue, maxdepth, modified);
-        return;
+        return FlushNoDepthConstFValue (fvalue, maxdepth);
       }
 
-      FlushGeneralConstFValue (fvalue, maxdepth, modified);
-      return;
+      return FlushGeneralConstFValue (fvalue, maxdepth);
     }
   }
 
   if (queue_tile_empty)
   {
-    FlushForEmpty (fvalue, maxdepth, modified);
-    return;
+    return FlushForEmpty (fvalue, maxdepth);
   }
 
   if (tile_full)
   {
-    FlushForFull (fvalue, maxdepth, modified);
-    return;
+    return FlushForFull (fvalue, maxdepth);
   }
 
   if (tile_min_depth < INIT_MIN_DEPTH_CMP && maxdepth <= tile_min_depth)
   {
-    FlushNoDepth (fvalue, maxdepth, modified);
-    return;
+    return FlushNoDepth (fvalue, maxdepth);
   }
 
-  FlushGeneral (fvalue, maxdepth, modified);
+  return FlushGeneral (fvalue, maxdepth);
 }
 
 bool csCoverageTile::TestDepthFlushGeneral (csTileCol& fvalue, float mindepth)
@@ -2118,21 +2090,20 @@ void csTiledCoverageBuffer::InsertPolygonInverted (csVector2* verts,
 
   int tx, ty;
 
-  bool modified = true;
   for (ty = 0 ; ty <= num_tile_rows-1 ; ty++)
   {
     csTileCol fvalue = TILECOL_FULL;
     csCoverageTile* tile = GetTile (0, ty);
     for (tx = 0 ; tx <= (width_po2 >> SHIFT_TILECOL)-1 ; tx++)
     {
-      tile->Flush (fvalue, max_depth, modified);
+      tile->Flush (fvalue, max_depth);
       tile++;
     }
   }
 }
 
 bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
-	float max_depth)
+	float max_depth/*, int& cnt_notculled_objects*/)
 {
   csBox2Int bbox;
   if (!DrawPolygon (verts, num_verts, bbox))
@@ -2146,6 +2117,7 @@ bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
   if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
 
   bool modified = false;
+  //cnt_notculled_objects = 0;
   for (ty = startrow ; ty <= endrow ; ty++)
   {
     csTileCol fvalue = TILECOL_EMPTY;
@@ -2155,7 +2127,8 @@ bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
       dr = (width_po2 >> SHIFT_TILECOL)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
-      tile->Flush (fvalue, max_depth, modified);
+      bool mod = tile->Flush (fvalue, max_depth);
+      modified |= mod;
       tile++;
     }
   }
@@ -2191,7 +2164,8 @@ bool csTiledCoverageBuffer::InsertOutline (
       dr = (width_po2 >> SHIFT_TILECOL)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
-      tile->Flush (fvalue, max_depth, modified);
+      bool mod = tile->Flush (fvalue, max_depth);
+      modified |= mod;
       tile++;
     }
   }
@@ -2405,6 +2379,22 @@ bool csTiledCoverageBuffer::QuickTestRectangle (const csTestRectData& data,
   }
   return false;
 }
+
+#if TEST_OCCLUDER_QUALITY
+void csTiledCoverageBuffer::MarkCulledObject (const csTestRectData& data)
+{
+  int tx, ty;
+  for (ty = data.startrow ; ty <= data.endrow ; ty++)
+  {
+    csCoverageTile* tile = GetTile (data.startcol, ty);
+    for (tx = data.startcol ; tx <= data.endcol ; tx++)
+    {
+      tile->objects_culled++;
+      tile++;
+    }
+  }
+}
+#endif
 
 int csTiledCoverageBuffer::PrepareWriteQueueTest (const csTestRectData& data,
 	float min_depth)

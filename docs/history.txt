@@ -9,6 +9,21 @@ chronological order.
 29-Jun-2004
 	- Jorrit fixed a bug in spr3d where manually specifying sprite normals
 	  didn't work.
+	- Jorrit started work on a new experimental optimization in Dynavis
+	  which will try to measure quality of occluders. Not enabled at
+	  the moment.
+	- Jorrit optimized Dynavis by allowing to use a coverage buffer that
+	  is smaller in size then the screen. This can give very small
+	  visibility culling errors but that should be rare (and not wider
+	  or taller then a pixel).
+	- Jorrit added a new config file for Dynavis where you can set
+	  various options (like for example the amount of coverage buffer
+	  reduction).
+	- Jorrit fixed a bug in csLight for pseudo-dynamic lights. If you
+	  specified a pseudo-dynamic light which is initially black the
+	  influence radius would be calculated at zero and the light would
+	  be ignored. Solved by not calculating the influence radius if
+	  the radius is already manually given by the user.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.

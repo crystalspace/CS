@@ -84,7 +84,8 @@ csLight::csLight (
   attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
   //attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
 #endif*/
-  CalculateInfluenceRadius ();
+  if (ABS (influenceRadius) < SMALL_EPSILON)
+    CalculateInfluenceRadius ();
 }
 
 csLight::~csLight ()
@@ -360,18 +361,18 @@ bool csLight::GetDistanceForBrightness (float brightness, float& distance)
 {
   switch (attenuation)
   {
-  case CS_ATTN_NONE:      
-    return false;
-  case CS_ATTN_LINEAR:
-    distance = (1 - brightness) / inv_dist;
-    return true;
-  case CS_ATTN_INVERSE:   
-    distance = 1 / brightness;
-    return true;
-  case CS_ATTN_REALISTIC: 
-    distance = sqrt (1 / brightness);
-    return true;
-  case CS_ATTN_CLQ:
+    case CS_ATTN_NONE:      
+      return false;
+    case CS_ATTN_LINEAR:
+      distance = (1 - brightness) / inv_dist;
+      return true;
+    case CS_ATTN_INVERSE:   
+      distance = 1 / brightness;
+      return true;
+    case CS_ATTN_REALISTIC: 
+      distance = sqrt (1 / brightness);
+      return true;
+    case CS_ATTN_CLQ:
     {
       // simple cases
       if (attenuationvec.z == 0)

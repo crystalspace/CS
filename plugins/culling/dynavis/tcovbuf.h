@@ -38,6 +38,8 @@
 #define TILECOL_EMPTY 0
 #define TILECOL_FULL ((uint32)~0)
 
+#define TEST_OCCLUDER_QUALITY 0
+
 typedef uint32 csTileCol;
 
 /**
@@ -144,6 +146,11 @@ private:
   // precalculate them.
   static void MakePrecalcTables ();
 
+#if TEST_OCCLUDER_QUALITY
+  // Count how many objects were occluded away that covered this tile.
+  int objects_culled;
+#endif
+
 public:
   csCoverageTile () :
   	tile_full (false),
@@ -170,6 +177,9 @@ public:
   {
     queue_tile_empty = true;
     tile_full = false;
+#if TEST_OCCLUDER_QUALITY
+    objects_culled = 0;
+#endif
   }
 
 #define INIT_MIN_DEPTH     999999999.0f
@@ -186,6 +196,9 @@ public:
     memset (depth, 0, sizeof (float)*NUM_DEPTH);
     tile_min_depth = INIT_MIN_DEPTH;
     tile_max_depth = 0;
+#if TEST_OCCLUDER_QUALITY
+    objects_culled = 0;
+#endif
   }
 
   /**
@@ -199,6 +212,9 @@ public:
     memset (depth, 0, sizeof (float)*NUM_DEPTH);
     tile_min_depth = INIT_MIN_DEPTH;
     tile_max_depth = 0;
+#if TEST_OCCLUDER_QUALITY
+    objects_culled = 0;
+#endif
   }
 
   /**
@@ -264,31 +280,33 @@ public:
    * will come later. This function will correctly handle the case where
    * the current tile is full. In that case only the fvalue will be
    * updated.
+   * Returns true if the tile was modified.
    */
-  void Flush (csTileCol& fvalue, float maxdepth, bool& modified);
+  bool Flush (csTileCol& fvalue, float maxdepth);
 
   /**
    * Version of Flush that handles the case where the tile is empty.
+   * Returns true if the tile was modified.
    */
-  void FlushForEmpty (csTileCol& fvalue, float maxdepth,
-  	bool& modified);
+  bool FlushForEmpty (csTileCol& fvalue, float maxdepth);
 
   /**
    * Version of Flush that handles the case where the tile is full.
+   * Returns true if the tile was modified.
    */
-  void FlushForFull (csTileCol& fvalue, float maxdepth,
-  	bool& modified);
+  bool FlushForFull (csTileCol& fvalue, float maxdepth);
 
   /**
    * Version of Flush that handles the case where there is no depth checking.
+   * Returns true if the tile was modified.
    */
-  void FlushNoDepth (csTileCol& fvalue, float maxdepth,
-  	bool& modified);
+  bool FlushNoDepth (csTileCol& fvalue, float maxdepth);
 
   /**
    * General Flush (slowest version).
+   * Returns true if the tile was modified.
    */
-  void FlushGeneral (csTileCol& fvalue, float maxdepth, bool& modified);
+  bool FlushGeneral (csTileCol& fvalue, float maxdepth);
 
   /**
    * Version of Flush that handles the case where the tile is empty.
@@ -305,16 +323,16 @@ public:
   /**
    * Version of Flush that handles the case where there is no depth checking.
    * This version is for a constant fvalue for the entire tile.
+   * Returns true if the tile was modified.
    */
-  void FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth,
-  	bool& modified);
+  bool FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth);
 
   /**
    * General Flush (slowest version).
    * This version is for a constant fvalue for the entire tile.
+   * Returns true if the tile was modified.
    */
-  void FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth,
-  	bool& modified);
+  bool FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth);
 
   //-----------------------------------------------------------------
 
@@ -572,6 +590,14 @@ public:
    * rectangle is visible.
    */
   bool QuickTestRectangle (const csTestRectData& data, float min_depth);
+
+#if TEST_OCCLUDER_QUALITY
+  /**
+   * Mark the given rectangle as being culled away. For every
+   * affected tile this will increase the objects_culled field.
+   */
+  void MarkCulledObject (const csTestRectData& data);
+#endif
 
   /**
    * Prepare a write queue test for the given rectangle. This returns the

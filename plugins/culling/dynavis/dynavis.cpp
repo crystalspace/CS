@@ -25,6 +25,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/garray.h"
 #include "csutil/array.h"
+#include "csutil/cfgacc.h"
 #include "csgeom/frustum.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/math3d.h"
@@ -245,7 +246,7 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   delete kdtree;
   delete tcovbuf; tcovbuf = 0;
 
-  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
+  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
@@ -263,6 +264,35 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
     scr_width = 640;
     scr_height = 480;
   }
+
+  csConfigAccess config;
+  config.AddConfig(object_reg, "/config/dynavis.cfg");
+  reduce_buf = config->GetInt ("Culling.Dynavis.ReduceCoverageBuffer", 0);
+  scr_width = scr_width << reduce_buf;
+  scr_height = scr_height << reduce_buf;
+
+  do_cull_frustum = config->GetBool ("Culling.Dynavis.FrustumCull", true);
+  const char* str = config->GetStr ("Culling.Dynavis.Coverage", "outline");
+  if (!strcmp (str, "outline"))
+    do_cull_coverage = COVERAGE_OUTLINE;
+  else if (!strcmp (str, "polygon"))
+    do_cull_coverage = COVERAGE_POLYGON;
+  else
+    do_cull_coverage = COVERAGE_NONE;
+
+  do_cull_history = config->GetBool ("Culling.Dynavis.History", true);
+  do_cull_writequeue = config->GetBool ("Culling.Dynavis.WriteQueue", true);
+  do_cull_ignoresmall = config->GetBool ("Culling.Dynavis.IgnoreSmall", false);
+  do_cull_clampoccluder = config->GetBool ("Culling.Dynavis.ClampOccluder",
+  	false);
+  do_cull_vpt = config->GetBool ("Culling.Dynavis.VPT", true);
+
+  // Fix bug with outlines behind view plane first!!!
+  do_cull_outline_splatting = config->GetBool (
+  	"Culling.Dynavis.OutlineSplatting", false);
+
+  do_insert_inverted_clipper = config->GetBool (
+  	"Culling.Dynavis.InvertedClipper", true);
 
   kdtree = new csKDTree ();
 
@@ -584,9 +614,6 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     // a good idea.
     iCamera* camera = data->rview->GetCamera ();
     const csReversibleTransform& camtrans = camera->GetTransform ();
-    float fov = camera->GetFOV ();
-    float sx = camera->GetShiftX ();
-    float sy = camera->GetShiftY ();
     float max_depth;
 #define DO_OUTLINE_TEST 0
 #define DO_WRITEQUEUE_TEST 0
@@ -758,10 +785,6 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
     campos_object = movtrans.Other2This (trans.GetOrigin ());
     trans /= movtrans;
   }
-
-  float fov = camera->GetFOV ();
-  float sx = camera->GetShiftX ();
-  float sy = camera->GetShiftY ();
 
   int i;
 
@@ -947,13 +970,11 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 # endif
 
   // Then insert the outline.
-  bool rc = tcovbuf->InsertOutline (
-  	trans, camera->GetFOV (), camera->GetShiftX (),
-  	camera->GetShiftY (), verts, vertex_count,
+  tcovbuf->InsertOutline (
+  	trans, fov, sx, sy, verts, vertex_count,
   	outline_info.outline_verts,
   	outline_info.outline_edges, outline_info.num_outline_edges,
 	do_cull_outline_splatting);
-  (void)rc;
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
@@ -1065,10 +1086,6 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
 	csBox2& sbox, float& min_depth, float& max_depth,
 	uint32 frustum_mask)
 {
-  float fov = camera->GetFOV ();
-  float sx = camera->GetShiftX ();
-  float sy = camera->GetShiftY ();
-
   csVisibilityObjectHistory* hist = obj->history;
   iVisibilityObject* visobj = obj->visobj;
 
@@ -1202,6 +1219,9 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
 	      {
 	        // It really is invisible.
 	        obj->MarkInvisible (INVISIBLE_TESTRECT);
+#		if TEST_OCCLUDER_QUALITY
+		tcovbuf->MarkCulledObject (testrect_data);
+#		endif
 	        vis = false;
                 return;
 	      }
@@ -1216,6 +1236,9 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
     else
     {
       obj->MarkInvisible (INVISIBLE_TESTRECT);
+#     if TEST_OCCLUDER_QUALITY
+      tcovbuf->MarkCulledObject (testrect_data);
+#     endif
       vis = false;
       return;
     }
@@ -1301,10 +1324,6 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     	sbox, min_depth, max_depth, new_mask2);
     goto end;
   }
-
-  float fov; fov = camera->GetFOV ();
-  float sx; sx = camera->GetShiftX ();
-  float sy; sy = camera->GetShiftY ();
 
   bool sbox_rc;	// Is screen box visible.
   sbox_rc = true;
@@ -1422,6 +1441,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	      {
 	        // It really is invisible.
 	        obj->MarkInvisible (INVISIBLE_TESTRECT);
+#		if TEST_OCCLUDER_QUALITY
+		tcovbuf->MarkCulledObject (testrect_data);
+#		endif
 	        vis = false;
                 goto end;
 	      }
@@ -1436,6 +1458,9 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     else
     {
       obj->MarkInvisible (INVISIBLE_TESTRECT);
+#     if TEST_OCCLUDER_QUALITY
+      tcovbuf->MarkCulledObject (testrect_data);
+#     endif
       vis = false;
       goto end;
     }
@@ -1603,6 +1628,18 @@ bool csDynaVis::VisTest (iRenderView* rview,
   debug_rx = rx;
   debug_ty = ty;
   debug_by = by;
+
+  fov = float (debug_camera->GetFOV ());
+  sx = debug_camera->GetShiftX ();
+  sy = debug_camera->GetShiftY ();
+  int rb = reduce_buf;
+  while (rb)
+  {
+    fov /= 2.0f;
+    sx /= 2.0f;
+    sy /= 2.0f;
+    rb >>= 1;
+  }
 
   // Just keep vis information from last frame.
   if (do_freeze_vis)
@@ -2557,10 +2594,6 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 	  visobj_wrap->model->UpdateOutline (campos_object);
 	  const csOutlineInfo& outline_info = visobj_wrap->model
 	  	->GetOutlineInfo ();
-	  float fov = debug_camera->GetFOV ();
-	  float sx = debug_camera->GetShiftX ();
-	  float sy = debug_camera->GetShiftY ();
-
 	  iPolygonMesh* polymesh = visobj->GetObjectModel ()->
 	  	GetPolygonMeshViscull ();
 	  const csVector3* verts = polymesh->GetVertices ();
