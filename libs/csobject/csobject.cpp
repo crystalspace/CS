@@ -312,17 +312,11 @@ void* csObject::GetChild (int InterfaceID, int Version,
 
   for (int i = 0; i < children->count; i++)
   {
-    void *obj = children->obj[i]->QueryInterface (InterfaceID, Version);
-    if (!obj)
+    if (Name && strcmp(children->obj[i]->GetName (), Name))
       continue;
 
-    if (Name && strcmp(children->obj[i]->GetName (), Name))
-    {
-      obj->DecRef ();
-      continue;
-    }
- 
-    return obj;
+    void *obj = children->obj[i]->QueryInterface (InterfaceID, Version);
+    if (obj) return obj;
   }
 
   return NULL;
