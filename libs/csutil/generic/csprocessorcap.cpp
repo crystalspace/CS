@@ -17,11 +17,10 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csprocessorcap.h"
+#include "csutil/csprocessorcap.h"
 
 bool csProcessorCapability::isInitialized = false;
 bool csProcessorCapability::mmxSupported = false;
 bool csProcessorCapability::sseSupported = false;
 bool csProcessorCapability::AMD3dnowSupported = false;
 char csProcessorCapability::processorName[16] = "";
-
