@@ -27,6 +27,7 @@
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
+#include "iutil/cmdline.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "ivideo/graph3d.h"
@@ -162,6 +163,22 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
+
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
+    iCommandLineParser);
+  if (cmdline)
+  {
+    bool verbose = cmdline->GetOption ("verbose") != 0;
+    if (verbose)
+    {
+      dest_stdout[CS_REPORTER_SEVERITY_WARNING] = true;
+      dest_stderr[CS_REPORTER_SEVERITY_WARNING] = false;
+      dest_stdout[CS_REPORTER_SEVERITY_NOTIFY] = true;
+      dest_stderr[CS_REPORTER_SEVERITY_NOTIFY] = false;
+      dest_stdout[CS_REPORTER_SEVERITY_DEBUG] = true;
+      dest_stderr[CS_REPORTER_SEVERITY_DEBUG] = false;
+    }
+  }
 
   return true;
 }

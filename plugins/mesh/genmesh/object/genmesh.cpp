@@ -827,14 +827,14 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
   }
 
   csReversibleTransform trans = movable->GetFullTransform ();
-  csSet<iLight*>::GlobalIterator it (affecting_lights.GetIterator ());
+  csSet<iLight*>::GlobalIterator it = affecting_lights.GetIterator ();
   while (it.HasNext ())
   {
     iLight* l = (iLight*)it.Next ();
     UpdateLightingOne (trans, l);
   }
-  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt (
-    pseudoDynInfo.GetIterator ());
+  csHash<csShadowArray*, iLight*>::GlobalIterator pdlIt =
+    pseudoDynInfo.GetIterator ();
   while (pdlIt.HasNext ())
   {
     iLight* l;

@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Mar-2004
+	- Jorrit modified the stdrep plugin (standard reporter listener) so
+	  that it now prints all messages on standard output if the
+	  -verbose commandline option is given.
+	- Jorrit disabled the rule for GF Go and MX in gldrivers.xml since
+	  it prevents proper operation of the r3dtest map (i.e. stencil
+	  shadows no longer work then).
 1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
 	  window rectangle (via PerformExtension()).

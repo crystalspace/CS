@@ -112,6 +112,7 @@
 	<usecfg>texturecompression</usecfg>
       </applicable>
     </rule>
+    <!--
     <rule description="GeForce MX/Go class HW">
       <conditions fulfill="one">
 	<regexp	string="renderer" pattern="^GeForce.*MX" />
@@ -121,5 +122,6 @@
 	<usecfg>noavp</usecfg>
       </applicable>
     </rule>
+    -->
   </rules>
 </gldriverdb>
