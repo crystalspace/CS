@@ -122,7 +122,6 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
     alphaType = csAlphaMode::alphaBinary;
   else
     alphaType = csAlphaMode::alphaNone;
-  //has_alpha = image->GetFormat () & CS_IMGFMT_ALPHA;
 
   //mean_color.red = mean_color.green = mean_color.blue = 0;
   if (image->HasKeycolor ())
@@ -159,7 +158,6 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image,
   this->flags = flags;
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
-  //has_alpha = images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA;
   if (images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA)
     alphaType = csAlphaMode::alphaSmooth;
   else if (images->GetImage (0)->HasKeycolor ())

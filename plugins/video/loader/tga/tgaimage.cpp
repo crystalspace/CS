@@ -66,10 +66,10 @@ struct TGAheader
   unsigned char Height_lo, Height_hi;	/* height of image */
   unsigned char PixelSize;		/* pixel size (8,16,24,32) */
   /* 
-    4 bits, number of attribute bits per pixel 
-    1 bit, reserved
-    1 bit, origin: 0=lower left, 1=upper left
-    2 bits, interleaving flag
+    bits 7-6, interleaving flag
+    bit  5, origin: 0=lower left, 1=upper left
+    bit  4, reserved
+    bits 3-0, number of attribute bits per pixel 
    */
   unsigned char flags;
 };
@@ -88,14 +88,14 @@ typedef char ImageIDField[256];
 #define TGA_CompMap4 33
 
 /* Definitions for interleave flag. */
-#define TGA_IL_None 0
-#define TGA_IL_Two 1
-#define TGA_IL_Four 2
-#define TGA_IL_MASK   0x03
+#define TGA_IL_None   0x00
+#define TGA_IL_Two    0x40
+#define TGA_IL_Four   0x80
+#define TGA_IL_MASK   0xc0
 
-#define TGA_Org_MASK  0x04
+#define TGA_Org_MASK  0x20
 #define TGA_Org_BL    0x00
-#define TGA_Org_TL    0x04
+#define TGA_Org_TL    0x20
 
 #define MAXCOLORS 16384
 

@@ -38,6 +38,9 @@ chronological order.
 	  where the arguments weren't casted correctly.
 	- res fixed a 'double to float conversion' MSVC warning in dynavis.
 	- res fixed a compile error in docconv.
+	- res fixed misinterpretion of the 'flags' TGA header field.
+	- res removed some leftover comments from 
+	  plugins/video/render3d/opengl/gl_txtmgr.cpp.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
 	  on August 1, 2003 when configuration was changed so that OSXDelegate
