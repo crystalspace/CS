@@ -1,5 +1,57 @@
 The history order is reversed so that new features are at the top.
 
+28-May-2001
+	- Fixed all the plugins makefiles so that they now have an additional
+	  CSUTIL in their link line. This satisfies one-pass linkers after
+	  the changes Martin did to SCF.
+27-May-2001
+	- Philip added CSSYS dependency to gamecore plugin.
+	- Martin Geisse changed the main export function for dynamic
+	  libraries used by SCF: This function is now called
+	  'ModuleName_scfInitialize' and takes an iSCF* as argument which is
+	  used to initialize the global iSCF::SCF variable for each module.
+	  If NULL is passed instead, the class table is returned but no SCF
+	  functions may be used in the module (scfreg is an example for this).
+	- Martin changed SCF cleanup functions. csSCF::Cleanup () now deletes
+	  the main csSCF object, which de-initializes everything in its
+	  destructor.
+	- Martin fixed a problem in SCF: To get the name of the exported
+	  function in a dynamic library, SCF now splits the input name into
+	  path and file name and only uses the file name to construct the
+	  function name. This makes it possible to move the dynamic libraries
+	  to another directory.
+	- Norman Kramer added -tl option to 3ds2lev for making texture origin
+	  lower left instead of upper right.
+26-May-2001
+	- Martin Geisse started modifying SCF:
+	    - iSCF now contains a static member that is an (iSCF*) and points
+	      to the only existing instance. This instance is now created and
+	      managed by SCF itself. This was done by the system driver
+	      before. The system driver still implements iSCF. When this
+	      interface is queried, the global iSCF is returned instead.
+	    - SCF functions no longer exist (in fact they still do, but they
+	      are private to SCF now). Instead the methods of iSCF should be
+	      used. The only exception is scfInitialize, which now also
+	      creates the global instance.
+	    - As a consequence, REGISTER_STATIC_CLASS and
+	      REGISTER_STATIC_LIBRARY now call scfInitialize if the global
+	      iSCF is NULL.
+	    - The methods of iSCF have been renamed to remove the 'scf'
+	      at the beginning of each method name. This conforms to CS
+	      naming style.
+	    - Removed the C-style functions and the wrapper functions of
+	      csSCF. The member functions of csSCF contain this code
+	      directly now.
+	    - Removed some calls to scfInitialize from within SCF functions.
+	      Previously it was possible that SCF functions are called before
+	      the first call to scfInitialize; this is not possible anymore.
+	- Martin removed the obsolete iSCF implementation of the system driver.
+	- Philip Wyett fixed cs.i by removing "scf" from begining of
+	  "CreateInstance ()" to bring into line with Martins changes. Also
+	  manually updated "cs_pyth.cpp" to take account of the changes,
+	  which I know I really shouldn't as it's is generated
+	  automatically - so if I did it wrong it will be corrected
+	  eventually - hey but it compiles again. ;-)
 25-May-2001
 	- Eric Sunshine removed a win32gcc-specific shell-related test case
 	  from CS/Makefile in order to avoid polluting this otherwise
@@ -36,6 +88,12 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine changed the `sequence' plugin so that it implements
 	  iPlugIn via embedding rather than inheritance in order to work around
 	  NextStep compiler bugs.
+	- Philip Wyett fixed broken fog with ATI Radeon.
+	- Philip made CSENGINE a dependency of engine plugin (but Eric reverts
+	  this change later).
+	- Norman Kramer changed the sound arts test program to use the new
+	  renderer (now have some weirdo effects with ifstrem in the mcop
+	  library). Rewrote the makefile.
 24-May-2001
 	- Eric Sunshine fixed several problems in lexan.mak.
 	- Eric Sunshine eliminated compilation warning from csobject.cpp about
@@ -93,7 +151,58 @@ The history order is reversed so that new features are at the top.
 	      (This is actually a common problem throughout the project, so it
 	      is not surprising that it showed up here as well.  We need to fix
 	      all of those other incorrect cases.)
+	- Michael Voasse did the following:
+	    - Rewrite of csMotion.
+	    - Modify csMotionLoader accordingly.
+	    - Modify spr3dldr and walktest for new applymotion parameter.
+	- Philip Wyett did some quick code cleanup and optimization to the
+	  motion plugin.
+	- Martin Geisse modified levtool, bumptest, and demosky in several
+	  places to use the engine through SCF.
+	- Martin fixed a case in almost all mesh loaders where they did not
+	  use the engine through interfaces.
+	- Martin made the following changes:
+	    - Added Draw(), DrawFunc() and SetContext() to iEngine.
+	    - The above functions now take an iCamera and iClipper2D as
+	      parameters (instead of csCamera and csClipper).
+	    - csPoly2D::ClipAgainst also takes an iClipper2D now.
+	    - Added GetClipper() to iView.
+	    - Cosmetic cleanup of csView.
+	    - Removed some unused csClipper includes and forward declarations.
+	- Thomas Hieber writes about map2cs:
+	  Hurray! Walktest doesn't crash any more, when loading my converted
+	  sample map. It now crashes a few seconds after loading, when I
+	  turn to the left in the map. (change was some more adjustments to
+	  the new map file format) I am pretty sure, that some untested
+	  features (like 3D models or sprites) still don't work. (I don't have
+	  map files that use these features, so I can't test this...)
 23-May-2001
+	- Philip Wyett changed the directory structure of where VC outputs
+	  files. For example for a CS build you will now see the new structure:
+ 		CS\mk\visualc\csdebug (OR) csrelease
+                   |
+                   |-- bin
+                   |    |
+                   |    |-- libs
+                   |
+                   |-- temp
+	  Now all ".lib" files are placed in "bin\libs"
+	  Now all ".exe" and ".dll" files via a new "copy to", are
+	  copied to the "bin" directory as well as the default "CS\"
+	  root directory.
+	  All object and VC intermediate files are created sub of "temp".
+	  This change will allow, the much easier collection and copying
+	  of files and/or working with both a debug or a release build of
+	  CS via copy and pastes to the "CS\" root directory and or setting
+	  of enviroment variables to use these directories as working ones.
+	  Also makes it easier for file collection for own projects and
+	  possible binary releases of the CS files.
+	  *** WARNING ***
+	  If you compile both debug and release builds of CS you must expect
+	  the disk space used on your system to be around "1.1Gb" and the
+	  the possibilty of mixing debug and release files inside the "CS\"
+	  root directory is possible, so must be done only with care...
+	  *** IMPORTANT ***
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.
 	- Fixed a warning in csLightMap.
