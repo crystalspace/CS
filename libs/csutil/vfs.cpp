@@ -988,7 +988,8 @@ bool VfsNode::GetFileTime (const char *Suffix, tm &ztime) const
     struct stat st;
     if (stat (fname, &st))
       return false;
-    ztime = *localtime (&st.st_mtime);
+    const time_t mtime = (time_t)st.st_mtime;
+    ztime = *localtime (&mtime);
   }
   return true;
 }
