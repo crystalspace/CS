@@ -7,6 +7,11 @@ The history order has been reversed so that new features are at the top.
 	  then moving objects would not be refreshed correctly. The reason
 	  is that the camera vertices were only updated when the camera
 	  changes but they also need to be updated when the movable changes.
+	- Added the terrain engine plugin from Richard D. Shank. This is
+	  the same terrain engine we used to have all the time. But this
+	  time it is implemented as a plugin. Great work Richard!
+	  Note that the old terrlod is currently no longer supported.
+	  Richard will do that one soon.
 6-Mar-2001
 	- Changed the following functions to work in object space instead
 	  of world space:

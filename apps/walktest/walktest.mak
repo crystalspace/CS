@@ -37,7 +37,7 @@ INC.WALKTEST = $(wildcard apps/walktest/*.h)
 SRC.WALKTEST = $(wildcard apps/walktest/*.cpp)
 OBJ.WALKTEST = $(addprefix $(OUT),$(notdir $(SRC.WALKTEST:.cpp=$O)))
 DEP.WALKTEST = \
-  CSPARSER CSENGINE CSTERR CSGEOM CSGFXLDR CSSYS CSUTIL CSOBJECT CSFX
+  CSPARSER CSENGINE CSGEOM CSGFXLDR CSSYS CSUTIL CSOBJECT CSFX
 LIB.WALKTEST = $(foreach d,$(DEP.WALKTEST),$($d.LIB))
 CFG.WALKTEST = data/config/walktest.cfg
 

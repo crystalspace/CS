@@ -34,7 +34,6 @@ CSENGINE.LIB = $(OUT)$(LIB_PREFIX)csengine$(LIB_SUFFIX)
 INC.CSENGINE = $(wildcard include/csengine/*.h)
 SRC.CSENGINE = $(wildcard libs/csengine/*.cpp libs/csengine/*/*.cpp)
 OBJ.CSENGINE = $(addprefix $(OUT),$(notdir $(SRC.CSENGINE:.cpp=$O)))
-CFLAGS.CSENGINE = -Ilibs/csterr
 
 TO_INSTALL.DATA += data/standard.zip 
 TO_INSTALL.STATIC_LIBS += $(CSENGINE.LIB)
@@ -54,9 +53,6 @@ all: $(CSENGINE.LIB)
 csengine: $(OUTDIRS) $(CSENGINE.LIB)
 clean: csengineclean
 
-$(OUT)terrddg$O: libs/csengine/terrddg.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.CSENGINE)
-
 $(CSENGINE.LIB): $(OBJ.CSENGINE)
 	$(DO.LIBRARY)
 
@@ -66,7 +62,7 @@ csengineclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)csengine.dep
 $(OUTOS)csengine.dep: $(SRC.CSENGINE)
-	$(DO.DEP1) $(CFLAGS.CSENGINE) $(DO.DEP2)
+	$(DO.DEP)
 else
 -include $(OUTOS)csengine.dep
 endif

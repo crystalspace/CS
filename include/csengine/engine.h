@@ -34,6 +34,7 @@ class csRegion;
 class csRadiosity;
 class csSector;
 class csMeshWrapper;
+class csTerrainWrapper;
 class csTextureWrapper;
 class csMaterialWrapper;
 class csTextureList;
@@ -433,6 +434,12 @@ public:
   csNamedObjVector mesh_factories;
 
   /**
+   * List of terrain object factories. This vector contains objects of
+   * type csTerrainFactoryWrapper*.
+   */
+  csNamedObjVector terrain_factories;
+
+  /**
    * List of thing templates. This vector contains objects of
    * type csThing*.
    */
@@ -453,6 +460,16 @@ public:
    * need to add it to all sectors that you want it to be visible in.
    */
   csNamedObjVector meshes;
+
+  /**
+   * List of all terrain in the engine. This vector contains objects
+   * of type csTerrainWrapper*. Use UnlinkTerrain() and RemoveTerrain()
+   * to unlink and/or remove terrains from this list. These functions
+   * take care of correctly removing the terrains from all sectors
+   * as well. Note that after you add a terrain to the list you still
+   * need to add it to all sectors that you want it to be visible in.
+   */
+  csNamedObjVector terrains;
 
   /**
    * List of all things in the engine. This vector contains objects
@@ -1025,6 +1042,18 @@ public:
   void RemoveMesh (csMeshWrapper* mesh);
 
   /**
+   * Unlink a terrain from the engine (but do not delete it).
+   * It is also removed from all sectors.
+   */
+  void UnlinkTerrain (csTerrainWrapper *pTerrain);
+
+  /**
+   * Unlink and delete a terrain from the engine.
+   * It is also removed from all sectors.
+   */
+  void RemoveTerrain (csTerrainWrapper *pTerrain);
+
+  /**
    * Unlink a thing from the engine (but do not delete it).
    * It is also removed from all sectors.
    */
@@ -1183,6 +1212,11 @@ public:
   /// Find a mesh factory by name
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName, bool regionOnly = false);
 
+  /// Find a terrain by name
+  virtual iTerrainWrapper *FindTerrainObject (const char *iName, bool regionOnly = false);
+  /// Find a terrain factory by name
+  virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName, bool regionOnly);
+
   /// Find a loaded texture by name.
   virtual iTextureWrapper* FindTexture (const char* iName, bool regionOnly = false);
   /// Find a loaded material by name.
@@ -1208,6 +1242,13 @@ public:
   /// Create mesh object.
   virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector, const csVector3& pos);
+
+  /// Create terrain factory.
+  virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* pClassId,
+	  const char* pName);
+  /// Create terrain object.
+  virtual iTerrainWrapper* CreateTerrainObject (iTerrainFactoryWrapper* pFactWrap,
+  	const char* name, iSector* sector);
 
   virtual iClipper2D* GetTopLevelClipper ();
 

@@ -1,5 +1,6 @@
 /*
-    Copyright (C) 1999,2000 by Jorrit Tyberghein
+    Copyright (C) 1999-2001 by Jorrit Tyberghein
+    Plug-In modifications by Richard D Shank
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -15,35 +16,51 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#include "cssysdef.h"
 
-#include "csengine/terrddg.h"
+#include "cssysdef.h"
+#include "ddgterr.h"
 #include "csengine/pol2d.h"
-#include "csengine/texture.h"
-#include "csengine/material.h"
-#include "csengine/engine.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
-#include "csterr/struct/ddgcntxt.h"
-#include "csterr/struct/ddgtmesh.h"
-#include "csterr/struct/ddgbtree.h"
-#include "csterr/struct/ddgvarr.h"
+#include "csgeom/vector3.h"
+#include "csutil/garray.h"
+#include "struct/ddgcntxt.h"
+#include "struct/ddgtmesh.h"
+#include "struct/ddgbtree.h"
+#include "struct/ddgvarr.h"
+#include "icamera.h"
+#include "iengine.h"
 #include "igraph3d.h"
+#include "imater.h"
+#include "irview.h"
+#include "isystem.h"
 #include "itxtmgr.h"
+#include "ivfs.h"
 
-IMPLEMENT_CSOBJTYPE (csDDGTerrain, csTerrain);
+static ddgControl control;
 
-csDDGTerrain::csDDGTerrain () : csTerrain ()
+IMPLEMENT_IBASE (csDDGTerrainObject)
+  IMPLEMENTS_INTERFACE (iTerrainObject)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iDDGState)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csDDGTerrainObject::DDGState)
+  IMPLEMENTS_INTERFACE (iDDGState)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+csDDGTerrainObject::csDDGTerrainObject( iSystem* pSys, iTerrainObjectFactory *pFactory)
 {
-  heightMap = NULL;
-  mesh = NULL;
-  vbuf = NULL;
-  _materialMap = NULL;
+  CONSTRUCT_IBASE( NULL )
+  CONSTRUCT_EMBEDDED_IBASE (scfiDDGState);
+  pSystem = pSys;
+  csDDGTerrainObject::pFactory = pFactory;
   do_dirlight = false;
+  mesh = NULL;
+  _materialMap = NULL;
 }
 
-csDDGTerrain::~csDDGTerrain ()
+csDDGTerrainObject::~csDDGTerrainObject ()
 {
   delete mesh;
   delete heightMap;
@@ -51,7 +68,7 @@ csDDGTerrain::~csDDGTerrain ()
   delete _materialMap;
 }
 
-void csDDGTerrain::SetDetail (unsigned int detail)
+void csDDGTerrainObject::SetLOD( unsigned int detail )
 {
   mesh->minDetail (detail);
   mesh->maxDetail ((unsigned int)(detail*1.1));
@@ -60,32 +77,48 @@ void csDDGTerrain::SetDetail (unsigned int detail)
   mesh->farClip (1000.0);
 }
 
-void csDDGTerrain::SetDirLight (const csVector3& dirl, const csColor& dirc)
+void csDDGTerrainObject::LoadHeightMap( const char *pName )
 {
-  dirlight = dirl;
-  dircolor = dirc;
-  do_dirlight = true;
-}
+  pHeightmapName = pName;
 
-int csDDGTerrain::GetNumMaterials ()
-{
-  return mesh->getBinTreeNo ()/2;
-}
+  // interface to the VFS and make sure the file is available
+  iVFS *pVFS = QUERY_PLUGIN( pSystem, iVFS );
+  if ( !pVFS->Exists( pHeightmapName ) )
+  {
+    pSystem->Printf( MSG_FATAL_ERROR, "Error locating height field: %s\n", pHeightmapName );
+    fatal_exit (0, false);
+  }
 
-static ddgControl control;
-bool csDDGTerrain::Initialize (const void* heightMapFile, unsigned long size)
-{
-  heightMap = new ddgHeightMap ();
-  if (heightMap->readTGN (heightMapFile, size))
-    return false;
+  // read the data from the file
+  iDataBuffer *pMapData = pVFS->ReadFile( pHeightmapName );
+  if ( !pMapData )
+  {
+    pSystem->Printf(MSG_FATAL_ERROR, "Error loading height field: %s\n", pHeightmapName );
+    fatal_exit (0, false);
+  }
 
+  // now convert the map data into a heightmap
+  heightMap = new ddgHeightMap();
+  if ( heightMap->readTGN( **pMapData, pMapData->GetSize() ) )
+
+  if ( !heightMap )
+  {
+    pSystem->Printf(MSG_FATAL_ERROR, "Error converting height field: %s\n", pHeightmapName );
+    fatal_exit (0, false);
+  }
+
+  pMapData->DecRef ();
+
+  // set up the ddg mesh
   mesh = new ddgTBinMesh (heightMap);
   context = new ddgContext ();
   context->control (&control);
   context->clipbox ()->min.set (0, 0, 0.1);
-  int fw = csEngine::current_engine->G3D->GetWidth ();
-  int fh = csEngine::current_engine->G3D->GetHeight ();
-  context->clipbox ()->max.set (fw, fh, 1000);
+
+  int width, height, depth;
+  bool fullscreen;
+  pSystem->GetSettings (width, height, depth, fullscreen);  
+  context->clipbox ()->max.set (width, height, 1000);
 
   vbuf = new ddgVArray ();
 
@@ -101,11 +134,82 @@ bool csDDGTerrain::Initialize (const void* heightMapFile, unsigned long size)
   // CS wants them to range from 0 to 1.
   _pos = csVector3 (0,0,0);
   _size = csVector3 (heightMap->cols (),
-      mesh->wheight (mesh->absMaxHeight ()), heightMap->rows ());
+  mesh->wheight (mesh->absMaxHeight ()), heightMap->rows ());
 
-  // This is  code that allocates the texture array for the terrain.
-  _materialMap = new csMaterialWrapper* [GetNumMaterials ()];
-  return true;
+}
+
+void csDDGTerrainObject::LoadMaterial( const char *pName )
+{
+  if( !_materialMap )
+  {
+    InitMaterials();
+  }
+
+  AddMaterial( ( char *)pName );
+}
+
+void csDDGTerrainObject::LoadMaterialGroup( const char *pName, int iStart, int iEnd )
+{
+  if( !_materialMap )
+  {
+    InitMaterials();
+  }
+
+  int i;
+  char *pMatName = new char[256];
+
+  for (i = iStart ; i <= iEnd ; i++)
+  {
+    sprintf( pMatName, pName, i );
+    AddMaterial( pMatName );
+  }
+}
+
+void csDDGTerrainObject::InitMaterials( void )
+{
+  // Initialize all materials. The first material is reused for all
+  // material entries that fail (cannot be found).
+  // This must happen AFTER the mesh is created
+  if (!mesh)
+  {
+    pSystem->Printf(MSG_FATAL_ERROR, "Heightfield needs to be loaded before materials" );
+    fatal_exit (0, false);
+  }
+
+  int num_mat = GetNumMaterials();
+  _materialMap = new iMaterialWrapper*[ num_mat ];
+  pFirstMat = NULL;
+  iMatIndex = 0;
+}
+
+void csDDGTerrainObject::AddMaterial( char *pName )
+{
+  iMaterialWrapper *pMaterial;
+
+  pMaterial = pEngine->FindMaterial( pName );
+  if (pMaterial == NULL)
+    pMaterial = pFirstMat;
+
+  pFirstMat = pMaterial;
+  SetMaterial( iMatIndex, pMaterial );
+  iMatIndex++;
+}
+
+void csDDGTerrainObject::SetDirLight( csVector3& dirl, csColor& dirc)
+{
+  dirlight = dirl;
+  dircolor = dirc;
+  do_dirlight = true;
+}
+
+void csDDGTerrainObject::DisableDirLight()
+{
+  do_dirlight = false;
+}
+
+int csDDGTerrainObject::GetNumMaterials ()
+{
+  return mesh->getBinTreeNo ()/2;
 }
 
 /// Number of entries in the Most Recently Used cache.
@@ -126,7 +230,7 @@ static int lut[24] = {0,1,2,3,4,5,6,7,8,9,10,11,0,1,2,3,4,5,6,7,8,9,10,11};
  *  Retrieve info for a single triangle.
  *  Returns true if triangle should be rendered at all.
  */
-bool csDDGTerrain::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf)
+bool csDDGTerrainObject::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf)
 {
   if (!bt->visible (tvc))
     return ddgFailure;
@@ -186,10 +290,11 @@ bool csDDGTerrain::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbu
 static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
 static DECLARE_GROWING_ARRAY (color_verts, csColor);
 
-void csDDGTerrain::Draw (iRenderView* rview, bool use_z_buf)
+void csDDGTerrainObject::Draw (iRenderView* rview, bool use_z_buf)
 {
-  iCamera* icam = rview->GetCamera ();
-  const csReversibleTransform& camtrans = icam->GetTransform ();
+  iGraphics3D* pG3D = rview->GetGraphics3D ();
+  iCamera* pCamera = rview->GetCamera ();
+
   bool modified = true;
 
   unsigned int i = 0, s = 0, d = 0, n = 0, nd = 0;
@@ -204,22 +309,26 @@ void csDDGTerrain::Draw (iRenderView* rview, bool use_z_buf)
   // matrix.
 
   // Position of camera.
-  const csVector3& translation = camtrans.GetO2TTranslation ();
+  csReversibleTransform RevTrans = pCamera->GetTransform();
+  csReversibleTransform tr_o2c = pCamera->GetTransform ();
+
+//  const csVector3& translation = rview->GetO2TTranslation ();
+  const csVector3& translation = RevTrans.GetO2TTranslation ();
   ddgVector3 p (translation.x, translation.y, translation.z);
 
   // Compute the camera's foward facing vector in world space.
   const csVector3 cforward (0,0,-1);
-  const csVector3 wforward = camtrans.This2OtherRelative (cforward);
+  const csVector3 wforward = RevTrans.This2OtherRelative (cforward);
   ddgVector3 f (wforward.x,wforward.y,wforward.z);
   f.normalize ();
   // Compute the camera's up facing vector in world space.
   const csVector3 cup (0,1,0);
-  const csVector3 wup = camtrans.This2OtherRelative (cup);
+  const csVector3 wup = RevTrans.This2OtherRelative (cup);
   ddgVector3 u (wup.x,wup.y,wup.z);
   u.normalize ();
   // Compute the camera's right facing vector in world space.
   const csVector3 cright (-1,0,0);
-  const csVector3 wright = camtrans.This2OtherRelative (cright);
+  const csVector3 wright = RevTrans.This2OtherRelative (cright);
   ddgVector3 r (wright.x,wright.y,wright.z);
   r.normalize ();
  
@@ -231,9 +340,8 @@ void csDDGTerrain::Draw (iRenderView* rview, bool use_z_buf)
   context->right (&r);
 
   // Get the FOV in angles.
-  context->fov (icam->GetFOVAngle ());
-  context->aspect (float (rview->GetGraphics3D ()->GetWidth ())
-  	/ (float)rview->GetGraphics3D ()->GetHeight ());
+  context->fov( pCamera->GetFOVAngle() );
+  context->aspect (float (pG3D->GetWidth ()) / (float)pG3D->GetHeight ());
 
   // Construct some clipping planes.
   context->extractPlanes (context->frustrum ());
@@ -302,13 +410,14 @@ void csDDGTerrain::Draw (iRenderView* rview, bool use_z_buf)
 
   } // end modified.
 
-  csReversibleTransform trans = camtrans;
-  rview->GetGraphics3D ()->SetObjectToCamera (&trans);
-  rview->GetGraphics3D ()->SetClipper (rview->GetClipper ()->GetClipPoly (),
-  	rview->GetClipper ()->GetNumVertices ());
+
+  iClipper2D* pClipper = rview->GetClipper ();
+  // RDS NOTE: check in cube, it's done a little different
+  pG3D->SetObjectToCamera( &RevTrans );
+  pG3D->SetClipper (pClipper->GetClipPoly (), pClipper->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
-  rview->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
-  rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+  pG3D->SetPerspectiveAspect( pCamera->GetFOV() );
+  pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   // Setup the structure for DrawTriangleMesh.
@@ -321,7 +430,7 @@ void csDDGTerrain::Draw (iRenderView* rview, bool use_z_buf)
     g3dmesh.num_vertices_pool = 1;
     g3dmesh.num_materials = 1;
     g3dmesh.use_vertex_color = false;
-    g3dmesh.do_mirror = icam->IsMirrored ();
+    g3dmesh.do_mirror = pCamera->IsMirrored ();
     g3dmesh.do_morph_texels = false;
     g3dmesh.do_morph_colors = false;
     g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
@@ -378,12 +487,15 @@ void csDDGTerrain::Draw (iRenderView* rview, bool use_z_buf)
         fog_verts.SetLimit (nd);
       g3dmesh.vertex_fog = fog_verts.GetArray ();
 
-      rview->CalculateFogMesh (icam->GetTransform (), g3dmesh);
+//      extern void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
+//	    G3DTriangleMesh& mesh);
+      // RDS NOTE:  this hasn't been tested yet
+      rview->CalculateFogMesh( tr_o2c, g3dmesh );
 
-      //@@@@ EDGES if (rview.GetCallback ())
-        //rview.CallCallback (CALLBACK_MESH, (void*)&g3dmesh);
-      //else
-        rview->GetGraphics3D ()->DrawTriangleMesh (g3dmesh);
+//      if (rview.callback)
+//        rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);
+//      else
+        pG3D->DrawTriangleMesh( g3dmesh );
       // Increment the starting offset by the number of triangles that
       // were in this block.
       s += d;
@@ -394,7 +506,7 @@ void csDDGTerrain::Draw (iRenderView* rview, bool use_z_buf)
 }
 
 // If we hit this terrain adjust our position to be on top of it.
-int csDDGTerrain::CollisionDetect (csTransform *transform)
+int csDDGTerrainObject::CollisionDetect (csTransform *transform)
 {
   float h;
   // Translate us into terrain coordinate space.
@@ -413,4 +525,62 @@ int csDDGTerrain::CollisionDetect (csTransform *transform)
   p = p + _pos;
   transform->SetOrigin (p);
   return 1;
+}
+
+//----------------------------------------------------------------------
+
+IMPLEMENT_IBASE (csDDGTerrainObjectFactory)
+  IMPLEMENTS_INTERFACE (iTerrainObjectFactory)
+IMPLEMENT_IBASE_END
+
+csDDGTerrainObjectFactory::csDDGTerrainObjectFactory( iSystem* pSys )
+{
+  CONSTRUCT_IBASE (NULL);
+  pSystem = pSys;
+}
+
+csDDGTerrainObjectFactory::~csDDGTerrainObjectFactory ()
+{
+}
+
+iTerrainObject* csDDGTerrainObjectFactory::NewInstance ()
+{
+  // RDS NOTE:  should the system go in here????
+  csDDGTerrainObject* pTerrObj = new csDDGTerrainObject( pSystem, this );
+  return QUERY_INTERFACE( pTerrObj, iTerrainObject );
+}
+
+//----------------------------------------------------------------------
+
+IMPLEMENT_IBASE (csDDGTerrainObjectType)
+  IMPLEMENTS_INTERFACE (iTerrainObjectType)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_FACTORY (csDDGTerrainObjectType)
+
+EXPORT_CLASS_TABLE (ddg)
+  EXPORT_CLASS (csDDGTerrainObjectType, "crystalspace.terrain.object.ddg",
+    "Crystal Space DDGTerrain Type")
+EXPORT_CLASS_TABLE_END
+
+csDDGTerrainObjectType::csDDGTerrainObjectType (iBase* pParent)
+{
+  CONSTRUCT_IBASE (pParent);
+}
+
+csDDGTerrainObjectType::~csDDGTerrainObjectType ()
+{
+}
+
+bool csDDGTerrainObjectType::Initialize (iSystem *pSys)
+{
+  pSystem = pSys;
+  return true;
+}
+
+iTerrainObjectFactory* csDDGTerrainObjectType::NewFactory()
+{
+  csDDGTerrainObjectFactory *pFactory = new csDDGTerrainObjectFactory( pSystem );
+  return QUERY_INTERFACE( pFactory, iTerrainObjectFactory );
 }

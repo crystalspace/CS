@@ -39,6 +39,9 @@ INC.DDG = $(wildcard plugins/terrain/object/ddg/*.h plugins/terrain/object/ddg/*
 SRC.DDG = $(wildcard plugins/terrain/object/ddg/*.cpp plugins/terrain/object/ddg/*/*.cpp)
 OBJ.DDG = $(addprefix $(OUT),$(notdir $(SRC.DDG:.cpp=$O)))
 CFLAGS.DDG = $(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.I)plugins/terrain/object/ddg
+# @@@@@ The following line is temporary until this makefile is fixed
+CFLAGS += $(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.I)plugins/terrain/object/ddg
+
 DEP.DDG = CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += DDG

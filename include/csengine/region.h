@@ -127,6 +127,10 @@ public:
     /// Find a mesh factory in this region by name
     virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName);
     /// Find a texture in this region by name
+    /// Find a terrain in this region by name
+    virtual iTerrainWrapper *FindTerrainObject (const char *iName);
+    /// Find a terrain factory in this region by name
+    virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName);
     virtual iTextureWrapper *FindTexture (const char *iName);
     /// Find a material in this region by name
     virtual iMaterialWrapper *FindMaterial (const char *iName);

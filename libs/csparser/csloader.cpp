@@ -19,46 +19,47 @@
 
 #include "cssysdef.h"
 #include "qint.h"
-#include "csparser/csloader.h"
-#include "csparser/crossbld.h"
-#include "csparser/snddatao.h"
-#include "csengine/cscoll.h"
 #include "csengine/campos.h"
-#include "csengine/sector.h"
-#include "csengine/thing.h"
+#include "csparser/crossbld.h"
+#include "csengine/cscoll.h"
+#include "csparser/csloader.h"
+#include "csengine/curve.h"
+#include "csengine/dumper.h"
+#include "csengine/engine.h"
+#include "csengine/halo.h"
+#include "csengine/keyval.h"
+#include "csengine/light.h"
 #include "csengine/meshobj.h"
 #include "csengine/polygon.h"
 #include "csengine/polytmap.h"
-#include "csengine/textrans.h"
-#include "csengine/engine.h"
-#include "csengine/light.h"
-#include "csengine/texture.h"
-#include "csengine/curve.h"
-#include "csengine/terrain.h"
-#include "csengine/terrddg.h"
-#include "csengine/terrlod.h"
-#include "csengine/dumper.h"
-#include "csengine/keyval.h"
 #include "csengine/region.h"
-#include "csengine/halo.h"
+#include "csengine/sector.h"
+#include "csparser/snddatao.h"
+#include "csengine/terrobj.h"
+#include "csengine/textrans.h"
+#include "csengine/texture.h"
+#include "csengine/thing.h"
+#include "csgfxldr/csimage.h"
+#include "cssys/system.h"
+#include "csutil/inifile.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"
-#include "csutil/inifile.h"
 #include "csutil/util.h"
-#include "cssys/system.h"
-#include "csgfxldr/csimage.h"
-#include "ivfs.h"
 #include "idatabuf.h"
-#include "isndldr.h"
-#include "isnddata.h"
-#include "isndrdr.h"
-#include "itxtmgr.h"
-#include "imotion.h"
 #include "ildrplug.h"
+#include "imotion.h"
+#include "imspr3d.h"
 #include "iskel.h"
 #include "iskelbon.h"
-#include "imspr3d.h"
+#include "isnddata.h"
+#include "isndldr.h"
+#include "isndrdr.h"
+#include "iterrobj.h"
+#include "itxtmgr.h"
+#include "ivfs.h"
+
+#include "itddg.h"
 
 typedef char ObName[30];
 /// The engine we are currently processing
@@ -80,6 +81,7 @@ public:
   static int lights_loaded;
   static int curves_loaded;
   static int meshes_loaded;
+  static int terrains_loaded;
   static int sounds_loaded;
   static void Init()
   {
@@ -90,6 +92,7 @@ public:
     lights_loaded   = 0;
     curves_loaded   = 0;
     meshes_loaded  = 0;
+    terrains_loaded  = 0;
     sounds_loaded   = 0;
   }
 };
@@ -101,6 +104,7 @@ int csLoaderStat::things_loaded   = 0;
 int csLoaderStat::lights_loaded   = 0;
 int csLoaderStat::curves_loaded   = 0;
 int csLoaderStat::meshes_loaded  = 0;
+int csLoaderStat::terrains_loaded = 0;
 int csLoaderStat::sounds_loaded   = 0;
 
 // Define all tokens used through this file
@@ -211,7 +215,8 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (STATIC)
   CS_TOKEN_DEF (CLONE)
   CS_TOKEN_DEF (TEMPLATE)
-  CS_TOKEN_DEF (TERRAIN)
+  CS_TOKEN_DEF (TERRAINFACTORY)
+  CS_TOKEN_DEF (TERRAINOBJ)
   CS_TOKEN_DEF (TEX)
   CS_TOKEN_DEF (TEXLEN)
   CS_TOKEN_DEF (TEXNR)
@@ -898,9 +903,9 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (TEXLEN)
     CS_TOKEN_TABLE (FOG)
-    CS_TOKEN_TABLE (MOVEABLE)
     CS_TOKEN_TABLE (DETAIL)
     CS_TOKEN_TABLE (CONVEX)
+    CS_TOKEN_TABLE (MOVEABLE)
     CS_TOKEN_TABLE (MOVE)
     CS_TOKEN_TABLE (HARDMOVE)
     CS_TOKEN_TABLE (TEMPLATE)
@@ -2181,7 +2186,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (SKY)
-    CS_TOKEN_TABLE (TERRAIN)
+    CS_TOKEN_TABLE (TERRAINOBJ)
     CS_TOKEN_TABLE (NODE)
     CS_TOKEN_TABLE (KEY)
   CS_TOKEN_TABLE_END
@@ -2206,9 +2211,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     }
     switch (cmd)
     {
-      case CS_TOKEN_TERRAIN:
-        terrain_process (*sector, name, params);
-        break;
       case CS_TOKEN_STATBSP:
         do_stat_bsp = true;
         break;
@@ -2229,6 +2231,14 @@ csSector* csLoader::load_sector (char* secname, char* buf)
           Engine->meshes.Push (sp);
           sp->GetMovable ().SetSector (sector);
 	  sp->GetMovable ().UpdateMove ();
+        }
+        break;
+      case CS_TOKEN_TERRAINOBJ:
+        {
+          csTerrainWrapper *pWrapper = new csTerrainWrapper (Engine);
+          pWrapper->SetName (name);
+          Engine->terrains.Push (pWrapper);
+          LoadTerrainObject (pWrapper, params, sector);
         }
         break;
       case CS_TOKEN_LIGHT:
@@ -2452,99 +2462,6 @@ void csLoader::skydome_process (csThing& thing, char* name, char* buf,
 
 //---------------------------------------------------------------------------
 
-void csLoader::terrain_process (csSector& sector, char* name, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (TYPE)
-    CS_TOKEN_TABLE (HEIGHTMAP)
-    CS_TOKEN_TABLE (DETAIL)
-    CS_TOKEN_TABLE (TEXTURE)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char* params;
-  char type[256];		// @@@ Hardcoded.
-  bool lod;
-  char heightmapname[256];	// @@@ Hardcoded.
-  char texturebasename[256];	// @@@ Hardcoded.
-  unsigned int detail = 3000;
-
-  lod = false;
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_TYPE:
-        ScanStr (params, "%s", type);
-	if (!strcasecmp (type, "lod")) lod = true;
-        break;
-      case CS_TOKEN_HEIGHTMAP:
-        ScanStr (params, "%s", heightmapname);
-        break;
-      case CS_TOKEN_TEXTURE:
-        ScanStr (params, "%s", texturebasename);
-        break;
-      case CS_TOKEN_DETAIL:
-        ScanStr (params, "%d", &detail);
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a terrain!\n", csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-
-  if (!System->VFS->Exists(heightmapname))
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Error locating height field: %s\n", heightmapname);
-    fatal_exit (0, false);
-  }
-
-  iDataBuffer *heightmap = System->VFS->ReadFile (heightmapname);
-  if (!heightmap)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Error loading height field: %s\n", heightmapname);
-    fatal_exit (0, false);
-  }
-
-  csTerrain* terr;
-  if (lod)
-    terr = (csTerrain*)new csLODTerrain ();
-  else
-    terr = (csTerrain*)new csDDGTerrain ();
-  terr->SetName (name);
-
-  // Otherwise read file, if that fails generate a random map.
-  if (!terr->Initialize (**heightmap, heightmap->GetSize ()))
-  {
-    heightmap->DecRef ();
-    CsPrintf (MSG_FATAL_ERROR, "Error creating height field from: %s\n", heightmapname);
-    fatal_exit (0, false);
-  }
-
-  // Initialize all textures. The first texture is reused for all
-  // texture entries that fail (cannot be found).
-  int num_mat = terr->GetNumMaterials ();
-  int i;
-  char matname[256];
-  csMaterialWrapper* first_mat = NULL;
-  for (i = 0 ; i < num_mat ; i++)
-  {
-    sprintf (matname, texturebasename, i);
-    csMaterialWrapper* mat = FindMaterial (matname, onlyRegion);
-    if (mat == NULL) mat = first_mat;
-    first_mat = mat;
-    terr->SetMaterial (i, mat);
-  }
-  terr->SetDetail (detail);
-
-  heightmap->DecRef ();
-  sector.AddTerrain (terr);
-}
-
-//---------------------------------------------------------------------------
-
 iSoundData* csLoader::LoadSoundData(const char* filename) {
   /* @@@ get the needed plugin interfaces:
    * when moving the loader to a plug-in, this should be done
@@ -2642,6 +2559,7 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (MOTION)
     CS_TOKEN_TABLE (REGION)
+    CS_TOKEN_TABLE (TERRAINFACTORY)
   CS_TOKEN_TABLE_END
 
   csResetParserLine();
@@ -2699,6 +2617,18 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
             LoadMeshObjectFactory (t, params);
           }
 	  break;
+        case CS_TOKEN_TERRAINFACTORY:
+        {
+          csTerrainFactoryWrapper* pWrapper = (csTerrainFactoryWrapper*)Engine->terrain_factories.FindByName( name );
+          if (!pWrapper)
+          {
+            pWrapper = new csTerrainFactoryWrapper ();
+            pWrapper->SetName( name );
+            Engine->terrain_factories.Push (pWrapper);
+          }
+          LoadTerrainObjectFactory (pWrapper, params);
+        }
+	      break; 
         case CS_TOKEN_REGION:
 	  {
 	    char str[255];
@@ -3440,6 +3370,166 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
     CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the mesh object!\n", csGetLastOffender ());
     fatal_exit (0, false);
   }
+
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
+bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper, char *pBuf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (PARAMS)
+    CS_TOKEN_TABLE (PLUGIN)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char *params;
+  char *pStr = new char[255];
+  iLoaderPlugIn *iPlugIn = NULL;
+  pStr[0] = 0;
+
+  while ((cmd = csGetObject (&pBuf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", pBuf);
+      fatal_exit( 0, false );
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_PARAMS:
+	if (!iPlugIn)
+	{
+          CsPrintf( MSG_FATAL_ERROR, "Could not load plugin '%s'!\n", pStr );
+          fatal_exit (0, false);
+	}
+	else
+	{
+          // use the plugin to parse through the parameters the engine is passed also
+          // a pointer to the factory is returned
+	  iBase *pBaseFactory = iPlugIn->Parse (params, csEngine::current_iengine);
+          // if we couldn't get the factory leave
+	  if (!pBaseFactory)
+	  {
+	    CsPrintf (MSG_FATAL_ERROR, "Plugin '%s' did not return a factory!\n",
+	    	    pStr);
+	    fatal_exit (0, false);
+	  }
+	  else
+	  {
+            // convert the iBase to iTerrainObjectFactory
+	    iTerrainObjectFactory *pFactory = 
+            QUERY_INTERFACE (pBaseFactory, iTerrainObjectFactory);
+            // set the factory into the csTerrainFactoryWrapper
+	    pWrapper->SetTerrainObjectFactory (pFactory);
+	    pFactory->DecRef ();
+	  }
+	}
+        break;
+      case CS_TOKEN_PLUGIN:
+	{
+	  ScanStr (params, "%s", pStr);
+	  iPlugIn = (iLoaderPlugIn*)loaded_plugins.FindPlugIn( pStr );
+	  if (!iPlugIn)
+	  {
+	    printf ("Plugin '%s' loaded!\n", pStr);
+	    iPlugIn = LOAD_PLUGIN (System, pStr, "TerrainLdr", iLoaderPlugIn);
+	    if (iPlugIn)
+              loaded_plugins.NewPlugIn (pStr, iPlugIn);
+	  }
+	}
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a terrain factory!\n",
+        csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  return true;
+}
+
+bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper, char *pBuf, csSector* sector)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (PLUGIN)
+    CS_TOKEN_TABLE (PARAMS)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  char *pStr = new char[255];
+  pStr[0] = 0;
+
+  csLoaderStat::terrains_loaded++;
+  iLoaderPlugIn* iPlugIn = NULL;
+
+  while ((cmd = csGetObject (&pBuf, commands, &name, &params) ) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", pBuf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_PARAMS:
+        if (!iPlugIn)
+        {
+          CsPrintf( MSG_FATAL_ERROR, "Could not load plugin '%s'!\n", pStr );
+          fatal_exit (0, false);
+        }
+        else
+        {
+          // use the plugin to parse through the parameters the engine is passed also
+          // a pointer to the factory is returned
+	  iBase *iBaseObject = iPlugIn->Parse (params, csEngine::current_iengine);
+          // if we couldn't get the factory leave
+	  if (!iBaseObject)
+	  {
+	    CsPrintf (MSG_FATAL_ERROR, "Plugin '%s' did not return a factory!\n",
+	    	      pStr);
+	    fatal_exit (0, false);
+	  }
+	  else
+	  {
+            // convert the iBase to iTerrainObject
+            iTerrainObject *iTerrObj = QUERY_INTERFACE (iBaseObject, iTerrainObject);
+            pWrapper->SetTerrainObject (iTerrObj);
+
+            iTerrObj->DecRef ();
+            iBaseObject->DecRef ();
+	  }
+        }
+        break;
+      case CS_TOKEN_PLUGIN:
+	{
+	  ScanStr (params, "%s", pStr);
+	  iPlugIn = (iLoaderPlugIn*)loaded_plugins.FindPlugIn (pStr);
+	  if (!iPlugIn)
+	  {
+	    printf ("Plugin '%s' loaded!\n", pStr);
+	    iPlugIn = LOAD_PLUGIN (System, pStr, "TerrainLdr", iLoaderPlugIn);
+	    if (iPlugIn)
+              loaded_plugins.NewPlugIn (pStr, iPlugIn);
+	  }
+	}
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the mesh object!\n", csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  // add new terrain to sector
+  sector->AddTerrain (pWrapper);
 
   return true;
 }

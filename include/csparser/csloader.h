@@ -52,6 +52,8 @@ class csSector;
 class csFrame;
 class csObject;
 class csPolygon3D;
+class csTerrainFactoryWrapper;
+class csTerrainWrapper;
 
 /**
  * Bit flags for the loader (used in csLoader::SetMode).
@@ -121,8 +123,6 @@ class csLoader
   /// Parse the definition for a skydome and create the corresponding objects
   static void skydome_process (csThing& thing, char* name, char* buf,
     csMaterialWrapper* material);
-  /// Parse the terrain engine's parameters
-  static void terrain_process (csSector& sector, char* name, char* buf);
   /// Parse the definition for a thing and create a thing object
   static csThing* load_thing (char* name, char* buf, csSector*, bool is_sky,
       	bool is_template);
@@ -155,6 +155,14 @@ class csLoader
    * Load the mesh object from the map file.
    */
   static bool LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector);
+
+  /// Load a Terrain Object Factory from the map file.
+  static bool LoadTerrainObjectFactory (csTerrainFactoryWrapper* pTerrFact, char* buf);
+
+  /**
+   * Load the terrain object from the map file.
+   */
+  static bool LoadTerrainObject( csTerrainWrapper *pTerrain, char* buf, csSector* pSector );
 
   /**
    * Load sounds from a SOUNDS(...) argument.

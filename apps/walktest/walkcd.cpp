@@ -38,7 +38,7 @@
 #include "csengine/keyval.h"
 #include "csengine/collider.h"
 #include "csengine/meshobj.h"
-#include "csengine/terrain.h"
+#include "csengine/terrobj.h"
 #include "csparser/impexp.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
@@ -265,8 +265,8 @@ void DoGravity (csVector3& pos, csVector3& vel)
       int i;
       for (i = 0 ; i < n[k]->GetNumberTerrains () ; i++)
       {
-	csTerrain* terrain = n[k]->GetTerrain (i);
-	hits += terrain->CollisionDetect (&test);
+	      csTerrainWrapper* terrain = n[k]->GetTerrain( i );
+	      hits += terrain->CollisionDetect( &test );
       }
     }
   }

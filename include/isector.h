@@ -23,12 +23,13 @@
 #include "cstypes.h"
 #include "csutil/scf.h"
 
+class iTerrainWrapper;
 class csSector;
 struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
 
-SCF_VERSION (iSector, 0, 1, 5);
+SCF_VERSION (iSector, 0, 1, 6);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -63,6 +64,9 @@ struct iSector : public iBase
   virtual int GetNumThings () = 0;
   /// Get a thing by index
   virtual iThing *GetThing (int iIndex) = 0;
+
+  /// Add a terrain object to this sector.
+  virtual void AddTerrain (iTerrainWrapper *pTerrain) = 0;
 
   /// Add a static or pseudo-dynamic light to this sector.
   virtual void AddLight (iStatLight *light) = 0;

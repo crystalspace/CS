@@ -31,15 +31,16 @@ class csThing;
 class csEngine;
 class csStatLight;
 class csMeshWrapper;
+class csTerrainWrapper;
 class csPolygon3D;
 class csCollection;
 class csCamera;
-class csTerrain;
 class csDynLight;
 class csPolygon2DQueue;
 class csProgressPulse;
 class csFrustumView;
 class Dumper;
+struct iTerrainWrapper;
 struct iGraphics3D;
 struct iStatLight;
 struct iVisibilityCuller;
@@ -84,7 +85,7 @@ private:
 
   /**
    * List of terrain objects in this sector. This vector
-   * contains objects of type csTerrain*.
+   * contains objects of type csTerrainWrapper*.
    */
   csNamedObjVector terrains;
 
@@ -379,12 +380,12 @@ public:
   /**
    * Add a terrain to this sector.
    */
-  void AddTerrain (csTerrain* terrain);
+  void AddTerrain (csTerrainWrapper* pTerrain);
 
   /**
    * Unlink a terrain from this sector.
    */
-  void UnlinkTerrain (csTerrain* col);
+  void UnlinkTerrain (csTerrainWrapper *pTerrain);
 
   /**
    * Get the number of terrains in this sector.
@@ -397,17 +398,17 @@ public:
   /**
    * Get the specified terrain.
    */
-  csTerrain* GetTerrain (int idx)
+  csTerrainWrapper* GetTerrain (int idx)
   {
-    return (csTerrain*)terrains[idx];
+    return (csTerrainWrapper*)terrains[idx];
   }
 
   /**
    * Find a terrain with the given name.
    */
-  csTerrain* GetTerrains (const char* name)
+  csTerrainWrapper* GetTerrains (const char* name)
   {
-    return (csTerrain*)terrains.FindByName (name);
+    return (csTerrainWrapper*)terrains.FindByName (name);
   }
 
   //----------------------------------------------------------------------
@@ -646,6 +647,7 @@ public:
     virtual int GetNumThings ()
     { return scfParent->things.Length (); }
     virtual iThing *GetThing (int iIndex);
+    virtual void AddTerrain (iTerrainWrapper *pTerrain);
     virtual void AddLight (iStatLight *light);
     virtual iStatLight *FindLight (float x, float y, float z, float dist);
     virtual void CalculateSectorBBox (csBox3& bbox, bool do_things, bool do_meshes,

@@ -37,6 +37,8 @@ struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iMaterialWrapper;
 struct iTextureWrapper;
+struct iTerrainWrapper;
+struct iTerrainFactoryWrapper;
 struct iCameraPosition;
 struct iRegion;
 struct iView;
@@ -178,6 +180,31 @@ struct iEngine : public iPlugIn
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName,
   	bool regionOnly = false) = 0;
   /**
+   * Find a terrain object by name. If regionOnly is true then the returned
+   * mesh object will belong to the current region. Note that this is different
+   * from calling iRegion::FindTerrainObject() because the latter will also
+   * return terrain objects that belong in a region but are not connected to the
+   * engine.
+   */
+  virtual iTerrainWrapper *FindTerrainObject (const char *iName,
+  	bool regionOnly = false) = 0;
+  /**
+   * Find a terrain factory by name. If regionOnly is true then the returned
+   * factory will belong to the current region. Note that this is different
+   * from calling iRegion::FindTerrainFactory() because the latter will also
+   * return factories that belong in a region but are not connected to the
+   * engine.
+   */
+  virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName,
+  	bool regionOnly = false) = 0;
+  /**
+   * Find a texture by name. If regionOnly is true then the returned
+   * texture will belong to the current region. Note that this is different
+   * from calling iRegion::FindTexture() because the latter will also
+   * return textures that belong in a region but are not connected to the
+   * engine.
+   */
+  /**
    * Find a texture by name. If regionOnly is true then the returned
    * texture will belong to the current region. Note that this is different
    * from calling iRegion::FindTexture() because the latter will also
@@ -262,6 +289,28 @@ struct iEngine : public iPlugIn
    */
   virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector, const csVector3& pos) = 0;
+  /**
+   * Conveniance function to create a terrain factory from a given type.
+   * The type plugin will only be loaded if needed. 'classId' is the
+   * SCF name of the plugin (like 'crystalspace.terrain.object.ddg').
+   * Returns NULL on failure. The factory will be registered with the engine
+   * under the given name. If there is already a factory with that name
+   * no new factory will be created but the found one is returned instead.
+   * If the name is NULL then no name will be set and no check will happen
+   * if the factory already exists.
+   */
+  virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* classId,
+  	const char* name) = 0;
+
+  /**
+   * Conveniance function to create a terrain object for a given factory.
+   * If 'sector' is NULL then the terrain object will not be set to a position.
+   * Returns NULL on failure. The object will be given the specified name.
+   * 'name' can be NULL if no name is wanted. Different mesh objects can
+   * have the same name (in contrast with factory objects).
+   */
+  virtual iTerrainWrapper* CreateTerrainObject (iTerrainFactoryWrapper* factory,
+  	const char* name, iSector* sector) = 0;
 };
 
 #endif // __IENGINE_H__

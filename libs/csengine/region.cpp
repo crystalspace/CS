@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,6 +30,7 @@
 #include "csengine/polytmap.h"
 #include "csengine/curve.h"
 #include "csobject/objiter.h"
+#include "csengine/terrobj.h"
 #include "csutil/csvector.h"
 #include "itxtmgr.h"
 
@@ -403,6 +404,23 @@ iMeshFactoryWrapper* csRegion::Region::FindMeshFactory (const char *iName)
     scfParent->FindObject (iName, csMeshFactoryWrapper::Type, false);
   if (!obj) return NULL;
   return &obj->scfiMeshFactoryWrapper;
+}
+
+iTerrainWrapper* csRegion::Region::FindTerrainObject (const char *iName)
+{
+  csTerrainWrapper* obj = (csTerrainWrapper*)scfParent->FindObject( iName,csTerrainWrapper::Type,true );
+  if (!obj)
+    return NULL;
+  return QUERY_INTERFACE( obj, iTerrainWrapper );
+}
+
+iTerrainFactoryWrapper* csRegion::Region::FindTerrainFactory (const char *iName)
+{
+  csTerrainFactoryWrapper* obj = (csTerrainFactoryWrapper*)
+    scfParent->FindObject (iName, csTerrainFactoryWrapper::Type, false);
+  if (!obj)
+    return NULL;
+  return &obj->scfiTerrainFactoryWrapper;
 }
 
 iTextureWrapper* csRegion::Region::FindTexture (const char *iName)

@@ -28,6 +28,8 @@ struct iSprite;
 struct iSpriteTemplate;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
+struct iTerrainWrapper;
+struct iTerrainFactoryWrapper;
 struct iTextureWrapper;
 struct iMaterialWrapper;
 struct iCameraPosition;
@@ -87,6 +89,10 @@ struct iRegion : public iBase
   virtual iMeshWrapper *FindMeshObject (const char *iName) = 0;
   /// Find a mesh factory in this region by name
   virtual iMeshFactoryWrapper *FindMeshFactory (const char *iName) = 0;
+  /// Find a terrain in this region by name
+  virtual iTerrainWrapper *FindTerrainObject (const char *iName) = 0;
+  /// Find a terrain factory in this region by name
+  virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName) = 0;
   /// Find a texture in this region by name
   virtual iTextureWrapper *FindTexture (const char *iName) = 0;
   /// Find a material in this region by name

@@ -38,7 +38,7 @@
 #include "csengine/quadtr3d.h"
 #include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
-#include "csengine/terrain.h"
+#include "csengine/terrobj.h"
 #include "csengine/covcube.h"
 #include "csengine/cbufcube.h"
 #include "csengine/bsp.h"
@@ -300,15 +300,19 @@ csStatLight* csSector::FindLight (CS_ID id)
 
 //----------------------------------------------------------------------
 
-void csSector::AddTerrain (csTerrain* terrain)
+void csSector::AddTerrain (csTerrainWrapper *pTerrain)
 {
-  terrains.Push ((csSome)terrain);
+  terrains.Push ((csSome) pTerrain );
 }
 
-void csSector::UnlinkTerrain (csTerrain* terrain)
+void csSector::UnlinkTerrain (csTerrainWrapper *pTerrain)
 {
-  int idx = terrains.Find ((csSome)terrain);
-  if (idx != -1) { terrains[idx] = NULL; terrains.Delete (idx); }
+  int idx = terrains.Find ((csSome)pTerrain);
+  if (idx != -1)
+  { 
+    terrains[idx] = NULL; 
+    terrains.Delete (idx);
+  }
 }
 
 //----------------------------------------------------------------------
@@ -939,8 +943,8 @@ void csSector::Draw (iRenderView* rview)
   {
     for (i = 0 ; i < terrains.Length () ; i++)
     {
-      csTerrain* terrain = (csTerrain*)terrains[i];
-      terrain->Draw (rview, true);
+      csTerrainWrapper* pTerrain = (csTerrainWrapper*)terrains[i];
+      pTerrain->Draw (rview, true);
     }
   }
 
@@ -1553,6 +1557,11 @@ iThing *csSector::eiSector::GetThing (const char *name)
 iThing *csSector::eiSector::GetThing (int iIndex)
 {
   return &((csThing*)(scfParent->things[iIndex]))->scfiThing;
+}
+
+void csSector::eiSector::AddTerrain (iTerrainWrapper *pTerrain)
+{
+  scfParent->AddTerrain (pTerrain->GetPrivateObject ());
 }
 
 void csSector::eiSector::AddLight (iStatLight *light)

@@ -396,6 +396,12 @@ Error initializing system!
 A. You probably did not compile everything. Compiling only the @file{.EXE}
 file is not sufficient! You must also compile all plug-ins you want to use.
 In the above example the software renderer is missing.
+
+If you are certain that everything is compiled, make sure your working
+directory is set to CS\.  To do this go to the Project Menu.  Select Settings
+and go to the Debug tab.  Change the debug executate to X:\CS\appname.  X: 
+being the drive letter.  Next set the working directory to X:\CS.  Click OK
+and your're good to go!
 @end itemize
 
 @subsubheading Miscellaneous
@@ -442,5 +448,6 @@ you wait a while, this will probably be fixed, or at least be worked around.
 Q. @emph{I have a problem that you haven't solved here!}
 
 A. Try sending a note to the Crystal Space mailing list and asking your
-question there.  @xref{Mailing Lists}.
+question there.  @xref{Mailing Lists}.  Make sure you include what operating system 
+and complier you are using.  
 @end itemize
