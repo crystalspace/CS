@@ -428,6 +428,7 @@ Blocks::~Blocks ()
   if (view) view->DecRef ();
   if (vc) vc->DecRef ();
   delete keyconf_menu;
+  delete player1;
 #if defined(BLOCKS_NETWORKING)
   TerminateConnection();
 #endif
