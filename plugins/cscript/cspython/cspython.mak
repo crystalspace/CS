@@ -202,7 +202,7 @@ endif
 cspythonclean:
 	-$(RMDIR) $(CSPYTHON) $(SWIG.CSPYTHON) $(OBJ.CSPYTHON) $(OUTDLL)/$(notdir $(INF.CSPYTHON)) $(TRASH.CSPYTHON) python.cex
 
-swigpythgen: swigpythclean $(SWIG.CSPYTHON)
+swigpythgen: $(OUTDIRS) swigpythclean $(SWIG.CSPYTHON)
 
 swigpythclean:
 	-$(RM) $(SWIG.CSPYTHON)
