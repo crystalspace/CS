@@ -52,6 +52,48 @@ chronological order.
 	    - evdefs.h: Warning(305): Bad constant value (ignored).
 	    - string.h: Warning(503): Can't wrap 'operator char const*' unless
 	      renamed to a valid identifier.
+	- Eric Sunshine made the following changes to cspython.mak:
+	    - Added top-level swigpythclean and cspythonmaintainerclean
+	      targets, the latter of which is hooked into the top-level
+	      maintainerclean target.
+	    - Set up some additional variables instead of repeated;u using
+	      constants for pathnames in rules section.
+	    - Fixed bug: Secondary-level swigpythclean target was not marked
+	      `phony'.
+	    - Eliminated some special-case code which prevented dependency
+	      loops when SWIGBIN was not set.  Cleaner logic obviated the need
+	      for this confusing special-case.
+	    - Fixed bug: swigpythclean failed to clean generated cspace.py.
+	    - cspythonclean now also cleans Swig-generated files.
+	- Eric Sunshine made the following changes to csperl5.mak:
+	    - Added top-level swigperl5clean target.
+	    - Eliminated convolution of swigperl5gen and swigperl5inst targets.
+	      New logic is clearer, more obvious, and less bug-ridden.
+	    - swigperl5gen and swigperl5inst targets are now available only if
+	      SWIGBIN is set.  (Having the targets available with Swig absent
+	      was not sensible.)
+	    - Fixed bug: Secondary-level swigperl5clean target was not marked
+	      `phony'.
+	    - Fixed poor design: Would refuse to build csperl5 module if user
+	      did not have Swig installed; even though the Swig-generated files
+	      are present already in the source tree.  Instead, now simply
+	      falls back to the files from the source tree (after all, that is
+	      why they are in CVS).
+	    - Fixed bug: swigperl5gen (and swigperl5inst) failed when invoked
+	      outside of source tree.
+	    - Fixed bug: swigperl5inst target was moving generated files from
+	      build directory to source directory rather than copying them.
+	      This caused subsequent invocations of these targets to think that
+	      additional work was required.
+	    - Fixed bug: swigperl5gen target failed to ensure that `out' build
+	      tree existed before Swig emitted files there.
+	    - Fixed bug: swigperl5clean was removing the wrong files.  It was
+	      removing the files from the source tree rather than the files
+	      emitted by Swig into the `out' build directory.
+	    - Fixed bug: csperl5maintainerclean was not removing the Swig files
+	      from the source tree (which, after all, is the purpose of a
+	      "maintainerclean" target).
+	    - csperl5clean now also cleans Swig-generated files.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from
 	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.
