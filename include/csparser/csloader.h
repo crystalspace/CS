@@ -39,6 +39,8 @@ class csCurveTemplate;
 class csSoundDataObject;
 class csSpriteTemplate;
 class csSprite3D;
+class csKeyValuePair;
+class csMapNode;
 
 enum { kTokenPSetVertex = 1, kTokenPSetPolygon, kTokenPSetBezier,
        kTokenPSetTexNr, kTokenPSetCircle,
@@ -62,6 +64,10 @@ public:
   static csCollection* load_collection (char* name, csWorld* world, char* buf);
   ///
   static csStatLight* load_statlight (char* buf);
+  ///
+  static csKeyValuePair* load_key (char* buf, csObject* pParent);
+  ///
+  static csMapNode* load_node (char* name, char* buf, csSector* sec);
   ///
   static csPolygonSet& ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
                                  char* name, char* params);

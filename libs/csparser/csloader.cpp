@@ -39,6 +39,7 @@
 #include "csengine/curve.h"
 #include "csengine/terrain.h"
 #include "csengine/dumper.h"
+#include "csengine/keyval.h"
 #include "csterr/ddgtmesh.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
@@ -129,6 +130,7 @@ TOKEN_DEF_START
   TOKEN_DEF (HALO)
   TOKEN_DEF (HEIGHT)
   TOKEN_DEF (IDENTITY)
+  TOKEN_DEF (KEY)
   TOKEN_DEF (LEN)
   TOKEN_DEF (LIBRARY)
   TOKEN_DEF (LIGHT)
@@ -141,10 +143,12 @@ TOKEN_DEF_START
   TOKEN_DEF (MIRROR)
   TOKEN_DEF (MOVE)
   TOKEN_DEF (MOVEABLE)
+  TOKEN_DEF (NODE)
   TOKEN_DEF (ORIG)
   TOKEN_DEF (PLANE)
   TOKEN_DEF (POLYGON)
   TOKEN_DEF (PORTAL)
+  TOKEN_DEF (POSITION)
   TOKEN_DEF (PRIMARY_ACTIVE)
   TOKEN_DEF (PRIMARY_INACTIVE)
   TOKEN_DEF (RADIUS)
@@ -691,6 +695,78 @@ csStatLight* csLoader::load_statlight (char* buf)
   return l;
 }
 
+csKeyValuePair* csLoader::load_key (char* buf, csObject* pParent)
+{
+  char Key  [256];
+  char Value[10000]; //Value can potentially grow _very_ large.
+  if (ScanStr(buf, "%S,%S", Key, Value) == 2)
+  {
+    CHK (csKeyValuePair* kvp = new csKeyValuePair(Key, Value));
+    if (pParent)
+    {
+      pParent->ObjAdd(kvp);
+    }
+    return kvp;
+  }
+  else
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Illegal Syntax for KEY() command in line %d", parser_line);
+    fatal_exit (0, false);
+    return NULL;
+  }
+}
+
+csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
+{
+  TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (KEY)
+    TOKEN_TABLE (POSITION)
+  TOKEN_TABLE_END
+
+  CHK( csMapNode* pNode = new csMapNode(name));
+  pNode->SetSector(sec);
+
+  long  cmd;
+  char* xname;
+  char* params;
+
+  float x     = 0;
+  float y     = 0;
+  float z     = 0;
+  float angle = 0;
+
+  while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case TOKEN_KEY:
+        load_key(params, pNode);
+        break;
+      case TOKEN_POSITION:
+        ScanStr (params, "%f,%f,%f", &x, &y, &z);
+        break;
+      default:
+        assert(false);
+        break;
+    }
+  }
+  if (cmd == PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a thing!\n", csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+
+  pNode->SetPosition(csVector3(x,y,z));
+  pNode->SetAngle(angle);
+
+  return pNode;
+}
+
 //---------------------------------------------------------------------------
 
 csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
@@ -1153,6 +1229,7 @@ csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
     TOKEN_TABLE (CONVEX)
     TOKEN_TABLE (MOVE)
     TOKEN_TABLE (TEMPLATE)
+    TOKEN_TABLE (KEY)
   TOKEN_TABLE_END
 
   TOKEN_TABLE_START (tok_matvec)
@@ -1228,6 +1305,9 @@ csThing* csLoader::load_thing (char* name, csWorld* w, char* buf,
              thing->MergeTemplate (t, info.default_texture, info.default_texlen,  info.default_lightx);
           csLoaderStat::polygons_loaded += t->GetNumPolygon ();
         }
+        break;
+      case TOKEN_KEY:
+        load_key(params, thing);
         break;
       default:
         ps_process (*thing, info, cmd, xname, params);
@@ -3382,6 +3462,8 @@ csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
     TOKEN_TABLE (SPRITE)
     TOKEN_TABLE (SKYDOME)
     TOKEN_TABLE (TERRAIN)
+    TOKEN_TABLE (NODE)
+    TOKEN_TABLE (KEY)
   TOKEN_TABLE_END
 
   char* name;
@@ -3434,6 +3516,14 @@ csSector* csLoader::load_sector (char* secname, csWorld* w, char* buf,
       case TOKEN_LIGHT:
         sector->AddLight ( load_statlight(params) );
         break;
+      case TOKEN_NODE:
+        sector->ObjAdd ( load_node(name, params, sector) ); 
+        break;
+      case TOKEN_KEY:
+      {
+        load_key(params, sector);
+        break;
+      }
       default:
         ps_process (*sector, info, cmd, name, params);
         break;
@@ -3738,6 +3828,7 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
     TOKEN_TABLE (LIBRARY)
     TOKEN_TABLE (START)
     TOKEN_TABLE (SOUNDS)
+    TOKEN_TABLE (KEY)
   TOKEN_TABLE_END
 
   parser_line = 1;
@@ -3827,6 +3918,9 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
             strcpy (world->start_sector, str);
           }
           break;
+      case TOKEN_KEY:
+        load_key(params, world);
+        break;
       }
     }
     if (cmd == PARSERR_TOKENNOTFOUND)
