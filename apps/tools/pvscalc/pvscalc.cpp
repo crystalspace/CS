@@ -163,7 +163,7 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   int axis;
   float where;
   csVector3 bbox_size = bbox.Max () - bbox.Min ();
-  if (minsize_only || boxlist.Length () <= 1)
+  if (minsize_only || boxlist.Length () <= 10)
   {
     // If we have 1 or less objects left then we continue splitting the
     // node so that leafs are smaller then 'minsize'.
@@ -242,6 +242,15 @@ void PVSCalcSector::BuildKDTree ()
   BuildKDTree (root, boxes, bbox, minsize, false, 0);
 }
 
+void csPoly3DBox::Calculate ()
+{
+  size_t i;
+  bbox.StartBoundingBox ((*this)[0]);
+  for (i = 1 ; i < GetVertexCount () ; i++)
+    bbox.AddBoundingVertexSmart ((*this)[i]);
+  area = GetArea ();
+}
+
 void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
   	csBox3& allbox, csBox3& staticbox,
 	int& allcount, int& staticcount,
@@ -283,12 +292,13 @@ void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
     for (p = 0 ; p < polybase->GetPolygonCount () ; p++)
     {
       const csMeshedPolygon& poly = mp[p];
-      csPoly3D poly3d;
+      csPoly3DBox poly3d;
       for (vt = 0 ; vt < poly.num_vertices ; vt++)
       {
         csVector3 vwor = trans.This2Other (vertices[poly.vertices[vt]]);
         poly3d.AddVertex (vwor);
       }
+      poly3d.Calculate ();
       polygons.Push (poly3d);
     }
   }
@@ -328,16 +338,20 @@ void PVSCalcSector::SortPolygonsOnSize ()
   {
     poly_with_area pwa;
     pwa.idx = i;
-    pwa.area = polygons[i].GetArea ();
+    pwa.area = polygons[i].GetPrecalcArea ();
     polygons_with_area.Push (pwa);
     if (pwa.area < min_area) min_area = pwa.area;
     if (pwa.area > max_area) max_area = pwa.area;
     total_area += double (pwa.area);
   }
   polygons_with_area.Sort (compare_polygons_on_size);
-  csArray<csPoly3D> sorted_polygons;
+  csArray<csPoly3DBox> sorted_polygons;
   for (i = 0 ; i < polygons_with_area.Length () ; i++)
-    sorted_polygons.Push (polygons[polygons_with_area[i].idx]);
+  {
+    poly_with_area& pwa = polygons_with_area[i];
+    if (pwa.area < 2) break;
+    sorted_polygons.Push (polygons[pwa.idx]);
+  }
   polygons = sorted_polygons;
 
   parent->ReportInfo ("Average polygon area %g, min %g, max %g\n",
@@ -520,7 +534,6 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   // First we calculate the projection of the polygon on the shadow plane
   // as seen from the first point on the source box. That will be the start
   // for calculating the intersection of all those projections.
-  csPoly2D poly_intersect;
   if (!polygon.ProjectAxisPlane (source.GetCorner (CS_BOX_CORNER_xyz),
   	plane.axis, plane.where, &poly_intersect))
     return false;
@@ -536,7 +549,6 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   int i;
   for (i = 1 ; i < 8 ; i++)
   {
-    csPoly2D poly;
     if (!polygon.ProjectAxisPlane (source.GetCorner (i),
   	plane.axis, plane.where, &poly))
       return false;
@@ -574,31 +586,6 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   return nummod > 0;
 }
 
-bool PVSCalcSector::CheckRelevantPolygon (float minsource, float maxsource,
-	const csPoly3D& polygon)
-{
-  // A polygon is relevant if it is completely enclosed within the
-  // source and the shadow plane. A polygon that intersects the shadow
-  // plane or enters the source box is not valid for shadow casting.
-  size_t i;
-  const csVector3* vertices = polygon.GetVertices ();
-  for (i = 0 ; i < polygon.GetVertexCount () ; i++)
-  {
-    float value = vertices[i][plane.axis];
-    if (plane.where < minsource)
-    {
-      if (value < plane.where || value > minsource)
-	return false;
-    }
-    else
-    {
-      if (value > plane.where || value < maxsource)
-	return false;
-    }
-  }
-  return true;
-}
-
 int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
 {
   // Start casting shadows starting with the biggest polygons.
@@ -608,15 +595,30 @@ int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
   // Calculate this for CheckRelevantPolygon.
   float minsource = source.Min (plane.axis);
   float maxsource = source.Max (plane.axis);
+  float mincheck, maxcheck;
+  if (plane.where < minsource)
+  {
+    mincheck = plane.where;
+    maxcheck = minsource;
+  }
+  else
+  {
+    mincheck = maxsource;
+    maxcheck = plane.where;
+  }
 
   DB(("  Cast Shadows between %g and %g (plane %d/%g)\n",
-  	plane.where < minsource ? plane.where : maxsource,
-	plane.where < minsource ? minsource : plane.where,
+  	mincheck, maxcheck,
 	plane.axis, plane.where));
 
   for (i = 0 ; i < polygons.Length () ; i++)
   {
-    if (CheckRelevantPolygon (minsource, maxsource, polygons[i]))
+    // First we test if the box of the polygon is enclosed within the
+    // source and the shadow plane. We use 'mincheck' and 'maxcheck' for those.
+    const csBox3& polygon_box = polygons[i].GetBBox ();
+    if (polygon_box.Min (plane.axis) >= mincheck
+    	&& polygon_box.Max (plane.axis) <= maxcheck)
+    {
       if (CastAreaShadow (source, polygons[i]))
       {
         // The shadow modified the coverage buffer. Test if our buffer is
@@ -628,6 +630,7 @@ int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
 	  return 1;
         }
       }
+    }
   }
 
   return status;
@@ -756,6 +759,8 @@ void PVSCalcSector::Calculate ()
   	staticcount, allcount);
   parent->ReportInfo ("%d static and %d total polygons",
   	staticpcount, allpcount);
+  parent->ReportInfo ("%d static polygons are big enough for building PVS",
+  	polygons.Length ());
 
   // From all geometry (static and dynamic) we now build the KDtree
   // that is the base for visibility culling.

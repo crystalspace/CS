@@ -53,6 +53,31 @@ struct PVSCalcProjectionPlane
 };
 
 /**
+ * A polygon with a bounding box.
+ */
+class csPoly3DBox : public csPoly3D
+{
+private:
+  csBox3 bbox;
+  float area;
+
+public:
+  csPoly3DBox () : csPoly3D () { }
+  csPoly3DBox (const csPoly3DBox& other) : csPoly3D (other)
+  {
+    bbox = other.GetBBox ();
+    area = other.GetPrecalcArea ();
+  }
+
+  /// Calculate the bbox and area.
+  void Calculate ();
+  /// Get the bbox.
+  const csBox3& GetBBox () const { return bbox; }
+  /// Get the area.
+  float GetPrecalcArea () const { return area; }
+};
+
+/**
  * The PVS calculator for one sector.
  */
 class PVSCalcSector
@@ -65,8 +90,13 @@ private:
   int maxdepth;
   int countnodes;
 
+  // Help variables used during calculation. They are here so that the internal
+  // memory that they allocate on construction is reused.
+  csPoly2D poly_intersect;
+  csPoly2D poly;
+
   // All static polygons. Will be sorted on size.
-  csArray<csPoly3D> polygons;
+  csArray<csPoly3DBox> polygons;
   // All world boxes for all objects. Will be used for calculating kdtree.
   csArray<csBox3> boxes;
 
@@ -124,17 +154,6 @@ private:
    * if the coverage buffer was actually modified.
    */
   bool CastAreaShadow (const csBox3& source, const csPoly3D& polygon);
-
-  /**
-   * Return true if the polygon is relevant for shadow casting given
-   * the source and the current shadow plane. This will return false
-   * on polygons that should not be considered for shadow casting (like
-   * polygons that intersect the shadow plane or the source box).
-   * 'minsource' and 'maxsource' are the values of source.Min?() and
-   * source.Max?() for the same right axis as the shadow plane.
-   */
-  bool CheckRelevantPolygon (float minsource, float maxsource,
-  	const csPoly3D& polygon);
 
   /**
    * Cast shadows on the previously set up projection plane until the

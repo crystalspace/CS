@@ -86,9 +86,9 @@ bool csPoly3D::ProjectXPlane (
   float plane_x,
   csPoly2D *poly2d) const
 {
-  poly2d->MakeEmpty ();
+  poly2d->SetVertexCount (vertices.Length ());
+  csVector2* verts = poly2d->GetVertices ();
 
-  csVector2 p;
   csVector3 v;
   float x_dist = plane_x - point.x;
   size_t i;
@@ -96,9 +96,8 @@ bool csPoly3D::ProjectXPlane (
   {
     v = vertices[i] - point;
     if (ABS (v.x) < SMALL_EPSILON) return false;
-    p.x = point.y + x_dist * v.y / v.x;
-    p.y = point.z + x_dist * v.z / v.x;
-    poly2d->AddVertex (p);
+    verts[i].x = point.y + x_dist * v.y / v.x;
+    verts[i].y = point.z + x_dist * v.z / v.x;
   }
 
   return true;
@@ -109,9 +108,9 @@ bool csPoly3D::ProjectYPlane (
   float plane_y,
   csPoly2D *poly2d) const
 {
-  poly2d->MakeEmpty ();
+  poly2d->SetVertexCount (vertices.Length ());
+  csVector2* verts = poly2d->GetVertices ();
 
-  csVector2 p;
   csVector3 v;
   float y_dist = plane_y - point.y;
   size_t i;
@@ -119,9 +118,8 @@ bool csPoly3D::ProjectYPlane (
   {
     v = vertices[i] - point;
     if (ABS (v.y) < SMALL_EPSILON) return false;
-    p.x = point.x + y_dist * v.x / v.y;
-    p.y = point.z + y_dist * v.z / v.y;
-    poly2d->AddVertex (p);
+    verts[i].x = point.x + y_dist * v.x / v.y;
+    verts[i].y = point.z + y_dist * v.z / v.y;
   }
 
   return true;
@@ -132,9 +130,9 @@ bool csPoly3D::ProjectZPlane (
   float plane_z,
   csPoly2D *poly2d) const
 {
-  poly2d->MakeEmpty ();
+  poly2d->SetVertexCount (vertices.Length ());
+  csVector2* verts = poly2d->GetVertices ();
 
-  csVector2 p;
   csVector3 v;
   float z_dist = plane_z - point.z;
   size_t i;
@@ -142,9 +140,8 @@ bool csPoly3D::ProjectZPlane (
   {
     v = vertices[i] - point;
     if (ABS (v.z) < SMALL_EPSILON) return false;
-    p.x = point.x + z_dist * v.x / v.z;
-    p.y = point.y + z_dist * v.y / v.z;
-    poly2d->AddVertex (p);
+    verts[i].x = point.x + z_dist * v.x / v.z;
+    verts[i].y = point.y + z_dist * v.y / v.z;
   }
 
   return true;
