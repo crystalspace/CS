@@ -56,7 +56,8 @@ void csVector::SetLength (int n)
   if ((n > limit) || ((limit > threshold) && (n < limit - threshold)))
   {
     n = ((n + threshold - 1) / threshold) * threshold;
-    root = (csSome *)realloc (root, n * sizeof (csSome));
+    if (n > 0)
+      root = (csSome *)realloc (root, n * sizeof (csSome));
     limit = n;
   }
 }
