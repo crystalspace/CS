@@ -711,13 +711,13 @@ And then rewrite as:
 @ifnottex
 @quotation
 @math{u / z = (m11 * Vs.x) / F + (m12 * Vs.y) / F + m13 + P / z}@*
-@math{v / z = (m21 * Vs.x) / V + (m22 * Vs.y) / F + m23 + Q / z}
+@math{v / z = (m21 * Vs.x) / F + (m22 * Vs.y) / F + m23 + Q / z}
 @end quotation
 @end ifnottex
 @tex
 $$\eqalign{
 {u \over z} &= {{m_{11} \times v_{s_x}} \over F} + {{m_{12} \times v_{s_y}} \over F} + m_{13} + {P \over z} \cr
-{v \over z} &= {{m_{21} \times v_{s_x}} \over V} + {{m_{22} \times v_{s_y}} \over F} + m_{23} + {Q \over z} \cr
+{v \over z} &= {{m_{21} \times v_{s_x}} \over F} + {{m_{22} \times v_{s_y}} \over F} + m_{23} + {Q \over z} \cr
 }$$
 @end tex
 

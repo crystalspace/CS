@@ -23,6 +23,8 @@ chronological order.
 	  recently added to the source and header files of the MacOS/X port.
 	  We already have CVS and history.txt for this purpose.  Also made
 	  minor formatting and whitespace corrections.
+	- Luca fixed an error in a math formula in the documentation section
+	  "7.6.6.4 Bringing it All Together" for doing texture mapping.
 3-Oct-2003
 	- Jorrit changed syntax services->ParsePortal() into
 	  HandlePortalParameter(). This is a more general function which can
