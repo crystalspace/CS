@@ -2,7 +2,7 @@
 #==============================================================================
 #
 #    CVS Snapshot Generation Script
-#    Copyright (C) 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#    Copyright (C) 2000,2001 by Eric Sunshine <sunshine@sunshineco.com>
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -59,10 +59,11 @@
 import commands, glob, grp, os, re, string, sys, tempfile, time
 
 prog_name = "snapshot.py"
-prog_version = "10"
+prog_version = "11"
 author_name = "Eric Sunshine"
 author_email = "sunshine@sunshineco.com"
-copyright = "Copyright (C) 2000 by " + author_name + " <" + author_email + ">"
+author_info = author_name + " <" + author_email + ">"
+copyright = "Copyright (C) 2000,2001 by " + author_info
 
 #------------------------------------------------------------------------------
 # Configuration Section
@@ -114,7 +115,7 @@ snapdir = "/home/groups/c/cr/crystal/htdocs/cvs-snapshots"
 keepsnapshots = 2
 keepdiffs = 14
 keeplogs = 14
-workdir = "/tmp"
+workdir = "/home/groups/c/cr/crystal"
 warnlevel = 0
 
 archivers = (
@@ -180,8 +181,12 @@ class Snapshot:
         return (rc[0] == 0)
 
     def removefile(self, path):
-        if os.path.exists(path):
+	try:
             os.remove(path)
+	except OSError, e:
+	    if warnlevel > 1:
+		self.log('Error removing file "' + path + '"; reason: ' +
+			 str(e))
 
     def makedirectory(self, path):
         if not os.path.exists(path) :
