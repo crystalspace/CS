@@ -77,7 +77,6 @@ package cspace;
 *CS_FX_SETALPHA = *cspacec::CS_FX_SETALPHA;
 *CS_FX_SETALPHA_INT = *cspacec::CS_FX_SETALPHA_INT;
 *AUTOLOAD = *cspacec::AUTOLOAD;
-*scfInitialize = *cspacec::scfInitialize;
 *csInitializer_SetupEventHandler = *cspacec::csInitializer_SetupEventHandler;
 *csInitializer_RequestPlugins = *cspacec::csInitializer_RequestPlugins;
 *CS_QUERY_REGISTRY = *cspacec::CS_QUERY_REGISTRY;
