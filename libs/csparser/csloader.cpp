@@ -4242,7 +4242,10 @@ csSector* csLoader::load_room (char* secname, char* buf)
     if (portals[i].is_warp)
     {
       if (portals[i].do_mirror)
+      {
         p->SetWarp (csTransform::GetReflect ( *(p->GetPolyPlane ()) ));
+	p->flags.Set (CS_POLY_COLLDET);
+      }
       else p->SetWarp (portals[i].m_warp, portals[i].v_warp_before,
                         portals[i].v_warp_after);
       p->GetPortal ()->flags.SetBool (CS_PORTAL_STATICDEST, portals[i].do_static);

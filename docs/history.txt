@@ -14,6 +14,7 @@ The history order has been reversed so that new features are at the top.
 	  at http://crystal.sourceforge.net/.
 	    - Added link for online CVS browsing.
 	    - Aesthetic improvements.
+	- Brandon Ehle did some enhancements to Python scripting.
 	- Eric Sunshine made the following changes to the automated
 	  documentation building process:
 	    - docproc.pl now places downloadable documentation package files
@@ -27,6 +28,110 @@ The history order has been reversed so that new features are at the top.
 	      via HTTP and FTP.
 	    - Updated documentation directory annotations (in spoofdir.info
 	      files) appropriately.
+	- Fixed a bug in loader so that collision detection is now also
+	  enabled for mirror surfaces in the ROOM syntax.
+	- Fixed an init bug in csPolygon3D with regards to materials.
+	- Added /lib/stdtex to VFS. This new archive contains a bunch of
+	  textures that are used by most CS levels (stdtex.zip).
+	- Andrew Zabolotny did the following:
+	    - Added to win32conf.bat display a note about which packages
+	      you should have installed. This depends upon which compiler
+	      you use (e.g. it displays slightly different help depending
+	      on whenever you use msvc or mingw32).
+	    - Enhanced the configure help for DJGPP.
+	    - Fixed both dosconf.bat and win32conf.bat (very old bug) to
+	      detect correctly whenever makedep is installed. Earlier it
+	      considered makedep to be always installed.
+	    - Added `walkall' target to compile just the plugins that are
+	      needed for walktest. Currently `make walkall' is equivalent to:
+		make walk soft csfont simpcon perfstat rapid
+	    - Fixed DOS/DJGPP build in debug mode with shared libraries.
+	      Added functions that are usually inlined (e.g. strcmp, memcmp,
+	      strcpy) to the list of exported functions in djgpp/loadlib.cpp.
+	      Fixed a bug in dosraw driver related to the fact that transfer
+	      buffer is overwritten by printf() (which is used in debug
+	      mode to print some videocard information). So, in overall,
+	      DOS port now works in both static/dynamic and optimize/debug
+	      modes.
+	    - Added perfstat plugin to static.cpp if SCL_PERFSTAT macro is
+	      defined. Effectively this adds FPS display for static mode
+	      build.
+	    - Enhanced (fixed) linex2d driver: now it uses "helvetica" font
+	      and GetTextWidth/Height are implemented properly. Also
+	      DrawText() works properly now (previously it painted text
+	      shifted up by some amount).
+	    - Added DrawBox() method to linex2d driver. Also I have fixed
+	      Clear() which were not clearing one pixel horizontally and
+	      vertically.
+	    - Added AllowContextResize(bool) method to iGraphics2D. By default
+	      context resizing is *disallowed*. This is because most
+	      applications won't handle the cscmdContextResize broadcast
+	      correctly, and will misbehave.  Applications which handles
+	      this broadcast correctly should issue AllowContextResize
+	      (true). Note that engine already does this (since engine
+	      handles context resizes) thus you should do this only for
+	      applications that don't use the engine.
+	    - Fixed x2d driver to allow width and height only in steps of 2.
+	      The reason is to not allow odd window width, because in some
+	      cases XFree86 (?) does not like that (every scanline is
+	      shifted by one pixel). I don't think this is a limitation,
+	      but if somebody don't like this, it should limit at least
+	      width to be even.
+	    - Moved glMatrixMode(), glOrtho(), glViewport() to 2D common
+	      OpenGL driver. This was done to allow 2D driver to function
+	      standalone (without 3D).
+	    - Added (not replaced) a new gl2d_font2.cpp, another OpenGL
+	      font "server". I have used glBitmap() to draw font, which
+	      will help on platforms with buggy OpenGL support for
+	      alpha-mapped textures (such as OS/2 and MacOS). We still
+	      have to see how compatible this approach is; but it at least
+	      works with OS/2 software OpenGL 1.0 (previous font rendering
+	      did not). Maybe we should make this a runtime option in
+	      opengl.cfg, I'm not sure. Also I have implemented text
+	      clipping. Vertical clipping seems to work, horizontal
+	      clipping should also work but I cannot fully test it due
+	      to non-implemented "xorig" parameter in glBitmap() in OS/2
+	      OpenGL.
+	    - Implemented runtime context resizing for the OS/2 OpenGL
+	      canvas. Also it respects AllowContextResize(bool).
+	    - Added a new test application: G2DTEST. As you may conclude
+	      from his name, this small application is meant to test most
+	      aspects of 2D graphics canvas plugins. Also it is a curious
+	      example of a application which uses just the graphics canvas
+	      plugin (without 3D renderer).
+	    - Fixed line drawing in graph2d.cpp (this affects most canvas
+	      plug-ins). Now line drawing is absolutely perfect,
+	      floating-point coordinates are correctly used. Even OS/2
+	      OpenGL shows little errors with line drawing, compared to
+	      graph2d.cpp (and OS/2 OpenGL is known to be accurate).
+	      This effectively broke CSWS which was designed for the
+	      "incorrect" line drawing behaviour :)
+	    - Fixed a bug in csOpenGLCommon2D::SaveArea which caused a shift
+	      to the area which is going to be saved.
+	    - Fixed CSWS after last changes to line draw routines. Now
+	      CSWS works with OpenGL, at least on OS/2.
+	    - Added PerformExtension ("flush") to OpenGL common graphics
+	      canvas. This can be used to do performance measurements.
+	    - Improved software line drawing performance from ~5.5
+	      MegaPixels/sec to approximatively ~15.8 MP/sec on Celeron/433.
+	      I think the assembly line drawing routine (which is used only
+	      in Win32/MSVC) should be removed since first of all I think
+	      it is slower, and secondly I doubt it is accurate (e.g. I'm
+	      sure it fails most of the accuracy tests in g2dtest). (for
+	      comparison: OS/2 OpenGL canvas gives just 3MP/sec, XFree86
+	      linex2d driver gives 7.3MP/sec :-). Hurray, we have the
+	      fastest-and-most-accurate line drawing routine in the world! :-)
+	    - Removed the WriteChar() routine from iGraphics2D interface.
+	    - Slightly improved software text drawing speed fom ~300000
+	      characters/sec to ~330000 characters/sec. For comparison:
+	      OS/2 software OpenGL gives ~26000 characters/sec and linex2d
+	      driver gives about ~241000 characters/sec.
+	    - Moved some OpenGL initialization stuff (realted to OpenGL
+	      start-up settings) from 3D driver to the 2D (canvas) driver
+	      (to the common part), to make possible to use OpenGL 2D
+	      driver without the 3D driver.
+	    - Added a note about C_INCLUDE_PATH needed to be set up correctly
+	      before you do "make depend" to the win32gcc.txi file.
 4-Sep-2000
 	- Brandon Ehle did some maintenance to the Python scripting stuff.
 	  Need to wait for next SWIG release for everything to fall in place.

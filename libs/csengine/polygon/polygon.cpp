@@ -206,6 +206,7 @@ csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
 
   if (material) SetMaterial (material);
+  else csPolygon3D::material = NULL;
 
   txt_info = NULL;
   txt_share_list = NULL;
@@ -453,7 +454,7 @@ void csPolygon3D::SetMaterial (csMaterialWrapper* material)
 
 iMaterialHandle* csPolygon3D::GetMaterialHandle ()
 {
-  return material->GetMaterialHandle ();
+  return material ? material->GetMaterialHandle () : NULL;
 }
 
 void csPolygon3D::eiPolygon3D::CreatePlane (const csVector3 &iOrigin, const csMatrix3 &iMatrix)
