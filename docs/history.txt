@@ -1,6 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
 11-Mar-2001
+	- Norman Kramer renamed avi codec classnames from codec.*
+	  to codec.avi.*.
+	- Norman also removed iCodec interface and replaced it with
+	  iAVICodec that lives in plugins/../format/avi.
+	- Norman added entry for rel codec to the makefiles.
+	- Norman added iAVICodec interface. csAVI now handles format-
+	  extension.
+	- Philip Wyett added new RLE plugin to workspace.
+	- Philip also fixed a compile error in AVI plugin.
+	- Wouter Wijngaards added cube factory saver and cubesaver plugins.
 	- Eric Sunshine fixed some Texinfo mark-up problems in win32.txi.
 	- Eric Sunshine fixed formatting of help message in rle.mak.
 	- Eric Sunshine added DSP.DDG.CFLAGS to ddg.mak in order to augment the
@@ -43,6 +53,12 @@ The history order has been reversed so that new features are at the top.
 	- Wouter implemented the ball factory and object savers.
 	- Wouter fixed another halo bug (a line of garbage on the top side
 	  of the halo).
+	- Thomas Hieber separated the Loader from the actual data storage.
+	  This will allow easy saving of modified data, and conversion to
+	  other formats like binary formats.
+	- Seth Galbraith fixed sprites in squawk to work with new
+	  mesh object system. Sprites actions still don't work and
+	  sprite smoothing is also broken.
 8-Mar-2001
 	- Eric Sunshine moved all of the pure SCF interface header files (the
 	  filenames beginning with `i') into subdirectories of CS/include.
