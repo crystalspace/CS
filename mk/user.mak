@@ -36,6 +36,7 @@ PLUGINS += collide/rapid
 PLUGINS += perfstat
 PLUGINS += bugplug
 PLUGINS += reporter
+PLUGINS += mesh/crossbld
 PLUGINS += mesh/cube/object        mesh/cube/persist/classic
 PLUGINS += mesh/spr2d/object       mesh/spr2d/persist/classic
 PLUGINS += mesh/spr3d/object       mesh/spr3d/persist/classic
