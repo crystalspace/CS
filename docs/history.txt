@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	  all callbacks.
 	- The missing sector callback that is used in the loader is now
 	  self-cleaning.
+	- Added iSector->SetSectorCallback() and other appropriate functions.
+	  This callback will be called whenever the sector is traversed
+	  for lighting or renering.
 21-Sep-2002
 	- Keith Fulton added optimization to dynamic lightmap recalculation
 	  to use tighter loops when overflow protection is not necessary.  These

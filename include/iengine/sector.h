@@ -46,7 +46,24 @@ struct iGraphics3D;
 struct iPolygon3D;
 struct iRenderView;
 
-SCF_VERSION (iSector, 0, 4, 4);
+SCF_VERSION (iSectorCallback, 0, 0, 1);
+
+/**
+ * Set a callback which is called when this sector is traversed.
+ * The given context will be either an instance of iRenderView, iFrustumView,
+ * or else NULL.
+ */
+struct iSectorCallback : public iBase
+{
+  /**
+   * Sector will be traversed. It is safe to delete this callback
+   * in this function.
+   */
+  virtual void Traverse (iSector* sector, iBase* context) = 0;
+};
+
+
+SCF_VERSION (iSector, 0, 4, 5);
 
 /**
  * The iSector interface is used to work with "sectors". A "sector"
@@ -159,6 +176,23 @@ struct iSector : public iBase
 
   /// Draw the sector with the given render view
   virtual void Draw (iRenderView* rview) = 0;
+
+  /**
+   * Set the sector callback. This will call IncRef() on the callback
+   * So make sure you call DecRef() to release your own reference.
+   */
+  virtual void SetSectorCallback (iSectorCallback* cb) = 0;
+
+  /**
+   * Remove a sector callback.
+   */
+  virtual void RemoveSectorCallback (iSectorCallback* cb) = 0;
+
+  /// Get the number of sector callbacks.
+  virtual int GetSectorCallbackCount () const = 0;
+  
+  /// Get the specified sector callback.
+  virtual iSectorCallback* GetSectorCallback (int idx) const = 0;
 };
 
 

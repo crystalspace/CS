@@ -137,6 +137,12 @@ csSector::~csSector ()
   CS_ASSERT (references.Length () == 0);
 
   lights.DeleteAll ();
+  int i;
+  for (i = 0 ; i < sector_cb_vector.Length () ; i++)
+  {
+    iSectorCallback* cb = (iSectorCallback*)sector_cb_vector.Get (i);
+    cb->DecRef ();
+  }
 
   // rendering queues are deleted automatically.
 }
@@ -677,6 +683,14 @@ void csSector::Draw (iRenderView *rview)
   iCamera *icam = rview->GetCamera ();
   rview->SetThisSector (&scfiSector);
 
+  i = sector_cb_vector.Length ()-1;
+  while (i >= 0)
+  {
+    iSectorCallback* cb = (iSectorCallback*)sector_cb_vector.Get (i);
+    cb->Traverse (&scfiSector, rview);
+    i--;
+  }
+
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
   if (rview->GetCallback ())
@@ -848,6 +862,14 @@ void csSector::Draw (iRenderView *rview)
 
 void csSector::CheckFrustum (iFrustumView *lview)
 {
+  int i = sector_cb_vector.Length ()-1;
+  while (i >= 0)
+  {
+    iSectorCallback* cb = (iSectorCallback*)sector_cb_vector.Get (i);
+    cb->Traverse (&scfiSector, lview);
+    i--;
+  }
+
   csCBufferCube *cb = engine->GetCBufCube ();
   cb->MakeEmpty ();
   RealCheckFrustum (lview);
