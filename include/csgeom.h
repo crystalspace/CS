@@ -21,7 +21,6 @@
 #include "csgeom/box.h"
 #include "csgeom/bsptree.h"
 #include "csgeom/chainhull2d.h"
-#include "csgeom/crysball.h"
 #include "csgeom/cspoint.h"
 #include "csgeom/csrect.h"
 #include "csgeom/csrectrg.h"

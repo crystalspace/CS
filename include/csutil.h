@@ -64,7 +64,6 @@
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
 #include "csutil/hashr.h"
-#include "csutil/indprint.h"
 #include "csutil/inputdef.h"
 #include "csutil/leakguard.h"
 #include "csutil/list.h"

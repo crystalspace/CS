@@ -1607,3 +1607,15 @@ while (iter.HasNext())
 @noindent
 Code using @samp{csStringHashIterator} can be fixed using the same simple
 transformation.
+
+@subheading Miscellaneous Removals
+
+The following facilities have been removed because they were unused and/or of
+questionable use.
+
+@itemize @bullet
+@item
+@code{csCrystalBall} and @file{csgeom/crysball.h}
+@item
+@code{csIndPrint} and @file{csutil/indprint.h}
+@end itemize

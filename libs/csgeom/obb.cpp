@@ -22,7 +22,6 @@
 #include "obb_priv.h"
 #include "csgeom/transfrm.h"
 #include "csqsqrt.h"
-#include "csutil/indprint.h"
 
 //=============================================================================
 

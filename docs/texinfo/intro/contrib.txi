@@ -965,11 +965,11 @@ contributed a FreeType font server plug-in.  He added a grid-view to @sc{csws}.
 He also added a sound renderer using the ``artsd'' sound server that comes with
 the ``aRts'' system (www.arts-project.org).  Norman added an export script for
 Blender.  He added texture coordinate animation to 2D sprites.  He worked on
-the video file streamer.  Norman also added the (unused) @samp{csCrystalBall}
-culler and the fancy console plugin.  In addition he also did a good deal of
-work on the OpenGL renderer (mostly support for extensions).  Norman worked on
-@sc{aws} and created a convertor from @sc{qt} to @sc{aws}.  Norman also added
-several sound related modules, such as ``ogg''.
+the video file streamer.  Norman also added the (unused and removed)
+@samp{csCrystalBall} culler and the fancy console plugin.  In addition he also
+did a good deal of work on the OpenGL renderer (mostly support for extensions).
+Norman worked on @sc{aws} and created a convertor from @sc{qt} to @sc{aws}.
+Norman also added several sound related modules, such as ``ogg''.
 
 @item
 Olivier Langlois (@email{olanglois@@sympatico.ca})

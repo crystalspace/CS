@@ -19,6 +19,9 @@ chronological order.
 	    MemTrackerRegistry            --> csMemTrackerRegistry
 	    RegisterMemoryTrackerModule() --> mtiRegisterModule()
 	- res fixed terrain being too high when using RGB images due a typo.
+	- Eric Sunshine removed the following unused modules:
+	    csCrystalBall
+	    csIndPrint
 4-Apr-2005
 	- res made the following changes:
 	    - Changed some internals of shader program variable mappings; now
