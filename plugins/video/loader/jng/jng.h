@@ -25,6 +25,7 @@
 #include "iutil/comp.h"
 #include "iutil/databuff.h"
 #include "csutil/csvector.h"
+#include "csutil/memfile.h"
 
 /**
  * The JNG image file format loader.
@@ -34,6 +35,16 @@ class csJNGImageIO : public iImageIO
  protected:
   csVector formats;
   iObjectRegistry* object_reg;
+
+ private:
+  csMemFile *outfile;
+  iImage *imgRGBA;
+
+  /// write something to our output stream
+  static mng_bool MNG_DECL cb_writedata (mng_handle hHandle, mng_ptr pBuf,
+                                         mng_uint32 iBuflen, mng_uint32p pWritten);
+  /// libmng wants a line in the buffer
+  static mng_ptr MNG_DECL cb_getcanvasline(mng_handle hHandle, mng_uint32 iLinenr);
 
  public:
   SCF_DECLARE_IBASE;
@@ -74,35 +85,22 @@ private:
   csRGBpixel *NewImage;
   iObjectRegistry* object_reg;
 
-  /// memory alloc callback for libmng
-  static mng_ptr MNG_DECL mng_alloc (mng_size_t iLen);
-  /// memory free callback for libmng
-  static void MNG_DECL mng_free (mng_ptr iPtr, mng_size_t iLen);
-  /// stream open callback for libmng
-  static mng_bool MNG_DECL mng_openstream (mng_handle hMNG);
-  /// stream close callback for libmng
-  static mng_bool MNG_DECL mng_closestream (mng_handle hMNG);
   /// stream read callback for libmng
-  static mng_bool MNG_DECL mng_readdata(mng_handle hHandle, mng_ptr pBuf,
-			                mng_uint32 iBuflen, mng_uint32 *pRead);
+  static mng_bool MNG_DECL cb_readdata(mng_handle hHandle, mng_ptr pBuf,
+			               mng_uint32 iBuflen, mng_uint32 *pRead);
   /// libmng tells us width/height through this
-  static mng_bool MNG_DECL mng_processheader(mng_handle hHandle, 
-					     mng_uint32 iWidth, mng_uint32 iHeight);
+  static mng_bool MNG_DECL cb_processheader(mng_handle hHandle, 
+					    mng_uint32 iWidth, mng_uint32 iHeight);
   /// libmng wants a line in the buffer
-  static mng_ptr MNG_DECL mng_getcanvasline(mng_handle hHandle, mng_uint32 iLinenr);
+  static mng_ptr MNG_DECL cb_getcanvasline(mng_handle hHandle, mng_uint32 iLinenr);
   /// libmng tells us that an area of the image has updated
-  static mng_bool MNG_DECL mng_imagerefresh(mng_handle hHandle, mng_uint32 iX, 
-					    mng_uint32 iY, mng_uint32 iWidth, 
-					    mng_uint32 iHeight);
+  static mng_bool MNG_DECL cb_imagerefresh(mng_handle hHandle, mng_uint32 iX, 
+					   mng_uint32 iY, mng_uint32 iWidth, 
+					   mng_uint32 iHeight);
   /// libmng wants to know the time...
-  static mng_uint32 MNG_DECL mng_gettickcount (mng_handle hHandle);
+  static mng_uint32 MNG_DECL cb_gettickcount (mng_handle hHandle);
   /// libmng wants us to set up a timer
-  static mng_bool MNG_DECL mng_settimer (mng_handle hHandle, mng_uint32 iMsecs);
-
-  /// report something
-  void Report (int severity, const char* msg, ...);
-  /// report libmng error information 
-  void ReportLibmngError (mng_handle hMNG, char* msg);
+  static mng_bool MNG_DECL cb_settimer (mng_handle hHandle, mng_uint32 iMsecs);
 
   /// Initialize the image object
   ImageJngFile (int iFormat, iObjectRegistry* p) : csImageFile (iFormat) 

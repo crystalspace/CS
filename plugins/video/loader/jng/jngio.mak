@@ -52,7 +52,7 @@ DEP.JNGIMG = CSUTIL CSSYS CSGFX CSUTIL
 MSVC.DSP += JNGIMG
 DSP.JNGIMG.NAME = csjngimg
 DSP.JNGIMG.TYPE = plugin
-DSP.JNGIMG.LIBS = libmng
+DSP.JNGIMG.LIBS = libmng zlib libjpeg
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

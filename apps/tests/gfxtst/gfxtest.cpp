@@ -193,8 +193,11 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
       const char* defext =  strchr (output_mime, '/');
       if (defext)
       {
+	defext++;
+	// skip a leading "x-" in the mime type (eg "image/x-jng")
+	if (!strncmp (defext, "x-", 2)) defext += 2; 
         strcat (eol, ".");
-        strcat (eol, defext + 1); // default ext from mime type
+        strcat (eol, defext); // default ext from mime type
       }
     }
   }
@@ -207,10 +210,18 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
 
 #if 1
   iDataBuffer *db = ImageLoader->Save (ifile, output_mime, output_opts);
-  FILE *f = fopen (outname, "wb");
-  if (f)
-    fwrite (db->GetData (), 1, db->GetSize (), f);
-  fclose (f);
+  if (db)
+  {
+    FILE *f = fopen (outname, "wb");
+    if (f)
+      fwrite (db->GetData (), 1, db->GetSize (), f);
+    fclose (f);
+    db->DecRef();
+  }
+  else
+  {
+    printf ("Failed to save %s. Plugin returned no data.\n", outname);
+  }
 #else
     SavePNM (outname, ifile->GetImageData (), ifile->GetWidth (), ifile->GetHeight (),
        (ifile->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR));
@@ -528,7 +539,7 @@ int main (int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdas:m:t:p:D:S:M:O:P:U::H::IhvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdas:m:t:p:D:S::M:O:P:U::H::IhvV", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -562,11 +573,7 @@ int main (int argc, char *argv[])
         break;
       case 'S':
         opt.outputmode = 0;
-	if (optarg && sscanf (optarg, "%s", output_name) != 1)
-	{
-          printf ("%s: expecting optional <filename> after -S\n", programname);
-          return -1;
-	}
+	if (optarg) sscanf (optarg, "%s", output_name);
 	break;
       case 'M':
 	if (optarg && sscanf (optarg, "%s", output_mime) != 1)

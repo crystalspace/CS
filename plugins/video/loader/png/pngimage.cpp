@@ -136,6 +136,10 @@ iDataBuffer *csPNGImageIO::Save (iImage *Image, iImageIO::FileFormatDescription 
        compress=#   image compression, 0..100 higher values give smaller files,
 		    but take longer to encode.
        progressive  interlaced output.
+   
+     examples:
+       compress=50
+       progressive,compress=30
    */
   const char *current_opt = extraoptions;
   while (current_opt && *current_opt)

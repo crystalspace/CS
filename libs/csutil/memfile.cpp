@@ -122,7 +122,7 @@ iDataBuffer *csMemFile::GetAllData()
     memcpy (data, buffer, size);
     free (buffer);
   }
-  iDataBuffer *db = new csDataBuffer (buffer, size);
+  iDataBuffer *db = new csDataBuffer (data, size);
   // Set disposition to 'DELETE' so that if Write() is called later on,
   // memory allocated for it will be correctly deallocated.  Do not use
   // 'IGNORE' here.
