@@ -38,16 +38,21 @@ TextureCache16::~TextureCache16 ()
 void TextureCache16::create_lighted_texture (TCacheData& tcd, TCacheLightedTexture* tclt,
 	csTextureManagerSoftware* txtmgr)
 {
-  if (tcd.lm_only) create_lighted_texture_lightmaps (tcd, tclt, txtmgr);
-  else if (tcd.txtmode == TXT_PRIVATE) create_lighted_texture_true_rgb_priv (tcd, tclt, txtmgr);
-  else if (tcd.txtmode == TXT_24BIT) create_lighted_texture_24bit (tcd, tclt, txtmgr);
-  else create_lighted_texture_true_rgb (tcd, tclt, txtmgr);
+  if (tcd.lm_only)
+    create_lighted_texture_lightmaps (tcd, tclt, txtmgr);
+  else if (tcd.txtmode == TXT_PRIVATE)
+    create_lighted_texture_true_rgb_priv (tcd, tclt, txtmgr);
+  else if (tcd.txtmode == TXT_24BIT)
+    create_lighted_texture_24bit (tcd, tclt, txtmgr);
+  else
+    create_lighted_texture_true_rgb (tcd, tclt, txtmgr);
 
-  if (tcd.lm_grid) show_lightmap_grid (tcd, tclt, txtmgr);
+  if (tcd.lm_grid)
+    show_lightmap_grid (tcd, tclt, txtmgr);
 }
 
-void TextureCache16::create_lighted_texture_true_rgb (TCacheData& tcd, TCacheLightedTexture* tclt,
-	csTextureManagerSoftware* txtmgr)
+void TextureCache16::create_lighted_texture_true_rgb (TCacheData& tcd,
+  TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr)
 {
   int w = tcd.width;
   int h = tcd.height;
