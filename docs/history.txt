@@ -25,6 +25,9 @@ Short-term cleanups that need to be done:
 	  Manager.  He also renamed types, classes, & constants, and
 	  reformatted the source code to more closely follow CS guidelines.
 	- Eric Sunshine removed some obsolete COM junk from the sound drivers.
+	- Eric Sunshine eliminated a compilation warning in ddgbtree.cpp
+	- Eric Sunshine ported the Socket Network Driver to BeOS.  It is now
+	  fully functional on this platform.
 29-Nov-1999
 	- Andrew Zabolotny did the following changes:
 	    - Fully rewrote halo support in software renderer. The
