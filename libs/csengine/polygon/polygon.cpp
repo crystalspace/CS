@@ -319,12 +319,11 @@ csPolyTexture* csPolygon3D::GetPolyTex (int mipmap)
 
 bool csPolygon3D::IsTransparent ()
 {
-  if (GetAlpha ()) return true;
-  //ITextureHandle* th = get_polytex (0)->get_texture_handle ();
-  ITextureHandle* th = GetTextureHandle ();
-  int idx;
-  th->GetTransparent (idx);
-  return idx != -1;
+  if (GetAlpha ())
+    return true;
+  bool transp;
+  GetTextureHandle ()->GetTransparent (transp);
+  return transp;
 }
 
 bool csPolygon3D::SamePlane (csPolygonInt* p)
