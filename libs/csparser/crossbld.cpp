@@ -77,8 +77,6 @@ void csCrossBuild_SpriteTemplateFactory::CrossBuild (csBase* object,
   csSpriteTemplate *newtemplate = (csSpriteTemplate*)object;
   buildsource.set_animation_frame(0);
 
-  newtemplate->AddVertices(buildsource.num_cor3);
-
   // build the triangle mesh
   Build_TriangleMesh(*newtemplate, buildsource);
 
@@ -108,6 +106,9 @@ void csCrossBuild_SpriteTemplateFactory::Build_Frame
   newframe->SetName(buildsource.object_name);
   int anm_idx = newframe->GetAnmIndex();
   int tex_idx = newframe->GetTexIndex();
+
+  if (framesource.GetNumFrames() == 1)
+    framesource.AddVertices(buildsource.num_cor3);
 
   for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
   {
