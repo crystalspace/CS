@@ -126,9 +126,15 @@ void SysMouseDriver::Close(void)
 void SysSystemDriver::SetSystemDefaults()
 {
 	csSystemDriver::SetSystemDefaults();
-	FRAME_WIDTH  = 320; if (config) FRAME_WIDTH = config->GetInt("VideoDriver", "WIDTH", FRAME_WIDTH);
-	FRAME_HEIGHT = 200; if (config) FRAME_HEIGHT = config->GetInt("VideoDriver", "HEIGHT", FRAME_HEIGHT);
-	Depth        = 8;   if (config) Depth = config->GetInt("VideoDriver", "DEPTH",  Depth);
+	FRAME_WIDTH  = 320;
+	FRAME_HEIGHT = 200;
+	Depth        = 8;
+	if (config)
+	{
+		FRAME_WIDTH = config->GetInt("VideoDriver", "WIDTH", FRAME_WIDTH);
+		FRAME_HEIGHT = config->GetInt("VideoDriver", "HEIGHT", FRAME_HEIGHT);
+		Depth = config->GetInt("VideoDriver", "DEPTH",  Depth);
+	}
 }
 
 bool SysSystemDriver::ParseArg(int argc, char* argv[], int& i)

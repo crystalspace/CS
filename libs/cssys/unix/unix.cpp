@@ -1,16 +1,16 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -52,7 +52,7 @@ void handler (int sig)
   SysSystemDriver::Shutdown = true;
   cleanup ();
   exit (1);
-} 
+}
 
 void init_sig ()
 {
@@ -87,9 +87,17 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver (), Callback (NULL)
 void SysSystemDriver::SetSystemDefaults ()
 {
   csSystemDriver::SetSystemDefaults ();
-  SimDepth = 0; if (config) SimDepth = config->GetYesNo ("VideoDriver", "SIMULATE_DEPTH", SimDepth);
-  UseSHM = 1; if (config) UseSHM = config->GetYesNo ("VideoDriver", "XSHM", UseSHM);
-  HardwareCursor = 1; if (config) HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor);
+  SimDepth = 0;
+  UseSHM = true;
+  HardwareCursor = true;
+  if (config)
+  {
+    SimDepth = config->GetYesNo ("VideoDriver", "SIMULATE_DEPTH", SimDepth);
+    if (config)
+      UseSHM = config->GetYesNo ("VideoDriver", "XSHM", UseSHM);
+    if (config)
+      HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor);
+  }
 }
 
 bool SysSystemDriver::ParseArg (int argc, char* argv[], int &i)
@@ -97,9 +105,7 @@ bool SysSystemDriver::ParseArg (int argc, char* argv[], int &i)
   if (strcasecmp ("-shm", argv[i]) == 0)
     UseSHM = true;
   else if (strcasecmp ("-noshm", argv[i]) == 0)
-  {
     UseSHM = false;
-  }
   else if (strcasecmp ("-sdepth", argv[i]) == 0)
   {
     i++;
@@ -227,7 +233,7 @@ void SysMouseDriver::Handler (int Button, int Down, int x, int y,
 {
   if (!Ready ())
     return;
-    
+
   if (Button == 0)
     do_mousemotion (::System->Time (), x, y);
   else if (Down)

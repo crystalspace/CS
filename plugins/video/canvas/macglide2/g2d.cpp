@@ -43,8 +43,6 @@ extern void out(char *str, ...);
 #include "cs3d/glide2/g3dglide.h"
 #include "cs3d/glide2/glidelib.h"
 
-#define NAME "Crystal"
-
 BEGIN_INTERFACE_TABLE(csGraphics2DGlide2x)
     IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
     IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
@@ -188,7 +186,7 @@ bool csGraphics2DGlide2x::Open(char *Title)
   wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
   wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
 
-  m_hWnd = CreateWindowEx(exStyle, NAME, Title, style,
+  m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, Title, style,
 	                      (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
                           (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
                           wwidth, wheight, NULL, NULL, gb_hInstance, NULL );

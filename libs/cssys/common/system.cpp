@@ -220,12 +220,18 @@ bool csSystemDriver::Open (char *Title)
 
 void csSystemDriver::Close(void)
 {
-  if (piSound) piSound->Close ();
-  if (piNetMan) piNetMan->Close ();
-  if (piNetDrv) piNetDrv->Close ();
-  if (piG3D) piG3D->Close ();
-  if (Keyboard) Keyboard->Close ();
-  if (Mouse) Mouse->Close ();
+  if (piSound)
+    piSound->Close ();
+  if (piNetMan)
+    piNetMan->Close ();
+  if (piNetDrv)
+    piNetDrv->Close ();
+  if (piG3D)
+    piG3D->Close ();
+  if (Keyboard)
+    Keyboard->Close ();
+  if (Mouse)
+    Mouse->Close ();
 }
 
 bool csSystemDriver::InitGraphics ()
@@ -233,10 +239,12 @@ bool csSystemDriver::InitGraphics ()
   HRESULT hRes;
   IGraphicsContextFactory* pFactory;
 
-  hRes = csCoGetClassObject (clsidRenderSystem, CLSCTX_INPROC_SERVER, NULL, IID_IGraphicsContextFactory, (void**)&pFactory);
+  hRes = csCoGetClassObject (clsidRenderSystem, CLSCTX_INPROC_SERVER, NULL,
+    IID_IGraphicsContextFactory, (void**)&pFactory);
   if (FAILED(hRes)) goto OnError;
 
-  hRes = pFactory->CreateInstance ((REFIID)IID_IGraphics3D, GetISystemFromSystem(this), (void**)&piG3D);
+  hRes = pFactory->CreateInstance ((REFIID)IID_IGraphics3D,
+    GetISystemFromSystem(this), (void**)&piG3D);
   if (FAILED(hRes)) goto OnError;
 
   hRes = piG3D->Get2dDriver (&piG2D);

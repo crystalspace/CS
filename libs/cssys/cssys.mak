@@ -7,6 +7,8 @@
 #     included into cssys library
 # SRC.SYS_CSSYS_DLL
 #   - additional source files needed only for dynamic libraries
+# SRC.SYS_CSSYS_EXE
+#   - additional source files needed only for executable files
 #
 
 # Library description
@@ -41,6 +43,8 @@ SRC.CSSYS = libs/cssys/common/csendian.cpp libs/cssys/common/system.cpp \
   $(SRC.SYS_CSSYS)
 ifeq ($(MAKE_DLL),yes)
   SRC.CSSYS += $(SRC.SYS_CSSYS_DLL)
+else
+  SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
 endif
 OBJ.CSSYS = $(addprefix $(OUT),$(notdir $(subst .s,$O,$(subst .c,$O,$(SRC.CSSYS:.cpp=$O)))))
 
@@ -63,7 +67,7 @@ cssysclean:
 
 ifdef DO_DEPEND
 $(OUTOS)cssys.dep: $(SRC.CSSYS)
-	$(DO.DEP) $(OUTOS)cssys.dep
+	$(DO.DEP)
 endif
 
 -include $(OUTOS)cssys.dep

@@ -61,8 +61,6 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
 /////The 2D Graphics Driver//////////////
 
-#define NAME  "Crystal"
-
 BEGIN_INTERFACE_TABLE(csGraphics2DOpenGL)
     IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
     IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
@@ -322,7 +320,7 @@ bool csGraphics2DOpenGL::Open(char *Title)
   wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
   wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
   
-  m_hWnd = CreateWindowEx(exStyle, NAME, Title, style,
+  m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, Title, style,
                           (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
                           (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
                           wwidth, wheight, NULL, NULL, m_hInstance, NULL );

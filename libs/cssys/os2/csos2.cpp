@@ -48,12 +48,21 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 void SysSystemDriver::SetSystemDefaults ()
 {
   csSystemDriver::SetSystemDefaults ();
-  FullScreen = 0; if (config) FullScreen = config->GetYesNo ("VideoDriver", "FULL_SCREEN", FullScreen);
-  WindowX = INT_MIN; if (config) WindowX = config->GetInt ("VideoDriver", "WINDOWX", WindowX);
-  WindowY = INT_MIN; if (config) WindowY = config->GetInt ("VideoDriver", "WINDOWY", WindowY);
-  WindowWidth = -1; if (config) WindowWidth = config->GetInt ("VideoDriver", "WINDOWWIDTH", WindowWidth);
-  WindowHeight = -1; if (config) WindowHeight = config->GetInt ("VideoDriver", "WINDOWHEIGHT", WindowHeight);
-  HardwareCursor = 1; if (config) HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor);
+  FullScreen = false;
+  WindowX = INT_MIN;
+  WindowY = INT_MIN;
+  WindowWidth = -1;
+  WindowHeight = -1;
+  HardwareCursor = true;
+  if (config)
+  {
+    FullScreen = config->GetYesNo ("VideoDriver", "FULL_SCREEN", FullScreen);
+    WindowX = config->GetInt ("VideoDriver", "WINDOWX", WindowX);
+    WindowY = config->GetInt ("VideoDriver", "WINDOWY", WindowY);
+    WindowWidth = config->GetInt ("VideoDriver", "WINDOWWIDTH", WindowWidth);
+    WindowHeight = config->GetInt ("VideoDriver", "WINDOWHEIGHT", WindowHeight);
+    HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor);
+  }
 }
 
 void SysSystemDriver::Help ()
