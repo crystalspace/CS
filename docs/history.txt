@@ -56,6 +56,8 @@ chronological order.
 	  on platforms which provide them). This fixes a bunch of build errors.
 	- Eric Sunshine added a check for the PRIx99 macros to configure.ac.
 	  If available, CS_HAVE_C_FORMAT_MACROS is emitted to csconfig.h.
+	- Eric Sunshine augmented csdef.h so that it fakes up the commonly used
+	  PRIx99 macros if the platform does not supply them.
 3-Apr-2005
 	- Eric Sunshine updated csBlockAllocator<> so that it automatically
 	  destroys contained objects at its own destruction time rather than

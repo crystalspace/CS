@@ -96,7 +96,8 @@
 
 // Platforms which have floating-point variations of the standard math.h
 // cos(), sin(), tan(), sqrt(), etc. functions should define
-// CS_HAVE_MATH_H_FLOAT_FUNCS.
+// CS_HAVE_MATH_H_FLOAT_FUNCS. For platforms which do not provide these
+// macros, we fake them up.
 #if !defined(CS_HAVE_MATH_H_FLOAT_FUNCS)
   #define acosf(X)    CS_STATIC_CAST(float,acos(X))
   #define asinf(X)    CS_STATIC_CAST(float,asin(X))
@@ -115,6 +116,66 @@
   #define tanf(X)     CS_STATIC_CAST(float,tan(X))
   #define floorf(X)   CS_STATIC_CAST(float,floor(X))
   #define ceilf(X)    CS_STATIC_CAST(float,ceil(X))
+#endif
+
+// Platforms which have the PRIx99 printf()-formatting directives should define
+// CS_HAVE_C_FORMAT_MACROS. For platforms which do not provide these macros, we
+// fake up the commonly used ones.
+#if !defined(CS_HAVE_C_FORMAT_MACROS)
+  #if CS_PROCESSOR_SIZE == 64
+    #define __CS_PRI64_PREFIX	"l"
+  #else
+    #define __CS_PRI64_PREFIX	"ll"
+  #endif
+
+  #ifndef PRId8
+    #define PRId8  "d"
+  #endif
+  #ifndef PRId16
+    #define PRId16 "d"
+  #endif
+  #ifndef PRId32
+    #define PRId32 "d"
+  #endif
+  #ifndef PRId64
+    #define PRId64 __CS_PRI64_PREFIX "d"
+  #endif
+  #ifndef PRIu8
+    #define PRIu8  "u"
+  #endif
+  #ifndef PRIu16
+    #define PRIu16 "u"
+  #endif
+  #ifndef PRIu32
+    #define PRIu32 "u"
+  #endif
+  #ifndef PRIu64
+    #define PRIu64 __CS_PRI64_PREFIX "u"
+  #endif
+  #ifndef PRIx8
+    #define PRIx8  "x"
+  #endif
+  #ifndef PRIx16
+    #define PRIx16 "x"
+  #endif
+  #ifndef PRIx32
+    #define PRIx32 "x"
+  #endif
+  #ifndef PRIx64
+    #define PRIx64 __CS_PRI64_PREFIX "x"
+  #endif
+  #ifndef PRIX8
+    #define PRIX8  "X"
+  #endif
+  #ifndef PRIX16
+    #define PRIX16 "X"
+  #endif
+  #ifndef PRIX32
+    #define PRIX32 "X"
+  #endif
+  #ifndef PRIX64
+    #define PRIX64 __CS_PRI64_PREFIX "X"
+  #endif
 #endif
 
 // Platforms with compilers which understand the new C++ keyword `explicit'
