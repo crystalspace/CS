@@ -18,7 +18,7 @@
 */
 
 /**
- * This is an hardware accelerated dynamic texture renderer for opengl based
+ * This is an hardware accelerated procedural texture renderer for opengl based
  * on Normans Glide implementation:
  *
  * And here is the basic idea:
@@ -28,8 +28,8 @@
  * To keep the backbuffer intact we save and restore the area. TODO..
  */
 
-#ifndef _OGL_DYNTEXBACK_H_
-#define _OGL_DYNTEXBACK_H_
+#ifndef _OGL_PROCTEXBACK_H_
+#define _OGL_PROCTEXBACK_H_
 
 #include "igraph3d.h"
 #include "igraph2d.h"
@@ -40,37 +40,37 @@
 #include "csgeom/transfrm.h"
 
 class csTextureMMOpenGL;
-class csTextureOpenGLDynamic;
+class csTextureProcOpenGL;
 class csClipper;
 
-
-
-class csOpenGLDynamicBackBuffer : public csGraphics3DOGLCommon
+class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 {
  protected:
   csTextureMMOpenGL *tex;
-  csTextureOpenGLDynamic *tex_0;
+  csTextureProcOpenGL *tex_0;
 
   int frame_height, pixel_bytes;
-  csPixelFormat *pfmt;
+  csPixelFormat pfmt;
   bool rstate_bilinearmap;
 
   // The pair of intefaces to the frame buffer
   csGraphics3DOGLCommon *g3d;
   iGraphics2D *g2d;
+
  public:
   DECLARE_IBASE;
 
-  csOpenGLDynamicBackBuffer (iBase *parent);
+  csOpenGLProcBackBuffer (iBase *parent);
 
-  virtual ~csOpenGLDynamicBackBuffer ();
+  virtual ~csOpenGLProcBackBuffer ();
 
-  void SetTarget (csGraphics3DOGLCommon *g3d, csTextureMMOpenGL *tex);
+  void Prepare (csGraphics3DOGLCommon *g3d, csTextureMMOpenGL *tex, 
+		csPixelFormat *ipfmt);
 
   virtual bool Initialize (iSystem* /*System*/)
   { return false; }
 
-  virtual bool Open (const char * /*Title*/)
+  virtual bool Open (const char* /*Title*/)
   { return false; }
 
   virtual void Close () {}
@@ -81,21 +81,16 @@ class csOpenGLDynamicBackBuffer : public csGraphics3DOGLCommon
 
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy, int sw, int sh,
 			     int tx, int ty, int tw, int th);
-
-  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
-    int width, int height, csPixelFormat *pfmt, void *buffer, 
-    RGBPixel *palette, int pal_size);
-
+  float GetZBuffValue (int x, int y);
 };
 
 
 // We do all this just to intercept a few calls. Mostly to transform 
 // y co-ordinates to a native opengl screen co-ordinate system, but also
-// to be able to report the correct texture width and height of this context, 
-// even though in reality the underlying buffer is the backbuffer.
+// to be able to report the correct texture width and height of this context.
 
 
-class csOpenGLDynamicBackBuffer2D : public iGraphics2D
+class csOpenGLProcBackBuffer2D : public iGraphics2D
 {
   iGraphics2D *g2d;
   int frame_height, width, height;
@@ -104,9 +99,9 @@ class csOpenGLDynamicBackBuffer2D : public iGraphics2D
  public:
   DECLARE_IBASE;
 
-  csOpenGLDynamicBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight);  
+  csOpenGLProcBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight);  
 
-  virtual ~csOpenGLDynamicBackBuffer2D ();
+  virtual ~csOpenGLProcBackBuffer2D ();
 
   virtual bool Initialize (iSystem* /*System*/)
   { return false; }
@@ -228,15 +223,16 @@ class csOpenGLDynamicBackBuffer2D : public iGraphics2D
   ///
   virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);
 
-
   virtual iImage *ScreenShot () 
   { return g2d->ScreenShot(); }
 
-  virtual iGraphics2D *CreateOffScreenCanvas (int /*width*/, int /*height*/, 
-    csPixelFormat* /*pfmt*/, void* /*buffer*/, RGBPixel* /*palette*/, 
-    int /*pal_size*/, int /*flags*/) 
+  virtual iGraphics2D *CreateOffScreenCanvas 
+  (int /*width*/, int /*height*/, void* /*buffer*/, csOffScreenBuffer /*hint*/, 
+   csPixelFormat* /*ipfmt = NULL*/, RGBPixel* /*palette = NULL*/, 
+   int /*pal_size = 0*/)
   { return NULL; }
+
 };
 
 
-#endif // _OGL_DYNTEXBACK_H_
+#endif // _OGL_PROCTEXBACK_H_
