@@ -130,6 +130,13 @@ class CS_CSGFX_EXPORT csColorQuantizer
 {
 private:
   friend struct csColorBox;
+  struct ColorIndex
+  {
+    int index;
+    csColorBox* box;
+
+    ColorIndex() : box(0) {}
+  };
 
   // The storage for color usage histogram.
   uint16 *hist;
@@ -141,7 +148,7 @@ private:
   // Number of valid color boxes.
   int boxcount;
   // The storage for color indices.
-  uint8 *color_index;
+  ColorIndex* color_index;
 
   // The state of quantization variables
   enum

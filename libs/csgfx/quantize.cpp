@@ -299,11 +299,12 @@ struct csColorBox
   }
 };
 
-static csColorQuantizer* compare_boxes_quant = 0;
 int csColorQuantizer::compare_boxes (const void *i1, const void *i2)
 {
-  int count1 = compare_boxes_quant->box [*(uint8 *)i1].PixelCount;
-  int count2 = compare_boxes_quant->box [*(uint8 *)i2].PixelCount;
+  CS_ASSERT (((ColorIndex*)i1)->box != 0);
+  CS_ASSERT (((ColorIndex*)i2)->box != 0);
+  int count1 = ((ColorIndex*)i1)->box->PixelCount;
+  int count2 = ((ColorIndex*)i2)->box->PixelCount;
   return (count1 > count2) ? -1 : (count1 == count2) ? 0 : +1;
 }
 
@@ -554,13 +555,14 @@ void csColorQuantizer::Palette (csRGBpixel *&outpalette,
 
   // Assign successive palette indices to all boxes
   int count, delta = transp ? 1 : 0;
-  color_index = new uint8 [boxcount + delta];
+  color_index = new ColorIndex[boxcount + delta];
   for (count = 0; count < boxcount; count++)
-    color_index [count] = count;
+  {
+    color_index[count].index = count;
+    color_index[count].box = box + count;
+  }
   // Sort palette indices by usage (a side bonus to quantization)
-  compare_boxes_quant = this;
-  qsort (color_index, boxcount, sizeof (uint8), compare_boxes);
-  compare_boxes_quant = 0;
+  qsort (color_index, boxcount, sizeof (ColorIndex), compare_boxes);
 
   // Allocate the palette, if not already allocated
   if (!outpalette)
@@ -572,14 +574,18 @@ void csColorQuantizer::Palette (csRGBpixel *&outpalette,
 
   // Now compute the mean color for each box
   for (count = 0; count < boxcount; count++)
-    box [color_index [count]].GetMeanColor (outpalette [count + delta]);
+    color_index[count].box->GetMeanColor (outpalette [count + delta]);
 
   // If we have a transparent color, set colormap entry 0 to it
   if (delta)
   {
     for (count = boxcount; count; count--)
-      color_index [count] = color_index [count - 1] + 1;
-    color_index [0] = 0;
+    {
+      color_index[count].index = color_index[count - 1].index + 1;
+      color_index[count].box = box + color_index[count].index;
+    }
+    color_index[0].index = 0;
+    color_index[0].box = box;
     outpalette [0] = csRGBpixel (0, 0, 0);
   }
 
@@ -606,7 +612,8 @@ void csColorQuantizer::Remap (csRGBpixel *image, int pixels,
   {
     // Now, fill inverse colormap with color indices
     for (count = 0; count < boxcount; count++)
-      box [color_index [count + delta] - delta].FillInverseCMap (icmap, count + delta);
+      box [color_index[count + delta].index - delta].FillInverseCMap (
+	icmap, count + delta);
     qState = qsRemap;
   }
 

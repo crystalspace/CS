@@ -9,6 +9,9 @@ chronological order.
 12-Mar-2005
 	- res fixed csPrintfFormatter to actually properly handle argument
 	  number specification (like in %3$d to take the 3rd argument).
+	- res fixed a problem in csColorQuantizer where a static variable used
+	  to qsort an array became 0 and caused crashes (possibly due lack of
+	  thread-safety). Removed need for static var.
 11-Mar-2005
 	- Jorrit fixed the simple2 tutorial in the documentation so that it
 	  explicitly states that you shouldn't use the scale.
