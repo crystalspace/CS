@@ -220,21 +220,4 @@ class UnrealMap:
 		return params
 
 def Load(file):
-#   	file='data/extremegen'
-#    	file='data/bluff'
-    	filepym=file+'.pym'
-    	filet3d=file+'.t3d'
-    	try:
-    		print 'Unrmap: Opening '+filepym
-    		asdf
-		a=pickle.load(open(filepym,'r'))
-	except:
-		print 'Unrmap: File not openable, attempting conversion of '+filet3d
-	 	m=UnrealMap()
-		m.Load(filet3d)
-		m.Save(filepym)
-		a=m.map
-	print 'Unrmap: Map loaded, creating...'
-	a.Load()
-	a.Count()
-#Load('/code/CS/data/entry')
+	print 'This used to work, but now its just a test case'

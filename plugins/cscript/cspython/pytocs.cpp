@@ -65,11 +65,3 @@ void InitPytocs() {
   System=NULL;
 }
 
-//TODO Move
-#include "isystem.h"
-#include "csparser/csloader.h"
-iSystem* GetSystem() {
-  return thisclass->Sys;
-}
-
-void* GetMyPtr() { return thisclass->Storage; }
