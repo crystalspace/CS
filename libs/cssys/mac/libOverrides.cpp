@@ -23,16 +23,6 @@
 	
 ----------------------------------------------------------------*/
 
-// We define our own versions of these
-#define fopen mac_fopen
-#define fgets mac_fgets
-#define access mac_access
-#define mkdir mac_mkdir
-#define unlink mac_unlink
-#define rmdir mac_rmdir
-#define chdir mac_chdir
-#define getcwd mac_getcwd
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ansi_files.h>
@@ -42,23 +32,22 @@
 #include <misc_io.h>
 #include <stat.h>
 #include <string.h>
+#ifdef __cplusplus 
+	extern "C" {
+#endif
+#include <fsp_fopen.h>
+#ifdef __cplusplus 
+}
+#endif
 #define SYSDEF_UNLINK
 #define SYSDEF_ACCESS
 #define SYSDEF_MKDIR
 #include "cssysdef.h"
 
-#include "Files.h"
+#include <Files.h>
+#include <Aliases.h>
+#include <Errors.h>
 
-#include <console.h>
-
-#undef getcwd
-#undef chdir
-#undef rmdir
-#undef unlink
-#undef mkdir
-#undef access
-#undef fgets
-#undef fopen
 
 /*
  *	FixupFilePath
@@ -71,9 +60,15 @@ static void FixupFilePath( const char *source, char *dest )
 	/*
 	 *	If the path is relative, start the path with a colon.
 	 */
-
 	if ( strchr( source, '/' ) && ( source[0] != '/' ) && ( source[0] != '.' )) {
 		*dest++ = ':';
+	}
+
+	/*
+	 *	If the path is absolute, remove the first slash.
+	 */
+	if ( source[0] == '/' ) {
+		++source;
 	}
 
 	while (*source)
@@ -115,21 +110,27 @@ static void FixupFilePath( const char *source, char *dest )
 FILE * fopen(const char * filename, const char * mode)
 {
 	FILE *			file;
-	char			new_filename[256];
+	char			new_filename[257];
+	FSSpec			theFileSpec;
+	OSErr			theError;
 
 	/*
 	 *	Convert the path from unix to mac
 	 */
 
-	FixupFilePath( filename, new_filename );
+	FixupFilePath( filename, &(new_filename[1]) );
+	new_filename[0] = strlen( &(new_filename[1]) );
+	theError = FSMakeFSSpec( 0, 0, (Byte *)new_filename, &theFileSpec );
+	if (( theError != noErr ) && ( theError != fnfErr ))
+		return NULL;
 
 	/*
 	 *	This code is taken from fopen in the MSL library source.
 	 */
 
-	__begin_critical_region( files_access);
+	__begin_critical_region( files_access );
 	
-	file = freopen( new_filename, mode, __find_unopened_file() );
+	file = FSp_fopen( &theFileSpec, mode );
 	
 	__end_critical_region( files_access );
 	
@@ -196,7 +197,11 @@ char * fgets(char * s, int n, FILE * file)
 /*------------------------------------------------------------------------------
 	Get state information on a file
 ------------------------------------------------------------------------------*/
+#if __MSL__	>=0x6000
+int _access( const char *path, int /* mode */ )
+#else
 int access( const char *path, int /* mode */ )
+#endif
 {
 	Byte			new_path[ FILENAME_MAX + 1 ];
 	HFileInfo		fpb;
@@ -225,9 +230,12 @@ int access( const char *path, int /* mode */ )
  *
  *		Creates a directory. (NB: mode is ignored on the mac)
  */
-int mkdir(const char *path, int mode)
+#if __MSL__	>=0x6000
+int _mkdir(const char *path)
+#else
+int mkdir(const char *path, int /* mode */)
+#endif
 {
-#pragma unused(mode)
 	HFileParam		fpb;
 	OSErr			err = -1;
 	Byte			new_path[ FILENAME_MAX + 1 ];
@@ -255,7 +263,11 @@ int mkdir(const char *path, int mode)
  *	
  *		Unlink (i.e. delete) a file.
  */
+#if __MSL__	>=0x6000
+int _unlink(const char *path)
+#else
 int unlink(const char *path)
+#endif
 {
 	FileParam		pb;
 	OSErr			err = noErr;
@@ -285,7 +297,11 @@ int unlink(const char *path)
  *	
  *		remove (i.e. delete) a directory.
  */
+#if __MSL__	>=0x6000
+int _rmdir(const char *path)
+#else
 int rmdir(const char *path)
+#endif
 {
 	FileParam		pb;
 	OSErr			err = noErr;
@@ -317,7 +333,11 @@ int rmdir(const char *path)
  *		Changes the current working directory (actually changes lowmem globals
  *		SFSaveDisk and CurDirStore which are used by open to open a file).
  */
+#if __MSL__	>=0x6000
+int _chdir(const char *path)
+#else
 int chdir(const char *path)
+#endif
 {
 	WDPBRec			wdpb;
 	Byte			new_path[ FILENAME_MAX + 1 ];
@@ -396,7 +416,11 @@ static void catdirname(char *buf, int size, short vrefnum, long dirnum)
  *		Returns the path to the current directory.
  */
  
+#if __MSL__	>=0x6000
+char *_getcwd(char *buf, int size)
+#else
 char *getcwd(char *buf, int size)
+#endif
 {
 	short			vrefnum;
 	long			dirid;
