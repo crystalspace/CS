@@ -61,14 +61,14 @@ protected:
 public:
   /**
    * Creates a fountain particle system.
-   * number : number of raindrops visible at one time
-   * mat: material of raindrops. mixmode = mixmode used.
+   * number : number of particles visible at one time
+   * mat: material of particles. mixmode = mixmode used.
    * lighted: the particles will be lighted if true.
-   * drop_width, drop_height: size of rectangular waterdrops.
+   * drop_width, drop_height: size of rectangular particles.
    * spot is the origin of the fountain
    * accel is the particle acceleration, in m/s^2, the gravity.
    * fall_time is the seconds a particle gets to fall.
-   * speed in m/s of the drops on exiting the spout.
+   * speed in m/s of the particles on exiting the spout.
    * opening is the angle controlling the width of the stream.
    * azimuth is the angle of the direction (horizontally) of the stream.
    * elevation is the angle of the direction (up/down) of the stream.
@@ -83,14 +83,14 @@ public:
   void SetParticleCount (int num) { initialized = false; number = num; }
   /// Get the number of particles used.
   int GetParticleCount () const { return number; }
-  /// Set the size of the fountain drops.
+  /// Set the size of the particles.
   void SetDropSize (float dropwidth, float dropheight)
   {
     initialized = false;
     drop_width = dropwidth;
     drop_height = dropheight;
   }
-  /// Get the size of the fountain drops.
+  /// Get the size of the particles.
   void GetDropSize (float& dropwidth, float& dropheight) const
   {
     dropwidth = drop_width;

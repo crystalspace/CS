@@ -51,14 +51,14 @@ protected:
 public:
   /**
    * creates a snow particle system.
-   * number : number of raindrops visible at one time
-   * mat: material of raindrops. mixmode = mixmode used.
+   * number : number of particles visible at one time
+   * mat: material of particles. mixmode = mixmode used.
    * lighted: the particles will be lighted if true.
-   * drop_width, drop_height: size of rectangular raindrops.
+   * drop_width, drop_height: size of rectangular particles.
    * rainbox_min and max: give the box in the world where it will snow.
    *   snow flakes will start ...
    *   and when they exit this box they will disappear.
-   * fall_speed: the direction and speed of the falling snow flakes.
+   * fall_speed: the direction and speed of the particles.
    *   You can make slanted slow this way. Although you would also want to
    *   slant the particles in that case...
    * swirl: is the amount of swirl for a flake, 0.0 is like rain.
@@ -72,14 +72,14 @@ public:
   /// Get the number of particles used.
   int GetParticleCount () const
   { return number; }
-  /// Set the size of the drops.
+  /// Set the size of the snowflakes.
   void SetDropSize (float dropwidth, float dropheight)
   {
     initialized = false;
     drop_width = dropwidth;
     drop_height = dropheight;
   }
-  /// Get the size of the snow flakes.
+  /// Get the size of the snowflakes.
   void GetDropSize (float& dropwidth, float& dropheight) const
   { dropwidth = drop_width; dropheight = drop_height; }
   /// Set box.

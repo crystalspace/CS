@@ -122,12 +122,12 @@ void csSnowMeshObject::Update (csTicks elapsed_time)
     {
       // this particle has left the box.
       // it will disappear.
-      // To keep the number of particles (and thus the raininess)
+      // To keep the number of particles (and thus the snowiness)
       // constant another particle will appear in sight now.
-      // @@@ rain only appears in box ceiling now, should appear on
+      // @@@ snow only appears in box ceiling now, should appear on
       // opposite side of rain_dir... 
 
-      // @@@ also shifty will not work very nicely with slanted rain.
+      // @@@ also shifty will not work very nicely with slanted snow.
       //   but perhaps it won't be too bad...
       float toolow = ABS(rainbox.MinY() - part_pos[i].y);
       float height = rainbox.MaxY() - rainbox.MinY();

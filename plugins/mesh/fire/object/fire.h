@@ -86,8 +86,8 @@ protected:
 public:
   /**
    * creates a fire particle system.
-   * number : number of raindrops visible at one time
-   * mat: material of raindrops. mixmode = mixmode used.
+   * number : number of particles visible at one time
+   * mat: material of particles. mixmode = mixmode used.
    * lighted: the particles will be lighted if true.
    * drop_width, drop_height: size of rectangular particles.
    * total_time is the seconds a particle gets to burn.
