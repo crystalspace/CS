@@ -317,6 +317,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   const char *Filename = cmdline->GetName (0);
   iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel (tm2);
+  Model->MergeObjects ();
 
   iMeshObjectType *ThingType = engine->GetThingType ();
   iMeshObjectFactory *ThingFactory = ThingType->NewFactory ();
@@ -363,8 +364,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
     iSprite3DState);
   sprState->SetBaseColor (csColor (1, 1, 1));
   sprState->SetLighting (false);
-  sprState->DecRef ();
   sprState->SetAction ("action");
+  sprState->DecRef ();
 
   // -------------------------------------------------------------------------
 

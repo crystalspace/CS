@@ -53,7 +53,7 @@ int csNamedObjVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
 
 // @@@ is there a better way than doing QUERY_INTERFACE all the time?
 
-csSome csNamedObjectVector::FindByName (const char* name) const
+int csNamedObjectVector::GetIndexByName (const char *name) const
 {
   int i;
   for (i = 0; i < Length (); i++)
@@ -61,9 +61,14 @@ csSome csNamedObjectVector::FindByName (const char* name) const
     iObject *o = GetObject (i);
     const char* oname = o->GetName ();
     if (name == oname || (name && oname && !strcmp (oname, name)))
-      return Get (i);
+      return i;
   }
-  return NULL;
+  return -1;
+}
+
+csSome csNamedObjectVector::FindByName (const char* name) const
+{
+  return Get (GetIndexByName (name));
 }
 
 int csNamedObjectVector::Compare (csSome Item1, csSome Item2, int /*Mode*/) const

@@ -120,6 +120,8 @@ public:
   /// Return the pointer to an element
   inline iObject *GetObject (int n) const
   { return SCF_QUERY_INTERFACE_FAST (((iBase*)(csIBaseVector::Get(n))), iObject); }
+  /// Return the index of the element with the given name, or -1.
+  int GetIndexByName (const char *name) const;
 };
 
 /**
@@ -133,6 +135,8 @@ public:
   CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS (NAME, TYPE, public, csNamedObjectVector) \
     TYPE *FindByName (const char* iName) const				\
     { return (TYPE*)csNamedObjectVector::FindByName (iName); }		\
+    int GetIndexByName (const char* iName) const			\
+    { return csNamedObjectVector::GetIndexByName (iName); }
 
 /// Finish the class definition of an object vector
 #define CS_FINISH_OBJECT_VECTOR						\

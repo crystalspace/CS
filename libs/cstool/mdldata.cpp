@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "cstool/mdldata.h"
+#include "csutil/nobjvec.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "iengine/texture.h"
@@ -60,6 +61,10 @@
 
 SCF_DECLARE_FAST_INTERFACE (iModelDataTexture);
 SCF_DECLARE_FAST_INTERFACE (iModelDataMaterial);
+SCF_DECLARE_FAST_INTERFACE (iModelDataObject);
+SCF_DECLARE_FAST_INTERFACE (iModelDataPolygon);
+SCF_DECLARE_FAST_INTERFACE (iModelDataVertices);
+SCF_DECLARE_FAST_INTERFACE (iModelDataAction);
 
 //----------------------------------------------------------------------------
 
@@ -295,6 +300,34 @@ CS_IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon, int, Texel, Texels);
 
 /*** csModelDataObject ***/
 
+#define CS_MERGE_VERTICES_HELPER(vnum,obj)	\
+  for (i=0; i<vnum->Get##obj##Count (); i++)	\
+    ver->Add##obj (vnum->Get##obj (i));
+
+static iModelDataVertices *MergeVertices (const iModelDataVertices *v1,
+	const iModelDataVertices *v2)
+{
+  int i;
+  iModelDataVertices *ver = new csModelDataVertices ();
+
+  if (v1)
+  {
+    CS_MERGE_VERTICES_HELPER (v1, Vertex)
+    CS_MERGE_VERTICES_HELPER (v1, Normal)
+    CS_MERGE_VERTICES_HELPER (v1, Texel)
+    CS_MERGE_VERTICES_HELPER (v1, Color)
+  }
+  if (v2)
+  {
+    CS_MERGE_VERTICES_HELPER (v2, Vertex)
+    CS_MERGE_VERTICES_HELPER (v2, Normal)
+    CS_MERGE_VERTICES_HELPER (v2, Texel)
+    CS_MERGE_VERTICES_HELPER (v2, Color)
+  }
+
+  return ver;
+}
+
 SCF_IMPLEMENT_IBASE (csModelDataObject)
   SCF_IMPLEMENTS_INTERFACE (iModelDataObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
@@ -315,6 +348,134 @@ csModelDataObject::csModelDataObject ()
 csModelDataObject::~csModelDataObject ()
 {
   SCF_DEC_REF (DefaultVertices);
+}
+
+/*
+void MergeAction (iModelDataAction *Out, iModelDataAction *In1,
+  iModelDataVertices *In2, bool Swap)
+{
+  for (int i=0; i<In1->GetFrameCount (); i++)
+  {
+    iModelDataVertices *ver = SCF_QUERY_INTERFACE_FAST (In1->QueryObject (),
+      iModelDataVertices);
+    if (ver)
+    {
+      iModelDataVertices *NewVertices = Swap ?
+        MergeVertices (In2, ver) : MergeVertices (ver, In2);
+      Out->AddFrame (In1->GetTime (i), NewVertices->QueryObject ());
+      NewVertices->DecRef ();
+      ver->DecRef ();
+    }
+  }
+}
+*/
+
+void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
+{
+  CS_DECLARE_OBJECT_VECTOR (csActionVector, iModelDataAction);
+
+  // store vertex, normal, texel and color offset
+  int VertexOffset = DefaultVertices ? DefaultVertices->GetVertexCount () : 0;
+  int NormalOffset = DefaultVertices ? DefaultVertices->GetNormalCount () : 0;
+  int TexelOffset = DefaultVertices ? DefaultVertices->GetTexelCount () : 0;
+  int ColorOffset = DefaultVertices ? DefaultVertices->GetColorCount () : 0;
+
+  // copy the default vertices
+  iModelDataVertices *ver = MergeVertices (DefaultVertices, obj->GetDefaultVertices ());
+  SetDefaultVertices (ver);
+  ver->DecRef ();
+
+  // copy all polygons
+  iObjectIterator *it = obj->QueryObject ()->GetIterator ();
+  while (!it->IsFinished ())
+  {
+    iModelDataPolygon *poly = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
+	iModelDataPolygon);
+    if (poly)
+    {
+      iModelDataPolygon *NewPoly = new csModelDataPolygon ();
+      scfiObject.ObjAdd (NewPoly->QueryObject ());
+
+      int i;
+      for (i=0; i<poly->GetVertexCount (); i++)
+      {
+        NewPoly->AddVertex (
+	  poly->GetVertex (i) + VertexOffset,
+	  poly->GetNormal (i) + NormalOffset,
+	  poly->GetColor (i) + ColorOffset,
+	  poly->GetTexel (i) + TexelOffset);
+      }
+      NewPoly->SetMaterial (poly->GetMaterial ());
+      NewPoly->DecRef ();
+    }
+    it->Next ();
+  }
+  it->DecRef ();
+
+  // build the action mapping
+/*
+  csActionVector ActionMap1, ActionMap2;
+
+  it = scfiObject.GetIterator ();
+  while (!it->IsFinished ())
+  {
+    iModelDataAction *Action = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
+      iModelDataAction);
+    if (Action)
+    {
+      ActionMap1.Push (Action);
+      ActionMap2.Push (NULL);
+      scfiObject.ObjRemove (Action->QueryObject ());
+      Action->DecRef ();
+    }
+    it->Next ();
+  }
+  it->DecRef ();
+
+  it = obj->QueryObject ()->GetIterator ();
+  while (!it->IsFinished ())
+  {
+    iModelDataAction *Action = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
+      iModelDataAction);
+    if (Action)
+    {
+      int n = ActionMap1.GetIndexByName (Action->QueryObject ()->GetName ());
+      if (n == -1) {
+        ActionMap1.Push (NULL);
+        ActionMap2.Push (Action);
+      } else {
+        ActionMap2.Replace (n, Action);
+      }
+      Action->DecRef ();
+    }
+    it->Next ();
+  }
+  it->DecRef ();
+
+  // merge the actions
+  for (int i=0; i<ActionMap1.Length (); i++)
+  {
+    iModelDataAction *Action1 = ActionMap1.Get (i),
+                     *Action2 = ActionMap2.Get (i),
+		     *NewAction = new csModelDataAction ();
+    NewAction->QueryObject ()->SetName (Action1->QueryObject ()->GetName ());
+    scfiObject.ObjAdd (NewAction->QueryObject ());
+    NewAction->DecRef ();
+
+    if (Action1) {
+      if (Action2) {
+        // merge two actions
+	CS_ASSERT (("Merging two animated objects currently not supported", false));
+      } else {
+        // merge action 1 and the default frame of object 2
+	MergeAction (NewAction, Action1, obj->GetDefaultVertices (), false);
+      }
+    } else {
+      // merge action 2 and the default frame of object 1
+      MergeAction (NewAction, Action2, GetDefaultVertices (), true);
+    }
+  }
+*/
 }
 
 /*** csModelDataCamera ***/
@@ -442,4 +603,31 @@ void csModelData::RegisterMaterials (iMaterialList *ml)
     it->Next ();
   }
   it->DecRef ();
+}
+
+CS_DECLARE_TYPED_VECTOR_NODELETE (csModelDataObjectVector, iModelDataObject);
+
+void csModelData::MergeObjects ()
+{
+  csModelDataObjectVector Objects;
+
+  while (1)
+  {
+    iModelDataObject *obj = CS_GET_CHILD_OBJECT_FAST ((&scfiObject), iModelDataObject);
+    if (!obj) break;
+    Objects.Push (obj);
+    scfiObject.ObjRemove (obj->QueryObject ());
+  }
+
+  iModelDataObject *NewObject = new csModelDataObject ();
+  scfiObject.ObjAdd (NewObject->QueryObject ());
+
+  while (Objects.Length () > 0)
+  {
+    iModelDataObject *obj = Objects.Pop ();
+    NewObject->MergeCopyObject (obj);
+    obj->DecRef ();
+  }
+
+  NewObject->DecRef ();
 }

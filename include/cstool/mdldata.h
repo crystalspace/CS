@@ -225,6 +225,9 @@ public:
   virtual ~csModelDataObject();
 
   CS_DECLARE_ACCESSOR_METHODS (iModelDataVertices*, DefaultVertices);
+
+  /// Copy the contents of another object into this one
+  virtual void MergeCopyObject (iModelDataObject *obj);
 };
 
 class csModelDataCamera : public iModelDataCamera
@@ -297,6 +300,8 @@ public:
   void RegisterTextures (iTextureList *tl);
   /// Register all materials using the given material list
   void RegisterMaterials (iMaterialList *ml);
+  /// Merge all contained mesh objects into a single one
+  void MergeObjects ();
 };
 
 #endif // __MDLDATA_H__

@@ -72,6 +72,7 @@ bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
 
   // copy the vertices
   iModelDataVertices *Vertices = Object->GetDefaultVertices ();
+  if (!Vertices) return false;
   for (i=0; i<Vertices->GetVertexCount (); i++)
     tgt->CreateVertex (Vertices->GetVertex (i));
 
@@ -329,5 +330,5 @@ bool csCrossBuilder::BuildSpriteFactory (iModelDataObject *Object,
     spract->AddFrame (tgt->GetFrame (0), 1000);
   }
 
-  return false;
+  return true;
 }
