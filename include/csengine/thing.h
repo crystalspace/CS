@@ -287,12 +287,6 @@ private:
   /// Full radius of object in object space.
   float max_obj_radius;
 
-  /**
-   * Light frame number. Using this number one can see if gouraud shaded
-   * vertices have been initialized already.
-   */
-  long light_frame_number;
-
 #ifndef CS_USE_NEW_RENDERER
   /// Fog information.
   csFog fog;
@@ -344,14 +338,6 @@ private:
 public:
   /// Set of flags
   csFlags flags;
-
-  /**
-   * Current light frame number. This is used for seeing
-   * if gouraud shading should be recalculated for this thing.
-   * If there is a mismatch between the frame number of this set
-   * and the global number then the gouraud shading is not up-to-date.
-   */
-  static long current_light_frame_number;
 
   /**
    * How many times are we busy drawing this thing (recursive).

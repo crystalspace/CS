@@ -76,9 +76,6 @@ private:
    */
   bool shared;
 
-  /// True if this is the first time we visit a thing in this frustum call.
-  bool first_time;
-
   /// True if space is mirrored.
   bool mirror;
 
@@ -93,7 +90,6 @@ public:
   csFrustumContext () :
   	shadows (NULL),
 	shared (false),
-  	first_time (false),
 	mirror (false)
   { }
 
@@ -102,7 +98,6 @@ public:
     shadows = c.shadows;
     shared = c.shared;
     mirror = c.mirror;
-    first_time = c.first_time;
     light_frustum = c.light_frustum;
     return *this;
   }
@@ -130,11 +125,6 @@ public:
   void SetMirrored (bool m) { mirror = m; }
   /// Is mirrored.
   bool IsMirrored () { return mirror; }
-
-  /// Set first time.
-  void SetFirstTime (bool ft) { first_time = ft; }
-  /// Is first time.
-  bool IsFirstTime () { return first_time; }
 };
 
 SCF_VERSION (iFrustumView, 0, 3, 0);

@@ -26,12 +26,12 @@
 #include "imesh/thing/portal.h"
 
 class csPolygon2D;
-class csPolygon3D;
 class csStatLight;
 class csObject;
 class csMeshWrapper;
 struct iRenderView;
 struct iFrustumView;
+struct iPolygon3D;
 
 /**
  * This class represents a portal. It belongs to some polygon
@@ -215,7 +215,7 @@ public:
    * reached (like the maximum number of times a certain sector
    * can be drawn through a mirror).
    */
-  bool Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
+  bool Draw (csPolygon2D* new_clipper, iPolygon3D* portal_polygon,
   	iRenderView* rview);
 
   /**
@@ -225,7 +225,7 @@ public:
    * not allow traversing the same sector more than five times).
    * Returns the intersection point with the polygon in 'isect'.
    */
-  csPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect);
 
   /**
@@ -236,7 +236,7 @@ public:
    * Optionally returns the polygon in 'polygonPtr'.
    */
   csMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& isect, csPolygon3D** polygonPtr);
+  	csVector3& isect, iPolygon3D** polygonPtr);
 
   /**
    * Check if the destination sector is NULL and if so call
@@ -362,6 +362,11 @@ public:
     virtual void CheckFrustum (iFrustumView* lview, int alpha)
     {
       scfParent->CheckFrustum (lview, alpha);
+    }
+    virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& isect)
+    {
+      return scfParent->HitBeam (start, end, isect);
     }
   } scfiPortal;
 };

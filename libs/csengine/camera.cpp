@@ -99,7 +99,7 @@ void csCamera::SetFarPlane (const csPlane3 *farplane)
     fp = NULL;
 }
 
-csPolygon3D *csCamera::GetHit (csVector3 &v)
+iPolygon3D *csCamera::GetHit (csVector3 &v)
 {
   csVector3 isect;
   return sector->HitBeam (v_o2t, v, isect);

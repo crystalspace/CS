@@ -93,7 +93,7 @@ struct iPortalCallback : public iBase
   virtual bool Traverse (iPortal* portal, iBase* context) = 0;
 };
 
-SCF_VERSION (iPortal, 0, 1, 0);
+SCF_VERSION (iPortal, 0, 1, 1);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -233,6 +233,17 @@ struct iPortal : public iReference
    * portal (0 is no completely transparent, 100 is complete opaque).
    */
   virtual void CheckFrustum (iFrustumView* lview, int alpha) = 0;
+
+  /**
+   * Follow a beam through this portal and return the polygon
+   * that it hits with. This function properly acounts for space
+   * warping portals and also checks for infinite recursion (does
+   * not allow traversing the same sector more than five times).
+   * Returns the intersection point with the polygon in 'isect'.
+   */
+  virtual iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& isect) = 0;
+
 };
 
 #endif // __IENGINE_PORTAL_H__

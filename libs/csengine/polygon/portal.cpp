@@ -267,7 +267,7 @@ void csPortal::WarpSpace (csReversibleTransform &t, bool &mirror) const
 
 bool csPortal::Draw (
   csPolygon2D *new_clipper,
-  csPolygon3D *portal_polygon,
+  iPolygon3D *portal_polygon,
   iRenderView *rview)
 {
   if (!CompleteSector (rview)) return false;
@@ -287,9 +287,9 @@ bool csPortal::Draw (
 #ifndef CS_USE_NEW_RENDERER
   rview->ResetFogInfo ();
 #endif // CS_USE_NEW_RENDERER
-  rview->SetPortalPolygon (&portal_polygon->scfiPolygon3D);
+  rview->SetPortalPolygon (portal_polygon);
   rview->SetPreviousSector (rview->GetThisSector ());
-  rview->SetClipPlane (portal_polygon->GetPlane ()->GetCameraPlane ());
+  rview->SetClipPlane (portal_polygon->GetCameraPlane ());
   rview->GetClipPlane ().Invert ();
   if (flags.Check (CS_PORTAL_CLIPDEST))
   {
@@ -345,7 +345,7 @@ bool csPortal::Draw (
   return true;
 }
 
-csPolygon3D *csPortal::HitBeam (
+iPolygon3D *csPortal::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect)
@@ -360,12 +360,12 @@ csPolygon3D *csPortal::HitBeam (
     csVector3 new_isect;
     iPolygon3D *p = sector->HitBeam (new_start, new_end, new_isect);
     if (p) isect = warp_wor.This2Other (new_isect);
-    return p ? p->GetPrivateObject () : NULL;
+    return p;
   }
   else
   {
     iPolygon3D *p = sector->HitBeam (start, end, isect);
-    return p ? p->GetPrivateObject () : NULL;
+    return p;
   }
 }
 
@@ -373,7 +373,7 @@ csMeshWrapper *csPortal::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
-  csPolygon3D **polygonPtr)
+  iPolygon3D **polygonPtr)
 {
   if (!CompleteSector (NULL)) return NULL;
   if (sector->GetPrivateObject ()->draw_busy >= max_sector_visit)
@@ -520,10 +520,9 @@ stop:
   }
 }
 
-void csPortal::SetMirror (iPolygon3D *iPoly)
+void csPortal::SetMirror (iPolygon3D* poly)
 {
-  csPolygon3D *poly = iPoly->GetPrivateObject ();
-  SetWarp (csTransform::GetReflect (*(poly->GetPolyPlane ())));
+  SetWarp (csTransform::GetReflect (poly->GetWorldPlane ()));
 }
 
 void csPortal::SetPortalCallback (iPortalCallback *cb)

@@ -33,7 +33,6 @@
 #include "csengine/light.h"
 #include "iengine/rview.h"
 #include "imesh/lighting.h"
-#include "csengine/polygon.h"
 
 
 
@@ -254,15 +253,15 @@ iVisibilityCuller* csSector::GetVisibilityCuller ()
   return culler;
 }
 
-csPolygon3D *csSector::HitBeam (
+iPolygon3D *csSector::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect)
 {
-  csPolygon3D *p = IntersectSegment (start, end, isect);
+  iPolygon3D *p = IntersectSegment (start, end, isect);
   if (p)
   {
-    csPortal *po = p->GetPortal ();
+    iPortal *po = p->GetPortal ();
     if (po)
     {
       draw_busy++;
@@ -283,21 +282,21 @@ csMeshWrapper *csSector::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
-  csPolygon3D **polygonPtr)
+  iPolygon3D **polygonPtr)
 {
   GetVisibilityCuller ();
   float r;
   iMeshWrapper* mesh;
   iPolygon3D* poly;
   bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly);
-  if (polygonPtr) *polygonPtr = poly ? poly->GetPrivateObject () : NULL;
+  if (polygonPtr) *polygonPtr = poly;
   if (rc && mesh)
     return mesh->GetPrivateObject ();
   else
     return NULL;
 }
 
-csPolygon3D *csSector::IntersectSegment (
+iPolygon3D *csSector::IntersectSegment (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
@@ -307,7 +306,7 @@ csPolygon3D *csSector::IntersectSegment (
 {
   float r, best_r = 10000000000.;
   csVector3 cur_isect;
-  csPolygon3D *best_p = NULL;
+  iPolygon3D *best_p = NULL;
   csVector3 obj_start, obj_end, obj_isect;
 
   if (!only_portals)
@@ -317,7 +316,7 @@ csPolygon3D *csSector::IntersectSegment (
     bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly);
     if (rc && poly)
     {
-      best_p = poly->GetPrivateObject ();
+      best_p = poly;
       best_r = r;
       if (p_mesh)
         *p_mesh = mesh ? mesh->GetPrivateObject () : NULL;
@@ -342,13 +341,11 @@ csPolygon3D *csSector::IntersectSegment (
 
     bool has_not_moved = mesh->GetMovable ()->IsFullTransformIdentity ();
 
-    // @@@ UGLY!!!
     csRef<iThingState> ith (SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
         iThingState));
     if (ith)
     {
-      csThing *sp = (csThing *) (ith->GetPrivateObject ());
       r = best_r;
 
       if (has_not_moved)
@@ -363,7 +360,7 @@ csPolygon3D *csSector::IntersectSegment (
         obj_end = movtrans.Other2This (end);
       }
 
-      csPolygon3D *p = sp->IntersectSegment (
+      iPolygon3D *p = ith->IntersectSegment (
           obj_start,
           obj_end,
           obj_isect,
@@ -395,13 +392,13 @@ csSector *csSector::FollowSegment (
   bool only_portals)
 {
   csVector3 isect;
-  csPolygon3D *p = IntersectSegment (
+  iPolygon3D *p = IntersectSegment (
       t.GetOrigin (),
       new_position,
       isect,
       NULL,
       only_portals);
-  csPortal *po;
+  iPortal *po;
 
   if (p)
   {
@@ -415,7 +412,7 @@ csSector *csSector::FollowSegment (
         return this;
       }
 
-      if (po->flags.Check (CS_PORTAL_WARP))
+      if (po->GetFlags ().Check (CS_PORTAL_WARP))
       {
         po->WarpSpace (t, mirror);
         new_position = po->Warp (new_position);
@@ -431,17 +428,17 @@ csSector *csSector::FollowSegment (
   return this;
 }
 
-csPolygon3D *csSector::IntersectSphere (
+iPolygon3D *csSector::IntersectSphere (
   csVector3 &center,
   float radius,
   float *pr)
 {
   float min_d = radius;
-  csPolygon3D *min_p = NULL;
+  iPolygon3D *min_p = NULL;
   (void)center;
 #if 0
   float d = .0f;
-  csPolygon3D *p = NULL, *min_p = NULL;
+  iPolygon3D *p = NULL, *min_p = NULL;
   csVector3 obj_center;
   csReversibleTransform movtrans;
 
@@ -449,7 +446,8 @@ csPolygon3D *csSector::IntersectSphere (
   int i;
   for (i = 0; i < things.Length (); i++)
   {
-    csThing *sp = (csThing *)things[i];
+    //@@@ NOT VALID!!!
+    iThingState *sp = (iThingState *)things[i];
     bool has_not_moved = sp->GetMovable ()->IsFullTransformIdentity ();
     if (has_not_moved)
       obj_center = center;
@@ -471,24 +469,8 @@ csPolygon3D *csSector::IntersectSphere (
   return min_p;
 }
 
-#if 0
-int compare_z_thing (const void *p1, const void *p2)
-{
-  csMeshWrapper *sp1 = *(csMeshWrapper **)p1;
-  csMeshWrapper *sp2 = *(csMeshWrapper **)p2;
-  float z1 = sp1->Vcam (sp1->GetCenter ()).z;
-  float z2 = sp2->Vcam (sp2->GetCenter ()).z;
-  if (z1 < z2)
-    return -1;
-  else if (z1 > z2)
-    return 1;
-  return 0;
-}
-#endif
-
 /*
  * @@@ THE NOTES BELOW ARE MOSTLY OBSOLETE NOW. I DON'T REMOVE THEM
- *
  * BECAUSE THERE IS STILL A GRAIN OF USEFUL INFORMATION IN THEM.
  *
  * Some notes about drawing here. These notes are the start for
@@ -906,11 +888,7 @@ iPolygon3D *csSector::eiSector::HitBeam (
   const csVector3 &end,
   csVector3 &isect)
 {
-  csPolygon3D *p = scfParent->HitBeam (start, end, isect);
-  if (p)
-    return &(p->scfiPolygon3D);
-  else
-    return NULL;
+  return scfParent->HitBeam (start, end, isect);
 }
 
 iMeshWrapper *csSector::eiSector::HitBeam (
@@ -919,7 +897,7 @@ iMeshWrapper *csSector::eiSector::HitBeam (
   csVector3 &isect,
   iPolygon3D **polygonPtr)
 {
-  csPolygon3D *p = NULL;
+  iPolygon3D *p = NULL;
   csMeshWrapper *obj = scfParent->HitBeam (
       start,
       end,
@@ -929,7 +907,7 @@ iMeshWrapper *csSector::eiSector::HitBeam (
   {
     if (p)
     {
-      *polygonPtr = &(p->scfiPolygon3D);
+      *polygonPtr = p;
     }
   }
 

@@ -1039,7 +1039,6 @@ public:
    * Update vertex lighting for this polygon. Only works if the
    * polygon uses gouraud shading or is flat-shaded.
    * 'dynamic' is true for a dynamic light.
-   * 'reset' is true if the light values need to be reset to 0.
    * 'lcol' is the color of the light. It is given seperately
    * because the color of the light may be modified by portals and
    * other effects.<br>

@@ -26,9 +26,9 @@
 #include "csengine/polygon.h"
 
 class csSector;
-class csPolygon3D;
 class Vertex;
 class csEngine;
+struct iPolygon3D;
 
 /**
  * A camera positioned in the 3D world.
@@ -105,7 +105,7 @@ public:
    * Check if there is a polygon in front of us in the direction
    * defined by 'v' (world space coordinates). Return the nearest polygon.
    */
-  csPolygon3D* GetHit (csVector3& v);
+  iPolygon3D* GetHit (csVector3& v);
 
   /// Set the default FOV for new cameras.
   static void SetDefaultFOV (int fov, int width)
@@ -388,8 +388,7 @@ public:
 
     virtual iPolygon3D* GetHit (csVector3& v)
     {
-      csPolygon3D* poly = scfParent->GetHit (v);
-      return poly ? &(poly->scfiPolygon3D) : NULL;
+      return scfParent->GetHit (v);
     }
     virtual void Correct (int n)
     {

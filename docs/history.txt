@@ -23,6 +23,17 @@ The history order is reversed so that new features are at the top.
 	- Additionally optimized all mesh objects and parts of the engine
 	  to test for the identity transform and avoid some matrix
 	  manipulations or even more in some cases.
+	- Added iPortal->HitBeam(). This function already existed in
+	  csPortal->HitBeam().
+	- Fixed csSector, csCamera, and csPortal so they no longer use
+	  csPolygon3D but instead always uses iPolygon3D.
+	- Continued working on seperating csThing from the engine.
+	  csSector no longer depends on csThing (but still uses iThingState
+	  in some places).
+	- Removed iFrustumView->SetFirstTime() and related. That way we
+	  remove another link between csThing and the engine (this was
+	  used for resetting the gouraud color but apparently this is no
+	  longer needed).
 17-Dec-2002
 	- Fixed the fix on reparenting of a mesh object for the culler.
 	- Added 'do_popup' parameter to iStandardReporterListener->

@@ -55,8 +55,6 @@
 #include "ivideo/graph3d.h"
 
 
-long csThing::current_light_frame_number = 0;
-
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csThing)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iThingState)
@@ -144,7 +142,6 @@ csThing::csThing (iBase *parent) :
 #endif // CS_USE_NEW_RENDERER
   bbox = NULL;
   obj_bbox_valid = false;
-  light_frame_number = -1;
 
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
@@ -1356,7 +1353,7 @@ void csThing::DrawOnePolygon (
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
     // the maximum number that a sector is drawn (for mirrors).
-    if (po->Draw (poly, p, d))
+    if (po->Draw (poly, &(p->scfiPolygon3D), d))
     {
       if (filtered) poly->DrawFilled (d, p, keep_plane, zMode);
       if (is_this_fog)
@@ -2649,14 +2646,6 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
   int i;
 
   draw_busy++;
-
-  if (light_frame_number != current_light_frame_number)
-  {
-    light_frame_number = current_light_frame_number;
-    lview->GetFrustumContext ()->SetFirstTime (true);
-  }
-  else
-    lview->GetFrustumContext ()->SetFirstTime (false);
 
   for (i = 0; i < polygons.Length (); i++)
   {

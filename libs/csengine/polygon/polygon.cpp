@@ -2449,7 +2449,7 @@ void csPolygon3D::FillLightMapStatic (csFrustumView *lview, bool vis)
 
     const csColor &col = lptq->GetColor ();
     iLight *il = lptq->GetLight ();
-    UpdateVertexLighting (il, col, false, ctxt->IsFirstTime ());
+    UpdateVertexLighting (il, col, false, false);
     return ;
   }
 

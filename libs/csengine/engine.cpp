@@ -1335,8 +1335,6 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     if (do_relight && meter) meter->Step ();
   }
 
-  csThing::current_light_frame_number++;
-
   if (do_relight && (lightcache_mode & CS_ENGINE_CACHE_WRITE))
   {
     Report ("Updating VFS....");

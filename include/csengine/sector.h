@@ -37,7 +37,7 @@ class csProgressPulse;
 class csSector;
 class csStatLight;
 class csMeshWrapper;
-class csPolygon3D;
+struct iPolygon3D;
 struct iStatLight;
 struct iVisibilityCuller;
 struct iRenderView;
@@ -307,17 +307,17 @@ public:
    * containing the 'start' point. 'isect' will be the intersection point
    * if a polygon is returned.
    */
-  csPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  iPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
   	csVector3& isect);
 
   /**
    * Follow a beam from start to end and return the first object
-   * that is hit. In case it is a thing the csPolygon3D field will be
+   * that is hit. In case it is a thing the iPolygon3D field will be
    * filled with the polygon that was hit.
    * If polygonPtr is null then the polygon will not be filled in.
    */
   csMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
-  	csVector3& intersect, csPolygon3D** polygonPtr);
+  	csVector3& intersect, iPolygon3D** polygonPtr);
 
   /**
    * Check visibility in a frustum way for all things and polygons in
@@ -343,7 +343,7 @@ public:
    * Note. This function correctly accounts for portal polygons
    * and could thus return a polygon not belonging to this sector.
    */
-  csPolygon3D* IntersectSphere (csVector3& center, float radius,
+  iPolygon3D* IntersectSphere (csVector3& center, float radius,
                                float* pr = NULL);
 
   /**
@@ -383,7 +383,7 @@ public:
    *
    * If 'mesh' != NULL the mesh will be filled in.
    */
-  csPolygon3D* IntersectSegment (const csVector3& start,
+  iPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, bool only_portals = false,
 	csMeshWrapper** p_mesh = NULL);
