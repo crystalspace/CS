@@ -1185,7 +1185,7 @@ bool csRadiosity :: PrepareShootDest(csRadElement *dest, csFrustumView *lview)
 void csRadiosity :: ShootRadiosityToElement(csRadElement* dest)
 {
   // shoot from each lumel, also a radiosity patch, to each lumel on other.
-#if 1
+#if 0
   csRadPoly* rp_src = (csRadPoly*)shoot_src;
   csRadPoly* rp_dest = (csRadPoly*)dest;
   CsPrintf(MSG_STDOUT, "Shooting from RadPoly %x (%s in %s sz %d) to %x (%s in %s sz %d).\n",
