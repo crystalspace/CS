@@ -208,8 +208,36 @@ public:
 
   /// Contracts the whole rect by n units
   void Inset(int n);
+
+  /**
+   * This function is the same as ClipLine() except that it doesn't
+   * check for two trivial cases (horizontal and vertical lines). It also
+   * doesn't check if the line is fully outside the box.
+   * Note: this function is only guaranteed to work correctly if the lines
+   * are not longer than an integer that fits in 16 bits.
+   */
+  bool ClipLineGeneral (int& x1, int& y1, int& x2, int& y2);
+
+  /**
+   * Clip a line to make it fit to this rectangle. This algorithm
+   * is inclusive (the clipped line will touch the borders). If this
+   * function returns false the line is fully outside the rectangle.
+   * Note: this function is only guaranteed to work correctly if the lines
+   * are not longer than an integer that fits in 16 bits.
+   */
+  bool ClipLine (int& x1, int& y1, int& x2, int& y2);
+
+  /**
+   * Clip a line to make it fit to this rectangle. This algorithm
+   * is inclusive (the clipped line will touch the borders). If this
+   * function returns false the line is fully outside the rectangle.
+   * Note: this function is guaranteed to work correctly even if the integer
+   * coordinates of the line are very big.
+   */
+  bool ClipLineSafe (int& x1, int& y1, int& x2, int& y2);
 };
 
 /** @} */
 
 #endif // __CS_RECT_H__
+

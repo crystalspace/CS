@@ -18,6 +18,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
+#include "qint.h"
 #include "csgeom/csrect.h"
 
 csRect::csRect ()
@@ -203,3 +204,173 @@ void csRect::Inset (int n)
   xmax -= n;
   ymax -= n;
 }
+
+bool csRect::ClipLineGeneral (int& x1, int& y1, int& x2, int& y2)
+{
+  int deltax = x2 - x1;
+  int deltay = y2 - y1;
+
+  int deltay_m_xmin = deltay * xmin;
+  int deltay_m_xmax = deltay * xmax;
+  int deltax_m_ymin = deltax * ymin;
+  int deltax_m_ymax = deltax * ymax;
+  int p = deltax * y1 - deltay*x1;
+  int p11 = deltax_m_ymin - deltay_m_xmin;
+  int p12 = deltax_m_ymax - deltay_m_xmin;
+  int p21 = deltax_m_ymin - deltay_m_xmax;
+  int p22 = deltax_m_ymax - deltay_m_xmax;
+  bool inside = false;
+  if ((p11<=p&&p<=p12) || (p12<=p&&p<=p11))
+  {
+    inside = true;
+    if      (x1<xmin) { x1 = xmin; y1 = (p + deltay_m_xmin)/deltax;}
+    else if (x2<xmin) { x2 = xmin; y2 = (p + deltay_m_xmin)/deltax;}
+  }
+  if ((p12<=p&&p<=p22) || (p22<=p&&p<=p12))
+  {
+    inside = true;
+    if      (y1>ymax) { y1 = ymax; x1 = (deltax_m_ymax - p)/deltay;}
+    else if (y2>ymax) { y2 = ymax; x2 = (deltax_m_ymax - p)/deltay;}
+  }
+  if ((p22<=p&&p<=p21) || (p21<=p&&p<=p22))
+  {
+    inside = true;
+    if      (x1>xmax) { x1 = xmax; y1 = (p + deltay_m_xmax)/deltax;}
+    else if (x2>xmax) { x2 = xmax; y2 = (p + deltay_m_xmax)/deltax;}
+  }
+  if ((p21<=p&&p<=p11) || (p11<=p&&p<=p21))
+  {
+    inside = true;
+    if      (y1<ymin) { y1 = ymin; x1 = (deltax_m_ymin - p)/deltay;}
+    else if (y2<ymin) { y2 = ymin; x2 = (deltax_m_ymin - p)/deltay;}
+  }
+  return inside;
+}
+
+
+bool csRect::ClipLine (int& x1, int& y1, int& x2, int& y2)
+{
+  // We first must be certain that the line (without boundries) does't cut
+  // the rectangle.
+  if ((x1<xmin&&x2<xmin) || (x1>xmax&&x2>xmax) ||
+      (y1<ymin&&y2<ymin) || (y1>ymax&&y2>ymax))
+  {
+    return false;
+  }
+
+  if (x1 == x2)
+  {
+    // Trivial (vertical) case.
+    if ((xmin<=x1 && x1<=xmax))
+    {
+      if      (y1>ymax) { y1 = ymax; }
+      else if (y2>ymax) { y2 = ymax; }
+      if      (y1<ymin) { y1 = ymin; }
+      else if (y2<ymin) { y2 = ymin; }
+      return true;
+    }
+    return false;
+  }
+
+  if (y1 == y2)
+  {
+    // Trivial (horizontal) case.
+    if ((ymin<=y1 && y1<=ymax))
+    {
+      if      (x1>xmax) { x1 = xmax; }
+      else if (x2>xmax) { x2 = xmax; }
+      if      (x1<xmin) { x1 = xmin; }
+      else if (x2<xmin) { x2 = xmin; }
+      return true;
+    }
+    return false;
+  }
+
+  return ClipLineGeneral (x1, y1, x2, y2);
+}
+
+bool csRect::ClipLineSafe (int& x1, int& y1, int& x2, int& y2)
+{
+  // We first must be certain that the line (without boundries) does't cut
+  // the rectangle.
+  if ((x1<xmin&&x2<xmin) || (x1>xmax&&x2>xmax) ||
+      (y1<ymin&&y2<ymin) || (y1>ymax&&y2>ymax))
+  {
+    return false;
+  }
+
+  if (x1 == x2)
+  {
+    // Trivial (vertical) case.
+    if ((xmin<=x1 && x1<=xmax))
+    {
+      if      (y1>ymax) { y1 = ymax; }
+      else if (y2>ymax) { y2 = ymax; }
+      if      (y1<ymin) { y1 = ymin; }
+      else if (y2<ymin) { y2 = ymin; }
+      return true;
+    }
+    return false;
+  }
+
+  if (y1 == y2)
+  {
+    // Trivial (horizontal) case.
+    if ((ymin<=y1 && y1<=ymax))
+    {
+      if      (x1>xmax) { x1 = xmax; }
+      else if (x2>xmax) { x2 = xmax; }
+      if      (x1<xmin) { x1 = xmin; }
+      else if (x2<xmin) { x2 = xmin; }
+      return true;
+    }
+    return false;
+  }
+
+  if (!((x1 >> 15) || (y1 >> 15) || (x2 >> 15) || (y2 >> 15)))
+  {
+    // Coordinates are safe.
+    return ClipLineGeneral (x1, y1, x2, y2);
+  }
+
+  // Safer routine that takes care not to overflow multiplication with
+  // integers.
+  float deltax = x2 - x1;
+  float deltay = y2 - y1;
+  float deltay_m_xmin = deltay * float (xmin);
+  float deltay_m_xmax = deltay * float (xmax);
+  float deltax_m_ymin = deltax * float (ymin);
+  float deltax_m_ymax = deltax * float (ymax);
+  float p = deltax * float (y1) - deltay * float (x1);
+  float p11 = deltax_m_ymin - deltay_m_xmin;
+  float p12 = deltax_m_ymax - deltay_m_xmin;
+  float p21 = deltax_m_ymin - deltay_m_xmax;
+  float p22 = deltax_m_ymax - deltay_m_xmax;
+  bool inside = false;
+  if ((p11<=p&&p<=p12) || (p12<=p&&p<=p11))
+  {
+    inside = true;
+    if      (x1<xmin) { x1 = xmin; y1 = QInt ((p + deltay_m_xmin)/deltax);}
+    else if (x2<xmin) { x2 = xmin; y2 = QInt ((p + deltay_m_xmin)/deltax);}
+  }
+  if ((p12<=p&&p<=p22) || (p22<=p&&p<=p12))
+  {
+    inside = true;
+    if      (y1>ymax) { y1 = ymax; x1 = QInt ((deltax_m_ymax - p)/deltay);}
+    else if (y2>ymax) { y2 = ymax; x2 = QInt ((deltax_m_ymax - p)/deltay);}
+  }
+  if ((p22<=p&&p<=p21) || (p21<=p&&p<=p22))
+  {
+    inside = true;
+    if      (x1>xmax) { x1 = xmax; y1 = QInt ((p + deltay_m_xmax)/deltax);}
+    else if (x2>xmax) { x2 = xmax; y2 = QInt ((p + deltay_m_xmax)/deltax);}
+  }
+  if ((p21<=p&&p<=p11) || (p11<=p&&p<=p21))
+  {
+    inside = true;
+    if      (y1<ymin) { y1 = ymin; x1 = QInt ((deltax_m_ymin - p)/deltay);}
+    else if (y2<ymin) { y2 = ymin; x2 = QInt ((deltax_m_ymin - p)/deltay);}
+  }
+  return inside;
+}
+
