@@ -25,8 +25,6 @@
   #define DIRECTINPUT_VERSION 0x0300
 #endif
 
-#define INITGUID
-
 #include <windowsx.h>
 #include <ddraw.h>
 #include <d3d.h>
