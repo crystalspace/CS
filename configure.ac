@@ -780,20 +780,17 @@ AC_DEFUN([CS_JAVA_HEADER_PATH],
 	AS_IF([test -n "$cs_java_platform"],
 	    [cs_java_inc="$cs_java_inc $cs_java_inc/$cs_java_platform"])])])
 
-AC_PATH_PROGS([JAVA], [java], [:], [$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin])
+AC_PATH_PROGS([JAVA], [java], [], [$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin])
 CS_BUILD_PROPERTY([JAVA], [$JAVA])
 
-AC_PATH_PROGS([JAVAC], [javac], [:], [$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin])
+AC_PATH_PROGS([JAVAC], [javac], [], [$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin])
 CS_BUILD_PROPERTY([JAVAC], [$JAVAC])
-
-AC_PATH_PROGS([ANT], [ant], [:], [$PATH:$ANT_HOME/bin])
-CS_BUILD_PROPERTY([ANT], [$ANT])
 
 AC_ARG_WITH([java], [AC_HELP_STRING([--with-java],
     [use Java scripting interface (default YES)])])
 AS_IF([test -z "$with_java"], [with_java=yes])
 
-AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$ANT"],
+AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$JAVA"],
     [CS_JAVA_HEADER_PATH([JAVAC])
     CS_CHECK_BUILD([if Java2 SDK is usable], [cs_cv_java],
 	[AC_LANG_PROGRAM(
@@ -801,6 +798,9 @@ AS_IF([test "$with_java" != no && test -n "$JAVAC" && test -n "$ANT"],
 	    JNIEXPORT void JNICALL f(JNIEnv *env, jobject obj);]])],
 	[CS_CREATE_TUPLE() CS_CREATE_TUPLE([$cs_java_inc])], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_java], [JAVA])])])
+
+AC_PATH_PROGS([ANT], [ant], [], [$PATH:$ANT_HOME/bin])
+CS_BUILD_PROPERTY([ANT], [$ANT])
 
 
 

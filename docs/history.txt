@@ -43,6 +43,8 @@ chronological order.
 	  to 0. As the documentation states, iSCF::SCF can be, dependent on the 
 	  platform, either module global or "truly" global. In the latter case,
 	  setting it to 0 can be dangerous.
+	- Eric Sunshine fixed bug in configure.ac where Java SDK check would be
+	  run even if Java development tools were not found.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied
