@@ -32,6 +32,10 @@ struct iAuth: public iPlugIn
   virtual bool ChangePass(char *UserName, char *OldPass, char *NewPass) = 0;
   virtual bool AdminChangePass(char *UserName, char *NewPass, 
 		  char *AdminUser, char *AdminPass) = 0;
+
+  virtual bool LockAccount(char *UserName, char *Reason, char *AdminUser, char *AdminPass) =0;
+  virtual bool UnlockAccount(char *UserName, char *Reason, char *AdminUser, char *AdminPass) = 0;
+
   virtual int GetLastError() = 0;
 };
 
