@@ -355,7 +355,7 @@ iNetworkSocket2* csNetworkSocket2::Accept()
   
   SOCKET socket_fd = accept(socketfd,(struct sockaddr *)&remote_addr,&sin_size);
   
-  if (!socket_fd) 
+  if (socket_fd == -1)
   {
     last_error = CS_NET_SOCKET_CANNOT_ACCEPT;
     return 0;
