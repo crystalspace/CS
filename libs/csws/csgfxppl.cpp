@@ -185,7 +185,7 @@ void csGraphicsPipeline::Flush (int iCurPage)
       case pipeopBOX:
       {
         System->piG2D->DrawBox (op->Box.xmin, op->Box.ymin,
-          op->Box.xmax - op->Box.xmin + 1, op->Box.ymax - op->Box.ymin + 1,
+          op->Box.xmax - op->Box.xmin, op->Box.ymax - op->Box.ymin,
           op->Box.color);
         INCLUDE_MIN_POINT (op->Box.xmin, op->Box.ymin);
         INCLUDE_MAX_POINT (op->Box.xmax, op->Box.ymax);
