@@ -1222,14 +1222,14 @@ void csTerrFuncObject::ComputeNormals (const G3DTriangleMesh& /*mesh*/,
       n = normal_func->GetNormal (dx, dy);
     else
     {
-      v[0].Set(-.1, height_func->GetHeight (dx-inv_totx, dy-inv_toty), -.1);
-      v[1].Set(  0, height_func->GetHeight (dx, dy-inv_toty), -.1);
-      v[2].Set( .1, height_func->GetHeight (dx+inv_totx, dy-inv_toty), -.1);
-      v[3].Set( .1, height_func->GetHeight (dx+inv_totx, dy), 0);
-      v[4].Set( .1, height_func->GetHeight (dx+inv_totx, dy+inv_toty),  .1);
-      v[5].Set(  0, height_func->GetHeight (dx, dy+inv_toty),  .1);
-      v[6].Set(-.1, height_func->GetHeight (dx-inv_totx, dy+inv_toty),  .1);
-      v[7].Set(-.1, height_func->GetHeight (dx-inv_totx, dy), 0);
+      v[0].Set(-.1, GetClampedHeight (dx-inv_totx, dy-inv_toty), -.1);
+      v[1].Set(  0, GetClampedHeight (dx, dy-inv_toty), -.1);
+      v[2].Set( .1, GetClampedHeight (dx+inv_totx, dy-inv_toty), -.1);
+      v[3].Set( .1, GetClampedHeight (dx+inv_totx, dy), 0);
+      v[4].Set( .1, GetClampedHeight (dx+inv_totx, dy+inv_toty),  .1);
+      v[5].Set(  0, GetClampedHeight (dx, dy+inv_toty),  .1);
+      v[6].Set(-.1, GetClampedHeight (dx-inv_totx, dy+inv_toty),  .1);
+      v[7].Set(-.1, GetClampedHeight (dx-inv_totx, dy), 0);
       n.Set (0, 0, 0);
       int j1, j;
       j1 = 7;

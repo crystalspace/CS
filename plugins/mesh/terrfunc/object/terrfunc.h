@@ -118,6 +118,17 @@ public:
   /// quaddiv framenumber to use
   int qd_framenum;
 
+  // A function which will get the height from the height function
+  // but first it will clamp the input to 0,0-1,1.
+  float GetClampedHeight (float x, float y)
+  {
+    if (x < 0.0f) x = 0.0f;
+    if (x > 1.0f) x = 1.0f;
+    if (y < 0.0f) y = 0.0f;
+    if (y > 1.0f) y = 1.0f;
+    return height_func->GetHeight (x, y);
+  }
+
 //private: //@@@
 public:
   iObjectRegistry* object_reg;

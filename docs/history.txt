@@ -27,6 +27,10 @@ The history order is reversed so that new features are at the top.
 	  activate each others' triggers, not their own.
 	- Fixed a few compile errors in the new changes in the engine
 	  sequence manager.
+	- Made sure that the normal calculation in terrfunc first
+	  clamps the x,y values given to the height function to avoid
+	  crashing. Thanks to Joseph Miller for pointing me to the bug
+	  and suggesting a fix (which I didn't use).
 10-Dec-2002
 	- Fixed a bug I introduced yesterday in parsing of HardMove.
 	  The transform was inverted.
