@@ -3007,7 +3007,7 @@ int main (int argc, char* argv[])
   //if (!)
 
   csString world_file(Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
-  
+  world_file.Append("/");
   if (!Sys->VFS->Exists (world_file.GetData()))
   {
     Sys->Printf (MSG_FATAL_ERROR, "The directory on VFS (%s) for world file does not exist!\n", world_file.GetData());
