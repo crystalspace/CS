@@ -1,21 +1,25 @@
 The history order has been reversed so that new features are at the top.
 
 10-May-2000
-	- Michael Dale Long did a major update for CrystalClear. A lot of
-	  work has been done on iActor. The main thing was adding multiple
-	  velocity support. A lot of other bugfixes and other things I
-	  can't remember right now, too.
+	- Michael Dale Long did a major update for CrystalClear.  A lot of
+	  work has been done on iActor.  The main thing was adding multiple
+	  velocity support.  A lot of other bugfixes and other things I can't
+	  remember right now, too.
 	- Frank O'Connor updated VC project files for new dynamic texture
 	  system.
-	- Modified makefile system to add an extra 'dyn' or 'stat' in
-	  the 'out' directory to differentiate between dynamic or static
-	  linking.
-	- Fixed an internal compiler error for gcc 2.7.2 in the Crystal
-	  Clear code.
-	- Andrew Zabolotny did a few code style fixes for csfont plugin
-	  and misc fixes for OS/2 DIVE canvas.
+	- Modified makefile system to add an extra 'dyn' or 'stat' in the
+	  'out' directory to differentiate between dynamic or static linking.
+	- Fixed an internal compiler error for gcc 2.7.2 in the Crystal Clear
+	  code.
+	- Andrew Zabolotny did a few code style fixes for csfont plugin and
+	  misc fixes for OS/2 DIVE canvas.
+	- Eric Sunshine added dynamic-texture support to the NeXT ports.  He
+	  also removed unused junk from dyntex2d.
 	- Samuel Humphreys sent me a new patch to clean up his dynamic
 	  textures and also implement them for OpenGL.
+	- Eric Sunshine eliminated symbolic naming conflict in several of the
+	  NetSpace sources where a variable named "Protocol" conflicted with
+	  the Objective-C class of same name.
 9-May-2000
 	- -revis commandline option will now work to force recalculation
 	  of the octree. -norevis will not work for this as CS cannot
@@ -38,11 +42,18 @@ The history order has been reversed so that new features are at the top.
 	  renderer plugin.
 	- Norman Kramer changed program name to avoid naming conflicts
 	  between rule and program name on unix systems.
-	- Norman fixed gfxtest to change %ld to %d. Eric then fixed this
-	  fix to be more portable with regards to how size_t is defined.
+	- Norman fixed gfxtest to change %ld to %d.  Eric Sunshine then fixed
+	  this fix to be more portable regardless of how size_t is defined on
+	  any particular platform.
 	- Norman removed various unused variables.
-	- Norman Kramer fixed mixup of glxclean and glx2dclean rules
-	  in makefile.
+	- Norman Kramer fixed mixup of glxclean and glx2dclean rules in
+	  makefile.
+	- Eric Sunshine fixed the formatting of the help message for csfont.
+	- Eric Sunshine fixed pytest.mak so that it only adds its target if
+	  Python was detected on the system.
+	- Eric Sunshine made dnapp more Unix-friendly.  It now uses -h for
+	  help rather than -?.  The problem with -? is that '?' is a filename
+	  wildcard to the Unix shell.  (Renamed the old -h option to -q.)
 	- Received a patch from Samuel Humphreys which allows you to render
 	  on texture dynamically. Currently this only works for the software
 	  renderer. Support for the other renderers will have to be added.
@@ -54,6 +65,12 @@ The history order has been reversed so that new features are at the top.
 	  to decide which processor you want to use (default is i386).
 	  If you wish to use another Intel processor you will need to modify
 	  CFLAGS.GENERAL.
+	- Eric Sunshine fixed several compilation problems throughout the
+	  project.
+	- Eric Sunshine updated next.txi and beos.txi to make reference to new
+	  csfont plugin.
+	- Eric Sunshine eliminated an apparently bogus warning from the
+	  OpenStep compiler in inifile.cpp.
 8-May-2000
 	- Eric Sunshine re-enabled -kb flag and re-added CRLF line terminators
 	  for all .dsp files so that they will work even from CVS snapshot
@@ -116,6 +133,8 @@ The history order has been reversed so that new features are at the top.
 	  under one logic group.
 	- Frank also did various other VC project file changes.
 	- Frank converted legacy SysPrintf to m_piSystem->Printf.
+	- Eric Sunshine fixed several compilation warnings throughout the
+	  project.
 7-May-2000
 	- More work on PVS. Still not working properly though.
 	- Started working on saving and loading of octree and PVS.
