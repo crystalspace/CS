@@ -22,7 +22,7 @@
 
 #include "csutil/scf.h"
 #include "igraph2d.h"
-#include "ifntrndr.h"
+#include "ifontsrv.h"
 
 ///
 #define CsPrintf System->Printf
@@ -52,8 +52,8 @@ public:
   /// The system driver.
   iSystem* System;
 
-  /// The font renderer
-  iFontRender *FontRenderer;
+  /// The font server
+  iFontServer *FontServer;
   
   /// Current font number
   int Font;
@@ -208,15 +208,15 @@ public:
 
   /// Gets the font size.
   virtual int GetFontSize ()
-  { long s; bool b = FontRenderer->GetFontProperty (Font, CS_FONTSIZE, s); return (b?s:-1);}
+  { long s; bool b = FontServer->GetFontProperty (Font, CS_FONTSIZE, s); return (b?s:-1);}
   
   /// Sets the font size.
   virtual bool SetFontSize (int FontSize)
-  { long s=FontSize; return FontRenderer->SetFontProperty (Font, CS_FONTSIZE, s, false ); }
+  { long s=FontSize; return FontServer->SetFontProperty (Font, CS_FONTSIZE, s, false ); }
 
-  /// Gets the font renderer.
-  virtual iFontRender *GetFontRender ()
-  { return FontRenderer; }
+  /// Gets the font server
+  virtual iFontServer *GetFontServer ()
+  { return FontServer; }
 
   /// Return the width of the framebuffer.
   virtual int GetWidth ()

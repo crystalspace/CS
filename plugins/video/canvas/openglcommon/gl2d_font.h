@@ -16,11 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GL2D_FONT_H__
-#define __GL2D_FONT_H__
+#ifndef __CS_GL2D_FONT_H__
+#define __CS_GL2D_FONT_H__
 
 #include <GL/gl.h>
-#include "ifntrndr.h"
+#include "ifontsvr.h"
 
 /**
   This class contains
@@ -67,14 +67,14 @@ class csGraphics2DOpenGLFontServer
    * internally
    */
   GLFontInfo **mFont_Information_Array;
-  iFontRender *pFontRender;
+  iFontServer *pFontServer;
   
 public:
   /**
    * The maximal number of fonts that can be registered.
    * Additional fonts must be added via AddFont()
    */
-  csGraphics2DOpenGLFontServer (int MaxFonts, iFontRender *pFR);
+  csGraphics2DOpenGLFontServer (int MaxFonts, iFontServer *pFR);
 
   /// Destructor cleans up all the OpenGL mess we left around
   ~csGraphics2DOpenGLFontServer ();
@@ -109,6 +109,4 @@ public:
   void WriteCharacter (char writeme, int fontnumber = 0);
 };
 
-#endif
-
-
+#endif // __CS_GL2D_FONT_H__

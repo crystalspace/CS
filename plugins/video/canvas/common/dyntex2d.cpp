@@ -71,7 +71,7 @@ iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas (int width, int heigh
   }
   else
   {
-    // For other than software Renderers falling back on software texture 
+    // For other than software renderer falling back on software texture 
     // buffers
     if (ipfmt->PixelBytes == 2)
     {
@@ -98,10 +98,10 @@ iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas (int width, int heigh
 
   Memory = (unsigned char*) buffer;
 
-  // get the fontrenderer
-  const char *p = System->ConfigGetStr ("FontRender", CS_FUNCID_FONT, 
-					"crystalspace.font.render.csfont");
-  FontRenderer = LOAD_PLUGIN (System, p, CS_FUNCID_FONT, iFontRender);
+  // Get the font server
+  const char *p = System->ConfigGetStr ("FontServer", CS_FUNCID_FONT, 
+					"crystalspace.font.server.csfont");
+  FontServer = LOAD_PLUGIN (System, p, CS_FUNCID_FONT, iFontServer);
   Font = 0;
 
   return (iGraphics2D*)this;

@@ -37,7 +37,7 @@
 csGraphics2D::csGraphics2D ()
 {
   Memory = NULL;
-  FontRenderer = NULL;
+  FontServer = NULL;
 }
 
 bool csGraphics2D::Initialize (iSystem* pSystem)
@@ -48,10 +48,10 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
 
   Palette = new RGBPixel[256];
 
-  // get the fontrenderer
-  const char *p = pSystem->ConfigGetStr ("FontRender", CS_FUNCID_FONT, "crystalspace.font.render.csfont");
-  FontRenderer = LOAD_PLUGIN (pSystem, p, CS_FUNCID_FONT, iFontRender);
-//  FontRenderer = QUERY_PLUGIN_ID (pSystem, CS_FUNCID_FONT, iFontRender);
+  // Get the font server
+  const char *p = pSystem->ConfigGetStr (
+    "FontServer", CS_FUNCID_FONT, "crystalspace.font.server.csfont");
+  FontServer = LOAD_PLUGIN (pSystem, p, CS_FUNCID_FONT, iFontServer);
   Font = 0;
 
   pfmt.PalEntries = 256;
@@ -74,7 +74,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
 
 csGraphics2D::~csGraphics2D ()
 {
-  if (FontRenderer) FontRenderer->DecRef ();
+  if (FontServer) FontServer->DecRef ();
   Close ();
   if (Palette)
     delete [] Palette;
@@ -297,7 +297,7 @@ void csGraphics2D::Write (int x, int y, int fg, int bg, const char *text)
   for (; *text; ++text)
   {
     WriteChar(x, y, fg, bg, *text);
-    x += FontRenderer->GetCharWidth ( Font, (unsigned char)*text );
+    x += FontServer->GetCharWidth ( Font, (unsigned char)*text );
   }
 }
 
@@ -496,13 +496,13 @@ bool csGraphics2D::PerformExtension (const char* args)
 int csGraphics2D::GetTextWidth (int Font, const char *text)
 {
   int w=0, h=0;
-  FontRenderer->GetTextDimensions (Font, text, w, h);
+  FontServer->GetTextDimensions (Font, text, w, h);
   return w;
 }
 
 int csGraphics2D::GetTextHeight (int Font)
 {
-  return FontRenderer->GetMaximumHeight (Font);
+  return FontServer->GetMaximumHeight (Font);
 }
 
 void csGraphics2D::GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)

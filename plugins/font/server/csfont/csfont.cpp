@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Norman Krämer
+    Copyright (C) 2000 by Norman Kramer
     original unplugged code and fonts by Andrew Zabolotny
 
     This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #include "tiny.fnt"	// font (C) Andrew Zabolotny
 #include "italic.fnt"	// font (C) Andrew Zabolotny
 
-csFontDef csDefaultFontRender::FontList [] =
+csFontDef csDefaultFontServer::FontList [] =
 {
   { "Police",		8, 8, 8,	font_Police,	width_Police	},
   { "Police.fixed",	8, 8, 8,	font_Police,	NULL		},
@@ -38,30 +38,30 @@ csFontDef csDefaultFontRender::FontList [] =
   { NULL,               0, 0, 0,        NULL,           NULL            }
 };
 
-IMPLEMENT_IBASE (csDefaultFontRender)
-  IMPLEMENTS_INTERFACE (iFontRender)
+IMPLEMENT_IBASE (csDefaultFontServer)
+  IMPLEMENTS_INTERFACE (iFontServer)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csDefaultFontRender)
+IMPLEMENT_FACTORY (csDefaultFontServer)
 
 EXPORT_CLASS_TABLE (csfont)
-  EXPORT_CLASS (csDefaultFontRender, "crystalspace.font.render.csfont", 
-		"CrystalSpace default font renderer" )
+  EXPORT_CLASS (csDefaultFontServer, "crystalspace.font.server.csfont", 
+		"CrystalSpace default font server" )
 EXPORT_CLASS_TABLE_END
 
-csDefaultFontRender::csDefaultFontRender (iBase *pParent)
+csDefaultFontServer::csDefaultFontServer (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
   FontCount = sizeof(FontList) / sizeof(FontList[0]) - 1;
 }
 
-bool csDefaultFontRender::Initialize (iSystem*)
+bool csDefaultFontServer::Initialize (iSystem*)
 {
   return true;
 }
 
-int csDefaultFontRender::LoadFont (const char* name, const char* /*filename*/)
+int csDefaultFontServer::LoadFont (const char* name, const char* /*filename*/)
 {
   for (int i = 0; FontList [i].Name; i++)
     if (!strcmp (FontList [i].Name, name))
@@ -69,7 +69,7 @@ int csDefaultFontRender::LoadFont (const char* name, const char* /*filename*/)
   return -1;
 }
 
-bool csDefaultFontRender::SetFontProperty (int /*fontId*/,
+bool csDefaultFontServer::SetFontProperty (int /*fontId*/,
   CS_FONTPROPERTY propertyId, long& property, bool /*autoApply*/)
 {
   bool succ = (propertyId == CS_FONTSIZE);
@@ -77,7 +77,7 @@ bool csDefaultFontRender::SetFontProperty (int /*fontId*/,
   return succ;
 }
 
-bool csDefaultFontRender::GetFontProperty (int fontId,
+bool csDefaultFontServer::GetFontProperty (int fontId,
   CS_FONTPROPERTY propertyId, long& property)
 {
   (void)fontId;
@@ -86,12 +86,12 @@ bool csDefaultFontRender::GetFontProperty (int fontId,
   return succ;
 }
 
-unsigned char *csDefaultFontRender::GetCharBitmap (int fontId, unsigned char c)
+unsigned char *csDefaultFontServer::GetCharBitmap (int fontId, unsigned char c)
 { 
   return &(FontList [fontId].FontBitmap [c * FontList [fontId].BytesPerChar]); 
 }
 
-int csDefaultFontRender::GetCharWidth (int fontId, unsigned char c)
+int csDefaultFontServer::GetCharWidth (int fontId, unsigned char c)
 {
   int width;
   if (FontList [fontId].IndividualWidth)
@@ -102,17 +102,17 @@ int csDefaultFontRender::GetCharWidth (int fontId, unsigned char c)
   return width;
 }
 
-int csDefaultFontRender::GetCharHeight (int fontId, unsigned char /*c*/)
+int csDefaultFontServer::GetCharHeight (int fontId, unsigned char /*c*/)
 { 
   return FontList [fontId].Height; 
 }
 
-int csDefaultFontRender::GetMaximumHeight (int fontId)
+int csDefaultFontServer::GetMaximumHeight (int fontId)
 {
   return FontList [fontId].Height; 
 }
 
-void csDefaultFontRender::GetTextDimensions (int fontId, const char* text,
+void csDefaultFontServer::GetTextDimensions (int fontId, const char* text,
   int& width, int& height)
 {
   int i, n = strlen (text);

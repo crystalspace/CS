@@ -32,15 +32,15 @@ void csGraphics2D::WRITECHAR_NAME (csGraphics2D *This, int x, int y,
   int fg, int bg, char c)
 {
   int ff = This->GetFontID ();
-  iFontRender *FR = This->GetFontRender ();
-  int charH = FR->GetCharHeight (ff, c);
-  int charW = FR->GetCharWidth (ff, c);
+  iFontServer *FS = This->GetFontServer ();
+  int charH = FS->GetCharHeight (ff, c);
+  int charW = FS->GetCharWidth (ff, c);
 
   if ((x + charW <= This->ClipX1) || (x >= This->ClipX2)
    || (y + charH <= This->ClipY1) || (y >= This->ClipY2))
     return;
 
-  register unsigned char *CharImage = FR->GetCharBitmap (ff, c);
+  register unsigned char *CharImage = FS->GetCharBitmap (ff, c);
 
   if ((x < This->ClipX1) || (x + charW > This->ClipX2)
    || (y < This->ClipY1) || (y + charH > This->ClipY2))

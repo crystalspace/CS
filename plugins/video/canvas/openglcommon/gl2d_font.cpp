@@ -25,7 +25,7 @@
 #include "video/canvas/common/graph2d.h"
 #include "csutil/util.h"
 
-#include "video/canvas/openglcommon/gl2d_font.h"
+#include "gl2d_font.h"
 
 csGraphics2DOpenGLFontServer::GLFontInfo::~GLFontInfo ()
 {
@@ -54,7 +54,7 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
   int rows=1;
   
   x=y=256.0;
-  height = pFontRender->GetCharHeight (fontId, 'T'); // just a dummy parameter
+  height = pFontServer->GetCharHeight (fontId, 'T'); // just a dummy parameter
 
   font->height = height;
 
@@ -63,11 +63,11 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
   width=0;
   while (1)
   {
-    width+= pFontRender->GetCharWidth (fontId, c);
+    width+= pFontServer->GetCharWidth (fontId, c);
     if (width>256)
     {
       rows++;
-      width= pFontRender->GetCharWidth (fontId, c);
+      width= pFontServer->GetCharWidth (fontId, c);
     }
     if (c==255) break;
     else c++;
@@ -91,7 +91,7 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
   c=0;
   while (1)
   {
-    width = pFontRender->GetCharWidth (fontId, c);
+    width = pFontServer->GetCharWidth (fontId, c);
     GlyphBitsNotByteAligned = width&7;
 
     // calculate the start of this character
@@ -131,7 +131,7 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
     //  then down
 
     // points to location of the font source data
-    unsigned char *fontsourcebits =  pFontRender->GetCharBitmap (fontId, c);
+    unsigned char *fontsourcebits =  pFontServer->GetCharBitmap (fontId, c);
 
     // grab bits from the source, and stuff them into the font bitmap
     // one at a time
@@ -207,8 +207,8 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
 /* The constructor initializes it member variables and constructs the
  * first font, if one was passed into the constructor
  */
-csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer (int MaxFonts, iFontRender *pFR)
-  : mFont_Count (0), mMax_Font_Count (MaxFonts), mFont_Information_Array (NULL), pFontRender(pFR)
+csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer (int MaxFonts, iFontServer *pFS)
+  : mFont_Count (0), mMax_Font_Count (MaxFonts), mFont_Information_Array (NULL), pFontServer(pFS)
 {
   mFont_Information_Array = new GLFontInfo * [MaxFonts];
 }

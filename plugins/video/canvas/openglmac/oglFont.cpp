@@ -26,8 +26,8 @@
 
 /** The constructor initializes it member variables and constructs the
  * first font, if one was passed into the constructor */
-csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer(int /*nFonts*/, iFontRender *pFR)
-    : Font_Count(0), Font_Offsets(NULL), pFontRenderer(pFR)
+csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer(int /*nFonts*/, iFontServer *pFS)
+    : Font_Count(0), Font_Offsets(NULL), pFontServer(pFS)
 {
 
 }
@@ -45,7 +45,7 @@ void csGraphics2DOpenGLFontServer::BuildFont(int iFont)
     // OK, update our member variables with new font information
 
     // need another spot in the array of offsets
-    int height = pFontRenderer->GetMaximumHeight (iFont);
+    int height = pFontServer->GetMaximumHeight (iFont);
     if (height==-1) return;
     if (Font_Offsets!=NULL)
     {
@@ -74,11 +74,11 @@ void csGraphics2DOpenGLFontServer::BuildFont(int iFont)
     unsigned char *flipbuffer = NULL;
     for (int characterindex=0; characterindex<256; characterindex++)
     {
-      int charwidth = pFontRenderer->GetCharWidth (iFont, characterindex);
+      int charwidth = pFontServer->GetCharWidth (iFont, characterindex);
       int BytesPerRow = (charwidth+7)/8;
-      int Rows = pFontRenderer->GetCharHeight (iFont, characterindex);
+      int Rows = pFontServer->GetCharHeight (iFont, characterindex);
       flipbuffer = (unsigned char*)realloc (flipbuffer, BytesPerRow*Rows);
-      unsigned char *basebuffer = pFontRenderer->GetCharBitmap (iFont, characterindex);
+      unsigned char *basebuffer = pFontServer->GetCharBitmap (iFont, characterindex);
       
       glNewList(newfontoffset+characterindex,GL_COMPILE);
 

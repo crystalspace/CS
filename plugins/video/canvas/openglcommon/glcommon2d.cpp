@@ -78,8 +78,8 @@ bool csGraphics2DGLCommon::Open (const char *Title)
   // load font 'server'
   if (LocalFontServer == NULL)
   {
-    int nFonts = FontRenderer->GetFontCount ();
-    LocalFontServer = new csGraphics2DOpenGLFontServer (nFonts, FontRenderer);
+    int nFonts = FontServer->GetFontCount ();
+    LocalFontServer = new csGraphics2DOpenGLFontServer (nFonts, FontServer);
     for (int fontindex = 0; fontindex < nFonts; fontindex++)
       LocalFontServer->AddFont (fontindex);
   }
@@ -218,7 +218,7 @@ void csGraphics2DGLCommon::WriteChar (int x, int y, int fg, int /*bg*/, char c)
   // due to the Push/PopMatrix calls
 //printf("%c x=%d\n", c, x);
   glPushMatrix();
-  glTranslatef (x, Height - y - FontRenderer->GetCharHeight (Font, 'T'),0.0);
+  glTranslatef (x, Height - y - FontServer->GetCharHeight (Font, 'T'),0.0);
 
   LocalFontServer->WriteCharacter(c, Font);
   glPopMatrix ();

@@ -23,13 +23,13 @@
 #include "csutil/csstrvec.h"
 #include "freefont.h"
 
-csFreeTypeRender::csFreeTypeRender (iBase *pParent)
+csFreeTypeServer::csFreeTypeServer (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
   bInit = false;
 }
 
-csFreeTypeRender::~csFreeTypeRender ()
+csFreeTypeServer::~csFreeTypeServer ()
 {
   // drop all fonts
   int i;
@@ -37,7 +37,7 @@ csFreeTypeRender::~csFreeTypeRender ()
   if (pSystem) pSystem->DecRef ();
 }
 
-bool csFreeTypeRender::Initialize (iSystem *pSystem)
+bool csFreeTypeServer::Initialize (iSystem *pSystem)
 {
   if ( bInit ) return true;
 
@@ -73,7 +73,7 @@ bool csFreeTypeRender::Initialize (iSystem *pSystem)
   return (bInit=succ);
 }
 
-int csFreeTypeRender::LoadFont (const char* name, const char* filename)
+int csFreeTypeServer::LoadFont (const char* name, const char* filename)
 {
   // first see if we already loaded that font
   int key = fonts.FindKey (name, 1);
@@ -141,7 +141,7 @@ int csFreeTypeRender::LoadFont (const char* name, const char* filename)
   return fontid;
 }
 
-bool csFreeTypeRender::CreateGlyphBitmaps (FT *font, int size)
+bool csFreeTypeServer::CreateGlyphBitmaps (FT *font, int size)
 {
   bool succ;
   FTDef *fontdef = font->GetFontDef (size);
@@ -252,7 +252,7 @@ bool csFreeTypeRender::CreateGlyphBitmaps (FT *font, int size)
   return succ;
 }
 
-bool csFreeTypeRender::SetFontProperty (int fontId, CS_FONTPROPERTY propertyId, long& property, 
+bool csFreeTypeServer::SetFontProperty (int fontId, CS_FONTPROPERTY propertyId, long& property, 
 					bool /*autoApply*/ )
 {
   bool succ = false;
@@ -274,7 +274,7 @@ bool csFreeTypeRender::SetFontProperty (int fontId, CS_FONTPROPERTY propertyId, 
   return succ;
 }
 
-bool csFreeTypeRender::GetFontProperty (int fontId, CS_FONTPROPERTY propertyId, long& property)
+bool csFreeTypeServer::GetFontProperty (int fontId, CS_FONTPROPERTY propertyId, long& property)
 {
   bool succ = false;
   if ( fontId >= 0 && fontId < fonts.Length() ){
@@ -290,7 +290,7 @@ bool csFreeTypeRender::GetFontProperty (int fontId, CS_FONTPROPERTY propertyId, 
   return succ;
 }
 
-unsigned char* csFreeTypeRender::GetCharBitmap (int fontId, unsigned char c)
+unsigned char* csFreeTypeServer::GetCharBitmap (int fontId, unsigned char c)
 {
   unsigned char *bm=NULL;
   if ( fontId >= 0 && fontId < fonts.Length() ){
@@ -302,7 +302,7 @@ unsigned char* csFreeTypeRender::GetCharBitmap (int fontId, unsigned char c)
   return bm;
 }
 
-int csFreeTypeRender::GetCharWidth (int fontId, unsigned char c)
+int csFreeTypeServer::GetCharWidth (int fontId, unsigned char c)
 {
   int width=0;
   if ( fontId >= 0 && fontId < fonts.Length() ){
@@ -314,7 +314,7 @@ int csFreeTypeRender::GetCharWidth (int fontId, unsigned char c)
   return width;
 }
 
-int csFreeTypeRender::GetCharHeight (int fontId, unsigned char c)
+int csFreeTypeServer::GetCharHeight (int fontId, unsigned char c)
 {
   int height=0;
   if ( fontId >= 0 && fontId < fonts.Length() ){
@@ -326,7 +326,7 @@ int csFreeTypeRender::GetCharHeight (int fontId, unsigned char c)
   return height;
 }
 
-int csFreeTypeRender::GetMaximumHeight (int fontId)
+int csFreeTypeServer::GetMaximumHeight (int fontId)
 {
   // all chars have same heigth so return any
   int height=-1;
@@ -340,7 +340,7 @@ int csFreeTypeRender::GetMaximumHeight (int fontId)
 
 }
 
-void csFreeTypeRender::GetTextDimensions (int fontId, const char* text, int& width, int& height)
+void csFreeTypeServer::GetTextDimensions (int fontId, const char* text, int& width, int& height)
 {
   width = height = 0;
   if ( fontId >= 0 && fontId < fonts.Length() ){
@@ -357,14 +357,14 @@ void csFreeTypeRender::GetTextDimensions (int fontId, const char* text, int& wid
 		     fontId, fonts.Length() );
 }
 
-IMPLEMENT_IBASE (csFreeTypeRender)
-  IMPLEMENTS_INTERFACE (iFontRender)
+IMPLEMENT_IBASE (csFreeTypeServer)
+  IMPLEMENTS_INTERFACE (iFontServer)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csFreeTypeRender)
+IMPLEMENT_FACTORY (csFreeTypeServer)
 
 EXPORT_CLASS_TABLE (freefont)
-  EXPORT_CLASS (csFreeTypeRender, "crystalspace.font.render.freetype", 
-		"CrystalSpace FreeType font renderer" )
+  EXPORT_CLASS (csFreeTypeServer, "crystalspace.font.server.freetype", 
+		"CrystalSpace FreeType font server" )
 EXPORT_CLASS_TABLE_END
