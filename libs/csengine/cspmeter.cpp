@@ -31,13 +31,24 @@ void csProgressMeter::Step()
     // In actuality meter displays only 50 units, but prints 0% - 100%.
     current++;
     int const extent = 50 * current / total;
-    for (int i = anchor; i <= extent; i++)
+    if (anchor <= extent)
     {
-      if (i % 5 == 0)
-        CsPrintf (type, "%d%%", i * 2);
-      else
-        CsPrintf (type, ".");
+      char buff [256]; // Batch the update here before sending to CsPrintf().
+      char* p = buff;
+      for (int i = anchor; i <= extent; i++)
+      {
+        if (i % 5 != 0)
+	  *p++ = '.';
+	else
+	{
+          int n;
+	  sprintf (p, "%d%%%n", i * 2, &n );
+	  p += n;
+	}
+      }
+      *p = '\0';
+      CsPrintf (type, "%s", buff);
+      anchor = extent + 1;
     }
-    anchor = extent + 1;
   }
 }
