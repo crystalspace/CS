@@ -23,8 +23,19 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine updated the "fake" istrvec.h and scfstrv.cpp files to
 	  correctly reflect Andrew's "real" scfstrv.h.  This allows the
 	  project to once again compile.
-	- Eric Sunshine and Thomas Hieber added missing 'const' to many of
-	  the prototypes in iStrVector and scfStrVector.
+	- Eric Sunshine and Thomas Hieber added missing 'const' to many of the
+	  prototypes in iStrVector and scfStrVector.
+	- Eric Sunshine removed the obsolete $(CSCOM.LIB) reference from all
+	  makefiles.  Also renamed $(CFLAGS.STATIC_COM) to
+	  $(CFLAGS.STATIC_SCF).
+	- Eric Sunshine changed the makefiles so that the notion of "plug-in"
+	  is now preferred over that of "driver".  (Though drivers, drivers2d,
+	  and driver3d are still retained since they are useful targets.)
+	  $(DRVHELP) became $(PLUGINHELP).  The 'plugin' pseudo-target now
+	  includes all drivers, as well as other non-driver plug-in modules.
+	- Eric Sunshine fixed the csPython makefile so that it only adds
+	  "cspython" the makefile's list of targets if haspythn.sh has
+	  determined that Python is installed.
 8-Nov-1999
 	- Eric Sunshine reverse-engineered Andrew Zabolotny's SCF changes and
 	  was able to recreate some missing files which Andrew forgot to
