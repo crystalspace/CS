@@ -224,7 +224,7 @@ elif mkdirs . 2>/dev/null; then
 else
   as_mkdir_p=''
 fi
-test -r ./-p && rm -rf ./-p
+test -d ./-p && rmdir ./-p
 
 as_executable_p="test -f"
 
@@ -28374,7 +28374,7 @@ elif mkdirs . 2>/dev/null; then
 else
   as_mkdir_p=''
 fi
-test -r ./-p && rm -rf ./-p
+test -d ./-p && rmdir ./-p
 
 as_executable_p="test -f"
 
@@ -28565,7 +28565,8 @@ cat >>$CONFIG_STATUS <<_ACEOF
 # INIT-COMMANDS section.
 #
 
-cs_header_text='$cs_header_text' cs_dir=`(dirname include/volatile.h) 2>/dev/null ||
+cs_header_text='$cs_header_text'
+	cs_dir=`(dirname include/volatile.h) 2>/dev/null ||
 $as_expr Xinclude/volatile.h : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
          Xinclude/volatile.h : 'X\(//\)[^/]' \| \
          Xinclude/volatile.h : 'X\(//\)$' \| \
@@ -28577,32 +28578,33 @@ echo Xinclude/volatile.h |
   	  /^X\(\/\/\)$/{ s//\1/; q; }
   	  /^X\(\/\).*/{ s//\1/; q; }
   	  s/.*/./; q'`
-	    { if test -n "$as_mkdir_p"; then
-    $as_mkdir_p \$cs_dir
+	{ if test -n "\$as_mkdir_p"; then
+    \$as_mkdir_p \$cs_dir
   else
     as_dir=\$cs_dir
     as_dirs=
-    while test ! -d "$as_dir"; do
-      as_dirs="$as_dir $as_dirs"
-      as_dir=`(dirname "$as_dir") 2>/dev/null ||
-$as_expr X"$as_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-         X"$as_dir" : 'X\(//\)[^/]' \| \
-         X"$as_dir" : 'X\(//\)$' \| \
-         X"$as_dir" : 'X\(/\)' \| \
-         .     : '\(.\)' 2>/dev/null ||
-echo X"$as_dir" |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
-  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
-  	  /^X\(\/\/\)$/{ s//\1/; q; }
-  	  /^X\(\/\).*/{ s//\1/; q; }
-  	  s/.*/./; q'`
+    while test ! -d "\$as_dir"; do
+      as_dirs="\$as_dir \$as_dirs"
+      as_dir=\`(dirname "\$as_dir") 2>/dev/null ||
+\$as_expr X"\$as_dir" : 'X\\(.*^/\\)//*^/^/*/*\$' \\| \\
+         X"\$as_dir" : 'X\\(//\\)^/' \\| \\
+         X"\$as_dir" : 'X\\(//\\)\$' \\| \\
+         X"\$as_dir" : 'X\\(/\\)' \\| \\
+         .     : '\\(.\\)' 2>/dev/null ||
+echo X"\$as_dir" |
+    sed '/^X\\(.*^/\\)\\/\\/*^/^/*\\/*\$/{ s//\\1/; q; }
+  	  /^X\\(\\/\\/\\)^/.*/{ s//\\1/; q; }
+  	  /^X\\(\\/\\/\\)\$/{ s//\\1/; q; }
+  	  /^X\\(\\/\\).*/{ s//\\1/; q; }
+  	  s/.*/./; q'\`
     done
-    test ! -n "$as_dirs" || mkdir $as_dirs
-  fi || { { echo "$as_me:$LINENO: error: cannot create directory \$cs_dir" >&5
-echo "$as_me: error: cannot create directory \$cs_dir" >&2;}
+    test ! -n "\$as_dirs" || mkdir \$as_dirs
+  fi || { { echo "\$as_me:\$LINENO: error: cannot create directory \$cs_dir" >&5
+echo "\$as_me: error: cannot create directory \$cs_dir" >&2;}
    { (exit 1); exit 1; }; }; }
 
-cs_makefile_text='$cs_makefile_text' cs_dir=`(dirname config.mak) 2>/dev/null ||
+cs_makefile_text='$cs_makefile_text'
+	cs_dir=`(dirname config.mak) 2>/dev/null ||
 $as_expr Xconfig.mak : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
          Xconfig.mak : 'X\(//\)[^/]' \| \
          Xconfig.mak : 'X\(//\)$' \| \
@@ -28614,32 +28616,33 @@ echo Xconfig.mak |
   	  /^X\(\/\/\)$/{ s//\1/; q; }
   	  /^X\(\/\).*/{ s//\1/; q; }
   	  s/.*/./; q'`
-	    { if test -n "$as_mkdir_p"; then
-    $as_mkdir_p \$cs_dir
+	{ if test -n "\$as_mkdir_p"; then
+    \$as_mkdir_p \$cs_dir
   else
     as_dir=\$cs_dir
     as_dirs=
-    while test ! -d "$as_dir"; do
-      as_dirs="$as_dir $as_dirs"
-      as_dir=`(dirname "$as_dir") 2>/dev/null ||
-$as_expr X"$as_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-         X"$as_dir" : 'X\(//\)[^/]' \| \
-         X"$as_dir" : 'X\(//\)$' \| \
-         X"$as_dir" : 'X\(/\)' \| \
-         .     : '\(.\)' 2>/dev/null ||
-echo X"$as_dir" |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
-  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
-  	  /^X\(\/\/\)$/{ s//\1/; q; }
-  	  /^X\(\/\).*/{ s//\1/; q; }
-  	  s/.*/./; q'`
+    while test ! -d "\$as_dir"; do
+      as_dirs="\$as_dir \$as_dirs"
+      as_dir=\`(dirname "\$as_dir") 2>/dev/null ||
+\$as_expr X"\$as_dir" : 'X\\(.*^/\\)//*^/^/*/*\$' \\| \\
+         X"\$as_dir" : 'X\\(//\\)^/' \\| \\
+         X"\$as_dir" : 'X\\(//\\)\$' \\| \\
+         X"\$as_dir" : 'X\\(/\\)' \\| \\
+         .     : '\\(.\\)' 2>/dev/null ||
+echo X"\$as_dir" |
+    sed '/^X\\(.*^/\\)\\/\\/*^/^/*\\/*\$/{ s//\\1/; q; }
+  	  /^X\\(\\/\\/\\)^/.*/{ s//\\1/; q; }
+  	  /^X\\(\\/\\/\\)\$/{ s//\\1/; q; }
+  	  /^X\\(\\/\\).*/{ s//\\1/; q; }
+  	  s/.*/./; q'\`
     done
-    test ! -n "$as_dirs" || mkdir $as_dirs
-  fi || { { echo "$as_me:$LINENO: error: cannot create directory \$cs_dir" >&5
-echo "$as_me: error: cannot create directory \$cs_dir" >&2;}
+    test ! -n "\$as_dirs" || mkdir \$as_dirs
+  fi || { { echo "\$as_me:\$LINENO: error: cannot create directory \$cs_dir" >&5
+echo "\$as_me: error: cannot create directory \$cs_dir" >&2;}
    { (exit 1); exit 1; }; }; }
 
-cs_jamconfig_text='$cs_jamconfig_text' cs_dir=`(dirname Jamconfig) 2>/dev/null ||
+cs_jamconfig_text='$cs_jamconfig_text'
+	cs_dir=`(dirname Jamconfig) 2>/dev/null ||
 $as_expr XJamconfig : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
          XJamconfig : 'X\(//\)[^/]' \| \
          XJamconfig : 'X\(//\)$' \| \
@@ -28651,29 +28654,29 @@ echo XJamconfig |
   	  /^X\(\/\/\)$/{ s//\1/; q; }
   	  /^X\(\/\).*/{ s//\1/; q; }
   	  s/.*/./; q'`
-	    { if test -n "$as_mkdir_p"; then
-    $as_mkdir_p \$cs_dir
+	{ if test -n "\$as_mkdir_p"; then
+    \$as_mkdir_p \$cs_dir
   else
     as_dir=\$cs_dir
     as_dirs=
-    while test ! -d "$as_dir"; do
-      as_dirs="$as_dir $as_dirs"
-      as_dir=`(dirname "$as_dir") 2>/dev/null ||
-$as_expr X"$as_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-         X"$as_dir" : 'X\(//\)[^/]' \| \
-         X"$as_dir" : 'X\(//\)$' \| \
-         X"$as_dir" : 'X\(/\)' \| \
-         .     : '\(.\)' 2>/dev/null ||
-echo X"$as_dir" |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
-  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
-  	  /^X\(\/\/\)$/{ s//\1/; q; }
-  	  /^X\(\/\).*/{ s//\1/; q; }
-  	  s/.*/./; q'`
+    while test ! -d "\$as_dir"; do
+      as_dirs="\$as_dir \$as_dirs"
+      as_dir=\`(dirname "\$as_dir") 2>/dev/null ||
+\$as_expr X"\$as_dir" : 'X\\(.*^/\\)//*^/^/*/*\$' \\| \\
+         X"\$as_dir" : 'X\\(//\\)^/' \\| \\
+         X"\$as_dir" : 'X\\(//\\)\$' \\| \\
+         X"\$as_dir" : 'X\\(/\\)' \\| \\
+         .     : '\\(.\\)' 2>/dev/null ||
+echo X"\$as_dir" |
+    sed '/^X\\(.*^/\\)\\/\\/*^/^/*\\/*\$/{ s//\\1/; q; }
+  	  /^X\\(\\/\\/\\)^/.*/{ s//\\1/; q; }
+  	  /^X\\(\\/\\/\\)\$/{ s//\\1/; q; }
+  	  /^X\\(\\/\\).*/{ s//\\1/; q; }
+  	  s/.*/./; q'\`
     done
-    test ! -n "$as_dirs" || mkdir $as_dirs
-  fi || { { echo "$as_me:$LINENO: error: cannot create directory \$cs_dir" >&5
-echo "$as_me: error: cannot create directory \$cs_dir" >&2;}
+    test ! -n "\$as_dirs" || mkdir \$as_dirs
+  fi || { { echo "\$as_me:\$LINENO: error: cannot create directory \$cs_dir" >&5
+echo "\$as_me: error: cannot create directory \$cs_dir" >&2;}
    { (exit 1); exit 1; }; }; }
 
 MAKE=${MAKE-make}

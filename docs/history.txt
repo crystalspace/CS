@@ -15,6 +15,21 @@ chronological order.
 	  hit.
 	- Eric Sunshine protected the new terrain item in user.mak inside
 	  USE_NEW_RENDERER conditional.
+	- Eric Sunshine changed mkdir.m4 so that _AS_MKDIR_P_PREPARE() removes
+	  the bogus "-p" directory using rmdir rather than "rm -rf" since rmdir
+	  is a bit safer in case someone actually has an existing directory
+	  named "-p" (as unlikely though that is).
+	- Eric Sunshine wrapped CS_TEXT_CACHE_OUTPUT's AS_MKDIR_P invocation
+	  inside AS_ESCAPE in order to ensure that AS_MKDIR_P works correctly
+	  even in cases when AS_MKDIR_P has to fall back to the non-"mkdir -p"
+	  case.  When it is not wrapped in AS_ESCAPE, the AS_MKDIR_P variables
+	  and subshell invocations ($ac_dir, $ac_dirs, `dirname`) are
+	  incorrectly evaluated in the context of configure, even though they
+	  are supposed to be evaluated in the context of config.status.
+	- Eric Sunshine updated commentary in mkdir.m4 and textcache.m4 to
+	  reflect the fact that he finally managed, with additional prompting,
+	  to get the Autoconf maintainers to fix the bugs which he had reported
+	  nearly a year ago.
 25-Sep-2003
 	- Jorrit removed iCamera->GetHit(). This function is only a very
 	  thin wrapper on top of iSector->HitBeamPortals() so it is not
