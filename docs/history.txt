@@ -15,6 +15,15 @@ Short-term cleanups that need to be done:
 31-Jan-2000
 	- Eric Sunshine fixed unixconf.sh so that it correctly captures
 	  and interprets output of 'which' command.
+	- Received new version of Blocks from Void <glitia@texnet.ro>.
+	  This version works almost correctly. Planes disappear when filled
+	  up and there is a score. Many bugs have been fixed.
+	- Cleaned up the Blocks code.
+	- Added a lot of new shapes sorted by difficulty.
+	- Added difficulty setting to Blocks.
+	- Added animated demo screen.
+	- Fixed a few small other bugs in Blocks (camera is now
+	  properly initialized when a new game starts).
 	- Eric Sunshine fixed the makefile for the csPython plug-in so that
 	  it correctly locates the Python library within PYTHON_LIB and
 	  also eliminated its reliance on the hard-coded 1.5 library name.
@@ -126,7 +135,7 @@ Short-term cleanups that need to be done:
 	  program. The problem was that glXDestroyContext was not being
 	  called.
 21-Jan-2000
-	- Michael Dale continued his work on the autoconf system
+	- Michael Day continued his work on the autoconf system
 	  in CS.
 	- Andrew Zabolotny updated inline assembly in software renderer
 	  so that it is gcc 2.95 compatible.
@@ -144,7 +153,7 @@ Short-term cleanups that need to be done:
 	  by Eric Wigforss <ewigforss@novametrix.com>, I did some
 	  adjustments too, to make debug and release mode consistent.
 20-Jan-2000
-	- Michael Dale started adding an 'autoconf' system to CS. He
+	- Michael Day started adding an 'autoconf' system to CS. He
 	  started his work with the csgeom library.
 	- Thomas Hieber updated Windows documentation.
 	- Changes to csphyzik from Noah L. Gibbs.

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -15,6 +15,19 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+/*
+  TODO:
+    Make nice startup screen with moving blocks as demo.
+    Print out score.
+    Improve 'new game'.
+    Detect end of game when blocks are too high.
+    Better rotation of blocks.
+    Better textures.
+    Better recognition of side of play area.
+    Make keys configurable.
+    Fix bug with partially shifted blocks.
+ */
 
 #define SYSDEF_ACCESS
 #include "sysdef.h"
@@ -44,6 +57,7 @@ Blocks* Sys = NULL;
 csView* view = NULL;
 
 #define Gfx3D System->G3D
+#define Gfx2D System->G2D
 
 //------------------------------ We need the VFS plugin and the 3D engine -----
 
@@ -54,19 +68,13 @@ REGISTER_STATIC_LIBRARY (engine)
 
 Blocks::Blocks ()
 {
-  rot_px_todo = 0;
-  rot_py_todo = 0;
-  rot_pz_todo = 0;
-  rot_mx_todo = 0;
-  rot_my_todo = 0;
-  rot_mz_todo = 0;
-  move_hor_todo = 0;
-  cam_move_dist = 0;
-
   full_rotate_x = create_rotate_x (M_PI/2);
   full_rotate_y = create_rotate_y (M_PI/2);
   full_rotate_z = create_rotate_z (M_PI/2);
-
+  full_rotate_x_reverse = create_rotate_x (-M_PI/2);
+  full_rotate_y_reverse = create_rotate_y (-M_PI/2);
+  full_rotate_z_reverse = create_rotate_z (-M_PI/2);
+  
   pause = false;
 
   destinations[0][0] = csVector3 (0, 3, -5);
@@ -101,18 +109,35 @@ Blocks::Blocks ()
   move_down_dy = dest_move_down_dy[cur_hor_dest];
 
   view_origin = csVector3 (0, 3, 0);
+
+  newgame = true;
+  startup_screen = true;
+  dynlight = NULL;
 }
 
 void Blocks::init_game ()
 {
   int i, j, k;
-  for (k = 0 ; k < CUBE_SAFETY+CUBE_HEIGHT+CUBE_SAFETY ; k++)
-    for (j = 0 ; j < CUBE_SAFETY+CUBE_DIM+CUBE_SAFETY ; j++)
-      for (i = 0 ; i < CUBE_SAFETY+CUBE_DIM+CUBE_SAFETY ; i++)
+  for (k = 0 ; k < ZONE_SAFETY+ZONE_HEIGHT+ZONE_SAFETY ; k++)
+    for (j = 0 ; j < ZONE_SAFETY+ZONE_DIM+ZONE_SAFETY ; j++)
+      for (i = 0 ; i < ZONE_SAFETY+ZONE_DIM+ZONE_SAFETY ; i++)
         game_cube[i][j][k] =
-	  i < CUBE_SAFETY || j < CUBE_SAFETY || k < CUBE_SAFETY ||
-	  i >= CUBE_SAFETY+CUBE_DIM || j >= CUBE_SAFETY+CUBE_DIM || k >= CUBE_SAFETY+CUBE_HEIGHT;
+	  i < ZONE_SAFETY || j < ZONE_SAFETY || k < ZONE_SAFETY ||
+	  i >= ZONE_SAFETY+ZONE_DIM || j >= ZONE_SAFETY+ZONE_DIM ||
+	  k >= ZONE_SAFETY+ZONE_HEIGHT;
+  transition = false;
+  newgame = false;
+  score = 0;
+  rot_px_todo = 0;
+  rot_py_todo = 0;
+  rot_pz_todo = 0;
+  rot_mx_todo = 0;
+  rot_my_todo = 0;
+  rot_mz_todo = 0;
+  move_hor_todo = 0;
+  cam_move_dist = 0;
 }
+
 
 csMatrix3 Blocks::create_rotate_x (float angle)
 {
@@ -143,24 +168,24 @@ csMatrix3 Blocks::create_rotate_z (float angle)
 
 void Blocks::add_pilar_template ()
 {
-  float dim = BLOCK_DIM/2.;
-  CHK (pilar_tmpl = new csThingTemplate ());
+  float dim = CUBE_DIM/2.;
+  pilar_tmpl = new csThingTemplate ();
   pilar_tmpl->SetName ("pilar");
   pilar_tmpl->AddVertex (-dim, 0, dim);
   pilar_tmpl->AddVertex (dim, 0, dim);
   pilar_tmpl->AddVertex (dim, 0, -dim);
   pilar_tmpl->AddVertex (-dim, 0, -dim);
-  pilar_tmpl->AddVertex (-dim, CUBE_HEIGHT*BLOCK_DIM, dim);
-  pilar_tmpl->AddVertex (dim, CUBE_HEIGHT*BLOCK_DIM, dim);
-  pilar_tmpl->AddVertex (dim, CUBE_HEIGHT*BLOCK_DIM, -dim);
-  pilar_tmpl->AddVertex (-dim, CUBE_HEIGHT*BLOCK_DIM, -dim);
+  pilar_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, dim);
+  pilar_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, dim);
+  pilar_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, -dim);
+  pilar_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, -dim);
 
   csPolygonTemplate* p;
   float A, B, C;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  CHK (p = new csPolygonTemplate (pilar_tmpl, "d", pilar_txt));
+  p = new csPolygonTemplate (pilar_tmpl, "d", pilar_txt);
   pilar_tmpl->AddPolygon (p);
   p->AddVertex (3);
   p->AddVertex (2);
@@ -171,7 +196,7 @@ void Blocks::add_pilar_template ()
       	pilar_tmpl->Vtex (0), pilar_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (pilar_tmpl, "b", pilar_txt));
+  p = new csPolygonTemplate (pilar_tmpl, "b", pilar_txt);
   pilar_tmpl->AddPolygon (p);
   p->AddVertex (0);
   p->AddVertex (1);
@@ -182,7 +207,7 @@ void Blocks::add_pilar_template ()
       	pilar_tmpl->Vtex (0), pilar_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (pilar_tmpl, "t", pilar_txt));
+  p = new csPolygonTemplate (pilar_tmpl, "t", pilar_txt);
   pilar_tmpl->AddPolygon (p);
   p->AddVertex (4);
   p->AddVertex (5);
@@ -193,7 +218,7 @@ void Blocks::add_pilar_template ()
       	pilar_tmpl->Vtex (4), pilar_tmpl->Vtex (5), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (pilar_tmpl, "f", pilar_txt));
+  p = new csPolygonTemplate (pilar_tmpl, "f", pilar_txt);
   pilar_tmpl->AddPolygon (p);
   p->AddVertex (7);
   p->AddVertex (6);
@@ -204,7 +229,7 @@ void Blocks::add_pilar_template ()
       	pilar_tmpl->Vtex (7), pilar_tmpl->Vtex (6), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (pilar_tmpl, "l", pilar_txt));
+  p = new csPolygonTemplate (pilar_tmpl, "l", pilar_txt);
   pilar_tmpl->AddPolygon (p);
   p->AddVertex (4);
   p->AddVertex (7);
@@ -215,7 +240,7 @@ void Blocks::add_pilar_template ()
       	pilar_tmpl->Vtex (7), pilar_tmpl->Vtex (3), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (pilar_tmpl, "r", pilar_txt));
+  p = new csPolygonTemplate (pilar_tmpl, "r", pilar_txt);
   pilar_tmpl->AddPolygon (p);
   p->AddVertex (6);
   p->AddVertex (5);
@@ -232,13 +257,13 @@ void Blocks::add_pilar_template ()
 void Blocks::add_pilar (int x, int y)
 {
   csThing* pilar;
-  CHK (pilar = new csThing ());
+  pilar = new csThing ();
   pilar->SetName ("pilar");
   pilar->SetSector (room);
   pilar->SetFlags (CS_ENTITY_MOVEABLE, 0);
   pilar->MergeTemplate (pilar_tmpl, pilar_txt, 1);
   room->AddThing (pilar);
-  csVector3 v ((x-CUBE_DIM/2)*BLOCK_DIM, 0, (y-CUBE_DIM/2)*BLOCK_DIM);
+  csVector3 v ((x-ZONE_DIM/2)*CUBE_DIM, 0, (y-ZONE_DIM/2)*CUBE_DIM);
   pilar->SetMove (room, v);
   pilar->Transform ();
 }
@@ -246,8 +271,8 @@ void Blocks::add_pilar (int x, int y)
 
 void Blocks::add_cube_template ()
 {
-  float dim = BLOCK_DIM/2.;
-  CHK (cube_tmpl = new csThingTemplate ());
+  float dim = CUBE_DIM/2.;
+  cube_tmpl = new csThingTemplate ();
   cube_tmpl->SetName ("cube");
   cube_tmpl->AddVertex (-dim, -dim, dim);
   cube_tmpl->AddVertex (dim, -dim, dim);
@@ -262,42 +287,42 @@ void Blocks::add_cube_template ()
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "d1", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "d1", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (3);
   p->AddVertex (2);
   p->AddVertex (1);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "d2", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "d2", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (3);
   p->AddVertex (1);
   p->AddVertex (0);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "b1", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "b1", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (0);
   p->AddVertex (1);
   p->AddVertex (5);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "b2", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "b2", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (0);
   p->AddVertex (5);
   p->AddVertex (4);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "t1", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "t1", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (4);
   p->AddVertex (5);
   p->AddVertex (6);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "t2", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "t2", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (4);
   p->AddVertex (6);
@@ -305,7 +330,7 @@ void Blocks::add_cube_template ()
   p->SetTextureSpace (tx_matrix, tx_vector);
 
 #if 0
-  CHK (p = new csPolygonTemplate (cube_tmpl, "f", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "f", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (7);
   p->AddVertex (6);
@@ -313,17 +338,17 @@ void Blocks::add_cube_template ()
   p->AddVertex (3);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	cube_tmpl->Vtex (7), cube_tmpl->Vtex (6), BLOCK_DIM, A, B, C);
+      	cube_tmpl->Vtex (7), cube_tmpl->Vtex (6), CUBE_DIM, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 #else
-  CHK (p = new csPolygonTemplate (cube_tmpl, "f1", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "f1", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (7);
   p->AddVertex (6);
   p->AddVertex (2);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "f2", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "f2", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (7);
   p->AddVertex (2);
@@ -331,28 +356,28 @@ void Blocks::add_cube_template ()
   p->SetTextureSpace (tx_matrix, tx_vector);
 #endif
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "l1", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "l1", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (4);
   p->AddVertex (7);
   p->AddVertex (3);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "l2", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "l2", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (4);
   p->AddVertex (3);
   p->AddVertex (0);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "r1", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "r1", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (6);
   p->AddVertex (5);
   p->AddVertex (1);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  CHK (p = new csPolygonTemplate (cube_tmpl, "r2", cube_txt));
+  p = new csPolygonTemplate (cube_tmpl, "r2", cube_txt);
   cube_tmpl->AddPolygon (p);
   p->AddVertex (6);
   p->AddVertex (1);
@@ -377,11 +402,11 @@ void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
 void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
 {
   csThing* cube;
-  CHK (cube = new csThing ());
-  cube->SetName ("cube");
+  cube = new csThing ();
+  cube->SetName ("cubexxx");
   cube->SetSector (room);
   cube->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
-  csVector3 shift (dx*BLOCK_DIM, dz*BLOCK_DIM, dy*BLOCK_DIM);
+  csVector3 shift (dx*CUBE_DIM, dz*CUBE_DIM, dy*CUBE_DIM);
   cube->MergeTemplate (cube_tmpl, cube_txt, 1, NULL, &shift, NULL);
 
   csPolygon3D* p;
@@ -400,7 +425,8 @@ void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
   p = cube->GetPolygon3D ("r2"); set_uv (p, 0, 0, 1, 1, 0, 1);
 
   room->AddThing (cube);
-  csVector3 v ((x-CUBE_DIM/2)*BLOCK_DIM, z*BLOCK_DIM+1, (y-CUBE_DIM/2)*BLOCK_DIM);
+  csVector3 v ((x-ZONE_DIM/2)*CUBE_DIM, z*CUBE_DIM+CUBE_DIM/2,
+  	(y-ZONE_DIM/2)*CUBE_DIM);
   cube->SetMove (room, v);
   cube->Transform ();
   cube->InitLightMaps (false);
@@ -418,17 +444,173 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
   num_cubes = 0;
   switch (type)
   {
-    case SHAPE_R1: add_cube (0, 0, 0, x, y, z); break;
-    case SHAPE_R2: add_cube (0, 0, 0, x, y, z); add_cube (1, 0, 0, x, y, z); break;
-    case SHAPE_R3: add_cube (-1, 0, 0, x, y, z); add_cube (0, 0, 0, x, y, z); add_cube (1, 0, 0, x, y, z); break;
-    case SHAPE_R4: add_cube (-1, 0, 0, x, y, z); add_cube (0, 0, 0, x, y, z); add_cube (1, 0, 0, x, y, z); add_cube (2, 0, 0, x, y, z); break;
-    case SHAPE_L: add_cube (-1, 0, 1, x, y, z); add_cube (-1, 0, 0, x, y, z); add_cube (0, 0, 0, x, y, z); add_cube (1, 0, 0, x, y, z); break;
-    case SHAPE_T1: add_cube (0, 0, 1, x, y, z); add_cube (-1, 0, 0, x, y, z); add_cube (0, 0, 0, x, y, z); add_cube (1, 0, 0, x, y, z); break;
-    case SHAPE_T2: add_cube (0, 0, 2, x, y, z); add_cube (0, 0, 1, x, y, z); add_cube (-1, 0, 0, x, y, z); add_cube (0, 0, 0, x, y, z); add_cube (1, 0, 0, x, y, z); break;
+    case SHAPE_R1:
+      add_cube (0, 0, 0, x, y, z);
+      break;
+    case SHAPE_R2:
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      break;
+    case SHAPE_R3:
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      break;
+    case SHAPE_R4:
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      add_cube (2, 0, 0, x, y, z);
+      break;
+    case SHAPE_L1:
+      add_cube (-1, 0, 1, x, y, z);
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      break;
+    case SHAPE_L2:
+      add_cube (-1, 0, 1, x, y, z);
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      break;
+    case SHAPE_T1:
+      add_cube (0, 0, 1, x, y, z);
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      break;
+    case SHAPE_T2:
+      add_cube (0, 0, 2, x, y, z);
+      add_cube (0, 0, 1, x, y, z);
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      break;
+    case SHAPE_FLAT:
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      add_cube (0, 1, 0, x, y, z);
+      add_cube (1, 1, 0, x, y, z);
+      break;
     case SHAPE_CUBE:
-    	add_cube (0, 0, 0, x, y, z); add_cube (1, 0, 0, x, y, z); add_cube (0, 1, 0, x, y, z); add_cube (1, 1, 0, x, y, z);
-    	add_cube (0, 0, 1, x, y, z); add_cube (1, 0, 1, x, y, z); add_cube (0, 1, 1, x, y, z); add_cube (1, 1, 1, x, y, z);
-	break;
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      add_cube (0, 1, 0, x, y, z);
+      add_cube (1, 1, 0, x, y, z);
+      add_cube (0, 0, 1, x, y, z);
+      add_cube (1, 0, 1, x, y, z);
+      add_cube (0, 1, 1, x, y, z);
+      add_cube (1, 1, 1, x, y, z);
+      break;
+    case SHAPE_U:
+      add_cube (-1, 0, 1, x, y, z);
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      add_cube (1, 0, 1, x, y, z);
+      break;
+    case SHAPE_S:
+      add_cube (-1, 0, 1, x, y, z);
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      add_cube (1, 0, -1, x, y, z);
+      break;
+    case SHAPE_L3:
+      add_cube (-1, 0, 1, x, y, z);
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      add_cube (2, 0, 0, x, y, z);
+      break;
+    case SHAPE_T1X:
+      add_cube (0, 0, 1, x, y, z);
+      add_cube (-1, 0, 0, x, y, z);
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      add_cube (0, 1, 0, x, y, z);
+      break;
+    case SHAPE_FLATX:
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      add_cube (0, 1, 0, x, y, z);
+      add_cube (1, 1, 0, x, y, z);
+      add_cube (0, 0, 1, x, y, z);
+      break;
+    case SHAPE_FLATXX:
+      add_cube (0, 0, 0, x, y, z);
+      add_cube (1, 0, 0, x, y, z);
+      add_cube (0, 1, 0, x, y, z);
+      add_cube (1, 1, 0, x, y, z);
+      add_cube (0, 0, 1, x, y, z);
+      add_cube (1, 1, 1, x, y, z);
+      break;
+    case SHAPE_DEMO_B:
+      add_cube (-1, 0, -2, x, y, z);
+      add_cube (-1, 0, -1, x, y, z);
+      add_cube (-1, 0,  0, x, y, z);
+      add_cube (-1, 0,  1, x, y, z);
+      add_cube (-1, 0,  2, x, y, z);
+      add_cube ( 0, 0, -2, x, y, z);
+      add_cube ( 0, 0,  0, x, y, z);
+      add_cube ( 0, 0,  2, x, y, z);
+      add_cube ( 1, 0, -1, x, y, z);
+      add_cube ( 1, 0,  1, x, y, z);
+      break;
+    case SHAPE_DEMO_L:
+      add_cube (-1, 0, -2, x, y, z);
+      add_cube (-1, 0, -1, x, y, z);
+      add_cube (-1, 0,  0, x, y, z);
+      add_cube (-1, 0,  1, x, y, z);
+      add_cube (-1, 0,  2, x, y, z);
+      add_cube ( 0, 0,  -2, x, y, z);
+      add_cube ( 1, 0,  -2, x, y, z);
+      break;
+    case SHAPE_DEMO_O:
+      add_cube (-1, 0, -2, x, y, z);
+      add_cube (-1, 0, -1, x, y, z);
+      add_cube (-1, 0,  0, x, y, z);
+      add_cube (-1, 0,  1, x, y, z);
+      add_cube (-1, 0,  2, x, y, z);
+      add_cube ( 0, 0, -2, x, y, z);
+      add_cube ( 0, 0,  2, x, y, z);
+      add_cube ( 1, 0, -2, x, y, z);
+      add_cube ( 1, 0, -1, x, y, z);
+      add_cube ( 1, 0,  0, x, y, z);
+      add_cube ( 1, 0,  1, x, y, z);
+      add_cube ( 1, 0,  2, x, y, z);
+      break;
+    case SHAPE_DEMO_C:
+      add_cube (-1, 0, -1, x, y, z);
+      add_cube (-1, 0,  0, x, y, z);
+      add_cube (-1, 0,  1, x, y, z);
+      add_cube ( 0, 0, -2, x, y, z);
+      add_cube ( 0, 0,  2, x, y, z);
+      add_cube ( 1, 0, -2, x, y, z);
+      add_cube ( 1, 0,  2, x, y, z);
+      break;
+    case SHAPE_DEMO_K:
+      add_cube (-1, 0, -2, x, y, z);
+      add_cube (-1, 0, -1, x, y, z);
+      add_cube (-1, 0,  0, x, y, z);
+      add_cube (-1, 0,  1, x, y, z);
+      add_cube (-1, 0,  2, x, y, z);
+      add_cube ( 0, 0, -1, x, y, z);
+      add_cube ( 0, 0,  1, x, y, z);
+      add_cube ( 1, 0, -2, x, y, z);
+      add_cube ( 1, 0,  2, x, y, z);
+      break;
+    case SHAPE_DEMO_S:
+      add_cube ( 1, 0, -1, x, y, z);
+      add_cube ( 1, 0,  0, x, y, z);
+      add_cube ( 1, 0,  2, x, y, z);
+      add_cube ( 0, 0, -2, x, y, z);
+      add_cube ( 0, 0,  0, x, y, z);
+      add_cube ( 0, 0,  2, x, y, z);
+      add_cube (-1, 0, -2, x, y, z);
+      add_cube (-1, 0,  0, x, y, z);
+      add_cube (-1, 0,  1, x, y, z);
+      break;
     default: break;
   }
   move_down_todo = 0;
@@ -440,25 +622,45 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
 
 void Blocks::start_rotation (BlRotType type)
 {
-  if (rot_px_todo || rot_mx_todo || rot_py_todo || rot_my_todo || rot_pz_todo || rot_mz_todo ||
-      move_hor_todo) return;
+  if (rot_px_todo || rot_mx_todo || rot_py_todo ||
+  	rot_my_todo || rot_pz_todo || rot_mz_todo || move_hor_todo)
+    return;
   switch (type)
   {
-    case ROT_PX: if (!check_new_shape_rotation (full_rotate_x)) return; rot_px_todo = M_PI/2; break;
-    case ROT_MX: if (!check_new_shape_rotation (-full_rotate_x)) return; rot_mx_todo = M_PI/2; break;
-    case ROT_PY: if (!check_new_shape_rotation (full_rotate_z)) return; rot_py_todo = M_PI/2; break;
-    case ROT_MY: if (!check_new_shape_rotation (-full_rotate_z)) return; rot_my_todo = M_PI/2; break;
-    case ROT_PZ: if (!check_new_shape_rotation (full_rotate_y)) return; rot_pz_todo = M_PI/2; break;
-    case ROT_MZ: if (!check_new_shape_rotation (-full_rotate_y)) return; rot_mz_todo = M_PI/2; break;
+    case ROT_PX:
+      if (!check_new_shape_rotation (full_rotate_x)) return;
+      rot_px_todo = M_PI/2;
+      break;
+    case ROT_MX:
+      if (!check_new_shape_rotation (full_rotate_x_reverse)) return;
+      rot_mx_todo = M_PI/2;
+      break;
+    case ROT_PY:
+      if (!check_new_shape_rotation (full_rotate_z)) return;
+      rot_py_todo = M_PI/2;
+      break;
+    case ROT_MY:
+      if (!check_new_shape_rotation (full_rotate_z_reverse)) return;
+      rot_my_todo = M_PI/2;
+      break;
+    case ROT_PZ:
+      if (!check_new_shape_rotation (full_rotate_y)) return;
+      rot_pz_todo = M_PI/2;
+      break;
+    case ROT_MZ:
+      if (!check_new_shape_rotation (full_rotate_y_reverse)) return;
+      rot_mz_todo = M_PI/2;
+      break;
   }
 }
 
 void Blocks::start_horizontal_move (int dx, int dy)
 {
-  if (rot_px_todo || rot_mx_todo || rot_py_todo || rot_my_todo || rot_pz_todo || rot_mz_todo ||
-      move_hor_todo) return;
+  if (rot_px_todo || rot_mx_todo || rot_py_todo || rot_my_todo ||
+  	rot_pz_todo || rot_mz_todo || move_hor_todo)
+    return;
   if (!check_new_shape_location (dx, dy, 0)) return;
-  move_hor_todo = BLOCK_DIM;
+  move_hor_todo = CUBE_DIM;
   move_hor_dx = dx;
   move_hor_dy = dy;
 }
@@ -466,14 +668,39 @@ void Blocks::start_horizontal_move (int dx, int dy)
 void Blocks::move_camera ()
 {
   csVector3 pos = cam_move_dist*cam_move_src + (1-cam_move_dist)*cam_move_dest;
-  view->GetCamera ()->SetPosition (pos); view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
+  view->GetCamera ()->SetPosition (pos);
+  view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
 }
 
 void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
 {
+  if (startup_screen)
+  {
+    switch (key)
+    {
+      case '1':
+        difficulty = NUM_EASY_SHAPE;
+	startup_screen = false;
+	newgame = true;
+	break;
+      case '2':
+        difficulty = NUM_MEDIUM_SHAPE;
+	startup_screen = false;
+	newgame = true;
+	break;
+      case '3':
+        difficulty = NUM_HARD_SHAPE;
+	startup_screen = false;
+	newgame = true;
+	break;
+      case CSKEY_ESC: System->Shutdown = true; break;
+    }
+    return;
+  }
+
   switch (key)
   {
-    case '1':
+    case 'u':
       if (cam_move_dist) break;
       cam_move_dist = 1;
       cam_move_src = view->GetCamera ()->GetW2CTranslation ();
@@ -485,7 +712,7 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
       move_down_dx = dest_move_down_dx[cur_hor_dest];
       move_down_dy = dest_move_down_dy[cur_hor_dest];
       break;
-    case '2':
+    case 'o':
       if (cam_move_dist) break;
       cam_move_dist = 1;
       cam_move_src = view->GetCamera ()->GetW2CTranslation ();
@@ -497,7 +724,7 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
       move_down_dx = dest_move_down_dx[cur_hor_dest];
       move_down_dy = dest_move_down_dy[cur_hor_dest];
       break;
-    case '3':
+    case 'h':
       if (cam_move_dist) break;
       cam_move_dist = 1;
       cam_move_src = view->GetCamera ()->GetW2CTranslation ();
@@ -505,7 +732,7 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
       cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
       cam_move_up = csVector3 (0, -1, 0);
       break;
-    case '4':
+    case 'y':
       if (cam_move_dist) break;
       cam_move_dist = 1;
       cam_move_src = view->GetCamera ()->GetW2CTranslation ();
@@ -513,14 +740,14 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
       cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
       cam_move_up = csVector3 (0, -1, 0);
       break;
-    case 'z':
+    case ';':
       if (cam_move_dist) break;
       cam_move_dist = 1;
       cam_move_src = view->GetCamera ()->GetW2CTranslation ();
       cam_move_dest = cam_move_src + .3 * (view_origin - cam_move_src);
       cam_move_up = csVector3 (0, -1, 0);
       break;
-    case 'Z':
+    case 'a':
       if (cam_move_dist) break;
       cam_move_dist = 1;
       cam_move_src = view->GetCamera ()->GetW2CTranslation ();
@@ -528,18 +755,20 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
       cam_move_up = csVector3 (0, -1, 0);
       break;
     case CSKEY_F1: G2D->PerformExtension ("sim_pal"); break;
-    case 'q': start_rotation (ROT_PX); break;
-    case 'a': start_rotation (ROT_MX); break;
-    case 'w': start_rotation (ROT_PY); break;
-    case 's': start_rotation (ROT_MY); break;
-    case 'e': start_rotation (ROT_PZ); break;
-    case 'd': start_rotation (ROT_MZ); break;
-    case CSKEY_UP: start_horizontal_move (-move_down_dx, -move_down_dy); break;
-    case CSKEY_DOWN: start_horizontal_move (move_down_dx, move_down_dy); break;
-    case CSKEY_LEFT: start_horizontal_move (-move_right_dx, -move_right_dy); break;
-    case CSKEY_RIGHT: start_horizontal_move (move_right_dx, move_right_dy); break;
-    case ' ': speed = 7; break;
+    case 'w': start_rotation (ROT_PX); break;
+    case 's': start_rotation (ROT_MX); break;
+    case 'e': start_rotation (ROT_PY); break;
+    case 'd': start_rotation (ROT_MY); break;
+    case 'r': start_rotation (ROT_PZ); break;
+    case 'f': start_rotation (ROT_MZ); break;
+    case 'i': start_horizontal_move (-move_down_dx, -move_down_dy); break;
+    case 'k': start_horizontal_move (move_down_dx, move_down_dy); break;
+    case 'j': start_horizontal_move (-move_right_dx, -move_right_dy); break;
+    case 'l': start_horizontal_move (move_right_dx, move_right_dy); break;
+    case ' ': if (speed == 7) speed = 0.2; // Space changes speeds now.
+	      else speed = 7; break;
     case 'p': pause = !pause; break;
+    case 'n': newgame = true; break;
     case CSKEY_ESC: System->Shutdown = true;
   }
 }
@@ -554,6 +783,7 @@ void Blocks::move_shape_internal (int dx, int dy, int dz)
 void Blocks::rotate_shape_internal (const csMatrix3& rot)
 {
   int i;
+
   for (i = 0 ; i < num_cubes ; i++)
   {
     csVector3 v;
@@ -561,6 +791,7 @@ void Blocks::rotate_shape_internal (const csMatrix3& rot)
     v.y = (float)cube_info[i].dy;
     v.z = (float)cube_info[i].dz;
     v = rot * v;
+
     if (v.x < 0) cube_info[i].dx = (int)(v.x-.5);
     else cube_info[i].dx = (int)(v.x+.5);
     if (v.y < 0) cube_info[i].dy = (int)(v.y-.5);
@@ -574,12 +805,18 @@ void Blocks::freeze_shape ()
 {
   int i;
   int x, y, z;
+  char cubename[20];
+
   for (i = 0 ; i < num_cubes ; i++)
   {
     x = cube_x+cube_info[i].dx;
     y = cube_y+cube_info[i].dy;
     z = cube_z+cube_info[i].dz;
     set_cube (x, y, z, true);
+    sprintf (cubename, "cubeAt%d%d%d", x, y, z);
+    // Before we let go of the shape (lose the pointer to it) we set it's
+    // name according to it's position.
+    cube_info[i].thing->SetName (cubename); 
   }
 }
 
@@ -587,13 +824,14 @@ void Blocks::dump_shape ()
 {
   int i;
   int x, y, z;
-  printf ("Dump shape:\n");
+  CsPrintf (MSG_DEBUG_0,"Dump shape:\n");
   for (i = 0 ; i < num_cubes ; i++)
   {
     x = cube_info[i].dx;
     y = cube_info[i].dy;
     z = cube_info[i].dz;
-    printf ("    %d: (%d,%d,%d) d=(%d,%d,%d)\n", i, cube_x+x, cube_y+y, cube_z+z, x, y, z);
+    CsPrintf (MSG_DEBUG_0, " %d: (%d,%d,%d) d=(%d,%d,%d)\n",
+    	i, cube_x+x, cube_y+y, cube_z+z, x, y, z);
   }
 }
 
@@ -648,6 +886,22 @@ void reset_vertex_colors (csThing* th)
   }
 }
 
+void Blocks::updateScore (void)
+{
+  int increase = 0;
+  int i;
+	
+  for (i=0 ; i<ZONE_HEIGHT ; i++)
+  {
+    if (filled_planes[i])
+    {
+      increase++;
+    }
+  }
+
+  score+=increase*increase;
+}
+
 void Blocks::move_cubes (time_t elapsed_time)
 {
   int i;
@@ -656,6 +910,20 @@ void Blocks::move_cubes (time_t elapsed_time)
   float elapsed_fall = elapsed*speed;
   float elapsed_move = elapsed*1.6;
   float elapsed_cam_move = elapsed*1.6;
+
+  if (startup_screen)
+  {
+    float old_dyn_x = dynlight_x;
+    dynlight_x += dynlight_dx*elapsed;
+    if (dynlight_x > 4 || dynlight_x < -4)
+    {
+      dynlight_dx = -dynlight_dx;
+      dynlight_x = old_dyn_x;
+    }
+    dynlight->Move (room, dynlight_x, dynlight_y, dynlight_z);
+    dynlight->Setup ();
+    return;
+  }
 
   if (cam_move_dist)
   {
@@ -668,18 +936,20 @@ void Blocks::move_cubes (time_t elapsed_time)
 
   if (!move_down_todo)
   {
-    //dump_shape ();
+    // dump_shape ();
     bool stop = !check_new_shape_location (0, 0, -1);
     if (stop)
     {
       freeze_shape ();
-      start_shape ((BlShapeType)(rand () % SHAPE_TOTAL), 3, 3, CUBE_HEIGHT-3);
+      checkForPlane ();
+      if (!transition)
+        start_shape ((BlShapeType)(rand () % difficulty), 3, 3, ZONE_HEIGHT-3);
       return;
     }
     else
     {
       move_shape_internal (0, 0, -1);
-      move_down_todo = BLOCK_DIM;
+      move_down_todo = CUBE_DIM;
     }
   }
   if (elapsed_fall > move_down_todo) elapsed_fall = move_down_todo;
@@ -694,7 +964,7 @@ void Blocks::move_cubes (time_t elapsed_time)
     rot_px_todo -= elapsed_rot;
     rot = create_rotate_x (elapsed_rot);
     do_rot = true;
-    if (!rot_px_todo) rotate_shape_internal (full_rotate_x);
+    if (!rot_px_todo) rotate_shape_internal (full_rotate_x_reverse);
   }
   else if (rot_mx_todo)
   {
@@ -702,7 +972,7 @@ void Blocks::move_cubes (time_t elapsed_time)
     rot_mx_todo -= elapsed_rot;
     rot = create_rotate_x (-elapsed_rot);
     do_rot = true;
-    if (!rot_mx_todo) rotate_shape_internal (-full_rotate_x);
+    if (!rot_mx_todo) rotate_shape_internal (full_rotate_x);
   }
   else if (rot_py_todo)
   {
@@ -718,7 +988,7 @@ void Blocks::move_cubes (time_t elapsed_time)
     rot_my_todo -= elapsed_rot;
     rot = create_rotate_y (-elapsed_rot);
     do_rot = true;
-    if (!rot_my_todo) rotate_shape_internal (-full_rotate_z);
+    if (!rot_my_todo) rotate_shape_internal (full_rotate_z_reverse);
   }
   else if (rot_pz_todo)
   {
@@ -734,7 +1004,7 @@ void Blocks::move_cubes (time_t elapsed_time)
     rot_mz_todo -= elapsed_rot;
     rot = create_rotate_z (-elapsed_rot);
     do_rot = true;
-    if (!rot_mz_todo) rotate_shape_internal (-full_rotate_y);
+    if (!rot_mz_todo) rotate_shape_internal (full_rotate_y_reverse);
   }
   else if (move_hor_todo)
   {
@@ -757,12 +1027,337 @@ void Blocks::move_cubes (time_t elapsed_time)
   csPolygonSet::current_light_frame_number++;
 }
 
+void Blocks::InitTextures ()
+{
+  if (world) world->Clear ();
+
+  // Maybe we shouldn't load the textures again if this is not the first time.
+  Sys->set_pilar_texture (
+    csLoader::LoadTexture (Sys->world, "txt1", "stone4.gif"));
+  Sys->set_cube_texture (
+    csLoader::LoadTexture (Sys->world, "txt2", "cube.gif"));
+  //Sys->set_cube_texture (
+    //csLoader::LoadTexture (Sys->world, "txt2", "clouds_thick1.jpg"));
+  csLoader::LoadTexture (Sys->world, "txt3", "mystone2.gif");
+  csLoader::LoadTexture (Sys->world, "clouds", "clouds.gif");
+}
+
+
+void Blocks::StartDemo ()
+{
+  InitTextures ();
+  csTextureHandle* tm = world->GetTextures ()->GetTextureMM ("clouds");
+
+  room = Sys->world->NewSector ();
+  room->SetName ("room");
+  Sys->set_cube_room (room);
+  csPolygon3D* p;
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (-50, 50, 50);
+  p->AddVertex (50, 50, 50);
+  p->AddVertex (50, -50, 50);
+  p->AddVertex (-50, -50, 50);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 100);
+  p->SetFlags (CS_POLY_MIPMAP, 0);
+
+  Sys->add_cube_template ();
+  Sys->init_game ();
+
+  csStatLight* light;
+  light = new csStatLight (0, 0, -2, 10, .2, .2, .2, false);
+  room->AddLight (light);
+
+  dynlight_x = 0;
+  dynlight_y = 2;
+  dynlight_z = -2;
+  dynlight_dx = 3;
+  delete dynlight;
+  dynlight = new csDynLight (dynlight_x, dynlight_y, dynlight_z, 6, 3, 0, 0);
+  Sys->world->AddDynLight (dynlight);
+  dynlight->SetSector (room);
+  dynlight->Setup ();
+
+  Sys->start_shape (SHAPE_DEMO_B, -7, 10, ZONE_HEIGHT-8);
+  Sys->start_shape (SHAPE_DEMO_L, -3, 10, ZONE_HEIGHT-8);
+  Sys->start_shape (SHAPE_DEMO_O, 1, 10, ZONE_HEIGHT-8);
+  Sys->start_shape (SHAPE_DEMO_C, 5, 10, ZONE_HEIGHT-8);
+  Sys->start_shape (SHAPE_DEMO_K, 9, 10, ZONE_HEIGHT-8);
+  Sys->start_shape (SHAPE_DEMO_S, 13, 10, ZONE_HEIGHT-8);
+  
+  Sys->world->Prepare ();
+
+  Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+
+  view->SetSector (room);
+  csVector3 pos (0, 3, -5);
+  view->GetCamera ()->SetPosition (pos);
+  view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
+  view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
+}
+
+void Blocks::StartNewGame ()
+{
+  InitTextures ();
+  csTextureHandle* tm = world->GetTextures ()->GetTextureMM ("txt3");
+
+  room = Sys->world->NewSector ();
+  room->SetName ("room");
+  Sys->set_cube_room (room);
+  csPolygon3D* p;
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 0, 5);
+  p->AddVertex (5, 0, 5);
+  p->AddVertex (5, 0, -5);
+  p->AddVertex (-5, 0, -5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 20, 5);
+  p->AddVertex (5, 20, 5);
+  p->AddVertex (5, 0, 5);
+  p->AddVertex (-5, 0, 5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (5, 20, 5);
+  p->AddVertex (5, 20, -5);
+  p->AddVertex (5, 0, -5);
+  p->AddVertex (5, 0, 5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (-5, 20, -5);
+  p->AddVertex (-5, 20, 5);
+  p->AddVertex (-5, 0, 5);
+  p->AddVertex (-5, 0, -5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = room->NewPolygon (tm);
+  p->AddVertex (5, 20, -5);
+  p->AddVertex (-5, 20, -5);
+  p->AddVertex (-5, 0, -5);
+  p->AddVertex (5, 0, -5);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  Sys->add_pilar_template ();
+  Sys->add_cube_template ();
+  Sys->init_game ();
+  Sys->add_pilar (-1, -1);
+  Sys->add_pilar (ZONE_DIM, -1);
+  Sys->add_pilar (-1, ZONE_DIM);
+  Sys->add_pilar (ZONE_DIM, ZONE_DIM);
+
+  csStatLight* light;
+  light = new csStatLight (-3, 5, 0, 10, 1, 0, 0, false);
+  room->AddLight (light);
+  light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false);
+  room->AddLight (light);
+  light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
+  room->AddLight (light);
+  light = new csStatLight (0, (ZONE_HEIGHT-3-3)*CUBE_DIM+1, 0,
+  	CUBE_DIM*10, .5, .5, .5, false);
+  room->AddLight (light);
+  light = new csStatLight (0, (ZONE_HEIGHT-3+3)*CUBE_DIM+1, 0,
+  	CUBE_DIM*10, .5, .5, .5, false);
+  room->AddLight (light);
+
+  Sys->start_shape (SHAPE_T2, 3, 3, ZONE_HEIGHT-3);
+  
+  Sys->world->Prepare ();
+
+  Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
+
+  view->SetSector (room);
+  csVector3 pos (0, 3, -5);
+  view->GetCamera ()->SetPosition (pos);
+  view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
+  view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
+}
+
+
+void Blocks::checkForPlane ()
+{
+  bool plane_hit;
+  int x,y,z,i;
+
+  // We know nothing yet.
+  for (i=0 ; i<ZONE_HEIGHT ; i++) filled_planes[i] = false;
+
+  for (z=0 ; z<ZONE_HEIGHT ; z++)
+  {
+    plane_hit = true;
+    for (x=0 ; x<ZONE_DIM ; x++)
+      for (y=0 ; y<ZONE_DIM ; y++)
+      {
+	// If one cube is missing we don't have a plane.
+	if (!get_cube (x,y,z)) plane_hit = false; 
+      }
+      if (plane_hit)
+      {
+	// We've got at least one plane, switch to transition mode.
+	transition = true;
+	filled_planes[z] = true;
+        removePlane (z);
+        // That's how much all the cubes above the plane will lower.
+        move_down_todo = CUBE_DIM;
+        updateScore ();
+        Sys->Printf (MSG_DEBUG_0, "\nthe score is %i", score);
+      }
+  }
+}
+
+void Blocks::removePlane (int z)
+{
+  int x,y;
+  char temp[20];
+
+  for (x=0 ; x<ZONE_DIM ; x++)
+    for (y=0 ; y<ZONE_DIM ; y++)
+    {
+      sprintf (temp, "cubeAt%d%d%d", x, y, z);
+      // Physically remove it.
+      room->RemoveThing (room->GetThing (temp));
+    }
+
+  for (x=0 ; x<ZONE_DIM ; x++)
+    for (y=0 ; y<ZONE_DIM ; y++)
+      // And then remove it from game_cube[][][].
+      set_cube (x, y, z, false);
+}
+
+void Blocks::handleTransition (time_t elapsed_time)
+{
+  int i;
+  transition = false;
+
+  for (i=0 ; i<ZONE_HEIGHT ; i++)
+  {
+    if (filled_planes[i])
+    {
+      transition = true;
+      gone_z = i;
+      lower (elapsed_time);
+      break;
+    }
+  }
+  if (!transition)
+    start_shape ((BlShapeType)(rand () % difficulty), 3, 3, ZONE_HEIGHT-3);
+}
+
+
+
+void Blocks::lower (time_t elapsed_time)
+{
+  float elapsed = (float)elapsed_time/1000.;
+  float elapsed_fall = elapsed*speed;
+  float elapsed_move = elapsed*1.6;
+  float elapsed_cam_move = elapsed*1.6;
+
+  if (cam_move_dist)
+  {
+    if (elapsed_cam_move > cam_move_dist) elapsed_cam_move = cam_move_dist;
+    cam_move_dist -= elapsed_cam_move;
+    move_camera ();
+  }
+
+  if (pause) return;
+
+  int i;
+  int x,y,z;
+  char temp[20];
+  csThing* t;
+
+  // Finished the transition.
+  if (!move_down_todo)
+  {
+    // We finished handling this plane.
+    filled_planes[gone_z] = false;
+
+    // We lower the planes (in case the player made more then one plane).
+    for (i=gone_z+1 ; i<ZONE_HEIGHT-1 ; i++)
+      filled_planes[i] = filled_planes[i+1];
+    filled_planes[ZONE_HEIGHT] = false; // And the last one.
+
+    // Now that everything is visually ok we lower(change) their names
+    // accordingly and clear them from game_cube[][][].
+    for (z=gone_z+1 ; z<ZONE_HEIGHT ; z++)
+      for (x=0 ; x<ZONE_DIM ; x++)
+        for (y=0 ; y<ZONE_DIM ; y++)
+	{
+	  set_cube (x, y, z-1, get_cube (x, y, z));
+          sprintf (temp, "cubeAt%d%d%d", x, y, z);
+          t = room->GetThing (temp);
+          if (t)
+	  {
+            sprintf (temp, "cubeAt%d%d%d", x, y, z-1);
+	    t->SetName (temp);
+	  }
+	}
+
+    // Mustn't forget the topmost level.
+    for (x=0 ; x<ZONE_DIM ; x++)
+      for (y=0 ; y<ZONE_DIM ; y++)
+        set_cube (x, y, ZONE_HEIGHT-1, false);
+  }
+
+  if (elapsed_fall > move_down_todo) elapsed_fall = move_down_todo;
+  move_down_todo -= elapsed_fall;
+
+  // Move everything from above the plane that dissapeared a bit lower.
+  for (z=gone_z+1 ; z<ZONE_HEIGHT ; z++)
+    for (x=0 ; x<ZONE_DIM ; x++)
+      for (y=0 ; y<ZONE_DIM ; y++)
+      {
+	sprintf (temp, "cubeAt%d%d%d", x, y, z);
+        // Only if there is a thing at that certain position, or less
+	// then CUBE_DIM lower.
+	t = room->GetThing (temp);
+	if (t)
+	{
+          t->Move (0, -elapsed_fall, 0);
+          t->Transform ();
+          reset_vertex_colors (t);
+          room->ShineLights (t);
+	}
+      }
+
+
+  // So that the engine knows to update the lights only when the frame
+  // has changed (?).
+  csPolygonSet::current_light_frame_number++; 
+}
+
+
+
 void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
 {
   SysSystemDriver::NextFrame (elapsed_time, current_time);
 
-  move_cubes (elapsed_time);
+  if (startup_screen)
+  {
+    if (newgame) StartDemo ();
+    //speed = 0;
+    //start_rotation ((enum BlRotType)((rand () % 6) + ROT_PX));
+    move_cubes (elapsed_time);
+    if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
+    view->Draw ();
+    if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+    Gfx2D->Write (100, 100, 0xffff, 0, "1: novice");
+    Gfx2D->Write (100, 120, 0xffff, 0, "2: normal");
+    Gfx2D->Write (100, 140, 0xffff, 0, "3: expert");
+    Gfx3D->FinishDraw ();
+    Gfx3D->Print (NULL);
+    return;
+  }
 
+  if (newgame) StartNewGame ();
+
+  // This is where Blocks stuff really happens.
+  if (!transition) move_cubes (elapsed_time);
+  // This is where the transition is handled.
+  else handleTransition (elapsed_time);
+  
   // Tell Gfx3D we're going to display 3D things
   if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
   view->Draw ();
@@ -823,8 +1418,8 @@ void debug_dump ()
 void cleanup ()
 {
   Sys->console_out ("Cleaning up...\n");
-  CHK (delete view);
-  CHK (delete Sys);
+  delete view;
+  delete Sys;
 }
 
 /*---------------------------------------------------------------------*
@@ -835,7 +1430,7 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // Create our main class which is the driver for Blocks.
-  CHK (Sys = new Blocks ());
+  Sys = new Blocks ();
   // temp hack until we find a better way
   csWorld::System = Sys;
 
@@ -863,14 +1458,14 @@ int main (int argc, char* argv[])
     CsPrintf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
     return -1;
   }
-  CHK (Sys->world = world->GetCsWorld ());
+  Sys->world = world->GetCsWorld ();
   world->DecRef ();
 
   // Some settings.
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);
 
   // Some commercials...
-  Sys->Printf (MSG_INITIALIZATION, "3D Blocks version 0.1.\n");
+  Sys->Printf (MSG_INITIALIZATION, "3D Blocks version 0.2.\n");
   Sys->Printf (MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
   iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
@@ -879,91 +1474,19 @@ int main (int argc, char* argv[])
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  CHK (view = new csView (Sys->world, Gfx3D));
+  view = new csView (Sys->world, Gfx3D);
 
   // Create our world.
-  csSector* room;
+//. I commented this because it seems to work without it :-)
+  //. csSector* room;
   Sys->Printf (MSG_INITIALIZATION, "Creating world!...\n");
   Sys->world->EnableLightingCache (false);
 
   // Change to virtual directory where Blocks data is stored
   Sys->VFS->ChDir (Sys->Config->GetStr ("Blocks", "DATA", "/data/blocks"));
 
-  Sys->set_pilar_texture (csLoader::LoadTexture (Sys->world, "txt1", "stone4.gif"));
-  Sys->set_cube_texture (csLoader::LoadTexture (Sys->world, "txt2", "cube.gif"));
-  csTextureHandle* tm = csLoader::LoadTexture (Sys->world, "txt3", "mystone2.gif");
-
-  room = Sys->world->NewSector ();
-  room->SetName ("room");
-  Sys->set_cube_room (room);
-  csPolygon3D* p;
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 0, 5);
-  p->AddVertex (5, 0, 5);
-  p->AddVertex (5, 0, -5);
-  p->AddVertex (-5, 0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, 5);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (5, 0, 5);
-  p->AddVertex (-5, 0, 5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (5, 0, -5);
-  p->AddVertex (5, 0, 5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5, 20, 5);
-  p->AddVertex (-5, 0, 5);
-  p->AddVertex (-5, 0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = room->NewPolygon (tm);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5, 0, -5);
-  p->AddVertex (5, 0, -5);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  Sys->add_pilar_template ();
-  Sys->add_cube_template ();
-  Sys->init_game ();
-  Sys->add_pilar (-1, -1);
-  Sys->add_pilar (CUBE_DIM, -1);
-  Sys->add_pilar (-1, CUBE_DIM);
-  Sys->add_pilar (CUBE_DIM, CUBE_DIM);
-  Sys->start_shape (SHAPE_T2, 3, 3, CUBE_HEIGHT-3);
-
-  csStatLight* light;
-  CHK (light = new csStatLight (-3, 5, 0, 10, 1, 0, 0, false));
-  room->AddLight (light);
-  CHK (light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false));
-  room->AddLight (light);
-  CHK (light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false));
-  room->AddLight (light);
-  CHK (light = new csStatLight (0, (CUBE_HEIGHT-3-3)*BLOCK_DIM+1, 0, BLOCK_DIM*10, .5, .5, .5, false));
-  room->AddLight (light);
-  CHK (light = new csStatLight (0, (CUBE_HEIGHT-3+3)*BLOCK_DIM+1, 0, BLOCK_DIM*10, .5, .5, .5, false));
-  room->AddLight (light);
-
+  Sys->InitTextures ();  
   Sys->world->Prepare ();
-
-  Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
-
-  // Wait one second before starting.
-  long t = Sys->Time ()+1000;
-  while (Sys->Time () < t) ;
-
-  view->SetSector (room);
-  view->GetCamera ()->SetPosition (csVector3 (0, 5, -3));
-  view->SetRectangle (2, 2, Sys->FrameWidth - 4, Sys->FrameHeight - 4);
 
   txtmgr->AllocPalette ();
 
