@@ -45,8 +45,9 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   int screen_num;
   int display_width, display_height;
   Window window;
-  Window WMwindow;
-  Window FSwindow;
+  Window wm_window;
+  int wm_width;
+  int wm_height;
   Window leader_window;
   Window root_window;
   GC gc;
@@ -76,6 +77,9 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
 #ifdef XFREE86VM
   XF86VidModeModeInfo orig_mode;
   XF86VidModeModeInfo fs_mode;
+  Window fs_window;
+  int fs_width;
+  int fs_height;
   int orig_x;
   int orig_y;
 #endif

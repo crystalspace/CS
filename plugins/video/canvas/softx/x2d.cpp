@@ -39,7 +39,7 @@ IMPLEMENT_IBASE_END
 
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
   csGraphics2D (), dpy (NULL), xim (NULL), cmap (0),
-  sim_lt8 (NULL), sim_lt16 (NULL)
+  sim_lt8 (NULL), sim_lt16 (NULL), currently_full_screen (false)
 {
   CONSTRUCT_IBASE (iParent);
 
@@ -281,28 +281,32 @@ bool csGraphics2DXLib::Open(const char *Title)
   swa.bit_gravity = CenterGravity;
 
 #ifdef XFREE86VM
-  FSwindow = XCreateWindow (dpy, root_window, 0, 0,
-    fs_mode.hdisplay, fs_mode.vdisplay, 0,
-    vinfo.depth, InputOutput, visual,
+  fs_width  = fs_mode.hdisplay;
+  fs_height = fs_mode.vdisplay;
+  fs_window = XCreateWindow (dpy, root_window, 0, 0,
+    fs_width, fs_height, 0, vinfo.depth, InputOutput, visual,
     CWOverrideRedirect | CWBorderPixel | (cmap ? CWColormap : 0), &swa);
+  XStoreName (dpy, fs_window, Title);
 #endif
+  wm_width  = Width;
+  wm_height = Height;
 
-  WMwindow = XCreateWindow (dpy, root_window, 64, 16, Width,Height, 4,
+  wm_window = XCreateWindow (dpy, root_window, 64, 16, wm_width, wm_height, 4,
     vinfo.depth, InputOutput, visual, CWBorderPixel | (cmap ? CWColormap : 0), &swa);
 
-  XSelectInput (dpy, WMwindow, FocusChangeMask | KeyPressMask |
+  XSelectInput (dpy, wm_window, FocusChangeMask | KeyPressMask |
     KeyReleaseMask | StructureNotifyMask);
 
   // Intern WM_DELETE_WINDOW and set window manager protocol
   // (Needed to catch user using window manager "delete window" button)
   wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols (dpy, WMwindow, &wm_delete_window, 1);
+  XSetWMProtocols (dpy, wm_window, &wm_delete_window, 1);
 
-  window = XCreateWindow (dpy, WMwindow, 0, 0,
+  window = XCreateWindow (dpy, wm_window, 0, 0,
     Width, Height, 0, vinfo.depth, InputOutput, visual,
     CWBackPixel | CWBorderPixel | CWBitGravity | (cmap ? CWColormap : 0), &swa);
 
-  XStoreName (dpy, WMwindow, Title);
+  XStoreName (dpy, wm_window, Title);
 
   XGCValues values;
   gc = XCreateGC (dpy, window, 0, &values);
@@ -329,23 +333,25 @@ bool csGraphics2DXLib::Open(const char *Title)
   normal_hints.min_height = 200;
   normal_hints.max_width = display_width;
   normal_hints.max_height = display_height;
-  XSetWMNormalHints (dpy, WMwindow, &normal_hints);
+  XSetWMNormalHints (dpy, wm_window, &normal_hints);
 
   XWMHints wm_hints;
   wm_hints.flags = InputHint | StateHint | WindowGroupHint;
   wm_hints.input = True;
   wm_hints.window_group = leader_window;
   wm_hints.initial_state = NormalState;
-  XSetWMHints (dpy, WMwindow, &wm_hints);
+  XSetWMHints (dpy, wm_window, &wm_hints);
+//    XSetWMHints (dpy, window, &wm_hints);
 
   Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
   XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32,
 		   PropModeReplace, (const unsigned char*)&leader_window, 1);
   XmbSetWMProperties (dpy, window, Title, Title,
                       NULL, 0, NULL, NULL, NULL);
-
+  XmbSetWMProperties (dpy, wm_window, Title, Title,
+                      NULL, 0, NULL, NULL, NULL);
   XMapWindow (dpy, window);
-  XMapRaised (dpy, WMwindow);
+  XMapRaised (dpy, wm_window);
 
   // Create mouse cursors
   XColor Black;
@@ -387,7 +393,7 @@ bool csGraphics2DXLib::Open(const char *Title)
       CsPrintf (MSG_INITIALIZATION, "SHM available but could not allocate. "
         "Trying without SHM.\n");
       if(xim) { XDestroyImage(xim); xim=NULL; }
-      do_shm=false;
+      do_shm = false;
       if(!AllocateMemory())
       {
 #endif //DO_SHM
@@ -416,9 +422,10 @@ bool csGraphics2DXLib::AllocateMemory ()
     int sc = DefaultScreen(dpy);
     int disp_depth = DefaultDepth(dpy,sc);
     int bitmap_pad = (disp_depth + 7) / 8;
-        bitmap_pad = (bitmap_pad==3) ? 32 : bitmap_pad*8;
 
-#   ifdef DO_SHM
+    bitmap_pad = (bitmap_pad == 3) ? 32 : bitmap_pad*8;
+
+#ifdef DO_SHM
     if (do_shm && !XShmQueryExtension (dpy))
     {
       do_shm = false;
@@ -460,7 +467,7 @@ bool csGraphics2DXLib::AllocateMemory ()
       shm_image.obdata = (char *)&shmi;
     }
     else
-#   endif /* DO_SHM */
+#endif /* DO_SHM */
     {
       xim = XCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth, ZPixmap, 0,
 			 NULL, Width, Height, bitmap_pad, 0);
@@ -566,9 +573,6 @@ void csGraphics2DXLib::restore_332_palette ()
     return;
 
   CsPrintf (MSG_DEBUG_0, "Restore 3:3:2 palette\n");
-  //System->Console->Print ();
-  //Print ();
-  //XFlush (dpy);
 
   int i, r, g, b;
 
@@ -609,9 +613,6 @@ void csGraphics2DXLib::recompute_simulated_palette ()
     return;
 
   CsPrintf (MSG_DEBUG_0, "Recompute simulated palette\n");
-  //System->Console->Print ();
-  //Print ();
-  //XFlush (dpy);
 
   palent* pe;
   int i;
@@ -713,9 +714,6 @@ void csGraphics2DXLib::recompute_simulated_palette ()
   pe_new[255].b = 255;
 
   CsPrintf (MSG_DEBUG_0, "Recomputing lookup table...\n");
-  //System->Console->Print ();
-  //Print ();
-  //XFlush (dpy);
 
   // Recompute the lookup table from 15/16-bit to 8-bit.
   int r, g, b;
@@ -762,9 +760,6 @@ void csGraphics2DXLib::recompute_grey_palette ()
     return;
 
   CsPrintf (MSG_DEBUG_0, "Compute grey palette\n");
-  //System->Console->Print ();
-  //Print ();
-  //XFlush (dpy);
 
   palent* pe;
   int i;
@@ -781,9 +776,6 @@ void csGraphics2DXLib::recompute_grey_palette ()
   }
 
   CsPrintf (MSG_DEBUG_0, "Recomputing lookup table...\n");
-  //System->Console->Print ();
-  //Print ();
-  //XFlush (dpy);
 
   // Recompute the lookup table from 15/16-bit to 8-bit.
   int r, g, b;
@@ -1108,6 +1100,9 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
   bool cskey=true;
   bool down;
   bool resize = false;
+  bool parent_resize = false;
+  int newWidth;
+  int newHeight;
 
 #ifdef DO_STUFF_EXTENDED_KEYCODE
   unsigned char keytranslated;
@@ -1117,8 +1112,42 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
     switch (event.type)
     {
       case ConfigureNotify:
-	if ((Width  != event.xconfigure.width) ||
-	    (Height != event.xconfigure.height))
+	if (event.xconfigure.window == wm_window)
+ 	{
+	  if (wm_width  != event.xconfigure.width ||
+	      wm_height != event.xconfigure.height)
+	  {
+	    wm_width  = event.xconfigure.width;
+	    wm_height = event.xconfigure.height;
+
+	    if (!currently_full_screen)
+	    {
+	      newWidth  = wm_width;
+	      newHeight = wm_height;
+	      parent_resize = true;
+	    }
+	  }
+	}
+#ifdef XFREE86VM
+	else if (event.xconfigure.window == fs_window)
+	{
+	  if (fs_width  != event.xconfigure.width ||
+	      fs_height != event.xconfigure.height)
+	  {
+	    fs_width  = event.xconfigure.width;
+	    fs_height = event.xconfigure.height;
+
+	    if (currently_full_screen)
+	    {
+	      newWidth  = fs_width;
+	      newHeight = fs_height;
+	      parent_resize = true;
+	    }
+	  }
+	}
+#endif
+	else if ((Width  != event.xconfigure.width) ||
+		 (Height != event.xconfigure.height))
 	{
 	  Width = event.xconfigure.width;
 	  Height = event.xconfigure.height;
@@ -1231,7 +1260,7 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
         System->QueueFocusEvent (event.type == FocusIn);
         break;
       case Expose:
-	if (!resize)
+	if (!resize && !parent_resize)
         {
 	  csRect rect (event.xexpose.x, event.xexpose.y,
 		       event.xexpose.x + event.xexpose.width,
@@ -1243,12 +1272,17 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
         break;
     }
 
+  if (parent_resize)
+  {
+    XResizeWindow (dpy, window, newWidth, newHeight);
+  }
+
   if (resize)
   {
     if (!ReallocateMemory ())
     {
       CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory on resize!\n");
-      System->StartShutdown ();
+      abort ();
     }
     System->QueueContextResizeEvent ((void*)this);
   }
@@ -1257,7 +1291,7 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
 
 bool csGraphics2DXLib::ReallocateMemory ()
 {
-  XSync (dpy, False);
+//    XSync (dpy, False);
   if (do_shm)
   {
     XShmDetach (dpy, &shmi);
@@ -1272,7 +1306,7 @@ bool csGraphics2DXLib::ReallocateMemory ()
   if (!AllocateMemory())
   {
     CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory!\n");
-    return false;
+    abort();
   }
 
   // Warning: reallocating memory from  csGraphics2D...need to promote
@@ -1369,13 +1403,13 @@ void csGraphics2DXLib::EnterFullScreen()
   XF86VidModeLockModeSwitch (dpy, screen_num, False);
   // only switch if needed
   if (!currently_full_screen) {
-    XSetWindowBackground (dpy, FSwindow, 0);
-    XClearWindow (dpy, FSwindow);
+    XSetWindowBackground (dpy, fs_window, 0);
+    XClearWindow (dpy, fs_window);
 
-    XSelectInput (dpy, FSwindow, StructureNotifyMask);
-    XMapRaised (dpy, FSwindow);
-    XIfEvent (dpy, &xEvent, wait_for_notify, (XPointer) FSwindow);
-    XSelectInput (dpy, FSwindow, NoEventMask);
+    XSelectInput (dpy, fs_window, StructureNotifyMask);
+    XMapRaised (dpy, fs_window);
+    XIfEvent (dpy, &xEvent, wait_for_notify, (XPointer) fs_window);
+    XSelectInput (dpy, fs_window, NoEventMask);
 
     // save current display information
     GetModeInfo (dpy, screen_num, &orig_mode);
@@ -1393,11 +1427,11 @@ void csGraphics2DXLib::EnterFullScreen()
     }
 
     // grab pointer in fullscreen mode
-    if (XGrabPointer (dpy, FSwindow, True, 0, GrabModeAsync, GrabModeAsync,
-		      FSwindow, None, CurrentTime) != GrabSuccess ||
-	XGrabKeyboard (dpy, WMwindow, True, GrabModeAsync,
+    if (XGrabPointer (dpy, fs_window, True, 0, GrabModeAsync, GrabModeAsync,
+		      fs_window, None, CurrentTime) != GrabSuccess ||
+	XGrabKeyboard (dpy, wm_window, True, GrabModeAsync,
 		       GrabModeAsync, CurrentTime) != GrabSuccess) {
-      XUnmapWindow (dpy, FSwindow);
+      XUnmapWindow (dpy, fs_window);
       CsPrintf (MSG_FATAL_ERROR, "Unable to grab focus\n");
     }
 
@@ -1416,9 +1450,10 @@ void csGraphics2DXLib::EnterFullScreen()
       {
 	XF86VidModeSetViewPort (dpy, screen_num, 0, 0);
 
-	x = (fs_mode.hdisplay - Width) / 2;
-	y = (fs_mode.vdisplay - Height) / 2;
-	XReparentWindow (dpy, window, FSwindow, x, y);
+	x = (fs_mode.hdisplay - fs_width) / 2;
+	y = (fs_mode.vdisplay - fs_height) / 2;
+	XReparentWindow (dpy, window, fs_window, x, y);
+	XResizeWindow (dpy, window, fs_width, fs_height);
 	XWarpPointer (dpy, None, window, 0, 0, 0, 0, pointerX, pointerY);
 
 	display_width  = fs_mode.hdisplay;
@@ -1427,16 +1462,13 @@ void csGraphics2DXLib::EnterFullScreen()
       }
     }
 
-    XSync (dpy, True);
+    XSync (dpy, False);
   }
 #endif // XFREE86VM
 }
 
 void csGraphics2DXLib::LeaveFullScreen ()
 {
-  if (!dpy)
-    return;
-
 #ifdef XFREE86VM
   XF86VidModeModeInfo mode;
   int pointerX;
@@ -1465,7 +1497,8 @@ void csGraphics2DXLib::LeaveFullScreen ()
     XUngrabPointer (dpy, CurrentTime);
     XUngrabKeyboard (dpy, CurrentTime);
 
-    XReparentWindow (dpy, window, WMwindow, 0, 0);
+    XReparentWindow (dpy, window, wm_window, 0, 0);
+    XResizeWindow (dpy, window, wm_width, wm_height);
 
     if (GetModeInfo (dpy, screen_num, &mode))
     {
@@ -1496,12 +1529,12 @@ void csGraphics2DXLib::LeaveFullScreen ()
 
       }
 
-      XUnmapWindow (dpy, FSwindow);
+      XUnmapWindow (dpy, fs_window);
     }
 
     XF86VidModeLockModeSwitch (dpy, screen_num, False);
 
-    XSync (dpy, True);
+    XSync (dpy, False);
   }
 #endif // XFREE86VM
 }

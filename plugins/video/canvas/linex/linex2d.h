@@ -40,8 +40,9 @@ class csGraphics2DLineXLib : public csGraphics2D
   Display* dpy;
   int screen_num;
   int display_width, display_height;
-  Window WMwindow;
-  Window FSwindow;
+  Window wm_window;
+  int wm_width;
+  int wm_height;
   Window window;
   Window leader_window;
   Window root_window;
@@ -75,6 +76,9 @@ class csGraphics2DLineXLib : public csGraphics2D
 #ifdef XFREE86VM
   XF86VidModeModeInfo orig_mode;
   XF86VidModeModeInfo fs_mode;
+  Window fs_window;
+  int fs_width;
+  int fs_height;
   int orig_x;
   int orig_y;
 #endif

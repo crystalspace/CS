@@ -38,7 +38,7 @@ EXPORT_CLASS_TABLE_END
 
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
-  csGraphics2DGLCommon (iParent), cmap (0)
+  csGraphics2DGLCommon (iParent), cmap (0), currently_full_screen(false)
 {
 
 }
@@ -193,7 +193,7 @@ bool csGraphics2DGLX::CreateContext (int *desired_attributes)
   return true;
 }
 
-const char *visual_class_name (int cls)
+static const char *visual_class_name (int cls)
 {
    switch (cls) {
       case StaticColor:
@@ -317,29 +317,34 @@ bool csGraphics2DGLX::Open(const char *Title)
     ButtonReleaseMask;
 
 #ifdef XFREE86VM
-  FSwindow = XCreateWindow (dpy, root_window, 0, 0,
-    fs_mode.hdisplay, fs_mode.vdisplay, 0 /*border*/,
+  fs_width  = fs_mode.hdisplay;
+  fs_height = fs_mode.vdisplay;
+  fs_window = XCreateWindow (dpy, root_window, 0, 0,
+    fs_width, fs_height, 0 /*border*/,
     active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWOverrideRedirect | CWBorderPixel | CWColormap, &winattr);
+  XStoreName (dpy, fs_window, Title);
 #endif
 
-  WMwindow = XCreateWindow (dpy, root_window, 0, 0, Width,Height, 0 /*border*/,
-    active_GLVisual->depth, InputOutput, active_GLVisual->visual,
+  wm_width  = Width;
+  wm_height = Height;
+  wm_window = XCreateWindow (dpy, root_window, 0, 0, wm_width, wm_height,
+     0 /*border*/, active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap, &winattr);
 
-  XSelectInput (dpy, WMwindow, FocusChangeMask | KeyPressMask |
+  XSelectInput (dpy, wm_window, FocusChangeMask | KeyPressMask |
   	KeyReleaseMask | StructureNotifyMask);
 
   // Intern WM_DELETE_WINDOW and set window manager protocol
   // (Needed to catch user using window manager "delete window" button)
   wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols (dpy, WMwindow, &wm_delete_window, 1);
+  XSetWMProtocols (dpy, wm_window, &wm_delete_window, 1);
 
-  window = XCreateWindow(dpy, WMwindow, 0, 0, Width,Height, 0 /*border*/,
+  window = XCreateWindow(dpy, wm_window, 0, 0, Width,Height, 0 /*border*/,
     active_GLVisual->depth, InputOutput, active_GLVisual->visual,
     CWBorderPixel | CWColormap | CWEventMask | CWBitGravity, &winattr);
 
-  XStoreName (dpy, WMwindow, Title);
+  XStoreName (dpy, wm_window, Title);
 
   // Now communicate fully to the window manager our wishes using the non-mapped
   // leader_window to form a window_group
@@ -361,9 +366,11 @@ bool csGraphics2DGLX::Open(const char *Title)
 		   PropModeReplace, (const unsigned char*)&leader_window, 1);
   XmbSetWMProperties (dpy, window, Title, Title,
                       NULL, 0, NULL, NULL, NULL);
+  XmbSetWMProperties (dpy, wm_window, Title, Title,
+                      NULL, 0, NULL, NULL, NULL);
 
   XMapWindow (dpy, window);
-  XMapRaised (dpy, WMwindow);
+  XMapRaised (dpy, wm_window);
 
   // Create mouse cursors
   XColor Black;
@@ -725,13 +732,13 @@ void csGraphics2DGLX::EnterFullScreen()
   XF86VidModeLockModeSwitch (dpy, screen_num, False);
   // only switch if needed
   if (!currently_full_screen) {
-    XSetWindowBackground (dpy, FSwindow, 0);
-    XClearWindow (dpy, FSwindow);
+    XSetWindowBackground (dpy, fs_window, 0);
+    XClearWindow (dpy, fs_window);
 
-    XSelectInput (dpy, FSwindow, StructureNotifyMask);
-    XMapRaised (dpy, FSwindow);
-    XIfEvent (dpy, &xEvent, wait_for_notify, (XPointer) FSwindow);
-    XSelectInput (dpy, FSwindow, NoEventMask);
+    XSelectInput (dpy, fs_window, StructureNotifyMask);
+    XMapRaised (dpy, fs_window);
+    XIfEvent (dpy, &xEvent, wait_for_notify, (XPointer) fs_window);
+    XSelectInput (dpy, fs_window, NoEventMask);
 
     // save current display information
     GetModeInfo (dpy, screen_num, &orig_mode);
@@ -749,11 +756,11 @@ void csGraphics2DGLX::EnterFullScreen()
     }
 
     // grab pointer in fullscreen mode
-    if (XGrabPointer (dpy, FSwindow, True, 0, GrabModeAsync, GrabModeAsync,
-		      FSwindow, None, CurrentTime) != GrabSuccess ||
-	XGrabKeyboard (dpy, WMwindow, True, GrabModeAsync,
+    if (XGrabPointer (dpy, fs_window, True, 0, GrabModeAsync, GrabModeAsync,
+		      fs_window, None, CurrentTime) != GrabSuccess ||
+	XGrabKeyboard (dpy, wm_window, True, GrabModeAsync,
 		       GrabModeAsync, CurrentTime) != GrabSuccess) {
-      XUnmapWindow (dpy, FSwindow);
+      XUnmapWindow (dpy, fs_window);
       CsPrintf (MSG_FATAL_ERROR, "Unable to grab focus\n");
     }
 
@@ -772,9 +779,10 @@ void csGraphics2DGLX::EnterFullScreen()
       {
 	XF86VidModeSetViewPort (dpy, screen_num, 0, 0);
 
-	x = (fs_mode.hdisplay - Width) / 2;
-	y = (fs_mode.vdisplay - Height) / 2;
-	XReparentWindow (dpy, window, FSwindow, x, y);
+	x = (fs_mode.hdisplay - fs_width) / 2;
+	y = (fs_mode.vdisplay - fs_height) / 2;
+	XReparentWindow (dpy, window, fs_window, x, y);
+	XResizeWindow (dpy, window, fs_width, fs_height);
 	XWarpPointer (dpy, None, window, 0, 0, 0, 0, pointerX, pointerY);
 
 	display_width  = fs_mode.hdisplay;
@@ -818,8 +826,8 @@ void csGraphics2DGLX::LeaveFullScreen()
     XUngrabPointer (dpy, CurrentTime);
     XUngrabKeyboard (dpy, CurrentTime);
 
-    XReparentWindow (dpy, window, WMwindow, 0, 0);
-
+    XReparentWindow (dpy, window, wm_window, 0, 0);
+    XResizeWindow (dpy, window, wm_width, wm_height);
     if (GetModeInfo (dpy, screen_num, &mode))
     {
       if (orig_mode.hdisplay != mode.hdisplay ||
@@ -849,7 +857,7 @@ void csGraphics2DGLX::LeaveFullScreen()
 
       }
 
-      XUnmapWindow (dpy, FSwindow);
+      XUnmapWindow (dpy, fs_window);
     }
 
     XF86VidModeLockModeSwitch (dpy, screen_num, False);
