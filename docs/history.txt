@@ -11,6 +11,7 @@ chronological order.
 	  class csStencilShadowStep. This works round C2248 MSVC 6
 	  compiler error and known compiler bug Q243351.
         - res fixed the totally bogus OR csLight::GetDistanceForBrightness ().
+        - Philip Wyett added CSTOOL dependency to rlsstd.mak (redstep_std). 
 9-Sep-2003
         - res added a simple calculation of binormals and tangents to thing.
         - res reformatted light.xml a bit.
