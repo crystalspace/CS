@@ -38,7 +38,9 @@ PLUGINS += video/format/codecs/rle
 #PLUGINS + =video/canvas/sdl
 
 # Sound drivers.
+ifeq ($(OSS.AVAILABLE),yes)
 PLUGINS += sound/driver/oss sound/renderer/software
+endif
 
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)

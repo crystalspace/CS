@@ -1592,11 +1592,13 @@ AC_LANG_POP([C++])
 AC_CHECK_HEADER([soundcard.h],
     [CS_HEADER_PROPERTY([CS_HAS_SOUNDCARD_H])],
     [AC_CHECK_HEADER([sys/soundcard.h],
-	[CS_HEADER_PROPERTY([CS_HAS_SYS_SOUNDCARD_H])],
-	    [AC_CHECK_HEADER([machine/soundcard.h],
-		[CS_HEADER_PROPERTY([CS_HAS_MACHINE_SOUNDCARD_H])])])])
-
-
+	[CS_HEADER_PROPERTY([CS_HAS_SYS_SOUNDCARD_H])
+	 cs_cv_soundcard_h="yes"],
+	[AC_CHECK_HEADER([machine/soundcard.h],
+	      [CS_HEADER_PROPERTY([CS_HAS_MACHINE_SOUNDCARD_H])
+	       cs_cv_soundcard_h="yes"])])])
+AS_IF([test "$cs_cv_soundcard_h" = "yes"],
+	[CS_MAKEFILE_PROPERTY([OSS.AVAILABLE], [yes])],[])
 
 #------------------------------------------------------------------------------
 # Check for BSD-style socket support.  Also test for presence of type

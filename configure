@@ -17971,6 +17971,7 @@ fi
 if test $ac_cv_header_sys_soundcard_h = yes; then
   cs_header_text="${cs_header_text}#define CS_HAS_SYS_SOUNDCARD_H
 "
+	 cs_cv_soundcard_h="yes"
 else
   if test "${ac_cv_header_machine_soundcard_h+set}" = set; then
   echo "$as_me:$LINENO: checking for machine/soundcard.h" >&5
@@ -18104,6 +18105,7 @@ fi
 if test $ac_cv_header_machine_soundcard_h = yes; then
   cs_header_text="${cs_header_text}#define CS_HAS_MACHINE_SOUNDCARD_H
 "
+	       cs_cv_soundcard_h="yes"
 fi
 
 
@@ -18113,7 +18115,10 @@ fi
 fi
 
 
-
+if test "$cs_cv_soundcard_h" = "yes"; then
+  cs_makefile_text="${cs_makefile_text}OSS.AVAILABLE = yes
+"
+fi
 
 
 #------------------------------------------------------------------------------
