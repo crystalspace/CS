@@ -9,6 +9,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
 #include "csutil/csvector.h"
+#include "csutil/csrgbvct.h"
 #include "iutil/vfs.h"
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
@@ -53,48 +54,6 @@ struct nRect
   x(_x), y(_y), w(_w), h(_h) {};
 };
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-class RGBVector : public csVector
-{
-
-public:
-  virtual int Compare(csSome item1, csSome item2, int Mode)
-  {
-    csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item1);
-    csRGBcolor *i2 = STATIC_CAST(csRGBcolor *, item2);
-
-    if ((*i1)==(*i2))
-      return 0;
-    else if(i1->red < i2->red &&
-	    i1->green < i2->green &&
-	    i1->blue < i2->blue)
-    {
-      return -1;
-    }
-    else
-      return 1;
-  }
-
-  virtual int CompareKey(csSome item, csConstSome key, int Mode)
-  {
-    csRGBcolor *i1 = STATIC_CAST(csRGBcolor *, item);
-    const csRGBcolor *i2 = STATIC_CAST(const csRGBcolor *, key);
-
-    if ((*i1)==(*i2))
-      return 0;
-    else if(i1->red < i2->red &&
-	    i1->green < i2->green &&
-	    i1->blue < i2->blue)
-    {
-      return -1;
-    }
-    else
-      return 1;
-  }
-
-};
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -456,7 +415,8 @@ public:
   {
     char mode[128];
     char matname[512];
-    RGBVector rgb_colors;
+
+    csRGBVector rgb_colors;
     csVector  pal_colors;
     
     char *data = new char[matmap->GetSize()];
