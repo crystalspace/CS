@@ -136,9 +136,12 @@ public:
    * \remarks Recursive mutexes are <b>not</b> compatible with conditions and
    *   must not be used with #csCondition.
    * <p>
-   * \remarks On Windows, mutexes are always recursive, while on other
-   *   platforms, such as Linux, non-recursive threads may be the default since
-   *   they are can be implemented more efficiently.
+   * \remarks On Windows, mutexes always exhibit recursive semantics, however,
+   *   for best portability, you should still choose an appropriate value for
+   *   #recursive. This is especially important since csCondition::Wait()
+   *   expects a non-recursive mutex.  On other platforms, such as Linux,
+   *   non-recursive threads may be the default since they are can be
+   *   implemented more efficiently.
    */
   static csRef<csMutex> Create (bool recursive = false);
 
