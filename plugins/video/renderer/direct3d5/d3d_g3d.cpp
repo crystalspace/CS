@@ -213,9 +213,9 @@ bool csGraphics3DDirect3DDx5::Initialize (iSystem *iSys)
   m_piSystem = iSys;
   m_piSystem->IncRef ();
 
-  SysPrintf (MSG_INITIALIZATION, "\nDirect3DRender DX5 selected\n");
+  SysPrintf (MSG_INITIALIZATION, "\nDirect3DRender selected\n");
 
-  m_piG2D = LOAD_PLUGIN (m_piSystem, "crystalspace.graphics2d.direct3d.dx5", NULL, iGraphics2D);
+  m_piG2D = LOAD_PLUGIN (m_piSystem, SOFTWARE_2D_DRIVER, NULL, iGraphics2D);
   if (!m_piG2D)
     return false;
 
