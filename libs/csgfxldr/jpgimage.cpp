@@ -26,8 +26,10 @@
 
 extern "C"
 {
-#if defined (OS_WIN32)		// Avoid defining "boolean" in libjpeg headers
+#if defined (OS_WIN32)
+#if !defined (COMP_GCC) // Avoid defining "boolean" in libjpeg headers
 #  define HAVE_BOOLEAN
+#endif
 #endif
 #define JDCT_DEFAULT JDCT_FLOAT	// use floating-point for decompression
 #include <jpeglib.h>
