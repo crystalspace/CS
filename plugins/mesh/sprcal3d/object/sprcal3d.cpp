@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 2003 by Keith Fulton
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -184,7 +184,10 @@ int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(const char *filename,
     return id;
 }
 
-bool csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,const char *name,bool attach)
+bool csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,
+						  const char *name,
+						  bool attach,
+						  iMaterialWrapper *defmat)
 {
     csString path(basePath);
     path.Append(filename);
@@ -198,6 +201,8 @@ bool csSpriteCal3DMeshObjectFactory::LoadCoreMesh(const char *filename,const cha
     }
     mesh->name              = name;
     mesh->attach_by_default = attach;
+    mesh->default_material  = defmat;
+
     submeshes.Push(mesh);
 
     return true;
@@ -396,9 +401,11 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   for(meshId = 0; meshId < factory->GetMeshCount(); meshId++)
   {
     if (factory->submeshes[meshId]->attach_by_default)
-	AttachCoreMesh(factory->submeshes[meshId]->index);
+    {
+	AttachCoreMesh(factory->submeshes[meshId]->index,(int)factory->submeshes[meshId]->default_material);
+    }
   }
-  calModel.setMaterialSet(0);
+//  calModel.setMaterialSet(0);
   calModel.update(0);
 }
 
@@ -714,18 +721,13 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 }
 
 
-bool csSpriteCal3DMeshObject::DrawSubmesh (iGraphics3D* g3d,iRenderView* rview,CalRenderer *pCalRenderer,int mesh, int submesh)
+bool csSpriteCal3DMeshObject::DrawSubmesh (iGraphics3D* g3d,
+					   iRenderView* rview,
+					   CalRenderer *pCalRenderer,
+					   int mesh, 
+					   int submesh,
+					   iMaterialWrapper *material)
 {
-    // get the material colors
-//    unsigned char ambientColor[4], diffuseColor[4], specularColor[4];
-//    pCalRenderer->getAmbientColor(&ambientColor[0]);
-//    pCalRenderer->getDiffuseColor(&diffuseColor[0]);
-//    pCalRenderer->getSpecularColor(&specularColor[0]);
-
-    // get the material shininess factor
-    float shininess;
-    shininess = pCalRenderer->getShininess();
-
     // get the transformed vertices of the submesh
     static float meshVertices[30000][3];
     int vertexCount;
@@ -741,8 +743,8 @@ bool csSpriteCal3DMeshObject::DrawSubmesh (iGraphics3D* g3d,iRenderView* rview,C
 
     // get the stored texture identifier
     // (only for the first map as example, others can be accessed in the same way though)
-    iMaterialWrapper *material;
-    material = (iMaterialWrapper *)pCalRenderer->getMapUserData(0);
+//    iMaterialWrapper *material;
+//    material = (iMaterialWrapper *)pCalRenderer->getMapUserData(0);
 
     // get the faces of the submesh
     static int meshFaces[50000][3];
@@ -812,7 +814,8 @@ bool csSpriteCal3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
       // select mesh and submesh for further data access
       if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
       {
-	  DrawSubmesh(g3d,rview,pCalRenderer,meshId,submeshId);
+	  iMaterialWrapper *mat = (iMaterialWrapper *)calModel.getVectorMesh()[meshId]->getSubmesh(submeshId)->getCoreMaterialId();
+	  DrawSubmesh(g3d,rview,pCalRenderer,meshId,submeshId,mat);
       }
     }
   }
@@ -979,10 +982,10 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(const char *meshname)
     if (idx == -1)
 	return false;
 
-    return AttachCoreMesh(factory->submeshes[idx]->index);
+    return AttachCoreMesh(factory->submeshes[idx]->index,(int)factory->submeshes[idx]->default_material);
 }
 
-bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id)
+bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id,int iMatWrapID)
 {
     if (!calModel.attachMesh(mesh_id))
 	return false;
@@ -996,7 +999,11 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id)
     attached_ids.Push(mesh_id);
     SetupObjectSubmesh(attached_ids.Length()-1);
     CalMesh *mesh = calModel.getMesh(mesh_id);
-    mesh->setMaterialSet(0);
+    for (int i=0; i<mesh->getSubmeshCount(); i++)
+    {
+	mesh->getSubmesh(i)->setCoreMaterialId(iMatWrapID);
+    }
+//    mesh->setMaterialSet(0);
     return true;
 }
 

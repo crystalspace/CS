@@ -53,6 +53,7 @@
 
 struct iObjectRegistry;
 struct iEngine;
+struct iMaterialWrapper;
 
 #define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
 
@@ -68,9 +69,10 @@ struct csCal3DAnimation
 
 struct csCal3DMesh
 {
-    int      index;
-    csString name;
-    bool     attach_by_default;
+    int		      index;
+    csString	      name;
+    bool	      attach_by_default;
+    iMaterialWrapper *default_material;
 };
 
 class csSpriteCal3DMeshObject;
@@ -128,7 +130,7 @@ public:
   float GetRenderScale() { return renderScale; }
   bool LoadCoreSkeleton(const char *filename);
   int  LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel);
-  bool LoadCoreMesh(const char *filename,const char *name,bool attach);
+  bool LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
 
@@ -248,8 +250,8 @@ public:
     virtual int LoadCoreAnimation(const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel)
     { return scfParent->LoadCoreAnimation(filename,name,type,base_vel,min_vel,max_vel); }
 
-    virtual bool LoadCoreMesh(const char *filename,const char *name,bool attach)
-    { return scfParent->LoadCoreMesh(filename,name,attach); }
+    virtual bool LoadCoreMesh(const char *filename,const char *name,bool attach,iMaterialWrapper *defmat)
+    { return scfParent->LoadCoreMesh(filename,name,attach,defmat); }
 
     virtual bool AddCoreMaterial(iMaterialWrapper *mat)
     { return scfParent->AddCoreMaterial(mat); }
@@ -323,7 +325,7 @@ private:
   void SetupObject ();
   void SetupObjectSubmesh(int index);
   void SetupVertexBuffer (int mesh,int submesh,int num_vertices,int num_triangles,csTriangle *triangles);
-  bool DrawSubmesh (iGraphics3D* g3d,iRenderView* rview,CalRenderer *pCalRenderer,int mesh,int submesh);
+  bool DrawSubmesh (iGraphics3D* g3d,iRenderView* rview,CalRenderer *pCalRenderer,int mesh,int submesh,iMaterialWrapper *material);
   void UpdateLightingSubmesh (iLight** lights, int num_lights,iMovable* movable,CalRenderer *pCalRenderer,int mesh, int submesh);
 
 public:
@@ -464,7 +466,7 @@ public:
   void SetLOD(float lod);
   
   bool AttachCoreMesh(const char *meshname);
-  bool AttachCoreMesh(int mesh_id);
+  bool AttachCoreMesh(int mesh_id,int iMatWrapID);
   bool DetachCoreMesh(const char *meshname);
   bool DetachCoreMesh(int mesh_id);
 
@@ -520,8 +522,8 @@ public:
     virtual bool AttachCoreMesh(const char *meshname)
     {  return scfParent->AttachCoreMesh(meshname); }
 
-    virtual bool AttachCoreMesh(int mesh_id)
-    {  return scfParent->AttachCoreMesh(mesh_id); }
+    virtual bool AttachCoreMesh(int mesh_id,int iMatWrapID)
+    {  return scfParent->AttachCoreMesh(mesh_id,iMatWrapID); }
 
     virtual bool DetachCoreMesh(const char *meshname)
     {  return scfParent->DetachCoreMesh(meshname); }
