@@ -66,7 +66,8 @@ bool csTerrain::Initialize (char* heightmap)
   wtoc[12] = 0;
   wtoc[13] = 0;
   wtoc[14] = 0;
-  wtoc[15] = 1;  float fov = 90.0;
+  wtoc[15] = 1;
+  float fov = 90.0;
   mesh->init (wtoc, clipbox, fov);
   return true;
 }
@@ -92,7 +93,6 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
   wtoc[7] = 0;
   wtoc[11] = 0;
   wtoc[15] = 1;
-  float fov = 90.0;
 
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
@@ -117,8 +117,6 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
     if (!bt->tri (tvc)->vis ().flags.none)
     {
       ddgVector3 p1, p2, p3;
-      ddgVector3 n1, n2, n3;
-      ddgVector2 t1, t2, t3;
       unsigned int i1, i2, i3;
 
       ddgTriIndex tva = bt->parent (tvc);
