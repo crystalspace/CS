@@ -51,6 +51,9 @@ struct iAwsParmList : public iBase
   virtual bool GetRect(char *name, csRect **value)=0;
   /// Returns the point named "name" in value.  True if it was found, otherwise false.
   virtual bool GetPoint(char *name, csPoint **value)=0;
+
+  /// Clears the parameter list
+  virtual void Clear()=0;
 };
 
 #endif
