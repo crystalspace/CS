@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Bugplug subemakefile
+# Bugplug submakefile
 #------------------------------------------------------------------------------
 
 DESCRIPTION.bugplug = Crystal Space debugging plug-in
