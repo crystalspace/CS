@@ -527,6 +527,20 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
 
 void csLightMap::ConvertToMixingMode ()
 {
+  int i;
+  mean_r = 0;
+  mean_g = 0;
+  mean_b = 0;
+  for (i = 0 ; i < lm_size ; i++)
+  {
+    mean_r += static_lm.mapR[i];
+    mean_g += static_lm.mapG[i];
+    mean_b += static_lm.mapB[i];
+  }
+  mean_r /= lm_size;
+  mean_g /= lm_size;
+  mean_b /= lm_size;
+
   //@@@
   //if (Textures::mixing == MIX_TRUE_RGB) return;
   //else convert_to_mixing_mode (static_lm.mapR, static_lm.mapG, static_lm.mapB, lm_size);

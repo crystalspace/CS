@@ -160,6 +160,14 @@ private:
   
   /// The hicolor cache ptr.
   HighColorCache_Data *hicolorcache;
+
+  /**
+   * Mean lighting value of this lightmap.
+   * (only for static lighting currently).
+   */
+  int mean_r;
+  int mean_g;
+  int mean_b;
   
   /**
    * Convert three lightmap tables to the right mixing mode.
@@ -188,6 +196,9 @@ public:
   csRGBLightMap& GetStaticMap () { return static_lm; }
   ///
   csRGBLightMap& GetRealMap () { return real_lm; }
+
+  ///
+  void GetMeanLighting (int& r, int& g, int& b) { r = mean_r; g = mean_g; b = mean_b; }
 
   ///
   int GetWidth () { return lwidth; }
@@ -259,7 +270,9 @@ public:
   /**
    * Convert the lightmaps to the correct mixing mode.
    * This function does nothing unless the mixing mode is
-   * nocolor.
+   * nocolor.<p>
+   *
+   * This function also calculates the mean color of the lightmap.
    */
   void ConvertToMixingMode ();
 

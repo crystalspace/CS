@@ -61,3 +61,10 @@ IMPLEMENT_GET_PROPERTY_PTR( GetHighColorCache, hicolorcache, HighColorCache_Data
 IMPLEMENT_SET_PROPERTY( SetHighColorCache, hicolorcache, HighColorCache_Data*, csLightMap, LightMap )
 
 
+STDMETHODIMP ILightMap::GetMeanLighting (int& r, int& g, int& b)
+{
+  METHOD_PROLOGUE (csLightMap, LightMap)
+  pThis->GetMeanLighting (r, g, b);
+  return S_OK;
+}
+
