@@ -404,6 +404,7 @@ void csTiledCoverageBuffer::Initialize ()
   for (i = 0 ; i < num_tiles ; i++)
   {
     tiles[i].MarkEmpty ();
+    tiles[i].ClearOperations ();
   }
 }
 
@@ -1114,21 +1115,22 @@ iString* csTiledCoverageBuffer::Debug_Dump ()
     {
       for (tx = 0 ; tx < (width_po2 >> 5) ; tx++)
       {
-        int cnt = 0;
         csCoverageTile* tile = GetTile (tx, ty);
 	for (x = 0 ; x < 4 ; x++)
 	{
-	  for (i = 0 ; i < 8 ; i++)
-	    for (j = 0 ; j < 8 ; j++)
-	      cnt += tile->coverage[x*8+i].TestBit (y*8+j);
+          int cnt = 0;
+	  if (!tile->queue_tile_empty)
+	    for (i = 0 ; i < 8 ; i++)
+	      for (j = 0 ; j < 8 ; j++)
+	        cnt += tile->coverage[x*8+i].TestBit (y*8+j);
+	  char c;
+	  if (cnt == 64) c = '#';
+	  else if (cnt > 54) c = '*';
+	  else if (cnt == 0) c = ' ';
+	  else if (cnt < 10) c = '.';
+	  else c = 'x';
+	  str.Append (c);
 	}
-	char c;
-	if (cnt == 64) c = '#';
-	else if (cnt > 54) c = '*';
-	else if (cnt == 0) c = ' ';
-	else if (cnt < 10) c = '.';
-	else c = 'x';
-	str.Append (c);
       }
       str.Append ('\n');
     }
@@ -1161,19 +1163,32 @@ iString* csTiledCoverageBuffer::Debug_UnitTest ()
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
 
+  csVector2 poly[4];
+
   Initialize ();
   COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
-  csVector2 poly[4];
   poly[0].Set (50, 50);
-  poly[1].Set (300, 50);
-  poly[2].Set (300, 300);
-  poly[3].Set (50, 300);
+  poly[1].Set (600, 50);
+  poly[2].Set (600, 430);
+  poly[3].Set (50, 430);
   InsertPolygon (poly, 4, 10.0);
+  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
+  COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
+  COV_ASSERT (TestPoint (csVector2 (599, 100), 5) == true, "tp");
+  COV_ASSERT (TestPoint (csVector2 (599, 100), 15) == false, "tp");
+  COV_ASSERT (TestPoint (csVector2 (601, 100), 5) == true, "tp");
+  COV_ASSERT (TestPoint (csVector2 (601, 100), 15) == true, "tp");
+
+  Initialize ();
+  poly[0].Set (50, 50);
+  poly[1].Set (600, 400);
+  poly[2].Set (600, 430);
+  poly[3].Set (50, 70);
+  InsertPolygon (poly, 4, 10.0);
+
 iString* sss = Debug_Dump ();
 printf ("%s\n", sss->GetData ());
 sss->DecRef ();
-  COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
-  COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
 
   rc->DecRef ();
   return NULL;

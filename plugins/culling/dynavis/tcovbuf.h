@@ -125,6 +125,7 @@ public:
   void MarkEmpty ()
   {
     queue_tile_empty = true;
+    tile_full = false;
   }
 
   /**
@@ -138,6 +139,13 @@ public:
     memset (depth, 0, sizeof (float)*32);
     blocks_full = 0;
     blocks_partial = 0;
+  }
+
+  /**
+   * Clear all operations.
+   */
+  void ClearOperations ()
+  {
     num_operations = 0;
   }
 
