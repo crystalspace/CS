@@ -24,6 +24,8 @@ LOCATE.DOCS = $(BUILDTOP)/out ;
 STATIC.PLUGINLIST =
     ball
     ballldr
+    bezier
+    bezierldr
     bugplug
     crossbld
     csbmpimg
@@ -60,7 +62,7 @@ STATIC.PLUGINLIST =
     metaball
     metagen
     motion
-    motionldr
+    motldr
     nullmesh
     rain
     rainldr
@@ -71,7 +73,7 @@ STATIC.PLUGINLIST =
     snow
     snowldr
     soft3d
-    softx
+    x2d
     spiral
     spirldr
     spr2d
@@ -79,12 +81,12 @@ STATIC.PLUGINLIST =
     spr3d
     spr3dldr
     starldr
-    starts
+    stars
     stdrep
+    stdpt
     thing
     thingldr
     vfs
-    x2d
     xext86vm
     xextshm
     xwin
