@@ -8,6 +8,7 @@ chronological order.
 
 27-Dec-2003
   - Philip Wyett continues a general cleanup of CS code.
+  - Philip Wyett added 'docconv' to the root CS directory .cvsignore.
 26-Dec-2003
   - Philip Wyett continues a general cleanup of CS code.
 25-Dec-2003
