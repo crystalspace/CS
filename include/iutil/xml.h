@@ -131,8 +131,6 @@ struct iXmlNode : public iBase
 
   /// Get an iterator over all attributes.
   virtual csRef<iXmlAttributeIterator> GetAttributes () = 0;
-  /// Get an iterator over all attributes of the specified name.
-  virtual csRef<iXmlAttributeIterator> GetAttributes (const char* name) = 0;
 
   /// Remove an attribute.
   virtual void RemoveAttribute (const csRef<iXmlAttribute>& attr) = 0;

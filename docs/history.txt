@@ -13,6 +13,12 @@ The history order is reversed so that new features are at the top.
 	- Moved fpu80x86.h to include/csutil.
 	- Completely removed the 'support' directory from CS since it is now
 	  empty.
+	- Implemented basic reading of XML. You can now read an XML document
+	  and parse of nodes and attributes. Writing of XML is not supported
+	  yet. And not all operations for reading are supported either.
+	  i.e. use the iterators. Nothing else works.
+	- Added xmltest application to dump the contents of an XML file.
+	- Fixed an error in mergeres.h by quoting the quotes.
 7-Aug-2002
 	- Eric Sunshine fixed a couple problems with csconf.mak.  First, it was
 	  using " instead of $".  It was using the hardcoded path "out/"

@@ -12,12 +12,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cs2xml csxmlconvclean
+.PHONY: cs2xml cs2xmlclean
 
 all apps: cs2xml
 cs2xml:
 	$(MAKE_APP)
-csxmlconvclean:
+cs2xmlclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -47,16 +47,16 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.cs2xml csxmlconvclean
+.PHONY: build.cs2xml cs2xmlclean
 
 all: $(CS2XML.EXE)
 build.cs2xml: $(OUTDIRS) $(CS2XML.EXE)
-clean: csxmlconvclean
+clean: cs2xmlclean
 
 $(CS2XML.EXE): $(DEP.EXE) $(OBJ.CS2XML) $(LIB.CS2XML)
 	$(DO.LINK.EXE)
 
-csxmlconvclean:
+cs2xmlclean:
 	-$(RM) $(CS2XML.EXE) $(OBJ.CS2XML)
 
 ifdef DO_DEPEND

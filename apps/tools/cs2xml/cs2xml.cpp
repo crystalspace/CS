@@ -75,7 +75,7 @@ void Cs2Xml::ReportError (const char* description, ...)
   va_list arg;
   va_start (arg, description);
   csReportV (object_reg, CS_REPORTER_SEVERITY_ERROR,
-  	"crystalspace.apps.levtool", description, arg);
+  	"crystalspace.apps.cs2xml", description, arg);
   va_end (arg);
 }
 
@@ -646,8 +646,8 @@ void Cs2Xml::Main ()
   iDataBuffer* buf = NULL;
   if (strstr (val, ".zip"))
   {
-    vfs->Mount ("/tmp/levtool_data", val);
-    buf = vfs->ReadFile ("/tmp/levtool_data/world");
+    vfs->Mount ("/tmp/cs2xml_data", val);
+    buf = vfs->ReadFile ("/tmp/cs2xml_data/world");
     if (!buf || !buf->GetSize ())
     {
       ReportError ("Archive '%s' does not seem to contain a 'world' file!",

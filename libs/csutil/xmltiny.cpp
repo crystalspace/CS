@@ -26,6 +26,8 @@
 #include "csutil/xmltinyp.h"
 #include "csutil/tinyxml.h"
 #include "iutil/vfs.h"
+#include "iutil/string.h"
+#include "iutil/databuff.h"
 
 //------------------------------------------------------------------------
 
@@ -51,6 +53,88 @@ csRef<iXmlDocument> csTinyXmlSystem::CreateDocument ()
 
 //------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csTinyXmlAttributeIterator)
+  SCF_IMPLEMENTS_INTERFACE (iXmlAttributeIterator)
+SCF_IMPLEMENT_IBASE_END
+
+csTinyXmlAttributeIterator::csTinyXmlAttributeIterator (TiXmlNode* parent)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  if (parent->Type () != TiXmlNode::ELEMENT)
+  {
+    csTinyXmlAttributeIterator::parent = NULL;
+    current = NULL;
+    return;
+  }
+  csTinyXmlAttributeIterator::parent = (TiXmlElement*)parent;
+  current = csTinyXmlAttributeIterator::parent->FirstAttribute ();
+}
+
+bool csTinyXmlAttributeIterator::HasNext ()
+{
+  return current != NULL;
+}
+
+csRef<iXmlAttribute> csTinyXmlAttributeIterator::Next ()
+{
+  csRef<iXmlAttribute> attr;
+  if (current != NULL)
+  {
+    attr.Take (new csTinyXmlAttribute (current));
+    current = current->Next ();
+  }
+  return attr;
+}
+
+//------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csTinyXmlNodeIterator)
+  SCF_IMPLEMENTS_INTERFACE (iXmlNodeIterator)
+SCF_IMPLEMENT_IBASE_END
+
+csTinyXmlNodeIterator::csTinyXmlNodeIterator (TiXmlNode* parent,
+	const char* value)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  csTinyXmlNodeIterator::parent = parent;
+  csTinyXmlNodeIterator::value = value ? csStrNew (value) : NULL;
+  if (value)
+    current = parent->FirstChild (value);
+  else
+    current = parent->FirstChild ();
+}
+
+bool csTinyXmlNodeIterator::HasNext ()
+{
+  return current != NULL;
+}
+
+csRef<iXmlNode> csTinyXmlNodeIterator::Next ()
+{
+  csRef<iXmlNode> node;
+  if (current != NULL)
+  {
+    node.Take (new csTinyXmlNode (current));
+    if (value)
+      current = current->NextSibling (value);
+    else
+      current = current->NextSibling ();
+  }
+  return node;
+}
+
+//------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csTinyXmlAttribute)
+  SCF_IMPLEMENTS_INTERFACE (iXmlAttribute)
+SCF_IMPLEMENT_IBASE_END
+
+//------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csTinyXmlNode)
+  SCF_IMPLEMENTS_INTERFACE (iXmlNode)
+SCF_IMPLEMENT_IBASE_END
+
 csTinyXmlNode::csTinyXmlNode ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -65,7 +149,6 @@ csTinyXmlNode::csTinyXmlNode (TiXmlNode* node)
 
 csTinyXmlNode::~csTinyXmlNode ()
 {
-  delete node;
 }
 
 const char* csTinyXmlNode::GetType ()
@@ -88,14 +171,14 @@ void csTinyXmlNode::SetType (const char* type)
 csRef<iXmlNodeIterator> csTinyXmlNode::GetChildren ()
 {
   csRef<iXmlNodeIterator> it;
-  // @@@ TODO
+  it.Take (new csTinyXmlNodeIterator (node, NULL));
   return it;
 }
 
 csRef<iXmlNodeIterator> csTinyXmlNode::GetChildren (const char* type)
 {
   csRef<iXmlNodeIterator> it;
-  // @@@ TODO
+  it.Take (new csTinyXmlNodeIterator (node, type));
   return it;
 }
 
@@ -148,14 +231,7 @@ void csTinyXmlNode::MoveNodeAfter (const csRef<iXmlNode>& node,
 csRef<iXmlAttributeIterator> csTinyXmlNode::GetAttributes ()
 {
   csRef<iXmlAttributeIterator> it;
-  // @@@ TODO
-  return it;
-}
-
-csRef<iXmlAttributeIterator> csTinyXmlNode::GetAttributes (const char* name)
-{
-  csRef<iXmlAttributeIterator> it;
-  // @@@ TODO
+  it.Take (new csTinyXmlAttributeIterator (node));
   return it;
 }
 
@@ -211,6 +287,10 @@ void csTinyXmlNode::MoveAttributeAfter (const csRef<iXmlAttribute>& attr,
 
 //------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csTinyXmlDocument)
+  SCF_IMPLEMENTS_INTERFACE (iXmlDocument)
+SCF_IMPLEMENT_IBASE_END
+
 csTinyXmlDocument::csTinyXmlDocument ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -245,12 +325,12 @@ const char* csTinyXmlDocument::ParseXML (iFile* file)
 
 const char* csTinyXmlDocument::ParseXML (iDataBuffer* buf)
 {
-  return "Not implemented yet!";
+  return ParseXML ((const char*)buf->GetData ());
 }
 
 const char* csTinyXmlDocument::ParseXML (iString* str)
 {
-  return "Not implemented yet!";
+  return ParseXML ((const char*)*str);
 }
 
 const char* csTinyXmlDocument::ParseXML (const char* buf)

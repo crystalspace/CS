@@ -23,51 +23,90 @@
 #include "csutil/tinyxml.h"
 
 /**
- * This is an SCF compatible wrapper for an attribute in TinyXml.
+ * This is an SCF compatible wrapper for an attribute iterator.
  */
-struct csTinyXmlAttribute : public iXmlNode
+struct csTinyXmlAttributeIterator : public iXmlAttributeIterator
 {
 private:
-  char* name;
-  char* value;
+  TiXmlAttribute* current;
+  TiXmlElement* parent;
+
+public:
+  csTinyXmlAttributeIterator (TiXmlNode* parent);
+  virtual ~csTinyXmlAttributeIterator () { }
+
+  SCF_DECLARE_IBASE;
+
+  virtual bool HasNext ();
+  virtual csRef<iXmlAttribute> Next ();
+};
+
+/**
+ * This is an SCF compatible wrapper for an attribute in TinyXml.
+ */
+struct csTinyXmlAttribute : public iXmlAttribute
+{
+private:
+  TiXmlAttribute* attr;
 
 public:
   csTinyXmlAttribute ()
   {
     SCF_CONSTRUCT_IBASE (NULL);
-    name = NULL;
-    value = NULL;
+    attr = NULL;
+  }
+
+  csTinyXmlAttribute (TiXmlAttribute* attr)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    csTinyXmlAttribute::attr = attr;
   }
 
   virtual ~csTinyXmlAttribute ()
   {
-    delete[] name;
-    delete[] value;
   }
 
   SCF_DECLARE_IBASE;
 
   virtual const char* GetName () const
   {
-    return name;
+    return attr->Name ();
   }
 
   virtual const char* GetValue () const
   {
-    return value;
+    return attr->Value ();
   }
 
   virtual void SetName (const char* name)
   {
-    delete[] csTinyXmlAttribute::name;
-    csTinyXmlAttribute::name = csStrNew (name);
+    attr->SetName (name);
   }
 
   virtual void SetValue (const char* value)
   {
-    delete[] csTinyXmlAttribute::value;
-    csTinyXmlAttribute::value = csStrNew (value);
+    attr->SetValue (value);
   }
+};
+
+/**
+ * This is an SCF compatible wrapper for a node iterator.
+ */
+struct csTinyXmlNodeIterator : public iXmlNodeIterator
+{
+private:
+  TiXmlNode* current;
+  TiXmlNode* parent;
+  char* value;
+
+public:
+  csTinyXmlNodeIterator (TiXmlNode* parent, const char* value);
+  virtual ~csTinyXmlNodeIterator () { delete[] value; }
+
+  SCF_DECLARE_IBASE;
+
+  virtual bool HasNext ();
+  virtual csRef<iXmlNode> Next ();
 };
 
 /**
@@ -104,7 +143,6 @@ public:
   virtual void MoveNodeAfter (const csRef<iXmlNode>& node,
   	const csRef<iXmlNode>& after);
   virtual csRef<iXmlAttributeIterator> GetAttributes ();
-  virtual csRef<iXmlAttributeIterator> GetAttributes (const char* name);
   virtual void RemoveAttribute (const csRef<iXmlAttribute>& attr);
   virtual void RemoveAttributes ();
   virtual void SetAttribute (const char* name, const char* value);
