@@ -362,7 +362,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
   float texheight = gs->texheight;
 
   GLGlyph *glyphs = gs->glyphs;
-  GLuint hLastTexture = glyphs [*text].hTexture - 1;
+  GLuint hLastTexture = glyphs [(unsigned char)(*text)].hTexture - 1;
 
   float x1 = 0.0;
 
@@ -380,7 +380,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
   int curvert = 0;
   for (; *text; ++text)
   {
-    GLGlyph &glyph = glyphs [*text];
+    GLGlyph &glyph = glyphs [(unsigned char)(*text)];
 
     float x_right, x2 = x_right = x1 + glyph.width;
     float tx1, tx2, ty1, ty2, y1, y2;
