@@ -935,16 +935,19 @@ void csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustrumView *lview)
   // use shadows and light from lview
   if(shadow_map) delete[] shadow_map;
   shadow_map = new float[dest->GetSize()];
-  for(int i=0; i<dest->GetSize(); i++)
-    shadow_map[i] = 0.0; // start with none visible.
-  // factor in light frustrum
   static_shadow_map = shadow_map;
   static_shadow_width = shoot_dest->GetWidth();
+  for(int i=0; i<dest->GetSize(); i++)
+    static_shadow_map[i] = 0.0; // start with none visible.
+  //memset(static_shadow_map, 0, dest->GetSize() * sizeof(float));
+  // factor in light frustrum
   MapFrustrum(lview->light_frustrum, draw_light_frustrum);
-  csRadPoly::FixCoverageMap(shadow_map, shoot_dest->GetWidth(),
+  csRadPoly::FixCoverageMap(static_shadow_map, shoot_dest->GetWidth(),
     shoot_dest->GetHeight());
 
   // remove shadows
+  // should be done by first acculumating shadows in one map,
+  // and only then subtracting them, as shadows map overlap.
   csShadowFrustrum *shadow = lview->shadows.GetFirst();
   while(shadow)
   {
@@ -1018,10 +1021,6 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 float csRadiosity :: GetVisibility(csRadPoly *srcpoly, const csVector3& src, 
     csRadPoly *destpoly, const csVector3& dest)
 {
-  // Note: it would be smart to project the src polygon to the dest 
-  // polygon earlier. Fill an array with poly_fill, and to do an array 
-  // lookup here.
-
   // change path slightly, to take floatingpoint inaccuracies into account.
   csVector3 path = dest-src;
   // aim slightly behind destination so we won't miss.
