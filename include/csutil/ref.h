@@ -72,9 +72,9 @@ public:
   {
     if (obj != other.obj)
     {
-      obj->DecRef();
+      if (obj) obj->DecRef();
       obj = other.obj;
-      obj->IncRef();
+      if (obj) obj->IncRef();
     }
   }
 
@@ -88,7 +88,7 @@ public:
   {
     T* oldobj = obj;
     obj = newobj;
-    if (!transfer_ownership)
+    if (obj && !transfer_ownership)
       obj->IncRef();
     if (oldobj)
       oldobj->DecRef();

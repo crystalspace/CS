@@ -34,6 +34,7 @@ The history order is reversed so that new features are at the top.
 	  transfer owner ship (for pointers) as was intended in the first
 	  place.
 	- Converted simple2 tutorial to use smart pointers.
+	- Fixed csRef::Assign() so it now correctly tests for NULL pointers.
 30-Jul-2002
 	- Added simple csRefCount class which does reference counting
 	  without the need for iBase.
