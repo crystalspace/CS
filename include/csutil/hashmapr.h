@@ -41,11 +41,11 @@ class csHashMapReversible : public csHashMap
   /// Does csHashCompute automatically.
   void Put (const char *key, csHashObject object);
 
-  /// Get the original key string from the value.
-  const char* GetKey (csHashObject value);
+  /// Get the first original key string with the given value.
+  const char* GetKey (csHashObject value) const;
 
-  /// Get the original key string from the key number.
-  const char* GetKey (csHashKey key);
+  /// Get the first original key string with the given key number.
+  const char* GetKey (csHashKey key) const;
 };
 
 /// A csHashIterator that knows about csHashMapReversible's reverse hash.
@@ -55,13 +55,24 @@ class csHashIteratorReversible : public csHashIterator
 
   private:
   csHashMapReversible *hashr;
+  const char *iterr;
   csHashKey keyr;
 
   public:
-  csHashIteratorReversible (csHashMapReversible *);
+  /// Construct an iterator over all elements of a reversible hash
+  csHashIteratorReversible (csHashMapReversible *hash);
+
+  /// Construct an iterator over specific elements of a reversible hash
+  csHashIteratorReversible (csHashMapReversible *hash, csHashKey key);
+
+  /// Construct an iterator over specific elements of a reversible hash
+  csHashIteratorReversible (csHashMapReversible *hash, const char *key);
+
+  /// Get next object, for iterators constructed from a string key
+  csHashObject Next ();
 
   /// Get the key of the current value.
-  const char* GetKey ();
+  const char* GetKey () const;
 };
 
 #endif // __CS_HASHMAPR_H__

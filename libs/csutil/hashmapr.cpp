@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "csutil/hashmapr.h"
-#include "csutil/hashmap.h"
 
 csHashMapReversible::csHashMapReversible (uint32 size)
   : csHashMap (size)
@@ -43,12 +42,12 @@ void csHashMapReversible::Put (const char *key, csHashObject object)
   csHashMap::Put (keynum, object);
 }
 
-const char* csHashMapReversible::GetKey (csHashObject value)
+const char* csHashMapReversible::GetKey (csHashObject value) const
 {
   return (char *) Reverse->Get ((csHashKey) value);
 }
 
-const char* csHashMapReversible::GetKey (csHashKey key)
+const char* csHashMapReversible::GetKey (csHashKey key) const
 {
   return (char *) HalfReverse->Get (key);
 }
@@ -57,9 +56,35 @@ csHashIteratorReversible::csHashIteratorReversible (csHashMapReversible *r)
   : csHashIterator (r)
 {
   hashr = r;
+  iterr = NULL;
 }
 
-const char* csHashIteratorReversible::GetKey ()
+csHashIteratorReversible::csHashIteratorReversible (csHashMapReversible *r,
+  csHashKey k) : csHashIterator (r, k)
+{
+  hashr = r;
+  iterr = NULL;
+}
+
+csHashIteratorReversible::csHashIteratorReversible (csHashMapReversible *r,
+  const char *k) : csHashIterator (r, csHashCompute (k))
+{
+  hashr = r;
+  iterr = k;
+}
+
+csHashObject csHashIteratorReversible::Next ()
+{
+  if (! iterr) return csHashIterator::Next ();
+
+  csHashObject obj;
+  while ((obj = csHashIterator::Next ()))
+    if (strcmp (GetKey (), iterr) == 0) return obj;
+
+  return NULL;
+}
+
+const char* csHashIteratorReversible::GetKey () const
 {
   if ((current_bucket != NULL) && (current_index > -1) && (current_index <= current_bucket->Length())) 
     return hashr->GetKey ( ((csHashElement *)((*current_bucket)[current_index])) ->key);
