@@ -36,7 +36,7 @@
 char* csGetConfigPath ()
 {
   char* buff = new char[1024];
-    
+
   if (OSXGetInstallPath(buff, 1024, PATH_SEPARATOR))
   {
     return buff;
@@ -56,11 +56,17 @@ char* csGetConfigPath ()
 char** csGetPluginPaths ()
 {
   char** paths = new char* [4];
+  char* buff = new char[1024];
 
+  strncpy(buff, csGetConfigPath(), 1024);
+  strncat(buff, OS_MACOSX_PLUGIN_DIR, 1024);
+  
   paths[0] = csGetConfigPath ();
-  paths[1] = csStrNew (OS_MACOSX_PLUGIN_DIR);
+  paths[1] = csStrNew (buff);
   paths[2] = csStrNew (".");
   paths[3] = 0;
 
+  delete[] buff;
+  
   return paths; 
 }    
