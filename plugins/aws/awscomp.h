@@ -25,6 +25,7 @@
 # include "csgeom/csrect.h"
 # include "awsprefs.h"
 # include "awsslot.h"
+# include "csutil/array.h"
 
 class awsCanvas;
 
@@ -89,16 +90,18 @@ protected:
   awsSource signalsrc;
 
 
-  /** Contains the redraw tag.  This tag changes everytime we redraw the window system, but only once per frame.
-      we use it to keep track of which windows have been redrawn and which haven't.
-     */
+  /**
+   * Contains the redraw tag.  This tag changes everytime we redraw the
+   * window system, but only once per frame. We use it to keep track of
+   * which windows have been redrawn and which haven't.
+   */
   unsigned int redraw_tag;
 
-	/// Tab order
-	csVector TabOrder;
+  /// Tab order
+  csArray<iAwsComponent*> TabOrder;
 
-	/// Focusable flag
-	bool focusable;
+  /// Focusable flag
+  bool focusable;
 
 public:
   SCF_DECLARE_IBASE;

@@ -32,7 +32,7 @@ awsComponent::awsComponent () :
 
 awsComponent::~awsComponent ()
 {
-  TabOrder.DeleteAll(false); //remove all children from TabOrder, but don't free them
+  TabOrder.DeleteAll(); //remove all children from TabOrder, but don't free them
 
   /// Let go our references to any children if we have them.
   iAwsComponent* child = GetTopChild();
@@ -766,7 +766,7 @@ int awsComponent::GetTabLength()
 iAwsComponent *awsComponent::GetTabComponent(int index)
 {
 	if(index < TabOrder.Length())
-		return ((iAwsComponent *)TabOrder[index]);	
+		return TabOrder[index];
 	else return 0;
 }
 

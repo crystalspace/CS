@@ -19,6 +19,11 @@ for each given day, however, are in normal (ascending) chronological order.
 	  all image loading plugins accordingly.
 	- Jorrit replaced the basic vector return in
 	  iAwsKeyContainer::Children() with a const csRefArray<iAwsKey>.
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced TabOrder in awsComponent with csArray<iAwsComponent*>.
+	    - Replaced vClipped in awsMultiLineEdit with
+	      csPDelArray<csString>.
+	    - Replaced vText in awsMultiLineEdit with csPDelArray<csString>.
 29-Jul-2003
 	- Jorrit made scfStringArray actually work by adding the needed
 	  SCF_CONSTRUCT stuff.

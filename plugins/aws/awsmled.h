@@ -27,6 +27,7 @@
 #include "awsscr.h"
 #include "csutil/csevent.h"
 #include "csutil/csvector.h"
+#include "csutil/parray.h"
 
 class awsMultiLineEdit : public awsComponent
 {
@@ -81,8 +82,8 @@ class awsMultiLineEdit : public awsComponent
     }
   };
 
-  csVector vClipped;
-  csVector vText;
+  csPDelArray<csString> vClipped;
+  csPDelArray<csString> vText;
   eventVector vDispatcher;
   awsActionDispatcher actions;
 
