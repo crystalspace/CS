@@ -100,6 +100,20 @@ public:
 };
 
 /**
+ * a class for a solid coloured texture
+*/
+class csGenerateTerrainImageTextureSolid:public csGenerateTerrainImageTexture
+{
+public:
+  /// the colour, range 0-255
+  csColor color;
+  /// delete it
+  virtual ~csGenerateTerrainImageTextureSolid() {}
+  /// get the color
+  virtual void GetColor(csColor& col, float, float) {col = color;}
+};
+
+/**
  * A class for a single texture
 */
 class csGenerateTerrainImageTextureSingle:public csGenerateTerrainImageTexture
