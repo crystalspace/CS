@@ -618,16 +618,14 @@ IMPLEMENT_CSOBJTYPE (csSprite3D, csObject)
 
 /// Static vertex array.
 static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
-/// Static z array.
-static DECLARE_GROWING_ARRAY (z_verts, float);
 /// Static uv array.
 static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
-/// The perspective corrected vertices.
-static DECLARE_GROWING_ARRAY (persp, csVector2);
-/// Array which indicates which vertices are visible and which are not.
-static DECLARE_GROWING_ARRAY (visible, bool);
 /// The list of fog vertices
 static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
+/// The list of object vertices.
+static DECLARE_GROWING_ARRAY (obj_verts, csVector3);
+/// The list of tween vertices.
+static DECLARE_GROWING_ARRAY (tween_verts, csVector3);
 /// The list of lights that hit the sprite
 static DECLARE_GROWING_ARRAY (light_worktable, csLight*);
 
@@ -655,23 +653,21 @@ csSprite3D::csSprite3D () : csObject (), bbox (NULL)
   tween_ratio = 0;
 
   tr_verts.IncRef ();
-  z_verts.IncRef ();
   uv_verts.IncRef ();
-  persp.IncRef ();
-  visible.IncRef ();
   fog_verts.IncRef ();
+  obj_verts.IncRef ();
+  tween_verts.IncRef ();
   light_worktable.IncRef ();
 }
 
 csSprite3D::~csSprite3D ()
 {
   light_worktable.DecRef ();
-  visible.DecRef ();
-  persp.DecRef ();
   uv_verts.DecRef ();
-  z_verts.DecRef ();
   tr_verts.DecRef ();
   fog_verts.DecRef ();
+  obj_verts.DecRef ();
+  tween_verts.DecRef ();
 
   while (dynamiclights) CHKB (delete dynamiclights);
   CHK (delete [] vertex_colors);
@@ -843,11 +839,10 @@ void csSprite3D::UpdateWorkTables (int max_size)
   if (max_size > tr_verts.GetLimit ())
   {
     tr_verts.SetLimit (max_size);
-    z_verts.SetLimit (max_size);
     uv_verts.SetLimit (max_size);
-    persp.SetLimit (max_size);
-    visible.SetLimit (max_size);
     fog_verts.SetLimit (max_size);
+    obj_verts.SetLimit (max_size);
+    tween_verts.SetLimit (max_size);
   }
 }
 
@@ -1074,9 +1069,7 @@ float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox& boundin
   return cbox.MaxZ ();
 }
 
-#if 1
-// Experimental new version of sprite drawing routine using
-// DrawTriangleMesh.
+// New version of sprite drawing routine using DrawTriangleMesh.
 void csSprite3D::Draw (csRenderView& rview)
 {
   int i;
@@ -1154,20 +1147,15 @@ void csSprite3D::Draw (csRenderView& rview)
   // @@@ This should only be done when aspect changes...
   rview.g3d->SetPerspectiveAspect (rview.aspect);
 
-  // BAD - ignores texel_to arrays
-  //csVector3* obj_verts = cframe->GetVertices ()->GetVertices ();
-  //csVector3* tween_verts = next_frame->GetVertices ()->GetVertices ();
-
-  CHK ( csVector3* obj_verts   = new csVector3 [tpl->GetNumTexels()]; )
-  CHK ( csVector3* tween_verts = new csVector3 [tpl->GetNumTexels()]; )
-  for ( i = 0 ; i < tpl->GetNumTexels() ; i++ )
-  {
-    obj_verts   [i] = tpl->GetVertex (cframe,     i);
-    tween_verts [i] = tpl->GetVertex (next_frame, i);
-  }
-
   bool do_tween = false;
   if (!skeleton_state && tween_ratio) do_tween = true;
+
+  // @@@ Can't this copy be avoided?
+  for (i = 0 ; i < tpl->GetNumTexels () ; i++)
+  {
+    obj_verts[i] = tpl->GetVertex (cframe, i);
+    if (do_tween) tween_verts[i] = tpl->GetVertex (next_frame, i);
+  }
 
   // If we have a skeleton then we transform all vertices through
   // the skeleton. In that case we also include the camera transformation
@@ -1175,12 +1163,12 @@ void csSprite3D::Draw (csRenderView& rview)
   csVector3* verts;
   if (skeleton_state)
   {
-    skeleton_state->Transform (tr_o2c, obj_verts, tr_verts.GetArray ());
+    skeleton_state->Transform (tr_o2c, obj_verts.GetArray (), tr_verts.GetArray ());
     verts = tr_verts.GetArray ();
   }
   else
   {
-    verts = obj_verts;
+    verts = obj_verts.GetArray ();
   }
 
   // Calculate the right LOD level for this sprite.
@@ -1243,7 +1231,7 @@ void csSprite3D::Draw (csRenderView& rview)
   {
     mesh.morph_factor = tween_ratio;
     mesh.num_vertices_pool = 2;
-    mesh.vertices[1] = tween_verts;
+    mesh.vertices[1] = tween_verts.GetArray ();
     mesh.texels[1][0] = uv_verts.GetArray ();
     mesh.vertex_colors[1] = vertex_colors;
   }
@@ -1281,310 +1269,7 @@ void csSprite3D::Draw (csRenderView& rview)
 
   if (draw_callback2)
     draw_callback2 (this, &rview, myOwner);
-
-  CHK (delete [] obj_verts);
-  CHK (delete [] tween_verts);
 }
-
-
-#else
-void csSprite3D::Draw (csRenderView& rview)
-{
-  int i;
-  if (draw_callback) draw_callback (this, &rview);
-
-  if (!tpl->cstxt)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Error! Trying to draw a sprite with no texture!\n");
-    fatal_exit (0, false);
-  }
-
-  // Test visibility of entire sprite by clipping bounding box against clipper.
-  // There are three possibilities:
-  //	1. box is not visible -> sprite is not visible.
-  //	2. box is entirely visible -> sprite is visible and need not be clipped.
-  //	3. box is partially visible -> sprite is visible and needs to be clipped
-  //	   if rview has do_clip_plane set to true.
-  csBox bbox;
-  if (GetScreenBoundingBox (rview, bbox) < 0) return;	// Not visible.
-  //@@@ Debug output: this should be an optional feature for WalkTest.
-  //{
-    //csPolygon2D* p2d = new csPolygon2D ();
-    //p2d->AddVertex (bbox.GetCorner (0));
-    //p2d->AddVertex (bbox.GetCorner (1));
-    //p2d->AddVertex (bbox.GetCorner (3));
-    //p2d->AddVertex (bbox.GetCorner (2));
-    //p2d->Draw (rview.g2d, 255);
-    //delete p2d;
-  //}
-
-  // Test if we need and should clip to the current portal.
-  int box_class;
-  box_class = rview.view->ClassifyBox (&bbox);
-  if (box_class == -1) return; // Not visible.
-  bool do_clip = false;
-  if (rview.do_clip_plane || rview.do_clip_frustrum)
-  {
-    if (box_class == 0) do_clip = true;
-  }
-
-  // If we don't need to clip to the current portal then we
-  // test if we need to clip to the top-level portal.
-  // Top-level clipping is always required unless we are totally
-  // within the top-level frustrum.
-  // IF it is decided that we need to clip here then we still
-  // clip to the inner portal. We have to do clipping anyway so
-  // why not do it to the smallest possible clip area.
-  if (!do_clip)
-  {
-    box_class = csWorld::current_world->top_clipper->ClassifyBox (&bbox);
-    if (box_class == 0) do_clip = true;
-  }
-
-  UpdateWorkTables (tpl->GetNumTexels());
-  UpdateDeferedLighting ();
-
-  csFrame * cframe = cur_action->GetFrame (cur_frame);
-
-  // Get next frame for animation tweening.
-  csFrame * next_frame;
-  if (cur_frame + 1 < cur_action->GetNumFrames())
-    next_frame = cur_action->GetFrame (cur_frame + 1);
-  else
-    next_frame = cur_action->GetFrame (0);
-
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csTransform tr_o2c = rview * csTransform (m_obj2world, m_world2obj * v_obj2world);
-
-  // Now we transform all vertices to camera space. There are two possibilities.
-  // If we have a skeleton then we let the skeleton do the transformation.
-  // Otherwise we just transform all vertices.
-
-  // Jorrit: Removed highly inefficient copy and allocation code
-  // and replaced with a single assignment:
-  //CHK ( delete [] object_vertices; )
-  //CHK ( object_vertices = new csVector3 [tpl->GetNumTexels()]; )
-  //for (i = 0; i < tpl->GetNumTexels(); i++)
-    //object_vertices[i] = tpl->GetVertex(cframe, i);
-
-  // UNCLEAN!  UNCLEAN!  Ignores texel_to arrays in csSpriteTemplate
-  //csVector3* obj_verts = cframe->GetVertices ()->GetVertices ();
-  //csVector3* tween_verts = next_frame->GetVertices ()->GetVertices ();
-
-  CHK ( csVector3* obj_verts   = new csVector3 [tpl->GetNumTexels()]; )
-  CHK ( csVector3* tween_verts = new csVector3 [tpl->GetNumTexels()]; )
-  for ( i = 0 ; i < tpl->GetNumTexels() ; i++ )
-  {
-    obj_verts   [i] = tpl->GetVertex (cframe,     i);
-    tween_verts [i] = tpl->GetVertex (next_frame, i);
-  }
-
-  if (skeleton_state)
-    skeleton_state->Transform (tr_o2c, obj_verts, tr_verts.GetArray ());
-  else
-  {
-    if (tween_ratio)
-    {
-      float remainder = 1 - tween_ratio;
-      for (i = 0 ; i < tpl->GetNumTexels() ; i++)
-        tr_verts[i] = tr_o2c * (tween_ratio * tween_verts[i]
-          + remainder * obj_verts[i]);
-    }
-    else
-    {
-      for (i = 0 ; i < tpl->GetNumTexels() ; i++)
-        tr_verts[i] = tr_o2c * obj_verts[i];
-    }
-  }
-
-  // Calculate the right LOD level for this sprite.
-  // Select the appropriate mesh.
-  csTriangleMesh* m;
-  int* emerge_from = NULL;
-  int num_verts;
-  float fnum = 0.0f;
-  if (cfg_lod_detail < 0 || cfg_lod_detail == 1)
-  {
-    m = tpl->GetTexelMesh ();
-    num_verts = tpl->GetNumTexels ();
-  }
-  else
-  {
-    m = &mesh;
-    // We calculate the number of vertices to use for this LOD
-    // level. The integer part will be the number of vertices.
-    // The fractional part will determine how much to morph
-    // between the new vertex and the previous last vertex.
-    fnum = cfg_lod_detail*(float)(tpl->GetNumTexels()+1);
-    num_verts = (int)fnum;
-    fnum -= num_verts;  // fnum is now the fractional part.
-    GenerateSpriteLOD (num_verts);
-    emerge_from = tpl->GetEmergeFrom ();
-  }
-
-  // Do vertex morphing if needed and then perspective correction.
-  for (i = 0 ; i < num_verts ; i++)
-  {
-    csVector3 v;
-    csVector2 uv;
-    if (cfg_lod_detail < 0 || cfg_lod_detail == 1 || i < num_verts-1)
-    {
-      v = tr_verts[i];
-      uv = tpl->GetTexel (cframe, i);
-    }
-    else
-    {
-      // Morph between the last vertex and the one we morphed from.
-      v = (1-fnum)*tr_verts[emerge_from[i]] + fnum*tr_verts[i];
-      uv = (1-fnum) * tpl->GetTexel (cframe, emerge_from[i])
-        + fnum * tpl->GetTexel (cframe, i);
-    }
-
-    uv_verts[i] = uv;
-    if (v.z >= SMALL_Z)
-    {
-      z_verts[i] = 1. / v.z;
-      float iz = rview.aspect * z_verts[i];
-      persp[i].x = v.x * iz + rview.shift_x;
-      persp[i].y = v.y * iz + rview.shift_y;
-      visible[i] = true;
-    }
-    else
-      visible[i] = false;
-  }
-
-  // Clipped polygon (assume it cannot have more than 64 vertices)
-  G3DPolygonDPFX poly;
-  memset (&poly, 0, sizeof(poly));
-  poly.inv_aspect = rview.inv_aspect;
-
-  if (force_otherskin)
-    poly.txt_handle = cstxt->GetTextureHandle ();
-  else
-    poly.txt_handle = tpl->cstxt->GetTextureHandle ();
-
-  // Fill flat color if renderer decide to paint it flat-shaded
-  poly.txt_handle->GetMeanColor (poly.flat_color_r,
-    poly.flat_color_g, poly.flat_color_b);
-
-  // The triangle in question
-  csVector2 triangle [3];
-  csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
-  rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-
-  if (!rview.callback)
-    rview.g3d->StartPolygonFX (poly.txt_handle, MixMode
-      | (vertex_colors ? CS_FX_GOURAUD : 0));
-
-  // Get this field from the current view for conveniance.
-  bool mirror = rview.IsMirrored ();
-
-  // Draw all triangles.
-  for (i = 0 ; i < m->GetNumTriangles () ; i++)
-  {
-    int a = m->GetTriangles ()[i].a;
-    int b = m->GetTriangles ()[i].b;
-    int c = m->GetTriangles ()[i].c;
-    if (visible[a] && visible[b] && visible[c])
-    {
-      //-----
-      // Do backface culling. Note that this depends on the
-      // mirroring of the current view.
-      //-----
-      float area = csMath2::Area2 (persp [a].x, persp [a].y,
-                          	   persp [b].x, persp [b].y,
-                          	   persp [c].x, persp [c].y);
-      int j, idx, dir;
-      if (!area) continue;
-      if (mirror)
-      {
-        if (area <= -SMALL_EPSILON) continue;
-        triangle [2] = persp[a];
-        triangle [1] = persp[b];
-        triangle [0] = persp[c];
-	// Setup loop variables for later.
-        idx = 2;
-	dir = -1;
-      }
-      else
-      {
-        if (area >= SMALL_EPSILON) continue;
-        triangle [0] = persp[a];
-        triangle [1] = persp[b];
-        triangle [2] = persp[c];
-	// Setup loop variables for later.
-        idx = 0;
-	dir = 1;
-      }
-
-      // Clip triangle. Note that the clipper doesn't care about the
-      // orientation of the triangle vertices. It works just as well in
-      // mirrored mode.
-      int rescount = 0;
-      if (do_clip)
-      {
-        if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) continue;
-        poly.num = rescount;
-      }
-      else
-        poly.num = 3;
-
-      int trivert [3] = { a, b, c };
-      // If mirroring we store the vertices in the other direction.
-      for (j = 0; j < 3; j++)
-      {
-        poly.vertices [idx].z = z_verts[trivert [j]];
-        poly.vertices [idx].u = uv_verts[trivert [j]].x;
-        poly.vertices [idx].v = uv_verts[trivert [j]].y;
-        if (vertex_colors)
-        {
-          poly.vertices [idx].r = vertex_colors[trivert[j]].red;
-          poly.vertices [idx].g = vertex_colors[trivert[j]].green;
-          poly.vertices [idx].b = vertex_colors[trivert[j]].blue;
-        }
-	idx += dir;
-      }
-      if (do_clip)
-	  PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle,
-			    vertex_colors != NULL);
-      else
-      {
-        poly.vertices [0].sx = triangle [0].x;
-        poly.vertices [0].sy = triangle [0].y;
-        poly.vertices [1].sx = triangle [1].x;
-        poly.vertices [1].sy = triangle [1].y;
-        poly.vertices [2].sx = triangle [2].x;
-        poly.vertices [2].sy = triangle [2].y;
-      }
-
-      // Draw resulting polygon
-      if (!rview.callback)
-      {
-	extern void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly);
-	CalculateFogPolygon (&rview, poly);
-        rview.g3d->DrawPolygonFX (poly);
-      }
-      else
-        rview.callback (&rview, CALLBACK_POLYGONQ, (void*)&poly);
-    }
-  }
-
-  if (draw_callback2)
-     draw_callback2 (this, &rview, myOwner);
-
-  if (!rview.callback)
-    rview.g3d->FinishPolygonFX ();
-
-  CHK (delete [] obj_verts);
-  CHK (delete [] tween_verts);
-}
-#endif
 
 void csSprite3D::InitSprite ()
 {

@@ -17,6 +17,9 @@ Short-term cleanups that need to be done:
 	- Added the first versions of the TeXInfo converted docs from
 	  Martin Geisse. The new txidocs directory is temporary until
 	  the documents are fully converted.
+	- Optimized the sprite changes from Seth a bit. Avoided allocation
+	  of arrays every frame. The copy of vertices is still there
+	  however.
 16-Feb-2000
 	- Some fixes to csPhyzik from Michael Ewert.
 	- Seth Galbraith managed to almost fix sprites by disabling LOD
