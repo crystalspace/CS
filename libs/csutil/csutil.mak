@@ -61,6 +61,9 @@ $(OUT)%$O: libs/csutil/impexp/iv/%.cpp
 $(OUT)%$O: libs/csutil/impexp/obj/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SOFT3D)
 
+$(OUT)%$O: libs/csutil/impexp/md2/%.cpp
+	$(DO.COMPILE.CPP) $(CFLAGS.SOFT3D)
+
 $(OUT)%$O: libs/csutil/impexp/pov/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.SOFT3D)
 
