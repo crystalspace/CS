@@ -85,6 +85,13 @@ void csStarsMeshObject::SetupObject ()
   }
 }
 
+void csStarsMeshObject::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
 void csStarsMeshObject::AddListener (iObjectModelListener *listener)
 {
   RemoveListener (listener);

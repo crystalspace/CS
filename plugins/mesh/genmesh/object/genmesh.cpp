@@ -178,6 +178,13 @@ void csGenmeshMeshObject::SetupObject ()
   }
 }
 
+void csGenmeshMeshObject::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
 void csGenmeshMeshObject::AddListener (iObjectModelListener *listener)
 {
   RemoveListener (listener);

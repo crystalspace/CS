@@ -1153,6 +1153,13 @@ void csSprite3DMeshObject::SetupObject ()
   }
 }
 
+void csSprite3DMeshObject::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
 void csSprite3DMeshObject::AddListener (iObjectModelListener *listener)
 {
   RemoveListener (listener);

@@ -101,6 +101,7 @@ void csParticleSystem::RemoveParticles ()
       GetParticle (i)->DecRef ();
   particles.DeleteAll ();
   shapenr++;
+  FireListeners ();
 }
 
 void csParticleSystem::AppendRectSprite (float width, float height,
@@ -126,6 +127,7 @@ void csParticleSystem::AppendRectSprite (float width, float height,
   state->SetMaterialWrapper (mat);
   AppendParticle (part);
   shapenr++;
+  FireListeners ();
 }
 
 
@@ -143,6 +145,7 @@ void csParticleSystem::AppendRegularSprite (int n, float radius,
 
   AppendParticle (part);
   shapenr++;
+  FireListeners ();
 }
 
 
@@ -190,6 +193,7 @@ void csParticleSystem::ScaleBy (float factor)
   for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->ScaleBy (factor);
   shapenr++;
+  FireListeners ();
 }
 
 
@@ -199,6 +203,7 @@ void csParticleSystem::Rotate (float angle)
   for (i = 0 ; i<particles.Length () ; i++)
     GetParticle (i)->Rotate (angle);
   shapenr++;
+  FireListeners ();
 }
 
 
@@ -230,6 +235,13 @@ void csParticleSystem::Update (csTicks elapsed_time)
   }
   if (change_rotation)
     Rotate (anglepersecond * elapsed_seconds);
+}
+
+void csParticleSystem::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
 }
 
 void csParticleSystem::AddListener (iObjectModelListener *listener)

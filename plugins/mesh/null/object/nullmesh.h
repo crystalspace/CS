@@ -60,10 +60,12 @@ public:
 
   void SetRadius (float radius)
   {
-    shapenr++;
     csNullmeshMeshObject::radius = radius;
+    shapenr++;
+    FireListeners ();
   }
   float GetRadius () const { return radius; }
+  void FireListeners ();
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 

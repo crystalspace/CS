@@ -729,6 +729,7 @@ public:
   csThing *GetTemplate () const
   { return ParentTemplate; }
 
+  void FireListeners ();
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 

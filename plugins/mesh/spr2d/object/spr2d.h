@@ -125,6 +125,7 @@ public:
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent)
   { rad =  radius; cent.Set(0,0,0); }
+  void FireListeners ();
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 

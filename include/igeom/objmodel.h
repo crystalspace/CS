@@ -69,8 +69,6 @@ struct iObjectModelListener : public iBase
 {
   /// The object model has changed.
   virtual void ObjectModelChanged (iObjectModel* model) = 0;
-  /// The object model is about to be destroyed.
-  virtual void ObjectModelDestroyed (iObjectModel* model) = 0;
 };
 
 SCF_VERSION (iObjectModel, 0, 0, 2);

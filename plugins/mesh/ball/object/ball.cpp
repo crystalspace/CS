@@ -153,6 +153,7 @@ void csBallMeshObject::SetRadius (float radiusx, float radiusy, float radiusz)
   csBallMeshObject::radiusz = radiusz;
   max_radius.Set (radiusx, radiusy, radiusz);
   shapenr++;
+  FireListeners ();
 }
 
 float csBallMeshObject::GetScreenBoundingBox (long cameranr,
@@ -469,6 +470,13 @@ void csBallMeshObject::SetupVertexBuffer ()
  }
 }
 
+void csBallMeshObject::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
 void csBallMeshObject::AddListener (iObjectModelListener *listener)
 {
   RemoveListener (listener);
@@ -644,6 +652,7 @@ void csBallMeshObject::HardTransform (const csReversibleTransform& t)
   shift = t.This2Other (shift);
   initialized = false;
   shapenr++;
+  FireListeners ();
 }
 
 bool csBallMeshObject::HitBeamOutline (const csVector3& start,

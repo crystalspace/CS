@@ -106,6 +106,13 @@ void csSprite2DMeshObject::SetupObject ()
   }
 }
 
+void csSprite2DMeshObject::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
 void csSprite2DMeshObject::AddListener (iObjectModelListener *listener)
 {
   RemoveListener (listener);
@@ -410,6 +417,7 @@ void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
     vertices [i].color_init.Set (1, 1, 1);
   }
   shapenr++;
+  FireListeners ();
 }
 
 void csSprite2DMeshObject::NextFrame (csTicks current_time)
@@ -466,6 +474,7 @@ void csSprite2DMeshObject::Particle::ScaleBy (float factor)
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos *= factor;
   scfParent->shapenr++;
+  scfParent->FireListeners ();
 }
 
 void csSprite2DMeshObject::Particle::Rotate (float angle)
@@ -475,6 +484,7 @@ void csSprite2DMeshObject::Particle::Rotate (float angle)
   for (i = 0; i < vertices.Length (); i++)
     vertices[i].pos.Rotate (angle);
   scfParent->shapenr++;
+  scfParent->FireListeners ();
 }
 
 void csSprite2DMeshObject::Sprite2DState::SetUVAnimation (const char *name, int style, bool loop)

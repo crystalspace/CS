@@ -88,6 +88,7 @@ public:
     initialized = false;
     box = b;
     shapenr++;
+    FireListeners ();
   }
   void GetBox (csBox3& b) const { b = box; }
 
@@ -122,6 +123,7 @@ public:
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent)
   { rad = max_radius; cent = box.GetCenter(); }
+  void FireListeners ();
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 

@@ -255,6 +255,7 @@ void csFireMeshObject::HardTransform (const csReversibleTransform& t)
   origin.Set( t.This2Other (origin.Min()),  t.This2Other (origin.Max()));
   initialized = false;
   shapenr++;
+  FireListeners ();
 }
 
 //----------------------------------------------------------------------

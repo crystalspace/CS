@@ -137,8 +137,9 @@ public:
   void SetShift (float shiftx, float shifty, float shiftz)
   {
     initialized = false;
-    shapenr++;
     shift.Set (shiftx, shifty, shiftz);
+    shapenr++;
+    FireListeners ();
   }
   const csVector3& GetShift () const {return shift;}
   void SetRimVertices (int num)
@@ -155,6 +156,7 @@ public:
     reversed = r;
     initialized = false;
     shapenr++;
+    FireListeners ();
   }
   /// Get reversed mode.
   bool IsReversed () const
@@ -167,6 +169,7 @@ public:
     toponly = t;
     initialized = false;
     shapenr++;
+    FireListeners ();
   }
   /// Only top half.
   bool IsTopOnly () const
@@ -200,6 +203,7 @@ public:
   void PaintSky(float time, float **dayvert, float **nightvert,
     float **topsun, float **sunset);
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void FireListeners ();
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 

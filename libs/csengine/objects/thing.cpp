@@ -515,6 +515,7 @@ void csThing::Prepare ()
     p = polygons.Get (i);
     p->Finish ();
   }
+  FireListeners ();
 }
 
 int csThing::AddCurveVertex (const csVector3 &v, const csVector2 &t)
@@ -1046,12 +1047,11 @@ void csThing::InvalidateThing ()
   bbox = NULL;
   CleanupThingEdgeTable ();
 
-
-
   shapenr++;
   scfiPolygonMeshLOD.Cleanup ();
   scfiPolygonMesh.Cleanup ();
   if(obj_normals) delete [] obj_normals;
+  FireListeners ();
 }
 
 void csThing::RemovePolygon (int idx)
@@ -2883,6 +2883,13 @@ bool csThing::DrawCurves (
   return true;                                  //@@@ RETURN correct vis info
 }
 #endif // CS_USE_NEW_RENDERER
+
+void csThing::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
 
 void csThing::AddListener (iObjectModelListener *listener)
 {

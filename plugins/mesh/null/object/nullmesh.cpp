@@ -74,6 +74,13 @@ csNullmeshMeshObject::~csNullmeshMeshObject ()
   if (vis_cb) vis_cb->DecRef ();
 }
 
+void csNullmeshMeshObject::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
 void csNullmeshMeshObject::AddListener (iObjectModelListener *listener)
 {
   RemoveListener (listener);

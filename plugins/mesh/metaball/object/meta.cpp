@@ -214,6 +214,13 @@ static void LitVertex( const csVector3 &n, csColor &c )
 }
 #endif
 
+void csMetaBall::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
 void csMetaBall::AddListener (iObjectModelListener *listener)
 {
   RemoveListener (listener);
@@ -317,7 +324,11 @@ void csMetaBall::CreateBoundingBox()
   }
   bb.StartBoundingBox( csVector3(minx,miny,minz));
   bb.AddBoundingVertexSmart( csVector3(maxx,maxy,maxz));
-  if ( !object_bbox.Contains(bb)) shape_num++;
+  if ( !object_bbox.Contains(bb))
+  {
+    shape_num++;
+    FireListeners ();
+  }
   object_bbox = bb;
   rad.Set(object_bbox.Max() - object_bbox.GetCenter());
 

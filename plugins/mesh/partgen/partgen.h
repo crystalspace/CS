@@ -230,6 +230,7 @@ public:
     rad = radius;
     cent = bbox.GetCenter();
   }
+  void FireListeners ();
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 

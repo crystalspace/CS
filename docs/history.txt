@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+2-Nov-2002
+	- Completed implementation of the new listener system in
+	  iObjectModel. The next step will be to change the visibility
+	  systems to actually use this new system.
 1-Nov-2002
 	- Removed userdata from iMovableListener. It is not needed.
 	- Added new iObjectModelListener so you can listen to changes in an

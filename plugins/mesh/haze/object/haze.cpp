@@ -552,6 +552,13 @@ float csHazeMeshObject::GetScreenBoundingBox (long cameranr,
 }
 
 
+void csHazeMeshObject::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
 void csHazeMeshObject::AddListener (iObjectModelListener *listener)
 {
   RemoveListener (listener);
