@@ -1016,7 +1016,7 @@ void csOctree::Cache (iCacheManager* cache_mgr)
   WriteLong (mf, (long)mode);
   Cache ((csOctreeNode *)root, mf);
   cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
-  	"octree", NULL, 0);
+  	"octree", NULL, ~0);
 }
 
 bool csOctree::ReadFromCache (
@@ -1181,7 +1181,7 @@ bool csOctree::ReadFromCache (
   csPolygonInt **polygons,
   int num)
 {
-  csRef<iDataBuffer> data (cache_mgr->ReadCache ("octree", NULL, 0));
+  csRef<iDataBuffer> data (cache_mgr->ReadCache ("octree", NULL, ~0));
   if (!data) return false;	// File doesn't exist
 
   csRef<csMemFile> cf (

@@ -35,7 +35,7 @@ SCF_VERSION (iCacheManager, 0, 0, 1);
  * The 'type' can be something like 'lightmap', 'octree', ...
  * The 'scope' can be something like 'myRegion_mySector', ...
  * The 'id' is a unique ID for the cached item in the given type
- * and scope.
+ * and scope. ~0 can be taken for the cases "no ID" or "ID unused".
  * Avoid using '/' and '\' characters in both type and scope as this
  * may cause conflicts with the given cache (if it caches on a file
  * system for example).

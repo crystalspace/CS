@@ -1215,7 +1215,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   char *reason = NULL;
 
   iCacheManager* cm = GetCacheManager ();
-  csRef<iDataBuffer> data (cm->ReadCache ("lm_precalc_info", NULL, 0));
+  csRef<iDataBuffer> data (cm->ReadCache ("lm_precalc_info", NULL, ~0));
   if (!data)
     reason = "no 'lm_precalc_info' found in cache";
   else
@@ -1274,7 +1274,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
       current.lightmap_size);
     if (lightcache_mode & CS_ENGINE_CACHE_WRITE)
     {
-      cm->CacheData (data, strlen (data), "lm_precalc_info", NULL, 0);
+      cm->CacheData (data, strlen (data), "lm_precalc_info", NULL, ~0);
     }
     Report ("Lightmap data is not up to date (reason: %s).", reason);
     lightcache_mode &= ~CS_ENGINE_CACHE_READ;
