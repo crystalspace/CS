@@ -217,7 +217,6 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
 	CS_ASSERT (op.y2 >= 0);
 	CS_ASSERT (op.y2 <= 63);
 	int y1, y2;
-	// @@@ DO WE REALLY HAVE TO SWAP HERE??? I DON'T THINK SO!
 	if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
 	else { y1 = op.y2; y2 = op.y1; }
 	const csBits64& start = precalc_start_lines[y2];
