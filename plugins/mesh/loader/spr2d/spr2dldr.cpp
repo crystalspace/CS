@@ -43,6 +43,8 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MULTIPLY2)
   CS_TOKEN_DEF (MULTIPLY)
   CS_TOKEN_DEF (TRANSPARENT)
+  CS_TOKEN_DEF (UVANIMATION)
+  CS_TOKEN_DEF (FRAME)
 
   CS_TOKEN_DEF (COLORS)
   CS_TOKEN_DEF (FACTORY)
@@ -158,6 +160,48 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
+static void ParseAnim (iSprite2DFactoryState* spr2dLook, const char *animname, char *buf)
+{
+  CS_TOKEN_TABLE_START (commands)
+    CS_TOKEN_TABLE (FRAME)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  float verts[200];
+  int duration;
+
+  iSprite2DUVAnimation *ani = spr2dLook->CreateUVAnimation ();
+  ani->SetName (animname);
+
+  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      printf ("Expected FRAME of '%s'!\n", buf);
+      return;
+    }
+    switch (cmd)
+    {
+      case CS_TOKEN_FRAME:
+	{
+	  int num;
+          ScanStr (params, "%d, %F", &duration, &verts, &num);
+	  iSprite2DUVAnimationFrame *frame = ani->CreateFrame (-1);
+	  frame->SetFrameData (name, duration, num/2, verts);
+	}
+	break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    printf ("Token '%s' not found while looking for animation FRAME tokens!\n",
+    	csGetLastOffender ());
+    return;
+  }
+}
+
 iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
 	iBase* /* context */)
 {
@@ -166,6 +210,7 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
     CS_TOKEN_TABLE (LIGHTING)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (UVANIMATION)
   CS_TOKEN_TABLE_END
 
   char* name;
@@ -222,6 +267,11 @@ iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine,
       case CS_TOKEN_MIXMODE:
         spr2dLook->SetMixMode (ParseMixmode (params));
 	break;
+      case CS_TOKEN_UVANIMATION:
+	{
+	  ParseAnim (spr2dLook, name, params);
+	}
+        break;
     }
   }
 
