@@ -252,6 +252,14 @@ int csConfigManager::GetDomainPriority(iConfigFileNew *cfg) const
   return d ? d->Pri : (int)PriorityMedium;
 }
 
+bool csConfigManager::SetDynamicDomain(iConfigFileNew *cfg)
+{
+  csConfigDomain *d = FindConfig(cfg);
+  if (!d) return false;
+  DynamicDomain = d;
+  return true;
+}
+
 iConfigFileNew *csConfigManager::GetDynamicDomain() const
 {
   return DynamicDomain->Cfg;

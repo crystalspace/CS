@@ -90,6 +90,11 @@ struct iConfigManager : public iConfigFileNew
   /// return the priority of a config domain
   virtual int GetDomainPriority(iConfigFileNew*) const = 0;
 
+  /**
+   * Change the dynamic domain. The given config object must already be
+   * registered with AddDomain(). Returns false if this is not the case.
+   */
+  virtual bool SetDynamicDomain(iConfigFileNew*) = 0;
   /// return a pointer to the dynamic config domain
   virtual iConfigFileNew *GetDynamicDomain() const = 0;
   /// set the priority of the dynamic config domain

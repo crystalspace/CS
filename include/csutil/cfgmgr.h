@@ -51,6 +51,11 @@ public:
   /// return the priority of a config domain
   virtual int GetDomainPriority(iConfigFileNew*) const;
 
+  /**
+   * Change the dynamic domain. The given config object must already be
+   * registered with AddDomain(). Returns false if this is not the case.
+   */
+  virtual bool SetDynamicDomain(iConfigFileNew*);
   /// return a pointer to the dynamic config domain
   virtual iConfigFileNew *GetDynamicDomain() const;
   /// set the priority of the dynamic config domain
