@@ -39,6 +39,8 @@ csCamera::csCamera () : csOrthoTransform()
   inv_aspect = default_inv_aspect;
   shift_x = csWorld::frame_width / 2;
   shift_y = csWorld::frame_height / 2;
+  use_farplane = false;
+  fp = NULL;
 }
 
 csCamera::csCamera (csCamera* c) : csOrthoTransform (*c)
@@ -49,6 +51,8 @@ csCamera::csCamera (csCamera* c) : csOrthoTransform (*c)
   inv_aspect = c->inv_aspect;
   shift_x = c->shift_x;
   shift_y = c->shift_y;
+  use_farplane = c->UseFarPlane();
+  fp = c->GetFarPlane();
 }
 
 csCamera::~csCamera ()

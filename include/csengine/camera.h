@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
 #include "icamera.h"
+#include "csengine/planeclp.h"
 
 #define VEC_FORWARD   csVector3(0,0,1)
 #define VEC_BACKWARD  csVector3(0,0,-1)
@@ -55,6 +56,10 @@ class csCamera : public csOrthoTransform, public iCamera
   /// If true we are in a mirrored world.
   bool mirror;
 
+  /// a farplane to cut everything thats behind it
+  csPlaneClip *fp;
+  bool use_farplane;
+  
 public:
   ///
   int aspect;
@@ -94,6 +99,16 @@ public:
   /// Get the FOV for this camera
   int GetFOV () const { return aspect; }
 
+  /// Set farplane, everything behind this will be cut
+  void SetFarPlane( csPlaneClip* farplane ){ fp = farplane; }
+  /// Get the Farplane
+  csPlaneClip* GetFarPlane(){ return fp; }
+  
+  /// do we actually use the farplane ?
+  bool UseFarPlane(){ return use_farplane; }
+  /// Set whether we use farplane or not. Farplane must been set before
+  void UseFarPlane(bool useit){ use_farplane = fp && useit; }
+  
   /**
    * Set the sector that the camera resides in.
    * Note that this function does not check if the current

@@ -459,6 +459,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
     if ( !p->dont_draw &&
          p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL,
 	 	d->GetOrigin (), verts, num_verts) && //@@@Use pool for verts?
+	 ( !d->UseFarPlane() || d->GetFarPlane()->ClipPolygon( verts, num_verts ) ) &&
          p->DoPerspective (*d, verts, num_verts, clip, NULL,
 	 	d->IsMirrored ())  &&
          clip->ClipAgainst (d->view) )
