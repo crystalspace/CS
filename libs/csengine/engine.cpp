@@ -1150,7 +1150,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   else
   {
     // data, NULL-terminated
-    csRef<iDataBuffer> ntData (new csDataBuffer (data));
+    csDataBuffer* ntData = new csDataBuffer (data);
     data = NULL;
     char *input = **ntData;
     while (*input)
@@ -1184,6 +1184,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
       CHECK ("LMVERSION", xi != current.lm_version, "lightmap format")
 #undef CHECK
     }
+    delete ntData;
   }
 
   if (reason)
