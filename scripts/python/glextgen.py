@@ -36,10 +36,14 @@ def writeArgument (arg, prevarg):
 def writeDefinitions (extensions):
     for ext in extensions:
         output.write ("// " + ext.getAttribute ("name") + "\n")
+        if ext.getAttribute("name").endswith("WGL",0,3):
+            output.write ("#ifdef _WIN32\n")
         for const in ext.getElementsByTagName ("TOKEN"):
             writeConstant (const)
         for func in ext.getElementsByTagName ("FUNCTION"):
             writeFunctionType (func)
+        if ext.getAttribute("name").endswith("WGL",0,3):
+            output.write ("#endif\n")
         output.write ("\n")
     output.write ("\n\n\n")
 
@@ -51,8 +55,12 @@ def writeExtensions (extensions):
 def writeFunctions (extensions):
     for ext in extensions:
         output.write ("  // " + ext.getAttribute ("name") + "\n")
+        if ext.getAttribute("name").endswith("WGL",0,3):
+            output.write ("#ifdef _WIN32\n")
         for func in ext.getElementsByTagName ("FUNCTION"):
             writeFunction (func)
+        if ext.getAttribute("name").endswith("WGL",0,3):
+            output.write ("#endif\n")
         output.write ("\n")
 
 def writeFunction (func):
@@ -66,6 +74,8 @@ def writeInitExtensions (extensions):
     output.write ("    bool allclear;\n")
     output.write ("    const char* extensions = (const char*)glGetString (GL_EXTENSIONS);\n");
     for ext in extensions:
+        if ext.getAttribute("name").endswith("WGL",0,3):
+            output.write ("#ifdef _WIN32\n")
         output.write ("    // " + ext.getAttribute ("name") + "\n")
         output.write ("    CS_" + ext.getAttribute ("name") + " = (strstr (extensions, \"" + \
                       ext.getAttribute ("name") + "\") != NULL);\n")
@@ -75,7 +85,10 @@ def writeInitExtensions (extensions):
             writeFunctionInit (func)
         output.write ("      if (CS_" + ext.getAttribute ("name") + " = allclear)\n")
         output.write ("        printf (\"GL Extension '" + \
-                      ext.getAttribute ("name") + "' found and used.\\n\");\n    }\n\n")
+                      ext.getAttribute ("name") + "' found and used.\\n\");\n    }\n")
+        if ext.getAttribute("name").endswith("WGL",0,3):
+            output.write ("#endif\n")
+        output.write ("\n")
 
 def writeFunctionInit (func):
     output.write ("      if (!(" + func.getAttribute ("name") + " = (" + \

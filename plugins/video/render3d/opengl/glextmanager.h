@@ -492,9 +492,12 @@ typedef GLvoid (csAPIENTRY* csGLSAMPLECOVERAGEARB) (GLclampf value, GLboolean in
 // GL_ARB_texture_env_add
 
 // WGL_ARB_extensions_string
+#ifdef _WIN32
 typedef char* (csAPIENTRY* csWGLGETEXTENSIONSSTRINGARB) (HDC hdc);
+#endif
 
 // WGL_ARB_buffer_region
+#ifdef _WIN32
 #define WGL_FRONT_COLOR_BUFFER_BIT_ARB                                     1
 #define WGL_BACK_COLOR_BUFFER_BIT_ARB                                      2
 #define WGL_DEPTH_BUFFER_BIT_ARB                                           4
@@ -503,6 +506,7 @@ typedef HANDLE (csAPIENTRY* csWGLCREATEBUFFERREGIONARB) (HDC hDC, GLint iLayerPl
 typedef GLvoid (csAPIENTRY* csWGLDELETEBUFFERREGIONARB) (HANDLE hRegion);
 typedef BOOL (csAPIENTRY* csWGLSAVEBUFFERREGIONARB) (HANDLE hRegion, GLint x, GLint y, GLint width, GLint height);
 typedef BOOL (csAPIENTRY* csWGLRESTOREBUFFERREGIONARB) (HANDLE hRegion, GLint x, GLint y, GLint width, GLint height, GLint xSrc, GLint ySrc);
+#endif
 
 // GL_ARB_texture_cube_map
 #define GL_NORMAL_MAP_ARB                                                  34065
@@ -1997,24 +2001,30 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXBLENDENVI) (GLenum pname, GLint param);
 typedef GLvoid (csAPIENTRY* csGLVERTEXBLENDENVF) (GLenum pname, GLfloat param);
 
 // WGL_I3D_image_buffer
+#ifdef _WIN32
 #define WGL_IMAGE_BUFFER_MIN_ACCESS_I3D                                    1
 #define WGL_IMAGE_BUFFER_LOCK_I3D                                          2
 typedef GLvoid* (csAPIENTRY* csWGLCREATEIMAGEBUFFERI3D) (HDC hDC, DWORD dwSize, UINT uFlags);
 typedef BOOL (csAPIENTRY* csWGLDESTROYIMAGEBUFFERI3D) (HDC hDC, GLvoid* pAddress);
 typedef BOOL (csAPIENTRY* csWGLASSOCIATEIMAGEBUFFEREVENTSI3D) (HDC hdc, HANDLE* pEvent, GLvoid* pAddress, DWORD* pSize, UINT count);
 typedef BOOL (csAPIENTRY* csWGLRELEASEIMAGEBUFFEREVENTSI3D) (HDC hdc, GLvoid* pAddress, UINT count);
+#endif
 
 // WGL_I3D_swap_frame_lock
+#ifdef _WIN32
 typedef BOOL (csAPIENTRY* csWGLENABLEFRAMELOCKI3D) ();
 typedef BOOL (csAPIENTRY* csWGLDISABLEFRAMELOCKI3D) ();
 typedef BOOL (csAPIENTRY* csWGLISENABLEDFRAMELOCKI3D) (BOOL* pFlag);
 typedef BOOL (csAPIENTRY* csWGLQUERYFRAMELOCKMASTERI3D) (BOOL* pFlag);
+#endif
 
 // WGL_I3D_swap_frame_usage
+#ifdef _WIN32
 typedef BOOL (csAPIENTRY* csWGLGETFRAMEUSAGEI3D) (GLfloat* pUsage);
 typedef BOOL (csAPIENTRY* csWGLBEGINFRAMETRACKINGI3D) ();
 typedef BOOL (csAPIENTRY* csWGLENDFRAMETRACKINGI3D) ();
 typedef BOOL (csAPIENTRY* csWGLQUERYFRAMETRACKINGI3D) (DWORD* pFrameCount, DWORD* pMissedFrames, GLfloat* pLastMissedUsage);
+#endif
 
 // GL_3DFX_texture_compression_FXT1
 #define GL_COMPRESSED_RGB_FXT1_3DFX                                        34480
@@ -2403,6 +2413,7 @@ typedef GLvoid (csAPIENTRY* csGLFLUSHVERTEXARRAYRANGEAPPLE) (GLsizei length, GLv
 typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYPARAMETERIAPPLE) (GLenum pname, GLint param);
 
 // WGL_ARB_pixel_format
+#ifdef _WIN32
 #define WGL_NUMBER_PIXEL_FORMATS_ARB                                       8192
 #define WGL_DRAW_TO_WINDOW_ARB                                             8193
 #define WGL_DRAW_TO_BITMAP_ARB                                             8194
@@ -2455,14 +2466,18 @@ typedef GLvoid (csAPIENTRY* csGLVERTEXARRAYPARAMETERIAPPLE) (GLenum pname, GLint
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBIVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLint* piValues);
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBFVARB) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLfloat* pfValues);
 typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATARB) (HDC hdc, GLint* piAttribIList, GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
+#endif
 
 // WGL_ARB_make_current_read
+#ifdef _WIN32
 #define WGL_ERROR_INVALID_PIXEL_TYPE_ARB                                   8259
 #define WGL_ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB                         8276
 typedef BOOL (csAPIENTRY* csWGLMAKECONTEXTCURRENTARB) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
 typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCARB) ();
+#endif
 
 // WGL_ARB_pbuffer
+#ifdef _WIN32
 #define WGL_DRAW_TO_PBUFFER_ARB                                            8237
 #define WGL_DRAW_TO_PBUFFER_ARB                                            8237
 #define WGL_MAX_PBUFFER_PIXELS_ARB                                         8238
@@ -2477,12 +2492,16 @@ typedef HDC (csAPIENTRY* csWGLGETPBUFFERDCARB) (HANDLE hPbuffer);
 typedef GLint (csAPIENTRY* csWGLRELEASEPBUFFERDCARB) (HANDLE hPbuffer, HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDESTROYPBUFFERARB) (HANDLE hPbuffer);
 typedef BOOL (csAPIENTRY* csWGLQUERYPBUFFERARB) (HANDLE hPbuffer, GLint iAttribute, GLint* piValue);
+#endif
 
 // WGL_EXT_swap_control
+#ifdef _WIN32
 typedef BOOL (csAPIENTRY* csWGLSWAPINTERVALEXT) (GLint interval);
 typedef GLint (csAPIENTRY* csWGLGETSWAPINTERVALEXT) ();
+#endif
 
 // WGL_ARB_render_texture
+#ifdef _WIN32
 #define WGL_BIND_TO_TEXTURE_RGB_ARB                                        8304
 #define WGL_BIND_TO_TEXTURE_RGBA_ARB                                       8305
 #define WGL_TEXTURE_FORMAT_ARB                                             8306
@@ -2520,15 +2539,21 @@ typedef GLint (csAPIENTRY* csWGLGETSWAPINTERVALEXT) ();
 typedef BOOL (csAPIENTRY* csWGLBINDTEXIMAGEARB) (HANDLE hPbuffer, GLint iBuffer);
 typedef BOOL (csAPIENTRY* csWGLRELEASETEXIMAGEARB) (HANDLE hPbuffer, GLint iBuffer);
 typedef BOOL (csAPIENTRY* csWGLSETPBUFFERATTRIBARB) (HANDLE hPbuffer, GLint* piAttribList);
+#endif
 
 // WGL_EXT_extensions_string
+#ifdef _WIN32
 typedef char* (csAPIENTRY* csWGLGETEXTENSIONSSTRINGEXT) ();
+#endif
 
 // WGL_EXT_make_current_read
+#ifdef _WIN32
 typedef BOOL (csAPIENTRY* csWGLMAKECONTEXTCURRENTEXT) (HDC hDrawDC, HDC hReadDC, HGLRC hglrc);
 typedef HDC (csAPIENTRY* csWGLGETCURRENTREADDCEXT) ();
+#endif
 
 // WGL_EXT_pbuffer
+#ifdef _WIN32
 #define WGL_DRAW_TO_PBUFFER_EXT                                            8237
 #define WGL_MAX_PBUFFER_PIXELS_EXT                                         8238
 #define WGL_MAX_PBUFFER_WIDTH_EXT                                          8239
@@ -2543,8 +2568,10 @@ typedef HDC (csAPIENTRY* csWGLGETPBUFFERDCEXT) (HANDLE hPbuffer);
 typedef GLint (csAPIENTRY* csWGLRELEASEPBUFFERDCEXT) (HANDLE hPbuffer, HDC hDC);
 typedef BOOL (csAPIENTRY* csWGLDESTROYPBUFFEREXT) (HANDLE hPbuffer);
 typedef BOOL (csAPIENTRY* csWGLQUERYPBUFFEREXT) (HANDLE hPbuffer, GLint iAttribute, GLint* piValue);
+#endif
 
 // WGL_EXT_pixel_format
+#ifdef _WIN32
 #define WGL_NUMBER_PIXEL_FORMATS_EXT                                       8192
 #define WGL_DRAW_TO_WINDOW_EXT                                             8193
 #define WGL_DRAW_TO_BITMAP_EXT                                             8194
@@ -2593,16 +2620,20 @@ typedef BOOL (csAPIENTRY* csWGLQUERYPBUFFEREXT) (HANDLE hPbuffer, GLint iAttribu
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBIVEXT) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLint* piValues);
 typedef BOOL (csAPIENTRY* csWGLGETPIXELFORMATATTRIBFVEXT) (HDC hdc, GLint iPixelFormat, GLint iLayerPlane, GLuint nAttributes, GLint* piAttributes, GLfloat* pfValues);
 typedef BOOL (csAPIENTRY* csWGLCHOOSEPIXELFORMATEXT) (HDC hdc, GLint* piAttribIList, GLfloat* pfAttribFList, GLuint nMaxFormats, GLint* piFormats, GLuint* nNumFormats);
+#endif
 
 // WGL_I3D_digital_video_control
+#ifdef _WIN32
 #define WGL_DIGITAL_VIDEO_CURSOR_ALPHA_FRAMEBUFFER_I3D                     8272
 #define WGL_DIGITAL_VIDEO_CURSOR_ALPHA_VALUE_I3D                           8273
 #define WGL_DIGITAL_VIDEO_CURSOR_INCLUDED_I3D                              8274
 #define WGL_DIGITAL_VIDEO_GAMMA_CORRECTED_I3D                              8275
 typedef BOOL (csAPIENTRY* csWGLGETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
 typedef BOOL (csAPIENTRY* csWGLSETDIGITALVIDEOPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
+#endif
 
 // WGL_I3D_gamma
+#ifdef _WIN32
 #define WGL_GAMMA_TABLE_SIZE_I3D                                           8270
 #define WGL_GAMMA_EXCLUDE_DESKTOP_I3D                                      8271
 #define WGL_GAMMA_EXCLUDE_DESKTOP_I3D                                      8271
@@ -2610,8 +2641,10 @@ typedef BOOL (csAPIENTRY* csWGLGETGAMMATABLEPARAMETERSI3D) (HDC hDC, GLint iAttr
 typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEPARAMETERSI3D) (HDC hDC, GLint iAttribute, GLint* piValue);
 typedef BOOL (csAPIENTRY* csWGLGETGAMMATABLEI3D) (HDC hDC, GLint iEntries, GLushort* puRed, GLushort* puGreen, GLushort* puBlue);
 typedef BOOL (csAPIENTRY* csWGLSETGAMMATABLEI3D) (HDC hDC, GLint iEntries, GLushort* puRed, GLushort* puGreen, GLushort* puBlue);
+#endif
 
 // WGL_I3D_genlock
+#ifdef _WIN32
 #define WGL_GENLOCK_SOURCE_MULTIVIEW_I3D                                   8260
 #define WGL_GENLOCK_SOURCE_EXTERNAL_SYNC_I3D                               8261
 #define WGL_GENLOCK_SOURCE_EXTERNAL_FIELD_I3D                              8262
@@ -2633,6 +2666,7 @@ typedef BOOL (csAPIENTRY* csWGLGETGENLOCKSAMPLERATEI3D) (HDC hDC, GLuint* uRate)
 typedef BOOL (csAPIENTRY* csWGLGENLOCKSOURCEDELAYI3D) (HDC hDC, GLuint uDelay);
 typedef BOOL (csAPIENTRY* csWGLGETGENLOCKSOURCEDELAYI3D) (HDC hDC, GLuint* uDelay);
 typedef BOOL (csAPIENTRY* csWGLQUERYGENLOCKMAXSOURCEDELAYI3D) (HDC hDC, GLuint* uMaxLineDelay, GLuint* uMaxPixelDelay);
+#endif
 
 // GL_ARB_matrix_palette
 #define GL_MATRIX_PALETTE_ARB                                              34880
@@ -3496,13 +3530,16 @@ public:
   // GL_ARB_texture_env_add
 
   // WGL_ARB_extensions_string
+#ifdef _WIN32
   #ifndef WGLGETEXTENSIONSSTRINGARB_DECL
   #define WGLGETEXTENSIONSSTRINGARB_DECL
   csWGLGETEXTENSIONSSTRINGARB wglGetExtensionsStringARB;
   #endif
 
+#endif
 
   // WGL_ARB_buffer_region
+#ifdef _WIN32
   #ifndef WGLCREATEBUFFERREGIONARB_DECL
   #define WGLCREATEBUFFERREGIONARB_DECL
   csWGLCREATEBUFFERREGIONARB wglCreateBufferRegionARB;
@@ -3523,6 +3560,7 @@ public:
   csWGLRESTOREBUFFERREGIONARB wglRestoreBufferRegionARB;
   #endif
 
+#endif
 
   // GL_ARB_texture_cube_map
 
@@ -5748,6 +5786,7 @@ public:
 
 
   // WGL_I3D_image_buffer
+#ifdef _WIN32
   #ifndef WGLCREATEIMAGEBUFFERI3D_DECL
   #define WGLCREATEIMAGEBUFFERI3D_DECL
   csWGLCREATEIMAGEBUFFERI3D wglCreateImageBufferI3D;
@@ -5768,8 +5807,10 @@ public:
   csWGLRELEASEIMAGEBUFFEREVENTSI3D wglReleaseImageBufferEventsI3D;
   #endif
 
+#endif
 
   // WGL_I3D_swap_frame_lock
+#ifdef _WIN32
   #ifndef WGLENABLEFRAMELOCKI3D_DECL
   #define WGLENABLEFRAMELOCKI3D_DECL
   csWGLENABLEFRAMELOCKI3D wglEnableFrameLockI3D;
@@ -5790,8 +5831,10 @@ public:
   csWGLQUERYFRAMELOCKMASTERI3D wglQueryFrameLockMasterI3D;
   #endif
 
+#endif
 
   // WGL_I3D_swap_frame_usage
+#ifdef _WIN32
   #ifndef WGLGETFRAMEUSAGEI3D_DECL
   #define WGLGETFRAMEUSAGEI3D_DECL
   csWGLGETFRAMEUSAGEI3D wglGetFrameUsageI3D;
@@ -5812,6 +5855,7 @@ public:
   csWGLQUERYFRAMETRACKINGI3D wglQueryFrameTrackingI3D;
   #endif
 
+#endif
 
   // GL_3DFX_texture_compression_FXT1
 
@@ -6515,6 +6559,7 @@ public:
 
 
   // WGL_ARB_pixel_format
+#ifdef _WIN32
   #ifndef WGLGETPIXELFORMATATTRIBIVARB_DECL
   #define WGLGETPIXELFORMATATTRIBIVARB_DECL
   csWGLGETPIXELFORMATATTRIBIVARB wglGetPixelFormatAttribivARB;
@@ -6530,8 +6575,10 @@ public:
   csWGLCHOOSEPIXELFORMATARB wglChoosePixelFormatARB;
   #endif
 
+#endif
 
   // WGL_ARB_make_current_read
+#ifdef _WIN32
   #ifndef WGLMAKECONTEXTCURRENTARB_DECL
   #define WGLMAKECONTEXTCURRENTARB_DECL
   csWGLMAKECONTEXTCURRENTARB wglMakeContextCurrentARB;
@@ -6542,8 +6589,10 @@ public:
   csWGLGETCURRENTREADDCARB wglGetCurrentReadDCARB;
   #endif
 
+#endif
 
   // WGL_ARB_pbuffer
+#ifdef _WIN32
   #ifndef WGLCREATEPBUFFERARB_DECL
   #define WGLCREATEPBUFFERARB_DECL
   csWGLCREATEPBUFFERARB wglCreatePbufferARB;
@@ -6569,8 +6618,10 @@ public:
   csWGLQUERYPBUFFERARB wglQueryPbufferARB;
   #endif
 
+#endif
 
   // WGL_EXT_swap_control
+#ifdef _WIN32
   #ifndef WGLSWAPINTERVALEXT_DECL
   #define WGLSWAPINTERVALEXT_DECL
   csWGLSWAPINTERVALEXT wglSwapIntervalEXT;
@@ -6581,8 +6632,10 @@ public:
   csWGLGETSWAPINTERVALEXT wglGetSwapIntervalEXT;
   #endif
 
+#endif
 
   // WGL_ARB_render_texture
+#ifdef _WIN32
   #ifndef WGLBINDTEXIMAGEARB_DECL
   #define WGLBINDTEXIMAGEARB_DECL
   csWGLBINDTEXIMAGEARB wglBindTexImageARB;
@@ -6598,15 +6651,19 @@ public:
   csWGLSETPBUFFERATTRIBARB wglSetPbufferAttribARB;
   #endif
 
+#endif
 
   // WGL_EXT_extensions_string
+#ifdef _WIN32
   #ifndef WGLGETEXTENSIONSSTRINGEXT_DECL
   #define WGLGETEXTENSIONSSTRINGEXT_DECL
   csWGLGETEXTENSIONSSTRINGEXT wglGetExtensionsStringEXT;
   #endif
 
+#endif
 
   // WGL_EXT_make_current_read
+#ifdef _WIN32
   #ifndef WGLMAKECONTEXTCURRENTEXT_DECL
   #define WGLMAKECONTEXTCURRENTEXT_DECL
   csWGLMAKECONTEXTCURRENTEXT wglMakeContextCurrentEXT;
@@ -6617,8 +6674,10 @@ public:
   csWGLGETCURRENTREADDCEXT wglGetCurrentReadDCEXT;
   #endif
 
+#endif
 
   // WGL_EXT_pbuffer
+#ifdef _WIN32
   #ifndef WGLCREATEPBUFFEREXT_DECL
   #define WGLCREATEPBUFFEREXT_DECL
   csWGLCREATEPBUFFEREXT wglCreatePbufferEXT;
@@ -6644,8 +6703,10 @@ public:
   csWGLQUERYPBUFFEREXT wglQueryPbufferEXT;
   #endif
 
+#endif
 
   // WGL_EXT_pixel_format
+#ifdef _WIN32
   #ifndef WGLGETPIXELFORMATATTRIBIVEXT_DECL
   #define WGLGETPIXELFORMATATTRIBIVEXT_DECL
   csWGLGETPIXELFORMATATTRIBIVEXT wglGetPixelFormatAttribivEXT;
@@ -6661,8 +6722,10 @@ public:
   csWGLCHOOSEPIXELFORMATEXT wglChoosePixelFormatEXT;
   #endif
 
+#endif
 
   // WGL_I3D_digital_video_control
+#ifdef _WIN32
   #ifndef WGLGETDIGITALVIDEOPARAMETERSI3D_DECL
   #define WGLGETDIGITALVIDEOPARAMETERSI3D_DECL
   csWGLGETDIGITALVIDEOPARAMETERSI3D wglGetDigitalVideoParametersI3D;
@@ -6673,8 +6736,10 @@ public:
   csWGLSETDIGITALVIDEOPARAMETERSI3D wglSetDigitalVideoParametersI3D;
   #endif
 
+#endif
 
   // WGL_I3D_gamma
+#ifdef _WIN32
   #ifndef WGLGETGAMMATABLEPARAMETERSI3D_DECL
   #define WGLGETGAMMATABLEPARAMETERSI3D_DECL
   csWGLGETGAMMATABLEPARAMETERSI3D wglGetGammaTableParametersI3D;
@@ -6695,8 +6760,10 @@ public:
   csWGLSETGAMMATABLEI3D wglSetGammaTableI3D;
   #endif
 
+#endif
 
   // WGL_I3D_genlock
+#ifdef _WIN32
   #ifndef WGLENABLEGENLOCKI3D_DECL
   #define WGLENABLEGENLOCKI3D_DECL
   csWGLENABLEGENLOCKI3D wglEnableGenlockI3D;
@@ -6757,6 +6824,7 @@ public:
   csWGLQUERYGENLOCKMAXSOURCEDELAYI3D wglQueryGenlockMaxSourceDelayI3D;
   #endif
 
+#endif
 
   // GL_ARB_matrix_palette
   #ifndef GLCURRENTPALETTEMATRIXARB_DECL
@@ -7070,6 +7138,7 @@ public:
         printf ("GL Extension 'GL_ARB_texture_env_add' found and used.\n");
     }
 
+#ifdef _WIN32
     // WGL_ARB_extensions_string
     CS_WGL_ARB_extensions_string = (strstr (extensions, "WGL_ARB_extensions_string") != NULL);
     if (CS_WGL_ARB_extensions_string)
@@ -7079,7 +7148,9 @@ public:
       if (CS_WGL_ARB_extensions_string = allclear)
         printf ("GL Extension 'WGL_ARB_extensions_string' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_ARB_buffer_region
     CS_WGL_ARB_buffer_region = (strstr (extensions, "WGL_ARB_buffer_region") != NULL);
     if (CS_WGL_ARB_buffer_region)
@@ -7092,6 +7163,7 @@ public:
       if (CS_WGL_ARB_buffer_region = allclear)
         printf ("GL Extension 'WGL_ARB_buffer_region' found and used.\n");
     }
+#endif
 
     // GL_ARB_texture_cube_map
     CS_GL_ARB_texture_cube_map = (strstr (extensions, "GL_ARB_texture_cube_map") != NULL);
@@ -8260,6 +8332,7 @@ public:
         printf ("GL Extension 'GL_ATI_vertex_streams' found and used.\n");
     }
 
+#ifdef _WIN32
     // WGL_I3D_image_buffer
     CS_WGL_I3D_image_buffer = (strstr (extensions, "WGL_I3D_image_buffer") != NULL);
     if (CS_WGL_I3D_image_buffer)
@@ -8272,7 +8345,9 @@ public:
       if (CS_WGL_I3D_image_buffer = allclear)
         printf ("GL Extension 'WGL_I3D_image_buffer' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_I3D_swap_frame_lock
     CS_WGL_I3D_swap_frame_lock = (strstr (extensions, "WGL_I3D_swap_frame_lock") != NULL);
     if (CS_WGL_I3D_swap_frame_lock)
@@ -8285,7 +8360,9 @@ public:
       if (CS_WGL_I3D_swap_frame_lock = allclear)
         printf ("GL Extension 'WGL_I3D_swap_frame_lock' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_I3D_swap_frame_usage
     CS_WGL_I3D_swap_frame_usage = (strstr (extensions, "WGL_I3D_swap_frame_usage") != NULL);
     if (CS_WGL_I3D_swap_frame_usage)
@@ -8298,6 +8375,7 @@ public:
       if (CS_WGL_I3D_swap_frame_usage = allclear)
         printf ("GL Extension 'WGL_I3D_swap_frame_usage' found and used.\n");
     }
+#endif
 
     // GL_3DFX_texture_compression_FXT1
     CS_GL_3DFX_texture_compression_FXT1 = (strstr (extensions, "GL_3DFX_texture_compression_FXT1") != NULL);
@@ -8723,6 +8801,7 @@ public:
         printf ("GL Extension 'GL_APPLE_vertex_array_range' found and used.\n");
     }
 
+#ifdef _WIN32
     // WGL_ARB_pixel_format
     CS_WGL_ARB_pixel_format = (strstr (extensions, "WGL_ARB_pixel_format") != NULL);
     if (CS_WGL_ARB_pixel_format)
@@ -8734,7 +8813,9 @@ public:
       if (CS_WGL_ARB_pixel_format = allclear)
         printf ("GL Extension 'WGL_ARB_pixel_format' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_ARB_make_current_read
     CS_WGL_ARB_make_current_read = (strstr (extensions, "WGL_ARB_make_current_read") != NULL);
     if (CS_WGL_ARB_make_current_read)
@@ -8745,7 +8826,9 @@ public:
       if (CS_WGL_ARB_make_current_read = allclear)
         printf ("GL Extension 'WGL_ARB_make_current_read' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_ARB_pbuffer
     CS_WGL_ARB_pbuffer = (strstr (extensions, "WGL_ARB_pbuffer") != NULL);
     if (CS_WGL_ARB_pbuffer)
@@ -8759,7 +8842,9 @@ public:
       if (CS_WGL_ARB_pbuffer = allclear)
         printf ("GL Extension 'WGL_ARB_pbuffer' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_EXT_swap_control
     CS_WGL_EXT_swap_control = (strstr (extensions, "WGL_EXT_swap_control") != NULL);
     if (CS_WGL_EXT_swap_control)
@@ -8770,7 +8855,9 @@ public:
       if (CS_WGL_EXT_swap_control = allclear)
         printf ("GL Extension 'WGL_EXT_swap_control' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_ARB_render_texture
     CS_WGL_ARB_render_texture = (strstr (extensions, "WGL_ARB_render_texture") != NULL);
     if (CS_WGL_ARB_render_texture)
@@ -8782,7 +8869,9 @@ public:
       if (CS_WGL_ARB_render_texture = allclear)
         printf ("GL Extension 'WGL_ARB_render_texture' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_EXT_extensions_string
     CS_WGL_EXT_extensions_string = (strstr (extensions, "WGL_EXT_extensions_string") != NULL);
     if (CS_WGL_EXT_extensions_string)
@@ -8792,7 +8881,9 @@ public:
       if (CS_WGL_EXT_extensions_string = allclear)
         printf ("GL Extension 'WGL_EXT_extensions_string' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_EXT_make_current_read
     CS_WGL_EXT_make_current_read = (strstr (extensions, "WGL_EXT_make_current_read") != NULL);
     if (CS_WGL_EXT_make_current_read)
@@ -8803,7 +8894,9 @@ public:
       if (CS_WGL_EXT_make_current_read = allclear)
         printf ("GL Extension 'WGL_EXT_make_current_read' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_EXT_pbuffer
     CS_WGL_EXT_pbuffer = (strstr (extensions, "WGL_EXT_pbuffer") != NULL);
     if (CS_WGL_EXT_pbuffer)
@@ -8817,7 +8910,9 @@ public:
       if (CS_WGL_EXT_pbuffer = allclear)
         printf ("GL Extension 'WGL_EXT_pbuffer' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_EXT_pixel_format
     CS_WGL_EXT_pixel_format = (strstr (extensions, "WGL_EXT_pixel_format") != NULL);
     if (CS_WGL_EXT_pixel_format)
@@ -8829,7 +8924,9 @@ public:
       if (CS_WGL_EXT_pixel_format = allclear)
         printf ("GL Extension 'WGL_EXT_pixel_format' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_I3D_digital_video_control
     CS_WGL_I3D_digital_video_control = (strstr (extensions, "WGL_I3D_digital_video_control") != NULL);
     if (CS_WGL_I3D_digital_video_control)
@@ -8840,7 +8937,9 @@ public:
       if (CS_WGL_I3D_digital_video_control = allclear)
         printf ("GL Extension 'WGL_I3D_digital_video_control' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_I3D_gamma
     CS_WGL_I3D_gamma = (strstr (extensions, "WGL_I3D_gamma") != NULL);
     if (CS_WGL_I3D_gamma)
@@ -8853,7 +8952,9 @@ public:
       if (CS_WGL_I3D_gamma = allclear)
         printf ("GL Extension 'WGL_I3D_gamma' found and used.\n");
     }
+#endif
 
+#ifdef _WIN32
     // WGL_I3D_genlock
     CS_WGL_I3D_genlock = (strstr (extensions, "WGL_I3D_genlock") != NULL);
     if (CS_WGL_I3D_genlock)
@@ -8874,6 +8975,7 @@ public:
       if (CS_WGL_I3D_genlock = allclear)
         printf ("GL Extension 'WGL_I3D_genlock' found and used.\n");
     }
+#endif
 
     // GL_ARB_matrix_palette
     CS_GL_ARB_matrix_palette = (strstr (extensions, "GL_ARB_matrix_palette") != NULL);
