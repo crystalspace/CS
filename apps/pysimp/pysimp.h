@@ -38,6 +38,7 @@ public:
   csEngine* engine;
   int motion_flags;
   iLoader *LevelLoader;
+  iGraphics3D *myG3D;
 
 public:
   PySimple ();

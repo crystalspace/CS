@@ -1,5 +1,4 @@
 # Application target only valid if module is listed in PLUGINS.
-ifneq (,$(findstring cspython,$(PLUGINS)))
 
 # Application description
 DESCRIPTION.pysimple = Crystal Space Python example
@@ -71,4 +70,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-endif # ifneq (,$(findstring cspython,$(PLUGINS)))

@@ -45,10 +45,12 @@ PySimple::PySimple ()
   engine = NULL;
   motion_flags = 0;
   LevelLoader = NULL;
+  myG3D = NULL;
 }
 
 PySimple::~PySimple ()
 {
+  DEC_REF (myG3D);
   if(view)
     delete view;
   if (LevelLoader)
@@ -77,6 +79,12 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   engine = Engine->GetCsEngine ();
   Engine->DecRef ();
 
+  myG3D = QUERY_PLUGIN(this, iGraphics3D);
+  if (!myG3D) {
+    Printf (MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
+    return false;
+  }
+
   LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
@@ -94,7 +102,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   // Some commercials...
   Printf (MSG_INITIALIZATION, "Simple Crystal Space Python Application version 0.1.\n");
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // First disable the lighting cache. Our app is simple enough
@@ -152,7 +160,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, G3D);
+  view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector(&((csSector*)engine->sectors[0])->scfiSector);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 2, 0));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
@@ -184,15 +192,15 @@ void PySimple::NextFrame ()
     view->GetCamera ()->Move (VEC_BACKWARD * 4 * speed);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
+  if (!myG3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
 
   if(view)
     view->Draw ();
 
   // Drawing code ends here.
-  G3D->FinishDraw ();
+  myG3D->FinishDraw ();
   // Print the final output.
-  G3D->Print (NULL);
+  myG3D->Print (NULL);
 }
 
 bool PySimple::HandleEvent (iEvent &Event)
