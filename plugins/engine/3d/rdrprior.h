@@ -36,14 +36,11 @@ typedef csPDelArray<csArrayMeshPtr> csArrayMeshPtrVector;
 class csRenderQueueSet
 {
 private:
-  // The list of meshes with CAMERA keyword set.
-  csArrayMeshPtr camera_meshes;
   // List of visiblel meshes per render priority. Updating
   // during VisTest() (OR only!)
   csArrayMeshPtrVector visible;
 
 public:
-
   /// Constructor.
   csRenderQueueSet ();
   /// Destructor.
@@ -54,31 +51,6 @@ public:
   
   /// Register a visible mesh object.
   void AddVisible (iMeshWrapper *mesh);
-
-  /**
-   * Add a mesh object. This will only have an effect if that mesh
-   * has the CS_ENTITY_CAMERA flag set.
-   */
-  void Add (iMeshWrapper *mesh);
-
-  /// Remove a mesh object.
-  void Remove (iMeshWrapper *mesh);
-
-  /// Remove a mesh object which is potentially in the wrong queue.
-  void RemoveUnknownPriority (iMeshWrapper *mesh);
-
-  /// Return the number of rendering queues (the maximum priority value).
-  //int GetQueueCount () { return queues.Length (); }
-
-  /**
-   * Return a single queue, or 0 if no queue exists for the given priority.
-   * Beware! Only the render priorities for CAMERA are not empty!
-   * The other lists are unused.
-   */
-  const csArrayMeshPtr& GetCameraMeshes () const
-  {
-    return camera_meshes;
-  }
 
   /**
    * Sort all priority queues and return a sorted list of all mesh

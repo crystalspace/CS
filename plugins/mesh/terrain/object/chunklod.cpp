@@ -313,19 +313,6 @@ csChunkLodTerrainFactory::MeshTreeNode::MeshTreeNode (
 	csChunkLodTerrainFactory* p, int x, int y, int w, int h, float e)
 {
   pFactory = p;
-  vertex_buffer = 0;
-  compressed_vertex_buffer = 0;
-  normal_buffer = 0;
-  compressed_normal_buffer = 0;
-  tangent_buffer = 0;
-  compressed_tangent_buffer = 0;
-  binormal_buffer = 0;
-  compressed_binormal_buffer = 0;
-  texcors_buffer = 0;
-  compressed_texcors_buffer = 0;
-  color_buffer = 0;
-  compressed_color_buffer = 0;
-  index_buffer = 0;
 
   error = (e < 1) ? 0.5 : e;
   int mid_w = w>>1, mid_h = h>>1;

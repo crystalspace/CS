@@ -328,8 +328,6 @@ public:
   csStringArray render_priorities;
   /// Sorting flags for the render priorities.
   csArray<int> render_priority_sortflags;
-  /// Do_camera flags for the render priorities.
-  csArray<bool> render_priority_cameraflags;
   /**
    * If the following flag is dirty then the render_priority_xxx values are
    * potentially invalid and need to be recalculated.
@@ -810,15 +808,9 @@ public:
   void UpdateStandardRenderPriorities ();
   /// Register a new render priority.
   virtual void RegisterRenderPriority (const char* name, long priority,
-  	int rendsort = CS_RENDPRI_NONE, bool do_camera = false);
+  	int rendsort = CS_RENDPRI_NONE);
   /// Get a render priority by name.
   virtual long GetRenderPriority (const char* name) const;
-  /// Set the render priority camera flag.
-  virtual void SetRenderPriorityCamera (long priority, bool do_camera);
-  /// Get the render priority camera flag.
-  virtual bool GetRenderPriorityCamera (const char* name) const;
-  /// Get the render priority camera flag.
-  virtual bool GetRenderPriorityCamera (long priority) const;
   /// Get the render priority sorting flag.
   virtual int GetRenderPrioritySorting (const char* name) const;
   /// Get the render priority sorting flag.

@@ -258,8 +258,6 @@ struct iEngine : public iBase
    *     camera viewpoint).
    * <li>#CS_RENDPRI_BACK2FRONT: sort objects back to front.
    * </ul>
-   * \param do_camera If 'do_camera' is true then this render priority will 
-   * be scanned for objects that have CS_ENTITY_CAMERA flag set.
    * \note The default render priorities are 'sky', 'portal', 'wall', 'object' 
    * and 'alpha' (in that priority order, where sky is rendered first and 
    * alpha is rendered last).  Should you wish to add your own render 
@@ -267,7 +265,7 @@ struct iEngine : public iBase
    * default render priorities along with your own new priorities.
    */
   virtual void RegisterRenderPriority (const char* name, long priority,
-  	int rendsort = CS_RENDPRI_NONE, bool do_camera = false) = 0;
+  	int rendsort = CS_RENDPRI_NONE) = 0;
 
   /**
    * Get a render priority by name.
@@ -277,12 +275,6 @@ struct iEngine : public iBase
    * \return 0 if render priority doesn't exist.
    */
   virtual long GetRenderPriority (const char* name) const = 0;
-  /// Set the render priority camera flag.
-  virtual void SetRenderPriorityCamera (long priority, bool do_camera) = 0;
-  /// Get the render priority camera flag.
-  virtual bool GetRenderPriorityCamera (const char* name) const = 0;
-  /// Get the render priority camera flag.
-  virtual bool GetRenderPriorityCamera (long priority) const = 0;
   /// Get the render priority sorting flag.
   virtual int GetRenderPrioritySorting (const char* name) const = 0;
   /// Get the render priority sorting flag.

@@ -112,16 +112,9 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed,
   if (do_camera)
   {
     iEngine* e = Sys->view->GetEngine ();
-    int c = e->GetRenderPriorityCount ()-1;
-    // Create a new camera render priority if the last one isn't
-    // already in camera mode.
-    if (!e->GetRenderPriorityCamera (c))
-    {
-      c++;
-      e->RegisterRenderPriority ("rain", c, CS_RENDPRI_NONE, true);
-    }
-    exp->SetRenderPriority (c);
+    int c = e->GetAlphaRenderPriority ();
     exp->GetFlags ().Set (CS_ENTITY_CAMERA);
+    exp->SetRenderPriority (c);
   }
   exp->SetZBufMode(CS_ZBUF_TEST);
 

@@ -60,36 +60,6 @@ void csRenderQueueSet::AddVisible (iMeshWrapper *mesh)
   visible[pri]->Push (mesh);
 }
 
-void csRenderQueueSet::Add (iMeshWrapper *mesh)
-{
-  long pri = mesh->GetRenderPriority ();
-
-  // If the CS_ENTITY_CAMERA flag is set we automatically mark
-  // the render priority with the camera flag.
-  bool do_camera = mesh->GetFlags ().Check (CS_ENTITY_CAMERA);
-  if (do_camera)
-  {
-    csEngine::current_engine->SetRenderPriorityCamera (pri, do_camera);
-  }
-  else
-  {
-    // We only add CAMERA meshes!
-    return;
-  }
-
-  camera_meshes.Push (mesh);
-}
-
-void csRenderQueueSet::Remove (iMeshWrapper *mesh)
-{
-  camera_meshes.Delete (mesh);
-}
-
-void csRenderQueueSet::RemoveUnknownPriority (iMeshWrapper *mesh)
-{
-  camera_meshes.Delete (mesh);
-}
-
 struct comp_mesh_comp
 {
   float z;

@@ -112,6 +112,11 @@ private:
   csSectorMeshList meshes;
 
   /**
+   * List of camera meshes (meshes with CS_ENTITY_CAMERA flag set).
+   */
+  csArray<iMeshWrapper*> camera_meshes;
+
+  /**
    * List of meshes that have portals that leave from this sector.
    */
   csSet<iMeshWrapper*> portal_meshes;

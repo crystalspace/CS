@@ -180,7 +180,9 @@ void csSector::UnregisterMeshToCuller (iMeshWrapper* mesh)
 
 void csSector::PrepareMesh (iMeshWrapper *mesh)
 {
-  RenderQueues.Add (mesh);
+  bool do_camera = mesh->GetFlags ().Check (CS_ENTITY_CAMERA);
+  if (do_camera) camera_meshes.Push (mesh);
+
   if (culler) RegisterMeshToCuller (mesh);
   int i;
   iMeshList* ml = mesh->GetChildren ();
@@ -193,7 +195,8 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
 
 void csSector::UnprepareMesh (iMeshWrapper *mesh)
 {
-  RenderQueues.Remove (mesh);
+  camera_meshes.Delete (mesh);
+
   if (culler) UnregisterMeshToCuller (mesh);
   int i;
   iMeshList* ml = mesh->GetChildren ();
@@ -206,10 +209,10 @@ void csSector::UnprepareMesh (iMeshWrapper *mesh)
 
 void csSector::RelinkMesh (iMeshWrapper *mesh)
 {
-  // @@@ this function would be a lot faster if the previous
-  // priority was known!
-  RenderQueues.RemoveUnknownPriority (mesh);
-  RenderQueues.Add (mesh);
+  camera_meshes.Delete (mesh);
+  bool do_camera = mesh->GetFlags ().Check (CS_ENTITY_CAMERA);
+  if (do_camera) camera_meshes.Push (mesh);
+
   int i;
   iMeshList* ml = mesh->GetChildren ();
   for (i = 0 ; i < ml->GetCount () ; i++)
@@ -633,7 +636,7 @@ void csSector::PrepareDraw (iRenderView *rview)
   }
 
   // CS_ENTITY_CAMERA meshes have to be moved to right position first.
-  const csArrayMeshPtr& cm = RenderQueues.GetCameraMeshes ();
+  const csArrayMeshPtr& cm = camera_meshes;
   for (i = 0 ; i < cm.Length () ; i++)
   {
     iMeshWrapper* m = cm.Get (i);

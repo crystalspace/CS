@@ -1072,8 +1072,7 @@ iObject *csEngine::QueryObject ()
 void csEngine::RegisterRenderPriority (
   const char *name,
   long priority,
-  int rendsort,
-  bool do_camera)
+  int rendsort)
 {
   int i;
 
@@ -1083,18 +1082,15 @@ void csEngine::RegisterRenderPriority (
   if (priority + 1 >= render_priority_sortflags.Length ())
   {
     render_priority_sortflags.SetLength (priority + 2);
-    render_priority_cameraflags.SetLength (priority + 2);
     render_priorities.SetLength (priority+2);
   }
   for (i = old_pri_len; i <= priority; i++)
   {
     render_priority_sortflags[i] = CS_RENDPRI_NONE;
-    render_priority_cameraflags[i] = false;
   }
 
   render_priorities.Put (priority, (char*)name);
   render_priority_sortflags[priority] = rendsort;
-  render_priority_cameraflags[priority] = do_camera;
   render_priority_dirty = true;
 }
 
@@ -1123,28 +1119,6 @@ long csEngine::GetRenderPriority (const char *name) const
   return 0;
 }
 
-void csEngine::SetRenderPriorityCamera (long priority, bool do_camera)
-{
-  render_priority_cameraflags[priority] = do_camera;
-}
-
-bool csEngine::GetRenderPriorityCamera (const char *name) const
-{
-  int i;
-  for (i = 0; i < render_priorities.Length (); i++)
-  {
-    const char *n = render_priorities[i];
-    if (n && !strcmp (name, n)) return render_priority_cameraflags[i];
-  }
-
-  return false;
-}
-
-bool csEngine::GetRenderPriorityCamera (long priority) const
-{
-  return render_priority_cameraflags[priority];
-}
-
 int csEngine::GetRenderPrioritySorting (const char *name) const
 {
   int i;
@@ -1167,8 +1141,7 @@ void csEngine::ClearRenderPriorities ()
   render_priority_dirty = true;
   render_priorities.DeleteAll ();
   render_priority_sortflags.SetLength (0);
-  render_priority_cameraflags.SetLength (0);
-  RegisterRenderPriority ("sky", 2, true);
+  RegisterRenderPriority ("sky", 2);
   RegisterRenderPriority ("portal", 3);
   RegisterRenderPriority ("wall", 4);
   RegisterRenderPriority ("object", 6);

@@ -3624,10 +3624,12 @@ bool csLoader::LoadRenderPriorities (iDocumentNode* node)
 	}
 	long pri = levelnode->GetContentsValueAsInt ();
 
-	bool do_camera = false;
 	csRef<iDocumentNode> cameranode = child->GetNode ("camera");
 	if (cameranode)
-	  do_camera = true;
+	{
+	  ReportWarning ("crystalspace.maploader",
+	      "The <camera/> flag for render priorities is no longer needed");
+	}
 
 	int rendsort = CS_RENDPRI_NONE;
 	csRef<iDocumentNode> sortnode = child->GetNode ("sort");
@@ -3655,7 +3657,7 @@ bool csLoader::LoadRenderPriorities (iDocumentNode* node)
 	    return false;
 	  }
 	}
-	Engine->RegisterRenderPriority (name, pri, rendsort, do_camera);
+	Engine->RegisterRenderPriority (name, pri, rendsort);
         break;
       }
       default:

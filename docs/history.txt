@@ -16,6 +16,15 @@ chronological order.
 	  installing *.pm files.
         - Philip Wyett removed old motion manager plugin entry from
           walktest.cfg.
+	- Jorrit moved the list of camera meshes from RenderQueues to
+	  the sector. This change means that it is no longer required for
+	  a mesh using CS_ENTITY_CAMERA to be in a render priority that
+	  has the camera flag set.
+	- Jorrit removed the iEngine methods which control the camera
+	  render priorities.
+	- Jorrit removed the 'camera' flag for render priorities in the
+	  engine and the loader. The keyword is still recognized by the loader
+	  but only a deprecated warning is given.
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render
