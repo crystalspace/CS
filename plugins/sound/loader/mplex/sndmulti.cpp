@@ -67,30 +67,34 @@ csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer() {
   }
 }
 
-bool csSoundLoaderMultiplexer::Initialize(iSystem *sys) {
-
+bool csSoundLoaderMultiplexer::Initialize(iSystem *sys) 
+{
   sys->Printf(MSG_INITIALIZATION, "Initializing sound loading multiplexer...\n");
   sys->Printf(MSG_INITIALIZATION, "  Looking for sound loader modules:\n");
 
-  for (long i=0; i<sys->GetNumPlugIns(); i++)
+  iVFS *pVFS = QUERY_PLUGIN (sys, iVFS);
+  if (pVFS)
   {
-    iBase *plg = sys->GetPlugIn(i);
-    if (plg == this) continue;
-
-    iSoundLoader *ldr = QUERY_INTERFACE(plg, iSoundLoader);
-    if (ldr) {
-      Loaders.Push(ldr);
-      iFactory *f = QUERY_INTERFACE(ldr, iFactory);
-      if (f) {
-        sys->Printf(MSG_INITIALIZATION, "    %s\n", f->QueryClassID());
-        f->DecRef();
-      } else
-        sys->Printf(MSG_INITIALIZATION,
-          "    *** loader module without proper SCF factory interface.\n");
+    csVector list;
+    iSCF::SCF->QueryClassList ("crystalspace.sound.loader.", list);
+    for (long i=0; i<list.Length (); i++)
+    {
+      const char *classname = (const char *)list.Get (i);
+      if (strcasecmp (classname, "crystalspace.sound.loader.multiplexer"))
+      {
+	sys->Printf(MSG_INITIALIZATION, "  soundloader: %s\n", classname);
+	iSoundLoader *ldr = LOAD_PLUGIN (sys, classname, 0, iSoundLoader);
+	if (ldr)
+	  Loaders.Push(ldr);
+      }
     }
+    pVFS->DecRef ();
+    return true;
   }
-
-  return true;
+  else
+    sys->Printf(MSG_WARNING, 
+		"  Oops, couldn't query iVFS from the system driver, cannot look for soundloaders now !\n");
+  return false;
 }
 
 iSoundData *csSoundLoaderMultiplexer::LoadSound(void *Data, unsigned long Size) const {
