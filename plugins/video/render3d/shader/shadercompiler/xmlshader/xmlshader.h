@@ -139,8 +139,11 @@ private:
     /// Add a variable to this context
     virtual void AddVariable (csShaderVariable *variable) {}
 
-    static const int STREAMMAX = 16;
-    static const int TEXTUREMAX = 16;
+    enum
+    {
+      STREAMMAX = 16,
+      TEXTUREMAX = 16
+    };
 
     //buffer mappings
     csStringID bufferID[STREAMMAX];

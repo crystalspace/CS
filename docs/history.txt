@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Feb-2004
+	- Eric Sunshine changed STREAMMAX and TEXTUREMAX constants in
+	  csXMLShaderCompiler::shaderPass from 'static const int' to 'enum'
+	  since MSVC used by Bruce Williams <midnightcoder@midnightcoder.com>
+	  could not grok the 'static const int'.  The 'enum' is accepted by all
+	  the compilers used for CS.
 1-Feb-2004
 	- Eric Sunshine applied a couple small patches from Randall Foreman
 	  <eidpers@comcast.net> for Borland C++Builder which fix re-declaration
