@@ -35,18 +35,18 @@ static struct csKeyModDef
   utf32_char code;
 } KeyModifiers [] =
 {
-  {"ctrl",	CSKEY_CTRL},
-  {"lctrl",	CSKEY_CTRL_LEFT},
-  {"rctrl",	CSKEY_CTRL_RIGHT},
-  {"alt",	CSKEY_ALT},
-  {"lalt",	CSKEY_ALT_LEFT},
-  {"ralt",	CSKEY_ALT_RIGHT},
-  {"shift",	CSKEY_SHIFT},
-  {"lshift",	CSKEY_SHIFT_LEFT},
-  {"rshift",	CSKEY_SHIFT_RIGHT},
-  {"num",	CSKEY_PADNUM},
-  {"scroll", 	CSKEY_SCROLLLOCK},
-  {"caps",	CSKEY_CAPSLOCK},
+  {"Ctrl",	CSKEY_CTRL},
+  {"LCtrl",	CSKEY_CTRL_LEFT},
+  {"RCtrl",	CSKEY_CTRL_RIGHT},
+  {"Alt",	CSKEY_ALT},
+  {"LAlt",	CSKEY_ALT_LEFT},
+  {"RAlt",	CSKEY_ALT_RIGHT},
+  {"Shift",	CSKEY_SHIFT},
+  {"LShift",	CSKEY_SHIFT_LEFT},
+  {"RShift",	CSKEY_SHIFT_RIGHT},
+  {"Num",	CSKEY_PADNUM},
+  {"Scroll", 	CSKEY_SCROLLLOCK},
+  {"Caps",	CSKEY_CAPSLOCK},
   { 0,	0}
 };
 
@@ -110,11 +110,212 @@ static struct csKeyCodeDef
   { 0,	0		}
 };
 
+//---------------------------------------------------------------------------
+
+static bool ParseModifier (const char* str, int& type, int& number)
+{
+  for (csKeyModDef *m = KeyModifiers; m->key; m++)
+  {
+    if (CSKEY_MODIFIER_NUM(m->code) == csKeyModifierNumAny)
+    {
+      if (strncasecmp (m->key, str, strlen (m->key)) == 0)
+      {
+	type = CSKEY_MODIFIER_TYPE(m->code);
+	const char* numStr = str + strlen (m->key);
+	if (*numStr == 0)
+	{
+	  number = csKeyModifierNumAny;
+	}
+	else
+	{
+	  int num;
+	  if ((sscanf (numStr, "%d", &num) > 0) && 
+	    (num >= 0) && (num < csKeyModifierNumAny))
+	  {
+	    number = num;
+	  }
+	}
+	return true;
+      }
+    }
+    else
+    {
+      if (strcasecmp (m->key, str) == 0)
+      {
+	number = CSKEY_MODIFIER_NUM(m->code);
+	type = CSKEY_MODIFIER_TYPE(m->code);
+	return true;
+      }
+    }
+  }
+  return false;
+}
+
+static const char* ParseModifiers (const char* str, csKeyModifiers& modifiers)
+{
+  memset (&modifiers, 0, sizeof (modifiers));
+
+  const char* name = str;
+  bool ismask;
+  do
+  {
+    ismask = false;
+    char* sep = strpbrk (name, "+-");
+    if (!sep) break;
+    // Hack: don't run "PAD+"/"PAD-" through the modifier check
+    if (*(sep + 1) == 0) break;
+
+    size_t mln = sep - name;
+    CS_ALLOC_STACK_ARRAY(char, modString, mln + 1);
+
+    strncpy (modString, name, mln);
+    modString[mln] = 0;
+
+    //for (csKeyModDef *m = KeyModifiers; m->key; m++)
+    //{
+    int t, n;
+    if (ParseModifier (modString, t, n))
+    {
+      if (n == csKeyModifierNumAny)
+      {
+	modifiers.modifiers[t] |= 0xffffffff;
+      }
+      else
+      {
+	modifiers.modifiers[t] |= (1 << n);
+      }
+      ismask = true;
+    }
+
+    name = sep + 1;
+  } while (ismask);
+
+  return name;
+}
+
+static bool ParseKey (const char* key, utf32_char* rawCode,
+  utf32_char* cookedCode)
+{
+  for (csKeyCodeDef *c = KeyDefs; c->key; c++)
+  {
+    if (strcasecmp (c->key, key) == 0) 
+    { 
+      if (rawCode) *rawCode = c->codeRaw;
+      if (cookedCode) *cookedCode = c->codeCooked;
+      return true;
+    }
+  }
+
+  int t, n;
+  if (ParseModifier (key, t, n))
+  {
+    if (rawCode) *rawCode = CSKEY_MODIFIER (t, n);
+    if (cookedCode) *cookedCode = CSKEY_MODIFIER (t, csKeyModifierNumAny);;
+    return true;
+  }
+
+  utf32_char ch;
+  bool valid;
+  csUnicodeTransform::UTF8Decode ((utf8_char*)key,
+    strlen (key), ch, &valid);
+  if (!valid) return false;
+  // @@@ Use I18Ned tolower() (once it's there...)
+  if (rawCode) *rawCode = (ch < 256) ? tolower (ch) : ch;
+  if (cookedCode) *cookedCode = 0; // @@@ Or ch? 
+
+  return true;
+}
+
+bool csParseKeyDef (const char* str, utf32_char* rawCode,
+  utf32_char* cookedCode, csKeyModifiers* modifiers)
+{
+  csKeyModifiers m;
+
+  const char* name = ParseModifiers (str, m);
+  if (!name) return false;
+
+  if (!ParseKey (name, rawCode, cookedCode)) return false;
+  if (modifiers) *modifiers = m;
+
+  return true;
+}
+
+static const char* GetModifierStr (int num, int type)
+{
+  for (csKeyModDef* md = KeyModifiers; md->key != 0; md++)
+  {
+    if (md->code == CSKEY_MODIFIER (num, type))
+    {
+      return md->key;
+    }
+  }
+  return 0;
+}
+
+csString csGetKeyDesc (utf32_char code, const csKeyModifiers* modifiers,
+		       bool distinguishModifiers)
+{
+  csString ret;
+
+  if (modifiers)
+  {
+    for (int m = 0; m < csKeyModifierTypeLast; m++)
+    {
+      if (modifiers->modifiers[m] == 0) continue;
+
+      if (distinguishModifiers && 
+	((modifiers->modifiers[m] & 0x80000000) == 0))
+      {
+	for (int t = 0; t < csKeyModifierNumAny; t++)
+	{
+	  if (modifiers->modifiers[m] & (1 << t))
+	  {
+	    const char* key = GetModifierStr (m, t);
+	    if (key) 
+	      ret << key << '+';
+	    else
+	    {
+	      key = GetModifierStr (m, csKeyModifierNumAny);
+	      if (key) ret << key << t << '+';
+	    }
+	  }
+	}
+      }
+      else
+      {
+	const char* key = GetModifierStr (m, csKeyModifierNumAny);
+	if (key) ret << key << '+';
+      }
+    }
+  }
+
+  for (csKeyCodeDef *c = KeyDefs; c->key; c++)
+  {
+    if (c->codeRaw == code)
+    {
+      ret << c->key;
+      return ret;
+    }
+  }
+
+  // @@@ Use I18Ned toupper() (once it's there...)
+  if ((code < 256) && (islower (code))) code = toupper (code);
+  utf8_char keyStr[CS_UC_MAX_UTF8_ENCODED + 1];
+  int keySize = csUnicodeTransform::EncodeUTF8 (code, keyStr, 
+    sizeof (keyStr) / sizeof (utf8_char));
+
+  if (keySize == 0) return "";
+  keyStr[keySize] = 0;
+  ret << keyStr;
+
+  return ret;
+}
+
+//---------------------------------------------------------------------------
+
 csInputDefinition::csInputDefinition ()
 {
   modifiersHonored = CSMASK_ALLSHIFTS;
-  /*keyCode = 0;
-  codeIsCooked = false;*/
   memset (&modifiers, 0, sizeof (modifiers));
   memset (&k, 0, MAX(sizeof (k), MAX(sizeof (m), sizeof (j))));
 }
@@ -137,78 +338,7 @@ uint32 csInputDefinition::GetHonoredModifiers ()
 
 bool csInputDefinition::Parse (const char* string, bool useCooked)
 {
-  memset (&modifiers, 0, sizeof (modifiers));
-
-  const char* name = string;
-  bool ismask;
-  do
-  {
-    ismask = false;
-    char* sep = strchr (name, '+');
-    if (!sep) break;
-    // Hack: don't run "PAD+" through the modifier check
-    if (*(sep + 1) == 0) break;
-
-    size_t mln = sep - name;
-    CS_ALLOC_STACK_ARRAY(char, modString, mln + 1);
-
-    strncpy (modString, name, mln);
-    modString[mln] = 0;
-
-    for (csKeyModDef *m = KeyModifiers; m->key; m++)
-    {
-      if (CSKEY_MODIFIER_NUM(m->code) == csKeyModifierNumAny)
-      {
-	if (strncasecmp (m->key, modString, strlen (m->key)) == 0)
-        {
-	  char* numStr = modString + strlen (m->key);
-	  if (*numStr == 0)
-	  {
-	    modifiers.modifiers[CSKEY_MODIFIER_TYPE(m->code)] |=
-	      0xffffffff;
-	  }
-	  else
-	  {
-	    int num;
-	    if ((sscanf (numStr, "%d", &num) > 0) && 
-	      (num < csKeyModifierNumAny))
-	    {
-	      modifiers.modifiers[CSKEY_MODIFIER_TYPE(m->code)] |=
-		(1 << num);
-	    }
-	  }
-	  ismask = true;
-	  break;
-        }
-      }
-      else
-      {
-        if (strcasecmp (m->key, modString) == 0)
-	{
-	  modifiers.modifiers[CSKEY_MODIFIER_TYPE(m->code)] |=
-	    1 << CSKEY_MODIFIER_NUM(m->code);
-	  ismask = true;
-	  break;
-	}
-      }
-    }
-
-    name = sep + 1;
-  } while (ismask);
-
-/*  int mod = 0;
-  bool ismask;
-  do
-  {
-    ismask = false;
-    for (csKeyMaskDef *m = KeyMasks; m->key; m++)
-      if (! strncasecmp (m->key, name, strlen (m->key)))
-      {
-        if (use_shift) mod |= m->mask;
-        name += strlen (m->key);
-        ismask = true;
-      }
-  } while (ismask);*/
+  const char* name = ParseModifiers (string, modifiers);
 
   if (! strncasecmp (name, "Mouse", 5))
   {
@@ -253,51 +383,21 @@ bool csInputDefinition::Parse (const char* string, bool useCooked)
       if (sscanf (name, "%d", &j.Button) <= 0) return false;
       containedType = csevJoystickDown;
     }
-/*    if (*name == 'X' || *name == 'x')
-      *ev = csEvent (0, csevJoystickMove, 1, 1, 0, 0, 0);
-    else if (*name == 'Y' || *name == 'y')
-      *ev = csEvent (0, csevJoystickMove, 1, 0, 1, 0, 0);
-    else *ev = csEvent (0, csevJoystickDown, 1, 0, 0, atoi (name), mod);*/
   }
   else
   {
-    utf32_char code = 0;
-    
-    for (csKeyCodeDef *c = KeyDefs; c->key; c++)
-    {
-      if (strcasecmp (c->key, name) == 0) 
-      { 
-	code = useCooked ? c->codeCooked : c->codeRaw; 
-	break; 
-      }
-    }
-    
+    utf32_char codeRaw = 0, codeCooked = 0;
+    if (!ParseKey (name, &codeRaw, &codeCooked)) return false;
+
+    utf32_char code = (useCooked && (codeCooked != 0)) ? codeCooked : codeRaw;
+
     if (code != 0)
     {
       k.keyCode = code;
       k.codeIsCooked = useCooked;
     }
-    else if (strlen (name) != 1)
+    else 
       return false;
-    else
-    {
-      if (useCooked)
-      {
-	k.keyCode = (utf32_char)*name;
-	k.codeIsCooked = true;
-      }
-      else
-      {
-	utf32_char ch;
-	bool valid;
-	csUnicodeTransform::UTF8Decode ((utf8_char*)name,
-	  strlen (name), ch, &valid);
-	if (!valid) return false;
-	// @@@ Use I18Ned tolower() (once it's there...)
-	k.keyCode = (ch < 256) ? tolower (ch) : ch;
-	k.codeIsCooked = false;
-      }
-    }
     containedType = csevKeyboard;
   }
   return true;

@@ -79,79 +79,45 @@ public:
  */
 #define CSAXIS_Y -2
 
-class csEvent;
+/**
+ * Convert a free-format string into a set of values that can be compared
+ * against the data of a keyboard event. 
+ * \name str Strings are in the form "Ctrl+a", "alt-shift+enter" etc. 
+ * \param rawCode Pointer to where the raw code is written to.
+ * \param cookedCode Pointer to where the cooked code is written to.
+ * \param modifiers Pointer where the key modifiers are written to.
+ * \returns Whether the string could be successfully parsed. Error can be
+ *  unrecognized keys etc.
+ * \remark If you don't want an information to be returned, pass in 0.
+ * \remark The cooked code returned *may* be 0. This is the case if
+ *  the non-modifier part is a single letter.
+ */
+extern bool csParseKeyDef (const char* str, utf32_char* rawCode,
+  utf32_char* cookedCode, csKeyModifiers* modifiers);
 
 /**
- * Convert a free-format string into an input event as understood by
- * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
- * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
+ * Convert a keycode and an optional set of modifiers into a free-form
+ * key string.
+ * \param code The key code. Is treated as a raw code, however raw vs
+ *  cooked doesn't matter here, only when evaluating the data returned
+ *  by e.g. csParseKeyString().
+ * \param modifiers The modifiers to include in the string. Can be 0.
+ * \param distinguishModifiers Whether to out put distinguished modifiers.
+ *  (e.g. "LAlt" vs just "Alt".)
+ * \returns The key string.
  */
-extern bool csParseInputDef (const char *name, iEvent *ev,
-  bool use_shift = true);
+extern csString csGetKeyDesc (utf32_char code, 
+			      const csKeyModifiers* modifiers,
+			      bool distinguishModifiers = true);
 
-/**
- * \overload 
+/*
+  @@@ TODO:
+    csParseMouseDef
+    csParseJoystickDef
+    csGetKeyDesc
+    csGetMouseDesc
+    csGetJoystickDesc
  */
-extern bool csParseInputDef (const char *name, csEvent &ev,
-  bool use_shift = true);
-
-/**
- * Convert a free-format string into an input event as understood by
- * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
- * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
- */
-extern bool csParseKeyDef (const char *name, int &key, int &shift,
-  bool use_shift = true);
-
-/**
- * Convert a free-format string into an input event as understood by
- * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
- * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
- */
-extern bool csParseMouseDef (const char *name, int &button, int &shift,
-  bool use_shift = true);
-
-/**
- * Convert a free-format string into an input event as understood by
- * the csinput library ("Ctrl+a", "alt+shift+mouse1" and so on).
- * Handy for supporting user-defined hot-keys, keyboard accelerators and so on.
- */
-extern bool csParseJoystickDef (const char *name, int &button, int &shift,
-  bool use_shift = true);
-
-/**
- * Given an event object this routine will copy a string describing the 
- * input combination in human-understandable format.
- */
-extern bool csGetInputDesc (iEvent *ev, char *buf,
-  bool use_shift = true);
-
-/**
- * \overload 
- */
-extern bool csGetInputDesc (csEvent &ev, char *buf,
-  bool use_shift = true);
-
-/**
- * Given an event object this routine will copy a string describing the 
- * input combination in human-understandable format.
- */
-extern bool csGetKeyDesc (int key, int shift, char *buf,
-  bool use_shift = true);
-
-/**
- * Given an event object this routine will copy a string describing the 
- * input combination in human-understandable format.
- */
-extern bool csGetMouseDesc (int button, int shift, char *buf,
-  bool use_shift = true);
-
-/**
- * Given an event object this routine will copy a string describing the 
- * input combination in human-understandable format.
- */
-extern bool csGetJoyDesc (int button, int shift, char *buf,
-  bool use_shift = true);
 
 #endif // __CS_UTIL_CSINPUTS_H__
 

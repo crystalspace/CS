@@ -19,6 +19,7 @@ chronological order.
 	- jamest updated cspace.i for latest keyboard event changes. 
           updated the the python module samples to reflect latest 
           keyboard event changes.
+	- res added an updated version of csParseKeyDef().
 18-Oct-2003
 	- DeSigna:
 	  - Considerable cleanups to the csShaderExpression optimizer pass.
