@@ -82,9 +82,12 @@ bool csGLShader_ARB::SupportType(const char* type)
   return false;
 }
 
-csPtr<iShaderProgram> csGLShader_ARB::CreateProgram()
+csPtr<iShaderProgram> csGLShader_ARB::CreateProgram(const char* type)
 {
-  return csPtr<iShaderProgram>(new csShaderGLAVP(object_reg, ext));
+  if( strcasecmp(type, "gl_arb_vp") == 0)
+    return csPtr<iShaderProgram>(new csShaderGLAVP(object_reg, ext));
+  else
+    return NULL;
 }
 
 void csGLShader_ARB::Open()
@@ -95,7 +98,7 @@ void csGLShader_ARB::Open()
   csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
-  ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
+  ext = (csGLExtensionManager*) sri->GetPrivateObject ("ext");
 }
 
 csPtr<iString> csGLShader_ARB::GetProgramID(const char* programstring)

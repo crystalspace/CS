@@ -36,7 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-#include "ivideo/shader/shadervar.h"
+//#include "ivideo/shader/shadervar.h"
 
 #include "../../opengl/glextmanager.h"
 
@@ -216,6 +216,7 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
   BuildTokenHash();
 
   csRef<iRender3D> r3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+  csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("arbvp");
   if(variablesnode)
@@ -239,8 +240,8 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
       case XMLTOKEN_DECLARE:
         {
           //create a new variable
-          csShaderVariable* var = new csShaderVariable();
-          var->SetName( child->GetAttributeValue("name") );
+          csRef<iShaderVariable> var = 
+            shadermgr->CreateVariable (child->GetAttributeValue ("name"));
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
           idtype -= 100;
           var->SetType( (iShaderVariable::VariableType) idtype);
@@ -262,6 +263,8 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
             var->SetValue( v );
             break;
           }
+          // @@@ I'll blame Matze if this is bad :) /Anders Stenberg
+          var->IncRef (); 
           variables.Put( csHashCompute(var->GetName()), var);
         }
         break;

@@ -44,7 +44,7 @@ public:
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgramPlugin
   ////////////////////////////////////////////////////////////////////
-  virtual csPtr<iShaderProgram> CreateProgram();
+  virtual csPtr<iShaderProgram> CreateProgram(const char* type);
 
   virtual bool SupportType(const char* type);
 

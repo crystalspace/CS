@@ -89,7 +89,7 @@ bool csGLShader_MTEX::SupportType(const char* type)
   return false;
 }
 
-csPtr<iShaderProgram> csGLShader_MTEX::CreateProgram()
+csPtr<iShaderProgram> csGLShader_MTEX::CreateProgram(const char* type)
 {
   return csPtr<iShaderProgram>(new csShaderGLMTEX(object_reg));;
 }
