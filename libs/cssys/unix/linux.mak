@@ -34,8 +34,7 @@ PLUGINS+=video/format/avi
 #PLUGINS+=video/format/codecs/divx4
 PLUGINS+=video/format/codecs/rle
 
-# Uncomment the following to build GGI 2D and/or SDL drivers
-#PLUGINS+=video/canvas/ggi
+# Uncomment the following to build SDL 2d canvas
 #PLUGINS+=video/canvas/sdl
 
 # Uncomment the following to build sound drivers
