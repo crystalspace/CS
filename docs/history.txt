@@ -20,6 +20,7 @@ chronological order.
 	  and added loader code for submeshes. No saver code yet.
 	- Vincent Knecht cleaned up rpm/cs.spec: using more wildcards, %exclude
 	  and %{_bindir}).
+	- Marten fixed two compile errors in vertexlight.h
 26-Feb-2005
 	- res renamed "anonymous render buffers" to user render buffers,
 	  simplified csUserRenderBufferManager, added a render buffer parser

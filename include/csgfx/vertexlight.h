@@ -21,6 +21,7 @@
 
 #include "csgeom/math.h"
 #include "csgeom/vector3.h"
+#include "iengine/movable.h"
 #include "iengine/light.h"
 
 // Attenuation functors
@@ -227,6 +228,7 @@ public:
     {
       float cosfact =
 	csSmoothStep (-(direction*lightDir), falloffOuter, falloffInner);
+      float distance = csQsqrt(direction.SquaredNorm ());
       if (cosfact > 0)
       {
         attn (distance, dp);
