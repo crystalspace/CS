@@ -1,6 +1,41 @@
 The history order has been reversed so that new features are at the top.
 
 15-Nov-2000
+	- Andrew Zabolotny did the following:
+	    - Fixed a bug in DrawPolygonFX introduced by my last changes,
+	      caused by an minor `optimization' I've added near the end
+	      after I rewrote it.  Reverted to non-`optimized' version,
+	      works better and possibly even faster :-)
+	    - Fixed a small bug in oblique button drawing: buttons with
+	      width less than height (weird case) were incorrectly painted.
+	    - Fixed a bug in G2D::ClipLine which causes infinite looping
+	      in certain circumstances.
+	    - Made csLayout a subclass of csDialog. This adds the following
+	      bonuses to the layout class:
+    		(*) Layout can be a separate root window now, like a toolbar.
+		    The ::Draw routine uses the skin capability, which
+		    means layout background is now configurable through
+		    csws.cfg (along with normal dialog background). If you
+		    still want the old behaviour, just set the CSS_TRANSPARENT
+		    flag and it won't draw anything anymore. This flag is
+		    automatically set for level two layouts (e.g. layouts
+		    inserted into another layouts).
+	        (*) Tab and Shift+Tab cycling for components inserted in
+		    a layout.
+	    - Fixed Shift+Tab handling for all X canvases. On XFree86
+	      (don't know about other X11 implementations) Shift+Tab is a
+	      different keysym XK_ISO_Left_Tab. I have added that case,
+	      protected by an #ifdef XK_ISO_Left_Tab.
+	    - Added csMenu::SuggestSize to determine the optimal size for
+	      a menu.
+	    - Reorganized cswstest to make it less clumsy as new
+	      widgets are added day after day. Now it consists of a empty
+	      screen with a root menu, every action is chosen from that menu.
+	    - Partially rewritten notebook widget since it used to reposition
+	      its sub-widget components directly inside its ::Draw() method.
+	      Now with the new redraw architecture it is illegal to resize
+	      and/or reposition anything inside ::Draw, inside ::Draw you
+	      just draw, that is.
 	- Samuel Humphreys did the following:
 	    - Cleaned up csview, now resizes box views properly again and now
 	      polygon views.
