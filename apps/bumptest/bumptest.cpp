@@ -120,9 +120,9 @@ bool BumpTest::InitProcDemo ()
   iTextureWrapper *bptex = engine->CreateTexture("bumptex", vfsfilename, 0,
     CS_TEXTURE_2D| CS_TEXTURE_3D);
   iMaterialWrapper* ibp = engine->CreateMaterial("bumptexture", bptex);
+  csRef<iImage> map = bptex->GetImageFile();
   engine->Prepare ();
 
-  iImage *map = bptex->GetImageFile();
   prBump = new csProcBump (map);
 
   matBump = prBump->Initialize (object_reg, engine, txtmgr, "bumps");
