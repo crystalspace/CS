@@ -28,9 +28,12 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include <ft2build.h>
+#include FT_INTERNAL_OBJECTS_H
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
+#include FT_MODULE_H
 #include "freefnt2.h"
+#include <crtdbg.h>
 
 CS_IMPLEMENT_PLUGIN
 
@@ -55,11 +58,17 @@ csFreeType2Server::csFreeType2Server (iBase *pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   VFS = NULL;
+  library = NULL;
+  freetype_inited = false;
 }
 
 csFreeType2Server::~csFreeType2Server ()
 {
   if (VFS) VFS->DecRef ();
+  if (freetype_inited) 
+  {
+    FT_Done_FreeType (library);
+  }
 }
 
 void csFreeType2Server::Report (int severity, const char* msg, ...)
@@ -84,10 +93,12 @@ bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
 {
   csFreeType2Server::object_reg = object_reg;
 
-  if (FT_Init_FreeType (&library))
+  freetype_inited = !FT_Init_FreeType (&library);
+
+  if (!freetype_inited)
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
-      "Could not create a TrueType engine instance !");
+      "Could not create a FreeType engine instance !");
     return false;
   }
 
@@ -426,15 +437,18 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
     GlyphBitmap &g = glyphset->glyphs[iso_char];
     g.isOk = true;
     g.advance = glyph->advance.x >> 16;
-    stride = MAX((g.advance+7)/8, ((FT_BitmapGlyph)glyph)->bitmap.pitch);
+    //stride = MAX((g.advance+7)/8, ((FT_BitmapGlyph)glyph)->bitmap.pitch);
+    stride = MAX((g.advance+7)/8, (((FT_BitmapGlyph)glyph)->bitmap.width+7)/8);
     g.bitmap = new unsigned char [bitmapsize=maxrows*stride];
     memset (g.bitmap, 0, bitmapsize);
     int startrow = maxrows-(baseline + ((FT_BitmapGlyph)glyph)->top);
+    if (startrow < 0) startrow = 0;
     int endrow = startrow+((FT_BitmapGlyph)glyph)->bitmap.rows;
+    if (endrow >= maxrows) endrow = maxrows-1;
     for (int n=0,i=startrow; i < endrow; i++,n++)
       memcpy (g.bitmap + stride*i, 
               ((FT_BitmapGlyph)glyph)->bitmap.buffer + n*((FT_BitmapGlyph)glyph)->bitmap.pitch,
-              ((FT_BitmapGlyph)glyph)->bitmap.pitch);
+              /*((FT_BitmapGlyph)glyph)->bitmap.pitch*/MIN(stride, ((FT_BitmapGlyph)glyph)->bitmap.pitch));
 
     g.width = ((FT_BitmapGlyph)glyph)->bitmap.width;
     //    g.rows = ((FT_BitmapGlyph)glyph)->bitmap.rows;

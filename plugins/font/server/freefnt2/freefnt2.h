@@ -201,6 +201,7 @@ public:
   csConfigAccess ftconfig;
   iVFS *VFS;
   const char *fontset;
+  bool freetype_inited;
 
   SCF_DECLARE_IBASE;
 
