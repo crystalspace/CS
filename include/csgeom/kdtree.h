@@ -23,6 +23,7 @@
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
 #include "csutil/scfstr.h"
+#include "csutil/ref.h"
 #include "csutil/blockallocator.h"
 #include "iutil/dbghelp.h"
 
@@ -136,7 +137,7 @@ private:
   csKDTree* child2;		// also be not 0.
   csKDTree* parent;		// 0 if this is the root.
 
-  iBase* userobject;		// An optional user object for this node.
+  csRef<iBase> userobject;	// An optional user object for this node.
 
   csBox3 node_bbox;		// Bbox of the node itself.
 
