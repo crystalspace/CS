@@ -22,13 +22,39 @@ csMemoryMappedIO::MemoryMapFile(mmioInfo *_platform, char *filename)
   // Clear the page map
   page_map = NULL;
 
-  // Clear the cache
-  memset(&cache, 0, sizeof(cache));
-
   // Initialize cache management variables
   cache_block_size = csmmioDefaultCacheBlockSize;
   cache_max_size = csmmioDefaultCacheSize;
   cache_block_count=0;
+  
+  // Initialize the cache so that all buckets have at least one block
+  
+  int i;
+  for(i=0; i<csmmioDefaultHashSize; ++i)
+  {
+    CacheBlock *cp=new CacheBlock;
+    
+    ++cache_block_count;
+
+    // Initialize it
+    cp->data = new unsigned char[block_size * cache_block_size];
+
+    // Set young so that it can be used again.
+    cp->age=0;
+
+    // This is the least likely page value.
+    cp->page=0xffffffff;
+
+    // Nothing next
+    cp->next=0;
+
+    cache[i] = cp;
+  }
+  
+#ifdef CS_DEBUG
+  hits=0;
+  misses=0;
+#endif
   
   if ((_platform->hMappedFile=fopen(filename, "rb")) == NULL)
   {
@@ -91,7 +117,7 @@ csMemoryMappedIO::CachePage(unsigned int page)
     cache[bucket]=cp;
 
     // Initialize it
-    cp->data = new unsigned char[block_size * cache_block_size];
+    assert((cp->data = new unsigned char[block_size * cache_block_size])!=NULL);
   }
   else
   {
@@ -110,7 +136,7 @@ csMemoryMappedIO::CachePage(unsigned int page)
     }
 
     // Unmark this page as allocated
-    page_map->ClearBit(cp->page); 
+    if (cp->page!=0xffffffff) page_map->ClearBit(cp->page); 
   }
     
   // Get the data for it.
