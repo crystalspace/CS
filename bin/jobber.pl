@@ -84,7 +84,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '20';
+my $PROG_VERSION = '21';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -265,15 +265,17 @@ my $MAKE = 'make';
 my $CONFIGURE = "cat << EOF > config.mak\n" .
     "TARGET = unix\n" .
     "TARGET_MAKEFILE = libs/cssys/unix/unix.mak\n" .
+    "SRCDIR = .\n" .
     "USE_PLUGINS = yes\n" .
     "CMD.MKDIR = mkdir\n" .
     "CMD.MKDIRS = mkdir -p\n" .
     "PROC = UNKNOWN\n" .
     "OS = UNIX\n" .
+    "COMP = GCC\n" .
     "MODE = optimize\n" .
     "PERL = perl\n" .
     "EOF\n" .
-    "sed 's/\@SET_MAKE\@//' < Makefile.in > Makefile\n";
+    "sed 's/\@SET_MAKE\@//;s/\@top_srcdir\@/./' < Makefile.in > Makefile\n";
 
 my @SCRIPT_OPTIONS = (
     'test!'     => \$TESTING,
