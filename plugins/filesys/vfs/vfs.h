@@ -62,6 +62,8 @@ public:
   virtual size_t Read (char *Data, size_t DataSize) = 0;
   /// Replacement for standard fwrite()
   virtual size_t Write (const char *Data, size_t DataSize) = 0;
+  /// Flush stream.
+  virtual void Flush () = 0;
   /// Replacement for standard feof()
   virtual bool AtEOF () = 0;
   /// Query current file pointer

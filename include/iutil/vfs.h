@@ -94,7 +94,7 @@ struct csFileTime
 #define VFS_STATUS_IOERROR	5
 /** @} */
 
-SCF_VERSION (iFile, 0, 0, 1);
+SCF_VERSION (iFile, 0, 0, 2);
 
 /// A replacement for FILE type in the virtual file space.
 struct iFile : public iBase
@@ -113,6 +113,8 @@ struct iFile : public iBase
   virtual size_t Read (char *Data, size_t DataSize) = 0;
   /// Replacement for standard fwrite()
   virtual size_t Write (const char *Data, size_t DataSize) = 0;
+  /// Flush stream.
+  virtual void Flush () = 0;
   /// Replacement for standard feof()
   virtual bool AtEOF () = 0;
   /// Query current file pointer

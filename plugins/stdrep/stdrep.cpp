@@ -18,11 +18,11 @@
 
 #include <string.h>
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "stdrep.h"
 #include "csver.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"
-#include "stdrep.h"
+#include "cssys/sysfunc.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
@@ -73,6 +73,17 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csReporterListener::ReporterListener)
   SCF_IMPLEMENTS_INTERFACE (iReporterListener)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+csString csReporterListener::DefaultDebugFilename()
+{
+  csString username = csGetUsername();
+  username.Collapse();
+  csString s = "/tmp/csdebug";
+  if (!username.IsEmpty())
+    s << '-' << username;
+  s << ".txt";
+  return s;
+}
+
 csReporterListener::csReporterListener (iBase *iParent)
 {
   SCF_CONSTRUCT_IBASE (iParent);
@@ -80,7 +91,7 @@ csReporterListener::csReporterListener (iBase *iParent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReporterListener);
   object_reg = NULL;
   reporter = NULL;
-  debug_file = csStrNew ("debug.txt");
+  debug_filename = DefaultDebugFilename();
 #ifdef CS_DEBUG
   SetMessageDestination (
   	CS_REPORTER_SEVERITY_BUG, false, true, true, true, true);
@@ -123,7 +134,6 @@ csReporterListener::csReporterListener (iBase *iParent)
 
 csReporterListener::~csReporterListener ()
 {
-  delete[] debug_file;
   // @@@ this is to prevent the chicken/egg problem, note that this solution
   // lacks in the sense that we might listen to  a totally different
   // reporter then the one in the registry.
@@ -140,9 +150,9 @@ csReporterListener::~csReporterListener ()
   }
 }
 
-bool csReporterListener::Initialize (iObjectRegistry *object_reg)
+bool csReporterListener::Initialize (iObjectRegistry* r)
 {
-  csReporterListener::object_reg = object_reg;
+  object_reg = r;
   SetDefaults ();
   return true;
 }
@@ -150,34 +160,32 @@ bool csReporterListener::Initialize (iObjectRegistry *object_reg)
 bool csReporterListener::Report (iReporter*, int severity,
 	const char* msgID, const char* description)
 {
-  char msgbuf[4096];
+  csString msg;
   if (show_msgid[severity])
-    sprintf (msgbuf, "%s: %s\n", msgID, description);
+    msg.Format("%s: %s\n", msgID, description);
   else
-    sprintf (msgbuf, "%s\n", description);
+    msg.Format("%s\n", description);
 
   if (dest_stdout[severity])
-    csPrintf ("%s", msgbuf);
+    csPrintf ("%s", msg.GetData());
   if (dest_stderr[severity])
-    fputs (msgbuf, stderr);
+    fputs (msg.GetData(), stderr);
   if (dest_console[severity] && console)
-    console->PutText (msgbuf);
+    console->PutText (msg.GetData());
   if (dest_alert[severity] && nativewm)
+    nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!", "Ok", msg.GetData());
+  if (dest_debug[severity] && !debug_filename.IsEmpty())
   {
-  if (show_msgid[severity])
-    sprintf (msgbuf, "%s:\n%s", msgID, description);
-    nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!",
-    	"Ok", msgbuf);
-  }
-  if (dest_debug[severity] && debug_file)
-  {
-    static FILE *f = NULL;
-    if (!f)
-      f = fopen (debug_file, "a+");
-    if (f)
+    if (!debug_file.IsValid())
     {
-      fputs (msgbuf, f);
-      fflush (f);
+      csRef<iVFS> vfs(CS_QUERY_REGISTRY(object_reg, iVFS));
+      if (vfs.IsValid())
+        debug_file = vfs->Open(debug_filename, VFS_FILE_WRITE);
+    }
+    if (debug_file.IsValid())
+    {
+      debug_file->Write(msg.GetData(), msg.Length());
+      debug_file->Flush();
     }
   }
   return msg_remove[severity];
@@ -202,10 +210,10 @@ void csReporterListener::SetReporter (iReporter* reporter)
   if (reporter) reporter->AddReporterListener (&scfiReporterListener);
 }
 
-void csReporterListener::SetDebugFile (const char* filename)
+void csReporterListener::SetDebugFile (const char* s)
 {
-  delete[] debug_file;
-  debug_file = csStrNew (filename);
+  debug_file = 0;
+  debug_filename = s;
 }
 
 void csReporterListener::SetDefaults ()
@@ -231,8 +239,8 @@ void csReporterListener::SetDefaults ()
   {
     reporter->AddReporterListener (&scfiReporterListener);
   }
-  delete[] debug_file;
-  debug_file = csStrNew ("debug.txt");
+  debug_file = 0;
+  debug_filename = DefaultDebugFilename();
 }
 
 void csReporterListener::SetMessageDestination (int severity,
@@ -258,4 +266,3 @@ void csReporterListener::ShowMessageID (int severity, bool showid)
   CS_ASSERT (severity >= 0 && severity <= 4);
   show_msgid[severity] = showid;
 }
-

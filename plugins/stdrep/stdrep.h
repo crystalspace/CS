@@ -21,11 +21,13 @@
 
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/scf.h"
+#include "iutil/vfs.h"
 #include "ivaria/stdrep.h"
 #include "ivaria/reporter.h"
+#include "csutil/csstring.h"
 
 struct iConsoleOutput;
+struct iFile;
 struct iNativeWindowManager;
 
 /**
@@ -36,11 +38,12 @@ struct iNativeWindowManager;
 class csReporterListener : public iStandardReporterListener
 {
 private:
-  iObjectRegistry *object_reg;
+  iObjectRegistry* object_reg;
   csRef<iConsoleOutput> console;
   csRef<iNativeWindowManager> nativewm;
   iReporter* reporter;	// Not a csRef! We don't want to keep a reference.
-  char* debug_file;
+  csString debug_filename;
+  csRef<iFile> debug_file;
   bool dest_stdout[5];
   bool dest_stderr[5];
   bool dest_console[5];
@@ -48,6 +51,8 @@ private:
   bool dest_debug[5];
   bool msg_remove[5];
   bool show_msgid[5];
+
+  static csString DefaultDebugFilename();
 
 public:
   SCF_DECLARE_IBASE;
@@ -59,7 +64,7 @@ public:
   virtual void SetOutputConsole (iConsoleOutput* console);
   virtual void SetNativeWindowManager (iNativeWindowManager* wm);
   virtual void SetReporter (iReporter* wm);
-  virtual void SetDebugFile (const char* filename);
+  virtual void SetDebugFile (const char* filename); // VFS path.
   virtual void SetDefaults ();
   virtual void SetMessageDestination (int severity,
   	bool do_stdout, bool do_stderr, bool do_console,
@@ -89,4 +94,3 @@ public:
 };
 
 #endif // __CS_STDREP_H__
-

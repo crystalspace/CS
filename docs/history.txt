@@ -19,6 +19,15 @@ The history order is reversed so that new features are at the top.
 	  returns the name of the user running the application.  Added
 	  implementations of csGetUsername() for Unix, Windows, MacOS/X,
 	  MacOS/X Server (Rhapsody), OpenStep, and NextStep.
+	- Eric Sunshine added an iFile::Flush() method.
+	- Eric Sunshine made the following changes the the stdrep plugin:
+	    - Works with VFS paths rather than physical paths.
+	    - Creates the "debug" file in the VFS temporary directory (/tmp)
+	      rather than the current working directory.
+	    - The debug log file name now contains the owner's username if the
+	      username can be determined.  Rather than the old "debug.txt", the
+	      name is now "csdebug-username.txt" (or "csdebug.txt" if the
+	      username is unknown).
 3-Oct-2002
 	- Finalized the implementation of the indexed operations in the engine
 	  sequence manager.

@@ -70,6 +70,8 @@ public:
   virtual size_t Read (char *Data, size_t DataSize);
   // write a block of data
   virtual size_t Write (const char *Data, size_t DataSize);
+  /// flush stream
+  virtual void Flush ();
   // check for EOF
   virtual bool AtEOF ();
   /// Query current file pointer
@@ -112,6 +114,8 @@ public:
   virtual size_t Write (const char *Data, size_t DataSize);
   // check for EOF
   virtual bool AtEOF ();
+  /// flush stream
+  virtual void Flush ();
   /// Query current file pointer
   virtual size_t GetPos ();
   /// Get all the data at once
@@ -518,6 +522,12 @@ size_t DiskFile::Write (const char *Data, size_t DataSize)
   return rc;
 }
 
+void DiskFile::Flush ()
+{
+  if (file)
+    fflush (file);
+}
+
 bool DiskFile::AtEOF ()
 {
   return feof (file);
@@ -603,6 +613,12 @@ size_t ArchiveFile::Write (const char *Data, size_t DataSize)
     return 0;
   }
   return DataSize;
+}
+
+void ArchiveFile::Flush ()
+{
+  if (Archive)
+    Archive->Flush ();
 }
 
 bool ArchiveFile::AtEOF ()
