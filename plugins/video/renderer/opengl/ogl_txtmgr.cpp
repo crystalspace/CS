@@ -289,7 +289,7 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
 	}
 	break;
       default:
-	  printf ("no sourceType %x\n", sourceType);
+	  printf ("OpenGL Warning: no sourceType %x\n", (unsigned int)sourceType);
       }
     }
   }

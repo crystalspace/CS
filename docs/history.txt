@@ -6,6 +6,7 @@ The history order is reversed so that new features are at the top.
 	  after those two other plugins by csPluginLoader. This
 	  fixes a bug where the stdrep plugin was not correctly
 	  initialized in some cases.
+	- Eric Sunshine eliminated a compilation warning from ogl_txtmgr.cpp.
 13-Oct-2001
 	- Fixed compilation error in OpenGL Canvas for X.
 12-Oct-2001
