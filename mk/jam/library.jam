@@ -118,6 +118,7 @@ rule LibraryStatic
 {
   local objects = $(>) ;
   local target = $(4) ;
+
   # Set LOCATE for the library and its contents.  The bound
   # value shows up as $(NEEDLIBS) on the Link actions.
   # For compatibility, we only do this if the library doesn't
@@ -184,13 +185,14 @@ rule LibraryStatic
     RmTemps $(target) : $(objects) ;
   }
 }
+
 rule LibraryShared
 {
   local objects = $(>) ;
   local target = $(4) ;
   local linklib = [ ConstructSharedLibraryLinkLib $(<) : $(3) ] ;
-
   local deplibs ;
+
   local i ;
   #for i in $($(<)_depends)
   for i in $(LIBDEPENDS)
@@ -202,6 +204,7 @@ rule LibraryShared
   {
     MakeLocate $(target) : $(LOCATE.TARGETS) ;
   }
+
   Depends $(<) : $(linklib) ;
   if $(linklib) != $(target)
   {
@@ -219,6 +222,7 @@ rule LibraryShared
     
   SystemLinkSharedLibrary $(target) : $(objects) $(deplibs) : $(linklib) ;
 }
+
 rule ConstructLibraryTarget
 {
   if ( ! [ IsElem shared : $(>) ] ) || ( $(BUILD_SHARED_LIBS) != "yes" )

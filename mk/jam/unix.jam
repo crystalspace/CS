@@ -150,4 +150,3 @@ actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS
   $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
     -Wl,-soname,$(<:BS)
 }
-
