@@ -840,7 +840,6 @@ int main (int argc, char *argv[])
       canvas = tmp;
     }
     System.myG2D = CS_LOAD_PLUGIN (plugin_mgr, canvas, CS_FUNCID_CANVAS, iGraphics2D);
-    System.myG2D->IncRef ();
   }
 
   if (!System.myG2D)
