@@ -20,7 +20,7 @@
 -*- Whenever possible, enclose strings in quotes. Quotes are accepted
     everywhere, both ' and " quotes are accepted. If the string has no
     quotes, it is finished as soon as one of non-alphanumeric and not
-    one of '_' '/' characters is encountered. E.g. FILE (/lev/texture.gif)
+    one of '_' '/' '.' characters is encountered. E.g. FILE (/lev/texture.gif)
     is accepted, but in any case it would be better to write '/lev/texture.gif'.
 
 -*- In general, the syntax requirements are not that strict as before. Since

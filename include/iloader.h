@@ -42,10 +42,10 @@ struct iLoader : public iPlugIn
   virtual bool Load (const char *iName) = 0;
 
   /**
-   * Parse a string and load the model from here.
+   * Parse a string and load the model/s.
    * It is not adviced to make heavy use of this feature;
    * some loaders (e.g. the standard one) can speed up loading
-   * by preparsing files and storing them pre-tokenized data
+   * by preparsing files and storing the pre-tokenized data
    * somewhere near the original file; if you use this method
    * you will always go through the tokenizer first.
    * The caller should be prepared for iData to be modified.
