@@ -40,8 +40,6 @@
 #endif
 
 #if defined(OS_MACOS)
-#  include "cssys/mac/MacKeyboard.h"
-#  include "cssys/mac/MacMouse.h"
 #  include "cssys/mac/MacSystem.h"
 #endif
 
