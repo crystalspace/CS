@@ -87,7 +87,7 @@ CS_IMPLEMENT_APPLICATION
 #define VIEWMESH_COMMAND_BLEND          78300
 #define VIEWMESH_COMMAND_CLEAR          78400
 #define VIEWMESH_COMMAND_SOCKET         78500
-
+#define VIEWMESH_COMMAND_LOADSOCKET     79000
 //-----------------------------------------------------------------------------
 
 ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
@@ -255,8 +255,22 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  dialog = 0;
 	  ModalData *data = (ModalData *) GetTopModalUserdata();
 
+      /* Check to see if this was from the dialog box to load a mesh for a
+         socket.
+       */            
+      if (data->code >= VIEWMESH_COMMAND_LOADSOCKET &&
+          data->code < VIEWMESH_COMMAND_LOADSOCKET + 100)
+      {
+        if ( !AttachMeshToSocket( data->code - VIEWMESH_COMMAND_LOADSOCKET, filename ) )
+        {
+          Printf( CS_REPORTER_SEVERITY_ERROR, 
+                    "Could not attach %s to socket # %d",
+                  filename, data->code - VIEWMESH_COMMAND_LOADSOCKET );
+        }
+      }
+      
 	  switch (data->code)
-	  {
+	  {      
 	    case VIEWMESH_COMMAND_LOADMESH:
 	      if (!LoadSprite(filename, scale))
 	      {
@@ -413,64 +427,33 @@ bool ViewMesh::HandleEvent (iEvent& ev)
            cal3dstate->ClearMorphTarget(i,10.0f);
         }
       }
+                                
       if (ev.Command.Code >= VIEWMESH_COMMAND_SOCKET &&
-	  ev.Command.Code < VIEWMESH_COMMAND_SOCKET + 100)
+          ev.Command.Code < VIEWMESH_COMMAND_SOCKET + 100)
       {
-	csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-	      iSpriteCal3DState));
-	if (cal3dstate)
-	{
-	  int i = ev.Command.Code - VIEWMESH_COMMAND_SOCKET;
-	  iSpriteCal3DSocket* socket = cal3dstate->FindSocket(socketlist.Get(i));
-	  
-	  if(!socket->GetMeshWrapper())
-	  {
-	    //Hack code to add a particle fountain could be a lot prettier
-	    csRef<iPluginManager> plugin_mgr (
-		CS_QUERY_REGISTRY (object_reg, iPluginManager));
-	    csRef<iMeshObjectType> fountain_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-		"crystalspace.mesh.object.fountain", iMeshObjectType);
-	    if (!fountain_type)
-	      fountain_type = CS_LOAD_PLUGIN (plugin_mgr,
-		  "crystalspace.mesh.object.fountain", iMeshObjectType);
-	    if (!fountain_type)
-	      printf ("No fountain type plug-in found!\n");
-	    csRef<iMeshObjectFactory> fountain_factory = fountain_type->NewFactory ();
-	    if (!fountain_factory)
-	      printf ("Unable to create new fountain factory!\n");
-	    csRef<iMeshObject> fountainMesh = fountain_factory->NewInstance ();
-            if (!fountainMesh)
-	      printf ("Unable to create new fountain mesh!\n");
-            csRef<iParticleState> partState =
-              SCF_QUERY_INTERFACE (fountainMesh, iParticleState);
-	    if (!partState)
-              printf ("No particle state plug-in found!\n");
-	    csRef<iFountainState> fountainState =
-	      SCF_QUERY_INTERFACE (fountainMesh, iFountainState);
-	    if (!fountainState)
-              printf ("No fountain state plug-in found!\n");
-	    fountainState->SetParticleCount (50);
-	    fountainState->SetDropSize (0.05f,0.05f);
-	    fountainState->SetSpeed(1);
-	    fountainState->SetOpening(0.2f);
-	    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
-	    partState->SetMaterialWrapper (mat);
-	    partState->SetColor(csColor(0.7f,0.9f,1));
-	    partState->SetMixMode (CS_FX_ADD);
+        csRef<iSpriteCal3DState> cal3dstate(
+            SCF_QUERY_INTERFACE(sprite->GetMeshObject(), iSpriteCal3DState));
+            
+        if (cal3dstate)
+        {
+          int i = ev.Command.Code - VIEWMESH_COMMAND_SOCKET;
+          menu->Hide();
+          delete dialog;
+          dialog = csFileDialog (this, "Select Mesh Object", "/this/", "Open",
+                                 true);
 
-	    csRef<iMeshWrapper> meshwrap = engine->CreateMeshWrapper(
-		fountainMesh, "Fountain", room,
-		csVector3 (0, 0, 0));
-	    sprite->GetChildren()->Add( meshwrap );
-	    socket->SetMeshWrapper( meshwrap );
-	  }
-	}
+          ModalData *data=new ModalData;
+          
+          data->code = VIEWMESH_COMMAND_LOADSOCKET+i;
+          StartModal (dialog, data);     
+        }    
       }
       break;
   }
 
   return false;
 }
+
 
 bool ViewMesh::LoadSprite(const char *filename, float scale)
 {
@@ -988,6 +971,58 @@ bool ViewMesh::Initialize ()
 
   return true;
 }
+
+bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile )
+{
+  csRef<iSpriteCal3DState> cal3dstate(
+        SCF_QUERY_INTERFACE(sprite->GetMeshObject(), iSpriteCal3DState));
+        
+  if (cal3dstate)
+  {
+    iSpriteCal3DSocket* socket = cal3dstate->FindSocket(socketlist.Get(socketNumber));
+    if ( !socket )
+    {
+      Printf (CS_REPORTER_SEVERITY_ERROR,
+              "Error getting socket: %d!", socketNumber);  
+      return false;                    
+    }
+  
+    csRef<iMeshWrapper> meshWrapOld = socket->GetMeshWrapper();
+    if ( meshWrapOld )
+    {
+        sprite->GetChildren()->Remove( meshWrapOld );
+        socket->SetMeshWrapper( NULL );    
+    }
+    
+    csRef<iMeshFactoryWrapper> factory = loader->LoadMeshObjectFactory( meshFile );
+    if ( !factory )
+    {
+      Printf (CS_REPORTER_SEVERITY_ERROR,
+              "Error loading mesh object factory '%s'!", meshFile);    
+      return false;
+    }
+    else
+    {
+      csRef<iMeshWrapper> meshWrap = engine->CreateMeshWrapper( factory, meshFile );
+                
+      meshWrap->GetFactory()->GetMeshObjectFactory()->
+      HardTransform( csTransform(csXRotMatrix3(PI/2),
+                     csVector3(0,0,0) ));                
+      sprite->GetChildren()->Add( meshWrap );
+      socket->SetMeshWrapper( meshWrap );
+    }                
+  }
+  else
+  {
+    Printf (CS_REPORTER_SEVERITY_ERROR,
+            "Could not get iSpriteCal3dState");        
+    return false;              
+  }              
+  
+  
+  return true;
+}
+
 
 /*---------------------------------------------------------------------*
  * Main function

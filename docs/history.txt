@@ -8,6 +8,8 @@ chronological order.
 
 16-May-2004
         - Philip Wyett elimenated gcc compiler warnings in simpleformer.cpp.
+        - Andrew Craig enhanced viewmesh by letting the user select a mesh 
+          file to load when using a socket on a model.
 15-May-2004
 	- Eric Sunshine added implementation of FReverse rule to 2.4 section of
 	  jamcompatibility.jam since it is missing in Jam 2.4 but is needed by

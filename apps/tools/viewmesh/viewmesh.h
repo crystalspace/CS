@@ -57,7 +57,15 @@ private:
   enum { movenormal, moveorigin, rotateorigin } cammode;
 
   void UpdateSpritePosition(csTicks elapsed);
-
+  
+  /**
+   * Attach a mesh file to a socket on the main mesh that is loaded.
+   * \param socketNumber  The number in the list of loaded sockets that we 
+   *                       want to attach to.
+   * \param fileName The VFS path to the mesh we want to attach.
+   */
+  bool AttachMeshToSocket( int socketNumber, char* fileName );
+  
 public:
   ViewMesh (iObjectRegistry *object_reg, csSkin &Skin);
   virtual ~ViewMesh ();
