@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+29-Mar-2000
+	- Fixed a bug in yesterdays bugfix on CompressShadowFrustrums.
+	- Fixed a bug which caused sectors using STATBSP to work wrong
+	  when the sector has less than 150 polygons.
 28-Mar-2000
 	- Added csColor+= operator to add colors.
 	- Fixed bug in loader of new mixmode parameter (for sprites).
@@ -40,6 +44,8 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed several compilation warnings and errors
 	  throughout the project.
 	- Started document on visibility (not finished right now).
+	- Robert Bate did some fixes for Codewarrior and updated the
+	  Mac project files.
 27-Mar-2000
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> made a small fix to line
 	  renderer.
