@@ -47,7 +47,6 @@ typedef struct
  * {
  *   TOKEN_TABLE_START (tokens)
  *     TOKEN_TABLE (ORIG)
- *     TOKEN_TABLE (ORIG)
  *     TOKEN_TABLE (FIRST_LEN)
  *     TOKEN_TABLE (FIRST)
  *     TOKEN_TABLE (SECOND_LEN)
@@ -125,8 +124,8 @@ long csGetObject(char **buf, csTokenDesc *tokens, char **name, char **data);
  * <code>
  *   TEXTURE( 1, 2, 3 )
  * </code>
- * <p>returning -1 is an error.
- * <p>returning -2 is EOF.
+ * <p>returning PARSERR_TOKENNOTFOUND on error.
+ * <p>returning PARSERR_EOF on EOF.
  * <p><b>NOTE</b>: Should be modified to accept assignments like:
  * <code>
  *   LIGHT=1
