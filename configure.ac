@@ -696,7 +696,7 @@ CS_EMIT_BUILD_FLAGS([if -pipe is accepted], [cs_cv_prog_cxx_pipe],
 CS_CHECK_BUILD_FLAGS([if -shared is accepted], [cs_cv_prog_link_shared],
     [CS_CREATE_TUPLE([-shared])], [C++],
     [CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS], [-shared], [+])], [],
-    [$cs_cv_prog_cxx_enable_errors], [], [], [-shared])
+    [$cs_cv_prog_cxx_enable_errors], [], [], [shared])
 
 
 

@@ -46,11 +46,14 @@ AC_PREREQ([2.56])
 #	promote to error status despite use of -Werror.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_COMPILER_PIC],
-    [AC_REQUIRE([CS_COMPILER_ERRORS])
+    [CS_COMPILER_ERRORS([$1],
+	[m4_default([$2_werror],[cs_cv_prog_compiler_pic_werror])])
     CS_CHECK_BUILD_FLAGS(
 	[how to enable m4_default([$1],[C]) PIC generation],
 	[m4_default([$2],[cs_cv_prog_compiler_pic])],
-	[CS_CREATE_TUPLE([-fPIC])], [$1], [$3], [$4], [], [], [], [-fPIC])])
+	[CS_CREATE_TUPLE([-fPIC])], [$1], [$3], [$4],
+	[m4_default([$$2_werror],[$cs_cv_prog_compiler_pic_werror])], [], [],
+	[fPIC])])
 
 # Backward-compatiblity alias.
 AC_DEFUN([CS_CHECK_COMPILER_PIC], [CS_COMPILER_PIC([$1],[$2],[$3],[$4])])

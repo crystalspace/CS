@@ -35,6 +35,22 @@ chronological order.
 	    CS_USE_FAKE_TYPENAME_KEYWORD   --> CS_HAVE_CXX_KEYWORD_TYPENAME
 	    CS_USE_FAKE_WCHAR_TYPE         --> CS_HAVE_WCHAR_T
 	    CS_USE_FAKE_WCSLEN             --> CS_HAVE_WCSLEN
+	- Eric Sunshine fixed problem in -fPIC and -shared configure checks
+	  where `grep' was misinterpreting the leading `-' on the literal
+	  search strings "-fPIC" and "-shared" as introducing a grep option.
+	  This caused grep to fail in all circumstances, thus producing bogus
+	  results.
+	- Eric Sunshine fixed problem in CS_COMPILER_PIC() macro (checkpic.m4)
+	  where it neglected to employ the result of the CS_COMPILER_ERRORS()
+	  check despite requesting an invocation of CS_COMPILER_ERRORS().
+	- Eric Sunshine fixed problem in the CS_COMPILER_PIC() macro where it
+	  used AC_REQUIRE() to invoke CS_COMPILER_ERRORS(), which meant that
+	  CS_COMPILER_ERRORS() would be invoked only if it had not yet been
+	  invoked by some other agent. This was problematic because
+	  CS_COMPILER_ERRORS() is intended to be invocable multiple times
+	  (possibly with different arguments). As a result, CS_COMPILER_PIC()
+	  was unable to predict the name of the shell variable in which
+	  CS_COMPILER_ERRORS() stored its result.
 7-Mar-2005
 	- Jorrit fixed walktest to use csStrCaseCmp instead of strcasecmp.
 	  That fixes compilation on mingw.
