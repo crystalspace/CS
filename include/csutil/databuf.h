@@ -44,6 +44,14 @@ public:
   /// Construct an data buffer object given a existing (new char []) pointer
   csDataBuffer (char *iData, size_t iSize)
   { SCF_CONSTRUCT_IBASE (NULL); Data = iData; Size = iSize; }
+  /// Duplicate an existing data buffer. Also appends a NULL char.
+  csDataBuffer (iDataBuffer *source)
+  {
+    SCF_CONSTRUCT_IBASE (NULL); 
+    Data = new char [(Size = source->GetSize()) + 1];
+    memcpy (Data, source->GetData(), Size);
+    Data[Size] = 0;
+  }
   /// Destroy (free) the buffer
   virtual ~csDataBuffer ();
 

@@ -743,12 +743,8 @@ csPtr<iDataBuffer> DiskFile::GetAllData (bool nullterm)
       {
 	// However, a null-terminated buffer is requested,
 	// but this one isn't yet - copy data, append null
-	char* data = new char [Size + 1];
-	csDataBuffer* dbuf = new csDataBuffer (data, Size);
-	memcpy (data, alldata->GetData(), Size);
-	*((char*)data + Size) = 0;
-	// discard old buffer
-	alldata = csPtr<iDataBuffer> (dbuf);
+	alldata = csPtr<iDataBuffer> 
+	  (new csDataBuffer (alldata));
 
         buffernt = nullterm;
       }

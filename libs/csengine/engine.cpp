@@ -42,6 +42,7 @@
 #include "csgfx/memimage.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
+#include "csutil/databuf.h"
 #include "csutil/debug.h"
 #include "csutil/vfscache.h"
 #include "csutil/xmltiny.h"
@@ -1148,7 +1149,10 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     reason = "no 'lm_precalc_info' found in cache";
   else
   {
-    char *input = **data;
+    // data, NULL-terminated
+    csRef<iDataBuffer> ntData (new csDataBuffer (data));
+    data = NULL;
+    char *input = **ntData;
     while (*input)
     {
       char *keyword = input + strspn (input, " \t");
