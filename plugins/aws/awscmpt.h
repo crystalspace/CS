@@ -71,6 +71,8 @@ public:
 
     /// Draw a pixel
     virtual void DrawPixel (int x, int y, int color);
+    virtual void DrawPixels (csPixelCoord* pixels, int num_pixels, int color);
+    virtual void Blit (int x, int y, int width, int height, unsigned char* data);
 
     /// Draw a line
     virtual void DrawLine (float x1, float y1, float x2, float y2, int color);

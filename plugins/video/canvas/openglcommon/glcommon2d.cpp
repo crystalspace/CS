@@ -278,6 +278,74 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
   }
 }
 
+void csGraphics2DGLCommon::DrawPixels (csPixelCoord* pixels,
+	int num_pixels, int color)
+{
+  // prepare for 2D drawing--so we need no fancy GL effects!
+  bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
+  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
+  setGLColorfromint (color);
+
+  int i;
+  glBegin (GL_POINTS);
+  for (i = 0 ; i < num_pixels ; i++)
+  {
+    int x = pixels->x;
+    int y = pixels->y;
+    pixels++;
+    if ((x >= ClipX1) && (x < ClipX2) && (y >= ClipY1) && (y < ClipY2))
+    {
+      glVertex2i (x, Height - y);
+    }
+  }
+  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
+}
+
+void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
+	unsigned char* data)
+{
+  bool hor_clip_needed = false;
+  bool ver_clip_needed = false;
+  int orig_x = x;
+  int orig_y = y;
+  int orig_w = w;
+  if ((x > ClipX2) || (y > ClipY2))
+    return;
+  if (x < ClipX1)
+    { w -= (ClipX1 - x), x = ClipX1; hor_clip_needed = true; }
+  if (y < ClipY1)
+    { h -= (ClipY1 - y), y = ClipY1; ver_clip_needed = true; }
+  if (x + w > ClipX2)
+    { w = ClipX2 - x; hor_clip_needed = true; }
+  if (y + h > ClipY2)
+    { h = ClipY2 - y; }
+  if ((w <= 0) || (h <= 0))
+    return;
+
+  // If vertical clipping is needed we skip the initial part.
+  if (ver_clip_needed)
+    data += 4*w*(y-orig_y);
+
+  if (!hor_clip_needed)
+  {
+    glRasterPos2i (x, y);
+    glDrawPixels (w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  }
+  else
+  {
+    data += 4*(x-orig_x);
+
+    // More complicated. We need to do scanline by scanline.
+    int j;
+    for (j = y ; j < y+h ; j++)
+    {
+      glRasterPos2i (x, j);
+      glDrawPixels (w, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+      data += 4*orig_w;
+    }
+  }
+}
+
 void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
   const char *text)
 {

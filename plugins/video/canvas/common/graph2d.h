@@ -149,6 +149,11 @@ public:
   /// Same but exposed through iGraphics2D interface
   virtual void DrawPixel (int x, int y, int color)
   { _DrawPixel (this, x, y, color); }
+  virtual void DrawPixels (csPixelCoord* pixels, int num_pixels, int color);
+  /// Blit a memory block. The format of the image is RGBA in bytes. Row by row.
+  virtual void Blit (int x, int y, int width, int height,
+  	unsigned char* data);
+
   /// Draw a line
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
   /// Draw a box of given width and height

@@ -234,6 +234,7 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
   iEngine *engine,
   iTextureManager *txtmgr)
 {
+/*@@@ BROKEN
   iAwsCanvas *canvas = new awsMultiProctexCanvas (
       engine->GetContext ()->GetDriver2D ()->GetWidth (),
       engine->GetContext ()->GetDriver2D ()->GetHeight (),
@@ -242,6 +243,8 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
       txtmgr);
 
   return canvas;
+*/
+  return NULL;
 }
 
 iAwsCanvas *awsManager::CreateDefaultCanvas (

@@ -43,7 +43,7 @@ awsSimpleCanvas::awsSimpleCanvas ()
   //texFlags = CS_TEXTURE_2D | CS_TEXTURE_PROC;
 
   // but this is ok either:
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS;
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
 }
 
 void awsSimpleCanvas::Animate (csTicks current_time)
@@ -123,7 +123,7 @@ void awsSingleProctexCanvas::Show (
   area->xmax = (area->xmax > w ? w : area->xmax);
   area->ymax = (area->ymax > h ? h : area->ymax);
 
-  canvas->G3D ()->Print (area);
+  canvas->GetG3D ()->Print (area);
 
   if (g3d)
   {

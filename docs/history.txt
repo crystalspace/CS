@@ -38,6 +38,11 @@ The history order is reversed so that new features are at the top.
 	  properly.
 	- Fixed the flame in flarge to be right orientation again.
 	- Removed several more procedural texture related things.
+	- Fixed aws for latest changes. AWS procedural texture support
+	  will most likely be broken though.
+	- Added iGraphics2D->DrawPixels() and Blit() which offer faster
+	  ways to render pixels on a canvas. Especially for OpenGL.
+	  Still not working properly though.
 15-Oct-2002
 	- Started work on the OpenGL implementation of SetRenderTarget().
 	  Added code in BeginDraw() to copy the texture to the display.

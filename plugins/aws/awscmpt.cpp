@@ -116,7 +116,7 @@ void awsMultiProctexCanvas::awscG2D::SetClipRect (
     rect.Intersect (ClipX1, ClipY1, ClipX2, ClipY2);
 
     awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-    canvas->G2D ()->SetClipRect (0, 0, rect.Width (), rect.Height ());
+    canvas->GetG2D ()->SetClipRect (0, 0, rect.Width (), rect.Height ());
   }
 }
 
@@ -172,7 +172,7 @@ void awsMultiProctexCanvas::awscG2D::DrawLine (
         // Height() (otherwise it would crash because that line is obviously
 
         // invalid
-        canvas->G2D ()->DrawLine (
+        canvas->GetG2D ()->DrawLine (
             (float)x1 - crect.xmin,
             (float)y1 - crect.ymin,
             (float)x2 - crect.xmin,
@@ -201,7 +201,7 @@ void awsMultiProctexCanvas::awscG2D::DrawBox (
     if (!rect.IsEmpty ())
     {
       awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-      canvas->G2D ()->DrawBox (
+      canvas->GetG2D ()->DrawBox (
           rect.xmin - canvasRect->xmin,
           rect.ymin - canvasRect->ymin,
           rect.Width (),
@@ -224,11 +224,41 @@ void awsMultiProctexCanvas::awscG2D::DrawPixel (int x, int y, int color)
       if (canvasRect->Contains (x, y))
       {
         awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-        canvas->G2D ()->DrawPixel (
+        canvas->GetG2D ()->DrawPixel (
             x - canvasRect->xmin,
             y - canvasRect->ymin,
             color);
       }
+    }
+  }
+}
+
+void awsMultiProctexCanvas::awscG2D::DrawPixels (
+	csPixelCoord* pixels, int num_pixels, int color)
+{
+  int i;
+  for (i = 0 ; i < num_pixels ; i++)
+    DrawPixel (pixels[i].x, pixels[i].y, color);
+}
+
+void awsMultiProctexCanvas::awscG2D::Blit (int x, int y,
+	int width, int height, unsigned char* data)
+{
+  int i, count = awsc->GetFlatCanvasCount ();
+  csRect boxrect (x, y, x + width, y + height);
+
+  for (i = 0; i < count; ++i)
+  {
+    csRect *canvasRect = awsc->GetFlatCanvasRect (i);
+    csRect rect (*canvasRect);
+    rect.Intersect (boxrect);
+    if (!rect.IsEmpty ())
+    {
+      awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
+      canvas->GetG2D ()->Blit (
+            x - canvasRect->xmin,
+            y - canvasRect->ymin,
+	    width, height, data);
     }
   }
 }
@@ -261,7 +291,7 @@ void awsMultiProctexCanvas::awscG2D::Write (
     if (canvasRect->Intersects (textRect))
     {
       awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-      canvas->G2D ()->Write (
+      canvas->GetG2D ()->Write (
           font,
           x - canvasRect->xmin,
           y - canvasRect->ymin,
@@ -300,7 +330,7 @@ void awsMultiProctexCanvas::awscG2D::WriteBaseline (
     if (canvasRect->Intersects (textRect))
     {
       awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-      canvas->G2D ()->WriteBaseline (
+      canvas->GetG2D ()->WriteBaseline (
           font,
           x - canvasRect->xmin,
           y - canvasRect->ymin,
@@ -322,7 +352,7 @@ unsigned char *awsMultiProctexCanvas::awscG2D::GetPixelAt (int x, int y)
     if (canvasRect->Contains (x, y))
     {
       awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-      return canvas->G2D ()->GetPixelAt (
+      return canvas->GetG2D ()->GetPixelAt (
           x - canvasRect->xmin,
           y - canvasRect->ymin);
     }
@@ -349,7 +379,7 @@ void awsMultiProctexCanvas::awscG2D::GetPixel (
     if (canvasRect->Contains (x, y))
     {
       awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-      canvas->G2D ()->GetPixel (
+      canvas->GetG2D ()->GetPixel (
           x - canvasRect->xmin,
           y - canvasRect->ymin,
           oR,
@@ -370,7 +400,7 @@ bool awsMultiProctexCanvas::awscG2D::BeginDraw ()
     {
       awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
 
-      canvas->G2D ()->BeginDraw ();
+      canvas->GetG2D ()->BeginDraw ();
     }
   }
 
@@ -391,7 +421,7 @@ void awsMultiProctexCanvas::awscG2D::FinishDraw ()
       {
         awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
 
-        canvas->G2D ()->FinishDraw ();
+        canvas->GetG2D ()->FinishDraw ();
       }
     }
   }
@@ -426,7 +456,7 @@ int awsMultiProctexCanvas::awscG2D::GetPalEntryCount ()
 {
   /*  int count=awsc->GetFlatCanvasCount();
   if (count) {
-    return awsc->GetFlatCanvas(0)->G2D()->GetPalEntryCount();
+    return awsc->GetFlatCanvas(0)->GetG2D()->GetPalEntryCount();
   } else {*/
   return 0;
 
@@ -438,7 +468,7 @@ int awsMultiProctexCanvas::awscG2D::GetPixelBytes ()
   int count = awsc->GetFlatCanvasCount ();
   if (count)
   {
-    return awsc->GetFlatCanvas (0)->G2D ()->GetPixelBytes ();
+    return awsc->GetFlatCanvas (0)->GetG2D ()->GetPixelBytes ();
   }
   else
   {
@@ -451,7 +481,7 @@ csPixelFormat *awsMultiProctexCanvas::awscG2D::GetPixelFormat ()
   int count = awsc->GetFlatCanvasCount ();
   if (count)
   {
-    return awsc->GetFlatCanvas (0)->G2D ()->GetPixelFormat ();
+    return awsc->GetFlatCanvas (0)->GetG2D ()->GetPixelFormat ();
   }
   else
   {
@@ -649,7 +679,7 @@ bool awsMultiProctexCanvas::awscG3D::BeginDraw (int DrawFlags)
   for (i = 0; i < count; ++i)
   {
     awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-    canvas->G3D ()->BeginDraw (DrawFlags);
+    canvas->GetG3D ()->BeginDraw (DrawFlags);
   }
 
   DrawMode = DrawFlags;
@@ -670,8 +700,8 @@ void awsMultiProctexCanvas::awscG3D::FinishDraw ()
   for (i = 0; i < count; ++i)
   {
     awsSimpleCanvas *canvas = awsc->GetFlatCanvas (i);
-    canvas->G3D ()->Print (NULL);
-    canvas->G3D ()->FinishDraw ();
+    canvas->GetG3D ()->Print (NULL);
+    canvas->GetG3D ()->FinishDraw ();
   }
 }
 
@@ -760,7 +790,7 @@ void awsMultiProctexCanvas::awscG3D::DrawPixmap (
       int ntw = QInt ((float)tw * ((float)rect.Width () / (float)sw));
       int nth = QInt ((float)th * ((float)rect.Height () / (float)sh));
 
-      canvas->G3D ()->DrawPixmap (
+      canvas->GetG3D ()->DrawPixmap (
           hTex,
           rect.xmin - canvasRect->xmin,
           rect.ymin - canvasRect->ymin,
@@ -840,11 +870,12 @@ awsMultiProctexCanvas::awsMultiProctexCanvas (
   CanvasWidth = DesiredCanvasWidth;
   CanvasHeight = DesiredCanvasHeight;
 
-  rG3D = engine->GetContext ();
+// @@@ BROKEN BROKEN BROKEN
+  //@@@rG3D = engine->GetContext ();
   rG2D = rG3D->GetDriver2D ();
 
   //iPluginManager *plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  vG3D = new awsMultiProctexCanvas::awscG3D (this, canvas_list[0].G3D ());
+  vG3D = new awsMultiProctexCanvas::awscG3D (this, canvas_list[0].GetG3D ());
   ((awsMultiProctexCanvas::awscG3D *) vG3D)->Initialize (object_reg);
   vG3D->Open ();
   vG2D = (awscG2D *)vG3D->GetDriver2D ();

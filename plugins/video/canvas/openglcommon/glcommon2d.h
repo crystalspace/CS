@@ -118,6 +118,10 @@ public:
   virtual void DrawBox (int x, int y, int w, int h, int color);
   /// Draw a pixel
   virtual void DrawPixel (int x, int y, int color);
+  /// Draw a series of pixels.
+  virtual void DrawPixels (csPixelCoord* pixels, int num_pixels, int color);
+  /// Blit.
+  virtual void Blit (int x, int y, int w, int h, unsigned char* data);
   /// Write a text string
   virtual void Write (iFont*, int x, int y, int fg, int bg, const char *text);
 

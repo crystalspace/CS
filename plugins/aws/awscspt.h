@@ -40,12 +40,6 @@ public:
   /// This is actually not used ever.  The window manager doesn't "animate", and only refreshes the canvas when needed.
   virtual void Animate (csTicks current_time);
 
-  /// Get the iGraphics2D interface so that components can use it.
-  iGraphics2D *G2D () { return ptG2D; }
-
-  /// Get the iGraphics3D interface so that components can use it.
-  iGraphics3D *G3D () { return ptG3D; }
-
   /// Set dimensions of texture
   void SetSize (int w, int h);
 };
@@ -72,8 +66,8 @@ public:
 
   virtual void Animate (csTicks current_time);
 
-  iGraphics2D *G2D () { return canvas->G2D (); }
-  iGraphics3D *G3D () { return canvas->G3D (); }
+  iGraphics2D *G2D () { return canvas->GetG2D (); }
+  iGraphics3D *G3D () { return canvas->GetG3D (); }
   virtual void Show (
                 csRect *area = NULL,
                 iGraphics3D *g3d = NULL,

@@ -26,6 +26,7 @@
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 #include "iengine/texture.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -268,6 +269,103 @@ void csGraphics2D::DrawPixel32 (csGraphics2D *This, int x, int y, int color)
   if ((x >= This->ClipX1) && (x < This->ClipX2)
    && (y >= This->ClipY1) && (y < This->ClipY2))
     *(long *)(This->GetPixelAt (x, y)) = color;
+}
+
+void csGraphics2D::DrawPixels (csPixelCoord* pixels, int num_pixels, int color)
+{
+  while (num_pixels > 0)
+  {
+    DrawPixel (pixels->x, pixels->y, color);
+    pixels++;
+    num_pixels--;
+  }
+}
+
+void csGraphics2D::Blit (int x, int y, int w, int h,
+	unsigned char* data)
+{
+  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  if (!g3d) return;
+
+  bool hor_clip_needed = false;
+  bool ver_clip_needed = false;
+  int orig_x = x;
+  int orig_y = y;
+  int orig_w = w;
+  if ((x > ClipX2) || (y > ClipY2))
+    return;
+  if (x < ClipX1)
+    { w -= (ClipX1 - x), x = ClipX1; hor_clip_needed = true; }
+  if (y < ClipY1)
+    { h -= (ClipY1 - y), y = ClipY1; ver_clip_needed = true; }
+  if (x + w > ClipX2)
+    { w = ClipX2 - x; hor_clip_needed = true; }
+  if (y + h > ClipY2)
+    { h = ClipY2 - y; }
+  if ((w <= 0) || (h <= 0))
+    return;
+
+  // If vertical clipping is needed we skip the initial part.
+  if (ver_clip_needed)
+    data += 4*w*(y-orig_y);
+  // Same for horizontal clipping.
+  if (hor_clip_needed)
+    data += 4*(x-orig_x);
+
+  int r, g, b;
+  unsigned char* d;
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
+  switch (pfmt.PixelBytes)
+  {
+    case 1:
+      while (h)
+      {
+	register uint8 *vram = GetPixelAt (x, y);
+	int w2 = w;
+	d = data;
+	while (w2 > 0)
+	{
+	  r = *d++; g = *d++; b = *d++; d++;
+	  *vram++ = txtmgr->FindRGB (r, g, b);
+	  w2--;
+	}
+        data += 4*orig_w;
+        y++; h--;
+      }
+      break;
+    case 2:
+      while (h)
+      {
+        register uint16 *vram = (uint16 *)GetPixelAt (x, y);
+	int w2 = w;
+	d = data;
+	while (w2 > 0)
+	{
+	  r = *d++; g = *d++; b = *d++; d++;
+	  *vram++ = txtmgr->FindRGB (r, g, b);
+	  w2--;
+	}
+        data += 4*orig_w;
+        y++; h--;
+      } /* endwhile */
+      break;
+    case 4:
+      while (h)
+      {
+        register uint32 *vram = (uint32 *)GetPixelAt (x, y);
+	int w2 = w;
+	d = data;
+	while (w2 > 0)
+	{
+	  r = *d++; g = *d++; b = *d++; d++;
+	  *vram++ = txtmgr->FindRGB (r, g, b);
+	  w2--;
+	}
+        data += 4*orig_w;
+        y++; h--;
+      } /* endwhile */
+      break;
+  } /* endswitch */
 }
 
 #ifndef NO_DRAWLINE

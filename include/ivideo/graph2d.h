@@ -35,6 +35,13 @@ struct iFontServer;
 struct iFont;
 struct iNativeWindow;
 
+struct csPixelCoord
+{
+  int x;
+  int y;
+};
+
+
 /**
  * Structure describing the pixel format.
  */
@@ -104,7 +111,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 2, 1, 0);
+SCF_VERSION (iGraphics2D, 2, 2, 0);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -159,7 +166,8 @@ struct iGraphics2D : public iBase
   /// Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b) = 0;
 
-  /** Set clipping rectangle.
+  /**
+   * Set clipping rectangle.
    * The clipping rectangle is inclusive the top and left edges and exclusive
    * for the right and bottom borders.
    */
@@ -206,6 +214,13 @@ struct iGraphics2D : public iBase
   /// Draw a pixel.
   virtual void DrawPixel (int x, int y, int color) = 0;
 
+  /// Draw an array of pixel coordinates with the given color.
+  virtual void DrawPixels (csPixelCoord* pixels, int num_pixels, int color) = 0;
+
+  /// Blit a memory block. The format of the image is RGBA in bytes. Row by row.
+  virtual void Blit (int x, int y, int width, int height,
+  	unsigned char* data) = 0;
+
   /// Returns the address of the pixel at the specified (x, y) coordinates.
   virtual unsigned char *GetPixelAt (int x, int y) = 0;
 
@@ -234,8 +249,8 @@ struct iGraphics2D : public iBase
 
   /**
    * Write a text string into the back buffer. A negative value for bg
-   * color will not draw the background. x and y are the pen position on a baseline.
-   * The actual font baseline is shifted up by the font's descent.
+   * color will not draw the background. x and y are the pen position on
+   * a baseline. The actual font baseline is shifted up by the font's descent.
    */
   virtual void WriteBaseline (iFont *font, int x, int y, int fg, int bg,
     const char *str) = 0;
