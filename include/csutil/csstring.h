@@ -218,7 +218,7 @@ public:
   /// Calls Trim() and collapses internal whitespace to a single space.
   csString &Collapse();
 
-  csString &Format(const char *format, ...);
+  csString &Format(const char *format, ...) CS_GNUC_PRINTF (2, 3);
 
 #define STR_FORMAT(TYPE,FMT,SZ) \
   static csString Format (TYPE v);

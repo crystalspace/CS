@@ -68,9 +68,9 @@ extern bool csPlatformStartup(iObjectRegistry*);
 extern bool csPlatformShutdown(iObjectRegistry*);
 
 /// CS version of printf
-extern int csPrintf (const char* str, ...);
+extern int csPrintf (const char* str, ...) CS_GNUC_PRINTF (1, 2);
 /// CS version of vprintf
-extern int csPrintfV (const char* str, va_list arg);
+extern int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 
 /// Get the current tick count.
 extern csTicks csGetTicks ();

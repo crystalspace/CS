@@ -97,13 +97,13 @@ public:
    */
   static void AddObject (iObjectRegistry* object_reg,
   	void* object, bool scf, char* file, int linenr,
-  	char* description, ...);
+  	char* description, ...) CS_GNUC_PRINTF (6, 7);
 
   /**
    * Attach a new description to an object in the graph.
    */
   static void AttachDescription (iObjectRegistry* object_reg,
-  	void* object, char* description, ...);
+  	void* object, char* description, ...) CS_GNUC_PRINTF (3, 4);
 
   /**
    * Attach a type to an object in the graph.

@@ -95,7 +95,7 @@ struct iMessageBoxData : public iBase
  */
 extern void csMessageBox (csComponent *iParent, const char *iTitle,
 	const char *iMessage, iBase* userdata,
-	int iFlags = CSMBS_INFO | CSMBS_OK, ...);
+	int iFlags = CSMBS_INFO | CSMBS_OK, ...) CS_GNUC_PRINTF (3, 6);
 
 /// File name entry field in file dialogs
 #define CSWID_FILENAME		0xC509

@@ -40,13 +40,13 @@ struct iNativeWindowManager : public iBase
    * Type is one of CS_ALERT_???.
    */
   virtual void Alert (int type, const char* title, const char* okMsg,
-  	const char* msg, ...) = 0;
+  	const char* msg, ...) CS_GNUC_PRINTF (5, 6) = 0;
   /**
    * Show an alert.
    * Type is one of CS_ALERT_???.
    */
   virtual void AlertV (int type, const char* title, const char* okMsg,
-  	const char* msg, va_list arg) = 0;
+  	const char* msg, va_list arg) CS_GNUC_PRINTF (5, 0) = 0;
 };
 
 SCF_VERSION (iNativeWindow, 0, 0, 1);

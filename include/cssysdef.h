@@ -469,6 +469,18 @@ extern void* operator new[] (size_t s, void* filename, int line);
 #  endif
 #endif
 
+// gcc can perform usefull checking for printf/scanf format strings, just add
+// this define at the end of the function declaration
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
+#  define CS_GNUC_PRINTF( format_idx, arg_idx)		\
+     __attribute__((format (printf, format_idx, arg_idx)))
+#  define CS_GNUX_SCANF( format_idx, arg_idx )				\
+     __attribute__((format (scanf, format_idx, arg_idx)))
+#else
+#  define CS_GNUC_PRINTF( format_idx, arg_idx )
+#  define CS_GNUC_PRINTF( format_idx, arg_idx )
+#endif
+
 /// Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 

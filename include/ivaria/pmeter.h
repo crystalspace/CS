@@ -36,7 +36,7 @@ struct iProgressMeter : public iBase
    * An id can be something like "crystalspace.engine.lighting.calculation".
    */
   virtual void SetProgressDescription (const char* id,
-  	const char* description, ...) = 0;
+  	const char* description, ...) CS_GNUC_PRINTF (3, 4) = 0;
 
   /**
    * Set the id and description of what we are currently monitoring.

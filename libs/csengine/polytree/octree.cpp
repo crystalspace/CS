@@ -925,7 +925,7 @@ bool csOctree::ReadFromCache (iVFS* vfs, const char* name,
   if (format_version != 100002)
   {
     csEngine::current_engine->Warn (
-      "Mismatched format version. Expected %ld, got %ld!",
+      "Mismatched format version. Expected %d, got %ld!",
     	100002, format_version);
     cf->DecRef ();
     return false;

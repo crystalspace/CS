@@ -222,10 +222,10 @@ public:
   void SetBackgroundStyle (csAppBackgroundStyle iBackgroundStyle);
 
   /// Display a string on the console using almost usual printf() syntax
-  void Printf (int mode, char const* format, ...);
+  void Printf (int mode, char const* format, ...) CS_GNUC_PRINTF (3, 4);
 
   /// Display a string on the console using almost usual printf() syntax
-  void PrintfV (int mode, char const* format, va_list);
+  void PrintfV (int mode, char const* format, va_list) CS_GNUC_PRINTF (3, 0);
 
   /// Add a single texture to application's texture list
   bool LoadTexture (const char *iTexName, const char *iTexParams,

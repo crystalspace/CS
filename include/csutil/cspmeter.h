@@ -78,8 +78,10 @@ public:
    * Set the id and description of what we are currently monitoring.
    * An id can be something like "crystalspace.engine.lighting.calculation".
    */
-  virtual void SetProgressDescription (const char*, const char*, ...) { }
-  virtual void SetProgressDescriptionV (const char*, const char*, va_list) { }
+  virtual void CS_GNUC_PRINTF (3, 4)
+      SetProgressDescription (const char*, const char*, ...) { }
+  virtual void CS_GNUC_PRINTF (3, 0)
+      SetProgressDescriptionV (const char*, const char*, va_list) { }
 
   /// Increment the meter by one unit and print a tick mark.
   virtual void Step ();

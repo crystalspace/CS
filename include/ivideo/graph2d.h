@@ -240,14 +240,16 @@ struct iGraphics2D : public iBase
    * commands, so please try to use descriptive command names rather
    * than "a", "b" and so on...
    */
-  virtual bool PerformExtension (char const* command, ...) = 0;
+  virtual bool PerformExtension (char const* command, ...) 
+      CS_GNUC_PRINTF (2, 3) = 0;
 
   /**
    * Perform a system specific exension.<p>
    * Just like PerformExtension() except that the command arguments are passed
    * as a `va_list'.
    */
-  virtual bool PerformExtensionV (char const* command, va_list) = 0;
+  virtual bool PerformExtensionV (char const* command, va_list) 
+      CS_GNUC_PRINTF (2, 0) = 0;
 
   /// Do a screenshot: return a new iImage object
   virtual iImage *ScreenShot () = 0;

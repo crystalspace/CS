@@ -41,6 +41,17 @@ The history order is reversed so that new features are at the top.
 	  thing would not be updated.
 	- Fixed a bug in iCamera::GetHit(). If there was no hit it would
 	  crash.
+	- Matze used the gnu c extension for checking printf argument strings,
+	  to use it in your own functions, add a CS_GNUC_PRINTF at the end of
+	  your function declaration. You should give the argument number from
+	  the format string as a first argument, and the argument number of the
+	  first var argument as a second number. Note that counting arguments
+	  starts with 1 for function but with 2 for member functions (prolly
+	  because of the implicit this pointer...). Example:
+		void Report (void *bla, const char *str, ...) CS_GNUC_PRINTF (2,3);
+	- Fixed a very minor bug in a format string (I hoped to find more to
+	  demonstrate usefullness of the above thing :)
+
 24-Nov-2001
 	- Added more debug graph commands for iImage. Also added links to
 	  iImage and the texture manager for the 3D renderers. This reveals

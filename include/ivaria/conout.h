@@ -76,12 +76,13 @@ struct iConsoleOutput : public iBase
    * this way: PutText ("some text\r"); This message will disappear
    * as soon as any other message will be sent to console.
    */
-  virtual void PutText (const char *iText, ...) = 0;
+  virtual void PutText (const char *iText, ...) CS_GNUC_PRINTF (2, 3) = 0;
 
   /**
    * Var_args version of PutText.
    */
-  virtual void PutTextV (const char *iText, va_list args) = 0;
+  virtual void PutTextV (const char *iText, va_list args) 
+      CS_GNUC_PRINTF (2, 0) = 0;
 
   /// Return a line from the buffer (-1 = current line)
   virtual const char *GetLine (int iLine = -1) const = 0;

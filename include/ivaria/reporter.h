@@ -89,13 +89,13 @@ struct iReporter : public iBase
    * 'crystalspace.sprite2dloader.parse.material'.
    */
   virtual void Report (int severity, const char* msgId,
-  	const char* description, ...) = 0;
+  	const char* description, ...) CS_GNUC_PRINTF(4, 5) = 0;
 
   /**
    * Report something. va_list version.
    */
   virtual void ReportV (int severity, const char* msgId,
-  	const char* description, va_list) = 0;
+  	const char* description, va_list) CS_GNUC_PRINTF(4, 0) = 0;
 
   /**
    * Clear all messages in the reporter. If severity is -1 then all
@@ -160,7 +160,8 @@ struct iReporter : public iBase
   /**
    * Report error.
    */
-  void ReportError (const char* msgId, const char* description, ...)
+  void CS_GNUC_PRINTF (3, 4) 
+      ReportError (const char* msgId, const char* description, ...)
   {
     va_list arg;
     va_start (arg, description);
@@ -171,7 +172,8 @@ struct iReporter : public iBase
   /**
    * Report warning.
    */
-  void ReportWarning (const char* msgId, const char* description, ...)
+  void CS_GNUC_PRINTF (3, 4)
+      ReportWarning (const char* msgId, const char* description, ...)
   {
     va_list arg;
     va_start (arg, description);
@@ -182,7 +184,8 @@ struct iReporter : public iBase
   /**
    * Report notification.
    */
-  void ReportNotify (const char* msgId, const char* description, ...)
+  void CS_GNUC_PRINTF (3, 4)
+      ReportNotify (const char* msgId, const char* description, ...)
   {
     va_list arg;
     va_start (arg, description);
@@ -193,7 +196,8 @@ struct iReporter : public iBase
   /**
    * Report bug.
    */
-  void ReportBug (const char* msgId, const char* description, ...)
+  void CS_GNUC_PRINTF (3, 4)
+      ReportBug (const char* msgId, const char* description, ...)
   {
     va_list arg;
     va_start (arg, description);
@@ -204,7 +208,8 @@ struct iReporter : public iBase
   /**
    * Report debug.
    */
-  void ReportDebug (const char* msgId, const char* description, ...)
+  void CS_GNUC_PRINTF (3, 4)
+      ReportDebug (const char* msgId, const char* description, ...)
   {
     va_list arg;
     va_start (arg, description);
@@ -223,8 +228,9 @@ struct iReporter : public iBase
 class csReporterHelper
 {
 public:
-  static void ReportV(iObjectRegistry* reg, int severity, char const* msgId,
-    char const* description, va_list args)
+  static void CS_GNUC_PRINTF (5, 0)
+      ReportV(iObjectRegistry* reg, int severity, char const* msgId,
+      char const* description, va_list args)
   {
     iReporter* reporter = CS_QUERY_REGISTRY(reg, iReporter);
     if (reporter)
@@ -239,8 +245,9 @@ public:
     }
   }
     
-  static void Report(iObjectRegistry* reg, int severity, char const* msgId,
-    char const* description, ...)
+  static void CS_GNUC_PRINTF (5, 6)
+      Report(iObjectRegistry* reg, int severity, char const* msgId,
+      char const* description, ...)
   {
     va_list arg;
     va_start(arg, description);

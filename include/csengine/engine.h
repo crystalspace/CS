@@ -452,17 +452,17 @@ public:
   /**
    * Report a notification message.
    */
-  void Report (const char* description, ...);
+  void Report (const char* description, ...) CS_GNUC_PRINTF (2, 3);
 
   /**
    * Report a warning.
    */
-  void Warn (const char* description, ...);
+  void Warn (const char* description, ...) CS_GNUC_PRINTF (2, 3);
 
   /**
    * Report a bug.
    */
-  void ReportBug (const char* description, ...);
+  void ReportBug (const char* description, ...) CS_GNUC_PRINTF (2, 3);
 
   /**
    * Check consistency of the loaded elements which comprise the world.
