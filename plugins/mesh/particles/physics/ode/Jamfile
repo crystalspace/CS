@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh particles physics ode ;
+
+Help partphys_ode : "Particle ODE-based Physics plug-in" ;
+
+Plugin partphys_ode
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith partphys_ode : csutil csgeom ;
+
+CompileGroups partphys_ode :  meshes ;
+
