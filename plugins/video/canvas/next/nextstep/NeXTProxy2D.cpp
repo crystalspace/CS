@@ -18,6 +18,7 @@
 //
 // *WARNING* Do NOT include any COM headers in this file.
 //-----------------------------------------------------------------------------
+#include "sysdef.h"
 #include "NeXTProxy2D.h"
 #include "NeXTDelegate.h"
 #include "NeXTFrameBuffer15.h"
