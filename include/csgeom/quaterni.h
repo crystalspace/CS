@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Norman Krämer
+    Copyright (C) 2000 by Norman Kramer
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _QUATERNION_H_
-#define _QUATERNION_H_
+#ifndef __CS_QUATERNION_H__
+#define __CS_QUATERNION_H__
 
 #include <math.h>
 #include "csgeom/math3d.h"
@@ -28,6 +28,10 @@
 class csQuaternion
 {
 public:
+  /// Initialize a quaternion with specific values.
+  inline void Init (double theR, double theX, double theY, double theZ)
+  { r = theR; x = theX; y = theY; z = theZ; } 
+
   /// Construct a 0,0,0,0 quaternion.
   csQuaternion () { Init(0, 0, 0, 0 ); }
   /// Construct a quaternion with the given parameters.
@@ -86,10 +90,6 @@ public:
     return csVector3 (p.x, p.y, p.z);
   }
 
-  ///
-  inline void Init (double theR, double theX, double theY, double theZ)
-  { r = theR; x = theX; y = theY; z = theZ; } 
-
   void Normalize() {
     if(x*x + y*y + z*z > .999) {
       // Severe problems...
@@ -106,4 +106,4 @@ public:
   double r,x,y,z;
 };
 
-#endif
+#endif // __CS_QUATERNION_H__

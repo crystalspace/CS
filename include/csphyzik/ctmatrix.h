@@ -42,6 +42,12 @@ protected:
 // NxN matrix
 class ctMatrixN
 {
+protected:
+  ctMatrixN(){ rows = NULL; dimen = 0; }
+
+  real **rows;
+  int dimen;
+
 public:
   ctMatrixN( long pdim, real scl = 1.0 ){
     dimen = pdim;
@@ -246,17 +252,34 @@ public:
 #endif
     }
   }
-
-protected:
-  ctMatrixN(){ rows = NULL; dimen = 0; }
-
-  real **rows;
-  int dimen;
 };
 
 
 class ctMatrix3 : public ctMatrix
 {
+protected:
+  ctVector3 rows[3];
+
+  real cofactor(int i, int j) {
+    real sign = ((i + j) % 2) ? -1 : 1;
+
+    // Set which rows/columns the cofactor will use
+    int r1, r2, c1, c2;
+    r1 = (i == 0) ? 1 : 0;
+    r2 = (i == 2) ? 1 : 2;
+    c1 = (j == 0) ? 1 : 0;
+    c2 = (j == 2) ? 1 : 2;
+
+    real C = rows[r1][c1] * rows[r2][c2] - rows[r2][c1] * rows[r1][c2];
+    return rows[i][j] * sign * C;
+  }
+
+  real determinant() {
+    return rows[0][0]*rows[1][1]*rows[2][2] + rows[0][1]*rows[1][2]*rows[2][0]
+      + rows[0][2]*rows[1][0]*rows[2][1] - rows[0][0]*rows[1][2]*rows[2][1]
+      - rows[0][1]*rows[1][0]*rows[2][2] - rows[0][2]*rows[1][1]*rows[2][0];
+  }
+
 public:
   ctMatrix3( real scl = 1.0 ){
     dimen = 3;
@@ -454,30 +477,6 @@ public:
     //    Debug::logf( CT_DEBUG_LEVEL, "\n" );
     }
   }
-
-protected:
-  ctVector3 rows[3];
-
-  real cofactor(int i, int j) {
-    real sign = ((i + j) % 2) ? -1 : 1;
-
-    // Set which rows/columns the cofactor will use
-    int r1, r2, c1, c2;
-    r1 = (i == 0) ? 1 : 0;
-    r2 = (i == 2) ? 1 : 2;
-    c1 = (j == 0) ? 1 : 0;
-    c2 = (j == 2) ? 1 : 2;
-
-    real C = rows[r1][c1] * rows[r2][c2] - rows[r2][c1] * rows[r1][c2];
-    return rows[i][j] * sign * C;
-  }
-
-  real determinant() {
-    return rows[0][0]*rows[1][1]*rows[2][2] + rows[0][1]*rows[1][2]*rows[2][0]
-      + rows[0][2]*rows[1][0]*rows[2][1] - rows[0][0]*rows[1][2]*rows[2][1]
-      - rows[0][1]*rows[1][0]*rows[2][2] - rows[0][2]*rows[1][1]*rows[2][0];
-  }
-
 };
 
 inline ctMatrix3 ctVector3::operator*( const ctVectorTranspose3 &pv )
