@@ -175,6 +175,8 @@ public:
   int texture_downsample;
   /// texture filtering anisotropy
   float texture_filter_anisotropy;
+  /// what bpp should textures have?
+  int texture_bits;
 
   static formatDescription glformats [];
   ///

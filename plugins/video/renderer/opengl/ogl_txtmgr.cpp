@@ -110,6 +110,9 @@ bool csTextureHandleOpenGL::FindFormatType ()
 
   formatidx = i;
 
+  sourceType = GL_UNSIGNED_BYTE;
+  targetFormat = csTextureManagerOpenGL::glformats[formatidx].targetFormat;
+
   // do we force it to some specific targetFormat ?
   if (csTextureManagerOpenGL::glformats[i].forcedFormat != 0)
   {
@@ -120,9 +123,6 @@ bool csTextureHandleOpenGL::FindFormatType ()
     if (csTextureManagerOpenGL::glformats[i].targetFormat != targetFormat)
       formatidx = i;
   }
-
-  sourceType = GL_UNSIGNED_BYTE;
-  targetFormat = csTextureManagerOpenGL::glformats[formatidx].targetFormat;
 
   if (csTextureManagerOpenGL::glformats[formatidx].sourceFormat == GL_RGB
       || csTextureManagerOpenGL::glformats[formatidx].sourceFormat == GL_RGBA)
@@ -334,7 +334,7 @@ bool csTextureHandleOpenGL::transform (iImage *Image, csTextureOpenGL *tex)
         case GL_UNSIGNED_BYTE_3_3_2:
 	  h = image_data = new uint8 [n];
 	  for (i=0; i<n; i++, data++)
-	    *h++ = (data->red & 0xe0) | (data->green & 0xe0)>>5
+	    *h++ = (data->red & 0xe0) | (data->green & 0xe0)>>3
 	      | (data->blue >> 6);
 	  break;
         case GL_UNSIGNED_SHORT_4_4_4_4:
@@ -692,6 +692,9 @@ void csTextureManagerOpenGL::read_config (iConfigFile *config)
     ("Video.OpenGL.TextureDownsample", 0);
   texture_filter_anisotropy = config->GetFloat
     ("Video.OpenGL.TextureFilterAnisotropy", 1.0);	
+  texture_bits = config->GetInt
+    ("Video.OpenGL.TextureBits", 0);
+  if (!texture_bits) texture_bits = pfmt.PixelBytes*8;
 
   csRef<iConfigIterator> it (config->Enumerate ("Video.OpenGL.TargetFormat"));
   while (it->Next ())
@@ -803,7 +806,7 @@ csPtr<iTextureHandle> csTextureManagerOpenGL::RegisterTexture (
   }
 
   csTextureHandleOpenGL* txt = new csTextureHandleOpenGL (
-  	image, flags, GL_RGBA, pfmt.PixelBytes*8, G3D);
+  	image, flags, GL_RGBA, texture_bits, G3D);
   textures.Push (txt);
   return csPtr<iTextureHandle> (txt);
 }
