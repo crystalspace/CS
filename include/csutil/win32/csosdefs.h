@@ -480,13 +480,14 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 // just to avoid windows.h inclusion
 #define csSW_SHOWNORMAL 1
 
-#if defined(CS_COMPILER_BCC)
-  #define CS_WIN32_ARGC _argc
-  #define CS_WIN32_ARGV _argv
-#else
-  #define CS_WIN32_ARGC __argc
-  #define CS_WIN32_ARGV __argv
+#ifdef __STRICT_ANSI__
+// Need those...
+extern int	_argc;
+extern char**	_argv;
 #endif
+
+#define CS_WIN32_ARGC _argc
+#define CS_WIN32_ARGV _argv
 
 #ifdef __CYGWIN32__
 #if !defined(CS_IMPLEMENT_PLATFORM_APPLICATION)
@@ -503,17 +504,27 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
  */
 
 #if !defined(CS_IMPLEMENT_PLATFORM_APPLICATION)
+#ifndef __STRICT_ANSI__
+  #define csMain main
+#else
+  /* Work around "error: ISO C++ forbids taking address of function `::main'"
+   * when compiling -ansi -pedantic */
+  #define csMain mainWithAnotherNameBecauseISOCPPForbidsIt
+#endif
 #define CS_IMPLEMENT_PLATFORM_APPLICATION                              \
-int main (int argc, char* argv[]);                                     \
+int csMain (int argc, char* argv[]);                            \
 int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show)\
 {                                                                      \
   (void)hApp;                                                          \
   (void)show;                                                          \
   (void)prev;                                                          \
   (void)cmd;                                                           \
-  int ret = main(CS_WIN32_ARGC, CS_WIN32_ARGV);                        \
+  int ret = csMain (CS_WIN32_ARGC, CS_WIN32_ARGV);                     \
   return ret;                                                          \
 }
+#ifdef __STRICT_ANSI__
+  #define main mainWithAnotherNameBecauseISOCPPForbidsIt
+#endif
 #endif // CS_IMPLEMENT_PLATFORM_APPLICATION
 
 #endif // __CYGWIN32__

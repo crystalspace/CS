@@ -208,6 +208,7 @@
   INTERFACE_APPLY(iSCF)
   INTERFACE_APPLY(iScript)
   INTERFACE_APPLY(iScriptObject)
+  INTERFACE_APPLY(iSimpleFormerState)
   INTERFACE_APPLY(iSector)
   INTERFACE_APPLY(iSectorList)
   INTERFACE_APPLY(iSoundHandle)
@@ -225,6 +226,10 @@
   INTERFACE_APPLY(iStreamFormat)
   INTERFACE_APPLY(iString)
   INTERFACE_APPLY(iStringArray)
+  INTERFACE_APPLY(iTerrainFactoryState)
+  INTERFACE_APPLY(iTerrainObjectState)
+  INTERFACE_APPLY(iTerraFormer)
+  INTERFACE_APPLY(iTerraSampler)
   INTERFACE_APPLY(iTextureHandle)
   INTERFACE_APPLY(iTextureList)
   INTERFACE_APPLY(iTextureManager)
@@ -852,6 +857,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "imesh/object.h"
 %include "imesh/ball.h"
 %include "imesh/thing.h"
+%include "imesh/terrain.h"
 
 %include "imap/loader.h"
 %include "imap/reader.h"
@@ -1000,6 +1006,8 @@ TYPEMAP_OUT_csWrapPtr
 %rename(GetString) iScriptObject::Get(const char*, char**);
 %rename(GetObject) iScriptObject::Get(const char*, csRef<iStringObject>&);
 %include "ivaria/script.h"
+%include "ivaria/simpleformer.h"
+%include "ivaria/terraform.h"
 
 %include "csutil/csobject.h"
 
