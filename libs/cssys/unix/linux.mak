@@ -21,8 +21,6 @@ PLUGINS+=video/canvas/linex
 # some of the following hardware/software renderers.  Also set the entry Driver
 # in section Display of opengl.cfg
 #PLUGINS+=video/canvas/openglx/glide
-#PLUGINS+=video/canvas/openglx/svga
-PLUGINS+=video/canvas/openglx/empty
 
 # uncomment the following to build Glide stuff
 #GLIDE_VERSIONS=2 3
