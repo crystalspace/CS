@@ -43,6 +43,7 @@
 #include "csengine/2d/csspr2d.h"
 #include "csutil/sparse3d.h"
 #include "csutil/inifile.h"
+#include "csutil/impexp/impexp.h"
 #include "csobject/nameobj.h"
 #include "csobject/dataobj.h"
 #include "csgfxldr/csimage.h"
@@ -52,6 +53,7 @@
 #include "itxtmgr.h"
 #include "isndrdr.h"
 
+
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
 #elif defined(OS_UNIX)
@@ -59,6 +61,8 @@
 #endif
 
 WalkTest *Sys;
+converter *ImportExport;
+
 #define Gfx3D System->piG3D
 #define Gfx2D System->piG2D
 
@@ -456,7 +460,6 @@ unsigned int _control87(unsigned int newcw, unsigned int mask)
 #endif
 
 
-
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
@@ -470,10 +473,27 @@ int main (int argc, char* argv[])
   // Create our main class which is the driver for WalkTest.
   CHK (Sys = new WalkTest ());
 
+
+ 
   // Open our configuration file and read the configuration values
   // specific for WalkTest.
   //@@@Config should belong to WalkTest.
   CHK (config = new csIniFile ("cryst.cfg"));
+
+  // create the converter class for testing
+
+  CHK(ImportExport = new converter());
+
+  // process import/export files from config and print log for testing
+
+  ImportExport->ProcessConfig (config);
+
+  // free memory - delete this if you want to use the data in the buffer
+
+  delete ImportExport;
+
+  // end converter test
+
   Sys->do_fps = config->GetYesNo ("WalkTest", "FPS", true);
   Sys->do_stats = config->GetYesNo ("WalkTest", "STATS", false);
   Sys->do_cd = config->GetYesNo ("WalkTest", "COLLDET", true);
