@@ -385,8 +385,8 @@ public:
   const char* Name()  const { return name; }
   const char* Value() const { return value; }
   char* Value() { return value; }
-  const int IntValue() const;
-  const double DoubleValue() const;
+  int IntValue() const;
+  double DoubleValue() const;
 
   void SetName( const char* _name )  { name = _name; }
   void SetValue( const char* _value )
@@ -775,7 +775,7 @@ public:
    * Generally, you probably want the error string ( ErrorDesc() ). But if you
    * prefer the ErrorId, this function will fetch it.
    */
-  const int ErrorId() const { return errorId; }
+  int ErrorId() const { return errorId; }
 
   /// If you have handled the error, it can be reset with this call.
   void ClearError() { error = false; errorId = 0; errorDesc = ""; }

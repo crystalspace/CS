@@ -655,12 +655,12 @@ void TiDocumentAttribute::SetDoubleValue( double value )
   SetValue (buf);
 }
 
-const int TiDocumentAttribute::IntValue() const
+int TiDocumentAttribute::IntValue() const
 {
   return atoi (value);
 }
 
-const double  TiDocumentAttribute::DoubleValue() const
+double  TiDocumentAttribute::DoubleValue() const
 {
   return atof (value);
 }

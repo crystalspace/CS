@@ -20,6 +20,7 @@ chronological order.
         - Fixed some warnings in csHashMap::iterator
         - did a blind fix to csString::RTrim. It was obviously wrong and icc
           reported that. Didn't test it though...
+        - fixed some more pointless consts in tinyxml code
 15-Jun-2004
 	- Jorrit fixed two serious problems with the NR floating portals
 	  implementations (csGLGraphics3D::SetupClipPortals()):
