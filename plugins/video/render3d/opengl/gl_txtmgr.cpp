@@ -267,7 +267,7 @@ void *csGLTextureHandle::GetPrivateObject ()
   return (csGLTextureHandle *)this;
 }
 
-bool csGLTextureHandle::GetAlphaMap () const
+bool csGLTextureHandle::GetAlphaMap () 
 {
   return (alphaType != csAlphaMode::alphaNone);
 }
