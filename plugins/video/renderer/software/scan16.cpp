@@ -223,9 +223,8 @@ extern int filter_bf;
 #define SCANLOOP \
     do									\
     {									\
-      UShort a = *_dest;						\
-      UShort b = srcTex[((vv>>16)<<shifter) + (uu>>16)];		\
-      *_dest++ = ((a & Scan.AlphaMask) >> 1) + ((b & Scan.AlphaMask) >> 1);\
+      UShort tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      *_dest++ = ((*_dest & Scan.AlphaMask) >> 1) + ((tex & Scan.AlphaMask) >> 1);\
       uu += duu;							\
       vv += dvv;							\
     }									\
@@ -247,18 +246,14 @@ extern int filter_bf;
 #define SCANLOOP \
     do									\
     {									\
-      UShort a = *_dest;						\
-      UShort b = srcTex[((vv>>16)<<shifter) + (uu>>16)];		\
-      int r1 = a >> 10;							\
-      int g1 = (a >> 5) & 0x1f;						\
-      int b1 = a & 0x1f;						\
-      int r2 = b >> 10;							\
-      int g2 = (b >> 5) & 0x1f;						\
-      int b2 = b & 0x1f;						\
-      r1 = ((256-Scan.AlphaFact)*r1 + r2*Scan.AlphaFact) >> 8;		\
-      g1 = ((256-Scan.AlphaFact)*g1 + g2*Scan.AlphaFact) >> 8;		\
-      b1 = ((256-Scan.AlphaFact)*b1 + b2*Scan.AlphaFact) >> 8;		\
-      *_dest++ = (r1<<10) | (g1<<5) | b1;				\
+      UShort tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      int tr = *_dest & 0x7c00;						\
+      int tg = *_dest & 0x03e0;						\
+      int tb = *_dest & 0x001f;						\
+      int r = (Scan.AlphaFact * ((tex & 0x7c00) - tr) >> 8) + tr;	\
+      int g = (Scan.AlphaFact * ((tex & 0x03e0) - tg) >> 8) + tg;	\
+      int b = (Scan.AlphaFact * ((tex & 0x001f) - tb) >> 8) + tb;	\
+      *_dest++ = (r & 0x7c00) | (g & 0x03e0) | b;			\
       uu += duu;							\
       vv += dvv;							\
     }									\
@@ -280,18 +275,14 @@ extern int filter_bf;
 #define SCANLOOP \
     do									\
     {									\
-      UShort a = *_dest;						\
-      UShort b = srcTex[((vv>>16)<<shifter) + (uu>>16)];		\
-      int r1 = a >> 11;							\
-      int g1 = (a >> 5) & 0x3f;						\
-      int b1 = a & 0x1f;						\
-      int r2 = b >> 11;							\
-      int g2 = (b >> 5) & 0x3f;						\
-      int b2 = b & 0x1f;						\
-      r1 = ((256-Scan.AlphaFact)*r1 + r2*Scan.AlphaFact) >> 8;		\
-      g1 = ((256-Scan.AlphaFact)*g1 + g2*Scan.AlphaFact) >> 8;		\
-      b1 = ((256-Scan.AlphaFact)*b1 + b2*Scan.AlphaFact) >> 8;		\
-      *_dest++ = (r1<<11) | (g1<<5) | b1;				\
+      UShort tex = srcTex [((vv >> 16) << shifter) + (uu >> 16)];	\
+      int tr = *_dest & 0xf800;						\
+      int tg = *_dest & 0x07e0;						\
+      int tb = *_dest & 0x001f;						\
+      int r = (Scan.AlphaFact * ((tex & 0xf800) - tr) >> 8) + tr;	\
+      int g = (Scan.AlphaFact * ((tex & 0x07e0) - tg) >> 8) + tg;	\
+      int b = (Scan.AlphaFact * ((tex & 0x001f) - tb) >> 8) + tb;	\
+      *_dest++ = (r & 0xf800) | (g & 0x07e0) | b;			\
       uu += duu;							\
       vv += dvv;							\
     }									\
@@ -520,10 +511,7 @@ void csScan_16_draw_scanline_fog_555 (int xx, unsigned char* d,
   UShort *_destend = _dest + xx;
   unsigned long izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
-  int fog_r = Scan.FogR;
-  int fog_g = Scan.FogG;
-  int fog_b = Scan.FogB;
-  UShort fog_pix = fog_r | fog_g | fog_b;
+  UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   ULong fog_dens = Scan.FogDensity;
 
   do
@@ -548,9 +536,9 @@ fd_done:
       if (fd < EXP_256_SIZE)
       {
         fd = tables.exp_256 [fd];
-        register int r = ((fd * ((*_dest & 0x7c00) - fog_r) >> 8) + fog_r);
-        register int g = ((fd * ((*_dest & 0x03e0) - fog_g) >> 8) + fog_g);
-        register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+        register int r = (fd * ((*_dest & 0x7c00) - Scan.FogR) >> 8) + Scan.FogR;
+        register int g = (fd * ((*_dest & 0x03e0) - Scan.FogG) >> 8) + Scan.FogG;
+        register int b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
         *_dest = (r & 0x7c00) | (g & 0x03e0) | b;
       }
       else
@@ -578,10 +566,7 @@ void csScan_16_draw_scanline_fog_565 (int xx, unsigned char* d,
   UShort *_destend = _dest + xx;
   unsigned long izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
-  int fog_r = Scan.FogR;
-  int fog_g = Scan.FogG;
-  int fog_b = Scan.FogB;
-  UShort fog_pix = fog_r | fog_g | fog_b;
+  UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   ULong fog_dens = Scan.FogDensity;
 
   do
@@ -606,9 +591,9 @@ fd_done:
       if (fd < EXP_256_SIZE)
       {
         fd = tables.exp_256 [fd];
-        register int r = ((fd * ((*_dest & 0xf800) - fog_r) >> 8) + fog_r);
-        register int g = ((fd * ((*_dest & 0x07e0) - fog_g) >> 8) + fog_g);
-        register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+        register int r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
+        register int g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
+        register int b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
         *_dest = (r & 0xf800) | (g & 0x07e0) | b;
       }
       else
@@ -634,10 +619,7 @@ void csScan_16_draw_scanline_fog_view_555 (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z; (void)inv_z;
   UShort* _dest = (UShort*)d;
   UShort* _destend = _dest + xx;
-  int fog_r = Scan.FogR;
-  int fog_g = Scan.FogG;
-  int fog_b = Scan.FogB;
-  UShort fog_pix = fog_r | fog_g | fog_b;
+  UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   ULong fog_dens = Scan.FogDensity;
 
   do
@@ -649,9 +631,9 @@ void csScan_16_draw_scanline_fog_view_555 (int xx, unsigned char* d,
       if (fd < EXP_256_SIZE)
       {
         fd = tables.exp_256 [fd];
-        register int r = ((fd * ((*_dest & 0x7c00) - fog_r) >> 8) + fog_r);
-        register int g = ((fd * ((*_dest & 0x03e0) - fog_g) >> 8) + fog_g);
-        register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+        register int r = (fd * ((*_dest & 0x7c00) - Scan.FogR) >> 8) + Scan.FogR;
+        register int g = (fd * ((*_dest & 0x03e0) - Scan.FogG) >> 8) + Scan.FogG;
+        register int b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
         *_dest = (r & 0x7c00) | (g & 0x03e0) | b;
       }
       else
@@ -676,10 +658,7 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z; (void)inv_z;
   UShort* _dest = (UShort*)d;
   UShort* _destend = _dest + xx;
-  int fog_r = Scan.FogR;
-  int fog_g = Scan.FogG;
-  int fog_b = Scan.FogB;
-  UShort fog_pix = fog_r | fog_g | fog_b;
+  UShort fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   ULong fog_dens = Scan.FogDensity;
 
   do
@@ -691,9 +670,9 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
       if (fd < EXP_256_SIZE)
       {
         fd = tables.exp_256 [fd];
-        register int r = ((fd * ((*_dest & 0xf800) - fog_r) >> 8) + fog_r);
-        register int g = ((fd * ((*_dest & 0x07e0) - fog_g) >> 8) + fog_g);
-        register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+        register int r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
+        register int g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
+        register int b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
         *_dest = (r & 0xf800) | (g & 0x07e0) | b;
       }
       else
@@ -718,16 +697,13 @@ void csScan_16_draw_scanline_fog_plane_555 (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
   UShort* _dest = (UShort*)d;
   UShort* _destend = _dest + xx;
-  int fog_r = Scan.FogR;
-  int fog_g = Scan.FogG;
-  int fog_b = Scan.FogB;
   int fd = tables.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
 
   do
   {
-    register int r = ((fd * ((*_dest & 0x7c00) - fog_r) >> 8) + fog_r);
-    register int g = ((fd * ((*_dest & 0x03e0) - fog_g) >> 8) + fog_g);
-    register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+    register int r = (fd * ((*_dest & 0x7c00) - Scan.FogR) >> 8) + Scan.FogR;
+    register int g = (fd * ((*_dest & 0x03e0) - Scan.FogG) >> 8) + Scan.FogG;
+    register int b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
     *_dest++ = (r & 0x7c00) | (g & 0x03e0) | b;
   }
   while (_dest < _destend);
@@ -746,16 +722,13 @@ void csScan_16_draw_scanline_fog_plane_565 (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)z_buf;
   UShort* _dest = (UShort*)d;
   UShort* _destend = _dest + xx;
-  int fog_r = Scan.FogR;
-  int fog_g = Scan.FogG;
-  int fog_b = Scan.FogB;
   int fd = tables.exp_256 [Scan.FogDensity * PLANAR_FOG_DENSITY_COEF];
 
   do
   {
-    register int r = ((fd * ((*_dest & 0xf800) - fog_r) >> 8) + fog_r);
-    register int g = ((fd * ((*_dest & 0x07e0) - fog_g) >> 8) + fog_g);
-    register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+    register int r = (fd * ((*_dest & 0xf800) - Scan.FogR) >> 8) + Scan.FogR;
+    register int g = (fd * ((*_dest & 0x07e0) - Scan.FogG) >> 8) + Scan.FogG;
+    register int b = (fd * ((*_dest & 0x001f) - Scan.FogB) >> 8) + Scan.FogB;
     *_dest++ = (r & 0xf800) | (g & 0x07e0) | b;
   }
   while (_dest < _destend);
