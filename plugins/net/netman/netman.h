@@ -67,7 +67,7 @@ class csNetworkManager : public iNetworkManager
       return scfParent->Initialize(r);
     }
   } scfiComponent;
-  friend class eiComponent;
+  friend struct eiComponent;
 
   struct eiEventHandler : public iEventHandler
   {
@@ -75,7 +75,7 @@ class csNetworkManager : public iNetworkManager
     virtual bool HandleEvent (iEvent &ev)
       { return scfParent->HandleEvent (ev); }
   } scfiEventHandler;
-  friend class eiEventHandler;
+  friend struct eiEventHandler;
 
   struct eiEventPlug : public iEventPlug
   {
@@ -83,6 +83,6 @@ class csNetworkManager : public iNetworkManager
     virtual unsigned GetPotentiallyConflictingEvents () { return 0; }
     virtual unsigned QueryEventPriority (unsigned i) { return 0; }
   } scfiEventPlug;
-  friend class eiEventPlug;
+  friend struct eiEventPlug;
 };
 
