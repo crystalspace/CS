@@ -47,6 +47,8 @@ public:
   
   void WriteHeader();
   void WriteFooter();
+  void WriteStartPoints();
+  void WriteMaterials();
   void WriteObjects(bool lighting);
   void WriteVertices(Lib3dsMesh* mesh);
   void WriteFaces(Lib3dsMesh* mesh, bool lighting, unsigned int numMesh);

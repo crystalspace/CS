@@ -149,57 +149,10 @@ void CSWriter::WriteHeader ()
   }
   else
   {
-    // extracts all unique textures
-    char *textures[10000];
-    int numTextures = 0;
-    int j;
-
-    // set the current mesh to the first in the file
-    Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
-    // as long as we have a valid mesh...
-    while( p3dsMesh )
-    {
-      // search if already present
-      bool found = false;
-
-      for (j=0; j<numTextures; j++) {
-        if (strcmp(p3dsMesh->faceL->material, textures[j])==0) {
-          found = true;
-          break;
-        }
-      }
-      // if not present add it!
-      if (!found) {
-        textures[numTextures] = p3dsMesh->faceL->material;
-        numTextures++;
-      }
-
-      // go to next mesh
-      p3dsMesh = p3dsMesh->next;
-    }
-
     WriteL ("WORLD (");
     Indent();
 
-    WriteL ("TEXTURES (");
-    Indent();
-    // set the current mesh to the first in the file
-    for (j=0; j<numTextures; j++)
-        WriteL ("TEXTURE '%s' (FILE (%s)) ",textures[j], textures[j]);
-    
-    UnIndent();
-    WriteL (")"); 
-    WriteL("");
-
-    WriteL ("MATERIALS (");
-    Indent();
-
-    for (j=0; j<numTextures; j++)
-        WriteL ("MATERIAL '%s' (TEXTURE ('%s'))",textures[j], textures[j]);
-    
-    UnIndent();
-    WriteL (")");
-    WriteL ("");
+    WriteMaterials();
     
     WriteL ("PLUGINS (");
     Indent();
@@ -207,9 +160,79 @@ void CSWriter::WriteHeader ()
     UnIndent();
     WriteL (")");
     WriteL(""); 
+
+    WriteStartPoints();
+
     WriteL ("SECTOR 'room' (");
     Indent();
   }
+}
+
+void CSWriter::WriteMaterials()
+{
+  // extracts all unique textures
+  char *textures[10000];
+  int numTextures = 0;
+  int j;
+  
+  // set the current mesh to the first in the file
+  Lib3dsMesh *p3dsMesh;
+  // as long as we have a valid mesh...
+  for (p3dsMesh = p3dsFile->meshes; p3dsMesh; p3dsMesh = p3dsMesh->next )
+  {
+    // Null Objekt?
+    if (!p3dsMesh->faces || !p3dsMesh->faceL)
+      continue;
+    
+    // search if already present
+    bool found = false;
+    
+    for (j=0; j<numTextures; j++) {
+      if (strcmp(p3dsMesh->faceL->material, textures[j])==0) {
+	found = true;
+	break;
+      }
+    }
+    // if not present add it!
+    if (!found) {
+      textures[numTextures] = p3dsMesh->faceL->material;
+      numTextures++;
+    }
+  }  
+
+  WriteL ("TEXTURES (");
+  Indent();
+  // set the current mesh to the first in the file
+  for (j=0; j<numTextures; j++)
+    WriteL ("TEXTURE '%s' (FILE (%s)) ",textures[j], textures[j]);
+  
+  UnIndent();
+  WriteL (")"); 
+  WriteL("");
+  
+  WriteL ("MATERIALS (");
+  Indent();
+  
+  for (j=0; j<numTextures; j++)
+    WriteL ("MATERIAL '%s' (TEXTURE ('%s'))",textures[j], textures[j]);
+  
+  UnIndent();
+  WriteL (")");
+  WriteL ("");
+}
+
+void CSWriter::WriteStartPoints()
+{
+  Lib3dsCamera* camera;
+  for (camera = p3dsFile->cameras; camera; camera = camera->next)
+  {
+    Write ("START '%s' (", camera->name);
+    WriteL ("'room', %g, %g, %g)",
+	camera->position[0] * xscale + xrelocate,
+	camera->position[1] * yscale + yrelocate,
+	camera->position[2] * zscale + zrelocate);
+  }
+  WriteL ("");
 }
 
 void CSWriter::WriteFooter ()
@@ -329,8 +352,8 @@ typedef unsigned short facenum;
 
 bool RelaxedPlanesEqual(const csDPlane& p1, const csDPlane& p2)
 {
-    return (( p1.norm - p2.norm) < (double) 13. ) &&
-	    ( ABS(p1.DD - p2.DD) < (double) 13. );
+    return (( p1.norm - p2.norm) < (double) .1 ) &&
+	    ( ABS(p1.DD - p2.DD) < (double) 10 );
 }
 
 bool CSWriter::CombineTriangle (Lib3dsMesh* mesh, csDPlane*& plane, int* poly,
@@ -554,20 +577,23 @@ void CSWriter::WriteObjects (bool lighting)
   else
   {
     // count meshes
-    int numMeshes = 0;
-    int n;
+    unsigned int numMeshes = 0;
+    unsigned int n;
     while (p3dsMesh)
     {
-      numMeshes++;
+      // Only count non NULL objects
+      if (p3dsMesh->faces && p3dsMesh->faceL)
+    	numMeshes++;
       p3dsMesh = p3dsMesh->next;
     }
     // build an array with all meshes
-    Lib3dsMesh* p3dsMeshArray = new Lib3dsMesh[numMeshes];
+    Lib3dsMesh** p3dsMeshArray = new Lib3dsMesh* [numMeshes];
     p3dsMesh = p3dsFile->meshes;
-    for (n=0; n<numMeshes; n++)
+    n=0;
+    for ( ; p3dsMesh && n<numMeshes ; p3dsMesh=p3dsMesh->next)
     {
-      p3dsMeshArray[n] = *p3dsMesh;
-      p3dsMesh = p3dsMesh->next;
+      if (p3dsMesh->faces && p3dsMesh->faceL)
+        p3dsMeshArray[n++] = p3dsMesh;
     }
 
     // Reorder the objects to have all "_s_" first.
@@ -578,11 +604,11 @@ void CSWriter::WriteObjects (bool lighting)
         if (!strstr( ((Lib3dsMesh *)&p3dsMeshArray[n])->name, "_s_"))
 	{
           // search a static and swap
-          for (int j=n+1; j<numMeshes; j++)
+          for (unsigned int j=n+1; j<numMeshes; j++)
 	  {
              if (strstr( ((Lib3dsMesh *)&p3dsMeshArray[j])->name, "_s_"))
 	     {
-                Lib3dsMesh tmp = p3dsMeshArray[j];
+                Lib3dsMesh* tmp = p3dsMeshArray[j];
                 p3dsMeshArray[j] = p3dsMeshArray[n];
                 p3dsMeshArray[n] = tmp;
                 //break;
@@ -592,13 +618,11 @@ void CSWriter::WriteObjects (bool lighting)
     }
 
     // assign reordered vector to main Lib3ds struct
-    p3dsMesh = p3dsFile->meshes;
     for (n=0; n<numMeshes-1; n++) {
-      ((Lib3dsMesh *)&p3dsMeshArray[n])->next=&p3dsMeshArray[n+1];
+      p3dsMeshArray[n]->next = p3dsMeshArray[n+1];
     }
-    ((Lib3dsMesh *)&p3dsMeshArray[n])->next=0;
-
-    p3dsFile->meshes = p3dsMeshArray;
+    p3dsMeshArray[n]->next=0;
+    p3dsFile->meshes = p3dsMeshArray[0];
   }
 
   // iterate on all meshes
