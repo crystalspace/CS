@@ -28,7 +28,7 @@ const unsigned int awsWindow::foBeveledBorder = 0x40;
 const int grip_size=16;
 
 // Set to true to get printf info about events, false to disable them.
-const bool DEBUG_WINDOW_EVENTS = true;
+const bool DEBUG_WINDOW_EVENTS = false;
 
 
 SCF_IMPLEMENT_IBASE(awsWindow)
@@ -280,7 +280,8 @@ awsWindow::OnMouseMove(int button, int x, int y)
   
     WindowManager()->InvalidateUpdateStore();
 
-  } else if (moving_mode)
+  } 
+  else if (moving_mode)
   {
     int delta_x = x-last_x;
     int delta_y = y-last_y;
@@ -307,6 +308,22 @@ awsWindow::OnMouseMove(int button, int x, int y)
     Frame().ymin+=delta_y;
     Frame().xmax+=delta_x;
     Frame().ymax+=delta_y;
+
+    // Move children
+    awsComponent *child = GetFirstChild();
+
+    if (child)
+    {
+      do 
+      {
+        child->Frame().xmin+=delta_x;
+        child->Frame().ymin+=delta_y;
+        child->Frame().xmax+=delta_x;
+        child->Frame().ymax+=delta_y;
+        
+        child = GetNextChild();
+      } while(!FinishedChildren());
+    }
 
     //if (DEBUG_WINDOW_EVENTS)
         //printf("aws-debug: deltas for move: %d, %d\n", delta_x, delta_y);
