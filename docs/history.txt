@@ -63,6 +63,10 @@ chronological order.
 	    - Fixed a number of additional potential 64-bit problems reported
 	      by the compiler throughout the project.
 	- Jorrit fixed pvscalc so that the minnode size is no longer ignored.
+	- Eric Sunshine re-enabled "Detect64BitPortabilityProblems" in MSVC7
+	  project files. We are now getting to the point where there should be
+	  very few, if any, 64-bit portability problems in the project, and we
+	  would like to identify any which still remain.
 21-Mar-2005
 	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
 	  was fragile, obfuscated, and unnecessarily complex.
