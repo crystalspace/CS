@@ -70,11 +70,11 @@ protected:
   /// Border width and height
   int BorderWidth, BorderHeight;
   /// Dialog transparency (if CSS_TRANSPARENT is set)
-  uint8 Alpha;
+  uint8 Alpha, OverlayAlpha;
   /// Frame bitmap, if there is one
-  csPixmap *FrameBitmap;
+  csPixmap *FrameBitmap, *OverlayBitmap;
   /// Set if this component should delete the frame bitmap when it is done
-  bool delFrameBitmap;
+  bool delFrameBitmap, delOverlayBitmap;
 
 public:
   /// Create dialog object
@@ -122,16 +122,33 @@ public:
 
   /// Set dialog transparency level (0 - opaque, 255 - fully transparent)
   void SetAlpha (uint8 iAlpha);
+  
+  /// Set dialog overlay transparency level (0 - opaque, 255 - fully transparent)
+  void SetOverlayAlpha (uint8 iAlpha);
+  
   /// Query dialog transparency level
   uint8 GetAlpha ()
   { return GetState (CSS_TRANSPARENT) ? Alpha : 0; }
 
-	/// Set the bitmap for the frame (only useful if the framestyle is csdfsBitmap)
-	void SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap);
-	/// Get the frame bitmap
-	csPixmap *GetFrameBitmap()
-	{ return FrameBitmap; }
+  /// Query dialog overlay transparency level
+  uint8 GetOverlayAlpha ()
+  { return GetState (CSS_TRANSPARENT) ? OverlayAlpha : 0; }
 
+
+  /// Set the bitmap for the frame (only useful if the framestyle is csdfsBitmap)
+  void SetFrameBitmap(csPixmap *iFrameBitmap, bool iDelFrameBitmap);
+  
+  /// Set the bitmap for the overlay (only useful if the framestyle is csdfsBitmap)
+  void SetOverlayBitmap(csPixmap *iOverlayBitmap, bool iDelOverlayBitmap);
+      
+  /// Get the frame bitmap
+  csPixmap *GetFrameBitmap()
+  { return FrameBitmap; }
+  
+  /// Get the overlay bitmap
+  csPixmap *GetOverlayBitmap()
+  { return OverlayBitmap; }
+  
 protected:
   /// Adjust focused control by switching back or forth if it is disabled
   void AdjustFocused (bool forward);
