@@ -628,7 +628,7 @@ struct PVSBuildData2
   csBox3 leaf_box;
 };
 
-bool BuildPVSOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
+bool BuildPVSOctreeNode (csPolygonTree* /*tree*/, csPolygonTreeNode* node,
 	const csVector3& /*pos*/, void* data)
 {
   if (!node) return false;
@@ -708,7 +708,7 @@ void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
 
 #if 1
 void csOctree::BuildPVSForLeaf (csThing* thing,
-	csOctreeNode* leaf, csCovcube* cube)
+	csOctreeNode* leaf, csCovcube* /*cube*/)
 {
 printf ("*"); fflush (stdout);
   // Here we traverse the octree starting from the leaf node.
