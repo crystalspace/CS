@@ -1482,13 +1482,6 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
 	node, "Please specify either <viscull/> or <colldet/>!");
     return false;
   }
-  if (!polymesh)
-  {
-    SyntaxService->ReportError (
-	"crystalspace.maploader.parse.polymesh",
-	node, "Please specify either <box> or <mesh>!");
-    return false;
-  }
   if (colldet)
     objmodel->SetPolygonMeshColldet (polymesh);
   if (viscull)

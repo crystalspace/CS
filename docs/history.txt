@@ -34,6 +34,11 @@ The history order is reversed so that new features are at the top.
 	      source directory.
 	- Fixed the makefiles of all particle systems. They need to link
 	  with cstool now. Also fixed the Jamfiles.
+	- It is no longer needed to actually specify a <box> or <mesh>
+	  inside the new <polymesh>. If you don't specify either then the
+	  action is to clear the polygon mesh for that specific type (colldet
+	  or viscull). This basically disables collision detection or
+	  occlusion writing for that object.
 15-Apr-2003
 	- Fixed a bug in the thing plugin.  If the dynavis culler was already
 	  mentioned before all other objects in the sector then this could
