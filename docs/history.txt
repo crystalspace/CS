@@ -21,6 +21,9 @@ chronological order.
 	  by Jam so that it employs the more robust check used by
 	  $TOP/Jamfile.in to see if the build directory differs from the source
 	  directory.  (The old scheme of checking could be fooled.)
+	- Eric Sunshine added a 'repairdoc' target to texinfo/Jamfile which
+	  invokes CS/docs/support/nodefix.pl to repair broken Texinfo @node and
+	  @menu directives.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.

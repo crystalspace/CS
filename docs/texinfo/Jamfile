@@ -1,8 +1,16 @@
 SubDir TOP docs texinfo ;
 
+if $(CMD.MAKEINFO)
+{
+  Texinfo manualinfo : cs-unix.txi : info : info manual ;
+  FLAGS.MAKEINFO on manualinfo += --output=crystal.info ;
+  Help manualinfo : "user manual in info format" ;
+}
+  
 if $(CMD.TEXI2HTML)
 {
-  FLAGS.TEXI2HTML on manualhtml += -init_file=$(TOP)/docs/support/texi2html.init -prefix=cs ;
+  TEXI2HTML.INIT = [ ConcatDirs $(TOP) docs support texi2html.init ] ;
+  FLAGS.TEXI2HTML on manualhtml += -init_file=$(TEXI2HTML.INIT) -prefix=cs ;
   Texi2HTML manualhtml : cs-unix.txi : html manual ;
   Help manualhtml : "user manual in html format" ;
 }
@@ -19,15 +27,29 @@ if $(CMD.TEXI2DVI) && $(CMD.DVIPS)
   Help manualps : "user manual in ps format" ;
 }
 
-if $(CMD.MAKEINFO)
-{
-  Texinfo manualinfo : cs-unix.txi : info : info manual ;
-  FLAGS.MAKEINFO on manualinfo += --output=crystal.info ;
-  Help manualinfo : "user manual in info format" ;
-}
-  
 if $(CMD.TEXI2DVI) && $(CMD.DVIPDF)
 {
   Texi2PDF manualpdf : cs-unix.txi : pdf manual ;
   Help manualpdf : "user manual in pdf format" ;
+}
+
+if $(PERL)
+{
+  NODEFIX = [ ConcatDirs $(TOP) docs support nodefix.pl ] ;
+
+  rule RepairNodes
+  {
+    Depends $(<) : $(>) ;
+    NotFile $(<) ;
+    Always $(<) ;
+    TEXINFO.INCDIR on $(<) = $(3) ;
+  }
+
+  actions RepairNodes
+  {
+    $(PERL) "$(NODEFIX)" --include-dir="$(TEXINFO.INCDIR)" "$(>)" ;
+  }
+
+  RepairNodes repairdoc : cs-unix.txi : $(SUBDIR) ;
+  Help repairdoc : "Repair Texinfo @node and @menu directives" : verbatim ;
 }
