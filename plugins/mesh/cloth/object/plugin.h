@@ -146,7 +146,7 @@ SCF_DECLARE_IBASE;
     SCF_DECLARE_EMBEDDED_IBASE (csStuffObject);
     virtual long GetShapeNumber () const { return 0; }
     virtual iPolygonMesh* GetPolygonMesh () { return NULL; }
-    virtual iPolygonMesh* etSmallerPolygonMesh () { return NULL; }
+    virtual iPolygonMesh* GetSmallerPolygonMesh () { return NULL; }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float) { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
     {
@@ -161,7 +161,7 @@ SCF_DECLARE_IBASE;
   } scfiObjectModel;
   friend class ObjectModel;
 
-  virtual iObjectModel *GetObjectModel () { return &scfiObjectModel; };
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; };
 
    //--------------------| BEGIN iGeneralMeshState implementation |----------------//
     struct eiGeneralMeshState : public iGeneralMeshState
