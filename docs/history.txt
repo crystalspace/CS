@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+3-Aug-2002
+	- Added effects system plugin from Anders Stenberg. Since I have
+	  crashes with the OpenGL patches to actually use this system
+	  I am not commiting those. So at this moment the 'effects'
+	  plugin is completely unused and unusable until I manage
+	  to fix the problem. I will add more documentaiton about this
+	  new system later.
 2-Aug-2002
 	- Eric Sunshine eliminated several unnecessary, and inadvertently
 	  inserted, event dispatch loops from csEventQueue::Process().
