@@ -27,6 +27,7 @@
 #include <Dialogs.h>
 #include <TextUtils.h>
 #define GLIDE24_ONLY
+#define SYSDEF_2DDRIVER_DEFS
 #endif
 #include <stdlib.h>
 #include <stdarg.h>
@@ -107,9 +108,6 @@ void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 
   MessageBox(NULL, str, "Fatal Error in Glide2xRender.dll", MB_OK);
 #elif defined( OS_MACOS )
-#define kGeneralErrorDialog			1026
-#define kErrorStrings				1025
-#define kFatalErrorInGlide			5
 	Str255	theString;
 	Str255	theString2;
 
