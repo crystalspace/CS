@@ -48,6 +48,11 @@ void GfxWrite (int x, int y, int fg, int bg, char *str, ...)
   Gfx2D->Write (x, y, fg, bg, buf);
 }
 
+csSimpleConsole::csSimpleConsole(iBase *base)
+{
+  CONSTRUCT_IBASE(base);
+}
+
 csSimpleConsole::csSimpleConsole (csIniFile *iConfig, csSimpleCommand* pc) : command_handler(pc)
 {
   config = iConfig;
@@ -465,3 +470,8 @@ void csSimpleConsole::SetupColors (iTextureManager* txtmgr)
   console_fg = txtmgr->FindRGB (console_fg_r, console_fg_g, console_fg_b);
   console_bg = txtmgr->FindRGB (console_bg_r, console_bg_g, console_bg_b);
 }
+
+IMPLEMENT_IBASE(csSimpleConsole)
+  IMPLEMENTS_INTERFACE(iConsole)
+IMPLEMENT_IBASE_END
+

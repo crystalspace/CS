@@ -24,13 +24,13 @@
 #include "sysdef.h"
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"
-#include "cssys/console.h"
 #include "csutil/csrect.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"
 #include "csutil/vfs.h"
 #include "csinput/csinput.h"
 #include "iplugin.h"
+#include "iconsole.h"
 #include "isndrdr.h"
 #include "inetdrv.h"
 #include "inetman.h"
@@ -320,13 +320,13 @@ csSystemDriver::~csSystemDriver ()
   DEREGISTER_DRIVER (Sound, iSoundRender);
   DEREGISTER_DRIVER (NetDrv, iNetworkDriver);
   DEREGISTER_DRIVER (NetMan, iNetworkManager);
+  DEREGISTER_DRIVER (Console, iConsole);
 
 #undef DEREGISTER_DRIVER
 
   // Free all plugins
   PlugIns.DeleteAll ();
 
-  CHK (delete Console);
   CHK (delete Mouse);
   CHK (delete Keyboard);
   CHK (delete EventQueue);
@@ -702,7 +702,7 @@ void csSystemDriver::Printf (int mode, const char* str, ...)
 
     case MSG_CONSOLE:
       if (System && System->Console)
-        System->Console->PutText ("%s", buf);
+        System->Console->PutText (buf);
       else
         console_out (buf);
       break;
@@ -749,9 +749,9 @@ void csSystemDriver::DemoWrite (const char* buf)
     if (ok2d)
       G2D->Clear (0);
 
-    Console->PutText ("%s", buf);
+    Console->PutText (buf);
     csRect area;
-    Console->Print (&area);
+    Console->Draw (&area);
 
     if (area.xmax >= FrameWidth)
       area.xmax = FrameWidth-1;
@@ -856,6 +856,7 @@ bool csSystemDriver::RegisterDriver (const char *iInterface, iPlugIn *iObject)
   CHECK (else, Sound,  iSoundRender)
   CHECK (else, NetDrv, iNetworkDriver)
   CHECK (else, NetMan, iNetworkManager)
+  CHECK (else, Console, iConsole)
   return rc;
 
 #undef CHECK
@@ -879,6 +880,7 @@ bool csSystemDriver::DeregisterDriver (const char *iInterface, iPlugIn *iObject)
   CHECK (else, Sound,  iSoundRender)
   CHECK (else, NetDrv, iNetworkDriver)
   CHECK (else, NetMan, iNetworkManager)
+  CHECK (else, Console, iConsole)
   return false;
 
 #undef CHECK

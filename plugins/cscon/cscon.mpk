@@ -1,0 +1,6 @@
+Name=Crystal Space Console Plugin
+Target=cscon
+Output=cscon
+Path=plugins/cscon
+Type=plugin
+CSLibs=csutil cssys

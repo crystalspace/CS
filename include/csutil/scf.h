@@ -205,6 +205,12 @@ void *Create_##Class (iBase *iParent)					\
 }
 
 /**
+ * The DECLARE_FACTORY macro is used to provide a forward definition 
+ * if IMPLEMENT_FACTORY is declared in another file.
+ */
+#define DECLARE_FACTORY(Class)  void *Create_##Class (iBase *iParent);
+
+/**
  * The shared library loader expects an array of such structures
  * to be exported from each shared library. Usually this is done by
  * implementing a exported function that returns a pointer to that table.

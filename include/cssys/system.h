@@ -32,7 +32,6 @@
 class csEventQueue;
 class csKeyboardDriver;
 class csMouseDriver;
-class csConsole;
 class csIniFile;
 
 struct iGraphics3D;
@@ -41,6 +40,7 @@ struct iNetworkDriver;
 struct iNetworkManager;
 struct iSoundRender;
 struct iConfig;
+struct iConsole;
 
 /**
  * This is the interface to operating system.<p>
@@ -174,7 +174,7 @@ public:
   /// Same as Shutdown but set manually by windowing system
   static bool ExitLoop;
   /// System console
-  csConsole *Console;
+  iConsole *Console;
   /// Debugging level (0 = no debug, 1 = normal debug, 2 = verbose debug)
   static int debug_level;
   /// true if demo console is ready

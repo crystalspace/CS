@@ -1235,6 +1235,7 @@ void start_console ()
   ((csSimpleConsole *)System->Console)->SetTransparent (0);
 
   System->ConsoleReady = true;
+
 }
 
 void WalkTest::EndWorld() {}

@@ -20,7 +20,9 @@
 #ifndef __SIMPCONS_H
 #define __SIMPCONS_H
 
-#include "cssys/console.h"
+#include "isystem.h"
+#include "iconsole.h"
+#include "csutil/csbase.h"
 #include "csutil/scf.h"
 
 struct iTextureManager;
@@ -49,7 +51,7 @@ enum
 /**
  * The console.
  */
-class csSimpleConsole : public csConsole
+class csSimpleConsole : public iConsole
 {
 protected:
   /// Text foreground color
@@ -72,7 +74,9 @@ protected:
   csIniFile *config;
 
 public:
+  DECLARE_IBASE;
   /// Create console object
+  csSimpleConsole (iBase *base);
   csSimpleConsole (csIniFile *iConfig, csSimpleCommand* = 0);
   /// Destroy console object
   virtual ~csSimpleConsole ();
@@ -121,6 +125,11 @@ public:
   /// Set the maximum number of lines (-1 = read from config file)
   void SetMaxLines (int ml = -1);
 
+  /// iConsole compatibility methods
+  virtual bool Initialize(iSystem *system) { return (system->RegisterDriver("iConsole", this)); }
+  virtual void PutText(const char *text) { PutText("%s", text); }
+  virtual void Draw(csRect *rect = NULL) { Print(rect); }
+  virtual void SetBufferSize(int lines) { SetMaxLines(lines); }
 private:
   /// Time left until messages will scroll up
   time_t LineTime;
