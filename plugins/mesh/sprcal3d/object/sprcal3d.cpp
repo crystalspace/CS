@@ -2354,10 +2354,14 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,
       for (j=0; j<mesh->getSubmeshCount(); j++)
       {
         mesh->getSubmesh(j)->setCoreMaterialId((int)mat);
+#ifdef CS_USE_NEW_RENDERER
         csRenderMesh *rm = &renderMeshes[attached_ids[i]][j];
-        rm->material = mat;                   
-      }           
+        rm->material = mat;
+#endif
+      }
+#ifdef CS_USE_NEW_RENDERER
       rmHolder.Clear();
+#endif
       return true;
     }
   }

@@ -17,6 +17,8 @@ chronological order.
 	  do a lot of work. I fixed this by adding a cap to 500 milliseconds
 	  for elapsed time. This is not accurate but it speeds them up
 	  a lot.
+        - Philip Wyett did some horrid #ifdef'ing in the sprcal3d plugin to
+          keep OR build compiling.
 23-Sep-2004
 	- Eric Sunshine augmented configure.ac so that it is no longer a fatal
 	  error for zlib to be missing since that made it unnecessarily
