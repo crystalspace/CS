@@ -27,6 +27,9 @@ Short-term cleanups that need to be done:
 	- Added a lot of sysdef.h to source files. Removed a lot of sysdef.h
 	  from include files. Added tests to decrease the probability of
 	  these errors.
+	- Eric Sunshine unified use of sysdef.h in NeXT system driver.
+	- Eric Sunshine unified use of #include versus #import in NeXT port.
+	  Now #import is only used for NeXT-specific headers.
 	- Change from Wyatt Miler to allow csSoundRenderA3D::PlayEphemeral()
 	  to accept a bool flag for looping the sound. Defaults to false.
 27-Feb-2000
