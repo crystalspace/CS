@@ -299,7 +299,7 @@ fillCol:
 
           mov eax, [fvalue]
           movq [eax], mm1
-          mov eax, [this+tile_full]
+          //mov eax, [this+tile_full] //@@@ illegal
           mov [eax], dl
 
           // restore state
@@ -447,7 +447,7 @@ fillCol2:
 
           mov eax, [fvalue]
           movq [eax], mm1
-          mov eax, [this+tile_full]
+          //mov eax, [this+tile_full] //@@@ illegal
           mov [eax], dl
 
           // restore state
