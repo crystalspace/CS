@@ -1,0 +1,9 @@
+@node Contributing
+@chapter Contributing to Crystal Space
+
+@include contrib/intro.txi
+@include contrib/document.txi
+@include contrib/coding.txi
+@include contrib/cvs.txi
+@include contrib/porting.txi
+@include contrib/todo.txi

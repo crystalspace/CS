@@ -1,0 +1,37 @@
+@node Requirements
+@section Requirements
+@cindex Requirements
+
+To utilize Crystal Space you need at least the following resources:
+
+@itemize @bullet
+@item
+Hardware: A good computer with hardware accelerated graphics is best. What
+you really need depends on the situation (the map file). Just try it.
+
+@item
+Operating System: One of the supported systems. Currently supported
+are: Windows, Unix/Linux, MacOS/X Server, OpenStep, NextStep,
+OS/2, BeOS, Irix, MacOS, and MS-DOS.  An Amiga port of Crystal Space
+also exists, but is not currently usable.
+
+@item
+C++ Development Environment: Crystal Space must be built with a C++
+compiler and other standard development tools.
+
+@item
+The main Crystal Space package:
+In fact you need the compiled library, an example application, and several
+drivers (@file{.DLL} or @file{.so} files). The CS package contains the
+sources for all of them, which means you must compile everything. This
+is explained later.
+
+@item
+One or more map files. These can be downloaded from the CS homepage
+(@uref{http://crystal.linuxgames.com}). They are ZIP files. Do not unzip
+them!  Crystal Space reads ZIP files directly.
+
+@item
+The external libraries @code{zlib}, @code{libjpeg} and @code{libpng}.
+@xref{External Libraries}.
+@end itemize

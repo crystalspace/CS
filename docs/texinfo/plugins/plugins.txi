@@ -1,0 +1,21 @@
+@node PlugIns
+@section Plug-In Modules
+@cindex Plug-In Modules
+
+Plug-in modules provide a means of extending the functionality of Crystal
+Space or an application based upon Crystal Space without having to actually
+modify Crystal Space itself.
+
+This section provides a list of plug-in modules which are bundled with Crystal
+Space.
+
+@include plugins/csclear.txi
+
+@node csPython
+@subsection csPython
+@cindex csPython
+@cindex Python
+@cindex Scripting, Python
+
+The plug-in module brings Python scripting support to Crystal Space.  It is
+currently in an early developmental state.

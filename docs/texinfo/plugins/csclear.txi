@@ -1,0 +1,79 @@
+@node csClear
+@subsection csClear
+@cindex csClear
+@cindex Crystal Clear
+@cindex Plug-In, csClear
+
+@strong{Warning}: This document is out of date.  More recent documentation
+is available in the plain-text file @file{csclear.txt}.  Merge these two
+documents and then rmeove @file{csclear.txt}.
+
+This section covers the Crystal Space Common Layered Animation Resource, or
+the CrystalClear Project. The goal of the CrystalClear project is to help
+speed development of 3D games based on the Crystal Space engine, by Jorrit
+Tyberghein and others. The ability to replace a component library of the
+system with another allows for 3D games of even different genres to share
+code in a consistent way. By using the LGPL, this opens the way for allowing
+even commercial games to be developed with the CrystalClear libraries, and at
+the author's option, be given back to the community without necessarily
+compromising the source of the game itself, should the author choose to not
+to release the source.
+
+There may be other libraries that are not officially part of the CrystalClear
+project, but are CrystalClear compliant and may be used interchangeably with
+the equivalent libraries within the project.  These libraries will have their
+own licensing terms; you will need to check with the documentation of those
+libraries.
+
+More information on the CrystalClear project can be found at @*
+@uref{http://php.indiana.edu/~mdlong/crystalclear}
+
+It is recommended that you join the mailing lists for both CrystalClear and
+Crystal Space itself if you wish to become actively involved with the
+development of CrystalClear. Details on how to join can be found on their
+respective homepages.
+
+The CrystalClear source code is now integrated with the Crystal Space source
+code. It should build along with the rest of CS unless you specify otherwise.
+
+More code is on the way, just be patient.  Or if you don't want to be
+patient, look at the layers specification on the CrystalClear homepage and
+start implementing the libraries for it, or help with existing libraries.
+
+@node csClear structure
+@subsubsection Structure of CrystalClear
+
+Currently, the CrystalClear code consists of the following:
+
+@table @emph
+@item The Entity layer
+@table @code
+@item EntityManager (ccentman)
+The ccEntityManager is the standard implementation for the IEntityManager
+interface. It controls loading and keeping track of Entities, which are
+high level interfaces for game @samp{entities} such as monsters,
+player-characters, etc.
+
+@item Entities
+Entities will be game player characters, npcs, and objects.  They
+will be part of the game application and interact directly with the
+engine. See @file{entity.txt} for a sketch of the Entity hierachy.
+@end table
+
+@item The Impulse Layer
+@table @code
+@item ImpulseManager (ccinman)
+The ccImpulsemanager is the standard implementation for the
+IImpulseManager interface. It controls various ImpulseHandlers and routes
+messages, called impulses, to them.
+
+@item ccinput
+The ccInputPlugin converts keyboard and mouse csEvents into CrystalClear
+impulses. The developer may choose to use csEvents directly, but this is
+provided to allow a consistent messaging interface.
+
+@item ccphysic
+The ccPhysicsPlugin is a low level collision ImpulseTarget. Responds to
+collision impulses, currently only in a limited fashion.
+@end table
+@end table

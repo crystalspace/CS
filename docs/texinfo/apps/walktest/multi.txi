@@ -1,0 +1,44 @@
+@node Console_MultiChoice
+@subsubsection Multi-choice commands
+
+A multi-choice command has one or more possible values. Typing the command
+without arguments will show the current value. Just type the new value after
+the command to change it. Use @samp{next} to switch to the next value and
+@samp{prev} to switch to the previous value. Example:
+
+@itemize @bullet
+@item
+@samp{lightmap}: show the current lightmap setting
+
+@item
+@samp{lightmap reasonable}: set lightmap setting to @samp{reasonable}
+
+@item
+@samp{lightmap next}: use the next value for lightmap setting
+@end itemize
+
+The following multi-choice commands are available :
+
+@table @code
+@item inter
+Choose the size of the interpolation step for simulation of perspective
+correct texture mapping. Default is @samp{smart} which will base the
+selection on the slope of the polygon. This is the fastest option but also
+the lowest quality as there are visible pops when the slope of a polygon
+changes slightly and another interpolation step is selected. Other choices
+are @samp{step8}, @samp{step16}, and @samp{step32} which will set
+interpolation at 8, 16, or 32 steps respectively.
+
+@item mipmap
+Selects when you want mipmapping. There are three possible values:
+@samp{off}, @samp{on}, and @samp{always} (default is @samp{on}). When
+mipmapping is set to @samp{off} there will be no mipmapping. When
+mipmapping is set to @samp{always} the highest level of mipmapping is
+always selected (results in a blurred display).
+
+@item map
+Control the display of the map. @samp{off} (default) is off. @samp{overlay}
+shows the map on top of the current display. @samp{on} shows the map on its
+own. While the map is active, moving with the arrow keys will move the map
+instead of the display.
+@end table

@@ -1,0 +1,132 @@
+@node Tutorial_Introduction
+@section Developing a Crystal Space Application
+
+Crystal Space is a package of components and libraries which can all be useful
+for creating computer games.  Although some of the packages are intended more
+for 3D gaming this is not as such a restriction of the package.  Components as
+the sound driver function just as well in a 2D gaming environment and the
+networking component can even be used in a text oriented environment.  This
+highlights one of the important characteristics of Crystal Space: the
+components and libraries are more or less independent of each other.  If you
+don't want networking, then just don't use the networking drivers.  If you
+don't want scripting then don't include that.  All packages are designed to be
+functional on their own or with a minimal number of other packages.  There are
+some dependencies of course.  For example, the 3D Engine requires a 3D
+Rasterizer to display its output.  On the other hand, you could very well use
+the 3D Rasterizer without the 3D Engine.
+
+Although there is a high level of independence, there is also a high level of
+integration.  The components and libraries were also designed to be used
+together and as such offer a flexible scheme of integration.
+
+If you are interested in developing a program using Crystal Space, then it
+is important to understand that Crystal Space is not a single monolithic
+module, but instead consists of several @dfn{libraries} and
+@dfn{plug-in modules}.  This manual uses the term @dfn{module} for both
+libraries and plug-ins when the distinction between the two is not important.
+
+Libraries and plug-in modules provide facilities to applications.  A quick
+summary of how these facilities may be accessed is presented below.
+
+@table @asis
+@item Libraries
+@itemize @bullet
+@item
+May provide C++ classes, functions and global variables.
+@item
+May define @sc{scf} interfaces.
+@end itemize
+
+@item Plug-In Modules
+@itemize @bullet
+@item
+May only define @sc{scf} interfaces.
+@end itemize
+@end table
+
+An @sc{scf} interface is an abstract contract which specifies a given set
+of messages to which any object which implements that interface may respond.
+It strictly decouple the interface from a module's implementation. This is
+easily done by giving you a pointer to an abstract C++ class. Its members are
+the interface methods, which must all be virtual, and no member variables.
+The implementation of these methods depends on the subclass of the object you
+got, but you don't have to know about it. This has two big advantages:
+
+@itemize @bullet
+@item
+The interface gets a clear structure, which does not depend on the
+implementation
+
+@item
+Several implementations get the same interface. You program is the same no
+matter which implementation you get because it only deals with the interface.
+Different implementations can be chosen at run-time, not compilation time.
+@end itemize
+
+The disadvantage is speed.  @sc{scf} interfaces are a bit slower that C++
+classes, so in some cases it is better to use C++ classes.  This is also
+better when an @sc{scf} interface is a bad solution.  This depends on the
+situation.  For example, the 3d math library, which deals with 3d vectors and
+matrices, can neither provide real interfaces, nor may it waste any time.
+
+Again, a library, like you know it, can make use of both normal C++ classes
+and functions, but it can also use @sc{scf} to provide such an interface.  And
+here is the big difference with plug-ins: They only provide SCF interfaces.
+If your interface is loaded as a dynamic library, you can at run-time exchange
+the implementation of a whole plug-in with another implementation, but the
+interface remains the same.  @sc{dll}s can only be used as plug-ins.
+
+There are actually three ways how a module can interfaced:
+
+@itemize
+@item
+A normal C++ library, like you probably know it. This is useful where speed
+is important. An example for this is the csGeom library.
+
+@item
+A statically linked plug-in. It is linked into the executable, but can only
+be accessed via SCF interfaces. This is just a cleaner way to organize
+statically linked libraries, and can be used if there is only one
+implementation for a plug-in interface. An example for this is the virtual
+file system.
+
+@item
+A dynamically linked plug-in. This is stored as @file{.so} or @file{.dll}
+file. It can only be accessed via SCF interfaces. This is useful when there
+are several implementations for one interface. An example for this is the
+3d rasterizer.
+@end itemize
+
+Both static and dynamic plug-ins are only loaded at startup if the line
+@samp{PluginType=PluginName} can be found in the @code{[PlugIns]} section of
+your config file. You may load only any number of plug-ins for each
+@samp{PluginType}, however in many cases it makes sense to load only a
+single plug-in of a certain type.
+
+Static plug-ins also require the line
+@example
+REGISTER_STATIC_LIBRARY (???)
+@end example
+in one of your C++ files (not inside a function body).
+
+Dynamic plug-ins must also be registered with the SCFReg utility.
+
+An example how @sc{scf} is used: The 3d rasterizer is used to provide polygon
+drawing functions.  Several implementations of this module exist, so it is
+best handled as a plug-in.  The different implementations exist as @sc{dll}s.
+The common interface for them is the abstract class @code{iGraphics3d}.  In
+the config file you tell Crystal Space to load the plugin @file{gl3d.so}.  In
+your main program you ask the system driver for the interface (iGraphics3d),
+and get this abstract class.  Your program does not have to know that the
+implementation of this interface is, in fact, the OpenGL renderer.  Because of
+this you can change the config file to load the sofware renderer instead, but
+you need not change your program.
+
+To sum it up, @sc{scf} is mainly used to provide common interfaces for
+@sc{dll}s, but it can also be used by statically linked libraries.  If you
+want to know how to write a plug-in yourself, you should read @ref{SCF}.
+
+A list of all modules can be found at @ref{Anatomy}.
+
+Now that you have learned some basics about the Crystal Space environment,
+you can try writing your first program.

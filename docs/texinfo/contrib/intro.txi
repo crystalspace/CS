@@ -1,0 +1,32 @@
+The Crystal Space project welcomes contribution from the Open Source
+community.  This is how the project grows and extends its functionality.  We
+accept bug fixes, new code, ideas, etc.
+
+If you have an idea about a new feature, or about the possible
+solution or hints on a bug, but you don't have program code, you should
+contact the mailing list.  @xref{Mailing Lists}.
+
+If you would like to contribute documentation, please read
+@ref{Writing Documentation}.
+
+If you wish to contribute code, you should first read @ref{Coding Style}.  If
+you are a registered Crystal Space developer with write-access to the @sc{cvs}
+repository, then before you commit changes, you should also read
+@ref{CVS Guide}.
+
+If you are not a registered developer, but still have code or bug fixes to
+submit, you can send your code to any developer with write access to the CVS
+repository.  To see which developers have write-access, look at the Crystal
+Space web page on SourceForge (@uref{http://www.sourceforge.net}).  It is also
+acceptable to send small changes or patches to the Crystal Space mailing list.
+If all else fails, you can always send your code to Jorrit Tyberghein
+(@email{Jorrit.Tyberghein@@uz.kuleuven.ac.be}) for inclusion in the project.
+
+If you would like to contribute to the project in general by working on
+features which are missing or lacking, you might want to see the future plans
+list, @ref{Todo}.  You can also contact the mailing list and ask if the Todo
+is up-to-date in that point.
+
+If you want to help with bug fixing, and you have an idea about a bug send a
+message to the mailing list.  If you have an actual fix for a bug, please send
+it to the developers.

@@ -1,0 +1,51 @@
+@node Quick Start
+@section Quick Start
+@cindex Walktest
+@cindex Quick Start
+
+Once you have built the Crystal Space system and its demonstration applications
+you may be eager to test them out.  This section will give you the opprtunity
+to do so without forcing you to wade through an over-abundance of explanations.
+Later sections will describe options and applications in more detail, but
+for now, sit back and have some fun.
+
+The executable for each application and all of its support files must be
+located in the same directory.  The map files are generally be placed in the
+@file{CS/data} directory, but this not a strict requirement.  Please note that
+the map @sc{zip} files should @emph{not} be unpacked.  Crystal Space can read
+files directly.
+
+In this example, we will run @samp{walktest}, the quintessential Crystal Space
+demonstration program.  To run @samp{walktest} with a specific map you have
+two options.  First, you can specify the map name on the command line:
+
+@example
+walktest map
+@end example
+
+Replace @samp{map} with any map file name which you have downloaded and
+placed in your @file{CS/data} directory.  For instance:
+
+@example
+walktest flarge
+@end example
+
+Your other option is to edit the configuration file @file{cryst.cfg} and set
+the @samp{WORLDFILE} variable to the name of the map you wish to use.  For
+instance:
+
+@example
+[World]
+; Start world file
+WORLDFILE=flarge
+@end example
+
+Note that on most platforms Crystal Space currently only supports 256-color
+displays (with a colormap) or 15/16/32-bit truecolor displays, though some
+platforms may be more tolerant and implement provide support for additional
+display depths.
+
+You can also use other command line parameters when running Crystal Space
+applications.  @xref{Common Command Line Options}.  Detailed setup can be done
+in the configuration file.  @xref{Configuration File}.  In-game setup can be
+done via the console.  @xref{Console}.

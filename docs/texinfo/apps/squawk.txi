@@ -1,0 +1,419 @@
+@node Squawk
+@section Squawk
+
+Created by Seth Galbraith (@email{sgalbrai@@krl.org}), also known as
+@emph{The Serpent Lord} (@uref{http://www.planetquake.com/simitar}).
+
+Some programming by Jorrit Tyberghein and Eric Sunshine
+
+MDL models and PNG textures Copyright 1999 by Ulrich Galbraith
+@email{ugalbrai@@krl.org}.
+
+@node Squawk About
+@subsection What it's about
+
+I'm making a multiplayer action role-playing game. Currently this application
+just tests a few ideas:
+
+@itemize @bullet
+@item
+multiple views for split-screen play
+
+@item
+sky box / environment map / background
+
+@item
+animated 3d characters
+@end itemize
+
+@node Squawk Controls
+@subsection Controls
+
+Run @samp{squawk.exe -help} to see command line options
+
+General controls:
+
+@table @key
+@item ESC
+exit program
+
+@item 1
+3 view layout (default)
+
+@item 2
+1 view layout
+
+@item 3
+no margin around views
+
+@item 4
+default margin around views
+
+@item 5
+wide margin around views
+@end table
+
+Upper view:
+
+@table @key
+@item UP
+look up
+
+@item DOWN
+look down
+
+@item LEFT
+look left
+
+@item RIGHT
+look right
+
+@item INS
+roll left
+
+@item DEL
+roll right
+
+@item HOME
+look up and left
+
+@item END
+look down and left
+
+@item PGUP
+look up and right
+
+@item PGDN
+look down and right
+@end table
+
+Lower left view:
+
+@table @key
+@item w
+look up
+
+@item s
+look down (also @key{x})
+
+@item a
+look left
+
+@item d
+look right
+
+@item r
+roll left
+
+@item f
+roll right
+
+@item q
+look up and left
+
+@item z
+look down and left
+
+@item e
+look up and right
+
+@item c
+look down and right
+@end table
+
+Lower right view:
+
+@table @key
+@item i
+look up
+
+@item k
+look down (also @key{,})
+
+@item j
+look left
+
+@item l
+look right
+
+@item y
+roll left
+
+@item h
+roll right
+
+@item u
+look up and left
+
+@item m
+look down and left
+
+@item o
+look up and right
+
+@item .
+look down and right
+@end table
+
+@node Squawk Bugs
+@subsection Known Bugs
+
+@itemize @bullet
+@item
+Edges of sky box polygons visible because of sloppy texture alignment code.
+
+@item
+Sprite polygons vanish when they cross the view plane.
+@end itemize
+
+@node Squawk History
+@subsection History
+
+For developments after September 1999 @xref{History}.
+
+@table @emph
+@item September 29, 1999 Seth Galbraith and Eric Sunshine
+@itemize @bullet
+@item
+Alternate configuration using the @code{-cfg} option
+
+@item
+Sprites can now be loaded from the @file{data/squawk} folder
+@end itemize
+
+@item September 28, 1999 Seth Galbraith
+@itemize @bullet
+@item
+Environment models in @file{.mdl} format by Ulrich Galbraith
+
+@item
+New skybox textures (ugly, meant to be temporary)
+
+@item
+configurable view layout (see @file{squawk.cfg})
+
+@item
+configurable sky textures (see @file{squawk.cfg})
+@end itemize
+
+@item September 27, 1999 Seth Galbraith
+@itemize @bullet
+@item
+gravity flag controls whether a view rotates around the world's Y axis
+
+@item
+enabled lighting for some sprites
+
+@item
+changed the FOV of each view
+
+@item
+added @code{_control87} commands to disable some FPU exceptions
+
+@item
+version 17
+@end itemize
+
+@item September 26, 1999 Seth Galbraith
+@itemize @bullet
+@item
+A lot of restructuring
+
+@item
+Replaced CS sprite with three @file{.mdl} format models
+
+@item
+Changed fixed-size arrays into @code{csVector} subclasses
+
+@item
+Created @code{sqkView} class which contains multiple @code{csViews}
+
+@item
+version 16
+@end itemize
+
+@item September 21, 1999 Seth Galbraith
+@itemize @bullet
+@item
+Jorrit fixed the bug where texture projection was always centered around
+the middle of the screen
+
+@item
+I merged @file{squawk.txt} and @file{history.txt} into this document
+
+@item
+Changed @samp{room} to @samp{skybox} throughout @file{squawk.cpp}
+
+@item
+Added @code{AddViewVertex} method that takes relative coordinates
+
+@item
+two views are now always linked like a single concave view
+
+@item
+the other views are now always independent
+
+@item
+version 15
+@end itemize
+
+@item September 17, 1999 Seth Galbraith
+@itemize @bullet
+@item
+centers of views adjusted depending on whether the views are linked
+
+@item
+replaced sky box textures with big 512x512 JPEG images
+
+@item
+version 14
+@end itemize
+
+@item September 4, 1999 Seth Galbraith
+@itemize @bullet
+@item
+converted all textures to 8 bit PNG format
+
+@item
+disabled lighting and mipmapping for the sky box
+
+@item
+version 13
+@end itemize
+
+@item August 25, 1999  Seth Galbraith
+@itemize @bullet
+@item
+load and display an animated 3d sprite
+
+@item
+version 12
+@end itemize
+
+@item August 4, 1999  Eric Sunshine
+@itemize @bullet
+@item
+fixed problem with handling of texture manager; was allocating palette
+prior to @code{world->Prepare()}, whereas it should have allocated done
+after
+
+@item
+console now latches palette colors before and after world has been
+prepared; thus allowing it to be used at any time, rather than only prior
+to world preparation
+
+@item
+background is now erased prior to activation of 3D views in order to
+clear away console text which incorrectly appeared in gaps between views
+
+@item
+version 11
+@end itemize
+
+@item July 29, 1999  Seth Galbraith
+@itemize @bullet
+@item
+space bar links and unlinks view controls
+
+@item
+allocate palette before creating console
+
+@item
+version 10
+@end itemize
+
+@item July 27, 1999  Jorrit Tyberghein
+@itemize @bullet
+@item
+load textures from @file{squawk.zip}
+
+@item
+version 9
+@end itemize
+
+@item July 26, 1999  Seth Galbraith
+@itemize @bullet
+@item
+named sector (sectors must be named for lighting)
+
+@item
+added console (palette is odd, font too big)
+
+@item
+version 8
+@end itemize
+
+@item July 24, 1999  Seth Galbraith
+@itemize @bullet
+@item
+misc updates based on CVS changes
+
+@item
+moved stuff around, then moved it back :-)
+
+@item
+version 7
+@end itemize
+
+@item July 23, 1999  Seth Galbraith
+@itemize @bullet
+@item
+added terragen environment map textures
+
+@item
+version 6
+@end itemize
+
+@item July 21, 1999  Seth Galbraith
+@itemize @bullet
+@item
+use configuration file @file{squawk.cfg}
+
+@item
+added @code{$(CSSCRIPT.LIB)} to dependencies in @file{squawk.mak}
+
+@item
+version 5
+@end itemize
+@end table
+
+@node Squawk Todo
+@subsection Things remaining to be done
+
+Controls:
+
+@itemize @bullet
+@item
+Better keyboard and mouse handling
+
+@item
+Multiple controls that can be used simultaneously
+
+@item
+Control character rather than camera
+
+@item
+Gamepad and Joystick support
+
+@item
+Chase cameras that follow characters
+@end itemize
+
+Content:
+
+@itemize @bullet
+@item
+@code{SetMixmode(CS_FX_KEYCOLOR)} should make black completely transparent
+for Sprites.
+
+@item
+Sprite transparency effects (alpha, and keycolor) should be configurable in
+world file
+
+@item
+Load some character models and not just scenery. (Can @file{.mdl} files be
+loaded through a library?)
+
+@item
+Dynamic skies (like DDG ROAM program?)
+@end itemize

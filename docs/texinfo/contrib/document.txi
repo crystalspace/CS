@@ -1,0 +1,46 @@
+@node Writing Documentation
+@section Writing Documentation
+@cindex Writing Documentation
+@cindex Documentation, Writing
+
+This section contains guidelines and instructions for writing documentation
+for the Crystal Space project.  Read this section if you are interested in
+contributing to the documentation project.
+
+@emph{FIXME}: This section is very lacking of content.
+
+These guidelines deal with subdivision of the documentation into files, into
+chapters and sections, and with node placing and linking.  To understand this
+document, you should know that 'chapters' is the general division of a Texinfo
+file into several parts, and 'sections' is the next subdivision.  ToC means
+'Table of Contents'.  'folder' and 'directory' means the same.
+
+Please follow these guidelines when writing documentation for Crystal Space.
+
+@itemize @bullet
+@item
+Write documentation using the Texinfo mark-up language.
+
+@item
+The @file{docs/texinfo} directory contains a table-of-contents file named
+@file{cs.txi} and one subdirectory for each chapter.  Each chapter directory
+contains at least one file called @file{chapter.txi}.
+
+@item
+Please restrict the names of documentation files to eight characters with a
+file extension of no more than three characters.  This allows @sc{dos} users
+to access the documentation by respecting @sc{dos}'s 8.3 limitation.
+
+@item
+When creating @code{@@itemize} lists, one blank line should separate each
+@code{@@item} except for short lists of items with short descriptions.
+
+@item
+Do not indent the text of each item within @code{@@itemize} or
+@code{@@table} blocks.  Allow the formatting tools to perform the indentation
+automatically.
+
+@item
+Attempt to keep the content of Texinfo source files under 80-columns in width
+if possible.  This is a general guidelines rather than a hard rule.
+@end itemize

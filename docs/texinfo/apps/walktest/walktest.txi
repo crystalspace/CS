@@ -1,0 +1,14 @@
+@emph{Broken}.
+@node Walktest
+@section Walktest
+@cindex Applications,Walktest
+
+This is the quintessential test application for the project, and the
+application most likely to be up-to-date any time a change is
+made to any part of the project.  Developers probably should not use
+this application as a guide for developing their own programs, as
+it's not the best example in clean coding.
+
+@include apps/walktest/keys.txi
+@include apps/walktest/console.txi
+@include apps/walktest/config.txi

@@ -1,0 +1,69 @@
+@node Blocks
+@section Blocks
+
+Blocks is a small 3D Tetris type game being developed by Jorrit Tyberghein
+using Crystal Space. Though not currently finished, it is still playable. The
+falling blocks are rendered with dynamically updated Gouroud lighting when
+16-bit display mode is in use.
+
+The keyboard controls are:
+
+@table @emph
+@item Camera Movement
+@table @key
+@item 1
+turn camera left
+
+@item 2
+turn camera right
+
+@item 3
+move camera down
+
+@item 4
+move camera up
+
+@item z
+zoom camera
+
+@item Z
+unzoom camera
+@end table
+
+@item Block Movement
+@table @key
+@item a
+rotate block clockwise along X axis
+
+@item s
+rotate block clockwise along Y axis
+
+@item d
+rotate block clockwise along Z axis
+
+@item q
+rotate block counter-clockwise along X axis
+
+@item w
+rotate block counter-clockwise along Y axis
+
+@item e
+rotate block counter-clockwise along Z axis
+
+@item ARROWS
+move block horizontally
+
+@item SPACE
+cause block to fall quickly
+@end table
+
+@item General
+@table @key
+@item p
+pause the game
+
+@item ESC
+quit the game
+@end table
+@end table
+

@@ -1,0 +1,99 @@
+@node Config_World
+@subsubsection @code{[World]} section
+
+The @code{[World]} section contains options for the engine.
+
+@table @code
+@item WORLDFILE=<file>
+Use the specified file as the default world file. Default is @samp{world}.
+Note that you can also specify the world file on the command line.
+
+@item MIXLIGHTS=<value>
+This flag controls how Crystal Space will control the colored lighting.
+Note that Crystal Space uses three lookup tables to control the color of a
+light. How these three lookup tables are defines is set with this flag.
+Note that this setting influences the speed of the texture cache. This
+setting is overridden by the @code{-mixing} commandline option.
+
+@table @code
+@item true_rgb
+The three tables are red, green, and blue. An accurate form of mixing
+is used which makes the texture cache a bit slower. This mode is
+automatically selected if you are running a 16-bit display or running
+with hardware acceleration.
+
+@item nocolor
+There is no colored lighting. This is the fastest way for the texture
+cache. Note that you can also specify this option in the local
+@file{cryst.cfg} file.
+@end table
+
+@item TXTMODE=<value>
+With this option you can control how the textures are managed internally
+independent of the display width. There are three possibilities:
+
+@table @code
+@item global
+The original mode. There is one global 256-color palette and all
+textures are mapped to that palette.
+
+@item private
+Every texture has its own private palette. There is still a global
+256-color palette (and it is computed the same way as with @samp{global})
+but the global palette is only used AFTER lighting has been added.
+
+@item 24bit
+Every texture is represented in full 24-bit. This option is not
+supported yet.
+@end table
+
+The difference between @samp{global} and @samp{private} is
+that with @samp{global} all textures are first mapped onto a global
+palette, then lighting is added (by the texture cache). With
+@samp{private} all lighting is added to the color of the texture and only
+then the conversion to the global palette is made. So @samp{private}
+should give much more accurate colors. @samp{24bit} will give about the
+same quality but will have large textures (24-bit instead of 8-bit) and a
+slightly faster texture cache. This setting is overridden by the
+@samp{-txtmode} commandline option.
+
+@item AMBIENT_WHITE=<ambient>
+Controls the amount of ambient light that is present on all textures even
+if there is no light shining on that. The value ranges from 0 (no white
+light) to 255 (full bright). Default is 40.
+
+@item AMBIENT_RED=<ambient>
+Controls the amount of additional red light that is present on all
+textures. The value ranges from 0 to 255. Default is 0.
+
+@item AMBIENT_GREEN=<ambient>
+Controls the amount of additional green light that is present on all
+textures. The value ranges from 0 to 255. Default is 0.
+
+@item AMBIENT_BLUE=<ambient>
+Controls the amount of additional blue light that is present on all
+textures. The value ranges from 0 to 255. Default is 0.
+
+@item RGB_DIST=<value>
+Control the maximum distance between two colors that is accepted by the
+color allocater before considering two colors from a texture to be the
+same. The color function that is used is:
+@example
+299*dr*dr + 587*dg*dg + 114*db*db
+@end example
+with @code{dr = (r2-r1)}, @code{dg = (g2-g1)} and @code{db = (b2-b1)}.
+The default value is 16333. If you lower this value Crystal Space will try
+to get very close matches for the most occuring values in every texture but
+this may not leave enough empty color slots for the colors that don't occur
+very much. A high value will cause a sloppy matching algorithm.
+
+@item RGB_COL_DIST=<value>
+Control the maximum distance between two colors that is accepted by the
+color allocater. This value is used when allocating colors for colored
+lighting. Crystal Space will try to allocate color cells for all colors
+used in a texture and it will also try to allocate color cells for colored
+versions of those color cells. Default value is 133333. If you lower
+this value, the quality of colored lights may get somewhat better but
+normal lighting for texture will be worse. If you use no colored lighting
+(@code{MIXLIGHTS=nocolor}) this value will not be used.
+@end table

@@ -1,0 +1,38 @@
+@node Concepts
+@chapter Concepts
+@cindex Concepts
+
+This chapter contains conceptual material forming the foundation upon which
+the Crystal Space 3D engine is built.  This information may be of great
+interest to people who wish to learn about higher-level concepts which apply
+to 3D graphics in general, as well specific ideas elements which apply to
+Crystal Space in particular.
+
+@xref{Anatomy}, for complementary and detailed material discussing actual
+implementation of the concepts discussed in this chapter.
+
+@emph{FIXME}: Fill in these sections.  Most of this information currently
+resides in LaTeX format.
+
+@itemize @bullet
+@item
+Cameras and Matrices
+@item
+Warping
+@item
+Octree
+@item
+Texture Cache
+@item
+Texture Mapping
+@item
+Rendering Loop
+@item
+Lighting
+@item
+Defining a World
+@item
+Collision Detection
+@item
+Miscallenous notes requiring classification.  (Jorrit's @dfn{brain dump}.)
+@end itemize

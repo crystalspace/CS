@@ -1,0 +1,26 @@
+@node OSSpecific
+@section Platform Specific Instructions
+
+When working with Crystal Space, always keep in mind, that this is a
+multiplatform project. So sometimes not all features will work correct
+on all platforms. Sometimes a specific port may even be broken due to
+changes in other ports. Since the introduction of CVS this is usually
+only for a short time, so if you got your version out of CVS, it usually
+pays off to post a message describing the problems to the Crystal
+Space Mailing List describing you problem and include the exact error
+messages. If you wait a while, this will probably be fixed, or at least be
+worked around. @xref{Mailing Lists}.
+
+For some ports there is an additional document called
+@samp{Detailed information for @dots{}}. This document explains the inner
+structure of the port to those who want to contribute code for that port.
+
+@include build/platform/unix.txi
+@include build/platform/win32.txi
+@include build/platform/next.txi
+@include build/platform/os2.txi
+@include build/platform/mac.txi
+@include build/platform/beos.txi
+@include build/platform/msdos.txi
+@include build/platform/win32gcc.txi
+@include build/platform/amiga.txi

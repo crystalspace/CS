@@ -1,0 +1,31 @@
+@node Console
+@subsection The Console
+@cindex Console
+
+Walktest provides a console to control the system. Only the Walktest console
+works like described here. Other CS apps can have their own console commands.
+The CS console is, in fact, only a class that provides text input and output
+on top of the 2d rasterizer. The main part in this file describes the command
+handler, which you have to provide in addition to the console. It reacts to
+console commands. Without a command handler, the console will be quiet and
+ignore any input.
+
+Pressing @key{TAB} activates the console. On the console there are several
+commands that you can use to control how Crystal Space works. Several of
+the commands are not directly useful for use from within the console
+but they are attached to keys. There are several kinds of commands:
+General, boolean, value and multi-choice commands.
+
+@quotation
+@emph{FIXME}: The current organization of command documentation is undesirable.
+Command descriptions should be organized from a user perspective rather than
+organized into groups based upon how the command treats arguments.  Most users
+will expect commands to be organized alphabetically, or functionally.  Rather
+than grouping commands by their treatment of arguments, we should provide an
+overview of argument treatment prior to listing commands.
+@end quotation
+
+@include apps/walktest/general.txi
+@include apps/walktest/boolean.txi
+@include apps/walktest/value.txi
+@include apps/walktest/multi.txi

@@ -1,0 +1,158 @@
+@node Amiga
+@subsection Amiga
+@cindex Amiga
+
+@strong{WARNING} The Amiga port of Crystal Space is extremely out of date
+and completely broken.  It has been maintained as part of the standard
+distribution in the hope that someone with Amiga experience will step forward
+to repair and maintain it.
+
+For current status, see the Amiga CS Port support web site at:
+@uref{http://www.weblink.org/weblink/AmigaCS}
+
+Current Minimum Requirements:
+@itemize @bullet
+@item
+Geek Gadgets
+@item
+GCC 2.7.0+
+@item
+ixemul.library 47.3+
+@item
+make 3.75+
+@item
+X11R6.1
+@item
+16MB RAM
+@item
+About 20MB of hard drive space.
+@item
+Several hours and a lot of patience.
+@end itemize
+
+To configure and build Crystal Space on Amiga, follow these instructions:
+
+@itemize @bullet
+@item
+First of all you need to install the Amiga GNU compiler.
+(How to install and get the GNU compiler is not documented here.)
+(See the "Geek Gadgets" CD, or either the @file{dev/gnu} or @file{dev/gg}
+directories on the Aminet for more information.)
+
+@item
+After you installed the GNU compiler you need an assign to
+the GNU compiler.  Put the following assign into your
+s:user-startup if it is not already there:
+
+@example
+Assign gg: <Your path where you have installed the GNU compiler>
+@end example
+
+If you want to change the assign from gg: to something else
+remember to also change it in @file{CS/mk/system/amiga.mak}
+(@code{-Igg:os-include/amiga})
+
+@item
+Unpack the Crystal Space archive in a directory of your choice.
+A directory @file{CS/} will be created for you.
+
+@item
+Unpack the @file{zlib_1.1.1.tgz} archive. Unpack this archive in the
+@file{CS} directory. If you want support for PNG or JPEG you can also
+unpack the @file{libpng.tgz} and the @file{libjpeg.tgz} into the same
+directory as @file{zlib_1.1.1.tgz} (in directory CS). These two aren't
+needed to a working Crystal Space version.
+
+@item
+You need to make the zlib. This is done by compiling the @file{z.lib}
+library. Go to the zlib directory (@file{CS/libs/zlib}) and type
+@example
+sh ./configure
+@end example
+When that is done, type @samp{make}.
+
+If all goes well you will get a @file{libz.a} file. To be sure that
+the zlib file is OK you can also type @samp{make test}.
+Now the zlib will be built and the zlib will be tested to see if
+it has been build correctly.
+
+NOTE: This is the static zlib library.  A shared library is not
+available at this time.
+
+@item
+If you also chose to use the libpng package, you need to copy the
+file @file{makefile.aos} from the @file{CS/libs/cssys/amiga/png/}
+directory to the @file{CS/libs/libpng/} directory if you got the general
+version. If you got the Amiga-specific version, that step is
+unnecessary. Type @samp{make -f makefile.aos} to compile PNG support.
+
+@item
+Currently the libjpeg is untested because I couldn't get it to work.
+
+@item
+You'll need to create dummy (empty) files for the following,
+unless these files actually exist in your installation:
+@example
+GG:include/alloca.h
+GG:include/dlfcn.h
+GG:include/sys/io.h
+@end example
+
+@item
+There are a number of harmless warnings that come from the
+misdefinition of @code{strchr()} / @code{index()} in the Amiga GNU
+distribution, and from implicit typecasting to and from @code{(void *)}.
+
+@item
+Compiling without FPU:
+Set @samp{DO_ASM} to @samp{no} in file @file{CS/mk/user.mak}
+
+@item
+Compiling with FPU:
+Set @samp{DO_ASM=yes} in file @file{CS/mk/user.mak}
+Set @samp{FPUVER=-m68881} in file @file{CS/mk/system/amiga.mak}
+
+@item
+Optimizing for 020, 040, or 060:
+See the @samp{CPUVER} flag comments in @file{CS/mk/system/amiga.mak}
+
+@item
+If you don't have png or jpeg installed set @code{DO_PNG=no} and
+@code{DO_JPG=no} in file @file{CS/mk/user.mak}. The GIF switch is require,
+because without it your program will do nothing.
+
+@item
+Change @samp{DO_SOUND} and @samp{DO_MMX} to @samp{no} in
+@file{CS/mk/user.mak} (Sound isn't currently supported.)
+
+@item
+Before you can compile CS you will need to add an include directory
+where the GNU make can find the Amiga specific includes like
+@file{exec/type.h} etc. This is essental, or @file{Amiga.cpp} and various
+other files will not be compiled. The default is
+@file{GG:os-include/amiga/}, but you can change this in the
+@file{CS/mk/system/amiga.mak} file by changing the path on the
+@samp{INCLUDE_DIRS=} line.
+
+@item
+When you're ready to start making the CrystalSpace project, type
+@samp{make amiga} from the @file{CS} directory.  When that completes,
+you'll need to type @samp{make depend}. After that, type @samp{make} by
+itself to see a list of the options available. You'll need to make all of
+the network drivers, as CS currently requires them all (this will
+change soon).
+
+NOTE: This procedure may not work anymore, as several items
+(notably the software renderer and network drivers) became shared plug-ins
+with the 0.11.058 beta.  I haven't tested the compiles for
+@code{USE_SHARED_PLUGINS=yes} yet, so this might not work.
+
+@item
+This is all that I could think of at the moment, more will be added.
+Any comments will be appreciated.
+@end itemize
+
+Note: Be aware of using an editor who expands the TAB key to spaces.
+Your makefiles won't work correctly if you do. The Amiga standard
+@file{ed} and @file{GOLDED} both do this.  Micro Emacs (@file{memacs})
+that also comes with the Amiga supports tabs correctly.

@@ -1,0 +1,24 @@
+@node PlugIns Drivers
+@chapter Plug-In Modules and Drivers
+@cindex Plug-In Modules and Drivers
+@cindex Modules, Plug-In
+@cindex Drivers
+
+This chapter discusses plug-in modules and drivers which are bundled with
+Crystal Space.  Applications make use of plug-in modules and drivers in order
+to accomplish a variety of tasks such as communicating with 3D display
+hardware or retrieving information about the mouse or keyboard.  Other
+plug-in modules may provide higher-level facilities such as scripting
+language support or a textual console display.
+
+Drivers are actually a subset of the broader classification of plug-in module.
+They are often considered distinct since they provide a lower-level foundation
+upon which higher-level application functionality is built, but the actual
+mechanism by which drivers interact with the application is identical to
+that which is used by all other plug-in modules.
+
+The mechansim by which communication is carried out with plug-in modules
+and drivers is known as @sc{scf}.  @xref{SCF}.
+
+@include plugins/plugins.txi
+@include plugins/drivers.txi

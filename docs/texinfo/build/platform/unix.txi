@@ -1,0 +1,182 @@
+@node Unix
+@subsection Unix
+@cindex Unix
+
+This section covers all Unix and Unix-like platforms which run X-windows.
+Some platforms which use the SVGA library for display on the console
+(sans X-windows) may also be covered.
+
+In general, you can use the instructions in this section to configure and
+build Crystal Space for Linux, BSD, Irix, etc.
+
+Note that the X version of Crystal Space optionally supports the Shared
+Memory Extension (SHM). This makes Crystal Space run much faster if your
+server supports it (Crystal Space should also support DGA but this is not
+yet the case).
+
+By default Crystal Space assumes that your server supports SHM. It will
+automatically auto-detect if your server doesn't support it. So you can
+safely leave it enabled.
+
+@node Unix Editing the Makefile
+@subsubsection Editing the Makefile
+
+The file @file{user.mak} (which you can find in @file{CS/mk}) is normally
+the only makefile that you should worry about. Edit it and see if all
+options are suitable for you.
+
+Some important options in @file{user.mak} are:
+
+@table @code
+@item DO_ASM=... (possible values: 'yes' or 'no')
+With this option you can disable all assembler optimizations
+present in CS. Note that there is currently only assembler currently
+for Intel so this option has no effect otherwise.
+The default for this option is @samp{yes} if you are compiling for
+optimization (see above option). Otherwise it is @samp{no} (because
+debugging interferes with the assembler).
+
+@item DO_SHM=... (possible values: 'yes' or 'no')
+When this option is set to @samp{yes}, CS will be linked with the XSHM
+(Shared Memory Extension) libraries. This option is set to @samp{yes}
+in all system dependent makefiles that require it. There is not
+much reason to set this option to @samp{no} because Crystal Space can
+check at runtime if the XSHM option is present or not. The only
+reason to disable it is if you don't have the libraries installed
+on your system (which should not happen often).
+
+@item DO_PNG, DO_GIF, DO_TGA, and DO_JPG (possible values: 'yes' or 'no')
+The @samp{DO_PNG} and @samp{DO_JPG} options are explained above.
+@samp{DO_GIF} and @samp{DO_TGA} are for controlling GIF and TGA graphics
+file loading. Do not disable @samp{DO_GIF} since all current level contain
+GIF files. It is not useful to disable @samp{DO_TGA} because it does not
+need any external library and it does not require much code in CS.
+
+@item MEM=...
+This is a flag which is definitelly not for the beginner. It enables
+a memory debugger which is in Crystal Space. Use only if you know
+what you are doing.
+@end table
+
+@node Unix Compiling
+@subsubsection Compiling on Unix
+
+The makefiles require GNU make, which is typically named @file{make} on most
+systems.  If this is not the case then substitute @file{gmake}, @file{gnumake}
+or whatever GNU make is called on your system.
+
+It is NOT possible to make Crystal Space using any other makefile
+(unless by doing so manually).
+
+First you need to configure the makefiles for your system. If you are
+using Linux, for example, you can do this as follows:
+
+@example
+make linux USE_SHARED_PLUGINS=yes
+@end example
+
+This indicates that we are going to compile for Linux and use dynamic
+linking (preferable). If you don't want to use the dynamic libraries you
+can set @code{USE_SHARED_PLUGINS=no}. That will generate one big executable.
+
+Optionally you can now do:
+
+@example
+make depend
+@end example
+
+To make sure that all dependencies are correct. This is only important
+if you intend to make changes to the sources and want to be sure that
+all files will be recompiled that are in need of recompiling.
+
+Then you need to do the following:
+
+@example
+make apps
+@end example
+
+If you selected @code{USE_SHARED_PLUGINS=yes} then this will generate an
+executable and drivers (extension @file{*.so} on Linux and most Unix
+platforms) for the software renderer, a 2D driver, and some network drivers.
+If you selected @code{USE_SHARED_PLUGINS=no} then only the executable is
+generated and the drivers are contained in that executable.
+
+If you selected @code{USE_SHARED_PLUGINS=yes} then you may need to register
+the drivers with the SCF system.  This generally only needs to be done once.
+The registration information is maintained in the file @file{scf.cfg}.
+However, typically this file is already up-to-date, so usually you can skip
+this step altogether. Only perform this step if the system is unable to
+locate the drivers or if you are actively developing a driver and changing
+registration information. The program to register plug-ins is called scfreg,
+and it was also compiled by @samp{make all}. To run it, type:
+
+@example
+./scfreg *.so
+@end example
+
+If all is well this should register all drivers so that Crystal Space will be
+able to load them dynamically.  If your platform uses a file extension other
+than @file{*.so} for plug-in modules, then alter the command appropriately.
+This step is not needed when @code{USE_SHARED_PLUGINS=no} is specified.
+
+Now you can run the executable @file{walktest}.
+
+@node Unix Other2d3d
+@subsubsection Compiling with other 3D and 2D drivers
+
+The makefiles are normally configured only for the software renderer
+and some default 2D driver. Here are some other options:
+
+@itemize @bullet
+@item
+OpenGL with X11
+
+@item
+Glide with X11
+
+@item
+Software with SVGALIB
+
+@item
+Software with GGI
+@end itemize
+
+To compile those drivers edit @file{libs/cssys/unix/linux.mak} (or one of the
+other makfiles in that directory) and edit the @samp{DRIVERS} statement so
+that it mentions the drivers you wish to build.  Then do @samp{make all} again
+and register the new drivers.
+
+The software renderer can run with the X11, SVGALIB, or GGI drivers. If
+the @samp{GGI_DISPLAY} environment variable is defined it will choose the
+GGI driver. Otherwise if @samp{DISPLAY} is defined it will choose the X11
+driver. If that fails it will try the @samp{SVGALIB} driver. There is no need
+to recompile the program.
+
+To select another 3D rasterizer you need to edit @file{cryst.cfg} and change
+the @samp{VideoDriver} setting. Or else you can run Crystal Space as follows:
+
+@example
+walktest -video=opengl
+@end example
+
+@node Unix WhereOBJ
+@subsubsection  Where are the Object Files?
+
+The build process places all object files and libraries in the directory
+@file{CS/out}.  This directory contains subdirectories for the operating
+system and processor architecture.  For example, if you compile on Linux
+for Intel with optimization then all object files will end up in
+@file{CS/out/LINUX/INTEL/optimize}.  However if you compile on a Solaris
+system for Sparc with debugging enabled then all objects files end up in
+@file{CS/out/SOLARIS/SPARC/debug}.
+
+The reason for this directory structure is that it simplifies the
+compilation of CS both with and without optimization, as well as when
+using a cross-compiler to generate object files for other processor
+architectures.
+
+Another advantage is for people who share the same directory structure for
+different systems.  For example, if Crystal Space is located on a shared
+directory for both a Solaris system and a Linux system then this
+arrangement allows the package to be built for each system without
+over-writing the other.

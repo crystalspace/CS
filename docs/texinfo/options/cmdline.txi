@@ -1,0 +1,35 @@
+@node Common Command Line Options
+@section Common Command Line Options
+@cindex Common Command Line Options
+@cindex Command Line Options
+@cindex Options, Command Line
+
+All Crystal Space applications respond to a common set of command line
+options.  Many applications define additional options which are specific
+to that particular application.
+
+The most immediately useful command line option which all applications
+respond to is @samp{-help}.  This command list all of the other options to
+which an application responds.
+
+The default setting for each command line option is set internally in the 
+program unless there is a corresponding line for it in the configuration file.  
+For example, normally the default for @code{-gamma} is @code{1.0} (the default 
+brightness level).  But when @code{GAMMA=2.0} is set in configuration file 
+@file{soft3d.cfg} the default will be @code{2.0} instead.  Command line 
+options always override default values.  
+
+Some interesting options to play with are:
+
+@table @code
+@item -mode=640x480
+Use this option to set the size of the display.
+
+@item -video=opengl
+(or direct3d, glide, software, ...).
+Use this option to select type of display driver to use.  Other options
+are @code{software}, @code{glide}, @code{direct3d}, etc.
+
+@item @emph{FIXME}
+Document the remaining common command line options.
+@end table

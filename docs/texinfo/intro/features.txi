@@ -1,0 +1,199 @@
+@node Feature List
+@section Feature List
+@cindex Features
+
+The first feature to mention is that Crystal Space is an open source project.
+It falls under the GNU copyleft license (LGPL). @xref{License}.
+
+Crystal Space is divided into several libraries. The items in the feature
+list are sorted by the library they belong to. Note that this is not a
+description how these libraries work together. Some libraries are even
+not mentioned here.
+
+Currently Crystal Space has the following features:
+
+@table @code
+@item csSys
+A system library that will perform system-dependent operations for your
+program. This way your program is easily portably to any supported system.
+It includes a good plug-in system that offers you an interface to
+dynamically loaded drivers (.so or .dll), like the 3d rasterizer.
+
+@item csGeom
+A 3d math library, including 2d and 3d vectors, matrices and polygons.
+This libary can be used without the rest of Crystal Space.
+
+@item 2d and 3d rasterizer
+These libraries allow you to draw directly on the screen, and to use
+hardware accelerated 3d drawing. They are independent from the engine and
+perform only basic operations. You can actually use them if you want to
+write your own engine. The libraries include:
+
+@itemize @bullet
+@item
+Direct3D, Glide, and OpenGL support in Windows port (in various stages
+of completion :-)
+
+@item
+OpenGL support for BeOS and Linux as well.
+
+@item
+Glide support for Linux (but not yet completely functional).
+
+@item
+Drawing arbitrary sloped convex polygons.
+
+@item
+Perspective correct texture mapping. You can chose between accuracy
+and speed (by selecting the interpolation step).
+
+@item
+Support for 8-bit (palette), 15/16-bit and 32-bit truecolor displays
+(no support for 24-bit yet).
+
+@item
+Mipmapping to minimize memory strain on the texture cache and to have
+nicer textures in the distance.
+
+@item
+The width and height of textures must be a power of two but the
+texture need not be a square.
+
+@item
+It is possible to map the texture on a polygon in various ways
+(rotated, scaled, mirrored, ...).
+
+@item
+Transparent and semi-transparent textures allowing for see-through
+water surfaces and windows.
+
+@item
+Colored volumetric fog.
+
+@item
+Halos around lights.
+@end itemize
+
+@item csEngine
+The 3d engine. It offers all the advatages of the 3d rasterizer
+(see above).It currently has the following features:
+@itemize @bullet
+@item
+True 6DOF engine.
+
+@item
+Moving objects and scripts controlling the movement.
+
+@item
+Static lighting with real shadows. Lighting and shadows are
+precomputed before the world is displayed.
+
+@item
+Colored lighting! There are three different types of lights possible
+(can be controlled with a configuration file). These three light colors
+can be choosen from white, red, green, or blue. A light source can mix
+the three values.
+
+@item
+Pseudo-dynamic colored lights which cannot move but have very accurate
+shadows and can change intensity/color randomly.
+
+@item
+Dynamic colored lighting with support for shadows (Things and sprites
+are ignored currently).
+
+@item
+Support for frame and skeletal based 3D triangle mesh sprites with LOD
+via progressive meshes!
+
+@item
+Portals are used for efficient and easy visibility sorting. In
+addition you can optionally enable a BSP for some sectors to allow for
+even more powerful world definitions.
+
+@item
+Additional C-buffer (coverage buffer) which can be enabled for even
+better visibility culling.
+
+@item
+Using portals you can also create transparent and semi-transparent
+mirrors.
+
+@item
+Alpha transparency in combination with mirrors allows simulation of
+shining walls.
+
+@item
+You can also include gouraud shaded triangle in the world.
+
+@item
+Dynamic gouraud shaded sky spheres.
+
+@item
+Curved surfaces.
+
+@item
+ZIP archive format to pack the world file, the textures and all other
+needed data files for one level inside one file. Crystal Space will also
+use the same ZIP file to automatically add lightmap data. This will
+greatly speed up the startup of Crystal Space.
+
+@item
+Powerful world file format allows you to easily redefine the world
+(but a real editor would be better).
+
+@item
+ZIP libraries with commonly used objects and textures are also supported.
+@end itemize
+
+@item csUtil
+Utility library. These utilities can be extracted and used without the
+other stuff. Includes:
+@itemize @bullet
+@item
+Reading INI files for program options.
+
+@item
+Reading and writing ZIP files as data files.
+
+@item
+Simple parser that you can use if INI files are not enough. It is used
+by the engine to read world files.
+
+@item
+Defining an interface for shared libraries (.so or .dll). This is used
+by the plug-in system.
+
+@item
+Dynamic-size arrays (csVector).
+
+@item
+Virtual file system.
+@end itemize
+
+@item csSndDrv / csSndRdr
+General sound system. Currently drivers are made for Linux, Macintosh,
+and Windows.
+
+@item csNetDrv
+General networking system on Linux, Windows, BeOS, MacOS/X Server,
+OpenStep, NextStep, and OS/2.
+
+@end table
+
+Future plans:
+
+@itemize @bullet
+@item
+2D sprites and alpha-mapped 2D sprites for simulating fog and explosions
+(possibly in combination with a primitive particle system).
+
+@item
+More powerful scripting language.
+
+@item
+More and better hardware accelerator support.
+
+@item
+Support for landscape capabilities and LOD (Level Of Detail).
+@end itemize

@@ -1,0 +1,30 @@
+@node Feedback
+@section Feedback and Bug Reporting
+@cindex Feedback
+@cindex Bug Reporting
+
+If you find a bug in Crystal Space you should
+send a bug report to the Crystal Space mailing list at:
+@email{crystal-main@@lists.sourceforge.net}.
+Try to give as much information as possible:
+
+@itemize @bullet
+@item
+The computer/OS (Windows, DOS, OS/2, Unix, Linux, @dots{})
+@item
+Type of processor (Pentium, SPARC, 680x0, @dots{})
+@item
+The display type (8-bit, 16-bit, 640x480, @dots{})
+@item
+The exact output of Crystal Space
+@item
+How to reproduce the crash (if it is reproducable).
+@item
+A fix for the bug if possible.
+@end itemize
+
+Additionally, you may report bugs via the sourceforge bug reporting
+system.  This is the prefered method, as we can assign someone to fix
+the bug(s), and all the developers can track the progress.  To access
+the bug reporting pages, please see
+@uref{http://sourceforge.net/bugs/?group_id=649}.

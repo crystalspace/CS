@@ -1,0 +1,12 @@
+@node Configuration File
+@section Configuration File
+@cindex Configuration File
+
+Most applications have an accompanying configuration file which describes
+configuration options particular to that application.  In other cases, a
+configuration file may be specific to a particular plug-in module or device
+driver.  Configuration files are named with the file extension @file{.cfg}.
+
+@include options/config/common.txi
+@include options/config/soft3d.txi
+@include options/config/sndsoft.txi

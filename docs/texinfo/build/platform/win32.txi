@@ -1,0 +1,506 @@
+@node Win32
+@subsection Windows
+@cindex Windows
+
+The Windows port of Crystal Space is maintained by
+@email{thieber@@gmx.net, Thomas Hieber}.  Crystal Space supports a wide
+variety of Windows installations and optional technologies such as DirectInput,
+DirectX, and Direct3D.
+
+@node Quickstart
+@subsubsection Quickstart
+
+To compile Crystal Space, you'll have to perform the following steps:
+(Using Microsoft Visual C++ 6.0)
+
+@itemize @bullet
+@item
+If anything doesn't work, @xref{Win32 FAQ}.
+
+@item
+Load @file{mk/visualc/csall.dsw}.
+
+@item
+Make @samp{All Files} your active project.
+
+@item
+Select Menu @samp{Build}, @samp{Rebuild All}.
+
+@item
+After a while you should finish with almost no warnings and no errors.
+
+@item
+Change your settings in @file{cryst.cfg} (included in the Configuration
+Files folder in the CrystalSpace project) to the following (or whatever you
+like more):
+@example
+DRIVER = crystalspace.graphics3d.software
+WORLDFILE = flarge
+@end example
+This will set up CrystalSpace to run in software mode using the worldfile
+@file{flarge}. Make sure that you have downloaded a worldfile from the
+Crystal Space Website before this. These files are in ZIP format and should
+be downloaded to the @file{$/CS/data} directory. Do not attempt to extract
+this archive - Crystal Space decompresses the ZIP file at run time.
+
+@item
+Open @samp{Project}, @samp{Settings}, select walktest on the left list.
+Select the @samp{Debug} tab in the register, select category @samp{general}
+and enter the the same directory the exe sits in as workdirectory. If the
+executable would be in @file{E:\cvs\Cs\walktest.exe}, you should select
+@file{E:\cvs\Cs\} as working directory. Make sure you do these settings for
+@samp{Win32 Debug} and @samp{Win32 Release} (Using the combobox on top of
+the left list). Then confirm the settings by pressing OK. Now select
+@samp{WalkTest files} in the Workspace files tab, click the right mouse
+button and select @samp{Set as active project}. Now call @samp{Build},
+@samp{execute walktest.exe}. Alternatively, you can switch to the windows
+explorer and call walktest.
+
+@item
+Enjoy :-)
+@end itemize
+
+@node Workspace
+@subsubsection Workspace
+
+The Crystal Space workspace is divided into several projects. They
+all exist as separate project files (@file{*.dsp}). All of them are being
+bound together by a workspace. You can choose either @file{csall.dsw} or
+@file{csexperimental.dsw}. This workspace will also ensure correct linking
+between the various projects, so you need to use a predefined workspace or,
+if you create your own, you will have to set project dependencies right.
+
+Currently the project files are created by using MS Visual C++ 6.0. I can't
+tell you anything about other compilers or other versions of MSVC, because
+6.0 is the only version I have at home. (It was reported, that for using
+MSVC 5.0 you could use the project files, but would have to create a new
+workspace.)
+
+The libraries :
+@table @samp
+@item CsWs
+The window manager library (need for Mazed editor)
+
+@item CSpace
+The static linked library, which includes the majority of the code
+
+@item csgame
+A library intended to make creation of games simpler by providing a more
+game oriented API of the engine.
+@end table
+
+The drivers:
+@table @samp
+@item SoftwareRender
+The SoftwareRender DLL, which includes the 3D graphics driver for software
+rasterization. This is loaded by the CrystalSpace EXE.
+
+@item Direct3D5Render
+The Direct3D Dx5 Render DLL, which includes the 3D graphics driver for
+Direct3D-accelerated rasterization. This is loaded by the CrystalSpace EXE.
+
+@item Direct3D61Render
+The Direct3D Dx6.1 Render DLL, which includes the 3D graphics driver for
+Direct3D-accelerated rasterization. This is loaded by the CrystalSpace EXE.
+
+@item Glide2xRender
+The Glide2x Render DLL, which includes the 3D graphics driver for
+Glide-accelerated rasterization. This is loaded by the CrystalSpace EXE.
+
+@item Glide3xRender
+The Glide3x Render DLL, which includes the 3D graphics driver for
+Glide-accelerated rasterization. This is loaded by the CrystalSpace EXE.
+(Not yet working, and therefore not included in csall workspace)
+
+@item OpenGLRender
+The OpenGLRender DLL, which includes the 3D graphics driver for
+OpenGL-accelerated rasterization. This is loaded by the CrystalSpace EXE.
+
+@item DirectDraw2D
+The DirectDraw Dx3 Graphics DLL, which includes the 2D graphics layer for
+DirectDraw screen devices. This is loaded by the CrystalSpace EXE.
+
+@item DirectDraw2D6dx61
+The DirectDraw Dx6.1 Graphics DLL, which includes the 2D graphics layer
+for DirectDraw screen devices. This is loaded by the CrystalSpace EXE.
+Tt's Dx6.1 compatible and used by Direct3D Dx6.1 Render.
+
+@item SoundDriverWaveOut
+A simple sound driver.
+
+@item SoundRenderA3D
+A special 3D sound render. To use this, you will need the according SDK,
+which I don't have, so I don't know if this project will even compile.
+Normally you will unload that project.
+
+@item SoundRenderEAX
+A special 3D sound render. To use this, you will need the according SDK,
+which I don't have, so I don't know if this project will even compile.
+Normally you will unload that project.
+
+@item SoundRenderDS3D
+A DirectX 3D sound driver.
+
+@item NetworkDriverSock
+The BSD Sockets network Driver, This is loaded by the CrystalSpace EXE.
+
+@item NetworkManagerSimple
+Dummy Network Manager. (The network manager is an layer above simple
+network services and offers more game oriented functions)
+@end table
+
+The applications:
+@table @samp
+@item WalkTest
+A walktest application, which includes key handling and such.
+
+@item MazeD
+An editor. (Almost working, but progressing much slower, than the CS
+engine.)
+
+@item PrimEdit
+An editor. (No project file inlcuded, because that project is dead. You
+might want to reanmite it anyway.)
+
+@item Simple
+A simple (minimum) CyrstalSpace application.
+
+@item map2cs
+A convertor to convert Quake map files to Crystal Space. See docs\map2cs
+for details.
+
+@item phyztest
+An application to show some of the abilitites of the CS physics system.
+
+@item Blocks
+A simple 3D tetris clone.
+
+@item shooter
+A simple first person shooter demo. (using csgame)
+@end table
+
+@node Win32 FAQ
+@subsubsection FAQ
+
+@itemize @bullet
+@item
+General Questions
+@table @code
+@item How do I compile Crystal Space using Visual C++ 5.0?
+MSVC 5.0 should work, if you have installed the latest Service Release,
+and the necessary SDK's (esp. DirectX. You will need at least the
+DirectX 5.0 SDK. The DirectX runtime version, that is usually bundled
+with games will not be enough!). It should be enough to follow the
+steps described in this doc. If you have further questions, you might
+want to contact Brad 'GreyBear' Davis (@email{jbdavis@@uswest.net}), as
+he has recently reported successful compilation of CS, using MSVC 5.0.
+
+@item How do I compile Crystal Space using Visual C++ 6.0?
+@xref{Quickstart}. Be sure to do exactly what is written there.
+If that doesn't work, read on. :-)
+@end table
+
+@item
+Compilation Time
+@table @code
+@item I get errors like :
+@example
+\..\libs\cs2d/ddraw61/ig2d.h(14) : error C2061: syntax error :
+identifier 'LPDIRECTDRAW4' 
+..\..\libs\cs2d/ddraw61/ig2d.h(16) : error C2061: syntax error : 
+identifier 'LPDIRECTDRAWSURFACE4'
+@end example
+You don't have installed the correct DirectX SDK. (Or have not installed
+it properly, which means manual adjustment of the library and include
+directorys in MSVC.) Either install the SDK correctly or unload the
+DirectX 6.1 related projects.
+
+@item Where are those damn zlib.h, png.h or jpeglib.h files?
+Those files are not part of the Crystal Space project, but they are required
+to build it. You must get a version of the following packages: ZLIB and
+LIBPNG. Those packages can be easily found on the net.@*
+The latest version of the ZLIB sources are at: @*
+@uref{ftp://ftp.uu.net/graphics/png/src}@code{/zlib???.zip} @*
+The latest version of the LIBPNG sources are at: @*
+@uref{ftp://ftp.uu.net/graphics/png/src}@code{/lpng???.zip} @*
+The latest version of the JPEGLIB sources are at: @*
+@uref{ftp://ftp.uu.net/graphics/png/src}@code{/jpeglib???.zip} @*
+To make things easier you can download precompiled DLL's and lib's for
+Windows at Jorrit Tyberghein's homepage:
+@uref{http://crystal.linuxgames.com}
+
+Check for libdlls.zip and read the included readme. This is the
+recommended way. For CS Version 0.13 the locatation for the zlib files
+has changed. But there are still some old versions of libdlls.zip
+floating around. You can either download an up to date version from my
+homepage: @uref{http://members.xoom.com/thieber/libdlls13.zip}.
+If everything works alright the files should be in the following places:
+@example
+CS\libjpeg.dll
+CS\png.dll
+CS\zlib.dll
+CS\include\cssys\win32\jconfig.h
+CS\include\cssys\win32\jerror.h
+CS\include\cssys\win32\jinclude.h
+CS\include\cssys\win32\jmorecfg.h
+CS\include\cssys\win32\jpeglib.h
+CS\include\cssys\win32\png.h
+CS\include\cssys\win32\pngconf.h
+CS\include\cssys\win32\zconf.h
+CS\include\cssys\win32\zlib.h
+CS\libs\cssys\win32\zlib.lib
+CS\libs\cssys\win32\png.lib
+CS\libs\cssys\win32\libjpeg.lib
+@end example
+This is in fact the most common reason for not being able to compile CS,
+so make sure, that you installed the files to the right places.
+
+@item Will I need to install additional SDK's?
+If you are using MSVC 6.0 (as I highly recommend), you have all needed
+headers and libraries for DirectX 5 and OpenGL installed. If you want
+to use Glide, EAX, A3D or DirectX 6, you will have to download the SDK's
+from their according sites. If you want just to build Crystal Space using
+those API', but don't need any docs or samples, you can get a mimum
+version of these API's from NooTe's homepage. Take a look at:
+@uref{http://www.multimania.com/noote/CrystalSpace}
+in the Sources section. You will need a3d 2.0, eax 1.0 and Glide2x. Of
+course, you can also get the full SDK at Aureal (A3D), CreativeLabs (EAX)
+and 3D/FX (Glide). @*
+You can get the most current DirectX SDK from
+@uref{http://www.microsoft.com} (But they sometimes remove it after a
+while, so you can't be sure)
+@end table
+
+@item Linking Time
+@table @code
+@item Where are the file png.lib and zlib.lib?
+Just look above at the question about @file{zlib.h} and @file{png.h}! It's
+the same problem, and if you have already done what is told there, I can't
+do much for you!
+
+@item I've got unresolved symbols!
+What kind of symbols? @*
+@samp{_png_...}: That means that you don't link the project with
+@file{png.lib}. Just take a look below where it is explained how to
+do so. @*
+@samp{_inflate... and _deflate...}: Well, it seems to your project lacks
+@file{zlib.lib}. The trick is explained just below, so hang on. @*
+@samp{_DirectDraw...}: Idem, but for ddraw.lib (DirectX component), look
+below. @*
+@code{others}: Well, I always have a solution, but this one is more
+difficult. It seems that there is a missing source file in your project.
+But the question is, which source file? If it isn't obvious by the name
+of the functions, just to the following: In the menu @samp{Edit}, select
+the option @samp{Find in Files...}. Put the name of the function in the
+field @samp{Find what}, Check that the @samp{In folder} field content is
+the CrystalSpace src directory and press @samp{Find}. You should get a
+bunch of files, many of them just making a call to the function. But
+there is surely one which contains the definition of the function. Look
+at the position of the file where it is defined, and add it to the
+project (Menu @samp{Project} @samp{Add To Project} @samp{Files}).
+
+In order to add (or remove) a library for the link process, Let's go in
+the menu @samp{Project}, @samp{Settings}, @samp{Link} Tab, @samp{General}
+category. There is a field called @samp{Object/library modules} that
+lists all the libraries added to the project at link time.
+
+OK, Now, it should link. So you should have an executable file called
+@file{walktest.exe} in your src directory. Let's run it!
+@end table
+
+@item Miscallaneous Things
+@table @code
+@item I just get a Black Screen!
+When I start walktest I just get a black screen, maybe with some text
+output, but after a few seconds it drops back to the normal windows
+screen without an error.
+
+This shouldn't happen any more, because in most cases now, walktest
+will display proper error messages. Anyway, you should make
+sure you have set an appropriate directory set. (see above)
+Make sure you have the level given in @file{cryst.cfg} as
+@samp{WORLDFILE=} at the exact location available (also keep in mind,
+that your current directory is, where the executable sits.)
+
+@item I don't care about png support, what can I do?
+It's easy. In the @samp{Project}, @samp{Settings} panel, choose the
+@samp{C/C++} tab, @samp{General} Category, select the field
+@samp{Preprocessor definitions} and remove @samp{DO_PNG}. Be sure to
+remove the @file{png.lib} from the modules added during link time (see
+above).
+
+@item I don't care about Direct3D support.
+Right click on the Direct3DRender project, and click @samp{Unload
+project}. It won't be compiled any longer after that. To reload it, right
+click on it and click @samp{Load Project}.
+
+@item I have a working jpeg library, how can I let CrystalSpace use it?
+Add DO_JPEG in the same place as above. Be sure to create the libjpeg
+directory (with @file{libjpeg.lib}, @file{jpeg.h}, @file{jerror.h},
+@file{jmorecfg.h} and @file{jconfig.h} in it).
+
+@item Broken after Update
+My last update did compile, but now I got a new version and everthing
+seems to be broken.
+
+When working with Crystal Space, always keep in mind, that this is a
+multiplatform project. So sometimes not all features will work correct
+on all platforms. Sometimes a specific port may even be broken due to
+changes in other ports. Since the introduction of CVS this is usually
+only for a short time, so if you got your version out of CVS, it usually
+pays off, to post a message describing the problems to the Crystal
+Space Mailing List describing you problem and include the exact error
+messages. If you wait a while, this will probably be fixed, or at least
+be worked around.
+Instructions on how to contact the Crystal Space mailinglist can be found
+on the Crystal Space homepage. (@uref{http://crystal.linuxgames.com})
+
+@item Problem not solved!
+I compile for the first time, and I have a problem that you haven't solved
+here!
+
+Mail me at @email{thieber@@gmx.net}. You can also try to reach Dan Ogles
+or Noote or send a note to Crystal Space Mailing List Don't forget to
+tell us if you're not a member of that list so that we can then send you
+a personal reply. @xref{Mailing Lists}.
+@end table
+@end itemize
+
+@node Win32 own apps
+@subsubsection Creating own applications
+
+After being able to compile and run, many people want to start creating their
+own applications using Crystal Space. (In fact, this is the main intention of
+the Crystal Space project) So here is a step by step explanation, on how to
+setup a project file for a Win32 application, that uses Crystal Space.
+
+@itemize @bullet
+@item
+Load @file{csall.dsw}.
+
+@item
+Select @samp{File}, @samp{New}, @samp{Project},
+@samp{Win 32 application}.
+
+@item
+Enter a name for your project (For example @file{test}).
+
+@item
+Set the path to @file{E:\cvs\CS\mk\visualc} (or wherever you store
+your CS. Just make sure it ends with @file{visualc}).
+
+@item
+Select @samp{Add to current workspace}.
+
+@item
+Do not select @samp{depenencies}.
+
+@item
+Press @samp{OK}.
+
+@item
+Select @samp{Create an empty project}.
+
+@item
+Select @samp{finish}.
+
+@item
+Select @samp{Project}, @samp{depencencies}.
+
+@item
+Make @samp{test} depend on @samp{cspace}.
+
+@item
+Make @samp{applications} depend on @samp{test}.
+
+@item
+Add @file{Cs\libs\cssys\win32\exeentry.cpp} to the @samp{test} project.
+
+@item
+Add all the remaining files to the project.
+
+@item
+Open the project settings for @samp{test}.
+
+@item
+Select the @samp{C++} tab.
+
+@item
+Select @samp{Win32 Debug}.
+
+@item
+Set Preprocessor Definitions to
+@samp{NDEBUG,_WINDOWS,WIN32,WIN32_VOLATILE}.
+
+@item
+Set Runtime Library to @samp{Multithreaded Debug}.
+
+@item
+Select @samp{Win32 Release}.
+
+@item
+Set Preprocessor Definitions to
+@samp{NDEBUG,_WINDOWS,WIN32,WIN32_VOLATILE}.
+
+@item
+Set Runtime Library to @samp{Multithreaded}.
+
+@item
+Select @samp{All configurations}.
+
+@item
+Set additional include directories to @file{..\..\include\cssys\win32,
+..\..\include,..\..\libs,..\..\support,..\..,..\..\apps}.
+
+@item
+Select the @samp{"Linker} tab.
+
+@item
+Select @samp{"All configurations}.
+
+@item
+Set @samp{Object/ library modules} to @file{kernel32.lib user32.lib
+gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib
+oleaut32.lib uuid.lib odbc32.lib odbccp32.lib zlib.lib png.lib libjpeg.lib
+dinput.lib dxguid.lib}
+
+@item
+Set @samp{additional library path} to @file{..\..\libs\cssys\win32\lib}
+
+@item
+Set @samp{name of output file} to @file{..\..\test.exe}
+
+@item
+Select @samp{General} tab.
+
+@item
+Select @samp{Win32 Debug}.
+
+@item
+Set @samp{Temporary Files} to @file{Debug\test}.
+
+@item
+Set @samp{Output Files} to @file{Debug}.
+
+@item
+Select @samp{Win32 Release}.
+
+@item
+Set @samp{Temporary Files} to @file{Release\test}.
+
+@item
+Set @samp{Output Files} to @file{Release}.
+
+@item
+Select the @samp{Debug} Tab.
+
+@item
+Set @samp{Working directory} to @file{e:\cvs\CS\} (or whereever the
+exe ends up.)
+
+@item
+Save all.
+@end itemize
+
+That should be it. Call @samp{Project},@samp{Build test.exe} and call
+@samp{Project}, @samp{Debug}, @samp{go}.

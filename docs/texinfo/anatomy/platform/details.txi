@@ -1,0 +1,13 @@
+@node Platform_Details
+@section Platform-Specific Details
+@cindex Platform-Specific Details
+@cindex Details, Platform-Specific
+
+This section contains in-depth and detailed platform-specific documentation.
+If you have questions about the port of Crystal Space to a particular
+platform or merely wish to know how it works, this is the information which
+you should read.
+
+@include anatomy/platform/next.txi
+@include anatomy/platform/os2.txi
+@include anatomy/platform/beos.txi

@@ -1,0 +1,53 @@
+@node WhereToGet
+@section Where To Get Crystal Space
+
+The Crystal Space home page.  This page contains the latest development and
+official releases of Crystal Space.  Here is a small note about the
+difference between the official and the development (beta) releases: both
+the official and development versions are actually beta.  The difference is
+that the official release should be more stable and will be easier to get
+working as all documentation and makefiles are up-to-date.  The development
+release will probably have more features but it may not work very well on
+your particular system, it may not work at all, or you might not be able to
+compile it.  But the development release may also work very well.  You never
+know.
+
+Crystal Space Homepage: @uref{http://crystal.linuxgames.com}
+If you want to keep in touch with the latest development of CS you can try to
+access the CVS server.  Have a look at the above page to see how this works.
+
+@node Mailing Lists
+@section Mailing Lists
+@cindex Mailing Lists
+
+There are two mailing lists for the Crystal Space project which may be of
+interest to users and developers.
+
+The first list is the discussion list used for general and in-depth
+discussion of Crystal Space and related projects.
+
+Mailing List: @email{crystal-main@@lists.sourceforge.net}.
+
+To subscribe to this list goto
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-main} and follow
+the instructions there. To unsubscribe goto the same page and follow the
+instructions for unsubscribing.
+
+The second list is for people who are interested in being notified of
+changes which are made to Crystal Space's CVS repository.  A notification
+message is sent to members of this list each time a change is made to some
+resource in the CVS repository.
+
+Mailing List: @email{crystal-cvs@@lists.sourceforge.net}.
+
+To subscribe to this list goto
+@uref{http://lists.sourceforge.net/mailman/listinfo/crystal-cvs} and follow
+the instructions there. To unsubscribe goto the same page and follow the
+instructions for unsubscribing.
+
+
+@node Texture Archive
+@section The Texture Archive
+
+A Crystal Space texture archive is maintained at
+@uref{http://server.empathy.com/crystal}.

@@ -1,0 +1,123 @@
+@node MS-DOS
+@subsection MS-DOS
+@cindex MS-DOS
+
+The DJGPP port of Crystal Space for MS-DOS is maintained by
+@email{sgalbrai@@krl.org, Seth Galbraith}.
+
+If you want to compile and use Crystal Space for DOS using the DJGPP compiler
+(@uref{http://www.delorie.com/djgpp}), you're reading the right document.
+
+@node MSDOS files
+@subsubsection Files you will need
+
+You should use the Crystal Space makefile system to compile Crystal Space.
+This will require some utilities and libraries which are common in Unix-like
+environments but not in DOS.  Here is a list of all of the files you should
+need to compile Crystal Space with DJGPP:
+
+@table @emph
+@item DJGPP development kit
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/djdev201.zip}
+
+@item DJGPP frequently asked questions
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/faq210b.zip}
+
+@item DJGPP DPMI provider
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2misc/csdpmi3b.zip}
+
+@item DJGPP GNU C++ libraries
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/lgp271b.zip}
+
+@item DJGPP GNU help system
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txi390b.zip}
+
+@item DJGPP GNU linker and assembler
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/bnu281b.zip}
+
+@item DJGPP GNU C compiler
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gcc281b.zip}
+
+@item DJGPP GNU C++ compiler
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gpp281b.zip}
+
+@item DJGPP GNU make utility
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/mak375b.zip}
+
+@item DJGPP GNU sed utility
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/sed302b.zip}
+
+@item DJGPP GNU file utilities
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/fil316b.zip}
+
+@item DJGPP GNU text utilities
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txt122b.zip}
+
+@item DJGPP GNU shell utilities
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/shl112b.zip}
+
+@item DJGPP GNU diff utilities
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/dif271b.zip}
+
+@item Compiled zip, jpeg and png libraries
+@uref{ftp://ftp.linuxgames.com/crystal/support/doslibs.zip} @*
+These are needed if the @samp{original} libraries don't work.
+@xref{MSDOS Bugs}.
+
+@item NASM (Netwide Assembler) for DOS
+@uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-dos.zip}
+@end table
+
+@node MSDOS Install
+@subsubsection Installation
+
+@itemize @bullet
+@item
+Unzip the compiled libraries into the same folder where you unzipped Crystal
+Space. (@xref{MSDOS Bugs}.)
+
+@item
+Unzip NASM somewhere.
+
+@item
+If you don't already have a directory for DJGPP, create one.  Unzip all of
+the DJGPP stuff into that directory.
+
+@item
+To use DJGPP you need to set two environment variables. Use this example but
+change the directories to match the directories where you have DJGPP and NASM
+installed:
+
+@example
+SET PATH=c:\djgpp\bin;c:\nasm\bin;%PATH%
+SET DJGPP=c:\djgpp\djgpp.env
+@end example
+
+@item
+Now just CD to your Crystal Space directory, run make and follow the
+instructions.
+@end itemize
+
+@node MSDOS Allegro
+@subsubsection Allegro
+
+If you use Allegro graphics library (and want to use it in Crystal Space),
+you can use an alternative video driver. For this, you will have to add a
+line
+
+@example
+USE_ALLEGRO = yes
+@end example
+
+to config.mak (after configuring as usual).
+
+@node MSDOS Bugs
+@subsubsection Bugs
+
+The compiled libraries didn't work for me, so I made my own. You can download
+them from here:
+@uref{http://asp.planetquake.com/dl/dl.asp?simitar/doslibsb.zip}
+
+Do not unzip the other compiled libraries into your Crystal Space directory.
+(Delete them if you already unzipped them.)  Unzip my version of the compiled
+libraries into your DJGPP directory.

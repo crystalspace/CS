@@ -1,0 +1,12 @@
+@node Options
+@chapter Options
+@cindex Options
+
+Crystal Space is a large project containing many applications and support
+modules.  Many of these facilities can be configured, adjusted, and
+manipulated in various ways to tailor their behavior.  This chapter discusses
+the various options available to you for tailoring Crystal Space's
+configuration.
+
+@include options/cmdline.txi
+@include options/config.txi

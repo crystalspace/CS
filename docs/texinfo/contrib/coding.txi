@@ -1,0 +1,127 @@
+@node Coding Style
+@section Coding Style
+
+For consistency and ease of future maintenance, when working on Crystal Space
+source code, please follow these guidelines.
+
+@table @emph
+@item RULE 1: Indentation
+Indent with two (2) spaces. If you use tabs then they must be interpreted as
+eight (8) spaces. This means that you should not use the tab character for
+indentation since that would indent by eight characters rather than two. Also
+consider avoiding tabs altogether in order to eliminate tab-related problems.
+Here is an example of proper indentation:
+
+@example
+void func ()
+@{
+  int a;
+  for (a = 0 ; a < 10 ; a++)
+  @{
+    int b = 5;
+    if (a < b)
+      printf ("Hello\n");
+  @}
+@}
+@end example
+
+This example also illustrates how to place curly braces and where to add
+spaces, for example @samp{for_(} rather than @samp{for(_}. Also add sufficient
+whitespace between tokens.
+
+@item RULE 2: Class and Method Naming
+Classes should be named in this fashion: @code{csThisIsAClass}. The name
+starts with lower-case @samp{cs} and has every word capitalized.
+
+Methods and functions should be named in this fashion: @code{ThisIsAMethod}.
+Each word in the name is capitalized.
+
+@item RULE 3: Doc++ and Comments
+Use Doc++ comments in header files to document classes, methods, and
+functions. These comments are extracted with the Doc++ tool and @sc{html}
+documentation is generated from them.
+
+@strong{Warning}: Always use Doc++ comments for a class. If you fail to do so
+then Doc++ will ignore comments for methods within the class itself.
+
+A one line Doc++ comment uses three slases (@code{///}) rather than two slashes
+as is typical for normal C++ comments. Multi-line Doc++ comments are specified
+with @samp{/** ... */} rather than @samp{/* ... */}. Here is an example:
+
+@example
+/**
+ * This class represents a blue ball.
+ * Blue balls bounce higher than red balls.
+ */
+class csBlueBall
+@{
+private:
+  // A private function, no Doc++ comment here...
+  // But still we add a comment :-)
+  void PrivateFunction ();
+
+public:
+  /// This is the constructor. Initializes the blue ball.
+  csBlueBall ();
+
+  /**
+   * This is a multiline comment.
+   * And this is the second line of the multiline comment.
+   */
+  void Deflate ();
+@};
+@end example
+
+@item RULE 4: Maximum Line Length (78 Characters)
+Lines in source code should be no longer than 78 characters. This facilitates
+generation of hard-copy and works better with certain tools which process
+code or text files.
+
+@item RULE 5: Multiple-Inclusion Protection for Headers
+Be certain to insert multiple-inclusion protection in all header files. These
+controls should take this form:
+
+@example
+#ifndef __CS_FILENAME_H__
+#define __CS_FILENAME_H__
+...
+#endif // __CS_FILENAME_H__
+@end example
+
+@item RULE 6: @sc{scf} Interfaces
+@sc{scf} interfaces always start with a lower @samp{i}, as in
+@code{iThisIsAnInterface}.
+
+@item RULE 7: Module/library dependencies
+Do not introduce unnecessary dependencies between libaries and modules.
+Absolutely avoid introducing circular dependencies.
+
+For instance, code in the csGeom library should never refer to code from the
+@samp{csEngine} library. The other way around is okay.
+
+@item RULE 8: DOS Filename Restrictions
+Use @sc{dos}-style 8.3 filenames for files which are shared by all platforms
+which run Crystal Space.  This allows the project to support @sc{dos} in
+addition to platforms with less restrictive filenames.  Platform-specific
+files (not intended for @sc{dos}) need not follow this restriction.
+
+@item RULE 9: Include "sysdef.h"
+Always include @file{sysdef.h} in each source file as the very first file
+included.  @emph{Never} include @file{sysdef.h} in header files.
+
+@item RULE 10: Platform Dependencies
+Beware of code that is endian specific.  Key off of the @code{CS_BIG_ENDIAN}
+or @code{CS_LITTLE_ENDIAN} macros if needed.  Avoid unions of bit-sets since
+they can result in endian-related problems.
+
+Beware of code which tries to access values of primitive types at non-even
+memory locations or locations which are not multiples of the type's size,
+since some platforms require @dfn{natural alignment} and will generate faults
+if data is accessed at incorrect locations.
+
+@item RULE 11: Avoid Global Objects With Constructors in Dynamic Load Libraries
+Avoid placing global objects which require automatic construction in
+dynamically loaded libraries. Some platforms fail to call the object's
+constructor at the time the library is loaded. Therefore it is unsafe to rely
+on such objects.
+@end table

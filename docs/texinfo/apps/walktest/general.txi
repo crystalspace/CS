@@ -1,0 +1,247 @@
+@node Console_General
+@subsubsection General commands
+
+General commands, in contrast to other commands, DO something instead of
+changing a variable. How the argument is interpreted depends on the command.
+
+The following general commands are available:
+
+@table @code
+@item quit
+Terminate the application.
+
+@item help
+Give a short list of all commands.
+
+@item capture
+Generate a screenshot in PNG format.
+
+@item cachedump
+Give information about the contents of the texture cache.
+
+@item cacheclr
+Clear the texture cache.
+
+@item activate
+Activate the object that is right in front of you.
+
+@item perftest
+Run a performance test on the current position.
+
+@item coorddump
+Show where the camera is located (sector and position).
+
+@item coordsave
+Save the current position to the @file{coord} file.
+
+@item coordload
+Restore the position from the @file{coord} file. Note that the position
+will always be restored but the orientation of the camera will only be
+restored if @samp{move3d} is set.
+
+@item hi
+Hilight the named polygon in the current sector. If the polygon is not
+found hilighting is disabled. This command is useful for debugging.
+
+@item exec
+Start a script containing console commands. Every line in this script is
+performed one line at a time at every new frame. The console automatically
+closes after executing a succesful @samp{exec} command.
+
+@item coordset
+Set the coordinate of the camera to the given sector and location. Example:
+@samp{coordset room,0,0,0} to restore the position of the camera to the
+starting point.
+
+@item cls
+Clear all messages from the console window.
+
+@item facenorth
+Face the camera to the north.
+
+@item facesouth
+Face the camera to the south.
+
+@item facewest
+Face the camera to the west.
+
+@item faceeast
+Face the camera to the east.
+
+@item facedown
+Face the camera down.
+
+@item faceup
+Face the camera up.
+
+@item cmessage
+Write the specified message to the console.
+
+@item dmessage
+Write the specified message to @file{debug.txt}.
+
+@item dnl
+Write a newline to @file{debug.txt}.
+
+@item version
+Write the current version to the console.
+
+@item about
+Write the current version to the console in a more verbose format.
+
+@item addlight
+Add a dynamic light at the position of the camera. With no arguments the
+color of this dynamic light will be random and the light will move up and
+down slightly. But you can also say @samp{addlight r,g,b,radius,st} for a
+more controlled light. The @samp{st} flag can be 0 or 1. If 1 things will
+also cast shadows.
+
+@item dellight
+Delete the last added dynamic light.
+
+@item dellights
+Delete all dynamic lights.
+
+@item picklight
+@emph{Broken}.
+
+@item droplight
+@emph{Broken}.
+
+@item fire
+Fire a missile in the direction that you are looking. The missile will
+explode when it hits a wall.
+
+@item debug1
+Debug command. The function of this command is undefined but it serves as a
+place-holder for some debugging functionality. A particular version of
+Crystal Space may assign some action to this command but another version
+may remove this action again.
+
+@item debug2
+Debug command. The function of this command is undefined but it serves as a
+place-holder for some debugging functionality. A particular version of
+Crystal Space may assign some action to this command but another version
+may remove this action again.
+
+@item extension
+Perform the specified system specific extension. Currently the X11 port is
+the only port that has extensions (sim_pal, sim_grey, and sim_332). They
+are used when simulating 15/16-bit display mode on a 8-bit display.
+
+@item bind
+Bind a key to a command. The given key can be anything like @key{alt-c},
+@key{shift-pgdn}, @key{home}, @key{ctrl-space},... The command can be
+anything that you can execute in the console. If you only give a key this
+command will show the current command that is bound to that key. If you
+give no parameters then all current key-bindings will be listed. Note that
+if you bind a key which has already been bound then the old key-binding
+will be removed.
+
+@item snd_play
+Play the given @file{wav} file (currently only has effect on Windows) as an
+@samp{ephemeral} wave.
+
+@item s_fog
+If no arguments are given this command will show the fog settings for the
+current sector. Otherwise you can set the fog level for this sector. Syntax
+is @samp{s_fog r,g,b,density}.
+
+@item turn
+Turn arround (so that the camera looks the other way). This command only
+works if @samp{move3d} is enabled.
+
+@item jump
+Jump upwards. Only works if the gravity system is enabled.
+
+@item step_forward
+Move forwards. Uses gravity system if @samp{move3d} is disabled.
+
+@item step_backward
+Move backwards. Uses gravity system if @samp{move3d} is disabled.
+
+@item strafe_left
+Move left. Uses gravity system if @samp{move3d} is disabled.
+
+@item strafe_right
+Move right. Uses gravity system if @samp{move3d} is disabled.
+
+@item look_up
+Look up. Uses gravity system if @samp{move3d} is disabled.
+
+@item look_down
+Look down. Uses gravity system if @samp{move3d} is disabled.
+
+@item rotate_left
+Rotate player left. Uses gravity system if @samp{move3d} is disabled.
+
+@item rotate_right
+Rotate player right. Uses gravity system if @samp{move3d} is disabled.
+
+@item i_forward, i_backward, i_left, i_right, i_up, i_down
+Move. The first argument is 0 or 1. If 1 we will move VERY VERY slowly (for
+debugging). The second argument is 0 or 1. If 1 we will move very fast.
+This command only works if @samp{move3d} is enabled.
+
+@item i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw
+Rotate left or right. The @samp{c} versions rotate along the camera axis.
+The @samp{w} version along the world axis. The first argument is 0 or 1.
+If 1 we will move VERY VERY slowly (for debugging). The second argument is
+0 or 1. If 1 we will move very fast. This command only works if
+@samp{move3d} is enabled.
+
+@item i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz
+Rotate the camera. The first argument is 0 or 1. If 1 we will move VERY
+VERY slowly (for debugging). The second argument is 0 or 1. If 1 we will
+move very fast. This command only works if @samp{move3d} is enabled.
+
+@item addbot
+Add a sprite that moves randomly through the dungeon.
+
+@item delbot
+Remove the last added bot.
+
+@item loadsprite
+Load a sprite from a model file (currently 3DS version 3 and MD2 are
+supported) and add it as a sprite template. Later you can use
+@samp{addsprite} to really add the sprite visually. Parameters are
+@samp{filename}, @samp{templatename}, @samp{texturename}. The texture
+should be one which is already loaded in memory. This is a current
+limitation. The filename represents a file within the VFS directory
+hierarchy.
+
+@item addsprite
+Add a sprite from a template already in memory.
+@samp{addsprite <name>,<size>}. @samp{name} is the name of a sprite
+template which has to be loaded in memory (either from @file{standard.zip}
+or from the level). The @samp{size} is a scale factor for the sprite. The
+sprite is put at the current location.
+
+@item delsprite
+Delete a sprite from the world with the given name.
+
+@item addskel
+Add a skeletal tree (demonstration). The first argument is the depth. A
+depth of 1 will create a root and one layer above. The second argument is
+the width. This is the number of branches created at every depth. A good
+tree is @samp{addskel 3,3}. Be careful with large numbers here. The number
+of triangles grows VERY fast! If the width parameter is negative the
+choosen width will be random between 1 and @code{-width} (inclusive).
+
+@item addghost
+Add a floating transparent green ghost. The first argument is the depth. A
+depth of 1 will create a root and one layer above. The second argument is
+the width. This is the number of arms for the ghost.
+
+@item dumpvis
+This command takes the current view and dumps information for the rendering
+process. You will see what sectors and polygons are rendered and how they
+are clipped. This is useful for debugging purposes. The output comes into
+@samp{debug.txt}.
+
+@item clrlights
+Clear all pseudo-dynamic lights in the world to black.
+
+@item setlight
+Set the color for the selected pseudo-dynamic light to r,g,b.
+@end table

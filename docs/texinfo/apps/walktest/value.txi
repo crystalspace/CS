@@ -1,0 +1,65 @@
+@node Console_Value
+@subsubsection Value commands
+
+A value command has some value associated with it. Typing the command without
+arguments will show the current value. Just type the value after the command
+to change it. Using a @samp{++} or @samp{--} operator before the value will
+increase or decrease the value with the given amount. Example:
+
+@itemize @bullet
+@item
+@samp{gamma}: show current gamma value
+
+@item
+@samp{gamma 1.5}: set gamma to 1.5
+
+@item
+@samp{gamma ++0.05}: increase gamma with 0.05
+
+@item
+@samp{gamma --0.05}: decrease gamma with 0.05
+@end itemize
+
+The following value commands are available:
+
+@table @code
+@item maxpol
+Set/get the maximum number of polygons that is drawn every frame. Normally
+this is set to a very high number so that this maximum is never reached
+(2000000000 polygons every frame should suit everones need for the near
+future :-)  You can reduce this number for debugging purposes. In
+combination with @samp{fclear} and binding keys to @samp{maxpol ++1} and
+@samp{maxpol --1} you can get the effect of drawing one polygon at a time.
+
+@item gamma
+Control the gamma value of the display. A gamma of 1.00 is neutral. 2.00
+(for example) is lighter and 0.5 is darker. Press @key{g} or @key{SHF-g} to
+experiment with this value at render time. This command corresponds with
+the @code{-gamma} commandline option and with the GAMMA configuration
+option.
+
+@item fov
+Control the FOV (Field Of Vision) of the display. By default this is equal
+to the height (in pixels) of the current display. Press @key{f} or
+@key{SHF-f} to experiment with this value at render time. This command
+corresponds with the @code{-fov} commandline option and with the FOV
+configuration option.
+
+@item cosfact
+Control the cosinus factor (default 0) used for lighting. For details,
+@xref{Config_Lighting}.
+
+@item p_alpha
+Change the alpha transparency for a selected portal. You can select a
+portal by clicking on it (only if it already has alpha transparency) or
+else by using the @samp{hi} command. Legal values for p_alpha are between 0
+and 100.
+
+@item snd_volume
+Change the master volume. Value between 0 and 1.
+
+@item lod
+Change the global LOD setting for sprite. 1 is full detail, 0 is no detail
+at all (i.e. you will not see the sprite). -1 is disabled. Any value
+between 0 and 1 is legal. Default is 1.
+@end table

@@ -1,0 +1,47 @@
+@node Anatomy
+@chapter Project Anatomy
+@cindex Anatomy
+
+This chapter dives into the actual anatomy of Crystal Space.  This is where
+you will find detailed descriptions of concrete implementations of concepts
+discussed in the Concepts chapter.  @xref{Concepts}.
+
+@emph{FIXME}: Fill in these sections.  Some of this information currently
+resides in LaTeX format.
+
+@itemize @bullet
+@item
+@anchor{VFS}
+Virtual File System (@sc{vfs})
+@item
+@anchor{SCF}
+Shared Class Facility (@sc{scf})
+@item
+Format of @emph{World} File
+@item
+Makefiles
+@item
+@anchor{CSWS}
+Crystal Space Windowing System (@sc{csws})
+@item
+Importing Foreign Models
+@item
+Memory Debugger
+@item
+Scripting
+@item
+@anchor{csGame}
+Game Library (@code{csgame})
+@item
+@anchor{csGeom}
+Geometry Library (@code{csgeom})
+@item
+@anchor{csUtil}
+Utility Library (@code{csutil})
+@end itemize
+
+@include anatomy/liblist.txi
+@include anatomy/dirhier.txi
+@include anatomy/makefile.txi
+@include anatomy/phyziks.txi
+@include anatomy/platform/details.txi

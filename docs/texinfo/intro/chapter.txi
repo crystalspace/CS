@@ -1,0 +1,29 @@
+@node CS Introduction
+@chapter Introduction
+@cindex Introduction
+
+CrystalSpace is a 6DOF 3D engine, it is not in itself a game and is still
+very much in development.  Everyone who feels inclined can contribute to the
+source. There are several things that still need to be done. For more
+information about what is missing and a list of current known bugs,
+@xref{Todo}.
+
+CrystalSpace is free and should remain free.  CrystalSpace falls under the
+GNU copyleft license for libraries.  To see what this means read the license
+that should be included with this archive. @xref{License}. In short it means
+that you are allowed to use Crystal Space in your products.  You are even
+allowed to sell your product using Crystal Space provided Crystal Space
+itself remains free.
+
+Please read the FAQ if you have a question.  If you don't find the answer
+there you can always E-Mail the mailing lists. @xref{FAQ}, or
+@ref{Mailing Lists}.
+
+@include intro/foreword.txi
+@include intro/features.txi
+@include intro/resource.txi
+@include intro/feedback.txi
+@include intro/genesis.txi
+@include intro/authors.txi
+@include intro/contrib.txi
+@include intro/license.txi

@@ -1,0 +1,27 @@
+@node Config_Common
+@subsection Common Configuration Options
+@cindex Common Configuration Options
+
+This section describes configuration options which are common to most
+Crystal Space applications and which will be found in the configuration files
+for applications but not for plug-in modules or drivers.
+
+@quotation
+@emph{Backward Compatibility Note}:
+Some options specified in configuration files can also be overridden by
+options in a file named @file{cryst.cfg} which actually resides within a map
+archive.  This facility is no longer well-supported and will probably
+disappear or be reengineered in the future.
+@end quotation
+
+Note that every option belongs in some section. Sections are denoted with
+@code{[@var{Section}]} in the config file.
+
+The following sections detail options which apply to all Crystal Space
+applications.
+
+@include options/config/common/plugins.txi
+@include options/config/common/world.txi
+@include options/config/common/video.txi
+@include options/config/common/lighting.txi
+@include options/config/common/console.txi
