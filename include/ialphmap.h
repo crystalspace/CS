@@ -9,16 +9,14 @@ extern const IID IID_IAlphaMapFile;
 
 interface IAlphaMapFile : public IUnknown
 {
-  DECLARE_IUNKNOWN ();
-
   ///
-  STDMETHOD (GetAlphaMapData) (UByte** ppResult);
+  STDMETHOD (GetAlphaMapData) (UByte** ppResult) PURE;
   ///
-  STDMETHOD (GetWidth) (int& nWidth);
+  STDMETHOD (GetWidth) (int& nWidth) PURE;
   ///
-  STDMETHOD (GetHeight) (int& nHeight);
+  STDMETHOD (GetHeight) (int& nHeight) PURE;
   ///
-  STDMETHOD (GetSize) (int& nSize);
+  STDMETHOD (GetSize) (int& nSize) PURE;
 };
 
 #endif // IIMAGE_H

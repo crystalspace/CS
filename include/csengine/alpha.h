@@ -32,29 +32,28 @@ class AlphaMapFile;
 interface IAlphaMapHandle;
 
 /**
- * csTextureHandle represents a texture and its link
- * to the ITextureHandle as returned by ITextureManager.
+ * csAlphaMapHandle implements IAlphaMapHandle.
  */
 class csAlphaMapHandle : public csObject
 {
 private:
   /// The corresponding ImageFile.
-	AlphaMapFile* afile;
-  /// The handle as returned by ITextureManager.
+  AlphaMapFile* afile;
+  /// The handle
   IAlphaMapHandle* alpha_handle;
   // Transparent color
 public:
-  /// Construct a texture handle given a image file
+  /// Construct an alpha-map handle given a image file
   csAlphaMapHandle (AlphaMapFile* alphamap);
   /// Copy contstructor
   csAlphaMapHandle (csAlphaMapHandle &ah);
-  /// Release texture handle
+  /// Release alpha-map handle
   virtual ~csAlphaMapHandle ();
 
-  /// Get the texture handle.
+  /// Get the alph-map handle.
   IAlphaMapHandle* GetAlphaHandle () { return alpha_handle; }
 
-  /// Set the texture handle.
+  /// Set the alpha-map handle.
   void SetAlphaHandle (IAlphaMapHandle* h);
 
   /// Get the ImageFile.
@@ -62,51 +61,5 @@ public:
 
   CSOBJTYPE;
 };
-
-
-/**
- * This class maintains all named textures and their
- * corresponding handles.
- */
-class csAlphaMapList
-{
-private:
-  /// List of textures.
-  csAlphaMapHandle** alphamaps;
-  ///
-  int num_alphamaps;
-  ///
-  int max_alphamaps;
-
-private:
-  ///
-  int GetAlphaMapIdx (const char* name);
-
-public:
-  /// Add a texture
-  void AddTexture (csAlphaMapHandle* tm);
-
-public:
-  ///
-  csAlphaMapList ();
-  ///
-  virtual ~csAlphaMapList ();
-
-  ///
-  void Clear ();
-
-  /// Create a new texture.
-  csAlphaMapHandle* NewAlphaMap(AlphaMapFile* alphamap);
-
-  /// Return number of textures
-  int GetNumAlphaMaps () { return num_alphamaps; }
-
-  /// Return texture by index
-  csAlphaMapHandle* GetAlphaMapMM (int idx) { return alphamaps[idx]; }
-
-  /// Find a texture given a name.
-  csAlphaMapHandle* GetAlphaMapMM (const char* name);
-};
-
 
 #endif /*TEXTURE_H*/

@@ -7,7 +7,7 @@
 extern const IID IID_IAlphaMapHandle;
 
 /** 
- * A texture handle as returned by ITextureManager.
+ * An alpha-map handle.
  */
 interface IAlphaMapHandle : public IUnknown
 {
