@@ -152,10 +152,6 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
     }
     m_pCollisionModel->BuildHierarchy (vertices);
   }
-
-  float dx = object_bbox.MaxX () - object_bbox.MinX ();
-  float dy = object_bbox.MaxY () - object_bbox.MinY ();
-  float dz = object_bbox.MaxZ () - object_bbox.MinZ ();
 }
 
 csRapidCollider::~csRapidCollider ()
