@@ -543,7 +543,6 @@ static void cmd_rmounts (char *args)
   csRef<iStringArray> rpaths = VFS->GetRealMountPaths (args);
   if (rpaths->Length ())
   {
-    bool nl = false;
     for (size_t i=0; i<rpaths->Length (); i++)
     {
       printf ("%s\n", rpaths->Get (i));
