@@ -51,6 +51,7 @@ public:
     realwidth = width; realheight = height;
     this->width = FindNearestPowerOf2( width );
     this->height = FindNearestPowerOf2( height );
+//    printf("nearest: %d %d\n", this->width, this->height);
 //    if ( realwidth < this->width ) this->width >>= 1;
 //    if ( realheight < this->height ) this->height >>= 1;
     CHK( alpha = new unsigned char[ this->width*this->height ] );

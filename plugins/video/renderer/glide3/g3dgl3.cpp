@@ -1349,9 +1349,7 @@ void csGraphics3DGlide3x::CloseFogObject (CS_ID /*id*/)
 iHalo *csGraphics3DGlide3x::CreateHalo (float r, float g, float b, unsigned char *alpha, int width, int height)
 {
   csGlideAlphaMap *am = new csGlideAlphaMap( alpha, width, height );
-  int w, h;
-  am->GetRealDimensions( w, h );
-  csGlideHalo *halo = new csGlideHalo ( r, g, b, w, h, this, am );
+  csGlideHalo *halo = new csGlideHalo ( r, g, b, width, height, this, am );
   return halo;
 }
 

@@ -60,10 +60,12 @@ void csGlideHalo::Draw (float x, float y, float w, float h, float iIntensity,
     int i;
     if (w<0) w = Width;
     if (h<0) h = Height;
-    int rwidth, rheight;
-    am->GetRealDimensions ( rwidth, rheight );
+    int p2width, p2height;
+    am->GetMipMapDimensions ( 0, p2width, p2height );
 
     G3D->m_pAlphamapCache->Add( am, true );
+    TextureHandler &texhnd = ((csGlideCacheData*)am->GetCacheData())->texhnd;
+    
     int screenheight = G3D->GetHeight();
     if ( !iVertices )
     {
@@ -72,10 +74,10 @@ void csGlideHalo::Draw (float x, float y, float w, float h, float iIntensity,
       v[1].x = MAX( 0, x );
       v[2].x = MIN( x + w, G3D->GetWidth() );
       v[3].x = MIN( x + w, G3D->GetWidth() );
-      v[0].y = MAX( 0, y );
-      v[1].y = MIN( y + w, screenheight );
-      v[2].y = MIN( y + w, screenheight );
-      v[3].y = MAX( 0, y );
+      v[0].y = MIN( y + w, screenheight );
+      v[1].y = MAX( 0, y );
+      v[2].y = MAX( 0, y );
+      v[3].y = MIN( y + w, screenheight );
       iVertCount = 4;
     }
     else
@@ -87,20 +89,20 @@ void csGlideHalo::Draw (float x, float y, float w, float h, float iIntensity,
       oldVerts = iVertCount;
     }
 
-    float u_scale = rwidth;
+    float u_scale = p2width;
     u_scale /= Width;
-    float v_scale = rheight;
+    float v_scale = p2height;
     v_scale /= Height;
-    v_scale=u_scale=1.;
     // Build the vertex structure
     for ( i=0; i < iVertCount; i++ )
     {
       vx[i].x = v[i].x ;
       vx[i].y = screenheight - v[i].y ;
       vx[i].oow = 1.f;
-      vx[i].tmuvtx[0].sow = (v[i].x - x) * u_scale;
-      vx[i].tmuvtx[0].tow = (v[i].y - y) * v_scale;
+      vx[i].tmuvtx[0].sow = ((v[i].x - x)/Width) * texhnd.width/u_scale;
+      vx[i].tmuvtx[0].tow = ((v[i].y - y)/Height) * texhnd.height/v_scale;
     }
+
     int ci = (int)(255.0f * (float)iIntensity);
     GlideLib_grConstantColorValue( ( ci << 24 ) | ( R << 16 ) | ( G << 8 ) | B );
     

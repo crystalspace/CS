@@ -395,7 +395,7 @@ void csGlideTextureCache::LoadTex(csGlideCacheData *d, int nMM)
   GrLOD_t lod[nMM];
   d->texhnd.loaded = false;
  
-  if (CalculateTexData ( width, height, 1.0, 1.0, lod, nMM, d ))
+  if (CalculateTexData ( width, height, 1, 1, lod, nMM, d ))
   {
     d->texhnd.info.format=GR_TEXFMT_RGB_565;
     d->texhnd.tmu = m_tmu;
@@ -514,7 +514,7 @@ void csGlideTextureCache::LoadAlpha (csGlideCacheData *d)
   GrLOD_t lod;
   d->texhnd.loaded = false;
  
-  if (CalculateTexData ( width, height, 1.0, 1.0, &lod, 1, d ))
+  if (CalculateTexData ( width, height, 1, 1, &lod, 1, d ))
   {
     d->texhnd.info.format=GR_TEXFMT_ALPHA_8;
     d->texhnd.tmu = m_tmu;
