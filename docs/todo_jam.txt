@@ -9,11 +9,11 @@ W - Wishlist (the build also works without this feature)
 
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
-[H] msvcgen.jam: The overriding LinkWith rule should fully resolve the library
-    dependencies for a target, just as the overridden rule does.  For instance,
-    if "LibDepends D : A B C" has been invoked, then all generated project
-    files which depend upon D should also automatically depend upon A, B, and
-    C.
+[H] msvcgen.jam: The overriding LinkWith rule is not properly resolving the
+    library dependencies for a target.  For instance, if "LibDepends D : A B C"
+    has been invoked, then all generated project files which depend upon D
+    should also automatically depend upon A, B, and C, but this is not
+    happening for some reason (presumably due to a bug in the code).
 [H] msvcgen.jam: Provide rules to copy the generated files back to the source
     tree upon explicit request so that they can be committed to the CVS
     respository if desired.
