@@ -14737,7 +14737,7 @@
                     </texmap>
                 </p>
             </params>
-            <move>
+            <hardmove>
                 <matrix>
                     <m11>0.5</m11>
                     <m12>0</m12>
@@ -14750,7 +14750,7 @@
                     <m33>0.5</m33>
                 </matrix>
                 <v x="-17.8" y="-0.9" z="-0.8" />
-            </move>
+            </hardmove>
         </meshobj>
         <meshobj name="tire2">
             <plugin>thing</plugin>
@@ -15181,7 +15181,7 @@
                     </texmap>
                 </p>
             </params>
-            <move>
+            <hardmove>
                 <matrix>
                     <m11>0.5</m11>
                     <m12>0</m12>
@@ -15194,7 +15194,7 @@
                     <m33>0.5</m33>
                 </matrix>
                 <v x="-17.8" y="-0.9" z="-3.2" />
-            </move>
+            </hardmove>
         </meshobj>
         <meshobj name="tire3">
             <plugin>thing</plugin>
@@ -15625,7 +15625,7 @@
                     </texmap>
                 </p>
             </params>
-            <move>
+            <hardmove>
                 <matrix>
                     <m11>0.5</m11>
                     <m12>0</m12>
@@ -15638,7 +15638,7 @@
                     <m33>0.5</m33>
                 </matrix>
                 <v x="-22.2" y="-0.9" z="-0.8" />
-            </move>
+            </hardmove>
         </meshobj>
         <meshobj name="tire4">
             <plugin>thing</plugin>
@@ -16069,7 +16069,7 @@
                     </texmap>
                 </p>
             </params>
-            <move>
+            <hardmove>
                 <matrix>
                     <m11>0.5</m11>
                     <m12>0</m12>
@@ -16082,7 +16082,7 @@
                     <m33>0.5</m33>
                 </matrix>
                 <v x="-22.2" y="-0.9" z="-3.2" />
-            </move>
+            </hardmove>
         </meshobj>
     </sector>
     <collection name="carCol">

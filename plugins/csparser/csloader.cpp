@@ -2308,6 +2308,17 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
   return true;
 }
 
+// Return true if the matrix does not scale.
+static bool TestOrthoMatrix (csMatrix3& m)
+{
+  // Test if the matrix does not scale. Scaling meshes is illegal
+  // in CS (must be done through hardmove).
+  csVector3 v = m * csVector3 (1, 1, 1);
+  float norm = v.Norm ();
+  float desired_norm = 1.7320508f;
+  return ABS (norm-desired_norm) < 0.01f;
+}
+
 bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
 	csStringID id, bool& handled, char*& priority,
@@ -2650,6 +2661,12 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	  csMatrix3 m;
 	  if (!SyntaxService->ParseMatrix (matrix_node, m))
 	    return false;
+	  if (!TestOrthoMatrix (m))
+	  {
+	    ReportWarning (
+	        "crystalspace.maploader.load.mesh",
+                child, "Scaling of mesh objects is not allowed in CS!");
+	  }
           mesh->GetMovable ()->SetTransform (m);
 	}
 	csRef<iDocumentNode> vector_node = child->GetNode ("v");
@@ -2806,6 +2823,12 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
 	  csMatrix3 m;
 	  if (!SyntaxService->ParseMatrix (matrix_node, m))
 	    return false;
+	  if (!TestOrthoMatrix (m))
+	  {
+	    ReportWarning (
+	        "crystalspace.maploader.load.mesh",
+                child, "Scaling of mesh objects is not allowed in CS!");
+	  }
           mesh->GetMovable ()->SetTransform (m);
 	}
 	csRef<iDocumentNode> vector_node = child->GetNode ("v");
