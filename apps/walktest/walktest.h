@@ -141,6 +141,7 @@ public:
   /// All maps we want to load.
   csMapToLoad* first_map, * last_map;
   int num_maps;
+  csMapToLoad* cache_map;	// If NULL no cache: entry was given.
   /// A script to execute at startup.
   char* auto_script;
 
@@ -416,6 +417,11 @@ public:
    * them (load time execution).
    */
   virtual void ParseKeyCmds ();
+
+  /**
+   * Set the current VFS dir to the given map directory.
+   */
+  bool SetMapDir (const char* map_dir);
 
   /// Draw the frame.
   void SetupFrame ();

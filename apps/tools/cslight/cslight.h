@@ -107,6 +107,13 @@ public:
   iObjectRegistry* object_reg;
   iVirtualClock* vc;
 
+  /**
+   * Set the current VFS dir to the given map_dir.
+   * This routine tries to be smart about mounting the dir.
+   * Returns false on failure.
+   */
+  bool SetMapDir (const char* map_dir);
+
 public:
   Lighter ();
   virtual ~Lighter ();

@@ -197,6 +197,7 @@ WalkTest::WalkTest () :
 
   first_map = last_map = NULL;
   num_maps = 0;
+  cache_map = NULL;
 }
 
 WalkTest::~WalkTest ()
@@ -276,18 +277,30 @@ void WalkTest::SetDefaults ()
     val = Config->GetStr ("Walktest.Settings.WorldFile");
 
   int idx = 0;
+  cache_map = NULL;
   while (val != NULL)
   {
     num_maps++;
     idx++;
     char map_dir[512];
+    csMapToLoad* map = new csMapToLoad;
+
+    // If the given value starts with "cache:" the given location will not
+    // be used as a map file (no loading of 'world' there) but instead the
+    // lightmap cache will be placed there. This cache:xxx.zip can
+    // only occur once (subsequence cache: entries will be ignored).
+    if (cache_map == NULL && strlen (val) > 7 && !strncmp ("cache:", val, 6))
+    {
+      cache_map = map;
+      val += 6;
+    }
+
     // if an absolute path is given, copy it. Otherwise prepend "/lev/".
     if (val[0] == '/')
       strcpy (map_dir, val);
     else
       sprintf (map_dir, "/lev/%s", val);
 
-    csMapToLoad* map = new csMapToLoad;
     map->map_dir = csStrNew (map_dir);
     map->next_map = NULL;
     if (last_map)
@@ -1251,6 +1264,50 @@ static bool WalkEventHandler (iEvent& ev)
   }
 }
 
+bool WalkTest::SetMapDir (const char* map_dir)
+{
+  char tmp[512];
+  sprintf (tmp, "%s/", map_dir);
+  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  if (!myVFS->Exists (map_dir))
+  {
+    char *name = strrchr (map_dir, '/');
+    if (name)
+    {
+      name++;
+      //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
+      //  name, name, name);
+      const char *valfiletype = "";
+      valfiletype = cfg->GetStr ("Walktest.Settings.WorldZipType", "");
+      if (strcmp (valfiletype, "") ==0)
+      {
+        valfiletype = "zip";
+      }
+      char* extension = strrchr (name, '.');
+      if (extension && !strcmp (extension+1, valfiletype))
+      {
+        // The file already ends with the correct extension.
+        sprintf (tmp, "$.$/data$/%s, $.$/%s, $(..)$/data$/%s, %s",
+            name, name, name, name);
+      }
+      else
+      {
+        // Add the extension.
+        sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
+            name, valfiletype, name, valfiletype, name, valfiletype);
+      }
+      myVFS->Mount (map_dir, tmp);
+    }
+  }
+  cfg->DecRef ();
+  if (!myVFS->ChDir (map_dir))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "The directory on VFS for map file does not exist!");
+    return false;
+  }
+  return true;
+}
+
 bool WalkTest::Initialize (int argc, const char* const argv[],
 	const char *iConfigName)
 {
@@ -1514,60 +1571,47 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     // Load from a map file.
     if (num_maps == 1)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.", first_map->map_dir);
+    else if (num_maps == 2 && cache_map != NULL)
+    {
+      if (cache_map != first_map)
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.", first_map->map_dir);
+      else
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.", first_map->next_map->map_dir);
+    }
     else if (num_maps > 1)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...", first_map->map_dir);
+
+    if (cache_map != NULL)
+    {
+      // First we force a clear of the cache manager in the engine
+      // so that a new one will be made soon.
+      Engine->SetCacheManager (NULL);
+      // Then we set the current directory right.
+      if (!SetMapDir (cache_map->map_dir))
+	return false;
+      // And finally we get the cache manager which will force it
+      // to be created based on current VFS dir.
+      Engine->GetCacheManager ();
+    }
 
     // Check the map and mount it if required.
     int i;
     csMapToLoad* map = first_map;
-    for (i = 0 ; i < num_maps ; i++)
+    Engine->DeleteAll ();
+    for (i = 0 ; i < num_maps ; i++, map = map->next_map)
     {
-      char tmp [512];
-      sprintf (tmp, "%s/", map->map_dir);
-      if (!myVFS->Exists (map->map_dir))
+      if (map == cache_map)
       {
-        char *name = strrchr (map->map_dir, '/');
-        if (name)
-        {
-          name++;
-          //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
-          //  name, name, name);
-	  const char *valfiletype = "";
-	  valfiletype = cfg->GetStr ("Walktest.Settings.WorldZipType", "");
-	  if (strcmp (valfiletype, "") ==0)
-	  {
-	    valfiletype = "zip";
-	  }
-	  char* extension = strrchr (name, '.');
-	  if (extension && !strcmp (extension+1, valfiletype))
-	  {
-	    // The file already ends with the correct extension.
-            sprintf (tmp, "$.$/data$/%s, $.$/%s, $(..)$/data$/%s, %s",
-               name, name, name, name);
-	  }
-	  else
-	  {
-	    // Add the extension.
-            sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
-               name, valfiletype, name, valfiletype, name, valfiletype);
-	  }
-          myVFS->Mount (map->map_dir, tmp);
-        }
+	continue;
       }
-
-      if (!myVFS->ChDir (map->map_dir))
-      {
-        Report (CS_REPORTER_SEVERITY_ERROR, "The directory on VFS for map file does not exist!");
-        return false;
-      }
+      if (!SetMapDir (map->map_dir))
+	return false;
 
       // Load the map from the file.
       if (num_maps > 1)
         Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'", map->map_dir);
-      if (!LevelLoader->LoadMapFile ("world", i == 0))	// Only clear for first map.
+      if (!LevelLoader->LoadMapFile ("world", false))
         return false;
-
-      map = map->next_map;
     }
 
     LoadLibraryData ();

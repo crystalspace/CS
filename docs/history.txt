@@ -1,5 +1,17 @@
 The history order is reversed so that new features are at the top.
 
+23-Jul-2002
+	- Both walktest and cslight now support the 'cache:' keyword
+	  on the commandline. If this keyword is given then the lightmap
+	  and other caches will go to that file instead of the usual
+	  map file. This is very useful in combination with multiple
+	  levels. You can now say:
+	  	walktest flarge room cache:test.zip -recalc
+	  which will load flarge and room and then place all cached
+	  lightmaps in test.zip. Similar for cslight.
+	- The engine will now store 'precalc_info' in the cache manager
+	  instead of VFS (as it should have done a long time ago).
+	  It is also now called 'lm_precalc_info'.
 22-Jul-2002
 	- Also extended cslight tool with the ability to load multiple
 	  maps and thus calculate lighting for all maps together. Note that
