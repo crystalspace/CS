@@ -167,7 +167,7 @@ struct iRigidBody : public iBase
   virtual bool AttachColliderCylinder (float length, float radius,
   	const csOrthoTransform& trans, float friction, float density,
 	float elasticity) = 0;
-  virtual bool AttachColliderBox (csVector3 size,
+  virtual bool AttachColliderBox (const csVector3 &size,
   	const csOrthoTransform& trans, float friction, float density,
 	float elasticity) = 0;
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,

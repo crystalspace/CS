@@ -727,7 +727,7 @@ bool csODERigidBody::AttachColliderCylinder (float length, float radius,
   return true;
 }
 
-bool csODERigidBody::AttachColliderBox (csVector3 size,
+bool csODERigidBody::AttachColliderBox (const csVector3 &size,
 	const csOrthoTransform& trans, float friction, float density,
 	float elasticity)
 {

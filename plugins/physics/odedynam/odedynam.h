@@ -248,7 +248,7 @@ public:
   bool AttachColliderCylinder (float length, float radius,
   	const csOrthoTransform& trans, float friction, float density,
 	float elasticity);
-  bool AttachColliderBox (csVector3 size,
+  bool AttachColliderBox (const csVector3 &size,
   	const csOrthoTransform& trans, float friction, float density,
 	float elasticity);
   bool AttachColliderSphere (float radius, const csVector3 &offset,
