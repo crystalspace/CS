@@ -35,7 +35,7 @@ else
   TO_INSTALL.STATIC_LIBS += $(NULLMESHLDR)
 endif
 
-INF.NULLMESHLDR = $(SRCDIR)/plugins/mesh/null/persist/standard/nmeshldr.csplugin
+INF.NULLMESHLDR = $(SRCDIR)/plugins/mesh/null/persist/standard/nullmeshldr.csplugin
 INC.NULLMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/persist/standard/*.h))
 SRC.NULLMESHLDR = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/null/persist/standard/*.cpp))
 OBJ.NULLMESHLDR = $(addprefix $(OUT)/,$(notdir $(SRC.NULLMESHLDR:.cpp=$O)))

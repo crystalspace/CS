@@ -23,6 +23,8 @@ The history order is reversed so that new features are at the top.
 	  option.
 	- Jorrit removed scripts/lua. This was a left-over from the past.
 	- Jorrit removed a mention of the lua plugin from the documentation.
+        - Philip Wyett corrected .csplugin filename in nmeshldr.mak, so
+          nullmeshldr.csplugin is cleaned correctly.
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild
