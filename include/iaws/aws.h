@@ -161,6 +161,9 @@ public:
 
   /// Returns the current flags
   virtual unsigned int GetFlags()=0;
+  
+  /// return object registry
+  virtual iObjectRegistry *GetObjectRegistry ()=0;
 };
 
 

@@ -904,6 +904,12 @@ awsManager::G3D()
   return ptG3D;
 }
 
+iObjectRegistry *
+awsManager::GetObjectRegistry()
+{
+  return object_reg;
+}
+
 void
 awsManager::SetFlag(unsigned int _flags)
 {

@@ -231,6 +231,9 @@ public:
     /// Get the iGraphics3D interface so that components can use it.
     virtual iGraphics3D *G3D();
 
+    /// Get the iGraphics3D interface so that components can use it.
+    virtual iObjectRegistry *GetObjectRegistry();
+
     /// Dispatches events to the proper components
     virtual bool HandleEvent(iEvent&);
 
