@@ -38,6 +38,8 @@ chronological order.
 	  for the `java' and `javac' commands.  This should help to ensure that
 	  the most desirable Java commands are found rather than the least
 	  desirable (which happens to be $WINDIR/system32/java.exe on Windows).
+	- Eric Sunshine made the CS_PATH_NORMALIZE() macro in path.m4 more
+	  robust when faced with shell meta-characters in the argument string.
 24-Oct-2004
 	- Eric Sunshine simplified the 22-Oct-2004 change to DDS loader so that
 	  it no longer Clone()'s the image when returning a mipmap.  It is
