@@ -617,10 +617,13 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       // @@@ We should only alloc the 2D polygon when we need to do it.
       // So this means further down the 'if'.
       p = (csPolygon3D*)polygon[i];
-      if (pvs && !p->IsVisible ())
+      if (pvs)
       {
-        // Polygon is not visible because of PVS.
-        //@@@ CURRENTLY DISABLED continue;
+        if (!p->IsVisible ())
+        {
+          // Polygon is not visible because of PVS.
+          //@@@ CURRENTLY DISABLED continue;
+        }
       }
 
       clip = (csPolygon2D*)(render_pool->Alloc ());
@@ -633,7 +636,8 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
            clip->ClipAgainst (d->view) )
       {
         po = p->GetPortal ();
-        if (csSector::do_portals && po)
+	if (csWorld::current_world->IsPVSOnly ()) visible = true;
+        else if (csSector::do_portals && po)
         {
 	  if (covtree)
             visible = covtree->TestPolygon (clip->GetVertices (),

@@ -188,7 +188,7 @@ void csSector::UseStaticTree (int mode, bool octree)
   {
     csVector3 min_bbox, max_bbox;
     static_thing->GetBoundingBox (min_bbox, max_bbox);
-    CHK (static_tree = new csOctree (this, min_bbox, max_bbox, 150, mode));
+    CHK (static_tree = new csOctree (this, min_bbox, max_bbox, 150/*20*/, mode));
   }
   else
   {
@@ -524,22 +524,21 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   csCBuffer* c_buffer;
   csSolidBsp* solidbsp;
   csCoverageMaskTree* covtree;
-  csRenderView* rview;
+  csRenderView* rview = (csRenderView*)data;
   static csPolygon2D persp;
   csVector3 array[6];
 
   if (csWorld::current_world->IsPVS ())
   {
     // Test for PVS.
-    printf ("%d", onode->IsVisible ()); fflush (stdout);
+    if (!onode->IsVisible ()) { printf ("%d", onode->IsVisible ()); fflush (stdout); }
     if (!onode->IsVisible ()) return false;
-    else if (csWorld::current_world->IsPVSOnly ()) goto vis;
+    else if (csWorld::current_world->IsPVSOnly ()) goto is_vis;
   }
 
   c_buffer = csWorld::current_world->GetCBuffer ();
   solidbsp = csWorld::current_world->GetSolidBsp ();
   covtree = csWorld::current_world->GetCovtree ();
-  rview = (csRenderView*)data;
   int num_array;
   otree->GetConvexOutline (onode, pos, array, num_array);
   if (num_array)
@@ -630,7 +629,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     }
   }
 
-vis:
+is_vis:
   count_cull_node_vis++;
   // If a node is visible we check wether or not it has a minibsp.
   // If it has a minibsp then we need to transform all vertices used

@@ -223,6 +223,8 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   current_camera = NULL;
   current_world = this;
   use_pvs = false;
+  use_pvs_only = false;
+  freeze_pvs = false;
   Library = NULL;
  
   if (!covtree_lut)

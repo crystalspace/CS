@@ -765,32 +765,24 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
   {
     if (node->IsLeaf ()) break;
     const csVector3& center = node->GetCenter ();
-    if (pos.x < center.x)
-      if (pos.y < center.y)
-        if (pos.z < center.z)
-	  node = (csOctreeNode*)node->children[OCTREE_BBB];
-	else
-	  node = (csOctreeNode*)node->children[OCTREE_BBF];
-      else
-        if (pos.z < center.z)
-	  node = (csOctreeNode*)node->children[OCTREE_BFB];
-	else
-	  node = (csOctreeNode*)node->children[OCTREE_BFF];
-    else
-      if (pos.y < center.y)
-        if (pos.z < center.z)
-	  node = (csOctreeNode*)node->children[OCTREE_FBB];
-	else
-	  node = (csOctreeNode*)node->children[OCTREE_FBF];
-      else
-        if (pos.z < center.z)
-	  node = (csOctreeNode*)node->children[OCTREE_FFB];
-	else
-	  node = (csOctreeNode*)node->children[OCTREE_FFF];
+    int cur_idx;
+    if (pos.x <= center.x) cur_idx = 0;
+    else cur_idx = 4;
+    if (pos.y > center.y) cur_idx |= 2;
+    if (pos.z > center.z) cur_idx |= 1;
+    node = (csOctreeNode*)node->children[cur_idx];
   }
 
   // Mark all objects in the world as invisible.
   csOctreeNode::pvs_cur_vis_nr++;
+
+{
+printf ("pos=%f,%f,%f\n", pos.x, pos.y, pos.z);
+csBox3& b = node->GetBox ();
+printf ("b=%f,%f,%f %f,%f,%f\n",
+b.MinX (), b.MinY (), b.MinZ (),
+b.MaxX (), b.MaxY (), b.MaxZ ());
+}
 
   csPVS& pvs = node->GetPVS ();
   int j;
@@ -1162,7 +1154,18 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   else
   {
     bool rc = BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox ());
-    if (rc) printf ("+"); else printf ("-");
+    if (rc) printf ("+");
+    else
+    {
+      printf ("-");
+      const csBox3& lb = leaf->GetBox ();
+      const csBox3& ob = occludee->GetBox ();
+      printf ("\nleaf=%f,%f,%f %f,%f,%f\noccludee=%f,%f,%f %f,%f,%f\n",
+      	lb.MinX (), lb.MinY (), lb.MinZ (),
+      	lb.MaxX (), lb.MaxY (), lb.MaxZ (),
+      	ob.MinX (), ob.MinY (), ob.MinZ (),
+      	ob.MaxX (), ob.MaxY (), ob.MaxZ ());
+    }
     fflush (stdout);
     if (rc) visible = true;
   }
@@ -1547,9 +1550,9 @@ csOctreeNode* csOctree::GetNodeFromPath (csOctreeNode* node,
   int i;
   for (i = 0 ; i < path_len ; i++)
   {
+    if (!node) return NULL;
     node = (csOctreeNode*)node->children[path[i]-1];
   }
-  printf ("\n");
   return node;
 }
 
@@ -1567,8 +1570,18 @@ bool csOctree::ReadFromCachePVS (iFile* cf, csOctreeNode* node)
     csOctreeVisible* ovis = pvs.Add ();
     csOctreeNode* occludee = GetNodeFromPath ((csOctreeNode*)root,
     	buf, b);
+    if (!occludee)
+    {
+      CsPrintf (MSG_WARNING, "Cached PVS does not match this world!\n");
+      return false;
+    }
     ovis->SetOctreeNode (occludee);
     b = ReadByte (cf);
+  }
+  if (ReadByte (cf) != 'X')
+  {
+    CsPrintf (MSG_WARNING, "Cached PVS is not valid!\n");
+    return false;
   }
   int i;
   for (i = 0 ; i < 8 ; i++)
@@ -1619,6 +1632,7 @@ void csOctree::CachePVS (csOctreeNode* node, iFile* cf)
     ovis = pvs.GetNext (ovis);
   }
   WriteByte (cf, 0);	// End marker
+  WriteByte (cf, 'X');	// Just a small check character to see if we're ok.
   int i;
   for (i = 0 ; i < 8 ; i++)
     CachePVS ((csOctreeNode*)node->children[i], cf);

@@ -9,6 +9,8 @@ The history order has been reversed so that new features are at the top.
 	- Added 'pvsonly' command so that you can force visibility culling
 	  to operate ONLY with the PVS and not use any other culling
 	  mechanisms (like c-buffer).
+	- Worked a bit more on PVS. Still not working :-)
+	- Made PVS caching more robust.
 	- Andrew Zabolotny fixed the Software renderer makefile that
 	  Paul broke a little.
 11-May-2000
