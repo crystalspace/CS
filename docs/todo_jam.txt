@@ -11,9 +11,8 @@ W - Wishlist (the build also works without this feature)
     plugin works).
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
-[H] Write complete documentation about the Jam build system for the CS user
-    manual.
 
+[M] Add a Jamfile for cscript/csjava.
 [M] Introduce a new rule named Description and change all invocations of the
     Help rule (except the ones using the "verbatim" option) to invocations of
     the Description rule throughout the project.  Next, remove the "verbatim"
@@ -25,6 +24,8 @@ W - Wishlist (the build also works without this feature)
     msvcgen.jam and win32.jam to utilize the target's decription string (as
     collected by the Description rule) rather than the help string (which is
     not necessarily appropriate as a module's description).
+[M] Write complete documentation about the Jam build system for the CS user
+    manual.
 [M] msvcgen.jam: Eliminate dependency upon external scripts for creation of the
     .rc resources. win32.jam is already capable of performing these tasks
     stand-alone, so it should be possible to do the same for msvcgen.jam,
@@ -36,6 +37,8 @@ W - Wishlist (the build also works without this feature)
     and INITJAMFILE. Would be also nice to extract more of the detection
     scripts in CS (perl, python, nasm, problematic cflags?)
 
+[L] Jorrit reports that with the command "jam -sMODE=profile walktest_static",
+    dynavis/debug/static/dynavis.o gets compiled twice.
 [L] msvcgen.jam: Consider overhauling the "configuration" file handling rule so
     that it associates configuration files with built targets.  This will allow
     the generated projects to reference configuration files.  Rather than the
