@@ -247,7 +247,7 @@ public:
     virtual bool HandleEvent (iEvent& ev)
     { return parent->HandleEvent (ev); }
   };
-  csRef<csODEDynamics::EventHandler> scfiEventHandler;
+  csRef<EventHandler> scfiEventHandler;
 };
 
 class csODEBodyGroup;

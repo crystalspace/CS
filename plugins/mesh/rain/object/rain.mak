@@ -39,7 +39,7 @@ INF.RAIN = $(SRCDIR)/plugins/mesh/rain/object/rain.csplugin
 INC.RAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/rain/object/*.h plugins/mesh/partgen/*.h))
 SRC.RAIN = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/rain/object/*.cpp plugins/mesh/partgen/*.cpp))
 OBJ.RAIN = $(addprefix $(OUT)/,$(notdir $(SRC.RAIN:.cpp=$O)))
-DEP.RAIN = CSTOOL CSGEOM CSUTIL CSUTIL
+DEP.RAIN = CSTOOL CSGEOM CSUTIL CSUTIL CSGFX
 
 MSVC.DSP += RAIN
 DSP.RAIN.NAME = rain

@@ -39,7 +39,7 @@ INF.SPR3D = $(SRCDIR)/plugins/mesh/spr3d/object/spr3d.csplugin
 INC.SPR3D = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/object/*.h))
 SRC.SPR3D = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/spr3d/object/*.cpp))
 OBJ.SPR3D = $(addprefix $(OUT)/,$(notdir $(SRC.SPR3D:.cpp=$O)))
-DEP.SPR3D = CSGEOM CSTOOL CSUTIL CSUTIL
+DEP.SPR3D = CSGEOM CSTOOL CSUTIL CSUTIL CSGFX
 
 MSVC.DSP += SPR3D
 DSP.SPR3D.NAME = spr3d

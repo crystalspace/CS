@@ -276,7 +276,7 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
   mesh.do_mirror = camera->IsMirrored ();  
 
   // set up the data for DrawTriangleMesh
-  for (int i=0; i<ParticleCount; i++)
+  for (i = 0; i<ParticleCount; i++)
   {
     // transform to eye coordinates
     csVector3 pos = trans.Other2This (PositionArray [i]);
