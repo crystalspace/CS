@@ -13,14 +13,18 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 3-Feb-2000
-	- Seth Galbraith changed sprites so that
-	  csSpriteTemplate::MergeTexels is now called when loading
-	  sprite templates.
+	- Seth Galbraith changed sprite loading in csParser so that
+	  csSpriteTemplate::MergeTexels is now called to eliminate duplicate
+	  texel maps.
 	- Eric Sunshine temporarily removed Seth Galbraith's new call to
 	  csSpriteTemplate::MergeTexels() from csLoader since MergeTexels() is
 	  buggy and results in deferred memory corruption at termination time.
 	  The problem is that MergeTexels() causes the merged texels[] arrays
 	  to be deleted multiple times.
+	- Eric Sunshine rewrote several bit-sets used by the terrain engine so
+	  that they are now implemented via safe and portable bit masks rather
+	  than unsafe and unportable unions.  This fixes the known problems
+	  with big-endian machines without resorting to special-case hackery.
 2-Feb-2000
 	- Large update to terrain engine from Alex Pfaffe.
 	    - Now renders 3000 triangles instead of only about 1000.
