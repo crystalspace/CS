@@ -92,9 +92,6 @@ csGraphics3DNull::~csGraphics3DNull ()
   }
 
   Close ();
-  vbufmgr->DecRef (); vbufmgr = NULL;
-  if (G2D)
-    G2D->DecRef ();
 }
 
 bool csGraphics3DNull::Initialize (iObjectRegistry *r)
