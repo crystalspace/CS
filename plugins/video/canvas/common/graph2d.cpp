@@ -640,6 +640,12 @@ bool csGraphics2D::CLIPt(float denom, float num, float& tE, float& tL)
 bool csGraphics2D::ClipLine (float &x0, float &y0, float &x1, float &y1,
                              int xmin, int ymin, int xmax, int ymax)
 {
+    // exclude the left/bottom edges (the Liang-Barsky algorithm will
+    // clip to those edges exactly, whereas the documentation for
+    // ClipLine specifies that the lower/bottom edges are excluded)
+    xmax--;
+    ymax--;
+
     float dx = x1 - x0;
     float dy = y1 - y0;
     bool visible = false;
