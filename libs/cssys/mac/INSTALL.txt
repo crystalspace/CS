@@ -1,0 +1,106 @@
+Crystal Space Macintosh Development Readme
+This is up to date as of April 27rd, 1999
+Written by K. Robert Bate
+If you have any questions or problems, contact me at rbate@ma.ultranet.com.
+
+Contents:
+1.	Requirements
+2.	Getting ready to develop
+3.	Working with the crystal space projects.
+4.	Frequently Asked Questions.
+
+[1] REQUIREMENTS
+
+1) Compiler: Metrowerks CodeWarrior Pro 4 or later.
+2) Include Files: Universal Includes 3.2 from Apple
+3) Libraries: libjpeg, linpng, and zlib.  The easiest place to get these is to
+get them from my web site <http://www.ultranet.com/~rbate>.  The libraries
+from my web site already have been built so they are ready to go.
+4) Directory layout:  The three libraries mentioned above and crystal space need
+to be unpacked into the same folder.
+
+[2] GETTING READY TO DEVELOP
+
+1. Unpack the includes in libs:cssys:mac:includes.sit.  If you used Stuffit Expander to
+unpack the includes, move the folder that is in "includes Folder" into "mac" then throw
+out "includes Folder".
+
+2. Unpack the compressed projects files in mk:mwcw:projects.sit.  If you used Stuffit Expander to
+unpack the project files, move the files that are in "projects Folder" into
+mwcw then throw out "projects Folder".  If you want to work with the glide renderer then unpack
+more_projects.sit.
+
+[3] WORKING WITH THE CRYSTAL SPACE PROJECTS
+
+There are 17 Crystal Space projects in the mwcw folder: 
+
+2 projects that build static libraries:
+CrystLib.prj	- generates the static linked library, which includes the
+				  majority of the code for Crystal Space
+CSWSLib.prj		- generates the static linked library, which includes the
+				  code for the Crystal Space Windowing System
+
+8 projects that build shared libraries:
+Driver2D.prj			- generates the 2D Graphics shared library.
+NetworkDriverNull.prj	- generates the null network driver shared library.
+NetworkMgrNull.prj  	- generates the null network manager shared library.
+SftRndr.prj				- generates the SoftwareRender shared library, which includes the 3D graphics
+						  driver for software rasterization.
+SoundDriver.prj 		- generates the mac sound driver shared library.
+SoundDriverNull.prj  	- generates the null sound driver shared library.
+SoundRender.prj			- generates the software sound render shared library.
+SoundRenderNull.prj		- generates the null sound render manager shared library.
+GlideRender.prj			- generates the Glide Render shared library.
+
+6 projects that generate applications
+CSRegSvr.prj	- generates the application which registers the shared libraries.
+CSWSTest.prj	- generates the application which tests the Crystal Space Windowing System.
+MazeD.prj		- generates the Crystal Space Editor.
+Primedit.prj	- generates another Crystal Space Editor.
+Simple.prj  	- generates a Simple Crystal Space application.
+Walktest.prj	- generates another Simple Crystal Space application.
+
+and 1 project that builds other projects
+MakeShared.prj	- Makes sure all of the shared libraries and CSRegSvr are up to date.
+
+Generally you will just build an application and all of the other pieces will be built for you.
+All of the resulting libraries and applications will be placed in the src directory.
+
+1. Open MakeShared.prj in CodeWarrior and make it.
+
+2. Switch back to the finder select all of the files that end in .shlb
+in the src folder and drop them on the csregsvr application.
+
+3. Choose an application to build.  I generally start with walktest.  Make it.
+
+4. Make sure the world file large.zip is in the src folder.
+
+5. You're all set to run the application.
+
+[3] FREQUENTLY ASKED QUESTIONS (Well, not really)
+
+1) There are a lot of warnings during compile.
+
+Well, that's normal as long as there are no errors.
+
+2a) What is this "ignored 'fopen' (code) in MSL.C.PPC.Lib" link warning?
+
+Inorder to keep from changing a lot of crystal space to fix the differences
+in path separators, I wrote a new version of fopen which handles the path separators
+then calls the same routines that the MSL library version of fopen does.  The warning
+is harmless and you should only worry if you don't get the warning message.
+
+2b) What is this "ignored 'fgets' (code) in MSL.C.PPC.Lib" link warning?
+
+Inorder to keep from changing a lot of crystal space to fix the differences
+in line endings, I wrote a new version of fgets which handles the line endings
+then calls the same routines that the MSL library version of fgets does.  The warning
+is harmless and you should only worry if you don't get the warning message.
+
+3) I need to get to the command line, where is it?
+
+When you launch the application, if you hold down the option key a command line
+dialog will pop up.  If the command line that you are typing needs to be the same
+all the time, create a 'str#' resource with an id of 1024 and make the first string in it
+the command line you want and it will be automaticly used.  Also, if you drop a text file
+on the application, the first 255 characters of the file are read and used as the command line.

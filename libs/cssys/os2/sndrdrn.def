@@ -1,0 +1,8 @@
+LIBRARY SndRdrN INITINSTANCE TERMINSTANCE
+DESCRIPTION "Crystal Space NULL sound renderer"
+EXPORTS
+	DllInitialize
+	DllCanUnloadNow
+	DllGetClassObject
+	DllRegisterServer
+	DllUnregisterServer

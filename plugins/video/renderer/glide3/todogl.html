@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<HTML>
+<HEAD>
+<TITLE>Todo list for Glide port - written by Xavier Trochu</TITLE>
+</HEAD>
+<BODY TEXT="#FFFF80" BGCOLOR="#000000" LINK="#8080FF" ALINK="#FF0000" VLINK="#9900DD">
+<P>
+<VAR>
+This list is here for me to remember what has to be done in order to have a great glide port of Crystal Space. 
+If you want to correct something, or to add something to this list, just send me a little <A HREF="#mail">mail<A>. I will try to maintain it so that it support the following hardware:
+<UL>
+<LI> <STRONG>VoodooGraphics (Voodoo1)</STRONG>
+<LI> <STRONG>Voodoo2</STRONG>
+<LI> Rush
+<LI> Banshee
+</UL>
+And the following systems:
+<UL>
+<LI> <STRONG>Windows 9x</STRONG>
+<LI> Windows NT
+<LI> DOS/WATCOM
+<LI> Linux
+</UL>
+If you have any combination of hardware and system that is not <STRONG>like this</STRONG>, be aware that this port has not been tested on this particular combination. Please, give it a try and send <A HREF="#mail">me</A> the result.
+<P>
+<STRONG> <FONT COLOR=RED>
+Owners of Banshee, I have a particular test to make on your system. <A HREF="#mail">ASK ME</A>.
+</FONT> </STRONG>
+</VAR>
+</P>
+<P>
+<STRONG>
+Things that needs to be done on the Glide port:
+</STRONG>
+
+<UL>
+<LI>DrawPolygonQuick has to be fixed.
+<LI>Lightmap size should be fixed.
+<LI>MultiPass Alpha routine has to be fixed.
+<LI>Check for SinglePass without Lightmap.
+<LI>Calculation of the sow/tow values may have to be rewritten (faster).
+<LI>Unload function called twice on the same texture... ?
+<LI>2 MByte boundary has to be checked in FixedTextureMemoryManager. I have one possible solution, but I don't like it...
+<LI>HighColorCacheAndManage need to be completly rewritten. The actual code is ugly.
+</UL>
+</P>
+
+<P>
+I can be reached at <A NAME="mail" HREF="mailto:xtrochu@yahoo.com">xtrochu@yahoo.com</A>.
+</P>
+</BODY>
+</HTML>

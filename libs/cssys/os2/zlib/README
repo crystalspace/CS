@@ -1,0 +1,5 @@
+This makefile is for zlib-1.1.1
+
+copy the os2/ subdirectory into zlib directory then run
+
+ make -f os2/Makefile.os2

@@ -1,0 +1,3 @@
+NAME csRegSvr WINDOWCOMPAT
+DESCRIPTION "Crystal Space COM registration server"
+STACKSIZE 1048576

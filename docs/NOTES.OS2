@@ -1,0 +1,141 @@
+/==============================================================================\
+|                      Compiling Crystal Space under OS/2                      |
+\==============================================================================/
+
+                               +----------------+
+                               | Pre-requisites |
+                               +----------------+
+
+    Currently Crystal Space compiles under OS/2 only with GNU C/C++ compiler.
+Theoretically it can be done with VisualAge and Watcom compilers (almost) as
+well, but you will have to do it all yourself.  Besides, currently assembler
+optimizations are available only for GNU C/C++ compiler (they uses GAS syntax)
+so most likely you anyway will want to use GCC.  Also you may consider using
+Pentium-optimizing GCC (PGCC) instead of simple GCC which can be found on
+http://goof.com/pcg/os2.  Also you need the EMX package; you need at least EMX
+tools (like emximp), include files and C libraries.
+
+    Crystal Space provides support for MMX instructions; GAS 2.6 which is
+shipped with as-of-today-latest EMX 0.9c does not; so you will need GAS 2.8.1
+or later compiled for OS/2.  You can find a pre-compiled binary on the above
+Web page.
+
+    Also you will need GNU Make (you should have it already if you're using
+GCC).  You will also need GNU sed if you want to make dependency files (you
+can get CrystalSpace up and running without them as well, but you will want
+them if you're going to make changes to source code).  You also will need a
+Unix-like shell (for example, BASH) for this since CMD.EXE locks up with long
+command lines (CrystalSpace sometimes generates 1K and even more!) and
+redirection. You will need to use this shell only when building dependencies.
+
+    You will need Resource Compiler (which is bundled with the OS/2 itself,
+during installation you should click the "Development tools" checkbox or so).
+Also it is available in OS/2 Toolkit.
+
+    OS/2 makefile allows both Unix-like shells and OS/2's standard cmd.exe to
+be used.  By default it is configured for cmd.exe since it is faster.  You can
+switch shells by changing the SHELL= line in makefile.os2.
+
+    You also will need IBM OS/2 Toolkit for DIVE headers.  Theoretically it
+can be made with DIVE headers for EMX which can be found on several sites, for
+example on ftp.leo.org, but I've never tried it.
+
+    You will also require Z-lib (de/compression library) PNGlib (if you're
+going to work with PNG files) and libJPEG (if you're going to use JPEG
+format).  PNG and JPG support are optional, but highly recommended.
+
+     For example, you can look for them at:
+
+  ftp://ftp.uu.net/graphics/png/src/zlib???.zip
+  ftp://ftp.uu.net/graphics/png/src/lpng???.zip
+  ftp://ftp.uu.net/graphics/jpeg/jpegsrc.???.tar.gz
+
+                            +---------------------+
+                            | Compiling libraries |
+                            +---------------------+
+
+    You will need to pre-compile at least Z-lib prior to compiling
+CrystalSpace itself.  In the following I suppose you downloaded all three
+libraries; however if you didn't download libjpeg or libpng simply skip
+corresponding instructions.
+
+    Find and download (preferably latest) versions of Z-lib, PNGlib and
+libJPEG; unpack them in the cryst/ subdirectory; usually they unpacks in a dir
+called somewhat like libjpeg-x.xx or zlib-x.xx where x.xx is current version
+number.  You should rename them into "zlib", "libjpeg" and "pnglib" so that
+CrystalSpace will find them.  You should have a tree like:
+
+  cryst/
+  cryst/docs    - CrystalSpace documentation
+  cryst/src     - CrystalSpace source code
+  cryst/zlib    - Z-lib library
+  cryst/pnglib  - PNG library
+  cryst/libjpeg - JPEG library
+  ...
+
+    Latest Z-lib and PNGlib already includes makefiles for compiling them
+under OS/2 with EMX/GCC; even if you got a library that do not, you can find
+all required makefiles in cryst/src/system/os2.  There is a README file in
+each directory which will tell you what you should do; in short, for Z-lib:
+
+  cd cryst
+  xcopy /s src\system\os2\zlib zlib
+  xcopy /s src\system\os2\libpng libpng
+  xcopy /s src\system\os2\libjpeg libjpeg
+
+    Now you should build each library:
+
+  cd zlib
+  make -f os2/makefile.os2 OMF=0
+  del *.o
+  make -f os2/makefile.os2 OMF=1
+
+    You should run MAKE twice to build both a.out format libraries (OMF=0) and
+OMF libraries (OMF=1).  You also should delete .o files between compilations
+since in any case makefiles builds ".o" (not .obj) files; however the final
+library will have .lib or .a extension depending on format.
+
+    After compilation, you will have:
+
+  z.dll    - The libZ dynamic library
+  z.a      - The libZ static library in a.out format
+  zdll.a   - The libZ dynamic import library in a.out format
+  z.lib    - The libZ static library in OMF format
+  zdll.lib - The libZ dynamic import library in OMF format
+
+    You can leave libraries in their place; you only will need to copy (or
+move) z.dll into a directory somewhere on your LIBPATH if you're going to use
+dynamic version of Z-lib.  Also you can (but you aren't required to) copy (or
+move) .lib and .a files into a directory on your LIBRARY_PATH (say f:/emx/lib)
+if you're going to use them in other projects too (or to avoid recompiling
+zlib upon receiving of future CrystalSpace updates).
+
+    Similarily:
+
+  cd libpng
+  make -f makefile.os2 OMF=0
+  del *.o
+  make -f makefile.os2 OMF=1
+
+  cd libjpeg
+  make -f os2/makefile.os2 OMF=0
+  del *.o
+  make -f os2/makefile.os2 OMF=1
+
+                               +----------------+
+                               | Up and running |
+                               +----------------+
+
+Now read INSTALL for information about compiling and running Crystal Space.
+
+                                 +------------+
+                                 | Last words |
+                                 +------------+
+
+    For system-independent tips (like "where are the object files?"  :-) you
+can look in other INSTALL.xxx files, for example INSTALL.Unix.  Also you may
+feel the urgent need (:-) to read some other documentation, there is a lot
+hanging around - starting from README file in the root directory to the docs/
+and csdoc/ directories full of text and html files.  There is also a document
+which describes OS/2-specific features of CrystalSpace called
+docs/os2notes.html.

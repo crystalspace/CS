@@ -1,0 +1,229 @@
+/*
+    Copyright (C) 1998 by Jorrit Tyberghein
+    Camera code written by Ivan Avramovic <ivan@avramovic.com>
+  
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+  
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+  
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "sysdef.h"
+#include "qint.h"
+#include "csengine/sysitf.h"
+#include "csengine/camera.h"
+#include "csengine/sector.h"
+#include "csengine/world.h"
+#include "csobject/nameobj.h"
+
+//---------------------------------------------------------------------------
+
+IMPLEMENT_UNKNOWN_NODELETE( csCamera )
+
+BEGIN_INTERFACE_TABLE( csCamera )
+	IMPLEMENTS_COMPOSITE_INTERFACE( Camera )
+END_INTERFACE_TABLE()
+
+int csCamera::aspect = 0;
+float csCamera::inv_aspect = 0;
+
+csCamera::csCamera () : csOrthoTransform()
+{
+  mirror = false;
+  sector = NULL;
+}
+
+csCamera::~csCamera () {}
+
+void csCamera::SaveFile (char* filename)
+{
+  FILE* fp;
+  csWorld::isys->FOpen (filename, "w", &fp);
+  fprintf (fp, "%12e %12e %12e\n", v_o2t.x, v_o2t.y, v_o2t.z);
+  fprintf (fp, "%12e %12e %12e\n", m_o2t.m11, m_o2t.m12, m_o2t.m13);
+  fprintf (fp, "%12e %12e %12e\n", m_o2t.m21, m_o2t.m22, m_o2t.m23); 
+  fprintf (fp, "%12e %12e %12e\n", m_o2t.m31, m_o2t.m32, m_o2t.m33);
+  fprintf (fp, "%s\n", csNameObject::GetName(*sector));
+  fprintf (fp, "%d\n", mirror);
+  csWorld::isys->FClose (fp);
+}
+
+bool csCamera::LoadFile (csWorld* world, char* filename)
+{
+  char buf[100];
+  FILE* fp;
+  csWorld::isys->FOpen (filename, "r", &fp);
+  if (!fp)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Could not open coordinate file 'coord'!\n");
+    return false;
+  }
+  csMatrix3 m;
+  csVector3 v;
+  csSector* s;
+  int imirror;
+
+  fscanf (fp, "%f %f %f\n", &v.x, &v.y, &v.z);
+  fscanf (fp, "%f %f %f\n", &m.m11, &m.m12, &m.m13);
+  fscanf (fp, "%f %f %f\n", &m.m21, &m.m22, &m.m23); 
+  fscanf (fp, "%f %f %f\n", &m.m31, &m.m32, &m.m33);
+  fscanf (fp, "%s\n", buf);
+  s = (csSector*)world->sectors.FindByName (buf);
+  if (!s)
+  {
+    csWorld::isys->FClose (fp);
+    CsPrintf (MSG_FATAL_ERROR, "Sector in coordinate file does not exist in this world!\n");
+    return false;
+  }
+  imirror = false; fscanf (fp, "%d\n", &imirror);
+
+  csWorld::isys->FClose (fp);
+
+  sector = s;
+  mirror = (bool)imirror;
+  v_o2t = v;
+  m_o2t = m;
+  // For camera matrices a transpose is equivalent to the inverse of a matrix.
+  m_t2o = m_o2t.GetTranspose ();
+  return true;
+}
+
+csPolygon3D* csCamera::GetHit (csVector3& v)
+{
+  return sector->HitBeam (v_o2t, v);
+}
+
+void csCamera::MoveWorld (const csVector3& v)
+{
+  csVector3 new_position = GetOrigin () + v;
+  if (sector)
+    sector = sector->FollowSegment (*this, new_position, mirror);
+  SetOrigin (new_position);
+}
+
+void csCamera::RotateWorld (const csVector3& v, float angle)
+{
+  csVector3 u = v;
+  float ca, sa;
+  u = csVector3::Unit (u);
+  ca = cos (angle);
+  sa = sin (angle);
+  
+  SetT2O ( 
+
+   csMatrix3(
+         ca+(1-ca)*u.x*u.x, u.x*u.y*(1-ca)-u.z*sa, u.x*u.z*(1-ca)+u.y*sa,
+     u.x*u.y*(1-ca)+u.z*sa,     ca+(1-ca)*u.y*u.y, u.y*u.z*(1-ca)-u.x*sa,
+     u.x*u.z*(1-ca)-u.y*sa, u.y*u.z*(1-ca)+u.x*sa,     ca+(1-ca)*u.z*u.z)
+
+   * GetT2O () );
+}
+
+void csCamera::Rotate (const csVector3& v, float angle)
+{
+  csVector3 u = v;
+  float ca, sa;
+  u = csVector3::Unit (u);
+  ca = cos (angle);
+  sa = sin (angle);
+  
+  SetT2O (GetT2O () *
+
+   csMatrix3(
+         ca+(1-ca)*u.x*u.x, u.x*u.y*(1-ca)-u.z*sa, u.x*u.z*(1-ca)+u.y*sa,
+     u.x*u.y*(1-ca)+u.z*sa,     ca+(1-ca)*u.y*u.y, u.y*u.z*(1-ca)-u.x*sa,
+     u.x*u.z*(1-ca)-u.y*sa, u.y*u.z*(1-ca)+u.x*sa,     ca+(1-ca)*u.z*u.z)
+
+   );
+}
+
+void csCamera::LookAt (const csVector3& v, const csVector3& up)
+{
+  csMatrix3 m; /* initialized to be the identity matrix */
+  csVector3 w1, w2, w3 = v;
+  float r;
+  
+  if ( (r=sqrt(v*v)) > SMALL_EPSILON )
+  {
+   w3 /= r;
+   w1 = w3 % up;
+   if ( (r=sqrt(w1*w1)) < SMALL_EPSILON )
+   {
+     w1 = w3 % csVector3(0,0,-1);
+     if ( (r=sqrt(w1*w1)) < SMALL_EPSILON )
+     {
+      w1 = w3 % csVector3(0,-1,0);
+      r = sqrt(w1*w1);
+     }
+   }
+   w1 /= r;
+   w2 = w3 % w1;
+
+   m.m11 = w1.x;  m.m12 = w2.x;  m.m13 = w3.x;
+   m.m21 = w1.y;  m.m22 = w2.y;  m.m23 = w3.y;
+   m.m31 = w1.z;  m.m32 = w2.z;  m.m33 = w3.z;
+  }
+
+  SetT2O (m);
+}
+
+void csCamera::Correct (int n)
+{
+  csVector3 w1, w2, w3;
+  float* vals[4];
+  if (n==0) return;
+
+  w3 = m_t2o.Col3();
+  vals[0] = &w3.x;  vals[1] = &w3.y;  vals[2] = &w3.z;  vals[4] = NULL;
+  Correct (n, vals);  /* perform the snap-to operation on the forward vector */
+
+/* Maybe w3 should be normalized.  Only necessary if there is
+   significant roundoff error: */
+//  w3 = csVector3::unit(w3); 
+  
+/* perhaps a snap-to should be performed on one of the other vectors as well */
+
+  w1 = m_t2o.Col2();
+  w2 = csVector3::Unit(w3 % w1);
+  w1 = w2 % w3;
+  
+  SetT2O ( csMatrix3 ( w1.x, w2.x, w3.x,
+                             w1.y, w2.y, w3.y,
+                             w1.z, w2.z, w3.z ) );
+}
+
+void csCamera::Correct (int n, float* vals[])
+{
+  float r, angle;
+
+  if (vals==NULL) return;
+  if (vals[0]==NULL) return;
+  if (vals[1]==NULL) return;
+  if (vals[2]!=NULL)
+  { 
+   if (*vals[0] < *vals[1])
+    { r = *vals[2];  *vals[2] = *vals[0];  *vals[0] = r; }
+   else { r = *vals[2];  *vals[2] = *vals[1];  *vals[1] = r; }
+  }
+  
+  angle = atan2 (*vals[1], *vals[0]);
+  angle = (2.*M_PI/n) * QRound(n * angle / (2*M_PI) );
+  *vals[1] = sqrt( (*vals[0])*(*vals[0]) + (*vals[1])*(*vals[1]) );
+  Correct(n, vals+1);
+  r = *vals[1];
+  *vals[0] = r*cos(angle);  *vals[1] = r*sin(angle); 
+}
+
+
+
+//---------------------------------------------------------------------------
+

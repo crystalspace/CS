@@ -1,0 +1,8 @@
+LIBRARY OS2DIVE INITINSTANCE TERMINSTANCE
+DESCRIPTION "Crystal Space 2D graphics driver for OS/2 using DIVE"
+EXPORTS
+	DllInitialize
+	DllCanUnloadNow
+	DllGetClassObject
+	DllRegisterServer
+	DllUnregisterServer

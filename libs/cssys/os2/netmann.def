@@ -1,0 +1,8 @@
+LIBRARY NetManN INITINSTANCE TERMINSTANCE
+DESCRIPTION "Crystal Space NULL network manager"
+EXPORTS
+	DllInitialize
+	DllCanUnloadNow
+	DllGetClassObject
+	DllRegisterServer
+	DllUnregisterServer

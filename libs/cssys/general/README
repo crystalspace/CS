@@ -1,0 +1,4 @@
+This directory contains general versions of system specific source
+files. If a port to some system can get away with a version from this
+directory then it should do so, otherwise it will have to redefine the
+wanted file in its own directory.

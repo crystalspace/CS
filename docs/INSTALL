@@ -1,0 +1,133 @@
+0. Contents of This Document
+----------------------------
+
+    1. Compilation Instructions
+    2. Running Crystal Space
+    3. Special Comments for X Windows Version
+    4. Command-Line Arguments And The Config File
+    5. The Console
+
+
+
+1. Compilation Instructions
+---------------------------
+
+To compile Crystal Space for your platform, read the appropriate installation 
+document as indicated below.  
+
+    Amiga                       INSTALL.Amiga
+    BeOS                        INSTALL.BeOS
+    DOS / DJGPP                 INSTALL.General NOTES.DOS
+    FreeBSD                     INSTALL.Unix
+    Linux                       INSTALL.Unix
+    Macintosh                   INSTALL.Mac
+    NextStep                    INSTALL.NeXT
+    OpenStep                    INSTALL.NeXT
+    OS/2                        INSTALL.General NOTES.OS2
+    Rhapsody (MacOS/X Server)   INSTALL.NeXT
+    Solaris                     INSTALL.Unix
+    Unix                        INSTALL.Unix
+    Windows 95 / Visual C++     INSTALL.Win
+
+After reading the appropriate platform-specific installation instructions,
+return to this document and continue reading with the next section.
+
+
+2. Running Crystal Space
+------------------------
+
+To run Crystal Space you need at least the following:
+
+    1. An executable (cryst.exe, cryst, wincryst.exe, ...)
+    2. standard.zip (not really required but recommended)
+    3. unless you are using a statically linked version of CS
+       you should also have a 3D rasterizer library (for example
+       the software rasterizer), a 2D driver library (for example
+       for XLib or SVGALIB) and at least the Network NULL Driver.
+       Those libraries are either in .so format (for Unix) or
+       in .DLL format (for OS/2 and Windows).
+    4. The configuration file: cryst.cfg
+    5. One or more level files (*.zip)
+
+And of course you also need a computer :-)
+
+The executable and all other files must be located in the same
+directory. The level files may be put anywhere. Please
+note that the level files should NOT be extracted. Crystal Space
+can read zip files directly and this is also the preferred way.
+
+To run Crystal Space with a specific level you have two
+possibilities (lets assume that you have put the level in a
+directory called 'data' and this directory is located in the
+same directory as the executable):
+
+    cryst data/level.zip
+
+(replace level.zip with any level you want).
+
+Otherwise you can edit cryst.cfg and set WORLDFILE=data/level.zip
+as a configuration option.
+
+Note that Crystal Space currently only supports 256-color displays
+(with a colormap) or 15/16-bit truecolor displays (note that Crystal
+Space may not support 15/16-bit mode on all systems).
+
+When Crystal Space starts it will begin calculating several tables.
+Depending on the type of your display (8-bit or 15/16-bit) and on
+several configuration values it will need to calculate a different
+number of tables. In 8-bit mode it is possible that the calculation
+of these tables takes such a long time that Crystal Space will cache
+them inside the level file (Crystal Space will automatically add the
+needed tables to the zip file if they are not already there).
+Note that all levels available on my home page already contain these
+tables if they need them.
+
+
+3. Special Comments for X Windows Version
+-----------------------------------------
+
+Note that the X version of Crystal Space optionally supports the Shared
+Memory Extension (SHM). This makes Crystal Space run much faster if your
+server supports it (Crystal Space should also support DGA but this is not
+yet the case).
+
+By default Crystal Space assumes that your server supports SHM. It will
+automatically auto-detect if your server doesn't support it. So you can
+safely leave it enabled.
+
+
+4. Command-Line Arguments And The Config File
+---------------------------------------------
+
+Crystal Space supports a number of command-line options. With
+'-help' you get a list and a description (including the default
+that is used for that option). The default for every command-line
+option is set internally in the program unless there is a
+corresponding line for it in the config file. For example,
+normally the default for -cache is 4000000 (the default size
+of the texture cache). But when CACHE=2000000 is set in 'cryst.cfg'
+the default will be 2000000. Using an option on the command-line will
+always override the default.
+
+Some interesting options to play with are:
+  -mode 640x480
+        (or an other value). Use this option to set the size of the display.
+  -nocolldet
+        If you experience problems with the current collision detection
+        system you can disable it with this option.
+
+The configuration file ('cryst.cfg') is useful for keeping options that
+you use often. Not all options can be set with the configuration file
+though, and not all configuration file options have a corresponding
+command-line option. See docs/config.txt for a complete list of all
+configuration file options.
+
+
+5. The Console
+--------------
+
+Starting with version 0.06 there is also an input/output console that
+you can use. Press 'tab' to toggle between the console and normal output.
+There are several commands that you can use. Type 'help' to get the
+list of commands. There is a document docs/console.txt describing
+all these commands.

@@ -1,0 +1,63 @@
+/*
+    OS/2 DIVE class library: resource file
+    Copyright (C) 1997 by FRIENDS software
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#include "os2.h"
+#include "cs2d/csdive/libDIVE.h"
+
+// Define DIVE window menu
+MENU idDive DISCARDABLE
+BEGIN
+  SUBMENU "Window", idDive
+  BEGIN
+    SUBMENU "~Align", cmdAlign
+    BEGIN
+      MENUITEM "~Top", cmdAlignTop
+      MENUITEM "~Bottom", cmdAlignBottom
+      MENUITEM "~Left", cmdAlignLeft
+      MENUITEM "~Right", cmdAlignRight
+      MENUITEM SEPARATOR
+      MENUITEM "~Center\tCtrl+Alt+`", cmdAlignCenter
+    END
+    SUBMENU  "~Scale", cmdScale
+    BEGIN
+      MENUITEM "~1:1\tCtrl+Alt+1", cmdSnap1to1
+      MENUITEM "~2:1\tCtrl+Alt+2", cmdSnap2to1
+      MENUITEM "~3:1\tCtrl+Alt+3", cmdSnap3to1
+      MENUITEM "~4:1\tCtrl+Alt+4", cmdSnap4to1
+      MENUITEM SEPARATOR
+      MENUITEM "~Full screen\tAlt+Home", cmdFullScreen
+    END
+    MENUITEM SEPARATOR
+    MENUITEM "~Keep aspect ratio", cmdToggleAspect
+    MENUITEM "~Pause\tPause", cmdPause,,MIA_NODISMISS
+    MENUITEM "~Mouse Cursor", cmdToggleMouse,,MIA_NODISMISS
+  END
+END
+
+// Define an accelerator table for DIVE window
+ACCELTABLE idDive DISCARDABLE
+BEGIN
+  "1",      cmdSnap1to1,    ALT, CONTROL
+  "2",      cmdSnap2to1,    ALT, CONTROL
+  "3",      cmdSnap3to1,    ALT, CONTROL
+  "4",      cmdSnap4to1,    ALT, CONTROL
+  "`",      cmdAlignCenter, ALT, CONTROL
+  VK_HOME,  cmdFullScreen,  VIRTUALKEY, ALT
+  VK_PAUSE, cmdPause,       VIRTUALKEY
+END

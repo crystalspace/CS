@@ -1,0 +1,198 @@
+// this was my attempt to use MMX for texture mapping... however, it is
+// slower than David Arnold's code... if someone can improve it, please
+// feel free ... - A.Z.
+
+#define I386_MMX_SCANLINE_MAP8 \
+    if (xx) \
+    { \
+      asm (" \
+		movd		%1, %%mm0	# load mm0 = 0 | uu					\n\
+		punpckldq	%%mm0, %%mm0	# now mm0 = uu | uu					\n\
+		movd		%3, %%mm2	# load mm2 = 0 | duu					\n\
+		paddd		%%mm2, %%mm0	# add mm2 to mm0 - now mm0 = uu | uu + duu		\n\
+		punpckldq	%%mm2, %%mm2	# move duu to high half of mm2; now mm2 = duu | duu	\n\
+		pslld		$1, %%mm2	# mm2 = duu*2 | duu*2					\n\
+\
+		movd		%2, %%mm1	# mm1 = 0 | vv						\n\
+		punpckldq	%%mm1, %%mm1	# mm1 = vv | vv						\n\
+		movd		%4, %%mm3	# mm3 = 0 | dvv						\n\
+		paddd		%%mm3, %%mm1	# mm1 = vv | vv + dvv					\n\
+		punpckldq	%%mm3, %%mm3	# mm3 = dvv | dvv					\n\
+		pslld		$1, %%mm3	# mm3 = dvv*2 | dvv*2					\n\
+\
+		movd		%5, %%mm5	# mm5 = shifter						\n\
+\
+		# Now the MMX register layout is as follows:						\n\
+		#       |  hi32  |  lo32  |								\n\
+		#-------+--------+--------+								\n\
+		#  mm0  |  uu0   |  uu1   |								\n\
+		#  mm1  |  vv0   |  vv1   |								\n\
+		#  mm2  | duu*2  | duu*2  |								\n\
+		#  mm3  | dvv*2  | dvv*2  |								\n\
+		#  mm5  |     shifter     |								\n\
+		#  mm6  | [scratch        |								\n\
+		#  mm7  |      registers] |								\n\
+\
+		# first set of four pixels								\n\
+		movq		%%mm1, %%mm7	# mm7 = vv0 | vv1					\n\
+		psrld		$16, %%mm7	# mm7 = vv0 >> 16 | vv1 >> 16				\n\
+		pslld		%%mm5, %%mm7	# mm7 = (vv0 >> 16) << shifter | (vv1 >> 16) << shifter	\n\
+		movq		%%mm0, %%mm6	# mm6 = uu0 | uu1					\n\
+		psrld		$16, %%mm6	# mm6 = uu0 >> 16 | uu1 >> 16				\n\
+		paddd		%%mm6, %%mm7	# mm7 = (vv0 >> 16) << shifter + uu0 >> 16 | (vv1 >> 16) << shifter + uu1 >> 16\n\
+\
+		movd		%%mm7, %%ebx	# ebx = (uu1 >> 16) << shifter + vv1 >> 16		\n\
+		movb		(%%edx,%%ebx), %%ah							\n\
+		psrlq		$32, %%mm7	# mm7 = 0 | (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movd		%%mm7, %%ebx	# ebx = (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movb		(%%edx,%%ebx), %%al							\n\
+\
+		paddd		%%mm2, %%mm0	# mm0 = uu0 + duu | uu1 + duu				\n\
+		paddd		%%mm3, %%mm1	# mm1 = vv0 + dvv | vv1 + dvv                           \n\
+\
+		shll		$16, %%eax	# eax = pixel3 | pixel2 | 0 | 0				\n\
+		movq		%%mm1, %%mm7	# mm7 = vv0 | vv1					\n\
+		psrld		$16, %%mm7	# mm7 = vv0 >> 16 | vv1 >> 16				\n\
+		pslld		%%mm5, %%mm7	# mm7 = (vv0 >> 16) << shifter | (vv1 >> 16) << shifter	\n\
+		movq		%%mm0, %%mm6	# mm6 = uu0 | uu1					\n\
+		psrld		$16, %%mm6	# mm6 = uu0 >> 16 | uu1 >> 16				\n\
+		paddd		%%mm6, %%mm7	# mm7 = (vv0 >> 16) << shifter + uu0 >> 16 | (vv1 >> 16) << shifter + uu1 >> 16\n\
+\
+		movd		%%mm7, %%ebx	# ebx = (uu1 >> 16) << shifter + vv1 >> 16		\n\
+		movb		(%%edx,%%ebx), %%ah							\n\
+		psrlq		$32, %%mm7	# mm7 = 0 | (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movd		%%mm7, %%ebx	# ebx = (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movb		(%%edx,%%ebx), %%al							\n\
+\
+		paddd		%%mm2, %%mm0	# mm0 = uu0 + duu | uu1 + duu				\n\
+		roll		$16, %%eax	# eax = pixel3 | pixel2 | 0 | 0				\n\
+		paddd		%%mm3, %%mm1	# mm1 = vv0 + dvv | vv1 + dvv                           \n\
+\
+		movl		%%eax, (%%edi)	# put four pixels into dest				\n\
+\
+		# second set of four pixels								\n\
+		movq		%%mm1, %%mm7	# mm7 = vv0 | vv1					\n\
+		psrld		$16, %%mm7	# mm7 = vv0 >> 16 | vv1 >> 16				\n\
+		pslld		%%mm5, %%mm7	# mm7 = (vv0 >> 16) << shifter | (vv1 >> 16) << shifter	\n\
+		movq		%%mm0, %%mm6	# mm6 = uu0 | uu1					\n\
+		psrld		$16, %%mm6	# mm6 = uu0 >> 16 | uu1 >> 16				\n\
+		paddd		%%mm6, %%mm7	# mm7 = (vv0 >> 16) << shifter + uu0 >> 16 | (vv1 >> 16) << shifter + uu1 >> 16\n\
+\
+		movd		%%mm7, %%ebx	# ebx = (uu1 >> 16) << shifter + vv1 >> 16		\n\
+		movb		(%%edx,%%ebx), %%ah							\n\
+		psrlq		$32, %%mm7	# mm7 = 0 | (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movd		%%mm7, %%ebx	# ebx = (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movb		(%%edx,%%ebx), %%al							\n\
+\
+		paddd		%%mm2, %%mm0	# mm0 = uu0 + duu | uu1 + duu				\n\
+		paddd		%%mm3, %%mm1	# mm1 = vv0 + dvv | vv1 + dvv                           \n\
+\
+		shll		$16, %%eax	# eax = pixel3 | pixel2 | 0 | 0				\n\
+		movq		%%mm1, %%mm7	# mm7 = vv0 | vv1					\n\
+		psrld		$16, %%mm7	# mm7 = vv0 >> 16 | vv1 >> 16				\n\
+		pslld		%%mm5, %%mm7	# mm7 = (vv0 >> 16) << shifter | (vv1 >> 16) << shifter	\n\
+		movq		%%mm0, %%mm6	# mm6 = uu0 | uu1					\n\
+		psrld		$16, %%mm6	# mm6 = uu0 >> 16 | uu1 >> 16				\n\
+		paddd		%%mm6, %%mm7	# mm7 = (vv0 >> 16) << shifter + uu0 >> 16 | (vv1 >> 16) << shifter + uu1 >> 16\n\
+\
+		movd		%%mm7, %%ebx	# ebx = (uu1 >> 16) << shifter + vv1 >> 16		\n\
+		movb		(%%edx,%%ebx), %%ah							\n\
+		psrlq		$32, %%mm7	# mm7 = 0 | (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movd		%%mm7, %%ebx	# ebx = (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movb		(%%edx,%%ebx), %%al							\n\
+\
+		paddd		%%mm2, %%mm0	# mm0 = uu0 + duu | uu1 + duu				\n\
+		roll		$16, %%eax	# eax = pixel3 | pixel2 | 0 | 0				\n\
+		paddd		%%mm3, %%mm1	# mm1 = vv0 + dvv | vv1 + dvv                           \n\
+\
+		movl		%%eax, 4(%%edi)	# put four pixels into dest				\n\
+\
+		# thirs set of four pixels								\n\
+		movq		%%mm1, %%mm7	# mm7 = vv0 | vv1					\n\
+		psrld		$16, %%mm7	# mm7 = vv0 >> 16 | vv1 >> 16				\n\
+		pslld		%%mm5, %%mm7	# mm7 = (vv0 >> 16) << shifter | (vv1 >> 16) << shifter	\n\
+		movq		%%mm0, %%mm6	# mm6 = uu0 | uu1					\n\
+		psrld		$16, %%mm6	# mm6 = uu0 >> 16 | uu1 >> 16				\n\
+		paddd		%%mm6, %%mm7	# mm7 = (vv0 >> 16) << shifter + uu0 >> 16 | (vv1 >> 16) << shifter + uu1 >> 16\n\
+\
+		movd		%%mm7, %%ebx	# ebx = (uu1 >> 16) << shifter + vv1 >> 16		\n\
+		movb		(%%edx,%%ebx), %%ah							\n\
+		psrlq		$32, %%mm7	# mm7 = 0 | (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movd		%%mm7, %%ebx	# ebx = (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movb		(%%edx,%%ebx), %%al							\n\
+\
+		paddd		%%mm2, %%mm0	# mm0 = uu0 + duu | uu1 + duu				\n\
+		paddd		%%mm3, %%mm1	# mm1 = vv0 + dvv | vv1 + dvv                           \n\
+\
+		shll		$16, %%eax	# eax = pixel3 | pixel2 | 0 | 0				\n\
+		movq		%%mm1, %%mm7	# mm7 = vv0 | vv1					\n\
+		psrld		$16, %%mm7	# mm7 = vv0 >> 16 | vv1 >> 16				\n\
+		pslld		%%mm5, %%mm7	# mm7 = (vv0 >> 16) << shifter | (vv1 >> 16) << shifter	\n\
+		movq		%%mm0, %%mm6	# mm6 = uu0 | uu1					\n\
+		psrld		$16, %%mm6	# mm6 = uu0 >> 16 | uu1 >> 16				\n\
+		paddd		%%mm6, %%mm7	# mm7 = (vv0 >> 16) << shifter + uu0 >> 16 | (vv1 >> 16) << shifter + uu1 >> 16\n\
+\
+		movd		%%mm7, %%ebx	# ebx = (uu1 >> 16) << shifter + vv1 >> 16		\n\
+		movb		(%%edx,%%ebx), %%ah							\n\
+		psrlq		$32, %%mm7	# mm7 = 0 | (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movd		%%mm7, %%ebx	# ebx = (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movb		(%%edx,%%ebx), %%al							\n\
+\
+		paddd		%%mm2, %%mm0	# mm0 = uu0 + duu | uu1 + duu				\n\
+		roll		$16, %%eax	# eax = pixel3 | pixel2 | 0 | 0				\n\
+		paddd		%%mm3, %%mm1	# mm1 = vv0 + dvv | vv1 + dvv                           \n\
+\
+		movl		%%eax, 8(%%edi)	# put four pixels into dest				\n\
+\
+		# fourth set of four pixels								\n\
+		movq		%%mm1, %%mm7	# mm7 = vv0 | vv1					\n\
+		psrld		$16, %%mm7	# mm7 = vv0 >> 16 | vv1 >> 16				\n\
+		pslld		%%mm5, %%mm7	# mm7 = (vv0 >> 16) << shifter | (vv1 >> 16) << shifter	\n\
+		movq		%%mm0, %%mm6	# mm6 = uu0 | uu1					\n\
+		psrld		$16, %%mm6	# mm6 = uu0 >> 16 | uu1 >> 16				\n\
+		paddd		%%mm6, %%mm7	# mm7 = (vv0 >> 16) << shifter + uu0 >> 16 | (vv1 >> 16) << shifter + uu1 >> 16\n\
+\
+		movd		%%mm7, %%ebx	# ebx = (uu1 >> 16) << shifter + vv1 >> 16		\n\
+		movb		(%%edx,%%ebx), %%ah							\n\
+		psrlq		$32, %%mm7	# mm7 = 0 | (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movd		%%mm7, %%ebx	# ebx = (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movb		(%%edx,%%ebx), %%al							\n\
+\
+		paddd		%%mm2, %%mm0	# mm0 = uu0 + duu | uu1 + duu				\n\
+		paddd		%%mm3, %%mm1	# mm1 = vv0 + dvv | vv1 + dvv                           \n\
+\
+		shll		$16, %%eax	# eax = pixel3 | pixel2 | 0 | 0				\n\
+		movq		%%mm1, %%mm7	# mm7 = vv0 | vv1					\n\
+		psrld		$16, %%mm7	# mm7 = vv0 >> 16 | vv1 >> 16				\n\
+		pslld		%%mm5, %%mm7	# mm7 = (vv0 >> 16) << shifter | (vv1 >> 16) << shifter	\n\
+		movq		%%mm0, %%mm6	# mm6 = uu0 | uu1					\n\
+		psrld		$16, %%mm6	# mm6 = uu0 >> 16 | uu1 >> 16				\n\
+		paddd		%%mm6, %%mm7	# mm7 = (vv0 >> 16) << shifter + uu0 >> 16 | (vv1 >> 16) << shifter + uu1 >> 16\n\
+\
+		movd		%%mm7, %%ebx	# ebx = (uu1 >> 16) << shifter + vv1 >> 16		\n\
+		movb		(%%edx,%%ebx), %%ah							\n\
+		psrlq		$32, %%mm7	# mm7 = 0 | (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movd		%%mm7, %%ebx	# ebx = (uu0 >> 16) << shifter + vv0 >> 16		\n\
+		movb		(%%edx,%%ebx), %%al							\n\
+\
+		paddd		%%mm2, %%mm0	# mm0 = uu0 + duu | uu1 + duu				\n\
+		roll		$16, %%eax	# eax = pixel3 | pixel2 | 0 | 0				\n\
+		paddd		%%mm3, %%mm1	# mm1 = vv0 + dvv | vv1 + dvv                           \n\
+\
+		movl		%%eax, 12(%%edi)# put four pixels into dest				\n\
+\
+		addl		$16, %%edi	# adjust videoram address				\n\
+		emms											\n\
+    " : "+D" (dd) \
+      : "m" (uu), "m" (vv), "m" (duu), "m" (dvv), "m" (shifter), "d" (srcTex)				\
+      : "st", "st(1)", "st(2)", "st(3)", "st(4)", "st(5)", "st(6)", "st(7)");				\
+      uu = uu1;								\
+      vv = vv1;								\
+    } else								\
+      do								\
+      {									\
+        *dd++ = srcTex[((vv>>16)<<shifter) + (uu>>16)];			\
+        uu += duu;							\
+        vv += dvv;							\
+      }									\
+      while (dd <= lastD)

@@ -1,0 +1,292 @@
+===============================================================================
+    Crystal Space for NextStep, OpenStep, Rhapsody (MacOS/X Server) DR2
+
+    This document was written by Eric Sunshine <sunshine@sunshineco.com>
+    Copyright (C)1999 by Eric Sunshine
+    1999/03/02
+
+    Also see src/system/next/README.NeXT for implementation details.
+===============================================================================
+
+0. Contents
+-----------
+
+    1. Introduction
+    2. Other References
+    3. GNU make
+    4. Unpacking
+    5. Architectures
+    6. Supporting Libraries
+    7. Building
+    8. Using Crystal Space
+    9. Controls
+
+
+1. Introduction
+---------------
+
+This document discusses installation and usage of Crystal Space for NextStep
+3.3, OpenStep 4.2, and Rhapsody (MacOS/X Server) DR2.
+
+Crystal Space was ported to NextStep, OpenStep, and Rhapsody by Eric Sunshine
+in February of 1999.  If you have questions or comments about this port,
+please contact me at: Eric Sunshine <sunshine@sunshineco.com>.
+
+
+2. Other References
+-------------------
+
+The file README.NeXT in the directory src/system/next contains comprehensive
+and detailed implementation information about the NextStep, OpenStep, and
+Rhapsody ports of Crystal Space.  It also contains a list of known bugs.
+
+The file INSTALL.General contains generic instructions regarding installation
+on Unix systems, as well as instructions for obtaining the latest supporting
+libraries, such as zlib, libpng, and libjpeg, which Crystal Space requires.
+It also contains information about special makefile variables which the more
+adventurous may find useful.
+
+The directories cryst/docs and cryst/csdocs contain many documents which may
+be of interest to those who are curious about the internal structure of
+Crystal Space.
+
+
+3. GNU make
+-----------
+
+Building Crystal Space requires GNU's "make" utility.  NextStep does not ship
+with GNU make, so it must be downloaded and installed before this project can
+be built.  OpenStep and Rhapsody both ship with GNU make installed.  On these
+platforms, it is named "gnumake".  OpenStep and Rhapsody users may skip to the
+next section.
+
+NextStep users can find pre-built binaries of GNU make at these locations:
+
+    ftp://ftp.next.peak.org/pub/next/apps/devtools/make.3.76.1.NIHS.bs.tar.gz
+    ftp://ftp.next.peak.org/pub/next/apps/devtools/gnumake.3.74.b.NIHS.tar.gz
+
+The source code for the latest version of GNU make can be downloaded from one
+of the standard GNU mirror sites:
+
+    http://wuarchive.wustl.edu/systems/gnu/make-3.77.tar.gz
+    ftp://ftp.uu.net/systems/gnu/make-3.77.tar.gz
+
+The current version of GNU make (3.77 at the time of this writing), does not
+correctly perform filename wildcard expansion, out of the box.  Fortunately,
+this problem can be easily corrected.  Build the program following these
+instructions:
+
+    a) Unpack the source
+       % gnutar xfz make-3.77.tar.gz
+    b) Run the configuration script
+       % cd make-3.77
+       % ./configure
+    c) Edit the files dir.c and glob/glob.c, and in each file find the line
+       which reads:
+           # define NAMLEN(dirent) (dirent)->d_namlen
+       Replace this line with:
+           # define NAMLEN(dirent) strlen((dirent)->d_name)
+    d) Build the project
+       % make install
+
+In order to be consistent with the OpenStep and Rhapsody installations, you
+should probably rename the installed executable to "gnumake" rather than the
+default name, "make".  The remaining instructions in this document assume that
+it is installed as "gnumake".
+
+
+4. Unpacking
+------------
+
+Unpack the core Crystal Space source code.
+
+    % gnutar xfz csmain*.tgz
+    % gnutar xfz csnext*.tgz
+    % gnutar xfz csunix*.tgz
+    % gnutar xfz libjpeg*.tgz
+    % gnutar xfz libpng*.tgz
+    % gnutar xfz zlib*.tgz
+
+Unpack optional packages which you are interested in building or using.
+
+    % gnutar xfz csmazed*.tgz
+    % gnutar xfz csblocks*.tgz
+    % gnutar xfz csdocs*.tgz
+
+Place the file "standard.zip" into the main source directory.  This file
+contains resources which are used by the Crystal Space demonstration programs.
+
+    % cp standard.zip cryst/src/standard.zip
+
+You must have at least one "level" file in order to use Crystal Space.
+Typically the level files should be placed in the cryst/data directory.  For
+instance:
+
+    % mv large.zip cryst/data/large.zip
+
+
+5. Architectures
+----------------
+
+This project may be built for any of the architectures which are supported by
+the standard developer tools, as summarized below.
+
+    Platform    Architectures           Tested
+    --------    -------------           ------
+    NextStep    i386 m68k sparc hppa    i386 m68k
+    OpenStep    i386 m68k sparc         i386 m68k
+    Rhapsody    i386 ppc                i386
+
+Crystal Space and the supporting components may be built as a multi-
+architecture binaries (MAB), thus allowing a single executable file to be used
+on multiple architectures.
+
+When building Crystal Space and its components multi-architecture binaries are
+generated by specifying the standard NeXT makefile variable TARGET_ARCHS on
+the command-line each time you invoke gnumake.  For instance, to build a MAB
+executable for Intel, Motorola, and Sparc, one would type:
+
+    gnumake TARGET_ARCHS="i386 m68k sparc" cs
+
+If TARGET_ARCHS is not specified then the project is compiled for the hardware
+on which it is being built.
+
+When building the supporting libraries, multi-architecture binaries are
+generated by specifying an alternate definition for CC on the command-line.
+For instance, to build the JPEG library for Intel, Motorola, and Sparc one
+would type:
+
+    make libjpeg.a CC="cc -arch i386 -arch m68k -arch sparc"
+
+If CC is not specified then the library is compiled for the hardware on which
+it is being built.
+
+
+6. Supporting Libraries
+-----------------------
+
+Before building Crystal Space, it is necessary to build the supporting
+libraries, zlib, libpng, and libjpeg.  Crystal Space makes uses of these
+libraries, even though they are not part of the project itself.
+
+These instructions assume that you wish to build multi-architecture libraries.
+If you do not care about this feature, then omit the CC="..." argument from
+the build commands.
+
+    % cd cryst/zlib
+    % sh ./configure
+    % make libz.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
+
+    % cd ../libpng
+    % make -f makefile.std libpng.a \
+      CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
+
+    % cd ../libjpeg
+    % sh ./configure
+    % make libjpeg.a CC="cc -arch i386 -arch m68k -arch sparc -arch hppa"
+
+
+7. Building
+-----------
+
+The Crystal Space project consists of a number of components and example
+programs.  The following commands must be issued from within the cryst/src
+directory.  To see a list of all targets which can be built by the makefile,
+type:
+
+    % gnumake help
+
+To begin building Crystal Space, first configure the makefiles for the
+appropriate platform by typing the correct build command as indicated below.
+
+    Platform    Build Command
+    --------    -------------
+    NextStep    % gnumake nextstep
+    OpenStep    % gnumake openstep
+    Rhapsody    % gnumake rhapsody
+
+Once the makefiles are configured for the appropriate platform, it is
+necessary to build the components which are required by most of the the
+Crystal Space example programs.  To build the components and programs as
+multi-architecture binaries specify the makefile variable TARGET_ARCHS on the
+command-line each time you invoke gnumake, as discussed in the "Architectures"
+section of this document.  To build the components, issue these commands:
+
+    % gnumake next2d            # NeXT 2D graphics driver
+    % gnumake soft              # Software renderer
+    % gnumake netdrvn           # Null network driver
+    % gnumake netdrvs           # Socket network driver
+    % gnumake netmann           # Null network manager
+    % gnumake netmans           # Socket network manager
+
+The main Crystal Space example program is named "cryst".  With this program
+the user can view and explore the maps.  The unfinished, but still impressive
+map editor is named "mazed".  To build these programs type:
+
+    % gnumake cs                # cryst, WalkTest the main example program
+    % gnumake mz                # mazed, MazeD the Crystal Space editor
+    % gnumake bl                # blocks, Blocks 3D-Tetris style game
+
+
+8. Using Crystal Space
+----------------------
+
+Make sure that the file "standard.zip" is in the cryst/src directory, as
+described in the "Unpacking" section of this document.  This file contains
+standard resources which are used by the example programs.
+
+You need to have one or more level files in order to run Crystal Space.  These
+are the files which contain the maps and rooms which you can explore with the
+"cryst" program, and which you can edit with "mazed".
+
+Before running Crystal Space for the first time, you should locate the file
+"cryst.cfg" which is in the cryst/src directory.  This file contains
+parameters which affect the Crystal Space environment such as mixing mode for
+lights, texture mapping modes, and light ambience.
+
+By default, the overall ambient light level is generally too dark for
+NextStep, OpenStep, and Rhapsody.  To fix this, edit the file cryst.cfg, and
+find the line which reads "AMBIENT_WHITE=".  Change the value of AMBIENT_WHITE
+to a value more suitable for the target platform, as summarized below:
+
+    Platform    Setting
+    --------    -------
+    NextStep    AMBIENT_WHITE=40
+    OpenStep    AMBIENT_WHITE=40
+    Rhapsody    AMBIENT_WHITE=60
+
+The first time you explore a level after changing the AMBIENT_WHITE value,
+Crystal Space will automatically recalculate the lights in the map.  This
+process can be quite time consuming, particularly for sizable levels such as
+"large.zip", so be patient.
+
+To run the Crystal Space "WalkTest" demonstration program, type:
+
+    % ./cryst ../data/large.zip
+
+This example allows you to explore the level "large.zip".  To explore a
+different level, substitute its name in place of "large.zip".
+
+The Crystal Space editor, MazeD, can be run with this command:
+
+    % ./mazed
+
+Blocks, the 3D-Tetris style game can be run with this command:
+
+    % ./blocks
+
+
+9. Controls
+-----------
+
+The document cryst/docs/keys.txt summarizes the keys which can be used to move
+around and explore the level with the Crystal Space example program "cryst".
+
+This same program also features a console into which the user can type
+commands to interact with the program.  To access the console while running
+the program, press the Tab key.  To get help and a list of commands which the
+console response to, type "help".  To exit from the console and resume the
+interactive exploration of the level, press Tab a second time.
+
+The document cryst/docs/blocks.txt summarizes the keys which can be used to
+play Blocks, the 3D-Tetris style game.

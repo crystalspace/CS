@@ -1,0 +1,8 @@
+LIBRARY SndDrvN INITINSTANCE TERMINSTANCE
+DESCRIPTION "Crystal Space NULL sound driver"
+EXPORTS
+	DllInitialize
+	DllCanUnloadNow
+	DllGetClassObject
+	DllRegisterServer
+	DllUnregisterServer

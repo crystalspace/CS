@@ -1,0 +1,5 @@
+This makefile is for libpng-1.0
+
+put these files into libpng directory then run
+
+ make -f Makefile.os2

@@ -1,0 +1,5 @@
+This makefile is for libjpeg-6a
+
+copy the os2/ subdirectory into libjpeg directory then run
+
+ make -f os2/Makefile.os2

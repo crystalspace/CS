@@ -1,0 +1,20 @@
+; This file contains definitions of some OS/2 functions
+; which aren't contained in the supplied with EMX os2.a
+
+  DiveQueryCaps			DIVE	1	?
+  DiveOpen			DIVE	2	?
+  DiveClose			DIVE	3	?
+  DiveSetupBlitter		DIVE	4	?
+  DiveBlitImage			DIVE	5	?
+  DiveAcquireFrameBuffer	DIVE	6	?
+  DiveSwitchBank		DIVE	7	?
+  DiveDeacquireFrameBuffer	DIVE	8	?
+  DiveSetDestinationPalette	DIVE	9	?
+  DiveSetSourcePalette		DIVE	10	?
+  DiveCalcFrameBufferAddress	DIVE	11	?
+  DiveAllocImageBuffer		DIVE	12	?
+  DiveFreeImageBuffer		DIVE	13	?
+  DiveBeginImageBufferAccess	DIVE	14	?
+  DiveEndImageBufferAccess	DIVE	15	?
+
+  Gre32Entry3			PMGRE	63	?

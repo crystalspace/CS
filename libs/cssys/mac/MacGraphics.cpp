@@ -1,0 +1,823 @@
+/*
+	Copyright (C) 1998 by Jorrit Tyberghein and K. Robert Bate.
+  
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Library General Public
+	License as published by the Free Software Foundation; either
+	version 2 of the License, or (at your option) any later version.
+  
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Library General Public License for more details.
+  
+	You should have received a copy of the GNU Library General Public
+	License along with this library; if not, write to the Free
+	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+/*----------------------------------------------------------------
+	Written by K. Robert Bate 1998.
+
+	10/1998		-	Created.
+	12/1998		-	Modified to use DrawSprockets when
+					the FullScreen flag is set.
+	2/1999		-	Added support for 32 bit pixels.
+	
+----------------------------------------------------------------*/
+#include "sysdef.h"
+#include "cscom/com.h"
+#include "cssys/common/system.h"
+#include "csgeom/csrect.h"
+
+#include <SegLoad.h>
+#include <Memory.h>
+#include <Palettes.h>
+#include <TextUtils.h>
+#include <Types.h>
+#include <Memory.h>
+#include <Quickdraw.h>
+#include <Fonts.h>
+#include <Events.h>
+#include <Menus.h>
+#include <Windows.h>
+#include <TextEdit.h>
+#include <Dialogs.h>
+#include <OSUtils.h>
+#include <ToolUtils.h>
+#include <DrawSprocket.h>
+
+#include "MacGraphics.h"
+
+#include "csutil/inifile.h"
+#include <stdarg.h>
+
+
+/////The 2D Graphics Driver//////////////
+
+#define NAME  "Crystal"
+
+BEGIN_INTERFACE_TABLE(csGraphics2DMac)
+    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
+    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphicsInfo, XGraphicsInfo )
+    IMPLEMENTS_COMPOSITE_INTERFACE_EX( IMacGraphicsInfo, XMacGraphicsInfo )
+END_INTERFACE_TABLE()
+
+IMPLEMENT_UNKNOWN(csGraphics2DMac)
+
+#define kArrowCursor	128
+
+#define kGeneralErrorDialog			1026
+#define kAskForDepthChangeDialog	1027
+
+#define kErrorStrings				1025
+#define kBadDepthString				1
+#define kNoDSContext				2
+#define kUnableToOpenDSContext		3
+#define kUnableToReserveDSContext	4
+
+
+/*----------------------------------------------------------------
+	Construct a graphics object.  This object provides a place on
+	screen to draw, and a place offscreen to render into.
+----------------------------------------------------------------*/
+csGraphics2DMac::csGraphics2DMac(ISystem* piSystem)
+				: csGraphics2D (piSystem)
+{
+	mMainWindow = NULL;
+	mColorTable = NULL;
+	mOffscreen = NULL;
+	mPixMap = NULL;
+    mMainPalette = NULL;
+    mPaletteChanged = false;
+    mDoubleBuffering = true;
+    mOldDepth = 0;
+	mSavedPort = NULL;
+	mSavedGDHandle = NULL;
+	mDrawSprocketsEnabled = false;
+}
+
+
+/*----------------------------------------------------------------
+	All Done, get rid of the color table and reset the screen
+	depth back to what it was if we changed it.
+----------------------------------------------------------------*/
+csGraphics2DMac::~csGraphics2DMac()
+{
+	if ( mDrawSprocketsEnabled ) {
+		DSpShutdown();
+	} else {
+		if ( mOldDepth ) {
+			GDHandle	theMainDevice;
+			theMainDevice = GetMainDevice();
+			SetDepth( theMainDevice, mOldDepth, (**theMainDevice).gdFlags, 1 );
+			mOldDepth = 0;
+		}
+	}
+
+	if ( mColorTable ) {
+		::DisposeHandle( (Handle)mColorTable );
+		mColorTable = NULL;
+	}
+}
+
+/*----------------------------------------------------------------
+	Construct the screen objects.  This object provides a place on
+	screen to draw, and a place offscreen to render into.
+----------------------------------------------------------------*/
+void csGraphics2DMac::Initialize()
+{
+	GDHandle				theMainDevice;
+	long					pixel_format;
+	OSErr					err;
+	Boolean					showDialogFlag;
+
+	csGraphics2D::Initialize ();
+
+	if (( FullScreen ) && ( DSpStartup() == noErr )) {
+		// Create the display
+		mDisplayAttributes.frequency 				= 0;
+		mDisplayAttributes.displayWidth				= Width;
+		mDisplayAttributes.displayHeight			= Height;
+		mDisplayAttributes.reserved1 				= 0;
+		mDisplayAttributes.reserved2 				= 0;
+		mDisplayAttributes.colorTable 				= NULL;
+		mDisplayAttributes.contextOptions 			= 0;
+		mDisplayAttributes.pageCount				= 0;
+		mDisplayAttributes.filler[1] 				= 0;
+		mDisplayAttributes.filler[2] 				= 0;
+		mDisplayAttributes.filler[3] 				= 0;
+		mDisplayAttributes.gameMustConfirmSwitch	= false;
+		mDisplayAttributes.reserved3[0] 			= 0;
+		mDisplayAttributes.reserved3[1] 			= 0;
+		mDisplayAttributes.reserved3[2] 			= 0;
+		mDisplayAttributes.reserved3[3] 			= 0;
+
+		if ( Depth == 0 ) {
+			mDisplayAttributes.colorNeeds				= kDSpColorNeeds_Request;
+			mDisplayAttributes.backBufferDepthMask		= kDSpDepthMask_8 | kDSpDepthMask_16 | kDSpDepthMask_32;
+			mDisplayAttributes.displayDepthMask			= kDSpDepthMask_8 | kDSpDepthMask_16 | kDSpDepthMask_32;
+			mDisplayAttributes.backBufferBestDepth		= 16;
+			mDisplayAttributes.displayBestDepth			= 16;
+		} else {
+			mDisplayAttributes.colorNeeds				= kDSpColorNeeds_Require;
+			if ( Depth == 32 ) {
+				mDisplayAttributes.backBufferDepthMask	= kDSpDepthMask_32;
+				mDisplayAttributes.displayDepthMask		= kDSpDepthMask_32;
+				mDisplayAttributes.backBufferBestDepth	= 32;
+				mDisplayAttributes.displayBestDepth		= 32;
+			} else if ( Depth == 16 ) {
+				mDisplayAttributes.backBufferDepthMask	= kDSpDepthMask_16;
+				mDisplayAttributes.displayDepthMask		= kDSpDepthMask_16;
+				mDisplayAttributes.backBufferBestDepth	= 16;
+				mDisplayAttributes.displayBestDepth		= 16;
+			} else {
+				mDisplayAttributes.backBufferDepthMask	= kDSpDepthMask_8;
+				mDisplayAttributes.displayDepthMask		= kDSpDepthMask_8;
+				mDisplayAttributes.backBufferBestDepth	= 8;
+				mDisplayAttributes.displayBestDepth		= 8;
+			}
+		}
+
+		err = DSpCanUserSelectContext( &mDisplayAttributes, &showDialogFlag );
+		if ( err ) {
+			DisplayErrorDialog( kNoDSContext );
+		}
+		if ( showDialogFlag == false ) {
+			err = DSpFindBestContext(&mDisplayAttributes, &mDisplayContext);
+			if ( err ) {
+				DisplayErrorDialog( kUnableToOpenDSContext );
+			}
+		} else {
+			err = DSpUserSelectContext( &mDisplayAttributes, 0, NULL, &mDisplayContext );
+			if ( err ) {
+				::ExitToShell();
+			}
+		}
+
+		DSpContext_GetAttributes( mDisplayContext, &mDisplayAttributes );
+		Depth = mDisplayAttributes.backBufferBestDepth;
+
+		mDrawSprocketsEnabled = true;
+	} else {
+		mDrawSprocketsEnabled = false;
+
+		mOffscreen = NULL;
+		mMainWindow = NULL;
+		mOldDepth = 0;
+
+		theMainDevice = GetMainDevice();
+		pixel_format = GETPIXMAPPIXELFORMAT( *((**theMainDevice).gdPMap) );
+
+		/*
+		 *	If the programs needs a certain pixel depth and the main device
+		 *	is not at this depth, ask the user if we can set the main screen
+		 *	to the required depth.
+		 */
+		if (( Depth ) && ( Depth != pixel_format )) {
+			/*
+			 *	Check to see if the main screen can handle the requested depth.
+			 */
+			if ( ! HasDepth( theMainDevice, Depth, (**theMainDevice).gdFlags, 1 )) {
+				DisplayErrorDialog( kBadDepthString );
+			}
+			/*
+			 *	Ask the user if we can change the depth, if not then quit.
+			 */
+			if ( Depth == 32 )
+				ParamText( "\pmillions of", "\p", "\p", "\p" );
+			else if ( Depth == 16 )
+				ParamText( "\pthousands of", "\p", "\p", "\p" );
+			else
+				ParamText( "\p256", "\p", "\p", "\p" );
+			if ( StopAlert( kAskForDepthChangeDialog, NULL ) != 1 ) {
+				::ExitToShell();
+			}
+		}
+
+		/*
+		 *	If the program does not need a certain pixel depth, check to make
+		 *	sure the pixel depth is on of the ones we can deal with.  If not,
+		 *	ask the user if we can set the main screen to the required depth.
+		 */
+		if (( ! Depth ) && (( pixel_format != 8 ) && ( pixel_format != 16 ) && ( pixel_format != 32 ))) {
+			/*
+			 *	Check to see if the main screen can handle the default depth.
+			 */
+			if ( ! HasDepth( theMainDevice, 8, (**theMainDevice).gdFlags, 1 )) {
+				/*
+				 *	No, see if it can deal with the other depths.
+				 */
+				if ( ! HasDepth( theMainDevice, 16, (**theMainDevice).gdFlags, 1 )) {
+					if ( ! HasDepth( theMainDevice, 32, (**theMainDevice).gdFlags, 1 )) {
+						DisplayErrorDialog( kBadDepthString );
+					} else {
+						Depth = 32;
+					}
+				} else {
+					Depth = 16;
+				}
+			} else {
+				Depth = 8;
+			}
+			/*
+			 *	Ask the user if we can change the depth, if not then quit.
+			 */
+			if ( Depth == 32 )
+				ParamText( "\pmillions of", "\p", "\p", "\p" );
+			else if ( Depth == 16 )
+				ParamText( "\pthousands of", "\p", "\p", "\p" );
+			else
+				ParamText( "\p256", "\p", "\p", "\p" );
+			if ( StopAlert( kAskForDepthChangeDialog, NULL ) != 1 ) {
+				::ExitToShell();
+			}
+		}
+
+		/*
+		 *	If the programs needs a certain pixel depth and the main device
+		 *	is not at this depth, change the main device to the required depth.
+		 */
+		if (( Depth ) && ( Depth != pixel_format )) {
+			SetDepth( theMainDevice, Depth, (**theMainDevice).gdFlags, 1 );
+			mOldDepth = pixel_format;
+		} else {
+			Depth = pixel_format;
+		}
+	}
+
+	/*
+	 *	Setup the pixel format, color table and drawing
+	 *	routines to the correct pixel depth.
+	 */
+	if ( Depth == 32 ) {
+		mColorTable = NULL;			// No color table needed
+		pfmt.PalEntries = 0;
+		pfmt.PixelBytes = 4;
+  		pfmt.RedMask = 0xFF << 16;
+  		pfmt.GreenMask = 0xFF << 8;
+  		pfmt.BlueMask = 0xFF;
+  		complete_pixel_format();
+
+		DrawPixel = DrawPixel32;
+		WriteChar = WriteChar32;
+		GetPixelAt = GetPixelAt32;
+		DrawSprite = DrawSprite32;
+	} else if ( Depth == 16 ) {
+		mColorTable = NULL;			// No color table needed
+		pfmt.PalEntries = 0;
+		pfmt.PixelBytes = 2;
+  		pfmt.RedMask = 0x1F << 10;
+  		pfmt.GreenMask = 0x1F << 5;
+  		pfmt.BlueMask = 0x1F;
+  		complete_pixel_format();
+
+		DrawPixel = DrawPixel16;
+		WriteChar = WriteChar16;
+		GetPixelAt = GetPixelAt16;
+		DrawSprite = DrawSprite16;
+	} else {
+		/*
+		 *	The 8 bit pixel data was filled in by csGraphics2D
+		 *	so all we need to do is make an empty color table.
+		 */
+		mColorTable = (CTabHandle)::NewHandleClear( sizeof(ColorSpec) * 256 + 8 );
+		(*mColorTable)->ctSeed = ::GetCTSeed();
+		(*mColorTable)->ctFlags = 0;
+		(*mColorTable)->ctSize = 255;
+	}
+
+	if ( mDrawSprocketsEnabled ) {
+		mDisplayAttributes.colorTable = mColorTable;
+		err = DSpContext_Reserve(mDisplayContext, &mDisplayAttributes);
+		if ( err ) {
+			DisplayErrorDialog( kUnableToReserveDSContext );
+		}
+	}
+}
+
+
+/*----------------------------------------------------------------
+	Open a window.
+----------------------------------------------------------------*/
+bool csGraphics2DMac::Open(char* Title)
+{
+	Str255			theTitle;
+	Rect			theBounds;
+	int				i;
+	int				theOffset;
+	unsigned int	theRowBytes;
+	OSErr			theError;
+
+	if ( mDrawSprocketsEnabled ) {
+		DSpContext_FadeGammaOut(NULL, NULL);
+		DSpContext_SetState(mDisplayContext, kDSpContextState_Active);
+		DSpContext_FadeGammaIn(NULL, NULL);
+
+		// Create the pixmap draw context with the image pointing to our back buffer
+		DSpContext_GetBackBuffer(mDisplayContext, kDSpBufferKind_Normal, &mOffscreen);
+		mPixMap = GetGWorldPixMap(mOffscreen);
+
+		mGetBufferAddress = false;
+		mDoubleBuffering = true;
+	} else {
+		/*
+		 *	Make the offscreen port.
+		 */
+
+		theBounds.left = 0;
+		theBounds.top = 0;
+		theBounds.right = Width;
+		theBounds.bottom = Height;
+		theError = ::NewGWorld( &mOffscreen, Depth, &theBounds, mColorTable, NULL, 0 );
+		if (( theError != noErr ) || ( mOffscreen == NULL ))
+			::ExitToShell();
+
+		/*
+		 *	lock it and get its address
+		 */
+		mPixMap = ::GetGWorldPixMap( mOffscreen );
+		::LockPixels(mPixMap);
+
+		/*
+		 *	Create the main window with the given title
+		 */
+		OffsetRect( &theBounds, 64, 64 );
+		strcpy( (char *)&theTitle[1], Title );
+		theTitle[0] = strlen( Title );
+		mMainWindow = (CWindowPtr)::NewCWindow( nil, &theBounds, theTitle, true, noGrowDocProc, 
+												(WindowPtr) -1, false, 0 );
+
+		// set the color table into the video card
+		::SetGWorld( (CGrafPtr)mMainWindow, NULL );
+		if ( Depth == 8 ) {
+			mMainPalette = ::NewPalette( 256, mColorTable, /* pmExplicit + */ pmTolerant, 0x2000 );
+			::SetPalette( (WindowPtr)mMainWindow, mMainPalette, true );
+			mPaletteChanged = true;
+		} else {
+			mPaletteChanged = false;
+		}
+		::ShowWindow( (WindowPtr)mMainWindow );
+		::SelectWindow( (WindowPtr)mMainWindow );
+
+		mDoubleBuffering = true;
+	}
+
+	Memory = (unsigned char*)::GetPixBaseAddr(mPixMap);
+	theRowBytes = (**mPixMap).rowBytes & 0x7fff;
+
+	/*
+	 *	Allocate buffer for address of each scan line to avoid multiplication
+	 */
+	CHK (LineAddress = new int [Height]);
+
+	if (LineAddress == NULL)
+		return false;
+
+	/*
+	 *	Initialize scanline address array (offset)
+	 */
+	for (i = 0, theOffset = 0; i < Height; i++, theOffset += theRowBytes )
+		LineAddress[i] = theOffset;
+
+
+	Clear( 0 );
+
+	return true;
+}
+
+
+/*----------------------------------------------------------------
+	Toasts the window and restores the clut to the main device.
+----------------------------------------------------------------*/
+void csGraphics2DMac::Close(void)
+{
+	if ( mDrawSprocketsEnabled ) {
+		if ( mDisplayContext != NULL )
+		{
+			DSpContext_FadeGammaOut(NULL, NULL);
+			DSpContext_SetState(mDisplayContext, kDSpContextState_Inactive);
+			DSpContext_FadeGammaIn(NULL, NULL);
+			DSpContext_Release(mDisplayContext);
+			
+			mDisplayContext = NULL;
+		}
+	} else {
+		if ( mOffscreen ) {
+			::DisposeGWorld( mOffscreen );
+			mOffscreen = NULL;
+		}
+
+		if ( mMainWindow ) {
+			::DisposeWindow( (WindowPtr)mMainWindow );
+			mMainWindow = NULL;
+		}
+
+		::RestoreDeviceClut( NULL );
+	}
+}
+
+
+/*----------------------------------------------------------------
+	Set a color in the color palette.
+----------------------------------------------------------------*/
+void csGraphics2DMac::SetRGB(int i, int r, int g, int b)
+{
+	CTabHandle	theCTable;
+	ColorSpec	theColor;
+
+	if (( i < 0 ) || ( i >= pfmt.PalEntries ))
+		return;
+
+	theColor.rgb.red =  r | (r << 8);
+	theColor.rgb.green = g | (g << 8);
+	theColor.rgb.blue = b | (b << 8);
+
+	if ( mDrawSprocketsEnabled ) {
+		DSpContext_SetCLUTEntries( mDisplayContext,  &theColor, i, i );
+	} else {
+		if ( mOffscreen ) {
+			theCTable = (**(mOffscreen->portPixMap)).pmTable;
+			(*theCTable)->ctTable[i].value = i;
+			(*theCTable)->ctTable[i].rgb = theColor.rgb;
+		} else {
+			theCTable = (**(mMainWindow->portPixMap)).pmTable;
+			(*theCTable)->ctTable[i].value = i;
+			(*theCTable)->ctTable[i].rgb = theColor.rgb;
+		}
+		CTabChanged( theCTable );
+
+		if ( mMainPalette ) {
+			SetEntryColor( mMainPalette, i, &theColor.rgb );
+		}
+	}
+	mPaletteChanged = true;
+}
+
+
+/*----------------------------------------------------------------
+	Make sure we are ready to draw.
+----------------------------------------------------------------*/
+bool csGraphics2DMac::BeginDraw()
+{
+	::GetGWorld( &mSavedPort, &mSavedGDHandle );
+
+	if ( mDrawSprocketsEnabled ) {
+		CGrafPtr port;
+		int		 i;
+		int		 theOffset;
+		int		 theRowBytes;
+
+		if ( mGetBufferAddress ) {
+			DSpContext_GetBackBuffer(mDisplayContext, kDSpBufferKind_Normal, &mOffscreen);
+			SetPort((GrafPtr) mOffscreen);
+
+			Memory = (unsigned char*)::GetPixBaseAddr(mOffscreen->portPixMap);
+			mGetBufferAddress = false;
+		}
+
+		mPaletteChanged = false;
+	} else {
+		CTabHandle	theCTable;
+
+		/*
+		 *	If the palette has changed, make sure the offscreen gworld
+		 *	(if there is one)and the window are correctly set up.
+		 */
+		if ( mPaletteChanged ) {
+			if ( mOffscreen ) {
+				theCTable = (**(mOffscreen->portPixMap)).pmTable;
+
+				::SetGWorld( (GWorldPtr)mOffscreen, NULL );
+				::CTabChanged( theCTable );
+			} else {
+				theCTable = (**(mMainWindow->portPixMap)).pmTable;
+
+				::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+				::CTabChanged( theCTable );
+			}
+
+			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+			::SelectWindow( (WindowPtr)mMainWindow );
+			::ActivatePalette( (WindowPtr)mMainWindow );
+
+			mPaletteChanged = false;
+		} else {
+			::SetGWorld( (GWorldPtr)mMainWindow, NULL );
+		}
+	}
+
+  return true;
+}
+
+
+/*----------------------------------------------------------------
+	Finish up drawing.
+----------------------------------------------------------------*/
+void csGraphics2DMac::FinishDraw()
+{
+	::SetGWorld( (GWorldPtr)mSavedPort, mSavedGDHandle );
+}
+
+
+/*----------------------------------------------------------------
+	Put the offscreen buffer into the window so the user can see it.
+----------------------------------------------------------------*/
+void csGraphics2DMac::Print( csRect * area )
+{
+	Rect	theRect;
+
+	if ( mDrawSprocketsEnabled ) {
+		/*
+		 *	If area is not null, then use it to select the
+		 *	region that is to be drawn.  Otherwise the whole
+		 *	window is drawn.
+		 */
+
+		if ( area ) {
+			theRect.top = area->ymin;
+			theRect.left = area->xmin;
+			theRect.bottom = area->ymax;
+			theRect.right = area->xmax;
+			DSpContext_InvalBackBufferRect( mDisplayContext, &theRect );
+		}
+
+		DSpContext_SwapBuffers( mDisplayContext, NULL, 0 );
+		mGetBufferAddress = true;
+	} else {
+		CGrafPtr	thePort;
+		GDHandle	theGDHandle;
+
+		if ( mDoubleBuffering ) {
+			::GetGWorld( &thePort, &theGDHandle );
+
+			::SetGWorld((GWorldPtr)mMainWindow, nil);
+
+			/*
+			 *	If area is not null, then use it to select the
+			 *	region that is to be drawn.  Otherwise the whole
+			 *	window is drawn.
+			 */
+
+			if ( area ) {
+				theRect.top = area->ymin;
+				theRect.left = area->xmin;
+				theRect.bottom = area->ymax;
+				theRect.right = area->xmax;
+			} else {
+				theRect = mOffscreen->portRect;
+			}
+
+			::CopyBits((BitMap*)*mPixMap, &((WindowPtr)mMainWindow)->portBits,
+				&theRect, &theRect, srcCopy, NULL );
+
+			::SetGWorld( thePort, theGDHandle );
+		}
+	}
+}
+
+
+/*----------------------------------------------------------------
+	Enable or disable double buffering; return TRUE if supported
+----------------------------------------------------------------*/
+bool csGraphics2DMac::DoubleBuffer(bool Enable)
+{
+	int				i;
+	int				theOffset;
+	unsigned int	theRowBytes;
+
+	/*
+	 *	If there is no pix map then we have not gotten to
+	 *	open yet so just save the enable.
+	 */
+
+	if ( mPixMap == NULL ) {
+		mDoubleBuffering = Enable;
+		return true;
+	}
+
+	/*
+	 *	Otherwise, if we are not doing drawsprockets,
+	 *	allow the double buffering to be turned on or off.
+	 */
+
+	if ( ! mDrawSprocketsEnabled ) {
+		if ( Enable != mDoubleBuffering ) {
+			mDoubleBuffering = Enable;
+
+			if ( Enable ) {  
+				mPixMap = ::GetGWorldPixMap(mOffscreen);
+				Memory = (unsigned char*)::GetPixBaseAddr(mPixMap);
+				theRowBytes = (**mPixMap).rowBytes & 0x7fff;
+			} else {
+				mPixMap = mMainWindow->portPixMap;
+				Memory = (unsigned char*)::GetPixBaseAddr(mPixMap);
+				theRowBytes = (**mPixMap).rowBytes & 0x7fff;
+				Memory += ( theRowBytes * ( - (**mPixMap).bounds.top )) +
+							( ((**mPixMap).pixelSize / 8 ) * ( - (**mPixMap).bounds.left ));
+			}
+
+			/*
+			 *	Setup the scanline address array (offsets).
+			 */
+			for (i = 0, theOffset = 0; i < Height; i++, theOffset += theRowBytes )
+				LineAddress[i] = theOffset;
+		}
+	}
+
+	return true;
+}
+
+/*----------------------------------------------------------------
+	Get the current drawing page.
+----------------------------------------------------------------*/
+int csGraphics2DMac::GetPage()
+{
+	return 0;
+}
+
+
+/*----------------------------------------------------------------
+	Set the mouse cursor.
+----------------------------------------------------------------*/
+bool csGraphics2DMac::SetMouseCursor( int iShape, ITextureHandle* iBitmap )
+{
+#pragma unused( iBitmap )
+	bool		cursorSet = true;
+	CursHandle	theCursor;
+
+	if ( iShape == csmcNone )
+		HideCursor();
+	else if ( iShape == csmcArrow )
+		InitCursor();
+	else {
+		if ( iShape == csmcWait )
+			theCursor = GetCursor( watchCursor );
+		else if ( iShape == csmcCross )
+			theCursor = GetCursor( crossCursor );
+		else
+			theCursor = GetCursor( iShape + kArrowCursor );
+
+		if ( theCursor )
+			SetCursor( *theCursor );
+		else {
+			HideCursor();
+			cursorSet = false;
+		}
+	}
+
+  return cursorSet;
+}
+
+/*----------------------------------------------------------------
+	Activate the window.
+----------------------------------------------------------------*/
+void csGraphics2DMac::ActivateWindow( WindowPtr inWindow, bool active )
+{
+	CGrafPtr	thePort;
+	GDHandle	theGDHandle;
+
+	if ( ! mDrawSprocketsEnabled ) {
+		if ( inWindow != (WindowPtr)mMainWindow )
+			return;
+
+		if ( active ) {
+			::SelectWindow( (WindowPtr)mMainWindow );
+			::ActivatePalette( (WindowPtr)mMainWindow );
+		}
+	}
+	return;
+}
+
+
+/*----------------------------------------------------------------
+	Update the window.
+----------------------------------------------------------------*/
+void csGraphics2DMac::UpdateWindow( WindowPtr inWindow, bool *updated )
+{
+	CGrafPtr	thePort;
+	GDHandle	theGDHandle;
+
+	*updated = false;
+
+	if ( ! mDrawSprocketsEnabled ) {
+		if ( inWindow != (WindowPtr)mMainWindow )
+			return;
+
+		::GetGWorld( &thePort, &theGDHandle );
+
+		::SetGWorld((GWorldPtr)mMainWindow, nil);
+
+		::BeginUpdate( (WindowPtr)mMainWindow );
+
+		if ( ! mDoubleBuffering ) {
+			::CopyBits((BitMap*)*mPixMap, &((WindowPtr)mMainWindow)->portBits,
+					&mOffscreen->portRect, &mOffscreen->portRect,
+					srcCopy, NULL );
+		}
+
+		::EndUpdate( (WindowPtr)mMainWindow );
+
+		::SetGWorld( thePort, theGDHandle );
+
+		*updated = true;
+	}
+	return;
+}
+
+void csGraphics2DMac::PointInWindow( Point *thePoint, bool *inWindow )
+{
+	if ( mDrawSprocketsEnabled ) {
+		DSpContextReference outContext;
+		OSStatus			err;
+
+		if ( DSpFindContextFromPoint( *thePoint, &outContext ) == noErr ) {
+			if ( outContext == mDisplayContext ) {
+				DSpContext_GlobalToLocal ( outContext, thePoint );
+				*inWindow = true;
+				return;
+			}
+		}
+		*inWindow = false;
+	} else {
+		GrafPtr	thePort;
+
+		if ( PtInRgn( *thePoint, ((WindowPeek)mMainWindow)->strucRgn )) {
+			::GetPort( &thePort );
+			::SetPort( (WindowPtr)mMainWindow );
+			::GlobalToLocal( thePoint );
+			::SetPort( thePort );
+
+			*inWindow = true;
+			return;
+		}
+
+		*inWindow = false;
+	}
+	return;
+}
+
+
+void csGraphics2DMac::IsDrawSprocketsEnabled( bool *isEnabled )
+{
+	*isEnabled = mDrawSprocketsEnabled;
+
+	return;
+}
+
+
+void csGraphics2DMac::DisplayErrorDialog( short errorIndex )
+{
+	Str255	theString;
+
+	if ( mDrawSprocketsEnabled ) {
+		if ( mDisplayContext )
+			DSpContext_SetState(mDisplayContext, kDSpContextState_Inactive);
+		DSpShutdown();
+	}
+
+	GetIndString( theString, kErrorStrings, errorIndex );
+	ParamText( theString, "\p",  "\p", "\p" );
+	StopAlert( kGeneralErrorDialog, NULL );
+	::ExitToShell();
+}

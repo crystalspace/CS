@@ -1,0 +1,281 @@
+Crystal Space VC++ Win32 Development Readme
+This is up to date as of January 18th, 1998
+
+Contents:
+1.	Working with the Workspace.
+2.	Frequently Asked Questions.
+
+---------[1] WORKING WITH THE WORKSPACE-------------------
+Written by Dan Ogles
+Updated by Noote (Nathaniel Saint Martin)
+
+If you have any questions, contact me at dogles@peachtree.com (or me noote@bigfoot.com).
+
+Working with Crystal Space under Win32 can sometimes be a pain. Since linux
+and other unix platforms are the primary platform for CS, it is common to
+find that the VC++ project files and such are out of date. This is my attempt
+to organize the VC++ project files so that they are organized in an easy to
+use manner. If you have any suggestions, feel free to contact me.
+
+The Crystal Space workspace is divided into 17 projects: 
+
+The libraries :
+* Com -- the statically linked library which includes all the
+  definitions for the interface IDs used in all the projects. This is linked
+  into all of the projects.
+* CsWs -- the window manager library (need for Mazed editor)
+* CSpace - the static linked library, which includes the majority of the code
+
+The drivers :
+* SoftwareRender - the SoftwareRender DLL, which includes the 3D graphics
+  driver for software rasterization. This is loaded by the CrystalSpace EXE.
+* Direct3D5Render - the Direct3D Dx5 Render DLL, which includes the 3D graphics
+  driver for Direct3D-accelerated rasterization. This is loaded by the
+  CrystalSpace EXE.
+* Direct3D6Render - the Direct3D Dx6 Render DLL, which includes the 3D graphics
+  driver for Direct3D-accelerated rasterization. This is loaded by the
+  CrystalSpace EXE.
+* Glide2xRender - the Glide2x Render DLL, which includes the 3D graphics
+  driver for Glide-accelerated rasterization. This is loaded by the
+  CrystalSpace EXE.
+* Glide3xRender - the Glide3x Render DLL, which includes the 3D graphics
+  driver for Glide-accelerated rasterization. This is loaded by the
+  CrystalSpace EXE.
+* OpenGLRender - the OpenGLRender DLL, which includes the 3D graphics
+  driver for OpenGL-accelerated rasterization. This is loaded by the
+  CrystalSpace EXE.
+* DirectDraw2D - the DirectDraw Dx3 Graphics DLL, which includes the 2D graphics
+  layer for DirectDraw screen devices. This is loaded by the CrystalSpace
+  EXE.
+* DirectDraw2D6 - the DirectDraw Dx6 Graphics DLL, which includes the 2D graphics
+  layer for DirectDraw screen devices. This is loaded by the CrystalSpace
+  EXE. it's Dx6 compatible and used by Direct3D Dx6 Render.
+* NetworkDriverNull - the null network Driver, This is loaded by the CrystalSpace
+  EXE.
+* NetworkDriverSock - the BSD Sockets network Driver, This is loaded by the CrystalSpace
+  EXE.
+
+The applications :
+* WalkTest -- a walktest application, which includes key handling and such.
+* MazeD -- an editor.
+* PrimEdit -- an editor.
+* Simple -- a simple (minimum) CyrstalSpace application.
+
+Note : Direct3DDx6, Glide3x and OpenGL render don't work.
+
+To compile Crystal Space, you'll have to perform the following steps.
+
+1. Compile the CrystalSpace, and all Drivers projects. This
+will create the output files CrystalSpace.exe, SoftwareRender.dll, and
+DirectDraw2D.dll in your $/cryst/src folder. You compile a project by right
+clicking on it in FileView, and clicking "Set As Active Project", then clicking
+the Build button (or pressing F7).
+
+2. Type the following commands on the command line (while in the $/cryst/src directory):
+
+"C:\Windows\System\RegSvr32 SoftwareRender.dll"
+"C:\Windows\System\RegSvr32 DirectDraw2D.dll"
+
+This will set up both COM servers in the Windows Registry. This is absolutely
+essential. Make sure that RegSvr32 returns a successful value.
+
+3. Change your settings in cryst.cfg (included in the Configuration Files folder
+in the CrystalSpace project) to the following:
+
+	DRIVER = crystalspace.graphics3d.software
+	WORLDFILE = ../data/large.zip
+
+This will set up CrystalSpace to run in software mode using the worldfile
+"large.zip". Make sure that you have downloaded a worldfile from the Crystal Space
+Website before this. These files are in ZIP format and should be downloaded to the
+$/cryst/data directory. Do not attempt to extract this archive - Crystal Space
+decompresses the ZIP file at run time.
+
+---------[2] FREQUENTLY ASKED QUESTIONS-------------------
+
+Written by Xavier Trochu.
+Updated by NooTe (Nathaniel Saint Martin)
+
+_ How do I compile Crystal Space using Visual C++ 5.0?
+
+That should be pretty easy:
+Just open the Project Workspace ($/cryst/src/visualc/CrystalSpace.dsw).
+Select what you want to compile and let's go!
+You have almost one hundred percent of at least one of the following thing
+happens. So let's answer to the compilation problems first, before looking
+at the linking problems.
+
+
+I. COMPILATION TIME:
+
+_ There are a lot of warnings during compile (~300 for bet11_013)!
+
+Well, that's normal:
+VC greatly cares about lost information, so every implicit casting from a more
+precise type to a less one generates a warning (ie double to float), and
+constant floating numbers declared have the double type for VC, whereas most
+of the corresponding variables are declared float. If you don't want them,
+just set the Warning Level of the project to 1. Right click on the project in
+the FileView and click "Settings". The setting is in the "General" Category, 
+"Warning Level" field. 
+
+There will be some other warnings, due to the typedef "bool" being a builtin
+type for VC 5. If you don't want them, ask for explicit casting in the mailing
+list, or do it yourself! 
+
+
+_ Where are those damn zlib.h, png.h or jpeglib.h files?
+
+Those files are not part of the Crystal Space project, but they are required
+to build it. You must get a version of the following packages: ZLIB and LIBPNG.
+Those packages can be easily found on the net. 
+the latest version of the ZLIB sources are at:
+    ftp://ftp.uu.net/graphics/png/src/zlib???.zip
+the latest version of the LIBPNG sources are at:
+    ftp://ftp.uu.net/graphics/png/src/lpng???.zip
+the latest version of the JPEGLIB sources are at:
+    ftp://ftp.uu.net/graphics/png/src/jpeglib???.zip
+
+To make things easier you can download precompiled DLL's and lib's for
+Windows at Jorrit Tyberghein's homepage:
+    http://www.geocities.com/SiliconValley/Horizon/3856/beta.html
+Check for libdlls.zip and read the included readme. This is the recommended way.
+
+Or else you can also get the pre-compiled DLLs at the homepage of Nathaniel
+Saint Martin at:
+    http://www.bigfoot.com/~noote/CrystalSpace in 'Sources' section
+You can get the png-vc.zip and zlib-vc.zip files and extract them like this:
+Create a directory called zlib in the Crystal Space base directory (the one
+that also contains data, src and docs directories). Put zlib.lib in it.
+Create a directory called libpng in the same directory and put png.lib in it.
+Put zlib.dll and png.dll in the src directory.
+Get zlib.h and zconf.h from the zlib library and put them in the zlib
+directory.
+Get png.h and pngconf.h from the libpng library and put them in the libpg
+directory. Recompile...
+
+
+_ Where are ddraw.h, d3d.h and d3dcaps.h files ?
+
+You must have the DirectX 5 or above SDK in order to compile Crystal Space. 
+You can get it from Microsoft. See at
+    http://www.microsoft.com/directx
+I have heard that they don't put it to download anymore but I know a place
+where you can still get it:  
+    ftp://ftp.univ-lille1.fr/pub/msdownload/directx/5.0/developerdl/
+
+OK, after having done all this (in half an hour), I don't have any
+compilation warnings or errors left. So things should be perfect, but ...
+
+
+II. LINKING TIME:
+
+_ Where are the file png.lib and zlib.lib?
+
+Just look above at the question about zlib.h and pnb.h! It's the same problem,
+and if you have already done what is told there, I can't do much for you!
+
+
+_ Where is the ddraw.lib library?
+
+It's included in the DirectX SDK. Look above for a pointer to get it.
+
+_ I've got unresolved symbols!
+
+What kind of symbols?
+  _png_... : That means that you don't link the project with png.lib. Just
+      take a look below where it is explained how to do so.
+  _inflate... and _deflate... : Well, it seems to your project lacks
+      zlib.lib. The trick is explained just below, so hang on.
+  _DirectDraw... : Idem, but for ddraw.lib (DirectX component), look below.
+  others        : Well, I always have a solution, but this one is more
+      difficult. It seems that there is a missing source file in your
+      project. But the question is, which source file? If it isn't obvious
+      by the name of the functions, just to the following: In the menu
+      "Edit", select the option "Find in Files...". Put the name of the
+      function in the field "Find what", Check that the "In folder" field
+      content is the CrystalSpace src directory and press "Find". You should
+      get a bunch of files, many of them just making a call to the function.
+      But there is surely one which contains the definition of the function.
+      Look at the position of the file where it is defined, and add it to the
+      project (Menu "Project"|"Add To Project"|"Files").
+
+In order to add (or remove) a library for the link process, Let's go in the
+menu "Project"|"Settings", "Link" Tab, "General" category. There is a field
+called "Object/library modules" that lists all the libraries added to the
+project at link time. WARNING: for png.lib and zlib.lib, use this:
+../../../libpng/png.lib and ../../../zlib/zlib.lib!
+Be sure to modify this for your current project!
+
+
+_ I've got some weird symbols included twice!
+
+It happened to me with previous release of Crystal Space, but not with the
+current one (bet11r032). In the same panel as above, but in the "Input"
+Category, There is a field called "ignore libraries". Add LIBCMT.LIB if your
+project is a Debug project, and add LIBCD.LIB if your project is a Release
+project.
+
+
+OK, Now, it should link. So you should have an executable file called
+"Cryst_win32.exe" in your src directory. Let's run it!
+
+
+III. MISCELLANEOUS THINGS:
+
+_ When I want to launch CrystalSpace I got an 'invalid directory' error!
+
+Just go in the "Project"|"Settings" panel, under "Debug" tab, you have a
+field wich ask for the "directory" . Put your CrystalSpace\src directory here.
+
+
+_ I don't care about png support, what can I do?
+
+It's easy. In the "Project"|"Settings" panel, choose the "C/C++" tab,
+"General" Category, select the field "Preprocessor definitions" and remove
+DO_PNG. Be sure to remove the png.lib from the modules added during link
+time (see above).
+
+
+_ I don't care about Direct3D support.
+
+Right click on the Direct3DRender project, and click "Unload project". It 
+won't be compiled any longer after that. To reload it, right click on it and
+click "Load Project".
+
+_ I have a working jpeg library, how can I let CrystalSpace use it?
+
+Add DO_JPEG in the same place as above. Be sure to create the libjpeg
+directory (with libjpeg.lib, jpeg.h, jerror.h, jmorecfg.h and jconfig.h in
+it). Add libjpeg.lib to the list of modules added during link time (see
+above). AND DON'T FORGET TO GIVE IT (DLL and LIB) to Nathaniel, or anyone
+else (like me)!
+
+
+_ I have a problem that you haven't solved here!
+
+Mail me about it at xtrochu@yahoo.com or Dan Ogles at dogles@peachtree.com.
+You could also try the Crystal Space Mailing List (crystal@lists.linux.it). 
+Don't forget to tell us if you're not a member of that list so that we can 
+then send you a personal reply.
+
+- What's this, does this guy know anything about good english?
+
+You're angry! GOOD! then correct my so bad english and mail me your corrections.
+
+
+_ What's this, does this guy know anything about CrystalSpace/C++/VisualC/etc?
+
+Don't keep your feelings/thoughts to yourself. If you have any idea to make this
+HOWTO better, mail it to me. You could even become officially responsible
+for the future versions of this file :-)
+
+Hope this helps you!
+
+
+Xavier TROCHU
+xtrochu@yahoo.com
+NooTe (Nathanile Saint Martin)
+noote@bigfoot.com
+
+

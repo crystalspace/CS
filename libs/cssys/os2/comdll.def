@@ -1,0 +1,8 @@
+LIBRARY ??? INITINSTANCE TERMINSTANCE
+DESCRIPTION "???"
+EXPORTS
+	DllInitialize
+	DllCanUnloadNow
+	DllGetClassObject
+	DllRegisterServer
+	DllUnregisterServer

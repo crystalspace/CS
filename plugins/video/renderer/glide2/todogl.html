@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html>
+
+<head>
+<title>Todo list for Glide port - written by Xavier Trochu</title>
+</head>
+
+<body TEXT="#FFFF80" BGCOLOR="#000000" LINK="#8080FF" ALINK="#FF0000" VLINK="#9900DD">
+
+<p><var>This list is here for me to remember what has to be done in order to have a great
+glide port of Crystal Space. If you want to correct something, or to add something to this
+list, just send me a little <a HREF="#mail">mail</a><a>. I will try to maintain it so that
+it support the following hardware: 
+
+<ul>
+  <li><strong>VoodooGraphics (Voodoo1)</strong> </li>
+  <li><strong>Voodoo2</strong> </li>
+  <li>Rush </li>
+  <li>Banshee </li>
+</ul>
+
+<p>And the following systems: 
+
+<ul>
+  <li><strong>Windows 9x</strong> </li>
+  <li>Windows NT </li>
+  <li>DOS/WATCOM </li>
+  <li>Linux </li>
+</ul>
+
+<p>If you have any combination of hardware and system that is not <strong>like this</strong>,
+be aware that this port has not been tested on this particular combination. Please, give
+it a try and send </a><a HREF="#mail">me</a> the result. </p>
+
+<p><strong><font COLOR="RED">Owners of Banshee, I have a particular test to make on your
+system. <a HREF="#mail">ASK ME</a>. </font></strong></var></p>
+
+<p><strong>Things that needs to be done on the Glide port: </strong>
+
+<ul>
+  <li>DrawPolygonQuick has to be fixed. </li>
+  <li>Lightmap size should be fixed. </li>
+  <li>MultiPass Alpha routine has to be fixed. </li>
+  <li>Check for SinglePass without Lightmap. </li>
+  <li>Calculation of the sow/tow values may have to be rewritten (faster). </li>
+  <li>Unload function called twice on the same texture... ? </li>
+  <li>2 MByte boundary has to be checked in FixedTextureMemoryManager. I have one possible
+    solution, but I don't like it... </li>
+  <li>HighColorCacheAndManage need to be completly rewritten. The actual code is ugly. </li>
+</ul>
+
+<p>We can be reached at <a NAME="mail" HREF="mailto:xtrochu@yahoo.com">xtrochu@yahoo.com</a>
+and <a href="mailto:noote@bigfoot.com">noote@bigfoot.com</a></p>
+</body>
+</html>

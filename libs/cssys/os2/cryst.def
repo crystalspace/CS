@@ -1,0 +1,3 @@
+NAME Cryst WINDOWAPI
+DESCRIPTION "CrystalSpace test executable"
+STACKSIZE 1048576
