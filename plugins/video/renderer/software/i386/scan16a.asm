@@ -594,6 +594,7 @@ proc		csScan_16_draw_pi_scanline_tex_zuse,24,ebx,esi,edi,ebp
 		targ	%$dz		; long dz
 		targ	%$bitmap	; unsigned char *bitmap
 		targ	%$bitmap_log2w	; int bitmap_log2w
+
 		loc	%$dudvFP,8	; fixed-point value of (dv * tex_w + du)
 		tloc	%$duFP		; fixed-point duu
 		tloc	%$dvFP		; fixed-point dvv
@@ -667,7 +668,7 @@ proc		csScan_16_draw_pi_scanline_tex_zuse,24,ebx,esi,edi,ebp
 		mov	ecx,%$paltable		; Get 8->16 table	; 2
 		mov	dl,[esi]		; Get texel		; 2
 		mov	dx,[ecx+edx*2]		; Convert to 16-bit	; 3/2
-		mov	ecx,[ebp]		; *zbuff = z		; 3
+		mov	ecx,[ebp]		; z = *zbuff		; 3
 		mov	[edi],dx		; Put texel		; 5
 
 %$zbelow:	add	ebx,%$dvFP		; v = v + dv		; 6

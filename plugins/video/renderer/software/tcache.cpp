@@ -77,7 +77,7 @@ csTextureCacheSoftware::~csTextureCacheSoftware ()
 void csTextureCacheSoftware::set_cache_size (long size)
 {
   Clear ();
-  cache_size = size * bytes_per_texel;
+  cache_size = size;
 }
 
 void csTextureCacheSoftware::Clear ()

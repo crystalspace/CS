@@ -320,9 +320,9 @@ public:
   /// Multiply a vector by a matrix (transform it).
   inline friend csVector3 operator* (const csMatrix3& m, const csVector3& v)
   {
-   return csVector3 (m.m11*v.x + m.m12*v.y + m.m13*v.z,
-                     m.m21*v.x + m.m22*v.y + m.m23*v.z,
-                     m.m31*v.x + m.m32*v.y + m.m33*v.z);
+    return csVector3 (m.m11*v.x + m.m12*v.y + m.m13*v.z,
+                      m.m21*v.x + m.m22*v.y + m.m23*v.z,
+                      m.m31*v.x + m.m32*v.y + m.m33*v.z);
   }
 
   /// Multiply a matrix and a scalar.

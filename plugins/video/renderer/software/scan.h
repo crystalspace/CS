@@ -113,10 +113,6 @@ struct csScanSetup
   int tw2;
   /// Height of the texture from the texture cache.
   int th2;
-  /// Difference with u for untiled textures.
-  float fdu;
-  /// Difference with v for untiled textures.
-  float fdv;
   /// Texture width in 16:16 fixed-point format - 1
   int tw2fp;
   /// Texture height in 16:16 fixed-point format - 1
@@ -175,6 +171,10 @@ struct csScanSetup
   int shf_h;
   /// 1 << shf_h - 1
   int and_h;
+  /// U at the origin of the texture
+  int min_u;
+  /// V at the origin of the texture
+  int min_v;
 
   /// Actual texture palette
   RGBPixel *TexturePalette;

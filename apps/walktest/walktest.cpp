@@ -954,7 +954,7 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
       player_spawned=true;
     }
 
-    for (int repeats=0 ; repeats<((elapsed_time)/25.0+0.5) ; repeats++)
+    for (int repeats = (elapsed_time + 12) / 25; repeats; repeats--)
     {
       if (move_3d)
       {
@@ -1015,7 +1015,7 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
     if (time0 != (time_t)-1)
     {
       if (time1 != time0)
-        timeFPS=10000.0f/(float)(time1-time0);
+        timeFPS = 10000.0f / (float)(time1 - time0);
     }
     cnt = 10;
     time0 = SysGetTime ();

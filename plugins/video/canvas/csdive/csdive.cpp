@@ -25,9 +25,6 @@
 #include "csinput/csevent.h"
 #include "isystem.h"
 
-// shit ...
-#undef SEVERITY_ERROR
-
 #include "csdive.h"
 #include "libDIVE.h"
 #include "libDIVEprv.h"
@@ -477,6 +474,7 @@ bool csGraphics2DOS2DIVE::BeginDraw ()
   {
     if (System->GetShutdown ())
       dW->Pause (FALSE);
+    csGraphics2D::FinishDraw ();
     return false;
   } /* endif */
 

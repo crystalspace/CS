@@ -149,10 +149,6 @@ struc csScanSetup
   int tw2;
   ; Height of the texture from the texture cache.
   int th2;
-  ; Difference with u for untiled textures.
-  float fdu;
-  ; Difference with v for untiled textures.
-  float fdv;
   ; Texture width in 16:16 fixed-point format - 1
   int tw2fp;
   ; Texture height in 16:16 fixed-point format - 1
@@ -211,6 +207,10 @@ struc csScanSetup
   int shf_h;
   ; 1 << shf_h - 1
   int and_h;
+  ; U at the origin of the texture
+  int min_u;
+  ; V at the origin of the texture
+  int min_v;
 
   ; Actual texture palette
   unsigned_int_P TexturePalette;
@@ -336,7 +336,13 @@ extvar	Scan
 		%define %%scanloop_body	%4 %+ _body
 		%define %%scanloop_fini	%4 %+ _fini
 
-proc		%%name,52+%%scanloop_args,ebx,esi,edi,ebp
+%if (%%flags & SCANPROC_MAP)
+%define	%%args_size	52
+%else
+%define	%%args_size	60
+%endif
+
+proc		%%name,%%args_size+%%scanloop_args,ebx,esi,edi,ebp
 		targ	%$width		; int
 		targ	%$dest		; unsigned char *
 		targ	%$zbuff		; unsigned long *
@@ -357,6 +363,10 @@ proc		%%name,52+%%scanloop_args,ebx,esi,edi,ebp
 		tloc	%$scanwidth	; int	initial scanline width (not decremented)
 		tloc	%$destend	; char*	the end of VRAM to be filled
 		tloc	%$zbuffend	; long*	the end of Z-buffer to be filled
+%if (%%flags & SCANPROC_MAP) == 0
+		tloc	%$min_u		; u at texture origin
+		tloc	%$min_v		; v at texture origin
+%endif
 
 ; if (width <= 0) return;
 		cmp	%$width,0
@@ -378,6 +388,13 @@ proc		%%name,52+%%scanloop_args,ebx,esi,edi,ebp
 	%endif
 
 		%%scanloop_init
+
+%if (%%flags & SCANPROC_MAP) == 0
+		mov	eax,min_u
+		mov	ecx,min_v
+		mov	%$min_u,eax
+		mov	%$min_v,ecx
+%endif
 
 ; const16 = 65536; const24 = 16777216;
 		mov	eax,0x47800000	; 65536F
@@ -575,6 +592,13 @@ proc		%%name,52+%%scanloop_args,ebx,esi,edi,ebp
 			mov	%$duu,eax
 ;   }
 		endif
+
+%if (%%flags & SCANPROC_MAP) == 0
+		mov	eax,%$min_u
+		mov	ecx,%$min_v
+		add	%$uu,eax
+		add	%$vv,ecx
+%endif
 
 		%%scanloop_body
 

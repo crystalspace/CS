@@ -55,8 +55,8 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   RGBPixel *tx_palette = texmm->GetColorMap ();
   UByte *tx_bitmap = (UByte *)tx->get_bitmap ();
 
-  int pt_minu = pt->GetIMinU () >> mmshift;
-  int pt_minv = pt->GetIMinV () >> mmshift;
+  int pt_min_u = pt->GetIMinU () >> mmshift;
+  int pt_min_v = pt->GetIMinV () >> mmshift;
   int pt_cell_size = pt->GetLightCellSize () >> mmshift;
   int pt_cell_shift = pt->GetLightCellShift () - mmshift;
   int pt_shfw = pt->GetShiftU () - mmshift;
@@ -172,14 +172,14 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
       for (int vv = 0; vv < lc_h; vv++)
       {
-        int tx_idx = ((v + vv + pt_minv) & tx_andh) << tx_shfw;
+        int tx_idx = ((v + vv + pt_min_v) & tx_andh) << tx_shfw;
         PI_PIXTYPE *__out = out;
 
         int r = r0, rd = (r1 - r0) >> pt_cell_shift;
         int g = g0, gd = (g1 - g0) >> pt_cell_shift;
         int b = b0, bd = (b1 - b0) >> pt_cell_shift;
 
-        int uu = u + pt_minu;
+        int uu = u + pt_min_u;
         int end_uu = uu + lc_w;
 
         for (; uu < end_uu; uu++)

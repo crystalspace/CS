@@ -244,13 +244,12 @@ void csScan_InitDraw (bool verynice, int MipMap, csGraphics3DSoftware* g3d,
       Scan.bitmap2 = NULL;	// Not a lighted texture.
   }
   else
-  {
     Scan.bitmap2 = NULL;
-    Scan.fdu = Scan.fdv = 0;
-  }
   int mmshift = verynice && MipMap ? MipMap - 1 : MipMap;
   Scan.tw2 = tex->GetWidth () >> mmshift;
   Scan.th2 = tex->GetHeight () >> mmshift;
+  Scan.min_u = (tex->GetIMinU () >> mmshift) << 16;
+  Scan.min_v = (tex->GetIMinV () >> mmshift) << 16;
 
 #ifdef STUPID_TEST
   Scan.tw2fp = (Scan.tw2 << 16) - 1;
@@ -271,7 +270,6 @@ void csScan_dump (csGraphics3DSoftware* pG3D)
   {
     SysPrintf (MSG_DEBUG_0, "Using a texture from the texture cache.\n");
     SysPrintf (MSG_DEBUG_0, "  Width=%d, height=%d\n", Scan.tw2, Scan.th2);
-    SysPrintf (MSG_DEBUG_0, "  fdu=%f, fdv=%f\n", Scan.fdu, Scan.fdv);
   }
   SysPrintf (MSG_DEBUG_0, "The original unlighted texture:\n");
   SysPrintf (MSG_DEBUG_0, "  Width=%d, height=%d\n", Scan.tw, Scan.th);

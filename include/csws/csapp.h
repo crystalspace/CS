@@ -66,7 +66,7 @@ protected:
   /// Window list width and height
   int WindowListWidth, WindowListHeight;
   /// Current & old mouse pointer ID
-  csMouseCursorID MouseCursorID;
+  csMouseCursorID MouseCursorID, OldMouseCursorID;
   /// The recursion level within System->Loop ()
   int LoopLevel;
   /// The code that dialog passed to Dismiss ()

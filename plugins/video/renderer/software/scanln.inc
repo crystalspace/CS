@@ -149,13 +149,17 @@ void SCANFUNC (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
     // hurt either).
     z1 = 1 / inv_z;
 
+#   if !defined (SCANMAP)
+    uu += Scan.min_u; vv += Scan.min_v;
+#   endif
+
     SCANLOOP;
 
-#   if defined (STUPID_TEST) && defined (SCANMAP)
+//#   if defined (STUPID_TEST) && defined (SCANMAP)
     // This almost definitively removes texture overflows
     uu = uu1;
     vv = vv1;
-#   endif
+//#   endif
   }
   while (xx);
 

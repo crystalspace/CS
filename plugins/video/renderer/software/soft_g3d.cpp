@@ -555,8 +555,32 @@ bool csGraphics3DSoftware::Open (const char *Title)
     SysPrintf (MSG_INITIALIZATION, "Using palette mode with 1 byte per pixel (256 colors).\n");
     pixel_shift = 0;
   }
+
   CHK (tcache = new csTextureCacheSoftware (texman));
-  tcache->set_cache_size (config->GetInt ("TextureManager", "CACHE", DEFAULT_CACHE_SIZE));
+  const char *cache_size = config->GetStr ("TextureManager", "CACHE", NULL);
+  int csize = DEFAULT_CACHE_SIZE;
+  if (cache_size)
+  {
+    char suffix [100];
+    sscanf (cache_size, "%d%s", &csize, suffix);
+    if (!strcasecmp (suffix, "KP"))
+      csize *= 1024 * pfmt.PixelBytes;
+    else if (!strcasecmp (suffix, "MP"))
+      csize *= 1024 * 1024 * pfmt.PixelBytes;
+    else if (!strcasecmp (suffix, "KB"))
+      csize *= 1024;
+    else if (!strcasecmp (suffix, "MB"))
+      csize *= 1024 * 1024;
+    else
+      csize = 0;
+
+    if (!csize)
+    {
+      SysPrintf (MSG_INITIALIZATION, "Invalid cache size specified, using default\n");
+      csize = DEFAULT_CACHE_SIZE;
+    }
+  }
+  tcache->set_cache_size (csize);
 
 #if defined (DO_MMX)
   int family, features;
@@ -1158,15 +1182,16 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 
   iPolygonTexture *tex = poly.poly_texture;
   csTextureMMSoftware *tex_mm = (csTextureMMSoftware *)poly.txt_handle->GetPrivateObject ();
+  float fdu, fdv;
   if (tex)
   {
-    Scan.fdu = tex->GetFDU ();
-    Scan.fdv = tex->GetFDV ();
+    fdu = tex->GetFDU ();
+    fdv = tex->GetFDV ();
   }
   else
   {
-    Scan.fdu = 0;
-    Scan.fdv = 0;
+    fdu = 0;
+    fdv = 0;
   }
 
   // Now we're in the right shape to determine the mipmap level.
@@ -1229,8 +1254,8 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
       int m0w = tex_mm->get_texture (0)->get_width ();
       int m0h = tex_mm->get_texture (0)->get_height ();
 
-      float _P1 = P1 * m0w, _P2 = P2 * m0w, _P3 = P3 * m0w, _P4 = P4 * m0w - Scan.fdu;
-      float _Q1 = Q1 * m0h, _Q2 = Q2 * m0h, _Q3 = Q3 * m0h, _Q4 = Q4 * m0h - Scan.fdv;
+      float _P1 = P1 * m0w, _P2 = P2 * m0w, _P3 = P3 * m0w, _P4 = P4 * m0w - fdu;
+      float _Q1 = Q1 * m0h, _Q2 = Q2 * m0h, _Q3 = Q3 * m0h, _Q4 = Q4 * m0h - fdv;
 
       float J1 = _P1 * inv_aspect + _P4 * M;
       float J2 = _P2 * inv_aspect + _P4 * N;
@@ -1272,8 +1297,8 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   if (mmshift)
   {
     int duv = (1 << mmshift);
-    Scan.fdu /= duv;
-    Scan.fdv /= duv;
+    fdu /= duv;
+    fdv /= duv;
   }
 
   // Now get the unlighted texture corresponding to mipmap level we choosen
@@ -1288,7 +1313,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 
   P1 *= Scan.tw; P2 *= Scan.tw; P3 *= Scan.tw; P4 *= Scan.tw;
   Q1 *= Scan.th; Q2 *= Scan.th; Q3 *= Scan.th; Q4 *= Scan.th;
-  P4 -= Scan.fdu; Q4 -= Scan.fdv;
+  P4 -= fdu; Q4 -= fdv;
 
   // Precompute everything so that we can calculate (u,v) (texture space
   // coordinates) for every (sx,sy) (screen space coordinates). We make

@@ -579,7 +579,8 @@ MRESULT diveWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgPar
       return 0;
     case WM_VRNENABLED:
       // Query current window width and height
-      if ((WindowW != swp.cx) || (WindowH != swp.cy))
+      if (WinQueryWindowPos (diveCL, &swp)
+       && ((WindowW != swp.cx) || (WindowH != swp.cy)))
       {
         WinQueryWindowPos (diveCL, &swp);
         DirtyRect.xRight = WindowW = swp.cx;
@@ -775,7 +776,7 @@ MRESULT diveWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm
 
       res = OldFrameWindowProc (diveFR, Message, MsgParm1, MsgParm2);
 
-      if ((long) res & AWP_MAXIMIZED)
+      if (long (res) & AWP_MAXIMIZED)
       {
         fMinimized = false;
         cLS = false;
@@ -784,13 +785,13 @@ MRESULT diveWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm
         cTS = false;
         WinEnableMenuItem (diveMN, cmdScale, FALSE);
       }
-      if ((long) res & AWP_MINIMIZED)
+      if (long (res) & AWP_MINIMIZED)
       {
         fMinimized = true;
         DiveSetupBlitter (hDive, NULL);
         oldDirtyRect.xLeft = -9999;
       }
-      if ((long) res & AWP_RESTORED)
+      if (long (res) & AWP_RESTORED)
       {
         fMinimized = false;
         cLS = false;

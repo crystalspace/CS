@@ -450,7 +450,7 @@
 		add	ecx,edx			; tex' + pix'		; 31
 		add	ebx,ebp			; vv += dvv		; 31
 		mov	ebp,%$duFP		; ebp = duu		; 32
-		add	edi,16			; dest++		; 32
+		lea	edi,[edi+16]		; dest++		; 32
 		sbb	edx,edx			; carry flag		; 33
 		add	eax,ebp			; uu += duu		; 33
 		adc	edx,edx			; *2 + carry (uu + duu)	; 34 (v stall)
@@ -473,7 +473,7 @@
 		add	ecx,edx			; tex' + pix'		; 2
 		add	ebx,ebp			; vv += dvv		; 2
 		mov	ebp,%$duFP		; ebp = duu		; 3
-		add	edi,4			; dest++		; 3
+		lea	edi,[edi+4]		; dest++		; 3
 		sbb	edx,edx			; carry flag		; 4
 		add	eax,ebp			; uu += duu		; 4
 		adc	edx,edx			; *2 + carry (uu + duu)	; 5 (v stall)
