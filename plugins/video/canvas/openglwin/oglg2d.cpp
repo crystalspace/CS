@@ -577,16 +577,17 @@ void csGraphics2DOpenGL::Activate (bool activated)
 void csGraphics2DOpenGL::SwitchDisplayMode ()
 {
   DEVMODE dmode;
-  LONG ti;
-
+	ZeroMemory (&dmode, sizeof(dmode));
+	dmode.dmSize = sizeof (DEVMODE);
+	dmode.dmDriverExtra = 0;
   EnumDisplaySettings (NULL, ENUM_CURRENT_SETTINGS, &dmode);
-
   dmode.dmBitsPerPel = Depth;
   dmode.dmPelsWidth = Width;
   dmode.dmPelsHeight = Height;
   if (m_nDisplayFrequency) dmode.dmDisplayFrequency = m_nDisplayFrequency;
   dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT | DM_DISPLAYFREQUENCY;
   
+	LONG ti;
   if ((ti = ChangeDisplaySettings(&dmode, CDS_FULLSCREEN)) != DISP_CHANGE_SUCCESSFUL)
   {
     // maybe just the monitor frequency is not supported.
