@@ -11,6 +11,10 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the engine. When creating a dynamic light it would
 	  have one reference too much. This also fixes the problem of
 	  dynamic lights not deleting in walktest.
+	- Fixed a few other similar bugs where a csRef was returned as
+	  a csPtr and it was assumed that a DecRef() would happen in that
+	  case (which no longer occurs since there is a constructor
+	  from csRef to csPtr).
 9-Oct-2002
 	- For some reason include/cssys/win32/csosdefs.h was full of
 	  ^M (carriage return) characters. This failed the compilation.

@@ -4350,7 +4350,8 @@ csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
   csThing *cm = new csThing (this);
   csRef<iMeshObjectFactory> ifact (SCF_QUERY_INTERFACE (
       cm, iMeshObjectFactory));
-  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
+  cm->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
 }
 
 csPtr<iPolyTxtPlane> csThingObjectType::CreatePolyTxtPlane (const char *name)

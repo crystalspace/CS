@@ -2389,7 +2389,8 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
   if (txt) mat->SetTextureWrapper (txt);
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
-  return csPtr<iMaterial> ((iMaterial*)imat);	// DecRef is ok in this case.
+  mat->DecRef ();
+  return csPtr<iMaterial> (imat);
 }
 
 csPtr<iMaterial> csEngine::CreateBaseMaterial (
@@ -2414,7 +2415,8 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
   }
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
-  return csPtr<iMaterial> ((iMaterial*)imat);	// DecRef is ok here.
+  mat->DecRef ();
+  return csPtr<iMaterial> (imat);
 }
 
 iTextureList *csEngine::GetTextureList () const
