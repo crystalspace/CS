@@ -1166,7 +1166,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     glViewport (0, 0, viewwidth, viewheight);
     needProjectionUpdate = true;
 
-    glCullFace (render_target ? GL_BACK : GL_FRONT);
+    statecache->SetCullFace (render_target ? GL_BACK : GL_FRONT);
 
     statecache->SetMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
@@ -1202,7 +1202,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 	*/
 	glOrtho (0., (GLdouble) viewwidth, (GLdouble) (2 * viewheight - txt_h), 
 	  (GLdouble) (viewheight - txt_h), -1.0, 10.0);
-	glCullFace (GL_BACK);
+	statecache->SetCullFace (GL_BACK);
       }
       else
 	SetGlOrtho (false);
@@ -1246,7 +1246,7 @@ void csGLGraphics3D::FinishDraw ()
     if ((current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)) == 
       CSDRAW_2DGRAPHICS)
     {
-      glCullFace (GL_FRONT);
+      statecache->SetCullFace (GL_FRONT);
     }
 
     if (rt_onscreen)
@@ -2050,16 +2050,29 @@ void csGLGraphics3D::SetupClipPortals ()
 	GLboolean wmRed, wmGreen, wmBlue, wmAlpha;
 	statecache->GetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
 	statecache->SetColorMask (false, false, false, false);
+	GLenum oldcullface;
+	statecache->GetCullFace (oldcullface);
+	statecache->SetCullFace (GL_FRONT);
+
+        statecache->SetMatrixMode (GL_PROJECTION);
+        glPushMatrix ();
+        glLoadIdentity ();
+        statecache->SetMatrixMode (GL_MODELVIEW);
+        glPushMatrix ();
+        glLoadIdentity ();
 
 	glBegin (GL_QUADS);
-	glVertex4f (0.0*100000.0, 0.0*100000.0, -1.0, 100000.0);
-	glVertex4f (float (viewwidth-1)*100000.0, 0.0*100000.0, -1.0, 
-	  100000.0);
-	glVertex4f (float (viewwidth-1)*100000.0, 
-	  float (viewheight-1)*100000.0, -1.0, 100000.0);
-	glVertex4f (0.0*100000.0, float (viewheight-1)*100000.0, -1.0, 
-	  100000.0);
+	glVertex3f (-1.0f, 1.0f, 1.0f);
+	glVertex3f (1.0f, 1.0f, 1.0f);
+	glVertex3f (1.0f, -1.0f, 1.0f);
+	glVertex3f (-1.0f, -1.0f, 1.0f);
 	glEnd ();
+
+        glPopMatrix ();
+        statecache->SetMatrixMode (GL_PROJECTION);
+        glPopMatrix ();
+
+	statecache->SetCullFace (oldcullface);
 	statecache->SetColorMask (wmRed, wmGreen, wmBlue, wmAlpha);
       }
     }

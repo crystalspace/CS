@@ -17,6 +17,11 @@ chronological order.
 	  The function to do a z-fill of the buffer (to clear the z-buffer
 	  for geometry in the portal) was backface culled and thus didn't
 	  do anything.
+	- Jorrit fixed a bug in the NR OpenGL renderer. It would sometimes
+	  call glCullFace() which would bypass the statecache.
+	- Jorrit attempted to fix the NR OpenPortals() command by trying
+	  to use better ways to fill the portal but it didn't seem to have
+	  worked very well.
 8-Jun-2004
 	- Jorrit fixed a bug in the FindByNameWithChild() function in the
 	  engine. This function would crash if there were unnamed meshes
