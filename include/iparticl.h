@@ -22,8 +22,8 @@
 #include "csutil/scf.h"
 class csColor;
 class csVector3;
-class iRenderView;
-class iLight;
+struct iRenderView;
+struct iLight;
 
 SCF_VERSION (iParticle, 0, 0, 2);
 

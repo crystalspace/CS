@@ -31,7 +31,7 @@ struct iGraphics2D;
 struct iGraphics3D;
 struct iCamera;
 struct csFog;
-struct csRenderView;
+class csRenderView;
 
 /**
  * Information for vertex based fog. There is an instance of this
