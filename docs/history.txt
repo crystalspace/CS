@@ -122,6 +122,20 @@ chronological order.
 	- Philip Wyett fixed typo in aws makefile, fixing make depend.
 	- Rhad made some changes to partedit so it doesn't need to recreate the
 	  mesh associated with the particle system for every change.
+	- Rhad re-activated the code to set the Value (position) of an AWS
+	  scrollbar with a SetProperty call.  Documentation be damned, this
+	  property will be writable!
+	- Rhad commented awsScrollBar::KnobTick and fixed this and other
+	  functions to correctly handle a minimum scroll value other than 0.
+	  Note that "proportional scrollbar" functionality is probably still
+	  broken since I don't know how that's supposed to work.
+	- Rhad changed the SetProperty() calls to awsScrollBar to expect floats
+	  instead of ints.  PLEASE NOTE THAT THIS MAY BREAK EXISTING FUNCTIONAL
+	  PROGRAMS WITHOUT COMPILER WARNINGS. (Thanks to void * cast calling 
+	  convention) However, I have doubts that anyone is using this since the
+	  internal values in the scrollbar have been floats for some time and
+	  the GetProperty() call has always presumed it was filling in a 
+	  float * .
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

@@ -284,21 +284,21 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
 
   if (strcmp ("Change", name) == 0)
   {
-    value_delta = *(int *)parm;
+    value_delta = *(float *)parm;
     
     Invalidate ();
     return true;
   }
   else if (strcmp ("BigChange", name) == 0)
   {
-    value_page_delta = *(int *)parm;
+    value_page_delta = *(float *)parm;
 
     Invalidate ();
     return true;
   }
   else if (strcmp ("Min", name) == 0)
   {
-    min = *(int *)parm;
+    min = *(float *)parm;
 
     // Fix value in case it's out of range
     value = (value < min) ? min : value;
@@ -308,12 +308,12 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
   }
   else if (strcmp ("Max", name) == 0)
   {
-    max = *(int *)parm;
+    max = *(float *)parm;
 
     // Fix the page size
     if (amntvis > max) 
       amntvis = max + 1;
-    int maxval = (int)(max - amntvis + 1);
+    int maxval = (float)(max - amntvis + 1);
 
     // Fix value in case it's out of range
     value = (value < min ? min : (value > maxval ? maxval : value));
@@ -323,12 +323,12 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
   }
   else if (strcmp ("PageSize", name) == 0)
   {
-    amntvis = *(int *)parm;
+    amntvis = *(float *)parm;
 
     // Fix the page size
     if (amntvis > max) 
       amntvis = max + 1;
-    int maxval = (int)(max - amntvis + 1);
+    int maxval = (float)(max - amntvis + 1);
 
     // Fix value in case it's out of range
     value = (value < min ? min : (value > maxval ? maxval : value));
@@ -336,58 +336,79 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
     Invalidate ();
     return true;
   }
-/* @@@ The 'Value' property is read-only, as also stated in the documentation.
-  I wonder why this code is here then! Luca (groton@gmx.net)
-
   else if (strcmp ("Value", name) == 0)
   {
-    value = *(int *)parm;
+    value = *(float *)parm;
 
     // Fix value in case it's out of range
-    int maxval = (int)(max - amntvis + 1);
+    int maxval = (float)(max - amntvis + 1);
 
     value = (value < min ? min : (value > maxval ? maxval : value));
 
     Invalidate ();
     return true;
-  }*/
+  }
 
   return false;
 }
 
+/*  This function handles at least mouse scrolling on the bar by "grabbing" the scroll "knob".
+ */
 void awsScrollBar::KnobTick (void *sk, iAwsSource *)
 {
-  // adjust position of knob and scrollbar value
   awsScrollBar *sb = (awsScrollBar *)sk;
-  int maxval = (int)(sb->max - sb->amntvis + 1);
+  /* amntvis relates to "proportional scrollbars" which are probably broken
+   *  because most everything else was prior to some fixups and I don't
+   *  know how "proportional scrollbars" are supposed to work so I haven't
+   *  attempted to fix them.
+   */
+  // For non "proportional" scrollbars, this value is sb->max (the Max property of the scrollbar) + 1
+  int maxval = (int)(sb->max  - sb->amntvis + 1);
 
   if (sb->orientation == sboVertical)
   {
-    int height = 10;
+    // Code for Vertical scrollbars.  We use height for calculations here.
+    int height = 10; 
+
+    // We get the rectangle that surrounds the entire scrollbar, including the end buttons (up/down arrows)
     csRect f (sb->Frame ());
 
-    // Get the bar height
+    // Then we subtract the height of the up and down arrows to get the height of the actual "bar" area we can scroll through
     f.ymin += sb->decVal->Frame ().Height () + 1;
     f.ymax -= sb->incVal->Frame ().Height () + 1;
 
-    // Get the knob height
+    /* This retrieves the knob height.  If amntvis isn't 0 you're using a "proportional" scrollbar
+     *  which apparently changes the size of the knob based on some factors.
+     */
     if (sb->amntvis == 0)
       sb->WindowManager ()->GetPrefMgr ()->LookupIntKey (
           "ScrollBarHeight",
           height);
     else
-      height = (int)((sb->amntvis * f.Height ()) / sb->max);
+      height = (int)((sb->amntvis * f.Height ()) / (sb->max - sb->min) );
 
-    // Get the actual height that we can traverse with the knob
+    // bh becomes the actual "usable" height in pixels - after we subtract the height of the knob from the scroll area
     int bh = f.Height () - height;
     
-    if ((maxval == 0) || (bh == 0)) 
+    // If there's no area to scroll through or the range (max - min) is less than 0, then there is only one possible position to be at.
+    if (((maxval - sb->min) <= 0) || (bh == 0)) 
       sb->value = 0;
     else
-      sb->value = (sb->knob->last_y - sb->decVal->Frame ().ymax) * maxval / bh;
+      /*  sb->knob->last_y is actually the last y position of the mouse while dragging the knob
+       *  We take that position, subtract the y of the bottom edge of the top arrow button - that gives us how far the mouse is 
+       *   "into" the scroll range.  We also subtract half of the height of the knob, otherwise the knob would end up
+       *   with the top edge at the mouse cursor (instead of the more desirable and logical center of the button).
+       *  We take this distance in, and divide by the total navigatable pixels in the scroll bar (bh) - this should give us a value 0.00 - 1.00 
+       *  That value is multiplied by the range this bar is supposed to cover (max - min) which gives us the number in range-units that we are into
+       *  the bar.  Finally we add the minimum to get the actual range-unit the mouse is at.
+       */
+      sb->value = ((sb->knob->last_y - (sb->knob->Frame().Height()/2) - sb->decVal->Frame ().ymax) * (maxval - sb->min) / bh) + sb->min;
+
   }
   else if (sb->orientation == sboHorizontal)
   {
+    // Code for Horizontal scrollbars.  We use width for calculations here.
+    // For detailed documentation of what is going on here, see above in the sboVertical case.
     int width = 10;
     csRect f (sb->Frame ());
 
@@ -399,15 +420,15 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
           "ScrollBarWidth",
           width);
     else
-      width = (int)((sb->amntvis * f.Width ()) / sb->max);
+      width = (int)((sb->amntvis * f.Width ()) / (sb->max - sb->min));
 
-    // Get the actual height that we can traverse with the knob
+   
     int bw = f.Width () - width;
 
     if (maxval == 0)
       sb->value = 0;
     else
-      sb->value = (sb->knob->last_x - sb->decVal->Frame ().xmax) * maxval / bw;
+      sb->value = ((sb->knob->last_x - (sb->knob->Frame().Width()/2) - sb->decVal->Frame ().xmax) * (maxval - sb->min) / bw) + sb->min ;
   }
   else
     return ;
@@ -509,17 +530,17 @@ void awsScrollBar::OnDraw (csRect clip)
           "ScrollBarHeight",
           height);
     else
-      height = (int)((amntvis * f.Height ()) / max);
+      height = (int)((amntvis * f.Height ()) / (max-min));
 
     // Get the actual height that we can traverse with the knob
     int bh = f.Height () - height;
 
     // Get the knob's position
     int ky;
-    if (max - amntvis == 0)
+    if ((max-min) - amntvis == 0)
       ky = 0;
     else
-      ky = (int)((value * bh) / (max-amntvis));
+      ky = (int)(((value-min) * bh) / ((max-min)-amntvis));
 
     f.ymin += ky;
     f.ymax = f.ymin + height;
@@ -536,17 +557,17 @@ void awsScrollBar::OnDraw (csRect clip)
       WindowManager ()->GetPrefMgr ()->LookupIntKey 
         ("ScrollBarWidth", width);
     else
-      width = (int)((amntvis * f.Width ()) / max);
+      width = (int)((amntvis * f.Width ()) / (max-min));
 
     // Get the actual height that we can traverse with the knob
     int bw = f.Width () - width;
 
     // Get the knob's position
     int kx;
-    if ((max - amntvis) == 0)
+    if (((max-min) - amntvis) == 0)
       kx = 0;
     else
-      kx = (int)((value * bw) / max);
+      kx = (int)(((value-min) * bw) / (max-min));
 
     f.xmin += kx;
     f.xmax = f.xmin + width;
