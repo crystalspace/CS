@@ -13,7 +13,7 @@ AC_PREREQ([2.56])
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [0.96])
+m4_define([cs_version_number], [0.97])
 
 
 
@@ -1471,6 +1471,16 @@ AC_CHECK_FT2([2.0],
     [CS_MAKEFILE_PROPERTY([FT2.AVAILABLE], [yes])
     CS_MAKEFILE_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
     CS_MAKEFILE_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for libxml2
+#------------------------------------------------------------------------------
+PKG_CHECK_MODULES(LIBXML2, xml2,
+    [CS_MAKEFILE_PROPERTY([LIBXML2.AVAILABLE], [yes])
+    CS_MAKEFILE_PROPERTY([LIBXML2.LFLAGS], [$LIBXML2_LIBS])
+    CS_MAKEFILE_PROPERTY([LIBXML2.CFLAGS], [$LIBXML2_CFLAGS])])
 
 
 
