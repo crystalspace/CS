@@ -248,7 +248,7 @@ public:
   void SetAttenuation (int a) {attenuation = a;}
 
   /**
-   * Change the light's attenuation type
+   * Get the brightness of a light at a given distance.
    */
   float GetBrightnessAtDistance (float d);
 
