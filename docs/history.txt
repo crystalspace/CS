@@ -14,6 +14,9 @@ chronological order.
 	  lines which fit the Swig check version number template:
 	    SWIG Version 1.3.21
 	    Compiled with g++ [powerpc-apple-darwin7.4.0]
+	- Eric Sunshine fixed bug in csArray::DeleteRange() where it failed to
+	  destroy (invoke the destructor of) the last object in the range.
+	  Reported by Bedrich Zaba <frogbride@seznam.cz>.
 11-Jul-2004
 	- Vincent Knecht added instructions for building RPMs in User Manual.
 	- Vincent Knecht ported note about removed plugins in apimod98.txi from
