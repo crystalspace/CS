@@ -4,8 +4,9 @@
 # flags are required.
 #
 # IMPORTS
-#    LINK
-#	Shell or environment variable used to link an executable.
+#    checktool()
+#	Shell function which checks if the program mentioned as its sole
+#	argument can be found in the PATH.
 #    msg_*()
 #	Functions for reporting progress to users.
 #
@@ -23,15 +24,21 @@
 #    PERL5.LFLAGS
 #	Makefile variable emitted to the standard output stream.  Value is the
 #	linker flags required for Perl.
+#    PERL5.EXTUTILS.AVAILABLE
+#	Makefile variable emitted to the standard output stream.  Value is
+#	"yes" if the ExtUtils::Embed package is availble with which the Perl
+#	embedding goop can be synthesized, otherwise the variable is not set.
+#    PERL5.EXTUTILS.DYNALOADER
+#	Makefile variable emitted to the standard output stream.  Value is
+#	"DynaLoader" if the DynaLoader module is available for use by
+#	ExtUtils::Embed, otherwise it is the empty string.  If ExtUtils::Embed
+#	is not available, then this variable is not set.
 #==============================================================================
-
-precondition '-n "${LINK}"'
 
 PERL_OK=0
 PERL5_CFLAGS=''
 PERL5_LFLAGS=''
-
-PERLXSI="include/cssys/csperlxs.c"
+PERL5_EXTUTILS=0
 
 PERL5=`checktool perl5`
 if [ -z "${PERL5}" ]; then
@@ -41,99 +48,67 @@ if [ -z "${PERL5}" ]; then
   PERL5_OK=0
 else
   msg_checking "for ExtUtils::Embed perl module"
-  if ${PERL5} -MExtUtils::Embed -e 0; then
+  if ${PERL5} -MExtUtils::Embed -e 0 >/dev/null 2>&1; then
     msg_result "yes"
 
-    PERL5_CFLAGS=`${PERL5} -MExtUtils::Embed -e ccopts`
-    PERL5_LFLAGS=`${PERL5} -MExtUtils::Embed -e ldopts`
+    PERL5_EXTUTILS=1
+    PERL5_CFLAGS=`${PERL5} -MExtUtils::Embed -e ccopts 2>/dev/null`
+    PERL5_LFLAGS=`${PERL5} -MExtUtils::Embed -e ldopts 2>/dev/null`
 
     msg_checking "for DynaLoader perl module"
-    if ${PERL5} -MDynaLoader -e 0; then
-      DYNA=DynaLoader
+    if ${PERL5} -MDynaLoader -e 0 >/dev/null 2>&1; then
+      PERL5_DYNALOADER=DynaLoader
       msg_result "yes"
     else
-      DYNA=
+      PERL5_DYNALOADER=
       msg_result "no"
     fi
-
-    msg_inform "Generating csperlxs.c..."
-    ${PERL5} -MExtUtils::Embed -e xsinit -- -o ${PERLXSI} -std ${DYNA} cspace
   else
     msg_result "no"
     msg_inform "Recommend you install the latest release of Perl 5."
     msg_inform "http://www.perl.org/"
 
     msg_checking "for Config perl module"
-    if ${PERL5} -MConfig -e 0; then
+    if ${PERL5} -MConfig -e 0 >/dev/null 2>&1; then
       msg_result "yes"
 
-      PERL5_CORE=`${PERL5} -MConfig -e 'print $Config{sitearch}'`"/CORE"
-      PERL5_CFLAGS=`${PERL5} -MConfig -e \
-        'print $Config{ccflags}'`" -I${PERL5_CORE}"
+      PERL5_CORE=`${PERL5} -MConfig -e 'print $Config{sitearch}' 2>/dev/null`
+      PERL5_CORE="${PERL5_CORE}/CORE"
+      PERL5_CFLAGS=`${PERL5} -MConfig -e 'print $Config{ccflags}' 2>/dev/null`
+      PERL5_CFLAGS="${PERL5_CFLAGS} -I${PERL5_CORE}"
       PERL5_LFLAGS=`${PERL5} -MConfig -e \
-        'print $Config{ldflags}, " ", $Config{libs}'`" -L${PERL5_CORE}"
+	'print $Config{ldflags}, " ", $Config{libs}' 2>/dev/null`
+      PERL5_LFLAGS="${PERL5_LFLAGS} -L${PERL5_CORE}"
     else
       msg_result "no"
 
       PERL5_CORE=`${PERL5} -V:sitearch | ${PERL5} -e \
-        '<STDIN> =~ m/\x27(.*)\x27/; print $1'`"/CORE"
+        '<STDIN> =~ m/\x27(.*)\x27/; print $1' 2>/dev/null`
+      PERL5_CORE="${PERL5_CORE}/CORE"
       PERL5_CFLAGS=`${PERL5} -V:ccflags | ${PERL5} -e \
-        '<STDIN> =~ m/\x27(.*)\x27/; print $1'`" -I${PERL5_CORE}"
+        '<STDIN> =~ m/\x27(.*)\x27/; print $1' 2>/dev/null`
+      PERL5_CFLAGS="${PERL5_CFLAGS} -I${PERL5_CORE}"
       PERL5_LFLAGS=`${PERL5} -V:ldflags | ${PERL5} -e \
-        '<STDIN> =~ m/\x27(.*)\x27/; print $1'` \
-                    `${PERL5} -V:libs | ${PERL5} -e \
-        '<STDIN> =~ m/\x27(.*)\x27/; print $1'`" -L${PERL5_CORE}"
+        '<STDIN> =~ m/\x27(.*)\x27/; print $1' 2>/dev/null`
+      PERL5_LFLAGS="${PERL5_LFLAGS} `${PERL5} -V:libs | ${PERL5} -e \
+        '<STDIN> =~ m/\x27(.*)\x27/; print $1' 2>/dev/null`"
+      PERL5_LFLAGS="${PERL5_LFLAGS} -L${PERL5_CORE}"
     fi
-
-    msg_inform "Generating boilerplate csperlxs.c..."
-    cat > ${PERLXSI} <<EOF
-#if defined(__cplusplus) && !defined(PERL_OBJECT)
-  #define is_cplusplus
-#endif
-#ifdef is_cplusplus
-  extern "C" {
-#endif
-  #include <EXTERN.h>
-  #include <perl.h>
-  #ifdef PERL_OBJECT
-    #define NO_XSLOCKS
-    #include <XSUB.h>
-    #include "win32iop.h"
-    #include <fcntl.h>
-    #include <perlhost.h>
-  #endif
-#ifdef is_cplusplus
-  }
-  #ifndef EXTERN_C
-    #define EXTERN_C extern "C"
-  #endif
-#else
-  #ifndef EXTERN_C
-    #define EXTERN_C extern
-  #endif
-#endif
-EXTERN_C void xs_init (pTHXo);
-EXTERN_C void boot_DynaLoader (pTHXo_ CV* cv);
-EXTERN_C void boot_cspace (pTHXo_ CV* cv);
-EXTERN_C void xs_init(pTHXo)
-{
-  char *file = __FILE__;
-  dXSUB_SYS;
-  /* DynaLoader is a special case */
-  newXS("DynaLoader::boot_DynaLoader", boot_DynaLoader, file);
-  newXS("cspace::bootstrap", boot_cspace, file);
-}
-EOF
   fi
 
   PERL5_OK=1
   PERL="${PERL5}"
 
   echo "PERL5.AVAILABLE = yes"
-  echo "PERL5=${PERL5}"
-  echo "PERL=${PERL}"
-  echo "PERL5.CFLAGS=${PERL5_CFLAGS}"
-  echo "PERL5.LFLAGS=${PERL5_LFLAGS}"
+  echo "PERL5 = ${PERL5}"
+  echo "PERL = ${PERL}"
+  echo "PERL5.CFLAGS = ${PERL5_CFLAGS}"
+  echo "PERL5.LFLAGS = ${PERL5_LFLAGS}"
+
+  if [ ${PERL5_EXTUTILS} -eq 1 ]; then
+    echo "PERL5.EXTUTILS.AVAILABLE = yes"
+    echo "PERL5.EXTUTILS.DYNALOADER = ${PERL5_DYNALOADER}"
+  fi
 
   if [ -n "${PERL5_CFLAGS}" ]; then
     msg_inform "perl5 cflags... ${PERL5_CFLAGS}"

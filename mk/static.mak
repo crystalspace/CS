@@ -81,7 +81,7 @@
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-DIR.LIBREF = $(OUTBASE)/derived
+DIR.LIBREF = $(OUTDERIVED)
 SRC.LIBREF = $(DIR.LIBREF)/cslibref.cpp
 OBJ.LIBREF = $(addprefix $(OUT)/,$(notdir $(SRC.LIBREF:.cpp=$O)))
 
@@ -126,13 +126,9 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-# Rule for creating directories.
-$(DIR.LIBREF): $(OUTBASE)
-	-$(MKDIR)
-	-$(RM) $(SRC.LIBREF)
-
 # Rule to synthesize SRC.LIBREF.
 $(SRC.LIBREF): $(DEP.LIBREF.EXTRA) $(DIR.LIBREF)
+	-$(RM) $(SRC.LIBREF)
 	@$(LIBREF.CONTENT)
 	@echo "Generated $(SRC.LIBREF)"
 

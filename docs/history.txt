@@ -8,6 +8,22 @@ The history order is reversed so that new features are at the top.
 	  OpenGL-related makefile.  chkogl.sh now publishes the makefile
 	  variables GL.AVAILABLE, GL.CFLAGS, and GL.LFLAGS; it no longer
 	  publishes OPENGL_PATH.
+	- Eric Sunshine made the following changes:
+	    - The chkperl.sh configuration script is no longer responsible for
+	      creating the glue file csperlxs.c.  This is now the
+	      responsibility of the csperl5.mak makefile.  A happy side-effect
+	      of this shift of responsibility is that the transient csperlxs.c
+	      is now created within the CS/out directory hierarchy, rather than
+	      within CS/include/cssys where it did not belong.
+	    - Removed the ugly hack from cs.mak which was responsible for
+	      cleaning up csperlxs.c.  This is no longer needed since
+	      csperlxs.c is only now created when the csperl5 module is enabled
+	      and only when required; rather than being created by the project
+	      configuration phase.
+	    - Added the new makefile variable OUTDERIVED to cs.mak.  This
+	      variable defines the location where transient derived sources
+	      should be placed.  For example, static.mak places cslibref.cpp in
+	      OUTDERIVED, and csperl5.mak places csperlxs.c there, as well.
 1-Jan-2003
 	- Eric Sunshine merged cygwin.mak into win32gcc.mak.  Now there is a
 	  single makefile configuration target for Cygwin and Mingw users.

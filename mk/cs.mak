@@ -61,14 +61,28 @@ endif
 # Define paths automatically searched for source files
 vpath %.cpp
 
-# Directory for object files
+# Directory for generated files (those removed at "make clean/distclean" time).
 OUTBASE=out
+
+# Directory for object files.
 OUTOS=$(OUTBASE)/$(OS)
 OUTPROC=$(OUTOS)/$(PROC)
 OUT=$(OUTPROC)/$(MODE)$(OUTSUFX.$(MAKE_DLL))
+
+# Directory for derived (transient) source files.
+OUTDERIVED=$(OUTPROC)/derived
+
+# Directory for plugin modules.
 ifeq (,$(OUTDLL))
 OUTDLL=.
 endif
+
+# Collective output directory list.
+OUTDIRS = $(OUTBASE) $(OUTOS) $(OUTPROC) $(OUT) $(OUTDERIVED)
+ifneq (.,$(OUTDLL))
+OUTDIRS += $(OUTDLL)
+endif
+
 ############################################
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
@@ -163,12 +177,6 @@ dep: build.makedep
   endif
 endif
 
-# Directories for output files
-OUTDIRS = $(OUTBASE) $(OUTOS) $(OUTPROC) $(OUT)
-ifneq (.,$(OUTDLL))
-OUTDIRS += $(OUTDLL)
-endif
-
 # The following include should make additional defines using above variables
 MAKESECTION = postdefines
 include mk/subs.mak
@@ -190,17 +198,8 @@ all: $(OUTDIRS)
 
 dep: $(OUTBASE) $(OUTOS)
 
-# @@@ FIXME: The Perl file we clean up here is generated at project
-# configuration time.  It is really the responsibility of csperl5.mak to clean
-# up these files, but that module is not enabled by default, which means that
-# the makefile is not loaded.  The proper solution is to enable csperl5.mak
-# automatically if the configuration script detects a working Perl
-# installation, however the module is still broken on a number of platforms, so
-# automatically enabling it is not a good idea.  Consequently, as an interim
-# solution, we clean up those files here.
 distclean: clean
 	-$(RM) config.mak include/volatile.h
-	-$(RM) include/cssys/csperlxs.c
 
 clean:
 	-$(RMDIR) $(OUTBASE)
