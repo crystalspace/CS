@@ -249,6 +249,12 @@ public:
   ///
   STDMETHODIMP GetMaximumAspectRatio(int& ratio) { ratio = m_MaxAspectRatio; return S_OK; }
   
+  /// Get the fog mode.
+  STDMETHODIMP GetFogMode (G3D_FOGMETHOD& retval) { retval = G3DFOGMETHOD_VERTEX; return S_OK; }
+
+  /// Get the fog mode.
+  STDMETHODIMP SetFogMode (G3D_FOGMETHOD fogm) { if (fogm == G3DFOGMETHOD_VERTEX) return S_OK; else return E_FAIL; }
+
   /// Get the ITextureManager.
   STDMETHODIMP GetTextureManager (ITextureManager** pi) { *pi = (ITextureManager*)txtmgr; return S_OK; }
 
@@ -262,8 +268,6 @@ public:
     return S_OK; 
   }
   
-  STDMETHODIMP GetFogMode (G3D_FOGMETHOD& retval) { retval = G3DFOGMETHOD_NONE; return S_OK; }
-  STDMETHODIMP SetFogMode (G3D_FOGMETHOD fogm) { if (fogm == G3DFOGMETHOD_NONE) return S_OK; else return E_FAIL; }
   STDMETHODIMP OpenFogObject (CS_ID id, csFog* fog);
   STDMETHODIMP AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
   STDMETHODIMP CloseFogObject (CS_ID id);

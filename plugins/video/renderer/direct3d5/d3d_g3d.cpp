@@ -1112,6 +1112,50 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   }
   
   // reset render states.
+  // If there is vertex fog then we apply that last.
+  if (poly.use_fog)
+  {
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE),  DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA), DD_OK); 
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA), DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, 0), DD_OK);
+
+    VERIFY_RESULT(m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
+
+    for (i=0; i<poly.num; i++)
+    {
+      float sx = poly.vertices[i].sx - m_nHalfWidth;
+      float sy = poly.vertices[i].sy - m_nHalfHeight;
+
+      z = 1.0f  / (M*sx + N*sy + O);
+      
+      vx.sx = poly.vertices[i].sx;
+      vx.sy = m_nHeight-poly.vertices[i].sy;
+      vx.sz = z*(float)SCALE_FACTOR;
+
+      if(vx.sz>0.9999)
+        vx.sz=0.9999;
+
+      vx.rhw = 1/z;
+      
+      
+      float I = 1.0f-poly.fog_info[i].intensity;
+
+      if (I<0.01f) I=0.01f; //Workaround for a bug, at least in the RivaTNT drivers.
+
+      float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
+      float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
+      float b = poly.fog_info[i].b > 1.0f ? 1.0f : poly.fog_info[i].b;
+
+      vx.color    = D3DRGBA(r, g, b, I);
+      vx.specular = 0;
+
+      VERIFY_RESULT(m_lpd3dDevice->Vertex( &vx ), DD_OK);
+    }
+    VERIFY_RESULT(m_lpd3dDevice->End(0), DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE),  DD_OK);
+  }
  
   if (bColorKeyed)
   {
@@ -1247,6 +1291,67 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly)
   }
 
   VERIFY_RESULT( m_lpd3dDevice->End(0), DD_OK );
+
+  if (poly.use_fog)
+  {
+    // Remember old values.
+    // @@@ This can't be efficient! We are setting and resetting
+    // Renderstate values for every triangle of a sprite. Maybe we
+    // should first do all non-fogged triangles and then in one
+    // go all fogged triangles?
+
+    DWORD OldAlpha;
+    DWORD OldZFunc;
+    DWORD OldDestBlend;
+    DWORD OldSrcBlend;
+    DWORD OldTexture;
+
+    VERIFY_RESULT(m_lpd3dDevice->GetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, &OldAlpha),     DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->GetRenderState(D3DRENDERSTATE_ZFUNC,            &OldZFunc),     DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->GetRenderState(D3DRENDERSTATE_DESTBLEND,        &OldDestBlend), DD_OK); 
+    VERIFY_RESULT(m_lpd3dDevice->GetRenderState(D3DRENDERSTATE_SRCBLEND,         &OldSrcBlend),  DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->GetRenderState(D3DRENDERSTATE_TEXTUREHANDLE,    &OldTexture),   DD_OK);
+   
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE),  DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC,            D3DCMP_LESSEQUAL), DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,        D3DBLEND_SRCALPHA), DD_OK); 
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,         D3DBLEND_INVSRCALPHA), DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE,    0), DD_OK);
+
+    VERIFY_RESULT( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK );
+  
+    for(i=0; i<poly.num; i++)
+    {
+      vx.sx = poly.vertices[i].sx;
+      vx.sy = m_nHeight-poly.vertices[i].sy;
+      vx.sz = SCALE_FACTOR / poly.vertices[i].z;
+      vx.rhw = poly.vertices[i].z;
+
+      float I = 1.0f-poly.fog_info[i].intensity;
+
+      if (I<0.01f) I=0.01f; //Workaround for a bug, at least in the RivaTNT drivers.
+
+      float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
+      float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
+      float b = poly.fog_info[i].b > 1.0f ? 1.0f : poly.fog_info[i].b;
+
+      vx.color    = D3DRGBA(r, g, b, I);
+
+      vx.specular = D3DRGB(0.0, 0.0, 0.0);
+      vx.tu = poly.vertices[i].u;
+      vx.tv = poly.vertices[i].v;
+    
+      VERIFY_RESULT(m_lpd3dDevice->Vertex( &vx ), DD_OK);
+    }
+
+    VERIFY_RESULT( m_lpd3dDevice->End(0), DD_OK );
+
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, OldAlpha),     DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC,            OldZFunc),     DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,        OldDestBlend), DD_OK); 
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,         OldSrcBlend),  DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE,    OldTexture),   DD_OK);
+  }
 
   return S_OK;
 }
