@@ -344,6 +344,22 @@ public:
   }
 
   /**
+   * Display a warning notification.
+   * \remarks
+   * The warning displayed with this function will be identified with the
+   * application string name identifier set with SetApplicationName().
+   */
+  static void ReportWarning (const char* description, ...)
+  {
+    va_list args;
+    va_start (args, description);
+    csReportV (object_reg, CS_REPORTER_SEVERITY_WARNING,
+      m_ApplicationStringName,
+      description, args);
+    va_end (args);
+  }
+  
+  /**
    * Display an information notification.
    * \remarks
    * The info displayed with this function will be identified with the
