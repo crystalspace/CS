@@ -478,6 +478,7 @@ version of Crystal Space, and any special configuration information.
 The author would like to acknowledge the assistance of the following person(s)
 in the creation of the Visual C++ 5 documentation.
 
+@itemize
 @item
 Andreas Hofler
 @end itemize
