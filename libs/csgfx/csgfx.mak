@@ -6,7 +6,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
 LIBHELP += \
-  $(NEWLINE)echo $"  make csgfx     Make the $(DESCRIPTION.csgfx)$"
+  $(NEWLINE)echo $"  make csgfx        Make the $(DESCRIPTION.csgfx)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
