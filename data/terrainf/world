@@ -240,7 +240,7 @@
   	<lodvalue name="block split distance">8</lodvalue>
   	<lodvalue name="minimum block size">32</lodvalue>
   	<lodvalue name="cd resolution">256</lodvalue>
-  	<lodvalue name="cd lod cost">.02</lodvalue>
+  	<!--<lodvalue name="cd lod cost">.02</lodvalue>-->
 	<materialmap image="/lev/terrain/materialmap.png" />
 	<staticlighting>yes</staticlighting>
 	<castshadows>yes</castshadows>
