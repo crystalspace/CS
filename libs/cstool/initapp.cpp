@@ -292,7 +292,7 @@ bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
 {
   va_list args;
   va_start(args, r);
-  bool const ok = RequestPlugins(r, args);
+  bool const ok = RequestPluginsV(r, args);
   va_end(args);
   return ok;
 }
