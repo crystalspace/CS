@@ -1,4 +1,4 @@
-Currently you need the cvs version of the ode library from www.q12.org/ode.
-Version 0.03 will _not_ cut it (for our needs).
-
-- latest ode cvs needs a ODE_OLD_COLLISION=1 in the ode/config/user-settings before you build it
+Currently (as of 30 Nov 2002) you need the CVS version of the ODE
+library.  Information about downloading it can be found at
+http://www.q12.org/ode.  The "stable" version 0.03 is not sufficient.
+This should work out of the box with the current CVS version of ODE.
