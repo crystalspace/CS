@@ -150,7 +150,7 @@ bool csApp::InitialSetup ()
     return false;
 
   // Change to the directory on VFS where we keep our data
-  const char *DataDir = System->ConfigGetStr ("MazeD", "Library", NULL);
+  const char *DataDir = System->ConfigGetStr ("CSWS", "Library", NULL);
   if (DataDir)
     VFS->ChDir (DataDir);
 
