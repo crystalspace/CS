@@ -26,6 +26,7 @@ W - Wishlist (the build also works without this feature)
     and INITJAMFILE. Would be also nice to extract more of the detection
     scripts in CS (perl, python, nasm, problematic cflags?)
 
+[L] Add support to create Microsoft CHM format documentation packages.
 [L] Jorrit reports that with the command "jam -sMODE=profile walktest_static",
     dynavis/debug/static/dynavis.o gets compiled twice.
 [L] msvcgen.jam: Consider overhauling the "configuration" file handling rule so
