@@ -12,6 +12,9 @@ chronological order.
 	  Needs more testing.
 	- res fixed the shader technique test in csbench. A wrong "shader type"
 	  parameter was passed to iMaterial->SetShader().
+	- Jorrit attempted to extend csbench to also test the light_bumpmap.xml
+	  shader. For this I had to create a new renderloop in code. The
+	  visual effects seems weird so I'm not sure it is actually working.
 20-Jun-2004
 	- Christian Bayle adapted debian scripts to the new configuration
 	  options

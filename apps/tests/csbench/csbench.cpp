@@ -51,6 +51,11 @@
 #include "iengine/sector.h"
 #include "iengine/camera.h"
 #include "iengine/material.h"
+#include "iengine/renderloop.h"
+#include "iengine/rendersteps/irsfact.h"
+#include "iengine/rendersteps/igeneric.h"
+#include "iengine/rendersteps/irenderstep.h"
+#include "iengine/rendersteps/icontainer.h"
 #include "ivaria/view.h"
 #include "cstool/csview.h"
 
@@ -290,7 +295,7 @@ void CsBench::BenchMark (const char* name, const char* description)
   vc->Advance ();
   csTicks current_time = vc->GetCurrentTicks ();
   int cnt = 0;
-  while (vc->GetCurrentTicks () < current_time+5000)
+  while (vc->GetCurrentTicks () < current_time+2000)
   {
     cnt++;
 
@@ -351,6 +356,40 @@ iDocumentSystem* CsBench::GetDocumentSystem ()
   return docsys;
 }
 
+void CsBench::PerformShaderTest (const char* shaderPath, const char* shname,
+		const char* shtype)
+{
+  csRef<iDocument> shaderDoc = GetDocumentSystem ()->CreateDocument ();
+  csRef<iShaderCompiler> shcom = GetShaderManager ()->GetCompiler ("XMLShader");
+  csRef<iFile> shaderFile = vfs->Open (shaderPath, VFS_FILE_READ);
+  shaderDoc->Parse (shaderFile);
+  csRef<iDocumentNode> shadernode = shaderDoc->GetRoot ()->GetNode ("shader");
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
+  csStringID shadertype = strings->Request (shtype);
+  csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
+  int i;
+  for (i = 0 ; i < prilist->GetCount () ; i++)
+  {
+    int pri = prilist->GetPriority (i);
+    csRef<iShader> shader = shcom->CompileShader (shadernode, pri);
+    if (shader)
+    {
+      csRef<iMaterial> matinput = engine->CreateBaseMaterial (
+		      engine->GetTextureList ()->FindByName ("stone"));
+      matinput->SetShader (shadertype, shader);
+      iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (matinput);
+      mat->Register (g3d->GetTextureManager ());
+      genmesh->SetMaterialWrapper (mat);
+      char name[256];
+      sprintf (name, "%s_%d", shname, pri);
+      char description[256];
+      sprintf (description, "Shader %s with priority %d", shname, pri);
+      BenchMark (name, description);
+    }
+  }
+}
+
 void CsBench::PerformTests ()
 {
   Report ("================================================================");
@@ -373,36 +412,42 @@ void CsBench::PerformTests ()
   g3d->SetOption ("StencilThreshold", "100000000");
   BenchMark ("planeclip", "glClipPlane clipping is used");
 
-  csRef<iDocument> shaderDoc = GetDocumentSystem ()->CreateDocument ();
-  csRef<iShaderCompiler> shcom = GetShaderManager ()->GetCompiler ("XMLShader");
-  char const* const shaderPath = "/shader/or_lighting.xml";
-  csRef<iFile> shaderFile = vfs->Open (shaderPath, VFS_FILE_READ);
-  shaderDoc->Parse (shaderFile);
-  csRef<iDocumentNode> shadernode = shaderDoc->GetRoot ()->GetNode ("shader");
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
-  csStringID shadertype = strings->Request ("OR compatibility");
-  csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
-  int i;
-  for (i = 0 ; i < prilist->GetCount () ; i++)
-  {
-    int pri = prilist->GetPriority (i);
-    csRef<iShader> shader = shcom->CompileShader (shadernode, pri);
-    if (shader)
-    {
-      csRef<iMaterial> matinput = engine->CreateBaseMaterial (
-		      engine->GetTextureList ()->FindByName ("stone"));
-      matinput->SetShader (shadertype, shader);
-      iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (matinput);
-      mat->Register (g3d->GetTextureManager ());
-      genmesh->SetMaterialWrapper (mat);
-      char name[256];
-      sprintf (name, "%s_%d", "or_lighting", pri);
-      char description[256];
-      sprintf (description, "Shader %s with priority %d", "or_lighting", pri);
-      BenchMark (name, description);
-    }
-  }
+  PerformShaderTest ("/shader/or_lighting.xml", "or_lighting", "OR compatibility");
+
+  iRenderLoopManager* rlmgr = engine->GetRenderLoopManager ();
+  csRef<iRenderLoop> loop = rlmgr->Create ();
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+	iPluginManager);
+  csRef<iRenderStepType> genType = CS_LOAD_PLUGIN (plugin_mgr,
+	"crystalspace.renderloop.step.generic.type", iRenderStepType);
+  csRef<iRenderStepType> lightType = CS_LOAD_PLUGIN (plugin_mgr,
+	"crystalspace.renderloop.step.lightiter.type", iRenderStepType);
+  csRef<iRenderStepFactory> genFact = genType->NewFactory ();
+  csRef<iRenderStepFactory> lightFact = lightType->NewFactory ();
+  csRef<iRenderStep> step;
+  csRef<iGenericRenderStep> genStep;
+  step = genFact->Create ();
+  loop->AddStep (step);
+  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
+  genStep->SetShaderType ("ambient");
+  genStep->SetZBufMode (CS_ZBUF_MESH);
+  genStep->SetZOffset (true);
+  genStep->SetPortalTraversal (true);
+  step = lightFact->Create ();
+  loop->AddStep (step);
+  csRef<iRenderStepContainer> contStep = SCF_QUERY_INTERFACE (step,
+	iRenderStepContainer);
+  step = genFact->Create ();
+  contStep->AddStep (step);
+  genStep = SCF_QUERY_INTERFACE (step, iGenericRenderStep);
+  genStep->SetShaderType ("diffuse");
+  genStep->SetZBufMode (CS_ZBUF_MESH);
+  genStep->SetZOffset (false);
+  genStep->SetPortalTraversal (false);
+  engine->GetRenderLoopManager ()->Register ("bump", loop);
+  engine->SetCurrentDefaultRenderloop (loop);
+
+  PerformShaderTest ("/shader/light_bumpmap.xml", "light_bumpmap", "diffuse");
 }
 
 /*---------------------------------------------------------------------*

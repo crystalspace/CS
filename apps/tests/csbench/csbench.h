@@ -61,6 +61,8 @@ private:
   void BenchMark (const char* name, const char* description);
   iDocumentSystem* GetDocumentSystem ();
   iShaderManager* GetShaderManager ();
+  void PerformShaderTest (const char* shaderPath, const char* shname,
+		  const char* shtype);
 
 public:
   CsBench ();
