@@ -12,6 +12,11 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+17-Feb-2000
+	- Seth did some fixes to sprite code again.
+	- Added the first versions of the TeXInfo converted docs from
+	  Martin Geisse. The new txidocs directory is temporary until
+	  the documents are fully converted.
 16-Feb-2000
 	- Some fixes to csPhyzik from Michael Ewert.
 	- Seth Galbraith managed to almost fix sprites by disabling LOD
@@ -38,7 +43,8 @@ Short-term cleanups that need to be done:
 	- A nice consequence of the new DrawTriangleMesh is that vertex
 	  fog should be a LOT faster.
 	- Eric Sunshine fixed a number of "variable may be used uninitialized"
-	  copilation warnings.
+	  compilation warnings.
+	- Thomas Hieber added support for DrawTriangleMesh to D3D 5 and 6.1.
 15-Feb-2000
 	- Eric Sunshine worked around an OpenStep compiler bug which was
 	  triggeredy by ctLinkList.  The compiler generates unlinkable code
