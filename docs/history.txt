@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+8-Jan-2000
+	- Michael Dale Long added support for configurable colors using
+	  the iTextureManager to iConsole.  He also removed all dependencies
+	  on the 3D graphics driver from the csConsole plugin.
 7-Jan-2000
 	- Fixed colored static lighting for OpenGL and Direct3D.
 	- Some fixes on lightmap deallocation. Now use DecRef()
