@@ -19,28 +19,40 @@
 #ifndef __CS_CSVER_H__
 #define __CS_CSVER_H__
 
+/**\file
+ * Crystal Space Version Information
+ */
+
 /* NOTE: Also update docs/texinfo/version.txi when updating these values. */
+/// Major version
 #define CS_VERSION_MAJOR CS_VER_QUOTE(0.95)
+/// Minor version (release, or "dev" for CVS version)
 #define CS_VERSION_MINOR CS_VER_QUOTE(dev)
+/// Date of release
 #define CS_RELEASE_DATE  CS_VER_QUOTE(Wed 2-Apr-2002)
 
 #define CS_VER_QUOTE(X) #X
 
 #if !defined(CS_PLATFORM_NAME)
+/// Name of the platform CS is compiled for (i.e. Win32)
 #  define CS_PLATFORM_NAME "MysteryPlatform"
 #  warning Unable to identify platform name using CS_PLATFORM_NAME.
 #endif
 #if !defined(CS_PROCESSOR_NAME)
+/// Name of the processor CS is compiled for (i.e. X86)
 #  define CS_PROCESSOR_NAME "MysteryProcessor"
 #  warning Unable to identify processor name using CS_PROCESSOR_NAME.
 #endif
 #if !defined(CS_COMPILER_NAME)
+/// Name of the compiler CS is compiled with (i.e. GCC)
 #  define CS_COMPILER_NAME "MysteryCompiler"
 #  warning Unable to identify compiler name using CS_COMPILER_NAME.
 #endif
 
+/// A complete version number
 #define CS_VERSION_NUMBER CS_VERSION_MAJOR " r" CS_VERSION_MINOR
 
+/// A complete version string, including date, platform, processor and compiler
 #define CS_VERSION CS_VERSION_NUMBER \
   " [" CS_PLATFORM_NAME "-" CS_PROCESSOR_NAME "-" CS_COMPILER_NAME "]"
 
