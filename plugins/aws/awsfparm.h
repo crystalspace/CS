@@ -89,6 +89,9 @@ public:
   virtual bool GetRect(char *name, csRect **value);
   /// Returns the point named "name" in value.  True if it was found, otherwise false.
   virtual bool GetPoint(char *name, csPoint **value);
+
+  /// Clears the parameter list
+  virtual void Clear();
 };
 
 #endif

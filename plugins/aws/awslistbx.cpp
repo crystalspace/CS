@@ -28,6 +28,53 @@ const int awsListBox::ctTree = 0x1;
 const int awsListBox::signalSelected=0x1;
 const int awsListBox::signalScrolled=0x2;
 
+const int alignLeft=0;
+const int alignCenter=1;
+const int alignRight=2;
+
+//////////////////////////////////////////////////////////////////////////
+// awsListRow implementation 
+//
+
+int 
+awsListRow::GetHeight(iAwsPrefManager *pm, int colcount)
+{
+  int minheight=0;
+  int i;
+
+  for(i=0; i<colcount; ++i)
+  {
+    int th=cols[i].GetHeight(pm);
+
+    if ( th > minheight)
+      minheight=th;
+  }
+
+  return minheight;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// awsListItem implementation 
+//
+
+int
+awsListItem::GetHeight(iAwsPrefManager *pm)
+{
+  int ih=0, iw=0;
+  int th=0, tw=0;
+
+  if (image) image->GetOriginalDimensions(iw, ih);
+  if (text)  pm->GetDefaultFont()->GetDimensions(text->GetData(), tw, th);
+
+  if (ih > th) return ih;
+  else return th;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// awsListBox implementation 
+//
+
 awsListBox::awsListBox():is_down(false), mouse_is_over(false), 
                          is_switch(false), was_down(false),
                          bkg(NULL), highlight(NULL), 
@@ -93,14 +140,16 @@ awsListBox::Setup(iAws *_wmgr, awsComponentNode *settings)
   // Get user prefs for the column headers
   for(i=0; i<ncolumns; ++i)
   {
-    cs_snprintf(buf, 64, "Column%dImg:", i);
+    cs_snprintf(buf, 64, "Column%dImg", i);
     pm->GetString(settings, buf, tn1);
-    cs_snprintf(buf, 64, "Column%dBkg:", i);
+    cs_snprintf(buf, 64, "Column%dBkg", i);
     pm->GetString(settings, buf, tn2);
-    cs_snprintf(buf, 64, "Column%dCaption:", i);
+    cs_snprintf(buf, 64, "Column%dCaption", i);
     pm->GetString(settings, buf, columns[i].caption);
-    cs_snprintf(buf, 64, "Column%dWidth:", i);
+    cs_snprintf(buf, 64, "Column%dWidth", i);
     pm->GetInt(settings, buf, columns[i].width);
+    cs_snprintf(buf, 64, "Column%dAlign", i);
+    pm->GetInt(settings, buf, columns[i].align);
 
     if (tn1) 
       columns[i].image = pm->GetTexture(tn1->GetData(), tn1->GetData());
@@ -133,7 +182,7 @@ awsListBox::Execute(char *action, iAwsParmList &parmlist)
 {
   if (awsComponent::Execute(action, parmlist)) return true;
 
-  if (strcmp(action, "InsertItem"))
+  if (strcmp(action, "InsertItem")==0)
   {
     char buf[50];
     int i;
@@ -145,7 +194,7 @@ awsListBox::Execute(char *action, iAwsParmList &parmlist)
     
     // Create a new set of columns and zero them out.
     row->cols = new awsListItem[ncolumns];
-    memset(row, 0, sizeof(awsListItem) * ncolumns);
+    memset(row->cols, 0, sizeof(awsListItem) * ncolumns);
     
     parmlist.GetInt("parent", (int *)&(row->parent));
 
@@ -181,6 +230,8 @@ awsListBox::Execute(char *action, iAwsParmList &parmlist)
       cs_snprintf(buf, 50, "alignimg%d", i);
       parmlist.GetInt(buf, &(row->cols[i].txt_align));
     }
+
+    rows.Push(row);
   }
   return false;
 }
@@ -239,7 +290,8 @@ awsListBox::OnDraw(csRect clip)
   int dfill = WindowManager()->GetPrefMgr()->GetColor(AC_DARKFILL);
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
 
-  int i;
+  int i,j;
+  int border=3;
     
   
   switch(frame_style)
@@ -269,6 +321,8 @@ awsListBox::OnDraw(csRect clip)
        g3d->DrawPixmap(bkg, Frame().xmin+4, Frame().ymin+4, Frame().Width()-7, Frame().Height()-7, 0, 0, Frame().Width(), Frame().Height(), 0);
       else
        g2d->DrawBox(Frame().xmin+4, Frame().ymin+4, Frame().Width()-7, Frame().Height()-7, fill);
+
+      border=5;
 
       break;
 
@@ -317,18 +371,160 @@ awsListBox::OnDraw(csRect clip)
       g2d->DrawLine(Frame().xmin, Frame().ymin, Frame().xmin, Frame().ymax, black);
       g2d->DrawLine(Frame().xmin, Frame().ymax, Frame().xmax, Frame().ymax, black);
       g2d->DrawLine(Frame().xmax, Frame().ymin, Frame().xmax, Frame().ymax, black);
+
+      border=1;
       break;
 
     case fsNone:
       break;
   }
 
+  int starty=Frame().ymin+border;
+  int startx=Frame().xmin+border;
 
-  // Now begin to draw actual list
-  for(i=0; i<rows.Length(); ++i)
+  int x=startx, y=starty;
+  int hch=15;
+  
+  for(i=0; i<ncolumns; ++i)
   {
+    if (columns[i].caption)
+    {
+     int tw, th, tx, ty, mcc;
+     int hcw;
 
+     if (i==ncolumns-1)
+       hcw = Frame().xmax-x-border;
+     else
+       hcw = columns[i].width;
+         
+     mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(columns[i].caption->GetData(), hcw-5);
+
+     scfString tmp(columns[i].caption->GetData());
+     tmp.Truncate(mcc);
+
+     // Get the size of the text
+     WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
+
+     // Calculate the center
+     ty = (hch>>1) - (th>>1);
+
+     switch(columns[i].align)
+     {
+      case alignRight:
+        tx = hcw-tw-2;
+        break;
+
+      case alignCenter:
+        tx = (hcw>>1) -  (tw>>1);
+        break;
+
+      default:
+        tx = 2;
+        break;
+     }
+
+     // Draw the text
+     g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
+                x+tx,
+                y+ty,
+                WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
+                -1,
+                tmp.GetData());
+
+     g2d->DrawLine(x, y, x+hcw, y, hi2);
+     g2d->DrawLine(x, y, x, y+hch, hi2);
+     g2d->DrawLine(x, y+hch, x+hcw, y+hch, lo2);
+     g2d->DrawLine(x+hcw, y, x+hcw, y+hch, lo2);
+    }
+
+    // Next column
+    x+=columns[i].width;
   }
+
+  // Setup y in proper place.
+  y+=hch+2;
+  
+  // Now begin to draw actual list
+  for(j=0; j<rows.Length(); ++j)
+  {
+    x=startx;
+    awsListRow *row = (awsListRow *)rows[j];
+
+    int ith=row->GetHeight(WindowManager()->GetPrefMgr(), ncolumns);
+
+    for(i=0; i<ncolumns; ++i)
+    {
+      if (row->cols[i].text)
+      {
+        int tw, th, tx, ty, mcc;
+        int cw;
+
+        int iw=0, ih=0; // stateful image width and height
+        int iws=0;      // stateful image spacer
+
+        if (i==ncolumns-1)
+          cw = Frame().xmax-x-border;
+        else
+          cw = columns[i].width;
+
+        // If this has state, fix it up.
+        if (row->cols[i].has_state)
+          tree_chke->GetOriginalDimensions(iw, ih);
+                   
+        mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(row->cols[i].text->GetData(), cw-5-iw);
+
+        scfString tmp(row->cols[i].text->GetData());
+        tmp.Truncate(mcc);
+
+        // Get the size of the text
+        WindowManager()->GetPrefMgr()->GetDefaultFont()->GetDimensions(tmp.GetData(), tw, th);
+
+        // Calculate the center
+        ty = (ith>>1) - (th>>1);
+
+        switch(row->cols[i].txt_align)
+        {
+          case alignRight:
+            tx = cw-tw-2;
+            iws=-iw+2;
+            break;
+
+          case alignCenter:
+            tx = (cw>>1) -  ((tw+iw)>>1);
+            break;
+
+          default:
+            tx = 2;
+            iws = iw+2; 
+            break;
+        }
+
+        // Draw the text
+        g2d->Write(WindowManager()->GetPrefMgr()->GetDefaultFont(),
+                    x+tx+iws,
+                    y+ty,
+                    WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
+                    -1,
+                    tmp.GetData());
+
+        if (row->cols[i].has_state)
+        {
+          if (row->cols[i].state)
+            g3d->DrawPixmap(tree_chkf, x+tx, y, iw, ih, 0,0, iw, ih);
+          else
+            g3d->DrawPixmap(tree_chke, x+tx, y, iw, ih, 0,0, iw, ih);
+        }
+       }
+
+        // Next column
+        x+=columns[i].width;
+
+    } // end for i (number of cols)
+
+    // next row.
+    y+=ith+2;
+
+  } // end for j (number of rows)
 }
 
 bool 
@@ -439,6 +635,10 @@ awsListBoxFactory::awsListBoxFactory(iAws *wmgr):awsComponentFactory(wmgr)
 
   RegisterConstant("lbtTree", awsListBox::ctTree);
   RegisterConstant("lbtList",  awsListBox::ctList);
+
+  RegisterConstant("lbAlignLeft", alignLeft);
+  RegisterConstant("lbAlignRight",  alignRight);
+  RegisterConstant("lbAlignCenter",  alignCenter);
 
   RegisterConstant("signalListBoxSelectionChanged",  awsListBox::signalSelected);
   RegisterConstant("signalListBoxScrolled",  awsListBox::signalScrolled);

@@ -54,7 +54,7 @@ struct awsListItem
   void DrawItem(iAws *wmgr, csRect frame);
 
   /// Tells what the minimum height of this item needs to be, taking into account children
-  int GetHeight();
+  int GetHeight(iAwsPrefManager *pm);
 };
 
 /// Manages a row of items
@@ -68,6 +68,9 @@ struct awsListRow
 
   /// Pointer to columns of items in this row
   awsListItem *cols;
+
+  /// Gets the minimum height of the row, does NOT recurse for children.
+  int GetHeight(iAwsPrefManager *pm, int colcount);
 };
 
 /// Manages a column of items
@@ -81,6 +84,9 @@ struct awsListColumn
 
   /// The caption of the header, if it has one.
   iString *caption;
+
+  /// Alignment
+  int align;
 
   /// The width of this column
   int width;

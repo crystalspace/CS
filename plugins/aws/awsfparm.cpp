@@ -45,6 +45,17 @@ awsParmList::FindParm(char *_name, int type)
   return NULL;
 }
 
+void
+awsParmList::Clear()
+{
+ int i;
+
+ for(i=0; i<parms.Length(); ++i)
+   delete (parmItem *)parms[i];
+ 
+ parms.SetLength(0);
+}
+
 void 
 awsParmList::AddInt(char *name, int value)
 {
