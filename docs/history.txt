@@ -20,6 +20,8 @@ chronological order.
 	- Eric Sunshine reverted Jorrit's reversion to Frank's csHash<>::Get()
 	  changes (after explaining why the original Get() method was so
 	  undisirable that it warranted removal).
+	- Eric Sunshine removed obsolete #include "iengine/statlght.h" from
+	  simple.txi tutorial.
 13-Mar-2004
 	- John Harger fixed the nVidia part of the PS1 plugin so that it will
 	  use the correct texture target on a 'tex' instruction.
