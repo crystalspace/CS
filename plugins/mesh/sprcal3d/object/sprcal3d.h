@@ -560,7 +560,10 @@ private:
   csArray<bool>             *is_initialized;
   bool lighting_dirty;
   csColor dynamic_ambient;
+  csArray<csArray<csVector3* > > vertices;
+  bool vertices_allocated;
 
+  void SetupVertices();
   void SetupObject ();
   void SetupObjectSubmesh(int index);
   void SetIdleOverrides(csRandomGen *rng,int which);

@@ -537,6 +537,49 @@ bool csIntersect3::IntersectTriangle (
   return (test1 == test2) && (test2 == test3) && (test1 != 0);
 }
 
+bool csIntersect3::Planes (
+   const csVector3& u, 
+   const csVector3& v,
+   const csPlane3* planes,
+   int length,
+   csVector3& isect,
+   float& dist)
+{
+  dist = -1;
+  int i;
+  for(i = 0;i < length;i++)
+  {
+    csVector3 tempisect;
+    float tempdist;
+    if(Plane(u,v,planes[i],tempisect,tempdist))
+    {
+      if(dist == -1||tempdist<dist)
+      {
+        bool inside = true;
+        int j;
+        for(j = 0;j < length;j++)
+        {
+          if(planes[j].Classify(tempisect)<0)
+ 	  {
+	    inside = false;
+	    break;
+ 	  }
+        }
+        if(inside)
+        {
+          isect = tempisect;
+	  dist = tempdist;
+        }
+      }
+    }
+  }
+  if(dist == -1)
+  {
+    return false;
+  }
+  return true;
+}
+
 bool csIntersect3::Plane (
   const csVector3 &u,
   const csVector3 &v,

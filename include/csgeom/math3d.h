@@ -293,6 +293,17 @@ public:
 	const csSegment3& seg, csVector3& isect);
 
   /**
+   * If a number of planes enclose a convex space (with their normals pointing outwards).
+   * This method returns true if they are intersected by a segment.
+   * isect contains the closest intersection point.
+   * dist contains the distance to that point (with distance between u and v being 1)
+   */
+  static bool Planes(
+     const csVector3& u, const csVector3& v,
+     const csPlane3* planes, int length,
+     csVector3& isect, float& dist);
+
+  /**
    * Intersect a 3D segment with a plane.  Returns true if there is an
    * intersection, with the intersection point returned in isect.
    */

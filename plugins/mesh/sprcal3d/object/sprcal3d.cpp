@@ -694,7 +694,8 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
       "Error creating model instance");
     return;
   }
-
+  vertices_allocated = false;
+  
 #ifdef CS_USE_NEW_RENDERER
   strings =  CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.shared.stringset", iStringSet);
@@ -716,6 +717,18 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
 {
+  if(vertices_allocated)
+  {
+    int m;
+    for (m=0;m<vertices.Length();m++)
+    {
+      int s;
+      for (s=0;s<vertices[m].Length();s++)
+      {
+	delete[] vertices[m][s];
+      }
+    }
+  }
   calModel.destroy();
 
   if (arrays_initialized)
@@ -1166,50 +1179,134 @@ void csSpriteCal3DMeshObject::SetupObject()
   RecalcBoundingBox(object_bbox);
 }
 
+void csSpriteCal3DMeshObject::SetupVertices()
+{
+  if(!vertices_allocated)
+  {
+    vertices.SetLength(calModel.getCoreModel()->getCoreMeshCount ());
+    int m;
+    for (m=0;m<vertices.Length();m++)
+    {
+      vertices[m].SetLength(calModel.getMesh(m)->getSubmeshCount());
+      int s;
+      for (s=0;s<vertices[m].Length();s++)
+      {
+	vertices[m][s] = new csVector3[calModel.getMesh(m)->getSubmesh(s)->getVertexCount ()];
+	calModel.getPhysique()->calculateVertices(calModel.getMesh(m)->getSubmesh(s),
+	    (float*)vertices[m][s]);
+      }
+    }
+    vertices_allocated = true;
+  }
+  else
+  {
+    int m;
+    for (m=0;m<vertices.Length();m++)
+    {
+      int s;
+      for (s=0;s<vertices[m].Length();s++)
+      {
+	calModel.getPhysique()->calculateVertices(calModel.getMesh(m)->getSubmesh(s),
+	    (float*)vertices[m][s]);
+      }
+    }
+  }
+}
+
 bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {
-  csSegment3 seg (start, end);
-  float dist, temp, max;
-  temp = dist = max = csSquaredDist::PointPoint (start, end);
-  csVector3 tsect;
+  SetupVertices();
+  
+  //Checks all of the cal3d bounding boxes of each bone to see if they hit
 
-  std::vector<CalMesh *>& vectorMesh = calModel.getVectorMesh ();
-  std::vector<CalMesh *>::iterator iteratorMesh = vectorMesh.begin();
-  while (iteratorMesh != vectorMesh.end())
+  bool hit = false;
+  std::vector<CalBone *> vectorBone = calModel.getSkeleton()->getVectorBone();
+  csArray<bool> bboxhits;
+  bboxhits.SetLength(vectorBone.size());
+  int b = 0;
+  std::vector<CalBone *>::iterator iteratorBone = vectorBone.begin();
+  while (iteratorBone != vectorBone.end())
   {
-    std::vector<CalSubmesh * >& vectorSubmesh = (*iteratorMesh)
-    	->getVectorSubmesh ();
-    std::vector<CalSubmesh *>::iterator iteratorSubmesh = vectorSubmesh.begin();
-    while (iteratorSubmesh != vectorSubmesh.end())
+    CalBoundingBox& cbb = (*iteratorBone)->getBoundingBox();
+    int i;
+    csPlane3 planes[6];
+    for(i=0;i<6;i++)
     {
-      csVector3* pVertexBuffer = new csVector3[(*iteratorSubmesh)
-      	->getVertexCount ()];
-      calModel.getPhysique()->calculateVertices(*iteratorSubmesh,
-      	(float*)pVertexBuffer);
-
-      std::vector<CalCoreSubmesh::Face>& vectorFace = (*iteratorSubmesh)
-      	->getCoreSubmesh()->getVectorFace();
-      std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
-      	= vectorFace.begin();
-      while(iteratorFace != vectorFace.end())
-      {
-	if (csIntersect3::IntersectTriangle (
-		pVertexBuffer[(*iteratorFace).vertexId[0]],
-		pVertexBuffer[(*iteratorFace).vertexId[1]],
-		pVertexBuffer[(*iteratorFace).vertexId[2]], seg, tsect))
-	{
-	  isect = tsect;
-	  if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
-	      csSquaredDist::PointPoint (start, end));
-	  return true;
-	}
-	++iteratorFace;
-      }
-      ++iteratorSubmesh;
-      delete[] pVertexBuffer;
+      planes[i].Set(cbb.plane[i].a,
+	  cbb.plane[i].b,
+	  cbb.plane[i].c,
+	  cbb.plane[i].d);
     }
-    ++iteratorMesh;
+    csVector3
+      tempisect;
+    float
+      tempdist;
+    if(csIntersect3::Planes(start,end,planes,6,tempisect,tempdist))
+    {
+      hit = true;
+      bboxhits[b] = true;
+    }
+    else
+    {
+      bboxhits[b] = false;
+    }
+    ++iteratorBone;
+    b++;
+  }
+
+  if(hit)
+  {
+    csSegment3 seg (start, end);
+    float dist, temp, max;
+    temp = dist = max = csSquaredDist::PointPoint (start, end);
+    csVector3 tsect;
+    int m;
+    for (m=0;m<vertices.Length();m++)
+    {
+      int s;
+      for (s=0;s<vertices[m].Length();s++)
+      {
+	std::vector<CalCoreSubmesh::Face>& vectorFace = calModel.getMesh(m)->getSubmesh(s)
+	  ->getCoreSubmesh()->getVectorFace();
+	std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
+	  = vectorFace.begin();
+	while(iteratorFace != vectorFace.end())
+	{
+	  bool bboxhit = false;
+	  int f;
+	  for(f=0;!bboxhit&&f<3;f++)
+	  {
+	    std::vector<CalCoreSubmesh::Influence> influ = calModel.getMesh(m)->getSubmesh(s)
+	      ->getCoreSubmesh()->getVectorVertex ()
+	      [(*iteratorFace).vertexId[f]].vectorInfluence;
+	    std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
+	      influ.begin();
+	    while(iteratorInflu != influ.end())
+	    {
+	      if(bboxhits[(*iteratorInflu).boneId])
+	      {
+		bboxhit = true;
+		break;
+	      }
+	      ++iteratorInflu;
+	    }
+	  }
+	  
+	  if (bboxhit &&  csIntersect3::IntersectTriangle (
+		vertices[m][s][(*iteratorFace).vertexId[0]],
+		vertices[m][s][(*iteratorFace).vertexId[1]],
+		vertices[m][s][(*iteratorFace).vertexId[2]], seg, tsect))
+	  {
+	    isect = tsect;
+	    if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+		csSquaredDist::PointPoint (start, end));
+	    return true;
+	  }
+	  ++iteratorFace;
+	}
+      }
+    }
   }
   return false;
 }
@@ -1218,56 +1315,111 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr, int* polygon_idx)
 {
-  // This routine is slow, but it is intended to be accurate.
-  if (polygon_idx) *polygon_idx = -1;
+  SetupVertices();
 
-  csSegment3 seg (start, end);
-  float dist, temp, max;
-  temp = dist = max = csSquaredDist::PointPoint (start, end);
-  csVector3 tsect;
-  
-  std::vector<CalMesh *>& vectorMesh = calModel.getVectorMesh ();
-  std::vector<CalMesh *>::iterator iteratorMesh = vectorMesh.begin();
-  while (iteratorMesh != vectorMesh.end())
+  //Checks all of the cal3d bounding boxes of each bone to see if they hit
+
+  bool hit = false;
+  std::vector<CalBone *> vectorBone = calModel.getSkeleton()->getVectorBone();
+  csArray<bool> bboxhits;
+  bboxhits.SetLength(vectorBone.size());
+  int b = 0;
+  std::vector<CalBone *>::iterator iteratorBone = vectorBone.begin();
+  while (iteratorBone != vectorBone.end())
   {
-    std::vector<CalSubmesh * >& vectorSubmesh = (*iteratorMesh)
-    	->getVectorSubmesh ();
-    std::vector<CalSubmesh *>::iterator iteratorSubmesh = vectorSubmesh.begin();
-    while (iteratorSubmesh != vectorSubmesh.end())
+    CalBoundingBox& cbb = (*iteratorBone)->getBoundingBox();
+    int i;
+    csPlane3 planes[6];
+    for(i=0;i<6;i++)
     {
-      csVector3* pVertexBuffer = new csVector3[(*iteratorSubmesh)
-      	->getVertexCount ()];
-      calModel.getPhysique()->calculateVertices(*iteratorSubmesh,
-      	(float*)pVertexBuffer);
-
-      std::vector<CalCoreSubmesh::Face>& vectorFace = (*iteratorSubmesh)
-      	->getCoreSubmesh()->getVectorFace();
-      std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
-      	= vectorFace.begin();
-      while(iteratorFace != vectorFace.end())
-      {
-	if (csIntersect3::IntersectTriangle (
-		pVertexBuffer[(*iteratorFace).vertexId[0]], 
-		pVertexBuffer[(*iteratorFace).vertexId[1]],
-		pVertexBuffer[(*iteratorFace).vertexId[2]], seg, tsect))
-	{
-	  temp = csSquaredDist::PointPoint (start, tsect);
-	  if (temp < dist)
-	  {
-	    dist = temp;
-	    isect = tsect;
-	  }
-	}
-	++iteratorFace;
-      }
-      ++iteratorSubmesh;
-    delete[] pVertexBuffer;
+      planes[i].Set(cbb.plane[i].a,
+	  cbb.plane[i].b,
+	  cbb.plane[i].c,
+	  cbb.plane[i].d);
     }
-    ++iteratorMesh;
+    csVector3
+      tempisect;
+    float
+      tempdist;
+    if(csIntersect3::Planes(start,end,planes,6,tempisect,tempdist))
+    { 
+      hit = true;
+      bboxhits[b] = true;
+    }
+    else
+    {
+      bboxhits[b] = false;
+    }
+    ++iteratorBone;
+    b++;
   }
-  if (pr) *pr = qsqrt (dist / max);
-  if (dist >= max) return false;
-  return true;
+
+  if(hit)
+  {
+    // This routine is slow, but it is intended to be accurate.
+    if (polygon_idx) *polygon_idx = -1;
+
+    csSegment3 seg (start, end);
+    float dist, temp, max;
+    temp = dist = max = csSquaredDist::PointPoint (start, end);
+    csVector3 tsect;
+
+    int m;
+    for (m=0;m<vertices.Length();m++)
+    {
+      int s;
+      for (s=0;s<vertices[m].Length();s++)
+      {
+	std::vector<CalCoreSubmesh::Face>& vectorFace = calModel.getMesh(m)->getSubmesh(s)
+	  ->getCoreSubmesh()->getVectorFace();
+	std::vector<CalCoreSubmesh::Face>::iterator iteratorFace
+	  = vectorFace.begin();
+	while(iteratorFace != vectorFace.end())
+	{
+	  bool bboxhit = false;
+	  int f;
+	  for(f=0;!bboxhit&&f<3;f++)
+	  {
+	    std::vector<CalCoreSubmesh::Influence> influ = calModel.getMesh(m)->getSubmesh(s)
+	      ->getCoreSubmesh()->getVectorVertex ()
+	      [(*iteratorFace).vertexId[f]].vectorInfluence;
+	    std::vector<CalCoreSubmesh::Influence>::iterator iteratorInflu =
+	      influ.begin();
+	    while(iteratorInflu != influ.end())
+	    {
+	      if(bboxhits[(*iteratorInflu).boneId])
+	      {
+		bboxhit = true;
+		break;
+	      }
+	      ++iteratorInflu;
+	    }
+	  }
+
+	  if (bboxhit && csIntersect3::IntersectTriangle (
+		vertices[m][s][(*iteratorFace).vertexId[0]], 
+		vertices[m][s][(*iteratorFace).vertexId[1]],
+		vertices[m][s][(*iteratorFace).vertexId[2]], seg, tsect))
+	  {
+	    temp = csSquaredDist::PointPoint (start, tsect);
+	    if (temp < dist)
+	    {
+	      dist = temp;
+	      isect = tsect;
+	    }
+	  }
+	  ++iteratorFace;
+	}
+      }
+    }
+    if (pr) *pr = qsqrt (dist / max);
+    if (dist >= max) return false;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
@@ -2145,7 +2297,6 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
 	  CS_BUFCOMP_FLOAT, 3, false);
 	vertex_size = vertexCount;
       }
-
       float* vertices = (float*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
       render->getVertices (vertices);
       vertex_buffer->Release ();
