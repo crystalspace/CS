@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 9-Apr-2003
 	- Matze fixed (blindly) lots of errors when using the jambuild on
 	  macosx.
+	- Fixed BugPlug so that it compiles again without the new renderer
+	  enabled.
 8-Apr-2003
         - Boyan fixed error in lightning plugin.
 	- Anders Stenberg fixed two cases where WaitForSingleObject used a 
@@ -32,6 +34,14 @@ The history order is reversed so that new features are at the top.
 	      brings the dynamic ambient color range in the same range as
 	      the rest of CS with 1 meaning full bright and 2 meaning
 	      double brightness.
+	- Thing changes:
+	    - Removed obsolete csThingBBox bounding box in csThing.
+	    - Split bezier curves in seperate mesh object plugin (bezier
+	      plugin).
+	    - Greatly cleaned up the csThingStatic stuff and moved all static
+	      stuff to that.
+	    - Updated API modification document.
+	    - Fixed map2cs to export curves using the new bezier plugin.
 	- Matze started to merge his jam build system:
 	    - Added configure-jam.ac file and changed autogen.sh to generate
 	      a configure-jam as well.
@@ -66,7 +76,6 @@ The history order is reversed so that new features are at the top.
 	    - sequence manager
 	- Additionally replaced a few csGetTicks() calls in walktest movement
 	  code with the virtual clock.
-	- Removed obsolete csThingBBox bounding box in csThing.
 6-Apr-2003
         - Rhad fixed some thread syncronization issues in the OpenAL
           and Direct Sound 3d sound renderers.

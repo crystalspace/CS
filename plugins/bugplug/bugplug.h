@@ -217,10 +217,10 @@ private:
   void Report (int severity, const char* msg, ...);
 
   // Toggle a G3D boolean option.
+  bool do_shadow_debug;
 #ifndef CS_USE_NEW_RENDERER
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
 #else
-  bool do_shadow_debug;
   csRef<iShader> standardShadowShader;
   csRef<iShader> debugShadowShader;
 
