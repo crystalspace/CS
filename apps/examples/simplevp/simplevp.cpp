@@ -183,7 +183,8 @@ bool Simple::Initialize ()
 
 	//Mount effectsdir'
 	csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
-	vfs->Mount("//effect//", ".\\data\\effectsys\\");
+	
+	vfs->Mount("/effect/", "$@data$/effectsys$/");
 
   // The virtual clock.
   vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
@@ -363,7 +364,13 @@ bool Simple::Initialize ()
 	//load our vertex-shader
 //	csRef<iVFS> vfs = CS_QUERY_REGISTRY(object_reg, iVFS);
 	csRef<iDataBuffer> id = vfs->ReadFile("/effect/ms.nvv");
-	
+
+	if( !id.IsValid())
+	{
+		csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.application", "Couldn't load vertex-program");
+		return false;
+	}
+
 	char *vdata;
 	vdata = (char*)(id->GetData());
 
