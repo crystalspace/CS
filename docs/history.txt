@@ -8,6 +8,7 @@ The history order is reversed so that new features are at the top.
 	- Oktal fixed a problem with the cssocket plugin where it would only
 	  send the first packet of a transmission that is split up into
 	  multiple packets.
+	- Philip Wyett eliminated some compiler warning(s).
 4-Apr-2003
         - JTarbox altered event define's to an enum
 	- Boyan added lightning loader plugin.

@@ -509,8 +509,8 @@ const csString& operator = (TYPE s) { return Replace (s); }
 
   void strlwr()
   {
-    for (char *p=Data; *p; p++)
-      *p = tolower(*p);
+    for (char *p = Data; *p; p++)
+      *p = (char) tolower (*p);
   }
 };
 
