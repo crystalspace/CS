@@ -27,21 +27,24 @@ SCF_VERSION (iCommandLineParser, 0, 0, 1);
 struct iCommandLineParser : public iBase
 {
   /**
-   * Initialize for the given command line (clears any information from
-   * previously used command lines).
+   * Initialize for the given command line.  Options from command line are
+   * added to any options already present --- i.e. those added via AddName()
+   * or AddOption().
    */
   virtual void Initialize (int argc, const char* const argv[]) = 0;
-
-  /// Query a specific commandline option (you can query second etc such option)
+  /// Clear all options and names.
+  virtual void Reset () = 0;
+  /// Query specific commandline option (you can query second etc. such option)
   virtual const char *GetOption (const char *iName, int iIndex = 0) const = 0;
-  /// Query a filename specified on the commandline (that is, without leading '-')
+  /// Query filename specified on commandline (that is, without leading '-')
   virtual const char *GetName (int iIndex = 0) const = 0;
   /// Add a command-line option to the command-line option array
   virtual void AddOption (const char *iName, const char *iValue) = 0;
   /// Add a command-line name to the command-line names array
   virtual void AddName (const char *iName) = 0;
   /// Replace the Nth command-line option with a new value
-  virtual bool ReplaceOption (const char *iName, const char *iValue, int iIndex = 0) = 0;
+  virtual bool ReplaceOption (const char *iName, const char *iValue,
+    int iIndex = 0) = 0;
   /// Replace the Nth command-line name with a new value
   virtual bool ReplaceName (const char *iValue, int iIndex = 0) = 0;
 };

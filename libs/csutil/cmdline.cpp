@@ -68,9 +68,6 @@ csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
 
 void csCommandLineParser::Initialize (int argc, const char* const argv[])
 {
-  Options.DeleteAll ();
-  Names.DeleteAll ();
-
   for (int i = 1; i < argc; i++)
   {
     char *opt = (char *)argv [i];
@@ -93,6 +90,12 @@ void csCommandLineParser::Initialize (int argc, const char* const argv[])
     else
       Names.Push (csStrNew (opt));
   }
+}
+
+void csCommandLineParser::Reset()
+{
+  Options.DeleteAll ();
+  Names.DeleteAll ();
 }
 
 csCommandLineOption*

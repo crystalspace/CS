@@ -47,23 +47,23 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  /// constructor
+  /// Constructor.
   csCommandLineParser (iBase *Parent = NULL);
-  /// construct with a given command line
+  /// Construct with a given command line.
   csCommandLineParser (int argc, const char* const argv[]);
   
   /**
-   * Initialize for the given command line (clears any information from
-   * previously used command lines).
+   * Initialize for the given command line.  Options from command line are
+   * added to any options already present --- i.e. those added via AddName()
+   * or AddOption().
    */
   virtual void Initialize (int argc, const char* const argv[]);
 
-  /// Query a specific commandline option (you can query second etc such option)
+  /// Clear all options and names.
+  virtual void Reset ();
+  /// Query specific commandline option (you can query second etc. such option)
   virtual const char *GetOption (const char *iName, int iIndex = 0) const;
-  /**
-   * Query a filename specified on the commandline (that is, without leading
-   * '-')
-   */
+  /// Query filename specified on commandline (that is, without leading '-')
   virtual const char *GetName (int iIndex = 0) const;
   /// Add a command-line option to the command-line option array
   virtual void AddOption (const char *iName, const char *iValue);

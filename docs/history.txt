@@ -3,6 +3,15 @@ The history order is reversed so that new features are at the top.
 1-Jul-2001
 	- Eric Sunshine repaired the new cmdline.cpp and cmdline.h so that they
 	  compile error-free with the NextStep compiler.
+	- Eric Sunshine repaired a fundamental flaw in the new
+	  csCommandLineParser class which caused most CS applications to crash.
+	  The problem was that csCommandLineParser::Initialize() emptied the
+	  option list (thus forgetting all existing options) before it
+	  processed the incoming argv[] vector.  This had the unfortunate
+	  side-effect of wiping out all iSystem::RequestPlugin() invocations
+	  which had occurred prior to the call to Initialize(), thus requested
+	  plugins were not being loaded, and programs would crash in the
+	  absence of those plugins.
 29-Jun-2001
 	- Got an Insure log from Philip Wyett. Using this I fixed a number
 	  of small problems and one rather bad problem. The bad problem
