@@ -17,6 +17,13 @@ The history order has been reversed so that new features are at the top.
 	  compilation, user should enable it itself.
 	- Thomas Riemer did a minor fix for initialization of name for
 	  command for NetSpace.
+	- Frank O'Connor did some fixes with regards to the new font
+	  renderer plugin.
+	- Norman Kramer changed program name to avoid naming conflicts
+	  between rule and program name on unix systems.
+	- Norman fixed gfxtest to change %ld to %d. Eric then fixed this
+	  fix to be more portable with regards to how size_t is defined.
+	- Norman removed various unused variables.
 8-May-2000
 	- Eric Sunshine re-enabled -kb flag and re-added CRLF line terminators
 	  for all .dsp files so that they will work even from CVS snapshot
