@@ -470,11 +470,12 @@ bool csPerfStats::WriteFile ()
 
   long total_len = 0;
   int statvec_num = statvec->Length ();
+  int i;
 
   if (!statvec_num)
     return false;
 
-  for (int i = 0; i < statvec_num; i++)
+  for (i = 0; i < statvec_num; i++)
     total_len += ((StatEntry*)statvec->Get (i))->len;
   // subtract end of file characters
   total_len -= statvec_num;
@@ -505,12 +506,12 @@ bool csPerfStats::WriteFile ()
     }
 
     // probably a better way to fill a string with spaces
-    for (int i = 0; i < f_buf_len; i++)
+    for (i = 0; i < f_buf_len; i++)
       f_buf [i] = ' ';
 
     char *buf = f_buf;
     char tbuf[15];
-    for (int i = 0; i < framevec_num; i++)
+    for (i = 0; i < framevec_num; i++)
     {
       FrameEntry* e = (FrameEntry*)head_section->framevec->Get (i);
       sprintf (tbuf, "\n%d", resolution*(i+1));
@@ -549,7 +550,7 @@ bool csPerfStats::WriteFile ()
       se = (StatEntry*)statvec->Get (j);
       j++;
     }
-    for (int i = 0; i < framevec_num; i++)
+    for (i = 0; i < framevec_num; i++)
     {
       while (se && se->frame_num < frame_count)
       {
@@ -570,7 +571,7 @@ bool csPerfStats::WriteFile ()
   }
   else
   {
-    for (int i = 0; i < statvec_num - 2; i++)
+    for (i = 0; i < statvec_num - 2; i++)
     {
       StatEntry* e = (StatEntry*)statvec->Get (i);
       strncpy (buf, e->buf, e->len - 1);
