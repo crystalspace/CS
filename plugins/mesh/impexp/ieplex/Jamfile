@@ -1,0 +1,9 @@
+SubDir TOP plugins mesh impexp ieplex ;
+
+Plugin ieplex
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith ieplex : csgeom cssys csutil ;
+
+Help ieplex : "Model Import/Export multiplexer plug-in" ;
+

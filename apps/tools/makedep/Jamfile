@@ -1,0 +1,9 @@
+SubDir TOP apps tools makedep ;
+
+Application makedep
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+
+Help makedep : "Dependency generation tool" ;
+

@@ -1,0 +1,15 @@
+SubDir TOP plugins video canvas ddraw ;
+
+if $(DDRAW.AVAILABLE) = "yes" 
+{
+Plugin ddraw2d
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith ddraw2d : directxcommon canvascommon cssys csutil ;
+ExternalLibs ddraw2d :  DDRAW ;
+
+Help ddraw2d : "Crystal Space DirectDraw 2D driver" ;
+CompileGroups ddraw2d :  drivers2d ;
+
+}
+

@@ -1,0 +1,10 @@
+SubDir TOP libs cstool ;
+
+Library cstool
+	: [ Wildcard *.cpp *.h ]
+;
+
+Help cstool : "Crystal Space tool Library" ;
+
+InstallConfig system.cfg ;
+

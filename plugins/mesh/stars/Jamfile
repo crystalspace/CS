@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh stars ;
+
+SubInclude TOP plugins mesh stars object ;
+SubInclude TOP plugins mesh stars persist ;

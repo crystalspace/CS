@@ -1,0 +1,11 @@
+SubDir TOP plugins console output simple ;
+
+Plugin simpcon
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith simpcon : csgeom cssys csutil ;
+
+Help simpcon : "Crystal Space simple output console" ;
+
+InstallConfig simpcon.cfg ;
+

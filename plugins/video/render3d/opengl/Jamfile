@@ -1,0 +1,11 @@
+SubDir TOP plugins video render3d opengl ;
+
+Plugin glrender3d
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith glrender3d : csgeom csgfx cssys csutil ;
+
+Help glrender3d : "Crystal Space Render3d OpenGL driver" ;
+
+InstallConfig opengl.cfg render3d.cfg ;
+

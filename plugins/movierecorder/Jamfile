@@ -1,0 +1,11 @@
+SubDir TOP plugins movierecorder ;
+
+Plugin movierecorder
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith movierecorder : cssys cstool csutil ;
+
+Help movierecorder : "Crystal Space realtime movie recorder" ;
+
+InstallConfig movierecorder.cfg ;
+

@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh snow ;
+
+SubInclude TOP plugins mesh snow object ;
+SubInclude TOP plugins mesh snow persist ;

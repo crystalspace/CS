@@ -1,0 +1,9 @@
+SubDir TOP plugins mesh bcterr object ;
+
+Plugin bcterr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith bcterr : csgeom cssys csutil ;
+
+Help bcterr : "Bezier Terrain plug-in" ;
+

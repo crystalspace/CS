@@ -1,0 +1,12 @@
+SubDir TOP plugins console output fancy ;
+
+Plugin fancycon
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith fancycon : csgeom cssys csutil ;
+
+Help fancycon : "Crystal Space fancy output console" ;
+
+InstallConfig fancycon.cfg ;
+InstallData fancycon.zip ;
+

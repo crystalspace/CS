@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh null object ;
+
+Plugin nullmesh
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith nullmesh : csgeom cssys csutil ;
+
+Help nullmesh : "General mesh object plug-in" ;
+CompileGroups nullmesh :  meshes ;
+

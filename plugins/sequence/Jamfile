@@ -1,0 +1,9 @@
+SubDir TOP plugins sequence ;
+
+Plugin sequence
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith sequence : csgeom cssys csutil ;
+
+Help sequence : "Crystal Space Sequence Manager Plug-In" ;
+

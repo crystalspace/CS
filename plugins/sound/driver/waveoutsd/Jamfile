@@ -1,0 +1,15 @@
+SubDir TOP plugins sound driver waveoutsd ;
+
+if $(WAVEOUT.AVAILABLE) = "yes" 
+{
+Plugin sndwaveout
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith sndwaveout : cssys csutil ;
+ExternalLibs sndwaveout :  WAVEOUT ;
+
+Help sndwaveout : "Crystal Space WaveOut sound driver" ;
+CompileGroups sndwaveout :  sounddrivers ;
+
+}
+

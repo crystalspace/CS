@@ -1,0 +1,9 @@
+SubDir TOP apps demosky ;
+
+Application demosky
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith demosky : csgeom csgfx cssys cstool csutil ;
+
+Help demosky : "Crystal Space sky demo" ;
+

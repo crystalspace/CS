@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh stars persist standard ;
+
+Plugin starldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith starldr : csgeom cssys csutil ;
+
+Help starldr : "Star mesh object loader" ;
+CompileGroups starldr :  meshes ;
+

@@ -1,0 +1,11 @@
+SubDir TOP data ;
+
+Data [ Wildcard *.zip ] ;
+
+InstallData standard.zip stdtex.zip ;
+
+SubInclude TOP data config ;
+SubInclude TOP data flarge ;
+SubInclude TOP data partsys ;
+SubInclude TOP data isomap ;
+

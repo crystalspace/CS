@@ -1,0 +1,30 @@
+SubDir TOP include ;
+
+rule ScanHeaders
+{
+  local _dir = [ FDirName $(TOP) include $(<) ] ;
+  local _i, _files = [ GLOB $(_dir) : * ] ;
+
+  for _i in $(_files)
+  {
+    if $(_i:S) = ".h"
+    {
+      LOCATE on $(_i:BSG=header_$(<)) = $(_dir) ;
+      InstallHeader $(_i:BSG=header_$(<)) : $(<) ;
+    }
+    else
+    {
+      if $(_i:BS) != $(DOT) && $(_i:BS) != $(DOTDOT)
+      {
+	ScanHeaders [ FDirName $(<) $(_i:BS) ] ;
+      }
+    }
+  }
+}
+
+ScanHeaders ;
+
+# remember to install volatile.h from top dir
+LOCATE on volatile.h = $(BUILDTOP) ;
+InstallHeader volatile.h ;
+

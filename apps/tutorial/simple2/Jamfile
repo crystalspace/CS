@@ -1,0 +1,9 @@
+SubDir TOP apps tutorial simple2 ;
+
+Application simple2
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith simple2 : csgeom csgfx cssys cstool csutil ;
+
+Help simple2 : "Crystal Space tutorial part two, sprite" ;
+

@@ -1,0 +1,9 @@
+SubDir TOP plugins video render3d shaderplugins glshader_cg ;
+
+Plugin glshader_cg
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith glshader_cg : csgeom csgfx cssys csutil ;
+
+Help glshader_cg : "Crystal Space Render3d Shaderplugin for CG" ;
+

@@ -1,0 +1,10 @@
+SubDir TOP apps tests eventtest ;
+
+Application eventtest
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith eventtest : cssys cstool csutil ;
+
+Help eventtest : "Crystal Space eventtest tester" ;
+

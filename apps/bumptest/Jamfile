@@ -1,0 +1,11 @@
+SubDir TOP apps bumptest ;
+
+Application bumptest
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith bumptest : csgeom csgfx cssys cstool csutil ;
+
+Help bumptest : "Crystal Space bumpmap test" ;
+
+InstallConfig csbumptest.cfg ;
+

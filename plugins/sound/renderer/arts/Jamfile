@@ -1,0 +1,16 @@
+SubDir TOP plugins sound renderer arts ;
+
+if $(ARTS.AVAILABLE) = "yes" 
+{
+Library csarts
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith csarts : soundrendercommon csarts.idl csgeom cssys cstool csutil ;
+ExternalLibs csarts :  ARTS ;
+
+Help csarts : "Crystal Space aRts sound renderer" ;
+CompileGroups csarts :  sounddrivers ;
+
+}
+

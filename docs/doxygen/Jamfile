@@ -1,0 +1,11 @@
+SubDir TOP docs doxygen ;
+
+if $(DOXYGEN)
+{
+  
+DoxyGen pubapi : pubapi.dox : pubapi : b2w.jpg smalllogo.jpg ;
+DoxyGen devapi : devapi.dox : devapi ;
+
+InstallDocDir pubapi ;
+}
+

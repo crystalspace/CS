@@ -1,0 +1,9 @@
+SubDir TOP plugins stdrep ;
+
+Plugin stdrep
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith stdrep : csgeom cssys csutil ;
+
+Help stdrep : "Crystal Space Standard Report Listener Plugin" ;
+

@@ -1,0 +1,29 @@
+SubDir TOP plugins aws ;
+
+FILES = av3dtxt.cpp av3dtxtm.cpp aws3dfrm.cpp awsadler.cpp awsbarct.cpp
+	awsbl.cpp awschkbx.cpp awscmdbt.cpp awscmpt.cpp awscomp.cpp
+	awsControlBar.cpp aws.cpp awscspt.cpp awsEngineView.cpp awsfparm.cpp
+	awsgbl.cpp awsgrpfr.cpp awsimgvw.cpp awsitmv.cpp awskcfct.cpp
+	awskeycn.cpp awslabel.cpp awslstbx.cpp awsMenu.cpp awsmgr.cpp
+	awsmled.cpp awsntbk.cpp awsPanel.cpp awsparser.cpp awsprefs.cpp
+	awsradbt.cpp awsscrbr.cpp awsscr.cpp awsslot.cpp awsstbar.cpp 
+	awsstdsk.cpp awsTabCtrl.cpp awstex.cpp awstimer.cpp awstxtbx.cpp
+	awswin.cpp ;
+if $(BISONBIN) && $(FLEXBIN)
+{
+  FILES += skinlex.ll skinpars.yy ;
+  # ugly...
+  BISONFLAGS += -p aws ;
+}
+else
+{
+  FILES += skinlex.cpp skinpars.cpp ;
+}
+
+Plugin aws :
+	$(FILES)
+;
+LinkWith aws : csgeom csgfx cssys cstool csutil ;
+
+Help aws : "Alternate Windowing System plug-in" ;
+

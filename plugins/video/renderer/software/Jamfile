@@ -1,0 +1,27 @@
+SubDir TOP plugins video renderer software ;
+
+if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86"
+{
+  SearchSubdir i386 ;
+  ASMFILES = [ Wildcard i386 : *.asm *.cpp *.h ] ;
+  ASFLAGS on $(ASMFILES) += -DOS=$(OS) -DPROC=$(PROC) -DCOMP=$(COMP) ;
+}
+else
+{
+  ASMFILES = ;
+}
+
+Plugin soft3d :
+	[ Wildcard *.cpp *.h ]
+	$(ASMFILES)
+;
+LinkWith soft3d : renderercommon csgeom csgfx cssys csutil ;
+if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86"
+{
+  CFlags soft3d : -DDO_NASM ;
+}
+
+Help soft3d : "Crystal Space software 3D renderer" ;
+
+InstallConfig soft3d.cfg ;
+

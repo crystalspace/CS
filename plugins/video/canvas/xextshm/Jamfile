@@ -1,0 +1,15 @@
+SubDir TOP plugins video canvas xextshm ;
+
+if $(X11.AVAILABLE) = "yes" 
+{
+Plugin xextshm
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith xextshm : csgeom cssys csutil ;
+ExternalLibs xextshm :  X11 ;
+
+Help xextshm : "Crystal Space X-Extension Shared Memory Plugin" ;
+CompileGroups xextshm :  drivers2d ;
+
+}
+

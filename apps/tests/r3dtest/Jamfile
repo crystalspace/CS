@@ -1,0 +1,9 @@
+SubDir TOP apps tests r3dtest ;
+
+Application r3dtest
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith r3dtest : csgeom csgfx cssys cstool csutil ;
+
+Help r3dtest : "Test of new renderer" ;
+

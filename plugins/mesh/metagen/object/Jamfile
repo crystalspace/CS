@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh metagen object ;
+
+Plugin metagen
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith metagen : csgeom cssys csutil ;
+
+Help metagen : "MetaGen mesh factory" ;
+CompileGroups metagen :  meshes ;
+

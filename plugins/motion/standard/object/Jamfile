@@ -1,0 +1,9 @@
+SubDir TOP plugins motion standard object ;
+
+Plugin motion
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith motion : csgeom cssys csutil ;
+
+Help motion : "Crystal Space skeletal motion plug-in" ;
+

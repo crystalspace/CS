@@ -1,0 +1,9 @@
+SubDir TOP plugins cssaver ;
+
+Plugin cssaver
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith cssaver : cssys cstool csutil ;
+
+Help cssaver : "Crystal Space map file saver" ;
+

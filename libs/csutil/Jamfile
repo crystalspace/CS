@@ -1,0 +1,11 @@
+SubDir TOP libs csutil ;
+
+Library csutil
+	: [ Wildcard *.cpp *.h ]
+;
+
+Help csutil : "Crystal Space utility library" ;
+
+# don't install scf.cfg this is deprecated now
+InstallConfig mouse.cfg ;
+

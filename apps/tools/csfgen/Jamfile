@@ -1,0 +1,10 @@
+SubDir TOP apps tools csfgen ;
+
+Application csfgen
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith csfgen : csgeom csgfx cssys cstool csutil ;
+
+Help csfgen : "TrueType to Crystal Space font converter" ;
+

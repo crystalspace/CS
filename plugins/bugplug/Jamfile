@@ -1,0 +1,11 @@
+SubDir TOP plugins bugplug ;
+
+Plugin bugplug
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith bugplug : csgeom cssys cstool csutil ;
+
+Help bugplug : "Crystal Space debugging plug-in" ;
+
+InstallConfig bugplug.cfg ;
+

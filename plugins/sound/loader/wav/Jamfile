@@ -1,0 +1,10 @@
+SubDir TOP plugins sound loader wav ;
+
+Plugin sndwav
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith sndwav : soundloadercommon cssys csutil ;
+
+Help sndwav : "Crystal Space wav sound loader" ;
+CompileGroups sndwav :  soundloaders ;
+

@@ -1,0 +1,14 @@
+SubDir TOP plugins cscript cslua ;
+
+if $(LUA.AVAILABLE) = "yes" 
+{
+Plugin cslua
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith cslua : csgeom cssys csutil ;
+ExternalLibs cslua :  LUA ;
+
+Help cslua : "Crystal Script Lua plug-in" ;
+
+}
+

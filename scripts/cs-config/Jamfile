@@ -1,0 +1,50 @@
+#============================================================================
+# Rules for creating cs-config compile help script
+#============================================================================
+
+SubDir TOP scripts cs-config ;
+
+actions csConfigGen
+{
+  cat $(SUBDIR)/cs-config.temppre > $(<)
+
+  echo "CRYSTAL=\"\${CRYSTAL- $(PREFIX) }\"" >> $(<)
+  echo "prefix=\"\${CRYSTAL}\"" >> $(<)
+  echo "exec_prefix=\"\${prefix}\"" >> $(<)
+  echo "makeout=\"$(LOCATE.OBJECTS)\"" >> $(<)
+  echo "version=\"$(PACKAGE.VERSION)\"" >> $(<)
+  echo "longversion=\"$(PACKAGE.STRING)\"" >> $(<)
+  echo "includedir=\"\${prefix}/include\"" >> $(<)
+  echo "syslibs=\" $(LINKLIBS) \"" >> $(<)
+  echo "common_cflags=\"\"" >> $(<)
+  echo "common_cxxflags=\"\"" >> $(<)
+  echo "" >> $(<)
+
+  echo "makevars()" >> $(<)
+  echo "{" >> $(<)
+  echo "echo Makevars not supported with jam build." >> $(<)
+  echo "}" >> $(<)
+  echo "" >> $(<)
+
+  cat $(SUBDIR)/cs-config.temppost >> $(<)
+}
+
+rule ConfigHelper
+{
+  csConfigGen $(<) ;
+  MODE on $(<) = $(EXEMODE) ;
+  SUBDIR on $(<) = $(SUBDIR) ;
+  Chmod $(<) ;
+
+  Depends exe : $(<) ;
+  LOCATE on cs-config.temppre cs-config.temppost = $(SUBDIR) ;
+  Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
+  		 $(TOP)/scripts/cs-config/Jamfile ;
+
+  InstallApplication $(<) ;
+}
+
+ConfigHelper cs-config ;
+Clean clean : cs-config ;
+Clean cs-configclean : cs-config ;
+

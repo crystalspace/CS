@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh explo persist standard ;
+
+Plugin exploldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith exploldr : csgeom cssys csutil ;
+
+Help exploldr : "Explosion mesh object loader" ;
+CompileGroups exploldr :  meshes ;
+

@@ -1,0 +1,15 @@
+SubDir TOP plugins sound loader ogg ;
+
+if $(VORBISFILE.AVAILABLE) = "yes" 
+{
+Plugin sndogg
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith sndogg : soundloadercommon cssys csutil ;
+ExternalLibs sndogg :  VORBISFILE ;
+
+Help sndogg : "Crystal Space ogg vorbis sound loader" ;
+CompileGroups sndogg :  soundloaders ;
+
+}
+

@@ -1,0 +1,4 @@
+SubDir TOP plugins video format ;
+
+SubInclude TOP plugins video format avi ;
+SubInclude TOP plugins video format codecs ;

@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh fire ;
+
+SubInclude TOP plugins mesh fire object ;
+SubInclude TOP plugins mesh fire persist ;

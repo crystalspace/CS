@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh rain object ;
+
+Plugin rain
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith rain : partgen csgeom cssys csutil ;
+
+Help rain : "Rain mesh object plug-in" ;
+CompileGroups rain :  meshes ;
+

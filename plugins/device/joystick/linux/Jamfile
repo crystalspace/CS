@@ -1,0 +1,16 @@
+SubDir TOP plugins device joystick linux ;
+
+if $(JOYSTICK.AVAILABLE) = "yes" 
+{
+Plugin joylin
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith joylin : cssys csutil ;
+ExternalLibs joylin :  JOYSTICK ;
+
+Help joylin : "Crystal Space Joystick plugin for Linux" ;
+
+InstallConfig joystick.cfg ;
+
+}
+

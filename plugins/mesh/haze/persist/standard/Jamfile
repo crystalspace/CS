@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh haze persist standard ;
+
+Plugin hazeldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith hazeldr : csgeom cssys csutil ;
+
+Help hazeldr : "Haze mesh object loader" ;
+CompileGroups hazeldr :  meshes ;
+

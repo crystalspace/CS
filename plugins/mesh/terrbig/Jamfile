@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh terrbig ;
+
+Plugin terrbig
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith terrbig : csgeom cssys csutil ;
+
+Help terrbig : "Large terrain plugin" ;
+CompileGroups terrbig :  meshes ;
+

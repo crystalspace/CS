@@ -1,0 +1,9 @@
+SubDir TOP apps tools uninst ;
+
+Application uninst
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+
+Help uninst : "Uninstall program" ;
+

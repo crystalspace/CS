@@ -1,0 +1,14 @@
+SubDir TOP plugins sound driver coreaudio ;
+
+if $(TARGET.OS) = "MACOS_X" 
+{
+Plugin casnddrv
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith casnddrv : cssys csutil ;
+
+Help casnddrv : "Crystal Space MacOS/X CoreAudio sound driver" ;
+CompileGroups casnddrv :  sounddrivers ;
+
+}
+

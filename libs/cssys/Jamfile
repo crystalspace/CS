@@ -1,0 +1,32 @@
+SubDir TOP libs cssys ;
+
+switch $(TARGET.OS)
+{
+case WIN32 :
+  SearchSubdir win32 ;
+  SearchSubdir general ; 
+  SYSFILES = [ Wildcard win32 : *.cpp *.h ] 
+		findlib.cpp getopt.cpp printf.cpp runloop.cpp sysinit.cpp ;
+case MACOS_X :
+  SearchSubdir macosx ;
+  SearchSubdir general ;
+  SYSFILES = [ Wildcard macosx : *.cpp *.m *.h ] 
+		findlib.cpp getopt.cpp printf.cpp sysroot.cpp pthrd.cpp 
+		cspthrd.h ;
+  InstallConfig macosx.cfg ;
+case * :
+  SearchSubdir unix ;
+  SearchSubdir general ;
+  SYSFILES = [ Wildcard unix : *.cpp *.h ]
+		sysroot.cpp findlib.cpp getopt.cpp printf.cpp runloop.cpp 
+		sysinit.cpp cspthrd.cpp cspthrd.h ;
+}
+
+Library cssys :
+	[ Wildcard *.cpp *.h ]
+	$(SYSFILES)
+;
+CFlags cssys : -DCS_CONFIGDIR='\"$(SYSCONFDIR)\"' -DCS_PLUGINDIR='\"$(PLUGINDIR)\"' ;
+
+Help cssys : "Crystal Space system library" ;
+

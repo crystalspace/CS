@@ -1,0 +1,9 @@
+SubDir TOP plugins collide rapid ;
+
+Plugin rapid
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith rapid : csgeom cssys csutil ;
+
+Help rapid : "RAPID collision detection plug-in" ;
+

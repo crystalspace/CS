@@ -1,0 +1,14 @@
+SubDir TOP apps tools ;
+
+SubInclude TOP apps tools cs2xml ;
+SubInclude TOP apps tools csfedit ;
+SubInclude TOP apps tools csfgen ;
+SubInclude TOP apps tools cslight ;
+SubInclude TOP apps tools levtool ;
+SubInclude TOP apps tools makedep ;
+SubInclude TOP apps tools picview ;
+SubInclude TOP apps tools scfreg ;
+SubInclude TOP apps tools tbconv ;
+SubInclude TOP apps tools uninst ;
+SubInclude TOP apps tools viewmesh ;
+SubInclude TOP apps tools vsh ;

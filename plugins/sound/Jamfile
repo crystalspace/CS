@@ -1,0 +1,5 @@
+SubDir TOP plugins sound ;
+
+SubInclude TOP plugins sound driver ;
+SubInclude TOP plugins sound loader ;
+SubInclude TOP plugins sound renderer ;

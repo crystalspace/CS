@@ -1,0 +1,10 @@
+SubDir TOP apps import maya2spr ;
+
+Application maya2spr
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith maya2spr : csgeom csgfx cssys csutil ;
+
+Help maya2spr : "Maya to CS Sprite convertor" ;
+

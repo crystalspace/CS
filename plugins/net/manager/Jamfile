@@ -1,0 +1,9 @@
+SubDir TOP plugins net manager ;
+
+Plugin netman
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith netman : cssys csutil ;
+
+Help netman : "Crystal Space network manager" ;
+

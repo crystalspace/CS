@@ -1,0 +1,14 @@
+SubDir TOP plugins cscript csperl5 ;
+
+if $(PERL5.AVAILABLE) = "yes" && $TARGET_DISABLED && "" 
+{
+Plugin csperl5
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith csperl5 : $(dep.csperl5) ;
+ExternalLibs csperl5 :  PERL5 ;
+
+Help csperl5 : "Crystal Space Perl5 scripting plugin" ;
+
+}
+

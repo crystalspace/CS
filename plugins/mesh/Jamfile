@@ -1,0 +1,27 @@
+SubDir TOP plugins mesh ;
+
+SubInclude TOP plugins mesh partgen ;
+SubInclude TOP plugins mesh ball ;
+SubInclude TOP plugins mesh bcterr ;
+SubInclude TOP plugins mesh cloth ;
+SubInclude TOP plugins mesh crossbld ;
+SubInclude TOP plugins mesh emit ;
+SubInclude TOP plugins mesh explo ;
+SubInclude TOP plugins mesh fire ;
+SubInclude TOP plugins mesh fountain ;
+SubInclude TOP plugins mesh genmesh ;
+SubInclude TOP plugins mesh haze ;
+SubInclude TOP plugins mesh impexp ;
+SubInclude TOP plugins mesh lghtng ;
+SubInclude TOP plugins mesh metaball ;
+SubInclude TOP plugins mesh metagen ;
+SubInclude TOP plugins mesh null ;
+SubInclude TOP plugins mesh rain ;
+SubInclude TOP plugins mesh snow ;
+SubInclude TOP plugins mesh spiral ;
+SubInclude TOP plugins mesh spr2d ;
+SubInclude TOP plugins mesh spr3d ;
+SubInclude TOP plugins mesh stars ;
+SubInclude TOP plugins mesh terrbig ;
+SubInclude TOP plugins mesh terrfunc ;
+SubInclude TOP plugins mesh thing ;

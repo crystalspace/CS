@@ -1,0 +1,12 @@
+SubDir TOP apps blocks ;
+
+Application blocks
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith blocks : csgeom csgfx cssys cstool csutil ;
+
+Help blocks : "Crystal Space Blocks game" ;
+
+InstallConfig blocks.cfg ;
+InstallData blocks.zip ;
+

@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh impexp ;
+
+SubInclude TOP plugins mesh impexp 3ds ;
+SubInclude TOP plugins mesh impexp ase ;
+SubInclude TOP plugins mesh impexp ieplex ;
+SubInclude TOP plugins mesh impexp md2 ;
+SubInclude TOP plugins mesh impexp mdl ;
+SubInclude TOP plugins mesh impexp obj ;
+SubInclude TOP plugins mesh impexp pov ;
+SubInclude TOP plugins mesh impexp spr ;

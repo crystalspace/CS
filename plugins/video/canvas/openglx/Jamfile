@@ -1,0 +1,16 @@
+SubDir TOP plugins video canvas openglx ;
+
+if $(GLX.AVAILABLE) = "yes" 
+{
+Plugin glx2d
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith glx2d : canvascommon openglcommon csgeom cssys csutil ;
+ExternalLibs glx2d :  GLX ;
+
+Help glx2d : "Crystal Space GL/X 2D driver" ;
+CompileGroups glx2d :  drivers2d ;
+
+}
+
+SubInclude TOP plugins video canvas openglx glide ;

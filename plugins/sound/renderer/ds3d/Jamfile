@@ -1,0 +1,15 @@
+SubDir TOP plugins sound renderer ds3d ;
+
+if $(DS3D.AVAILABLE) = "yes" 
+{
+Plugin sndds3d
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith sndds3d : soundrendercommon csgeom cssys csutil ;
+ExternalLibs sndds3d :  DS3D ;
+
+Help sndds3d : "Crystal Space DirectSound 3D sound renderer" ;
+CompileGroups sndds3d :  sounddrivers ;
+
+}
+

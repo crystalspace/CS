@@ -1,0 +1,8 @@
+SubDir TOP libs csgfx ;
+
+Library csgfx
+	: [ Wildcard *.cpp *.h ]
+;
+
+Help csgfx : "Crystal Space graphics utility library" ;
+

@@ -1,0 +1,15 @@
+SubDir TOP plugins sound renderer eax ;
+
+if $(EAX.AVAILABLE) = "yes" 
+{
+Plugin sndeax
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith sndeax : soundrendercommon csgeom cssys csutil ;
+ExternalLibs sndeax :  EAX ;
+
+Help sndeax : "Crystal Space EAX sound renderer" ;
+CompileGroups sndeax :  sounddrivers ;
+
+}
+

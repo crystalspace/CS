@@ -1,0 +1,15 @@
+SubDir TOP plugins net driver ensocket ;
+
+if $(SOCKET.AVAILABLE) = "yes" 
+{
+Plugin ensocket
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith ensocket : cssys csutil ;
+ExternalLibs ensocket :  SOCKET ;
+
+Help ensocket : "Crystal Space ensocket network driver" ;
+CompileGroups ensocket :  netdrivers ;
+
+}
+

@@ -1,0 +1,16 @@
+SubDir TOP plugins font server freefnt2 ;
+
+if $(FT2.AVAILABLE) = "yes" 
+{
+Plugin freefnt2
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith freefnt2 : cssys csutil ;
+ExternalLibs freefnt2 :  FT2 ;
+
+Help freefnt2 : "Crystal Space FreeType font server" ;
+
+InstallConfig freetype.cfg ;
+
+}
+

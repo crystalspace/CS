@@ -1,0 +1,12 @@
+SubDir TOP apps demo ;
+
+Application csdemo
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith csdemo : csgeom csgfx cssys cstool csutil ;
+
+Help csdemo : "Crystal Space Demo" ;
+
+Win32Resource csdemo : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;
+InstallConfig csdemo.cfg ;
+

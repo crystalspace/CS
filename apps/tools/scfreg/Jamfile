@@ -1,0 +1,10 @@
+SubDir TOP apps tools scfreg ;
+
+Application scfreg
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith scfreg : csgeom cssys csutil ;
+
+Help scfreg : "Crystal Space SCF registration server" ;
+

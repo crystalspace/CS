@@ -1,0 +1,10 @@
+SubDir TOP plugins video canvas memory ;
+
+Plugin memory
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith memory : canvascommon cssys csutil ;
+
+Help memory : "Crystal Space memory 2D driver" ;
+CompileGroups memory :  drivers2d ;
+

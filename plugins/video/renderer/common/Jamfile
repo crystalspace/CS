@@ -1,0 +1,7 @@
+SubDir TOP plugins video renderer common ;
+
+Library renderercommon
+	: [ Wildcard *.cpp *.h ]
+	: noinstall
+;
+

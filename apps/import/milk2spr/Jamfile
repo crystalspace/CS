@@ -1,0 +1,10 @@
+SubDir TOP apps import milk2spr ;
+
+Application milk2spr
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith milk2spr : csgeom csgfx cssys csutil ;
+
+Help milk2spr : "Milkshape ASCII Model conversion tool" ;
+

@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh emit persist standard ;
+
+Plugin emitldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith emitldr : csgeom cssys csutil ;
+
+Help emitldr : "Emit mesh object loader" ;
+CompileGroups emitldr :  meshes ;
+

@@ -1,0 +1,7 @@
+SubDir TOP plugins sound renderer common ;
+
+Library soundrendercommon
+	: [ Wildcard *.cpp *.h ]
+	: noinstall
+;
+

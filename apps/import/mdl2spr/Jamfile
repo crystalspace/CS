@@ -1,0 +1,10 @@
+SubDir TOP apps import mdl2spr ;
+
+Application mdl2spr
+	: [ Wildcard *.cpp *.h ]
+	: console
+;
+LinkWith mdl2spr : csgeom csgfx cssys csutil ;
+
+Help mdl2spr : "Quake model MDL/MD2 conversion tool" ;
+

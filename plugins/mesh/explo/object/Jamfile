@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh explo object ;
+
+Plugin explo
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith explo : partgen csgeom cssys csutil ;
+
+Help explo : "Explosion mesh object plug-in" ;
+CompileGroups explo :  meshes ;
+

@@ -1,0 +1,13 @@
+SubDir TOP apps walktest ;
+
+Application walktest
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith walktest : csengine csgeom csgfx cssys cstool csutil ;
+
+Help walktest : "Crystal Space WalkTest demo" ;
+
+Win32Resource walktest : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;
+InstallConfig autoexec.cfg walktest.cfg ;
+InstallMapfile flarge partsys ;
+

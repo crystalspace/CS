@@ -1,0 +1,15 @@
+SubDir TOP docs texinfo ;
+
+if $(PERL)
+{
+  TEXIFLAGS on htmldocs += -init_file=$(TOP)/docs/support/texi2html.init -prefix=cs ;
+  Texi2HTML htmldocs : cs-unix.txi : html ;
+
+  InstallDocDir htmldocs ;
+}
+
+if $(TEXI2DVI)
+{
+  Texi2DVI dvidocs : cs-unix.txi ;
+}
+

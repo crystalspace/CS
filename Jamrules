@@ -1,0 +1,40 @@
+# Include config
+BUILDTOP ?= $(TOP) ;
+JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
+include $(JAMCONFIG) ;
+if ! $(JAMCONFIG_READ)
+{
+  EXIT "Couldn't find config. Please run 'configure' first!" ;
+}
+
+# csutil uses zlib :-/
+APPLICATION.LFLAGS += $(ZLIB.LFLAGS) ;
+APPLICATION.CFLAGS += $(ZLIB.CFLAGS) ;
+
+# Put output files into out/systemname
+LOCATE.OBJECTS = $(BUILDTOP)/out/$(OSFULL[1]:L) ;
+LOCATE.TARGETS = $(BUILDTOP) ;
+LOCATE.DOCS = $(BUILDTOP)/out ;
+
+# list of plugins which should be linked in when building static
+STATIC.PLUGINLIST = reporter stdrep csfont engine vfs frustvis
+		    dynavis bugplug sequence engseq csconin simpcon
+		    csparser cssynldr
+		    crossbld ieplex thing thingldr genmesh gmeshldr
+		    ball ballldr emit emitldr explo exploldr fire fireldr
+		    fountain fountldr gtreeldr haze hazeldr metaball
+		    mballldr metagen nullmesh rain rainldr snow snowldr spiral
+		    spirldr spr2d spr2dldr spr3d spr3dldr starts starldr
+		    motion motionldr
+		    rapid
+		    imgplex csgifimg csjpgimg csbmpimg cspngimg
+		    soft3d x2d softx xwin xextshm xext86vm
+		    gl3d glx2d effects
+;
+
+# Include CS build rules
+include $(TOP)/mk/jam/build.jam ;
+
+# common include directory
+IncludeDir $(BUILDTOP) $(TOP)/include $(TOP)/plugins $(TOP)/apps $(TOP)/libs ;
+

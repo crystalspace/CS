@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh terrfunc ;
+
+SubInclude TOP plugins mesh terrfunc object ;
+SubInclude TOP plugins mesh terrfunc persist ;

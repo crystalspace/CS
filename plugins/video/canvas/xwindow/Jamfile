@@ -1,0 +1,23 @@
+SubDir TOP plugins video canvas xwindow ;
+
+if $(X11.AVAILABLE) = "yes" 
+{
+Plugin xwin :
+	[ Wildcard *.cpp *.h ]
+;
+LinkWith xwin : canvascommon csgeom cssys csutil ;
+if $(XFREE86VM.AVAILABLE) = "yes"
+{
+  CFlags xwin : -DXFREE86VM ;
+  ExternalLibs xwin : XFREE86VM ;
+}
+else
+{
+  ExternalLibs xwin :  X11 ;
+}
+
+Help xwin : "Crystal Space X Window Plugin" ;
+CompileGroups xwin :  drivers2d ;
+
+}
+

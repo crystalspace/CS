@@ -1,0 +1,26 @@
+SubDir TOP plugins filesys vfs ;
+
+if $(ZLIB.AVAILABLE) = "yes"
+{
+
+Plugin vfs :
+	[ Wildcard *.cpp *.h ]
+;
+LinkWith vfs : cssys csutil ;
+ExternalLibs vfs : ZLIB ;
+
+actions VfsCfgGen
+{
+  cat $(SUBDIR)/vfs.cfg.template > $(<)
+  echo "VFS.Unix.CS_DATADIR = $(DATADIR) " >> $(<)
+  echo "VFS.Unix.CS_CONFIGDIR = $(SYSCONFDIR) " >> $(<)
+  echo "VFS.Unix.CS_MAPDIR = $(MAPDIR) " >> $(<)
+}
+
+# Build our own vfs.cfg
+LOCATE on <config>vfs.cfg = $(LOCATE_TARGET) ;
+VfsCfgGen <config>vfs.cfg ;
+InstallConfig vfs.cfg ;
+
+}
+

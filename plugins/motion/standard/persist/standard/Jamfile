@@ -1,0 +1,9 @@
+SubDir TOP plugins motion standard persist standard ;
+
+Plugin motldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith motldr : csgeom cssys csutil ;
+
+Help motldr : "Crystal Space skeletal motion loader" ;
+

@@ -1,0 +1,9 @@
+SubDir TOP plugins engseq ;
+
+Plugin engseq
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith engseq : csgeom cssys csutil ;
+
+Help engseq : "Crystal Space Engine Sequence Manager Plug-In" ;
+

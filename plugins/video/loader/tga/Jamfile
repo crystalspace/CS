@@ -1,0 +1,10 @@
+SubDir TOP plugins video loader tga ;
+
+Plugin cstgaimg
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith cstgaimg : csgfx cssys csutil ;
+
+Help cstgaimg : "Crystal Space tga image loader" ;
+CompileGroups cstgaimg :  imageloaders ;
+

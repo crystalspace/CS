@@ -1,0 +1,4 @@
+SubDir TOP plugins mesh spiral ;
+
+SubInclude TOP plugins mesh spiral object ;
+SubInclude TOP plugins mesh spiral persist ;

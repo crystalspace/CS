@@ -1,0 +1,15 @@
+SubDir TOP plugins net driver socket ;
+
+if $(SOCKET.AVAILABLE) = "yes" 
+{
+Plugin cssocket
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith cssocket : cssys csutil ;
+ExternalLibs cssocket :  SOCKET ;
+
+Help cssocket : "Crystal Space socket network driver" ;
+CompileGroups cssocket :  netdrivers ;
+
+}
+

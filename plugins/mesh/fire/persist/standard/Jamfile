@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh fire persist standard ;
+
+Plugin fireldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith fireldr : csgeom cssys csutil ;
+
+Help fireldr : "Fire mesh object loader" ;
+CompileGroups fireldr :  meshes ;
+

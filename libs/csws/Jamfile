@@ -1,0 +1,13 @@
+SubDir TOP libs csws ;
+
+SearchSubdir skins/default ;
+
+Library csws :
+	[ Wildcard *.cpp *.h ]
+	[ Wildcard skins/default : *.cpp *.h ]
+;
+Help csws : "Crystal Space Windowing System library" ;
+
+InstallConfig csws.cfg ;
+InstallData csws.zip ;
+

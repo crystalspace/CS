@@ -1,0 +1,9 @@
+SubDir TOP apps tools viewmesh ;
+
+Application viewmesh
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith viewmesh : csgeom csgfx cssys cstool csutil csws ;
+
+Help viewmesh : "Crystal Space mesh viewing utility" ;
+

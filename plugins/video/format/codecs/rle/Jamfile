@@ -1,0 +1,9 @@
+SubDir TOP plugins video format codecs rle ;
+
+Plugin rlecodec
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith rlecodec : cssys csutil ;
+
+Help rlecodec : "Crystal Space RLE codec" ;
+

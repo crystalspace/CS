@@ -1,0 +1,9 @@
+SubDir TOP apps tutorial phystut ;
+
+Application phystut
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith phystut : csgeom csgfx cssys cstool csutil ;
+
+Help phystut : "Crystal Space physics tutorial" ;
+

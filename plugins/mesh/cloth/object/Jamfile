@@ -1,0 +1,9 @@
+SubDir TOP plugins mesh cloth object ;
+
+Plugin cloth
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith cloth : csgeom cssys csutil ;
+
+Help cloth : "Cloth mesh object plug-in" ;
+

@@ -1,0 +1,10 @@
+SubDir TOP plugins video renderer line ;
+
+Plugin line3d
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith line3d : renderercommon csgeom csgfx cssys csutil ;
+
+Help line3d : "Crystal Space line 3D renderer" ;
+CompileGroups line3d :  drivers3d ;
+

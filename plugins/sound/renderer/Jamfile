@@ -1,0 +1,8 @@
+SubDir TOP plugins sound renderer ;
+
+SubInclude TOP plugins sound renderer common ;
+SubInclude TOP plugins sound renderer arts ;
+SubInclude TOP plugins sound renderer ds3d ;
+SubInclude TOP plugins sound renderer eax ;
+SubInclude TOP plugins sound renderer openal ;
+SubInclude TOP plugins sound renderer software ;

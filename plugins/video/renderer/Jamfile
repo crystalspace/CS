@@ -1,0 +1,8 @@
+SubDir TOP plugins video renderer ;
+
+SubInclude TOP plugins video renderer common ;
+SubInclude TOP plugins video renderer inf ;
+SubInclude TOP plugins video renderer line ;
+SubInclude TOP plugins video renderer null ;
+SubInclude TOP plugins video renderer opengl ;
+SubInclude TOP plugins video renderer software ;
