@@ -11,7 +11,23 @@ The history order is reversed so that new features are at the top.
 	  create the event outlet later when I'm sure the event queue
 	  will be created and registered in the object registry.
 	- Moved the creation of the event queue from the system driver
-	  to csInitializer::InitializeSCF().
+	  to csInitializer::CreateEventQueue().
+	- Moved the initialization of SCF from the system driver to
+	  csInitializer::InitializeSCF().
+	- Moved the initialization of the config file from csSystemDriver
+	  to the new csInitializer::SetupConfigManager(). This function
+	  must now be called to initialize the config manager (after
+	  calling either CreateEnvironment() or else CreateConfigManager()).
+	  Removed the parameter 'configName' from
+	  csInitializer::RequestPlugins(). RequestPlugins() is no longer
+	  responsible for loading the config file. It will simply use
+	  the already loaded config files. If you don't need a config
+	  file then you don't have to call this new routine. RequestPlugins()
+	  or Initialize() will call it automatically in that case.
+	- Removed the VFS variable from the system driver.
+	- Removed csSystemDriver::SetSystemDefaults().
+	  This change breaks the Windows -noconsole/console option. I will
+	  have to fix this later using another technique.
 	- Jorge Acereda Maciá <al004046@anubis.uji.es> fixed two bugs in
 	  csSector::HitBeam() when no mesh was hit. In that case a null
 	  pointer would result in a crash.

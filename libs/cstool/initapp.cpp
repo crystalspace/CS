@@ -41,6 +41,8 @@
 #include "csutil/cmdline.h"
 #include "csutil/cfgfile.h"
 #include "csutil/cfgmgr.h"
+#include "csutil/cfgacc.h"
+#include "csutil/prfxcfg.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
 #include "iutil/virtclk.h"
@@ -49,7 +51,7 @@
 #include "iutil/cfgmgr.h"
 
 static SysSystemDriver* global_sys = NULL;
-static char* global_config_name = NULL;
+static bool config_done = false;
 static int global_argc = 0;
 static const char* const * global_argv = 0;
 static iEventHandler* installed_event_handler = NULL;
@@ -139,13 +141,75 @@ iObjectRegistry* csInitializer::CreateObjectRegistry ()
   return global_sys->GetObjectRegistry ();
 }
 
-bool csInitializer::RequestPlugins (iObjectRegistry* /*object_reg*/,
-	const char* config_name,
+bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
+	const char* configName)
+{
+  if (config_done) return true;
+
+  // @@@ This is ugly.  We need a better, more generalized way of doing this.
+  // Hard-coding the name of the VFS plugin (crytalspace.kernel.vfs) is bad.
+  // Then later ensuring that we skip over this same plugin when requested
+  // by the client is even uglier.  The reason that the VFS plugin is required
+  // this early is that both the application configuration file and the
+  // configuration file for other plugins may (and almost always do) reside on
+  // a VFS volume.
+
+  // we first create an empty application config file, so we can create the
+  // config manager at all. Then we load the VFS. After that, all config files
+  // can be loaded. At the end, we make the user-and-application-specific
+  // config file the dynamic one.
+
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iVFS* VFS = CS_QUERY_PLUGIN (plugin_mgr, iVFS);
+  if (!VFS)
+  {
+    VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs",
+  	  CS_FUNCID_VFS, iVFS);
+  }
+
+  iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  iConfigFile* cfg = Config->GetDynamicDomain ();
+  Config->SetDomainPriority (cfg, iConfigManager::ConfigPriorityApplication);
+
+  // Initialize application configuration file
+  if (configName)
+    if (!cfg->Load (configName, VFS))
+    {
+      VFS->DecRef ();
+      return false;
+    }
+  VFS->DecRef ();
+
+  // look if the user-specific config domain should be used
+  {
+    csConfigAccess cfgacc (object_reg, "/config/system.cfg");
+    if (cfgacc->GetBool ("System.UserConfig", true))
+    {
+      // open the user-specific, application-neutral config domain
+      cfg = new csPrefixConfig ("/config/user.cfg", VFS, "Global",
+      	"User.Global");
+      Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserGlobal);
+      cfg->DecRef ();
+
+      // open the user-and-application-specific config domain
+      cfg = new csPrefixConfig ("/config/user.cfg", VFS,
+      	cfgacc->GetStr ("System.ApplicationID", "Noname"),
+        "User.Application");
+      Config->AddDomain (cfg, iConfigManager::ConfigPriorityUserApp);
+      Config->SetDynamicDomain (cfg);
+      cfg->DecRef ();
+    }
+  }
+  
+  config_done = true;
+  return true;
+}
+
+bool csInitializer::RequestPlugins (iObjectRegistry* object_reg,
 	int argc, const char* const argv[],
 	...)
 {
-  if (config_name) global_config_name = csStrNew (config_name);
-  else global_config_name = NULL;
+  if (!config_done) SetupConfigManager (object_reg, NULL);
   global_argc = argc;
   global_argv = argv;
 
@@ -167,8 +231,9 @@ bool csInitializer::RequestPlugins (iObjectRegistry* /*object_reg*/,
 
 bool csInitializer::Initialize (iObjectRegistry* object_reg)
 {
-  bool rc = global_sys->Initialize (global_argc, global_argv,
-    global_config_name);
+  if (!config_done) SetupConfigManager (object_reg, NULL);
+
+  bool rc = global_sys->Initialize (global_argc, global_argv);
   if (!rc) return false;
 
   // Setup the object registry.

@@ -1011,8 +1011,15 @@ int main (int argc, char* argv[])
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
   if (!object_reg) return -1;
 
-  if (!csInitializer::RequestPlugins (object_reg,
-  		"/config/cswstest.cfg", argc, argv,
+  if (!csInitializer::SetupConfigManager (object_reg, "/config/cswstest.cfg"))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.cswstest",
+	"Can't initialize!");
+    return -1;
+  }
+
+  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
 	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

@@ -102,7 +102,7 @@ public:
   ~SysSystemDriver();
 
   // Implementation of iSystem.
-  virtual bool Initialize(int argc, char const* const argv[], char const* cfg);
+  virtual bool Initialize(int argc, char const* const argv[]);
   virtual void NextFrame();
 
   // Implementation of iEventPlug.

@@ -150,8 +150,17 @@ public:
   static iConfigManager* CreateConfigManager (iObjectRegistry* object_reg);
 
   /**
+   * Setup the config manager. If you have no config file then you can still
+   * call this routine using a NULL parameter. If you don't call this then
+   * either RequestPlugins() or Initialize() will call this routine with
+   * NULL parameter.
+   */
+  static bool SetupConfigManager (iObjectRegistry* object_reg,
+    const char* configName);
+
+  /**
    * Request a few widely used standard plugins and also read
-   * the config file/command line for potential other plugins.
+   * the standard config file and command line for potential other plugins.
    * This routine must be called before Initialize().
    * <p>
    * The variable arguments should contain three entries for every
@@ -160,7 +169,6 @@ public:
    * above. <b>WARNING</b> Make sure to end the list with CS_REQUEST_END!
    */
   static bool RequestPlugins (iObjectRegistry* object_reg,
-	const char* config_name,
 	int argc, const char* const argv[],
 	...);
 

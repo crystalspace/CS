@@ -312,7 +312,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSystemDriver::csSystemDriver () :
-  VFS(0), EventQueue(0), Plugins (8, 8), OptionList (16, 16)
+  EventQueue(0), Plugins (8, 8), OptionList (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginManager);
@@ -344,12 +344,6 @@ csSystemDriver::~csSystemDriver ()
 
   // Deregister all known drivers and plugins
 
-  // @@ either comment the following out or the appropriate CHECK () in UnloadPlugins
-  // i'm not sure whats nicer. I'd prefer to decref it here but then a special
-  // treating of VFS is still needed in UnloadPlugin. Since the system class wont 
-  // live forever, we can simply wait for the biological solution.
-  //  if (VFS) VFS->DecRef ();
-
   // Free all plugins.
   int i;
   for (i = Plugins.Length()-1; i >= 0; i--)
@@ -369,57 +363,13 @@ csSystemDriver::~csSystemDriver ()
   iSCF::SCF->Finish();
 }
 
-bool csSystemDriver::Initialize (int argc, const char* const argv[],
-  const char *iConfigName)
+bool csSystemDriver::Initialize (int argc, const char* const argv[])
 {
   EventQueue = CS_QUERY_REGISTRY (&object_reg, iEventQueue);
   EventQueue->IncRef();
 
-  // @@@ This is ugly.  We need a better, more generalized way of doing this.
-  // Hard-coding the name of the VFS plugin (crytalspace.kernel.vfs) is bad.
-  // Then later ensuring that we skip over this same plugin when requested
-  // by the client is even uglier.  The reason that the VFS plugin is required
-  // this early is that both the application configuration file and the
-  // configuration file for other plugins may (and almost always do) reside on
-  // a VFS volume.
-
-  // we first create an empty application config file, so we can create the
-  // config manager at all. Then we load the VFS. After that, all config files
-  // can be loaded. At the end, we make the user-and-application-specific
-  // config file the dynamic one.
-
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Initializing system driver!\n");
 
-  iConfigManager* Config = CS_QUERY_REGISTRY (&object_reg, iConfigManager);
-  iConfigFile* cfg = Config->GetDynamicDomain ();
-  Config->SetDomainPriority(cfg, iConfigManager::ConfigPriorityApplication);
-  VFS = CS_LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
-
-  // Initialize application configuration file
-  if (iConfigName)
-    if (!cfg->Load (iConfigName, VFS))
-      ReportSys (CS_REPORTER_SEVERITY_WARNING,
-	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
-
-  // look if the user-specific config domain should be used
-  {
-    csConfigAccess cfgacc (&object_reg, "/config/system.cfg");
-    if (cfgacc->GetBool("System.UserConfig", true))
-    {
-      // open the user-specific, application-neutral config domain
-      cfg = OpenUserConfig("Global", "User.Global");
-      Config->AddDomain(cfg, iConfigManager::ConfigPriorityUserGlobal);
-      cfg->DecRef();
-
-      // open the user-and-application-specific config domain
-      cfg = OpenUserConfig(cfgacc->GetStr("System.ApplicationID", "Noname"),
-        "User.Application");
-      Config->AddDomain(cfg, iConfigManager::ConfigPriorityUserApp);
-      Config->SetDynamicDomain(cfg);
-      cfg->DecRef();
-    }
-  }
-  
   // Register some generic pseudo-plugins.  (Some day these should probably
   // become real plugins.)
   iKeyboardDriver* k = new csKeyboardDriver (&object_reg);
@@ -436,9 +386,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
   	iCommandLineParser);
   CommandLine->Initialize (argc, argv);
-
-  // Analyse config and command line
-  SetSystemDefaults (Config);
 
   // The list of plugins
   csPluginList PluginList;
@@ -482,6 +429,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   }
 
   // Now load and initialize all plugins
+  iConfigManager* Config = CS_QUERY_REGISTRY (&object_reg, iConfigManager);
   iConfigIterator *plugin_list = Config->Enumerate ("System.Plugins.");
   if (plugin_list)
   {
@@ -498,6 +446,10 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     plugin_list->DecRef ();
   }
 
+  // Check if vfs is already there (@@@ ugly hack).
+  iVFS* VFS = CS_QUERY_PLUGIN (this, iVFS);
+  if (VFS) VFS->DecRef ();
+
   // Sort all plugins by their dependency lists
   if (!PluginList.Sort (this))
     return false;
@@ -512,10 +464,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     iBase *plg = LoadPlugin (r.ClassID, r.FuncID, NULL, 0);
     if (plg) plg->DecRef ();
   }
-
-  /// Now find the drivers that are known by the system driver
-  if (!VFS)
-    VFS = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
 
   // flush all removed config files
   Config->FlushRemoved();
@@ -583,18 +531,6 @@ bool csSystemDriver::HandleEvent (iEvent& e)
     return true;
   }
   return false;
-}
-
-void csSystemDriver::SetSystemDefaults (iConfigManager*)
-{   
-}
-
-iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID,
-  const char *Alias)
-{
-  // the default implementation does not make a difference between different
-  // users. It always uses /config/user.cfg, with the application ID as prefix.
-  return new csPrefixConfig("/config/user.cfg", VFS, ApplicationID, Alias);
 }
 
 void csSystemDriver::QueryOptions (iComponent *iObject)
@@ -795,13 +731,6 @@ bool csSystemDriver::UnloadPlugin (iComponent *iObject)
   }
 
   csPlugin *p = Plugins.Get (idx);
-
-#define CHECK(Var,Func)						\
-  if (p->FuncID && !strcmp (p->FuncID, Func)) { Var->DecRef (); Var = NULL; }
-
-  CHECK (VFS, CS_FUNCID_VFS)
-
-#undef CHECK
 
   object_reg.Unregister ((iBase *)iObject, NULL);
   return Plugins.Delete (idx);

@@ -51,12 +51,11 @@ NeXTSystemDriver::~NeXTSystemDriver()
 //-----------------------------------------------------------------------------
 // Initialize
 //-----------------------------------------------------------------------------
-bool NeXTSystemDriver::Initialize(int argc, char const* const argv[],
-  char const* cfgfile)
+bool NeXTSystemDriver::Initialize(int argc, char const* const argv[])
 {
   assistant = new NeXTAssistant(this);
   object_reg.Register(assistant, "NeXTAssistant");
-  return superclass::Initialize(argc, argv, cfgfile);
+  return superclass::Initialize(argc, argv);
 }
 
 

@@ -53,7 +53,7 @@ public:
   Simple ();
   virtual ~Simple ();
 
-  bool Initialize (int argc, const char* const argv[], const char* config);
+  bool Initialize (int argc, const char* const argv[]);
   bool HandleEvent (iEvent&);
   void SetupFrame ();
   void FinishFrame ();

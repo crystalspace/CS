@@ -103,13 +103,12 @@ static bool SimpleEventHandler (iEvent& ev)
   }
 }
 
-bool Simple::Initialize (int argc, const char* const argv[],
-  const char *iConfigName)
+bool Simple::Initialize (int argc, const char* const argv[])
 {
   object_reg = csInitializer::CreateEnvironment ();
   if (!object_reg) return false;
 
-  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
 	CS_REQUEST_ENGINE,
@@ -428,7 +427,7 @@ int main (int argc, char* argv[])
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!simple->Initialize (argc, argv, NULL))
+  if (!simple->Initialize (argc, argv))
   {
     csReport (simple->object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple2",

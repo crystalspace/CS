@@ -166,7 +166,13 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   object_reg = csInitializer::CreateEnvironment ();
   if (!object_reg) return false;
 
-  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!\n");
+    return false;
+  }
+
+  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
 	CS_REQUEST_END))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!\n");

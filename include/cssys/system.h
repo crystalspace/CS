@@ -142,8 +142,6 @@ private:
   csTicks ElapsedTime, CurrentTime;
   
 private:
-  // The Virtual File System object
-  iVFS *VFS;
   // Shared event queue.
   iEventQueue* EventQueue;
 
@@ -173,8 +171,7 @@ public:
   virtual ~csSystemDriver ();
 
   /// This is usually called right after object creation.
-  virtual bool Initialize (int argc, const char* const argv[],
-    const char *iConfigName);
+  virtual bool Initialize (int argc, const char* const argv[]);
 
   /**
    * Send cscmdSystemOpen message to all loaded plugins.
@@ -245,20 +242,6 @@ protected:
   /// Query the elapsed time between last frames and absolute time.
   void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime) const
   { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
-
-  /**
-   * Query default width/height/depth from config file
-   * and from command-line parameters.
-   */
-  virtual void SetSystemDefaults (iConfigManager *config);
-
-  /**
-   * Open the user-specific configuration domain. The default is the file
-   * CS/data/config/user.cfg. This function is called at least twice, with
-   * different ID strings. This *must* be supported!
-   */
-  virtual iConfigFile *OpenUserConfig (const char *ApplicationID,
-  	const char *Alias);
 
 public:
   SCF_DECLARE_IBASE;

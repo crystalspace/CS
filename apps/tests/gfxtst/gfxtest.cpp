@@ -435,7 +435,15 @@ int main (int argc, char *argv[])
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
   if (!object_reg) return -1;
 
-  if (!csInitializer::RequestPlugins (object_reg, NULL, argc, argv,
+  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.gfxtest",
+	"Error initializing system !");
+    return -1;
+  }
+
+  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
 	CS_REQUEST_IMAGELOADER,

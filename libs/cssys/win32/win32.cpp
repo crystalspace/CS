@@ -734,9 +734,10 @@ void csSleep (int SleepTime)
   ::Sleep (SleepTime);
 }
 
+//@@@ THIS PART OF CONFIG HELP IS CURRENTLY BROKEN!!!
 void SysSystemDriver::SetSystemDefaults (iConfigManager *Config)
 {
-  csSystemDriver::SetSystemDefaults (Config);
+  //csSystemDriver::SetSystemDefaults (Config);
 
 #ifdef CS_DEBUG
   need_console = true;

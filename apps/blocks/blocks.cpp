@@ -3177,8 +3177,13 @@ int main (int argc, char* argv[])
   if (!object_reg) return -1;
   Sys->object_reg = object_reg;
 
-  if (!csInitializer::RequestPlugins (object_reg, "/config/blocks.cfg",
-  	argc, argv, CS_REQUEST_END))
+  if (!csInitializer::SetupConfigManager (object_reg, "/config/blocks.cfg"))
+  {
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
+    return -1;
+  }
+
+  if (!csInitializer::RequestPlugins (object_reg, argc, argv, CS_REQUEST_END))
   {
     Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     return -1;

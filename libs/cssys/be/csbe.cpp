@@ -122,8 +122,7 @@ SysSystemDriver::~SysSystemDriver()
 //	so that it can intercept common BeOS messages and forward appropriate
 //	ones to the Crystal Space event-loop which runs in the main thread.
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::Initialize (int argc, char const* const argv[],
-    char const *iConfigName)
+bool SysSystemDriver::Initialize (int argc, char const* const argv[])
 {
   char path[MAXPATHLEN];		// *1*
   char name[MAXPATHLEN];
@@ -140,7 +139,7 @@ bool SysSystemDriver::Initialize (int argc, char const* const argv[],
   be_app->AddHandler(this);		// *3*
   be_app->SetPreferredHandler(this);
 
-  return superclass::Initialize(argc, argv, iConfigName);
+  return superclass::Initialize(argc, argv);
 }
 
 

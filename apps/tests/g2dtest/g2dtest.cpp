@@ -133,7 +133,16 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
   pfmt_init = false;
 
   object_reg = csInitializer::CreateEnvironment ();
-  if (!csInitializer::RequestPlugins (object_reg, NULL, argc, argv,
+
+  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.g2dtest",
+        "Unable to init app!");
+    return false;
+  }
+
+  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
   	CS_REQUEST_VFS,
   	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_END))

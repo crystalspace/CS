@@ -73,10 +73,10 @@ public:
   virtual bool Open ();
   virtual void Close ();
 
-  ///
+  /// @@@ CURRENTLY BROKEN!!!
   virtual void SetSystemDefaults (iConfigManager *Config);
 
-  ///
+  /// @@@ CURRENTLY BROKEN!!!
   virtual void Help ();
 
   /// Function for Win32Helper to set the cursor.

@@ -151,7 +151,13 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   object_reg = csInitializer::CreateEnvironment ();
   if (!object_reg) return false;
 
-  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't initialize app!");
+    return false;
+  }
+
+  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
   	CS_REQUEST_VFS,
 	CS_REQUEST_SOFTWARE3D,
 	CS_REQUEST_PLUGIN("crystalspace.engine.iso:Engine.Iso", iIsoEngine),
