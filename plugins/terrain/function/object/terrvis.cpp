@@ -123,45 +123,75 @@ int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z,
 void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
     int horsize, int& left, int& right)
 {
-  // only need to test four of the vertices, since the height is not important
-  // for this.
-  int sidx = 0;
-  for (;;)
-  {
-    int idx[4];
-    idx[sidx] = GetHorIndex(campos, bbox.MinX(), bbox.MinZ(), horsize);
-    idx[(sidx+1)&3] = GetHorIndex(campos, bbox.MaxX(), bbox.MinZ(), horsize);
-    idx[(sidx+2)&3] = GetHorIndex(campos, bbox.MaxX(), bbox.MaxZ(), horsize);
-    idx[(sidx+3)&3] = GetHorIndex(campos, bbox.MinX(), bbox.MaxZ(), horsize);
-    // note: from  0-1, 1-2, 2-3, 3-0 are the edge lines
+  // First we check in which quadrant our camera is relative to the box
+  // (as seen in 2D: only x and z components). Using that information we
+  // know what vertex of the box is at the left side and what vertex is
+  // at the right side of our extent. Then we can compute the angles of
+  // those two vertices.
 
-    left = right = idx[0];
-    for(int i=1; i<4; i++)
-    {
-      // already included?
-      if( (right-idx[i]+horsize)%horsize <= (right-left+horsize)%horsize )
-        continue;
-      // extend the directions, by adding this angle to existing range.
-      int ldiff = (left - idx[i] + horsize) % horsize;
-      int rdiff = (idx[i] - right + horsize) % horsize;
-      if(ldiff < rdiff)
-        // angle is closer to left than right angle
-        left = idx[i];
-      else
-        right = idx[i];
-    }
-    // The resulting span should be less than half the horizon.
-    // If not then we retry again but with another starting position.
-    if (! ((right - left + horsize)%horsize <= (horsize/2+1)))
-    {
-      sidx++;
-//printf ("idx[0]=%d idx[1]=%d idx[2]=%d idx[3]=%d\n", idx[0], idx[1], idx[2], idx[3]);
+  // In the code below we compute the left index which is compatible
+  // with BOX_CORNER_xyz (for csBox3::GetCorner()).
+  int left_idx;
+  if (campos.x < bbox.MinX ())
+  {
+    if (campos.z > bbox.MaxZ ())
+      left_idx = BOX_CORNER_XyZ;
+    else
+      left_idx = BOX_CORNER_xyZ;
+  }
+  else if (campos.x > bbox.MaxX ())
+  {
+    if (campos.z < bbox.MinZ ())
+      left_idx = BOX_CORNER_xyz;
+    else
+      left_idx = BOX_CORNER_Xyz;
+  }
+  else
+  {
+    if (campos.z < bbox.MinZ ())
+      left_idx = BOX_CORNER_xyz;
+    else
+      left_idx = BOX_CORNER_XyZ;
+  }
+
+  // In the code below we compute the right index which is compatible
+  // with BOX_CORNER_xyz (for csBox3::GetCorner()).
+  int right_idx;
+  if (campos.z < bbox.MinZ ())
+  {
+    if (campos.x < bbox.MaxX ())
+      right_idx = BOX_CORNER_Xyz;
+    else
+      right_idx = BOX_CORNER_XyZ;
+  }
+  else if (campos.z > bbox.MaxZ ())
+  {
+    if (campos.x < bbox.MinX ())
+      right_idx = BOX_CORNER_xyz;
+    else
+      right_idx = BOX_CORNER_xyZ;
+  }
+  else
+  {
+    if (campos.x < bbox.MinX ())
+      right_idx = BOX_CORNER_xyz;
+    else
+      right_idx = BOX_CORNER_XyZ;
+  }
+
+  // left_idx and right_idx are now the left-most and right-most
+  // indices in the bounding box. We compute angles for them.
+  csVector3 left_corner = bbox.GetCorner (left_idx);
+  csVector3 right_corner = bbox.GetCorner (right_idx);
+
+  // Seems that right and left are swapped for the horizon buffer.
+  right = GetHorIndex (campos, left_corner.x, left_corner.z, horsize);
+  left = GetHorIndex (campos, right_corner.x, right_corner.z, horsize);
+
+//printf ("left_idx=%d right_idx=%d\n", left_idx, right_idx);
 //printf ("left=%d right=%d horsize=%d\n", left, right, horsize);
 //printf ("campos=(%g,%g,%g) bbox=(%g,%g,%g)-(%g,%g,%g)\n", campos.x, campos.y, campos.z, bbox.MinX (), bbox.MinY (), bbox.MinZ (), bbox.MaxX (), bbox.MaxY (), bbox.MaxZ ());
 //fflush (stdout);
-    }
-    else break;
-  }
 
   CS_ASSERT( (right - left + horsize)%horsize <= (horsize/2+1));
 }
