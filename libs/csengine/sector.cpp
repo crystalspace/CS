@@ -371,7 +371,7 @@ int compare_z_thing (const void* p1, const void* p2)
 }
 
 static int count_cull_node_notvis_behind;
-static int count_cull_node_vis_cutzplane;
+// static int count_cull_node_vis_cutzplane;
 static int count_cull_node_notvis_cbuffer;
 static int count_cull_node_vis;
 
