@@ -68,7 +68,7 @@ csRef<iMeshWrapper> csVosObject3D::GetMeshWrapper()
 
 void csVosObject3D::SetMeshWrapper(iMeshWrapper* mw)
 {
-  LOG("vosobject3d", 2, "setting mesh wrapper!!!");
+  LOG("vosobject3d", 3, "setting mesh wrapper on " << object3d->getURLstr());
   if(meshwrapper.IsValid()) {
     csRef<iEngine> engine = CS_QUERY_REGISTRY (object3d->getVosA3DL()->GetObjectRegistry(),
                                                iEngine);
@@ -473,7 +473,7 @@ void csMetaObject3D::changeOrientation (const csMatrix3 &ori)
 
 void csMetaObject3D::changeMaterial (iMaterialWrapper* mat)
 {
-  LOG("vosobject3d", 2, "change material!");
+  LOG("vosobject3d", 3, "changing material on " << getURLstr());
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
   if (mw.IsValid())
   {
