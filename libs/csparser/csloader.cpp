@@ -101,7 +101,6 @@ int csLoaderStat::sounds_loaded   = 0;
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (A)
   CS_TOKEN_DEF (ACCEL)
   CS_TOKEN_DEF (ACTION)
   CS_TOKEN_DEF (ACTIVATE)
@@ -175,6 +174,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (LIGHTMAP)
   CS_TOKEN_DEF (LIGHTX)
   CS_TOKEN_DEF (LIMB)
+  CS_TOKEN_DEF (LINK)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATERIALS)
   CS_TOKEN_DEF (MATRIX)
@@ -251,8 +251,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TEXTURE_SCALE)
   CS_TOKEN_DEF (MAT_SET)
   CS_TOKEN_DEF (MAT_SET_SELECT)
-  CS_TOKEN_DEF (MOTIONM)
-  CS_TOKEN_DEF (MOTIONQ)
+  CS_TOKEN_DEF (MOTION)
   CS_TOKEN_DEF (Q)
   CS_TOKEN_DEF (THING)
   CS_TOKEN_DEF (TOTALTIME)
@@ -378,6 +377,12 @@ bool csLoader::load_matrix (char* buf, csMatrix3 &m)
 bool csLoader::load_vector (char* buf, csVector3 &v)
 {
   ScanStr (buf, "%f,%f,%f", &v.x, &v.y, &v.z);
+  return true;
+}
+
+bool csLoader::load_quaternion (char* buf, csQuaternion &q)
+{
+  ScanStr (buf, "%f,%f,%f,%f", &q.x, &q.y, &q.z, &q.r);
   return true;
 }
 
@@ -3966,7 +3971,6 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
 }
 
 //---------------------------------------------------------------------------
-//iMotionManager* csWorld::GetMotions () { return motions; }
 
 bool csLoader::LoadWorld (char* buf)
 {
@@ -3991,8 +3995,7 @@ bool csLoader::LoadWorld (char* buf)
     CS_TOKEN_TABLE (START)
     CS_TOKEN_TABLE (SOUNDS)
     CS_TOKEN_TABLE (KEY)
-    CS_TOKEN_TABLE (MOTIONM)
-  	CS_TOKEN_TABLE (MOTIONQ)
+    CS_TOKEN_TABLE (MOTION)
   CS_TOKEN_TABLE_END
 
   csResetParserLine();
@@ -4019,8 +4022,7 @@ bool csLoader::LoadWorld (char* buf)
       }
       switch (cmd)
       {
-        case CS_TOKEN_MOTIONQ:
-        case CS_TOKEN_MOTIONM:
+        case CS_TOKEN_MOTION:
 					{
 						iMotionManager* motionmanager=System->MotionMan;
 						if (!motionmanager) {
@@ -4029,7 +4031,7 @@ bool csLoader::LoadWorld (char* buf)
 						} else {
 							iMotion* m=motionmanager->FindByName(name);
 							if(!m) {
-								m=motionmanager->AddMotion(name, (cmd==CS_TOKEN_MOTIONM));
+								m=motionmanager->AddMotion(name);
 								LoadMotion(m, params);
 							}
 						}
@@ -5109,15 +5111,14 @@ iMotion* csLoader::LoadMotion (csWorld* world, const char* fname)
   }
 
   CS_TOKEN_TABLE_START (tokens)
-    CS_TOKEN_TABLE (MOTIONQ)
-  	CS_TOKEN_TABLE (MOTIONM)
+  	CS_TOKEN_TABLE (MOTION)
   CS_TOKEN_TABLE_END
 
   char *name, *data;
   char *buf = **databuff;
 	long cmd;
 
-  if (cmd=csGetObject (&buf, tokens, &name, &data))
+  if ((cmd=csGetObject (&buf, tokens, &name, &data)) > 0)
   {
     if (!data)
     {
@@ -5131,7 +5132,7 @@ iMotion* csLoader::LoadMotion (csWorld* world, const char* fname)
 		} else {
 			iMotion* m=motionmanager->FindByName(name);
 			if(!m) {
-				m=motionmanager->AddMotion(name, (cmd==CS_TOKEN_MOTIONM));
+				m=motionmanager->AddMotion(name);
 				if (LoadMotion (m, data))
 				{
 					databuff->DecRef ();
@@ -5157,8 +5158,13 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
     CS_TOKEN_TABLE (FRAME)
   CS_TOKEN_TABLE_END
 
-	CS_TOKEN_TABLE_START (tok_frameset)
-		CS_TOKEN_TABLE (A)
+	CS_TOKEN_TABLE_START (tok_anim)
+		CS_TOKEN_TABLE (Q)
+  	CS_TOKEN_TABLE (MATRIX)
+	CS_TOKEN_TABLE_END
+
+	CS_TOKEN_TABLE_START (tok_frame)
+		CS_TOKEN_TABLE (LINK)
 	CS_TOKEN_TABLE_END
 
   char* name;
@@ -5176,42 +5182,37 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
     switch (cmd)
     {
 			case CS_TOKEN_ANIM:
-			{
-				iMotionAnim *motanim=mot->AddAnim(name);
-				LoadAnim(motanim, params);
-			}
+				{
+					cmd = csGetObject (&params, tok_anim, &name, &params2);
+					if(cmd==CS_TOKEN_Q) {
+						csQuaternion quat;
+						load_quaternion(params2, quat);
+						mot->AddAnim(quat);
+					} else if(cmd==CS_TOKEN_MATRIX) {
+						csMatrix3 mat;
+						load_matrix(params2, mat);
+						mot->AddAnim(mat);
+					} else {
+						CsPrintf (MSG_FATAL_ERROR, "Expected MATRIX or Q instead of '%s'!\n", buf);
+						fatal_exit (0, false);
+					}     
+				}
 			break;
       case CS_TOKEN_FRAME:
-			{
-				int framenum=0;
-
-				if(mot->GetFrame(framenum)) {
-					CsPrintf (MSG_FATAL_ERROR, "Frame %d for motion '%s' already defined!\n", framenum, mot->GetName());
-					fatal_exit (0, false);
-				}
-
-				iMotionFrame* frame=mot->AddFrame(framenum);
-
-				char fn[64];
-				while ((cmd = csGetObject (&params, tok_frameset, &name, &params2)) > 0)
 				{
-					if (!params2)
-					{
-						CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", params);
-						fatal_exit (0, false);
-					}
-					switch (cmd)
-					{
-						case CS_TOKEN_A:
-							ScanStr (params2, "%s", fn);
-							if(!frame->LinkAnim(fn)) {
-								CsPrintf (MSG_FATAL_ERROR, "Could not link in anim '%s' to frame %d in motion '%s'!\n", fn, framenum, mot->GetName());
-								fatal_exit (0, false);
-							}
-							break;
+					int framenumber;
+					ScanStr(name, "%d", &framenumber);
+					mot->AddFrame(framenumber);
+					while((cmd = csGetObject (&params, tok_frame, &name, &params2))>0) {
+						if(cmd!=CS_TOKEN_LINK) {
+							CsPrintf (MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
+							fatal_exit (0, false);
+						}
+						int link;
+						ScanStr(params2, "%d", &link);
+						mot->AddFrameLink(framenumber, name, link);
 					}
 				}
-			}
 			break;
 		}
   }
@@ -5223,54 +5224,4 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
   }
   return true;
 }
-
-bool csLoader::LoadAnim (iMotionAnim* mot, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-	  CS_TOKEN_TABLE (AFFECTOR)
-    CS_TOKEN_TABLE (Q)
-  	CS_TOKEN_TABLE (MATRIX)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char* params2;
-  char str[255];
-
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
-    }
-    switch (cmd)
-    {
-			case CS_TOKEN_AFFECTOR:
-			  mot->AddAffector(params);
-				break;
-			case CS_TOKEN_Q:
-			{
-				csQuaternion q;
-				mot->Set(q);
-			}
-			break;
-			case CS_TOKEN_MATRIX:
-			{
-				csMatrix3 m;
-			  mot->Set(m);
-			}
-			break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite template!\n",
-        csGetLastOffender ());
-    fatal_exit (0, false);
-  }
-  return true;
-}
-
 //---------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 
 #include "csengine/polyset.h"
 #include "csparser/loadinfo.h"
+#include "csgeom/quaterni.h"
 
 struct iImage;
 struct csRGBcolor;
@@ -69,6 +70,8 @@ class csLoader
   static bool load_matrix (char* buf, csMatrix3 &m);
   /// Parse a vector definition
   static bool load_vector (char* buf, csVector3 &v);
+	/// Parse a quaternion definition
+	static bool load_quaternion (char* buf, csQuaternion &q);
   /// Parse a color definition
   static bool load_color (char *buf, csRGBcolor &c);
   /// Parse a polygon plane definition and return a new object

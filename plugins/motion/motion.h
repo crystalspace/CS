@@ -21,65 +21,57 @@
 
 #include "imotion.h"
 #include "csutil/csvector.h"
+#include "csgeom/quaterni.h"
+#include "csgeom/matrix3.h"
 
-///
-class csMotionAnim:public iMotion {
-public:
-  DECLARE_IBASE;
+struct csMotionFrame {
+	int keyframe;
 
-	csMotionAnim(iBase *iParent);
-	virtual ~csMotionAnim();
+	int size;
+	int *links;
+	unsigned int *affectors;
 };
-
-class csMotionAnimVectorBase:public csVector {
-public:
-	virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
-		{ int id1 = ((csMotionAnim*)Item1)->GetHash(), id2 = ((csMotionAnim*)Item2)->GetHash();
-		return id1 - id2; }
-
-	virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
-		{ int id1 = ((csMotionAnim*)Item1)->GetHash(), id2 = (int)Key; return id1 - id2; }
-};
-
-DECLARE_TYPED_VECTOR_WITH_BASE(csMotionAnimVector,csMotionAnim,csMotionAnimVectorBase);
-
-///
-class csMotionFrame:public iMotion {
-public:
-  DECLARE_IBASE;
-
-	csMotionFrame(iBase *iParent);
-	virtual ~csMotionFrame();
-};
-
-class csMotionFrameVectorBase:public csVector {
-public:
-	virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
-		{ int id1 = ((csMotionAnim*)Item1)->GetNumber(), id2 = ((csMotionAnim*)Item2)->GetNumber();
-		return id1 - id2; }
-
-	virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
-		{ int id1 = ((csMotionAnim*)Item1)->GetNumber(), id2 = (int)Key; return id1 - id2; }
-};
-
-DECLARE_TYPED_VECTOR_WITH_BASE(csMotionFrameVector,csMotionFrame,csMotionFrameVectorBase);
 
 ///
 class csMotion:public iMotion {
 	char* name;
+	char matrixmode;
 
-	csMotionFrameVector frames;
+	unsigned int hash;
 
-	csMotionAnimVector anims;
+	void* transforms;
+	int numtransforms;
+
+	csMotionFrame* frames;
+	int numframes;
+
 public:
   DECLARE_IBASE;
 
-	csMotion(iBase *iParent);
+	///
+	csMotion();
+	///
 	virtual ~csMotion();
+	///
+	unsigned int GetHash() { return hash; }
+	///
+	virtual const char* GetName ();
+	///
+	virtual void SetName (const char* name); 
+	///
+	virtual bool AddAnim (const csQuaternion &quat);
+	///
+	virtual bool AddAnim (const csMatrix3 &mat);
+	///
+	virtual void AddFrame (int framenumber);
+	///
+	virtual void AddFrameLink (int framenumber, const char* affector, int link);
 };
 
 class csMotionVectorBase:public csVector {
 public:
+  csMotionVectorBase (int ilimit = 8, int ithreshold = 16) 
+    : csVector(ilimit, ithreshold) {}
 	virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
 		{ int id1 = ((csMotion*)Item1)->GetHash(), id2 = ((csMotion*)Item2)->GetHash();
 		return id1 - id2; }
@@ -102,10 +94,6 @@ public:
 	///
 	virtual ~csMotionManager();
 
-	///
-	virtual const char* GetName ();
-	///
-	virtual void SetName (const char* name);
 	///
 	virtual bool Initialize (iSystem *iSys);
   ///
