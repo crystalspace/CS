@@ -444,7 +444,7 @@ bool csConfigFile::Load(const char* fName, iVFS *vfs, bool Merge, bool NewWins)
   }
 
   // parse the data
-  LoadFromBuffer(Filedata->GetInt8(), NewWins);
+  LoadFromBuffer((char*)Filedata->GetInt8(), NewWins);
   Filedata->DecRef();
 
   if (!Merge)
