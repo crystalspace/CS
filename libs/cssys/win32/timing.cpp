@@ -33,7 +33,7 @@ long csSystemDriver::Time ()
   //accuracy instead of very rough ticks. This routine will also provide
   //correct wrap around at the end of "long"
 
-  static __int64 Freq      = 0; 
+  static __int64 Freq      = 0;
   static __int64 LastCount = 0;
   static __int64 LastRest  = 0;
   static long    LastTime  = 0;

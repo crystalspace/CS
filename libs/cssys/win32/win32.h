@@ -21,9 +21,9 @@
 
 #include <windows.h>
 
-#if defined(COMP_WCC) || defined(COMP_BC)
-// The WATCOM C++ compiler does not accept a 'main' routine
-// in a program which already contains WinMain. This is a 'fix'.
+#if defined (OS_WIN32)
+// Windows compilers has a different idea of program entry point behaviour,
+// compared to other platform compilers.
 #define main csMain
 #endif
 
@@ -34,7 +34,6 @@
 #define strncasecmp(s1,s2,n) strnicmp(s1,s2,n)
 #endif
 
-//#define PixelAt(x,y) ...
 #include "cscom/com.h"
 #include "cssys/win32/win32itf.h"
 #include <objbase.h>
@@ -48,12 +47,11 @@
 #include "cssys/common/system.h"
 
 // Maximal path length
-// Maximal path length
 #ifndef MAXPATHLEN
 #  ifdef _MAX_FNAME
 #    define MAXPATHLEN _MAX_FNAME
 #  else
-#    define MAXPATHLEN 256
+#    define MAXPATHLEN 260		// and not 256!
 #  endif
 #endif
 
@@ -66,9 +64,9 @@
 /// Directory entry
 struct dirent
 {
-	char d_name [MAXPATHLEN + 1];	/* File name, 0 terminated */
-	long d_size;				/* File size (bytes)       */
-	unsigned d_attr;			/* File attributes (Windows-specific) */
+  char d_name [MAXPATHLEN + 1];		// File name, 0 terminated
+  long d_size;				// File size (bytes)
+  unsigned d_attr;			// File attributes (Windows-specific)
 };
 
 /// Directory handle
@@ -88,7 +86,7 @@ static inline bool isdir (char *path, dirent *de)
 }
 #endif
 
-/// Windows version.
+/// Windows system driver
 class SysSystemDriver : public csSystemDriver
 {
 public:
@@ -103,19 +101,19 @@ public:
   /// Implementation of IWin32SystemDriver interface.
   class XWin32SystemDriver : public IWin32SystemDriver
   {
-	/// Returns the HINSTANCE of the program
-	STDMETHODIMP GetInstance(HINSTANCE* retval);
-	/// Returns S_OK if the program is 'active', S_FALSE otherwise.
-	STDMETHODIMP GetIsActive();
-	/// Gets the nCmdShow of the WinMain().
-	STDMETHODIMP GetCmdShow(int* retval);
+    /// Returns the HINSTANCE of the program
+    STDMETHODIMP GetInstance (HINSTANCE* retval);
+    /// Returns S_OK if the program is 'active', S_FALSE otherwise.
+    STDMETHODIMP GetIsActive ();
+    /// Gets the nCmdShow of the WinMain().
+    STDMETHODIMP GetCmdShow (int* retval);
 
-	DECLARE_IUNKNOWN()
+    DECLARE_IUNKNOWN ()
   };
 
   // COM stuff
-  DECLARE_IUNKNOWN()
-  DECLARE_INTERFACE_TABLE(SysSystemDriver)  
+  DECLARE_IUNKNOWN ()
+  DECLARE_INTERFACE_TABLE (SysSystemDriver)  
   DECLARE_COMPOSITE_INTERFACE_EMBEDDED (Win32SystemDriver);
 };
 
@@ -124,9 +122,9 @@ class SysKeyboardDriver : public csKeyboardDriver
 {
 #ifdef DO_DINPUT_KEYBOARD
 private:
-	HANDLE m_hEvent;
-	HANDLE m_hThread;
-	friend DWORD WINAPI s_threadroutine(LPVOID param);
+  HANDLE m_hEvent;
+  HANDLE m_hThread;
+  friend DWORD WINAPI s_threadroutine(LPVOID param);
 #endif
 public:
   SysKeyboardDriver();

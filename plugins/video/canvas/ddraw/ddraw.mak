@@ -27,14 +27,16 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-.PHONY: ddraw.lib
+LIBS.DDRAW+=ddraw.lib
 
 ifeq ($(USE_DLL),yes)
   DDRAW=csddraw$(DLL)
-  DEP.DDRAW=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB) ddraw.lib
+  DEP.DDRAW=$(CSCOM.LIB) $(CSUTIL.LIB) $(CSSYS.LIB)
+  LIBS.LOCAL.DDRAW=$(LIBS.DDRAW)
 else
   DDRAW=$(OUT)$(LIB_PREFIX)csddraw$(LIB)
-  DEP.EXE+=$(DDRAW) ddraw.lib
+  DEP.EXE+=$(DDRAW)
+  LIBS.EXE+=$(LIBS.DDRAW)
   CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_DDRAW2D
 endif
 DESCRIPTION.$(DDRAW)=$(DESCRIPTION.ddraw)
@@ -58,7 +60,7 @@ cleanlib: ddrawcleanlib
 ddraw: $(OUTDIRS) $(DDRAW)
 
 $(DDRAW): $(OBJ.DDRAW) $(DEP.DDRAW)
-	$(DO.LIBRARY)
+	$(DO.LIBRARY) $(LIBS.LOCAL.DDRAW)
 
 ddrawclean:
 	$(RM) $(DDRAW)

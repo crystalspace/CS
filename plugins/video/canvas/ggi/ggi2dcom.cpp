@@ -51,9 +51,9 @@ void GGI2DUnregister ()
 
 STDAPI DllInitialize ()
 {
- csCoInitialize (0);
- gRegData.szInProcServer = DLL_NAME;
- return TRUE; 
+  csCoInitialize (0);
+  gRegData.szInProcServer = DLL_NAME;
+  return TRUE; 
 }
 
 void STDAPICALLTYPE ModuleRelease(void)

@@ -61,28 +61,11 @@ void STDAPICALLTYPE ModuleRelease()
   gb_cRef--;
 }
 
-#ifdef OS_WIN32
-
-HINSTANCE DllHandle;
-
-// our main entry point...should be called when we're loaded.
-COMBOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD /*fdwReason*/, LPVOID /*lpvReserved*/)
+STDAPI DllInitialize ()
 {
-  DllHandle = hinstDLL;
-  
+  csCoInitialize (0);
   return TRUE;
 }
-
-#endif
-
-#if defined( OS_LINUX ) || defined( OS_MACOS ) || defined( OS_BE )
-  STDAPI DllInitialize ()
-  {
-       csCoInitialize (0);
-   
-       return TRUE;
-  }
-#endif
 
 // return S_OK if it's ok to unload us now.
 STDAPI DllCanUnloadNow()

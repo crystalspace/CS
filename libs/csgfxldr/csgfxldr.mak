@@ -84,19 +84,19 @@ endif # ifeq ($(MAKESECTION),targets)
 ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
 
 ifeq ($(DO_GIF),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_GIF$">>volatile.tmp
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_GIF$">>volatile.tmp
 endif
 ifeq ($(DO_BMP),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_BMP$">>volatile.tmp
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_BMP$">>volatile.tmp
 endif
 ifeq ($(DO_TGA),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_TGA$">>volatile.tmp
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_TGA$">>volatile.tmp
 endif
 ifeq ($(DO_PNG),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_PNG$">>volatile.tmp
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_PNG$">>volatile.tmp
 endif
 ifeq ($(DO_JPG),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_JPG$">>volatile.tmp
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_JPG$">>volatile.tmp
 endif
 
 endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)

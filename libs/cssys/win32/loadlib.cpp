@@ -17,11 +17,9 @@
 */
 
 #include "sysdef.h"
-
-#ifdef NO_COM_SUPPORT
+#include "cscom/com.h"
 
 #include <windows.h>
-#include "cscom/com.h"
 
 CS_HLIBRARY SysLoadLibrary (char* szLibName)
 {
@@ -36,9 +34,5 @@ PROC SysGetProcAddress (CS_HLIBRARY Handle, char* szProcName)
 
 bool SysFreeLibrary (CS_HLIBRARY Handle)
 {
-  -*- warning: should return true if success, false if failed
-  -*- check the line below and remove this comment
-  return FreeLibrary (Handle);
+  return FreeLibrary ((void*)Handle);
 }
-
-#endif

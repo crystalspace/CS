@@ -120,13 +120,17 @@ void csGraphics2D::Close ()
 
 void csGraphics2D::complete_pixel_format ()
 {
-  unsigned long s;
-  pfmt.RedShift = 0;   s = pfmt.RedMask;   while (s && !(s&1)) { pfmt.RedShift++; s >>= 1; }
-  pfmt.GreenShift = 0; s = pfmt.GreenMask; while (s && !(s&1)) { pfmt.GreenShift++; s >>= 1; }
-  pfmt.BlueShift = 0;  s = pfmt.BlueMask;  while (s && !(s&1)) { pfmt.BlueShift++; s >>= 1; }
-  pfmt.RedBits = 0;    s = pfmt.RedMask >> pfmt.RedShift;     while (s) { pfmt.RedBits++; s >>= 1; }
-  pfmt.GreenBits = 0;  s = pfmt.GreenMask >> pfmt.GreenShift; while (s) { pfmt.GreenBits++; s >>= 1; }
-  pfmt.BlueBits = 0;   s = pfmt.BlueMask >> pfmt.BlueShift;   while (s) { pfmt.BlueBits++; s >>= 1; }
+#define COMPUTE(comp)							\
+  {									\
+    unsigned long i, tmp = pfmt.comp##Mask;				\
+    for (i = 0; !(tmp & 1); tmp >>= 1, i++) ;				\
+    pfmt.comp##Shift = i;						\
+    for (i = 0; tmp & 1; tmp >>= 1, i++) ;				\
+    pfmt.comp##Bits = i;						\
+  }
+  COMPUTE (Red);
+  COMPUTE (Green);
+  COMPUTE (Blue);
 }
 
 bool csGraphics2D::BeginDraw ()

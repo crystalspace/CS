@@ -321,9 +321,7 @@ void csSector::Draw (csRenderView& rview)
       rview.added_fog_info = true;
     }
     else if (fogmethod != G3DFOGMETHOD_NONE)
-    {
       rview.g3d->OpenFogObject (GetID (), &GetFog ());
-    }
   }
 
   if (bsp)

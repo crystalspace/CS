@@ -51,16 +51,6 @@ void _stdcall ModuleRelease()
   gb_cRef--;
 }
 
-HINSTANCE DllHandle;
-
-// our main entry point...should be called when we're loaded.
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD /*fdwReason*/, LPVOID /*lpvReserved*/)
-{
-  DllHandle = hinstDLL;
-
-  return TRUE;
-}
-
 // return S_OK if it's ok to unload us now.
 STDAPI DllCanUnloadNow()
 {

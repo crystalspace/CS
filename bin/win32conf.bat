@@ -5,11 +5,6 @@
   rem *** language" is so poor that we can only hope the user have the
   rem *** configuration we are expecting.
 
-  copy config.tmp + bin\win32conf.var tmp >nul
-  if errorlevel 1 goto exit
-  del config.tmp >nul
-  ren tmp config.tmp >nul
-
   echo ### Testing whenever you have (the right version of) NASM installed ...
   echo %%xdefine TEST >conftest.asm
   nasm -f win32 conftest.asm -o conftest.o
@@ -21,5 +16,10 @@
 
 :nonasm
   del conftest.asm
+
+  copy config.tmp + bin\win32conf.var tmp >nul
+  if errorlevel 1 goto exit
+  del config.tmp >nul
+  ren tmp config.tmp >nul
 
 :exit

@@ -49,8 +49,7 @@ void STDAPICALLTYPE ModuleAddRef(void)
 STDAPI DllInitialize()
 {
   csCoInitialize(0);
-   
- 	return S_OK;
+  return S_OK;
 }
 
 // return S_OK if it's ok to unload us now.

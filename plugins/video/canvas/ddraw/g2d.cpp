@@ -304,22 +304,22 @@ void csGraphics2DDDraw3::Initialize ()
   
   
   // set xx bpp mode up //
-  
-  if (Depth==16)
+
+  if (Depth == 16)
   {
     DrawPixel = DrawPixel16;   WriteChar = WriteChar16;
     GetPixelAt = GetPixelAt16; DrawSprite = DrawSprite16;
-    
-    // calculate CS's pixel format structure.
+
+    // Set pixel format
     pfmt.PixelBytes = 2;
     pfmt.PalEntries = 0;
     pfmt.RedMask = RedMask;
     pfmt.GreenMask = GreenMask;
     pfmt.BlueMask = BlueMask;
-    
-    complete_pixel_format();
+
+    complete_pixel_format ();
   }
-  else if (Depth==32)
+  else if (Depth == 32)
   {
     DrawPixel = DrawPixel32;   WriteChar = WriteChar32;
     GetPixelAt = GetPixelAt32; DrawSprite = DrawSprite32;
@@ -335,7 +335,16 @@ void csGraphics2DDDraw3::Initialize ()
     complete_pixel_format();
   }
 
-  // message("Using %d bits per pixel (%d color mode).\n", m_nDepth, 1 << m_nDepth);
+#if 0
+ printf ("Bytes per pixel: %d\n"
+         "Red/Green/Blue bits: %d,%d,%d\n"
+         "Red/Green/Blue mask: %08lX,%08lX,%08lX\n"
+         "Red/Green/Blue shift: %d,%d,%d\n"
+ ,
+         pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits,
+         pfmt.RedMask, pfmt.GreenMask, pfmt.BlueMask,
+         pfmt.RedShift, pfmt.GreenShift, pfmt.BlueShift);
+#endif
 }
 
 bool csGraphics2DDDraw3::Open(char *Title)

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
+    This is the entry point for console executables
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,32 +20,9 @@
 #include "sysdef.h"
 #include "cscom/com.h"
 
-#if defined(COMP_BC)
-#include <dos.h>		// For _argc & _argv
-#endif
-
 #undef main
 extern int csMain (int argc, char* argv[]);
-
-HINSTANCE ModuleHandle;
-bool ApplicationActive = true;
-int ApplicationShow;
-
-// The main entry for GUI applications
-int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
-  LPSTR lpCmdLine, int nCmdShow)
-{
-  ModuleHandle = hInstance;
-  ApplicationShow = nCmdShow;
-
-#ifdef COMP_BC
-  csMain ( _argc,  _argv);
-#else
-  csMain (__argc, __argv);
-#endif
-
-  return TRUE;
-}
+extern HINSTANCE ModuleHandle;		// defined in the COM library
 
 // The main entry for console applications
 int main (int argc, char* argv[])

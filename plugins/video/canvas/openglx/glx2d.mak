@@ -108,7 +108,7 @@ ifndef DO_SHM
 endif
 
 ifeq ($(DO_SHM)$(findstring DO_SHM,$(MAKE_VOLATILE_H)),yes)
-  MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define DO_SHM$">>volatile.tmp
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SHM$">>volatile.tmp
 endif
 
 endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
