@@ -45,6 +45,8 @@ chronological order.
 	  didn't help.
 	- Jorrit merged csArrayBase with csArray so that only csArray
 	  remains.
+	- Jorrit fixed a compile error in viewmesh with the array changes.
+	- Jorrit fixed a compile error in freefnt2 with the array changes.
 6-Aug-2003
 	- Jorrit fixed a compile error in freefnt2 font server related to the
 	  csRefArray->csArray change.

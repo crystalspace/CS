@@ -352,7 +352,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  {
 	    csComponent *item = activemenu->GetItem (ev.Command.Code);
 	    cal3dstate->ClearAnimCycle (item->GetText (),3);
-	    activelist.Delete (item->GetText() );
+	    activelist.Delete ((char*)item->GetText() );
 	    menu->Hide ();
 	    activemenu->Delete (item);
 	    return true;
