@@ -209,6 +209,11 @@ CS_BUILD_PROPERTY([CMD.DLLWRAP], [$DLLWRAP])
 AC_CHECK_TOOL([WINDRES], [windres])
 CS_BUILD_PROPERTY([CMD.WINDRES], [$WINDRES])
 
+AC_CHECK_TOOL([OBJCOPY], [objcopy])
+AS_IF([test -n "$OBJCOPY"],
+    [CS_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
+    CS_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
+
 AC_CHECK_PROGS([FLEXBIN], [flex])
 CS_BUILD_PROPERTY([FLEXBIN], [$FLEXBIN])
 
@@ -875,9 +880,9 @@ AS_IF([test -d /usr/local/lib],
 #	appropriate TARGET and TARGET_MAKEFILE makefile variables, and OS_FOO
 #	header define.
 #------------------------------------------------------------------------------
-cs_host_os_normalized=''
 AC_DEFUN([CS_CHECK_HOST],
     [AC_REQUIRE([AC_CANONICAL_HOST])
+    cs_host_os_normalized=''
     case $host_os in
 	mingw*|cygwin*)
 	    cs_host_target=win32gcc
@@ -1527,57 +1532,6 @@ CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
 
 
 #------------------------------------------------------------------------------
-# Check if libbfd is present (part of GNU binutils).
-#
-# IMPLEMENTATION NOTES
-#
-# It seems that some platforms have two version of libiberty installed: one
-# from binutils and one from gcc.  The binutils version resides in /usr/lib,
-# whereas the gcc version resides in the gcc installation directory.  The gcc
-# version, by default, takes precedence at link time over the binutils version.
-# Unfortunately, in broken cases, the gcc version of libiberty is missing
-# htab_create_alloc() which is required by some libbfd functions.  The
-# extensive secondary check of libbfd catches this anomalous case of broken gcc
-# libiberty.  It turns out that it is possible to make the linker prefer the
-# binutils version by specifying -L/usr/lib, thus the extensive test attempts
-# to do so in an effort to resolve this unfortunate issue.
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([bfd],
-    [AC_LANG_PROGRAM([#include <bfd.h>], [bfd_init();])],
-    [], [], [], [], [], [], [-liberty])
-
-AS_IF([test $cs_cv_libbfd = yes],
-    [CS_CHECK_BUILD([if libbfd is usable], [cs_cv_libbfd_ok],
-	[AC_LANG_PROGRAM([#include <bfd.h>],
-	    [bfd* p;
-	    asection* s;
-	    bfd_init();
-	    p = bfd_openr(0,0);
-	    bfd_check_format(p,bfd_object);
-	    bfd_get_section_by_name(p,0);
-	    bfd_section_size(p,s);
-	    bfd_get_section_contents(p,s,0,0,0);
-	    bfd_close(p);])],
-	[CS_CREATE_TUPLE() CS_CREATE_TUPLE([],[-L/usr/lib],[])], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libbfd_ok], [LIBBFD])
-	CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [$cs_cv_libbfd_ok_cflags], [+])
-	CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [$cs_cv_libbfd_ok_lflags], [+])
-	CS_BUILD_PROPERTY([LIBS.EXE], [$cs_cv_libbfd_ok_libs], [+])], [], [],
-	[$cs_cv_libbfd_cflags], [$cs_cv_libbfd_lflags], [$cs_cv_libbfd_libs])])
-
-
-
-#------------------------------------------------------------------------------
-# Check if objcopy is present (part of GNU binutils).
-#------------------------------------------------------------------------------
-AC_CHECK_TOOL([OBJCOPY], [objcopy])
-AS_IF([test -n "$OBJCOPY"],
-    [CS_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
-    CS_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
-
-
-
-#------------------------------------------------------------------------------
 # Check for Cg shader package.
 #------------------------------------------------------------------------------
 AC_CHECK_PROGS([CGC], [cgc])
@@ -1943,6 +1897,113 @@ AS_IF([test $cs_cv_cxx_qint_ok = no],
 
 
 #------------------------------------------------------------------------------
+# Determine if modules should be built as plugins or static link libraries.
+# The macro CS_CHECK_ENABLE_PLUGINS sets the shell variable enable_plugins to
+# yes or no.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_ENABLE_PLUGINS],
+    [AC_MSG_CHECKING([whether to build plugins])
+    AC_ARG_ENABLE([plugins], [AC_HELP_STRING([--enable-plugins],
+	[create plugin modules instead of linkable libraries (default YES)])],
+	[], [enable_plugins=yes])
+    AC_MSG_RESULT([$enable_plugins])])
+
+CS_CHECK_ENABLE_PLUGINS
+CS_BUILD_PROPERTY([USE_PLUGINS], [$enable_plugins])
+AS_IF([test $enable_plugins != yes], [CS_HEADER_PROPERTY([CS_STATIC_LINKED])])
+
+
+
+#------------------------------------------------------------------------------
+# Determine if plugin meta-information should be embedded directly into the
+# plugin module or if it should exist in a stand-alone .csplugin file.  The
+# macro CS_CHECK_ENABLE_META_EMBEDDING sets the shell variable
+# enable_meta_info_embedding to yes or no.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_ENABLE_META_EMBEDDING],
+    [AC_REQUIRE([CS_CHECK_ENABLE_PLUGINS])
+    AC_REQUIRE([CS_CHECK_HOST])
+    AS_IF([test $enable_plugins = yes],
+	[AC_MSG_CHECKING([whether to embed plugin meta-information])
+	case $cs_host_target in
+	    unix) cs_embed_meta_info_default=no ;;
+	    *) cs_embed_meta_info_default=yes ;;
+	esac
+	AC_ARG_ENABLE([meta-info-embedding],
+	    [AC_HELP_STRING([--enable-meta-info-embedding],
+		[store plugin meta-information directly inside plugin modules
+		if supported by platform; if disabled, meta-information is
+		stored in stand-alone .csplugin files; this is enabled by
+		default for non-Unix platforms, and disabled by default for
+		Unix platforms since the Unix implementation requires the
+		GPL-licensed libbfd library; enable this option on Unix only if
+		you are certain you want a GPL-licensed library infecting your
+		project])],
+	    [], [enable_meta_info_embedding=$cs_embed_meta_info_default])
+	AC_MSG_RESULT([$enable_meta_info_embedding])],
+	[enable_meta_info_embedding=no])])
+
+CS_CHECK_ENABLE_META_EMBEDDING
+CS_BUILD_PROPERTY([EMBED_META], [$enable_meta_info_embedding])
+AS_IF([test $enable_meta_info_embedding = yes],
+    [CS_HEADER_PROPERTY([CS_EMBED_PLUGIN_META])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if libbfd is present (part of GNU binutils).
+#
+# WARNING
+#
+# libbfd carries a GPL license which is incompatible with the LGPL license of
+# Crystal Space.  On platforms for which libbfd can be used, we check for and
+# utilize this library only if explicitly requested by the user via
+# --enable-meta-info-embedding.
+#
+# IMPLEMENTATION NOTES
+#
+# It seems that some platforms have two version of libiberty installed: one
+# from binutils and one from gcc.  The binutils version resides in /usr/lib,
+# whereas the gcc version resides in the gcc installation directory.  The gcc
+# version, by default, takes precedence at link time over the binutils version.
+# Unfortunately, in broken cases, the gcc version of libiberty is missing
+# htab_create_alloc() which is required by some libbfd functions.  The
+# extensive secondary check of libbfd catches this anomalous case of broken gcc
+# libiberty.  It turns out that it is possible to make the linker prefer the
+# binutils version by specifying -L/usr/lib, thus the extensive test attempts
+# to do so in an effort to resolve this unfortunate issue.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_LIBBFD],
+    [AC_REQUIRE([CS_CHECK_ENABLE_META_EMBEDDING])
+    AS_IF([test $enable_meta_info_embedding = yes],
+	[CS_CHECK_LIB_WITH([bfd],
+	    [AC_LANG_PROGRAM([#include <bfd.h>], [bfd_init();])],
+	    [], [], [], [], [], [], [-liberty])],
+	[cs_cv_libbfd=no])])
+
+CS_CHECK_LIBBFD
+AS_IF([test $cs_cv_libbfd = yes],
+    [CS_CHECK_BUILD([if libbfd is usable], [cs_cv_libbfd_ok],
+	[AC_LANG_PROGRAM([#include <bfd.h>],
+	    [bfd* p;
+	    asection* s;
+	    bfd_init();
+	    p = bfd_openr(0,0);
+	    bfd_check_format(p,bfd_object);
+	    bfd_get_section_by_name(p,0);
+	    bfd_section_size(p,s);
+	    bfd_get_section_contents(p,s,0,0,0);
+	    bfd_close(p);])],
+	[CS_CREATE_TUPLE() CS_CREATE_TUPLE([],[-L/usr/lib],[])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libbfd_ok], [LIBBFD])
+	CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [$cs_cv_libbfd_ok_cflags], [+])
+	CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [$cs_cv_libbfd_ok_lflags], [+])
+	CS_BUILD_PROPERTY([LIBS.EXE], [$cs_cv_libbfd_ok_libs], [+])], [], [],
+	[$cs_cv_libbfd_cflags], [$cs_cv_libbfd_lflags], [$cs_cv_libbfd_libs])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine build mode; either "optimize", "debug", or "profile".
 #------------------------------------------------------------------------------
 AC_ARG_ENABLE([optimize], [AC_HELP_STRING([--enable-optimize],
@@ -1974,35 +2035,6 @@ AC_MSG_CHECKING([build mode])
 AS_VAR_SET_IF([cs_build_mode], [], [cs_build_mode=optimize])
 AC_MSG_RESULT([$cs_build_mode])
 CS_BUILD_PROPERTY([MODE], [$cs_build_mode])
-
-
-
-#------------------------------------------------------------------------------
-# Determine if modules should be built as plugins or static link libraries.
-# Also determine if plugin meta-information should be embedded directly into
-# the plugin module or if it should exist in a stand-alone .csplugin file.
-#------------------------------------------------------------------------------
-AC_MSG_CHECKING([whether to build plugins])
-AC_ARG_ENABLE([plugins], [AC_HELP_STRING([--enable-plugins],
-    [create plugin modules instead of static link libraries (default YES)])],
-    [], [enable_plugins=yes])
-AC_MSG_RESULT([$enable_plugins])
-CS_BUILD_PROPERTY([USE_PLUGINS], [$enable_plugins])
-AS_IF([test $enable_plugins != yes], [CS_HEADER_PROPERTY([CS_STATIC_LINKED])])
-
-AS_IF([test $enable_plugins = yes],
-    [AC_MSG_CHECKING([whether to embed plugin meta-information])
-    AC_ARG_ENABLE([meta-info-embedding],
-	[AC_HELP_STRING([--enable-meta-info-embedding],
-	    [store plugin meta-information directly inside plugin modules if
-	    supported by platform (default YES); if disabled, meta-information
-	    is stored in stand-alone .csplugin files])],
-	[], [enable_meta_info_embedding=yes])
-    AC_MSG_RESULT([$enable_meta_info_embedding])
-    CS_BUILD_PROPERTY([EMBED_META], [$enable_meta_info_embedding])
-    AS_IF([test $enable_meta_info_embedding = yes],
-	[CS_HEADER_PROPERTY([CS_EMBED_PLUGIN_META])])],
-    [CS_BUILD_PROPERTY([EMBED_META], [no])])
 
 
 

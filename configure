@@ -314,7 +314,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIGBIN MAKE JAM SET_MAKE NASM MAKEDEP PERL PYTHON CPP EGREP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS FT2_CONFIG FT2_CFLAGS FT2_LIBS SDLCONFIG OBJCOPY ac_ct_OBJCOPY CGC CXXCPP LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CXX CXXFLAGS ac_ct_CXX RANLIB ac_ct_RANLIB DLLTOOL ac_ct_DLLTOOL DLLWRAP ac_ct_DLLWRAP WINDRES ac_ct_WINDRES OBJCOPY ac_ct_OBJCOPY FLEXBIN BISONBIN DOXYGEN TEXI2DVI DVIPS DVIPDF MAKEINFO INSTALL SWIGBIN MAKE JAM SET_MAKE NASM MAKEDEP PERL PYTHON CPP EGREP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS FT2_CONFIG FT2_CFLAGS FT2_LIBS SDLCONFIG CGC CXXCPP LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -880,6 +880,18 @@ Optional Features:
                           a 586)
   --disable-freetypetest  Do not try to compile and run
                           a test FreeType program
+  --enable-plugins        create plugin modules instead of linkable libraries
+                          (default YES)
+  --enable-meta-info-embedding
+                          store plugin meta-information directly inside plugin
+                          modules if supported by platform; if disabled,
+                          meta-information is stored in stand-alone .csplugin
+                          files; this is enabled by default for non-Unix
+                          platforms, and disabled by default for Unix
+                          platforms since the Unix implementation requires the
+                          GPL-licensed libbfd library; enable this option on
+                          Unix only if you are certain you want a GPL-licensed
+                          library infecting your project
   --enable-optimize       build with optimizations enabled (default YES); same
                           as --enable-mode=optimize
   --enable-debug          build with debugging information (default NO); same
@@ -888,13 +900,6 @@ Optional Features:
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
                           `debug', `profile' (default OPTIMIZE)
-  --enable-plugins        create plugin modules instead of static link
-                          libraries (default YES)
-  --enable-meta-info-embedding
-                          store plugin meta-information directly inside plugin
-                          modules if supported by platform (default YES); if
-                          disabled, meta-information is stored in stand-alone
-                          .csplugin files
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
                           common memory management mistakes (default NO)
@@ -959,13 +964,13 @@ Optional Packages:
   --with-libcal3d=dir     specify location of libcal3d if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
-  --with-libbfd=dir       specify location of libbfd if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
   --with-libCg=dir        specify location of libCg if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
   --with-libCgGL=dir      specify location of libCgGL if not detected
+                          automatically; searches dir, dir/include, and
+                          dir/lib
+  --with-libbfd=dir       specify location of libbfd if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
 
@@ -3057,6 +3062,105 @@ cs_build_prop_val=`echo x$WINDRES | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 "
     cs_jamconfig_text="${cs_jamconfig_text}CMD.WINDRES ?= \"$cs_build_prop_val\" ;
 "
+fi
+
+
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}objcopy", so it can be a program name with args.
+set dummy ${ac_tool_prefix}objcopy; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_OBJCOPY+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$OBJCOPY"; then
+  ac_cv_prog_OBJCOPY="$OBJCOPY" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_OBJCOPY="${ac_tool_prefix}objcopy"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+OBJCOPY=$ac_cv_prog_OBJCOPY
+if test -n "$OBJCOPY"; then
+  echo "$as_me:$LINENO: result: $OBJCOPY" >&5
+echo "${ECHO_T}$OBJCOPY" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+fi
+if test -z "$ac_cv_prog_OBJCOPY"; then
+  ac_ct_OBJCOPY=$OBJCOPY
+  # Extract the first word of "objcopy", so it can be a program name with args.
+set dummy objcopy; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_prog_ac_ct_OBJCOPY+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  if test -n "$ac_ct_OBJCOPY"; then
+  ac_cv_prog_ac_ct_OBJCOPY="$ac_ct_OBJCOPY" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_OBJCOPY="objcopy"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+fi
+fi
+ac_ct_OBJCOPY=$ac_cv_prog_ac_ct_OBJCOPY
+if test -n "$ac_ct_OBJCOPY"; then
+  echo "$as_me:$LINENO: result: $ac_ct_OBJCOPY" >&5
+echo "${ECHO_T}$ac_ct_OBJCOPY" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+  OBJCOPY=$ac_ct_OBJCOPY
+else
+  OBJCOPY="$ac_cv_prog_OBJCOPY"
+fi
+
+if test -n "$OBJCOPY"; then
+  cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}OBJCOPY.AVAILABLE = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}OBJCOPY.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+    cs_build_prop_val=`echo x$OBJCOPY | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}CMD.OBJCOPY = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= \"$cs_build_prop_val\" ;
+"
+fi
+
 fi
 
 
@@ -9049,7 +9153,6 @@ fi
 #	appropriate TARGET and TARGET_MAKEFILE makefile variables, and OS_FOO
 #	header define.
 #------------------------------------------------------------------------------
-cs_host_os_normalized=''
 
 
 
@@ -9528,6 +9631,7 @@ done
 
 
 
+    cs_host_os_normalized=''
     case $host_os in
 	mingw*|cygwin*)
 	    cs_host_target=win32gcc
@@ -21755,903 +21859,6 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check if libbfd is present (part of GNU binutils).
-#
-# IMPLEMENTATION NOTES
-#
-# It seems that some platforms have two version of libiberty installed: one
-# from binutils and one from gcc.  The binutils version resides in /usr/lib,
-# whereas the gcc version resides in the gcc installation directory.  The gcc
-# version, by default, takes precedence at link time over the binutils version.
-# Unfortunately, in broken cases, the gcc version of libiberty is missing
-# htab_create_alloc() which is required by some libbfd functions.  The
-# extensive secondary check of libbfd catches this anomalous case of broken gcc
-# libiberty.  It turns out that it is possible to make the linker prefer the
-# binutils version by specifying -L/usr/lib, thus the extensive test attempts
-# to do so in an effort to resolve this unfortunate issue.
-#------------------------------------------------------------------------------
-
-# Check whether --with-libbfd or --without-libbfd was given.
-if test "${with_libbfd+set}" = set; then
-  withval="$with_libbfd"
-
-fi;
-
-    if test -z "$with_libbfd"; then
-  with_libbfd=yes
-fi
-
-    if test "$with_libbfd" != no; then
-  # If --with-lib value is same as cached value, then assume other
-	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libbfd" != "$cs_cv_with_libbfd"; then
-  cs_ignore_cache=yes
-else
-  cs_ignore_cache=no
-fi
-
-
-	if test $with_libbfd != yes; then
-  cs_check_lib_paths=$with_libbfd
-else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
-fi
-
-
-	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
-    do
-	case $cs_lib_item in
-	    *\|*)
-    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_check_incdir=''
-else
-  if test "$1" = filler; then
-  cs_check_incdir=''
-else
-  cs_check_incdir=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_check_libdir=''
-else
-  if test "$1" = filler; then
-  cs_check_libdir=''
-else
-  cs_check_libdir=$1
-fi
-
-	shift
-fi
-
-		if test -n "$cs_check_incdir"; then
-  cs_check_lib_cflag="-I$cs_check_incdir"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_check_libdir"; then
-  cs_check_lib_lflag="-L$cs_check_libdir"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "bfd"; then
-  cs_check_lib_libs="-lbfd"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "bfd"; then
-  cs_check_lib_libs="-lbfd"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "bfd"; then
-  cs_check_lib_libs="-lbfd"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	esac
-    done
-
-	if test "$cs_ignore_cache" != yes; then
-  echo "$as_me:$LINENO: checking for libbfd" >&5
-echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
-if test "${cs_cv_libbfd+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in $cs_check_lib_flags
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test -liberty $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <bfd.h>
-int
-main ()
-{
-bfd_init();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-	    break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libbfd=yes
-		cs_cv_libbfd_cflags=$cs_build_cflags
-		cs_cv_libbfd_lflags=$cs_build_lflags
-		cs_cv_libbfd_libs=$cs_build_libs
-else
-  cs_cv_libbfd=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
-echo "${ECHO_T}$cs_cv_libbfd" >&6
-else
-  echo "$as_me:$LINENO: checking for libbfd" >&5
-echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in $cs_check_lib_flags
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test  $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test -liberty $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <bfd.h>
-int
-main ()
-{
-bfd_init();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-	    break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libbfd=yes
-		cs_cv_libbfd_cflags=$cs_build_cflags
-		cs_cv_libbfd_lflags=$cs_build_lflags
-		cs_cv_libbfd_libs=$cs_build_libs
-else
-  cs_cv_libbfd=no
-fi
-
-	    echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
-echo "${ECHO_T}$cs_cv_libbfd" >&6
-fi
-
-    if test $cs_cv_libbfd = yes; then
-  :
-else
-  cs_cv_libbfd_cflags=''
-	cs_cv_libbfd_lflags=''
-	cs_cv_libbfd_libs=''
-	:
-fi
-
-else
-  cs_cv_libbfd=no
-fi
-
-    cs_cv_with_libbfd="$with_libbfd"
-
-    if test "$cs_cv_libbfd" = yes; then
-  :
-else
-  :
-fi
-
-
-if test $cs_cv_libbfd = yes; then
-  if test "" != yes; then
-  echo "$as_me:$LINENO: checking if libbfd is usable" >&5
-echo $ECHO_N "checking if libbfd is usable... $ECHO_C" >&6
-if test "${cs_cv_libbfd_ok+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` `echo @@-L/usr/lib@ | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_libbfd_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libbfd_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libbfd_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <bfd.h>
-int
-main ()
-{
-bfd* p;
-	    asection* s;
-	    bfd_init();
-	    p = bfd_openr(0,0);
-	    bfd_check_format(p,bfd_object);
-	    bfd_get_section_by_name(p,0);
-	    bfd_section_size(p,s);
-	    bfd_get_section_contents(p,s,0,0,0);
-	    bfd_close(p);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-	    break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libbfd_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libbfd_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libbfd_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libbfd_ok=yes
-		cs_cv_libbfd_ok_cflags=$cs_build_cflags
-		cs_cv_libbfd_ok_lflags=$cs_build_lflags
-		cs_cv_libbfd_ok_libs=$cs_build_libs
-else
-  cs_cv_libbfd_ok=no
-fi
-
-fi
-echo "$as_me:$LINENO: result: $cs_cv_libbfd_ok" >&5
-echo "${ECHO_T}$cs_cv_libbfd_ok" >&6
-else
-  echo "$as_me:$LINENO: checking if libbfd is usable" >&5
-echo $ECHO_N "checking if libbfd is usable... $ECHO_C" >&6
-	    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-    cs_cflags_save="$CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in `echo @@@ | sed 'y% %#%'` `echo @@-L/usr/lib@ | sed 'y% %#%'`
-    do
-
-    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_dummy=''
-else
-  if test "$1" = filler; then
-  cs_dummy=''
-else
-  cs_dummy=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_cflags_test=''
-else
-  if test "$1" = filler; then
-  cs_cflags_test=''
-else
-  cs_cflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_lflags_test=''
-else
-  if test "$1" = filler; then
-  cs_lflags_test=''
-else
-  cs_lflags_test=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_libs_test=''
-else
-  if test "$1" = filler; then
-  cs_libs_test=''
-else
-  cs_libs_test=$1
-fi
-
-	shift
-fi
-
-    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
-    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
-    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
-
-	CFLAGS="$cs_cflags_test $cs_cv_libbfd_cflags $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $cs_cv_libbfd_lflags $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_cv_libbfd_libs $cs_libs_save"
-	cat >conftest.$ac_ext <<_ACEOF
-#line $LINENO "configure"
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <bfd.h>
-int
-main ()
-{
-bfd* p;
-	    asection* s;
-	    bfd_init();
-	    p = bfd_openr(0,0);
-	    bfd_check_format(p,bfd_object);
-	    bfd_get_section_by_name(p,0);
-	    bfd_section_size(p,s);
-	    bfd_get_section_contents(p,s,0,0,0);
-	    bfd_close(p);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-         { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  cs_build_ok=yes
-	    break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-fi
-rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
-    done
-
-    CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-    if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libbfd_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libbfd_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_cv_libbfd_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_libbfd_ok=yes
-		cs_cv_libbfd_ok_cflags=$cs_build_cflags
-		cs_cv_libbfd_ok_lflags=$cs_build_lflags
-		cs_cv_libbfd_ok_libs=$cs_build_libs
-else
-  cs_cv_libbfd_ok=no
-fi
-
-	    echo "$as_me:$LINENO: result: $cs_cv_libbfd_ok" >&5
-echo "${ECHO_T}$cs_cv_libbfd_ok" >&6
-fi
-
-    if test $cs_cv_libbfd_ok = yes; then
-  if test "$cs_cv_libbfd_ok" = yes; then
-  cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}LIBBFD.AVAILABLE = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.AVAILABLE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}LIBBFD.CFLAGS = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.CFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}LIBBFD.LFLAGS = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.LFLAGS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
-	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}LFLAGS.SYSTEM += $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
-"
-fi
-
-	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}LIBS.EXE += $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
-"
-fi
-
-else
-  cs_cv_libbfd_ok_cflags=''
-	cs_cv_libbfd_ok_lflags=''
-	cs_cv_libbfd_ok_libs=''
-	:
-fi
-
-fi
-
-
-
-
-#------------------------------------------------------------------------------
-# Check if objcopy is present (part of GNU binutils).
-#------------------------------------------------------------------------------
-if test -n "$ac_tool_prefix"; then
-  # Extract the first word of "${ac_tool_prefix}objcopy", so it can be a program name with args.
-set dummy ${ac_tool_prefix}objcopy; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_OBJCOPY+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$OBJCOPY"; then
-  ac_cv_prog_OBJCOPY="$OBJCOPY" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_OBJCOPY="${ac_tool_prefix}objcopy"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-OBJCOPY=$ac_cv_prog_OBJCOPY
-if test -n "$OBJCOPY"; then
-  echo "$as_me:$LINENO: result: $OBJCOPY" >&5
-echo "${ECHO_T}$OBJCOPY" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-fi
-if test -z "$ac_cv_prog_OBJCOPY"; then
-  ac_ct_OBJCOPY=$OBJCOPY
-  # Extract the first word of "objcopy", so it can be a program name with args.
-set dummy objcopy; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_prog_ac_ct_OBJCOPY+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  if test -n "$ac_ct_OBJCOPY"; then
-  ac_cv_prog_ac_ct_OBJCOPY="$ac_ct_OBJCOPY" # Let the user override the test.
-else
-as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_prog_ac_ct_OBJCOPY="objcopy"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-fi
-fi
-ac_ct_OBJCOPY=$ac_cv_prog_ac_ct_OBJCOPY
-if test -n "$ac_ct_OBJCOPY"; then
-  echo "$as_me:$LINENO: result: $ac_ct_OBJCOPY" >&5
-echo "${ECHO_T}$ac_ct_OBJCOPY" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  OBJCOPY=$ac_ct_OBJCOPY
-else
-  OBJCOPY="$ac_cv_prog_OBJCOPY"
-fi
-
-if test -n "$OBJCOPY"; then
-  cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}OBJCOPY.AVAILABLE = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}OBJCOPY.AVAILABLE ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-    cs_build_prop_val=`echo x$OBJCOPY | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}CMD.OBJCOPY = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}CMD.OBJCOPY ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-fi
-
-
-
-
-#------------------------------------------------------------------------------
 # Check for Cg shader package.
 #------------------------------------------------------------------------------
 for ac_prog in cgc
@@ -27552,6 +26759,893 @@ fi
 
 
 #------------------------------------------------------------------------------
+# Determine if modules should be built as plugins or static link libraries.
+# The macro CS_CHECK_ENABLE_PLUGINS sets the shell variable enable_plugins to
+# yes or no.
+#------------------------------------------------------------------------------
+
+
+echo "$as_me:$LINENO: checking whether to build plugins" >&5
+echo $ECHO_N "checking whether to build plugins... $ECHO_C" >&6
+    # Check whether --enable-plugins or --disable-plugins was given.
+if test "${enable_plugins+set}" = set; then
+  enableval="$enable_plugins"
+
+else
+  enable_plugins=yes
+fi;
+    echo "$as_me:$LINENO: result: $enable_plugins" >&5
+echo "${ECHO_T}$enable_plugins" >&6
+cs_build_prop_val=`echo x$enable_plugins | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}USE_PLUGINS = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}USE_PLUGINS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+if test $enable_plugins != yes; then
+  cs_header_text="${cs_header_text}#define CS_STATIC_LINKED
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Determine if plugin meta-information should be embedded directly into the
+# plugin module or if it should exist in a stand-alone .csplugin file.  The
+# macro CS_CHECK_ENABLE_META_EMBEDDING sets the shell variable
+# enable_meta_info_embedding to yes or no.
+#------------------------------------------------------------------------------
+
+
+
+
+    if test $enable_plugins = yes; then
+  echo "$as_me:$LINENO: checking whether to embed plugin meta-information" >&5
+echo $ECHO_N "checking whether to embed plugin meta-information... $ECHO_C" >&6
+	case $cs_host_target in
+	    unix) cs_embed_meta_info_default=no ;;
+	    *) cs_embed_meta_info_default=yes ;;
+	esac
+	# Check whether --enable-meta-info-embedding or --disable-meta-info-embedding was given.
+if test "${enable_meta_info_embedding+set}" = set; then
+  enableval="$enable_meta_info_embedding"
+
+else
+  enable_meta_info_embedding=$cs_embed_meta_info_default
+fi;
+	echo "$as_me:$LINENO: result: $enable_meta_info_embedding" >&5
+echo "${ECHO_T}$enable_meta_info_embedding" >&6
+else
+  enable_meta_info_embedding=no
+fi
+
+cs_build_prop_val=`echo x$enable_meta_info_embedding | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}EMBED_META = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}EMBED_META ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+if test $enable_meta_info_embedding = yes; then
+  cs_header_text="${cs_header_text}#define CS_EMBED_PLUGIN_META
+"
+fi
+
+
+
+
+#------------------------------------------------------------------------------
+# Check if libbfd is present (part of GNU binutils).
+#
+# WARNING
+#
+# libbfd carries a GPL license which is incompatible with the LGPL license of
+# Crystal Space.  On platforms for which libbfd can be used, we check for and
+# utilize this library only if explicitly requested by the user via
+# --enable-meta-info-embedding.
+#
+# IMPLEMENTATION NOTES
+#
+# It seems that some platforms have two version of libiberty installed: one
+# from binutils and one from gcc.  The binutils version resides in /usr/lib,
+# whereas the gcc version resides in the gcc installation directory.  The gcc
+# version, by default, takes precedence at link time over the binutils version.
+# Unfortunately, in broken cases, the gcc version of libiberty is missing
+# htab_create_alloc() which is required by some libbfd functions.  The
+# extensive secondary check of libbfd catches this anomalous case of broken gcc
+# libiberty.  It turns out that it is possible to make the linker prefer the
+# binutils version by specifying -L/usr/lib, thus the extensive test attempts
+# to do so in an effort to resolve this unfortunate issue.
+#------------------------------------------------------------------------------
+
+
+
+    if test $enable_meta_info_embedding = yes; then
+
+# Check whether --with-libbfd or --without-libbfd was given.
+if test "${with_libbfd+set}" = set; then
+  withval="$with_libbfd"
+
+fi;
+
+    if test -z "$with_libbfd"; then
+  with_libbfd=yes
+fi
+
+    if test "$with_libbfd" != no; then
+  # If --with-lib value is same as cached value, then assume other
+	 # cached values are also valid; otherwise, ignore all cached values.
+	if test "$with_libbfd" != "$cs_cv_with_libbfd"; then
+  cs_ignore_cache=yes
+else
+  cs_ignore_cache=no
+fi
+
+
+	if test $with_libbfd != yes; then
+  cs_check_lib_paths=$with_libbfd
+else
+  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+fi
+
+
+	cs_check_lib_flags=''
+    for cs_lib_item in $cs_check_lib_paths
+    do
+	case $cs_lib_item in
+	    *\|*)
+    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_check_incdir=''
+else
+  if test "$1" = filler; then
+  cs_check_incdir=''
+else
+  cs_check_incdir=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_check_libdir=''
+else
+  if test "$1" = filler; then
+  cs_check_libdir=''
+else
+  cs_check_libdir=$1
+fi
+
+	shift
+fi
+
+		if test -n "$cs_check_incdir"; then
+  cs_check_lib_cflag="-I$cs_check_incdir"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_check_libdir"; then
+  cs_check_lib_lflag="-L$cs_check_libdir"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "bfd"; then
+  cs_check_lib_libs="-lbfd"
+else
+  cs_check_lib_libs=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	    *)  if test -n "$cs_lib_item"; then
+  cs_check_lib_cflag="-I$cs_lib_item"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item"; then
+  cs_check_lib_lflag="-L$cs_lib_item"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "bfd"; then
+  cs_check_lib_libs="-lbfd"
+else
+  cs_check_lib_libs=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		if test -n "$cs_lib_item/include"; then
+  cs_check_lib_cflag="-I$cs_lib_item/include"
+else
+  cs_check_lib_cflag=''
+fi
+
+    if test -n "$cs_lib_item/lib"; then
+  cs_check_lib_lflag="-L$cs_lib_item/lib"
+else
+  cs_check_lib_lflag=''
+fi
+
+    if test -n "bfd"; then
+  cs_check_lib_libs="-lbfd"
+else
+  cs_check_lib_libs=''
+fi
+
+    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
+		;;
+	esac
+    done
+
+	if test "$cs_ignore_cache" != yes; then
+  echo "$as_me:$LINENO: checking for libbfd" >&5
+echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
+if test "${cs_cv_libbfd+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test -liberty $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <bfd.h>
+int
+main ()
+{
+bfd_init();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libbfd=yes
+		cs_cv_libbfd_cflags=$cs_build_cflags
+		cs_cv_libbfd_lflags=$cs_build_lflags
+		cs_cv_libbfd_libs=$cs_build_libs
+else
+  cs_cv_libbfd=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
+echo "${ECHO_T}$cs_cv_libbfd" >&6
+else
+  echo "$as_me:$LINENO: checking for libbfd" >&5
+echo $ECHO_N "checking for libbfd... $ECHO_C" >&6
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in $cs_check_lib_flags
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test  $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
+	LIBS="$cs_libs_test -liberty $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <bfd.h>
+int
+main ()
+{
+bfd_init();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test -liberty | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libbfd=yes
+		cs_cv_libbfd_cflags=$cs_build_cflags
+		cs_cv_libbfd_lflags=$cs_build_lflags
+		cs_cv_libbfd_libs=$cs_build_libs
+else
+  cs_cv_libbfd=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_libbfd" >&5
+echo "${ECHO_T}$cs_cv_libbfd" >&6
+fi
+
+    if test $cs_cv_libbfd = yes; then
+  :
+else
+  cs_cv_libbfd_cflags=''
+	cs_cv_libbfd_lflags=''
+	cs_cv_libbfd_libs=''
+	:
+fi
+
+else
+  cs_cv_libbfd=no
+fi
+
+    cs_cv_with_libbfd="$with_libbfd"
+
+    if test "$cs_cv_libbfd" = yes; then
+  :
+else
+  :
+fi
+
+else
+  cs_cv_libbfd=no
+fi
+
+if test $cs_cv_libbfd = yes; then
+  if test "" != yes; then
+  echo "$as_me:$LINENO: checking if libbfd is usable" >&5
+echo $ECHO_N "checking if libbfd is usable... $ECHO_C" >&6
+if test "${cs_cv_libbfd_ok+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` `echo @@-L/usr/lib@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libbfd_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libbfd_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libbfd_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <bfd.h>
+int
+main ()
+{
+bfd* p;
+	    asection* s;
+	    bfd_init();
+	    p = bfd_openr(0,0);
+	    bfd_check_format(p,bfd_object);
+	    bfd_get_section_by_name(p,0);
+	    bfd_section_size(p,s);
+	    bfd_get_section_contents(p,s,0,0,0);
+	    bfd_close(p);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libbfd_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libbfd_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libbfd_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libbfd_ok=yes
+		cs_cv_libbfd_ok_cflags=$cs_build_cflags
+		cs_cv_libbfd_ok_lflags=$cs_build_lflags
+		cs_cv_libbfd_ok_libs=$cs_build_libs
+else
+  cs_cv_libbfd_ok=no
+fi
+
+fi
+echo "$as_me:$LINENO: result: $cs_cv_libbfd_ok" >&5
+echo "${ECHO_T}$cs_cv_libbfd_ok" >&6
+else
+  echo "$as_me:$LINENO: checking if libbfd is usable" >&5
+echo $ECHO_N "checking if libbfd is usable... $ECHO_C" >&6
+	    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    cs_cflags_save="$CFLAGS"
+    cs_lflags_save="$LDFLAGS"
+    cs_libs_save="$LIBS"
+    cs_build_ok=no
+
+    for cs_build_item in `echo @@@ | sed 'y% %#%'` `echo @@-L/usr/lib@ | sed 'y% %#%'`
+    do
+
+    set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
+	{ for (i=1; i <= NF; ++i)
+	    { if ($i == "") print "filler"; else print $i } }'`
+    shift
+    if test $# -eq 0; then
+  cs_dummy=''
+else
+  if test "$1" = filler; then
+  cs_dummy=''
+else
+  cs_dummy=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_cflags_test=''
+else
+  if test "$1" = filler; then
+  cs_cflags_test=''
+else
+  cs_cflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_lflags_test=''
+else
+  if test "$1" = filler; then
+  cs_lflags_test=''
+else
+  cs_lflags_test=$1
+fi
+
+	shift
+fi
+if test $# -eq 0; then
+  cs_libs_test=''
+else
+  if test "$1" = filler; then
+  cs_libs_test=''
+else
+  cs_libs_test=$1
+fi
+
+	shift
+fi
+
+    cs_cflags_test=`echo $cs_cflags_test | sed 'y%#% %'`
+    cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
+    cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
+
+	CFLAGS="$cs_cflags_test $cs_cv_libbfd_cflags $cs_cflags_save"
+	LDFLAGS="$cs_lflags_test $cs_cv_libbfd_lflags $cs_lflags_save"
+	LIBS="$cs_libs_test $cs_cv_libbfd_libs $cs_libs_save"
+	cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <bfd.h>
+int
+main ()
+{
+bfd* p;
+	    asection* s;
+	    bfd_init();
+	    p = bfd_openr(0,0);
+	    bfd_check_format(p,bfd_object);
+	    bfd_get_section_by_name(p,0);
+	    bfd_section_size(p,s);
+	    bfd_get_section_contents(p,s,0,0,0);
+	    bfd_close(p);
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=yes
+	    break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+    done
+
+    CFLAGS=$cs_cflags_save
+    LDFLAGS=$cs_lflags_save
+    LIBS=$cs_libs_save
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+    if test $cs_build_ok = yes; then
+  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_libbfd_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_lflags=`echo x$cs_lflags_test $cs_cv_libbfd_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libbfd_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_libbfd_ok=yes
+		cs_cv_libbfd_ok_cflags=$cs_build_cflags
+		cs_cv_libbfd_ok_lflags=$cs_build_lflags
+		cs_cv_libbfd_ok_libs=$cs_build_libs
+else
+  cs_cv_libbfd_ok=no
+fi
+
+	    echo "$as_me:$LINENO: result: $cs_cv_libbfd_ok" >&5
+echo "${ECHO_T}$cs_cv_libbfd_ok" >&6
+fi
+
+    if test $cs_cv_libbfd_ok = yes; then
+  if test "$cs_cv_libbfd_ok" = yes; then
+  cs_build_prop_val=`echo xyes | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}LIBBFD.AVAILABLE = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.AVAILABLE ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}LIBBFD.CFLAGS = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.CFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_lflags $cs_cv_libbfd_ok_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}LIBBFD.LFLAGS = $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}LIBBFD.LFLAGS ?= \"$cs_build_prop_val\" ;
+"
+fi
+
+fi
+
+	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}LFLAGS.SYSTEM += $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+	cs_build_prop_val=`echo x$cs_cv_libbfd_ok_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    if test -n "$cs_build_prop_val"; then
+  cs_makefile_text="${cs_makefile_text}LIBS.EXE += $cs_build_prop_val
+"
+    cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS += \"$cs_build_prop_val\" ;
+"
+fi
+
+else
+  cs_cv_libbfd_ok_cflags=''
+	cs_cv_libbfd_ok_lflags=''
+	cs_cv_libbfd_ok_libs=''
+	:
+fi
+
+fi
+
+
+
+
+#------------------------------------------------------------------------------
 # Determine build mode; either "optimize", "debug", or "profile".
 #------------------------------------------------------------------------------
 # Check whether --enable-optimize or --disable-optimize was given.
@@ -27655,75 +27749,6 @@ cs_build_prop_val=`echo x$cs_build_mode | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 "
     cs_jamconfig_text="${cs_jamconfig_text}MODE ?= \"$cs_build_prop_val\" ;
 "
-fi
-
-
-
-
-#------------------------------------------------------------------------------
-# Determine if modules should be built as plugins or static link libraries.
-# Also determine if plugin meta-information should be embedded directly into
-# the plugin module or if it should exist in a stand-alone .csplugin file.
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking whether to build plugins" >&5
-echo $ECHO_N "checking whether to build plugins... $ECHO_C" >&6
-# Check whether --enable-plugins or --disable-plugins was given.
-if test "${enable_plugins+set}" = set; then
-  enableval="$enable_plugins"
-
-else
-  enable_plugins=yes
-fi;
-echo "$as_me:$LINENO: result: $enable_plugins" >&5
-echo "${ECHO_T}$enable_plugins" >&6
-cs_build_prop_val=`echo x$enable_plugins | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}USE_PLUGINS = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}USE_PLUGINS ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-if test $enable_plugins != yes; then
-  cs_header_text="${cs_header_text}#define CS_STATIC_LINKED
-"
-fi
-
-
-if test $enable_plugins = yes; then
-  echo "$as_me:$LINENO: checking whether to embed plugin meta-information" >&5
-echo $ECHO_N "checking whether to embed plugin meta-information... $ECHO_C" >&6
-    # Check whether --enable-meta-info-embedding or --disable-meta-info-embedding was given.
-if test "${enable_meta_info_embedding+set}" = set; then
-  enableval="$enable_meta_info_embedding"
-
-else
-  enable_meta_info_embedding=yes
-fi;
-    echo "$as_me:$LINENO: result: $enable_meta_info_embedding" >&5
-echo "${ECHO_T}$enable_meta_info_embedding" >&6
-    cs_build_prop_val=`echo x$enable_meta_info_embedding | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}EMBED_META = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}EMBED_META ?= \"$cs_build_prop_val\" ;
-"
-fi
-
-    if test $enable_meta_info_embedding = yes; then
-  cs_header_text="${cs_header_text}#define CS_EMBED_PLUGIN_META
-"
-fi
-
-else
-  cs_build_prop_val=`echo xno | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-    if test -n "$cs_build_prop_val"; then
-  cs_makefile_text="${cs_makefile_text}EMBED_META = $cs_build_prop_val
-"
-    cs_jamconfig_text="${cs_jamconfig_text}EMBED_META ?= \"$cs_build_prop_val\" ;
-"
-fi
-
 fi
 
 
@@ -28806,6 +28831,8 @@ s,@DLLWRAP@,$DLLWRAP,;t t
 s,@ac_ct_DLLWRAP@,$ac_ct_DLLWRAP,;t t
 s,@WINDRES@,$WINDRES,;t t
 s,@ac_ct_WINDRES@,$ac_ct_WINDRES,;t t
+s,@OBJCOPY@,$OBJCOPY,;t t
+s,@ac_ct_OBJCOPY@,$ac_ct_OBJCOPY,;t t
 s,@FLEXBIN@,$FLEXBIN,;t t
 s,@BISONBIN@,$BISONBIN,;t t
 s,@DOXYGEN@,$DOXYGEN,;t t
@@ -28832,8 +28859,6 @@ s,@FT2_CONFIG@,$FT2_CONFIG,;t t
 s,@FT2_CFLAGS@,$FT2_CFLAGS,;t t
 s,@FT2_LIBS@,$FT2_LIBS,;t t
 s,@SDLCONFIG@,$SDLCONFIG,;t t
-s,@OBJCOPY@,$OBJCOPY,;t t
-s,@ac_ct_OBJCOPY@,$ac_ct_OBJCOPY,;t t
 s,@CGC@,$CGC,;t t
 s,@CXXCPP@,$CXXCPP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t

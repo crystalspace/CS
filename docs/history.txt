@@ -20,6 +20,17 @@ chronological order.
 	    - Was incorrectly emitting OS_MACOSX when building for Darwin.
 	    - Neglected to emit OS_UNIX when building for MacOX/X (in addition
 	      to OS_MACOSX which it was correctly emitting).
+	- Eric Sunshine augumented configure.ac so that plugin meta-information
+	  embedding is disabled by default for platforms on which libbfd
+	  accesses the embedded information, since libbfd uses a GPL license
+	  which is incompatible with Crystal Space's LGPL license.  People who
+	  do not mind having their project infected by the GPL libbfd library
+	  must enable embedding explicitly.
+	- Eric Sunshine augmented configure.ac so that it no longer performs
+	  the libbfd check if plugin meta-information embedding is disabled.
+	  Previously it performed the check regardless, which could result in
+	  -lbfd appearing in the link statement even when embedding was
+	  disabled.
 27-Sep-2003
 	- Eric Sunshine made minor clarifications to the "SCF Changes" section
 	  of the "Release Notes 0.96 to 0.98" appendix in the user manual.
