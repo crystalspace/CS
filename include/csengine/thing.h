@@ -52,6 +52,7 @@ struct iShadowBlockList;
 struct csVisObjInfo;
 struct iGraphics3D;
 struct iRenderView;
+struct iMovable;
 class Dumper;
 
 /**
@@ -226,6 +227,14 @@ private:
 
   /// Bounding box in object space.
   csBox3 obj_bbox;
+  /**
+   * Bounding box in world space.
+   * This is a cache for GetBoundingBox(iMovable,csBox3) which
+   * will recalculate this if the movable changes (by using movablenr).
+   */
+  csBox3 wor_bbox;
+  /// Last movable number that was used for the bounding box in world space.
+  long wor_bbox_movablenr;
 
   /// If true then the bounding box in object space is valid.
   bool obj_bbox_valid;
@@ -616,6 +625,11 @@ public:
    * This is calculated based on the oriented bounding box.
    */
   void GetBoundingBox (csBox3& box);
+
+  /**
+   * Get the bounding box for this object given some transformation (movable).
+   */
+  void GetBoundingBox (iMovable* movable, csBox3& box);
 
   /**
    * Get the radius in object space for this polygon set.

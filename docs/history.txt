@@ -1,5 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
+23-Mar-2001:
+	- Did an optimization in the CheckFrustum routines. It was apparantly
+	  doing a copy of every polygon without actually using that copy.
+	- Changed the polygon handling functions in CheckFrustum to use object
+	  space instead of world space. For bsp type polygons (for visibility
+	  testing of object) world space == object space and for normal
+	  polygons this is also true for all things that are merged in a
+	  bsp tree.
+	- Added csThing::GetBoundingBox() which takes a movable and calculates
+	  a bounding box based on the object space bounding box and that
+	  movable. It will automatically cache the bounding box so that when
+	  the object doesn't move nothing is recalculated.
+	- By using this new GetBoundingBox() function I completely avoided
+	  the use of world space coordinates for things in csSector which is
+	  as it should be.
 22-Mar-2001:
 	- Rewrote the CheckFrustum and shadow stuff so that most of it now
 	  uses the SCF interfaces instead of the classes.

@@ -125,6 +125,7 @@ csThing::csThing (csEngine* engine, bool is_sky, bool is_template) :
 
   cameranr = -1;
   movablenr = -1;
+  wor_bbox_movablenr = -1;
   cached_movable = NULL;
 
   cfg_moving = CS_THING_MOVE_NEVER;
@@ -1154,6 +1155,28 @@ void csThing::GetBoundingBox (csBox3& box)
   obj_bbox.Set (min_bbox, max_bbox);
   box = obj_bbox;
   obj_radius = (max_bbox - min_bbox) * 0.5f;
+}
+
+void csThing::GetBoundingBox (iMovable* movable, csBox3& box)
+{
+  if (wor_bbox_movablenr != movable->GetUpdateNumber ())
+  {
+    // First make sure obj_bbox is valid.
+    GetBoundingBox (box);
+    wor_bbox_movablenr = movable->GetUpdateNumber ();
+    // @@@ Maybe it would be better to really calculate the bounding box
+    // here instead of just transforming the object space bounding box?
+    csReversibleTransform movtrans = movable->GetFullTransform ();
+    wor_bbox.StartBoundingBox (movtrans.This2Other (obj_bbox.GetCorner (0)));
+    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (1)));
+    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (2)));
+    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (3)));
+    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (4)));
+    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (5)));
+    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (6)));
+    wor_bbox.AddBoundingVertexSmart (movtrans.This2Other (obj_bbox.GetCorner (7)));
+  }
+  box = wor_bbox;
 }
 
 //-------------------------------------------------------------------------

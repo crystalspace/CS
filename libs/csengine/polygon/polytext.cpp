@@ -377,7 +377,7 @@ void csPolyTexture::ProcessDelayedLightmaps (csFrustumView *lview,
  * Since not all polygons that share a lightmap may be hit by a single light,
  * the ProcessDelayedLightmaps method is called as soon as a frustumview
  * is going to be destroyed, so that all lightmaps which's lighting was
- * postponed can be processeed at least now.
+ * postponed can be processed at least now.
  */
 bool csPolyTexture::GetLightmapBounds (const csVector3& lightpos, bool mirror,
 	csVector3 *bounds)

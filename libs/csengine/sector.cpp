@@ -1015,26 +1015,12 @@ void* csSector::CheckFrustumPolygons (csSector*,
   csPolygon3D* p;
   CheckFrustData* fdata = (CheckFrustData*)data;
   csFrustumView* lview = fdata->lview;
-  csVector3& center = lview->light_frustum->GetOrigin ();
-  int i, j;
+  int i;
   for (i = 0 ; i < num ; i++)
   {
     p = (csPolygon3D*)polygon[i];
     if (p->GetUnsplitPolygon ()) p = (csPolygon3D*)(p->GetUnsplitPolygon ());
-
-    csVector3 poly[50];	// @@@ HARDCODED! BAD!
-    for (j = 0 ; j < p->GetNumVertices () ; j++)
-      poly[j] = p->Vwor (j)-center;
-    if (p->GetPortal ())
-    {
-      lview->poly_func ((csObject*)p, lview);
-    }
-    else
-    {
-      //@@@ ONLY DO THIS WHEN QUADTREE IS USED!!!
-      //csEngine::current_engine->GetQuadcube ()->InsertPolygon (poly, p->GetNumVertices ());
-      lview->poly_func ((csObject*)p, lview);
-    }
+    lview->poly_func ((csObject*)p, lview);
   }
   return NULL;
 }
@@ -1137,8 +1123,9 @@ void* CheckFrustumPolygonsFB (csThing* thing,
     if (polygon[i]->GetType () != 1) continue;
     p = (csPolygon3D*)polygon[i];
 
+    // Polygons that are merged with the octree have world==obj space.
     for (j = 0 ; j < p->GetNumVertices () ; j++)
-      poly[j] = p->Vwor (j)-center;
+      poly[j] = p->Vobj (j)-center;
     bool vis = false;
 
     float clas = p->GetPlane ()->GetWorldPlane ().Classify (center);
@@ -1166,10 +1153,12 @@ void* CheckFrustumPolygonsFB (csThing* thing,
       csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
       pl.DD += center * pl.norm;
       pl.Invert ();
-      csFrustum* frust = lview->GetShadows ()->GetLastShadowBlock ()->AddShadow (center,
-	  	(void*)p, p->GetVertices ().GetNumVertices (), pl);
+      csFrustum* frust = lview->GetShadows ()->GetLastShadowBlock ()->
+      		AddShadow (center, (void*)p,
+		p->GetVertices ().GetNumVertices (), pl);
+      // Polygons that are merged with the octree have world==obj space.
       for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
-        frust->GetVertex (j).Set (p->Vwor (j)-center);
+        frust->GetVertex (j).Set (p->Vobj (j)-center);
       frust_cnt--;
       if (frust_cnt < 0)
       {
@@ -1260,8 +1249,7 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
 {
   csFrustum* lf = lview.light_frustum;
   bool infinite = lf->IsInfinite ();
-  csVector3& center = lf->GetOrigin ();
-  csThingBBox* bbox;
+  csVector3& c = lf->GetOrigin ();
   bool vis;
   int i, i1;
   int j;
@@ -1279,66 +1267,50 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
     if (infinite) vis = true;
     else
     {
-      bbox = sp->GetBoundingBox ();
-      if (bbox)
+      csBox3 bbox;
+      sp->GetBoundingBox (&(sp->GetMovable ().scfiMovable), bbox);
+      // Here we do a quick test to see if the bounding box is visible in
+      // in the frustum. This test is not complete in the sense that it will
+      // say that some bounding boxes are visible even if they are not. But
+      // it is correct in the sense that if it says a bounding box
+      // is invisible, then it certainly is invisible.
+      //
+      // It works by taking all vertices of the bounding box. If
+      // ALL of them are on the outside of the same plane from the
+      // frustum then the object is certainly not visible.
+      vis = true;
+      i1 = lf->GetNumVertices ()-1;
+      for (i = 0 ; i < lf->GetNumVertices () ; i1 = i, i++)
       {
-        // If we have a bounding box then we can do a quick test to
-	// see if the bounding box is visible in the frustum. This
-	// test is not complete in the sense that it will say that
-	// some bounding boxes are visible even if they are not. But
-	// it is correct in the sense that if it says a bounding box
-	// is invisible, then it certainly is invisible.
-	//
-	// It works by taking all vertices of the bounding box. If
-	// ALL of them are on the outside of the same plane from the
-	// frustum then the object is certainly not visible.
-	vis = true;
-	i1 = lf->GetNumVertices ()-1;
-	for (i = 0 ; i < lf->GetNumVertices () ; i1 = i, i++)
-	{
-	  csVector3& v1 = lf->GetVertex (i);
-	  csVector3& v2 = lf->GetVertex (i1);
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i1)-center, v1, v2) < 0)
-	  	continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i2)-center, v1, v2) < 0)
-	  	continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i3)-center, v1, v2) < 0)
-	  	continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i4)-center, v1, v2) < 0)
-	  	continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i5)-center, v1, v2) < 0)
-	  	continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i6)-center, v1, v2) < 0)
-	  	continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i7)-center, v1, v2) < 0)
-	  	continue;
-	  if (csMath3::WhichSide3D (sp->Vwor (bbox->i8)-center, v1, v2) < 0)
-	  	continue;
-	  // Here we have a case of all vertices of the bbox being on the
-	  // outside of the same plane.
-	  vis = false;
-	  break;
-	}
-	if (vis && lf->GetBackPlane ())
-	{
-	  // If still visible then we can also check the back plane.
-	  // @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTUMS CURRENTLY DON'T
-	  // HAVE A BACK PLANE YET.
-	  if (!csMath3::Visible (sp->Vwor (bbox->i1)-center, *lf->GetBackPlane ()) &&
-	      !csMath3::Visible (sp->Vwor (bbox->i2)-center, *lf->GetBackPlane ()) &&
-	      !csMath3::Visible (sp->Vwor (bbox->i3)-center, *lf->GetBackPlane ()) &&
-	      !csMath3::Visible (sp->Vwor (bbox->i4)-center, *lf->GetBackPlane ()) &&
-	      !csMath3::Visible (sp->Vwor (bbox->i5)-center, *lf->GetBackPlane ()) &&
-	      !csMath3::Visible (sp->Vwor (bbox->i6)-center, *lf->GetBackPlane ()) &&
-	      !csMath3::Visible (sp->Vwor (bbox->i7)-center, *lf->GetBackPlane ()) &&
-	      !csMath3::Visible (sp->Vwor (bbox->i8)-center, *lf->GetBackPlane ()))
-	    vis = false;
-	}
+        csVector3& v1 = lf->GetVertex (i);
+        csVector3& v2 = lf->GetVertex (i1);
+        if (csMath3::WhichSide3D (bbox.GetCorner (0)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (1)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (2)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (3)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (4)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (5)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (6)-c, v1, v2) < 0) continue;
+        if (csMath3::WhichSide3D (bbox.GetCorner (7)-c, v1, v2) < 0) continue;
+        // Here we have a case of all vertices of the bbox being on the
+        // outside of the same plane.
+        vis = false;
+        break;
       }
-      else
+      if (vis && lf->GetBackPlane ())
       {
-        CsPrintf (MSG_WARNING, "Bounding box for thing not found!\n");
-        vis = true;
+        // If still visible then we can also check the back plane.
+        // @@@ NOTE THIS IS UNTESTED CODE. LIGHT_FRUSTUMS CURRENTLY DON'T
+        // HAVE A BACK PLANE YET.
+        if (!csMath3::Visible (bbox.GetCorner (0)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (1)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (2)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (3)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (4)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (5)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (6)-c, *lf->GetBackPlane ()) &&
+            !csMath3::Visible (bbox.GetCorner (7)-c, *lf->GetBackPlane ()))
+          vis = false;
       }
     }
 
@@ -1513,29 +1485,19 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
 	bool do_things, bool do_meshes, bool /*do_terrain*/)
 {
   bbox.StartBoundingBox ();
+  csBox3 b;
   int i;
   if (do_things)
     for (i = 0 ; i < things.Length () ; i++)
     {
       csThing* th = (csThing*)things[i];
-      csThingBBox* pset_bbox = th->GetBoundingBox ();
-      if (pset_bbox)
-      {
-        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i1));
-        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i2));
-        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i3));
-        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i4));
-        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i5));
-        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i6));
-        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i7));
-        bbox.AddBoundingVertex (th->Vwor (pset_bbox->i8));
-      }
+      th->GetBoundingBox (&(th->GetMovable ().scfiMovable), b);
+      bbox += b;
     }
   if (do_meshes)
     for (i = 0 ; i < meshes.Length () ; i++)
     {
       csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
-      csBox3 b;
       mesh->GetTransformedBoundingBox (mesh->GetMovable ().GetTransform (), b);
       bbox += b;
     }
