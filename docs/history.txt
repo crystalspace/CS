@@ -56,6 +56,8 @@ chronological order.
 	- Eric Sunshine made a bunch of Doxygen comment corrections in AWS
 	  headers.
 	- Jorrit clarified some Doxygen comments for iMovable.
+	- Jorrit changed the shader compiler to give more verbose diagnostics
+	  when -verbose commandline option is given.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during

@@ -128,7 +128,8 @@ private:
       return owner->GetVariableRecursive (name);
     }
     /// Fill a csShaderVariableList. Return number of variables filled
-    virtual unsigned int FillVariableList (csShaderVariableProxyList *list) const
+    virtual unsigned int FillVariableList (
+	csShaderVariableProxyList *list) const
     {
       return staticVariables.FillVariableList (list);
     }
@@ -220,7 +221,7 @@ public:
 private:
   void Report (int severity, const char* msg, ...);
 
-  //struct to hold all techniques, until we decide which to use
+  // struct to hold all techniques, until we decide which to use
   struct techniqueKeeper
   {
     techniqueKeeper(iDocumentNode *n, unsigned int p) : node(n), priority(p)
@@ -231,19 +232,23 @@ private:
 
   static int CompareTechniqueKeeper(void const* item1, void const* item2);
   
-  //load one technique, and create shader from it
+  // load one technique, and create shader from it
   csPtr<csXMLShader> CompileTechnique (iDocumentNode *node, 
     const char* shaderName, iDocumentNode *parentSV = 0);
 
-  //load one pass, return false if it fails
+  // load one pass, return false if it fails
   bool LoadPass (iDocumentNode *node, csXMLShader::shaderPass *pass);
 
-  //load a shaderdefinition block
+  // load a shaderdefinition block
   bool LoadSVBlock (iDocumentNode *node, csShaderVariableContextHelper*
     staticVariables, csShaderVariableProxyList *dynamicVariables) ;
 
-  //load a shaderprogram
-  csPtr<iShaderProgram> LoadProgram (iDocumentNode *node, csXMLShader::shaderPass *pass);
+  // load a shaderprogram
+  csPtr<iShaderProgram> LoadProgram (iDocumentNode *node,
+	csXMLShader::shaderPass *pass);
+
+  // Set reason for failure.
+  void SetFailReason (const char* reason);
 
   /// XML Token and management
   csStringHash xmltokens;
@@ -256,6 +261,9 @@ private:
   csRef<iStringSet> strings;
   csRef<iGraphics3D> g3d;
   csRef<iSyntaxService> synldr;
+
+  bool do_verbose;
+  char* fail_reason;
 };
 
 #endif

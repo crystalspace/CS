@@ -20,6 +20,7 @@
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
+#include "iutil/cmdline.h"
 #include "imap/services.h"
 #include "ivaria/reporter.h"
 #include "ivideo/rendermesh.h"
@@ -50,11 +51,18 @@ csXMLShaderCompiler::csXMLShaderCompiler(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
   init_token_table (xmltokens);
+  fail_reason = 0;
 }
 
 csXMLShaderCompiler::~csXMLShaderCompiler()
 {
+  delete[] fail_reason;
+}
 
+void csXMLShaderCompiler::SetFailReason (const char* reason)
+{
+  delete[] fail_reason;
+  fail_reason = csStrNew (reason);
 }
 
 void csXMLShaderCompiler::Report (int severity, const char* msg, ...)
@@ -74,12 +82,19 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
     object_reg, "crystalspace.shared.stringset", iStringSet);
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  synldr = CS_QUERY_REGISTRY (objectreg, iSyntaxService);
+  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
+  	object_reg, iCommandLineParser);
+  if (cmdline)
+    do_verbose = (cmdline->GetOption ("verbose") != 0);
+  else
+    do_verbose = false;
 
   return true;
 }
 
-int csXMLShaderCompiler::CompareTechniqueKeeper(void const* item1, void const* item2)
+int csXMLShaderCompiler::CompareTechniqueKeeper (void const* item1,
+	void const* item2)
 {
   techniqueKeeper *t1, *t2;
   t1 = (techniqueKeeper*) item1;
@@ -100,8 +115,8 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
 
   csArray<techniqueKeeper> techniquesTmp;
 
-  //read in the techniques
-  while(it->HasNext ())
+  // Read in the techniques.
+  while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () == CS_NODE_ELEMENT &&
@@ -123,29 +138,48 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ)
   {
     techniqueKeeper tk = techIt.Next();
     shader = CompileTechnique (tk.node, shaderName, templ);
-    if (shader != 0) break;
+    if (shader != 0)
+    {
+      if (do_verbose)
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Shader '%s': Technique with priority %d succeeds!",
+	  shaderName, tk.priority);
+      break;
+    }
+    else
+    {
+      if (do_verbose)
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  "Shader '%s': Technique with priority %d fails. Reason: %s.",
+	  shaderName, tk.priority,
+	  fail_reason);
+    }
   }
 
   if (shader == 0)
   {
     // @@@ Or a warning instead?
-    Report (CS_REPORTER_SEVERITY_NOTIFY,
+    Report (CS_REPORTER_SEVERITY_WARNING,
       "No technique validated for shader '%s'", shaderName);
   }
 
   return csPtr<iShader> (csRef<iShader> (shader));
 }
 
-csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
-							  const char* shaderName,
-							  iDocumentNode *parentSV)
+csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (
+	iDocumentNode *node,
+	const char* shaderName,
+	iDocumentNode *parentSV)
 {
   //check nodetype
   if (node->GetType()!=CS_NODE_ELEMENT || 
-    xmltokens.Request (node->GetValue()) != XMLTOKEN_TECHNIQUE)
+      xmltokens.Request (node->GetValue()) != XMLTOKEN_TECHNIQUE)
+  {
+    if (do_verbose) SetFailReason ("Node is not a well formed technique");
     return 0;
+  }
 
-  csRef<csXMLShader> newShader (csPtr<csXMLShader> (new csXMLShader (g3d)));
+  csRef<csXMLShader> newShader = csPtr<csXMLShader> (new csXMLShader (g3d));
   newShader->name = csStrNew (shaderName);
 
   //count passes
@@ -164,14 +198,16 @@ csPtr<csXMLShader> csXMLShaderCompiler::CompileTechnique (iDocumentNode *node,
     csRef<iDocumentNode> varNode = parentSV->GetNode(
       xmltokens.Request (XMLTOKEN_SHADERVAR));
     if (varNode)
-      LoadSVBlock (varNode, &newShader->staticVariables, &newShader->dynamicVariables);
+      LoadSVBlock (varNode, &newShader->staticVariables,
+      	&newShader->dynamicVariables);
   }
 
   csRef<iDocumentNode> varNode = node->GetNode(
     xmltokens.Request (XMLTOKEN_SHADERVAR));
 
   if (varNode)
-    LoadSVBlock (varNode, &newShader->staticVariables, &newShader->dynamicVariables);
+    LoadSVBlock (varNode, &newShader->staticVariables,
+    	&newShader->dynamicVariables);
 
   //alloc passes
   newShader->passes = 
@@ -226,9 +262,12 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       pass->vp = program;
     else
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Vertex Program for shader '%s' failed to load",
-	pass->owner->GetName ());
+      if (do_verbose)
+        SetFailReason ("vertex program failed to load");
+      else
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+	  "Vertex Program for shader '%s' failed to load",
+	  pass->owner->GetName ());
       return false;
     }
   }
@@ -242,9 +281,12 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       pass->fp = program;
     else
     {
-      Report (CS_REPORTER_SEVERITY_WARNING, 
-	"Fragment Program for shader '%s' failed to load",
-	pass->owner->GetName ());
+      if (do_verbose)
+        SetFailReason ("fragment program failed to load");
+      else
+        Report (CS_REPORTER_SEVERITY_WARNING, 
+	  "Fragment Program for shader '%s' failed to load",
+	  pass->owner->GetName ());
       return false;
     }
   }
@@ -391,7 +433,8 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       varRef = pass->GetVariableRecursive(pass->bufferID[pass->bufferCount]);
 
       if(!varRef)
-        varRef = pass->owner->GetVariableRecursive(pass->bufferID[pass->bufferCount]);
+        varRef = pass->owner->GetVariableRecursive (
+		pass->bufferID[pass->bufferCount]);
 
       //pass->bufferRef[a] = varRef; //FETCH REF IF IT EXSISTS AT THIS POINT
       if (!varRef)
