@@ -8,10 +8,12 @@ vpath %.cpp $(SRCDIR)/plugins/video/canvas/common
 
 INC.COMMON.DRV2D = \
   plugins/video/canvas/common/graph2d.h \
-  plugins/video/canvas/common/scrshot.h
+  plugins/video/canvas/common/scrshot.h \
+  plugins/video/canvas/common/fontcache.h
 SRC.COMMON.DRV2D = \
   plugins/video/canvas/common/graph2d.cpp \
-  plugins/video/canvas/common/scrshot.cpp
+  plugins/video/canvas/common/scrshot.cpp \
+  plugins/video/canvas/common/fontcache.cpp
 
 INC.COMMON.DRV2D.OPENGL = plugins/video/canvas/openglcommon/*.h
 SRC.COMMON.DRV2D.OPENGL = plugins/video/canvas/openglcommon/*.cpp

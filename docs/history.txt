@@ -73,6 +73,9 @@ chronological order.
 	  bbox.
 	- Jorrit removed unneeded SCF_QUERY_INTERFACE for iPolygonMesh
 	  from odedynamics plugin.
+	- res added the new fontcache.* files to the list of "common canvas
+	  sources" in plugins/video/canvas/canvas.mak, fixing build errors
+	  of GL plugins.
 11-Aug-2003
         - Philip Wyett changed #include "cal3d/cal3d" to
           #include <cal3d/cal3d.h> and dropped below other includes fixing
