@@ -67,7 +67,29 @@ GetRegistryInstallPath (const HKEY parentKey, char *oInstallPath, size_t iBuffer
   return false;
 }
 
-char* csGetConfigPath ()
+// ensures that the path as no trailing path delimiter
+static inline char* NewPathWOTrailingDelim (const char *path)
+{
+  char *newPath = csStrNew (path);
+  if (strlen(path) > 0)
+  {
+    char *end = &newPath[strlen(newPath) - 1];
+    if ((*end == '/') || (*end == '\\'))
+      *end = 0;
+  }
+  return newPath;
+}
+
+// cache configuration path
+struct _CfgPath {
+  char* path;
+  _CfgPath() { path = NULL; };
+  ~_CfgPath() { if (path) delete[] path; };
+};
+
+CS_IMPLEMENT_STATIC_VAR (getCachedCfgPath, _CfgPath, ())
+
+static inline char* FindConfigPath ()
 {
   // override the default to get install path from
   // 1. CRYSTAL environment variable
@@ -83,16 +105,16 @@ char* csGetConfigPath ()
   // the shared systemwide registry strategy; this is the best approach unless
   // someone implements a SetInstallPath() to override it before Open() is
   // called.
-  char *path = getenv ("CRYSTAL");
-  if (path && *path)
-    return csStrNew (path);
+  char *envpath = getenv ("CRYSTAL");
+  if (envpath && *envpath)
+    return NewPathWOTrailingDelim (envpath);
 
   // try the registry
-  path = new char[1024];
+  char path[1024];
   if (GetRegistryInstallPath (HKEY_CURRENT_USER, path, 1024))
-    return path;
+    return NewPathWOTrailingDelim (path);
   if (GetRegistryInstallPath (HKEY_LOCAL_MACHINE, path, 1024))
-    return path;
+    return NewPathWOTrailingDelim (path);
 
   // perhaps current drive/dir?
   FILE *test = fopen("scf.cfg", "r");
@@ -101,7 +123,7 @@ char* csGetConfigPath ()
     // use current dir
     fclose(test);
     strcpy(path, ".");
-    return path;
+    return csStrNew (path);
   }
 
   // directory where app is?
@@ -119,8 +141,7 @@ char* csGetConfigPath ()
   {
     // use current dir
     fclose(test);
-    strncpy (path, apppath, 1024);
-    return path;
+    return NewPathWOTrailingDelim (apppath);
   }
 
   // retrieve the path of the Program Files folder and append 
@@ -139,21 +160,31 @@ char* csGetConfigPath ()
 	if (SUCCEEDED(SHGetPathFromIDList (pidl, programpath)))
 	{
 	  strncpy (path, programpath, MIN(sizeof(programpath), 1024-30));
-	  strcat (path, "\\Crystal\\");
+	  strcat (path, "\\Crystal");
 	}
 	MAlloc->Free (pidl);
       }
       MAlloc->Release ();
     }
     if (programpath[0]) 
-      return path;
+      return csStrNew (path);
   }
 
   // nothing helps, use default
   // which is "C:\Program Files\Crystal\"
-  strncpy(path, "C:\\Program Files\\Crystal\\", 1024);
+  strncpy(path, "C:\\Program Files\\Crystal", 1024);
 
-  return path;
+  return csStrNew (path);
+}
+
+char* csGetConfigPath ()
+{
+  _CfgPath *cachedCfgPath = getCachedCfgPath();
+  if (cachedCfgPath->path == NULL)
+  {
+    cachedCfgPath->path = FindConfigPath();
+  }
+  return csStrNew (cachedCfgPath->path);
 }
 
 char** csGetPluginPaths ()

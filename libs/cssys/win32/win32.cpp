@@ -456,7 +456,7 @@ SCF_IMPLEMENT_IBASE (Win32Assistant)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-static void ToLower (char *dst, const char *src) 
+static inline void ToLower (char *dst, const char *src) 
 {
   char *d=dst;
   const char *s=src;
@@ -466,54 +466,38 @@ static void ToLower (char *dst, const char *src)
   *d=0;
 }
 
-bool csPlatformStartup(iObjectRegistry* r)
+static inline bool AddToPathEnv (char *dir, char **pathEnv)
 {
-  /*
-    When it isn't already in the PATH environment,
-    the CS directory will be put there in fornt of all
-    other paths.
-    The idea is that DLLs required by plugins (e.g. zlib)
-    which reside in the CS directory can be found by the
-    OS even if the application is somewhere else.
-   */
-
   // check if installdir is in the path.
   bool gotpath = false;
 
-  char installDir[MAX_PATH];
-  char* temp = csGetConfigPath ();
-  strncpy (installDir, temp, MAX_PATH);
-  delete[] temp;
-  size_t idlen = strlen(installDir);
+  size_t dlen = strlen(dir);
   // csGetInstallDir() might return "" (current dir)
-  if (idlen != 0)
+  if (dlen != 0)
   {
-    ToLower (installDir, installDir);
-    idlen--;
-    installDir[idlen] = 0;
+    ToLower (dir, dir);
   
-    const char* path = getenv("PATH");
-    if (path)
+    if (*pathEnv)
     {
-      char *mypath = new char[strlen(path) + 1];
-      ToLower (mypath, path);
+      char *mypath = new char[strlen(*pathEnv) + 1];
+      ToLower (mypath, *pathEnv);
 
-      char* ppos = strstr (mypath, installDir);
+      char* ppos = strstr (mypath, dir);
       while (!gotpath && ppos)
       {
         char* npos = strchr (ppos, ';');
         if (npos) *npos = 0;
 
-        if ((strlen (ppos) == idlen) || (strlen (ppos) == idlen+1))
+        if ((strlen (ppos) == dlen) || (strlen (ppos) == dlen+1))
         {
-	  if (ppos[idlen] == '\\') ppos[idlen] = 0;
-	  if (!strcmp (ppos, installDir))
+	  if (ppos[dlen] == '\\') ppos[dlen] = 0;
+	  if (!strcmp (ppos, dir))
 	  {
 	    // found it
 	    gotpath = true;
 	  }
         }
-        ppos = npos ? strstr (npos+1, installDir) : NULL;
+        ppos = npos ? strstr (npos+1, dir) : NULL;
       }
       delete[] mypath;
     }
@@ -521,14 +505,43 @@ bool csPlatformStartup(iObjectRegistry* r)
     if (!gotpath)
     {
       // put CRYSTAL path into PATH environment.
-      char *newpath = new char[(path?strlen(path):0) + strlen(installDir) + 2];
-      strcpy (newpath, installDir);
+      char *newpath = new char[(*pathEnv?strlen(*pathEnv):0) + strlen(dir) + 2];
+      strcpy (newpath, dir);
       strcat (newpath, ";");
-      if (path) strcat (newpath, path);
-      SetEnvironmentVariable ("PATH", newpath);
-      delete[] newpath;
+      if (*pathEnv) strcat (newpath, *pathEnv);
+      if (*pathEnv) delete[] *pathEnv;
+      *pathEnv = newpath;
+      return true;
     }
   }
+  return false;
+}
+
+bool csPlatformStartup(iObjectRegistry* r)
+{
+  /*
+    When it isn't already in the PATH environment,
+    the CS directory will be put there in front of all
+    other paths.
+    The idea is that DLLs required by plugins (e.g. zlib)
+    which reside in the CS directory can be found by the
+    OS even if the application is somewhere else.
+   */
+
+  char* pathEnv = csStrNew (getenv("PATH"));
+  bool pathChanged = false;
+
+  char** pluginpaths = csGetPluginPaths ();
+  for (int i=0; pluginpaths[i]!=0; i++)
+  {
+    if (AddToPathEnv (pluginpaths[i], &pathEnv)) pathChanged = true;
+
+    delete[] pluginpaths[i];
+  }
+  delete[] pluginpaths;
+
+  if (pathChanged) SetEnvironmentVariable ("PATH", pathEnv);
+  delete[] pathEnv;
 
   Win32Assistant* a = new Win32Assistant(r);
   bool ok = r->Register (static_cast<iWin32Assistant*>(a), "iWin32Assistant");

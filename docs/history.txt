@@ -27,6 +27,11 @@ The history order is reversed so that new features are at the top.
 	  1.14.  In particular, Base 1.14 failed to set cs_build_ok to "yes"
 	  and instead left the old value ("no") in place.
 	- De-obfuscated a loop in csHashMap::Delete().
+	- res made the following changes to the Win32 port:
+	  * csGetInstallPath() now always returns a path without trailing 
+	    delimiter.
+	  * all plugin directories are added to the PATH env var on startup.
+	  * the install path is cached between calls to csGetInstallPath().
 1-Mar-2003
 	- Greg Block changed the makefile for the xml documentsystem plugin to
 	  not override the values for the link flags to use when linking libxml
