@@ -24,8 +24,8 @@
 #include "cstypes.h"
 #endif
 
-#ifndef WIN32
-// Linux defines
+#if defined (COMP_GCC)
+// Linux, Mingw & Cygwin32 defines
 #ifdef DDG
 #include <strstream.h> 
 #endif
