@@ -402,8 +402,6 @@ void csPolygon3D::Finish ()
   }
 }
 
-#define USE_SUBTEX_OPT 1
-
 void csPolygon3D::CreateLightmaps (IGraphics3D* g3d)
 {
   if (!lightmap) return;
@@ -423,13 +421,9 @@ void csPolygon3D::CreateLightmaps (IGraphics3D* g3d)
     tex1->SetMipmapSize (def_mipmap_size);
   else
     tex1->SetMipmapSize (def_mipmap_size>>1);
-# if !USE_SUBTEX_OPT
-  tex1->lm = lightmap;
-# else
   CHK (lightmap1 = new csLightMap ());
   tex1->lm = lightmap1;
   lightmap1->CopyLightmap (lightmap);
-# endif
 
   tex2->SetMipmapSize (tex1->mipmap_size>>1);
 
@@ -437,20 +431,13 @@ void csPolygon3D::CreateLightmaps (IGraphics3D* g3d)
   // But with the new sub-texture optimization in combination with the dynamic
   // lighting extension this gives some problems. For the moment we just copy
   // the lightmaps even though they are actually the same.
-# if !USE_SUBTEX_OPT
-  tex2->lm = lightmap;
-# else
   CHK (lightmap2 = new csLightMap ());
   tex2->lm = lightmap2;
   lightmap2->CopyLightmap (lightmap);
-# endif
 
   if (tex2->mipmap_size < 1)
   {
     tex2->SetMipmapSize (1);
-#   if !USE_SUBTEX_OPT
-    CHK (delete lightmap2);
-#   endif
     CHK (lightmap2 = new csLightMap ());
     lightmap2->MipmapLightmap (TEXW(tex2), TEXH(tex2), 1, lightmap, TEXW(tex1), TEXH(tex1), tex1->mipmap_size);
     tex2->lm = lightmap2;
@@ -463,20 +450,14 @@ void csPolygon3D::CreateLightmaps (IGraphics3D* g3d)
   else
   {
     tex3->SetMipmapSize (tex2->mipmap_size>>1);
-#   if !USE_SUBTEX_OPT
-    tex3->lm = lightmap;
-#   else
     CHK (lightmap3 = new csLightMap ());
     tex3->lm = lightmap3;
     lightmap3->CopyLightmap (lightmap);
-#   endif
 
     if (tex3->mipmap_size < 1)
     {
       tex3->SetMipmapSize (1);
-#     if !USE_SUBTEX_OPT
       CHK (delete lightmap3);
-#     endif
       CHK (lightmap3 = new csLightMap ());
       lightmap3->MipmapLightmap (TEXW(tex3), TEXH(tex3), 1, lightmap, TEXW(tex2), TEXH(tex2), tex2->mipmap_size);
       tex3->lm = lightmap3;

@@ -432,15 +432,15 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
   //   0 -- horizontal
   //   1 -- vertical
 
-  int height=visible.bottom-visible.top;
-  int width=visible.right-visible.left;
+  int height=QInt (visible.bottom-visible.top);
+  int width=QInt (visible.right-visible.left);
 
   float a=calc_area (n,p2d);
   if (fabs (a-height*width)<EPS)
   {
     // this area is completely covered
 
-    int x=visible.left,y=visible.top;
+    int x=QInt (visible.left),y=QInt (visible.top);
     for (int i=0 ; i<height ; i++)
       for (int j=0 ; j<width ; j++)
   __draw_func (j+x, i+y, 1);
@@ -458,15 +458,15 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 
   if (height==1&&width==1)
   {
-    int x=visible.left, y=visible.top;
+    int x=QInt (visible.left), y=QInt (visible.top);
     __draw_func (x, y, a);
 
     depth--;
     return;
   }
 
-  int sub_x = visible.left+width/2;
-  int sub_y = visible.top+height/2;
+  int sub_x = QInt (visible.left+width/2);
+  int sub_y = QInt (visible.top+height/2);
 
   int how_to_divide=1;
 
@@ -734,13 +734,14 @@ void csPolyTexture::FillLightmap (csLightView& lview)
   poly_fill(rpv,rp,vis);
 
   uv=0;
-  for (int __uv,sy=0;sy<lh;sy++)
+  //int __uv;
+  for (int sy=0;sy<lh;sy++)
   {
     for (u=0;u<lw;u++,uv++)
     {
-  //@@@ (Note from Jorrit): The following test should not be needed
-  // but it appears to be anyway. 'uv' can get too large.
-  if (uv >= lm_size) continue;
+      //@@@ (Note from Jorrit): The following test should not be needed
+      // but it appears to be anyway. 'uv' can get too large.
+      if (uv >= lm_size) continue;
 
         float usual_value=1.0;
 
@@ -800,84 +801,84 @@ void csPolyTexture::FillLightmap (csLightView& lview)
             v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
           v2 = vv + m_t2w * v1;
 
-    // Check if the point on the polygon is shadowed. To do this
-    // we traverse all shadow frustrums and see if it is contained in any of them.
-    csShadowFrustrum* shadow_frust;
-    shadow_frust = lview.shadows.GetFirst ();
-    bool shadow = false;
-    while (shadow_frust)
-    {
-      if (shadow_frust->relevant && shadow_frust->polygon != polygon)
-        if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
-          { shadow = true; break; }
-      shadow_frust = shadow_frust->next;
-    }
-    if (!shadow) { rc = false; break; }
+	  // Check if the point on the polygon is shadowed. To do this
+	  // we traverse all shadow frustrums and see if it is contained in any of them.
+	  csShadowFrustrum* shadow_frust;
+	  shadow_frust = lview.shadows.GetFirst ();
+	  bool shadow = false;
+	  while (shadow_frust)
+	  {
+	    if (shadow_frust->relevant && shadow_frust->polygon != polygon)
+	      if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
+		{ shadow = true; break; }
+	    shadow_frust = shadow_frust->next;
+	  }
+	  if (!shadow) { rc = false; break; }
 
-    if (!do_accurate_things) break;
-    rc = true;
+	  if (!do_accurate_things) break;
+	  rc = true;
         }
 
         if (!rc)
         {
-    //@@@ I think this is wrong and the next line is right!
+    	  //@@@ I think this is wrong and the next line is right!
           //d = csSquaredDist::PointPoint (light->GetCenter (), v2);
           d = csSquaredDist::PointPoint (lview.light_frustrum->GetOrigin (), v2);
           DB ((MSG_DEBUG_0, "    -> In viewing frustrum (distance %f compared with radius %f)\n", sqrt (d), light->GetRadius ()));
 
-    if (d >= light->GetSquaredRadius ()) continue;
-    d = sqrt (d);
+	  if (d >= light->GetSquaredRadius ()) continue;
+	  d = sqrt (d);
           DB ((MSG_DEBUG_0, "    -> *** HIT ***\n"));
 
-    hit = true;
+	  hit = true;
 
-    l1 = mapR[uv];
+	  l1 = mapR[uv];
 
-    //@@@ I think this is wrong and the next line is right!
-    //float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
-    float cosinus = (v2-lview.light_frustrum->GetOrigin ())*polygon->GetPolyPlane ()->Normal ();
-    cosinus /= d;
-    cosinus += cosfact;
-    if (cosinus < 0) cosinus = 0;
-    else if (cosinus > 1) cosinus = 1;
-    if (dyn)
-    {
-      dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
-      l1 = l1 + lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl));
-      if (l1 > 255) l1 = 255;
-      mapR[uv] = l1;
-    }
-    else
-    {
-      if (lview.r > 0)
-      {
-        l1 = l1 + lightness*QRound (cosinus * r200d*(light->GetRadius () - d));
-        if (l1 > 255) l1 = 255;
-        mapR[uv] = l1;
-      }
-      if (lview.g > 0 && mapG)
-      {
-        l2 = mapG[uv] + lightness*QRound (cosinus * g200d*(light->GetRadius () - d));
-        if (l2 > 255) l2 = 255;
-        mapG[uv] = l2;
-      }
-      if (lview.b > 0 && mapB)
-      {
-        l3 = mapB[uv] + lightness*QRound (cosinus * b200d*(light->GetRadius () - d));
-        if (l3 > 255) l3 = 255;
-        mapB[uv] = l3;
-      }
-    }
+	  //@@@ I think this is wrong and the next line is right!
+	  //float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();
+	  float cosinus = (v2-lview.light_frustrum->GetOrigin ())*polygon->GetPolyPlane ()->Normal ();
+	  cosinus /= d;
+	  cosinus += cosfact;
+	  if (cosinus < 0) cosinus = 0;
+	  else if (cosinus > 1) cosinus = 1;
+	  if (dyn)
+	  {
+	    dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
+	    l1 = l1 + QInt (lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
+	    if (l1 > 255) l1 = 255;
+	    mapR[uv] = l1;
+	  }
+	  else
+	  {
+	    if (lview.r > 0)
+	    {
+	      l1 = l1 + QInt (lightness*QRound (cosinus * r200d*(light->GetRadius () - d)));
+	      if (l1 > 255) l1 = 255;
+	      mapR[uv] = l1;
+	    }
+	    if (lview.g > 0 && mapG)
+	    {
+	      l2 = mapG[uv] + QInt (lightness*QRound (cosinus * g200d*(light->GetRadius () - d)));
+	      if (l2 > 255) l2 = 255;
+	      mapG[uv] = l2;
+	    }
+	    if (lview.b > 0 && mapB)
+	    {
+	      l3 = mapB[uv] + QInt (lightness*QRound (cosinus * b200d*(light->GetRadius () - d)));
+	      if (l3 > 255) l3 = 255;
+	      mapB[uv] = l3;
+	    }
+	  }
         }
-        //mapR[uv] = 128;
-        //mapG[uv] = 128;
-        //mapB[uv] = 128;
-        //if (u == 0 && (v & 1)) { mapR[uv] = 255; mapG[uv] = 0; mapB[uv] = 0; }
-        //else if (v == 0 && (u & 1)) { mapR[uv] = 0; mapG[uv] = 255; mapB[uv] = 0; }
-        //else if (u == lw-1 && (v & 1)) { mapR[uv] = 0; mapG[uv] = 0; mapB[uv] = 255; }
-        //else if (v == lh-1 && (u & 1)) { mapR[uv] = 255; mapG[uv] = 0; mapB[uv] = 255; }
-        //else if (u == v) { mapR[uv] = 255; mapG[uv] = 255; mapB[uv] = 0; }
-        //else if (u == lh-1-v) { mapR[uv] = 0; mapG[uv] = 255; mapB[uv] = 255; }
+      //mapR[uv] = 128;
+      //mapG[uv] = 128;
+      //mapB[uv] = 128;
+      //if (u == 0 && (v & 1)) { mapR[uv] = 255; mapG[uv] = 0; mapB[uv] = 0; }
+      //else if (v == 0 && (u & 1)) { mapR[uv] = 0; mapG[uv] = 255; mapB[uv] = 0; }
+      //else if (u == lw-1 && (v & 1)) { mapR[uv] = 0; mapG[uv] = 0; mapB[uv] = 255; }
+      //else if (v == lh-1 && (u & 1)) { mapR[uv] = 255; mapG[uv] = 0; mapB[uv] = 255; }
+      //else if (u == v) { mapR[uv] = 255; mapG[uv] = 255; mapB[uv] = 0; }
+      //else if (u == lh-1-v) { mapR[uv] = 0; mapG[uv] = 255; mapB[uv] = 255; }
     }
   }
 

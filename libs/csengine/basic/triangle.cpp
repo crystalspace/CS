@@ -304,8 +304,6 @@ void csLOD::CalculateLOD (csTriangleMesh* mesh, csTriangleVertices* verts,
     emerge_from[i] = translate[to_vertices[col_idx]];
     col_idx--;
   }
-
-  int a=3;
 }
 
 //---------------------------------------------------------------------------

@@ -17,6 +17,7 @@
 */
 
 #include "sysdef.h"
+#include "qint.h"
 #include "csobject/nameobj.h"
 #include "csengine/objects/thing.h"
 #include "csengine/objects/thingtpl.h"
@@ -243,12 +244,12 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
       if (gouraud)
       {
-        control_x[0] = tess->GetVertex (ct.i1).control.x*lm_width;
-        control_y[0] = tess->GetVertex (ct.i1).control.y*lm_height;
-        control_x[1] = tess->GetVertex (ct.i2).control.x*lm_width;
-        control_y[1] = tess->GetVertex (ct.i2).control.y*lm_height;
-        control_x[2] = tess->GetVertex (ct.i3).control.x*lm_width;
-        control_y[2] = tess->GetVertex (ct.i3).control.y*lm_height;
+        control_x[0] = QInt (tess->GetVertex (ct.i1).control.x*lm_width);
+        control_y[0] = QInt (tess->GetVertex (ct.i1).control.y*lm_height);
+        control_x[1] = QInt (tess->GetVertex (ct.i2).control.x*lm_width);
+        control_y[1] = QInt (tess->GetVertex (ct.i2).control.y*lm_height);
+        control_x[2] = QInt (tess->GetVertex (ct.i3).control.x*lm_width);
+        control_y[2] = QInt (tess->GetVertex (ct.i3).control.y*lm_height);
       }
 
       bool visible = true;
