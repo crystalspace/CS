@@ -6,6 +6,8 @@ The history order has been reversed so that new features are at the top.
 	  proc texture was correctly initialized.
 	- Fixed csfx so that there is only one Initialize() method now
 	  as was originally intended.
+	- Disabled lighting for the fire polygon that is created in simple.
+	  Now fire will actually look like fire and not green :-)
 21-Dec-2000
 	- Philip Wyett fixed a small bug in texture.h.
 	- Philip also found a bug in ~SoftwareCachedTexture () which
