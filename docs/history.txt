@@ -48,6 +48,9 @@ The history order is reversed so that new features are at the top.
 	  Cygwin where structures and functions are defined differently between
 	  <winsock.h> and <sys/types.h> and <unistd.h>, all of which are
 	  present with Cygwin.
+	- Matze fixed socket problems on cygwin where winsock.h redefines
+	  fdset. You can define __USE_W32_SOCKETS before including any headers
+	  to avoid this problem.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.
