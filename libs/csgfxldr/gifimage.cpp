@@ -205,6 +205,8 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
   GIFStream gptr (iBuffer,iSize);
   GIFPalette palette;
   UByte ch;
+  int is_transparent = 0;
+  UByte transp_index = 0;
 
   if (strncmp( (char*)iBuffer, "GIF87a", 6) && strncmp( (char*)iBuffer, "GIF89a", 6)) 
     return GIF_BadFormat;
@@ -235,7 +237,18 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
     {
       case GRAPHIC_EXT:
 	ch = gptr.nextbyte();
-	if (*gptr & 0x1) (void)gptr; // image is transparent
+	if (*gptr & 0x1)
+	{
+	  // image is transparent
+	  is_transparent = 1;
+	  // get transparent color index - (ch==4), so the 3'th byte
+	  transp_index = gptr[3];
+	  csRGBcolor tcol = palette(transp_index);
+#ifdef CS_DEBUG
+	  printf("Transparent colour index is %d (%d,%d,%d).\n", 
+	    transp_index, tcol.red, tcol.green, tcol.blue);
+#endif // CS_DEBUG
+	}
 	gptr += ch;
 	break;
       case PLAINTEXT_EXT:
