@@ -36,6 +36,15 @@ chronological order.
 	  for cscript/csjava source files.
 	- res augmented annotate.php to mention that the documentation 
 	  annotations are not a support forum.
+	- Eric Sunshine made the following changes:
+	    - Augmented the CS_PATH_NORMALIZE() macro in path.m4 so that it
+	      also collapses and strips whitespace.
+	    - Added a CS_RUN_PATH_NORMALIZE() macro which runs a
+	      client-supplied command and normalizes the output.
+	    - Updated configure.ac so that it normalizes the `cflags' and
+	      `lflags' reported by these modules: cs-win32libs, Java,
+	      FreeType2, SDL, VOS, wxWidgets, AAlib.  (Flags for Perl and
+	      Python have been normalized since 15-Feb-2004.
 19-Oct-2004
 	- Jorrit worked further on foliage mesh. Added support for
 	  specifying LOD control in a foliage object.

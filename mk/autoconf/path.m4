@@ -22,6 +22,16 @@ AC_PREREQ([2.56])
 #------------------------------------------------------------------------------
 # CS_PATH_NORMALIZE(STRING)
 #	Normalize a pathname at run-time by transliterating Windows/DOS
-#	backslashes to forward slashes.
+#	backslashes to forward slashes.  Also collapses whitespace.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_PATH_NORMALIZE], [`echo x$1 | tr '\\\\' '/' | sed 's/^x//'`])
+AC_DEFUN([CS_PATH_NORMALIZE],
+[`echo x$1 | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`])
+
+
+#------------------------------------------------------------------------------
+# CS_RUN_PATH_NORMALIZE(COMMAND)
+#	Normalize the pathname emitted by COMMAND by transliterating
+#	Windows/DOS backslashes to forward slashes.  Also collapses whitespace.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_RUN_PATH_NORMALIZE],
+[`AC_RUN_LOG([$1]) | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`])

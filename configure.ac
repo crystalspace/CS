@@ -180,12 +180,12 @@ AS_IF([test $ac_compiler_gnu = yes],
 AC_CACHE_CHECK([for cslibs package], [cs_cv_cslibs],
     [AS_IF([test -n "$CSLIBS_CONFIG"],
 	[cs_cv_cslibs=yes
-	cs_cv_cslibs_cflags=`
-	    AC_RUN_LOG([$CSLIBS_CONFIG --cflags $cs_cv_cslibs_compiler])`
-	cs_cv_cslibs_lflags=`
-	    AC_RUN_LOG([$CSLIBS_CONFIG --lflags $cs_cv_cslibs_compiler])`
-	cs_cv_cslibs_binpath=`
-	    AC_RUN_LOG([$CSLIBS_CONFIG --binpath $cs_cv_cslibs_compiler])`],
+	cs_cv_cslibs_cflags=CS_RUN_PATH_NORMALIZE(
+	    [$CSLIBS_CONFIG --cflags $cs_cv_cslibs_compiler])
+	cs_cv_cslibs_lflags=CS_RUN_PATH_NORMALIZE(
+	    [$CSLIBS_CONFIG --lflags $cs_cv_cslibs_compiler])
+	cs_cv_cslibs_binpath=CS_RUN_PATH_NORMALIZE(
+	    [$CSLIBS_CONFIG --binpath $cs_cv_cslibs_compiler])],
 	[cs_cv_cslibs=no])])
 AS_IF([test $cs_cv_cslibs = yes],
     [CFLAGS="$CFLAGS $cs_cv_cslibs_cflags"
@@ -442,9 +442,7 @@ AS_IF([test -n "$PERL" && test "$with_perl" != no],
 		cs_cv_perl_ext=`AC_RUN_LOG([$PERL -V:dlext | \
 		    $PERL -e '<STDIN> =~ m/\x27(.*)\x27/; print $1'])`])])
 	cs_cv_perl_cflags=CS_PATH_NORMALIZE([$cs_cv_perl_cflags])
-	cs_cv_perl_cflags=CS_TRIM([$cs_cv_perl_cflags])
-	cs_cv_perl_lflags=CS_PATH_NORMALIZE([$cs_cv_perl_lflags])
-	cs_cv_perl_lflags=CS_TRIM([$cs_cv_perl_lflags])])
+	cs_cv_perl_lflags=CS_PATH_NORMALIZE([$cs_cv_perl_lflags])])
 
     AS_IF([test -n "$cs_cv_perl_cflags$cs_cv_perl_lflags"],
 	[CS_CHECK_BUILD([if Perl SDK is usable], [cs_cv_perl],
@@ -495,7 +493,8 @@ AC_DEFUN([CS_JAVA_FLAGS],
 	    esac
 	    AS_IF([test -n "$cs_java_platform"],
 		[$1_cflags="$$1_cflags
-		    $$1_cflags/$cs_java_platform"])])])])
+		    $$1_cflags/$cs_java_platform"])
+	    $1_cflags=CS_PATH_NORMALIZE([$$1_cflags])])])])
 
 AC_PATH_PROGS([JAVA], [java], [],
     [$PATH$PATH_SEPARATOR$JAVA_HOME/bin$PATH_SEPARATOR$JAVA_HOME/jre/bin])
@@ -1393,9 +1392,9 @@ AC_CHECK_TOOLS([FT2CONFIG], [freetype-config])
 AC_CACHE_CHECK([for FreeType2], [cs_cv_libft2],
     [AS_IF([test -n "$FT2CONFIG"],
 	[cs_cv_libft2=yes
-	cs_cv_libft2_cflags=`AC_RUN_LOG([$FT2CONFIG --cflags])`
+	cs_cv_libft2_cflags=CS_RUN_PATH_NORMALIZE([$FT2CONFIG --cflags])
 	cs_cv_libft2_lflags=''
-	cs_cv_libft2_libs=`AC_RUN_LOG([$FT2CONFIG --libs])`],
+	cs_cv_libft2_libs=CS_RUN_PATH_NORMALIZE([$FT2CONFIG --libs])],
 	[cs_cv_libft2=no])])
 
 AS_IF([test $cs_cv_libft2 = yes],
@@ -1469,9 +1468,9 @@ AC_CHECK_TOOLS([SDLCONFIG], [sdl12-config sdl11-config sdl-config])
 AC_CACHE_CHECK([for SDL], [cs_cv_libsdl],
     [AS_IF([test -n "$SDLCONFIG"],
 	[cs_cv_libsdl=yes
-	cs_cv_libsdl_cflags=`AC_RUN_LOG([$SDLCONFIG --cflags])`
+	cs_cv_libsdl_cflags=CS_RUN_PATH_NORMALIZE([$SDLCONFIG --cflags])
 	cs_cv_libsdl_lflags=''
-	cs_cv_libsdl_libs=`AC_RUN_LOG([$SDLCONFIG --libs])`],
+	cs_cv_libsdl_libs=CS_RUN_PATH_NORMALIZE([$SDLCONFIG --libs])],
 	[cs_cv_libsdl=no])])
 
 AS_IF([test $cs_cv_libsdl = yes],
@@ -1502,11 +1501,11 @@ AS_IF([test "$with_vos" != no],
 	[AS_IF([test -n "$PKGCONFIG"],
 	    [AS_IF([AC_RUN_LOG([$PKGCONFIG --exists libmetaobject_a3dl])],
 		[cs_cv_libvos=yes
-		cs_cv_libvos_cflags="`AC_RUN_LOG(
-		    [$PKGCONFIG --cflags cs_vos_pkgs])`"
+		cs_cv_libvos_cflags=CS_RUN_PATH_NORMALIZE(
+		    [$PKGCONFIG --cflags cs_vos_pkgs])
 		cs_cv_libvos_lflags=''
-		cs_cv_libvos_libs=`AC_RUN_LOG(
-		    [$PKGCONFIG --libs cs_vos_pkgs])`],
+		cs_cv_libvos_libs=CS_RUN_PATH_NORMALIZE(
+		    [$PKGCONFIG --libs cs_vos_pkgs])],
 		[cs_cv_libvos=no])],
 	    [cs_cv_libvos=no])])
     AS_IF([test $cs_cv_libvos = yes],
@@ -1530,10 +1529,10 @@ AC_CHECK_TOOLS([WXCONFIG], [wx-config])
 AC_CACHE_CHECK([for wxWidgets], [cs_cv_wxwidgets],
     [AS_IF([test -n "$WXCONFIG"],
     	[cs_cv_wxwidgets=yes
-    	cs_cv_wxwidgets_cflags="`AC_RUN_LOG([$WXCONFIG --cxxflags])`"
-    	cs_cv_wxwidgets_lflags="`AC_RUN_LOG([$WXCONFIG --ldflags])`"
-    	cs_cv_wxwidgets_libs="`AC_RUN_LOG([$WXCONFIG --libs])`"
-    	cs_cv_wxwidgets_gllibs="`AC_RUN_LOG([$WXCONFIG --gl-libs])`"],
+    	cs_cv_wxwidgets_cflags=CS_RUN_PATH_NORMALIZE([$WXCONFIG --cxxflags])
+    	cs_cv_wxwidgets_lflags=CS_RUN_PATH_NORMALIZE([$WXCONFIG --ldflags])
+    	cs_cv_wxwidgets_libs=CS_RUN_PATH_NORMALIZE([$WXCONFIG --libs])
+    	cs_cv_wxwidgets_gllibs=CS_RUN_PATH_NORMALIZE([$WXCONFIG --gl-libs])],
         [cs_cv_wxwidgets=no])])
 
 AS_IF([test $cs_cv_wxwidgets = yes],
@@ -1723,9 +1722,9 @@ AC_CHECK_TOOLS([AALIBCONFIG], [aalib-config])
 AC_CACHE_CHECK([for AAlib], [cs_cv_libaa],
     [AS_IF([test -n "$AALIBCONFIG"],
 	[cs_cv_libaa=yes
-	cs_cv_libaa_cflags=`AC_RUN_LOG([$AALIBCONFIG --cflags])`
+	cs_cv_libaa_cflags=CS_RUN_PATH_NORMALIZE([$AALIBCONFIG --cflags])
 	cs_cv_libaa_lflags=''
-	cs_cv_libaa_libs=`AC_RUN_LOG([$AALIBCONFIG --libs])`
+	cs_cv_libaa_libs=CS_RUN_PATH_NORMALIZE([$AALIBCONFIG --libs])
 	CS_EMIT_BUILD_RESULT([cs_cv_libaa], [AALIB])],
 	[cs_cv_libaa=no])])
 

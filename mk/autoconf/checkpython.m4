@@ -58,29 +58,23 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		print string.join(map(str,sys.version_info[[:2]]),".")'])`
 	    cs_cv_pybase="python${cs_pyver}"
 
-	    cs_cv_pybase_cflags=`AC_RUN_LOG([$PYTHON -c \
+	    cs_cv_pybase_cflags=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
 		'import distutils.sysconfig; \
-		print "-I" + distutils.sysconfig.get_python_inc()'])`
-	    cs_cv_pybase_cflags=CS_PATH_NORMALIZE([$cs_cv_pybase_cflags])
-	    cs_cv_pybase_cflags=CS_TRIM([$cs_cv_pybase_cflags])
+		print "-I" + distutils.sysconfig.get_python_inc()'])
 
 	    # Depending upon platform and installation, link library might
 	    # reside in "${prefix}/lib", "get_python_lib()/config", or
 	    # "${prefix}/libs" on Windows.
-	    cs_cv_pybase_lflags=`AC_RUN_LOG([$PYTHON -c \
+	    cs_cv_pybase_lflags=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
 		'import sys,distutils.sysconfig; \
 		print "-L" + distutils.sysconfig.get_python_lib(0,1) + \
 		    " -L"+distutils.sysconfig.get_python_lib(0,1)+"/config" + \
-		    " -L"+sys.prefix + "/lib" + " -L"+sys.prefix + "/libs"'])`
-	    cs_cv_pybase_lflags=CS_PATH_NORMALIZE([$cs_cv_pybase_lflags])
-	    cs_cv_pybase_lflags=CS_TRIM([$cs_cv_pybase_lflags])
+		    " -L"+sys.prefix + "/lib" + " -L"+sys.prefix + "/libs"'])
 
-	    cs_cv_pybase_libs=`AC_RUN_LOG([$PYTHON -c \
+	    cs_cv_pybase_libs=CS_RUN_PATH_NORMALIZE([$PYTHON -c \
 		'import distutils.sysconfig; \
 		print (distutils.sysconfig.get_config_var("LIBS") or "")+" "+ \
-		      (distutils.sysconfig.get_config_var("SYSLIBS") or "")'])`
-	    cs_cv_pybase_libs=CS_PATH_NORMALIZE([$cs_cv_pybase_libs])
-	    cs_cv_pybase_libs=CS_TRIM([$cs_cv_pybase_libs])
+		      (distutils.sysconfig.get_config_var("SYSLIBS") or "")'])
 
 	    cs_cv_python_ext=`AC_RUN_LOG([$PYTHON -c \
 		'import distutils.sysconfig; \

@@ -84,18 +84,9 @@ then
     min_cs_version=ifelse([$1],[],[0.94],[$1])
     AC_MSG_CHECKING([for Crystal Space - version >= $min_cs_version])
 
-    CRYSTAL_CFLAGS=`$CSCONF $csconf_args --cxxflags $4`
-    CRYSTAL_CFLAGS=CS_PATH_NORMALIZE([$CRYSTAL_CFLAGS])
-    CRYSTAL_CFLAGS=CS_TRIM([$CRYSTAL_CFLAGS])
-
-    CRYSTAL_LIBS=`$CSCONF $csconf_args --libs $4`
-    CRYSTAL_LIBS=CS_PATH_NORMALIZE([$CRYSTAL_LIBS])
-    CRYSTAL_LIBS=CS_TRIM([$CRYSTAL_LIBS])
-
-    CRYSTAL_INCLUDE_DIR=`$CSCONF --includedir $4`
-    CRYSTAL_INCLUDE_DIR=CS_PATH_NORMALIZE([$CRYSTAL_INCLUDE_DIR])
-    CRYSTAL_INCLUDE_DIR=CS_TRIM([$CRYSTAL_INCLUDE_DIR])
-
+    CRYSTAL_CFLAGS=CS_RUN_PATH_NORMALIZE([$CSCONF $csconf_args --cxxflags $4])
+    CRYSTAL_LIBS=CS_RUN_PATH_NORMALIZE([$CSCONF $csconf_args --libs $4])
+    CRYSTAL_INCLUDE_DIR=CS_RUN_PATH_NORMALIZE([$CSCONF --includedir $4])
     CRYSTAL_VERSION=`$CSCONF --version $4`
 
     cs_major_version=`$CSCONF $cs_args --version | \

@@ -868,102 +868,137 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-cpu-specific-optimizations=level
                           enable CPU-specific optimizations; recognized levels
-                          are `no', `minimum' or `min', `maximum' or `max'
-                          (default MINIMUM); the `minimum' option selects
+                          are `no',
+ `minimum' or `min', `maximum' or `max'
+                          (default MINIMUM); the `minimum'
+ option selects
                           optimizations which are likely to be supported by
                           reasonably modern hardware, thus making the
-                          resulting executables fairly portable; use the
-                          `maximum' option with caution since code for one
+                          resulting executables
+ fairly portable; use the
+                          `maximum' option with caution since code for
+ one
                           processor will not work with earlier processors (for
-                          example, Intel 686-specific code will not work with
+                          example, Intel
+ 686-specific code will not work with
                           a 586)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
-                          modules if supported by platform; if disabled,
-                          meta-information is stored in stand-alone .csplugin
-                          files; this is enabled by default for non-Unix
+                          modules if
+ supported by platform; if disabled,
+                          meta-information is stored in
+ stand-alone .csplugin
+                          files; this is enabled by default for
+ non-Unix
                           platforms, and disabled by default for Unix
-                          platforms since the Unix implementation requires the
-                          GPL-licensed libbfd library; enable this option on
-                          Unix only if you are certain you want a GPL-licensed
-                          library infecting your project
-  --enable-optimize       build with optimizations enabled (default YES); same
-                          as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO); same
+                          platforms
+ since the Unix implementation requires
+                          the GPL-licensed libbfd
+ library; enable this option
+                          on Unix only if you are certain you
+ want a
+                          GPL-licensed library infecting your project
+  --enable-optimize       build with optimizations enabled (default YES);
+                          same as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO);
+ same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO); same
+  --enable-profile        build with profiling information (default NO);
+ same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile' (default OPTIMIZE)
+                          `debug', `profile'
+ (default OPTIMIZE)
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory management mistakes (default NO)
+                          common memory
+ management mistakes (default NO)
   --enable-memory-tracker enable the memory tracker which checks memory usage
-                          per source file (default NO)
+                          per
+ source file (default NO)
   --enable-leak-guard     enable the leak guard protection which warns about
-                          objects not freed at program exit (default NO)
+                          objects not freed
+ at program exit (default NO)
   --enable-new-renderer   enable use of new renderer (_EXPERIMENTAL_!)
                           (default NO)
   --enable-make-emulation enable emulation layer allowing project to be built
-                          with `make', in addition to `jam' (default YES)
+                          with `make', in
+ addition to `jam' (default YES)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-perl             use Perl5 scripting interface (default NO)
-  --without-python        do not use Python scripting interface
+  --without-python        do not use
+ Python scripting interface
   --with-java             use Java scripting interface (default YES)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-libz=dir         specify location of libz if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libpng=dir       specify location of libpng if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libjpeg=dir      specify location of libjpeg if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libmng=dir       specify location of libmng if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libmikmod=dir    specify location of libmikmod if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libogg=dir       specify location of libogg if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libvorbis=dir    specify location of libvorbis if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libvorbisfile=dir
                           specify location of libvorbisfile if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-lib3ds=dir       specify location of lib3ds if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libode=dir       specify location of libode if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-vos=dir          specify location of VOS pkg-config files
   --with-libCg=dir        specify location of libCg if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libCgGL=dir      specify location of libCgGL if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libasound=dir    specify location of libasound if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
   --with-libbfd=dir       specify location of libbfd if not detected
-                          automatically; searches dir/include, dir/lib, and
+                          automatically; searches
+ dir/include, dir/lib, and
                           dir
 
 Some influential environment variables:
@@ -4607,24 +4642,21 @@ if test "${cs_cv_cslibs+set}" = set; then
 else
   if test -n "$CSLIBS_CONFIG"; then
   cs_cv_cslibs=yes
-	cs_cv_cslibs_cflags=`
-	    { (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --cflags \$cs_cv_cslibs_compiler") >&5
+	cs_cv_cslibs_cflags=`{ (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --cflags \$cs_cv_cslibs_compiler") >&5
   ($CSLIBS_CONFIG --cflags $cs_cv_cslibs_compiler) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
-	cs_cv_cslibs_lflags=`
-	    { (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --lflags \$cs_cv_cslibs_compiler") >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_cslibs_lflags=`{ (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --lflags \$cs_cv_cslibs_compiler") >&5
   ($CSLIBS_CONFIG --lflags $cs_cv_cslibs_compiler) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
-	cs_cv_cslibs_binpath=`
-	    { (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --binpath \$cs_cv_cslibs_compiler") >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_cslibs_binpath=`{ (echo "$as_me:$LINENO: \$CSLIBS_CONFIG --binpath \$cs_cv_cslibs_compiler") >&5
   ($CSLIBS_CONFIG --binpath $cs_cv_cslibs_compiler) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 else
   cs_cv_cslibs=no
 fi
@@ -7170,10 +7202,8 @@ fi
 
 fi
 
-	cs_cv_perl_cflags=`echo x$cs_cv_perl_cflags | tr '\\\\' '/' | sed 's/^x//'`
-	cs_cv_perl_cflags=`echo x$cs_cv_perl_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_perl_lflags=`echo x$cs_cv_perl_lflags | tr '\\\\' '/' | sed 's/^x//'`
-	cs_cv_perl_lflags=`echo x$cs_cv_perl_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_perl_cflags=`echo x$cs_cv_perl_cflags | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_perl_lflags=`echo x$cs_cv_perl_lflags | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
 
@@ -7619,9 +7649,7 @@ else
 		print "-I" + distutils.sysconfig.get_python_inc()') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
-	    cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | tr '\\\\' '/' | sed 's/^x//'`
-	    cs_cv_pybase_cflags=`echo x$cs_cv_pybase_cflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 
 	    # Depending upon platform and installation, link library might
 	    # reside in "${prefix}/lib", "get_python_lib()/config", or
@@ -7638,9 +7666,7 @@ else
 		    " -L"+sys.prefix + "/lib" + " -L"+sys.prefix + "/libs"') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
-	    cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | tr '\\\\' '/' | sed 's/^x//'`
-	    cs_cv_pybase_lflags=`echo x$cs_cv_pybase_lflags | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 
 	    cs_cv_pybase_libs=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
 		'import distutils.sysconfig; \\
@@ -7652,9 +7678,7 @@ else
 		      (distutils.sysconfig.get_config_var("SYSLIBS") or "")') 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
-	    cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | tr '\\\\' '/' | sed 's/^x//'`
-	    cs_cv_pybase_libs=`echo x$cs_cv_pybase_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 
 	    cs_cv_python_ext=`{ (echo "$as_me:$LINENO: \$PYTHON -c \\
 		'import distutils.sysconfig; \\
@@ -8233,6 +8257,7 @@ fi
 		    $cs_java_cflags/$cs_java_platform"
 fi
 
+	    cs_java_cflags=`echo x$cs_java_cflags | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 fi
 
 fi
@@ -26327,13 +26352,13 @@ else
   ($FT2CONFIG --cflags) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libft2_lflags=''
 	cs_cv_libft2_libs=`{ (echo "$as_me:$LINENO: \$FT2CONFIG --libs") >&5
   ($FT2CONFIG --libs) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 else
   cs_cv_libft2=no
 fi
@@ -27776,13 +27801,13 @@ else
   ($SDLCONFIG --cflags) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libsdl_lflags=''
 	cs_cv_libsdl_libs=`{ (echo "$as_me:$LINENO: \$SDLCONFIG --libs") >&5
   ($SDLCONFIG --libs) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 else
   cs_cv_libsdl=no
 fi
@@ -28260,17 +28285,17 @@ else
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
   cs_cv_libvos=yes
-		cs_cv_libvos_cflags="`{ (echo "$as_me:$LINENO: \$PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc") >&5
+		cs_cv_libvos_cflags=`{ (echo "$as_me:$LINENO: \$PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc") >&5
   ($PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`"
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 		cs_cv_libvos_lflags=''
 		cs_cv_libvos_libs=`{ (echo "$as_me:$LINENO: \$PKGCONFIG --libs libmetaobject_a3dl libmetaobject_misc") >&5
   ($PKGCONFIG --libs libmetaobject_a3dl libmetaobject_misc) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 else
   cs_cv_libvos=no
 fi
@@ -28419,26 +28444,26 @@ if test "${cs_cv_wxwidgets+set}" = set; then
 else
   if test -n "$WXCONFIG"; then
   cs_cv_wxwidgets=yes
-    	cs_cv_wxwidgets_cflags="`{ (echo "$as_me:$LINENO: \$WXCONFIG --cxxflags") >&5
+    	cs_cv_wxwidgets_cflags=`{ (echo "$as_me:$LINENO: \$WXCONFIG --cxxflags") >&5
   ($WXCONFIG --cxxflags) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`"
-    	cs_cv_wxwidgets_lflags="`{ (echo "$as_me:$LINENO: \$WXCONFIG --ldflags") >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	cs_cv_wxwidgets_lflags=`{ (echo "$as_me:$LINENO: \$WXCONFIG --ldflags") >&5
   ($WXCONFIG --ldflags) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`"
-    	cs_cv_wxwidgets_libs="`{ (echo "$as_me:$LINENO: \$WXCONFIG --libs") >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	cs_cv_wxwidgets_libs=`{ (echo "$as_me:$LINENO: \$WXCONFIG --libs") >&5
   ($WXCONFIG --libs) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`"
-    	cs_cv_wxwidgets_gllibs="`{ (echo "$as_me:$LINENO: \$WXCONFIG --gl-libs") >&5
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+    	cs_cv_wxwidgets_gllibs=`{ (echo "$as_me:$LINENO: \$WXCONFIG --gl-libs") >&5
   ($WXCONFIG --gl-libs) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`"
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 else
   cs_cv_wxwidgets=no
 fi
@@ -32843,13 +32868,13 @@ else
   ($AALIBCONFIG --cflags) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_libaa_lflags=''
 	cs_cv_libaa_libs=`{ (echo "$as_me:$LINENO: \$AALIBCONFIG --libs") >&5
   ($AALIBCONFIG --libs) 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }`
+  (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	if test "$cs_cv_libaa" = yes; then
   cs_build_prop_val="yes"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
@@ -35662,6 +35687,12 @@ done
 
 
 
+
+
+
+
+
+
 for ac_header in unistd.h \
     sys/types.h \
     sys/socket.h \
@@ -38208,9 +38239,11 @@ if diff $cache_file confcache >/dev/null 2>&1; then :; else
   fi
 fi
 rm -f confcache
-    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval; use
+    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error: unrecognized mode --enable-mode=$enableval; use
+echo "$as_me: error: unrecognized mode --enable-mode=$enableval;
+ use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac
