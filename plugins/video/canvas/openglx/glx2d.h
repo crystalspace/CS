@@ -52,6 +52,9 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   XVisualInfo *active_GLVisual;
   GLXContext active_GLContext;
 
+  // "WM_DELETE_WINDOW" atom
+  Atom wm_delete_window;
+
   // we are using a specific displaydriver
   iOpenGLDisp *dispdriver;
   

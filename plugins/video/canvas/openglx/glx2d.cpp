@@ -207,6 +207,11 @@ bool csGraphics2DGLX::Open(const char *Title)
   XMapWindow (dpy, window);
   XStoreName (dpy, window, Title);
 
+  // Intern WM_DELETE_WINDOW and set window manager protocol
+  // (Needed to catch user using window manager "delete window" button)
+  wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols (dpy, window, &wm_delete_window, 1);
+
   // Create mouse cursors
   XColor Black;
   memset (&Black, 0, sizeof (Black));
@@ -376,6 +381,11 @@ static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
   return false;
 }
 
+// XCheckMaskEvent() doesn't get ClientMessage Events so use XCheckIfEvent()
+//    with this Predicate function as a work-around ( ClientMessage events
+//    are needed in order to catch "WM_DELETE_WINDOW")
+static Bool AlwaysTruePredicate (Display*, XEvent*, char*) { return True; }
+
 void csGraphics2DGLX::ProcessEvents (void *Param)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
@@ -384,9 +394,15 @@ void csGraphics2DGLX::ProcessEvents (void *Param)
   int state, key;
   bool down;
 
-  while (XCheckMaskEvent (Self->dpy, ~0, &event))
+  while (XCheckIfEvent (Self->dpy, &event, AlwaysTruePredicate, 0))
     switch (event.type)
     {
+      case ClientMessage:
+	if (static_cast<Atom>(event.xclient.data.l[0]) == Self->wm_delete_window)
+	{
+	  Self->System->StartShutdown();
+	}
+	break;
       case ButtonPress:
         state = ((XButtonEvent*)&event)->state;
         Self->System->QueueMouseEvent (button_mapping [event.xbutton.button],

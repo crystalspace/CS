@@ -21,6 +21,9 @@ Short-term cleanups that need to be done:
 	  (for polygon trees). Seems to be working properly now.
 	- Added view frustrum to csRenderView. Use this for quickly culling
 	  octree nodes. This should speed up rendering a bit.
+	- Brett Hall <swizin@rain.org> fixed OpenGL and software 2D
+	  drivers for X Windows so that they don't crash when the windows
+	  are closed by the window manager.
 24-Jan-2000
 	- Noah L. Gibbs fixed Normalize() method in csQuaternion.
 	- Noah also got rigid bodies pretty much working in his demo code,

@@ -49,6 +49,9 @@ class csGraphics2DXLib : public csGraphics2D
   XVisualInfo vinfo;
   unsigned int vclass;
 
+  // "WM_DELETE_WINDOW" atom
+  Atom wm_delete_window;
+
   // Window colormap
   Colormap cmap;
 
