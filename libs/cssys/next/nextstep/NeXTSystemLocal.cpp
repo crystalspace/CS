@@ -10,18 +10,15 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTSystemProxy.cpp
+// NeXTSystemLocal.cpp
 //
-//	C++ object which interacts with Objective-C world on behalf of 
-//	SysSystemDriver which can not directly interface with Objective-C on 
-//	account of COM-related conflicts.  This is the Objective-C-only 
-//	portion of NeXTSystemProxy.  See NeXTSystemProxyCom.cpp for the 
-//	COM-only portion of NeXTSystemProxy.  Also see README.NeXT for 
-//	details.  
+//	NeXT-specific hardware & operating/system drivers for CrystalSpace.
+//	This file contains methods which are specific to the NextStep
+//	platform.  See NeXTSystemDriver.cpp for methods which are shared
+//	between MacOS/X Server, OpenStep, and NextStep.
 //
-// *WARNING* Do NOT include any COM headers in this file.
 //-----------------------------------------------------------------------------
-#import "NeXTSystemProxy.h"
+#import "NeXTSystemDriver.h"
 #import "NeXTDelegate.h"
 #import "NeXTMenu.h"
 extern "Objective-C" {
@@ -32,32 +29,30 @@ extern "Objective-C" {
 //-----------------------------------------------------------------------------
 // Category of Application which supports recursive run loops.
 //-----------------------------------------------------------------------------
-@interface Application (NeXTSystemProxy)
-- (void)runRecursively:(NeXTSystemProxy const*)proxy;
+@interface Application (NeXTSystemDriver)
+- (void)runRecursively:(NeXTSystemDriver const*)sys;
 @end
-@implementation Application (NeXTSystemProxy)
-- (void)runRecursively:(NeXTSystemProxy const*)proxy
+@implementation Application (NeXTSystemDriver)
+- (void)runRecursively:(NeXTSystemDriver const*)sys
     {
     int const was_running = running;
     [self run];
-    if (proxy->continue_running())
+    if (sys->continue_running())
 	running = was_running;
     }
 @end
 
 
 //-----------------------------------------------------------------------------
-// Constructor
+// init_system
 //	Interaction with AppKit is initiated here with instantiation of an
 //	Application object and the 'controller' which oversees AppKit-related
 //	events and messages.
 //-----------------------------------------------------------------------------
-NeXTSystemProxy::NeXTSystemProxy( SysSystemDriver* p )
+void NeXTSystemDriver::init_system()
     {
-    driver = p;
-    init_ticks();
     NXApp = [Application new];
-    controller = [[NeXTDelegate alloc] initWithProxy:this];
+    controller = [[NeXTDelegate alloc] initWithDriver:this];
     [NXApp setDelegate:controller];
     Menu* const menu = NeXTMenuGenerate();
     [menu setTitle:[NXApp appName]];
@@ -66,9 +61,9 @@ NeXTSystemProxy::NeXTSystemProxy( SysSystemDriver* p )
 
 
 //-----------------------------------------------------------------------------
-// Destructor
+// shutdown_system
 //-----------------------------------------------------------------------------
-NeXTSystemProxy::~NeXTSystemProxy()
+void NeXTSystemDriver::shutdown_system()
     {
     [[NXApp delegate] showMouse];
     [NXApp setDelegate:0];
@@ -83,7 +78,7 @@ NeXTSystemProxy::~NeXTSystemProxy()
 //	Begin a run-loop.  May be called recursively by CSWS.  Uses special
 //	-runRecursively: method to handle recursive invocations of run-loop.
 //-----------------------------------------------------------------------------
-void NeXTSystemProxy::start_loop()
+void NeXTSystemDriver::start_loop()
     {
     if (continue_running())
 	{
@@ -94,23 +89,11 @@ void NeXTSystemProxy::start_loop()
 
 
 //-----------------------------------------------------------------------------
-// timer_fired
-//	Target of timer.  Forwards timer event to proxy.
-//-----------------------------------------------------------------------------
-void NeXTSystemProxy::timer_fired()
-    {
-    step_frame();
-    if (!continue_looping())
-	stop_run_loop();
-    }
-
-
-//-----------------------------------------------------------------------------
 // stop_run_loop
-//	Stops the application's run-loop.  Unfortunately the run-loop does not 
-//	actually stop until another event arrives, so we fake one up.  
+//	Stops the application's run-loop.  Unfortunately the run-loop does not
+//	actually stop until another event arrives, so we fake one up.
 //-----------------------------------------------------------------------------
-void NeXTSystemProxy::stop_run_loop()
+void NeXTSystemDriver::stop_run_loop()
     {
     [NXApp stop:0];
 

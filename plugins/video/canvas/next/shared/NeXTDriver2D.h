@@ -20,19 +20,27 @@
 //-----------------------------------------------------------------------------
 #include "csutil/scf.h"
 #include "cs2d/common/graph2d.h"
-#include "cssys/next/shared/NeXTSystemInterface.h"
-class NeXTProxy2D;
+class NeXTFrameBuffer;
+@class NeXTView;
 
 class NeXTDriver2D : public csGraphics2D
     {
     typedef csGraphics2D superclass;
 
 private:
-    iNeXTSystemDriver* next_system;
-    NeXTProxy2D* proxy;	// Interface to Objective-C world; see README.NeXT.
+    bool initialized;
+    NeXTFrameBuffer* frame_buffer;
+    NeXTView* view;
 
+    bool init_driver( int simulate_depth );
+    void shutdown_driver();
     void setup_rgb_15();
     void setup_rgb_32();
+    bool open_window( char const* title );
+    void flush();
+
+    static int best_bits_per_sample();
+    static int determine_bits_per_sample( int simulate_depth );
 
 public:
     NeXTDriver2D::NeXTDriver2D( iBase* );

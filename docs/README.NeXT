@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/11/19
+    1999/11/22
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -12,15 +12,14 @@
 -----------
 
     1. Introduction
-    2. COM Dilemma
-    3. Directories
-    4. Files
-    5. Run-Loop
-    6. Video Optimizations
-    7. Frame Buffer Processing
-    8. Future Plans
-    9. Bugs
-   10. History
+    2. Directories
+    3. Files
+    4. Run-Loop
+    5. Video Optimizations
+    6. Frame Buffer Processing
+    7. Future Plans
+    8. Bugs
+    9. History
 
 
 1. Introduction
@@ -58,63 +57,7 @@ for direct frame-buffer access provided by the NSDirectBitmap,
 NSDirectPalette, and NSDirectScreen classes.
 
 
-2. COM Dilemma
---------------
-
-Crystal Space attempts to conform to the Common Object Model (COM)
-specification in order support plug-in module capability.  Unfortunately, in a
-couple cases, the COM specification is incompatible with Objective-C.
-
-First, COM defines a 4-byte BOOL type (long), whereas Objective-C defines BOOL
-as a 1-byte value (char).  This inequality of type results in a compilation
-error when including both COM and Objective-C headers in the same file.  To
-work around this problem, the COM BOOL type was renamed to COMBOOL within the
-Crystal Space project.  COMBOOL remains binary compatible with the real COM
-BOOL while avoiding messy naming complications.
-
-Second, the COM headers define the macro "interface" as having the value
-"struct".  This, too, results in a compilation error whenever COM and
-Objective-C headers are included in the same compilation unit.  The problem is
-that Objective-C uses the keyword "@interface" to introduce Objective-C
-classes.  However, the C-preprocessor, which translates C macros prior to the
-actual compilation phase, replaces "@interface" with "@struct".  The
-Objective-C compiler then complains about "@struct", which is not a recognized
-keyword, and the compilation fails.
-
-In order to work around this problem, classes were split apart in such a way
-as to ensure that conflicting headers are never included in the same
-compilation unit.  In some cases, as many as five files resulted from the
-dissection of a single interface / implementation pair in order to accommodate
-this conflict.
-
-For example, in most non-NeXT Crystal Space ports, the implementation of
-SysSystemDriver can be contained in a single source file and a single header
-file.  In this port, however, SysSystemDriver is split across five files as
-illustrated below.
-
-    NeXTSystemDriver.h      COM-specific interface of SysSystemDriver.
-    NeXTSystemDriver.cpp    COM-specific implementation of SysSystemDriver.
-    NeXTSystemProxy.h       Pure C++ interface.  Usable by COM and Objective-C.
-    NeXTSystemProxy.cpp     Objective-C-only system driver implementation.
-    NeXTSystemProxyCom.cpp  COM-only system driver implementation.
-
-A more thorough discussion of the functionality of these files may be found in
-the "Files" section of this document.
-
-Other classes have been dissected in a similar fashion in order to work around
-the COM conflict.  In general a class named "SomeClass" is split into
-component parts in the following manner.
-
-    SomeClass           A skeleton COM-based class.  Acts as a shell which
-                        forwards messages to a proxy which does the real work.
-    SomeProxy           A distinct class which implements functionality on
-                        behalf of SomeClass.
-    SomeProxy.h         The pure C++ interface to SomeProxy.
-    SomeProxy.cpp       The Objective-C portion of SomeProxy's implementation.
-    SomeProxyCom.cpp    The COM portion of SomeProxy's implementation.
-
-
-3. Directories
+2. Directories
 --------------
 
 The root components of this port of Crystal Space are in the directories
@@ -136,19 +79,18 @@ Functionally, this port is comprised of two distinct system-dependent modules.
 1) The core components which provide low-level platform-specific functionality
    to the Crystal Space engine.  These files and resources are located in
    platform-specific subdirectories of CS/libs/cssys/next.  For instance,
-   files specific to the MacOS/X Server port reside in
-   CS/libs/cssys/next/macosxs, whereas files common to all three platforms
-   reside in CS/libs/cssys/next/shared.
+   files specific to the OpenStep port reside in CS/libs/cssys/next/openstep,
+   whereas files common to all three platforms reside in
+   CS/libs/cssys/next/shared.
 
 2) The library which provides 2D graphics capability into which Crystal Space
    renders its images.  These files and resources are located in
    platform-specific subdirectories of CS/libs/cs2d/next.  For instance, files
-   specific to the MacOS/X Server port reside in CS/libs/cs2d/next/nextstep,
-   whereas files common to all three platforms reside in
-   CS/libs/cs2d/next/shared.
+   specific to the NextStep port reside in CS/libs/cs2d/next/nextstep, whereas
+   files common to all three platforms reside in CS/libs/cs2d/next/shared.
 
 
-4. Files
+3. Files
 --------
 
 This port of Crystal Space makes use of a number of platform-specific
@@ -168,36 +110,22 @@ Crystal Space requires.  This includes interfaces to the underlying operating
 system as well as higher-level event-loop processing as provided by the
 AppKit's Application class.  The files comprising this module are:
 
-    NeXTSystemDriver.h      The COM-capable declaration of SysSystemDriver.
-                            Does not include Objective-C headers.  This is the
-                            sole interface through which Crystal Space
-                            communicates with the platform-specific port.
+    NeXTSystemDriver.h      Defines NeXTSystemDriver and its subclass
+                            SysSystemDriver which all ports of Crystal Space
+                            must supply.  This is the sole interface through
+                            which Crystal Space accesses platform-specific
+                            functionality.
 
-    NeXTSystemDriver.cpp    The COM-based definition of SysSystemDriver.  Does
-                            not include Objective-C headers.  This class is
-                            essentially a shell which forwards requests
-                            through a pure C++ interface to a proxy object
-                            which performs the actual functionality on behalf
-                            of SysSystemDriver.
+    NeXTSystemDriver.cpp    Implements methods of NeXTSystemDriver which are
+                            common to MacOS/X Server, OpenStep, and NextStep.
 
-    NeXTSystemProxy.h       A pure C++ interface.  Can be included by both COM
-                            and Objective-C compilation units.  The core
-                            functionality of SysSystemDriver is actually
-                            handled by this class on its behalf since
-                            SysSystemDriver can not cleanly interface with
-                            Objective-C on account of the COM conflict.
+    NeXTSystemLocal.cpp     Implements methods of NeXTSystemDriver which are
+                            particular to a specific platform, either MacOS/X
+                            Server, OpenStep, or NextStep.
 
-    NeXTSystemProxy.cpp     The implementation of the Objective-C-specific
-                            functionality used by SysSystemDriver.  Does not
-                            include COM headers.
-
-    NeXTSystemProxyCom.cpp  The implementation of the COM-specific
-                            functionality used by SysSystemDriver.  Does not
-                            include Objective-C headers.
-
-    NeXTSystemInterface.h   A pure COM interface to NeXTSystemDriver.  This
+    NeXTSystemInterface.h   A pure SCF interface to NeXTSystemDriver.  This
                             defines the NeXTSystemDriver interface which is
-                            accessible to other modules via COM.
+                            accessible to other modules via SCF.
 
     NeXTDelegate.cpp        An Objective-C class which acts as the delegate to
     NeXTDelegate.h          both the Application object and the animation
@@ -207,7 +135,7 @@ AppKit's Application class.  The files comprising this module are:
                             user on the AppKit side are also forwarded.
 
     NeXTLoadLibrary.cpp     Functions which provide dynamic linking facilities
-                            for MacOS/X Server, OpenStep, & NextStep.
+                            for MacOS/X Server, OpenStep, and NextStep.
 
     NeXTMenu.cpp            A utility which generates the application's main
     NeXTMenu.h              menu from INI-style configuration information.
@@ -222,10 +150,10 @@ AppKit's Application class.  The files comprising this module are:
     malloc.h                A header which works around Crystal Space's misuse
                             of the deprecated <malloc.h> header.
 
-    osdefs.h                Implementation of platform-specific operating
+    csosdefs.h              Implementation of platform-specific operating
                             system functionality.  Allows Crystal Space to
                             treat the operating system services abstractly.
-                            Located in CS/include/cssys/next, and included by
+                            Located in CS/include/cssys/next and included by
                             CS/include/sysdef.h.
 
 The NeXT 2D graphics library in CS/libs/cs2d/next provides 2D graphics
@@ -235,36 +163,17 @@ It is also responsible for actually displaying the frame-buffer in a manner
 which is appropriate for the given platform.  The files comprising the 2D
 graphics library are:
 
-    NeXTDriver2DFactory.cpp The COM server object which knows how to vend
-    NeXTDriver2DFactory.h   NeXTDriver2D objects to clients.
+    NeXTDriver2D.h          Defines the class NeXTDriver2D which provides 2D
+                            drawing surface to Crystal Space.  This is the
+                            sole interface through which Crystal Space
+                            communicates with the 2D graphics services.
 
-    NeXTDriver2D.h          The COM-capable declaration of NeXTDriver2D, a
-                            subclass of csGraphics2D.  Does not include
-                            Objective-C headers.  This is the sole interface
-                            through which Crystal Space communicates with the
-                            2D graphics library.
+    NeXTDriver2D.cpp        Implements methods of NeXTDriver2D which are
+                            common to MacOS/X Server, OpenStep, and NextStep.
 
-    NeXTDriver2D.cpp        The COM-based implementation of the 2D graphics
-                            server.  Does not include Objective-C headers.
-                            This is essentially a shell which forwards
-                            requests through a pure C++ interface to a proxy
-                            object which performs the actual functionality on
-                            behalf of NeXTDriver2D.
-
-    NeXTDriver2DCom.cpp     The implementation of the COM-specific
-                            functionality used by NeXTDriver2D.  Does not
-                            include Objective-C headers.
-
-    NeXTProxy2D.h           A pure C++ interface.  Can be included by both COM
-                            and Objective-C compilation units.  The core
-                            functionality of NeXTDriver2D is actually handled
-                            by this class on its behalf since NeXTDriver2D can
-                            not cleanly interface with Objective-C on account
-                            of the COM conflict.
-
-    NeXTProxy2D.cpp         The implementation of the Objective-C-specific
-                            functionality used by NeXTDriver2D.  Does not
-                            include COM headers.
+    NeXTLocal2D.cpp         Implements methods of NeXTDriver2D which are
+                            particular to a specific platform, either MacOS/X
+                            Server, OpenStep, or NextStep.
 
     NeXTView.cpp            An Objective-C subclass of the AppKit's View class.
     NeXTView.h              This is the view where the animation is actually
@@ -283,7 +192,7 @@ graphics library are:
     NeXTFrameBuffer32.h     convert Crystal Space RGB:888 to NeXT RGBA:8888.
 
 
-5. Run-Loop
+4. Run-Loop
 -----------
 
 The design of Crystal Space assumes that the programmer has full control over
@@ -338,7 +247,7 @@ such as DOS or Unix, where the program can simply take control of the entire
 environment without regard to other outside factors.
 
 
-6. Video Optimizations
+5. Video Optimizations
 ----------------------
 
 Unlike programs on some other platforms, OpenStep and NextStep applications do
@@ -441,7 +350,7 @@ hardware use either 12- or 24-bit RGB frame buffers so the actual impact of
 this limitation may not be particularly severe.
 
 
-7. Frame Buffer Processing
+6. Frame Buffer Processing
 --------------------------
 
 With few exceptions, most MacOS/X Server, OpenStep, and NextStep
@@ -531,7 +440,7 @@ table and outputs that color.  This technique is both simple and generally
 efficient.
 
 
-8. Future Plans
+7. Future Plans
 ---------------
 This is a list of items which are planned for future releases of this project.
 
@@ -552,12 +461,13 @@ This is a list of items which are planned for future releases of this project.
     o Possibly implement sound support.
 
 
-9. Bugs
+8. Bugs
 -------
 This is a list of known problems with the current release of this project.
 
     o Using the -nolight option causes WalkTest to crash very early in
-      csScan_CalcBlendTables().
+      csScan_CalcBlendTables().  This seems to be an issue with other ports
+      as well, though.  It may not be NeXT-specific.
     o Keyboard events generated with the "alt" modifier are not correctly
       translated to Crystal Space events.  The reason is that NextStep "cooks"
       the key-code completely into some other character prior to sending the
@@ -572,8 +482,23 @@ This is a list of known problems with the current release of this project.
       and it would be necessary to hard-code scan-codes for each one.
 
 
-10. History
------------
+9. History
+----------
+1999/11/22 (15r000+CVS)
+    Removed much obfuscation which was forced upon the port by use of COM
+        within Crystal Space.  SCF, the replacement, does not have the
+        problems which made COM such a hassle (a conflicting BOOL type, and
+        a conflicting macro definition of "interface").  Classes which used
+        to be split into separate implementation files (one part with COM code
+        and the other with Objective-C code) have been merged.  In general,
+        the code is quite a bit simpler.
+    Reworked NeXTSystemDriver to implement the iNeXTSystemDriver interface
+        via embedding rather than inheritance in order to work around NextStep
+        compiler bug which resulted in a crash either at compile time or run
+        time depending upon circumstances.  The actual problem is that the
+        compiler does not deal gracefully with multiple inheritance when a
+        common base class is involved.
+
 1999/11/15 (15r000+CVS)
     Performed the SCF conversion on the NextStep port.  This involved working
         around severe mulitple-inheritance bugs in the compiler.
@@ -595,9 +520,9 @@ This is a list of known problems with the current release of this project.
         application to crash when querying COM for the halo rasterizer.  In
         order to fix the problem, I reworked csGraphics3DSoftware so that it
         implements IHaloRasterizer via composition rather than inheritence.
-	[1999/10/21 -- I discovered, after the fact, that the bug was actaully
-	the well-known "'const' table with undeclared size" compiler bug.  It
-	was apparently unrelated to multiple-inheritance.]
+        [1999/10/21 -- I discovered, after the fact, that the bug was actaully
+        the well-known "'const' table with undeclared size" compiler bug.  It
+        was apparently unrelated to multiple-inheritance.]
 
 1999/10/10 (15r000+CVS)
     Reworked dynamic linking so that it deals gracefully with the case when it

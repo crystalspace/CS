@@ -10,19 +10,19 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTProxy2D.cpp
+// NeXTLocal2D.cpp
 //
-//	C++ object which interacts with Objective-C world on behalf of
-//	NeXTDriver2D which can not directly interface with Objective-C on
-//	account of COM-related conflicts.  See README.NeXT for details.
+//	NeXT-specific subclass of csGraphics2D which implements 2D-graphic
+//	functionality via the AppKit.  This file contains methods which are
+//	shared between the MacOS/X Server and OpenStep platforms.  See
+//	NeXTDriver2D.cpp for methods which are shared between MacOS/X Server,
+//	OpenStep, and NextStep.
 //
-// *WARNING* Do NOT include any COM headers in this file.
 //-----------------------------------------------------------------------------
 #include "sysdef.h"
-#include "NeXTProxy2D.h"
+#include "NeXTDriver2D.h"
 #include "NeXTDelegate.h"
-#include "NeXTFrameBuffer15.h"
-#include "NeXTFrameBuffer32.h"
+#include "NeXTFrameBuffer.h"
 #include "NeXTView.h"
 
 extern "Objective-C" {
@@ -32,9 +32,6 @@ extern "Objective-C" {
 #import <AppKit/NSDPSContext.h>
 #import <AppKit/NSImage.h>
 #import <AppKit/NSWindow.h>
-}
-extern "C" {
-#include <assert.h>
 }
 
 //-----------------------------------------------------------------------------
@@ -89,7 +86,7 @@ static NSWindowDepth window_server_depth()
 //	including those compiled with earlier versions of OpenStep or
 //	NextStep.
 //-----------------------------------------------------------------------------
-static int best_bits_per_sample()
+int NeXTDriver2D::best_bits_per_sample()
     {
     NSWindowDepth const depth = window_server_depth();
     NSString* const s = NSColorSpaceFromDepth( depth );
@@ -105,51 +102,21 @@ static int best_bits_per_sample()
 
 
 //-----------------------------------------------------------------------------
-// determine_bits_per_sample
+// shutdown_driver
 //-----------------------------------------------------------------------------
-static int determine_bits_per_sample( int simulate_depth )
-    {
-    int bps;
-    switch (simulate_depth)
-	{
-	case 15: bps = 4; break;
-	case 32: bps = 8; break;
-	default: bps = best_bits_per_sample(); break;
-	}
-    return bps;
-    }
-
-
-//-----------------------------------------------------------------------------
-// Constructor
-//-----------------------------------------------------------------------------
-NeXTProxy2D::NeXTProxy2D( unsigned int w, unsigned int h, int simulate_depth ):
-    window(0), view(0), width(w), height(h), frame_buffer(0)
-    {
-    switch (determine_bits_per_sample( simulate_depth ))
-	{
-	case 4: frame_buffer = new NeXTFrameBuffer15( width, height ); break;
-	case 8: frame_buffer = new NeXTFrameBuffer32( width, height ); break;
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
-// Destructor
-//-----------------------------------------------------------------------------
-NeXTProxy2D::~NeXTProxy2D()
+void NeXTDriver2D::shutdown_driver()
     {
     [[NSApp delegate] showMouse];
     [[NSApp delegate] registerAnimationWindow:0];
+    NSWindow* window = [view window];
     [window setDelegate:0];
     [window close];
     [window release];	// Window releases NeXTView.
-    delete frame_buffer;
     }
 
 
 //-----------------------------------------------------------------------------
-// open
+// open_window
 //	Opens a titled Window and installs a NeXTView as its contentView.
 //	Registers the window with the application's delegate as its "animation
 //	window".  Passes the raw frame-buffer along to the NeXTView which blits
@@ -163,10 +130,10 @@ NeXTProxy2D::~NeXTProxy2D()
 //	option since, for some inexplicable reason, the contents of a Retained
 //	non-deferred window are never drawn.
 //-----------------------------------------------------------------------------
-bool NeXTProxy2D::open( char const* title )
+bool NeXTDriver2D::open_window( char const* title )
     {
-    NSRect const r = {{ 0, 0 }, { width, height }};
-    window = [[NSWindow alloc]
+    NSRect const r = {{ 0, 0 }, { Width, Height }};
+    NSWindow* window = [[NSWindow alloc]
 	initWithContentRect:r
 	styleMask:(NSTitledWindowMask | NSClosableWindowMask)
 	backing:NSBackingStoreRetained
@@ -188,32 +155,29 @@ bool NeXTProxy2D::open( char const* title )
 
 
 //-----------------------------------------------------------------------------
-// close
+// Close
 //-----------------------------------------------------------------------------
-void NeXTProxy2D::close()
+void NeXTDriver2D::Close()
     {
-    [window close];
+    [[view window] close];
+    superclass::Close();
     }
 
 
 //-----------------------------------------------------------------------------
 // flush
-//	Convert the CrystalSpace frame-buffer into NeXT format and blit the
-//	image to the display.
 //-----------------------------------------------------------------------------
-void NeXTProxy2D::flush()
+void NeXTDriver2D::flush()
     {
-    assert( frame_buffer != 0 );
-    frame_buffer->cook();
     [view flush];
     [[NSDPSContext currentContext] flush];
     }
 
 
 //-----------------------------------------------------------------------------
-// set_mouse_cursor
+// SetMouseCursor
 //-----------------------------------------------------------------------------
-bool NeXTProxy2D::set_mouse_cursor( csMouseCursorID shape, iTextureHandle* )
+bool NeXTDriver2D::SetMouseCursor( csMouseCursorID shape, iTextureHandle* )
     {
     bool handled = false;
     if (shape == csmcArrow)

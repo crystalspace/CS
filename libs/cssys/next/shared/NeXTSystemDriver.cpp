@@ -13,29 +13,36 @@
 // NeXTSystemDriver.cpp
 //
 //	NeXT-specific hardware & operating/system drivers for CrystalSpace.
+//	This file contains methods which are shared between MacOS/X Server,
+//	OpenStep, and NextStep platforms.  See NeXTSystemLocal.cpp for
+//	platform-specific implementation.
 //
 //-----------------------------------------------------------------------------
 #include "NeXTSystemDriver.h"
-#include "NeXTSystemProxy.h"
 #include "version.h"
 #include "csutil/inifile.h"
 
 //-----------------------------------------------------------------------------
 // SCF interface to NeXT-specific csSystemDriver.
 //-----------------------------------------------------------------------------
-IMPLEMENT_IBASE(SysSystemDriver)
+IMPLEMENT_IBASE(NeXTSystemDriver)
     IMPLEMENTS_INTERFACE(iSystem)
-    IMPLEMENTS_INTERFACE(iNeXTSystemDriver)
+    IMPLEMENTS_EMBEDDED_INTERFACE(iNeXTSystemDriver)
 IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE(NeXTSystemDriver::NeXTSystemInterface)
+  IMPLEMENTS_INTERFACE(iNeXTSystemDriver)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-SysSystemDriver::SysSystemDriver() :
-    csSystemDriver(), proxy(0), simulated_depth(0)
+NeXTSystemDriver::NeXTSystemDriver() : csSystemDriver(), 
+    initialized(false), controller(0), ticks(0), simulated_depth(0)
     {
     CONSTRUCT_IBASE(0);
+    CONSTRUCT_EMBEDDED_IBASE(scfiNeXTSystemDriver);
     printf("Crystal Space for " OS_NEXT_DESCRIPTION " " VERSION "\nPorted to "
 	OS_NEXT_DESCRIPTION " by Eric Sunshine <sunshine@sunshineco.com>\n\n");
     }
@@ -44,19 +51,21 @@ SysSystemDriver::SysSystemDriver() :
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
-SysSystemDriver::~SysSystemDriver()
+NeXTSystemDriver::~NeXTSystemDriver()
     {
-    if (proxy != 0)
-	delete proxy;
+    if (initialized)
+	shutdown_system();
     }
 
 
 //-----------------------------------------------------------------------------
-// Initialize -- Create the SCF --> Objective-C proxy.
+// Initialize
 //-----------------------------------------------------------------------------
-bool SysSystemDriver::Initialize( int argc, char* argv[], char const* cfgfile )
+bool NeXTSystemDriver::Initialize(int argc, char* argv[], char const* cfgfile)
     {
-    proxy = new NeXTSystemProxy( this );
+    init_system();
+    init_ticks();
+    initialized = true;
     return superclass::Initialize( argc, argv, cfgfile );
     }
 
@@ -64,9 +73,9 @@ bool SysSystemDriver::Initialize( int argc, char* argv[], char const* cfgfile )
 //-----------------------------------------------------------------------------
 // SetSystemDefaults
 //-----------------------------------------------------------------------------
-void SysSystemDriver::SetSystemDefaults( csIniFile* config )
+void NeXTSystemDriver::SetSystemDefaults( csIniFile* config )
     {
-    superclass::SetSystemDefaults(config);
+    superclass::SetSystemDefaults( config );
     char const* const s = GetOptionCL( "simdepth" );
     simulated_depth = (s != 0 ?
 	atoi(s) : config->GetInt( "VideoDriver", "SimulateDepth", 0 ));
@@ -76,7 +85,7 @@ void SysSystemDriver::SetSystemDefaults( csIniFile* config )
 //-----------------------------------------------------------------------------
 // Help
 //-----------------------------------------------------------------------------
-void SysSystemDriver::Help()
+void NeXTSystemDriver::Help()
     {
     superclass::Help();
     Printf( MSG_STDOUT,
@@ -87,16 +96,49 @@ void SysSystemDriver::Help()
 //-----------------------------------------------------------------------------
 // Loop -- Start the Application's run-loop; return at termination.
 //-----------------------------------------------------------------------------
-void SysSystemDriver::Loop()
+void NeXTSystemDriver::Loop()
     {
-    proxy->start_loop(); // Returns when user requests shutdown.
+    start_loop(); // Returns when user requests shutdown.
+    }
+
+
+//-----------------------------------------------------------------------------
+// timer_fired -- Target of timer.  Forwards timer event to proxy.
+//-----------------------------------------------------------------------------
+void NeXTSystemDriver::timer_fired()
+    {
+    step_frame();
+    if (!continue_looping())
+	stop_run_loop();
+    }
+
+
+//-----------------------------------------------------------------------------
+// step_frame
+//-----------------------------------------------------------------------------
+void NeXTSystemDriver::step_frame()
+    {
+    long const now = Time();
+    long const elapsed = now - ticks;
+    ticks = now;
+    NextFrame( elapsed, now );
+    }
+
+
+//-----------------------------------------------------------------------------
+// terminate
+//-----------------------------------------------------------------------------
+void NeXTSystemDriver::terminate()
+    {
+    Shutdown = true;
+    stop_run_loop();
     }
 
 
 //-----------------------------------------------------------------------------
 // GetSimulatedDepth
 //-----------------------------------------------------------------------------
-int SysSystemDriver::GetSimulatedDepth() const
+int NeXTSystemDriver::NeXTSystemInterface::GetSimulatedDepth() const
     {
-    return simulated_depth;
+    return scfParent->simulated_depth;
     }

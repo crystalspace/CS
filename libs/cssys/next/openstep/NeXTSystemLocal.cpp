@@ -10,18 +10,15 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTSystemProxy.cpp
+// NeXTSystemLocal.cpp
 //
-//	C++ object which interacts with Objective-C world on behalf of 
-//	SysSystemDriver which can not directly interface with Objective-C on 
-//	account of COM-related conflicts.  This is the Objective-C-only 
-//	portion of NeXTSystemProxy.  See NeXTSystemProxyCom.cpp for the 
-//	COM-only portion of NeXTSystemProxy.  Also see README.NeXT for 
-//	details.  
+//	NeXT-specific hardware & operating/system drivers for CrystalSpace.
+//	This file contains methods which are specific to the MacOS/X Server
+//	and OpenStep platforms.  See NeXTSystemDriver.cpp for methods which
+//	are shared between MacOS/X Server, OpenStep, and NextStep.
 //
-// *WARNING* Do NOT include any COM headers in this file.
 //-----------------------------------------------------------------------------
-#import "NeXTSystemProxy.h"
+#import "NeXTSystemDriver.h"
 #import "NeXTDelegate.h"
 #import "NeXTMenu.h"
 extern "Objective-C" {
@@ -32,39 +29,37 @@ extern "Objective-C" {
 #import <Foundation/NSProcessInfo.h>
 }
 
-static NSAutoreleasePool* GLOBAL_POOL = 0;
+static NSAutoreleasePool* CS_GLOBAL_POOL = 0;
 
 //-----------------------------------------------------------------------------
 // Category of NSApplication which supports recursive run loops.
 //-----------------------------------------------------------------------------
-@interface NSApplication (NeXTSystemProxy)
-- (void)runRecursively:(NeXTSystemProxy const*)proxy;
+@interface NSApplication (NeXTSystemDriver)
+- (void)runRecursively:(NeXTSystemDriver const*)sys;
 @end
-@implementation NSApplication (NeXTSystemProxy)
-- (void)runRecursively:(NeXTSystemProxy const*)proxy
+@implementation NSApplication (NeXTSystemDriver)
+- (void)runRecursively:(NeXTSystemDriver const*)sys
     {
     int const was_running = _running;
     [self run];
-    if (proxy->continue_running())
+    if (sys->continue_running())
 	_running = was_running;
     }
 @end
 
 
 //-----------------------------------------------------------------------------
-// Constructor
+// init_system
 //	Interaction with AppKit is initiated here with instantiation of an
-//	Application object and the 'controller' which oversees AppKit-related
-//	events and messages.
+//	NSApplication object and the 'controller' which oversees AppKit-
+//	related events and messages.
 //-----------------------------------------------------------------------------
-NeXTSystemProxy::NeXTSystemProxy( SysSystemDriver* p )
+void NeXTSystemDriver::init_system()
     {
-    if (GLOBAL_POOL == 0) GLOBAL_POOL = [[NSAutoreleasePool alloc] init];
+    if (CS_GLOBAL_POOL == 0) CS_GLOBAL_POOL = [[NSAutoreleasePool alloc] init];
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    driver = p;
-    init_ticks();
     NSApp = [NSApplication sharedApplication];
-    controller = [[NeXTDelegate alloc] initWithProxy:this];
+    controller = [[NeXTDelegate alloc] initWithDriver:this];
     [NSApp setDelegate:controller];
     NSMenu* const menu = NeXTMenuGenerate();
     [menu setTitle:[[NSProcessInfo processInfo] processName]];
@@ -74,9 +69,9 @@ NeXTSystemProxy::NeXTSystemProxy( SysSystemDriver* p )
 
 
 //-----------------------------------------------------------------------------
-// Destructor
+// shutdown_system
 //-----------------------------------------------------------------------------
-NeXTSystemProxy::~NeXTSystemProxy()
+void NeXTSystemDriver::shutdown_system()
     {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     [[NSApp delegate] showMouse];
@@ -93,7 +88,7 @@ NeXTSystemProxy::~NeXTSystemProxy()
 //	Begin a run-loop.  May be called recursively by CSWS.  Uses special
 //	-runRecursively: method to handle recursive invocations of run-loop.
 //-----------------------------------------------------------------------------
-void NeXTSystemProxy::start_loop()
+void NeXTSystemDriver::start_loop()
     {
     if (continue_running())
 	{
@@ -106,23 +101,11 @@ void NeXTSystemProxy::start_loop()
 
 
 //-----------------------------------------------------------------------------
-// timer_fired
-//	Target of timer.  Forwards timer event to proxy.
-//-----------------------------------------------------------------------------
-void NeXTSystemProxy::timer_fired()
-    {
-    step_frame();
-    if (!continue_looping())
-	stop_run_loop();
-    }
-
-
-//-----------------------------------------------------------------------------
 // stop_run_loop
 //	Stops the application's run-loop.  Unfortunately the run-loop does not 
 //	actually stop until another event arrives, so we fake one up.  
 //-----------------------------------------------------------------------------
-void NeXTSystemProxy::stop_run_loop()
+void NeXTSystemDriver::stop_run_loop()
     {
     [NSApp stop:0];
     [NSApp postEvent:[NSEvent otherEventWithType:NSApplicationDefined

@@ -14,12 +14,12 @@
 //-----------------------------------------------------------------------------
 // NeXTDelegate.h
 //
-//	A delegate to the Application and animation Window.  Acts as a gateway 
-//	between the AppKit and CrystalSpace by forwarding Objective-C messages 
-//	and events to SysSystemDriver's C++ proxy, NeXTSystemProxy.  In 
-//	particular, mouse and keyboard related events from the animation view 
-//	are translated into CrystalSpace format and forwarded.  Application 
-//	and Window events (such as application termination) are also handled.
+//	A delegate to the Application and animation Window.  Acts as a gateway
+//	between the AppKit and CrystalSpace by forwarding Objective-C messages
+//	and events to the C++ system driver, NeXTSystemDriver.  In particular,
+//	mouse and keyboard related events from the animation view are
+//	translated into CrystalSpace format and forwarded.  Application and
+//	Window events (such as application termination) are also handled.
 //
 //-----------------------------------------------------------------------------
 extern "Objective-C" {
@@ -27,16 +27,14 @@ extern "Objective-C" {
 #import <AppKit/NSView.h>	// NSTrackingRectTag
 }
 @class NSString, NSTimer, NSWindow;
-class NeXTSystemProxy;
+class NeXTSystemDriver;
 
 @interface NeXTDelegate : NSObject
     {
+    NeXTSystemDriver* driver;
     NSWindow* animationWindow;
-    NeXTSystemProxy* proxy;
     NSTimer* timer;
-    BOOL stateShift;
-    BOOL stateAlt;
-    BOOL stateCtrl;
+    unsigned long modifiers;
     BOOL mouseHidden;
     BOOL paused;
     BOOL autoResume;
@@ -45,7 +43,7 @@ class NeXTSystemProxy;
     NSString* savedTitle;
     }
 
-- (id)initWithProxy:(NeXTSystemProxy*)proxy;
+- (id)initWithDriver:(NeXTSystemDriver*)driver;
 - (BOOL)windowShouldClose:(id)sender;
 - (void)windowDidMove:(NSNotification*)n;
 - (void)registerAnimationWindow:(NSWindow*)w; // Must have valid windowNum.

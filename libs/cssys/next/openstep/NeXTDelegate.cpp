@@ -12,16 +12,16 @@
 //-----------------------------------------------------------------------------
 // NeXTDelegate.cpp
 //
-//	A delegate to the Application and animation Window.  Acts as a gateway 
-//	between the AppKit and CrystalSpace by forwarding Objective-C messages 
-//	and events to SysSystemDriver's C++ proxy, NeXTSystemProxy.  In 
-//	particular, mouse and keyboard related events from the animation view 
-//	are translated into CrystalSpace format and forwarded.  Application 
-//	and Window events (such as application termination) are also handled.
+//	A delegate to the Application and animation Window.  Acts as a gateway
+//	between the AppKit and CrystalSpace by forwarding Objective-C messages
+//	and events to the C++ system driver, NeXTSystemDriver.  In particular,
+//	mouse and keyboard related events from the animation view are
+//	translated into CrystalSpace format and forwarded.  Application and
+//	Window events (such as application termination) are also handled.
 //
 //-----------------------------------------------------------------------------
 #import "NeXTDelegate.h"
-#import "NeXTSystemProxy.h"
+#import "NeXTSystemDriver.h"
 #import "csinput/csevent.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
@@ -72,11 +72,11 @@ enum
 
 //-----------------------------------------------------------------------------
 // timerFired:
-//	Target of timer.  Forwards timer event to proxy.  Runs in child thread.
+//	Target of timer; forwards timer event to driver; runs in child thread.
 //-----------------------------------------------------------------------------
 - (void)timerFired:(NSTimer*)p
     {
-    proxy->timer_fired();
+    driver->timer_fired();
     }
 
 
@@ -247,7 +247,7 @@ enum
     [self stopTimer];
     [self unprepareWindow:animationWindow];
     [animationWindow close];
-    proxy->terminate();
+    driver->terminate();
     }
 
 
@@ -258,7 +258,7 @@ enum
 - (BOOL)windowShouldClose:(id)sender
     {
     if (sender == animationWindow)
-	[self quit:self];
+	[self quit:0];
     return YES;
     }
 
@@ -389,21 +389,23 @@ enum
 
 
 //-----------------------------------------------------------------------------
-// check:key:mask:flag:
+// check:ns:cs:key:
 //	Track state of modifier (shift, alt, ctrl) keys.  OpenStep does not
 //	supply key up/down events for modifier flags so simulate these events
 //	whenever a -flagsChanged: notification is posted.
 //-----------------------------------------------------------------------------
-- (void)check:(NSEvent*)p key:(int)key mask:(unsigned int)mask flag:(BOOL*)flag
+- (void)check:(NSEvent*)p ns:(unsigned int)nsmask
+    cs:(unsigned long)csmask key:(int)key
     {
-    BOOL const state = (([p modifierFlags] & mask) != 0);
-    if (state != *flag)
+    BOOL const new_state = (([p modifierFlags] & nsmask) != 0);
+    BOOL const old_state = ((modifiers & csmask) != 0);
+    if (new_state != old_state)
 	{
-	if (state)
-	    proxy->key_down( key );
+	driver->QueueKeyEvent( key, new_state );
+	if (new_state)
+	    modifiers |= csmask;
 	else
-	    proxy->key_up( key );
-	*flag = state;
+	    modifiers &= ~csmask;
 	}
     }
 
@@ -411,25 +413,29 @@ enum
 //-----------------------------------------------------------------------------
 // Keyboard
 //-----------------------------------------------------------------------------
-- (void)keyDown:(NSEvent*)p inView:(NSView*)v
+- (void)keyEvent:(NSEvent*)p down:(BOOL)flag
     {
     if (!paused)
-	proxy->key_down( [self classifyKeyDown:p] );
+	driver->QueueKeyEvent( [self classifyKeyDown:p], flag );
+    }
+
+- (void)keyDown:(NSEvent*)p inView:(NSView*)v
+    {
+    [self keyEvent:p down:YES];
     }
 
 - (void)keyUp:(NSEvent*)p inView:(NSView*)v
     {
-    if (!paused)
-	proxy->key_up( [self classifyKeyDown:p] );
+    [self keyEvent:p down:NO];
     }
 
 - (void)flagsChanged:(NSEvent*)p inView:(NSView*)v
     {
     if (!paused)
 	{
-	[self check:p key:CSKEY_SHIFT mask:NSShiftKeyMask     flag:&stateShift];
-	[self check:p key:CSKEY_ALT   mask:NSAlternateKeyMask flag:&stateAlt  ];
-	[self check:p key:CSKEY_CTRL  mask:NSControlKeyMask   flag:&stateCtrl ];
+	[self check:p ns:NSShiftKeyMask     cs:CSMASK_SHIFT key:CSKEY_SHIFT];
+	[self check:p ns:NSAlternateKeyMask cs:CSMASK_ALT   key:CSKEY_ALT  ];
+	[self check:p ns:NSControlKeyMask   cs:CSMASK_CTRL  key:CSKEY_CTRL ];
 	}
     }
 
@@ -458,7 +464,7 @@ enum
 	{
 	int x, y;
 	if ([self localize:p toView:v x:&x y:&y])
-	    proxy->mouse_moved( x, y );
+	    driver->QueueMouseEvent( 0, false, x, y, 0 );
 	}
     }
 
@@ -468,7 +474,7 @@ enum
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	proxy->mouse_up( button, x, y );
+	driver->QueueMouseEvent( button, false, x, y, 0 );
 	}
     }
 
@@ -478,7 +484,7 @@ enum
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	proxy->mouse_down( button, x, y, stateShift, stateAlt, stateCtrl );
+	driver->QueueMouseEvent( button, true, x, y, modifiers );
 	}
     }
 
@@ -521,8 +527,8 @@ enum
 	savedTitle = [[animationWindow title] copy];
 	[animationWindow setTitle:
 		[savedTitle stringByAppendingString:@"  [Paused]"]];
-	proxy->focus_changed( false );
-	proxy->clock_running( false );
+	driver->pause_clock();
+	driver->QueueFocusEvent( false );
 	}
     }
 
@@ -534,8 +540,8 @@ enum
 	[animationWindow setTitle:savedTitle];
 	[self startTracking:animationWindow];
 	[self startTimer];
-	proxy->focus_changed( true );
-	proxy->clock_running( true );
+	driver->resume_clock();
+	driver->QueueFocusEvent( true );
 	}
     }
 
@@ -564,17 +570,15 @@ enum
 
 
 //-----------------------------------------------------------------------------
-// initWithProxy:
+// initWithDriver:
 //-----------------------------------------------------------------------------
-- (id)initWithProxy:(NeXTSystemProxy*)p
+- (id)initWithDriver:(NeXTSystemDriver*)p
     {
     [super init];
     animationWindow = 0;
-    proxy = p;
+    driver = p;
     timer = 0;
-    stateShift = NO;
-    stateAlt   = NO;
-    stateCtrl  = NO;
+    modifiers = 0;
     mouseHidden = NO;
     paused = NO;
     tracking = NO;

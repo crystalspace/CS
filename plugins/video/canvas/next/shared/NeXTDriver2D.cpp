@@ -13,13 +13,16 @@
 // NeXTDriver2D.cpp
 //
 //	NeXT-specific subclass of csGraphics2D which implements 2D-graphic
-//	functionality via the AppKit.
+//	functionality via the AppKit.  This file contains methods which are
+//	shared between the MacOS/X Server, OpenStep, and NextStep platforms.
+//	See NeXTLocal2D.cpp for platform-specific implementation.
 //
 //-----------------------------------------------------------------------------
 #include "sysdef.h"
 #include "NeXTDriver2D.h"
-#include "NeXTFrameBuffer.h"
-#include "NeXTProxy2D.h"
+#include "NeXTFrameBuffer15.h"
+#include "NeXTFrameBuffer32.h"
+#include "NeXTSystemInterface.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY(NeXTDriver2D)
@@ -38,7 +41,7 @@ IMPLEMENT_IBASE_END
 // Constructor
 //-----------------------------------------------------------------------------
 NeXTDriver2D::NeXTDriver2D( iBase* p ) :
-    csGraphics2D(), next_system(0), proxy(0)
+    csGraphics2D(), initialized(false), frame_buffer(0), view(0)
     {
     CONSTRUCT_IBASE(p);
     }
@@ -49,11 +52,10 @@ NeXTDriver2D::NeXTDriver2D( iBase* p ) :
 //-----------------------------------------------------------------------------
 NeXTDriver2D::~NeXTDriver2D()
     {
-    Close();
-    if (proxy != 0)
-	delete proxy;
-    if (next_system != 0)
-	next_system->DecRef();
+    if (initialized)
+	shutdown_driver();
+    if (frame_buffer != 0)
+	delete frame_buffer;
     Memory = 0;
     }
 
@@ -62,33 +64,17 @@ NeXTDriver2D::~NeXTDriver2D()
 // Initialize
 //	We only support depth of 15 or 32.  See README.NeXT for an explanation.
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::Initialize(iSystem* s)
+bool NeXTDriver2D::Initialize( iSystem* s )
     {
     bool ok = superclass::Initialize(s);
     if (ok)
 	{
-	next_system = QUERY_INTERFACE (System, iNeXTSystemDriver);
-	if (next_system != 0)
+	iNeXTSystemDriver* nxsys = QUERY_INTERFACE (System, iNeXTSystemDriver);
+	if (nxsys != 0)
 	    {
-	    int simulated_depth = next_system->GetSimulatedDepth();
-	    proxy = new NeXTProxy2D( Width, Height, simulated_depth );
-	    NeXTFrameBuffer const* frame_buffer = proxy->get_frame_buffer();
-	    if (frame_buffer != 0)
-		{
-		Depth  = frame_buffer->depth();
-		Memory = frame_buffer->get_raw_buffer();
-		pfmt.RedMask    = frame_buffer->red_mask();
-		pfmt.GreenMask  = frame_buffer->green_mask();
-		pfmt.BlueMask   = frame_buffer->blue_mask();
-		pfmt.PixelBytes = frame_buffer->bytes_per_pixel();
-		pfmt.PalEntries = frame_buffer->palette_entries();
-		complete_pixel_format();
-		switch (Depth)
-		    {
-		    case 15: setup_rgb_15(); break;
-		    case 32: setup_rgb_32(); break;
-		    }
-		}
+	    initialized = true;
+	    ok = init_driver( nxsys->GetSimulatedDepth() );
+	    nxsys->DecRef();
 	    }
 	else
 	    {
@@ -98,6 +84,58 @@ bool NeXTDriver2D::Initialize(iSystem* s)
 	    }
 	}
     return ok;
+    }
+
+
+//-----------------------------------------------------------------------------
+// init_driver
+//-----------------------------------------------------------------------------
+bool NeXTDriver2D::init_driver( int simulate_depth )
+    {
+    bool ok = true;
+    switch (determine_bits_per_sample( simulate_depth ))
+	{
+	case 4: frame_buffer = new NeXTFrameBuffer15( Width, Height ); break;
+	case 8: frame_buffer = new NeXTFrameBuffer32( Width, Height ); break;
+	default: ok = false; break;
+	}
+
+    if (ok)
+	{
+	Depth  = frame_buffer->depth();
+	Memory = frame_buffer->get_raw_buffer();
+	pfmt.RedMask    = frame_buffer->red_mask();
+	pfmt.GreenMask  = frame_buffer->green_mask();
+	pfmt.BlueMask   = frame_buffer->blue_mask();
+	pfmt.PixelBytes = frame_buffer->bytes_per_pixel();
+	pfmt.PalEntries = frame_buffer->palette_entries();
+	complete_pixel_format();
+	switch (Depth)
+	    {
+	    case 15: setup_rgb_15(); break;
+	    case 32: setup_rgb_32(); break;
+	    }
+	}
+    else
+	System->Print( MSG_FATAL_ERROR, "FATAL: Bizarre internal error; "
+		"support for 15- and 32-bit RGB only\n" );
+    return ok;
+    }
+
+
+//-----------------------------------------------------------------------------
+// determine_bits_per_sample
+//-----------------------------------------------------------------------------
+int NeXTDriver2D::determine_bits_per_sample( int simulate_depth )
+    {
+    int bps;
+    switch (simulate_depth)
+	{
+	case 15: bps = 4; break;
+	case 32: bps = 8; break;
+	default: bps = best_bits_per_sample(); break;
+	}
+    return bps;
     }
 
 
@@ -131,21 +169,9 @@ void NeXTDriver2D::setup_rgb_32()
 bool NeXTDriver2D::Open( char const* title )
     {
     bool okay = false;
-    if (proxy->get_frame_buffer() == 0)
-	System->Print( MSG_FATAL_ERROR, "Unsupported display depth\n" );
-    else if (superclass::Open( title ))
-	okay = proxy->open( title );
+    if (superclass::Open( title ))
+	okay = open_window( title );
     return okay;
-    }
-
-
-//-----------------------------------------------------------------------------
-// Close
-//-----------------------------------------------------------------------------
-void NeXTDriver2D::Close()
-    {
-    proxy->close();
-    superclass::Close();
     }
 
 
@@ -154,14 +180,6 @@ void NeXTDriver2D::Close()
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::Print( csRect* )
     {
-    proxy->flush();
-    }
-
-
-//-----------------------------------------------------------------------------
-// SetMouseCursor
-//-----------------------------------------------------------------------------
-bool NeXTDriver2D::SetMouseCursor( csMouseCursorID c, iTextureHandle* bitmap )
-    {
-    return proxy->set_mouse_cursor( c, bitmap );
+    frame_buffer->cook();
+    flush();
     }
