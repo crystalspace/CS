@@ -74,15 +74,17 @@ void awsEngineView::OnDraw(csRect )
         Frame ().xmin + (Frame ().Width () >> 1),
         (g3d->GetHeight () - Frame ().Height () - Frame ().ymin) +
           (Frame ().Height () >> 1));
+    //view->GetCamera ()->SetFOV (
+        //view->GetCamera ()->GetFOV (),
+        //Frame ().Width ());
     view->GetCamera ()->SetFOV (
-        view->GetCamera ()->GetFOV (),
+        Frame ().Height (),
         Frame ().Width ());
-
-	g3d->BeginDraw (
-              view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
+    g3d->BeginDraw (
+    	view->GetEngine ()->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS);
     view->Draw ();
     g3d->BeginDraw (CSDRAW_2DGRAPHICS);
-	view->SetContext(og3d);
+    view->SetContext(og3d);
   }
 }
 

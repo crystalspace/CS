@@ -3,10 +3,14 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+4-June-2003
+	- Fixed a bug in the AWS engine view where it would not set the FOV
+	  of the camera based on the height of the frame. This caused the
+	  engine view to look a bit weird.
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line
-	   389 in fancycon.cpp)
+	  389 in fancycon.cpp)
 	- Jorrit changed Blocks so it no longer uses HardTransform() on
 	  genmesh instances.
 	- Jorrit removed support for HardTransform() in genmesh objects.
