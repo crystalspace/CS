@@ -188,6 +188,23 @@ void csPolygon3D::Reset ()
   ResetUV ();
 }
 
+void csPolygon3D::SetUV2 (int i, float u, float v)
+{
+  if (!uv_coords)
+  {
+    CHK (uv_coords = new csVector2 [num_vertices]);
+  }
+  else
+  {
+    CHK (csVector2* new_uv_coords = new csVector2 [num_vertices]);
+    memcpy (new_uv_coords, uv_coords, sizeof (csVector2)*(num_vertices-1));
+    CHK (delete [] uv_coords);
+    uv_coords = new_uv_coords;
+  }
+  uv_coords[i].x = u;
+  uv_coords[i].y = v;
+}
+
 void csPolygon3D::SetUV (int i, float u, float v)
 {
   if (!uv_coords) CHKB (uv_coords = new csVector2 [num_vertices]);
@@ -311,15 +328,22 @@ void csPolygon3D::SetPortal (csPortal* prt)
   delete_portal = true;
 }
 
-void csPolygon3D::SplitWithPlane (csVector3* front, int& front_n,
-				  csVector3* back, int& back_n, csPlane& plane)
+void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
+				  csPlane& plane)
 {
+  CHK (csPolygon3D* np1 = new csPolygon3D (*this));
+  CHK (csPolygon3D* np2 = new csPolygon3D (*this));
+  *poly1 = (csPolygonInt*)np1; // Front
+  *poly2 = (csPolygonInt*)np2; // Back
+  np1->Reset ();
+  np2->Reset ();
+  GetParent ()->AddPolygon (np1);
+  GetParent ()->AddPolygon (np2);
+
   csVector3 ptB;
   float sideA, sideB;
   csVector3 ptA = Vwor (num_vertices - 1);
   sideA = plane.Classify (ptA);
-
-  front_n = back_n = 0;
 
   for (int i = -1 ; ++i < num_vertices ; )
   {
@@ -335,11 +359,10 @@ void csPolygon3D::SplitWithPlane (csVector3* front, int& front_n,
 	csVector3 v = ptB; v -= ptA;
 	float sect = - plane.Classify (ptA) / ( plane.Normal () * v ) ;
 	v *= sect; v += ptA;
-	*back++ = *front++ = v;
-	back_n++; front_n++;
+	np1->AddVertex (v);
+	np2->AddVertex (v);
       }
-      *back++ = ptB;
-      back_n++;
+      np2->AddVertex (ptB);
     }
     else if (sideB < 0)
     {
@@ -351,21 +374,24 @@ void csPolygon3D::SplitWithPlane (csVector3* front, int& front_n,
 	csVector3 v = ptB; v -= ptA;
 	float sect = - plane.Classify (ptA) / ( plane.Normal () * v );
 	v *= sect; v += ptA;
-	*back++ = *front++ = v;
-	back_n++; front_n++;
+	np1->AddVertex (v);
+	np2->AddVertex (v);
       }
-      *front++ = ptB;
-      front_n++;
+      np1->AddVertex (ptB);
     }
     else
     {
-      *back++ = *front++ = ptB;
-      back_n++; front_n++;
+      np1->AddVertex (ptB);
+      np2->AddVertex (ptB);
     }
     ptA = ptB;
     sideA = sideB;
   }
+
+  np1->Finish ();
+  np2->Finish ();
 }
+
 
 void csPolygon3D::SetTexture (csTextureHandle* texture)
 {
@@ -1547,15 +1573,10 @@ void csPolygon3D::CacheLightmaps (csPolygonSet* owner, int index)
 
 //---------------------------------------------------------------------------
 
-csPolygon2D csPolygon2D::clipped (MAX_VERTICES, true);
-
-csPolygon2D::csPolygon2D (int max, bool use_uv)
+csPolygon2D::csPolygon2D ()
 {
-  max_vertices = max;
-  CHK (vertices = new csVector2 [max]);
-  //@@@
-  // if (use_uv) { CHK (uv_coords = new csVector2 [max]); }
-  // else uv_coords = NULL;
+  max_vertices = 10;
+  CHK (vertices = new csVector2 [10]);
   MakeEmpty ();
 }
 
@@ -1566,12 +1587,6 @@ csPolygon2D::csPolygon2D (csPolygon2D& copy)
   num_vertices = copy.num_vertices;
   memcpy (vertices, copy.vertices, sizeof (csVector2)*num_vertices);
   bbox = copy.bbox;
-  //if (copy.uv_coords)
-  //{
-    //CHK (uv_coords = new csVector2 [max_vertices]);
-    //memcpy (uv_coords, copy.uv_coords, sizeof (csVector2)*num_vertices);
-  //}
-  //else uv_coords = NULL;
 }
 
 csPolygon2D::~csPolygon2D ()
@@ -1581,7 +1596,6 @@ csPolygon2D::~csPolygon2D ()
   // allocated by csPolygon2DQueue.
   if (max_vertices)
     CHKB (delete [] vertices);
-  //CHK (delete [] uv_coords);
 }
 
 void csPolygon2D::MakeEmpty ()
@@ -1590,21 +1604,31 @@ void csPolygon2D::MakeEmpty ()
   bbox.StartBoundingBox ();
 }
 
+void csPolygon2D::MakeRoom (int new_max)
+{
+  if (new_max <= max_vertices) return;
+  CHK (csVector2* new_vertices = new csVector2 [new_max]);
+  memcpy (new_vertices, vertices, num_vertices*sizeof (csVector2));
+  CHK (delete [] vertices);
+  vertices = new_vertices;
+  max_vertices = new_max;
+}
+
 void csPolygon2D::AddVertex (float x, float y)
 {
+  if (num_vertices >= max_vertices)
+    MakeRoom (max_vertices+5);
   vertices[num_vertices].x = x;
   vertices[num_vertices].y = y;
   num_vertices++;
   bbox.AddBoundingVertex (x, y);
-  if (num_vertices > max_vertices)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "OVERFLOW add_vertex!\n");
-    fatal_exit (0, false);
-  }
 }
 
 void csPolygon2D::AddPerspective (float x, float y, float z)
 {
+  if (num_vertices >= max_vertices)
+    MakeRoom (max_vertices+5);
+
   float iz = csCamera::aspect/z;
   float px, py;
 
@@ -1619,6 +1643,7 @@ void csPolygon2D::AddPerspective (float x, float y, float z)
 
 bool csPolygon2D::ClipAgainst (csClipper* view)
 {
+  MakeRoom (num_vertices+view->GetNumVertices ()+1);
   return view->Clip (vertices, num_vertices, max_vertices, &bbox);
 }
 
@@ -2220,74 +2245,159 @@ void csPolygon2D::AddFogPolygon (IGraphics3D* g3d, csPolygon3D* /*poly*/, csPoly
 
 //---------------------------------------------------------------------------
 
-csVector2Array::csVector2Array ()
-{
-  // Preallocate 100 vectors in the array.
-  max_vectors = 100;
-  CHK (array = new csVector2 [max_vectors]);
-  num_vectors = 0;
-}
-
-csVector2Array::~csVector2Array ()
-{
-  CHK (delete [] array);
-}
-
-int csVector2Array::AddArray (int n)
-{
-  int index = num_vectors;
-  num_vectors += n;
-  if (num_vectors > max_vectors)
-  {
-    max_vectors += 50;
-    CHK (csVector2* new_array = new csVector2 [max_vectors]);
-    if (num_vectors-n > 0)
-      memcpy (new_array, array, (num_vectors-n)*sizeof (csVector2));
-    CHK (delete [] array);
-    array = new_array;
-  }
-  return index;
-}
-
-//---------------------------------------------------------------------------
-
-csVector2Array csPolygon2DQueue::vector_array;
-
 csPolygon2DQueue::csPolygon2DQueue (int max_size)
 {
   CHK (queue = new csQueueElement [max_size]);
   max_queue = max_size;
   num_queue = 0;
-  vector_idx = vector_array.GetNextIndex ();
 }
 
 csPolygon2DQueue::~csPolygon2DQueue ()
 {
   CHK (delete [] queue);
-  vector_array.RemoveArray (vector_idx);
 }
 
 void csPolygon2DQueue::Push (csPolygon3D* poly3d, csPolygon2D* poly2d)
 {
   queue[num_queue].poly3d = poly3d;
-  queue[num_queue].vector_len = poly2d->GetNumVertices ();
-  queue[num_queue].vector_idx = vector_array.AddArray (
-  	poly2d->GetNumVertices ());
-  memcpy (vector_array.GetVectors (queue[num_queue].vector_idx),
-  	poly2d->GetVertices (), sizeof (csVector2)*poly2d->GetNumVertices ());
+  queue[num_queue].poly2d = poly2d;
   num_queue++;
 }
 
-void csPolygon2DQueue::Pop (csPolygon3D** poly3d, csPolygon2D* poly2d)
+bool csPolygon2DQueue::Pop (csPolygon3D** poly3d, csPolygon2D** poly2d)
 {
+  if (num_queue <= 0) return false;
   num_queue--;
   *poly3d = queue[num_queue].poly3d;
-  poly2d->MakeEmpty ();
-  csVector2* array = vector_array.GetVectors (queue[num_queue].vector_idx);
-  int i;
-  for (i = 0 ; i < queue[num_queue].vector_len ; i++)
-    poly2d->AddVertex (array[i]);
+  *poly2d = queue[num_queue].poly2d;
+  return true;
 }
+
+//---------------------------------------------------------------------------
+
+csPolygonBsp::csPolygonBsp ()
+{
+  max_vertices = 4;
+  CHK (vertices = new csVector3 [max_vertices]);
+  num_vertices = 0;
+  poly3d = NULL;
+}
+
+csPolygonBsp::csPolygonBsp (csPolygon3D* orig_poly3d)
+{
+  max_vertices = num_vertices = orig_poly3d->GetNumVertices ();
+  CHK (vertices = new csVector3 [max_vertices]);
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i] = orig_poly3d->Vwor (i);
+  poly3d = orig_poly3d;
+}
+
+csPolygonBsp::~csPolygonBsp ()
+{
+  CHK (delete [] vertices);
+}
+
+
+void csPolygonBsp::AddVertex (const csVector3& v)
+{
+  if (num_vertices >= max_vertices)
+  {
+    max_vertices += 2;
+    CHK (csVector3* new_vertices = new csVector3 [max_vertices]);
+    memcpy (new_vertices, vertices, sizeof (csVector3)*num_vertices);
+    CHK (delete [] vertices);
+    vertices = new_vertices;
+  }
+  vertices[num_vertices++] = v;
+}
+
+int csPolygonBsp::Classify (csPolygonInt* spoly)
+{
+  if (SamePlane (spoly)) return POL_SAME_PLANE;
+
+  int i;
+  int front = 0, back = 0;
+  csPolygonBsp* poly = (csPolygonBsp*)spoly;
+  csPolyPlane* pl = poly->poly3d->GetPlane ();
+
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    float dot = pl->Classify (vertices[i]);
+    if (ABS (dot) < SMALL_EPSILON) dot = 0;
+    if (dot > 0) back++;
+    else if (dot < 0) front++;
+  }
+  if (back == 0) return POL_FRONT;
+  if (front == 0) return POL_BACK;
+  return POL_SPLIT_NEEDED;
+}
+
+void csPolygonBsp::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
+				   csPlane& plane)
+{
+  CHK (csPolygonBsp* np1 = new csPolygonBsp ());
+  CHK (csPolygonBsp* np2 = new csPolygonBsp ());
+  *poly1 = (csPolygonInt*)np1; // Front
+  *poly2 = (csPolygonInt*)np2; // Back
+  np1->SetPolygon3D (poly3d);
+  np2->SetPolygon3D (poly3d);
+
+  csVector3 ptB;
+  float sideA, sideB;
+  csVector3 ptA = vertices[num_vertices - 1];
+  sideA = plane.Classify (ptA);
+
+  for (int i = -1 ; ++i < num_vertices ; )
+  {
+    ptB = vertices[i];
+    sideB = plane.Classify (ptB);
+    if (sideB > 0)
+    {
+      if (sideA < 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - plane.Classify (ptA) / ( plane.Normal () * v ) ;
+	v *= sect; v += ptA;
+	np1->AddVertex (v);
+	np2->AddVertex (v);
+      }
+      np2->AddVertex (ptB);
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - plane.Classify (ptA) / ( plane.Normal () * v );
+	v *= sect; v += ptA;
+	np1->AddVertex (v);
+	np2->AddVertex (v);
+      }
+      np1->AddVertex (ptB);
+    }
+    else
+    {
+      np1->AddVertex (ptB);
+      np2->AddVertex (ptB);
+    }
+    ptA = ptB;
+    sideA = sideB;
+  }
+}
+
+bool csPolygonBsp::SamePlane (csPolygonInt* p)
+{
+  if (((csPolygonBsp*)p)->GetPolyPlane () == GetPolyPlane ()) return true;
+  return csMath3::PlanesEqual (*((csPolygonBsp*)p)->GetPolyPlane (), *GetPolyPlane ());
+}
+
 
 //---------------------------------------------------------------------------
 

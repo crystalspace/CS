@@ -109,7 +109,7 @@ private:
   /**
    * Draw a number of polygons from a queue (used with C buffer processing).
    */
-  static void DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview);
+  void DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview);
 
 public:
   /**
@@ -188,6 +188,12 @@ public:
    * Get the first thing in this sector.
    */
   csThing* GetFirstThing () { return first_thing; }
+
+  /**
+   * Get the thing representing all non-moving things (all
+   * things which are moved into this thing will return IsMerged()==true).
+   */
+  csThing* GetStaticThing () { return static_thing; }
 
   /**
    * Call this function to generate a BSP tree for all csThings

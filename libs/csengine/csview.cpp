@@ -29,7 +29,7 @@ csView::csView (csWorld *iWorld, IGraphics3D* ig3d)
 {
   world = iWorld;
   g3d = ig3d;
-  CHK (view = new csPolygon2D (16));
+  CHK (view = new csPolygon2D ());
   CHK (camera = new csCamera ());
   clipper = NULL;
 }
@@ -56,7 +56,7 @@ void csView::SetRectangle (int x, int y, int w, int h)
 void csView::AddViewVertex (int x, int y)
 {
   if (!view)
-    CHKB (view = new csPolygon2D (16));
+    CHKB (view = new csPolygon2D ());
   view->AddVertex (x, y);
   CHK (delete clipper); clipper = NULL;
 }

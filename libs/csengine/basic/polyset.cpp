@@ -30,6 +30,7 @@
 #include "csengine/stats.h"
 #include "csengine/dumper.h"
 #include "csengine/cbuffer.h"
+#include "csengine/pool.h"
 #include "csobject/nameobj.h"
 #include "csgeom/bsp.h"
 #include "igraph3d.h"
@@ -240,7 +241,7 @@ void csPolygonSet::AddPolygon (csPolygonInt* poly)
   }
 
   polygons[num_polygon++] = poly;
-  poly->SetParent (this);
+  ((csPolygon3D*)poly)->SetParent (this);
 }
 
 
@@ -428,7 +429,7 @@ void csPolygonSet::RestoreTransformation (csVector3* old_tr3)
 }
 
 void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderView* d,
-	bool can_be_reused, bool use_z_buf)
+	bool use_z_buf)
 {
   if (d->callback)
   {
@@ -456,12 +457,9 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderVi
     bool is_this_fog = sector->HasFog ();
 
     // If there is filtering (alpha mapping or something like that) we need to keep the
-    // 2D polygon and texture plane so that it can be drawn after the sector has been drawn.
-    // If 'can_be_reused' == true We can't just use 'poly' because calling Portal->Draw
-    // will (possibly) reuse that 2D polygon.
+    // texture plane so that it can be drawn after the sector has been drawn.
     // The texture plane needs to be kept because this polygon may be rendered again
     // (through mirrors) possibly overwriting the plane.
-    csPolygon2D* keep_clipped = NULL;
     csPolyPlane* keep_plane = NULL;
 
     long do_transp;
@@ -471,10 +469,9 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderVi
               
     if (filtered || is_this_fog)
     {
-      if (can_be_reused) CHKB (keep_clipped = new csPolygon2D (csPolygon2D::clipped));
       CHK (keep_plane = new csPolyPlane (*(p->GetPlane ())));
     }
-              
+
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
     // the maximum number that a sector is drawn (for mirrors).
@@ -482,10 +479,8 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderVi
     {
       if (!d->callback)
       {
-	csPolygon2D* keep = keep_clipped ? keep_clipped : poly;
-	if (filtered)
-	  keep->DrawFilled (d, p, keep_plane, use_z_buf);
-	if (is_this_fog) keep->AddFogPolygon (d->g3d, p, keep_plane, d->IsMirrored (),
+	if (filtered) poly->DrawFilled (d, p, keep_plane, use_z_buf);
+	if (is_this_fog) poly->AddFogPolygon (d->g3d, p, keep_plane, d->IsMirrored (),
 		sector->GetID (), CS_FOG_BACK);
       }
     }
@@ -493,7 +488,6 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderVi
       poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
 
     // Cleanup.
-    CHK (delete keep_clipped);
     CHK (delete keep_plane);
   }
   else if (!d->callback)
@@ -507,19 +501,22 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
   csVector3* verts;
   int num_verts;
   int i;
+  csPolygon2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
   {
+    clip = render_pool->Alloc ();
     p = (csPolygon3D*)polygon[i];
     if ( !p->dont_draw &&
          p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL, d->GetOrigin (),
-	 	verts, num_verts) && 
-         p->DoPerspective (*d, verts, num_verts, &csPolygon2D::clipped,
-	 	NULL/*orig_triangle*/, d->IsMirrored ())  &&
-         csPolygon2D::clipped.ClipAgainst (d->view) )
+	 	verts, num_verts) && //@@@Use pool for verts?
+         p->DoPerspective (*d, verts, num_verts, clip, NULL, d->IsMirrored ())  &&
+         clip->ClipAgainst (d->view) )
     {
-      DrawOnePolygon (p, &csPolygon2D::clipped, d, true, use_z_buf);
+      DrawOnePolygon (p, clip, d, use_z_buf);
     }
+    render_pool->Free (clip);
   }
 }
 
@@ -533,31 +530,34 @@ void csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   int i;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   bool visible;
+  csPolygon2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPolygon2D* clip;
   
   for (i = 0 ; i < num ; i++)
   {
+    clip = render_pool->Alloc ();
+    visible = false;
     p = (csPolygon3D*)polygon[i];
     if ( !p->dont_draw &&
          p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane*)NULL, d->GetOrigin (),
-	 	verts, num_verts) && 
-         p->DoPerspective (*d, verts, num_verts, &csPolygon2D::clipped,
-	 	NULL/*orig_triangle*/, d->IsMirrored ())  &&
-         csPolygon2D::clipped.ClipAgainst (d->view) )
+	 	verts, num_verts) &&
+         p->DoPerspective (*d, verts, num_verts, clip, NULL, d->IsMirrored ())  &&
+         clip->ClipAgainst (d->view) )
     {
       po = p->GetPortal ();
       if (csSector::do_portals && po)
       {
-        visible = c_buffer->TestPolygon (csPolygon2D::clipped.GetVertices (),
-		csPolygon2D::clipped.GetNumVertices ());
+        visible = c_buffer->TestPolygon (clip->GetVertices (), clip->GetNumVertices ());
       }
       else
       {
-        visible = c_buffer->InsertPolygon (csPolygon2D::clipped.GetVertices (),
-		csPolygon2D::clipped.GetNumVertices ());
+        visible = c_buffer->InsertPolygon (clip->GetVertices (), clip->GetNumVertices ());
       }
-      if (visible)
-	poly_queue->Push (p, &csPolygon2D::clipped);
     }
+    if (visible)
+      poly_queue->Push (p, clip);
+    else
+      render_pool->Free (clip);
   }
 }
 

@@ -67,6 +67,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   piHR = NULL;
   textures = NULL;
   c_buffer = NULL;
+  CHK (render_pol2d_pool = new csPolygon2DPool ());
   CHK (cfg_engine = new csEngineConfig ());
   BuildSqrtTable ();
 }
@@ -77,6 +78,7 @@ csWorld::~csWorld ()
   if (piHR) { FINAL_RELEASE (piHR); piHR = NULL; }
   CHK (delete textures);
   CHK (delete cfg_engine);
+  CHK (delete render_pol2d_pool);
 }
 
 void csWorld::Clear ()
@@ -100,6 +102,8 @@ void csWorld::Clear ()
   CHK (delete textures); textures = NULL;
   CHK (textures = new csTextureList ());
   CHK (delete c_buffer); c_buffer = NULL;
+  CHK (delete render_pol2d_pool);
+  CHK (render_pol2d_pool = new csPolygon2DPool ());
 }
 
 void csWorld::EnableLightingCache (bool en)
@@ -456,9 +460,70 @@ void csWorld::Draw (IGraphics3D* g3d, csCamera* c, csClipper* view)
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
   rview.callback = NULL;
 
-  //@@@ Make this a flag.
-  //EnableCBuffer (true);
-  if (c_buffer) c_buffer->Initialize ();
+  if (c_buffer)
+  {
+    c_buffer->Initialize ();
+#if 0
+    printf ("------ INIT --------\n");
+    bool empty[800];
+    int v;
+    for (;;)
+    {
+      int cnt = (rand () >> 3) % 200;
+      printf ("%d ", cnt); fflush (stdout);
+      for (v = 0 ; v < 800 ; v++) empty[v]=true;
+      for (v = 0 ; v < 80 ; v++) empty[v]=false;
+      for (v = 640+80 ; v < 800 ; v++) empty[v]=false;
+      c_buffer->Initialize ();
+      bool rc1, rc2, span_empty;
+      int x;
+      while (cnt > 0)
+      {
+        int sx = ((rand () >> 3) % 700)-30;
+        int ex = ((rand () >> 3) % 700)-30;
+	if (ex < sx) { int s = sx; sx = ex; ex = s; }
+
+	rc1 = c_buffer->TestSpan (sx, ex, 10);
+	span_empty = false;
+	for (x = sx ; x <= ex ; x++)
+	  if (empty[x+80]) { span_empty = true; break; }
+	rc2 = span_empty == true;
+	if (rc1 != rc2)
+	{
+	  printf ("\nERROR!\n");
+	  printf ("TestSpan (%d,%d) returned %d while extra check gives %d\n",
+	  	sx, ex, rc1, rc2);
+    	  c_buffer->DumpLine (10);
+	  exit (0);
+	}
+
+	rc1 = c_buffer->InsertSpan (sx, ex, 10);
+	span_empty = false;
+	for (x = sx ; x <= ex ; x++)
+	  if (empty[x+80]) { span_empty = true; empty[x+80] = false; }
+	rc2 = span_empty == true;
+	if (rc1 != rc2)
+	{
+	  printf ("\nERROR!\n");
+	  printf ("InsertSpan (%d,%d) returned %d while extra check gives %d\n",
+	  	sx, ex, rc1, rc2);
+    	  c_buffer->DumpLine (10);
+	  exit (0);
+	}
+
+	for (x = -30 ; x < 640+30 ; x++)
+	  if (c_buffer->TestSpan (x, x, 10) != empty[x+80])
+	  {
+	    printf ("\nERROR!\n");
+	    printf ("Scanline doesn't correspond to buffer (x=%d)!\n", x);
+	    c_buffer->DumpLine (10);
+	    exit (0);
+	  }
+        cnt--;
+      }
+    }
+#endif
+  }
 
   csSector* s = c->GetSector ();
   s->Draw (rview);

@@ -23,6 +23,7 @@
 #include "csgeom/math3d.h"
 #include "csengine/csobjvec.h"
 #include "csengine/rview.h"
+#include "csengine/pool.h"
 #include "csobject/csobj.h"
 #include "csutil/cleanup.h"
 
@@ -161,6 +162,8 @@ public:
   static ISystem* isys;
   // Current world.
   static csWorld* current_world;
+  // An object pool for 2D polygons used by the rendering process.
+  csPolygon2DPool* render_pol2d_pool;
 
 private:
   /// Texture and color information object.

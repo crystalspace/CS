@@ -69,45 +69,6 @@ class csPolygonInt
 {
 public:
   /**
-   * Clone this polygon and return a new (almost)
-   * identical copy. The vertices must not be cloned (the resulting
-   * polygon should be empty) and the polygon should not be linked
-   * to the parent, but all other attributes must be copied.
-   */
-  virtual csPolygonInt* Clone () = 0;
-
-  /**
-   * Set the parent of this polygon.
-   */
-  virtual void SetParent (csPolygonParentInt* parent) = 0;
-
-  /**
-   * Get the parent of this polygon.
-   */
-  virtual csPolygonParentInt* GetParent () = 0;
-
-  /**
-   * Reset the polygon (remove all vertices).
-   */
-  virtual void Reset () = 0;
-
-  /**
-   * Add a vertex from the container to the polygon and return
-   * the index (starting with 0) of the added vertex.
-   */
-  virtual int AddVertex (const csVector3& v) = 0;
-
-  /**
-   * Finish adding vertices.
-   */
-  virtual void Finish () = 0;
-
-  /**
-   * Return the current number of vertices in this polygon.
-   */
-  virtual int GetNumVertices () = 0;
-
-  /**
    * Return the plane of this polygon.
    */
   virtual csPlane* GetPolyPlane () = 0;
@@ -122,11 +83,12 @@ public:
   virtual int Classify (csPolygonInt* poly) = 0;
 
   /**
-   * Split this polygon with the given plane (A,B,C,D) and put the
-   * 'front' polygon in the 'front' array and the 'back' polygon in the
-   * 'back' array.
+   * Split this polygon with the given plane (A,B,C,D) and return the
+   * two resulting new polygons in 'front' and 'back'. The new polygons will
+   * mimic the behaviour of the parent polygon as good as possible.
+   * This function is mainly used by the BSP splitter.
    */
-  virtual void SplitWithPlane (csVector3* front, int& front_n, csVector3* back, int& back_n, csPlane& plane) = 0;
+  virtual void SplitWithPlane (csPolygonInt** front, csPolygonInt** back, csPlane& plane) = 0;
 
   /**
    * Return true if this polygon and the given polygon are on the same

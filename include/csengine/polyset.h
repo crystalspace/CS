@@ -176,16 +176,14 @@ protected:
 
   /**
    * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
-   * and clipped version of the 3D polygon. If 'can_be_reused' is true then
-   * you cannot depend on the 2D polygon having the same value after recusing
-   * through a portal. Otherwise you can depend on this.
+   * and clipped version of the 3D polygon.
    */
   void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly, csRenderView* d,
-	bool can_be_reused, bool use_z_buf);
+	bool use_z_buf);
   /**
-   * Draw the given array of polygons from this csPolygonSet. This
+   * Draw the given array of polygons in the current csPolygonSet. This
    * function is called by subclasses of csPolygonSet (csSector and
-   * Thing currently).
+   * csThing currently).
    */
   void DrawPolygonArray (csPolygonInt** polygon, int num, csRenderView* rview,
   	bool use_z_buf);

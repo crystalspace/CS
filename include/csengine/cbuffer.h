@@ -90,6 +90,9 @@ private:
    * true if the span line was modified (i.e. the span is visible).
    */
   bool InsertSpan (int startx, int endx);
+
+  /// Dump information about this scanline.
+  void Dump ();
 };
 
 /**
@@ -173,6 +176,9 @@ public:
    * Returns true if the polygon is visible.
    */
   bool InsertPolygon (csVector2* verts, int num_verts);
+
+  /// Dump debug information for a scanline.
+  void DumpLine (int y) { lines[y].Dump (); }
 };
 
 #endif /*CBUFFER_H*/

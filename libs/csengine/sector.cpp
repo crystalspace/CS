@@ -291,6 +291,14 @@ void* csSector::TestQueuePolygons (csPolygonParentInt* pi, csPolygonInt** polygo
 
 void csSector::DrawPolygonsFromQueue (csPolygon2DQueue* queue, csRenderView* rview)
 {
+  csPolygon3D* poly3d;
+  csPolygon2D* poly2d;
+  csPolygon2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  while (queue->Pop (&poly3d, &poly2d))
+  {
+    DrawOnePolygon (poly3d, poly2d, rview, false);
+    render_pool->Free (poly2d);
+  }
 }
 
 int compare_z_thing (const void* p1, const void* p2)
@@ -361,9 +369,10 @@ void csSector::Draw (csRenderView& rview)
     {
       CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()));
     }
+    csPolygon2DQueue* queue = poly_queue;
     TestQueuePolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&rview);
-    DrawPolygonsFromQueue (poly_queue, &rview);
-    CHK (delete poly_queue);
+    DrawPolygonsFromQueue (queue, &rview);
+    CHK (delete queue);
   }
   else if (bsp)
     bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, (void*)&rview);

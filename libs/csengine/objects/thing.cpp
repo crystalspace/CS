@@ -386,6 +386,8 @@ void csThing::DrawFoggy (csRenderView& d)
   csVector3* verts;
   int num_verts;
   int i;
+  csPolygon2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
+  csPolygon2D* clip;
 
   if (TransformWorld2Cam (d))
   {
@@ -398,50 +400,54 @@ void csThing::DrawFoggy (csRenderView& d)
     {
       p = (csPolygon3D*)polygons[i];
       if (p->dont_draw) continue;
+      clip = render_pool->Alloc ();
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
       if (!front
        && p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
              verts, num_verts, false)
-       && p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ())
-       && csPolygon2D::clipped.ClipAgainst (d.view))
+       && p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ())
+       && clip->ClipAgainst (d.view))
       {
 	if (d.callback)
 	{
           d.callback (&d, CALLBACK_POLYGON, (void*)p);
-          d.callback (&d, CALLBACK_POLYGON2D, (void*)&csPolygon2D::clipped);
+          d.callback (&d, CALLBACK_POLYGON2D, (void*)clip);
 	}
 
         Stats::polygons_drawn++;
 
 	if (!d.callback)
-          csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (), CS_FOG_BACK);
+          clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (), CS_FOG_BACK);
       }
+      render_pool->Free (clip);
     }
     d.SetMirrored (!d.IsMirrored ());
     for (i = 0 ; i < num_polygon ; i++)
     {
       p = (csPolygon3D*)polygons[i];
       if (p->dont_draw) continue;
+      clip = render_pool->Alloc ();
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
 
       if (front
        && p->ClipToPlane (d.do_clip_plane ? &d.clip_plane : (csPlane*)NULL, d.GetOrigin (),
           verts, num_verts, true)
-       && p->DoPerspective (d, verts, num_verts, &csPolygon2D::clipped, orig_triangle, d.IsMirrored ())
-       && csPolygon2D::clipped.ClipAgainst (d.view))
+       && p->DoPerspective (d, verts, num_verts, clip, orig_triangle, d.IsMirrored ())
+       && clip->ClipAgainst (d.view))
       {
 	if (d.callback)
 	{
           d.callback (&d, CALLBACK_POLYGON, (void*)p);
-          d.callback (&d, CALLBACK_POLYGON2D, (void*)&csPolygon2D::clipped);
+          d.callback (&d, CALLBACK_POLYGON2D, (void*)clip);
 	}
 
         Stats::polygons_drawn++;
 
         if (!d.callback)
-	  csPolygon2D::clipped.AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (), CS_FOG_FRONT);
+	  clip->AddFogPolygon (d.g3d, p, p->GetPlane (), d.IsMirrored (), GetID (), CS_FOG_FRONT);
       }
+      render_pool->Free (clip);
     }
     if (!d.callback) d.g3d->CloseFogObject (GetID ());
   }

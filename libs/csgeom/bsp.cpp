@@ -145,33 +145,10 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons, int num)
       case POL_BACK: back_poly[back_idx++] = polygons[i]; break;
       case POL_SPLIT_NEEDED:
 	{
-	  csVector3* front_v, * back_v;
-	  int front_n, back_n, j;
-	  int n = polygons[i]->GetNumVertices ();
-  	  CHK (front_v = new csVector3 [n*2]);
-  	  CHK (back_v = new csVector3 [n*2]);
-	  polygons[i]->SplitWithPlane (front_v, front_n, back_v, back_n, *plane);
-
-	  csPolygonInt* np1 = polygons[i]->Clone ();
-	  csPolygonInt* np2 = polygons[i]->Clone ();	// polygons[i]@@@
-	  np1->Reset ();
-	  np2->Reset ();
-
-	  for (j = 0 ; j < front_n ; j++)
-	    np2->AddVertex (front_v[j]);
-	  for (j = 0 ; j < back_n ; j++)
-	    np1->AddVertex (back_v[j]);
-	  polygons[i]->GetParent ()->AddPolygon (np1);
-	  polygons[i]->GetParent ()->AddPolygon (np2);
-
-	  np1->Finish ();
-	  np2->Finish ();
-
-	  CHK (delete [] front_v);
-	  CHK (delete [] back_v);
-
-	  front_poly[front_idx++] = np2;
-	  back_poly[back_idx++] = np1;
+	  csPolygonInt* np1, * np2;
+	  polygons[i]->SplitWithPlane (&np1, &np2, *plane);
+	  front_poly[front_idx++] = np1;
+	  back_poly[back_idx++] = np2;
 	}
 	break;
 

@@ -87,8 +87,10 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
   bool vis = false;
   csCBufferSpan* s = first_span;
   csCBufferSpan* ps = NULL;	// 'ps' holds the previous span.
+//printf ("  test span %d-%d\n", startx, endx);
   while (s)
   {
+//printf ("    test against span %d-%d\n", s->startx, s->endx);
     // If the start of the empty span is after then end of the full span
     // then we can stop scanning.
     if (s->startx > endx) break;
@@ -108,22 +110,28 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       // If empty span is fully enclosed in full span then we have to remove empty span.
       if (s->startx >= startx && s->endx <= endx)
       {
-        if (ps) ps->next = s->next;
-	else first_span = s->next;
+//printf ("    remove empty span\n");
+	csCBufferSpan* sn = s->next;
+        if (ps) ps->next = sn;
+	else first_span = sn;
 	parent->FreeSpan (s);
+	s = sn;
+	continue;
       }
 
       // If start of empty span is before start of full span then we 
       // have to shrink the empty span.
-      else if (s->startx < startx)
+      else if (s->startx < startx && s->endx <= endx)
       {
+//printf ("    shrink empty span 1\n");
         s->endx = startx-1;
       }
 
       // If end of empty span is after end of full span then we have
       // to shrink the empty span.
-      else if (s->endx > endx)
+      else if (s->endx > endx && s->startx >= startx)
       {
+//printf ("    shrink empty span 2\n");
 	s->startx = endx+1;
       }
 
@@ -131,6 +139,7 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       // have to split the empty span.
       else
       {
+//printf ("    split empty\n");
         csCBufferSpan* new_span = parent->AllocSpan ();
 	new_span->next = s->next;
 	s->next = new_span;
@@ -146,6 +155,16 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
 
   // There are no more empty spans which overlap with the given full span.
   return vis;
+}
+
+void csCBufferLine::Dump ()
+{
+  csCBufferSpan* span = first_span;
+  while (span)
+  {
+    printf ("  empty = %d-%d\n", span->startx, span->endx);
+    span = span->next;
+  }
 }
 
 //---------------------------------------------------------------------------
