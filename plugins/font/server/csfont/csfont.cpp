@@ -439,7 +439,7 @@ void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, int &desc
   desc = Baseline;
 }
 
-void csDefaultFont::GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &)
+void csDefaultFont::GetDimensions (const char *, int &, int &, int &, int &, int &)
 {
   // @@@ Added to fix compile error
 }
