@@ -6,11 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include "csphyzik/phyztype.h"
 
-#ifndef __CYSTALSPACE__
-#define __CYSTALSPACE__
-#endif
-#ifdef __CYSTALSPACE__
+#ifdef __CRYSTALSPACE__
 #include "sysdef.h"
 #include "cssys/system.h"
 //class csSystemDriver;
@@ -26,12 +24,12 @@
 #define McAssertFail( A, B ) { if( !A ){ Debug::log( B ); abort(); } }
 #define McAssertGoTo( A, B, C ) { if( !A ){ Debug::log( B ); goto C; } }
 #ifdef __CRYSTALSPACE__
-#define assert McAssert
+//#define assert McAssert
 #endif
 #define assert_fail McAssertFail 
 #define assert_goto McAssertGoTo
 
-#ifdef __CYSTALSPACE__
+#ifdef __CRYSTALSPACE__
 #define CT_DEBUG_LEVEL MSG_DEBUG_1
 #define Debug csSystemDriver
 #define logf Printf
@@ -51,9 +49,10 @@ class Debug
 {
 public:
 
-	static void log( char *err_mess/*string err_mess*/ ){  /*ferr << err_mess;*/ }
+	static void log( int debug_level, char *err_mess){} //string err_mess ){  ferr << err_mess; }
 	static void logf( char *err_mess, ... ){}
 };
+
 #endif
 
 #endif
