@@ -237,8 +237,8 @@ void awsSink::RegisterFrame(void *sk, iAwsSource *source)
 
 void awsSink::UpdateInput(float value,int textboxnum)
 {
-  char txt[20];
-  gcvt (value,6,txt);
+  char txt[64];
+  sprintf(txt, "%g", value);
 
   csRef<iString> tmp (csPtr<iString> (new scfString(txt)));
 
@@ -332,7 +332,7 @@ void awsSink::SetAddAge(void *sk, iAwsSource *source)
 }
 float awsSink::GetValueX(float scale,float phase)
 {
-  float temp;
+  float temp = 0;
 
   switch(i_state)
   {
@@ -350,7 +350,7 @@ float awsSink::GetValueX(float scale,float phase)
 }
 float awsSink::GetValueY(float scale,float phase)
 {
-  float temp;
+  float temp = 0;
 
   switch(i_state)
   {
@@ -368,7 +368,7 @@ float awsSink::GetValueY(float scale,float phase)
 }
 float awsSink::GetValueZ(float scale,float phase)
 {
-  float temp;
+  float temp = 0;
 
   switch(i_state)
   {
@@ -386,7 +386,7 @@ float awsSink::GetValueZ(float scale,float phase)
 }
 float awsSink::GetValueOther(float scale)
 {
-  float temp;
+  float temp = 0;
 
   switch(i_state)
   {

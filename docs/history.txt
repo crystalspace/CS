@@ -55,8 +55,10 @@ chronological order.
 	- Jorrit replaced a lot of 'if (bla) delete bla' with 'delete bla'.
 	  C++ guarantees that 'delete' will check on null pointer so there is
 	  no need to add another test.
-	- Luca replaced some call to Delete (int) (which does not exist no more) 
-	  with DeleteIndex (int) in the source code of the csSoundRenderDS3D class.
+	- Luca replaced some call to Delete (int) (which no longer exists) 
+	  with DeleteIndex (int) in the source code of the csSoundRenderDS3D
+	  class.
+	- Eric Sunshine fixed compilation problems with partedit on MacOS/X.
 2-Aug-2003
 	- Jorrit renamed csPDelArray::Delete(int) to DeleteIndex() to conform
 	  more to the API used by csArray.

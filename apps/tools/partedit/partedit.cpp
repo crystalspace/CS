@@ -62,11 +62,6 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-static float lastvaluex = 1.0;
-static float lastvaluey = 1.0;
-static float lastvaluez = 1.0;
-static float lastvalueother = 1.0;
-
 // The global pointer to PartEdit
 PartEdit *System;
 
@@ -149,7 +144,7 @@ void PartEdit::SetupFrame ()
 	  else 
 	  {
 		s->UpdateInput((s->GetValueOther(5.0)),4);
-		emitState->SetParticleTime((s->GetValueOther(5.0)));
+		emitState->SetParticleTime(int(s->GetValueOther(5.0)));
 	  }
 	  break;
 	case 7:
@@ -478,7 +473,7 @@ bool PartEdit::Initialize ()
   emitState->SetParticleCount(25);
   emitState->SetLighting (false);
   emitState->SetRectParticles(width,0.05);
-  emitState->SetParticleTime(part_time);
+  emitState->SetParticleTime(int(part_time));
   emitState->SetStartPosEmit(startpos);
   emitState->SetStartSpeedEmit(startspeed);
   emitState->SetStartAccelEmit(startaccel);
