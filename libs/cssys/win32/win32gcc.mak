@@ -50,7 +50,7 @@ LIBS.FREETYPE.SYSTEM = $(LFLAGS.l)ttf
 
 # <cs-config>
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL = $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
+CFLAGS.GENERAL = $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
 # </cs-config>
 
 # <cs-config>

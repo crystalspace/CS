@@ -90,6 +90,8 @@ void csShaderGLCGVP::Activate(iShaderPass* current, csRenderMesh* mesh)
 	        v4.x, v4.y, v4.z, v4.w);
           }
           break;
+        default:
+	  break;
       }
     }
   }
@@ -391,6 +393,6 @@ csPtr<iString> csShaderGLCGVP::GetProgramID()
 {
   csMD5::Digest d = csMD5::Encode(programstring);
   scfString* str = new scfString();
-  str->Append((const char*)d.data[0], 16);
+  str->Append((char const*)&d.data, sizeof(d.data));
   return csPtr<iString>(str);
 }

@@ -6,6 +6,23 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Sep-2003
+	- DeSigna made the following chanages:
+	    - Fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 
+	      accordance to the other SCF macros.
+	    - Fixed all usage of SCF_CREATE_INSTANCE in CS to work correctly.
+	    - Fixed nettut to use csRef<> tracking instead of raw pointers.
+	- Eric Sunshine added an RTLD_NOW check to configure.ac since this
+	  constant is missing from some platforms, such as OpenBSD.
+	- Eric Sunshine added a check to configure.ac for the Cg shader
+	  toolkit.  The glshader_cg plugin is now built only if the Cg toolkit
+	  is detected.
+	- Eric Sunshine added a check to configure.ac to see if the compiler
+	  recognizes the -pipe option.
+	- Eric Sunshine fixed several bugs in the glshader_cg plugin where
+	  the various ProgramID() methods were casting the first character of
+	  a string to a pointer, rather than taking the address of the string
+	  as intended.  Also eliminated several compilation warnings.
 13-Sep-2003
 	- Philipp Aumayr removed changed a delete data; to delete[] data; in
 	  plugins/video/openglcommon/glfontcache.h. mentioned by unaek in 
@@ -16,11 +33,6 @@ chronological order.
 	- Jorrit cleaned up the shader plugins.
 	- Duhprey fixed an error in shadow caps.  Fixes one of the glitches
 	  behind the wall in r3dtest.
-	- DeSigna:
-	  - fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 
-	    accordance to the other SCF macros.
-	  - fixed all usage of SCF_CREATE_INSTANCE in CS to work correctly.
-	  - fixed nettut to use csRef<> tracking instead of raw pointers 
 12-Sep-2003
 	- Jorrit moved the progressive LOD calculation classes from sprite3d
 	  to csgeom.

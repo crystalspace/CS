@@ -128,7 +128,7 @@ csPtr<iString> csGLShader_CG::GetProgramID(const char* programstring)
 {
   csMD5::Digest d = csMD5::Encode(programstring);
   scfString* str = new scfString();
-  str->Append((const char*)d.data[0], 16);
+  str->Append((char const*)&d.data, sizeof(d.data));
   return csPtr<iString>(str);
 }
 

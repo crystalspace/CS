@@ -294,6 +294,27 @@ AS_IF([test $cs_cv_prog_makedep_ok = yes],
 
 
 #------------------------------------------------------------------------------
+# Check for typical required libraries (libm, libdl, libnsl).
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_COMMON_LIBS],
+    [AC_LANG_PUSH([C])
+    AC_CHECK_LIB([m], [pow],
+	[CS_BUILD_PROPERTY([LIBS.EXE], [-lm], [+])
+	cs_cv_libm=yes cs_cv_libm_libs='-lm'],
+	[cs_cv_libm=no cs_cv_libm_libs=''])
+    AC_CHECK_LIB([dl], [dlopen],
+	[CS_BUILD_PROPERTY([LIBS.EXE], [-ldl], [+])
+	cs_cv_libdl=yes cs_cv_libdl_libs='-ldl'],
+	[cs_cv_libdl=no cs_cv_libdl_libs=''])
+    AC_CHECK_LIB([nsl], [gethostbyname],
+	[CS_BUILD_PROPERTY([LIBS.EXE], [-lnsl], [+])])
+    AC_LANG_POP([C])])
+
+CS_CHECK_COMMON_LIBS
+
+
+
+#------------------------------------------------------------------------------
 # Check for pthread.  Also check if pthread implementation supports the
 # recursive mutex extension.
 #------------------------------------------------------------------------------
@@ -343,6 +364,21 @@ AS_IF([test $cs_cv_sys_pthread = yes],
     AS_IF([test $cs_cv_sys_pthread_recursive != no],
 	[CS_HEADER_PROPERTY([CS_PTHREAD_MUTEX_RECURSIVE],
 	    [$cs_cv_sys_pthread_recursive])])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if RTLD_NOW dlopen() flag is available; some installations (OpenBSD,
+# for example) provide only RTLD_LAZY.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_RTLD],
+    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])
+    CS_CHECK_BUILD([for RTLD_NOW], [cs_cv_sys_rtld_now],
+	[AC_LANG_PROGRAM([#include <dlfcn.h>], [dlopen(0, RTLD_NOW)])],
+	[], [], [CS_HEADER_PROPERTY([CS_RTLD_NOW_AVAILABLE])], [], [],
+	[], [], [$cs_cv_libdl_libs])])
+
+CS_CHECK_RTLD
 
 
 
@@ -654,6 +690,14 @@ CS_CHECK_VTABLE_THUNKS
 
 
 #------------------------------------------------------------------------------
+# Check if compiler recognizes -pipe directive.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([if -pipe is accepted], [cs_cv_prog_cxx_pipe],
+   [CS_CREATE_TUPLE([-pipe])], [C++], [CFLAGS.SYSTEM], [+])
+
+
+
+#------------------------------------------------------------------------------
 # Check for compiler- and CPU-specific code generation flags.  These flags are
 # mutually exclusive.  Exclusivity is enforced by the CS_CHECK_CODE_GEN_FLAG()
 # macro.  Note that use of these flags typically means that the resulting
@@ -903,25 +947,6 @@ CS_JAMCONFIG_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
 CS_JAMCONFIG_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized])
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
-
-
-
-#------------------------------------------------------------------------------
-# Check for typical required libraries (libm, libdl, libnsl).
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_COMMON_LIBS],
-    [AC_LANG_PUSH([C])
-    AC_CHECK_LIB([m], [pow],
-	[CS_BUILD_PROPERTY([LIBS.EXE], [-lm], [+])
-	cs_cv_libm=yes cs_cv_libm_libs='-lm'],
-	[cs_cv_libm=no cs_cv_libm_libs=''])
-    AC_CHECK_LIB([dl], [dlopen],
-	[CS_BUILD_PROPERTY([LIBS.EXE], [-ldl], [+])])
-    AC_CHECK_LIB([nsl], [gethostbyname],
-	[CS_BUILD_PROPERTY([LIBS.EXE], [-lnsl], [+])])
-    AC_LANG_POP([C])])
-
-CS_CHECK_COMMON_LIBS
 
 
 
@@ -1523,6 +1548,36 @@ AC_CHECK_PROGS([OBJCOPY], [objcopy])
 AS_IF([test -n "$OBJCOPY"],
     [CS_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
     CS_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for Cg shader package.
+#------------------------------------------------------------------------------
+AC_CHECK_PROGS([CGC], [cgc])
+CS_BUILD_PROPERTY([CGC], [$CGC])
+
+AC_DEFUN([CS_CHECK_LIBCG_PREPARE],
+    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])])
+
+CS_CHECK_LIBCG_PREPARE
+
+CS_CHECK_LIB_WITH([Cg],
+    [AC_LANG_PROGRAM(
+	[@%:@include <Cg/cg.h>],
+	[CGcontext c = cgCreateContext()])], [], [], [], [],
+    [$cs_cv_libm_cflags], [$cs_cv_libm_lflags], [$cs_cv_libm_libs])
+
+AS_IF([test $cs_cv_libCg = yes],
+    [CS_CHECK_LIB_WITH([CgGL],
+	[AC_LANG_PROGRAM(
+	    [#include <Cg/cg.h>
+	    @%:@include <Cg/cgGL.h>],
+	    [CGprogram p; cgGLBindProgram(p)])], [], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libCgGL], [CG])], [],
+	[$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
+	[$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
+	[$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs])])
 
 
 

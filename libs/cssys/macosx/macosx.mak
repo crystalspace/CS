@@ -80,7 +80,7 @@ CFLAGS.GENERAL = \
   $(MACOSX.CFLAGS.CONFIG) \
   $(CFLAGS.SYSTEM) \
   $(CSTHREAD.CFLAGS) \
-  -Wno-precomp -fno-common -pipe
+  -Wno-precomp -fno-common
 # </cs-config>
 
 # Special option for the software 3D renderer to force it to ARGB mode
