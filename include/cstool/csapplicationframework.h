@@ -71,13 +71,13 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *   SetApplicationName ("my.example.app");
  * }
  *
- * MyApp::OnIntialize()
+ * bool MyApp::OnInitialize()
  * {
  *   // Request plugins, initialize any global non-CS data and structures
  *   return true;
  * }
  * 
- * MyApp::Application()
+ * bool MyApp::Application()
  * {
  *   // Perform initialization of CS data and structures, set event handler,
  *   // load world, etc.
