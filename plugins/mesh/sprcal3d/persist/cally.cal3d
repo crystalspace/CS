@@ -11,17 +11,17 @@
    <params>
 
 	<path dir="../cal3d/cal3d_data/cally/" />
-	<scale value=".01" />
+	<scale value=".1" />
 
 	<skeleton file="cally.csf" />
 
-	<animation file="cally_idle.caf" />
-	<animation file="cally_tornado_kick.caf" />
-	<animation file="cally_walk.caf" />
-	<animation file="cally_strut.caf" />
-	<animation file="cally_jog.caf" />
-	<animation file="cally_shoot_arrow.caf" />
-	<animation file="cally_wave.caf" />
+	<animation file="cally_idle.caf"         name="stand" type="1" base_vel="0" min_vel="0" max_vel="0" />
+	<animation file="cally_tornado_kick.caf" name="kick"  type="4" base_vel="0" min_vel="0" max_vel="0" />
+	<animation file="cally_walk.caf"         name="walk"  type="1" base_vel="2" min_vel="0" max_vel="4" />
+	<animation file="cally_strut.caf"        name="strut" type="3" base_vel="2" min_vel="0" max_vel="5" />
+	<animation file="cally_jog.caf"          name="jog"   type="1" base_vel="5" min_vel="2" max_vel="5" />
+	<animation file="cally_shoot_arrow.caf"  name="shoot arrow" type="4" />
+	<animation file="cally_wave.caf"         name="greet" type="4" />
 
 	<mesh file="cally_calf_left.cmf" />
 	<mesh file="cally_calf_right.cmf" />

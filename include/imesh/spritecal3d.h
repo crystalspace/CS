@@ -71,7 +71,12 @@ struct iSpriteCal3DFactoryState : public iBase
   /**
    * This loads the supplied file as one animation action for the sprite.
    */
-  virtual int  LoadCoreAnimation(const char *filename) = 0;
+  virtual int  LoadCoreAnimation(const char *filename,
+				 const char *name,
+				 int type,
+				 float base_velocity,
+				 float min_velocity,
+				 float max_velocity) = 0;
 
   /**
    * This loads a submesh which will attach to this skeleton.
@@ -92,13 +97,22 @@ struct iSpriteCal3DFactoryState : public iBase
 
 };
 
-SCF_VERSION (iSpriteCal3DState, 0, 0, 6);
+SCF_VERSION (iSpriteCal3DState, 0, 0, 1);
 
 /**
  * This interface describes the API for the 3D sprite mesh object.
  */
 struct iSpriteCal3DState : public iBase
 {
+    virtual int GetAnimCount() = 0;
+    virtual const char *GetAnimName(int idx) = 0;
+    virtual void ClearAllAnims() = 0;
+    virtual bool SetAnimCycle(const char *name, float pct) = 0;
+    virtual bool AddAnimCycle(const char *name, float pct, float delay) = 0;
+    virtual bool ClearAnimCycle(const char *name, float delay) = 0;
+    virtual bool SetAnimAction(const char *name, float delayIn, float delayOut) = 0;
+    virtual bool SetVelocity(float vel) = 0;
+    virtual void SetLOD(float lod) = 0;
 };
 
 #endif // __CS_IMESH_SPRITE3D_H__

@@ -225,9 +225,19 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       case XMLTOKEN_ANIMATION:
       {
 	const char *file = child->GetAttributeValue("file");
+	const char *name = child->GetAttributeValue("name");
+	int type = child->GetAttributeValueAsInt("type");
+	float base_vel = child->GetAttributeValueAsInt("base_vel");
+	float min_vel = child->GetAttributeValueAsFloat("min_vel");
+	float max_vel = child->GetAttributeValueAsFloat("max_vel");
 	if (file)
 	{
-	  int animID = newspr->LoadCoreAnimation(file);
+	  int animID = newspr->LoadCoreAnimation(file,
+						 name,
+						 type,
+						 base_vel,
+						 min_vel,
+						 max_vel);
 	  if (animID == -1)
 	  {
 	    newspr->ReportLastError();
