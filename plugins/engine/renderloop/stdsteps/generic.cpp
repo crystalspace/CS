@@ -213,9 +213,19 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   for (int n = 0; n < num; n++)
   {
     csRenderMesh* mesh = meshes[n];
-    
+
     if (mesh->portal) 
     {
+      if (numSSM > 0)
+      {
+        if (shader != 0)
+	{
+          RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
+          shader = 0;
+	}
+        numSSM = 0;
+      }
+
       ToggleStepSettings (g3d, false);
       mesh->portal->Draw (rview);
     }
@@ -227,12 +237,10 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
       {
         // @@@ Need error reporter
         if (shader != 0)
-        {
-          RenderMeshes (g3d, shader, sameShaderMeshes, 
-            numSSM);
-        }
-
-        shader = meshShader;
+	{
+          RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
+          shader = meshShader;
+	}
         numSSM = 0;
       }
       sameShaderMeshes[numSSM++] = mesh;
@@ -243,10 +251,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
   {
     // @@@ Need error reporter
     if (shader != 0)
-    {
-      RenderMeshes (g3d, shader, sameShaderMeshes, 
-        numSSM);
-    }
+      RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
   }
 
   ToggleStepSettings (g3d, false);
