@@ -79,6 +79,11 @@ csPortal* csPortal::Clone ()
   clone->filter_r = filter_r;
   clone->filter_g = filter_g;
   clone->filter_b = filter_b;
+  int i;
+  for (i = 0 ; i < sector_cb_vector.Length () ; i++)
+    clone->SetMissingSectorCallback (GetMissingSectorCallback (i));
+  for (i = 0 ; i < portal_cb_vector.Length () ; i++)
+    clone->SetPortalCallback (GetPortalCallback (i));
   return clone;
 }
 
