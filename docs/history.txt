@@ -24,6 +24,8 @@ chronological order.
 	- res changed phystut so the angular velocity of spawned objects 
 	  doesn't cause them to immediately go left when touching a wall.
 	- res made the csStringHash::Request() methods const.
+	- Jorrit fixed a size_t related bug in the engine. This is 1002540
+	  on the tracker.
 2-Aug-2004
 	- Eric Sunshine localized the faked-up `socklen_t' from csdef.h to
 	  csutil/sockets.h so that the type is faked up only if requested by

@@ -899,11 +899,15 @@ void csSector::Draw (iRenderView *rview)
   }
 
   // queue all halos in this sector to be drawn.
-  for (i = lights.GetCount () - 1; i >= 0; i--)
+  i = lights.GetCount ();
+  while (i > 0)
+  {
+    i--;
     // Tell the engine to try to add this light into the halo queue
     csEngine::current_engine->AddHalo (
       csEngine::current_engine->current_camera,  
       lights.Get (i)->GetPrivateObject ());
+  }
 
   // Handle the fog, if any
   if (fogmethod != G3DFOGMETHOD_NONE)
