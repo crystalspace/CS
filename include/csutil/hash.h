@@ -400,7 +400,7 @@ public:
 
 /**
  * This class implements a basic set for objects.
- * You can basicly use this to test for the occurance
+ * You can basically use this to test for the occurrence
  * of some object quickly.
  */
 template <class T, class KeyHandler = csIntegralHashKeyHandler<T> > 
@@ -412,7 +412,7 @@ private:
 public:
   /**
    * Construct a new empty set.
-   * The given size will be given to the hasmap.
+   * The given size will be passed to the hashmap.
    */
   csSet (int size = 257, int grow_rate = 64, int max_size = 20000)
   	: map (size, grow_rate, max_size)
@@ -421,7 +421,7 @@ public:
 
   /**
    * Add an object to this set.
-   * This will do nothing is the object is already here.
+   * This will do nothing if the object is already present.
    */
   void Add (const T& object)
   {
@@ -477,9 +477,8 @@ public:
     return map.GetSize ();
   }
 
-  /// Return the hash map for this hash set
-  inline csHash<T, T, KeyHandler> *GetHash () {return &map;}
+  /// Return the hash map for this hash set.
+  csHash<T, T, KeyHandler>* GetHash () { return &map; }
 };
-
 
 #endif
