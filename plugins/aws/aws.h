@@ -312,26 +312,26 @@ public:
 
 public:
   /// Set the contexts however you want
-  virtual void SetCanvas (iAwsCanvas *newCanvas);
+  virtual bool SetupCanvas(iAwsCanvas *newCanvas, iGraphics2D *g2d=NULL, iGraphics3D *g3d=NULL);
 
   /// Get the current context
   virtual iAwsCanvas *GetCanvas ();
 
   /// Create a default canvas, covering the whole screen
-  virtual iAwsCanvas *CreateDefaultCanvas (
+  /*virtual iAwsCanvas *CreateDefaultCanvas (
                         iEngine *engine,
-                        iTextureManager *txtmgr);
+                        iTextureManager *txtmgr);*/
 
   /// Create a default canvas, just a single proctex
-  virtual iAwsCanvas *CreateDefaultCanvas (
+  /*virtual iAwsCanvas *CreateDefaultCanvas (
                         iEngine *engine,
                         iTextureManager *txtmgr,
                         int width,
                         int height,
-                        const char *name);
+                        const char *name);*/
 
   /// Create a canvas that uses custom graphics devices (e.g. the screen)
-  virtual iAwsCanvas *CreateCustomCanvas (iGraphics2D *g2d, iGraphics3D *g3d);
+  ///virtual iAwsCanvas *CreateCustomCanvas (iGraphics2D *g2d, iGraphics3D *g3d);
 
   /// Get the iGraphics2D interface so that components can use it.
   virtual iGraphics2D *G2D ();

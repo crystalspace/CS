@@ -127,6 +127,9 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
 
   RegisterCommonComponents ();
 
+  // Now set by default.
+  SetFlag(AWSF_AlwaysRedrawWindows);
+
   return true;
 }
 
@@ -210,16 +213,24 @@ void awsManager::SetFocusedComponent (iAwsComponent *_focused)
   /*keyb_focus = */focused = _focused;
 }
 
+
 iAwsComponent *awsManager::GetKeyboardFocusedComponent()
 {
   return keyb_focus;
 }
 
 
-void awsManager::SetCanvas (iAwsCanvas *newCanvas)
+bool awsManager::SetupCanvas (iAwsCanvas *_newCanvas, iGraphics2D *g2d, iGraphics3D *g3d)
 {
-  if (!newCanvas)
-    return;
+  iAwsCanvas *newCanvas = _newCanvas;
+
+  if (newCanvas == NULL)
+  {
+	if (g2d == NULL || g3d == NULL)
+		return false;
+
+    newCanvas = new awsScreenCanvas (g2d, g3d);
+  }
   
   canvas = csPtr<iAwsCanvas>(newCanvas);
 
@@ -234,6 +245,8 @@ void awsManager::SetCanvas (iAwsCanvas *newCanvas)
   frame.Set (0, 0, ptG2D->GetWidth (), ptG2D->GetHeight ());
 
   Mark (frame);
+
+  return true;
 }
 
 iAwsCanvas *awsManager::GetCanvas ()
@@ -241,11 +254,12 @@ iAwsCanvas *awsManager::GetCanvas ()
   return canvas;
 }
 
+/*
 iAwsCanvas *awsManager::CreateDefaultCanvas (
   iEngine *engine,
   iTextureManager *txtmgr)
 {
-/*@@@ BROKEN
+  @@@BROKEN
   iAwsCanvas *canvas = new awsMultiProctexCanvas (
       engine->GetContext ()->GetDriver2D ()->GetWidth (),
       engine->GetContext ()->GetDriver2D ()->GetHeight (),
@@ -254,11 +268,11 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
       txtmgr);
 
   return canvas;
-*/
-  return 0;
-}
 
-iAwsCanvas *awsManager::CreateDefaultCanvas (
+  return 0;
+} */
+
+/*iAwsCanvas *awsManager::CreateDefaultCanvas (
   iEngine *engine,
   iTextureManager *txtmgr,
   int width,
@@ -273,17 +287,19 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
       txtmgr,
       name);
 
-  return canvas;
-}
+  return canvas; 
 
-iAwsCanvas *awsManager::CreateCustomCanvas (
+  return 0;
+} */
+
+/*iAwsCanvas *awsManager::CreateCustomCanvas (
   iGraphics2D *g2d,
   iGraphics3D *g3d)
 {
   iAwsCanvas *canvas = new awsScreenCanvas (g2d, g3d);
 
   return canvas;
-}
+}*/
 
 void awsManager::CreateTransition(iAwsComponent *win, unsigned transition_type, float step_size)
 {
