@@ -21,8 +21,6 @@
 #define __CSOSDEFS_H__
 
 #include <math.h>
-#include <semaphore.h>
-#include <pthread.h>
 
 // filesystem settings
 #define CS_MAXPATHLEN	256
@@ -97,9 +95,8 @@ int main (int argc, char* argv[]) \
 }
 #endif // !CS_STATIC_LINKED && CS_UNIX_PLUGIN_REQUIRES_MAIN
 
-typedef pthread_t csThread;
-typedef pthread_mutex_t csMutex;
-typedef pthread_cond_t csCondition;
-typedef sem_t csSemaphore;
-typedef void*(*csThreadFunc)(void*);
+#ifdef CS_THREADS
+#include CS_THREADS_INC
+#endif
+
 #endif // __CSOSDEFS_H__
