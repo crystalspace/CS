@@ -1,37 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 <world>
-    <addon plugin="crystalspace.renderloop.loop.loader">
-	<name>myLoop</name>
-	<steps>
-	  <!-- ambient lighting -->
-	  <step plugin="crystalspace.renderloop.step.generic">
-	    <shadertype>ambient</shadertype>
-	    <zoffset>yes</zoffset>
-	    <portaltraversal />
-	    <zuse />
-	  </step>
-	  <step plugin="crystalspace.renderloop.step.lightiter">
-	    <steps>
-	      <!-- stencil shadows -->
-	      <step plugin="crystalspace.renderloop.step.shadow.stencil">
-		<steps>
-		  <!-- diffuse lighting -->
-		  <step plugin="crystalspace.renderloop.step.generic">
-		    <shadertype>diffuse</shadertype>
-		    <zoffset>no</zoffset>
-		    <ztest />
-		  </step>
-		</steps>
-	      </step>
-	    </steps>
-	  </step>
-	</steps>
+    <addon>
+  	<plugin>crystalspace.renderloop.loop.loader</plugin>
+        <paramsfile>/shader/std_rloop_shadowed.xml</paramsfile>
     </addon>
     
     <settings>
         <clearzbuf>yes</clearzbuf>
         <lightmapcellsize>16</lightmapcellsize>
-        <renderloop>myLoop</renderloop>
+        <renderloop>std_rloop_shadowed</renderloop>
     </settings>
     <key name="map2cs_scaling" value="0.025" />
     <start>

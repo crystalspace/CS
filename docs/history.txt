@@ -12,6 +12,10 @@ chronological order.
 	  taking an iImage**, not an csRef<iImage>*.
 	- res fixed a couple VC7 64bit warnings.
 	- res augmented picview to browse images, not files.
+	- Jorrit added data/shader/std_rloop_terrainfixed.xml and modified
+	  terrainf to use it. Also modified r3dtest, and isomap levels to use
+	  data/shader/std_rloop_shadowed.xml and modified terrain to use
+	  data/shader/std_rloop_diffuse.xml.
 23-Mar-2005
 	- res removed the Apache snprintf code.
 	- res fixed AWS after the recent 64bit compatibility changes. In 

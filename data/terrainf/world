@@ -88,36 +88,13 @@
 
   <addon>
     <plugin>crystalspace.renderloop.loop.loader</plugin>
-    <params>
-      <name>myLoop</name>
-      <steps>
-        <!-- ambient lighting -->
-        <step plugin="crystalspace.renderloop.step.generic">
-          <shadertype>ambient</shadertype>
-          <zoffset>yes</zoffset>
-	  <portaltraversal/>
-          <zuse />
-        </step>
-        <!-- draws terrain splatting -->
-        <step plugin="crystalspace.renderloop.step.generic">
-          <shadertype>terrain splat</shadertype>
-          <zoffset>no</zoffset>
-	  <zuse />
-        </step>
-        <!-- draws geometry -->
-        <step plugin="crystalspace.renderloop.step.generic">
-          <shadertype>standard</shadertype>
-          <zoffset>no</zoffset>
-          <zuse />
-        </step>
-      </steps>
-    </params>
+    <paramsfile>/shader/std_rloop_terrainfixed.xml</paramsfile>
   </addon>
     
   <settings>
     <clearzbuf>yes</clearzbuf>
     <lightmapcellsize>16</lightmapcellsize>
-    <renderloop>myLoop</renderloop>
+    <renderloop>std_rloop_terrainfixed</renderloop>
   </settings>
 
   <start>

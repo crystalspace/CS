@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<params>
+  <name>std_rloop_terrainfixed</name>
+  <steps>
+        <!-- ambient lighting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>ambient</shadertype>
+          <zoffset>yes</zoffset>
+	  <portaltraversal/>
+          <zuse />
+        </step>
+        <!-- draws terrain splatting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>terrain splat</shadertype>
+          <zoffset>no</zoffset>
+	  <zuse />
+        </step>
+        <!-- draws geometry -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>standard</shadertype>
+          <zoffset>no</zoffset>
+          <zuse />
+        </step>
+  </steps>
+</params>

@@ -2,41 +2,14 @@
 <!-- http://projects.blender.org/projects/blend2cs -->
 <world>
     <addon>
-      <plugin>crystalspace.renderloop.loop.loader</plugin>
-      <params>
-	<name>myLoop</name>
-	<steps>
-	  <!-- ambient lighting -->
-	  <step plugin="crystalspace.renderloop.step.generic">
-	    <shadertype>ambient</shadertype>
-	    <zoffset>yes</zoffset>
-	    <portaltraversal />
-	    <zuse />
-	  </step>
-	  <step plugin="crystalspace.renderloop.step.lightiter">
-	    <steps>
-	      <!-- stencil shadows -->
-	      <step plugin="crystalspace.renderloop.step.shadow.stencil">
-		<steps>
-		  <!-- diffuse lighting -->
-		  <step plugin="crystalspace.renderloop.step.generic">
-		    <shadertype>diffuse</shadertype>
-		    <zoffset>no</zoffset>
-		    <ztest />
-		  </step>
-		</steps>
-	      </step>
-	    </steps>
-	  </step>
-	</steps>
-      </params>
+  	<plugin>crystalspace.renderloop.loop.loader</plugin>
+        <paramsfile>/shader/std_rloop_shadowed.xml</paramsfile>
     </addon>
-    
     <settings>
         <clearzbuf>yes</clearzbuf>
         <clearscreen>yes</clearscreen>
         <lightmapcellsize>16</lightmapcellsize>
-        <renderloop>myLoop</renderloop>
+        <renderloop>std_rloop_shadowed</renderloop>
     </settings>
   <plugins>
     <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
