@@ -16,6 +16,8 @@ chronological order.
 	- Jorrit reverted the Jamfile modification for dynavis to add a new
 	  dynavis_debug target. It conflicts somehow with the standard
 	  dynavis target.
+	- Jorrit did a slight optimization in the stencil renderloop plugin.
+	  Using memcpy instead of manual copy.
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:

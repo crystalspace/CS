@@ -194,17 +194,14 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
 #else
 */
 
+    int* edge_indices_array = edge_indices.GetArray ();
     for (i = 0; i < edge_count; i += 2)
     {
       csVector3 lightdir = entry->meshLightPos - edge_midpoints[i];
       if (((lightdir * edge_normals[i]) * (lightdir * edge_normals[i+1])) <= 0)
       {
-        buf[indexRange++] = edge_indices[i*3 + 0];
-        buf[indexRange++] = edge_indices[i*3 + 1];
-        buf[indexRange++] = edge_indices[i*3 + 2];
-        buf[indexRange++] = edge_indices[i*3 + 3];
-        buf[indexRange++] = edge_indices[i*3 + 4];
-        buf[indexRange++] = edge_indices[i*3 + 5];
+        memcpy (buf+indexRange, edge_indices_array+i*3, sizeof (int)*6);
+	indexRange += 6;
       }
     }
 // #endif

@@ -35,6 +35,7 @@
 #include "csutil/hash.h"
 #include "csutil/csstring.h"
 #include "csutil/strhash.h"
+#include "csutil/garray.h"
 #include "../../common/basesteptype.h"
 #include "../../common/basesteploader.h"
 #include "../../common/parserenderstep.h"
@@ -73,7 +74,7 @@ private:
   int vertex_count, triangle_count;
   int edge_count;
   csArray<csVector3> face_normals;
-  csArray<int> edge_indices;
+  csDirtyAccessArray<int> edge_indices;
   csArray<csVector3> edge_midpoints;
   csArray<csVector3> edge_normals;
 
