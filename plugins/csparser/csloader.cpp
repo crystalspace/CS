@@ -430,7 +430,6 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
   } /* endif */
 
   buf->DecRef ();
-  loaded_plugins.DeleteAll ();
 
   return true;
 }
@@ -575,7 +574,6 @@ bool csLoader::LoadLibraryFile (const char* fname)
 
   buf->DecRef ();
   
-  loaded_plugins.DeleteAll ();
   return retcode;
 }
 
@@ -1272,6 +1270,7 @@ csLoader::csLoader(iBase *p)
 
 csLoader::~csLoader()
 {
+  loaded_plugins.DeleteAll ();
   SCF_DEC_REF(VFS);
   SCF_DEC_REF(ImageLoader);
   SCF_DEC_REF(SoundLoader);

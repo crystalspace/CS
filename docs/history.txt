@@ -19,6 +19,10 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated additional resources and references to
 	  obsolete applications and modules such as dungeon, vfstest, MazeD,
 	  t3d2cs, etc.
+	- Changed the loader plugin so it no longers unloads all plugins
+	  after LoadMapFile(). This is not efficient as LoadMapFile() can
+	  be used multiple times to fill up several reasons. Instead the
+	  plugins are now unloaded in the destructor of the loader plugin.
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter
