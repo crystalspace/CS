@@ -22,11 +22,13 @@
 #include <stdarg.h>
 
 #include "csws/csws.h"
+#include "csutil/csstrvec.h"
 
 struct iEngine;
 struct iLoader;
 struct iGraphics3D;
 struct iEvent;
+struct iMeshWrapper;
 struct iKeyboardDriver;
 struct iObjectRegistry;
 struct iVirtualClock;
@@ -41,15 +43,18 @@ private:
   iGraphics3D* g3d;
   iSector* room;
   iView* view;
+  iMeshWrapper *sprite;
 
   csMenu *menu;
   csWindow *dialog;
- 
+  csStrVector stateslist;
 public:
   ViewMesh (iObjectRegistry *object_reg, csSkin &Skin);
   virtual ~ViewMesh ();
 
-  bool LoadSprite(const char *filename,float scale);
+  static void Help ();
+  bool LoadSprite (const char *filename,float scale);
+  void ConstructMenu();
 
   virtual bool Initialize ();
   virtual bool HandleEvent (iEvent&);

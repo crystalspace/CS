@@ -24,6 +24,7 @@
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/util.h"
 #include "viewmesh.h"
 #include "iutil/eventq.h"
 #include "iutil/eventh.h"
@@ -62,6 +63,7 @@
 CS_IMPLEMENT_APPLICATION
 
 #define VIEWMESH_COMMAND_LOADMESH 77701
+#define VIEWMESH_STATES_SELECT_START  77800
 
 //-----------------------------------------------------------------------------
 
@@ -87,11 +89,19 @@ ViewMesh::~ViewMesh ()
   if (dialog) delete dialog;
 }
 
+void ViewMesh::Help ()
+{
+  printf ("Options for ViewMesh:\n");
+  printf ("  -L=<file>          Load a library file (for textures/materials)\n");
+  printf ("  -Scale=<ratio>     Scale the Object\n");
+  printf ("  <meshfile>         Load the specified mesh object\n");
+}
+
 bool ViewMesh::HandleEvent (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    // display next fram
+    // display next frame
     Draw();
   }
     
@@ -115,29 +125,21 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       break;
     case csevMouseDown:
     case csevMouseDoubleClick:
-      if (menu) {
-	  delete menu;
-	  menu=NULL;
-	  return true;
+      // show the menu
+      if (menu->GetState(CSS_VISIBLE))
+	menu->Hide();
+      else
+      {
+	menu->Show();
+	menu->SetPos(ev.Mouse.x,ev.Mouse.y);
       }
-      // Create a menu
-      menu = new csMenu (this, csmfs3D, 0);
-      (void)new csMenuItem(menu);
-      (void)new csMenuItem(menu,"Load Mesh", VIEWMESH_COMMAND_LOADMESH);
-      (void)new csMenuItem (menu, "~Quit", cscmdQuit);
-      menu->SetPos(ev.Mouse.x,ev.Mouse.y);
       return true;
-
     case csevCommand:
       switch(ev.Command.Code)
       {
 	case VIEWMESH_COMMAND_LOADMESH:
 	{
-	  if (menu)
-	  {
-	    delete menu;
-	    menu=NULL;
-	  }
+	  menu->Hide();
       	  if (dialog)
 	    delete dialog;
 	  dialog= csFileDialog (this, "Select Mesh Object", "/this/", "Open", true);
@@ -155,9 +157,25 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  {
 	    Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh");
 	  }
+	  ConstructMenu();
+	  return true;
 	}
 	default:
 	  break;
+      }
+      if (ev.Command.Code > VIEWMESH_STATES_SELECT_START && 
+	  ev.Command.Code < VIEWMESH_STATES_SELECT_START + 100)
+      {
+      	iSprite3DState *spstate = SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+	    iSprite3DState);
+	if (spstate)
+	{
+	  spstate->SetAction(
+	      stateslist.Get(ev.Command.Code - VIEWMESH_STATES_SELECT_START) );
+	  spstate->DecRef();
+	}
+	menu->Hide();
+	return true;
       }
       break;
   }
@@ -167,13 +185,13 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 
 bool ViewMesh::LoadSprite(const char *filename,float scale)
 {
-  iMeshFactoryWrapper *imeshfact = loader->LoadMeshObjectFactory (filename);
+  iMeshFactoryWrapper *imeshfactwrap = loader->LoadMeshObjectFactory (filename);
 
-  if (!imeshfact)
+  if (!imeshfactwrap)
     return false;
 
-  iMeshWrapper *sprite = engine->CreateMeshWrapper(
-      imeshfact, "MySprite", room,
+  sprite = engine->CreateMeshWrapper(
+      imeshfactwrap, "MySprite", room,
       csVector3 (0, 10, 0));
   csMatrix3 m; m.Identity(); m *= scale;
   sprite->GetMovable()->GetTransform();
@@ -185,10 +203,53 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
     spstate->SetAction("default");
     spstate->DecRef();
   }
-  imeshfact->DecRef();
+    
+  // Update Sprite States menu
+  iMeshObjectFactory *imeshfact= imeshfactwrap->GetMeshObjectFactory();
+  iSprite3DFactoryState *factstate= SCF_QUERY_INTERFACE(imeshfact,
+      iSprite3DFactoryState);
+  if (factstate)
+  {
+    stateslist.DeleteAll();
+    stateslist.Push (csStrNew("default"));
+    for (int i=0;i<factstate->GetActionCount();i++)
+    {
+      iSpriteAction *spaction = factstate->GetAction(i);
+      stateslist.Push (csStrNew(spaction->GetName()));
+    }
+    factstate->DecRef();
+  }
+  imeshfactwrap->DecRef();
   sprite->DeferUpdateLighting (CS_NLIGHT_DYNAMIC|CS_NLIGHT_STATIC, 10);
 
   return true;
+}
+
+void ViewMesh::ConstructMenu()
+{
+  if (menu)
+    delete menu;
+  menu = new csMenu(this, csmfs3D, 0);
+  (void)new csMenuItem(menu,"Load Mesh", VIEWMESH_COMMAND_LOADMESH);
+
+  // StateMenu
+  csMenu *statesmenu = new csMenu(NULL);
+  for (int i=0;i<stateslist.Length();i++)
+  {
+    (void)new csMenuItem(statesmenu, stateslist.Get(i),
+			 VIEWMESH_STATES_SELECT_START+i);
+  }
+  (void)new csMenuItem(menu, "States", statesmenu);
+
+  // Camer Mode
+  csMenu *cammode = new csMenu(NULL);
+  (void)new csMenuItem(cammode, "Normal Movement");
+  (void)new csMenuItem(cammode, "Look to Origin");
+  (void)new csMenuItem(cammode, "Rotate");
+  (void)new csMenuItem(menu, "Camera Mode", cammode);
+
+  (void)new csMenuItem(menu,"~Quit", cscmdQuit);
+  menu->Hide();
 }
 
 void ViewMesh::Draw()
@@ -201,7 +262,7 @@ void ViewMesh::Draw()
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
 
-  if (!dialog && !menu)
+  if (!dialog && !menu->GetState(CSS_VISIBLE))
   {
     iCamera* c = view->GetCamera();
     if (GetKeyState (CSKEY_RIGHT))
@@ -222,7 +283,7 @@ void ViewMesh::Draw()
   pplBeginDraw(CSDRAW_3DGRAPHICS);
   view->Draw();
   pplInvalidate(bound);
-  if (menu) {
+  if (menu->GetState(CSS_VISIBLE)) {
     menu->Invalidate(true);
   }
   if (dialog) {
@@ -374,7 +435,7 @@ bool ViewMesh::Initialize ()
   const char* meshfilename = cmdline->GetName (0);
   const char* texturefilename = cmdline->GetName (1);
   const char* texturename = cmdline->GetName (2);
-  const char* scaleTxt = cmdline->GetName (3);
+  const char* scaleTxt = cmdline->GetOption("Scale");
   cmdline->DecRef ();
   float scale = 1;
   if (scaleTxt != NULL)
@@ -382,6 +443,17 @@ bool ViewMesh::Initialize ()
     sscanf (scaleTxt, "%f", &scale);
   }
 
+  // Load specified Libraries
+  Printf (CS_REPORTER_SEVERITY_NOTIFY, "Loading libs...");
+  const char *libname;
+  for (int i=0; (libname=cmdline->GetOption("Lib",i)); i++)
+  {
+    if (!loader->LoadLibraryFile(libname))
+    {
+      Printf (CS_REPORTER_SEVERITY_ERROR, "Couldn load lib %s.", libname);
+    }
+  }
+      
   // Load a texture for our sprite.
   if (texturefilename && texturename)
   {
@@ -408,6 +480,9 @@ bool ViewMesh::Initialize ()
     	"Error loading mesh object factory '%s'!", meshfilename);
     return false;
   }
+
+  // Create an menu
+  ConstructMenu();
 
   return true;
 }
@@ -454,6 +529,7 @@ int main (int argc, char* argv[])
   
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
+    ViewMesh::Help();
     csCommandLineHelper::Help(object_reg);
     return 0;
   }
