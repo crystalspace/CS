@@ -233,10 +233,10 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
     return 0;
   }
 
-  csRef<iDocumentNode> rlNode = doc->GetRoot ()->GetNode ("renderloop");
+  csRef<iDocumentNode> rlNode = doc->GetRoot ()->GetNode ("params");
   if (rlNode == 0)
   {
-    engine->Warn ("Error loading '%s': no <renderloop> node", fileName);
+    engine->Warn ("Error loading '%s': no <params> node", fileName);
     return 0;
   }
 

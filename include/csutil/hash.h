@@ -19,7 +19,7 @@
 #ifndef __CS_UTIL_HASH_H__
 #define __CS_UTIL_HASH_H__
 
-#include <csutil/array.h>
+#include "csutil/array.h"
 
 /**
  * Compute a hash key for a null-terminated string.
@@ -37,6 +37,9 @@ uint32 csHashCompute (char const*);
  */
 uint32 csHashCompute (char const*, int length);
 
+/**
+ * A hash key handler for integral types and types that can be casted to such.
+ */
 template <class T>
 class csIntegralHashKeyHandler
 {
@@ -410,6 +413,15 @@ private:
   csHash<T, T, KeyHandler> map;
 
 public:
+  /// An iterator class for the set.
+  class Iterator : public csHash<T, T, KeyHandler>::Iterator
+  {
+  };
+  /// An iterator class for the set.
+  class GlobalIterator : public csHash<T, T, KeyHandler>::GlobalIterator
+  {
+  };
+
   /**
    * Construct a new empty set.
    * The given size will be passed to the hashmap.
@@ -479,6 +491,16 @@ public:
 
   /// Return the hash map for this hash set.
   csHash<T, T, KeyHandler>* GetHash () { return &map; }
+
+  /**
+   * Return an iterator for the hash set, to iterate over all elements.
+   * Modifying the set while you have open iterators will cause undefined 
+   * behaviour.
+   */
+  GlobalIterator GetIterator () const
+  {
+    return map.GlobalIterator (this);
+  }
 };
 
 #endif

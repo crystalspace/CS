@@ -24,6 +24,14 @@ chronological order.
 	  the way for creation of proper shared libraries in the future.
 	- Eric Sunshine augmented cs-config so that it has knowledge of the
 	  csappframe library.
+	- res made the following changes:
+	    - Moved the const char* and csRef<> hash key handlers from
+	      engine/renderloop.h to csutil/hashhandlers.h, as they're general
+	      purpose.
+	    - Changed the renderloop file loader: instead of <renderloop>, the
+	      top level node must be named <params>, for compatibility with
+	      the "paramsfile" option from csloader.
+	    - Added a GetIterator() method to csSet<>.
 15-Sep-2003
 	- Eric Sunshine added a check for the C++ `typename' keyword to
 	  configure.ac.  If not recognized by the compiler, the
