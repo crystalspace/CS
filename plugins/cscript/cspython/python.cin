@@ -1,6 +1,6 @@
 #!/bin/sh
 if test -z "$1"; then
-    echo "Don't call this script directly it's meant to use together with cs-cofig"
+    echo "Don't call this script directly it's meant to use together with cs-config"
     exit 1
 fi
 
