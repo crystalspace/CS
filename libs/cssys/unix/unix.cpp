@@ -63,6 +63,7 @@ void handler (int sig)
 
 void init_sig ()
 {
+#ifndef DO_COREDUMP
   signal (SIGHUP, handler);
   signal (SIGINT, handler);
   signal (SIGTRAP, handler);
@@ -74,6 +75,7 @@ void init_sig ()
   signal (SIGBUS, handler);
   signal (SIGFPE, handler);
   signal (SIGILL, handler);
+#endif // ! DO_COREDUMP
 }
 
 //------------------------------------------------------ The System driver ---//

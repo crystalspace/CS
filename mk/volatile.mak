@@ -23,3 +23,6 @@ endif
 ifeq ($(NEED_FAKE_BOOL),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define NO_BOOL_TYPE$">>volatile.tmp
 endif
+ifeq ($(DO_COREDUMP),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_COREDUMP$">>volatile.tmp
+endif
