@@ -59,32 +59,36 @@
 struct RGBcolor
 {
   unsigned char red, green, blue;
-  RGBcolor() : red(0), green(0), blue(0) {}
-  RGBcolor(unsigned char r, unsigned char g, unsigned char b) :
+  RGBcolor () : red(0), green(0), blue(0) {}
+  RGBcolor (unsigned char r, unsigned char g, unsigned char b) :
     red(r), green(g), blue(b) {}
-  bool operator== (const RGBcolor& c)
-    { return c.red == red && c.green == green && c.blue == blue; }
-  bool operator!= (const RGBcolor& c) { return !operator==(c); }
-  RGBcolor operator+ (const RGBcolor& c)
-    { return RGBcolor(c.red+red, c.green+green, c.blue+blue); }
+  bool operator == (const RGBcolor& c) const
+  { return (c.red == red) && (c.green == green) && (c.blue == blue); }
+  bool operator != (const RGBcolor& c) const
+  { return !operator == (c); }
+  RGBcolor operator + (const RGBcolor& c) const
+  { return RGBcolor (c.red + red, c.green + green, c.blue + blue); }
 };
 
 /// An RGB pixel.
 struct RGBPixel
 {
   unsigned char red, green, blue, pad;
-  RGBPixel() : red(0), green(0), blue(0), pad(0) {}
-  RGBPixel(const RGBcolor& c) :
-    red(c.red), green(c.green), blue(c.blue), pad(0) {}
-  RGBPixel(const RGBPixel& p) :
-    red(p.red), green(p.green), blue(p.blue), pad(p.pad) {}
-  bool operator== (const RGBcolor& c)
-    { return c.red == red && c.green == green && c.blue == blue; }
-  bool operator== (const RGBPixel& p)
-    { return p.red == red && p.green == green && p.blue == blue; }
-  bool operator!= (const RGBcolor& c) { return !operator==(c); }
-  bool operator!= (const RGBPixel& p) { return !operator==(p); }
-  operator RGBcolor() { return RGBcolor(red, green, blue); }
+  RGBPixel () : red(0), green(0), blue(0), pad(0) {}
+  RGBPixel (const RGBcolor& c) :
+    red (c.red), green (c.green), blue (c.blue), pad (0) {}
+  RGBPixel (const RGBPixel& p) :
+    red (p.red), green (p.green), blue (p.blue), pad (p.pad) {}
+  bool operator == (const RGBcolor& c) const
+  { return (c.red == red) && (c.green == green) && (c.blue == blue); }
+  bool operator == (const RGBPixel& p) const
+  { return (p.red == red) && (p.green == green) && (p.blue == blue); }
+  bool operator != (const RGBcolor& c) const
+  { return !operator == (c); }
+  bool operator != (const RGBPixel& p) const
+  { return !operator == (p); }
+  operator RGBcolor () const
+  { return RGBcolor (red, green, blue); }
 };
 
 /// An RGB palette entry with statistics information.
@@ -92,18 +96,21 @@ struct RGBPalEntry
 {
   unsigned char red, green, blue;
   long count;
-  RGBPalEntry() : red(0), green(0), blue(0), count(0) {}
-  RGBPalEntry(const RGBcolor& c) :
-    red(c.red), green(c.green), blue(c.blue), count(0) {}
-  RGBPalEntry(const RGBPalEntry& e) :
-    red(e.red), green(e.green), blue(e.blue), count(e.count) {}
-  bool operator== (const RGBcolor& c)
-    { return c.red == red && c.green == green && c.blue == blue; }
-  bool operator== (const RGBPalEntry& e)
-    { return e.red == red && e.green == green && e.blue == blue && e.count == count; }
-  bool operator!= (const RGBcolor& c) { return !operator==(c); }
-  bool operator!= (const RGBPalEntry& e) { return !operator==(e); }
-  operator RGBcolor() { return RGBcolor(red, green, blue); }
+  RGBPalEntry () : red(0), green(0), blue(0), count(0) {}
+  RGBPalEntry (const RGBcolor& c) :
+    red (c.red), green (c.green), blue (c.blue), count (0) {}
+  RGBPalEntry (const RGBPalEntry& e) :
+    red (e.red), green (e.green), blue (e.blue), count (e.count) {}
+  bool operator == (const RGBcolor& c) const
+  { return (c.red == red) && (c.green == green) && (c.blue == blue); }
+  bool operator == (const RGBPalEntry& e) const
+  { return (e.red == red) && (e.green == green) && (e.blue == blue) && (e.count == count); }
+  bool operator != (const RGBcolor& c) const
+  { return !operator == (c); }
+  bool operator != (const RGBPalEntry& e) const
+  { return !operator==(e); }
+  operator RGBcolor () const
+  { return RGBcolor (red, green, blue); }
 };
 
 #endif // RGBPIXEL_H
