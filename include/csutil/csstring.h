@@ -493,8 +493,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
       return true;
     if (n > Size)
       return false;
-    if (Size == 0 && n == 0)
-      return true;
+    CS_ASSERT(Data != 0);
     if (ignore_case)
       return (strncasecmp (Data, iStr.GetData (), n) == 0);
     else
@@ -516,8 +515,7 @@ csString& Replace (TYPE s) { Size = 0; return Append(s); }
       return true;
     if (n > Size)
       return false;
-    if (Size == 0 && n == 0)
-      return true;
+    CS_ASSERT(Data != 0);
     if (ignore_case)
       return (strncasecmp (Data, iStr, n) == 0);
     else
