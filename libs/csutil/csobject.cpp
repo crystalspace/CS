@@ -163,7 +163,7 @@ void csObject::SetName (const char *iName)
 {
   delete [] Name;
   Name = csStrNew (iName);
-  DG_DESCRIBE1 (this, "csObject(%s)", Name);
+  DG_DESCRIBE1 (this, "%s", Name);
 }
 
 const char *csObject::GetName () const

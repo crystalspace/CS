@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+20-Nov-2001
+	- Small fix in csObject::SetName() with relation to the debugging
+	  graph.
 19-Nov-2001
 	- Added iEngine::RemoveObject() which is a conveniance function to
 	  'remove' a CS object from the engine. This will not clear the
