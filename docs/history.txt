@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+18-Mar-2003
+	- Added two entries to the faq about scaled objects.
 17-Mar-2003
 	- Fixed scale issue with dynamic ambient. Dynamic ambient brightness
 	  was divided by 1.5 but that's not needed.
@@ -18,7 +20,7 @@ The history order is reversed so that new features are at the top.
 	- Matze changed plugin linking flags on unix to use -shared instead of
 	  -Wl,-shared as this seems to fix some problems with unresolved
 	  problems on some linux boxes.
-	- Matze fixed a typo in netmtest makefile
+	- Matze fixed a typo in netmtest makefile.
 15-Mar-2003
 	- Greg Block fixed lightmap loading and saving on
 	  non-Intel-endian systems.

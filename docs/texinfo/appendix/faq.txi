@@ -274,6 +274,29 @@ everywhere. Using @samp{WinCVS} it is also possible to set these
 options.  @xref{WinCVS Tutorial}.
 
 @item
+@strong{Q}: I have some objects but collision detection is not working on
+them. What is wrong?
+
+@strong{A}: One of the most common errors is to scale an object using
+the transform in the movable. Unfortunatelly various subsystems in Crystal
+Space (like collision detection and visibility culling) don't work on
+scaled objects. If you want to scale your object you should do it
+with @code{HardTransform} or @code{<hardmove>} instead. Note that for
+some types of mesh objects (like 3D sprites) you must do this on the factory.
+
+@item
+@strong{Q}: I have some objects that seem to be culled wrong. What can cause
+this?
+
+@strong{A1}: See the question about collision detection not working with
+scaled objects. Don't scale your objects using the movable. Instead scale
+them with @code{HardTransform}.
+
+@strong{A2}: Another common error is forgetting to call
+@code{movable->UpdateMove()} after moving a model. If you don't call that
+function then the visibility culler doesn't know the object has moved.
+
+@item
 @strong{Q}: Why isn't my object lit correctly (all black) and why doesn't
 lighting update when I move it?
 
