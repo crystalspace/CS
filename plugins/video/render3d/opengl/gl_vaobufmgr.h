@@ -22,6 +22,7 @@
 
 #include "csutil/strhash.h"
 #include "ivideo/rndbuf.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 
 struct iLightingInfo;
 struct iTextureHandle;
@@ -67,6 +68,7 @@ private:
   csRenderBufferLockType lastlock;
   bool discarded;
   csVaoRenderBufferManager* vaomgr;
+  csGLExtensionManager* ext;
   
 public:
   SCF_DECLARE_IBASE;

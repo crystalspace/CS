@@ -41,7 +41,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/shader/shader.h"
 #include "video/canvas/openglcommon/glstates.h"
 
-#include "../../opengl/glextmanager.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 #include "../../opengl/gl_txtmgr.h"
 #include "../../common/txtmgr.h"
 #include "../../opengl/gl_txtcache.h"
@@ -105,6 +105,8 @@ void csGLShader_MTEX::Open()
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
   ext = (csGLExtensionManager*) sri->GetPrivateObject("ext");
+  ext->InitGL_ARB_texture_env_dot3 ();
+  ext->InitGL_ARB_texture_env_combine ();
 }
 
 csPtr<iString> csGLShader_MTEX::GetProgramID(const char* programstring)

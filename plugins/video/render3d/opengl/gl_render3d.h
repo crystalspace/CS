@@ -44,7 +44,7 @@
 
 #include "ivaria/bugplug.h"
 
-#include "glextmanager.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 #include "gl_sysbufmgr.h"
 #include "gl_varbufmgr.h"
 #include "gl_vaobufmgr.h"
@@ -98,7 +98,7 @@ private:
 
   static csGLStateCache* statecache;
 
-  csGLExtensionManager ext;
+  csGLExtensionManager *ext;
   csGLVertexArrayHelper varr;
   csGLTextureCache *txtcache;
   csGLTextureManager *txtmgr;
@@ -206,7 +206,6 @@ private:
   bool texunitenabled[16]; // @@@ Hardcoded max number of units
 
   iShaderPass* lastUsedShaderpass;
-
 public:
   SCF_DECLARE_IBASE;
 

@@ -52,7 +52,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "gl_sysbufmgr.h"
 #include "gl_txtcache.h"
 #include "gl_txtmgr.h"
-#include "glextmanager.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 
 #include "../common/txtmgr.h"
 
@@ -674,9 +674,6 @@ void csGLRender3D::ApplyObjectToCamera ()
 // iRender3D
 ////////////////////////////////////////////////////////////////////
 
-
-
-
 bool csGLRender3D::Open ()
 {
   csRef<iPluginManager> plugin_mgr (
@@ -708,7 +705,8 @@ bool csGLRender3D::Open ()
   
   object_reg->Register( G2D, "iGraphics2D");
 
-  G2D->PerformExtension("getstatecache", &statecache);
+  G2D->PerformExtension ("getstatecache", &statecache);
+  G2D->PerformExtension	("getextmanager", &ext);
 
   int w = G2D->GetWidth ();
   int h = G2D->GetHeight ();
@@ -724,10 +722,18 @@ bool csGLRender3D::Open ()
   object_reg->Register (effectserver, "iEffectServer");
   }*/
 
-  csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
-  ext.InitExtensions (gl);
-  varr.ext = &ext;
-
+  // The extension manager requires to initialize all used extensions with
+  // a call to InitExtension first.
+  ext->InitGL_ARB_multitexture ();
+  ext->InitGL_ARB_texture_compression ();
+  ext->InitGL_SGIS_generate_mipmap ();
+  ext->InitGL_EXT_texture_filter_anisotropic ();
+  ext->InitGL_NV_vertex_array_range ();
+  ext->InitGL_NV_fence ();
+  ext->InitGL_ATI_vertex_array_object ();
+  ext->InitGL_ATI_vertex_attrib_array_object ();
+  ext->InitGL_EXT_texture_lod_bias ();
+  varr.ext = ext;
 
   shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   if( !shadermgr )
@@ -754,15 +760,14 @@ bool csGLRender3D::Open ()
   shvar_light_0_attenuation->SetType(iShaderVariable::VECTOR4);
   shadermgr->AddVariable(shvar_light_0_attenuation);
 
-  bool useVAR = config->GetBool ("Video.OpenGL.UseExtension.GL_NV_vertex_array_range");
-
-  if ( useVAR && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if (ext->CS_GL_NV_vertex_array_range && ext->CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
     buffermgr = bm;
   } 
-  else if ( ext.CS_GL_ATI_vertex_array_object && ext.CS_GL_ATI_vertex_attrib_array_object)
+  else if ( ext->CS_GL_ATI_vertex_array_object && 
+    ext->CS_GL_ATI_vertex_attrib_array_object)
   {
     csVaoRenderBufferManager* bm = new csVaoRenderBufferManager();
     bm->Initialize(this);
@@ -950,7 +955,7 @@ void csGLRender3D::FinishDraw ()
         {
           if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
           {
-            if (ext.CS_GL_SGIS_generate_mipmap)
+            if (ext->CS_GL_SGIS_generate_mipmap)
             {
               glTexParameteri (GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE);
             }
@@ -1088,7 +1093,7 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   void* data = buffer->Lock (CS_BUF_LOCK_RENDER);
   if (data)
   {
-    ext.glEnableVertexAttribArrayARB (attrib);
+    ext->glEnableVertexAttribArrayARB (attrib);
     if (bind)
       varr.VertexAttribPointer (
         attrib, buffer->GetComponentCount (), 
@@ -1103,7 +1108,7 @@ void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
 {
   if (vertattrib[attrib])
   {
-    ext.glDisableVertexAttribArrayARB (attrib);
+    ext->glDisableVertexAttribArrayARB (attrib);
     vertattrib[attrib]->Release ();
     vertattribenabled[attrib] = false;
   }
@@ -1122,10 +1127,10 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   if (bind && texunit[unit])
     DeactivateTexture (unit);
 
-  if (ext.CS_GL_ARB_multitexture)
+  if (ext->CS_GL_ARB_multitexture)
   {
-    ext.glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-    ext.glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
   } else if (unit != 0) return false;
 
   txtcache->Cache (txthandle);
@@ -1147,7 +1152,7 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
     statecache->Enable_GL_TEXTURE_2D (unit);
     if (bind)
       glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
-    if (ext.CS_GL_EXT_texture_lod_bias)
+    if (ext->CS_GL_EXT_texture_lod_bias)
     {
       glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
 	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); //big hack
@@ -1203,10 +1208,10 @@ bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int u
   if (bind && texunit[unit])
     DeactivateTexture (unit);
 
-  if (ext.CS_GL_ARB_multitexture)
+  if (ext->CS_GL_ARB_multitexture)
   {
-    ext.glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-    ext.glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
   } else if (unit != 0) return false;
 
   txtcache->Cache (txthandle);
@@ -1228,7 +1233,7 @@ bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int u
     statecache->Enable_GL_TEXTURE_2D (unit);
     if (bind)
       glBindTexture (GL_TEXTURE_2D, cachedata->Handle );
-    if (ext.CS_GL_EXT_texture_lod_bias)
+    if (ext->CS_GL_EXT_texture_lod_bias)
     {
       glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
 	GL_TEXTURE_LOD_BIAS_EXT, textureLodBias); //big hack
@@ -1262,10 +1267,10 @@ void csGLRender3D::DeactivateTexture (int unit)
   if (!texunitenabled[unit])
     return;
 
-  if (ext.CS_GL_ARB_multitexture)
+  if (ext->CS_GL_ARB_multitexture)
   {
-    ext.glActiveTextureARB(GL_TEXTURE0_ARB + unit);
-    ext.glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
+    ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
   } else if (unit != 0) return;
 
   csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
@@ -1599,12 +1604,12 @@ void csGLRender3D::SetShadowState (int state)
   {
   case CS_SHADOW_VOLUME_BEGIN:
     current_shadow_state = CS_SHADOW_VOLUME_BEGIN;
-    glClearStencil (0);
     stencil_initialized = false;
-    glClear (GL_STENCIL_BUFFER_BIT);
     glClearStencil (0);
+    glClear (GL_STENCIL_BUFFER_BIT);
     statecache->Enable_GL_STENCIL_TEST ();
-    glStencilFunc (GL_ALWAYS, 0, 127);
+    statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
+    //statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     glPolygonOffset (-0.1, -4); 
     statecache->Enable_GL_POLYGON_OFFSET_FILL ();
     break;
@@ -1746,7 +1751,7 @@ csGLRender3D::eiShaderRenderInterface::~eiShaderRenderInterface()
 void* csGLRender3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
 {
   if(strcasecmp(name, "ext") == 0)
-    return (void*) (&scfParent->ext);
+    return (void*) (scfParent->ext);
   if(strcasecmp(name, "txtcache") == 0)
     return (void*) (scfParent->txtcache);
   if(strcasecmp(name, "varr") == 0)

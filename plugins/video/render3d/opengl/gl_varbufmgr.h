@@ -23,6 +23,7 @@
 #include "csutil/csvector.h"
 #include "csutil/list.h"
 #include "ivideo/rndbuf.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 
 //#include "gl_render3d.h"
 
@@ -94,6 +95,7 @@ class csVARRenderBuffer : public iRenderBuffer
 private:
   static const char MAXMEMORYBLOCKS = 2;
   friend class csVARRenderBufferManager;
+  csGLExtensionManager* ext;
   bool isRealVAR;
   csVARMemoryBlock* memblock;
   char currentBlock;
@@ -155,6 +157,7 @@ class csVARRenderBufferManager: public iRenderBufferManager
   friend class csVARRenderBuffer;
 private:
   csGLRender3D* render3d; /// Must keep this to be able to use extensions
+  csGLExtensionManager* ext;
 
   unsigned char* var_buffer;
   csBuddyAllocator* myalloc;

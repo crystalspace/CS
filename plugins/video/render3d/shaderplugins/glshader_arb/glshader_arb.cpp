@@ -30,10 +30,11 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
+#include "ivideo/graph2d.h"
 #include "ivideo/render3d.h"
 #include "ivideo/shader/shader.h"
 
-#include "../../opengl/glextmanager.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 #include "../../opengl/gl_helper.h"
 
 #include "glshader_avp.h"
@@ -99,7 +100,8 @@ void csGLShader_ARB::Open()
   csRef<iRender3D> r = CS_QUERY_REGISTRY(object_reg,iRender3D);
   csRef<iShaderRenderInterface> sri = SCF_QUERY_INTERFACE(r, iShaderRenderInterface);
 
-  ext = (csGLExtensionManager*) sri->GetPrivateObject ("ext");
+  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+  ext->InitGL_ARB_vertex_program ();
   varr = (csGLVertexArrayHelper*) sri->GetPrivateObject ("varr");
 }
 

@@ -33,7 +33,7 @@
 #include "csgfx/csimgvec.h"
 #include "csutil/array.h"
 
-#include "glextmanager.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 
 // csGLTexture stuff
 
@@ -923,7 +923,7 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget, const char *n
 
   if (glformats[theOld].name)
   {
-    if (!strcmp (newTarget, "compressed") && R3D->ext.CS_GL_ARB_texture_compression)
+    if (!strcmp (newTarget, "compressed") && R3D->ext->CS_GL_ARB_texture_compression)
     {
       GLint compressedFormat;
       // is the format compressable at all ?

@@ -26,7 +26,7 @@
 #include "gl_render3d.h"
 #include "gl_txtcache.h"
 #include "gl_txtmgr.h"
-#include "glextmanager.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 #include "GL/glu.h"
 
 
@@ -227,7 +227,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR
                          : GL_NEAREST_MIPMAP_NEAREST);
 
-  if (R3D->ext.CS_GL_EXT_texture_filter_anisotropic)
+  if (R3D->ext->CS_GL_EXT_texture_filter_anisotropic)
   {
     glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
       R3D->txtmgr->texture_filter_anisotropy);
@@ -257,7 +257,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       }
       else
       {
-	R3D->ext.glCompressedTexImage2DARB (
+	R3D->ext->glCompressedTexImage2DARB (
 	  GL_TEXTURE_2D, 
 	  i, 
 	  (GLenum)togl->internalFormat,
@@ -275,7 +275,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     for (int i=0; i < txt_mm->vTex.Length (); i++)
     {
       csGLTexture *togl = txt_mm->vTex[i];
-      R3D->ext.glTexImage3DEXT (GL_TEXTURE_3D, 
+      R3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, 
                     i,
                     txt_mm->TargetFormat (),
                     togl->get_width (),

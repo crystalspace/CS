@@ -20,7 +20,7 @@
 #ifndef __CS_GL_HELPER_H__
 #define __CS_GL_HELPER_H__
 
-class csGLExtensionManager;
+struct csGLExtensionManager;
 
 class csGLVertexArrayHelper
 {

@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	  the filter stuff to the install macros.
         - JTarbox updated the event object from csVector to csArray<>
     - res added some missing includes to glextmanager.h
+    - res changed the new GL renderer to utilize the modified extension
+      manager.
 28-Apr-2003
 	- Matze fixed vfs.cfg generation when doing jam install.
 	- Eric Sunshine made the following changes to the cspython build

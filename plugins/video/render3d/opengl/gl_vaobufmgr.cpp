@@ -39,26 +39,27 @@ csVaoRenderBuffer::csVaoRenderBuffer (int size, csRenderBufferType type,
   csRenderBufferComponentType comptype, int compcount,
   csVaoRenderBufferManager* vaomgr)
 {
-    SCF_CONSTRUCT_IBASE (NULL)
+  SCF_CONSTRUCT_IBASE (NULL)
 
-    tempbuffer = NULL;
-    indexbuffer = NULL;
-    csVaoRenderBuffer::size = size;
-    csVaoRenderBuffer::type = type;
-    csVaoRenderBuffer::comptype = comptype;
-    csVaoRenderBuffer::compcount = compcount;
-    csVaoRenderBuffer::vaomgr = vaomgr;
-    locked = false;
+  tempbuffer = NULL;
+  indexbuffer = NULL;
+  csVaoRenderBuffer::size = size;
+  csVaoRenderBuffer::type = type;
+  csVaoRenderBuffer::comptype = comptype;
+  csVaoRenderBuffer::compcount = compcount;
+  csVaoRenderBuffer::vaomgr = vaomgr;
+  locked = false;
 
-    discarded = true;
+  discarded = true;
 
-    // Get a buffer-index to use
-    VAObufferID = vaomgr->render3d->ext.glNewObjectBufferATI(size, NULL, GL_STATIC_ATI);
+  ext = vaomgr->render3d->ext;
+  // Get a buffer-index to use
+  VAObufferID = ext->glNewObjectBufferATI(size, NULL, GL_STATIC_ATI);
 }
 
 csVaoRenderBuffer::~csVaoRenderBuffer()
 {
-  vaomgr->render3d->ext.glFreeObjectBufferATI(VAObufferID);
+  ext->glFreeObjectBufferATI(VAObufferID);
   //release other buffers
   delete[] (char *)tempbuffer;
   delete[] (char *)indexbuffer;
@@ -70,7 +71,7 @@ void csVaoRenderBuffer::Release()
   if(lastlock != CS_BUF_LOCK_RENDER && type != CS_BUF_INDEX)
   {
     //copy to our VAO buffer
-    vaomgr->render3d->ext.glUpdateObjectBufferATI(VAObufferID, 0, size, tempbuffer, GL_DISCARD_ATI);
+    ext->glUpdateObjectBufferATI(VAObufferID, 0, size, tempbuffer, GL_DISCARD_ATI);
   }
   discarded = false;
 }

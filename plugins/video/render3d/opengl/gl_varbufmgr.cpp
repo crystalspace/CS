@@ -241,17 +241,19 @@ bool csVARRenderBufferManager::Initialize(csGLRender3D* render3d)
 {
   csVARRenderBufferManager::render3d = render3d;
 
+  ext = render3d->ext;
+
   // Alloc some VAR-memory
   // HACK: this should be fetched from config-file.. for now it's hardcoded
-  if(render3d->ext.wglAllocateMemoryNV)
-    var_buffer = (unsigned char*) render3d->ext.wglAllocateMemoryNV(CS_VAR_ALLOC_SIZE, 0.0f,0.0f,0.5f);
+  if(ext->CS_GL_NV_vertex_array_range && ext->wglAllocateMemoryNV)
+    var_buffer = (unsigned char*) ext->wglAllocateMemoryNV(CS_VAR_ALLOC_SIZE, 0.0f,0.0f,0.5f);
   else
     return false;
 
   if(!var_buffer)
     return false;
 
-  render3d->ext.glVertexArrayRangeNV(CS_VAR_ALLOC_SIZE, var_buffer);
+  ext->glVertexArrayRangeNV(CS_VAR_ALLOC_SIZE, var_buffer);
   //glEnableClientState(GL_VERTEX_ARRAY_RANGE_WITHOUT_FLUSH_NV);
 
 
@@ -266,7 +268,7 @@ csVARRenderBufferManager::~csVARRenderBufferManager()
   glDisableClientState(GL_VERTEX_ARRAY_RANGE_NV);
 
   if(var_buffer)
-    render3d->ext.wglFreeMemoryNV(var_buffer);
+    ext->wglFreeMemoryNV(var_buffer);
   var_buffer = 0;
   
   myalloc->PrintStats();
@@ -389,7 +391,7 @@ csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, csRenderBufferType 
   discardable = true;
 
   memblock = new csVARMemoryBlock[MAXMEMORYBLOCKS];
-
+  ext = bm->render3d->ext;
 
   int i;
   for(i = 0; i < MAXMEMORYBLOCKS; ++i)
@@ -413,10 +415,10 @@ csVARRenderBuffer::~csVARRenderBuffer()
     int i;
     for(i = 0; i < MAXMEMORYBLOCKS;++i)
     {
-      bm->render3d->ext.glFinishFenceNV(memblock[i].fence_id);
+      ext->glFinishFenceNV(memblock[i].fence_id);
       if(memblock[i].buffer)
         bm->myalloc->free( (void*)((long)(memblock[i].buffer) - (long)(bm->var_buffer)));
-      bm->render3d->ext.glDeleteFencesNV(1, &memblock[i].fence_id);
+      ext->glDeleteFencesNV(1, &memblock[i].fence_id);
     }
   }
   delete[] memblock;
@@ -461,7 +463,7 @@ void* csVARRenderBuffer::Lock(csRenderBufferLockType lockType)
         locked = true;
         discarded = true;
         lastlock = lockType;
-        bm->render3d->ext.glGenFencesNV(1, &(memblock[currentBlock].fence_id));
+        ext->glGenFencesNV(1, &(memblock[currentBlock].fence_id));
       }
       return memblock[currentBlock].buffer;
     }
@@ -476,7 +478,7 @@ void* csVARRenderBuffer::Lock(csRenderBufferLockType lockType)
   }
   else if (type == CS_BUF_STATIC)
   {
-    bm->render3d->ext.glFinishFenceNV(memblock[currentBlock].fence_id);
+    ext->glFinishFenceNV(memblock[currentBlock].fence_id);
     locked = true;
     discarded = false;
     lastlock = lockType;
@@ -484,7 +486,7 @@ void* csVARRenderBuffer::Lock(csRenderBufferLockType lockType)
   }
   else if (type == CS_BUF_DYNAMIC)
   {
-    if(bm->render3d->ext.glTestFenceNV(memblock[currentBlock].fence_id))
+    if(bm->render3d->ext->glTestFenceNV(memblock[currentBlock].fence_id))
     {
       //it was free, use it
       locked = true;
@@ -507,7 +509,7 @@ void csVARRenderBuffer::Release()
 {
   if(lastlock == CS_BUF_LOCK_RENDER && type != CS_BUF_INDEX)
   {
-    bm->render3d->ext.glSetFenceNV(memblock->fence_id, GL_ALL_COMPLETED_NV);
+    ext->glSetFenceNV(memblock->fence_id, GL_ALL_COMPLETED_NV);
   }
 
   if(lastlock != CS_BUF_LOCK_RENDER)
@@ -529,9 +531,9 @@ bool csVARRenderBuffer::Discard()
   {
     if(memblock[i].buffer != NULL)
     {
-      bm->render3d->ext.glFinishFenceNV(memblock[i].fence_id);
+      ext->glFinishFenceNV(memblock[i].fence_id);
       bm->myalloc->free( (void*)((long)(memblock[i].buffer) - (long)(bm->var_buffer)));
-      bm->render3d->ext.glDeleteFencesNV(1, &memblock[i].fence_id);
+      ext->glDeleteFencesNV(1, &memblock[i].fence_id);
       memblock[i].buffer = NULL;
     }
   }
