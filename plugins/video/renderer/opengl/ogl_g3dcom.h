@@ -183,7 +183,7 @@ protected:
 
 public:
   /// The maximum texture size
-  int max_texture_size;
+  GLint max_texture_size;
   /// The texture cache.
   OpenGLTextureCache* texture_cache;
 
