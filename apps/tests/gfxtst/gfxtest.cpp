@@ -19,24 +19,25 @@
 
 */
 
+#include <string.h>
 #include "cssysdef.h"
-#include "cstool/initapp.h"
+
 #include "csgfx/csimage.h"
-#include "csutil/util.h"
+#include "csqsqrt.h"
+#include "cstool/initapp.h"
 #include "csutil/cfgfile.h"
-#include "iutil/databuff.h"
-#include "iutil/objreg.h"
-#include "ivideo/graph3d.h"
-#include "ivaria/reporter.h"
-#include "iutil/eventh.h"
-#include "iutil/comp.h"
+#include "csutil/cmdhelp.h"
+#include "csutil/getopt.h"
+#include "csutil/util.h"
 #include "igraphic/imageio.h"
+#include "iutil/comp.h"
+#include "iutil/databuff.h"
+#include "iutil/eventh.h"
+#include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
-#include "csutil/cmdhelp.h"
-#include "csqsqrt.h"
-
-#include <string.h>
+#include "ivaria/reporter.h"
+#include "ivideo/graph3d.h"
 
 CS_IMPLEMENT_APPLICATION
 

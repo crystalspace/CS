@@ -18,18 +18,19 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/csunicode.h"
-#include "csutil/csendian.h"
 #include "cstool/initapp.h"
-#include "csutil/util.h"
-#include "csutil/memfile.h"
+#include "csutil/csendian.h"
 #include "csutil/csstring.h"
-#include "ivideo/fontserv.h"
-#include "iutil/objreg.h"
-#include "iutil/eventh.h"
+#include "csutil/csunicode.h"
+#include "csutil/getopt.h"
+#include "csutil/memfile.h"
+#include "csutil/util.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
+#include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
+#include "ivideo/fontserv.h"
 
 CS_IMPLEMENT_APPLICATION
 
