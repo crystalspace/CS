@@ -21,7 +21,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-LIB.EXTERNAL.FREEFONT2 = -lfreetype
+LIB.EXTERNAL.FREEFONT2 = $(FT2.LFLAGS)
 
 ifeq ($(USE_PLUGINS),yes)
   FREEFONT2 = $(OUTDLL)/freefnt2$(DLL)
@@ -58,7 +58,7 @@ ifeq ($(MAKESECTION),targets)
 freefnt2: $(OUTDIRS) $(FREEFONT2)
 
 $(OUT)/%$O: plugins/font/server/freefnt2/%.cpp
-	$(DO.COMPILE.CPP) -I/usr/include/freetype2
+	$(DO.COMPILE.CPP) $(FT2.CFLAGS)
 
 $(FREEFONT2): $(OBJ.FREEFONT2) $(LIB.FREEFONT2)
 	$(DO.PLUGIN) $(LIB.EXTERNAL.FREEFONT2)

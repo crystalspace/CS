@@ -126,7 +126,9 @@ ifeq ($(3DS.AVAILABLE),yes)
 PLUGINS.DYNAMIC += mesh/impexp/3ds
 endif
 PLUGINS.DYNAMIC += font/server/fontplex
-#PLUGINS.DYNAMIC += font/server/freefnt2
+ifeq ($(FT2.AVAILABLE),yes)
+PLUGINS.DYNAMIC += font/server/freefnt2
+endif
 PLUGINS.DYNAMIC += aws
 ifeq ($(OGG.AVAILABLE),yes)
 PLUGINS.DYNAMIC += sound/loader/ogg
