@@ -37,6 +37,7 @@
 
 #include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
+#include "inetwork/driver.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
@@ -80,10 +81,25 @@ static long LastConnectTime = 0;
 // End networking stuff.
 //-----------------------------------------------------------------------------
 
+#define  QUERY_PLUG(myPlug, iFace, errMsg) \
+  myPlug = QUERY_PLUGIN (Sys, iFace); \
+  if (!myPlug) \
+  { \
+    Sys->Printf (MSG_FATAL_ERROR, errMsg); \
+    return -1; \
+  }
+
+#define  QUERY_PLUG_NM(myPlug, iFace, errMsg) \
+  myPlug = QUERY_PLUGIN (Sys, iFace); \
+  if (!myPlug) \
+  { \
+    Sys->Printf (MSG_INITIALIZATION, errMsg); \
+  }
+
 Blocks* Sys = NULL;
 
-#define Gfx3D System->G3D
-#define Gfx2D System->G2D
+#define Gfx3D Sys->myG3D
+#define Gfx2D Sys->myG2D
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -287,6 +303,10 @@ Blocks::Blocks ()
   engine = NULL;
   view = NULL;
   LevelLoader = NULL;
+  myG2D = NULL;
+  myG3D = NULL;
+  myVFS = NULL;
+  myNetDrv = NULL;
 
   full_rotate_x = create_rotate_x (M_PI/2);
   full_rotate_y = create_rotate_y (M_PI/2);
@@ -370,6 +390,10 @@ Blocks::~Blocks ()
   TerminateConnection();
 #endif
   if (LevelLoader) LevelLoader->DecRef();
+  if (myNetDrv) myNetDrv->DecRef ();
+  if (myG2D) myG2D->DecRef ();
+  if (myG3D) myG3D->DecRef ();
+  if (myVFS) myVFS->DecRef ();
 }
 
 void Blocks::InitGame ()
@@ -2949,13 +2973,13 @@ bool Blocks::InitNet()
   {
     const char source[] = "2222";
 
-    if (!System->NetDrv) return false;
-    Listener = System->NetDrv->NewListener (source, true, false, false);
+    if (!myNetDrv) return false;
+    Listener = myNetDrv->NewListener (source, true, false, false);
     if (Listener != NULL)
       Sys->Printf (MSG_INITIALIZATION, "Listening on port %s\n", source);
     else
       Sys->Printf (MSG_INITIALIZATION,"Error creating network listener (%d)\n",
-        Sys->NetDrv->GetLastError ());
+        myNetDrv->GetLastError ());
 
     return (Listener != NULL);
   }
@@ -2971,11 +2995,11 @@ void Blocks::Connect ()
 {
   const char target[] = "localhost:2222";
   Connection = NULL;
-  if (!Sys->NetDrv) return;
+  if (!myNetDrv) return;
   Sys->Printf(MSG_INITIALIZATION, "Attempting connection to %s...", target);
-  Connection = Sys->NetDrv->NewConnection(target, true, false);
+  Connection = myNetDrv->NewConnection(target, true, false);
   if (Connection == NULL)
-    Sys->Printf (MSG_INITIALIZATION,"Error %d\n", Sys->NetDrv->GetLastError());
+    Sys->Printf (MSG_INITIALIZATION,"Error %d\n", myNetDrv->GetLastError());
   else
     Sys->Printf(MSG_INITIALIZATION, "OK\nPress a key [A-Z] to send a"
       "message to the server.\n");
@@ -3031,16 +3055,17 @@ int main (int argc, char* argv[])
   }
 
   // Find the pointer to engine plugin
-  Sys->engine = QUERY_PLUGIN (Sys, iEngine);
-  if (!Sys->engine)
-  {
-    Sys->Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
-    return -1;
-  }
+  QUERY_PLUG (Sys->engine, iEngine, "No iEngine plugin!\n");
+
   Sys->thing_type = Sys->engine->GetThingType ();
 
+  QUERY_PLUG (Sys->myG3D, iGraphics3D, "No iGraphics3D plugin!\n");
+  QUERY_PLUG (Sys->myG2D, iGraphics2D, "No iGraphics2D plugin!\n");
+  QUERY_PLUG (Sys->myVFS, iVFS, "No iVFS plugin!\n");
+  QUERY_PLUG_NM (Sys->myNetDrv, iNetworkDriver, "No iNetworkDriver plugin!\n");
+
   // Get a font handle
-  Sys->font = Sys->G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
+  Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Get the level loader
   Sys->LevelLoader = QUERY_PLUGIN_ID(Sys, CS_FUNCID_LVLLOADER, iLoader);
@@ -3074,9 +3099,9 @@ int main (int argc, char* argv[])
   // Change to virtual directory where Blocks data is stored
   //if (!)
 
-  csString world_file(Sys->Config->GetStr ("Blocks.Data", "/data/blocks"));
+  csString world_file(Sys->GetConfig ()->GetStr ("Blocks.Data", "/data/blocks"));
   world_file.Append("/");
-  if (!Sys->VFS->Exists (world_file.GetData()))
+  if (!Sys->myVFS->Exists (world_file.GetData()))
   {
     Sys->Printf (MSG_FATAL_ERROR,
       "The directory on VFS (%s) for world file does not exist!\n",
@@ -3084,7 +3109,7 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  Sys->VFS->ChDir (world_file.GetData());
+  Sys->myVFS->ChDir (world_file.GetData());
   Sys->ReadConfig ();
   Sys->InitEngine ();
 

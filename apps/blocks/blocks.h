@@ -307,6 +307,11 @@ public:
   iEngine* engine;
   iView* view;
   iTextureManager* txtmgr;
+  iGraphics2D *myG2D;
+  iGraphics3D *myG3D;
+  iVFS *myVFS;
+  iNetworkDriver *myNetDrv;
+
   static int white, black, red;
 
   // The font we are typing with
