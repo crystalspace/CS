@@ -8,7 +8,9 @@
 # can be found in libs/cssys/os2 subdirectory
 #------------------------------------------------------------------------------
 
+ifdef COMSPEC
 SHELL = $(COMSPEC)
+endif
 
 # Friendly names for building environment
 DESCRIPTION.os2gcc = OS/2-GCC/EMX
