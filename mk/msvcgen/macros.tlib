@@ -25,6 +25,45 @@
 MACRO slash(s) GET s.replace('/','\\');
 
 #------------------------------------------------------------------------------
+# Given a path, strip off any prefix found in the my.doc.striproot[] array.
+# For example, if my.doc.striproot[] contains '/usr/local/', and this macro is
+# invoked as striproot('/usr/local/foo.bar'), then the return value will be
+# 'foo.bar'.
+#------------------------------------------------------------------------------
+MACRO striproot(p) BLOCK;
+  IF my.doc.striproot;
+    UNLESS my.doc.striprootpat;
+      r = [];
+      FOREACH c IN my.doc.striproot;
+	IF c != '.';
+	  c = c.replace('[/\\\\]?$', '/?') IF c != './';
+	  r.push(c.replace('[.]', '\\.'));
+	END;
+      END;
+      my.doc.striprootpat = '^(?i:' _ r.join('|') _ ')';
+    END;
+    p.replace(my.doc.striprootpat, '');
+  ELSE;
+    GET p;
+  END;
+END;
+
+#------------------------------------------------------------------------------
+# Given an array of paths, invoke striproot() upon each and return the results.
+# Note that, because TemplateToolkit macros can not return true lists, the
+# return value is actually a string with the elements delimited by the token
+# `|'; thus clients must split() the return value if a real list result is
+# desired.  For instance: myfiles = striproots(allfiles).split('|')
+#------------------------------------------------------------------------------
+MACRO striproots(p) BLOCK;
+  r = [];
+  FOREACH c IN p;
+    r.push(striproot(c));
+  END;
+  r.join('|');
+END;
+
+#------------------------------------------------------------------------------
 # Given an array of path components, return the concatenation of the components
 # (using backslash '\' as a delimiter) after possibly stripping an optional
 # prefix from each component.  The list of prefixes which may be stripped are
@@ -34,25 +73,11 @@ MACRO slash(s) GET s.replace('/','\\');
 # 'foo\bar\cow.baz'.
 #------------------------------------------------------------------------------
 MACRO path(p) BLOCK;
-  IF my.doc.striproot;
-    UNLESS my.doc.striprootpat;
-      t = [];
-      FOREACH c IN my.doc.striproot;
-	IF c != '.';
-	  c = c.replace('[/\\\\]?$', '/?') IF c != './';
-	  t.push(c.replace('[.]', '\\.'));
-	END;
-      END;
-      my.doc.striprootpat = '^(?i:' _ t.join('|') _ ')';
-    END;
-    r = [];
-    FOREACH c IN p;
-      r.push(c.replace(my.doc.striprootpat,''));
-    END;
-    slash(r.join('\\'));
-  ELSE;
-    slash(p.join('\\'));
+  r = [];
+  FOREACH c IN p;
+    r.push(striproot(c));
   END;
+  slash(r.join('\\'));
 END;
 
 #------------------------------------------------------------------------------
@@ -72,7 +97,7 @@ MACRO flags(s) GET slash(s).replace('\A\\\\','/').replace('\s\\\\',' /');
 # list ['foo.h', 'bar.cpp', 'cow.cpp'], the list of returned items will be
 # ['bar.cpp'].  Note that, because TemplateToolkit macros can not return true
 # lists, the return value is actually a string with the elements delimited by
-# the token `|'; thus clients must split() the return value if an real list
+# the token `|'; thus clients must split() the return value if a real list
 # result is desired.  For instance: myfiles = filter(allfiles).split('|')
 #------------------------------------------------------------------------------
 MACRO filter(x) BLOCK;

@@ -32,7 +32,7 @@
   load(respfile, 'doc');
   FOREACH f IN my.doc.customize; PROCESS $f | null; END;
 
-  files = filter(my.doc.file).split('\|').sort;
+  files = striproots(filter(my.doc.file).split('\|')).split('\|').sort;
   builds = builds.nsort('priority');
 END -%]
 # Microsoft Developer Studio Project File - Name="[% my.doc.project.0 %]" - Package Owner=<4>

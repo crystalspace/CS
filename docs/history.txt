@@ -49,6 +49,14 @@ chronological order.
 	  could be fooled into thinking that the project files were outdated if
 	  the wildcard operation returned the same list of files in different
 	  orders on different runs.
+	- Eric Sunshine fixed bug in the msvcgen project templates where the
+	  file lists were not always sorted reliably. The problem was that the
+	  file list was sorted before prefixes (such as $(TOP) and $(BUILDTOP))
+	  were stripped from the files.  However, once the prefixes were
+	  stripped, the files would appear out-of-order.  For example, given
+	  the files "/a/foo" and "/b/bar", they would be sorted into ("/a/foo",
+	  "/b/bar"), and then the prefixes would be stripped, giving ("foo",
+	  "bar"), which is improperly sorted.
 1-Mar-2005
 	- res fixed the use of 'return' in a void method in glrender3d.cpp.
 	- Marten fixed a bug related to attenuation of lights in r3dtest. 
