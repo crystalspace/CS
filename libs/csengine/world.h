@@ -23,6 +23,7 @@
 #include "csgeom/math3d.h"
 #include "csengine/basic/csobjvec.h"
 #include "csobject/csobj.h"
+#include "csutil/cleanup.h"
 
 class csSector;
 class csTextureList;
@@ -67,6 +68,19 @@ class csWorld : public csObject
   friend class Dumper;
 
 public:
+  /**
+   * This is a vector which holds objects of type 'csCleanable'.
+   * They will be destroyed when the world is destroyed. That's
+   * the only special thing. This is useful for holding memory
+   * which you allocate locally in a function but you want
+   * to reuse accross function invocations. There is no general
+   * way to make sure that the memory will be freed it only exists
+   * as a static pointer in your function code. Adding a class
+   * encapsulating that memory to this array will ensure that the
+   * memory is removed once the world is destroyed.
+   */
+  csCleanup cleanup;
+
   /**
    * List of sectors in the world. This vector contains
    * objects of type csSector*. Use NewSector() to add sectors

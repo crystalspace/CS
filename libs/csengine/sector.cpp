@@ -612,6 +612,55 @@ void csSector::Draw (csRenderView& rview)
 }
 
 
+void* csSector::CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
+{
+  csPolygon3D* p;
+  csLightView* d = (csLightView*)data;
+  int i;
+  for (i = 0 ; i < num ; i++)
+  {
+    p = (csPolygon3D*)polygon[i];
+    p->CalculateLighting (d);
+  }
+  return NULL;
+}
+
+void csSector::CalculateLighting (csLightView& lview)
+{
+  if (draw_busy >= cfg_reflections) return;
+
+  draw_busy++;
+  csVector3* old;
+  NewTransformation (old);
+
+  csVector3& center = lview.light_frustrum->GetOrigin ();
+  TranslateVector (center);
+
+  if (light_frame_number != current_light_frame_number)
+  {
+    light_frame_number = current_light_frame_number;
+    lview.gouroud_color_reset = true;
+  }
+  else lview.gouroud_color_reset = false;
+
+  if (bsp)
+    bsp->Back2Front (center, &CalculateLightingPolygons, (void*)&lview);
+  else
+    CalculateLightingPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
+
+  if (static_thing) static_thing->CalculateLighting (lview);
+  csThing* sp = first_thing;
+  while (sp)
+  {
+    if (!sp->IsMerged ()) sp->CalculateLighting (lview);
+    sp = (csThing*)(sp->GetNext ());
+  }
+
+  RestoreTransformation (old);
+  draw_busy--;
+}
+
+#if 0
 struct SectorShineInfo
 {
   csStatLight* light;
@@ -623,251 +672,7 @@ struct SectorShineInfo
   csTransform *trans;
   IGraphics3D* g3d;
 };
-
-void* csSector::ShinePolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
-{
-  csPolygon3D* p;
-  csPortal* po;
-  csLightView* d = (csLightView*)data;
-  int i;
-  for (i = 0 ; i < num ; i++)
-  {
-    p = (csPolygon3D*)polygon[i];
-    csVector3* new_frustrum = NULL;
-    int new_num_frustrum = 0;
-    if (p->ClipFrustrum (d->center, d->frustrum, d->num_frustrum, d->mirror, &new_frustrum, &new_num_frustrum))
-    {
-      // First we check if the light can reach the polygon. If not then there is no
-      // need to include it in the view frustrum. This is especially useful for portals
-      // since then whole sectors can be culled away efficiently.
-
-      // First compute the distance from the center of the light to the plane of
-      // the polygon. If this distance is greater then the radius of the light then
-      // we have a trivial case (no hit possible).
-      float dist_to_plane = p->GetPolyPlane ()->Distance (d->center);
-
-      bool faraway = true;
-      if (dist_to_plane < d->l->GetRadius ())
-      {
-        // The light is close enough to the plane of the polygon. Now we calculate
-	// an accurate minimum squared distance from the light to the polygon. Note
-	// that we use the new_frustrum which is relative to the center of the light.
-	// So this algorithm works with the light position at (0,0,0) (@@@ we should
-	// use this to optimize this algorithm further).
-	csVector3 o (0, 0, 0);
-	float min_sqdist = csSquaredDist::PointPoly (o, new_frustrum, new_num_frustrum,
-		*(p->GetPolyPlane ()), dist_to_plane*dist_to_plane);
-	if (min_sqdist < d->l->GetSquaredRadius ()) faraway = false;	// Light reaches polygon.
-      }
-
-      if (!faraway)
-      {
-        csLightView new_lview;
-	new_lview.CopyNoFrustrum (*d);
-        new_lview.frustrum = new_frustrum;
-        new_lview.num_frustrum = new_num_frustrum;
-        p->ShineLightmaps (new_lview);
-        po = p->GetPortal ();
-        if (po) po->ShineLightmaps (new_lview);
-        else if (!new_lview.dynamic && do_radiosity)
-        {
-          // If there is no portal we simulate radiosity by creating
-	  // a dummy portal for this polygon which reflects light.
-	  csPortalCS mirror;
-	  mirror.SetSector (p->GetSector ());
-	  mirror.SetAlpha (10);
-	  float r, g, b;
-	  p->GetTextureHandle ()->GetMeanColor (r, g, b);
-	  mirror.SetFilter (r/4, g/4, b/4);
-	  mirror.SetWarp (csTransform::GetReflect ( *(p->GetPolyPlane ()) ));
-	  mirror.ShineLightmaps (new_lview);
-        }
-      }
-      else
-      {
-        CHK (delete [] new_frustrum);
-      }
-    }
-  }
-  return NULL;
-}
-
-void csSector::ShineLightmaps (csLightView& lview)
-{
-  if (draw_busy >= cfg_reflections) return;
-
-  draw_busy++;
-  csVector3* old;
-  NewTransformation (old);
-
-  TranslateVector (lview.center);
-
-  csLightView new_lview;
-  new_lview.Copy (lview);
-
-  /* Don't think it's necessary with new lightmaps shining. This code moves *
-   *  shadows somehow, and this is not correct. -- D.D.                     */
-#if 0
-  // First we slightly expand the frustrum. This is to make sure that
-  // boundary cases are also catched correctly.
-  if (new_lview.frustrum)
-  {
-    // First calculate the center point of the frustrum. We will
-    // expand around that point.
-    int i;
-    csVector3 minf, maxf, cent;
-    minf.x = minf.y = minf.z = 1000000;
-    maxf.x = maxf.y = maxf.z = -1000000;
-    for (i = 0 ; i < lview.num_frustrum ; i++)
-    {
-      if (lview.frustrum[i].x < minf.x) minf.x = lview.frustrum[i].x;
-      if (lview.frustrum[i].y < minf.y) minf.y = lview.frustrum[i].y;
-      if (lview.frustrum[i].z < minf.z) minf.z = lview.frustrum[i].z;
-      if (lview.frustrum[i].x > maxf.x) maxf.x = lview.frustrum[i].x;
-      if (lview.frustrum[i].y > maxf.y) maxf.y = lview.frustrum[i].y;
-      if (lview.frustrum[i].z > maxf.z) maxf.z = lview.frustrum[i].z;
-    }
-    cent = (minf+maxf) / 2.0;
-
-    // Scale the frustrum.
-    for (i = 0 ; i < lview.num_frustrum ; i++)
-      new_lview.frustrum[i] = (lview.frustrum[i]-cent) * 1.00 + cent;
-  }
 #endif
-
-  if (light_frame_number != current_light_frame_number)
-  {
-    light_frame_number = current_light_frame_number;
-    new_lview.gouroud_color_reset = true;
-  }
-  else new_lview.gouroud_color_reset = false;
-
-  if (bsp)
-    bsp->Back2Front (new_lview.center, &ShinePolygons, (void*)&new_lview);
-  else
-    ShinePolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&new_lview);
-
-  if (static_thing) static_thing->ShineLightmaps (lview);
-  csThing* sp = first_thing;
-  while (sp)
-  {
-    if (!sp->IsMerged ()) sp->ShineLightmaps (lview);
-    sp = (csThing*)(sp->GetNext ());
-  }
-
-  RestoreTransformation (old);
-  draw_busy--;
-}
-
-void* csSector::CalculateLightmapsPolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
-{
-  csPolygon3D* p;
-  csPortal* po;
-  csLightView* d = (csLightView*)data;
-  csFrustrum* light_frustrum = d->light_frustrum;
-  csFrustrum* new_light_frustrum;
-  csVector3* poly;
-  int i, j;
-  for (i = 0 ; i < num ; i++)
-  {
-    p = (csPolygon3D*)polygon[i];
-    CHK (poly = new csVector3 [p->GetNumVertices ()]);	//@@@ Not efficient, allocate once, use many times!!!
-    for (j = 0 ; j < p->GetNumVertices () ; j++)
-      poly[j] = p->Vcam (j);
-    new_light_frustrum = light_frustrum->Intersect (poly, p->GetNumVertices ());
-    CHK (delete [] poly);
-
-    if (new_light_frustrum)
-    {
-      // There is an intersection of the current light frustrum with the polygon.
-      // This means that the polygon is hit by the light.
-
-      // First compute the distance from the center of the light to the plane of
-      // the polygon. If this distance is greater than the radius of the light then
-      // we have a trivial case (no hit possible).
-      float dist_to_plane = p->GetPolyPlane ()->Distance (light_frustrum->GetOrigin ());
-
-      bool faraway = true;
-      if (dist_to_plane < d->l->GetRadius ())
-      {
-        // The light is close enough to the plane of the polygon. Now we calculate
-	// an accurate minimum squared distance from the light to the polygon. Note
-	// that we use the new_frustrum which is relative to the center of the light.
-	// So this algorithm works with the light position at (0,0,0) (@@@ we should
-	// use this to optimize this algorithm further).
-	csVector3 o (0, 0, 0);
-	float min_sqdist = csSquaredDist::PointPoly (o, new_light_frustrum->GetVertices (),
-		new_light_frustrum->GetNumVertices (),
-		*(p->GetPolyPlane ()), dist_to_plane*dist_to_plane);
-	if (min_sqdist < d->l->GetSquaredRadius ()) faraway = false;	// Light reaches polygon.
-      }
-
-      if (!faraway)
-      {
-        csLightView new_lview;
-	new_lview.CopyNoFrustrum (*d);
-        new_lview.light_frustrum = new_light_frustrum;
-        p->CalculateLightmaps (new_lview);
-        po = p->GetPortal ();
-        if (po) po->CalculateLightmaps (new_lview);
-        else if (!new_lview.dynamic && do_radiosity)
-        {
-          // If there is no portal we simulate radiosity by creating
-	  // a dummy portal for this polygon which reflects light.
-	  csPortalCS mirror;
-	  mirror.SetSector (p->GetSector ());
-	  mirror.SetAlpha (10);
-	  float r, g, b;
-	  p->GetTextureHandle ()->GetMeanColor (r, g, b);
-	  mirror.SetFilter (r/4, g/4, b/4);
-	  mirror.SetWarp (csTransform::GetReflect ( *(p->GetPolyPlane ()) ));
-	  mirror.CalculateLightmaps (new_lview);
-        }
-      }
-
-      CHK (delete new_light_frustrum);
-    }
-  }
-  return NULL;
-}
-
-void csSector::CalculateLightmaps (csLightView& lview)
-{
-  if (draw_busy >= cfg_reflections) return;
-
-  draw_busy++;
-  csVector3* old;
-  NewTransformation (old);
-
-  TranslateVector (lview.light_frustrum->GetOrigin ());
-
-  csLightView new_lview;
-  new_lview.Copy (lview);
-
-  if (light_frame_number != current_light_frame_number)
-  {
-    light_frame_number = current_light_frame_number;
-    new_lview.gouroud_color_reset = true;
-  }
-  else new_lview.gouroud_color_reset = false;
-
-  if (bsp)
-    bsp->Back2Front (new_lview.center, &CalculateLightmapsPolygons, (void*)&new_lview);
-  else
-    CalculateLightmapsPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&new_lview);
-
-  if (static_thing) static_thing->CalculateLightmaps (lview);
-  csThing* sp = first_thing;
-  while (sp)
-  {
-    if (!sp->IsMerged ()) sp->CalculateLightmaps (lview);
-    sp = (csThing*)(sp->GetNext ());
-  }
-
-  RestoreTransformation (old);
-  draw_busy--;
-}
-
 
 void* csSector::DumpFrustrumPolygons (csPolygonParentInt*, csPolygonInt** polygon, int num, void* data)
 {
@@ -1258,7 +1063,7 @@ void csSector::ShineLights ()
   for (i = 0 ; i < lights.Length () ; i++)
   {
     CsPrintf(MSG_TICKER, "");
-    ((csStatLight*)lights[i])->ShineLightmaps ();
+    ((csStatLight*)lights[i])->CalculateLighting ();
   }
 }
 
@@ -1268,7 +1073,7 @@ void csSector::ShineLights (csThing* th)
   for (i = 0 ; i < lights.Length () ; i++)
   {
     CsPrintf(MSG_TICKER, "");
-    ((csStatLight*)lights[i])->ShineLightmaps (th);
+    ((csStatLight*)lights[i])->CalculateLighting (th);
   }
 }
 

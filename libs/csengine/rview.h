@@ -79,32 +79,6 @@ public:
 };
 
 /**
- * A shadow polygon. Objects of this type are collected by the
- * lighting routines. Every polygon of every thing generates a
- * shadow polygon which follows the csLightView structure below.
- */
-class csShadowPatch
-{
-public:
-  ///
-  csShadowPatch* next;
-
-  /**
-   * The shadow frustrum.
-   */
-  csVector3* frustrum;
-  ///
-  int num_frustrum;
-
-  csShadowPatch () : next (NULL), frustrum (NULL), num_frustrum (0) { }
-
-  ~csShadowPatch ()
-  {
-    CHK (delete [] frustrum);
-  }
-};
-
-/**
  * This structure represents all information needed for static lighting.
  * It is the basic information block that is passed between the various
  * static lighting routines.
@@ -114,13 +88,6 @@ class csLightView
 public:
   /// The light that we're processing.
   csLight* l;
-
-  /**
-   * The center of the light. This may differ from the actual center
-   * of 'l' because space warping may have relocated it. Routines should
-   * always use this center.
-   */
-  csVector3 center;
 
   /**
    * The current color of the light. Initially this is the same as the
@@ -156,33 +123,7 @@ public:
   csFrustrum* light_frustrum;
 
   /**
-  @@@ OBSOLETE
-   * The current view frustrum as seen from the light (relative
-   * to the center of the light). If frustrum == NULL then everything is
-   * visible (the full frustrum).
-   */
-  csVector3* frustrum;
-  ///
-  int num_frustrum;
-
-  /**
-  @@@ OBSOLETE
-   * All shadows collected upto now.
-   * @@@ Currently not used but reserved for later when implementing
-   * a better lighting system.
-   */
-  csShadowPatch* shadows;
-
-  /**
-  @@@ OBSOLETE
-   * Pointer to the first shadow in the list which belongs to
-   * the previous recursion level (and which should not be cleaned
-   * by this one).
-   */
-  csShadowPatch* prev_shadows;
-
-  /**
-  @@@ OBSOLETE?
+  @@@ Soon will be OBSOLETE!
    * A tranform from the space of the light beam to the space of the light
    * source.
    */
@@ -190,63 +131,12 @@ public:
 
 public:
   ///
-  csLightView () : light_frustrum (NULL), frustrum (NULL), num_frustrum (0), shadows (NULL),
-  	prev_shadows (NULL), beam2source () { }
+  csLightView () : light_frustrum (NULL), beam2source () { }
  
   ///
   ~csLightView ()
   {
-    CHK (delete [] frustrum);
-    //while (shadows && shadows != prev_shadows)
-    //{
-      //csShadowPatch* s = shadows;
-      //shadows = s->next;
-      //CHK (delete s);
-    //}
-  }
-
-  ///
-  void SetNumFrustrum (int n)
-  {
-    num_frustrum = n;
-    CHK (delete [] frustrum);
-    CHK (frustrum = new csVector3 [n]);
-  }
-
-  ///
-  int GetNumFrustrum () { return num_frustrum; }
-
-  ///
-  csVector3* GetFrustrum () { return frustrum; }
-
-  ///
-  csLightView& Copy (csLightView& other)
-  {
-    if (&other == this) return *this;
-    *this = other;
-    //prev_shadows = shadows;
-    if (other.frustrum)
-    {
-      CHK (frustrum = new csVector3 [num_frustrum]);
-      memcpy (frustrum, other.frustrum, num_frustrum*sizeof (csVector3));
-    }
-    if (other.light_frustrum)
-    {
-      CHK (light_frustrum = new csFrustrum (*other.light_frustrum));
-    }
-    return *this;
-  }
-
-  ///
-  csLightView& CopyNoFrustrum (csLightView& other)
-  {
-    if (&other == this) return *this;
-    *this = other;
-    //prev_shadows = shadows;
-    frustrum = NULL,
-    num_frustrum = 0;
-    light_frustrum = NULL;
-    return *this;
+    CHK (delete light_frustrum);
   }
 };
 
