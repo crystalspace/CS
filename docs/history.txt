@@ -13,6 +13,7 @@ chronological order.
 	- res fixed an uninitialized member of csKDTree.
 	- res fixed the uninitialized dynDomain in the ball plugin.
 	- res made the XML shader compiler more verbose in case of errors.
+	- res updated the stencil makefile/Jamfile to link against csgfx.
 09-Dec-2003
 	- Marten fixed stencil shadow renderloop plugin.
 	- Marten fixed so CLOD and ballmesh compiles, not tested yet though.

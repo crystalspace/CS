@@ -50,7 +50,7 @@ SRC.RENDSTEP_STENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
    $(DIR.RENDSTEP_STENCIL)/shadow/stencil/*.cpp \
   plugins/engine/renderloop/common/*.cpp))
 OBJ.RENDSTEP_STENCIL = $(addprefix $(OUT)/,$(notdir $(SRC.RENDSTEP_STENCIL:.cpp=$O)))
-DEP.RENDSTEP_STENCIL = CSTOOL CSGEOM CSUTIL
+DEP.RENDSTEP_STENCIL = CSGFX CSUTIL CSGEOM CSTOOL
 
 TO_INSTALL.CONFIG += $(CFG.RENDSTEP_STENCIL)
 
