@@ -56,7 +56,7 @@ static struct option long_options[] =
   {"truecolor", no_argument, 0, 'c'},
   {"verbose", no_argument, 0, 'v'},
   {"version", no_argument, 0, 'V'},
-  {"save", no_argument, 0, 'S'},
+  {"save", optional_argument, 0, 'S'},
   {"display", optional_argument, 0, 'D'},
   {"heightmap", optional_argument, 0, 'H'},
   {"info", no_argument, 0, 'I'},
@@ -95,6 +95,7 @@ static struct
 };
 // Dont move inside the struct!
 static csRGBpixel transpcolor;
+char output_name[512] = "";
 
 static int display_help ()
 {
@@ -102,7 +103,7 @@ static int display_help ()
   printf ("Copyright (C) 2000 Andrew Zabolotny\n\n");
   printf ("Usage: %s {option/s} [image file] [...]\n\n", programname);
   printf ("  -d   --dither        Apply Floyd-Steinberg dithering when reducing to 8 bpp\n");
-  printf ("  -s   --scale=#,#     Re-scale the image to given size #\n");
+  printf ("  -s   --scale=#[,#]   Re-scale the image to given size #\n");
   printf ("  -m   --mipmap=#      Create mipmap level # (=0,1,2,3) from image\n");
   printf ("  -t   --transp=#,#,#  Treat color (R,G,B) as transparent\n");
   printf ("  -8   --paletted      Convert image to 8 bits-per-pixel paletted format\n");
@@ -112,9 +113,9 @@ static int display_help ()
   printf ("  -V   --version       Display program version\n");
   printf ("  -a   --strip-alpha   Remove alpha channel, if present\n");
   printf ("------------------- Output options (reciprocally exclusive): ------------------\n");
-  printf ("  -S   --save          Output a PNG output image (default)\n");
-  printf ("  -D   --display{=#,#} Display the image in ASCII format :-)\n");
-  printf ("  -H   --heightmap{=#} Output a 3D heightmap in Crystal Space format\n");
+  printf ("  -S   --save[=#]      Output a PNG output image (default)\n");
+  printf ("  -D   --display[=#,#] Display the image in ASCII format :-)\n");
+  printf ("  -H   --heightmap[=#] Output a 3D heightmap in Crystal Space format\n");
   printf ("                       An optional scale argument may be specified\n");
   printf ("  -I   --info          Display image info (and don't do anything more)\n");
   return 1;
@@ -153,17 +154,22 @@ static bool SavePNM (const char *fname, void *image, int w, int h, bool rgb)
 static bool output_picture (const char *fname, const char *suffix, iImage *ifile)
 {
   char outname [CS_MAXPATHLEN + 1];
-  strcpy (outname, fname);
-  char *eol = strchr (outname, 0);
-  while (eol > outname && *eol != '.') eol--;
-  if (eol == outname) eol = strchr (outname, 0);
-  strcpy (eol, suffix);
-  strcat (eol, ".png");
+  if (output_name[0])
+    strcpy (outname, output_name);
+  else
+  {
+    strcpy (outname, fname);
+    char *eol = strchr (outname, 0);
+    while (eol > outname && *eol != '.') eol--;
+    if (eol == outname) eol = strchr (outname, 0);
+    strcpy (eol, suffix);
+    strcat (eol, ".png");
+  }
   printf ("Saving output file %s\n", outname);
 
 #if 1
   iDataBuffer *db = ImageLoader->Save (ifile, "image/png");
-  FILE *f = fopen (outname, "w+");
+  FILE *f = fopen (outname, "wb");
   if (f)
     fwrite (db->GetData (), 1, db->GetSize (), f);
   fclose (f);
@@ -376,8 +382,12 @@ static bool process_file (const char *fname)
   char suffix [20];
   suffix [0] = 0;
 
-  if (opt.scaleX > 0 && opt.scaleY > 0)
+  if (opt.scaleX > 0)
   {
+    if (opt.scaleY == -1)
+    {
+      opt.scaleY = (ifile->GetHeight () * opt.scaleX) / ifile->GetWidth ();
+    }
     printf ("Rescaling image to %d x %d\n", opt.scaleX, opt.scaleY);
     ifile->Rescale (opt.scaleX, opt.scaleY);
     sprintf (strchr (suffix, 0), "-s%dx%d", opt.scaleX, opt.scaleY);
@@ -465,7 +475,7 @@ int main (int argc, char *argv[])
   programname = argv [0];
 
   int c;
-  while ((c = getopt_long (argc, argv, "8cdas:m:t:D::H::IhvV", long_options, NULL)) != EOF)
+  while ((c = getopt_long (argc, argv, "8cdas:m:t:D:S::H::IhvV", long_options, NULL)) != EOF)
     switch (c)
     {
       case '?':
@@ -483,6 +493,14 @@ int main (int argc, char *argv[])
       case 'a':
         opt.stripalpha = true;
         break;
+      case 'S':
+        opt.outputmode = 0;
+	if (optarg && sscanf (optarg, "%s", output_name) != 1)
+	{
+          printf ("%s: expecting optional <filename> -S\n", programname);
+          return -1;
+	}
+	break;
       case 'D':
         opt.outputmode = 1;
         if (optarg &&
@@ -493,11 +511,15 @@ int main (int argc, char *argv[])
         }
         break;
       case 's':
-        if (sscanf (optarg, "%d,%d", &opt.scaleX, &opt.scaleY) != 2)
-        {
-          printf ("%s: expecting <width>,<height> after -s\n", programname);
-          return -1;
-        }
+	{
+          int rc = sscanf (optarg, "%d,%d", &opt.scaleX, &opt.scaleY);
+	  if (rc != 1 && rc != 2)
+          {
+            printf ("%s: expecting <width>[,<height>] after -s\n", programname);
+            return -1;
+          }
+	  if (rc == 1) opt.scaleY = -1;
+	}
         break;
       case 't':
       {

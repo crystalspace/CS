@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+20-Dec-2001
+	- Fixed gfxtest so it will actually write out the PNG file correctly
+	  on windows (i.e. use binary mode for writing the file).
+	- Added the ability to gfxtest to scale given only the X size. The Y
+	  size will then be calculated proportionally.
+	- Added the ability to add a filename after -S or --save option so
+	  you can give the filename it should use.
 19-Dec-2001
 	- Rationalized the far plane in the camera:
 	    - Removed the special csFarPlane class in the engine and instead
