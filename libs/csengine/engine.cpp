@@ -550,15 +550,19 @@ void csEngine::Clear ()
   nextframe_pending = 0;
   if (G3D) G3D->ClearCache ();
   halos.DeleteAll ();
-  collections.DeleteAll ();
+  int i;
+  for (i = collections.Length () -1; i >= 0 ; i--)
+    RemoveCollection ((csCollection*)collections.Get (i));
+
   meshes.DeleteAll ();
   terrains.DeleteAll();
   mesh_factories.DeleteAll ();
   terrain_factories.DeleteAll();
   curve_templates.DeleteAll ();
+
   sectors.DeleteAll ();
   camera_positions.DeleteAll ();
-  int i;
+
   for (i = 0 ; i < planes.Length () ; i++)
   {
     csPolyTxtPlane* p = (csPolyTxtPlane*)planes[i];
@@ -574,10 +578,8 @@ void csEngine::Clear ()
     first_dyn_lights = dyn;
   }
   delete materials; 
-  materials = NULL;
   materials = new csMaterialList ();
   delete textures; 
-  textures = NULL;
   textures = new csTextureList ();
 
   // Delete engine states and their references to cullers before cullers are
@@ -1399,23 +1401,12 @@ void csEngine::RemoveTerrain (iTerrainWrapper* terr)
   RemoveTerrain (terr->GetPrivateObject ());
 }
 
-void csEngine::UnlinkCollection (csCollection* collection)
-{
-  collection->GetMovable ().ClearSectors ();
-  int idx = collections.Find (collection);
-  if (idx == -1) return;
-  collections[idx] = NULL;
-  collections.Delete (idx);
-}
-
 void csEngine::RemoveCollection (csCollection* collection)
 {
   collection->GetMovable ().ClearSectors ();
   int idx = collections.Find (collection);
   if (idx == -1) return;
-  collections[idx] = NULL;
   collections.Delete (idx);
-  delete collection;
 }
 
 struct LightAndDist
