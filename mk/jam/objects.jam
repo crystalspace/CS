@@ -34,7 +34,7 @@ rule RegisterHeaderRule
   }
 }
 
-##  CompileObject sources
+##  CompileObjects sources
 ##    Compile a set of sourcefiles into objectfiles (extension: SUFOBJ,
 ##	usually .o). This rule takes care of setting LOCATE and SEARCH
 ##    variables to the $(SEARCH_SOURCE) and $(LOCATE_SOURCE) variables.
@@ -64,9 +64,9 @@ rule CompileObjects
 #----------------------------------------------------------------------------
 # private part
 
-# helper rule: Compiles a sourcefile to an object file. Does header file
+# helper rule: Compiles a source file to an object file. Does header file
 # scanning, sets LOCATE and SEARCH for source and target, grists the files
-# with the current subdir and searches the correct rule in registered rules.
+# with the current subdir and searches for the correct registered rule.
 rule CompileObject
 {
   # handle #includes for source: Jam scans for headers with
