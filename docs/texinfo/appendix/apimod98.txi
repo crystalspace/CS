@@ -1175,5 +1175,5 @@ switch (e.Type)
 
 The functionality provided by @code{WriteBaseline()} is now available by 
 specifying the @code{CS_WRITE_BASELINE} flag when calling 
-@code{iGraphics2D::Write()}. Hence, @code{WriteBaseline()} is superflouos and
+@code{iGraphics2D::Write()}. Hence, @code{WriteBaseline()} is superfluous and
 has been deprecated.
