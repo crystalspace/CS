@@ -183,7 +183,7 @@ bool csIntersect2::Plane (const csVector2& u, const csVector2& v,
   return true;
 }
 
-static bool csIntersect2::Planes (const csPlane2& p1, const csPlane2& p2,
+bool csIntersect2::Planes (const csPlane2& p1, const csPlane2& p2,
                     csVector2& isect)
 {
   // p1: A1x+B1y+C1 = 0
