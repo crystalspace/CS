@@ -18,6 +18,8 @@ he history order is reversed so that new features are at the top.
 	      pixel data.
 	    - Added PowerPC-specific versions of qsqrt() and qisqrt() for use
 	      by Macintosh (and any other PowerPC-based computers).
+	- Eric Sunshine fixed csThing::SetCacheName() so that it once again
+	  compiles successfully on NextStep.
 13-Jan-2002
 	- Matze changed cs-config --version to only output major number, the
 	  --longversion outputs all

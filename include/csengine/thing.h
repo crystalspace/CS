@@ -783,10 +783,10 @@ public:
   void PrepareLighting ();
 
   /// Set the cache name for this thing.
-  void SetCacheName (const char* cachename)
+  void SetCacheName (const char* n)
   {
-    delete[] csThing::cachename;
-    csThing::cachename = cachename ? csStrNew (cachename) : NULL;
+    delete[] cachename;
+    cachename = n ? csStrNew (n) : 0;
   }
   /// Get the cache name.
   const char* GetCacheName () const { return cachename; }
