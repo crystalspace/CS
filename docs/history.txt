@@ -27,6 +27,9 @@ The history order is reversed so that new features are at the top.
 	    - Fixed bugs: A significant number of boundary (one-off) errors
 	      were present.
 	- Eric Sunshine eliminated compilation warnings from tinystr.cpp.
+	- Eric Sunshine patched win32gcc.mak to work around problem on Win9x
+	  and WinME where "dllwrap --driver-name=g++" results in the error
+	  "dllwrap.exe: installation problem, cannot exec g++".
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.
