@@ -35,7 +35,9 @@
 #include <sys/types.h>
 
 #if defined(OS_WIN32)
+#if !defined(__CYGWIN__)
 #  include <winsock.h>
+#  endif
 #  ifndef socklen_t
      typedef int socklen_t;
 #  endif
