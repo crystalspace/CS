@@ -451,7 +451,7 @@ void csGraphics3DOGLCommon::PerfTest ()
         cnt++;
       }
       test_modes[i].cnt = cnt;
-      printf ("    %d FPS for %c\n", cnt,
+      SysPrintf (MSG_INITIALIZATION, "    %d FPS for %c\n", cnt,
     	  test_modes[i].mode); fflush (stdout);
     }
     // Sort the results.
@@ -506,7 +506,7 @@ void csGraphics3DOGLCommon::PerfTest ()
       cnt++;
     }
     test_modes[i].cnt = cnt;
-    printf ("    %d FPS for %c (small clipper)\n", cnt,
+    SysPrintf (MSG_INITIALIZATION, "    %d FPS for %c (small clipper)\n", cnt,
     	test_modes[i].mode); fflush (stdout);
   }
 
