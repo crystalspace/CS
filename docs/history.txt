@@ -13,6 +13,10 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine disabled shooter.mak since the csgame library is now
 	  defunct.
 	- Eric Sunshine eliminated a slew of compilation warnings in 3ds2lev.
+	- Eric Sunshine fixed a problem following Andrew's config-file change
+	  of yesterday where several plugins modules were applying 'delete'
+	  to iConfigFile rather than DecRef().  Also fixed one plugin which
+	  was leaking an iConfigFile reference.
 2-Oct-2000
 	- Andrew Zabolotny did the following changes to CS:
 	    - Overhauled the csIniFile class. There is now a new
