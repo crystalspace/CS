@@ -29,6 +29,15 @@ The history order is reversed so that new features are at the top.
 	  manual.
 	- Eric Sunshine updated jobber.pl so that it no longer uses the
 	  old-style "make linux" in preparation for its processing.
+	- Eric Sunshine made the following changes to the configure script:
+	    - Fixed bug: Failed to emit X11.AVAILABLE makefile property when
+	      X11 was available.
+	    - Fixed bug: Was emitting X_CFLAGS, X_LIBS, X_PRE_LIBS, and
+	      X_EXTRA_LIBS makefile properties only if VideoMode extensions
+	      were available, but should have been emitting them whenever X11
+	      was present.
+	    - The -I/usr/local/include viability test is now performed only if
+	      /usr/local/include is present on the build host.
 5-Jan-2002
 	- Applied a patch from Rene Jager (renej.frog@yucom.be) which does
 	  the following:

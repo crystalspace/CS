@@ -1029,24 +1029,26 @@ AS_IF([test $cs_cv_prog_cxx_debug_gdb != no],
 
 #------------------------------------------------------------------------------
 # Check if compiler complains about adding /usr/local/include to the header
-# search path.  If not, add this to the search path since not all compilers
-# search there by default.  Some compiler, on the other hand, complain if it is
-# already in the built-in search path, and the complaint is an annoyance.
+# search path.  If not, add it to the header search path since not all
+# compilers search there by default.  Some compiler, on the other hand,
+# complain if it is already in the built-in search path, and we would like to
+# avoid the complaint, if possible.
 #------------------------------------------------------------------------------
-AS_IF([test $cs_cv_prog_cxx_enable_warnings != no && \
-    test $cs_cv_prog_cxx_enable_errors != no],
-    [AC_CACHE_CHECK([checking if -I/usr/local/include is usable],
-	[cs_cv_prog_cxx_local_include],
-	[CS_BUILD_IFELSE([],
-	    [CS_CREATE_TUPLE([-I/usr/local/include \
-		$cs_cv_prog_cxx_enable_warnings \
-		$cs_cv_prog_cxx_enable_errors],[],[])], [C++],
-		[cs_cv_prog_cxx_local_include=yes],
-		[cs_cv_prog_cxx_local_include=no])])],
-    [cs_cv_prog_cxx_local_include=yes])
+AS_IF([test -d /usr/local/include],
+    [AS_IF([test $cs_cv_prog_cxx_enable_warnings != no && \
+	test $cs_cv_prog_cxx_enable_errors != no],
+	[AC_CACHE_CHECK([checking if -I/usr/local/include is usable],
+	    [cs_cv_prog_cxx_local_include],
+	    [CS_BUILD_IFELSE([],
+		[CS_CREATE_TUPLE([-I/usr/local/include \
+		    $cs_cv_prog_cxx_enable_warnings \
+		    $cs_cv_prog_cxx_enable_errors],[],[])], [C++],
+		    [cs_cv_prog_cxx_local_include=yes],
+		    [cs_cv_prog_cxx_local_include=no])])],
+	[cs_cv_prog_cxx_local_include=yes])
 
-AS_IF([test $cs_cv_prog_cxx_local_include = yes],
-    [CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])])
+    AS_IF([test $cs_cv_prog_cxx_local_include = yes],
+	[CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])])])
 		
 
 
@@ -1058,7 +1060,13 @@ AC_PATH_X
 AC_PATH_XTRA
 
 AS_IF([test "$no_x" != yes],
-    [CS_CHECK_LIB_WITH([Xxf86vm],
+    [CS_MAKEFILE_PROPERTY([X11.AVAILABLE], [yes])
+    CS_MAKEFILE_PROPERTY([X_CFLAGS], [$X_CFLAGS])
+    CS_MAKEFILE_PROPERTY([X_LIBS], [$X_LIBS])
+    CS_MAKEFILE_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS])
+    CS_MAKEFILE_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS])
+
+    CS_CHECK_LIB_WITH([Xxf86vm],
 	[AC_LANG_PROGRAM(
 	    [#define XK_MISCELLANY 1
 	    #include <X11/Xlib.h>
@@ -1066,11 +1074,7 @@ AS_IF([test "$no_x" != yes],
 	    #include <X11/Xatom.h>
 	    #include <X11/extensions/xf86vmode.h>],
 	    [XF86VidModeLockModeSwitch(0, 0, 0)])], [], [],
-	[CS_MAKEFILE_PROPERTY([USE_XFREE86VM], [yes])
-	    CS_MAKEFILE_PROPERTY([X_CFLAGS], [$X_CFLAGS])
-	    CS_MAKEFILE_PROPERTY([X_LIBS], [$X_LIBS])
-	    CS_MAKEFILE_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS])
-	    CS_MAKEFILE_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS])], [],
+	[CS_MAKEFILE_PROPERTY([USE_XFREE86VM], [yes])], [],
 	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS])])
 
 

@@ -6654,12 +6654,14 @@ fi
 
 #------------------------------------------------------------------------------
 # Check if compiler complains about adding /usr/local/include to the header
-# search path.  If not, add this to the search path since not all compilers
-# search there by default.  Some compiler, on the other hand, complain if it is
-# already in the built-in search path, and the complaint is an annoyance.
+# search path.  If not, add it to the header search path since not all
+# compilers search there by default.  Some compiler, on the other hand,
+# complain if it is already in the built-in search path, and we would like to
+# avoid the complaint, if possible.
 #------------------------------------------------------------------------------
-if test $cs_cv_prog_cxx_enable_warnings != no && \
-    test $cs_cv_prog_cxx_enable_errors != no; then
+if test -d /usr/local/include; then
+  if test $cs_cv_prog_cxx_enable_warnings != no && \
+	test $cs_cv_prog_cxx_enable_errors != no; then
   echo "$as_me:$LINENO: checking checking if -I/usr/local/include is usable" >&5
 echo $ECHO_N "checking checking if -I/usr/local/include is usable... $ECHO_C" >&6
 if test "${cs_cv_prog_cxx_local_include+set}" = set; then
@@ -6677,8 +6679,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @-I/usr/local/include \
-		$cs_cv_prog_cxx_enable_warnings \
-		$cs_cv_prog_cxx_enable_errors@@ | sed 'y% %#%'`
+		    $cs_cv_prog_cxx_enable_warnings \
+		    $cs_cv_prog_cxx_enable_errors@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -6801,9 +6803,11 @@ else
 fi
 
 
-if test $cs_cv_prog_cxx_local_include = yes; then
+    if test $cs_cv_prog_cxx_local_include = yes; then
   cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += -I/usr/local/include
 "
+fi
+
 fi
 
 
@@ -8246,6 +8250,17 @@ fi
 
 
 if test "$no_x" != yes; then
+  cs_makefile_text="${cs_makefile_text}X11.AVAILABLE = yes
+"
+    cs_makefile_text="${cs_makefile_text}X_CFLAGS = $X_CFLAGS
+"
+    cs_makefile_text="${cs_makefile_text}X_LIBS = $X_LIBS
+"
+    cs_makefile_text="${cs_makefile_text}X_PRE_LIBS = $X_PRE_LIBS
+"
+    cs_makefile_text="${cs_makefile_text}X_EXTRA_LIBS = $X_EXTRA_LIBS
+"
+
 
 # Check whether --with-libXxf86vm or --without-libXxf86vm was given.
 if test "${with_libXxf86vm+set}" = set; then
@@ -8667,14 +8682,6 @@ fi
 
     if test "$cs_cv_libXxf86vm" = yes; then
   cs_makefile_text="${cs_makefile_text}USE_XFREE86VM = yes
-"
-	    cs_makefile_text="${cs_makefile_text}X_CFLAGS = $X_CFLAGS
-"
-	    cs_makefile_text="${cs_makefile_text}X_LIBS = $X_LIBS
-"
-	    cs_makefile_text="${cs_makefile_text}X_PRE_LIBS = $X_PRE_LIBS
-"
-	    cs_makefile_text="${cs_makefile_text}X_EXTRA_LIBS = $X_EXTRA_LIBS
 "
 else
   :
