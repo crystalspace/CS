@@ -34,12 +34,14 @@
 
 #include "csutil/scf.h"
 #include "csutil/cfgacc.h"
+#include "csutil/array.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "plugins/video/renderer/common/polybuf.h"
 #include "ogl_polybuf.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly3d.h"
+#include "csgeom/poly2d.h"
 #include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -424,6 +426,17 @@ protected:
   int cliptype;
   /// 3D Frustum calculated from clipper.
   csPoly3D frustum;
+
+  // Structure used for maintaining a stack of clipper portals.
+  struct csClipPortal
+  {
+    csPoly2D* poly;
+    int num_poly;
+    csClipPortal () : poly (NULL) { }
+    ~csClipPortal () { delete[] poly; }
+  };
+  csArray<csClipPortal> clipportal_stack;
+
   /**
    * If true the frustum below is valid. If false
    * we need to calculate it from the clipper and aspect.

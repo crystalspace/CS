@@ -284,6 +284,10 @@ struct iSector : public iBase
 {
 };
 
+struct iThingState : public iBase
+{
+};
+
 struct iThingFactoryState : public iBase
 {
   iPolygon3DStatic* CreatePolygon (const char* name);
@@ -296,6 +300,10 @@ struct iMeshObject : public iBase
     csPtr<iThingState> Query_iThingState()
     {
       return SCF_QUERY_INTERFACE(self, iThingState);
+    }
+    csPtr<iThingFactoryState> Query_iThingFactoryState()
+    {
+      return SCF_QUERY_INTERFACE(self, iThingFactoryState);
     }
   }
 };

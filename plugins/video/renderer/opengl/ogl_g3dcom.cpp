@@ -1382,6 +1382,7 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
     lightmap_cache->global_timestamp++;
 
     FlushDrawPolygon ();
+    clipportal_stack.DeleteAll ();
   }
 
   // If we go to 2D mode then we do as if several modes are disabled.

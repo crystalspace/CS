@@ -483,22 +483,27 @@ GetInvFOV()
 1.20.  class iSector
 --------------------
 
-1.21.  class iThingFactoryState
+1.21.  class iThingState
+------------------------
+
+1.22.  class iThingFactoryState
 -------------------------------
 
 CreatePolygon(name)
 
-1.22.  class iMeshObject
+1.23.  class iMeshObject
 ------------------------
 
 Query_iThingState()
 
-1.23.  class iMeshWrapper
+Query_iThingFactoryState()
+
+1.24.  class iMeshWrapper
 -------------------------
 
 GetMeshObject()
 
-1.24.  class iLightMap
+1.25.  class iLightMap
 ----------------------
 
 GetMapData()
@@ -519,7 +524,7 @@ GetMeanLighting(r,g,b)
 
 GetSize()
 
-1.25.  class iPolygon3DStatic
+1.26.  class iPolygon3DStatic
 -----------------------------
 
 GetMaterialHandle()
@@ -544,7 +549,7 @@ SetPlane(iName)
 
 SetTextureSpace(v_orig,v1,len1)
 
-1.26.  class iPolygon3D
+1.27.  class iPolygon3D
 -----------------------
 
 GetLightMap()
@@ -553,7 +558,7 @@ GetVertexW(idx)
 
 GetVertexC(idx)
 
-1.27.  class iImage
+1.28.  class iImage
 -------------------
 
 GetImageData()
@@ -584,7 +589,7 @@ Clone()
 
 Crop(x,y,width,height)
 
-1.28.  class iTextureManager
+1.29.  class iTextureManager
 ----------------------------
 
 RegisterTexture(image,flags)
@@ -597,7 +602,7 @@ SetVerbose(vb)
 
 GetTextureFormat()
 
-1.29.  class iPolygonTexture
+1.30.  class iPolygonTexture
 ----------------------------
 
 GetMaterialHandle()
@@ -627,10 +632,10 @@ GetCacheData(idx)
 
 SetCacheData(idx,d)
 
-1.30.  class iCameraPosition
+1.31.  class iCameraPosition
 ----------------------------
 
-1.31.  class iSectorList
+1.32.  class iSectorList
 ------------------------
 
 GetCount()
@@ -643,17 +648,17 @@ Remove(sec)
 
 FindByName(name)
 
-1.32.  class iMaterialList
+1.33.  class iMaterialList
 --------------------------
 
 FindByName(name)
 
-1.33.  class iTextureList
+1.34.  class iTextureList
 -------------------------
 
 FindByName(name)
 
-1.34.  class iEngine
+1.35.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -672,7 +677,7 @@ GetMaterialList()
 
 GetTextureList()
 
-1.35.  class iObjectRegistry
+1.36.  class iObjectRegistry
 ----------------------------
 
 Query_iEngine()

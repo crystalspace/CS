@@ -8,6 +8,9 @@ The history order is reversed so that new features are at the top.
 	  functions (currently unimplemented) will be used for more specialized
 	  portal clipping where a portal wants to restrict drawing to a
 	  certain area AND also keep current Z-buffer contents into account.
+	- Fixed pysimp.py for latest API changes with things and also fixed
+	  python plugin in general for this.
+	- Started working on OpenGL version of OpenPortal() (unfinished).
 23-Mar-2003
 	- Jonathan Tarbox Added initial Flatten/Unflatten code, don't
 	  expect it to work just yet.

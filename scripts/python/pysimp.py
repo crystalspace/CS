@@ -22,9 +22,9 @@ def CreateRoom(matname):
 	room = engine.GetSectors().FindByName("room")
 	walls = engine.CreateSectorWallsMesh(room,"walls")
 	if use_new_cspython_plugin:
-		thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
+		thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingFactoryState)
 	else:
-		thingstate = walls.GetMeshObject().Query_iThingState()
+		thingstate = walls.GetMeshObject().Query_iThingFactoryState()
 	material=engine.GetMaterialList().FindByName(matname)
 
 	poly=thingstate.CreatePolygon('floor')
