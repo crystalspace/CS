@@ -36,7 +36,8 @@
 
 //------------------------------------------------------ The System driver ---//
 
-SysSystemDriver::SysSystemDriver () : csSystemDriver ()
+SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
+	: csSystemDriver (object_reg)
 {
 #ifdef I18N
   // Never do "LC_ALL" because this will break some things like numeric format
