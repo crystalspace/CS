@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+3-Feb-2004
+	- Eric Sunshine fixed syntax error in aws.mak introduced yesterday
+	  which manifested when running 'msvcgen' targets.
 2-Feb-2004
 	- Eric Sunshine changed STREAMMAX and TEXTUREMAX constants in
 	  csXMLShaderCompiler::shaderPass from 'static const int' to 'enum'

@@ -59,7 +59,7 @@ DIR.AWS = plugins/aws
 OUT.AWS = $(OUT)/$(DIR.AWS)
 INF.AWS = $(SRCDIR)/$(DIR.AWS)/aws.csplugin
 ifeq ($(DO_MSVCGEN),yes)
-INC.AWS = $(wildcard $(addprefix $(SRCDIR)/,
+INC.AWS = $(wildcard $(addprefix $(SRCDIR)/, \
   $(DIR.AWS)/*.h $(DIR.AWS)/*.hpp include/iaws/*.h))
 SRC.AWS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWS)/*.cpp))
 else
