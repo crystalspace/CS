@@ -1,5 +1,19 @@
 The history order is reversed so that new features are at the top.
 
+16-Aug-2002
+	- Implemented XML loading in the csparser plugin for the following items:
+	    - Library (LIBRARY)
+	    - Sounds (SOUNDS and SOUND)
+	    - Lod control (LOD)
+	    - Mesh factory (MESHFACT)
+	    - Mesh object from factory (MESHREF)
+	    - Add-on (ADDON)
+	    - Settings (SETTINGS)
+	    - Render priorities (PRIORITIES)
+	    - Collections (COLLECTION)
+	    - Start (START)
+	    - Keys (KEY)
+	    - Nodes (NODE)
 15-Aug-2002
 	- Eric Sunshine changed next.mak so that it only uses the CFLAGS
 	  -Ilibs/zlib, -Ilibs/libpng, -Ilibs/libjpeg and the LFLAGS

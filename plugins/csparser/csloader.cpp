@@ -3373,6 +3373,117 @@ bool csLoader::LoadMap (iDocumentNode* node)
   return true;
 }
 
+bool csLoader::LoadLibrary (iDocumentNode* node)
+{
+  if (!Engine)
+  {
+    ReportError (
+	  "crystalspace.maploader.parse.noengine",
+	  "No engine present while in LoadLibrary!");
+    return false;
+  }
+ 
+  csRef<iDocumentNode> libnode = node->GetNode ("library");
+  if (libnode)
+  {
+    csRef<iDocumentNodeIterator> it = libnode->GetNodes ();
+    while (it->HasNext ())
+    {
+      csRef<iDocumentNode> child = it->Next ();
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
+      const char* value = child->GetValue ();
+      csStringID id = xmltokens.Request (value);
+      switch (id)
+      {
+        case XMLTOKEN_ADDON:
+	  if (!LoadAddOn (child, (iEngine*)Engine))
+	    return false;
+      	  break;
+        case XMLTOKEN_TEXTURES:
+          // Append textures to engine.
+          if (!ParseTextureList (child))
+            return false;
+          break;
+        case XMLTOKEN_MATERIALS:
+          if (!ParseMaterialList (child))
+            return false;
+          break;
+        case XMLTOKEN_SOUNDS:
+          if (!LoadSounds (child))
+            return false;
+          break;
+        case XMLTOKEN_MESHREF:
+          {
+            iMeshWrapper* mesh = LoadMeshObjectFromFactory (child);
+            if (!mesh)
+	    {
+      	      ReportError (
+	      	  "crystalspace.maploader.load.meshobject",
+		  "Could not load mesh object '%s' in library!",
+		  child->GetAttributeValue ("name"));
+	      return false;
+	    }
+	    mesh->QueryObject ()->SetName (child->GetAttributeValue ("name"));
+	    Engine->GetMeshes ()->Add (mesh);
+	    //mesh->DecRef ();
+          }
+          break;
+        case XMLTOKEN_MESHOBJ:
+          {
+	    iMeshWrapper* mesh = Engine->CreateMeshWrapper (
+			    child->GetAttributeValue ("name"));
+            if (!LoadMeshObject (mesh, child))
+	    {
+      	      ReportError (
+	      	  "crystalspace.maploader.load.meshobject",
+		  "Could not load mesh object '%s' in library!",
+		  child->GetAttributeValue ("name"));
+	      mesh->DecRef ();
+	      return false;
+	    }
+	    //mesh->DecRef ();
+          }
+          break;
+        case XMLTOKEN_MESHFACT:
+          {
+            iMeshFactoryWrapper* t = Engine->CreateMeshFactory (
+			    child->GetAttributeValue ("name"));
+	    if (t)
+	    {
+	      if (!LoadMeshObjectFactory (t, child))
+	      {
+		t->DecRef ();
+		ReportError (
+		     "crystalspace.maploader.load.library.meshfactory",
+		     "Could not load mesh object factory '%s' in library!",
+		     child->GetAttributeValue ("name"));
+		return false;
+	      }
+	      t->DecRef ();
+	    }
+	  }
+	  break;
+        case XMLTOKEN_PLUGINS:
+	  if (!LoadPlugins (child))
+	    return false;
+          break;
+	default:
+          TokenError ("a library file", value);
+          return false;
+      }
+    }
+  }
+  else
+  {
+    ReportError (
+      "crystalspace.maploader.parse.expectedlib",
+      "Expected 'library' token!");
+    return false;
+  }
+
+  return true;
+}
+
 bool csLoader::LoadPlugins (iDocumentNode* node)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -3397,30 +3508,667 @@ bool csLoader::LoadPlugins (iDocumentNode* node)
   return true;
 }
 
-bool csLoader::LoadLibrary (iDocumentNode* node)
-{
-  return true;
-}
-
 bool csLoader::LoadSounds (iDocumentNode* node)
 {
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_SOUND:
+        {
+          const char* name = child->GetAttributeValue ("name");
+          const char* filename = name;
+	  csRef<iDocumentNode> filenode = child->GetNode ("file");
+	  if (filenode)
+	  {
+	    filename = filenode->GetContentsValue ();
+	  }
+          iSoundWrapper *snd =
+	    CS_GET_NAMED_CHILD_OBJECT (Engine->QueryObject (), iSoundWrapper, name);
+          if (!snd)
+            LoadSound (name, filename);
+        }
+        break;
+      default:
+        TokenError ("the list of sounds", value);
+        return false;
+    }
+  }
+
   return true;
 }
 
 bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 {
+  float level = 1;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_LEVEL:
+	level = child->GetContentsValueAsFloat ();
+        break;
+      default:
+        TokenError ("a LOD control", value);
+        return false;
+    }
+  }
+
+  lodctrl->SetLOD (level);
+
   return true;
 }
 
 bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	iDocumentNode* node, csReversibleTransform* transf)
 {
+  iLoaderPlugin* plug = NULL;
+  iMaterialWrapper *mat = NULL;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_LOD:
+        {
+	  if (!stemp->GetMeshObjectFactory ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "Please use 'params' before specifying LOD!");
+	    return false;
+	  }
+	  csRef<iLODControl> lodctrl;
+	  lodctrl.Take (SCF_QUERY_INTERFACE (
+	    	stemp->GetMeshObjectFactory (),
+		iLODControl));
+	  if (!lodctrl)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "This mesh factory doesn't implement LOD control!");
+	    return false;
+	  }
+	  if (!LoadLodControl (lodctrl, child))
+	    return false;
+	}
+        break;
+      case XMLTOKEN_ADDON:
+	if (!LoadAddOn (child, stemp))
+	  return false;
+      	break;
+      case XMLTOKEN_PARAMS:
+	if (!plug)
+	{
+          ReportError (
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin!");
+	  return false;
+	}
+	else
+	{
+	  // We give here the iMeshObjectFactory as the context. If this
+	  // is a new factory this will be NULL. Otherwise it is possible
+	  // to append information to the already loaded factory.
+	  iBase* mof = plug->Parse (child, GetLoaderContext (),
+	  	stemp->GetMeshObjectFactory ());
+	  if (!mof)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.plugin",
+              "Could not parse plugin!");
+	    return false;
+	  }
+	  else
+	  {
+	    iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof,
+	    	iMeshObjectFactory);
+	    if (!mof2)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.meshfactory",
+		"Returned object does not implement iMeshObjectFactory!");
+	      return false;
+	    }
+	    stemp->SetMeshObjectFactory (mof2);
+	    mof2->SetLogicalParent (stemp);
+	    mof2->DecRef ();
+	    mof->DecRef ();
+	  }
+	}
+        break;
+      case XMLTOKEN_PARAMSFILE:
+	if (!plug)
+	{
+          ReportError (
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin!");
+	  return false;
+	}
+	else
+        {
+          iDataBuffer *buf = VFS->ReadFile (child->GetContentsValue ());
+	  if (!buf)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.loadingfile",
+	      "Error opening file '%s'!", child->GetContentsValue ());
+	    return false;
+	  }
+
+	  // We give here the iMeshObjectFactory as the context. If this
+	  // is a new factory this will be NULL. Otherwise it is possible
+	  // to append information to the already loaded factory.
+	  // @@@ SWITCH TO XML HERE!
+	  iBase* mof = plug->Parse ((char*)(buf->GetUint8 ()),
+	  	GetLoaderContext (), stemp->GetMeshObjectFactory ());
+	  buf->DecRef ();
+	  if (!mof)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.plugin",
+              "Could not parse plugin!");
+	    return false;
+	  }
+	  else
+	  {
+	    iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof,
+	    	iMeshObjectFactory);
+	    if (!mof2)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.meshfactory",
+		"Returned object does not implement iMeshObjectFactory!");
+	      return false;
+	    }
+	    stemp->SetMeshObjectFactory (mof2);
+	    mof2->SetLogicalParent (stemp);
+	    mof2->DecRef ();
+	    mof->DecRef ();
+	  }
+        }
+        break;
+
+      case XMLTOKEN_MATERIAL:
+        {
+	  if (!stemp->GetMeshObjectFactory ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "Please use 'params' before specifying 'material'!");
+	    return false;
+	  }
+	  const char* matname = child->GetContentsValue ();
+          mat = GetLoaderContext ()->FindMaterial (matname);
+          if (mat)
+	  {
+	    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (
+	    	stemp->GetMeshObjectFactory (),
+		iSprite3DFactoryState);
+	    if (!state)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.meshfactory",
+                "Only use MATERIAL keyword with 3D sprite factories!");
+	      return false;
+	    }
+            state->SetMaterialWrapper (mat);
+	    state->DecRef ();
+	  }
+          else
+          {
+            ReportError (
+	      "crystalspace.maploader.parse.unknownmaterial",
+              "Material '%s' not found!", matname);
+	    return false;
+          }
+        }
+        break;
+
+      case XMLTOKEN_FILE:
+        {
+          if (!ModelConverter || !CrossBuilder) return false;
+
+	  const char* filename = child->GetContentsValue ();
+          iDataBuffer *buf = VFS->ReadFile (filename);
+	  if (!buf)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.loadingmodel",
+	      "Error opening file model '%s'!", filename);
+	    return false;
+	  }
+
+	  iModelData *Model = ModelConverter->Load (buf->GetUint8 (),
+	  	buf->GetSize ());
+	  buf->DecRef ();
+          if (!Model)
+	  {
+            ReportError (
+ 	      "crystalspace.maploader.parse.loadingmodel",
+	      "Error loading file model '%s'!", filename);
+	    return false;
+	  }
+
+	  csModelDataTools::SplitObjectsByMaterial (Model);
+	  csModelDataTools::MergeObjects (Model, false);
+	  iMeshFactoryWrapper *stemp2 =
+	    CrossBuilder->BuildSpriteFactoryHierarchy (Model, Engine, mat);
+	  Model->DecRef ();
+
+	  stemp->SetMeshObjectFactory (stemp2->GetMeshObjectFactory ());
+	  int i;
+	  iMeshFactoryList* mfl2 = stemp2->GetChildren ();
+	  iMeshFactoryList* mfl = stemp->GetChildren ();
+	  for (i=0; i<mfl2->GetCount (); i++)
+	    mfl->Add (mfl2->Get (i));
+	  stemp2->DecRef ();
+        }
+        break;
+
+      case XMLTOKEN_PLUGIN:
+	plug = loaded_plugins.FindPlugin (child->GetContentsValue ());
+        break;
+
+      case XMLTOKEN_MESHFACT:
+        {
+          iMeshFactoryWrapper* t = Engine->CreateMeshFactory (child->GetAttributeValue ("name"));
+	  csReversibleTransform child_transf;
+          if (!LoadMeshObjectFactory (t, child, &child_transf))
+	  {
+	    ReportError (
+	    	"crystalspace.maploader.load.meshfactory",
+		"Could not load mesh object factory '%s'!",
+		child->GetAttributeValue ("name"));
+	    if (t) t->DecRef ();
+	    return false;
+	  }
+	  stemp->GetChildren ()->Add (t);
+	  t->SetTransform (child_transf);
+	  t->DecRef ();
+        }
+	break;
+
+      case XMLTOKEN_MOVE:
+        {
+	  if (!transf)
+	  {
+	    ReportError (
+	    	"crystalspace.maploader.load.meshfactory",
+		"'move' is only useful for hierarchical transformations!");
+	    return false;
+	  }
+	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	  if (matrix_node)
+	  {
+	    csMatrix3 m;
+	    if (!SyntaxService->ParseMatrix (matrix_node, m))
+	      return false;
+            transf->SetO2T (m);
+	  }
+	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	  if (vector_node)
+	  {
+	    csVector3 v;
+	    if (!SyntaxService->ParseVector (vector_node, v))
+	      return false;
+            transf->SetO2TTranslation (v);
+	  }
+        }
+        break;
+      case XMLTOKEN_HARDMOVE:
+        {
+	  if (!stemp->GetMeshObjectFactory ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "Please use 'params' before specifying 'hardmove'!");
+	    return false;
+	  }
+	  if (!stemp->GetMeshObjectFactory ()->SupportsHardTransform ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              "This factory doesn't support 'hardmove'!");
+	    return false;
+	  }
+	  csReversibleTransform tr;
+	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	  if (matrix_node)
+	  {
+	    csMatrix3 m;
+	    if (!SyntaxService->ParseMatrix (matrix_node, m))
+	      return false;
+            tr.SetO2T (m);
+	  }
+	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	  if (vector_node)
+	  {
+	    csVector3 v;
+	    if (!SyntaxService->ParseVector (vector_node, v))
+	      return false;
+            tr.SetOrigin (v);
+	  }
+	  stemp->HardTransform (tr);
+        }
+        break;
+      default:
+        TokenError ("a mesh factory", value);
+        return false;
+    }
+  }
+
   return true;
 }
 
 iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 {
-  return NULL;
+  if (!Engine) return NULL;
+
+  const char* priority;
+
+  Stats->meshes_loaded++;
+  iMeshWrapper* mesh = NULL;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_LOD:
+        {
+          if (!mesh)
+	  {
+	    ReportError (
+	  	  "crystalspace.maploader.load.meshobject",
+	  	  "First specify the parent factory with 'factory'!");
+	    return NULL;
+	  }
+	  if (!mesh->GetMeshObject ())
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              "Mesh object is missing!");
+	    return NULL;
+	  }
+	  csRef<iLODControl> lodctrl;
+	  lodctrl.Take (SCF_QUERY_INTERFACE (
+	    	mesh->GetMeshObject (),
+		iLODControl));
+	  if (!lodctrl)
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.meshobject",
+              "This mesh doesn't implement LOD control!");
+	    return NULL;
+	  }
+	  if (!LoadLodControl (lodctrl, child))
+	    return NULL;
+	}
+        break;
+      case XMLTOKEN_PRIORITY:
+	priority = child->GetContentsValue ();
+	break;
+      case XMLTOKEN_ADDON:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+	if (!LoadAddOn (child, mesh))
+	  return NULL;
+      	break;
+      case XMLTOKEN_NOLIGHTING:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_NOLIGHTING);
+        break;
+      case XMLTOKEN_NOSHADOWS:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_NOSHADOWS);
+        break;
+      case XMLTOKEN_INVISIBLE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_INVISIBLE);
+        break;
+      case XMLTOKEN_DETAIL:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_DETAIL);
+        break;
+      case XMLTOKEN_ZFILL:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        if (!priority) priority = "wall";
+        mesh->SetZBufMode (CS_ZBUF_FILL);
+        break;
+      case XMLTOKEN_ZUSE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        if (!priority) priority = "object";
+        mesh->SetZBufMode (CS_ZBUF_USE);
+        break;
+      case XMLTOKEN_ZNONE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        if (!priority) priority = "sky";
+        mesh->SetZBufMode (CS_ZBUF_NONE);
+        break;
+      case XMLTOKEN_ZTEST:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        if (!priority) priority = "alpha";
+        mesh->SetZBufMode (CS_ZBUF_TEST);
+        break;
+      case XMLTOKEN_CAMERA:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        if (!priority) priority = "sky";
+        mesh->GetFlags().Set (CS_ENTITY_CAMERA);
+        break;
+      case XMLTOKEN_CONVEX:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+        mesh->GetFlags().Set (CS_ENTITY_CONVEX);
+        break;
+      case XMLTOKEN_KEY:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+	{
+          iKeyValuePair* kvp = ParseKey (child, mesh->QueryObject());
+	  if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return NULL;
+	}
+        break;
+      case XMLTOKEN_HARDMOVE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+	else if (!mesh->GetMeshObject ()->SupportsHardTransform ())
+	{
+          ReportError (
+	    "crystalspace.maploader.parse.meshobject",
+            "This mesh object doesn't support 'hardmove'!");
+	  return NULL;
+	}
+	else
+        {
+	  csReversibleTransform tr;
+	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	  if (matrix_node)
+	  {
+	    csMatrix3 m;
+	    if (!SyntaxService->ParseMatrix (matrix_node, m))
+	      return false;
+            tr.SetO2T (m);
+	  }
+	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	  if (vector_node)
+	  {
+	    csVector3 v;
+	    if (!SyntaxService->ParseVector (vector_node, v))
+	      return false;
+            tr.SetOrigin (v);
+	  }
+	  mesh->HardTransform (tr);
+        }
+        break;
+      case XMLTOKEN_MOVE:
+        if (!mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"First specify the parent factory with 'factory'!");
+	  return NULL;
+	}
+	else
+        {
+          mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
+          mesh->GetMovable ()->SetPosition (csVector3 (0));
+	  csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	  if (matrix_node)
+	  {
+	    csMatrix3 m;
+	    if (!SyntaxService->ParseMatrix (matrix_node, m))
+	      return false;
+            mesh->GetMovable ()->SetTransform (m);
+	  }
+	  csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	  if (vector_node)
+	  {
+	    csVector3 v;
+	    if (!SyntaxService->ParseVector (vector_node, v))
+	      return false;
+            mesh->GetMovable ()->SetPosition (v);
+	  }
+	  mesh->GetMovable ()->UpdateMove ();
+        }
+        break;
+
+      case XMLTOKEN_FACTORY:
+        if (mesh)
+	{
+	  ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"There is already a factory for this mesh!");
+	  return NULL;
+	}
+	else
+	{
+          iMeshFactoryWrapper* t = Engine->GetMeshFactories ()
+	  	->FindByName (child->GetContentsValue ());
+          if (!t)
+	  {
+	    ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"Can't find factory '%s'!", child->GetContentsValue ());
+	    return NULL;
+	  }
+	  mesh = t->CreateMeshWrapper ();
+	}
+        break;
+      default:
+        TokenError ("a mesh object", value);
+	return NULL;
+    }
+  }
+
+  if (!mesh)
+  {
+    ReportError (
+	  	"crystalspace.maploader.load.meshobject",
+	  	"There is no 'factory' for this mesh!");
+    return NULL;
+  }
+  if (!priority) priority = "object";
+  mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+
+  return mesh;
 }
 
 bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
@@ -3764,26 +4512,335 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 
 bool csLoader::LoadAddOn (iDocumentNode* node, iBase* context)
 {
+  iLoaderPlugin* plug = NULL;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_PARAMS:
+	if (!plug)
+	{
+          ReportError (
+	      "crystalspace.maploader.load.plugin",
+              "Could not load plugin!");
+	  return false;
+	}
+	else
+	{
+	  plug->Parse (child, GetLoaderContext (), context);
+	}
+        break;
+
+      case XMLTOKEN_PLUGIN:
+	plug = loaded_plugins.FindPlugin (child->GetContentsValue ());
+        break;
+      default:
+	TokenError ("an add-on", value);
+	return false;
+    }
+  }
+
   return true;
 }
 
 bool csLoader::LoadSettings (iDocumentNode* node)
 {
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_CLEARZBUF:
+        {
+	  bool yesno;
+	  if (!SyntaxService->ParseBool (child, yesno, true))
+	    return false;
+	  Engine->SetClearZBuf (yesno);
+        }
+        break;
+      case XMLTOKEN_CLEARSCREEN:
+        {
+	  bool yesno;
+	  if (!SyntaxService->ParseBool (child, yesno, true))
+	    return false;
+	  Engine->SetClearScreen (yesno);
+        }
+        break;
+      case XMLTOKEN_LIGHTMAPCELLSIZE:
+        {
+	  int cellsize = child->GetContentsValueAsInt ();
+	  if (cellsize >= 0)
+	  {
+	    if (!csIsPowerOf2 (cellsize) )
+	    {
+	      int newcellsize = csFindNearestPowerOf2(cellsize);
+	      ReportNotify ("lightmap cell size %d "
+	        "is not a power of two, using %d", 
+	        cellsize, newcellsize);
+	      cellsize = newcellsize;
+	    }
+	    Engine->SetLightmapCellSize (cellsize);
+	  }
+	  else
+	  {
+	    ReportNotify ("bogus lightmap cell size %d", cellsize);
+	  }
+        }
+	break;
+      case XMLTOKEN_MAXLIGHTMAPSIZE:
+        {
+	  int max[2];
+	  max[0] = child->GetAttributeValueAsInt ("horizontal");
+	  max[1] = child->GetAttributeValueAsInt ("vertical");
+	  if ( (max[0] > 0) && (max[1] > 0) )
+	  {
+	    Engine->SetMaxLightmapSize (max[0], max[1]);
+	  }
+	  else
+	  {
+	    ReportNotify ("bogus maximum lightmap size %dx%d", max[0], max[1]);
+	  }
+        }
+	break;
+      case XMLTOKEN_AMBIENT:
+        {
+	  csColor c;
+	  if (!SyntaxService->ParseColor (child, c))
+	    return NULL;
+	  Engine->SetAmbientLight (c);
+        }
+	break;
+      default:
+        TokenError ("the settings", value);
+        return false;
+    }
+  }
+
   return true;
 }
 
 bool csLoader::LoadRenderPriorities (iDocumentNode* node)
 {
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_PRIORITY:
+      {
+	const char* name = child->GetAttributeValue ("name");
+	csRef<iDocumentNode> levelnode = child->GetNode ("level");
+	if (!levelnode)
+	{
+          ReportError (
+	    "crystalspace.maploader.parse.priorities",
+	    "Render priority '%s' is missing a 'level'!",
+	    name);
+	  return false;
+	}
+	long pri = levelnode->GetContentsValueAsInt ();
+	int rendsort = CS_RENDPRI_NONE;
+	csRef<iDocumentNode> sortnode = child->GetNode ("sort");
+	if (sortnode)
+	{
+	  const char* sorting = child->GetContentsValue ();
+	  if (!strcmp (sorting, "BACK2FRONT"))
+	  {
+	    rendsort = CS_RENDPRI_BACK2FRONT;
+	  }
+	  else if (!strcmp (sorting, "FRONT2BACK"))
+	  {
+	    rendsort = CS_RENDPRI_FRONT2BACK;
+	  }
+	  else if (!strcmp (sorting, "NONE"))
+	  {
+	    rendsort = CS_RENDPRI_NONE;
+	  }
+	  else
+	  {
+            ReportError (
+	      "crystalspace.maploader.parse.priorities",
+	      "Unknown sorting attribute '%s' for the render priority!",
+	      sorting);
+	    return false;
+	  }
+	}
+	Engine->RegisterRenderPriority (name, pri, rendsort);
+        break;
+      }
+      default:
+        TokenError ("the render priorities", value);
+	return false;
+    }
+  }
+
   return true;
 }
 
 iCollection* csLoader::ParseCollection (iDocumentNode* node)
 {
-  return NULL;
+  iCollection* collection = Engine->GetCollections ()->NewCollection (
+		  node->GetAttributeValue ("name"));
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_ADDON:
+	ReportError (
+		"crystalspace.maploader.parse.collection",
+         	"'addon' not yet supported in collection!");
+	return NULL;
+      case XMLTOKEN_MESHOBJ:
+	ReportError (
+		"crystalspace.maploader.parse.collection",
+         	"'meshobj' not yet supported in collection!");
+        break;
+      case XMLTOKEN_LIGHT:
+        {
+	  const char* lightname = child->GetContentsValue ();
+	  iLight* l = NULL;
+	  iSectorList* sl = Engine->GetSectors ();
+	  int i;
+	  for (i = 0 ; i < sl->GetCount () ; i++)
+	  {
+	    iSector* sect = sl->Get (i);
+	    if ((!ResolveOnlyRegion) || (!Engine->GetCurrentRegion ()) ||
+	      Engine->GetCurrentRegion ()->IsInRegion (sect->QueryObject ()))
+	    {
+	      l = sect->GetLights ()->FindByName (lightname);
+	      if (l) break;
+	    }
+	  }
+          if (!l)
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.collection",
+            	"Light '%s' not found!", lightname);
+	    return NULL;
+	  }
+	  else
+	  {
+	    collection->AddObject (l->QueryObject ());
+	  }
+        }
+        break;
+      case XMLTOKEN_SECTOR:
+        {
+	  const char* sectname = child->GetContentsValue ();
+	  iSector* s = GetLoaderContext ()->FindSector (sectname);
+          if (!s)
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.collection",
+            	"Sector '%s' not found!", sectname);
+	    return NULL;
+	  }
+	  else
+	  {
+            collection->AddObject (s->QueryObject ());
+	  }
+        }
+        break;
+      case XMLTOKEN_COLLECTION:
+        {
+	  const char* colname = child->GetContentsValue ();
+	  //@@@$$$ TODO: Collection in regions.
+	  iCollection* th;
+	  if (ResolveOnlyRegion && Engine->GetCurrentRegion ())
+	    th = Engine->GetCurrentRegion ()->FindCollection (colname);
+	  else
+            th = Engine->GetCollections ()->FindByName (colname);
+          if (!th)
+	  {
+	    ReportError (
+		"crystalspace.maploader.parse.collection",
+            	"Collection '%s' not found!", colname);
+	    return NULL;
+	  }
+	  else
+	  {
+            collection->AddObject (th->QueryObject());
+	  }
+        }
+        break;
+      default:
+        TokenError ("a collection", value);
+	collection->DecRef ();
+	return NULL;
+    }
+  }
+
+  return collection;
 }
 
 bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
 {
+  const char* start_sector = "room";
+  csVector3 pos (0, 0, 0);
+  csVector3 up (0, 1, 0);
+  csVector3 forward (0, 0, 1);
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_SECTOR:
+	start_sector = child->GetContentsValue ();
+	break;
+      case XMLTOKEN_POSITION:
+	if (!SyntaxService->ParseVector (child, pos))
+	  return false;
+	break;
+      case XMLTOKEN_UP:
+	if (!SyntaxService->ParseVector (child, up))
+	  return false;
+	break;
+      case CS_TOKEN_FORWARD:
+	if (!SyntaxService->ParseVector (child, forward))
+	  return false;
+	break;
+      case CS_TOKEN_FARPLANE:
+        {
+	  csPlane3 p;
+	  p.A () = child->GetAttributeValueAsFloat ("a");
+	  p.B () = child->GetAttributeValueAsFloat ("b");
+	  p.C () = child->GetAttributeValueAsFloat ("c");
+	  p.D () = child->GetAttributeValueAsFloat ("d");
+	  campos->SetFarPlane (&p);
+        }
+	break;
+      default:
+	TokenError ("a camera position", value);
+	return false;
+    }
+  }
+
+  campos->Set (start_sector, pos, forward, up);
   return true;
 }
 
@@ -4054,12 +5111,73 @@ defaulthalo:
 
 iKeyValuePair* csLoader::ParseKey (iDocumentNode* node, iObject* pParent)
 {
-  return NULL;
+  const char* name = node->GetAttributeValue ("name");
+  if (!name)
+  {
+    ReportError (
+		"crystalspace.maploader.parse.key",
+    	        "Missing 'name' attribute for 'key'!");
+    return NULL;
+  }
+  const char* value = node->GetAttributeValue ("value");
+  if (!value)
+  {
+    ReportError (
+		"crystalspace.maploader.parse.key",
+    	        "Missing 'value' attribute for 'key'!");
+    return NULL;
+  }
+  csKeyValuePair* cskvp = new csKeyValuePair (name, value);
+  iKeyValuePair* kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
+  if (pParent)
+    pParent->ObjAdd (kvp->QueryObject ());
+  kvp->DecRef ();
+  return kvp;
 }
 
 iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
 {
-  return NULL;
+  iMapNode* pNode = &(new csMapNode (node->GetAttributeValue ("name")))->scfiMapNode;
+  pNode->SetSector (sec);
+
+  csVector3 pos;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_ADDON:
+	ReportError (
+		"crystalspace.maploader.parse.node",
+        	"'addon' not yet supported in node!");
+	return NULL;
+      case XMLTOKEN_KEY:
+        {
+          iKeyValuePair* kvp = ParseKey (child, pNode->QueryObject ());
+          if (kvp)
+	    kvp->DecRef ();
+	  else
+	    return NULL;
+	}
+        break;
+      case XMLTOKEN_POSITION:
+	if (!SyntaxService->ParseVector (child, pos))
+	  return NULL;
+        break;
+      default:
+        TokenError ("a node", value);
+	return NULL;
+    }
+  }
+
+  pNode->SetPosition (pos);
+
+  return pNode;
 }
 
 iSector* csLoader::ParseSector (iDocumentNode* node)
