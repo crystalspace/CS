@@ -7,7 +7,7 @@ L - Low Priority (only minor function loss)
 W - Wishlist (the build also works without this feature)
 * - Completed
 
-[H] msvcgen.jam: Updated to respect the new ApplicationIconDefault and
+[H] msvcgen.jam: Update to respect the new ApplicationIconDefault and
     ApplicationIcon rules.
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
