@@ -108,6 +108,17 @@ struct iBase
 /// This macro should make use of DecRef() safer.
 #define SCF_DEC_REF(ptr) {if (ptr) {ptr->DecRef();}}
 
+/**
+ * This macro should be used to change the reference
+ * inside a variable. The old reference will be DecRef()'ed
+ * and the new reference will be IncRef()'ed.
+ */
+#define SCF_SET_REF(var,ref) \
+  { \
+    if (ref) ref->IncRef (); \
+    if (var) var->DecRef (); \
+    var = ref; \
+  }
 
 /**
  * This macro should be embedded into any SCF-capable class definition

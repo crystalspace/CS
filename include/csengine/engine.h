@@ -35,7 +35,6 @@ class csRegion;
 class csRadiosity;
 class csSector;
 class csMeshWrapper;
-class csTerrainWrapper;
 class csTextureWrapper;
 class csMaterialWrapper;
 class csTextureList;
@@ -75,8 +74,6 @@ SCF_DECLARE_FAST_INTERFACE (iPolyTxtPlane)
 SCF_DECLARE_FAST_INTERFACE (iStatLight)
 SCF_DECLARE_FAST_INTERFACE (iDynLight)
 SCF_DECLARE_FAST_INTERFACE (iMaterialHandle)
-SCF_DECLARE_FAST_INTERFACE (iTerrainWrapper)
-SCF_DECLARE_FAST_INTERFACE (iTerrainFactoryWrapper)
 SCF_DECLARE_FAST_INTERFACE (iMapNode)
 
 SCF_DECLARE_FAST_INTERFACE (csPolyTxtPlane)
@@ -311,12 +308,6 @@ public:
   csNamedObjVector mesh_factories;
 
   /**
-   * List of terrain object factories. This vector contains objects of
-   * type csTerrainFactoryWrapper*.
-   */
-  csNamedObjVector terrain_factories;
-
-  /**
    * List of curve templates (bezier templates). This vector contains objects of
    * type csCurveTemplate*.
    */
@@ -330,16 +321,6 @@ public:
    * you still need to add it to all sectors that you want it to be visible in.
    */
   csNamedObjVector meshes;
-
-  /**
-   * List of all terrain in the engine. This vector contains objects
-   * of type csTerrainWrapper*. Use RemoveTerrain()
-   * to remove terrains from this list. These functions
-   * take care of correctly removing the terrains from all sectors
-   * as well. Note that after you add a terrain to the list you still
-   * need to add it to all sectors that you want it to be visible in.
-   */
-  csNamedObjVector terrains;
 
   /**
    * The list of all camera position objects.
@@ -902,18 +883,6 @@ public:
   virtual void RemoveMesh (iMeshWrapper* mesh);
 
   /**
-   * Unlink and delete (using DecRef ()) a terrain from the engine.
-   * It is also removed from all sectors.
-   */
-  void RemoveTerrain (csTerrainWrapper *pTerrain);
-
-  /**
-   * Unlink and delete (using DecRef ()) a terrain from the engine.
-   * It is also removed from all sectors.
-   */
-  virtual void RemoveTerrain (iTerrainWrapper *pTerrain);
-
-  /**
    * Unlink and delete a collection from the engine.
    * It is also removed from all sectors.
    */
@@ -1064,13 +1033,6 @@ public:
   /// Delete a mesh factory by name
   virtual void DeleteMeshFactory (const char* iName, bool regionOnly = false);
 
-  /// Find a terrain by name
-  virtual iTerrainWrapper *FindTerrainObject (const char *iName,
-  	bool regionOnly = false) const;
-  /// Find a terrain factory by name
-  virtual iTerrainFactoryWrapper *FindTerrainFactory (const char *iName,
-  	bool regionOnly) const;
-
   /// Find a loaded texture by name.
   virtual iTextureWrapper* FindTexture (const char* iName,
   	bool regionOnly = false) const;
@@ -1141,25 +1103,6 @@ public:
   virtual int GetMeshFactoryCount () const;
   /// return a mesh factory by index
   virtual iMeshFactoryWrapper *GetMeshFactory (int n) const;
-
-  /// Create a terrain factory wrapper from a terrain plugin
-  virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* pClassId,
-	  const char* pName);
-  /// Create a terrain factory wrapper for an existing terrain factory
-  virtual iTerrainFactoryWrapper* CreateTerrainFactory (iTerrainObjectFactory*,
-  	const char* name);
-  /// Create an uninitialized terrain factory wrapper
-  virtual iTerrainFactoryWrapper* CreateTerrainFactory (const char* name);
-
-  /// Create a terrain wrapper from a terrain factory wrapper
-  virtual iTerrainWrapper* CreateTerrainObject (
-  	iTerrainFactoryWrapper* pFactWrap,
-  	const char* name, iSector* sector);
-  /// Create a terrain wrapper for an existing terrain object
-  virtual iTerrainWrapper* CreateTerrainObject (iTerrainObject*,
-  	const char* name, iSector* sector);
-  /// Create an uninitialized terrain wrapper
-  virtual iTerrainWrapper* CreateTerrainObject (const char* name);
 
   virtual iPolyTxtPlane* CreatePolyTxtPlane (const char* name = NULL);
   virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name,

@@ -16,15 +16,17 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ITERRAIN_TERRFUNC_H_
-#define __ITERRAIN_TERRFUNC_H_
+#ifndef __IMESH_TERRFUNC_H_
+#define __IMESH_TERRFUNC_H_
 
 #include "csutil/scf.h"
 
 struct iEngine;
 struct iImage;
+struct iMaterialWrapper;
 class csVector3;
 class csColor;
+class csTransform;
 
 /**
  * Function for the terrain engine. Expects values for dx and dy between
@@ -126,7 +128,17 @@ struct iTerrFuncState : public iBase
    * Return true if vis testing is enabled.
    */
   virtual bool IsVisTestingEnabled () = 0;
+
+  virtual void SetDirLight (const csVector3& pos, const csColor& col) = 0;
+  virtual csVector3 GetDirLightPosition () const = 0;
+  virtual csColor GetDirLightColor () const = 0;
+  virtual void DisableDirLight () = 0;
+  virtual bool IsDirLightEnabled () const = 0;
+  virtual void SetMaterial (int i, iMaterialWrapper* mat) = 0;
+  virtual int GetMaterialCount () const = 0;
+
+  virtual int CollisionDetect (csTransform *p) = 0;
 };
 
-#endif // __ITERRAIN_TERRFUNC_H_
+#endif // __IMESH_TERRFUNC_H_
 

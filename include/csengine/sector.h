@@ -27,13 +27,11 @@
 #include "iengine/sector.h"
 #include "ivideo/graph3d.h"
 #include "iengine/mesh.h"
-#include "iengine/terrain.h"
 #include "iutil/objref.h"
 
 class csEngine;
 class csStatLight;
 class csMeshWrapper;
-class csTerrainWrapper;
 class csPolygon3D;
 class csCollection;
 class csCamera;
@@ -41,7 +39,6 @@ class csDynLight;
 class csPolygon2DQueue;
 class csProgressPulse;
 class Dumper;
-struct iTerrainWrapper;
 struct iGraphics3D;
 struct iStatLight;
 struct iVisibilityCuller;
@@ -89,12 +86,6 @@ private:
    * This vector contains objects of type csStatLight*.
    */
   csNamedObjVector lights;
-
-  /**
-   * List of terrain objects in this sector. This vector
-   * contains objects of type csTerrainWrapper*.
-   */
-  csVector terrains;
 
   /// Engine handle.
   csEngine* engine;
@@ -292,41 +283,6 @@ public:
   csStatLight* FindLight (unsigned long id) const;
 
   //----------------------------------------------------------------------
-  // Terrain manipulation functions
-  //----------------------------------------------------------------------
-
-  /**
-   * Add a terrain to this sector.
-   */
-  void AddTerrain (csTerrainWrapper* pTerrain);
-
-  /**
-   * Unlink a terrain from this sector.
-   */
-  void UnlinkTerrain (csTerrainWrapper *pTerrain);
-
-  /**
-   * Get the number of terrains in this sector.
-   */
-  int GetTerrainCount () const
-  {
-    return terrains.Length ();
-  }
-
-  /**
-   * Get the specified terrain.
-   */
-  csTerrainWrapper* GetTerrain (int idx) const
-  {
-    return (csTerrainWrapper*)terrains[idx];
-  }
-
-  /**
-   * Find a terrain with the given name.
-   */
-  csTerrainWrapper* GetTerrain (const char* name) const;
-
-  //----------------------------------------------------------------------
   // Visibility Stuff
   //----------------------------------------------------------------------
 
@@ -452,7 +408,7 @@ public:
    * This function is not very efficient as it will traverse all objects
    * in the sector one by one and compute a bounding box from that.
    */
-  void CalculateSectorBBox (csBox3& bbox, bool do_meshes, bool do_terrain)
+  void CalculateSectorBBox (csBox3& bbox, bool do_meshes)
     const;
 
   //------------------------------------------------
@@ -536,16 +492,6 @@ public:
     virtual void UnlinkMesh (iMeshWrapper *pMesh)
     { scfParent->UnlinkMesh (pMesh->GetPrivateObject ()); }
 
-    virtual int GetTerrainCount () const
-    {
-      return scfParent->GetTerrainCount ();
-    }
-    virtual iTerrainWrapper *GetTerrain (int n) const;
-    virtual void AddTerrain (iTerrainWrapper *pTerrain);
-    virtual iTerrainWrapper *GetTerrain (const char *name) const;
-    virtual void UnlinkTerrain (iTerrainWrapper *pTerrain)
-    { scfParent->UnlinkTerrain (pTerrain->GetPrivateObject ()); }
-
     virtual int GetCollectionCount () const
     {
       return scfParent->GetCollectionCount ();
@@ -565,9 +511,8 @@ public:
     virtual void ShineLights (iMeshWrapper* mesh)
     { scfParent->ShineLights (mesh); }
 
-    virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes,
-  	bool do_terrain) const
-    { scfParent->CalculateSectorBBox (bbox, do_meshes, do_terrain); }
+    virtual void CalculateSectorBBox (csBox3& bbox, bool do_meshes) const
+    { scfParent->CalculateSectorBBox (bbox, do_meshes); }
 
     virtual bool HasFog () const { return scfParent->HasFog (); }
     virtual csFog *GetFog () const { return &scfParent->fog; }

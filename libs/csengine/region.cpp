@@ -29,7 +29,6 @@
 #include "csengine/material.h"
 #include "csengine/polytmap.h"
 #include "csengine/curve.h"
-#include "csengine/terrobj.h"
 #include "csutil/csvector.h"
 #include "ivideo/txtmgr.h"
 
@@ -348,16 +347,6 @@ iMeshWrapper* csRegion::Region::FindMeshObject (const char *iName)
 iMeshFactoryWrapper* csRegion::Region::FindMeshFactory (const char *iName)
 {
   return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMeshFactoryWrapper, iName);
-}
-
-iTerrainWrapper* csRegion::Region::FindTerrainObject (const char *iName)
-{
-  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iTerrainWrapper, iName);
-}
-
-iTerrainFactoryWrapper* csRegion::Region::FindTerrainFactory (const char *iName)
-{
-  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iTerrainFactoryWrapper, iName);
 }
 
 iTextureWrapper* csRegion::Region::FindTexture (const char *iName)

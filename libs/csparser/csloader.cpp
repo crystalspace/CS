@@ -45,7 +45,6 @@
 #include "iengine/region.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
-#include "iengine/terrain.h"
 #include "iengine/collectn.h"
 #include "iengine/sector.h"
 #include "iengine/movable.h"
@@ -57,7 +56,6 @@
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
-#include "iterrain/object.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
@@ -82,7 +80,6 @@ public:
   int lights_loaded;
   int curves_loaded;
   int meshes_loaded;
-  int terrains_loaded;
   int sounds_loaded;
 
   void Init()
@@ -94,7 +91,6 @@ public:
     lights_loaded   = 0;
     curves_loaded   = 0;
     meshes_loaded   = 0;
-    terrains_loaded = 0;
     sounds_loaded   = 0;
   }
 
@@ -186,8 +182,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
   CS_TOKEN_DEF (START)
-  CS_TOKEN_DEF (TERRAINFACTORY)
-  CS_TOKEN_DEF (TERRAINOBJ)
   CS_TOKEN_DEF (TEXTURE)
   CS_TOKEN_DEF (TEXTURES)
   CS_TOKEN_DEF (TRANSPARENT)
@@ -699,7 +693,6 @@ bool csLoader::LoadMap (char* buf)
     CS_TOKEN_TABLE (SOUNDS)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (REGION)
-    CS_TOKEN_TABLE (TERRAINFACTORY)
     CS_TOKEN_TABLE (RENDERPRIORITIES)
     CS_TOKEN_TABLE (PLUGINS)
   CS_TOKEN_TABLE_END
@@ -756,16 +749,6 @@ bool csLoader::LoadMap (char* buf)
 	    }
           }
 	  break;
-        case CS_TOKEN_TERRAINFACTORY:
-          {
-            iTerrainFactoryWrapper* terr =
-		Engine->FindTerrainFactory (name);
-            if (!terr)
-	      terr = Engine->CreateTerrainFactory(name);
-            if (!LoadTerrainObjectFactory (terr, params))
-	      return false;
-          }
-	  break; 
         case CS_TOKEN_REGION:
 	  {
 	    char str[255];
@@ -1709,179 +1692,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadTerrainObjectFactory (iTerrainFactoryWrapper* pWrapper,
-	char *pBuf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (ADDON)
-    CS_TOKEN_TABLE (PARAMS)
-    CS_TOKEN_TABLE (PLUGIN)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char *params;
-  char *pStr = new char[255];
-  iLoaderPlugIn *iPlugIn = NULL;
-  pStr[0] = 0;
-
-  while ((cmd = csGetObject (&pBuf, commands, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-	  "crystalspace.maploader.parse.badformat",
-	  "Expected parameters instead of '%s' while parsing terrain factory!",
-	  pBuf);
-      return false;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_ADDON:
-	if (!LoadAddOn (params, pWrapper))
-	  return false;
-      	break;
-      case CS_TOKEN_PARAMS:
-	if (!iPlugIn)
-	{
-          ReportError (reporter,
-	      "crystalspace.maploader.load.plugin",
-              "Could not load plugin '%s'!", pStr);
-	  return false;
-	}
-	else
-	{
-          // Use the plugin to parse through the parameters the engine is
-	  // passed also a pointer to the factory is returned.
-	  iBase *pBaseFactory = iPlugIn->Parse (params,
-	  	Engine, pWrapper);
-          // If we couldn't get the factory leave.
-	  if (!pBaseFactory)
-	  {
-	    // @@@ Use reporter
-	    return false;
-	  }
-	  else
-	  {
-            // Convert the iBase to iTerrainObjectFactory.
-	    iTerrainObjectFactory *pFactory = 
-              SCF_QUERY_INTERFACE (pBaseFactory, iTerrainObjectFactory);
-            // Set the factory into the csTerrainFactoryWrapper.
-	    pWrapper->SetTerrainObjectFactory (pFactory);
-	    pFactory->DecRef ();
-	  }
-	}
-        break;
-      case CS_TOKEN_PLUGIN:
-	{
-	  csScanStr (params, "%s", pStr);
-	  iPlugIn = loaded_plugins.FindPlugIn (pStr, "TerrainLdr");
-	}
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    TokenError ("a terrain factory");
-    return false;
-  }
-
-  return true;
-}
-
-bool csLoader::LoadTerrainObject (iTerrainWrapper *pWrapper,
-	char *pBuf, iSector* sector)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (ADDON)
-    CS_TOKEN_TABLE (PLUGIN)
-    CS_TOKEN_TABLE (PARAMS)
-    CS_TOKEN_TABLE (KEY)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-  char *pStr = new char[255];
-  pStr[0] = 0;
-
-  Stats->terrains_loaded++;
-  iLoaderPlugIn* iPlugIn = NULL;
-
-  while ((cmd = csGetObject (&pBuf, commands, &name, &params) ) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-	  "crystalspace.maploader.parse.badformat",
-	  "Expected parameters instead of '%s' while parsing terrain object!",
-	  pBuf);
-      return false;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_KEY:
-        if (!ParseKey (params, pWrapper->QueryObject()))
-	  return false;
-        break;
-      case CS_TOKEN_ADDON:
-	if (!LoadAddOn (params, pWrapper))
-	  return false;
-      	break;
-      case CS_TOKEN_PARAMS:
-        if (!iPlugIn)
-        {
-          ReportError (reporter,
-	      "crystalspace.maploader.load.plugin",
-              "Could not load plugin '%s'!", pStr);
-	  return false;
-        }
-        else
-        {
-          // Use the plugin to parse through the parameters the engine
-	  // is passed also a pointer to the factory is returned.
-	  iBase *iBaseObject = iPlugIn->Parse (params,
-	  	Engine, pWrapper);
-          // if we couldn't get the factory leave
-	  if (!iBaseObject)
-	  {
-	    // @@@ Use reporter
-	    return false;
-	  }
-	  else
-	  {
-            // convert the iBase to iTerrainObject
-            iTerrainObject *iTerrObj = SCF_QUERY_INTERFACE (iBaseObject,
-	    	iTerrainObject);
-            pWrapper->SetTerrainObject (iTerrObj);
-
-            iTerrObj->DecRef ();
-            iBaseObject->DecRef ();
-	  }
-        }
-        break;
-      case CS_TOKEN_PLUGIN:
-	{
-	  csScanStr (params, "%s", pStr);
-	  iPlugIn = loaded_plugins.FindPlugIn (pStr, "TerrainLdr");
-	}
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    TokenError ("a terrain object");
-    return false;
-  }
-
-  // add new terrain to sector
-  sector->AddTerrain (pWrapper);
-
-  return true;
-}
-
-//---------------------------------------------------------------------------
-
 bool csLoader::LoadAddOn (char* buf, iBase* context)
 {
   CS_TOKEN_TABLE_START (commands)
@@ -2064,7 +1874,7 @@ SCF_EXPORT_CLASS_TABLE (lvlload)
   SCF_EXPORT_CLASS_DEP (csLoader, "crystalspace.level.loader",
     "Level and library file loader", "crystalspace.kernel., "
     "crystalspace.sound.loader., crystalspace.image.loader, "
-    "crystalspace.mesh.loader., crystalspace.terrain.loader., "
+    "crystalspace.mesh.loader., "
     "crystalspace.engine.3d, crystalspace.graphics3d., "
     "crystalspace.sound.render., crystalspace.motion.manager.")
 SCF_EXPORT_CLASS_TABLE_END
@@ -3172,7 +2982,6 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
     CS_TOKEN_TABLE (FOG)
     CS_TOKEN_TABLE (LIGHT)
     CS_TOKEN_TABLE (MESHOBJ)
-    CS_TOKEN_TABLE (TERRAINOBJ)
     CS_TOKEN_TABLE (NODE)
     CS_TOKEN_TABLE (KEY)
   CS_TOKEN_TABLE_END
@@ -3228,13 +3037,6 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
 	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
-        }
-        break;
-      case CS_TOKEN_TERRAINOBJ:
-        {
-	  iTerrainWrapper *terr = Engine->CreateTerrainObject(name);
-          if (!LoadTerrainObject (terr, params, sector))
-	    return false;
         }
         break;
       case CS_TOKEN_LIGHT:

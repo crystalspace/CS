@@ -50,7 +50,6 @@ struct iConfigFile;
 struct iMaterialHandle;
 struct iLoader;
 struct iMeshWrapper;
-struct iTerrainWrapper;
 struct iLight;
 struct iPolygon3D;
 struct iView;
@@ -63,7 +62,6 @@ SCF_DECLARE_FAST_INTERFACE (csDoor)
 SCF_DECLARE_FAST_INTERFACE (csRotatingObject)
 SCF_DECLARE_FAST_INTERFACE (csLightObject)
 SCF_DECLARE_FAST_INTERFACE (iSoundWrapper)
-//SCF_DECLARE_FAST_INTERFACE (iTerrainWrapper)
 SCF_DECLARE_FAST_INTERFACE (iLight)
 //SCF_DECLARE_FAST_INTERFACE (iMeshWrapper)
 //SCF_DECLARE_FAST_INTERFACE (iKeyValuePair)
@@ -295,7 +293,7 @@ public:
   int anim_sky_rot;
 
   /// A pointer to the terrain for which we animate the dirlight.
-  iTerrainWrapper* anim_dirlight;
+  iMeshWrapper* anim_dirlight;
   /// A pointer to a pseudo-dynamic light that we're animating.
   iLight* anim_dynlight;
 

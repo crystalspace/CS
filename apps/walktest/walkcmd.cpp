@@ -469,7 +469,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
     }
     else if (!strcmp (kp->GetKey (), "cmd_AnimateDirLight"))
     {
-      iTerrainWrapper *wrap = SCF_QUERY_INTERFACE_FAST (src, iTerrainWrapper);
+      iMeshWrapper *wrap = SCF_QUERY_INTERFACE_FAST (src, iMeshWrapper);
       if (wrap)
       {
         anim_dirlight = wrap;
@@ -589,11 +589,6 @@ void WalkTest::ParseKeyCmds ()
     {
       iMeshWrapper* sprite = sector->GetMesh (j);
       ParseKeyCmds (sprite->QueryObject ());
-    }
-    for (j = 0 ; j < sector->GetTerrainCount () ; j++)
-    {
-      iTerrainWrapper* terr = sector->GetTerrain (j);
-      ParseKeyCmds (terr->QueryObject ());
     }
     for (j = 0 ; j < sector->GetLightCount () ; j++)
     {

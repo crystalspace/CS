@@ -49,10 +49,10 @@ PLUGINS += mesh/ball/object        mesh/ball/persist/classic
 PLUGINS += mesh/surf/object        mesh/surf/persist/classic
 PLUGINS += mesh/emit/object        mesh/emit/persist/classic
 PLUGINS += mesh/metaball/object    mesh/metaball/persist/classic
+PLUGINS += mesh/terrfunc/object    mesh/terrfunc/persist/classic
 PLUGINS += mesh/metagen/object
 PLUGINS += mesh/stars/object
 PLUGINS += mesh/thing/persist/classic
-PLUGINS += terrain/function/object terrain/function/persist/classic
 PLUGINS += motion/standard/object  motion/standard/persist/classic
 PLUGINS += engine/3d
 

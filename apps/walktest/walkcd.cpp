@@ -24,6 +24,7 @@
 #include "csgeom/frustum.h"
 #include "iengine/view.h"
 #include "imesh/thing/polygon.h"
+#include "imesh/terrfunc.h"
 #include "csparser/impexp.h"
 #include "csgeom/csrect.h"
 #include "csutil/dataobj.h"
@@ -31,8 +32,6 @@
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
 #include "ivaria/collider.h"
-
-#include "csengine/terrobj.h"
 
 extern WalkTest *Sys;
 
@@ -260,13 +259,19 @@ void DoGravity (csVector3& pos, csVector3& vel)
   int k;
   for ( k = 0; k < num_sectors ; k++)
   {
-    if (n[k]->GetTerrainCount () > 0)
+    if (n[k]->GetMeshCount () > 0)
     {
       int i;
-      for (i = 0 ; i < n[k]->GetTerrainCount () ; i++)
+      for (i = 0 ; i < n[k]->GetMeshCount () ; i++)
       {
-	      iTerrainWrapper* terrain = n[k]->GetTerrain( i );
-	      hits += terrain->GetPrivateObject ()->CollisionDetect( &test );
+	iMeshWrapper* terrain = n[k]->GetMesh (i);
+	iTerrFuncState* state = SCF_QUERY_INTERFACE (terrain
+		->GetMeshObject (), iTerrFuncState);
+	if (state)
+	{
+	  hits += state->CollisionDetect( &test );
+	  state->DecRef ();
+        }
       }
     }
   }

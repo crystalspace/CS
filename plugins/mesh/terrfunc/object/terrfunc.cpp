@@ -41,7 +41,7 @@
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_IBASE (csTerrFuncObject)
-  SCF_IMPLEMENTS_INTERFACE (iTerrainObject)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTerrFuncState)
 SCF_IMPLEMENT_IBASE_END
 
@@ -140,7 +140,7 @@ void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
 }
 
 csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
-	iTerrainObjectFactory *pFactory)
+	iMeshObjectFactory *pFactory)
 {
   SCF_CONSTRUCT_IBASE (NULL)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrFuncState);
@@ -169,11 +169,15 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   CorrectSeams (0, 0);
   quad_depth = 6;
   quadtree = NULL;
+  vis_cb = NULL;
+  current_lod = 1;
+  current_features = ALL_FEATURES;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
 {
   delete[] blocks;
+  if (vis_cb) vis_cb->DecRef ();
 }
 
 void csTerrFuncObject::CorrectSeams (int tw, int th)
@@ -1226,9 +1230,26 @@ void csTerrFuncObject::TestVisibility (iRenderView* rview)
   quadtree->ComputeVisibility (origin, global_bbox, horizon, CS_HORIZON_SIZE);
 }
 
-void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
+bool csTerrFuncObject::DrawTest (iRenderView*, iMovable*)
+{
+  // @@@ Can we do something more sensible here?
+  return true;
+}
+
+void csTerrFuncObject::UpdateLighting (iLight**, int,
+      	iMovable*)
+{
+  // @@@ Can we do something more sensible here?
+  return;
+}
+
+bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
+  	csZBufMode zbufMode)
 {
   SetupObject ();
+
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
+
   if (do_vis_test)
     TestVisibility (rview);
 
@@ -1238,8 +1259,7 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
   csReversibleTransform& camtrans = pCamera->GetTransform ();
   const csVector3& origin = camtrans.GetOrigin ();
   pG3D->SetObjectToCamera (&camtrans);
-  pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
-      use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
+  pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zbufMode );
 
   int bx, by;
   int blidx = 0;
@@ -1277,6 +1297,18 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
       }
     }
   }
+  return true;
+}
+
+void csTerrFuncObject::GetObjectBoundingBox (csBox3& bbox, int type)
+{
+  bbox = global_bbox;
+}
+
+csVector3 csTerrFuncObject::GetRadius ()
+{
+  // @@@ IMPLEMENT ME!
+  return csVector3 (0);
 }
 
 int csTerrFuncObject::CollisionDetect (csTransform* transform)
@@ -1300,10 +1332,17 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
   return 1;
 }
 
+bool csTerrFuncObject::HitBeamObject (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr)
+{
+  // @@@ IMPLEMENT ME!
+  return false;
+}
+
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csTerrFuncObjectFactory)
-  SCF_IMPLEMENTS_INTERFACE (iTerrainObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
 csTerrFuncObjectFactory::csTerrFuncObjectFactory (iSystem* pSys)
@@ -1316,24 +1355,24 @@ csTerrFuncObjectFactory::~csTerrFuncObjectFactory ()
 {
 }
 
-iTerrainObject* csTerrFuncObjectFactory::NewInstance ()
+iMeshObject* csTerrFuncObjectFactory::NewInstance ()
 {
   csTerrFuncObject* pTerrObj = new csTerrFuncObject (pSystem, this);
-  return (iTerrainObject*)pTerrObj;
+  return (iMeshObject*)pTerrObj;
 }
 
 //----------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csTerrFuncObjectType)
-  SCF_IMPLEMENTS_INTERFACE (iTerrainObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
   SCF_IMPLEMENTS_INTERFACE (iPlugIn)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csTerrFuncObjectType)
 
 SCF_EXPORT_CLASS_TABLE (terrfunc)
-  SCF_EXPORT_CLASS (csTerrFuncObjectType, "crystalspace.terrain.object.terrfunc",
-    "Crystal Space Function Terrain Type")
+  SCF_EXPORT_CLASS (csTerrFuncObjectType, "crystalspace.mesh.object.terrfunc",
+    "Crystal Space Function Terrain Mesh Type")
 SCF_EXPORT_CLASS_TABLE_END
 
 csTerrFuncObjectType::csTerrFuncObjectType (iBase* pParent)
@@ -1351,9 +1390,14 @@ bool csTerrFuncObjectType::Initialize (iSystem *pSys)
   return true;
 }
 
-iTerrainObjectFactory* csTerrFuncObjectType::NewFactory()
+iMeshObjectFactory* csTerrFuncObjectType::NewFactory()
 {
   csTerrFuncObjectFactory *pFactory = new csTerrFuncObjectFactory (pSystem);
-  return (iTerrainObjectFactory*)pFactory;
+  return (iMeshObjectFactory*)pFactory;
+}
+
+uint32 csTerrFuncObjectType::GetFeatures () const
+{
+  return 0;
 }
 

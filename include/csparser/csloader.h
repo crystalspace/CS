@@ -46,8 +46,6 @@ struct iSkeletonLimb;
 struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
-struct iTerrainFactoryWrapper;
-struct iTerrainWrapper;
 struct iSector;
 struct iStatLight;
 struct iKeyValuePair;
@@ -144,15 +142,6 @@ class csLoader : public iLoader
    * Load the mesh object from the map file.
    */
   bool LoadMeshObject (iMeshWrapper* mesh, char* buf);
-
-  /// Load a Terrain Object Factory from the map file.
-  bool LoadTerrainObjectFactory (iTerrainFactoryWrapper* pTerrFact, char* buf);
-
-  /**
-   * Load the terrain object from the map file.
-   */
-  bool LoadTerrainObject( iTerrainWrapper *pTerrain, char* buf,
-  	iSector* pSector );
 
   /**
    * Load a plugin in general.

@@ -22,9 +22,9 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
-#include "iterrain/object.h"
+#include "imesh/object.h"
 #include "iengine/terrain.h"
-#include "iterrain/terrfunc.h"
+#include "imesh/terrfunc.h"
 
 #define CS_QUAD_TOPLEFT 0
 #define CS_QUAD_TOPRIGHT 1

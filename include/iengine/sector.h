@@ -29,7 +29,6 @@ class csColor;
 class csBox3;
 class csReversibleTransform;
 struct iCollection;
-struct iTerrainWrapper;
 struct iMeshWrapper;
 struct iThing;
 struct iStatLight;
@@ -76,17 +75,6 @@ struct iSector : public iBase
   /// Unlink a mesh object.
   virtual void UnlinkMesh (iMeshWrapper *pMesh) = 0;
 
-  /// Return the number of terrain objects in this sector.
-  virtual int GetTerrainCount () const = 0;
-  /// Return a terrain wrapper by index.
-  virtual iTerrainWrapper *GetTerrain (int n) const = 0;
-  /// Add a terrain object to this sector.
-  virtual void AddTerrain (iTerrainWrapper *pTerrain) = 0;
-  /// Find a terrain object by name.
-  virtual iTerrainWrapper *GetTerrain (const char *name) const = 0;
-  /// Unlink a terrain object.
-  virtual void UnlinkTerrain (iTerrainWrapper *pTerrain) = 0;
-
   /// Return the number of collection objects in this sector.
   virtual int GetCollectionCount () const = 0;
   /// Return a collection by index.
@@ -121,7 +109,7 @@ struct iSector : public iBase
    * in the sector one by one and compute a bounding box from that.
    */
   virtual void CalculateSectorBBox (csBox3& bbox,
-  	bool do_meshes, bool do_terrain) const = 0;
+  	bool do_meshes) const = 0;
 
   /**
    * Use the specified mesh object as the visibility culler for

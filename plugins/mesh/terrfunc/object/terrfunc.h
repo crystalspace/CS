@@ -22,9 +22,9 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
-#include "iterrain/object.h"
-#include "iengine/terrain.h"
-#include "iterrain/terrfunc.h"
+#include "iengine/mesh.h"
+#include "imesh/object.h"
+#include "imesh/terrfunc.h"
 
 struct iEngine;
 struct iMaterialWrapper;
@@ -33,6 +33,8 @@ class csTerrainQuad;
 
 #define LOD_LEVELS 4
 #define CS_HORIZON_SIZE 100
+
+#define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
 
 /**
  * This is one block in the terrain.
@@ -56,7 +58,7 @@ public:
   ~csTerrBlock ();
 };
 
-class csTerrFuncObject : public iTerrainObject
+class csTerrFuncObject : public iMeshObject
 {
 public:
   csTerrainHeightFunction* height_func;
@@ -73,7 +75,10 @@ public:
 
 private:
   iSystem* pSystem;
-  iTerrainObjectFactory* pFactory;
+  iMeshObjectFactory* pFactory;
+  iMeshObjectDrawCallback* vis_cb;
+  float current_lod;
+  uint32 current_features;
   csColor base_color;
   // Squared distances at which to change LOD (0..2).
   float lod_sqdist[LOD_LEVELS-1];
@@ -199,7 +204,7 @@ private:
 
 public:
   /// Constructor.
-  csTerrFuncObject (iSystem* pSys, iTerrainObjectFactory* factory);
+  csTerrFuncObject (iSystem* pSys, iMeshObjectFactory* factory);
   virtual ~csTerrFuncObject ();
 
   void LoadMaterialGroup (iEngine* engine, const char *pName,
@@ -320,11 +325,9 @@ public:
    * This will call MarkVisible() for all quad nodes that are visible.
    */
   void TestVisibility (iRenderView* rview);
+  //  RDS NOTE: is this the same as DrawTest()????
 
-  ///--------------------- iTerrainObject implementation ---------------------
-  SCF_DECLARE_IBASE;
-
-  virtual void SetDirLight (const csVector3& pos, const csColor& col)
+  void SetDirLight (const csVector3& pos, const csColor& col)
   {
     csVector3 dp = dirlight - pos;
     if (do_dirlight &&
@@ -341,12 +344,11 @@ public:
     dirlight_color = col;
     dirlight_number++;
   }
-  virtual csVector3 GetDirLightPosition () const { return dirlight; }
-  virtual csColor GetDirLightColor () const { return dirlight_color; }
-  virtual void DisableDirLight () { do_dirlight = false; }
-  virtual bool IsDirLightEnabled () const { return do_dirlight; }
-  virtual void Draw (iRenderView *rview, bool use_z_buf = true);
-  virtual void SetMaterial (int i, iMaterialWrapper* mat)
+  csVector3 GetDirLightPosition () const { return dirlight; }
+  csColor GetDirLightColor () const { return dirlight_color; }
+  void DisableDirLight () { do_dirlight = false; }
+  bool IsDirLightEnabled () const { return do_dirlight; }
+  void SetMaterial (int i, iMaterialWrapper* mat)
   {
     if (!blocks || block_dim_invalid)
     {
@@ -355,11 +357,61 @@ public:
     }
     blocks[i].material = mat;
   }
-  virtual int GetMaterialCount () { return blockxy*blockxy; }
-  virtual void SetLOD (unsigned int) { }
+  int GetMaterialCount () { return blockxy*blockxy; }
 
-  virtual int CollisionDetect (csTransform *p);
+  int CollisionDetect (csTransform *p);
 
+  ///--------------------- iMeshObject implementation ---------------------
+  SCF_DECLARE_IBASE;
+
+  virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
+
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+
+  virtual void UpdateLighting (iLight** lights, int num_lights,
+      	iMovable* movable);
+
+  virtual bool Draw (iRenderView* rview, iMovable* movable,
+  	csZBufMode zbufMode);
+
+  virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
+  {
+    SCF_SET_REF (vis_cb, cb);
+  }
+  virtual iMeshObjectDrawCallback* GetVisibleCallback () const
+  {
+    return vis_cb;
+  }
+
+  virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  virtual csVector3 GetRadius ();
+
+  virtual void NextFrame (cs_time) { }
+  virtual bool WantToDie () const { return false; }
+
+  virtual void HardTransform (const csReversibleTransform&) { }
+  virtual bool SupportsHardTransform () const { return false; }
+
+  virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr);
+
+  virtual long GetShapeNumber () const { return 1; }
+
+  virtual uint32 GetLODFeatures () const { return current_features; }
+  virtual void SetLODFeatures (uint32 mask, uint32 value)
+  {
+    mask &= ALL_FEATURES;
+    current_features = (current_features & ~mask) | (value & mask);
+  }
+  virtual void SetLOD (float lod) { current_lod = lod; }
+  virtual float GetLOD () const { return current_lod; }
+  virtual int GetLODPolygonCount (float /*lod*/) const
+  {
+    // @@@ IMPLEMENT ME!
+    return 1;
+  }
+
+  /**  RDS NOTE: this is from iTerrainObject, what matches???  **/
   //------------------------- iTerrFuncState implementation ----------------
   class TerrFuncState : public iTerrFuncState
   {
@@ -469,6 +521,40 @@ public:
     {
       return scfParent->IsVisTestingEnabled ();
     }
+    virtual void SetDirLight (const csVector3& pos, const csColor& col)
+    {
+      return scfParent->SetDirLight (pos, col);
+    }
+    virtual csVector3 GetDirLightPosition () const
+    {
+      return scfParent->GetDirLightPosition ();
+    }
+    virtual csColor GetDirLightColor () const
+    {
+      return scfParent->GetDirLightColor ();
+    }
+    virtual void DisableDirLight ()
+    {
+      return scfParent->DisableDirLight ();
+    }
+    virtual bool IsDirLightEnabled () const
+    {
+      return scfParent->IsDirLightEnabled ();
+    }
+    virtual void SetMaterial (int i, iMaterialWrapper* mat)
+    {
+      return scfParent->SetMaterial (i, mat);
+    }
+    virtual int GetMaterialCount () const
+    {
+      return scfParent->GetMaterialCount ();
+    }
+
+    virtual int CollisionDetect (csTransform *p)
+    {
+      return scfParent->CollisionDetect (p);
+    }
+
   } scfiTerrFuncState;
   friend class TerrFuncState;
 };
@@ -476,7 +562,7 @@ public:
 /**
  * Factory for terrain. 
  */
-class csTerrFuncObjectFactory : public iTerrainObjectFactory
+class csTerrFuncObjectFactory : public iMeshObjectFactory
 {
 private:
   iSystem *pSystem;
@@ -490,14 +576,17 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual iTerrainObject* NewInstance ();
+  virtual iMeshObject* NewInstance ();
+
+  virtual void HardTransform (const csReversibleTransform&) { }
+  virtual bool SupportsHardTransform () const { return false; }
 };
 
 /**
  * TerrFunc type. This is the plugin you have to use to create instances
  * of csTerrFuncObjectFactory.
  */
-class csTerrFuncObjectType : public iTerrainObjectType
+class csTerrFuncObjectType : public iMeshObjectType
 {
 private:
   iSystem *pSystem;
@@ -512,11 +601,15 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSys);
 
-  //---------------------- iTerrainObjectType implementation --------------
+  //---------------------- iMeshObjectType implementation --------------
   SCF_DECLARE_IBASE;
 
   /// Draw.
-  virtual iTerrainObjectFactory* NewFactory ();
+  virtual iMeshObjectFactory* NewFactory ();
+
+  /// get supported object features
+  virtual uint32 GetFeatures () const;
+
 };
 
 #endif // __CS_TERRFUNC_H__

@@ -6,6 +6,21 @@ The history order is reversed so that new features are at the top.
 	- Added back some include files from WalkTest that Martin removed
 	  but which are needed hard.
 	- Richard D. Shank added header files for 3ds importer.
+	- Richard made the start to moving terrain object to a mesh object.
+	  I continued his work. terrfunc is now a mesh object like all others.
+	  There is a new newsky.zip on the ftp site for this change.
+	- This also means that TERRAINFACTORY and TERRAINOBJ are gone in
+	  map files (use MESHFACT and MESHOBJ). Everything related to
+	  terrains is gone from the engine. A terrain is a mesh object.
+	- The engine also had functions for manipulating terrains in
+	  iEngine, iRegion, and iSector. These are now gone.
+	- Fixed WalkTest terrain dynamic lighting for this change.
+	- Fixed WalkTest terrain collision detection for this change.
+	- Fixed BugPlug ability to enable/disable vistesting for terrains.
+	- Added SCF_SET_REF() to safely set a reference in a variable.
+	  This will make sure the old reference (if any) gets released
+	  and the new reference will be increased. Will safely work in
+	  combination with NULL.
 	- Martin Geisse removed lots of unneeded include statements from
 	  walktest and squawk. Also made some changes to squawk, so it now
 	  uses the engine only through interfaces.

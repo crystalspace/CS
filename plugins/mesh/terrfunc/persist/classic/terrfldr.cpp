@@ -27,9 +27,9 @@
 #include "isys/vfs.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
-#include "iterrain/terrfunc.h"
-#include "iterrain/object.h"
-#include "iengine/terrain.h"
+#include "imesh/terrfunc.h"
+#include "imesh/object.h"
+#include "iengine/mesh.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -66,9 +66,9 @@ SCF_IMPLEMENT_FACTORY (csTerrFuncLoader)
 
 SCF_EXPORT_CLASS_TABLE (terrfldr)
   SCF_EXPORT_CLASS (csTerrFuncFactoryLoader,
-    "crystalspace.terrain.loader.factory.terrfunc",
+    "crystalspace.mesh.loader.factory.terrfunc",
     "Crystal Space Function Terrain Factory Loader")
-  SCF_EXPORT_CLASS (csTerrFuncLoader, "crystalspace.terrain.loader.terrfunc",
+  SCF_EXPORT_CLASS (csTerrFuncLoader, "crystalspace.mesh.loader.terrfunc",
     "Crystal Space Function Terrain Loader")
 SCF_EXPORT_CLASS_TABLE_END
 
@@ -90,16 +90,16 @@ bool csTerrFuncFactoryLoader::Initialize (iSystem* pSys)
 iBase* csTerrFuncFactoryLoader::Parse (const char* /*string*/,
 	iEngine* /*engine*/, iBase* /* context */)
 {
-  iTerrainObjectType* pType = CS_QUERY_PLUGIN_CLASS (pSystem,
-  	"crystalspace.terrain.object.terrfunc", "TerrainObj",
-	iTerrainObjectType);
+  iMeshObjectType* pType = CS_QUERY_PLUGIN_CLASS (pSystem,
+  	"crystalspace.mesh.object.terrfunc", "MeshObj",
+	iMeshObjectType);
   if (!pType)
   {
-    pType = CS_LOAD_PLUGIN (pSystem, "crystalspace.terrain.object.terrfunc",
-    	"TerrainObj", iTerrainObjectType);
-    printf ("Load TYPE plugin crystalspace.terrain.object.terrfunc\n");
+    pType = CS_LOAD_PLUGIN (pSystem, "crystalspace.mesh.object.terrfunc",
+    	"MeshObj", iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.mesh.object.terrfunc\n");
   }
-  iTerrainObjectFactory* pFactory = pType->NewFactory ();
+  iMeshObjectFactory* pFactory = pType->NewFactory ();
   return pFactory;
 }
 
@@ -146,7 +146,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
   char *pParams;
   char pStr[255];
 
-  iTerrainObject* iTerrObj = NULL;
+  iMeshObject* iTerrObj = NULL;
   iTerrFuncState* iTerrainState = NULL;
 
   char* pBuf = (char*)pString;
@@ -162,13 +162,13 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
       case CS_TOKEN_FACTORY:
 	{
           csScanStr (pParams, "%s", pStr);
-	  iTerrainFactoryWrapper* iFactory = iEngine->FindTerrainFactory (pStr);
+	  iMeshFactoryWrapper* iFactory = iEngine->FindMeshFactory (pStr);
 	  if (!iFactory)
 	  {
 	    // @@@ Error handling!
 	    return NULL;
 	  }
-	  iTerrObj = iFactory->GetTerrainObjectFactory()->NewInstance();
+	  iTerrObj = iFactory->GetMeshObjectFactory()->NewInstance();
           iTerrainState = SCF_QUERY_INTERFACE (iTerrObj, iTerrFuncState);
 	}
 	break;
@@ -182,7 +182,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
             // @@@ Error handling!
             return NULL;
 	  }
-	  iTerrObj->SetMaterial (i, mat);
+	  iTerrainState->SetMaterial (i, mat);
 	}
         break;
       case CS_TOKEN_GROUPMATERIAL:
@@ -241,7 +241,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	  csColor col;
 	  csScanStr (pParams, "%f,%f,%f:%f,%f,%f", &pos.x, &pos.y, &pos.z,
 	  	&col.red, &col.green, &col.blue);
-	  iTerrObj->SetDirLight (pos, col);
+	  iTerrainState->SetDirLight (pos, col);
 	}
 	break;
       case CS_TOKEN_LODDIST:

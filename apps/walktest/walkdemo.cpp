@@ -94,7 +94,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   }
 
   csBox3 bbox;
-  sector->CalculateSectorBBox (bbox, true, false);
+  sector->CalculateSectorBBox (bbox, true);
 
   // @@@ Memory leak on factories!
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.rain",
@@ -140,7 +140,7 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
   }
 
   csBox3 bbox;
-  sector->CalculateSectorBBox (bbox, true, false);
+  sector->CalculateSectorBBox (bbox, true);
 
   // @@@ Memory leak on factories!
   iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (System, "crystalspace.mesh.object.snow",

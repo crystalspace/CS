@@ -39,7 +39,6 @@
 #include "csengine/material.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
-#include "csengine/terrobj.h"
 #include "csengine/cbuffer.h"
 #include "csengine/lppool.h"
 #include "csengine/radiosty.h"
@@ -557,9 +556,7 @@ void csEngine::Clear ()
   for (i = meshes.Length () -1; i >= 0 ; i--)
     RemoveMesh ((csMeshWrapper*)meshes.Get (i));
 
-  terrains.DeleteAll();
   mesh_factories.DeleteAll ();
-  terrain_factories.DeleteAll();
   curve_templates.DeleteAll ();
 
   for (i = 0 ; i < sectors.Length () ; i++)
@@ -1401,19 +1398,6 @@ void csEngine::RemoveMesh (iMeshWrapper* mesh)
   RemoveMesh (mesh->GetPrivateObject ());
 }
 
-void csEngine::RemoveTerrain (csTerrainWrapper* terr)
-{
-  terr->ClearSectors ();
-  int idx = terrains.Find (terr);
-  if (idx == -1) return;
-  terrains.Delete (idx);
-}
-
-void csEngine::RemoveTerrain (iTerrainWrapper* terr)
-{
-  RemoveTerrain (terr->GetPrivateObject ());
-}
-
 void csEngine::RemoveCollection (csCollection* collection)
 {
   collection->GetMovable ().ClearSectors ();
@@ -1880,37 +1864,6 @@ iMeshFactoryWrapper *csEngine::FindMeshFactory (const char *iName,
   return ifact;
 }
 
-iTerrainWrapper *csEngine::FindTerrainObject (const char *iName,
-  bool regionOnly) const
-{
-  csTerrainWrapper *pTerrain;
-
-  if (regionOnly && region)
-    pTerrain = (csTerrainWrapper*)FindObjectInRegion( region, terrains, iName );
-  else
-    pTerrain = (csTerrainWrapper*)terrains.FindByName( iName );
-  if (!pTerrain)
-    return NULL;
-
-  iTerrainWrapper* iTerrain = SCF_QUERY_INTERFACE( pTerrain, iTerrainWrapper );
-  iTerrain->DecRef ();
-  return iTerrain;
-}
-
-iTerrainFactoryWrapper *csEngine::FindTerrainFactory (const char *iName,
-  bool regionOnly) const
-{
-  csTerrainFactoryWrapper *pFactory;
-  if (regionOnly && region)
-    pFactory = (csTerrainFactoryWrapper*)FindObjectInRegion (region, terrain_factories, iName);
-  else
-    pFactory = (csTerrainFactoryWrapper*)terrain_factories.FindByName( iName );
-  if (!pFactory)
-    return NULL;
-  iTerrainFactoryWrapper* iFactory = &pFactory->scfiTerrainFactoryWrapper;
-  return iFactory;
-}
-
 iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt)
 {
   csMaterial* mat = new csMaterial ();
@@ -2254,100 +2207,6 @@ iMeshFactoryWrapper *csEngine::GetMeshFactory (int n) const
   	scfiMeshFactoryWrapper;
 }
 
-
-iTerrainFactoryWrapper* csEngine::CreateTerrainFactory (const char* pClassId,
-	const char* pName)
-{
-  if (pName != NULL)
-  {
-    iTerrainFactoryWrapper *iFactWrap = FindTerrainFactory( pName, false );
-    if ( iFactWrap )
-      return iFactWrap;
-  }
-  
-  iTerrainObjectType *iType = CS_QUERY_PLUGIN_CLASS (System, pClassId, "TerrainObj", iTerrainObjectType );
-  if( !iType )
-    iType = CS_LOAD_PLUGIN( System, pClassId, "TerrainObj", iTerrainObjectType );
-  if( !iType )
-    return NULL;
-
-  iTerrainObjectFactory *iFactory = iType->NewFactory();
-  iType->DecRef();
-  if (!iFactory)
-    return NULL;
-
-  // don't pass the name to avoid a second search
-  iTerrainFactoryWrapper *fwrap = CreateTerrainFactory (iFactory, NULL);
-  if (fwrap && pName) fwrap->QueryObject()->SetName (pName);
-  iFactory->DecRef ();
-  return fwrap;
-}
-
-iTerrainFactoryWrapper* csEngine::CreateTerrainFactory
-	(iTerrainObjectFactory *fact, const char* pName)
-{
-  if (pName != NULL)
-  {
-    iTerrainFactoryWrapper *iFactWrap = FindTerrainFactory (pName, false);
-    if (iFactWrap)
-      return iFactWrap;
-  }
-
-  csTerrainFactoryWrapper* fwrap = new csTerrainFactoryWrapper (fact);
-  if (pName) fwrap->SetName (pName);
-  fwrap->IncRef ();
-  terrain_factories.Push (fwrap);
-  return &fwrap->scfiTerrainFactoryWrapper;
-}
-
-iTerrainFactoryWrapper* csEngine::CreateTerrainFactory(const char* pName)
-{
-  if (pName != NULL)
-  {
-    iTerrainFactoryWrapper *iFactWrap = FindTerrainFactory (pName, false);
-    if (iFactWrap)
-      return iFactWrap;
-  }
-
-  csTerrainFactoryWrapper* fwrap = new csTerrainFactoryWrapper ();
-  if (pName) fwrap->SetName (pName);
-  fwrap->IncRef ();
-  terrain_factories.Push (fwrap);
-  return &fwrap->scfiTerrainFactoryWrapper;
-}
-
-iTerrainWrapper* csEngine::CreateTerrainObject (
-	iTerrainFactoryWrapper* pFactWrap, const char *pName,
-	iSector *iSector)
-{
-  iTerrainObjectFactory *iTObjFact = pFactWrap->GetTerrainObjectFactory ();
-  iTerrainObject *iTerrObj = iTObjFact->NewInstance ();
-  iTerrainWrapper *twrap = CreateTerrainObject (iTerrObj, pName, iSector);
-  iTerrObj->DecRef ();
-  return twrap;
-}
-
-iTerrainWrapper* csEngine::CreateTerrainObject (iTerrainObject *terr,
-  	const char *pName, iSector *iSector)
-{
-  csTerrainWrapper *twrap = new csTerrainWrapper (this, terr);
-  if (pName) twrap->SetName (pName);
-  terrains.Push (twrap);
-
-  // add new terrain to sector
-  if (iSector)
-    iSector->AddTerrain (&twrap->scfiTerrainWrapper);
-
-  return &twrap->scfiTerrainWrapper;
-}
-
-iTerrainWrapper* csEngine::CreateTerrainObject (const char *pName)
-{
-  csTerrainWrapper *twrap = new csTerrainWrapper (this);
-  if (pName) twrap->SetName (pName);
-  terrains.Push (twrap);
-  return &twrap->scfiTerrainWrapper;
-}
 
 iPolyTxtPlane* csEngine::CreatePolyTxtPlane (const char* name)
 {

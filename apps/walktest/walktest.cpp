@@ -56,7 +56,8 @@
 #include "ivaria/reporter.h"
 #include "imap/parser.h"
 #include "isound/wrapper.h"
-#include "iterrain/object.h"
+#include "imesh/terrfunc.h"
+#include "imesh/object.h"
 
 #include "csengine/wirefrm.h"
 #include "csengine/cbuffer.h"
@@ -400,11 +401,15 @@ void WalkTest::MoveSystems (cs_time elapsed_time, cs_time current_time)
   // Move the directional light if any.
   if (anim_dirlight)
   {
-    csVector3 pos = anim_dirlight->GetTerrainObject ()->GetDirLightPosition ();
-    csColor col = anim_dirlight->GetTerrainObject ()->GetDirLightColor ();
+    iTerrFuncState* state = SCF_QUERY_INTERFACE (
+    	anim_dirlight->GetMeshObject (),
+	iTerrFuncState);
+    csVector3 pos = state->GetDirLightPosition ();
+    csColor col = state->GetDirLightColor ();
     csYRotMatrix3 mat (.05* 2. * M_PI * (float)elapsed_time/1000.);
     pos = mat * pos;
-    anim_dirlight->GetTerrainObject ()->SetDirLight (pos, col);
+    state->SetDirLight (pos, col);
+    state->DecRef ();
   }
   // Animate the psuedo-dynamic light if any.
   if (anim_dynlight)

@@ -39,8 +39,7 @@
 #include "ivaria/conout.h"
 #include "iutil/object.h"
 #include "imesh/object.h"
-#include "iterrain/terrfunc.h"
-#include "iterrain/object.h"
+#include "imesh/terrfunc.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
@@ -552,10 +551,10 @@ bool csBugPlug::EatKey (iEvent& event)
 	  for (i = 0 ; i < Engine->GetSectorCount () ; i++)
 	  {
 	    iSector* sector = Engine->GetSector (i);
-	    for (j = 0 ; j < sector->GetTerrainCount () ; j++)
+	    for (j = 0 ; j < sector->GetMeshCount () ; j++)
 	    {
-	      iTerrainWrapper* terr = sector->GetTerrain (j);
-	      iTerrFuncState* st = SCF_QUERY_INTERFACE (terr->GetTerrainObject (),
+	      iMeshWrapper* terr = sector->GetMesh (j);
+	      iTerrFuncState* st = SCF_QUERY_INTERFACE (terr->GetMeshObject (),
 	      	iTerrFuncState);
 	      if (st)
 	      {

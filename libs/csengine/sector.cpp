@@ -35,7 +35,6 @@
 #include "csengine/stats.h"
 #include "csengine/cbuffer.h"
 #include "csengine/bspbbox.h"
-#include "csengine/terrobj.h"
 #include "csengine/cbufcube.h"
 #include "csengine/bsp.h"
 #include "csengine/octree.h"
@@ -104,7 +103,6 @@ csSector::~csSector ()
   mesh_priority_queues.DeleteAll ();
 
   lights.DeleteAll ();
-  terrains.DeleteAll ();
   if (culler) culler->DecRef ();
 }
 
@@ -291,35 +289,6 @@ csStatLight* csSector::FindLight (unsigned long id) const
   {
     csStatLight* l = (csStatLight*)lights[i];
     if (l->GetLightID () == id) return l;
-  }
-  return NULL;
-}
-
-//----------------------------------------------------------------------
-
-void csSector::AddTerrain (csTerrainWrapper *pTerrain)
-{
-  terrains.Push ((csSome) pTerrain );
-}
-
-void csSector::UnlinkTerrain (csTerrainWrapper *pTerrain)
-{
-  int idx = terrains.Find ((csSome)pTerrain);
-  if (idx != -1)
-  { 
-    terrains[idx] = NULL; 
-    terrains.Delete (idx);
-  }
-}
-
-csTerrainWrapper* csSector::GetTerrain (const char* name) const
-{
-  int i;
-  for (i = 0 ; i < terrains.Length () ; i++)
-  {
-    csTerrainWrapper* s = (csTerrainWrapper*)terrains[i];
-    if (!strcmp (name, s->GetName ()))
-      return s;
   }
   return NULL;
 }
@@ -900,16 +869,6 @@ void csSector::Draw (iRenderView* rview)
   }
   delete [] mesh_queue;
 
-  // Draw all terrain surfaces.
-  if (terrains.Length () > 0)
-  {
-    for (i = 0 ; i < terrains.Length () ; i++)
-    {
-      csTerrainWrapper* pTerrain = (csTerrainWrapper*)terrains[i];
-      pTerrain->Draw (rview, true);
-    }
-  }
-
   // queue all halos in this sector to be drawn.
   for (i = lights.Length () - 1; i >= 0; i--)
     // Tell the engine to try to add this light into the halo queue
@@ -1155,7 +1114,7 @@ void csSector::ShineLights (iMeshWrapper* mesh, csProgressPulse* pulse)
 }
 
 void csSector::CalculateSectorBBox (csBox3& bbox,
-	bool do_meshes, bool /*do_terrain*/) const
+	bool do_meshes) const
 {
   bbox.StartBoundingBox ();
   csBox3 b;
@@ -1167,7 +1126,6 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
       mesh->GetTransformedBoundingBox (mesh->GetMovable ().GetTransform (), b);
       bbox += b;
     }
-  // @@@ if (do_terrain) not yet supported
 }
 
 //---------------------------------------------------------------------------
@@ -1186,22 +1144,6 @@ iMeshWrapper *csSector::eiSector::GetMesh (const char *name) const
 {
   csMeshWrapper *mw = scfParent->GetMesh (name);
   return mw ? &mw->scfiMeshWrapper : NULL;
-}
-
-iTerrainWrapper *csSector::eiSector::GetTerrain (int n) const
-{
-  return &scfParent->GetTerrain (n)->scfiTerrainWrapper;
-}
-
-iTerrainWrapper *csSector::eiSector::GetTerrain (const char *name) const
-{
-  csTerrainWrapper *tw = scfParent->GetTerrain (name);
-  return tw ? &tw->scfiTerrainWrapper : NULL;
-}
-
-void csSector::eiSector::AddTerrain (iTerrainWrapper *pTerrain)
-{
-  scfParent->AddTerrain (pTerrain->GetPrivateObject ());
 }
 
 void csSector::eiSector::AddLight (iStatLight *light)
