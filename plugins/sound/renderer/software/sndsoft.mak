@@ -39,30 +39,36 @@ vpath %.cpp plugins/sound/renderer/software
 # used
 #
 
-ifeq ($(COMP),GCC)
+ifeq ($(OS),WIN32)
+	ifeq ($(COMP),GCC)
+
 # COMP_GCC Linker assumes static libs have extension .a
 # Mingw/Cygwin both use libdsound.a (static lib) as the
 # place to get MS DirectSound references from
-  LIBS.DSOUND+=$(LFLAGS.l)dsound$
-else
+
+  	LIBS.DSOUND+=$(LFLAGS.l)dsound$
+	else
+
 #COMP_VC & COMP_BC
-  LIBS.DSOUND+=$(LFLAGS.l)dsound$(LIB)
+	  LIBS.DSOUND+=$(LFLAGS.l)dsound$(LIB)
+	endif
 endif
 
-
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  SNDSOFT=$(OUTDLL)sndsoft$(DLL)
+
+	ifeq ($(OS),WIN32)
+	 	SNDSOFT=$(OUTDLL)sndsoft$(DLL)
+	endif
+
   DEP.SNDSOFT=$(CSUTIL.LIB) $(CSSYS.LIB) $(CSSNDLDR.LIB) $(CSSFXLDR.LIB)
 	LIBS.LOCAL.SNDSOFT=$(LIBS.SNDSOFT)
+
 else
 # Generate static libs
   SNDSOFT=$(OUT)$(LIB_PREFIX)sndsoft$(LIB)
 	DEP.EXE+=$(SNDSOFT)
 
  	ifeq ($(OS),WIN32)
-
-# Mingw/Cygwin both use libdsound.a (static lib) as the
-# place to get MS DirectSound references from
 
 		ifeq ($(COMP),GCC)
  			LIBS.EXE+=$(LIBS.DSOUND)
