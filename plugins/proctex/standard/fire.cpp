@@ -118,8 +118,7 @@ csPtr<iBase> csPtFireLoader::Parse (iDocumentNode* node,
     }
   }
   csRef<iTextureWrapper> tex = fireFact->Generate();
-  csRef<iFireTexture> fire = csPtr<iFireTexture>
-    (SCF_QUERY_INTERFACE (tex, iFireTexture));
+  csRef<iFireTexture> fire = SCF_QUERY_INTERFACE (tex, iFireTexture);
 
   if (node)
   {
