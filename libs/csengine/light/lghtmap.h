@@ -85,25 +85,28 @@ public:
   }
 
   ///
-  csRGBLightMap () { mapR = mapG = mapB = NULL; }
+  csRGBLightMap () : mapR (NULL), mapG (NULL), mapB (NULL) { }
   ///
   ~csRGBLightMap () { Clear (); }
 
   ///
   void AllocRed (int size)
   {
+    CHK (delete [] mapR);
     CHK (mapR = new unsigned char [size]);
   }
 
   ///
   void AllocGreen (int size)
   {
+    CHK (delete [] mapG);
     CHK (mapG = new unsigned char [size]);
   }
 
   ///
   void AllocBlue (int size)
   {
+    CHK (delete [] mapB);
     CHK (mapB = new unsigned char [size]);
   }
 
