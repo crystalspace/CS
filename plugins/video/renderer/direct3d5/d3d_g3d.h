@@ -306,7 +306,7 @@ public:
   { return NULL; }
 
   virtual void OpenFogObject (CS_ID id, csFog* fog);
-  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
+  virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
   virtual void CloseFogObject (CS_ID id);
 
 private:

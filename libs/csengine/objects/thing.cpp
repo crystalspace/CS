@@ -271,7 +271,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
   	// Clip triangle
   	int rescount;
-  	if (!rview.view->Clip (triangle, clipped_triangle, 3, rescount)) continue;
+  	if (!rview.view->Clip (triangle, 3, clipped_triangle, rescount)) continue;
 
         texes[0] = &tess->GetVertex (ct.i1).txt_coord;
         texes[1] = &tess->GetVertex (ct.i2).txt_coord;

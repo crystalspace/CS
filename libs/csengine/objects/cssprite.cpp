@@ -1194,7 +1194,7 @@ void csSprite3D::Draw (csRenderView& rview)
 
   // Test if we need and should clip to the current portal.
   int box_class;
-  box_class = rview.view->ClassifyBox (&bbox);
+  box_class = rview.view->ClassifyBox (bbox);
   if (box_class == -1) return; // Not visible.
   bool do_clip = false;
   if (rview.do_clip_plane || rview.do_clip_frustrum)
@@ -1211,7 +1211,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // why not do it to the smallest possible clip area.
   if (!do_clip)
   {
-    box_class = csWorld::current_world->top_clipper->ClassifyBox (&bbox);
+    box_class = csWorld::current_world->top_clipper->ClassifyBox (bbox);
     if (box_class == 0) do_clip = true;
   }
 

@@ -808,6 +808,33 @@ struct
   { 8, 3, 8, 3, 8, 3, 8, 3 }            // 8-steps
 };
 
+static void inline SelectInterpolationStep (float M)
+{
+  // Select the right interpolation factor based on the z-slope of our
+  // polygon. This will greatly increase the speed of polygons which are
+  // horizontally constant in z.
+  if (ABS (M) < .000001)
+  {
+    Scan.InterpolStep = inter_modes[Scan.InterpolMode].step1;
+    Scan.InterpolShift = inter_modes[Scan.InterpolMode].shift1;
+  }
+  else if (ABS (M) < .00005)
+  {
+    Scan.InterpolStep = inter_modes[Scan.InterpolMode].step2;
+    Scan.InterpolShift = inter_modes[Scan.InterpolMode].shift2;
+  }
+  else if (ABS (M) < .001)
+  {
+    Scan.InterpolStep = inter_modes[Scan.InterpolMode].step3;
+    Scan.InterpolShift = inter_modes[Scan.InterpolMode].shift3;
+  }
+  else
+  {
+    Scan.InterpolStep = inter_modes[Scan.InterpolMode].step4;
+    Scan.InterpolShift = inter_modes[Scan.InterpolMode].shift4;
+  }
+}
+
 void csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
 {
   int i;
@@ -1140,7 +1167,14 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     if ((fabs (poly.vertices [i].sx - poly.vertices [i - 1].sx)
        + fabs (poly.vertices [i].sy - poly.vertices [i - 1].sy)) > VERTEX_NEAR_THRESHOLD)
       num_vertices++;
+
+    if (poly.vertices[i].sx < 0 || poly.vertices[i].sx > width)
+      return;
   }
+
+  // If the polygon exceeds the screen, it is a engine failure
+  if (max_y > height || min_y < 0)
+    return;
 
   // if this is a 'degenerate' polygon, skip it.
   if (num_vertices < 3)
@@ -1328,29 +1362,7 @@ void csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     K3 = Q3              + Q4 * O;
   }
 
-  // Select the right interpolation factor based on the z-slope of our
-  // polygon. This will greatly increase the speed of polygons which are
-  // horizontally constant in z.
-  if (ABS (M) < .000001)
-  {
-    Scan.InterpolStep = inter_modes[Scan.InterpolMode].step1;
-    Scan.InterpolShift = inter_modes[Scan.InterpolMode].shift1;
-  }
-  else if (ABS (M) < .00005)
-  {
-    Scan.InterpolStep = inter_modes[Scan.InterpolMode].step2;
-    Scan.InterpolShift = inter_modes[Scan.InterpolMode].shift2;
-  }
-  else if (ABS (M) < .001)
-  {
-    Scan.InterpolStep = inter_modes[Scan.InterpolMode].step3;
-    Scan.InterpolShift = inter_modes[Scan.InterpolMode].shift3;
-  }
-  else
-  {
-    Scan.InterpolStep = inter_modes[Scan.InterpolMode].step4;
-    Scan.InterpolShift = inter_modes[Scan.InterpolMode].shift4;
-  }
+  SelectInterpolationStep (M);
 
   // Steps for interpolating horizontally accross a scanline.
   Scan.M = M;
@@ -1667,7 +1679,7 @@ void csGraphics3DSoftware::CloseFogObject (CS_ID id)
   CHK (delete fb);
 }
 
-void csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fog_type)
+void csGraphics3DSoftware::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fog_type)
 {
   int i;
   int max_i, min_i;
@@ -1785,6 +1797,8 @@ void csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fog
     Scan.Fog8 = BuildIndexedFogTable ();
     Scan.FogPix = texman->find_rgb (Scan.FogR, Scan.FogG, Scan.FogB);
   }
+
+  SelectInterpolationStep (M);
 
   // Steps for interpolating horizontally accross a scanline.
   Scan.M = M;

@@ -123,7 +123,7 @@ public:
   virtual void OpenFogObject (CS_ID, csFog* ) { }
 
   ///
-  virtual void AddFogPolygon (CS_ID, G3DPolygonAFP&, int ) { }
+  virtual void DrawFogPolygon (CS_ID, G3DPolygonDFP&, int ) { }
 
   ///
   virtual void CloseFogObject (CS_ID) { }

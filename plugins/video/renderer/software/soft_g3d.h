@@ -141,7 +141,7 @@ class csGraphics3DSoftware : public iGraphics3D
   int DrawMode;
 
   /// draw_scanline_xxx routines
-  csDrawScanline* ScanProc [0x12];
+  csDrawScanline* ScanProc [0x13];
   /// draw_pi_scanline_xxx routines
   csDrawPIScanline* ScanProcPI [4];
   /// draw_pi_scanline_gouraud_xxx routines
@@ -293,7 +293,7 @@ public:
    *    <li>CS_FOG_VIEW:        the view-plane
    * </ul>
    */
-  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
+  virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
 
   /**
    * Close a volumetric fog object. After the volumetric object is

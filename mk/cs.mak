@@ -131,9 +131,9 @@ SED_DEPEND=-e "s/^\([^ ].*\)/$$\(OUT\)\1/" $(SYS_SED_DEPEND)
 # How to build a source dependency file
 ifndef DO.DEP
   ifeq ($(DEPEND_TOOL),cc)
-    DO.DEP = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
-    DO.DEP1 = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE)  
+    DO.DEP1 = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE)
     DO.DEP2 = $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
+    DO.DEP = $(DO.DEP1) $(DO.DEP2)
   else
     ifeq ($(DEPEND_TOOL),mkdep)
       # If mkdep is already installed, don't build it

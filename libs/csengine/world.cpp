@@ -965,11 +965,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   if (c_buffer)
   {
     c_buffer->Initialize ();
-    csVector2 verts[50];	// @@@ BAD! Hardcoded!
-    int i, num;
-    num = view->GetNumVertices ();
-    for (i = 0 ; i < num ; i++) verts[i] = view->GetVertex (i);
-    c_buffer->InsertPolygon (verts, num, true);
+    c_buffer->InsertPolygon (view->GetClipPoly (), view->GetNumVertices (), true);
   }
   else if (solidbsp)
   {
@@ -977,7 +973,8 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     csVector2 verts[50];	// @@@ BAD! Hardcoded!
     int i, num;
     num = view->GetNumVertices ();
-    for (i = 0 ; i < num ; i++) verts[num-i-1] = view->GetVertex (i);
+    csVector2 *clipview = view->GetClipPoly ();
+    for (i = 0 ; i < num ; i++) verts[num-i-1] = clipview [i];
     solidbsp->InsertPolygonInv (verts, num);
   }
   else if (quadtree)
@@ -988,7 +985,8 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     csVector2 verts[50];	// @@@ BAD! Hardcoded!
     int i, num;
     num = view->GetNumVertices ();
-    for (i = 0 ; i < num ; i++) verts[num-i-1] = view->GetVertex (i);
+    csVector2 *clipview = view->GetClipPoly ();
+    for (i = 0 ; i < num ; i++) verts[num-i-1] = clipview [i];
     covtree->UpdatePolygonInverted (verts, num);
   }
 
@@ -1172,7 +1170,7 @@ bool csWorld::ProcessHalo (csLightHalo *Halo)
       csVector2 (v.x + hw2, v.y - hh2)
     };
     // Clip the halo against clipper
-    if (top_clipper->Clip (HaloPoly, HaloClip, 4, HaloVCount))
+    if (top_clipper->Clip (HaloPoly, 4, HaloClip, HaloVCount))
     {
       xtl = HaloPoly [0].x;
       ytl = HaloPoly [0].y;

@@ -2245,8 +2245,8 @@ void csGraphics3DDirect3DDx6::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
 {
 }
 
-void csGraphics3DDirect3DDx6::AddFogPolygon (CS_ID /*id*/,
-  G3DPolygonAFP& /*poly*/, int /*fogtype*/)
+void csGraphics3DDirect3DDx6::DrawFogPolygon (CS_ID /*id*/,
+  G3DPolygonDFP& /*poly*/, int /*fogtype*/)
 {
 }
 

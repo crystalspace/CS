@@ -87,9 +87,9 @@ CFLAGS.DLL=
 LFLAGS.GENERAL=-Zmt
 
 # Flags for the linker which are used when optimizing/debugging/profiling.
-LFLAGS.optimize=-s -Zstack 512
-LFLAGS.debug=-g -Zstack 512
-LFLAGS.profile=-pg -Zstack 512
+LFLAGS.optimize=-s
+LFLAGS.debug=-g
+LFLAGS.profile=-pg
 ifeq ($(USE_OMF)/$(USE_CRTDLL),yes/no)
   LFLAGS.optimize+=-Zsmall-conv -Zsys
   LFLAGS.debug+=-Zsmall-conv -Zsys
@@ -99,6 +99,9 @@ else
   LFLAGS.debug+=-Zcrtdll
   LFLAGS.profile+=-Zcrtdll
 endif
+
+# Flags for linker when building a GUI executable
+LFLAGS.EXE+=-Zstack 512
 
 # Flags for the linker which are used when building a shared library.
 LFLAGS.DLL=-Zdll

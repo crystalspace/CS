@@ -627,7 +627,7 @@ void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
 //---------------------------------------------------------------------------
 
 void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
-	csPolyPlane* plane, bool use_z_buf)
+  csPolyPlane* plane, bool use_z_buf)
 {
   int i;
   bool debug = false;
@@ -644,8 +644,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     rview->g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   }
 
-  if (poly->GetTextureType () == POLYTXT_GOURAUD ||
-  	poly->CheckFlags (CS_POLY_FLATSHADING))
+  if (poly->GetTextureType () == POLYTXT_GOURAUD
+   || poly->CheckFlags (CS_POLY_FLATSHADING))
   {
     // We have a gouraud shaded polygon.
     // Add all dynamic lights if polygon is dirty.
@@ -777,10 +777,11 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     g3dpoly.z_value         = poly->Vcam(0).z;
 #ifdef DO_HW_UVZ
     g3dpoly.mirror          = mirror;
-    if ( poly->isClipped || rview->view->Clipped() )
+    if (poly->isClipped || rview->view->DidClipping ())
        g3dpoly.uvz = NULL;
-    else{
-       g3dpoly.uvz = poly->uvz;
+    else
+    {
+      g3dpoly.uvz = poly->uvz;
       for (i = 0 ; i < num_vertices ; i++)
       {
         g3dpoly.uvz[i].z = poly->Vcam(i).z;
@@ -820,14 +821,17 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
 }
 
 void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
-	csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
+  csPolyPlane* plane, bool mirror, CS_ID id, int fogtype)
 {
   int i;
 
-  static G3DPolygonAFP g3dpoly;
+  static G3DPolygonDFP g3dpoly;
   memset(&g3dpoly, 0, sizeof(g3dpoly));
   g3dpoly.num = num_vertices;
   g3dpoly.inv_aspect = csWorld::current_world->current_camera->inv_aspect;
+#if 0
+  memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));
+#else
   if (mirror)
     for (i = 0 ; i < num_vertices ; i++)
     {
@@ -835,11 +839,8 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
       g3dpoly.vertices[num_vertices-i-1].sy = vertices[i].y;
     }
   else
-    for (i = 0 ; i < num_vertices ; i++)
-    {
-      g3dpoly.vertices[i].sx = vertices[i].x;
-      g3dpoly.vertices[i].sy = vertices[i].y;
-    }
+    memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));
+#endif
   //g3dpoly.polygon = GetIPolygon3DFromcsPolygon3D(poly); //DPQFIX
 
   float Ac, Bc, Cc, Dc;
@@ -851,7 +852,7 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
 
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, true);
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
-  g3d->AddFogPolygon (id, g3dpoly, fogtype);
+  g3d->DrawFogPolygon (id, g3dpoly, fogtype);
 }
 
 //---------------------------------------------------------------------------

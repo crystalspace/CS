@@ -58,7 +58,7 @@ struct iHalo;
 /// Macro for easier setting of alpha bits into mixmode
 #define CS_FX_SETALPHA(alpha)	(CS_FX_ALPHA | UInt (alpha * CS_FX_MASK_ALPHA))
 
-/// Vertex Structure for use with G3DPolygonDP and G3DPolygonAFP
+/// Vertex Structure for use with G3DPolygonDP and G3DPolygonDFP
 class G3DVertex
 {
 public:
@@ -186,8 +186,8 @@ struct G3DPolygonDP
 /// Structure containing all info needed by DrawPolygonFlat (DPF)
 typedef G3DPolygonDP G3DPolygonDPF;
 
-/// Structure containing all info needed by AddFogPolygon (AFP)
-struct G3DPolygonAFP
+/// Structure containing all info needed by DrawFogPolygon (DFP)
+struct G3DPolygonDFP
 {
   /// Current number of vertices.
   int num;
@@ -526,12 +526,12 @@ struct iGraphics3D : public iPlugIn
    *	<li>CS_FOG_VIEW:	the view-plane
    * </ul>
    */
-  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype) = 0;
+  virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype) = 0;
 
   /**
    * Close a volumetric fog object. After the volumetric object is
    * closed it should be rendered on screen (whether you do it here
-   * or in AddFogPolygon is not important).
+   * or in DrawFogPolygon is not important).
    */
   virtual void CloseFogObject (CS_ID id) = 0;
 

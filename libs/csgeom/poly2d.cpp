@@ -106,10 +106,10 @@ void csPoly2D::UpdateBoundingBox ()
     bbox.AddBoundingVertex (vertices[i]);
 }
 
-bool csPoly2D::ClipAgainst (csClipper* view)
+bool csPoly2D::ClipAgainst (csClipper *view)
 {
-  MakeRoom (num_vertices+view->GetNumVertices ()+1);
-  return view->Clip (vertices, num_vertices, max_vertices, &bbox);
+  MakeRoom (num_vertices + view->GetNumVertices () + 1);
+  return view->Clip (vertices, num_vertices, bbox);
 }
 
 void csPoly2D::Intersect (const csPlane2& plane,

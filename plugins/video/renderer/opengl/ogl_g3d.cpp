@@ -1048,7 +1048,7 @@ void csGraphics3DOpenGL::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
   // OpenGL driver implements vertex-based fog ...
 }
 
-void csGraphics3DOpenGL::AddFogPolygon (CS_ID /*id*/, G3DPolygonAFP &/*poly*/, int /*fogtype*/)
+void csGraphics3DOpenGL::DrawFogPolygon (CS_ID /*id*/, G3DPolygonDFP &/*poly*/, int /*fogtype*/)
 {
   // OpenGL driver implements vertex-based fog ...
 }

@@ -1089,147 +1089,153 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
   }
 
   // Check if special or mixed processing is required
-  if (ind != end)
-  {
-    // If we are processing a triangle (uv_coords != NULL) then
-    // we stop here because the triangle is only visible if all
-    // vertices are visible (this is not exactly true but it is
-    // easier this way! @@@ CHANGE IN FUTURE).
+  if (ind == end)
+    return true;
+
+  // If we are processing a triangle (uv_coords != NULL) then
+  // we stop here because the triangle is only visible if all
+  // vertices are visible (this is not exactly true but it is
+  // easier this way! @@@ CHANGE IN FUTURE).
 //    if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
 //      return false;
 
 #ifdef DO_HW_UVZ
-    isClipped = true;
+  isClipped = true;
 #endif
-    csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
-    csVector2 *evert = NULL;
+  csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
+  csVector2 *evert = NULL;
 
-    if (ind == source)
+  if (ind == source)
+  {
+    while (ind < end)
     {
+      if (ind->z >= SMALL_Z) { reentern = ind;  reenter = ind-1;  break; }
+      ind++;
+    }
+  }
+  else
+  {
+    exit = ind;
+    exitn = ind-1;
+    evert = dest->GetLast ();
+  }
+
+  // Check if mixed processing is required
+  if (exit || reenter)
+  {
+    bool needfinish = false;
+
+    if (exit)
+    {
+      // we know where the polygon is no longer NORMAL, now we need to
+      // to find out on which edge it becomes NORMAL again.
       while (ind < end)
       {
         if (ind->z >= SMALL_Z) { reentern = ind;  reenter = ind-1;  break; }
         ind++;
       }
-    }
+      if (ind == end)
+      { reentern = source; reenter = ind - 1; }
+      else
+        needfinish = true;
+    } /* if (exit) */
     else
     {
-      exit = ind;
-      exitn = ind-1;
-      evert = dest->GetLast ();
-    }
-
-    // Check if mixed processing is required
-    if (exit || reenter)
-    {
-     bool needfinish = false;
-
-     if (exit)
-     {
-      // we know where the polygon is no longer NORMAL, now we need to
-      // to find out on which edge it becomes NORMAL again.
-      while (ind < end)
-      {
-       if (ind->z >= SMALL_Z) { reentern = ind;  reenter = ind-1;  break; }
-       ind++;
-      }
-      if (ind == end) { reentern = source;  reenter = ind-1; }
-       else needfinish = true;
-     } /* if (exit) */
-     else
-     {
       // we know where the polygon becomes NORMAL, now we need to
       // to find out on which edge it ceases to be NORMAL.
       while (ind < end)
       {
-       if (ind->z >= SMALL_Z) dest->AddPerspective (*ind);
-       else { exit = ind;  exitn = ind-1;  break; }
-       ind++;
+        if (ind->z >= SMALL_Z)
+          dest->AddPerspective (*ind);
+        else
+        { exit = ind;  exitn = ind-1;  break; }
+        ind++;
       }
-      if (ind == end) { exit = source;  exitn = ind-1; }
+      if (ind == end)
+        { exit = source;  exitn = ind-1; }
       evert = dest->GetLast ();
-     }
+    }
 
-     // Add the NEAR points appropriately.
-#    define MAX_VALUE 1000000.
+    // Add the NEAR points appropriately.
+#define MAX_VALUE 1000000.
 
-     // First, for the exit point.
-     float ex, ey, epointx, epointy;
-     ex = exitn->z * exit->x - exitn->x * exit->z;
-     ey = exitn->z * exit->y - exitn->y * exit->z;
-     if (ABS(ex) < SMALL_EPSILON && ABS(ey) < SMALL_EPSILON)
-     {
+    // First, for the exit point.
+    float ex, ey, epointx, epointy;
+    ex = exitn->z * exit->x - exitn->x * exit->z;
+    ey = exitn->z * exit->y - exitn->y * exit->z;
+    if (ABS(ex) < SMALL_EPSILON && ABS(ey) < SMALL_EPSILON)
+    {
       // Uncommon special case:  polygon passes through origin.
       plane->WorldToCamera (trans, source[0]); //@@@ Why is this needed???
       ex = plane->GetCameraPlane ().A();
       ey = plane->GetCameraPlane ().B();
       if (ABS(ex) < SMALL_EPSILON && ABS(ey) < SMALL_EPSILON)
       {
-       // Downright rare case:  polygon near parallel with viewscreen.
-       ex = exit->x - exitn->x;
-       ey = exit->y - exitn->y;
+        // Downright rare case:  polygon near parallel with viewscreen.
+        ex = exit->x - exitn->x;
+        ey = exit->y - exitn->y;
       }
-     }
-     if (ABS(ex) > ABS(ey))
-     {
-       if (ex>0) epointx = MAX_VALUE;
-       else epointx = -MAX_VALUE;
-       epointy = (epointx - evert->x)*ey/ex + evert->y;
-     }
-     else
-     {
-       if (ey>0) epointy = MAX_VALUE;
-       else epointy = -MAX_VALUE;
-       epointx = (epointy - evert->y)*ex/ey + evert->x;
-     }
+    }
+    if (ABS(ex) > ABS(ey))
+    {
+      if (ex>0) epointx = MAX_VALUE;
+      else epointx = -MAX_VALUE;
+      epointy = (epointx - evert->x)*ey/ex + evert->y;
+    }
+    else
+    {
+      if (ey>0) epointy = MAX_VALUE;
+      else epointy = -MAX_VALUE;
+      epointx = (epointy - evert->y)*ex/ey + evert->x;
+    }
 
-     // Next, for the reentry point.
-     float rx, ry, rpointx, rpointy;
+    // Next, for the reentry point.
+    float rx, ry, rpointx, rpointy;
 
-     // Perspective correct the point.
-     float iz = csWorld::current_world->current_camera->aspect/reentern->z;
-     csVector2 rvert;
-     rvert.x = reentern->x * iz + csWorld::current_world->current_camera->shift_x;
-     rvert.y = reentern->y * iz + csWorld::current_world->current_camera->shift_y;
+    // Perspective correct the point.
+    float iz = csWorld::current_world->current_camera->aspect/reentern->z;
+    csVector2 rvert;
+    rvert.x = reentern->x * iz + csWorld::current_world->current_camera->shift_x;
+    rvert.y = reentern->y * iz + csWorld::current_world->current_camera->shift_y;
 
-     if (reenter == exit && reenter->z > -SMALL_EPSILON)
-     { rx = ex;  ry = ey; }
-     else
-     {
-       rx = reentern->z * reenter->x - reentern->x * reenter->z;
-       ry = reentern->z * reenter->y - reentern->y * reenter->z;
-     }
-     if (ABS(rx) < SMALL_EPSILON && ABS(ry) < SMALL_EPSILON)
-     {
+    if (reenter == exit && reenter->z > -SMALL_EPSILON)
+    { rx = ex;  ry = ey; }
+    else
+    {
+      rx = reentern->z * reenter->x - reentern->x * reenter->z;
+      ry = reentern->z * reenter->y - reentern->y * reenter->z;
+    }
+    if (ABS(rx) < SMALL_EPSILON && ABS(ry) < SMALL_EPSILON)
+    {
       // Uncommon special case:  polygon passes through origin.
       plane->WorldToCamera (trans, source[0]); //@@@ Why is this needed?
       rx = plane->GetCameraPlane ().A();
       ry = plane->GetCameraPlane ().B();
       if (ABS(rx) < SMALL_EPSILON && ABS(ry) < SMALL_EPSILON)
       {
-       // Downright rare case:  polygon near parallel with viewscreen.
-       rx = reenter->x - reentern->x;
-       ry = reenter->y - reentern->y;
+        // Downright rare case:  polygon near parallel with viewscreen.
+        rx = reenter->x - reentern->x;
+        ry = reenter->y - reentern->y;
       }
-     }
-     if (ABS(rx) > ABS(ry))
-     {
-       if (rx>0) rpointx = MAX_VALUE;
-       else rpointx = -MAX_VALUE;
-       rpointy = (rpointx - rvert.x)*ry/rx + rvert.y;
-     }
-     else
-     {
-       if (ry>0) rpointy = MAX_VALUE;
-       else rpointy = -MAX_VALUE;
-       rpointx = (rpointy - rvert.y)*rx/ry + rvert.x;
-     }
+    }
+    if (ABS(rx) > ABS(ry))
+    {
+      if (rx>0) rpointx = MAX_VALUE;
+      else rpointx = -MAX_VALUE;
+      rpointy = (rpointx - rvert.x)*ry/rx + rvert.y;
+    }
+    else
+    {
+      if (ry>0) rpointy = MAX_VALUE;
+      else rpointy = -MAX_VALUE;
+      rpointx = (rpointy - rvert.y)*rx/ry + rvert.x;
+    }
 
-#    define QUADRANT(x,y) ( (y<x?1:0)^(x<-y?3:0) )
-#    define MQUADRANT(x,y) ( (y<x?3:0)^(x<-y?1:0) )
+#define QUADRANT(x,y) ( (y<x?1:0)^(x<-y?3:0) )
+#define MQUADRANT(x,y) ( (y<x?3:0)^(x<-y?1:0) )
 
     dest->AddVertex (epointx,epointy);
-#   if EXPERIMENTAL_BUG_FIX
+#if EXPERIMENTAL_BUG_FIX
     if (mirror)
     {
       int quad = MQUADRANT(epointx, epointy);
@@ -1262,43 +1268,40 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
         quad = (quad+1)&3;
       }
     }
-#   endif
+#endif
     dest->AddVertex (rpointx,rpointy);
 
-     // Add the rest of the vertices, which are all NORMAL points.
-     if (needfinish) while (ind < end)
-      dest->AddPerspective (*ind++);
+    // Add the rest of the vertices, which are all NORMAL points.
+    if (needfinish) while (ind < end)
+     dest->AddPerspective (*ind++);
 
-    } /* if (exit || reenter) */
-
-    // Do special processing (all points are NEAR or BEHIND)
+  } /* if (exit || reenter) */
+  // Do special processing (all points are NEAR or BEHIND)
+  else
+  {
+    if (mirror)
+    {
+      csVector3* ind2 = end - 1;
+      for (ind = source;  ind < end;  ind2=ind, ind++)
+        if ((ind->x - ind2->x)*(ind2->y) - (ind->y - ind2->y)*(ind2->x) > -SMALL_EPSILON)
+          return false;
+      dest->AddVertex ( MAX_VALUE,-MAX_VALUE);
+      dest->AddVertex ( MAX_VALUE, MAX_VALUE);
+      dest->AddVertex (-MAX_VALUE, MAX_VALUE);
+      dest->AddVertex (-MAX_VALUE,-MAX_VALUE);
+    }
     else
     {
-      if (mirror)
-      {
-        csVector3* ind2 = end - 1;
-        for (ind = source;  ind < end;  ind2=ind, ind++)
-          if ((ind->x - ind2->x)*(ind2->y) - (ind->y - ind2->y)*(ind2->x) > -SMALL_EPSILON)
-            return false;
-        dest->AddVertex ( MAX_VALUE,-MAX_VALUE);
-        dest->AddVertex ( MAX_VALUE, MAX_VALUE);
-        dest->AddVertex (-MAX_VALUE, MAX_VALUE);
-        dest->AddVertex (-MAX_VALUE,-MAX_VALUE);
-      }
-      else
-      {
-        csVector3* ind2 = end - 1;
-        for (ind = source;  ind < end;  ind2=ind, ind++)
-          if ((ind->x - ind2->x)*(ind2->y) - (ind->y - ind2->y)*(ind2->x) < SMALL_EPSILON)
-            return false;
-        dest->AddVertex (-MAX_VALUE,-MAX_VALUE);
-        dest->AddVertex (-MAX_VALUE, MAX_VALUE);
-        dest->AddVertex ( MAX_VALUE, MAX_VALUE);
-        dest->AddVertex ( MAX_VALUE,-MAX_VALUE);
-      }
+      csVector3* ind2 = end - 1;
+      for (ind = source;  ind < end;  ind2=ind, ind++)
+        if ((ind->x - ind2->x)*(ind2->y) - (ind->y - ind2->y)*(ind2->x) < SMALL_EPSILON)
+          return false;
+      dest->AddVertex (-MAX_VALUE,-MAX_VALUE);
+      dest->AddVertex (-MAX_VALUE, MAX_VALUE);
+      dest->AddVertex ( MAX_VALUE, MAX_VALUE);
+      dest->AddVertex ( MAX_VALUE,-MAX_VALUE);
     }
-
-  } /* if (ind != end) */
+  }
   return true;
 }
 

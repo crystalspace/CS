@@ -1520,7 +1520,7 @@ void csGraphics3DGlide2x::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
 {
 }
 
-void csGraphics3DGlide2x::AddFogPolygon (CS_ID /*id*/, G3DPolygonAFP& /*poly*/, 
+void csGraphics3DGlide2x::DrawFogPolygon (CS_ID /*id*/, G3DPolygonDFP& /*poly*/, 
   int /*fogtype*/)
 {
 }

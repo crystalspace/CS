@@ -514,8 +514,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   int num_indices;
   if (onode->GetMiniBspVerts ())
   {
-    // Here we get the polygon set as the static thing from the
-    // sector itself.
+    // Here we get the polygon set as the static thing from the sector itself.
     csPolygonSet* pset = (csPolygonSet*)(otree->GetSector ()->GetStaticThing ());
     cam = pset->GetCameraVertices ();
     indices = onode->GetMiniBspVerts ();
@@ -640,7 +639,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 // Z buffer. Aside from the fact that they clip geometry in 3D
 // that passes through the portal. Note that 3D sprites don't
 // currently support 3D geometry clipping yet.
-
 
 void csSector::Draw (csRenderView& rview)
 {
@@ -901,50 +899,35 @@ void csSector::Draw (csRenderView& rview)
       // Tell the world to try to add this light into the halo queue
       csWorld::current_world->AddHalo ((csLight *)lights.Get (i));
 
+  // Handle the fog, if any
   if (fogmethod != G3DFOGMETHOD_NONE)
   {
-    G3DPolygonAFP g3dpoly;
-    int i;
+    G3DPolygonDFP g3dpoly;
     if (fogmethod == G3DFOGMETHOD_ZBUFFER)
     {
       g3dpoly.num = rview.view->GetNumVertices ();
-      if (rview.GetSector () == this)
+      csVector2 *clipview = rview.view->GetClipPoly ();
+      memcpy (g3dpoly.vertices, clipview, g3dpoly.num * sizeof (csVector2));
+      if (rview.GetSector () == this && draw_busy == 0)
       {
         // Since there is fog in the current camera sector we simulate
         // this by adding the view plane polygon.
-        for (i = 0 ; i < g3dpoly.num ; i++)
-        {
-          g3dpoly.vertices[g3dpoly.num-i-1].sx = rview.view->GetVertex (i).x;
-          g3dpoly.vertices[g3dpoly.num-i-1].sy = rview.view->GetVertex (i).y;
-        }
-        rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_VIEW);
+        rview.g3d->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_VIEW);
       }
       else
       {
         // We must add a FRONT fog polygon for the clipper to this sector.
-        if (rview.IsMirrored ())
-          for (i = 0 ; i < g3dpoly.num ; i++)
-          {
-            g3dpoly.vertices[g3dpoly.num-i-1].sx = rview.view->GetVertex (i).x;
-            g3dpoly.vertices[g3dpoly.num-i-1].sy = rview.view->GetVertex (i).y;
-          }
-        else
-          for (i = 0 ; i < g3dpoly.num ; i++)
-          {
-            g3dpoly.vertices[i].sx = rview.view->GetVertex (i).x;
-            g3dpoly.vertices[i].sy = rview.view->GetVertex (i).y;
-          }
         g3dpoly.normal.A = -rview.clip_plane.A ();
         g3dpoly.normal.B = -rview.clip_plane.B ();
         g3dpoly.normal.C = -rview.clip_plane.C ();
         g3dpoly.normal.D = -rview.clip_plane.D ();
         g3dpoly.inv_aspect = rview.inv_aspect;
-        rview.g3d->AddFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
+        rview.g3d->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
       }
     }
     else if (fogmethod == G3DFOGMETHOD_VERTEX && rview.added_fog_info)
     {
-      csFogInfo* fog_info = rview.fog_info;
+      csFogInfo *fog_info = rview.fog_info;
       rview.fog_info = rview.fog_info->next;
       CHK (delete fog_info);
     }

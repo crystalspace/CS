@@ -369,7 +369,7 @@ public:
    * fog is drawn as an additional texture on each polygon that
    * is effected by the fog.
    */
-  virtual void AddFogPolygon (CS_ID id, G3DPolygonAFP& poly, int fogtype);
+  virtual void DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fogtype);
         
   /**
    * Close a volumetric fog object. After the volumetric object is

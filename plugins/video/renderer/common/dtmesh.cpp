@@ -233,9 +233,8 @@ static DECLARE_GROWING_ARRAY (visible, bool);
 /// Array with colors.
 static DECLARE_GROWING_ARRAY (color_verts, csColor);
 
-void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransform& o2c,
-	csClipper* clipper, float aspect,
-	int width2, int height2)
+void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
+  csTransform& o2c, csClipper* clipper, float aspect, int width2, int height2)
 {
   int i;
 
@@ -394,7 +393,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d, csTransfo
       int rescount = 0;
       if (mesh.do_clip && clipper)
       {
-        if (!clipper->Clip (triangle, clipped_triangle, 3, rescount)) continue;
+        if (!clipper->Clip (triangle, 3, clipped_triangle, rescount)) continue;
         poly.num = rescount;
       }
       else

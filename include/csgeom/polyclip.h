@@ -27,6 +27,54 @@
 
 class Dumper;
 
+/// Maximal number of vertices in output (clipped) polygons
+#define MAX_OUTPUT_VERTICES	64
+
+/**
+ * Clipper return codes.<p>
+ * The clipper routines return one of the values below so that we can
+ * distinguish between the cases when input polygon is completely outside
+ * the clipping polygon (thus it is not visible), completely inside the
+ * clipping polygon (thus it has not changed) and partially outside,
+ * partially inside (thus it was clipped).
+ */
+
+/// The input polygon is completely outside of clipper polygon
+#define CS_CLIP_OUTSIDE		0
+/// The input polygon is completely inside (thus has not changed)
+#define CS_CLIP_INSIDE		1
+/// The input polygon was partially inside, partially outside
+#define CS_CLIP_CLIPPED		2
+
+/**
+ * The clipper can output additional information about each vertex in
+ * output polygon. This is used for generating U/V/Z values and so on,
+ * if they are needed.
+ */
+struct csVertexStatus
+{
+  /// The type of vertex: unmodified original, on the edge of original, other
+  unsigned char Type;
+  /// Original vertex number (for CS_VERTEX_ORIGINAL and CS_VERTEX_ONEDGE)
+  unsigned char Vertex;
+  /// Additional information for CS_VERTEX_ONEDGE (0..1, the 't' parameter)
+  float Pos;
+};
+
+/**
+ * The following are possible values for csVertexStatus.Type field.
+ * The csVertexStatus is used by csClipper:Clip() routine which is
+ * able to output a status structure corresponding to each output vertex.
+ * This information is usually used to clip other information associated
+ * with polygon vertices (i.e. z, u, v and such).
+ */
+/// The output vertex is one of the input vertices
+#define CS_VERTEX_ORIGINAL	0
+/// The output vertex is located on one of the edges of the original polygon
+#define CS_VERTEX_ONEDGE	1
+/// The output vertex is located somewhere inside the original polygon
+#define CS_VERTEX_INSIDE	2
+
 /**
  * The csClipper class is an abstract parent to all 2D clipping objects.
  */
@@ -35,25 +83,37 @@ class csClipper
 protected:
   /// This variable holds a pool for 2D polygons as used by the clipper.
   static csPoly2DPool polypool;
-  /// Did we really clipp the poly
-  bool bClipped;
-  
+
 public:
   /**
-   * Clip a set of 2D points and return in 'dest_poly'.
-   * 'dest_poly' must be big enough to hold the clipped polygon.
-   * Return 0 if polygon is not visible (clipped away).
+   * Clip a set of 2D points and return in 'OutPolygon' which is expected
+   * to contain space at least for MAX_OUTPUT_VERTICES elements.
+   * Returns one of CS_CLIP_XXX values defined above.
    */
-  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
-  	int &OutCount) = 0;
+  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+    csVector2 *OutPolygon, int &OutCount) = 0;
 
   /**
-   * Clip a set of 2D points and return them in the same array.
-   * On input MaxCount contains number of elements that Output can hold.
+   * Clip a set of 2D points.
    * On output Count is set to number of vertices in output polygon.
+   * The output array is expected to contain space for at least
+   * MAX_OUTPUT_VERTICES elements. The bounding box is set to the
+   * minimal rectangle that contains the output polygon.
+   * Returns one of CS_CLIP_XXX values defined above.
    */
-  virtual bool Clip (csVector2 *Polygon, int &Count, int MaxCount, 
-                     csBox *BoundingBox) = 0;
+  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+    csVector2 *OutPolygon, int &OutCount, csBox &BoundingBox) = 0;
+
+  /**
+   * Same as above but provides additional information on each output
+   * vertex. The information type can be: vertex is one of original vertices,
+   * vertex is on the edge of the original polygon and vertex is arbitrary
+   * located inside the original polygon. Both OutPolygon and OutStatus
+   * arrays are expected to have enough storage for at least
+   * MAX_OUTPUT_VERTICES elements.
+   */
+  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+    csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus) = 0;
 
   /**
    * Classify some bounding box against this clipper.
@@ -63,22 +123,23 @@ public:
    * <li> 0 if box is partially visible.
    * <li> 1 if box is entirely visible.
    */
-  virtual int ClassifyBox (csBox* box) = 0;
+  virtual int ClassifyBox (csBox &box) = 0;
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (float x, float y) = 0;
 
+  /// Same as above but takes a csVector2
+  inline bool IsInside (const csVector2 &v)
+  { return IsInside (v.x, v.y); }
+
   /// Return number of vertices for this clipper polygon.
   virtual int GetNumVertices () = 0;
 
-  /// Return vertex at index for this clipper polygon.
-  virtual const csVector2 GetVertex (int i) = 0;
-
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly () = 0;
-  
-  /// Return whether we applied clipping ( or the poly was fully within the area )
-  bool Clipped(){ return bClipped; }
+
+  /// Wrapper function: clip a polygon in-place.
+  UByte Clip (csVector2 *InPolygon, int &InOutCount, csBox &BoundingBox);
 };
 
 /**
@@ -87,12 +148,12 @@ public:
  */
 class csBoxClipper : public csClipper
 {
-  ///
+  /// The clipping region
   csBox region;
-  ///
+  /// The vertices of clipping region (for GetClipPoly ())
   csVector2 ClipBox [4];
 
-  ///
+  /// Helper function for constructors
   inline void InitClipBox ()
   {
     ClipBox [0].Set (region.MinX (), region.MinY ());
@@ -106,41 +167,31 @@ public:
   csBoxClipper (const csBox& b) : region (b)
   { InitClipBox (); }
   /// Initializes the clipper object to a rectangle with the given coords.
-  csBoxClipper (float x1, float y1, float x2, float y2) : region(x1,y1,x2,y2)
+  csBoxClipper (float x1, float y1, float x2, float y2) : region (x1,y1,x2,y2)
   { InitClipBox (); }
 
-  /// Clip a to dest_poly.
-  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
-  	int &OutCount);
+  /// Simple clipping
+  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+    csVector2 *OutPolygon, int &OutCount);
 
-  /**
-   * Clip a set of 2D points and return them in the same array.
-   * On input MaxCount contains number of elements that Output can hold.
-   * On output Count is set to number of vertices in output polygon
-   */
-  virtual bool Clip (csVector2 *Polygon, int &Count, int MaxCount, 
-                     csBox *BoundingBox);
+  /// Clip and compute the bounding box
+  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+    csVector2 *OutPolygon, int &OutCount, csBox &BoundingBox);
+
+  /// Clip and return additional information about each vertex
+  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+    csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus);
 
   /// Classify some bounding box against this clipper.
-  virtual int ClassifyBox (csBox* box);
+  virtual int ClassifyBox (csBox &box);
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
-  virtual bool IsInside (float x, float y) { return region.In (x,y); }
+  virtual bool IsInside (float x, float y)
+  { return region.In (x,y); }
 
   /// Return number of vertices for this clipper polygon.
-  virtual int GetNumVertices () { return 4; }
-
-  /// Return vertex at index for this clipper polygon.
-  virtual const csVector2 GetVertex (int i)
-  {
-    switch (i)
-    {
-      case 0: return csVector2 (region.MinX (), region.MinY ());
-      case 1: return csVector2 (region.MaxX (), region.MinY ());
-      case 2: return csVector2 (region.MaxX (), region.MaxY ());
-      default: return csVector2 (region.MinX (), region.MaxY ());
-    }
-  }
+  virtual int GetNumVertices ()
+  { return 4; }
 
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly ()
@@ -148,32 +199,25 @@ public:
 };
 
 /**
- * The csPolygonClipper class can be used for clipping any convex polygon
- * with any other polygon. The clipper object should be used, if possible,
+ * The csPolygonClipper class can be used for clipping any polygon against
+ * any other convex polygon. The clipper object should be used, if possible,
  * for many polygons (for example, a 3D sprite can initialize a clipper
  * object then clip all of its triangle against it at once) as the
  * initialization of clipper polygon involves some (although not too
  * expensive) calculations.
- * Both clipped and clipping polygons *should* be convex as the result
- * of intersection of two non-convex polygons can result in more than
- * one resulting polygon, and this class does not handle that.
+ * The clipping polygon *should* be convex since the routine does not
+ * expect any line to intersect the edge of clipping polygon more than twice.
  */
 class csPolygonClipper : public csClipper
 {
   friend class Dumper;
 
-  /// Private structure for keeping pre-calculated some data
-  struct SegData
-  {
-    float dx, dy;
-  };
-
   /// Equation for all edges of clipping polygon
-  SegData *ClipData;
+  csVector2 *ClipData;
   /// Clipper polygon itself
   csVector2 *ClipPoly;
   /// A pointer to the pooled polygon (so that we can free it later).
-  csPoly2D* ClipPoly2D;
+  csPoly2D *ClipPoly2D;
   /// Number of vertices in clipper polygon
   int ClipPolyVertices;
   /// Clipping polygon bounding box
@@ -192,29 +236,26 @@ public:
   /// Destroy the polygon clipper object.
   virtual ~csPolygonClipper ();
 
-  /// Clip to dest_poly.
-  virtual bool Clip (csVector2 *Polygon, csVector2* dest_poly, int Count,
-  	int &OutCount);
+  /// Simple clipping
+  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+    csVector2 *OutPolygon, int &OutCount);
 
-  /**
-   * Clip a set of 2D points and return them in the same array.
-   * On input MaxCount contains number of elements that Output can hold.
-   * On output Count is set to number of vertices in output polygon.
-   */
-  virtual bool Clip (csVector2 *Polygon, int &Count, int MaxCount, 
-                     csBox *BoundingBox);
+  /// Clip and compute the bounding box
+  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+    csVector2 *OutPolygon, int &OutCount, csBox &BoundingBox);
+
+  /// Clip and return additional information about each vertex
+  virtual UByte Clip (csVector2 *InPolygon, int InCount,
+    csVector2 *OutPolygon, int &OutCount, csVertexStatus *OutStatus);
 
   /// Classify some bounding box against this clipper.
-  virtual int ClassifyBox (csBox* box);
+  virtual int ClassifyBox (csBox &box);
 
   /// Return true if given point is inside (or on bound) of clipper polygon.
   virtual bool IsInside (float x, float y);
 
   /// Return number of vertices for this clipper polygon.
   virtual int GetNumVertices () { return ClipPolyVertices; }
-
-  /// Return vertex at index for this clipper polygon.
-  virtual const csVector2 GetVertex (int i) { return ClipPoly[i]; }
 
   /// Return a pointer to the array of csVector2's
   virtual csVector2 *GetClipPoly ()
