@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 4-Sep-2003
+	- Peter Amstutz fixed the csPolyTexture destructor (part of
+	  the thing plugin) to not try to deallocate the lightmap 
+	  (and thus crash) if the lightmap is actually NULL
 	- Peter Amstutz added new API documentation for the
           parameters of about 75% of the methods defined in iEngine
 	- Jorrit updated the collision detection howto and also clarified
