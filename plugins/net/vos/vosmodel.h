@@ -26,6 +26,7 @@
 
 #include <vos/metaobjects/a3dl/model.hh>
 #include <vos/metaobjects/a3dl/actor.hh>
+#include "imesh/mdldata.h"
 #include "inetwork/vosa3dl.h"
 #include "csvosa3dl.h"
 #include "vosobject3d.h"
@@ -36,6 +37,13 @@ class csMetaModel : public virtual csMetaObject3D,
 {
 private:
   bool alreadyLoaded;
+  csRef<iDataBuffer> databuf;
+  std::string modeldatatype;
+  A3DL::ActionEvent::EventType eventType;
+  std::string action;
+  bool valid;
+  boost::mutex model_data_mutex;
+
 public:
   csMetaModel(VOS::VobjectBase* superobject);
 
@@ -44,6 +52,16 @@ public:
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
   virtual void notifyActionChange(const A3DL::ActionEvent& ae);
+
+  std::string getModelDatatype() { return modeldatatype; }
+  csRef<iDataBuffer> getDatabuf();
+  A3DL::ActionEvent::EventType getEventType() { return eventType; }
+  std::string getAction() { return action; }
+
+  virtual void notifyChildInserted(VOS::VobjectEvent& e);
+  virtual void notifyChildRemoved(VOS::VobjectEvent& e);
+
+  virtual void notifyPropertyChange(const VOS::PropertyEvent& event);
 };
 
 #endif

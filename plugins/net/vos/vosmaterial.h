@@ -43,6 +43,8 @@ class csMetaMaterial :
 protected:
   csRef<iMaterialWrapper> materialwrapper;
   bool alreadyLoaded;
+  csVosA3DL* vosa3dl;
+  bool needListener;
 
   static csRef<iMaterialWrapper> checkerboard;
 
@@ -62,6 +64,8 @@ public:
 
   /** Get the "checkerboard" default pattern. */
   static csRef<iMaterialWrapper> GetCheckerboard();
+
+  void updateMaterial();
 
   virtual void notifyPropertyChange(const VOS::PropertyEvent& event);
   virtual void notifyChildInserted(VOS::VobjectEvent& event);

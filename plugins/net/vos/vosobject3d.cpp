@@ -44,11 +44,11 @@ SCF_IMPLEMENT_IBASE_END
 
 /// csVosObject3D ///
 
-csVosObject3D::csVosObject3D(A3DL::Object3D* obj3d, VUtil::RefCounted* rc)
+csVosObject3D::csVosObject3D(csMetaObject3D* obj3d, VUtil::RefCounted* rc)
 {
   if(rc) {
-  rc->acquire();
-  object3d.assign(obj3d, false);
+    rc->acquire();
+    object3d.assign(obj3d, false);
   } else object3d.assign(obj3d, true);
 
   SCF_CONSTRUCT_IBASE (0);
@@ -68,6 +68,13 @@ csRef<iMeshWrapper> csVosObject3D::GetMeshWrapper()
 
 void csVosObject3D::SetMeshWrapper(iMeshWrapper* mw)
 {
+  LOG("vosobject3d", 2, "setting mesh wrapper!!!");
+  if(meshwrapper.IsValid()) {
+    csRef<iEngine> engine = CS_QUERY_REGISTRY (object3d->getVosA3DL()->GetObjectRegistry(),
+                                               iEngine);
+  meshwrapper->QueryObject()->ObjRemove(this);
+    engine->GetMeshes()->Remove(meshwrapper);
+  }
   meshwrapper = mw;
   meshwrapper->QueryObject()->ObjAdd(this);
 }
@@ -194,6 +201,21 @@ public:
 };
 
 
+// Set material task
+
+class MaterialTask : public Task
+{
+  vRef<csMetaObject3D> obj;
+  csRef<iMaterialWrapper> material;
+
+public:
+  MaterialTask (csMetaObject3D *o, csRef<iMaterialWrapper> m)
+    : obj(o, true), material(m) {}
+  ~MaterialTask () {}
+
+  void doTask() { obj->changeMaterial (material); }
+};
+
 
 /// csMetaObject3D ///
 
@@ -303,6 +325,7 @@ void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   LOG("csMetaObject3D", 3, "now in csMetaObject3D::setup");
 
   this->vosa3dl = vosa3dl;
+  sector = sect;
 
   vosa3dl->mainThreadTasks.push(GetSetupTask(vosa3dl, sect));
 
@@ -329,6 +352,21 @@ void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
     {
     }
   }
+
+  if(event.getContextualName() == "a3dl:material") {
+    try
+    {
+      metamaterial = VOS::meta_cast<csMetaMaterial> (getMaterial());
+      LOG("vosobject3d", 3, "getting material " << metamaterial.isValid());
+      metamaterial->Setup(vosa3dl);
+
+      updateMaterial();
+    }
+    catch(std::runtime_error& e)
+    {
+      LOG("vosobject3d", 2, "Got error " << e.what());
+    }
+  }
 }
 
 void csMetaObject3D::notifyChildRemoved (VobjectEvent &event)
@@ -339,7 +377,8 @@ void csMetaObject3D::notifyChildRemoved (VobjectEvent &event)
   {
     try
     {
-      meta_cast<Property> (event.getChild())->removePropertyListener (this);
+      vRef<Property> prop = meta_cast<Property> (event.getOldChild());
+      if (prop.isValid()) prop->removePropertyListener (this);
     }
     catch (...)
     {
@@ -350,29 +389,9 @@ void csMetaObject3D::notifyChildRemoved (VobjectEvent &event)
 void csMetaObject3D::notifyChildReplaced (VobjectEvent &event)
 {
   LOG ("vosobject3d", 4, "notifyChildReplaced " << event.getContextualName());
-  if (event.getContextualName() == "a3dl:position" ||
-      event.getContextualName() == "a3dl:orientation")
-  {
-    try
-    {
-      vRef<Property> prop = meta_cast<Property> (event.getOldChild());
-    if (prop.isValid()) prop->removePropertyListener (this);
-    }
-    catch (...)
-    {
-    }
 
-    try
-    {
-      vRef<Property> p = meta_cast<Property> (event.getChild());
-      p->addParentListener (&DoNothingListener::static_);
-      p->addPropertyListener (this);
-      p->setPriority (Message::LowLatency);
-    }
-    catch (...)
-    {
-    }
-  }
+  notifyChildRemoved(event);
+  notifyChildInserted(event);
 }
 
 void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
@@ -394,7 +413,9 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
             << "\", prop read is \""
             << event.getProperty()->read() << "\" and getPos() gave us "
             << x << " " << y << " " << z);
-        vosa3dl->mainThreadTasks.push (new PositionTask(this,csVector3((float)x, (float)y, (float)z)));
+        vosa3dl->mainThreadTasks.push (new PositionTask(this,csVector3((float)x,
+                                                                       (float)y,
+                                                                       (float)z)));
       }
       else if (pcr->getContextualName() == "a3dl:orientation")
       {
@@ -446,8 +467,24 @@ void csMetaObject3D::changeOrientation (const csMatrix3 &ori)
 
   if (csvobj3d->GetCollider().IsValid())
   {
-  csvobj3d->GetCollider()->SetOrientation(ori);
+    csvobj3d->GetCollider()->SetOrientation(ori);
   }
+}
+
+void csMetaObject3D::changeMaterial (iMaterialWrapper* mat)
+{
+  LOG("vosobject3d", 2, "change material!");
+  csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
+  if (mw.IsValid())
+  {
+    mw->GetMeshObject()->SetMaterialWrapper(mat);
+  }
+}
+
+void csMetaObject3D::updateMaterial ()
+{
+  vosa3dl->mainThreadTasks.push (new MaterialTask(this,
+                                                  metamaterial->GetMaterialWrapper()));
 }
 
 csRef<csVosObject3D> csMetaObject3D::GetCSinterface()

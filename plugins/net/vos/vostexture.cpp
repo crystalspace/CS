@@ -37,9 +37,38 @@
 #endif
 
 #include "vostexture.h"
+#include "vosmaterial.h"
 
 using namespace VUtil;
 using namespace VOS;
+
+/// UpdateTextureTask ///
+
+class TextureUpdateTask : public Task
+{
+public:
+  bool* needListener;
+  vRef<csMetaTexture> metatxt;
+  virtual void doTask();
+};
+
+void TextureUpdateTask::doTask()
+{
+  if(*needListener) {
+    metatxt->addChildListener(metatxt);
+    *needListener = false;
+  }
+
+  // now go through our parents and let them know that this material is ready
+  for(ParentSetIterator i = metatxt->getParents(); i.hasMore(); i++) {
+    if((*i)->getContextualName() == "a3dl:texture") {
+      vRef<csMetaMaterial> mm = meta_cast<csMetaMaterial>((*i)->getParent());
+      if(mm.isValid()) mm->updateMaterial();
+    }
+  }
+}
+
+/// ConstructTextureTask ///
 
 class ConstructTextureTask : public Task
 {
@@ -49,6 +78,7 @@ public:
   std::string texturedata;
   std::string cachefilename;
   vRef<csMetaTexture> metatxt;
+  bool* needListener;
 
   ConstructTextureTask(iObjectRegistry *objreg, const std::string& name,
                          const std::string& cache, csMetaTexture* mt);
@@ -107,9 +137,14 @@ void ConstructTextureTask::doTask()
   }
 
   metatxt->texturewrapper = texture;
+
+  TextureUpdateTask* tut = new TextureUpdateTask;
+  tut->metatxt = metatxt;
+  tut->needListener = needListener;
+  TaskQueue::defaultTQ().addTask(tut);
 }
 
-
+/// ConstructMozTextureTask ///
 
 class ConstructMozTextureTask : public Task
 {
@@ -164,12 +199,14 @@ void ConstructMozTextureTask::doTask()
 
   metatxt->texturewrapper = tw;
 #endif
-    LOG("ConstructMozTextureTask", 1, "Warning: No iMozilla support; can't use HTML textures.");
+    LOG("ConstructMozTextureTask", 2, "Warning: No iMozilla support; can't use HTML textures.");
 }
 
 
+/// csMetaTexture ///
+
 csMetaTexture::csMetaTexture(VobjectBase* superobject)
-    : A3DL::Texture(superobject), alreadyLoaded(false)
+  : A3DL::Texture(superobject), alreadyLoaded(false), needListener(true)
 {
 }
 
@@ -181,6 +218,8 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
 {
   if(alreadyLoaded) return;
   else alreadyLoaded = true;
+
+  this->vosa3dl = vosa3dl;
 
   vRef<Property> imagedata = getImage();
 
@@ -218,9 +257,9 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
       vosa3dl->GetObjectRegistry(), getURLstr(),
       cachefilename, this);
     imagedata->read(ctt->texturedata);
+    ctt->needListener = &needListener;
     vosa3dl->mainThreadTasks.push(ctt);
   }
-  //addChildListener(this);
 }
 
 void csMetaTexture::notifyPropertyChange(const PropertyEvent& event)
@@ -230,7 +269,8 @@ void csMetaTexture::notifyPropertyChange(const PropertyEvent& event)
     vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
     if(pcr->getContextualName() == "a3dl:image")
     {
-      // XXX reload the image and stuff
+      alreadyLoaded = false;
+      Setup(vosa3dl);
     }
   }
   catch(NoSuchObjectError) { }

@@ -43,9 +43,11 @@ class csMetaTexture :
   public VOS::PropertyListener
 {
 private:
-  iObjectRegistry *object_reg;
+  iObjectRegistry* object_reg;
   csRef<iTextureWrapper> texturewrapper;
   bool alreadyLoaded;
+  csVosA3DL* vosa3dl;
+  bool needListener;
 
 public:
   csMetaTexture(VOS::VobjectBase* superobject);

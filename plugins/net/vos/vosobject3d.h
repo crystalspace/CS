@@ -34,6 +34,9 @@
 
 #include "csvosa3dl.h"
 #include "vossector.h"
+#include "vosmaterial.h"
+
+class csMetaObject3D;
 
 class csVosObject3D : public csObject,
                       public iVosObject3D,
@@ -43,12 +46,12 @@ class csVosObject3D : public csObject,
 private:
   csRef<iMeshWrapper> meshwrapper;
   csRef<iRigidBody> collider;
-  VUtil::vRef<A3DL::Object3D> object3d;
+  VUtil::vRef<csMetaObject3D> object3d;
 
 public:
   SCF_DECLARE_IBASE;
 
-  csVosObject3D(A3DL::Object3D* obj3d, VUtil::RefCounted* rc);
+  csVosObject3D(csMetaObject3D* obj3d, VUtil::RefCounted* rc);
   virtual ~csVosObject3D();
 
   virtual csRef<iMeshWrapper> GetMeshWrapper();
@@ -72,7 +75,9 @@ class csMetaObject3D : public virtual A3DL::Object3D,
 protected:
   bool alreadyLoaded;
   csRef<csVosObject3D> csvobj3d;
-  csVosA3DL *vosa3dl;
+  csRef<csVosA3DL> vosa3dl;
+  csRef<csVosSector> sector;
+  VUtil::vRef<csMetaMaterial> metamaterial;
 
 public:
   csMetaObject3D(VOS::VobjectBase* superobject);
@@ -88,7 +93,10 @@ public:
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
   VUtil::Task* GetSetupTask(csVosA3DL* vosa3dl, csVosSector* sect);
 
+  void updateMaterial ();
+
   csRef<csVosObject3D> GetCSinterface();
+  VUtil::vRef<csMetaMaterial> getMetaMaterial() { return metamaterial; }
 
   // Child change listener for events
   virtual void notifyChildInserted (VOS::VobjectEvent &event);
@@ -103,11 +111,11 @@ public:
   virtual void changePosition (const csVector3 &pos);
   virtual void changeOrientation (const csMatrix3 &ori);
 
+  virtual void changeMaterial (iMaterialWrapper* mat);
+
   // This is commented out because CS does not support dynamically changing
   // scaling of objects
   //virtual void changeScaling (const csMatrix3 &scaling)
-
-
 };
 
 #endif

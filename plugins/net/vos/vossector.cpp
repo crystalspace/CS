@@ -123,6 +123,7 @@ void LoadObjectTask::doTask()
   {
     if (toRemove)
     {
+      LOG("LoadObjectTask", 3, "Removing object from sector");
       sector->removeObject3D (obj3d->GetCSinterface());
       sector->GetSector()->GetMeshes()->Remove (wrapper);
       //wrapper->GetMovable()->GetSectors()->Remove (sector->GetSector());
@@ -360,7 +361,7 @@ void csVosSector::notifyChildRemoved (VobjectEvent &event)
   if(obj3d.isValid())
   {
     vosa3dl->mainThreadTasks.push(new LoadObjectTask( vosa3dl, obj3d,
-                                                      this, true));
+                                                        this, true));
   }
   else
   {

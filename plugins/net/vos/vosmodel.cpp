@@ -27,7 +27,6 @@
 #include "imesh/sprite3d.h"
 #include "imesh/object.h"
 #include "imesh/mdlconv.h"
-#include "imesh/mdldata.h"
 #include "imesh/crossbld.h"
 #include "cstool/mdltool.h"
 #include "csutil/databuf.h"
@@ -36,42 +35,65 @@
 
 #include "csvosa3dl.h"
 #include "vosmodel.h"
-#include "vosmaterial.h"
 
 using namespace VUtil;
 using namespace VOS;
+
+class SetModelAnimTask : public Task
+{
+public:
+  vRef<csMetaModel> model;
+  char* action;
+  A3DL::ActionEvent::EventType evtype;
+
+  SetModelAnimTask(csMetaModel* m, const char* a, A3DL::ActionEvent::EventType et)
+    : model(m, true), evtype(et)
+    {
+      action = strdup(a);
+    }
+
+  virtual ~SetModelAnimTask()
+    {
+      free(action);
+    }
+
+  virtual void doTask()
+    {
+      if(model->GetCSinterface()->GetMeshWrapper().IsValid()) {
+        csRef<iSprite3DState> spstate = SCF_QUERY_INTERFACE(
+          model->GetCSinterface()->GetMeshWrapper()->GetMeshObject (),
+          iSprite3DState);
+
+        if(evtype == A3DL::ActionEvent::SetActionCycle) {
+          spstate->SetAction (action);
+        } else if(evtype == A3DL::ActionEvent::DoActionOnce) {
+          spstate->SetOverrideAction (action);
+        }
+      }
+    }
+};
+
+
+/// ConstructModelTask ///
 
 class ConstructModelTask : public Task
 {
 public:
   iObjectRegistry *object_reg;
-  vRef<csMetaMaterial> metamat;
   vRef<csMetaModel> model;
-  std::string name;
   csRef<iSector> sector;
-  csRef<iDataBuffer> databuf;
-  std::string datatype;
 
   ConstructModelTask(iObjectRegistry *objreg,
-                     vRef<csMetaMaterial> mat,
                      csMetaModel* m,
-                     const std::string& n,
-                     iSector *s,
-                     csRef<iDataBuffer> databuf,
-                     const std::string& datatype);
+                     iSector *s);
   virtual ~ConstructModelTask();
   virtual void doTask();
 };
 
 ConstructModelTask::ConstructModelTask (iObjectRegistry *objreg,
-                                        vRef<csMetaMaterial> mat,
                                         csMetaModel* m,
-                                        const std::string& n,
-                                        iSector *s,
-                                        csRef<iDataBuffer> db,
-                                        const std::string& dt)
-  : object_reg(objreg), metamat(mat), model(m, true),
-    name(n), sector(s), databuf(db), datatype(dt)
+                                        iSector *s)
+  : object_reg(objreg), model(m, true), sector(s)
 {
 }
 
@@ -153,13 +175,13 @@ void ConstructModelTask::doTask()
   if (!modconv || !xbuild)
   {
     LOG ("ConstructModelTask", 2, "Failed to load model converter and cross builder plugins, " <<
-         "ignoring model (" << name << ")");
+         "ignoring model (" << model->getURLstr() << ")");
     return;
   }
 
   LOG ("ConstructModelTask", 3, "Loading into model converter");
-  csRef<iModelData> data = modconv->Load (databuf->GetUint8(),
-    databuf->GetSize());
+  csRef<iModelData> data = modconv->Load (model->getDatabuf()->GetUint8(),
+                                          model->getDatabuf()->GetSize());
   if (!data)
   {
     LOG ("ConstructModelTask", 2, "Could not load model using converter");
@@ -172,9 +194,9 @@ void ConstructModelTask::doTask()
 
   LOG ("ConstructModelTask", 3, "Creating factory");
   csRef<iMeshFactoryWrapper> factory;
-  if(metamat.isValid()) {
+  if(model->getMetaMaterial().isValid()) {
     factory = xbuild->BuildSpriteFactoryHierarchy (
-      data, engine, metamat->GetMaterialWrapper());
+      data, engine, model->getMetaMaterial()->GetMaterialWrapper());
   }
   else
   {
@@ -187,15 +209,21 @@ void ConstructModelTask::doTask()
     LOG ("ConstructModelTask", 2, "Could not build factory");
     return;
   }
-  else factory->QueryObject()->SetName (name.c_str());
+  else factory->QueryObject()->SetName (model->getURLstr().c_str());
 
   csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (
-                             factory, name.c_str(), sector, csVector3(0, 0, 0));
+    factory, model->getURLstr().c_str(), sector, csVector3(0, 0, 0));
 
-  NormalizeModel (meshwrapper, true, true, datatype);
+  NormalizeModel (meshwrapper, true, true, model->getModelDatatype());
 
   model->GetCSinterface()->SetMeshWrapper(meshwrapper);
+
+  if(model->getAction() != "") {
+    SetModelAnimTask smat(model, model->getAction().c_str(), model->getEventType());
+    smat.doTask();
+  }
 }
+
 
 /// csMetaModel ///
 
@@ -203,7 +231,8 @@ csMetaModel::csMetaModel(VobjectBase* superobject)
   : A3DL::Object3D(superobject),
     csMetaObject3D(superobject),
     A3DL::Model(superobject),
-    alreadyLoaded(false)
+    alreadyLoaded(false),
+    valid(false)
 {
 }
 
@@ -213,41 +242,14 @@ MetaObject* csMetaModel::new_csMetaModel(VobjectBase* superobject,
   return new csMetaModel(superobject);
 }
 
+csRef<iDataBuffer> csMetaModel::getDatabuf() { return databuf; }
+
 void csMetaModel::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
 {
   if(alreadyLoaded) return;
   else alreadyLoaded = true;
 
   LOG("csMetaModel", 3, "entered setup for " << getURLstr());
-
-  // Get material
-  vRef<csMetaMaterial> mat;
-  try {
-    vRef<A3DL::Material> m = getMaterial();
-    mat = meta_cast<csMetaMaterial>(getMaterial());
-    LOG("csMetaModel", 3, "getting material " << mat.isValid());
-    mat->Setup(vosa3dl);
-    LOG("csMetaModel", 3, "setting up model");
-  } catch(std::runtime_error& e) {
-    LOG("csMetaModel", 2, "Got error " << e.what());
-  }
-
-  vRef<Property> property = getModelObj();
-
-  // Create databuffer for model.  Need a new buffer for this as CS will
-  // delete[] it
-  csRef<iDataBuffer> databuf;
-  std::string s;
-  property->read(s);
-  char *buffer = new char[s.size()];
-  for (std::string::size_type i = 0; i < s.size(); i++) buffer[i] = s[i];
-  databuf.AttachNew (new csDataBuffer (buffer, s.size()));
-
-  // Create task
-  vosa3dl->mainThreadTasks.push(new ConstructModelTask (
-                              vosa3dl->GetObjectRegistry(), mat,
-                              this, getURLstr(), sect->GetSector(),
-                              databuf, property->getDataType()));
 
   vRef<A3DL::Actor> actor = meta_cast<A3DL::Actor>(this);
   if(actor.isValid()) actor->addActionListener(this);
@@ -256,43 +258,89 @@ void csMetaModel::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   csMetaObject3D::Setup(vosa3dl, sect);
 }
 
-class SetModelAnimTask : public Task
-{
-public:
-  vRef<csMetaModel> model;
-  char* action;
-  A3DL::ActionEvent::EventType evtype;
-
-  SetModelAnimTask(csMetaModel* m, const char* a, A3DL::ActionEvent::EventType et)
-    : model(m, true), evtype(et)
-    {
-      action = strdup(a);
-    }
-
-  virtual ~SetModelAnimTask()
-    {
-      free(action);
-    }
-
-  virtual void doTask()
-    {
-      csRef<iSprite3DState> spstate = SCF_QUERY_INTERFACE(
-        model->GetCSinterface()->GetMeshWrapper()->GetMeshObject (),
-        iSprite3DState);
-
-      if(evtype == A3DL::ActionEvent::SetActionCycle) {
-        spstate->SetAction (action);
-      } else if(evtype == A3DL::ActionEvent::DoActionOnce) {
-        spstate->SetOverrideAction (action);
-      }
-    }
-};
-
 void csMetaModel::notifyActionChange(const A3DL::ActionEvent& ae)
 {
-  LOG("csMetaModel", 2, "Got notifyActionChange with action " << ae.getAction());
+  LOG("csMetaModel", 4, "Got notifyActionChange with action " << ae.getAction());
 
-  vosa3dl->mainThreadTasks.push(
-    new SetModelAnimTask(this, ae.getAction().c_str(),
-                         ae.getEventType()));
+  eventType = ae.getEventType();
+  action = ae.getAction();
+
+  if(GetCSinterface()->GetMeshWrapper().IsValid())
+  {
+    vosa3dl->mainThreadTasks.push(new SetModelAnimTask(this, ae.getAction().c_str(),
+                                                       ae.getEventType()));
+  }
+}
+
+void csMetaModel::notifyChildInserted(VobjectEvent& e)
+{
+  csMetaObject3D::notifyChildInserted(e);
+
+  if(e.getContextualName() == "a3dl:model"
+     || e.getContextualName() == "a3dl:hardorientation")
+  {
+    vRef<VOS::Property> p = VOS::meta_cast<VOS::Property>(e.getChild());
+    if(p.isValid()) p->addPropertyListener(this);
+  }
+
+  if(!valid && metamaterial.isValid() && databuf.IsValid())
+  {
+    valid = true;
+    // Create task
+    vosa3dl->mainThreadTasks.push(new ConstructModelTask (vosa3dl->GetObjectRegistry(),
+                                                          this, sector->GetSector()));
+    vosa3dl->mainThreadTasks.push(GetSetupTask(vosa3dl, sector));
+  }
+}
+
+void csMetaModel::notifyChildRemoved(VobjectEvent& e)
+{
+  csMetaObject3D::notifyChildRemoved(e);
+
+  if(e.getContextualName() == "a3dl:model") {
+    vRef<VOS::Property> p = VOS::meta_cast<VOS::Property>(e.getChild());
+    if(p.isValid()) p->removePropertyListener(this);
+  }
+}
+
+void csMetaModel::notifyPropertyChange(const PropertyEvent& event)
+{
+  csMetaObject3D::notifyPropertyChange(event);
+
+  try
+  {
+    VUtil::vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
+    if(pcr->getContextualName() == "a3dl:model")
+    {
+      vRef<Property> property = getModelObj();
+
+      LOG("vosmodel", 2, "model data size " << event.getNewValue().size());
+
+      // Create databuffer for model.  Need a new buffer for this as CS will
+      // delete[] it
+      char *buffer = new char[event.getNewValue().size()];
+      for (std::string::size_type i = 0; i < event.getNewValue().size(); i++)
+        buffer[i] = event.getNewValue()[i];
+      databuf.AttachNew (new csDataBuffer (buffer, event.getNewValue().size()));
+
+      modeldatatype = event.getDataType();
+
+      valid = false;
+    }
+    if (pcr->getContextualName() == "a3dl:hardorientation")
+    {
+      valid = false;
+    }
+  } catch(std::runtime_error& e) {
+    LOG("csMetaModel", 2, "error " << e.what());
+  }
+
+  if(!valid && metamaterial.isValid() && databuf.IsValid())
+  {
+    valid = true;
+    // Create task
+    vosa3dl->mainThreadTasks.push(new ConstructModelTask (vosa3dl->GetObjectRegistry(),
+                                                          this, sector->GetSector()));
+    vosa3dl->mainThreadTasks.push(GetSetupTask(vosa3dl, sector));
+  }
 }

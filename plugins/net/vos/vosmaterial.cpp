@@ -40,6 +40,36 @@ iObjectRegistry* csMetaMaterial::object_reg;
 using namespace VUtil;
 using namespace VOS;
 
+/// MaterialUpdateTask ///
+
+class MaterialUpdateTask : public Task
+{
+public:
+  vRef<csMetaMaterial> mm;
+  bool* needListener;
+  virtual void doTask();
+};
+
+
+void MaterialUpdateTask::doTask()
+{
+  if(*needListener) {
+    mm->addChildListener(mm);
+    *needListener = false;
+  }
+
+  // now go through our parents and let them know that this material is ready
+  for(ParentSetIterator i = mm->getParents(); i.hasMore(); i++) {
+    if((*i)->getContextualName() == "a3dl:material") {
+      vRef<csMetaObject3D> obj3d = meta_cast<csMetaObject3D>((*i)->getParent());
+      if(obj3d.isValid()) obj3d->updateMaterial();
+    }
+  }
+}
+
+
+/// ConstructMaterialTask ///
+
 class ConstructMaterialTask : public Task
 {
 public:
@@ -50,6 +80,7 @@ public:
   iObjectRegistry *object_reg;
   bool iscolor;
   float R, G, B;
+  bool* needListener;
 
   ConstructMaterialTask(iObjectRegistry *objreg, csMetaMaterial* mm);
   virtual ~ConstructMaterialTask();
@@ -114,7 +145,7 @@ void ConstructMaterialTask::doTask()
       color->SetFlatColor(csRGBcolor(red, green, blue));
       if(!material) {
       material = engine->GetMaterialList()->NewMaterial(color,
-      	p.getURL().getString().c_str());
+        p.getURL().getString().c_str());
       }
       material->SetMaterial(color);
       material->Register(txtmgr);
@@ -125,7 +156,7 @@ void ConstructMaterialTask::doTask()
       color->SetFlatColor(csRGBcolor((int)(r*255), (int)(g*255), (int)(b*255)));
       if(!material) {
       material = engine->GetMaterialList()->NewMaterial(color,
-      	p.getURL().getString().c_str());
+        p.getURL().getString().c_str());
       }
       material->SetMaterial(color);
       material->Register(txtmgr);
@@ -133,7 +164,8 @@ void ConstructMaterialTask::doTask()
 
 
       iTextureWrapper* txtwrap;
-      txtwrap = engine->CreateBlackTexture(metamaterial->getURLstr().c_str(), 64, 64, 0, CS_TEXTURE_3D);
+      txtwrap = engine->CreateBlackTexture(metamaterial->getURLstr().c_str(),
+                                           64, 64, 0, CS_TEXTURE_3D);
 
       csImageMemory* img = new csImageMemory(64, 64);
       csRGBpixel px((int)(R*255.0), (int)(G*255.0), (int)(B*255.0));
@@ -153,14 +185,23 @@ void ConstructMaterialTask::doTask()
     if(!material) return;
     material->Register(txtmgr);
 
+    if(metamaterial->materialwrapper.IsValid())
+      engine->GetMaterialList()->Remove(metamaterial->materialwrapper);
+
     metamaterial->materialwrapper = material;
+
+    MaterialUpdateTask* mut = new MaterialUpdateTask;
+    mut->mm = metamaterial;
+    mut->needListener = needListener;
+    TaskQueue::defaultTQ().addTask(mut);
   }
 }
 
 
+/// csMetaMaterial ///
 
 csMetaMaterial::csMetaMaterial(VobjectBase* superobject)
-  : A3DL::Material(superobject), alreadyLoaded(false)
+  : A3DL::Material(superobject), alreadyLoaded(false), needListener(true)
 {
 }
 
@@ -195,9 +236,13 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
   if(alreadyLoaded) return;
   else alreadyLoaded = true;
 
+  this->vosa3dl = vosa3dl;
+
   LOG("csMetaMaterial", 3, "setting up material");
   ConstructMaterialTask* cmt = new ConstructMaterialTask(
     vosa3dl->GetObjectRegistry(), this);
+
+  cmt->needListener = &needListener;
 
   A3DL::TextureIterator txt = getTextureLayers();
   if(txt.hasMore())
@@ -219,7 +264,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
       {
         vRef<csMetaTexture> mt = meta_cast<csMetaTexture>(*txt);
         if(mt.isValid())
-  {
+        {
           mt->Setup(vosa3dl);
           mt->acquire();
           cmt->layers.push_back(mt);
@@ -236,7 +281,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
           cmt->coords[i].ushift = ushift;
           cmt->coords[i].vshift = vshift;
           switch(mt->getBlendMode())
-    {
+          {
             case A3DL::Material::BLEND_NORMAL:
               try
               {
@@ -278,7 +323,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
   else
   {
     getColor(cmt->R, cmt->G, cmt->B);
-    LOG("CSA3DL Material", 2, 
+    LOG("CSA3DL Material", 2,
             "CS Material: material has no textures, assuming it's color. (" <<
             cmt->R << ", " << cmt->G << ", " << cmt->B << ")");
     cmt->iscolor = true;
@@ -286,27 +331,20 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
 
   vosa3dl->mainThreadTasks.push(cmt);
 
-#if 0
-  // now go through our parents and let them know that this material is ready
-  const ParentSet& parents = getParents();
-  for(ParentSet::const_iterator i = parents.begin(); i != parents.end(); i++) {
-    Object3D* obj3d = meta_cast<Object3D*>((*i)->parent);
-    if(obj3d)
-      obj3d->setupMaterial();
-  }
-#endif
-
   return;
 }
 
 void csMetaMaterial::notifyPropertyChange(const PropertyEvent& event)
 {
+  LOG("vosmaterial", 2, "woob woob property change!");
   try
   {
     vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
-    if(pcr->getContextualName() == "a3dl:color")
+    if(pcr->getContextualName() == "a3dl:color"
+      || pcr->getContextualName() == "a3dl:texture")
     {
-      // XXX
+      alreadyLoaded = false;
+      Setup(vosa3dl);
     }
   }
   catch(NoSuchObjectError) { }
@@ -322,11 +360,11 @@ csRef<iMaterialWrapper> csMetaMaterial::GetMaterialWrapper()
 
 void csMetaMaterial::notifyChildInserted(VobjectEvent& event)
 {
+  LOG("vosmaterial", 2, "woob woob child inserted!");
+
   if(event.getContextualName() == "a3dl:texture")
   {
-    // TODO: can we just modify the material's texture list?
-    //clearMaterial();
-    //loadMaterial();
+    updateMaterial();
   }
   vRef<Property> p = meta_cast<Property>(event.getNewChild());
   if(p.isValid()) p->addPropertyListener(this);
@@ -342,9 +380,7 @@ void csMetaMaterial::notifyChildRemoved(VobjectEvent& event)
 {
   if(event.getContextualName() == "a3dl:texture")
   {
-    // TODO: can we just modify the material's texture list?
-    //clearMaterial();
-    //loadMaterial();
+    updateMaterial();
   }
   vRef<Property> p = meta_cast<Property>(event.getOldChild());
   if(p.isValid()) p->removePropertyListener(this);
@@ -354,4 +390,10 @@ MetaObject* csMetaMaterial::new_csMetaMaterial(VobjectBase* superobject,
   const std::string& type)
 {
   return new csMetaMaterial(superobject);
+}
+
+void csMetaMaterial::updateMaterial()
+{
+    alreadyLoaded = false;
+    Setup(vosa3dl);
 }
