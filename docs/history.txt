@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+27-Dec-2001
+	- Added a new csStringSet::Request() which can return the string
+	  based on the ID (i.e. exactly the opposite of the old Request()
+	  method in csStringSet).
 25-Dec-2001
 	- Matze had nothing to do and fixed hundreds of compiler warnings
 	  in aws.

@@ -58,6 +58,21 @@ csStringID csStringSet::Request (const char *Name)
   return itf->ID;
 }
 
+const char* csStringSet::Request (csStringID id)
+{
+  csRegisteredString *itf;
+
+  csHashIterator it (&Registry);
+  while (it.HasNext ())
+  {
+    itf = (csRegisteredString*) it.Next ();
+    if (itf->ID == id)
+      return itf->String;
+  }
+
+  return NULL;
+}
+
 void csStringSet::Clear ()
 {
   csHashIterator it (&Registry);

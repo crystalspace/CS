@@ -41,14 +41,23 @@ class csStringSet
   csHashMap Registry;
   csStringID IDCounter;
 public:
-  
-  /// constructor
+  /// Constructor
   csStringSet ();
-  /// destructor
+  /// Destructor
   ~csStringSet ();
 
-  /// request the ID for the given string
+  /**
+   * Request the ID for the given string. Create a new ID
+   * if the string was never requested before.
+   */
   csStringID Request (const char *s);
+
+  /**
+   * Request the string for a given ID. Return NULL if the string
+   * has not been requested (yet).
+   */
+  const char* Request (csStringID id);
+
   /**
    * Delete all stored strings. When new strings are registered again, new
    * ID values will be used, not the old ones reused.
