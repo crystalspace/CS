@@ -52,7 +52,6 @@ bool csSpider::DrawTest (iRenderView* rview, iMovable*)
   if (!camera)
   {
     camera = rview->GetCamera ();
-    // @@@ Should Spider IncRef() camera to keep it alive?
   }
   return false;
 }

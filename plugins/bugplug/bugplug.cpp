@@ -485,6 +485,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   csVector3 end = camera->GetTransform ().This2Other (v);
 
   iSector* sector = camera->GetSector ();
+  CS_ASSERT (sector != 0);
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
   csVector3 isect;
 

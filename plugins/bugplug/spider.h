@@ -22,6 +22,8 @@
 #include "imesh/object.h"
 #include "csgeom/box.h"
 #include "igeom/objmodel.h"
+#include "csutil/weakref.h"
+#include "iengine/camera.h"
 
 struct iEngine;
 struct iCamera;
@@ -51,7 +53,7 @@ class csSpider : public iMeshObject
 {
 private:
   iBase* logparent;
-  iCamera* camera;
+  csWeakRef<iCamera> camera;
   iMeshWrapper* wrap;
 
 public:

@@ -115,6 +115,12 @@ public:
   virtual void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane);
 
+  bool IntersectRay (const csVector3 &start, const csVector3 &end) const;
+  bool IntersectSegmentPlane (const csVector3 &start, const csVector3 &end,
+    csVector3 &isect, float *pr) const;
+  bool IntersectSegment (const csVector3 &start, const csVector3 &end,
+    csVector3 &isect, float *pr) const;
+
   /// Set portal flags (see CS_PORTAL_XXX values)
   virtual csFlags& GetFlags () { return flags; }
 

@@ -413,50 +413,48 @@ int csSector::IntersectSegment (
     if (mesh->GetMeshObject ()->GetPortalCount () == 0) continue;
 
     bool has_not_moved = mesh->GetMovable ()->IsFullTransformIdentity ();
-    csRef<iThingState> ith = SCF_QUERY_INTERFACE (
-        mesh->GetMeshObject (),
-        iThingState);
-    if (ith)
+    if (has_not_moved)
     {
-      r = best_r;
-
-      if (has_not_moved)
-      {
-        obj_start = start;
-        obj_end = end;
-      }
-      else
-      {
-        movtrans = mesh->GetMovable ()->GetFullTransform ();
-        obj_start = movtrans.Other2This (start);
-        obj_end = movtrans.Other2This (end);
-      }
-
-      int p = ith->IntersectSegment (
-          obj_start, obj_end, obj_isect,
-          &r,
-          only_portals);	// Always true here.
-
-      if (p != -1 && r < best_r)
-      {
-        if (has_not_moved)
-          cur_isect = obj_isect;
-        else
-          cur_isect = movtrans.This2Other (obj_isect);
-        best_r = r;
-        best_p = p;
-        isect = cur_isect;
-        if (p_mesh) *p_mesh = mesh;
-      }
+      obj_start = start;
+      obj_end = end;
     }
     else
     {
-      // @@@ Use iMeshWrapper->GetPortalContainer() when that exists!!!
-      //csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-      	//iPortalContainer);
-      //CS_ASSERT (pc != 0);
-      //int i;
-      //for (i = 0 ; i < 
+      movtrans = mesh->GetMovable ()->GetFullTransform ();
+      obj_start = movtrans.Other2This (start);
+      obj_end = movtrans.Other2This (end);
+    }
+    r = best_r;
+
+    csRef<iThingState> ith = SCF_QUERY_INTERFACE (
+        mesh->GetMeshObject (),
+        iThingState);
+    int p;
+    if (ith)
+    {
+      p = ith->IntersectSegment (
+          obj_start, obj_end, obj_isect,
+          &r,
+          only_portals);	// Always true here.
+    }
+    else
+    {
+      // We know it is a portal container. No other object can have a
+      // portal.
+      bool rc = mesh->GetMeshObject ()->HitBeamObject (
+      	obj_start, obj_end, obj_isect, &r, &p);
+      if (!rc) p = -1;
+    }
+    if (p != -1 && r < best_r)
+    {
+      if (has_not_moved)
+        cur_isect = obj_isect;
+      else
+        cur_isect = movtrans.This2Other (obj_isect);
+      best_r = r;
+      best_p = p;
+      isect = cur_isect;
+      if (p_mesh) *p_mesh = mesh;
     }
   }
 
@@ -1019,19 +1017,9 @@ iMeshWrapper *csSector::eiSector::HitBeam (
   int *polygonPtr,
   bool accurate)
 {
-  int p = 0;
-  iMeshWrapper *obj = scfParent->HitBeam (
+  return scfParent->HitBeam (
       start, end, isect,
-      polygonPtr ? &p : 0, accurate);
-  if (obj)
-  {
-    if (p)
-    {
-      *polygonPtr = p;
-    }
-  }
-
-  return obj;
+      polygonPtr, accurate);
 }
 
 iSector *csSector::eiSector::FollowSegment (

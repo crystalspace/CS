@@ -187,6 +187,100 @@ void csPortal::ComputeCameraPlane (const csReversibleTransform& t,
   // @@@ TODO
 }
 
+bool csPortal::IntersectRay (const csVector3 &start,
+    const csVector3 &end) const
+{
+  // First we do backface culling on the polygon with respect to
+  // the starting point of the beam.
+  const csPlane3 &pl = object_plane;
+  float dot1 = pl.D () +
+    pl.A () * start.x + pl.B () * start.y + pl.C () * start.z;
+  if (dot1 > 0) return false;
+
+  // If this vector is perpendicular to the plane of the polygon we
+  // need to catch this case here.
+  float dot2 = pl.D () + pl.A () * end.x + pl.B () * end.y + pl.C () * end.z;
+  if (ABS (dot1 - dot2) < SMALL_EPSILON) return false;
+
+  // Now we generate a plane between the starting point of the ray and
+  // every edge of the polygon. With the plane normal of that plane we
+  // can then check if the end of the ray is on the same side for all
+  // these planes.
+  csVector3 normal;
+  csVector3 relend = end;
+  relend -= start;
+
+  csDirtyAccessArray<csVector3>* vt = parent->GetVertices ();
+  int i, i1;
+  i1 = vertex_indices.Length () - 1;
+  for (i = 0; i < vertex_indices.Length (); i++)
+  {
+    csMath3::CalcNormal (normal, start, (*vt)[i1], (*vt)[i]);
+    if ((relend * normal) > 0) return false;
+    i1 = i;
+  }
+
+  return true;
+}
+
+bool csPortal::IntersectSegmentPlane (
+  const csVector3 &start, const csVector3 &end,
+  csVector3 &isect, float *pr) const
+{
+  float x1 = start.x;
+  float y1 = start.y;
+  float z1 = start.z;
+  float x2 = end.x;
+  float y2 = end.y;
+  float z2 = end.z;
+  float r, num, denom;
+
+  // So now we have the plane equation of the polygon:
+  // A*x + B*y + C*z + D = 0
+  //
+  // We also have the parameter line equations of the ray
+  // going through 'start' and 'end':
+  // x = r*(x2-x1)+x1
+  // y = r*(y2-y1)+y1
+  // z = r*(z2-z1)+z1
+  //
+  // =>   A*(r*(x2-x1)+x1) + B*(r*(y2-y1)+y1) + C*(r*(z2-z1)+z1) + D = 0
+  // Set *pr to -1 to indicate error if we return false now.
+  if (pr) *pr = -1;
+
+  denom = object_plane.A () * (x2 - x1) +
+	  object_plane.B () * (y2 - y1) +
+	  object_plane.C () * (z2 - z1);
+  if (ABS (denom) < SMALL_EPSILON) return false;  // Lines are parallel
+  num = -(object_plane.A () * x1 +
+	  object_plane.B () * y1 +
+	  object_plane.C () * z1 +
+	  object_plane.D ());
+  r = num / denom;
+
+  // Calculate 'r' and 'isect' even if the intersection point is
+  // not on the segment. That way we can use this function for testing
+  // with rays as well.
+  if (pr) *pr = r;
+
+  isect.x = r * (x2 - x1) + x1;
+  isect.y = r * (y2 - y1) + y1;
+  isect.z = r * (z2 - z1) + z1;
+
+  // If r is not in [0,1] the intersection point is not on the segment.
+  if (r < 0 /*-SMALL_EPSILON*/ || r > 1) return false;
+
+  return true;
+}
+
+bool csPortal::IntersectSegment (
+  const csVector3 &start, const csVector3 &end,
+  csVector3 &isect, float *pr) const
+{
+  if (!IntersectRay (start, end)) return false;
+  return IntersectSegmentPlane (start, end, isect, pr);
+}
+
 csVector3 csPortal::Warp (const csReversibleTransform& t,
     const csVector3 &pos) const
 {

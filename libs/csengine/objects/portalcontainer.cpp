@@ -926,12 +926,28 @@ bool csPortalContainer::HitBeamObject (const csVector3& start,
 	int* polygon_idx)
 {
   Prepare ();
-  (void)start;
-  (void)end;
-  (void)isect;
-  (void)pr;
-  (void)polygon_idx;
-  return false;
+  int i;
+  float r, best_r = 2000000000.;
+  csVector3 cur_isect;
+  int best_p = -1;
+
+  for (i = 0; i < portals.Length (); i++)
+  {
+    csPortal *p = portals[i];
+    if (p->IntersectSegment (start, end, cur_isect, &r))
+    {
+      if (r < best_r)
+      {
+        best_r = r;
+        best_p = i;
+        isect = cur_isect;
+      }
+    }
+  }
+
+  if (pr) *pr = best_r;
+  if (polygon_idx) *polygon_idx = best_p;
+  return best_p != -1;
 }
 
 void csPortalContainer::GetRadius (csVector3& radius, csVector3& center)

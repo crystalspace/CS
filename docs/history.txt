@@ -30,6 +30,17 @@ chronological order.
 	  reflect the fact that he finally managed, with additional prompting,
 	  to get the Autoconf maintainers to fix the bugs which he had reported
 	  nearly a year ago.
+	- Jorrit completed the implementation of csSector::IntersectSegment()
+	  for portal containers.
+	- Jorrit implemented HitBeamObject() for portal containers. Also
+	  supports the polygon index.
+	- Jorrit made the first portal in flarge (the one from the first
+	  room to the second small room) use the new portal container feature.
+	  Seems to work ok so far.
+	- Jorrit changed the spider in bugplug to use a weak reference to the
+	  camera to ensure the camera pointer is cleaned up if the camera
+	  is deleted. This fixes a crash bug in bugplug when trying to
+	  select some objects through portals.
 25-Sep-2003
 	- Jorrit removed iCamera->GetHit(). This function is only a very
 	  thin wrapper on top of iSector->HitBeamPortals() so it is not
