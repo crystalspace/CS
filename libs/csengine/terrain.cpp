@@ -46,12 +46,10 @@ csTerrain::~csTerrain ()
   CHK (delete clipbox);
 }
 
-void csTerrain::classify( ddgVector3 *p, ddgVector3 *n, ddgColor3 *c)
+void csTerrain::classify( ddgVector3 *p, ddgColor3 *c)
 {
 	// Steep normal
-    if (fabs(n->v[1]) < _cliffangle)
-		c->set(_cliff); // Cliff
-    else if (p->v[1] < _beachalt)
+    if (p->v[1] < _beachalt)
 		c->set(_beach); // Beach
     else if (p->v[1] < _grassalt)
 		c->set(_grass); // Grass
@@ -63,9 +61,7 @@ void csTerrain::classify( ddgVector3 *p, ddgVector3 *n, ddgColor3 *c)
 		c->set(_snow);  // Snow
 	
 	static int cl = 0, b=0,g=0,t=0,r=0,s=0;
-    if (fabs(n->v[1]) < _cliffangle)
-		cl++;
-    else if (p->v[1] < _beachalt)
+    if (p->v[1] < _beachalt)
 		b++;
     else if (p->v[1] < _grassalt)
 		g++;
@@ -79,26 +75,24 @@ void csTerrain::classify( ddgVector3 *p, ddgVector3 *n, ddgColor3 *c)
 
 static csRenderView *grview = NULL;
 // Perform coord transformation using CS instead of DDG.
-static void transformer(ddgVector3 vin, ddgVector3 *vout)
+void transformer(ddgVector3 vin, ddgVector3 *vout)
 {
 	if (grview)
 	{
-		csVector3 csw1 = grview->World2Camera( csVector3(vin.v[0],vin.v[1],vin.v[2]) );
+		csVector3 csw1 = grview->World2Camera( csVector3(vin.v[0], vin.v[1], vin.v[2]) );
 		vout->v[0] = csw1.x;
 		vout->v[1] = csw1.y;
 		vout->v[2] = csw1.z;
 	}
 	else
 	{
-		vout->v[0] = vin.v[0];
-		vout->v[1] = vin.v[1];
-		vout->v[2] = vin.v[2];
+		vout->set(vin);
 	}
 }
 
 bool csTerrain::Initialize (char* heightmap)
 {
-
+  grview = NULL;
   CHK (height = new ddgHeightMap ());
   if (height->readTGN (heightmap))
 	  height->generateHeights(257,257,5);
@@ -160,13 +154,13 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
         tvp = ddgTBinTree::parent(tvc);
         tv0 = mesh->stri[tvc].v0;
         tv1 = mesh->stri[tvc].v1;
-		ddgVector3 *p = bt->tri(tv0)->pos();
+		ddgVector3 *p = bt->pos(tv0);
     	// Use the nearest coord of the triangle.
         d = p->v[2];
-		p = bt->tri(tv1)->pos();
+		p = bt->pos(tv1);
         if (p->v[2] < d)
             d = p->v[2];
-		p = bt->tri(tvp)->pos();
+		p = bt->pos(tvp);
         if (p->v[2] < d)
             d = p->v[2];
         mesh->qz()->ddgSplayTree::insert (bt->index(),tvc,(unsigned int)d);
@@ -174,7 +168,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 	}
 
    // Render
-  mesh->qzi()->reset ();
+  mesh->qzi()->reset (true);
   while (!mesh->qzi()->end ())
   {
     ddgTriIndex tvc = mesh->indexZQ (mesh->qzi());
@@ -185,32 +179,28 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 
       ddgVector3 *p1, *p2, *p3;
       ddgVector3 wp1, wp2, wp3;
-      ddgVector3 n1, n2, n3;
       ddgVector2 t1, t2, t3;
       ddgColor3  c1, c2, c3;
 	  unsigned int tvp = bt->parent (tvc),
 		  tv0 = bt->v0 (tvc),
 		  tv1 = bt->v1 (tvc);
 	  // Camera space coords.
-	  p3 =	bt->tri(tvp)->pos();
-	  p2 =	bt->tri(tv0)->pos();
-	  p1 =	bt->tri(tv1)->pos();
+	  p3 =	bt->pos(tvp);
+	  p2 =	bt->pos(tv0);
+	  p1 =	bt->pos(tv1);
 	  // World space coords.
       bt->vertex(tvp,&wp1);
       bt->vertex(tv0,&wp2);
       bt->vertex(tv1,&wp3);
 	  // Normals.
-	  bt->normal(tvp,&n1);
-	  bt->normal(tv0,&n2);
-	  bt->normal(tv1,&n3);
       // Texture coords from 0 - N where N is size of texture.
 	  bt->textureC(tvp,t1);
 	  bt->textureC(tv0,t2);
 	  bt->textureC(tv1,t3);
 	  // Create some color scheme.
-	  classify(wp1,&n1,&c1);
-	  classify(wp2,&n2,&c2);
-	  classify(wp3,&n3,&c3);
+	  classify(&wp1,&c1);
+	  classify(&wp2,&c2);
+	  classify(&wp3,&c3);
 
       float iz;
       float pz[3];
@@ -219,17 +209,17 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
       pz[0] = 1 / p1->v[2];
       iz = rview.aspect * pz[0];
       triangle[0].x = p1->v[0] * iz + rview.shift_x;
-      triangle[0].y = p1->v[1] * iz + rview.shift_x;
+      triangle[0].y = p1->v[1] * iz + rview.shift_y;
       if (p2->v[2] < SMALL_Z) goto not_vis;
       pz[1] = 1 / p2->v[2];
       iz = rview.aspect * pz[1];
       triangle[1].x = p2->v[0] * iz + rview.shift_x;
-      triangle[1].y = p2->v[1] * iz + rview.shift_x;
+      triangle[1].y = p2->v[1] * iz + rview.shift_y;
       if (p3->v[2] < SMALL_Z) goto not_vis;
       pz[2] = 1 / p3->v[2];
       iz = rview.aspect * pz[2];
       triangle[2].x = p3->v[0] * iz + rview.shift_x;
-      triangle[2].y = p3->v[1] * iz + rview.shift_x;
+      triangle[2].y = p3->v[1] * iz + rview.shift_y;
 
       csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
       int rescount;
@@ -263,7 +253,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     }
 
     not_vis:
-    mesh->qzi() ->next ();
+    mesh->qzi() ->prev ();
   }
 
   rview.g3d->FinishPolygonFX ();
