@@ -307,6 +307,13 @@ public:
     return root[n];
   }
 
+  /// Get an element (const).
+  T const& Get (int n) const
+  {
+    CS_ASSERT (n >= 0 && n < count);
+    return root[n];
+  }
+
   /**
    * Get an item from the array. If the number of elements in this
    * array is too small the array will be automatically extended.
@@ -321,6 +328,12 @@ public:
 
   /// Get an element (non-const).
   T& operator [] (int n)
+  {
+    return Get(n);
+  }
+
+  /// Get a const reference.
+  T const& operator [] (int n) const
   {
     return Get(n);
   }
@@ -506,20 +519,6 @@ public:
   void Sort (ArraySortCompareFunction* compare)
   {
     qsort (root, Length (), sizeof (T), compare);
-  }
-
-  /// Get an element (const).
-  T const& Get (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
-  }
-
-  /// Get a const reference.
-  T const& operator [] (int n) const
-  {
-    CS_ASSERT (n >= 0 && n < count);
-    return root[n];
   }
 
   /**
