@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.tutsimpvs = Crystal Space tutorial part one
+DESCRIPTION.tutsimpvs = Crystal Space tutorial, video selector
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
