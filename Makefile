@@ -173,6 +173,7 @@ configbanner:
 config.tmp:
 	@echo MODE = $(MODE)>>config.tmp
 	@echo USE_PLUGINS = $(USE_PLUGINS)>>config.tmp
+	@echo FORCEBUCK = $(FORCEBUCK)>>config.tmp
 	@$(SYSCONFIG)
 	$(subst DEST,config.mak,$(UPD))
 

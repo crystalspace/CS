@@ -97,6 +97,16 @@ make depend
 make -k all
 @end example
 
+Some Windows ME users have reported a system crash when running the 
+@samp{make win32gcc} command. If you have that problem, try adding
+@samp{FORCEBUCK=SS} to the command line, like this:
+
+@example
+make win32gcc MODE=debug FORCEBUCK=SS
+make depend
+make -k all
+@end example
+
 Note that making the @samp{depend} target is not absolutely required.  If
 doing so presents problems, then you can safely omit it:
 
@@ -107,7 +117,7 @@ make -k all
 
 @subsubheading Additional Command Line Compile Options
 
-You can also inser the @samp{clean} makefile target into the @samp{make}
+You can also insert the @samp{clean} makefile target into the @samp{make}
 command, as follows:
 
 @example

@@ -14,13 +14,29 @@ EMPTY=
 SPACE=$(EMPTY) $(EMPTY)
 SEPARATOR=$"*-------------------------------------------------------------------------*$"
 
-# Unix shells tend to use "$" as delimiter for variable names.
-# Test for this behaviour and set $(BUCK) variable correspondigly ...
-__TMP__:=$(shell echo $$$$)
-ifeq ($(__TMP__),$$$$)
+# If no-one's supplied a value for $(FORCEBUCK), turn that feature off
+ifeq ($(strip $(FORCEBUCK)),)
+  FORCEBUCK = no
+endif
+
+# If $(FORCEBUCK) is set, use it to set the value of $(BUCK) manually
+ifeq ($(strip $(FORCEBUCK)),SS)
   BUCK = $$
-else
+endif
+ifeq ($(strip $(FORCEBUCK)),BSS)
   BUCK = \$$
+endif
+
+# Unix shells tend to use "$" as delimiter for variable names.
+# Test for this behaviour and set $(BUCK) variable correspondigly
+# if someone hasn't already supplied a value.
+ifeq ($(strip $(BUCK)),)
+  __TMP__:=$(shell echo $$$$)
+  ifeq ($(__TMP__),$$$$)
+    BUCK = $$
+  else
+    BUCK = \$$
+  endif
 endif
 
 # The suffixes for $(OUT) directory when making PIC and non-PIC code
