@@ -13,6 +13,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+1-Dec-1999
+	- Eric Sunshine ported the new halo implementation to NeXT.
+	- Eric Sunshine made csClear and cctest work on NextStep again by
+	  working around a multiple-inheritence compiler bug.
 30-Nov-1999
 	- Andrew Zabolotny added new halo support. iHaloRasterizer is gone.
 	  iHalo objects are created instead. Added halo support to MazeD
