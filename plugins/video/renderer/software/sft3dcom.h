@@ -69,6 +69,15 @@ protected:
   /// if this is a procedural texture manager
   bool is_for_procedural_textures;
 
+  /// Current render target.
+  csRef<iTextureHandle> render_target;
+  /// If true then the current render target has been put on screen.
+  bool rt_onscreen;
+  /// If true then we have set the old clip rect.
+  bool rt_cliprectset;
+  /// Old clip rect to restore after rendering on a proc texture.
+  int rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy;
+
   /// Z buffer.
   uint32* z_buffer;
   /// Size of Z buffer.
@@ -470,7 +479,7 @@ public:
   virtual bool IsLightmapOK (iPolygonTexture* poly_texture);
 
   virtual void SetRenderTarget (iTextureHandle* handle, bool persistent);
-  virtual iTextureHandle* GetRenderTarget () const { return NULL; }
+  virtual iTextureHandle* GetRenderTarget () const { return render_target; }
 
   /// Get Z-buffer value at given X,Y position
   virtual float GetZBuffValue (int x, int y);

@@ -106,7 +106,8 @@ public:
   iImage *image;
 
   /// Create a csTexture object
-  csTextureSoftware (csTextureHandle *Parent, iImage *Image) : csTexture (Parent)
+  csTextureSoftware (csTextureHandle *Parent, iImage *Image)
+	  : csTexture (Parent)
   {
     bitmap = NULL;
     alphamap = NULL;
@@ -157,6 +158,16 @@ protected:
   /// The private palette (with gamma applied)
   csRGBpixel palette [256];
 
+  /**
+   * Reverse palette. This will translate a 15 or 16-bit color
+   * value (corresponding to format of the display if display
+   * is 15 or 16 bit or else 5:6:5 if display is 32-bit) to a palette
+   * entry valid for this texture. This table is only present if
+   * CreateReversePalette() is called. Typically this is done
+   * for procedural textures (SetRenderTarget()) only.
+   */
+  uint8* reverse_palette;
+
   /// Number of used colors in palette
   int palette_size;
 
@@ -186,6 +197,17 @@ public:
    * a [color index] -> [truecolor value] conversion table.
    */
   void remap_texture ();
+
+  /**
+   * Create the reverse palette for this texture.
+   * If the reverse palette is already created nothing will happen.
+   */
+  void CreateReversePalette ();
+
+  /**
+   * Get the pointer to the reverse palette or NULL if not calculate yet.
+   */
+  uint8* GetReversePalette () const { return reverse_palette; }
 
   /// Query the private texture colormap
   csRGBpixel *GetColorMap () { return palette; }

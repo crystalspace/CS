@@ -146,7 +146,8 @@ void csTextureHandleLine::ComputeMeanColor ()
   int i;
 
   // Compute a common palette for all three mipmaps
-  csQuantizeBegin ();
+  csColorQuantizer quant;
+  quant.Begin ();
 
   csRGBpixel *tc = transp ? &transp_color : 0;
 
@@ -155,13 +156,13 @@ void csTextureHandleLine::ComputeMeanColor ()
     {
       csTextureLine *t = (csTextureLine *)tex [i];
       if (!t->image) break;
-      csQuantizeCount ((csRGBpixel *)t->image->GetImageData (),
+      quant.Count ((csRGBpixel *)t->image->GetImageData (),
         t->get_size (), tc);
     }
 
   csRGBpixel *pal = palette;
   palette_size = 256;
-  csQuantizePalette (pal, palette_size, tc);
+  quant.Palette (pal, palette_size, tc);
 
   for (i = 0; i < 4; i++)
     if (tex [i])
@@ -169,7 +170,7 @@ void csTextureHandleLine::ComputeMeanColor ()
       csTextureLine *t = (csTextureLine *)tex [i];
       if (!t->image) break;
 
-      csQuantizeRemap ((csRGBpixel *)t->image->GetImageData (),
+      quant.Remap ((csRGBpixel *)t->image->GetImageData (),
         t->get_size (), t->bitmap, tc);
 
       // Very well. Now we don'tex need the iImage anymore, so free it
@@ -178,7 +179,7 @@ void csTextureHandleLine::ComputeMeanColor ()
       t->image = NULL;
     }
 
-  csQuantizeEnd ();
+  quant.End ();
 
   // Compute the mean color from the palette
   csRGBpixel *src = palette;
@@ -394,7 +395,8 @@ void csTextureManagerLine::compute_palette ()
         cmap.alloc_rgb (20 + _r * 42, 20 + _g * 42, 30 + _b * 50, prefered_dist);
 
   // Compute a common color histogram for all textures
-  csQuantizeBegin ();
+  csColorQuantizer quant;
+  quant.Begin ();
 
   for (i = textures.Length () - 1; i >= 0; i--)
   {
@@ -403,7 +405,7 @@ void csTextureManagerLine::compute_palette ()
     int colormapsize = txt->GetColorMapSize ();
     if (txt->GetKeyColor ())
       colormap++, colormapsize--;
-    csQuantizeCount (colormap, colormapsize);
+    quant.Count (colormap, colormapsize);
   }
 
   // Introduce the uniform colormap bias into the histogram
@@ -413,14 +415,14 @@ void csTextureManagerLine::compute_palette ()
     if (!locked [i] && cmap.alloc [i])
       new_cmap [colors++] = cmap [i];
 
-  csQuantizeBias (new_cmap, colors, uniform_bias);
+  quant.Bias (new_cmap, colors, uniform_bias);
 
   // Now compute the actual colormap
   colors = 0;
   for (i = 0; i < 256; i++)
     if (!locked [i]) colors++;
   csRGBpixel *cmap_p = new_cmap;
-  csQuantizePalette (cmap_p, colors);
+  quant.Palette (cmap_p, colors);
 
   // Finally, put the computed colors back into the colormap
   int outci = 0;
@@ -430,7 +432,7 @@ void csTextureManagerLine::compute_palette ()
     cmap [outci++] = new_cmap [i];
   }
 
-  csQuantizeEnd ();
+  quant.End ();
 
   // Now create the inverse colormap
   create_inv_cmap ();

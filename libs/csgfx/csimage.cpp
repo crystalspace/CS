@@ -488,7 +488,8 @@ void csImageFile::convert_rgba (csRGBpixel *iImage)
       {
         // The most complex case: reduce an RGB image to a paletted image.
         int maxcolors = 256;
-        csQuantizeRGB (iImage, pixels, Width, (uint8 *&)Image, Palette,
+	csColorQuantizer quant;
+        quant.RGB (iImage, pixels, Width, (uint8 *&)Image, Palette,
           maxcolors, csImage_dither);
       }
       delete [] iImage;

@@ -127,8 +127,9 @@ int csColorMap::FreeEntries ()
 
 //----------------------------------------------- csTextureHandleSoftware ---//
 
-csTextureHandleSoftware::csTextureHandleSoftware (csTextureManagerSoftware *texman,
-  iImage *image, int flags) : csTextureHandle (image, flags)
+csTextureHandleSoftware::csTextureHandleSoftware (
+	csTextureManagerSoftware *texman, iImage *image, int flags)
+	: csTextureHandle (image, flags)
 {
   pal2glob = NULL;
   pal2glob8 = NULL;
@@ -136,6 +137,7 @@ csTextureHandleSoftware::csTextureHandleSoftware (csTextureManagerSoftware *texm
     AdjustSizePo2 ();
   orig_palette = NULL;
   (this->texman = texman)->IncRef ();
+  reverse_palette = NULL;
 }
 
 csTextureHandleSoftware::~csTextureHandleSoftware ()
@@ -145,9 +147,61 @@ csTextureHandleSoftware::~csTextureHandleSoftware ()
   delete [] (uint8 *)pal2glob;
   delete [] pal2glob8;
   delete [] orig_palette;
+  delete [] reverse_palette;
 }
 
-csTexture *csTextureHandleSoftware::NewTexture (iImage *newImage, bool ismipmap)
+void csTextureHandleSoftware::CreateReversePalette ()
+{
+  if (reverse_palette) return;
+  if (texman->pfmt.PixelBytes == 1) return;	// @@@ Not supported.
+
+  // Make a copy of the pixel format for the canvas and
+  // correct it to a 16 bit format if it is 32 bit.
+  csPixelFormat pfmt = texman->pfmt;
+  if (pfmt.PixelBytes == 4)
+  {
+    pfmt.RedMask = 0x1f << 11;
+    pfmt.GreenMask = 0x3f << 5;
+    pfmt.BlueMask = 0x1f;
+    pfmt.PalEntries = 0;
+    pfmt.PixelBytes = 2;
+    pfmt.complete ();
+  }
+
+  int total_colors = 1 << (pfmt.RedBits + pfmt.GreenBits + pfmt.BlueBits);
+  reverse_palette = new uint8 [total_colors];
+  int i, j;
+  for (i = 0 ; i < total_colors ; i++)
+  {
+    int r = ((i & pfmt.RedMask) >> pfmt.RedShift) << (8-pfmt.RedBits);
+    int g = ((i & pfmt.GreenMask) >> pfmt.GreenShift) << (8-pfmt.GreenBits);
+    int b = ((i & pfmt.BlueMask) >> pfmt.BlueShift) << (8-pfmt.BlueBits);
+    // @@@ This is probably not the best routine. Need to check later.
+    int best_dist = 60000;
+    int best_idx = -1;
+    for (j = 0 ; j < 256 ; j++)
+    {
+      const csRGBpixel& p = palette[j];
+      // @@@ Use rgb_dist? Slower though.
+      int dist = ABS (p.red-r) + ABS (p.green-g) + ABS (p.blue-b);
+      if (dist == 0)
+      {
+	// Perfect match.
+	best_idx = j;
+	break;
+      }
+      else if (dist < best_dist)
+      {
+	best_dist = dist;
+	best_idx = j;
+      }
+    }
+    reverse_palette[i] = j;
+  }
+}
+
+csTexture *csTextureHandleSoftware::NewTexture (iImage *newImage,
+	bool ismipmap)
 {
   csRef<iImage> Image;
   if (ismipmap && texman->sharpen_mipmaps)
@@ -185,7 +239,8 @@ void csTextureHandleSoftware::ComputeMeanColor ()
   bool destroy_image = true;
 
   // Compute a common palette for all three mipmaps
-  csQuantizeBegin ();
+  csColorQuantizer quant;
+  quant.Begin ();
 
   csRGBpixel *tc = transp ? &transp_color : 0;
 
@@ -194,13 +249,13 @@ void csTextureHandleSoftware::ComputeMeanColor ()
     {
       csTextureSoftware *t = (csTextureSoftware *)tex [i];
       if (!t->image) break;
-      csQuantizeCount ((csRGBpixel *)t->image->GetImageData (),
+      quant.Count ((csRGBpixel *)t->image->GetImageData (),
         t->get_size (), tc);
     }
 
   csRGBpixel *pal = palette;
   palette_size = 256;
-  csQuantizePalette (pal, palette_size, tc);
+  quant.Palette (pal, palette_size, tc);
 
   for (i = 0; i < 4; i++)
     if (tex [i])
@@ -209,10 +264,10 @@ void csTextureHandleSoftware::ComputeMeanColor ()
       if (!t->image) break;
       uint8* bmap = t->bitmap; // Temp assignment to pacify BeOS compiler.
       if (texman->dither_textures || (flags & CS_TEXTURE_DITHER))
-        csQuantizeRemapDither ((csRGBpixel *)t->image->GetImageData (),
+        quant.RemapDither ((csRGBpixel *)t->image->GetImageData (),
           t->get_size (), t->get_width (), pal, palette_size, bmap, tc);
       else
-        csQuantizeRemap ((csRGBpixel *)t->image->GetImageData (),
+        quant.Remap ((csRGBpixel *)t->image->GetImageData (),
           t->get_size (), bmap, tc);
       t->bitmap = bmap;
 
@@ -242,7 +297,7 @@ void csTextureHandleSoftware::ComputeMeanColor ()
       }
     }
 
-  csQuantizeEnd ();
+  quant.End ();
 
   SetupFromPalette ();
 }
@@ -278,7 +333,8 @@ void csTextureHandleSoftware::SetupFromPalette ()
   }
 }
 
-void csTextureHandleSoftware::GetOriginalColormap (csRGBpixel *oPalette, int &oCount)
+void csTextureHandleSoftware::GetOriginalColormap (csRGBpixel *oPalette,
+		int &oCount)
 {
   oCount = palette_size;
   uint8 *src = orig_palette;
@@ -359,7 +415,8 @@ static uint8 *GenLightmapTable (int bits)
   return table;
 }
 
-csTextureManagerSoftware::csTextureManagerSoftware (iObjectRegistry *object_reg,
+csTextureManagerSoftware::csTextureManagerSoftware (
+  iObjectRegistry *object_reg,
   csGraphics3DSoftwareCommon *iG3D, iConfigFile *config)
   : csTextureManager (object_reg, iG3D->GetDriver2D())
 {
@@ -498,7 +555,8 @@ void csTextureManagerSoftware::create_inv_cmap ()
   // Now we'll encode the palette into 16-bit values
   int i;
   for (i = 0; i < 256; i++)
-    Scan.GlobalCMap [i] = encode_rgb (cmap [i].red, cmap [i].green, cmap [i].blue);
+    Scan.GlobalCMap [i] = encode_rgb (cmap [i].red, cmap [i].green,
+		    cmap [i].blue);
 }
 
 void csTextureManagerSoftware::create_alpha_tables ()
@@ -548,10 +606,12 @@ void csTextureManagerSoftware::compute_palette ()
   for (_r = 0; _r < 6; _r++)
     for (_g = 0; _g < 6; _g++)
       for (_b = 0; _b < 4; _b++)
-        cmap.alloc_rgb (20 + _r * 42, 20 + _g * 42, 30 + _b * 50, prefered_dist);
+        cmap.alloc_rgb (20 + _r * 42, 20 + _g * 42, 30 + _b * 50,
+			prefered_dist);
 
   // Compute a common color histogram for all textures
-  csQuantizeBegin ();
+  csColorQuantizer quant;
+  quant.Begin ();
 
   for (i = textures.Length () - 1; i >= 0; i--)
   {
@@ -562,7 +622,7 @@ void csTextureManagerSoftware::compute_palette ()
     csRGBpixel *cmap = colormap;
     if (txt->GetKeyColor ())
       cmap++, colormapsize--;
-    csQuantizeCount (cmap, colormapsize);
+    quant.Count (cmap, colormapsize);
   }
 
   // Introduce the uniform colormap bias into the histogram
@@ -572,14 +632,14 @@ void csTextureManagerSoftware::compute_palette ()
     if (!locked [i] && cmap.alloc [i])
       new_cmap [colors++] = cmap [i];
 
-  csQuantizeBias (new_cmap, colors, uniform_bias);
+  quant.Bias (new_cmap, colors, uniform_bias);
 
   // Now compute the actual colormap
   colors = 0;
   for (i = 0; i < 256; i++)
     if (!locked [i]) colors++;
   csRGBpixel *cmap_p = new_cmap;
-  csQuantizePalette (cmap_p, colors);
+  quant.Palette (cmap_p, colors);
 
   // Finally, put the computed colors back into the colormap
   int outci = 0;
@@ -589,7 +649,7 @@ void csTextureManagerSoftware::compute_palette ()
     cmap [outci++] = new_cmap [i];
   }
 
-  csQuantizeEnd ();
+  quant.End ();
 
   // Now create the inverse colormap
   create_inv_cmap ();

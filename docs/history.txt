@@ -3,6 +3,18 @@ The history order is reversed so that new features are at the top.
 17-Oct-2002
 	- Removed a few additional procedural texture functions from the
 	  iGraphics3D/iGraphics2D interfaces.
+	- Started work on software implementation of SetRenderTarget().
+	  To support this added the ability to generate inverse palettes
+	  in software renderer textures. An inverse palette basically
+	  transforms a truecolor color (15 or 16 bit) to a palette index
+	  which is suitable for that texture (in the software renderer
+	  every texture has its own 8-bit palette).
+	  Other than this the SetRenderTarget() is currently not yet
+	  operational.
+	- Put the csQuantizeBla() functions in a new csColorQuantizer
+	  class. This ensures that it is now possible to use multiple
+	  instances of the csColorQuantizer by eliminating the use
+	  of global variables.
 	- Eric Sunshine eliminated compilation warnings from the OpenGL
 	  renderer.
 	- Eric sunshine eliminated compilation warnings from the csSaver

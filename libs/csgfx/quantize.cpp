@@ -23,39 +23,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-/*
- * The algorithm presented here is a variation of well-known and widely-used
- * Heckbert quantization algorithm. It works in the following way: first,
- * we build a 3-D histogram that describes which colors and how many times
- * the corresponding colors were used. Since we deal with RGB images, all
- * possible colors counts to 256^3 = 16777216 colors, too much to keep in
- * memory. Because of this, we ignore several lowest bits from each color
- * component, taking into consideration human eye's sensivity to different
- * color components we take 5 bits for R, 6 bits for G and 4 bits for B.
- * This summary reduces to 32*64*16 = 32768 histogram cells, which is
- * a reasonable size for an dynamically-allocated array.
- *
- * Next, we take the entire color box and split it into subboxes.
- * The split happens along the longest of R,G,B axis into half
- * (and taking again into account eye sensivity). After which we take
- * again the biggest box, and split it again and so on until we
- * have that much boxes how much colors we want. Then we assign to each
- * box a color index, and compute the median RGB value for each box.
- *
- * To keep memory requirements in reasonable bounds, we scale down R/G/B
- * components to 5/6/4 bits respectively. This produces results that are
- * different from those we'll get with, say, 6/7/6 resolution but its
- * a quite suitable solution, for a quality vs speed choice. I've tried
- * 5/6/5 as well as 6/6/4 and its really hard to say they are better -
- * the results are definitely different but it's hard to say they are
- * really better.
- *
- * WARNING: If the sum of R+G+B bits exceeds 16, you will a need special
- * case for big endian machines for the INDEX_B macro (see below). With
- * big-endian machines the B component starts at bit 8, thus the right
- * shift counter becomes negative. Probably the best solution is to add
- * and #if B_BIT + 8 - HIST_B_BITS - HIST_G_BITS - HIST_R_BITS < 0.
- */
 #define HIST_R_BITS	5
 #define HIST_G_BITS	6
 #define HIST_B_BITS	5
@@ -102,12 +69,7 @@
 // Calculate index into histogram for given R,G,B components
 #define INDEX(r,g,b)	(r + (g << HIST_R_BITS) + (b << (HIST_R_BITS + HIST_G_BITS)))
 
-// The storage for color usage histogram
-static uint16 *hist = NULL;
-// Total number of colors that were used to create the histogram
-static unsigned hist_pixels;
-
-/*
+/**
  * A box in color space.
  * Both minimal and maximal component bounds are inclusive, that is, the bounds
  * Rm = 0, Rx = 255 means the box covers the entire R component range.
@@ -118,6 +80,8 @@ static unsigned hist_pixels;
  */
 struct csColorBox
 {
+  csColorQuantizer* quant;
+
   // The minimal and maximal R
   uint8 Rm,Rx;
   // The minimal and maximal G
@@ -152,41 +116,41 @@ struct csColorBox
   void CountPixels ()
   {
     PixelCount = ColorCount = 0;
-	int b;
+    int b;
     for (b = Bm; b <= Bx; b++)
-	{
-	  int g;
+    {
+      int g;
       for (g = Gm; g <= Gx; g++)
       {
-        uint16 *hp = &hist [INDEX (Rm, g, b)];
-		int r;
+        uint16 *hp = &quant->hist [INDEX (Rm, g, b)];
+	int r;
         for (r = Rx - Rm; r >= 0; r--, hp++)
-		{
+	{
           if (*hp)
           {
             PixelCount += *hp;
             ColorCount++;
           } /* endif */
-		}
-      } /* endfor */
 	}
+      } /* endfor */
+    }
   }
 
   // Move Rm up until we find pixels that contain this value
   bool ShrinkRm ()
   {
     uint8 iRm = Rm;
-	int g;
+    int g;
     for (; Rm <= Rx; Rm++)
-	{
-	  uint8 b;
+    {
+      uint8 b;
       for (b = Bm; b <= Bx; b++)
       {
-        uint16 *hp = &hist [INDEX (Rm, Gm, b)];
+        uint16 *hp = &quant->hist [INDEX (Rm, Gm, b)];
         for (g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
           if (*hp) return (Rm != iRm);
       }
-	}
+    }
     return (Rm != iRm);
   }
 
@@ -194,11 +158,11 @@ struct csColorBox
   bool ShrinkRx ()
   {
     uint8 iRx = Rx;
-	int g;
+    int g;
     for (; Rx >= Rm; Rx--)
       for (uint8 b = Bm; b <= Bx; b++)
       {
-        uint16 *hp = &hist [INDEX (Rx, Gm, b)];
+        uint16 *hp = &quant->hist [INDEX (Rx, Gm, b)];
         for (g = Gx - Gm; g >= 0; g--, hp += HIST_R_MAX)
           if (*hp) return (Rx != iRx);
       }
@@ -209,18 +173,18 @@ struct csColorBox
   bool ShrinkGm ()
   {
     uint8 iGm = Gm;
-	int r;
+    int r;
 
     for (; Gm <= Gx; Gm++)
-	{
-	  uint8 b;
+    {
+      uint8 b;
       for (b = Bm; b <= Bx; b++)
       {
-        uint16 *hp = &hist [INDEX (Rm, Gm, b)];
+        uint16 *hp = &quant->hist [INDEX (Rm, Gm, b)];
         for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Gm != iGm);
       }
-	}
+    }
     return (Gm != iGm);
   }
 
@@ -228,17 +192,17 @@ struct csColorBox
   bool ShrinkGx ()
   {
     uint8 iGx = Gx;
-	int r;
+    int r;
     for (; Gx >= Gm; Gx--)
-	{
-	  uint8 b;
+    {
+      uint8 b;
       for (b = Bm; b <= Bx; b++)
       {
-        uint16 *hp = &hist [INDEX (Rm, Gx, b)];
+        uint16 *hp = &quant->hist [INDEX (Rm, Gx, b)];
         for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Gx != iGx);
       }
-	}
+    }
     return (Gx != iGx);
   }
 
@@ -246,17 +210,17 @@ struct csColorBox
   bool ShrinkBm ()
   {
     uint8 iBm = Bm;
-	int r;
+    int r;
     for (; Bm <= Bx; Bm++)
-	{
-	  uint8 g;
+    {
+      uint8 g;
       for (g = Gm; g <= Gx; g++)
       {
-        uint16 *hp = &hist [INDEX (Rm, g, Bm)];
+        uint16 *hp = &quant->hist [INDEX (Rm, g, Bm)];
         for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Bm != iBm);
       }
-	}
+    }
     return (Bm != iBm);
   }
 
@@ -264,17 +228,17 @@ struct csColorBox
   bool ShrinkBx ()
   {
     uint8 iBx = Bx;
-	int r;
+    int r;
     for (; Bx >= Bm; Bx--)
-	{
-	  uint8 g;
+    {
+      uint8 g;
       for (g = Gm; g <= Gx; g++)
       {
-        uint16 *hp = &hist [INDEX (Rm, g, Bx)];
+        uint16 *hp = &quant->hist [INDEX (Rm, g, Bx)];
         for (r = Rx - Rm; r >= 0; r--, hp++)
           if (*hp) return (Bx != iBx);
       }
-	}
+    }
     return (Bx != iBx);
   }
 
@@ -295,11 +259,11 @@ struct csColorBox
   {
     unsigned rs = 0, gs = 0, bs = 0;
     unsigned count = 0;
-	int b, g, r;
+    int b, g, r;
     for (b = Bm; b <= Bx; b++)
       for (g = Gm; g <= Gx; g++)
       {
-        uint16 *hp = &hist [INDEX (Rm, g, b)];
+        uint16 *hp = &quant->hist [INDEX (Rm, g, b)];
         for (r = Rm; r <= Rx; r++, hp++)
           if (*hp)
           {
@@ -325,47 +289,44 @@ struct csColorBox
   void FillInverseCMap (uint8 *icmap, uint8 index)
   {
     int Rcount = Rx - Rm + 1;
-	int b;
+    int b;
     for (b = Bm; b <= Bx; b++)
-	{
-	  int g;
+    {
+      int g;
       for (g = Gm; g <= Gx; g++)
         memset (&icmap [INDEX (Rm, g, b)], index, Rcount);
-	}
+    }
   }
 };
 
-// The storage for color space boxes
-static csColorBox *box = NULL;
-// Number of valid color boxes
-static int boxcount;
-// The storage for color indices
-static uint8 *color_index = NULL;
-
-static int compare_boxes (const void *i1, const void *i2)
+static csColorQuantizer* compare_boxes_quant = NULL;
+int csColorQuantizer::compare_boxes (const void *i1, const void *i2)
 {
-  int count1 = box [*(uint8 *)i1].PixelCount;
-  int count2 = box [*(uint8 *)i2].PixelCount;
+  int count1 = compare_boxes_quant->box [*(uint8 *)i1].PixelCount;
+  int count2 = compare_boxes_quant->box [*(uint8 *)i2].PixelCount;
   return (count1 > count2) ? -1 : (count1 == count2) ? 0 : +1;
 }
 
-//------------------------------------------------------------- The API ------//
-
-// The state of quantization variables
-static enum
+csColorQuantizer::csColorQuantizer ()
 {
-  // Uninitialized: initial state
-  qsNone,
-  // Counting color frequencies
-  qsCount,
-  // Remapping input images to output
-  qsRemap
-} qState = qsNone;
+  hist = NULL;
+  hist_pixels = 0;
+  box = NULL;
+  boxcount = 0;
+  color_index = NULL;
+  qState = qsNone;
+  Begin ();
+}
 
-void csQuantizeBegin ()
+csColorQuantizer::~csColorQuantizer ()
+{
+  End ();
+}
+
+void csColorQuantizer::Begin ()
 {
   // Clean up, if previous quantization sequence was not finished
-  csQuantizeEnd ();
+  End ();
 
   // First, allocate the histogram
   hist = new uint16 [HIST_R_MAX * HIST_G_MAX * HIST_B_MAX];
@@ -375,14 +336,16 @@ void csQuantizeBegin ()
   qState = qsCount;
 }
 
-void csQuantizeEnd ()
+/// Clean up quantization. Is automatically done at destruction time.
+void csColorQuantizer::End ()
 {
   delete [] color_index; color_index = NULL;
   delete [] box; box = NULL;
   delete [] hist; hist = NULL;
 }
 
-void csQuantizeCount (csRGBpixel *image, int pixels, csRGBpixel *transp)
+void csColorQuantizer::Count (csRGBpixel *image, int pixels,
+		csRGBpixel *transp)
 {
   // Sanity check
   if (!pixels || qState != qsCount)
@@ -416,7 +379,7 @@ void csQuantizeCount (csRGBpixel *image, int pixels, csRGBpixel *transp)
     }
 }
 
-void csQuantizeBias (csRGBpixel *colors, int count, int weight)
+void csColorQuantizer::Bias (csRGBpixel *colors, int count, int weight)
 {
   // Sanity check
   if (!count || qState != qsCount)
@@ -443,7 +406,8 @@ void csQuantizeBias (csRGBpixel *colors, int count, int weight)
   }
 }
 
-void csQuantizePalette (csRGBpixel *&outpalette, int &maxcolors, csRGBpixel *transp)
+void csColorQuantizer::Palette (csRGBpixel *&outpalette,
+		int &maxcolors, csRGBpixel *transp)
 {
   // Sanity check
   if (qState != qsCount || !maxcolors)
@@ -451,6 +415,10 @@ void csQuantizePalette (csRGBpixel *&outpalette, int &maxcolors, csRGBpixel *tra
 
   // Good. Now we create the array of color space boxes.
   box = new csColorBox [maxcolors];
+  int i;
+  for (i = 0 ; i < maxcolors ; i++)
+    box [i].quant = this;
+
   box [0].Set (0, HIST_R_MAX - 1, 0, HIST_G_MAX - 1, 0, HIST_B_MAX - 1);
   box [0].Shrink ();
   box [0].ComputeVolume ();
@@ -590,7 +558,9 @@ void csQuantizePalette (csRGBpixel *&outpalette, int &maxcolors, csRGBpixel *tra
   for (count = 0; count < boxcount; count++)
     color_index [count] = count;
   // Sort palette indices by usage (a side bonus to quantization)
+  compare_boxes_quant = this;
   qsort (color_index, boxcount, sizeof (uint8), compare_boxes);
+  compare_boxes_quant = NULL;
 
   // Allocate the palette, if not already allocated
   if (!outpalette)
@@ -616,7 +586,7 @@ void csQuantizePalette (csRGBpixel *&outpalette, int &maxcolors, csRGBpixel *tra
   maxcolors = boxcount + delta;
 }
 
-void csQuantizeRemap (csRGBpixel *image, int pixels,
+void csColorQuantizer::Remap (csRGBpixel *image, int pixels,
   uint8 *&outimage, csRGBpixel *transp)
 {
   // Sanity check
@@ -667,7 +637,8 @@ void csQuantizeRemap (csRGBpixel *image, int pixels,
     }
 }
 
-void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
+void csColorQuantizer::RemapDither (
+  csRGBpixel *image, int pixels, int pixperline,
   csRGBpixel *palette, int colors, uint8 *&outimage, csRGBpixel *transp)
 {
   // Sanity check
@@ -690,11 +661,11 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
     csInverseColormap (colors - delta, palette + delta,
       HIST_R_BITS, HIST_G_BITS, HIST_B_BITS, icmap);
     if (transp)
-	{
-	  int i;
+    {
+      int i;
       for (i = 0; i < HIST_R_MAX * HIST_G_MAX * HIST_B_MAX; i++)
         icmap [i]++;
-	}
+    }
     qState = qsRemap;
   }
 
@@ -817,17 +788,18 @@ void csQuantizeRemapDither (csRGBpixel *image, int pixels, int pixperline,
   }
 }
 
-void csQuantizeRGB (csRGBpixel *image, int pixels, int pixperline,
+void csColorQuantizer::RGB (csRGBpixel *image, int pixels, int pixperline,
   uint8 *&outimage, csRGBpixel *&outpalette, int &maxcolors, bool dither)
 {
-  csQuantizeBegin ();
+  Begin ();
 
-  csQuantizeCount (image, pixels);
-  csQuantizePalette (outpalette, maxcolors);
+  Count (image, pixels);
+  Palette (outpalette, maxcolors);
   if (dither)
-    csQuantizeRemapDither (image, pixels, pixperline, outpalette, maxcolors, outimage);
+    RemapDither (image, pixels, pixperline, outpalette, maxcolors, outimage);
   else
-    csQuantizeRemap (image, pixels, outimage);
+    Remap (image, pixels, outimage);
 
-  csQuantizeEnd ();
+  End ();
 }
+

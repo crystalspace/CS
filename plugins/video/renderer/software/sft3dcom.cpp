@@ -1364,6 +1364,41 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
       return false;
   }
 
+  if (render_target)
+  {
+    int txt_w, txt_h;
+    render_target->GetMipMapDimensions (0, txt_w, txt_h);
+    if (!rt_cliprectset)
+    {
+      G2D->GetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
+      G2D->SetClipRect (-1, -1, txt_w+1, txt_h+1);
+      rt_cliprectset = true;
+    }
+
+    if (!rt_onscreen)
+    {
+#if 0
+      texture_cache->Cache (render_target);
+      GLuint handle = ((csTxtCacheData *)render_target->GetCacheData ())
+      	->Handle;
+      statecache->SetShadeModel (GL_FLAT);
+      statecache->EnableState (GL_TEXTURE_2D);
+      glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
+      statecache->SetTexture (GL_TEXTURE_2D, handle);
+      SetupBlend (CS_FX_COPY, 0, false);
+      SetGLZBufferFlags (CS_ZBUF_NONE);
+
+      glBegin (GL_QUADS);
+      glTexCoord2f (0, 0); glVertex2i (0, height-txt_h+1);
+      glTexCoord2f (0, 1); glVertex2i (0, height-0+1);
+      glTexCoord2f (1, 1); glVertex2i (txt_w, height-0+1);
+      glTexCoord2f (1, 0); glVertex2i (txt_w, height-txt_h+1);
+      glEnd ();
+#endif
+      rt_onscreen = true;
+    }
+  }
+
   if (DrawFlags & CSDRAW_CLEARZBUFFER)
     memset (z_buffer, 0, z_buf_size);
 
@@ -1439,7 +1474,6 @@ bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
   }
 
   DrawMode = DrawFlags;
-
   return true;
 }
 
@@ -1458,6 +1492,62 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
   DrawMode = 0;
+
+  if (render_target)
+  {
+    if (rt_cliprectset)
+    {
+      rt_cliprectset = false;
+      G2D->SetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
+    }
+
+    if (rt_onscreen)
+    {
+      rt_onscreen = false;
+#if 0
+      int txt_w, txt_h;
+      render_target->GetMipMapDimensions (0, txt_w, txt_h);
+      csTextureHandleSoftware* tex_mm = (csTextureHandleSoftware *)
+	    render_target->GetPrivateObject ();
+      csTextureSoftware *tex_0 = (csTextureSoftware*)(tex_mm->get_texture (0));
+      tex_mm->CreateReversePalette ();
+      uint8* reverse_palette = tex_mm->GetReversePalette ();
+      int x, y;
+      uint8* bitmap = tex_0->bitmap;
+      switch (pfmt.PixelBytes)
+      {
+	case 1: // Not supported @@@
+	  break;
+	case 2:
+	  {
+	    for (y = 0 ; y < txt_h ; y++)
+	    {
+              uint16* d = (uint16*)line_table[y];
+	      for (x = 0 ; x < txt_w ; x++)
+	      {
+		*bitmap++ = reverse_palette[*d++];
+	      }
+	    }
+	  }
+	  break;
+	case 4:
+	  {
+	    for (y = 0 ; y < txt_h ; y++)
+	    {
+              uint32* d = (uint32*)line_table[y];
+	      for (x = 0 ; x < txt_w ; x++)
+	      {
+		uint32 pix = *d++;
+		//*bitmap++ = reverse_palette[*d++];
+	      }
+	    }
+	  }
+	  break;
+      }
+#endif
+    }
+  }
+  render_target = NULL;
 }
 
 #define SMALL_D 0.01
@@ -3514,7 +3604,8 @@ bool csGraphics3DSoftwareCommon::IsLightmapOK (iPolygonTexture* poly_texture)
 void csGraphics3DSoftwareCommon::SetRenderTarget (iTextureHandle* handle,
 	bool persistent)
 {
-  (void)handle;
-  (void)persistent;
+  render_target = handle;
+  rt_onscreen = !persistent;
+  rt_cliprectset = false;
 }
 
