@@ -61,9 +61,9 @@ void SystemFatalError (char *s)
   exit (1);
 }
 
-#ifdef DO_DINPUT_KEYBOARD
-
 #define MAX_SCANCODE 0x100
+
+#ifdef DO_DINPUT_KEYBOARD
 
 /*
  * This table performs the translation from keycode to Crystal Space key code.
