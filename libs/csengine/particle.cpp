@@ -493,10 +493,15 @@ void csRainParticleSystem :: Update(time_t elapsed_time)
 
       // @@@ also shifty will not work very nicely with slanted rain.
       //   but perhaps it won't be too bad...
-      float shifty = rainbox.MinY() - part_pos[i].y;
+      float toolow = ABS(rainbox.MinY() - part_pos[i].y);
+      float height = rainbox.MaxY() - rainbox.MinY();
+      height /= 4.0;
+      while(toolow>height) toolow-=height;
       pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(), 
         0.0f, rainbox.MaxZ() - rainbox.MinZ()), rainbox.Min() );
-      pos.y = rainbox.MaxY() - shifty;
+      pos.y = rainbox.MaxY() - toolow;
+      if(pos.y < rainbox.MinY() || pos.y > rainbox.MaxY()) 
+        pos.y = rainbox.MaxY() - height * ((float)rand() / (1.0 + RAND_MAX));
       GetParticle(i)->SetPosition(pos);
       part_pos[i] = pos;
     }
@@ -569,10 +574,15 @@ void csSnowParticleSystem :: Update(time_t elapsed_time)
 
       // @@@ also shifty will not work very nicely with slanted rain.
       //   but perhaps it won't be too bad...
-      float shifty = rainbox.MinY() - part_pos[i].y;
+      float toolow = ABS(rainbox.MinY() - part_pos[i].y);
+      float height = rainbox.MaxY() - rainbox.MinY();
+      height /= 4.0;
+      while(toolow>height) toolow-=height;
       pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(), 
         0.0f, rainbox.MaxZ() - rainbox.MinZ()), rainbox.Min() );
-      pos.y = rainbox.MaxY() - shifty;
+      pos.y = rainbox.MaxY() - toolow;
+      if(pos.y < rainbox.MinY() || pos.y > rainbox.MaxY()) 
+        pos.y = rainbox.MaxY() - height * ((float)rand() / (1.0 + RAND_MAX));
       GetParticle(i)->SetPosition(pos);
       part_pos[i] = pos;
       part_speed[i] = 0.0;
