@@ -2,20 +2,23 @@ Crystal Space detailed change log.
 http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
+
 7-Jul-2003
+	- Peter Amstutz changed iDataBuffer so that it can be instructed 
+	  not to delete the underlying buffer when iDataBuffer is freed.
 	- Peter Amstutz fixed csPolygon3DStatic so that the object plane 
 	  (polygon normal) is updated if necessary when GetObjectPlane() 
 	  is called.
-	- Peter Amstutz changed iDataBuffer so that it can be instructed 
-	  not to delete the underlying buffer when iDataBuffer is freed.
-
+	- Eric Sunshine removed some errant DecRef() invocations from the
+	  "pixmap" how-to which were pointed out by Jacob€Gostylo
+	  <jgostylo@users.sourceforge.net>.
 5-Jul-2003
         - Boyan removed circular reference between ds3d render and listener
           which prevent to unload ds3d plugin.
 	- Marten added so that NR use gl*Pointer when there are no 
 	  glAttributePointer extension available.
-	- res added a home-grown GetLongPathName () surrogate for older 
-	  Windowses, where it's unsupported. This was pointed out by Paul G.
+	- res added a home-grown GetLongPathName() surrogate for older Windows
+	  versions, where it's unsupported.  This was pointed out by Paul G.
 4-Jul-2003
 	- res committed fixes from Oktal for some circular #include 
 	  dependencies in the new renderer.
@@ -43,12 +46,12 @@ The history order is reversed so that new features are at the top.
 	- res enhanced bugplug with a command to send debug commands to
 	  arbitrary plugins. Syntax is: debugcmd <classID> <command>
 	- res fixed a spelling error in bugplug.
-	- duhprey did the following:
-	    - Softness generalization patch (soft_cfm contact is now handled 
+	- Duhprey did the following:
+	    - Softness generalization patch (soft_cfm contact is now handled
 	      the same was as friction and elasticity)
-	    - Plane direction patches (invert A and C, as well as B)
-	      planes are not consistent and still need some work.
-	    - Revert the MeshSphere collider, those optimizations aren't 
+	    - Plane direction patches (invert A and C, as well as B) planes are
+	      not consistent and still need some work.
+	    - Revert the MeshSphere collider, those optimizations aren't
 	      general.
 	    - Fix the collision callback to work when 1 body is static.
 2-Jul-2003
@@ -57,31 +60,28 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine applied a patch to snapshot.py from Just van Rossum
 	  <just@letterror.com> which allows it to work correctly when project
 	  subdirectory names contain spaces.
-	- Anders Stenberg 
-	  -  made sure NextFrame is called when rendering with new renderer.
-	  -  fixed a bug where xorpat assumed width == height.
-	- DeSigna 
-	  - added a pair of MemoryMapWindow() functions, allow mapping
-	    parts of files, mapping in read/write files and re-using
-	    file handles for multiple windows into the same file. 
-	  - MemoryMapFile() was modified to work with these new
-	    functions.  
+	- Anders Stenberg made the following changes:
+	    - Made sure NextFrame is called when rendering with new renderer.
+	    - Fixed a bug where xorpat assumed width == height.
+	- DeSigna made the following changes:
+	  - Added a pair of MemoryMapWindow() functions, allow mapping parts of
+	    files, mapping in read/write files and re-using file handles for
+	    multiple windows into the same file.
+	  - MemoryMapFile() was modified to work with these new functions.
 	- Duhprey made a Speed improvement to PreCompute in terrbig
-	- res updated the Win32 memory mapping for "window mapping". 
-	  However, the new stuff is still untested, as it isn't used yet 
-	  anywhere.
+	- res updated the Win32 memory mapping for "window mapping".  However,
+	  the new stuff is still untested, as it isn't used yet anywhere.
 	- res fixed some doxygen issues in csshlib.h, sysfunc.h, syspath.h.
-	- DeSigna patched in the walktest documentation contributed by
-	  Marten <martin@cyber-dog.freeserve.co.uk>. The old
-	  documentation remains in CVS until some parts are
-	  transplanted.
+	- DeSigna patched in the walktest documentation contributed by Marten
+	  <martin@cyber-dog.freeserve.co.uk>.  The old documentation remains in
+	  CVS until some parts are transplanted.
 1-Jul-2003
 	- HangDude made the following changes:
 	   - Moved anonrndbuf.h from csutil to cstool (on Jorrit's request).
 	   - Added LGPL notice.
 	   - Updated genmesh because of that change.
-	- res fixed rlsstencil.mak which got messed up when the plugin name
-	  was changed.
+	- res fixed rlsstencil.mak which got messed up when the plugin name was
+	  changed.
 	- Matze moved CFLAGS from mk/jam/variant.jam to Jamrules to not enforce
 	  external projects to the same flags as CS is using
 	- Anders Stenberg made the following changes:
@@ -100,20 +100,20 @@ The history order is reversed so that new features are at the top.
 	  in Matze's CS/mk/autoconf directory or in some other location
 	  searched by Autoconf by default.
 28-Jun-2003
-	- DeSigna fixed a small logic error in csGetKeyDesc(), where
-	  a ?: conditional had its values the wrong way round.
-        - JTarbox fixed it so the fast_mem_copy code is only active
-          with a MSVC less then version 7.
-	- res fixed win32 csosdefs.h to use fast_mem_copy only on MSVC.
-	  The recent changes caused that fast_mem_copy was used on VC < 7
-	  _and_ non-VC platforms.
+	- DeSigna fixed a small logic error in csGetKeyDesc(), where a ?:
+	  conditional had its values the wrong way round.
+        - JTarbox fixed it so the fast_mem_copy code is only active with a MSVC
+	  less then version 7.
+	- res fixed win32 csosdefs.h to use fast_mem_copy only on MSVC.  The
+	  recent changes caused that fast_mem_copy was used on VC < 7 _and_
+	  non-VC platforms.
 27-Jun-2003
-	- Jorrit fixed a bug in genmesh where it would not initialize
-	  normals to 0 if <autonormals/> was not used. The result would
-	  be unpredictable lighting behaviour. Now genmesh will initialize
-	  the normals to 0. This means that at least the behaviour is
-	  consistent: if you don't use <autonormals/> and you don't specify
-	  normals manually you'll get NO lighting at all.
+	- Jorrit fixed a bug in genmesh where it would not initialize normals
+	  to 0 if <autonormals/> was not used.  The result would be
+	  unpredictable lighting behaviour.  Now genmesh will initialize the
+	  normals to 0.  This means that at least the behaviour is consistent:
+	  if you don't use <autonormals/> and you don't specify normals
+	  manually you'll get NO lighting at all.
 	- res augmented r3dtest to accept a map to load as a command line
 	  parameter.
 	- res renamed stencil.csplugin to the correct rlsstencil.csplugin.
@@ -139,10 +139,9 @@ The history order is reversed so that new features are at the top.
 	  renderer.
 25-Jun-2003
 	- Oktal manually applied a patch to cssocket that was intended for
-	  ensocket, submitted by Ladislav Foldyna.
-	  The patch adds multicast support.
-	  I also added warnings that are triggered when deprecated functions
-	  are called.
+	  ensocket, submitted by Ladislav Foldyna.  The patch adds multicast
+	  support.  I also added warnings that are triggered when deprecated
+	  functions are called.
 	- Oktal fixed the argv error in the Perl module by just having Swig
 	  ignore the function that was causing trouble. This looks like some
 	  sort of bug in Swig.
@@ -218,19 +217,20 @@ The history order is reversed so that new features are at the top.
 	  It have alot of serve compilation-errors which should be fixed before
 	  commiting.
 23-Jun-2003
-	- HangDude fixed metaballs for recent renderbuffer changes
-	   (changed CS_BUF_INDEX / STATIC to CS_BUF_DYNAMIC)
+	- HangDude fixed metaballs for recent renderbuffer changes (changed
+	  CS_BUF_INDEX / STATIC to CS_BUF_DYNAMIC)
         - Boyan did the following in AWS:
-          - Added iAwsComponent->GetFirstFocusableChild
-          - Added awsWindow->SetFocusedChild and awsWindow->GetFocusedChild
-          - awsWindow now holds last focused child on Hide() If window
-            shows again WindowManager knows witch child need to be focused. If
-            there is no info about last focused child window calls
-            GetFirstFocusableChild and focus it.
+	    - Added iAwsComponent->GetFirstFocusableChild().
+	    - Added awsWindow->SetFocusedChild and
+	      awsWindow->GetFocusedChild().
+	    - awsWindow now holds last focused child on Hide() If window shows
+	      again WindowManager knows witch child need to be focused.  If
+	      there is no info about last focused child window calls
+	      GetFirstFocusableChild and focus it.
 	- Jorrit fixed formatting with the csQuaternion class.
 	- Matze fixed 2 errors in the jam rules for .csplugin -> metadata.rc:
-	    There was no dependency set from .csplugin->metadata.rc and the
-	    generated file was not added to the clean target.
+	  There was no dependency set from .csplugin->metadata.rc and the
+	  generated file was not added to the clean target.
 	- Oktal added loaders for the nullmesh object and factory, needed for
 	  blend2cs and hierarchical meshes.
 	- Eric Sunshine fixed the following problems with cspython.mak:
@@ -273,9 +273,8 @@ The history order is reversed so that new features are at the top.
 	  registered is inside a static plugin, no message is emitted.
 	- res removed csGetResourcePath() from winsyspath.cpp - it is in
 	  resdir.cpp already.
-	- DeSigna implemented awsWindow::foNoBorder, which existed as
-	  a name, but unaccessable from skin definitions and unhandled
-	  in the code.
+	- DeSigna implemented awsWindow::foNoBorder, which existed as a name,
+	  but unaccessable from skin definitions and unhandled in the code.
 	- Eric Sunshine added cssys/general/resdir.cpp to
 	  cssys/win32/win32gcc.mak, cssys/Jamfile (for Windows), and
 	  msvcgen/win32.mak since Frank removed the csGetResourcePath()
@@ -444,10 +443,9 @@ The history order is reversed so that new features are at the top.
 	  of the height-y-1.
 	  Closed three sf-bugs on this topic.
 19-Jun-2003
-	- HangDude did following
-	    - added anonymous render buffer manager class, which
-	       can be used to implement the anonymous render buffers for new
-	       renderer easily.
+	- HangDude did following:
+	    - Added anonymous render buffer manager class, which can be used to
+	      implement the anonymous render buffers for new renderer easily.
 	    - "stream" to "renderbuffer" namechange in genmeshldr
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,
