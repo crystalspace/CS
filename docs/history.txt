@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Nov-2003
+	- res made the following changes to configure:
+	    - Now checks for a 'cslibs-config' script, which provide 
+	      additional CFLAGS and LDFLAGS. This script will be included in
+	      the upcoming unified Win32 libs package.
+	    - Some library checks now utilize the new aliases feature for the
+	      lib names in the Win32 libs package.
 21-Nov-2003
 	- Eric Sunshine augmented CS_CHECK_LIBS_WITH() in checklib.m4 so that
 	  it now accepts an optional list of alias names of the library for

@@ -246,6 +246,16 @@ AC_CHECK_PROGS([JAM], [jam])
 AC_PROG_MAKE_SET
 
 
+AC_CHECK_PROGS([CSLIBS_CONFIG], [cslibs-config])
+AS_IF([test -n "$CSLIBS_CONFIG"],
+  [CSLIBS_CFLAGS=`$CSLIBS_CONFIG --cflags`
+   CSLIBS_LFLAGS=`$CSLIBS_CONFIG --lflags`
+   CFLAGS="$CFLAGS $CSLIBS_CFLAGS"
+   CPPFLAGS="$CPPFLAGS $CSLIBS_CFLAGS"
+   LDFLAGS="$LDFLAGS $CSLIBS_LFLAGS"
+   PATH=`$CSLIBS_CONFIG --binpath`:$PATH
+   ])
+
 
 #------------------------------------------------------------------------------
 # Determine how to make a directory tree.  We need to know the exact commands,
@@ -1266,7 +1276,7 @@ CS_CHECK_BUILD([for DirectX], [cs_cv_libdirectx],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([z], [AC_LANG_PROGRAM([#include <zlib.h>], [zlibVersion()])],
     [$srcdir/libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])],
-    [CS_MSG_ERROR([zlib is essential for building CS.])])
+    [CS_MSG_ERROR([zlib is essential for building CS.])], [], [], [], [zlib])
 
 
 
@@ -1287,7 +1297,7 @@ AS_IF([test "$cs_cv_libz" = yes],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libpng], [PNG])], [],
 	[$cs_cv_libz_cflags $cs_cv_libm_cflags],
 	[$cs_cv_libz_lflags $cs_cv_libm_lflags],
-	[$cs_cv_libz_libs $cs_cv_libm_libs])])
+	[$cs_cv_libz_libs $cs_cv_libm_libs], [libpng])])
 
 
 
@@ -1301,7 +1311,8 @@ CS_CHECK_LIB_WITH([jpeg],
 	#include <stdio.h>
 	#include <jpeglib.h>],
 	[jpeg_create_compress(0)])],
-    [$srcdir/libs/*jpeg*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjpeg], [JPEG])])
+    [$srcdir/libs/*jpeg*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjpeg], [JPEG])],
+    [], [], [], [], [libjpeg])
 
 
 
@@ -1316,7 +1327,7 @@ AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libmng], [MNG])], [],
 	[$cs_cv_libjpeg_cflags $cs_cv_libz_cflags],
 	[$cs_cv_libjpeg_lflags $cs_cv_libz_lflags],
-	[$cs_cv_libjpeg_libs $cs_cv_libz_libs])])
+	[$cs_cv_libjpeg_libs $cs_cv_libz_libs], [libmng])])
 
 
 
@@ -1396,7 +1407,8 @@ CS_CHECK_LIB3DS_PREPARE
 
 CS_CHECK_LIB_WITH([3ds],
     [AC_LANG_PROGRAM([#include <lib3ds/file.h>],[lib3ds_file_new();])],
-    [$srcdir/libs/lib3ds*], [], [], [], [], [], [$cs_cv_libm_libs])
+    [$srcdir/libs/lib3ds*], [], [], [], [], [], [$cs_cv_libm_libs],
+    [lib3ds-120])
 
 AS_IF([test $cs_cv_lib3ds = yes],
     [CS_CHECK_BUILD([if lib3ds is sufficiently recent], [cs_cv_lib3ds_recent],
@@ -1450,10 +1462,14 @@ AC_DEFUN([CS_CHECK_LIBOPENAL],
 	    [CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
 	    [alutInit(0,0);])],
 	[CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
-	CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
+	CS_CREATE_TUPLE([],[],[-lopenal]) \
+	CS_CREATE_TUPLE([],[],[-lopenal32]) \
 	CS_CREATE_TUPLE([],[],[-lalut -lopenal]) \
+	CS_CREATE_TUPLE([],[],[-lalut -lopenal32]) \
 	CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
-	CS_CREATE_TUPLE([],[],[-lopenal])], [],
+	CS_CREATE_TUPLE([],[],[-lopenal32 -ldsound]) \
+	CS_CREATE_TUPLE([],[],[-lalut -lopenal -ldsound]) \
+	CS_CREATE_TUPLE([],[],[-lalut -lopenal32 -ldsound])], [],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])], [], [],
 	[$cs_use_local_include $cs_cv_sys_pthread_cflags],
 	[$cs_use_local_lib $cs_cv_sys_pthread_lflags],
