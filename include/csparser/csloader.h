@@ -188,7 +188,7 @@ class csLoader
   static csFrame* LoadFrame (csSpriteTemplate* stemp, char* buf);
 
   /// Find a material (and create one from texture if possible)
-  static csMaterialWrapper* FindMaterial (const char *iName);
+  static csMaterialWrapper* FindMaterial (const char *iName, bool onlyRegion = false);
 
   /// Load texture definition
   static void load_tex (char** buf, Color* colors, int num_colors, char* name);

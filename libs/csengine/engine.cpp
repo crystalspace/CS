@@ -2079,6 +2079,16 @@ iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
   return &wr->scfiMaterialWrapper;
 }
 
+csMaterialWrapper* csEngine::FindCsMaterial (const char* iName, bool regionOnly)
+{
+  csMaterialWrapper* wr;
+  if (regionOnly && region)
+    wr = (csMaterialWrapper*)FindObjectInRegion (region, *materials, iName);
+  else
+    wr = materials->FindByName (iName);
+  return wr;
+}
+
 iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
 {
   csTextureWrapper* wr;
@@ -2087,6 +2097,16 @@ iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
   else
     wr = textures->FindByName (iName);
   return &wr->scfiTextureWrapper;
+}
+
+csTextureWrapper* csEngine::FindCsTexture (const char* iName, bool regionOnly)
+{
+  csTextureWrapper* wr;
+  if (regionOnly && region)
+    wr = (csTextureWrapper*)FindObjectInRegion (region, *textures, iName);
+  else
+    wr = textures->FindByName (iName);
+  return wr;
 }
 
 iCameraPosition* csEngine::FindCameraPosition (const char* iName, bool regionOnly)

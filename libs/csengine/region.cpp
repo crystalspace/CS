@@ -249,7 +249,16 @@ bool csRegion::Region::PrepareTextures ()
   }
 
   // Prepare all the textures.
-  txtmgr->PrepareTextures ();
+  //@@@ Only prepare new textures: txtmgr->PrepareTextures ();
+  {
+    for (csObjIterator iter =
+	scfParent->GetIterator (csTextureWrapper::Type, false);
+  	!iter.IsFinished () ; ++iter)
+    {
+      csTextureWrapper* csth = (csTextureWrapper*)iter.GetObj ();
+      csth->GetTextureHandle ()->Prepare ();
+    }
+  }
 
   // Then register all materials to the texture manager.
   {
@@ -264,7 +273,17 @@ bool csRegion::Region::PrepareTextures ()
   }
 
   // Prepare all the materials.
-  txtmgr->PrepareMaterials ();
+  //@@@ Only prepare new materials: txtmgr->PrepareMaterials ();
+  {
+    for (csObjIterator iter = 
+	scfParent->GetIterator (csMaterialWrapper::Type, false);
+  	!iter.IsFinished () ; ++iter)
+    {
+      csMaterialWrapper* csmh = (csMaterialWrapper*)iter.GetObj ();
+      csmh->GetMaterialHandle ()->Prepare ();
+    }
+  }
+
   return true;
 }
 

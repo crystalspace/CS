@@ -770,7 +770,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     csPolyTexGouraud *gs = poly->GetGouraudInfo ();
 
     g3dpolyfx.num = num_vertices;
-    poly->GetMaterialWrapper ()->Visit ();
+    if (poly->GetMaterialWrapper ())
+      poly->GetMaterialWrapper ()->Visit ();
     g3dpolyfx.mat_handle = poly->GetMaterialHandle ();
     g3dpolyfx.inv_aspect = rview->GetInvFOV ();
 
@@ -832,7 +833,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
     static G3DPolygonDP g3dpoly;
 
     g3dpoly.num = num_vertices;
-    poly->GetMaterialWrapper ()->Visit ();
+    if (poly->GetMaterialWrapper ())
+      poly->GetMaterialWrapper ()->Visit ();
     g3dpoly.mat_handle = poly->GetMaterialHandle ();
     g3dpoly.inv_aspect = rview->GetInvFOV ();
 

@@ -44,6 +44,12 @@
 #include "csengine/particle.h"
 #include "csengine/region.h"
 #include "csengine/halo.h"
+#include "csfx/partexp.h"
+#include "csfx/partfire.h"
+#include "csfx/partspir.h"
+#include "csfx/partsnow.h"
+#include "csfx/partfoun.h"
+#include "csfx/partrain.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"
@@ -400,13 +406,13 @@ bool csLoader::load_color (char *buf, csRGBcolor &c)
   return true;
 }
 
-csMaterialWrapper *csLoader::FindMaterial (const char *iName)
+csMaterialWrapper *csLoader::FindMaterial (const char *iName, bool onlyRegion)
 {
-  csMaterialWrapper *mat = Engine->GetMaterials ()->FindByName (iName);
+  csMaterialWrapper *mat = Engine->FindCsMaterial (iName, onlyRegion);
   if (mat)
     return mat;
 
-  csTextureWrapper *tex = Engine->GetTextures ()->FindByName (iName);
+  csTextureWrapper *tex = Engine->FindCsTexture (iName, onlyRegion);
   if (tex)
   {
     // Add a default material with the same name as the texture
@@ -759,7 +765,7 @@ csParticleSystem* csLoader::load_fountain (char* name, char* buf)
         break;
       case CS_TOKEN_TEXTURE: //@@@MAT
         ScanStr (params, "%s", str);
-        material = FindMaterial (str);
+        material = FindMaterial (str, onlyRegion);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -862,7 +868,7 @@ csParticleSystem* csLoader::load_fire (char* name, char* buf)
         break;
       case CS_TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        material = FindMaterial (str);
+        material = FindMaterial (str, onlyRegion);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -950,7 +956,7 @@ csParticleSystem* csLoader::load_rain (char* name, char* buf)
         break;
       case CS_TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        material = FindMaterial (str);
+        material = FindMaterial (str, onlyRegion);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -1039,7 +1045,7 @@ csParticleSystem* csLoader::load_snow (char* name, char* buf)
         break;
       case CS_TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        material = FindMaterial (str);
+        material = FindMaterial (str, onlyRegion);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -1439,7 +1445,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
       //@@OBSOLETE, retained for backward compatibility
     case CS_TOKEN_MATERIAL:
       ScanStr (params, "%s", str);
-      info.default_material = FindMaterial (str);
+      info.default_material = FindMaterial (str, onlyRegion);
       if (info.default_material == NULL)
       {
         CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -1588,7 +1594,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec,
         break;
       case CS_TOKEN_TEXTURE: //@@@MAT
         ScanStr (params, "%s", str);
-        material = FindMaterial (str);
+        material = FindMaterial (str, onlyRegion);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -2045,7 +2051,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
         //@@OBSOLETE, retained for backward compatibility
       case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        mat = FindMaterial (str);
+        mat = FindMaterial (str, onlyRegion);
         if (mat == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -2591,7 +2597,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
       case CS_TOKEN_TEXTURE:
       {
         ScanStr (params, "%s", str);
-        csTextureWrapper *texh = Engine->GetTextures ()->FindByName (str);
+        csTextureWrapper *texh = Engine->FindCsTexture (str, onlyRegion);
         if (texh)
           material->SetTextureWrapper (texh);
         else
@@ -2703,7 +2709,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
         //@@OBSOLETE, retained for backward compatibility
       case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        mat = FindMaterial (str);
+        mat = FindMaterial (str, onlyRegion);
         if (mat == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -2894,7 +2900,7 @@ void csLoader::load_tex (char** buf, Color* colors, int num_colors, char* name)
     {
       case CS_TOKEN_TEXTURE://@@@MAT
         ScanStr (params, "%s", str);
-        colors[num_colors].material = FindMaterial (str);
+        colors[num_colors].material = FindMaterial (str, onlyRegion);
         if (colors[num_colors].material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -3048,7 +3054,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case CS_TOKEN_TEXTURE:
         ScanStr (params, "%s", str);
-        material = FindMaterial (str);
+        material = FindMaterial (str, onlyRegion);
         if (material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -3064,7 +3070,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
       case CS_TOKEN_CEIL_TEXTURE:
       case CS_TOKEN_FLOOR_TEXTURE:
         ScanStr (params, "%s", str);
-        colors[num_colors].material = FindMaterial (str);
+        colors[num_colors].material = FindMaterial (str, onlyRegion);
         if (colors[num_colors].material == NULL)
         {
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
@@ -3909,7 +3915,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
   for (i = 0 ; i < num_mat ; i++)
   {
     sprintf (matname, texturebasename, i);
-    csMaterialWrapper* mat = FindMaterial (matname);
+    csMaterialWrapper* mat = FindMaterial (matname, onlyRegion);
     if (mat == NULL) mat = first_mat;
     first_mat = mat;
     terr->SetMaterial (i, mat);
@@ -4701,7 +4707,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
       case CS_TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
-          csMaterialWrapper *mat = FindMaterial (str);
+          csMaterialWrapper *mat = FindMaterial (str, onlyRegion);
           if (mat)
             stemp->SetMaterial (mat);
           else
@@ -4966,7 +4972,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
       case CS_TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
-          csMaterialWrapper* mat = FindMaterial (str);
+          csMaterialWrapper* mat = FindMaterial (str, onlyRegion);
           if (mat == NULL)
           {
             CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", params);
@@ -5083,8 +5089,7 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         //@@OBSOLETE, retained for backward compatibility
       case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);
-        FindMaterial (str);
-        csMaterialWrapper *mat = FindMaterial (str);
+        csMaterialWrapper *mat = FindMaterial (str, onlyRegion);
         if (!mat)
         {
           CsPrintf (MSG_FATAL_ERROR, "No material named `%s' found!\n", str);
@@ -5180,26 +5185,28 @@ iMotion* csLoader::LoadMotion (csEngine* engine, const char* fname)
       fatal_exit (0, false);
     }
 
-		iMotionManager* motionmanager=System->MotionMan;
-		if (!motionmanager) {
-			CsPrintf(MSG_FATAL_ERROR, "No motion manager loaded!\n");
-		} else {
-			iMotion* m=motionmanager->FindByName(name);
-			if(!m) {
-				m=motionmanager->AddMotion(name);
-				if (LoadMotion (m, data))
-				{
-					databuff->DecRef ();
-					return m;
-				}
-				else
-				{
-					m->DecRef();
-					databuff->DecRef ();
-					return NULL;
-				}
-			}
-		}
+    iMotionManager* motionmanager=System->MotionMan;
+    if (!motionmanager)
+      CsPrintf (MSG_FATAL_ERROR, "No motion manager loaded!\n");
+    else
+    {
+      iMotion* m = motionmanager->FindByName (name);
+      if (!m)
+      {
+	m=motionmanager->AddMotion (name);
+	if (LoadMotion (m, data))
+	{
+	  databuff->DecRef ();
+	  return m;
+	}
+	else
+	{
+	  m->DecRef ();
+	  databuff->DecRef ();
+	  return NULL;
+	}
+      }
+    }
   }
   databuff->DecRef ();
   return NULL;

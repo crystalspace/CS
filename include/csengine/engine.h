@@ -35,6 +35,8 @@ class csRegion;
 class csRadiosity;
 class csSector;
 class csSprite;
+class csTextureWrapper;
+class csMaterialWrapper;
 class csTextureList;
 class csMaterialList;
 class csPolygon3D;
@@ -1092,6 +1094,11 @@ public:
    * Add an object to the current region.
    */
   void AddToCurrentRegion (csObject* obj);
+
+  /// Find a loaded texture by name.
+  csTextureWrapper* FindCsTexture (const char* iName, bool regionOnly = false);
+  /// Find a loaded material by name.
+  csMaterialWrapper* FindCsMaterial (const char* iName, bool regionOnly = false);
 
   CSOBJTYPE;
   DECLARE_IBASE;
