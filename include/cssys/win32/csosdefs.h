@@ -225,14 +225,15 @@ struct mmioInfo
 #define CS_EXPORTED_FUNCTION extern "C" __declspec(dllexport)
 
 #if defined (CS_SYSDEF_PROVIDE_DIR) || defined (CS_SYSDEF_PROVIDE_GETCWD) || defined (CS_SYSDEF_PROVIDE_MKDIR)
+#ifdef __CYGWIN32__
+#  include <dirent.h>
+#  define __NEED_GENERIC_ISDIR
+#else
 #  include <direct.h>
 #  if defined(COMP_BC) || defined(COMP_GCC)
-#    ifdef __CYGWIN32__
-#	include <sys/dirent.h>
-#    else
-#    	include <dirent.h>
-#    endif
+#    include <dirent.h>
 #  endif
+#endif
 #endif
 
 #if defined (COMP_BC)
@@ -252,6 +253,11 @@ struct mmioInfo
 #  define CS_MAXPATHLEN 260 /* not 256 */
 #endif
 #define PATH_SEPARATOR '\\'
+
+#if defined (__CYGWIN32__) && defined(CS_SYSDEF_PROVIDE_MKDIR)
+#    define MKDIR(path) mkdir(path, 0755)
+#    undef CS_SYSDEF_PROVIDE_MKDIR
+#endif
 
 // Windows has built-in var "SystemRoot"
 // (env var on NT, but not 9x; so we provide it this way)
@@ -355,9 +361,14 @@ inline char* __VfsCheckVar(const char* VarName)
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_TEMP
-#  include <process.h>
-#  define TEMP_FILE "%x.cs", GETPID()
-#  define TEMP_DIR win32_tempdir()
+# ifdef __CYGWIN32__
+#   include <unistd.h>
+#   define TEMP_FILE "cs%lu.tmp", (unsigned long)getpid()
+#   define TEMP_DIR  "/tmp"
+# else
+#   include <process.h>
+#   define TEMP_FILE "%x.cs", GETPID()
+#   define TEMP_DIR win32_tempdir()
    // This is the function called by TEMP_DIR macro
    static inline char *win32_tempdir()
    {
@@ -368,6 +379,7 @@ inline char* __VfsCheckVar(const char* VarName)
        return tmp;
      return "";
    }
+# endif
 #endif // CS_SYSDEF_PROVIDE_TEMP
 
 // Microsoft Visual C++ compiler includes a very in-efficient 'memcpy'.
@@ -436,6 +448,12 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
   #define main csMain
 #endif
 
+#ifdef __CYGWIN32__
+#define CS_IMPLEMENT_PLATFORM_APPLICATION \
+HINSTANCE ModuleHandle = NULL; \
+int ApplicationShow = SW_SHOWNORMAL;
+#else
+
 #if defined(COMP_BC)
   #define CS_WIN32_ARGC _argc
   #define CS_WIN32_ARGV _argv
@@ -456,6 +474,7 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
   (void)cmd; \
   return main(CS_WIN32_ARGC, CS_WIN32_ARGV); \
 }
+#endif
 
 #if !defined(CS_STATIC_LINKED)
 
