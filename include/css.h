@@ -30,6 +30,19 @@
 #ifndef NO_CSSYSDEF
 // make it safe so no double cssysdef.h includes
 #ifndef __CS_CSSYSDEFS_H__
+
+#define CS_SYSDEF_PROVIDE_CASE
+#define CS_SYSDEF_PROVIDE_PATH
+#define CS_SYSDEF_PROVIDE_MKDIR
+#define CS_SYSDEF_PROVIDE_GETCWD
+#define CS_SYSDEF_PROVIDE_TEMP
+#define CS_SYSDEF_PROVIDE_DIR
+#define CS_SYSDEF_PROVIDE_UNLINK
+#define CS_SYSDEF_PROVIDE_ACCESS
+#define CS_SYSDEF_PROVIDE_ALLOCA
+#define CS_SYSDEF_PROVIDE_GETOPT
+#define CS_SYSDEF_PROVIDE_SOCKETS
+#define CS_SYSDEF_PROVIDE_SELECT
 #include "cssysdef.h"
 #endif
 #endif 
