@@ -72,6 +72,38 @@ public:
     return In (v.x, v.y);
   }
 
+  /**
+   * Test if a polygon if visible in the box. This
+   * function does not test the case where the box is
+   * fully contained in the polygon. But all other
+   * cases are tested.
+   */
+  static bool Intersect (float minx, float miny, float maxx, float maxy,
+    csVector2* poly, int num_poly);
+
+  /**
+   * Test if a polygon if visible in the box. This
+   * function does not test the case where the box is
+   * fully contained in the polygon. But all other
+   * cases are tested.
+   */
+  static bool Intersect (const csVector2& minbox, const csVector2& maxbox,
+    csVector2* poly, int num_poly)
+  {
+    return Intersect (minbox.x, minbox.y, maxbox.x, maxbox.y, poly, num_poly);
+  }
+
+  /**
+   * Test if a polygon if visible in the box. This
+   * function does not test the case where the box is
+   * fully contained in the polygon. But all other
+   * cases are tested.
+   */
+  bool Intersect (csVector2* poly, int num_poly)
+  {
+    return Intersect (minbox, maxbox, poly, num_poly);
+  }
+
   /// Test if the given coordinate is in this box.
   bool In (float x, float y) const
   {

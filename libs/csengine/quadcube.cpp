@@ -47,7 +47,7 @@ bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
     // No vertices are behind. Just perspective correct.
     for (i = 0 ; i < num_verts ; i++)
     {
-      persp.AddPerspective (verts[i]);
+      persp.AddPerspectiveUnit (verts[i]);
     }
   }
   else
@@ -67,7 +67,7 @@ bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
 	{
 	  // We need to intersect and add intersection point.
 	  csIntersect3::ZPlane (SMALL_EPSILON, verts[i], verts[i1], isect);
-	  persp.AddPerspective (isect);
+	  persp.AddPerspectiveUnit (isect);
 	}
       }
       else
@@ -76,10 +76,10 @@ bool csQuadtreePersp::DoPerspective (csVector3* verts, int num_verts,
 	{
 	  // We need to intersect and add both intersection point and this point.
 	  csIntersect3::ZPlane (SMALL_EPSILON, verts[i], verts[i1], isect);
-	  persp.AddPerspective (isect);
+	  persp.AddPerspectiveUnit (isect);
 	}
 	// Just perspective correct and add to the 2D polygon.
-	persp.AddPerspective (verts[i]);
+	persp.AddPerspectiveUnit (verts[i]);
       }
       i1 = i;
     }
@@ -92,7 +92,7 @@ bool csQuadtreePersp::InsertPolygon (csVector3* verts, int num_verts,
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
-  if (clipper && !persp.ClipAgainst (clipper)) return false;
+  //if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csQuadtree::InsertPolygon (persp.GetVertices (),
   	persp.GetNumVertices (), persp.GetBoundingBox ());
 }
@@ -102,17 +102,14 @@ bool csQuadtreePersp::TestPolygon (csVector3* verts, int num_verts,
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
-  if (clipper && !persp.ClipAgainst (clipper)) return false;
+  //if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csQuadtree::TestPolygon (persp.GetVertices (),
   	persp.GetNumVertices (), persp.GetBoundingBox ());
 }
 
-csQuadcube::csQuadcube (float z, int depth)
+csQuadcube::csQuadcube (int depth)
 {
-  float x = (csWorld::frame_width/2) * csCamera::default_inv_aspect * z;
-  float y = (csWorld::frame_height/2) * csCamera::default_inv_aspect * z;
-  z_dist = z;
-  csBox box (-x, -y, x, y);
+  csBox box (-1, -1, 1, 1);
 
   CHK (trees[0] = new csQuadtreePersp (box, depth));
   CHK (trees[1] = new csQuadtreePersp (box, depth));

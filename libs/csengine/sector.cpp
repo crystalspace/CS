@@ -1006,6 +1006,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
     return false;
   }
 
+#if 0
   // Test node against quad-tree.
   csVector3 outline[6];
   int num_outline;
@@ -1021,6 +1022,7 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
       return false;
     }
   }
+#endif
 
   csShadowFrustrum* sf = lview->shadows.GetFirst ();
   for ( ; sf ; sf = sf->next)

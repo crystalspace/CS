@@ -62,6 +62,24 @@ void csPolygon2D::AddPerspective (float x, float y, float z)
   bbox.AddBoundingVertex (px, py);
 }
 
+void csPolygon2D::AddPerspectiveUnit (float x, float y, float z)
+{
+  if (num_vertices >= max_vertices)
+    MakeRoom (max_vertices+5);
+
+  float iz = 1./z;
+  float px, py;
+
+  px = x * iz;
+  py = y * iz;
+  vertices[num_vertices].x = px;
+  vertices[num_vertices].y = py;
+
+  num_vertices++;
+  bbox.AddBoundingVertex (px, py);
+}
+
+
 void csPolygon2D::Draw (IGraphics2D* g2d, int col)
 {
   int i;

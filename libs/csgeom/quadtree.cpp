@@ -179,41 +179,12 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     if (center_vis || left_vis || top_vis) vis = true;
     // If bbox is entirely in child area then polygon is visible.
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MaxY () <= center.y) vis = true;
-    else if (pol_bbox.MaxX () <= center.x)
-    {
-      // If bbox crosses child area vertically but does not cross
-      // it horizontally (both left and right) then polygon is visible.
-      if (pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
-      // Else we have a difficult case. Here we know the bottom-left corner
-      // of the child area is inside the bounding box. We test every vertex
-      // of the polygon and see if any is inside the child area. In that
-      // case the polygon is visible.
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].y <= center.y && verts[i].x >= cur_bbox.MinX ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else if (pol_bbox.MaxY () <= center.y)
-    {
-      if (pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].x <= center.x && verts[i].y >= cur_bbox.MinY ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else
-      for (i = 0 ; i < num_verts ; i++)
-	if (verts[i].x <= center.x && verts[i].y <= center.y)
-	{
-	  vis = true;
-	  break;
-	}
+    // If bbox crosses child area vertically but does not cross
+    // it horizontally (both left and right) then polygon is visible.
+    else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
+    else if (pol_bbox.MaxY () <= center.y && pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
+    // Most general case: just do the intersection test for the area and the polygon.
+    else vis = csBox::Intersect (cur_bbox.Min (), center, verts, num_verts);
 
     if (vis)
     {
@@ -241,35 +212,9 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     vis = false;
     if (center_vis || right_vis || top_vis) vis = true;
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxY () <= center.y) vis = true;
-    else if (pol_bbox.MinX () >= center.x)
-    {
-      if (pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].y <= center.y && verts[i].x <= cur_bbox.MaxX ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else if (pol_bbox.MaxY () <= center.y)
-    {
-      if (pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].x >= center.x && verts[i].y >= cur_bbox.MinY ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else
-      for (i = 0 ; i < num_verts ; i++)
-	if (verts[i].x >= center.x && verts[i].y <= center.y)
-	{
-	  vis = true;
-	  break;
-	}
+    else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
+    else if (pol_bbox.MaxY () <= center.y && pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
+    else vis = csBox::Intersect (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y, verts, num_verts);
 
     if (vis)
     {
@@ -295,39 +240,13 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     vis = false;
     if (center_vis || right_vis || bottom_vis) vis = true;
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MinY () >= center.y) vis = true;
-    else if (pol_bbox.MinX () >= center.x)
-    {
-      if (pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].y >= center.y && verts[i].x <= cur_bbox.MaxX ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else if (pol_bbox.MinY () >= center.y)
-    {
-      if (pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].x >= center.x && verts[i].y <= cur_bbox.MaxY ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else
-      for (i = 0 ; i < num_verts ; i++)
-	if (verts[i].x >= center.x && verts[i].y >= center.y)
-	{
-	  vis = true;
-	  break;
-	}
+    else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
+    else if (pol_bbox.MinY () >= center.y && pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
+    else vis = csBox::Intersect (center, cur_bbox.Max (), verts, num_verts);
 
     if (vis)
     {
-      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, cur_bbox.Max ()))
+      if (center_vis && right_vis && bottom_vis && csPoly2D::In (verts, num_verts, cur_bbox.Max ()))
       {
         children[2]->SetState (CS_QUAD_FULL);
 	rc3 = true;
@@ -347,41 +266,15 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     vis = false;
     if (center_vis || left_vis || bottom_vis) vis = true;
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinY () >= center.y) vis = true;
-    else if (pol_bbox.MaxX () <= center.x)
-    {
-      if (pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].y >= center.y && verts[i].x >= cur_bbox.MinX ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else if (pol_bbox.MinY () >= center.y)
-    {
-      if (pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].x <= center.x && verts[i].y <= cur_bbox.MaxY ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else
-      for (i = 0 ; i < num_verts ; i++)
-	if (verts[i].x >= center.x && verts[i].y >= center.y)
-	{
-	  vis = true;
-	  break;
-	}
+    else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
+    else if (pol_bbox.MinY () >= center.y && pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
+    else vis = csBox::Intersect (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY (), verts, num_verts);
 
     if (vis)
     {
       v.x = cur_bbox.MinX ();
       v.y = cur_bbox.MaxY ();
-      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, v))
+      if (center_vis && left_vis && bottom_vis && csPoly2D::In (verts, num_verts, v))
       {
         children[3]->SetState (CS_QUAD_FULL);
 	rc4 = true;
@@ -403,8 +296,12 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     return true;
   }
 
-  node->SetState (CS_QUAD_PARTIAL);
-  return true;
+  if (rc1 || rc2 || rc3 || rc4)
+  {
+    node->SetState (CS_QUAD_PARTIAL);
+    return true;
+  }
+  return false;
 }
 
 bool csQuadtree::InsertPolygon (csVector2* verts, int num_verts, const csBox& pol_bbox)
@@ -445,7 +342,7 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
   csQuadtreeNode** children = node->children;
   // If there are no children then we assume polygon is not visible.
   // This is an optimization which is not entirely correct@@@
-  if (!children[0]) return true;
+  if (!children[0]) return false;
 
   csBox childbox;
   const csVector2& center = node->GetCenter ();
@@ -484,41 +381,12 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
     if (center_vis || left_vis || top_vis) vis = true;
     // If bbox is entirely in child area then polygon is visible.
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MaxY () <= center.y) vis = true;
-    else if (pol_bbox.MaxX () <= center.x)
-    {
-      // If bbox crosses child area vertically but does not cross
-      // it horizontally (both left and right) then polygon is visible.
-      if (pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
-      // Else we have a difficult case. Here we know the bottom-left corner
-      // of the child area is inside the bounding box. We test every vertex
-      // of the polygon and see if any is inside the child area. In that
-      // case the polygon is visible.
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].y <= center.y && verts[i].x >= cur_bbox.MinX ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else if (pol_bbox.MaxY () <= center.y)
-    {
-      if (pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].x <= center.x && verts[i].y >= cur_bbox.MinY ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else
-      for (i = 0 ; i < num_verts ; i++)
-	if (verts[i].x <= center.x && verts[i].y <= center.y)
-	{
-	  vis = true;
-	  break;
-	}
+    // If bbox crosses child area vertically but does not cross
+    // it horizontally (both left and right) then polygon is visible.
+    else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
+    else if (pol_bbox.MaxY () <= center.y && pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
+    // Most general case: just do the intersection test for the area and the polygon.
+    else vis = csBox::Intersect (cur_bbox.Min (), center, verts, num_verts);
 
     if (vis)
     {
@@ -546,35 +414,9 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
     vis = false;
     if (center_vis || right_vis || top_vis) vis = true;
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxY () <= center.y) vis = true;
-    else if (pol_bbox.MinX () >= center.x)
-    {
-      if (pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].y <= center.y && verts[i].x <= cur_bbox.MaxX ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else if (pol_bbox.MaxY () <= center.y)
-    {
-      if (pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].x >= center.x && verts[i].y >= cur_bbox.MinY ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else
-      for (i = 0 ; i < num_verts ; i++)
-	if (verts[i].x >= center.x && verts[i].y <= center.y)
-	{
-	  vis = true;
-	  break;
-	}
+    else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
+    else if (pol_bbox.MaxY () <= center.y && pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
+    else vis = csBox::Intersect (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y, verts, num_verts);
 
     if (vis)
     {
@@ -599,39 +441,13 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
     vis = false;
     if (center_vis || right_vis || bottom_vis) vis = true;
     else if (pol_bbox.MinX () >= center.x && pol_bbox.MinY () >= center.y) vis = true;
-    else if (pol_bbox.MinX () >= center.x)
-    {
-      if (pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].y >= center.y && verts[i].x <= cur_bbox.MaxX ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else if (pol_bbox.MinY () >= center.y)
-    {
-      if (pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].x >= center.x && verts[i].y <= cur_bbox.MaxY ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else
-      for (i = 0 ; i < num_verts ; i++)
-	if (verts[i].x >= center.x && verts[i].y >= center.y)
-	{
-	  vis = true;
-	  break;
-	}
+    else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
+    else if (pol_bbox.MinY () >= center.y && pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
+    else vis = csBox::Intersect (center, cur_bbox.Max (), verts, num_verts);
 
     if (vis)
     {
-      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, cur_bbox.Max ()))
+      if (center_vis && right_vis && bottom_vis && csPoly2D::In (verts, num_verts, cur_bbox.Max ()))
       {
         return true;
       }
@@ -650,41 +466,15 @@ bool csQuadtree::TestPolygon (csQuadtreeNode* node,
     vis = false;
     if (center_vis || left_vis || bottom_vis) vis = true;
     else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinY () >= center.y) vis = true;
-    else if (pol_bbox.MaxX () <= center.x)
-    {
-      if (pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].y >= center.y && verts[i].x >= cur_bbox.MinX ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else if (pol_bbox.MinY () >= center.y)
-    {
-      if (pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
-      else
-        for (i = 0 ; i < num_verts ; i++)
-	  if (verts[i].x <= center.x && verts[i].y <= cur_bbox.MaxY ())
-	  {
-	    vis = true;
-	    break;
-	  }
-    }
-    else
-      for (i = 0 ; i < num_verts ; i++)
-	if (verts[i].x >= center.x && verts[i].y >= center.y)
-	{
-	  vis = true;
-	  break;
-	}
+    else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
+    else if (pol_bbox.MinY () >= center.y && pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
+    else vis = csBox::Intersect (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY (), verts, num_verts);
 
     if (vis)
     {
       v.x = cur_bbox.MinX ();
       v.y = cur_bbox.MaxY ();
-      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, v))
+      if (center_vis && left_vis && bottom_vis && csPoly2D::In (verts, num_verts, v))
       {
         return true;
       }

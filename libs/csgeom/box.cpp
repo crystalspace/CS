@@ -110,6 +110,57 @@ bool operator< (const csVector2& point, const csBox& box)
            (point.y >= box.minbox.y) && (point.y <= box.maxbox.y) );
 }
 
+bool csBox::Intersect (float minx, float miny, float maxx, float maxy,
+    csVector2* poly, int num_poly)
+{
+  int i, i1;
+  for (i = 0 ; i < num_poly ; i++)
+    if (poly[i].x <= maxx && poly[i].y <= maxy &&
+	poly[i].x >= minx && poly[i].y >= miny)
+      return true;
+
+  float r, x, y;
+  i1 = num_poly-1;
+  for (i = 0 ; i < num_poly ; i++)
+  {
+    bool do_hor_test1 = (poly[i].x < minx && poly[i1].x > minx);
+    bool do_hor_test2 = (poly[i].x < maxx && poly[i1].x > maxx);
+    if (do_hor_test1 || do_hor_test2)
+    {
+      r = (poly[i1].y - poly[i].y) / (poly[i1].x - poly[i].x);
+      if (do_hor_test1)
+      {
+        y = r * (minx - poly[i].x) + poly[i].y;
+        if (y >= miny && y <= maxy) return true;
+      }
+      if (do_hor_test2)
+      {
+        y = r * (maxx - poly[i].x) + poly[i].y;
+        if (y >= miny && y <= maxy) return true;
+      }
+    }
+    bool do_ver_test1 = (poly[i].y < miny && poly[i1].y > miny);
+    bool do_ver_test2 = (poly[i].y < maxy && poly[i1].y > maxy);
+    if (do_ver_test1 || do_ver_test2)
+    {
+      r = (poly[i1].x - poly[i].x) / (poly[i1].y - poly[i].y);
+      if (do_ver_test1)
+      {
+        x = r * (miny - poly[i].y) + poly[i].x;
+        if (x >= minx && x <= maxx) return true;
+      }
+      if (do_ver_test2)
+      {
+        x = r * (maxy - poly[i].y) + poly[i].x;
+        if (x >= minx && x <= maxx) return true;
+      }
+    }
+    i1 = i;
+  }
+
+  return false;
+}
+
 //---------------------------------------------------------------------------
 
 csVector3 csBox3::GetCorner (int corner) const

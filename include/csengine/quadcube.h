@@ -63,12 +63,10 @@ class csQuadcube
 private:
   /// The six quad-trees.
   csQuadtreePersp* trees[6];
-  /// The z value used for the box.
-  float z_dist;
 
 public:
   /// Make the quad-cube for the box.
-  csQuadcube (float z, int depth);
+  csQuadcube (int depth);
 
   /**
    * Destroy this quad-cube
