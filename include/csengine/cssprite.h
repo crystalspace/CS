@@ -30,6 +30,7 @@ class Dumper;
 class csTextureList;
 class csTextureHandle;
 class csTriangleMesh;
+class csLightHitsSprite;
 interface ITextureHandle;
 
 /**
@@ -309,6 +310,11 @@ private:
   ///
   bool force_otherskin;
 
+  /**
+   * List of light-hits-sprites for this sprite.
+   */
+  csLightHitsSprite* dynamiclights;
+
 public:
   ///
   csSprite3D ();
@@ -471,6 +477,23 @@ public:
 
   /// Remove this sprite from all sectors it is in (but not from the world).
   void RemoveFromSectors ();
+
+  /**
+   * Unlink a light-hits-sprite from the list.
+   * Warning! This function does not test if it
+   * is really on the list!
+   */
+  void UnlinkDynamicLight (csLightHitsSprite* lp);
+
+  /**
+   * Add a light-hits-sprite to the list.
+   */
+  void AddDynamicLight (csLightHitsSprite *lp);
+
+  /**
+   * Get the list of dynamic lights that hit this sprite.
+   */
+  csLightHitsSprite* GetDynamicLights () { return dynamiclights; }
 
   CSOBJTYPE;
 };

@@ -264,10 +264,12 @@ csSprite3D::csSprite3D () : csObject ()
   force_otherskin = false;
   cur_action = NULL;
   vertex_colors = NULL;
+  dynamiclights = NULL;
 }
 
 csSprite3D::~csSprite3D ()
 {
+  while (dynamiclights) CHKB (delete dynamiclights);
   CHK (delete tr_frame);
   CHK (delete [] persp);
   CHK (delete [] visible);
@@ -695,6 +697,12 @@ void csSprite3D::RemoveFromSectors ()
   }
 }
 
+#if 0
+void csSprite3D::DeferUpdateLighting (csLight** lights, int num_lights)
+{
+}
+#endif
+
 void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 {
   int i, j;
@@ -733,4 +741,23 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
     }
   }
 }
+
+void csSprite3D::UnlinkDynamicLight (csLightHitsSprite* lp)
+{
+  if (lp->next_sprite) lp->next_sprite->prev_sprite = lp->prev_sprite;
+  if (lp->prev_sprite) lp->prev_sprite->next_sprite = lp->next_sprite;
+  else dynamiclights = lp->next_sprite;
+  lp->prev_sprite = lp->next_sprite = NULL;
+  lp->sprite = NULL;
+}
+
+void csSprite3D::AddDynamicLight (csLightHitsSprite* lp)
+{
+  lp->next_sprite = dynamiclights;
+  lp->prev_sprite = NULL;
+  if (dynamiclights) dynamiclights->prev_sprite = lp;
+  dynamiclights = lp;
+  lp->sprite = this;
+}
+
 
