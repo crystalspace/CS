@@ -301,7 +301,7 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-#define BENCHTIME 1000
+#define BENCHTIME 2000
 
 void CsBench::BenchMark (const char* name, const char* description, 
 			 uint drawFlags)

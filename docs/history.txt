@@ -7,6 +7,17 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 30-Jun-2004
+	- Jorrit modified walktest so that the default 'perftest' command
+	  does 200 frames instead of 100. That is more accurate.
+	- Jorrit modified Dynavis so that it will now increase the frame
+	  counter faster if it detects camera movement. By doing that the
+	  history information will be updated faster in case the camera
+	  moves faster. This means that Dynavis will react faster to changing
+	  conditions.
+	- Jorrit increased benchmark test in csbench to 2 seconds.
+	- Jorrit finished the optimization in Dynavis where every occluder
+	  is being tested to see how useful it was. Also added two new
+	  config options to dynavis.cfg to play with this.
 	- res disabled the 64bit compatibility checks in the VC7 projects for
 	  the 0.98 release.
 29-Jun-2004
@@ -52,6 +63,13 @@ chronological order.
 	  Relighting levels is disabled for now when building NR.
 	- res fixed csPixelShaderParser::GetInstructionString() appearing
 	  in a "#ifdef CS_DEBUG" in the glshader_ps1 plugin.
+	- Jorrit added a new small optimization to Dynavis. If inserting
+	  an occluder on the coverage buffer didn't actually modify the
+	  coverage and depth buffer then the occluder will be disabled for
+	  a few frames (random).
+	- Jorrit added a new 'toggle_ignorebadoccluder' debug command to
+	  Dynavis to toggle this new feature. Also added a new
+	  'Culling.Dynavis.IgnoreBadOccluders' option to dynavis.cfg.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.

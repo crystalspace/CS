@@ -2102,12 +2102,12 @@ void csTiledCoverageBuffer::InsertPolygonInverted (csVector2* verts,
   }
 }
 
-bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
-	float max_depth)
+int csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
+	float max_depth, csBox2Int& modified_bbox)
 {
   csBox2Int bbox;
   if (!DrawPolygon (verts, num_verts, bbox))
-    return false;
+    return 0;
 
   int tx, ty;
   int startrow, endrow;
@@ -2116,7 +2116,7 @@ bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
   endrow = bbox.maxy >> SHIFT_TILEROW;
   if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
 
-  bool modified = false;
+  int modified = 0;
   for (ty = startrow ; ty <= endrow ; ty++)
   {
     csTileCol fvalue = TILECOL_EMPTY;
@@ -2127,24 +2127,37 @@ bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       bool mod = tile->Flush (fvalue, max_depth);
-      modified |= mod;
+      if (mod)
+      {
+        modified++;
+	if (tx < modified_bbox.minx) modified_bbox.minx = tx;
+	if (tx > modified_bbox.maxx) modified_bbox.maxx = tx;
+	if (ty < modified_bbox.miny) modified_bbox.miny = ty;
+	if (ty > modified_bbox.maxy) modified_bbox.maxy = ty;
+      }
       tile++;
     }
   }
   return modified;
 }
 
-bool csTiledCoverageBuffer::InsertOutline (
+int csTiledCoverageBuffer::InsertOutline (
 	const csReversibleTransform& trans, float fov, float sx, float sy,
 	csVector3* verts, int num_verts,
 	bool* used_verts,
-	int* edges, int num_edges, bool splat_outline)
+	int* edges, int num_edges, bool splat_outline,
+	csBox2Int& modified_bbox)
 {
   csBox2Int bbox;
   float max_depth;
   if (!DrawOutline (trans, fov, sx, sy, verts, num_verts, used_verts, edges,
   	num_edges, bbox, max_depth, splat_outline))
-    return false;
+    return 0;
+
+  modified_bbox.minx = 10000;
+  modified_bbox.miny = 10000;
+  modified_bbox.maxx = -10000;
+  modified_bbox.maxy = -10000;
 
   int tx, ty;
   int startrow, endrow;
@@ -2153,7 +2166,7 @@ bool csTiledCoverageBuffer::InsertOutline (
   endrow = bbox.maxy >> SHIFT_TILEROW;
   if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
 
-  bool modified = false;
+  int modified = 0;
   for (ty = startrow ; ty <= endrow ; ty++)
   {
     csTileCol fvalue = TILECOL_EMPTY;
@@ -2164,7 +2177,14 @@ bool csTiledCoverageBuffer::InsertOutline (
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       bool mod = tile->Flush (fvalue, max_depth);
-      modified |= mod;
+      if (mod)
+      {
+        modified++;
+	if (tx < modified_bbox.minx) modified_bbox.minx = tx;
+	if (tx > modified_bbox.maxx) modified_bbox.maxx = tx;
+	if (ty < modified_bbox.miny) modified_bbox.miny = ty;
+	if (ty > modified_bbox.maxy) modified_bbox.maxy = ty;
+      }
       tile++;
     }
   }
@@ -2379,7 +2399,6 @@ bool csTiledCoverageBuffer::QuickTestRectangle (const csTestRectData& data,
   return false;
 }
 
-#if TEST_OCCLUDER_QUALITY
 void csTiledCoverageBuffer::MarkCulledObject (const csTestRectData& data)
 {
   int tx, ty;
@@ -2393,7 +2412,22 @@ void csTiledCoverageBuffer::MarkCulledObject (const csTestRectData& data)
     }
   }
 }
-#endif
+
+int csTiledCoverageBuffer::CountNotCulledObjects (const csBox2Int& bbox)
+{
+  int tx, ty;
+  int cnt = 0;
+  for (ty = bbox.miny ; ty <= bbox.maxy ; ty++)
+  {
+    csCoverageTile* tile = GetTile (bbox.minx, ty);
+    for (tx = bbox.minx ; tx <= bbox.maxx ; tx++)
+    {
+      cnt += tile->objects_culled;
+      tile++;
+    }
+  }
+  return cnt;
+}
 
 int csTiledCoverageBuffer::PrepareWriteQueueTest (const csTestRectData& data,
 	float min_depth)
@@ -2616,7 +2650,8 @@ csPtr<iString> csTiledCoverageBuffer::Debug_UnitTest ()
   poly[1].Set (600, 50);
   poly[2].Set (600, 430);
   poly[3].Set (50, 430);
-  InsertPolygon (poly, 4, 10.0);
+  csBox2Int modified_bbox;
+  InsertPolygon (poly, 4, 10.0, modified_bbox);
   COV_ASSERT (TestPoint (csVector2 (100, 100), 5) == true, "tp");
   COV_ASSERT (TestPoint (csVector2 (100, 100), 15) == false, "tp");
   COV_ASSERT (TestPoint (csVector2 (599, 100), 5) == true, "tp");

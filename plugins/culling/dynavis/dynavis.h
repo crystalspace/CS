@@ -33,6 +33,7 @@
 #include "iengine/viscull.h"
 #include "dmodel.h"
 #include "dhistmgr.h"
+#include "tcovbuf.h"
 
 class csKDTree;
 class csKDTreeChild;
@@ -147,6 +148,25 @@ public:
 };
 
 /**
+ * A structure that is used during vis culling to store every occluder
+ * that is being used.
+ */
+class csOccluderInfo
+{
+public:
+  csVisibilityObjectWrapper* obj;
+
+  // This is a structure that is used during visibility testing
+  // to hold the 2D box on screen that this object covers when used as
+  // an occluder.
+  csBox2Int occluder_box;
+
+  // Total count of occluded objects for all covered tiles (these
+  // are the objects that are occluded BEFORE this occluder comes into play).
+  int total_notoccluded;
+};
+
+/**
  * A dynamic visisibility culling system.
  */
 class csDynaVis : public iVisibilityCuller
@@ -159,7 +179,7 @@ public:
 private:
   csBlockAllocator<csVisibilityObjectWrapper> visobj_wrappers;
 
-  iObjectRegistry *object_reg;
+  iObjectRegistry* object_reg;
   csRef<iBugPlug> bugplug;
   csKDTree* kdtree;
   // Ever growing box of all objects that were ever in the tree.
@@ -170,6 +190,9 @@ private:
   csArray<csVisibilityObjectWrapper*> visobj_vector;
   csObjectModelManager* model_mgr;
   csWriteQueue* write_queue;
+
+  // List of occluders that were used this frame.
+  csArray<csOccluderInfo> occluder_info;
 
   int scr_width, scr_height;	// Screen dimensions.
   int reduce_buf;
@@ -197,6 +220,14 @@ private:
   static bool do_cull_vpt;
   static bool do_cull_outline_splatting;
   static bool do_insert_inverted_clipper;
+  static bool do_cull_ignore_bad_occluders;
+  static int badoccluder_thresshold;
+  static int badoccluder_maxsweepcount;
+
+  // Compared to history_frame_cnt to see if we must retry all bad occluders
+  // again.
+  uint32 badoccluder_sweepcount;
+  bool badoccluder_retry;
 
   bool do_freeze_vis;
 

@@ -1701,7 +1701,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "perftest"))
   {
-    int num = 100;
+    int num = 200;
     if (arg)
     {
       csScanStr (arg, "%d", &num);
