@@ -267,7 +267,6 @@
 #include "csutil/csstring.h"
 #include "csutil/stringarray.h"
 #include "csutil/databuf.h"
-#include "csutil/dataobj.h"
 #include "csutil/datastrm.h"
 #include "csutil/debug.h"
 #include "csutil/event.h"
