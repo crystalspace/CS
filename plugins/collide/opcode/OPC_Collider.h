@@ -118,13 +118,13 @@
 		 *	\return		null if everything is ok, else a string describing the problem
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		virtual				const char*		ValidateSettings()	= 0
+		virtual				const char*		ValidateSettings()
 #if !defined(__GNUC__)
 							{
 								return "Collider::ValidateSettings: pure virtual function called!";
 							}
 #else
-;
+= 0;
 #endif							
 		protected:
 
