@@ -13,6 +13,7 @@ struct iAwsSigSrc;
 
 class  awsWindow;
 class  awsComponentNode;
+class  awsComponentFactory;
             
 
 SCF_VERSION (iAws, 0, 0, 1);
@@ -25,6 +26,9 @@ public:
 
   /// Set the preference manager used by the window system
   virtual void       SetPrefMgr(iAwsPrefs *pmgr)=0;
+
+  /// Allows a component to register itself for dynamic template instatiation via definition files.
+  virtual void RegisterComponentFactory(awsComponentFactory *factory, char *name)=0;
 
   /// Get the top window
   virtual awsWindow *GetTopWindow()=0;
