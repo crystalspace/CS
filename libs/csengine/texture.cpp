@@ -140,10 +140,7 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
 
   handle = txtmgr->RegisterTexture (image, flags);
   if (handle)
-  {
     SetKeyColor (key_col_r, key_col_g, key_col_b);
-    handle->IncRef();
-  }
 }
 
 iObject *csTextureWrapper::TextureWrapper::QueryObject()

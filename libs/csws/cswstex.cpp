@@ -113,7 +113,6 @@ void csWSTexture::Register (iTextureManager *iTexMan)
   if (!iTexMan) return;
   Unregister ();
   Handle = iTexMan->RegisterTexture (Image, Flags);
-  Handle->IncRef();
   SetKeyColor (HasKey);
 }
 

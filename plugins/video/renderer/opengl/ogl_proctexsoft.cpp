@@ -137,7 +137,6 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
   // flags are not set. 
   image->IncRef ();
   iTextureHandle *hstxt = soft_man->RegisterTexture (image, flags);
-  hstxt->IncRef ();
   // deal with key colours..
   if (ogl_txt->GetKeyColor ())
   {

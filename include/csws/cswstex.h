@@ -78,6 +78,7 @@ public:
   /// Get texture name
   const char *GetName ()
   { return Name; }
+  /// CSWS uses its own reference counting system.
   iTextureHandle *GetHandle ()
   { return Handle; }
   /// Increment reference count to this texture

@@ -191,7 +191,6 @@ void csMaterialWrapper::Register (iTextureManager *txtmgr)
   if (handle)
     handle->DecRef ();
   handle = txtmgr->RegisterMaterial (material);
-  handle->IncRef();
 }
 
 void csMaterialWrapper::Visit ()

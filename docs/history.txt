@@ -12,6 +12,19 @@ The history order is reversed so that new features are at the top.
 	  means that putting a lot of particle systems in a sector will
 	  now be more efficient as only the ones that need to be drawn
 	  will be considered for drawing.
+	- Michael Voase did the following:
+	  csengine/material.cpp and texture.cpp:
+	  Started addressing outstanding memory leaks,
+	  starting with the ones caused by myself. Some
+	  of the texture and material handles should start
+	  deleteing automatically now.
+	  
+	  csws/cswstex.cpp:
+	  Started addressing outstanding memory leaks,
+	  starting with the ones caused by myself. The
+	  texture manager will now clean up correctly
+	  and completely under csfedit and some
+	  csws based applications.
 9-Aug-2001
 	- Martin Geisse reverted recent changes to csObject because they
 	  contradict with the ideas of reference counting.
