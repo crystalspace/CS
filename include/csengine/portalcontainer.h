@@ -140,11 +140,6 @@ private:
   // Probably only for old renderer: clip data between DrawTest->Draw. @@@OR@@@
   int clip_portal, clip_plane, clip_z_plane;
 
-  /// Transform from object to world space.
-  void ObjectToWorld (iMovable* movable, const csReversibleTransform& movtrans);
-  /// Transform from world to camera space.
-  void WorldToCamera (iCamera* camera, const csReversibleTransform& camtrans);
-
   // Drawing stuff...
   bool csPortalContainer::ClipToPlane (int portal_idx, csPlane3 *portal_plane,
 	const csVector3 &v_w2c, csVector3 * &pverts, int &num_verts);
@@ -171,6 +166,11 @@ public:
   csDirtyAccessArray<csVector3>* GetVertices () { return &vertices; }
   csDirtyAccessArray<csVector3>* GetWorldVertices () { return &world_vertices; }
   const csRefArray<csPortal>& GetPortals () const { return portals; }
+
+  /// Transform from object to world space.
+  void ObjectToWorld (iMovable* movable, const csReversibleTransform& movtrans);
+  /// Transform from world to camera space.
+  void WorldToCamera (iCamera* camera, const csReversibleTransform& camtrans);
 
   SCF_DECLARE_IBASE_EXT (csMeshObject);
 

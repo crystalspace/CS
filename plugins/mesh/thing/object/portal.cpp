@@ -108,7 +108,7 @@ const csPlane3& csPortalObsolete::GetObjectPlane ()
   return parent->GetObjectPlane ();
 }
 
-const csPlane3& csPortalObsolete::GetWorldPlane ()
+const csPlane3& csPortalObsolete::GetWorldPlane (iMovable*)
 {
   // @@@ WRONG: but going to be removed anyway...
   return parent->GetObjectPlane ();
@@ -118,6 +118,13 @@ void csPortalObsolete::ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane)
 {
   // @@@ WRONG: but going to be removed anyway...
+}
+
+bool csPortalObsolete::PointOnPolygon (const csVector3& point,
+  	iMovable*)
+{
+  // @@@ WRONG: but going to be removed anyway...
+  return parent->PointOnPolygon (point);
 }
 
 bool csPortalObsolete::CompleteSector (iBase *context)

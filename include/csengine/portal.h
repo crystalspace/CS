@@ -111,9 +111,11 @@ public:
   virtual void SetSector (iSector* s);
 
   virtual const csPlane3& GetObjectPlane () { return object_plane; }
-  virtual const csPlane3& GetWorldPlane () { return world_plane; }
+  virtual const csPlane3& GetWorldPlane (iMovable* movable = 0);
   virtual void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane);
+  virtual bool PointOnPolygon (const csVector3& point,
+  	iMovable* movable = 0);
 
   bool IntersectRay (const csVector3 &start, const csVector3 &end) const;
   bool IntersectSegmentPlane (const csVector3 &start, const csVector3 &end,

@@ -30,6 +30,7 @@
 class csReversibleTransform;
 class csPlane3;
 struct iMeshWrapper;
+struct iMovable;
 
 /**
  * If this flag is set then this portal will clip all geometry in
@@ -129,7 +130,7 @@ struct iPortalCallback : public iBase
   virtual bool Traverse (iPortal* portal, iBase* context) = 0;
 };
 
-SCF_VERSION (iPortal, 0, 4, 0);
+SCF_VERSION (iPortal, 0, 5, 0);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -172,14 +173,26 @@ struct iPortal : public iBase
    * Get the world space plane of this portal.
    * Note! This function assumes the mesh containing this portal
    * has previously been transformed to world space!
+   * The optional movable parameter can be used to recalculate the world
+   * plane if that is needed. If the movable parameter is not given then
+   * the last calculated world plane is used.
    */
-  virtual const csPlane3& GetWorldPlane () = 0;
+  virtual const csPlane3& GetWorldPlane (iMovable* movable = 0) = 0;
 
   /**
    * Calculate the camera space plane for this portal.
    */
   virtual void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane) = 0;
+
+  /**
+   * Test if a point is on the polygon represented by this portal. This
+   * test happens in world space. The optional movable is used to update
+   * the world space vertices if needed. Otherwise the last calculated vertices
+   * are used.
+   */
+  virtual bool PointOnPolygon (const csVector3& point,
+  	iMovable* movable = 0) = 0;
 
   /**
    * Set the sector that this portal points too. To avoid circular

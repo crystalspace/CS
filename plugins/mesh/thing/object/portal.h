@@ -110,9 +110,10 @@ public:
   int* GetVertexIndices () const;
   int GetVertexIndicesCount () const;
   const csPlane3& GetObjectPlane ();
-  const csPlane3& GetWorldPlane ();
+  const csPlane3& GetWorldPlane (iMovable* movable = 0);
   void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane);
+  bool PointOnPolygon (const csVector3& point, iMovable* movable = 0);
 
   /// Set the maximum sector visit.
   void SetMaximumSectorVisit (int msv)
@@ -285,14 +286,19 @@ public:
     {
       return scfParent->GetObjectPlane ();
     }
-    virtual const csPlane3& GetWorldPlane ()
+    virtual const csPlane3& GetWorldPlane (iMovable* movable = 0)
     {
-      return scfParent->GetWorldPlane ();
+      return scfParent->GetWorldPlane (movable);
     }
     virtual void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane)
     {
       scfParent->ComputeCameraPlane (t, camplane);
+    }
+    virtual bool PointOnPolygon (const csVector3& point,
+  	iMovable* movable = 0)
+    {
+      return scfParent->PointOnPolygon (point, movable);
     }
 
     virtual csFlags& GetFlags () { return scfParent->GetFlags (); }

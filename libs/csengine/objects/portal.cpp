@@ -28,6 +28,7 @@
 #include "iengine/camera.h"
 #include "iengine/shadows.h"
 #include "iengine/light.h"
+#include "iengine/movable.h"
 
 SCF_IMPLEMENT_IBASE(csPortal)
   SCF_IMPLEMENTS_INTERFACE(iPortal)
@@ -181,12 +182,55 @@ void csPortal::GetColorFilter (float &r, float &g, float &b) const
   b = filter_b;
 }
 
+const csPlane3& csPortal::GetWorldPlane (iMovable* movable)
+{
+  if (movable)
+  {
+    const csReversibleTransform& movtrans = movable->GetFullTransform ();
+    parent->ObjectToWorld (movable, movtrans);
+  }
+  return world_plane;
+}
+
 void csPortal::ComputeCameraPlane (const csReversibleTransform& t,
 	csPlane3& camplane)
 {
   csDirtyAccessArray<csVector3>* vt = parent->GetWorldVertices ();
   csVector3 cam_vert = t.Other2This ((*vt)[0]);
   t.Other2This (world_plane, cam_vert, camplane);
+}
+
+bool csPortal::PointOnPolygon (const csVector3& v,
+  	iMovable* movable)
+{
+  if (movable)
+  {
+    const csReversibleTransform& movtrans = movable->GetFullTransform ();
+    parent->ObjectToWorld (movable, movtrans);
+  }
+  csDirtyAccessArray<csVector3>* vt = parent->GetWorldVertices ();
+  // First check if point is on the plane.
+  csPlane3 &pl = world_plane;
+  float dot = pl.D () + pl.A () * v.x + pl.B () * v.y + pl.C () * v.z;
+  if (ABS (dot) >= EPSILON) return false;
+
+  // Check if 'v' is on the same side of all edges.
+  int i, i1;
+  bool neg = false, pos = false;
+  i1 = vertex_indices.Length () - 1;
+  for (i = 0; i < vertex_indices.Length (); i++)
+  {
+    float ar = csMath3::Area3 (v, (*vt)[vertex_indices[i1]],
+    	(*vt)[vertex_indices[i]]);
+    if (ar < 0)
+      neg = true;
+    else if (ar > 0)
+      pos = true;
+    if (neg && pos) return false;
+    i1 = i;
+  }
+
+  return true;
 }
 
 bool csPortal::IntersectRay (const csVector3 &start,

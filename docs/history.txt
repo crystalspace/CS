@@ -14,6 +14,14 @@ chronological order.
 	  iVisibilityCuller->IntersectSegment() function (the one that
 	  returns polygon indices) from false to true. This means that by
 	  default the most accurate version is used.
+	- Jorrit added an optional movable parameter to
+	  iPortal->GetWorldPlane(). This can be used by the portal container to
+	  update the world plane if that is needed.
+	- Jorrit added iPortal->PointOnPolygon() which tests if a worldspace
+	  point is in the portal polygon.
+	- Jorrit implemented iMeshWrapper->PlaceMesh() so that it works with
+	  the new portal containers. In addition it now also works on portals
+	  that move. This wasn't the case in the past.
 30-Sep-2003
 	- Jorrit fixed a bug in thing polygon mesh helper where it would not
 	  clean up old data if the thing changes and at the same time the

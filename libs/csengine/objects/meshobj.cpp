@@ -704,40 +704,28 @@ void csMeshWrapper::PlaceMesh ()
   while (it->HasNext ())
   {
     iMeshWrapper* mesh = it->Next ();
-    if (mesh->GetMeshObject ()->GetPortalCount () == 0)
-      continue;		// No portals to consider.
+    int pc_count = mesh->GetMeshObject ()->GetPortalCount ();
+    if (pc_count == 0) continue;		// No portals to consider.
 
-    csRef<iThingState> thing = SCF_QUERY_INTERFACE (
-        mesh->GetMeshObject (), iThingState);
-    if (thing)
+    for (j = 0 ; j < pc_count ; j++)
     {
-      // @@@ This function will currently only consider portals on things
-      // that cannot move.
-      if (thing->GetMovingOption () == CS_THING_MOVE_NEVER)
+      iPortal *portal = mesh->GetMeshObject ()->GetPortal (j);
+      iSector *dest_sector = portal->GetSector ();
+      if (movable_sectors->Find (dest_sector) == -1)
       {
-        iThingFactoryState* thing_fact = thing->GetFactory ();
-        for (j = 0; j < thing_fact->GetPortalCount (); j++)
-        {
-          iPortal *portal = thing_fact->GetPortal (j);
-          iSector *dest_sector = portal->GetSector ();
-          if (movable_sectors->Find (dest_sector) == -1)
-          {
-            iPolygon3D *portal_poly = thing->GetPortalPolygon (j);
-            const csPlane3 &pl = portal_poly->GetWorldPlane ();
+	iMovable* movable = mesh->GetMovable ();
+        const csPlane3 &pl = portal->GetWorldPlane (movable);
 
-            float sqdist = csSquaredDist::PointPlane (
-                sphere.GetCenter (), pl);
-            if (sqdist <= max_sq_radius)
-            {
-              // Plane of portal is close enough.
-              // If N is the normal of the portal plane then we
-              // can use that to calculate the point on the portal plane.
-              csVector3 testpoint = sphere.GetCenter () + pl.Normal () * qsqrt (
+        float sqdist = csSquaredDist::PointPlane (sphere.GetCenter (), pl);
+        if (sqdist <= max_sq_radius)
+        {
+          // Plane of portal is close enough.
+          // If N is the normal of the portal plane then we
+          // can use that to calculate the point on the portal plane.
+          csVector3 testpoint = sphere.GetCenter () + pl.Normal () * qsqrt (
                   sqdist);
-              if (portal_poly->GetStaticData ()->PointOnPolygon (testpoint))
-                movable_sectors->Add (dest_sector);
-            }
-          }
+          if (portal->PointOnPolygon (testpoint, movable))
+            movable_sectors->Add (dest_sector);
         }
       }
     }
