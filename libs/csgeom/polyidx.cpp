@@ -15,28 +15,27 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csgeom/polyidx.h"
 
 csPolyIndexed::csPolyIndexed (int start_size)
 {
   max_vertices = start_size;
-  vertices_idx = new int [max_vertices];
+  vertices_idx = new int[max_vertices];
   MakeEmpty ();
 }
 
-csPolyIndexed::csPolyIndexed (csPolyIndexed& copy)
+csPolyIndexed::csPolyIndexed (csPolyIndexed &copy)
 {
   max_vertices = copy.max_vertices;
-  vertices_idx = new int [max_vertices];
+  vertices_idx = new int[max_vertices];
   num_vertices = copy.num_vertices;
-  memcpy (vertices_idx, copy.vertices_idx, sizeof (int)*num_vertices);
+  memcpy (vertices_idx, copy.vertices_idx, sizeof (int) * num_vertices);
 }
 
 csPolyIndexed::~csPolyIndexed ()
 {
-  delete [] vertices_idx;
+  delete[] vertices_idx;
 }
 
 void csPolyIndexed::MakeEmpty ()
@@ -46,21 +45,21 @@ void csPolyIndexed::MakeEmpty ()
 
 void csPolyIndexed::MakeRoom (int new_max)
 {
-  if (new_max <= max_vertices) return;
-  int* new_vertices_idx = new int [new_max];
-  memcpy (new_vertices_idx, vertices_idx, num_vertices*sizeof (int));
-  delete [] vertices_idx;
+  if (new_max <= max_vertices) return ;
+
+  int *new_vertices_idx = new int[new_max];
+  memcpy (new_vertices_idx, vertices_idx, num_vertices * sizeof (int));
+  delete[] vertices_idx;
   vertices_idx = new_vertices_idx;
   max_vertices = new_max;
 }
 
 int csPolyIndexed::AddVertex (int i)
 {
-  if (num_vertices >= max_vertices)
-    MakeRoom (max_vertices+5);
+  if (num_vertices >= max_vertices) MakeRoom (max_vertices + 5);
   vertices_idx[num_vertices] = i;
   num_vertices++;
-  return num_vertices-1;
+  return num_vertices - 1;
 }
 
 //---------------------------------------------------------------------------

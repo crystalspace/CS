@@ -15,11 +15,10 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csgeom/subrec.h"
 
-csSubRectangles::csSubRectangles (const csRect& region)
+csSubRectangles::csSubRectangles (const csRect &region)
 {
   csSubRectangles::region = region;
   first = NULL;
@@ -29,28 +28,29 @@ csSubRectangles::csSubRectangles (const csRect& region)
 csSubRectangles::~csSubRectangles ()
 {
   Clear ();
-  delete first;		// Clean up the first region.
+  delete first; // Clean up the first region.
 }
 
 void csSubRectangles::Clear ()
 {
   while (first)
   {
-    csSubRect* n = first->next;
+    csSubRect *n = first->next;
     delete first;
     first = n;
   }
+
   first = new csSubRect (region);
   first->prev = NULL;
   first->next = NULL;
 }
 
-bool csSubRectangles::Alloc (int w, int h, csRect& rect)
+bool csSubRectangles::Alloc (int w, int h, csRect &rect)
 {
   // @@@ This is not a good algo. Needs to be improved!
-  csSubRect* near_fit = NULL;
-  csSubRect* fit = NULL;
-  csSubRect* s = first;
+  csSubRect *near_fit = NULL;
+  csSubRect *fit = NULL;
+  csSubRect *s = first;
   while (s)
   {
     int rw = s->Width ();
@@ -58,8 +58,10 @@ bool csSubRectangles::Alloc (int w, int h, csRect& rect)
     if (w == rw && h == rh)
     {
       // We have an exact fit. Return now.
-      if (s->prev) s->prev->next = s->next;
-      else first = s->next;
+      if (s->prev)
+        s->prev->next = s->next;
+      else
+        first = s->next;
       if (s->next) s->next->prev = s->prev;
       rect = *s;
       delete s;
@@ -67,50 +69,68 @@ bool csSubRectangles::Alloc (int w, int h, csRect& rect)
     }
     else if (w <= rw && h <= rh)
     {
-      if (w == rw || h == rh) near_fit = s;
-      else fit = s;
+      if (w == rw || h == rh)
+        near_fit = s;
+      else
+        fit = s;
     }
+
     s = s->next;
   }
+
   if (near_fit)
   {
     // We have a near fit (i.e. one dimensions fits exactly).
-    rect.Set (near_fit->xmin, near_fit->ymin,
-    	near_fit->xmin+w, near_fit->ymin+h);
+    rect.Set (
+        near_fit->xmin,
+        near_fit->ymin,
+        near_fit->xmin + w,
+        near_fit->ymin + h);
+
     // Shrink the free block.
     int rw = near_fit->Width ();
     if (w == rw)
-      near_fit->Set (near_fit->xmin, near_fit->ymin+h,
-    	near_fit->xmax, near_fit->ymax);
+      near_fit->Set (
+          near_fit->xmin,
+          near_fit->ymin + h,
+          near_fit->xmax,
+          near_fit->ymax);
     else
-      near_fit->Set (near_fit->xmin+w, near_fit->ymin,
-    	near_fit->xmax, near_fit->ymax);
+      near_fit->Set (
+          near_fit->xmin + w,
+          near_fit->ymin,
+          near_fit->xmax,
+          near_fit->ymax);
     return true;
   }
   else if (fit)
   {
     // We have to create an additional block.
-    rect.Set (fit->xmin, fit->ymin, fit->xmin+w, fit->ymin+h);
-    csSubRect* s2 = new csSubRect (fit->xmin+w, fit->ymin,
-    	fit->xmax, fit->ymin+h);
+    rect.Set (fit->xmin, fit->ymin, fit->xmin + w, fit->ymin + h);
+
+    csSubRect *s2 = new csSubRect (
+        fit->xmin + w,
+        fit->ymin,
+        fit->xmax,
+        fit->ymin + h);
     s2->next = first;
     s2->prev = NULL;
     if (first) first->prev = s2;
     first = s2;
-    fit->Set (fit->xmin, fit->ymin+h, fit->xmax, fit->ymax);
+    fit->Set (fit->xmin, fit->ymin + h, fit->xmax, fit->ymax);
     return true;
   }
+
   // No room.
   return false;
 }
 
 void csSubRectangles::Dump ()
 {
-  csSubRect* s = first;
+  csSubRect *s = first;
   while (s)
   {
     printf ("  free: %d,%d,%d,%d\n", s->xmin, s->ymin, s->xmax, s->ymax);
     s = s->next;
   }
 }
-

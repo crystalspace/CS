@@ -15,7 +15,6 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csgeom/vtpool.h"
 
@@ -23,7 +22,7 @@ csDefaultVertexArrayPool::csDefaultVertexArrayPool ()
 {
 }
 
-csDefaultVertexArrayPool& csDefaultVertexArrayPool::GetDefaultPool()
+csDefaultVertexArrayPool &csDefaultVertexArrayPool::GetDefaultPool ()
 {
   static csDefaultVertexArrayPool default_pool;
   return default_pool;
@@ -32,43 +31,45 @@ csDefaultVertexArrayPool& csDefaultVertexArrayPool::GetDefaultPool()
 csPooledVertexArrayPool::csPooledVertexArrayPool ()
 {
   miscpool = NULL;
+
   int i;
-  for (i = 0 ; i < 6 ; i++)
-    pool[i] = NULL;
+  for (i = 0; i < 6; i++) pool[i] = NULL;
 }
 
 csPooledVertexArrayPool::~csPooledVertexArrayPool ()
 {
   int i;
-  for (i = 0 ; i < 6 ; i++)
+  for (i = 0; i < 6; i++)
     while (pool[i])
     {
-      PoolEl* pel = pool[i]->next;
+      PoolEl *pel = pool[i]->next;
       free (pool[i]);
       pool[i] = pel;
     }
+
   while (miscpool)
   {
-    PoolEl* pel = miscpool->next;
+    PoolEl *pel = miscpool->next;
     free (miscpool);
     miscpool = pel;
   }
 }
 
-csVector3* csPooledVertexArrayPool::GetVertexArray (int n)
+csVector3 *csPooledVertexArrayPool::GetVertexArray (int n)
 {
   if (n >= 3 && n <= 8)
   {
-    if (!pool[n-3])
+    if (!pool[n - 3])
     {
-      PoolEl* pel = (PoolEl*)malloc (sizeof (PoolEl)+(n-1)*sizeof (csVector3));
+      PoolEl *pel = (PoolEl *)malloc (
+          sizeof (PoolEl) + (n - 1) * sizeof (csVector3));
       pel->n = n;
       return &pel->first_vertex;
     }
     else
     {
-      PoolEl* pel = pool[n-3];
-      pool[n-3] = pool[n-3]->next;
+      PoolEl *pel = pool[n - 3];
+      pool[n - 3] = pool[n - 3]->next;
       return &pel->first_vertex;
     }
   }
@@ -76,34 +77,40 @@ csVector3* csPooledVertexArrayPool::GetVertexArray (int n)
   {
     if (!miscpool)
     {
-      PoolEl* pel = (PoolEl*)malloc (sizeof (PoolEl)+(n-1)*sizeof (csVector3));
+      PoolEl *pel = (PoolEl *)malloc (
+          sizeof (PoolEl) + (n - 1) * sizeof (csVector3));
       pel->n = n;
       return &pel->first_vertex;
     }
     else
     {
-      PoolEl* pel = miscpool;
+      PoolEl *pel = miscpool;
       miscpool = miscpool->next;
       if (n > pel->n)
       {
         // First reallocate.
-        pel = (PoolEl*)realloc (pel, sizeof (PoolEl)+(n-1)*sizeof (csVector3));
-	pel->n = n;
+        pel = (PoolEl *)realloc (
+            pel,
+            sizeof (PoolEl) + (n - 1) * sizeof (csVector3));
+        pel->n = n;
       }
+
       return &pel->first_vertex;
     }
   }
 }
 
-void csPooledVertexArrayPool::FreeVertexArray (csVector3* ar, int n)
+void csPooledVertexArrayPool::FreeVertexArray (csVector3 *ar, int n)
 {
-  if (!ar) return;
+  if (!ar) return ;
+
   PoolEl p;
-  PoolEl* pel = (PoolEl*)(((char*)ar)-(((long)&p.first_vertex)-(long)&p.next));
+  PoolEl *pel = (PoolEl *)
+    (((char *)ar) - (((long) &p.first_vertex) - (long) &p.next));
   if (n >= 3 && n <= 8)
   {
-    pel->next = pool[n-3];
-    pool[n-3] = pel;
+    pel->next = pool[n - 3];
+    pool[n - 3] = pel;
   }
   else
   {
@@ -112,7 +119,7 @@ void csPooledVertexArrayPool::FreeVertexArray (csVector3* ar, int n)
   }
 }
 
-csPooledVertexArrayPool& csPooledVertexArrayPool::GetDefaultPool()
+csPooledVertexArrayPool &csPooledVertexArrayPool::GetDefaultPool ()
 {
   static csPooledVertexArrayPool default_pool;
   return default_pool;

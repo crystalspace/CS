@@ -16,53 +16,71 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include <math.h>
 #include "cssysdef.h"
 #include "qsqrt.h"
 #include "csgeom/vector2.h"
 
 //---------------------------------------------------------------------------
-
-float csVector2::Norm (const csVector2& v)
-{ return qsqrt (v*v); }
+float csVector2::Norm (const csVector2 &v)
+{
+  return qsqrt (v * v);
+}
 
 float csVector2::Norm () const
-{ return qsqrt (x*x+y*y); }
+{
+  return qsqrt (x * x + y * y);
+}
 
 void csVector2::Rotate (float angle)
 {
-  float s = (float) sin (angle);
-  float c = (float) cos (angle);
+  float s = (float)sin (angle);
+  float c = (float)cos (angle);
   float nx = x * c + y * s;
   y = -x * s + y * c;
   x = nx;
 }
 
 //---------------------------------------------------------------------------
+csVector2 operator+ (const csVector2 &v1, const csVector2 &v2)
+{
+  return csVector2 (v1.x + v2.x, v1.y + v2.y);
+}
 
-csVector2 operator+ (const csVector2& v1, const csVector2& v2)
-{ return csVector2(v1.x+v2.x, v1.y+v2.y); }
+csVector2 operator- (const csVector2 &v1, const csVector2 &v2)
+{
+  return csVector2 (v1.x - v2.x, v1.y - v2.y);
+}
 
-csVector2 operator- (const csVector2& v1, const csVector2& v2)
-{ return csVector2(v1.x-v2.x, v1.y-v2.y); }
+float operator * (const csVector2 &v1, const csVector2 &v2)
+{
+  return v1.x * v2.x + v1.y * v2.y;
+}
 
-float operator* (const csVector2& v1, const csVector2& v2)
-{ return v1.x*v2.x+v1.y*v2.y; }
+csVector2 operator * (const csVector2 &v, float f)
+{
+  return csVector2 (v.x * f, v.y * f);
+}
 
-csVector2 operator* (const csVector2& v, float f)
-{ return csVector2(v.x*f, v.y*f); }
+csVector2 operator * (float f, const csVector2 &v)
+{
+  return csVector2 (v.x * f, v.y * f);
+}
 
-csVector2 operator* (float f, const csVector2& v)
-{ return csVector2(v.x*f, v.y*f); }
+csVector2 operator/ (const csVector2 &v, float f)
+{
+  f = 1.0f / f;
+  return csVector2 (v.x * f, v.y * f);
+}
 
-csVector2 operator/ (const csVector2& v, float f)
-{ f = 1.0f / f; return csVector2(v.x * f, v.y * f); }
+bool operator== (const csVector2 &v1, const csVector2 &v2)
+{
+  return (v1.x == v2.x) && (v1.y == v2.y);
+}
 
-bool operator== (const csVector2& v1, const csVector2& v2)
-{ return (v1.x==v2.x) && (v1.y==v2.y); }
-
-bool operator!= (const csVector2& v1, const csVector2& v2)
-{ return (v1.x!=v2.x) || (v1.y!=v2.y); }
+bool operator!= (const csVector2 &v1, const csVector2 &v2)
+{
+  return (v1.x != v2.x) || (v1.y != v2.y);
+}
 
 //---------------------------------------------------------------------------

@@ -15,7 +15,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include <math.h>
 #include <float.h>
 #include "cssysdef.h"
@@ -25,23 +24,22 @@
 #include "csgeom/math3d.h"
 
 //---------------------------------------------------------------------------
-
-csSphere operator+ (const csSphere& s1, const csSphere& s2)
+csSphere operator+ (const csSphere &s1, const csSphere &s2)
 {
   csSphere s = s1;
   s += s2;
   return s;
 }
 
-void csSphere::Union (const csVector3& ocenter, float oradius)
+void csSphere::Union (const csVector3 &ocenter, float oradius)
 {
   // First calculate distance between centers of two spheres.
   float distance = qsqrt (csSquaredDist::PointPoint (center, ocenter));
 
-  if (radius >= oradius+distance) // Sphere 2 is inside sphere 1
+  if (radius >= oradius + distance)       // Sphere 2 is inside sphere 1
   {
   }
-  else if (oradius >= radius+distance) // Sphere 1 is inside sphere 2
+  else if (oradius >= radius + distance)  // Sphere 1 is inside sphere 2
   {
     center = ocenter;
     radius = oradius;
@@ -49,15 +47,15 @@ void csSphere::Union (const csVector3& ocenter, float oradius)
   else if (ABS (distance) < SMALL_EPSILON)
   {
     // Spheres very close to each other. Because the two tests above
+
     // succeeded the spheres are actually equal. So nothing has to be done.
   }
   else
   {
-    csVector3 direction = (center-ocenter) / distance;
-    center = (center + direction*radius + ocenter + direction*oradius) * 0.5f;
+    csVector3 direction = (center - ocenter) / distance;
+    center = (center + direction * radius + ocenter + direction * oradius) * 0.5f;
     radius = (radius + oradius + distance) * 0.5f;
   }
 }
 
 //---------------------------------------------------------------------------
-

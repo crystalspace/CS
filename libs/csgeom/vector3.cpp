@@ -16,7 +16,6 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include <math.h>
 #include <float.h>
 #include "cssysdef.h"
@@ -25,21 +24,21 @@
 #include "csgeom/vector3.h"
 
 //---------------------------------------------------------------------------
-
 float csVector3::Norm () const
 {
-  return qsqrt (x*x + y*y + z*z);
+  return qsqrt (x * x + y * y + z * z);
 }
 
 void csVector3::Normalize ()
 {
-  float sqlen = x*x + y*y + z*z;
-  if (sqlen < SMALL_EPSILON) return;
+  float sqlen = x * x + y * y + z * z;
+  if (sqlen < SMALL_EPSILON) return ;
+
   float invlen = qisqrt (sqlen);
   *this *= invlen;
 }
 
-csVector3::csVector3 (const csDVector3& v)
+csVector3::csVector3 (const csDVector3 &v)
 {
   x = (float)v.x;
   y = (float)v.y;
