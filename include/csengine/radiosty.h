@@ -511,9 +511,10 @@ public:
    */
   static int static_specular_tightness;
 
-  /** Multiplier for amount of texture colour used. Also gives more light.
+  /** Multiplier for amount of texture colour used. 
    *  regular value is 1.0, smaller will be darker, larger will make
-   *  surroundings blend eachothers colours more and be brighter.
+   *  surroundings blend eachothers colours more.
+   *  0.0 means not to use texture colouring.
    */
   static float colour_bleed;
 
