@@ -8,7 +8,7 @@ JAMCONFIG ?= $(BUILDTOP)/Jamconfig ;
 include $(JAMCONFIG) ;
 if ! $(JAMCONFIG_READ)
 {
-  EXIT "Couldn't find config. Please configure the project." ;
+  EXIT "Failed to find configuration information. Please configure project." ;
 }
 
 # CFLAGS
@@ -31,6 +31,18 @@ if $(PTHREAD.AVAILABLE) = "yes"
 LOCATE.OBJECTS = $(BUILDTOP)/out/$(OSFULL[1]:L) ;
 LOCATE.TARGETS = $(BUILDTOP) ;
 LOCATE.DOCS = $(BUILDTOP)/out/docs ;
+
+# Include CS build rules.
+include $(TOP)/mk/jam/build.jam ;
+
+# Additional msvcgen configuration.
+MsvcGenConfig [ ConcatDirs $(TOP) mk msvcgen msvcgen.jam ] ;
+
+# Project-specific settings.
+if $(TARGET.OS) = MACOS_X
+{
+  ApplicationIconDefaultOSX appicon.icns : $(TOP) libs csutil macosx ;
+}
 
 # List of plugins which should be linked in when building static.
 if $(USE_NEW_RENDERER) = "yes"
@@ -180,15 +192,6 @@ if $(TARGET.OS) = "WIN32" && $(GL.AVAILABLE) = "yes"
 if $(TARGET.OS) = "MACOS_X" { STATIC.PLUGINLIST += cocoa2d cgdriver2d ; }
 if $(TARGET.OS) = "MACOS_X" && $(GL.AVAILABLE) = "yes"
   { STATIC.PLUGINLIST += glosx2d ; }
-
-# Include CS build rules.
-include $(TOP)/mk/jam/build.jam ;
-
-# Project-specific settings.
-if $(TARGET.OS) = MACOS_X
-{
-  ApplicationIconDefaultOSX appicon.icns : $(TOP) libs csutil macosx ;
-}
 
 # Common include directory.
 IncludeDir

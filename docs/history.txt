@@ -53,6 +53,11 @@ chronological order.
 	- Eric Sunshine augmented the CompileGroups rule in groups.jam so that
 	  it complains if handed a compile group which was not registered via
 	  RegisterCompileGroups.
+	- Eric Sunshine augmented msvcgen.jam to make it possible to invoke the
+	  'msvcgen', 'msvcgen6', and 'msvcgen7' targets directly, instead of
+	  having to run the stand-alone mk/msvcgen/msvcgen.sh shell script.
+	  (The 'msvcgen' target is just a shortcut which invokes the other two
+	  targets.)  Removed the msvcgen.sh script.
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by

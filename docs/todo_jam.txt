@@ -10,7 +10,12 @@ W - Wishlist (the build also works without this feature)
 [H] msvcgen.jam: Add support to create multiple, customizable workspaces rather
     than always creating only wksall.  Obvious examples of workspaces are the
     ones presently created by the GNU make system: wksall, wkstypical,
-    wkswalkall, wksnewrenderer.
+    wkswalkall, wksnewrenderer.  This is particularly problematic since
+    creation of the wksnewrenderer target is entirely crippled by the fact that
+    USE_NEW_RENDERER must be "no" in order to create the other workspaces, but
+    "yes" to create this one. A different set of Jamfiles is loaded depending
+    upon this setting, thus making it extremely difficult to get the proper set
+    of module definitions.
 [H] msvcgen.jam: Add support to create specified pseudo-groups in generated
     workspaces, such as grpall-typical, grplibs-typical, etc.
 [H] msvcgen.jam: Either respect ExternaLibs() or fix all the Jamfiles which
@@ -19,35 +24,54 @@ W - Wishlist (the build also works without this feature)
     wsock32.lib, for instance.  There are a number of other such modules.  The
     current monlithic solution of placing this information in
     CS/mk/msvcgen/Jamconfig is ugly, error-prone, and a maintenance headache.
-[H] msvcgen.jam: Eliminate the ugly and monolithic mk/msvcgen/msvcgen.sh and
-    mk/msvcgen/Jamconfig.  Instead, it should be possible to run the entire
-    process using the normal Jamconfig created by the configuration process.
-[H] msvcgen.jam: Should override the Help rule to capture the help message for
-    a target, rather than relying upon the ugly, out-of-place "$(<)_help =
-    $(>)" hack which was added to help.jam, to allow msvcgen.jam to access the
-    help string.  msvcgen.jam should be responsible for its own requirements.
+[H] msvcgen.jam: Eliminate the ugly and monolithic mk/msvcgen/msvcgen.jam. The
+    information in this file should be provided by rule invocations in the
+    various module Jamfiles. (This is directly related to the above item.)
 [H] msvcgen.jam: There should be some way to indicate that project files should
     not be generated for certain applications, plugins, and libraries.  This
     could be done either via a monolithic list or on a module-by-module basis
     in each module's Jamfile.  (What are the relative merits of each approach?)
+    Obvious examples for which MSVC project files should not be created are
+    those modules which are specific to Unix and MacOS/X.
+[H] An MSVC project file is created for the walktest_static variation. (Worse,
+    it generates the file out/apps/walktest/static/_crystal_static_init.cpp and
+    references it in the project file; _and_ it even compiles that file.  This
+    is especially bad for automated project file creation on the SourceForge
+    shell machine where the compiler is unavailable.)
+[H] msvcgen.jam: When modules reference sources or headers outside of the local
+    source directory via some number of ".."'s, these resources appear as
+    "../../foo/bar/../../this/module" in the generated project file.  (If MSVC6
+    & 7 don't care about this, then we can lower the priority of this item, and
+    instead consider it just an ugly but not dangerous anomaly.)
 [H] There are no rules for building the pure Python module yet (only the Python
     plugin works).
 [H] There are no rules for building the pure Perl5 module yet (only the Perl5
     plugin works).
-[H] The `jobber' scripts on SourceForge should use jam instead of make.
+[H] The `jobber' script on SourceForge should use jam instead of make.
 [H] Write complete documentation about the Jam build system for the CS user
     manual.
 
+[M] Introduce a new rule named Description and change all invocations of the
+    Help rule (except the ones using the "verbatim" option) to invocations of
+    the Description rule throughout the project.  Next, remove the "verbatim"
+    option from the Help rule and make the Help rule _always_ treat its
+    argument as verbatim. Also eliminate the anomaly where Help is hard-coded
+    to prepend "Build the" to the incoming text.  Then, augment the
+    Application, Library, Plugin, and ShellScript rules to invoke Help
+    automatically with the text "Build the $(description)".  Finally, augment
+    msvcgen.jam and win32.jam to utilize the target's decription string (as
+    collected by the Description rule) rather than the help string (which is
+    not necessarily appropriate as a module's description).
+[M] msvcgen.jam: Eliminate dependency upon external scripts for creation of the
+    .rc resources. win32.jam is already capable of performing these tasks
+    stand-alone, so it should be possible to do the same for msvcgen.jam,
+    possibly by invoking the rules provided by win32.jam.
 [M] Write a tutorial (maybe we could just link to the text in the RoboRun
     project?).  Another interesting topic would be integrating Crystal Space
     with other build systems like Automake or Ant.
 [M] Re-work the provided m4 scripts to provide functionality like CS_CHECK_HOST
     and INITJAMFILE. Would be also nice to extract more of the detection
     scripts in CS (perl, python, nasm, problematic cflags?)
-[M] msvcgen.jam: Eliminate dependency upon external scripts for creation of the
-    .rc resources. win32.jam is already capable of performing these tasks
-    stand-alone, so it should be possible to do the same for msvcgen.jam,
-    possibly by invoking the rules provided by win32.jam.
 
 [L] msvcgen.jam: Overhaul the "configuration" file handling rule so that it
     associates configuration files with built targets.  This will allow the
@@ -59,13 +83,17 @@ W - Wishlist (the build also works without this feature)
     function correctly without this information.
 [L] msvcgen.jam: Provide a generic Resources() rule which allows specification
     of additional textual resources for inclusion in generated projects.  (The
-    GNU msvcgen does this.)
+    GNU msvcgen does this.)  Note that this is just a convenience for the user
+    of the project file; the project file itself will function correctly
+    without this information.
 [L] msvcgen.jam: Provide rules to copy the generated files back to the source
     tree upon explicit request so that they can be committed to the CVS
     respository if desired.
-[L] Eliminate the need for the documentation-building shell scripts. Jam is
-    sufficiently expressive that it should be able to handle the image-copying
-    and other functionality without depending upon these external tools.
+[L] Eliminate the need for the documentation-building shell scripts; the ones
+    which copy image files from docs/texinfo/* into the build directory.  Jam
+    is sufficiently expressive that it should be able to handle the
+    image-copying and other functionality without depending upon these external
+    tools.
 
 [W] See if there's a way to create some suitable MSVC templates for external
     projects, so that we autogenrate msvc-makefiles there too.
@@ -82,11 +110,15 @@ W - Wishlist (the build also works without this feature)
     adds -k to the command-line.  :-(
 [W] It would be nice to have the configure files regenerated and execute if the
     configure.ac file has changed.  Unfortunately it is not possible to force
-    jam to re-read its configuration files, so this isn't 100% possible...
-    Would it be possible to somehow recreate the configure files and then exit
-    Jam with a message telling that you should rerun configure, or at least
-    emit a big warning?
+    jam to re-read its configuration files, so this isn't 100% possible.  Would
+    it be possible to somehow recreate the configure files and then exit Jam
+    with a message telling that you should rerun configure, or at least emit a
+    big warning?
 
+[*] msvcgen.jam: Eliminate the ugly mk/msvcgen/msvcgen.sh.  Instead, it should
+    be possible to run the entire process using the normal Jamconfig created by
+    the configuration process and by simply invoking the desired targets
+    (msvcgen, msvcgen6, msvcgen7).
 [*] msvcgen.jam: Auto-generated MSVC project files should be generated into the
     build directory rather than the source tree, since the source tree might be
     read-only or shared.

@@ -2,8 +2,58 @@
 # Rules for creating msvc projectfiles
 #============================================================================
 
-if "$(MSVCGEN_CONFIG)"
+if ! $(DO_MSVCGEN)
 {
+JAM ?= jam ;
+
+## MsvcGenConfig configfile
+##   Specify an additional configuration file to augment the msvcgen
+##   environment.
+##
+## @@@ This is likely temporary. It is present for backward compatibiliy while
+## additional configuration information is maintained in a monolithic
+## configuration file, rather than provided to msvcgen via normal rule
+## invocation by module-specific Jamfiles.
+rule MsvcGenConfig
+{
+  MSVCGEN_CONFIG = $(<) ;
+}
+
+## MsvcGenTarget version
+rule MsvcGenTarget
+{
+  Always msvcgen$(<) ;
+  NotFile msvcgen$(<) ;
+  MSVC_VERSION on msvcgen$(<) = $(<) ;
+  MsvcGen msvcgen$(<) ;
+  Help msvcgen$(<) : "Create MSVC$(<) project files" : verbatim ;
+}
+
+actions MsvcGen
+{
+  $(JAM) -sDO_MSVCGEN=yes -sMSVCGEN_CONFIG=$(MSVCGEN_CONFIG) \
+    -sMSVC_VERSION=$(MSVC_VERSION) -sTARGET.OS=WIN32 -sUSE_PLUGINS=yes \
+    -sUSE_NEW_RENDERER=no msvcgen
+}
+
+MsvcGenTarget 6 ;
+MsvcGenTarget 7 ;
+
+Always msvcgen ;
+NotFile msvcgen ;
+Depends msvcgen : msvcgen6 msvcgen7 ;
+Help msvcgen : "Create MSVC6 and MSVC7 project files" : verbatim ;
+
+}
+else
+{
+
+if $(MSVCGEN_CONFIG)
+{
+  include $(MSVCGEN_CONFIG) ;
+}
+
+PERL ?= perl ;
 MSVCGEN = $(PERL) [ ConcatDirs $(TOP) mk msvcgen msvcgen.pl ] ;
 MERGERES = $(SHELL) [ ConcatDirs $(TOP) libs csutil win32 mergeres.sh ] ;
 
@@ -37,8 +87,33 @@ else
   EXIT "No msvcgen support for MSVC version $(MSVC_VERSION) yet!" ;
 }
   
+MSVC.DEPEND ?= ;
+MSVC.LIBRARY ?= ;
+MSVC.LFLAGS ?= ;
+MSVC.CFLAGS ?= ;
+MSVC.DEPEND.appgui ?= ;
+MSVC.LIBRARY.appgui ?= ;
+MSVC.LFLAGS.appgui ?= ;
+MSVC.CFLAGS.appgui ?= ;
+MSVC.DEPEND.appcon ?= ;
+MSVC.LIBRARY.appcon ?= ;
+MSVC.LFLAGS.appcon ?= ;
+MSVC.CFLAGS.appcon ?= ;
+MSVC.DEPEND.plugin ?= ;
+MSVC.LIBRARY.plugin ?= ;
+MSVC.LFLAGS.plugin ?= ;
+MSVC.CFLAGS.plugin ?= ;
+MSVC.DEPEND.library ?= ;
+MSVC.LIBRARY.library ?= ;
+MSVC.LFLAGS.library ?= ;
+MSVC.CFLAGS.library ?= ;
+
 #----------------------------------------------------------------------------
 # Override some rules
+
+rule MsvcGenConfig
+{
+}
 
 ## MsvcProject target : sources : type : target-with-ext
 rule MsvcProject

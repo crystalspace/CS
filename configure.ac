@@ -232,9 +232,13 @@ AS_IF([test -n "$SWIG"],
     [CS_CHECK_PROG_VERSION([swig], [$SWIG -version 2>&1], [1.3.14],
 	[9.9|.9], [CS_BUILD_PROPERTY([CMD.SWIG], [$SWIG])])])
 
-AC_CHECK_PROGS([JAM], [jam])
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
 AC_PROG_MAKE_SET
+
+AC_CHECK_PROGS([JAM], [jam])
+CS_BUILD_PROPERTY([JAM], [$JAM])
+
+
 
 #------------------------------------------------------------------------------
 # Determine how to make a directory tree.  We need to know the exact commands,
