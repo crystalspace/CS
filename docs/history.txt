@@ -1,6 +1,30 @@
 The history order has been reversed so that new features are at the top.
 
+28-Jun-2000
+	- Rene Dudfield <illumen@yahoo.com> contributed a set of Python
+	  scripts for Blender to convert Blender entities to CS objects.
+	  You can find them in CS/scripts/blender. There is also a README
+	  there which explains how to use the scripts in Blender.
 27-Jun-2000
+	- Samuel Humphreys fixed dtsimple:
+	    - Fixed the portal...it was the gouraud shading which broke it,
+	      turned it into a mirror for the time being.
+	    - Fixed non-coplanar wall.
+	    - Re-organised the lighting, added a stand for the view screen.
+	    - Added a vector texture space method to csPolygon3D.
+	    - some other trivialities :)
+	- Andrew Zabolotny fixed wscs app so that it will not create two
+	  instances of 3D and 2D drivers (and will not crash at exit due
+	  to this) and it will also refresh the screen correctly (implemented
+	  missing support for that in CSWS).
+	- Andrew also changed ForceFullRedraw() into a more flexible
+	  pplInvalidate() call which allows for invalidating a random screen
+	  rectangle instead of entire screen.
+	- Andrew fixed OS/2 video driver so that BeginDraw/EndDraw can be
+	  called multiple times before doing Print() in double-buffered mode.
+	- Andrew fixed common graphics class so that it can be Close()'d
+	  without being Open'ed and so that it won't crash if we just create
+	  it and destroy instantaneously.
 	- Wyatt Miler updates the Mac project files.
 	- Fixed the bug when that could cause severe problems when
 	  loading a world for which the octree isn't valid anymore. The
@@ -45,6 +69,19 @@ The history order has been reversed so that new features are at the top.
 	  recently added these constants to csevent.h.
 	- Eric Sunshine fixed a couple copy/paste errors in NeXTDelegate.cpp
 	  for NextStep.
+	- Thomas Hieber made REGISTER_STATIC_CLASS really static (removes a
+	  linker warning on msvc).
+	- Thomas moved HINSTANCE to win32 instead of having it in exeentry/
+	  dllentry. This removes a warning on the linking of libAll. Anyway
+	  it looks better that way too. Maybe we should eliminate exeentry
+	  and dllentry completly. These files seem pretty redundant to me
+	  (it could all be done by win32.cpp IMHO).
+	- Thomas also did a few minor cleanups here and there and a few
+	  minor changes to VC project files.
+	- Norman Kramer fixed CSWS (cstree) so that it compiles on Windows
+	  now.
+	- Norman added support for ZFILL_ONLY in glide renderer.
+	- Martin Geisse cleaned up the code of the wave-out sound driver.
 26-Jun-2000
 	- Fixed memory leak while building BSP/octree.
 	- Eric Sunshine eliminated a slew of compilation warning in cstree.cpp
