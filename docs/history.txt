@@ -1,24 +1,36 @@
 The history order has been reversed so that new features are at the top.
 
 21-Mar-2001:
-	- Reverted the fix from Philip to python plugin and did the
-	  fix the 'right' way. Please don't modify cs_pyth.cpp directly.
-	  It is an automatically generated file and it makes no sense
-	  to modify it. You have to modify the source file called
-	  plugins/cscript/common/cs.i and then run the target
-	  'make cspythonswig' (provided you have swig).
+	- Reverted the fix from Philip to python plugin and did the fix the
+	  'right' way.  Please don't modify cs_pyth.cpp directly.  It is an
+	  automatically generated file and it makes no sense to modify it.  You
+	  have to modify the source file called plugins/cscript/common/cs.i and
+	  then run the target 'make cspythonswig' (provided you have swig).
+	- Eric Sunshine fixed a bug in the WAL image loader where it was
+	  unconditionally trying to access 100 bytes of the incoming image
+	  even if the image contained fewer than 100 bytes, thus it was
+	  potentially accessing memory beyond the end of the allocated block.
+	  This would result in a crash on some platforms.
+	- Eric Sunshine fixed several problems in mdl2spr where it was
+	  accessing strings as though they were null-terminated even though it
+	  had neither ensured null-termination nor even ensured that the
+	  allocated buffer was large enough to hold the null-terminator.
+	- Eric Sunshine fixed a fundamental flaw in mdl2spr which completely
+	  corrupted converted Quake 2 models.  The conversion process was
+	  essentially throwing away valid vertex coordinates and substituting
+	  incorrect coordinates in their stead.
 20-Mar-2001:
 	- Philip Wyett altered his email address in the docs.
 	- Wouter Wijngaards added the following methods to explosion
-	  particlesystem: GetNumberParticles, GetCenter, GetPush,
-	  GetNrSides, GetPartRadius, GetLighting, GetSpreadPos,
-	  GetSpreadSpeed, GetSpreadAcceleration and GetFadeSprites.
-	- Wouter also added a method GetColor() to iParticleState, to get
-	  the particle color.
+	  particlesystem: GetNumberParticles, GetCenter, GetPush, GetNrSides,
+	  GetPartRadius, GetLighting, GetSpreadPos, GetSpreadSpeed,
+	  GetSpreadAcceleration and GetFadeSprites.
+	- Wouter also added a method GetColor() to iParticleState, to get the
+	  particle color.
 	- Wouter added the ExplosionSaver and ExplosionFactorySaver PlugIns.
-	- Split rview.cpp and rview.h into rview and lview. rview contains
-	  csRenderView and lview contains everything related to the
-	  shadow calculations.
+	- Split rview.cpp and rview.h into rview and lview.  rview contains
+	  csRenderView and lview contains everything related to the shadow
+	  calculations.
 	- Robert Bate brought the Mac projects files up to date.
 	- Philip Wyett manually updated the VC project files.
 	- Philip also did a fix to the python plugin.

@@ -58,6 +58,8 @@ bool RegisterWAL ()
 
 csImageFile* csWALImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 {
+  if (iSize < sizeof(WALHeader))
+    return NULL;
   ImageWALFile* i = new ImageWALFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
