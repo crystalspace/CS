@@ -97,10 +97,16 @@ void csThreadJobQueue::PullAndRun (iJob* job)
     bool didWait = false;
     while (currentJob == job)
     {
+      csScopedMutexLock jobLock (jobFinishMutex);
       sharedData.jobXS->Release();
       // wait for the job completion
-      csScopedMutexLock jobLock (jobFinishMutex);
-      sharedData.jobFinish->Wait (jobFinishMutex);
+      if (!sharedData.jobFinish->Wait (jobFinishMutex, 500))
+      {
+	// @@@ Timeout not v. nice
+#ifdef CS_DEBUG
+	csPrintf ("csThreadJobQueue::PullAndRun(): timeout\n");
+#endif
+      }
       didWait = true;
       sharedData.jobXS->LockWait();
     }

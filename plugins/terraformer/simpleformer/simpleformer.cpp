@@ -344,11 +344,9 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
       {
         // Grab the intensity as height
         // We're reversing Y to later get negative Y in heightmap image 
-        // to positive Z in terrain
-        
-        // @@@ Edited to not flip Y. Why did I do it in the first place?
-        // /Anders Stenberg
-        heightData[x+y*width] = 
+        // to positive Z in terrain - sampler space has an inverted Y
+	// axis in comparison to image space.
+        heightData[x+(height-y-1)*width] = 
           data[x+y*width].Intensity ()/255.0;
       }
     }
@@ -372,11 +370,9 @@ void csSimpleFormer::SetHeightmap (iImage *heightmap)
       {
         // Grab the intensity as height
         // We're reversing Y to later get negative Y in heightmap image 
-        // to positive Z in terrain
-
-        // @@@ Edited to not flip Y. Why did I do it in the first place?
-        // /Anders Stenberg
-        heightData[x+y*width] = 
+        // to positive Z in terrain - sampler space has an inverted Y
+	// axis in comparison to image space.
+        heightData[x+(height-y-1)*width] = 
           palette[data[x+y*width]].Intensity () / 255.0;
       }
     }
@@ -728,14 +724,14 @@ void csSimpleSampler::CacheTexCoords ()
   texCoord.y = minCorner.z / (float)terraFormer->height;
   const csVector2 tcStep (
     sampleDistanceHeight.x / (float)terraFormer->width, 
-    sampleDistanceHeight.z / (float)terraFormer->height);  
+    sampleDistanceHeight.z / (float)terraFormer->height);
   for (unsigned int i = 0; i<resolution; ++i)
   {
     texCoord.x = startx; 
     for (unsigned int j = 0; j<resolution; ++j)
     {
       // Just assign the texture coordinate
-      texCoords[idx++] = texCoord;
+      texCoords[idx++].Set (texCoord.x, -texCoord.y); //= texCoord;
       texCoord.x += tcStep.x;
     }
     texCoord.y += tcStep.y;

@@ -175,6 +175,8 @@ static int _cs_fputs (const char* string, FILE* stream)
 
     string += ansiCommandLen + textLen;
   }
+  if (isTTY && (oldAttr != textAttr))
+    SetConsoleTextAttribute (hCon, textAttr);
   return (int)ret;
 }
 

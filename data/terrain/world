@@ -71,7 +71,7 @@
     <material name="Stone">
       <texture>stone4.gif</texture>
       <shadervar name="tex normal" type="texture">stone2DOT3.png</shadervar>
-      <shadervar name="texture scale" type="vector2">32,32</shadervar>
+      <shadervar name="texture scale" type="vector2">64,64</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
       <shader type="diffuse">splatting_scattering</shader>
     </material>
@@ -154,7 +154,8 @@
     <plugin>crystalspace.terraformer.simple.loader</plugin>
     <params>
       <name>simple</name>
-      <heightmap>/lev/terrain/heightmap_257x257.png</heightmap>
+      <!--heightmap>/lev/terrain/heightmap_257x257.png</heightmap-->
+      <heightmap>/lev/terrain/heightmap.png</heightmap>
       <!--<heightmap image="/lev/terrain/heightmap_2049x2049.png"/>-->
       <scale x="256" y="30" z="256" />
     </params>

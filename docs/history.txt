@@ -21,6 +21,10 @@ chronological order.
 	- res made csparser and cssynldr use csReport().
 	- res changed the generic csPrintf() to use fputws() only on wide
 	  streams and fputs() otherwise.
+	- res fixed the simpleformer & bruteblock plugins to use correctly
+	  oriented material and base maps.
+	- res added hacked around apparent deadlocks in the thread job queue
+	  by adding a timeout at one point.
 28-Feb-2005
 	- Jorrit changed the generation of the light ID so that it is
 	  compatible again for pseudo dynamic lights. Otherwise too many

@@ -614,8 +614,8 @@ bool csTerrBlock::IsMaterialUsed (int index)
     // we don't miss materials due to just being at the border
     // of a block.
     csBox2 heightmapSpace (
-    	center.x - size / 2.0 -1.0,
-	center.z - size / 2.0 -1.0,
+    	center.x - size / 2.0 - 1.0,
+	center.z - size / 2.0 - 1.0,
 	center.x + size / 2.0 + 1.0,
 	center.z + size / 2.0 + 1.0);
     const csBox2& terrRegion = terr->region;
@@ -626,12 +626,13 @@ bool csTerrBlock::IsMaterialUsed (int index)
                 (terrRegion.MaxY() - terrRegion.MinY());
     int mmLeft = 
       (int)floor ((heightmapSpace.MinX() - terrRegion.MinX()) * wm);
-    int mmTop = 
-      (int)floor ((heightmapSpace.MinY() - terrRegion.MinY()) * hm);
+    // account for decreasing TCs with increasing Y
+    int mmBottom = terr->materialMapH - 
+      (int)ceil ((heightmapSpace.MinY() - terrRegion.MinY()) * hm);
     int mmRight = 
       (int)ceil ((heightmapSpace.MaxX() - terrRegion.MinX()) * wm);
-    int mmBottom = 
-      (int)ceil ((heightmapSpace.MaxY() - terrRegion.MinY()) * hm);
+    int mmTop = terr->materialMapH -
+      (int)floor ((heightmapSpace.MaxY() - terrRegion.MinY()) * hm);
 
     // Jorrit: for some reason we must cap mmRight and mmBottom.
     if (mmRight >= terr->materialMapW) mmRight = terr->materialMapW-1;
@@ -2229,9 +2230,9 @@ void csTerrainFactory::SetSamplerRegion (const csBox2& region)
   samplerRegion = region;
   // @@@ Add better control over resolution?
   int resolution = (int)(region.MaxX () - region.MinX ());
-  // Make the resolution conform to n^2+1
+  // Make the resolution conform to 2^n+1
   resolution = csLog2 (resolution);
-  resolution = (int)(pow(2.0f, resolution)) + 1;
+  resolution = (1 << resolution) + 1;
 
   hm_x = hm_y = resolution;
 }
