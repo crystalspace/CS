@@ -36,9 +36,10 @@ ifeq ($(MAKESECTION),postdefines)
 #TCLTK=-ltk8.0 -ltcl8.0 -L/usr/X11R6/lib -lX11
 
 # For python 2.0+
-#LIBUTIL=-lutil
-ifneq (,$(filter python2%, $(notdir $(PYTHON_LIB))))
-  LIBUTIL=-lutil
+ifneq ($(OS),NEXT)
+  ifneq (,$(filter python2%, $(notdir $(PYTHON_LIB))))
+    LIBUTIL=-lutil
+  endif
 endif
 
 ifneq ($(OS),NEXT)

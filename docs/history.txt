@@ -26,6 +26,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed haspythn.sh so that it does a better job of
 	  locating Python even when Python is installed in a non-standard
 	  location.
+	- Eric Sunshine patched cspython.mak for MacOS/X.
 12-Sep-2002
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.
