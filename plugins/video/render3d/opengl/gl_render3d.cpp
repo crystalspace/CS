@@ -360,6 +360,7 @@ void csGLGraphics3D::SetAlphaType (csAlphaMode::AlphaType alphaType)
 
 void csGLGraphics3D::SetMirrorMode (bool mirror)
 {
+  if (render_target) mirror = !mirror;
   if (mirror)
     statecache->SetCullFace (GL_BACK);
   else
@@ -696,21 +697,21 @@ void csGLGraphics3D::SetupProjection ()
   statecache->SetMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   SetGlOrtho (render_target);
-  if (render_target)
+  /*if (render_target)
   {
     int txt_w, txt_h;
-    render_target->GetMipMapDimensions (0, txt_w, txt_h);
+    render_target->GetMipMapDimensions (0, txt_w, txt_h);*/
 
     /*
       Need a different translation for PTs, they are in the upper left.
       @@@ Not very nice to have that here,
-      @@@ furthermore, the perspective center Y coordinate is effectively
+      @@@ furthermore, the perspective center X & Y coordinate is effectively
           hardcoded
      */
 
-    glTranslatef (asp_center_x, (txt_h / 2), 0);
+    /*glTranslatef ((txt_w / 2), (txt_h / 2), 0);
   }
-  else
+  else*/
     glTranslatef (asp_center_x, asp_center_y, 0);
 
   GLfloat matrixholder[16];
@@ -1218,6 +1219,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     }
   }
 
+  glClearColor (1, 0, 0, 0);
   if (drawflags & CSDRAW_CLEARZBUFFER)
   {
     const GLbitfield stencilFlag = 
@@ -1241,7 +1243,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
     statecache->SetMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
-    object2camera = csReversibleTransform();
+    object2camera.Identity ();
     return true;
   }
   else if (drawflags & CSDRAW_2DGRAPHICS)
@@ -1282,6 +1284,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
       statecache->SetMatrixMode (GL_MODELVIEW);
       glLoadIdentity ();
+      object2camera.Identity ();
 
       SetZMode (CS_ZBUF_NONE);
       
@@ -1297,7 +1300,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
 void csGLGraphics3D::FinishDraw ()
 {
-  SetMirrorMode (false);
+  SetMirrorMode (render_target != 0);
 
   if (current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
     G2D->FinishDraw ();
@@ -1308,10 +1311,10 @@ void csGLGraphics3D::FinishDraw ()
     {
       rt_cliprectset = false;
       G2D->SetClipRect (rt_old_minx, rt_old_miny, rt_old_maxx, rt_old_maxy);
-      statecache->SetMatrixMode (GL_PROJECTION);
+      /*statecache->SetMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
       glOrtho (0., viewwidth, 0., viewheight, -1.0, 10.0);
-      glViewport (0, 0, viewwidth, viewheight);
+      glViewport (0, 0, viewwidth, viewheight);*/
     }
 
     if ((current_drawflags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)) == 
@@ -1750,7 +1753,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 
   SetupProjection ();
 
-  int num_tri = (mymesh->indexend-mymesh->indexstart)/3;
+  int num_tri = 0;
+
   SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
                 mymesh->clip_z_plane,
@@ -1777,19 +1781,24 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   switch (mymesh->meshtype)
   {
     case CS_MESHTYPE_QUADS:
+      num_tri = (mymesh->indexend-mymesh->indexstart)/2;
       primitivetype = forceWireframe ? GL_LINES : GL_QUADS;
       break;
     case CS_MESHTYPE_TRIANGLESTRIP:
+      num_tri = (mymesh->indexend-mymesh->indexstart)-2;
       primitivetype = forceWireframe ? GL_LINE_STRIP : GL_TRIANGLE_STRIP;
       break;
     case CS_MESHTYPE_TRIANGLEFAN:
+      num_tri = (mymesh->indexend-mymesh->indexstart)-2;
       primitivetype = forceWireframe ? GL_LINE_STRIP : GL_TRIANGLE_FAN;
       break;
     case CS_MESHTYPE_POINTS:
       primitivetype = GL_POINTS;
+      num_tri = (mymesh->indexend-mymesh->indexstart);
       break;
     case CS_MESHTYPE_POINT_SPRITES:
     {
+      num_tri = (mymesh->indexend-mymesh->indexstart);
       if(!(ext->CS_GL_ARB_point_sprite && ext->CS_GL_ARB_point_parameters))
       {
         break;
@@ -1820,14 +1829,17 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
       break;
     }
     case CS_MESHTYPE_LINES:
+      num_tri = (mymesh->indexend-mymesh->indexstart)/2;
       primitivetype = GL_LINES;
       break;
     case CS_MESHTYPE_LINESTRIP:
+      num_tri = (mymesh->indexend-mymesh->indexstart)-1;
       primitivetype = GL_LINE_STRIP;
       break;
     case CS_MESHTYPE_POLYGON:
     case CS_MESHTYPE_TRIANGLES:
     default:
+      num_tri = (mymesh->indexend-mymesh->indexstart)/3;
       primitivetype = forceWireframe ? GL_LINES : GL_TRIANGLES;
       break;
   }
@@ -2479,15 +2491,27 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
 
   if (flags & csSimpleMeshScreenspace)
   {
-    const float vwf = (float)(viewwidth);
-    const float vhf = (float)(viewheight);
+    if (current_drawflags & CSDRAW_2DGRAPHICS)
+    {
+      rmesh.object2camera.SetO2T (
+        csMatrix3 (1.0f, 0.0f, 0.0f,
+        0.0f, -1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f));
+      rmesh.object2camera.SetO2TTranslation (csVector3 (0, viewheight, 0));
+      // Try to be compatible with 2D drawing mode
+      G2D->PerformExtension ("glflushtext");
+    } else {
+      const float vwf = (float)(viewwidth);
+      const float vhf = (float)(viewheight);
 
-    rmesh.object2camera.SetO2T (
+      rmesh.object2camera.SetO2T (
       csMatrix3 (1.0f, 0.0f, 0.0f,
-		 0.0f, -1.0f, 0.0f,
-		 0.0f, 0.0f, 1.0f));
-    rmesh.object2camera.SetO2TTranslation (csVector3 (
+      0.0f, -1.0f, 0.0f,
+      0.0f, 0.0f, 1.0f));
+      rmesh.object2camera.SetO2TTranslation (csVector3 (
       vwf / 2.0f, vhf / 2.0f, -aspect));
+    }
+    rmesh.object2camera *= mesh.object2camera;
   }
   else
     rmesh.object2camera = mesh.object2camera;
@@ -2539,7 +2563,17 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
       mesh.shader->DeactivatePass ();
     }
   }
-  
+
+  if (flags & csSimpleMeshScreenspace)
+  {
+    if (current_drawflags & CSDRAW_2DGRAPHICS)
+    {
+      // Bring it back, that old new york rap! 
+      // Or well, at least that old identity transform
+      SetObjectToCameraInternal (csReversibleTransform ());
+    }
+  }
+
   if (!useShader)
   {
     DeactivateBuffer (CS_VATTRIB_POSITION);
@@ -2918,4 +2952,3 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
   }
   return false;
 }
-
