@@ -291,7 +291,7 @@ public:
   int GetUVAnimationCount () const {return vAnims.Length ();}
   iSprite2DUVAnimation *CreateUVAnimation ()
   {
-    csSprite2DUVAnimation *p = new csSprite2DUVAnimation (this);
+    csSprite2DUVAnimation *p = new csSprite2DUVAnimation (NULL);
     vAnims.Push (p);
     return (iSprite2DUVAnimation *)p;
   }
