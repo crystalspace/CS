@@ -129,7 +129,7 @@ public:
 
   SCF_DECLARE_IBASE;
   BCPolyMesh ();
-  ~BCPolyMesh ();
+  virtual ~BCPolyMesh ();
   
   virtual int GetVertexCount ()
   {

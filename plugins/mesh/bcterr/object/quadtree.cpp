@@ -111,7 +111,7 @@ bool csColQuad::HitBeamObject (csSegment3 seg,
   //if (BBoxLineIntersect (bbox, seg, isect, pr) )
   {
     int i, j, k, length;
-    float shortest;
+    float shortest = 0;
     csVector3 dist, ssect;
     bool hit, hashit;
     csVector3 *work;
