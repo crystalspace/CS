@@ -22,9 +22,5 @@ rule ScanHeaders
   }
 }
 
-ScanHeaders ;
-
-# remember to install volatile.h from buildtop dir
-LOCATE on volatile.h = $(BUILDTOP)/include ;
-InstallHeader volatile.h ;
+ScanHeaders . ;
 
