@@ -173,7 +173,7 @@ public:
   const BitProxy operator[](unsigned pos) const
   {
     CS_ASSERT (pos < mNumBits);
-    return BitProxy(CONST_CAST(csBitArray&,*this), pos);
+    return BitProxy(CS_CONST_CAST(csBitArray&,*this), pos);
   }
 
   /// equal to other array

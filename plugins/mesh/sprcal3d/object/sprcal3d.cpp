@@ -65,7 +65,7 @@ SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
       "factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
     iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
     (Object)->IncRef ();						
-    return STATIC_CAST(iPolygonMesh*, Object);				
+    return CS_STATIC_CAST(iPolygonMesh*, Object);				
   }
 }
 SCF_IMPLEMENT_IBASE_END
@@ -429,7 +429,7 @@ SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLODControl)
       "GetPolygonMeshColldet() instead.\n");
 #endif
     (&scfiPolygonMesh)->IncRef ();						
-    return STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
+    return CS_STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
   }
 }
 SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
@@ -444,7 +444,7 @@ SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
       "factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
     iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
     (Object)->IncRef ();						
-    return STATIC_CAST(iPolygonMesh*, Object);				
+    return CS_STATIC_CAST(iPolygonMesh*, Object);				
   }
 }
 SCF_IMPLEMENT_IBASE_END

@@ -44,7 +44,7 @@ bool run_pool_tests(iObjectRegistry* object_reg)
     printf ("EventQueue not loaded, Zoinks!\n");
     return false;
   }
-  csEventQueue *eq = STATIC_CAST(csEventQueue *, (iEventQueue *)q);
+  csEventQueue *eq = CS_STATIC_CAST(csEventQueue *, (iEventQueue *)q);
 
   fprintf (stdout, "Event Pool count: %d\n", eq->CountPool());
   fprintf (stdout, "Allocating 10 events...  ");

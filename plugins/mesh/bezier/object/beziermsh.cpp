@@ -86,7 +86,7 @@ SCF_IMPLEMENT_IBASE(csBezierMesh)
 #endif
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
       (Object)->IncRef ();						
-      return STATIC_CAST(iPolygonMesh*, Object);				
+      return CS_STATIC_CAST(iPolygonMesh*, Object);				
     }
   }
 SCF_IMPLEMENT_IBASE_END

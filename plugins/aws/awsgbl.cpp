@@ -190,7 +190,7 @@ void awsGridBagLayout::setConstraints (
   awsGridBagConstraints &constraints)
 {
   // check if the component exists.
-  awsGridBagConstraints *p = STATIC_CAST (
+  awsGridBagConstraints *p = CS_STATIC_CAST (
       awsGridBagConstraints *,
       comptable.Get ((csHashKey) cmp));
 
@@ -203,7 +203,7 @@ void awsGridBagLayout::setConstraints (
 
 awsGridBagConstraints awsGridBagLayout::getConstraints (iAwsComponent *cmp)
 {
-  awsGridBagConstraints *constraints = STATIC_CAST (
+  awsGridBagConstraints *constraints = CS_STATIC_CAST (
       awsGridBagConstraints *,
       comptable.Get ((csHashKey) cmp));
 
@@ -230,7 +230,7 @@ awsGridBagConstraints awsGridBagLayout::getConstraints (iAwsComponent *cmp)
 awsGridBagConstraints *awsGridBagLayout::lookupConstraints (
   iAwsComponent *cmp)
 {
-  awsGridBagConstraints *constraints = STATIC_CAST (
+  awsGridBagConstraints *constraints = CS_STATIC_CAST (
       awsGridBagConstraints *,
       comptable.Get ((csHashKey) cmp));
 

@@ -460,7 +460,7 @@ int csNetworkSocket2::Send (char const* buff, size_t size)
 
 int csNetworkSocket2::Connect (char const* host, int port)
 {
-  struct hostent const* host_ent = gethostbyname(CONST_CAST(char*,host));
+  struct hostent const* host_ent = gethostbyname(CS_CONST_CAST(char*,host));
   if (host_ent == 0)
     last_error = CS_NET_SOCKET_CANNOT_RESOLVE;
   else

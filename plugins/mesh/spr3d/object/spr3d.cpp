@@ -182,7 +182,7 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObjectFactory)
 	"factory; use iObjectModel->GetPolygonMeshColldet() instead.\n");
       iPolygonMesh* Object = scfiObjectModel.GetPolygonMeshColldet();
       (Object)->IncRef ();						
-      return STATIC_CAST(iPolygonMesh*, Object);				
+      return CS_STATIC_CAST(iPolygonMesh*, Object);				
     }
   }
 SCF_IMPLEMENT_IBASE_END
@@ -947,7 +947,7 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
 	"GetPolygonMeshColldet() instead.\n");
 #endif
       (&scfiPolygonMesh)->IncRef ();						
-      return STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
+      return CS_STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
     }
   }
 SCF_IMPLEMENT_IBASE_END

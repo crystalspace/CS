@@ -86,10 +86,16 @@
   #define CS_CAST(C,T,V) (C<T>(V))
 #endif
 
-#define STATIC_CAST(T,V)      CS_CAST(static_cast,T,V)
-#define DYNAMIC_CAST(T,V)     CS_CAST(dynamic_cast,T,V)
-#define REINTERPRET_CAST(T,V) CS_CAST(reinterpret_cast,T,V)
-#define CONST_CAST(T,V)       CS_CAST(const_cast,T,V)
+#define CS_STATIC_CAST(T,V)      CS_CAST(static_cast,T,V)
+#define CS_DYNAMIC_CAST(T,V)     CS_CAST(dynamic_cast,T,V)
+#define CS_REINTERPRET_CAST(T,V) CS_CAST(reinterpret_cast,T,V)
+#define CS_CONST_CAST(T,V)       CS_CAST(const_cast,T,V)
+
+// DEPRECATED use the CS_ prefix versions instead.
+#define STATIC_CAST(T,V)      CS_STATIC_CAST(T,V)
+#define DYNAMIC_CAST(T,V)     CS_DYNAMIC_CAST(T,V)
+#define REINTERPRET_CAST(T,V) CS_REINTERPRET_CAST(T,V)
+#define CONST_CAST(T,V)       CS_CONST_CAST(T,V)
 
 // Platforms with compilers which do not understand the new C++ keyword
 // `explicit' should define CS_USE_FAKE_EXPLICIT_KEYWORD.

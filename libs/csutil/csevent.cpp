@@ -407,10 +407,10 @@ bool csEvent::Add(const char *name, iEvent *v)
 {
   if (this == v)
     return false;
-  if (CheckForLoops(this, STATIC_CAST(csEvent*, v)))
+  if (CheckForLoops(this, CS_STATIC_CAST(csEvent*, v)))
   {
     attribute *object = new attribute(attribute::tag_event);
-    object->Event = STATIC_CAST(csEvent*, v);
+    object->Event = CS_STATIC_CAST(csEvent*, v);
     if (object->Event)
     { 
       object->Event->IncRef();
@@ -1425,7 +1425,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
         {
           b.Read((char *)&ui32, sizeof(uint32));
           ui32 = convert_endian(ui32);
-          csPoolEvent *me = STATIC_CAST(csPoolEvent *, this);
+          csPoolEvent *me = CS_STATIC_CAST(csPoolEvent *, this);
           if (me)
           {
             csRef<iEvent> e = me->pool->CreateEvent(0);
@@ -1435,7 +1435,7 @@ bool csEvent::UnflattenCrystal(const char *buffer, uint32 length)
 	  else
           {
             csEvent *e = new csEvent();
-            Add(name, STATIC_CAST(iEvent *,e));
+            Add(name, CS_STATIC_CAST(iEvent *,e));
             e->Unflatten(buffer+b.GetPos(), ui32);
           }
           printf("returning from sub event\n");

@@ -50,7 +50,7 @@ public:
   /// Compare a key (csRGBcolor struct) with a csRGBcolor struct
   static int CompareKey (csRGBcolor* const& i1, void* key)
   {
-    const csRGBcolor* i2 = REINTERPRET_CAST(const csRGBcolor*, key);
+    const csRGBcolor* i2 = CS_REINTERPRET_CAST(const csRGBcolor*, key);
 
     if ((*i1)==(*i2))
       return 0;

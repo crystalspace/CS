@@ -383,7 +383,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   if (plugin)
   {
     csRef<iBase> b = plugin->Parse (ParamsNode,
-      ldr_context, STATIC_CAST(iBase*, &context));
+      ldr_context, CS_STATIC_CAST(iBase*, &context));
     if (b) tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
   }
 
@@ -401,7 +401,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
       BuiltinCheckerTexLoader.AttachNew (ctl);
     }
     csRef<iBase> b = BuiltinCheckerTexLoader->Parse (ParamsNode,
-      ldr_context, STATIC_CAST(iBase*, &context));
+      ldr_context, CS_STATIC_CAST(iBase*, &context));
     tex = SCF_QUERY_INTERFACE (b, iTextureWrapper);
   }
 

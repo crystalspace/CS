@@ -8,14 +8,14 @@ chronological order.
 
 21-Dec-2003
 	- res added a shader, or_lighting.xml, which mimics the old renderer.
-	- res fixed genmesh to provide the lighting as vertex colors on NR
-	  as well.
+	- res fixed genmesh to provide the lighting as vertex colors on NR as
+	  well.
 	- res augmented xmlshader to report a warning when an unknown buffer
 	  destination was specified.
-	- Philipp Aumayr added 3 functions to iWin32Assitant so that it's now 
-	  less of a pain to use an external message loop. 2 of those functions
-	  are for setting/getting a state wether CS should use its MSG loop, the
-	  third function is to send Win32 messages to CS.
+	- Philipp Aumayr added 3 functions to iWin32Assitant so that it's now
+	  less of a pain to use an external message loop.  2 of those functions
+	  are for setting/getting a state wether CS should use its MSG loop,
+	  the third function is to send Win32 messages to CS.
 	- Anders Stenberg removed a ; in Fixed fP the kept it from compiling;
 	- Anders Stenberg made a better "draw the last pixel of the line"-fix
 	  in the 2D renderer.
@@ -23,6 +23,13 @@ chronological order.
 	  was disabled. (Probably my fault. :)
 	- res fixed drawing of unlit Thing polys in NR.
 	- res fixed a non-virtual destructor in terrfunc.
+	- Eric sunshine renamed the following macros in order to avoid
+	  pollution of the global namespace.  (The old names are still
+	  recognized, though deprecated.)
+	    STATIC_CAST()      --> CS_STATIC_CAST()
+	    DYNAMIC_CAST()     --> CS_DYNAMIC_CAST()
+	    REINTERPRET_CAST() --> CS_REINTERPRET_CAST()
+	    CONST_CAST()       --> CS_CONST_CAST()
 20-Dec-2003
 	- Andreas Busch added Yield() to csThread for posix and win32.
 	- res made some changes to GL proc texes and the GL canvas to work

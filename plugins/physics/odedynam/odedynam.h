@@ -692,7 +692,7 @@ public:
      SCF_DECLARE_EMBEDDED_IBASE (csODEJoint);
      inline ODEJointType GetType()
      {
-        return STATIC_CAST (ODEJointType, dJointGetType (scfParent->jointID));
+        return CS_STATIC_CAST (ODEJointType, dJointGetType (scfParent->jointID));
      }
  
      void SetLoStop (float value) { SetParam (dParamLoStop, value); }

@@ -62,7 +62,7 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
 	"GetPolygonMeshColldet() instead.\n");
 #endif
       (&scfiPolygonMesh)->IncRef ();						
-      return STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
+      return CS_STATIC_CAST(iPolygonMesh*, &scfiPolygonMesh);				
     }
   }
 SCF_IMPLEMENT_IBASE_END

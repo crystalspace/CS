@@ -1225,3 +1225,19 @@ to complement the existing @code{RequestPlugins(...)} which accepts a variable
 number of arguments.  The new overload allows the list of requested plugins to
 be composed at run-time, whereas the older variable-argument method required
 the list be known at compile-time, which was not always convenient or possible.
+
+@subheading Pollution Reduction
+
+The following symbols have been renamed in order to avoid pollution of the
+global namespace.
+
+@itemize @bullet
+@item
+@code{STATIC_CAST()} @result{} @code{CS_STATIC_CAST()}
+@item
+@code{DYNAMIC_CAST()} @result{} @code{CS_DYNAMIC_CAST()}
+@item
+@code{REINTERPRET_CAST()} @result{} @code{CS_REINTERPRET_CAST()}
+@item
+@code{CONST_CAST()} @result{} @code{CS_CONST_CAST()}
+@end itemize

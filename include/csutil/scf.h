@@ -411,7 +411,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
     scfCompatibleVersion (iVersion, scfInterface<Interface>::GetVersion())) \
   {									\
     (Object)->IncRef ();						\
-    return STATIC_CAST(Interface*, Object);				\
+    return CS_STATIC_CAST(Interface*, Object);				\
   }
 
 /**
