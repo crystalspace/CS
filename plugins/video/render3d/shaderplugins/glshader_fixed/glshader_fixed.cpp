@@ -125,6 +125,9 @@ void csGLShader_FIXED::Open()
 
   if (!(enable && ext)) return;
 
+  ext->InitGL_ARB_multitexture();
+  ext->InitGL_ARB_texture_cube_map();
+
   if (ext->CS_GL_ARB_multitexture)
   {
     ext->InitGL_ARB_texture_env_combine ();

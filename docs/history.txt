@@ -11,6 +11,8 @@ chronological order.
 	  texturecoordinates for reflective cubemaping.
 	- Marten Svanfeldt added a demo using a reflective cubemap and a simple
 	  liquid surface simulation
+	- Marten added a missing check of the ARB_texture_cube_map extension
+	  to the reflective cubemapping code.
 3-Oct-2003
 	- Jorrit changed syntax services->ParsePortal() into
 	  HandlePortalParameter(). This is a more general function which can

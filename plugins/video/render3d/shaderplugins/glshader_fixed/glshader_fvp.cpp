@@ -156,7 +156,7 @@ void csGLShaderFVP::Deactivate(iShaderPass* current)
 
 void csGLShaderFVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 {
-  if (environment == ENVIRON_REFLECT_CUBE)
+  if (environment == ENVIRON_REFLECT_CUBE && ext->CS_GL_ARB_texture_cube_map)
   {
     //setup for environmental cubemapping
     glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,GL_REFLECTION_MAP_ARB);
@@ -199,7 +199,7 @@ void csGLShaderFVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 
 void csGLShaderFVP::ResetState ()
 {
-  if (environment == ENVIRON_REFLECT_CUBE)
+  if (environment == ENVIRON_REFLECT_CUBE && ext->CS_GL_ARB_texture_cube_map)
   {
     glDisable(GL_TEXTURE_GEN_S);
     glDisable(GL_TEXTURE_GEN_T);
@@ -335,7 +335,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
               {
                 if (str = child->GetAttributeValue ("mapping"))
                 {
-                  if (!strcasecmp(str, "cube"))
+                  if (!strcasecmp(str, "cube") && ext->CS_GL_ARB_texture_cube_map)
                   {
                     environment = ENVIRON_REFLECT_CUBE;
                   }
