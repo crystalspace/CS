@@ -368,7 +368,30 @@ while (t) { cnt_mat++; t = t->next; }
 int cnt_lm = 0;
 TrianglesSuperLightmapNode* sln = GetFirstTrianglesSLM ();
 while (sln) { cnt_lm++; sln = sln->prev; }
-printf ("vtcnt=%d cnt_mat=%d cnt_lm=%d\n", GetVertexCount (), cnt_mat, cnt_lm); fflush (stdout);
+printf ("vtcnt=%d cnt_mat=%d cnt_lm=%d   ", GetVertexCount (), cnt_mat, cnt_lm);
+sln = GetFirstTrianglesSLM ();
+while (sln)
+{
+	int i;
+	int tot_area = 0;
+	int maxx = 0;
+	int maxy = 0;
+	for (i = 0 ; i < sln->info->rectangles.Length () ; i++)
+	{
+          iLightMap* lm = sln->info->lightmaps[i]->GetLightMap();
+          int lmwidth = lm->GetWidth ();
+          int lmheigth = lm->GetHeight ();
+	  const csRect& r = sln->info->rectangles[i];
+	  if (r.xmax > maxx) maxx = r.xmax;
+	  if (r.ymax > maxy) maxy = r.ymax;
+	  int area = lmwidth * lmheigth;
+	  tot_area += area;
+	  //printf ("%dx%d  %dx%d\n", lmwidth, lmheigth, r.xmax-r.xmin, r.ymax-r.ymin);
+	}
+	printf ("    num=%d maxx=%d maxy=%d tot_area=%d smallest=%d\n", sln->info->rectangles.Length (), maxx, maxy, tot_area, maxx*maxy);
+	sln = sln->prev;
+}
+fflush (stdout);
 return;
 }
 #endif
