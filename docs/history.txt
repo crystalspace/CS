@@ -17,6 +17,9 @@ chronological order.
 	  another portal (floating or not) behind the floating portal then that
 	  other portal clip area is currently fully ignored. This is something
 	  we have to fix too.
+        - Fixed some warnings in csHashMap::iterator
+        - did a blind fix to csString::RTrim. It was obviously wrong and icc
+          reported that. Didn't test it though...
 15-Jun-2004
 	- Jorrit fixed two serious problems with the NR floating portals
 	  implementations (csGLGraphics3D::SetupClipPortals()):

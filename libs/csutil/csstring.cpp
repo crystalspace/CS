@@ -217,7 +217,9 @@ void csString::SubString (csString& sub, size_t x, size_t len) const
 {
   CS_ASSERT(sub.Data != Data); // Check for same string
   sub.Truncate(0);
-  if (x >= 0 && x < Size)
+  // XXX Matze: we should rather assert or throw an exception in case the x and
+  // len parameters are wrong...
+  if (x < Size)
   {
     if (x + len > Size)
       len = Size - x;
@@ -317,10 +319,11 @@ csString &csString::RTrim()
   if (Size > 0)
   {
     CS_ASSERT(Data != 0);
-    size_t i;
-    for (i = Size - 1; i >= 0; i--)
-      if (!isspace ((unsigned char)Data[i]))
+    const char* c;
+    for (c = Data + Size - 1; c != Data; c--)
+      if (!isspace ((unsigned char)*c))
         break;
+    size_t i = c - Data;
     if (i < Size - 1)
       Truncate(i + 1);
   }
