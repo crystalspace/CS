@@ -52,9 +52,9 @@ CS_IMPLEMENT_APPLICATION
 //-----------------------------------------------------------------------------
 
 // the global system driver variable
-Simple *System;
+DemoSky *System;
 
-void Simple::Report (int severity, const char* msg, ...)
+void DemoSky::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
@@ -69,7 +69,7 @@ void Simple::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-Simple::Simple ()
+DemoSky::DemoSky ()
 {
   view = NULL;
   engine = NULL;
@@ -86,7 +86,7 @@ Simple::Simple ()
   LevelLoader = NULL;
 }
 
-Simple::~Simple ()
+DemoSky::~DemoSky ()
 {
   if (view) view->DecRef ();;
   if(font) font->DecRef ();
@@ -103,7 +103,7 @@ Simple::~Simple ()
   delete sky_u;
   delete sky_d;
 
-  delete flock;
+//  delete flock;
 }
 
 void Cleanup ()
@@ -112,7 +112,7 @@ void Cleanup ()
   delete System;
 }
 
-void Simple::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, 
+void DemoSky::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly, 
   int size, const csVector3& orig, const csVector3& upt, float ulen, 
   const csVector3& vpt, float vlen)
 {
@@ -136,7 +136,7 @@ void Simple::SetTexSpace(csProcSkyTexture *skytex, iPolygon3D *poly,
 }
 
 
-bool Simple::Initialize (int argc, const char* const argv[],
+bool DemoSky::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
   if (!superclass::Initialize (argc, argv, iConfigName))
@@ -322,7 +322,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   return true;
 }
 
-void Simple::NextFrame ()
+void DemoSky::NextFrame ()
 {
   SysSystemDriver::NextFrame ();
   csTime elapsed_time, current_time;
@@ -369,7 +369,7 @@ void Simple::NextFrame ()
   myG3D->Print (NULL);
 }
 
-bool Simple::HandleEvent (iEvent &Event)
+bool DemoSky::HandleEvent (iEvent &Event)
 {
   if (superclass::HandleEvent (Event))
     return true;
@@ -528,7 +528,7 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // Create our main class.
-  System = new Simple ();
+  System = new DemoSky ();
 
   // We want at least the minimal set of plugins
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");

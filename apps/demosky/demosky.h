@@ -39,7 +39,7 @@ struct iMeshWrapper;
 struct iMaterialWrapper;
 struct iLoader;
 
-class Simple : public SysSystemDriver
+class DemoSky : public SysSystemDriver
 {
   typedef SysSystemDriver superclass;
 private:
@@ -69,8 +69,8 @@ private:
     const csVector3& vpt, float vlen);
 
 public:
-  Simple ();
-  virtual ~Simple ();
+  DemoSky ();
+  virtual ~DemoSky ();
 
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
