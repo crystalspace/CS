@@ -28,12 +28,17 @@
 
 CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer)
 CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::FogAccesor)
+CS_LEAKGUARD_IMPLEMENT (csGLPolygonRenderer::NormalAccesor)
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer)
   SCF_IMPLEMENTS_INTERFACE(iPolygonRenderer)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::FogAccesor)
+  SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE(csGLPolygonRenderer::NormalAccesor)
   SCF_IMPLEMENTS_INTERFACE(iShaderVariableAccessor)
 SCF_IMPLEMENT_IBASE_END
 
@@ -59,6 +64,7 @@ csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
   renderBufferNum = ~0;
   polysNum = 0;
   fog_accessor.AttachNew (new FogAccesor(this));
+  normal_accessor.AttachNew (new NormalAccesor(this));
   shadermanager = parent->shadermgr;
 }
 
@@ -114,10 +120,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
     vertex_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
     csVector3* vertices = (csVector3*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
-
-    normal_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector3), 
-      CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
-    csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
 
     texel_buffer = parent->CreateRenderBuffer (num_verts * sizeof (csVector2), 
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
@@ -242,12 +244,12 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
         int vidx = static_data->vertices[j];
         const csVector3& vertex = obj_verts[vidx];
         *vertices++ = vertex;
-        if (smoothed)
-        {
-	  *normals++ = -(*static_data->objNormals)[vidx];
-        }
-        else
-	  *normals++ = polynormal;
+        //if (smoothed)
+        //{
+	  //*normals++ = -(*static_data->objNormals)[vidx];
+        //}
+        //else
+	  //*normals++ = polynormal;
 
         csVector3 t = object2texture.Other2This (vertex);
         *texels++ = csVector2 (t.x, t.y);
@@ -283,7 +285,6 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 
   index_buffer->Release ();
   texel_buffer->Release ();
-  normal_buffer->Release ();
   vertex_buffer->Release ();
   tangent_buffer->Release ();
   binormal_buffer->Release ();
@@ -303,7 +304,7 @@ void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
   sv = mesh.variablecontext->GetVariableAdd (texel_name);
   sv->SetValue (texel_buffer);
   sv = mesh.variablecontext->GetVariableAdd (normal_name);
-  sv->SetValue (normal_buffer);
+  sv->SetAccessor (normal_accessor);
   sv = mesh.variablecontext->GetVariableAdd (binormal_name);
   sv->SetValue (binormal_buffer);
   sv = mesh.variablecontext->GetVariableAdd (tangent_name);
@@ -405,4 +406,60 @@ void csGLPolygonRenderer::FogAccesor::PreGetValue (csShaderVariable *variable)
   fog_buffer->Release ();
 
   variable->SetValue(fog_buffer);
+}
+
+void csGLPolygonRenderer::NormalAccesor::PreGetValue (
+	csShaderVariable *variable)
+{
+  if (normalVerticesNum != renderer->polysNum)
+  {
+    int num_verts = 0;
+    size_t i;
+
+    for (i = 0; i < renderer->polys.Length(); i++)
+    {
+      csPolygonRenderData* poly = renderer->polys[i];
+      num_verts += poly->num_vertices;
+    }
+
+    normal_buffer = renderer->parent->CreateRenderBuffer (
+    	num_verts * sizeof (csVector3), 
+        CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 3);
+    csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+    memset (normals,0,num_verts*sizeof(csVector3));
+    normal_buffer->Release();
+    normalVerticesNum = renderer->polysNum;
+  }
+
+  csVector3* normals = (csVector3*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
+
+  for (size_t i = 0; i < renderer->polys.Length(); i++)
+  {
+    csPolygonRenderData* static_data = renderer->polys[i];
+    bool smoothed = static_data->objNormals && *static_data->objNormals;
+
+    csVector3 polynormal;
+    if (!smoothed)
+    {
+      // hmm... It seems that both polynormal and obj_normals[] need to be
+      // inverted. Don't know why, just found it out empirical.
+      polynormal = -static_data->plane_obj.Normal();
+    }
+
+    // First, fill the normal buffer.
+    int j, vc = static_data->num_vertices;
+    for (j = 0; j < vc; j++)
+    {
+      int vidx = static_data->vertices[j];
+      if (smoothed)
+	*normals++ = -(*static_data->objNormals)[vidx];
+      else
+	*normals++ = polynormal;
+    }
+
+  }
+
+  normal_buffer->Release ();
+
+  variable->SetValue (normal_buffer);
 }

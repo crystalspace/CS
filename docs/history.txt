@@ -50,6 +50,10 @@ chronological order.
 	      times. Now, all code treats it as 1-based.
 	    - Fixed the informational messages reported by csjoylin so that
 	      they employ 1-based joystick numbers, rather than 0-based.
+	- Jorrit fixed the NR OpenGL polygon renderer so that it only
+	  creates buffers for normals if normals are actually asked for.
+	  Need to do the same for binormals, tangents, and others but it
+	  already helps a bit for memory usage.
 28-Sep-2004
 	- Rhad mutexed some portions of the software renderer to reduce
 	  thread contention issues.  This is not a complete fix but should

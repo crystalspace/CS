@@ -35,7 +35,6 @@ private:
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
-  csRef<iRenderBuffer> normal_buffer;
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
   csRef<iRenderBuffer> tangent_buffer;
@@ -87,8 +86,36 @@ private:
     void PreGetValue (csShaderVariable *variable);
   };
   friend class FogAccesor;
-
   csRef<FogAccesor> fog_accessor;
+
+  class NormalAccesor : public iShaderVariableAccessor
+  {
+  private:
+    csGLPolygonRenderer *renderer;
+    csRef<iRenderBuffer> normal_buffer;
+    
+    uint normalVerticesNum;
+  public:
+    CS_LEAKGUARD_DECLARE (NormalAccesor);
+    SCF_DECLARE_IBASE;
+
+    NormalAccesor (csGLPolygonRenderer *renderer)
+      : normalVerticesNum (0)
+    {
+      SCF_CONSTRUCT_IBASE(0);
+      this->renderer = renderer;    
+    }
+
+    virtual ~NormalAccesor()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
+
+    void PreGetValue (csShaderVariable *variable);
+  };
+  friend class NormalAccesor;
+  csRef<NormalAccesor> normal_accessor;
+
 public:
   CS_LEAKGUARD_DECLARE (csGLPolygonRenderer);
 
