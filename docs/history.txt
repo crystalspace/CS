@@ -13,7 +13,7 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
-22-Aug-1999
+23-Aug-1999
 	- Eric Sunshine performed a major overhaul and re-engineering of the
 	  BeOS port of Crystal Space.  The port is now about 95% usable
 	  versus 25% prior to this effort.  In addition, numerous bugs were
