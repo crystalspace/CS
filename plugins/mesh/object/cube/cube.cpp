@@ -42,6 +42,7 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
   csCubeMeshObject::factory = factory;
   initialized = false;
   camera_cookie = 0;
+  vis_cb = NULL;
 }
 
 csCubeMeshObject::~csCubeMeshObject ()
@@ -71,7 +72,7 @@ void csCubeMeshObject::GetTransformedBoundingBox (iTransformationManager* tranma
   cbox = camera_bbox;
 }
 
-void Perspective (const csVector3& v, csVector2& p, float fov,
+static void Perspective (const csVector3& v, csVector2& p, float fov,
     	float sx, float sy)
 {
   float iz = fov / v.z;
@@ -306,6 +307,8 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
     printf ("INTERNAL ERROR: cube used without valid material handle!\n");
     return false;
   }
+
+  if (vis_cb) vis_cb (this, rview, vis_cbData);
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
 

@@ -52,6 +52,7 @@ csBallMeshObject::csBallMeshObject ()
   verts_circle = 6;
   material = NULL;
   MixMode = 0;
+  vis_cb = NULL;
   top_normals = NULL;
   top_mesh.vertices[0] = NULL;
   top_mesh.vertex_colors[0] = NULL;
@@ -451,6 +452,8 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
     printf ("INTERNAL ERROR: ball used without valid material handle!\n");
     return false;
   }
+
+  if (vis_cb) vis_cb (this, rview, vis_cbData);
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
 

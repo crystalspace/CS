@@ -47,6 +47,8 @@ private:
   G3DTriangleMesh mesh;
   bool initialized;
   csBox3 object_bbox;
+  csMeshCallback* vis_cb;
+  void* vis_cbData;
 
   /**
    * Camera space bounding box is cached here.
@@ -91,6 +93,15 @@ public:
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable);
+  virtual void SetVisibleCallback (csMeshCallback* cb, void* cbData)
+  {
+    vis_cb = cb;
+    vis_cbData = cbData;
+  }
+  virtual csMeshCallback* GetVisibleCallback ()
+  {
+    return vis_cb;
+  }
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
   virtual void NextFrame (cs_time /*current_time*/) { }
   virtual bool WantToDie () { return false; }

@@ -26,6 +26,12 @@
 #include "imeshobj.h"
 
 class Dumper;
+class csMeshWrapper;
+class csRenderView;
+
+/// A callback function for csMeshWrapper::Draw().
+typedef void (csDrawCallback) (csMeshWrapper* spr, csRenderView* rview,
+	void* cbData);
 
 /**
  * The holder class for all implementations of iMeshObject.
@@ -43,6 +49,11 @@ private:
 
   /// Children of this object (other instances of csMeshWrapper).
   csNamedObjVector children;
+
+  /// The callback which is called just before drawing.
+  csDrawCallback* draw_cb;
+  /// Userdata for the draw_callback.
+  void* draw_cbData;
 
 protected:
   /**
@@ -64,6 +75,26 @@ public:
   void SetMeshObject (iMeshObject* mesh);
   /// Get the mesh object.
   iMeshObject* GetMeshObject () const {return mesh;}
+
+  /**
+   * Set a callback which is called just before the object is drawn.
+   * This is useful to do some expensive computations which only need
+   * to be done on a visible object. Note that this function will be
+   * called even if the object is not visible. In general it is called
+   * if there is a likely probability that the object is visible (i.e.
+   * it is in the same sector as the camera for example).
+   */
+  void SetDrawCallback (csDrawCallback* cb, void* cbData)
+  {
+    draw_cb = cb;
+    draw_cbData = cbData;
+  }
+
+  /// Get the draw callback.
+  csDrawCallback* GetDrawCallback ()
+  {
+    return draw_cb;
+  }
 
   /**
    * Light object according to the given array of lights (i.e.

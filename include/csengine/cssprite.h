@@ -150,48 +150,6 @@ private:
 };
 
 /**
- * Macros for the csSprite3D lighting levels.
- */
-#define CS_SPR_LIGHTING_HQ 0
-#define CS_SPR_LIGHTING_LQ 1
-#define CS_SPR_LIGHTING_FAST 2
-#define CS_SPR_LIGHTING_RANDOM 3
-
-/**
- * Use the global value for determining which lighting level is used by the
- * sprite.
- */
-#define CS_SPR_LIGHT_GLOBAL 0
-
-/**
- * Use the sprites template lighting quality value for determining which
- * lighting level is used by the sprite.
- */
-#define CS_SPR_LIGHT_TEMPLATE 1
-
-/**
- * Use the lighting quality value local to the sprite for determining which
- * lighting level is used by the sprite.
- */
-#define CS_SPR_LIGHT_LOCAL 2
-
-/**
- * Use the global value for determining if LOD is used by the
- * sprite, and what level it should be used at.
- */
-#define CS_SPR_LOD_GLOBAL 0
-
-/**
- * Use the sprites template lod value.
- */
-#define CS_SPR_LOD_TEMPLATE 1
-
-/**
- * Use the LOD value local to the sprite.
- */
-#define CS_SPR_LOD_LOCAL 2
-
-/**
  * A 3D sprite based on a triangle mesh with a single texture.
  * Animation is done with frames.
  * This class represents a template from which a csSprite3D

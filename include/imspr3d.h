@@ -26,7 +26,9 @@
 struct iMaterialWrapper;
 struct iSkeleton;
 struct iSkeletonState;
+struct iMeshObject;
 struct iMeshObjectFactory;
+struct iRenderView;
 
 /**
  * Macros for the csSprite3D lighting levels.
@@ -161,9 +163,26 @@ struct iSprite3DFactoryState : public iBase
   /// returns the number of triangles in the sprite
   virtual int GetNumTriangles () = 0;
 
-  // @@@ TODO: access the frames
-  // @@@ TODO: access the actions
-  // @@@ TODO: something to get the triangle mesh??? Do we need that?
+  /// Create and add a new frame to the sprite.
+  virtual iSpriteFrame* AddFrame () = 0;
+  /// Find a named frame.
+  virtual iSpriteFrame* FindFrame (const char* name) = 0;
+  /// Query the number of frames.
+  virtual int GetNumFrames () = 0;
+  /// Query the frame number f.
+  virtual iSpriteFrame* GetFrame (int f) = 0;
+
+  /// Create and add a new action frameset to the sprite.
+  virtual iSpriteAction* AddAction () = 0;
+  /// Find a named action.
+  virtual iSpriteAction* FindAction (const char* name) = 0;
+  /// Get the first action.
+  virtual iSpriteAction* GetFirstAction () = 0;
+  /// Get number of actions in sprite.
+  virtual int GetNumActions () = 0;
+  /// Get action number No
+  virtual iSpriteAction* GetAction (int No) = 0;
+
   // @@@ TODO: what about HardTransform()? Needs to be extension
   //  	       to csMeshWrapper.
 
@@ -236,7 +255,6 @@ struct iSprite3DState : public iBase
   /// Get mix mode.
   virtual UInt GetMixMode () = 0;
 
-  // @@@ TODO: what about the two types of callbacks?
   // @@@ TODO: dynamic light support? Probably obsolete.
   // @@@ TODO: global LOD level.
   // @@@ TODO: static int global_lighting_quality;

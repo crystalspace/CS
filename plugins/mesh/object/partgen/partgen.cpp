@@ -55,6 +55,7 @@ csParticleSystem::csParticleSystem (iSystem* system)
   spr_factory = NULL;
   prev_time = 0;
   MixMode = 0;
+  vis_cb = NULL;
 
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (system, "crystalspace.mesh.object.sprite.2d",
       "MeshObj", iMeshObjectType);
@@ -207,6 +208,7 @@ bool csParticleSystem::DrawTest (iRenderView*, iMovable*)
 
 bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable)
 {
+  if (vis_cb) vis_cb (this, rview, vis_cbData);
   csReversibleTransform trans = movable->GetFullTransform ();
   for (int i = 0 ; i < particles.Length() ; i++)
     GetParticle (i)->Draw (rview, trans);

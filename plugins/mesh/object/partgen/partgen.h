@@ -69,6 +69,8 @@ protected:
    * no particle may exceed the bbox. 
    */
   csBox3 bbox;
+  csMeshCallback* vis_cb;
+  void* vis_cbData;
 
   /// Pointer to a mesh object factory for 2D sprites.
   iMeshObjectFactory* spr_factory;
@@ -173,10 +175,6 @@ public:
   /// Get the bounding box for this particle system.
   inline const csBox3& GetBoundingBox() const {return bbox;}
 
-  /// Move all particles to this position
-  //virtual void SetPosition(const csVector3& pos);
-  /// Move all particles by given delta.
-  //virtual void MovePosition(const csVector3& move);
   /// Set particle colors, convenience function.
   virtual void SetupColor ();
   /// Add particle colors, convenience function.
@@ -212,6 +210,15 @@ public:
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable);
+  virtual void SetVisibleCallback (csMeshCallback* cb, void* cbData)
+  {
+    vis_cb = cb;
+    vis_cbData = cbData;
+  }
+  virtual csMeshCallback* GetVisibleCallback ()
+  {
+    return vis_cb;
+  }
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false)
   {
     (void)accurate;

@@ -1,5 +1,24 @@
 The history order has been reversed so that new features are at the top.
 
+18-Jan-2001
+	- Extended iMeshObject interface with SetVisibleCallback() and
+	  GetVisibleCallback(). This function will essentially provide
+	  the same functionality as SetDrawCallback2() does for csSprite3D.
+	  i.e. callback the application when the object is really (or almost
+	  really) visible. Note that you are not allowed to significantly
+	  change the layout, position or anything else that might affect
+	  visibility in this callback (for obvious reasons).
+	- Modified all the current mesh object plugins to support this new
+	  callback.
+	- Added SetDrawCallback() and GetDrawCallback() to csMeshWrapper.
+	  This has the same functionality as the SetDrawCallback() in
+	  csSprite3D. i.e. this callback is called when the object is
+	  considered for drawing. This means that there is a chance it
+	  is visible (but not guaranteed). It is allowed to do minor
+	  changes to geometry here as long as you don't change the sectors
+	  where this object lives.
+	- Added support for frames and actions to iSprite3DFactoryState.
+	- Fixed Mazed for my iSpriteFrame changes yesterday.
 17-Jan-2001
 	- Wouter Windows added more error messages to openglwin32 canvas.
 	- Martin Geisse removed current support for threading from the

@@ -57,6 +57,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   lighting = factory->HasLighting ();
   MixMode = factory->GetMixMode ();
   initialized = false;
+  vis_cb = NULL;
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
@@ -262,6 +263,8 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
     printf ("INTERNAL ERROR: sprite2D used without valid material handle!\n");
     return false;
   }
+
+  if (vis_cb) vis_cb (this, rview, vis_cbData);
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();

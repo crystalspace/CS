@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,11 +23,16 @@
 #include "csgeom/box.h"
 #include "iplugin.h"
 
+struct iMeshObject;
 struct iRenderView;
 struct iMovable;
 struct iLight;
 
-SCF_VERSION (iMeshObject, 0, 0, 5);
+/// A callback function for MeshObj::Draw().
+typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
+	void* callbackData);
+
+SCF_VERSION (iMeshObject, 0, 0, 6);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -57,6 +62,20 @@ struct iMeshObject : public iBase
    * this function (possibly with an UpdateLighting() in between.
    */
   virtual bool Draw (iRenderView* rview, iMovable* movable) = 0;
+
+  /**
+   * Register a callback to the mesh object which will be called
+   * from within Draw() if the mesh object thinks that the object is
+   * really visible. Depending on the type of mesh object this can be
+   * very accurate or not accurate at all. But in all cases it will
+   * certainly be called if the object is visible.
+   */
+  virtual void SetVisibleCallback (csMeshCallback* cb, void* cbData) = 0;
+
+  /**
+   * Get the current visible callback.
+   */
+  virtual csMeshCallback* GetVisibleCallback () = 0;
 
   /**
    * Get the bounding box in object space for this mesh object.

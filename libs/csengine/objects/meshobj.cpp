@@ -31,6 +31,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   ptree_obj = &bbox;
   csMeshWrapper::mesh = mesh;
   mesh->IncRef ();
+  draw_cb = NULL;
 }
 
 csMeshWrapper::csMeshWrapper (csObject* theParent)
@@ -39,6 +40,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   bbox.SetOwner (this);
   ptree_obj = &bbox;
   csMeshWrapper::mesh = NULL;
+  draw_cb = NULL;
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
@@ -109,6 +111,7 @@ void csMeshWrapper::UpdateMove ()
 
 void csMeshWrapper::Draw (csRenderView& rview)
 {
+  if (draw_cb) draw_cb (this, &rview, draw_cbData);
   iRenderView* irv = QUERY_INTERFACE (&rview, iRenderView);
   iMovable* imov = QUERY_INTERFACE (&movable, iMovable);
   if (mesh->DrawTest (irv, imov))
