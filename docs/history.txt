@@ -27,9 +27,9 @@ The history order is reversed so that new features are at the top.
 	- Made the string table in the TinyXML parser use 431 entries instead
 	  of 211. Might improve parsing performance a bit.
 	- Removed 'type' variable from TinyXML nodes.
-	- Changed the csInputBinder API from handling references to integers
-	  to handling pointers to classes which hold a private integer or
-	  boolean (depending on type) with accessor functions.
+	- Oktal Changed the csInputBinder API from handling references to
+	  integers to handling pointers to classes which hold a private
+	  integer or boolean (depending on type) with accessor functions.
 11-Mar-2003
 	- Fixed a leak in the prepare textures code of regions. It was
 	  forgetting to reset the image pointer to NULL. This means
