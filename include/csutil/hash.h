@@ -264,6 +264,7 @@ public:
     /// Move the iterator back to the first element.
     void Return () { element = 0; Seek (); }
   };
+  friend class csHash<T>::Iterator;
 
   /// An iterator class for the hash.
   class GlobalIterator
@@ -276,7 +277,7 @@ public:
     void Init () { size = hash->Elements[bucket].Length (); }
 
   protected:
-    GlobalIterator (const csHash<T> *hash0) : hash (hash0) { Zero (); Init (); }
+    GlobalIterator(const csHash<T> *hash0) : hash(hash0) { Zero (); Init (); }
 
     friend class csHash<T>;
   public:
@@ -313,6 +314,7 @@ public:
     /// Move the iterator back to the first element.
     void Return () { Zero (); Init (); }
   };
+  friend class csHash<T>::GlobalIterator;
 
   /// Return an iterator for the hash, to iterate only over the elements
   /// with the given key.
