@@ -210,6 +210,23 @@ size_t csString::FindFirst (char c, size_t pos)
   return tmp - Data;
 }
 
+size_t csString::FindLast (char c, size_t pos)
+{
+  if (pos == (size_t)-1)
+    pos = Size;
+
+  if (pos > Size || !Data)
+    return (size_t)-1;
+
+  char * tmp;
+  for (tmp = Data + pos; tmp >= Data; tmp--) {
+    if (*tmp == c)
+      return tmp - Data;
+  }
+
+  return (size_t)-1;
+}
+
 csString &csString::LTrim()
 {
   size_t i;

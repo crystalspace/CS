@@ -84,6 +84,24 @@ iString &scfString::Append (const iString *iStr, size_t iCount)
   return *this;
 }
 
+void scfString::SubString (iString * sub, size_t start, size_t len) 
+{
+  csString tmp(sub->GetData());
+  s.SubString(tmp, start, len);
+  sub->Clear();
+  sub->Append(tmp.GetData());
+}
+
+size_t scfString::FindFirst (const char c, size_t p) 
+{
+  return s.FindFirst(c, p);
+}
+
+size_t scfString::FindLast (const char c, size_t p)
+{
+  s.FindLast(c, p);
+}
+
 void scfString::Format (const char* format, ...)
 {
   va_list args;

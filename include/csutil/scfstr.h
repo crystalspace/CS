@@ -105,6 +105,17 @@ public:
   /// Append a string to this one (possibly iCount characters from the string)
   virtual iString &Append (const iString *iStr, size_t iCount = (size_t)-1);
 
+  /**
+   * SubString another string out of this one. The result is placed
+   * in 'sub'. The substring is from 'start', of length 'len'.
+   */
+  virtual void SubString (iString * sub, size_t start, size_t len);
+
+  /// Find first character 'c' from position 'p'.
+  virtual size_t FindFirst (const char c, size_t p = (size_t)-1);
+  /// Find first character 'c', counting backwards from position 'p'. Default position is the end of the string.
+  virtual size_t FindLast (const char c, size_t p = (size_t)-1);
+
   /// Format.
   virtual void Format (const char *format, ...) CS_GNUC_PRINTF (2, 3);
   /// Format.

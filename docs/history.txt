@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed a bug in registrycfg.cpp. If SetStr() was called
 	  with a 0 value then it would cause a crash. Now it does the
 	  correct thing which is deleting the key.
+	- DeSigna added csString::FindLast(). iString/scfString has
+	  been updated for new SubString, FindFirst and FindLast
+	  members. 
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:

@@ -108,6 +108,17 @@ struct iString : public iBase
   virtual iString &Append (const iString *iStr, size_t iCount = (size_t)-1)=0;
 
   /**
+   * SubString another string out of this one. The result is placed
+   * in 'sub'. The substring is from 'start', of length 'len'.
+   */
+  virtual void SubString (iString * sub, size_t start, size_t len) = 0;
+
+  /// Find first character 'c' from position 'p'.
+  virtual size_t FindFirst (const char c, size_t p = (size_t)-1) = 0;
+  /// Find first character 'c', counting backwards from position 'p'. Default position is the end of the string.
+  virtual size_t FindLast (const char c, size_t p = (size_t)-1) = 0;
+  
+  /**
    * Format this string using sprintf() formatting directives.  Automatically
    * allocates sufficient memory to hold result.  Newly formatted string
    * overwrites previous string value.

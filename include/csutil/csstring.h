@@ -185,8 +185,10 @@ public:
    */
   void SubString (csString& sub, size_t start, size_t len);
 
-  /// Find first c from pos.
+  /// Find first character 'c' from position 'p'.
   size_t FindFirst (const char c, size_t p = (size_t)-1);
+  /// Find first character 'c', counting backwards from position 'p'. Default position is the end of the string.
+  size_t FindLast (const char c, size_t p = (size_t)-1);
 
 #define STR_APPEND(TYPE,FMT,SZ) csString& Append(TYPE n) \
   { char s[SZ]; cs_snprintf(s, SZ, #FMT, n); return Append(s); }
