@@ -184,119 +184,91 @@ csMatrix3 csLoader::load_matrix (char* buf)
 {
   TOKEN_TABLE_START(commands)
     TOKEN_TABLE (IDENTITY)
-    TOKEN_TABLE (ROT)
-    TOKEN_TABLE (SCALE)
-  TOKEN_TABLE_END
-
-  TOKEN_TABLE_START(rot_cmds)
     TOKEN_TABLE (ROT_X)
     TOKEN_TABLE (ROT_Y)
     TOKEN_TABLE (ROT_Z)
-  TOKEN_TABLE_END
-
-  TOKEN_TABLE_START(scale_cmds)
+    TOKEN_TABLE (ROT)
     TOKEN_TABLE (SCALE_X)
     TOKEN_TABLE (SCALE_Y)
     TOKEN_TABLE (SCALE_Z)
+    TOKEN_TABLE (SCALE)
   TOKEN_TABLE_END
 
-  char * params, * params2;
+  char* params;
   int cmd, num;
+  float angle;
+  float scaler;
   float list[30];
+  const csMatrix3 identity;
   csMatrix3 M;
 
   while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
   {
     switch (cmd)
     {
-
       case TOKEN_IDENTITY:
-        return csMatrix3 (); // return the identity
+        M = identity;
         break;
-
+      case TOKEN_ROT_X:
+        ScanStr (params, "%f", &angle);
+        M *= csXRotMatrix3 (angle);
+        break;
+      case TOKEN_ROT_Y:
+        ScanStr (params, "%f", &angle);
+        M *= csYRotMatrix3 (angle);
+        break;
+      case TOKEN_ROT_Z:
+        ScanStr (params, "%f", &angle);
+        M *= csZRotMatrix3 (angle);
+        break;
       case TOKEN_ROT:
-        float angle;
-        while ((cmd = csGetCommand (&params, rot_cmds, &params2)) > 0)
+        ScanStr (params, "%F", list, &num);
+        if (num == 3)
         {
-          switch (cmd)
-          {
-            case TOKEN_ROT_X:
-              ScanStr (params2, "%f", &angle);
-              M *= csXRotMatrix3 (angle);
-              break;
-            case TOKEN_ROT_Y:
-              ScanStr (params2, "%f", &angle);
-              M *= csYRotMatrix3 (angle);
-              break;
-            case TOKEN_ROT_Z:
-              ScanStr (params2, "%f", &angle);
-              M *= csZRotMatrix3 (angle);
-              break;
-          }
+          M *= csXRotMatrix3 (list[0]);
+          M *= csZRotMatrix3 (list[2]);
+          M *= csYRotMatrix3 (list[1]);
         }
-        if (cmd == PARSERR_TOKENNOTFOUND)
-        {
-          // not a ROT_* token, so ROT may contain three
-          // rotation angles in X,Y,Z order, or just a Y angle
-
-          ScanStr (params, "%F", list, &num);
-          if (num == 1) M *= csYRotMatrix3 (list[0]);
-          else if (num == 3)
-          {
-            // I'm not sure in what order the rotations should be applied.
-            // This order (which I use in squawk) seems intuitive.
-            M *= csXRotMatrix3 (list[0]);
-            M *= csZRotMatrix3 (list[2]);
-            M *= csYRotMatrix3 (list[1]);
-          }
-          else CsPrintf (MSG_WARNING, "Badly formed rotation: '%s'\n", params);
-        }
+        else
+	  CsPrintf (MSG_WARNING, "Badly formed rotation: '%s'\n", params);
         break;
-
+      case TOKEN_SCALE_X:
+        ScanStr (params, "%f", &scaler);
+        M *= csXScaleMatrix3(scaler);
+        break;
+      case TOKEN_SCALE_Y:
+        ScanStr (params, "%f", &scaler);
+        M *= csYScaleMatrix3(scaler);
+        break;
+      case TOKEN_SCALE_Z:
+        ScanStr (params, "%f", &scaler);
+        M *= csZScaleMatrix3(scaler);
+        break;
       case TOKEN_SCALE:
-        float scale;
-        while ((cmd = csGetCommand (&params, scale_cmds, &params2)) > 0)
-        {
-          switch (cmd)
-          {
-            case TOKEN_SCALE_X:
-              ScanStr (params2, "%f", &scale);
-              M *= csMatrix3 (scale,0,0,0,1,0,0,0,1);
-              break;
-            case TOKEN_SCALE_Y:
-              ScanStr (params2, "%f", &scale);
-              M *= csMatrix3 (1,0,0,0,scale,0,0,0,1);
-              break;
-            case TOKEN_SCALE_Z:
-              ScanStr (params2, "%f", &scale);
-              M *= csMatrix3 (1,0,0,0,1,0,0,0,scale);
-              break;
-          }
-        }
-        if (cmd == PARSERR_TOKENNOTFOUND)
-        {
-          // not a SCALE_* token, so SCALE may contain a
-          // single scale value, or an X, Y, and Z scale
-
-          ScanStr (params, "%F", list, &num);
-          if (num == 1) M *= list[0];
-          else if (num == 3) M *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
-          else CsPrintf (MSG_WARNING, "Badly formed scale: '%s'\n", params);
-        }
+        ScanStr (params, "%F", list, &num);
+        if (num == 1)      // One scaler; applied to entire matrix.
+	  M *= list[0];
+        else if (num == 3) // Three scalers; applied to X, Y, Z individually.
+	  M *= csMatrix3 (list[0],0,0,0,list[1],0,0,0,list[2]);
+        else
+	  CsPrintf (MSG_WARNING, "Badly formed scale: '%s'\n", params);
         break;
     }
   }
   if (cmd == PARSERR_TOKENNOTFOUND)
   {
-    // not a SCALE, ROT, or IDENTITY token, so the matrix may contain
-    // a single scale value or the nine values of a 3 x 3 matrix
+    // Neither SCALE, ROT, nor IDENTITY, so matrix may contain a single scaler
+    // or the nine values of a 3x3 matrix.
     ScanStr (buf, "%F", list, &num);
-    if (num == 1) return csMatrix3 () * list[0];
-    if (num == 9) return csMatrix3 (
-      list[0], list[1], list[2],
-      list[3], list[4], list[5],
-      list[6], list[7], list[8]);
-    CsPrintf (MSG_WARNING, "Badly formed matrix '%s'\n", buf);
+    if (num == 1)
+      M = csMatrix3 () * list[0];
+    else if (num == 9)
+      M = csMatrix3 (
+        list[0], list[1], list[2],
+        list[3], list[4], list[5],
+        list[6], list[7], list[8]);
+    else
+      CsPrintf (MSG_WARNING, "Badly formed matrix '%s'\n", buf);
   }
   return M;
 }
