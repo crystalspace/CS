@@ -32,6 +32,9 @@ struct awsListItem
   /// The text string, if it has one.
   iString *text;
 
+  /// user supplied parameter
+  int param;
+  
   /// The state of the item, if it has one
   bool state;
 

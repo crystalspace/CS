@@ -437,6 +437,9 @@ void awsListBox::InsertItem (void *owner, iAwsParmList &parmlist)
 
     cs_snprintf (buf, 50, "alignimg%d", i);
     parmlist.GetInt (buf, &(row->cols[i].txt_align));
+
+    cs_snprintf (buf, 50, "param%d", i);
+    parmlist.GetInt (buf, &(row->cols[i].param));
   }
 
   // Add the item
@@ -528,16 +531,19 @@ bool awsListBox::GetItems (awsListRow *row, iAwsParmList &parmlist)
     char buf[50];
 
     bool *state = new bool[ncolumns];
+    int  *param = new int [ncolumns];
 
     iString **str = new iString *[ncolumns];
 
     bool *usedt = new bool[ncolumns];
     bool *useds = new bool[ncolumns];
+    bool *usedp = new bool[ncolumns];
 
     for (i = 0; i < ncolumns; ++i)
     {
       usedt[i] = false;
       useds[i] = false;
+      usedp[i] = false;
     }
 
     // check if they want the text or state or what. then return those in the parmlist
@@ -555,6 +561,13 @@ bool awsListBox::GetItems (awsListRow *row, iAwsParmList &parmlist)
       {
         state[i] = row->cols[i].state;
         useds[i] = true;
+      }
+
+      cs_snprintf (buf, 50, "param%d", i);
+      if (parmlist.GetInt (buf, &param[i]))
+      {
+        param[i] = row->cols[i].param;
+        usedp[i] = true;
       }
     }
 
@@ -574,12 +587,20 @@ bool awsListBox::GetItems (awsListRow *row, iAwsParmList &parmlist)
         cs_snprintf (buf, 50, "state%d", i);
         parmlist.AddBool (buf, state[i]);
       }
+
+      if (usedp[i])
+      {
+        cs_snprintf (buf, 50, "param%d", i);
+        parmlist.AddInt (buf, param[i]);
+      }
     }
 
-    delete state;
-    delete str;
-    delete useds;
-    delete usedt;
+    delete [] state;
+    delete [] str;
+    delete [] param;
+    delete [] useds;
+    delete [] usedt;
+    delete [] usedp;
     succ = true;
   }
   return succ;
