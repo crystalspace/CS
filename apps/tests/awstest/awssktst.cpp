@@ -109,14 +109,13 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
   int q;
   for (q=0; q<10; ++q)
   {
-
     // Setup first row
-    pl->AddString("text0", new scfString("Human"));
+    pl->AddString("text0", "Human");
 
-    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddString("text1", "Enabled");
     pl->AddBool("stateful1", true);
 
-    pl->AddString("text2", new scfString("Shenobi"));
+    pl->AddString("text2", "Shenobi");
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
@@ -125,13 +124,13 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup second row
-    pl->AddString("text0", new scfString("Android"));
+    pl->AddString("text0", "Android");
 
-    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddString("text1", "Enabled");
     pl->AddBool("stateful1", true);
     pl->AddBool("state1", true);
 
-    pl->AddString("text2", new scfString("Tenalt"));
+    pl->AddString("text2", "Tenalt");
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
@@ -142,14 +141,14 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup third row (hierarchical)
-    pl->AddString("text0", new scfString("Ship"));
+    pl->AddString("text0", "Ship");
 
-    pl->AddString("text1", new scfString("Active"));
+    pl->AddString("text1", "Active");
     pl->AddBool("stateful1", true);
     pl->AddBool("groupstate1", true);
     pl->AddBool("state1", true);
 
-    pl->AddString("text2", new scfString("Daedalus"));
+    pl->AddString("text2", "Daedalus");
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
@@ -158,14 +157,14 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup fourth row (hierarchical)
-    pl->AddString("text0", new scfString("Ship"));
+    pl->AddString("text0", "Ship");
 
-    pl->AddString("text1", new scfString("Active"));
+    pl->AddString("text1", "Active");
     pl->AddBool("stateful1", true);
     pl->AddBool("groupstate1", true);
     pl->AddBool("state1", false);
 
-    pl->AddString("text2", new scfString("Temtor"));
+    pl->AddString("text2", "Temtor");
     pl->AddOpaque("Opaque", parent);
 
     // Add it into the list
@@ -177,14 +176,14 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup fifth row (hierarchical)
-    pl->AddString("text0", new scfString("TurboLaser"));
+    pl->AddString("text0", "TurboLaser");
 
-    pl->AddString("text1", new scfString("Active"));
+    pl->AddString("text1", "Active");
     pl->AddBool("stateful1", true);
     pl->AddBool("groupstate1", true);
     pl->AddBool("state1", false);
 
-    pl->AddString("text2", new scfString("Johnny"));
+    pl->AddString("text2", "Johnny");
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
@@ -194,13 +193,13 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup sixth row
-    pl->AddString("text0", new scfString("Betarus"));
+    pl->AddString("text0", "Betarus");
 
-    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddString("text1", "Enabled");
     pl->AddBool("stateful1", true);
     pl->AddBool("state1", false);
 
-    pl->AddString("text2", new scfString("Sloth"));
+    pl->AddString("text2", "Sloth");
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
@@ -209,13 +208,13 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup seventh row
-    pl->AddString("text0", new scfString("Vegan"));
+    pl->AddString("text0", "Vegan");
 
-    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddString("text1", "Enabled");
     pl->AddBool("stateful1", true);
     pl->AddBool("state1", false);
 
-    pl->AddString("text2", new scfString("Klamath"));
+    pl->AddString("text2", "Klamath");
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
@@ -226,14 +225,14 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup third row (hierarchical)
-    pl->AddString("text0", new scfString("Ship"));
+    pl->AddString("text0", "Ship");
 
-    pl->AddString("text1", new scfString("Active"));
+    pl->AddString("text1", "Active");
     pl->AddBool("stateful1", true);
     pl->AddBool("groupstate1", true);
     pl->AddBool("state1", true);
 
-    pl->AddString("text2", new scfString("Tertullia"));
+    pl->AddString("text2", "Tertullia");
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
@@ -242,14 +241,14 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup fourth row (hierarchical)
-    pl->AddString("text0", new scfString("Ship"));
+    pl->AddString("text0", "Ship");
 
-    pl->AddString("text1", new scfString("Active"));
+    pl->AddString("text1", "Active");
     pl->AddBool("stateful1", true);
     pl->AddBool("groupstate1", true);
     pl->AddBool("state1", false);
 
-    pl->AddString("text2", new scfString("Gempus"));
+    pl->AddString("text2", "Gempus");
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
@@ -261,14 +260,14 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup fifth row (hierarchical)
-    pl->AddString("text0", new scfString("BatterSlam"));
+    pl->AddString("text0", "BatterSlam");
 
-    pl->AddString("text1", new scfString("Active"));
+    pl->AddString("text1", "Active");
     pl->AddBool("stateful1", true);
     pl->AddBool("groupstate1", true);
     pl->AddBool("state1", false);
 
-    pl->AddString("text2", new scfString("James"));
+    pl->AddString("text2", "James");
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
@@ -278,13 +277,13 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
 
     //////////////////////////
     // Setup eigth row
-    pl->AddString("text0", new scfString("Antarian"));
+    pl->AddString("text0", "Antarian");
 
-    pl->AddString("text1", new scfString("Enabled"));
+    pl->AddString("text1", "Enabled");
     pl->AddBool("stateful1", true);
     pl->AddBool("state1", false);
 
-    pl->AddString("text2", new scfString("Gelvin"));
+    pl->AddString("text2", "Gelvin");
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
