@@ -37,10 +37,10 @@ To compile Crystal Space, you'll have to perform the following steps:
    in the CrystalSpace project) to the following (or whatever you like more):
 
      DRIVER = crystalspace.graphics3d.software
-     WORLDFILE = large.zip
+     WORLDFILE = large
 
    This will set up CrystalSpace to run in software mode using the worldfile
-   "large.zip". Make sure that you have downloaded a worldfile from the 
+   "large". Make sure that you have downloaded a worldfile from the 
    Crystal Space Website before this. These files are in ZIP format and should
    be downloaded to the $/CS/data directory. Do not attempt to extract this 
    archive - Crystal Space decompresses the ZIP file at run time.
@@ -264,13 +264,6 @@ OK, Now, it should link. So you should have an executable file called
 
 III. MISCELLANEOUS THINGS:
 
-- When I want to launch Walktest I got an 'standard.zip not found' error!
-
-Make sure you placed standard.zip into the same directory as the exe file
-and have not unzipped it. If it is there, make sure, that walktest will
-use the proper working directory. See Section [1] quickstart step 9 for
-details on how to do this.
-
 - When I start walktest I just get a black screen, maybe with some
   text output, but after a few seconds it drops back to the normal
   windows screen without an error
@@ -330,5 +323,3 @@ Xavier TROCHU
 xtrochu@yahoo.com
 NooTe (Nathaniel Saint Martin)
 noote@bigfoot.com
-
-
