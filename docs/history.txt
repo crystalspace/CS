@@ -17,6 +17,9 @@ chronological order.
 	  more optimal routine is selected for flushing the operations.
 	- Jorrit cleaned up the coverage buffer Flush() routine by splitting
 	  it up in all different cases.
+	- Matze fixed win32.jam so that the resource and supporting file names
+	  incorporate the target's name.  This allows "variants" to work
+	  correctly on Windows.
 	- Jorrit reenabled the dynavis_debug target in the Dynavis jamfile
 	  after Matze applied some fixes to the metadata embedding code
 	  on windows.
@@ -39,6 +42,9 @@ chronological order.
 	  it will now also create a conservative projection of the OBB
 	  if one or more of the points are behind the view plane (z < 0).
 	  In the past it would simply create a huge screensize box.
+	- Eric Sunshine fixed a bug in assembler.jam where the pathnames used
+	  with the -I directives lacked a trailing slash.  The slash is
+	  required by NASM.  (Bug #827028)
 22-Oct-2003
 	- Jorrit fixed a bug in csMovableSectorList which did all the needed
 	  SCF stuff EXCEPT inherit from iBase. This is an old bug but for

@@ -17,7 +17,9 @@ rule Nasm
 {
   Depends $(<) : $(>) ;
   NASM.FLAGS on $(<) += $(NASM.FLAGS) ;
-  INCLUDEFLAGS on $(<) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
+  local includeflags = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
+  # NASM requires that -I paths have a trailing slash.
+  INCLUDEFLAGS on $(<) = $(includeflags)$(SLASH) ;
 }
 
 NASM.HDRPATTERN = "^[ 	]*%[ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
