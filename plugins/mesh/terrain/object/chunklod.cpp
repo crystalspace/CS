@@ -1068,6 +1068,7 @@ struct QueuedLight
 
   float* intensities;
 };
+
 CS_IMPLEMENT_STATIC_VAR (GetLightQueue, csArray<QueuedLight>, ())
 
 void csChunkLodTerrainObject::UpdateColors (const csArray<int>& colors,

@@ -80,7 +80,6 @@
     <priority name="sky">
       <level>1</level>
       <sort>NONE</sort>
-      <camera />
     </priority>
     <priority name="mirror">
       <level>2</level>
@@ -187,9 +186,9 @@
 	  <material>Marble</material>
 	  <material>Stone</material>
 	</materialpalette>
-	<materialmap image="/lev/terrain/materialmap.png" />
 	<loddistance>200</loddistance>
 	<errortolerance>1</errortolerance>
+	<materialmap image="/lev/terrain/materialmap.png" />
       </params>
       <move> 
         <v x="0" y="0" z="0" /> 

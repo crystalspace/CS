@@ -24,6 +24,11 @@ chronological order.
 	  file (checks if it is a <world> file) if -inds or -outds is
 	  used. By doing that the tool can be used to convert mesh factories
 	  and other type of XML files too.
+	- Jorrit added code to the chunklod (NR terrain) mesh loader so that
+	  it tests the following two things:
+	      - Material palette must be specified BEFORE material map.
+	      - LodDistance must be set before material map too.
+	- Jorrit fixed the terrain level for this change.
 26-Apr-2004
 	- Eric Sunshine fixed bugs in cross-product functions of csVector4 and
 	  csDVector4 where it was accessing 'x' component of wrong vector.

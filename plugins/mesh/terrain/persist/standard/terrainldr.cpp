@@ -283,6 +283,8 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
 {
   csRef<iMeshObject> mesh;
   csRef<iTerrainObjectState> state;
+  bool palette_set = false;
+  bool material_map_set = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -343,10 +345,18 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
           return 0;
         }
         state->SetMaterialPalette (pal);
+	palette_set = true;
         break;
       }
       case XMLTOKEN_MATERIALMAP:
       {
+        if (!palette_set)
+	{
+          synldr->ReportError ("crystalspace.terrain.factory.loader",
+              child, "First set a material palette before <materialmap>!");
+          return 0;
+	}
+	material_map_set = true;
         const char* imagefile = child->GetAttributeValue ("image");
         const char *arrayfile = child->GetAttributeValue ("raw");
         int width = child->GetAttributeValueAsInt ("width");
@@ -391,6 +401,12 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
       }
       case XMLTOKEN_LODDISTANCE:
       {
+        if (material_map_set)
+	{
+          synldr->ReportError ("crystalspace.terrain.factory.loader",
+              child, "<loddistance> must be set before <materialmap>!");
+          return 0;
+	}
         float dist = child->GetContentsValueAsFloat ();
 	state->SetLODDistance (dist);
 	break;
