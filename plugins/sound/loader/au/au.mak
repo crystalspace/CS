@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: sndau auclean
+.PHONY: sndau sndauclean
 all plugins drivers snddrivers: sndau
 
 sndau:
 	$(MAKE_TARGET) MAKE_DLL=yes
-auclean:
+sndauclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -55,15 +55,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sndau auclean
+.PHONY: sndau sndauclean
 
 sndau: $(OUTDIRS) $(SNDAU)
 
 $(SNDAU): $(OBJ.SNDAU) $(LIB.SNDAU)
 	$(DO.PLUGIN)
 
-clean: auclean
-auclean:
+clean: sndauclean
+sndauclean:
 	$(RM) $(SNDAU) $(OBJ.SNDAU)
 
 ifdef DO_DEPEND

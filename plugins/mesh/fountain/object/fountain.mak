@@ -10,10 +10,10 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: fountain fountclean
+.PHONY: fountain fountainclean
 plugins meshes all: fountain
 
-fountclean:
+fountainclean:
 	$(MAKE_CLEAN)
 fountain:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -48,14 +48,14 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: fountain fountclean
+.PHONY: fountain fountainclean
 fountain: $(OUTDIRS) $(FOUNTAIN)
 
 $(FOUNTAIN): $(OBJ.FOUNTAIN) $(LIB.FOUNTAIN)
 	$(DO.PLUGIN)
 
-clean: fountclean
-fountclean:
+clean: fountainclean
+fountainclean:
 	-$(RM) $(FOUNTAIN) $(OBJ.FOUNTAIN)
 
 ifdef DO_DEPEND

@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csgifimg gifimgclean
+.PHONY: csgifimg csgifimgclean
 all plugins: csgifimg
 
 csgifimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
-gifimgclean:
+csgifimgclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -54,15 +54,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csgifimg gifimgclean
+.PHONY: csgifimg csgifimgclean
 
 csgifimg: $(OUTDIRS) $(CSGIFIMG)
 
 $(CSGIFIMG): $(OBJ.CSGIFIMG) $(LIB.CSGIFIMG)
 	$(DO.PLUGIN)
 
-clean: gifimgclean
-gifimgclean:
+clean: csgifimgclean
+csgifimgclean:
 	$(RM) $(CSGIFIMG) $(OBJ.CSGIFIMG)
 
 ifdef DO_DEPEND

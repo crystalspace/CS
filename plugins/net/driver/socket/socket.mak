@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cssocket socketclean
+.PHONY: cssocket cssocketclean
 all plugins drivers netdrivers: cssocket
 
 cssocket:
 	$(MAKE_TARGET) MAKE_DLL=yes
-socketclean:
+cssocketclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -56,15 +56,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cssocket socketclean
+.PHONY: cssocket cssocketclean
 
 cssocket: $(OUTDIRS) $(CSSOCKET)
 
 $(CSSOCKET): $(OBJ.CSSOCKET) $(LIB.CSSOCKET)
 	$(DO.PLUGIN) $(LIB.CSSOCKET.SPECIAL)
 
-clean: socketclean
-socketclean:
+clean: cssocketclean
+cssocketclean:
 	$(RM) $(CSSOCKET) $(OBJ.CSSOCKET)
 
 ifdef DO_DEPEND

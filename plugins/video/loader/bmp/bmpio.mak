@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csbmpimg bmpimgclean
+.PHONY: csbmpimg csbmpimgclean
 all plugins: csbmpimg
 
 csbmpimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
-bmpimgclean:
+csbmpimgclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -54,15 +54,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csbmpimg bmpimgclean
+.PHONY: csbmpimg csbmpimgclean
 
 csbmpimg: $(OUTDIRS) $(CSBMPIMG)
 
 $(CSBMPIMG): $(OBJ.CSBMPIMG) $(LIB.CSBMPIMG)
 	$(DO.PLUGIN)
 
-clean: bmpimgclean
-bmpimgclean:
+clean: csbmpimgclean
+csbmpimgclean:
 	$(RM) $(CSBMPIMG) $(OBJ.CSBMPIMG)
 
 ifdef DO_DEPEND

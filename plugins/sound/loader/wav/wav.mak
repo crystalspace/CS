@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: sndwav wavclean
+.PHONY: sndwav sndwavclean
 all plugins drivers snddrivers: sndwav
 
 sndwav:
 	$(MAKE_TARGET) MAKE_DLL=yes
-wavclean:
+sndwavclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -55,15 +55,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sndwav wavclean
+.PHONY: sndwav sndwavclean
 
 sndwav: $(OUTDIRS) $(SNDWAV)
 
 $(SNDWAV): $(OBJ.SNDWAV) $(LIB.SNDWAV)
 	$(DO.PLUGIN)
 
-clean: wavclean
-wavclean:
+clean: sndwavclean
+sndwavclean:
 	$(RM) $(SNDWAV) $(OBJ.SNDWAV)
 
 ifdef DO_DEPEND

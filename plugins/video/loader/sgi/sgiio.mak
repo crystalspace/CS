@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cssgiimg sgiimgclean
+.PHONY: cssgiimg cssgiimgclean
 all plugins: cssgiimg
 
 cssgiimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
-sgiimgclean:
+cssgiimgclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -54,15 +54,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cssgiimg sgiimgclean
+.PHONY: cssgiimg cssgiimgclean
 
 cssgiimg: $(OUTDIRS) $(CSSGIIMG)
 
 $(CSSGIIMG): $(OBJ.CSSGIIMG) $(LIB.CSSGIIMG)
 	$(DO.PLUGIN)
 
-clean: sgiimgclean
-sgiimgclean:
+clean: cssgiimgclean
+cssgiimgclean:
 	$(RM) $(CSSGIIMG) $(OBJ.CSSGIIMG)
 
 ifdef DO_DEPEND

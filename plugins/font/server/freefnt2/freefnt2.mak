@@ -10,11 +10,11 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: freefnt2 freefont2clean
+.PHONY: freefnt2 freefnt2clean
 all plugins: freefnt2
 freefnt2:
 	$(MAKE_TARGET) MAKE_DLL=yes
-freefont2clean:
+freefnt2clean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -54,7 +54,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: freefnt2 freefont2clean
+.PHONY: freefnt2 freefnt2clean
 freefnt2: $(OUTDIRS) $(FREEFONT2)
 
 $(OUT)/%$O: plugins/font/server/freefnt2/%.cpp
@@ -63,8 +63,8 @@ $(OUT)/%$O: plugins/font/server/freefnt2/%.cpp
 $(FREEFONT2): $(OBJ.FREEFONT2) $(LIB.FREEFONT2)
 	$(DO.PLUGIN) $(LIB.EXTERNAL.FREEFONT2)
 
-clean: freefont2clean
-freefont2clean:
+clean: freefnt2clean
+freefnt2clean:
 	-$(RM) $(FREEFONT2) $(OBJ.FREEFONT2)
 
 ifdef DO_DEPEND

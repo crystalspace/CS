@@ -13,7 +13,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cslexan lexanclean
+.PHONY: cslexan cslexanclean
 all plugins: cslexan
 
 cslexan:
@@ -51,14 +51,14 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cslexan lexanclean
+.PHONY: cslexan cslexanclean
 cslexan: $(OUTDIRS) $(LEXAN)
 
 $(CSLEXAN): $(OBJ.CSLEXAN) $(LIB.CSLEXAN)
 	$(DO.PLUGIN)
 
-clean: lexanclean
-lexanclean:
+clean: cslexanclean
+cslexanclean:
 	-$(RM) $(CSLEXAN) $(OBJ.CSLEXAN)
 
 ifdef DO_DEPEND

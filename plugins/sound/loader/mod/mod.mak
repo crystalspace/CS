@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: sndmod csmodclean
+.PHONY: sndmod sndmodclean
 all plugins drivers snddrivers: sndmod
 
 sndmod:
 	$(MAKE_TARGET) MAKE_DLL=yes
-csmodclean:
+sndmodclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -54,15 +54,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sndmod csmodclean
+.PHONY: sndmod sndmodclean
 
 sndmod: $(OUTDIRS) $(SNDMOD)
 
 $(SNDMOD): $(OBJ.SNDMOD) $(LIB.SNDMOD)
 	$(DO.PLUGIN) -lmikmod
 
-clean: csmodclean
-csmodclean:
+clean: sndmodclean
+sndmodclean:
 	$(RM) $(SNDMOD) $(OBJ.SNDMOD)
 
 ifdef DO_DEPEND

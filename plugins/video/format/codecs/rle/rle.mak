@@ -10,12 +10,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: rlecodec rleclean
+.PHONY: rlecodec rlecodecclean
 plugins all: rlecodec
 
 rlecodec:
 	$(MAKE_TARGET) MAKE_DLL=yes
-rleclean:
+rlecodecclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -52,14 +52,14 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: rlecodec rleclean
+.PHONY: rlecodec rlecodecclean
 rlecodec: $(OUTDIRS) $(RLE)
 
 $(RLE): $(OBJ.RLE) $(LIB.RLE)
 	$(DO.PLUGIN) $(LIB.EXTERNAL.RLE)
 
-clean: rleclean
-rleclean:
+clean: rlecodecclean
+rlecodecclean:
 	-$(RM) $(RLE) $(OBJ.RLE)
 
 ifdef DO_DEPEND

@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: sndiff iffclean
+.PHONY: sndiff sndiffclean
 all plugins drivers snddrivers: sndiff
 
 sndiff:
 	$(MAKE_TARGET) MAKE_DLL=yes
-iffclean:
+sndiffclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -55,15 +55,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sndiff iffclean
+.PHONY: sndiff sndiffclean
 
 sndiff: $(OUTDIRS) $(SNDIFF)
 
 $(SNDIFF): $(OBJ.SNDIFF) $(LIB.SNDIFF)
 	$(DO.PLUGIN)
 
-clean: iffclean
-iffclean:
+clean: sndiffclean
+sndiffclean:
 	$(RM) $(SNDIFF) $(OBJ.SNDIFF)
 
 ifdef DO_DEPEND

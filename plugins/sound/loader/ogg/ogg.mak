@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: sndogg csoggclean
+.PHONY: sndogg sndoggclean
 all plugins drivers snddrivers: sndogg
 
 sndogg:
 	$(MAKE_TARGET) MAKE_DLL=yes
-csoggclean:
+sndoggclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -54,15 +54,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sndogg csoggclean
+.PHONY: sndogg sndoggclean
 
 sndogg: $(OUTDIRS) $(SNDOGG)
 
 $(SNDOGG): $(OBJ.SNDOGG) $(LIB.SNDOGG)
 	$(DO.PLUGIN) -lvorbisfile -lvorbis -logg
 
-clean: csoggclean
-csoggclean:
+clean: sndoggclean
+sndoggclean:
 	$(RM) $(SNDOGG) $(OBJ.SNDOGG)
 
 ifdef DO_DEPEND

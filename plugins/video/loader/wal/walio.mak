@@ -13,12 +13,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cswalimg walimgclean
+.PHONY: cswalimg cswalimgclean
 all plugins: cswalimg
 
 cswalimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
-walimgclean:
+cswalimgclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -54,15 +54,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cswalimg walimgclean
+.PHONY: cswalimg cswalimgclean
 
 cswalimg: $(OUTDIRS) $(CSWALIMG)
 
 $(CSWALIMG): $(OBJ.CSWALIMG) $(LIB.CSWALIMG)
 	$(DO.PLUGIN)
 
-clean: walimgclean
-walimgclean:
+clean: cswalimgclean
+cswalimgclean:
 	$(RM) $(CSWALIMG) $(OBJ.CSWALIMG)
 
 ifdef DO_DEPEND

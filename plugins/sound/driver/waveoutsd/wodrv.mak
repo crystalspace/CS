@@ -16,12 +16,12 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: sndwaveout wosclean
+.PHONY: sndwaveout sndwaveoutclean
 all plugins drivers snddrivers: sndwaveout
 
 sndwaveout:
 	$(MAKE_TARGET) MAKE_DLL=yes
-wosclean:
+sndwaveoutclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -60,15 +60,15 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sndwaveout wosclean
+.PHONY: sndwaveout sndwaveoutclean
 
 sndwaveout: $(OUTDIRS) $(WOS)
 
 $(WOS): $(OBJ.WOS) $(LIB.WOS)
 	$(DO.PLUGIN) $(LDFLAGS.WOS)
 
-clean: wosclean
-wosclean:
+clean: sndwaveoutclean
+sndwaveoutclean:
 	$(RM) $(WOS) $(OBJ.WOS)
 
 ifdef DO_DEPEND
