@@ -164,12 +164,6 @@
 #undef max
 #undef DeleteFile
 
-#if defined(COMP_VC)
-  typedef __int64 int64_t;
-#else
-  typedef long long int64_t;
-#endif
-
 #if defined(_DEBUG) || defined(CS_DEBUG)
   #include <assert.h>
   #define ASSERT(expression) assert(expression)

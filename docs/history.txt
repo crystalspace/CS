@@ -20,6 +20,7 @@ The history order is reversed so that new features are at the top.
 	  style and not used anymore. Also removed schedul.h
 	- Matze removed unused CS_STATIC_TABLE macro from csdef.h and added
 	  DEPRECATED comments to TRUE and FALSE
+	- Matze removed definition for int64_t from win32/csosdefs.h
 3-Apr-2003
 	- Micah added a 'tile' texture he drew, to stdtex.zip
         - Micah added a 'plaster' texture he drew, to stdtex.zip
