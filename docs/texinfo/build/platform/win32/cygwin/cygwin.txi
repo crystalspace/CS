@@ -5,7 +5,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@dsl.pipex.com}.}
 @noindent
-@emph{Last updated 6 January 2003.}
+@emph{Last updated 9 February 2003.}
 
 These instructions are for building Crystal Space with Cygwin a @sc{gnu}
 compiler for Windows created by Red Hat Inc. and other third party
@@ -177,6 +177,76 @@ Bash prompt and navigate to where you extracted the files (that is, the
 directory which contains the @file{Makefile}).  Next, at the command prompt
 type @samp{make install}.
 
+@subsubheading Open Dynamics Engine (required for physics plugin)
+
+The Open Dynamics Engine library is required for successful compilation of
+the CS @sc{ode} physics plugin. You can obtain the latest source tar ball via
+the web link below.
+
+@noindent
+@uref{http://opende.sourceforge.net/}
+
+In order to successfully compile, you will need todo a couple of things.  Open
+a Cygwin Bash prompt and navigate to where you extracted the files (that is,
+the directory which contains the @file{Makefile}).
+
+Sadly... unlike on other platforms, during configurarion the @emph{lib}
+directory would be created for you.  However, under Cygwin it won't, so we
+must.  At the command prompt enter the following command and hit return.
+
+@example
+mkdir lib
+@end example
+
+Next we set the configuration for the Cygwin platform.  Open the file
+@file{config/user-settings} in your favourite editor and change the following
+line from.
+
+@example
+PLATFORM=unix-gcc
+@end example
+
+to
+
+@example
+PLATFORM=cygwin
+@end example
+
+Make sure you are back in the directory containing the @file{Makefile} before
+continuing. From the Bash prompt issue the following command and then hit
+return.
+
+@example
+make configure
+@end example
+
+Once configuration is complete and we have been returned to the Bash Prompt.
+Next, enter the following command and hit return inorder to compile the ode
+library.
+
+@example
+make ode-lib
+@end example
+
+After once again being returned to the Bash prompt, we can proceed and install
+@sc{ode} into Cygwin. The easiest way to install @sc{ode} is thus. Copy the
+@emph{lib} and @emph{include} directories and paste them into your Cygwin
+@emph{/usr} directory. You will be prompted about over writing files, which you
+should just answer @file{Yes to All} too.
+
+@subsubheading Installing the @sc{mng} Library (optional)
+
+In order to successfully build the @emph{jng} plugin, you must have @emph{mng}
+installed on your system.  You can download it via the following link.
+
+@noindent
+@uref{ftp://sunsite.dk/projects/crystal/support/general/libmng-1.0.4.tar.gz}
+
+To install, extract the archive to a location of your choice.  Open a Cygwin
+Bash prompt and navigate to where you extracted the files (that is, the
+directory which contains the @file{install-sh}).  Next, at the command prompt
+type @samp{make install}.
+
 @subsubheading Building Crystal Space
 
 Open a Cygwin Bash prompt via the desktop shortcut or the via item in the
@@ -186,7 +256,7 @@ commands:
 @example
 ./configure
 make depend
-make -k all
+make all
 @end example
 
 Note that making the @samp{depend} target is optional and can be omitted if you
@@ -203,7 +273,7 @@ You can also insert the @samp{clean} makefile target into the @samp{make}
 command, as follows:
 
 @example
-make -k clean all
+make clean all
 @end example
 
 @noindent

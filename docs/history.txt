@@ -3,6 +3,8 @@ The history order is reversed so that new features are at the top.
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.
+  - Philip Wyett extended Cygwin docs to cover installation of MNG
+    and the Open Dynamics Engine (ODE) libraries.
 8-Feb-2003
 	- Reverted the changes of res for packed rgb struct since they
 	  don't appear to work on linux (png image loader crashes).
