@@ -1861,15 +1861,24 @@ void csEngine::ControlMeshes ()
   }
 }
 
-char* csEngine::SplitRegionName (const char* name, iRegion** region)
+char* csEngine::SplitRegionName (const char* name, iRegion*& region,
+	bool& global)
 {
-  *region = NULL;
+  region = NULL;
+  global = false;
+
   char* p = strchr (name, '/');
   if (!p) return (char*)name;
+  if (*name == '*' && *(name+1) == '/')
+  {
+    global = true;
+    return p+1;
+  }
+
   *p = 0;
-  *region = regions.FindByName (name);
+  region = regions.FindByName (name);
   *p = '/';
-  if (!*region) return NULL;
+  if (!region) return NULL;
   return p+1;
 }
 
@@ -1877,13 +1886,14 @@ iMaterialWrapper* csEngine::FindMaterial (const char* name,
 	iRegion* reg)
 {
   iRegion* region;
-  char* n = SplitRegionName (name, &region);
+  bool global;
+  char* n = SplitRegionName (name, region, global);
   if (!n) return NULL;
 
   iMaterialWrapper* mat;
   if (region)
     mat = region->FindMaterial (n);
-  else if (reg)
+  else if (!global && reg)
     mat = reg->FindMaterial (n);
   else
     mat = GetMaterialList ()->FindByName (n);
@@ -1894,13 +1904,14 @@ iTextureWrapper* csEngine::FindTexture (const char* name,
 	iRegion* reg)
 {
   iRegion* region;
-  char* n = SplitRegionName (name, &region);
+  bool global;
+  char* n = SplitRegionName (name, region, global);
   if (!n) return NULL;
 
   iTextureWrapper* txt;
   if (region)
     txt = region->FindTexture (n);
-  else if (reg)
+  else if (!global && reg)
     txt = reg->FindTexture (n);
   else
     txt = GetTextureList ()->FindByName (n);
@@ -1911,13 +1922,14 @@ iSector* csEngine::FindSector (const char* name,
 	iRegion* reg)
 {
   iRegion* region;
-  char* n = SplitRegionName (name, &region);
+  bool global;
+  char* n = SplitRegionName (name, region, global);
   if (!n) return NULL;
 
   iSector* sect;
   if (region)
     sect = region->FindSector (n);
-  else if (reg)
+  else if (!global && reg)
     sect = reg->FindSector (n);
   else
     sect = GetSectors ()->FindByName (n);
@@ -1928,13 +1940,14 @@ iMeshWrapper* csEngine::FindMeshObject (const char* name,
 	iRegion* reg)
 {
   iRegion* region;
-  char* n = SplitRegionName (name, &region);
+  bool global;
+  char* n = SplitRegionName (name, region, global);
   if (!n) return NULL;
 
   iMeshWrapper* mesh;
   if (region)
     mesh = region->FindMeshObject (n);
-  else if (reg)
+  else if (!global && reg)
     mesh = reg->FindMeshObject (n);
   else
     mesh = GetMeshes ()->FindByName (n);
@@ -1945,13 +1958,14 @@ iMeshFactoryWrapper* csEngine::FindMeshFactory (const char* name,
 	iRegion* reg)
 {
   iRegion* region;
-  char* n = SplitRegionName (name, &region);
+  bool global;
+  char* n = SplitRegionName (name, region, global);
   if (!n) return NULL;
 
   iMeshFactoryWrapper* fact;
   if (region)
     fact = region->FindMeshFactory (n);
-  else if (reg)
+  else if (!global && reg)
     fact = reg->FindMeshFactory (n);
   else
     fact = GetMeshFactories ()->FindByName (n);
@@ -1962,13 +1976,14 @@ iCameraPosition* csEngine::FindCameraPosition (const char* name,
 	iRegion* reg)
 {
   iRegion* region;
-  char* n = SplitRegionName (name, &region);
+  bool global;
+  char* n = SplitRegionName (name, region, global);
   if (!n) return NULL;
 
   iCameraPosition* campos;
   if (region)
     campos = region->FindCameraPosition (n);
-  else if (reg)
+  else if (!global && reg)
     campos = reg->FindCameraPosition (n);
   else
     campos = GetCameraPositions ()->FindByName (n);
@@ -1979,13 +1994,14 @@ iCollection* csEngine::FindCollection (const char* name,
 	iRegion* reg)
 {
   iRegion* region;
-  char* n = SplitRegionName (name, &region);
+  bool global;
+  char* n = SplitRegionName (name, region, global);
   if (!n) return NULL;
 
   iCollection* col;
   if (region)
     col = region->FindCollection (n);
-  else if (reg)
+  else if (!global && reg)
     col = reg->FindCollection (n);
   else
     col = GetCollections ()->FindByName (n);

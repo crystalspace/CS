@@ -432,11 +432,15 @@ private:
   /**
    * Split a name into optional 'region/name' format.
    * This function returns the pointer to the real name of the object.
-   * The *region variable will contain the region is one is given.
+   * The 'region' variable will contain the region is one is given.
    * If a region was given but none could be found this function returns
-   * NULL (this is an error).
+   * NULL (this is an error).<br>
+   * If '*' was given as a region name then all regions are searched EVEN if
+   * the the FindXxx() routine is called for a specific region only. i.e.
+   * this forces the search to be global. In this case 'global' will be set
+   * to true.
    */
-  char* SplitRegionName (const char* name, iRegion** region);
+  char* SplitRegionName (const char* name, iRegion*& region, bool& global);
 
 public:
   /**

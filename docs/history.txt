@@ -33,6 +33,12 @@ The history order is reversed so that new features are at the top.
 	  are perfectly legal. It is possible for the factory to be in
 	  another region for example.
 	- Fixed the python plugin for the changes yesterday.
+	- Added the ability to use '*' as the region name when using the
+	  'regionname/objectname' syntax. i.e. you can now say:
+	    MATERIAL ('*/stone')
+	  This syntax forces a global search (i.e. ignoring all regions)
+	  for the material 'stone' EVEN if the current loader context
+	  says that only one region should be used.
 21-Feb-2002
 	- Peter Amstutz <tetron@student.umass.edu> added a patch to CS
 	  to add two additional broadcast events:
