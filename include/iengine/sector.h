@@ -100,8 +100,6 @@ struct iSector : public iBase
   virtual iMeshList* GetMeshes () = 0;
   /**
    * Get the list of static and pseudo-dynamic lights in this sector.
-   * Do NOT add dynamic lights to this list. For a dynamic light
-   * you only have to call SetSector() on those dynamic lights.
    */
   virtual iLightList* GetLights () = 0;
 
