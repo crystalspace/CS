@@ -298,8 +298,8 @@ void Demo::SetupSector ()
   p->CreateVertex (csVector3 (size, -size, size));
   p->CreateVertex (csVector3 (size, -size, -size));
   p->CreateVertex (csVector3 (-size, -size, -size));
-  SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
-  	2.*size, p->GetVertex (3), 2.*size);
+  SetTexSpace (p, 256, p->GetVertex (2), p->GetVertex (3),
+  	2.*size, p->GetVertex (1), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
   p = walls_state->CreatePolygon ("u");

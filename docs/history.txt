@@ -3,6 +3,32 @@ The history order is reversed so that new features are at the top.
 5-Jul-2001
 	- Removed Glide renderer and canvases due to lack of
 	  maintenance. It was not functional either.
+	- Michael Voasse writes:
+	    - In the ongoing quest to implement HitBeam() in all
+  	      mesh objects, todays victim is terrfunc. Unfortunately,
+  	      I have been slightly side-tracked into correcting bugs
+  	      and stabalizing various algo's.
+	    - Corrected the behaviour of csIntersect3::IntersectTriangle()
+	      which had a habit of failing when the triangle was co-planar
+	      with origin. IntersectTriangle() will now shift the points
+	      away from origin if necessary. *WARNING* If you are using
+	      WhichSide3D() please be aware you will need to do the same
+	      trick to get a valid result.
+	    - Added ALLMATERIAL keyword to terrain func loader. Mostly
+	      added for testing purposes cause I was really jack of
+	      having to add dozens of materials every time I changed
+	      block count (esp since they were all the same texture).
+	    - Added a bound check to CalculateCost() to prevent a divide
+	      by zero error. This happens when you have small blocks with
+	      lots of grid points.
+	    - Added a NULL assignment to the node field in the csTerrBlock
+	      class constructor. This prevents unnassigned nodes getting
+	      past the CS_ASSERT() in csTerrFuncObject::Draw(). This doesnt
+	      really fix anything, just prevents the invalid pointers from
+	      being used. This seems to occur when the QUADDEPTH value is
+	      set too low.
+	- Fixed texture mapping of one of the sides of the skybox in csdemo.
+	  Two weeks ago Norman changed this for some reason?
 4-Jul-2001
 	- Added iCamera::SetTransform() which should be used to directly
 	  set the transform. It is illegal to assign to the result of
@@ -77,6 +103,12 @@ The history order is reversed so that new features are at the top.
 	    SKIN_SLICE()                --> CSWS_SKIN_SLICE()
 	    SKIN_DECLARE_END            --> CSWS_SKIN_DECLARE_END
 	    CSWS_SKIN_DECLARE_DEFAULT() --> CSWS_CSWS_SKIN_DECLARE_DEFAULT()
+	- Martin Geisse made the following changes:
+	    - Added proper texture and material information to the model
+	      data structures.
+	    - The thing crossbuilder now uses the stored textures in the
+	      thing.
+	    - Mdltest shows this feature on the floor polygon.
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter
