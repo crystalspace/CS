@@ -1129,6 +1129,7 @@ struct IntersectSegment_Front2BackData
 {
   csSegment3 seg;
   csVector3 isect;
+  float sqdist;	// squared distance between seg.start and isect.
   float r;
   iMeshWrapper* mesh;
   iPolygon3D* polygon;
@@ -1140,15 +1141,23 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
   IntersectSegment_Front2BackData* data
   	= (IntersectSegment_Front2BackData*)userdata;
 
-  // If mesh != NULL then we have already found our mesh and we
-  // stop immediatelly.
-  if (data->mesh) return false;
+  const csBox3& node_bbox = treenode->GetNodeBBox ();
+
+  // If mesh != NULL then we have already found our mesh. In that
+  // case we will compare the distance of the origin with the the
+  // box of the treenode and the already found shortest distance to
+  // see if we have to proceed.
+  if (data->mesh)
+  {
+    csBox3 b (node_bbox.Min ()-data->seg.Start (),
+    	      node_bbox.Max ()-data->seg.Start ());
+    if (b.SquaredOriginDist () > data->sqdist) return false;
+  }
 
   // In the first part of this test we are going to test if the
   // start-end vector intersects with the node. If not then we don't
   // need to continue.
   csVector3 box_isect;
-  const csBox3& node_bbox = treenode->GetNodeBBox ();
   if (csIntersect3::BoxSegment (node_bbox, data->seg, box_isect) == -1)
   {
     return false;
@@ -1185,19 +1194,20 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 	{
 	  if (!mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
 	  {
+	    // Transform our vector to object space.
+	    //@@@ Consider the ability to check if
+	    // object==world space for objects in general?
+	    csReversibleTransform movtrans (visobj_wrap->visobj->
+		  GetMovable ()->GetFullTransform ());
+	    csVector3 obj_start = movtrans.Other2This (data->seg.Start ());
+	    csVector3 obj_end = movtrans.Other2This (data->seg.End ());
+	    csVector3 obj_isect;
+	    float r;
+
 	    csRef<iThingState> st (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
 	      	iThingState));
 	    if (st)
 	    {
-	      // Transform our vector to object space.
-	      //@@@ Consider the ability to check if
-	      // object==world space for objects in general?
-	      csReversibleTransform movtrans (visobj_wrap->visobj->
-		  GetMovable ()->GetFullTransform ());
-	      csVector3 obj_start = movtrans.Other2This (data->seg.Start ());
-	      csVector3 obj_end = movtrans.Other2This (data->seg.End ());
-	      csVector3 obj_isect;
-	      float r;
 	      iPolygon3D* p = st->IntersectSegment (
 			obj_start, obj_end,
 			obj_isect, &r, false);
@@ -1206,7 +1216,25 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 		data->r = r;
 		data->polygon = p;
 		data->isect = movtrans.This2Other (obj_isect);
+		data->sqdist = csSquaredDist::PointPoint (
+			data->seg.Start (), data->isect);
 		data->mesh = mesh;
+	      }
+	    }
+	    else
+	    {
+	      if (mesh->GetMeshObject ()->HitBeamOutline (obj_start,
+	      	obj_end, obj_isect, &r))
+	      {
+	        if (r < data->r)
+		{
+		  data->r = r;
+		  data->polygon = NULL;
+		  data->isect = movtrans.This2Other (obj_isect);
+		  data->sqdist = csSquaredDist::PointPoint (
+			data->seg.Start (), data->isect);
+		  data->mesh = mesh;
+		}
 	      }
 	    }
 	  }
@@ -1215,13 +1243,12 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
     }
   }
 
-  if (data->mesh) return false;
   return true;
 }
 
-iPolygon3D* csDynaVis::IntersectSegment (const csVector3& start,
+bool csDynaVis::IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
-    iMeshWrapper** p_mesh)
+    iMeshWrapper** p_mesh, iPolygon3D** poly)
 {
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
@@ -1232,9 +1259,10 @@ iPolygon3D* csDynaVis::IntersectSegment (const csVector3& start,
 
   if (p_mesh) *p_mesh = data.mesh;
   if (pr) *pr = data.r;
+  if (poly) *poly = data.polygon;
   isect = data.isect;
 
-  return data.polygon;
+  return data.mesh != NULL;
 }
 
 //======== CastShadows =====================================================
@@ -1484,7 +1512,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
     csRef<iFont> fnt;
     if (fntsvr)
     {
-      fnt = csPtr<iFont> (fntsvr->GetFont (0));
+      fnt = fntsvr->GetFont (0);
       if (fnt == NULL)
         fnt = fntsvr->LoadFont (CSFONT_COURIER);
     }
@@ -2052,6 +2080,15 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"Dumped current state.");
     do_state_dump = true;
+
+    csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
+    if (dbghelp)
+    {
+      csRef<iString> rc (dbghelp->Dump ());
+      printf ("%s\n", rc->GetData ());
+      fflush (stdout);
+    }
+
     return true;
   }
   else if (!strcmp (cmd, "analyze_vis"))

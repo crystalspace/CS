@@ -920,7 +920,20 @@ public:
    * Append a list of shadow frustums which extend from
    * this thing. The origin is the position of the light.
    */
-  void AppendShadows (iMovable* movable, iShadowBlockList* shadows, const csVector3& origin);
+  void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
+  	const csVector3& origin);
+
+  /**
+   * Test a beam with this thing.
+   */
+  bool HitBeamOutline (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr);
+
+  /**
+   * Test a beam with this thing.
+   */
+  bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr);
 
   //----------------------------------------------------------------------
   // Transformation
@@ -1215,9 +1228,9 @@ public:
     {
       return scfParent->VisTest (sphere);
     }
-    virtual iPolygon3D* IntersectSegment (const csVector3& start,
+    virtual bool IntersectSegment (const csVector3& start,
       const csVector3& end, csVector3& isect, float* pr = NULL,
-      iMeshWrapper** p_mesh = NULL);
+      iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL);
     virtual void CastShadows (iFrustumView* fview)
     {
       scfParent->CastShadows (fview);
@@ -1300,12 +1313,16 @@ public:
       scfParent->HardTransform (t);
     }
     virtual bool SupportsHardTransform () const { return true; }
-    virtual bool HitBeamOutline (const csVector3&, const csVector3&,
-      csVector3&, float*)
-    { return false; }
-    virtual bool HitBeamObject (const csVector3& /*start*/,
-    	const csVector3& /*end*/,
-  	csVector3& /*isect*/, float* /*pr*/) { return false; }
+    virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
+      csVector3& isect, float* pr)
+    {
+      return scfParent->HitBeamOutline (start, end, isect, pr);
+    }
+    virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
+  	csVector3& isect, float* pr)
+    {
+      return scfParent->HitBeamObject (start, end, isect, pr);
+    }
     virtual void SetLogicalParent (iBase* lp) { scfParent->logparent = lp; }
     virtual iBase* GetLogicalParent () const { return scfParent->logparent; }
     virtual iObjectModel* GetObjectModel ()

@@ -105,9 +105,9 @@ public:
   virtual bool VisTest (iRenderView* rview);
   virtual bool VisTest (const csBox3& box);
   virtual bool VisTest (const csSphere& sphere);
-  virtual iPolygon3D* IntersectSegment (const csVector3& start,
+  virtual bool IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
-    iMeshWrapper** p_mesh = NULL);
+    iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL);
   virtual void CastShadows (iFrustumView* fview);
 
   struct eiComponent : public iComponent

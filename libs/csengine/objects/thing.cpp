@@ -1389,6 +1389,62 @@ csPolygon3D *csThing::IntersectSegment (
   }
 }
 
+bool csThing::HitBeamOutline (const csVector3& start,
+  const csVector3& end, csVector3& isect, float* pr)
+{
+  if (static_tree)
+  {
+    // Version with culler.
+    ISectData idata;
+    idata.only_local = true;
+    idata.seg.Set (start, end);
+
+    void *rc = static_tree->Front2Back (
+        start,
+        IntersectSegmentTestPol,
+        (void *) &idata,
+        IntersectSegmentCull,
+        (void *) &idata);
+    if (rc)
+    {
+      if (pr) *pr = idata.r;
+      isect = idata.isect;
+      return rc != NULL;
+    }
+
+    return false;
+  }
+  else
+  {
+    // Version without culler.
+    int i;
+    float r;
+    csPolygon3D *best_p = NULL;
+
+    // @@@ This routine is not very optimal. Especially for things
+    // with large number of polygons.
+    for (i = 0; i < polygons.Length (); i++)
+    {
+      csPolygon3D *p = polygons.Get (i);
+      if (p->IntersectSegment (start, end, isect, &r))
+      {
+        if (pr) *pr = r;
+        return true;
+      }
+    }
+
+    return false;
+  }
+}
+
+bool csThing::HitBeamObject (const csVector3& start,
+  const csVector3& end, csVector3& isect, float *pr)
+{
+  csPolygon3D* poly = IntersectSegment (start, end, isect, pr, false);
+  if (poly) return true;
+  return false;
+}
+
 void csThing::DrawOnePolygon (
   csPolygon3D *p,
   csPolygon2D *poly,
@@ -4105,12 +4161,13 @@ iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 }
 
 //---------------------------------------------------------------------------
-iPolygon3D *csThing::VisCull::IntersectSegment (
+bool csThing::VisCull::IntersectSegment (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
   float *pr,
-  iMeshWrapper **p_mesh)
+  iMeshWrapper **p_mesh,
+  iPolygon3D** poly)
 {
   csMeshWrapper *m;
   csPolygon3D *p = scfParent->IntersectSegmentFull (
@@ -4127,10 +4184,11 @@ iPolygon3D *csThing::VisCull::IntersectSegment (
       *p_mesh = NULL;
   }
 
+  if (poly) *poly = &(p->scfiPolygon3D);
   if (p)
-    return &(p->scfiPolygon3D);
+    return true;
   else
-    return NULL;
+    return false;
 }
 
 //---------------------------------------------------------------------------

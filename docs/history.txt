@@ -28,6 +28,18 @@ The history order is reversed so that new features are at the top.
 	- Started working on cleaning up the sector HitBeam() routines
 	  and also making them more accurate. Unfinished so still unused
 	  at this moment.
+	- Implemented iMeshObject::HitBeamOutline() and HitBeamObject()
+	  for things.
+	- Fixed bad csRef handling of font in Dynavis.
+	- Fixed frustvis and dynavis handling of IntersectSegment().
+	  This fixes several problems with iSector->HitBeam() not working
+	  properly in all cases.
+	- Changed the API of iVisibilityCuller->IntersectSegment() to
+	  make it possible to use it for non-thing meshes too.
+	- Fixed implementation of frustvis and dynavis IntersectSegment()
+	  to also return hits with non-thing meshes. Octree culler is
+	  not fixed for this.
+	- Cleaned up iSector->HitBeam() considerably.
 25-Sep-2002
 	- Sequence manager (the old one) can now cope with null trueSequence
 	  and falseSequence in the condition.

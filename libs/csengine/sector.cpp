@@ -295,7 +295,6 @@ csPolygon3D *csSector::HitBeam (
     return NULL;
 }
 
-#if 0
 csMeshWrapper *csSector::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
@@ -305,75 +304,14 @@ csMeshWrapper *csSector::HitBeam (
   GetVisibilityCuller ();
   float r;
   iMeshWrapper* mesh;
-  iPolygon3D* poly = culler->IntersectSegment (start, end, isect, &r, &mesh);
+  iPolygon3D* poly;
+  bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly);
   if (polygonPtr) *polygonPtr = poly ? poly->GetPrivateObject () : NULL;
-  return mesh ? mesh->GetPrivateObject () : NULL;
+  if (rc)
+    return mesh->GetPrivateObject ();
+  else
+    return NULL;
 }
-#else
-csMeshWrapper *csSector::HitBeam (
-  const csVector3 &start,
-  const csVector3 &end,
-  csVector3 &isect,
-  csPolygon3D **polygonPtr)
-{
-  float r, best_mesh_r = 10000000000.;
-  iMeshWrapper *near_mesh = NULL;
-  csVector3 tsect;
-
-  // First check all meshes in this sector.
-  int i;
-  for (i = 0; i < meshes.Length (); i++)
-  {
-    iMeshWrapper *mesh = meshes.Get (i);
-    if (
-      !mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE) &&
-      mesh->HitBeam (start, end, isect, &r))
-    {
-      if (r < best_mesh_r)
-      {
-        best_mesh_r = r;
-        near_mesh = mesh;
-        tsect = isect;
-      }
-    }
-  }
-
-  float best_poly_r;
-  csMeshWrapper *poly_mesh;
-  csPolygon3D *p = IntersectSegment (
-      start,
-      end,
-      isect,
-      &best_poly_r,
-      false,
-      &poly_mesh);
-
-  // We hit a polygon and the polygon is closer than the mesh.
-  if (p && best_poly_r < best_mesh_r)
-  {
-    csPortal *po = p->GetPortal ();
-    if (po)
-    {
-      draw_busy++;
-
-      csVector3 new_start = isect;
-      csMeshWrapper *obj = po->HitBeam (new_start, end, isect, polygonPtr);
-      draw_busy--;
-      return obj;
-    }
-    else
-    {
-      if (polygonPtr) *polygonPtr = p;
-      return poly_mesh;
-    }
-  }
-
-  // The mesh is closer (or there is no mesh).
-  if (polygonPtr) *polygonPtr = NULL;
-  isect = tsect;
-  return near_mesh ? near_mesh->GetPrivateObject () : NULL;
-}
-#endif
 
 csPolygon3D *csSector::IntersectSegment (
   const csVector3 &start,
@@ -393,10 +331,11 @@ csPolygon3D *csSector::IntersectSegment (
     // culler_mesh has option CS_THING_MOVE_NEVER so
     // object space == world space.
     iMeshWrapper *mesh;
-    iPolygon3D *ip = culler->IntersectSegment (start, end, isect, &r, &mesh);
-    if (ip)
+    iPolygon3D* poly;
+    bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly);
+    if (rc && poly)
     {
-      best_p = ip->GetPrivateObject ();
+      best_p = poly->GetPrivateObject ();
       best_r = r;
       if (p_mesh)
         *p_mesh = mesh ? mesh->GetPrivateObject ()

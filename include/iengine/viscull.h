@@ -41,7 +41,7 @@ class csVector3;
 class csBox3;
 class csSphere;
 
-SCF_VERSION (iVisibilityCuller, 0, 0, 8);
+SCF_VERSION (iVisibilityCuller, 0, 1, 0);
 
 /**
  * This interface represents a visibility culling system.
@@ -91,11 +91,12 @@ struct iVisibilityCuller : public iBase
    * Intersect a beam using this culler and return the intersection
    * point, the mesh and optional polygon. If the returned mesh is NULL
    * then this means that the object belonging to the culler itself was
-   * hit.
+   * hit. This function will also detect hits with non-thing objects.
+   * In that case the returned polygon will always be NULL.
    */
-  virtual iPolygon3D* IntersectSegment (const csVector3& start,
+  virtual bool IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr = NULL,
-    iMeshWrapper** p_mesh = NULL) = 0;
+    iMeshWrapper** p_mesh = NULL, iPolygon3D** poly = NULL) = 0;
 
   /**
    * Start casting shadows from a given point in space.
