@@ -767,7 +767,7 @@ int main (int argc, char* argv[])
   if (Sys->auto_script)
     Command::start_script (Sys->auto_script);
 
-  TestFrustrum ();
+  //TestFrustrum ();
   // The main loop.
   Sys->Loop ();
 
