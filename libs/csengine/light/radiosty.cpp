@@ -1289,18 +1289,16 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // is not really a cosinus. But it doesn't matter for our calculations.
   // If specular is enabled it matters and in that case we correct it.
   float cossrcangle = src_normal * path;
-  //if (cossrcangle < SMALL_EPSILON) return;
-
   float cosdestangle = - (dest_normal * path);
-  //if (cosdestangle < SMALL_EPSILON) return; 
-  // facing away, negative light is not good.
 
-  float sqdistance = path.SquaredNorm ();
-  float sqdistance_real = sqdistance;
+  float distance = path.Norm ();
+  float sqdistance = distance * distance;
   if (sqdistance < 0.01f) sqdistance = 0.01f;
 
+  // This function calculates radiosity with linear light attenuation
+  // because that is what CS uses internally as well.
   float totalfactor = cossrcangle * cosdestangle * 
-    source_patch_area * visibility / (sqdistance_real * sqdistance);
+    source_patch_area * visibility / (distance * sqdistance);
 
   //if(totalfactor > 10.0f) totalfactor = 10.0f;
 
@@ -1336,7 +1334,6 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
  
   // Now we need to correct the cosinus factor so that it
   // really represents a cosinus.
-  float distance = sqrt (sqdistance_real);
   float inv_distance = 1./distance;
   path *= inv_distance;
   cosdestangle *= inv_distance;
