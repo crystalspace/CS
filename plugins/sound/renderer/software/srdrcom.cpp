@@ -73,6 +73,9 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
   memory = NULL;
   memorysize = 0;
   ActivateMixing = false;
+  owning = downing = false;
+  data = csCondition::Create ();
+  mixing = csMutex::Create ();
 }
 
 void csSoundRenderSoftware::Report (int severity, const char* msg, ...)
@@ -122,7 +125,6 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
 
   // read the config file
   Config.AddConfig(object_reg, "/config/sound.cfg");
-
   return true;
 }
 
@@ -171,11 +173,24 @@ bool csSoundRenderSoftware::Open()
   ct = vc->GetCurrentTicks ();
   LastTime = ct;
 
+  if (SoundDriver->ThreadAware ())
+  {
+    mixing->LockWait ();
+    bRunning = true;
+    mixer = csThread::Create (new MixerRunnable (this));
+    mixer->Start ();
+    mixing->Release ();
+  }
   return true;
 }
 
 void csSoundRenderSoftware::Close()
 {
+  bRunning = false;
+  data->Signal (true);
+  mixing->LockWait ();
+  owning = true;
+  downing = true;
   ActivateMixing = false;
   if (SoundDriver)
   {
@@ -198,6 +213,9 @@ void csSoundRenderSoftware::Close()
     hdl->Unregister();
     hdl->DecRef();
   }
+  owning = false;
+  downing = false;
+  mixing->Release ();
 }
 
 csPtr<iSoundHandle> csSoundRenderSoftware::RegisterSound(iSoundData *snd)
@@ -216,10 +234,15 @@ void csSoundRenderSoftware::UnregisterSound(iSoundHandle *snd)
 {
   int n = SoundHandles.Find(snd);
   if (n != -1) {
-    csSoundHandleSoftware *hdl = (csSoundHandleSoftware *)snd;
-    SoundHandles.Delete(n);
-    hdl->Unregister();
-    hdl->DecRef();
+    if (owning || mixing->LockWait ()) // dont remove while we mix
+    {
+      csSoundHandleSoftware *hdl = (csSoundHandleSoftware *)snd;
+      SoundHandles.Delete(n);
+      hdl->Unregister();
+      hdl->DecRef();
+      
+      if (!owning) mixing->Release ();
+    }
   }
 }
 
@@ -257,15 +280,25 @@ void csSoundRenderSoftware::AddSource(csSoundSourceSoftware *src)
 {
   Sources.Push(src);
   src->IncRef();
+  data->Signal (true);
 }
 
 void csSoundRenderSoftware::RemoveSource(csSoundSourceSoftware *src)
 {
-  int n=Sources.Find(src);
-  if (n!=-1)
+  if (downing || mixing->LockWait ()) // dont remove while we mix
   {
-    Sources.Delete(n);
-    src->DecRef();
+    if (!downing) owning = true;
+    int n=Sources.Find(src);
+    if (n!=-1)
+    {
+      Sources.Delete(n);
+      src->DecRef();
+    }
+    if (!downing) 
+    {
+      owning = false;
+      mixing->Release ();
+    }
   }
 }
 
@@ -296,7 +329,8 @@ void csSoundRenderSoftware::MixingFunction()
     src->Prepare(Volume);
     src->AddToBufferStatic(memory, memorysize);
     if (!src->IsActive()) {
-      RemoveSource(src);
+      Sources.Delete (i);
+      src->DecRef ();
       i--;
     }
   }
@@ -333,4 +367,22 @@ void csSoundRenderSoftware::Update()
 {
   // update sound if the sound driver doesn't do it
   if(!SoundDriver->IsBackground()) MixingFunction();
+}
+
+void csSoundRenderSoftware::ThreadedMix ()
+{
+  while (bRunning)
+  {
+    mixing->LockWait ();
+    data->Wait (mixing);
+    bool bRelock = false;
+    while (bRunning && Sources.Length() != 0)
+    {
+      if (bRelock) mixing->LockWait ();
+      MixingFunction ();
+      mixing->Release ();
+      bRelock = true;
+    }
+    if (!bRelock) mixing->Release ();
+  }
 }

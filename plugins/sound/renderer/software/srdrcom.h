@@ -25,6 +25,7 @@
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
 #include "csutil/cfgacc.h"
+#include "cssys/thread.h"
 #include "isound/data.h"
 #include "isound/renderer.h"
 #include "iutil/eventh.h"
@@ -38,6 +39,27 @@ class csSoundSourceSoftware;
 class csSoundRenderSoftware : public iSoundRender
 {
   friend class csSoundSourceSoftware;
+  class MixerRunnable : public csRunnable
+  {
+    csSoundRenderSoftware *sr;
+    int count;
+  public:
+    MixerRunnable (csSoundRenderSoftware *rend): sr(rend), count(1){}
+    virtual ~MixerRunnable () {}
+    virtual void IncRef () {count++;}
+    virtual void DecRef () {if (--count == 0) delete this;}
+    virtual void Run () {sr->ThreadedMix ();}
+  };
+  friend class MixerRunnable;
+
+  void ThreadedMix ();
+
+  // thread and mutex
+  bool bRunning, owning, downing;
+  csRef<csMutex> mixing;
+  csRef<csCondition> data;
+  csRef<csThread> mixer;
+
 public:
   SCF_DECLARE_IBASE;
   // The system driver.

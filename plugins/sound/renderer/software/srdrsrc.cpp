@@ -53,8 +53,7 @@ csSoundSourceSoftware::~csSoundSourceSoftware()
 void csSoundSourceSoftware::Play(unsigned long pMethod)
 {
   PlayMethod=pMethod;
-  if (!Active) SoundRender->AddSource(this);
-  Active=true;
+  if (!Active){ Active=true; SoundRender->AddSource(this); }
   if (PlayMethod & SOUND_RESTART) Restart();
 }
 
@@ -62,8 +61,8 @@ void csSoundSourceSoftware::Stop()
 {
   if (Active)
   {
-    Active=false;
     SoundRender->RemoveSource(this);
+    Active=false;
   }
 }
 
