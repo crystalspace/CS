@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+6-Jul-2001
+	- Fixed a bug in Blocks with the vertical raster lines. Some of
+	  them were visible from the wrong side.
+	- Converted Blocks, Demosky, Bumptest, Metademo, Pysimple,
+	  Squawk and Video apps to use the engine as a plugin.
+	- Isotest was linking with engine and parser for no visible reason.
+	- Csfedit was linking with engine and parser for no visible reason.
+	- Fixed a few descriptions in makefiles so that they align properly.
+	- Removed link with CSPARSER from all makefiles. csParser is now
+	  a plugin.
 5-Jul-2001
 	- Removed Glide renderer and canvases due to lack of
 	  maintenance. It was not functional either.
@@ -53,6 +63,72 @@ The history order is reversed so that new features are at the top.
 	  not at all).
 	- WalkTest now uses the csTextProgressMeter and gives it to the
 	  engine.
+	- Martin Geisse did the following:
+	    - Fixed a compile warning in the reporter plugin.
+	    - Added missing 'const' specifiers to iSectorList.
+	    - Did some cleanup in the movable code using typed vectors.
+	    - The list of sectors for a movable is now returned as an
+	      iSectorList instead of a csVector which actually contains
+	      csSector objects. Note that the movable uses another
+	      implementation of iSectorList than csEngine does.
+	    - Fixed a compiler warning in spr3d.cpp (hope that this is the
+	      correct fix, but it's the only one that makes sense to me).
+	    - Changed the way lightmaps are represented in the engine.
+	      Instead of a simple array of simple, an array of csRGBpixel's
+	      is now used. This should not change the actual binary
+	      representation, which is important for the renderers.
+	    - All this is done in csRGBMap. csRGBLightMap has been removed.
+	    - Added a generic macro to csutil (sarray.h) that lets you
+	      define a non-growing but resizable array, similar to the newly
+	      added csRGBMap but for any given type. Removed csRGBMap again;
+	      the lightmap code uses the above macro for this.
+	      Also re-implemented csShadowMap using the macro.
+	    - Added Find(iSector*) to iSectorList and cleaned up the movable
+	      code to use objects through interfaces (though they are not
+	      yet reference-counted correctly).
+	    - Fixed the impexp multiplexer and POV importer to compile again
+	      and added both to the build process.
+	- Michael Voasse did the following:
+	    - In the ongoing quest to implement HitBeam() in all
+	      mesh objects, todays victim is terrfunc. Included
+	      is the first draft for HitBeamObject(), several
+	      core changes to the engine. I have changed
+	      csIntersect3D::BoxSegment() to return the code
+	      for the box side where the intersection was found, -1
+	      otherwise.
+	    - Changed MeshObject::GetRadius() to use two parameters
+	      to return the radius and the center.
+	    - Added several methods to terrfunc for translating values
+	      from one space to another.
+	    - Cleaned up a small memory leak in Terrfunc.
+	    - Two small bugfixes to sprite3d and isoengine
+	      after my last commit. This corrects HitBeamObject()
+	      in Sprite3d and isoengine.
+	- Christopher Nelson did the following:
+	  AWS had the following items added:
+	    - Iterators for awsComponentNode settings.
+	    - FindWindowDef for finding the node for a window definition
+	      in the preferences manager.
+	    - CreateWindowFromDef: This is the high-level key to the whole
+	      definitions architecture.  While the user does have to specify
+	      defintions files to parse, the rest is all automatic.  
+	      When creating a window from a definition template, the user
+	      calls this function, which returns an awsWindow *.  This
+	      function takes care of creating the window to the specifications
+	      in the defintion file, and also recursively constructs children,
+	      adding them into the parent.  This is really the last big step
+	      in the AWS system.  Next, I will begin to create a number of
+	      components, and test the actual drawing and implementation.
+	      If there are any functionality requests, now would be a good
+	      time. I will also post a message to that effect on the main
+	      list.
+	    - Updated definition to support FindWindowDef.  The iAws
+	      definition has not yet been updated to support factories.
+	- Philip Wyett fixed a function parameter redefinition error under
+	  VC6. Note on another error:
+	  awsmgr.cpp(294) : error C2660: 'AddChild' : function does not
+	  take 1 parameters
+	  All other errors are I think are un-finished stuff... :-)
 4-Jul-2001
 	- Added iCamera::SetTransform() which should be used to directly
 	  set the transform. It is illegal to assign to the result of

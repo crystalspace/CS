@@ -34,7 +34,7 @@ CSVID.EXE=csvid$(EXE)
 INC.CSVID = $(wildcard apps/video/*.h)
 SRC.CSVID = $(wildcard apps/video/*.cpp)
 OBJ.CSVID = $(addprefix $(OUT),$(notdir $(SRC.CSVID:.cpp=$O)))
-DEP.CSVID = CSPARSER CSTOOL CSENGINE CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.CSVID = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSVID = $(foreach d,$(DEP.CSVID),$($d.LIB))
 
 #TO_INSTALL.EXE += $(CSVID.EXE)

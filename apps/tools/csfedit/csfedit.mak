@@ -31,7 +31,7 @@ CSFEDIT.EXE=csfedit$(EXE)
 INC.CSFEDIT = $(wildcard apps/tools/csfedit/*.h)
 SRC.CSFEDIT = $(wildcard apps/tools/csfedit/*.cpp)
 OBJ.CSFEDIT = $(addprefix $(OUT),$(notdir $(SRC.CSFEDIT:.cpp=$O)))
-DEP.CSFEDIT = CSPARSER CSGFX CSWS CSENGINE CSTOOL CSUTIL CSSYS CSGEOM CSUTIL
+DEP.CSFEDIT = CSGFX CSWS CSTOOL CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSFEDIT = $(foreach d,$(DEP.CSFEDIT),$($d.LIB))
 
 #TO_INSTALL.EXE += $(CSFEDIT.EXE)

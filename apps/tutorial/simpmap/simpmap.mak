@@ -31,7 +31,7 @@ SIMPMAP.EXE=simpmap$(EXE)
 INC.SIMPMAP = $(wildcard apps/tutorial/simpmap/*.h)
 SRC.SIMPMAP = $(wildcard apps/tutorial/simpmap/*.cpp)
 OBJ.SIMPMAP = $(addprefix $(OUT),$(notdir $(SRC.SIMPMAP:.cpp=$O)))
-DEP.SIMPMAP = CSPARSER CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.SIMPMAP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.SIMPMAP = $(foreach d,$(DEP.SIMPMAP),$($d.LIB))
 
 #TO_INSTALL.EXE += $(SIMPMAP.EXE)

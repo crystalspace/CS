@@ -62,8 +62,6 @@
 #include "iutil/object.h"
 #include "imap/parser.h"
 
-#include "csengine/thing.h"
-
 #if defined(BLOCKS_NETWORKING)
 #include "inetwork/driver.h"
 #endif
@@ -114,8 +112,6 @@ Blocks* Sys = NULL;
 #define Gfx2D Sys->myG2D
 
 //------------------------------------------------- We need the 3D engine -----
-
-SCF_REGISTER_STATIC_LIBRARY (engine)
 
 int Blocks::white, Blocks::black, Blocks::red;
 
@@ -392,7 +388,8 @@ Blocks::Blocks ()
 Blocks::~Blocks ()
 {
   if (dynlight) dynlight->DecRef ();
-  if (engine) {
+  if (engine)
+  {
     engine->DeleteAll ();
     engine->DecRef ();
   }
@@ -996,7 +993,6 @@ again:
     reset_vertex_colors (t);
     room->ShineLights (t);
   }
-  csThing::current_light_frame_number++;
 }
 
 void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
@@ -1776,7 +1772,6 @@ void Blocks::HandleGameMovement (csTime elapsed_time)
     reset_vertex_colors (t);
     room->ShineLights (t);
   }
-  csThing::current_light_frame_number++;
 }
 
 void Blocks::HandleMovement (csTime elapsed_time)
@@ -2179,8 +2174,8 @@ void Blocks::InitGameRoom ()
 
   for (int i = 0 ; i < player1->zone_dim-1 ; i++)
   {
-    Sys->add_vrast (-1, i, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
-    Sys->add_vrast ((player1->zone_dim)-1, i, CUBE_DIM/2, CUBE_DIM/2, M_PI/2);
+    Sys->add_vrast (-1, i, CUBE_DIM/2, CUBE_DIM/2, M_PI/2);
+    Sys->add_vrast ((player1->zone_dim)-1, i, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
     Sys->add_vrast (i, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
     Sys->add_vrast (i, (player1->zone_dim)-1, CUBE_DIM/2, CUBE_DIM/2, M_PI);
   }
@@ -2467,10 +2462,6 @@ void Blocks::HandleLoweringPlanes (csTime elapsed_time)
 	  it->DecRef ();
 	}
       }
-
-  // So that the engine knows to update the lights only when the frame
-  // has changed (?).
-  csThing::current_light_frame_number++;
 }
 
 void Blocks::NextFrame ()

@@ -24,10 +24,9 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
-class csSector;
 class csView;
-class csEngine;
-class csDynLight;
+struct iSector;
+struct iEngine;
 struct iLoader;
 
 class PySimple : public SysSystemDriver
@@ -35,7 +34,7 @@ class PySimple : public SysSystemDriver
   typedef SysSystemDriver superclass;
 public:
   csView* view;
-  csEngine* engine;
+  iEngine* engine;
   int motion_flags;
   iLoader *LevelLoader;
   iGraphics3D *myG3D;

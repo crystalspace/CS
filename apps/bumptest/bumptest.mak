@@ -31,8 +31,7 @@ BUMPTEST.EXE=bumptest$(EXE)
 INC.BUMPTEST = $(wildcard apps/bumptest/*.h)
 SRC.BUMPTEST = $(wildcard apps/bumptest/*.cpp)
 OBJ.BUMPTEST = $(addprefix $(OUT),$(notdir $(SRC.BUMPTEST:.cpp=$O)))
-DEP.BUMPTEST = \
-  CSPARSER CSTOOL CSENGINE CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.BUMPTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.BUMPTEST = $(foreach d,$(DEP.BUMPTEST),$($d.LIB))
 CFG.BUMPTEST = data/config/csbumptest.cfg
 

@@ -19,12 +19,13 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "csutil/scanstr.h"
+#include "csutil/cscolor.h"
 #include "pysimp.h"
-#include "csengine/sector.h"
-#include "csengine/engine.h"
-#include "csengine/camera.h"
-#include "csengine/light.h"
-#include "csengine/polygon.h"
+#include "iengine/sector.h"
+#include "iengine/engine.h"
+#include "iengine/camera.h"
+#include "iengine/light.h"
+#include "imesh/thing/polygon.h"
 #include "cstool/csview.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -34,8 +35,6 @@
 //------------------------------------------------- We need the 3D engine -----
 
 CS_IMPLEMENT_APPLICATION
-
-SCF_REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 
@@ -80,17 +79,16 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  iEngine *Engine = CS_QUERY_PLUGIN (this, iEngine);
-  if (!Engine)
+  engine = CS_QUERY_PLUGIN (this, iEngine);
+  if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
-  engine = Engine->GetCsEngine ();
-  Engine->DecRef ();
 
   myG3D = CS_QUERY_PLUGIN_ID(this, CS_FUNCID_VIDEO, iGraphics3D);
-  if (!myG3D) {
+  if (!myG3D)
+  {
     Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
     return false;
   }
@@ -111,7 +109,8 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   }
 
   // Some commercials...
-  Printf (CS_MSG_INITIALIZATION, "Simple Crystal Space Python Application version 0.1.\n");
+  Printf (CS_MSG_INITIALIZATION,
+    "Simple Crystal Space Python Application version 0.1.\n");
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
@@ -123,37 +122,41 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
-  csSector *room = engine->CreateSector ("room")->GetPrivateObject ();
+  iSector *room = engine->CreateSector ("room");
 
   int testpython=0;
   int testlua=0;
-  for(int i=1; i<argc; i++) {
-    if(!strcasecmp(argv[i], "-python")) {
+  for (int i=1; i<argc; i++)
+  {
+    if (!strcasecmp(argv[i], "-python"))
+    {
       testpython=1;
     }
-    if(!strcasecmp(argv[i], "-lua")) {
+    if (!strcasecmp(argv[i], "-lua"))
+    {
       testlua=1;
     }
   }
 
-  if(!testpython && !testlua) {
-    Printf (CS_MSG_FATAL_ERROR, "Please select -python or -lua to select which scripting engine to test!\n");
+  if (!testpython && !testlua)
+  {
+    Printf (CS_MSG_FATAL_ERROR,
+      "Please select -python or -lua to select which scripting engine to test!\n");
     return 0;
   }
 
-  if(testpython) {
+  if(testpython)
+  {
     // Initialize the python plugin.
-    iScript* is = CS_LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
-    if (is) {
-
-    // Load a python module (scripts/python/pysimp.py).
-
+    iScript* is = CS_LOAD_PLUGIN (this,
+      "crystalspace.script.python", "Python", iScript);
+    if (is)
+    {
+      // Load a python module (scripts/python/pysimp.py).
       if (!is->LoadModule ("pysimp"))
         return 0;
 
       // Set up our room.
-
-  //@@@@@@@@@@@@@@@ PYTHON SCRIPT should create polygons on thing
       // Execute one method defined in pysimp.py
       // This will create the polygons in the room.
       if (!is->RunText ("pysimp.CreateRoom('stone')"))
@@ -163,24 +166,25 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     }
   }
 
-  if(testlua) {
-  //Now try some lua scripting stuff
-    iScript* is = CS_LOAD_PLUGIN (this, "crystalspace.script.lua", "Lua", iScript);
-    if (is) {
-
+  if (testlua)
+  {
+    //Now try some lua scripting stuff
+    iScript* is = CS_LOAD_PLUGIN (this,
+      "crystalspace.script.lua", "Lua", iScript);
+    if (is)
+    {
       if (!is->LoadModule ("scripts/lua/pysimp.lua"))
         return 0;
-   
       if (!is->RunText ("CreateRoom('stone')"))
         return 0;
-
       is->DecRef();
     }
   }
 
-  csStatLight* light;
-  light = new csStatLight (0, 5, 0, 10, 1, 0, 0, false);
-  room->AddLight(light);
+  iStatLight* light;
+  light = engine->CreateLight (NULL, csVector3 (0, 5, 0), 10,
+  	csColor (1, 0, 0), false);
+  room->AddLight (light);
 
   engine->Prepare ();
 
@@ -191,7 +195,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // manually creating a camera and a clipper but it makes things a little
   // easier.
   view = new csView (engine, myG3D);
-  view->GetCamera ()->SetSector(engine->sectors[0]);
+  view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 2, 0));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 
@@ -224,7 +228,7 @@ void PySimple::NextFrame ()
   // Tell 3D driver we're going to display 3D things.
   if (!myG3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
 
-  if(view)
+  if (view)
     view->Draw ();
 
   // Drawing code ends here.

@@ -32,7 +32,7 @@ MDLTEST.EXE = mdltest$(EXE)
 INC.MDLTEST = $(wildcard apps/mdltest/*.h)
 SRC.MDLTEST = $(wildcard apps/mdltest/*.cpp)
 OBJ.MDLTEST = $(addprefix $(OUT),$(notdir $(SRC.MDLTEST:.cpp=$O)))
-DEP.MDLTEST = CSPARSER CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.MDLTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.MDLTEST = $(foreach d,$(DEP.MDLTEST),$($d.LIB))
 
 #TO_INSTALL.EXE += $(MDLTEST.EXE)

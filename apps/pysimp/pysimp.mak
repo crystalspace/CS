@@ -35,8 +35,7 @@ PYSIMP.EXE = pysimp$(EXE)
 INC.PYSIMP = $(wildcard apps/pysimp/*.h)
 SRC.PYSIMP = $(wildcard apps/pysimp/*.cpp)
 OBJ.PYSIMP = $(addprefix $(OUT),$(notdir $(SRC.PYSIMP:.cpp=$O)))
-DEP.PYSIMP = \
-  CSPARSER CSTOOL CSENGINE CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.PYSIMP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.PYSIMP = $(foreach d,$(DEP.PYSIMP),$($d.LIB))
 
 #TO_INSTALL.EXE += $(PYSIMP.EXE)

@@ -4,7 +4,7 @@ DESCRIPTION.ieplex = Model Import/Export multiplexer plug-in
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make ieplex        Make the $(DESCRIPTION.ieplex)$"
+  $(NEWLINE)echo $"  make ieplex       Make the $(DESCRIPTION.ieplex)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

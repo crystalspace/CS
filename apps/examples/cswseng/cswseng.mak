@@ -32,7 +32,7 @@ INC.CSWSE = $(wildcard apps/examples/cswseng/*.h)
 SRC.CSWSE = $(wildcard apps/examples/cswseng/*.cpp)
 OBJ.CSWSE = $(addprefix $(OUT),$(notdir $(SRC.CSWSE:.cpp=$O)))
 DEP.CSWSE = \
-  CSWS CSPARSER CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+  CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSWSE = $(foreach d,$(DEP.CSWSE),$($d.LIB))
 
 #TO_INSTALL.EXE    += $(CSWSE.EXE)
