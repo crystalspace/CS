@@ -23,6 +23,7 @@
 #include "cstypes.h"
 
 struct iObjectRegistry;
+struct iEvent;
 
 /**
  * This is a very general function that does a lot of the application
