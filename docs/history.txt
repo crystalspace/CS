@@ -119,6 +119,15 @@ chronological order.
 	- Neil Mosafi changed the csvosa3dl plugin
 	    - Fixed some confusing log messages
 	    - Plugin-wide relight system which should _almost_ work perfectly
+	- MatzeB reports:
+	  Replaced crystal spaces VERY poor stringhashfunction with something
+	  better (D.J. Bernstein algo). It's also totally unnecessary that the
+	  CS hashmap only uses prime numbers has hashtablesize. That is only
+	  necessary if you have a poor hash function as we had before. A more
+	  efficient way is to make the hashtable use size of 2^n, this allows
+	  for efficient & mask for clipping hashfunction to hasharea and allows
+	  for efficient lazy algorithms for dynamically growing hashtables.
+	  If I just had time to implement this stuff...
 5-Jun-2004
 	- res made the following changes:
 	    - Added the *f versions of floor and ceil to csdef.h.
