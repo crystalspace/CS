@@ -98,8 +98,8 @@ public:
                     v1.x*v2.y-v1.y*v2.x);
   }
 
-  // take cross product of two vectors and put result in this vector
-  void cross(const csDVector3 & px, const csDVector3 & py){
+  /// take cross product of two vectors and put result in this vector
+  void Cross(const csDVector3 & px, const csDVector3 & py){
     x = px.y*py.z - px.z*py.y;
     y = px.z*py.x - px.x*py.z;
     z = px.x*py.y - px.y*py.x;
@@ -202,10 +202,10 @@ public:
   /// Returns the norm (magnitude) of a vector.
   inline static double Norm (const csDVector3& v) { return v.Norm(); }
 
-  // Normalizes a vector to a unit vector.
+  /// Normalizes a vector to a unit vector.
   inline static csDVector3 Unit (const csDVector3& v) { return v.Unit(); }
 
-  // scale this vector to length = 1.0;
+  /// scale this vector to length = 1.0;
   void Normalize();
 
 };
