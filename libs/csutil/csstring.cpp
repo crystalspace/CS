@@ -17,6 +17,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+//-----------------------------------------------------------------------------
+// GLOBAL NOTES
+//
+// *1* Plus one to account for implicit null byte.
+// *2* Retrieve data pointer _after_ ExpandIfNeeded() rather than before since
+//     ExpandIfNeeded() may relocate the string buffer.
+//-----------------------------------------------------------------------------
+
 #include "cssysdef.h"
 extern "C" 
 {
@@ -41,7 +49,7 @@ void csStringBase::Free ()
 
 void csStringBase::SetCapacityInternal (size_t NewSize, bool soft)
 {
-  NewSize++; // Plus one for implicit null byte.
+  NewSize++; // GLOBAL NOTE *1*
   if (soft)
     NewSize = ComputeNewSize (NewSize);
   MaxSize = NewSize;
@@ -71,7 +79,7 @@ size_t csStringBase::ComputeNewSize (size_t NewSize)
 
 void csStringBase::SetCapacity (size_t NewSize)
 {
-  if (NewSize + 1 > GetCapacity() + 1) // Plus one for implicit null byte.
+  if (NewSize + 1 > GetCapacity() + 1) // GLOBAL NOTE *1*
     SetCapacityInternal (NewSize, false);
 }
 
@@ -122,7 +130,7 @@ csStringBase& csStringBase::AppendFmtV (const char* format, va_list args)
 
 void csStringBase::ExpandIfNeeded(size_t NewSize)
 {
-  if (NewSize + 1 > GetCapacity() + 1) // Plus one for implicit null byte.
+  if (NewSize + 1 > GetCapacity() + 1) // GLOBAL NOTE *1*
     SetCapacityInternal (NewSize, true);
 }
 
@@ -146,7 +154,7 @@ void csStringBase::ShrinkBestFit()
   else
   {
     CS_ASSERT(Data != 0);
-    MaxSize = Size + 1; // Plus one for implicit null byte.
+    MaxSize = Size + 1; // GLOBAL NOTE *1*
     char* s = new char[MaxSize];
     memcpy(s, Data, MaxSize);
     delete[] Data;
@@ -159,7 +167,7 @@ csStringBase &csStringBase::Truncate (size_t iPos)
   if (iPos < Size)
   {
     Size = iPos;
-    GetData() [Size] = '\0';
+    GetDataMutable() [Size] = '\0';
   }
   return *this;
 }
@@ -168,7 +176,7 @@ csStringBase &csStringBase::DeleteAt (size_t iPos, size_t iCount)
 {
   if (iCount <= 0) return *this;
   CS_ASSERT (iPos < Size && iPos + iCount <= Size);
-  char* p = GetData();
+  char* p = GetDataMutable();
   if (p != 0)
   {
     if (iPos + iCount < Size)
@@ -189,8 +197,8 @@ csStringBase &csStringBase::Insert (size_t iPos, const csStringBase &iStr)
   size_t const sl = iStr.Length ();
   size_t const NewSize = sl + Size;
   ExpandIfNeeded (NewSize);
-  char* p = GetData(); // Retrieve after ExpandIfNeeded(), which may move data.
-  memmove (p + iPos + sl, p + iPos, Size - iPos + 1); // Also move null.
+  char* p = GetDataMutable();                         // GLOBAL NOTE *2*
+  memmove (p + iPos + sl, p + iPos, Size - iPos + 1); // GLOBAL NOTE *1*
   memcpy (p + iPos, iStr.GetData (), sl);
   Size = NewSize;
   return *this;
@@ -212,8 +220,8 @@ csStringBase &csStringBase::Insert (size_t iPos, const char* str)
   size_t const sl = strlen (str);
   size_t const NewSize = sl + Size;
   ExpandIfNeeded (NewSize);
-  char* p = GetData(); // Retrieve after ExpandIfNeeded(), which may move data.
-  memmove (p + iPos + sl, p + iPos, Size - iPos + 1); // Also move null.
+  char* p = GetDataMutable();                         // GLOBAL NOTE *2*
+  memmove (p + iPos + sl, p + iPos, Size - iPos + 1); // GLOBAL NOTE *1*
   memcpy (p + iPos, str, sl);
   Size = NewSize;
   return *this;
@@ -229,8 +237,8 @@ csStringBase &csStringBase::Overwrite (size_t iPos, const csStringBase &iStr)
   size_t const sl = iStr.Length ();
   size_t const NewSize = iPos + sl;
   ExpandIfNeeded (NewSize);
-  char* p = GetData(); // Retrieve after ExpandIfNeeded(), which may move data.
-  memcpy (p + iPos, iStr.GetData (), sl + 1); // Also copy null terminator.
+  char* p = GetDataMutable();                 // GLOBAL NOTE *2*
+  memcpy (p + iPos, iStr.GetData (), sl + 1); // GLOBAL NOTE *1*
   Size = NewSize;
   return *this;
 }
@@ -246,7 +254,7 @@ csStringBase& csStringBase::Replace (const csStringBase& Str, size_t Count)
 
 csStringBase& csStringBase::Replace (const char* Str, size_t Count)
 {
-  char* p = GetData();
+  char* p = GetDataMutable();
   if (Str == 0 || Count == 0)
     Free();
   else if (p != 0 && Str >= p && Str < p + Size) // Pathalogical cases
@@ -283,7 +291,7 @@ csStringBase &csStringBase::Append (const char *iStr, size_t iCount)
 
   size_t const NewSize = Size + iCount;
   ExpandIfNeeded (NewSize);
-  char* p = GetData(); // Retrieve after ExpandIfNeeded(), which may move data.
+  char* p = GetDataMutable(); // GLOBAL NOTE *2*
   CS_ASSERT(p != 0);
   memcpy (p + Size, iStr, iCount);
   Size = NewSize;
@@ -373,7 +381,7 @@ void csStringBase::ReplaceAll (const char* str, const char* replaceWith)
   csStringBase newStr;
   size_t p = 0;
   const size_t strLen = strlen (str);
-  char* x = GetData();
+  char* x = GetDataMutable();
 
   while (true)
   {
@@ -393,7 +401,7 @@ void csStringBase::ReplaceAll (const char* str, const char* replaceWith)
 // is undefined.
 csStringBase& csStringBase::Downcase()
 {
-  char* p = GetData();
+  char* p = GetDataMutable();
   if (p != 0)
   {
     char const* const pN = p + Length();
@@ -409,7 +417,7 @@ csStringBase& csStringBase::Downcase()
 // is undefined.
 csStringBase& csStringBase::Upcase()
 {
-  char* p = GetData();
+  char* p = GetDataMutable();
   if (p != 0)
   {
     char const* const pN = p + Length();
@@ -426,7 +434,7 @@ csStringBase& csStringBase::Upcase()
 csStringBase &csStringBase::LTrim()
 {
   size_t i;
-  char* const p = GetData();
+  char const* const p = GetData();
   for (i = 0; i < Size; i++)
     if (!isspace ((unsigned char)p[i]))
       break;
@@ -442,7 +450,7 @@ csStringBase &csStringBase::RTrim()
 {
   if (Size > 0)
   {
-    char* const p = GetData();
+    char const* const p = GetData();
     CS_ASSERT(p != 0);
     const char* c;
     for (c = p + Size - 1; c != p; c--)
@@ -464,7 +472,7 @@ csStringBase &csStringBase::Collapse()
 {
   if (Size > 0)
   {
-    char* p = GetData();
+    char* p = GetDataMutable();
     CS_ASSERT(p != 0);
     char const* src = p;
     char const* slim = p + Size;
@@ -511,10 +519,10 @@ csStringBase &csStringBase::PadLeft (size_t iNewSize, char iChar)
   if (iNewSize > Size)
   {
     ExpandIfNeeded (iNewSize);
-    char* p = GetData(); // Retrieve after ExpandIfNeeded(), in case data moved
+    char* p = GetDataMutable();          // GLOBAL NOTE *2*
     CS_ASSERT(p != 0);
     const size_t toInsert = iNewSize - Size;
-    memmove (p + toInsert, p, Size + 1); // Also move null terminator.
+    memmove (p + toInsert, p, Size + 1); // GLOBAL NOTE *1*
     for (size_t x = 0; x < toInsert; x++)
       p [x] = iChar;
     Size = iNewSize;
@@ -527,7 +535,7 @@ csStringBase& csStringBase::PadRight (size_t iNewSize, char iChar)
   if (iNewSize > Size)
   {
     ExpandIfNeeded (iNewSize);
-    char* p = GetData(); // Retrieve after ExpandIfNeeded(), in case data moved
+    char* p = GetDataMutable(); // GLOBAL NOTE *2*
     CS_ASSERT(p != 0);
     for (size_t x = Size; x < iNewSize; x++)
       p [x] = iChar;
@@ -542,7 +550,7 @@ csStringBase& csStringBase::PadCenter (size_t iNewSize, char iChar)
   if (iNewSize > Size)
   {
     ExpandIfNeeded (iNewSize);
-    char* p = GetData(); // Retrieve after ExpandIfNeeded(), in case data moved
+    char* p = GetDataMutable(); // GLOBAL NOTE *2*
     CS_ASSERT(p != 0);
     const size_t toInsert = iNewSize - Size;
     const size_t halfInsert = toInsert / 2;

@@ -89,6 +89,20 @@ protected:
   /// Compute a new buffer size. Takes GrowBy into consideration.
   size_t ComputeNewSize (size_t NewSize);
 
+  /**
+   * Get a pointer to the null-terminated character array.
+   * \return A C-string pointer to the null-terminated character array; or zero
+   *   if the string represents a null-pointer.
+   * \remarks See the class description for a discussion about how and when the
+   *   string will represent a null-pointer.
+   * \warning This returns a non-const pointer, so use this function with care.
+   *   Call this only when you need to modify the string content. External
+   *   clients are never allowed to directly modify the internal string buffer,
+   *   which is why this function is not public.
+   */
+  virtual char* GetDataMutable ()
+  { return Data; }
+
 public:
   /**
    * Ask the string to allocate enough space to hold \p NewSize characters.
@@ -323,20 +337,6 @@ public:
    *   if the string represents a null-pointer.
    * \remarks See the class description for a discussion about how and when the
    *   string will represent a null-pointer.
-   * \warning This returns a non-const pointer, so use this function with care!
-   * \deprecated Use the 'const' version of GetData() instead.
-   */
-  /*CS_DEPRECATED_METHOD*/ 
-  // @@@ GCC and VC always seem to prefer this GetData() and barf "deprecated".
-  virtual char* GetData ()
-  { return Data; }
-
-  /**
-   * Get a pointer to the null-terminated character array.
-   * \return A C-string pointer to the null-terminated character array; or zero
-   *   if the string represents a null-pointer.
-   * \remarks See the class description for a discussion about how and when the
-   *   string will represent a null-pointer.
    */
   virtual char const* GetData () const
   { return Data; }
@@ -373,7 +373,7 @@ public:
   char& operator [] (size_t n)
   {
     CS_ASSERT (n < Size);
-    return GetData()[n];
+    return GetDataMutable()[n];
   }
 
   /// Get n'th character.
@@ -392,7 +392,7 @@ public:
   void SetAt (size_t n, const char c)
   {
     CS_ASSERT (n < Size);
-    GetData() [n] = c;
+    GetDataMutable() [n] = c;
   }
 
   /// Get the n'th character.
@@ -942,6 +942,9 @@ protected:
     }
   }
 
+  virtual char* GetDataMutable ()
+  { return (miniused == 0 && Data == 0 ? 0 : (Data != 0 ? Data : minibuff)); }
+
 public:
   /**
    * Create an empty csStringFast object.
@@ -985,8 +988,6 @@ public:
   template<typename T>
   const csStringFast& operator = (T const& s) { Replace (s); return *this; }
 
-  virtual char* GetData ()
-  { return (miniused == 0 && Data == 0 ? 0 : (Data != 0 ? Data : minibuff)); }
   virtual char const* GetData () const
   { return (miniused == 0 && Data == 0 ? 0 : (Data != 0 ? Data : minibuff)); }
 
