@@ -1833,6 +1833,21 @@
         </node>
     </sector>
     <sequences>
+        <sequence name="animLight">
+            <fadelight light="bumplight" duration="5000"
+	        red="1.5" green=".5" blue=".5" />
+	    <delay time="5000" />
+            <fadelight light="bumplight" duration="5000"
+	        red=".5" green=".5" blue="1.5" />
+	    <delay time="5000" />
+            <fadelight light="bumplight" duration="5000"
+	        red=".5" green="1.5" blue=".5" />
+	    <delay time="5000" />
+            <fadelight light="bumplight" duration="5000"
+	    	red="1.5625" green="1.5625" blue="0.784314" />
+	    <delay time="5000" />
+	    <enable trigger="animLight" />
+	</sequence>
         <sequence name="moveLight">
 	    <movelight light="bumplight" duration="1000"
               x="5" y="0" z="0" />
@@ -1865,6 +1880,10 @@
         </sequence>
     </sequences>
     <triggers>
+        <trigger name="animLight">
+            <sectorvis sector="room" />
+            <fire delay="0" sequence="animLight" />
+	</trigger>
         <trigger name="moveLight">
             <sectorvis sector="room" />
             <fire delay="0" sequence="moveLight" />
