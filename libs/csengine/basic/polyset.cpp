@@ -650,21 +650,25 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	{
           clip = (csPolygon2D*)(render_pool->Alloc ());
           if ( bsppol->ClipToPlane (d->do_clip_plane ? &d->clip_plane :
-		  (csPlane3*)NULL, d->GetOrigin (), verts, num_verts) &&
-               bsppol->DoPerspective (*d, verts, num_verts, clip,
-	 	  d->IsMirrored ()) &&
-               clip->ClipAgainst (d->view) )
-          {
-	    if (covtree)
+		  (csPlane3*)NULL, d->GetOrigin (), verts, num_verts))
+	  {
+	    if (!d->UseFarPlane	() || d->GetFarPlane ()->ClipPolygon (verts, num_verts))   
 	    {
-	      if (covtree->TestPolygon (clip->GetVertices (),
-	    	  clip->GetNumVertices (), clip->GetBoundingBox ()))
-	        mark_vis = true;
+               if (bsppol->DoPerspective (*d, verts, num_verts, clip, d->IsMirrored ()) 
+	          && clip->ClipAgainst (d->view) )
+               {
+	         if (covtree)
+	         {
+	           if (covtree->TestPolygon (clip->GetVertices (),
+	    	      clip->GetNumVertices (), clip->GetBoundingBox ()))
+	           mark_vis = true;
+	         }
+	         else if (c_buffer->TestPolygon (clip->GetVertices (),
+	  	   clip->GetNumVertices ()))
+	          mark_vis = true;
+              }
 	    }
-	    else if (c_buffer->TestPolygon (clip->GetVertices (),
-	  	  clip->GetNumVertices ()))
-	      mark_vis = true;
-          }
+	  }    
 	}
 	if (mark_vis)
 	{
@@ -728,6 +732,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         if (
          p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
                             d->GetOrigin (), verts, num_verts)
+	 && (!d->UseFarPlane () || d->GetFarPlane ()->ClipPolygon (verts, num_verts))		    
          && p->DoPerspective (*d, verts, num_verts, clip, NULL,
                               d->IsMirrored ())
          && clip->ClipAgainst (d->view))
@@ -753,6 +758,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         if (!(
            p->ClipToPlane (d->do_clip_plane ? &d->clip_plane : (csPlane3*)NULL,
                               d->GetOrigin (), verts, num_verts)
+           && (!d->UseFarPlane () || d->GetFarPlane ()->ClipPolygon (verts, num_verts))		    
            && p->DoPerspective (*d, verts, num_verts, clip, NULL,
                                 d->IsMirrored ())
            && clip->ClipAgainst (d->view)))

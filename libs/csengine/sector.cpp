@@ -612,6 +612,15 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
       count_cull_node_notvis_behind++;
       return false;
     }
+    
+    if (rview->UseFarPlane ())
+    {
+      for (i = 0 ; i < num_array ; i++)
+        if (rview->GetFarPlane ()->Classify (cam[i]) > SMALL_EPSILON) 
+	  break;
+      if (i == num_array) return false;
+    }
+    
     persp.MakeEmpty ();
     if (num_z_0 == 0)
     {

@@ -261,13 +261,15 @@ csCrystalBall::~csCrystalBall ()
     delete (crysVec*)vPoints.Get (i);
 }
 
-void csCrystalBall::InsertPolygon (iPolygonSet *polyset, int idx)
+void csCrystalBall::InsertPolygon (iPolygonMesh *polyset, int idx)
 {
-  iPolygon3D *p = polyset->GetPolygon (idx);
+  csMeshedPolygon &mp = polyset->GetPolygons ()[idx];
   // calc the normal first
   crysVec *n = new crysVec (idx);
-  csMath3::CalcNormal (*n, p->GetVertex (0), p->GetVertex (1), p->GetVertex (2));
-  
+  csMath3::CalcNormal (*n, polyset->GetVertices ()[mp.vertices[0]], 
+		       polyset->GetVertices ()[mp.vertices[1]],
+		       polyset->GetVertices ()[mp.vertices[2]]
+		       );
   // which of the 8 starting triangles we add this to ?
   int i1, i2, i3, i = 0;
   if (n->y < 0)
@@ -302,10 +304,10 @@ void csCrystalBall::InsertPolygon (iPolygonSet *polyset, int idx)
     tri[i].Adjust (nPos);
 }
 
-void csCrystalBall::Build (iPolygonSet *polyset)
+void csCrystalBall::Build (iPolygonMesh *polyset)
 {
   // just cycle through all polygons and add them
-  for (int i=0; i<polyset->GetPolygonCount (); i++)
+  for (int i=0; i<polyset->GetNumPolygons (); i++)
     InsertPolygon (polyset, i);
 }
 
