@@ -80,7 +80,7 @@ struct iFlareHalo;
 #define CS_ATTN_REALISTIC 3
 /** @} */
 
-SCF_VERSION (iLightCallback, 0, 0, 1);
+SCF_VERSION (iLightCallback, 0, 1, 0);
 
 /**
  * Set a callback which is called when this light color is changed.
@@ -94,10 +94,28 @@ struct iLightCallback : public iBase
    * in this function.
    */
   virtual void OnColorChange (const csColor& newcolor) = 0;
+
+  /**
+   * Light position will be changed. It is safe to delete this callback
+   * in this function.
+   */
+  virtual void OnPositionChange (const csVector3& newpos) = 0;
+
+  /**
+   * Sector will be changed. It is safe to delete this callback
+   * in this function.
+   */
+  virtual void OnSectorChange (iSector* newsector) = 0;
+
+  /**
+   * Radius will be changed. It is safe to delete this callback
+   * in this function.
+   */
+  virtual void OnRadiusChange (float newradius) = 0;
 };
 
 
-SCF_VERSION (iLight, 0, 0, 7);
+SCF_VERSION (iLight, 0, 0, 8);
 
 /**
  * The iLight interface is the SCF interface for the csLight class.
@@ -213,6 +231,11 @@ struct iLight : public iBase
   /// Get the specified light callback.
   virtual iLightCallback* GetLightCallback (int idx) const = 0;
 
+  /**
+   * Return a number that changes when the light changes (color,
+   * or position).
+   */
+  virtual uint32 GetLightNumber () const = 0;
 };
 
 SCF_VERSION (iLightList, 0, 0, 1);

@@ -73,10 +73,13 @@ protected:
   /// Attenuation type
   int attenuation;
 
+  /// Light number. Changes when the light changes in some way (color/pos).
+  uint32 lightnr;
+
   /**
    * List of light callbacks.
    */
-  csVector light_cb_vector;
+  csRefArray<iLightCallback> light_cb_vector;
 
 public:
   /// Set of flags
@@ -119,7 +122,7 @@ public:
   /**
    * Set the current sector for this light.
    */
-  virtual void SetSector (csSector* sector) { csLight::sector = sector; }
+  virtual void SetSector (csSector* sector);
 
   /**
    * Get the current sector for this light.
@@ -129,7 +132,7 @@ public:
   /**
    * Set the center position.
    */
-  void SetCenter (const csVector3& v) { center = v; }
+  void SetCenter (const csVector3& v);
 
   /**
    * Get the center position.
@@ -154,8 +157,7 @@ public:
   /**
    * Set the radius.
    */
-  void SetRadius (float radius)
-    { dist = radius; sqdist = dist*dist; inv_dist = 1 / dist; }
+  void SetRadius (float radius);
 
   /**
    * Get the light color.
@@ -202,7 +204,6 @@ public:
   void SetLightCallback (iLightCallback* cb)
   {
     light_cb_vector.Push (cb);
-    cb->IncRef ();
   }
 
   void RemoveLightCallback (iLightCallback* cb)
@@ -211,7 +212,6 @@ public:
     if (idx != -1)
     {
       light_cb_vector.Delete (idx);
-      cb->DecRef ();
     }
   }
 
@@ -270,7 +270,12 @@ public:
     {
       return scfParent->GetLightCallback (idx);
     }
+    virtual uint32 GetLightNumber () const
+    {
+      return scfParent->lightnr;
+    }
   } scfiLight;
+  friend struct Light;
 };
 
 /**

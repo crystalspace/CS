@@ -8,6 +8,22 @@ The history order is reversed so that new features are at the top.
 	- Fixed frustvis/dynavis for completely flat objects.
 	- Keith Fulton fixed a bug in frame anim of sprite3d's when going
 	  from a time delayed frame to a space displacement frame.
+	- Fixed a memory leak in the light callbacks (for color changes)
+	  that were added some time ago to the lighting class. The code
+	  used a csVector to store the light callbacks but csVector doesn't
+	  automatically DecRef() the contents when destructed. Now uses
+	  csRefArray instead.
+	- Added OnPositionChange() to iLightCallback. This is called when
+	  the position of a light changes.
+	- Added OnSectorChange() to iLightCallback. This is called when
+	  the sector of a light changes.
+	- Added OnRadiusChange() to iLightCallback. This is called when
+	  the radius of a light changes.
+	- Added GetLightNumber() to iLight. This can be used to check if
+	  a light has changed position, color, sector, or radius since last
+	  time you called that function.
+	- Bounding box is not correctly updated after doing HardTransform() on
+	  a 3D sprite.
 7-Jan-2002
 	- Keith Fulton added SetReverseAction to the Sprite3d so that
 	  they can walk backwards without defining a new action.  Call this

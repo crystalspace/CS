@@ -66,6 +66,7 @@ csLight::csLight (
   color.blue = blue;
 
   attenuation = CS_ATTN_LINEAR;
+  lightnr = 0;
 }
 
 csLight::~csLight ()
@@ -114,6 +115,17 @@ const csVector3 &csLight::Light::GetCenter ()
   return scfParent->GetCenter ();
 }
 
+void csLight::SetCenter (const csVector3 &pos)
+{
+  int i;
+  for (i = 0; i < light_cb_vector.Length (); i++)
+  {
+    ((iLightCallback *)light_cb_vector[i])->OnPositionChange (pos);
+  }
+  center = pos;
+  lightnr++;
+}
+
 void csLight::Light::SetCenter (const csVector3 &pos)
 {
   scfParent->SetCenter (pos);
@@ -122,6 +134,18 @@ void csLight::Light::SetCenter (const csVector3 &pos)
 iSector *csLight::Light::GetSector ()
 {
   return &scfParent->GetSector ()->scfiSector;
+}
+
+void csLight::SetSector (csSector* sector)
+{
+  int i;
+  for (i = 0; i < light_cb_vector.Length (); i++)
+  {
+    ((iLightCallback *)light_cb_vector[i])->OnSectorChange (
+    	&(sector->scfiSector));
+  }
+  csLight::sector = sector;
+  lightnr++;
 }
 
 void csLight::Light::SetSector (iSector *sector)
@@ -144,6 +168,19 @@ float csLight::Light::GetInverseRadius ()
   return scfParent->GetInverseRadius ();
 }
 
+void csLight::SetRadius (float radius)
+{
+  int i;
+  for (i = 0; i < light_cb_vector.Length (); i++)
+  {
+    ((iLightCallback *)light_cb_vector[i])->OnRadiusChange (radius);
+  }
+  dist = radius;
+  sqdist = dist*dist;
+  inv_dist = 1 / dist;
+  lightnr++;
+}
+
 void csLight::Light::SetRadius (float r)
 {
   scfParent->SetRadius (r);
@@ -159,10 +196,11 @@ void csLight::SetColor (const csColor& col)
   int i;
   for (i = 0; i < light_cb_vector.Length (); i++)
   {
-    ((iLightCallback *)light_cb_vector[i])->OnColorChange(col);
+    ((iLightCallback *)light_cb_vector[i])->OnColorChange (col);
   }
 
   color = col; 
+  lightnr++;
 }
 
 void csLight::Light::SetColor (const csColor &col)

@@ -92,7 +92,7 @@ public:
 class csIsoFakeLight : public iLight {
   csIsoLight *isolight;
   csFlags flags;
-  csVector light_cb_vector;
+  csRefArray<iLightCallback> light_cb_vector;
 
 public:
   SCF_DECLARE_IBASE;
@@ -132,17 +132,13 @@ public:
   virtual void SetLightCallback (iLightCallback* cb)
   {
     light_cb_vector.Push (cb);
-    cb->IncRef ();
   }
 
   virtual void RemoveLightCallback (iLightCallback* cb)
   {
     int idx = light_cb_vector.Find (cb);
     if (idx != -1)
-    {
       light_cb_vector.Delete (idx);
-      cb->DecRef ();
-    }
   }
 
   virtual int GetLightCallbackCount () const

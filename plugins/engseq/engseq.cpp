@@ -1299,31 +1299,35 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  float AverageColor(const csColor& col)
+  float AverageColor (const csColor& col)
   {
-      return (col.red + col.blue + col.green)/3;
+    return (col.red + col.blue + col.green)/3;
   }
 
   virtual void OnColorChange (const csColor& col)
   {
-      uint32 global_framenr = trigger->GetEngineSequenceManager ()
+    uint32 global_framenr = trigger->GetEngineSequenceManager ()
       	->GetGlobalFrameNr ();
-      if (framenr != global_framenr)
+    if (framenr != global_framenr)
+    {
+      if (operation == 1) // new color less than trigger color
       {
-        if (operation == 1) // new color less than trigger color
-	{
-	    if ( AverageColor (col) >= AverageColor (trigger_color) )
-		return;
-	}
-	else if (operation == 2)
-	{
-	    if ( AverageColor (col) <= AverageColor (trigger_color) )
-		return;
-	}
-        framenr = global_framenr;
-	trigger->Fire ();
+	if ( AverageColor (col) >= AverageColor (trigger_color) )
+	  return;
       }
+      else if (operation == 2)
+      {
+	if ( AverageColor (col) <= AverageColor (trigger_color) )
+	  return;
+      }
+      framenr = global_framenr;
+      trigger->Fire ();
+    }
   }
+
+  virtual void OnPositionChange (const csVector3&) { }
+  virtual void OnSectorChange (iSector*) { }
+  virtual void OnRadiusChange (float) { }
 };
 
 SCF_IMPLEMENT_IBASE (csTriggerLightCallback)

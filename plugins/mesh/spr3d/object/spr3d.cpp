@@ -790,6 +790,7 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
       }
       c = c->GetNextSibling ();
     }
+    ComputeBoundingBox ();
   }
   else
   {
@@ -799,8 +800,26 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
     for (i = 0 ; i < numf ; i++)
     {
       csVector3* verts = GetVertices (i);
-      for (j = 0 ; j < num ; j++)
-        verts[j] = t.This2Other (verts[j]);
+      csBox3 box;
+      csVector3 max_sq_radius (0);
+      verts[0] = t.This2Other (verts[0]);
+      box.StartBoundingBox (verts[0]);
+      for (j = 1 ; j < num ; j++)
+      {
+        csVector3& v = verts[j];
+        v = t.This2Other (v);
+        box.AddBoundingVertexSmart (v);
+        csVector3 sq_radius (v.x*v.x, v.y*v.y, v.z*v.z);
+        if (sq_radius.x > max_sq_radius.x) max_sq_radius.x = sq_radius.x;
+        if (sq_radius.y > max_sq_radius.y) max_sq_radius.y = sq_radius.y;
+        if (sq_radius.z > max_sq_radius.z) max_sq_radius.z = sq_radius.z;
+      }
+      GetFrame (i)->SetBoundingBox (box);
+      GetFrame (i)->SetRadius (csVector3 (
+    	qsqrt (max_sq_radius.x),
+	qsqrt (max_sq_radius.y),
+	qsqrt (max_sq_radius.z)));
+
     }
   }
 }
