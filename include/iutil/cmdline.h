@@ -24,6 +24,7 @@
 /**\addtogroup util
  * @{ */
 #include "csutil/scf.h"
+#include "csutil/csstring.h"
 
 SCF_VERSION (iCommandLineParser, 0, 0, 2);
 
@@ -73,18 +74,18 @@ struct iCommandLineParser : public iBase
    * GetAppDir(); however, on MacOS/X, it is the "Resources" directory within
    * the Cocoa application wrapper.
    */
-  virtual const char* GetResourceDir () = 0;
+  virtual const csString& GetResourceDir () = 0;
 
   /**
    * Returns the directory in which the application executable resides; or the
    * directory in which the Cocoa application wrapper resides on MacOS/X.
    */
-  virtual const char* GetAppDir () = 0;
+  virtual const csString& GetAppDir () = 0;
 
   /**
    * Returns the full path to the application executable.
    */
-  virtual const char* GetAppPath () = 0;
+  virtual const csString& GetAppPath () = 0;
 };
 
 /** @} */

@@ -1523,9 +1523,7 @@ bool csVFS::Initialize (iObjectRegistry *object_reg)
 {
   csVFS::object_reg = object_reg;
 
-  char* confpath = csGetConfigPath();
-  basedir = alloc_normalized_path(confpath);
-  delete[] confpath;
+  basedir = alloc_normalized_path(csGetConfigPath());
 
   csRef<iCommandLineParser> cmdline =
     CS_QUERY_REGISTRY (object_reg, iCommandLineParser);

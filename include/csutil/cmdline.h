@@ -59,11 +59,11 @@ private:
   csCommandLineOption *FindOption (const char *iName, int iIndex) const;
 
   /// Directory of application resources.
-  char* resDir;
+  csString resDir;
   /// Directory of application executable.
-  char* appDir;
+  csString appDir;
   /// Full path of application executable.
-  char* appPath;
+  csString appPath;
 public:
   SCF_DECLARE_IBASE;
 
@@ -108,18 +108,18 @@ public:
    * GetAppDir(); however, on MacOS/X, it is the "Resources" directory within
    * the Cocoa application wrapper.
    */
-  virtual const char* GetResourceDir ();
+  virtual const csString& GetResourceDir ();
 
   /**
    * Returns the directory in which the application executable resides; or the
    * directory in which the Cocoa application wrapper resides on MacOS/X.
    */
-  virtual const char* GetAppDir ();
+  virtual const csString& GetAppDir ();
 
   /**
    * Returns the full path to the application executable.
    */
-  virtual const char* GetAppPath ();
+  virtual const csString& GetAppPath ();
 };
 
 #endif // __CS_CMDLINE_H__

@@ -21,6 +21,7 @@
 #define __CS_CSSYS_SYSPATH_H__
 
 #include "csutil/array.h"
+#include "csutil/csstring.h"
 #include "csutil/ref.h"
 #include "csutil/util.h"
 #include "iutil/stringarray.h"
@@ -50,9 +51,8 @@ csRef<iStringArray> csFindSystemRoots();
  * It has a limited use because mostly everything should be done
  * through VFS which is installation directory - independent; but
  * some initialization tasks still need this.
- * You're responsible to delete[] the string after using it.
  */
-char* csGetConfigPath ();
+csString csGetConfigPath ();
 
 /** 
  * Get a list of directories where plugins are installed.
@@ -80,7 +80,7 @@ char* csExpandPath (const char* path);
  *   many platforms, this is the only way to determine the actual location of
  *   the executable.
  */
-char* csGetAppPath (const char* argv0);
+csString csGetAppPath (const char* argv0);
 
 /**
  * Return the directory in which the application executable resides.  For
@@ -98,7 +98,7 @@ char* csGetAppPath (const char* argv0);
  *   many platforms, this is the only way to determine the actual location of
  *   the executable.
  */
-char* csGetAppDir (const char* argv0);
+csString csGetAppDir (const char* argv0);
 
 /**
  * Return the directory in which the application's resources reside.  On
@@ -116,7 +116,7 @@ char* csGetAppDir (const char* argv0);
  *   many platforms, this is the only way to determine the actual location of
  *   the resources.
  */
-char* csGetResourceDir (const char* argv0);
+csString csGetResourceDir (const char* argv0);
 
 /**
  * Check whether two native paths actually point to the same location.

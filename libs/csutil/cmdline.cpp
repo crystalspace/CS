@@ -27,9 +27,6 @@ SCF_IMPLEMENT_IBASE_END
 csCommandLineParser::csCommandLineParser (iBase *Parent) : Names (16, 16)
 {
   SCF_CONSTRUCT_IBASE (Parent);
-  resDir = 0;
-  appDir = 0;
-  appPath = 0;
 }
 
 csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
@@ -41,9 +38,6 @@ csCommandLineParser::csCommandLineParser (int argc, const char* const argv[]) :
 
 csCommandLineParser::~csCommandLineParser()
 {
-  delete[] resDir;
-  delete[] appDir;
-  delete[] appPath;
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -183,17 +177,17 @@ bool csCommandLineParser::GetBoolOption(const char *iName, bool defaultValue)
   return result;
 }
 
-const char* csCommandLineParser::GetResourceDir ()
+const csString& csCommandLineParser::GetResourceDir ()
 {
   return resDir;
 }
 
-const char* csCommandLineParser::GetAppDir ()
+const csString& csCommandLineParser::GetAppDir ()
 {
   return appDir;
 }
 
-const char* csCommandLineParser::GetAppPath ()
+const csString& csCommandLineParser::GetAppPath ()
 {
   return appPath;
 }

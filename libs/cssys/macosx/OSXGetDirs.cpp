@@ -44,8 +44,8 @@
 bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
 {
   bool ok = false;
-  char* apppath = csGetAppPath(argv0);
-  if (apppath != 0)
+  char* apppath = csStrNew(csGetAppPath(argv0));
+  if ((const char*) apppath != 0)
   {
     char* slash = strrchr(apppath, PATH_SEPARATOR);
     CS_ASSERT( slash != 0 );
@@ -83,15 +83,16 @@ bool app_info(char const* argv0, csString& dir, csString& name, bool& is_gui)
 //	within a wrapper, we just return the directory containing the
 //	executable.
 //-----------------------------------------------------------------------------
-char* csGetAppDir (const char* argv0)
+csString csGetAppDir (const char* argv0)
 {
   csString dir;
   csString name;
   bool is_gui;
   char* appdir = 0;
-  if (app_info(argv0, dir, name, is_gui))
-    appdir = csStrNew(dir);
-  return appdir;
+  if (!app_info(argv0, dir, name, is_gui))
+    return 0;
+  
+  return dir;
 }
 
 
@@ -106,17 +107,16 @@ char* csGetAppDir (const char* argv0)
 //	the executable, which happens to be the default behavior for
 //	non-MacOS/X platforms.
 //-----------------------------------------------------------------------------
-char* csGetResourceDir (const char* argv0)
+csString csGetResourceDir (const char* argv0)
 {
   csString dir;
   csString name;
   bool is_gui;
   char* resdir = 0;
-  if (app_info(argv0, dir, name, is_gui))
-  {
-    if (is_gui)
-      dir << PATH_SEPARATOR << name << OSX_RESOURCES_GRIST;
-    resdir = csStrNew(dir);
-  }
-  return resdir;
+  if (!app_info(argv0, dir, name, is_gui))
+    return 0;
+  
+  if (is_gui)
+    dir << PATH_SEPARATOR << name << OSX_RESOURCES_GRIST;
+  return dir;
 }

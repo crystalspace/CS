@@ -26,26 +26,24 @@
 #include <unistd.h>
 #include <limits.h>
 
-char* csGetAppPath (const char* argv0)
+csString csGetAppPath (const char* argv0)
 {
   if (argv0 == 0 || *argv0 == '\0')
-    return 0;
-
-  char* fullPath = 0;
+    return (const char*) 0;
 
   if (*argv0 == PATH_SEPARATOR)	// Absolute path; tells exact location of app.
   {
-    fullPath = csStrNew (argv0);
+    return argv0;  
   } 
   else if (strchr (argv0, PATH_SEPARATOR) != 0) // Relative path containing / ?
   {
     char dir[CS_MAXPATHLEN];		// Yes, getcwd()+relpath gives location
-    if (getcwd(dir, sizeof(dir)) != 0)	// of app.
-    {
-      csString path(dir);
-      path << PATH_SEPARATOR << argv0;
-      fullPath = csStrNew(path);
-    }
+    if (getcwd(dir, sizeof(dir)) == 0)	// of app.
+      return (const char*) 0;
+
+    csString path(dir);
+    path << PATH_SEPARATOR << argv0;
+    return path;
   }
   else 
   {
@@ -65,14 +63,12 @@ char* csGetAppPath (const char* argv0)
       apppath << currentPart << PATH_SEPARATOR << argv0;
       if (access (apppath, F_OK) == 0)
       {
-	fullPath = csStrNew(apppath);
-	break;
+        delete[] envPATH;
+        return apppath;
       }
     }
     while (nextPart != 0);
-
-    delete[] envPATH;
   }
-
-  return fullPath;
+  
+  return (const char*) 0;
 }

@@ -172,14 +172,14 @@ struct _CfgPath {
 
 CS_IMPLEMENT_STATIC_VAR (getCachedCfgPath, _CfgPath, ())
 
-char* csGetConfigPath ()
+csString csGetConfigPath ()
 {
   _CfgPath *cachedCfgPath = getCachedCfgPath();
   if (cachedCfgPath->path == 0)
   {
     cachedCfgPath->path = FindConfigPath();
   }
-  return csStrNew (cachedCfgPath->path);
+  return cachedCfgPath->path;
 }
 
 

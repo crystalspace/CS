@@ -33,92 +33,82 @@
 
 // These defines should be set by the configure script
 #ifndef CS_CONFIGDIR
+#ifdef COMP_GCC
+#warning CS_CONFIGDIR not set
+#endif
 #define CS_CONFIGDIR "/usr/local/crystal"
 #endif
 #ifndef CS_PLUGINDIR
+#ifdef COMP_GCC
+#warning CS_PLUGINDIR not set
+#endif
 #define CS_PLUGINDIR "/usr/local/crystal/lib"
 #endif
 
-char* csGetConfigPath ()
+csString csGetConfigPath ()
 {
+  const char* crystalconfig = getenv("CRYSTAL_CONFIG");
+  if(crystalconfig) {
+    return crystalconfig;
+  }
+  
   const char* crystal = getenv ("CRYSTAL");
-  char* path;
-
-  if (!crystal)
-  {
-    // no setting, use the default.
-    // is the current dir a possible install? try opening vfs.cfg,
-    if (!access ("vfs.cfg", F_OK))
-    {
-      return csStrNew (".");
+  if(crystal) {
+    csString path = crystal;
+    csString file;
+    path += "/etc/crystal";
+    
+    file = path;
+    file += "/vfs.cfg";
+    if(!access(file, F_OK)) {
+      return path;
     }
 
-    // XXX: This shouldn't be here and can be removed as soon as the new
-    // system works...
-#if 1
-    // debian install place
-    if (!access ("/usr/lib/crystalspace/vfs.cfg", F_OK))
-    {
-      return csStrNew ("/usr/lib/crystalspace/");
+    path = crystal;
+    file = path;
+    file += "/vfs.cfg";
+    if(!access(file, F_OK)) {
+      return path;
     }
-#endif
 
-    // default install place
-    return csStrNew(CS_CONFIGDIR);
+    fprintf (stderr,
+        "Couldn't find vfs.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
+    return (const char*) 0;
   }
 
-  // check for $CRYSTAL/etc
-  path = new char[320];
-  strncpy (path, crystal, 300);
-  strcat (path, "/etc/vfs.cfg");
-  if (!access (path, F_OK))
+  // no setting, use the default.
+  // is the current dir a possible install? try opening vfs.cfg,
+  if (!access ("vfs.cfg", F_OK))
   {
-    strncpy (path, crystal, 300);
-    strcat (path, "/etc");
-    return path;
+    return ".";
   }
 
-  // check for $CRYSTAL
-  strncpy (path, crystal, 300);
-  strcat (path, "/vfs.cfg");
-  if (!access (path, F_OK))
-  {
-    strncpy (path, crystal, 320);
-    return path;
-  }
-
-  fprintf (stderr,
-      "Couldn't find vfs.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
-
-  delete[] path;
-  return 0;
+  // default install place
+  return CS_CONFIGDIR;
 }
 
 csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;
 
-  char* appPath = csGetAppDir (argv0);
-  char* resPath = csGetResourceDir (argv0);
-  
-  if (resPath != 0)
-    paths->AddOnce (resPath, DO_SCAN_RECURSION, "app");
-  if (appPath != 0)
-    paths->AddOnce (appPath, DO_SCAN_RECURSION, "app");
-
-  delete[] appPath;
-  delete[] resPath;
+  paths->AddOnce(csGetResourceDir(argv0), false, "app");
+  paths->AddOnce(csGetAppDir(argv0), false, "app");
 
   const char* crystal = getenv ("CRYSTAL");
-  if (!crystal)
-    paths->AddOnce (CS_PLUGINDIR, DO_SCAN_RECURSION, "plugins");
-  else 
-  {
-    paths->AddOnce (crystal, false, "crystal");
-    char* temp = new char[1024];
-    strncpy (temp, crystal, 1000);
-    strcat (temp, "/lib");
-    paths->AddOnce (temp, DO_SCAN_RECURSION, "crystal");
+  if(crystal) {
+    csString path = crystal;
+    path += "/lib/crystal";
+    paths->AddOnce(path, false, "plugins");
   }
+  const char* crystal_plugin = getenv("CRYSTAL_PLUGIN");
+  if(crystal_plugin) {
+    paths->AddOnce(crystal_plugin, false, "plugins");
+  }
+
+  if(!crystal && !crystal_plugin) {
+    paths->AddOnce(CS_PLUGINDIR, false, "plugins");
+  }
+    
   return paths;
 }
+

@@ -75,9 +75,8 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   InitPytocs();
 
   char path[256];
-  char* temp = csGetConfigPath ();
+  csString temp = csGetConfigPath();
   strncpy (path, temp, 256);
-  delete[] temp;
   strcat (path, "/");
 
   if (!LoadModule ("sys")) return false;

@@ -22,17 +22,13 @@
 #include "csutil/util.h"
 #include <string.h>
 
-char* csGetAppDir (const char* argv0)
+csString csGetAppDir (const char* argv0)
 {
-  char* appdir = 0;
-  char* apppath = csGetAppPath(argv0);
-  if (apppath != 0)
-  {
-    char* slash = strrchr (apppath, PATH_SEPARATOR);
-    if (slash != 0)
-      *slash = '\0';
-    appdir = csStrNew (apppath);
-    delete[] apppath;
+  csString apppath = csGetAppPath(argv0);
+  size_t lastslash = apppath.FindLast(PATH_SEPARATOR);
+  if(lastslash != (size_t) -1) {
+    return apppath.Slice(0, lastslash);
   }
-  return appdir;
+
+  return apppath;
 }

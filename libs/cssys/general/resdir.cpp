@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "cssys/syspath.h"
 
-char* csGetResourceDir (const char* argv0)
+csString csGetResourceDir (const char* argv0)
 {
   return csGetAppDir(argv0);
 }

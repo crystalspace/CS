@@ -30,32 +30,8 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;
 
-  char* appPath = csGetAppDir (argv0);
-  char* resPath = csGetResourceDir (argv0);
-  char* configPath = csGetConfigPath ();
-  
-  // Don't add "/" since it won't work on Windows.
-  if (resPath && *resPath && (resPath[1] != 0 || *resPath != PATH_SEPARATOR))
-    paths->AddOnce (resPath, DO_SCAN_RECURSION, "app");
-  if (appPath && *appPath && (appPath[1] != 0 || *appPath != PATH_SEPARATOR))
-    paths->AddOnce (appPath, DO_SCAN_RECURSION, "app");
-
-  if (configPath)
-  {
-    csString tmp;
-    tmp << configPath << PATH_SEPARATOR << "lib";
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
-
-    tmp.Clear();
-    tmp << configPath << PATH_SEPARATOR << "crystal";
-    paths->AddOnce (tmp, DO_SCAN_RECURSION, "crystal");
-
-    paths->AddOnce (configPath, false, "crystal");
-  }
-    
-  delete[] configPath;
-  delete[] appPath;
-  delete[] resPath;
+  paths->AddOnce(csGetAppDir(argv0), false, "app");
+  paths->AddOnce(csGetResourceDir(argv0), false, "app");
 
   return paths;
 }
