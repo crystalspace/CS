@@ -32,54 +32,6 @@
 //
 // ddgUtil:
 //
-//  See if we are running on a Pentium III.
-//
-
-bool ddgUtil::DetectSIMD(void)
-{
-
-#ifdef WIN32
-bool found_simd;
-_asm
-
-{
-pushfd
-pop eax // get EFLAGS into eax
-mov ebx,eax // keep a copy
-xor eax,0x200000 
-// toggle CPUID bit
-
-push eax
-popfd // set new EFLAGS
-pushfd
-pop eax // EFLAGS back into eax
-
-xor eax,ebx 
-// have we changed the ID bit?
-
-je NO_SIMD 
-// No, no CPUID instruction
-
-// we could toggle the 
-// ID bit so CPUID is present
-mov eax,1
-
-cpuid // get processor features
-test edx,1<<25 // check the SIMD bit
-jz NO_SIMD
-mov found_simd,1 
-jmp DONE
-NO_SIMD:
-mov found_simd,0
-DONE:
-}
-
-return found_simd;
-#else
-return false;
-#endif
-
-}
 
 // ----------------------------------------------------------------------
 float ddgAngle::_cosTable[180*ddgAngle_res];

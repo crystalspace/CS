@@ -129,58 +129,6 @@ public:
 	/// The min of two float values.
 	inline static float abs( float v1)
 	{ return v1 > 0 ? v1:-v1; }
-	/// Detect if we have SIMD instructions.
-	static bool DetectSIMD(void);
-
-};
-
-
-
-/// A generic node class which can be maintained by a List.
-class WEXP ddgListNode
-{
-    /// Next node in the list.
-    ddgListNode* _next;
-public:
-    /// Construct a node.
-    inline ddgListNode() { _next = 0; }
-    /// return the next node.
-    inline ddgListNode* next( ddgListNode* t = 0 )
-	{
-		return (t? _next = t : _next); 
-	}
-};
-
-/// A generic list class which maintains a list of ListNodes.
-class WEXP ddgList
-{
-    /// Number of nodes in the list.
-    unsigned int _no;
-    /// The head of the list.
-    ddgListNode*  _head;
-public:
-    /// Constructor for an empty list.
-    ddgList() { _no = 0; _head = 0; }
-    /// Add a listnode to the list.
-    inline void add( ddgListNode* t) { t->next(_head); _head = t; _no++; }
-    /// Remove a specified list node from the list.
-    inline void remove( ddgListNode* t) {
-		ddgListNode *c = _head, *p = 0;
-		while(c)
-		{
-			if (t == c) 
-			{
-				_no--;
-				if (p) p->next(t->next());
-				if (p==_head) _head = t->next(); c=0;
-			}
-			else { p = c; c = c->next(); }
-        }
-    }
-    /// Return the size of the list.
-    inline unsigned int size() { return _no; }
-    /// Return the head of the list.
-    inline ddgListNode* head( ddgListNode *h = 0) { return (h? _head = h: _head); }
 };
 
 #endif
