@@ -1021,19 +1021,6 @@ public:
   void InitializeDefault ();
 
   /**
-   * This function will try to read the lightmap from the
-   * cache in the level archive.
-   */
-  bool ReadFromCache (iCacheManager* cache_mgr, int id);
-
-  /**
-   * Call after calling InitializeDefault() and CalculateLighting to cache
-   * the calculated lightmap to the level archive. This function does
-   * nothing if the cached lightmap was already up-to-date.
-   */
-  bool WriteToCache (iCacheManager* cache_mgr, int id);
-
-  /**
    * This function will try to read the lightmap from the given file.
    */
   bool ReadFromCache (iFile* file);

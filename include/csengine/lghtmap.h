@@ -211,20 +211,6 @@ public:
   void DelShadowMap (csShadowMap* plm);
 
   /**
-   * Read from the cache. Return true if succesful.
-   * 'id' is a global id that is used to identify objects.
-   */
-  bool ReadFromCache (iCacheManager* cache_mgr, int id, int w, int h,
-    csObject* obj, bool isPolygon, csEngine*);
-
-  /**
-   * Cache the lightmaps in the precalculation area.
-   * 'id' is a global id that is used to identify objects.
-   */
-  void Cache (iCacheManager* cache_mgr, int id, csPolygon3D* poly,
-  	csCurve* curve, csEngine*);
-
-  /**
    * Read lightmap from a file. Return true if succesful.
    */
   bool ReadFromCache (iFile* file, int w, int h,

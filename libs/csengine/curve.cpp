@@ -579,50 +579,6 @@ void csCurve::InitializeDefaultLighting ()
   LightmapUpToDate = false;
 }
 
-bool csCurve::ReadFromCache (iCacheManager* cache_mgr, int id)
-{
-  if (!IsLightable ()) return true;
-  LightMap = new csLightMap ();
-
-  // Allocate space for the LightMap and initialize it to ambient color.
-  int r, g, b;
-  r = csLight::ambient_red;
-  g = csLight::ambient_green;
-  b = csLight::ambient_blue;
-  LightMap->Alloc (
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
-      r,
-      g,
-      b);
-
-  LightMap->ReadFromCache (
-      cache_mgr,
-      id,
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
-      CURVE_LM_SIZE * csLightMap::lightcell_size,
-      this,
-      false,
-      csEngine::current_engine);
-  LightmapUpToDate = true;
-  return true;
-}
-
-bool csCurve::WriteToCache (iCacheManager* cache_mgr, int id)
-{
-  if (!LightMap) return true;
-  if (!LightmapUpToDate)
-  {
-    LightmapUpToDate = true;
-    if (
-      csEngine::current_engine->GetLightingCacheMode ()
-        & CS_ENGINE_CACHE_WRITE)
-      LightMap->Cache (cache_mgr, id, NULL, this, csEngine::current_engine);
-  }
-
-  return true;
-}
-
 bool csCurve::ReadFromCache (iFile* file)
 {
   if (!IsLightable ()) return true;
