@@ -214,12 +214,17 @@ AC_DEFUN([CS_CHECK_BUILD],
 #	set to the composite value of $cs_build_cflags, $cs_build_lflags, and
 #	$cs_build_libs of the FLAGS element which succeeded (not including the
 #	"other" flags) and ACTION-IF-RECOGNIZED is invoked.  If no options are
-#	recognized, then CACHE-VAR is set to "no", and ACTION-IF-NOT-RECOGNIZED
-#	is invoked.
+#	recognized, then CACHE-VAR is set to the empty string, and
+#	ACTION-IF-NOT-RECOGNIZED is invoked. As a convenience, in case
+#	comparing CACHE-VAR against the empty string to test for failure is
+#	undesirable, a second variable named CACHE-VAR_ok is set to the literal
+#	"no" upon failure, and to the same value as CACHE-VAR upon success.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_BUILD_FLAGS],
-    [AC_CACHE_CHECK([$1], [$2],
+    [AC_CACHE_CHECK([$1], [$2_ok],
 	[CS_BUILD_IFELSE([], [$3], [$4],
-	    [$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])],
-	    [$2=no], [$7], [$8], [$9], [Y], [$10])])
-    AS_IF([test "$$2" != no], [$5], [$6])])
+	    [$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])
+	    $2_ok="$$2"],
+	    [$2=''
+	    $2_ok=no], [$7], [$8], [$9], [Y], [$10])])
+    AS_IF([test "$$2_ok" != no], [$5], [$6])])

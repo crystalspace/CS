@@ -868,161 +868,120 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-cpu-specific-optimizations=level
                           enable CPU-specific optimizations; recognized levels
-                          are `no',
- `minimum' or `min', `maximum' or `max'
-                          (default MINIMUM); the `minimum'
- option selects
+                          are `no', `minimum' or `min', `maximum' or `max'
+                          (default MINIMUM); the `minimum' option selects
                           optimizations which are likely to be supported by
                           reasonably modern hardware, thus making the
-                          resulting executables
- fairly portable; use the
-                          `maximum' option with caution since code for
- one
+                          resulting executables fairly portable; use the
+                          `maximum' option with caution since code for one
                           processor will not work with earlier processors (for
-                          example, Intel
- 686-specific code will not work with
+                          example, Intel 686-specific code will not work with
                           a 586)
   --enable-meta-info-embedding
                           store plugin meta-information directly inside plugin
-                          modules if
- supported by platform; if disabled,
-                          meta-information is stored in
- stand-alone .csplugin
-                          files; this is enabled by default for
- non-Unix
+                          modules if supported by platform; if disabled,
+                          meta-information is stored in stand-alone .csplugin
+                          files; this is enabled by default for non-Unix
                           platforms, and disabled by default for Unix
-                          platforms
- since the Unix implementation requires
-                          the GPL-licensed libbfd
- library; enable this option
-                          on Unix only if you are certain you
- want a
-                          GPL-licensed library infecting your project
-  --enable-optimize       build with optimizations enabled (default YES);
-                          same as --enable-mode=optimize
-  --enable-debug          build with debugging information (default NO);
- same
+                          platforms since the Unix implementation requires the
+                          GPL-licensed libbfd library; enable this option on
+                          Unix only if you are certain you want a GPL-licensed
+                          library infecting your project
+  --enable-optimize       build with optimizations enabled (default YES); same
+                          as --enable-mode=optimize
+  --enable-debug          build with debugging information (default NO); same
                           as --enable-mode=debug
-  --enable-profile        build with profiling information (default NO);
- same
+  --enable-profile        build with profiling information (default NO); same
                           as --enable-mode=profile
   --enable-mode=mode      set build mode; recognized modes are `optimize',
-                          `debug', `profile'
- (default OPTIMIZE)
+                          `debug', `profile' (default OPTIMIZE)
   --enable-extensive-memory-debugger
                           enable the extensive memory debugger which catches
-                          common memory
- management mistakes (default NO)
+                          common memory management mistakes (default NO)
   --enable-memory-tracker enable the memory tracker which checks memory usage
-                          per
- source file (default NO)
+                          per source file (default NO)
   --enable-leak-guard     enable the leak guard protection which warns about
-                          objects not freed
- at program exit (default NO)
+                          objects not freed at program exit (default NO)
   --enable-shared         enable creation of shared libraries
                           (_EXPERIMENTAL_!) (default NO)
   --enable-make-emulation enable emulation layer allowing project to be built
-                          with `make', in
- addition to `jam' (default YES)
+                          with `make', in addition to `jam' (default YES)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-perl             use Perl5 scripting interface (default NO)
-  --without-python        do not use
- Python scripting interface
+  --without-python        do not use Python scripting interface
   --with-java             use Java scripting interface (default YES)
   --with-x                use the X Window System
   --with-libXxf86vm=dir   specify location of libXxf86vm if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libXaw=dir       specify location of libXaw if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-mesa             use Mesa OpenGL library if available (default YES)
   --with-libz=dir         specify location of libz if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libpng=dir       specify location of libpng if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libjpeg=dir      specify location of libjpeg if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-liblcms=dir      specify location of liblcms if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libmng=dir       specify location of libmng if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libmikmod=dir    specify location of libmikmod if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libogg=dir       specify location of libogg if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libvorbis=dir    specify location of libvorbis if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libvorbisfile=dir
                           specify location of libvorbisfile if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-lib3ds=dir       specify location of lib3ds if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libode=dir       specify location of libode if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libfreetype2=dir specify location of libfreetype2 if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libcal3d=dir     specify location of libcal3d if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libsdl=dir       specify location of libsdl if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-vos=dir          specify location of VOS pkg-config files
   --with-libCg=dir        specify location of libCg if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libCgGL=dir      specify location of libCgGL if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libasound=dir    specify location of libasound if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libaa=dir        specify location of libaa if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libcppunit=dir   specify location of libcppunit if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
   --with-libbfd=dir       specify location of libbfd if not detected
-                          automatically; searches
- dir/include, dir/lib, and
+                          automatically; searches dir/include, dir/lib, and
                           dir
 
 Some influential environment variables:
@@ -7979,7 +7938,7 @@ fi
 
     echo "$as_me:$LINENO: checking how to suppress 'long double' warnings" >&5
 echo $ECHO_N "checking how to suppress 'long double' warnings... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_ignore_long_double+set}" = set; then
+if test "${cs_cv_prog_cxx_ignore_long_double_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -8120,18 +8079,15 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_long_double=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_ignore_long_double_ok="$cs_cv_prog_cxx_ignore_long_double"
 else
-  cs_cv_prog_cxx_ignore_long_double=no
+  cs_cv_prog_cxx_ignore_long_double=''
+	    cs_cv_prog_cxx_ignore_long_double_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_ignore_long_double" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_ignore_long_double" >&6
-    if test "$cs_cv_prog_cxx_ignore_long_double" != no; then
-  cs_prog_cxx_ignore_long_double="$cs_cv_prog_cxx_ignore_long_double"
-else
-  cs_prog_cxx_ignore_long_double=''
-fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_ignore_long_double_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_ignore_long_double_ok" >&6
 
 
 
@@ -8226,7 +8182,7 @@ else
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); } | tr '\\\\' '/' | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	    cs_cv_pybase_cflags="$cs_cv_pybase_cflags \
-		$cs_prog_cxx_ignore_long_double"
+		$cs_cv_prog_cxx_ignore_long_double"
 
 	    # Depending upon platform and installation, link library might
 	    # reside in "${prefix}/lib", "get_python_lib()/config", or
@@ -9258,13 +9214,12 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check how to enable compilation warnings.  Note that on some platforms, it is
-# more appropriate to use -Wmost rather than -Wall even if the compiler
-# understands both, thus we attempt -Wmost before -Wall.
+# Check how to enable and disable compilation warnings, and how to promote
+# diagnostics from warning to error status.
 #------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking how to enable compilation warnings" >&5
-echo $ECHO_N "checking how to enable compilation warnings... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_enable_warnings+set}" = set; then
+echo "$as_me:$LINENO: checking how to enable C++ compilation warnings" >&5
+echo $ECHO_N "checking how to enable C++ compilation warnings... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_enable_warnings_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -9405,14 +9360,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_warnings=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_enable_warnings_ok="$cs_cv_prog_cxx_enable_warnings"
 else
-  cs_cv_prog_cxx_enable_warnings=no
+  cs_cv_prog_cxx_enable_warnings=''
+	    cs_cv_prog_cxx_enable_warnings_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_warnings" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_enable_warnings" >&6
-    if test "$cs_cv_prog_cxx_enable_warnings" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_warnings_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_enable_warnings_ok" >&6
+    if test "$cs_cv_prog_cxx_enable_warnings_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_enable_warnings"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -9420,20 +9377,12 @@ echo "${ECHO_T}$cs_cv_prog_cxx_enable_warnings" >&6
 "
 fi
 
-	    cs_prog_cxx_enable_warnings="$cs_cv_prog_cxx_enable_warnings"
-else
-  cs_prog_cxx_enable_warnings=''
 fi
 
 
-
-
-#------------------------------------------------------------------------------
-# Check how to make compiler treat warnings as errors.
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking how to treat warnings as errors" >&5
-echo $ECHO_N "checking how to treat warnings as errors... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_enable_errors+set}" = set; then
+echo "$as_me:$LINENO: checking how to treat C++ warnings as errors" >&5
+echo $ECHO_N "checking how to treat C++ warnings as errors... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_enable_errors_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -9574,30 +9523,20 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_errors=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_enable_errors_ok="$cs_cv_prog_cxx_enable_errors"
 else
-  cs_cv_prog_cxx_enable_errors=no
+  cs_cv_prog_cxx_enable_errors=''
+	    cs_cv_prog_cxx_enable_errors_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_errors" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_enable_errors" >&6
-    if test "$cs_cv_prog_cxx_enable_errors" != no; then
-  cs_prog_cxx_enable_errors="$cs_cv_prog_cxx_enable_errors"
-else
-  cs_prog_cxx_enable_errors=''
-fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_errors_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_enable_errors_ok" >&6
 
 
-
-
-#------------------------------------------------------------------------------
-# Check how to make compiler ignore unused variables and arguments.  This is
-# needed for code generated by tools, such as Swig, Bison, and Flex, over which
-# we have no control.
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking how to ignore unused variables" >&5
-echo $ECHO_N "checking how to ignore unused variables... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_ignore_unused_variables+set}" = set; then
+echo "$as_me:$LINENO: checking how to suppress C++ unused variable warnings" >&5
+echo $ECHO_N "checking how to suppress C++ unused variable warnings... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_ignore_unused_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -9737,36 +9676,30 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_ignore_unused_variables=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_ignore_unused=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_ignore_unused_ok="$cs_cv_prog_cxx_ignore_unused"
 else
-  cs_cv_prog_cxx_ignore_unused_variables=no
+  cs_cv_prog_cxx_ignore_unused=''
+	    cs_cv_prog_cxx_ignore_unused_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_ignore_unused_variables" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_ignore_unused_variables" >&6
-    if test "$cs_cv_prog_cxx_ignore_unused_variables" != no; then
-  cs_build_prop_val="$cs_cv_prog_cxx_ignore_unused_variables"
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_ignore_unused_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_ignore_unused_ok" >&6
+    if test "$cs_cv_prog_cxx_ignore_unused_ok" != no; then
+  cs_build_prop_val="$cs_cv_prog_cxx_ignore_unused"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.WARNING.NO_UNUSED ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-
 fi
 
 
-
-
-#------------------------------------------------------------------------------
-# Check how to make compiler ignore uninitialized variables and arguments.
-# This is needed for code generated by tools, such as Swig, Bison, and Flex,
-# over which we have no control.
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking how to ignore uninitialized variables" >&5
-echo $ECHO_N "checking how to ignore uninitialized variables... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_ignore_uninitialized_variables+set}" = set; then
+echo "$as_me:$LINENO: checking how to suppress C++ uninitialized warnings" >&5
+echo $ECHO_N "checking how to suppress C++ uninitialized warnings... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_ignore_uninitialized_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -9906,35 +9839,30 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_ignore_uninitialized_variables=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cxx_ignore_uninitialized=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_ignore_uninitialized_ok="$cs_cv_prog_cxx_ignore_uninitialized"
 else
-  cs_cv_prog_cxx_ignore_uninitialized_variables=no
+  cs_cv_prog_cxx_ignore_uninitialized=''
+	    cs_cv_prog_cxx_ignore_uninitialized_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_ignore_uninitialized_variables" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_ignore_uninitialized_variables" >&6
-    if test "$cs_cv_prog_cxx_ignore_uninitialized_variables" != no; then
-  cs_build_prop_val="$cs_cv_prog_cxx_ignore_uninitialized_variables"
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_ignore_uninitialized_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_ignore_uninitialized_ok" >&6
+    if test "$cs_cv_prog_cxx_ignore_uninitialized_ok" != no; then
+  cs_build_prop_val="$cs_cv_prog_cxx_ignore_uninitialized"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED ?= \"$cs_build_prop_val\" ;
 "
 fi
 
-
 fi
 
 
-
-
-#------------------------------------------------------------------------------
-# Check if warnings about unknown #pragmas can be disabled.  (MSVC and Borland
-# use a number of pragmas not understood by GCC, for instance.)
-#------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking how to ignore unknown #pragma directives" >&5
-echo $ECHO_N "checking how to ignore unknown #pragma directives... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_ignore_unknown_pragmas+set}" = set; then
+echo "$as_me:$LINENO: checking how to suppress C++ unknown #pragma warnings" >&5
+echo $ECHO_N "checking how to suppress C++ unknown #pragma warnings... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_ignore_unknown_pragmas_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -10075,21 +10003,22 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_ignore_unknown_pragmas=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_ignore_unknown_pragmas_ok="$cs_cv_prog_cxx_ignore_unknown_pragmas"
 else
-  cs_cv_prog_cxx_ignore_unknown_pragmas=no
+  cs_cv_prog_cxx_ignore_unknown_pragmas=''
+	    cs_cv_prog_cxx_ignore_unknown_pragmas_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_ignore_unknown_pragmas" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_ignore_unknown_pragmas" >&6
-    if test "$cs_cv_prog_cxx_ignore_unknown_pragmas" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_ignore_unknown_pragmas_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_ignore_unknown_pragmas_ok" >&6
+    if test "$cs_cv_prog_cxx_ignore_unknown_pragmas_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_ignore_unknown_pragmas"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
-
 
 fi
 
@@ -10101,7 +10030,7 @@ fi
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking how to enable C++ exceptions" >&5
 echo $ECHO_N "checking how to enable C++ exceptions... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_enable_exceptions+set}" = set; then
+if test "${cs_cv_prog_cxx_enable_exceptions_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -10242,14 +10171,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_exceptions=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_enable_exceptions_ok="$cs_cv_prog_cxx_enable_exceptions"
 else
-  cs_cv_prog_cxx_enable_exceptions=no
+  cs_cv_prog_cxx_enable_exceptions=''
+	    cs_cv_prog_cxx_enable_exceptions_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_exceptions" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_enable_exceptions" >&6
-    if test "$cs_cv_prog_cxx_enable_exceptions" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_exceptions_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_enable_exceptions_ok" >&6
+    if test "$cs_cv_prog_cxx_enable_exceptions_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_enable_exceptions"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -10263,7 +10194,7 @@ fi
 
 echo "$as_me:$LINENO: checking how to disable C++ exceptions" >&5
 echo $ECHO_N "checking how to disable C++ exceptions... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_disable_exceptions+set}" = set; then
+if test "${cs_cv_prog_cxx_disable_exceptions_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -10404,14 +10335,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_disable_exceptions=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_disable_exceptions_ok="$cs_cv_prog_cxx_disable_exceptions"
 else
-  cs_cv_prog_cxx_disable_exceptions=no
+  cs_cv_prog_cxx_disable_exceptions=''
+	    cs_cv_prog_cxx_disable_exceptions_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_disable_exceptions" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_disable_exceptions" >&6
-    if test "$cs_cv_prog_cxx_disable_exceptions" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_disable_exceptions_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_disable_exceptions_ok" >&6
+    if test "$cs_cv_prog_cxx_disable_exceptions_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_disable_exceptions"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -10442,7 +10375,7 @@ fi
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking how to enforce C++ standards conformance" >&5
 echo $ECHO_N "checking how to enforce C++ standards conformance... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_enable_pedantic+set}" = set; then
+if test "${cs_cv_prog_cxx_enable_pedantic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -10583,14 +10516,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_enable_pedantic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_enable_pedantic_ok="$cs_cv_prog_cxx_enable_pedantic"
 else
-  cs_cv_prog_cxx_enable_pedantic=no
+  cs_cv_prog_cxx_enable_pedantic=''
+	    cs_cv_prog_cxx_enable_pedantic_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_pedantic" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_enable_pedantic" >&6
-    if test "$cs_cv_prog_cxx_enable_pedantic" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_enable_pedantic_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_enable_pedantic_ok" >&6
+    if test "$cs_cv_prog_cxx_enable_pedantic_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_enable_pedantic"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -10619,7 +10554,7 @@ fi
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking if -multiply_defined suppress is needed" >&5
 echo $ECHO_N "checking if -multiply_defined suppress is needed... $ECHO_C" >&6
-if test "${cs_cv_prog_link_suppress_multiple+set}" = set; then
+if test "${cs_cv_prog_link_suppress_multiple_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -10761,14 +10696,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_suppress_multiple=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_link_suppress_multiple_ok="$cs_cv_prog_link_suppress_multiple"
 else
-  cs_cv_prog_link_suppress_multiple=no
+  cs_cv_prog_link_suppress_multiple=''
+	    cs_cv_prog_link_suppress_multiple_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_link_suppress_multiple" >&5
-echo "${ECHO_T}$cs_cv_prog_link_suppress_multiple" >&6
-    if test "$cs_cv_prog_link_suppress_multiple" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_link_suppress_multiple_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_link_suppress_multiple_ok" >&6
+    if test "$cs_cv_prog_link_suppress_multiple_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_link_suppress_multiple"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -10793,7 +10730,7 @@ fi
 
 echo "$as_me:$LINENO: checking if -force_cpusubtype_ALL is needed" >&5
 echo $ECHO_N "checking if -force_cpusubtype_ALL is needed... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_force_cpusubtype_all+set}" = set; then
+if test "${cs_cv_prog_cxx_force_cpusubtype_all_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -10934,22 +10871,21 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_force_cpusubtype_all=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_force_cpusubtype_all_ok="$cs_cv_prog_cxx_force_cpusubtype_all"
 else
-  cs_cv_prog_cxx_force_cpusubtype_all=no
+  cs_cv_prog_cxx_force_cpusubtype_all=''
+	    cs_cv_prog_cxx_force_cpusubtype_all_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_force_cpusubtype_all" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_force_cpusubtype_all" >&6
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_force_cpusubtype_all_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_force_cpusubtype_all_ok" >&6
 
-if test $cs_cv_prog_cxx_force_cpusubtype_all != no; then
-  cs_build_prop_val="$cs_cv_prog_cxx_force_cpusubtype_all"
+cs_build_prop_val="$cs_cv_prog_cxx_force_cpusubtype_all"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS.MANDATORY += \"$cs_build_prop_val\" ;
 "
-fi
-
 fi
 
 
@@ -10969,7 +10905,7 @@ fi
 	darwin*)
 	    echo "$as_me:$LINENO: checking if -fno-common is needed" >&5
 echo $ECHO_N "checking if -fno-common is needed... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_no_common+set}" = set; then
+if test "${cs_cv_prog_cxx_no_common_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -11110,14 +11046,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_no_common=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_no_common_ok="$cs_cv_prog_cxx_no_common"
 else
-  cs_cv_prog_cxx_no_common=no
+  cs_cv_prog_cxx_no_common=''
+	    cs_cv_prog_cxx_no_common_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_no_common" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_no_common" >&6
-    if test "$cs_cv_prog_cxx_no_common" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_no_common_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_no_common_ok" >&6
+    if test "$cs_cv_prog_cxx_no_common_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_no_common"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -11147,7 +11085,7 @@ fi
 	mingw*|cygwin*)
 	    echo "$as_me:$LINENO: checking if -fvtable-thunks is needed" >&5
 echo $ECHO_N "checking if -fvtable-thunks is needed... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_vtable_thunks+set}" = set; then
+if test "${cs_cv_prog_cxx_vtable_thunks_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -11218,7 +11156,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_prog_cxx_enable_errors $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -11288,14 +11226,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_vtable_thunks=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_vtable_thunks_ok="$cs_cv_prog_cxx_vtable_thunks"
 else
-  cs_cv_prog_cxx_vtable_thunks=no
+  cs_cv_prog_cxx_vtable_thunks=''
+	    cs_cv_prog_cxx_vtable_thunks_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_vtable_thunks" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_vtable_thunks" >&6
-    if test "$cs_cv_prog_cxx_vtable_thunks" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_vtable_thunks_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_vtable_thunks_ok" >&6
+    if test "$cs_cv_prog_cxx_vtable_thunks_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_vtable_thunks"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -11315,7 +11255,7 @@ fi
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking if -pipe is accepted" >&5
 echo $ECHO_N "checking if -pipe is accepted... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_pipe+set}" = set; then
+if test "${cs_cv_prog_cxx_pipe_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -11456,14 +11396,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pipe=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_pipe_ok="$cs_cv_prog_cxx_pipe"
 else
-  cs_cv_prog_cxx_pipe=no
+  cs_cv_prog_cxx_pipe=''
+	    cs_cv_prog_cxx_pipe_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_pipe" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_pipe" >&6
-    if test "$cs_cv_prog_cxx_pipe" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_pipe_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_pipe_ok" >&6
+    if test "$cs_cv_prog_cxx_pipe_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_pipe"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -11480,16 +11422,15 @@ fi
 #------------------------------------------------------------------------------
 # Check if compiler/linker recognizes -shared directive which is needed for
 # linking plugin modules.  Unfortunately, the Apple compiler (and possibly
-# others) require extra effort.  Even though the compiler does not recognize
-# the -shared option, it nevertheless returns a "success" result after
-# complaining that the option is unrecognized.  Worse, even -Werror fails to
-# coerce the compiler into returning a "failure" result, so we must perform the
-# additional task of checking the compiler's output for an appropriate error
-# emission, such as "unrecognized option `-shared'".
+# others) requires extra effort.  Even though the compiler does not recognize
+# the -shared option, it nevertheless returns a "success" result after emitting
+# the warning "unrecognized option `-shared'".  Worse, even -Werror fails to
+# promote the warning to an error, so we must instead scan the compiler's
+# output for an appropriate diagnostic.
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking if -shared is accepted" >&5
 echo $ECHO_N "checking if -shared is accepted... $ECHO_C" >&6
-if test "${cs_cv_prog_link_shared+set}" = set; then
+if test "${cs_cv_prog_link_shared_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -11560,7 +11501,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_prog_cxx_enable_errors $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -11600,7 +11541,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  if { ac_try='grep "nrecognize" conftest.err >/dev/null 2>&1'
+  if { ac_try='grep "-shared" conftest.err >/dev/null 2>&1'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -11640,14 +11581,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_shared=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_link_shared_ok="$cs_cv_prog_link_shared"
 else
-  cs_cv_prog_link_shared=no
+  cs_cv_prog_link_shared=''
+	    cs_cv_prog_link_shared_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_link_shared" >&5
-echo "${ECHO_T}$cs_cv_prog_link_shared" >&6
-    if test "$cs_cv_prog_link_shared" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_link_shared_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_link_shared_ok" >&6
+    if test "$cs_cv_prog_link_shared_ok" != no; then
   cs_build_prop_val="-shared"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -11994,7 +11937,7 @@ fi
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking how to export all dynamic symbols" >&5
 echo $ECHO_N "checking how to export all dynamic symbols... $ECHO_C" >&6
-if test "${cs_cv_prog_link_export_dynamic+set}" = set; then
+if test "${cs_cv_prog_link_export_dynamic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -12135,14 +12078,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_link_export_dynamic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_link_export_dynamic_ok="$cs_cv_prog_link_export_dynamic"
 else
-  cs_cv_prog_link_export_dynamic=no
+  cs_cv_prog_link_export_dynamic=''
+	    cs_cv_prog_link_export_dynamic_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_link_export_dynamic" >&5
-echo "${ECHO_T}$cs_cv_prog_link_export_dynamic" >&6
-    if test "$cs_cv_prog_link_export_dynamic" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_link_export_dynamic_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_link_export_dynamic_ok" >&6
+    if test "$cs_cv_prog_link_export_dynamic_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_link_export_dynamic"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -12490,9 +12435,10 @@ fi
 # (PIC).  This feature is required by some platforms when building plugin
 # modules and shared libraries.
 #------------------------------------------------------------------------------
-echo "$as_me:$LINENO: checking if C++ compiler supports PIC generation" >&5
-echo $ECHO_N "checking if C++ compiler supports PIC generation... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_pic+set}" = set; then
+
+    echo "$as_me:$LINENO: checking how to enable C++ PIC generation" >&5
+echo $ECHO_N "checking how to enable C++ PIC generation... $ECHO_C" >&6
+if test "${cs_cv_prog_cxx_pic_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -12603,7 +12549,17 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
+  if { ac_try='grep "-fPIC" conftest.err >/dev/null 2>&1'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  cs_build_ok=no
+else
   cs_build_ok=yes
+fi
+
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
@@ -12617,7 +12573,7 @@ fi
 
     done
 
-
+     rm -f conftest.err
     CXXFLAGS=$cs_cflags_save
     LDFLAGS=$cs_lflags_save
     LIBS=$cs_libs_save
@@ -12633,14 +12589,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_pic=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_pic_ok="$cs_cv_prog_cxx_pic"
 else
-  cs_cv_prog_cxx_pic=no
+  cs_cv_prog_cxx_pic=''
+	    cs_cv_prog_cxx_pic_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_pic" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_pic" >&6
-    if test "$cs_cv_prog_cxx_pic" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_pic_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_pic_ok" >&6
+    if test "$cs_cv_prog_cxx_pic_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_pic"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -15440,7 +15398,7 @@ fi
 
     echo "$as_me:$LINENO: checking how to enable optimizations" >&5
 echo $ECHO_N "checking how to enable optimizations... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_optimize+set}" = set; then
+if test "${cs_cv_prog_cxx_optimize_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -15581,14 +15539,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_optimize=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_optimize_ok="$cs_cv_prog_cxx_optimize"
 else
-  cs_cv_prog_cxx_optimize=no
+  cs_cv_prog_cxx_optimize=''
+	    cs_cv_prog_cxx_optimize_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_optimize" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_optimize" >&6
-    if test "$cs_cv_prog_cxx_optimize" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_optimize_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_optimize_ok" >&6
+    if test "$cs_cv_prog_cxx_optimize_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_optimize"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -15602,7 +15562,7 @@ fi
 
     echo "$as_me:$LINENO: checking if $CXX recognizes -fomit-frame-pointer" >&5
 echo $ECHO_N "checking if $CXX recognizes -fomit-frame-pointer... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_omit_frame_pointer+set}" = set; then
+if test "${cs_cv_prog_cxx_omit_frame_pointer_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -15743,14 +15703,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_omit_frame_pointer=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_omit_frame_pointer_ok="$cs_cv_prog_cxx_omit_frame_pointer"
 else
-  cs_cv_prog_cxx_omit_frame_pointer=no
+  cs_cv_prog_cxx_omit_frame_pointer=''
+	    cs_cv_prog_cxx_omit_frame_pointer_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_omit_frame_pointer" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_omit_frame_pointer" >&6
-    if test "$cs_cv_prog_cxx_omit_frame_pointer" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_omit_frame_pointer_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_omit_frame_pointer_ok" >&6
+    if test "$cs_cv_prog_cxx_omit_frame_pointer_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_omit_frame_pointer"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -15765,7 +15727,7 @@ fi
 
     echo "$as_me:$LINENO: checking if $CXX recognizes -ffast-math" >&5
 echo $ECHO_N "checking if $CXX recognizes -ffast-math... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_fast_math+set}" = set; then
+if test "${cs_cv_prog_cxx_fast_math_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -15906,14 +15868,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_fast_math=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_fast_math_ok="$cs_cv_prog_cxx_fast_math"
 else
-  cs_cv_prog_cxx_fast_math=no
+  cs_cv_prog_cxx_fast_math=''
+	    cs_cv_prog_cxx_fast_math_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_fast_math" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_fast_math" >&6
-    if test "$cs_cv_prog_cxx_fast_math" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_fast_math_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_fast_math_ok" >&6
+    if test "$cs_cv_prog_cxx_fast_math_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_fast_math"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -15932,7 +15896,7 @@ fi
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking how to enable compiler debug output" >&5
 echo $ECHO_N "checking how to enable compiler debug output... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_debug+set}" = set; then
+if test "${cs_cv_prog_cxx_debug_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -16073,14 +16037,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_prog_cxx_debug=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cxx_debug_ok="$cs_cv_prog_cxx_debug"
 else
-  cs_cv_prog_cxx_debug=no
+  cs_cv_prog_cxx_debug=''
+	    cs_cv_prog_cxx_debug_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_debug" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_debug" >&6
-    if test "$cs_cv_prog_cxx_debug" != no; then
+echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_debug_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cxx_debug_ok" >&6
+    if test "$cs_cv_prog_cxx_debug_ok" != no; then
   cs_build_prop_val="$cs_cv_prog_cxx_debug"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
@@ -16088,11 +16054,7 @@ echo "${ECHO_T}$cs_cv_prog_cxx_debug" >&6
 "
 fi
 
-
-fi
-
-if test $cs_cv_prog_cxx_debug != no; then
-  cs_build_prop_val="$cs_cv_prog_cxx_debug"
+	    cs_build_prop_val="$cs_cv_prog_cxx_debug"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.LFLAGS.debug += \"$cs_build_prop_val\" ;
@@ -16121,7 +16083,7 @@ fi
 if test -d /usr/local/include; then
   echo "$as_me:$LINENO: checking if -I/usr/local/include is usable" >&5
 echo $ECHO_N "checking if -I/usr/local/include is usable... $ECHO_C" >&6
-if test "${cs_cv_prog_cxx_local_include+set}" = set; then
+if test "${cs_cv_prog_cpp_local_include_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=cc
@@ -16192,7 +16154,7 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_prog_cxx_enable_warnings $cs_prog_cxx_enable_errors $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_warnings $cs_cv_prog_cxx_enable_errors $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -16261,34 +16223,31 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_prog_cxx_local_include=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_cv_prog_cpp_local_include=`echo x$cs_build_cflags $cs_build_lflags $cs_build_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	    cs_cv_prog_cpp_local_include_ok="$cs_cv_prog_cpp_local_include"
 else
-  cs_cv_prog_cxx_local_include=no
+  cs_cv_prog_cpp_local_include=''
+	    cs_cv_prog_cpp_local_include_ok=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_prog_cxx_local_include" >&5
-echo "${ECHO_T}$cs_cv_prog_cxx_local_include" >&6
-    if test "$cs_cv_prog_cxx_local_include" != no; then
-  cs_cv_prog_cxx_local_include=yes
-else
-  cs_cv_prog_cxx_local_include=no
-fi
+echo "$as_me:$LINENO: result: $cs_cv_prog_cpp_local_include_ok" >&5
+echo "${ECHO_T}$cs_cv_prog_cpp_local_include_ok" >&6
 
 else
-  cs_cv_prog_cxx_local_include=no
+  cs_cv_prog_cpp_local_include=''
 fi
 
 
-if test $cs_cv_prog_cxx_local_include = yes; then
-  cs_build_prop_val="-I/usr/local/include"
+if test -n "$cs_cv_prog_cpp_local_include"; then
+  cs_build_prop_val="$cs_cv_prog_cpp_local_include"
     cs_build_prop_val=`echo x$cs_build_prop_val | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
     if test -n "$cs_build_prop_val"; then
   cs_jamconfig_text="${cs_jamconfig_text}COMPILER.CFLAGS += \"$cs_build_prop_val\" ;
 "
 fi
 
-    CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+    CPPFLAGS="$CPPFLAGS $cs_cv_prog_cpp_local_include"
 fi
 
 
@@ -16311,10 +16270,13 @@ fi
 #------------------------------------------------------------------------------
 # Check if va_copy or __va_copy is available.
 #------------------------------------------------------------------------------
+# CS_CHECK_VA_COPY(FUNCTION)
+
+
 if test "" != yes; then
   echo "$as_me:$LINENO: checking for va_copy" >&5
 echo $ECHO_N "checking for va_copy... $ECHO_C" >&6
-if test "${cs_cv_va_copy+set}" = set; then
+if test "${cs_cv_func_va_copy+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -16395,11 +16357,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <stdio.h>
-	#include <stdarg.h>
+	    #include <stdarg.h>
 int
 main ()
 {
-va_list ap1; va_list ap2; va_copy (ap1, ap2)
+va_list ap1; va_list ap2; va_copy(ap1,ap2)
   ;
   return 0;
 }
@@ -16455,17 +16417,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_va_copy=yes
-		cs_cv_va_copy_cflags=$cs_build_cflags
-		cs_cv_va_copy_lflags=$cs_build_lflags
-		cs_cv_va_copy_libs=$cs_build_libs
+	cs_cv_func_va_copy=yes
+		cs_cv_func_va_copy_cflags=$cs_build_cflags
+		cs_cv_func_va_copy_lflags=$cs_build_lflags
+		cs_cv_func_va_copy_libs=$cs_build_libs
 else
-  cs_cv_va_copy=no
+  cs_cv_func_va_copy=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv_va_copy" >&5
-echo "${ECHO_T}$cs_cv_va_copy" >&6
+echo "$as_me:$LINENO: result: $cs_cv_func_va_copy" >&5
+echo "${ECHO_T}$cs_cv_func_va_copy" >&6
 else
   echo "$as_me:$LINENO: checking for va_copy" >&5
 echo $ECHO_N "checking for va_copy... $ECHO_C" >&6
@@ -16547,11 +16509,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <stdio.h>
-	#include <stdarg.h>
+	    #include <stdarg.h>
 int
 main ()
 {
-va_list ap1; va_list ap2; va_copy (ap1, ap2)
+va_list ap1; va_list ap2; va_copy(ap1,ap2)
   ;
   return 0;
 }
@@ -16607,33 +16569,32 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv_va_copy=yes
-		cs_cv_va_copy_cflags=$cs_build_cflags
-		cs_cv_va_copy_lflags=$cs_build_lflags
-		cs_cv_va_copy_libs=$cs_build_libs
+	cs_cv_func_va_copy=yes
+		cs_cv_func_va_copy_cflags=$cs_build_cflags
+		cs_cv_func_va_copy_lflags=$cs_build_lflags
+		cs_cv_func_va_copy_libs=$cs_build_libs
 else
-  cs_cv_va_copy=no
+  cs_cv_func_va_copy=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv_va_copy" >&5
-echo "${ECHO_T}$cs_cv_va_copy" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_func_va_copy" >&5
+echo "${ECHO_T}$cs_cv_func_va_copy" >&6
 fi
 
-    if test $cs_cv_va_copy = yes; then
+    if test $cs_cv_func_va_copy = yes; then
   cs_header_text="${cs_header_text}#define CS_HAVE_VA_COPY
 "
-    cs_cv_va_copy=yes
 else
-  cs_cv_va_copy_cflags=''
-	cs_cv_va_copy_lflags=''
-	cs_cv_va_copy_libs=''
-	cs_cv_va_copy=no
+  cs_cv_func_va_copy_cflags=''
+	cs_cv_func_va_copy_lflags=''
+	cs_cv_func_va_copy_libs=''
+
 fi
 
 if test "" != yes; then
   echo "$as_me:$LINENO: checking for __va_copy" >&5
 echo $ECHO_N "checking for __va_copy... $ECHO_C" >&6
-if test "${cs_cv___va_copy+set}" = set; then
+if test "${cs_cv_func___va_copy+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_ext=c
@@ -16714,11 +16675,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <stdio.h>
-	#include <stdarg.h>
+	    #include <stdarg.h>
 int
 main ()
 {
-va_list ap1; va_list ap2; __va_copy (ap1, ap2)
+va_list ap1; va_list ap2; __va_copy(ap1,ap2)
   ;
   return 0;
 }
@@ -16774,17 +16735,17 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv___va_copy=yes
-		cs_cv___va_copy_cflags=$cs_build_cflags
-		cs_cv___va_copy_lflags=$cs_build_lflags
-		cs_cv___va_copy_libs=$cs_build_libs
+	cs_cv_func___va_copy=yes
+		cs_cv_func___va_copy_cflags=$cs_build_cflags
+		cs_cv_func___va_copy_lflags=$cs_build_lflags
+		cs_cv_func___va_copy_libs=$cs_build_libs
 else
-  cs_cv___va_copy=no
+  cs_cv_func___va_copy=no
 fi
 
 fi
-echo "$as_me:$LINENO: result: $cs_cv___va_copy" >&5
-echo "${ECHO_T}$cs_cv___va_copy" >&6
+echo "$as_me:$LINENO: result: $cs_cv_func___va_copy" >&5
+echo "${ECHO_T}$cs_cv_func___va_copy" >&6
 else
   echo "$as_me:$LINENO: checking for __va_copy" >&5
 echo $ECHO_N "checking for __va_copy... $ECHO_C" >&6
@@ -16866,11 +16827,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <stdio.h>
-	#include <stdarg.h>
+	    #include <stdarg.h>
 int
 main ()
 {
-va_list ap1; va_list ap2; __va_copy (ap1, ap2)
+va_list ap1; va_list ap2; __va_copy(ap1,ap2)
   ;
   return 0;
 }
@@ -16926,27 +16887,26 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   cs_build_cflags=`echo x$cs_cflags_test $cs_cv_prog_cxx_enable_pedantic | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_cv___va_copy=yes
-		cs_cv___va_copy_cflags=$cs_build_cflags
-		cs_cv___va_copy_lflags=$cs_build_lflags
-		cs_cv___va_copy_libs=$cs_build_libs
+	cs_cv_func___va_copy=yes
+		cs_cv_func___va_copy_cflags=$cs_build_cflags
+		cs_cv_func___va_copy_lflags=$cs_build_lflags
+		cs_cv_func___va_copy_libs=$cs_build_libs
 else
-  cs_cv___va_copy=no
+  cs_cv_func___va_copy=no
 fi
 
-	    echo "$as_me:$LINENO: result: $cs_cv___va_copy" >&5
-echo "${ECHO_T}$cs_cv___va_copy" >&6
+	    echo "$as_me:$LINENO: result: $cs_cv_func___va_copy" >&5
+echo "${ECHO_T}$cs_cv_func___va_copy" >&6
 fi
 
-    if test $cs_cv___va_copy = yes; then
+    if test $cs_cv_func___va_copy = yes; then
   cs_header_text="${cs_header_text}#define CS_HAVE___VA_COPY
 "
-    cs_cv___va_copy=yes
 else
-  cs_cv___va_copy_cflags=''
-	cs_cv___va_copy_lflags=''
-	cs_cv___va_copy_libs=''
-	cs_cv___va_copy=no
+  cs_cv_func___va_copy_cflags=''
+	cs_cv_func___va_copy_lflags=''
+	cs_cv_func___va_copy_libs=''
+
 fi
 
 
@@ -53999,12 +53959,6 @@ done
 
 
 
-
-
-
-
-
-
 for ac_header in unistd.h \
     sys/types.h \
     sys/socket.h \
@@ -55304,16 +55258,7 @@ if test "${cs_cv_cxx_qsqrt_ok+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   if test $cs_long_bits -eq 32 && test $ac_compiler_gnu = yes; then
-  cs_qsqrt_cflags="$cs_optimize_flags"
-	    if test $cs_cv_prog_cxx_pic != no; then
-  cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_pic"
-fi
-
-	    if test $cs_cv_prog_cxx_force_cpusubtype_all != no; then
-  cs_qsqrt_cflags="$cs_cv_prog_cxx_force_cpusubtype_all"
-fi
-
-	    ac_ext=cc
+  ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -55325,7 +55270,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
     cs_build_ok=no
 
 
-    for cs_build_item in `echo @$cs_qsqrt_cflags -I$srcdir/include@@ | sed 'y% %#%'`
+    for cs_build_item in `echo @-I$srcdir/include@@ | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -55381,8 +55326,11 @@ fi
     cs_lflags_test=`echo $cs_lflags_test | sed 'y%#% %'`
     cs_libs_test=`echo $cs_libs_test | sed 'y%#% %'`
 
-	CXXFLAGS="$cs_cflags_test $cs_cv_prog_cxx_enable_warnings \
-		$cs_cv_prog_cxx_enable_errors $cs_cflags_save"
+	CXXFLAGS="$cs_cflags_test $cs_optimize_flags \
+		$cs_cv_prog_cxx_enable_warnings \
+		$cs_cv_prog_cxx_enable_errors \
+		$cs_cv_prog_cxx_pic \
+		$cs_cv_prog_cxx_force_cpusubtype_all $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
 	LIBS="$cs_libs_test  $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
@@ -55451,8 +55399,11 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
     if test $cs_build_ok = yes; then
-  cs_build_cflags=`echo x$cs_cflags_test $cs_cv_prog_cxx_enable_warnings \
-		$cs_cv_prog_cxx_enable_errors | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+  cs_build_cflags=`echo x$cs_cflags_test $cs_optimize_flags \
+		$cs_cv_prog_cxx_enable_warnings \
+		$cs_cv_prog_cxx_enable_errors \
+		$cs_cv_prog_cxx_pic \
+		$cs_cv_prog_cxx_force_cpusubtype_all | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_libs=`echo x$cs_libs_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_cxx_qsqrt_ok=yes
@@ -56847,11 +56798,9 @@ if diff $cache_file confcache >/dev/null 2>&1; then :; else
   fi
 fi
 rm -f confcache
-    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval;
- use
+    { { echo "$as_me:$LINENO: error: unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&5
-echo "$as_me: error: unrecognized mode --enable-mode=$enableval;
- use
+echo "$as_me: error: unrecognized mode --enable-mode=$enableval; use
     \`optimize', \`debug', or \`profile'" >&2;}
    { (exit 1); exit 1; }; } ;;
     esac

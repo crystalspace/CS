@@ -38,6 +38,49 @@ chronological order.
 	- res fixed csString::FormatV() to properly use a copied va_list 
 	  instead of reusing the same for multiple cs_vsnprintf() invocations,
 	  which causes problems on x86_64 (and probably others).
+	- Eric Sunshine extracted the warning-related compiler checks (-Wmost,
+	  -Wall, -Werror, -Wno-unused, -Wno-uninitialized, -Wno-unknown-pragma)
+	  from configure.ac and created re-usable macros in warnings.m4. The
+	  new macros are:
+	    CS_COMPILER_WARNINGS()
+	    CS_COMPILER_ERRORS()
+	    CS_COMPILER_IGNORE_UNUSED()
+	    CS_COMPILER_IGNORE_UNINITIALIZED()
+	    CS_COMPILER_IGNORE_PRAGMAS()
+	- Eric Sunshine renamed the CS_CHECK_COMPILER_PIC() macro in
+	  checkpic.m4 to CS_COMPILER_PIC(). (The old name is still recognized
+	  for backward compatiblity.)
+	- Eric Sunshine changed the behavior of CS_CHECK_BUILD_FLAGS() in
+	  checkbuild.m4.  Rather than setting CACHE-VAR to "no" upon failure,
+	  it now sets it to the empty string. This simplifies client usage
+	  since the client no longer needs to check against "no" before
+	  attempting to utilize the discovered value.  For example, it is now
+	  safe to use the result of CS_CHECK_BUILD_FLAGS() directly, as in
+	  CFLAGS below:
+	    CS_CHECK_BUILD_FLAGS([if -Wflarp is recognized],
+	        [cs_cv_prog_cc_flarp], [CS_CREATE_TUPLE([-Wflarp])])
+	    CFLAGS="$CFLAGS $cs_cv_prog_cc_flarp"
+	  If the old behavior of checking against "no" to detect failure is
+	  still needed (rather than checking against an empty string), then the
+	  new variable named CACHE-VAR_ok can be consulted.
+	- Eric Sunshine fixed bugs in the recently added va_copy() and
+	  __va_copy() checks in configure.ac, and the recently modified
+	  MAXPATHLEN check where the literal "no" was being added to CFLAGS for
+	  the duration of the checks if the "-ansi -pedantic" check failed.
+	- Eric Sunshine refactored the new va_copy()/__va_copy() checks in
+	  configure.ac in order to simplify maintenance.
+	- Eric Sunshine made the -shared check in configure.ac and compiler.m4
+	  more robust against localization problems by checking the compiler
+	  diagnostics for the literal "-shared" (which appears in the warning
+	  message), rather than for "unrecognized", since "unrecognized" might
+	  be translated if the user's language selection is not English.
+	- Eric Sunshine fixed problem on Windows with MingW where csQsqrt()
+	  test was failing because -fPIC flag was generating warning "-fPIC
+	  ignored for target (all code is position independent)". Coupled with
+	  use of -Werror flag, this caused configure to think that the test had
+	  failed despite the fact that the build itself might have succeeded.
+	- Eric Sunshine updated out-of-date comments for CS_EMIT_BUILD_FLAGS()
+	  in emit.m4.
 6-Mar-2005
 	- Eric Sunshine removed invocation of SWIGEXTERN() from definition of
 	  csWrapTypedObject() in pythpost.i since the meaning of SWIGEXTERN

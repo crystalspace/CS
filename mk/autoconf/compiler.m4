@@ -60,7 +60,7 @@ AC_DEFUN([CS_PROG_CXX],[
         CXXFLAGS=`echo "$CXXFLAGS" | sed 's/\-O.//g;s/-g.//g'`
 	CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
 
-	CS_CHECK_COMPILER_PIC([C++], [cs_cv_prog_cxx_pic],
+	CS_COMPILER_PIC([C++], [cs_cv_prog_cxx_pic],
 	    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS.PIC],
 		[$cs_cv_prog_cxx_pic])])
     ])
@@ -76,7 +76,7 @@ AC_DEFUN([CS_PROG_LINK],[
     CS_CHECK_BUILD_FLAGS([if -shared is accepted], [cs_cv_prog_link_shared],
 	[CS_CREATE_TUPLE([-shared])], [C++],
 	[CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS], [-shared], [+])], [],
-	[], [], [], [nrecognize])
+	[], [], [], [-shared])
 
     CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
 	[CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],

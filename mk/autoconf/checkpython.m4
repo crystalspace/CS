@@ -70,7 +70,7 @@ AC_DEFUN([CS_CHECK_PYTHON],
 		'import distutils.sysconfig; \
 		print "-I" + distutils.sysconfig.get_python_inc()'])
 	    cs_cv_pybase_cflags="$cs_cv_pybase_cflags \
-		$cs_prog_cxx_ignore_long_double"
+		$cs_cv_prog_cxx_ignore_long_double"
 
 	    # Depending upon platform and installation, link library might
 	    # reside in "${prefix}/lib", "get_python_lib()/config", or
@@ -148,6 +148,4 @@ AC_DEFUN([CS_EMIT_CHECK_PYTHON],
 AC_DEFUN([CS_CHECK_SUPPRESS_LONG_DOUBLE_WARNINGS],
     [CS_CHECK_BUILD_FLAGS([how to suppress 'long double' warnings],
 	[cs_cv_prog_cxx_ignore_long_double],
-	[CS_CREATE_TUPLE([-Wno-long-double])], [C++],
-	[cs_prog_cxx_ignore_long_double="$cs_cv_prog_cxx_ignore_long_double"],
-	[cs_prog_cxx_ignore_long_double=''])])
+	[CS_CREATE_TUPLE([-Wno-long-double])], [C++])])
