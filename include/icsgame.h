@@ -195,7 +195,7 @@ struct iAttribute : public iBase
 SCF_VERSION (iAttributeIterator, 0, 1, 0);
 
 /**
- * Document me @@@
+ * Allows to iterate across several Attributes
  */
 struct iAttributeIterator : public iBase
 {
@@ -240,7 +240,7 @@ SCF_VERSION (iAttributeArray, 0, 1, 0);
 struct iAttributeArray : public iBase
 {
   /// Get the number of entries.
-  virtual int* GetNum () = 0;
+  virtual int GetNum () = 0;
 
   /**
    * Get the entry at the given position, 
