@@ -739,7 +739,7 @@ void csTextureManagerSoftware::Register8BitCanvas (iGraphics2D *g2d8bit)
     mG2D = new canvas8bit (g2d8bit, mG2D);
 }
 
-void csTextureManagerSoftware::UnRegister8BitCanvas (iGraphics2D *g2d8bit)
+void csTextureManagerSoftware::UnRegister8BitCanvas (iGraphics2D* /*g2d8bit*/)
 {
 //    if (mG2D)
 //    {
