@@ -147,6 +147,7 @@
 #include "inetwork/sockerr.h"
 #include "inetwork/netman.h"
 #include "inetwork/socket2.h"
+#include "iengine/portalcontainer.h"
 
 // Mark Gossage: somewhere in winuser.h there are a couple of #defines to
 // rename RegisterClass and UnregisterClass (which are windoze fns).
@@ -213,6 +214,7 @@
 	INTERFACE_APPLY(iMeshObjectFactory)
 	INTERFACE_APPLY(iMeshObjectType)
 	INTERFACE_APPLY(iMeshWrapper)
+	INTERFACE_APPLY(iMeshWrapperIterator)
 	INTERFACE_APPLY(iModelConverter)
 	INTERFACE_APPLY(iMovable)
 	INTERFACE_APPLY(iMovableListener)
@@ -229,6 +231,8 @@
 	INTERFACE_APPLY(iObjectRegistry)
 	INTERFACE_APPLY(iPluginManager)
 	INTERFACE_APPLY(iPolygonMesh)
+	INTERFACE_APPLY(iPortal)
+	INTERFACE_APPLY(iPortalContainer)
 	INTERFACE_APPLY(iReporter)
 	INTERFACE_APPLY(iReporterIterator)
 	INTERFACE_APPLY(iReporterListener)
@@ -246,6 +250,7 @@
 	INTERFACE_APPLY(iSprite2DState)
 	INTERFACE_APPLY(iSprite3DState)
 	INTERFACE_APPLY(iSpriteCal3DState)
+	INTERFACE_APPLY(iStandardReporterListener)
 	INTERFACE_APPLY(iStream)
 	INTERFACE_APPLY(iStreamIterator)
 	INTERFACE_APPLY(iStreamFormat)
@@ -386,6 +391,7 @@
 %apply float * OUTPUT { float & rb };
 
 // input/output arguments
+%apply bool * INOUT { bool & mirror };
 %apply int * INOUT { int & maxcolors };
 %apply float * INOUT { float & iR };
 %apply float * INOUT { float & iG };
@@ -456,6 +462,12 @@ TYPEMAP_IN_ARRAY_CNT_PTR(
 )
 TYPEMAP_IN_ARRAY_PTR_CNT(
 	(csVector2 * InPolygon, int InCount), *
+)
+TYPEMAP_IN_ARRAY_PTR_CNT(
+	(csVector3* vertices, int num_vertices), *
+)
+TYPEMAP_IN_ARRAY_PTR_CNT(
+	(csVector3* vertices, int num), *
 )
 
 // Handle arrays as output arguments.
@@ -834,6 +846,8 @@ TYPEMAP_OUT_csWrapPtr
 %include "iengine/movable.h"
 %include "iengine/region.h"
 %include "iengine/viscull.h"
+%include "iengine/portal.h"
+%include "iengine/portalcontainer.h"
 
 #ifndef CS_SWIG_PUBLISH_IGENERAL_FACTORY_STATE_ARRAYS
 %ignore iGeneralFactoryState::GetVertices;

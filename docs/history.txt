@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Apr-2004
+	- Eric Sunshine applied a few scripting-related patches from Michael
+	  Franz Aigner <crystal-space@amfranz.com>:
+	    - Fixed inverted logic bug when testing result of PyList_Check() in
+	      TYPEMAP_IN_ARRAY_BODY().
+	    - Fixed bug where TYPEMAP_IN_ARRAY_BODY() was improperly invoking
+	      Swig's $descriptor() pseudo-macro with the result that it was
+	      entirely dysfunctional.
+	    - Published additional interfaces: iMeshWrapperIterator, iPortal,
+	      iPortalContainer, iStandardReporterListener.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to

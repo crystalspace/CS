@@ -250,8 +250,8 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 %enddef
 
 #undef TYPEMAP_IN_ARRAY_BODY
-%define TYPEMAP_IN_ARRAY_BODY(array_type, base_type, cnt, ptr, to_item)
-	if (PyList_Check($input))
+%define TYPEMAP_IN_ARRAY_BODY(array_type, base_type, base_descriptor, cnt, ptr, to_item)
+	if (!PyList_Check($input))
 	{
 		PyErr_SetString(PyExc_TypeError, "not a list");
 		return 0;
@@ -263,8 +263,8 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 	{
 		base_type * p;
 		PyObject * o = PyList_GetItem($input, i);
-		if (SWIG_ConvertPtr(o, (void **) &p, $descriptor(base_type *),
-			SWIG_POINTER_EXCEPTION))
+		if ((SWIG_ConvertPtr(o, (void **) &p, base_descriptor,
+			SWIG_POINTER_EXCEPTION)) == -1)
 		{
 			PyErr_SetString(
 				PyExc_TypeError, "list must contain " #base_type "'s"
@@ -280,7 +280,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 %define TYPEMAP_IN_ARRAY_CNT_PTR(pattern, to_item)
 	%typemap(in) pattern
 	{
-		TYPEMAP_IN_ARRAY_BODY($*2_type, $2_basetype, $1, $2, to_item)
+		TYPEMAP_IN_ARRAY_BODY($*2_type, $2_basetype, $2_descriptor, $1, $2, to_item)
 	}
 	%typemap(freearg) pattern
 	{
@@ -292,7 +292,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
 %define TYPEMAP_IN_ARRAY_PTR_CNT(pattern, to_item)
 	%typemap(in) pattern
 	{
-		TYPEMAP_IN_ARRAY_BODY($*1_type, $1_basetype, $2, $1, to_item)
+		TYPEMAP_IN_ARRAY_BODY($*1_type, $1_basetype, $1_descriptor, $2, $1, to_item)
 	}
 	%typemap(freearg) pattern
 	{
