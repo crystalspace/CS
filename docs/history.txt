@@ -55,6 +55,10 @@ The history order is reversed so that new features are at the top.
 	  replace user.cfg with the standard user preferences system on OS X.
 	- Eric Sunshine fixed render3d/opengl/Jamfile so that it links the
 	  plugin against the OpenGL library.
+	- Jorrit fixed the bezier mesh so that ForceRelight() with a new
+	  light also works.
+	- Jorrit fixed the bezier mesh so that removing a pseudo-dynamic
+	  light also works.
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.

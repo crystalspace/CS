@@ -235,6 +235,11 @@ void csCurve::DynamicLightDisconnect (iDynLight* dynlight)
 
 void csCurve::StaticLightDisconnect (iStatLight* statlight)
 {
+  if (!LightMap) return;
+  csCurveShadowMap* sm = LightMap->FindShadowMap (statlight->QueryLight ());
+  if (!sm) return;
+  LightMap->DelShadowMap (sm);
+  light_version--;
 }
 
 void csCurve::AddLightPatch (csBezierLightPatch *lp)
@@ -549,6 +554,7 @@ void csCurve::CalculateLightingStatic (iFrustumView *lview, bool vis)
   }
 
   delete shadow_matrix;
+  light_version--;
 }
 
 void csCurve::CalculateLightingDynamic (iFrustumView *lview)

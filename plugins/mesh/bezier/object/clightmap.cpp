@@ -108,9 +108,25 @@ void csCurveLightMap::SetLightCellSize (int size)
 
 void csCurveLightMap::DelShadowMap (csCurveShadowMap *smap)
 {
-  first_smap = smap->next;
+  if (smap == first_smap)
+  {
+    first_smap = smap->next;
+  }
+  else
+  {
+    csCurveShadowMap* map = first_smap;
+    while (map && map->next != smap)
+    {
+      map = map->next;
+    }
+    if (map)
+    {
+      map->next = smap->next;
+    }
+  }
   delete smap;
 }
+
 
 csCurveShadowMap *csCurveLightMap::NewShadowMap (iLight *light, int w, int h)
 {

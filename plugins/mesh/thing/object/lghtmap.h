@@ -181,7 +181,7 @@ public:
 
   /**
    * Delete a ShadowMap.
-   * It is ment for pseudo-dynamic lights that do not reach the polygon
+   * It is ment for pseudo-dynamic lights that do not reach the polygon.
    * but this can only be seen after trying.
    */
   void DelShadowMap (csShadowMap* plm);
