@@ -116,6 +116,8 @@ class csShadow;
 #define DEBUGCMD_DEBUGVIEW	1038	// Toggle debug view
 #define DEBUGCMD_SCRSHOT	1039	// Screenshot
 #define DEBUGCMD_FPS		1040	// Toggle fps (default on)
+#define DEBUGCMD_HIDESELECTED	1041	// Remove selected obj from sectors.
+#define DEBUGCMD_UNDOHIDE	1042	// Undo last hide.
 
 /**
  * For key mappings.
@@ -183,6 +185,10 @@ private:
 
   /// The selected mesh.
   iMeshWrapper* selected_mesh;
+  /// Previous selected mesh (after DEBUGCMD_HIDESELECTED).
+  iMeshWrapper* prev_selected_mesh;
+  int mesh_num_sectors;
+  iSector* mesh_sectors[10];
 
   /// Shadow!
   csShadow* shadow;

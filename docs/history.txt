@@ -10,6 +10,10 @@ The history order is reversed so that new features are at the top.
 	  by David Calkins.
 	- Reverted a change to the image loader multiplexer because it was
 	  EXTREMELY slow.
+	- Added the ability to bugplug to hide the selected mesh. With
+	  ctrl-d h the selected mesh will be removed from all sectors.
+	  With ctrl-d shift-h the last removed mesh will be put back (works
+	  only once).
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.

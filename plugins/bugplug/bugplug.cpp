@@ -122,6 +122,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   shadow = new csShadow ();
   spider_hunting = false;
   selected_mesh = NULL;
+  prev_selected_mesh = NULL;
   scfiEventHandler = NULL;
   shadow->SetShadowMesh (selected_mesh);
 
@@ -1026,6 +1027,38 @@ bool csBugPlug::EatKey (iEvent& event)
 	fps_tottime = 0;
 	fps_cur = -1;
         break;
+      case DEBUGCMD_HIDESELECTED:
+        if (selected_mesh)
+	{
+	  iMovable* m = selected_mesh->GetMovable ();
+	  iSectorList* sl = m->GetSectors ();
+	  int i;
+	  for (i = 0 ; i < sl->GetCount () ; i++)
+	    mesh_sectors[i] = sl->Get (i);
+	  mesh_num_sectors = sl->GetCount ();
+	  m->ClearSectors ();
+	  m->UpdateMove ();
+	  prev_selected_mesh = selected_mesh;
+	  selected_mesh = NULL;
+	}
+	else
+	{
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"There is no selected mesh to hide!");
+	}
+        break;
+      case DEBUGCMD_UNDOHIDE:
+        if (prev_selected_mesh)
+	{
+	  iMovable* m = prev_selected_mesh->GetMovable ();
+	  iSectorList* sl = m->GetSectors ();
+	  int i;
+	  for (i = 0 ; i < mesh_num_sectors ; i++)
+	    sl->Add (mesh_sectors[i]);
+	  m->UpdateMove ();
+	  prev_selected_mesh = NULL;
+	}
+        break;
     }
     process_next_key = false;
   }
@@ -1402,6 +1435,8 @@ int csBugPlug::GetCommandCode (const char* cmd, char* args)
   if (!strcmp (cmd, "debugview"))	return DEBUGCMD_DEBUGVIEW;
   if (!strcmp (cmd, "scrshot"))		return DEBUGCMD_SCRSHOT;
   if (!strcmp (cmd, "fps"))		return DEBUGCMD_FPS;
+  if (!strcmp (cmd, "hideselected"))	return DEBUGCMD_HIDESELECTED;
+  if (!strcmp (cmd, "undohide"))	return DEBUGCMD_UNDOHIDE;
 
   return DEBUGCMD_UNKNOWN;
 }
