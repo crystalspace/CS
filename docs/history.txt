@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
           The variable is only true for the MSVCGEN process to force
           exclusion from our project files and will not affect nix or
           other platforms.
+	- Jorrit removed csArray and csPArray->GetArray() again as this
+	  breaks encapsulation.
 19-May-2003
 	- Eric Sunshine made the following changes to the Jam build facility:
 	    - Added helper rules InstallApplicationGUI and
