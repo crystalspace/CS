@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <signal.h>
+#include <string.h>
 #include "sysdef.h"
 #include "csutil/inifile.h"
 #include "cssys/unix/unix.h"
@@ -41,10 +42,16 @@ void handler (int sig)
   in_exit = true;
 
   int err = errno;
-  fprintf (stderr, "\n%d signal caught; last error: %s\n",
+#if defined (__USE_GNU)
+  fprintf (stderr, "\n%s signal caught; last error: %s\n",
+    strsignal (sig), strerror (err));
+#elif defined (OS_LINUX) || defined (OS_FREEBSD)
+  fprintf (stderr, "\n%s signal caught; last error: %s\n",
+    sys_siglist [sig], strerror (err));
+#else
+  fprintf (stderr, "\nSignal %d caught; last error: %s\n",
     sig, strerror (err));
-  //fprintf (stderr, "\n%s signal caught; last error: %s\n",
-    //sys_siglist [sig], strerror (err));
+#endif
 
   if (sig != SIGINT)
     debug_dump ();
