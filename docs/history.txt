@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Dec-2004
+	- Small bug fix: changed 'i' to 'm' in thing.cpp:1084
+	  for (int m = 0; i < repMaterials.Length(); m++)
 23-Dec-2004
 	- Jorrit added a first version of a new heightmapgen tool. This
 	  tool will take an input world file, pick up one mesh from that world
