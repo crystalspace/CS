@@ -132,31 +132,6 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   csShaderVariable *var;
   int i,j;
 
-  for (i = 0; i < variablemap.Length (); i++)
-  {
-    // Check if we've got it locally
-    var = svcontext.GetVariable(variablemap[i].name);
-    if (!var)
-    {
-      // If not, check the static contexts
-      for (j=0;j<staticContexts.Length();j++)
-      {
-        var = staticContexts[j]->GetVariable (variablemap[i].name);
-        if (var) break;
-      }
-    }
-    if (var)
-    {
-      // We found it, so we add it as a static mapping
-      variablemap[i].statlink = var;
-    }
-  }
-
-  return LoadProgramStringToGL (programstring);
-}
-
-bool csShaderGLCGVP::LoadProgramStringToGL(const char* programstring)
-{
   if(!programstring)
     return false;
 
@@ -176,6 +151,32 @@ bool csShaderGLCGVP::LoadProgramStringToGL(const char* programstring)
 
   cgGLLoadProgram (program);
 
+  for (i = 0; i < variablemap.Length (); i++)
+  {
+    // Get the Cg parameter
+    variablemap[i].parameter = cgGetNamedParameter (
+      program, variablemap[i].cgvarname);
+    // Check if it's found, and just skip it if not.
+    if (!variablemap[i].parameter)
+      continue;
+    // Check if we've got it locally
+    var = svcontext.GetVariable(variablemap[i].name);
+    if (!var)
+    {
+      // If not, check the static contexts
+      for (j=0;j<staticContexts.Length();j++)
+      {
+        var = staticContexts[j]->GetVariable (variablemap[i].name);
+        if (var) break;
+      }
+    }
+    if (var)
+    {
+      // We found it, so we add it as a static mapping
+      variablemap[i].statlink = var;
+    }
+  }
+  
   return true;
 }
 

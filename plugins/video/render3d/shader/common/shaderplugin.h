@@ -22,6 +22,14 @@
 #include "csutil/scf.h"
 #include "csgfx/shadervar.h"
 
+struct varmapping
+{
+  csStringID source;
+  csString destination;
+  varmapping (csStringID s, char* d)
+    : source(s), destination(d) {}
+};
+
 SCF_VERSION(iShaderProgram, 0,2,0);
 /**
  * A helper for shaders that which to use the general plugins.
@@ -43,10 +51,13 @@ struct iShaderProgram : iBase
   virtual void ResetState () = 0;
 
   /// Loads from a document-node
-  virtual bool Load(iDocumentNode* node) = 0;
+  virtual bool Load (iDocumentNode* node) = 0;
+
+  /// Loads from raw text
+  virtual bool Load (const char* program, csArray<varmapping> &mappings) = 0;
 
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticDomains) = 0;
+  virtual bool Compile (csArray<iShaderVariableContext*> &staticDomains) = 0;
 };
 
 SCF_VERSION(iShaderProgramPlugin,0,1,0);

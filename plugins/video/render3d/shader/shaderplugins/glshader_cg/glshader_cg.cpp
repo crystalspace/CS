@@ -34,6 +34,8 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/graph2d.h"
 #include "ivideo/shader/shader.h"
 
+#include "video/canvas/openglcommon/glextmanager.h"
+
 #include "glshader_cgvp.h"
 #include "glshader_cgfp.h"
 
@@ -126,6 +128,61 @@ void csGLShader_CG::Open()
     enable = true;
   else
     return;
+
+  csGLExtensionManager *ext;
+  r->GetDriver2D()->PerformExtension ("getextmanager", &ext);
+
+  bool route = false;
+  csRef<iConfigManager> config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
+  if (config->KeyExists ("Video.OpenGL.Shader.Cg.PSRouting"))
+  {
+    route = config->GetBool ("Video.OpenGL.Shader.Cg.PSRouting");
+    if (route)
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        "crystalspace.graphics3d.shader.glcg",
+        "Routing Cg fragment programs to Pixel Shader plugin ON (forced).", 0);
+    else
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.graphics3d.shader.glcg",
+      "Routing Cg fragment programs to Pixel Shader plugin OFF (forced).", 0);
+  } else {
+    ext->InitGL_ARB_fragment_program ();
+    ext->InitGL_ATI_fragment_shader ();
+
+    // If the hardware's got ATI_f_p, but isn't new enough to have ARB_f_p
+    // we default to routing Cg fragment programs to the Pixel Shader plugin
+    route = !ext->CS_GL_ARB_fragment_program && 
+            ext->CS_GL_ATI_fragment_shader;
+    if (route)
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.graphics3d.shader.glcg",
+      "Routing Cg fragment programs to Pixel Shader plugin ON (default).", 0);
+    else
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.graphics3d.shader.glcg",
+      "Routing Cg fragment programs to Pixel Shader plugin OFF (default).", 0);
+  }
+
+  if (route)
+  {
+    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
+      iPluginManager);
+
+    psplg = CS_QUERY_PLUGIN_CLASS(plugin_mgr, 
+      "crystalspace.graphics3d.shader.glps1", iShaderProgramPlugin);
+    if(!psplg)
+    {
+      psplg = CS_LOAD_PLUGIN(plugin_mgr, 
+        "crystalspace.graphics3d.shader.glps1", iShaderProgramPlugin);
+      if (!psplg)
+      {
+        csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+          "crystalspace.graphics3d.shader.glcg",
+          "Could not find crystalspace.graphics3d.shader.glps1. Cg to PS "
+          "routing unavailable.", 0);
+      }
+    }
+  }
 
   isOpen = true;
 }

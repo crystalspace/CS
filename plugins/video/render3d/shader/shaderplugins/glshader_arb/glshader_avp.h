@@ -112,6 +112,10 @@ public:
   /// Loads from a document-node
   virtual bool Load(iDocumentNode* node);
 
+  /// Loads from raw text
+  virtual bool Load (const char* program, csArray<varmapping> &mappings)
+  { return false; }
+
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
 

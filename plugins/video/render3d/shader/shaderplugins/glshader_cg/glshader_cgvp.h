@@ -98,8 +98,6 @@ public:
     SCF_DESTRUCT_IBASE ();
   }
 
-  bool LoadProgramStringToGL( const char* programstring );
-
   void SetValid(bool val) { validProgram = val; }
 
   ////////////////////////////////////////////////////////////////////
@@ -120,13 +118,17 @@ public:
   virtual void ResetState ();
 
   /// Check if valid
-  virtual bool IsValid() { return validProgram;} 
+  virtual bool IsValid () { return validProgram;} 
 
   /// Loads from a document-node
-  virtual bool Load(iDocumentNode* node);
+  virtual bool Load (iDocumentNode* node);
+
+  /// Loads from raw text
+  virtual bool Load (const char* program, csArray<varmapping> &mappings)
+  { return false; }
 
   /// Compile a program
-  virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+  virtual bool Compile (csArray<iShaderVariableContext*> &staticContexts);
 
 
   /**

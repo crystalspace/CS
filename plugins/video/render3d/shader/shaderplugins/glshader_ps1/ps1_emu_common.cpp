@@ -155,6 +155,25 @@ bool csShaderGLPS1_Common::Load(iDocumentNode* program)
   return true;
 }
 
+bool csShaderGLPS1_Common::Load (const char* program, 
+                            csArray<varmapping> &mappings)
+{
+  programstring = csStrNew (program);
+
+  for (int m=0; m<mappings.Length (); ++m)
+  {
+    variablemap.Push (variablemapentry ());
+    int i = variablemap.Length ()-1;
+
+    variablemap[i].name = mappings[m].source;
+
+    variablemap[i].registernum = atoi (mappings[m].destination);
+  }
+
+  return true;
+}
+
+
 bool csShaderGLPS1_Common::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
   csShaderVariable *var;

@@ -46,6 +46,12 @@ SCF_IMPLEMENT_IBASE_END
 
 void csShaderGLCGFP::Activate()
 {
+  if (pswrap)
+  {
+    pswrap->Activate ();
+    return;
+  } 
+
   cgGLEnableProfile (cgGetProgramProfile (program));
 
   cgGLBindProgram (program);
@@ -53,6 +59,12 @@ void csShaderGLCGFP::Activate()
 
 void csShaderGLCGFP::Deactivate()
 {
+  if (pswrap)
+  {
+    pswrap->Deactivate ();
+    return;
+  } 
+
   cgGLDisableProfile (cgGetProgramProfile (program));
 }
 
@@ -60,6 +72,12 @@ void csShaderGLCGFP::SetupState (csRenderMesh* mesh,
   const CS_SHADERVAR_STACK &stacks)
 {
   int i;
+
+  if (pswrap)
+  {
+    pswrap->SetupState (mesh, stacks);
+    return;
+  } 
 
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
@@ -113,6 +131,11 @@ void csShaderGLCGFP::SetupState (csRenderMesh* mesh,
 
 void csShaderGLCGFP::ResetState()
 {
+  if (pswrap)
+  {
+    pswrap->ResetState ();
+    return;
+  } 
 }
 
 bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
@@ -122,49 +145,95 @@ bool csShaderGLCGFP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   csShaderVariable *var;
   int i,j;
 
-  for (i = 0; i < variablemap.Length (); i++)
-  {
-    // Check if we've got it locally
-    var = svcontext.GetVariable(variablemap[i].name);
-    if (!var)
-    {
-      // If not, check the static contexts
-      for (j=0;j<staticContexts.Length();j++)
-      {
-        var = staticContexts[j]->GetVariable (variablemap[i].name);
-        if (var) break;
-      }
-    }
-    if (var)
-    {
-      // We found it, so we add it as a static mapping
-      variablemap[i].statlink = var;
-    }
-  }
-
-  return LoadProgramStringToGL (programstring);
-}
-
-bool csShaderGLCGFP::LoadProgramStringToGL(const char* programstring)
-{
   if(!programstring)
     return false;
 
-  CGprofile profile = CG_PROFILE_UNKNOWN;
+  // See if we want to wrap through the PS plugin
+  // (psplg will be 0 if wrapping isn't wanted)
+  if (shaderPlug->psplg)
+  {
+    program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
+      programstring, CG_PROFILE_PS_1_3, "main", 0);
 
-  if(cg_profile.Length ())
-    profile = cgGetProfile (cg_profile.GetData ());
+    if (!program)
+      return false;
 
-  if(profile == CG_PROFILE_UNKNOWN)
-    profile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
+    pswrap = shaderPlug->psplg->CreateProgram ("fp");
 
-  program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
-    programstring, profile, "main", 0);
+    if (!pswrap)
+      return false;
 
-  if (!program)
-    return false;
+    csArray<varmapping> mappings;
+    
+    for (i = 0; i < variablemap.Length (); i++)
+    {
+      // Get the Cg parameter
+      CGparameter parameter = cgGetNamedParameter (
+        program, variablemap[i].cgvarname);
+      // Check if it's found, and just skip it if not.
+      if (!parameter)
+        continue;
+      // Make sure it's a C-register
+      CGresource resource = cgGetParameterResource (parameter);
+      if (resource == CG_C)
+      {
+        // Get the register number, and create a mapping
+        char regnum[2];
+        sprintf (regnum, "%d", cgGetParameterResourceIndex (parameter));
+        mappings.Push (varmapping (variablemap[i].name, regnum));
+      }
+    }
 
-  cgGLLoadProgram (program);
+    if (pswrap->Load (cgGetProgramString (program, CG_COMPILED_PROGRAM), 
+      mappings))
+    {
+      return pswrap->Compile (staticContexts);
+    } else {
+      return false;
+    }
+  } else {
+    CGprofile profile = CG_PROFILE_UNKNOWN;
+
+    if(cg_profile.Length ())
+      profile = cgGetProfile (cg_profile.GetData ());
+
+    if(profile == CG_PROFILE_UNKNOWN)
+      profile = cgGLGetLatestProfile (CG_GL_FRAGMENT);
+
+    program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
+      programstring, profile, "main", 0);
+
+    if (!program)
+      return false;
+
+    cgGLLoadProgram (program);
+
+    for (i = 0; i < variablemap.Length (); i++)
+    {
+      // Get the Cg parameter
+      variablemap[i].parameter = cgGetNamedParameter (
+        program, variablemap[i].cgvarname);
+      // Check if it's found, and just skip it if not.
+      if (!variablemap[i].parameter)
+        continue;
+      // Check if we've got it locally
+      var = svcontext.GetVariable(variablemap[i].name);
+      if (!var)
+      {
+        // If not, check the static contexts
+        for (j=0;j<staticContexts.Length();j++)
+        {
+          var = staticContexts[j]->GetVariable (variablemap[i].name);
+          if (var) break;
+        }
+      }
+      if (var)
+      {
+        // We found it, so we add it as a static mapping
+        variablemap[i].statlink = var;
+      }
+    }
+  }
 
   return true;
 }

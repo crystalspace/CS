@@ -351,6 +351,24 @@ bool csPixelShaderParser::ParseProgram (const char *program)
   // Trim any leading/trailing blank lines
   prog.Trim ();
 
+  int pos = 0, len = prog.Length ();
+
+  // Remove leading comments (//)
+  while(pos < len && !strncmp(prog.GetData ()+pos, "//", 2))
+  {
+    int end = prog.FindFirst ('\n', pos);
+    if(end<0) end = len;
+    pos = end + 1;
+  }
+
+  if (len == 0)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+      "Empty program!");
+    return false;
+  }
+
+
   max_registers[CS_PS_REG_TEX] = 4;
   max_registers[CS_PS_REG_TEMP] = 2;
   max_registers[CS_PS_REG_CONSTANT] = 8;
@@ -358,9 +376,12 @@ bool csPixelShaderParser::ParseProgram (const char *program)
 
   // Identify the version
   if(!strncmp(prog, "ps_1_1", 6)) version = CS_PS_1_1;
-  else if(!strncmp(prog, "ps_1_2", 6)) version = CS_PS_1_2;
-  else if(!strncmp(prog, "ps_1_3", 6)) version = CS_PS_1_3;
-  else if(!strncmp(prog, "ps_1_4", 6)) 
+  else if(!strncmp(prog+pos, "ps.1.1", 6)) version = CS_PS_1_1;
+  else if(!strncmp(prog+pos, "ps_1_2", 6)) version = CS_PS_1_2;
+  else if(!strncmp(prog+pos, "ps.1.2", 6)) version = CS_PS_1_2;
+  else if(!strncmp(prog+pos, "ps_1_3", 6)) version = CS_PS_1_3;
+  else if(!strncmp(prog+pos, "ps.1.3", 6)) version = CS_PS_1_3;
+  else if(!strncmp(prog+pos, "ps_1_4", 6)) 
   {
     max_registers[CS_PS_REG_TEX] = 6;
     max_registers[CS_PS_REG_TEMP] = 6;
@@ -373,7 +394,7 @@ bool csPixelShaderParser::ParseProgram (const char *program)
     return false;
   }
 
-  prog.DeleteAt (0, 6);
+  prog.DeleteAt (0, pos+6);
 
   csStringReader reader (prog);
   csString line;

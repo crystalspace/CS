@@ -87,6 +87,8 @@ private:
   bool validProgram;
 
   csShaderVariableContext svcontext;
+
+  csRef<iShaderProgram> pswrap;
 public:
   SCF_DECLARE_IBASE;
 
@@ -106,9 +108,7 @@ public:
     SCF_DESTRUCT_IBASE ();
   }
 
-  bool LoadProgramStringToGL( const char* programstring );
-
-  void SetValid(bool val) { validProgram = val; }
+  void SetValid (bool val) { validProgram = val; }
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram
@@ -132,6 +132,10 @@ public:
 
   /// Loads from a document-node
   virtual bool Load(iDocumentNode* node);
+
+  /// Loads from raw text
+  virtual bool Load (const char* program, csArray<varmapping> &mappings)
+  { return false; }
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);

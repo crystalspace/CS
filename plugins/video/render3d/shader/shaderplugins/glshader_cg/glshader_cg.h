@@ -37,6 +37,7 @@ private:
 public:
   static csRef<iObjectRegistry> object_reg;
   static CGcontext context;
+  csRef<iShaderProgramPlugin> psplg;
 
   SCF_DECLARE_IBASE;
   
