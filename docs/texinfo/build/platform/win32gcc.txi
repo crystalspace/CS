@@ -140,3 +140,12 @@ Adjust them to match your system libraries.  For example, if you use the
 @samp{-lopengl32} and @samp{-lglut32} to @samp{-lopengl} and @samp{-lglut} in
 @samp{LIBS.GL3D.SYSTEM}.  Also in the file @file{CS\mk\user.mak} select which
 plugins you wish to compile.
+
+@subsubheading Troubleshooting
+
+If you successfully compile Crystal, yet cannot run the applications from
+the @samp{CS\} root directory. A possible cause could be you have a installed
+Crystal Space in or sub of a directory with a space in it i.e. @samp{crystal space}.
+
+To get round this problem, you should remove the space from your directory i.e.
+change @samp{crystal space} to @samp{crystal_space} or similar.
