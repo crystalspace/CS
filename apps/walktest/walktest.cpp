@@ -86,9 +86,16 @@ void DrawZbuffer ()
 
     if (gi_pixelbytes == 4)
     {
-      //@@@
+      ULong *dest;
+      Gfx2D->GetPixelAt(0, y, (unsigned char**)&dest);
+
+      ULong *zbuf;
+      Gfx3D->GetZBufPoint (0, y, &zbuf);
+
+      for (int x = 0; x < FRAME_WIDTH; x++)
+        *dest++ = *zbuf++ >> 10;
     }
-    if (gi_pixelbytes == 2)
+    else if (gi_pixelbytes == 2)
     {
       UShort *dest;
       Gfx2D->GetPixelAt(0, y, (unsigned char**)&dest);
