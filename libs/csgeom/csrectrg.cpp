@@ -458,7 +458,7 @@ void csRectRegion::Exclude (csRect &nrect)
 
 void csRectRegion::ClipTo (csRect &clip)
 {
-  for (i = region_count - 1; i >= 0; i--)
+  for (int i = region_count - 1; i >= 0; i--)
   {
     region[i].Intersect (clip);
     if (region[i].IsEmpty ())
