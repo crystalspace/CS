@@ -44,8 +44,8 @@ class csCBuffer;
  * A line in the CBuffer.
  * Spans are allocated on an as-needed base. But they are
  * not freed. Instead, unused spans are put in the first_unused
- * list. The size of this list will always be equal to the maximum
- * number of spans used for that line.
+ * list (in csCBuffer). The size of this list will always be equal
+ * to the maximum number of spans once used on screen.
  */
 class csCBufferLine
 {
@@ -56,14 +56,20 @@ private:
   csCBufferSpan* first_span;
   // Pointer to last span in the list of empty spans.
   csCBufferSpan* last_span;
-  // List of all unused spans on this line.
-  csCBufferSpan* first_unused;
+  // Parent C-buffer.
+  csCBuffer* parent;
 
 private:
   /// Initialize a c-buffer line.
   csCBufferLine ();
-  /// Destruct a c-buffer line and free all spans (also the unused ones).
+  /**
+   * Destruct a c-buffer line and free all used spans.
+   * Note: the spans are really freed and not put in the unused list.
+   */
   ~csCBufferLine ();
+
+  /// Set parent.
+  void SetParent (csCBuffer* par) { parent = par; }
 
   /**
    * Initialize this line to the given empty span.
@@ -92,6 +98,8 @@ private:
  */
 class csCBuffer
 {
+  friend class csCBufferLine;
+
 private:
   // The lines of this c-buffer.
   csCBufferLine* lines;
@@ -103,6 +111,28 @@ private:
   int startx, endx;
   // Total number of not-full lines.
   int not_full_lines;
+  // List of all unused spans on screen.
+  csCBufferSpan* first_unused;
+
+  // Allocate a span (possible from the unused list).
+  csCBufferSpan* AllocSpan ()
+  {
+    csCBufferSpan* s;
+    if (first_unused)
+    {
+      s = first_unused;
+      first_unused = first_unused->next;
+    }
+    else
+      CHKB (s = new csCBufferSpan ());
+    return s;
+  }
+  // Free a span (put in the unused list).
+  void FreeSpan (csCBufferSpan* span)
+  {
+    span->next = first_unused;
+    first_unused = span;
+  }
 
 public:
   /// Create a new c-buffer with the given dimensions.

@@ -27,10 +27,7 @@ csCBufferLine::csCBufferLine ()
 {
   first_span = NULL;
   last_span = NULL;
-  // We already place one span in the unused buffer
-  // so that Initialize() can use that.
-  CHK (first_unused = new csCBufferSpan ());
-  first_unused->next = NULL;
+  parent = NULL;
 }
 
 void csCBufferLine::Initialize (int startx, int endx)
@@ -40,17 +37,15 @@ void csCBufferLine::Initialize (int startx, int endx)
     // Append the current unused list to the last span
     // and set the new unused list to the first span.
     // This moves all used spans to the unused list.
-    last_span->next = first_unused;
-    first_unused = first_span;
+    last_span->next = parent->first_unused;
+    parent->first_unused = first_span;
   }
-  // We know there is at least one span in the unused list
-  // because a c-buffer line is initialized with one span.
-  first_span = first_unused;
+  // Allocate an empty span for the whole scanline.
+  first_span = parent->AllocSpan ();
   first_span->startx = startx;
   first_span->endx = endx;
   first_span->next = NULL;
   last_span = first_span;
-  first_unused = first_unused->next;
 }
 
 csCBufferLine::~csCBufferLine ()
@@ -61,12 +56,6 @@ csCBufferLine::~csCBufferLine ()
     n = first_span->next;
     CHK (delete first_span);
     first_span = n;
-  }
-  while (first_unused)
-  {
-    n = first_unused->next;
-    CHK (delete first_unused);
-    first_unused = n;
   }
 }
 
@@ -121,8 +110,7 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       {
         if (ps) ps->next = s->next;
 	else first_span = s->next;
-	s->next = first_unused;
-	first_unused = s;
+	parent->FreeSpan (s);
       }
 
       // If start of empty span is before start of full span then we 
@@ -143,16 +131,7 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
       // have to split the empty span.
       else
       {
-        csCBufferSpan* new_span;
-        if (first_unused)
-	{
-	  new_span = first_unused;
-	  first_unused = first_unused->next;
-	}
-	else
-	{
-	  CHK (new_span = new csCBufferSpan ());
-	}
+        csCBufferSpan* new_span = parent->AllocSpan ();
 	new_span->next = s->next;
 	s->next = new_span;
 	if (new_span->next == NULL) last_span = new_span;
@@ -178,10 +157,20 @@ csCBuffer::csCBuffer (int sx, int ex, int n_lines)
   endx = ex;
   CHK (lines = new csCBufferLine [num_lines]);
   CHK (full = new bool [num_lines]);
+  first_unused = NULL;
+  int i;
+  for (i = 0 ; i < num_lines ; i++)
+    lines[i].SetParent (this);
 }
 
 csCBuffer::~csCBuffer ()
 {
+  while (first_unused)
+  {
+    csCBufferSpan* n = first_unused->next;
+    CHK (delete first_unused);
+    first_unused = n;
+  }
   CHK (delete [] lines);
   CHK (delete [] full);
 }
