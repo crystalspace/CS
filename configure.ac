@@ -1306,12 +1306,20 @@ AS_IF([test $cs_cv_libode = yes],
 	[AC_LANG_PROGRAM(
 	    [[#include <ode/ode.h>]],
 	    [dWorldID w = dWorldCreate();
-	    dBodySetGravityMode(0,0);
-	    dWorldStepFast1(w,0,0);
-	    dCloseODE();])],
-	[], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
+	    dWorldQuickStep(w,0.0f);])],
+	[], [C++], [], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])],
 	[cs_cv_libode_recent=no])
+
+AS_IF([test $cs_cv_libode_recent = yes],
+    [CS_CHECK_BUILD([if libode is built with OPCODE support],
+	[cs_cv_libode_opcode],
+	[AC_LANG_PROGRAM(
+	    [[#include <ode/ode.h>]],
+	    [dGeomTriMeshDataCreate();])],
+	[], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
+	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])],
+	[cs_cv_libode_opcode=no])
 
 AS_IF([test $cs_cv_libode_recent = yes],
     [CS_CHECK_BUILD([if extern "C" is needed with libode],

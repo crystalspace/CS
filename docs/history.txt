@@ -6,29 +6,33 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Sep-2004
+	- Eric Sunshine upgraded the ODE "sufficiently recent" check in
+	  configure.ac so that it demands version 0.5. Also added a check to
+	  see if ODE was built with OPCODE support since OPCODE support is
+	  required by Mike Handverger's latest changes.
 4-Sep-2004
 	- Mike Handverger updated odedynam including the following changes:
-	  - TriMesh collisions (that collide with everything except planes,
-	     since that is missing in ODE currently) Partly from code posted
-	     to crystal-main by Marc Rochel.
-	  - Ability to select QuickStep (setting iterations not possible yet)
-             QuickStep is a new solver for ODE that is much much faster
-	  - Ability to use AutoDisableBodies. When turned on, ODE will
-	     disable any rigid body that hasn't been moving much recently.
-	     Generally, this means the body is on the ground, so it speeds
-             things up by not doing collision-detection with that body.
-             When an enabled body collides with a disabled body, it will
-             enable it.
-	  - More to come...
-	  - *warning* ODE 0.5 required. 
+	    - TriMesh collisions (that collide with everything except planes,
+	      since that is missing in ODE currently) Partly from code posted
+	      to crystal-main by Marc Rochel.
+	    - Ability to select QuickStep (setting iterations not possible yet)
+	      QuickStep is a new solver for ODE that is much much faster.
+	    - Ability to use AutoDisableBodies. When turned on, ODE will
+	      disable any rigid body that hasn't been moving much recently.
+	      Generally, this means the body is on the ground, so it speeds
+	      things up by not doing collision-detection with that body.  When
+	      an enabled body collides with a disabled body, it will enable it.
+	    - More to come...
+	    - *Warning* ODE 0.5 required. 
 	- Mike Handverger updated phystut to demo odedynam updates:
-	  - Added on screen display for various things
-	  - Select Solver with the following keys
-	    1 = WorldStep
-	    2 = StepFast
-	    3 = QuickStep
-	  - Turn on AutoDisableBodies with 'd'
-	  - Create a TriMesh 'm'
+	    - Added on screen display for various things.
+	    - Select Solver with the following keys:
+	        1 = WorldStep
+	        2 = StepFast
+	        3 = QuickStep
+	    - Turn on AutoDisableBodies with 'd'.
+	    - Create a TriMesh 'm'.
 3-Sep-2004
 	- Eric Sunshine applied a patch from <cbarney1509@earthlink.net> which
 	  changes csgfx/mipmap.inc "from array index to pointer offsetting
