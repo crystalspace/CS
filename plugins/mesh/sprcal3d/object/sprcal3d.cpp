@@ -17,7 +17,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "sprcal3d.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/quaterni.h"
@@ -40,7 +40,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/memfile.h"
 #include "csutil/csmd5.h"
 #include "iengine/mesh.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "qsqrt.h"
 
 // STL include required by cal3d

@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "qint.h"
 #include "beziermsh.h"
 #include "lightpool.h"

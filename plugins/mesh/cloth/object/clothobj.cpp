@@ -21,7 +21,7 @@
 #include <string.h>
 #include "cssysdef.h"
 #include "qsqrt.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
 #include "csutil/virtclk.h"

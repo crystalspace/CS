@@ -19,7 +19,7 @@
 #ifndef __CS_SPR3D_H__
 #define __CS_SPR3D_H__
 
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "csutil/array.h"
 #include "csutil/parray.h"

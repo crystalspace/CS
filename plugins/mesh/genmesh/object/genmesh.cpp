@@ -21,7 +21,7 @@
 #include "csgeom/box.h"
 #include "csgeom/frustum.h"
 #include "csgeom/trimesh.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
 #include "genmesh.h"

@@ -19,7 +19,7 @@
 #ifndef __CS_SPRCAL3D_H__
 #define __CS_SPRCAL3D_H__
 
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "csutil/parray.h"
 #include "csutil/garray.h"

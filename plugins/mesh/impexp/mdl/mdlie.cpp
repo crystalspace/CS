@@ -28,7 +28,7 @@
 #include "csutil/garray.h"
 
 // all int's in an MDL file are little endian
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 
 // upper bound onsize of biggest data element (vertex, polygon) in an MDL file
 static int const MAX_DATAELEMENT_SIZE = 8192;

@@ -25,8 +25,8 @@
  */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
-#include "cssys/csendian.h"
+#include "csutil/sysfunc.h"
+#include "csutil/csendian.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/quaterni.h"

@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/sysfunc.h"
+#include "csutil/sysfunc.h"
 #include "spr3d.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/sphere.h"
@@ -39,7 +39,7 @@
 #include "csutil/memfile.h"
 #include "csutil/csmd5.h"
 #include "iengine/mesh.h"
-#include "cssys/csendian.h"
+#include "csutil/csendian.h"
 #include "qsqrt.h"
 
 // [res: moved here 'cause I get an "internal compiler error" on msvc7... whyever]
