@@ -245,13 +245,6 @@ public:
    */
   static csMeshWrapper* LoadMeshObject (csEngine*, const char* fname);
 
-  /// Load a sound and return an iSoundData object
-  static iSoundHandle* LoadSoundHandle(const char* filename);
-
-  /// Load a sound and add it to the engine
-  static csSoundDataObject *LoadSoundObject (csEngine*, char* name,
-    const char* fname);
-
   /// Set loader mode (see CS_LOADER_XXX flags above)
   static void SetMode (int iFlags);
 
@@ -289,6 +282,10 @@ public:
   virtual iImage *LoadImage (const char *fname);
   virtual iTextureHandle *LoadTexture (const char *fname, int flags);
   virtual iTextureWrapper *LoadTexture (const char *name, const char *fname, int flags);
+
+  virtual iSoundData *LoadSoundData (const char *fname);
+  virtual iSoundHandle *LoadSound (const char *fname);
+  virtual csSoundDataObject *LoadSound (const char *name, const char *fname);
 };
 
 #endif // __CS_CSLOADER_H__

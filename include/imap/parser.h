@@ -28,6 +28,7 @@ struct iTextureHandle;
 struct iTextureWrapper;
 struct iSoundData;
 struct iSoundHandle;
+class csSoundDataObject;
 
 SCF_VERSION (iLoader, 0, 0, 1);
 
@@ -79,6 +80,13 @@ struct iLoaderNew : public iPlugIn
    */
   virtual iTextureWrapper *LoadTexture (const char *Name,
     const char *FileName, int Flags = CS_TEXTURE_3D) = 0;
+
+  /// Load a sound file and return an iSoundData object
+  virtual iSoundData *LoadSoundData (const char *fname) = 0;
+  /// Load a sound file and register the sound
+  virtual iSoundHandle *LoadSound (const char *fname) = 0;
+  /// Load a sound file, register the sound and create a wrapper object for it
+  virtual csSoundDataObject *LoadSound (const char *name, const char *fname) = 0;
 };
 
 #endif // __IMAP_PARSER_H__

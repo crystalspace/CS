@@ -914,81 +914,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 
 //---------------------------------------------------------------------------
 
-iSoundHandle* csLoader::LoadSoundHandle(const char* filename) {
-  /* @@@ get the needed plugin interfaces:
-   * when moving the loader to a plug-in, this should be done
-   * at initialization, and pointers shouldn't be DecRef'ed here.
-   * The 'no sound loader' warning should also be printed at
-   * initialization.
-   * I marked all cases with '###'.
-   */
-
-  /* get format descriptor */
-  /* ### */iSoundRender *SoundRender =
-    QUERY_PLUGIN_ID(System, CS_FUNCID_SOUND, iSoundRender);
-  /* ### */if (!SoundRender) return NULL;
-
-  /* read the file data */
-  iDataBuffer *buf = System->VFS->ReadFile (filename);
-  if (!buf || !buf->GetSize ())
-  {
-    if (buf) buf->DecRef ();
-    CsPrintf (MSG_WARNING,
-      "Cannot open sound file \"%s\" from VFS\n", filename);
-    return NULL;
-  }
-
-  /* ### get sound loader plugin */
-  static bool TriedToLoadSound = false;
-  iSoundLoader *SoundLoader =
-    QUERY_PLUGIN_ID(System, CS_FUNCID_SNDLOADER, iSoundLoader);
-  if (!SoundLoader) {
-    if (!TriedToLoadSound) {
-      TriedToLoadSound = true;
-      CsPrintf(MSG_WARNING,
-        "Trying to load sound without sound loader.\n");
-    }
-    return NULL;
-  }
-
-  /* load the sound */
-  iSoundData *Sound = SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize ());
-  buf->DecRef ();
-  /* ### */SoundLoader->DecRef();
-
-  /* check for valid sound data */
-  if (!Sound) {
-    CsPrintf (MSG_WARNING, "Cannot create sound data from file \"%s\"!\n", filename);
-    return NULL;
-  }
-
-  /* register the sound */
-  iSoundHandle *hdl = SoundRender->RegisterSound(Sound);
-  /* ### */SoundRender->DecRef();
-
-  return hdl;
-}
-
-
-csSoundDataObject *csLoader::LoadSoundObject (csEngine* engine,
-  char* name, const char* fname) {
-
-  Engine=engine;
-  /* load the sound handle */
-  iSoundHandle *Sound = LoadSoundHandle(fname);
-
-  /* build wrapper object */
-  csSoundDataObject* sndobj = new csSoundDataObject (Sound);
-  sndobj->SetName (name);
-
-  /* add it to the engine */
-// @@@ engine->GetSounds()->Add(sndobj);
-
-  return sndobj;
-}
-
-//---------------------------------------------------------------------------
-
 static void ResolvePortalSectors (csEngine* Engine, bool onlyRegion,
 	csThing* ps)
 {
@@ -1503,7 +1428,7 @@ bool csLoader::LoadSounds (char* buf)
         iSoundHandle *snd = csSoundDataObject::GetSound (*Engine, name);
         if (!snd)
         {
-          csSoundDataObject *s = LoadSoundObject(Engine, name, filename);
+          csSoundDataObject *s = GlobalLoader->LoadSound(name, filename);
           if (s)
           {
             Engine->ObjAdd(s);
@@ -2602,3 +2527,58 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname, int
 
   return &(TexWrapper->scfiTextureWrapper);
 }
+
+//--- Sound Loading ---------------------------------------------------------
+
+iSoundData *csLoader::LoadSoundData(const char* filename) {
+  if (!tmpWrap.VFS || !tmpWrap.SoundLoader)
+    return NULL;
+
+  // read the file data
+  iDataBuffer *buf = tmpWrap.VFS->ReadFile (filename);
+  if (!buf || !buf->GetSize ()) {
+    if (buf) buf->DecRef ();
+    System->Printf (MSG_WARNING,
+      "Cannot open sound file \"%s\" from VFS\n", filename);
+    return NULL;
+  }
+
+  // load the sound
+  iSoundData *Sound = tmpWrap.SoundLoader->LoadSound(buf->GetUint8 (), buf->GetSize ());
+  buf->DecRef ();
+
+  // check for valid sound data
+  if (!Sound) System->Printf (MSG_WARNING,
+    "Cannot create sound data from file \"%s\"!\n", filename);
+
+  return Sound;
+}
+
+iSoundHandle *csLoader::LoadSound(const char* filename) {
+  if (!tmpWrap.SoundRender)
+    return NULL;
+
+  iSoundData *Sound = LoadSoundData(filename);
+  if (!Sound) return NULL;
+
+  /* register the sound */
+  iSoundHandle *hdl = tmpWrap.SoundRender->RegisterSound(Sound);
+  if (!hdl)
+    System->Printf (MSG_WARNING, "Cannot register sound \"%s\"!\n", filename);
+
+  return hdl;
+}
+
+csSoundDataObject *csLoader::LoadSound (const char* name, const char* fname) {
+  // load the sound handle
+  iSoundHandle *Sound = LoadSound(fname);
+  if (!Sound) return NULL;
+
+  // build wrapper object
+  csSoundDataObject* sndobj = new csSoundDataObject (Sound);
+  sndobj->SetName (name);
+
+  // @@@ add the sound to the engine
+  return sndobj;
+}
+
