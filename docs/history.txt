@@ -12,6 +12,9 @@ The history order is reversed so that new features are at the top.
             there is no info about last focused child window calls 
             GetFirstFocusableChild and focus it.
 	- Jorrit fixed formatting with the csQuaternion class.
+	- Matze fixed 2 errors in the jam rules for .csplugin -> metadata.rc:
+	    There was no dependency set from .csplugin->metadata.rc and the
+	    generated file was not added to the clean target.
 22-Jun-2003
 	- Luca did the following:
 	  - Fixed a bug in the label component of AWS: in fact the method
