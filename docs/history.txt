@@ -23,6 +23,9 @@ chronological order.
 	  because it is used in flarge (it should display nothing with
 	  OR).
 	- Jorrit added a protomesh to flarge.
+	- Jorrit added a new foliage mesh. This mesh does not do anything
+	  at this moment. It is just an empty stub. Real implementation will
+	  follow soon.
 6-Oct-2004
 	- Jorrit did various lighting related optimizations to genmesh:
 	    - To genmesh pseudo dynamic lighting handling. If the light is

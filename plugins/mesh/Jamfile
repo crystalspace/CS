@@ -33,4 +33,5 @@ if [ Property build : newrenderer ] || [ Property build : projgen ]
 {
   SubInclude TOP plugins mesh terrain ;
   SubInclude TOP plugins mesh terrain_brute ;
+  SubInclude TOP plugins mesh foliage ;
 }

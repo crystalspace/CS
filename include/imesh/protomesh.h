@@ -53,7 +53,7 @@ SCF_VERSION (iProtoFactoryState, 0, 0, 1);
  * <p>
  * Main creators of instances implementing this interface:
  *   <ul>
- *   <li>Protomesy mesh object plugin (crystalspace.mesh.object.protomesh)
+ *   <li>Protomesh mesh object plugin (crystalspace.mesh.object.protomesh)
  *   <li>iMeshObjectType::NewFactory()
  *   </ul>
  * Main ways to get pointers to this interface:

@@ -1,0 +1,3 @@
+SubDir TOP plugins mesh foliage persist ;
+
+SubInclude TOP plugins mesh foliage persist standard ;

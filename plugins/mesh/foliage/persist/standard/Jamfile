@@ -1,0 +1,11 @@
+SubDir TOP plugins mesh foliage persist standard ;
+
+Description foliageldr : "Foliage mesh object loader" ;
+
+Plugin foliageldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith foliageldr : csgeom csutil ;
+
+CompileGroups foliageldr :  meshes ;
+
