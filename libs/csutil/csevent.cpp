@@ -1456,11 +1456,6 @@ bool csEvent::UnflattenXML(const char *buffer, uint32 length)
   return false;
 }
 
-bool csEvent::Pooled()
-{
-  return false;
-}
-
 csPoolEvent::csPoolEvent(csEventQueue *q) 
 {
     pool = q;
@@ -1492,7 +1487,11 @@ void csPoolEvent::DecRef()
   }
 }
 
-bool csPoolEvent::Pooled()
+void csPoolEvent::DecRefUnlessPooled()
 {
-  return true;
+}
+
+void csPoolEvent::IncRefIfPooled()
+{
+  IncRef();
 }
