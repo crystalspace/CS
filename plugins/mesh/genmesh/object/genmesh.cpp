@@ -330,16 +330,16 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
       {
     csColor& c = static_mesh_colors[v];
     uint8 b;
-    if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;;
+    if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
     c.red = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
-    if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;;
+    if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
     c.green = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
-    if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;;
+    if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b)) goto stop;
     c.blue = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
       }
 
       uint8 c;
-      if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;;
+      if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
       while (c != 0)
       {
     char lid[16];
@@ -358,13 +358,13 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
       if (mf.Read ((char*)&b, sizeof (b)) != sizeof (b))
       {
         delete shadowArr;
-        goto stop;;
+        goto stop;
       }
       intensities[n] = (float)b / (float)CS_NORMAL_LIGHT_LEVEL;
     }
     pseudoDynInfo.Put (l, shadowArr);
 
-    if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;;
+    if (mf.Read ((char*)&c, sizeof (c)) != sizeof (c)) goto stop;
       }
       rc = true;
     }
@@ -685,7 +685,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
     shadowArr = new csShadowArray ();
     pseudoDynInfo.Put (li, shadowArr);
     shadowArr->shadowmap = new float[factory->GetVertexCount ()];
-    memset (shadowArr->shadowmap, 0, factory->GetVertexCount () * sizeof (float));
+    memset(shadowArr->shadowmap, 0, factory->GetVertexCount() * sizeof(float));
   }
 
   csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL);
@@ -723,7 +723,8 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
     float vrt_sq_dist = csSquaredDist::PointPoint (obj_light_pos,
       vertices[i]);
     if (vrt_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
-    float in_vrt_dist = (vrt_sq_dist >= SMALL_EPSILON)?qisqrt (vrt_sq_dist):1.0f;
+    float in_vrt_dist =
+      (vrt_sq_dist >= SMALL_EPSILON) ? qisqrt (vrt_sq_dist) : 1.0f;
 
     float cosinus;
     if (vrt_sq_dist < SMALL_EPSILON) cosinus = 1;
@@ -758,8 +759,8 @@ void csGenmeshMeshObject::FinalizeLighting (iMovable* movable, iLight* light,
 {
 }
 
-void csGenmeshMeshObject::UpdateLightingOne (const csReversibleTransform& trans,
-    iLight* li)
+void csGenmeshMeshObject::UpdateLightingOne (
+  const csReversibleTransform& trans, iLight* li)
 {
   csVector3* normals = factory->GetNormals ();
   csColor* colors = lit_mesh_colors;
@@ -768,7 +769,8 @@ void csGenmeshMeshObject::UpdateLightingOne (const csReversibleTransform& trans,
   csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
   float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
   if (obj_sq_dist >= li->GetInfluenceRadiusSq ()) return;
-  float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
+  float in_obj_dist =
+    (obj_sq_dist >= SMALL_EPSILON) ? qisqrt (obj_sq_dist) : 1.0f;
 
   csColor light_color = li->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
       * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
@@ -1514,7 +1516,8 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetRenderBuffer (csStringID name)
 }
 */
 
-void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (csShaderVariable* var)
+void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
+  csShaderVariable* var)
 {
   if (var->Name == vertex_name)
   {
@@ -1524,7 +1527,8 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (csShaderVariable* va
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_vertices_dirty_flag = false;
-      vertex_buffer->CopyToBuffer (mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
+      vertex_buffer->CopyToBuffer (
+        mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
     }
     var->SetValue(vertex_buffer);
     return;
@@ -1537,7 +1541,8 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (csShaderVariable* va
         sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 2, false);
       mesh_texels_dirty_flag = false;
-      texel_buffer->CopyToBuffer (mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+      texel_buffer->CopyToBuffer (
+        mesh_texels, sizeof (csVector2)*num_mesh_vertices);
     }
     var->SetValue(texel_buffer);
     return;
@@ -1550,7 +1555,8 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (csShaderVariable* va
         sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_normals_dirty_flag = false;
-      normal_buffer->CopyToBuffer (mesh_normals, sizeof (csVector3)*num_mesh_vertices);
+      normal_buffer->CopyToBuffer (
+        mesh_normals, sizeof (csVector3)*num_mesh_vertices);
     }
     var->SetValue(normal_buffer);
     return;
@@ -1563,7 +1569,8 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (csShaderVariable* va
         sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC,
         CS_BUFCOMP_FLOAT, 3, false);
       mesh_colors_dirty_flag = false;
-      color_buffer->CopyToBuffer (mesh_colors, sizeof (csColor) * num_mesh_vertices);
+      color_buffer->CopyToBuffer (
+        mesh_colors, sizeof (csColor) * num_mesh_vertices);
     }
     var->SetValue(color_buffer);
     return;
@@ -1584,7 +1591,8 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (csShaderVariable* va
         ibuf[i * 3 + 1] = mesh_triangles[i].b;
         ibuf[i * 3 + 2] = mesh_triangles[i].c;
       }
-      index_buffer->CopyToBuffer (ibuf, sizeof (unsigned int)*num_mesh_triangles*3);
+      index_buffer->CopyToBuffer (
+        ibuf, sizeof (unsigned int)*num_mesh_triangles*3);
       delete [] ibuf;
     }
     var->SetValue(index_buffer);
@@ -1629,8 +1637,8 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 #ifndef CS_USE_NEW_RENDERER
   if (top_mesh.triangles)
   {
-    memcpy (new_triangles, top_mesh.triangles, sizeof (csTriangle)*
-        MIN (n, top_mesh.num_triangles));
+    memcpy (new_triangles, top_mesh.triangles,
+      sizeof (csTriangle) * MIN (n, top_mesh.num_triangles));
   }
   top_mesh.num_triangles = n;
   delete[] top_mesh.triangles;
@@ -1638,8 +1646,8 @@ void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 #else
   if (mesh_triangles)
   {
-    memcpy (new_triangles, mesh_triangles, sizeof (csTriangle)*
-        MIN (n, num_mesh_triangles));
+    memcpy (new_triangles, mesh_triangles,
+      sizeof (csTriangle) * MIN (n, num_mesh_triangles));
   }
   num_mesh_triangles = n;
   delete [] mesh_triangles;
@@ -1965,41 +1973,39 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
     triangles[11].a = 23; triangles[11].b = 17; triangles[11].c = 14;
 
     csVector3* normals = GetNormals();
-    normals[0].Set(box.MinX(), box.MaxY(), box.MinZ()); normals[0].Normalize();
-    normals[1].Set(box.MinX(), box.MaxY(), box.MinZ()); normals[1].Normalize();
-    normals[2].Set(box.MinX(), box.MaxY(), box.MinZ()); normals[2].Normalize();
+    normals[0].Set(box.MinX(),box.MaxY(),box.MinZ()); normals[0].Normalize();
+    normals[1].Set(box.MinX(),box.MaxY(),box.MinZ()); normals[1].Normalize();
+    normals[2].Set(box.MinX(),box.MaxY(),box.MinZ()); normals[2].Normalize();
 
-    normals[3].Set(box.MinX(), box.MaxY(), box.MaxZ()); normals[3].Normalize();
-    normals[4].Set(box.MinX(), box.MaxY(), box.MaxZ()); normals[4].Normalize();
-    normals[5].Set(box.MinX(), box.MaxY(), box.MaxZ()); normals[5].Normalize();
+    normals[3].Set(box.MinX(),box.MaxY(),box.MaxZ()); normals[3].Normalize();
+    normals[4].Set(box.MinX(),box.MaxY(),box.MaxZ()); normals[4].Normalize();
+    normals[5].Set(box.MinX(),box.MaxY(),box.MaxZ()); normals[5].Normalize();
 
-    normals[6].Set(box.MaxX(), box.MaxY(), box.MaxZ()); normals[6].Normalize();
-    normals[7].Set(box.MaxX(), box.MaxY(), box.MaxZ()); normals[7].Normalize();
-    normals[8].Set(box.MaxX(), box.MaxY(), box.MaxZ()); normals[8].Normalize();
+    normals[6].Set(box.MaxX(),box.MaxY(),box.MaxZ()); normals[6].Normalize();
+    normals[7].Set(box.MaxX(),box.MaxY(),box.MaxZ()); normals[7].Normalize();
+    normals[8].Set(box.MaxX(),box.MaxY(),box.MaxZ()); normals[8].Normalize();
 
-    normals[9].Set(box.MaxX(), box.MaxY(), box.MinZ()); normals[9].Normalize();
-    normals[10].Set(box.MaxX(), box.MaxY(), box.MinZ()); normals[10].Normalize();
-    normals[11].Set(box.MaxX(), box.MaxY(), box.MinZ()); normals[11].Normalize();
+    normals[9].Set(box.MaxX(),box.MaxY(),box.MinZ()); normals[9].Normalize();
+    normals[10].Set(box.MaxX(),box.MaxY(),box.MinZ()); normals[10].Normalize();
+    normals[11].Set(box.MaxX(),box.MaxY(),box.MinZ()); normals[11].Normalize();
 
-    normals[12].Set(box.MinX(), box.MinY(), box.MaxZ()); normals[12].Normalize();
-    normals[13].Set(box.MinX(), box.MinY(), box.MaxZ()); normals[13].Normalize();
-    normals[14].Set(box.MinX(), box.MinY(), box.MaxZ()); normals[14].Normalize();
+    normals[12].Set(box.MinX(),box.MinY(),box.MaxZ()); normals[12].Normalize();
+    normals[13].Set(box.MinX(),box.MinY(),box.MaxZ()); normals[13].Normalize();
+    normals[14].Set(box.MinX(),box.MinY(),box.MaxZ()); normals[14].Normalize();
 
-    normals[15].Set(box.MaxX(), box.MinY(), box.MaxZ()); normals[15].Normalize();
-    normals[16].Set(box.MaxX(), box.MinY(), box.MaxZ()); normals[16].Normalize();
-    normals[17].Set(box.MaxX(), box.MinY(), box.MaxZ()); normals[17].Normalize();
+    normals[15].Set(box.MaxX(),box.MinY(),box.MaxZ()); normals[15].Normalize();
+    normals[16].Set(box.MaxX(),box.MinY(),box.MaxZ()); normals[16].Normalize();
+    normals[17].Set(box.MaxX(),box.MinY(),box.MaxZ()); normals[17].Normalize();
 
-    normals[18].Set(box.MaxX(), box.MinY(), box.MinZ()); normals[18].Normalize();
-    normals[19].Set(box.MaxX(), box.MinY(), box.MinZ()); normals[19].Normalize();
-    normals[20].Set(box.MaxX(), box.MinY(), box.MinZ()); normals[20].Normalize();
+    normals[18].Set(box.MaxX(),box.MinY(),box.MinZ()); normals[18].Normalize();
+    normals[19].Set(box.MaxX(),box.MinY(),box.MinZ()); normals[19].Normalize();
+    normals[20].Set(box.MaxX(),box.MinY(),box.MinZ()); normals[20].Normalize();
 
-    normals[21].Set(box.MinX(), box.MinY(), box.MinZ()); normals[21].Normalize();
-    normals[22].Set(box.MinX(), box.MinY(), box.MinZ()); normals[22].Normalize();
-    normals[23].Set(box.MinX(), box.MinY(), box.MinZ()); normals[23].Normalize();
+    normals[21].Set(box.MinX(),box.MinY(),box.MinZ()); normals[21].Normalize();
+    normals[22].Set(box.MinX(),box.MinY(),box.MinZ()); normals[22].Normalize();
+    normals[23].Set(box.MinX(),box.MinY(),box.MinZ()); normals[23].Normalize();
 
     Invalidate();
-
-
 
 #if 0
   SetVertexCount (8);
@@ -2238,5 +2244,3 @@ bool csGenmeshMeshObjectType::Initialize (iObjectRegistry* object_reg)
 
   return true;
 }
-
-
