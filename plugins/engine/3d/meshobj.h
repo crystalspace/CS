@@ -167,13 +167,6 @@ protected:
   uint32 visnr;
 
   /**
-   * Cached lod number. This is valid if cached_lod_visnr is equal
-   * to visnr.
-   */
-  float cached_lod;
-  uint32 cached_lod_visnr;
-
-  /**
    * Position in the world.
    */
   csMovable movable;
@@ -310,13 +303,6 @@ protected:
 public:
   /// Constructor.
   csMeshWrapper (iMeshWrapper* theParent, iMeshObject* meshobj = 0);
-
-  /**
-  * During rendering a child mesh can ask its parent if it should
-  * be rendered or not. This is not very efficient so we should change
-  * this but for now this is our solution. @@@
-  */
-  bool IsChildVisible (iMeshWrapper* child, iRenderView* rview);
 
   /// Set the mesh factory.
   void SetFactory (iMeshFactoryWrapper* factory)
@@ -456,12 +442,16 @@ public:
   iLODControl* GetStaticLOD ();
   void RemoveMeshFromStaticLOD (iMeshWrapper* mesh);
   void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh);
+  csStaticLODMesh* GetStaticLODMesh () const { return static_lod; }
+  /// Return true if there is a parent mesh that has static lod.
+  bool SomeParentHasStaticLOD () const;
 
   /**
    * Draw the zpass for the object.  If this object doesn't use lighting
    * then it can be drawn fully here.
    */
-  csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview, iMovable* movable);
+  csRenderMesh** GetRenderMeshes (int& num, iRenderView* rview,
+  	iMovable* movable);
   /// This pass sets up the shadow stencil buffer
   void DrawShadow (iRenderView* rview, iLight* light);
   /// This pass draws the diffuse lit mesh

@@ -475,18 +475,21 @@ public:
   void RegisterPortalMesh (iMeshWrapper* mesh);
   void UnregisterPortalMesh (iMeshWrapper* mesh);
 
-  //--------------------- iVisibilityCullerListner interface ------------------
+  //--------------------- iVisibilityCullerListener interface ------------------
+  // Note! For OR only!
   struct eiVisibilityCullerListener : public iVisibilityCullerListener
   {
+    iRenderView* rview;
     SCF_DECLARE_EMBEDDED_IBASE (csSector);
     virtual void ObjectVisible (iVisibilityObject *visobj, iMeshWrapper *mesh)
-      { scfParent->ObjectVisible (visobj, mesh);  }
+    {
+      scfParent->ObjectVisible (rview, visobj, mesh);
+    }
   } scfiVisibilityCullerListener;
 
-  void ObjectVisible (iVisibilityObject *visobj, iMeshWrapper *mesh)
-  {
-    visobj->SetVisibilityNumber (current_visnr);
-  }
+  void ObjectVisible (iRenderView* rview, iVisibilityObject *visobj,
+  	iMeshWrapper *mesh);
+  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh);
 
   //------------------------- iSector interface -------------------------------
   struct eiSector : public iSector

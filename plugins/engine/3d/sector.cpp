@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "qint.h"
+#include "qsqrt.h"
 #include "csutil/csstring.h"
 #include "csutil/hashmap.h"
 #include "csutil/csppulse.h"
@@ -148,20 +149,30 @@ csSector::~csSector ()
 
 void csSector::RegisterEntireMeshToCuller (iMeshWrapper* mesh)
 {
+  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
+    	->GetCsMeshWrapper ();
+  if (cmesh->SomeParentHasStaticLOD ()) return;
+
   csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
         iVisibilityObject);
   culler->RegisterVisObject (vo);
+
+  if (cmesh->GetStaticLODMesh ()) return;
   int i;
-  iMeshList* ml = mesh->GetChildren ();
-  for (i = 0 ; i < ml->GetCount () ; i++)
+  const csMeshMeshList& ml = cmesh->GetChildren ();
+  for (i = 0 ; i < ml.GetCount () ; i++)
   {
-    iMeshWrapper* child = ml->Get (i);
+    iMeshWrapper* child = ml.Get (i);
     RegisterEntireMeshToCuller (child);
   }
 }
 
 void csSector::RegisterMeshToCuller (iMeshWrapper* mesh)
 {
+  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
+    	->GetCsMeshWrapper ();
+  if (cmesh->SomeParentHasStaticLOD ()) return;
+
   csRef<iVisibilityObject> vo = SCF_QUERY_INTERFACE (mesh,
         iVisibilityObject);
   culler->RegisterVisObject (vo);
@@ -254,6 +265,40 @@ iVisibilityCuller* csSector::GetVisibilityCuller ()
   return culler;
 }
 
+// OR only!
+void csSector::MarkMeshAndChildrenVisible (iMeshWrapper* mesh)
+{
+  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
+    	->GetCsMeshWrapper ();
+  cmesh->SetVisibilityNumber (current_visnr);
+  int i;
+  const csMeshMeshList& children = cmesh->GetChildren ();
+  for (i = 0 ; i < children.GetCount () ; i++)
+  {
+    iMeshWrapper* child = children.Get (i);
+    MarkMeshAndChildrenVisible (child);
+  }
+}
+
+// OR only!
+void csSector::ObjectVisible (iRenderView* rview,
+	iVisibilityObject *visobj, iMeshWrapper *mesh)
+{
+  visobj->SetVisibilityNumber (current_visnr);
+  csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
+    	->GetCsMeshWrapper ();
+  csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+  if (static_lod)
+  {
+    float distance = qsqrt (cmesh->GetSquaredDistance (rview));
+    float lod = static_lod->GetLODValue (distance);
+    csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
+    int i;
+    for (i = 0 ; i < meshes.Length () ; i++)
+      MarkMeshAndChildrenVisible (meshes[i]);
+  }
+}
+
 class csSectorVisibleMeshCallback : public iVisibilityCullerListener
 {
 public:
@@ -276,19 +321,32 @@ public:
     this->rview = rview;
   }
 
-  virtual void ObjectVisible (iVisibilityObject *visobject,
-    iMeshWrapper *mesh)
+  void MarkMeshAndChildrenVisible (iMeshWrapper* mesh)
   {
-    if (privMeshlist == 0)
-      return;
-
     csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
-    	->GetCsMeshWrapper ();
-    csMeshWrapper* csParent = cmesh->GetCsParent ();
-    if (csParent && !csParent->IsChildVisible (mesh, rview)) return;
-    /*if (!cmesh->GetMeshObject ()->DrawTest (rview,
-    	&(cmesh->GetCsMovable ()).scfiMovable))
-      return;*/
+    	  ->GetCsMeshWrapper ();
+    ObjectVisible (cmesh);
+    int i;
+    const csMeshMeshList& children = cmesh->GetChildren ();
+    for (i = 0 ; i < children.GetCount () ; i++)
+    {
+      iMeshWrapper* child = children.Get (i);
+      MarkMeshAndChildrenVisible (child);
+    }
+  }
+
+  void ObjectVisible (csMeshWrapper* cmesh)
+  {
+    csStaticLODMesh* static_lod = cmesh->GetStaticLODMesh ();
+    if (static_lod)
+    {
+      float distance = qsqrt (cmesh->GetSquaredDistance (rview));
+      float lod = static_lod->GetLODValue (distance);
+      csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
+      int i;
+      for (i = 0 ; i < meshes.Length () ; i++)
+        MarkMeshAndChildrenVisible (meshes[i]);
+    }
 
     int num;
     csRenderMesh** meshes = cmesh->GetRenderMeshes (num, rview, 
@@ -305,6 +363,16 @@ public:
       privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
 	  cmesh->GetZBufMode (), box);
     }
+  }
+
+  virtual void ObjectVisible (iVisibilityObject*, iMeshWrapper *mesh)
+  {
+    if (privMeshlist == 0)
+      return;
+
+    csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)mesh)
+    	->GetCsMeshWrapper ();
+    ObjectVisible (cmesh);
   }
 
 private:
@@ -806,6 +874,7 @@ void csSector::Draw (iRenderView *rview)
   {
     // Mark visible objects.
     current_visnr++;
+    scfiVisibilityCullerListener.rview = rview;
     culler->VisTest (rview, &scfiVisibilityCullerListener);
     //uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
 

@@ -57,7 +57,6 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject *meshobj) :
 
   movable.scfParent = (iBase*)(csObject*)this;
   visnr = 0;
-  cached_lod_visnr = ~0;
   wor_bbox_movablenr = -1;
   movable.SetMeshWrapper (this);
   Parent = theParent;
@@ -180,6 +179,13 @@ void csMeshWrapper::UpdateMove ()
     iMeshWrapper *spr = children.Get (i);
     spr->GetMovable ()->UpdateMove ();
   }
+}
+
+bool csMeshWrapper::SomeParentHasStaticLOD () const
+{
+  if (!csParent) return false;
+  if (csParent->static_lod) return true;
+  return csParent->SomeParentHasStaticLOD ();
 }
 
 void csMeshWrapper::MoveToSector (iSector *s)
@@ -351,7 +357,6 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
 void csMeshWrapper::Draw (iRenderView *rview)
 {
   if (flags.Check (CS_ENTITY_INVISIBLEMESH)) return;
-  if (csParent && !csParent->IsChildVisible (&scfiMeshWrapper, rview)) return;
   DrawInt (rview);
 }
 
@@ -494,36 +499,6 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
   float wor_sq_dist = GetSquaredDistance (rview);
   float dist = min_imposter_distance->Get ();
   return (wor_sq_dist > dist*dist);
-}
-
-bool csMeshWrapper::IsChildVisible (iMeshWrapper* child, iRenderView* rview)
-{
-  if (static_lod)
-  {
-    uint32 visnr = ((csSector::eiSector*)rview->GetThisSector ())->
-      GetCsSector ()->current_visnr;
-
-    // If we have static lod we only draw the children for the right LOD level.
-    if (cached_lod_visnr != visnr)
-    {
-      float distance = qsqrt (GetSquaredDistance (rview));
-      cached_lod = static_lod->GetLODValue (distance);
-      cached_lod_visnr = visnr;
-    }
-    csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (cached_lod);
-    // @@@ This loop is not very efficient!
-    int i;
-    for (i = 0 ; i < meshes.Length () ; i++)
-    {
-      if (meshes[i] == child) return true;
-    }
-    return false;
-  }
-
-  if (csParent && !csParent->IsChildVisible (&scfiMeshWrapper, rview))
-    return false;
-
-  return true;
 }
 
 void csMeshWrapper::DrawIntFull (iRenderView *rview)

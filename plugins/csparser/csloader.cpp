@@ -1976,8 +1976,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	    return false;
 	  csRef<iNullFactoryState> nullmesh = SCF_QUERY_INTERFACE (
 		fact, iNullFactoryState);
-	  if (nullmesh)
-	    nullmesh->SetBoundingBox (b);
+	  nullmesh->SetBoundingBox (b);
 	}
         break;
       case XMLTOKEN_PARAMS:
