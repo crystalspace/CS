@@ -552,9 +552,9 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   if (dyn_ambient_r || dyn_ambient_g || dyn_ambient_b)
   {
     csRGBcolor ambient;
-    ambient.Set (dyn_ambient_r * (255/1.5),
-                 dyn_ambient_g * (255/1.5),
-                 dyn_ambient_b * (255/1.5)  );
+    ambient.Set ((unsigned char)(dyn_ambient_r * (255/1.5)),
+                 (unsigned char)(dyn_ambient_g * (255/1.5)),
+                 (unsigned char)(dyn_ambient_b * (255/1.5)));
 
     if (max_static_color_values.red   + ambient.red   < 256  &&
         max_static_color_values.green + ambient.green < 256  &&
@@ -637,9 +637,9 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
         } while (p < last_p);
 
         // Now update max color to include this merged shadowmap
-        temp_max_color_values.red   += smap->max_shadow * red;
-        temp_max_color_values.green += smap->max_shadow * green;
-        temp_max_color_values.blue  += smap->max_shadow * blue;
+        temp_max_color_values.red   += (unsigned char)(smap->max_shadow * red);
+        temp_max_color_values.green += (unsigned char)(smap->max_shadow * green);
+        temp_max_color_values.blue  += (unsigned char)(smap->max_shadow * blue);
 #ifdef DEBUG_OVERFLOWOPT
         countfast++;
 #endif
@@ -661,11 +661,11 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
 
         } while (p < last_p);
         // Now update max color to include this merged shadowmap
-        int color = temp_max_color_values.red + smap->max_shadow * red;
+        int color = int(temp_max_color_values.red + smap->max_shadow * red);
         temp_max_color_values.red = (color>255)?255:color;
-        color = temp_max_color_values.green + smap->max_shadow * green;
+        color = int(temp_max_color_values.green + smap->max_shadow * green);
         temp_max_color_values.green = (color>255)?255:color;
-        color = temp_max_color_values.blue + smap->max_shadow * blue;
+        color = int(temp_max_color_values.blue + smap->max_shadow * blue);
         temp_max_color_values.blue= (color>255)?255:color;
 
 #ifdef DEBUG_OVERFLOWOPT

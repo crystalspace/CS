@@ -56,6 +56,8 @@ The history order is reversed so that new features are at the top.
 	    libs/cssys/be/*
 	    plugins/video/canvas/be/*
 	    plugins/video/canvas/openglbe/*
+	- Eric Sunshine eliminated a plethora of compilation warnings recently
+	  introduced into lghtmap.cpp.
 23-Sep-2002
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature
