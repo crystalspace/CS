@@ -24,6 +24,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/strhash.h"
+#include "csutil/array.h"
 
 struct iEngine;
 struct iPluginManager;
@@ -34,6 +35,14 @@ struct iThingState;
 struct iThingFactoryState;
 struct iMeshObject;
 struct iMeshObjectType;
+
+struct RepMaterial
+{
+  char* oldmat;
+  char* newmat;
+  RepMaterial () : oldmat (NULL), newmat (NULL) { }
+  ~RepMaterial () { delete[] oldmat; delete[] newmat; }
+};
 
 /**
  * Private information during the loading process of a thing.
@@ -49,6 +58,7 @@ public:
   float default_texlen;
   bool load_factory;	// If true we are loading a factory.
   bool global_factory;	// We are using a global factory ('factory' or 'clone').
+  csArray<RepMaterial> replace_materials;
 
   ThingLoadInfo () : default_material (NULL), default_texlen (1) {}
 };

@@ -912,11 +912,6 @@ void csThing::SetMovingOption (int opt)
 
       cached_movable = NULL;
       break;
-
-    case CS_THING_MOVE_OFTEN:
-      if (wor_verts != static_data->obj_verts) delete[] wor_verts;
-      wor_verts = static_data->obj_verts;
-      break;
   }
 
   movablenr = -1;                 // @@@ Is this good?
@@ -966,10 +961,6 @@ void csThing::WorUpdate ()
         cameranr--;
       }
       break;
-
-    case CS_THING_MOVE_OFTEN:
-      //@@@ Not implemented yet!
-      return ;
   }
 }
 
@@ -1027,13 +1018,16 @@ void csThing::Prepare ()
 
       int i;
       csPolygon3D *p;
+      csPolygon3DStatic *ps;
       polygons.DeleteAll ();
       for (i = 0 ; i < static_data->static_polygons.Length () ; i++)
       {
 	p = static_data->thing_type->blk_polygon3d.Alloc ();
-	p->SetStaticData (static_data->static_polygons.Get (i));
+	ps = static_data->static_polygons.Get (i);
+	p->SetStaticData (ps);
 	p->SetParent (this);
 	polygons.Push (p);
+	p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
 	p->RefreshFromStaticData ();
 	p->Finish ();
       }
@@ -1072,19 +1066,46 @@ void csThing::Prepare ()
   polybuf_materials = NULL;
 
   int i;
+  csPolygon3DStatic *ps;
   csPolygon3D *p;
   polygons.DeleteAll ();
   for (i = 0; i < static_data->static_polygons.Length (); i++)
   {
     p = static_data->thing_type->blk_polygon3d.Alloc ();
-    p->SetStaticData (static_data->static_polygons.Get (i));
+    ps = static_data->static_polygons.Get (i);
+    p->SetStaticData (ps);
     p->SetParent (this);
     polygons.Push (p);
+    p->SetMaterial (FindRealMaterial (ps->GetMaterialWrapper ()));
     p->RefreshFromStaticData ();
     p->Finish ();
   }
 
   FireListeners ();
+}
+
+iMaterialWrapper* csThing::FindRealMaterial (iMaterialWrapper* old_mat)
+{
+  int i;
+  for (i = 0 ; i < replace_materials.Length () ; i++)
+  {
+    if (replace_materials[i].old_mat == old_mat)
+      return replace_materials[i].new_mat;
+  }
+  return NULL;
+}
+
+void csThing::ReplaceMaterial (iMaterialWrapper* oldmat,
+	iMaterialWrapper* newmat)
+{
+  replace_materials.Push (RepMaterial (oldmat, newmat));
+  prepared = false;
+}
+
+void csThing::ClearReplacedMaterials ()
+{
+  replace_materials.DeleteAll ();
+  prepared = false;
 }
 
 csPolygon3D *csThing::GetPolygon3D (const char *name)
@@ -1359,7 +1380,7 @@ void csThing::PreparePolygonBuffer ()
   {
     matpol[i].spoly = static_data->GetPolygon3DStatic (i);
     matpol[i].poly = GetPolygon3D (i);
-    matpol[i].mat = matpol[i].spoly->GetMaterialWrapper ();
+    matpol[i].mat = matpol[i].poly->GetRealMaterial ();
   }
 
   //-----

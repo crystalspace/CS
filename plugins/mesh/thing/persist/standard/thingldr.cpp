@@ -347,7 +347,13 @@ Nag to Jorrit about this feature if you want it.");
       case XMLTOKEN_REPLACEMATERIAL:
         CHECK_TOPLEVEL("replacematerial");
         CHECK_OBJECTONLY("replacematerial");
-	CREATE_FACTORY_IF_NEEDED;
+	{
+	  int idx = info.replace_materials.Push (RepMaterial ());
+	  info.replace_materials[idx].oldmat = csStrNew (
+		child->GetAttributeValue ("old"));
+	  info.replace_materials[idx].newmat = csStrNew (
+		child->GetAttributeValue ("new"));
+	}
 	break;
 
       case XMLTOKEN_MATERIAL:
@@ -413,6 +419,32 @@ csPtr<iBase> csThingLoader::Parse (iDocumentNode* node,
   {
     info.obj = NULL;
   }
+  else
+  {
+    int i;
+    for (i = 0 ; i < info.replace_materials.Length () ; i++)
+    {
+      RepMaterial& rm = info.replace_materials[i];
+      iMaterialWrapper* old_mat = ldr_context->FindMaterial (rm.oldmat);
+      if (!old_mat)
+      {
+	synldr->ReportError (
+	        "crystalspace.thingloader.parse.material",
+                node, "Couldn't find material named '%s'!", rm.oldmat);
+	return NULL;
+      }
+      iMaterialWrapper* new_mat = ldr_context->FindMaterial (rm.newmat);
+      if (!new_mat)
+      {
+	synldr->ReportError (
+	        "crystalspace.thingloader.parse.material",
+                node, "Couldn't find material named '%s'!", rm.newmat);
+	return NULL;
+      }
+      info.thing_state->ReplaceMaterial (old_mat, new_mat);
+    }
+  }
+
   return csPtr<iBase> (info.obj);
 }
 

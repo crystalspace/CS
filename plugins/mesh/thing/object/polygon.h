@@ -744,13 +744,10 @@ private:
   /**
    * @@@@@@@@@@@@@ DO WE NEED THIS HERE?
    * The physical parent of this polygon.
-   * Important note for CS developers. If the parent of a polygon
-   * is changed in any way and this polygon has a portal then the
-   * portal needs to be removed from the old thing and added to the
-   * new thing (things keep a list of all polygons having a portal
-   * on them).
    */
   csThing* thing;
+
+  iMaterialWrapper* material;
 
   /// The world space plane equation.
   csPlane3 plane_wor;
@@ -808,6 +805,18 @@ public:
    * Refresh texture mapping and other info from static polygon.
    */
   void RefreshFromStaticData ();
+
+  void SetMaterial (iMaterialWrapper* mat) { material = mat; }
+  iMaterialWrapper* GetMaterial () { return material; }
+  /**
+   * Get the real material to use for rendering this polygon.
+   * This will first check the local material and if that is NULL
+   * return the one from the factory.
+   */
+  iMaterialWrapper* GetRealMaterial ()
+  {
+    return material ? material : static_data->GetMaterialWrapper ();
+  }
 
   /**
    * @@@@@ NEEDED?
@@ -1089,6 +1098,14 @@ public:
   	csPlane3& pl)
     {
       scfParent->ComputeCameraPlane (t, pl);
+    }
+    virtual void SetMaterial (iMaterialWrapper* mat)
+    {
+      scfParent->SetMaterial (mat);
+    }
+    virtual iMaterialWrapper* GetMaterial ()
+    {
+      return scfParent->GetMaterial ();
     }
   } scfiPolygon3D;
   friend struct eiPolygon3D;

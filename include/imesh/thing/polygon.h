@@ -257,7 +257,7 @@ struct iPolygon3DStatic : public iBase
   virtual bool PointOnPolygon (const csVector3& v) = 0;
 };
 
-SCF_VERSION (iPolygon3D, 0, 3, 0);
+SCF_VERSION (iPolygon3D, 0, 3, 1);
 
 /**
  * This is the interface to dynamic part of a 3D polygon.
@@ -292,6 +292,15 @@ struct iPolygon3D : public iBase
   /// Compute the camera plane based on the camera transform.
   virtual void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& pl) = 0;
+
+  /**
+   * Set the material for this polygon. This material must have
+   * the same size as the material given in the factory!
+   * If NULL then the factory material will be used.
+   */
+  virtual void SetMaterial (iMaterialWrapper* mat) = 0;
+  /// Get the material for this polygon.
+  virtual iMaterialWrapper* GetMaterial () = 0;
 };
 
 /**

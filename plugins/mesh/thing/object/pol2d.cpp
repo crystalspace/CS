@@ -117,8 +117,9 @@ void csPolygon2D::DrawFilled (
   static G3DPolygonDP g3dpoly;
 
   g3dpoly.num = num_vertices;
-  if (spoly->GetMaterialWrapper ()) spoly->GetMaterialWrapper ()->Visit ();
-  g3dpoly.mat_handle = spoly->GetMaterialHandle ();
+  iMaterialWrapper* rm = poly->GetRealMaterial ();
+  if (rm) rm->Visit ();
+  g3dpoly.mat_handle = rm ? rm->GetMaterialHandle () : NULL;
   g3dpoly.mixmode = spoly->GetMixMode ();
   g3dpoly.mixmode &= ~(CS_FX_ALPHA | CS_FX_MASK_ALPHA);
   if (spoly->GetAlpha ())

@@ -29,6 +29,7 @@
 #include "csutil/csvector.h"
 #include "csutil/array.h"
 #include "csutil/refarr.h"
+#include "csutil/array.h"
 #include "csutil/blockallocator.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
@@ -60,6 +61,17 @@ struct iMovable;
 struct iFrustumView;
 struct iMaterialWrapper;
 struct iPolygonBuffer;
+
+/**
+ * A structure used to replace materials.
+ */
+struct RepMaterial
+{
+  iMaterialWrapper* old_mat;
+  iMaterialWrapper* new_mat;
+  RepMaterial (iMaterialWrapper* o, iMaterialWrapper* n) :
+  	old_mat (o), new_mat (n) { }
+};
 
 /**
  * A helper class for iPolygonMesh implementations used by csThing.
@@ -413,6 +425,9 @@ private:
   /// The array of dynamic polygon data (csPolygon3D).
   csPolygonArray polygons;
 
+  /// Optional array of materials to replace.
+  csArray<RepMaterial> replace_materials;
+
 #ifndef CS_USE_NEW_RENDERER
   /**
    * If we are a detail object then this will contain a reference to a
@@ -610,6 +625,12 @@ public:
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 
+  /// Find the real material to use if it was replaced (or NULL if not).
+  iMaterialWrapper* FindRealMaterial (iMaterialWrapper* old_mat);
+
+  void ReplaceMaterial (iMaterialWrapper* oldmat, iMaterialWrapper* newmat);
+  void ClearReplacedMaterials ();
+
   //----------------------------------------------------------------------
   // Bounding information
   //----------------------------------------------------------------------
@@ -799,6 +820,16 @@ public:
       scfParent->Prepare ();
       if (scfParent->static_data->flags.Check (CS_THING_FASTMESH))
         scfParent->PreparePolygonBuffer ();
+    }
+
+    virtual void ReplaceMaterial (iMaterialWrapper* oldmat,
+  	iMaterialWrapper* newmat)
+    {
+      scfParent->ReplaceMaterial (oldmat, newmat);
+    }
+    virtual void ClearReplacedMaterials ()
+    {
+      scfParent->ClearReplacedMaterials ();
     }
   } scfiThingState;
   friend struct ThingState;

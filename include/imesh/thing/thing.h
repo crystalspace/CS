@@ -54,7 +54,6 @@ struct iMovable;
  * SetMovingOption() for more info.
  */
 #define CS_THING_MOVE_NEVER 0
-#define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
 
@@ -167,7 +166,7 @@ struct iThingFactoryState : public iBase
   virtual void SetCosinusFactor (float cosfact) = 0;
 };
 
-SCF_VERSION (iThingState, 0, 6, 0);
+SCF_VERSION (iThingState, 0, 6, 1);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -225,17 +224,6 @@ struct iThingState : public iBase
    *       move but more memory is used as all the vertices are duplicated.
    *       Use this option for geometry that is not too big (in number of
    *       vertices) and only moves occasionally like doors of elevators.
-   *   <li>CS_THING_MOVE_OFTEN: this option is set for a thing that moves
-   *       very often (i.e. almost every frame). Setting this option means
-   *       that the object->world and camera transformations will be combined
-   *       at render time. It has the same memory efficiency as MOVE_NEVER
-   *       but the transforms need to be combined every frame (if the object
-   *       is visible). Use this option for geometry that moves a lot. Also
-   *       very useful for objects that often move and have lots of vertices
-   *       since in that case combining the transforms ones is a lot more
-   *       efficient than doing two transforms on every vertex.
-   *	   <b>WARNING:</b> This option is currently NOT supported!
-   *	   Use CS_THING_MOVE_OCCASIONAL instead.
    * </ul>
    */
   virtual void SetMovingOption (int opt) = 0;
@@ -258,6 +246,22 @@ struct iThingState : public iBase
    * decrease the time need to setup things later.
    */
   virtual void Prepare () = 0;
+
+  /**
+   * Scan all polygons and replace the given material with a new material.
+   * Note that the new material MUST have the same size as the old material!
+   * If 'newmat' == NULL then the default from the factory will be used
+   * again. Note that 'oldmat' will always be compared from the factory
+   * and not from the current material the polygon has!
+   */
+  virtual void ReplaceMaterial (iMaterialWrapper* oldmat,
+  	iMaterialWrapper* newmat) = 0;
+
+  /**
+   * Clear all replaced materials (i.e. reset to default materials from
+   * factory).
+   */
+  virtual void ClearReplacedMaterials () = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 3, 0);

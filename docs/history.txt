@@ -23,6 +23,14 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug with collision detection and HardTransform of a thing
 	  mesh object. This is a new bug introduced with my changes yesterday
 	  and it was visible in the partsys level (when traversing a portal).
+	- Removed the unsupported CS_THING_MOVE_OFTEN flag. Only OCCASIONAL
+	  and NEVER remain.
+	- Added iPolygon3D->SetMaterial() and GetMaterial().
+	- Added iThingState->ReplaceMaterial() to scan all polygons and
+	  replace the material with another one (must be the same size!).
+	  The new 'replacematerials' now uses this function.
+	  Additionally added iThingState->ClearReplacedMaterials() to
+	  reset all replaced materials to default (i.e. use from factory).
 	- Philip Wyett fixed glut detection in Jam configure process.
 	- Wouter Wijngaards fixed a problem with the software sound
 	  renderer, where it would malfunction if multiple sounds caused 
