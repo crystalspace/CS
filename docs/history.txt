@@ -31,6 +31,8 @@ chronological order.
 	- res moved PreacheTexture() to iTextureHandle.
 	- res removed the NR GL texture cache and merged the relevant code
 	  (texture uploading, mainly) with the texture manager.
+	- res enabled bindoc compilation on 64bit systems. Seems to work on
+	  fine on SF's AMD64 compile farm machine.
 30-Sep-2004
 	- Jorrit added a new 'copy' flag to CreateRenderBuffer() and
 	  CreateIndexRenderBuffer() which is default to true. Meshes can
