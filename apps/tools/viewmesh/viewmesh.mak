@@ -32,7 +32,7 @@ VIEWMESH.EXE = viewmesh$(EXE)
 INC.VIEWMESH = $(wildcard apps/tools/viewmesh/*.h)
 SRC.VIEWMESH = $(wildcard apps/tools/viewmesh/*.cpp)
 OBJ.VIEWMESH = $(addprefix $(OUT),$(notdir $(SRC.VIEWMESH:.cpp=$O)))
-DEP.VIEWMESH = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.VIEWMESH = CSWS CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.VIEWMESH = $(foreach d,$(DEP.VIEWMESH),$($d.LIB))
 
 #TO_INSTALL.EXE += $(VIEWMESH.EXE)

@@ -21,6 +21,8 @@
 
 #include <stdarg.h>
 
+#include "csws/csws.h"
+
 struct iEngine;
 struct iLoader;
 struct iGraphics3D;
@@ -31,11 +33,8 @@ struct iVirtualClock;
 struct iSector;
 struct iView;
 
-class ViewMesh
+class ViewMesh : public csApp
 {
-public:
-  iObjectRegistry* object_reg;
-
 private:
   iEngine* engine;
   iLoader* loader;
@@ -43,19 +42,15 @@ private:
   iKeyboardDriver* kbd;
   iSector* room;
   iView* view;
-  iVirtualClock* vc;
  
 public:
-  ViewMesh ();
+  ViewMesh (iObjectRegistry *object_reg, csSkin &Skin);
   virtual ~ViewMesh ();
 
-  bool Initialize (int argc, const char* const argv[],
-    const char *iConfigName);
+  bool Initialize ();
   bool HandleEvent (iEvent&);
   void SetupFrame ();
   void FinishFrame ();
-
-  void Report (int severity, const char* msg, ...);
 };
 
 #endif // __VIEWMESH_H__

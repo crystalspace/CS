@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+30-Oct-2001
+	- Matze changed code structure of viewmesh a bit. I'll add csws
+	  interfaces tomorrow
+
 29-Oct-2001
 	- Eric Sunshine augmented the makefile configuration procedure for the
 	  Apple/NeXT ports so that they work even if executable permission has

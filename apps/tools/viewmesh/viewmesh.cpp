@@ -54,28 +54,25 @@
 #include "igraphic/imageio.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
 #include "iutil/vfs.h"
 
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-// The global system driver
-ViewMesh *System;
-
-ViewMesh::ViewMesh ()
+ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
+    : csApp (object_reg, Skin)
 {
   view = NULL;
   engine = NULL;
   loader = NULL;
   g3d = NULL;
   kbd = NULL;
-  vc = NULL;
 }
 
 ViewMesh::~ViewMesh ()
 {
-  if (vc) vc->DecRef ();
   if (view) view->DecRef ();
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
@@ -83,131 +80,59 @@ ViewMesh::~ViewMesh ()
   if (kbd) kbd->DecRef ();
 }
 
-void ViewMesh::Report (int severity, const char* msg, ...)
-{
-  va_list arg;
-  va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
-  if (rep)
-  {
-    rep->ReportV (severity, "crystalspace.application.viewmesh", msg, arg);
-    rep->DecRef ();
-  }
-  else
-  {
-    csPrintfV (msg, arg);
-    csPrintf ("\n");
-  }
-  va_end (arg);
-}
-
-void Cleanup ()
-{
-  csPrintf ("Cleaning up...\n");
-  iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = NULL;
-  csInitializer::DestroyApplication (object_reg);
-}
-
-static bool ViewEventHandler (iEvent& ev)
+bool ViewMesh::HandleEvent (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    System->SetupFrame ();
+    SetupFrame ();
     return true;
   }
   else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
   {
-    System->FinishFrame ();
+    FinishFrame ();
     return true;
   }
-  else
+  else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    return System ? System->HandleEvent (ev) : false;
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+    {
+      q->GetEventOutlet()->Broadcast
+	(cscmdQuit);
+      q->DecRef ();
+    }
+    return true;
   }
+ 
+  return false; 
 }
 
-bool ViewMesh::Initialize (int argc, const char* const argv[],
-  const char *iConfigName)
+#define VM_QUERYPLUGIN(var, intf, str)				\
+  var = CS_QUERY_REGISTRY (object_reg, intf);			\
+  if (!var)							\
+  {								\
+    Printf (CS_REPORTER_SEVERITY_ERROR, "No " str " plugin!");	\
+    return false;						\
+  }
+
+bool ViewMesh::Initialize ()
 {
-  object_reg = csInitializer::CreateEnvironment ();
-  if (!object_reg) return false;
-
-  if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
+  if (!csApp::Initialize())
     return false;
-  }
 
-  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
-  if (!csInitializer::RequestPlugins (object_reg,
-  	CS_REQUEST_VFS,
-	CS_REQUEST_SOFTWARE3D,
-	CS_REQUEST_ENGINE,
-	CS_REQUEST_FONTSERVER,
-	CS_REQUEST_IMAGELOADER,
-	CS_REQUEST_LEVELLOADER,
-	CS_REQUEST_END))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
-    return false;
-  }
-
-  if (!csInitializer::SetupEventHandler (object_reg, ViewEventHandler))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
-    return false;
-  }
-
-  // Check for commandline help.
-  if (csCommandLineHelper::CheckHelp (object_reg))
-  {
-    csCommandLineHelper::Help (object_reg);
-    exit (0);
-  }
-
-  // The virtual clock.
-  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
-
+  // Query for plugins
   // Find the pointer to engine plugin
-  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  if (!engine)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
-    exit (-1);
-  }
+  VM_QUERYPLUGIN (engine, iEngine, "iEngine");
 
-  loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (!loader)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
-    exit (-1);
-  }
-
-  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (!g3d)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
-    exit (-1);
-  }
-
-  kbd = CS_QUERY_REGISTRY (object_reg, iKeyboardDriver);
-  if (!kbd)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iKeyboardDriver plugin!");
-    exit (-1);
-  }
+  VM_QUERYPLUGIN (loader, iLoader, "iLoader");
+  VM_QUERYPLUGIN (g3d, iGraphics3D, "iGraphics3D");
+  VM_QUERYPLUGIN (kbd, iKeyboardDriver, "iKeyboardDriver");
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iGraphics2D* g2d = g3d->GetDriver2D ();
   iNativeWindow* nw = g2d->GetNativeWindow ();
-  if (nw) nw->SetTitle ("View Mesh");
-  if (!csInitializer::OpenApplication (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
-    Cleanup ();
-    exit (1);
-  }
+  if (nw)
+    nw->SetTitle ("View Mesh");
 
   // Setup the texture manager
   iTextureManager* txtmgr = g3d->GetTextureManager ();
@@ -216,7 +141,7 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   // Initialize the texture manager
   txtmgr->ResetPalette ();
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
+  Printf (CS_REPORTER_SEVERITY_NOTIFY,
     "View Mesh version 0.1.");
 
   // First disable the lighting cache. Our app is simple enough
@@ -224,13 +149,12 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
+  Printf (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!");
-    Cleanup ();
-    exit (1);
+    Printf (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!");
+    return false;
   }
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
@@ -313,7 +237,7 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   light->DecRef ();
 
   engine->Prepare ();
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "Created.");
+  Printf (CS_REPORTER_SEVERITY_NOTIFY, "Created.");
 
   view = new csView (engine, g3d);
   view->GetCamera ()->SetSector (room);
@@ -322,8 +246,8 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
 
   txtmgr->SetPalette ();
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  iCommandLineParser *cmdline;
+  VM_QUERYPLUGIN (cmdline, iCommandLineParser, "iCommandLineParser");
 
   const char* meshfilename = cmdline->GetName (0);
   const char* texturefilename = cmdline->GetName (1);
@@ -343,10 +267,9 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   	  texturefilename);
     if (txt == NULL)
     {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Error loading texture '%s'!",
+      Printf (CS_REPORTER_SEVERITY_ERROR, "Error loading texture '%s'!",
       	texturefilename);
-      Cleanup ();
-      exit (1);
+      return false;
     }
     txt->Register (txtmgr);
     txt->GetTextureHandle()->Prepare ();
@@ -363,10 +286,9 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   	  meshfilename);
     if (imeshfact == NULL)
     {
-      Report (CS_REPORTER_SEVERITY_ERROR,
+      Printf (CS_REPORTER_SEVERITY_ERROR,
         "Error loading mesh object factory '%s'!", meshfilename);
-      Cleanup ();
-      exit (1);
+      return false;
     }
 
     // Add the sprite to the engine.
@@ -388,22 +310,6 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   }
 
   return true;
-}
-
-bool ViewMesh::HandleEvent (iEvent& Event)
-{
-  if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
-  {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
-    if (q)
-    {
-      q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
-    return true;
-  }
-
-  return false;
 }
 
 void ViewMesh::SetupFrame ()
@@ -448,27 +354,73 @@ void ViewMesh::FinishFrame ()
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
+
+// define a skin for csws
+CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
+
 int main (int argc, char* argv[])
-{
+{ 
   srand (time (NULL));
 
+  iObjectRegistry *object_reg = csInitializer::CreateEnvironment();
+  if (!object_reg)
+    return 1;
+
+  if (!csInitializer::SetupConfigManager (object_reg, NULL))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.application.viewmesh", "Couldn't load config file!");
+    return 1;
+  }
+
+  csInitializer::SetupCommandLineParser (object_reg, argc, argv);
+  if (!csInitializer::RequestPlugins (object_reg, 
+	      CS_REQUEST_VFS,
+	      CS_REQUEST_SOFTWARE3D,
+	      CS_REQUEST_ENGINE,
+	      CS_REQUEST_FONTSERVER,
+	      CS_REQUEST_IMAGELOADER,
+	      CS_REQUEST_LEVELLOADER,
+	      CS_REQUEST_REPORTER,
+	      CS_REQUEST_REPORTERLISTENER,
+	      CS_REQUEST_END))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.application.viewmesh", "Couldn't find plugins!\n"
+	"Is your CRYSTAL environment var properly set?");
+    return 1;
+  }
+  
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help(object_reg);
+    return 0;
+  }
+
+  if (!csInitializer::OpenApplication(object_reg))
+  {
+    return 1;
+  }
+
   // Create our main class.
-  System = new ViewMesh ();
+  ViewMesh *app = new ViewMesh (object_reg, DefaultSkin);
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!app->Initialize ())
   {
-    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
-    Cleanup ();
-    exit (1);
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
+	"crystalspace.application.viewmesh", "Error initializing system!");
+    csInitializer::DestroyApplication(object_reg);
+    return 1;
   }
 
   // Main loop.
-  csDefaultRunLoop(System->object_reg);
+  csDefaultRunLoop(object_reg);
 
   // Cleanup.
-  Cleanup ();
+  delete app;
+  csInitializer::DestroyApplication(object_reg);
 
   return 0;
 }
