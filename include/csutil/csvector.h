@@ -147,14 +147,6 @@ inline void csVector::QuickSort (int Mode)
     QuickSort (0, count - 1, Mode);
 }
 
-class csUnknownVector:public csVector {
-public:
-	csUnknownVector(int ilimit = 8, int ithreshold = 16) 
-		:csVector(ilimit, ithreshold) {}
-
-	bool FreeItem(csSome Item) { ((IUnknown*)Item)->Release(); return 1; }
-};
-
 
 /* These macros will create a type-safe wrapper for csVector which manages
  * pointers to some type.

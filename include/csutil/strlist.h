@@ -24,12 +24,12 @@
 
 #define csSTRList csStringList
 
-class csStringList:private csUnknownVector {
+class csStringList:private csVector {
 public:
 	int Add(csSTR& Name) { return Push(new csSTR(Name)); }
 	int Add(const char *Name) { return Push(new csSTR(Name)); }
 
-	void Delete(int n) { csVector::Delete(n); }
+	void Delete(int n) { delete (csSTR*)csVector::Get(n); }
 	void Clear() { DeleteAll(); }
 
 	csSTR& Get(int index) { return *((csSTR*)(csVector::Get(index))); }
