@@ -3,7 +3,7 @@ based upon Jam for external Crystal Space projects.  It sets up Jam support,
 Autoconf macros, a configure script, MSVC project file generation capability, a
 source directory, and a few rudimentary source and header files.
 
-To run the script, set your CRSYTAL environment variable, and go to some
+To run the script, set your CRYSTAL environment variable, and go to some
 directory under which you want to have the project created.  Then, just invoke
 the script. If the Crystal Space SDK has been installed, then the script will
 reside at:
