@@ -125,8 +125,7 @@ void Class::DecRef ()							\
     delete this;							\
 }									\
 void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
-{									\
-  IMPLEMENTS_INTERFACE(iBase)
+{
 
 /**
  * IMPLEMENT_EMBEDDED_IBASE should be used to implement embedded
@@ -148,8 +147,7 @@ void Class::DecRef ()							\
     scfParent->DecRef ();						\
 }									\
 void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
-{									\
-  IMPLEMENTS_INTERFACE(iBase)
+{
 
 /**
  * This macro is used to finish a IMPLEMENT_IBASE definition
@@ -199,7 +197,7 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
 #define IMPLEMENT_FACTORY(Class)					\
 void *Create_##Class (iBase *iParent)					\
 {									\
-  return DYNAMIC_CAST(iBase*)(new Class (iParent));			\
+  return new Class (iParent);						\
 }
 
 /**
