@@ -1,0 +1,939 @@
+<!-- Created by map2cs 0.97 on 2003-06-04 20:12:23 -->
+<world>
+    <settings>
+        <clearzbuf>yes</clearzbuf>
+        <lightmapcellsize>16</lightmapcellsize>
+    </settings>
+    <key name="map2cs_scaling" value="0.025" />
+    <start>
+        <sector>room</sector>
+        <position x="-5" y="-12.6" z="0" />
+        <forward x="0" y="0" z="1" />
+        <up x="0" y="1" z="0" />
+    </start>
+    <textures>
+        <texture name="CRETE3_CEIL02A">
+            <file>/lib/stdtex/blobby.jpg</file>
+        </texture>
+        <texture name="CRETE2_FLR01">
+            <file>/lib/stdtex/blobby.jpg</file>
+        </texture>
+        <texture name="C2A1_W1">
+            <file>/lib/stdtex/oldbrick.jpg</file>
+        </texture>
+        <texture name="CRATE02B">
+            <file>/lib/stdtex/parket.jpg</file>
+        </texture>
+        <texture name="CRATE02">
+            <file>/lib/stdtex/parket.jpg</file>
+        </texture>
+        <texture name="{GRATE2A">
+            <file>/lib/stdtex/oldmetal.jpg</file>
+            <transparent red="0" green="0" blue="1" />
+        </texture>
+        <texture name="C2A2_SATORB">
+            <file>/lib/stdtex/bricks.jpg</file>
+        </texture>
+    </textures>
+    <shaders>
+	<shader><file>/shader/ambient.xml</file></shader>
+	<shader><file>/shader/light.xml</file></shader>
+    </shaders>
+    <materials>
+        <material name="CRETE3_CEIL02A">
+            <texture>CRETE3_CEIL02A</texture>
+	    <shader type="ambient">ambient</shader>
+	    <shader type="diffuse">light</shader>
+        </material>
+        <material name="CRETE2_FLR01">
+            <texture>CRETE2_FLR01</texture>
+	    <shader type="ambient">ambient</shader>
+	    <shader type="diffuse">light</shader>
+        </material>
+        <material name="C2A1_W1">
+            <texture>C2A1_W1</texture>
+	    <shader type="ambient">ambient</shader>
+	    <shader type="diffuse">light</shader>
+        </material>
+        <material name="CRATE02B">
+            <texture>CRATE02B</texture>
+	    <shader type="ambient">ambient</shader>
+	    <shader type="diffuse">light</shader>
+        </material>
+        <material name="CRATE02">
+            <texture>CRATE02</texture>
+	    <shader type="ambient">ambient</shader>
+	    <shader type="diffuse">light</shader>
+        </material>
+        <material name="{GRATE2A">
+            <texture>{GRATE2A</texture>
+	    <shader type="ambient">ambient</shader>
+	    <shader type="diffuse">light</shader>
+        </material>
+        <material name="C2A2_SATORB">
+            <texture>C2A2_SATORB</texture>
+	    <shader type="ambient">ambient</shader>
+	    <shader type="diffuse">light</shader>
+        </material>
+    </materials>
+    <renderpriorities>
+        <priority name="sky">
+            <level>1</level>
+            <sort>NONE</sort>
+            <camera />
+        </priority>
+        <priority name="mirror">
+            <level>2</level>
+            <sort>FRONT2BACK</sort>
+        </priority>
+        <priority name="wall">
+            <level>3</level>
+            <sort>NONE</sort>
+        </priority>
+        <priority name="object">
+            <level>4</level>
+            <sort>NONE</sort>
+        </priority>
+        <priority name="alpha">
+            <level>5</level>
+            <sort>BACK2FRONT</sort>
+        </priority>
+    </renderpriorities>
+    <plugins>
+        <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+        <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+        <plugin name="bezier">crystalspace.mesh.loader.bezier</plugin>
+        <plugin name="bezierFact">crystalspace.mesh.loader.factory.bezier</plugin>
+    </plugins>
+    <sector name="room">
+        <meshobj name="room">
+            <plugin>thing</plugin>
+            <zuse />
+            <key name="classname" value="cs_sector" />
+            <key name="rendercolor" value="0 0 0" />
+            <key name="cs_name" value="room" />
+            <key name="lighting" value="1" />
+            <priority>wall</priority>
+            <params>
+                <v x="-6.2" y="-6.6" z="3" />
+                <v x="-6.2" y="-6.6" z="-15.8" />
+                <v x="12.6" y="-6.6" z="-15.8" />
+                <v x="12.6" y="-6.6" z="3" />
+                <v x="-6.2" y="-14.2" z="3" />
+                <v x="12.6" y="-14.2" z="3" />
+                <v x="12.6" y="-14.2" z="-15.8" />
+                <v x="-6.2" y="-14.2" z="-15.8" />
+                <v x="-6.2" y="-12.6" z="-3.2" />
+                <v x="-4.6" y="-12.6" z="-3.2" />
+                <v x="-4.6" y="-12.6" z="-4.8" />
+                <v x="-6.2" y="-12.6" z="-4.8" />
+                <v x="-4.6" y="-14.2" z="-3.2" />
+                <v x="-4.6" y="-14.2" z="-4.8" />
+                <v x="-6.2" y="-14.2" z="-3.2" />
+                <v x="-6.2" y="-14.2" z="-4.8" />
+                <v x="-0.6" y="-12.6" z="-4.8" />
+                <v x="1" y="-12.6" z="-4.8" />
+                <v x="1" y="-12.6" z="-5.6" />
+                <v x="-0.6" y="-12.6" z="-5.6" />
+                <v x="-0.6" y="-14.2" z="-5.6" />
+                <v x="-0.6" y="-14.2" z="-4.8" />
+                <v x="1" y="-14.2" z="-4.8" />
+                <v x="1" y="-14.2" z="-5.6" />
+                <v x="-0.6" y="-12.6" z="-6.4" />
+                <v x="1" y="-12.6" z="-6.4" />
+                <v x="-0.6" y="-14.2" z="-6.4" />
+                <v x="1" y="-14.2" z="-6.4" />
+                <v x="3" y="-14.2" z="3" />
+                <v x="3" y="-13.2" z="3" />
+                <v x="3" y="-13.2" z="-12" />
+                <v x="3" y="-14.2" z="-12" />
+                <v x="3.4" y="-14.2" z="3" />
+                <v x="3.4" y="-14.2" z="-12" />
+                <v x="3.4" y="-13.2" z="-12" />
+                <v x="3.4" y="-13.2" z="3" />
+                <v x="3" y="-11.6" z="3" />
+                <v x="3" y="-11.6" z="-6.6" />
+                <v x="3" y="-13.2" z="-6.6" />
+                <v x="3.4" y="-11.6" z="3" />
+                <v x="3.4" y="-13.2" z="-6.6" />
+                <v x="3.4" y="-11.6" z="-6.6" />
+                <v x="3" y="-11.6" z="-12" />
+                <v x="3" y="-13.2" z="-8.2" />
+                <v x="3" y="-11.6" z="-8.2" />
+                <v x="3.4" y="-11.6" z="-12" />
+                <v x="3.4" y="-11.6" z="-8.2" />
+                <v x="3.4" y="-13.2" z="-8.2" />
+                <v x="3" y="-6.6" z="3" />
+                <v x="3" y="-6.6" z="-12" />
+                <v x="3" y="-8.1" z="-12" />
+                <v x="3" y="-8.1" z="3" />
+                <v x="3.4" y="-6.6" z="3" />
+                <v x="3.4" y="-8.1" z="3" />
+                <v x="3.4" y="-8.1" z="-12" />
+                <v x="3.4" y="-6.6" z="-12" />
+                <v x="3" y="-9.8" z="3" />
+                <v x="3" y="-9.8" z="-12" />
+                <v x="3.4" y="-9.8" z="-12" />
+                <v x="3.4" y="-9.8" z="3" />
+                <v x="3" y="-8.1" z="1.2" />
+                <v x="3" y="-9.8" z="1.2" />
+                <v x="3.4" y="-9.8" z="1.2" />
+                <v x="3.4" y="-8.1" z="1.2" />
+                <v x="3" y="-9.8" z="-1.4" />
+                <v x="3" y="-8.1" z="-1.4" />
+                <v x="3.4" y="-8.1" z="-1.4" />
+                <v x="3.4" y="-9.8" z="-1.4" />
+                <p>
+                    <v>0</v>
+                    <v>1</v>
+                    <v>2</v>
+                    <v>3</v>
+                    <material>CRETE3_CEIL02A</material>
+                    <texmap>
+                        <orig x="0" y="-6.6" z="0" />
+                        <first x="1.6" y="-6.6" z="0" />
+                        <second x="0" y="-6.6" z="-1.6" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>4</v>
+                    <v>5</v>
+                    <v>6</v>
+                    <v>7</v>
+                    <material>CRETE2_FLR01</material>
+                    <texmap>
+                        <orig x="0" y="-14.2" z="0" />
+                        <first x="3.2" y="-14.2" z="0" />
+                        <second x="0" y="-14.2" z="-3.2" />
+                        <firstlen>3.2</firstlen>
+                        <secondlen>3.2</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>0</v>
+                    <v>4</v>
+                    <v>7</v>
+                    <v>1</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="-6.2" y="0" z="0" />
+                        <first x="-6.2" y="0" z="8" />
+                        <second x="-6.2" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>3</v>
+                    <v>2</v>
+                    <v>6</v>
+                    <v>5</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="12.6" y="0" z="0" />
+                        <first x="12.6" y="0" z="8" />
+                        <second x="12.6" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>0</v>
+                    <v>3</v>
+                    <v>5</v>
+                    <v>4</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="0" z="3" />
+                        <first x="8" y="0" z="3" />
+                        <second x="0" y="-4" z="3" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>1</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="0" z="-15.8" />
+                        <first x="8" y="0" z="-15.8" />
+                        <second x="0" y="-4" z="-15.8" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>8</v>
+                    <v>9</v>
+                    <v>10</v>
+                    <v>11</v>
+                    <material>CRATE02B</material>
+                    <texmap>
+                        <orig x="0.2" y="-12.6" z="0" />
+                        <first x="1.8" y="-12.6" z="0" />
+                        <second x="0.2" y="-12.6" z="-1.6" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>9</v>
+                    <v>12</v>
+                    <v>13</v>
+                    <v>10</v>
+                    <material>CRATE02</material>
+                    <texmap>
+                        <orig x="-4.6" y="0.2" z="0" />
+                        <first x="-4.6" y="0.2" z="1.6" />
+                        <second x="-4.6" y="-1.4" z="0" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>8</v>
+                    <v>14</v>
+                    <v>12</v>
+                    <v>9</v>
+                    <material>CRATE02</material>
+                    <texmap>
+                        <orig x="0.2" y="0.2" z="-3.2" />
+                        <first x="1.8" y="0.2" z="-3.2" />
+                        <second x="0.2" y="-1.4" z="-3.2" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>11</v>
+                    <v>10</v>
+                    <v>13</v>
+                    <v>15</v>
+                    <material>CRATE02</material>
+                    <texmap>
+                        <orig x="0.2" y="0.2" z="-4.8" />
+                        <first x="1.8" y="0.2" z="-4.8" />
+                        <second x="0.2" y="-1.4" z="-4.8" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>16</v>
+                    <v>17</v>
+                    <v>18</v>
+                    <v>19</v>
+                    <material>CRATE02B</material>
+                    <texmap>
+                        <orig x="-0.6" y="-12.6" z="0" />
+                        <first x="1" y="-12.6" z="0" />
+                        <second x="-0.6" y="-12.6" z="-1.6" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>16</v>
+                    <v>19</v>
+                    <v>20</v>
+                    <v>21</v>
+                    <material>CRATE02</material>
+                    <texmap>
+                        <orig x="-0.6" y="0.2" z="0" />
+                        <first x="-0.6" y="0.2" z="1.6" />
+                        <second x="-0.6" y="-1.4" z="0" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>17</v>
+                    <v>22</v>
+                    <v>23</v>
+                    <v>18</v>
+                    <material>CRATE02</material>
+                    <texmap>
+                        <orig x="1" y="0.2" z="-1.6" />
+                        <first x="1" y="0.2" z="0" />
+                        <second x="1" y="-1.4" z="-1.6" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>16</v>
+                    <v>21</v>
+                    <v>22</v>
+                    <v>17</v>
+                    <material>CRATE02</material>
+                    <texmap>
+                        <orig x="1" y="0.2" z="-4.8" />
+                        <first x="2.6" y="0.2" z="-4.8" />
+                        <second x="1" y="-1.4" z="-4.8" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>24</v>
+                    <v>19</v>
+                    <v>18</v>
+                    <v>25</v>
+                    <material>CRATE02B</material>
+                    <texmap>
+                        <orig x="-0.6" y="-12.6" z="0" />
+                        <first x="1" y="-12.6" z="0" />
+                        <second x="-0.6" y="-12.6" z="-1.6" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>24</v>
+                    <v>26</v>
+                    <v>20</v>
+                    <v>19</v>
+                    <material>CRATE02</material>
+                    <texmap>
+                        <orig x="-0.6" y="0.2" z="0" />
+                        <first x="-0.6" y="0.2" z="1.6" />
+                        <second x="-0.6" y="-1.4" z="0" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>25</v>
+                    <v>18</v>
+                    <v>23</v>
+                    <v>27</v>
+                    <material>CRATE02</material>
+                    <texmap>
+                        <orig x="1" y="0.2" z="-1.6" />
+                        <first x="1" y="0.2" z="0" />
+                        <second x="1" y="-1.4" z="-1.6" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>24</v>
+                    <v>25</v>
+                    <v>27</v>
+                    <v>26</v>
+                    <material>CRATE02</material>
+                    <texmap>
+                        <orig x="1" y="0.2" z="-6.4" />
+                        <first x="2.6" y="0.2" z="-6.4" />
+                        <second x="1" y="-1.4" z="-6.4" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>28</v>
+                    <v>29</v>
+                    <v>30</v>
+                    <v>31</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3" y="0" z="0" />
+                        <first x="3" y="0" z="8" />
+                        <second x="3" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>32</v>
+                    <v>33</v>
+                    <v>34</v>
+                    <v>35</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3.4" y="0" z="0" />
+                        <first x="3.4" y="0" z="8" />
+                        <second x="3.4" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>31</v>
+                    <v>30</v>
+                    <v>34</v>
+                    <v>33</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0.4" y="0" z="-12" />
+                        <first x="8.4" y="0" z="-12" />
+                        <second x="0.4" y="-4" z="-12" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>29</v>
+                    <v>35</v>
+                    <v>34</v>
+                    <v>30</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="-13.2" z="0" />
+                        <first x="8" y="-13.2" z="0" />
+                        <second x="0" y="-13.2" z="-4" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>36</v>
+                    <v>37</v>
+                    <v>38</v>
+                    <v>29</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3" y="0" z="0" />
+                        <first x="3" y="0" z="8" />
+                        <second x="3" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>39</v>
+                    <v>35</v>
+                    <v>40</v>
+                    <v>41</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3.4" y="0" z="0" />
+                        <first x="3.4" y="0" z="8" />
+                        <second x="3.4" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>37</v>
+                    <v>41</v>
+                    <v>40</v>
+                    <v>38</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="0" z="-6.6" />
+                        <first x="8" y="0" z="-6.6" />
+                        <second x="0" y="-4" z="-6.6" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>42</v>
+                    <v>30</v>
+                    <v>43</v>
+                    <v>44</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3" y="0" z="0" />
+                        <first x="3" y="0" z="8" />
+                        <second x="3" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>45</v>
+                    <v>46</v>
+                    <v>47</v>
+                    <v>34</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3.4" y="0" z="0" />
+                        <first x="3.4" y="0" z="8" />
+                        <second x="3.4" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>42</v>
+                    <v>45</v>
+                    <v>34</v>
+                    <v>30</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0.4" y="0" z="-12" />
+                        <first x="8.4" y="0" z="-12" />
+                        <second x="0.4" y="-4" z="-12" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>44</v>
+                    <v>43</v>
+                    <v>47</v>
+                    <v>46</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="0" z="-8.2" />
+                        <first x="8" y="0" z="-8.2" />
+                        <second x="0" y="-4" z="-8.2" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>48</v>
+                    <v>49</v>
+                    <v>50</v>
+                    <v>51</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3" y="0" z="0" />
+                        <first x="3" y="0" z="8" />
+                        <second x="3" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>52</v>
+                    <v>53</v>
+                    <v>54</v>
+                    <v>55</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3.4" y="0" z="0" />
+                        <first x="3.4" y="0" z="8" />
+                        <second x="3.4" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>49</v>
+                    <v>55</v>
+                    <v>54</v>
+                    <v>50</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0.4" y="0" z="-12" />
+                        <first x="8.4" y="0" z="-12" />
+                        <second x="0.4" y="-4" z="-12" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>51</v>
+                    <v>50</v>
+                    <v>54</v>
+                    <v>53</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="-8.1" z="0" />
+                        <first x="8" y="-8.1" z="0" />
+                        <second x="0" y="-8.1" z="-4" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>36</v>
+                    <v>56</v>
+                    <v>57</v>
+                    <v>42</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3" y="0" z="0" />
+                        <first x="3" y="0" z="8" />
+                        <second x="3" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>39</v>
+                    <v>45</v>
+                    <v>58</v>
+                    <v>59</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3.4" y="0" z="0" />
+                        <first x="3.4" y="0" z="8" />
+                        <second x="3.4" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>42</v>
+                    <v>57</v>
+                    <v>58</v>
+                    <v>45</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0.4" y="0" z="-12" />
+                        <first x="8.4" y="0" z="-12" />
+                        <second x="0.4" y="-4" z="-12" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>36</v>
+                    <v>42</v>
+                    <v>45</v>
+                    <v>39</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="-11.6" z="0" />
+                        <first x="8" y="-11.6" z="0" />
+                        <second x="0" y="-11.6" z="-4" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>56</v>
+                    <v>59</v>
+                    <v>58</v>
+                    <v>57</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="-9.8" z="0" />
+                        <first x="8" y="-9.8" z="0" />
+                        <second x="0" y="-9.8" z="-4" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>51</v>
+                    <v>60</v>
+                    <v>61</v>
+                    <v>56</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3" y="0" z="0" />
+                        <first x="3" y="0" z="8" />
+                        <second x="3" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>53</v>
+                    <v>59</v>
+                    <v>62</v>
+                    <v>63</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3.4" y="0" z="0" />
+                        <first x="3.4" y="0" z="8" />
+                        <second x="3.4" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>60</v>
+                    <v>63</v>
+                    <v>62</v>
+                    <v>61</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="0" z="1.2" />
+                        <first x="8" y="0" z="1.2" />
+                        <second x="0" y="-4" z="1.2" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>50</v>
+                    <v>57</v>
+                    <v>64</v>
+                    <v>65</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3" y="0" z="0" />
+                        <first x="3" y="0" z="8" />
+                        <second x="3" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>54</v>
+                    <v>66</v>
+                    <v>67</v>
+                    <v>58</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="3.4" y="0" z="0" />
+                        <first x="3.4" y="0" z="8" />
+                        <second x="3.4" y="-4" z="0" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>50</v>
+                    <v>54</v>
+                    <v>58</v>
+                    <v>57</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0.4" y="0" z="-12" />
+                        <first x="8.4" y="0" z="-12" />
+                        <second x="0.4" y="-4" z="-12" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>65</v>
+                    <v>64</v>
+                    <v>67</v>
+                    <v>66</v>
+                    <material>C2A1_W1</material>
+                    <texmap>
+                        <orig x="0" y="0" z="-1.4" />
+                        <first x="8" y="0" z="-1.4" />
+                        <second x="0" y="-4" z="-1.4" />
+                        <firstlen>8</firstlen>
+                        <secondlen>4</secondlen>
+                    </texmap>
+                </p>
+            </params>
+        </meshobj>
+        <light>
+            <center x="-4.2" y="-11" z="-1.4" />
+            <radius>150</radius>
+            <color red="1.5625" green="1.5625" blue="0.784314" />
+            <attenuation>none</attenuation>
+        </light>
+        <light>
+            <center x="1.8" y="-12" z="-8.2" />
+            <radius>150</radius>
+            <color red="1.5625" green="0.784314" blue="0.392157" />
+            <attenuation>none</attenuation>
+        </light>
+        <meshobj name="e6">
+            <plugin>thing</plugin>
+            <zuse />
+            <key name="classname" value="func_wall" />
+            <key name="rendercolor" value="0 0 0" />
+            <priority>object</priority>
+            <params>
+                <v x="3.1" y="-11.6" z="-6.6" />
+                <v x="3.3" y="-11.6" z="-6.6" />
+                <v x="3.3" y="-11.6" z="-8.2" />
+                <v x="3.1" y="-11.6" z="-8.2" />
+                <v x="3.1" y="-13.2" z="-6.6" />
+                <v x="3.1" y="-13.2" z="-8.2" />
+                <v x="3.3" y="-13.2" z="-8.2" />
+                <v x="3.3" y="-13.2" z="-6.6" />
+                <p>
+                    <v>0</v>
+                    <v>3</v>
+                    <v>5</v>
+                    <v>4</v>
+                    <material>{GRATE2A</material>
+                    <texmap>
+                        <orig x="3.1" y="0" z="0" />
+                        <first x="3.1" y="0" z="1.6" />
+                        <second x="3.1" y="-1.6" z="0" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>1</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <material>{GRATE2A</material>
+                    <texmap>
+                        <orig x="3.3" y="0" z="0" />
+                        <first x="3.3" y="0" z="1.6" />
+                        <second x="3.3" y="-1.6" z="0" />
+                        <firstlen>1.6</firstlen>
+                        <secondlen>1.6</secondlen>
+                    </texmap>
+                </p>
+            </params>
+        </meshobj>
+        <meshobj name="e7">
+            <plugin>thing</plugin>
+            <zuse />
+            <key name="classname" value="func_wall" />
+            <key name="rendercolor" value="0 0 0" />
+            <priority>object</priority>
+            <params>
+                <v x="3.1" y="-8.1" z="1.2" />
+                <v x="3.3" y="-8.1" z="1.2" />
+                <v x="3.3" y="-8.1" z="-1.4" />
+                <v x="3.1" y="-8.1" z="-1.4" />
+                <v x="3.1" y="-9.8" z="1.2" />
+                <v x="3.1" y="-9.8" z="-1.4" />
+                <v x="3.3" y="-9.8" z="-1.4" />
+                <v x="3.3" y="-9.8" z="1.2" />
+                <p>
+                    <v>0</v>
+                    <v>3</v>
+                    <v>5</v>
+                    <v>4</v>
+                    <material>C2A2_SATORB</material>
+                    <texmap>
+                        <orig x="3.1" y="-1.3" z="-1.40001" />
+                        <first x="3.1" y="-1.3" z="1.2" />
+                        <second x="3.1" y="-3" z="-1.40001" />
+                        <firstlen>2.6</firstlen>
+                        <secondlen>1.7</secondlen>
+                    </texmap>
+                </p>
+                <p>
+                    <v>1</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <v>2</v>
+                    <material>C2A2_SATORB</material>
+                    <texmap>
+                        <orig x="3.3" y="-1.3" z="-1.40001" />
+                        <first x="3.3" y="-1.3" z="1.2" />
+                        <second x="3.3" y="-3" z="-1.40001" />
+                        <firstlen>2.6</firstlen>
+                        <secondlen>1.7</secondlen>
+                    </texmap>
+                </p>
+            </params>
+        </meshobj>
+        <node name="e2">
+            <key name="classname" value="info_player_start" />
+            <key name="angle" value="360" />
+            <key name="origin" value="-200 0 -504" />
+            <position x="-5" y="-12.6" z="0" />
+        </node>
+        <node name="e4">
+            <key name="classname" value="light" />
+            <key name="_light" value="255 255 128 200" />
+            <key name="origin" value="-168 -56 -440" />
+            <position x="-4.2" y="-11" z="-1.4" />
+        </node>
+        <node name="e5">
+            <key name="classname" value="light" />
+            <key name="_light" value="255 128 64 200" />
+            <key name="origin" value="72 -328 -480" />
+            <position x="1.8" y="-12" z="-8.2" />
+        </node>
+    </sector>
+</world>
