@@ -608,6 +608,12 @@ public:
   void PrepareSectors();
 
   /**
+   * Calls UpdateMove for all particle systems to initialise bsp bounding boxes
+   * when sector is in front to back mode.
+   */
+  void PrepareParticleSystems ();
+
+  /**
    * Calculate all lighting information. Normally you shouldn't call
    * this function directly, because it will be called by Prepare().
    */
@@ -1107,7 +1113,7 @@ public:
 
   //----------------Begin-Multi-Context-Support------------------------------
 
-  /// Redirecting wrapper around the main Draw function.
+  /// Point engine to rendering context
   void SetContext (iGraphics3D* g3d);
 
 private:

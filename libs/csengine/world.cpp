@@ -888,11 +888,27 @@ void csWorld::PrepareSectors()
   }
 }
 
+// If a STAT_BSP level the loader call to UpdateMove is redundant when called
+// before csWorld::Prepare(). Probably the same for the rest of the sprites too.
+void csWorld::PrepareParticleSystems ()
+{
+  int i;
+  for (i = 0 ; i < sprites.Length () ; i++)
+  {
+    csSprite* sp = (csSprite*)sprites[i];
+    if (sp->GetType () >= csParticleSystem::Type)
+    {
+      csParticleSystem* partsys = (csParticleSystem*)sp;
+      partsys->GetMovable ().UpdateMove ();
+    }
+  }
+}
+
 bool csWorld::Prepare ()
 {
   PrepareTextures ();
   PrepareSectors ();
-
+  PrepareParticleSystems ();
   // The images are no longer needed by the 3D engine.
   iTextureManager *txtmgr = G3D->GetTextureManager ();
   txtmgr->FreeImages ();
@@ -1221,11 +1237,6 @@ void csWorld::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
     Resize ();
   }
 
-  // when many cameras per context, need to make sure each camera has updated
-  // shift_* fields, after resizing.
-  //  current_camera->SetPerspectiveCenter (frame_width/2, frame_height/2);
-  // smgh: depreciated.. it is now the apps responsibility to monitor context
-  // resize events and update the cameras accordingly. (dtsimple implements this)
   top_clipper = view;
 
   rview.clip_plane.Set (0, 0, 1, -1);   //@@@CHECK!!!
