@@ -13,6 +13,19 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+30-Dec-1999
+	- Continued work on new csPolyTxtPlane class.
+	- Added IncRef/DecRef to csPolyPlane and csPolyTxtPlane.
+	- Added 'const' to some of the functions.
+	- Moved csPolyTxtPlane from csPolygon3D to csLightMapped
+	  where it belongs. This has three advantages: a) it is cleaner,
+	  b) it is faster for gouraud shaded polygons since there is less
+	  transformation work to do, c) it is more memory efficient for
+	  gouraud shaded polygons.
+29-Dec-1999
+	- Started work on seperating the plane component from the
+	  texture mapping stuff. This is so that we can preserve memory
+	  for polygons that use gouraud shading.
 27-Dec-1999
 	- Further changes to MazeD and handling of flat colors from
 	  Norman Kramer.
