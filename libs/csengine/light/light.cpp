@@ -306,12 +306,15 @@ bool csLight::GetDistanceForBrightness (float brightness, float& distance)
   {
   case CS_ATTN_NONE:      
     return false;
-  case CS_ATTN_LINEAR:    
-    return (1 - brightness) / inv_dist;
+  case CS_ATTN_LINEAR:
+    distance = (1 - brightness) / inv_dist;
+    return true;
   case CS_ATTN_INVERSE:   
-    return 1 / brightness;
+    distance = 1 / brightness;
+    return true;
   case CS_ATTN_REALISTIC: 
-    return sqrt (1 / brightness);
+    distance = sqrt (1 / brightness);
+    return true;
   case CS_ATTN_CLQ:
 #endif
     {
