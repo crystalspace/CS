@@ -190,10 +190,7 @@ csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent) : G2D (NULL)
 csGraphics3DSoftware::~csGraphics3DSoftware ()
 {
   if (System)
-  {
-    System->DeregisterDriver ("iGraphics3D", this);
     System->DecRef ();
-  }
 
   Close ();
   csScan_Finalize ();

@@ -24,6 +24,7 @@
 #include "csobject/nobjvec.h"
 #include "csengine/rview.h"
 #include "csengine/tranman.h"
+#include "csengine/halo.h"
 #include "csobject/csobj.h"
 #include "iworld.h"
 #include "iconfig.h"
@@ -44,7 +45,6 @@ class csQuadcube;
 class csWorld;
 class Dumper;
 class csLight;
-class csHaloInformation;
 class csCBuffer;
 class csQuadtree;
 class csPoly2DPool;
@@ -143,6 +143,25 @@ class csWorld : public iWorld, public iConfig, public csObject
 {
   friend class Dumper;
 
+  // Private class for keeping an array of halo infos
+  class csHaloVector : public csVector
+  {
+  public:
+    // Constructor
+    csHaloVector () : csVector (16, 16) {}
+    // Destructor
+    virtual ~csHaloVector () { DeleteAll (); }
+    // Free an item from array
+    virtual bool FreeItem (csSome Item)
+    { CHK (delete (csHaloInformation *)Item); return true; }
+    // Find a halo by referenced light
+    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+    { return ((csHaloInformation *)Item)->pLight == (csLight *)Key ? 0 : -1; }
+    // Return an reference to Nth halo info
+    inline csHaloInformation *Get (int n) const
+    { return (csHaloInformation *)csVector::Get (n); }
+  };
+
 public:
   /**
    * This is the Virtual File System object where all the files
@@ -235,7 +254,7 @@ private:
   /// Linked list of dynamic lights.
   csDynLight* first_dyn_lights;
   /// List of halos (csHaloInformation).
-  csVector halos;  
+  csHaloVector halos;  
   /// The Halo rasterizer. If NULL halo's are not supported by the rasterizer.
   iHaloRasterizer* HaloRast;
   /// If true then the lighting cache is enabled.

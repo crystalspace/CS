@@ -25,9 +25,7 @@ IMPLEMENT_IBASE (scfString)
 IMPLEMENT_IBASE_END
 
 scfString::~scfString ()
-{
-  delete s;
-}
+{ delete s; }
 
 void scfString::SetSize (size_t NewSize)
 { s->SetSize (NewSize); }

@@ -422,10 +422,7 @@ csGraphics3DGlide2x::~csGraphics3DGlide2x()
   if (m_piG2D)
     m_piG2D->DecRef ();
   if (m_piSystem)
-  {
-    m_piSystem->DeregisterDriver ("iGraphics3D", this);
     m_piSystem->DecRef ();
-  }
 }
 
 bool csGraphics3DGlide2x::Initialize (iSystem *iSys)

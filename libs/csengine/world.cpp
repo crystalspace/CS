@@ -224,16 +224,13 @@ csWorld::~csWorld ()
   if (HaloRast) HaloRast->DecRef ();
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
-  if (textures)
-    CHKB (delete textures);
+  CHK (delete textures);
   CHK (delete render_pol2d_pool);
   CHK (delete lightpatch_pool);
-  if (quadcube)
-    CHKB (delete quadcube);
+  CHK (delete quadcube);
 
   // @@@ temp hack
-  if (camera_hack)
-    CHKB (delete camera_hack);
+  CHK (delete camera_hack);
   camera_hack = NULL;
 }
 
@@ -818,7 +815,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   for (int cntHalos = 0; cntHalos < halos.Length(); cntHalos++)
   {
     bool halo_drawn = false;
-    pinfo = (csHaloInformation*)halos.Get(cntHalos);
+    pinfo = halos.Get(cntHalos);
 
     float hintensity = pinfo->pLight->GetHaloIntensity ();
 
@@ -906,13 +903,7 @@ void csWorld::AddHalo (csHaloInformation* pinfo)
 
 bool csWorld::HasHalo (csLight* pLight)
 {
-  for (int i=0; i < halos.Length(); i++)
-  {
-    if (((csHaloInformation*)halos[i])->pLight == pLight)
-      return true;
-  }
-
-  return false;
+  return halos.FindKey (pLight) >= 0;
 }
 
 csStatLight* csWorld::FindLight (float x, float y, float z, float dist)

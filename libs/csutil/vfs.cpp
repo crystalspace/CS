@@ -1028,15 +1028,6 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 csVFS::~csVFS ()
 {
   CHK (delete config);
-  if (System)
-    System->DeregisterDriver ("iVFS", this);
-}
-
-bool csVFS::ReadConfig (csIniFile *Config)
-{
-  (config = Config)->EnumData ("VFS", EnumConfig, this);
-  NodeList.QuickSort (0);
-  return true;
 }
 
 bool csVFS::Initialize (iSystem *iSys)
@@ -1057,9 +1048,17 @@ bool csVFS::EnumConfig (csSome Parm, char *Name, size_t DataSize, csSome Data)
   return false;
 }
 
+bool csVFS::ReadConfig (csIniFile *Config)
+{
+  (config = Config)->EnumData ("VFS", EnumConfig, this);
+  NodeList.QuickSort (0);
+  return true;
+}
+
 bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 {
-  CHK (VfsNode *e = new VfsNode (ExpandPath (VirtualPath, true), VirtualPath, System));
+  char *xp = ExpandPath (VirtualPath, true);
+  CHK (VfsNode *e = new VfsNode (xp, VirtualPath, System));
   if (!e->AddRPath (RealPath, config))
   {
     CHK (delete e);
@@ -1401,7 +1400,8 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
   if (!PreparePath (VirtualPath, true, node, suffix, sizeof (suffix))
    || suffix [0])
   {
-    CHK (node = new VfsNode (ExpandPath (VirtualPath, true), VirtualPath, System));
+    char *xp = ExpandPath (VirtualPath, true);
+    CHK (node = new VfsNode (xp, VirtualPath, System));
     NodeList.Push (node);
   }
 

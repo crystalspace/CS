@@ -1109,9 +1109,9 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
   if (tween_ratio)
   {
-    CHK (object_vertices = new csVector3 [tpl->GetNumVertices()];)
+    CHK (object_vertices = new csVector3 [tpl->GetNumVertices()]);
 
-    csFrame * next_frame;
+    csFrame *next_frame;
     if (cur_frame + 1 < cur_action->GetNumFrames())
       next_frame = cur_action->GetFrame (cur_frame + 1);
     else
@@ -1148,7 +1148,7 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
   // delete tweened vertices
   if (tween_ratio)
-    CHK (delete [] object_vertices;)
+    CHKB (delete [] object_vertices);
 }
 
 void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* object_vertices)

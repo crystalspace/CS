@@ -66,11 +66,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
 
 csGraphics2D::~csGraphics2D ()
 {
-  if (System)
-  {
-    System->DeregisterDriver ("iGraphics2D", this);
-    Close ();
-  }
+  Close ();
 }
 
 bool csGraphics2D::Open (const char *Title)

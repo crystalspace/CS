@@ -73,7 +73,7 @@ csSystemDriver::csPlugIn::csPlugIn (iPlugIn *iObject, const char *iClassID)
 
 csSystemDriver::csPlugIn::~csPlugIn ()
 {
-  delete [] ClassID;
+  CHK (delete [] ClassID);
   PlugIn->DecRef ();
 }
 
@@ -118,9 +118,26 @@ csSystemDriver::~csSystemDriver ()
 
   System = NULL;
 
-  // NOTE: We should not decrement reference count for known drivers
-  // since we suppose they will deregister themself during their
-  // shutdown sequence. If they won't do, they won't be unloaded.
+  // Deregister all known drivers
+#define DEREGISTER_DRIVER(Object, Interface)			\
+  if (Object)							\
+  {								\
+    iPlugIn *plugin = QUERY_INTERFACE (Object, iPlugIn);	\
+    if (plugin)							\
+    {								\
+      DeregisterDriver (#Interface, plugin);			\
+      plugin->DecRef ();					\
+    }								\
+  }
+
+  DEREGISTER_DRIVER (VFS, iVFS);
+  DEREGISTER_DRIVER (G2D, iGraphics3D);
+  DEREGISTER_DRIVER (G3D, iGraphics2D);
+  DEREGISTER_DRIVER (Sound, iSoundRender);
+  DEREGISTER_DRIVER (NetDrv, iNetworkDriver);
+  DEREGISTER_DRIVER (NetMan, iNetworkManager);
+
+#undef DEREGISTER_DRIVER
 
   // Free all plugins
   PlugIns.DeleteAll ();
@@ -142,14 +159,14 @@ bool csSystemDriver::Initialize (int argc, char *argv[], const char *iConfigName
 
   // Initialize configuration file
   if (iConfigName)
-    Config = new csIniFile (ConfigName = strnew (iConfigName));
+    CHKB (Config = new csIniFile (ConfigName = strnew (iConfigName)))
   else
-    Config = new csIniFile ();
+    CHKB (Config = new csIniFile ());
 
   // Initialize Shared Class Facility
-  csIniFile *SCFconfig = new csIniFile ("scf.cfg");
+  CHK (csIniFile *SCFconfig = new csIniFile ("scf.cfg"));
   scfInitialize (SCFconfig);
-  delete SCFconfig;
+  CHK (delete SCFconfig);
 
   // Create the Event Queue
   CHK (EventQueue = new csEventQueue ());
@@ -338,7 +355,7 @@ void csSystemDriver::CollectOptions (int argc, char *argv[])
       opt = strnew (opt);
       char *arg = strchr (opt, '=');
       if (arg) *arg++ = 0; else arg = opt + strlen (opt);
-      CommandLine.Push (new csCommandLineOption (opt, arg));
+      CHK (CommandLine.Push (new csCommandLineOption (opt, arg)));
     }
     else
       CommandLineNames.Push (strnew (opt));
@@ -572,15 +589,15 @@ void csSystemDriver::QueryOptions (iPlugIn *iObject)
     {
       csOptionDescription option;
       Config->GetOptionDescription (i, &option);
-      OptionList.Push (new csPluginOption (option.name, option.type, option.id,
-        (option.type == CSVAR_BOOL) || (option.type == CSVAR_CMD), Config));
+      CHK (OptionList.Push (new csPluginOption (option.name, option.type, option.id,
+        (option.type == CSVAR_BOOL) || (option.type == CSVAR_CMD), Config)));
       if (option.type == CSVAR_BOOL)
       {
         char buf[100];
         strcpy (buf, "no");
         strcpy (buf + 2, option.name);
-        OptionList.Push (new csPluginOption (buf, option.type, option.id,
-          false, Config));
+        CHK (OptionList.Push (new csPluginOption (buf, option.type, option.id,
+          false, Config)));
       }
     } /* endfor */
 
@@ -674,7 +691,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iInterface,
     Printf (MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
   else
   {
-    PlugIns.Push (new csPlugIn (p, iClassID));
+    CHK (PlugIns.Push (new csPlugIn (p, iClassID)));
     if (p->Initialize (this))
     {
       iBase *ret;

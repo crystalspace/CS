@@ -122,7 +122,7 @@ void Class::DecRef ()							\
   if (scfParent)							\
     scfParent->DecRef ();						\
   if (scfRefCount <= 0)							\
-    delete this;							\
+    CHKB (delete this);							\
 }									\
 void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
 {
@@ -197,7 +197,8 @@ void *Class::QueryInterface (const char *iInterfaceID, int iVersion)	\
 #define IMPLEMENT_FACTORY(Class)					\
 void *Create_##Class (iBase *iParent)					\
 {									\
-  return new Class (iParent);						\
+  CHK (void *ret = new Class (iParent));				\
+  return ret;								\
 }
 
 /**

@@ -233,10 +233,7 @@ csGraphics3DDirect3DDx6::~csGraphics3DDirect3DDx6()
   if (m_piG2D)
     m_piG2D->DecRef ();
   if (m_piSystem)
-  {
-    m_piSystem->DeregisterDriver ("iGraphics3D", this);
     m_piSystem->DecRef ();
-  }
 }
 
 bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)

@@ -228,7 +228,7 @@ csArchive::ArchiveEntry *csArchive::InsertEntry (const char *name,
   ZIP_central_directory_file_header &cdfh)
 {
   int dupentry;
-  ArchiveEntry *e = new ArchiveEntry (name, cdfh);
+  CHK (ArchiveEntry *e = new ArchiveEntry (name, cdfh));
   dir.InsertSorted (e, &dupentry);
   if (dupentry >= 0)
     dir.Delete (dupentry);
@@ -356,7 +356,7 @@ char *csArchive::ReadEntry (FILE *infile, ArchiveEntry * f)
         // Kludge warning: I've encountered a file where zlib 1.1.1 returned
         // Z_BUF_ERROR although everything was ok (a slightly compressed PNG file)
         if ((err != Z_STREAM_END)
-            && ((err != Z_BUF_ERROR) || bytes_left || zs.avail_out))
+         && ((err != Z_BUF_ERROR) || bytes_left || zs.avail_out))
         {
           //CHK (delete[] out_buff);
           //return NULL;
@@ -822,7 +822,7 @@ bool csArchive::ArchiveEntry::Append (const void *data, size_t size)
     if (buffer)
     {
       memcpy (new_buffer, buffer, info.ucsize);
-      delete [] buffer;
+      CHK (delete [] buffer);
     }
     if (buffer_pos + size < new_size)
       memset (new_buffer + buffer_pos + size, 0, new_size - (buffer_pos + size));

@@ -66,7 +66,7 @@ void* operator new (size_t s)
   }
   else
   {
-    printf ("WARNING! Memory was allocated without CHK (%d bytes)!\n", s);
+    printf ("WARNING! Memory was allocated without CHK (%lu bytes)!\n", s);
     me->file = NULL;
   }
   if (entries) entries->prev = me;
@@ -131,7 +131,7 @@ void operator delete (void* p)
     pp = ((char*)p)-WALL_SIZE;
     if (strncmp (pp, BEFOREWALL_STR, WALL_SIZE))
     {
-      printf ("ERROR! Memory was overwritten before block allocated at %s:%d with size %d!\n",
+      printf ("ERROR! Memory was overwritten before block allocated at %s:%d with size %lu!\n",
       	e->file ? e->file : "", e->line, e->size);
       printf ("       Overwritten with: ");
       dump_memory (pp, WALL_SIZE);
@@ -142,7 +142,7 @@ void operator delete (void* p)
     }
     if (strncmp (pp+e->size+WALL_SIZE, AFTERWALL_STR, WALL_SIZE))
     {
-      printf ("ERROR! Memory was overwritten after block allocated at %s:%d with size %d!\n",
+      printf ("ERROR! Memory was overwritten after block allocated at %s:%d with size %lu!\n",
       	e->file ? e->file : "", e->line, e->size);
       printf ("       Overwritten with: ");
       dump_memory (pp+e->size+WALL_SIZE, WALL_SIZE);
@@ -211,7 +211,7 @@ void check_mem ()
         int how_many = MIN (fill_count, strlen (fill_str));
         if (memcmp (fill, fill_str, how_many))
         {
-          printf ("ERROR! Memory was overwritten after block allocated at %s:%d with size %d was freed!\n",
+          printf ("ERROR! Memory was overwritten after block allocated at %s:%d with size %lu was freed!\n",
       	    e->file ? e->file : "", e->line, e->size);
           printf ("       Overwritten with: ");
           dump_memory (fill, 16);

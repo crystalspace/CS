@@ -110,10 +110,7 @@ csGraphics3DOpenGL::~csGraphics3DOpenGL ()
     G2D->DecRef ();
 
   if (System)
-  {
-    System->DeregisterDriver ("iGraphics3D", this);
     System->DecRef ();
-  }
 }
 
 bool csGraphics3DOpenGL::Initialize (iSystem *iSys)
