@@ -9,6 +9,22 @@ chronological order.
 11-Aug-2004
 	- PK implemented the SaverPlugin in genmesh, spr3dmesh and fixed a
 	  bug in the write down order of the other SaverPlugins.
+	- Jorrit added a new iVFS->ChDirAuto() function that is similar to
+	  ChDir() but it can automount real paths and zip files if needed.
+	  This function replaces similar code that was already duplicated
+	  in walktest, cslight, Crystal Core, and soon the new lighter app.
+	  ChDirAuto() accepts a normal VFS path, a real path using /, \,
+	  or $/ path delimiter and also zip files. It also supports a path
+	  in which to look for the given directory.
+	- Jorrit fixed VFS so that ChDir() now fails if you give an invalid
+	  vfs path. Previously it would simply set the current path to 0
+	  and return true anyway.
+	- Jorrit added a new lighter app. This tool is currently almost the
+	  same as cslight but in the (near) future this tool will calculate
+	  super lightmaps for the totally new (yet to be designed) new
+	  lightmap system that we'll have in Crystal Space.
+	- Jorrit removed the feature in walktest to be able to change the
+	  zip file extension. Don't really see why that is useful.
 10-Aug-2004
 	- PK implemented the csThingFactorySaver.
 	- Jorrit fixed a few places in CS where a reverse size_t loop was done

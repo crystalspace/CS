@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2004 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 #include "csutil/cscolor.h"
 #include "cstool/initapp.h"
 #include "csutil/cmdhelp.h"
-#include "cslight.h"
+#include "lighter.h"
 #include "iengine/engine.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -127,7 +127,8 @@ void csCsLightProgressMeter::Step()
       System->g2d->Write (System->font, 20, fh*3/4-40, System->color_text,
         System->color_bg, cur_description);
     System->g2d->DrawBox (10, fh*3/4-10, where, 20, System->color_done);
-    System->g2d->DrawBox (10+where, fh*3/4-10, fw-where-20, 20, System->color_todo);
+    System->g2d->DrawBox (10+where, fh*3/4-10, fw-where-20, 20,
+    	System->color_todo);
     System->g3d->FinishDraw ();
     System->g3d->Print (0);
   }
@@ -159,35 +160,29 @@ void csCsLightProgressMeter::SetGranularity(int n)
 
 //-----------------------------------------------------------------------------
 
-Lighter::Lighter ()
+Lighter::Lighter (iObjectRegistry* object_reg)
 {
+  Lighter::object_reg = object_reg;
 }
 
 Lighter::~Lighter ()
 {
 }
 
-void Lighter::Report (int severity, const char* msg, ...)
+bool Lighter::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
   csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
-    rep->ReportV (severity, "crystalspace.application.cslight", msg, arg);
+    rep->ReportV (severity, "crystalspace.application.lighter", msg, arg);
   else
   {
     csPrintfV (msg, arg);
     csPrintf ("\n");
   }
   va_end (arg);
-}
-
-void Cleanup ()
-{
-  csPrintf ("Cleaning up...\n");
-  iObjectRegistry* object_reg = System->object_reg;
-  delete System; System = 0;
-  csInitializer::DestroyApplication (object_reg);
+  return false;
 }
 
 bool Lighter::SetMapDir (const char* map_dir)
@@ -196,29 +191,19 @@ bool Lighter::SetMapDir (const char* map_dir)
   csStringArray paths;
   paths.Push ("/lev/");
   if (!myVFS->ChDirAuto (map_dir, &paths))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Error setting directory '%s'!",
+    return Report (CS_REPORTER_SEVERITY_ERROR, "Error setting directory '%s'!",
     	map_dir);
-    return false;
-  }
   return true;
 }
 
-bool Lighter::Initialize (int argc, const char* const argv[],
-  const char *iConfigName)
+bool Lighter::Initialize ()
 {
-  object_reg = csInitializer::CreateEnvironment (argc, argv);
-  if (!object_reg) return false;
-
-  if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Can't init app!");
-    return false;
-  }
+  if (!csInitializer::SetupConfigManager (object_reg, 0))
+    return Report (CS_REPORTER_SEVERITY_ERROR, "Can't init app!");
 
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
-	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_OPENGL3D,
 	CS_REQUEST_ENGINE,
 	CS_REQUEST_FONTSERVER,
 	CS_REQUEST_PLUGIN("crystalspace.font.server.freetype2", iFontServer),
@@ -227,12 +212,10 @@ bool Lighter::Initialize (int argc, const char* const argv[],
 	CS_REQUEST_REPORTERLISTENER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_END))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Can't init app!");
-    return false;
-  }
+    return Report (CS_REPORTER_SEVERITY_ERROR, "Can't init app!");
 
-  csRef<iStandardReporterListener> repl (CS_QUERY_REGISTRY (object_reg, iStandardReporterListener));
+  csRef<iStandardReporterListener> repl = CS_QUERY_REGISTRY (object_reg,
+  	iStandardReporterListener);
   if (repl)
   {
     // tune the reporter to be a bit more chatty
@@ -254,7 +237,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   if (csCommandLineHelper::CheckHelp (object_reg))
   {
     csCommandLineHelper::Help (object_reg);
-    exit (0);
+    return true;
   }
 
   // The virtual clock.
@@ -263,35 +246,22 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
-    exit (-1);
-  }
+    return Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
-    exit (-1);
-  }
+    return Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
-    exit (-1);
-  }
+    return Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
 
   // Open the main system. This will open all the previously loaded plug-ins.
   g2d = g3d->GetDriver2D ();
   iNativeWindow* nw = g2d->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Lighting Application");
   if (!csInitializer::OpenApplication (object_reg))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
-    Cleanup ();
-    exit (1);
-  }
+    return Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
 
   // Setup the texture manager.
   iTextureManager* txtmgr = g3d->GetTextureManager ();
@@ -329,10 +299,8 @@ bool Lighter::Initialize (int argc, const char* const argv[],
     {
       val += 6;
       if (!SetMapDir (val))
-      {
-        Cleanup ();
-        exit (1);
-      }
+        return Report (CS_REPORTER_SEVERITY_ERROR,
+      	  "Error setting map dir '%s'!", val);
 
       // First we force a clear of the cache manager in the engine
       // so that a new one will be made soon.
@@ -359,29 +327,24 @@ bool Lighter::Initialize (int argc, const char* const argv[],
 	// We already have one map so it is sufficient here.
 	break;
       }
-      Report (CS_REPORTER_SEVERITY_ERROR,
+      return Report (CS_REPORTER_SEVERITY_ERROR,
     	  "Please give a level (either a zip file or a VFS dir)!");
-      Cleanup ();
-      exit (1);
     }
     if (strlen (val) > 7 && !strncmp ("cache:", val, 6))
     {
       // We already treated the cache entry so we just continue here.
       continue;
     }
+
     if (!SetMapDir (val))
-    {
-      Cleanup ();
-      exit (1);
-    }
+      return Report (CS_REPORTER_SEVERITY_ERROR,
+      	"Error setting map dir '%s'!", val);
 
     // Load the level file which is called 'world'.
-    if (!loader->LoadMapFile ("world", map_idx == 0))	// Only clear engine for first level.
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't load level '%s'!", val);
-      Cleanup ();
-      exit (1);
-    }
+    // Only clear engine for first level.
+    if (!loader->LoadMapFile ("world", map_idx == 0))
+      return Report (CS_REPORTER_SEVERITY_ERROR,
+      	"Couldn't load level '%s'!", val);
     map_idx++;
   }
 
@@ -399,19 +362,17 @@ int main (int argc, char* argv[])
 {
   srand (time (0));
 
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
+  if (!object_reg) exit (1);
+
   // Create our main class.
-  System = new Lighter ();
+  System = new Lighter (object_reg);
 
   // Initialize the main system. This will load all needed plug-ins.
-  if (!System->Initialize (argc, argv, 0))
-  {
-    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
-    Cleanup ();
-    exit (1);
-  }
+  System->Initialize ();
 
-  // Cleanup.
-  Cleanup ();
+  delete System;
+  csInitializer::DestroyApplication (object_reg);
 
   return 0;
 }

@@ -1694,7 +1694,10 @@ bool csVFS::ChDir (const char *Path)
     return false;
 
   // Find the current directory node and directory suffix
-  cnode = GetNode (newwd, cnsufx, sizeof (cnsufx));
+  VfsNode* newcnode = GetNode (newwd, cnsufx, sizeof (cnsufx));
+  if (!newcnode)
+    return false;
+  cnode = newcnode;
 
   delete [] cwd;
   cwd = newwd;
@@ -2048,6 +2051,96 @@ bool csVFS::LoadMountsFromFile (iConfigFile* file)
   }
 
   return success;
+}
+
+// Transform a path so that every \ or / is replaced with $/.
+// If 'add_end' is true there will also be a $/ at the end if there
+// is not already one there.
+// The result of this function must be deleted with delete[].
+static char* TransformPath (const char* path, bool add_end)
+{
+  // The length we allocate below is enough in all cases.
+  char* npath = new char [strlen (path)*2+2+1];
+  char* np = npath;
+  bool lastispath = false;
+  while (*path)
+  {
+    if (*path == '$' && *(path+1) == '/')
+    {
+      *np++ = '$';
+      *np++ = '/';
+      path++;
+      lastispath = true;
+    }
+    else if (*path == '/' || *path=='\\')
+    {
+      *np++ = '$';
+      *np++ = '/';
+      lastispath = true;
+    }
+    else
+    {
+      *np++ = *path;
+      lastispath = false;
+    }
+    path++;
+  }
+  if (add_end && !lastispath)
+  {
+    *np++ = '$';
+    *np++ = '/';
+  }
+  *np++ = 0;
+  return npath;
+}
+
+bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
+	const char* vfspath)
+{
+  // If the VFS path is valid we can use that.
+  if (ChDir (path))
+    return true;
+
+  // Now try to see if we can get it from one of the paths.
+  if (paths)
+  {
+    size_t i;
+    for (i = 0 ; i < paths->Length () ; i++)
+    {
+      csString testpath = paths->Get (i);
+      if (testpath[testpath.Length ()-1] != '/')
+        testpath += "/";
+      testpath += path;
+      printf ("Try '%s'\n", (const char*)testpath);
+      if (ChDir ((const char*)testpath))
+	return true;
+    }
+  }
+
+  // First check if it is a zip file.
+  int pathlen = strlen (path);
+  bool is_zip = pathlen >= 5 && !strcmp (path+pathlen-4, ".zip");
+  char* npath = TransformPath (path, !is_zip);
+
+  // See if we have to generate a unique VFS name.
+  csString tryvfspath;
+  if (vfspath)
+  {
+    tryvfspath = vfspath;
+  }
+  else
+  {
+    // To generate unique names.
+    static int cnt = 0;
+    tryvfspath.Format ("/tmp/__auto%d__", cnt);
+    cnt++;
+  }
+  
+  bool rc = Mount ((const char*)tryvfspath, npath);
+  delete[] npath;
+  if (!rc)
+    return false;
+  return ChDir ((const char*)tryvfspath);
 }
 
 bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime) const

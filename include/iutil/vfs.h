@@ -29,6 +29,7 @@
 #include "csutil/ref.h"
 #include "iutil/databuff.h"
 #include "iutil/stringarray.h"
+#include "csutil/stringarray.h"
 
 struct iConfigFile;
 
@@ -350,6 +351,32 @@ struct iVFS : public iBase
    */
   virtual bool LoadMountsFromFile (iConfigFile* file) = 0;
 
+  /**
+   * Conveniance function to set the current VFS directory to the given path.
+   * The path can be any of the following:
+   * <ul>
+   * <li>A valid VFS path. In that case this is equivalent to calling
+   *     ChDir(path).
+   * <li>A real path (using '/', '\', or '$/' for path delimiter). In this
+   *     case this path will be mounted on the 'vfspath' parameter and a
+   *     ChDir(vfspath) will happen.
+   * <li>A real path to a zip file. In this case the zip file will
+   *     be mounted on the 'vfspath' parameter and a ChDir(vfspath) will
+   *     happen.
+   * </ul>
+   * \param path is the path to mount (VFS, real, zip, ...)
+   * \param paths is an array of possible vfs paths to also look in
+   *        for the given file. This can an empty array or 0. If not empty
+   *        then this routine will first try to find the 'path' as such
+   *        if it is a VFS path. Otherwise it will scan all paths here
+   *        and add the path as a prefix. Only if all this fails will it
+   *        try to interprete the input path as a real world dir or zip file.
+   * \param vfspath is the temporary name to use in case it is not a vfs
+   *        path. If not given then this routine will try to use a suitable
+   *        temporary name.
+   */
+  virtual bool ChDirAuto (const char* path, const csStringArray* paths,
+  	const char* vfspath = 0) = 0;
 
   /**
    * Query file date/time.

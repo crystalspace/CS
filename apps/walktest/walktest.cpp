@@ -217,7 +217,6 @@ void WalkTest::SetDefaults ()
   {
     num_maps++;
     idx++;
-    char map_dir[512];
     csMapToLoad* map = new csMapToLoad;
 
     // If the given value starts with "cache:" the given location will not
@@ -230,13 +229,7 @@ void WalkTest::SetDefaults ()
       val += 6;
     }
 
-    // if an absolute path is given, copy it. Otherwise prepend "/lev/".
-    if (val[0] == '/')
-      strcpy (map_dir, val);
-    else
-      sprintf (map_dir, "/lev/%s", val);
-
-    map->map_dir = csStrNew (map_dir);
+    map->map_dir = csStrNew (val);
     map->next_map = 0;
     if (last_map)
       last_map->next_map = map;
@@ -1011,43 +1004,12 @@ static bool WalkEventHandler (iEvent& ev)
 
 bool WalkTest::SetMapDir (const char* map_dir)
 {
-  char tmp[512];
-  sprintf (tmp, "%s/", map_dir);
-  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
-  if (!myVFS->Exists (map_dir))
+  csStringArray paths;
+  paths.Push ("/lev/");
+  if (!myVFS->ChDirAuto (map_dir, &paths))
   {
-    char *name = strrchr (map_dir, '/');
-    if (name)
-    {
-      name++;
-      //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
-      //  name, name, name);
-      const char *valfiletype = "";
-      valfiletype = cfg->GetStr ("Walktest.Settings.WorldZipType", "");
-      if (strcmp (valfiletype, "") ==0)
-      {
-        valfiletype = "zip";
-      }
-      char* extension = strrchr (name, '.');
-      if (extension && !strcmp (extension+1, valfiletype))
-      {
-        // The file already ends with the correct extension.
-        sprintf (tmp, "$.$/data$/%s, $.$/%s, $(..)$/data$/%s, %s",
-            name, name, name, name);
-      }
-      else
-      {
-        // Add the extension.
-        sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s ",
-            name, valfiletype, name, valfiletype, name, valfiletype);
-      }
-      myVFS->Mount (map_dir, tmp);
-    }
-  }
-  if (!myVFS->ChDir (map_dir))
-  {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"The directory on VFS for map file does not exist!");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error setting directory '%s'!",
+    	map_dir);
     return false;
   }
   return true;

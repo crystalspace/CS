@@ -204,6 +204,10 @@ public:
   /// Load a configuration file
   virtual bool LoadMountsFromFile (iConfigFile* file);
 
+  /// Auto-mount ChDir.
+  virtual bool ChDirAuto (const char* path, const csStringArray* paths,
+  	const char* vfspath = 0);
+
   /// Initialize the Virtual File System
   virtual bool Initialize (iObjectRegistry *object_reg);
 

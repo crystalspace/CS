@@ -5,6 +5,7 @@ SubInclude TOP apps tools csfgen ;
 SubInclude TOP apps tools cslight ;
 SubInclude TOP apps tools docconv ;
 SubInclude TOP apps tools levtool ;
+SubInclude TOP apps tools lighter ;
 SubInclude TOP apps tools partedit ;
 SubInclude TOP apps tools picview ;
 SubInclude TOP apps tools viewmesh ;
