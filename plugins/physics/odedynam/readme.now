@@ -1,0 +1,5 @@
+Currently you need the cvs version of the ode library from www.q12.org/ode.
+Version 0.03 will _not_ cut it (for our needs).
+After compiling and installing you need to make changes to ode/config.h (wherever you installed it).
+Comment out the typedefs for int8, uint8, int32 and uint32.
+
