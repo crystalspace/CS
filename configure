@@ -28511,7 +28511,7 @@ fi
 
 if test "$with_vos" != no && test "$with_vos" != yes; then
   if test -n "$PKG_CONFIG_PATH"; then
-  // 	PKG_CONFIG_PATH="$PKG_CONFIG_PATH$PATH_SEPARATOR$with_vos"
+  PKG_CONFIG_PATH="$PKG_CONFIG_PATH$PATH_SEPARATOR$with_vos"
 else
   PKG_CONFIG_PATH="$with_vos"
 fi

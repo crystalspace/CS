@@ -1505,7 +1505,7 @@ AS_IF([test -z "$with_vos"], [with_vos=yes])
 
 AS_IF([test "$with_vos" != no && test "$with_vos" != yes],
     [AS_IF([test -n "$PKG_CONFIG_PATH"],
-// 	[PKG_CONFIG_PATH="$PKG_CONFIG_PATH$PATH_SEPARATOR$with_vos"],
+ 	[PKG_CONFIG_PATH="$PKG_CONFIG_PATH$PATH_SEPARATOR$with_vos"],
 	[PKG_CONFIG_PATH="$with_vos"])
     export PKG_CONFIG_PATH])
 AC_CHECK_TOOLS([PKGCONFIG], [pkg-config])
