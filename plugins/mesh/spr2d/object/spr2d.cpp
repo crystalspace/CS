@@ -43,9 +43,6 @@ SCF_IMPLEMENT_IBASE (csSprite2DMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite2DState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iParticle)
-#ifdef CS_USE_NEW_RENDERER
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShaderVariableAccessor)
-#endif
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::ObjectModel)
@@ -61,9 +58,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::Particle)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 #ifdef CS_USE_NEW_RENDERER
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite2DMeshObject::eiShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE (csSprite2DMeshObject::eiShaderVariableAccessor)
   SCF_IMPLEMENTS_INTERFACE (iShaderVariableAccessor)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csStringID csSprite2DMeshObject::vertex_name = csInvalidStringID;
 csStringID csSprite2DMeshObject::texel_name = csInvalidStringID;
@@ -77,9 +74,6 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiParticle);
-#ifdef CS_USE_NEW_RENDERER
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
-#endif
   csSprite2DMeshObject::factory = factory;
   logparent = 0;
   ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
@@ -106,9 +100,6 @@ csSprite2DMeshObject::~csSprite2DMeshObject ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite2DState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiParticle);
-#ifdef CS_USE_NEW_RENDERER
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
-#endif
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -153,15 +144,17 @@ void csSprite2DMeshObject::SetupObject ()
     }
     
     svcontext.AttachNew (new csShaderVariableContext ());
+    csRef<iShaderVariableAccessor> accessor;
+    accessor.AttachNew (new eiShaderVariableAccessor (this));
     csShaderVariable* sv;
     sv = svcontext->GetVariableAdd (index_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor (accessor);
     sv = svcontext->GetVariableAdd (vertex_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor (accessor);
     sv = svcontext->GetVariableAdd (texel_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor (accessor);
     sv = svcontext->GetVariableAdd (color_name);
-    sv->SetAccessor (&scfiShaderVariableAccessor);
+    sv->SetAccessor (accessor);
 #endif
   }
 }

@@ -28,6 +28,7 @@
 #include "csutil/array.h"
 #include "csutil/refarr.h"
 #include "cstool/rendermeshholder.h"
+#include "csutil/weakref.h"
 #include "imesh/object.h"
 #include "imesh/sprite2d.h"
 #include "imesh/particle.h"
@@ -66,13 +67,25 @@ protected:
 #ifdef CS_USE_NEW_RENDERER
   class eiShaderVariableAccessor : public iShaderVariableAccessor
   {
+    csWeakRef<csSprite2DMeshObject> parent;
   public:
-    SCF_DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
+    SCF_DECLARE_IBASE;
+
+    eiShaderVariableAccessor (csSprite2DMeshObject* parent)
+    {
+      SCF_CONSTRUCT_IBASE(0);
+      eiShaderVariableAccessor::parent = parent;
+    }
+    virtual ~eiShaderVariableAccessor() 
+    {
+      SCF_DESTRUCT_IBASE();
+    }
+
     virtual void PreGetValue (csShaderVariable* variable)
     {
-      scfParent->PreGetShaderVariableValue (variable);
+      if (parent) parent->PreGetShaderVariableValue (variable);
     }
-  } scfiShaderVariableAccessor;
+  };
   friend class eiShaderVariableAccessor;
 
   void PreGetShaderVariableValue (csShaderVariable* variable);

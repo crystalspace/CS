@@ -13,6 +13,7 @@ chronological order.
 	  actual attenuation settings.
 	- res added non-const versions for csHash<>::Get() and 
 	  GetElementPointer().
+	- res made spr2d's SV accessor a non-embedded interface. Fixes a leak.
 3-Apr-2004
 	- Jorrit fixed a new compile error in the simple console plugin.
 	- Jorrit added a new 'back2front' keyword for the genmesh factory
