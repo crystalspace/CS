@@ -269,8 +269,9 @@ int csKDTree::FindBestSplitLocation (int axis, float& split_loc)
     for (j = 0 ; j < num_objects ; j++)
     {
       const csBox3& bbox = objects[j]->bbox;
-      if (bbox.Max (axis) < a) left++;
-      else if (bbox.Min (axis) > a) right++;
+      // The .0001 is for safety.
+      if (bbox.Max (axis) < a-.0001) left++;
+      else if (bbox.Min (axis) > a+.0001) right++;
     }
     int cut = num_objects-left-right;
     // If we have no object on the left or right then this is a bad
@@ -596,19 +597,13 @@ bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,
     // There are children.
     if (pos[split_axis] <= split_location)
     {
-printf ("F2B 1\n"); fflush (stdout);
       child1->Front2Back (pos, func, userdata, cur_timestamp);
-printf ("F2B 2\n"); fflush (stdout);
       child2->Front2Back (pos, func, userdata, cur_timestamp);
-printf ("F2B 3\n"); fflush (stdout);
     }
     else
     {
-printf ("F2B 4\n"); fflush (stdout);
       child2->Front2Back (pos, func, userdata, cur_timestamp);
-printf ("F2B 5\n"); fflush (stdout);
       child1->Front2Back (pos, func, userdata, cur_timestamp);
-printf ("F2B 6\n"); fflush (stdout);
     }
   }
   return true;

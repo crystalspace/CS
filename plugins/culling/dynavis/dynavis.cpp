@@ -82,7 +82,7 @@ csDynaVis::csDynaVis (iBase *iParent)
   stats_total_notvistest_time = 0;
 
   do_cull_frustum = true;
-  do_cull_coverage = true;
+  do_cull_coverage = COVERAGE_OUTLINE;
   cfg_view_mode = VIEWMODE_STATS;
   do_state_dump = false;
 }
@@ -288,7 +288,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
     data->frustum_mask = new_mask;
   }
 
-  if (do_cull_coverage)
+  if (do_cull_coverage != COVERAGE_NONE)
   {
     iCamera* camera = data->rview->GetCamera ();
     float max_depth;
@@ -432,7 +432,6 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 
   const csVector3* verts = polymesh->GetVertices ();
   int vertex_count = polymesh->GetVertexCount ();
-  int poly_count = polymesh->GetPolygonCount ();
 
   csReversibleTransform movtrans = movable->GetFullTransform ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
@@ -537,7 +536,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       goto end;
     }
 
-    if (do_cull_coverage)
+    if (do_cull_coverage != COVERAGE_NONE)
     {
       iCamera* camera = data->rview->GetCamera ();
       float max_depth;
@@ -556,13 +555,15 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
     // Object is visible. Let it update the coverage buffer if we
     // are using do_cull_coverage.
-    if (do_cull_coverage && obj->visobj->GetObjectModel ()->
+    if (do_cull_coverage != COVERAGE_NONE && obj->visobj->GetObjectModel ()->
     	GetSmallerPolygonMesh ())
     {
-      //UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
-      	//obj->model);
-      UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
-      	obj->model);
+      if (do_cull_coverage == COVERAGE_POLYGON)
+        UpdateCoverageBuffer (data->rview->GetCamera (), obj->visobj,
+      	  obj->model);
+      else
+	UpdateCoverageBufferOutline (data->rview->GetCamera (), obj->visobj,
+      	  obj->model);
     }
 
     obj->visobj->MarkVisible ();
@@ -607,7 +608,6 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
   // Remember current frustum mask.
   uint32 old_frustum_mask = data->frustum_mask;
 
-#if 0
   // In the first part of this test we are going to test if the node
   // itself is visible. If it is not then we don't need to continue.
   if (!dynavis->TestNodeVisibility (treenode, data))
@@ -615,22 +615,16 @@ static bool VisTest_Front2Back (csKDTree* treenode, void* userdata,
     vis = false;
     goto end;
   }
-#endif
 
-printf ("Before Distribute\n"); fflush (stdout);
   treenode->Distribute ();
-printf ("After Distribute\n"); fflush (stdout);
 
-#if 0
   int num_objects;
   csKDTreeChild** objects;
   num_objects = treenode->GetObjectCount ();
   objects = treenode->GetObjects ();
   int i;
-printf ("tov 1\n"); fflush (stdout);
   for (i = 0 ; i < num_objects ; i++)
   {
-printf ("tov 2:%d\n", i); fflush (stdout);
     if (objects[i]->timestamp != cur_timestamp)
     {
       objects[i]->timestamp = cur_timestamp;
@@ -639,8 +633,6 @@ printf ("tov 2:%d\n", i); fflush (stdout);
       dynavis->TestObjectVisibility (visobj_wrap, data);
     }
   }
-printf ("tov 3\n"); fflush (stdout);
-#endif
 
   vis = true;
 
@@ -648,7 +640,6 @@ end:
   // Restore the frustum mask.
   data->frustum_mask = old_frustum_mask;
 
-printf ("Before Return\n"); fflush (stdout);
   return vis;
 }
 
@@ -707,7 +698,6 @@ bool csDynaVis::VisTest (iRenderView* rview)
     }
   }
 
-printf ("AAAAAAAAAAAAAA1\n"); fflush (stdout);
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible. In the mean time also update the coverage
   // buffer for further culling.
@@ -715,7 +705,6 @@ printf ("AAAAAAAAAAAAAA1\n"); fflush (stdout);
   data.rview = rview;
   data.dynavis = this;
   kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data);
-printf ("AAAAAAAAAAAAAA2\n"); fflush (stdout);
 
   // Conclude statistics.
   if (t2 != 0)
@@ -928,9 +917,13 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
   }
   else if (!strcmp (cmd, "toggle_coverage"))
   {
-    do_cull_coverage = !do_cull_coverage;
+    do_cull_coverage++;
+    if (do_cull_coverage > COVERAGE_OUTLINE) do_cull_coverage = COVERAGE_NONE;
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
-    	"%s coverage culling!", do_cull_coverage ? "Enabled" : "Disabled");
+    	"%s coverage culling!",
+	do_cull_coverage == COVERAGE_NONE ? "Disabled" :
+	do_cull_coverage == COVERAGE_POLYGON ? "Polygon" :
+	"Outline");
     return true;
   }
   else if (!strcmp (cmd, "clear_stats"))

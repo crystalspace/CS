@@ -51,6 +51,10 @@ enum csVisReason
 #define VIEWMODE_FIRST 0
 #define VIEWMODE_LAST 2
 
+#define COVERAGE_NONE 0
+#define COVERAGE_POLYGON 1
+#define COVERAGE_OUTLINE 2
+
 struct VisTest_Front2BackData;
 
 /**
@@ -91,7 +95,7 @@ private:
 
   // Various flags to enable/disable parts of the culling algorithm.
   bool do_cull_frustum;
-  bool do_cull_coverage;
+  int do_cull_coverage;
 
   // View mode for debugging (one of VIEWMODE_... constants).
   int cfg_view_mode;

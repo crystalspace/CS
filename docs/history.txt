@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+25-May-2002
+	- Fixed a bug in KD-tree of Dynavis which could cause infinite
+	  recursion while traversing the tree. Also enabled normal Dynavis
+	  processing again.
+	- Extended Dynavis 'toggle_coverage' command so that it now has
+	  three modes: None, Polygon, and Outline.
 24-May-2002
 	- Fixed a bug in the handling of the polygon mesh instances in a thing.
 	  If they were queried too early they could hold invalid date and
