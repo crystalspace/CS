@@ -1940,7 +1940,6 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (iMeshObjectFactory *fact,
 
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
-  mfactwrap->IncRef ();
   GetMeshFactories ()->AddMeshFactory (&(mfactwrap->scfiMeshFactoryWrapper));
   return &mfactwrap->scfiMeshFactoryWrapper;
 }
@@ -1955,7 +1954,6 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* name)
 
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper ();
   if (name) mfactwrap->SetName (name);
-  mfactwrap->IncRef ();
   GetMeshFactories ()->AddMeshFactory (&(mfactwrap->scfiMeshFactoryWrapper));
   return &mfactwrap->scfiMeshFactoryWrapper;
 }
