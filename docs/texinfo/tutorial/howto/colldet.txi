@@ -1,0 +1,114 @@
+@c -*-texinfo-*-
+@node HOWTO Collision Detection, , ,
+@subsection Doing Collision Detection
+@cindex iCollideSystem
+@cindex iCollider
+@cindex iPolygonMesh
+@cindex iObject
+@cindex iMeshWrapper
+
+Collision detection in CS is one of the more complicated issues. In this
+section I give a quick description of all the classes and interfaces in CS
+and what you should do to use them.
+
+@subsubheading Loading the @samp{iCollideSystem}
+
+The basis of the collision detection system is the @samp{iCollideSystem}.
+This is an interface which implemented by some collision detection plugin.
+At this moment we only have an implementation of the @sc{RAPID} collision
+detection system but it would be a simple matter to add a new plugin for
+another system.
+
+To load a collision detection system you can use the following code:
+
+@example
+const char* p = Config->GetStr ("MyGame.Settings.CollDetPlugIn",
+  	"crystalspace.colldet.rapid");
+iCollideSystem* cd_sys = LOAD_PLUGIN (System, p, "CollDet", iCollideSystem);
+if (!cd_sys)
+@{
+  Printf (MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
+  return false;
+@}
+@end example
+
+This is a very general example. It will first get the prefered collision
+detection plugin from the config file. If the config file doesn't specify
+it then it will use 'crystalspace.colldet.rapid' which is the only one
+we have at the moment. If you don't want to let the users choose another
+plugin then you can also hardcode the string. The cd_sys should be stored
+somewhere central (i.e. your application class).
+
+@subsubheading Initializing Geometry
+
+Before you can use the collision detection system you have to make
+instances of @samp{iCollider}. Only the collide system can do that. To
+create an @samp{iCollider} you have to give an instance of @samp{iPolygonMesh}.
+Several meshes in CS implement @samp{iPolygonMesh}. If you have special
+geometry on your own you can make your own classes to implement
+@samp{iPolygonMesh}. Here is some code on how to initialize the collider
+for a mesh:
+
+@example
+iCollider* MyGame::InitCollider (iMeshWrapper* mesh)
+@{
+  iPolygonMesh* polmesh = QUERY_INTERFACE (mesh->GetMeshObject (),
+  	iPolygonMesh);
+  if (polmesh)
+    return cd_sys->CreateCollider (polmesh);
+  else
+    return NULL;
+@}
+@end example
+
+After that you need to store the returned collider somewhere so you
+can easily retrieve it later when you want to do the collision detection.
+Usually in a game you have entity classes which will have a pointer to the
+mesh. In that case you can easily store the collider in that entity class.
+
+However, you can also use the @samp{iObject} system to attach your collider
+to the mesh itself (@@@TODO! More on this subject later when Martin finishes
+his new RTTI system).
+
+@@@TODO! More info about how to add this collider for all objects loaded
+in the engine.
+
+@subsubheading The Player Collider
+
+Depending on the game your player might have a representation of
+geometry or not. If it doesn't you will have to make your own version
+of @samp{iPolygonMesh} to create a collider for the player. Even if
+your player has geometry (i.e. a 3D sprite) it is sometimes still preferable
+to create your own special geometry for the player. The reason is
+gravity. When you would just use one collider for the player you can have
+problems moving around because the player would not be able to jump over
+even the tiniest elevation in height. Sometimes the edge between adjacent
+polygons can even cause the player to collide with that other polygon due
+to numerical inprecision. To solve this problem it is best to make one
+collider that is used for gravity only and another collider that is used
+to test if you can move around. The gravity collider will be used only
+to test if the player can go downwards or upwards. To avoid not being able
+to go over small height elevations, the player collider should float slightly
+above the ground.
+
+The best way to make the gravity collider is to make your own implementation
+of @samp{iPolygonMesh}. This is very efficient. To keep the returned
+collider I recommend storing them somewhere in the player class or else the
+main game class.
+
+@subsubheading Doing Collision Detection
+
+When everything is set up it is time to do collision detection. To test
+for collisions you use the @code{Collide} function in @samp{iCollideSystem}.
+This will test the collisions between two colliders. The result of this
+will be true or false and in addition the collide system will keep a list
+of all triangle pairs for the hits. Those triangle pairs can be used to
+decide what to do on collision (i.e. slide on a wall for example).
+
+Because collision detection works on two objects at a time it is a good
+idea to have some system on top of the collision detection system that
+detects when it is useful to do collision detection. You can use a bounding
+sphere for that. Also you should only do collision detection if the object
+moves.
+
+

@@ -1,0 +1,18 @@
+@c -*-texinfo-*-
+@node HOWTO, , WinCVS Tutorial, Tutorials
+@section HOWTO
+@cindex Tutorial, HOWTO
+
+@noindent
+@emph{Written by Jorrit Tyberghein, @email{Jorrit.Tyberghein@@pandora.be}}
+
+Last updated 10 May, 2001.
+
+This is a list of HOWTO's for Crystal Space. They contain short questions with
+more or less short answers.
+
+@menu
+* HOWTO Collision Detection:: Doing Collision Detection
+@end menu
+
+@importss{tutorial,howto,colldet.txi}
