@@ -171,6 +171,15 @@ public:
        happens automatically normally. */
   virtual void SetupPalette()=0;
 
+  /** Allows a component to specify it's own constant values for parsing. */
+  virtual void RegisterConstant(char *name, int value)=0;
+
+  /** Returns true if the constant has been registered, false otherwise.  */
+  virtual bool ConstantExists(char *name)=0;
+
+  /** Allows a component to retrieve the value of a constant, or the parser as well. */
+  virtual int  GetConstantValue(char *name)=0;
+
 };
 
 SCF_VERSION (iAwsSigSrc, 0, 0, 1);
