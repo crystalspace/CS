@@ -21,6 +21,15 @@ chronological order.
 	- res tweaked the GL text drawing settings; the somewhat problematic
 	  method to use the GL_BLEND method together with a GL_INTENSITY
 	  texture is now disabled by default.
+	- Eric Sunshine fixed bogus logic in csPluginLoader::LoadPlugins()
+	  where it was placing all loaded plugins into the object-registry even
+	  before they had been initialized (via iComponent::Initialize()).
+	  This allowed other objects potentially and incorrectly to access the
+	  incompletely initialized objects.  Now, however, objects are placed
+	  in the registry only after Initialize() has been invoked, and only if
+	  successful.  As a corollary, this also fixes a bug where objects were
+	  available incorrectly in the object-registry even if Initialize()
+	  failed.
 27-Dec-2004
 	- Eric Sunshine applied a fix to csXWindow::HandleEvent(), loosely
 	  based upon a patch submitted by Seth Yastrov <syastrov@gmail.com>,

@@ -242,7 +242,6 @@ bool csPluginLoader::LoadPlugins ()
   // Now eat all common-for-plugins command-line switches
   bool g3d_override = false;
   const char *val = CommandLine->GetOption ("video");
-
   if (val)
   {
     // Alternate videodriver
@@ -355,47 +354,21 @@ bool csPluginLoader::LoadPlugins ()
     r->plugin = 0;
     if (VFS && r->Tag && strcmp (r->Tag, "iVFS") == 0)
       continue;
-    iBase *plg = plugin_mgr->LoadPlugin (r->ClassID, 0, 0, false);
-    r->plugin = plg;
-    if (plg)
+    r->plugin.AttachNew(plugin_mgr->LoadPlugin (r->ClassID, 0, 0, true));
+    if (r->plugin)
     {
-      if (!object_reg->Register (plg, r->Tag))
+      if (!object_reg->Register (r->plugin, r->Tag))
       {
-        if (r->Tag)
-          csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	    "crystalspace.pluginloader.loadplugins",
-    	    "Duplicate tag '%s' found for plugin '%s'!", r->Tag, r->ClassID);
-        else
-          csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	    "crystalspace.pluginloader.loadplugins",
-    	    "Could not register plugin '%s'!", r->ClassID);
-        return false;
+	if (r->Tag)
+	  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	    "crystalspace.pluginloader.loadplugins",
+	    "Duplicate tag '%s' found for plugin '%s'!", r->Tag, r->ClassID);
+	else
+	  csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	    "crystalspace.pluginloader.loadplugins",
+	    "Could not register plugin '%s'!", r->ClassID);
+	return false;
       }
-      plg->DecRef ();
-    }
-  }
-
-  // Initialize all plugins.
-  for (n = 0; n < PluginList.Length (); n++)
-  {
-    const csPluginLoadRec* r = PluginList.Get(n);
-    if (r->plugin)
-    {
-      csRef<iComponent> comp (SCF_QUERY_INTERFACE (r->plugin, iComponent));
-      if (comp)
-        comp->Initialize (object_reg);
-    }
-  }
-
-  // Query all commandline options for plugins.
-  for (n = 0; n < PluginList.Length (); n++)
-  {
-    const csPluginLoadRec* r = PluginList.Get(n);
-    if (r->plugin)
-    {
-      csRef<iComponent> comp (SCF_QUERY_INTERFACE (r->plugin, iComponent));
-      if (comp)
-        plugin_mgr->QueryOptions (comp);
     }
   }
 
