@@ -162,6 +162,21 @@ public:
   }
 
   /**
+   * Faster version of MakeEmpty() that assumes that several of the fields will
+   * be correctly updated directly after calling this function. Don't call this
+   * unless you know what you are doing!
+   */
+  void MakeEmptyQuick ()
+  {
+    queue_tile_empty = false;
+    memset (depth, 0, sizeof (float)*32);
+    tile_min_depth = INIT_MIN_DEPTH;
+    tile_max_depth = 0;
+    blocks_full = 0;
+    blocks_partial = 0;
+  }
+
+  /**
    * Clear all operations.
    */
   void ClearOperations ()
@@ -203,6 +218,26 @@ public:
    * updated.
    */
   void Flush (csBits64& fvalue, float maxdepth);
+
+  /**
+   * Version of Flush that handles the case where the tile is empty.
+   */
+  void FlushForEmpty (csBits64& fvalue, float maxdepth);
+
+  /**
+   * Version of Flush that handles the case where the tile is full.
+   */
+  void FlushForFull (csBits64& fvalue, float maxdepth);
+
+  /**
+   * Version of Flush that handles the case where there is no depth checking.
+   */
+  void FlushNoDepth (csBits64& fvalue, float maxdepth);
+
+  /**
+   * General flush version (least efficient).
+   */
+  void FlushGeneral (csBits64& fvalue, float maxdepth);
 
   /**
    * Test if a given rectangle with exactly the size of this tile

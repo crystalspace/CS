@@ -260,7 +260,7 @@ bool csReporterListener::HandleEvent (iEvent& event)
 	      csTimedMessage* tm = messages[i];
               g2d->Write (fnt, 4+6, 4+6+i*(fh+4), fg, bg, tm->msg);
 	      // Set the time the first time we could actually display it.
-	      if (tm->time == 0) tm->time = csGetTicks () + 10000;
+	      if (tm->time == 0) tm->time = csGetTicks () + 5000;
 	    }
 	    csTicks t = csGetTicks ();
 	    i = 0;

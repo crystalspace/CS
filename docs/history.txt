@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Oct-2003
+	- Jorrit reduced the 'yellow-message-time' in the standard reporter
+	  from 10 to 5 seconds.
+	- Jorrit fixed a bug in dynavis where it would sometimes incorrectly
+	  update the depth buffer. The chance of this bug manifesting itself
+	  was not very big though.
+	- Jorrit optimized the coverage buffer in Dynavis a bit by adding
+	  handling for a special case in a tile. If a tile is empty then a
+	  more optimal routine is selected for flushing the operations.
+	- Jorrit cleaned up the coverage buffer Flush() routine by splitting
+	  it up in all different cases.
 22-Oct-2003
 	- Jorrit fixed a bug in csMovableSectorList which did all the needed
 	  SCF stuff EXCEPT inherit from iBase. This is an old bug but for
