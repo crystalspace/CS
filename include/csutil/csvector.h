@@ -198,7 +198,7 @@ inline void csVector::QuickSort (int Mode)
  * Usage:
  *   BEGIN_TYPED_VECTOR_EXT(NAME,TYPE,OBJ)
  *     user-defined FreeItem(OBJ) here
- *   END_TYPED_VECTOR_EXT
+ *   END_TYPED_VECTOR_EXT(TYPE)
  *
  * Parameters:
  *   NAME - Name of the new vector class.
@@ -210,6 +210,10 @@ inline void csVector::QuickSort (int Mode)
   class NAME : private csVector						\
   {									\
   public:								\
+    inline bool Delete (int n, bool FreeIt = true)			\
+    { return csVector::Delete (n, FreeIt); }				\
+    inline void DeleteAll (bool FreeThem = true)			\
+    { csVector::DeleteAll (FreeThem); }					\
     inline NAME (int ilimit = 16, int ithreshold = 16) :		\
       csVector (ilimit, ithreshold) {}					\
     virtual ~NAME ()							\
@@ -245,20 +249,16 @@ inline void csVector::QuickSort (int Mode)
     { csVector::QuickSort (Left, Right, Mode); }			\
     inline void QuickSort (int Mode = 0)				\
     { csVector::QuickSort (Mode); }					\
-    inline bool Delete (int n, bool FreeIt = true)			\
-    { return csVector::Delete (n, FreeIt); }				\
-    inline void DeleteAll (bool FreeThem = true)			\
-    { csVector::DeleteAll (FreeThem); }					\
     inline int FindKey (csConstSome Key, int Mode = 0) const		\
     { return csVector::FindKey (Key, Mode); }				\
     inline int FindSortedKey (csConstSome Key, int Mode = 0) const	\
     { return csVector::FindSortedKey (Key, Mode); }			\
-    virtual bool FreeItem (csSome Item)					\
-    { return FreeTypedItem ((TYPE *)Item); }				\
     inline bool FreeTypedItem (TYPE *OBJ) {
 
-#define END_TYPED_VECTOR_EXT						\
+#define END_TYPED_VECTOR_EXT(TYPE)					\
     }									\
+    virtual bool FreeItem (csSome Item)					\
+    { return FreeTypedItem ((TYPE *)Item); }				\
   }
 
 /**
@@ -270,19 +270,19 @@ inline void csVector::QuickSort (int Mode)
   BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
     delete obj;								\
     return true;							\
-  END_TYPED_VECTOR_EXT
+  END_TYPED_VECTOR_EXT (TYPE)
 
 /// This is a special version of typed vectors that don't delete their elements
 #define DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)			\
   BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
     return true;							\
-  END_TYPED_VECTOR_EXT
+  END_TYPED_VECTOR_EXT (TYPE)
 
 /// This is a special version of typed vectors for SCF objects
 #define DECLARE_TYPED_SCF_VECTOR(NAME,TYPE)				\
   BEGIN_TYPED_VECTOR_EXT (NAME,TYPE,obj)				\
     obj->DecRef();							\
     return true;							\
-  END_TYPED_VECTOR_EXT
+  END_TYPED_VECTOR_EXT (TYPE)
 
 #endif // __CSVECTOR_H__
