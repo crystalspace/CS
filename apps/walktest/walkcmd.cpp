@@ -623,9 +623,10 @@ void WalkTest::ParseKeyCmds (iObject* src)
   if (mesh)
   {
     int k;
-    for (k = 0 ; k < mesh->GetChildCount () ; k++)
+    iMeshList* ml = mesh->GetChildren ();
+    for (k = 0 ; k < ml->GetMeshCount () ; k++)
     {
-      iMeshWrapper* spr = mesh->GetChild (k);
+      iMeshWrapper* spr = ml->GetMesh (k);
       ParseKeyCmds (spr->QueryObject ());
     }
     mesh->DecRef ();

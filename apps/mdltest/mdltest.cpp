@@ -67,8 +67,9 @@ void InitializeSprite (iMeshWrapper *SpriteWrapper)
   sprState->DecRef ();
 
   int i;
-  for (i=0; i<SpriteWrapper->GetChildCount (); i++)
-    InitializeSprite (SpriteWrapper->GetChild (i));
+  iMeshList* ml = SpriteWrapper->GetChildren ();
+  for (i=0; i<ml->GetMeshCount (); i++)
+    InitializeSprite (ml->GetMesh (i));
 }
 
 iModelDataVertices *Simple::CreateDefaultModelVertexFrame ()
@@ -364,8 +365,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   iMaterialWrapper* tm = LoadTexture ("material1", "/lib/std/stone4.gif");
-  iMaterialWrapper* tm2 = LoadTexture ("material2", "/lib/std/andrew_wood.gif");
-  iMaterialWrapper* tm3 = LoadTexture ("material3", "/lib/std/andrew_marble4.gif");
+  //iMaterialWrapper* tm2 = LoadTexture ("material2", "/lib/std/andrew_wood.gif");
+  //iMaterialWrapper* tm3 = LoadTexture ("material3", "/lib/std/andrew_marble4.gif");
 
   room = engine->CreateSector ("room");
 

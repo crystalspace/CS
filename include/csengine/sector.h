@@ -23,6 +23,7 @@
 #include "csutil/nobjvec.h"
 #include "csgeom/math3d.h"
 #include "csengine/bsp.h"
+#include "csengine/meshobj.h"
 #include "csutil/cscolor.h"
 #include "iutil/objref.h"
 #include "iengine/movable.h"
@@ -46,32 +47,17 @@ struct iRenderView;
 struct iMeshWrapper;
 struct iFrustumView;
 
-CS_DECLARE_TYPED_VECTOR_NODELETE (csMeshVector, iMeshWrapper);
-
 /// A list of meshes for a sector.
-class csSectorMeshList : public csMeshVector
+class csSectorMeshList : public csMeshList
 {
 private:
   csSector* sector;
 
 public:
-  SCF_DECLARE_IBASE;
-
   csSectorMeshList ();
   void SetSector (csSector* sec) { sector = sec; }
-  iMeshWrapper *FindByName (const char *name) const;
-  void AddMesh (iMeshWrapper* mesh);
-  void RemoveMesh (iMeshWrapper* mesh);
-  class MeshList : public iMeshList
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSectorMeshList);
-    virtual int GetMeshCount () const;
-    virtual iMeshWrapper *GetMesh (int idx) const;
-    virtual void AddMesh (iMeshWrapper *mesh);
-    virtual void RemoveMesh (iMeshWrapper *mesh);
-    virtual iMeshWrapper *FindByName (const char *name) const;
-    virtual int Find (iMeshWrapper *mesh) const;
-  } scfiMeshList;
+  virtual void AddMesh (iMeshWrapper* mesh);
+  virtual void RemoveMesh (iMeshWrapper* mesh);
 };
 
 

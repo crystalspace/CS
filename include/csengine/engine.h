@@ -231,6 +231,15 @@ public:
 };
 
 /**
+ * A list of meshes for the engine.
+ */
+class csEngineMeshList : public csMeshList
+{
+public:
+  virtual bool FreeItem (csSome Item);
+};
+
+/**
  * Object which implements iConfig interface on behalf of csEngine.
  * This class is used as an embedded SCF object within csEngine.  Typically,
  * this class would be declared as an inner class of csEngine, but the NextStep
@@ -330,7 +339,7 @@ public:
    * from all sectors as well. Note that after you add a mesh to the list
    * you still need to add it to all sectors that you want it to be visible in.
    */
-  csMeshList meshes;
+  csEngineMeshList meshes;
 
   /**
    * The list of all camera position objects.

@@ -57,34 +57,9 @@ bool csSector::do_radiosity = false;
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csSectorMeshList)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iMeshList)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSectorMeshList::MeshList)
-  SCF_IMPLEMENTS_INTERFACE (iMeshList)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csSectorMeshList::csSectorMeshList ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshList);
   sector = NULL;
-}
-
-iMeshWrapper *csSectorMeshList::FindByName (const char *name) const
-{
-  if (!name) return NULL;
-
-  int i;
-  for (i=0 ; i<Length () ; i++)
-  {
-    iMeshWrapper *mesh = Get (i);
-    if (mesh->QueryObject ()->GetName ())
-      if (!strcmp (mesh->QueryObject ()->GetName (), name))
-        return mesh;
-  }
-  return NULL;
 }
 
 void csSectorMeshList::AddMesh (iMeshWrapper* mesh)
@@ -98,19 +73,6 @@ void csSectorMeshList::RemoveMesh (iMeshWrapper* mesh)
   CS_ASSERT (sector != NULL);
   sector->UnlinkMesh (mesh->GetPrivateObject ());
 }
-
-int csSectorMeshList::MeshList::GetMeshCount () const
-{ return scfParent->Length (); }
-iMeshWrapper *csSectorMeshList::MeshList::GetMesh (int idx) const
-{ return scfParent->Get (idx); }
-void csSectorMeshList::MeshList::AddMesh (iMeshWrapper* sect)
-{ scfParent->AddMesh (sect); }
-void csSectorMeshList::MeshList::RemoveMesh (iMeshWrapper* sect)
-{ scfParent->RemoveMesh (sect); }
-iMeshWrapper *csSectorMeshList::MeshList::FindByName (const char *name) const
-{ return scfParent->FindByName (name); }
-int csSectorMeshList::MeshList::Find (iMeshWrapper *mesh) const
-{ return scfParent->Find (mesh); }
 
 //---------------------------------------------------------------------------
 

@@ -1370,7 +1370,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  }
 	  sp->QueryObject ()->SetName (name);
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-          mesh->AddChild (sp);
+          mesh->GetChildren ()->AddMesh (sp);
         }
         break;
       case CS_TOKEN_MESHOBJ:
@@ -1385,7 +1385,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	    return false;
 	  }
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-          mesh->AddChild (sp);
+          mesh->GetChildren ()->AddMesh (sp);
         }
         break;
       case CS_TOKEN_HARDMOVE:

@@ -563,8 +563,6 @@ int main (int argc, char* argv[])
   }    
   csInitializeApplication (object_reg);
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Example: CSWS And Engine");

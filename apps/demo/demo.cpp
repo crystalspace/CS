@@ -572,7 +572,7 @@ void Demo::SetupObjects ()
 	"crystalspace.mesh.loader.fire",
 	NULL, csVector3 (0));
   tail->SetZBufMode (CS_ZBUF_TEST);
-  spr3d->AddChild (tail);
+  spr3d->GetChildren ()->AddMesh (tail);
 
   spr3d = engine->CreateMeshWrapper (
   	engine->FindMeshFactory ("fighter"), "Fighter2",
@@ -589,7 +589,7 @@ void Demo::SetupObjects ()
 	"crystalspace.mesh.loader.fire",
 	NULL, csVector3 (0));
   tail->SetZBufMode (CS_ZBUF_TEST);
-  spr3d->AddChild (tail);
+  spr3d->GetChildren ()->AddMesh (tail);
 
   spr3d = engine->CreateMeshWrapper (
   	engine->FindMeshFactory ("shuttle"), "Shuttle",
@@ -606,7 +606,7 @@ void Demo::SetupObjects ()
 	"crystalspace.mesh.loader.fire",
 	NULL, csVector3 (0));
   tail->SetZBufMode (CS_ZBUF_TEST);
-  spr3d->AddChild (tail);
+  spr3d->GetChildren ()->AddMesh (tail);
 
   spr3d = engine->CreateMeshWrapper (
   	engine->FindMeshFactory ("th_ship"), "Shuttle2",
@@ -623,7 +623,7 @@ void Demo::SetupObjects ()
 	"crystalspace.mesh.loader.fire",
 	NULL, csVector3 (0));
   tail->SetZBufMode (CS_ZBUF_TEST);
-  spr3d->AddChild (tail);
+  spr3d->GetChildren ()->AddMesh (tail);
 
   // Create laser.
   spr3d = engine->CreateMeshWrapper (
@@ -684,42 +684,42 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   spr3d_tower->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_tower->SetZBufMode (CS_ZBUF_USE);
-  spr3d->AddChild (spr3d_tower);
+  spr3d->GetChildren ()->AddMesh (spr3d_tower);
 
   iMeshWrapper* spr3d_spoke = engine->CreateMeshWrapper (
   	engine->FindMeshFactory ("ss1_spoke"), "SS1_Spoke",
   	NULL, csVector3 (0));
   spr3d_spoke->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_spoke->SetZBufMode (CS_ZBUF_USE);
-  spr3d->AddChild (spr3d_spoke);
+  spr3d->GetChildren ()->AddMesh (spr3d_spoke);
 
   iMeshWrapper* spr3d_dome = engine->CreateMeshWrapper (
   	engine->FindMeshFactory ("ss1_dome"), "SS1_Dome",
   	NULL, csVector3 (0));
   spr3d_dome->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_dome->SetZBufMode (CS_ZBUF_USE);
-  spr3d->AddChild (spr3d_dome);
+  spr3d->GetChildren ()->AddMesh (spr3d_dome);
 
   iMeshWrapper* spr3d_tail = engine->CreateMeshWrapper (
   	engine->FindMeshFactory ("ss1_tail"), "SS1_Tail",
   	NULL, csVector3 (0));
   spr3d_tail->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_tail->SetZBufMode (CS_ZBUF_USE);
-  spr3d->AddChild (spr3d_tail);
+  spr3d->GetChildren ()->AddMesh (spr3d_tail);
 
   iMeshWrapper* spr3d_arm = engine->CreateMeshWrapper (
   	engine->FindMeshFactory ("ss1_arm1"), "SS1_Arm1",
   	NULL, csVector3 (0));
   spr3d_arm->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_arm->SetZBufMode (CS_ZBUF_USE);
-  spr3d->AddChild (spr3d_arm);
+  spr3d->GetChildren ()->AddMesh (spr3d_arm);
 
   spr3d_arm = engine->CreateMeshWrapper (
   	engine->FindMeshFactory ("ss1_arm1"), "SS1_Arm1",
   	NULL, csVector3 (0));
   spr3d_arm->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_arm->SetZBufMode (CS_ZBUF_USE);
-  spr3d->AddChild (spr3d_arm);
+  spr3d->GetChildren ()->AddMesh (spr3d_arm);
   spr3d_arm->GetMovable ()->GetTransform ().RotateThis (csVector3 (0, 1, 0),
   	M_PI/2.);
   spr3d_arm->GetMovable ()->UpdateMove ();
@@ -729,7 +729,7 @@ void Demo::SetupObjects ()
   	NULL, csVector3 (0));
   spr3d_pod1->SetRenderPriority (engine->GetRenderPriority ("object"));
   spr3d_pod1->SetZBufMode (CS_ZBUF_USE);
-  spr3d->AddChild (spr3d_pod1);
+  spr3d->GetChildren ()->AddMesh (spr3d_pod1);
 
   //=====
 

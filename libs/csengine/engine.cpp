@@ -121,6 +121,16 @@ void csEngine::ReportBug (const char* description, ...)
 
 //---------------------------------------------------------------------------
 
+bool csEngineMeshList::FreeItem (csSome Item)
+{
+  iMeshWrapper* mesh = (iMeshWrapper*)Item;
+  mesh->GetMovable ()->ClearSectors ();
+  mesh->DecRef ();
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
 csLightIt::csLightIt (csEngine* e, csRegion* r) : engine (e), region (r)
 {
   Restart ();

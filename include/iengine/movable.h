@@ -43,7 +43,7 @@ struct iMovableListener : public iBase
   virtual void MovableDestroyed (iMovable* movable, void* userdata) = 0;
 };
 
-SCF_VERSION (iMovable, 0, 1, 0);
+SCF_VERSION (iMovable, 0, 1, 1);
 
 /**
  * This interface describes a movable entity. It is usually
@@ -54,6 +54,8 @@ struct iMovable : public iBase
 {
   /// Get the parent movable.
   virtual iMovable* GetParent () const = 0;
+  /// Set the parent movable.
+  virtual void SetParent (iMovable* parent) = 0;
 
   /**
    * Initialize the list of sectors to one sector where

@@ -38,6 +38,89 @@ class csCamera;
 class csMeshFactoryWrapper;
 class csLight;
 
+CS_DECLARE_OBJECT_VECTOR (csMeshListHelper, iMeshWrapper);
+
+/**
+ * General list of meshes. This class implements iMeshList.
+ * Subclasses of this class can override FreeItem(), AddMesh(),
+ * and RemoveMesh() for more specific functionality.
+ */
+class csMeshList : public csMeshListHelper
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csMeshList ();
+
+  /// Override FreeItem
+  virtual bool FreeItem (csSome Item);
+  /// Add a mesh.
+  virtual void AddMesh (iMeshWrapper* mesh);
+  /// Remove a mesh.
+  virtual void RemoveMesh (iMeshWrapper* mesh);
+
+  class MeshList : public iMeshList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMeshList);
+    virtual int GetMeshCount () const;
+    virtual iMeshWrapper *GetMesh (int idx) const;
+    virtual void AddMesh (iMeshWrapper *mesh)
+    {
+      scfParent->AddMesh (mesh);
+    }
+    virtual void RemoveMesh (iMeshWrapper *mesh)
+    {
+      scfParent->RemoveMesh (mesh);
+    }
+    virtual iMeshWrapper *FindByName (const char *name) const;
+    virtual int Find (iMeshWrapper *mesh) const;
+  } scfiMeshList;
+};
+
+/**
+ * Subclass of csMeshList to hold the children of another mesh object.
+ */
+class csMeshMeshList : public csMeshList
+{
+private:
+  csMeshWrapper* mesh;
+
+public:
+  csMeshMeshList () : mesh (NULL) { }
+  void SetMesh (csMeshWrapper* m) { mesh = m; }
+  virtual void AddMesh (iMeshWrapper* child);
+  virtual void RemoveMesh (iMeshWrapper* child);
+};
+
+CS_DECLARE_OBJECT_VECTOR (csMeshFactoryListHelper, iMeshFactoryWrapper);
+
+/**
+ * A list of mesh factories.
+ */
+class csMeshFactoryList : public csMeshFactoryListHelper
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  /// constructor
+  csMeshFactoryList ();
+
+  /// override FreeItem
+  virtual bool FreeItem (csSome Item);
+
+  class MeshFactoryList : public iMeshFactoryList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMeshFactoryList);
+    virtual int GetMeshFactoryCount () const;
+    virtual iMeshFactoryWrapper *GetMeshFactory (int idx) const;
+    virtual void AddMeshFactory (iMeshFactoryWrapper *mesh);
+    virtual void RemoveMeshFactory (iMeshFactoryWrapper *mesh);
+    virtual iMeshFactoryWrapper *FindByName (const char *name) const;
+    virtual int Find (iMeshFactoryWrapper *mesh) const;
+  } scfiMeshFactoryList;
+};
+
 SCF_VERSION (csMeshWrapper, 0, 0, 1);
 
 /**
@@ -106,8 +189,8 @@ private:
   /// Mesh object corresponding with this csMeshWrapper.
   iMeshObject* mesh;
 
-  /// Children of this object (other instances of csMeshWrapper).
-  csNamedObjVector children;
+  /// Children of this object (other instances of iMeshWrapper).
+  csMeshMeshList children;
 
   /// The callback which is called just before drawing.
   iMeshDrawCallback* draw_cb;
@@ -285,7 +368,7 @@ public:
   	csVector3& isect, float* pr);
 
   /// Get the children of this mesh object.
-  const csNamedObjVector& GetChildren () const { return children; }
+  const csMeshMeshList& GetChildren () const { return children; }
 
   /// Get the radius of this mesh (ignoring children).
   void GetRadius (csVector3& rad, csVector3& cent) const 
@@ -344,6 +427,11 @@ public:
   {
     return render_priority;
   }
+
+  /// Add a child to this mesh.
+  void AddChild (iMeshWrapper* child);
+  /// Remove a child from this mesh.
+  void RemoveChild (iMeshWrapper* child);
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -447,14 +535,11 @@ public:
     }
     virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox,
   	csBox3& cbox);
-    virtual void AddChild (iMeshWrapper* child);
-    virtual void RemoveChild (iMeshWrapper* child);
-    virtual iBase* GetParentContainer ();
-    virtual int GetChildCount () const
+    virtual iMeshList* GetChildren ()
     {
-      return scfParent->GetChildren ().Length ();
+      return &(scfParent->children.scfiMeshList);
     }
-    virtual iMeshWrapper* GetChild (int idx) const;
+    virtual iBase* GetParentContainer ();
     virtual void GetRadius (csVector3& rad, csVector3 &cent) const 
 	  { scfParent->GetRadius (rad,cent); }
     virtual void Draw (iRenderView* rview)
@@ -579,56 +664,6 @@ public:
     virtual csReversibleTransform& GetChildTransform (int idx);
   } scfiMeshFactoryWrapper;
   friend struct MeshFactoryWrapper;
-};
-
-CS_DECLARE_OBJECT_VECTOR (csMeshListHelper, iMeshWrapper);
-
-class csMeshList : public csMeshListHelper
-{
-public:
-  SCF_DECLARE_IBASE;
-
-  /// constructor
-  csMeshList ();
-
-  /// override FreeItem
-  virtual bool FreeItem (csSome Item);
-
-  class MeshList : public iMeshList
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMeshList);
-    virtual int GetMeshCount () const;
-    virtual iMeshWrapper *GetMesh (int idx) const;
-    virtual void AddMesh (iMeshWrapper *mesh);
-    virtual void RemoveMesh (iMeshWrapper *mesh);
-    virtual iMeshWrapper *FindByName (const char *name) const;
-    virtual int Find (iMeshWrapper *mesh) const;
-  } scfiMeshList;
-};
-
-CS_DECLARE_OBJECT_VECTOR (csMeshFactoryListHelper, iMeshFactoryWrapper);
-
-class csMeshFactoryList : public csMeshFactoryListHelper
-{
-public:
-  SCF_DECLARE_IBASE;
-
-  /// constructor
-  csMeshFactoryList ();
-
-  /// override FreeItem
-  virtual bool FreeItem (csSome Item);
-
-  class MeshFactoryList : public iMeshFactoryList
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMeshFactoryList);
-    virtual int GetMeshFactoryCount () const;
-    virtual iMeshFactoryWrapper *GetMeshFactory (int idx) const;
-    virtual void AddMeshFactory (iMeshFactoryWrapper *mesh);
-    virtual void RemoveMeshFactory (iMeshFactoryWrapper *mesh);
-    virtual iMeshFactoryWrapper *FindByName (const char *name) const;
-    virtual int Find (iMeshFactoryWrapper *mesh) const;
-  } scfiMeshFactoryList;
 };
 
 #endif // __CS_MESHOBJ_H__

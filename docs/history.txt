@@ -1,5 +1,24 @@
 The history order is reversed so that new features are at the top.
 
+21-Aug-2001
+	- Made destructor of new MD2 importer virtual.
+	- Fixed makefile linking for MD2 importer.
+	- Standardized csMeshList so that it can be reused better for other
+	  mesh lists. This means that AddMesh and RemoveMesh are now virtual
+	  functions in csMeshList so that they can be overriden by
+	  subclasses.
+	- csSectorMeshList now inherits from csMeshList making that code
+	  a lot easier.
+	- Added csEngineMeshList (subclass of csMeshList) which is now used
+	  by the engine (instead of csMeshList).
+	- Added csMeshMeshList (subclass of csMeshList) to hold to children
+	  of a mesh wrapper.
+	- Removed iMeshWrapper::GetChildCount, AddChild, RemoveChild,
+	  and GetChild. Instead there is now GetChildren() which returns
+	  an iMeshList.
+	- Added iMovable::SetParent().
+	- Removed a few warnings regarding not using the plugin manager.
+	- Fixed Blocks after yesterdays changes.
 20-Aug-2001
 	- Philip Wyett removed duplicate commented out entry for cslua plugin.
 	  Manually updated MSVC project files with CSLUA. This I do

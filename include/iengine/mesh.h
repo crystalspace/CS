@@ -28,6 +28,7 @@ struct iMeshObject;
 struct iCamera;
 struct iMeshObjectFactory;
 struct iMeshWrapper;
+struct iMeshList;
 class csMeshWrapper;
 class csMeshFactoryWrapper;
 struct iMeshFactoryWrapper;
@@ -110,7 +111,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 0, 17);
+SCF_VERSION (iMeshWrapper, 0, 1, 17);
 
 /**
  * This interface corresponds to the object in the engine
@@ -281,23 +282,10 @@ struct iMeshWrapper : public iBase
   virtual float GetScreenBoundingBox (iCamera* camera, csBox2& sbox,
   	csBox3& cbox) = 0;
 
-  /// Get the number of children.
-  virtual int GetChildCount () const = 0;
-  /// Get a child.
-  virtual iMeshWrapper* GetChild (int idx) const = 0;
   /**
-   * Add a child to this object. The transform of that child will be
-   * interpreted relative to this object. An IncRef() on the child will
-   * happen.
+   * Get all the children of this mesh object.
    */
-  virtual void AddChild (iMeshWrapper* child) = 0;
-  /**
-   * Remove a child from this object. The child will be DecRef()'ed
-   * and thus removed if this was the last reference.
-   * Note that RemoveChild() will not work if the the given mesh is not
-   * a child of this mesh.
-   */
-  virtual void RemoveChild (iMeshWrapper* child) = 0;
+  virtual iMeshList* GetChildren () = 0;
   /**
    * Get the parent of this mesh. This will be either a pointer to the
    * engine or another meshwrapper (or NULL if the mesh is not linked

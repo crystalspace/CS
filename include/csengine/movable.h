@@ -247,6 +247,10 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMovable);
     virtual iMovable* GetParent () const;
+    virtual void SetParent (iMovable* parent)
+    {
+      scfParent->SetParent (parent);
+    }
     virtual void SetSector (iSector* sector);
     virtual void ClearSectors ();
     virtual iSectorList *GetSectors ();

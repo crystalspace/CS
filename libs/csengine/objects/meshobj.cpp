@@ -104,6 +104,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
+  children.SetMesh (this);
 }
 
 csMeshWrapper::csMeshWrapper (csObject* theParent)
@@ -134,6 +135,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
+  children.SetMesh (this);
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
@@ -154,8 +156,8 @@ void csMeshWrapper::UpdateMove ()
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csMeshWrapper* spr = (csMeshWrapper*)children[i];
-    spr->GetMovable ().UpdateMove ();
+    iMeshWrapper* spr = children.Get (i);
+    spr->GetMovable ()->UpdateMove ();
   }
 }
 
@@ -274,7 +276,7 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csMeshWrapper* spr = (csMeshWrapper*)children[i];
+    csMeshWrapper* spr = children.Get (i)->GetPrivateObject ();
     spr->Draw (rview);
   }
 }
@@ -288,7 +290,7 @@ void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csMeshWrapper* spr = (csMeshWrapper*)children[i];
+    csMeshWrapper* spr = children.Get (i)->GetPrivateObject ();
     spr->UpdateLighting (lights, num_lights);
   }
 }
@@ -419,7 +421,7 @@ void csMeshWrapper::HardTransform (const csReversibleTransform& t)
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csMeshWrapper* spr = (csMeshWrapper*)children[i];
+    csMeshWrapper* spr = children.Get (i)->GetPrivateObject ();
     spr->HardTransform (t);
   }
 }
@@ -497,12 +499,7 @@ float csMeshWrapper::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
-void csMeshWrapper::MeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
-{
-  scfParent->SetFactory (factory->GetPrivateObject ());
-}
-
-void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
+void csMeshWrapper::AddChild (iMeshWrapper* child)
 {
   // First unlink the mesh from the engine or another parent.
   csMeshWrapper* c = child->GetPrivateObject ();
@@ -525,32 +522,35 @@ void csMeshWrapper::MeshWrapper::AddChild (iMeshWrapper* child)
     else
     {
       csMeshWrapper* old_mesh = (csMeshWrapper*)par;
-      csNamedObjVector& ch = old_mesh->children;
-      int idx = ch.Find (c);
+      csMeshMeshList& ch = old_mesh->children;
+      int idx = ch.Find (child);
       CS_ASSERT (idx != -1);	// Impossible!
-      ch.Delete (idx, false);	// Unlink object
-      c->DecRef ();
+      ch.Delete (idx);		// Remove object
     }
   }
-  c->SetParentContainer ((csMeshWrapper*)scfParent);
-  scfParent->children.Push (c);
-  c->GetMovable ().SetParent (&scfParent->movable.scfiMovable);
+  c->SetParentContainer (this);
+  children.Push (child);
+  child->GetMovable ()->SetParent (&movable.scfiMovable);
 }
 
-void csMeshWrapper::MeshWrapper::RemoveChild (iMeshWrapper* child)
+void csMeshWrapper::RemoveChild (iMeshWrapper* child)
 {
   // First unlink the mesh from the engine or another parent.
   csMeshWrapper* c = child->GetPrivateObject ();
   csObject* par = c->GetParentContainer ();
 
-  if (par != scfParent) return;	// Wrong parent, nothing to do.
-  csNamedObjVector& ch = scfParent->children;
-  int idx = ch.Find (c);
+  if (par != this) return;	// Wrong parent, nothing to do.
+  csMeshMeshList& ch = children;
+  int idx = ch.Find (child);
   CS_ASSERT (idx != -1);
-  ch.Delete (idx, false);		// Unlink object
-  c->DecRef ();
+  ch.Delete (idx);		// Remove object
   c->SetParentContainer (NULL);
-  c->GetMovable ().SetParent (NULL);
+  child->GetMovable ()->SetParent (NULL);
+}
+
+void csMeshWrapper::MeshWrapper::SetFactory (iMeshFactoryWrapper* factory)
+{
+  scfParent->SetFactory (factory->GetPrivateObject ());
 }
 
 iBase* csMeshWrapper::MeshWrapper::GetParentContainer ()
@@ -560,18 +560,25 @@ iBase* csMeshWrapper::MeshWrapper::GetParentContainer ()
   return (iBase*)par;	// par == iObject == iBase
 }
 
-iMeshWrapper* csMeshWrapper::MeshWrapper::GetChild (int idx) const
-{
-  CS_ASSERT (idx >= 0 && idx < scfParent->children.Length ());
-  csMeshWrapper* child = (csMeshWrapper*)(scfParent->GetChildren ()[idx]);
-  return &(child->scfiMeshWrapper);
-}
-
 float csMeshWrapper::MeshWrapper::GetScreenBoundingBox (iCamera* camera,
 	csBox2& sbox, csBox3& cbox)
 {
   return scfParent->GetScreenBoundingBox (camera->GetPrivateObject (),
   	sbox, cbox);
+}
+
+//--------------------------------------------------------------------------
+
+void csMeshMeshList::AddMesh (iMeshWrapper* child)
+{
+  CS_ASSERT (mesh != NULL);
+  mesh->AddChild (child);
+}
+
+void csMeshMeshList::RemoveMesh (iMeshWrapper* child)
+{
+  CS_ASSERT (mesh != NULL);
+  mesh->RemoveChild (child);
 }
 
 //--------------------------------------------------------------------------
@@ -626,7 +633,8 @@ csMeshWrapper* csMeshFactoryWrapper::NewMeshObject ()
   {
     csMeshFactoryWrapper* childfact = (csMeshFactoryWrapper*)children[i];
     csMeshWrapper* relchild = childfact->NewMeshObject ();
-    meshObj->scfiMeshWrapper.AddChild (&(relchild->scfiMeshWrapper));
+    meshObj->scfiMeshWrapper.GetChildren ()->AddMesh (
+    	&(relchild->scfiMeshWrapper));
     relchild->GetMovable ().SetTransform ((csReversibleTransform)
     	transformations[i]);
     relchild->GetMovable ().UpdateMove ();
@@ -731,26 +739,29 @@ csMeshList::csMeshList ()
 bool csMeshList::FreeItem (csSome Item)
 {
   iMeshWrapper* mesh = (iMeshWrapper*)Item;
-  mesh->GetMovable ()->ClearSectors ();
   mesh->DecRef ();
   return true;
 }
 
+void csMeshList::AddMesh (iMeshWrapper *mesh)
+{
+  Push (mesh);
+}
+
+void csMeshList::RemoveMesh (iMeshWrapper *mesh)
+{
+  int n = Find (mesh);
+  if (n >= 0) Delete (n); 
+}
+
 int csMeshList::MeshList::GetMeshCount () const
-  { return scfParent->Length (); }
+{ return scfParent->Length (); }
 iMeshWrapper *csMeshList::MeshList::GetMesh (int idx) const
-  { return scfParent->Get (idx); }
-void csMeshList::MeshList::AddMesh (iMeshWrapper *mesh)
-  { scfParent->Push (mesh); }
-void csMeshList::MeshList::RemoveMesh (iMeshWrapper *mesh)
-  {
-    int n = scfParent->Find (mesh);
-    if (n >= 0) scfParent->Delete (n); 
-  }
+{ return scfParent->Get (idx); }
 iMeshWrapper *csMeshList::MeshList::FindByName (const char *name) const
-  { return scfParent->FindByName (name); }
+{ return scfParent->FindByName (name); }
 int csMeshList::MeshList::Find (iMeshWrapper *mesh) const
-  { return scfParent->Find (mesh); }
+{ return scfParent->Find (mesh); }
 
 //--------------------------------------------------------------------------
 
