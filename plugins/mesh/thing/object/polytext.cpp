@@ -761,7 +761,6 @@ b:
   }
 
 finish:
-  lm->CalcMaxStatic();
   delete[] f_uv;
 }
 

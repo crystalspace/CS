@@ -58,6 +58,10 @@ chronological order.
 	  works.
 	- Jorrit optimized thing a bit more by deleting the csSubRectangles2
 	  structure after calculating the optimal lightmap distribution.
+	- Jorrit fixed a problem with dynamic lighting and things. It would
+	  call lm->CalcMaxStatic() all the time which is very slow. The
+	  static lightmap doesn't change with dynamic lighting so calling
+	  this function is totally wasted.
 18-Feb-2004
 	- Jorrit added the ability to specify defaults for mesh object types
 	  in the map loader. Here is an example to demonstrate how this works:

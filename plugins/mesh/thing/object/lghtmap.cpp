@@ -609,8 +609,9 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   return true;
 }
 
-void csLightMap::CalcMaxStatic()
+void csLightMap::CalcMaxStatic ()
 {
+  csRGBpixel min_static_color_values(256,256,256);
   max_static_color_values.Set(0,0,0);
 
   csRGBpixel *map = static_lm;
@@ -623,7 +624,19 @@ void csLightMap::CalcMaxStatic()
         max_static_color_values.green = map->green;
     if (max_static_color_values.blue < map->blue)
         max_static_color_values.blue = map->blue;
+
+    if (min_static_color_values.red > map->red)
+        min_static_color_values.red = map->red;
+    if (min_static_color_values.green > map->green)
+        min_static_color_values.green = map->green;
+    if (min_static_color_values.blue > map->blue)
+        min_static_color_values.blue = map->blue;
+
     map++;
   }
+  //printf ("dist=%d,%d,%d\n", max_static_color_values.red-min_static_color_values.red,
+  	//max_static_color_values.green-min_static_color_values.green,
+	//max_static_color_values.blue-min_static_color_values.blue);
+  //fflush (stdout);
 }
 
