@@ -7,6 +7,9 @@ ifeq ($(MAKESECTION),rootdefines)
 # Application-specific help commands
 APPHELP += $(NEWLINE)echo $"  make walk         Make the $(DESCRIPTION.walk)$"
 
+PSEUDOHELP += $(NEWLINE) \
+  echo $"  make walkall      Make WalkTest and all plug-ins it requires$"
+
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
@@ -32,7 +35,8 @@ WALKTEST.EXE = walktest$(EXE)
 INC.WALKTEST = $(wildcard apps/walktest/*.h)
 SRC.WALKTEST = $(wildcard apps/walktest/*.cpp)
 OBJ.WALKTEST = $(addprefix $(OUT),$(notdir $(SRC.WALKTEST:.cpp=$O)))
-DEP.WALKTEST = CSPARSER CSENGINE CSTERR CSGEOM CSFX CSGFXLDR CSSYS CSUTIL CSOBJECT
+DEP.WALKTEST = \
+  CSPARSER CSENGINE CSTERR CSGEOM CSFX CSGFXLDR CSSYS CSUTIL CSOBJECT
 LIB.WALKTEST = $(foreach d,$(DEP.WALKTEST),$($d.LIB))
 CFG.WALKTEST = data/config/cryst.cfg
 

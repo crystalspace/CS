@@ -4,6 +4,8 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine made a slight modification to handling of the Backspace
 	  key in the OpenStep port so that it works in the expected fashion in
 	  Crystal Space.
+	- Eric Sunshine added documentation for the `walkall' makefile target
+	  to the output of the `help' makefile target.
 23-Dec-2000
 	- Norman Kramer fixed a bug in the bmp loader.
 	- Moved snow, rain, spiral, fountain, fire, and explosion particle
