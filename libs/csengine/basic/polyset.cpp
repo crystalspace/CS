@@ -457,7 +457,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num,
   }
 }
 
-void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** polygon, int num,
+void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
 	csRenderView* d, bool use_z_buf)
 {
   // @@@ We should include object 2 world transform here too like it
