@@ -286,7 +286,7 @@ void ddgTBinMesh::initNeighbours( void )
                 stri[klk+t].neighbour = stri[lk+t].neighbour + lk + b;
             }
     	    // Check Edge cases
-			else if (b = edge(kt))
+			else if ((b = edge(kt)) != 0)
 			{
 				if (b==3) // Diagonal.
 				{
