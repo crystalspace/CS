@@ -22,6 +22,12 @@
 
 template <class T> class csRef;
 
+#if defined(CS_STRICT_SMART_POINTERS) && defined(CS_DEBUG)
+#  define CS_TEST_VOIDPTRUSAGE
+#else
+#  undef CS_TEST_VOIDPTRUSAGE
+#endif
+
 /**
  * A normal pointer. This class should ONLY be used for functions
  * returning pointers that are already IncRef()'ed for the caller.
@@ -38,10 +44,36 @@ class csPtr
 private:
   friend class csRef<T>;
   T* obj;
+# ifdef CS_TEST_VOIDPTRUSAGE
+  // If assigned is false this pointer hasn't been assigned to a
+  // csRef yet. csRef will set this to 'true' when the csPtr is
+  // copied to a csRef.
+  bool assigned;
+# endif
 
 public:
-  csPtr (T* p) : obj (p) { }
+  csPtr (T* p) : obj (p)
+  {
+#   ifdef CS_TEST_VOIDPTRUSAGE
+    assigned = false;
+#   endif
+  }
+
+#ifdef CS_TEST_VOIDPTRUSAGE
+  ~csPtr ()
+  {
+    // If not assigned to a csRef we have a problem (leak).
+    // So if this assert fires for you, then you are calling
+    // a function that returns a csPtr and not using the result
+    // (or at least not assigning it to a csRef). This is a memory
+    // leak and you should fix that.
+    CS_ASSERT (assigned == true);
+  }
+#endif
+
+#if !defined(CS_STRICT_SMART_POINTERS)
   operator T* () const { return obj; }
+#endif
 };
 
 /**
@@ -72,6 +104,9 @@ public:
   csRef (const csPtr<T>& newobj)
   {
     obj = newobj.obj;
+#   ifdef CS_TEST_VOIDPTRUSAGE
+    newobj.assigned = true;
+#   endif
   }
 
   /**
@@ -112,6 +147,9 @@ public:
     T* oldobj = obj;
     // First assign and then DecRef() of old object!
     obj = newobj.obj;
+#   ifdef CS_TEST_VOIDPTRUSAGE
+    newobj.assigned = true;
+#   endif
     if (oldobj)
       oldobj->DecRef ();
     return *this;

@@ -68,6 +68,9 @@ endif
 ifeq ($(EXTENSIVE_MEMDEBUG),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_EXTENSIVE_MEMDEBUG$">>volatile.tmp
 endif
+ifeq ($(STRICT_SMART_POINTERS),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_STRICT_SMART_POINTERS$">>volatile.tmp
+endif
 ifeq ($(DO_SOUND),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
 endif

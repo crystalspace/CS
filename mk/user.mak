@@ -137,6 +137,19 @@ ifndef EXTENSIVE_MEMDEBUG
   EXTENSIVE_MEMDEBUG=no
 endif
 
+# Enable strict smart pointers. If this is set to yes then csPtr return
+# values can ONLY be assigned to csRef's. So casting of csPtr to normal pointers
+# does not work. This is a good way to ensure that your code is fully
+# clean with regards to smart pointer usage. Note that this flag does NOT
+# affect the ability to cast csRef's to normal pointers. Only for csPtr.
+# In addition to the removal of the cast operator, setting this flag in
+# combination with debug mode also causes some tests to be added for good
+# usage of csPtr (i.e. calling a function that returns csPtr and not using
+# the result will be detected at runtime).
+ifndef STRICT_SMART_POINTERS
+  STRICT_SMART_POINTERS=no
+endif
+
 # Should we cache makefile information?  Caching information speeds up the
 # build process by avoiding the time-consuming scanning which locates and then
 # reads makefiles throughout the project.  Usually caching is desirable.

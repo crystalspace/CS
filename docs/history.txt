@@ -2,6 +2,15 @@ The history order is reversed so that new features are at the top.
 
 11-Sep-2002
 	- Further csPtr/csRef cleanups by removing the cast operator.
+	- Added a new STRICT_SMART_POINTERS flag in mk/user.mak. If this
+	  is set to 'yes' then smart pointers are strict which means
+	  that a csPtr can ONLY be assigned to a csRef. All other usage
+	  will be marked as invalid. So setting this flag to yes is a good
+	  way to see if your code is correctly using smart pointers.
+	  In addition, when you are in debug mode and the strict smart
+	  pointer flag is set, CS will also (at runtime) test if you are
+	  actually assigning the csPtr result to a csRef. If not you have
+	  a memory leak and this will cause an assert error.
 10-Sep-2002
 	- iLoaderPlugin and iBinaryLoaderPlugin->Parse() now return a
 	  csPtr.
