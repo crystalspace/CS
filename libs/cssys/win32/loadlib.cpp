@@ -73,7 +73,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
    handle = LoadLibrary (tmp);
    errorCode = GetLastError();
    SetEnvironmentVariable("PATH", OLD_PATH);
-   delete[] OLD_PATH;
+   delete[] DLLDIR;
    delete[] OLD_PATH;
  }
 

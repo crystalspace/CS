@@ -22,6 +22,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine disabled the annoying, abusive message in aclocal.m4
 	  about missing FreeType2 library.  We don't need to abuse the user
 	  when an optional library is absent.
+	- Eric Sunshine fixed a double-delete[] bug in win32/loadlib.cpp on
+	  Cygwin reported by Dan Mahoney <domahoneyii@users.sourceforge.net>.
 27-Jan-2003
 	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
 	  16 was too much for cards with less texture memory. We have to find
