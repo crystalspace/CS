@@ -529,7 +529,6 @@ void Dumper::dump_stubs (csOctreeNode* onode, char* name, int level)
   dump_stubs (onode->todo_stubs, "todo", level+1);
   if (onode->minibsp) dump_stubs ((csBspNode*)(onode->minibsp->root),
   	"root", level+1);
-  int i;
   dump_stubs ((csOctreeNode*)onode->children[0], "0", level+1);
   dump_stubs ((csOctreeNode*)onode->children[1], "1", level+1);
   dump_stubs ((csOctreeNode*)onode->children[2], "2", level+1);
