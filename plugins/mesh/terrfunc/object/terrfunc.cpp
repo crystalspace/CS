@@ -97,7 +97,7 @@ csTerrBlock::~csTerrBlock ()
 
 void csTerrBlock::PrepareQuadDiv(iTerrainHeightFunction *height_func)
 {
-  int depth = 9;
+  int depth = 4;
   if(!quaddiv) quaddiv = new csTerrainQuadDiv(depth);
   quaddiv->ComputeDmax(height_func, 
     bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
@@ -115,12 +115,19 @@ void csTerrBlock::PrepareFrame(const csVector3& campos)
 
 /// data to pass for drawing
 struct terrdata {
+  /// traingle mesh to draw for block
   G3DTriangleMesh mesh;
+  /// keep track of tris, verts, tex, color
   CS_DECLARE_GROWING_ARRAY (triangles, csTriangle);
   CS_DECLARE_GROWING_ARRAY (vertices, csVector3);
   CS_DECLARE_GROWING_ARRAY (texels, csVector2);
   CS_DECLARE_GROWING_ARRAY (colors, csColor);
+  /// the block
   csTerrBlock *block;
+  /// texture correction
+  float correct_du, correct_su, correct_dv, correct_sv;
+  /// the terrain
+  csTerrFuncObject *terr;
 };
 
 /// get triangles
@@ -138,16 +145,58 @@ static void TerrTri(void *userdata, const csVector3& t1,
   tri.b = trinum+1;
   tri.c = trinum+2;
   dat->triangles.Push( tri );
-  dat->colors.Push( csColor(1,1,1) );
-  dat->colors.Push( csColor(1,1,1) );
-  dat->colors.Push( csColor(1,1,1) );
-  dat->texels.Push( csVector2(0,0) );
-  dat->texels.Push( csVector2(1,0) );
-  dat->texels.Push( csVector2(0,1) );
+
+  float boxxsize = dat->block->bbox.MaxX() - dat->block->bbox.MinX();
+  float boxysize = dat->block->bbox.MaxZ() - dat->block->bbox.MinZ();
+  float minx = dat->block->bbox.MinX();
+  float miny = dat->block->bbox.MinZ();
+
+  /// hack for light!
+  /// need to precompute a light-map texture
+  csColor res1 = dat->terr->base_color;
+  csColor res2 = dat->terr->base_color;
+  csColor res3 = dat->terr->base_color;
+  if(dat->terr->do_dirlight && dat->terr->normal_func)
+  {
+    float l;
+    l = dat->terr->dirlight * dat->terr->normal_func->GetNormal
+      ((t1.x-minx)/boxxsize, (t1.z-miny)/boxysize);
+    if(l>0) res1 += dat->terr->dirlight_color * l;
+    l = dat->terr->dirlight * dat->terr->normal_func->GetNormal
+      ((t2.x-minx)/boxxsize, (t2.z-miny)/boxysize);
+    if(l>0) res2 += dat->terr->dirlight_color * l;
+    l = dat->terr->dirlight * dat->terr->normal_func->GetNormal
+      ((t3.x-minx)/boxxsize, (t3.z-miny)/boxysize);
+    if(l>0) res3 += dat->terr->dirlight_color * l;
+  }
+  dat->colors.Push(res1);
+  dat->colors.Push(res2);
+  dat->colors.Push(res3);
+
+  // obtain texture coords
+  csVector2 uv(t1.x - minx, t1.z - miny);
+  uv.x /= boxxsize;
+  uv.y /= boxysize;
+  uv.x = uv.x * dat->correct_du + dat->correct_su;
+  uv.y = uv.y * dat->correct_dv + dat->correct_sv;
+  dat->texels.Push( uv );
+  uv.Set(t2.x - minx, t2.z - miny);
+  uv.x /= dat->block->bbox.MaxX() - dat->block->bbox.MinX();
+  uv.y /= dat->block->bbox.MaxZ() - dat->block->bbox.MinZ();
+  uv.x = uv.x * dat->correct_du + dat->correct_su;
+  uv.y = uv.y * dat->correct_dv + dat->correct_sv;
+  dat->texels.Push( uv );
+  uv.Set(t3.x - minx, t3.z - miny);
+  uv.x /= dat->block->bbox.MaxX() - dat->block->bbox.MinX();
+  uv.y /= dat->block->bbox.MaxZ() - dat->block->bbox.MinZ();
+  uv.x = uv.x * dat->correct_du + dat->correct_su;
+  uv.y = uv.y * dat->correct_dv + dat->correct_sv;
+  dat->texels.Push( uv );
 }
 
 void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
-  bool clip_z_plane)
+  bool clip_z_plane, float correct_du, float correct_su, float correct_dv, 
+  float correct_sv, csTerrFuncObject *terr)
 {
   /// collect triangles and draw them
   iGraphics3D *pG3D = rview->GetGraphics3D();
@@ -177,26 +226,63 @@ void csTerrBlock::Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
   m.mesh.clip_z_plane = clip_z_plane;
   m.mesh.mat_handle = material->GetMaterialHandle();
 
+  m.correct_du = correct_du;
+  m.correct_su = correct_su;
+  m.correct_dv = correct_dv;
+  m.correct_sv = correct_sv;
+
+  m.terr = terr;
   m.block = this;
 
   CS_ASSERT(quaddiv);
   quaddiv->Triangulate(TerrTri, (void*)&m, framenum,
     bbox.MinX(), bbox.MinZ(), bbox.MaxX(), bbox.MaxZ());
 
-  int num_vertices = m.vertices.Length();
-
-  if( (num_vertices <= 0) || (m.mesh.num_triangles <= 0))
+  if( (m.vertices.Length() <= 0) || (m.triangles.Length() <= 0))
     return;
 
+  m.mesh.num_triangles = m.triangles.Length();
+  m.mesh.triangles = m.triangles.GetArray();
+
   CS_ASSERT(m.mesh.buffers[0]);
-  CS_ASSERT(m.mesh.buffers[0]->IsLocked ());
+  CS_ASSERT(!m.mesh.buffers[0]->IsLocked ());
   vbufmgr->LockBuffer(m.mesh.buffers[0],
     m.vertices.GetArray(), m.texels.GetArray(), m.colors.GetArray(), 
-    num_vertices, 0);
+    m.vertices.Length(), 0);
   rview->CalculateFogMesh(camtrans, m.mesh);
   pG3D->DrawTriangleMesh(m.mesh);
   vbufmgr->UnlockBuffer (m.mesh.buffers[0]);
 }
+
+//---- divisor height function --------------------------
+struct QuadDivHeightFunc : public iTerrainHeightFunction
+{
+  /// height func to wrap
+  iTerrainHeightFunction *hf;
+  /// scale and offset in world
+  float scx, scy, offx, offy;
+  /// scale and offset of heights
+  float sch, offh;
+
+  SCF_DECLARE_IBASE;
+  QuadDivHeightFunc () { SCF_CONSTRUCT_IBASE (NULL); hf=NULL;}
+  virtual ~QuadDivHeightFunc () {}
+  /// get height using world space in world space answers
+  virtual float GetHeight (float x, float y)
+  {
+    float localx = x * scx + offx;
+    float localy = y * scy + offy;
+    float res = hf->GetHeight(localx, localy);
+    res = res*sch + offh;
+    //printf("QDHF %g, %g -> (%g,%g) to %g\n", x, y, localx, localy, res);
+    return res;
+  }
+};
+
+SCF_IMPLEMENT_IBASE (QuadDivHeightFunc)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainHeightFunction)
+SCF_IMPLEMENT_IBASE_END
+
 
 //------------------------------------------------------------------------
 
@@ -323,6 +409,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   current_features = 0;
   vbufmgr = NULL;
   quaddiv_enabled = false;
+  quad_height = NULL;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
@@ -332,6 +419,7 @@ csTerrFuncObject::~csTerrFuncObject ()
   if (vis_cb) vis_cb->DecRef ();
   if (height_func) height_func->DecRef ();
   if (normal_func) normal_func->DecRef ();
+  if (quad_height) delete quad_height;
 }
 
 void csTerrFuncObject::CorrectSeams (int tw, int th)
@@ -1510,10 +1598,23 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
       {
         if(quaddiv_enabled)
 	{
-	  block.PrepareQuadDiv(height_func);
+	  if(!quad_height)
+	  {
+	    QuadDivHeightFunc *qdhf = new QuadDivHeightFunc();
+	    qdhf->hf = height_func;
+	    qdhf->scx = 1.0 / (scale.x * float (blockxy));
+	    qdhf->scy = 1.0 / (scale.z * float (blockxy));
+	    qdhf->offx = -topleft.x * qdhf->scx;
+	    qdhf->offy = -topleft.z * qdhf->scy;
+	    qdhf->offh = topleft.y;
+	    qdhf->sch = scale.y;
+	    quad_height = qdhf;
+	  }
+	  block.PrepareQuadDiv(quad_height);
 	  block.PrepareFrame( origin );
 	  SetupVertexBuffer (block.vbuf[0], block.vbuf[0]);
-	  block.Draw(rview, clip_portal, clip_plane, clip_z_plane);
+	  block.Draw(rview, clip_portal, clip_plane, clip_z_plane,
+	    correct_du, correct_su, correct_dv, correct_sv, this);
 	  continue;
 	}
         csVector3& bc = block.center;

@@ -35,6 +35,7 @@ struct iMaterialWrapper;
 struct iObjectRegistry;
 class csTerrainQuad;
 class csTerrainQuadDiv;
+class csTerrFuncObject;
 
 #define LOD_LEVELS 4
 #define CS_HORIZON_SIZE 100
@@ -77,7 +78,8 @@ public:
   void PrepareFrame(const csVector3& campos);
   /// Draw (for quaddiv use)
   void Draw(iRenderView *rview, bool clip_portal, bool clip_plane,
-    bool clip_z_plane);
+    bool clip_z_plane, float correct_du, float correct_su, float correct_dv, 
+    float correct_sv, csTerrFuncObject *terr);
 };
 
 class csTerrFuncObject : public iMeshObject
@@ -103,8 +105,11 @@ public:
 
   /// quad divisor enabled?
   bool quaddiv_enabled;
+  /// quad height function wrapper
+  iTerrainHeightFunction *quad_height;
 
-private:
+//private: //@@@
+public:
   iObjectRegistry* object_reg;
   iBase* logparent;
   iMeshObjectFactory* pFactory;
