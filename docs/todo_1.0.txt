@@ -31,16 +31,16 @@ Bugs to fix:
 	     0.5 and 1.5 fps (on my computer) when facing into the room (not at
 	     a blank wall) and stays low until the light is removed (shift-1).
 	     (optimize mode)
-FIXED?	[S]  Using software renderer, go to the room in flarge with the spinning
+	[S]  Using software renderer, go to the room in flarge with the spinning
 	     blocks and rings.  Add a light with shift-L.  The software
 	     renderer immediately crashes while trying to dereference a null
 	     pointer.  (optimize mode)
-FIXED?	[S]  Blocks crashes at exit time dereferencing a garbage pointer
+	[**] Blocks crashes at exit time dereferencing a garbage pointer
 	     (sometimes null, sometimes not).  To reproduce: 1) Launch.  2)
 	     Start new game.  3) Press ESC to get back to menu.  4) Select Quit
 	     item.  5) Crash.  Note that this crash occurs randomly.  (optimize
 	     mode)
-FIXED?	[S]  walktest crashes randomly at exit time if a static light is added
+	[**] walktest crashes randomly at exit time if a static light is added
 	     using either renderer.  To reproduce: 1) Launch walktest with
 	     flarge.  2) Go to main hall.  3) Add a light (shift-L).  4) Quit
 	     (press Q).  5) Crash (7 out of 10 times).  (optimize mode)
@@ -48,7 +48,7 @@ FIXED?	[S]  walktest crashes randomly at exit time if a static light is added
 	     wall; and instead pass right through the wall.  Consequently, the
 	     rocket object is never removed from the world, nor is its dynamic
 	     light removed. (optimize mode)
-FIXED?	[S]  In walktest, if you fire a rocket and manually delete its dynamic
+	[S]  In walktest, if you fire a rocket and manually delete its dynamic
 	     light, walktest crashes when the rocket later tries to delete the
 	     light itself.  To reproduce: a) Launch walktest.  b) Fire a
 	     rocket.  c) While the rocket is still in flight or still
