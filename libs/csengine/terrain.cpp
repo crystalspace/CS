@@ -28,9 +28,6 @@
 #include "csgeom/polyclip.h"
 #include "igraph3d.h"
 
-
-//---------------------------------------------------------------------------
-
 IMPLEMENT_CSOBJTYPE (csTerrain,csObject);
 
 csTerrain::csTerrain () : csObject()
@@ -53,7 +50,7 @@ void csTerrain::SetDetail( unsigned int detail)
 {
   mesh->minDetail(detail);
   mesh->maxDetail(detail);
-  mesh->absMaxDetail(detail*0.25);
+  mesh->absMaxDetail((unsigned int)(detail * 0.25));
 }
 
 
@@ -152,9 +149,27 @@ bool csTerrain::PushTriangle(ddgTBinTree *bt, ddgVBIndex tvc, ddgVBuffer *vbuf)
 
   if (vbuf->textureOn ())
   {
-    if (!i1) { bt->textureC(tva,t1); t1.multiply( _texturescale); t1.v[0] -= ((int)t1[0]);  t1.v[1] -= ((int)t1[1]); }
-    if (!i2) { bt->textureC(tv0,t2); t2.multiply( _texturescale); t2.v[0] -= ((int)t2[0]);  t2.v[1] -= ((int)t2[1]); }
-    if (!i3) { bt->textureC(tv1,t3); t3.multiply( _texturescale); t3.v[0] -= ((int)t3[0]);  t3.v[1] -= ((int)t3[1]); }
+    if (!i1)
+    {
+      bt->textureC(tva,t1);
+      t1.multiply( _texturescale);
+      t1.v[0] -= ((int)t1[0]);
+      t1.v[1] -= ((int)t1[1]);
+    }
+    if (!i2)
+    {
+      bt->textureC(tv0,t2);
+      t2.multiply( _texturescale);
+      t2.v[0] -= ((int)t2[0]);
+      t2.v[1] -= ((int)t2[1]);
+    }
+    if (!i3)
+    {
+      bt->textureC(tv1,t3);
+      t3.multiply( _texturescale);
+      t3.v[0] -= ((int)t3[0]);
+      t3.v[1] -= ((int)t3[1]);
+    }
   }
   // if (vbuf->colorOn())
   // {
@@ -335,7 +350,8 @@ int csTerrain::CollisionDetect( csTransform *transform )
   // Translate us into terrain coordinate space.
   csVector3 p = transform->GetOrigin () - _pos;
   // If our location is above or outside the terrain then we cannot hit is.
-  if ((p[0] < 0)||(p[2] < 0)||(p[0] > _size[0])||(p[2] > _size[2])||(p[1]>_size[1]))
+  if (p[0] < 0 || p[2] < 0 || p[0] > _size[0] || p[2] > _size[2] ||
+      p[1]>_size[1])
     return 0;
 
   // Return height of terrain at this location in Y coord.
