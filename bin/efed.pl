@@ -320,7 +320,7 @@ sub process_path {
     }
     else {
 	my ($content, $edits) = (undef, 0);
-	if (@main::opt_edits) {
+	if (@main::opt_edit) {
 	    $content = load_file($path);
 	    $edits = apply_edits($content);
 	}
