@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	  person can contact people on the Mingw mailing list.  Finding a more
 	  correct solution to this problem is important, as the current hack is
 	  really unacceptable in the long run.
+	- Eric Sunshine eliminated a couple compilation warnings about negative
+	  values being assigned to unsigned quantities in demo.cpp.
 24-May-2001
 	- Eric Sunshine fixed several problems in lexan.mak.
 	- Eric Sunshine eliminated compilation warning from csobject.cpp about

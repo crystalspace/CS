@@ -1609,13 +1609,13 @@ bool Demo::HandleEvent (iEvent &Event)
           seqmgr->TimeWarp (20);
 	  break;
         case ',':
-          seqmgr->TimeWarp (-20);
+          seqmgr->TimeWarp ((cs_time)-20);
 	  break;
         case '>':
           seqmgr->TimeWarp (2500);
 	  break;
         case '<':
-          seqmgr->TimeWarp (-2500, true);
+          seqmgr->TimeWarp ((cs_time)-2500, true);
 	  break;
         case '/':
           seqmgr->TimeWarp (0, true);
