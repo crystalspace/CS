@@ -26,17 +26,99 @@
 #include "csutil/scf.h"
 
 struct iObject;
+struct iImage;
+struct iTextureWrapper;
+struct iTextureList;
+struct iMaterial;
+struct iMaterialList;
+struct iMaterialWrapper;
+struct iVFS;
+struct iImageIO;
+
+SCF_VERSION (iModelDataTexture, 0, 0, 1);
+
+/**
+ * This structure contains the information about a texture for an
+ * imported model. <p>
+ *
+ * There are three possible types of representation for a texture: As a file
+ * name, as an iImage or as a texture wrapper. The model data
+ * structures will not convert between them automatically, but some
+ * convenience functions are included to make conversion easier. <p>
+ *
+ * As an example, exporting to a model file which does not contain the
+ * textures themselves but only their file name will require that the
+ * file name is set. Exporting to a model file which contains the textures
+ * directly will contain an iImage to work. Exporting to a mesh object will
+ * require a texture wrapper.
+ */
+struct iModelDataTexture : public iBase
+{
+  /// Query the iObject for this texture
+  virtual iObject* QueryObject () = 0;
+
+  /// Set the file name of the texture
+  virtual void SetFileName (const char *fn) = 0;
+  /// Return the file name of the texture
+  virtual const char *GetFileName () const = 0;
+
+  /// Set the image object
+  virtual void SetImage (iImage *image) = 0;
+  /// Return the image object
+  virtual iImage *GetImage () const = 0;
+
+  /// Set the texture wrapper
+  virtual void SetTextureWrapper (iTextureWrapper *th) = 0;
+  /// Return the texture wrapper
+  virtual iTextureWrapper *GetTextureWrapper () const = 0;
+
+  /**
+   * Load the image from a file with the current filename (i.e. this
+   * texture must have a file name) from the CWD of the given file
+   * system. Note: This leaves the texture wrapper untouched.
+   */
+  virtual void LoadImage (iVFS *VFS, iImageIO *ImageIO, int Format) = 0;
+
+  /**
+   * Create a texture wrapper from the given texture list.
+   * Requires that an image object exists.
+   */
+  virtual void Register (iTextureList *tl) = 0;
+};
+
 
 SCF_VERSION (iModelDataMaterial, 0, 0, 1);
 
 /**
- * This structure contains the information about a material for an
- * imported model.
+ * This structure contains the information about a material for an imported
+ * model. This information can be stored in two different way: Either as a
+ * base iMaterial, or as a material wrapper. Conversion between the two is
+ * usually possible, but does not happen automatically. <p>
+ *
+ * Whatever you use the model data for determines which representation is
+ * used. As an example, exporting to a model file uses the base material.
+ * Exporting to a mesh object uses the material wrapper.
  */
 struct iModelDataMaterial : public iBase
 {
   /// Query the iObject for this material
   virtual iObject* QueryObject () = 0;
+
+  /// Return the base material
+  virtual iMaterial *GetBaseMaterial () const = 0;
+  /// Set the base material
+  virtual void SetBaseMaterial (iMaterial *mat) = 0;
+
+  /// Return the material wrapper
+  virtual iMaterialWrapper *GetMaterialWrapper () const = 0;
+  /// Set the base material
+  virtual void SetMaterialWrapper (iMaterialWrapper *mat) = 0;
+
+  /**
+   * Create a material wrapper from the given material list.
+   * Requires that the base material exists.
+   */
+  virtual void Register (iMaterialList *ml) = 0;
 };
 
 
@@ -189,6 +271,13 @@ struct iModelData : public iBase
 {
   /// Query the iObject for the model data
   virtual iObject* QueryObject () = 0;
+
+  /// Load all textures from the CWD of the given file system
+  virtual void LoadImages (iVFS *VFS, iImageIO *ImageIO, int Format) = 0;
+  /// Register all textures using the given texture list
+  virtual void RegisterTextures (iTextureList *tl) = 0;
+  /// Register all materials using the given material list
+  virtual void RegisterMaterials (iMaterialList *ml) = 0;
 };
 
 #endif // __IMESH_MDLDATA_H__

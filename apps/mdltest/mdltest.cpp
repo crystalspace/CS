@@ -44,9 +44,15 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-void Simple::ImportModel (iThingState *fState, iMaterialWrapper *DefaultMaterial)
+void Cleanup ();
+
+void Simple::ImportModel (iThingState *fState, iMaterialWrapper *DefaultMaterial,
+  iMaterialWrapper *OtherMaterial)
 {
   iModelData *Model = new csModelData ();
+
+  iModelDataMaterial *mat = new csModelDataMaterial ();
+  mat->SetMaterialWrapper (OtherMaterial);
 
   iModelDataObject *Object = new csModelDataObject ();
   Model->QueryObject ()->ObjAdd (Object->QueryObject ());
@@ -65,6 +71,7 @@ void Simple::ImportModel (iThingState *fState, iMaterialWrapper *DefaultMaterial
   Polygon->AddVertex (1, csVector3 (0,1,0), csColor (1,1,1), csVector2 (0,5));
   Polygon->AddVertex (2, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,5));
   Polygon->AddVertex (3, csVector3 (0,1,0), csColor (1,1,1), csVector2 (5,0));
+  Polygon->SetMaterial (mat);
 
   Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
@@ -103,6 +110,17 @@ void Simple::ImportModel (iThingState *fState, iMaterialWrapper *DefaultMaterial
 
   crossbuilder->BuildThing (Model, fState, DefaultMaterial);
   Model->DecRef ();
+}
+
+iMaterialWrapper *Simple::LoadTexture (const char *name, const char *fn)
+{
+  if (!loader->LoadTexture (name, fn))
+  {
+    Printf (CS_MSG_FATAL_ERROR, "Error loading texture '%s' !\n", fn);
+    Cleanup ();
+    exit (1);
+  }
+  return engine->GetMaterialList ()->FindByName (name);
 }
 
 //-----------------------------------------------------------------------------
@@ -193,13 +211,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // Create our world.
   Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
 
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-  {
-    Printf (CS_MSG_FATAL_ERROR, "Error loading 'stone4' texture!\n");
-    Cleanup ();
-    exit (1);
-  }
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
+  iMaterialWrapper* tm = LoadTexture ("stone", "/lib/std/stone4.gif");
+  iMaterialWrapper* tm2 = LoadTexture ("wood", "/lib/std/andrew_wood.gif");
 
   room = engine->CreateSector ("room");
 
@@ -207,7 +220,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iMeshObjectFactory *Factory = ThingType->NewFactory ();
 
   iThingState *fState = SCF_QUERY_INTERFACE (Factory, iThingState);
-  ImportModel (fState, tm);
+  ImportModel (fState, tm, tm2);
   fState->DecRef ();
 
   iMeshObject *Object = Factory->NewInstance ();

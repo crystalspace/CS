@@ -84,28 +84,39 @@ bool csCrossBuilder::BuildThing (iModelData *Data, iThingState *tgt,
   iMaterialWrapper *DefaultMaterial) const
 {
   int i;
+
+  // find the first object in the scene
   iModelDataObject *Object = FindObject (Data);
   if (!Object)
     return false;
 
+  // copy the vertices
   for (i=0; i<Object->GetVertexCount (); i++)
     tgt->CreateVertex (Object->GetVertex (i));
 
+  // copy the polygons
   iObjectIterator *it = Object->QueryObject ()->GetIterator ();
   while (!it->IsFinished ())
   {
+    // test if this is a valid polygon
     iModelDataPolygon *Polygon =
       SCF_QUERY_INTERFACE_FAST (it->GetObject (), iModelDataPolygon);
-
     if (Polygon->GetVertexCount () < 3)
       continue;
-
     iPolygon3D *ThingPoly = tgt->CreatePolygon ();
 
+    // copy vertices
     for (i=0; i<Polygon->GetVertexCount (); i++)
       ThingPoly->CreateVertex (Polygon->GetVertex (i));
     
-    ThingPoly->SetMaterial (DefaultMaterial);
+    // copy material
+    iModelDataMaterial *mat = Polygon->GetMaterial ();
+    if (mat && mat->GetMaterialWrapper ())
+      ThingPoly->SetMaterial (mat->GetMaterialWrapper ());
+    else
+      ThingPoly->SetMaterial (DefaultMaterial);
+    
+    // copy texture transformation
     ThingPoly->SetTextureSpace (
       Object->GetVertex(Polygon->GetVertex(0)), Polygon->GetTextureCoords(0),
       Object->GetVertex(Polygon->GetVertex(1)), Polygon->GetTextureCoords(1),

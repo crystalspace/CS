@@ -18,6 +18,13 @@
 
 #include "cssysdef.h"
 #include "cstool/mdldata.h"
+#include "igraphic/image.h"
+#include "igraphic/imageio.h"
+#include "iengine/texture.h"
+#include "ivideo/material.h"
+#include "iengine/material.h"
+#include "iutil/databuff.h"
+#include "isys/vfs.h"
 
 #define IMPLEMENT_ARRAY_INTERFACE_NONUM(clname,type,sing_name,mult_name) \
   type clname::Get##sing_name (int n) const				\
@@ -48,6 +55,9 @@
   IMPLEMENT_EMBEDDED_OBJECT (clname::Embedded_csObject);		\
   iObject* clname::QueryObject ()					\
   { return &scfiObject; }
+
+SCF_DECLARE_FAST_INTERFACE (iModelDataTexture);
+SCF_DECLARE_FAST_INTERFACE (iModelDataMaterial);
 
 /*** csModelDataPolygon ***/
 
@@ -100,7 +110,7 @@ IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
 	const csVector2 &, TextureCoords, TextureCoords);
 IMPLEMENT_ARRAY_INTERFACE_NONUM (csModelDataPolygon,
 	const csColor &, Color, Colors);
-IMPLEMENT_ACCESSOR_METHOD (csModelDataPolygon, iModelDataMaterial *, Material);
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataPolygon, iModelDataMaterial *, Material);
 
 /*** csModelDataObject ***/
 
@@ -203,6 +213,81 @@ csModelDataMaterial::csModelDataMaterial ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  BaseMaterial = NULL;
+  MaterialWrapper = NULL;
+}
+
+csModelDataMaterial::~csModelDataMaterial ()
+{
+  SCF_DEC_REF (BaseMaterial);
+  SCF_DEC_REF (MaterialWrapper);
+}
+
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataMaterial, iMaterial*, BaseMaterial);
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataMaterial, iMaterialWrapper*, MaterialWrapper);
+
+void csModelDataMaterial::Register (iMaterialList *ml)
+{
+  if (!BaseMaterial) return;
+  SetMaterialWrapper (ml->NewMaterial (BaseMaterial));
+}
+
+/*** csModelDataTexture ***/
+
+SCF_IMPLEMENT_IBASE (csModelDataTexture)
+  SCF_IMPLEMENTS_INTERFACE (iModelDataTexture)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObject)
+SCF_IMPLEMENT_IBASE_END
+
+IMPLEMENT_OBJECT_INTERFACE (csModelDataTexture);
+
+csModelDataTexture::csModelDataTexture ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+  FileName = NULL;
+  Image = NULL;
+  TextureWrapper = NULL;
+}
+
+csModelDataTexture::~csModelDataTexture ()
+{
+  delete[] FileName;
+  SCF_DEC_REF (Image);
+  SCF_DEC_REF (TextureWrapper);
+}
+
+void csModelDataTexture::SetFileName (const char *fn)
+{
+  delete[] FileName;
+  FileName = csStrNew (fn);
+}
+
+const char *csModelDataTexture::GetFileName () const
+{
+  return FileName;
+}
+
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iImage*, Image);
+IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iTextureWrapper*, TextureWrapper);
+
+void csModelDataTexture::LoadImage (iVFS *vfs, iImageIO *io, int Format)
+{
+  if (!FileName) return;
+  SCF_DEC_REF (Image);
+  Image = NULL;
+
+  iDataBuffer *dbuf = vfs->ReadFile (FileName);
+  if (!dbuf) return;
+
+  Image = io->Load (dbuf->GetUint8 (), dbuf->GetSize (), Format);
+  dbuf->DecRef ();
+}
+
+void csModelDataTexture::Register (iTextureList *tl)
+{
+  if (!Image) return;
+  SetTextureWrapper (tl->NewTexture (Image));
 }
 
 /*** csModelData ***/
@@ -218,4 +303,46 @@ csModelData::csModelData ()
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
+}
+
+void csModelData::LoadImages (iVFS *vfs, iImageIO *io, int Format)
+{
+  iObjectIterator *it = scfiObject.GetIterator ();
+  while (!it->IsFinished ())
+  {
+    iModelDataTexture *tex = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
+      iModelDataTexture);
+    if (tex)
+      tex->LoadImage (vfs, io, Format);
+    it->Next ();
+  }
+  it->DecRef ();
+}
+
+void csModelData::RegisterTextures (iTextureList *tm)
+{
+  iObjectIterator *it = scfiObject.GetIterator ();
+  while (!it->IsFinished ())
+  {
+    iModelDataTexture *tex = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
+      iModelDataTexture);
+    if (tex)
+      tex->Register (tm);
+    it->Next ();
+  }
+  it->DecRef ();
+}
+
+void csModelData::RegisterMaterials (iMaterialList *ml)
+{
+  iObjectIterator *it = scfiObject.GetIterator ();
+  while (!it->IsFinished ())
+  {
+    iModelDataMaterial *mat = SCF_QUERY_INTERFACE_FAST (it->GetObject (),
+      iModelDataMaterial);
+    if (mat)
+      mat->Register (ml);
+    it->Next ();
+  }
+  it->DecRef ();
 }

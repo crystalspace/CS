@@ -35,7 +35,10 @@ SCF_VERSION (iCrossBuilder, 0, 0, 1);
  */
 struct iCrossBuilder : public iBase
 {
-  /// Build a thing from a model file
+  /**
+   * Build a thing from a model file. The model data must have its materials
+   * stored as material wrappers, otherwise the default material will be used.
+   */
   virtual bool BuildThing (iModelData *Data, iThingState *tgt,
 	iMaterialWrapper *DefaultMaterial = NULL) const = 0;
 

@@ -168,7 +168,8 @@ public:
 class csModelDataMaterial : public iModelDataMaterial
 {
 private:
-
+  iMaterial *BaseMaterial;
+  iMaterialWrapper *MaterialWrapper;
 public:
   SCF_DECLARE_IBASE;
   DECLARE_OBJECT_INTERFACE;
@@ -176,7 +177,47 @@ public:
   /// Constructor
   csModelDataMaterial ();
   /// Destructor
-  virtual ~csModelDataMaterial () {}
+  virtual ~csModelDataMaterial ();
+
+  DECLARE_ACCESSOR_METHODS (iMaterial*, BaseMaterial);
+  DECLARE_ACCESSOR_METHODS (iMaterialWrapper*, MaterialWrapper);
+
+  /// Create a material wrapper from the given material list
+  void Register (iMaterialList *ml);
+};
+
+class csModelDataTexture : public iModelDataTexture
+{
+private:
+  char *FileName;
+  iImage *Image;
+  iTextureWrapper *TextureWrapper;
+public:
+  SCF_DECLARE_IBASE;
+  DECLARE_OBJECT_INTERFACE;
+
+  /// Constructor
+  csModelDataTexture ();
+  /// Destructor
+  virtual ~csModelDataTexture ();
+
+  /// Set the file name of the texture
+  void SetFileName (const char *fn);
+  /// Return the file name of the texture
+  const char *GetFileName () const;
+
+  DECLARE_ACCESSOR_METHODS (iImage*, Image);
+  DECLARE_ACCESSOR_METHODS (iTextureWrapper*, TextureWrapper);
+
+  /**
+   * Load the image from a file with the current filename (i.e. this
+   * texture must have a file name) from the CWD of the given file
+   * system. Note: This leaves the texture wrapper untouched.
+   */
+  void LoadImage (iVFS *VFS, iImageIO *ImageIO, int Format);
+
+  /// Create a texture wrapper from the given texture list
+  void Register (iTextureList *tl);
 };
 
 class csModelData : public iModelData
@@ -189,6 +230,13 @@ public:
   csModelData ();
   /// Destructor
   virtual ~csModelData () {}
+
+  /// Load all texture images from the CWD of the given file system
+  void LoadImages (iVFS *VFS, iImageIO *il, int Format);
+  /// Register all textures using the given texture list
+  void RegisterTextures (iTextureList *tl);
+  /// Register all materials using the given material list
+  void RegisterMaterials (iMaterialList *ml);
 };
 
 #endif // __MDLDATA_H__
