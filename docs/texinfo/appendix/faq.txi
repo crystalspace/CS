@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node FAQ, ApiMods17, Contributing, Top
+@node FAQ, API Modifications, Contributing, Top
 @appendix Frequently Asked Questions (@sc{faq})
 @cindex Frequently Asked Questions
 @cindex @sc{faq}

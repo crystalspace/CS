@@ -1,19 +1,7 @@
 @c -*-texinfo-*-
-@node ApiMods17, Index, FAQ, Top
-@appendix Significant @sc{api} Changes from 0.16 to 0.17
+@node API Modifications 17, , API Modifications 18, API Modifications
+@appendixsec @sc{api} Changes from 0.16 to 0.17
 @cindex @sc{api} Changes
-
-This document provides information to aid developers during the transition
-from version 0.16 of Crystal Space to 0.17. At this moment Crystal Space is
-still beta so we don't have a frozen @sc{api} (@dfn{Application Programmer's
-Interface}).  Even after releasing 1.0 @sc{api} changes will sometimes be
-unavoidable (but we will try to minimize them).  This document should give you
-a head start at trying to convert your application from one version of Crystal
-Space to the next.  Only the major changes are covered here.  If you have
-trouble with something that isn't discussed here you should send mail to the
-the Crystal Space mailing list and ask for help.  @xref{Mailing Lists}.
-
-@heading @sc{api} Changes: Version 0.16 to 0.17
 
 This section documents the major changes between versions 0.16 and 0.17 of of
 Crystal Space.

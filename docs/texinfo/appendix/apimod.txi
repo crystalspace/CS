@@ -1,0 +1,23 @@
+@c -*-texinfo-*-
+@node API Modifications, Index, FAQ, Top
+@appendix Significant @sc{api} Changes
+@cindex @sc{api} Changes
+
+This document provides information to aid developers during the transition
+between versions of Crystal Space.  At this moment Crystal Space is still beta
+so we do not yet have a frozen @sc{api} (@dfn{Application Programmer's
+Interface}).  Even after version 1.0 is released, @sc{api} changes will still
+sometimes be unavoidable (but we will try to minimize them).  The following
+sections should give you a head start at trying to convert your application
+from one version of Crystal Space to the next.  Only the major changes are
+covered here.  If you have trouble with something that is not discussed here
+you should send mail to the the Crystal Space mailing list and ask for help.
+@xref{Mailing Lists}.
+
+@menu
+* API Modifications 18:: @sc{api} Changes from 0.17 to 0.18
+* API Modifications 17:: @sc{api} Changes from 0.16 to 0.17
+@end menu
+
+@imports{appendix,apimod18.txi}
+@imports{appendix,apimod17.txi}

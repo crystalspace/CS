@@ -28,6 +28,17 @@ The history order has been reversed so that new features are at the top.
 	- Fixed levtool app to use the new spr3d plugin.
 	- Changed GetRadius() in iMeshObject to return a csVector instead
 	  of a float.
+	- Eric Sunshine made the following changes to the API transition
+	  documentation:
+	    - Re-organized so that there is a single appendix for API
+	      transitions rather than multiple appendices.  The API transition
+	      appendix now contains a sub-section for each transitional
+	      version.
+	    - Ran nodefix.pl (make repairdoc) to repair out of date @node and
+	      @menu directives.
+	    - Eliminated underfull and overfull hbox warning messages reported
+	      by TeX.
+	    - Performed a bit of clean up in apimod18.txi.
 8-Feb-2001
 	- Martin Geisse changed DirectInput version number from 0x0700
 	  to 0x0300.
