@@ -28,6 +28,7 @@ class csSector;
 class csView;
 class csWorld;
 class csDynLight;
+struct iCollideSystem;
 
 class Phyztest : public SysSystemDriver
 {
@@ -39,6 +40,7 @@ public:
   csDynLight* dynlight;
   float angle;
   int motion_flags;
+  iCollideSystem* cdsys;
 
 public:
   Phyztest ();

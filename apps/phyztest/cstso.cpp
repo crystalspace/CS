@@ -21,14 +21,15 @@ csSpaceTimeObj::csSpaceTimeObj()
   //what_type = ST_SPACETIME; 
 }
 
-csRigidSpaceTimeObj::csRigidSpaceTimeObj( csSprite3D *psprt, ctRigidBody *prb )
+csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, csSprite3D *psprt, ctRigidBody *prb )
 {
   space_time_continuum[continuum_end++] = this;
  // what_type = ST_SPACETIME; 
  // col = pcollide;
   sprt = psprt;
   rb = prb;
-  col = new csRAPIDCollider (*sprt, sprt);
+  iPolygonMesh* mesh = QUERY_INTERFACE (sprt, iPolygonMesh);
+  col = new csCollider (*sprt, cdsys, mesh);
   what_type = ST_RIGID;
 
 }
@@ -92,14 +93,12 @@ csMatrix3 m;
 csVector3 n;
 csVector3 x;
 csVector3 trime;
-csCdTriangle *wall;
-csCdTriangle *htri;
 real max_depth;
 real current_depth;
 csOrthoTransform tfm;
 ctCollidingContact *this_contact;
 //ctCollidingContact *prev_contact;
-collision_pair *CD_contact = NULL;
+csCollisionPair *CD_contact = NULL;
 //bool hit_found;
 
   max_depth = 0;
@@ -109,9 +108,10 @@ collision_pair *CD_contact = NULL;
     first_sector = space_time_continuum[i]->sprt->GetSector (0);
     
     // Start collision detection.
-    csRAPIDCollider::CollideReset ();
-    csRAPIDCollider::SetFirstHit (false);
     coli = space_time_continuum[i]->col;
+    iCollideSystem* cdsys = coli->GetCollideSystem ();
+    cdsys->ResetCollisionPairs ();
+    cdsys->SetOneHitOnly (false);
    // for ( ; num_sectors-- ; )
     M = space_time_continuum[i]->rb->get_world_to_this();
     m.Set( M[0][0], M[0][1], M[0][2],
@@ -125,13 +125,13 @@ collision_pair *CD_contact = NULL;
     tfm.SetO2TTranslation( x );
 
     // Check collision with this sector.
-    csRAPIDCollider::numHits = 0;
+    cdsys->ResetCollisionPairs ();
     if( first_sector ){
       coli->Collide(*first_sector, &tfm);
-      CD_contact = csRAPIDCollider::GetCollisions ();
+      CD_contact = cdsys->GetCollisionPairs ();
     }
 
-    space_time_continuum[i]->num_collisions = csRAPIDCollider::numHits;
+    space_time_continuum[i]->num_collisions = cdsys->GetNumCollisionPairs ();
     space_time_continuum[i]->contact = NULL;
     contact_heap_index = 0;
     // determine type of collision and penetration depth
@@ -143,7 +143,7 @@ collision_pair *CD_contact = NULL;
       this_contact = &(contact_heap[contact_heap_index]);
       this_contact->next = NULL;
       
-      for( int acol = 0; acol < csRAPIDCollider::numHits; acol++ ){
+      for( int acol = 0; acol < cdsys->GetNumCollisionPairs (); acol++ ){
         space_time_continuum[i]->cd_contact[acol] = CD_contact[acol];
 
         // here is where the body hit should be recorded as well
@@ -153,8 +153,9 @@ collision_pair *CD_contact = NULL;
 
         this_contact->restitution = 0.75;
 
-        wall = CD_contact[acol].tr2;
-        n = ((wall->p2-wall->p1)%(wall->p3-wall->p2)).Unit();
+        csCollisionPair& cd = CD_contact[acol];
+        n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();
+
       //  CsPrintf( MSG_DEBUG_1, "n %f, %f, %f\n", n.x, n.y, n.z );
         this_contact->n = n;
 
@@ -167,19 +168,17 @@ collision_pair *CD_contact = NULL;
       return 0;
 */
 
-        htri = CD_contact[acol].tr1;
-
         // check each point of this triangle to see which penetrated the most
   
         for( int j = 0; j < 3 ; j++ ){
           if( j == 0 )
-            trime = tfm.This2Other( htri->p1 );
+            trime = tfm.This2Other( cd.a1 );
           else if ( j == 1 )
-            trime = tfm.This2Other( htri->p2 );
+            trime = tfm.This2Other( cd.b1 );
           else
-            trime = tfm.This2Other( htri->p3 );
+            trime = tfm.This2Other( cd.c1 );
 
-          current_depth = -(trime - wall->p1)*n;
+          current_depth = -(trime - cd.a2)*n;
           // this is the collision point
           if( current_depth > max_depth ){
             max_depth = current_depth;

@@ -5,7 +5,7 @@
 // just wanted to see some stuff bouncing around for now. 
 #include "csphyzik/ctcat.h"
 #include "csengine/collider.h"
-#include "csengine/rapid.h"
+#include "icollide.h"
 
 class csWorld;
 class csSprite3D;
@@ -46,12 +46,12 @@ public:
 	csSprite3D *sprt;
 	ctRigidBody *rb;
   
-  collision_pair cd_contact[MAX_COL_PER_STO];
+  csCollisionPair cd_contact[MAX_COL_PER_STO];
   int num_collisions;
 
 	ctCollidingContact *contact;
 
-	csRigidSpaceTimeObj( csSprite3D *psprt, ctRigidBody *prb );
+	csRigidSpaceTimeObj( iCollideSystem* cdsys, csSprite3D *psprt, ctRigidBody *prb );
 
 protected:
   static void update_space();

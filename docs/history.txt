@@ -11,6 +11,17 @@ The history order has been reversed so that new features are at the top.
 	  engine objects (or game objects). Usage of this class is optional
 	  and the engine will never use it itself.
 	- Fixed WalkTest so that it REALLY compiles now.
+	- Added debug info to libs/csengine/terrain.cpp for Alex Pfaffe.
+	- Tried to fix csgame library with regards to the new collision
+	  detection system but I didn't manage to fix all. Particularly
+	  in libs/csgame/gcollide.cpp there are a few things that I
+	  didn't manage to fix. I hope Thomas Hieber can look at this.
+	- Fixed csclear library and cctest app with new collision detection
+	  system. It compiles and runs now but collision detection seems a
+	  bit broken. Not sure why.
+	- Fixed phyztest due to the latest collision detection changes.
+	- Wouter, Samuel and Jorrit experimented a bit with some problems
+	  with 'usleep' in unix.cpp.
 2-Aug-2000
 	- Martin Geisse added 2d animations and aligned pixmaps.
 	- Norman Kramer fixed funcon plugin so that use_fog=false for DPFX.

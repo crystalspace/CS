@@ -121,10 +121,12 @@ Phyztest::Phyztest ()
   world = NULL;
   dynlight = NULL;
   motion_flags = 0;
+  cdsys = NULL;
 }
 
 Phyztest::~Phyztest ()
 {
+  if (cdsys) cdsys->DecRef ();
   delete view;
 }
 
@@ -156,6 +158,8 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     cleanup ();
     exit (1);
   }
+
+  cdsys = LOAD_PLUGIN (Sys, "crystalspace.colldet.rapid", "CollDet", iCollideSystem);
 
   // Some commercials...
   Printf (MSG_INITIALIZATION, "Phyztest Crystal Space Application version 0.1.\n");
@@ -229,7 +233,8 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   light = new csStatLight (0, 7, -3, 10, 0, 1, 0, false);
   room->AddLight (light);
 
-  (void)new csRAPIDCollider(*room, room);
+  iPolygonMesh* mesh = QUERY_INTERFACE (room, iPolygonMesh);
+  (void)new csCollider(*room, cdsys, mesh);
 
   world->Prepare ();
 
@@ -367,7 +372,7 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
     rb_bot->rotate_around_line( rotaxisy, degree_to_rad(45) );  
     rb_bot->rotate_around_line( rotaxisz, degree_to_rad(60) );
     rb_bot->set_angular_v( ctVector3( 0,0,0) );
-    (void)new csRigidSpaceTimeObj( bot, rb_bot );
+    (void)new csRigidSpaceTimeObj( cdsys, bot, rb_bot );
   }
   
   // Move the dynamic light around.

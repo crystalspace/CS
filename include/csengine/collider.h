@@ -54,6 +54,9 @@ public:
   /// Get the collider interface for this object.
   iCollider* GetCollider () { return collider; }
 
+  /// Get the collide system.
+  iCollideSystem* GetCollideSystem () { return collide_system; }
+
   /**
    * Check if this collider collides with pOtherCollider.
    * Returns true if collision detected and adds the pair to the collisions
