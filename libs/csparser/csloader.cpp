@@ -3694,12 +3694,11 @@ bool CSLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world,
 
           if (TextureSizeIsIllegal)
           {
-            CsPrintf (MSG_FATAL_ERROR, 
-                      "Texture '%s' has illegal format!\n" 
-                      "The Width and Height must be a power of two.\n"
+            CsPrintf (MSG_WARNING, 
+                      "Texture '%s' probably has an illegal format!\n" 
+                      "The Width and Height should be a power of two.\n"
                       "actual size is w:%d h:%d\n",
                       name, Width, Height);
-            fatal_exit (0, false);
           }
 
           if (Height>256 || Width>256)
