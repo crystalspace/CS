@@ -13090,7 +13090,6 @@ sub CS_CLIPPER_TOPLEVEL () { $cspacec::CS_CLIPPER_TOPLEVEL }
 sub CS_CLIPPER_REQUIRED () { $cspacec::CS_CLIPPER_REQUIRED }
 sub CS_CLIP_NOT () { $cspacec::CS_CLIP_NOT }
 sub CS_CLIP_NEEDED () { $cspacec::CS_CLIP_NEEDED }
-sub CS_CLIP_TOPLEVEL () { $cspacec::CS_CLIP_TOPLEVEL }
 sub CS_ZBUF_NONE () { $cspacec::CS_ZBUF_NONE }
 sub CS_ZBUF_FILL () { $cspacec::CS_ZBUF_FILL }
 sub CS_ZBUF_TEST () { $cspacec::CS_ZBUF_TEST }
