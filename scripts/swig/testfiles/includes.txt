@@ -1,0 +1,6 @@
+testfiles/include/
+testfiles/output/
+csutil/bitset.h
+csutil/csevcord.h
+csutil/csevent.h
+csutil/csinput.h

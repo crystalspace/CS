@@ -1,0 +1,94 @@
+
+What is it?
+------------
+
+  A filtering system for headers to make them %includable for swig.  It filters for a number of things which are common in CS.  Makes it easier to make cs.i
+
+
+How to use
+---------------
+run:
+python fixheaders.py include_files.txt
+
+NOTE: this will overwrite cs.i
+
+
+Files:
+-----------
+
+All these files are included in scripts/swig/
+
+
+cstmpl.i   - a template for the cs.i file.
+
+custom.i   - hand written custom stuff for swig.
+
+
+cs_incs/   - Directory for the output of the processor.
+
+../../include/ivaria/cs.i   - The file used to make the cspython plugin.
+
+
+
+Format of Include files.
+--------------------------
+
+<base in>     - relative to the scripts/swig directory.
+<base out>    - relative to the scripts/swig directory.
+<... header names>	- relative the base in directory.
+
+
+
+
+How does it work.
+--------------------
+
+It takes a number of file lists of header files.  
+
+It filters them and includes them in the middle of the cs.i
+
+
+
+
+
+
+Wrapping your own headers.
+---------------------------
+
+The filter script can take multiple include, file lists.  So that you can add your own header files into cspython.
+
+NOTE: there can only be one cspython plugin loaded at a time.
+
+So there can only be reuse at the source level at the moment.
+
+
+
+
+
+Making a big iObjectRegistry.CS_QUERY_REGISTRY method.
+--------------------------------------------------------
+
+There is a way to automate making an iObjectRegistry which contains 
+  all of the objects that the system knows about.
+
+This is done by getting all the VERSION_<object type> variables(which have 
+  been declared from SCF_VERSION macros) and making a lot of Query_i* methods.
+
+
+
+
+
+TODO:
+
+ - Add the generation of the iObjectRegistry to the header processor class.
+
+ - Make an include file, and add as many crystal space headers to it.
+   - figure out ways to fix the ones which do not work.
+
+ - Figure out how to handle function over loading( swig 1.1 does not support this).  Swig 1.3 says it supports function overloading.  However swig 1.3 is alpha software, and does not work with the current interface wrapper.
+
+ - Test fixheaders.py on platforms other than linux.
+
+ - Try and automate as much of the stuff manually entered into cs.i.
+
+ - clean up the resulting cs.i
