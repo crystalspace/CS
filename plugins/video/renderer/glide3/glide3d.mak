@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glide33
 
-all plugins drivers drivers33: glide33
+all plugins drivers drivers3d: glide33
 
 glide33:
 	$(MAKE_TARGET) MAKE_DLL=yes

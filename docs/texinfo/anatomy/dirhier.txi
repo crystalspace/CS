@@ -78,93 +78,6 @@ only one subdirectory in libs, some will be a combination of several
 subdirectories.
 
 @table @code
-@item CS/libs/cs2d
-The 2D driver component which manages creation of the Crystal Space window
-used for rendering and also supports limited 2D drawing capabilities
-(including 2D pixmaps).  It can be used standalone but it is currently very
-limited and not very useful (may change in the future).  There are several
-implementations of this component.  All are specific to some 3D Rasterizer
-(for example, the OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib
-Driver).
-
-@table @code
-@item CS/libs/cs2d/common
-Common code for 2D drivers
-@item CS/libs/cs2d/be
-BeOS version
-@item CS/libs/cs2d/csdive
-@sc{os}/2 version
-@item CS/libs/cs2d/ddraw
-Win32 using Direct Draw
-@item CS/libs/cs2d/ddraw6
-Win32 using Direct Draw (DirectX 6)
-@item CS/libs/cs2d/dosraw
-@sc{dos}
-@item CS/libs/cs2d/ggi
-Unix, using @sc{ggi}
-@item CS/libs/cs2d/softx
-Unix, using X
-@item CS/libs/cs2d/svgalib
-Unix, using @sc{svga}lib
-@item CS/libs/cs2d/mac
-Macintosh
-@item CS/libs/cs2d/next
-MacOS/X Server, OpenStep, NextStep
-@item CS/libs/cs2d/glid2dcommon
-Common code for to Glide2 drivers
-@item CS/libs/cs2d/beglide2
-Glide2X 2D driver for BeOS
-@item CS/libs/cs2d/macglide2
-Glide2x 2D driver for Macintosh
-@item CS/libs/cs2d/unxglide2
-Glide2x 2D driver for Unix
-@item CS/libs/cs2d/winglide2
-Glide2x 2D driver for Win32
-@item CS/libs/cs2d/winglide3
-Glide3x 2D driver for Win32
-@item CS/libs/cs2d/openglcommon
-Common code for all OpenGL 2D drivers
-@item CS/libs/cs2d/openglbe
-OpenGL 2D driver for BeOS
-@item CS/libs/cs2d/openglmac
-OpenGL 2D driver for Macintosh
-@item CS/libs/cs2d/openglos2
-OpenGL 2D driver for @sc{os}/2
-@item CS/libs/cs2d/openglwin
-OpenGL 2D driver for Win32
-@item CS/libs/cs2d/openglx
-OpenGL 2D driver for Unix/X Windows
-@end table
-
-@item CS/libs/cs3d
-The 3D rasterizer component is required by the 3D engine but may also be
-useful standalone.  It needs a 2D Driver.  There are currently several classes
-of this component which correspond to particular @sc{api}s: software, OpenGL,
-Glide, and Direct3D.  Some rasterizers are operating system independent, such
-as OpenGL and software.  Some rasterizer techonolgy is only available on
-certain operating systems, such as DirectX.
-
-@table @code
-@item CS/libs/cs3d/common
-Common code for 3D rasterizers
-@item CS/libs/cs3d/direct3d5
-Direct3D rasterizer using DirectX 5
-@item CS/libs/cs3d/direct3d6
-Direct3D rasterizer using DirectX 6
-@item CS/libs/cs3d/glide2
-3D rasterizer using glide2x
-@item CS/libs/cs3d/glide3
-3D rasterizer using glide3x
-@item CS/libs/cs3d/opengl
-3D rasterizer using OpenGL
-@item CS/libs/cs3d/software
-Software based rasterizer
-@item CS/libs/cs3d/line
-A vector based rasterizer (draws only lines)
-@item CS/libs/cs3d/inf
-The @emph{infinite} rasterizer (draws nothing at all)
-@end table
-
 @item CS/libs/csengine
 The 3D engine is one of the corner stones of Crystal Space and also what
 originally sparked the birth of the Crystal Space project.  It needs the 3D
@@ -197,10 +110,6 @@ The graphics loader library.  Routines to support loading various graphic file
 formats and put them internally in the same format.  This library supports
 @sc{jpg}, @sc{gif}, @sc{tga}, @sc{png}, and @sc{bmp}.
 
-@item CS/libs/csnetdrv
-Network drivers.  The only existing driver is a @sc{bsd} socket-based
-@sc{tcp/ip} driver.
-
 @item CS/libs/csobject
 Hierarchy of Crystal Space independant classes, that are used as base for most
 Crystal Space classes.  The main use for these classes is a system for
@@ -215,19 +124,6 @@ A library which parses @sc{ascii} world files and imports the world into the
 This library contains a very primitive scripting engine.  It is not very
 powerful and needs to be replaced by something better.  However, it is still
 used by some of the current levels.
-
-@item CS/libs/cssnddrv
-System dependent sound drivers.  There are currently drivers for Macintosh,
-@sc{oss} (Linux), and Windows.
-
-@table @code
-@item CS/libs/cssnddrv/macsnd
-Sounddriver for Macintosh
-@item CS/libs/cssnddrv/oss
-Sounddriver for Unix
-@item CS/libs/cssnddrv/waveoutsd
-Sounddriver for Win32
-@end table
 
 @item CS/libs/cssfxldr
 Routines to support loading various sound file formats and put them internally
@@ -320,6 +216,110 @@ Project files for Win32 using MSVC 5.0/ 6.0
 @item CS/plugins
 Plug-in, dynamically loaded modules.  Communication with these modules is
 performed strictly via @sc{scf} interfaces.  @xref{SCF}.
+
+@item CS/plugins/video/canvas
+The 2D driver component which manages creation of the Crystal Space window
+used for rendering and also supports limited 2D drawing capabilities
+(including 2D pixmaps).  It can be used standalone but it is currently very
+limited and not very useful (may change in the future).  There are several
+implementations of this component.  All are specific to some 3D Rasterizer
+(for example, the OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib
+Driver).
+
+@table @code
+@item CS/plugins/video/canvas/common
+Common code for 2D drivers
+@item CS/plugins/video/canvas/be
+BeOS version
+@item CS/plugins/video/canvas/csdive
+@sc{os}/2 version
+@item CS/plugins/video/canvas/ddraw
+Win32 using Direct Draw
+@item CS/plugins/video/canvas/ddraw6
+Win32 using Direct Draw (DirectX 6)
+@item CS/plugins/video/canvas/dosraw
+@sc{dos}
+@item CS/plugins/video/canvas/ggi
+Unix, using @sc{ggi}
+@item CS/plugins/video/canvas/softx
+Unix, using X
+@item CS/plugins/video/canvas/svgalib
+Unix, using @sc{svga}lib
+@item CS/plugins/video/canvas/mac
+Macintosh
+@item CS/plugins/video/canvas/next
+MacOS/X Server, OpenStep, NextStep
+@item CS/plugins/video/canvas/glid2dcommon
+Common code for to Glide2 drivers
+@item CS/plugins/video/canvas/beglide2
+Glide2X 2D driver for BeOS
+@item CS/plugins/video/canvas/macglide2
+Glide2x 2D driver for Macintosh
+@item CS/plugins/video/canvas/unxglide2
+Glide2x 2D driver for Unix
+@item CS/plugins/video/canvas/winglide2
+Glide2x 2D driver for Win32
+@item CS/plugins/video/canvas/winglide3
+Glide3x 2D driver for Win32
+@item CS/plugins/video/canvas/openglcommon
+Common code for all OpenGL 2D drivers
+@item CS/plugins/video/canvas/openglbe
+OpenGL 2D driver for BeOS
+@item CS/plugins/video/canvas/openglmac
+OpenGL 2D driver for Macintosh
+@item CS/plugins/video/canvas/openglos2
+OpenGL 2D driver for @sc{os}/2
+@item CS/plugins/video/canvas/openglwin
+OpenGL 2D driver for Win32
+@item CS/plugins/video/canvas/openglx
+OpenGL 2D driver for Unix/X Windows
+@end table
+
+@item CS/plugins/video/renderer
+The 3D rasterizer component is required by the 3D engine but may also be
+useful standalone.  It needs a 2D Driver.  There are currently several classes
+of this component which correspond to particular @sc{api}s: software, OpenGL,
+Glide, and Direct3D.  Some rasterizers are operating system independent, such
+as OpenGL and software.  Some rasterizer techonolgy is only available on
+certain operating systems, such as DirectX.
+
+@table @code
+@item CS/plugins/video/renderer/common
+Common code for 3D rasterizers
+@item CS/plugins/video/renderer/direct3d5
+Direct3D rasterizer using DirectX 5
+@item CS/plugins/video/renderer/direct3d6
+Direct3D rasterizer using DirectX 6
+@item CS/plugins/video/renderer/glide2
+3D rasterizer using glide2x
+@item CS/plugins/video/renderer/glide3
+3D rasterizer using glide3x
+@item CS/plugins/video/renderer/opengl
+3D rasterizer using OpenGL
+@item CS/plugins/video/renderer/software
+Software based rasterizer
+@item CS/plugins/video/renderer/line
+A vector based rasterizer (draws only lines)
+@item CS/plugins/video/renderer/inf
+The @emph{infinite} rasterizer (draws nothing at all)
+@end table
+
+@item CS/plugins/net/driver
+Network drivers.  The only existing driver is a @sc{bsd} socket-based
+@sc{tcp/ip} driver.
+
+@item CS/plugins/sound/driver
+System dependent sound drivers.  There are currently drivers for Macintosh,
+@sc{oss} (Linux), and Windows.
+
+@table @code
+@item CS/plugins/sound/driver/macsnd
+Sounddriver for Macintosh
+@item CS/plugins/sound/driver/oss
+Sounddriver for Unix
+@item CS/plugins/sound/driver/waveoutsd
+Sounddriver for Win32
+@end table
 
 @table @code
 @item CS/plugins/csclear

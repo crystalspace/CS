@@ -44,7 +44,7 @@ else
   LIBS.EXE+=-lGL
 endif
 DESCRIPTION.$(GLBE2D) = $(DESCRIPTION.glbe2d)
-SRC.GLBE2D = $(wildcard libs/cs2d/openglbe/*.cpp \
+SRC.GLBE2D = $(wildcard plugins/video/canvas/openglbe/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLBE2D:.cpp=$O)))
 
@@ -60,9 +60,9 @@ clean: glbeclean
 
 glbe2d: $(OUTDIRS) $(GLBE2D)
 
-$(OUT)%$O: libs/cs2d/openglbe/%.cpp
+$(OUT)%$O: plugins/video/canvas/openglbe/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLBE2D)
-$(OUT)%$O: libs/cs2d/openglcommon/%.cpp
+$(OUT)%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLBE2D)
 
 $(GLBE2D): $(OBJ.GLBE2D) $(DEP.BE2D)

@@ -132,14 +132,14 @@ values for all these parameters.  it also creates a bitmap of the required
 @samp{color_space} pointed to by private @samp{BBitMap*} bitmap.
 
 @code{csGraphics3DSoftware::Open()} calls @code{csGraphics2DBeLib::Open()}
-which is (defined in @file{cs2d/be/belibg2d.cpp}) which begins by calling the
-inherited @file{csGraphics2D::Open()} method (defined in
-@file{cs2d/common/graph2d.cpp}).  @code{csGraphics2D::Open()} creates an
-@samp{int} array with the number of scanlines designated in @file{cryst.cfg}
-and sets up the static @samp{csGraphics2D::ScanLine} pointer to it.  It then
-initialises it with precalculated addresses of each scanline in the bitmap.  A
-new instance of @samp{CrystView} and attached to a new instance of
-@samp{CrystWindow}.
+which is (defined in @file{plugins/video/canvas/be/belibg2d.cpp}) which begins
+by calling the inherited @file{csGraphics2D::Open()} method (defined in
+@file{plugins/video/canvas/common/graph2d.cpp}).  @code{csGraphics2D::Open()}
+creates an @samp{int} array with the number of scanlines designated in
+@file{cryst.cfg} and sets up the static @samp{csGraphics2D::ScanLine} pointer
+to it.  It then initialises it with precalculated addresses of each scanline
+in the bitmap.  A new instance of @samp{CrystView} and attached to a new
+instance of @samp{CrystWindow}.
 
 @samp{CrystView} is derived from @samp{BView} and implements handlers for key
 and mouse actions.  @samp{CrystWindow} is derived from @samp{BDirectWindow}.

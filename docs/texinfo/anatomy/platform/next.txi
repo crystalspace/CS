@@ -67,14 +67,14 @@ directory hierarchies:
 
 @itemize @bullet
 @item @code{CS/libs/cssys/next}
-@item @code{CS/libs/cssys/cs2d/next}
+@item @code{CS/plugins/video/canvas/next}
 @end itemize
 
 @noindent
 Relative to each directory, in platform-specific subdirectories, are the the
 files comprising the associated MacOS/X Server, OpenStep, and NextStep
 components.  The contents of the subdirectories of @file{CS/libs/cssys/next}
-and @file{CS/libs/cs2d/next} are summarized below.
+and @file{CS/plugins/video/canvas/next} are summarized below.
 
 @quotation
 @multitable @columnfractions .12 .88
@@ -105,10 +105,10 @@ platforms reside in @file{CS/libs/cssys/next/shared}.
 @item
 The library which provides 2D graphics capability into which Crystal Space
 renders its images.  These files and resources are located in
-platform-specific subdirectories of @file{CS/libs/cs2d/next}.  For instance,
-files specific to the NextStep port reside in
-@file{CS/libs/cs2d/next/nextstep}, whereas files common to all three platforms
-reside in @file{CS/libs/cs2d/next/shared}.
+platform-specific subdirectories of @file{CS/plugins/video/canvas/next}.  For
+instance, files specific to the NextStep port reside in
+@file{CS/plugins/video/canvas/next/nextstep}, whereas files common to all
+three platforms reside in @file{CS/plugins/video/canvas/next/shared}.
 @end itemize
 
 @node NeXT Files, NeXT Run-Loop, NeXT Directories, NeXT Details
@@ -132,8 +132,9 @@ for each target platform.
 @end multitable
 @end quotation
 
-An additional makefile, @file{CS/libs/cs2d/next/next2d.mak}, is common to all
-three platforms and controls the build process for the 2D display driver.
+An additional makefile, @file{CS/plugins/video/canvas/next/next2d.mak}, is
+common to all three platforms and controls the build process for the 2D
+display driver.
 
 The core components provide low-level platform-specific functionality which
 Crystal Space requires.  This includes interfaces to the underlying operating
@@ -196,12 +197,12 @@ Crystal Space to treat the operating system services abstractly.  Located in
 @file{CS/include/cssys/next} and included by @file{CS/include/sysdef.h}.
 @end table
 
-The @NeXT{} 2D graphics library in @file{CS/libs/cs2d/next} provides 2D
-graphics capability to the Crystal Space engine.  This library is responsible
-for providing a hardware-specific frame-buffer into which Crystal Space can
-draw.  It is also responsible for actually displaying the frame-buffer in a
-manner which is appropriate for the given platform.  The files comprising the
-2D graphics library are:
+The @NeXT{} 2D graphics library in @file{CS/plugins/video/canvas/next}
+provides 2D graphics capability to the Crystal Space engine.  This library is
+responsible for providing a hardware-specific frame-buffer into which Crystal
+Space can draw.  It is also responsible for actually displaying the
+frame-buffer in a manner which is appropriate for the given platform.  The
+files comprising the 2D graphics library are:
 
 @table @code
 @item NeXTDriver2D.h

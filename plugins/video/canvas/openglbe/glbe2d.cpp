@@ -22,8 +22,8 @@
 #include <Screen.h>
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cs2d/openglbe/glbe2d.h"
-#include "cs2d/openglbe/CrystGLWindow.h"
+#include "glbe2d.h"
+#include "CrystGLWindow.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGLBe)

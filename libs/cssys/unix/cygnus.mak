@@ -5,16 +5,17 @@
 DESCRIPTION.cygnus = Windows with Cygnus
 
 # Choose which drivers you want to build/use
-PLUGINS+=cs2d/softx cs3d/software cssnddrv/oss cssndrdr/software
+PLUGINS+=video/canvas/softx video/renderer/software \
+  sound/driver/oss sound/renderer/software
 
 # uncomment the following to build SVGALIB 2D driver
-PLUGINS+=cs2d/svgalib
+PLUGINS+=video/canvas/svgalib
 # uncomment the following to build GGI 2D driver
-#PLUGINS+=cs2d/ggi 
+#PLUGINS+=video/canvas/ggi 
 # uncomment the following to build OpenGL stuff
-PLUGINS+=cs3d/opengl cs2d/openglx
+PLUGINS+=video/renderer/opengl video/canvas/openglx
 # uncomment the following to build Glide stuff
-#PLUGINS+=cs3d/glide2 cs2d/unxglide2
+#PLUGINS+=video/renderer/glide2 video/canvas/unxglide2
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

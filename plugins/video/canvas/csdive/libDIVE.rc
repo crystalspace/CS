@@ -18,7 +18,7 @@
 */
 
 #include "os2.h"
-#include "cs2d/csdive/libDIVE.h"
+#include "video/canvas/csdive/libDIVE.h"
 
 // Define DIVE window menu
 MENU idDive DISCARDABLE

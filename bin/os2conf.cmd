@@ -200,7 +200,7 @@
   call saycon ANSI.LGREEN"Checking whenever OpenGL toolkit is installed ..."
   if (SysSearchPath("LIBRARY_PATH", "opengl.lib") \= "") then
   do
-    say 'DRIVERS += cs2d/openglos2 cs3d/opengl';
+    say 'PLUGINS += plugins/canvas/openglos2 plugins/renderer/opengl';
     call saycon ANSI.LCYAN||"      found"
   end
   else

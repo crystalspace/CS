@@ -160,23 +160,24 @@ a driver, an executable and so on.
 Note that @samp{MAKESECTION} variable is used not only in system-dependent
 submakefile.  All submakefiles uses it; for libraries, for drivers and so on.
 
-Each system-dependent submakefile defines a variable called @samp{DRIVERS}
+Each system-dependent submakefile defines a variable called @samp{PLUGINS}
 which contain references to all drivers that are supported by this platform.
 The drivers are referenced by their directory name inside @file{libs/}
-subdirectory.  For example, a @samp{DRIVERS} variable that refers to the
+subdirectory.  For example, a @samp{PLUGINS} variable that refers to the
 software X-windows 2D driver and to the software 3D renderer would look like
 this:
 
 @example
-DRIVERS += cs2d/softx cs3d/soft
+PLUGINS += video/canvas/softx video/renderer/soft
 @end example
 
-To find the submakefiles for drivers, @file{libs/} is prepended to all
-components of @samp{DRIVERS}; @file{/*.mak} is appended; and a wildcard search
+To find the submakefiles for drivers, @file{plugins/} is prepended to all
+components of @samp{PLUGINS}; @file{/*.mak} is appended; and a wildcard search
 is performed.  A possible result of above expansion might be:
 
 @example
-DRIVER_SUBMAKEFILES=libs/cs2d/softx/x2d.mak libs/cs3d/soft/soft3d.mak
+PLUGINS_SUBMAKEFILES=plugins/video/canvas/softx/x2d.mak
+  plugins/video/renderer/soft/soft3d.mak
 @end example
 
 These submakefiles are included each time when @file{subs.mak} is included
@@ -188,13 +189,11 @@ submakefiles contained one level deep in the @file{libs/} directory (i.e.
 
 @example
 (~/CS)% ls libs/*/*.mak
-libs/cs2d/cs2d.mak              libs/csphyzik/csphyzik.mak
-libs/cs3d/cs3d.mak              libs/cssfxldr/cssfxldr.mak
-libs/csengine/csengine.mak      libs/cssys/cssys.mak
-libs/csgame/csgame.mak          libs/csterr/csterr.mak
-libs/csgeom/csgeom.mak          libs/cstools/cstools.mak
-libs/csgfxldr/csgfxldr.mak      libs/csutil/csutil.mak
-libs/csparser/csparser.mak
+libs/csengine/csengine.mak      libs/cssfxldr/cssfxldr.mak
+libs/csgame/csgame.mak          libs/cssys/cssys.mak
+libs/csgeom/csgeom.mak          libs/csterr/csterr.mak
+libs/csgfxldr/csgfxldr.mak      libs/cstools/cstools.mak
+libs/csobject/csobject.mak      libs/csutil/csutil.mak
 @end example
 
 Submakefiles for applications located last, using the search mask

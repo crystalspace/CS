@@ -26,7 +26,7 @@
 
 // Sets up graphics drivers -- Assumes DirectX 5 or later & DirectDraw 3D
 #include "cssys/win32/DirectDetection.h"
-#include "cs2d/ddraw/ig2d.h"
+#include "video/canvas/ddraw/ig2d.h"
 
 #include <windows.h>
 #include <windowsx.h>

@@ -223,9 +223,9 @@ exactly what is written there.  If that doesn't work, read on.
 Q. @emph{I get errors like the following:}
 
 @example
-libs\cs2d/ddraw61/ig2d.h(14) : error C2061:
+plugins\video\canvas\ddraw61\ig2d.h(14) : error C2061:
   syntax error : identifier 'LPDIRECTDRAW4'
-libs\cs2d/ddraw61/ig2d.h(16) : error C2061:
+plugins\video\canvas\ddraw61\ig2d.h(16) : error C2061:
   syntax error : identifier 'LPDIRECTDRAWSURFACE4'
 @end example
 

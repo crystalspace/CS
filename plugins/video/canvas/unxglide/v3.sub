@@ -17,7 +17,7 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: glidx2d3
 
-all plugins drivers drivers23: glidx2d3
+all plugins drivers drivers2d: glidx2d3
 
 glidx2d3:
 	$(MAKE_TARGET) MAKE_DLL=yes

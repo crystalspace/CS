@@ -12,7 +12,7 @@
 DESCRIPTION.os2wcc = OS/2 with Watcom C
 
 # Choose which drivers you want to build/use
-DRIVERS+=cs2d/csdive cs3d/software cssndrdr/software
+PLUGINS+=video/canvas/csdive video/renderer/software sound/renderer/software
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

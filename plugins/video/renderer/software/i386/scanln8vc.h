@@ -156,7 +156,7 @@ __asm   mov     _dest, edi                  \
       izz += dzz;                   \
     }                               \
     while (z_buffer <= lastZbuf)
-#include "cs3d/software/scanline.inc"
+#include "video/renderer/software/scanline.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -213,7 +213,7 @@ __asm   mov     izz, ebx  }             \
     uu = uu1;                           \
     vv = vv1;                           \
     z_buffer = sz_buffer;
-#include "cs3d/software/scanline.inc"
+#include "video/renderer/software/scanline.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -344,7 +344,7 @@ __asm   mov     ebp, oldEBP     /* Restore EBP*/ \
 __asm   mov     _dest, edi }    \
     uu = uu1;                   \
     vv = vv1;
-#include "cs3d/software/scanline.inc"
+#include "video/renderer/software/scanline.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -475,7 +475,7 @@ __asm   mov     ebp, oldEBP     /* Restore EBP*/ \
 __asm   mov     _dest, edi }    \
     uu = uu1;                   \
     vv = vv1;
-#include "cs3d/software/scanline.inc"
+#include "video/renderer/software/scanline.inc"
 
 #if defined (DO_MMX)
 
@@ -489,7 +489,7 @@ __asm   mov     _dest, edi }    \
 #define SCANMAP
 #define SCANLOOP I386_SCANLINE_MAP8
 #define SCANEND MMX_FILLZBUFFER
-#include "cs3d/software/scanline.inc"
+#include "video/renderer/software/scanline.inc"
 
 #undef SCANFUNC
 #undef SCANEND
@@ -509,7 +509,7 @@ __asm   mov     _dest, edi }    \
     }									\
     while (_dest <= _destend)
 #define SCANEND MMX_FILLZBUFFER
-#include "cs3d/software/scanline.inc"
+#include "video/renderer/software/scanline.inc"
 
 #endif // DO_MMX
 

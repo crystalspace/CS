@@ -8,7 +8,7 @@ ifeq ($(NEXT.FRIEND),yes)
 override DO_ASM=no
 
 # Choose which drivers you want to build/use
-DRIVERS+=cs2d/next cs3d/software cs3d/line
+PLUGINS+=video/canvas/next video/renderer/software video/renderer/line
 
 ifneq ($(NEXT.TARGET),)
   DESCRIPTION.$(NEXT.TARGET):=$(NEXT.DESCRIPTION)

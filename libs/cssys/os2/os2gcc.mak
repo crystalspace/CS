@@ -12,7 +12,7 @@
 DESCRIPTION.os2gcc = OS/2 with GCC/EMX
 
 # Choose which drivers you want to build/use
-DRIVERS += cs2d/csdive cs3d/software cs3d/line
+PLUGINS += video/canvas/csdive video/renderer/software video/renderer/line
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

@@ -23,7 +23,7 @@
 #include <sys/param.h>
 #include "sysdef.h"
 #include "isystem.h"
-#include "cs2d/openglbe/CrystGLWindow.h"
+#include "CrystGLWindow.h"
 #include "cssys/be/icsbe.h"
 
 CrystGLView::CrystGLView(BRect frame, iBeLibSystemDriver* isys) :

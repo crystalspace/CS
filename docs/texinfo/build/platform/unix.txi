@@ -147,7 +147,7 @@ Software with GGI
 @end itemize
 
 To compile those drivers edit @file{libs/cssys/unix/linux.mak} (or one of the
-other makfiles in that directory) and edit the @samp{DRIVERS} statement so
+other makfiles in that directory) and edit the @samp{PLUGINS} statement so
 that it mentions the drivers you wish to build.  Then do @samp{make all} again
 and register the new drivers.
 

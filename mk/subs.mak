@@ -1,5 +1,5 @@
 # This submakefile dynamically compute the name for all
-# driver, libs and apps submakefiles and includes them.
+# plugins, libs, and apps submakefiles and includes them.
 
 ifneq ($(TARGET_MAKEFILE),)
   include $(TARGET_MAKEFILE)
@@ -12,16 +12,8 @@ ifneq ($(LIBRARY_SUBMAKEFILES),)
   include $(LIBRARY_SUBMAKEFILES)
 endif
 
-ifeq ($(DRIVER_SUBMAKEFILES),)
-  DRIVER_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix libs/,$(sort $(DRIVERS)))))
-endif
-ifneq ($(DRIVER_SUBMAKEFILES),)
-  include $(DRIVER_SUBMAKEFILES)
-endif
-
 ifeq ($(PLUGINS_SUBMAKEFILES),)
   PLUGINS_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix plugins/,$(sort $(PLUGINS)))))
-  PLUGINS_SUBMAKEFILES += plugins/video/canvas/cs2d.mak plugins/video/renderer/cs3d.mak
 endif
 ifneq ($(PLUGINS_SUBMAKEFILES),)
   include $(PLUGINS_SUBMAKEFILES)
@@ -47,4 +39,3 @@ endif
 ifneq ($(COMPOSITE_SUBMAKEFILES),)
   include $(COMPOSITE_SUBMAKEFILES)
 endif
-

@@ -4,10 +4,11 @@
 DESCRIPTION.borland = Windows with Borland
 
 # Choose which drivers you want to build/use
-# cs2d/ddraw6 cs2d/openglwin cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
+# video/canvas/ddraw6 video/canvas/openglwin video/renderer/direct3d5 
+# video/renderer/direct3d6 video/renderer/opengl
 #
-DRIVERS+=cs2d/ddraw cs3d/software cssndrdr/software cs3d/opengl \
-  cs2d/openglwin cs3d/direct3d5
+PLUGINS+=video/canvas/ddraw video/renderer/software cssndrdr/software \
+  video/renderer/opengl video/canvas/openglwin video/renderer/direct3d5
 
 # Uncomment the following to get an startup console window
 #CONSOLE_FLAGS = -DWIN32_USECONSOLE

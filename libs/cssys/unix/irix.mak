@@ -5,12 +5,12 @@
 DESCRIPTION.irix = IRIX
 
 # Choose which drivers you want to build/use
-PLUGINS+=cs2d/softx cs3d/software cssndrdr/software
+PLUGINS+=video/canvas/softx video/renderer/software sound/renderer/software
 
 # uncomment the following to build GGI 2D driver
-#PLUGINS+=cs2d/ggi
+#PLUGINS+=video/canvas/ggi
 # uncomment the following to build OpenGL stuff
-PLUGINS+=cs3d/opengl cs2d/openglx
+PLUGINS+=video/renderer/opengl video/canvas/openglx
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

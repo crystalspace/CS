@@ -12,35 +12,35 @@ This section provides a list of drivers which are bundled with Crystal Space.
 
 @itemize @bullet
 @item
-@emph{3D Rasterizer} (component: cs3d) This component is required by the
-3D Engine but is also useful standalone.  It needs a 2D Driver.  There
-are currently several implementations of this component: Software,
-OpenGL, Glide, and Direct3D.
+@emph{3D Rasterizer} (component: video/renderer) This component is required by
+the 3D Engine but is also useful standalone.  It needs a 2D Driver.  There are
+currently several implementations of this component: Software, OpenGL, Glide,
+and Direct3D.
 
 @item
-@emph{2D Driver} (component: cs2d) This component manages the creation
-of the Crystal Space window used for rendering and also supports limited
-2D drawing capabilities (including 2D sprites).  It can be used
-standalone but it is currently very limited and not very useful (may
-change in the future).  There are several implementations of this
-component.  All are specific to some 3D Rasterizer (for example, the
-OpenGL 3D Rasterizer on Unix requires the OpenGL 2D XLib Driver).
+@emph{2D Driver} (component: video/canvas) This component manages the creation
+of the Crystal Space window used for rendering and also supports limited 2D
+drawing capabilities (including 2D sprites).  It can be used standalone but it
+is currently very limited and not very useful (may change in the future).
+There are several implementations of this component.  All are specific to some
+3D Rasterizer (for example, the OpenGL 3D Rasterizer on Unix requires the
+OpenGL 2D XLib Driver).
 
 @item
-@emph{Sound Driver} (component: cssnddrv) System dependent sound
+@emph{Sound Driver} (component: sound/driver) System dependent sound
 drivers.  There are currently drivers for Macintosh, @sc{oss}
 (Linux), and Windows.
 
 @item
-@emph{Sound Renderer} (component: cssndrdr) System dependent sound
+@emph{Sound Renderer} (component: sound/renderer) System dependent sound
 renderers.  There are currently renderers for a3d, ds3d, eax, and
 software.
 
 @item
-@emph{Network Driver} (component: csnetdrv) System dependent network
+@emph{Network Driver} (component: net/driver) System dependent network
 drivers.  There is currently only a sockets driver.
 
 @item
-@emph{Network Manager} (component: csnetman) System dependent network
+@emph{Network Manager} (component: net/manager) System dependent network
 managers.  There is currently only a simple manager.
 @end itemize

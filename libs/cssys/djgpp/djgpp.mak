@@ -5,12 +5,12 @@
 # Friendly names for building environment
 DESCRIPTION.djgpp = DOS with DJGPP
 
-DRIVERS+=cs3d/software
+PLUGINS+=video/renderer/software
 
 ifeq ($(USE_ALLEGRO),yes)
-  DRIVERS += cs2d/alleg2
+  PLUGINS += video/canvas/alleg2
 else
-  DRIVERS += cs2d/dosraw
+  PLUGINS += video/canvas/dosraw
 endif
 
 #---------------------------------------------------- rootdefines & defines ---#

@@ -46,15 +46,15 @@ than actually linking with a library.
 
 @itemize @minus
 @item
-@code{cs2d}
+@code{video/canvas}
 @item
-@code{cs3d}
+@code{video/renerer}
 @item
-@code{csnetdrv}
+@code{network/driver}
 @item
-@code{cssnddrv}
+@code{sound/driver}
 @item
-@code{cssndrdr}
+@code{sound/renderer}
 @end itemize
 
 @item Level 4: @emph{Engine---Binds Togehter Engines Components}

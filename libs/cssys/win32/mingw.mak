@@ -5,12 +5,12 @@ DESCRIPTION.mingw = Win32 with Mingw GCC
 
 
 # Choose which drivers you want to build/use
-# cs2d/ddraw6 cs2d/ddraw cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
+# video/canvas/ddraw6 video/canvas/ddraw video/renderer/direct3d5
+# video/renderer/direct3d6 video/renderer/opengl
 #
-DRIVERS+= cs2d/ddraw cs3d/software
-#  csnetdrv/null csnetman/null csnetman/simple \
-#  cssnddrv/null cssndrdr/null cssndrdr/software \
-# cs2d/ddraw6 cs2d/ddraw cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
+PLUGINS+= video/canvas/ddraw video/renderer/software
+# sound/renderer/software video/canvas/ddraw video/renderer/direct3d5 \
+# video/renderer/direct3d6 video/renderer/opengl
 #
 #  Uncomment the following to get a startup console window
 #CONSOLE_FLAGS = -DWIN32_USECONSOLE

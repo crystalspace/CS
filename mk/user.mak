@@ -27,8 +27,9 @@ endif
 # Default list of plugins to build
 # Note that you'll link all plugins into executable in the case of static build
 ifndef PLUGINS
-  PLUGINS=cscon csclear dungeon net/driver/socket net/netman netspace/nstp \
-    netspace/nsmgr $(DETECTED_PLUGINS)
+  PLUGINS=video/canvas video/renderer cscon csclear dungeon \
+    net/driver/socket net/netman \
+    netspace/nstp netspace/nsmgr $(DETECTED_PLUGINS)
 endif
 
 # Should we use NASM for assembly?
