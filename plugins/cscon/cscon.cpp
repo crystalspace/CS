@@ -16,9 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
 #include "cssysdef.h"
 #include "iconsole.h"
 #include "igraph2d.h"
