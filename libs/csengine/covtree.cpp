@@ -18,13 +18,13 @@
 
 #include "sysdef.h"
 #include "csgeom/math2d.h"
+#include "csengine/covmask.h"
 #include "csengine/covtree.h"
-#include "csengine/covtreep.h"
 #include "igraph2d.h"
 
 //---------------------------------------------------------------------------
 
-csCovMaskLUT* lut;
+static csCovMaskLUT* lut = NULL;
 
 // These defines test bit 0 of a mask.
 #define INSIDE(imsk) ((imsk & 1) == 1)
@@ -33,8 +33,48 @@ csCovMaskLUT* lut;
 #define NOT_OUTSIDE(omsk) ((omsk & 1) == 0)
 #define PARTIAL(imsk,omsk) ((imsk & 1) == 0 && (omsk & 1) == 0)
 
+/**
+ * This templated class represents a node in the coverage
+ * mask tree. It is templated because we don't want to use
+ * any pointers. So we need to be able to nest classes and
+ * this be done comfortably with the template approach
+ * used below.  Maintenance note: Each method within this
+ * class is defined inline within the class definition itself
+ * in order to trick the NextStep 3.3 compiler into generating
+ * linkable code.  If they are not defined in this manner, then
+ * the compiler fails to emit the actual implementations, which
+ * results in "undefined symbol" errors at link time.
+ */
 template <class Child>
-bool csCovTreeNode<Child>::TestPolygonNotEmpty (csVector2* poly, int num_poly,
+class csCovTreeNode : public csCovMaskTriage
+{
+private:
+  /**
+   * The children of this node.
+   * For every bit in the mask there is one child.
+   */
+  Child children[CS_CM_BITS];
+
+public:
+  /// Return the horizontal/vertical number of pixels for this node.
+  static int GetPixelSize ()
+  {
+    return Child::GetPixelSize ()*csCovMaskTriage::GetPixelSize ();
+  }
+
+  /// Return the horizontal/vertical number of pixels for this node (shift).
+  static int GetPixelShift ()
+  {
+    return Child::GetPixelShift ()+csCovMaskTriage::GetPixelShift ();
+  }
+
+/**
+ * Test if a polygon is not empty for the given area on the
+ * coverage mask tree without actually looking at the contents
+ * of the tree. This is useful for testing polygon in empty
+ * parts of the tree which are not defined.
+ */
+bool TestPolygonNotEmpty (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs) const
 {
@@ -107,8 +147,13 @@ again:
   return false;
 }
 
-template <class Child>
-bool csCovTreeNode<Child>::TestPolygon (csVector2* poly, int num_poly,
+/**
+ * Test a polygon against this node (and children).
+ * Returns true if polygon is visible.
+ * hor_offs, and ver_offs are the offset for the (0,0) corner
+ * of the node.
+ */
+bool TestPolygon (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs) const
 {
@@ -209,8 +254,15 @@ again:
   return false;
 }
 
-template <class Child>
-bool csCovTreeNode<Child>::UpdatePolygon (csVector2* poly, int num_poly,
+/**
+ * Update this node and all children to a polygon.
+ * This function is similar to InsertPolygon() but it does
+ * not look at the old contents of the node and children.
+ * Instead it assumes the old contents was empty.
+ * This function returns false if the polygon mask for
+ * the top-level node was empty and true otherwise.
+ */
+bool UpdatePolygon (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs)
 {
@@ -339,8 +391,12 @@ again:
   return modified;
 }
 
-template <class Child>
-bool csCovTreeNode<Child>::UpdatePolygonInverted (csVector2* poly, int num_poly,
+/**
+ * This function is similar to UpdatePolygon() but it
+ * inverts the polygon mask first. So it has the effect
+ * of updating for the inverted polygon.
+ */
+bool UpdatePolygonInverted (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs)
 {
@@ -473,8 +529,13 @@ again:
 }
 
 
-template <class Child>
-bool csCovTreeNode<Child>::InsertPolygon (csVector2* poly, int num_poly,
+/**
+ * Insert a polygon in this node (and children).
+ * Returns true if polygon was visible (i.e. tree is modified).
+ * hor_offs, and ver_offs are the offset for the (0,0) corner
+ * of the node.
+ */
+bool InsertPolygon (csVector2* poly, int num_poly,
 	csCovEdgeInfo* edges,
 	int hor_offs, int ver_offs)
 {
@@ -652,9 +713,11 @@ again:
   return modified;
 }
 
-template <class Child>
-void csCovTreeNode<Child>::GfxDump (iGraphics2D* ig2d, int level,
-	int hor_offs, int ver_offs)
+/**
+ * Do a graphical dump of the coverage mask tree
+ * upto the specified level.
+ */
+void GfxDump (iGraphics2D* ig2d, int level, int hor_offs, int ver_offs)
 {
   // Scan all bits of the mask and dump them.
   csMask msk_in = in;
@@ -680,7 +743,7 @@ again:
     {
       for (c = 0 ; c < Child::GetPixelSize () ; c++)
         for (r = 0 ; r < Child::GetPixelSize () ; r++)
-      	  ig2d->DrawPixel (new_hor_offs+c, ig2d->GetHeight ()-1024+ (new_ver_offs+r), ~0);
+      	  ig2d->DrawPixel (new_hor_offs+c, ig2d->GetHeight ()-1024+ (new_ver_offs+r), 0x7fff);
     }
     else if (OUTSIDE (msk_out))
     {
@@ -710,10 +773,10 @@ again:
     {
       for (c = 0 ; c < Child::GetPixelSize () ; c++)
       	ig2d->DrawPixel (new_hor_offs+c,
-		ig2d->GetHeight ()-1024+ (new_ver_offs+Child::GetPixelSize ()-1), 0xaaaa);
+		ig2d->GetHeight ()-1024+ (new_ver_offs+Child::GetPixelSize ()-1), 0x2aaa);
       for (r = 0 ; r < Child::GetPixelSize () ; r++)
         ig2d->DrawPixel (new_hor_offs+Child::GetPixelSize ()-1,
-		ig2d->GetHeight ()-1024+ (new_ver_offs+r), 0xaaaa);
+		ig2d->GetHeight ()-1024+ (new_ver_offs+r), 0x2aaa);
     }
 
     // Go to next bit.
@@ -736,8 +799,13 @@ again:
 # endif
 }
 
-template <class Child>
-void csCovTreeNode<Child>::MakeInvalid ()
+/**
+ * Make this tree invalid. This will set the state of
+ * this node to 'invalid' and also the state of all children.
+ * This can be used for debugging purposes but serves no other
+ * useful purpose.
+ */
+void MakeInvalid ()
 {
   int i;
 
@@ -746,8 +814,18 @@ void csCovTreeNode<Child>::MakeInvalid ()
   csCovMaskTriage::MakeInvalid ();
 }
 
-template <class Child>
-bool csCovTreeNode<Child>::TestConsistency (int hor_offs, int ver_offs) const
+/**
+ * Test consistancy for this node. Consistance can be broken
+ * in the following cases:<br>
+ * <ul>
+ * <li>Mask is invalid.
+ * <li>A bit is partial while the corresponding child isn't.
+ * </ul>
+ * The results are printed on standard output.
+ * This function returns false if it found an error. In that case
+ * it will stop searching for further errors.
+ */
+bool TestConsistency (int hor_offs, int ver_offs) const
 {
   if (IsInvalid ())
   {
@@ -809,6 +887,85 @@ bit says it should be partial!\n", idx, hor_offs, ver_offs,
   return true;
 }
 
+}; // end class csCovTreeNode
+
+//-------------------------------------------------------------------
+
+/**
+ * A subclass of csCovMask also implementing
+ * TestPolygon/InsertPolygon.
+ */
+class csCovTreeNode0 : public csCovMask
+{
+public:
+  /**
+   * Test a polygon against this node.
+   * Returns true if polygon is visible.
+   * hor_offs, and ver_offs are the offset for the (0,0) corner
+   * of the node.
+   */
+  bool TestPolygon (csVector2* poly, int num_verts,
+	csCovEdgeInfo* edges,
+  	int hor_offs, int ver_offs) const;
+
+  /**
+   * Insert a polygon in this node.
+   * Returns true if polygon was visible (i.e. mask is modified).
+   * hor_offs, and ver_offs are the offset for the (0,0) corner
+   * of the node.
+   */
+  bool InsertPolygon (csVector2* poly, int num_verts,
+	csCovEdgeInfo* edges,
+  	int hor_offs, int ver_offs);
+
+  /**
+   * Update this node to a mask.
+   * This function is similar to InsertPolygon() but it does
+   * not look at the old contents of the node.
+   * Instead it assumes the old contents was empty.
+   * This function returns false if the polygon mask for
+   * the top-level node was empty and true otherwise.
+   */
+  bool UpdatePolygon (csVector2* poly, int num_verts,
+	csCovEdgeInfo* edges,
+  	int hor_offs, int ver_offs);
+
+  /**
+   * This function is similar to UpdatePolygon() but it
+   * inverts the polygon mask first. So it has the effect
+   * of updating for the inverted polygon.
+   */
+  bool UpdatePolygonInverted (csVector2* poly, int num_verts,
+	csCovEdgeInfo* edges,
+  	int hor_offs, int ver_offs);
+  /**
+   * Test if a polygon is not empty for the given area on the
+   * coverage mask tree without actually looking at the contents
+   * of the tree. This is useful for testing polygon in empty
+   * parts of the tree which are not defined.
+   */
+  bool TestPolygonNotEmpty (csVector2* poly, int num_verts,
+	csCovEdgeInfo* edges,
+  	int hor_offs, int ver_offs) const;
+
+  /**
+   * Make this node invalid. This is a do-nothing function
+   * here because a csCovMask does not have an invalid state.
+   */
+  void MakeInvalid () { }
+
+  /**
+   * Test consistancy for this node. This is an empty function
+   * as a csCovMask cannot be inconsistant.
+   */
+  bool TestConsistency (int, int) const { return true; }
+
+  /**
+   * Do a graphical dump of the coverage mask tree
+   * upto the specified level.
+   */
+  void GfxDump (iGraphics2D* ig2d, int level, int hor_offs, int ver_offs);
+};
 
 //-------------------------------------------------------------------
 
@@ -952,7 +1109,7 @@ again:
     {
       col = idx & CS_CM_DIMMASK;
       row = idx >> CS_CM_DIMSHIFT;
-      ig2d->DrawPixel (hor_offs+col, ig2d->GetHeight () - 1024+ (ver_offs+row), ~0);
+      ig2d->DrawPixel (hor_offs+col, ig2d->GetHeight () - 1024+ (ver_offs+row), 0x7fff);
     }
 
     // Go to next bit.
@@ -972,7 +1129,15 @@ again:
 # endif
 }
 
-void calc_size ()
+//---------------------------------------------------------------------------
+
+typedef csCovTreeNode<csCovTreeNode0> csCovTreeNode1;
+typedef csCovTreeNode<csCovTreeNode1> csCovTreeNode2;
+typedef csCovTreeNode<csCovTreeNode2> csCovTreeNode3;
+typedef csCovTreeNode<csCovTreeNode3> csCovTreeNode4;
+typedef csCovTreeNode<csCovTreeNode4> csCovTreeNode5;
+
+static void calc_size ()
 {
 printf ("1: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode1), csCovTreeNode1::GetPixelSize (), csCovTreeNode1::GetPixelSize ());
 printf ("2: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode2), csCovTreeNode2::GetPixelSize (), csCovTreeNode2::GetPixelSize ());
@@ -980,8 +1145,6 @@ printf ("3: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode3), csCovTreeNode
 printf ("4: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode4), csCovTreeNode4::GetPixelSize (), csCovTreeNode4::GetPixelSize ());
 printf ("5: %lu (%dx%d)\n", (unsigned long)sizeof(csCovTreeNode5), csCovTreeNode5::GetPixelSize (), csCovTreeNode5::GetPixelSize ());
 }
-
-//---------------------------------------------------------------------------
 
 csCoverageMaskTree::csCoverageMaskTree (csCovMaskLUT* lut, const csBox& box)
 {
