@@ -451,7 +451,7 @@ bool csConfigFile::Save(const char *file, iVFS *vfs)
 
   // look if we are trying to save to 'our' file. This is only a rough
   // check and will not detect if these are the same files in all cases.
-  if (strcmp(Filename, file)==0 && VFS==vfs)
+  if (Filename && strcmp(Filename, file)==0 && VFS==vfs)
   {
     if (!Dirty) return true;
     Dirty = false;
