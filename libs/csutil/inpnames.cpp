@@ -240,11 +240,11 @@ bool csParseKeyDef (const char* str, utf32_char* rawCode,
   return true;
 }
 
-static const char* GetModifierStr (int num, int type)
+static const char* GetModifierStr (uint num, uint type)
 {
   for (csKeyModDef* md = KeyModifiers; md->key != 0; md++)
   {
-    if (md->code == (utf32_char)CSKEY_MODIFIER (num, type))
+    if (md->code == CSKEY_MODIFIER (num, type))
     {
       return md->key;
     }
@@ -259,14 +259,14 @@ csString csGetKeyDesc (utf32_char code, const csKeyModifiers* modifiers,
 
   if (modifiers)
   {
-    for (int m = 0; m < csKeyModifierTypeLast; m++)
+    for (uint m = 0; m < csKeyModifierTypeLast; m++)
     {
       if (modifiers->modifiers[m] == 0) continue;
 
       if (distinguishModifiers && 
 	((modifiers->modifiers[m] & 0x80000000) == 0))
       {
-	for (int t = 0; t < csKeyModifierNumAny; t++)
+	for (uint t = 0; t < csKeyModifierNumAny; t++)
 	{
 	  if (modifiers->modifiers[m] & (1 << t))
 	  {
@@ -306,7 +306,7 @@ csString csGetKeyDesc (utf32_char code, const csKeyModifiers* modifiers,
 
   if (keySize == 0) return "";
   keyStr[keySize] = 0;
-  ret << keyStr;
+  ret << (char*)keyStr;
 
   return ret;
 }

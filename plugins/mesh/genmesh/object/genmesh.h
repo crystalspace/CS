@@ -25,6 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "csutil/hashmap.h"
+#include "csutil/hash.h"
 #include "csutil/garray.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
@@ -36,6 +37,7 @@
 #include "csgeom/objmodel.h"
 #include "igeom/polymesh.h"
 #include "iengine/shadcast.h"
+#include "iengine/light.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
 #include "cstool/anonrndbuf.h"
@@ -48,6 +50,7 @@ struct iCacheManager;
 struct iEngine;
 class csGenmeshMeshObjectFactory;
 class csGenmeshMeshObjectType;
+class csGenmeshMeshObject;
 class csColor;
 class csPolygonMesh;
 class G3DFogInfo;
@@ -61,7 +64,7 @@ public:
   iLight* light;
   csShadowArray* next;
   // For every vertex of the mesh a value.
-  uint8* shadowmap;
+  float* shadowmap;
 
   csShadowArray () : shadowmap (0) { }
   ~csShadowArray ()
@@ -100,13 +103,15 @@ private:
 
   csColor* lit_mesh_colors;
   int num_lit_mesh_colors;	// Should be equal to factory number.
+  csColor* static_mesh_colors;
   /// Dynamic ambient light assigned to this genmesh.
   csColor dynamic_ambient;
   uint32 ambient_version;
+  csHash<csShadowArray*, iLight*> pseudoDynInfo;
 
   // If we are using the iLightingInfo lighting system then this
   // is an array of lights that affect us right now.
-  csHashSet affecting_lights;
+  csSet<iLight*> affecting_lights;
   // If the following flag is dirty then some of the affecting lights
   // has changed and we need to recalculate.
   bool lighting_dirty;
@@ -130,12 +135,20 @@ private:
   long cur_movablenr;
 
   /**
+   * Clears out the pseudoDynInfo hash and frees the memory allocated by the
+   * shadow maps.
+   */
+  void ClearPseudoDynLights ();
+
+  /**
    * Setup this object. This function will check if setup is needed.
    */
   void SetupObject ();
 
   /**
    * Make sure the 'lit_mesh_colors' array has the right size.
+   * Also clears the pseudo-dynamic light hash if the vertex count
+   * changed!
    */
   void CheckLitColors ();
 
@@ -149,7 +162,6 @@ private:
    * Update lighting using the iLightingInfo system.
    */
   void UpdateLighting2 (iMovable* movable);
-
 public:
   /// Constructor.
   csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory);
@@ -183,6 +195,8 @@ public:
   void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
     	const csVector3& origin);
   void CastShadows (iMovable* movable, iFrustumView* fview);
+  void FinalizeLighting (iMovable* movable, iLight* light,
+    const csArray<bool>& influences);
   void DynamicLightChanged (iDynLight* dynlight);
   void DynamicLightDisconnect (iDynLight* dynlight);
   void StaticLightChanged (iStatLight* statlight);
