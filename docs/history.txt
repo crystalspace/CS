@@ -42,9 +42,10 @@ The history order is reversed so that new features are at the top.
 	  to be not useful on MacOS/X. At least the optimization to
 	  DrawPolygonSingleTexture helped.
 	- Optimized thing smoothing a little.
-	- Matze changed plugin linking flags on unix to use -shared instead of
-	  -Wl,-shared as this seems to fix some problems with unresolved
-	  problems on some linux boxes.
+	- Matze applied a patch to unix.mak to work around problem with
+	  recent Gentoo Linux in which some libc symbols were not resolved when
+	  loading plugin modules.  Specifically, LFLAGS.DLL now sends -shared
+	  directly to gcc (g++) rather than to the linker (-Wl,-shared).
 	- Matze fixed a typo in netmtest makefile.
 15-Mar-2003
 	- Greg Block fixed lightmap loading and saving on
