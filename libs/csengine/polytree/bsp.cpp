@@ -226,12 +226,22 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
   return poly_idx;
 }
 
+#define BSPDB 0
+
+#if BSPDB
+#  define DB(msg) CsPrintf##msg;
+#else
+#  define DB(msg)
+#endif
+
 void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
 	int num)
 {
+DB((MSG_DEBUG_0, "csBspTree::Build (num=%d)\n", num))
   int i;
   if (!Covers (polygons, num))
   {
+DB((MSG_DEBUG_0, "  polygons_on_splitter=false\n"))
     // We have a convex set.
     node->polygons_on_splitter = false;
     for (i = 0 ; i < num ; i++)
@@ -241,6 +251,8 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
 
   csPolygonInt* split_poly = polygons[SelectSplitter (polygons, num)];
   node->splitter = *(split_poly->GetPolyPlane ());
+DB((MSG_DEBUG_0, "  splitter plane=%f,%f,%f,%f\n", node->splitter.A (),
+	node->splitter.B (), node->splitter.C (), node->splitter.D ()))
 
   // Now we split the node according to the plane of that polygon.
   csPolygonInt** front_poly = new csPolygonInt* [num];
@@ -250,6 +262,16 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
   for (i = 0 ; i < num ; i++)
   {
     int c = polygons[i]->Classify (node->splitter);
+DB((MSG_DEBUG_0, "  classify polygon %d -> %d\n", i, c))
+#if BSPDB
+{
+int j;
+csPolygon3D* p = (csPolygon3D*)polygons[i];
+for (j = 0 ; j < p->GetNumVertices () ; j++)
+CsPrintf (MSG_DEBUG_0, "    %d: %f,%f,%f\n", j, p->Vwor (j).x,
+p->Vwor (j).y, p->Vwor (j).z);
+}
+#endif
     switch (c)
     {
       case POL_SAME_PLANE:
