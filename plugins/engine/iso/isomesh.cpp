@@ -183,6 +183,52 @@ public:
   {
     mesh.do_fog = false;
   }
+  virtual bool TestBSphere (const csReversibleTransform& o2c,
+	const csSphere& sphere)
+  {
+    csSphere tr_sphere = o2c.Other2This (sphere);
+    const csVector3& tr_center = tr_sphere.GetCenter ();
+    float radius = tr_sphere.GetRadius ();
+
+    float sx = fakecam->GetShiftX ();
+    float sy = fakecam->GetShiftY ();
+    float inv_fov = fakecam->GetInvFOV ();
+    const csRect& rect = isorview->GetView()->GetRect();
+    float xmin = (rect.xmin - sx) * inv_fov;
+    float ymin = (rect.ymin - sy) * inv_fov;
+    float xmax = (rect.xmax - sx) * inv_fov;
+    float ymax = (rect.ymax - sy) * inv_fov;
+    /// test if chance that we must clip to a portal -> or the Toplevel clipper
+    /// better: only if it crosses that.
+    bool outside = true, inside = true;
+    csVector3 v1 (xmin, ymin, 1);
+    csVector3 v2 (xmax, ymin, 1);
+    float dist = csVector3::Unit (v1 % v2) * tr_center;
+    if ((-dist) <= radius)
+    {
+      if (dist < radius) inside = false;
+      csVector3 v3 (xmax, ymax, 1);
+      dist = csVector3::Unit (v2 % v3) * tr_center;
+      if ((-dist) <= radius)
+      {
+        if (dist < radius) inside = false;
+        v2.Set (xmin, ymax, 1);
+        dist = csVector3::Unit (v3 % v2) * tr_center;
+        if ((-dist) <= radius)
+        {
+          if (dist < radius) inside = false;
+          dist = csVector3::Unit (v2 % v1) * tr_center;
+          if ((-dist) <= radius)
+	  {
+	    outside = false;
+            if (dist < radius) inside = false;
+	  }
+        }
+      }
+    }
+    if (outside) return false;
+    return true;
+  }
   virtual bool ClipBSphere (const csReversibleTransform& o2c,
 	const csSphere& sphere,
 	int& clip_portal, int& clip_plane, int& clip_z_plane)
