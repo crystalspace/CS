@@ -158,9 +158,9 @@ available for the adventurous.
 @file{wkstypical.dsw} --- Builds the typical modules needed by most users of
 Crystal Space.
 
-@item
-@file{wksall.dsw} --- Builds all modules, even the experimental ones.
-
+@c @item
+@c @file{wksall.dsw} --- Builds all modules, even the experimental ones.
+@c 
 @item
 @file{wksnewrenderer.dsw} --- Same as @file{wkstypical.dsw}, but builds the new
 experimental renderer, rather than the old one.  When using this workspace, you

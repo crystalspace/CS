@@ -151,9 +151,9 @@ are available for the adventurous.
 @file{wkstypical.sln} --- Builds the typical modules needed by most users of
 Crystal Space.
 
-@item
-@file{wksall.sln} --- Builds all modules, even the experimental ones.
-
+@c @item
+@c @file{wksall.sln} --- Builds all modules, even the experimental ones.
+@c 
 @item
 @file{wksnewrenderer.sln} --- Same as @file{wkstypical.sln}, but builds the new
 experimental renderer, rather than the old one.  When using this workspace, you

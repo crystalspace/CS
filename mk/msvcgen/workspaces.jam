@@ -20,7 +20,7 @@
 #==============================================================================
 
 # Everything.
-MsvcGenWorkspace all : : "grp.+_(?!all\.)" ;
+# MsvcGenWorkspace all : : "grp.+_(?!all\.)" ;
 
 # What the typical user will need. Presently, everything but the new renderer.
 MsvcGenWorkspace typical : :

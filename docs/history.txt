@@ -10,6 +10,14 @@ chronological order.
 	- Eric Sunshine updated references to the SourceForge CVS server in the
 	  user manual from cvs.crystal.sourceforge.net to cvs.sourceforge.net
 	  since the former address no longer works.
+	- Eric Sunshine disabled generation of the MSVC wksall workspace for
+	  now since it generally just confused people who failed to read the
+	  manual to learn that they should be using wkstypical.  Also, wksall
+	  was not providing any specific benefit at this time since we do not
+	  presently have any experimental modules (those which would not appear
+	  in wkstypical).  Anyhow, experimental modules ought probably populate
+	  a wksexperimental workspace, which would be much less confusing for
+	  non-manual-reading users.
 24-May-2004
 	- Jorrit added a proper copy constructor to csHashMapReversible.
 	  Without that copy constructor doing a copy of such a hashmap
