@@ -250,4 +250,3 @@ float csSoundBufferDS3D::GetFrequencyFactor()
 	}
 
 	return factor;
-}

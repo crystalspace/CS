@@ -102,33 +102,33 @@ csSimpleConsole::csSimpleConsole (csIniFile *iConfig, csSimpleCommand* pc) : com
   else if (LineMessageMax >= LineMax)
     LineMessageMax = LineMax-1;
 
-  CHK (LineMessage = new char * [LineMessageMax]);
-  CHK (LinesChanged = new bool [LineMessageMax]);
+  LineMessage = new char * [LineMessageMax];
+  LinesChanged = new bool [LineMessageMax];
   for (i = 0; i < LineMessageMax; i++)
   {
-    CHK (LineMessage [i] = new char [SIZE_LINE]);
+    LineMessage [i] = new char [SIZE_LINE];
     LineMessage [i][0] = '\0';
     LinesChanged [i] = true;
   }
   LineMessageNumber = 0;
 
-  CHK (Line = new char * [LineMax]);
+  Line = new char * [LineMax];
   for (i = 0; i < LineMax; i++)
   {
-    CHK (Line [i] = new char [SIZE_LINE]);
+    Line [i] = new char [SIZE_LINE];
     Line [i][0] = '\0';
   }
   LineNumber = 0;
 
-  CHK (LineCommand = new char [SIZE_LINE]);
+  LineCommand = new char [SIZE_LINE];
   LineCommand [0] = '\0';
   LineCommandMax = SIZE_LINE - 1;
   LineCommandCount = 0;
 
-  CHK (History = new char * [HistoryMax]);
+  History = new char * [HistoryMax];
   for (i = 0; i < HistoryMax; i++)
   {
-    CHK (History [i] = new char[SIZE_LINE]);
+    History [i] = new char[SIZE_LINE];
     History [i][0] = '\0';
   }
   HistoryCount = 0;
@@ -145,25 +145,25 @@ csSimpleConsole::~csSimpleConsole ()
   int i;
 
   for (i = 0; i < LineMessageMax; i++)
-    CHKB (delete [] LineMessage [i]);
-  CHK (delete [] LineMessage);
+    delete [] LineMessage [i];
+  delete [] LineMessage;
 
   if (Line)
   {
     for (i = 0; i < LineMax; i++)
-      CHKB (delete [] Line [i]);
-    CHK (delete [] Line);
+      delete [] Line [i];
+    delete [] Line;
   }
 
   if (History)
   {
     for (i = 0; i < HistoryMax; i++)
-      CHKB (delete [] History [i]);
-    CHK (delete [] History);
+      delete [] History [i];
+    delete [] History;
   }
 
-  CHK (delete [] LineCommand);
-  CHK (delete [] LinesChanged);
+  delete [] LineCommand;
+  delete [] LinesChanged;
 }
 
 void csSimpleConsole::SetTransparent (int t)
@@ -180,10 +180,10 @@ void csSimpleConsole::SetMaxLines (int ml)
 
   // First remove the old messages
   for (i = 0; i < LineMessageMax; i++)
-    CHKB (delete [] LineMessage[i]);
-  CHK (delete [] LineMessage);
+    delete [] LineMessage[i];
+  delete [] LineMessage;
 
-  CHK (delete [] LinesChanged);
+  delete [] LinesChanged;
 
   if (ml == -1)
     LineMessageMax = config->GetInt ("SimpleConsole", "LINEMAX", 4);
@@ -193,11 +193,11 @@ void csSimpleConsole::SetMaxLines (int ml)
     LineMessageMax = LineMax-1;
 
   // Allocate new messages.
-  CHK (LineMessage = new char * [LineMessageMax]);
-  CHK (LinesChanged = new bool [LineMessageMax]);
+  LineMessage = new char * [LineMessageMax];
+  LinesChanged = new bool [LineMessageMax];
   for (i = 0; i < LineMessageMax; i++)
   {
-    CHK (LineMessage [i] = new char [SIZE_LINE]);
+    LineMessage [i] = new char [SIZE_LINE];
     LineMessage [i][0] = '\0';
     LinesChanged[i] = true;
   }

@@ -145,15 +145,15 @@ WalkTest::~WalkTest ()
 {
   if (World)
     World->DecRef ();
-  CHK (delete wf);
-  CHK (delete [] auto_script);
-  CHK (delete layer);
-  CHK (delete view);
-  CHK (delete infinite_maze);
-  CHK (delete huge_room);
-  CHK (delete cslogo);
-  CHK (delete body);
-  CHK (delete legs);
+  delete wf;
+  delete [] auto_script;
+  delete layer;
+  delete view;
+  delete infinite_maze;
+  delete huge_room;
+  delete cslogo;
+  delete body;
+  delete legs;
 }
 
 void WalkTest::SetSystemDefaults (csIniFile *Config)
@@ -224,8 +224,8 @@ void WalkTest::SetSystemDefaults (csIniFile *Config)
 
   if ((val = GetOptionCL ("exec")))
   {
-    CHK (delete [] auto_script);
-    CHK (auto_script = strnew (val));
+    delete [] auto_script;
+    auto_script = strnew (val);
   }
 }
 
@@ -755,7 +755,7 @@ void cleanup ()
   Sys->console_out ("Cleaning up...\n");
   free_keymap ();
   Sys->EndWorld ();
-  CHK (delete Sys); Sys = NULL;
+  delete Sys; Sys = NULL;
 }
 
 void start_console ()
@@ -783,7 +783,7 @@ void start_console ()
 
 void WalkTest::EndWorld ()
 {
-  CHK (delete view); view = NULL;
+  delete view; view = NULL;
 }
 
 void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
@@ -796,12 +796,12 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     sn--;
     csSector* sp = (csSector*)world->sectors[sn];
     // Initialize the sector itself.
-    CHK((void)new csRAPIDCollider(*sp, sp));
+    (void)new csRAPIDCollider(*sp, sp);
     // Initialize the things in this sector.
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
-      CHK((void)new csRAPIDCollider(*tp, tp));
+      (void)new csRAPIDCollider(*tp, tp);
       tp = (csThing*)(tp->GetNext ());
     }
   }
@@ -816,7 +816,7 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     spp = (csSprite3D*)sp;
 
     // TODO: Should create beings for these.
-    CHK((void)new csRAPIDCollider(*spp, spp));
+    (void)new csRAPIDCollider(*spp, spp);
   }
 
   // Create a player object that follows the camera around.
@@ -850,11 +850,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   cfg_legs_offset = Config->GetFloat ("CD", "LEGSOFFSET", -1.1);
 
   //--- create the converter class for testing
-  CHK (ImportExport = new converter());
+  ImportExport = new converter();
   // process import/export files from config and print log for testing
   ImportExport->ProcessConfig (Config);
   // free memory - delete this if you want to use the data in the buffer
-  CHK (delete ImportExport);
+  delete ImportExport;
   //--- end converter test
 
 #ifdef CS_DEBUG
@@ -875,7 +875,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   }
 
   // Create console object for text and commands.
-  CHK (System->Console = new csSimpleConsole (Config, Command::SharedInstance ()));
+  System->Console = new csSimpleConsole (Config, Command::SharedInstance ());
 
   // Open the startup console
   start_console ();
@@ -901,7 +901,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  CHK (view = new csView (world, Gfx3D));
+  view = new csView (world, Gfx3D);
 
   // Initialize the command processor with the world and camera.
   Command::Initialize (world, view->GetCamera (), Gfx3D, System->Console, System);
@@ -909,7 +909,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // Create the language layer needed for scripting.
   // Also register a small C script so that it can be used
   // by levels. large.zip uses this script.
-  CHK (layer = new LanguageLayer (world, view->GetCamera ()));
+  layer = new LanguageLayer (world, view->GetCamera ());
   int_script_reg.reg ("message", &do_message_script);
 
   // Now we have two choices. Either we create an infinite
@@ -944,7 +944,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     if (do_infinite)
     {
       // Create the initial (non-random) part of the maze.
-      CHK (infinite_maze = new InfiniteMaze ());
+      infinite_maze = new InfiniteMaze ();
       room = infinite_maze->create_six_room (world, 0, 0, 0)->sector;
       infinite_maze->create_six_room (world, 0, 0, 1);
       infinite_maze->create_six_room (world, 0, 0, 2);
@@ -978,7 +978,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     else
     {
       // Create the huge world.
-      CHK (huge_room = new HugeRoom ());
+      huge_room = new HugeRoom ();
       room = huge_room->create_huge_world (world);
     }
 
@@ -1046,7 +1046,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
       int w, h;
       iTextureHandle* phTex = texh->GetTextureHandle();
       phTex->GetMipMapDimensions (0, w, h);
-      CHK (cslogo = new csPixmap (phTex, 0, 0, w, h));
+      cslogo = new csPixmap (phTex, 0, 0, w, h);
     }
 
     // Look for the start sector in this world.
@@ -1074,7 +1074,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   InitWorld (world, view->GetCamera ());
 
   // Create a wireframe object which will be used for debugging.
-  CHK (wf = new csWireFrameCam (txtmgr));
+  wf = new csWireFrameCam (txtmgr);
 
   // Load a few sounds.
 #ifdef DO_SOUND
@@ -1147,7 +1147,7 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // Create the system driver object
-  CHK (Sys = new WalkTest ());
+  Sys = new WalkTest ();
 
   // Initialize the main system. This will load all needed plugins
   // (3D, 2D, network, sound, ..., engine) and initialize them.

@@ -26,7 +26,7 @@ csRigidSpaceTimeObj::csRigidSpaceTimeObj( csSprite3D *psprt, ctRigidBody *prb )
  // col = pcollide;
   sprt = psprt;
   rb = prb;
-  CHK (col = new csRAPIDCollider (*sprt, sprt));
+  col = new csRAPIDCollider (*sprt, sprt);
   what_type = ST_RIGID;
 
 }

@@ -122,7 +122,7 @@ void D3DCache::cache_texture (iTextureHandle *texture)
     num++;
     total_size += size;
         
-    CHK (cached_texture = new csD3DCacheData);
+    cached_texture = new csD3DCacheData;
     memset(cached_texture, 0, sizeof(cached_texture));
         
     cached_texture->next = head;
@@ -223,7 +223,7 @@ void D3DCache::cache_lightmap (iPolygonTexture *polytex)
     num++;
     total_size += size;
         
-    CHK (cached_texture = new csD3DCacheData);
+    cached_texture = new csD3DCacheData;
     memset(cached_texture, 0, sizeof(cached_texture));
 
     cached_texture->next = head;

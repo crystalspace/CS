@@ -457,7 +457,7 @@ bool csGraphics2DOpenGL::SetMousePosition (int x, int y)
 iGraphics2D *csGraphics2DOpenGL::CreateOffScreenCanvas (int width, int height, 
 	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
 {
-  CHK (csDynamicTexture2D *tex = new csDynamicTexture2D (System));
+  csDynamicTexture2D *tex = new csDynamicTexture2D (System);
   return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
 				     palette, pal_size);
 };

@@ -58,7 +58,7 @@ csLightMapped::csLightMapped () : csPolygonTextureType ()
 {
   txt_plane = NULL;
   theDynLight = NULL;
-  CHK (tex = new csPolyTexture ());
+  tex = new csPolyTexture ();
   lightmap_up_to_date = false;
 }
 
@@ -90,7 +90,7 @@ void csLightMapped::SetTxtPlane (csPolyTxtPlane* txt_pl)
 void csLightMapped::NewTxtPlane ()
 {
   if (txt_plane) txt_plane->DecRef ();
-  CHK (txt_plane = new csPolyTxtPlane ());
+  txt_plane = new csPolyTxtPlane ();
 }
 
 //---------------------------------------------------------------------------
@@ -110,9 +110,9 @@ csGouraudShaded::~csGouraudShaded ()
 
 void csGouraudShaded::Clear ()
 {
-  CHK (delete [] uv_coords); uv_coords = NULL;
-  CHK (delete [] colors); colors = NULL;
-  CHK (delete [] static_colors); static_colors = NULL;
+  delete [] uv_coords; uv_coords = NULL;
+  delete [] colors; colors = NULL;
+  delete [] static_colors; static_colors = NULL;
 }
 
 void csGouraudShaded::Setup (int num_vertices)
@@ -121,11 +121,11 @@ void csGouraudShaded::Setup (int num_vertices)
   bool use_gouraud = (colors || static_colors);
   Clear ();
   csGouraudShaded::num_vertices = num_vertices;
-  CHK (uv_coords = new csVector2 [num_vertices]);
+  uv_coords = new csVector2 [num_vertices];
   if (use_gouraud)
   {
-    CHK (colors = new csColor [num_vertices]);
-    CHK (static_colors = new csColor [num_vertices]);
+    colors = new csColor [num_vertices];
+    static_colors = new csColor [num_vertices];
     int j;
     for (j = 0 ; j < num_vertices ; j++)
     {
@@ -139,8 +139,8 @@ void csGouraudShaded::EnableGouraud (bool g)
 {
   if (!g)
   {
-    CHK (delete [] colors); colors = NULL;
-    CHK (delete [] static_colors); static_colors = NULL;
+    delete [] colors; colors = NULL;
+    delete [] static_colors; static_colors = NULL;
   }
   else
   {
@@ -151,10 +151,10 @@ void csGouraudShaded::EnableGouraud (bool g)
       	"Setup was not called yet for csGouraudShaded!\n");
       fatal_exit (0, false);
     }
-    CHK (delete [] colors); colors = NULL;
-    CHK (delete [] static_colors); static_colors = NULL;
-    CHK (colors = new csColor [num_vertices]);
-    CHK (static_colors = new csColor [num_vertices]);
+    delete [] colors; colors = NULL;
+    delete [] static_colors; static_colors = NULL;
+    colors = new csColor [num_vertices];
+    static_colors = new csColor [num_vertices];
     int j;
     for (j = 0 ; j < num_vertices ; j++)
     {
@@ -296,7 +296,7 @@ csPolygon3D::~csPolygon3D ()
 {
   if (txt_info) { txt_info->DecRef (); txt_info = NULL; }
   if (plane) { plane->DecRef (); plane = NULL; }
-  if (delete_portal) { CHKB (delete portal); portal = NULL; }
+  if (delete_portal) { delete portal; portal = NULL; }
   while (light_info.lightpatches)
     csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
   VectorArray.DecRef ();
@@ -315,10 +315,10 @@ void csPolygon3D::SetTextureType (int type)
   switch (type)
   {
     case POLYTXT_LIGHTMAP:
-      CHK (txt_info = new csLightMapped ());
+      txt_info = new csLightMapped ();
       break;
     case POLYTXT_GOURAUD:
-      CHK (txt_info = new csGouraudShaded ());
+      txt_info = new csGouraudShaded ();
       break;
   }
 }
@@ -334,9 +334,9 @@ void csPolygon3D::Reset ()
 void csPolygon3D::SetCSPortal (csSector* sector)
 {
   if (portal && portal->GetSector () == sector) return;
-  if (portal && delete_portal) { CHK (delete portal); portal = NULL; }
+  if (portal && delete_portal) { delete portal; portal = NULL; }
   if (!sector) return;
-  CHK (portal = new csPortal);
+  portal = new csPortal;
   delete_portal = true;
   portal->DisableSpaceWarping ();
   portal->SetSector (sector);
@@ -345,7 +345,7 @@ void csPolygon3D::SetCSPortal (csSector* sector)
 
 void csPolygon3D::SetPortal (csPortal* prt)
 {
-  if (portal && delete_portal) { CHK (delete portal); portal = NULL; }
+  if (portal && delete_portal) { delete portal; portal = NULL; }
   portal = prt;
   delete_portal = true;
 }
@@ -353,8 +353,8 @@ void csPolygon3D::SetPortal (csPortal* prt)
 void csPolygon3D::SplitWithPlane (csPolygonInt** poly1, csPolygonInt** poly2,
 				  const csPlane3& plane)
 {
-  CHK (csPolygon3D* np1 = new csPolygon3D (*this));
-  CHK (csPolygon3D* np2 = new csPolygon3D (*this));
+  csPolygon3D* np1 = new csPolygon3D (*this);
+  csPolygon3D* np2 = new csPolygon3D (*this);
   *poly1 = (csPolygonInt*)np1; // Front
   *poly2 = (csPolygonInt*)np2; // Back
   np1->Reset ();
@@ -559,7 +559,7 @@ void csPolygon3D::ComputeNormal ()
   PlaneNormal (&A, &B, &C);
   D = -A*Vobj (0).x - B*Vobj (0).y - C*Vobj (0).z;
 
-  if (!plane) CHKB (plane = new csPolyPlane ());
+  if (!plane) plane = new csPolyPlane ();
 
   // By default the world space normal is equal to the object space normal.
   plane->GetObjectPlane ().Set (A, B, C, D);
@@ -600,7 +600,7 @@ void csPolygon3D::Finish ()
   if (flags.Check (CS_POLY_LIGHTING)
    && TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
   {
-    CHK (csLightMap *lm = new csLightMap ());
+    csLightMap *lm = new csLightMap ();
     lmi->tex->SetLightMap (lm);
     int r, g, b;
     GetSector ()->GetAmbientColor (r, g, b);
@@ -845,7 +845,7 @@ bool csPolygon3D::ClipPoly (csVector3* frustum, int m, bool mirror,
   if (!frustum)
   {
     // Infinite frustum.
-    CHK (csVector3* dd = new csVector3 [num_vertices]);
+    csVector3* dd = new csVector3 [num_vertices];
     *dest = dd;
     if (!mirror)
       for (i = 0 ; i < num_vertices ; i++)
@@ -857,7 +857,7 @@ bool csPolygon3D::ClipPoly (csVector3* frustum, int m, bool mirror,
     return true;
   }
 
-  CHK (csVector3* dd = new csVector3 [num_vertices+m]);     // For safety
+  csVector3* dd = new csVector3 [num_vertices+m];     // For safety
   *dest = dd;
   if (!mirror)
     for (i = 0 ; i <num_vertices ; i++)
@@ -875,7 +875,7 @@ bool csPolygon3D::ClipPoly (csVector3* frustum, int m, bool mirror,
     ClipPolyPlane (dd, num_dest, mirror, p[i1], p[i]);
     if ((*num_dest) < 3)
     {
-      CHK (delete [] dd);
+      delete [] dd;
       *dest = NULL;
       return false;
     }
@@ -1443,7 +1443,7 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
     {
       if (sf->relevant)
       {
-        CHK (copy_sf = new csShadowFrustum (*sf));
+        copy_sf = new csShadowFrustum (*sf);
         lp->shadows.AddLast (copy_sf);
       }
       sf = sf->next;

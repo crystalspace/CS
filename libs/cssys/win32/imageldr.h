@@ -20,10 +20,10 @@ public:
 
   ~init_ImageLoader()
   {
-    if (gif) CHKB( delete gif );
-    if (jpg) CHKB( delete jpg );
-    if (png) CHKB( delete png );
-    if (tga) CHKB( delete tga );
+    if (gif)  delete gif ;
+    if (jpg)  delete jpg ;
+    if (png)  delete png ;
+    if (tga)  delete tga ;
   }
 
   bool initialized;

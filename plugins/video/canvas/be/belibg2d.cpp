@@ -70,7 +70,7 @@ bool csGraphics2DBeLib::Initialize (iSystem* p)
 
       // Create frame-buffer.
       BRect const r(0, 0, Width - 1, Height - 1);
-      CHK (bitmap = new BBitmap(r, curr_color_space));
+      bitmap = new BBitmap(r, curr_color_space);
     }
     else
     {
@@ -101,8 +101,8 @@ bool csGraphics2DBeLib::Open(const char* title)
       win_rect.Set(x, y, x + vw, y + vh);
     }
 
-    view = CHK(new CrystView(BRect(0, 0, vw, vh), be_system));
-    window = CHK(new CrystWindow(win_rect, title, view, System, be_system));
+    view = new CrystView(BRect(0, 0, vw, vh), be_system);
+    window = new CrystWindow(win_rect, title, view, System, be_system);
 	
     window->Show();
     if(window->Lock())

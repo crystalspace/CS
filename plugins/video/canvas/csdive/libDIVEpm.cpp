@@ -68,9 +68,9 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
         case pmcmdCreateDIVEctx:
         {
           // Create a DIVE context
-          CHK (rqData->Parm.CreateCtx.dW = new diveWindow (rqData->Parm.CreateCtx.Mode->Width,
+          rqData->Parm.CreateCtx.dW = new diveWindow (rqData->Parm.CreateCtx.Mode->Width,
             rqData->Parm.CreateCtx.Mode->Height, (FOURCC) rqData->Parm.CreateCtx.Mode->PixelFormat,
-            rqData->Parm.CreateCtx.Mode->Buffers));
+            rqData->Parm.CreateCtx.Mode->Buffers);
           if (!rqData->Parm.CreateCtx.dW)
           {
             rc = pmrcDIVEfailure;
@@ -78,7 +78,7 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
           }
           if (rqData->Parm.CreateCtx.dW->lastError != derrOK)
           {
-            CHK (delete rqData->Parm.CreateCtx.dW);
+            delete rqData->Parm.CreateCtx.dW;
 
             rqData->Parm.CreateCtx.dW = NULL;
             rc = pmrcDIVEfailure;
@@ -89,7 +89,7 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
         case pmcmdDestroyDIVEctx:
         {
           if (rqData->Parm.DestroyCtx.dW)
-            CHKB (delete rqData->Parm.DestroyCtx.dW)
+            delete rqData->Parm.DestroyCtx.dW
           else
             rc = pmrcNotInitialized;
           break;
@@ -169,7 +169,7 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
 static void PMthread (void *)
 {
 //  DosSetPriority (PRTYS_THREAD, PRTYC_REGULAR, PRTYD_MAXIMUM, 0);
-  CHK (dA = new diveApp ());
+  dA = new diveApp ();
   if (dA)
   {
     PMmng = dA->CreateWindow (NULL, NULLHANDLE, 0, 0);
@@ -179,7 +179,7 @@ static void PMthread (void *)
       dA->Run ();
       PMmng = NULLHANDLE;
     }
-    CHK (delete dA);
+    delete dA;
   }
 }
 

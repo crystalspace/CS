@@ -112,7 +112,7 @@ void csGlideTextureCache::Add(iTextureHandle *texture, bool alpha)
       Unload(cached_texture);          // unload it.
     }
     
-    CHK (cached_texture = new csGlideCacheData);
+    cached_texture = new csGlideCacheData;
 
     cached_texture->pSource = texture;
     cached_texture->lSize = size;
@@ -191,7 +191,7 @@ void csGlideTextureCache::Add(iPolygonTexture *polytex)
             
     }
     
-    CHK (cached_texture = new csGlideCacheData);
+    cached_texture = new csGlideCacheData;
 
     cached_texture->pSource = piLM;
     cached_texture->lSize = size;

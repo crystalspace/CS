@@ -165,7 +165,7 @@ void csGraphics2DOpenGLFontServer::AddFont (int fontId)
                 GL_ALPHA, GL_UNSIGNED_BYTE, fontbitmapdata);
 
   delete [] nTexNames;
-  CHK (delete [] fontbitmapdata);
+  delete [] fontbitmapdata;
 }
 
 void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
@@ -210,7 +210,7 @@ void csGraphics2DOpenGLFontServer::GLFontInfo::DrawCharacter (
 csGraphics2DOpenGLFontServer::csGraphics2DOpenGLFontServer (int MaxFonts, iFontRender *pFR)
   : mFont_Count (0), mMax_Font_Count (MaxFonts), mFont_Information_Array (NULL), pFontRender(pFR)
 {
-  CHK (mFont_Information_Array = new GLFontInfo * [MaxFonts]);
+  mFont_Information_Array = new GLFontInfo * [MaxFonts];
 }
 
 csGraphics2DOpenGLFontServer::~csGraphics2DOpenGLFontServer ()
@@ -220,8 +220,8 @@ csGraphics2DOpenGLFontServer::~csGraphics2DOpenGLFontServer ()
   {
     // cycle through all loaded fonts
     for (int index = 0; index < mFont_Count; index++)
-      CHKB (delete mFont_Information_Array [index]);
-    CHK (delete [] mFont_Information_Array);
+      delete mFont_Information_Array [index];
+    delete [] mFont_Information_Array;
   }
 }
 

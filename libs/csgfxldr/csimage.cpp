@@ -152,7 +152,7 @@ csImageFile::csImageFile (int iFormat)
 csImageFile::~csImageFile ()
 {
   FreeImage ();
-  CHK (delete [] fName);
+  delete [] fName;
 }
 
 int csImageFile::GetWidth ()
@@ -177,7 +177,7 @@ void *csImageFile::GetImageData ()
 
 void csImageFile::SetName (const char *iName)
 {
-  CHKB (delete [] fName);
+  delete [] fName;
   fName = strnew (iName);
 }
 
@@ -213,14 +213,14 @@ void csImageFile::FreeImage ()
   switch (Format & CS_IMGFMT_MASK)
   {
     case CS_IMGFMT_TRUECOLOR:
-      CHK (delete [] (RGBPixel *)Image);
+      delete [] (RGBPixel *)Image;
       break;
     case CS_IMGFMT_PALETTED8:
-      CHK (delete [] (UByte *)Image);
+      delete [] (UByte *)Image;
       break;
   }
-  CHK (delete [] Palette);
-  CHK (delete [] Alpha);
+  delete [] Palette;
+  delete [] Alpha;
   Image = NULL; Palette = NULL; Alpha = NULL;
 }
 
@@ -277,7 +277,7 @@ iImage *csImageFile::MipMap (int steps, RGBPixel *transp)
   if ((steps < 0) || (steps > 3))
     return NULL;
 
-  CHK (csImageFile* nimg = new csImageFile (Format));
+  csImageFile* nimg = new csImageFile (Format);
   nimg->set_dimensions (Width >> steps, Height >> steps);
 
   RGBPixel *mipmap = new RGBPixel [nimg->Width * nimg->Height];
@@ -513,7 +513,7 @@ void csImageFile::SetFormat (int iFormat)
 
 iImage *csImageFile::Clone ()
 {
-  CHK (csImageFile* nimg = new csImageFile (Format));
+  csImageFile* nimg = new csImageFile (Format);
   nimg->Width = Width;
   nimg->Height = Height;
   nimg->fName = NULL;
@@ -558,7 +558,7 @@ iImage *csImageFile::Clone ()
 iImage *csImageFile::Crop ( int x, int y, int width, int height )
 {
   if ( x+width > Width || y+height > Height ) return NULL;
-  CHK (csImageFile* nimg = new csImageFile (Format));
+  csImageFile* nimg = new csImageFile (Format);
   nimg->Width = width;
   nimg->Height = height;
   nimg->fName = NULL;

@@ -91,8 +91,8 @@ csCovMaskLUT::csCovMaskLUT (int dimension)
   // We allocate two extra entries in the lookup tables to hold
   // the mask values for completely outside and completely inside
   // (in that order).
-  CHK (triage_masks = new csCovMaskTriage[num_edge_points*num_edge_points+2]);
-  CHK (masks = new csCovMask[num_edge_points*num_edge_points+2]);
+  triage_masks = new csCovMaskTriage[num_edge_points*num_edge_points+2];
+  masks = new csCovMask[num_edge_points*num_edge_points+2];
   index_outside = num_edge_points*num_edge_points;
   index_inside = index_outside+1;
   
@@ -116,8 +116,8 @@ csCovMaskLUT::csCovMaskLUT (int dimension)
 
 csCovMaskLUT::~csCovMaskLUT ()
 {
-  CHK (delete [] triage_masks);
-  CHK (delete [] masks);
+  delete [] triage_masks;
+  delete [] masks;
 }
 
 void calc_from_point (int from, int dimension, int& from_ix1, int& from_iy1,
@@ -221,8 +221,8 @@ void csCovMaskLUT::BuildTables ()
 
   // Allocate a left and right matrix for all boxes defined in
   // a coverage mask. See below for info how left and right are filled.
-  CHK (bool* left = new bool[(CS_CM_DIM+1)*(CS_CM_DIM+1)]);
-  CHK (bool* right = new bool[(CS_CM_DIM+1)*(CS_CM_DIM+1)]);
+  bool* left = new bool[(CS_CM_DIM+1)*(CS_CM_DIM+1)];
+  bool* right = new bool[(CS_CM_DIM+1)*(CS_CM_DIM+1)];
   
   for (from = 0 ; from < num_edge_points ; from++)
   {
@@ -322,8 +322,8 @@ void csCovMaskLUT::BuildTables ()
     }
   }
 
-  CHK (delete [] left);
-  CHK (delete [] right);
+  delete [] left;
+  delete [] right;
 
   masks[index_outside].Outside ();
   masks[index_inside].Inside ();

@@ -37,7 +37,7 @@ LanguageLayer::~LanguageLayer ()
   while (first_run)
   {
     csRunScript* n = first_run->get_next ();
-    CHK (delete first_run);
+    delete first_run;
     first_run = n;
   }
 }
@@ -62,7 +62,7 @@ void LanguageLayer::step_run ()
       if (r->get_prev ()) r->get_prev ()->set_next (r->get_next ());
       else first_run = r->get_next ();
       if (r->get_next ()) r->get_next ()->set_prev (r->get_prev ());
-      CHK (delete r);
+      delete r;
     }
     r = n;
   }
@@ -336,14 +336,14 @@ TriggerList::~TriggerList ()
   while (first_trigger)
   {
     Trigger* n = first_trigger->next;
-    CHK (delete first_trigger);
+    delete first_trigger;
     first_trigger = n;
   }
 }
 
 void TriggerList::add_trigger (csScript* s, csObject* object)
 {
-  CHK (Trigger* t = new Trigger ());
+  Trigger* t = new Trigger ();
   t->script = s;
   t->next = first_trigger;
   t->object = object;

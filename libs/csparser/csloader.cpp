@@ -356,7 +356,7 @@ csPolyTxtPlane* csLoader::load_polyplane (char* buf, char* name)
   char* xname;
   long cmd;
   char* params;
-  CHK (csPolyTxtPlane* ppl = new csPolyTxtPlane ());
+  csPolyTxtPlane* ppl = new csPolyTxtPlane ();
   ppl->SetName (name);
 
   bool tx1_given = false, tx2_given = false;
@@ -449,7 +449,7 @@ void csLoader::load_light (char* name, char* buf)
     TOKEN_TABLE (BECOMING_INACTIVE)
   TOKEN_TABLE_END
 
-  CHK (CLights *theLite = new CLights());
+  CLights *theLite = new CLights();
   theLite->SetName (name);
 
   long cmd;
@@ -525,7 +525,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
   long cmd;
   char* params;
 
-  CHK (csCollection* collection = new csCollection ());
+  csCollection* collection = new csCollection ();
   collection->SetName (name);
 
   char str[255];
@@ -612,7 +612,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
             csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(*cs);
             if (!objtrig)
             {
-              CHK(objtrig = new csObjectTrigger());
+              objtrig = new csObjectTrigger();
               cs->ObjAdd(objtrig);
             }
             objtrig->NewActivateTrigger(s,collection);
@@ -726,7 +726,7 @@ csStatLight* csLoader::load_statlight (char* buf)
     }
   }
 
-  CHK (csStatLight* l = new csStatLight (x, y, z, dist, r, g, b, dyn));
+  csStatLight* l = new csStatLight (x, y, z, dist, r, g, b, dyn);
   if (halo)
   {
     l->flags.Set (CS_LIGHT_HALO, CS_LIGHT_HALO);
@@ -742,7 +742,7 @@ csKeyValuePair* csLoader::load_key (char* buf, csObject* pParent)
   char Value[10000]; //Value can potentially grow _very_ large.
   if (ScanStr(buf, "%S,%S", Key, Value) == 2)
   {
-    CHK (csKeyValuePair* kvp = new csKeyValuePair(Key, Value));
+    csKeyValuePair* kvp = new csKeyValuePair(Key, Value);
     if (pParent)
       pParent->ObjAdd (kvp);
     return kvp;
@@ -762,7 +762,7 @@ csMapNode* csLoader::load_node (char* name, char* buf, csSector* sec)
     TOKEN_TABLE (POSITION)
   TOKEN_TABLE_END
 
-  CHK( csMapNode* pNode = new csMapNode(name));
+   csMapNode* pNode = new csMapNode(name);
   pNode->SetSector(sec);
 
   long  cmd;
@@ -903,7 +903,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
         csObjectTrigger* objtrig = csObjectTrigger::GetTrigger(ps);
         if (!objtrig)
         {
-          CHK(objtrig = new csObjectTrigger());
+          objtrig = new csObjectTrigger();
           ps.ObjAdd(objtrig);
         }
         objtrig->NewActivateTrigger (s);
@@ -923,7 +923,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info,
         csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(ps);
         if (!objtrig)
         {
-          CHK(objtrig = new csObjectTrigger());
+          objtrig = new csObjectTrigger();
           ps.ObjAdd(objtrig);
         }
         objtrig->NewActivateTrigger(s);
@@ -976,7 +976,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
   char* xname;
 
-  CHK (csThing* thing = new csThing ());
+  csThing* thing = new csThing ();
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
@@ -1125,7 +1125,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
           csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(*thing);
           if (!objtrig)
           {
-            CHK(objtrig = new csObjectTrigger());
+            objtrig = new csObjectTrigger();
             thing->ObjAdd(objtrig);
           }
           objtrig->NewActivateTrigger (s);
@@ -1145,7 +1145,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
           csObjectTrigger *objtrig = csObjectTrigger::GetTrigger(*thing);
           if (!objtrig)
           {
-            CHK(objtrig = new csObjectTrigger());
+            objtrig = new csObjectTrigger();
             thing->ObjAdd(objtrig);
           }
           objtrig->NewActivateTrigger (s);
@@ -1292,7 +1292,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
 
   char* xname;
 
-  CHK( csThing* thing = new csThing() );
+   csThing* thing = new csThing() ;
   thing->SetName (name);
 
   csLoaderStat::things_loaded++;
@@ -1455,7 +1455,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   long cmd;
   char* params, * params2;
 
-  CHK(csPolygon3D *poly3d = new csPolygon3D (default_texture));
+  csPolygon3D *poly3d = new csPolygon3D (default_texture);
   poly3d->SetName (polyname);
 
   csTextureHandle* tex = NULL;
@@ -1528,7 +1528,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
       case TOKEN_PORTAL:
         {
           ScanStr (params, "%s", str);
-          CHK(csSector *s = new csSector());
+          csSector *s = new csSector();
           s->SetName (str);
           poly3d->SetCSPortal (s);
           csLoaderStat::portals_loaded++;
@@ -1814,7 +1814,7 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
 
   (void)default_lightx; (void)sec; (void)parent;
 
-  CHK (csBezier *poly3d = new csBezier (NULL));
+  csBezier *poly3d = new csBezier (NULL);
   poly3d->SetName (polyname);
   poly3d->SetTextureHandle (default_texture);
   csTextureHandle* tex = NULL;
@@ -1968,7 +1968,7 @@ iImage* csLoader::load_image (const char* name)
   }
 
   ifile = csImageLoader::Load ((UByte *)buf, size, World->GetTextureFormat ());
-  CHK (delete [] buf);
+  delete [] buf;
 
   if (!ifile)
   {
@@ -2104,8 +2104,8 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
   long cmd;
   char* params, * params2;
 
-  CHK(csPolygonTemplate *ptemplate =
-              new csPolygonTemplate(parent, ptname, default_texture));
+  csPolygonTemplate *ptemplate =
+              new csPolygonTemplate(parent, ptname, default_texture);
   csTextureHandle* tex;
   if (default_texture == NULL) tex = NULL;
   else ptemplate->SetTexture (default_texture);
@@ -2310,7 +2310,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
   int i;
   char *params, *params2;
 
-  CHK(csBezierTemplate *ptemplate = new csBezierTemplate());
+  csBezierTemplate *ptemplate = new csBezierTemplate();
   ptemplate->SetName (ptname);
 
   ptemplate->SetParent (parent);
@@ -2471,7 +2471,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
   char str[255];
   int i;
 
-  CHK( csThingTemplate *tmpl = new csThingTemplate() );
+   csThingTemplate *tmpl = new csThingTemplate() ;
   tmpl->SetName (tname);
   long cmd;
   char* params;
@@ -2584,16 +2584,16 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
       case TOKEN_FILE:
         {
           ScanStr (params, "%s", str);
-	  CHK (converter* filedata = new converter);
+	  converter* filedata = new converter;
 	  if (filedata->ivcon (str, true, false, NULL, System->VFS) == ERROR)
 	  {
 	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
-	    CHK (delete filedata);
+	    delete filedata;
 	    fatal_exit (0, false);
 	  }
 	  csCrossBuild_ThingTemplateFactory builder;
 	  builder.CrossBuild (tmpl, *filedata);
-	  CHK (delete filedata);
+	  delete filedata;
 	}
 	break;
     }
@@ -2639,7 +2639,7 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
   char* name;
   int i;
 
-  CHK (csThingTemplate* tmpl = new csThingTemplate ());
+  csThingTemplate* tmpl = new csThingTemplate ();
   tmpl->SetName (tname);
 
   csTextureHandle* texture = NULL;
@@ -2842,7 +2842,7 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
 
   while (done < todo_end)
   {
-    CHK (p = new csPolygonTemplate (tmpl, todo[done].poly, todo[done].texture));
+    p = new csPolygonTemplate (tmpl, todo[done].poly, todo[done].texture);
     tmpl->AddPolygon (p);
     p->AddVertex (todo[done].v4);
     p->AddVertex (todo[done].v3);
@@ -3063,7 +3063,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
   int i1, i2, i3, i4;
   bool do_stat_bsp = false;
 
-  CHK(csSector* sector = new csSector());
+  csSector* sector = new csSector();
   sector->SetName (secname);
 
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
@@ -3240,7 +3240,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case TOKEN_SPRITE:
         {
-          CHK (csSprite3D* sp = new csSprite3D ());
+          csSprite3D* sp = new csSprite3D ();
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
@@ -3249,7 +3249,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case TOKEN_SPRITE2D:
         {
-          CHK (csSprite2D* sp = new csSprite2D ());
+          csSprite2D* sp = new csSprite2D ();
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
@@ -3363,7 +3363,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
           csObjectTrigger* objtrig = csObjectTrigger::GetTrigger(*sector);
           if (!objtrig)
           {
-            CHK(objtrig = new csObjectTrigger());
+            objtrig = new csObjectTrigger();
             sector->ObjAdd(objtrig);
           }
           objtrig->NewActivateTrigger (s);
@@ -3383,7 +3383,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
           csObjectTrigger* objtrig = csObjectTrigger::GetTrigger(*sector);
           if (!objtrig)
           {
-            CHK(objtrig = new csObjectTrigger());
+            objtrig = new csObjectTrigger();
             sector->ObjAdd(objtrig);
           }
           objtrig->NewActivateTrigger (s);
@@ -3555,7 +3555,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
     }
 
     // This will later be defined correctly
-    CHK( portal = new csSector () );
+     portal = new csSector () ;
     portal->SetName (portals[i].sector);
     p->SetCSPortal (portal);
     csLoaderStat::portals_loaded++;
@@ -3608,7 +3608,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   char* params;
   bool do_stat_bsp = false;
 
-  CHK( csSector* sector = new csSector() );
+   csSector* sector = new csSector() ;
   sector->SetName (secname);
 
   csLoaderStat::sectors_loaded++;
@@ -3639,7 +3639,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case TOKEN_SPRITE:
         {
-          CHK (csSprite3D* sp = new csSprite3D ());
+          csSprite3D* sp = new csSprite3D ();
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
@@ -3648,7 +3648,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case TOKEN_SPRITE2D:
         {
-          CHK (csSprite2D* sp = new csSprite2D ());
+          csSprite2D* sp = new csSprite2D ();
           sp->SetName (name);
           LoadSprite (sp, params);
           World->sprites.Push (sp);
@@ -3795,7 +3795,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
     for (j = 0 ; j < num ; j++)
     {
       sprintf (end_poly_name, "%d_%d_A", i, j);
-      CHK (csPolygon3D* p = new csPolygon3D (texture));
+      csPolygon3D* p = new csPolygon3D (texture);
       p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
@@ -3816,7 +3816,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
       sector.AddPolygon (p);
       csLoaderStat::polygons_loaded++;
       sprintf (end_poly_name, "%d_%d_B", i, j);
-      CHK (p = new csPolygon3D (texture));
+      p = new csPolygon3D (texture);
       p->SetName (poly_name);
       p->SetSector (&sector);
       p->SetParent (&sector);
@@ -3859,7 +3859,7 @@ void csLoader::skydome_process (csSector& sector, char* name, char* buf,
   for (j = 0 ; j < num ; j++)
   {
     sprintf (end_poly_name, "%d_%d", num/2, j);
-    CHK (csPolygon3D* p = new csPolygon3D (texture));
+    csPolygon3D* p = new csPolygon3D (texture);
     p->SetName (poly_name);
     p->SetSector (&sector);
     p->SetParent (&sector);
@@ -3928,7 +3928,7 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf,
     fatal_exit (0, false);
   }
 
-  CHK (csTerrain* terr = new csTerrain ());
+  csTerrain* terr = new csTerrain ();
   terr->SetName (name);
   terr->SetTexture (texture);
 
@@ -3963,14 +3963,14 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
   }
 
   snd = csSoundLoader::load ((UByte*)buf, size);
-  CHK (delete [] buf);
+  delete [] buf;
   if (!snd)
   {
     CsPrintf (MSG_FATAL_ERROR, "The sound file \"%s\" is corrupt!\n", filename);
     return NULL;
   }
 
-  CHK (sndobj = new csSoundDataObject (snd));
+  sndobj = new csSoundDataObject (snd);
   sndobj->SetName (name);
 
   return sndobj;
@@ -4031,7 +4031,7 @@ bool csLoader::LoadWorld (char* buf)
             csSpriteTemplate* t = World->GetSpriteTemplate (name);
             if (!t)
             {
-              CHK (t = new csSpriteTemplate ());
+              t = new csSpriteTemplate ();
               t->SetName (name);
               World->sprite_templates.Push (t);
             }
@@ -4130,7 +4130,7 @@ bool csLoader::LoadWorld (char* buf)
             fatal_exit (0, false);
           }
           portal->SetSector (snew);
-          CHK( delete stmp );
+           delete stmp ;
         }
       }
   }
@@ -4155,12 +4155,12 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
     return false;
   }
 
-  CHK (csIniFile* cfg = new csIniFile (System->VFS, "world.cfg"));
+  csIniFile* cfg = new csIniFile (System->VFS, "world.cfg");
   if (cfg)
   {
     csLightMap::SetLightCellSize (cfg->GetInt ("Lighting", "LIGHTMAP_SIZE",
     	csLightMap::lightcell_size));
-    CHK (delete cfg);
+    delete cfg;
   }
   CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n",
       csLightMap::lightcell_size, csLightMap::lightcell_size);
@@ -4179,7 +4179,7 @@ bool csLoader::LoadWorldFile (csWorld* world, LanguageLayer* layer, const char* 
       csLoaderStat::lights_loaded, csLoaderStat::sounds_loaded);
   } /* endif */
 
-  CHK (delete [] buf);
+  delete [] buf;
 
   return true;
 }
@@ -4278,7 +4278,7 @@ bool csLoader::LoadLibrary (char* buf)
             csSpriteTemplate* t = World->GetSpriteTemplate (name);
             if (!t)
             {
-              CHK (t = new csSpriteTemplate ());
+              t = new csSpriteTemplate ();
               t->SetName (name);
               World->sprite_templates.Push (t);
             }
@@ -4314,7 +4314,7 @@ bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
   World = world;
   bool retcode = LoadLibrary (buf);
 
-  CHK (delete [] buf);
+  delete [] buf;
 
   return retcode;
 }
@@ -4424,7 +4424,7 @@ bool csLoader::LoadSkeleton (csSkeletonLimb* limb, char* buf, bool is_connection
     {
       case TOKEN_LIMB:
         {
-          CHK (csSkeletonConnection* con = new csSkeletonConnection ());
+          csSkeletonConnection* con = new csSkeletonConnection ();
 	  if (!LoadSkeleton (con, params, true)) return false;
 	  limb->AddChild (con);
 	}
@@ -4528,7 +4528,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 
       case TOKEN_SKELETON:
 	{
-          CHK (csSkeleton* skeleton = new csSkeleton ());
+          csSkeleton* skeleton = new csSkeleton ();
 	  if (!LoadSkeleton (skeleton, params, false)) return false;
 	  stemp->SetSkeleton (skeleton);
 	}
@@ -4630,16 +4630,16 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
       case TOKEN_FILE:
         {
           ScanStr (params, "%s", str);
-	  CHK (converter* filedata = new converter);
+	  converter* filedata = new converter;
 	  if (filedata->ivcon (str, true, false, NULL, System->VFS) == ERROR)
 	  {
 	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
-	    CHK (delete filedata);
+	    delete filedata;
 	    fatal_exit (0, false);
 	  }
 	  csCrossBuild_SpriteTemplateFactory builder;
 	  builder.CrossBuild (stemp, *filedata);
-	  CHK (delete filedata);
+	  delete filedata;
         }
         break;
 

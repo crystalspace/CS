@@ -32,10 +32,10 @@ bool RegisterGIF ()
 
 csImageFile* csGIFImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 {
-  CHK (ImageGifFile* i = new ImageGifFile (iFormat));
+  ImageGifFile* i = new ImageGifFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
-    CHK (delete i);
+    delete i;
     return NULL;
   }
   return i;    
@@ -378,15 +378,15 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
 
 bool ImageGifFile::Load (UByte* iBuffer, ULong iSize)
 {
-  CHK (int* Prefix  = new int [4096]); // Hash table used by decompressor.
-  CHK (int* Suffix  = new int [4096]); // Hash table used by decompressor.
-  CHK (int* OutCode = new int [1025]); // Output array used by decompressor.
+  int* Prefix  = new int [4096]; // Hash table used by decompressor.
+  int* Suffix  = new int [4096]; // Hash table used by decompressor.
+  int* OutCode = new int [1025]; // Output array used by decompressor.
 
   int rc = decode_gif (iBuffer, iSize, Prefix, Suffix, OutCode);
 
-  CHK (delete [] Prefix);
-  CHK (delete [] Suffix);
-  CHK (delete [] OutCode);
+  delete [] Prefix;
+  delete [] Suffix;
+  delete [] OutCode;
 
   return (rc == 0);
 }

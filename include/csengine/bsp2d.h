@@ -44,7 +44,7 @@ public:
   /// Delete a particular array element.
   virtual bool FreeItem (csSome Item)
   {
-    CHK (delete (csSegment2*)Item);
+    delete (csSegment2*)Item;
     return true;
   }
 

@@ -110,7 +110,7 @@ void HighColorCache::Add (iTextureHandle *texture)
         num++;
         total_size += size;
         
-        CHK (cached_texture = new csD3DCacheData);
+        cached_texture = new csD3DCacheData;
         
         cached_texture->next = head;
         cached_texture->prev = NULL;
@@ -215,7 +215,7 @@ void HighColorCache::Add(iPolygonTexture *polytex)
         num++;
         total_size += size;
         
-        CHK (cached_texture = new csD3DCacheData);
+        cached_texture = new csD3DCacheData;
         
         cached_texture->next = head;
         cached_texture->prev = NULL;

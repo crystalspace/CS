@@ -89,8 +89,8 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* t
     return;
   }
 
-  CHK (csParSysExplosion* exp = new csParSysExplosion (100,
-  	center, csVector3 (0, 0, 0), txt, 6, 0.15, true, .6, 2., 2.));
+  csParSysExplosion* exp = new csParSysExplosion (100,
+  	center, csVector3 (0, 0, 0), txt, 6, 0.15, true, .6, 2., 2.);
   exp->MoveToSector (sector);
   exp->SetSelfDestruct (3000);
   exp->SetMixmode (CS_FX_SETALPHA (0.50));
@@ -116,8 +116,8 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* txtn
     return;
   }
 
-  CHK (csSpiralParticleSystem* exp = new csSpiralParticleSystem (500,
-  	bottom, txt));
+  csSpiralParticleSystem* exp = new csSpiralParticleSystem (500,
+  	bottom, txt);
   exp->MoveToSector (sector);
   //exp->SetSelfDestruct (3000);
   exp->SetMixmode (CS_FX_SETALPHA (0.50));
@@ -206,7 +206,7 @@ void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame,
 
   for (i = 0 ; i < rwidth ; i++)
   {
-    CHK (con = new csSkeletonConnection ());
+    con = new csSkeletonConnection ();
     parent->AddChild (con);
     csMatrix3 tr = csYRotMatrix3 (0) * csZRotMatrix3(.15) *
                                                  csXRotMatrix3(.15);
@@ -220,7 +220,7 @@ void add_tree_limbs (csSpriteTemplate* tmpl, csFrame* frame,
 csSkeleton* create_skeltree (csSpriteTemplate* tmpl, csFrame* frame,
 	int& vertex_idx, int maxdepth, int width)
 {
-  CHK (csSkeleton* skel = new csSkeleton ());
+  csSkeleton* skel = new csSkeleton ();
   add_tree_limbs (tmpl, frame, skel, vertex_idx, 0, maxdepth, width, 0);
   return skel;
 }
@@ -252,7 +252,7 @@ void animate_skeleton_tree (csSkeletonLimbState* limb)
     TreeSkelSpriteInfo* o = (TreeSkelSpriteInfo*)con->GetChild (TreeSkelSpriteInfo::Type);
     if (!o)
     {
-      CHK (o = new TreeSkelSpriteInfo ());
+      o = new TreeSkelSpriteInfo ();
       if ((rand () >> 3) & 0x1)
       {
         o->x_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * .4 -.2;
@@ -310,7 +310,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
   csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname);
   if (!tmpl)
   {
-    CHK (tmpl = new csSpriteTemplate ());
+    tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
     tmpl->SetTexture (Sys->world->GetTextures (), "white.gif");
@@ -428,7 +428,7 @@ void add_ghost_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* pa
   int i;
   for (i = 0 ; i < width ; i++)
   {
-    CHK (con = new csSkeletonConnection ());
+    con = new csSkeletonConnection ();
     parent->AddChild (con);
     csMatrix3 tr = csYRotMatrix3 (0) *
     	csZRotMatrix3 (.15) *
@@ -444,7 +444,7 @@ void add_ghost_limbs (csSpriteTemplate* tmpl, csFrame* frame, csSkeletonLimb* pa
 csSkeleton* create_skelghost (csSpriteTemplate* tmpl, csFrame* frame,
 	int& vertex_idx, int maxdepth, int width)
 {
-  CHK (csSkeleton* skel = new csSkeleton ());
+  csSkeleton* skel = new csSkeleton ();
   add_ghost_limbs (tmpl, frame, skel, vertex_idx, 0, maxdepth, width, 0, .2);
   return skel;
 }
@@ -460,7 +460,7 @@ void animate_skeleton_ghost (csSkeletonLimbState* limb)
     	(GhostSkelSpriteInfo::Type);
     if (!o)
     {
-      CHK (o = new GhostSkelSpriteInfo ());
+      o = new GhostSkelSpriteInfo ();
       if ((rand () >> 3) & 0x1)
       {
         o->x_angle_base = (((float)((rand () >> 3)&0xff)) / 255.) * .4 -.2;
@@ -519,7 +519,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
   csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate (skelname);
   if (!tmpl)
   {
-    CHK (tmpl = new csSpriteTemplate ());
+    tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
     tmpl->SetTexture (Sys->world->GetTextures (), "green.gif");
@@ -535,8 +535,8 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
   }
   csSprite3D* spr = add_sprite (skelname, "__skelghost__", where, pos, 1);
   spr->SetMixmode (CS_FX_SETALPHA (0.75));
-  CHK ((void)new csRAPIDCollider (*spr, spr));
-  CHK (GhostSpriteInfo* gh_info = new GhostSpriteInfo ());
+  (void)new csRAPIDCollider (*spr, spr);
+  GhostSpriteInfo* gh_info = new GhostSpriteInfo ();
   spr->ObjAdd (gh_info);
   gh_info->dir = 1;
   spr->SetDrawCallback (animate_skeleton_ghost_cb);
@@ -640,7 +640,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
     float r, g, b;
     RandomColor (r, g, b);
     //@@@ MEMORY LEAK?
-    CHK (dyn = new csDynLight (pos.x, pos.y, pos.z, dyn_radius, r, g, b));
+    dyn = new csDynLight (pos.x, pos.y, pos.z, dyn_radius, r, g, b);
     Sys->view->GetWorld ()->AddDynLight (dyn);
     dyn->SetSector (where);
     dyn->Setup ();
@@ -648,7 +648,7 @@ void add_bot (float size, csSector* where, csVector3 const& pos,
   csSpriteTemplate* tmpl = Sys->view->GetWorld ()->GetSpriteTemplate ("bot");
   if (!tmpl) return;
   Bot* bot;
-  CHK (bot = new Bot (tmpl));
+  bot = new Bot (tmpl);
   bot->SetName ("bot");
   Sys->view->GetWorld ()->sprites.Push (bot);
   bot->MoveToSector (where);
@@ -756,8 +756,8 @@ void HandleDynLight (csDynLight* dyn)
 	  Sys->view->GetWorld ()->RemoveSprite (ms->sprite);
 	}
         dyn->ObjRemove(dyn->GetChild (csDataObject::Type));
-        CHK (delete ms);
-        CHK (ExplosionStruct* es = new ExplosionStruct);
+        delete ms;
+        ExplosionStruct* es = new ExplosionStruct;
         if (Sys->Sound)
           if ((es->snd = Sys->Sound->CreateSource (Sys->wMissile_boom)))
           {
@@ -768,7 +768,7 @@ void HandleDynLight (csDynLight* dyn)
         es->type = DYN_TYPE_EXPLOSION;
         es->radius = 2;
         es->dir = 1;
-        CHK (csDataObject* esdata = new csDataObject (es));
+        csDataObject* esdata = new csDataObject (es);
         dyn->ObjAdd (esdata);
         add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo.jpg");
         return;
@@ -799,9 +799,9 @@ void HandleDynLight (csDynLight* dyn)
             sb->Stop ();
             es->snd->DecRef ();
 	  }
-	  CHK (delete es);
+	  delete es;
           Sys->view->GetWorld ()->RemoveDynLight (dyn);
-          CHK (delete dyn);
+          delete dyn;
 	  return;
 	}
       }
@@ -837,11 +837,11 @@ void fire_missile ()
   csVector3 pos = Sys->view->GetCamera ()->Camera2World (dir);
   float r, g, b;
   RandomColor (r, g, b);
-  CHK (csDynLight* dyn = new csDynLight (pos.x, pos.y, pos.z, 4, r, g, b));
+  csDynLight* dyn = new csDynLight (pos.x, pos.y, pos.z, 4, r, g, b);
   Sys->view->GetWorld ()->AddDynLight (dyn);
   dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
   dyn->Setup ();
-  CHK (MissileStruct* ms = new MissileStruct);
+  MissileStruct* ms = new MissileStruct;
   if (Sys->Sound)
     if ((ms->snd = Sys->Sound->CreateSource (Sys->wMissile_whoosh)))
     {
@@ -852,7 +852,7 @@ void fire_missile ()
   ms->type = DYN_TYPE_MISSILE;
   ms->dir = (csOrthoTransform)*(Sys->view->GetCamera ());
   ms->sprite = NULL;
-  CHK(csDataObject* msdata = new csDataObject(ms));
+  csDataObject* msdata = new csDataObject(ms);
   dyn->ObjAdd(msdata);
 
   char misname[10];
@@ -877,12 +877,12 @@ void fire_missile ()
 
 void AttachRandomLight (csDynLight* light)
 {
-  CHK (RandomLight* rl = new RandomLight);
+  RandomLight* rl = new RandomLight;
   rl->type = DYN_TYPE_RANDOM;
   rl->dyn_move_dir = .2;
   rl->dyn_move = 0;
   rl->dyn_r1 = rl->dyn_g1 = rl->dyn_b1 = 1;
-  CHK(csDataObject* rldata = new csDataObject (rl));
+  csDataObject* rldata = new csDataObject (rl);
   light->ObjAdd (rldata);
 }
 

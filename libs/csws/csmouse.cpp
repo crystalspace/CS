@@ -40,7 +40,7 @@ csMousePointer::csMousePointer (csComponent *iParent, int ID, int x, int y,
 
 csMousePointer::~csMousePointer ()
 {
-  CHK (delete Cursor);
+  delete Cursor;
   Free ();
 }
 
@@ -74,11 +74,11 @@ void csMousePointer::Free ()
 
 void csMousePointer::SetTexture (iTextureHandle *tex)
 {
-  CHK (delete Cursor);
-  CHK (Cursor = new csPixmap (tex, tX, tY, tW, tH));
+  delete Cursor;
+  Cursor = new csPixmap (tex, tX, tY, tW, tH);
   if (!Cursor->ok ())
   {
-    CHK (delete Cursor);
+    delete Cursor;
     Cursor = NULL;
   } /* endif */
 }
@@ -125,7 +125,7 @@ void csMouse::NewPointer (char *id, char *posdef)
   ScanStr (id, "%d", &cID);
   int cX, cY, cW, cH, chX, chY;
   ScanStr (posdef, "%d,%d,%d,%d,%d,%d", &cX, &cY, &cW, &cH, &chX, &chY);
-  CHK ((void)new csMousePointer (this, cID, cX, cY, cW, cH, chX, chY));
+  (void)new csMousePointer (this, cID, cX, cY, cW, cH, chX, chY);
 }
 
 static bool do_set_texture (csComponent *child, void *param)

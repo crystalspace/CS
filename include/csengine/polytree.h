@@ -134,7 +134,7 @@ protected:
   csSector* sector;
 
   /// Clear the nodes.
-  void Clear () { CHK (delete root); }
+  void Clear () { delete root; }
 
   // Various routines to write to an iFile. Used by 'Cache'.
   void WriteString (iFile* cf, char* str, int len);

@@ -85,10 +85,10 @@ csGraphics3DLine::csGraphics3DLine (iBase *iParent) : G2D (NULL), config (NULL)
 csGraphics3DLine::~csGraphics3DLine ()
 {
   Close ();
-  CHK (delete texman);
+  delete texman;
   if (G2D)
     G2D->DecRef ();
-  CHK (delete config;)
+  delete config;
 }
 
 bool csGraphics3DLine::Initialize (iSystem *iSys)
@@ -106,7 +106,7 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
   if (!G2D)
     return false;
 
-  CHK (texman = new csTextureManagerLine (System, G2D, config));
+  texman = new csTextureManagerLine (System, G2D, config);
 
   return true;
 }
@@ -181,13 +181,13 @@ void csGraphics3DLine::SetPerspectiveCenter (int x, int y)
 
 void csGraphics3DLine::SetClipper (csVector2* vertices, int num_vertices)
 {
-  CHK (delete clipper);
+  delete clipper;
   clipper = NULL;
   if (!vertices) return;
   // @@@ This could be better! We are using a general polygon clipper
   // even in cases where a box clipper would be better. We should
   // have a special SetBoxClipper call in iGraphics3D.
-  CHK (clipper = new csPolygonClipper (vertices, num_vertices, false, true));
+  clipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
 bool csGraphics3DLine::BeginDraw (int DrawFlags)

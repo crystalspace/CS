@@ -27,7 +27,7 @@ csPolygonIntArray::csPolygonIntArray ()
 
 csPolygonIntArray::~csPolygonIntArray ()
 {
-  CHK (delete [] polygons);
+  delete [] polygons;
 }
 
 void csPolygonIntArray::AddPolygon (csPolygonInt* poly)
@@ -35,15 +35,15 @@ void csPolygonIntArray::AddPolygon (csPolygonInt* poly)
   if (!polygons)
   {
     max = 6;
-    CHK (polygons = new csPolygonInt* [max]);
+    polygons = new csPolygonInt* [max];
   }
 
   if (num >= max)
   {
-    CHK (csPolygonInt** pp = new csPolygonInt* [max+3]);
+    csPolygonInt** pp = new csPolygonInt* [max+3];
     memcpy (pp, polygons, sizeof (csPolygonInt*)*max);
     max += 3;
-    CHK (delete [] polygons);
+    delete [] polygons;
     polygons = pp;
   }
 

@@ -159,7 +159,7 @@ csSoftHalo::csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
 {
   CONSTRUCT_IBASE (NULL);
   R = iR; G = iG; B = iB;
-  CHK (Alpha = new unsigned char [(Width = iWidth) * (Height = iHeight)]);
+  Alpha = new unsigned char [(Width = iWidth) * (Height = iHeight)];
   memcpy (Alpha, iAlpha, Width * Height);
   (G3D = iG3D)->IncRef ();
 }
@@ -167,7 +167,7 @@ csSoftHalo::csSoftHalo (float iR, float iG, float iB, unsigned char *iAlpha,
 // Destroy the halo object
 csSoftHalo::~csSoftHalo ()
 {
-  CHKB (delete [] Alpha);
+  delete [] Alpha;
   G3D->DecRef ();
 }
 
@@ -397,6 +397,6 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
 iHalo *csGraphics3DSoftwareCommon::CreateHalo (float iR, float iG, float iB,
   unsigned char *iAlpha, int iWidth, int iHeight)
 {
-  CHK (csSoftHalo *h = new csSoftHalo (iR, iG, iB, iAlpha, iWidth, iHeight, this));
+  csSoftHalo *h = new csSoftHalo (iR, iG, iB, iAlpha, iWidth, iHeight, this);
   return h;
 }

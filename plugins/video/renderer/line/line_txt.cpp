@@ -291,7 +291,7 @@ csTextureManagerLine::~csTextureManagerLine ()
 void csTextureManagerLine::Clear ()
 {
   csTextureManager::Clear ();
-  CHK (delete alpha_tables); alpha_tables = NULL;
+  delete alpha_tables; alpha_tables = NULL;
 }
 
 ULong csTextureManagerLine::encode_rgb (int r, int g, int b)
@@ -332,7 +332,7 @@ void csTextureManagerLine::create_inv_cmap ()
     SysPrintf (MSG_INITIALIZATION, "  Computing inverse colormap...\n");
 
   // Greg Ewing, 12 Oct 1998
-  CHK (delete inv_cmap);
+  delete inv_cmap;
   inv_cmap = NULL; // let the routine allocate the array itself
   csInverseColormap (256, &cmap [0], RGB2PAL_BITS_R, RGB2PAL_BITS_G,
     RGB2PAL_BITS_B, inv_cmap);
@@ -351,7 +351,7 @@ void csTextureManagerLine::create_alpha_tables ()
     SysPrintf (MSG_INITIALIZATION, "  Computing alpha tables...\n");
 
   if (!alpha_tables)
-    CHKB (alpha_tables = new csAlphaTables ());
+    alpha_tables = new csAlphaTables ();
 
   UByte *map50 = alpha_tables->alpha_map50;
   UByte *map25 = alpha_tables->alpha_map25;
@@ -467,7 +467,7 @@ iTextureHandle *csTextureManagerLine::RegisterTexture (iImage* image,
 {
   if (!image) return NULL;
 
-  CHK (csTextureMMLine *txt = new csTextureMMLine (image, flags));
+  csTextureMMLine *txt = new csTextureMMLine (image, flags);
   textures.Push (txt);
   return txt;
 }

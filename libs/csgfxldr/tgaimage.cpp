@@ -44,10 +44,10 @@ bool RegisterTGA ()
 
 csImageFile* csTGAImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 {
-  CHK (ImageTgaFile* i = new ImageTgaFile (iFormat));
+  ImageTgaFile* i = new ImageTgaFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
-    CHK ( delete i );
+     delete i ;
     return NULL;
   }
   return i;    

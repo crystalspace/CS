@@ -63,7 +63,7 @@ csCrossBuild_SpriteTemplateFactory::~csCrossBuild_SpriteTemplateFactory()
 /// full sprite template builder
 csBase *csCrossBuild_SpriteTemplateFactory::CrossBuild (converter &buildsource)
 {
-  CHK (csSpriteTemplate *newtemplate = new csSpriteTemplate());
+  csSpriteTemplate *newtemplate = new csSpriteTemplate();
   CrossBuild ((csBase*)newtemplate, buildsource);
   newtemplate->GenerateLOD ();
   newtemplate->ComputeBoundingBox ();
@@ -167,7 +167,7 @@ csSpriteTemplate *ivconbuild_Quake2csSpriteTemplate(Archive &pakarchive)
   sprintf(tempfilename,"%s.md2",tempfilenamebase);
   FILE *tempfile = fopen(tempfilename,"wb");
   fwrite(modelrawdata,modeldatasize,1,tempfile);
-  CHK (delete [] modelrawdata);
+  delete [] modelrawdata;
 
   return newtemplate;
 }
@@ -201,7 +201,7 @@ csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,cha
       char *tempfilename = tmpnam(NULL);
       FILE *tempfile = fopen(tempfilename,"wb");
       fwrite(skinrawdata,skindatasize,1,tempfile);
-      CHK (delete [] skinrawdata);
+      delete [] skinrawdata;
       fclose(tempfile);
 
       // convert to a gif which we CAN read
@@ -230,11 +230,11 @@ csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,cha
 
       if (prefixstring)
       {
-        CHK (char *prefixedname = new char[strlen(filename)+strlen(prefixstring)+1]);
+        char *prefixedname = new char[strlen(filename)+strlen(prefixstring)+1];
         strcpy(prefixedname,prefixstring);
 	strcat(prefixedname,filename);
 	defaulttexture->SetName (prefixedname);
-	CHK (delete[] prefixedname);
+	delete[] prefixedname;
       }
       defaulttexture->SetName (filename);
     }
@@ -266,7 +266,7 @@ csCrossBuild_ThingTemplateFactory::~csCrossBuild_ThingTemplateFactory()
 /// full thing template builder
 csBase *csCrossBuild_ThingTemplateFactory::CrossBuild(converter &buildsource)
 {
-  CHK (csThingTemplate *newtemplate = new csThingTemplate());
+  csThingTemplate *newtemplate = new csThingTemplate();
   CrossBuild ((csBase*)newtemplate, buildsource);
   return newtemplate;
 }
@@ -305,7 +305,7 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThingTemplate& mesh
   {
     char buf[10];
     sprintf (buf, "t%d", triangleindex);
-    CHK (csPolygonTemplate* ptemp = new csPolygonTemplate (&meshsource, buf));
+    csPolygonTemplate* ptemp = new csPolygonTemplate (&meshsource, buf);
     int a = buildsource.face[0][triangleindex];
     int b = buildsource.face[1][triangleindex];
     int c = buildsource.face[2][triangleindex];
@@ -404,7 +404,7 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2SpriteTemplate(
   sprintf(tempfilename,"%s.md2",tempfilenamebase);
   FILE *tempfile = fopen(tempfilename,"wb");
   fwrite(modelrawdata,modeldatasize,1,tempfile);
-  CHK (delete [] modelrawdata);
+  delete [] modelrawdata;
 
   converter modeldata;
   modeldata.ivcon(tempfilename);
@@ -446,7 +446,7 @@ csTextureHandle *csCrossBuild_Quake2Importer::Import_Quake2Textures (
       iImage *newskin = csImageLoader::Load((unsigned char *)imagedata,
         imagefilesize, importdestination->GetTextureFormat ());
 
-      CHK (delete [] imagedata);
+      delete [] imagedata;
 
       //if (!defaulttexture)
       defaulttexture = importdestination->GetTextures()->NewTexture (newskin);
@@ -457,11 +457,11 @@ csTextureHandle *csCrossBuild_Quake2Importer::Import_Quake2Textures (
       char *prefixstring = modelname;
       if (prefixstring)
       {
-        CHK (char *prefixedname = new char[strlen(skinfilename)+strlen(prefixstring)+1]);
+        char *prefixedname = new char[strlen(skinfilename)+strlen(prefixstring)+1];
         strcpy(prefixedname,prefixstring);
 	strcat(prefixedname,skinfilename);
 	defaulttexture->SetName (prefixedname);
-	CHK (delete[] prefixedname);
+	delete[] prefixedname;
       }
       defaulttexture->SetName (skinfilename);
 

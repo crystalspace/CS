@@ -80,11 +80,11 @@ void csScan_Initialize ()
   Scan.InterpolMode = INTER_MODE_SMART;
 
   // 16K
-  CHK (Scan.one_div_z = new unsigned int [1 << 12]);
+  Scan.one_div_z = new unsigned int [1 << 12];
   // ~1.5K
-  CHK (Scan.exp_256 = new unsigned char [EXP_256_SIZE+3]);
+  Scan.exp_256 = new unsigned char [EXP_256_SIZE+3];
   // ~1K
-  CHK (Scan.exp_16 = new unsigned char [EXP_32_SIZE+3]);
+  Scan.exp_16 = new unsigned char [EXP_32_SIZE+3];
   // 6*8K
   memset (&Scan.BlendingTable, sizeof (Scan.BlendingTable), 0);
 
@@ -105,7 +105,7 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
   // First free old blending tables
   for (i = 0; i < 6; i++)
     if (Scan.BlendingTable [i])
-      CHKB (delete [] Scan.BlendingTable [i]);
+      delete [] Scan.BlendingTable [i];
 
   // Compute number of bits for our blending table
   unsigned int bits = MAX (MAX (rbits, gbits), bbits);
@@ -128,7 +128,7 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
   if (bits2)
     table_size += 1 << (2 * bits2 + 1);
   for (i = 0; i < NUMBLENDINGTABLES; i++)
-    CHKB (Scan.BlendingTable [i] = new unsigned char [table_size]);
+    Scan.BlendingTable [i] = new unsigned char [table_size];
 
   unsigned int index = 0;
 
@@ -170,10 +170,10 @@ void csScan_CalcBlendTables (int rbits, int gbits, int bbits)
 void csScan_Finalize ()
 {
   for (int i = 0; i < NUMBLENDINGTABLES; i++)
-    CHKB (delete [] Scan.BlendingTable [i]);
-  CHK (delete [] Scan.exp_16);
-  CHK (delete [] Scan.exp_256);
-  CHK (delete [] Scan.one_div_z);
+    delete [] Scan.BlendingTable [i];
+  delete [] Scan.exp_16;
+  delete [] Scan.exp_256;
+  delete [] Scan.one_div_z;
 }
 
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,

@@ -35,8 +35,8 @@ csBspNode::csBspNode ()
 
 csBspNode::~csBspNode ()
 {
-  CHK (delete front);
-  CHK (delete back);
+  delete front;
+  delete back;
 }
 
 void csBspNode::AddPolygon (csPolygonInt* poly)
@@ -99,14 +99,14 @@ void csBspTree::Build ()
 
 void csBspTree::Build (csPolygonInt** polygons, int num)
 {
-  CHK (root = new csBspNode);
+  root = new csBspNode;
 
-  CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
+  csPolygonInt** new_polygons = new csPolygonInt* [num];
   int i;
   for (i = 0 ; i < num ; i++)
     new_polygons[i] = polygons[i];
   Build ((csBspNode*)root, new_polygons, num);
-  CHK (delete [] new_polygons);
+  delete [] new_polygons;
 }
 
 int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
@@ -235,8 +235,8 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
   node->splitter = *(split_poly->GetPolyPlane ());
 
   // Now we split the node according to the plane of that polygon.
-  CHK (csPolygonInt** front_poly = new csPolygonInt* [num]);
-  CHK (csPolygonInt** back_poly = new csPolygonInt* [num]);
+  csPolygonInt** front_poly = new csPolygonInt* [num];
+  csPolygonInt** back_poly = new csPolygonInt* [num];
   int front_idx = 0, back_idx = 0;
 
   for (i = 0 ; i < num ; i++)
@@ -266,17 +266,17 @@ void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
 
   if (front_idx)
   {
-    CHK (node->front = new csBspNode);
+    node->front = new csBspNode;
     Build (node->front, front_poly, front_idx);
   }
   if (back_idx)
   {
-    CHK (node->back = new csBspNode);
+    node->back = new csBspNode;
     Build (node->back, back_poly, back_idx);
   }
 
-  CHK (delete [] front_poly);
-  CHK (delete [] back_poly);
+  delete [] front_poly;
+  delete [] back_poly;
 }
 
 void csBspTree::ProcessTodo (csBspNode* node)
@@ -481,8 +481,8 @@ int* csBspTree::GetVertices (int& count)
 {
   if (!root) return 0;
   int cnt = ((csBspNode*)root)->CountVertices ();
-  CHK (int* idx = new int [cnt]);
-  CHK (int* idx2 = new int [cnt]);
+  int* idx = new int [cnt];
+  int* idx2 = new int [cnt];
   int cur_idx = 0;
   ((csBspNode*)root)->FetchVertices (idx, cur_idx);
 
@@ -496,12 +496,12 @@ int* csBspTree::GetVertices (int& count)
   {
     if (idx[i] != idx2[j-1]) idx2[j++] = idx[i];
   }
-  CHK (int* indices = new int [j]);
+  int* indices = new int [j];
   memcpy (indices, idx2, j*sizeof (int));
   count = j;
 
-  CHK (delete [] idx);
-  CHK (delete [] idx2);
+  delete [] idx;
+  delete [] idx2;
   return indices;
 }
 
@@ -560,8 +560,8 @@ bool csBspTree::ReadFromCache (iFile* cf, csBspNode* node,
   ReadPlane3 (cf, node->splitter);
 
   // Now we split the node according to the plane of that polygon.
-  CHK (csPolygonInt** front_poly = new csPolygonInt* [num]);
-  CHK (csPolygonInt** back_poly = new csPolygonInt* [num]);
+  csPolygonInt** front_poly = new csPolygonInt* [num];
+  csPolygonInt** back_poly = new csPolygonInt* [num];
   int front_idx = 0, back_idx = 0;
 
   for (i = 0 ; i < num ; i++)
@@ -597,33 +597,33 @@ bool csBspTree::ReadFromCache (iFile* cf, csBspNode* node,
 
   if (front_idx)
   {
-    CHK (node->front = new csBspNode);
+    node->front = new csBspNode;
     bool rc = ReadFromCache (cf, node->front, front_poly, front_idx);
     if (!rc) return false;
   }
   if (back_idx)
   {
-    CHK (node->back = new csBspNode);
+    node->back = new csBspNode;
     bool rc = ReadFromCache (cf, node->back, back_poly, back_idx);
     if (!rc) return false;
   }
 
-  CHK (delete [] front_poly);
-  CHK (delete [] back_poly);
+  delete [] front_poly;
+  delete [] back_poly;
   return true;
 }
 
 bool csBspTree::ReadFromCache (iFile* cf,
 	csPolygonInt** polygons, int num)
 {
-  CHK (root = new csBspNode);
+  root = new csBspNode;
 
-  CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
+  csPolygonInt** new_polygons = new csPolygonInt* [num];
   int i;
   for (i = 0 ; i < num ; i++)
     new_polygons[i] = polygons[i];
   bool rc = ReadFromCache (cf, (csBspNode*)root, new_polygons, num);
-  CHK (delete [] new_polygons);
+  delete [] new_polygons;
   return rc;
 }
 

@@ -189,7 +189,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   if (sim_depth == 15 && real_pfmt.PixelBytes == 1)
   {
     // Simulate 15-bit on 8-bit.
-    CHK (sim_lt8 = new unsigned char [65536]);
+    sim_lt8 = new unsigned char [65536];
     int i, r, g, b;
     for (i = 0 ; i < 32768 ; i++)
     {
@@ -202,7 +202,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   else if ((sim_depth == 16 || sim_depth == 32) && real_pfmt.PixelBytes == 1)
   {
     // Simulate 16-bit on 8-bit.
-    CHK (sim_lt8 = new unsigned char [65536]);
+    sim_lt8 = new unsigned char [65536];
     int i, r, g, b;
     for (i = 0 ; i < 65536 ; i++)
     {
@@ -248,8 +248,8 @@ csGraphics2DXLib::~csGraphics2DXLib(void)
   Close();
   if (UnixSystem)
     UnixSystem->DecRef ();
-  CHK (delete [] sim_lt8);
-  CHK (delete [] sim_lt16);
+  delete [] sim_lt8;
+  delete [] sim_lt16;
 }
 
 bool csGraphics2DXLib::Open(const char *Title)
@@ -411,7 +411,7 @@ bool csGraphics2DXLib::AllocateMemory ()
     {
       xim = XCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth, ZPixmap, 0,
 			 NULL, Width, Height, bitmap_pad, 0);
-      CHK(xim->data = new char[xim->bytes_per_line*xim->height]);
+      xim->data = new char[xim->bytes_per_line*xim->height];
       real_Memory = (unsigned char*)(xim->data);
     }
 
@@ -420,7 +420,7 @@ bool csGraphics2DXLib::AllocateMemory ()
     if (!sim_depth)
       Memory = real_Memory;
     else
-      CHKB (Memory = new unsigned char [Width*Height*pfmt.PixelBytes]);
+      Memory = new unsigned char [Width*Height*pfmt.PixelBytes];
   }
 
   return true;
@@ -448,7 +448,7 @@ void csGraphics2DXLib::Close ()
   }
   if (Memory && sim_depth)
   {
-    CHKB (delete [] Memory);
+    delete [] Memory;
     Memory = NULL;
   }
 
@@ -558,7 +558,7 @@ void csGraphics2DXLib::recompute_simulated_palette ()
   int i;
 
   // Create a palette of 16K entries
-  CHK (pe = new palent [65536]);
+  pe = new palent [65536];
   if (sim_depth == 32)
     for (i = 0 ; i < 65536 ; i++)
     {
@@ -612,7 +612,7 @@ void csGraphics2DXLib::recompute_simulated_palette ()
   // Sort based on count.
   qsort ((void*)pe, 65536, sizeof (palent), cmp_palent);
 
-  CHK (palent* pe_new = new palent[257]);
+  palent* pe_new = new palent[257];
   pe_new[0].r = 0;
   pe_new[0].g = 0;
   pe_new[0].b = 0;
@@ -691,8 +691,8 @@ void csGraphics2DXLib::recompute_simulated_palette ()
     XStoreColor (dpy, cmap, &color);
   }
 
-  CHK (delete [] pe);
-  CHK (delete [] pe_new);
+  delete [] pe;
+  delete [] pe_new;
   CsPrintf (MSG_DEBUG_0, "Done!\n");
 }
 
@@ -711,7 +711,7 @@ void csGraphics2DXLib::recompute_grey_palette ()
   int i;
 
   // Create a grey palette
-  CHK (pe = new palent [256]);
+  pe = new palent [256];
   for (i = 0 ; i < 256 ; i++)
   {
     pe[i].idx = i;
@@ -759,7 +759,7 @@ void csGraphics2DXLib::recompute_grey_palette ()
     XStoreColor (dpy, cmap, &color);
   }
 
-  CHK (delete [] pe);
+  delete [] pe;
   CsPrintf (MSG_DEBUG_0, "Done!\n");
 }
 
@@ -889,7 +889,7 @@ void csGraphics2DXLib::Print (csRect *area)
       // from 8-bit to 16-bit and we change 16-bit to 32-bit on the fly.
       if (!sim_lt16)
       {
-        CHK (sim_lt16 = new UShort [256]);
+        sim_lt16 = new UShort [256];
 	int i, r, g, b;
 	for (i = 0 ; i < 256 ; i++)
 	{
@@ -984,7 +984,7 @@ void csGraphics2DXLib::SetRGB(int i, int r, int g, int b)
   if (sim_depth == 8)
     if (sim_lt16)
     {
-      CHK (delete [] sim_lt16);
+      delete [] sim_lt16;
       sim_lt16 = NULL;
     }
 
@@ -1202,8 +1202,8 @@ bool csGraphics2DXLib::ReallocateMemory ()
     CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory!\n");
     return false;
   }
-  CHK (delete [] LineAddress);
-  CHK (LineAddress = new int [Height]);
+  delete [] LineAddress;
+  LineAddress = new int [Height];
   if (LineAddress == NULL) return false;
  
   // Initialize scanline address array
@@ -1219,7 +1219,7 @@ bool csGraphics2DXLib::ReallocateMemory ()
 iGraphics2D *csGraphics2DXLib::CreateOffScreenCanvas (int width, int height, 
 	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
 {
-  CHK (csDynamicTexture2D *tex = new csDynamicTexture2D (System));
+  csDynamicTexture2D *tex = new csDynamicTexture2D (System);
   return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
 				     palette, pal_size);
 }

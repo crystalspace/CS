@@ -330,18 +330,18 @@ csPolygonStubPool::~csPolygonStubPool ()
   while (alloced)
   {
     PoolObj* n = alloced->next;
-    //CHK (delete alloced->ps); @@@ This free is not valid!
+    //delete alloced->ps; @@@ This free is not valid!
     // We should use a ref count on the pool itself so that we
     // now when all objects in the pool are freed and the
     // 'alloced' list will be empty.
-    CHK (delete alloced);
+    delete alloced;
     alloced = n;
   }
   while (freed)
   {
     PoolObj* n = freed->next;
-    CHK (delete freed->ps);
-    CHK (delete freed);
+    delete freed->ps;
+    delete freed;
     freed = n;
   }
 }
@@ -356,8 +356,8 @@ csPolygonStub* csPolygonStubPool::Alloc ()
   }
   else
   {
-    CHK (pnew = new PoolObj ());
-    CHK (pnew->ps = new csPolygonStub ());
+    pnew = new PoolObj ();
+    pnew->ps = new csPolygonStub ();
   }
   pnew->next = alloced;
   alloced = pnew;

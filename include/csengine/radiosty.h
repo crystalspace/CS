@@ -53,7 +53,7 @@ public:
   ///
   void Clear ()
   {
-    CHK (delete [] map); map = NULL;
+    delete [] map; map = NULL;
     max_sizeRGB = 0;
   }
 
@@ -83,8 +83,8 @@ public:
   void Alloc (int size)
   {
     max_sizeRGB = size;
-    CHK (delete [] map);
-    CHK (map = new float [size*3]);
+    delete [] map;
+    map = new float [size*3];
   }
 
   /// copy from floatmap

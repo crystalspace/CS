@@ -55,7 +55,7 @@ csCBufferLine::~csCBufferLine ()
   while (first_span)
   {
     n = first_span->next;
-    CHK (delete first_span);
+    delete first_span;
     first_span = n;
   }
 }
@@ -177,7 +177,7 @@ csCBuffer::csCBuffer (int sx, int ex, int n_lines)
   num_lines = n_lines;
   startx = sx;
   endx = ex;
-  CHK (lines = new csCBufferLine [num_lines]);
+  lines = new csCBufferLine [num_lines];
   first_unused = NULL;
   int i;
   for (i = 0 ; i < num_lines ; i++)
@@ -190,10 +190,10 @@ csCBuffer::~csCBuffer ()
   while (first_unused)
   {
     csCBufferSpan* n = first_unused->next;
-    CHK (delete first_unused);
+    delete first_unused;
     first_unused = n;
   }
-  CHK (delete [] lines);
+  delete [] lines;
 }
 
 void csCBuffer::Initialize ()

@@ -45,7 +45,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   // Get the system parameters
   System->GetSettings (Width, Height, Depth, FullScreen);
 
-  CHK (Palette = new RGBPixel[256]);
+  Palette = new RGBPixel[256];
 
   // get the fontrenderer
   const char *p = pSystem->ConfigGetStr ("FontRender", CS_FUNCID_FONT, "crystalspace.font.render.csfont");
@@ -86,7 +86,7 @@ bool csGraphics2D::Open (const char *Title)
   FrameBufferLocked = 0;
 
   // Allocate buffer for address of each scan line to avoid multuplication
-  CHK (LineAddress = new int [Height]);
+  LineAddress = new int [Height];
   if (LineAddress == NULL) return false;
 
   // Initialize scanline address array
@@ -101,7 +101,7 @@ bool csGraphics2D::Open (const char *Title)
 void csGraphics2D::Close ()
 {
   if (LineAddress)
-  { CHK (delete [] LineAddress); LineAddress = NULL; }
+  { delete [] LineAddress; LineAddress = NULL; }
 }
 
 bool csGraphics2D::BeginDraw ()
@@ -405,11 +405,11 @@ csImageArea *csGraphics2D::SaveArea (int x, int y, int w, int h)
   if ((w <= 0) || (h <= 0))
     return NULL;
 
-  CHK (csImageArea *Area = new csImageArea (x, y, w, h));
+  csImageArea *Area = new csImageArea (x, y, w, h);
   if (!Area)
     return NULL;
   w *= pfmt.PixelBytes;
-  CHK (char *dest = Area->data = new char [w * h]);
+  char *dest = Area->data = new char [w * h];
   if (!dest)
   {
     delete Area;
@@ -447,8 +447,8 @@ void csGraphics2D::FreeArea (csImageArea *Area)
   if (Area)
   {
     if (Area->data)
-      CHKB (delete[] Area->data);
-    CHK (delete Area);
+      delete[] Area->data;
+    delete Area;
   } /* endif */
 }
 

@@ -22,9 +22,9 @@
 
 void csFrustum::Clear ()
 {
-  CHK (delete [] vertices); vertices = NULL;
+  delete [] vertices; vertices = NULL;
   num_vertices = max_vertices = 0;
-  CHK (delete backplane); backplane = NULL;
+  delete backplane; backplane = NULL;
   wide = false;
   mirrored = false;
 }
@@ -39,14 +39,14 @@ csFrustum::csFrustum (csVector3& o, csVector3* verts, int num_verts,
   mirrored = false;
   if (verts)
   {
-    CHK (vertices = new csVector3 [max_vertices]);
+    vertices = new csVector3 [max_vertices];
     memcpy (vertices, verts, sizeof (csVector3) * num_vertices);
   }
   else vertices = NULL;
 
   if (backp)
   {
-    CHK (backplane = new csPlane3 (*backp));
+    backplane = new csPlane3 (*backp);
   }
   else backplane = NULL;
 }
@@ -60,36 +60,36 @@ csFrustum::csFrustum (const csFrustum &copy)
   mirrored = copy.mirrored;
   if (copy.vertices)
   {
-    CHK (vertices = new csVector3 [max_vertices]);
+    vertices = new csVector3 [max_vertices];
     memcpy (vertices, copy.vertices, sizeof (csVector3) * num_vertices);
   }
   else vertices = NULL;
 
   if (copy.backplane)
   {
-    CHK (backplane = new csPlane3 (*copy.backplane));
+    backplane = new csPlane3 (*copy.backplane);
   }
   else backplane = NULL;
 }
 
 void csFrustum::SetBackPlane (csPlane3& plane)
 {
-  CHK (delete backplane);
-  CHK (backplane = new csPlane3 (plane));
+  delete backplane;
+  backplane = new csPlane3 (plane);
 }
 
 void csFrustum::RemoveBackPlane ()
 {
-  CHK (delete backplane); backplane = NULL;
+  delete backplane; backplane = NULL;
 }
 
 void csFrustum::ExtendVertexArray (int num)
 {
-  CHK (csVector3* new_vertices = new csVector3 [max_vertices+num]);
+  csVector3* new_vertices = new csVector3 [max_vertices+num];
   if (vertices)
   {
     memcpy (new_vertices, vertices, sizeof (csVector3)*num_vertices);
-    CHK (delete [] vertices);
+    delete [] vertices;
   }
   vertices = new_vertices;
   max_vertices += num;
@@ -280,7 +280,7 @@ void csFrustum::ClipToPlane (csVector3& v1, csVector3& v2)
 csFrustum* csFrustum::Intersect (const csFrustum& other)
 {
   if (other.IsEmpty ()) return NULL;
-  if (other.IsInfinite ()) { CHK (csFrustum* f = new csFrustum (*this)); return f; }
+  if (other.IsInfinite ()) { csFrustum* f = new csFrustum (*this); return f; }
   return Intersect (other.vertices, other.num_vertices);
 }
 
@@ -291,7 +291,7 @@ csFrustum* csFrustum::Intersect (csVector3* poly, int num)
   {
     // If this frustum is infinite then the intersection of this
     // frustum with the other is equal to the other.
-    CHK (new_frustum = new csFrustum (origin, poly, num));
+    new_frustum = new csFrustum (origin, poly, num);
     new_frustum->SetMirrored (IsMirrored ());
   }
   else if (IsEmpty ())
@@ -305,7 +305,7 @@ csFrustum* csFrustum::Intersect (csVector3* poly, int num)
     // General case. Create a new frustum from the given polygon with
     // the origin of this frustum and clip it to every plane from this
     // frustum.
-    CHK (new_frustum = new csFrustum (GetOrigin (), poly, num));
+    new_frustum = new csFrustum (GetOrigin (), poly, num);
     new_frustum->SetMirrored (IsMirrored ());
     int i, i1;
     i1 = num_vertices-1;
@@ -315,7 +315,7 @@ csFrustum* csFrustum::Intersect (csVector3* poly, int num)
       if (new_frustum->IsEmpty ())
       {
         // Intersection has become empty. Return NULL.
-	CHK (delete new_frustum);
+	delete new_frustum;
 	return NULL;
       }
       i1 = i;
@@ -329,7 +329,7 @@ csFrustum* csFrustum::Intersect (csVector3* poly, int num)
       if (new_frustum->IsEmpty ())
       {
         // Intersection has become empty. Return NULL.
-	CHK (delete new_frustum);
+	delete new_frustum;
 	return NULL;
       }
     }

@@ -32,7 +32,7 @@ csCurvesArray::~csCurvesArray ()
 
 bool csCurvesArray::FreeItem (csSome Item)
 {
-  CHK (delete (csCurve *)Item);
+  delete (csCurve *)Item;
   return true;
 }
 
@@ -52,7 +52,7 @@ csPolygonArray::~csPolygonArray ()
 
 bool csPolygonArray::FreeItem (csSome Item)
 {
-  CHK (delete (csPolygon3D *)(csPolygonInt *)Item);
+  delete (csPolygon3D *)(csPolygonInt *)Item;
   return true;
 }
 
@@ -89,7 +89,7 @@ csPolygonTemplateArray::~csPolygonTemplateArray ()
 
 bool csPolygonTemplateArray::FreeItem (csSome Item)
 {
-  CHK (delete (csPolygonTemplate *)Item);
+  delete (csPolygonTemplate *)Item;
   return true;
 }
 
@@ -109,7 +109,7 @@ csCurveTemplateArray::~csCurveTemplateArray ()
 
 bool csCurveTemplateArray::FreeItem (csSome Item)
 {
-  CHK (delete (csCurveTemplate *)Item);
+  delete (csCurveTemplate *)Item;
   return true;
 }
 

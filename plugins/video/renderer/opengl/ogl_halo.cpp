@@ -79,8 +79,8 @@ csOpenGLHalo::csOpenGLHalo(float iR,float iG,float iB,unsigned char *iAlpha,
 
   //Normally I could use the supplied iAlpha directly, but since I have to transform
   //The halo (fade-in) I make 2 buffers
-  CHK(Alpha=new unsigned char [Width*Height]);
-  CHK(backAlpha=new unsigned char [Width*Height]);
+  Alpha=new unsigned char [Width*Height];
+  backAlpha=new unsigned char [Width*Height];
 
   memset(Alpha,0,Width*Height); //Clear both buffers (no garbage)
   memset(backAlpha,0,Width*Height);
@@ -109,8 +109,8 @@ csOpenGLHalo::csOpenGLHalo(float iR,float iG,float iB,unsigned char *iAlpha,
 csOpenGLHalo::~csOpenGLHalo()
 {
   //Kill, crush and destroy
-  CHK(delete [] Alpha);
-  CHK(delete [] backAlpha);
+  delete [] Alpha;
+  delete [] backAlpha;
   glDeleteTextures(1,&halohandle);  //Delete generated OpenGL handle
   G3D->DecRef();
 }
@@ -188,6 +188,6 @@ void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVecto
 
 iHalo *csGraphics3DOpenGL::CreateHalo(float iR,float iG,float iB,unsigned char *iAlpha,int iWidth,int iHeight)
 {
-  CHK(csOpenGLHalo *h=new csOpenGLHalo(iR,iG,iB,iAlpha,iWidth,iHeight,this));
+  csOpenGLHalo *h=new csOpenGLHalo(iR,iG,iB,iAlpha,iWidth,iHeight,this);
   return h;
 }

@@ -120,7 +120,7 @@ class csSystemDriver : public iSystem
     virtual ~csPluginOption ()
     {
       Config->DecRef ();
-      CHK (delete [] Name);
+      delete [] Name;
     }
   };
 
@@ -135,7 +135,7 @@ class csSystemDriver : public iSystem
     { Name = iName; Value = iValue; }
     /// Destructor: assume that "delete [] Name" will remove also Value
     ~csCommandLineOption ()
-    { CHK (delete [] Name); }
+    { delete [] Name; }
   };
 
   class csCommandLineOptions : public csVector
@@ -143,7 +143,7 @@ class csSystemDriver : public iSystem
   public:
     csCommandLineOptions (int iLength, int iDelta) : csVector (iLength, iDelta) {}
     virtual bool FreeItem (csSome Item)
-    { CHK (delete (csCommandLineOption *)Item); return true; }
+    { delete (csCommandLineOption *)Item; return true; }
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
     { return strcmp (((csCommandLineOption *)Item)->Name, (const char*)Key); }
   };

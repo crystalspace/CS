@@ -156,7 +156,7 @@ class csWorld : public iWorld, public csObject
     virtual ~csHaloVector () { DeleteAll (); }
     // Free an item from array
     virtual bool FreeItem (csSome Item)
-    { CHK (delete (csLightHalo *)Item); return true; }
+    { delete (csLightHalo *)Item; return true; }
     // Find a halo by referenced light
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
     { return ((csLightHalo *)Item)->Light == (csLight *)Key ? 0 : -1; }
@@ -704,7 +704,7 @@ public:
   csPolyIt* NewPolyIterator ()
   {
     csPolyIt* it;
-    CHK (it = new csPolyIt (this));
+    it = new csPolyIt (this);
     return it;
   }
 
@@ -714,7 +714,7 @@ public:
   csLightIt* NewLightIterator ()
   {
     csLightIt* it;
-    CHK (it = new csLightIt (this));
+    it = new csLightIt (this);
     return it;
   }
 

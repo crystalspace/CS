@@ -54,18 +54,18 @@ public:
     while (alloced)
     {
       PoolObj* n = alloced->next;
-      //CHK (delete alloced->lp); @@@ This free is not valid!
+      //delete alloced->lp; @@@ This free is not valid!
       // We should use a ref count on the pool itself so that we
       // now when all objects in the pool are freed and the
       // 'alloced' list will be empty.
-      CHK (delete alloced);
+      delete alloced;
       alloced = n;
     }
     while (freed)
     {
       PoolObj* n = freed->next;
-      CHK (delete freed->lp);
-      CHK (delete freed);
+      delete freed->lp;
+      delete freed;
       freed = n;
     }
   }
@@ -81,8 +81,8 @@ public:
     }
     else
     {
-      CHK (pnew = new PoolObj ());
-      CHK (pnew->lp = new csLightPatch ());
+      pnew = new PoolObj ();
+      pnew->lp = new csLightPatch ();
     }
     pnew->next = alloced;
     alloced = pnew;

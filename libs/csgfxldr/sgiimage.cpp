@@ -52,10 +52,10 @@ bool RegisterSGI ()
 
 csImageFile* csSGIImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 {
-  CHK (ImageSGIFile* i = new ImageSGIFile (iFormat));
+  ImageSGIFile* i = new ImageSGIFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
-    CHK (delete i);
+    delete i;
     return NULL;
   }
   return i;

@@ -43,9 +43,9 @@ csThingTemplate::csThingTemplate () : csObject (),
 
 csThingTemplate::~csThingTemplate ()
 {
-  CHK (delete [] vertices);
-  CHK (delete [] curve_vertices);
-  CHK (delete [] curve_texels);
+  delete [] vertices;
+  delete [] curve_vertices;
+  delete [] curve_texels;
 }
 
 void csThingTemplate::AddVertex (float x, float y, float z)
@@ -53,14 +53,14 @@ void csThingTemplate::AddVertex (float x, float y, float z)
   if (!vertices)
   {
     max_vertices = 10;
-    CHK (vertices = new csVector3 [max_vertices]);
+    vertices = new csVector3 [max_vertices];
   }
   while (num_vertices >= max_vertices)
   {
     max_vertices += 10;
-    CHK (csVector3* new_vertices = new csVector3 [max_vertices]);
+    csVector3* new_vertices = new csVector3 [max_vertices];
     memcpy (new_vertices, vertices, sizeof (csVector3)*num_vertices);
-    CHK (delete [] vertices);
+    delete [] vertices;
     vertices = new_vertices;
   }
 
@@ -75,18 +75,18 @@ void csThingTemplate::AddCurveVertex (csVector3& v, csVector2& t)
   if (!curve_vertices)
   {
     max_curve_vertices = 10;
-    CHK (curve_vertices = new csVector3 [max_curve_vertices]);
-    CHK (curve_texels   = new csVector2 [max_curve_vertices]);
+    curve_vertices = new csVector3 [max_curve_vertices];
+    curve_texels   = new csVector2 [max_curve_vertices];
   }
   while (num_curve_vertices >= max_curve_vertices)
   {
     max_curve_vertices += 10;
-    CHK (csVector3* new_vertices = new csVector3 [max_curve_vertices]);
-    CHK (csVector2* new_texels   = new csVector2 [max_curve_vertices]);
+    csVector3* new_vertices = new csVector3 [max_curve_vertices];
+    csVector2* new_texels   = new csVector2 [max_curve_vertices];
     memcpy (new_vertices, curve_vertices, sizeof (csVector3)*num_curve_vertices);
     memcpy (new_texels,   curve_texels,   sizeof (csVector2)*num_curve_vertices);
-    CHK (delete [] curve_vertices);
-    CHK (delete [] curve_texels);
+    delete [] curve_vertices;
+    delete [] curve_texels;
     curve_vertices = new_vertices;
     curve_texels   = new_texels;
   }
@@ -117,9 +117,9 @@ csPolygonTemplate::csPolygonTemplate (csThingTemplate* iParent, char* iName,
 
 csPolygonTemplate::~csPolygonTemplate ()
 {
-  CHK (delete [] name);
-  CHK (delete [] vertices_idx);
-  CHK (delete [] uv_coords);
+  delete [] name;
+  delete [] vertices_idx;
+  delete [] uv_coords;
 }
 
 void csPolygonTemplate::AddVertex (int v)
@@ -127,14 +127,14 @@ void csPolygonTemplate::AddVertex (int v)
   if (!vertices_idx)
   {
     max_vertices = 4;
-    CHK (vertices_idx = new int [max_vertices]);
+    vertices_idx = new int [max_vertices];
   }
   while (num_vertices >= max_vertices)
   {
     max_vertices += 2;
-    CHK (int* new_vertices_idx = new int [max_vertices]);
+    int* new_vertices_idx = new int [max_vertices];
     memcpy (new_vertices_idx, vertices_idx, sizeof (int)*num_vertices);
-    CHK (delete [] vertices_idx);
+    delete [] vertices_idx;
     vertices_idx = new_vertices_idx;
   }
 
@@ -143,14 +143,14 @@ void csPolygonTemplate::AddVertex (int v)
 
 void csPolygonTemplate::SetUV (int i, float u, float v)
 {
-  if (!uv_coords) CHKB (uv_coords = new csVector2 [num_vertices]);
+  if (!uv_coords) uv_coords = new csVector2 [num_vertices];
   uv_coords[i].x = u;
   uv_coords[i].y = v;
 }
 
 void csPolygonTemplate::ResetUV ()
 {
-  CHK (delete [] uv_coords);
+  delete [] uv_coords;
   uv_coords = NULL;
 }
 

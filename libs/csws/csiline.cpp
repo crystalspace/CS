@@ -36,11 +36,11 @@ csInputLine::csInputLine (csComponent *iParent, int iMaxLen,
   cursorpos = 0;
   selstart = selend = 0;
   textx = 0;
-  CHK (text = new char [iMaxLen + 1]);
+  text = new char [iMaxLen + 1];
   SetText (NULL);
   FrameStyle = iFrameStyle;
   SetPalette (CSPAL_INPUTLINE);
-  CHK (timer = new csTimer (this, CURSOR_FLASHING_INTERVAL));
+  timer = new csTimer (this, CURSOR_FLASHING_INTERVAL);
 }
 
 void csInputLine::SetText (const char *iText)

@@ -40,7 +40,7 @@ csSoundData::~csSoundData()
 
 void csSoundData::Clean()
 {
-  CHKB (delete [] (UByte *)Data);
+  delete [] (UByte *)Data;
   Data = NULL;
   Size = 0;
   Frequency = 0;
@@ -99,7 +99,7 @@ bool csSoundData::convertFrequencyTo (int toFrequency)
       int nextchan=(Stereo)?2:1;
       double step;
 
-      CHK (convert=new unsigned char [newsize]);
+      convert=new unsigned char [newsize];
       if (convert == NULL) return 0;
 
       for(i = 0, step = 0.0; i < newsize; i++, step += coeff)
@@ -110,7 +110,7 @@ bool csSoundData::convertFrequencyTo (int toFrequency)
           ((int (from [intstep + nextchan]) - int (from [intstep]))) * interstep);
       }
 
-      CHK (delete (UByte *) Data);
+      delete (UByte *) Data;
       Data = (UByte *)convert;
       Size = newsize;
       Frequency = toFrequency;
@@ -125,7 +125,7 @@ bool csSoundData::convertFrequencyTo (int toFrequency)
 
       newsize=(unsigned long)((double)(Size)/coeff);
 
-      CHK (convert=new short [newsize]);
+      convert=new short [newsize];
       if (convert == NULL) return 0;
 
       for (i = 0, step = 0.0; i < newsize; i++, step += coeff)
@@ -137,7 +137,7 @@ bool csSoundData::convertFrequencyTo (int toFrequency)
           (int (from [intstep + nextchan]) - int (from [intstep])) * interstep);
       }
 
-      CHK (delete [] (UByte *)Data);
+      delete [] (UByte *)Data;
       Data=(UByte *)convert;
       Size=newsize;
       Frequency=toFrequency;
@@ -158,13 +158,13 @@ bool csSoundData::convert16bitTo(bool toBit16)
       short *convert;
       UByte *from=(UByte *)Data;
 
-      CHK (convert=new short [Size]);
+      convert=new short [Size];
       if(convert==NULL) return 0;
 
       for(int j=0; j<Size; j++)
         convert [j] = (from [j] * 256) - 32768;
 
-      CHK (delete [] (UByte *)Data);
+      delete [] (UByte *)Data;
       Data=(unsigned char *)convert;
       Bit16=true;
     }
@@ -173,13 +173,13 @@ bool csSoundData::convert16bitTo(bool toBit16)
       unsigned char *convert;
       short *from=(short *)Data;
 
-      CHK (convert = new unsigned char [Size]);
+      convert = new unsigned char [Size];
       if(convert == NULL) return 0;
 
       for (i = 0; i < Size; i++)
         convert [i] = (from [i] - 32768) / 256;
 
-      CHK (delete [] (UByte *)Data);
+      delete [] (UByte *)Data;
       Data = (UByte *)convert;
       Bit16 = false;
     }
@@ -202,13 +202,13 @@ bool csSoundData::convertStereoTo(bool toStereo)
         unsigned char *from=(UByte *)Data;
         long newsize=Size/2;
 
-        CHK (convert=new unsigned char [newsize]);
+        convert=new unsigned char [newsize];
         if(convert==NULL) return 0;
 
         for(i=0; i<newsize; i++)
           convert[i]=(from[i*2]+from[(i*2)+1])/2;
 
-        CHK (delete [] (UByte *)Data);
+        delete [] (UByte *)Data;
         Data=(UByte *)convert;
         Stereo=false;
         Size=newsize;
@@ -219,13 +219,13 @@ bool csSoundData::convertStereoTo(bool toStereo)
         short *from=(short *)Data;
         long newsize=Size/2;
 
-        CHK (convert=new short [newsize]);
+        convert=new short [newsize];
         if(convert==NULL) return 0;
 
         for(i=0; i<newsize; i++)
           convert[i]=(from[i*2]+from[(i*2)+1])/2;
 
-        CHK (delete [] (UByte *) Data);
+        delete [] (UByte *) Data;
         Data=(UByte *)convert;
         Stereo=false;
         Size=newsize;
@@ -239,13 +239,13 @@ bool csSoundData::convertStereoTo(bool toStereo)
         unsigned char *from=(UByte *)Data;
         long newsize=Size*2;
 
-        CHK (convert=new unsigned char [newsize]);
+        convert=new unsigned char [newsize];
         if(convert==NULL) return 0;
 
         for(i=0; i<Size; i++)
           convert[i*2]=convert[(i*2)+1]=from[i];
 
-        CHK (delete [] (UByte *)Data);
+        delete [] (UByte *)Data;
         Data=(UByte *)convert;
         Size=newsize;
         Stereo=true;
@@ -256,13 +256,13 @@ bool csSoundData::convertStereoTo(bool toStereo)
         short *from=(short *)Data;
         long newsize=Size*2;
 
-        CHK (convert=new short [newsize]);
+        convert=new short [newsize];
         if(convert==NULL) return 0;
 
         for(i=0; i<Size; i++)
           convert[i*2]=convert[(i*2)+1]=from[i];
 
-        CHK (delete [] (UByte *)Data);
+        delete [] (UByte *)Data;
         Data=(UByte *)convert;
         Size=newsize;
         Stereo=true;

@@ -204,18 +204,18 @@ void bind_key (const char* arg)
     csKeyMap* map = find_mapping (arg);
     if (map)
     {
-      CHK (delete [] map->cmd);
+      delete [] map->cmd;
     }
     else
     {
-      CHK (map = new csKeyMap ());
+      map = new csKeyMap ();
       map->next = mapping;
       map->prev = NULL;
       if (mapping) mapping->prev = map;
       mapping = map;
       map_key (arg, map);
     }
-    CHK (map->cmd = new char [strlen (space+1)+1]);
+    map->cmd = new char [strlen (space+1)+1];
     strcpy (map->cmd, space+1);
     *space = ' ';
   }
@@ -234,8 +234,8 @@ void free_keymap ()
   {
     prev = cur;
     cur = cur->next;
-    CHK (delete [] prev->cmd);
-    CHK (delete prev);
+    delete [] prev->cmd;
+    delete prev;
   }
   mapping = NULL;
 }

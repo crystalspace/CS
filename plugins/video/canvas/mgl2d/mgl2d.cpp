@@ -26,7 +26,7 @@
 #undef CHK
 #include "mgl2d.h"
 #undef CHK
-#define CHK(x) x
+#define x x
 
 extern int ScancodeToChar[];
 

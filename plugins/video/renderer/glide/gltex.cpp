@@ -126,7 +126,7 @@ void csTextureMMGlide::remap_mm ()
       dest = (UShort *)tex->get_bitmap ();
       if ( !dest )
       {
-        CHK ( dest = new UShort[ w*h ] );
+         dest = new UShort[ w*h ] ;
 	tex->raw = dest;
       }
       

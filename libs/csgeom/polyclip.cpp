@@ -111,7 +111,7 @@ csPolygonClipper::csPolygonClipper (csPoly2D *Clipper, bool mirror, bool copy)
   {
     ClipPoly2D = NULL;
     ClipPoly = Clipper->GetVertices ();
-    CHK (ClipData = new csVector2 [ClipPolyVertices]);
+    ClipData = new csVector2 [ClipPolyVertices];
   }
 
   Prepare ();
@@ -140,7 +140,7 @@ csPolygonClipper::csPolygonClipper (csVector2 *Clipper, int Count,
   {
     ClipPoly2D = NULL;
     ClipPoly = Clipper;
-    CHK (ClipData = new csVector2 [ClipPolyVertices]);
+    ClipData = new csVector2 [ClipPolyVertices];
   }
 
   Prepare ();
@@ -151,7 +151,7 @@ csPolygonClipper::~csPolygonClipper ()
   if (ClipPoly2D)
     polypool.Free (ClipPoly2D);
   else
-    CHKB (delete [] ClipData);
+    delete [] ClipData;
 }
 
 void csPolygonClipper::Prepare ()

@@ -89,7 +89,7 @@ bool csGraphics2DGLCommon::Open (const char *Title)
 void csGraphics2DGLCommon::Close(void)
 {
   csGraphics2D::Close ();
-  CHK (delete LocalFontServer);
+  delete LocalFontServer;
   LocalFontServer = NULL;
 }
 

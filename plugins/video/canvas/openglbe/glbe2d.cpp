@@ -85,8 +85,8 @@ bool csGraphics2DGLBe::Open(const char* title)
     win_rect.Set(x, y, x + vw, y + vh);
   }
 
-  view = CHK(new CrystGLView(BRect(0, 0, vw, vh), be_system));
-  window = CHK(new CrystGLWindow(win_rect, title, view, System, be_system));
+  view = new CrystGLView(BRect(0, 0, vw, vh), be_system);
+  window = new CrystGLWindow(win_rect, title, view, System, be_system);
 	
   window->Show();
   if (window->Lock())

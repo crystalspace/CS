@@ -195,7 +195,7 @@ csStatLight::csStatLight (float x, float y, float z, float dist,
 
 csStatLight::~csStatLight ()
 {
-  CHK (delete [] polygons);
+  delete [] polygons;
 }
 
 void poly_light_func (csObject* obj, csFrustumView* lview)
@@ -232,7 +232,7 @@ void csStatLight::CalculateLighting ()
   lview.b = GetColor ().blue;
   lview.dynamic = false;
 
-  CHK (lview.light_frustum = new csFrustum (center));
+  lview.light_frustum = new csFrustum (center);
   lview.light_frustum->MakeInfinite ();
   sector->CheckFrustum (lview);
 }
@@ -259,7 +259,7 @@ void csStatLight::CalculateLighting (csThing* th)
   lview.b = GetColor ().blue;
   lview.dynamic = false;
 
-  CHK (lview.light_frustum = new csFrustum (center));
+  lview.light_frustum = new csFrustum (center);
   lview.light_frustum->MakeInfinite ();
   th->CheckFrustum (lview);
 }
@@ -287,7 +287,7 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
   lview.callback = callback;
   lview.callback_data = callback_data;
 
-  CHK (lview.light_frustum = new csFrustum (center));
+  lview.light_frustum = new csFrustum (center);
   lview.light_frustum->MakeInfinite ();
   sector->CheckFrustum (lview);
 }
@@ -298,7 +298,7 @@ void csStatLight::RegisterPolygon (csPolygon3D* poly)
   if (dynamic && !polygons)
   {
     num_polygon = 0;
-    CHK (polygons = new csPolygon3D* [MAX_NUM_POLYGON]);
+    polygons = new csPolygon3D* [MAX_NUM_POLYGON];
   }
 
   int i;
@@ -351,7 +351,7 @@ csLightPatch::csLightPatch ()
 
 csLightPatch::~csLightPatch ()
 {
-  CHK (delete [] vertices);
+  delete [] vertices;
   RemovePatch ();
 }
 
@@ -366,9 +366,9 @@ void csLightPatch::Initialize (int n)
 {
   if (n > max_vertices)
   {
-    CHK (delete [] vertices);
+    delete [] vertices;
     max_vertices = n;
-    CHK (vertices = new csVector3 [max_vertices]);
+    vertices = new csVector3 [max_vertices];
   }
   num_vertices = n;
 }
@@ -414,7 +414,7 @@ void csDynLight::Setup ()
   lview.b = GetColor ().blue;
   lview.dynamic = true;
 
-  CHK (lview.light_frustum = new csFrustum (center));
+  lview.light_frustum = new csFrustum (center);
   lview.light_frustum->MakeInfinite ();
   sector->CheckFrustum (lview);
 }

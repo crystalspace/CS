@@ -235,7 +235,7 @@ bool csGraphics2DLineXLib::Open(const char *Title)
       break;
   }
 
-  CHK (Memory = new unsigned char [Width*Height*pfmt.PixelBytes]);
+  Memory = new unsigned char [Width*Height*pfmt.PixelBytes];
 
   Clear (0);
   return true;
@@ -268,7 +268,7 @@ void csGraphics2DLineXLib::Close ()
   }
   if (Memory)
   {
-    CHKB (delete [] Memory);
+    delete [] Memory;
     Memory = NULL;
   }
 

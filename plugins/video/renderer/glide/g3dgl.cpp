@@ -214,9 +214,9 @@ csGraphics3DGlide::~csGraphics3DGlide()
   if (m_pAlphamapCache)
     m_pAlphamapCache->DecRef ();
   if (config)
-    CHKB (delete config);
+    delete config;
   if (txtmgr)
-    CHKB (delete txtmgr);
+    delete txtmgr;
   if (m_pCamera)
     m_pCamera->DecRef ();
   if (m_piGlide2D)
@@ -240,7 +240,7 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
   m_piG2D = LOAD_PLUGIN (m_piSystem, GLIDE_2D, NULL, iGraphics2D);
   if (!m_piG2D) return false;
 
-  CHK (txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D, this, config));
+  txtmgr = new csTextureManagerGlide (m_piSystem, m_piG2D, this, config);
 
   m_bVRetrace = config->GetYesNo("Glide","VRETRACE",FALSE);
   // tell the 2D driver whether to wait for VRETRACE
@@ -267,7 +267,7 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
   // if a board sports only one TMU all kind of textures go into this one
   // otherwise plain textures and alphamaps are in the first TMU and lightmaps in the 2nd
   FixedTextureMemoryManager *pTMM = new FixedTextureMemoryManager (m_TMUs[0].memory_size);
-  CHK (m_pTextureCache = new csGlideTextureCache ( &m_TMUs[0], 16, pTMM ));
+  m_pTextureCache = new csGlideTextureCache ( &m_TMUs[0], 16, pTMM );
   if ( m_iMultiPass )
   {
     m_pLightmapCache = m_pTextureCache;
@@ -276,7 +276,7 @@ bool csGraphics3DGlide::Initialize (iSystem *iSys)
   else
   {
     pTMM = new FixedTextureMemoryManager (m_TMUs[1].memory_size);
-    CHK (m_pLightmapCache = new csGlideTextureCache ( &m_TMUs[1], 16, pTMM ));
+    m_pLightmapCache = new csGlideTextureCache ( &m_TMUs[1], 16, pTMM );
   }
   m_pAlphamapCache = m_pTextureCache;
   m_pTextureCache->IncRef ();
@@ -470,11 +470,11 @@ void csGraphics3DGlide::SetPerspectiveCenter (int x, int y)
 
 void csGraphics3DGlide::SetClipper (csVector2* vertices, int num_vertices)
 {
-  CHK (delete clipper);
+  delete clipper;
   clipper = NULL;
   if (!vertices) return;
   
-  CHK (clipper = new csPolygonClipper (vertices, num_vertices, false, true));
+  clipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
 bool csGraphics3DGlide::BeginDraw (int DrawFlags)
@@ -1074,7 +1074,7 @@ void csGraphics3DGlide::DrawPolygonFX (G3DPolygonDPFX& poly)
     if ( poly.num  > m_vertsize )
     {
       if ( m_verts ) delete m_verts;
-      CHK (m_verts = new MyGrVertex[poly.num]);
+      m_verts = new MyGrVertex[poly.num];
       m_vertsize = poly.num;
     }
 

@@ -56,7 +56,7 @@ csKeyboardAccelerator::~csKeyboardAccelerator ()
 
 void csKeyboardAccelerator::Event (int iKey, int iShifts, csEvent &iEvent)
 {
-  CHK (csAccElement *ae = new csAccElement);
+  csAccElement *ae = new csAccElement;
   ae->Key = iKey;
   ae->Shifts = iShifts;
   ae->Event = iEvent;
@@ -92,7 +92,7 @@ bool csKeyboardAccelerator::PostHandleEvent (csEvent &Event)
       if ((ae->Key == Event.Key.Code)
        && (ae->Shifts == (Event.Key.Modifiers & CSMASK_ALLSHIFTS)))
       {
-        CHK (csEvent *ev = new csEvent (ae->Event));
+        csEvent *ev = new csEvent (ae->Event);
         app->PutEvent (ev);
         return true;
       } /* endif */

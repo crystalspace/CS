@@ -72,9 +72,9 @@ void csButton::FreeBitmaps ()
   if (delImages)
   {
     if (ImageNormal)
-      CHKB (delete ImageNormal);
+      delete ImageNormal;
     if (ImagePressed && ImagePressed != ImageNormal)
-      CHKB (delete ImagePressed);
+      delete ImagePressed;
   } /* endif */
   delImages = false;
   ImageNormal = NULL;

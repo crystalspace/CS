@@ -73,18 +73,18 @@ class csCrossBuild_Factory
  *
 ========================================================================
   // read in the model file
-  CHK (converter * filedata = new converter);
+  converter * filedata = new converter;
   if (filedata->ivcon (filename) == ERROR)
   {
     Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
-    CHK (delete filedata);
+    delete filedata;
     return;
   }
 
   // convert data from the 'filedata' structure into a CS sprite template
   csCrossBuild_SpriteTemplateFactory builder;
   csSpriteTemplate *result = (csSpriteTemplate *)builder.CrossBuild (*filedata);
-  CHK (delete filedata);
+  delete filedata;
 
   // add this sprite to the world
   results->SetName(templatename);

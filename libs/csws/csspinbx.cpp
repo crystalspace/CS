@@ -45,7 +45,7 @@ csSpinBox::csSpinBox (csComponent *iParent, csInputLineFrameStyle iFrameStyle)
   SpinState = 0;
   Value = NumLimits.MinValue = NumLimits.MaxValue = 0;
   NumLimits.ValueFormat = NULL;
-  CHK (SpinTimer = new csTimer (this, AUTO_SPIN_INTERVAL));
+  SpinTimer = new csTimer (this, AUTO_SPIN_INTERVAL);
   SpinTimer->Stop ();
 
   spinboxref++;
@@ -54,8 +54,8 @@ csSpinBox::csSpinBox (csComponent *iParent, csInputLineFrameStyle iFrameStyle)
     // If  images are not loaded, load them
     for (int i = 0; i < 3; i++)
       if (!sprspin [i])
-        CHKB (sprspin [i] = new csPixmap (app->GetTexture (
-          SPINBOX_TEXTURE_NAME), i * 16, 0, 16, 16));
+        sprspin [i] = new csPixmap (app->GetTexture (
+          SPINBOX_TEXTURE_NAME), i * 16, 0, 16, 16);
   } /* endif */
 }
 
@@ -67,7 +67,7 @@ csSpinBox::~csSpinBox ()
   {
     for (int i = 0; i < 3; i++)
     {
-      CHK (delete sprspin [i]);
+      delete sprspin [i];
       sprspin [i] = NULL;
     } /* endfor */
   }

@@ -185,7 +185,7 @@ public:
   static csPoly2DFactory* SharedFactory();
 
   /// Create a poly2d.
-  virtual csPoly2D* Create () { CHK (csPoly2D* p = new csPoly2D ()); return p; }
+  virtual csPoly2D* Create () { csPoly2D* p = new csPoly2D (); return p; }
 };
 
 #endif /*POLY2D_H*/

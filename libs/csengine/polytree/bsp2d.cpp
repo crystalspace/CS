@@ -36,8 +36,8 @@ csBspNode2D::csBspNode2D () : segments (10, 10)
 
 csBspNode2D::~csBspNode2D ()
 {
-  CHK (delete front);
-  CHK (delete back);
+  delete front;
+  delete back;
 }
 
 void csBspNode2D::AddSegment (csSegment2* seg)
@@ -54,7 +54,7 @@ csBspTree2D::csBspTree2D ()
 
 csBspTree2D::~csBspTree2D ()
 {
-  CHK (delete root);
+  delete root;
 }
 
 void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
@@ -76,7 +76,7 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
       // Not really the same plane. Send to the front node.
       if (!node->front)
       {
-        CHK (node->front = new csBspNode2D ());
+        node->front = new csBspNode2D ();
         node->front->splitter.Set (*segment);
         node->front->AddSegment (segment);
       }
@@ -89,7 +89,7 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
     // Front.
     if (!node->front)
     {
-      CHK (node->front = new csBspNode2D ());
+      node->front = new csBspNode2D ();
       node->front->splitter.Set (*segment);
       node->front->AddSegment (segment);
     }
@@ -101,7 +101,7 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
     // Back.
     if (!node->back)
     {
-      CHK (node->back = new csBspNode2D ());
+      node->back = new csBspNode2D ();
       node->back->splitter.Set (*segment);
       node->back->AddSegment (segment);
     }
@@ -114,8 +114,8 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
     csVector2 isect;
     float dist;
     csIntersect2::Plane (*segment, node->splitter, isect, dist);
-    CHK (csSegment2* segf = new csSegment2 ());
-    CHK (csSegment2* segb = new csSegment2 ());
+    csSegment2* segf = new csSegment2 ();
+    csSegment2* segb = new csSegment2 ();
     if (c1 < 0)
     {
       segb->Set (segment->Start (), isect);
@@ -129,7 +129,7 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
 
     if (!node->front)
     {
-      CHK (node->front = new csBspNode2D ());
+      node->front = new csBspNode2D ();
       node->front->splitter.Set (*segf);
       node->front->AddSegment (segf);
     }
@@ -138,14 +138,14 @@ void csBspTree2D::Add (csBspNode2D* node, csSegment2* segment)
 
     if (!node->back)
     {
-      CHK (node->back = new csBspNode2D ());
+      node->back = new csBspNode2D ();
       node->back->splitter.Set (*segb);
       node->back->AddSegment (segb);
     }
     else
       Add (node->back, segb);
 
-    CHK (delete segment);
+    delete segment;
   }
 }
 
@@ -155,7 +155,7 @@ void csBspTree2D::Add (csSegment2* segment)
     Add (root, segment);
   else
   {
-    CHK (root = new csBspNode2D ());
+    root = new csBspNode2D ();
     root->splitter.Set (*segment);
     root->AddSegment (segment);
   }

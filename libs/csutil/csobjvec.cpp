@@ -22,7 +22,7 @@
 
 bool csObjVector::FreeItem (csSome Item)
 {
-  CHKB (delete (csBase *) Item);
+  delete (csBase *) Item;
   return true;
 }
 

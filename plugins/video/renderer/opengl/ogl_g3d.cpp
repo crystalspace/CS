@@ -149,7 +149,7 @@ csGraphics3DOpenGL::csGraphics3DOpenGL (iBase * iParent):
 
 csGraphics3DOpenGL::~csGraphics3DOpenGL ()
 {
-  CHK (delete config);
+  delete config;
 
   Close ();
   if (G2D) G2D->DecRef ();
@@ -168,7 +168,7 @@ bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
   if (!G2D)
     return 0;
 
-  CHK (txtmgr = new csTextureManagerOpenGL (System, G2D, config, this));
+  txtmgr = new csTextureManagerOpenGL (System, G2D, config, this);
 
   m_renderstate.dither = config->GetYesNo ("OpenGL", "ENABLE_DITHER", false);
   z_buf_mode = CS_ZBUF_NONE;
@@ -183,7 +183,7 @@ bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
   m_config_options.do_multitexture_level = 0;
   m_config_options.do_extra_bright = false;
 
-// CHK (txtmgr = new csTextureManagerOpenGL (System, G2D));
+// txtmgr = new csTextureManagerOpenGL (System, G2D);
 
   return true;
 }
@@ -290,8 +290,8 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   // bit depth for the texture 'cache', since GL hides most of the
   // details from us. Maybe we should just not worry about it... GJH
 
-  CHK (texture_cache = new OpenGLTextureCache (1 << 24, 24));
-  CHK (lightmap_cache = new OpenGLLightmapCache (1 << 24, 24));
+  texture_cache = new OpenGLTextureCache (1 << 24, 24);
+  lightmap_cache = new OpenGLLightmapCache (1 << 24, 24);
   texture_cache->SetBilinearMapping (config->GetYesNo ("OpenGL", "ENABLE_BILINEARMAP", true));
 
   // tells OpenGL driver we align texture data on byte boundaries,
@@ -328,7 +328,7 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexImage2D (GL_TEXTURE_2D, 0, 4, FOGTABLE_SIZE, 1, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, transientfogdata);
-  CHK (delete[]transientfogdata);
+  delete[]transientfogdata;
 
   GLenum errtest;
   errtest = glGetError ();
@@ -365,11 +365,11 @@ void csGraphics3DOpenGL::Close ()
     return;
 
   // we should remove all texture handles before we kill the graphics context
-  CHK (delete txtmgr);
+  delete txtmgr;
   txtmgr = NULL;
-  CHK (delete texture_cache);
+  delete texture_cache;
   texture_cache = NULL;
-  CHK (delete lightmap_cache);
+  delete lightmap_cache;
   lightmap_cache = NULL;
 
   if (m_fogtexturehandle)
@@ -393,13 +393,13 @@ void csGraphics3DOpenGL::SetDimensions (int width, int height)
 
 void csGraphics3DOpenGL::SetClipper (csVector2* vertices, int num_vertices)
 {
-  CHK (delete clipper);
+  delete clipper;
   clipper = NULL;
   if (!vertices) return;
   // @@@ This could be better! We are using a general polygon clipper
   // even in cases where a box clipper would be better. We should
   // have a special SetBoxClipper call in iGraphics3D.
-  CHK (clipper = new csPolygonClipper (vertices, num_vertices, false, true));
+  clipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
 bool csGraphics3DOpenGL::BeginDraw (int DrawFlags)
@@ -1883,8 +1883,8 @@ iGraphics3D *csGraphics3DOpenGL::CreateOffScreenRenderer (int width, int height,
 {
 
   // For now just create a software dynamic texture
-  CHK (csDynamicTextureSoft3D *tex3d =  
-       new csDynamicTextureSoft3D (System, G2D));
+  csDynamicTextureSoft3D *tex3d =  
+       new csDynamicTextureSoft3D (System, G2D);
 
   return tex3d->CreateOffScreenRenderer (width, height, pfmt, buffer, NULL, 0);
 }

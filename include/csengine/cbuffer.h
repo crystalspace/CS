@@ -140,7 +140,7 @@ private:
       first_unused = first_unused->next;
     }
     else
-      CHKB (s = new csCBufferSpan ());
+      s = new csCBufferSpan ();
     return s;
   }
   /// Free a span (put in the unused list).

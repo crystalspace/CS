@@ -131,7 +131,7 @@ csSoundData* AIFFLoader::loadsound(UByte* buf, ULong size)
         if((ULong)chunk_size>size)
           goto exit_read;
 
-        CHK (data = new char[chunk_size]);
+        data = new char[chunk_size];
         if(data==NULL) goto exit_read;
         char *ptr=(char *)data;
         
@@ -149,7 +149,7 @@ csSoundData* AIFFLoader::loadsound(UByte* buf, ULong size)
         if((ULong)chunk_size>size)
           goto exit_read;
 
-        CHK (data= new char[chunk_size]);
+        data= new char[chunk_size];
         if(data==NULL) goto exit_read;
         unsigned short *ptr=(unsigned short *)data;
         
@@ -172,18 +172,18 @@ csSoundData* AIFFLoader::loadsound(UByte* buf, ULong size)
 
   if(data==NULL) goto exit_read;
 
-  CHK (sb = new csSoundData((flag2==HZ11025)?11025:(flag2==HZ22050)?22050:/*(flag2==HZ44100)*/44100,
+  sb = new csSoundData((flag2==HZ11025)?11025:(flag2==HZ22050)?22050:/*(flag2==HZ44100)*/44100,
     (flag==BIT16)?true:false,
     (nchannels==2)?true:false,
     (flag==BIT16)?true:false,
     (flag==BIT16)?samples_size/2:samples_size,
-    data));
+    data);
 
   if(sb==NULL) goto exit_read;
 
   goto exit_ok;
 exit_read:
-  CHK (delete [] data);
+  delete [] data;
 
 exit_ok:
   return sb;

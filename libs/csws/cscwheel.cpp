@@ -35,8 +35,8 @@ csColorWheel::csColorWheel (csComponent *iParent) : csStatic (iParent, csscsBitm
   {
     // If color wheel image is not loaded, load it
     if (!cwspr)
-      CHKB (cwspr = new csPixmap (app->GetTexture (
-        COLORWHEEL_TEXTURE_NAME), 0, 0, 129, 129));
+      cwspr = new csPixmap (app->GetTexture (
+        COLORWHEEL_TEXTURE_NAME), 0, 0, 129, 129);
   } /* endif */
   Bitmap = cwspr;
   SetSuggestedSize (0, 0);
@@ -46,7 +46,7 @@ csColorWheel::~csColorWheel ()
 {
   if (--cwref == 0)
   {
-    CHK (delete cwspr);
+    delete cwspr;
     cwspr = NULL;
   }
   Bitmap = NULL;

@@ -125,7 +125,7 @@ bool csGraphics2DGlide2x::Initialize (iSystem *pSystem)
 
   MungeFPCW(&wOldCW);
 
-  CHK(glLib = new GlideLib);
+  glLib = new GlideLib;
 #endif
 	
 #if defined(OS_LINUX)

@@ -403,7 +403,7 @@ static float *fog_exp_table = NULL;
 
 static void InitializeFogTable ()
 {
-  CHK (fog_exp_table = new float [FOG_EXP_TABLE_SIZE]);
+  fog_exp_table = new float [FOG_EXP_TABLE_SIZE];
   for (int i = 0; i < FOG_EXP_TABLE_SIZE; i++)
     fog_exp_table [i] = 1 - exp (-float (i) / 256.);
 }
@@ -965,14 +965,14 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
 
 csPolygon2DQueue::csPolygon2DQueue (int max_size)
 {
-  CHK (queue = new csQueueElement [max_size]);
+  queue = new csQueueElement [max_size];
   max_queue = max_size;
   num_queue = 0;
 }
 
 csPolygon2DQueue::~csPolygon2DQueue ()
 {
-  CHK (delete [] queue);
+  delete [] queue;
 }
 
 void csPolygon2DQueue::Push (csPolygon3D* poly3d, csPolygon2D* poly2d)

@@ -22,21 +22,21 @@
 csPolyIndexed::csPolyIndexed (int start_size)
 {
   max_vertices = start_size;
-  CHK (vertices_idx = new int [max_vertices]);
+  vertices_idx = new int [max_vertices];
   MakeEmpty ();
 }
 
 csPolyIndexed::csPolyIndexed (csPolyIndexed& copy)
 {
   max_vertices = copy.max_vertices;
-  CHK (vertices_idx = new int [max_vertices]);
+  vertices_idx = new int [max_vertices];
   num_vertices = copy.num_vertices;
   memcpy (vertices_idx, copy.vertices_idx, sizeof (int)*num_vertices);
 }
 
 csPolyIndexed::~csPolyIndexed ()
 {
-  CHK (delete [] vertices_idx);
+  delete [] vertices_idx;
 }
 
 void csPolyIndexed::MakeEmpty ()
@@ -47,9 +47,9 @@ void csPolyIndexed::MakeEmpty ()
 void csPolyIndexed::MakeRoom (int new_max)
 {
   if (new_max <= max_vertices) return;
-  CHK (int* new_vertices_idx = new int [new_max]);
+  int* new_vertices_idx = new int [new_max];
   memcpy (new_vertices_idx, vertices_idx, num_vertices*sizeof (int));
-  CHK (delete [] vertices_idx);
+  delete [] vertices_idx;
   vertices_idx = new_vertices_idx;
   max_vertices = new_max;
 }

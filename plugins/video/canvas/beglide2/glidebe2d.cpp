@@ -70,7 +70,7 @@ bool csGraphics2DBeGlide::Initialize(iSystem *pSystem)
   GraphicsReady=1;  
   
   // temporary bitmap
-  CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), curr_color_space));
+  cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), curr_color_space);
   return true;
 }
 
@@ -97,8 +97,8 @@ bool csGraphics2DBeGlide::Open(const char *Title)
   BeSystem->GetFocusHandler (FocusHandler, FocusHandlerParm);
 	
   // Open window
-  dpy = CHK (new CrystGlideView(BRect(0,0,Width-1,Height-1)));
-  window = CHK (new CrystGlideWindow(BRect(32,32,Width+32,Height+32), Title, dpy, this));
+  dpy = new CrystGlideView(BRect(0,0,Width-1,Height-1));
+  window = new CrystGlideWindow(BRect(32,32,Width+32,Height+32), Title, dpy, this);
 	printf ("2d driver. hwnd is %x \n", window);
   window->Show();
   if(window->Lock()) {
@@ -252,7 +252,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   switch (this_color_space) {
   	case B_RGB15: 
 //			defer bitmap creation
-//  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB15));
+//  		cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB15);
 		Depth	  = 15;
   		RedMask   = 0x1f << 10;
   		GreenMask = 0x1f << 5;
@@ -272,7 +272,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		break;
   	case B_RGB16:
 //			defer bitmap creation
-//  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB16));
+//  		cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB16);
   		Depth	  = 16;
   		RedMask   = 0x1f << 11;
   		GreenMask = 0x3f << 5;
@@ -293,7 +293,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   	case B_RGB32:
   	case B_RGBA32:
 //			defer bitmap creation
-//  		CHK (cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB32));
+//  		cryst_bitmap = new BBitmap(BRect(0,0,Width-1,Height-1), B_RGB32);
 		Depth	  = 32;
   		RedMask   = 0xff << 16;
   		GreenMask = 0xff << 8;

@@ -115,7 +115,7 @@ public:
     }
     else
     {
-      CHK (f = new csVertexArray ());
+      f = new csVertexArray ();
     }
     f->next = alloced;
     if (!alloced) last_alloced = f;

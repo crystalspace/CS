@@ -596,7 +596,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   if (lp->vertices)
   {
     int mi;
-    CHK (f_uv = new csVector2 [lp->num_vertices]);
+    f_uv = new csVector2 [lp->num_vertices];
     for (i = 0 ; i < lp->num_vertices ; i++)
     {
       //if (lview.mirror) mi = lview.num_frustum-i-1;
@@ -797,7 +797,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 
 finish:
 
-  CHK (delete [] f_uv);
+  delete [] f_uv;
 }
 
 void csPolyTexture::GetTextureBox (float& fMinU, float& fMinV, float& fMaxU, float& fMaxV)

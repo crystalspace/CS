@@ -141,7 +141,7 @@ csGraphics2DGlideX::~csGraphics2DGlideX ()
   Close ();
   if (UnixSystem)
     UnixSystem->DecRef ();
-  CHKB (delete [] Memory);
+  delete [] Memory;
 }
 
 bool csGraphics2DGlideX::Open(const char *Title)
@@ -212,7 +212,7 @@ bool csGraphics2DGlideX::Open(const char *Title)
       else
 #endif 
       {
-        CHK (Memory = new unsigned char[Width*Height*pfmt.PixelBytes]);
+        Memory = new unsigned char[Width*Height*pfmt.PixelBytes];
       }
     }
   }
@@ -237,7 +237,7 @@ void csGraphics2DGlideX::Close(void)
 #ifdef DO_SHM
     shmdt(shmi.shmaddr);
 #else
-    CHK (delete [] Memory);
+    delete [] Memory;
 #endif
 
     unsetenv("SST_NOSHUTDOWN");

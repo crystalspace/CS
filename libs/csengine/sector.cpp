@@ -85,10 +85,10 @@ csSector::~csSector ()
   while (first_thing)
   {
     csThing* n = (csThing*)(first_thing->GetNext ());
-    CHK (delete first_thing);
+    delete first_thing;
     first_thing = n;
   }
-  CHK (delete static_tree);
+  delete static_tree;
 
   // The sprites are not deleted here because they can occur in more
   // than one sector at the same time. Therefor we first clear the list.
@@ -157,10 +157,10 @@ void csSector::UseStaticTree (int mode, bool octree)
   octree = true;
   //mode = BSP_BALANCE_AND_SPLITS;
 
-  CHK (delete static_tree); static_tree = NULL;
+  delete static_tree; static_tree = NULL;
 
   if (static_thing) return;
-  CHK (static_thing = new csThing ());
+  static_thing = new csThing ();
   static_thing->SetName ("__static__");
 
   static_thing->SetSector (this);
@@ -173,7 +173,7 @@ void csSector::UseStaticTree (int mode, bool octree)
     	&& sp->GetNumCurves () == 0)
     {
       static_thing->Merge (sp);
-      CHK (delete sp);
+      delete sp;
       if (sp_prev) sp_prev->SetNext (this, n);
       else first_thing = n;
     }
@@ -188,11 +188,11 @@ void csSector::UseStaticTree (int mode, bool octree)
   {
     csVector3 min_bbox, max_bbox;
     static_thing->GetBoundingBox (min_bbox, max_bbox);
-    CHK (static_tree = new csOctree (this, min_bbox, max_bbox, 150/*20*/, mode));
+    static_tree = new csOctree (this, min_bbox, max_bbox, 150/*20*/, mode);
   }
   else
   {
-    CHK (static_tree = new csBspTree (this, mode));
+    static_tree = new csBspTree (this, mode);
   }
 
   csString str ("vis/octree_");
@@ -782,7 +782,7 @@ void csSector::Draw (csRenderView& rview)
   {
     if ((fogmethod = csWorld::current_world->fogmethod) == G3DFOGMETHOD_VERTEX)
     {
-      CHK (csFogInfo* fog_info = new csFogInfo ());
+      csFogInfo* fog_info = new csFogInfo ();
       fog_info->next = rview.fog_info;
       if (rview.portal_polygon)
       {
@@ -839,8 +839,8 @@ void csSector::Draw (csRenderView& rview)
 	  otree->MarkVisibleFromPVS (rview.GetOrigin ());
       }
 
-      CHK (poly_queue = new csPolygon2DQueue (polygons.Length ()+
-      	static_thing->GetNumPolygons ()));
+      poly_queue = new csPolygon2DQueue (polygons.Length ()+
+      	static_thing->GetNumPolygons ());
       static_thing->UpdateTransformation ();
       static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
       	&rview, CullOctreeNode, &rview);
@@ -849,7 +849,7 @@ void csSector::Draw (csRenderView& rview)
       {
 	// Push all visible sprites in a queue.
 	// @@@ Avoid memory allocation?
-	CHK (sprite_queue = new csSprite* [sprites.Length ()]);
+	sprite_queue = new csSprite* [sprites.Length ()];
 	num_sprite_queue = 0;
         for (i = 0 ; i < sprites.Length () ; i++)
         {
@@ -860,13 +860,13 @@ void csSector::Draw (csRenderView& rview)
     }
     else
     {
-      CHK (poly_queue = new csPolygon2DQueue (polygons.Length ()));
+      poly_queue = new csPolygon2DQueue (polygons.Length ());
     }
     csPolygon2DQueue* queue = poly_queue;
     TestQueuePolygonArray (polygons.GetArray (), polygons.Length (), &rview,
     	queue, false);
     DrawPolygonsFromQueue (queue, &rview);
-    CHK (delete queue);
+    delete queue;
   }
   else
   {
@@ -1007,7 +1007,7 @@ void csSector::Draw (csRenderView& rview)
 	}
       }
     }
-    CHK (delete [] sprite_queue);
+    delete [] sprite_queue;
   }
 
   // Draw all terrain surfaces.
@@ -1054,7 +1054,7 @@ void csSector::Draw (csRenderView& rview)
     {
       csFogInfo *fog_info = rview.fog_info;
       rview.fog_info = rview.fog_info->next;
-      CHK (delete fog_info);
+      delete fog_info;
     }
   }
 
@@ -1122,7 +1122,7 @@ void CompressShadowFrustums (csFrustumList* list)
       csShadowFrustum* sfdel = sf;
       sf = sf->prev;
       list->Unlink (sfdel);
-      CHK (delete sfdel);
+      delete sfdel;
     }
     else
       sf = sf->prev;
@@ -1185,7 +1185,7 @@ void* CheckFrustumPolygonsFB (csSector*,
       if ((clas <= 0) != cw) continue;
 
       csShadowFrustum* frust;
-      CHK (frust = new csShadowFrustum (center));
+      frust = new csShadowFrustum (center);
       csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
       pl.DD += center * pl.norm;
       pl.Invert ();
@@ -1294,7 +1294,7 @@ csThing** csSector::GetVisibleThings (csFrustumView& lview, int& num_things)
   sp = first_thing;
   while (sp) { num_things++; sp = (csThing*)(sp->GetNext ()); }
   if (!num_things) { return NULL; }
-  CHK (csThing** visible_things = new csThing* [num_things]);
+  csThing** visible_things = new csThing* [num_things];
 
   num_things = 0;
   sp = first_thing;
@@ -1415,13 +1415,17 @@ void csSector::CheckFrustum (csFrustumView& lview)
       {
         shadows = sp->GetShadows (this, center);
         lview.shadows.AppendList (shadows);
-        CHK (delete shadows);
+        delete shadows;
       }
     }
 
-  // If there is a static tree (BSP and/or octree) then we can use
-  // another way to do the lighting. In that case we go front to back
-  // and add shadows to the list while we are doing that.
+  // If there is a static tree (BSP and/or octree) then we
+  // can use another way to do the lighting. In that case we
+  // go front to back and add shadows to the list while we are doing
+  // that. In future I would like to add some extra culling stage
+  // here using a quad-tree or something similar (for example six
+  // quad-trees arranged in a cube around the light).
+
   if (static_tree)
   {
     count_cull_dist = 0;
@@ -1451,7 +1455,7 @@ void csSector::CheckFrustum (csFrustumView& lview)
     if (sp != static_thing)
       sp->CheckFrustum (lview);
   }
-  CHK (delete [] visible_things);
+  delete [] visible_things;
 
   // Restore the shadow list in 'lview' and then delete
   // all the shadow frustums that were added in this recursion
@@ -1463,7 +1467,7 @@ void csSector::CheckFrustum (csFrustumView& lview)
   while (frustum)
   {
     csShadowFrustum* sf = frustum->next;
-    CHK (delete frustum);
+    delete frustum;
     frustum = sf;
   }
 

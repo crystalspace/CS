@@ -310,7 +310,7 @@ DWORD WINAPI csSoundDriverWaveOut::waveOutThreadProc( LPVOID dwParam)
         
         are_you_playing = true;
         
-        CHK(SoundBlock * block = new SoundBlock);
+        SoundBlock * block = new SoundBlock;
         
         // Allocate memory for both the header and the actual sound data itself
         block->driver = snd;
@@ -393,7 +393,7 @@ bool csSoundDriverWaveOut::MixChunk()
 {
   if(hwo==NULL) return false;
 
-	CHK(SoundBlock * block = new SoundBlock);
+	SoundBlock * block = new SoundBlock;
 
 	// Allocate memory for both the header and the actual sound data itself
 	block->driver = this;

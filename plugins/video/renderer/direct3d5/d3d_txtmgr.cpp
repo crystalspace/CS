@@ -64,15 +64,15 @@ void csTextureManagerDirect3D::PrepareTextures ()
 {
   int i;
 
-  CHK (delete factory_3d); factory_3d = NULL;
-  CHK (delete factory_2d); factory_2d = NULL;
-  CHK (factory_3d = new csTextureFactory32 ());
+  delete factory_3d; factory_3d = NULL;
+  delete factory_2d; factory_2d = NULL;
+  factory_3d = new csTextureFactory32 ();
   if (pfmt.PixelBytes == 1)
-    { CHK (factory_2d = new csTextureFactory8 ()); }
+    { factory_2d = new csTextureFactory8 (); }
   else if (pfmt.PixelBytes == 2)
-    { CHK (factory_2d = new csTextureFactory16 ()); }
+    { factory_2d = new csTextureFactory16 (); }
   else
-    { CHK (factory_2d = new csTextureFactory32 ()); }
+    { factory_2d = new csTextureFactory32 (); }
 
   remap_textures ();
 }

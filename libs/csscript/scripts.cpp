@@ -57,7 +57,7 @@ void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
   // All different script languages should be recognized here.
   if (!strncmp (params, "prim", (int)(par-params)))
   {
-    CHK (PrimScript* sc = new PrimScript (layer));
+    PrimScript* sc = new PrimScript (layer);
     sc->SetName (name);
     par++;
     sc->load (&par);
@@ -65,7 +65,7 @@ void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
   }
   else if (!strncmp (params, "int", (int)(par-params)))
   {
-    CHK (IntScript* sc = new IntScript (layer));
+    IntScript* sc = new IntScript (layer);
     sc->SetName (name);
     par++;
     sc->load (par);

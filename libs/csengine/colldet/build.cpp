@@ -33,7 +33,7 @@ csCdModel::csCdModel (int NumberOfTriangles)
   m_pBoxes          = NULL;
   m_NumBoxesAlloced = 0;
 
-  CHK (m_pTriangles = new csCdTriangle [NumberOfTriangles]);
+  m_pTriangles = new csCdTriangle [NumberOfTriangles];
   m_NumTriangles          = 0;
   m_NumTrianglesAllocated = m_pTriangles ? NumberOfTriangles : 0;
 }
@@ -41,9 +41,9 @@ csCdModel::csCdModel (int NumberOfTriangles)
 csCdModel::~csCdModel ()
 {
   // the boxes pointed to should be deleted.
-  CHK (delete [] m_pBoxes);
+  delete [] m_pBoxes;
   // the triangles pointed to should be deleted.
-  CHK (delete [] m_pTriangles);
+  delete [] m_pTriangles;
 }
 
 bool csCdModel::AddTriangle (const csVector3 &p1, const csVector3 &p2,
@@ -76,22 +76,22 @@ bool csCdModel::AddTriangle (const csVector3 &p1, const csVector3 &p2,
 bool csCdModel::BuildHierarchy ()
 {
   // Delete the boxes if they're already allocated
-  CHK (delete [] m_pBoxes);
+  delete [] m_pBoxes;
 
   // allocate the boxes and set the box list globals
   m_NumBoxesAlloced = m_NumTriangles * 2;
-  CHK (m_pBoxes = new csCdBBox [m_NumBoxesAlloced]);
+  m_pBoxes = new csCdBBox [m_NumBoxesAlloced];
   if (!m_pBoxes) return false;
   
   // Determine initial orientation, mean point, and splitting axis.
   int i; 
   Accum _M;
   
-  CHK (Moment::stack = new Moment[m_NumTriangles]);
+  Moment::stack = new Moment[m_NumTriangles];
 
   if (!Moment::stack)
   {
-    CHK (delete [] m_pBoxes); 
+    delete [] m_pBoxes; 
     m_pBoxes = NULL;
     return false;
   }
@@ -146,14 +146,14 @@ bool csCdModel::BuildHierarchy ()
   SortedEigen(_C, m_pBoxes[0].m_Rotation);
 
   // create the index list
-  CHK (int *t = new int [m_NumTriangles]);
+  int *t = new int [m_NumTriangles];
   if (t == 0)
   {
-    CHK (delete [] Moment::stack); 
+    delete [] Moment::stack; 
     Moment::stack = NULL;
-    CHK (delete [] m_pBoxes); 
+    delete [] m_pBoxes; 
     m_pBoxes = NULL;
-    CHK (delete [] t);
+    delete [] t;
     return false;
   }
   for (i = 0; i < m_NumTriangles; i++)
@@ -163,18 +163,18 @@ bool csCdModel::BuildHierarchy ()
   csCdBBox *pool = m_pBoxes + 1;
   if (!m_pBoxes[0].BuildBBoxTree(t, m_NumTriangles, m_pTriangles, pool))
   {
-    CHK (delete [] m_pBoxes); 
+    delete [] m_pBoxes; 
     m_pBoxes = NULL;
-    CHK (delete [] t);
+    delete [] t;
     return false;
   }
   
   // free the moment list
-  CHK (delete [] Moment::stack);
+  delete [] Moment::stack;
   Moment::stack = NULL;
 
   // free the index list
-  CHK (delete [] t);
+  delete [] t;
 
   return true;
 }

@@ -39,15 +39,15 @@ IMPLEMENT_CSOBJTYPE (csBezierTemplate,csCurveTemplate);
 csCurveTesselated::csCurveTesselated (int num_v, int num_t)
 {
   num_vertices = num_v;
-  CHK (vertices = new csCurveVertex[num_v]);
+  vertices = new csCurveVertex[num_v];
   num_triangles = num_t;
-  CHK (triangles = new csCurveTriangle[num_t]);
+  triangles = new csCurveTriangle[num_t];
 }
 
 csCurveTesselated::~csCurveTesselated ()
 {
-  CHK (delete[] vertices);
-  CHK (delete[] triangles);
+  delete[] vertices;
+  delete[] triangles;
 }
 
 csCurveTesselated* csBezier::Tesselate (int res)
@@ -61,10 +61,10 @@ csCurveTesselated* csBezier::Tesselate (int res)
     return previous_tesselation;
 
   previous_resolution = res;
-  CHK(delete previous_tesselation);
+  delete previous_tesselation;
 
-  CHK( previous_tesselation = 
-       new csCurveTesselated ((res+1)*(res+1), 2*res*res));
+  previous_tesselation = 
+       new csCurveTesselated ((res+1)*(res+1), 2*res*res);
 
   TDtDouble *controls[9] = 
   {
@@ -133,7 +133,7 @@ csCurveTesselated* csBezier::Tesselate (int res)
 
 csCurve::~csCurve ()
 {
-  CHK (delete lightmap);
+  delete lightmap;
 }
 
 // Default IsLightable returns false, because we don't know how to calculate
@@ -160,7 +160,7 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 {
   if (!IsLightable ()) return;
-  CHK (lightmap = new csLightMap ());
+  lightmap = new csLightMap ();
 
   // Allocate space for the lightmap and initialize it current sector ambient color.
   int r, g, b;
@@ -271,7 +271,7 @@ csBezier::csBezier (csBezierTemplate* parent_tmpl) : csCurve (parent_tmpl)
 
 csBezier::~csBezier ()
 {
-  CHK(delete previous_tesselation);
+  delete previous_tesselation;
 }
 
 void csBezier::SetControlPoint(int index, int control_id)
@@ -353,7 +353,7 @@ int csBezierTemplate::NumVertices ()
 
 csCurve* csBezierTemplate::MakeCurve ()
 {
-  CHK (csBezier* p = new csBezier (this));
+  csBezier* p = new csBezier (this);
   p->SetTextureHandle (cstxt);
   return p;
 }

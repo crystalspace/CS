@@ -24,11 +24,11 @@
 
 csSkeletonLimb::~csSkeletonLimb ()
 {
-  CHK (delete [] vertices);
+  delete [] vertices;
   while (children)
   {
     csSkeletonLimb* n = children->GetNext ();
-    CHK (delete children);
+    delete children;
     children = n;
   }
 }
@@ -40,9 +40,9 @@ void csSkeletonLimb::AddVertex (int v)
   if (num_vertices >= max_vertices)
   {
     int* new_vertices;
-    CHK (new_vertices = new int [max_vertices+16]);
+    new_vertices = new int [max_vertices+16];
     if (vertices) memcpy (new_vertices, vertices, num_vertices*sizeof (int));
-    CHK (delete [] vertices);
+    delete [] vertices;
     vertices = new_vertices;
   }
   vertices[num_vertices++] = v;
@@ -113,14 +113,14 @@ void csSkeletonLimb::ComputeBoundingBox (csPoly3D* source)
 
 csSkeletonLimbState* csSkeletonLimb::CreateState ()
 {
-  CHK (csSkeletonLimbState* limb = new csSkeletonLimbState ());
+  csSkeletonLimbState* limb = new csSkeletonLimbState ();
   UpdateState (limb);
   return limb;
 }
 
 csSkeletonLimbState* csSkeletonConnection::CreateState ()
 {
-  CHK (csSkeletonConnectionState* con = new csSkeletonConnectionState ());
+  csSkeletonConnectionState* con = new csSkeletonConnectionState ();
   UpdateState ((csSkeletonLimbState*)con);
   con->SetTransformation (trans);
   return (csSkeletonLimbState*)con;
@@ -128,7 +128,7 @@ csSkeletonLimbState* csSkeletonConnection::CreateState ()
 
 csSkeletonLimbState* csSkeleton::CreateState ()
 {
-  CHK (csSkeletonState* skel = new csSkeletonState ());
+  csSkeletonState* skel = new csSkeletonState ();
   UpdateState ((csSkeletonLimbState*)skel);
   return (csSkeletonLimbState*)skel;
 }
@@ -144,7 +144,7 @@ csSkeletonLimbState::~csSkeletonLimbState ()
   while (children)
   {
     csSkeletonLimbState* n = children->GetNext ();
-    CHK (delete children);
+    delete children;
     children = n;
   }
 }

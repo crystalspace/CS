@@ -174,7 +174,7 @@ public:
   scfClassRegistry () : csVector (16, 16) {}
   virtual ~scfClassRegistry () { DeleteAll (); }
   virtual bool FreeItem (csSome Item)
-  { CHKB (delete (scfFactory *)Item); return true; }
+  { delete (scfFactory *)Item; return true; }
   virtual int CompareKey (csSome Item, csConstSome Key, int) const
   { return strcmp (((scfFactory *)Item)->ClassID, (char *)Key); }
   virtual int Compare (csSome Item1, csSome Item2, int) const
@@ -227,10 +227,10 @@ scfFactory::~scfFactory ()
 #ifndef CS_STATIC_LINKED
   if (Library)
     Library->DecRef ();
-  CHK (delete [] LibraryName);
+  delete [] LibraryName;
 #endif
-  CHK (delete [] Dependencies);
-  CHK (delete [] ClassID);
+  delete [] Dependencies;
+  delete [] ClassID;
 }
 
 void scfFactory::IncRef ()
@@ -242,7 +242,7 @@ void scfFactory::IncRef ()
     if (libidx >= 0)
       Library = (scfSharedLibrary *)LibraryRegistry->Get (libidx);
     else
-      CHKB (Library = new scfSharedLibrary (LibraryName));
+      Library = new scfSharedLibrary (LibraryName);
     if (Library->ok ())
       ClassInfo = Library->Find (ClassID);
     if (!Library->ok () || !ClassInfo)
@@ -327,10 +327,10 @@ static bool SortClassRegistry = false;
 void scfInitialize (csIniFile *iConfig)
 {
   if (!ClassRegistry)
-    CHKB (ClassRegistry = new scfClassRegistry ());
+    ClassRegistry = new scfClassRegistry ();
 #ifndef CS_STATIC_LINKED
   if (!LibraryRegistry)
-    CHKB (LibraryRegistry = new scfLibraryVector());
+    LibraryRegistry = new scfLibraryVector();
   if (iConfig)
   {
     csIniFile::DataIterator iterator (iConfig->EnumData ("SCF.Registry"));
@@ -351,10 +351,10 @@ void scfInitialize (csIniFile *iConfig)
 
 void scfFinish ()
 {
-  CHK (delete ClassRegistry);
+  delete ClassRegistry;
   ClassRegistry = NULL;
 #ifndef CS_STATIC_LINKED
-  CHK (delete LibraryRegistry);
+  delete LibraryRegistry;
   LibraryRegistry = NULL;
 #endif
 }
@@ -426,7 +426,7 @@ bool scfRegisterStaticClass (scfClassInfo *iClassInfo)
   if (ClassRegistry->FindKey (iClassInfo->ClassID) >= 0)
     return false;
   // Create a factory and add it to class registry
-  CHK (ClassRegistry->Push (new scfFactory (iClassInfo)));
+  ClassRegistry->Push (new scfFactory (iClassInfo));
   SortClassRegistry = true;
   return true;
 }

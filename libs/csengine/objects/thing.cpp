@@ -205,8 +205,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
     // First I transform all tesselated vertices from object to
     // world space and then from world to camera space.
-    CHK (persp = new csVector2 [tess->GetNumVertices ()]);
-    CHK (z_array = new float [tess->GetNumVertices ()]);
+    persp = new csVector2 [tess->GetNumVertices ()];
+    z_array = new float [tess->GetNumVertices ()];
     for (j = 0 ;  j < tess->GetNumVertices () ; j++)
     {
       csCurveVertex& cv = tess->GetVertex (j);
@@ -347,8 +347,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     if (!rview.callback)
       rview.g3d->FinishPolygonFX ();
 
-    CHK (delete [] persp);
-    CHK (delete [] z_array);
+    delete [] persp;
+    delete [] z_array;
   }
 }
 
@@ -528,7 +528,7 @@ void csThing::CacheLightMaps ()
 void csThing::Merge (csThing* other)
 {
   int i, j;
-  CHK (int* merge_vertices = new int [other->GetNumVertices ()+1]);
+  int* merge_vertices = new int [other->GetNumVertices ()+1];
   for (i = 0 ; i < other->GetNumVertices () ; i++)
     merge_vertices[i] = AddVertex (other->Vwor (i));
 
@@ -552,7 +552,7 @@ void csThing::Merge (csThing* other)
     other->curves[i] = NULL;
   }
 
-  CHK (delete [] merge_vertices);
+  delete [] merge_vertices;
 }
 
 
@@ -570,7 +570,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
   curves_scale = tpl->curves_scale;
   ParentTemplate = tpl;
 
-  CHK (merge_vertices = new int [tpl->GetNumVertices ()+1]);
+  merge_vertices = new int [tpl->GetNumVertices ()+1];
   for (i = 0 ; i < tpl->GetNumVertices () ; i++)
   {
     csVector3 v = tpl->Vtex (i);
@@ -631,7 +631,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     AddCurve (p);
   }
 
-  CHK (delete [] merge_vertices);
+  delete [] merge_vertices;
 }
 
 void csThing::MergeTemplate (csThingTemplate* tpl, csTextureList* txtList,

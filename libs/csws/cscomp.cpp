@@ -63,7 +63,7 @@ csComponent::~csComponent ()
 static bool do_delete (csComponent *child, void *param)
 {
   (void)param;
-  CHK (delete child);
+  delete child;
   return false;
 }
 
@@ -953,22 +953,22 @@ void csComponent::ClipAlienChildren (csObjVector &rect, csComponent *child)
           csRect r (cur->xmin, cur->ymin, cur->xmax, childbound.ymin);
           r.Intersect (*cur);
           if (!r.IsEmpty ())
-            CHKB (rect.Push (new csRect (r)));
+            rect.Push (new csRect (r));
 
           r.Set (cur->xmin, childbound.ymax, cur->xmax, cur->ymax);
           r.Intersect (*cur);
           if (!r.IsEmpty ())
-            CHKB (rect.Push (new csRect (r)));
+            rect.Push (new csRect (r));
 
           r.Set (cur->xmin, childbound.ymin, childbound.xmin, childbound.ymax);
           r.Intersect (*cur);
           if (!r.IsEmpty ())
-            CHKB (rect.Push (new csRect (r)));
+            rect.Push (new csRect (r));
 
           r.Set (childbound.xmax, childbound.ymin, cur->xmax, childbound.ymax);
           r.Intersect (*cur);
           if (!r.IsEmpty ())
-            CHKB (rect.Push (new csRect (r)));
+            rect.Push (new csRect (r));
 
           rect.Delete (i);
         } /* endif */
@@ -1026,22 +1026,22 @@ void csComponent::Clip (csObjVector &rect, csComponent *last)
               csRect r (cur->xmin, cur->ymin, cur->xmax, nb->bound.ymin);
               r.Intersect (*cur);
               if (!r.IsEmpty ())
-                CHKB (rect.Push (new csRect (r)));
+                rect.Push (new csRect (r));
 
               r.Set (cur->xmin, nb->bound.ymax, cur->xmax, cur->ymax);
               r.Intersect (*cur);
               if (!r.IsEmpty ())
-                CHKB (rect.Push (new csRect (r)));
+                rect.Push (new csRect (r));
 
               r.Set (cur->xmin, nb->bound.ymin, nb->bound.xmin, nb->bound.ymax);
               r.Intersect (*cur);
               if (!r.IsEmpty ())
-                CHKB (rect.Push (new csRect (r)));
+                rect.Push (new csRect (r));
 
               r.Set (nb->bound.xmax, nb->bound.ymin, cur->xmax, nb->bound.ymax);
               r.Intersect (*cur);
               if (!r.IsEmpty ())
-                CHKB (rect.Push (new csRect (r)));
+                rect.Push (new csRect (r));
 
               rect.Delete (i);
             } /* endif */
@@ -1127,7 +1127,7 @@ void csComponent::Box (int xmin, int ymin, int xmax, int ymax, int colindx)
   if ((xmin >= xmax) || (ymin >= ymax))
     return;
   csObjVector rect (8, 4);
-  CHK (csRect *bb = new csRect (xmin, ymin, xmax, ymax));
+  csRect *bb = new csRect (xmin, ymin, xmax, ymax);
   bb->Intersect (dirty);
   if (!clip.IsEmpty ())
     bb->Intersect (clip);
@@ -1153,7 +1153,7 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
   * all resulting rectangles.
   */
   csObjVector rect (8, 4);
-  CHK (csRect *lb = new csRect (QInt (x1), QInt (y1), QInt (x2), QInt (y2)));
+  csRect *lb = new csRect (QInt (x1), QInt (y1), QInt (x2), QInt (y2));
   lb->Normalize ();
   lb->xmax += 2;
   lb->ymax += 2;
@@ -1187,7 +1187,7 @@ void csComponent::Pixel (int x, int y, int colindx)
     return;
 
   csObjVector rect (8, 4);
-  CHK (csRect *lb = new csRect (x, y, x + 1, y + 1));
+  csRect *lb = new csRect (x, y, x + 1, y + 1);
   lb->Intersect (dirty);
   if (!clip.IsEmpty ())
     lb->Intersect (clip);
@@ -1218,7 +1218,7 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
   tb.Intersect (dirty);
   if (!clip.IsEmpty ())
     tb.Intersect (clip);
-  CHK (rect.Push (new csRect (tb)));
+  rect.Push (new csRect (tb));
   Clip (rect, this);
 
   int ox = x, oy = y;
@@ -1249,7 +1249,7 @@ void csComponent::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
   * all resulting rectangles.
   */
   csObjVector rect (8, 4);
-  CHK (csRect *sb = new csRect (x, y, x + w, y + h));
+  csRect *sb = new csRect (x, y, x + w, y + h);
   sb->Intersect (dirty);
   if (!clip.IsEmpty ())
     sb->Intersect (clip);
@@ -1444,14 +1444,14 @@ void csComponent::Close ()
   if (GetState (CSS_MODAL))
     app->Dismiss (cscmdCancel);
   else
-    CHKB (delete this);
+    delete this;
 }
 
 void csComponent::PrepareLabel (const char *iLabel, char * &oLabel,
   int &oUnderlinePos)
 {
   if (oLabel)
-    CHKB (delete[] oLabel);
+    delete[] oLabel;
 
   oUnderlinePos = -1;
   oLabel = NULL;
@@ -1465,7 +1465,7 @@ void csComponent::PrepareLabel (const char *iLabel, char * &oLabel,
     for (i = 0; i < sl; i++)
       if (iLabel [i] != '~')
         cc++;
-    CHK (oLabel = new char [cc + 1]);
+    oLabel = new char [cc + 1];
 
     cc = 0;
     for (i = 0; i < sl; i++)
@@ -1521,7 +1521,7 @@ void csComponent::SetText (const char *iText)
 {
   if (!iText)
     iText = "";
-  CHKB (delete [] text);
+  delete [] text;
   text = strnew (iText);
   Invalidate ();
 }
@@ -1620,7 +1620,7 @@ void csComponent::FindMaxFreeRect (csRect &area)
 {
   // Now compute maximal uncovered area of desktop
   csObjVector rect (8, 4);
-  CHK (rect.Push (new csRect (bound)));
+  rect.Push (new csRect (bound));
   Clip (rect, this);
 
   // Show the "wait" mouse cursor if there are too many rectangles

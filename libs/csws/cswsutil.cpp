@@ -51,16 +51,16 @@ csWindowList::csWindowList (csComponent *iParent) : csWindow (iParent,
 {
   shouldclose = false;
   SetFont (csFontCourier);
-  CHK (dialog = new csDialog (this));
-  CHK (list = new csListBox (dialog, CSLBS_MULTIPLESEL | CSLBS_VSCROLL, cslfsThinRect));
-  CHK (butshow = new csButton (dialog, cscmdWindowListShow, CSBS_SHIFT
-    | CSBS_SELECTABLE | CSBS_NOMOUSEFOCUS | CSBS_NOKEYBOARDFOCUS, csbfsThinRect));
+  dialog = new csDialog (this);
+  list = new csListBox (dialog, CSLBS_MULTIPLESEL | CSLBS_VSCROLL, cslfsThinRect);
+  butshow = new csButton (dialog, cscmdWindowListShow, CSBS_SHIFT
+    | CSBS_SELECTABLE | CSBS_NOMOUSEFOCUS | CSBS_NOKEYBOARDFOCUS, csbfsThinRect);
   butshow->SetText ("~Show");
-  CHK (butmaximize = new csButton (dialog, cscmdWindowListMaximize, CSBS_SHIFT
-    | CSBS_SELECTABLE | CSBS_NOMOUSEFOCUS | CSBS_NOKEYBOARDFOCUS, csbfsThinRect));
+  butmaximize = new csButton (dialog, cscmdWindowListMaximize, CSBS_SHIFT
+    | CSBS_SELECTABLE | CSBS_NOMOUSEFOCUS | CSBS_NOKEYBOARDFOCUS, csbfsThinRect);
   butmaximize->SetText ("~Maximize");
-  CHK (butclose = new csButton (dialog, cscmdWindowListClose, CSBS_SHIFT
-    | CSBS_SELECTABLE | CSBS_NOMOUSEFOCUS | CSBS_NOKEYBOARDFOCUS, csbfsThinRect));
+  butclose = new csButton (dialog, cscmdWindowListClose, CSBS_SHIFT
+    | CSBS_SELECTABLE | CSBS_NOMOUSEFOCUS | CSBS_NOKEYBOARDFOCUS, csbfsThinRect);
   butclose->SetText ("~Close");
   focusedwindow = app->focused;
 }
@@ -161,8 +161,8 @@ bool csWindowList::do_addtowindowlist (csComponent *child, void *param)
   {
     const char *title = child->GetText ();
     if (title && title[0])
-      CHKB ((void)new csListBoxItem (windowlist->list, title, (int)child,
-        child == windowlist->focusedwindow ? cslisEmphasized : cslisNormal));
+      (void)new csListBoxItem (windowlist->list, title, (int)child,
+        child == windowlist->focusedwindow ? cslisEmphasized : cslisNormal);
   } /* endif */
   return false;
 }
@@ -178,8 +178,8 @@ void csWindowList::RebuildList ()
 csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand, char *iText,
   csButtonFrameStyle iFrameStyle, int iButtonStyle)
 {
-  CHK (csButton *but = new csButton (iToolbar, iCommand, iButtonStyle,
-    iFrameStyle));
+  csButton *but = new csButton (iToolbar, iCommand, iButtonStyle,
+    iFrameStyle);
   but->SetText (iText);
   int w, h;
   but->SuggestSize (w, h);
@@ -191,8 +191,8 @@ csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,
   csPixmap *bmpup, csPixmap *bmpdn, csButtonFrameStyle iFrameStyle,
   int iButtonStyle, bool iDeletePixmaps)
 {
-  CHK (csButton *but = new csButton (iToolbar, iCommand, iButtonStyle,
-    iFrameStyle));
+  csButton *but = new csButton (iToolbar, iCommand, iButtonStyle,
+    iFrameStyle);
   but->SetBitmap (bmpup, bmpdn, iDeletePixmaps);
   int w, h;
   but->SuggestSize (w, h);
@@ -206,7 +206,7 @@ csPixmap *NewBitmap (csApp *app, char *texturename, int tx, int ty,
   iTextureHandle *tex = app->GetTexture (texturename);
   csPixmap *spr;
   if (tex)
-    CHKB (spr = new csPixmap (tex, tx, ty, tw, th))
+    spr = new csPixmap (tex, tx, ty, tw, th);
   else
     spr = NULL;
 
@@ -242,10 +242,10 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
   };
 
   int i;
-  CHK (csWindow *MsgBox = new csWindow (iParent, iTitle,
+  csWindow *MsgBox = new csWindow (iParent, iTitle,
     CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR,
-    cswfs3D));
-  CHK (csDialog *Dialog = new csDialog (MsgBox));
+    cswfs3D);
+  csDialog *Dialog = new csDialog (MsgBox);
 
   csPixmap *img = NULL;
   csStatic *bmp = NULL;
@@ -268,7 +268,7 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
       break;
   } /* endswitch */
   if (img)
-    CHKB (bmp = new csStatic (Dialog, img));
+    bmp = new csStatic (Dialog, img);
 
   // Create static objects for all text lines
   csStatic *L [100];
@@ -285,7 +285,7 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
       strncpy (line, MsgStart, count);
       line [count] = 0;
 
-      CHK (L [L_count] = new csStatic (Dialog, NULL, line, csscsText));
+      L [L_count] = new csStatic (Dialog, NULL, line, csscsText);
 
       int w,h;
       L [L_count]->SuggestSize (w, h);
@@ -307,8 +307,8 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
   {
     if (ButtonDesc [i].Mask & iFlags)
     {
-      CHK (B [B_count] = new csButton (Dialog, ButtonDesc [i].Command,
-        ButtonDesc [i].Style));
+      B [B_count] = new csButton (Dialog, ButtonDesc [i].Command,
+        ButtonDesc [i].Style);
       B [B_count]->SetText (ButtonDesc [i].Text);
 
       int w,h;
@@ -369,7 +369,7 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
 
   int ret = iParent->app->Execute (MsgBox);
 
-  CHK (delete MsgBox);
+  delete MsgBox;
   return ret;
 }
 
@@ -564,11 +564,11 @@ cspFileDialog::cspFileDialog (csComponent *iParent)
   {
     // If images are not loaded, load them
     if (!fdspr [0])
-      CHKB (fdspr [0] = new csPixmap (app->GetTexture (
-        FILEDLG_TEXTURE_NAME), 0, 0, 16, 13));
+      fdspr [0] = new csPixmap (app->GetTexture (
+        FILEDLG_TEXTURE_NAME), 0, 0, 16, 13);
     if (!fdspr [1])
-      CHKB (fdspr [1] = new csPixmap (app->GetTexture (
-        FILEDLG_TEXTURE_NAME), 16, 0, 16, 13));
+      fdspr [1] = new csPixmap (app->GetTexture (
+        FILEDLG_TEXTURE_NAME), 16, 0, 16, 13);
   } /* endif */
 }
 
@@ -576,8 +576,8 @@ cspFileDialog::~cspFileDialog ()
 {
   if (--fdref == 0)
   {
-    CHK (delete fdspr [0]); fdspr [0] = NULL;
-    CHK (delete fdspr [1]); fdspr [1] = NULL;
+    delete fdspr [0]; fdspr [0] = NULL;
+    delete fdspr [1]; fdspr [1] = NULL;
   }
   if (path)
     delete [] path;
@@ -740,7 +740,7 @@ void cspFileDialog::Reread ()
       sep++;			// Root directory "/"
     strncpy (name, curp, sep - curp);
     name [sep - curp] = 0;
-    CHK (csListBoxItem *lbi = new csListBoxItem (dp, name, CSFDI_PATHCOMPONENT));
+    csListBoxItem *lbi = new csListBoxItem (dp, name, CSFDI_PATHCOMPONENT);
     lbi->SetBitmap (fdspr [1], false);
     lbi->SetOffset (level * 6, 0);
     level++; curp = sep;
@@ -798,45 +798,45 @@ void cspFileDialog::Reread ()
 csWindow *csFileDialog (csComponent *iParent, char *iTitle, char *iFileName,
   char *iOpenButtonText)
 {
-  CHK (csWindow *w = new csWindow (iParent, iTitle,
-    CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR));
-  CHK (cspFileDialog *d = new cspFileDialog (w));
+  csWindow *w = new csWindow (iParent, iTitle,
+    CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR);
+  cspFileDialog *d = new cspFileDialog (w);
   w->SetDragStyle (w->GetDragStyle () & ~CS_DRAG_SIZEABLE);
 
-  CHK (csComponent *c = new csInputLine (d, MAXPATHLEN));
+  csComponent *c = new csInputLine (d, MAXPATHLEN);
   c->id = CSWID_FILENAME;
   c->SetRect (5, 15, 5+310, 31);
 
-  CHK (c = new csStatic (d, c, "File ~name"));
+  c = new csStatic (d, c, "File ~name");
   c->SetPos (5, 5);
 
-  CHK (c = new csInputLine (d, MAXPATHLEN));
+  c = new csInputLine (d, MAXPATHLEN);
   c->id = CSWID_PATHNAME;
   c->SetRect (5, 45, 5+310, 61);
 
-  CHK (c = new csStatic (d, c, "File ~path"));
+  c = new csStatic (d, c, "File ~path");
   c->SetPos (5, 35);
 
-  CHK (c = new csListBox (d, CSLBS_HSCROLL | CSLBS_VSCROLL));
+  c = new csListBox (d, CSLBS_HSCROLL | CSLBS_VSCROLL);
   c->id = CSWID_DIRLIST;
   c->SetRect (5, 75, 5+150, 245);
 
-  CHK (c = new csStatic (d, c, "~Directories"));
+  c = new csStatic (d, c, "~Directories");
   c->SetPos (5, 65);
 
-  CHK (c = new csListBox (d, CSLBS_HSCROLL | CSLBS_VSCROLL));
+  c = new csListBox (d, CSLBS_HSCROLL | CSLBS_VSCROLL);
   c->id = CSWID_FILELIST;
   c->SetRect (165, 75, 165+150, 245);
 
-  CHK (c = new csStatic (d, c, "~Files"));
+  c = new csStatic (d, c, "~Files");
   c->SetPos (165, 65);
 
   csButton *b[2];
-  CHK (b [0] = new csButton (d, cscmdOK, CSBS_DEFAULTVALUE | CSBS_DEFAULT));
+  b [0] = new csButton (d, cscmdOK, CSBS_DEFAULTVALUE | CSBS_DEFAULT);
   b [0]->SetText (iOpenButtonText);
   b [0]->SetSuggestedSize (+16, +2);
 
-  CHK (b [1] = new csButton (d, cscmdCancel, CSBS_DEFAULTVALUE | CSBS_DISMISS));
+  b [1] = new csButton (d, cscmdCancel, CSBS_DEFAULTVALUE | CSBS_DISMISS);
   b [1]->SetText ("Cancel");
   b [1]->SetSuggestedSize (+16, +2);
 
@@ -1084,9 +1084,9 @@ bool cspColorDialog::HandleEvent (csEvent &Event)
 
 csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
 {
-  CHK (csWindow *w = new csWindow (iParent, iTitle,
-    CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR));
-  CHK (cspColorDialog *d = new cspColorDialog (w));
+  csWindow *w = new csWindow (iParent, iTitle,
+    CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR);
+  cspColorDialog *d = new cspColorDialog (w);
   w->SetDragStyle (w->GetDragStyle () & ~CS_DRAG_SIZEABLE);
 
   csColorWheel *cw = new csColorWheel (d);
@@ -1099,7 +1099,7 @@ csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
 #define ADD_SLIDER(wid,y)						\
   {									\
     int sby = y + 4;							\
-    CHK (sb = new csScrollBar (d, cssfsThinRect));			\
+    sb = new csScrollBar (d, cssfsThinRect);			\
     sb->id = wid;							\
     sb->SetRect (sbx + 10, sby,						\
       sbx + 10 + 128 + CSSB_DEFAULTSIZE * 2, sby + CSSB_DEFAULTSIZE);	\
@@ -1113,12 +1113,12 @@ csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
     sbs.pagestep = 10;							\
     sb->SendCommand (cscmdScrollBarSet, &sbs);				\
 									\
-    CHK (st = new csStatic (d, NULL, "@@@"));				\
+    st = new csStatic (d, NULL, "@@@");				\
     st->SetPos (sb->bound.xmax + 4,					\
      sby + (sb->bound.Height () - st->bound.Height ()) / 2);		\
     st->id = wid##_NUM;							\
 									\
-    CHK (st = new csStatic (d, sb, "@"));				\
+    st = new csStatic (d, sb, "@");				\
     st->SetPos (sb->bound.xmin - 10,					\
      sby + (sb->bound.Height () - st->bound.Height ()) / 2);		\
     st->id = wid##_LABEL;						\
@@ -1132,12 +1132,12 @@ csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
 #undef ADD_SLIDER
 
   csButton *b;
-  CHK (b = new csButton (d, cscmdOK, CSBS_DEFAULTVALUE | CSBS_DEFAULT));
+  b = new csButton (d, cscmdOK, CSBS_DEFAULTVALUE | CSBS_DEFAULT);
   b->SetText ("~Ok");
   b->SetRect (CD_WIDTH - 65, 5, CD_WIDTH - 5, 25);
   b->SetState (CSS_GROUP, true);
 
-  CHK (b = new csButton (d, cscmdCancel, CSBS_DEFAULTVALUE));
+  b = new csButton (d, cscmdCancel, CSBS_DEFAULTVALUE);
   b->SetText ("Cancel");
   b->SetRect (CD_WIDTH - 65, 30, CD_WIDTH - 5, 50);
 
@@ -1148,16 +1148,16 @@ csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
   st->id = CSWID_COLORSAMPLE;
 
   csRadioButton *rb;
-  CHK (rb = new csRadioButton (d, CSWID_COLORHLS));
+  rb = new csRadioButton (d, CSWID_COLORHLS);
   rb->SetPos (CD_WIDTH - 65, 116); rb->SetState (CSS_GROUP, true);
   rb->SetCommandCode (cscmdToggleHLS);
-  CHK (st = new csStatic (d, rb, "HLS"));
+  st = new csStatic (d, rb, "HLS");
   st->SetPos (CD_WIDTH - 50, 118);
 
-  CHK (rb = new csRadioButton (d, CSWID_COLORRGB));
+  rb = new csRadioButton (d, CSWID_COLORRGB);
   rb->SetPos (CD_WIDTH - 65, 130);
   rb->SetCommandCode (cscmdToggleHLS);
-  CHK (st = new csStatic (d, rb, "RGB"));
+  st = new csStatic (d, rb, "RGB");
   st->SetPos (CD_WIDTH - 50, 132);
 
   // Set starting color value

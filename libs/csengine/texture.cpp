@@ -110,7 +110,7 @@ csTextureList::~csTextureList ()
 
 csTextureHandle *csTextureList::NewTexture (iImage *image)
 {
-  CHK (csTextureHandle *tm = new csTextureHandle (image));
+  csTextureHandle *tm = new csTextureHandle (image);
   Push (tm);
   return tm;
 }

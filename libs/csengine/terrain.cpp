@@ -40,10 +40,10 @@ csTerrain::csTerrain () : csObject()
 
 csTerrain::~csTerrain ()
 {
-  CHK (delete mesh);
-  CHK (delete height);
-  CHK (delete clipbox);
-  CHK (delete vbuf);
+  delete mesh;
+  delete height;
+  delete clipbox;
+  delete vbuf;
 }
 
 void csTerrain::SetDetail( unsigned int detail)
@@ -77,13 +77,13 @@ csVector3 transformer (csVector3 vin)
 bool csTerrain::Initialize (const void* heightmap, unsigned long size)
 {
   grview = NULL;
-  CHK (height = new ddgHeightMap ());
+  height = new ddgHeightMap ();
   if (height->readTGN (heightmap, size))
     height->generateHeights (257,257,5);
-  CHK (mesh = new ddgTBinMesh (height));
-  CHK (clipbox = new ddgBBox (ddgVector3(0,0,3),ddgVector3(640, 480, 15000)));
+  mesh = new ddgTBinMesh (height);
+  clipbox = new ddgBBox (ddgVector3(0,0,3),ddgVector3(640, 480, 15000));
 
-  CHK (vbuf = new ddgVBuffer ());
+  vbuf = new ddgVBuffer ();
 
   vbuf->size (25000);
   vbuf->renderMode (true, false, true);

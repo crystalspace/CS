@@ -49,7 +49,7 @@ csStatic::csStatic (csComponent *iParent, csPixmap *iBitmap)
 
 csStatic::~csStatic ()
 {
-  CHKB (delete Bitmap);
+  delete Bitmap;
 }
 
 void csStatic::Init (csStaticStyle iStyle)

@@ -150,18 +150,18 @@ void load_sprite (char *filename, char *templatename, char* txtname)
   }
 
   // read in the model file
-  CHK (converter * filedata = new converter);
+  converter * filedata = new converter;
   if (filedata->ivcon (filename, true, false, NULL, Sys->VFS) == ERROR)
   {
     Sys->Printf (MSG_CONSOLE, "There was an error reading the data!\n");
-    CHK (delete filedata);
+    delete filedata;
     return;
   }
 
   // convert data from the 'filedata' structure into a CS sprite template
   csCrossBuild_SpriteTemplateFactory builder;
   csSpriteTemplate *result = (csSpriteTemplate *)builder.CrossBuild (*filedata);
-  CHK (delete filedata);
+  delete filedata;
 
   // add this sprite to the world
   result->SetName (templatename);
@@ -685,14 +685,14 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg && ScanStr (arg, "%f,%f,%f,%f,%d", &r, &g, &b, &radius,
     	&thing_shadows) == 5)
     {
-      CHK (dyn = new csDynLight (pos.x, pos.y, pos.z, radius, r, g, b));
+      dyn = new csDynLight (pos.x, pos.y, pos.z, radius, r, g, b);
       if (thing_shadows) dyn->flags.Set (CS_LIGHT_THINGSHADOWS,
       	CS_LIGHT_THINGSHADOWS);
       rnd = false;
     }
     else
     {
-      CHK (dyn = new csDynLight (pos.x, pos.y, pos.z, 6, 1, 1, 1));
+      dyn = new csDynLight (pos.x, pos.y, pos.z, 6, 1, 1, 1);
       rnd = true;
     }
     Sys->view->GetWorld ()->AddDynLight (dyn);
@@ -709,7 +709,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if ((dyn = Sys->view->GetWorld ()->GetFirstDynLight ()) != NULL)
     {
       Sys->view->GetWorld ()->RemoveDynLight (dyn);
-      CHK (delete dyn);
+      delete dyn;
       Sys->Printf (MSG_CONSOLE, "Dynamic light deleted.\n");
     }
   }
@@ -719,7 +719,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     while ((dyn = Sys->view->GetWorld ()->GetFirstDynLight ()) != NULL)
     {
       Sys->view->GetWorld ()->RemoveDynLight (dyn);
-      CHK (delete dyn);
+      delete dyn;
     }
     Sys->Printf (MSG_CONSOLE, "All dynamic lights deleted.\n");
   }

@@ -51,7 +51,7 @@ csTextureMM::csTextureMM (iImage* Image, int Flags)
 csTextureMM::~csTextureMM ()
 {
   for (int i = 0; i < 4; i++)
-    CHKB (delete tex [i]);
+    delete tex [i];
   FreeImage ();
 }
 
@@ -72,7 +72,7 @@ void csTextureMM::CreateMipmaps ()
 
   // Delete existing mipmaps, if any
   for (int i = 0; i < 4; i++)
-    CHKB (delete tex [i]);
+    delete tex [i];
 
   tex [0] = NewTexture (image);
 

@@ -58,18 +58,18 @@ public:
     while (alloced)
     {
       PoolObj* n = alloced->next;
-      //CHK (delete alloced->pol2d); @@@ This free is not valid!
+      //delete alloced->pol2d; @@@ This free is not valid!
       // We should use a ref count on the pool itself so that we
       // now when all objects in the pool are freed and the
       // 'alloced' list will be empty.
-      CHK (delete alloced);
+      delete alloced;
       alloced = n;
     }
     while (freed)
     {
       PoolObj* n = freed->next;
-      CHK (delete freed->pol2d);
-      CHK (delete freed);
+      delete freed->pol2d;
+      delete freed;
       freed = n;
     }
   }
@@ -85,7 +85,7 @@ public:
     }
     else
     {
-      CHK (pnew = new PoolObj ());
+      pnew = new PoolObj ();
       pnew->pol2d = factory->Create ();
     }
     pnew->next = alloced;

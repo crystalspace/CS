@@ -32,18 +32,18 @@ csView::csView (csWorld *iWorld, iGraphics3D* ig3d)
   world = iWorld;
   (G3D = ig3d)->IncRef ();
 
-  CHK (view = new csPolygon2D ());
-  CHK (camera = new csCamera ());
+  view = new csPolygon2D ();
+  camera = new csCamera ();
   clipper = NULL;
 }
 
 csView::~csView ()
 {
   G3D->DecRef ();
-  CHK (delete bview);
-  CHK (delete camera);
-  CHK (delete view);
-  CHK (delete clipper);
+  delete bview;
+  delete camera;
+  delete view;
+  delete clipper;
 }
 
 void csView::ClearView ()
@@ -62,18 +62,18 @@ void csView::SetRectangle (int x, int y, int w, int h)
   if (x + w > orig_width) { w = orig_width - x; }
   if (y + h > orig_height) { h = orig_height - y; }
 
-  CHK (delete view);  view = NULL;
-  CHK (delete bview);
-  CHK (bview = new csBox2 (x, y, x + w - 1, y + h - 1));
-  CHK (delete clipper); clipper = NULL;
+  delete view;  view = NULL;
+  delete bview;
+  bview = new csBox2 (x, y, x + w - 1, y + h - 1);
+  delete clipper; clipper = NULL;
 }
 
 void csView::AddViewVertex (int x, int y)
 {
   if (!view)
-    CHKB (view = new csPolygon2D ());
+    view = new csPolygon2D ();
   view->AddVertex (x, y);
-  CHK (delete clipper); clipper = NULL;
+  delete clipper; clipper = NULL;
 }
 
 void csView::Draw ()
@@ -106,18 +106,18 @@ void csView::UpdateClipper ()
       xmax = QRound (xscale * (bview->MaxX() + 1));
       ymin = QRound (yscale * bview->MinY());
       ymax = QRound (yscale * (bview->MaxY() + 1));
-      CHK (delete bview);
+      delete bview;
     }
-    CHK (bview = new csBox2 (xmin, ymin, xmax - 1, ymax - 1));
-    CHK (delete clipper);
+    bview = new csBox2 (xmin, ymin, xmax - 1, ymax - 1);
+    delete clipper;
     clipper = NULL;
   }
 
   if (!clipper)
     if (view)
-      CHKB (clipper = new csPolygonClipper (view))
+      clipper = new csPolygonClipper (view);
     else
-      CHKB (clipper = new csBoxClipper (*bview));
+      clipper = new csBoxClipper (*bview);
 }
 
 void csView::SetSector (csSector *sector)

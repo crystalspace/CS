@@ -41,8 +41,8 @@ csWSTexture::csWSTexture (const char *iName, iImage *inImage, int iFlags)
 csWSTexture::~csWSTexture ()
 {
   Unregister ();
-  CHK (delete [] Name);
-  CHK (delete [] FileName);
+  delete [] Name;
+  delete [] FileName;
   if (Image)
     Image->DecRef ();
   if (Handle)
@@ -140,13 +140,13 @@ void csWSTexture::Refresh ()
 
 void csWSTexture::SetName (const char *iName)
 {
-  CHK (delete [] Name);
+  delete [] Name;
   Name = strnew (iName);
 }
 
 void csWSTexture::SetFileName (const char *iFileName)
 {
-  CHK (delete [] FileName);
+  delete [] FileName;
   FileName = strnew (iFileName);
 }
 
@@ -187,7 +187,7 @@ csWSTexVector::~csWSTexVector ()
 
 bool csWSTexVector::FreeItem (csSome Item)
 {
-  CHK (delete (csWSTexture *)Item);
+  delete (csWSTexture *)Item;
   return true;
 }
 

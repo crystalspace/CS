@@ -258,7 +258,7 @@ public:
     while (first)
     {
       sf = first->next;
-      CHK (delete first);
+      delete first;
       first = sf;
     }
     last = NULL;

@@ -27,7 +27,7 @@ IMPLEMENT_CSOBJTYPE (csSoundDataObject,csObject);
 
 csSoundDataObject::~csSoundDataObject ()
 {
-  if (sndbuf) CHKB(delete sndbuf);
+  if (sndbuf) delete sndbuf;
 }
 
 csSoundData* csSoundDataObject::GetSound (csObject& csobj, const char* name)

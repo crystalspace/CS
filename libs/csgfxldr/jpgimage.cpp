@@ -43,10 +43,10 @@ bool RegisterJPG ()
 
 csImageFile* csJPGImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
 {
-  CHK (ImageJpgFile* i = new ImageJpgFile (iFormat));
+  ImageJpgFile* i = new ImageJpgFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
-    CHK (delete i);
+    delete i;
     return NULL;
   }
   return i;    
@@ -240,9 +240,9 @@ bool ImageJpgFile::Load (UByte* iBuffer, ULong iSize)
 
   int pixelcount = Width * Height;
   if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
-    CHKB (Image = new UByte [pixelcount])
+    Image = new UByte [pixelcount];
   else
-    CHKB (Image = new RGBPixel [pixelcount]);
+    Image = new RGBPixel [pixelcount];
 
   /* JSAMPLEs per row in output buffer */
   row_stride = cinfo.output_width * cinfo.output_components;

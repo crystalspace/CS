@@ -84,11 +84,11 @@ void csMenuItem::Init ()
   {
     // If  'checked' and 'submenu' images are not loaded, load them
     if (!sprchecked)
-      CHKB (sprchecked = new csPixmap (app->GetTexture (
-        MENU_TEXTURE_NAME), 0, 0, 9, 9));
+      sprchecked = new csPixmap (app->GetTexture (
+        MENU_TEXTURE_NAME), 0, 0, 9, 9);
     if (!sprsubmenu)
-      CHKB (sprsubmenu = new csPixmap (app->GetTexture (
-        MENU_TEXTURE_NAME), 9, 0, 9, 9));
+      sprsubmenu = new csPixmap (app->GetTexture (
+        MENU_TEXTURE_NAME), 9, 0, 9, 9);
   } /* endif */
 }
 
@@ -96,16 +96,16 @@ csMenuItem::~csMenuItem ()
 {
   if (--menuitemref == 0)
   {
-    CHK (delete sprchecked); sprchecked = NULL;
-    CHK (delete sprsubmenu); sprsubmenu = NULL;
+    delete sprchecked; sprchecked = NULL;
+    delete sprsubmenu; sprsubmenu = NULL;
   }
-  CHKB (delete [] info)
+  delete [] info;
 }
 
 void csMenuItem::SetText (const char *iText)
 {
-  CHKB (delete [] text)
-  CHKB (delete [] info)
+  delete [] text;
+  delete [] info;
 
   text = NULL;
   info = NULL;
@@ -123,7 +123,7 @@ void csMenuItem::SetText (const char *iText)
       break;
     else if (iText [i] != '~')
       cc++;
-  CHK (text = new char [cc + 1]);
+  text = new char [cc + 1];
   if (i < sl)
     info = strnew (iText + i + 1);
 

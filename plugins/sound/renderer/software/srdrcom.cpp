@@ -102,7 +102,7 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 	}
 	
 	numberChannels = configsndsoft->GetInt("SoundRender.software", "MAX_CHANNELS", 16);
-	CHK (Channels = new Channel* [numberChannels]);
+	Channels = new Channel* [numberChannels];
 	for (int i=0; i<numberChannels; i++)
 		Channels [i]=NULL;
 	
@@ -124,7 +124,7 @@ csSoundRenderSoftware::~csSoundRenderSoftware()
 	
 	if (Channels)
 	{
-		CHKB (delete [] Channels);
+		delete [] Channels;
 		Channels = NULL;
 	}
 	
@@ -163,7 +163,7 @@ iSoundBuffer* csSoundRenderSoftware::CreateSoundBuffer(csSoundData *snd)
 	snd->convertFrequencyTo(getFrequency());
 	snd->convert16bitTo(is16Bits());
 	
-	CHK (csSoundBufferSoftware* pNew = new csSoundBufferSoftware (NULL));
+	csSoundBufferSoftware* pNew = new csSoundBufferSoftware (NULL);
 	if (!pNew) return NULL;
 
 	pNew->setSoundData (snd, false);
@@ -238,7 +238,7 @@ void csSoundRenderSoftware::PlayEphemeral(csSoundData *snd, bool loop)
 	snd->convertFrequencyTo(getFrequency());
 	snd->convert16bitTo(is16Bits());
 	
-	CHK (Channel *c = new Channel ());
+	Channel *c = new Channel ();
 	
 	//to loop or not, defaults to not
 	if (loop == true) c->setSoundData (snd, true);
@@ -448,7 +448,7 @@ bool csSoundRenderSoftware::delChannel (Channel_ID id)
 			else
 				AllChannels = NULL;
 			
-			CHK (delete c);
+			delete c;
 			return true;
 		}
 		else
@@ -464,7 +464,7 @@ bool csSoundRenderSoftware::delChannel (Channel_ID id)
 					else
 						old->next = NULL;
 					
-					CHK (delete c);
+					delete c;
 					return true;
 				}
 			}

@@ -29,14 +29,14 @@ csPoly2DFactory* csPoly2DFactory::SharedFactory()
 csPoly2D::csPoly2D (int start_size)
 {
   max_vertices = start_size;
-  CHK (vertices = new csVector2 [max_vertices]);
+  vertices = new csVector2 [max_vertices];
   MakeEmpty ();
 }
 
 csPoly2D::csPoly2D (csPoly2D& copy)
 {
   max_vertices = copy.max_vertices;
-  CHK (vertices = new csVector2 [max_vertices]);
+  vertices = new csVector2 [max_vertices];
   num_vertices = copy.num_vertices;
   memcpy (vertices, copy.vertices, sizeof (csVector2)*num_vertices);
   bbox = copy.bbox;
@@ -52,9 +52,9 @@ csPoly2D& csPoly2D::operator= (const csPoly2D& other)
   }
   else
   {
-    CHK (delete [] vertices);
+    delete [] vertices;
     max_vertices = other.max_vertices;
-    CHK (vertices = new csVector2 [max_vertices]);
+    vertices = new csVector2 [max_vertices];
     num_vertices = other.num_vertices;
     if (num_vertices)
       memcpy (vertices, other.vertices, sizeof (csVector2)*num_vertices);
@@ -65,7 +65,7 @@ csPoly2D& csPoly2D::operator= (const csPoly2D& other)
 
 csPoly2D::~csPoly2D ()
 {
-  CHK (delete [] vertices);
+  delete [] vertices;
 }
 
 void csPoly2D::MakeEmpty ()
@@ -101,9 +101,9 @@ bool csPoly2D::In (csVector2* poly, int num_poly, const csVector2& v)
 void csPoly2D::MakeRoom (int new_max)
 {
   if (new_max <= max_vertices) return;
-  CHK (csVector2* new_vertices = new csVector2 [new_max]);
+  csVector2* new_vertices = new csVector2 [new_max];
   memcpy (new_vertices, vertices, num_vertices*sizeof (csVector2));
-  CHK (delete [] vertices);
+  delete [] vertices;
   vertices = new_vertices;
   max_vertices = new_max;
 }

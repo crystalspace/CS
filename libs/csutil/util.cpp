@@ -43,7 +43,7 @@ char *strnew (const char *s)
   if (s)
   {
     size_t sl = strlen (s) + 1;
-    CHK (char *r = new char [sl]);
+    char *r = new char [sl];
     memcpy (r, s, sl);
     return r;
   }
@@ -74,9 +74,9 @@ static bool RecursiveCombinations (int *vector, int top, int mask, int m, int n,
 void Combinations (int m, int n, bool (*callback) (int *vector, int count,
   void *arg), void *arg)
 {
-  CHK (int *vector = new int [m]);
+  int *vector = new int [m];
   RecursiveCombinations (vector, 0, 0, m, n, callback, arg);
-  CHK (delete [] vector);
+  delete [] vector;
 }
 
 #ifdef COMP_BC

@@ -107,22 +107,22 @@ bool csSolidBspPersp::TestPolygon (csVector3* verts, int num_verts)
 
 csSolidBspCube::csSolidBspCube ()
 {
-  CHK (trees[0] = new csSolidBspPersp ());
-  CHK (trees[1] = new csSolidBspPersp ());
-  CHK (trees[2] = new csSolidBspPersp ());
-  CHK (trees[3] = new csSolidBspPersp ());
-  CHK (trees[4] = new csSolidBspPersp ());
-  CHK (trees[5] = new csSolidBspPersp ());
+  trees[0] = new csSolidBspPersp ();
+  trees[1] = new csSolidBspPersp ();
+  trees[2] = new csSolidBspPersp ();
+  trees[3] = new csSolidBspPersp ();
+  trees[4] = new csSolidBspPersp ();
+  trees[5] = new csSolidBspPersp ();
 }
 
 csSolidBspCube::~csSolidBspCube ()
 {
-  CHK (delete trees[0]);
-  CHK (delete trees[1]);
-  CHK (delete trees[2]);
-  CHK (delete trees[3]);
-  CHK (delete trees[4]);
-  CHK (delete trees[5]);
+  delete trees[0];
+  delete trees[1];
+  delete trees[2];
+  delete trees[3];
+  delete trees[4];
+  delete trees[5];
 }
 
 void csSolidBspCube::MakeEmpty ()

@@ -222,7 +222,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (
       delete cached_texture;
     }
 
-    CHK (cached_texture = new SoftwareCachedTexture (MipMap, pt));
+    cached_texture = new SoftwareCachedTexture (MipMap, pt);
     cached_texture->frameno = frameno;
 
     int margin_size = H_MARGIN * bitmap_w * bytes_per_texel;

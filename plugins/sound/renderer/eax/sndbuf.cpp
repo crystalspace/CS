@@ -246,4 +246,3 @@ float csSoundBufferEAX::GetFrequencyFactor()
 	}
 	
 	return factor;
-}

@@ -31,18 +31,18 @@ csSolidBspNodePool::~csSolidBspNodePool ()
   while (alloced)
   {
     PoolObj* n = alloced->next;
-    //CHK (delete alloced->pi); @@@ This free is not valid!
+    //delete alloced->pi; @@@ This free is not valid!
     // We should use a ref count on the pool itself so that we
     // now when all objects in the pool are freed and the
     // 'alloced' list will be empty.
-    CHK (delete alloced);
+    delete alloced;
     alloced = n;
   }
   while (freed)
   {
     PoolObj* n = freed->next;
-    CHK (delete freed->node);
-    CHK (delete freed);
+    delete freed->node;
+    delete freed;
     freed = n;
   }
 }
@@ -70,8 +70,8 @@ csSolidBspNode* csSolidBspNodePool::Alloc ()
   }
   else
   {
-    CHK (pnew = new PoolObj ());
-    CHK (pnew->node = new csSolidBspNode ());
+    pnew = new PoolObj ();
+    pnew->node = new csSolidBspNode ();
   }
   pnew->next = alloced;
   alloced = pnew;
@@ -112,8 +112,8 @@ void csSolidBspNodePool::Dump ()
 
 csSolidBspNode::~csSolidBspNode ()
 {
-  CHK (delete left);
-  CHK (delete right);
+  delete left;
+  delete right;
 }
 
 //---------------------------------------------------------------------------

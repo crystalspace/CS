@@ -55,11 +55,11 @@ cswsSystemDriver::cswsSystemDriver (csApp *ParentApp) :
 
 cswsSystemDriver::~cswsSystemDriver ()
 {
-  CHK (delete [] linecolor);
+  delete [] linecolor;
   if (textline)
     for (int i = 0; i < maxlines; i++)
-      CHKB (delete [] textline [i]);
-  CHK (delete [] textline);
+      delete [] textline [i];
+  delete [] textline;
   application = NULL;
 }
 
@@ -78,11 +78,11 @@ bool cswsSystemDriver::Initialize (int argc, const char* const argv[],
   maxwidth = Width / 4;
   maxlines = Height / (G2D->GetTextHeight (application->GetFont ()) + 2);
 
-  CHK (textline = new char *[maxlines]);
-  CHK (linecolor = new int [maxlines]);
+  textline = new char *[maxlines];
+  linecolor = new int [maxlines];
   for (int i = 0; i < maxlines; i++)
   {
-    CHK (textline [i] = new char [maxwidth + 1]);
+    textline [i] = new char [maxwidth + 1];
     memset (textline [i], 0, maxwidth + 1);
     linecolor [i] = cs_Color_Black;
   } /* endfor */

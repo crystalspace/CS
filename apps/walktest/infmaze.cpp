@@ -33,12 +33,12 @@
 
 InfiniteMaze::InfiniteMaze ()
 {
-  CHK (infinite_world = new WideSparse3D ());
+  infinite_world = new WideSparse3D ();
 }
 
 InfiniteMaze::~InfiniteMaze ()
 {
-  if (infinite_world) CHKB (delete infinite_world);
+  if (infinite_world) delete infinite_world;
 }
 
 void InfiniteMaze::create_one_side (csSector* room, char* pname,
@@ -139,17 +139,17 @@ InfRoomData* InfiniteMaze::create_six_room (csWorld* world, int x, int y, int z)
   create_one_side (room, "f", t, t2, dx-s,dy-s,dz+s,  dx+s,dy-s,dz+s,  dx+s,dy-s,dz-s,  dx-s,dy-s,dz-s, 0,.1,0);
   create_one_side (room, "c", t, t2, dx-s,dy+s,dz-s,  dx+s,dy+s,dz-s,  dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-.1,0);
 
-  CHK (csStatLight* light = new csStatLight (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s), 1+rand1 (3),
-  	rand1 (1), rand1 (1), rand1 (1), false));
+  csStatLight* light = new csStatLight (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s), 1+rand1 (3),
+  	rand1 (1), rand1 (1), rand1 (1), false);
   room->AddLight (light);
 
-  CHK (InfRoomData* ird = new InfRoomData ());
+  InfRoomData* ird = new InfRoomData ();
   ird->x = x;
   ird->y = y;
   ird->z = z;
   ird->sector = room;
   infinite_world->set (x, y, z, (void*)ird);
-  CHK (csDataObject* irddata = new csDataObject(ird));
+  csDataObject* irddata = new csDataObject(ird);
   room->ObjAdd(irddata);
   return ird;
 }
@@ -190,7 +190,7 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1, int x2, int y2, 
     else p1 = "w";
   InfRoomData* s = (InfRoomData*)(infinite_world->get (x1, y1, z1));
   csPolygon3D* po = s->sector->GetPolygon3D (p1);
-  CHK (InfPortalCS* prt = new InfPortalCS ());
+  InfPortalCS* prt = new InfPortalCS ();
   po->SetPortal (prt);
   prt->SetSector (NULL);
   prt->x1 = x1; prt->y1 = y1; prt->z1 = z1;
@@ -249,10 +249,10 @@ void InfPortalCS::ConnectNewSector ()
     s->draw_busy = old_draw_busy;
 
     LV* n = lviews->next;
-    CHK (delete lviews);
+    delete lviews;
     lviews = n;
   }
-  CHK ((void)new csRAPIDCollider (*s, s));
+  (void)new csRAPIDCollider (*s, s);
 }
 
 bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon, csRenderView& rview)
@@ -281,12 +281,12 @@ void InfPortalCS::CheckFrustum (csFrustumView& lview)
     {
       // If we want to shine light through this portal but it doesn't
       // really exist yet then we remember the csFrustumView for later.
-      CHK (LV* lv = new LV ());
+      LV* lv = new LV ();
       lv->next = lviews;
       lviews = lv;
       lv->lv = lview;
       if (lview.light_frustum)
-        CHKB (lv->lv.light_frustum = new csFrustum (*lview.light_frustum));
+        lv->lv.light_frustum = new csFrustum (*lview.light_frustum);
     }
   }
   else

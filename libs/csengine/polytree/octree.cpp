@@ -43,14 +43,14 @@ void csPVS::Clear ()
   while (visible)
   {
     csOctreeVisible* n = visible->next;
-    CHK (delete visible);
+    delete visible;
     visible = n;
   }
 }
 
 csOctreeVisible* csPVS::Add ()
 {
-  CHK (csOctreeVisible* ovis = new csOctreeVisible ());
+  csOctreeVisible* ovis = new csOctreeVisible ();
   ovis->next = visible;
   visible = ovis;
   return ovis;
@@ -76,10 +76,10 @@ csOctreeNode::~csOctreeNode ()
   int i;
   for (i = 0 ; i < 8 ; i++)
   {
-    CHK (delete children[i]);
+    delete children[i];
   }
-  CHK (delete minibsp);
-  CHK (delete [] minibsp_verts);
+  delete minibsp;
+  delete [] minibsp_verts;
 }
 
 bool csOctreeNode::IsEmpty ()
@@ -98,7 +98,7 @@ void csOctreeNode::SetMiniBsp (csBspTree* mbsp)
 
 void csOctreeNode::BuildVertexTables ()
 {
-  CHK (delete [] minibsp_verts);
+  delete [] minibsp_verts;
   if (minibsp)
     minibsp_verts = minibsp->GetVertices (minibsp_numverts);
   int i;
@@ -126,25 +126,25 @@ void csOctree::Build ()
 {
   int i;
   int num = sector->GetNumPolygons ();
-  CHK (csPolygonInt** polygons = new csPolygonInt* [num]);
+  csPolygonInt** polygons = new csPolygonInt* [num];
   for (i = 0 ; i < num ; i++) polygons[i] = sector->GetPolygonInt (i);
 
-  CHK (root = new csOctreeNode);
+  root = new csOctreeNode;
 
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), polygons, num);
 
-  CHK (delete [] polygons);
+  delete [] polygons;
 }
 
 void csOctree::Build (csPolygonInt** polygons, int num)
 {
-  CHK (root = new csOctreeNode);
+  root = new csOctreeNode;
 
-  CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
+  csPolygonInt** new_polygons = new csPolygonInt* [num];
   int i;
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
   Build ((csOctreeNode*)root, bbox.Min (), bbox.Max (), new_polygons, num);
-  CHK (delete [] new_polygons);
+  delete [] new_polygons;
 }
 
 void csOctree::ProcessTodo (csOctreeNode* node)
@@ -293,11 +293,11 @@ void AddPolygonTo2DBSP (const csPlane3& plane, csBspTree2D* bsp2d,
     float cl2d = pl.Classify (csVector2 (0, 0));
     if ((cl3d < 0 && cl2d < 0) || (cl3d > 0 && cl2d > 0))
     {
-      CHK (seg2 = new csSegment2 (s1, s2));
+      seg2 = new csSegment2 (s1, s2);
     }
     else
     {
-      CHK (seg2 = new csSegment2 (s2, s1));
+      seg2 = new csSegment2 (s2, s1);
     }
     bsp2d->Add (seg2);
   }
@@ -398,9 +398,9 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   float* xarray_all, * yarray_all, * zarray_all;
   float* xarray, * yarray, * zarray;
   int num_xar, num_yar, num_zar;
-  CHK (xarray_all = new float [num*10]);
-  CHK (yarray_all = new float [num*10]);
-  CHK (zarray_all = new float [num*10]);
+  xarray_all = new float [num*10];
+  yarray_all = new float [num*10];
+  zarray_all = new float [num*10];
   GetVertexComponents (polygons, num, tbox,
 	xarray_all, num_xar, yarray_all, num_yar, zarray_all, num_zar);
   // Make sure the center is always included.
@@ -410,16 +410,16 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   qsort (xarray_all, num_xar, sizeof (float), compare_float);
   qsort (yarray_all, num_yar, sizeof (float), compare_float);
   qsort (zarray_all, num_zar, sizeof (float), compare_float);
-  CHK (xarray = new float [num_xar]);
-  CHK (yarray = new float [num_yar]);
-  CHK (zarray = new float [num_zar]);
+  xarray = new float [num_xar];
+  yarray = new float [num_yar];
+  zarray = new float [num_zar];
   int num_x, num_y, num_z;
   num_x = RemoveDoubles (xarray_all, num_xar, xarray);
   num_y = RemoveDoubles (yarray_all, num_yar, yarray);
   num_z = RemoveDoubles (zarray_all, num_zar, zarray);
-  CHK (delete [] xarray_all);
-  CHK (delete [] yarray_all);
-  CHK (delete [] zarray_all);
+  delete [] xarray_all;
+  delete [] yarray_all;
+  delete [] zarray_all;
 
   int i, j;
   csVector3 best_center = orig;
@@ -459,7 +459,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
     csPlane3 plane (1, 0, 0, -x);
     // First create a 2D bsp tree for all intersections of the
     // polygons in the node with the chosen plane.
-    CHK (csBspTree2D* bsp2d = new csBspTree2D ());
+    csBspTree2D* bsp2d = new csBspTree2D ();
     for (j = 0 ; j < num ; j++)
       if (polygons[j]->ClassifyX (x) == POL_SPLIT_NEEDED)
 	AddPolygonTo2DBSP (plane, bsp2d, (csPolygon3D*)polygons[j]);
@@ -484,7 +484,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
       best_center.x = x;
     }
 
-    CHK (delete bsp2d);
+    delete bsp2d;
   }
 
   // Try y planes.
@@ -493,7 +493,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   {
     y = yarray[i]+.1;
     csPlane3 plane (0, 1, 0, -y);
-    CHK (csBspTree2D* bsp2d = new csBspTree2D ());
+    csBspTree2D* bsp2d = new csBspTree2D ();
     for (j = 0 ; j < num ; j++)
       if (polygons[j]->ClassifyY (y) == POL_SPLIT_NEEDED)
 	AddPolygonTo2DBSP (plane, bsp2d, (csPolygon3D*)polygons[j]);
@@ -510,7 +510,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
       max_solid = count_solid;
       best_center.y = y;
     }
-    CHK (delete bsp2d);
+    delete bsp2d;
   }
 
   // Try z planes.
@@ -519,7 +519,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   {
     z = zarray[i]+.1;
     csPlane3 plane (0, 0, 1, -z);
-    CHK (csBspTree2D* bsp2d = new csBspTree2D ());
+    csBspTree2D* bsp2d = new csBspTree2D ();
     for (j = 0 ; j < num ; j++)
       if (polygons[j]->ClassifyZ (z) == POL_SPLIT_NEEDED)
 	AddPolygonTo2DBSP (plane, bsp2d, (csPolygon3D*)polygons[j]);
@@ -536,7 +536,7 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
       max_solid = count_solid;
       best_center.z = z;
     }
-    CHK (delete bsp2d);
+    delete bsp2d;
   }
 #else
   // Try a few x-planes first.
@@ -582,9 +582,9 @@ void csOctree::ChooseBestCenter (csOctreeNode* node,
   }
 #endif
   node->center = best_center;
-  CHK (delete [] xarray);
-  CHK (delete [] yarray);
-  CHK (delete [] zarray);
+  delete [] xarray;
+  delete [] yarray;
+  delete [] zarray;
 }
 
 void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
@@ -605,7 +605,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
   if (num <= bsp_num)
   {
     csBspTree* bsp;
-    CHK (bsp = new csBspTree (sector, mode));
+    bsp = new csBspTree (sector, mode);
     bsp->Build (polygons, num);
     node->SetMiniBsp (bsp);
     node->leaf = true;
@@ -623,7 +623,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
   int idx[8];
   for (i = 0 ; i < 8 ; i++)
   {
-    CHK (polys[i] = new csPolygonInt* [num]);
+    polys[i] = new csPolygonInt* [num];
     idx[i] = 0;
   }
 
@@ -653,7 +653,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
     // Even if there are no polygons in the node we create
     // a child octree node because some of the visibility stuff
     // depends on that (i.e. adding dynamic objects).
-    CHK (node->children[i] = new csOctreeNode);
+    node->children[i] = new csOctreeNode;
     csVector3 new_bmin;
     csVector3 new_bmax;
     if (i & 4) { new_bmin.x = center.x; new_bmax.x = bmax.x; }
@@ -665,7 +665,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
     Build ((csOctreeNode*)node->children[i], new_bmin, new_bmax,
     	polys[i], idx[i]);
 
-    CHK (delete [] polys[i]);
+    delete [] polys[i];
   }
 }
 
@@ -776,14 +776,6 @@ void csOctree::MarkVisibleFromPVS (const csVector3& pos)
   // Mark all objects in the world as invisible.
   csOctreeNode::pvs_cur_vis_nr++;
 
-{
-printf ("pos=%f,%f,%f\n", pos.x, pos.y, pos.z);
-const csBox3& b = node->GetBox ();
-printf ("b=%f,%f,%f %f,%f,%f\n",
-b.MinX (), b.MinY (), b.MinZ (),
-b.MaxX (), b.MaxY (), b.MaxZ ());
-}
-
   csPVS& pvs = node->GetPVS ();
   int j;
   // Here we mark all octree nodes as visible.
@@ -855,7 +847,17 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
 	{
 	  //@@@BUG? The 'true' for 'mirror' in the next alloc is probably
 	  // dependent on which side of the axis plane our corner is.
-	  CHK (csClipper* clipper = new csPolygonClipper (&proj_poly, true));
+{
+printf ("================\n");
+printf ("corner=%f,%f,%f plane_nr=%f plane_pos=%f\n",
+corner.x, corner.y, corner.z, plane_nr, plane_pos);
+int k;
+for (k = 0 ; k < cur_poly.GetNumVertices () ; k++)
+printf ("  %d:%f,%f,%f %f,%f\n", k, cur_poly[k].x, cur_poly[k].y,
+cur_poly[k].z, proj_poly[k].x, proj_poly[k].y);
+printf ("%f\n", csMath2::Area2 (proj_poly[0], proj_poly[1], proj_poly[2]));
+}
+	  csClipper* clipper = new csPolygonClipper (&proj_poly, true);
 	  result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
 	  int num_verts = result_poly.GetNumVertices ();
 //if (verbose)
@@ -876,7 +878,7 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
 //}
 	  UByte rc = clipper->Clip (result_poly.GetVertices (), num_verts,
 	  	result_poly.GetBoundingBox ());
-	  CHK (delete clipper);
+	  delete clipper;
 	  if (rc == CS_CLIP_OUTSIDE)
 	    num_verts = 0;
 //if (verbose) printf ("      rc=%d num_verts=%d\n", rc, num_verts);
@@ -909,7 +911,7 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
 	// @@@ WE NEED TO MAKE THIS CLIPPER EARLIER AND
 	// GIVE IT TO THIS ROUTINE!
 	csBox2 b (0, 0, 1024, 1024);
-	CHK (csClipper* clipper = new csBoxClipper (b));
+	csClipper* clipper = new csBoxClipper (b);
 	result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
 	int num_verts = result_poly.GetNumVertices ();
 	if (clipper->Clip (result_poly.GetVertices (), num_verts,
@@ -921,7 +923,7 @@ void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
 	  	result_poly.GetNumVertices ());
 	  if (cbuffer->IsFull ()) return;
 	}
-	CHK (delete clipper);
+	delete clipper;
       }
     }
 }
@@ -1121,7 +1123,7 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
 
   // From the calculated plane area we can now calculate a scale to get
   // to a c-buffer size of 1024x1024. We also allocate this c-buffer here.
-  CHK (csCBuffer* cbuffer = new csCBuffer (0, 1023, 1024));
+  csCBuffer* cbuffer = new csCBuffer (0, 1023, 1024);
   csVector2 scale = (plane_area.Max () - plane_area.Min ()) / 1024.;
   scale.x = 1./scale.x;
   scale.y = 1./scale.y;
@@ -1134,7 +1136,7 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
 
   // If the c-buffer is full then the occludee will not be visible.
   bool full = cbuffer->IsFull ();
-  CHK (delete cbuffer);
+  delete cbuffer;
   return !full;
 }
 
@@ -1396,7 +1398,7 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
   if (do_minibsp)
   {
     csBspTree* bsp;
-    CHK (bsp = new csBspTree (sector, mode));
+    bsp = new csBspTree (sector, mode);
     bool rc = bsp->ReadFromCache (cf, polygons, num);
     node->SetMiniBsp (bsp);
     if (!rc) return false;
@@ -1413,7 +1415,7 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
   int idx[8];
   for (i = 0 ; i < 8 ; i++)
   {
-    CHK (polys[i] = new csPolygonInt* [num]);
+    polys[i] = new csPolygonInt* [num];
     idx[i] = 0;
   }
 
@@ -1445,14 +1447,14 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
     {
       int j;
       for (j = i ; j < 8 ; j++)
-        CHKB (delete [] polys[j]);
+        delete [] polys[j];
       CsPrintf (MSG_WARNING, "Corrupt cached octree! Wrong node number!\n");
       return false;
     }
     // Even if there are no polygons in the node we create
     // a child octree node because some of the visibility stuff
     // depends on that (i.e. adding dynamic objects).
-    CHK (node->children[i] = new csOctreeNode);
+    node->children[i] = new csOctreeNode;
     csVector3 new_bmin;
     csVector3 new_bmax;
     if (i & 4) { new_bmin.x = center.x; new_bmax.x = bmax.x; }
@@ -1467,11 +1469,11 @@ bool csOctree::ReadFromCache (iFile* cf, csOctreeNode* node,
     {
       int j;
       for (j = i ; j < 8 ; j++)
-        CHKB (delete [] polys[j]);
+        delete [] polys[j];
       return false;
     }
 
-    CHK (delete [] polys[i]);
+    delete [] polys[i];
   }
 
   // Read and ignore the 255 that should be here.
@@ -1509,13 +1511,13 @@ bool csOctree::ReadFromCache (iVFS* vfs, const char* name,
   bsp_num = ReadLong (cf);
   mode = ReadLong (cf);
 
-  CHK (root = new csOctreeNode);
-  CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
+  root = new csOctreeNode;
+  csPolygonInt** new_polygons = new csPolygonInt* [num];
   int i;
   for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
   bool rc = ReadFromCache (cf, (csOctreeNode*)root, bbox.Min (), bbox.Max (),
   	new_polygons, num);
-  CHK (delete [] new_polygons);
+  delete [] new_polygons;
   cf->DecRef ();
   return rc;
 }

@@ -186,7 +186,7 @@ public:
   }
   virtual bool FreeItem (csSome Item)
   {
-    CHK (delete (VfsArchive *)Item);
+    delete (VfsArchive *)Item;
     return true;
   }
   VfsArchive *Get (int iIndex)
@@ -269,14 +269,14 @@ csFile::csFile (int Mode, VfsNode *ParentNode, int RIndex,
 
   size_t vpl = strlen (Node->VPath);
   size_t nsl = strlen (NameSuffix);
-  CHK (Name = new char [vpl + nsl + 1]);
+  Name = new char [vpl + nsl + 1];
   memcpy (Name, Node->VPath, vpl);
   memcpy (Name + vpl, NameSuffix, nsl + 1);
 }
 
 csFile::~csFile ()
 {
-  CHK (delete [] Name);
+  delete [] Name;
   ArchiveCache->CheckUp ();
 }
 
@@ -313,7 +313,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
   char *rp = (char *)Node->RPathV [Index];
   size_t rpl = strlen (rp);
   size_t nsl = strlen (ns);
-  CHK (char *fName = new char [rpl + nsl + 1]);
+  char *fName = new char [rpl + nsl + 1];
   memcpy (fName, rp, rpl);
   memcpy (fName + rpl, ns, nsl + 1);
 
@@ -339,7 +339,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
     *lastps = VFS_PATH_SEPARATOR;
   }
 
-  CHK (delete [] fName);
+  delete [] fName;
 
   if (!file)
     CheckError ();
@@ -379,7 +379,7 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
 {
   size_t pbl = strlen (PathBase);
   size_t pl = pbl + strlen (PathSuffix) + 1;
-  CHK (char *path = new char [pl]);
+  char *path = new char [pl];
   char *cur = path + pbl;
   char *prev = NULL;
 
@@ -408,7 +408,7 @@ void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
     while (*cur && (*cur != PATH_SEPARATOR))
       cur++;
   }
-  CHK (delete [] path);
+  delete [] path;
 }
 
 int DiskFile::GetStatus ()
@@ -566,7 +566,7 @@ ArchiveFile::~ArchiveFile ()
   printf ("VFS: Closing some file from archive \"%s\"\n", Archive->GetName ());
 #endif
 
-  CHK (delete [] data);
+  delete [] data;
   if (fh)
     Archive->Writing--;
   Archive->DecRef ();
@@ -623,8 +623,8 @@ VfsNode::VfsNode (char *iPath, const char *iConfigKey, iSystem *iSys)
 
 VfsNode::~VfsNode ()
 {
-  CHK (delete [] ConfigKey);
-  CHK (delete [] VPath);
+  delete [] ConfigKey;
+  delete [] VPath;
 }
 
 bool VfsNode::AddRPath (const char *RealPath, const csIniFile *Config)
@@ -699,7 +699,7 @@ bool VfsNode::AddRPath (const char *RealPath, const csIniFile *Config)
       src = cur + 1;
     } /* endif */
 
-  CHK (delete [] oldsrc);
+  delete [] oldsrc;
 
   return rc;
 }
@@ -793,8 +793,8 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
           continue;
 
         bool append_slash = isdir (tpath, de);
-        CHK (char *vpath = new char [strlen (VPath) + strlen (Suffix) +
-	  strlen (de->d_name) + (append_slash ? 2 : 1)]);
+        char *vpath = new char [strlen (VPath) + strlen (Suffix) +
+	  strlen (de->d_name) + (append_slash ? 2 : 1)];
 	strcpy (vpath, VPath);
 	strcat (vpath, Suffix);
 	strcat (vpath, de->d_name);
@@ -821,7 +821,7 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
           continue;
 
         idx = ArchiveCache->Length ();
-        CHK (ArchiveCache->Push (new VfsArchive (rpath, System)));
+        ArchiveCache->Push (new VfsArchive (rpath, System));
       }
 
       VfsArchive *a = ArchiveCache->Get (idx);
@@ -849,14 +849,14 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
 	  if (cur < fnl)
 	    cur++;
           size_t vpl = strlen (VPath);
-          CHK (char *vpath = new char [vpl + cur + 1]);
+          char *vpath = new char [vpl + cur + 1];
           memcpy (vpath, VPath, vpl);
           memcpy (vpath + vpl, fname, cur);
 	  vpath [vpl + cur] = 0;
 	  if (FileList->Find (vpath) == -1)
             FileList->Push (vpath);
 	  else
-	    CHKB (delete [] vpath);
+	    delete [] vpath;
         }
       }
     }
@@ -874,12 +874,12 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
     if (rpath [strlen (rpath) - 1] == PATH_SEPARATOR)
     {
       // rpath is a directory
-      CHK (f = new DiskFile (Mode, this, i, FileName));
+      f = new DiskFile (Mode, this, i, FileName);
       if (f->GetStatus () == VFS_STATUS_OK)
         break;
       else
       {
-        CHK (delete f);
+        delete f;
 	f = NULL;
       }
     }
@@ -898,7 +898,7 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
 	}
 
         idx = ArchiveCache->Length ();
-        CHK (ArchiveCache->Push (new VfsArchive (rpath, System)));
+        ArchiveCache->Push (new VfsArchive (rpath, System));
       }
 
       f = new ArchiveFile (Mode, this, i, FileName, ArchiveCache->Get (idx));
@@ -906,7 +906,7 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
         break;
       else
       {
-        CHK (delete f);
+        delete f;
 	f = NULL;
       }
     }
@@ -943,7 +943,7 @@ bool VfsNode::FindFile (const char *Suffix, char *RealPath,
           continue;
 
         idx = ArchiveCache->Length ();
-        CHK (ArchiveCache->Push (new VfsArchive (rpath, System)));
+        ArchiveCache->Push (new VfsArchive (rpath, System));
       }
 
       VfsArchive *a = ArchiveCache->Get (idx);
@@ -1039,7 +1039,7 @@ csVFS::VfsVector::~VfsVector ()
 
 bool csVFS::VfsVector::FreeItem (csSome Item)
 {
-  CHK (delete (VfsNode *)Item);
+  delete (VfsNode *)Item;
   return true;
 }
 
@@ -1072,20 +1072,20 @@ EXPORT_CLASS_TABLE_END
 csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 {
   CONSTRUCT_IBASE (iParent);
-  CHK (cwd = new char [2]);
+  cwd = new char [2];
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;
   cnode = NULL;
   cnsufx [0] = 0;
   config = NULL;
-  CHK (ArchiveCache = new VfsArchiveCache ());
+  ArchiveCache = new VfsArchiveCache ();
 }
 
 csVFS::~csVFS ()
 {
-  CHK (delete config);
-  CHK (delete [] cwd);
-  CHK (delete ArchiveCache);
+  delete config;
+  delete [] cwd;
+  delete ArchiveCache;
   if (System) System->DecRef ();
 }
 
@@ -1110,10 +1110,10 @@ bool csVFS::ReadConfig (csIniFile *Config)
 bool csVFS::AddLink (const char *VirtualPath, const char *RealPath)
 {
   char *xp = ExpandPath (VirtualPath, true);
-  CHK (VfsNode *e = new VfsNode (xp, VirtualPath, System));
+  VfsNode *e = new VfsNode (xp, VirtualPath, System);
   if (!e->AddRPath (RealPath, config))
   {
-    CHK (delete e);
+    delete e;
     return false;
   }
 
@@ -1180,7 +1180,7 @@ char *csVFS::ExpandPath (const char *Path, bool IsDir) const
   } /* endwhile */
 
   // Allocate a new string and return it
-  CHK (char *ret = new char [outp + 1]);
+  char *ret = new char [outp + 1];
   memcpy (ret, outname, outp);
   ret [outp] = 0;
   return ret;
@@ -1227,7 +1227,7 @@ bool csVFS::PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
     return false;
 
   Node = GetNode (fname, Suffix, SuffixSize);
-  CHK (delete [] fname);
+  delete [] fname;
   return (Node != NULL);
 }
 
@@ -1241,7 +1241,7 @@ bool csVFS::ChDir (const char *Path)
   // Find the current directory node and directory suffix
   cnode = GetNode (newwd, cnsufx, sizeof (cnsufx));
 
-  CHK (delete [] cwd);
+  delete [] cwd;
   cwd = newwd;
 
   ArchiveCache->CheckUp ();
@@ -1259,7 +1259,7 @@ bool csVFS::PopDir ()
     return false;
   char *olddir = (char *) dirstack.Pop ();
   bool retcode = ChDir (olddir);
-  CHK (delete [] olddir);
+  delete [] olddir;
   return retcode;
 }
 
@@ -1287,7 +1287,7 @@ iStrVector *csVFS::FindFiles (const char *Path) const
   char suffix [VFS_MAX_PATH_LEN + 1];		// the suffix relative to node
   char mask [VFS_MAX_PATH_LEN + 1];		// the filename mask
   char XPath [VFS_MAX_PATH_LEN + 1];		// the expanded path
-  CHK (scfStrVector *fl = new scfStrVector (16, 16));// the output list
+  scfStrVector *fl = new scfStrVector (16, 16);// the output list
 
   PreparePath (Path, false, node, suffix, sizeof (suffix));
 
@@ -1309,7 +1309,7 @@ iStrVector *csVFS::FindFiles (const char *Path) const
   {
     char *s = ExpandPath (Path, true);
     strcpy (XPath, s);
-    CHK (delete [] s);
+    delete [] s;
   }
 
   // first add all nodes that are located one level deeper
@@ -1328,13 +1328,13 @@ iStrVector *csVFS::FindFiles (const char *Path) const
         pp++;
       while (*pp && *pp == VFS_PATH_SEPARATOR)
         pp++;
-      CHK (char *news = new char [pp - node->VPath + 1]);
+      char *news = new char [pp - node->VPath + 1];
       memcpy (news, node->VPath, pp - node->VPath);
       news [pp - node->VPath] = 0;
       if (fl->Find (news) == -1)
         fl->Push (news);
       else
-        CHKB (delete [] news);
+        delete [] news;
     }
   }
 
@@ -1344,7 +1344,7 @@ iStrVector *csVFS::FindFiles (const char *Path) const
 
   if (fl->Length () == 0)
   {
-    CHK (delete fl);
+    delete fl;
     fl = NULL;
   }
 
@@ -1388,7 +1388,7 @@ char *csVFS::ReadFile (const char *FileName, size_t &Size)
     return data;
   }
 
-  CHK (data = new char [Size + 1]);
+  data = new char [Size + 1];
   if (!data)
   {
     F->DecRef ();
@@ -1399,7 +1399,7 @@ char *csVFS::ReadFile (const char *FileName, size_t &Size)
   data [Size] = 0;
   if (F->Read (data, Size) != Size)
   {
-    CHK (delete [] data);
+    delete [] data;
     F->DecRef ();
     return NULL;
   }
@@ -1448,7 +1448,7 @@ bool csVFS::Mount (const char *VirtualPath, const char *RealPath)
    || suffix [0])
   {
     char *xp = ExpandPath (VirtualPath, true);
-    CHK (node = new VfsNode (xp, VirtualPath, System));
+    node = new VfsNode (xp, VirtualPath, System);
     NodeList.Push (node);
   }
 
@@ -1501,7 +1501,7 @@ bool csVFS::SaveMounts (const char *FileName)
     for (j = 0; j < node->UPathV.Length (); j++)
       sl += strlen ((char *)node->UPathV.Get (j)) + 1;
 
-    CHK (char *tmp = new char[sl + 1]);
+    char *tmp = new char[sl + 1];
     sl = 0;
     for (j = 0; j < node->UPathV.Length (); j++)
     {
@@ -1519,7 +1519,7 @@ bool csVFS::SaveMounts (const char *FileName)
       sl += rpl + 1;
     }
     config->SetStr ("VFS", node->ConfigKey, tmp);
-    CHK (delete [] tmp);
+    delete [] tmp;
   }
   return config->Save (FileName);
 }

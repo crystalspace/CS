@@ -66,7 +66,7 @@ bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
   csIniFile* config = new csIniFile(v, "/config/cryst.cfg");
   v->DecRef(); v = NULL;
   m_DoGlideInWindow = (!config->GetYesNo("VideoDriver","FullScreen",FALSE));
-  CHK (delete config);
+  delete config;
   
   Depth = 16;
 
@@ -80,7 +80,7 @@ csGraphics2DGlideCommon::~csGraphics2DGlideCommon ()
   Close ();
   if (cursorBmp) delete cursorBmp;
   if (mcBack) delete mcBack;
-  CHKB (delete [] Memory);
+  delete [] Memory;
 }
 
 bool csGraphics2DGlideCommon::Open(const char *Title)
@@ -267,10 +267,10 @@ csImageArea *csGraphics2DGlideCommon::SaveArea (int x, int y, int w, int h)
   if ((w <= 0) || (h <= 0))
     return NULL;
 
-  CHK (csImageArea *Area = new csImageArea (x, y, w, h));
+  csImageArea *Area = new csImageArea (x, y, w, h);
   if (!Area)
     return NULL;
-  CHK (char *dest = Area->data = new char [w * h * pfmt.PixelBytes]);
+  char *dest = Area->data = new char [w * h * pfmt.PixelBytes];
   if (!dest)
   {
     delete Area;

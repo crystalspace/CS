@@ -338,7 +338,7 @@ plain:
           if ((branch->Type == TYPE_DATA) && strstr (cur, branch->Data.Name))
             continue;
         }
-        CHK (branch = new PrvINInode);
+        branch = new PrvINInode;
         branch->Type = TYPE_COMMENT;
         branch->Comments = NULL;
         if (*cur)
@@ -346,7 +346,7 @@ plain:
         else
           branch->Comment.Text = NULL;
         if (!Comments)
-          CHKB (Comments = new PrvINIbranch);
+          Comments = new PrvINIbranch;
         Comments->Push (branch);
       }
       else if (*cur == '[')           // Section
@@ -365,11 +365,11 @@ plain:
           i--;
         tmp[i] = 0;
 
-        CHK (branch = new PrvINInode);
+        branch = new PrvINInode;
         branch->Type = TYPE_SECTION;
         branch->Comments = Comments;
         branch->Section.Name = strdup (tmp);
-        CHK (branch->Section.Vector = CurBranch = new PrvINIbranch ());
+        branch->Section.Vector = CurBranch = new PrvINIbranch ();
         Root.Push (branch);
         Comments = NULL;
       }                                 // else if Section
@@ -391,7 +391,7 @@ error:    if (Error (LineNo, buff, int (cur - buff)))
           i--;
         tmp[i] = 0;
 
-        CHK (branch = new PrvINInode);
+        branch = new PrvINInode;
         branch->Type = TYPE_DATA;
         branch->Comments = Comments;
         branch->Data.Name = strdup (tmp);
@@ -427,7 +427,7 @@ out:
   {
     while (Comments->Length ())
       Root.Push (Comments->Pop ());
-    CHK (delete Comments);
+    delete Comments;
 //    Comments = NULL;    // not needed but left for clarity
   }
   return true;

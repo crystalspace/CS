@@ -502,7 +502,7 @@ allocate:
 bool VideoSystem::AllocateBackBuffer ()
 {
   FreeBackBuffer ();
-  CHK (VRAMBuffer = new unsigned char [ScreenSize]);
+  VRAMBuffer = new unsigned char [ScreenSize];
   if (!VRAMBuffer)
     return false;
   return true;
@@ -512,7 +512,7 @@ void VideoSystem::FreeBackBuffer ()
 {
   if (VRAMBuffer)
   {
-    CHK (delete[] VRAMBuffer);
+    delete[] VRAMBuffer;
     VRAMBuffer = NULL;
   }
 }

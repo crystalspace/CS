@@ -22,6 +22,11 @@ The history order has been reversed so that new features are at the top.
 	  from the nstp plugin and uses its classes directly instead of
 	  going through the SCF interface.
 	- Eric Sunshine fixed a bug in the 'depend' target of for BeOS OpenGL.
+	- Andrew Zabolotny added a new CSWS component: notebook control
+	  AKA "property shit". Only used in cswstest for now. Going to be
+	  used in MazeD.
+	- Removed all CHK and CHKB from the code. That memory debugger
+	  is now obsolete.
 11-May-2000
 	- Changes from Michael Dale Long:
 	    - Added a CHK_DECREF() macro to cctest.h that checks if an

@@ -325,8 +325,8 @@ csSystemDriver::~csSystemDriver ()
 
   Close ();
 
-  CHKB (delete Config);
-  CHKB (delete [] ConfigName);
+  delete Config;
+  delete [] ConfigName;
   // Free all plugin options (also decrefs their iConfig interfaces)
   OptionList.DeleteAll ();
 
@@ -584,7 +584,7 @@ bool csSystemDriver::ProcessEvents ()
   {
     did_some_work = true;
     HandleEvent (*ev);
-    CHK (delete ev);
+    delete ev;
   }
 
   return did_some_work;
@@ -616,7 +616,7 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
       char* wopt = strnew (opt);
       char *arg = strchr (wopt, '=');
       if (arg) *arg++ = 0; else arg = wopt + strlen (wopt);
-      CHK (CommandLine.Push (new csCommandLineOption (wopt, arg)));
+      CommandLine.Push (new csCommandLineOption (wopt, arg));
     }
     else
       CommandLineNames.Push (strnew (opt));
@@ -851,15 +851,15 @@ void csSystemDriver::QueryOptions (iPlugIn *iObject)
       csOptionDescription option;
       if (!Config->GetOptionDescription (i, &option))
         break;
-      CHK (OptionList.Push (new csPluginOption (option.name, option.type, option.id,
-        (option.type == CSVAR_BOOL) || (option.type == CSVAR_CMD), Config)));
+      OptionList.Push (new csPluginOption (option.name, option.type, option.id,
+        (option.type == CSVAR_BOOL) || (option.type == CSVAR_CMD), Config));
       if (option.type == CSVAR_BOOL)
       {
         char buf[100];
         strcpy (buf, "no");
         strcpy (buf + 2, option.name);
-        CHK (OptionList.Push (new csPluginOption (buf, option.type, option.id,
-          false, Config)));
+        OptionList.Push (new csPluginOption (buf, option.type, option.id,
+          false, Config));
       }
     } /* endfor */
 
@@ -913,7 +913,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
     Printf (MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
   else
   {
-    CHK (PlugIns.Push (new csPlugIn (p, iClassID, iFuncID)));
+    PlugIns.Push (new csPlugIn (p, iClassID, iFuncID));
     if (p->Initialize (this))
     {
       iBase *ret;
@@ -1148,7 +1148,7 @@ const char *csSystemDriver::GetNameCL (int iIndex)
 
 void csSystemDriver::AddOptionCL (const char *iName, const char *iValue)
 {
-  CHK (CommandLine.Push (new csCommandLineOption (strnew (iName), strnew (iValue))));
+  CommandLine.Push (new csCommandLineOption (strnew (iName), strnew (iValue)));
 }
 
 void csSystemDriver::AddNameCL (const char *iName)

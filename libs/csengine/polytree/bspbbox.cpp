@@ -29,7 +29,7 @@ csPolygonIntPool csBspPolygon::poly_pool (&poly_fact);
 
 csPolygonInt* csBspPolygonFactory::Create ()
 {
-  CHK (csBspPolygon* pol = new csBspPolygon ());
+  csBspPolygon* pol = new csBspPolygon ();
   return (csPolygonInt*)pol;
 }
 

@@ -33,7 +33,7 @@ csBeing::csBeing (  csPolygonSet *p, csSector* s, csTransform *cdt)
   _ground = 0;
   _sold = 0;
   _vold.Set (0, 0, 0);
-  CHK(m_pCollider = new csRAPIDCollider(p));
+  m_pCollider = new csRAPIDCollider(p);
 
 }
 
@@ -44,7 +44,7 @@ csBeing::csBeing ( csSprite3D *sp, csSector* s, csTransform *cdt)
   _ground = 0;
   _sold = 0;
   _vold.Set (0, 0, 0);
-  CHK(m_pCollider = new csRAPIDCollider(sp));
+  m_pCollider = new csRAPIDCollider(sp);
 }
 
 csBeing::~csBeing() {
@@ -67,7 +67,7 @@ csBeing* csBeing::PlayerSpawn (char *name)
   #define OZ    0.0
   
   csPolygon3D *p;
-  CHK (csPolygonSet* playerps = new csPolygonSet());
+  csPolygonSet* playerps = new csPolygonSet();
   playerps->SetName (name);
 
   playerps->AddVertex(OX,    OY,    OZ); 
@@ -110,7 +110,7 @@ csBeing* csBeing::PlayerSpawn (char *name)
   p->AddVertex (0); p->AddVertex (4); 
   p->AddVertex (7); p->AddVertex (3); 
 
-  CHK (csBeing* b = new csBeing(playerps));
+  csBeing* b = new csBeing(playerps);
 
   return b;
 }
@@ -126,12 +126,12 @@ int csBeing::InitWorld (csWorld* world, csCamera* /*camera*/)
     sn--;
     csSector* sp = (csSector*)world->sectors[sn];
     // Initialize the sector itself.
-    CHK((void)new csRAPIDCollider(*sp, sp));
+    (void)new csRAPIDCollider(*sp, sp);
     // Initialize the things in this sector.
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
-      CHK((void)new csRAPIDCollider(*tp, tp));
+      (void)new csRAPIDCollider(*tp, tp);
       tp = (csThing*)(tp->GetNext ());
     }
   }
@@ -146,7 +146,7 @@ int csBeing::InitWorld (csWorld* world, csCamera* /*camera*/)
 
     spp = (csSprite3D*)sp;
     // TODO: Should create beings for these.
-    CHK((void)new csRAPIDCollider(*spp, spp));
+    (void)new csRAPIDCollider(*spp, spp);
   }
 
   // Create a player object that follows the camera around.
@@ -159,7 +159,7 @@ int csBeing::InitWorld (csWorld* world, csCamera* /*camera*/)
 
 void csBeing::EndWorld(void)
 {
-  CHK (delete player);
+  delete player;
 }
 
 int csBeing::_CollisionDetect (csSector* sp, csTransform *cdt)

@@ -243,13 +243,13 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
     default:
       return;
   } /* endswitch */
-  CHK (firstvisible = first = new csTimer (this, MOUSE_SCROLL_INTERVAL));
+  firstvisible = first = new csTimer (this, MOUSE_SCROLL_INTERVAL);
   if (iStyle & CSLBS_HSCROLL)
-    CHKB (hscroll = new csScrollBar (this, sbsty))
+    hscroll = new csScrollBar (this, sbsty);
   else
     hscroll = NULL;
   if (iStyle & CSLBS_VSCROLL)
-    CHKB (vscroll = new csScrollBar (this, sbsty))
+    vscroll = new csScrollBar (this, sbsty);
   else
     vscroll = NULL;
 }
@@ -428,7 +428,7 @@ static bool do_deselect (csComponent *child, void *param)
 static bool do_deleteitem (csComponent *child, void *param)
 {
   (void)param;
-  CHK (delete child);
+  delete child;
   return false;
 }
 

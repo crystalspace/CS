@@ -412,7 +412,7 @@ bool csGraphics2DMac::Open(const char* Title)
 	/*
 	 *	Allocate buffer for address of each scan line to avoid multiplication
 	 */
-	CHK (LineAddress = new int [Height]);
+	LineAddress = new int [Height];
 
 	if (LineAddress == NULL)
 		return false;

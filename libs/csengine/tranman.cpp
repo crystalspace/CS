@@ -37,13 +37,13 @@ csTransformationManager::~csTransformationManager ()
   while (freed)
   {
     csVertexArray* n = freed->next;
-    CHK (delete freed);
+    delete freed;
     freed = n;
   }
   while (alloced)
   {
     csVertexArray* n = alloced->next;
-    CHK (delete alloced);
+    delete alloced;
     alloced = n;
   }
 }

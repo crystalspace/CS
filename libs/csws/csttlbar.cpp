@@ -26,7 +26,7 @@
 csTitleBar::csTitleBar (csComponent *iParent, char *iText)
   : csComponent (iParent)
 {
-  CHK (text = new char [strlen (iText) + 1]);
+  text = new char [strlen (iText) + 1];
   strcpy (text, iText);
   SetPalette (CSPAL_TITLEBAR);
 }

@@ -76,9 +76,9 @@ csConverter_MD2FrameManipulator::~csConverter_MD2FrameManipulator()
     for (int frameindex=0; frameindex < m_total_frame_count; frameindex++)
     {
       if (m_frame_array[frameindex].vertexcoords)
-        CHK (delete [] m_frame_array[frameindex].vertexcoords);
+        delete [] m_frame_array[frameindex].vertexcoords;
     }
-    CHK (delete m_frame_array);
+    delete m_frame_array;
   }
 }
 
@@ -158,8 +158,8 @@ class md2vertexset {
       for (csindex=0; csindex < numindices; csindex++)
       { newxyzindices[csindex] = xyzcoordindices[csindex];
         newtexindices[csindex] = texcoordindices[csindex]; }
-      CHK (delete [] xyzcoordindices);
-      CHK (delete [] texcoordindices);
+      delete [] xyzcoordindices;
+      delete [] texcoordindices;
       newxyzindices[numindices] = xyzindex;
       newtexindices[numindices] = texindex;
       xyzcoordindices = newxyzindices;

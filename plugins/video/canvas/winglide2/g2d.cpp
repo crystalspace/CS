@@ -118,7 +118,7 @@ bool csGraphics2DGlide2x::Initialize (iSystem *pSystem)
 
   MungeFPCW(&wOldCW);
 
-  CHK(glLib = new GlideLib);
+  glLib = new GlideLib;
 	
   // calculate CS's pixel format structure. 565
   pfmt.PixelBytes = 2;

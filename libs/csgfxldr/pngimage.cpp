@@ -39,10 +39,10 @@ bool RegisterPNG ()
 csImageFile* csPNGImageLoader::LoadImage (UByte* iBuffer, ULong iSize,
   int iFormat)
 {
-  CHK (ImagePngFile* i = new ImagePngFile (iFormat));
+  ImagePngFile* i = new ImagePngFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
-    CHK (delete i);
+    delete i;
     return NULL;
   }
   return i;    
@@ -175,11 +175,11 @@ nomem2:
   if (rowbytes != exp_rowbytes)
     goto nomem2;                        // Yuck! Something went wrong!
 
-  CHK (png_bytep * const row_pointers = new png_bytep[Height]);
+  png_bytep * const row_pointers = new png_bytep[Height];
 
   if (setjmp (png->jmpbuf))             // Set a new exception handler
   {
-    CHK (delete [] row_pointers);
+    delete [] row_pointers;
     goto nomem2;
   }
 
@@ -247,7 +247,7 @@ nomem2:
   png_destroy_read_struct (&png, &info, (png_infopp) NULL);
 
   // Free the row pointers array that is not needed anymore
-  CHK (delete [] row_pointers);
+  delete [] row_pointers;
 
   return true;
 }

@@ -79,7 +79,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
         }
       }
     }
-    CHK (delete config);
+    delete config;
   }
   else
     CsPrintf (MSG_FATAL_ERROR, "could not opengl.cfg, will use NULL as displaydriver\n");
@@ -453,7 +453,7 @@ bool csGraphics2DGLX::HandleEvent (csEvent &/*Event*/)
 iGraphics2D *csGraphics2DGLX::CreateOffScreenCanvas (int width, int height, 
 	   csPixelFormat *pfmt, void *buffer, RGBPixel *palette, int pal_size)
 {
-  CHK (csDynamicTexture2D *tex = new csDynamicTexture2D (System));
+  csDynamicTexture2D *tex = new csDynamicTexture2D (System);
   return tex->CreateOffScreenCanvas (width, height, pfmt, buffer, 
 				     palette, pal_size);
 }

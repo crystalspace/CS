@@ -159,7 +159,7 @@ void csPortal::CheckFrustum (csFrustumView& lview)
 
   csFrustumView new_lview = lview;
   if (lview.light_frustum)
-    CHKB (new_lview.light_frustum = new csFrustum (*lview.light_frustum));
+    new_lview.light_frustum = new csFrustum (*lview.light_frustum);
 
   // If copied_frustums is true we copied the frustums and we need to delete them
   // later.
@@ -186,7 +186,7 @@ void csPortal::CheckFrustum (csFrustumView& lview)
     {
       if (sf->relevant)
       {
-        CHK (copy_sf = new csShadowFrustum (*sf));
+        copy_sf = new csShadowFrustum (*sf);
         new_lview.shadows.AddLast (copy_sf);
       }
       sf = sf->next;
@@ -236,7 +236,7 @@ void csPortal::CheckFrustum (csFrustumView& lview)
     {
       if (sf->relevant)
       {
-        CHK (copy_sf = new csShadowFrustum (*sf));
+        copy_sf = new csShadowFrustum (*sf);
         new_lview.shadows.AddLast (copy_sf);
       }
       sf = sf->next;

@@ -453,7 +453,7 @@ void Dumper::dump (csQuadtree* tree)
   }
 
   char* buf;
-  CHK (buf = new char [depthp*depthp]);
+  buf = new char [depthp*depthp];
 
   CsPrintf (MSG_DEBUG_0, "Depth=%d depthp=%d\n", depth, depthp);
   memset (buf, '?', depthp*depthp);
@@ -468,7 +468,7 @@ void Dumper::dump (csQuadtree* tree)
     CsPrintf (MSG_DEBUG_0, "%s\n", buf2);
   }
 
-  CHK (delete [] buf);
+  delete [] buf;
 }
 
 char* spaces (int nr)

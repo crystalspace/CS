@@ -23,21 +23,21 @@
 csPoly2DEdges::csPoly2DEdges (int start_size)
 {
   max_edges = start_size;
-  CHK (edges = new csSegment2 [max_edges]);
+  edges = new csSegment2 [max_edges];
   MakeEmpty ();
 }
 
 csPoly2DEdges::csPoly2DEdges (csPoly2DEdges& copy)
 {
   max_edges = copy.max_edges;
-  CHK (edges = new csSegment2 [max_edges]);
+  edges = new csSegment2 [max_edges];
   num_edges = copy.num_edges;
   memcpy (edges, copy.edges, sizeof (csSegment2)*num_edges);
 }
 
 csPoly2DEdges::~csPoly2DEdges ()
 {
-  CHK (delete [] edges);
+  delete [] edges;
 }
 
 void csPoly2DEdges::MakeEmpty ()
@@ -70,9 +70,9 @@ bool csPoly2DEdges::In (csSegment2* poly, int num_edge, const csVector2& v)
 void csPoly2DEdges::MakeRoom (int new_max)
 {
   if (new_max <= max_edges) return;
-  CHK (csSegment2* new_edges = new csSegment2 [new_max]);
+  csSegment2* new_edges = new csSegment2 [new_max];
   memcpy (new_edges, edges, num_edges*sizeof (csSegment2));
-  CHK (delete [] edges);
+  delete [] edges;
   edges = new_edges;
   max_edges = new_max;
 }

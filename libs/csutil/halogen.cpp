@@ -30,7 +30,7 @@
  */
 unsigned char *GenerateHalo (int iSize, float iFactor, float iCross)
 {
-  CHK (unsigned char *image = new unsigned char [iSize * iSize]);
+  unsigned char *image = new unsigned char [iSize * iSize];
   memset (image, 0, iSize * iSize);
 
   const int s1 = iSize - 1;	// size - 1

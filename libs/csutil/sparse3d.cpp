@@ -81,7 +81,7 @@ void WideSparse3D::set (int x, int y, int z, void* obj)
   {
     if (!lx)
     {
-      CHK (lx = new HdX ());
+      lx = new HdX ();
       lx->x = x;
       lx->next = first_x;
       lx->prev = NULL;
@@ -90,14 +90,14 @@ void WideSparse3D::set (int x, int y, int z, void* obj)
     }
     if (!ly)
     {
-      CHK (ly = new HdY ());
+      ly = new HdY ();
       ly->y = y;
       ly->next = lx->first_y;
       ly->prev = NULL;
       if (lx->first_y) lx->first_y->prev = ly;
       lx->first_y = ly;
     }
-    CHK (lz = new SparseCell ());
+    lz = new SparseCell ();
     lz->z = z;
     lz->next = ly->first_z;
     lz->prev = NULL;
@@ -126,19 +126,19 @@ void WideSparse3D::del (int x, int y, int z)
     if (lz->next) lz->next->prev = lz->prev;
     if (lz->prev) lz->prev->next = lz->next;
     else ly->first_z = lz->next;
-    CHK (delete lz);
+    delete lz;
     if (!ly->first_z)
     {
       if (ly->next) ly->next->prev = ly->prev;
       if (ly->prev) ly->prev->next = ly->next;
       else lx->first_y = ly->next;
-      CHK (delete ly);
+      delete ly;
       if (!lx->first_y)
       {
         if (lx->next) lx->next->prev = lx->prev;
         if (lx->prev) lx->prev->next = lx->next;
         else first_x = lx->next;
-	CHK (delete lx);
+	delete lx;
       }
     }
   }

@@ -29,12 +29,12 @@
 
 #define ADD_SYSMENU_ENTRIES(menu) \
   if (iWindowStyle & CSWS_BUTMAXIMIZE) \
-    CHKB ((void) new csMenuItem (menu, "~Maximize", cscmdMaximize)); \
+    (void) new csMenuItem (menu, "~Maximize", cscmdMaximize); \
   if (iWindowStyle & CSWS_BUTHIDE) \
-    CHKB ((void) new csMenuItem (menu, "~Hide",     cscmdHide)); \
+    (void) new csMenuItem (menu, "~Hide",     cscmdHide); \
   if (iWindowStyle & (CSWS_BUTMAXIMIZE | CSWS_BUTHIDE)) \
-    CHKB ((void) new csMenuItem (menu)); \
-  CHK ((void) new csMenuItem (menu, "~Close",    cscmdClose));
+    (void) new csMenuItem (menu); \
+  (void) new csMenuItem (menu, "~Close",    cscmdClose);
 
 // Private menu class for system menu
 class csSysMenu : public csMenu
@@ -74,11 +74,11 @@ csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
   // Attach required handles & gadgets to window
   if (iWindowStyle & CSWS_BUTSYSMENU)
   {
-    CHK (csButton *bt = new csButton (this, cscmdWindowSysMenu, 0, csbfsNone));
+    csButton *bt = new csButton (this, cscmdWindowSysMenu, 0, csbfsNone);
     SetButtBitmap (bt, "SYSMNUN", "SYSMNUP");
     bt->id = CSWID_BUTSYSMENU;
 
-    CHK (csMenu *mn = new csSysMenu (this, csmfs3D, CSMS_DEFAULTVALUE, bt));
+    csMenu *mn = new csSysMenu (this, csmfs3D, CSMS_DEFAULTVALUE, bt);
     ADD_SYSMENU_ENTRIES (mn);
 //  mn->PlaceItems ();
     mn->Hide ();
@@ -86,39 +86,39 @@ csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
   } /* endif */
   if (iWindowStyle & CSWS_BUTCLOSE)
   {
-    CHK (csButton *bt = new csButton (this, cscmdClose, 0, csbfsNone));
+    csButton *bt = new csButton (this, cscmdClose, 0, csbfsNone);
     SetButtBitmap (bt, "CLOSEN", "CLOSEP");
     bt->id = CSWID_BUTCLOSE;
   } /* endif */
   if (iWindowStyle & CSWS_BUTHIDE)
   {
-    CHK (csButton *bt = new csButton (this, cscmdHide, 0, csbfsNone));
+    csButton *bt = new csButton (this, cscmdHide, 0, csbfsNone);
     SetButtBitmap (bt, "HIDEN", "HIDEP");
     bt->id = CSWID_BUTHIDE;
   } /* endif */
   if (iWindowStyle & CSWS_BUTMAXIMIZE)
   {
-    CHK (csButton *bt = new csButton (this, cscmdMaximize, 0, csbfsNone));
+    csButton *bt = new csButton (this, cscmdMaximize, 0, csbfsNone);
     SetButtBitmap (bt, "MAXN", "MAXP");
     bt->id = CSWID_BUTMAXIMIZE;
   } /* endif */
   if (iWindowStyle & CSWS_TITLEBAR)
   {
-    CHK (csComponent *tb = new csTitleBar (this, iTitle));
+    csComponent *tb = new csTitleBar (this, iTitle);
     tb->id = CSWID_TITLEBAR;
   }
   else
     SetText (iTitle);
   if (iWindowStyle & CSWS_MENUBAR)
   {
-    CHK (csComponent *mn = new csMenu (this, csmfsBar, 0));
+    csComponent *mn = new csMenu (this, csmfsBar, 0);
     mn->id = CSWID_MENUBAR;
   } /* endif */
   if (iWindowStyle & CSWS_TOOLBAR)
   {
     bool htb = ((iWindowStyle & CSWS_TBPOS_MASK) == CSWS_TBPOS_TOP)
             || ((iWindowStyle & CSWS_TBPOS_MASK) == CSWS_TBPOS_BOTTOM);
-    CHK (csDialog *tb = new csDialog (this, htb ? csdfsHorizontal : csdfsVertical));
+    csDialog *tb = new csDialog (this, htb ? csdfsHorizontal : csdfsVertical);
     tb->id = CSWID_TOOLBAR;
     tb->SetAutoGrid (2, 1, false);
     tb->SetState (CSS_SELECTABLE, false);
@@ -132,11 +132,11 @@ void csWindow::SetButtBitmap (csButton *button, char *id_n, char *id_p)
 
   int tx,ty,tw,th;
   FindCFGBitmap (app->System, *(app->titlebardefs), id_n, &tx, &ty, &tw, &th);
-  CHK (csPixmap *bmpn = new csPixmap (app->GetTexture (
-    TITLEBAR_TEXTURE_NAME), tx, ty, tw, th));
+  csPixmap *bmpn = new csPixmap (app->GetTexture (
+    TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   FindCFGBitmap (app->System, *(app->titlebardefs), id_p, &tx, &ty, &tw, &th);
-  CHK (csPixmap *bmpp = new csPixmap (app->GetTexture (
-    TITLEBAR_TEXTURE_NAME), tx, ty, tw, th));
+  csPixmap *bmpp = new csPixmap (app->GetTexture (
+    TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   button->SetBitmap (bmpn, bmpp);
 }
 

@@ -96,7 +96,7 @@ public:
   csTriangleVertex () : deleted (false), con_triangles (NULL), num_con_triangles (0), max_con_triangles (0),
   	con_vertices (NULL), num_con_vertices (0), max_con_vertices (0) { }
   ///
-  ~csTriangleVertex () { CHK (delete [] con_triangles); CHK (delete [] con_vertices); }
+  ~csTriangleVertex () { delete [] con_triangles; delete [] con_vertices; }
   ///
   void AddTriangle (int idx);
   ///

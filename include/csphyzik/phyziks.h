@@ -10,4 +10,3 @@
 #include "csphyzik/ik.h"
 #include "csphyzik/contact.h"
 #include "csphyzik/ctcontct.h"
-#include "csphyzik/ctcat.h"

@@ -109,14 +109,14 @@ csWfPolygon::csWfPolygon ()
 
 csWfPolygon::~csWfPolygon ()
 {
-  if (vertices) CHKB (delete [] vertices);
+  if (vertices) delete [] vertices;
 }
 
 void csWfPolygon::SetNumVertices (int n)
 {
   num_vertices = n;
-  CHK (delete [] vertices);
-  CHK (vertices = new csVector3 [num_vertices]);
+  delete [] vertices;
+  vertices = new csVector3 [num_vertices];
 }
 
 void csWfPolygon::SetVertex (int i, csVector3& v)
@@ -221,7 +221,7 @@ csWireFrame::~csWireFrame ()
   while (colors)
   {
     csWfColor* n = colors->next;
-    CHK (delete colors);
+    delete colors;
     colors = n;
   }
 }
@@ -231,7 +231,7 @@ void csWireFrame::Clear ()
   while (objects)
   {
     csWfObject* n = objects->GetNext ();
-    CHK (delete objects);
+    delete objects;
     objects = n;
   }
   numObjects = 0;
@@ -252,7 +252,7 @@ csWfColor* csWireFrame::RegisterColor (int r, int g, int b)
 {
   csWfColor* c = FindColor (r, g, b);
   if (c) return c;
-  CHK (c = new csWfColor (txtmgr, r, g, b));
+  c = new csWfColor (txtmgr, r, g, b);
   c->next = colors;
   colors = c;
   return c;
@@ -260,7 +260,7 @@ csWfColor* csWireFrame::RegisterColor (int r, int g, int b)
 
 csWfVertex* csWireFrame::AddVertex (const csVector3& v)
 {
-  CHK (csWfVertex* vt = new csWfVertex ());
+  csWfVertex* vt = new csWfVertex ();
   vt->SetLocation (v);
   vt->SetColor (white);
   vt->SetNext (objects);
@@ -274,7 +274,7 @@ csWfVertex* csWireFrame::AddVertex (const csVector3& v)
 
 csWfLine* csWireFrame::AddLine (csVector3& v1, csVector3& v2)
 {
-  CHK (csWfLine* li = new csWfLine ());
+  csWfLine* li = new csWfLine ();
   li->SetLine (v1, v2);
   li->SetColor (white);
   li->SetNext (objects);
@@ -288,7 +288,7 @@ csWfLine* csWireFrame::AddLine (csVector3& v1, csVector3& v2)
 
 csWfPolygon* csWireFrame::AddPolygon ()
 {
-  CHK (csWfPolygon* po = new csWfPolygon ());
+  csWfPolygon* po = new csWfPolygon ();
   po->SetColor (white);
   po->SetNext (objects);
   if (objects) objects->SetPrev (po);
@@ -321,14 +321,14 @@ void csWireFrame::Apply (void (*func)( csWfObject*, void*), void *param)
 
 csWireFrameCam::csWireFrameCam (iTextureManager* txtmgr)
 {
-  CHK (wf = new csWireFrame (txtmgr));
-  CHK (c = new csCamera ());
+  wf = new csWireFrame (txtmgr);
+  c = new csCamera ();
 }
 
 csWireFrameCam::~csWireFrameCam ()
 {
-  CHK (delete wf);
-  CHK (delete c);
+  delete wf;
+  delete c;
 }
 
 void csWireFrameCam::KeyUp (float speed, bool slow, bool fast)

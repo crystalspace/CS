@@ -229,15 +229,15 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
  
   if (!covtree_lut)
   {
-    CHK (covtree_lut = new csCovMaskLUT (16));
+    covtree_lut = new csCovMaskLUT (16);
   }
-  CHK (covcube = new csCovcube (covtree_lut));
-  //CHK (cbufcube = new csCBufferCube (1024));
+  covcube = new csCovcube (covtree_lut);
+  //cbufcube = new csCBufferCube (1024);
 
-  CHK (textures = new csTextureList ());
+  textures = new csTextureList ();
 
-  CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
-  CHK (lightpatch_pool = new csLightPatchPool ());
+  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory());
+  lightpatch_pool = new csLightPatchPool ();
 
   BuildSqrtTable ();
 }
@@ -251,15 +251,15 @@ csWorld::~csWorld ()
   if (G3D) G3D->DecRef ();
   if (VFS) VFS->DecRef ();
   if (System) System->DecRef ();
-  CHK (delete textures);
-  CHK (delete render_pol2d_pool);
-  CHK (delete lightpatch_pool);
-  CHK (delete covcube);
-  CHK (delete cbufcube);
-  CHK (delete covtree_lut);
+  delete textures;
+  delete render_pol2d_pool;
+  delete lightpatch_pool;
+  delete covcube;
+  delete cbufcube;
+  delete covtree_lut;
 
   // @@@ temp hack
-  CHK (delete camera_hack);
+  delete camera_hack;
   camera_hack = NULL;
 }
 
@@ -316,7 +316,7 @@ bool csWorld::HandleEvent (csEvent &Event)
         // This is needed for the lighting routines.
         if (!current_camera)
         {
-          CHK (current_camera = new csCamera ());
+          current_camera = new csCamera ();
           camera_hack = current_camera;
         }
 
@@ -353,18 +353,18 @@ void csWorld::Clear ()
   while (first_dyn_lights)
   {
     csDynLight* dyn = first_dyn_lights->GetNext ();
-    CHK (delete first_dyn_lights);
+    delete first_dyn_lights;
     first_dyn_lights = dyn;
   }
-  CHK (delete textures); textures = NULL;
-  CHK (textures = new csTextureList ());
-  CHK (delete c_buffer); c_buffer = NULL;
-  CHK (delete solidbsp); solidbsp = NULL;
-  CHK (delete covtree); covtree = NULL;
-  CHK (delete render_pol2d_pool);
-  CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
-  CHK (delete lightpatch_pool);
-  CHK (lightpatch_pool = new csLightPatchPool ());
+  delete textures; textures = NULL;
+  textures = new csTextureList ();
+  delete c_buffer; c_buffer = NULL;
+  delete solidbsp; solidbsp = NULL;
+  delete covtree; covtree = NULL;
+  delete render_pol2d_pool;
+  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory());
+  delete lightpatch_pool;
+  lightpatch_pool = new csLightPatchPool ();
   use_pvs = false;
 
   // Clear all object libraries
@@ -382,14 +382,14 @@ void csWorld::EnableSolidBsp (bool en)
 {
   if (en)
   {
-    CHK (delete c_buffer); c_buffer = NULL;
-    CHK (delete covtree); covtree = NULL;
+    delete c_buffer; c_buffer = NULL;
+    delete covtree; covtree = NULL;
     if (solidbsp) return;
-    CHK (solidbsp = new csSolidBsp ());
+    solidbsp = new csSolidBsp ();
   }
   else
   {
-    CHK (delete solidbsp);
+    delete solidbsp;
     solidbsp = NULL;
   }
 }
@@ -398,14 +398,14 @@ void csWorld::EnableCBuffer (bool en)
 {
   if (en)
   {
-    CHK (delete solidbsp); solidbsp = NULL;
-    CHK (delete covtree); covtree = NULL;
+    delete solidbsp; solidbsp = NULL;
+    delete covtree; covtree = NULL;
     if (c_buffer) return;
-    CHK (c_buffer = new csCBuffer (0, frame_width-1, frame_height));
+    c_buffer = new csCBuffer (0, frame_width-1, frame_height);
   }
   else
   {
-    CHK (delete c_buffer);
+    delete c_buffer;
     c_buffer = NULL;
   }
 }
@@ -414,19 +414,19 @@ void csWorld::EnableCovtree (bool en)
 {
   if (en)
   {
-    CHK (delete solidbsp); solidbsp = NULL;
-    CHK (delete c_buffer); c_buffer = NULL;
+    delete solidbsp; solidbsp = NULL;
+    delete c_buffer; c_buffer = NULL;
     if (covtree) return;
     csBox2 box (0, 0, frame_width, frame_height);
     if (!covtree_lut)
     {
-      CHK (covtree_lut = new csCovMaskLUT (16));
+      covtree_lut = new csCovMaskLUT (16);
     }
-    CHK (covtree = new csCoverageMaskTree (covtree_lut, box));
+    covtree = new csCoverageMaskTree (covtree_lut, box);
   }
   else
   {
-    CHK (delete covtree);
+    delete covtree;
     covtree = NULL;
   }
 }
@@ -443,7 +443,7 @@ csThingTemplate* csWorld::GetThingTemplate (const char* name)
 
 csSector* csWorld::NewSector ()
 {
-  CHK (csSector* s = new csSector());
+  csSector* s = new csSector();
   s->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
   sectors.Push (s);
   return s;
@@ -631,7 +631,7 @@ void csWorld::ShineLights ()
 
 #undef CHECK
       }
-    CHK (delete [] data);
+    delete [] data;
 
     if (reason)
     {
@@ -753,8 +753,8 @@ void csWorld::ShineLights ()
     CsPrintf (MSG_WARNING, "WARNING: error updating lighttable cache!\n");
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 
-  CHK (delete pit);
-  CHK (delete lit);
+  delete pit;
+  delete lit;
 
 #if CS_COV_STATS
   printf ("TestPolygonNotEmpty: %d loop=%d child=%d 0=%d\n",
@@ -828,7 +828,7 @@ bool csWorld::CheckConsistency ()
     }
   }
 
-  CHK (delete pit);
+  delete pit;
   CsPrintf (MSG_INITIALIZATION, "DONE\n");
   return error;
 }
@@ -1289,7 +1289,7 @@ void csWorld::RemoveSprite (csSprite* sprite)
   if (idx == -1) return;
   sprites[idx] = NULL;
   sprites.Delete (idx);
-  CHK (delete sprite);
+  delete sprite;
 }
 
 struct LightAndDist
@@ -1308,18 +1308,18 @@ public:
   int size, num_lights;
 
   csLightArray () : array (NULL), size (0), num_lights (0) { }
-  virtual ~csLightArray () { CHK (delete [] array); }
+  virtual ~csLightArray () { delete [] array; }
   void Reset () { num_lights = 0; }
   void AddLight (csLight* l, float sqdist)
   {
     if (num_lights >= size)
     {
       LightAndDist* new_array;
-      CHK (new_array = new LightAndDist [size+5]);
+      new_array = new LightAndDist [size+5];
       if (array)
       {
         memcpy (new_array, array, sizeof (LightAndDist)*num_lights);
-        CHK (delete [] array);
+        delete [] array;
       }
       array = new_array;
       size += 5;
@@ -1359,7 +1359,7 @@ int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flag
   static csLightArray* light_array = NULL;
   if (!light_array)
   {
-    CHK (light_array = new csLightArray ());
+    light_array = new csLightArray ();
     csWorld::current_world->cleanup.Push (light_array);
   }
   light_array->Reset ();
@@ -1465,7 +1465,7 @@ bool csWorld::DeleteLibrary (const char *iName)
   while (first_dyn_lights)
   {
     csDynLight *dyn = first_dyn_lights->GetNext ();
-    CHK (delete first_dyn_lights);
+    delete first_dyn_lights;
     first_dyn_lights = dyn;
   }
 */
@@ -1493,7 +1493,7 @@ bool csWorld::CreateTexture (const char *iName, const char *iFileName,
 
   iImage *ifile = csImageLoader::Load ((UByte *)data, size,
     CS_IMGFMT_TRUECOLOR);// GetTextureFormat ());
-  CHK (delete [] data);
+  delete [] data;
 
   if (!ifile)
   {

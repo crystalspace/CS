@@ -88,7 +88,7 @@ private:
     ArchiveEntryVector () : csVector (256, 256) {}
     virtual ~ArchiveEntryVector () { DeleteAll (); }
     virtual bool FreeItem (csSome Item)
-    { CHK (delete (ArchiveEntry *)Item); return true; }
+    { delete (ArchiveEntry *)Item; return true; }
     virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
     { return strcmp (((ArchiveEntry *)Item1)->filename, ((ArchiveEntry *)Item2)->filename); }
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const

@@ -86,11 +86,11 @@ csPolygonSet::csPolygonSet () : csObject(),
 
 csPolygonSet::~csPolygonSet ()
 {
-  CHK (delete [] wor_verts);
-  CHK (delete [] obj_verts);
-  CHK (delete [] curve_vertices);
-  CHK (delete [] curve_texels);
-  CHK (delete bbox);
+  delete [] wor_verts;
+  delete [] obj_verts;
+  delete [] curve_vertices;
+  delete [] curve_texels;
+  delete bbox;
 }
 
 void csPolygonSet::Prepare ()
@@ -108,18 +108,18 @@ int csPolygonSet::AddCurveVertex (csVector3& v, csVector2& t)
   if (!curve_vertices)
   {
     max_curve_vertices = 10;
-    CHK (curve_vertices = new csVector3 [max_curve_vertices]);
-    CHK (curve_texels   = new csVector2 [max_curve_vertices]);
+    curve_vertices = new csVector3 [max_curve_vertices];
+    curve_texels   = new csVector2 [max_curve_vertices];
   }
   while (num_curve_vertices >= max_curve_vertices)
   {
     max_curve_vertices += 10;
-    CHK (csVector3* new_vertices = new csVector3 [max_curve_vertices]);
-    CHK (csVector2* new_texels   = new csVector2 [max_curve_vertices]);
+    csVector3* new_vertices = new csVector3 [max_curve_vertices];
+    csVector2* new_texels   = new csVector2 [max_curve_vertices];
     memcpy (new_vertices, curve_vertices, sizeof (csVector3)*num_curve_vertices);
     memcpy (new_texels,   curve_texels,   sizeof (csVector2)*num_curve_vertices);
-    CHK (delete [] curve_vertices);
-    CHK (delete [] curve_texels);
+    delete [] curve_vertices;
+    delete [] curve_texels;
     curve_vertices = new_vertices;
     curve_texels   = new_texels;
   }
@@ -135,8 +135,8 @@ int csPolygonSet::AddVertex (float x, float y, float z)
   if (!wor_verts)
   {
     max_vertices = 10;
-    CHK (wor_verts = new csVector3 [max_vertices]);
-    CHK (obj_verts = new csVector3 [max_vertices]);
+    wor_verts = new csVector3 [max_vertices];
+    obj_verts = new csVector3 [max_vertices];
   }
   while (num_vertices >= max_vertices)
   {
@@ -144,13 +144,13 @@ int csPolygonSet::AddVertex (float x, float y, float z)
       max_vertices *= 2;
     else
       max_vertices += 10000;
-    CHK (csVector3* new_wor_verts = new csVector3 [max_vertices]);
-    CHK (csVector3* new_obj_verts = new csVector3 [max_vertices]);
+    csVector3* new_wor_verts = new csVector3 [max_vertices];
+    csVector3* new_obj_verts = new csVector3 [max_vertices];
     memcpy (new_wor_verts, wor_verts, sizeof (csVector3)*num_vertices);
     memcpy (new_obj_verts, obj_verts, sizeof (csVector3)*num_vertices);
 
-    CHK (delete [] wor_verts);
-    CHK (delete [] obj_verts);
+    delete [] wor_verts;
+    delete [] obj_verts;
 
     wor_verts = new_wor_verts;
     obj_verts = new_obj_verts;
@@ -212,7 +212,7 @@ void csPolygonSet::CompressVertices ()
   if (num_vertices <= 0)
     return;
 
-  CHK (CompressVertex* vt = new CompressVertex [num_vertices]);
+  CompressVertex* vt = new CompressVertex [num_vertices];
   int i, j;
   for (i = 0 ; i < num_vertices ; i++)
   {
@@ -245,8 +245,8 @@ void csPolygonSet::CompressVertices ()
   // Now allocate and fill new vertex tables.
   // After this new_idx in the vt table will be the new index
   // of the vector.
-  CHK (csVector3* new_obj = new csVector3 [count_unique]);
-  CHK (csVector3* new_wor = new csVector3 [count_unique]);
+  csVector3* new_obj = new csVector3 [count_unique];
+  csVector3* new_wor = new csVector3 [count_unique];
   new_obj[0] = obj_verts[vt[0].orig_idx];
   new_wor[0] = wor_verts[vt[0].orig_idx];
   vt[0].new_idx = 0;
@@ -269,8 +269,8 @@ void csPolygonSet::CompressVertices ()
   qsort (vt, num_vertices, sizeof (CompressVertex), compare_vt_orig);
 
   // Replace the old vertex tables.
-  CHK (delete [] wor_verts);
-  CHK (delete [] obj_verts);
+  delete [] wor_verts;
+  delete [] obj_verts;
   wor_verts = new_wor;
   obj_verts = new_obj;
   num_vertices = max_vertices = count_unique;
@@ -285,7 +285,7 @@ void csPolygonSet::CompressVertices ()
       idx[j] = vt[idx[j]].new_idx;
   }
 
-  CHK (delete [] vt);
+  delete [] vt;
 
   // If there is a bounding box we recreate it.
   if (bbox) CreateBoundingBox ();
@@ -309,7 +309,7 @@ iPolygon3D *csPolygonSet::PolySet::GetPolygon (int idx)
 
 csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
 {
-  CHK (csPolygon3D* p = new csPolygon3D (texture));
+  csPolygon3D* p = new csPolygon3D (texture);
   p->SetSector (sector);
   AddPolygon (p);
   return p;
@@ -342,7 +342,7 @@ csCurve* csPolygonSet::GetCurve (char* name)
 
 csCurve* csPolygonSet::new_bezier (char* name, TextureMM* texture)
 {
-  CHK (csBezier* p = new csBezier (name, 0x1234));
+  csBezier* p = new csBezier (name, 0x1234);
   p->setTexture(texture);
   //TODO??  p->set_sector (sector);
   AddCurve (p);
@@ -405,7 +405,7 @@ void csPolygonSet::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
               
     if (filtered || is_this_fog)
     {
-      CHK (keep_plane = new csPolyPlane (*(p->GetPlane ())));
+      keep_plane = new csPolyPlane (*(p->GetPlane ()));
     }
 
     // Draw through the portal. If this fails we draw the original polygon
@@ -487,11 +487,11 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   // to this structure every time. Maybe hold this array native
   // in every detail object?
   // IMPORTANT OPT!!! CACHE THIS ARRAY IN EACH ENTITY!
-  CHK (mesh.polygons = new csPolygonDPM [GetNumPolygons ()]);
-  CHK (mesh.txt_handle = new iTextureHandle* [GetNumPolygons ()]);
-  CHK (mesh.plane = new G3DTexturePlane [GetNumPolygons ()]);
-  CHK (mesh.normal = new csPlane3 [GetNumPolygons ()]);
-  CHK (mesh.poly_texture = new iPolygonTexture* [GetNumPolygons ()]);
+  mesh.polygons = new csPolygonDPM [GetNumPolygons ()];
+  mesh.txt_handle = new iTextureHandle* [GetNumPolygons ()];
+  mesh.plane = new G3DTexturePlane [GetNumPolygons ()];
+  mesh.normal = new csPlane3 [GetNumPolygons ()];
+  mesh.poly_texture = new iPolygonTexture* [GetNumPolygons ()];
   for (i = 0 ; i < GetNumPolygons () ; i++)
   {
     csPolygon3D* p = GetPolygon3D (i);
@@ -540,11 +540,11 @@ void csPolygonSet::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   // @@@ Provide functionality for visible edges here...
 
 cleanup:
-  CHK (delete [] mesh.polygons);
-  CHK (delete [] mesh.txt_handle);
-  CHK (delete [] mesh.plane);
-  CHK (delete [] mesh.normal);
-  CHK (delete [] mesh.poly_texture);
+  delete [] mesh.polygons;
+  delete [] mesh.txt_handle;
+  delete [] mesh.plane;
+  delete [] mesh.normal;
+  delete [] mesh.poly_texture;
 }
 
 void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
@@ -705,7 +705,7 @@ void csPolygonSet::GetCameraMinMaxZ (float& minz, float& maxz)
 // shadows.
 csFrustumList* csPolygonSet::GetShadows (csSector* sector, csVector3& origin)
 {
-  CHK (csFrustumList* list = new csFrustumList ());
+  csFrustumList* list = new csFrustumList ();
   csShadowFrustum* frust;
   int i, j;
   csPolygon3D* p;
@@ -718,7 +718,7 @@ csFrustumList* csPolygonSet::GetShadows (csSector* sector, csVector3& origin)
     if (ABS (clas) < EPSILON) continue;
     if ((clas <= 0) != cw) continue;
 
-    CHK (frust = new csShadowFrustum (origin));
+    frust = new csShadowFrustum (origin);
     frust->sector = sector;
     frust->draw_busy = sector->draw_busy;
     list->AddFirst (frust);
@@ -736,9 +736,9 @@ csFrustumList* csPolygonSet::GetShadows (csSector* sector, csVector3& origin)
 void csPolygonSet::CreateBoundingBox ()
 {
   float minx, miny, minz, maxx, maxy, maxz;
-  CHK (delete bbox); bbox = NULL;
+  delete bbox; bbox = NULL;
   if (num_vertices <= 0) return;
-  CHK (bbox = new csPolygonSetBBox ());
+  bbox = new csPolygonSetBBox ();
   minx = maxx = obj_verts[0].x;
   miny = maxy = obj_verts[0].y;
   minz = maxz = obj_verts[0].z;
@@ -933,7 +933,7 @@ int find_chull (int nverts, csVector2 *vertices, csVector2 *&chull)
 
   Find2DConvexHull (nverts, vertices, &num, &order);
 
-  CHK(chull = new csVector2[num]);
+  chull = new csVector2[num];
   for (int i = 0; i < num; i++)
     chull[i]=vertices[order[i]];
 
@@ -983,27 +983,27 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
 	head->data.x=x_;
 	head->data.y=y_;
 
-	CHK (head->next=new point_list);
+	head->next=new point_list;
 	head=head->next;
       }
     }
   }
 
   csVector2 *final_data,*data;
-  CHK (data=new csVector2[num_pts]);
+  data=new csVector2[num_pts];
   for (head = &list, i = 0; i < num_pts; i++)
   {
     data[i]=head->data;
 
     prev=head;
     head=head->next;
-    if (prev!=&list) { CHK (delete prev); }
+    if (prev!=&list) { delete prev; }
   }
 
-  if (i) { CHK (delete[] head); }
+  if (i) { delete[] head; }
 
   num_vertices = find_chull (num_pts, data, final_data);
-  if (num_pts) { CHK (delete data); }
+  if (num_pts) { delete data; }
 
   return final_data;
 }

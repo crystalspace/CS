@@ -54,7 +54,7 @@ converter::converter() : revnorm(FALSE), frame_builder(NULL)
 
 converter::~converter()
 {
-  CHK (delete frame_builder);
+  delete frame_builder;
 }
 
 void converter::ProcessConfig (csIniFile* config)

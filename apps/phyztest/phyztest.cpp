@@ -99,7 +99,7 @@ csSprite3D *add_test_sprite( csSpriteTemplate *tmpl, csSector *aroom, csView *vi
 {
   csSprite3D *tsprt;
   
-  CHK (tsprt = new csSprite3D());
+  tsprt = new csSprite3D();
   tsprt->SetTemplate( tmpl );
   view->GetWorld ()->sprites.Push (tsprt);
   tsprt->MoveToSector (aroom);
@@ -146,7 +146,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     CsPrintf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
     abort ();
   }
-  CHK (world = World->GetCsWorld ());
+  world = World->GetCsWorld ();
   World->DecRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
@@ -229,7 +229,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   light = new csStatLight (0, 7, -3, 10, 0, 1, 0, false);
   room->AddLight (light);
 
-  CHK((void)new csRAPIDCollider(*room, room));
+  (void)new csRAPIDCollider(*room, room);
 
   world->Prepare ();
 
@@ -338,7 +338,7 @@ void Phyztest::NextFrame (time_t elapsed_time, time_t current_time)
       Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
       return;
     }
-    CHK (bot = new csSprite3D());
+    bot = new csSprite3D();
     bot->SetTemplate( tmpl );
     view->GetWorld ()->sprites.Push (bot);
     bot->MoveToSector (room);

@@ -54,7 +54,7 @@ public:
 //    printf("nearest: %d %d\n", this->width, this->height);
 //    if ( realwidth < this->width ) this->width >>= 1;
 //    if ( realheight < this->height ) this->height >>= 1;
-    CHK( alpha = new unsigned char[ this->width*this->height ] );
+     alpha = new unsigned char[ this->width*this->height ] ;
     memset( alpha, this->width*this->height, 0 );
 //    int xoff = (this->width - realwidth)/2;
 //    int yoff = (this->height - realheight)/2;

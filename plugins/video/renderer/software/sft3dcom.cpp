@@ -150,7 +150,7 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 {
   Close ();
-  CHK (delete config);
+  delete config;
   if (G2D) G2D->DecRef ();
   if (System) System->DecRef ();
 }
@@ -461,7 +461,7 @@ bool csGraphics3DSoftwareCommon::Open (const char *Title)
   }
 
   // Create the texture manager
-  CHK (texman = new csTextureManagerSoftware (System, this, config));
+  texman = new csTextureManagerSoftware (System, this, config);
 
   int nWidth = G2D->GetWidth ();
   int nHeight = G2D->GetHeight ();
@@ -486,7 +486,7 @@ bool csGraphics3DSoftwareCommon::Open (const char *Title)
 
   SetDimensions (nWidth, nHeight);
 
-  CHK (tcache = new csTextureCacheSoftware (texman));
+  tcache = new csTextureCacheSoftware (texman);
   const char *cache_size = config->GetStr ("TextureManager", "CACHE", NULL);
   int csize = DEFAULT_CACHE_SIZE;
   if (cache_size)
@@ -555,18 +555,18 @@ void csGraphics3DSoftwareCommon::Close()
   while (fog_buffers)
   {
     FogBuffer* n = fog_buffers->next;
-    CHK (delete fog_buffers);
+    delete fog_buffers;
     fog_buffers = n;
   }
 
-  CHK (delete tcache); tcache = NULL;
-  CHK (delete clipper); clipper = NULL;
+  delete tcache; tcache = NULL;
+  delete clipper; clipper = NULL;
 
 //    csScan_Finalize ();
-  CHK (delete texman); texman = NULL;
-  CHK (delete [] z_buffer); z_buffer = NULL;
-  CHK (delete [] smaller_buffer); smaller_buffer = NULL;
-  CHK (delete [] line_table); line_table = NULL;
+  delete texman; texman = NULL;
+  delete [] z_buffer; z_buffer = NULL;
+  delete [] smaller_buffer; smaller_buffer = NULL;
+  delete [] line_table; line_table = NULL;
 
   G2D->Close ();
   width = height = -1;
@@ -589,30 +589,30 @@ void csGraphics3DSoftwareCommon::SetDimensions (int nwidth, int nheight)
   width2 = width/2;
   height2 = height/2;
 
-  CHK (delete [] smaller_buffer);
+  delete [] smaller_buffer;
   smaller_buffer = NULL;
   if (do_smaller_rendering)
   {
-    CHK (smaller_buffer = new UByte [(width*height) * pfmt.PixelBytes]);
+    smaller_buffer = new UByte [(width*height) * pfmt.PixelBytes];
   }
 
-  CHK (delete [] z_buffer);
-  CHK (z_buffer = new unsigned long [width*height]);
+  delete [] z_buffer;
+  z_buffer = new unsigned long [width*height];
   z_buf_size = sizeof (unsigned long)*width*height;
 
-  CHK (delete [] line_table);
-  CHK (line_table = new UByte* [height+1]);
+  delete [] line_table;
+  line_table = new UByte* [height+1];
 }
 
 void csGraphics3DSoftwareCommon::SetClipper (csVector2* vertices, int num_vertices)
 {
-  CHK (delete clipper);
+  delete clipper;
   clipper = NULL;
   if (!vertices) return;
   // @@@ This could be better! We are using a general polygon clipper
   // even in cases where a box clipper would be better. We should
   // have a special SetBoxClipper call in iGraphics3D.
-  CHK (clipper = new csPolygonClipper (vertices, num_vertices, false, true));
+  clipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
 bool csGraphics3DSoftwareCommon::BeginDraw (int DrawFlags)
@@ -1618,7 +1618,7 @@ FogBuffer* csGraphics3DSoftwareCommon::find_fog_buffer (CS_ID id)
 
 void csGraphics3DSoftwareCommon::OpenFogObject (CS_ID id, csFog* fog)
 {
-  CHK (FogBuffer* fb = new FogBuffer ());
+  FogBuffer* fb = new FogBuffer ();
   fb->next = fog_buffers;
   fb->prev = NULL;
   fb->id = id;
@@ -1641,7 +1641,7 @@ void csGraphics3DSoftwareCommon::CloseFogObject (CS_ID id)
   if (fb->next) fb->next->prev = fb->prev;
   if (fb->prev) fb->prev->next = fb->next;
   else fog_buffers = fb->next;
-  CHK (delete fb);
+  delete fb;
 }
 
 void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, int fog_type)

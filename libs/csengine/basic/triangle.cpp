@@ -25,7 +25,7 @@ csTriangleMesh::csTriangleMesh (const csTriangleMesh& mesh)
 {
   max_triangles = mesh.max_triangles;
   num_triangles = mesh.num_triangles;
-  CHK (triangles = new csTriangle [max_triangles]);
+  triangles = new csTriangle [max_triangles];
   memcpy (triangles, mesh.triangles, sizeof (csTriangle)*max_triangles);
 }
 
@@ -36,7 +36,7 @@ csTriangleMesh::~csTriangleMesh ()
 
 void csTriangleMesh::Clear ()
 {
-  CHK (delete [] triangles);
+  delete [] triangles;
   num_triangles = max_triangles = 0;
 }
 
@@ -49,11 +49,11 @@ void csTriangleMesh::AddTriangle (int a, int b, int c)
 {
   if (num_triangles >= max_triangles)
   {
-    CHK (csTriangle* new_triangles = new csTriangle [max_triangles+8]);
+    csTriangle* new_triangles = new csTriangle [max_triangles+8];
     if (triangles)
     {
       memcpy (new_triangles, triangles, sizeof (csTriangle)*max_triangles);
-      CHK (delete [] triangles);
+      delete [] triangles;
     }
     triangles = new_triangles;
     max_triangles += 8;
@@ -74,11 +74,11 @@ void csTriangleVertex::AddTriangle (int idx)
 
   if (num_con_triangles >= max_con_triangles)
   {
-    CHK (int* new_con_triangles = new int [max_con_triangles+4]);
+    int* new_con_triangles = new int [max_con_triangles+4];
     if (con_triangles)
     {
       memcpy (new_con_triangles, con_triangles, sizeof (int)*max_con_triangles);
-      CHK (delete [] con_triangles);
+      delete [] con_triangles;
     }
     con_triangles = new_con_triangles;
     max_con_triangles += 4;
@@ -95,11 +95,11 @@ void csTriangleVertex::AddVertex (int idx)
 
   if (num_con_vertices >= max_con_vertices)
   {
-    CHK (int* new_con_vertices = new int [max_con_vertices+4]);
+    int* new_con_vertices = new int [max_con_vertices+4];
     if (con_vertices)
     {
       memcpy (new_con_vertices, con_vertices, sizeof (int)*max_con_vertices);
-      CHK (delete [] con_vertices);
+      delete [] con_vertices;
     }
     con_vertices = new_con_vertices;
     max_con_vertices += 4;
@@ -154,7 +154,7 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices)
 
 csTriangleVertices::csTriangleVertices (csTriangleMesh* mesh, csVector3* verts, int num_verts)
 {
-  CHK (vertices = new csTriangleVertex [num_verts]);
+  vertices = new csTriangleVertex [num_verts];
   num_vertices = num_verts;
 
   // Build connectivity information for all vertices in this mesh.
@@ -177,7 +177,7 @@ csTriangleVertices::csTriangleVertices (csTriangleMesh* mesh, csVector3* verts, 
 
 csTriangleVertices::~csTriangleVertices ()
 {
-  CHK (delete [] vertices);
+  delete [] vertices;
 }
 
 void csTriangleVertices::UpdateVertices (csVector3* verts)
@@ -243,8 +243,8 @@ void csLOD::CalculateLOD (csTriangleMesh* mesh, csTriangleVertices* verts,
   int num = verts->GetNumVertices ();
   int from, to, col_idx;
   int *from_vertices, *to_vertices;
-  CHK (from_vertices = new int [num]);
-  CHK (to_vertices = new int [num]);
+  from_vertices = new int [num];
+  to_vertices = new int [num];
   col_idx = 0;
   while (num > 1)
   {
@@ -312,8 +312,8 @@ void csLOD::CalculateLOD (csTriangleMesh* mesh, csTriangleVertices* verts,
     col_idx--;
   }
 
-  CHK (delete [] from_vertices);
-  CHK (delete [] to_vertices);
+  delete [] from_vertices;
+  delete [] to_vertices;
 }
 
 //---------------------------------------------------------------------------

@@ -133,7 +133,7 @@ void csRAPIDCollider::PolygonInitialize (csPolygonSet *ps)
 
   if (tri_count)
   {
-    CHK (m_pCollisionModel = new csCdModel (tri_count));
+    m_pCollisionModel = new csCdModel (tri_count);
     if (!m_pCollisionModel)
       return;
     
@@ -189,7 +189,7 @@ void csRAPIDCollider::Sprite3DInitialize (csSprite3D *sp)
   // It correctly takes care of optional skeletons.
   csVector3* object_vertices = sp->GetObjectVerts (cf);
 
-  CHK (m_pCollisionModel = new csCdModel (mesh->GetNumTriangles ()));
+  m_pCollisionModel = new csCdModel (mesh->GetNumTriangles ());
   if (!m_pCollisionModel) 
   {
     return;  // Error
@@ -214,7 +214,7 @@ csRAPIDCollider::~csRAPIDCollider(void)
 {
   if (m_pCollisionModel)
   {
-    CHK (delete m_pCollisionModel);
+    delete m_pCollisionModel;
     m_pCollisionModel = NULL;
   }
 

@@ -122,22 +122,22 @@ csQuadcube::csQuadcube (int depth)
 {
   csBox2 box (-1, -1, 1, 1);
 
-  CHK (trees[0] = new csQuadtreePersp (box, depth));
-  CHK (trees[1] = new csQuadtreePersp (box, depth));
-  CHK (trees[2] = new csQuadtreePersp (box, depth));
-  CHK (trees[3] = new csQuadtreePersp (box, depth));
-  CHK (trees[4] = new csQuadtreePersp (box, depth));
-  CHK (trees[5] = new csQuadtreePersp (box, depth));
+  trees[0] = new csQuadtreePersp (box, depth);
+  trees[1] = new csQuadtreePersp (box, depth);
+  trees[2] = new csQuadtreePersp (box, depth);
+  trees[3] = new csQuadtreePersp (box, depth);
+  trees[4] = new csQuadtreePersp (box, depth);
+  trees[5] = new csQuadtreePersp (box, depth);
 }
 
 csQuadcube::~csQuadcube ()
 {
-  CHK (delete trees[0]);
-  CHK (delete trees[1]);
-  CHK (delete trees[2]);
-  CHK (delete trees[3]);
-  CHK (delete trees[4]);
-  CHK (delete trees[5]);
+  delete trees[0];
+  delete trees[1];
+  delete trees[2];
+  delete trees[3];
+  delete trees[4];
+  delete trees[5];
 }
 
 void csQuadcube::MakeEmpty ()

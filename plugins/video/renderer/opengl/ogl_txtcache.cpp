@@ -120,7 +120,7 @@ void OpenGLCache::cache_texture (iTextureHandle *txt_handle)
     num++;
     total_size += size;
 
-    CHK (cached_texture = new csGLCacheData);
+    cached_texture = new csGLCacheData;
 
     cached_texture->next = head;
     cached_texture->prev = NULL;
@@ -226,7 +226,7 @@ void OpenGLCache::cache_lightmap (iPolygonTexture *polytex)
     num++;
     total_size += size;
 
-    CHK (cached_texture = new csGLCacheData);
+    cached_texture = new csGLCacheData;
 
     cached_texture->next = head;
     cached_texture->prev = NULL;
@@ -480,7 +480,7 @@ void OpenGLLightmapCache::Load(csGLCacheData *d)
   // For the software renderer this would be almost no problem and
   // it would make the hardware renderers faster as the following
   // conversion would not be needed anymore.
-  CHK (unsigned char *lm_data = new unsigned char[lmwidth*lmheight*4]);
+  unsigned char *lm_data = new unsigned char[lmwidth*lmheight*4];
   unsigned char *walkdata = lm_data;
   unsigned char *last_data = walkdata+(lmwidth*lmheight*4);
   while (walkdata < last_data)

@@ -148,7 +148,7 @@ void csObject::ObjRelease (csObject *obj)
 void csObject::ObjRemove (csObject *obj)
 { 
   ObjRelease (obj);
-  CHK (delete obj); 
+  delete obj; 
 }
 
 //------------------------------------------------------ Object iterator -----//

@@ -316,7 +316,7 @@ IMPLEMENT_IBASE_EXT_END
 
 SysSystemDriver::SysSystemDriver () : csSystemDriver(), running(false)
 {
-  CHK (app = new CrystApp (this));
+  app = new CrystApp (this);
 };
 
 static int32 begin_loop(void* data)

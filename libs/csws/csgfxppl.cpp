@@ -113,7 +113,7 @@ void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, int fonts
   pe->Text.bg = bg;
   pe->font = font;
   pe->fontsize = fontsize;
-  CHK (pe->Text.string = strnew (s));
+  pe->Text.string = strnew (s);
 }
 
 void csGraphicsPipeline::Sprite2D (csPixmap *s2d, int x, int y, int w, int h)
@@ -313,7 +313,7 @@ void csGraphicsPipeline::Flush (int iCurPage)
         int tmpy = op->Text.y + TextHeight (op->font, op->fontsize);
         INCLUDE_MIN_POINT (op->Text.x, op->Text.y);
         INCLUDE_MAX_POINT (tmpx, tmpy);
-        CHK (delete[] op->Text.string);
+        delete[] op->Text.string;
         break;
       }
       case pipeopSPR2D:

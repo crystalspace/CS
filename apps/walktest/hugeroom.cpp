@@ -110,7 +110,7 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
     case 2: tm = world->GetTextures ()->FindByName ("txt2"); break;
   }
 
-  CHK (csPolygon3D* p = new csPolygon3D (tm));
+  csPolygon3D* p = new csPolygon3D (tm);
   char polname[10];
   sprintf (polname, "p%d", pol_nr);
   p->SetName (polname); 
@@ -152,7 +152,7 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
 
 csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 {
-  CHK (csThing* thing = new csThing ());
+  csThing* thing = new csThing ();
   thing->SetName ("t"); 
 
 #ifdef ROOM_SMALL
@@ -226,7 +226,7 @@ csThing* HugeRoom::create_thing (csSector* sector, const csVector3& pos)
 csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
 	float xdim, float ydim, float zdim, float angle_y)
 {
-  CHK (csThing* thing = new csThing ());
+  csThing* thing = new csThing ();
   thing->SetName ("t"); 
 
   float y_low = -wall_dim+1;
@@ -399,17 +399,17 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   num = ((rand () >> 3) % (sector_max_lights-sector_min_lights+1)) + sector_min_lights;
   for (i = 0 ; i < num ; i++)
   {
-    CHK (csStatLight* light = new csStatLight (
+    csStatLight* light = new csStatLight (
     	rand2 (sector_light_max_pos), rand2 (sector_light_max_pos), rand2 (sector_light_max_pos),
     	sector_light_min_radius+rand1 (sector_light_max_radius-sector_light_min_radius+1),
     	rand1 (sector_light_max_red-sector_light_min_red)+sector_light_min_red,
     	rand1 (sector_light_max_green-sector_light_min_green)+sector_light_min_green,
-    	rand1 (sector_light_max_blue-sector_light_min_blue)+sector_light_min_blue, false));
+    	rand1 (sector_light_max_blue-sector_light_min_blue)+sector_light_min_blue, false);
     room->AddLight (light);
   }
 
 #if defined(ROOM_CITY)
-  CHK (csThing* floorthing = new csThing ());
+  csThing* floorthing = new csThing ();
   floorthing->SetName ("floor"); 
   create_wall (room, floorthing,
   	csVector3 (-wall_dim, -wall_dim+1, wall_dim),
@@ -420,7 +420,7 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
   room->AddThing (floorthing);
   floorthing->Transform ();
 #elif !defined(ROOM_SMALL)
-  CHK (csThing* floorthing = new csThing ());
+  csThing* floorthing = new csThing ();
   floorthing->SetName ("floor"); 
   create_wall (room, floorthing, csVector3 (-3, -1, 3), csVector3 (3, -1, 3),
   	csVector3 (3, -1, -3), csVector3 (-3, -1, -3), 4, 4, 0);

@@ -29,7 +29,7 @@ csQuadtreeNode::csQuadtreeNode ()
 
 csQuadtreeNode::~csQuadtreeNode ()
 {
-  CHK (delete [] children);
+  delete [] children;
 }
 
 //--------------------------------------------------------------------------
@@ -42,7 +42,7 @@ void csQuadtree::Build (csQuadtreeNode* node, const csBox2& box, int depth)
 
   csBox2 childbox;
 
-  CHK (node->children = new csQuadtreeNode [4]);
+  node->children = new csQuadtreeNode [4];
 
   csQuadtreeNode* children = node->children;
 
@@ -62,13 +62,13 @@ void csQuadtree::Build (csQuadtreeNode* node, const csBox2& box, int depth)
 csQuadtree::csQuadtree (const csBox2& box, int depth)
 {
   bbox = box;
-  CHK (root = new csQuadtreeNode ());
+  root = new csQuadtreeNode ();
   Build (root, box, depth-1);
 }
 
 csQuadtree::~csQuadtree ()
 {
-  CHK (delete root);
+  delete root;
 }
 
 bool BoxEntirelyInPolygon (csVector2* verts, int num_verts, const csBox2& bbox)

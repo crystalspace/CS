@@ -178,7 +178,7 @@ bool csGraphics2DGGI::Open(const char *Title)
   // Open your graphic interface
   if (!csGraphics2D::Open (Title)) return false;
 
-  Memory = CHK( new unsigned char [Width*Height*pfmt.PixelBytes] );
+  Memory =  new unsigned char [Width*Height*pfmt.PixelBytes] ;
 
   Clear(0);
   return true;

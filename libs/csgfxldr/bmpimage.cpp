@@ -35,10 +35,10 @@ bool RegisterBMP ()
 csImageFile* csBMPImageLoader::LoadImage (UByte* iBuffer, ULong iSize,
   int iFormat)
 {
-  CHK (ImageBMPFile* i = new ImageBMPFile (iFormat));
+  ImageBMPFile* i = new ImageBMPFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
-    CHK (delete i);
+    delete i;
     return NULL;
   }
   return i;

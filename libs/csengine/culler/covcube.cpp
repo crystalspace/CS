@@ -127,22 +127,22 @@ csCovcube::csCovcube (csCovMaskLUT* lut)
   //@@@Depends on coverage mask tree depth.
   csBox2 box (0, 0, 1024, 1024);
 
-  CHK (trees[0] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[1] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[2] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[3] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[4] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[5] = new csCoverageMaskTreePersp (lut, box));
+  trees[0] = new csCoverageMaskTreePersp (lut, box);
+  trees[1] = new csCoverageMaskTreePersp (lut, box);
+  trees[2] = new csCoverageMaskTreePersp (lut, box);
+  trees[3] = new csCoverageMaskTreePersp (lut, box);
+  trees[4] = new csCoverageMaskTreePersp (lut, box);
+  trees[5] = new csCoverageMaskTreePersp (lut, box);
 }
 
 csCovcube::~csCovcube ()
 {
-  CHK (delete trees[0]);
-  CHK (delete trees[1]);
-  CHK (delete trees[2]);
-  CHK (delete trees[3]);
-  CHK (delete trees[4]);
-  CHK (delete trees[5]);
+  delete trees[0];
+  delete trees[1];
+  delete trees[2];
+  delete trees[3];
+  delete trees[4];
+  delete trees[5];
 }
 
 void csCovcube::MakeEmpty ()

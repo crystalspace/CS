@@ -37,8 +37,8 @@ extern void dump_mem_list ();
 
 #else /*MEM_CHECK*/
 
-#define CHK(x) x
-#define CHKB(x) { CHK(x); }
+//#define CHK(x) x
+//#define CHKB(x) { CHK(x); }
 
 #endif /*MEM_CHECK*/
 

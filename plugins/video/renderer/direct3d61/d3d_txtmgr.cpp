@@ -203,7 +203,7 @@ void csTextureMMDirect3D::CreateMipmaps ()
 
   // Delete existing mipmaps, if any
   for (int i = 0; i < 4; i++)
-    CHKB (delete tex [i]);
+    delete tex [i];
 
   delete m_pTexture2d;
 

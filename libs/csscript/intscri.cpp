@@ -36,8 +36,8 @@ IntScriptRegister::~IntScriptRegister ()
   {
     Reg* n = first->next;
     if (first->name)
-      CHKB (delete [] first->name);
-    CHK (delete first);
+      delete [] first->name;
+    delete first;
     first = n;
   }
 }
@@ -50,9 +50,9 @@ void IntScriptRegister::reg (char* name, IntScriptFunc* func)
     fatal_exit (0, true);
     return; // if fatal_exit returns
   }
-  CHK (Reg* r = new Reg);
+  Reg* r = new Reg;
   r->next = first;
-  CHK (r->name = new char [strlen (name)+1]);
+  r->name = new char [strlen (name)+1];
   strcpy (r->name, name);
   r->func = func;
   first = r;
@@ -80,7 +80,7 @@ IntScript::IntScript (LanguageLayer* layer) : csScript (layer)
 
 IntScript::~IntScript ()
 {
-  if (data) CHKB (delete [] data);
+  if (data) delete [] data;
 }
 
 void IntScript::load (char* buf)
@@ -95,7 +95,7 @@ void IntScript::load (char* buf)
     fatal_exit (0, true);
     return; // if fatal_exit returns
   }
-  CHK (data = new char [strlen (str2)+1]);
+  data = new char [strlen (str2)+1];
   strcpy (data, str2);
 }
 
@@ -105,7 +105,7 @@ void IntScript::prepare ()
 
 csRunScript* IntScript::run_script (csObject* attached)
 {
-  CHK (IntRunScript* r = new IntRunScript (this, attached));
+  IntRunScript* r = new IntRunScript (this, attached);
   layer->link_run (r);
   return (csRunScript*)r;
 }

@@ -36,5 +36,5 @@ void csImageMemory::Rescale (int NewWidth, int NewHeight)
   Width = NewWidth;
   Height = NewHeight;
   delete [] (RGBPixel *) Image;
-  CHK (Image = (void*) new RGBPixel[Width*Height]);
+  Image = (void*) new RGBPixel[Width*Height];
 }

@@ -221,7 +221,7 @@ bool csGraphics3DDirect3DDx5::Initialize (iSystem *iSys)
   if (!m_piG2D)
     return false;
 
-  CHK (txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D, config));
+  txtmgr = new csTextureManagerDirect3D (m_piSystem, m_piG2D, config);
 
   m_bVerbose = config->GetYesNo ("Direct3DDX5", "VERBOSE", false);
 
@@ -578,12 +578,12 @@ bool csGraphics3DDirect3DDx5::Open(const char* Title)
   // half for lightmaps
   if (m_iTypeLightmap != 0)
   {
-    CHK (m_pTextureCache = new D3DTextureCache(dwFree/2, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps));
-    CHK (m_pLightmapCache = new D3DLightMapCache(dwFree/2, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount));
+    m_pTextureCache = new D3DTextureCache(dwFree/2, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps);
+    m_pLightmapCache = new D3DLightMapCache(dwFree/2, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdLightmapSurfDesc.ddpfPixelFormat.dwRGBBitCount);
   }
   else
   {
-    CHK (m_pTextureCache = new D3DTextureCache(dwFree, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps));
+    m_pTextureCache = new D3DTextureCache(dwFree, m_bIsHardware, m_lpDD, m_lpd3dDevice, m_ddsdTextureSurfDesc.ddpfPixelFormat.dwRGBBitCount, bMipmapping, &m_Caps);
     m_pLightmapCache = NULL;
   }
   
@@ -1399,13 +1399,13 @@ long csGraphics3DDirect3DDx5::GetRenderState(G3D_RENDERSTATEOPTION op)
 
 void csGraphics3DDirect3DDx5::SetClipper (csVector2* vertices, int num_vertices)
 {
-  CHK (delete m_pClipper);
+  delete m_pClipper;
   m_pClipper = NULL;
   if (!vertices) return;
   // @@@ This could be better! We are using a general polygon clipper
   // even in cases where a box clipper would be better. We should
   // have a special SetBoxClipper call in iGraphics3D.
-  CHK (m_pClipper = new csPolygonClipper (vertices, num_vertices, false, true));
+  m_pClipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
 void csGraphics3DDirect3DDx5::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)

@@ -90,9 +90,9 @@ csGraphics3DInfinite::csGraphics3DInfinite (iBase *iParent) :
 csGraphics3DInfinite::~csGraphics3DInfinite ()
 {
   Close ();
-  CHK (delete texman);
+  delete texman;
   if (G2D) G2D->DecRef ();
-  CHK (delete config;)
+  delete config;
 }
 
 bool csGraphics3DInfinite::Initialize (iSystem *iSys)
@@ -109,7 +109,7 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
   if (!G2D)
     return false;
 
-  CHK (texman = new csTextureManagerInfinite (System, G2D, config));
+  texman = new csTextureManagerInfinite (System, G2D, config);
 
   return true;
 }
@@ -190,13 +190,13 @@ void csGraphics3DInfinite::SetPerspectiveCenter (int x, int y)
 
 void csGraphics3DInfinite::SetClipper (csVector2* vertices, int num_vertices)
 {
-  CHK (delete clipper);
+  delete clipper;
   clipper = NULL;
   if (!vertices) return;
   // @@@ This could be better! We are using a general polygon clipper
   // even in cases where a box clipper would be better. We should
   // have a special SetBoxClipper call in iGraphics3D.
-  CHK (clipper = new csPolygonClipper (vertices, num_vertices, false, true));
+  clipper = new csPolygonClipper (vertices, num_vertices, false, true);
 }
 
 long csGraphics3DInfinite::GetAccurateTime ()

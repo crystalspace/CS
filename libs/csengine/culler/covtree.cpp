@@ -1206,9 +1206,9 @@ csCoverageMaskTree::csCoverageMaskTree (csCovMaskLUT* lut, const csBox2& box)
   bbox = box;
   // @@@ Configurable!
 # if defined(CS_CM_8x8)
-  CHK (tree = (void*)new csCovTreeNode3 ());
+  tree = (void*)new csCovTreeNode3 ();
 # else
-  CHK (tree = (void*)new csCovTreeNode4 ());
+  tree = (void*)new csCovTreeNode4 ();
 # endif
 }
 
@@ -1216,9 +1216,9 @@ csCoverageMaskTree::~csCoverageMaskTree ()
 {
   // @@@ Configurable!
 # if defined(CS_CM_8x8)
-  CHK (delete (csCovTreeNode3*)tree);
+  delete (csCovTreeNode3*)tree;
 # else
-  CHK (delete (csCovTreeNode4*)tree);
+  delete (csCovTreeNode4*)tree;
 # endif
 }
 

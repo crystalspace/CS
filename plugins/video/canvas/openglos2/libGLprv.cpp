@@ -64,8 +64,8 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
           break;
         case pmcmdCreateGLctx:
           // Create a GL context
-          CHK (rqData->Parm.CreateCtx.glW = new glWindow (rqData->Parm.CreateCtx.Width,
-            rqData->Parm.CreateCtx.Height, rqData->Parm.CreateCtx.ContextFlags));
+          rqData->Parm.CreateCtx.glW = new glWindow (rqData->Parm.CreateCtx.Width,
+            rqData->Parm.CreateCtx.Height, rqData->Parm.CreateCtx.ContextFlags);
           if (!rqData->Parm.CreateCtx.glW)
           {
             rc = pmrcGLfailure;
@@ -73,7 +73,7 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
           }
           if (rqData->Parm.CreateCtx.glW->lastError != glerOK)
           {
-            CHK (delete rqData->Parm.CreateCtx.glW);
+            delete rqData->Parm.CreateCtx.glW;
 
             rqData->Parm.CreateCtx.glW = NULL;
             rc = pmrcGLfailure;
@@ -82,7 +82,7 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
           break;
         case pmcmdDestroyGLctx:
           if (rqData->Parm.DestroyCtx.glW)
-            CHKB (delete rqData->Parm.DestroyCtx.glW)
+            delete rqData->Parm.DestroyCtx.glW
           else
             rc = pmrcNotInitialized;
           break;
@@ -156,7 +156,7 @@ static MRESULT EXPENTRY PMmanager (HWND Handle, ULONG Message, MPARAM MsgParm1, 
 
 static void PMthread (void *)
 {
-  CHK (dA = new glApp ());
+  dA = new glApp ();
   if (dA)
   {
     PMmng = dA->CreateWindow (NULL, NULLHANDLE, 0, 0);
@@ -166,7 +166,7 @@ static void PMthread (void *)
       dA->Run ();
       PMmng = NULLHANDLE;
     }
-    CHK (delete dA);
+    delete dA;
   }
 }
 

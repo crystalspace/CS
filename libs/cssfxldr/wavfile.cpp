@@ -114,7 +114,7 @@ csSoundData* WAVLoader::loadsound(UByte* buf, ULong size)
     ptr+=wavchk.len;
   }
   
-  CHK (data=new char[wavchk.len]);
+  data=new char[wavchk.len];
   if(data==NULL)
     goto exit_read;
   
@@ -127,12 +127,12 @@ csSoundData* WAVLoader::loadsound(UByte* buf, ULong size)
   }
 #endif // CS_BIG_ENDIAN
 
-  CHK (sb = new csSoundData(wavhdr.samples_per_sec,
+  sb = new csSoundData(wavhdr.samples_per_sec,
     (wavhdr.bits_per_sample==16)?true:false,
     (wavhdr.channel==2)?true:false,
     (wavhdr.bits_per_sample==16)?true:false,
     (wavhdr.bits_per_sample==16)?(wavchk.len/2)-1:wavchk.len-1,
-    data));
+    data);
 
   if(sb==NULL) goto exit_read;
 

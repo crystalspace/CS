@@ -139,7 +139,7 @@ void select_object (csRenderView* rview, int type, void* entity)
     int i;
     csPolygon2D* polygon = (csPolygon2D*)entity;
     int num = polygon->GetNumVertices ();
-    CHK (csPolygon2D* pp = new csPolygon2D ());
+    csPolygon2D* pp = new csPolygon2D ();
     if (rview->IsMirrored ())
       for (i = 0 ; i < num ; i++)
         pp->AddVertex  (polygon->GetVertices ()[num-i-1]);
@@ -150,7 +150,7 @@ void select_object (csRenderView* rview, int type, void* entity)
         pp->GetNumVertices (), &pp->GetBoundingBox ()) != CS_POLY_OUT)
       Dumper::dump (polygon, "csPolygon2D");
 
-    CHK (delete pp);
+    delete pp;
   }
   else if (type == CALLBACK_SECTOR)
   {

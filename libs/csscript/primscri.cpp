@@ -39,13 +39,13 @@ CmdSequence::CmdSequence  ()
 
 CmdSequence::~CmdSequence ()
 {
-  if (cmds) CHKB (delete [] cmds);
-  if (long_args) CHKB (delete [] long_args);
-  if (flt_args) CHKB (delete [] flt_args);
-  if (mat_args) CHKB (delete [] mat_args);
-  if (vec_args) CHKB (delete [] vec_args);
-  if (seq_args) CHKB (delete [] seq_args);
-  if (cso_names) CHKB (delete [] cso_names);
+  if (cmds) delete [] cmds;
+  if (long_args) delete [] long_args;
+  if (flt_args) delete [] flt_args;
+  if (mat_args) delete [] mat_args;
+  if (vec_args) delete [] vec_args;
+  if (seq_args) delete [] seq_args;
+  if (cso_names) delete [] cso_names;
 }
 
 void CmdSequence::compile_pass1 (char** buf)
@@ -158,13 +158,13 @@ void CmdSequence::compile_pass1 (char** buf)
 
   num_cmds++; // Room for CMD_RETURN
 
-  CHK (cmds = new UByte [num_cmds]);
-  if (num_long_args) CHKB (long_args = new long [num_long_args]);
-  if (num_flt_args) CHKB (flt_args = new float [num_flt_args]);
-  if (num_mat_args) CHKB (mat_args = new csMatrix3 [num_mat_args]);
-  if (num_vec_args) CHKB (vec_args = new csVector3 [num_vec_args]);
-  if (num_seq_args) CHKB (seq_args = new CmdSequence [num_seq_args]);
-  if (num_cso_names) CHKB (cso_names = new csObjName [num_cso_names]);
+  cmds = new UByte [num_cmds];
+  if (num_long_args) long_args = new long [num_long_args];
+  if (num_flt_args) flt_args = new float [num_flt_args];
+  if (num_mat_args) mat_args = new csMatrix3 [num_mat_args];
+  if (num_vec_args) vec_args = new csVector3 [num_vec_args];
+  if (num_seq_args) seq_args = new CmdSequence [num_seq_args];
+  if (num_cso_names) cso_names = new csObjName [num_cso_names];
 }
 
 void CmdSequence::compile_pass2 (char** buf)
@@ -324,7 +324,7 @@ void PrimScript::prepare ()
 
 csRunScript* PrimScript::run_script (csObject* attached)
 {
-  CHK (PrimScriptRun* r = new PrimScriptRun (this, attached));
+  PrimScriptRun* r = new PrimScriptRun (this, attached);
   layer->link_run (r);
   return (csRunScript*)r;
 }
@@ -338,7 +338,7 @@ CmdSequenceRun::CmdSequenceRun ()
 
 CmdSequenceRun::~CmdSequenceRun ()
 {
-  if (vars) CHKB (delete [] vars);
+  if (vars) delete [] vars;
 }
 
 void CmdSequenceRun::start (CmdSequence* seq)
@@ -349,9 +349,9 @@ void CmdSequenceRun::start (CmdSequence* seq)
   cur_mat_arg = 0;
   cur_vec_arg = 0;
   cur_seq_arg = 0;
-  if (vars) { CHK (delete [] vars); vars = NULL; }
+  if (vars) { delete [] vars; vars = NULL; }
   if (seq->num_long_vars)
-    CHKB (vars = new long [seq->num_long_vars]);
+    vars = new long [seq->num_long_vars];
 }
 
 //---------------------------------------------------------------------------

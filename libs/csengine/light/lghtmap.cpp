@@ -34,7 +34,7 @@ csShadowMap::csShadowMap ()
 
 csShadowMap::~csShadowMap ()
 {
-  CHK (delete [] map);
+  delete [] map;
 }
 
 #define lightcell_size	csLightMap::lightcell_size
@@ -42,13 +42,13 @@ csShadowMap::~csShadowMap ()
 
 void csShadowMap::Alloc (csLight*, int w, int h)
 {
-  CHK (delete [] map); map = NULL;
+  delete [] map; map = NULL;
 
   int lw = 1 + ((w + lightcell_size - 1) >> lightcell_shift);
   int lh = 1 + ((h + lightcell_size - 1) >> lightcell_shift);
 
   long lm_size = lw * lh;
-  CHK (map = new unsigned char [lm_size]);
+  map = new unsigned char [lm_size];
   memset (map, 0, lm_size);
 }
 
@@ -57,8 +57,8 @@ void csShadowMap::Alloc (csLight*, int w, int h)
 
 void csShadowMap::CopyLightMap (csShadowMap *source, int size)
 {
-  if (map) CHKB (delete [] map);
-  CHK (map = new unsigned char [size]);
+  if (map) delete [] map;
+  map = new unsigned char [size];
   memcpy (map, source->map, size);
   light = source->light;
 }
@@ -85,7 +85,7 @@ csLightMap::~csLightMap ()
   while (first_smap)
   {
     csShadowMap *smap = first_smap->next;
-    CHK (delete first_smap);
+    delete first_smap;
     first_smap = smap;
   }
   static_lm.Clear ();
@@ -101,12 +101,12 @@ void csLightMap::SetLightCellSize (int size)
 void csLightMap::DelShadowMap (csShadowMap* smap)
 {
   first_smap = smap->next;
-  CHK (delete smap);
+  delete smap;
 }
 
 csShadowMap *csLightMap::NewShadowMap (csLight* light, int w, int h)
 {
-  CHK (csShadowMap *smap = new csShadowMap ());
+  csShadowMap *smap = new csShadowMap ();
   smap->light = light;
   smap->next = first_smap;
   first_smap = smap;
@@ -165,14 +165,14 @@ void csLightMap::CopyLightMap (csLightMap* source)
   while (first_smap)
   {
     smap = first_smap->next;
-    CHK (delete first_smap);
+    delete first_smap;
     first_smap = smap;
   }
 
   smap = source->first_smap;
   while (smap)
   {
-    CHK (smap2 = new csShadowMap ());
+    smap2 = new csShadowMap ();
     smap2->next = first_smap;
     first_smap = smap2;
     smap2->CopyLightMap (smap, lm_size);
@@ -267,7 +267,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
       ps.lm_size != lm_size))
   {
     // Invalid.
-    CHK (delete [] data);
+    delete [] data;
     return false;
   }
 
@@ -280,7 +280,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
   memcpy (static_lm.GetMap (), d, lm_size * 3);
   d += lm_size * 3;
 
-  CHK (delete [] data);
+  delete [] data;
 
   //-------------------------------
   // Now load the dynamic data.
@@ -319,7 +319,7 @@ bool csLightMap::ReadFromCache (int w, int h, csPolygonSet* owner,
     d += lm_size;
   }
 
-  CHK (delete [] data);
+  delete [] data;
 
   return true;
 }
@@ -498,9 +498,9 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   while (smap)
   {
     unsigned char* old_map = smap->map;
-    CHK (smap->map = new unsigned char [lm_size]);
+    smap->map = new unsigned char [lm_size];
     ResizeMap (old_map, oldw, oldh, smap->map, lwidth, lheight);
-    CHK (delete [] old_map);
+    delete [] old_map;
     smap = smap->next;
   }
 }

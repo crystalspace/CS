@@ -60,9 +60,9 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
     // Load arrow and scroller images
     iTextureHandle *scrolltex = app->GetTexture (SCROLLBAR_TEXTURE_NAME);
     for (int i = 0; i < 12; i++)
-      CHKB (sprarrows [i] = new csPixmap (scrolltex, i * 9, 0, 9, 9));
-    CHK (sprscroller [0] = new csPixmap (scrolltex, 12 * 9 + 0, 0, 7, 8));
-    CHK (sprscroller [1] = new csPixmap (scrolltex, 12 * 9 + 7, 0, 8, 7));
+      sprarrows [i] = new csPixmap (scrolltex, i * 9, 0, 9, 9);
+    sprscroller [0] = new csPixmap (scrolltex, 12 * 9 + 0, 0, 7, 8);
+    sprscroller [1] = new csPixmap (scrolltex, 12 * 9 + 7, 0, 8, 7);
   } /* endif */
 
   TrackScroller = false;
@@ -72,14 +72,14 @@ csScrollBar::csScrollBar (csComponent *iParent, csScrollBarFrameStyle iFrameStyl
   // create both scroll buttons
   csButtonFrameStyle bfs = (FrameStyle == cssfsThickRect ? csbfsThickRect : csbfsThinRect);
   const int bs = CSBS_NOMOUSEFOCUS | CSBS_NODEFAULTBORDER;
-  CHK (scroller = new csButton (this, cscmdNothing, bs, bfs));
-  CHK (topleft  = new csButton (this, cscmdNothing, bs, bfs));
+  scroller = new csButton (this, cscmdNothing, bs, bfs);
+  topleft  = new csButton (this, cscmdNothing, bs, bfs);
   topleft->id = SCROLL_UL;
-  CHK (botright = new csButton (this, cscmdNothing, bs, bfs));
+  botright = new csButton (this, cscmdNothing, bs, bfs);
   botright->id = SCROLL_DR;
 
   // create repeat timer
-  CHK (timer = new csTimer (this, SCROLL_REPEAT_INTERVAL));
+  timer = new csTimer (this, SCROLL_REPEAT_INTERVAL);
 }
 
 csScrollBar::~csScrollBar ()
@@ -88,11 +88,11 @@ csScrollBar::~csScrollBar ()
   {
     for (int i = 0; i < 12; i++)
     {
-      CHK (delete sprarrows [i]);
+      delete sprarrows [i];
       sprarrows [i] = NULL;
     } /* endfor */
-    CHK (delete sprscroller [0]); sprscroller[0] = NULL;
-    CHK (delete sprscroller [1]); sprscroller[1] = NULL;
+    delete sprscroller [0]; sprscroller[0] = NULL;
+    delete sprscroller [1]; sprscroller[1] = NULL;
   } /* endif */
 }
 

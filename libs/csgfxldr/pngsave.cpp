@@ -155,7 +155,7 @@ error2:
    * layout, however, so choose what fits your needs best).  You need to
    * use the first method if you aren't handling interlacing yourself.
    */
-  CHK (png_bytep *row_pointers = new png_bytep [height]);
+  png_bytep *row_pointers = new png_bytep [height];
   UByte *ImageData = (UByte *)Image->GetImageData ();
   for (int i = 0; i < height; i++)
     row_pointers [i] = ImageData + i * rowlen;

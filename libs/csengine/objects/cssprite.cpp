@@ -47,15 +47,15 @@ csFrame::csFrame (int anm_idx, int tex_idx)
 
 csFrame::~csFrame ()
 {
-  CHK (delete [] name);
+  delete [] name;
 }
 
 void csFrame::SetName (char * n)
 {
-  CHK (delete [] name);
+  delete [] name;
   if (n)
   {
-    CHK (name = new char [strlen (n)+1]);
+    name = new char [strlen (n)+1];
     strcpy (name, n);
   }
   else
@@ -71,15 +71,15 @@ csSpriteAction::csSpriteAction() : frames (8, 8), delays (8, 8)
 
 csSpriteAction::~csSpriteAction()
 {
-  CHK (delete [] name);
+  delete [] name;
 }
 
 void csSpriteAction::SetName (char *n)
 {
-  CHK (delete [] name);
+  delete [] name;
   if (n)
   {
-    CHK (name = new char [strlen (n) + 1]);
+    name = new char [strlen (n) + 1];
     strcpy (name, n);
   }
   else
@@ -107,7 +107,7 @@ csSpriteTemplate::csSpriteTemplate ()
   texel_to_normal = NULL;
   normal_mesh = NULL;
 
-  CHK (texel_mesh = new csTriangleMesh ());
+  texel_mesh = new csTriangleMesh ();
 
   texel_to_vertex = NULL;
   vertex_mesh = NULL;
@@ -117,16 +117,16 @@ csSpriteTemplate::csSpriteTemplate ()
 
 csSpriteTemplate::~csSpriteTemplate ()
 {
-  CHK (delete texel_mesh);
-  CHK (delete [] emerge_from);
-  CHK (delete skeleton);
-  CHK (delete tri_verts);
+  delete texel_mesh;
+  delete [] emerge_from;
+  delete skeleton;
+  delete tri_verts;
 
-  CHK (delete normal_mesh);
-  CHK (delete [] texel_to_normal);
+  delete normal_mesh;
+  delete [] texel_to_normal;
 
-  CHK (delete vertex_mesh);
-  CHK (delete [] texel_to_vertex);
+  delete vertex_mesh;
+  delete [] texel_to_vertex;
 }
 
 void csSpriteTemplate::AddVertices (int num)
@@ -145,10 +145,10 @@ void csSpriteTemplate::AddVertices (int num)
 
   if (NormalsAreCompressed ())
   {
-    CHK (int* ttn = new int [GetNumTexels() + num]);
+    int* ttn = new int [GetNumTexels() + num];
     for (vertex = 0; vertex < GetNumTexels(); vertex++)
       ttn [vertex] = texel_to_normal [vertex];
-    CHK (delete[] texel_to_normal);
+    delete[] texel_to_normal;
     texel_to_normal = ttn;
     for (vertex = 0; vertex < num; vertex++)
       texel_to_normal [GetNumTexels() + vertex] = GetNumNormals  () + vertex;
@@ -159,10 +159,10 @@ void csSpriteTemplate::AddVertices (int num)
 
   if (VerticesAreCompressed ())
   {
-    CHK (int* ttv = new int [GetNumTexels() + num]);
+    int* ttv = new int [GetNumTexels() + num];
     for (vertex = 0; vertex < GetNumTexels(); vertex++)
       ttv [vertex] = texel_to_vertex [vertex];
-    CHK (delete[] texel_to_vertex);
+    delete[] texel_to_vertex;
     texel_to_vertex = ttv;
     for (vertex = 0; vertex < num; vertex++)
       texel_to_vertex [GetNumTexels() + vertex] = GetNumVertices () + vertex;
@@ -184,14 +184,14 @@ void csSpriteTemplate::AddTriangle (int a, int b, int c)
 
 void csSpriteTemplate::SetSkeleton (csSkeleton* sk)
 {
-  CHK (delete skeleton);
+  delete skeleton;
   skeleton = sk;
 }
 
 csSprite3D* csSpriteTemplate::NewSprite ()
 {
   csSprite3D* spr;
-  CHK (spr = new csSprite3D ());
+  spr = new csSprite3D ();
   spr->SetTemplate (this);
   spr->SetAction ("default");
   spr->InitSprite ();
@@ -208,7 +208,7 @@ return;
   //@@@ turn this into a parameter or member variable?
   int lod_base_frame = 0;
 
-  CHK (csVector3* v = new csVector3[GetNumTexels()]);
+  csVector3* v = new csVector3[GetNumTexels()];
 
   if (VerticesAreCompressed ())
   {
@@ -221,26 +221,26 @@ return;
       v[i] = GetVertex (lod_base_frame, i);
   }
 
-  CHK (csTriangleVertices* verts = new csTriangleVertices (texel_mesh, v, GetNumTexels()));
-  CHK (delete [] v);
+  csTriangleVertices* verts = new csTriangleVertices (texel_mesh, v, GetNumTexels());
+  delete [] v;
 
-  CHK (delete [] emerge_from);
-  CHK (emerge_from = new int [GetNumTexels()]);
-  CHK (int* translate = new int [GetNumTexels()]);
-  CHK (csTriangleMesh* new_mesh = new csTriangleMesh (*texel_mesh));
+  delete [] emerge_from;
+  emerge_from = new int [GetNumTexels()];
+  int* translate = new int [GetNumTexels()];
+  csTriangleMesh* new_mesh = new csTriangleMesh (*texel_mesh);
 
   csLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
   for (i = 0 ; i < texels.Length () ; i++)
   {
     int j;
-    CHK (csVector2* new_texels = new csVector2 [GetNumTexels()]);
+    csVector2* new_texels = new csVector2 [GetNumTexels()];
     csPoly2D* tx = texels.Get(i);
     for (j = 0 ; j < GetNumTexels() ; j++)
       new_texels[translate[j]] = (*tx)[j];
     for (j = 0 ; j < GetNumTexels() ; j++)
       (*tx)[j] = new_texels[j];
-    CHK (delete [] new_texels);
+    delete [] new_texels;
   }
 
   if (skeleton) skeleton->RemapVertices (translate);
@@ -255,25 +255,25 @@ return;
 
   if (NormalsAreCompressed ())
   {
-    CHK (int* ttn = new int [GetNumTexels()]);
+    int* ttn = new int [GetNumTexels()];
     for (i = 0 ; i < GetNumTexels() ; i++)
       ttn[translate[i]] = texel_to_normal[i];
-    CHK (delete [] texel_to_normal);
+    delete [] texel_to_normal;
     texel_to_normal = ttn;
   }
 
   if (VerticesAreCompressed ())
   {
-    CHK (int* ttv = new int [GetNumTexels()]);
+    int* ttv = new int [GetNumTexels()];
     for (i = 0 ; i < GetNumTexels() ; i++)
       ttv[translate[i]] = texel_to_vertex[i];
-    CHK (delete [] texel_to_vertex);
+    delete [] texel_to_vertex;
     texel_to_vertex = ttv;
   }
 
-  CHK (delete [] translate);
-  CHK (delete verts);
-  CHK (delete new_mesh);
+  delete [] translate;
+  delete verts;
+  delete new_mesh;
 }
 
 void csSpriteTemplate::ComputeBoundingBox ()
@@ -307,10 +307,10 @@ void csSpriteTemplate::ComputeBoundingBox ()
 
 csFrame* csSpriteTemplate::AddFrame ()
 {
-  CHK (csFrame* fr = new csFrame (frames.Length(), texels.Length()));
-  CHK (csPoly3D* nr = new csPoly3D ());
-  CHK (csPoly2D* tx = new csPoly2D ());
-  CHK (csPoly3D* vr = new csPoly3D ());
+  csFrame* fr = new csFrame (frames.Length(), texels.Length());
+  csPoly3D* nr = new csPoly3D ();
+  csPoly2D* tx = new csPoly2D ();
+  csPoly3D* vr = new csPoly3D ();
 
   if (frames.Length() > 0)
   {
@@ -338,7 +338,7 @@ csFrame* csSpriteTemplate::FindFrame (char *n)
 
 csSpriteAction* csSpriteTemplate::AddAction ()
 {
-  CHK (csSpriteAction* a = new csSpriteAction ());
+  csSpriteAction* a = new csSpriteAction ();
   actions.Push (a);
   return a;
 }
@@ -371,14 +371,14 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
 
   if (!tri_verts)
   {
-    CHK (tri_verts = new csTriangleVertices (texel_mesh, object_verts, GetNumTexels()));
+    tri_verts = new csTriangleVertices (texel_mesh, object_verts, GetNumTexels());
   }
 
   int i, j;
   csTriangle * tris = texel_mesh->GetTriangles();
   int num_triangles = texel_mesh->GetNumTriangles();
   // @@@ Avoid this allocate!
-  CHK (csVector3 * tri_normals = new csVector3[num_triangles]);
+  csVector3 * tri_normals = new csVector3[num_triangles];
 
   // calculate triangle normals
   // get the cross-product of 2 edges of the triangle and normalize it
@@ -430,7 +430,7 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
     }
   }
 
-  CHK (delete[] tri_normals);
+  delete[] tri_normals;
 }
 
 
@@ -450,8 +450,8 @@ int csSpriteTemplate::MergeVertices (csFrame * frame)
   csPoly3D* verts = vertices.Get (frame->GetAnmIndex ());
 
   // create an array of ints which maps old vertex indices to new ones
-  CHK (int* new_vertices = new int [GetNumVertices()]);
-  CHK (int* old_vertices = new int [GetNumVertices()]);
+  int* new_vertices = new int [GetNumVertices()];
+  int* old_vertices = new int [GetNumVertices()];
 
   // map the first new vertex to the first old vertex
   new_vertices[0] = 0;
@@ -514,13 +514,13 @@ int csSpriteTemplate::MergeVertices (csFrame * frame)
   for (int i = 0; i < GetNumTexels(); i++)
     ttv[i] = old_vertices[texel_to_vertex[i]];
   if (texel_to_vertex)
-    CHK (delete [] texel_to_vertex);
+    delete [] texel_to_vertex;
   texel_to_vertex = ttv;
 
 #endif
 
-  CHK (delete [] new_vertices);
-  CHK (delete [] old_vertices);
+  delete [] new_vertices;
+  delete [] old_vertices;
 
   return redundant_vertex_count;
 }
@@ -532,8 +532,8 @@ int csSpriteTemplate::MergeNormals (csFrame * frame)
   csPoly3D* verts = vertices.Get (frame->GetAnmIndex ());
 
   // create an array of ints which maps old vertex indices to new ones
-  CHK (int* new_vertices = new int [GetNumNormals()]);
-  CHK (int* old_vertices = new int [GetNumNormals()]);
+  int* new_vertices = new int [GetNumNormals()];
+  int* old_vertices = new int [GetNumNormals()];
 
   // map the first new vertex to the first old vertex
   new_vertices[0] = 0;
@@ -597,13 +597,13 @@ int csSpriteTemplate::MergeNormals (csFrame * frame)
   for (int i = 0; i < GetNumTexels(); i++)
     ttn[i] = old_vertices[texel_to_normal[i]];
   if (texel_to_normal)
-    CHK (delete [] texel_to_normal);
+    delete [] texel_to_normal;
   texel_to_normal = ttn;
 
 #endif
 
-  CHK (delete [] new_vertices);
-  CHK (delete [] old_vertices);
+  delete [] new_vertices;
+  delete [] old_vertices;
 
   return redundant_vertex_count;
 }
@@ -619,7 +619,7 @@ int csSpriteTemplate::MergeTexels ()
 
   // start a count and a list of unique texel maps
   int unique_texel_map_count;
-  CHK (csPoly2D** unique_texel_maps = new csPoly2D* [frames.Length()]);
+  csPoly2D** unique_texel_maps = new csPoly2D* [frames.Length()];
 
   // add the first frame to the unique texel map list
   unique_texel_maps [0] = texels.Get (GetFrame (0)->GetTexIndex ());
@@ -692,7 +692,7 @@ int csSpriteTemplate::MergeTexels ()
     }
   }
 
-  CHK (delete[] unique_texel_maps);
+  delete[] unique_texel_maps;
 
   return same_count;
 }
@@ -720,7 +720,7 @@ csSprite::csSprite () : csObject (), bbox (NULL)
 
 csSprite::~csSprite ()
 {
-  while (dynamiclights) CHKB (delete dynamiclights);
+  while (dynamiclights) delete dynamiclights;
   csWorld::current_world->UnlinkSprite (this);
   //RemoveFromSectors ();
 }
@@ -839,8 +839,8 @@ csSprite3D::~csSprite3D ()
   obj_verts.DecRef ();
   tween_verts.DecRef ();
 
-  CHK (delete [] vertex_colors);
-  CHK (delete skeleton_state);
+  delete [] vertex_colors;
+  delete skeleton_state;
 }
 
 void csSprite3D::SetPosition (const csVector3& p)
@@ -903,7 +903,7 @@ void csSprite3D::Transform (csMatrix3& matrix)
 void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
 {
   tpl = tmpl;
-  CHK (delete skeleton_state);
+  delete skeleton_state;
   skeleton_state = NULL;
   if (tmpl->GetSkeleton ()) skeleton_state = (csSkeletonState*)tmpl->GetSkeleton ()->CreateState ();
 }
@@ -958,7 +958,7 @@ void csSprite3D::SetVertexColor (int i, const csColor& col)
 {
   if (!vertex_colors)
   {
-    CHK (vertex_colors = new csColor [tpl->GetNumTexels ()]);
+    vertex_colors = new csColor [tpl->GetNumTexels ()];
     int j;
     for (j = 0 ; j < tpl->GetNumTexels (); j++)
       vertex_colors[j].Set (0, 0, 0);
@@ -970,7 +970,7 @@ void csSprite3D::AddVertexColor (int i, const csColor& col)
 {
   if (!vertex_colors)
   {
-    CHK (vertex_colors = new csColor [tpl->GetNumTexels ()]);
+    vertex_colors = new csColor [tpl->GetNumTexels ()];
     int j;
     for (j = 0 ; j < tpl->GetNumTexels (); j++)
       vertex_colors[j].Set (0, 0, 0);
@@ -983,7 +983,7 @@ void csSprite3D::ResetVertexColors ()
   if (vertex_colors)
     for (int i = 0 ; i < tpl->GetNumTexels (); i++)
       vertex_colors [i].Set (0, 0, 0);
-  //CHK (delete [] vertex_colors);
+  //delete [] vertex_colors;
   //vertex_colors = NULL;
 }
 

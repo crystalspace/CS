@@ -76,11 +76,11 @@ csApp::csApp (const char *AppTitle, csAppBackgroundStyle iBackgroundStyle) : csC
   SetPalette (CSPAL_APP);
   state |= CSS_VISIBLE | CSS_SELECTABLE | CSS_FOCUSED;
 
-  CHK (Mouse = new csMouse (NULL));
+  Mouse = new csMouse (NULL);
   Mouse->app = this;
 
   // Create the system driver object
-  CHK (System = new cswsSystemDriver (this));
+  System = new cswsSystemDriver (this);
 }
 
 csApp::~csApp ()
@@ -89,20 +89,20 @@ csApp::~csApp ()
   DeleteAll ();
 
   if (titlebardefs)
-    CHKB (delete titlebardefs);
+    delete titlebardefs;
   if (dialogdefs)
-    CHKB (delete dialogdefs);
+    delete dialogdefs;
 
   if (Mouse)
-    CHKB (delete Mouse);
+    delete Mouse;
   if (GfxPpl)
-    CHKB (delete GfxPpl);
+    delete GfxPpl;
 
   // Delete all textures prior to deleting the texture manager
   Textures.DeleteAll ();
 
   if (System)
-    CHK (delete System);
+    delete System;
 }
 
 void csApp::printf (int mode, char* str, ...)
@@ -127,7 +127,7 @@ bool csApp::InitialSetup (int argc, const char* const argv[],
     return false;
 
   // Create the graphics pipeline
-  CHK (GfxPpl = new csGraphicsPipeline (System));
+  GfxPpl = new csGraphicsPipeline (System);
 
   // For GUI apps double buffering is a serious performance hit
   System->G2D->DoubleBuffer (false);
@@ -244,14 +244,14 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   if (cmd == PARSERR_TOKENNOTFOUND)
   {
     printf (MSG_WARNING, "Unknown texture parameter keyword detected: '%s'\n", bufptr);
-    CHK (delete [] buffer);
+    delete [] buffer;
     return false;
   }
 
   // Now load the texture
   size_t size;
   char *fbuffer = System->VFS->ReadFile (filename, size);
-  CHK (delete [] buffer);
+  delete [] buffer;
   if (!fbuffer || !size)
   {
     printf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
@@ -261,7 +261,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   iTextureManager *txtmgr = System->G3D->GetTextureManager ();
   iImage *image = csImageLoader::Load ((UByte *)fbuffer, size,
     txtmgr->GetTextureFormat ());
-  CHK (delete [] fbuffer);
+  delete [] fbuffer;
 
   csWSTexture *tex = new csWSTexture (iTexName, image, iFlags);
   image->DecRef ();
@@ -282,9 +282,9 @@ void csApp::LoadConfig ()
   TOKEN_TABLE_END
 
   if (!titlebardefs)
-    CHKB (titlebardefs = new csStrVector (16, 16));
+    titlebardefs = new csStrVector (16, 16);
   if (!dialogdefs)
-    CHKB (dialogdefs = new csStrVector (16, 16));
+    dialogdefs = new csStrVector (16, 16);
 
   size_t cswscfglen;
   char *cswscfg = System->VFS->ReadFile (CSWS_CFG, cswscfglen);
@@ -307,14 +307,14 @@ void csApp::LoadConfig ()
       }
       case TOKEN_TITLEBUTTON:
       {
-        CHK (char *tmp = new char [strlen (name) + 1 + strlen (params) + 1]);
+        char *tmp = new char [strlen (name) + 1 + strlen (params) + 1];
         sprintf (tmp, "%s %s", name, params);
         titlebardefs->Push (tmp);
         break;
       }
       case TOKEN_DIALOGBUTTON:
       {
-        CHK (char *tmp = new char [strlen (name) + 1 + strlen (params) + 1]);
+        char *tmp = new char [strlen (name) + 1 + strlen (params) + 1];
         sprintf (tmp, "%s %s", name, params);
         dialogdefs->Push (tmp);
         break;
@@ -326,7 +326,7 @@ void csApp::LoadConfig ()
         printf (MSG_FATAL_ERROR, "Unknown token in csws.cfg! (%s)\n", cfg);
         fatal_exit (0, false);			// Unknown token
     }
-  CHK (delete[] cswscfg);
+  delete[] cswscfg;
 }
 
 void csApp::PrepareTextures ()
@@ -417,7 +417,7 @@ bool csApp::ProcessEvents ()
     {
       // nobody handled the event, do nothing
     }  
-    CHK (delete ev);
+    delete ev;
   }
 
   // Broadcast a "post-process" event
@@ -551,7 +551,7 @@ bool csApp::HandleEvent (csEvent &Event)
 
 void csApp::WindowList ()
 {
-  CHK (csWindowList *wl = new csWindowList (this));
+  csWindowList *wl = new csWindowList (this);
   int x, y;
   GetMouse ()->GetPosition (x, y);
   int w = WindowListWidth;

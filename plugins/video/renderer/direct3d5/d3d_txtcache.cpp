@@ -83,7 +83,7 @@ void D3DTextureCache::Load(csD3DCacheData *d)
   IDirectDrawSurface* lpDDNextLevel;
   
   DDCOLORKEY key = { 0, 0 };
-  CHK (cached_texture = new D3DTextureCache_Data);
+  cached_texture = new D3DTextureCache_Data;
   
   iTextureHandle* txt_handle = (iTextureHandle*)d->pSource;
   csTextureMM* txt_mm = (csTextureMM*)txt_handle->GetPrivateObject ();
@@ -426,7 +426,7 @@ else mean = total_size/num;
 
 void D3DLightMapCache::Load(csD3DCacheData *d)
 {
-  CHK (D3DLightCache_Data *cached_texture = new D3DLightCache_Data);
+  D3DLightCache_Data *cached_texture = new D3DLightCache_Data;
   d->pData = cached_texture;
   
   iLightMap *piLM = QUERY_INTERFACE(d->pSource, iLightMap);

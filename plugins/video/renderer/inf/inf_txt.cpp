@@ -125,7 +125,7 @@ iTextureHandle *csTextureManagerInfinite::RegisterTexture (iImage* image,
 {
   if (!image) return NULL;
 
-  CHK (csTextureMMInfinite *txt = new csTextureMMInfinite (image, flags));
+  csTextureMMInfinite *txt = new csTextureMMInfinite (image, flags);
   textures.Push (txt);
   return txt;
 }

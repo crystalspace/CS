@@ -72,7 +72,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     CsPrintf (MSG_FATAL_ERROR, "No iWorld plugin!\n");
     abort ();
   }
-  CHK (world = World->GetCsWorld ());
+  world = World->GetCsWorld ();
   World->DecRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.

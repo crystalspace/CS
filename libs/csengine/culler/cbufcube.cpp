@@ -112,25 +112,25 @@ bool csCBufferPersp::TestPolygon (csVector3* verts, int num_verts,
 
 csCBufferCube::csCBufferCube (int dim)
 {
-  CHK (trees[0] = new csCBufferPersp (0, dim-1, dim));
-  CHK (trees[1] = new csCBufferPersp (0, dim-1, dim));
-  CHK (trees[2] = new csCBufferPersp (0, dim-1, dim));
-  CHK (trees[3] = new csCBufferPersp (0, dim-1, dim));
-  CHK (trees[4] = new csCBufferPersp (0, dim-1, dim));
-  CHK (trees[5] = new csCBufferPersp (0, dim-1, dim));
+  trees[0] = new csCBufferPersp (0, dim-1, dim);
+  trees[1] = new csCBufferPersp (0, dim-1, dim);
+  trees[2] = new csCBufferPersp (0, dim-1, dim);
+  trees[3] = new csCBufferPersp (0, dim-1, dim);
+  trees[4] = new csCBufferPersp (0, dim-1, dim);
+  trees[5] = new csCBufferPersp (0, dim-1, dim);
   csBox2 b (0, 0, dim, dim);
-  CHK (clipper = new csBoxClipper (b));
+  clipper = new csBoxClipper (b);
 }
 
 csCBufferCube::~csCBufferCube ()
 {
-  CHK (delete trees[0]);
-  CHK (delete trees[1]);
-  CHK (delete trees[2]);
-  CHK (delete trees[3]);
-  CHK (delete trees[4]);
-  CHK (delete trees[5]);
-  CHK (delete clipper);
+  delete trees[0];
+  delete trees[1];
+  delete trees[2];
+  delete trees[3];
+  delete trees[4];
+  delete trees[5];
+  delete clipper;
 }
 
 void csCBufferCube::MakeEmpty ()
