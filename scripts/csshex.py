@@ -12,5 +12,6 @@ UserImports = ['csshex', 'sys', 'os']
 
 UserAlias={
 	'quit':'sys.exit(0)', 
+	'exit':'sys.exit(0)', 
 	'dir':'do_listdir(".")', 
 };
