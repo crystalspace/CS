@@ -170,19 +170,6 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
   object_reg->Register (imageio, "iImageIO");
 
   //---------
-  // AWS
-  //---------
-  aws = CS_LOAD_PLUGIN (plugmgr, "crystalspace.window.alternatemanager", iAws);
-  if (!aws)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-      "crystalspace.tools.vidprefs",
-      "Couldn't load AWS plugin!");
-    return false;
-  }
-  object_reg->Register (aws, "iAws");
-
-  //---------
   // iFontServer
   //---------
   fontserv = CS_LOAD_PLUGIN (plugmgr, "crystalspace.font.server.default",
@@ -223,6 +210,18 @@ bool csVideoPreferences::Setup (iObjectRegistry* object_reg)
   }
   object_reg->Register (g2d, "iGraphics2D");
 
+  //---------
+  // AWS
+  //---------
+  aws = CS_LOAD_PLUGIN (plugmgr, "crystalspace.window.alternatemanager", iAws);
+  if (!aws)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      "crystalspace.tools.vidprefs",
+      "Couldn't load AWS plugin!");
+    return false;
+  }
+  object_reg->Register (aws, "iAws");                                            
   exit_loop = false;
 
   // Open the main system. This will open all the previously loaded plug-ins.
