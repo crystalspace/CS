@@ -48,7 +48,6 @@ MSVC.MAKE.FLAGS = \
   CSPYTHON_MSVC_EXCLUDE=yes
 
 MSVC.PLUGINS.REQUIRED =         \
-  apps/import/caltocs		\
   cscript/cspython              \
   documentsystem/xml            \
   filesys/vfs			\

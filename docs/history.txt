@@ -10,6 +10,8 @@ chronological order.
         - Philip Wyett changed #include "cal3d/cal3d" to
           #include <cal3d/cal3d.h> and dropped below other includes fixing
           all the makedep warnings.
+        - Philip Wyett removed caltocs due to lack of general support
+          and maintenance.
 10-Aug-2003
 	- Peter Amstutz added a check to "scan.cpp" of the software
 	  renderer so that it would not defer a null pointer (and hence crash)
