@@ -1131,6 +1131,11 @@ struct iEngine : public iBase
    *   let the method fail.)
    */
   virtual bool SetCurrentDefaultRenderloop (iRenderLoop* loop) = 0;
+
+  /**
+   * Get the current framenumber. This should be incremented once every Draw
+   */
+  virtual uint32 GetCurrentFrameNumber () = 0;
 };
 
 /** @} */

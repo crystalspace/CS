@@ -430,6 +430,9 @@ private:
   /// Store virtual clock to speed up time queries.
   csRef<iVirtualClock> virtual_clock;
 
+  /// Store the current framenumber. Is incremented every Draw ()
+  uint32 current_framenumber;
+
 private:
   /**
    * Setup for starting a Draw or DrawFunc.
@@ -1063,6 +1066,12 @@ public:
   virtual iRenderLoopManager* GetRenderLoopManager ();
   virtual iRenderLoop* GetCurrentDefaultRenderloop ();
   virtual bool SetCurrentDefaultRenderloop (iRenderLoop* loop);
+
+  /**
+   * Get the current framenumber. This should be incremented once every Draw
+   */
+  virtual uint32 GetCurrentFrameNumber ()
+  { return current_framenumber; };
 
 private:
   /// Resizes frame width and height dependent data members

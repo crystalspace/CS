@@ -750,7 +750,7 @@ csEngine::csEngine (iBase *iParent) :
   resize = false;
 
   renderLoopManager = 0;
-
+  current_framenumber = 0;
   ClearRenderPriorities ();
 }
 
@@ -1698,6 +1698,8 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 void csEngine::Draw (iCamera *c, iClipper2D *view)
 {
   ControlMeshes ();
+  
+  current_framenumber++;
 
   csRenderView rview (c, view, G3D, G2D);
   StartDraw (c, view, rview);
@@ -1731,6 +1733,7 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 void csEngine::Draw (iCamera *c, iClipper2D *view)
 {
   top_clipper = view;
+  current_framenumber++;
   defaultRenderLoop->Draw (c, view);
 }
 
