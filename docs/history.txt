@@ -66,7 +66,7 @@ chronological order.
 	  the project has been configured.
 	- Eric Sunshine changed configure.ac so that it emits the header
 	  property CS_USE_FAKE_SOCKLEN_TYPE to csconfig.h rather than emitting
-	  the explicit 'typedef int socklen_t'. csdef.h now fakes up socklent_t
+	  the explicit '#define socklen_t int'. csdef.h now fakes up socklent_t
 	  in an appropriate manner if CS_USE_FAKE_SOCKLEN_TYPE is defined.
 	- Eric Sunshine fixed bug in the ObjTagMetaData rule (unix.jam) where
 	  it was placing plugin meta-data in a section named ".crystal",
