@@ -933,7 +933,6 @@ APPLY_FOR_EACH_INTERFACE
 // iutil/event.h
 %extend iEvent
 {
-	const csEventKeyData Key;
 	const csEventMouseData Mouse;
 	const csEventJoystickData Joystick;
 	const csEventCommandData Command;
@@ -951,8 +950,6 @@ APPLY_FOR_EACH_INTERFACE
 
 // iutil/event.h
 %{
-	csEventKeyData * iEvent_Key_get (iEvent * event)
-		{ return &event->Key; }
 	csEventMouseData * iEvent_Mouse_get (iEvent * event)
 		{ return &event->Mouse; }
 	csEventJoystickData * iEvent_Joystick_get (iEvent * event)
