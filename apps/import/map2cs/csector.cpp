@@ -135,11 +135,11 @@ bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
     CreateNode (sector, "cullerp", "crystalspace.culling.dynavis");
   }
 
-  if (m_IsDefaultsector && pWorld->NeedSkysector())
+/*  if (m_IsDefaultsector && pWorld->NeedSkysector())
   {
     pWorld->WriteSky(node);
   }
-  else
+  else*/
   {
     if (m_Portals.Length() > 0)
     {

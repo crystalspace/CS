@@ -5,6 +5,13 @@ The history order is reversed so that new features are at the top.
 	  non-Intel-endian systems.
 	- Reverted the lightmap changes as it prevented proper loading of
 	  lightmaps on intel-endian systems.
+	- res made the following changes:
+	    - commented out the XML test code in csparser and added it to the
+	      TinyXML docsys plugin instead.
+	    - added a document system multiplexer.
+	    - changed in mkverres.sh '(c) 2003' to 2002  .
+	    - map2cs used to write sky info twice if there was only the default
+	      sector.
 14-Mar-2003
 	- Eric Sunshine corrected spelling mistake in Doxygen comment for
 	  iMovable which was noted by <shri@vitalstate.co.uk>.

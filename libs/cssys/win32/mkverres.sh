@@ -26,6 +26,12 @@ cat > ${outfile} << EOF
 
 1 VERSIONINFO
 FILEVERSION ${fileversion}
+PRODUCTVERSION ${fileversion}
+#ifdef CS_DEBUG
+FILEFLAGS 0x1
+#else
+FILEFLAGS 0x0
+#endif
 {
   BLOCK "StringFileInfo"
   {
@@ -34,7 +40,7 @@ FILEVERSION ${fileversion}
       VALUE "ProductName", "CrystalSpace"
       VALUE "ProductVersion", CS_VERSION_W_DATE
       VALUE "FileVersion", CS_VERSION_NUMBER
-      VALUE "LegalCopyright", "(C)1998-2002 Jorrit Tyberghein and others."
+      VALUE "LegalCopyright", "(C)1998-2003 Jorrit Tyberghein and others."
       VALUE "FileDescription", "${description}"
 #ifdef CS_DEBUG
       VALUE "Comments", "Debug build"

@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Binary document system submakefile
+# TinyXML document system submakefile
 #------------------------------------------------------------------------------
 DESCRIPTION.xmltiny = Crystal Space TinyXML document system
 

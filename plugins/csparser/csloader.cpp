@@ -325,6 +325,22 @@ void csLoader::ReportWarning (const char* id, iDocumentNode* node, const char* d
 bool csLoader::TestXml (const char* file, iDataBuffer* buf,
 	csRef<iDocument>& doc)
 {
+  // @@@ Move to some better place
+  csRef<iDocumentSystem> xml (
+      CS_QUERY_REGISTRY (object_reg, iDocumentSystem));
+  if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
+  doc = xml->CreateDocument ();
+  const char* error = doc->Parse (buf);
+  if (error != NULL)
+  {
+    ReportError (
+	    "crystalspace.maploader.parse.xml",
+	    "Document system error for file '%s': %s!", error, file);
+    doc = NULL;
+    return false;
+  }
+
+/*
   const char* b = **buf;
   while (*b == ' ' || *b == '\n' || *b == '\t') b++;
   if (*b == '<')
@@ -347,6 +363,7 @@ bool csLoader::TestXml (const char* file, iDataBuffer* buf,
       return false;
     }
   }
+*/
   return true;
 }
 
