@@ -13,6 +13,9 @@ The history order is reversed so that new features are at the top.
 	  option implies '-nosplit'.
 	- Javier Santos worked on the CS Schema definition for the map
 	  format. Still incomplete but you can find it in scripts/xml.
+	- Keith Fulton added support in the sequence manager for
+	  dynamic ambient light.  New commands are <setambient> and
+	  <fadeambient>.  See flarge world for examples of usage.
 4-Dec-2002
 	- Added iDocumentNode->Equals() to compare two nodes. Comparing
 	  the pointers doesn't work because these are only wrappers
