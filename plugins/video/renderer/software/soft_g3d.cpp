@@ -555,7 +555,9 @@ STDMETHODIMP csGraphics3DSoftware::Initialize ()
   m_piG2D->Initialize ();
   txtmgr->InitSystem ();
 
+#ifdef DO_MMX
   do_mmx = config->GetYesNo ("Hardware", "MMX", true);
+#endif
   do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
     config->GetYesNo ("Hardware", "INTERLACING", false));
