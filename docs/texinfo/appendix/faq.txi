@@ -184,7 +184,7 @@ a 3D card that is supported by OpenGL then you should make sure you have
 recent drivers for that card and that they are properly configured.
 
 @strong{A2}: Note that some operations in Crystal Space require the
-existance of a stencil buffer. If there is no hardware stencil available
+existence of a stencil buffer. If there is no hardware stencil available
 OpenGL will revert to using software which is very slow. Some 3D cards
 only have hardware stencil in some display modes. For example ATI and
 nVidia cards only have accelerated stencil in 24/32-bit color mode and

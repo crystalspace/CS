@@ -13,4 +13,4 @@ length argument list specified with a printf-style format string.
 Supported types are: int, float, double, string and script object.
 
 The interface is fully documented in the Public API Reference, so this
-page is only here to draw attention to its existance.
+page is only here to draw attention to its existence.

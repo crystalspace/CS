@@ -3,20 +3,22 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
-01-Juj-2003
-	- HangDude 
-	   - moved anonrndbuf.h from csutil to cstool (on Jorrit's request)
-	   - added LGPL notice
-	   - updated genmesh because of that change
+02-Jul-2003
+	- Eric Sunshine fixed some spelling errors in the user manual pointed
+	  out by Vincent Knecht <vince@iefr.ath.cx>: existance -> existence
+01-Jul-2003
+	- HangDude made the following changes:
+	   - Moved anonrndbuf.h from csutil to cstool (on Jorrit's request).
+	   - Added LGPL notice.
+	   - Updated genmesh because of that change.
 	- res fixed rlsstencil.mak which got messed up when the plugin name
 	  was changed.
 	- Matze moved CFLAGS from mk/jam/variant.jam to Jamrules to not enforce
 	  external projects to the same flags as CS is using
-	- Anders Stenberg 
-	  - fixed a bug in stdrep where it assumed that the renderer was 
+	- Anders Stenberg made the following changes:
+	  - Fixed a bug in stdrep where it assumed that the renderer was
 	    in 2d mode.
-	  - added console output to r3dtest. Can be toggled with TAB.
-	
+	  - Added console output to r3dtest. Can be toggled with TAB.
 29-Jun-2003
 	- Luca fixed the inconcistency of properties read and written by
 	  Set/GetProperty in the awsScrollBar class. He updated the texinfo
@@ -34,7 +36,7 @@ The history order is reversed so that new features are at the top.
         - JTarbox fixed it so the fast_mem_copy code is only active
           with a MSVC less then version 7.
 	- res fixed win32 csosdefs.h to use fast_mem_copy only on MSVC.
-	  The recent changes caused that fast_mem_copy was used on VC < 7 
+	  The recent changes caused that fast_mem_copy was used on VC < 7
 	  _and_ non-VC platforms.
 27-Jun-2003
 	- Jorrit fixed a bug in genmesh where it would not initialize
@@ -64,7 +66,7 @@ The history order is reversed so that new features are at the top.
 	  supposed to transform the incoming .csplugin suffix on the pathname
 	  with .csbundle, but instead uselessly replaced .csplugin with
 	  .csplugin.
-	- Anders Stenberg added support for pixmaps (DrawPixmap) to new 
+	- Anders Stenberg added support for pixmaps (DrawPixmap) to new
 	  renderer.
 25-Jun-2003
 	- Oktal manually applied a patch to cssocket that was intended for
@@ -83,7 +85,7 @@ The history order is reversed so that new features are at the top.
           people to contact me directly re MSVC related build issues and
           updated authors info to indicate my current inactive status.
 	- res fixed the sndds3d makefile to work on MinGW/MSYS.
-	- Anders Stenberg commited a fix for AWS from Gersh fixing two window 
+	- Anders Stenberg commited a fix for AWS from Gersh fixing two window
 	  flags both defined as 0x40.
 24-Jun-2003
 	- Oktal added an iGraphicsMemory interface with which to access
@@ -129,16 +131,16 @@ The history order is reversed so that new features are at the top.
 	- Matze added an Iterator to csArray.
 	- Luca (groton@gmx.net) fixed a bug in the awsList: the bug was that
 	  the list box wasn't displaying the last item in some cases. I had to
-	  modify in some places the source code of the awsScrollBar too: 
-	  I replaced in the awsScrollBar's source code many 'max - amntvis' 
-	  expressions with the expression 'max - amountVis + 1': 
+	  modify in some places the source code of the awsScrollBar too:
+	  I replaced in the awsScrollBar's source code many 'max - amntvis'
+	  expressions with the expression 'max - amountVis + 1':
 	  in fact if i have 10 item in my own listbox (ie the 'max' is 9),
 	  and if the visible items are 5 (ie 'amntvis' is 5), then the correct
 	  expression to get the max value for the index of the item displayed
 	  in the first row is 'max - amntvis + 1', that is 5, with the previous
 	  code that value was wrongly set to 4.
 	- res slightly changed Win32 csGetPluginMetadata(): a .csplugin file
-	  is looked for when the supplied file name has this extension. 
+	  is looked for when the supplied file name has this extension.
 	  Retrieving the resource from a .DLL is still tried in all cases.
 	  This should make metadata retrieval a bit faster.
 	- res fixed FR #759764 "Uninitialized members in partgen.cpp":
@@ -154,7 +156,7 @@ The history order is reversed so that new features are at the top.
           - Added awsWindow->SetFocusedChild and awsWindow->GetFocusedChild
           - awsWindow now holds last focused child on Hide() If window
             shows again WindowManager knows witch child need to be focused. If
-            there is no info about last focused child window calls 
+            there is no info about last focused child window calls
             GetFirstFocusableChild and focus it.
 	- Jorrit fixed formatting with the csQuaternion class.
 	- Matze fixed 2 errors in the jam rules for .csplugin -> metadata.rc:
@@ -174,17 +176,17 @@ The history order is reversed so that new features are at the top.
 	- HangDude converted metaballs to new renderer
 	- Luca did the following:
 	  - Fixed a bug in the label component of AWS: in fact the method
-	    awsLabel::OnKeypress was returning always 'true', although the 
+	    awsLabel::OnKeypress was returning always 'true', although the
 	    event was not eaten at all; we must instead let it be passed
 	    along to other listeners which could instead use and eat it.
-	  - Fixed a bug when the glwin32 canvas is receiving WM_SIZE windows 
+	  - Fixed a bug when the glwin32 canvas is receiving WM_SIZE windows
 	    message: in fact if the resizing flag is SIZE_MINIMIZED, then the
 	    Height and the Width of the canvas was wrongly being set to 1!
 	    Instead we have to preserve the current Height and Width values,
 	    and just set the correct clipping rect to an empty region.
-	    Besides, when we receive the WM_SIZE windows message, the old 
+	    Besides, when we receive the WM_SIZE windows message, the old
 	    behaviour was to 'return 0' wrongly, because we must instead
-	    pass the message to the iWin32Assistant window procedure which 
+	    pass the message to the iWin32Assistant window procedure which
 	    handles the WM_SIZE message as well (it can send to the CS event
 	    queue messages like csevCanvasHidden and csevCanvasExposed).
 	- Eric Sunshine made the following documentation-related changes:
@@ -234,7 +236,7 @@ The history order is reversed so that new features are at the top.
 	- Wouter fixed the normal cursor in the standard console output.
 	- Wouter added two extensions to standard console to set colours.
 20-Jun-2003
-	- Marten fixed an error in the inline assembly in tcovbuf.cpp 
+	- Marten fixed an error in the inline assembly in tcovbuf.cpp
 	  which prevented it from compiling on msvc6
 	- Jorrit fixed a compile error in thing with relation to the new
 	  renderer.
@@ -306,7 +308,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated a few instances of NULL which had creeped
 	  back into the project.
 	- res made the following changes to the new renderer system:
-	    - Index buffers aren't treated in a special way any more now. 
+	    - Index buffers aren't treated in a special way any more now.
 	      Just your average vertex buffer.
 	    - Changed the internal implementation of render buffers a bit.
 	    - Renamed stencil shadow binary to 'rlsstencil' to fit in with the
@@ -314,7 +316,7 @@ The history order is reversed so that new features are at the top.
 	- Wouter added the option wfoNoDrag to aws windows, making the window
 	  non-draggable. Fixed fs3dMask constant to fit available values.
 	- res made the following changes to thing:
-	    - Polys are now triangulized as single triangles instead of tri 
+	    - Polys are now triangulized as single triangles instead of tri
 	      fans. That makes it possible to store multiple poylgons in a
 	      single rendermesh. Now one rendermesh per material is created.
 	    - Index buffer now uses UNSIGNED_INT instead of INT. The latter
@@ -363,7 +365,7 @@ The history order is reversed so that new features are at the top.
 	- Wouter fixed off-by-one bugs in opengl 2d drawing. This causes
 	  aws and csws to draw correctly (for me).
 	  In gl3d the DrawPixmap routine is fixed to use the same
-	  computation as glcommon2d is using. 
+	  computation as glcommon2d is using.
 	  Computation of a y location is gly = height - y.
 	  The gly then has a range of 1..height. Still it is OK.
 	  On opengl gly=0.0 is off screen. gly=height is also off screen.
@@ -374,8 +376,8 @@ The history order is reversed so that new features are at the top.
 	  Closed three sf-bugs on this topic.
 19-Jun-2003
 	- HangDude did following
-	    - added anonymous render buffer manager class, which 
-	       can be used to implement the anonymous render buffers for new 
+	    - added anonymous render buffer manager class, which
+	       can be used to implement the anonymous render buffers for new
 	       renderer easily.
 	    - "stream" to "renderbuffer" namechange in genmeshldr
 	- Oktal made the following changes to the Perl plugin and module:
@@ -387,10 +389,10 @@ The history order is reversed so that new features are at the top.
 	    - Uncommented the plugin from user.mak.
 	- Oktal fixed a typo and a missing #include in unix/instpath.cpp.
 	- Duhprey did the following (new renderer):
-	    - Added Shadow Volume step for custom renderloop, needs 
+	    - Added Shadow Volume step for custom renderloop, needs
 	      speed optimiations
 	    - Modified Light Iterator step to always do stencil write
-	      (should be optimized out later when stencil writes aren't 
+	      (should be optimized out later when stencil writes aren't
 	      needed)
 	- Jorrit fixed various compile errors in csStringArray which were
 	  introduced after the changes to char const*. These changes were
@@ -400,7 +402,7 @@ The history order is reversed so that new features are at the top.
 	  hangs the nsvcgen process when run locally.
 	- res fixed:
 	    - Wrong parameters for *nix csGetPluginPaths().
-	    - Stupid bug where the name of the .csplugin instead of. dll file 
+	    - Stupid bug where the name of the .csplugin instead of. dll file
 	      was returned as the plugin path on Win32.
 	    - Matze wrote docu about per-user config on unix.
 	    - Matze made the configure script abort if libz is missing.
@@ -432,14 +434,14 @@ The history order is reversed so that new features are at the top.
 	  coding/portability section of the user manual to reflect the fact
 	  that we do now allow templates, though with certain restrictions.
 	- Marten removed the sc. discardingsystem for renderbuffers
-	- Marten ported the ballmesh, nullmesh, simplecon and csconout to 
+	- Marten ported the ballmesh, nullmesh, simplecon and csconout to
 	  new renderer.
 	- res made the following changes:
 	    - Added some documentation about per-user configs.
 	    - Fixed csGetAppPath() on unix.
 	    - On Win32, external .csplugin files are supported again (in
 	      addition to embedded metadata.)
-	    - SCF factories have internally a 'context' now. The 'context' 
+	    - SCF factories have internally a 'context' now. The 'context'
  	      basically identifies the directory of a plugin and is used to
 	      decide whether duplicate class ID will be reported or not.
 	    - Eliminated a bit of redundant code and used more macros in
@@ -484,7 +486,7 @@ The history order is reversed so that new features are at the top.
 	- res made the following changes:
 	    - Added a few helpers to deal with native paths and plugin paths.
 	    - All platforms now use the same plugin paths:
-	      <app dir>, $CRYSTAL/lib, $CRYSTAL/crystal, $CRYSTAL 
+	      <app dir>, $CRYSTAL/lib, $CRYSTAL/crystal, $CRYSTAL
 	      (where $CRYSTAL is the CS installation dir)
 	- Marten renamed iStreamSource to iRenderBufferSource and GetBuffer to
 	  GetRenderBuffer. In the classes the terms stream and renderbuffer are
@@ -494,16 +496,16 @@ The history order is reversed so that new features are at the top.
 	  paragraph to the documentation about same.
 	- res fixed double compilation of cssys/win32/syspath.cpp with jam.
 	- duhprey did the following:
-	    - Quick fix to return current working directory instead of App's 
+	    - Quick fix to return current working directory instead of App's
 	      full path
-	    - Added #include "cssys/syspath.h" so vfs could find 
+	    - Added #include "cssys/syspath.h" so vfs could find
 	      csGetConfigPath
 	- Oktal fixed a preprocessor directive in csprocessorcap.h,
 	  it's "#elif" not "#else if".
 	- res added the missing pluginpaths.cpp to MSVC libcssys.
-	- res changed the plain "#elif" to "#elif defined()" in 
+	- res changed the plain "#elif" to "#elif defined()" in
 	  csprocessorcap.h.
-	- res fixed a couple of NR makefiles for proper MSVC project 
+	- res fixed a couple of NR makefiles for proper MSVC project
 	  generation.
 	- res removed sysinit.cpp from win32 cssys. Win32 has it's own version
 	  of those functions.
@@ -578,10 +580,10 @@ The history order is reversed so that new features are at the top.
 	- res updated the MSVC6 makefile templates.
 	- res made the following changes to the MSVC warning suppression:
 	    - added some missing descriptions of silenced warnings
-	    - removed silencing of "unused variable" warning and turned 
-	      emission of "class has virtual functions, but destructor is not 
-	      virtual" on. This is the beginning of an attempt to have MSVC 
-	      emit the same warnings as GCC (as far as possible.) More tweaks 
+	    - removed silencing of "unused variable" warning and turned
+	      emission of "class has virtual functions, but destructor is not
+	      virtual" on. This is the beginning of an attempt to have MSVC
+	      emit the same warnings as GCC (as far as possible.) More tweaks
 	      will follow over time.
 	- res made some common functions 'intrinsic' on MSVC.
 	- res fixed a few compiler warnings.
@@ -600,11 +602,11 @@ The history order is reversed so that new features are at the top.
 	    - Such a function is provided for Win32. For unix and macosx,
 	      the "old" function that scans for .csplugin files is used.
 	- res made the following changes:
-	    - The DirectDraw configure time test now also tests for 
+	    - The DirectDraw configure time test now also tests for
 	      DirectSound, and thus changed the makefile var nomenclature to
 	      "DirectX".
-	    - Slight changed the way DLLs are loaded on Win32: now 
-	      LoadLibraryEx() is used with a flag which causes Windows to 
+	    - Slight changed the way DLLs are loaded on Win32: now
+	      LoadLibraryEx() is used with a flag which causes Windows to
 	      first look for the actual file in the specified directory.
 	    - On Win32, plugin metadata is now contained inside the DLL.
 	- res worked around problems with static linking. Specifically, it was
@@ -682,7 +684,7 @@ The history order is reversed so that new features are at the top.
 	  generating vfs.cfg.
 	- DeSigna added a comment to the contribs section, changed
 	  some minor formatting for the printed manual.
-	- Duhprey added a line to the hashmap constructor forcing bucket 
+	- Duhprey added a line to the hashmap constructor forcing bucket
 	  capacity to a prime number
 	- Eric Sunshine performed Phase Four of the elimination of the
 	  monolithic scf.cfg:
@@ -729,21 +731,21 @@ The history order is reversed so that new features are at the top.
 	  if the filename happened to be equal to the texture name. The result
 	  of that was that dmburg failed.
 	- Matze fixed a stupid mistake where 3ds2lev forgot to output lights.
-	- res changed csRegistryConfig::Save() and Load() from returning 
-	  'false' to 'true', fixing a false error report when the config 
+	- res changed csRegistryConfig::Save() and Load() from returning
+	  'false' to 'true', fixing a false error report when the config
 	  manager invoked those methods.
-	- duhprey fixed a dependency problem with the common area in the 
+	- duhprey fixed a dependency problem with the common area in the
 	  renderloop plugins
 	- res augmented configure to accept an --enable-new-renderer option,
-	  emitting CS_USE_NEW_RENDERER to volatile.h and setting an 
+	  emitting CS_USE_NEW_RENDERER to volatile.h and setting an
 	  USE_NEW_RENDERER makefile var.
-	- duhprey added missing SCF_CONSTRUCT_IBASE () in csRenderLoop 
+	- duhprey added missing SCF_CONSTRUCT_IBASE () in csRenderLoop
 	  constructor
 	- Luca Cappa (groton@gmx.net) fixed a very small bug in awstut: in fact
 	  in the main (), if the Initialize() method would fail, there will be a
 	  memory leak due to the non-destruction of the awsTutorial class
 	  instance.
-	- res fixed win32gcc.mak where the resourcer merger and compiler 
+	- res fixed win32gcc.mak where the resourcer merger and compiler
 	  invokation didn't respect $(SRCDIR) causing "file not found"
 	  errors.
 	- res added a script to package XML metadata into a Windows resource
@@ -751,7 +753,7 @@ The history order is reversed so that new features are at the top.
 	- res changed the texture parser to only use the texture name as a
 	  source image file name if neither a <file> nor a <type> have been
 	  specified; previously, this was always done, with the result that
-	  the loader always tried to load an image with the texture name as 
+	  the loader always tried to load an image with the texture name as
 	  the filename, causing a confusing warning in flarge.
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
@@ -759,24 +761,24 @@ The history order is reversed so that new features are at the top.
 	  as part of Eric's other fixes to SCF.  This patch eliminates a
 	  shutdown-time crash caused by static global variables being destroyed
 	  twice.  (Bug #752140)
-	- res fixed a stupid bug in the Win32 registry configuration where a 
+	- res fixed a stupid bug in the Win32 registry configuration where a
 	  string was deleted and immediately used after. One of the symptoms
 	  were non-functional writing of settings.
-        - DeSigna added an assertion that ensures csString::SubString()'s 
+        - DeSigna added an assertion that ensures csString::SubString()'s
           csString& argument isn't itself.
 	- res added code to save user configuration in Documents & Settings
 	  on Win32. Still disabled, though.
-	- res changed the way special folder paths are retrieved on Win32; 
+	- res changed the way special folder paths are retrieved on Win32;
 	  now shfolder.dll is used.
-	- res added "CrystalSpace." prefixes to the default "Noname" 
+	- res added "CrystalSpace." prefixes to the default "Noname"
 	  application ID and to those of CS demo apps.
 	- res augmented csInitializer::SetupConfigManager() to read user.cfg
 	  again for some backward compatibility. user.cfg has a lower priority
 	  than the platform-specific configuration.
 	- res completed the render loop loader. This includes that the default
 	  render steps have been moved to a plugin.
-	- res completely banished user.cfg from all spheres of 
-	  csInitializer::SetupConfigManager() and out of reach of mortal 
+	- res completely banished user.cfg from all spheres of
+	  csInitializer::SetupConfigManager() and out of reach of mortal
 	  beings. Also changed OS/X makefile to use the Unix platform
 	  configuration (in lack of a special OS/X variant.)
 	- Matze modified the csConfigManager to save the config when in it's
@@ -788,20 +790,20 @@ The history order is reversed so that new features are at the top.
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().
         - DeSigna fixed an AWS bug reported by Gersh:
-	  <Gersh> DeSigna: in awswin.cpp's OnMouseMove function, change 
-          the return false to a return true. 
-          (It was not possible to tell if aws deals with a move event if 
+	  <Gersh> DeSigna: in awswin.cpp's OnMouseMove function, change
+          the return false to a return true.
+          (It was not possible to tell if aws deals with a move event if
           the mouse is over a window).
 	- Jorrit fixed a bug in registrycfg.cpp. If SetStr() was called
 	  with a 0 value then it would cause a crash. Now it does the
 	  correct thing which is deleting the key.
 	- DeSigna added csString::FindLast(). iString/scfString has
 	  been updated for new SubString, FindFirst and FindLast
-	  members. 
+	  members.
 	- DeSigna fixed minor off-by-one bug in
 	  csString::FindLast(). Documentation for FindFirst/FindLast
 	  has been updated to include the not-found status return
-	  value. 
+	  value.
 	- Eric Sunshine fixed a problem where SCF potentially was initializing
 	  and finalizing plugin modules multiple times as classes exported by
 	  the plugin were instantiated and destroyed.  This caused serious
@@ -817,15 +819,15 @@ The history order is reversed so that new features are at the top.
 	  introduced with Eric's large SCF changes on June 5, 2003.
 	- Jorrit renamed strarr.h to stringarray.h.
 	- res made the following changes:
-	    - Moved CS_INITIALIZE_PLATFORM_APPLICATION invokation to 
-	      csInitializer::CreateEnvironment() and also augmented the 
+	    - Moved CS_INITIALIZE_PLATFORM_APPLICATION invokation to
+	      csInitializer::CreateEnvironment() and also augmented the
 	      doxygen documentation, as suggested by ES.
 	    - Added iWin32Assistant::GetApplicationWindow().
 	    - Replace use of GetForegroundWindow() in DirectSound3D renderer
 	      with above (bug 751779).
 	    - Fixed scfString::FindLast() not returning a value.
 	- Matze improved the introduction message in createproject.sh
-	- res changed the Win32 registry config to store floats as strings 
+	- res changed the Win32 registry config to store floats as strings
 	  instead of binaries for better human readability.
 	- Matze implemented platform config on unix. Now config files are
 	  created in $HOME/.crystal
@@ -835,10 +837,10 @@ The history order is reversed so that new features are at the top.
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:
-	    - Added a macro CS_INITIALIZE_PLATFORM_APPLICATION which is 
+	    - Added a macro CS_INITIALIZE_PLATFORM_APPLICATION which is
 	      intended to placed near the very start of an application. It is
-	      supposed to contain platform-specific initialization stuff, 
-	      though it's currently only used for MSVC-specific debug flag 
+	      supposed to contain platform-specific initialization stuff,
+	      though it's currently only used for MSVC-specific debug flag
 	      tweaks.
 	    - CS_INITIALIZE_PLATFORM_APPLICATION is now employed in
 	      csInitializer::InitializeSCF().
@@ -847,7 +849,7 @@ The history order is reversed so that new features are at the top.
 	      a platform-specific configuration instance for the user
 	      configuration. Falls back to old user.cfg mechanism if
 	      csGetPlatformConfig() returns 0.
-	    - Added a dummy csGetPlatformConfig() in 
+	    - Added a dummy csGetPlatformConfig() in
 	      libs/cssys/general/platformcfg.cpp.
 8-Jun-2003
 	- Eric Sunshine fixed problems in csInitializer::CloseApplication() and
@@ -865,7 +867,7 @@ The history order is reversed so that new features are at the top.
 6-June-2003
 	- res did further fixes related to the new shader var stuff.
 	  r3dtest now seems to run fine (for me, at least.)
-	- Wouter fixed up the iso engine. When a sprite is added to 
+	- Wouter fixed up the iso engine. When a sprite is added to
 	  a grid, then the sprite is lighted by the static lights.
 	- groton@gmx.net added the method csQuaternion::GetEulerAngles.
 	- DeSigna fixed a single word error in manual section 5.2.3,
@@ -887,11 +889,11 @@ The history order is reversed so that new features are at the top.
 	  the world-specific settings reset.
 	- res augmented the map loader to allow setting of a <renderloop> in
 	  a map's <settings>.
-	- res added support for render loop loading through the <addon> 
+	- res added support for render loop loading through the <addon>
 	  mechanism.
-	- res started working on a generic render step plugin. For now just 
+	- res started working on a generic render step plugin. For now just
 	  compiles, but doesn't do anything yet.
-	- res added missing csEvent::DecRefUnlessPooled() and 
+	- res added missing csEvent::DecRefUnlessPooled() and
 	  csEvent::IncRefIfPooled().
 	- Jorrit documented the three rotation matrices (csXRotMatrix3 and
 	  so on) to describe exactly how they work. This is to solve the
@@ -903,7 +905,7 @@ The history order is reversed so that new features are at the top.
 	  instead. Otherwise you get a lot of unneeded object creation.
 	  Also added Next() as a synonym to ++ so that you can now
 	  use the standard while (HasNext()) { Next(); ...} construct too.
-        - DeSigna corrected a range checking bug in csString::SubString(), 
+        - DeSigna corrected a range checking bug in csString::SubString(),
 	  and made the second range argument a length instead of an index.
 	- Jorrit fixed csProcFile inheritance to use public inheritance
 	  for iFireTexture instead of private inheritance.
@@ -1037,10 +1039,10 @@ The history order is reversed so that new features are at the top.
 	  when the caller's reference to the event goes out of scope, the
 	  event will be removed from the queue and returned to the pool.
 	  This problem was evident in the network manager.
-	- res added Get() and Delete() methods to csHashMapReversible that 
+	- res added Get() and Delete() methods to csHashMapReversible that
 	  work on a key string.
 	- res added a "render loop manager" to the engine.
-	- res fixed some "csFooIterator::Next: recursive on all control paths, 
+	- res fixed some "csFooIterator::Next: recursive on all control paths,
 	  function will cause runtime stack overflow" warnings on MSVC.
 	- res removed iSectorRenderMeshList::GetVisible().
 3-June-2003
@@ -1099,9 +1101,9 @@ The history order is reversed so that new features are at the top.
 	  lots of nice comments to perlpre.i and perlpost.i.
 	- Oktal fixed a couple of nasty typos (XSRETURN_SV and sv_setpvn)
 	  in the Perl Swig module.
-	- res fixed a stupid mistake in the new GL screenshot causing the 
+	- res fixed a stupid mistake in the new GL screenshot causing the
 	  first line to contain garbage.
-	- res made some slight changes to the movierecorder, hoping that 
+	- res made some slight changes to the movierecorder, hoping that
 	  performance might be a tad better.
 1-June-2003
 	- Philip Wyett started adding MSVC 7 external app HOWTO screenshot
@@ -1111,13 +1113,13 @@ The history order is reversed so that new features are at the top.
 	- res improved the performance of GL screenshots. They now deal
 	  directly with the data returned from glReadPixels() and thus need
 	  less computations on the pixel data. They also come from a pool
-	  now, which reduces the number of new/delete calls when many 
+	  now, which reduces the number of new/delete calls when many
 	  screenshots are requested (i.e. when recording a movie.)
-	- (New Renderer) Anders Stenberg rewrote the custom render loop a bit 
-	  to be more general, and also added "foreachlight" support. Also 
-	  changed the way z-mode is set. Now it's set explicitly by a SetZMode 
-	  call, and not implicitly in DrawMesh. A csBasicVector in the 
-	  shadermanager has been replaced with csRefArray too. 
+	- (New Renderer) Anders Stenberg rewrote the custom render loop a bit
+	  to be more general, and also added "foreachlight" support. Also
+	  changed the way z-mode is set. Now it's set explicitly by a SetZMode
+	  call, and not implicitly in DrawMesh. A csBasicVector in the
+	  shadermanager has been replaced with csRefArray too.
 	  (Might have introduced bugs with reference counts.)
 	- Oktal overhauled the Perl Swig interface files, including:
 	    - Recovered the csWrapPtr usage stuff that got misplaced during
@@ -1160,14 +1162,14 @@ The history order is reversed so that new features are at the top.
 31-May-2003
 	- Oktal fixed an error in the Perl plugin that only appeared with
 	  certain versions of Perl, to do with their funny macros.
-	- Anders Stenberg fixed a bug on win32 where the main output window 
-	  wasn't shown sometimes because of a badly initialized variable 
+	- Anders Stenberg fixed a bug on win32 where the main output window
+	  wasn't shown sometimes because of a badly initialized variable
 	  (cmdshow).
 	- Keith Fulton fixed the OverrideAction problem, which was that if
-	  Action A was running, and OverrideAction B was called, then 
-	  SetAction was again called with Action C while Action B was still 
-	  active, when Action B ended, Action A would be restored instead of 
-	  C.  Now, when SetAction(C) is called, the Override is cleared out, 
+	  Action A was running, and OverrideAction B was called, then
+	  SetAction was again called with Action C while Action B was still
+	  active, when Action B ended, Action A would be restored instead of
+	  C.  Now, when SetAction(C) is called, the Override is cleared out,
 	  so only Action C will run until further notice.
 30-May-2003
 	- Philip Wyett added the CS copyright notice and moved the includes to
@@ -1199,12 +1201,12 @@ The history order is reversed so that new features are at the top.
 	    - Eliminated unportable ussage of "echo -e" from static.jam.
 	- Eric Sunshine fixed macosx/cocoa/Jamfile so that it now links with
 	  the canvascommon library target.
-	- res augmented the Win32 Alert() facility (i.e. message boxes) to 
-	  honor okMsg (that is, you can now give the OK button a different 
+	- res augmented the Win32 Alert() facility (i.e. message boxes) to
+	  honor okMsg (that is, you can now give the OK button a different
 	  text.)
 	- Anders Stenberg finally fixed an annoying bug in the new renderer
-	  causing errors in the the 2x2 mipmap. The problem was that 
-	  GL_UNPACK_ALIGNMENT wasn't changed from the default of 4 byte 
+	  causing errors in the the 2x2 mipmap. The problem was that
+	  GL_UNPACK_ALIGNMENT wasn't changed from the default of 4 byte
 	  alignment. (Thanks res for the help.)
 29-May-2003
 	- Oktal removed the clean target from from swig.jam as it was deleting
@@ -1224,7 +1226,7 @@ The history order is reversed so that new features are at the top.
 	  these functions to be declared inline to avoid syntax errors and
 	  linking errors.
 	- Philip Wyett moved the existing MSVC external application creation
-          HOWTO, to a new directory indicating MSVC 6. He also created 
+          HOWTO, to a new directory indicating MSVC 6. He also created
           a new one for the upcoming MSVC 7 external application HOWTO.
 	- Eric Sunshine added the new csPhysicalFile class to csutil.  This is
 	  an implementation of the abstract iFile interface for "real" files
@@ -1284,12 +1286,12 @@ The history order is reversed so that new features are at the top.
 	    - Rearranged the pgserver initialization code; it was doing things
 	      in the wrong order which was causing a segfault within Pico.
         - JTarbox Fixed a bug with Post() and added a check to determine if an
-          iEvent object is a csPoolEvent or csEvent object via the Pooled() 
+          iEvent object is a csPoolEvent or csEvent object via the Pooled()
           function
 27-May-2003
 	- Boyan made the following changes:
-	    - Fixed kyboard focusing component bug in AWS 
-	    - Added awsWindow::Show() and awsWindow::Hide() in AWS. 
+	    - Fixed kyboard focusing component bug in AWS
+	    - Added awsWindow::Show() and awsWindow::Hide() in AWS.
 	    - This features allows triger these events in .def file (using
 	      signalWindowShown and signalWindowHidden)
 	- Philip Wyett added *.pyd (Python DLL's) and *.csplugin to the CS root
@@ -1417,9 +1419,9 @@ The history order is reversed so that new features are at the top.
 		- Eliminate the hard-coded SCF registration information in each
 		  plugin's source code.
 	- res changed the DDraw code so errors in device enumeration aren't
-	  fatal any more, but just emit a warning instead. Also tried to 
+	  fatal any more, but just emit a warning instead. Also tried to
 	  improve the compilation for people with older DirectX SDKs. Those
-	  changes are made somewhat blindly as everything worked and works 
+	  changes are made somewhat blindly as everything worked and works
 	  fine for me.
 	- res removed #define INITGUID in directdetection.cpp to fix duplicate
 	  defined symbols in VC6.
