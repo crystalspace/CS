@@ -31,7 +31,7 @@ CS_IMPLEMENT_APPLICATION
 
 static void usage(FILE* s, int rc)
 {
-  fprintf(s, "Usage: ms2spr <option> [model-file] [sprite-name]\n\n");
+  fprintf(s, "Usage: ms2spr <option> [model-file] [sprite-name]\n[sprite-name] without the trailing .spr\n");
   fprintf(s, "Options:\n");
   fprintf(s, "  -h : help (this page)\n");
   fprintf(s, "  -c : example code for loading\n");
@@ -44,18 +44,18 @@ static void okay_usage()  { usage(stdout,  0); }
 static void printCode(FILE* s, int rc)
 {
   fprintf(s, "An example for loading the file(using variables from simple2):\n\n");
-  fprintf(s, "loader->LoadLibraryFile (\"/lib/std/sprite.spr\")\n");
+  fprintf(s, "loader->LoadLibraryFile (\"/lib/std/sprfile.spr\")//assume you called the file, sprfile\n");
   fprintf(s, "...\n");
   fprintf(s, "engine->Prepare ();//All library loading should be before prepare\n");
   fprintf(s, "...\n");
-  fprintf(s, "iMeshFactoryWrapper* imeshfact = engine->GetMeshFactories()->FindByName(\"man2\");\n");
+  fprintf(s, "iMeshFactoryWrapper* imeshfact = engine->GetMeshFactories()->FindByName(\"sprfile\");//same name as sprite file\n");
   fprintf(s, "iMeshWrapper* sprite = engine->CreateMeshWrapper ( imeshfact, \"MySprite\", room, pos);\n");
   fprintf(s, "iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (), iSprite3DState);\n");
   fprintf(s, "iSkeletonState *skel_state = spstate->GetSkeletonState();\n");
   fprintf(s, "limb->DecRef();\n");
   fprintf(s, "iSkeletonConnectionState *con = SCF_QUERY_INTERFACE (limb, iSkeletonConnectionState );\n");
   fprintf(s, "iSkeletonBone *bone = SCF_QUERY_INTERFACE (con, iSkeletonBone);\n");
-  fprintf(s, "iMotionTemplate* motion=motman->FindMotionByName(\"default\");\n");
+  fprintf(s, "iMotionTemplate* motion=motman->FindMotionByName(\"default\");//The Motion is always called default\n");
   fprintf(s, "iMotionController* mc=motman->AddController(bone);\n");
   fprintf(s, "mc->SetMotion(motion);\n");
   fprintf(s, "spstate->DecRef ();\n");

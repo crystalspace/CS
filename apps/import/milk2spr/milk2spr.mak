@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.milkconv = Quake model Milkshape conversion tool
+DESCRIPTION.milkconv = Milkshape ACII Model conversion tool
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
