@@ -441,7 +441,7 @@ public:
     }
     virtual bool GetFarPlane (csPlane3& pl)
     {
-      if (scfParent->fp) { pl = *scfParent->fp; return true; }
+      if (scfParent->fp) { pl = *scfParent->fp; return scfParent->use_farplane; }
       else return false;
     }
     virtual iSector* GetSector ();
