@@ -2254,6 +2254,7 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
       {
         dist = temp;
 	isect = tsect;
+        if (polygon_idx) *polygon_idx = i;
       }
     }
   }
