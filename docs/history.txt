@@ -298,8 +298,9 @@ The history order is reversed so that new features are at the top.
 	- Added the ability to validate triggers from within a sequence.  Using
 	  this I added the ability for the door in flarge to close again once
 	  the camera moves away from the door.  Disabled for now due to bugs...
-	- Eric Sunshine fixed spoofdir.php so that synthesis valid URLs for
-	  pathnames containing embedded spaces and other special characters.
+	- Eric Sunshine fixed spoofdir.php so that it synthesizes valid URLs
+	  for pathnames containing embedded spaces and other special
+	  characters.
 	- Eric Sunshine changed the Mingw port so that the CC and CXX compiler
 	  settings are determined dynamically via the comptest.sh script,
 	  rather than being hard-coded in the makefile.
