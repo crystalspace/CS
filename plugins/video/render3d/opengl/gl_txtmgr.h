@@ -55,11 +55,27 @@ struct csGLUploadData
   const void* image_data;
   int w, h, d;
   csRef<iBase> dataRef;
-  GLenum sourceFormat;
-  GLenum sourceType;
+  GLenum targetFormat;
+  bool compressed;
+  union
+  {
+    struct 
+    {
+      GLenum sourceFormat;
+      GLenum sourceType;
+    };
+    struct
+    {
+      size_t compressedSize;
+    };
+  };
   int mip;
   int imageNum;
+
+  csGLUploadData() : image_data(0), compressed(false) {}
 };
+
+struct csGLTextureClassSettings;
 
 class csGLTextureHandle : public iTextureHandle
 {
@@ -111,8 +127,10 @@ private:
 
   void *cachedata;
 
-  bool Compressable () { return !texFlags.Check (CS_TEXTURE_2D); }
-  bool transform (iImageVector *ImageVec, int mipNum);
+  GLenum DetermineTargetFormat (GLenum defFormat, bool allowCompress,
+    const char* rawFormat, bool& compressedTarget);
+  bool transform (bool allowCompressed, 
+    GLenum targetFormat, iImageVector *ImageVec, int mipNum);
 
   GLuint Handle;
   /// Upload the texture to GL.

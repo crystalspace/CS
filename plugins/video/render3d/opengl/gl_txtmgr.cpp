@@ -290,6 +290,8 @@ void csGLTextureHandle::PrepareInt ()
     csAlphaMode::AlphaType newAlphaType = csAlphaMode::alphaNone;
     if (IsTransp())
       PrepareKeycolor (images->GetImage (i), transp_color, newAlphaType);
+#if 0
+    // Avoid accessing the image data until really needed
     else
       /*
         Check all alpha values for the actual alpha type.
@@ -298,6 +300,7 @@ void csGLTextureHandle::PrepareInt ()
 	images->GetImage (i)->GetHeight(), 
 	(csRGBpixel*)images->GetImage (i)->GetImageData (),
 	0, newAlphaType);
+#endif
 
     if (newAlphaType > alphaType) alphaType = newAlphaType;
   }
@@ -346,6 +349,17 @@ void csGLTextureHandle::CreateMipMaps()
 
   const csGLTextureClassSettings* textureSettings = 
     txtmgr->GetTextureClassSettings (textureClass);
+  /* Determine internal format of the texture. You can't mix glTexImage and 
+   * glCompressedTexImage for different mip levels unless the internal format
+   * is exactly the same. The target formats of the lower mip levels are later
+   * checked against the target format of the first mip.
+   */
+  bool compressedTarget;
+  GLenum targetFormat = (alphaType != csAlphaMode::alphaNone) ? 
+    textureSettings->formatRGBA : textureSettings->formatRGB;
+  targetFormat = DetermineTargetFormat (targetFormat, 
+    !textureSettings->forceDecompress, images->GetImage (0)->GetRawFormat(), 
+    compressedTarget);
 
   // Determine if and how many mipmaps we skip.
   const bool doReduce = !texFlags.Check (CS_TEXTURE_2D | CS_TEXTURE_NOMIPMAPS)
@@ -374,7 +388,8 @@ void csGLTextureHandle::CreateMipMaps()
   }
   if (texFlags.Check (CS_TEXTURE_NOMIPMAPS))
   {
-    transform (thisImages, 0);
+    transform (!textureSettings->forceDecompress, targetFormat, 
+      thisImages, 0);
   }
   else
   {
@@ -397,7 +412,8 @@ void csGLTextureHandle::CreateMipMaps()
       h = thisImages->GetImage (0)->GetHeight ();
 
       if ((mipskip == 0) || ((w == 1) && (h == 1)))
-	transform (thisImages, nTex++);
+	transform (!textureSettings->forceDecompress, targetFormat, 
+	thisImages, nTex++);
 
       if ((w == 1) && (h == 1)) break;
 
@@ -436,8 +452,42 @@ void csGLTextureHandle::CreateMipMaps()
   }
 }
 
+GLenum csGLTextureHandle::DetermineTargetFormat (GLenum defFormat, 
+						 bool allowCompress,
+						 const char* rawFormat, 
+						 bool& compressedFormat)
+{
+  GLenum targetFormat = defFormat;
+  compressedFormat = false;
 
-bool csGLTextureHandle::transform (iImageVector *ImageVector, int mipNum)
+  if (rawFormat)
+  {
+    if (G3D->ext->CS_GL_EXT_texture_compression_s3tc 
+      && allowCompress)
+    {
+      if (strcmp (rawFormat, "dxt1") == 0)
+      {
+	targetFormat = (alphaType != csAlphaMode::alphaNone) ?
+	  GL_COMPRESSED_RGBA_S3TC_DXT1_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
+	compressedFormat = true;
+      }
+      else if (strcmp (rawFormat, "dxt3") == 0)
+      {
+	targetFormat = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+	compressedFormat = true;
+      }
+      else if (strcmp (rawFormat, "dxt5") == 0)
+      {
+	targetFormat = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+	compressedFormat = true;
+      }
+    }
+  }
+  return targetFormat;
+}
+
+bool csGLTextureHandle::transform (bool allowCompressed, GLenum targetFormat, 
+				   iImageVector *ImageVector, int mipNum)
 {
   uint8 *h;
 
@@ -460,6 +510,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, int mipNum)
 	uploadData.w = Image->GetWidth();
 	uploadData.h = Image->GetHeight();
 	uploadData.d = 1;
+	uploadData.targetFormat = targetFormat;
 	uploadData.sourceFormat = GL_RGBA;
 	uploadData.sourceType = GL_UNSIGNED_BYTE;
 	uploadData.mip = mipNum;
@@ -472,6 +523,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, int mipNum)
       uploadData.w = Image->GetWidth();
       uploadData.h = Image->GetHeight();
       uploadData.d = d;
+      uploadData.targetFormat = targetFormat;
       uploadData.sourceFormat = GL_RGBA;
       uploadData.sourceType = GL_UNSIGNED_BYTE;
       uploadData.mip = mipNum;
@@ -507,14 +559,57 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, int mipNum)
       this->uploadData->Length());
 
     csRef<iImage> Image = ImageVector->GetImage (0);
-    uploadData.dataRef = Image;
-    uploadData.image_data = (uint8*)Image->GetImageData (); // @@@ use pixel packing!
-    //uploadData->size = n * 4;
+    const char* rawFormat = Image->GetRawFormat();
+    if (rawFormat)
+    {
+      csRef<iDataBuffer> imageRaw = Image->GetRawData();
+      uploadData.dataRef = imageRaw;
+      if (strcmp (rawFormat, "r8g8b8") == 0)
+      {
+	uploadData.image_data = imageRaw->GetUint8();
+	uploadData.sourceFormat = GL_RGB;
+	uploadData.sourceType = GL_UNSIGNED_BYTE;
+      }
+      else if (strcmp (rawFormat, "r5g6b5") == 0)
+      {
+	uploadData.image_data = imageRaw->GetUint8();
+	uploadData.sourceFormat = GL_RGB;
+	uploadData.sourceType = GL_UNSIGNED_SHORT_5_6_5;
+      }
+      else if (strcmp (rawFormat, "a8r8g8b8") == 0)
+      {
+	uploadData.image_data = imageRaw->GetUint8();
+	uploadData.sourceFormat = GL_BGRA;
+	uploadData.sourceType = GL_UNSIGNED_INT_8_8_8_8_REV;
+      }
+      else 
+      {
+	bool isCompressedTarget;
+	/* Only use glCompressedTexImage if the target format matches
+	 * exactly the one of mip 0. */
+	if ((DetermineTargetFormat (targetFormat, allowCompressed,
+	  rawFormat, isCompressedTarget) == targetFormat) 
+	  && isCompressedTarget)
+	{
+	  uploadData.image_data = imageRaw->GetUint8();
+	  uploadData.compressed = true;
+	  uploadData.compressedSize = imageRaw->GetSize();
+	}
+      }
+    }
+
+    if (!uploadData.image_data)
+    {
+      uploadData.image_data = (uint8*)Image->GetImageData (); // @@@ use pixel packing!
+      uploadData.dataRef = Image;
+      //uploadData->size = n * 4;
+      uploadData.sourceFormat = GL_RGBA;
+      uploadData.sourceType = GL_UNSIGNED_BYTE;
+    }
+    uploadData.targetFormat = targetFormat;
     uploadData.w = Image->GetWidth();
     uploadData.h = Image->GetHeight();
     uploadData.d = 1;
-    uploadData.sourceFormat = GL_RGBA;
-    uploadData.sourceType = GL_UNSIGNED_BYTE;
     uploadData.mip = mipNum;
   }
   
@@ -544,8 +639,6 @@ void csGLTextureHandle::Load ()
 
   const csGLTextureClassSettings* textureSettings = 
     txtmgr->GetTextureClassSettings (textureClass);
-  const GLenum targetFormat = (alphaType != csAlphaMode::alphaNone) ? 
-    textureSettings->formatRGBA : textureSettings->formatRGB;
 
   static const GLint textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
     GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
@@ -596,19 +689,19 @@ void csGLTextureHandle::Load ()
     for (i = 0; i < uploadData->Length(); i++)
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
-      //if (togl->compressed == GL_FALSE)
+      if (uploadData.compressed)
+      {
+	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_2D, uploadData.mip, 
+	  uploadData.targetFormat, uploadData.w, uploadData.h, 
+	  0, uploadData.compressedSize, uploadData.image_data);
+      }
+      else
       {
 	glTexImage2D (GL_TEXTURE_2D, uploadData.mip, 
-	  targetFormat, 
+	  uploadData.targetFormat, 
 	  uploadData.w, uploadData.h, 0, uploadData.sourceFormat, 
 	  uploadData.sourceType, uploadData.image_data);
       }
-      /*else
-      {
-	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_2D, i, 
-	  (GLenum)togl->internalFormat, togl->get_width(),  togl->get_height(), 
-	  0, togl->size, togl->image_data);
-      }*/
     }
   }
   else if (target == CS_TEX_IMG_3D)
@@ -635,7 +728,7 @@ void csGLTextureHandle::Load ()
     {
       const csGLUploadData& uploadData = this->uploadData->Get (i);
       G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, uploadData.mip, 
-	targetFormat, uploadData.w, uploadData.h, uploadData.d,
+	uploadData.targetFormat, uploadData.w, uploadData.h, uploadData.d,
 	0, uploadData.sourceFormat, uploadData.sourceType, 
 	uploadData.image_data);
     }
@@ -669,7 +762,7 @@ void csGLTextureHandle::Load ()
       const csGLUploadData& uploadData = this->uploadData->Get (i);
 
       glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + uploadData.imageNum, 
-	uploadData.mip, targetFormat, 
+	uploadData.mip, uploadData.targetFormat, 
 	uploadData.w, uploadData.h,
         0, uploadData.sourceFormat, uploadData.sourceType,	
 	uploadData.image_data);

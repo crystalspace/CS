@@ -48,6 +48,8 @@ public:
   virtual int GetWidth () const { return 0; }
   virtual int GetHeight () const { return 0; }
   */
+  // Most images are 2D, so provide a sensible default
+  virtual int GetDepth () const { return 1; }
 
   virtual void SetName (const char *iName)
   {
@@ -71,6 +73,13 @@ public:
 
   virtual uint HasMipmaps () const { return 0; }
   virtual csRef<iImage> GetMipmap (uint num) 
+  { return (num == 0) ? this : 0; }
+
+  virtual const char* GetRawFormat() const { return 0; }
+  virtual csRef<iDataBuffer> GetRawData() const { return 0; }
+  virtual csImageType  GetImageType() const { return csimg2D; }
+  virtual uint HasSubImages() const { return 0; }
+  virtual csRef<iImage> GetSubImage (uint num) 
   { return (num == 0) ? this : 0; }
 };
 

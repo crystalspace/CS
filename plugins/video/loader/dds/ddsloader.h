@@ -21,18 +21,41 @@
 
 #include "csutil/scf.h"
 #include "csgfx/memimage.h"
-
+#include "csutil/parasiticdatabuffer.h"
+#include "csutil/refarr.h"
 #include "iutil/comp.h"
 #include "igraphic/imageio.h"
 
-#include "csutil/refarr.h"
 #include "dds.h"
 
 struct iObjectRegistry;
 
+enum csDDSRawDataType
+{
+  csrawUnknown,
+  csrawDXT1,
+  csrawR8G8B8,
+  csrawR5G6B5,
+
+  csrawUnknownAlpha,
+  csrawDXT1Alpha,
+  csrawDXT2,
+  csrawDXT3,
+  csrawDXT4,
+  csrawDXT5,
+  csrawA8R8G8B8,
+
+  csrawAlphaFirst = csrawUnknownAlpha,
+  csrawAlphaLast = csrawDXT5,
+
+  csrawUnsupported
+};
+
 class csDDSImageIO : public iImageIO, public iComponent
 {
 public:
+  csParasiticDataBufferPooled::Pool bufferPool;
+
   SCF_DECLARE_IBASE;
 
   csDDSImageIO (iBase* parent);
@@ -51,6 +74,10 @@ public:
 private:
   csImageIOFileFormatDescriptions formats;
   iObjectRegistry* object_reg;
+
+  void CopyLEUI32s (void* dest, const void* source, size_t count);
+  csDDSRawDataType IdentifyPixelFormat (const dds::PixelFormat& pf, 
+    uint& bpp);
 };
 
 class csDDSImageFile : public csImageMemory
@@ -59,17 +86,33 @@ class csDDSImageFile : public csImageMemory
 public:
   virtual ~csDDSImageFile ();
 
+  virtual const void *GetImageData ();
+  virtual const csRGBpixel* GetPalette ();
+  virtual const uint8* GetAlpha ();
+
   virtual csRef<iImage> GetMipmap (uint num);
   
   virtual uint HasMipmaps () const;  
-private:
-  csDDSImageFile (iObjectRegistry* object_reg, int format);
 
-  bool Load (dds::Loader* loader);
+  virtual const char* GetRawFormat() const;
+  virtual csRef<iDataBuffer> GetRawData() const;
+private:
+  csDDSImageFile (iObjectRegistry* object_reg, 
+    int format, iDataBuffer* sourceData, csDDSRawDataType rawType, 
+    const dds::PixelFormat& pixelFmt);
+
+  struct RawInfo
+  {
+    csRef<iDataBuffer> rawData;
+    csDDSRawDataType rawType;
+    dds::PixelFormat pixelFmt;
+  };
+  RawInfo* rawInfo;
+  void MakeImageData ();
 
   csRefArray<iImage> mipmaps;
-  uint mipmapcount;
   iObjectRegistry* object_reg;
+  csDDSImageIO* iio;
 
   void Report (int severity, const char* msg, ...);
 };

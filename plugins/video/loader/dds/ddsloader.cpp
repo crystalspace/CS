@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/csendian.h"
 #include "csgfx/imagemanipulate.h"
 #include "ivaria/reporter.h"
 #include "dds.h"
@@ -59,26 +60,172 @@ void csDDSImageIO::SetDithering (bool)
 {
 }
 
+void csDDSImageIO::CopyLEUI32s (void* dest, const void* source, size_t count)
+{
+  uint32* d = (uint32*)dest; uint32* s = (uint32*)source;
+  while (count-- > 0)
+  {
+    *(d++) = csGetLittleEndianLong (s++);
+  }
+}
+
+csDDSRawDataType csDDSImageIO::IdentifyPixelFormat (const dds::PixelFormat& pf, 
+						    uint& bpp)
+{
+  csDDSRawDataType type = csrawUnsupported;
+  if (pf.flags & dds::FLAG_FOURCC)
+  {
+    switch (pf.fourcc)
+    {
+      case MakeFourCC ('D','X','T','1'):
+	type = csrawDXT1;
+	bpp = 4; 
+	break;
+      case MakeFourCC ('D','X','T','2'):
+	type = csrawDXT2;
+	bpp = 8; 
+	break;
+      case MakeFourCC ('D','X','T','3'):
+	type = csrawDXT3;
+	bpp = 8; 
+	break;
+      case MakeFourCC ('D','X','T','4'):
+	type = csrawDXT4;
+	bpp = 8; 
+	break;
+      case MakeFourCC ('D','X','T','5'):
+	type = csrawDXT5;
+	bpp = 8; 
+	break;
+    }
+  }
+  else
+  {
+    type = (dds::FLAG_ALPHAPIXEL) ? csrawUnknownAlpha : csrawUnknown;
+    bpp = pf.bitdepth;
+    if (pf.bitdepth == 16)
+    {
+      if ((pf.redmask == 0xf800) && (pf.greenmask == 0x07e0) 
+	&& (pf.bluemask == 0x001f))
+      {
+	if (!(pf.flags & dds::FLAG_ALPHAPIXEL))
+	  type = csrawR5G6B5;
+      }
+    }
+    else if (pf.bitdepth == 24)
+    {
+      if ((pf.redmask == 0x00ff0000) && (pf.greenmask == 0x0000ff00) 
+	&& (pf.bluemask == 0x00000ff))
+      {
+	if (!(pf.flags & dds::FLAG_ALPHAPIXEL))
+	  type = csrawR8G8B8;
+      }
+    }
+    else if (pf.bitdepth == 32)
+    {
+      if ((pf.redmask == 0x00ff0000) && (pf.greenmask == 0x0000ff00) 
+	&& (pf.bluemask == 0x00000ff))
+      {
+	if ((pf.flags & dds::FLAG_ALPHAPIXEL) && (pf.alphamask == 0xff000000))
+	  type = csrawA8R8G8B8;
+      }
+    }
+  }
+
+  return type;
+}
+
+static size_t DataSize (csDDSRawDataType dataType, int bpp, int w, int h, 
+			int d)
+{
+  switch (dataType)
+  {
+    case csrawDXT1:
+    case csrawDXT1Alpha:
+    case csrawDXT2:
+    case csrawDXT3:
+    case csrawDXT4:
+    case csrawDXT5:
+      {
+	int minW = ((w + 3) / 4) * 4;
+	int minH = ((h + 3) / 4) * 4;
+	return (minW * minH * bpp) / 8;
+      }
+    default:
+      return (w * h * d * bpp) / 8;
+  }
+}
+
 csPtr<iImage> csDDSImageIO::Load (iDataBuffer* buf, int format)
 {
-  dds::Loader* loader = new dds::Loader;
-
-  loader->SetSource (buf->GetUint8(), buf->GetSize());
-  if (!loader->IsDDS())                       
-  {
-    delete loader;
+  if (buf->GetSize() < sizeof (dds::Header))
     return 0;
+
+  dds::Header head;
+  CopyLEUI32s (&head, buf->GetData(), sizeof (head) / sizeof (uint32));
+  if (head.magic != dds::Magic)
+    return 0;
+
+  const uint32 minimumflags = dds::FLAG_CAPS | dds::FLAG_HEIGHT | 
+    dds::FLAG_WIDTH | dds::FLAG_PIXELFORMAT;
+  if ((head.flags & minimumflags) != minimumflags)
+    return 0;
+
+  uint bpp; 
+  csDDSRawDataType dataType = IdentifyPixelFormat (head.pixelformat,
+    bpp);
+  if (dataType == csrawUnsupported)
+    return 0;
+
+  uint Depth = (head.flags & dds::FLAG_DEPTH) ? head.depth : 1;
+  size_t imgOffset = sizeof (dds::Header);
+  size_t dataSize = DataSize (dataType, bpp, head.width, head.height, Depth);
+
+  if ((dataType == csrawDXT1) && 
+    (dds::Loader::ProbeDXT1Alpha (buf->GetUint8() + imgOffset,
+    head.width, head.height, Depth, dataSize)))
+    dataType = csrawDXT1Alpha;
+
+  if ((dataType < csrawAlphaFirst) || (dataType > csrawAlphaLast))
+    format &= ~CS_IMGFMT_ALPHA;
+  if ((format & CS_IMGFMT_MASK) == CS_IMGFMT_ANY)
+    format = (format & ~CS_IMGFMT_MASK) | CS_IMGFMT_TRUECOLOR;
+
+  csRef<iDataBuffer> imgBuf;
+  {
+    csParasiticDataBufferPooled* bufPtr = bufferPool.Alloc ();
+    bufPtr->SetContents (buf, imgOffset, dataSize);
+    imgBuf.AttachNew (bufPtr);
+  }
+  csDDSImageFile* Image;
+  Image = new csDDSImageFile (object_reg, format, imgBuf,
+    dataType, head.pixelformat);
+  Image->SetDimensions (head.width, head.height);
+
+  if ((head.flags & (dds::FLAG_MIPMAP | dds::FLAG_MIPMAPCOUNT))
+    && (head.mipmapcount != 0))
+  {
+    csRef<csDDSImageFile> mip;
+    uint mipCount = head.mipmapcount - 1;
+    uint w = head.width; uint h = head.height; uint d = Depth;
+    while (mipCount-- > 0)
+    {
+      w = MAX (1, w >> 1); h = MAX (1, h >> 1); d = MAX (1, d >> 1);
+      imgOffset += dataSize;
+      dataSize = DataSize (dataType, bpp, w, h, d);
+      {
+	csParasiticDataBufferPooled* bufPtr = bufferPool.Alloc ();
+	bufPtr->SetContents (buf, imgOffset, dataSize);
+	imgBuf.AttachNew (bufPtr);
+      }
+      mip.AttachNew (new csDDSImageFile (object_reg, format, imgBuf,
+	dataType, head.pixelformat));
+      mip->SetDimensions (w, h);
+      Image->mipmaps.Push (mip);
+    }
   }
 
-  csDDSImageFile* image = new csDDSImageFile (object_reg, format);
-  if (!image->Load (loader))
-  {
-    delete loader;
-    return 0;
-  }
-
-  delete loader;
-  return csPtr<iImage> (image);
+  return csPtr<iImage> (Image);
 }
 
 csPtr<iDataBuffer> csDDSImageIO::Save (iImage* image,
@@ -95,60 +242,107 @@ csPtr<iDataBuffer> csDDSImageIO::Save (iImage* image, const char* mime,
 
 //---------------------------------------------------------------------------
 
-csDDSImageFile::csDDSImageFile (iObjectRegistry* object_reg, int format)
-  : csImageMemory (format), mipmaps(0), mipmapcount(0)
+csDDSImageFile::csDDSImageFile (iObjectRegistry* object_reg, int format, 
+				iDataBuffer* sourceData, 
+				csDDSRawDataType rawType, 
+				const dds::PixelFormat& pixelFmt)
+  : csImageMemory (format), mipmaps(0)
 {
   csDDSImageFile::object_reg = object_reg;
+  rawInfo = new RawInfo;
+  rawInfo->rawData = sourceData;
+  rawInfo->rawType = rawType;
+  rawInfo->pixelFmt = pixelFmt;
 }
 
 csDDSImageFile::~csDDSImageFile ()
 {
+  delete rawInfo;
 }
 
-bool csDDSImageFile::Load (dds::Loader* loader)
+void csDDSImageFile::MakeImageData ()
 {
-  SetDimensions (loader->GetWidth(), loader->GetHeight());
-  /*if (loader->GetBytesPerPixel() != 4)
+  if (rawInfo != 0)
   {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "DDS loader only supports 32 bit images at the moment.");
-    return false;
-  }*/
-  csRGBpixel* img = loader->LoadImage ();
-  if (!img)
-    return false;
-  ConvertFromRGBA (img);
-  if (loader->GetFormat() == dds::FORMAT_RGB)
-    Format &= ~CS_IMGFMT_ALPHA;
-  else
-    CheckAlpha();
+    const uint8* source = rawInfo->rawData->GetUint8();
+    const size_t dataSize = rawInfo->rawData->GetSize();
+    csRGBpixel* buf = new csRGBpixel[Width * Height];
+    switch (rawInfo->rawType)
+    {
+      case csrawDXT1:
+      case csrawDXT1Alpha:
+	{
+	  dds::Loader::DecompressDXT1 (buf, source, Width, Height, 1,
+	    dataSize);
+	  break;
+	}
+      case csrawDXT2:
+	{
+	  dds::Loader::DecompressDXT2 (buf, source, Width, Height, 1,
+	    dataSize);
+	  break;
+	}
+      case csrawDXT3:
+	{
+	  dds::Loader::DecompressDXT3 (buf, source, Width, Height, 1,
+	    dataSize);
+	  break;
+	}
+      case csrawDXT4:
+	{
+	  dds::Loader::DecompressDXT4 (buf, source, Width, Height, 1,
+	    dataSize);
+	  break;
+	}
+      case csrawDXT5:
+	{
+	  dds::Loader::DecompressDXT5 (buf, source, Width, Height, 1,
+	    dataSize);
+	  break;
+	}
+      default:
+	{
+	  if (rawInfo->pixelFmt.flags & dds::FLAG_ALPHAPIXEL)
+	    dds::Loader::DecompressRGBA (buf, source, Width, Height, 1,
+	      dataSize, rawInfo->pixelFmt);
+	  else
+	    dds::Loader::DecompressRGB (buf, source, Width, Height, 1,
+	      dataSize, rawInfo->pixelFmt);
+	}
+    }
 
-  mipmapcount = loader->GetMipmapCount () - 1;
-  for (uint i=0;i<mipmapcount;i++)
-  {
-    csRGBpixel* img = loader->LoadMipmap(i);
-    if (!img)
-      return false;
-
-    csRef<csDDSImageFile> image;
-    image.AttachNew (new csDDSImageFile (object_reg, Format));
-    int newW = loader->GetWidth() >> (i+1);
-    newW = MAX(newW, 1);
-    int newH = loader->GetHeight() >> (i+1);
-    newH = MAX(newH, 1);
-    image->SetDimensions (newW, newH);
-    image->ConvertFromRGBA (img);
-    mipmaps.Push (image);
+    ConvertFromRGBA (buf);
+    if (Format & CS_IMGFMT_ALPHA) CheckAlpha();
+    delete rawInfo; rawInfo = 0;
   }
+}
 
-  return true;
+const void* csDDSImageFile::GetImageData ()
+{
+  MakeImageData();
+  return csImageMemory::GetImageData();
+}
+
+const csRGBpixel* csDDSImageFile::GetPalette ()
+{
+  if (!(Format & CS_IMGFMT_PALETTED8)) return 0;
+  MakeImageData();
+  return csImageMemory::GetPalette();
+}
+
+const uint8* csDDSImageFile::GetAlpha ()
+{
+  if ((Format & (CS_IMGFMT_PALETTED8 | CS_IMGFMT_ALPHA))
+    != (CS_IMGFMT_PALETTED8 | CS_IMGFMT_ALPHA)) return 0;
+  MakeImageData();
+  return csImageMemory::GetAlpha();
 }
 
 csRef<iImage> csDDSImageFile::GetMipmap (uint num)
 {
   if (num == 0)
     return this;
-  if (num > mipmapcount)
+  if (num > mipmaps.Length())
     return 0;
 
   return mipmaps[num-1];
@@ -156,7 +350,43 @@ csRef<iImage> csDDSImageFile::GetMipmap (uint num)
 
 uint csDDSImageFile::HasMipmaps () const
 {
-  return mipmapcount;
+  return mipmaps.Length();
+}
+
+static const char* RawTypeString (csDDSRawDataType type)
+{
+  switch (type)
+  {
+    case csrawDXT1:   
+    case csrawDXT1Alpha:
+      return "dxt1";
+    case csrawDXT2:
+      return "dxt2";
+    case csrawDXT3:
+      return "dxt3";
+    case csrawDXT4:
+      return "dxt4";
+    case csrawDXT5:
+      return "dxt5";
+    case csrawR8G8B8:
+      return "r8g8b8";
+    case csrawR5G6B5:
+      return "r5g6b5";
+    case csrawA8R8G8B8:
+      return "a8r8g8b8";
+    default:
+      return 0;
+  }
+}
+
+const char* csDDSImageFile::GetRawFormat() const
+{
+  return rawInfo ? (RawTypeString (rawInfo->rawType)) : 0;
+}
+
+csRef<iDataBuffer> csDDSImageFile::GetRawData() const
+{
+  return rawInfo ? (rawInfo->rawData) : 0;
 }
 
 void csDDSImageFile::Report (int severity, const char* msg, ...)

@@ -76,9 +76,9 @@ private:
    * Coordinates of the lightmap on the super lightmap, in renderer coords.
    */
   float lmu1, lmv1, lmu2, lmv2;
-
 public:
-  csPolyTextureMapping() : fdu(0.0f), fdv(0.0f), Imin_u(0), Imin_v(0),
+  csPolyTextureMapping() :
+    fdu(0.0f), fdv(0.0f), Imin_u(0), Imin_v(0),
     Fmin_u(0.0f), Fmin_v(0.0f), Fmax_u(0.0f), Fmax_v(0.0f), shf_u(0),
     w(0), h(0), w_orig(0), 
     lmu1(0.0f), lmv1(0.0f), lmu2(0.0f), lmv2(0.0f)
@@ -184,7 +184,6 @@ public:
 
   /// Get original width.
   int GetLitOriginalWidth () const { return w_orig; }
-
   /// Get lightmap coordinates (on super lightmap).
   void GetCoordsOnSuperLM (float& lmu1, float& lmv1,
   	float& lmu2, float& lmv2) const

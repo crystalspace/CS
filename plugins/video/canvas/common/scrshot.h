@@ -20,9 +20,9 @@
 #define __CS_SCRSHOT_H__
 
 #include "ivideo/graph2d.h"
-#include "igraphic/image.h"
+#include "csgfx/imagebase.h"
 
-class csScreenShot : public iImage
+class csScreenShot : public csImageBase
 {
   int Format;
   void *Data;
@@ -44,12 +44,6 @@ public:
   /// Query image height
   virtual int GetHeight () const
   { return Height; }
-  /// Set image file name
-  virtual void SetName (const char *iName)
-  { (void) iName; }
-  /// Get image file name
-  virtual const char *GetName () const
-  { return 0; }
   /// Qyery image format (see CS_IMGFMT_XXX above)
   virtual int GetFormat () const
   { return Format; }
@@ -58,28 +52,6 @@ public:
   { return Palette; }
   virtual int GetClosestIndex (const csRGBpixel& color);
   /// Get alpha map for 8-bit paletted image.
-  virtual const uint8 *GetAlpha ()
-  { return 0; }
-  /// Change image format
-  virtual void SetFormat (int /*iFormat*/)
-  { }
-
-
-  /// Check if image has a keycolour stored with it.
-  virtual bool HasKeyColor () const
-  { return 0; }
-  virtual bool HasKeycolor () const
-  { return HasKeyColor(); }
-  /// Get the keycolour stored with the image.
-  virtual void GetKeyColor (int &r, int &g, int &b) const
-  { r=0;g=0;b=0; }
-  virtual void GetKeycolor (int &r, int &g, int &b) const
-  { GetKeyColor(r,g,b); }
-  /// Has mipmaps.
-  virtual uint HasMipmaps () const
-  { return 0; }
-  virtual csRef<iImage> GetMipmap (uint num)
-  { return (num == 0) ? this : 0; }
 };
 
 #endif // __CS_SCRSHOT_H__

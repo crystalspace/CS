@@ -13,11 +13,17 @@ chronological order.
 	  <cjcollier@colliertech.org> to csutil/t/objreg.t which adds tests for
 	  iObjectRegistry::Get().
 	- Marten rewrote the VBO support. It now uses a fixed cache and only 
-	  a few VBO-allocated buffers togheter with a slot-cache algorithm.
+	  a few VBO-allocated buffers together with a slot-cache algorithm.
 	  It still needs some work, but it should work for most conditions.
 	  VBO is still disabled by default though, if you want to try it
 	  enable VBO in r3dopengl.cfg.
 	- Marten fixed a typo in xmlshader.
+	- res augmented the iImage interface with means to query raw image 
+	  data.
+	- res augmented the GL texture manager to allow direct upload of DXT-
+	  compressed textures, as opposed to the previous way were the image
+	  was uncompressed and later recompressed by the GL driver.
+	- res added csGetBigEndianLong() and relatives.
 25-Jan-2005
 	- Jorrit fixed a bug that could come up in case you are relighting
 	  several maps at the same time and a certain polygon was affected

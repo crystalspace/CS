@@ -29,6 +29,7 @@
  */
 
 #include "csutil/scf.h"
+#include "iutil/databuff.h"
 #include "csgfx/rgbpixel.h"
 
 /*
@@ -59,7 +60,24 @@
 #define CS_IMGFMT_INVALID	0x80000000
 
 
-SCF_VERSION (iImage, 2, 0, 0);
+/** Type of an image. */
+enum csImageType
+{
+  /// 2D image. Nothing special.
+  csimg2D = 0,
+  /**
+   * 3D image. The depth slices are arranged consecutively.
+   */
+  csimg3D,
+  /**
+   * Cube map. The cube faces are stored as sub images, the indices
+   * are the CS_TEXTURE_CUBE_XXX values.
+   * \sa CS_TEXTURE_CUBE_POS_X
+   */
+  csimgCube
+};
+
+SCF_VERSION (iImage, 2, 0, 1);
 
 /**
  * The iImage interface is used to work with image objects.
@@ -86,9 +104,11 @@ struct iImage : public iBase
    */
   virtual const void *GetImageData () = 0;
   /// Query image width
-  virtual int GetWidth () const = 0;
+  virtual int GetWidth() const = 0;
   /// Query image height
-  virtual int GetHeight () const = 0;
+  virtual int GetHeight() const = 0;
+  /// Query image depth (only sensible when the image type is csimg3D)
+  virtual int GetDepth() const = 0;
 
   /// Set image file name
   virtual void SetName (const char *iName) = 0;
@@ -128,7 +148,7 @@ struct iImage : public iBase
   /**
    * Returns the number of mipmaps contained in the image (in case there exist
    * any precalculated mipmaps), in addition to the original image. 0 means
-   * there a no mipmaps.
+   * there are no precomputed mipmaps.
    */
   virtual uint HasMipmaps () const = 0;
   /**
@@ -137,6 +157,32 @@ struct iImage : public iBase
    * returns that mipmap.
    */
   virtual csRef<iImage> GetMipmap (uint num) = 0;
+  
+  /**
+   * Get a string identifying the format of the raw data of the image
+   * (or 0 if raw data is not provided).
+   */
+  virtual const char* GetRawFormat() const = 0;
+  /**
+   * Get the raw data of the image (or 0 if raw data is not provided).
+   */
+  virtual csRef<iDataBuffer> GetRawData() const = 0;
+  /**
+   * Get the type of the contained image.
+   */
+  virtual csImageType  GetImageType() const = 0;
+  /**
+   * Returns the number of sub images, in addition to this image. 
+   * Subimages are usually used for cube map faces.
+   */
+  virtual uint HasSubImages() const = 0;
+  /**
+   * Query a sub image.
+   * A value of 0 for \a num returns the original image, a value larger or equal
+   * than the return value of HasSubImages() returns that sub image, any other
+   * value returns 0.
+   */
+  virtual csRef<iImage> GetSubImage (uint num) = 0;
 };
 
 /** @} */

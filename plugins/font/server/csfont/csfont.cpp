@@ -39,12 +39,6 @@ CS_IMPLEMENT_PLUGIN
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csParasiticDataBuffer)
-  SCF_IMPLEMENTS_INTERFACE (iDataBuffer)
-SCF_IMPLEMENT_IBASE_END
-
-//---------------------------------------------------------------------------
-
 struct csFontDef
 {
   const char* Name;

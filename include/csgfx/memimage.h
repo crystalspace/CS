@@ -83,6 +83,7 @@ protected:
    * or call EnsureImage().
    */
   void SetDimensions (int newWidth, int newHeight);
+  void SetDimensions (int newWidth, int newHeight, int newDepth);
 
   /// Allocate the pixel data buffers.
   void AllocImage();

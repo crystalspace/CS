@@ -24,7 +24,7 @@
 
 class csGraphics2DGLCommon;
 
-class csGLScreenShot : public iImage
+class csGLScreenShot : public csImageBase
 {
   csGraphics2DGLCommon* G2D;
   int Format;
@@ -45,30 +45,8 @@ public:
   { return Width; }
   virtual int GetHeight () const
   { return Height; }
-  virtual void SetName (const char *iName)
-  { (void) iName; }
-  virtual const char *GetName () const
-  { return 0; }
   virtual int GetFormat () const
   { return Format; }
-  virtual const csRGBpixel *GetPalette ()
-  { return 0; }
-  virtual int GetClosestIndex (const csRGBpixel& color)
-  { return -1; }
-  virtual const uint8 *GetAlpha ()
-  { return 0; }
-  virtual bool HasKeyColor () const
-  { return 0; }
-  virtual bool HasKeycolor () const
-  { return HasKeyColor(); }
-  virtual void GetKeyColor (int &r, int &g, int &b) const
-  { r=0; g=0; b=0; }
-  virtual void GetKeycolor (int &r, int &g, int &b) const
-  { GetKeyColor(r,g,b); }
-  virtual uint HasMipmaps () const
-  { return 0; }
-  virtual csRef<iImage> GetMipmap (uint num)
-  { return (num == 0) ? this : 0; }
   void SetData (void*);
 };
 

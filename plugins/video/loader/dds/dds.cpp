@@ -27,303 +27,6 @@
 namespace dds
 {
 
-Loader::Loader ()
-  : source(0), sourcelen(0), header(0), lasterror(0)
-{
-  positions = 0;
-}
-
-Loader::~Loader ()
-{
-  delete[] positions;
-  delete header;
-}
-
-void Loader::SetSource (void* buffer, size_t bufferlen)
-{
-  source = (uint8*) buffer;
-  sourcelen = bufferlen;
-  header = 0;
-}
-
-bool Loader::IsDDS ()
-{
-  uint32 magic = csLittleEndianLong( *((uint32*) source));
-  if (magic != Magic)
-    return false;
-
-  if (!ReadHeader ())
-    return false;
-
-  if (header->size != 124)
-    return false;
-
-  // minimum flags we need
-  uint32 minimumflags = FLAG_CAPS | FLAG_HEIGHT | FLAG_WIDTH |
-		     FLAG_PIXELFORMAT;
-  if ((header->flags & minimumflags) != minimumflags)
-    return false;
-
-  return true;
-}
-
-int Loader::GetWidth()
-{
-  return header->width;
-}
-
-int Loader::GetHeight ()
-{
-  return header->height;
-}
-
-int Loader::GetBytesPerPixel ()
-{
-  return bpp;
-}
-
-int Loader::GetDepth ()
-{
-  return depth;
-}
-
-int Loader::GetMipmapCount ()
-{
-  if (!(header->flags & FLAG_MIPMAPCOUNT))
-    return 0;
-
-  return header->mipmapcount;
-}
-
-csRGBpixel* Loader::LoadImage ()
-{
-  csRGBpixel* buffer = new csRGBpixel[GetWidth() * GetHeight() * GetDepth()];
-
-  // Data starts after header (header size is minus magic)
-  if (!Decompress (buffer, positions[0], GetWidth(), GetHeight(), 
-	      GetWidth() * GetHeight() * bpp))
-  {
-    delete[] buffer;
-    return 0;
-  }
-
-  return buffer;
-}
-
-csRGBpixel* Loader::LoadMipmap (int number)
-{
-  if (number >= GetMipmapCount())
-    return 0;
-
-  int width = GetWidth() >> (number+1);
-  int height = GetHeight() >> (number+1);
-
-  csRGBpixel* buffer = new csRGBpixel[width * height];
-  Decompress (buffer, positions[number+1], width, height,
-	      width * height * bpp);
-
-  return buffer;
-}
-
-uint32 Loader::GetUInt32()
-{
-  uint32 res = csLittleEndianLong (*((uint32*) readpos));
-  readpos += sizeof(uint32);
-
-  return res;
-}
-
-bool Loader::ReadHeader ()
-{
-  if (sourcelen < sizeof(Header))
-    return false;
-
-  int i;
-
-  readpos = source;
-
-  delete header;
-  header = new Header;
-  header->magic = GetUInt32();
-  header->size = GetUInt32();
-  header->flags = GetUInt32 ();
-  header->height = GetUInt32 ();
-  header->width = GetUInt32 ();
-  header->linearsize = GetUInt32 ();
-  header->depth = GetUInt32 ();
-  header->mipmapcount = GetUInt32 ();
-  header->alphabitdepth = GetUInt32 ();
-  for (i=0;i<10;i++)
-    header->reserved[i] = GetUInt32 ();
-  
-  header->pixelformat.size = GetUInt32 ();
-  header->pixelformat.flags = GetUInt32 ();
-  header->pixelformat.fourcc = GetUInt32 ();
-  header->pixelformat.bitdepth = GetUInt32 ();
-  header->pixelformat.redmask = GetUInt32 ();
-  header->pixelformat.bluemask = GetUInt32 ();
-  header->pixelformat.greenmask = GetUInt32 ();
-  header->pixelformat.alphamask = GetUInt32 ();
-
-  header->capabilities.caps1 = GetUInt32 ();
-  header->capabilities.caps2 = GetUInt32 ();
-  header->capabilities.caps3 = GetUInt32 ();
-  header->capabilities.caps4 = GetUInt32 ();
-  header->capabilities.texturestage = GetUInt32 ();
-
-  if (header->size != 124)
-    return false;
-
-  // minimum flags we need                                   
-  uint32 minimumflags = FLAG_CAPS | FLAG_HEIGHT | FLAG_WIDTH |
-		     FLAG_PIXELFORMAT;
-  if ((header->flags & minimumflags) != minimumflags)
-    return false;
-
-  CheckFormat ();
-
-  if (format == FORMAT_UNKNOWN)
-  {
-    printf ("Unknown compression format in dds file.\n");
-    return false;
-  }
-  if (header->capabilities.caps1 & FLAG_COMPLEX
-      && header->capabilities.caps1 & FLAG_CUBEMAP)
-  {
-    printf ("Cubemaps not supported yet!\n");  
-    return false;
-  }
-
-  // Calculate Positions of the image Data
-  int nmips = GetMipmapCount();
-  if (nmips == 0) nmips = 1;
-  delete[] positions;
-  positions = new uint8* [nmips];
-  positions[0] = readpos;
-  uint32 add;
-  if (header->flags & FLAG_LINEARSIZE)
-    add = header->linearsize;
-  else if (header->flags & FLAG_PITCH)
-    add = header->linearsize *= header->height;
-  else
-  {
-    if (format == FORMAT_RGBA || format == FORMAT_RGB)
-      add = header->width * header->height * bpp;
-    else if (format == FORMAT_DXT1)
-      add = header->width * header->height / 2;
-    else
-      add = header->width * header->height;
-  }
-  for (i = 1; i < nmips; i++)
-  {
-    positions[i] = positions[i - 1] + add;
-    if (format == FORMAT_RGBA || format == FORMAT_RGB)
-      add /= 4;
-    else if (format == FORMAT_DXT1)
-      add = MAX(add/4, 8);
-    else
-      add = MAX(add/4, 16);
-  }
-  if ((size_t)(positions[nmips - 1] - positions[0] + add) > sourcelen)
-  {
-    printf ("DDS Image too small: needs %u bytes; contains only %lu.\n",
-	(unsigned int)(positions[nmips] - positions[0] + add),
-	(unsigned long)sourcelen);
-    return false;
-  }
-    
-  return true;
-}
-
-void Loader::CheckFormat ()
-{
-  blocksize = 0;
-  bpp = 4;
-
-  if (header->pixelformat.flags & FLAG_FOURCC) // compressed image
-  {
-    blocksize = ((GetWidth()+3)/4) * ((GetHeight()+3)/4) *
-      ((header->pixelformat.bitdepth +3)/4);
-    switch (header->pixelformat.fourcc)
-    {
-      case MakeFourCC ('D','X','T','1'):
-	blocksize *= 8;
-	format = FORMAT_DXT1;
-	break;
-      case MakeFourCC ('D','X','T','2'):
-	blocksize *= 16;
-	format = FORMAT_DXT2;
-	break;
-      case MakeFourCC ('D','X','T','3'):
-	blocksize *= 16;
-	format = FORMAT_DXT3;
-	break;
-      case MakeFourCC ('D','X','T','4'):
-	blocksize *= 16;
-	format = FORMAT_DXT4;
-	break;
-      case MakeFourCC ('D','X','T','5'):
-	blocksize *= 16;
-	format = FORMAT_DXT5;
-	break;
-
-      default:
-	format = FORMAT_UNKNOWN;
-	lasterror = "Unknown compression format";
-	return;
-    }
-  }
-  else // not compressed
-  {
-    if (header->pixelformat.flags & FLAG_ALPHAPIXEL)
-    {
-      //blocksize = GetWidth()*GetHeight() * header->pixelformat.bitdepth * 4;
-      format = FORMAT_RGBA;
-    }
-    else
-    {
-      //blocksize = GetWidth()*GetHeight() * header->pixelformat.bitdepth * 3;
-      format = FORMAT_RGB;
-      //bpp = 3;
-    }
-    bpp = header->pixelformat.bitdepth / 8;
-    blocksize = GetWidth() * GetHeight() * bpp;
-  }
-
-  depth = header->depth ? header->depth : 1;
-}
-
-bool Loader::Decompress (csRGBpixel* buffer, uint8* source,
-			 int width, int height, uint32 planesize)
-{
-  switch (format)
-  {
-    case FORMAT_RGB:
-    case FORMAT_RGBA:
-      if (bpp < 3) return false;
-      DecompressRGBA (buffer, source, width, height, planesize);
-      break;
-    case FORMAT_DXT1:
-      DecompressDXT1 (buffer, source, width, height, planesize);
-      break;
-    case FORMAT_DXT2:
-      DecompressDXT2 (buffer, source, width, height, planesize);
-      break;
-    case FORMAT_DXT3:
-      DecompressDXT3 (buffer, source, width, height, planesize);
-      break;
-    case FORMAT_DXT4:
-      DecompressDXT4 (buffer, source, width, height, planesize);
-      break;
-    case FORMAT_DXT5:
-      DecompressDXT5 (buffer, source, width, height, planesize);
-      break;
-    default:
-      break;
-  }
-  return true;
-}
-
 struct Color8888
 {
   unsigned char r,g,b,a;
@@ -339,37 +42,37 @@ static inline int ColorComponent (int x, int bitcount, int shift)
 #define COLOR565_GREEN(x)   ColorComponent(x, 6, 5)
 #define COLOR565_BLUE(x)    ColorComponent(x, 5, 0)
 
-void Loader::DecompressRGBA (csRGBpixel* buffer, uint8* source, int, int, 
-			     uint32 size)
+bool Loader::ProbeDXT1Alpha (const uint8* source, int w, int h, int depth, 
+			     size_t size)
 {
-  if (format == FORMAT_RGB)
+  int          x, y, z;
+  unsigned char *Temp;
+  uint16       color_0, color_1;
+
+  Temp = (unsigned char*) source;
+  for (z = 0; z < depth; z++) 
   {
-    while (size > 0)
+    for (y = 0; y < w; y += 4) 
     {
-      buffer->red = *source++;
-      buffer->green = *source++;
-      buffer->blue = *source++;
-      buffer->alpha = 0xff;
-      size -= 3;
-      buffer++;
+      for (x = 0; x < h; x += 4) 
+      {
+	color_0 = csLittleEndianShort (*((uint16*)Temp)); 
+	color_1 = csLittleEndianShort (*((uint16*)Temp+1));
+	Temp += 8;
+
+	if (color_0 <= color_1) 
+	{
+	  return true;
+	}
+      }
     }
   }
-  else
-  {
-    while (size > 0)
-    {
-      buffer->red = *source++;
-      buffer->green = *source++;
-      buffer->blue = *source++;
-      buffer->alpha = *source++;
-      size -= 4;
-      buffer++;
-    }
-  }
+  return false;
 }
 
-void Loader::DecompressDXT1 (csRGBpixel* buffer, uint8* source, 
-			     int Width, int Height, uint32 planesize)
+void Loader::DecompressDXT1 (csRGBpixel* buffer, const uint8* source, 
+			     int Width, int Height, int depth, 
+			     uint32 planesize)
 {
   int          x, y, z, i, j, k, Select;
   unsigned char *Temp;
@@ -452,13 +155,13 @@ void Loader::DecompressDXT1 (csRGBpixel* buffer, uint8* source,
   }
 }
 
-void Loader::DecompressDXT2(csRGBpixel* buffer, uint8* source, int width,
-			    int height, uint32 planesize)
+void Loader::DecompressDXT2(csRGBpixel* buffer, const uint8* source, int width,
+			    int height, int depth, uint32 planesize)
 {
   // Can do color & alpha same as dxt3, but color is pre-multiplied
   // so the result will be wrong unless corrected.
-  DecompressDXT3(buffer, source, width, height, planesize);
-  CorrectPremult (buffer, planesize);
+  DecompressDXT3(buffer, source, width, height, depth, planesize);
+  CorrectPremult (buffer, width * height * depth);
 }
 
 struct DXTAlphaBlockExplicit
@@ -466,8 +169,9 @@ struct DXTAlphaBlockExplicit
   uint16 row[4];
 };
 
-void Loader::DecompressDXT3(csRGBpixel* buffer, uint8* source,
-			    int Width, int Height, uint32 planesize)
+void Loader::DecompressDXT3(csRGBpixel* buffer, const uint8* source,
+			    int Width, int Height, int depth, 
+			    uint32 planesize)
 {
   int           x, y, z, i, j, k, Select;
   unsigned char *Temp;
@@ -552,24 +256,27 @@ void Loader::DecompressDXT3(csRGBpixel* buffer, uint8* source,
   }
 }
 
-void Loader::DecompressDXT4 (csRGBpixel* buffer, uint8* source, 
-			     int width, int height, uint32 planesize)
+void Loader::DecompressDXT4 (csRGBpixel* buffer, const uint8* source, 
+			     int width, int height, int depth, 
+			     uint32 planesize)
 {
   // Can do color & alpha same as dxt5, but color is pre-multiplied
   // so the result will be wrong unless corrected.
-  DecompressDXT5 (buffer, source, width, height, planesize);
-  CorrectPremult (buffer, planesize);
+  DecompressDXT5 (buffer, source, width, height, depth, planesize);
+  CorrectPremult (buffer, width * height * depth);
 }
 
-void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source, 
-			     int Width, int Height, uint32 planesize)
+void Loader::DecompressDXT5 (csRGBpixel* buffer, const uint8* source, 
+			     int Width, int Height, int depth, 
+			     uint32 planesize)
 {
   int             x, y, z, i, j, k, Select;
-  uint8         *Temp;
+  const uint8     *Temp;
   uint16       color_0, color_1;
   Color8888       colours[4];
   uint32          bitmask, Offset;
-  uint8         alphas[8], *alphamask;
+  uint8		  alphas[8];
+  const uint8*	  alphamask;
   uint32          bits;
 
   Temp = source;
@@ -696,10 +403,90 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
   }
 }
 
-void Loader::CorrectPremult (csRGBpixel* buffer, uint32 planesize)
+inline static void ComputeMaskParams (uint32 mask, int& shift1, int& mul, int& shift2)
 {
-  uint32 size = (planesize * GetDepth()) / bpp;
-  for (uint32 i = 0; i<size; i++)
+  shift1 = 0; mul = 1; shift2 = 0;
+  while ((mask & 1) == 0)
+  {
+    mask >>= 1;
+    shift1++;
+  }
+  uint bc = 0;
+  while ((mask & (1 << bc)) != 0) bc++;
+  while ((mask * mul) < 255)
+    mul = (mul << bc) + 1;
+  mask *= mul;
+  while ((mask & ~0xff) != 0)
+  {
+    mask >>= 1;
+    shift2++;
+  }
+}
+
+void Loader::DecompressRGB (csRGBpixel* buffer, const uint8* source, 
+			    int w, int h, int depth, size_t size, 
+			    const PixelFormat& pf)
+{
+  const int valShift = 32 - pf.bitdepth;
+  const uint valMask = (1 << pf.bitdepth) - 1;
+  const size_t pixSize = (pf.bitdepth + 7) / 8;
+  int rShift1, rMul, rShift2;
+  ComputeMaskParams (pf.redmask, rShift1, rMul, rShift2);
+  int gShift1, gMul, gShift2;
+  ComputeMaskParams (pf.greenmask, gShift1, gMul, gShift2);
+  int bShift1, bMul, bShift2;
+  ComputeMaskParams (pf.bluemask, bShift1, bMul, bShift2);
+
+  uint pixnum = w * h * depth;
+  while (pixnum-- > 0)
+  {
+    uint32 px = csGetLittleEndianLong (source) & valMask;
+    source += pixSize;
+    uint32 pxc = px & pf.redmask;
+    buffer->red = ((pxc >> rShift1) * rMul) >> rShift2;
+    pxc = px & pf.greenmask;
+    buffer->green = ((pxc >> gShift1) * gMul) >> gShift2;
+    pxc = px & pf.bluemask;
+    buffer->blue = ((pxc >> bShift1) * bMul) >> bShift2;
+    buffer++;
+  }
+}
+
+void Loader::DecompressRGBA (csRGBpixel* buffer, const uint8* source, 
+			     int w, int h, int depth, size_t size, 
+			     const PixelFormat& pf)
+{
+  const int valShift = 32 - pf.bitdepth;
+  const size_t pixSize = (pf.bitdepth + 7) / 8;
+  int rShift1, rMul, rShift2;
+  ComputeMaskParams (pf.redmask, rShift1, rMul, rShift2);
+  int gShift1, gMul, gShift2;
+  ComputeMaskParams (pf.greenmask, gShift1, gMul, gShift2);
+  int bShift1, bMul, bShift2;
+  ComputeMaskParams (pf.bluemask, bShift1, bMul, bShift2);
+  int aShift1, aMul, aShift2;
+  ComputeMaskParams (pf.alphamask, aShift1, aMul, aShift2);
+
+  uint pixnum = w * h * depth;
+  while (pixnum-- > 0)
+  {
+    uint32 px = csGetLittleEndianLong (source) >> valShift;
+    source += pixSize;
+    uint32 pxc = px & pf.redmask;
+    buffer->red = ((pxc >> rShift1) * rMul) >> rShift2;
+    pxc = px & pf.greenmask;
+    buffer->green = ((pxc >> gShift1) * gMul) >> gShift2;
+    pxc = px & pf.bluemask;
+    buffer->blue = ((pxc >> bShift1) * bMul) >> bShift2;
+    pxc = px & pf.alphamask;
+    buffer->alpha = ((pxc >> aShift1) * aMul) >> aShift2;
+    buffer++;
+  }
+}
+
+void Loader::CorrectPremult (csRGBpixel* buffer, size_t pixnum)
+{
+  for (uint32 i = 0; i<pixnum; i++)
   {
     const int a = buffer[i].alpha;
     if (!a) continue;

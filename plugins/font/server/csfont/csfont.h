@@ -31,6 +31,7 @@
 #include "csutil/weakref.h"
 #include "iutil/plugin.h"
 #include "iutil/databuff.h"
+#include "csutil/parasiticdatabuffer.h"
 
 struct iObjectRegistry;
 struct iPluginManager;
@@ -39,48 +40,6 @@ class csDefaultFontServer;
 #define GLYPH_INDEX_UPPER_SHIFT	    8
 #define GLYPH_INDEX_LOWER_COUNT	    256
 #define GLYPH_INDEX_LOWER_MASK	    0xff
-
-class csParasiticDataBuffer : public iDataBuffer
-{
-  csRef<iDataBuffer> parentBuffer;
-  size_t size;
-  uint8* data;
-public:
-  SCF_DECLARE_IBASE;
-
-  csParasiticDataBuffer (iDataBuffer* parent, size_t offs,
-    size_t size = (size_t)~0)
-  {
-    SCF_CONSTRUCT_IBASE(0);
-    parentBuffer = parent;
-    data = parent->GetUint8 () + offs;
-    if (size == (size_t)~0)
-      csParasiticDataBuffer::size = parent->GetSize () - offs;
-    else
-      csParasiticDataBuffer::size = size;
-  }
-  virtual ~csParasiticDataBuffer ()
-  {
-    SCF_DESTRUCT_IBASE();
-  }
-
-  /// Query the buffer size
-  virtual size_t GetSize () const
-  { return size; }
-  /// Get the buffer as an abstract pointer
-  virtual char* GetData () const
-  { return (char*)data; }
-  /// Get the buffer as an (char *) pointer
-  inline char *operator * () const
-  { return (char *)GetData (); }
-  /// Get as an int8 *
-  inline int8* GetInt8 ()
-  { return (int8 *)GetData (); }
-  /// Get as an uint8 *
-  inline uint8* GetUint8 ()
-  { return (uint8 *)GetData (); }
-};
-
 
 /**
  * Bitmap font

@@ -265,7 +265,7 @@ static inline float csConvertEndian (float f)
 { return csLittleEndianFloat (f); }
 
 /// Read a little-endian short from address
-inline uint16 csGetLittleEndianShort (void *buff)
+inline uint16 csGetLittleEndianShort (const void *buff)
 {
 #ifdef CS_STRICT_ALIGNMENT
   uint16 s; memcpy (&s, buff, sizeof (s));
@@ -276,7 +276,7 @@ inline uint16 csGetLittleEndianShort (void *buff)
 }
 
 /// Read a little-endian long from address
-inline uint32 csGetLittleEndianLong (void *buff)
+inline uint32 csGetLittleEndianLong (const void *buff)
 {
 #ifdef CS_STRICT_ALIGNMENT
   uint32 l; memcpy (&l, buff, sizeof (l));
@@ -287,15 +287,15 @@ inline uint32 csGetLittleEndianLong (void *buff)
 }
 
 /// Read a little-endian 32-bit float from address
-inline float csGetLittleEndianFloat32 (void *buff)
+inline float csGetLittleEndianFloat32 (const void *buff)
 { uint32 l = csGetLittleEndianLong (buff); return csLongToFloat (l); }
 
 /// Read a little-endian 16-bit float from address
-inline float csGetLittleEndianFloat16 (void *buff)
+inline float csGetLittleEndianFloat16 (const void *buff)
 { uint16 s = csGetLittleEndianShort (buff); return csShortToFloat (s); }
 
 /// Set a little-endian short on a address
-inline void csSetLittleEndianShort (void *buff, uint16 s)
+inline void csSetLittleEndianShort (const void *buff, uint16 s)
 {
 #ifdef CS_STRICT_ALIGNMENT
   s = csLittleEndianShort (s);
@@ -306,7 +306,7 @@ inline void csSetLittleEndianShort (void *buff, uint16 s)
 }
 
 /// Set a little-endian long on a address
-inline void csSetLittleEndianLong (void *buff, uint32 l)
+inline void csSetLittleEndianLong (const void *buff, uint32 l)
 {
 #ifdef CS_STRICT_ALIGNMENT
   l = csLittleEndianLong (l);
@@ -317,12 +317,73 @@ inline void csSetLittleEndianLong (void *buff, uint32 l)
 }
 
 /// Set a little-endian 32-bit float on a address
-inline void csSetLittleEndianFloat32 (void *buff, float f)
+inline void csSetLittleEndianFloat32 (const void *buff, float f)
 { csSetLittleEndianLong (buff, csFloatToLong (f)); }
 
 /// Set a little-endian 16-bit float on a address
-inline void csSetLittleEndianFloat16 (void *buff, float f)
+inline void csSetLittleEndianFloat16 (const void *buff, float f)
 { csSetLittleEndianShort (buff, csFloatToShort (f)); }
+
+
+/// Read a big-endian short from address
+inline uint16 csGetBigEndianShort (const void *buff)
+{
+#ifdef CS_STRICT_ALIGNMENT
+  uint16 s; memcpy (&s, buff, sizeof (s));
+  return csBigEndianShort (s);
+#else
+  return csBigEndianShort (*(uint16 *)buff);
+#endif
+}
+
+/// Read a big-endian long from address
+inline uint32 csGetBigEndianLong (const void *buff)
+{
+#ifdef CS_STRICT_ALIGNMENT
+  uint32 l; memcpy (&l, buff, sizeof (l));
+  return csBigEndianLong (l);
+#else
+  return csBigEndianLong (*(uint32 *)buff);
+#endif
+}
+
+/// Read a big-endian 32-bit float from address
+inline float csGetBigEndianFloat32 (const void *buff)
+{ uint32 l = csGetBigEndianLong (buff); return csLongToFloat (l); }
+
+/// Read a big-endian 16-bit float from address
+inline float csGetBigEndianFloat16 (const void *buff)
+{ uint16 s = csGetBigEndianShort (buff); return csShortToFloat (s); }
+
+/// Set a big-endian short on a address
+inline void csSetBigEndianShort (void *buff, uint16 s)
+{
+#ifdef CS_STRICT_ALIGNMENT
+  s = csBigEndianShort (s);
+  memcpy (buff, &s, sizeof (s));
+#else
+  *((uint16 *)buff) = csBigEndianShort (s);
+#endif
+}
+
+/// Set a big-endian long on a address
+inline void csSetBigEndianLong (void *buff, uint32 l)
+{
+#ifdef CS_STRICT_ALIGNMENT
+  l = csBigEndianLong (l);
+  memcpy (buff, &l, sizeof (l));
+#else
+  *((uint32 *)buff) = csBigEndianLong (l);
+#endif
+}
+
+/// Set a big-endian 32-bit float on a address
+inline void csSetBigEndianFloat32 (void *buff, float f)
+{ csSetBigEndianLong (buff, csFloatToLong (f)); }
+
+/// Set a big-endian 16-bit float on a address
+inline void csSetBigEndianFloat16 (void *buff, float f)
+{ csSetBigEndianShort (buff, csFloatToShort (f)); }
 
 /** @} */
 

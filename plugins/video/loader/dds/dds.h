@@ -81,8 +81,8 @@ struct PixelFormat
   uint32 bitdepth;  // number of bits per pixel (usually 16,24 or 32)
   
   uint32 redmask;   // mask for the red pixels (usually 0x00ff0000)
-  uint32 bluemask;  // mask for the green pixels (usually 0x0000ff00)
-  uint32 greenmask; // mask for the blue pixels (usually 0x000000ff)
+  uint32 greenmask; // mask for the green pixels (usually 0x0000ff00)
+  uint32 bluemask;  // mask for the blue pixels (usually 0x000000ff)
   
   uint32 alphamask; // mask for the alpha value in a pixel
 			      // (usually 0xff000000)
@@ -92,9 +92,10 @@ struct Capabilities
 {
   uint32 caps1;
   uint32 caps2;
-  uint32 caps3;
+  uint32 reserved[2];
+  /*uint32 caps3;
   uint32 caps4;
-  uint32 texturestage;
+  uint32 texturestage;*/
 };
 
 struct Header
@@ -131,63 +132,24 @@ const uint32 Magic = MakeFourCC ('D','D','S',' ');
 class Loader
 {
 public:
-  Loader ();
-  ~Loader ();
-  
-  void SetSource (void* buffer, size_t bufferlen);
-
-  bool IsDDS ();	  // Readsin the Header and tests if it is a dds file
-  int GetWidth ();	  // returns width of the image
-  int GetHeight ();	  // returns height of the image
-  int GetBytesPerPixel (); // return bits per pixel
-  int GetDepth ();	  // returns depth of the image (for volume/3d images)
-  int GetMipmapCount ();  // returns number of contained mipmap levels
-  
-  // Loads the main Image and returns a buffer which has to be deleted with
-  // delete[] later.
-  // Note that you MUST call IsDDS before calling this function
-  csRGBpixel* LoadImage ();
-
-  // Loads mipmap number n. Returns a buffer which has to be deleted with
-  // delete[] later
-  csRGBpixel* LoadMipmap (int n);
-
-  int GetFormat () const { return format; }
+  static bool ProbeDXT1Alpha (const uint8* source, int w, int h, int depth, 
+    size_t size);
+  static void DecompressDXT1 (csRGBpixel* buffer, const uint8* source, 
+    int w, int h, int depth, size_t size);
+  static void DecompressDXT2 (csRGBpixel* buffer, const uint8* source, 
+    int w, int h, int depth, size_t size);
+  static void DecompressDXT3 (csRGBpixel* buffer, const uint8* source, 
+    int w, int h, int depth, size_t size);
+  static void DecompressDXT4 (csRGBpixel* buffer, const uint8* source, 
+    int w, int h, int depth, size_t size);
+  static void DecompressDXT5 (csRGBpixel* buffer, const uint8* source, 
+    int w, int h, int depth, size_t size);
+  static void DecompressRGB (csRGBpixel* buffer, const uint8* source, 
+    int w, int h, int depth, size_t size, const PixelFormat& pf);
+  static void DecompressRGBA (csRGBpixel* buffer, const uint8* source, 
+    int w, int h, int depth, size_t size, const PixelFormat& pf);
 private:
-  bool ReadHeader ();
-  
-  void CheckFormat ();
-
-  uint32 GetUInt32 ();
-
-  bool Decompress (csRGBpixel* buffer, uint8* source, int w, int h, 
-    uint32 size);
-  void DecompressRGBA (csRGBpixel* buffer, uint8* source, int w, int h, 
-    uint32 size);
-  void DecompressDXT1 (csRGBpixel* buffer, uint8* source, int w, int h, 
-    uint32 size);
-  void DecompressDXT2 (csRGBpixel* buffer, uint8* source, int w, int h, 
-    uint32 size);
-  void DecompressDXT3 (csRGBpixel* buffer, uint8* source, int w, int h, 
-    uint32 size);
-  void DecompressDXT4 (csRGBpixel* buffer, uint8* source, int w, int h, 
-    uint32 size);
-  void DecompressDXT5 (csRGBpixel* buffer, uint8* source, int w, int h, 
-    uint32 size);
-
-  void CorrectPremult (csRGBpixel* buffer, uint32 planesize);
-
-  int format, blocksize;
-  int depth; // depth of volume textures
-  int bpp; // bytes per pixel
-
-  uint8* source;
-  uint8* readpos;
-  uint8** positions;
-  size_t sourcelen;
-  Header* header;
-  
-  const char* lasterror;
+  static void CorrectPremult (csRGBpixel* buffer, size_t pixnum);
 };
 
 } // end of namespace dds
