@@ -314,11 +314,11 @@ global namespace.
 @item
 @code{QInt()} @result{} @code{csQint()}
 @item
-@code{QInt16()} @result{} @code{csQint16()}
+@code{QInt8()} @result{} @code{csQfixed8()}
 @item
-@code{QInt24()} @result{} @code{csQint24()}
+@code{QInt16()} @result{} @code{csQfixed16()}
 @item
-@code{QInt8()} @result{} @code{csQint8()}
+@code{QInt24()} @result{} @code{csQfixed24()}
 @item
 @code{qisqrt()} @result{} @code{csQisqrt()}
 @item

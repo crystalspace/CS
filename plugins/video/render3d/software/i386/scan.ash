@@ -418,10 +418,10 @@ proc		%%name,%%args_size+%%scanloop_args,ebx,esi,edi,ebp
 		fxch			; z, u, inv_z			; 1
 		fmul	%$v_div_z	; v, u, inv_z			; 2/3
 
-; int uu = csQint16 (u);
-; int vv = csQint16 (v);
-; long izz = csQint24 (inv_z);
-; dzz = csQint24 (M);
+; int uu = csQfixed16 (u);
+; int vv = csQfixed16 (v);
+; long izz = csQfixed24 (inv_z);
+; dzz = csQfixed24 (M);
 		fld	st2		; inv_z, v, u, inv_z		; 3/1
 		fmul	%$const24	; izz, v, u, inv_z		; 4/3
 		fxch	st2		; u, v, izz, inv_z		; 4
@@ -490,8 +490,8 @@ proc		%%name,%%args_size+%%scanloop_args,ebx,esi,edi,ebp
 			lea	eax,[edi+ecx*(%%bpp/8)]			; 10
 			mov	%$destend,eax				; 11
 
-;     uu1 = csQint16 (u1);
-;     vv1 = csQint16 (v1);
+;     uu1 = csQfixed16 (u1);
+;     vv1 = csQfixed16 (v1);
 			fmul	%$const16; uu1, v1, inv_z		; 12/3
 			fxch		; v1, uu1, inv_z		; 12
 			fmul	%$const16;vv1, uu1, inv_z		; 13/3
@@ -560,8 +560,8 @@ proc		%%name,%%args_size+%%scanloop_args,ebx,esi,edi,ebp
 			fxch		; v_div_z, u1, z1, inv_z	; 11
 			fmulp	st2	; u1, v1, inv_z			; 12 (stall)
 			mov	%$destend,eax				; 13
-;     uu1 = csQint16 (u1);
-;     vv1 = csQint16 (v1);
+;     uu1 = csQfixed16 (u1);
+;     vv1 = csQfixed16 (v1);
 			fmul	%$const16;uu1, v1, inv_z		; 14/3
 			fxch		; v1, uu1, inv_z		; 14
 			fmul	%$const16;vv1, uu1, inv_z		; 15/3

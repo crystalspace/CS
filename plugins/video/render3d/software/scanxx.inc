@@ -47,8 +47,8 @@ void SCAN_NAME (SCAN_BPP, scan_flat_zfil) (int xx, unsigned char* d,
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
-  int32 izz = csQint24 (inv_z);
-  int32 dzz = csQint24 (Scan.M);
+  int32 izz = csQfixed24 (inv_z);
+  int32 dzz = csQfixed24 (Scan.M);
   PIXTYPE *_dest = (PIXTYPE *)d;
   PIXTYPE *_destend = _dest + xx - 1;
   do
@@ -91,8 +91,8 @@ void SCAN_NAME (SCAN_BPP, scan_flat_zuse) (int xx, unsigned char* d,
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
-  uint32 izz = csQint24 (inv_z);
-  uint32 dzz = csQint24 (Scan.M);
+  uint32 izz = csQfixed24 (inv_z);
+  uint32 dzz = csQfixed24 (Scan.M);
   PIXTYPE *_dest = (PIXTYPE *)d;
   PIXTYPE *_destend = _dest + xx - 1;
   do
@@ -120,8 +120,8 @@ void SCAN_NAME (SCAN_BPP, scan_flat_ztest) (int xx, unsigned char* d,
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
-  uint32 izz = csQint24 (inv_z);
-  uint32 dzz = csQint24 (Scan.M);
+  uint32 izz = csQfixed24 (inv_z);
+  uint32 dzz = csQfixed24 (Scan.M);
   PIXTYPE *_dest = (PIXTYPE *)d;
   PIXTYPE *_destend = _dest + xx - 1;
   do

@@ -3000,8 +3000,8 @@ void csSoftwareGraphics3DCommon::RealStartPolygonFX (iTextureHandle* handle,
     pqinfo.tw = txt_unl->get_width ();
     pqinfo.th = txt_unl->get_height ();
     pqinfo.shf_w = txt_unl->get_w_shift ();
-    pqinfo.twfp = csQint16 (pqinfo.tw) - 1;
-    pqinfo.thfp = csQint16 (pqinfo.th) - 1;
+    pqinfo.twfp = csQfixed16 (pqinfo.tw) - 1;
+    pqinfo.thfp = csQfixed16 (pqinfo.th) - 1;
     pqinfo.keycolor = tex_mm->GetKeyColor ();
     pqinfo.textured = do_textured;
     pqinfo.tiling = !!(mode & CS_FX_TILING);
@@ -3232,14 +3232,14 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
         if (dyR)
         {
           float inv_dyR = 1 / dyR;
-          R.x = csQint16 (poly.vertices [(int)R.sv].x);
-          R.dxdy = csQint16 (
+          R.x = csQfixed16 (poly.vertices [(int)R.sv].x);
+          R.dxdy = csQfixed16 (
             (poly.vertices [(int)R.fv].x - poly.vertices [(int)R.sv].x) * inv_dyR);
-          R.dzdy = csQint24 ((iz [(int)R.fv] - iz [(int)R.sv]) * inv_dyR);
+          R.dzdy = csQfixed24 ((iz [(int)R.fv] - iz [(int)R.sv]) * inv_dyR);
           if (pqinfo.textured)
           {
-            R.dudy = csQint16 ((uu [(int)R.fv] - uu [(int)R.sv]) * inv_dyR);
-            R.dvdy = csQint16 ((vv [(int)R.fv] - vv [(int)R.sv]) * inv_dyR);
+            R.dudy = csQfixed16 ((uu [(int)R.fv] - uu [(int)R.sv]) * inv_dyR);
+            R.dvdy = csQfixed16 ((vv [(int)R.fv] - vv [(int)R.sv]) * inv_dyR);
           }
           if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
@@ -3251,7 +3251,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           // horizontal pixel correction
           float deltaX = (R.dxdy * 1/65536.) *
             (poly.vertices [(int)R.sv].y - (float (sy) - 0.5));
-          R.x += csQint16 (deltaX);
+          R.x += csQfixed16 (deltaX);
 
           // apply sub-pixel accuracy factor
           float Factor;
@@ -3261,10 +3261,10 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             Factor = 0;
           if (pqinfo.textured)
           {
-            R.u = csQint16 (uu [(int)R.sv] + (uu [(int)R.fv] - uu [(int)R.sv]) * Factor);
-            R.v = csQint16 (vv [(int)R.sv] + (vv [(int)R.fv] - vv [(int)R.sv]) * Factor);
+            R.u = csQfixed16 (uu [(int)R.sv] + (uu [(int)R.fv] - uu [(int)R.sv]) * Factor);
+            R.v = csQfixed16 (vv [(int)R.sv] + (vv [(int)R.fv] - vv [(int)R.sv]) * Factor);
           }
-          R.z = csQint24 (iz [(int)R.sv] + (iz [(int)R.fv] - iz [(int)R.sv]) * Factor);
+          R.z = csQfixed24 (iz [(int)R.sv] + (iz [(int)R.fv] - iz [(int)R.sv]) * Factor);
           if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             R.r = csQround (rr [(int)R.sv] + (rr [(int)R.fv] - rr [(int)R.sv]) * Factor);
@@ -3290,14 +3290,14 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
         if (dyL)
         {
           float inv_dyL = 1 / dyL;
-          L.x = csQint16 (poly.vertices [(int)L.sv].x);
-          L.dxdy = csQint16 (
+          L.x = csQfixed16 (poly.vertices [(int)L.sv].x);
+          L.dxdy = csQfixed16 (
             (poly.vertices [(int)L.fv].x - poly.vertices [(int)L.sv].x) * inv_dyL);
-          L.dzdy = csQint24 ((iz [(int)L.fv] - iz [(int)L.sv]) * inv_dyL);
+          L.dzdy = csQfixed24 ((iz [(int)L.fv] - iz [(int)L.sv]) * inv_dyL);
           if (pqinfo.textured)
           {
-            L.dudy = csQint16 ((uu [(int)L.fv] - uu [(int)L.sv]) * inv_dyL);
-            L.dvdy = csQint16 ((vv [(int)L.fv] - vv [(int)L.sv]) * inv_dyL);
+            L.dudy = csQfixed16 ((uu [(int)L.fv] - uu [(int)L.sv]) * inv_dyL);
+            L.dvdy = csQfixed16 ((vv [(int)L.fv] - vv [(int)L.sv]) * inv_dyL);
           }
           if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
@@ -3309,7 +3309,7 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
           // horizontal pixel correction
           float deltaX = (L.dxdy * 1/65536.) *
             (poly.vertices [(int)L.sv].y - (float (sy) - 0.5));
-          L.x += csQint16 (deltaX);
+          L.x += csQfixed16 (deltaX);
 
           // apply sub-pixel accuracy factor
           float Factor;
@@ -3319,10 +3319,10 @@ void csSoftwareGraphics3DCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
             Factor = 0;
           if (pqinfo.textured)
           {
-            L.u = csQint16 (uu [(int)L.sv] + (uu [(int)L.fv] - uu [(int)L.sv]) * Factor);
-            L.v = csQint16 (vv [(int)L.sv] + (vv [(int)L.fv] - vv [(int)L.sv]) * Factor);
+            L.u = csQfixed16 (uu [(int)L.sv] + (uu [(int)L.fv] - uu [(int)L.sv]) * Factor);
+            L.v = csQfixed16 (vv [(int)L.sv] + (vv [(int)L.fv] - vv [(int)L.sv]) * Factor);
           }
-          L.z = csQint24 (iz [(int)L.sv] + (iz [(int)L.fv] - iz [(int)L.sv]) * Factor);
+          L.z = csQfixed24 (iz [(int)L.sv] + (iz [(int)L.fv] - iz [(int)L.sv]) * Factor);
           if (!(pqinfo.mixmode & CS_FX_FLAT))
           {
             L.r = csQround (rr [(int)L.sv] + (rr [(int)L.fv] - rr [(int)L.sv]) * Factor);

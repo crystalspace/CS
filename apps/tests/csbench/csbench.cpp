@@ -520,9 +520,6 @@ void CsBench::PerformTests ()
 # endif
   Report ("Compiler '%s', platform '%s', processor '%s'",
   	CS_COMPILER_NAME, CS_PLATFORM_NAME, CS_PROCESSOR_NAME);
-#ifdef CS_QINT_WORKAROUND
-  Report ("csQint() workaround enabled!");
-#endif
 #ifdef CS_NO_QSQRT
   Report ("csQsqrt() disabled!");
 #endif

@@ -39,8 +39,8 @@ csRef<iImage> csImageManipulate::Rescale2D (iImage* source, int newwidth,
   // just a rough scale. It could be improved by someone in the future.
 
   unsigned int x, y;
-  unsigned int dx = csQint16 (float (Width) / float (newwidth));
-  unsigned int dy = csQint16 (float (Height) / float (newheight));
+  unsigned int dx = csQfixed16 (float (Width) / float (newwidth));
+  unsigned int dy = csQfixed16 (float (Height) / float (newheight));
 
 #define RESIZE(pt, Source, Dest)			\
   {							\
@@ -100,7 +100,7 @@ csRef<iImage> csImageManipulate::Rescale (iImage* source, int newwidth,
   if (source->GetPalette() != 0)
     memcpy (newImage->GetPalettePtr(), source->GetPalette(), 
       sizeof (csRGBpixel) * 256);
-  uint dz = csQint16 (float (Depth) / float (newdepth));
+  uint dz = csQfixed16 (float (Depth) / float (newdepth));
   if (newdepth < Depth)
   {
     csRef<csImageMemory> resizeScrap;

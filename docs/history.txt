@@ -6,6 +6,23 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Mar-2005
+	- Eric Sunshine renamed csQint8(), csQint16(), and csQint24() to
+	  csQfixed8(), csQfixed16(), and csQfixed24(), respectively, in order
+	  to better reflect their functionality. (The old names, though
+	  deprecated, are still recognized for backward compatibility.)
+	- Eric Sunshine re-implemented csQint(), csQround(), csQfixed8(),
+	  csQfixed16(), and csQfixed24() in terms of simple casting operations
+	  rather than advanced bit-trickery since, on modern hardware, the
+	  casts tend to be significantly faster. For instance, csQint() with
+	  CS_QINT_WORKAROUND defined was about six times slower than the simple
+	  cast, and csQint() without CS_QINT_WORKAROUND defined was two times
+	  slower than the cast.
+	- Eric Sunshine removed the CS_IEEE_DOUBLE_FORMAT disabling override on
+	  Intel style 64-bit platforms which was added on 22-Feb-2005 since it
+	  caused csutil/formatter.h to complain about not knowing how to format
+	  floating point as hexadecimal. (Anyhow, this override is no longer
+	  needed since csQint() should now work correctly on 64-bit platforms.)
 14-Mar-2005
 	- Eric Sunshine propagated yesterday's csString ShrinkBestFit() and
 	  Empty() additions to iString and scfString for API consistency.

@@ -2198,39 +2198,6 @@ AS_IF([test $cs_cv_cxx_qsqrt_ok = no],
 
 
 #------------------------------------------------------------------------------
-# Check if a compiler bug discovered in gcc 2.96 (RedHat and other unstable
-# versions) and gcc 3.0.1 causes csQint() to misbehave.
-# -----------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_QINT],
-    [AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
-    AC_REQUIRE([CS_CHECK_LONG_BITS])
-    AC_CACHE_CHECK([if csQint() functions correctly], [cs_cv_cxx_qint_ok],
-	[AS_IF([test $cs_long_bits -eq 32],
-	    [AC_LANG_PUSH([C++])
-	    cs_cflags_save="$CXXFLAGS"
-	    CXXFLAGS="$CXXFLAGS $cs_optimize_flags"
-	    AC_RUN_IFELSE(
-		[AC_LANG_PROGRAM(
-		    [static inline long double2int(double val) {
-			long* l;
-			val += 68719476736.0;
-			l = (long*)((char*)&val + 2);
-			return *l; }],
-		    [exit(double2int(255.99) != 255);])],
-		[cs_cv_cxx_qint_ok=yes],
-		[cs_cv_cxx_qint_ok=no],
-		[cs_cv_cxx_qint_ok=no])
-	    CXXFLAGS="$cs_cflags_save"
-	    AC_LANG_POP([C++])],
-	    [cs_cv_cxx_qint_ok=no])])])
-
-CS_CHECK_QINT
-AS_IF([test $cs_cv_cxx_qint_ok = no],
-    [CS_HEADER_PROPERTY([CS_QINT_WORKAROUND])])
-
-
-
-#------------------------------------------------------------------------------
 # Determine if plugin meta-information should be embedded directly into the
 # plugin module or if it should exist in a stand-alone .csplugin file.  The
 # macro CS_CHECK_ENABLE_META_EMBEDDING sets the shell variable

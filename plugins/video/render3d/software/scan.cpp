@@ -38,8 +38,8 @@ void csScan_scan_zfil (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z; (void)inv_z; (void)d;
   uint32* lastZbuf = z_buf + xx-1;
   int dzz, izz;
-  izz = csQint24 (inv_z);
-  dzz = csQint24 (Scan.M);
+  izz = csQfixed24 (inv_z);
+  dzz = csQfixed24 (Scan.M);
 
   do
   {

@@ -592,8 +592,8 @@ proc		csScan_32_scan_fog,36,ebx,esi,edi,ebp
 
 		tloc	%$destend	; unsigned char * (dest + width)
 		tloc	%$const24	; float 16777216
-		tloc	%$dzz		; csQint24 (Scan.M)
-		tloc	%$izz		; csQint24 (inv_z)
+		tloc	%$dzz		; csQfixed24 (Scan.M)
+		tloc	%$izz		; csQfixed24 (inv_z)
 		tloc	%$fogpix	; r|g|b
 		tloc	%$fogdens	; FogDensity
 		tloc	%$fogr		; FogR
@@ -611,8 +611,8 @@ proc		csScan_32_scan_fog,36,ebx,esi,edi,ebp
 		mov	%$destend,eax
 		mov	%$const24,ecx
 
-; unsigned long izz = csQint24 (inv_z);
-; int dzz = csQint24 (Scan.M);
+; unsigned long izz = csQfixed24 (inv_z);
+; int dzz = csQfixed24 (Scan.M);
 		fld	%$inv_z		; inv_z				; 0/1
 		fld	M		; M,inv_z			; 1/1
 		fmul	%$const24	; M*16777216,inv_z		; 2/3

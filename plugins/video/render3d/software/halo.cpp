@@ -261,7 +261,7 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
   int xTL = csQround (x);
   int yTL = csQround (y);
   // Compute horizontal motion delta
-  int delta = csQint16 (scaleX);
+  int delta = csQfixed16 (scaleX);
 
   // The halo polygon is counterclockwise (since the clipping polygon is
   // counterclockwise). Now we should draw it from top to bottom.

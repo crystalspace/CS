@@ -890,8 +890,8 @@ void csScan_16_555_scan_fog (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z;
   uint16 *_dest = (uint16 *)d;
   uint16 *_destend = _dest + xx;
-  uint32 izz = csQint24 (inv_z);
-  int dzz = csQint24 (Scan.M);
+  uint32 izz = csQfixed24 (inv_z);
+  int dzz = csQfixed24 (Scan.M);
   uint16 fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   uint32 fog_dens = Scan.FogDensity;
 
@@ -945,8 +945,8 @@ void csScan_16_565_scan_fog (int xx, unsigned char* d,
   (void)u_div_z; (void)v_div_z;
   uint16 *_dest = (uint16 *)d;
   uint16 *_destend = _dest + xx;
-  uint32 izz = csQint24 (inv_z);
-  int dzz = csQint24 (Scan.M);
+  uint32 izz = csQfixed24 (inv_z);
+  int dzz = csQfixed24 (Scan.M);
   uint16 fog_pix = Scan.FogR | Scan.FogG | Scan.FogB;
   uint32 fog_dens = Scan.FogDensity;
 

@@ -77,9 +77,9 @@ void SCANFUNC (int xx, unsigned char* d, uint32* z_buf, float inv_z,
   z = 1 / inv_z;
   u = u_div_z * z;
   v = v_div_z * z;
-  uu = csQint16 (u);
-  vv = csQint16 (v);
-  izz = csQint24 (inv_z);
+  uu = csQfixed16 (u);
+  vv = csQfixed16 (v);
+  izz = csQfixed24 (inv_z);
 
   // Some optimizations for processors with many registers (PowerPC, 680x0).
   // Get global variables into registers.
@@ -105,7 +105,7 @@ void SCANFUNC (int xx, unsigned char* d, uint32* z_buf, float inv_z,
     inv_z += Scan.M * xx;
   z1 = 1 / inv_z;
 
-  dzz = csQint24 (Scan.M);
+  dzz = csQfixed24 (Scan.M);
 
 # if defined (STUPID_TEST) && defined (SCANMAP)
   if (uu < 0) uu = 0; else if (uu > Scan.tw2fp) uu = Scan.tw2fp;
@@ -123,8 +123,8 @@ void SCANFUNC (int xx, unsigned char* d, uint32* z_buf, float inv_z,
 
       u1 = u_div_z * z1;
       v1 = v_div_z * z1;
-      uu1 = csQint16 (u1);
-      vv1 = csQint16 (v1);
+      uu1 = csQfixed16 (u1);
+      vv1 = csQfixed16 (v1);
 #     if defined (STUPID_TEST) && defined (SCANMAP)
       if (uu1 < 0) uu1 = 0; else if (uu1 > Scan.tw2fp) uu1 = Scan.tw2fp;
       if (vv1 < 0) vv1 = 0; else if (vv1 > Scan.th2fp) vv1 = Scan.th2fp;
@@ -145,8 +145,8 @@ void SCANFUNC (int xx, unsigned char* d, uint32* z_buf, float inv_z,
 
       u1 = u_div_z * z1;
       v1 = v_div_z * z1;
-      uu1 = csQint16 (u1);
-      vv1 = csQint16 (v1);
+      uu1 = csQfixed16 (u1);
+      vv1 = csQfixed16 (v1);
 #     if defined (STUPID_TEST) && defined (SCANMAP)
       if (uu1 < 0) uu1 = 0; else if (uu1 > Scan.tw2fp) uu1 = Scan.tw2fp;
       if (vv1 < 0) vv1 = 0; else if (vv1 > Scan.th2fp) vv1 = Scan.th2fp;
