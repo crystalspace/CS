@@ -31,8 +31,8 @@ class Dumper;
 #define MAX_OUTPUT_VERTICES	64
 
 /**
- * Clipper return codes.<p>
- * The clipper routines return one of the values below so that we can
+ * Clipper return codes.
+ * <p>The clipper routines return one of the values below so that we can
  * distinguish between the cases when input polygon is completely outside
  * the clipping polygon (thus it is not visible), completely inside the
  * clipping polygon (thus it has not changed) and partially outside,
