@@ -197,7 +197,6 @@ if $(CMD.DOXYGEN)
 rule Doxygen
 {
   local dir = [ FDirName $(LOCATE.DOCS) $(3) ] ;
-  MakeLocate $(<) : $(dir) ;
 
   local i ;
   for i in $(4)
@@ -218,9 +217,10 @@ rule Doxygen
   Always $(<) ;
   Depends $(<) : $(>) ;
   Depends $(<) : $(dir) ;
+  MkDir $(dir) ;
   CleanDir $(<)clean : $(dir) ;
   Depends cleandoc : $(<)clean ;
-  RunDoxygen $(<) : $(>) : $(dir) ;
+  RunDoxygen $(<) : $(>) ;
 }
 }
 
