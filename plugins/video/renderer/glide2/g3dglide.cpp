@@ -32,13 +32,9 @@
 #endif
 #include <stdlib.h>
 #include <stdarg.h>
-#include <glide.h>
 
 #include "isystem.h"
-#include "ipolygon.h"
-#include "icamera.h"
 #include "itexture.h"
-#include "igraph3d.h"
 #include "itxtmgr.h"
 #include "ilghtmap.h"
 #include "igraph2d.h"
@@ -46,8 +42,6 @@
 #include "csutil/inifile.h"
 #include "csutil/scanstr.h"
 #include "qint.h"
-
-#include "cs2d/glide2common/iglide2d.h"
 
 #if defined (OS_WIN32)
 #include "cs2d/winglide2/g2d.h"
@@ -62,7 +56,6 @@
 #include "glidelib.h"
 #include "g3dglide.h"
 #include "alphamap.h"
-#include "gl_halo.h"
 
 //
 // Interface table definition
@@ -396,6 +389,7 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   poly_alpha = -1;
   poly_fog = false;
   clipper = NULL;
+  m_piGlide2D = NULL;
   
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
@@ -445,6 +439,8 @@ csGraphics3DGlide2x::~csGraphics3DGlide2x()
     CHKB (delete txtmgr);
   if (m_pCamera)
     m_pCamera->DecRef ();
+  if (m_piGlide2D)
+    m_piGlide2D->DecRef ();
   if (m_piG2D)
     m_piG2D->DecRef ();
 //  if (m_piSystem)
@@ -468,14 +464,13 @@ bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
 
   m_bVRetrace = config->GetYesNo("Glide2x","VRETRACE",FALSE);
   // tell the 2D driver whether to wait for VRETRACE
-  iGraphics2DGlide *piGlide  = QUERY_INTERFACE ( m_piG2D, iGraphics2DGlide );
-  if (!piGlide){
+  m_piGlide2D  = QUERY_INTERFACE ( m_piG2D, iGraphics2DGlide );
+  if (!m_piGlide2D){
       SysPrintf ( MSG_INITIALIZATION, "\nCould not set VRETRACE\n");
   }
   else{
       SysPrintf ( MSG_INITIALIZATION, "\nVRETRACE is %s\n", m_bVRetrace ? "on" : "off" );
-      piGlide->SetVRetrace( m_bVRetrace );
-      piGlide->DecRef();
+      m_piGlide2D->SetVRetrace( m_bVRetrace );
   }
   
   GrHwConfiguration grconfig;
@@ -506,6 +501,8 @@ bool csGraphics3DGlide2x::Initialize (iSystem *iSys)
   // generate fogtable
   guFogGenerateExp( fogtable, 0.02f );
 
+  // if a board sports only one TMU all kind of textures go into this one
+  // otherwise plain textures and alphamaps are in the first TMU and lightmaps in the 2nd
   FixedTextureMemoryManager *pTMM = new FixedTextureMemoryManager (m_TMUs[0].memory_size);
   CHK (m_pTextureCache = new csGlideTextureCache ( &m_TMUs[0], 16, pTMM ));
   if ( m_iMultiPass )
@@ -567,6 +564,21 @@ bool csGraphics3DGlide2x::Open(const char* Title)
   FxU32 hwnd=0;
   GrScreenResolution_t iRes;
 
+  // we have to force 640x480 resoltuions on boards with TMU < 4MB to enable Depthbuffering
+  if ( m_piG2D->GetWidth () > 640 && m_iMultiPass && m_TMUs[0].memory_size < (2<<21) )
+  {
+    SysPrintf (MSG_INITIALIZATION, "  Forcing 640x480 resolution to enable Depthbuffer on this system\n");
+    if ( !m_piGlide2D )
+    {
+       SysPrintf (MSG_INITIALIZATION, "  Yikes, cannot force, because 2D driver handle is NULL... exiting\n");
+       return false;
+    }
+    m_piGlide2D->ForceResolution( 640, 480 );
+  }
+
+  m_nWidth = m_piG2D->GetWidth ();
+  m_nHalfWidth = m_nWidth/2;
+  
   // Open the 2D driver.
   if (!m_piG2D->Open (Title))
     return false;
@@ -976,6 +988,7 @@ void csGraphics3DGlide2x::SetupPolygon ( G3DPolygonDP& poly, float& J1, float& J
 
 void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
 {
+//return;
   if (poly.num < 3 || poly.normal.D == 0.0) return;
   iPolygonTexture* pTex;
   iLightMap* piLM = NULL;
@@ -1023,6 +1036,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
   {
     is_transparent = true;
     a = 255 - (int)(( poly.alpha / 100.f ) * 255.f);
+    GlideLib_grDepthMask( FXFALSE );
   }
   
   // if we draw a flat shaded polygon we gonna use the mean color
@@ -1156,6 +1170,8 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
   if (is_colorkeyed)
     GlideLib_grChromakeyMode (GR_CHROMAKEY_DISABLE);
   
+  if ( poly.alpha )
+    GlideLib_grDepthMask( FXTRUE );
 }
 
 void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
@@ -1216,6 +1232,7 @@ void csGraphics3DGlide2x::StartPolygonFX (iTextureHandle *handle,  UInt mode)
     m_dpfx.alpha   = 255 - (mode & CS_FX_MASK_ALPHA);
     GlideLib_grAlphaBlendFunction ( GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA, 
                                     GR_BLEND_SRC_ALPHA, GR_BLEND_ONE_MINUS_SRC_ALPHA );
+    GlideLib_grDepthMask( FXFALSE );
     break;
   case CS_FX_TRANSPARENT:
     // Color = 1 * DEST + 0 * SRC = DEST
@@ -1257,6 +1274,9 @@ void csGraphics3DGlide2x::FinishPolygonFX ()
                            FXFALSE,FXFALSE);
   }
   m_thTex = NULL;
+  
+  if (m_dpfx.mixmode & CS_FX_MASK_MIXMODE)
+    GlideLib_grDepthMask( FXTRUE );
 }
 
 void csGraphics3DGlide2x::DrawPolygonFX (G3DPolygonDPFX& poly)
@@ -1490,8 +1510,14 @@ iHalo *csGraphics3DGlide2x::CreateHalo (float r, float g, float b, unsigned char
 {
   csGlideAlphaMap *am = new csGlideAlphaMap( alpha, width, height );
   int w, h;
-  am->GetMipMapDimensions( 0, w, h );
+  am->GetRealDimensions( w, h );
   csGlideHalo *halo = new csGlideHalo ( r, g, b, w, h, this, am );
   return halo;
 }
 
+float csGraphics3DGlide2x::GetZbuffValue ( int x, int y )
+{
+  float z = m_piGlide2D->GetZbuffValue (x, y);
+//  printf("%g\n", z);
+  return z;
+}

@@ -37,6 +37,7 @@
 #include "gl_halo.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
+#include "cs2d/glide2common/iglide2d.h"
 
 class csGlideTextureCache;
 
@@ -82,7 +83,9 @@ private:
 
   /// the 2d graphics driver.
   iGraphics2D* m_piG2D;
-
+  /// Same seen as glide driver
+  iGraphics2DGlide *m_piGlide2D;
+  
   /// The system driver
   iSystem* m_piSystem;
 
@@ -271,7 +274,7 @@ public:
 
   virtual iHalo *CreateHalo(float iR, float iG, float iB, unsigned char *iAlpha, int iWidth, int iHeight );
 
-  virtual float GetZbuffValue( int x, int y ) { return (float)(2<<16); }
+  virtual float GetZbuffValue( int x, int y );
 
 private:
   /// board selected

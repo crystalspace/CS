@@ -48,6 +48,7 @@ public:
     CONSTRUCT_IBASE( NULL );
     pCacheData = NULL;
     alpha = NULL;
+    printf("dim %d %d\n", width, height );
     realwidth = width; realheight = height;
     this->width = FindNearestPowerOf2( width );
     this->height = FindNearestPowerOf2( height );
@@ -55,11 +56,11 @@ public:
 //    if ( realheight < this->height ) this->height >>= 1;
     CHK( alpha = new unsigned char[ this->width*this->height ] );
     memset( alpha, this->width*this->height, 0 );
-    int xoff = (this->width - realwidth)/2;
-    int yoff = (this->height - realheight)/2;
+//    int xoff = (this->width - realwidth)/2;
+//    int yoff = (this->height - realheight)/2;
     int i;
     for ( i=0; i < realheight; i++ )
-      memcpy( alpha + (i+yoff)*this->width + xoff, map + i*realwidth, realwidth );
+      memcpy( alpha + i*this->width, map + i*realwidth, realwidth );
     compute_mean_alpha ();
 //    savemap();
   }
