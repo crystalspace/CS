@@ -29,6 +29,7 @@ The history order is reversed so that new features are at the top.
 	  creates and manages the virtual clock. The already existing
 	  csInitializer::CreateVirtualClock() will now create and register
 	  the virtual clock.
+	- Fixed a crash-on-exit bug introduced with the changes above.
 8-Oct-2001
 	- Moved the creation of the config manager and the command line
 	  parser from the system driver to the respective csInitializer

@@ -339,6 +339,9 @@ csSystemDriver::~csSystemDriver ()
      
   if (EventQueue != 0)
     EventQueue->DecRef();
+
+  // Make sure to unregister the plugin manager here.
+  object_reg->Unregister (&scfiPluginManager);
 }
 
 bool csSystemDriver::Initialize (int argc, const char* const argv[])
