@@ -20,6 +20,7 @@
 	Written by K. Robert Bate 2000.
 ----------------------------------------------------------------*/
 
+#define USE_OLD_INPUT_SPROCKET_LABELS 1
 #include <InputSprocket.h>
 
 ISpNeed gInputNeeds[] =
