@@ -1346,9 +1346,7 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 
 bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 {
-  float lodm = 0;
-  float loda = 1;
-
+  lodctrl->SetLOD (0, 1);
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -1360,18 +1358,33 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
     {
       case XMLTOKEN_DISTANCE:
 	{
-	  csRef<iDocumentAttribute> at = child->GetAttribute ("m");
+	  csRef<iDocumentAttribute> at;
+	  at = child->GetAttribute ("varm");
 	  if (at)
 	  {
-	    lodm = child->GetAttributeValueAsFloat ("m");
-	    loda = child->GetAttributeValueAsFloat ("a");
+	    // We use variables.
+	    iSharedVariable *varm = Engine->GetVariableList()->FindByName (
+	    	child->GetAttributeValue ("varm"));
+	    iSharedVariable *vara = Engine->GetVariableList()->FindByName (
+	    	child->GetAttributeValue ("vara"));
+	    lodctrl->SetLOD (varm, vara);
+	    break;
+	  }
+
+	  at = child->GetAttribute ("m");
+	  if (at)
+	  {
+	    float lodm = child->GetAttributeValueAsFloat ("m");
+	    float loda = child->GetAttributeValueAsFloat ("a");
+	    lodctrl->SetLOD (lodm, loda);
 	  }
 	  else
 	  {
 	    float d0 = child->GetAttributeValueAsFloat ("d0");
 	    float d1 = child->GetAttributeValueAsFloat ("d1");
-	    lodm = -1.0 / (d1-d0);
-	    loda = -lodm * d0;
+	    float lodm = -1.0 / (d1-d0);
+	    float loda = -lodm * d0;
+	    lodctrl->SetLOD (lodm, loda);
 	  }
 	}
         break;
@@ -1380,8 +1393,6 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
         return false;
     }
   }
-
-  lodctrl->SetLOD (lodm, loda);
 
   return true;
 }

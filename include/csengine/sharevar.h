@@ -21,9 +21,9 @@
 
 #include "csutil/nobjvec.h"
 #include "csutil/csstring.h"
-#include "iengine/sharevar.h"
 #include "csutil/csobject.h"
-
+#include "csutil/refarr.h"
+#include "iengine/sharevar.h"
 
 
 SCF_VERSION (csSharedVariable, 0, 0, 2);
@@ -38,6 +38,9 @@ private:
   float value;
   csColor color;
   csVector3 vec;
+  csRefArray<iSharedVariableListener> listeners;
+
+  void FireListeners ();
 
 public:
 
@@ -55,26 +58,57 @@ public:
   }
 
   void Set (float val)
-  {  value = val; type = iSharedVariable::SV_FLOAT; }
+  {
+    value = val;
+    type = iSharedVariable::SV_FLOAT;
+    FireListeners ();
+  }
   
   float Get () const
-  {  return (type == iSharedVariable::SV_FLOAT) ? value : 0; }
+  {
+    return (type == iSharedVariable::SV_FLOAT) ? value : 0;
+  }
   
   void SetColor (const csColor& col)
-  {  color.Set(col.red,col.green,col.blue); type = iSharedVariable::SV_COLOR; }
+  {
+    color.Set(col.red,col.green,col.blue);
+    type = iSharedVariable::SV_COLOR;
+    FireListeners ();
+  }
 
   const csColor& GetColor() const
-  {  return (type == iSharedVariable::SV_COLOR) ? color : csColor (0,0,0),color; }
+  {
+    return (type == iSharedVariable::SV_COLOR)
+    	? color
+	: csColor (0,0,0),color;
+  }
 
   void SetVector (const csVector3& v)
-  {  vec = v; type = iSharedVariable::SV_VECTOR; }
+  {
+    vec = v;
+    type = iSharedVariable::SV_VECTOR;
+    FireListeners ();
+  }
 
   const csVector3& GetVector() const
-  {  return (type == iSharedVariable::SV_VECTOR) ? vec : csVector3 (0,0,0),vec; }
+  {
+    return (type == iSharedVariable::SV_VECTOR) ? vec : csVector3 (0,0,0),vec;
+  }
 
   int GetType () const
-  {  return type; }
+  {
+    return type;
+  }
 
+  void AddListener (iSharedVariableListener* listener)
+  {
+    listeners.Push (listener);
+  }
+
+  void RemoveListener (iSharedVariableListener* listener)
+  {
+    listeners.Delete (listener);
+  }
 
   //---------------------- iSharedVariable interface --------------------------
   struct eiSharedVariable : public iSharedVariable
@@ -85,22 +119,29 @@ public:
     virtual void Set(float val)
     { scfParent->Set(val); }
     virtual float Get() const
-    {   return scfParent->Get(); }
+    { return scfParent->Get(); }
     virtual void SetName (const char *iName)
-    {   scfParent->SetName(iName); }
+    { scfParent->SetName(iName); }
     virtual const char *GetName () const
-    {   return scfParent->GetName(); }
+    { return scfParent->GetName(); }
     virtual void SetColor (const csColor& color)
-    {   scfParent->SetColor (color); }
+    { scfParent->SetColor (color); }
     virtual const csColor& GetColor() const
-    {   return scfParent->GetColor(); }
+    { return scfParent->GetColor(); }
     virtual void SetVector (const csVector3& v)
-    {   scfParent->SetVector (v); }
+    { scfParent->SetVector (v); }
     virtual const csVector3& GetVector () const
-    {   return scfParent->GetVector (); }
+    { return scfParent->GetVector (); }
     int GetType () const
-    {   return scfParent->GetType (); }
-
+    { return scfParent->GetType (); }
+    virtual void AddListener (iSharedVariableListener* listener)
+    {
+      scfParent->AddListener (listener);
+    }
+    virtual void RemoveListener (iSharedVariableListener* listener)
+    {
+      scfParent->RemoveListener (listener);
+    }
   } scfiSharedVariable;
   friend struct eiSharedVariable;
 };
@@ -138,3 +179,4 @@ public:
 };
 
 #endif // __CS_SHAREVAR_H__
+

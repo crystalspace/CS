@@ -30,6 +30,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSharedVariable::eiSharedVariable)
   SCF_IMPLEMENTS_INTERFACE(iSharedVariable)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+void csSharedVariable::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->VariableChanged (&scfiSharedVariable);
+}
+
+//-----------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(csSharedVariableList)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSharedVariableList)

@@ -24,9 +24,31 @@
 #include "csutil/refcount.h"
 #include "iengine/lod.h"
 #include "iengine/mesh.h"
+#include "iengine/sharevar.h"
 
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
+
+/**
+ * A listener to listen to the variables.
+ */
+class csLODListener : public iSharedVariableListener
+{
+private:
+  float* variable;
+public:
+  SCF_DECLARE_IBASE;
+  csLODListener (float* variable)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    csLODListener::variable = variable;
+  }
+
+  virtual void VariableChanged (iSharedVariable* var)
+  {
+    *variable = var->Get ();
+  }
+};
 
 /**
  * This class is used to represent the static lod levels of a
@@ -40,6 +62,13 @@ private:
 
   /// Function for lod.
   float lod_m, lod_a;
+  /// Or using variables.
+  csRef<iSharedVariable> lod_varm;
+  csRef<iSharedVariable> lod_vara;
+  csRef<csLODListener> lod_varm_listener;
+  csRef<csLODListener> lod_vara_listener;
+
+  void ClearLODListeners ();
 
 public:
   SCF_DECLARE_IBASE;
@@ -50,6 +79,12 @@ public:
 
   virtual void SetLOD (float m, float a);
   virtual void GetLOD (float& m, float& a) const;
+  virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara);
+  virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
+  {
+    varm = lod_varm;
+    vara = lod_vara;
+  }
   virtual int GetLODPolygonCount (float lod) const;
 
   float GetLODValue (float distance) const
@@ -97,6 +132,11 @@ private:
 
   /// Function for lod.
   float lod_m, lod_a;
+  /// Or using variables.
+  csRef<iSharedVariable> lod_varm;
+  csRef<iSharedVariable> lod_vara;
+  csRef<csLODListener> lod_varm_listener;
+  csRef<csLODListener> lod_vara_listener;
 
 public:
   SCF_DECLARE_IBASE;
@@ -107,6 +147,12 @@ public:
 
   virtual void SetLOD (float m, float a);
   virtual void GetLOD (float& m, float& a) const;
+  virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara);
+  virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
+  {
+    varm = lod_varm;
+    vara = lod_vara;
+  }
   virtual int GetLODPolygonCount (float lod) const { return 0; }
 
   /// Get the mesh array for the numerical lod.

@@ -283,6 +283,14 @@ public:
       m = 0;
       a = 1;
     }
+    virtual void SetLOD (iSharedVariable*, iSharedVariable*)
+    {
+    }
+    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable* &vara)
+    {
+      varm = 0;
+      vara = 0;
+    }
     virtual int GetLODPolygonCount (float /*lod*/) const
     {
       return 0;
@@ -543,6 +551,12 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
     virtual void SetLOD (float, float) {  }
     virtual void GetLOD (float& m, float& a) const { m = 0; a = 1; }
+    virtual void SetLOD (iSharedVariable*, iSharedVariable*) {  }
+    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara)
+    {
+      varm = 0;
+      vara = 0;
+    }
     virtual int GetLODPolygonCount (float lod) const
     {
       return scfParent->GetLODPolygonCount (lod);
@@ -633,6 +647,14 @@ public:
     {
       m = 0;
       a = 1;
+    }
+    virtual void SetLOD (iSharedVariable*, iSharedVariable*)
+    {
+    }
+    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara)
+    {
+      varm = 0;
+      vara = 0;
     }
     virtual int GetLODPolygonCount (float /*lod*/) const
     {

@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+14-Aug-2003
+	- Jorrit added iSharedVariableListener. With this interface you can
+	  listen to a variable and get notified when its value changes.
+	  Using iSharedVariable->AddListener() you can add listeners.
+	- Jorrit added the ability to set LOD in iLODControl using variables
+	  instead of constants.
 13-Aug-2003
 	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
 	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.

@@ -30,10 +30,12 @@
 #include "csutil/cscolor.h"
 #include "csgeom/vector3.h"
 
+struct iSharedVariableListener;
+
 SCF_VERSION (iSharedVariable, 0, 1, 0);
 
 /**
- * iSharedVariable implements a refcounted float value which can
+ * iSharedVariable implements a refcounted value which can
  * be shared across many objects and updated efficiently.
  */
 struct iSharedVariable : public iBase
@@ -76,9 +78,27 @@ struct iSharedVariable : public iBase
 
   /// Get the type currently stored by this variable.
   virtual int GetType () const = 0;
+
+  /// Add a listener to variables.
+  virtual void AddListener (iSharedVariableListener* listener) = 0;
+
+  /// Remove a listener.
+  virtual void RemoveListener (iSharedVariableListener* listener) = 0;
 };
 
+SCF_VERSION (iSharedVariableListener, 0, 0, 1);
 
+/**
+ * A listener so that you can get notified when a variable is
+ * changed.
+ */
+struct iSharedVariableListener : public iBase
+{
+  /**
+   * A variable has changed.
+   */
+  virtual void VariableChanged (iSharedVariable* var) = 0;
+};
 
 SCF_VERSION (iSharedVariableList, 0, 0, 2);
 

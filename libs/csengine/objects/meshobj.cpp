@@ -818,9 +818,18 @@ iMeshWrapper *csMeshFactoryWrapper::NewMeshObject ()
   if (static_lod)
   {
     iLODControl* lod = mesh->CreateStaticLOD ();
-    float m, a;
-    static_lod->GetLOD (m, a);
-    lod->SetLOD (m, a);
+    iSharedVariable* varm, * vara;
+    static_lod->GetLOD (varm, vara);
+    if (varm)
+    {
+      lod->SetLOD (varm, vara);
+    }
+    else
+    {
+      float m, a;
+      static_lod->GetLOD (m, a);
+      lod->SetLOD (m, a);
+    }
   }
 
   int i;

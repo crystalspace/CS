@@ -27,7 +27,9 @@
  
 #include "csutil/scf.h"
 
-SCF_VERSION (iLODControl, 0, 1, 0);
+struct iSharedVariable;
+
+SCF_VERSION (iLODControl, 0, 2, 0);
 
 /**
  * The iLODControl interface represents an object that has controllable
@@ -51,6 +53,18 @@ struct iLODControl : public iBase
    * Get the current LOD function.
    */
   virtual void GetLOD (float& m, float& a) const = 0;
+
+  /**
+   * Set LOD using variables.
+   */
+  virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara) = 0;
+
+  /**
+   * Return the variables used by lod. If lod was not set using variables
+   * then varm and vara will be set to 0.
+   */
+  virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara)
+  	const = 0;
 
   /**
    * Get a rough estimate of the number of polygons for a given LOD value

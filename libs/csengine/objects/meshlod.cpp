@@ -18,10 +18,15 @@
 
 #include "cssysdef.h"
 #include "csengine/meshlod.h"
+#include "iengine/sharevar.h"
 
 
 SCF_IMPLEMENT_IBASE(csStaticLODMesh)
   SCF_IMPLEMENTS_INTERFACE(iLODControl)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_IBASE(csLODListener)
+  SCF_IMPLEMENTS_INTERFACE(iSharedVariableListener)
 SCF_IMPLEMENT_IBASE_END
 
 csStaticLODMesh::csStaticLODMesh ()
@@ -35,8 +40,25 @@ csStaticLODMesh::~csStaticLODMesh ()
 {
 }
 
+void csStaticLODMesh::ClearLODListeners ()
+{
+  if (lod_varm)
+  {
+    lod_varm->RemoveListener (lod_varm_listener);
+    lod_varm_listener = 0;
+    lod_varm = 0;
+  }
+  if (lod_vara)
+  {
+    lod_vara->RemoveListener (lod_vara_listener);
+    lod_vara_listener = 0;
+    lod_vara = 0;
+  }
+}
+
 void csStaticLODMesh::SetLOD (float m, float a)
 {
+  ClearLODListeners ();
   lod_m = m;
   lod_a = a;
 }
@@ -45,6 +67,19 @@ void csStaticLODMesh::GetLOD (float& m, float& a) const
 {
   m = lod_m;
   a = lod_a;
+}
+
+void csStaticLODMesh::SetLOD (iSharedVariable* varm, iSharedVariable* vara)
+{
+  ClearLODListeners ();
+  lod_varm = varm;
+  lod_vara = vara;
+  lod_varm_listener = csPtr<csLODListener> (new csLODListener (&lod_m));
+  lod_varm->AddListener (lod_varm_listener);
+  lod_vara_listener = csPtr<csLODListener> (new csLODListener (&lod_a));
+  lod_vara->AddListener (lod_vara_listener);
+  lod_m = varm->Get ();
+  lod_a = vara->Get ();
 }
 
 int csStaticLODMesh::GetLODPolygonCount (float lod) const
@@ -74,12 +109,23 @@ void csStaticLODFactoryMesh::SetLOD (float m, float a)
 {
   lod_m = m;
   lod_a = a;
+  lod_varm = 0;
+  lod_vara = 0;
 }
 
 void csStaticLODFactoryMesh::GetLOD (float& m, float& a) const
 {
   m = lod_m;
   a = lod_a;
+}
+
+void csStaticLODFactoryMesh::SetLOD (iSharedVariable* varm,
+	iSharedVariable* vara)
+{
+  lod_varm = varm;
+  lod_vara = vara;
+  lod_m = varm->Get ();
+  lod_a = vara->Get ();
 }
 
 

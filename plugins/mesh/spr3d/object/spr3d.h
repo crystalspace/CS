@@ -37,6 +37,7 @@
 #include "imesh/object.h"
 #include "iengine/material.h"
 #include "iengine/lod.h"
+#include "iengine/sharevar.h"
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -54,6 +55,27 @@
 
 struct iObjectRegistry;
 struct iEngine;
+
+/**
+ * A listener to listen to the variables.
+ */
+class csSpriteLODListener : public iSharedVariableListener
+{
+private:
+  float* variable;
+public:
+  SCF_DECLARE_IBASE;
+  csSpriteLODListener (float* variable)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    csSpriteLODListener::variable = variable;
+  }
+
+  virtual void VariableChanged (iSharedVariable* var)
+  {
+    *variable = var->Get ();
+  }
+};
 
 /**
  * A frame for 3D sprite animation.
@@ -300,11 +322,20 @@ private:
    */
   int lighting_quality_config;
 
-  /*
+  /**
    * Values for the function <code>lod=m*distance+a</code> that is used
    * to compute the actual LOD level for this object.
    */
   float lod_m, lod_a;
+
+  /**
+   * It is also possible to use variables. If these are not 0 then the
+   * lod values are taken from variables.
+   */
+  csRef<iSharedVariable> lod_varm;
+  csRef<iSharedVariable> lod_vara;
+  csRef<csSpriteLODListener> lod_varm_listener;
+  csRef<csSpriteLODListener> lod_vara_listener;
 
   /**
    * The lod_level_config for this template.
@@ -594,6 +625,8 @@ public:
     m = lod_m;
     a = lod_a;
   }
+  void ClearLODListeners ();
+  void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3 &cent);
@@ -928,6 +961,7 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
     virtual void SetLOD (float m, float a)
     {
+      scfParent->ClearLODListeners ();
       scfParent->lod_m = m;
       scfParent->lod_a = a;
     }
@@ -935,6 +969,17 @@ public:
     {
       m = scfParent->lod_m;
       a = scfParent->lod_a;
+    }
+    virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara)
+    {
+      scfParent->SetupLODListeners (varm, vara);
+      scfParent->lod_m = varm->Get ();
+      scfParent->lod_a = vara->Get ();
+    }
+    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
+    {
+      varm = scfParent->lod_varm;
+      vara = scfParent->lod_vara;
     }
     virtual int GetLODPolygonCount (float lod) const
     {
@@ -961,6 +1006,12 @@ public:
    * Configuration values for global LOD (function <code>m*distance+a</code>).
    */
   static float global_lod_m, global_lod_a;
+  /**
+   * It is also possible to use variables. If these are not 0 then the
+   * lod values are taken from variables.
+   */
+  static csRef<iSharedVariable> global_lod_varm;
+  static csRef<iSharedVariable> global_lod_vara;
 
 private:
   /**
@@ -979,6 +1030,15 @@ private:
    * (function <code>m*distance+a</code>).
    */
   float local_lod_m, local_lod_a;
+
+  /**
+   * It is also possible to use variables. If these are not 0 then the
+   * lod values are taken from variables.
+   */
+  csRef<iSharedVariable> local_lod_varm;
+  csRef<iSharedVariable> local_lod_vara;
+  csRef<csSpriteLODListener> local_lod_varm_listener;
+  csRef<csSpriteLODListener> local_lod_vara_listener;
 
   /**
    * Quality setting for sprite lighting.
@@ -1582,6 +1642,8 @@ public:
 
   /// For LOD.
   int GetLODPolygonCount (float lod) const;
+  void ClearLODListeners ();
+  void SetupLODListeners (iSharedVariable* varm, iSharedVariable* vara);
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3 &cent);
@@ -1866,13 +1928,26 @@ public:
     virtual void SetLOD (float m, float a)
     {
       scfParent->SetLodLevelConfig (CS_SPR_LOD_LOCAL);
-      scfParent->local_lod_m = m;
-      scfParent->local_lod_a = a;
+      scfParent->ClearLODListeners ();
+      scfParent->local_lod_varm = 0;
+      scfParent->local_lod_vara = 0;
     }
     virtual void GetLOD (float& m, float& a) const
     {
       m = scfParent->local_lod_m;
       a = scfParent->local_lod_a;
+    }
+    virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara)
+    {
+      scfParent->SetLodLevelConfig (CS_SPR_LOD_LOCAL);
+      scfParent->SetupLODListeners (varm, vara);
+      scfParent->local_lod_m = varm->Get ();
+      scfParent->local_lod_a = vara->Get ();
+    }
+    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
+    {
+      varm = scfParent->local_lod_varm;
+      vara = scfParent->local_lod_vara;
     }
     virtual int GetLODPolygonCount (float lod) const
     {
@@ -1935,11 +2010,25 @@ public:
     {
       csSprite3DMeshObject::global_lod_m = m;
       csSprite3DMeshObject::global_lod_a = a;
+      csSprite3DMeshObject::global_lod_varm = 0;
+      csSprite3DMeshObject::global_lod_vara = 0;
     }
     virtual void GetLOD (float& m, float& a) const
     {
       m = csSprite3DMeshObject::global_lod_m;
       a = csSprite3DMeshObject::global_lod_a;
+    }
+    virtual void SetLOD (iSharedVariable* varm, iSharedVariable* vara)
+    {
+      csSprite3DMeshObject::global_lod_varm = varm;
+      csSprite3DMeshObject::global_lod_vara = vara;
+      csSprite3DMeshObject::global_lod_m = varm->Get ();
+      csSprite3DMeshObject::global_lod_a = vara->Get ();
+    }
+    virtual void GetLOD (iSharedVariable*& varm, iSharedVariable*& vara) const
+    {
+      varm = csSprite3DMeshObject::global_lod_varm;
+      vara = csSprite3DMeshObject::global_lod_vara;
     }
     virtual int GetLODPolygonCount (float /*lod*/) const
     {

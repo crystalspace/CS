@@ -57,6 +57,12 @@ CS_IMPLEMENT_PLUGIN
 
 //--------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE(csSpriteLODListener)
+  SCF_IMPLEMENTS_INTERFACE(iSharedVariableListener)
+SCF_IMPLEMENT_IBASE_END
+
+//--------------------------------------------------------------------------
+
 SCF_IMPLEMENT_IBASE (csSpriteFrame)
   SCF_IMPLEMENTS_INTERFACE (iSpriteFrame)
 SCF_IMPLEMENT_IBASE_END
@@ -250,6 +256,7 @@ csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
   delete skeleton;
   delete tri_verts;
   delete[] cachename;
+  ClearLODListeners ();
 }
 
 void csSprite3DMeshObjectFactory::GenerateCacheName ()
@@ -781,6 +788,36 @@ int csSprite3DMeshObjectFactory::GetLODPolygonCount (float lod) const
   return QInt (GetTriangleCount ()*lod);
 }
 
+void csSprite3DMeshObjectFactory::ClearLODListeners ()
+{
+  if (lod_varm)
+  {
+    lod_varm->RemoveListener (lod_varm_listener);
+    lod_varm_listener = 0;
+    lod_varm = 0;
+  }
+  if (lod_vara)
+  {
+    lod_vara->RemoveListener (lod_vara_listener);
+    lod_vara_listener = 0;
+    lod_vara = 0;
+  }
+}
+
+void csSprite3DMeshObjectFactory::SetupLODListeners (iSharedVariable* varm,
+	iSharedVariable* vara)
+{
+  ClearLODListeners ();
+  lod_varm = varm;
+  lod_vara = vara;
+  lod_varm_listener = csPtr<csSpriteLODListener> (
+  	new csSpriteLODListener (&lod_m));
+  lod_varm->AddListener (lod_varm_listener);
+  lod_vara_listener = csPtr<csSpriteLODListener> (
+  	new csSpriteLODListener (&lod_a));
+  lod_vara->AddListener (lod_vara_listener);
+}
+
 csSpriteAction2* csSprite3DMeshObjectFactory::FindAction (const char *n) const
 {
   int i;
@@ -1071,11 +1108,42 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   delete [] vertex_colors;
   delete skeleton_state;
   delete rand_num;
+  ClearLODListeners ();
 }
 
 int csSprite3DMeshObject::GetLODPolygonCount (float lod) const
 {
   return QInt (factory->GetTriangleCount () * lod);
+}
+
+void csSprite3DMeshObject::ClearLODListeners ()
+{
+  if (local_lod_varm)
+  {
+    local_lod_varm->RemoveListener (local_lod_varm_listener);
+    local_lod_varm_listener = 0;
+    local_lod_varm = 0;
+  }
+  if (local_lod_vara)
+  {
+    local_lod_vara->RemoveListener (local_lod_vara_listener);
+    local_lod_vara_listener = 0;
+    local_lod_vara = 0;
+  }
+}
+
+void csSprite3DMeshObject::SetupLODListeners (iSharedVariable* varm,
+	iSharedVariable* vara)
+{
+  ClearLODListeners ();
+  local_lod_varm = varm;
+  local_lod_vara = vara;
+  local_lod_varm_listener = csPtr<csSpriteLODListener> (
+  	new csSpriteLODListener (&local_lod_m));
+  local_lod_varm->AddListener (local_lod_varm_listener);
+  local_lod_vara_listener = csPtr<csSpriteLODListener> (
+  	new csSpriteLODListener (&local_lod_a));
+  local_lod_vara->AddListener (local_lod_vara_listener);
 }
 
 void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
@@ -1145,6 +1213,8 @@ void csSprite3DMeshObject::FixVertexColors ()
 
 float csSprite3DMeshObject::global_lod_m = 0;
 float csSprite3DMeshObject::global_lod_a = 1;
+csRef<iSharedVariable> csSprite3DMeshObject::global_lod_varm;
+csRef<iSharedVariable> csSprite3DMeshObject::global_lod_vara;
 
 // Set the default lighting quality.
 int csSprite3DMeshObject::global_lighting_quality = DEFAULT_LIGHTING;
