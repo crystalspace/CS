@@ -33,24 +33,84 @@
 struct iComponent;
 
 /**
- * Find a plugin by his class ID. First the plugin
- * with requested class identifier is found,
- * and after this it is queried for the respective interface; if it does
- * not implement the requested interface, 0 is returned.
+ * Find a plugin by its class ID. First the plugin with requested class
+ * identifier is found, and after this it is queried for the respective
+ * interface; if it does not implement the requested interface, 0 is returned.
+ * \param Object An object that implements iPluginManager.
+ * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
+ * \param Interface Desired nterface name (ex. iGraphics2D, iVFS, etc.).
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,Interface)			\
   csPtr<Interface> ((Interface *)((Object)->QueryPlugin			\
   (ClassID, #Interface, scfInterface<Interface>::GetVersion())))
 
 /**
- * Tell plugin manager driver to load a plugin.
- * `Object' is a object that implements iPluginManager interface.
- * `ClassID' is the class ID (`crystalspace.graphics3d.software').
- * `Interface' is a interface name (iGraphics2D, iVFS and so on).
+ * Tell plugin manager to load a plugin.
+ * \param Object An object that implements iPluginManager.
+ * \param ClassID The SCF class name (ex. crystalspace.graphics3d.software).
+ * \param Interface Desired nterface name (ex. iGraphics2D, iVFS, etc.).
  */
 #define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
   csPtr<Interface> ((Interface *)((Object)->LoadPlugin			\
   (ClassID, #Interface, scfInterface<Interface>::GetVersion())))
+
+/**
+ * Same as CS_LOAD_PLUGIN() but does nott bother asking for a interface.
+ * This is useful for unconditionally loading plugins.
+ */
+#define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)				\
+  csPtr<iBase> ((Object)->LoadPlugin (ClassID, 0, 0))
+
+/**
+ * Use this macro to query the object registry, loading a plugin if needed.  If
+ * an object with a given interface exists in an object registry, get that
+ * object from the registry. If the registry query fails, try to load a plugin
+ * and get the interface from there. If that succeeds, the interface is added
+ * to the registry for future use and given a tag the same name as the
+ * requested interface. Example use:
+ *
+ * \code
+ * csRef\<iDynamics\> dynamic_system;
+ * CS_QUERY_REGISTRY_PLUGIN(dynamic_system, object_reg, 
+ *   "crystalspace.dynamics.ode", iDynamics);
+ * \endcode
+ *
+ * \param obj csRef to hold the discovered or created/loaded object.
+ * \param object_reg The object registry (of type iObjectRegistry).
+ * \param scf_id The requested SCF class name (ex. "crystalspace.dynamice.ode")
+ * \param interface The interface to requested from class scf_id
+ *   (ex. iDynamics). This argument is also stringified and used as the objects
+ *   tag in the registry.
+ * \todo This probably ought to be made more thread-safe by locking the object
+ *   registry if possible.
+ */
+#define CS_QUERY_REGISTRY_PLUGIN(obj,object_reg,scf_id,interface) \
+do { \
+  obj = CS_QUERY_REGISTRY(object_reg, interface); \
+  if (!obj.IsValid()) \
+  { \
+    csRef<iPluginManager> mgr = CS_QUERY_REGISTRY(object_reg,iPluginManager); \
+    if (!mgr.IsValid()) \
+    { \
+      csReport(object_reg, CS_REPORTER_SEVERITY_ERROR, \
+        "crystalspace.plugin.query", "Plugin manager missing from " \
+        "object-registry when attempting to query/load class: %s", scf_id); \
+    } \
+    obj = CS_LOAD_PLUGIN(mgr, scf_id, interface); \
+    if (!obj.IsValid()) \
+    { \
+      csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, \
+        "crystalspace.plugin.query", "Failed to load class \"%s\" with " \
+        "interface \"" #interface "\"", scf_id); \
+    } \
+    if (!object_reg->Register(obj, #interface))	\
+    { \
+      csReport(object_reg, CS_REPORTER_SEVERITY_WARNING, \
+	"crystalspace.plugin.query", "Failed to register class \"%s\" with " \
+	"tag \"" #interface "\" in the object-registry.", scf_id); \
+    } \
+  } \
+} while (0)
 
 SCF_VERSION (iPluginIterator, 0, 0, 1);
 
@@ -64,13 +124,6 @@ struct iPluginIterator : public iBase
   /// Get next element.
   virtual iBase* Next () = 0;
 };
-
-/**
- * Same as CS_LOAD_PLUGIN but don't bother asking for a interface.
- * This is useful for unconditionally loading plugins.
- */
-#define CS_LOAD_PLUGIN_ALWAYS(Object,ClassID)			\
-  csPtr<iBase> ((Object)->LoadPlugin (ClassID, 0, 0))
 
 SCF_VERSION (iPluginManager, 0, 2, 0);
 

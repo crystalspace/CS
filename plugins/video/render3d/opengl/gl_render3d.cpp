@@ -900,13 +900,8 @@ bool csGLGraphics3D::Open ()
       }
     }
 
-  shadermgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
-  if (!shadermgr)
-  {
-    shadermgr = csPtr<iShaderManager> (CS_LOAD_PLUGIN (
-    	plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
-    object_reg->Register (shadermgr, "iShaderManager");
-  }
+  CS_QUERY_REGISTRY_PLUGIN(shadermgr, object_reg,
+    "crystalspace.graphics3d.shadermanager", iShaderManager);
 
   txtmgr.AttachNew (new csGLTextureManager (
     object_reg, GetDriver2D (), config, this));

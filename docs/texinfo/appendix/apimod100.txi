@@ -8,7 +8,7 @@ Crystal Space.
 
 @subheading @code{csArray<>} Index and Size Type Change
 
-@code{csArray<>} has been changed to use the @code{size_t} instead of
+@code{csArray<>} has been changed to use @samp{size_t} instead of
 @samp{int} for array sizes and indices.  Probably, the most significant
 semantic difference of this change is that @samp{size_t} is usually
 @emph{unsigned} as opposed to @samp{int} which is @emph{signed}.
@@ -42,9 +42,9 @@ for (size_t i = 0, n = a.Length(); i < n; i++)
 @dots{}
 @end example
 
-Backward iteration is a bit more problematic. As mentioned before, 
-@samp{size_t} is unsigned, so you do not have negative values. This can be a
-problem in constructs like:
+Backward iteration is a bit more problematic. As mentioned before,
+@samp{size_t} typically is unsigned, so you do not have negative values. This
+can be a problem in constructs like:
 
 @example
 csArray<@dots{}> a;
@@ -97,7 +97,7 @@ Functions like @code{csArray<>::FindSortedKey()} and @code{csArray<>::Find()}
 used to return -1 to signify that an item was not found.  This is still the
 case, but with a twist.  Now, @samp{(size_t)-1} is returned.  For convenience,
 a constant, @samp{csArrayItemNotFound}, has been added, which has this exact
-value.  It can be used in comparions to make it clear what is actually being
+value.  It can be used in comparisons to make it clear what is actually being
 checked.
 
 Apropros comparisons: Recall that @samp{size_t} is @emph{unsigned}, so checking
@@ -465,8 +465,8 @@ available:
 @code{cstool/prwater.h}
 @end itemize
  
-Likewise, procedural textures can no longer be created programmatically via,
-for instance, @samp{new csProcFire}.  Instead, you must now use the plugin
+Likewise, procedural textures can no longer be allocated directly (for
+instance, via @samp{new csProcFire}).  Instead, you must now use the plugin
 system to create such textures. For example:
  
 @example
@@ -532,9 +532,11 @@ non-standard idiom, such as:
 @example
 csList<sometype> list = @dots{};
 csList<sometype>::Iterator it(list);
-if (it.HasCurrent()) @{
+if (it.HasCurrent())
+@{
   do_something(*it);         // First value.
-  while (it.HasNext()) @{
+  while (it.HasNext())
+  @{
     do_something(it.Next()); // Remaining values.
   @}
 @}
@@ -545,7 +547,8 @@ Or, the slightly less complicated, though still somewhat convoluted:
 
 @example
 csList<sometype>::Iterator it(list);
-while (it.HasCurrent()) @{
+while (it.HasCurrent())
+@{
   do_something(*it);
   it.Next();
 @}
@@ -558,7 +561,8 @@ idiom:
 
 @example
 csList<sometype>::Iterator it(list);
-while (it.HasNext()) @{
+while (it.HasNext())
+@{
   do_something(it.Next());
 @}
 @end example
@@ -680,7 +684,7 @@ file.
 
 The @code{iEvent::Find()} method was renamed to @code{Retrieve()} and exhibits
 different return value semantics. Rather than returning a mere boolean result,
-it now returns one of the @samp{csEventError) enumeration constants.  Of
+it now returns one of the @samp{csEventError} enumeration constants.  Of
 particular note, in the case of success, @code{csEventErrNone} is returned,
 which has a value of 0. This success value could be misinterpreted as ``false''
 by the unwary when fixing code to deal with this semantic change. Conditionals
@@ -689,7 +693,7 @@ new semantic into account. For instance, code such as the following:
 
 @example
 iEvent* ev = @dots{};
-if (ev->Find(@{dots}))
+if (ev->Find(@dots{}))
 @{
   @dots{}
 @}
@@ -752,37 +756,37 @@ The following methods have been removed from the @samp{iGraphics3D} interface:
 
 @itemize @bullet
 @item
-@code{GetZBuffAt()}
+@code{ClearCache()}
+@item
+@code{CloseFogObject()}
+@item
+@code{DrawFogPolygon()}
 @item
 @code{DrawPolygonDebug()}
 @item
 @code{DrawPolygonFX()}
 @item
-@code{DrawTriangleMesh()}
-@item
 @code{DrawPolygonMesh()}
 @item
-@code{OpenFogObject()}
-@item
-@code{DrawFogPolygon()}
-@item
-@code{CloseFogObject()}
+@code{DrawTriangleMesh()}
 @item
 @code{DumpCache()}
 @item
-@code{ClearCache()}
-@item
 @code{GetVertexBufferManager()}
+@item
+@code{GetZBuffAt()}
+@item
+@code{OpenFogObject()}
 @end itemize
 
-From @samp{iRenderView} following fog-related methods have been removed.
+From @samp{iRenderView}, the following fog-related methods have been removed.
 Fog is now calculated within the renderer.
 
 @itemize @bullet
 @item
-@code{CalculateFogPolygon()}
-@item
 @code{CalculateFogMesh()}
+@item
+@code{CalculateFogPolygon()}
 @end itemize
 
 The old methods for rendering (@code{Draw()} and @code{DrawTest()})
@@ -795,15 +799,25 @@ or have become private, and are no longer available to client code:
 @item
 @code{G3DFogInfo}
 @item
-@code{G3DPolygonDPFX}
-@item
 @code{G3DPolygonDFP}
 @item
-@code{G3DPolygonDP}
+@code{G3DPolygonDPFX}
 @item
 @code{G3DPolygonDPF}
 @item
-@code{G3DTriangleMesh}
+@code{G3DPolygonDP}
 @item
 @code{G3DPolygonMesh}
+@item
+@code{G3DTriangleMesh}
 @end itemize
+
+@subheading Query Macros
+
+The macro @code{CS_QUERY_REGISTRY_PLUGIN()} has been added to
+@file{iutil/plugin.h}. This is a convenience macro which embodies the common
+idiom of first querying the object-registry for an object implementing some
+interface, and then asking the plugin manager to load a plugin supplying the
+desired object if it was not found in the object-registry. It also registers
+the object with the object-registry if the plugin manager loads it
+successfully.

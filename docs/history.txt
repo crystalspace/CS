@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Dec-2004
+	- Eric Sunshine added the CS_QUERY_REGISTRY_PLUGIN() macro to
+	  <iutil/plugin.h>, which is based upon a submission from Reed Hedges.
+	  This macro embodies the common idiom of first querying the
+	  object-registry for an object, and then asking the plugin manager to
+	  load an appropriate plugin if the object was not found. It also
+	  registers an object instantiated from the loaded plugin with the
+	  object-registry if necessary. Also, as a test of its functionality,
+	  altered the shaders and renderers to utilize this new macro.
 15-Dec-2004
 	- res added a graphical alert box to the xwindow plugin. It is based 
 	  upon the xmessage program, utilizes the Xaw toolkit and is enabled
