@@ -27,6 +27,18 @@ The history order is reversed so that new features are at the top.
 	  old approach where the checks were combined.
 	- Eric Sunshine applied a patch to ogl_g3dcom.cpp from Daniel Schubert
 	  <daschubert@web.de> which resolves several int versus GLenum issues.
+	- Eric Sunshine made the following changes to the configure script:
+	    - The option --without-x is now the default on Windows.  This
+	      should work around the problem on Cygwin where the compilation
+	      process was finding the Cygwin X11/OpenGL headers instead of the
+	      Win32 OpenGL headers.  This was problematic because the Cygwin
+	      headers lack __stdcall, which results in link errors when linking
+	      against opengl32.lib (libopengl32.a).
+	    - /usr/local is now added to cs_lib_paths_default only if the
+	      directory exists and if the compiler does not complain about
+	      -I/usr/local/include messing up the built-in search order.  This
+	      should eliminate warning messages from cpp during the "make
+	      depend" phase.
 6-Feb-2002
 	- Eric Sunshine added FT_UINT_MAX and FT_ULONG_MAX defines to freefont2
 	  "make depend" flags to work around problem reported by David Calkins

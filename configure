@@ -6732,7 +6732,9 @@ fi
 
 
     if test $cs_cv_prog_cxx_local_include = yes; then
-  cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += -I/usr/local/include
+  /sw/include|/sw/lib="$/sw/include|/sw/lib \
+	    /usr/local/include|/usr/local/lib"
+	cs_makefile_text="${cs_makefile_text}CFLAGS.SYSTEM += -I/usr/local/include
 "
 fi
 
@@ -7409,6 +7411,12 @@ fi
 # Check for X-Windows.  If the X-Windows implementation is XFree86, then also
 # enable the `VideoMode' extension.
 #------------------------------------------------------------------------------
+
+
+
+    case $host_os in
+	mingw*|cygwin*|darwin*) with_x=no ;;
+    esac
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -8877,7 +8885,7 @@ fi
 	if test $with_libXxf86vm != yes; then
   cs_check_lib_paths=$with_libXxf86vm
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /sw/include|/sw/lib "
 fi
 
 
@@ -11325,7 +11333,7 @@ fi
 	if test $with_libz != yes; then
   cs_check_lib_paths=$with_libz
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/zlib*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/zlib*"
 fi
 
 
@@ -11766,7 +11774,7 @@ fi
 	if test $with_libpng != yes; then
   cs_check_lib_paths=$with_libpng
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libpng*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/libpng*"
 fi
 
 
@@ -12208,7 +12216,7 @@ fi
 	if test $with_libjpeg != yes; then
   cs_check_lib_paths=$with_libjpeg
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/*jpeg*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/*jpeg*"
 fi
 
 
@@ -12653,7 +12661,7 @@ fi
 	if test $with_libmng != yes; then
   cs_check_lib_paths=$with_libmng
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libmng*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/libmng*"
 fi
 
 
@@ -13095,7 +13103,7 @@ fi
 	if test $with_libmikmod != yes; then
   cs_check_lib_paths=$with_libmikmod
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libmikmod*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/libmikmod*"
 fi
 
 
@@ -13536,7 +13544,7 @@ fi
 	if test $with_libogg != yes; then
   cs_check_lib_paths=$with_libogg
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libogg*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/libogg*"
 fi
 
 
@@ -13971,7 +13979,7 @@ fi
 	if test $with_libvorbis != yes; then
   cs_check_lib_paths=$with_libvorbis
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libvorbis.*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/libvorbis.*"
 fi
 
 
@@ -14408,7 +14416,7 @@ fi
 	if test $with_libvorbisfile != yes; then
   cs_check_lib_paths=$with_libvorbisfile
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libvorbisfile*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/libvorbisfile*"
 fi
 
 
@@ -14864,7 +14872,7 @@ fi
 	if test $with_lib3ds != yes; then
   cs_check_lib_paths=$with_lib3ds
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/lib3ds*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/lib3ds*"
 fi
 
 
@@ -15592,7 +15600,7 @@ fi
 	if test $with_libode != yes; then
   cs_check_lib_paths=$with_libode
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libode*"
+  cs_check_lib_paths="| /sw/include|/sw/lib libs/libode*"
 fi
 
 
@@ -17042,7 +17050,7 @@ fi
 	if test $with_libvga != yes; then
   cs_check_lib_paths=$with_libvga
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /sw/include|/sw/lib "
 fi
 
 
@@ -17483,7 +17491,7 @@ fi
 	if test $with_libcal3d != yes; then
   cs_check_lib_paths=$with_libcal3d
 else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib "
+  cs_check_lib_paths="| /sw/include|/sw/lib "
 fi
 
 
