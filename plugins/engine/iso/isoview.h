@@ -152,7 +152,7 @@ public:
   virtual csPlane3* GetFarPlane() const {return NULL;}
   virtual long GetCameraNumber() const {return camnum;}
   virtual iPolygon3D *GetHit (csVector3 &) {return NULL;}
-#warning Implement these
+  // Added to allow compilation but not implemented
   virtual void SetUnmirroredCameraPos (const csVector3& ump) 
     { CS_ASSERT(false && "UNIMPLEMENTED"); }
   virtual const csVector3& GetUnmirroredCameraPos () const
