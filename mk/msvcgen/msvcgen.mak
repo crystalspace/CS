@@ -205,10 +205,10 @@ MSVC.CVS.DIR = $(MSVC.CVS.BASE)/visualc
 MSVC.OUT.BASE = $(OUTBASE)mk
 MSVC.OUT.DIR = $(MSVC.OUT.BASE)/visualc
 MSVC.OUT.FRAGMENT = $(MSVC.OUT.BASE)/fragment
-MSVC.EXT.DSP = .dsp
-MSVC.EXT.DSW = .dsw
-MSVC.EXT.FRAGMENT = .dwi
-MSVC.DSW = csall$(MSVC.EXT.DSW)
+MSVC.EXT.PROJECT = dsp
+MSVC.EXT.WORKSPACE = dsw
+MSVC.EXT.FRAGMENT = frag
+MSVC.DSW = csall.$(MSVC.EXT.WORKSPACE)
 
 # Prefixes for particular project types.  For instance, the name "csgeom"
 # which is of type "library" is transformed into a project name "libcsgeom".
@@ -233,14 +233,14 @@ MSVC.PROJECT = $(MSVC.PREFIX.$(DSP.$*.TYPE))$(DSP.$*.NAME)
 
 # Macro to compose full project pathname.
 # (ex: "CSGEOM" becomes "out/mk/visualc/libcsgeom.dsp")
-MSVC.OUTPUT = $(MSVC.OUT.DIR)/$(MSVC.PROJECT)$(MSVC.EXT.DSP)
+MSVC.OUTPUT = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.PROJECT)
 
 # Macro to compose full fragment pathname.
 # (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.dwi")
-MSVC.FRAGMENT = $(MSVC.OUT.FRAGMENT)/$(MSVC.PROJECT)$(MSVC.EXT.FRAGMENT)
+MSVC.FRAGMENT = $(MSVC.OUT.FRAGMENT)/$(MSVC.PROJECT).$(MSVC.EXT.FRAGMENT)
 
 # Macro to compose entire list of resources which comprise a project.
-MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES)
+MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) $($*.WINRSRC)
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -276,9 +276,9 @@ MSVC.CFLAGS.DIRECTIVE = $(subst --cflags='',,--cflags='$(DSP.$*.CFLAGS)')
 
 # Macros to compose lists of existing and newly created DSW and DSP files.
 MSVC.CVS.FILES = $(sort $(subst $(MSVC.CVS.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC.CVS.DIR)/*,$(MSVC.EXT.DSP) $(MSVC.EXT.DSW)))))
+  $(addprefix $(MSVC.CVS.DIR)/*,.$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE)))))
 MSVC.OUT.FILES = $(sort $(subst $(MSVC.OUT.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC.OUT.DIR)/*,$(MSVC.EXT.DSP) $(MSVC.EXT.DSW)))))
+  $(addprefix $(MSVC.OUT.DIR)/*,.$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE)))))
 
 # Quick'n'dirty macro to compare two file lists and report the appropriate
 # CVS "add" and "remove" commands which the user will need to invoke in order
@@ -319,11 +319,12 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 
 # Build a DSP project file and an associated DSW fragment file.
 %.MAKEDSP:
-	$(MSVC.SILENT)$(MSVCGEN) --quiet --dsp \
+	$(MSVC.SILENT)$(MSVCGEN) --quiet --project \
+	--projext=$(MSVC.EXT.PROJECT) --wsext=$(MSVC.EXT.WORKSPACE) \
 	--name=$(DSP.$*.NAME) \
 	--template=$(DSP.$*.TYPE) \
 	--template-dir=$(MSVC.TEMPLATE.DIR) \
-	--project=$(MSVC.PROJECT) \
+	--projname=$(MSVC.PROJECT) \
 	--output=$(MSVC.OUTPUT) \
 	--fragment=$(MSVC.FRAGMENT) \
 	$(MSVC.DEPEND.DIRECTIVES) \
@@ -334,10 +335,11 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 
 # Build the project-wide DSW file (csall.dsw).
 dswgen:
-	$(MSVC.SILENT)$(MSVCGEN) --quiet --dsw \
+	$(MSVC.SILENT)$(MSVCGEN) --quiet --workspace \
+	--projext=$(MSVC.EXT.PROJECT) --wsext=$(MSVC.EXT.WORKSPACE) \
 	--output=$(MSVC.OUT.DIR)/$(MSVC.DSW) \
 	--template-dir=$(MSVC.TEMPLATE.DIR) \
-	$(wildcard $(MSVC.OUT.FRAGMENT)/*$(MSVC.EXT.FRAGMENT))
+	$(wildcard $(MSVC.OUT.FRAGMENT)/*.$(MSVC.EXT.FRAGMENT))
 
 # Build all Visual-C++ DSW and DSP project files.  The DSW file is built last
 # since it is composed of the fragment files generated as part of the DSP file

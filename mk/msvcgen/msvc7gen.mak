@@ -196,7 +196,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-MSVC7GEN = $(PERL) -Imk/msvcgen mk/msvcgen/msvc7gen.pl
+MSVC7GEN = $(PERL) -Imk/msvcgen mk/msvcgen/msvcgen.pl
 MSVC7.TEMPLATE.DIR = mk/msvcgen/template7
 ifneq (,$(MSVC7_QUIET))
 MSVC7.SILENT = @
@@ -207,10 +207,10 @@ MSVC7.CVS.DIR = $(MSVC7.CVS.BASE)/visualc7
 MSVC7.OUT.BASE = $(OUTBASE)mk
 MSVC7.OUT.DIR = $(MSVC7.OUT.BASE)/visualc7
 MSVC7.OUT.FRAGMENT = $(MSVC7.OUT.BASE)/fragment7
-MSVC7.EXT.DSP = .vcproj
-MSVC7.EXT.DSW = .sln
-MSVC7.EXT.FRAGMENT = .frag
-MSVC7.DSW = csall$(MSVC7.EXT.DSW)
+MSVC7.EXT.PROJECT = vcproj
+MSVC7.EXT.WORKSPACE = sln
+MSVC7.EXT.FRAGMENT = frag
+MSVC7.WORKSPACE = csall.$(MSVC7.EXT.WORKSPACE)
 
 # Prefixes for particular project types.  For instance, the name "csgeom"
 # which is of type "library" is transformed into a project name "libcsgeom".
@@ -235,14 +235,14 @@ MSVC7.PROJECT = $(MSVC7.PREFIX.$(DSP.$*.TYPE))$(DSP.$*.NAME)
 
 # Macro to compose full project pathname.
 # (ex: "CSGEOM" becomes "out/mk/visualc/libcsgeom.vcproj")
-MSVC7.OUTPUT = $(MSVC7.OUT.DIR)/$(MSVC7.PROJECT)$(MSVC7.EXT.DSP)
+MSVC7.OUTPUT = $(MSVC7.OUT.DIR)/$(MSVC7.PROJECT).$(MSVC7.EXT.PROJECT)
 
 # Macro to compose full fragment pathname.
 # (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.frag")
-MSVC7.FRAGMENT = $(MSVC7.OUT.FRAGMENT)/$(MSVC7.PROJECT)$(MSVC7.EXT.FRAGMENT)
+MSVC7.FRAGMENT = $(MSVC7.OUT.FRAGMENT)/$(MSVC7.PROJECT).$(MSVC7.EXT.FRAGMENT)
 
 # Macro to compose entire list of resources which comprise a project.
-MSVC7.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES)
+MSVC7.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) $($*.WINRSRC)
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -278,9 +278,9 @@ MSVC7.CFLAGS.DIRECTIVE = $(subst --cflags='',,--cflags='$(DSP.$*.CFLAGS)')
 
 # Macros to compose lists of existing and newly created .SLN and .VCPROJ files.
 MSVC7.CVS.FILES = $(sort $(subst $(MSVC7.CVS.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC7.CVS.DIR)/*,$(MSVC7.EXT.DSP) $(MSVC7.EXT.DSW)))))
+  $(addprefix $(MSVC7.CVS.DIR)/*,.$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE)))))
 MSVC7.OUT.FILES = $(sort $(subst $(MSVC7.OUT.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC7.OUT.DIR)/*,$(MSVC7.EXT.DSP) $(MSVC7.EXT.DSW)))))
+  $(addprefix $(MSVC7.OUT.DIR)/*,.$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE)))))
 
 # Quick'n'dirty macro to compare two file lists and report the appropriate
 # CVS "add" and "remove" commands which the user will need to invoke in order
@@ -322,11 +322,13 @@ $(MSVC7.OUT.DIR) $(MSVC7.OUT.FRAGMENT): $(MSVC7.OUT.BASE)
 
 # Build a .VCPROJ project file and associated .SLN fragment files.
 %.MAKEVCPROJ:
-	$(MSVC7.SILENT)$(MSVC7GEN) --quiet --vcproj \
+	$(MSVC7.SILENT)$(MSVC7GEN) --quiet --project \
+	--htmlents \
+	--projext=$(MSVC7.EXT.PROJECT) --wsext=$(MSVC7.EXT.WORKSPACE) \
 	--name=$(DSP.$*.NAME) \
 	--template=$(DSP.$*.TYPE) \
 	--template-dir=$(MSVC7.TEMPLATE.DIR) \
-	--project=$(MSVC7.PROJECT) \
+	--projname=$(MSVC7.PROJECT) \
 	--output=$(MSVC7.OUTPUT) \
 	--fragment=$(MSVC7.FRAGMENT) \
 	$(MSVC7.DEPEND.DIRECTIVES) \
@@ -337,10 +339,12 @@ $(MSVC7.OUT.DIR) $(MSVC7.OUT.FRAGMENT): $(MSVC7.OUT.BASE)
 
 # Build the project-wide .SLN file (csall.sln).
 slngen:
-	$(MSVC7.SILENT)$(MSVC7GEN) --quiet --sln \
-	--output=$(MSVC7.OUT.DIR)/$(MSVC7.DSW) \
+	$(MSVC7.SILENT)$(MSVC7GEN) --quiet --workspace \
+	--htmlents \
+	--projext=$(MSVC7.EXT.PROJECT) --wsext=$(MSVC7.EXT.WORKSPACE) \
+	--output=$(MSVC7.OUT.DIR)/$(MSVC7.WORKSPACE) \
 	--template-dir=$(MSVC7.TEMPLATE.DIR) \
-	$(wildcard $(MSVC7.OUT.FRAGMENT)/*$(MSVC7.EXT.FRAGMENT))
+	$(wildcard $(MSVC7.OUT.FRAGMENT)/*.$(MSVC7.EXT.FRAGMENT))
 
 # Build all Visual-C++ .SLN and .VCPROJ project files.  The .SLN file is built last
 # since it is composed of the fragment files generated as part of the .VCPROJ file
