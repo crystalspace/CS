@@ -27,6 +27,8 @@ The history order is reversed so that new features are at the top.
 	  (Pretty much just a hack to use a copy of the old renderer. No 
 	  makefiles included, so someone who knows what they're doing should 
 	  create some. )
+        - Philip Wyett changed an ASSERT () call to CS_ASSERT () in
+          'gl_renderbuffer.h'.
 15-Jul-2003
 	- Christopher Nelson removed the procedural texture support from
 	  AWS entirely.  This means that a user must do all the construction

@@ -168,7 +168,7 @@ public:
     {
       ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, bufferId);
       // @@@ Should be real error check.
-      ASSERT(ext->glUnmapBufferARB (GL_ARRAY_BUFFER_ARB));
+      CS_ASSERT(ext->glUnmapBufferARB (GL_ARRAY_BUFFER_ARB));
     }
     locked = false;
     lastLock = CS_BUF_LOCK_NOLOCK;
