@@ -20,6 +20,10 @@ The history order is reversed so that new features are at the top.
 	  csGetInstallPath() function.
 	- Removed all 'fatal_exit' calls and also removed fatal_exit()
 	  itself.
+	- Dan Bogdanov made the following changes:
+	    - Fixed (a typo) and updated djgpp.mak
+	    - Fixed dosconf.bat to output a more useful config.mak
+	    - Changed perftest and vsh so that they can be linked statically
 2-Jul-2001
 	- Eric Sunshine eliminated a compilation warning about unused variable
 	  in mdltool.cpp.  (In fact, this particular variable was being
