@@ -296,6 +296,8 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   iMeshObject* mesh = factory->NewInstance ();
   csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
   mesh->DecRef ();
+  factory->DecRef ();
+  type->DecRef ();
   Sys->view->GetEngine ()->meshes.Push (exp);
   exp->GetMovable ().SetSector (sector);
   exp->GetMovable ().SetPosition (center);
@@ -303,7 +305,8 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   exp->SetZBufMode(CS_ZBUF_TEST);
 
   iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
-  partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+  iMaterialWrapper *imat = QUERY_INTERFACE (mat, iMaterialWrapper);
+  partstate->SetMaterialWrapper (imat);
   partstate->SetMixMode (CS_FX_SETALPHA (0.50));
   partstate->SetColor (csColor (1, 1, 0));
   partstate->SetChangeRotation (5.0);
@@ -323,6 +326,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
   expstate->SetFadeSprites (500);
   expstate->AddLight (QUERY_INTERFACE (Sys->engine, iEngine),
       	QUERY_INTERFACE (sector, iSector), 1000);
+  imat->DecRef ();
   partstate->DecRef ();
   expstate->DecRef ();
 }
@@ -1169,6 +1173,7 @@ void light_statics ()
           const char* name = wrap->GetName ();
           if (!strcmp (name, "__skelghost__")) move_ghost (wrap);
 	}
+	state->DecRef ();
       }
     }
     sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
