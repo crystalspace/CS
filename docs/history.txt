@@ -1,5 +1,29 @@
 The history order has been reversed so that new features are at the top.
 
+14-Apr-2000
+	- As by a suggestion of Wouter Wijngaards, Andrew Zabolotny
+	  converted the poly_fill routine in polytext.cpp (static lighting)
+	  completely to integer.
+	- Andrew Zabolotny also fixed a bug in the gif loader that could
+	  cause it to loop forever on some gifs.
+	- Andrew removed ambient_white variables from csLight class.
+	  Now csWorld just adds the AMBIENT_WHITE value to
+	  csLight::ambient_r/g/b and that's all.
+	- Andrew also optimized the lightmap routines a little bit.
+	- Removed QRound in the same routine because it is totally
+	  wasted and only slows down.
+	- Eric Sunshine updated the VC project files (received them
+	  from Nicholas Blumire <empathy@empathy.hostingcheck.com>).
+13-Apr-2000
+	- Changes from Paul Garceau:
+	  Patch for Mingw to work around unknown escape sequence
+	  error
+	    - Moved #define COMPUTE(comp) comment to position
+	      one line before void complete().
+	    - Minor modification to comment to maintain accuracy
+	      of commented documentation.
+	- Wouter Wijngaards added RemoveHalo function to csWorld.
+	  In the destructor of lights the halo is deleted too.
 12-Apr-2000
 	- Andrew Zabolotny implemented a killer enhancement on the
 	  texture cache, courtesy of John Carmack :-) It improves
