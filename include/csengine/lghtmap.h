@@ -40,6 +40,7 @@ class csShadowMap
   friend class csLightMap;
   ///
   friend class csPolyTexture;
+  friend class csCurve;
 
 private:
   csShadowMap* next;
@@ -207,6 +208,8 @@ public:
   /// set the dirty flag for this lightmap
   void MakeDirtyDynamicLights () { dyn_dirty = true; }
 
+  bool UpdateRealLightMap ();
+  
   ///
   csRGBLightMap& GetStaticMap () { return static_lm; }
   ///

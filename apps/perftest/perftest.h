@@ -27,6 +27,8 @@
 
 class PerfTest;
 
+// Number of horizontal and vertical polygons for every multi-polygon test.
+#define NUM_MULTIPOLTEST 24
 
 class Tester
 {
@@ -36,7 +38,7 @@ protected:
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest) = 0;
   virtual void Draw (iGraphics3D* g3d) = 0;
-  virtual char* Description () = 0;
+  virtual void Description (char* dst) = 0;
   virtual Tester* NextTester () = 0;
   int GetCount () { return draw; }
 };
@@ -49,9 +51,9 @@ private:
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
   virtual void Draw (iGraphics3D* g3d);
-  virtual char* Description ()
+  virtual void Description (char* dst)
   {
-    return "Texture mapped polygon with gouraud shading... ";
+    strcpy (dst, "Texture mapped polygon with gouraud shading... ");
   }
   virtual Tester* NextTester ();
 };
@@ -64,9 +66,9 @@ private:
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
   virtual void Draw (iGraphics3D* g3d);
-  virtual char* Description ()
+  virtual void Description (char* dst)
   {
-    return "Polygon with gouraud shading... ";
+    strcpy (dst, "Polygon with gouraud shading... ");
   }
   virtual Tester* NextTester ();
 };
@@ -79,9 +81,9 @@ private:
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
   virtual void Draw (iGraphics3D* g3d);
-  virtual char* Description ()
+  virtual void Description (char* dst)
   {
-    return "Texture mapped polygon with alpha transparency... ";
+    strcpy (dst, "Texture mapped polygon with alpha transparency... ");
   }
   virtual Tester* NextTester ();
 };
@@ -89,14 +91,79 @@ public:
 class MultiPolygonTester : public Tester
 {
 private:
-  G3DPolygonDPFX poly[10][10];
+  G3DPolygonDPFX poly[NUM_MULTIPOLTEST][NUM_MULTIPOLTEST];
 
 public:
   virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
   virtual void Draw (iGraphics3D* g3d);
-  virtual char* Description ()
+  virtual void Description (char* dst)
   {
-    return "100 Texture mapped polygons with gouraud shading... ";
+    sprintf (dst, "%d Texture mapped polygons with gouraud shading... ",
+    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);;
+  }
+  virtual Tester* NextTester ();
+};
+
+class MultiPolygon2Tester : public Tester
+{
+private:
+  G3DPolygonDPFX poly[NUM_MULTIPOLTEST][NUM_MULTIPOLTEST];
+
+public:
+  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
+  virtual void Draw (iGraphics3D* g3d);
+  virtual void Description (char* dst)
+  {
+    sprintf (dst, "%d Texture mapped polygons with gouraud shading (vs 2)... ",
+    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);
+  }
+  virtual Tester* NextTester ();
+};
+
+class MultiTexture1Tester : public Tester
+{
+private:
+  G3DPolygonDPFX poly[NUM_MULTIPOLTEST][NUM_MULTIPOLTEST];
+
+public:
+  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
+  virtual void Draw (iGraphics3D* g3d);
+  virtual void Description (char* dst)
+  {
+    sprintf (dst, "%d polygons with four alternating textures... ",
+    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);
+  }
+  virtual Tester* NextTester ();
+};
+
+class MultiTexture2Tester : public Tester
+{
+private:
+  G3DPolygonDPFX poly[NUM_MULTIPOLTEST][NUM_MULTIPOLTEST];
+
+public:
+  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
+  virtual void Draw (iGraphics3D* g3d);
+  virtual void Description (char* dst)
+  {
+    sprintf (dst, "%d polygons with four grouped textures... ",
+    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);
+  }
+  virtual Tester* NextTester ();
+};
+
+class MeshTester : public Tester
+{
+private:
+  G3DTriangleMesh mesh;
+
+public:
+  virtual void Setup (iGraphics3D* g3d, PerfTest* perftest);
+  virtual void Draw (iGraphics3D* g3d);
+  virtual void Description (char* dst)
+  {
+    sprintf (dst, "%d polygons with DrawTriangleMesh... ",
+    	NUM_MULTIPOLTEST*NUM_MULTIPOLTEST);
   }
   virtual Tester* NextTester ();
 };
@@ -108,7 +175,9 @@ class PerfTest : public SysSystemDriver
 private:
   bool needs_setup;
   Tester* current_tester;
-  iTextureHandle* texture1;
+  iTextureHandle* texture[4];
+  // Load a texture.
+  iTextureHandle* LoadTexture (char* file);
 
 public:
   PerfTest ();
@@ -119,7 +188,10 @@ public:
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
   virtual bool HandleEvent (csEvent &Event);
   
-  iTextureHandle* GetTexture1 () { return texture1; }
+  iTextureHandle* GetTexture (int idx)
+  {
+    return texture[idx];
+  }
 };
 
 #endif // PERF_H

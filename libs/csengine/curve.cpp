@@ -178,39 +178,92 @@ void csCurve::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 
 void csCurve::CalculateLighting (csFrustumView& lview)
 {
-  if (!lightmap) return;
-  if (lightmap_up_to_date) return;
-  int lm_width, lm_height;
-  lm_width = lightmap->GetWidth ()-2;
-  lm_height = lightmap->GetHeight ()-2;
-  csRGBLightMap& map = lightmap->GetStaticMap ();
-  UByte* mapR = map.GetRed ();
-  UByte* mapG = map.GetGreen ();
-  UByte* mapB = map.GetBlue ();
-  csStatLight* light = (csStatLight*)lview.userdata;
+  if (!lightmap || lightmap_up_to_date) 
+    return;
+  
+  int lm_width = lightmap->GetWidth ();
+  int lm_height = lightmap->GetHeight ();
 
-  csColor color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
-  int l1, l2, l3;
+  csStatLight *light = (csStatLight *)lview.userdata;
+
+  bool dyn = light->IsDynamic();
+
+  UByte *mapR, *mapG, *mapB;
+  csShadowFrustum* sf = NULL;
+  csShadowMap* smap;
+
+  csColor color;
+
+  if (dyn)
+  {
+    smap = lightmap->FindShadowMap( light );
+    if (!smap)
+    {
+      smap = lightmap->NewShadowMap(light, CURVE_LM_SIZE, CURVE_LM_SIZE );
+    }
+    
+    mapR = smap->map;
+    mapG = NULL;
+    mapB = NULL;
+  
+    sf = lview.shadows.GetFirst();
+  }
+  else
+  {
+    mapR = lightmap->GetStaticMap ().GetRed ();
+    mapG = lightmap->GetStaticMap ().GetGreen ();
+    mapB = lightmap->GetStaticMap ().GetBlue ();
+    color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;
+  }
+
+  int lval;
 
   float cosfact = csPolyTexture::cfg_cosinus_factor;
 
+  // calculate the static lightmap
   csVector3 pos;
   csVector3 normal;
   float d;
   float u, v;
   int ui, vi;
   int uv;
-  for (ui = 0 ; ui <= lm_width ; ui++)
+  for (ui = 0 ; ui < lm_width ; ui++)
   {
     u = ((float)ui)/(float)lm_width;
-    for (vi = 0 ; vi <= lm_height ; vi++)
+    for (vi = 0 ; vi < lm_height ; vi++)
     {
       v = ((float)vi)/(float)lm_height;
-      uv = vi*(lm_width+2)+ui;
+      uv = vi*lm_width+ui;
       PosInSpace (pos, u, v);
+
+      /*if (dyn)
+      {
+        // is the point contained within the light frustrum? 
+        if (!lview.light_frustum->Contains(pos - lview.light_frustum->GetOrigin()))
+          // No, skip it
+          continue;
+
+        // if we have any shadow frustrums
+        if (sf != NULL)
+        {
+          for(csShadowFrustum* csf=sf; csf != NULL; csf=csf->next)
+          {
+            // is this point in shadow
+            if (sf->Contains(pos - sf->GetOrigin()))
+              break;
+          }
+          
+          // if it was found in shadow skip it
+          if (csf != NULL)
+            continue;
+        }
+      }*/
+
       d = csSquaredDist::PointPoint (light->GetCenter (), pos);
       if (d >= light->GetSquaredRadius ()) continue;
       d = FastSqrt (d);
+      // @@@: Normals are returning 0,0,0.  I'm 90% positive that this
+      //      should never happen
       Normal (normal, u, v);
       float cosinus = (pos-light->GetCenter ())*normal;
       cosinus /= d;
@@ -220,23 +273,32 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
       float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
-      if (lview.r > 0)
+      if (dyn)
       {
-        l1 = mapR[uv] + QRound (color.red * brightness);
-        if (l1 > 255) l1 = 255;
-        mapR[uv] = l1;
+        lval = mapR[uv] + QRound (NORMAL_LIGHT_LEVEL * brightness);
+        if (lval > 255) lval = 255;
+        mapR[uv] = lval;
       }
-      if (lview.g > 0 && mapG)
+      else
       {
-        l2 = mapG[uv] + QRound (color.green * brightness);
-        if (l2 > 255) l2 = 255;
-        mapG[uv] = l2;
-      }
-      if (lview.b > 0 && mapB)
-      {
-        l3 = mapB[uv] + QRound (color.blue * brightness);
-        if (l3 > 255) l3 = 255;
-        mapB[uv] = l3;
+        if (lview.r > 0)
+        {
+          lval = mapR[uv] + QRound (color.red * brightness);
+          if (lval > 255) lval = 255;
+          mapR[uv] = lval;
+        }
+        if (lview.g > 0 && mapG)
+        {
+          lval = mapG[uv] + QRound (color.green * brightness);
+          if (lval > 255) lval = 255;
+          mapG[uv] = lval;
+        }
+        if (lview.b > 0 && mapB)
+        {
+          lval = mapB[uv] + QRound (color.blue * brightness);
+          if (lval > 255) lval = 255;
+          mapB[uv] = lval;
+        }
       }
     }
   }

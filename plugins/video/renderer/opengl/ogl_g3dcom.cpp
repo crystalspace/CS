@@ -901,8 +901,20 @@ round16 (long f)
   return (f + 0x8000) >> 16;
 }
 
+//static iTextureHandle* prev_handle = NULL;
+//static UInt prev_mode = ~0;
+
 void csGraphics3DOGLCommon::StartPolygonFX (iTextureHandle * handle, UInt mode)
 {
+//@@@ Experimental!!!
+// If the following code is enabled then speed goes up considerably in some
+// cases. However this doesn't work very well. We need a global state mechanism
+// because other functions may mess up the state as well.
+//  if (handle == prev_handle && mode == prev_mode) return;
+//  prev_handle = handle;
+//  prev_mode = mode;
+
+
   // try shortcut method if available
   if (ShortcutStartPolygonFX && (this ->* ShortcutStartPolygonFX) (handle, mode))
     return;

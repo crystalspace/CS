@@ -201,6 +201,12 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   {
     int j;
     c = curves.Get (i);
+
+    // if we have a dirty lightmap recombine the curves and the shadow maps
+    c->lightmap->UpdateRealLightMap();
+
+    // @@@ TODO: shine the dynamic lights on the curves
+
     csCurveTesselated* tess = c->Tesselate (res);
 
     // First I transform all tesselated vertices from object to
@@ -237,7 +243,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     if (c->lightmap)
     {
       gouraud = true;
-      csRGBLightMap& map = c->lightmap->GetStaticMap ();
+      csRGBLightMap& map = c->lightmap->GetRealMap ();
       mapR = map.GetRed ();
       mapG = map.GetGreen ();
       mapB = map.GetBlue ();

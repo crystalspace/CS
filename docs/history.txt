@@ -1,6 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
 18-Jun-2000
+	- Norman Kramer fixed Squawk and csgame following the recent modifications
+	  in sprite creation.
+	- Martin Geisse removed another compiler warning in dungeon plugin.
+	- Added two new tests to 'perftest' to test how grouping of
+	  textures in the 3D rasterizer might benefit performance.
+	  It seems that this would give a great benefit indeed.
+	- Got a new patch from Travis McIntosh to start work for
+	  supporting pseudo-dynamic lights and curved surfaces.
+	  Not finished yet.
 	- Eric Sunshine made the following changes to the Crystal Space
 	  documentation:
 	    - Repaired all of the errors and warnings reported by 'makeinfo'
@@ -44,6 +53,9 @@ The history order has been reversed so that new features are at the top.
 	  trigger a NextStep multiple-inheritance compiler bug which caused
 	  particle systems to crash.
 17-Jun-2000
+	- Wouter Wijngaards changed quadtree so that the potentially confusing
+	  up and down terms are gone (trees were apparently upside down in the
+	  Netherlands).
 	- Fundamental change in how the particle systems work.
 	  A particle system now also inherits from csSprite and
 	  is controlled like other sprites. So for the engine as
@@ -61,6 +73,12 @@ The history order has been reversed so that new features are at the top.
 	  change which will require changes in potentially all applications
 	  using CS. csSpriteTemplate::NewSprite() also has the new
 	  parent parameter.
+	- Norman Kramer added a new grid and slider (splitter handle) class
+	  and a WindowToClient method for csWindow (for CSWS).
+	  Norman also added this new csGrid dialog to cswstest.
+	- Martin Geisse removed some warnings in dungeon plugin and
+	  removed a non-useful feature. In addition he added some new
+	  features.
 16-Jun-2000
 	- Improved the 'rain' console command in WalkTest so that it
 	  adds rain to the entire current sector. There are now three
@@ -80,6 +98,7 @@ The history order has been reversed so that new features are at the top.
 	  it easier to grok by other compilers.
 	  Wouter also added a rediculously fast TestRectangle routine
 	  to csQuadTree :-)
+	- Robert Bate updated the Mac project files.
 15-Jun-2000
 	- Cleaned up some debugging stuff for c-buffer from WalkTest.
 	- Moved csOjbectStuffFactory::Initialize to csObjectStub.

@@ -413,6 +413,66 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   }
 }
 
+bool csLightMap::UpdateRealLightMap ()
+{
+  if (!dyn_dirty) return false;
+
+  dyn_dirty = false;
+
+  //---
+  // First copy the static lightmap to the real lightmap.
+  // Remember the real lightmap first so that we can see if
+  // there were any changes.
+  //---
+
+  memcpy (real_lm.GetMap (), static_lm.GetMap (), 3 * lm_size);
+
+  //---
+  // Then add all pseudo-dynamic lights.
+  //---
+  csLight* light;
+  unsigned char* mapR, * mapG, * mapB;
+  float red, green, blue;
+  unsigned char* p, * last_p;
+  int l, s;
+
+  if (first_smap)
+  {
+    csShadowMap* smap = first_smap;
+
+    // Color mode.
+    do
+    {
+      mapR = real_lm.GetRed ();
+      mapG = real_lm.GetGreen ();
+      mapB = real_lm.GetBlue ();
+      light = smap->light;
+      red = light->GetColor ().red;
+      green = light->GetColor ().green;
+      blue = light->GetColor ().blue;
+      csLight::CorrectForNocolor (&red, &green, &blue);
+      p = smap->map;
+      last_p = p+lm_size;
+      do
+      {
+        s = *p++;
+        l = *mapR + QRound (red * s);
+        *mapR++ = l < 255 ? l : 255;
+        l = *mapG + QRound (green * s);
+        *mapG++ = l < 255 ? l : 255;
+        l = *mapB + QRound (blue * s);
+        *mapB++ = l < 255 ? l : 255;
+      }
+      while (p < last_p);
+
+      smap = smap->next;
+    }
+    while (smap);
+  }
+
+  return true;
+}
+
 void csLightMap::ConvertToMixingMode ()
 {
   int i;
