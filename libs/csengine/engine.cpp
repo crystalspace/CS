@@ -3349,28 +3349,61 @@ csPtr<iMeshWrapper> csEngine::CreatePortalContainer (const char* name,
 }
 
 csPtr<iMeshWrapper> csEngine::CreatePortal (
+	const char* name,
   	iMeshWrapper* parentMesh, iSector* destSector,
-	csVector3* vertices, int num_vertices)
+	csVector3* vertices, int num_vertices,
+	iPortal*& portal)
 {
-  csRef<iMeshWrapper> mesh = CreatePortalContainer ("__dummy__");
-  parentMesh->GetChildren ()->Add (mesh);
-  csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  csRef<iMeshWrapper> mesh;
+  csRef<iPortalContainer> pc;
+  if (name)
+  {
+    mesh = parentMesh->GetChildren ()->FindByName (name);
+    if (mesh)
+    {
+      pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
   	iPortalContainer);
-  iPortal* portal = pc->CreatePortal (vertices, num_vertices);
+      if (!pc) mesh = 0;
+    }
+  }
+  if (!mesh)
+  {
+    mesh = CreatePortalContainer (name);
+    parentMesh->GetChildren ()->Add (mesh);
+    pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  	iPortalContainer);
+  }
+  portal = pc->CreatePortal (vertices, num_vertices);
   portal->SetSector (destSector);
   return csPtr<iMeshWrapper> (mesh);
 }
 
 csPtr<iMeshWrapper> csEngine::CreatePortal (
+	const char* name,
   	iSector* sourceSector, const csVector3& pos,
 	iSector* destSector,
-	csVector3* vertices, int num_vertices)
+	csVector3* vertices, int num_vertices,
+	iPortal*& portal)
 {
-  csRef<iMeshWrapper> mesh = CreatePortalContainer ("__dummy__",
-  	sourceSector, pos);
-  csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  csRef<iMeshWrapper> mesh;
+  csRef<iPortalContainer> pc;
+  if (name && sourceSector)
+  {
+    mesh = sourceSector->GetMeshes ()->FindByName (name);
+    if (mesh)
+    {
+      pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
   	iPortalContainer);
-  iPortal* portal = pc->CreatePortal (vertices, num_vertices);
+      if (!pc) mesh = 0;
+    }
+  }
+  if (!mesh)
+  {
+    mesh = CreatePortalContainer (name, sourceSector, pos);
+    pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  	iPortalContainer);
+  }
+  portal = pc->CreatePortal (vertices, num_vertices);
   portal->SetSector (destSector);
   return csPtr<iMeshWrapper> (mesh);
 }

@@ -63,6 +63,7 @@ struct iTextureList;
 struct iCameraPosition;
 struct iCameraPositionList;
 struct iRegion;
+struct iPortal;
 struct iGraphics3D;
 struct iClipper2D;
 struct iObject;
@@ -873,33 +874,47 @@ struct iEngine : public iBase
    * and make this portal a child mesh of another mesh. Use SCF_QUERY_INTERFACE
    * with iPortalContainer on the returned mesh for more control over the
    * portal(s) in the portal object.
+   * \param name is the name of the portal container mesh to create the portal
+   * in. If the parentMesh already has a mesh with that name then that will
+   * be used. If there is already a mesh with that name but it is not a
+   * portal container then a new mesh will be created.
    * \param parentMesh is the mesh where the portal container will be placed
    * as a child.
    * \param destSector is the sector where the single portal that is created
    * inside the portal object will point too.
+   * \param portal is a return value for the created portal.
    * \return The meshwrapper on success (assign to a csRef),
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreatePortal (
+  	const char* name,
   	iMeshWrapper* parentMesh, iSector* destSector,
-	csVector3* vertices, int num_vertices) = 0;
+	csVector3* vertices, int num_vertices,
+	iPortal*& portal) = 0;
 
   /**
    * Conveniance function to create a portal from one sector to another.
    * Use SCF_QUERY_INTERFACE with iPortalContainer on the returned mesh for
    * more control over the portal(s) in the portal object.
+   * \param name is the name of the portal container mesh to create the portal
+   * in. If the sourceSector already has a mesh with that name then that will
+   * be used. If there is already a mesh with that name but it is not a
+   * portal container then a new mesh will be created.
    * \param sourceSector is the sector where the portal container will be
    * placed.
    * \param pos is the position inside that sector.
    * \param destSector is the sector where the single portal that is created
    * inside the portal object will point too.
+   * \param portal is a return value for the created portal.
    * \return The meshwrapper on success (assign to a csRef),
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreatePortal (
+  	const char* name,
   	iSector* sourceSector, const csVector3& pos,
 	iSector* destSector,
-	csVector3* vertices, int num_vertices) = 0;
+	csVector3* vertices, int num_vertices,
+	iPortal*& portal) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that

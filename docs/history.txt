@@ -6,6 +6,22 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Oct-2003
+	- Jorrit extended the two versions of iEngine->CreatePortal() with
+	  a 'name' parameter. That name will be used for the portal container
+	  mesh. If there is already a portal container with that name then
+	  that portal container will be reused (possibly allowing to create
+	  multiple portals in the same portal container).
+	- Jorrit changed the main loader to use the name of the <portal>
+	  for the created portal container.
+	- Jorrit changed the disabled part of thing loader (which creates
+	  portal containers instead of portals in the thing itself) to
+	  use "__portals__" as the name of the portal container where all
+	  portals are created.
+	- Jorrit additionally added a return 'portal' parameter to both
+	  versions of iEngine->CreatePortal() so that the caller can more
+	  easily find out the portal that was created without having to
+	  revert to getting the last created portal in the portal container.
 1-Oct-2003
 	- Jorrit fixed a bug reported by valgrind in the portal container.
 	  It was using an uninitialized variable.

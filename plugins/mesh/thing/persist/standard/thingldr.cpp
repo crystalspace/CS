@@ -732,14 +732,12 @@ bool csThingLoader::ParsePoly3d (
       int i;
       for (i = 0 ; i < poly3d->GetVertexCount () ; i++)
         portal_verts[i] = poly3d->GetVertex (i);
-      csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (mesh, destSector,
-      	portal_verts, poly3d->GetVertexCount ());
+      iPortal* portal;
+      csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
+      	"__portals__", mesh, destSector,
+      	portal_verts, poly3d->GetVertexCount (), portal);
       delete[] portal_verts;
 
-      csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (
-      	portal_mesh->GetMeshObject (), iPortalContainer);
-      CS_ASSERT (pc != 0);
-      iPortal* portal = pc->GetPortal (0);
       if (!destSector)
       {
 	MissingSectorCallback* mscb = new MissingSectorCallback (

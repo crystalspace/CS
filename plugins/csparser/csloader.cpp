@@ -3947,8 +3947,8 @@ SCF_IMPLEMENT_IBASE_END
 bool csLoader::ParsePortal (iLoaderContext* ldr_context,
 	iDocumentNode* node, iSector* sourceSector)
 {
-// @@@ NAME IGNORED
 // @@@ Need to use syntax services::ParsePortal()!
+  const char* name = node->GetAttributeValue ("name");
   iSector* destSector = 0;
   csDirtyAccessArray<csVector3> poly;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -3984,17 +3984,15 @@ bool csLoader::ParsePortal (iLoaderContext* ldr_context,
     }
   }
 
+  iPortal* portal;
   csRef<iMeshWrapper> mesh = Engine->CreatePortal (
+  	name,
   	sourceSector, csVector3 (0), destSector,
-  	poly.GetArray (), poly.Length ());
+  	poly.GetArray (), poly.Length (), portal);
   if (!destSector)
   {
     // Create a callback to find the sector at runtime when the
     // portal is first used.
-    csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-  	  iPortalContainer);
-    CS_ASSERT (pc != 0);
-    iPortal* portal = pc->GetPortal (0);
     portal->SetMissingSectorCallback (missing_cb);
   }
   return true;
