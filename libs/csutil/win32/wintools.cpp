@@ -90,7 +90,6 @@ wchar_t* cswinGetErrorMessageW (HRESULT code)
 
 char* cswinGetErrorMessage (HRESULT code)
 {
-
   return csStrNew (cswinGetErrorMessageW (code));
 }
 

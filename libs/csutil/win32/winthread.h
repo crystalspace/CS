@@ -67,7 +67,7 @@ class CS_CSUTIL_EXPORT csWinThread : public csThread
  protected:
   HANDLE thread;
   csRef<csRunnable> runnable;
-  LPTSTR lasterr;
+  char* lasterr;
   bool running;
   bool created;
 };
@@ -87,7 +87,7 @@ public:
   bool Destroy ();
  protected:
   HANDLE mutex;
-  LPTSTR lasterr;
+  char* lasterr;
   friend class csWinCondition;
 };
 
@@ -104,7 +104,7 @@ public:
   virtual char const* GetLastError ();
 
  protected:
-  LPTSTR lasterr;
+  char* lasterr;
   LONG value;
   HANDLE sem;
  private:
@@ -126,7 +126,7 @@ class CS_CSUTIL_EXPORT csWinCondition : public csCondition
   bool Destroy ();
  private:
   HANDLE cond;
-  LPTSTR lasterr;
+  char* lasterr;
 };
 
 #endif // __CS_WINTHREAD_H__

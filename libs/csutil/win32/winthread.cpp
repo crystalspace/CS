@@ -17,23 +17,45 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/sysfunc.h"
 #include "winthread.h"
 #include <windows.h>
 #include <process.h>
 
 #include "csutil/win32/wintools.h"
 
+static inline bool CheckLastError (char*& lasterr)
+{
+  DWORD errCode = GetLastError();
+  delete[] lasterr;
+  if (errCode != NO_ERROR)
+  {
+    lasterr = cswinGetErrorMessage (errCode);
+  }
+  else
+  {
+    lasterr = 0;
+  }
+  return (errCode != NO_ERROR);
+}
+
+static inline void ShowError (const char* message, const char* lasterr)
+{
 #ifdef CS_DEBUG
-#define CS_SHOW_ERROR if (lasterr) printf ("%s\n",lasterr)
-#else
-#define CS_SHOW_ERROR
+  csPrintf ("'%s' failed: %s\n", message, lasterr);
 #endif
+}
 
-#define CS_GET_SYSERROR() \
-if (lasterr){delete[] lasterr; lasterr = 0;}\
-  lasterr = cswinGetErrorMessage (::GetLastError ())
+static inline void TestError (bool result, const char* message, char*& lasterr)
+{
+  if (!result)
+  {
+    if (CheckLastError (lasterr))
+      ShowError (message, lasterr);
+  }
+}
 
-#define CS_TEST(x) if(!(x)) {CS_GET_SYSERROR(); CS_SHOW_ERROR;}
+#define CS_TEST(x)    TestError ((x), #x, lasterr);
 
 // ignore recursive switch... windows mutexes are always recursive.
 csRef<csMutex> csMutex::Create (bool )
@@ -44,46 +66,43 @@ csRef<csMutex> csMutex::Create (bool )
 csWinMutex::csWinMutex ()
 {
   lasterr = 0;
-  mutex = CreateMutex (0, false, 0);
-  CS_TEST (mutex != 0);
+  CS_TEST ((mutex = CreateMutex (0, false, 0)) != 0);
 }
 
 csWinMutex::~csWinMutex ()
 {
 #ifdef CS_DEBUG
   //  CS_ASSERT (Destroy ());
-  Destroy ();
-#else
-  Destroy ();
 #endif
-  if (lasterr) {LocalFree (lasterr); lasterr = 0;}
+  Destroy ();
+  delete[] lasterr;
 }
 
 bool csWinMutex::Destroy ()
 {
-  bool rc = CloseHandle (mutex);
-  CS_TEST (rc);
+  bool rc;
+  CS_TEST (rc = CloseHandle (mutex));
   return rc;
 }
 
 bool csWinMutex::LockWait()
 {
-  bool rc = (WaitForSingleObject (mutex, INFINITE) != WAIT_FAILED);
-  CS_TEST (rc);
+  bool rc;
+  CS_TEST (rc = (WaitForSingleObject (mutex, INFINITE) != WAIT_FAILED));
   return rc;
 }
 
 bool csWinMutex::LockTry ()
 {
-  bool rc = (WaitForSingleObject (mutex, 0) != WAIT_FAILED);
-  CS_TEST (rc);
+  bool rc;
+  CS_TEST (rc = (WaitForSingleObject (mutex, 0) != WAIT_FAILED));
   return rc;
 }
 
 bool csWinMutex::Release ()
 {
-  bool rc = ReleaseMutex (mutex);
-  CS_TEST (rc);
+  bool rc;
+  CS_TEST (rc = ReleaseMutex (mutex));
   return rc;
 }
 
@@ -102,41 +121,41 @@ csWinSemaphore::csWinSemaphore (uint32 v)
 {
   lasterr = 0;
   value = v;
-  sem = CreateSemaphore (0, (LONG)value, (LONG)value, 0);
+  CS_TEST ((sem = CreateSemaphore (0, (LONG)value, (LONG)value, 0)) != 0);
   if (sem == 0)
     value = 0;
-  CS_TEST (sem != 0);
 }
 
 csWinSemaphore::~csWinSemaphore ()
 {
   Destroy ();
+  delete[] lasterr;
 }
 
 bool csWinSemaphore::LockWait ()
 {
-  bool rc = (WaitForSingleObject (sem, INFINITE) != WAIT_FAILED);
+  bool rc;
+  CS_TEST (rc = (WaitForSingleObject (sem, INFINITE) != WAIT_FAILED));
   if (rc)
     value--;
-  CS_TEST (rc);
   return rc;
 }
 
 bool csWinSemaphore::LockTry ()
 {
-  bool rc = (WaitForSingleObject (sem, 0) != WAIT_FAILED);
+  bool rc;
+  CS_TEST (rc = (WaitForSingleObject (sem, 0) != WAIT_FAILED));
   if (rc)
     value--;
-  CS_TEST (rc);
   return rc;
 }
 
 bool csWinSemaphore::Release ()
 {
-  bool rc = ReleaseSemaphore (sem, 1, &value);
+  bool rc;
+  CS_TEST (rc = ReleaseSemaphore (sem, 1, &value));
   if (rc)
     value++;
-  CS_TEST (rc);
   return rc;
 }
 
@@ -147,8 +166,8 @@ uint32 csWinSemaphore::Value ()
 
 bool csWinSemaphore::Destroy ()
 {
-  bool rc = CloseHandle (sem);
-  CS_TEST (rc);
+  bool rc;
+  CS_TEST (rc = CloseHandle (sem));
   return rc;
 }
 
@@ -166,25 +185,24 @@ csRef<csCondition> csCondition::Create (uint32 conditionAttributes)
 csWinCondition::csWinCondition (uint32 /*conditionAttributes*/)
 {
   lasterr = 0;
-  cond = CreateEvent (0, false, false, 0); // auto-reset
-  CS_TEST (cond != 0);
+  CS_TEST ((cond = CreateEvent (0, false, false, 0)) != 0); // auto-reset
 }
 
 csWinCondition::~csWinCondition ()
 {
   Destroy ();
+  delete[] lasterr;
 }
 
 void csWinCondition::Signal (bool /*WakeAll*/)
 {
   // only releases one waiting thread, coz its auto-reset
-  bool rc = PulseEvent (cond);
-  CS_TEST (rc);
+  CS_TEST (PulseEvent (cond));
 }
 
 bool csWinCondition::Wait (csMutex* mutex, csTicks timeout)
 {
-  // SignalObjectAndWait() is only available in WinNT 4.0 and above
+  // @@@ SignalObjectAndWait() is only available in WinNT 4.0 and above
   // so we use the potentially dangerous version below
   if (mutex->Release () && LockWait (timeout==0?INFINITE:(DWORD)timeout))
     return mutex->LockWait ();
@@ -193,15 +211,15 @@ bool csWinCondition::Wait (csMutex* mutex, csTicks timeout)
 
 bool csWinCondition::LockWait (DWORD nMilliSec)
 {
-  bool rc = (WaitForSingleObject (cond, nMilliSec) != WAIT_FAILED);
-  CS_TEST (rc);
+  bool rc;
+  CS_TEST (rc = (WaitForSingleObject (cond, nMilliSec) != WAIT_FAILED));
   return rc;
 }
 
 bool csWinCondition::Destroy ()
 {
-  bool rc = CloseHandle (cond);
-  CS_TEST (rc);
+  bool rc;
+  CS_TEST (rc = CloseHandle (cond));
   return rc;
 }
 
@@ -228,6 +246,7 @@ csWinThread::~csWinThread ()
   if (running)
     Stop ();
   CloseHandle (thread);
+  delete[] lasterr;
 }
 
 bool csWinThread::Start ()
@@ -241,10 +260,9 @@ bool csWinThread::Start ()
       CREATE_SUSPENDED, &dummyThreadId);
   #endif
 
-  bool created = (thread != 0);
-  CS_TEST (created);
-  running = (ResumeThread (thread) != (DWORD)-1);
-  CS_TEST (running);
+  bool created;
+  CS_TEST (created = (thread != 0));
+  CS_TEST (running = (ResumeThread (thread) != (DWORD)-1));
   return running;
 }
 
@@ -252,8 +270,8 @@ bool csWinThread::Wait ()
 {
   if (running)
   {
-    bool rc = (WaitForSingleObject (thread, INFINITE) != WAIT_FAILED);
-    CS_TEST (rc);
+    bool rc;
+    CS_TEST (rc = (WaitForSingleObject (thread, INFINITE) != WAIT_FAILED));
     return rc;
   }
   return true;
@@ -269,8 +287,7 @@ bool csWinThread::Stop ()
 {
   if (running)
   {
-    running = !TerminateThread (thread, ~0);
-    CS_TEST (!running);
+    CS_TEST (!(running = !TerminateThread (thread, ~0)));
   }
   return !running;
 }
@@ -292,6 +309,3 @@ uint csWinThread::ThreadRun (void* param)
   #endif
   return 0;
 }
-
-#undef CS_TEST
-#undef CS_SHOW_ERROR
