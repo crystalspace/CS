@@ -260,12 +260,6 @@ bool InfPortalCS::Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool lo
   return csPortalCS::Draw (new_clipper, portal_plane, loose_end, rview);
 }
 
-csPolygon3D* InfPortalCS::FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist)
-{
-  if (GetSector ()) return csPortalCS::FollowBeam (start, end, poly, sqdist);
-  else return NULL;
-}
-
 void InfPortalCS::CalculateLighting (csLightView& lview)
 {
   if (!GetSector ())
