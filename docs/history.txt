@@ -10,6 +10,9 @@ chronological order.
 	- Philip Wyett re-applied the Eric Sunshines Cygwin __argc __argv
           fix in win32.cpp, which was overwritten by the old version
           by another dev.
+            - Philip Wyett added CreateThread () and ExitThread () for
+              Cygwin port, as it does not have _beginthreadex () or
+              _endthreadex ().
 1-Sep-2003
 	- Jorrit unreverted the changes from Old_Belge on the sprcal3d
 	  mesh object. Unfortunatelly this means that this plugin now

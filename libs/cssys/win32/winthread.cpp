@@ -231,8 +231,14 @@ csWinThread::~csWinThread ()
 
 bool csWinThread::Start ()
 {
-  thread = (HANDLE)_beginthreadex (0, 0, ThreadRun, (void*)this, 
-    CREATE_SUSPENDED, 0);
+  #if defined (__CYGWIN__)
+    thread = CreateThread (0, 0, (LPTHREAD_START_ROUTINE) ThreadRun, (void*)this, 
+      CREATE_SUSPENDED, 0);
+  #else
+    thread = (HANDLE)_beginthreadex (0, 0, ThreadRun, (void*)this, 
+      CREATE_SUSPENDED, 0);
+  #endif
+
   bool created = (thread != 0);
   CS_TEST (created);
   running = (ResumeThread (thread) != (DWORD)-1);
@@ -271,7 +277,11 @@ uint csWinThread::ThreadRun (void* param)
   csWinThread *thread = (csWinThread*)param;
   thread->runnable->Run ();
   thread->running = false;
-  _endthreadex (0);
+  #if defined (__CYGWIN__)
+    ExitThread (0);
+  #else
+    _endthreadex (0);
+  #endif
   return 0;
 }
 
