@@ -7,6 +7,9 @@ The history order is reversed so that new features are at the top.
 	  submission from Leandro Ezequiel Lovisolo <lovisolo@datafull.com>.
 	- Marten Svanfeldt added a fix which improves quality in new renderer
 	  by texture-mipmap level biasing.
+	- Eric Sunshine fixed a memory leak in csGetPluginPaths() for MacOS/X.
+	  An invocation of csStrNew(), which should have been eliminated in the
+	  previous commit, was left in place.
 1-Mar-2003
 	- Greg Block changed the makefile for the xml documentsystem plugin to
 	  not override the values for the link flags to use when linking libxml

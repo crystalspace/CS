@@ -59,8 +59,9 @@ char** csGetPluginPaths()
 
   strncpy(buff, cpath, sizeof(buff));
   strncat(buff, OS_MACOSX_PLUGIN_DIR, sizeof(buff));
+  buff[sizeof(buff) - 1] = '\0';
 
-  paths[0] = csStrNew(buff);
+  paths[0] = buff;
   paths[1] = cpath;
   paths[2] = csStrNew(".");
   paths[3] = 0;
