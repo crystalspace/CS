@@ -24,9 +24,9 @@
 #include "dsound.h"
 #include "eax.h"
 
-#include "cssndrdr/eax/sndrdr.h"
-#include "cssndrdr/eax/sndbuf.h"
-#include "cssndrdr/eax/sndsrc.h"
+#include "sndrdr.h"
+#include "sndbuf.h"
+#include "sndsrc.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY(csSoundBufferEAX)

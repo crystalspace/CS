@@ -23,7 +23,7 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cssnddrv/macsnd/macsdrv.h"
+#include "macsdrv.h"
 #include "isystem.h"
 #include "isndlstn.h"
 #include "isndsrc.h"

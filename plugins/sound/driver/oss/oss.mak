@@ -41,7 +41,7 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDOSS
 endif
 DESCRIPTION.$(SNDOSS) = $(DESCRIPTION.oss)
-SRC.SNDOSS = $(wildcard libs/cssnddrv/oss/*.cpp)
+SRC.SNDOSS = $(wildcard plugins/sound/driver/oss/*.cpp)
 OBJ.SNDOSS = $(addprefix $(OUT),$(notdir $(SRC.SNDOSS:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

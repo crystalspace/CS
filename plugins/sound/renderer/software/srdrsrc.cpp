@@ -20,8 +20,8 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cssndrdr/software/srdrbuf.h"
-#include "cssndrdr/software/srdrsrc.h"
+#include "srdrbuf.h"
+#include "srdrsrc.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY (csSoundSourceSoftware)

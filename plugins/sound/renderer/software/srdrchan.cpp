@@ -21,7 +21,7 @@
 #include <math.h>
 
 #include "sysdef.h"
-#include "cssndrdr/software/srdrchan.h"
+#include "srdrchan.h"
 
 Channel_ID Channel::lastID=1;
 

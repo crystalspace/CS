@@ -24,7 +24,7 @@
 #include <mmsystem.h>
 
 #include "csutil/scf.h"
-#include "cssnddrv/waveoutsd/wodrv.h"
+#include "wodrv.h"
 #include "isystem.h"
 #include "csutil/inifile.h"
 #include "isndlstn.h"

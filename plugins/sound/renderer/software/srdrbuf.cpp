@@ -20,16 +20,11 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cssndrdr/software/srdrbuf.h"
-#include "cssndrdr/software/srdrsrc.h"
+#include "srdrbuf.h"
+#include "srdrsrc.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY (csSoundBufferSoftware)
-
-EXPORT_CLASS_TABLE (glwin32)
-  EXPORT_CLASS (csSoundBufferSoftware, "crystalspace.sound.render.software",
-    "Software sound driver for Crystal Space")
-EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE(csSoundBufferSoftware)
   IMPLEMENTS_INTERFACE(iSoundBuffer)
@@ -37,7 +32,7 @@ IMPLEMENT_IBASE_END;
 
 csSoundBufferSoftware::csSoundBufferSoftware(iBase *piBase)
 {
-	CONSTRUCT_IBASE(piBase);
+  CONSTRUCT_IBASE(piBase);
 }
 
 csSoundBufferSoftware::~csSoundBufferSoftware()
@@ -87,4 +82,3 @@ float csSoundBufferSoftware::GetFrequencyFactor()
 {
   return fFrequencyFactor;
 }
-

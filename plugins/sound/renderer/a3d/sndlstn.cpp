@@ -25,8 +25,8 @@
 
 #include "ia3dapi.h"
 
-#include "cssndrdr/a3d/sndrdr.h"
-#include "cssndrdr/a3d/sndlstn.h"
+#include "sndrdr.h"
+#include "sndlstn.h"
 
 IMPLEMENT_FACTORY(csSoundListenerA3D)
 

@@ -24,7 +24,7 @@ Written by Nathaniel 'NooTe' Saint Martin
 #include "isndbuf.h"
 #include "isndsrc.h"
 
-#include "cssndrdr/software/srdrchan.h"
+#include "srdrchan.h"
 
 class csSoundBufferSoftware : public iSoundBuffer, public Channel
 {

@@ -24,10 +24,10 @@
 #include "sysdef.h"
 #include "qint.h"
 #include "csutil/scf.h"
-#include "cssndrdr/software/srdrcom.h"
-#include "cssndrdr/software/srdrlst.h"
-#include "cssndrdr/software/srdrsrc.h"
-#include "cssndrdr/software/srdrbuf.h"
+#include "srdrcom.h"
+#include "srdrlst.h"
+#include "srdrsrc.h"
+#include "srdrbuf.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
 #include "isndlstn.h"
@@ -39,7 +39,7 @@ csIniFile* configsndsoft;
 
 IMPLEMENT_FACTORY (csSoundRenderSoftware)
 
-EXPORT_CLASS_TABLE (sndrdrs)
+EXPORT_CLASS_TABLE (sndsoft)
   EXPORT_CLASS (csSoundRenderSoftware, "crystalspace.sound.render.software",
     "Software Sound Renderer for Crystal Space")
 EXPORT_CLASS_TABLE_END

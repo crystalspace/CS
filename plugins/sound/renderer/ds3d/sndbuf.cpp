@@ -23,9 +23,9 @@
 
 #include "dsound.h"
 
-#include "cssndrdr/ds3d/sndrdr.h"
-#include "cssndrdr/ds3d/sndbuf.h"
-#include "cssndrdr/ds3d/sndsrc.h"
+#include "sndrdr.h"
+#include "sndbuf.h"
+#include "sndsrc.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY(csSoundBufferDS3D)

@@ -25,8 +25,8 @@
 #include "dsound.h"
 #include "eax.h"
 
-#include "cssndrdr/eax/sndrdr.h"
-#include "cssndrdr/eax/sndlstn.h"
+#include "sndrdr.h"
+#include "sndlstn.h"
 
 IMPLEMENT_FACTORY(csSoundListenerEAX)
 

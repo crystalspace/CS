@@ -24,9 +24,9 @@
 
 #include "ia3dapi.h"
 
-#include "cssndrdr/a3d/sndrdr.h"
-#include "cssndrdr/a3d/sndbuf.h"
-#include "cssndrdr/a3d/sndsrc.h"
+#include "sndrdr.h"
+#include "sndbuf.h"
+#include "sndsrc.h"
 
 IMPLEMENT_TEMPLATE(csSoundSourceA3D);
 

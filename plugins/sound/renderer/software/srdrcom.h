@@ -26,7 +26,7 @@
 
 #include "csutil/scf.h"
 #include "cssfxldr/common/snddata.h"
-#include "cssndrdr/software/srdrchan.h"
+#include "srdrchan.h"
 #include "isndrdr.h"
 #include "isnddrv.h"
 #include "iplugin.h"

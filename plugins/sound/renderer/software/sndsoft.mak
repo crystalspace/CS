@@ -2,26 +2,26 @@
 # to build the software sound renderer
 
 # Driver description
-DESCRIPTION.sndrdrs = Crystal Space software sound renderer
+DESCRIPTION.sndsoft = Crystal Space software sound renderer
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make sndrdrs      Make the $(DESCRIPTION.sndrdrs)$"
+PLUGINHELP += $(NEWLINE)echo $"  make sndsoft      Make the $(DESCRIPTION.sndsoft)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: sndrdrs
+.PHONY: sndsoft
 
-all plugins drivers snddrivers: sndrdrs
+all plugins drivers snddrivers: sndsoft
 
-sndrdrs:
+sndsoft:
 	$(MAKE_TARGET) MAKE_DLL=yes
-sndrdrsclean:
+sndsoftclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -29,46 +29,46 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/cssndrdr/software
+vpath %.cpp plugins/sound/renderer/software
 
 # The Software Sound renderer
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  SNDRDRS=$(OUTDLL)sndrdrs$(DLL)
-  DEP.SNDRDRS=$(CSUTIL.LIB) $(CSSYS.LIB) $(CSSNDLDR.LIB) $(CSSFXLDR.LIB)
+  SNDSOFT=$(OUTDLL)sndsoft$(DLL)
+  DEP.SNDSOFT=$(CSUTIL.LIB) $(CSSYS.LIB) $(CSSNDLDR.LIB) $(CSSFXLDR.LIB)
 else
-  SNDRDRS=$(OUT)$(LIB_PREFIX)sndrdrs$(LIB)
-  DEP.EXE+=$(SNDRDRS)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDRDRS
+  SNDSOFT=$(OUT)$(LIB_PREFIX)sndsoft$(LIB)
+  DEP.EXE+=$(SNDSOFT)
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_SNDSOFT
 endif
-DESCRIPTION.$(SNDRDRS) = $(DESCRIPTION.sndrdrs)
-SRC.SNDRDRS = $(wildcard libs/cssndrdr/software/*.cpp)
-OBJ.SNDRDRS = $(addprefix $(OUT),$(notdir $(SRC.SNDRDRS:.cpp=$O)))
+DESCRIPTION.$(SNDSOFT) = $(DESCRIPTION.sndsoft)
+SRC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.cpp)
+OBJ.SNDSOFT = $(addprefix $(OUT),$(notdir $(SRC.SNDSOFT:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: sndrdrs sndrdrsclean
+.PHONY: sndsoft sndsoftclean
 
 # Chain rules
-snd: sndrdrs
-clean: sndrdrsclean
+snd: sndsoft
+clean: sndsoftclean
 
-sndrdrs: $(OUTDIRS) $(SNDRDRS)
+sndsoft: $(OUTDIRS) $(SNDSOFT)
 
-$(SNDRDRS): $(OBJ.SNDRDRS) $(DEP.SNDRDRS)
+$(SNDSOFT): $(OBJ.SNDSOFT) $(DEP.SNDSOFT)
 	$(DO.PLUGIN)
 
-sndrdrsclean:
-	$(RM) $(SNDRDRS) $(OBJ.SNDRDRS)
+sndsoftclean:
+	$(RM) $(SNDSOFT) $(OBJ.SNDSOFT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)sndrdrs.dep
-$(OUTOS)sndrdrs.dep: $(SRC.SNDRDRS)
+dep: $(OUTOS)sndsoft.dep
+$(OUTOS)sndsoft.dep: $(SRC.SNDSOFT)
 	$(DO.DEP)
 else
--include $(OUTOS)sndrdrs.dep
+-include $(OUTOS)sndsoft.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

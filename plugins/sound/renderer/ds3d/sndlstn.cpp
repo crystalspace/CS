@@ -24,8 +24,8 @@
 
 #include "dsound.h"
 
-#include "cssndrdr/ds3d/sndrdr.h"
-#include "cssndrdr/ds3d/sndlstn.h"
+#include "sndrdr.h"
+#include "sndlstn.h"
 
 IMPLEMENT_FACTORY(csSoundListenerDS3D)
 

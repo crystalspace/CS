@@ -35,7 +35,7 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cssnddrv/oss/ossdrv.h"
+#include "ossdrv.h"
 #include "iplugin.h"
 #include "isystem.h"
 #include "isndlstn.h"

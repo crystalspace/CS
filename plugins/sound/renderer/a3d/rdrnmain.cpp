@@ -29,7 +29,7 @@
 
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cssndrdr/a3d/sndrdr.h"
+#include "sndrdr.h"
 #include "isndrdr.h"
 
 static unsigned int gRefCount = 0;
