@@ -145,8 +145,10 @@ void awsLabel::OnDraw (csRect /*clip*/)
     // Draw the text
     g2d->Write (
         WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
-        Frame ().xmin + tx + is_down,
-        Frame ().ymin + ty + is_down,
+        //Frame ().xmin + tx + is_down,
+        //Frame ().ymin + ty + is_down,
+        Frame ().xmin + tx,
+        Frame ().ymin + ty,
         WindowManager ()->GetPrefMgr ()->GetColor (AC_TEXTFORE),
         -1,
         tmp.GetData ());

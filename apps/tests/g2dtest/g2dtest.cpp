@@ -66,6 +66,9 @@ class G2DTestSystemDriver
     stTestLinePerf,
     stTestTextDraw,
     stTestTextDraw2,
+    stPixelClipTest,
+    stLineClipTest,
+    stBoxClipTest,
     stPause,
     stWaitKey
   };
@@ -83,7 +86,7 @@ class G2DTestSystemDriver
   // some handy colors
   int white, yellow, green, red, blue, black, gray, dsteel;
   // Last pressed key
-  int lastkey, lastkey2, lastkey3, lastkey4;
+  int lastkey, lastkey2, lastkey3, lastkey4, lastkey5, lastkey6, lastkey7;
   // Switch backbuffer while waiting for a key
   bool SwitchBB;
   // Current font
@@ -124,6 +127,12 @@ private:
   void DrawLinePerf ();
   void DrawTextTest ();
   void DrawTextTest2 ();
+
+  void PixelClipTest ();
+  void LineClipTest  ();
+  void BoxClipTest ();
+
+  void DrawClipRect(int x, int y, int w, int h);
 };
 
 G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
@@ -189,6 +198,15 @@ void G2DTestSystemDriver::EnterState (appState newstate, int arg)
     case stTestTextDraw2:
       lastkey4 = 0;
       break;
+    case stPixelClipTest:
+      lastkey5 = 0;
+      break;
+    case stLineClipTest:
+      lastkey6 = 0;
+      break;
+    case stBoxClipTest:
+      lastkey7 = 0;
+      break;
     case stWaitKey:
       lastkey = 0;
       break;
@@ -237,6 +255,9 @@ void G2DTestSystemDriver::SetupFrame ()
     case stTestLinePerf:
     case stTestTextDraw:
     case stTestTextDraw2:
+    case stPixelClipTest:
+    case stLineClipTest:
+    case stBoxClipTest:
     {
       if (!myG2D->BeginDraw ())
         break;
@@ -247,7 +268,7 @@ void G2DTestSystemDriver::SetupFrame ()
       {
         case stStartup:
           DrawStartupScreen ();
-//EnterState (stTestTextDraw);
+//EnterState (stPixelClipTest);
 //break;
           EnterState (stContextInfo);
           EnterState (stPause, 5000);
@@ -308,9 +329,36 @@ void G2DTestSystemDriver::SetupFrame ()
         case stTestTextDraw2:
           DrawTextTest2 ();
           if (lastkey4)
-            ;//EnterState ();
+            EnterState (stPixelClipTest);
           else
             EnterState (stTestTextDraw2);
+          break;
+        case stPixelClipTest:
+          PixelClipTest ();
+          if (lastkey5)
+          {
+            myG2D->SetClipRect(0,0,myG2D->GetWidth(), myG2D->GetHeight());
+            EnterState (stLineClipTest);
+          }
+          else
+            EnterState (stPixelClipTest);
+          break;
+        case stLineClipTest:
+          LineClipTest ();
+          if (lastkey6)
+          {
+            myG2D->SetClipRect(0,0,myG2D->GetWidth(), myG2D->GetHeight());
+            EnterState (stBoxClipTest);
+          }
+          else
+            EnterState (stLineClipTest);
+          break;
+        case stBoxClipTest:
+          BoxClipTest ();
+          if (lastkey7)
+            ;//EnterState ();
+          else
+            EnterState (stBoxClipTest);
           break;
         default:
           break;
@@ -391,6 +439,12 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
           case stTestTextDraw2:
             lastkey4 = Event.Key.Char;
             break;
+          case stPixelClipTest:
+            lastkey5 = Event.Key.Char;
+          case stLineClipTest:
+            lastkey6 = Event.Key.Char;
+          case stBoxClipTest:
+            lastkey7 = Event.Key.Char;
           default:
             break;
         }
@@ -827,6 +881,210 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   WriteCentered (0, 16*1, green, black, " Performance: %20.1f characters/second ", perf);
 }
 
+
+void G2DTestSystemDriver::PixelClipTest ()
+{
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
+  int sx = w/4, sy = h / 2 + 60, sw = w/2, sh = h / 4 - 60;
+  myG2D->SetClipRect(0,0,w,h);
+  myG2D->DrawBox(0,0,w,h, dsteel);
+  
+
+
+  SetFont (CSFONT_ITALIC);
+  WriteCentered (0,16*-12, white, -1, "PIXEL CLIP TEST");
+
+  SetFont (CSFONT_LARGE);
+  WriteCentered (0,16*-10,  black, dsteel, "This will test if pixel clipping is being done properly");
+  
+  WriteCentered (0,16*-8,   black, dsteel, "For each of the following clip tests we will be drawing");
+  WriteCentered (0,16*-7,   black, dsteel, "a 1 pixel wide green rectangle with a 1 pixel wide red rectangle");
+  WriteCentered (0,16*-6,   black, dsteel, "inside of it.");
+
+  WriteCentered (0,16*-4,   black, dsteel, "The clipping rectangle has been set so the red rectangle is");
+  WriteCentered (0,16*-3,   black, dsteel, "inside the clipping region. If any of the lines of the red rectangle");
+  WriteCentered (0,16*-2,   black, dsteel, "are solid (not drawn over) then the clipping region is cutting off too much");
+  
+  WriteCentered (0,16*0,   black, dsteel, "The green rectangle is outside the clipping region. If any of the lines");
+  WriteCentered (0,16*1,   black, dsteel, "of the green rectangle are being drawn over then the clipping region is");
+  WriteCentered (0,16*2,   black, dsteel, "not clipping enough.");
+  
+
+  SetFont (CSFONT_COURIER);
+
+  DrawClipRect(sx, sy, sw, sh);
+
+  myG2D->SetClipRect(sx + 1, sy + 1, sx + sw, sy + sh);
+  
+
+  // Test random pixel drawing
+  csRandomGen rng (csGetTicks ());
+  csTicks start_time = csGetTicks (), delta_time;
+
+
+  // widen the range where we try to draw pixels
+  sx -= 10;
+  sy -= 10;
+  sw += 20;
+  sh += 20;
+
+  do
+  {
+	int i;
+    for (i = 0; i < 1000; i++)
+    {
+      float x = sx + rng.Get () * sw;
+      float y = sy + rng.Get () * sh;
+      myG2D->DrawPixel(x,y,black);
+    }
+    delta_time = csGetTicks () - start_time;
+  } while (delta_time < 100);
+}
+
+
+void G2DTestSystemDriver::DrawClipRect(int sx, int sy, int sw, int sh)
+{
+  myG2D->DrawLine (sx, sy, sx + sw, sy, green);
+  myG2D->DrawLine (sx, sy + sh, sx + sw, sy + sh, green);
+  myG2D->DrawLine (sx, sy, sx, sy + sh, green);
+  myG2D->DrawLine (sx + sw, sy, sx + sw, sy + sh, green);
+  myG2D->DrawLine (sx+1, sy+1, sx + sw-1, sy+1, red);
+  myG2D->DrawLine (sx+1, sy + sh-1, sx + sw-1, sy + sh-1, red);
+  myG2D->DrawLine (sx+1, sy+1, sx+1, sy + sh-1, red);
+  myG2D->DrawLine (sx + sw - 1, sy+1, sx + sw - 1, sy + sh-1, red);
+}
+
+
+void G2DTestSystemDriver::LineClipTest ()
+{
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
+    myG2D->SetClipRect(0,0,w,h);
+  myG2D->DrawBox(0,0,w,h, dsteel);
+
+
+  SetFont (CSFONT_ITALIC);
+  WriteCentered (0,-16*4, white, -1, "LINE CLIP TEST");
+
+  SetFont (CSFONT_LARGE);
+  WriteCentered (0,-16*1,  black, dsteel, "This will test if line clipping is being done properly");
+  WriteCentered (0,0,   black, dsteel, "You should see 3 thin green rectangles below with black");
+  WriteCentered (0,16*1,   black, dsteel, "inside each. Like before we want no black on the green while the");
+  WriteCentered (0,16*2,   black, dsteel, "red should be covered. The first box is drawing horizontal lines, ");
+  WriteCentered (0,16*3,   black, dsteel, "the second, vertical lines, and the third, random diagonal lines.");
+  
+
+  SetFont (CSFONT_COURIER);
+  int sx1 = w/7, sx2 = 3*sx1, sx3 = 5*sx1, sy = h / 2 + 60, sw = w/7, sh = h / 4 - 60;
+  DrawClipRect(sx1, sy, sw, sh);
+  DrawClipRect(sx2, sy, sw, sh);
+  DrawClipRect(sx3, sy, sw, sh);
+
+
+
+  // Test random pixel drawing
+  csRandomGen rng (csGetTicks ());
+  csTicks start_time = csGetTicks (), delta_time;
+
+
+  // widen the range where we try to draw pixels
+  int sx1_big = sx1 - 10;
+  int sx2_big = sx2 - 10;
+  int sx3_big = sx3 - 10;
+  int sy_big = sy - 10;
+  int sw_big = sw + 20;
+  int sh_big = sh + 20;
+
+  do
+  {
+	int i;
+
+    myG2D->SetClipRect(sx1 + 1, sy + 1, sx1 + sw, sy + sh);
+    for (i = 0; i < 10; i++)
+    {
+      float x1 = sx1_big + rng.Get () * sw_big;
+      float x2 = sx1_big + rng.Get () * sw_big;
+      float y = sy_big + rng.Get () * sh_big;
+      myG2D->DrawLine(x1,y,x2,y,black);
+    }
+
+    myG2D->SetClipRect(sx2 + 1, sy + 1, sx2 + sw, sy + sh);
+    for (i = 0; i < 100; i++)
+    {
+      float x = sx2_big + rng.Get () * sw_big;
+      float y1 = sy_big + rng.Get () * sh_big;
+      float y2 = sy_big + rng.Get () * sh_big;
+      myG2D->DrawLine(x,y1,x,y2,black);
+    }
+
+    myG2D->SetClipRect(sx3 + 1, sy + 1, sx3 + sw, sy + sh);
+    for (i = 0; i < 100; i++)
+    {
+      float x1 = sx3_big + rng.Get () * sw_big;
+      float y1 = sy_big + rng.Get () * sh_big;
+      float x2 = sx3_big + rng.Get () * sw_big;
+      float y2 = sy_big + rng.Get () * sh_big;
+      myG2D->DrawLine(x1,y1,x2,y2,black);
+    }
+    delta_time = csGetTicks () - start_time;
+  } while (delta_time < 100);
+
+} 
+
+void G2DTestSystemDriver::BoxClipTest()
+{
+  int w = myG2D->GetWidth ();
+  int h = myG2D->GetHeight ();
+  int sx = w/4, sy = h / 2 + 60, sw = w/2, sh = h / 4 - 60;
+  myG2D->SetClipRect(0,0,w,h);
+  myG2D->DrawBox(0,0,w,h, dsteel);
+  
+  SetFont (CSFONT_ITALIC);
+  WriteCentered (0,-16*4, white, -1, "BOX CLIP TEST");
+
+  SetFont (CSFONT_LARGE);
+  WriteCentered (0,-16*3,  black, dsteel, "This will test if box clipping is being done properly");
+  WriteCentered (0,-16*2,  black, dsteel, "You should see a thin green rectangle below");
+
+  WriteCentered (0,16*0,   black, dsteel, "Again all the black should be contained inside the green");
+  WriteCentered (0,16*1,   black, dsteel, "rectangle. The red rectangle should not be visible.");
+  
+
+  SetFont (CSFONT_COURIER);
+
+  DrawClipRect(sx, sy, sw, sh);
+
+  myG2D->SetClipRect(sx + 1, sy + 1, sx + sw, sy + sh);
+  
+
+  // Test random box drawing
+  csRandomGen rng (csGetTicks ());
+  csTicks start_time = csGetTicks (), delta_time;
+
+
+  // widen the range where we try to draw
+  sx -= 10;
+  sy -= 10;
+  sw += 20;
+  sh += 20;
+
+  do
+  {
+	int i;
+    for (i = 0; i < 1000; i++)
+    {
+      float x = sx + rng.Get () * sw;
+      float y = sy + rng.Get () * sh;
+      float width = rng.Get () * sw;
+      float height = rng.Get () * sh;
+      myG2D->DrawBox(x,y,width,height,black);
+    }
+    delta_time = csGetTicks () - start_time;
+  } while (delta_time < 100);
+
+}
+
 static bool G2DEventHandler (iEvent& ev)
 {
   if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
@@ -879,7 +1137,7 @@ int main (int argc, char *argv[])
       canvas = CS_SOFTWARE_2D_DRIVER;
     else if (strncmp ("crystalspace.", canvas, 13))
     {
-      ALLOC_STACK_ARRAY (tmp, char, strlen (canvas) + 25);
+      char *tmp = (char *)alloca (strlen (canvas) + 25);
       strcpy (tmp, "crystalspace.graphics2d.");
       strcat (tmp, canvas);
       canvas = tmp;

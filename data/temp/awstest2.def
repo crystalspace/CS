@@ -44,7 +44,7 @@ skin "Normal Windows"
 window "Another"
 {
   Frame: (100,100)-(600,440)
-  Style: wfsNormal
+  Style: fsBevel
   Title: "A window with lots of stuff"
 
   component "Blue" is "Command Button"

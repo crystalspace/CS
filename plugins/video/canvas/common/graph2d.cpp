@@ -203,7 +203,7 @@ bool csGraphics2D::Open ()
   for (i = 0, addr = 0; i < Height; i++, addr += bpl)
     LineAddress[i] = addr;
 
-  SetClipRect (0, 0, Width - 1, Height - 1);
+  SetClipRect (0, 0, Width, Height);
   return true;
 }
 
@@ -262,22 +262,22 @@ void csGraphics2D::ClearAll (int color)
 
 void csGraphics2D::DrawPixel8 (csGraphics2D *This, int x, int y, int color)
 {
-  if ((x >= This->ClipX1) && (x <= This->ClipX2)
-   && (y >= This->ClipY1) && (y <= This->ClipY2))
+  if ((x >= This->ClipX1) && (x < This->ClipX2)
+   && (y >= This->ClipY1) && (y < This->ClipY2))
     *(This->GetPixelAt (x, y)) = color;
 }
 
 void csGraphics2D::DrawPixel16 (csGraphics2D *This, int x, int y, int color)
 {
-  if ((x >= This->ClipX1) && (x <= This->ClipX2)
-   && (y >= This->ClipY1) && (y <= This->ClipY2))
+  if ((x >= This->ClipX1) && (x < This->ClipX2)
+   && (y >= This->ClipY1) && (y < This->ClipY2))
     *(short *)(This->GetPixelAt (x, y)) = color;
 }
 
 void csGraphics2D::DrawPixel32 (csGraphics2D *This, int x, int y, int color)
 {
-  if ((x >= This->ClipX1) && (x <= This->ClipX2)
-   && (y >= This->ClipY1) && (y <= This->ClipY2))
+  if ((x >= This->ClipX1) && (x < This->ClipX2)
+   && (y >= This->ClipY1) && (y < This->ClipY2))
     *(long *)(This->GetPixelAt (x, y)) = color;
 }
 
@@ -290,11 +290,13 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
   int fx1 = QInt (x1), fx2 = QInt (x2),
       fy1 = QInt (y1), fy2 = QInt (y2);
 
+
   // Adjust the farthest margin
-  if (fx1 < fx2) { if (float (fx2) == x2) fx2--; }
-  else if (fx1 > fx2) { if (float (fx1) == x1) fx1--; }
-  if (fy1 < fy2) { if (float (fy2) == y2) fy2--; }
-  else if (fy1 > fy2) { if (float (fy1) == y1) fy1--; }
+  //if (fx1 < fx2) { if (float (fx2) == x2) fx2--; }
+  //else if (fx1 > fx2) { if (float (fx1) == x1) fx1--; }
+  //if (fy1 < fy2) { if (float (fy2) == y2) fy2--; }
+  //else if (fy1 > fy2) { if (float (fy1) == y1) fy1--; }
+
 
   if (fy1 == fy2)
   {
@@ -349,6 +351,14 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     }								\
   }
 
+/*#define H_LINE(pixtype)						\
+  {								\
+    int x, y;  \
+    for (x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)	\
+    {								\
+      DrawPixel(x, (y>>16), color); y += deltay;					\
+    }								\ */
+
     switch (pfmt.PixelBytes)
     {
       case 1: H_LINE (uint8); break;
@@ -382,6 +392,16 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
       *p = color; x += deltax;					\
     }								\
   }
+
+/*#define V_LINE(pixtype)						\
+  {								\
+    int x, y; \
+    for (x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)	\
+    {								\
+      DrawPixel((x>>16), y, color); \
+      x += deltax; \
+    }								\
+  }*/
 
     switch (pfmt.PixelBytes)
     {
@@ -473,21 +493,22 @@ bool csGraphics2D::ClipLine (float &x1, float &y1, float &x2, float &y2,
   int xmin, int ymin, int xmax, int ymax)
 {
   float fxmin = xmin;
-  float fxmax = xmax;
+  float fxmax = xmax-EPSILON;
   float fymin = ymin;
-  float fymax = ymax;
+  float fymax = ymax-EPSILON;
 
 #define CLIP_LEFT   0x01
 #define CLIP_TOP    0x02
 #define CLIP_RIGHT  0x04
 #define CLIP_BOTTOM 0x08
 
+
 #define SetOutCodes(u, x, y)                \
   u = 0;                                    \
   if (x < fxmin) u |= CLIP_LEFT;            \
   if (y < fymin) u |= CLIP_TOP;             \
-  if (x > fxmax ) u |= CLIP_RIGHT;           \
-  if (y > fymax ) u |= CLIP_BOTTOM;
+  if (x > fxmax) u |= CLIP_RIGHT;           \
+  if (y > fymax) u |= CLIP_BOTTOM;
 
 #define FSWAP(a,b) { float __tmp__ = a; a = b; b = __tmp__; }
 #define CSWAP(a,b) { char __tmp__ = a; a = b; b = __tmp__; }

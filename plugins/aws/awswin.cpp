@@ -35,6 +35,7 @@ const int awsWindow:: foMin = 0x4;
 const int awsWindow:: foClose = 0x8;
 const int awsWindow:: foTitle = 0x10;
 const int awsWindow:: foGrip = 0x20;
+
 const int awsWindow:: foRoundBorder = 0x0;			// default
 const int awsWindow:: foBeveledBorder = 0x40;
 const int awsWindow:: foNoBorder = 0x80;
@@ -75,6 +76,12 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   if (Layout ()) Layout ()->SetOwner (GetComponent());
 
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
+
+
+  // set the default options depending on style
+  // the constructor by default includes them all
+  if(style == fsBitmap)
+    frame_options = 0;
 
   pm->GetInt (settings, "Options", frame_options);
   pm->GetString (settings, "Title", title);
@@ -139,6 +146,7 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   
   awsComponentNode closeinfo("Close Button", "Command Button");
   closeinfo.Add(new awsIntKey("Style", awsCmdButton::fsNormal));
+
   closeinfo.Add(new awsIntKey("IconAlign", awsCmdButton::iconLeft));
   closeinfo.Add(new awsStringKey("Icon", close_button_txt));
   close_button.SetFlag(AWSF_CMP_NON_CLIENT);
@@ -161,6 +169,7 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   
   awsComponentNode zoominfo("Zoom Button", "Command Button");
   zoominfo.Add(new awsIntKey("Style", awsCmdButton::fsNormal));
+
   zoominfo.Add(new awsIntKey("IconAlign", awsCmdButton::iconLeft));
   zoominfo.Add(new awsStringKey("Icon", zoom_button_txt));
   zoom_button.SetFlag(AWSF_CMP_NON_CLIENT);
@@ -184,8 +193,11 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   
   awsComponentNode mininfo("Min Button", "Command Button");
   mininfo.Add(new awsIntKey("Style", awsCmdButton::fsNormal));
+
   mininfo.Add(new awsIntKey("IconAlign", awsCmdButton::iconLeft));
+
   mininfo.Add(new awsStringKey("Icon", min_button_txt));
+
 
   min_button.SetFlag(AWSF_CMP_NON_CLIENT);
   min_button.Create(WindowManager(), this, &mininfo);
@@ -198,9 +210,11 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   if(~frame_options & foClose)
     close_button.Hide();
   
+
   if(~frame_options & foZoom)
     zoom_button.Hide();
   
+
   if(~frame_options & foMin)
     min_button.Hide();
 
@@ -438,8 +452,6 @@ void awsWindow::OnDraw (csRect clip)
 {
   iGraphics2D *g2d = WindowManager ()->G2D ();
 
- 
-
   awsPanel::OnDraw(clip);
   if(style == fsNormal)
   {
@@ -460,63 +472,66 @@ void awsWindow::OnDraw (csRect clip)
 
   if (frame_options & foTitle)
   {
-	  const int step = 6;
-      
-	  csRect title_frame = Frame();
+    const int step = 6;
+    
+    if(style != fsBitmap)
+    {
+      csRect title_frame = Frame();
       csRect insets = frame_drawer.GetInsets(style);
-	  title_frame.xmin += insets.xmin;
-	  title_frame.ymin += insets.ymin;
-	  title_frame.xmax -= insets.xmax;
-	  title_frame.ymax = title_frame.ymin + title_bar_height;
-
+      title_frame.xmin += insets.xmin;
+      title_frame.ymin += insets.ymin;
+      title_frame.xmax -= insets.xmax;
+      title_frame.ymax = title_frame.ymin + title_bar_height;
+      
       // if the title is active
       if (IsActiveWindow())
       {
-		  DrawGradient(title_frame, title_color[0], title_color[1], title_color[2],
-			                        title_color[3], title_color[4], title_color[5]);
-	  }
-	  else
+        DrawGradient(title_frame, title_color[0], title_color[1], title_color[2],
+          title_color[3], title_color[4], title_color[5]);
+      }
+      else
       {
-          DrawGradient(title_frame, title_color[6], title_color[7], title_color[8],
-			                        title_color[9], title_color[10], title_color[11]);
+        DrawGradient(title_frame, title_color[6], title_color[7], title_color[8],
+          title_color[9], title_color[10], title_color[11]);
       }
       
-      if (title)
+    }
+    if (title)
+    {
+      // find how far to the right can we write
+      // the title bar
+      int right_border = ClientFrame().xmax;
+      if(frame_options & foMin)
+        right_border = MIN(min_button.Frame().xmin, right_border);
+      if(frame_options & foZoom)
+        right_border = MIN(zoom_button.Frame().xmin, right_border);
+      if(frame_options & foClose)
+        right_border = MIN(close_button.Frame().xmin, right_border);
+      
+      
+      
+      int mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()
+        ->GetLength (title->GetData (), right_border - ClientFrame().xmin - 10);
+      
+      scfString tmp (title->GetData ());
+      tmp.Truncate (mcc);
+      
+      if(mcc < (int) title->Length())
       {
-        // find how far to the right can we write
-		// the title bar
-        int right_border = ClientFrame().xmax;
-        if(frame_options & foMin)
-			right_border = MIN(min_button.Frame().xmin, right_border);
-		if(frame_options & foZoom)
-            right_border = MIN(zoom_button.Frame().xmin, right_border);
-		if(frame_options & foClose)
-			right_border = MIN(close_button.Frame().xmin, right_border);
-
-
-
-        int mcc = WindowManager ()->GetPrefMgr ()->GetDefaultFont ()
-          ->GetLength (title->GetData (), right_border - ClientFrame().xmin - 10);
-        
-        scfString tmp (title->GetData ());
-        tmp.Truncate (mcc);
-		
-		if(mcc < (int) title->Length())
-		{
-		  // set the last 3 characters to ...
-		  for(unsigned int i = MAX(0, (int)tmp.Length() - 3); i < tmp.Length(); i++)
-			  tmp.SetAt(i, '.');
-		}
-        
-        // now draw the title
-        g2d->Write (
-          WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
-          ClientFrame ().xmin + 5,
-          Frame ().ymin + (step >> 1) + title_offset,
-          title_text_color,
-          -1,
-          tmp.GetData ());
+        // set the last 3 characters to ...
+        for(unsigned int i = MAX(0, (int)tmp.Length() - 3); i < tmp.Length(); i++)
+          tmp.SetAt(i, '.');
       }
+      
+      // now draw the title
+      g2d->Write (
+        WindowManager ()->GetPrefMgr ()->GetDefaultFont (),
+        ClientFrame ().xmin + 5,
+        Frame ().ymin + (step >> 1) + title_offset,
+        title_text_color,
+        -1,
+        tmp.GetData ());
+    }
   }   // end if title bar
 		
 }

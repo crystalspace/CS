@@ -79,13 +79,48 @@ public:
     * If it returns false then the component was not able to initialize properly and
     * shouldn't be used.
     **/
-    virtual bool Create(iAws *m, iAwsComponent *parent, awsComponentNode *settings)
-    { return comp->Create (m, parent, settings);}
 
+    /// Reproducing the create code here is a temporary fix
+    /// until I can find a better solution. Currently you can
+    /// not properly embed the menu and popupMenu components like
+    /// this
+    virtual bool Create(iAws *m, iAwsComponent *parent, awsComponentNode *settings)
+    {
+      SetID(settings->Name());
+      SetParent(parent);
+      
+      // set ourself up by querying the settings 
+      if(!Setup(m, settings)) return false;
+      
+      // if we are a top-level component link in to the top-level list
+      if(Parent() == NULL)
+      {
+        // Link into the current hierarchy, at the top.
+        if (m->GetTopComponent () == NULL)
+        {
+          m->SetTopComponent (this);
+        }
+        else
+        {
+          LinkAbove (m->GetTopComponent ());
+          m->SetTopComponent (this);
+        }
+      }
+      
+      // unless you have set the non client flag by this point 
+      // you get added to the parent's layout
+      if(~Flags() & AWSF_CMP_NON_CLIENT && Parent() && Parent()->Layout())
+        Parent()->Layout()->AddComponent(this, settings);
+      
+      if(Parent())
+        Parent()->AddChild(this);
+      return true;
+    }
+    
     /// Sets up component
     virtual bool Setup(iAws *wmgr, awsComponentNode *settings)
     { return comp->Setup(wmgr, settings); }
-
+    
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent(iEvent& Event)
      {

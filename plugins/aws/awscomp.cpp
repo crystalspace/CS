@@ -244,8 +244,7 @@ bool awsComponent::SetProperty (const char *name, void *parm)
   if (strcmp ("Frame", name) == 0)
   {
     csRect *r = (csRect *) (parm);
-
-    Frame ().Set (*r);
+    ResizeTo(*r);
     return true;
   }
 
@@ -585,11 +584,18 @@ void awsComponent::LayoutChildren ()
   if (Layout ()) Layout ()->LayoutComponents ();
 }
 
+
+
 void awsComponent::AddToLayout(iAwsComponent* cmp,awsComponentNode* settings)
+
 {
+
    if (Layout())
+
      Layout()->AddComponent(cmp, settings);
+
 }
+
 
 iAwsComponent* awsComponent::Window()
 {
