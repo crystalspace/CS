@@ -25,6 +25,7 @@
 
 class csWorld;
 class csVector3;
+class csMatrix3;
 class csColor;
 
 struct iSector;

@@ -20,10 +20,12 @@
 #define __ICMDMGR_H__
 
 #include "csutil/scf.h"
+
 #include "isystem.h"
 #include "iplugin.h"
 #include "inetcmd.h"
 #include "isector.h"
+#include "iworld.h"
 
 SCF_VERSION (iCmdMgr, 0, 0, 1);
 
@@ -61,6 +63,9 @@ struct iCMDMGR: public iPlugIn
 
   virtual int GetLastError() =0;
   virtual int GetProtocolVersion() = 0;
+
+  /// Associate a world with the ns world 
+  virtual void AssignWorld(iWorld *) = 0;
 
   virtual void AddWorld(char *name, iSector *sector) = 0;
   virtual void DropWorld(iSector *sector) = 0;
