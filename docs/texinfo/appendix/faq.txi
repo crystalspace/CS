@@ -10,6 +10,9 @@ some questions about Crystal Space, try consulting this list first.
 The first section contains practical questions and answers. The second
 section (see later) contains more technical questions.
 
+More FAQs can also be found online in the CS Wiki 
+(@uref{http://crystal.sourceforge.net/phpwiki/index.php?FAQ}).
+
 @itemize @bullet
 @item
 @strong{Q}: From where can I download Crystal Space?
