@@ -1767,6 +1767,8 @@ int viscnt_vis_node;
 int viscnt_invis_node;
 int viscnt_vis_obj;
 int viscnt_invis_obj;
+float viscnt_vis_node_vol;
+float viscnt_invis_node_vol;
 #endif
 
 void *csThing::TestQueuePolygonArray (
@@ -2745,6 +2747,8 @@ bool CullOctreeNode (
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;
 
+  bool vis = true;
+
   int i;
   csOctree *otree = (csOctree *)tree;
   csOctreeNode *onode = (csOctreeNode *)node;
@@ -2761,7 +2765,7 @@ bool CullOctreeNode (
   //if (w->IsPVS ())
   //{
   // Test for PVS.
-  //if (!onode->IsVisible ()) return false;
+  //if (!onode->IsVisible ()) { vis = false; goto the_end; }
   //else if (w->IsPVSOnly ()) goto is_vis;
   //}
   c_buffer = w->GetCBuffer ();
@@ -2797,21 +2801,30 @@ bool CullOctreeNode (
       if (bot && cam[i].y <= cam[i].z * by) bot = false;
     }
 
-    if (left || right || top || bot) return false;
+    if (left || right || top || bot)
+    {
+      vis = false;
+      goto the_end;
+    }
 
     if (num_z_0 == nVert)
     {
       // Node behind camera.
-      return false;
+      vis = false;
+      goto the_end;
     }
 
     if (far_plane)
     {
-      if (num_array == 7)                       // we havent transformed the 7th yet
+      if (num_array == 7)                 // we havent transformed the 7th yet
         cam[6] = camtrans.Other2This (array[6]);
       for (i = 0; i < num_array; i++)
         if (far_plane->Classify (cam[i]) > SMALL_EPSILON) break;
-      if (i == num_array) return false;
+      if (i == num_array)
+      {
+	vis = false;
+        goto the_end;
+      }
     }
 
     persp.MakeEmpty ();
@@ -2844,7 +2857,8 @@ bool CullOctreeNode (
         {
           if (cam[i1].z < SMALL_EPSILON)
           {
-            // We need to intersect and add both intersection point and this point.
+            // We need to intersect and add both intersection point and
+	    // this point.
             csIntersect3::ZPlane (SMALL_EPSILON, cam[i], cam[i1], isect);
             persp.AddPerspective (isect);
           }
@@ -2857,10 +2871,13 @@ bool CullOctreeNode (
       }
     }
 
-    if (!persp.ClipAgainst (rview->GetClipper ())) return false;
+    if (!persp.ClipAgainst (rview->GetClipper ()))
+    {
+      vis = false;
+      goto the_end;
+    }
 
     // c-buffer test.
-    bool vis;
     if (xor_buffer)
       vis = xor_buffer->TestPolygon (
           persp.GetVertices (),
@@ -2869,11 +2886,7 @@ bool CullOctreeNode (
       vis = c_buffer->TestPolygon (
           persp.GetVertices (),
           persp.GetVertexCount ());
-#   ifdef CS_DEBUG
-    if (vis) viscnt_vis_node++;
-    else viscnt_invis_node++;
-#   endif
-    if (!vis) return false;
+    if (!vis) goto the_end;
   }
 
   // If a node is visible we check wether or not it has a minibsp.
@@ -2893,7 +2906,23 @@ bool CullOctreeNode (
       cam[indices[i]] = camtrans.Other2This (pset->Vwor (indices[i]));
   }
 
-  return true;
+the_end:
+# ifdef CS_DEBUG
+  if (viscnt_enabled)
+  {
+    if (vis) viscnt_vis_node++;
+    else
+    {
+      viscnt_invis_node++;
+      const csBox3& b = onode->GetBox ();
+      float volume = (b.MaxX ()-b.MinX ()) * (b.MaxY ()-b.MinY ()) *
+		(b.MaxZ ()-b.MinZ ());
+      viscnt_invis_node_vol += volume;
+    }
+  }
+# endif
+
+  return vis;
 }
 
 /**
@@ -3001,6 +3030,16 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
   // to draw it.
   if (static_tree)
   {
+#   ifdef CS_DEBUG
+    if (viscnt_enabled)
+    {
+      csOctree* otree = (csOctree*)static_tree;
+      const csBox3& b = otree->GetRoot ()->GetBox ();
+      viscnt_vis_node_vol = (b.MaxX ()-b.MinX ()) * (b.MaxY ()-b.MinY ()) *
+		(b.MaxZ ()-b.MinZ ());
+    }
+#   endif
+
     int engine_mode = csEngine::current_engine->GetEngineMode ();
 
     // If this thing has a static polygon tree (octree) there
@@ -3011,7 +3050,8 @@ bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
         (rview->FindRenderContextData ((void *)this));
       if (!pvi)
       {
-        csEngine::current_engine->ReportBug ("INTERNAL ERROR! polygon queue is missing!!!");
+        csEngine::current_engine->ReportBug (
+		"INTERNAL ERROR! polygon queue is missing!!!");
         fflush (stdout);
         DEBUG_BREAK;
       }

@@ -137,6 +137,7 @@ csBugPlug::~csBugPlug ()
   while (mappings)
   {
     csKeyMap* n = mappings->next;
+    delete mappings->args;
     delete mappings;
     mappings = n;
   }
@@ -453,7 +454,8 @@ bool csBugPlug::EatKey (iEvent& event)
   }
 
   // Get command.
-  int cmd = GetCommandCode (key, shift, alt, ctrl);
+  char* args;
+  int cmd = GetCommandCode (key, shift, alt, ctrl, args);
   if (down)
   {
     // First we check if it is the 'debug enter' key.
@@ -500,14 +502,9 @@ bool csBugPlug::EatKey (iEvent& event)
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Debug graph dumped!");
 	csDebuggingGraph::Dump (object_reg);
         break;
-      case DEBUGCMD_TOGGLEXOR:
-        Report (CS_REPORTER_SEVERITY_NOTIFY, "Toggle c-buffer/XOR buffer!");
-	Engine->DebugCommand ("toggle_xorbuf");
-        break;
-      case DEBUGCMD_TOGGLECULL:
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"Toggle Visibility Culling Statistics!");
-	Engine->DebugCommand ("toggle_cullstat");
+      case DEBUGCMD_ENGINECMD:
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Engine command: %s", args);
+	Engine->DebugCommand (args);
         break;
       case DEBUGCMD_HELP:
         Report (CS_REPORTER_SEVERITY_NOTIFY, "Sorry, cannot help you yet.");
@@ -880,8 +877,17 @@ int csBugPlug::GetKeyCode (const char* keystring, bool& shift, bool& alt,
   return keycode;
 }
 
-int csBugPlug::GetCommandCode (const char* cmd)
+int csBugPlug::GetCommandCode (const char* cmd, char* args)
 {
+  char* spc = strchr (cmd, ' ');
+  if (spc)
+  {
+    *spc = 0;
+    strcpy (args, spc+1);
+  }
+  else
+    args[0] = 0;
+
   if (!strcmp (cmd, "debugenter"))	return DEBUGCMD_DEBUGENTER;
   if (!strcmp (cmd, "mouseenter"))	return DEBUGCMD_MOUSEENTER;
   if (!strcmp (cmd, "quit"))		return DEBUGCMD_QUIT;
@@ -913,21 +919,25 @@ int csBugPlug::GetCommandCode (const char* cmd)
   if (!strcmp (cmd, "meshbbox"))	return DEBUGCMD_MESHBBOX;
   if (!strcmp (cmd, "meshrad"))		return DEBUGCMD_MESHRAD;
   if (!strcmp (cmd, "debuggraph"))	return DEBUGCMD_DEBUGGRAPH;
-  if (!strcmp (cmd, "togglexor"))	return DEBUGCMD_TOGGLEXOR;
-  if (!strcmp (cmd, "togglecull"))	return DEBUGCMD_TOGGLECULL;
+  if (!strcmp (cmd, "enginecmd"))	return DEBUGCMD_ENGINECMD;
 
   return DEBUGCMD_UNKNOWN;
 }
 
-int csBugPlug::GetCommandCode (int key, bool shift, bool alt, bool ctrl)
+int csBugPlug::GetCommandCode (int key, bool shift, bool alt, bool ctrl,
+	char*& args)
 {
   csKeyMap* m = mappings;
   while (m)
   {
     if (m->key == key && m->shift == shift && m->alt == alt && m->ctrl == ctrl)
+    {
+      args = m->args;
       return m->cmd;
+    }
     m = m->next;
   }
+  args = NULL;
   return DEBUGCMD_UNKNOWN;
 }
 
@@ -938,12 +948,15 @@ void csBugPlug::AddCommand (const char* keystring, const char* cmdstring)
   // Check if valid key name.
   if (keycode == -1) return;
 
-  int cmdcode = GetCommandCode (cmdstring);
+  char args[512];
+  int cmdcode = GetCommandCode (cmdstring, args);
   // Check if valid command name.
   if (cmdcode == DEBUGCMD_UNKNOWN) return;
 
   // Check if key isn't already defined.
-  if (GetCommandCode (keycode, shift, alt, ctrl) != DEBUGCMD_UNKNOWN) return;
+  char* args2;
+  if (GetCommandCode (keycode, shift, alt, ctrl, args2) != DEBUGCMD_UNKNOWN)
+    return;
 
   // Make new key assignment.
   csKeyMap* map = new csKeyMap ();
@@ -955,6 +968,10 @@ void csBugPlug::AddCommand (const char* keystring, const char* cmdstring)
   map->next = mappings;
   if (mappings) mappings->prev = map;
   map->prev = NULL;
+  if (args[0])
+    map->args = csStrNew (args);
+  else
+    map->args = NULL;
   mappings = map;
 }
 

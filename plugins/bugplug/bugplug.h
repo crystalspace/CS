@@ -94,8 +94,7 @@ class csShadow;
 #define DEBUGCMD_MESHBBOX	1022	// Show BBOX of selected mesh
 #define DEBUGCMD_MESHRAD	1023	// How RADIUS of selected mesh
 #define DEBUGCMD_DEBUGGRAPH	1024	// Do a dump of the debug graph
-#define DEBUGCMD_TOGGLEXOR	1025	// Toggle c-buffer vs xor-buf
-#define DEBUGCMD_TOGGLECULL	1026	// Toggle vis culling statistics
+#define DEBUGCMD_ENGINECMD	1025	// General engine DebugCommand() (arg)
 
 /**
  * For key mappings.
@@ -106,6 +105,7 @@ struct csKeyMap
   int key;
   bool shift, alt, ctrl;
   int cmd;	// One of DEBUGCMD_...
+  char* args;
 };
 
 //--------------------------------------------------------------------------
@@ -215,14 +215,18 @@ private:
   /// Execute mouse button three.
   void MouseButton3 (iCamera* camera);
 
-  /// Given a command string, return a command code.
-  int GetCommandCode (const char* cmd);
+  /**
+   * Given a command string, return a command code.
+   * Optionally fill 'args' with arguments after the command.
+   */
+  int GetCommandCode (const char* cmd, char* args);
   /// Given a keyname, parse it and return key code + modifier status.
   int GetKeyCode (const char* keystring, bool& shift, bool& alt,
 	bool& ctrl);
 
   /// Given a keycode, and shift/alt/ctrl status return a command code.
-  int GetCommandCode (int key, bool shift, bool alt, bool ctrl);
+  int GetCommandCode (int key, bool shift, bool alt, bool ctrl,
+  	char*& args);
   /// Add a new key binding for a command.
   void AddCommand (const char* keystring, const char* cmdstring);
 

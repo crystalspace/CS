@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+25-Apr-2002
+	- Removed the 'togglecull' and 'togglexor' commands from BugPlug.
+	  Instead added the ability to have arguments with bugplug commands
+	  and added the more general 'enginecmd' command. The first argument
+	  after 'enginecmd' will be given to engine->DebugCommand().
+	  In data/config/bugplug.cfg defined x as 'enginecmd toggle_xorbuf'
+	  and ctrl-c as 'enginecmd toggle_cullstat'.
+	- 'toggle_cullstat' will now show the percentage of the complete
+	  octree bounding box that is visible.
 23-Apr-2002
 	- Fixed parsing of FILE keyword in texture parsing so it also
 	  works with quotes.

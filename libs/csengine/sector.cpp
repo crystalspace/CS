@@ -630,6 +630,8 @@ void csSector::Draw (iRenderView *rview)
   extern int viscnt_invis_node; viscnt_invis_node = 0;
   extern int viscnt_vis_obj; viscnt_vis_obj = 0;
   extern int viscnt_invis_obj; viscnt_invis_obj = 0;
+  extern float viscnt_invis_node_vol; viscnt_invis_node_vol = 0;
+  extern float viscnt_vis_node_vol; viscnt_vis_node_vol = 0;
 # endif
 
   draw_busy++;
@@ -799,9 +801,12 @@ void csSector::Draw (iRenderView *rview)
   extern bool viscnt_enabled;
   if (viscnt_enabled)
   {
-    printf ("poly +%d -%d   node +%d -%d   obj +%d -%d\n",
-	viscnt_vis_poly, viscnt_invis_poly, viscnt_vis_node,
-	viscnt_invis_node, viscnt_vis_obj, viscnt_invis_obj);
+    float percentage =
+      100.0f - 100.0f * viscnt_invis_node_vol / viscnt_vis_node_vol;
+    printf ("p+%d-%d   o+%d-%d   n+%d-%d(%g%%)\n",
+	viscnt_vis_poly, viscnt_invis_poly,
+	viscnt_vis_obj, viscnt_invis_obj,
+	viscnt_vis_node, viscnt_invis_node, percentage);
     fflush (stdout);
   }
 # endif

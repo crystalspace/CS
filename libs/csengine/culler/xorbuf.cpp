@@ -492,9 +492,12 @@ bool csXORBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
     buf = &buffer[i<<w_shift];
     scr_buf = &scr_buffer[i<<w_shift];
     uint32 first = init;
+    //bool rowmod = false;
     for (x = 0 ; x < width ; x++)
     {
       first ^= *buf++;
+      //if (first) rowmod = true;
+      //if (rowmod && !first) break;
       uint32 sb = *scr_buf;
       if ((~sb) & first)
       {
