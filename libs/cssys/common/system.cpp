@@ -868,6 +868,7 @@ STDMETHODIMP csSystemDriver::XSystem::GetSubSystemPtr(void **retval, int iSubSys
     break;
   default:
     *retval = NULL;
+    return E_FAIL;
     break;
   }
 
