@@ -41,7 +41,7 @@ void csBasicVector::SetLength (int n)
   count = n;
   if (n > limit || (limit > threshold && n < limit - threshold))
   {
-    n = n + threshold - 1;
+    n = ((n + threshold - 1) / threshold ) * threshold;
     if (!n)
     {
       if (root)
