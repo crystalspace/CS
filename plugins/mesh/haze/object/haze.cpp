@@ -85,21 +85,24 @@ void csHazeHull::ComputeEdges()
   int p;
   for(p=0; p<total_poly; p++)
   {
+    //printf("poly %d: ", p);
     for(i=0; i<pol_num[p]; i++)
     {
       /// get two indices
       int idx1 = pol_verts[p][i];
       int idx2 = pol_verts[p][ (i+1) % pol_num[p] ];
       /// swap so idx1 <= idx2
-      if(idx2>idx1)
+      if(idx1>idx2)
       {
         int swp = idx1;
 	idx1 = idx2;
 	idx2 = swp;
       }
       /// mark
+      //printf("(%d-%d) ", idx1, idx2);
       matrix[ idx1*total_vert + idx2 ] = 1;
     }
+    //printf("\n");
   }
   /// use matrix to fill fields.
 
@@ -160,11 +163,13 @@ void csHazeHull::ComputeEdges()
 
   /// remove temp matrix
   delete[] matrix;
+  
+  //exit(-1);
 }
 
 
 void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos, 
-  int& numv, int* pts)
+  int& numv, int*& pts)
 {
   // create some temporary arrays
   numv = 0;
@@ -185,11 +190,13 @@ void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos,
     hull->GetVertex(v0, hull->GetPolVertex(p, 0));
     hull->GetVertex(v1, hull->GetPolVertex(p, 1));
     hull->GetVertex(v2, hull->GetPolVertex(p, 2));
-    if(csMath3::WhichSide3D(campos-v0, v1-v0, v2-v0)) {
+    if(csMath3::WhichSide3D(campos-v0, v1-v0, v2-v0) > 0) {
+      //printf("polygon %d visible\n", p);
       for(i=0; i<hull->GetPolVerticeCount(p); i++)
       {
         int edge, i1, i2;
 	edge = hull->GetPolEdge(p, i, i1, i2);
+	//printf("increasing edge %d (from %d - %d)\n", edge, i1, i2);
 	use_edge[edge] ++;
 	use_start[edge] = i1;
 	use_end[edge] = i2;
@@ -241,9 +248,20 @@ void csHazeHull::ComputeOutline(iHazeHull *hull, const csVector3& campos,
 
 //------------ csHazeHullBox -----------------------------------
 
+SCF_IMPLEMENT_IBASE (csHazeHullBox)
+  SCF_IMPLEMENTS_INTERFACE (iHazeHull)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeHullBox)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeHullBox::HazeHullBox)
+  SCF_IMPLEMENTS_INTERFACE (iHazeHullBox)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csHazeHullBox::csHazeHullBox(const csVector3& a, const csVector3& b)
   : csHazeHull()
 {
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullBox);
   min = a;
   max = b;
   /// fill with data
@@ -314,6 +332,17 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
   current_features = 0;
   origin.Set(0,0,0);
   directional.Set(0,0,0);
+
+  /// copy the factory settings
+  origin = factory->GetOrigin();
+  directional = factory->GetDirectional();
+  csHazeLayerVector *factlayers = factory->GetLayers();
+  for(int i=0; i<factlayers->Length(); i++)
+  {
+    csHazeLayer *p = new csHazeLayer (factlayers->GetLayer(i)->hull,
+      factlayers->GetLayer(i)->scale);
+    layers.Push(p);
+  }
 }
 
 csHazeMeshObject::~csHazeMeshObject ()
@@ -342,8 +371,8 @@ bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-void csHazeMeshObject::UpdateLighting (iLight** lights, int num_lights,
-    const csVector3& pos)
+void csHazeMeshObject::UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
+    const csVector3& /*pos*/)
 {
   SetupObject ();
 }
@@ -483,10 +512,13 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
+  printf("drawing\n");
+
   /// preapre to transform the points
   iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
   csVector3 campos = camera->GetTransform().GetOrigin();
+  campos = movable->GetFullTransform() * campos;
   float fov = camera->GetFOV ();
   float shx = camera->GetShiftX ();
   float shy = camera->GetShiftY ();
@@ -506,15 +538,20 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   iHazeHull *hull = layers.GetLayer(0)->hull;
   int layer_num = 0;
   int *layer_poly = 0;
+  //campos.Set(10,10,10);
+  printf("campos %g,%g,%g\n", campos.x, campos.y, campos.z);
   csHazeHull::ComputeOutline(hull, campos, layer_num, layer_poly);
+  printf("has outline of size %d: ", layer_num);
   if(layer_num <= 0) return false;
   csVector3* layer_pts = new csVector3[layer_num];
   for(i=0; i<layer_num; i++)
   {
+    printf(" %d", layer_poly[i]);
     csVector3 objpos;
     hull->GetVertex(objpos, layer_poly[i] );
     ProjectO2S(tr_o2c, fov, shx, shy, objpos, layer_pts[i]);
   }
+  printf("\n");
   // get hull 0 uv values
   float layer_scale = layers.GetLayer(0)->scale;
   csVector2* layer_uvs = new csVector2[layer_num];
@@ -540,7 +577,20 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
     tri_pts[2] = layer_pts[nexti];
     tri_uvs[1] = layer_uvs[i];
     tri_uvs[2] = layer_uvs[nexti];
+    printf("drawing a polygon\n");
     DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
+
+    // debug drawing of the outline 
+    iGraphics2D *g2d = g3d->GetDriver2D();
+    g2d->DrawLine(scr_orig.x, scr_orig.y, scr_orig.x+1, scr_orig.y+1, -1);
+    // only outline
+    //g2d->DrawLine( layer_pts[i].x, layer_pts[i].y, 
+      //layer_pts[nexti].x, layer_pts[nexti].y, -1);
+    // show direction of lines (from black to white)
+    float midx = (layer_pts[i].x + layer_pts[nexti].x)*0.5;
+    float midy = (layer_pts[i].y + layer_pts[nexti].y)*0.5;
+    g2d->DrawLine( layer_pts[i].x, layer_pts[i].y, midx, midy, 0);
+    g2d->DrawLine( midx, midy, layer_pts[nexti].x, layer_pts[nexti].y, -1);
   }
 
   delete[] layer_poly;
@@ -562,6 +612,7 @@ void csHazeMeshObject::ProjectO2S(csReversibleTransform& tr_o2c, float fov,
 void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d, 
   iMaterialHandle *mat, int num, const csVector3* pts, const csVector2* uvs)
 {
+  g3dpolyfx.use_fog = false;
   g3dpolyfx.num = num;
   g3dpolyfx.mat_handle = mat;
   g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,
@@ -574,6 +625,8 @@ void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
   int i;
   for(i = 0; i < num; i++)
   {
+    poly2d[i].x = pts[i].x;
+    poly2d[i].y = pts[i].y;
     g3dpolyfx.vertices [i].sx = pts[i].x;
     g3dpolyfx.vertices [i].sy = pts[i].y;
     g3dpolyfx.vertices [i].z = pts[i].z;
@@ -623,16 +676,22 @@ void csHazeMeshObject::NextFrame (csTicks /*current_time*/)
 SCF_IMPLEMENT_IBASE (csHazeMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeFactoryState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iHazeHullCreation)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObjectFactory::HazeFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iHazeFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csHazeMeshObjectFactory::HazeHullCreation)
+  SCF_IMPLEMENTS_INTERFACE (iHazeHullCreation)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 csHazeMeshObjectFactory::csHazeMeshObjectFactory (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeFactoryState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiHazeHullCreation);
   material = NULL;
   MixMode = 0;
   origin.Set(0,0,0);

@@ -71,6 +71,29 @@ struct iHazeHull : public iBase
     int& end_idx) const = 0;
 };
 
+SCF_VERSION (iHazeHullBox, 0, 0, 1);
+
+/**
+ *  A predefined hull. 
+ */
+struct iHazeHullBox : public iBase
+{
+  /// get box settings, min and max
+  virtual void GetSettings(csVector3& min, csVector3& max) = 0;
+};
+
+SCF_VERSION (iHazeHullCreation, 0, 0, 1);
+
+/**
+ * This interface is implemented by the haze factory in order to be able to
+ * create the predefined haze hulls.
+ */
+struct iHazeHullCreation : public iBase
+{
+  /// create a predefined hull: a box given min and max.
+  virtual iHazeHullBox* CreateBox(const csVector3& min, 
+    const csVector3& max) const = 0;
+};
 
 SCF_VERSION (iHazeFactoryState, 0, 0, 1);
 
@@ -78,6 +101,8 @@ SCF_VERSION (iHazeFactoryState, 0, 0, 1);
  * This interface describes the API for the sprite factory mesh object.
  * When multiple hulls are used, they must have the same number of
  * vertices, vertices are taken to be numbered in the same ordering.
+ *
+ * The factory also implements the iHazeHullCreation interface
  */
 struct iHazeFactoryState : public iBase
 {

@@ -88,7 +88,7 @@ public:
    * made static here, so not every custom iHazeHull has to implement it.
    */
   static void ComputeOutline(iHazeHull *hull, const csVector3& campos, 
-    int& numv, int* pts);
+    int& numv, int*& pts);
 
   /// --------- iHazeHull implementation --------------------------
   virtual int GetPolygonCount() const {return total_poly;}
@@ -129,12 +129,20 @@ public:
 class csHazeHullBox : public csHazeHull {
   csVector3 min, max;
 public:
+  SCF_DECLARE_IBASE;
   /// create new.
   csHazeHullBox(const csVector3& a, const csVector3& b);
   ///
   virtual ~csHazeHullBox();
-  /// get settings
-  void GetSettings(csVector3& a, csVector3& b) {a=min; b=max;}
+  //------------------------- iHazeHullBox implementation ----------------
+  class HazeHullBox : public iHazeHullBox
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csHazeHullBox);
+    /// get settings
+    virtual void GetSettings(csVector3& a, csVector3& b) 
+    {a=scfParent->min; b=scfParent->max;}
+  } scfiHazeHullBox;
+  friend HazeHullBox;
 };
 
 
@@ -313,6 +321,12 @@ class csHazeMeshObjectFactory : public iMeshObjectFactory
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   /// Get mixmode.
   UInt GetMixMode () const { return MixMode; }
+  /// Get the layers vector
+  csHazeLayerVector* GetLayers() {return &layers;}
+  /// get the origin
+  const csVector3& GetOrigin() const {return origin;}
+  /// get the directional
+  const csVector3& GetDirectional() const {return directional;}
   
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
@@ -356,6 +370,15 @@ class csHazeMeshObjectFactory : public iMeshObjectFactory
     { return scfParent->layers.GetLayer(layer)->scale; }
   } scfiHazeFactoryState;
   friend class HazeFactoryState;
+
+  //------------------------- iHazeHullCreation implementation ----------------
+  class HazeHullCreation : public iHazeHullCreation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csHazeMeshObjectFactory);
+    virtual iHazeHullBox* CreateBox(const csVector3& a, const csVector3& b)
+      const { return &(new csHazeHullBox(a, b))->scfiHazeHullBox; }
+  } scfiHazeHullCreation;
+  friend class HazeHullCreation;
 };
 
 /**
