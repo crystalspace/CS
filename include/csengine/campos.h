@@ -73,7 +73,7 @@ public:
 
     virtual iObject *QueryObject() {return scfParent;}
 	
-	virtual char *GetSector() { return scfParent->Sector; }
+	virtual const char *GetSector() { return scfParent->Sector; }
 
 	virtual csVector3 GetPosition() { return scfParent->Position; }
 
