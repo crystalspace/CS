@@ -365,7 +365,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 	      synldr->ReportError (
 	        "crystalspace.maploader.parse.heightgen", flipxnode,
                 "bad flipx argument.");
-	      return false;
+	      return 0;
 	    }
 	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
 	  if(flipynode)
@@ -374,7 +374,7 @@ csPtr<iBase> csTerrFuncLoader::Parse (iDocumentNode* node,
 	      synldr->ReportError (
 	        "crystalspace.maploader.parse.heightgen", flipynode,
                 "bad flipy argument.");
-	      return false;
+	      return 0;
 	    }
 
 	  csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));

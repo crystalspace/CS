@@ -73,6 +73,9 @@ chronological order.
 	  the software X-windows canvas (however, it presently converts colored
 	  cursors to black and white).
 	- Eric Sunshine eliminated compilation warnings in some canvases.
+	- Eric Sunshine fixed bugs in csTerrFuncLoader::Parse().  Was returning
+	  boolean values even though function is declared as returning
+	  csPtr<iBase>.
 10-Dec-2003
 	- Eric Sunshine fixed bug in unix.mak where it was incorrectly
 	  exporting the hard-coded "-ldl -lm" to cs-config's --libs option even
