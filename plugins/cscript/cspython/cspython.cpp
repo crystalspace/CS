@@ -19,6 +19,7 @@
 #include "Python.h"
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "cssys/syspath.h"
 #include "cspython.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
