@@ -15,6 +15,10 @@ The history order has been reversed so that new features are at the top.
 	- Some experimentation with pysimple. Tried to update it so that
 	  it works more like the normal simple but instead it creates
 	  part of the geometry in python. However it does not work yet.
+	- Eric Sunshine removed the unused, unfinished, and broken Macintosh
+	  Glide canvas.  By all accounts, it appears that this driver has
+	  never worked.  Most of the content of these source files is actually
+	  old code left over from X-windows and Win32.
 3-Oct-2000
 	- Fixed a bug in the 3dslev convertor where it would accidently
 	  remove small polygons.
