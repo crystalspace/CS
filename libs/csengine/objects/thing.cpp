@@ -1579,7 +1579,8 @@ void csThing::PreparePolygonBuffer ()
   for (i = 0; i < polygons.Length (); i++)
   {
     matpol[i].poly = GetPolygon3D (i);
-    matpol[i].mat = &(matpol[i].poly->GetMaterialWrapper ()->scfiMaterialWrapper);
+    matpol[i].mat = &(matpol[i].poly->GetMaterialWrapper ()
+    	->scfiMaterialWrapper);
   }
 
   //-----
@@ -1648,6 +1649,8 @@ void csThing::PreparePolygonBuffer ()
         *v_obj2tex,
         lmi->GetPolyTex ());
   }
+
+  delete[] MatPol;
 }
 
 void csThing::GetTransformedBoundingBox (

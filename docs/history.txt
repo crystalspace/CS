@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+29-Jul-2002
+	- Fixed a memory leak in csThing::PreparePolygonBuffer().
 27-Jul-2002
 	- Added a new blender export script (blender2cs.py) written by
 	  John Harger. This one exports to thing mesh factories and puts
