@@ -117,7 +117,6 @@ CSOBJTYPE_IMPL(csSkeletonState,csSkeletonLimbState);
 
 csSkeletonLimbState::~csSkeletonLimbState ()
 {
-  CHK (delete [] vertices);
   while (children)
   {
     csSkeletonLimbState* n = children->GetNext ();
