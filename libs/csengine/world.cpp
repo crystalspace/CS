@@ -60,7 +60,7 @@ csWorld* csWorld::current_world = NULL;
 
 CSOBJTYPE_IMPL(csWorld,csObject);
 
-csWorld::csWorld () : start_vec (0, 0, 0), csObject()
+csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
 {
   first_dyn_lights = NULL;
   world_file = NULL;
