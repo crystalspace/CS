@@ -1156,9 +1156,15 @@ this:
 // main.cpp
 CS_IMPLEMENT_APPLICATION
 
+class MyApp : public csApplicationFramework
+@{
+  /* ... */
+@};
+
 int main (int argc, char* argv[]) 
 @{
-  return csApplicationFramework::Main(argc, argv);
+  MyApp myApp;
+  return myApp.Main (argc, argv);
 @}
 @end example
 
