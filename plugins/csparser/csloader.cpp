@@ -1844,7 +1844,7 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 		plug, binplug))
 	{
 	  SyntaxService->ReportError (
- 	      "crystalspace.maploader.parse.addon",
+ 	      "crystalspace.maploader.parse.meshfact",
 	      child, "Error loading plugin '%s'!", child->GetContentsValue ());
 	  return false;
 	}
@@ -2641,7 +2641,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  if (!loaded_plugins.FindPlugin (plugname, plug, binplug))
 	  {
 	    SyntaxService->ReportError (
- 	        "crystalspace.maploader.parse.addon",
+ 	        "crystalspace.maploader.parse.meshobj",
 	        child, "Error loading plugin '%s'!", plugname);
 	    return false;
 	  }

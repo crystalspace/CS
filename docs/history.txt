@@ -12,6 +12,8 @@ The history order is reversed so that new features are at the top.
 	  that it is also performed on Cygwin since this flag is needed with
 	  the 2.x compiler on Cygwin.  (Previously, it was performed only for
 	  Mingw).
+	- Jorrit fixed two wrong message id's in the csparser. It was
+	  complaining about 'addon' while it had nothing to do with that.
 9-Jul-2003
 	- Jorrit fixed PlaceMesh() so that it now uses
 	  engine->GetNearbyObjects(). That makes it a lot more efficient
