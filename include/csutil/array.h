@@ -160,7 +160,7 @@ private:
       curcapacity--;
       if (curcapacity)
         mtiUpdateAmount (mti, curcapacity, curcapacity * sizeof (T));
-
+      return;
     }
     mtiUpdateAmount (mti, dn, dn * sizeof (T));
   }
