@@ -130,6 +130,8 @@ public:
   csTriangleVertices (csTriangleMesh* mesh, csVector3* verts, int num_verts);
   ///
   ~csTriangleVertices ();
+  /// Update vertex table for a given set of vertices (with the same number as at init).
+  void UpdateVertices (csVector3* verts);
 
   ///
   int GetNumVertices () { return num_vertices; }

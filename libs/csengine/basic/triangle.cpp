@@ -180,6 +180,13 @@ csTriangleVertices::~csTriangleVertices ()
   CHK (delete [] vertices);
 }
 
+void csTriangleVertices::UpdateVertices (csVector3* verts)
+{
+  int i;
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i].pos = verts[i];
+}
+
 int csTriangleVertices::GetMinimalCostVertex ()
 {
   int i;

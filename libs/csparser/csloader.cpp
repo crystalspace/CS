@@ -4684,13 +4684,12 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
           float list[100];
 	  int num;
           ScanStr (params, "%F", list, &num);
-	  num /= 3;
-	  verts.SetLimit (num);
+	  num /= 2;
+	  verts.SetLength (num);
           for (i = 0 ; i < num ; i++)
 	  {
-	    verts[i].pos.x = list[i*3+0];
-	    verts[i].pos.y = list[i*3+1];
-	    verts[i].pos.z = list[i*3+2];
+	    verts[i].pos.x = list[i*2+0];
+	    verts[i].pos.y = list[i*2+1];
 	  }
         }
         break;
@@ -4700,7 +4699,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	  int num;
           ScanStr (params, "%F", list, &num);
 	  num /= 2;
-	  verts.SetLimit (num);
+	  verts.SetLength (num);
           for (i = 0 ; i < num ; i++)
 	  {
 	    verts[i].u = list[i*2+0];

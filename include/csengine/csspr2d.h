@@ -33,7 +33,7 @@ class csTextureHandle;
 
 struct csSprite2DVertex
 {
-  csVector3 pos;
+  csVector2 pos;
   csColor color;
   float u, v;
 };

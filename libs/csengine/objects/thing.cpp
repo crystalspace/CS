@@ -173,7 +173,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
   csVector2* persp;
   float* z_array;
   csVector2 triangle[3];
-  csVector2 clipped_triangle[10];	//@@@BAD HARDCODED!
+  csVector2 clipped_triangle[MAX_OUTPUT_VERTICES];	//@@@BAD HARDCODED!
+  csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
   csVector3 coord;
   UByte* mapR=NULL, * mapG=NULL, * mapB=NULL;
   int lm_width=0, lm_height=0;
@@ -271,7 +272,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
   	// Clip triangle
   	int rescount;
-  	if (!rview.view->Clip (triangle, 3, clipped_triangle, rescount)) continue;
+	UByte clip_result = rview.view->Clip (triangle, 3, clipped_triangle,
+		rescount, clipped_vtstats);
+        if (clip_result == CS_CLIP_OUTSIDE) continue;
 
         texes[0] = &tess->GetVertex (ct.i1).txt_coord;
         texes[1] = &tess->GetVertex (ct.i2).txt_coord;
@@ -308,7 +311,19 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	  idx += dir;
   	}
 
-        PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle, gouraud);
+        //PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle, gouraud);
+	if (clip_result != CS_CLIP_INSIDE)
+          PreparePolygonFX2 (&poly, clipped_triangle, rescount, clipped_vtstats,
+		  (csVector2 *)triangle, 3, gouraud);
+	else
+	{
+          poly.vertices [0].sx = triangle [0].x;
+          poly.vertices [0].sy = triangle [0].y;
+          poly.vertices [1].sx = triangle [1].x;
+          poly.vertices [1].sy = triangle [1].y;
+          poly.vertices [2].sx = triangle [2].x;
+          poly.vertices [2].sy = triangle [2].y;
+	}
 
   	// Draw resulting polygon
 	if (!rview.callback)

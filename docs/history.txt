@@ -12,6 +12,30 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+25-Mar-2000
+	- Optimized sprites a bit more.
+	- Changed curve drawing using new clipper routine to get
+	  u,v coordinates.
+	- Continued work on 2D sprites. It is now possible to draw
+	  them. Lighting does not work yet.
+	- Michael Dale Long did the following changes:
+	    - Modified funConsole so it is now a part of the cscon plugin
+	      instead of a separate plugin that depends on cscon (this is
+	      how it is already in MSVC).
+	    - Changed cctest so it shows a fullscreen startup console
+	      but a smaller interactive console so you can still see
+	      funConsole's border.
+	    - Added funConsole to scf.cfg and made it the default console
+	      for cctest.
+	    - Changed the way cctest handles mouse input. Should be more
+	      friendly on Windows, but I haven't tested it there yet.
+	    - cctest no longer automatically captures the mouse. You click
+	      on the window to activate mouse capture and press ESC to
+	      release it.  Also made the right mouse button move backwards
+	      for better control from the mouse.
+	    - Increased of the speed of the rockets. It is no longer
+	      possible for the user to outrun them. :-)
+	- Michael also fixed some VC project files.
 24-Mar-2000
 	- Norman Kramer did some work on glide3 support.
 	- Changes from Michael Dale Long:
@@ -52,10 +76,15 @@ Short-term cleanups that need to be done:
 	      template, BEZIER() and bezier template (although it looks like
 	      it is unused there yet) contexts.
 	    - Implemented texture mapping saving in MazeD; about 90% done.
+	- Started some serious optimization on sprites. In OpenGL with
+	  10 sydneys I could only get about 5 FPS. Now I get 13 FPS.
 	- Eric Sunshine patched up Texinfo to HTML documentation conversion
 	  so that it will work on DOS by moving some of the texi2html options
 	  from the command line into the 'init' file.  This works around DOS's
 	  128-byte command-line length limitation.
+	- Michael Ewert added apply_impulse to the csphyzik library.
+	  So you can now apply an arbitrary impulse to a jointed figure and
+	  get the proper motion as a result. Nifty!
 23-Mar-2000
 	- Gary Haussmann added basic support for DrawTriangleMesh(). All
 	  triangles are sent via a glDrawElements() call.  May crash some

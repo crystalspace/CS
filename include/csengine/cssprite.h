@@ -54,6 +54,9 @@ private:
   int texturing_index;
   char* name;
 
+  /// If true then normals are already calculated for this frame.
+  bool normals_calculated;
+
   /// Bounding box in object space for this frame.
   csBox3 box;
 
@@ -69,6 +72,11 @@ public:
   int GetTexIndex () { return texturing_index; }
   ///
   void SetTexIndex (int tex_idx) { texturing_index = tex_idx; }
+
+  /// Return true if normals are already calculated.
+  bool NormalsCalculated () { return normals_calculated; }
+  /// Set normals calculated to value.
+  void SetNormalsCalculated (bool n) { normals_calculated = n; }
 
   ///
   void SetName (char * n);
@@ -172,6 +180,13 @@ private:
   int* texel_to_normal;
   /// Array that maps Texels to Vertices
   int* texel_to_vertex;
+
+  /**
+   * Connectivity information for this sprite template.
+   * Also contains temporary vertex position information
+   * for one sprite (@@@this should be avoided!!!!)
+   */
+  csTriangleVertices* tri_verts;
 
 public:
 

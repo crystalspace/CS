@@ -41,6 +41,7 @@ csFrame::csFrame (int anm_idx, int tex_idx)
   name = NULL;
   animation_index = anm_idx;
   texturing_index = tex_idx;
+  normals_calculated = false;
 }
 
 csFrame::~csFrame ()
@@ -103,13 +104,14 @@ csSpriteTemplate::csSpriteTemplate ()
   skeleton = NULL;
 
   texel_to_normal = NULL;
-  normal_mesh     = NULL;
+  normal_mesh = NULL;
 
-  CHK (texel_mesh  = new csTriangleMesh ());
+  CHK (texel_mesh = new csTriangleMesh ());
 
   texel_to_vertex = NULL;
-  vertex_mesh     = NULL;
+  vertex_mesh = NULL;
 
+  tri_verts = NULL;
 }
 
 csSpriteTemplate::~csSpriteTemplate ()
@@ -117,6 +119,7 @@ csSpriteTemplate::~csSpriteTemplate ()
   CHK (delete texel_mesh);
   CHK (delete [] emerge_from);
   CHK (delete skeleton);
+  CHK (delete tri_verts);
 
   if (normal_mesh != NULL)
   {
@@ -198,8 +201,6 @@ csSprite3D* csSpriteTemplate::NewSprite ()
 
 void csSpriteTemplate::GenerateLOD ()
 {
-#if 1
-
   int i;
 
   //@@@ turn this into a parameter or member variable?
@@ -260,7 +261,6 @@ void csSpriteTemplate::GenerateLOD ()
   CHK (delete [] translate);
   CHK (delete verts);
   CHK (delete new_mesh);
-#endif
 }
 
 void csSpriteTemplate::ComputeBoundingBox ()
@@ -338,12 +338,21 @@ void csSpriteTemplate::SetTexture (csTextureList* textures, const char *texname)
 
 void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
 {
+  // @@@ We only calculated normals once for every frame.
+  // Normal calculation is too expensive to do again every time.
+  // But maybe we should make this optional for fast systems?
+  if (frame->NormalsCalculated ()) return;
+  frame->SetNormalsCalculated (true);
 
-  CHK (csTriangleVertices *tri_verts = new csTriangleVertices (texel_mesh, object_verts, GetNumTexels()));
+  if (!tri_verts)
+  {
+    CHK (tri_verts = new csTriangleVertices (texel_mesh, object_verts, GetNumTexels()));
+  }
 
   int i, j;
   csTriangle * tris = texel_mesh->GetTriangles();
   int num_triangles = texel_mesh->GetNumTriangles();
+  // @@@ Avoid this allocate!
   CHK (csVector3 * tri_normals = new csVector3[num_triangles]);
 
   // calculate triangle normals
@@ -355,7 +364,7 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
     tri_normals [i] = ab % bc;
     float norm = tri_normals[i].Norm ();
     if (norm)
-        tri_normals[i] /= norm;
+      tri_normals[i] /= norm;
   }
 
   // calculate vertex normals, by averaging connected triangle normals
@@ -374,7 +383,6 @@ void csSpriteTemplate::ComputeNormals (csFrame* frame, csVector3* object_verts)
         n /= norm;
     }
   }
-  CHK (delete tri_verts);
   CHK (delete tri_normals);
 }
 

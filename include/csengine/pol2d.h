@@ -119,6 +119,7 @@ public:
 
 
 struct G3DPolygonDPFX;
+class csVertexStatus;
 
 /**
  * Prepare a filled in G3DPolygonDPFX structure for drawing via
@@ -126,6 +127,9 @@ struct G3DPolygonDPFX;
  */
 extern void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_poly,
   int num_vertices, csVector2 *orig_triangle, bool gouraud);
+extern void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly, csVector2* clipped_poly,
+  int num_vertices, csVertexStatus* clipped_vtstats, csVector2 *orig_poly,
+  int orig_num_vertices, bool gouraud);
 
 /*
  * An element for the queue.

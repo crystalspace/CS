@@ -33,6 +33,12 @@
 // 3D rasterizer if you can't do it better :-)
 //------------------------------------------------------------------------
 
+#define INTERPOLATE1(component) \
+  g3dpoly->vertices[i].##component## = tritexcoords[vt].##component## + t*(tritexcoords[vt2].##component##-tritexcoords[vt].##component##);
+
+#define INTERPOLATE1_FOG(component) \
+  g3dpoly->fog_info[i].##component## = trifoginfo[vt].##component## + t*(trifoginfo[vt2].##component##-trifoginfo[vt].##component##);
+
 #define INTERPOLATE(component) \
 { \
   float v1 = tritexcoords[edge1[0]].##component## + t1 * (tritexcoords[edge1[1]].##component## - tritexcoords[edge1[0]].##component##); \
@@ -86,21 +92,21 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_ver
         vt = clipped_vtstats[i].Vertex;
 	vt2 = (vt+1)%3;
 	t = clipped_vtstats[i].Pos;
-	g3dpoly->vertices[i].z = tritexcoords[vt].z + t*(tritexcoords[vt2].z-tritexcoords[vt].z);
-	g3dpoly->vertices[i].u = tritexcoords[vt].u + t*(tritexcoords[vt2].u-tritexcoords[vt].u);
-	g3dpoly->vertices[i].v = tritexcoords[vt].v + t*(tritexcoords[vt2].v-tritexcoords[vt].v);
+	INTERPOLATE1 (z);
+	INTERPOLATE1 (u);
+	INTERPOLATE1 (v);
 	if (gouraud)
 	{
-	  g3dpoly->vertices[i].r = tritexcoords[vt].r + t*(tritexcoords[vt2].r-tritexcoords[vt].r);
-	  g3dpoly->vertices[i].g = tritexcoords[vt].g + t*(tritexcoords[vt2].g-tritexcoords[vt].g);
-	  g3dpoly->vertices[i].b = tritexcoords[vt].b + t*(tritexcoords[vt2].b-tritexcoords[vt].b);
+	  INTERPOLATE1 (r);
+	  INTERPOLATE1 (g);
+	  INTERPOLATE1 (b);
 	}
 	if (use_fog)
 	{
-	  g3dpoly->fog_info[i].r = trifoginfo[vt].r + t*(trifoginfo[vt2].r-trifoginfo[vt].r);
-	  g3dpoly->fog_info[i].g = trifoginfo[vt].g + t*(trifoginfo[vt2].g-trifoginfo[vt].g);
-	  g3dpoly->fog_info[i].b = trifoginfo[vt].b + t*(trifoginfo[vt2].b-trifoginfo[vt].b);
-	  g3dpoly->fog_info[i].intensity = trifoginfo[vt].intensity + t*(trifoginfo[vt2].intensity-trifoginfo[vt].intensity);
+	  INTERPOLATE1_FOG (r);
+	  INTERPOLATE1_FOG (g);
+	  INTERPOLATE1_FOG (b);
+	  INTERPOLATE1_FOG (intensity);
 	}
 	break;
       case CS_VERTEX_INSIDE:
@@ -337,7 +343,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       int rescount = 0;
       if (mesh.do_clip && clipper)
       {
-        clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount, clipped_vtstats);
+        clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount,
+		clipped_vtstats);
         if (clip_result == CS_CLIP_OUTSIDE) continue;
         poly.num = rescount;
       }

@@ -118,6 +118,115 @@ void csPolygon2D::Draw (iGraphics2D* g2d, int col)
 
 //---------------------------------------------------------------------------
 
+#define INTERPOLATE1(component) \
+  g3dpoly->vertices[i].##component## = tritexcoords[vt].##component## + t*(tritexcoords[vt2].##component##-tritexcoords[vt].##component##);
+
+#define INTERPOLATE(component) \
+{ \
+  float v1 = tritexcoords[edge_from[0]].##component## + t1 * (tritexcoords[edge_to[0]].##component## - tritexcoords[edge_from[0]].##component##); \
+  float v2 = tritexcoords[edge_from[1]].##component## + t2 * (tritexcoords[edge_to[1]].##component## - tritexcoords[edge_from[1]].##component##); \
+  g3dpoly->vertices[i].##component## = v1 + t * (v2 - v1); \
+}
+
+void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
+	csVector2* clipped_verts,
+	int num_vertices, csVertexStatus* clipped_vtstats,
+	csVector2* orig_poly, int orig_num_vertices, bool gouraud)
+{
+  // first we copy the first texture coordinates to a local buffer
+  // to avoid that they are overwritten when interpolating.
+  G3DTexturedVertex tritexcoords[50];	//@@@
+  int i;
+  for (i = 0; i < orig_num_vertices; i++)
+    tritexcoords[i] = g3dpoly->vertices[i];
+
+  int vt, vt2;
+  float t;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    g3dpoly->vertices[i].sx = clipped_verts[i].x;
+    g3dpoly->vertices[i].sy = clipped_verts[i].y;
+    switch (clipped_vtstats[i].Type)
+    {
+      case CS_VERTEX_ORIGINAL:
+        vt = clipped_vtstats[i].Vertex;
+        g3dpoly->vertices[i].z = tritexcoords[vt].z;
+        g3dpoly->vertices[i].u = tritexcoords[vt].u;
+        g3dpoly->vertices[i].v = tritexcoords[vt].v;
+	if (gouraud)
+	{
+          g3dpoly->vertices[i].r = tritexcoords[vt].r;
+          g3dpoly->vertices[i].g = tritexcoords[vt].g;
+          g3dpoly->vertices[i].b = tritexcoords[vt].b;
+	}
+	break;
+      case CS_VERTEX_ONEDGE:
+        vt = clipped_vtstats[i].Vertex;
+	vt2 = (vt+1)%orig_num_vertices;
+	t = clipped_vtstats[i].Pos;
+	INTERPOLATE1 (z);
+	INTERPOLATE1 (u);
+	INTERPOLATE1 (v);
+	if (gouraud)
+	{
+	  INTERPOLATE1 (r);
+	  INTERPOLATE1 (g);
+	  INTERPOLATE1 (b);
+	}
+	break;
+      case CS_VERTEX_INSIDE:
+        float x = clipped_verts[i].x;
+        float y = clipped_verts[i].y;
+        int edge_from[2], edge_to[2];
+	int edge = 0;
+	int j, j1;
+	j1 = orig_num_vertices-1;
+	for (j = 0 ; j < orig_num_vertices ; j++)
+	{
+          if ((y >= orig_poly[j].y && y <= orig_poly[j1].y) ||
+	      (y <= orig_poly[j].y && y >= orig_poly[j1].y))
+	  {
+	    edge_from[edge] = j;
+	    edge_to[edge] = j1;
+	    edge++;
+	    if (edge >= 2) break;
+	  }
+	  j1 = j;
+	}
+	if (edge == 1)
+	{
+	  // Safety if we only found one edge.
+	  edge_from[1] = edge_from[0];
+	  edge_to[1] = edge_to[0];
+	}
+	csVector2& A = orig_poly[edge_from[0]];
+	csVector2& B = orig_poly[edge_to[0]];
+	csVector2& C = orig_poly[edge_from[1]];
+	csVector2& D = orig_poly[edge_to[1]];
+	float t1 = (y - A.y) / (B.y - A.y);
+	float t2 = (y - C.y) / (D.y - C.y);
+	float x1 = A.x + t1 * (B.x - A.x);
+	float x2 = C.x + t2 * (D.x - C.x);
+	t = (x - x1) / (x2 - x1);
+	INTERPOLATE(z);
+	INTERPOLATE(u);
+	INTERPOLATE(v);
+	if (gouraud)
+	{
+	  INTERPOLATE(r);
+	  INTERPOLATE(g);
+	  INTERPOLATE(b);
+	}
+	break;
+    }
+  }
+}
+
+#undef INTERPOLATE
+#undef INTERPOLATE1
+#undef INTERPOLATE_FOG
+#undef INTERPOLATE1_FOG
+
 void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 	int num_vertices, csVector2* orig_triangle, bool gouraud)
 {
@@ -735,8 +844,8 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly,
       g3dpolyfx.vertices[2].g = po_colors[2].green;
       g3dpolyfx.vertices[2].b = po_colors[2].blue;
     }
-    PreparePolygonFX (&g3dpolyfx, vertices, num_vertices, orig_triangle,
-    	po_colors != NULL);
+    PreparePolygonFX (&g3dpolyfx, vertices, num_vertices,
+    	orig_triangle, po_colors != NULL);
     rview->g3d->StartPolygonFX (g3dpolyfx.txt_handle,
     	CS_FX_COPY | ( po_colors ? CS_FX_GOURAUD : 0));
     CalculateFogPolygon (rview, g3dpolyfx);
