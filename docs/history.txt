@@ -9,6 +9,8 @@ The history order is reversed so that new features are at the top.
 	- Wouter fixed up the iso engine. When a sprite is added to 
 	  a grid, then the sprite is lighted by the static lights.
 	- groton@gmx.net added the method csQuaternion::GetEulerAngles.
+	- DeSigna fixed a single word error in manual section 5.2.3,
+	  pointed out by Aner (crystalspace@myway.com)
 5-June-2003
 	- Oktal removed the setting to 0 of event category and subcategory
 	  now that the event queue does that for us.

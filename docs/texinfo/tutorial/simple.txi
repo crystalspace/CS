@@ -553,7 +553,7 @@ bool Simple::Initialize ()
 
 This extra code first loads a texture with @code{LoadTexture()}.
 The first parameter is the name of the texture as it will be known in the
-engine; and the third is the
+engine; and the second is the
 actual filename on the @sc{vfs} volume (@pxref{VFS}).  Note, if you don't have
 the @file{stone4.gif} texture you can use another one.  The only requirement
 is that it must have sizes which are a power of 2 (e.g. 64x64) (note that
