@@ -48,17 +48,13 @@ MSVCGEN_BUILD_ROOT ?= [ ConcatDirs $(BUILDTOP) out ] ;
 #------------------------------------------------------------------------------
 # Public rule stubs. May be implemented by msvcgen phase 1 or phase 2 or both.
 
-## MsvcGenConfig configfile
-## MsvcGenConfig variable : value
+## MsvcGenConfig variable [ : value ]
 ##   Specify additional configuration information to augment the msvcgen
-##   environment.  If one argument is provided, then it is a file containing
-##   Jam statements providing additional configuration for the msvcgen process.
-##   In the common case, the file will contain a series of simple variable
-##   assignment statements.  If two arguments are provided, then the named
-##   'variable' is set to 'value' for the msvcgen run.  Invocations of the
-##   two-argument form of MsvcGenConfig are cumulative, so variable/value
-##   tuples can be provided incrementally.  It is legal to use both forms of
-##   MsvcGenConfig; they are not mutually exclusive.
+##   environment.  The named 'variable' is set to 'value' for the msvcgen run.
+##   If 'value' is omitted, then 'variable' is cleared.  Invocations of
+##   MsvcGenConfig are cumulative, so variable/value tuples can be provided
+##   incrementally.  It is legal to use this rule in conjunction with
+##   MsvcGenConfigFile; they are not mutually exclusive.
 ##
 ##   The most common reason to invoke this rule is to provide MSVC-specific
 ##   fallback values for the library checks typically performed by an Autoconf
@@ -79,6 +75,15 @@ MSVCGEN_BUILD_ROOT ?= [ ConcatDirs $(BUILDTOP) out ] ;
 ##   platforms.
 rule MsvcGenConfig { MsvcGenConfig1 $(1) : $(2) ; }
 rule MsvcGenConfig1 { }
+
+## MsvcGenConfigFile file
+##   Similar to MsvcGenConfig, except that the configuration is provided via a
+##   file containing Jam statements.  In the common case, the file will contain
+##   a series of simple variable assignment statements.  It is legal to use
+##   this rule in conjunction with MsvcGenConfig; they are not mutually
+##   exclusive.
+rule MsvcGenConfigFile { MsvcGenConfigFile1 $(1) : $(2) ; }
+rule MsvcGenConfigFile1 { }
 
 ## MsvcGenWorkspace name [ : accepts [ : rejects ]]
 ##   Specify the name of a workspace which the 'msvcgen' target should create.
@@ -190,19 +195,25 @@ MSVCGEN_SILENT ?= no ;
 JAM ?= jam ;
 if $(MSVCGEN_SILENT) = yes { JAM += -d0 ; }
 
-## MsvcGenConfig configfile
 ## MsvcGenConfig variable : value
 ##   (See documentation above.)
 rule MsvcGenConfig1
 {
   if $(>)
   {
-    MSVCGEN_CONFIG_TUPLES += "-s$(<)=$(>)" ;
+    MSVCGEN_CONFIG_TUPLES += "-s$(<)='$(>)'" ;
   }
   else
   {
-    MSVCGEN_CONFIG = $(<) ;
+    MSVCGEN_CONFIG_TUPLES += "-s$(<)=''" ;
   }
+}
+
+## MsvcGenConfigFile file
+##   (See documentation above.)
+rule MsvcGenConfigFile1
+{
+  MSVCGEN_CONFIG = $(<) ;
 }
 
 ## MsvcGenSubDir dircomponents [ : version ]
@@ -660,7 +671,7 @@ rule LinkWith
 
 rule MsvcExternalLibrary
 {
-  LIBRARIES on $($(<)_TARGET) += $(>) ;
+  if $(>) { LIBRARIES on $($(<)_TARGET) += $(>) ; }
 }
 
 rule MsvcCFlags
