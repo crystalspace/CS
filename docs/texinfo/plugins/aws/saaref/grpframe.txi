@@ -2,7 +2,7 @@
 @node AWS Group Frame, AWS List Box, AWS Radio Button, AWS Signals and Actions Reference
 @subsubsection Group Frame
 
-A group frame's type is ``Group Grame''.
+A group frame's type is ``Group Frame''.
 
 @subsubheading Attributes
 
