@@ -237,6 +237,7 @@ be visible.
 
   <colors> ::= 'COLORS' '(' <color> ',' <color> ',' <color> ')'
   <gouraud> ::= 'GOURAUD' '(' ')'
+  <clip> ::= 'CLIP' '(' ')'
   <flatcol> ::= 'FLATCOL' '(' <color> ')'
   
   <cosfact> ::= 'COSFACT' '(' <number> ')'
@@ -244,7 +245,7 @@ be visible.
   <polygon-comp> ::= <texnr> | <lighting> | <mipmap> | <portal> | <warp> |
 		   <lightx> | <polygon-texture> | <vertices> | <alpha> |
 		   <fog> | <uv> | <uva> | <colors> | <cosfact> | <gouraud> |
-		   <flatcol>
+		   <flatcol> | <clip>
   <polygon> ::= 'POLYGON' <polygon-name> '(' { <polygon-comp> } ')'
 
 -----------------------------------------------------------------------------
