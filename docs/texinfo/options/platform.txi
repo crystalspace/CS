@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Platform peruser
+@node Platform peruser, , Configuration File, Options
 @section Platform-specific per-user configuration
 @cindex Per-user configuration
 

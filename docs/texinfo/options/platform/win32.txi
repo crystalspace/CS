@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Platform peruser Win32
+@node Platform peruser Win32, , Platform peruser, Platform peruser
 @subsection Storage of per-user configuration on Windows
 @cindex Windows per-user configuration
 
