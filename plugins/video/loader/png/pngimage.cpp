@@ -138,15 +138,18 @@ error1:
   png_infop info = png_create_info_struct (png);
   if (info == NULL)
   {
-error2:
     png_destroy_write_struct (&png, (png_infopp)NULL);
+error2:
     goto error1;
   }
 
   /* Catch processing errors */
   if (setjmp(png->jmpbuf))
+  {
     /* If we get here, we had a problem reading the file */
+    png_destroy_write_struct (&png, &info);
     goto error2;
+  }
 
   /* Set up the output function. We could use standard file output
    * routines but for some (strange) reason if we write the file inside
@@ -185,12 +188,13 @@ error2:
   png_set_IHDR (png, info, width, height, 8, colortype,
     PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
+  png_colorp palette = NULL;
   /* set the palette if there is one. */
   if (colortype & PNG_COLOR_MASK_PALETTE)
   {
     csRGBpixel *pal = Image->GetPalette ();
-    png_colorp palette = (png_colorp)malloc (256 * sizeof (png_color));
-	int i;
+    palette = (png_colorp)malloc (256 * sizeof (png_color));
+    int i;
     for (i = 0; i < 256; i++)
     {
       palette [i].red   = pal [i].red;
@@ -239,11 +243,13 @@ error2:
   /* It is REQUIRED to call this to finish writing the rest of the file */
   png_write_end (png, info);
 
-  if (info->palette)
-    free (info->palette);
+  //if (info->palette)
+  //  free (info->palette);
 
   /* clean up after the write, and free any memory allocated */
-  png_destroy_write_struct (&png, (png_infopp)NULL);
+  png_destroy_write_struct (&png, &info);
+  if (palette) 
+    free(palette);
 
   /* Free the row pointers */
   delete [] row_pointers;
