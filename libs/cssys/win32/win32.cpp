@@ -53,7 +53,6 @@ extern char** _argv;
 bool ApplicationActive = true;
 extern HINSTANCE ModuleHandle;
 extern int ApplicationShow;
-extern bool need_console;
 
 void SystemFatalError (char *s)
 {
@@ -410,7 +409,7 @@ class Win32Assistant :
 {
 private:
   iObjectRegistry* registry;
-  bool need_console;
+  bool console_window;
   HCURSOR m_hCursor;
   iEventOutlet* EventOutlet;
   void SetWinCursor (HCURSOR);
@@ -434,6 +433,7 @@ public:
   virtual bool HandleEvent (iEvent&);
   virtual unsigned GetPotentiallyConflictingEvents ();
   virtual unsigned QueryEventPriority (unsigned);
+  virtual void DisableConsole ();
 };
 
 static Win32Assistant* GLOBAL_ASSISTANT = 0;
@@ -476,26 +476,18 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 {
   SCF_CONSTRUCT_IBASE(0);
 
-  need_console = false;
 #ifdef CS_DEBUG
-  need_console = true;
+  console_window = true;
+#else
+  console_window = false;
 #endif
 
-#if !defined(__CYGWIN__)
-  // required as the CommandLineParser isn't set up yet:
-  int i;
-  for (i = 1; i < CS_WIN32_ARGC; i++)
-  {
-    char *opt = (char *)CS_WIN32_ARGV [i];
-    if (*opt == '-')
-    {
-      while (*opt == '-') opt++;
-      if (!strcmp(opt, "console")) need_console = true;
-      if (!strcmp(opt, "noconsole")) need_console = false;
-    }
-  }
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (r, iCommandLineParser);
+  if (cmdline->GetOption ("console")) console_window = true;
+  if (cmdline->GetOption ("noconsole")) console_window = false;
+  cmdline->DecRef ();
 
-  if (need_console)
+  if (console_window)
   {
     // @@@ if we are started from the command prompt, is there a way
     //     to use that console ?
@@ -503,9 +495,6 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
     freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
     freopen("CONOUT$", "a", stdout); // Redirect stdout to console   
   }
-#else
-  need_console = false;
-#endif
 
   registry = r;
   registry->IncRef();
@@ -543,7 +532,7 @@ Win32Assistant::~Win32Assistant ()
 {
   if (EventOutlet != 0)
     EventOutlet->DecRef();
-  if (need_console)
+  if (console_window)
     FreeConsole();
 }
 
@@ -869,8 +858,8 @@ long FAR PASCAL Win32Assistant::WindowProc (HWND hWnd, UINT message,
 void Win32Assistant::Win32Assistant (iConfigManager *Config)
 {
 #ifdef CS_DEBUG
-  need_console = true;
-  if (need_console)
+  console_window = true;
+  if (console_window)
   {
     AllocConsole();
     freopen("CONOUT$", "a", stderr); // Redirect stderr to console   
@@ -885,7 +874,7 @@ void Win32Assistant::Win32Assistant (iConfigManager *Config)
 void Win32Assistant::Help ()
 {
   printf ("  -[no]console       Create a debug console (default = %s)\n",
-    need_console ? "yes" : "no");
+    console_window ? "yes" : "no");
 }
 #endif
 
@@ -925,4 +914,20 @@ bool Win32Assistant::SetCursor (int cursor)
   }
   SetWinCursor (cur);
   return success;
+}
+
+void Win32Assistant::DisableConsole ()
+{
+  if (console_window) {
+    console_window = false;
+    freopen("_conout.txt", "a", stderr); 
+    freopen("_conout.txt", "a", stdout); 
+    FreeConsole();
+    
+    struct tm *now;
+    time_t aclock;
+    time( &aclock );                 
+    now = localtime( &aclock );  
+    printf("====== %s", asctime(now));
+ }
 }

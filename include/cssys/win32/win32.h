@@ -44,6 +44,8 @@ struct iWin32Assistant : public iBase
   virtual int GetCmdShow () const = 0;
   /// Set the mouse shape.
   virtual bool SetCursor (int cursor) = 0;
+  /// Disable the console window (if present)
+  virtual void DisableConsole () = 0;
 };
 
 // @@@ Delete everything below when the system driver is removed.
