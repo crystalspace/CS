@@ -141,8 +141,7 @@ cp -pr "$TEMPLATEDIR/template7" "$PROJECTNAME/mk/msvcgen"
 
 # instantiate template files
 Instantiate "$TEMPLATEDIR/autogen.template" "$PROJECTNAME/autogen.sh"
-Instantiate "$TEMPLATEDIR/config-msvc.template" \
-	    "$PROJECTNAME/src/config-msvc.h"
+Instantiate "$TEMPLATEDIR/config-msvc.template" "$PROJECTNAME/config-msvc.h"
 Instantiate "$TEMPLATEDIR/configure.template" "$PROJECTNAME/configure.ac"
 Instantiate "$TEMPLATEDIR/Jamfile.template" "$PROJECTNAME/Jamfile"
 Instantiate "$TEMPLATEDIR/Jamfile-src.template" "$PROJECTNAME/src/Jamfile"

@@ -3,6 +3,3 @@ SubDir TOP src ;
 Description #PROJECTNAME# : "#LONGNAME#" ;
 Application #PROJECTNAME# : [ Wildcard *.cpp *.h ] ;
 ExternalLibs #PROJECTNAME# : CRYSTAL ;
-
-Clean distclean : config.h ;
-Clean maintainerclean : config.h.in ;
