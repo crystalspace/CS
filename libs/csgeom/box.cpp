@@ -791,8 +791,8 @@ bool csBox3::ProjectOutline (const csVector3& origin,
   for (i = 0 ; i < num_array ; i++)
   {
     csVector3 isect;
-    if (!csIntersect3::AxisPlane (origin, ol.vertices[i], axis, where,
-    	isect))
+    if (!csIntersect3::AxisPlane (origin, GetCorner (ol.vertices[i]),
+    	axis, where, isect))
       return false;
     csVector2 v;
     switch (axis)
@@ -819,8 +819,8 @@ bool csBox3::ProjectOutline (const csVector3& origin,
   for (i = 0 ; i < num_array ; i++)
   {
     csVector3 isect;
-    if (!csIntersect3::AxisPlane (origin, ol.vertices[i], axis, where,
-    	isect))
+    if (!csIntersect3::AxisPlane (origin, GetCorner (ol.vertices[i]),
+    	axis, where, isect))
       return false;
     switch (axis)
     {

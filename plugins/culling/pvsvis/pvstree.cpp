@@ -438,7 +438,7 @@ void csStaticPVSTree::SetBoundingBox (const csBox3& bbox)
   // the root box.
   if (!node_minbox_set)
   {
-    node_minbox = (root_box.Max () - root_box.Min ()) / 4.0;
+    node_minbox = (root_box.Max () - root_box.Min ()) / 3.0;
   }
 
   if (root)

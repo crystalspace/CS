@@ -45,38 +45,6 @@ PVSCalcSector::~PVSCalcSector ()
   delete plane.covbuf_clipper;
 }
 
-void PVSCalcSector::CountDistribution (
-	const csArray<csBox3>& boxlist,
-	float wherex, float wherey, float wherez,
-	int& distx, int& disty, int& distz,
-	bool& badx, bool &bady, bool& badz)
-{
-  size_t i;
-  distx = disty = distz = 0;
-  size_t middlex = 0, middley = 0, middlez = 0;
-  for (i = 0 ; i < boxlist.Length () ; i++)
-  {
-    int splitx = boxlist[i].TestSplit (0, wherex);
-    int splity = boxlist[i].TestSplit (1, wherey);
-    int splitz = boxlist[i].TestSplit (2, wherez);
-    if (splitx < 0) distx--;
-    else if (splitx > 0) distx++;
-    else middlex++;
-    if (splity < 0) disty--;
-    else if (splity > 0) disty++;
-    else middley++;
-    if (splitz < 0) distz--;
-    else if (splitz > 0) distz++;
-    else middlez++;
-  }
-  distx = ABS (distx);
-  disty = ABS (disty);
-  distz = ABS (distz);
-  badx = (middlex == boxlist.Length ());
-  bady = (middley == boxlist.Length ());
-  badz = (middlez == boxlist.Length ());
-}
-
 void PVSCalcSector::DistributeBoxes (int axis, float where,
 	const csArray<csBox3>& boxlist,
 	csArray<csBox3>& boxlist_left,
@@ -91,6 +59,97 @@ void PVSCalcSector::DistributeBoxes (int axis, float where,
     if (split >= 0)
       boxlist_right.Push (boxlist[i]);
   }
+}
+
+float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
+	const csBox3& bbox1, const csBox3& bbox2)
+{
+  float max1 = bbox1.Max (axis);
+  float min2 = bbox2.Min (axis);
+  if (max1 < min2-.01)
+  {
+    where = max1 + (min2-max1) * 0.5;
+    return min2-max1;
+  }
+  float min1 = bbox1.Min (axis);
+  float max2 = bbox2.Max (axis);
+  if (max2 < min1-.01)
+  {
+    where = max2 + (min1-max2) * 0.5;
+    return min1-max2;
+  }
+  return -1.0;
+}
+
+float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
+	const csBox3& node_bbox, const csArray<csBox3>& boxlist)
+{
+  if (boxlist.Length () == 2)
+  {
+    return FindBestSplitLocation (axis, where, boxlist[0], boxlist[1]);
+  }
+
+  size_t i, j;
+
+  // Calculate minimum and maximum value along the axis.
+  float mina = boxlist[0].Min (axis);
+  float maxa = boxlist[0].Max (axis);
+  for (i = 1 ; i < boxlist.Length () ; i++)
+  {
+    const csBox3& bbox = boxlist[i];
+    if (bbox.Min (axis) < mina) mina = bbox.Min (axis);
+    if (bbox.Max (axis) > maxa) maxa = bbox.Max (axis);
+  }
+  // Make sure we don't go outside node_box.
+  if (mina < node_bbox.Min (axis)) mina = node_bbox.Min (axis);
+  if (maxa > node_bbox.Max (axis)) maxa = node_bbox.Max (axis);
+
+  // Do 10 tests to find best split location. This should
+  // probably be a configurable parameter.
+
+  // @@@ Is the routine below very efficient?
+# define FBSL_ATTEMPTS 20
+  float a;
+  float best_qual = -2.0;
+  float inv_num_objects = 1.0 / float (boxlist.Length ());
+  for (i = 0 ; i < FBSL_ATTEMPTS ; i++)
+  {
+    // Calculate a possible split location.
+    a = mina + float (i+1)*(maxa-mina)/float (FBSL_ATTEMPTS+1.0);
+    // Now count the number of objects that are completely
+    // on the left and the number of objects completely on the right
+    // side. The remaining objects are cut by this position.
+    int left = 0;
+    int right = 0;
+    for (j = 0 ; j < boxlist.Length () ; j++)
+    {
+      const csBox3& bbox = boxlist[j];
+      // The .0001 is for safety.
+      if (bbox.Max (axis) < a-.0001) left++;
+      else if (bbox.Min (axis) > a+.0001) right++;
+    }
+    int cut = boxlist.Length ()-left-right;
+    // If we have no object on the left or right then this is a bad
+    // split which we should never take.
+    float qual;
+    if (left == 0 || right == 0)
+    {
+      qual = -1.0;
+    }
+    else
+    {
+      float qual_cut = 1.0 - (float (cut) * inv_num_objects);
+      float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
+      qual = 3.0 * qual_cut + qual_balance;
+    }
+    if (qual > best_qual)
+    {
+      best_qual = qual;
+      where = a;
+    }
+  }
+# undef FBSL_ATTEMPTS
+  return best_qual;
 }
 
 void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
@@ -128,35 +187,31 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   }
   else
   {
-    int distx, disty, distz;
-    bool badx, bady, badz;
-    CountDistribution (boxlist,
-    	bbox.MinX () + bbox_size.x / 2,
-    	bbox.MinY () + bbox_size.y / 2,
-    	bbox.MinZ () + bbox_size.z / 2,
-	distx, disty, distz,
-	badx, bady, badz);
-    if (!badx && distx < disty && distx < distz)
+    float where0, where1, where2;
+    float q0 = FindBestSplitLocation (0, where0, bbox, boxlist);
+    float q1 = FindBestSplitLocation (1, where1, bbox, boxlist);
+    float q2 = FindBestSplitLocation (2, where2, bbox, boxlist);
+    if (q0 > q1 && q0 > q2)
     {
       axis = 0;
-      where = bbox.MinX () + bbox_size.x / 2;
+      where = where0;
     }
-    else if (!bady && disty < distx && disty < distz)
+    else if (q1 > q0 && q1 > q2)
     {
       axis = 1;
-      where = bbox.MinY () + bbox_size.y / 2;
+      where = where1;
     }
-    else if (!badz)
+    else if (q2 >= 0)
     {
       axis = 2;
-      where = bbox.MinZ () + bbox_size.z / 2;
+      where = where2;
     }
     else
     {
       // All options are bad. Here we mark the traversal so that
       // we only continue to split for minsize.
       BuildKDTree (node, boxlist, bbox, minsize, true, depth);
-      return;
+      return;	// No good split location.
     }
   }
 
@@ -405,6 +460,9 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   plane.offset = bbox.Min ();
   plane.scale.x = float (DIM_COVBUFFER) / (bbox.MaxX ()-bbox.MinX ());
   plane.scale.y = float (DIM_COVBUFFER) / (bbox.MaxY ()-bbox.MinY ());
+  DB(("  Hull box: (%g,%g)-(%g,%g) scale=%g,%g offset=%g,%g\n",
+  	bbox.MinX (), bbox.MinY (), bbox.MaxX (), bbox.MaxY (),
+	plane.scale.x, plane.scale.y, plane.offset.x, plane.offset.y));
 
   // Clear the coverage buffer.
   plane.covbuf->Initialize ();
@@ -504,24 +562,55 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   return nummod > 0;
 }
 
+bool PVSCalcSector::CheckRelevantPolygon (float minsource, float maxsource,
+	const csPoly3D& polygon)
+{
+  // A polygon is relevant if it is completely enclosed within the
+  // source and the shadow plane. A polygon that intersects the shadow
+  // plane or enters the source box is not valid for shadow casting.
+  size_t i;
+  const csVector3* vertices = polygon.GetVertices ();
+  for (i = 0 ; i < polygon.GetVertexCount () ; i++)
+  {
+    float value = vertices[i][plane.axis];
+    if (plane.where < minsource)
+    {
+      if (value < plane.where || value > minsource)
+	return false;
+    }
+    else
+    {
+      if (value > plane.where || value < maxsource)
+	return false;
+    }
+  }
+  return true;
+}
+
 int PVSCalcSector::CastShadowsUntilFull (const csBox3& source)
 {
   // Start casting shadows starting with the biggest polygons.
   size_t i;
   int status = -1;	// Coverage buffer is now empty.
+
+  // Calculate this for CheckRelevantPolygon.
+  float minsource = source.Min (plane.axis);
+  float maxsource = source.Max (plane.axis);
+
   for (i = 0 ; i < polygons.Length () ; i++)
   {
-    if (CastAreaShadow (source, polygons[i]))
-    {
-      // The shadow modified the coverage buffer. Test if our buffer is
-      // full now.
-      status = plane.covbuf->StatusNoDepth ();
-      if (status == 1)
+    if (CheckRelevantPolygon (minsource, maxsource, polygons[i]))
+      if (CastAreaShadow (source, polygons[i]))
       {
-        // Yes! Coverage buffer is full. We can return early here.
-	return 1;
+        // The shadow modified the coverage buffer. Test if our buffer is
+        // full now.
+        status = plane.covbuf->StatusNoDepth ();
+        if (status == 1)
+        {
+          // Yes! Coverage buffer is full. We can return early here.
+	  return 1;
+        }
       }
-    }
   }
 
   return status;
@@ -567,7 +656,8 @@ void PVSCalcSector::RecurseDestNodes (void* sourcenode, void* destnode,
         // cannot be seen from the source node.
         invisible_nodes.Add (destnode);
         pvstree->MarkInvisible (sourcenode, destnode);
-        DBA(("Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
+	DBA(("-"));
+        DB(("Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
     	    source.MinX (), source.MinY (), source.MinZ (),
     	    source.MaxX (), source.MaxY (), source.MaxZ (),
     	    dest.MinX (), dest.MinY (), dest.MinZ (),
@@ -575,16 +665,6 @@ void PVSCalcSector::RecurseDestNodes (void* sourcenode, void* destnode,
 
         // If the destination node is invisible that automatically implies
         // that the children are invisible too. No need to recurse further.
-        return;
-      }
-
-      if (level == -1)
-      {
-        // The coverage buffer is completely empty. In this case the
-        // destination node is visible from the source node and also we
-        // know that all children of the destination node will also be
-        // visible because the coverage buffer was not filled at all. There
-        // is no chance for shadowing. So we don't have to proceed here.
         return;
       }
     }
@@ -600,18 +680,19 @@ void PVSCalcSector::RecurseDestNodes (void* sourcenode, void* destnode,
 }
 
 void PVSCalcSector::RecurseSourceNodes (void* sourcenode,
-	csSet<void*> invisible_nodes)
+	csSet<void*> invisible_nodes, int& nodecounter)
 {
-  printf ("source node %p\n", sourcenode);
+  nodecounter--;
+  printf ("\nsource node %p (%d) ", sourcenode, nodecounter); fflush (stdout);
   // We recurse through all destination nodes now. This will update the
   // set of invisible_nodes.
   RecurseDestNodes (sourcenode, pvstree->GetRootNode (), invisible_nodes);
 
   // Traverse to the children to calculate visibility from there.
   void* child1 = pvstree->GetFirstChild (sourcenode);
-  if (child1) RecurseSourceNodes (child1, invisible_nodes);
+  if (child1) RecurseSourceNodes (child1, invisible_nodes, nodecounter);
   void* child2 = pvstree->GetSecondChild (sourcenode);
-  if (child2) RecurseSourceNodes (child2, invisible_nodes);
+  if (child2) RecurseSourceNodes (child2, invisible_nodes, nodecounter);
 }
 
 void PVSCalcSector::Calculate ()
@@ -656,14 +737,14 @@ void PVSCalcSector::Calculate ()
   	staticbox.MaxX (), staticbox.MaxY (), staticbox.MaxZ ());
   parent->ReportInfo( "%d static and %d total objects",
   	staticcount, allcount);
-  parent->ReportInfo( "%d static and %d total polygons",
+  parent->ReportInfo ("%d static and %d total polygons",
   	staticpcount, allpcount);
 
   // From all geometry (static and dynamic) we now build the KDtree
   // that is the base for visibility culling.
   BuildKDTree ();
   pvstree->UpdateBoundingBoxes ();
-  parent->ReportInfo( "KDTree: max depth=%d, number of nodes=%d",
+  parent->ReportInfo ("KDTree: max depth=%d, number of nodes=%d",
   	maxdepth, countnodes);
 
   // Now it is time to calculate (in)visibility between all nodes. This
@@ -676,7 +757,8 @@ void PVSCalcSector::Calculate ()
   // are automatically invisible for the children too and don't have
   // to be considered anymore.
   csSet<void*> invisible_nodes;
-  RecurseSourceNodes (pvstree->GetRootNode (), invisible_nodes);
+  int nodecounter = countnodes;
+  RecurseSourceNodes (pvstree->GetRootNode (), invisible_nodes, nodecounter);
 
   // Write our KDTree with pvs.
   if (!pvstree->WriteOut ())
@@ -713,13 +795,13 @@ bool PVSCalc::OnInitialize(int argc, char* argv[])
       CS_REQUEST_REPORTER,
       CS_REQUEST_REPORTERLISTENER,
       CS_REQUEST_END))
-    return ReportError("Failed to initialize plugins!");
+    return ReportError ("Failed to initialize plugins!");
 
   // Now we need to setup an event handler for our application.
   // Crystal Space is fully event-driven. Everything (except for this
   // initialization) happens in an event.
   if (!RegisterQueue(GetObjectRegistry()))
-    return ReportError("Failed to set up event handler!");
+    return ReportError ("Failed to set up event handler!");
 
   return true;
 }
@@ -733,26 +815,26 @@ bool PVSCalc::Application()
   // Open the main system. This will open all the previously loaded plug-ins.
   // i.e. all windows will be opened.
   if (!OpenApplication(GetObjectRegistry()))
-    return ReportError("Error opening system!");
+    return ReportError ("Error opening system!");
 
   // Now get the pointer to various modules we need. We fetch them
   // from the object registry. The RequestPlugins() call we did earlier
   // registered all loaded plugins with the object registry.
   // The virtual clock.
   g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
-  if (!g3d) return ReportError("Failed to locate 3D renderer!");
+  if (!g3d) return ReportError ("Failed to locate 3D renderer!");
 
   engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
-  if (!engine) return ReportError("Failed to locate 3D engine!");
+  if (!engine) return ReportError ("Failed to locate 3D engine!");
 
   vc = CS_QUERY_REGISTRY(GetObjectRegistry(), iVirtualClock);
-  if (!vc) return ReportError("Failed to locate Virtual Clock!");
+  if (!vc) return ReportError ("Failed to locate Virtual Clock!");
 
   kbd = CS_QUERY_REGISTRY(GetObjectRegistry(), iKeyboardDriver);
-  if (!kbd) return ReportError("Failed to locate Keyboard Driver!");
+  if (!kbd) return ReportError ("Failed to locate Keyboard Driver!");
 
   loader = CS_QUERY_REGISTRY(GetObjectRegistry(), iLoader);
-  if (!loader) return ReportError("Failed to locate Loader!");
+  if (!loader) return ReportError ("Failed to locate Loader!");
 
   // Here we load our world from a map file.
   if (!LoadMap ()) return false;

@@ -73,16 +73,6 @@ private:
   // Projection plane information.
   PVSCalcProjectionPlane plane;
 
-  /**
-   * Count distribution of boxes for the three axii.
-   * distx, disty, and distz will contain the difference between
-   * left and right distribution. So the smallest value is best.
-   */
-  void CountDistribution (
-	const csArray<csBox3>& boxlist,
-	float wherex, float wherey, float wherez,
-	int& distx, int& disty, int& distz,
-	bool& badx, bool &bady, bool& badz);
   /// Distribute a set of boxes to left/right.
   void DistributeBoxes (int axis, float where,
 	const csArray<csBox3>& boxlist,
@@ -93,6 +83,20 @@ private:
   void BuildKDTree (void* node, const csArray<csBox3>& boxlist,
 	const csBox3& bbox, const csVector3& minsize,
 	bool minsize_only, int depth);
+
+  /**
+   * Try to find a split between two boxes along an axis and return the
+   * quality of that split. This is used for the building of the kdtree.
+   */
+  float FindBestSplitLocation (int axis, float& where,
+	const csBox3& bbox1, const csBox3& bbox2);
+
+  /**
+   * Try to find the best split location for a number of boxes.
+   * This is used for the building of the kdtree.
+   */
+  float FindBestSplitLocation (int axis, float& where,
+	const csBox3& node_bbox, const csArray<csBox3>& boxlist);
 
   /// Sort all polygons on size.
   void SortPolygonsOnSize ();
@@ -122,6 +126,17 @@ private:
   bool CastAreaShadow (const csBox3& source, const csPoly3D& polygon);
 
   /**
+   * Return true if the polygon is relevant for shadow casting given
+   * the source and the current shadow plane. This will return false
+   * on polygons that should not be considered for shadow casting (like
+   * polygons that intersect the shadow plane or the source box).
+   * 'minsource' and 'maxsource' are the values of source.Min?() and
+   * source.Max?() for the same right axis as the shadow plane.
+   */
+  bool CheckRelevantPolygon (float minsource, float maxsource,
+  	const csPoly3D& polygon);
+
+  /**
    * Cast shadows on the previously set up projection plane until the
    * coverage buffer is full or we ran out of relevant polygons.
    * This function will return 1 if the coverage buffer was full. That means
@@ -147,9 +162,11 @@ private:
    * Traverse the kdtree for source nodes and calculate the visibility set
    * for each of them. The set of invisible nodes are the nodes that are
    * invisible for the parent of the source node. This set is given to this
-   * function as a copy so that it is ok to modify it.
+   * function as a copy so that it is ok to modify it. nodecounter is used
+   * to be able to print out some progress.
    */
-  void RecurseSourceNodes (void* sourcenode, csSet<void*> invisible_nodes);
+  void RecurseSourceNodes (void* sourcenode, csSet<void*> invisible_nodes,
+  	int& nodecounter);
 
 public:
   PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);

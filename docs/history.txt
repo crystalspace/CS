@@ -11,6 +11,21 @@ chronological order.
 	  that texture, material or geometry changes to 3D objects are
 	  propagated to the CS engine on the fly, instead of only being
 	  loaded once in the initial setup.
+	- Jorrit fixed a bug in csBox3::ProjectOutline(). It was completely
+	  misinterpreting the vertices and procuding wrong results.
+	- Jorrit removed an optimization in pvscalc where we would not
+	  test visibility of destination children if the destination parent
+	  was totally visible (coverage buffer totally empty). This
+	  optimization doesn't add that much speedup and it can degrade
+	  quality too much.
+12-Feb-2005
+	- Jorrit added a test to pvscalc so that irrelevant polygons are
+	  no longer shadow casted. This speeds up calculations and also makes
+	  shadow casting more correct as polygons that intersect the shadow
+	  plane or the source box should not be considered at all.
+	- Jorrit drastically improved the quality of the kdtree calculated
+	  by pvscalc. Insteaad of 5599 nodes for the pvstest level there are
+	  now 246 nodes.
 11-Feb-2005
 	- Jorrit changed csBox3::ProjectOutline() to work with
 	  csPoly2DUnbounded instead of csPoly2D.
@@ -47,6 +62,8 @@ chronological order.
 	  testing. Initial tests seem to indicate that it is doing something.
 	  But calculation takes WAY too long for big maps (and even for small
 	  maps for that matter). This will have to be optimized a lot.
+	- Jorrit added a progress counter to pvscalc. That way you can get
+	  an approximate idea of how far we are in the calculations.
 10-Feb-2005
 	- Jorrit added csIntersect3::XPlane() and YPlane() to complement
 	  the already existing ZPlane(). Also added AxisPlane() which will
