@@ -11,6 +11,8 @@ chronological order.
 	  status of 'autoconf' as its own exit status. This allows invokers of
 	  autogen.sh to determine if Autoconf failed.  Also removed out-of-date
 	  comment in autogen.sh.
+	- Eric Sunshine fixed bug in CS/docs/doxygen/Jamfile where it failed to
+	  mention doxygen.css in the argument list for the Doxygen rule.
 17-Apr-2004
 	- Aren Blondahl updated map2cs to have newly optimized render priority
 	  on entities ('priority' tag in the .map) and fixed map2cs to support
