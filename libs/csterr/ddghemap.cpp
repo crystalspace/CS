@@ -168,7 +168,7 @@ error:
 
 bool ddgHeightMap::readTGN(char *file)
 {
-	FILE *fptr = file && file[0] ? fopen(file,"r") : 0;
+	FILE *fptr = file && file[0] ? fopen(file,"rb") : 0;
 	if (!fptr)
 	{
 		ddgErrorSet(FileRead,(char *) (file ? file : "(null)"));
@@ -177,9 +177,6 @@ bool ddgHeightMap::readTGN(char *file)
 	}
 	unsigned char ch1, ch2;
 
-	#ifdef WIN32
-	_setmode(_fileno(fptr),_O_BINARY);
-	#endif
 	char name[9],type[9], segment[5], pad[2];
 
 	// Name 8 bytes.
@@ -280,6 +277,20 @@ bool ddgHeightMap::readTGN(char *file)
 			return true;
 		}
 		r++;
+	}
+	// Swap byte order for machines with different endian.
+	unsigned long test_value = 0x12345678L;
+	if  (*((unsigned char*)&test_value) == 0x12)
+	{
+		char s;
+		int i;
+
+		for (i = 0; i < 2 * _rows * _cols; i=i+2)
+		{
+			s = _pixbuffer[i];
+			_pixbuffer[i] = _pixbuffer[i+1];
+			_pixbuffer[i+1] = s;
+		}
 	}
 
 	fclose(fptr);
