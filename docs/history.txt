@@ -16,6 +16,8 @@ chronological order.
 	  on numerous platforms.
 	- Jorrit removed a csReversibleTransform from genmesh objects. This
 	  was added for the new renderer but was actually not used.
+	- Jorrit optimized the ball mesh object in a similar manner by also
+	  removing tr_o2c.
 3-Jan-2004
         - Philip Wyett continued a general cleanup of CS code formatting.
 	- Steven Geens fixed a very fatal typo in sprcal3dstate.

@@ -80,7 +80,6 @@ private:
   csRenderMesh mesh;
   csRenderMesh* meshPtr;
 
-  csReversibleTransform tr_o2c;
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
