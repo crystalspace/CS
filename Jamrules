@@ -17,11 +17,6 @@ COMPILER.CFLAGS.debug += -DCS_DEBUG ;
 COMPILER.CFLAGS.profile += -g3 -pg ;
 COMPILER.LFLAGS.profile += -g3 -pg ;
 
-# Put output files into out/systemname.
-LOCATE.OBJECTS = $(BUILDTOP)/out/$(OSFULL[1]:L) ;
-LOCATE.TARGETS = $(BUILDTOP) ;
-LOCATE.DOCS = $(BUILDTOP)/out/docs ;
-
 # Include CS build rules.
 include $(TOP)/mk/jam/build.jam ;
 

@@ -21,7 +21,7 @@
 
 LOCATE.OBJECTS ?= $(BUILDTOP)/out/$(OSFULL[1]:L) ;
 LOCATE.TARGETS ?= $(BUILDTOP) ;
-LOCATE.DOCS ?= $(BUILDTOP)/out ;
+LOCATE.DOCS ?= $(BUILDTOP)/out/docs ;
 
 SUBDIRRULES += FixSubDirPath ;
 

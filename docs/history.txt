@@ -8,6 +8,10 @@ chronological order.
 
 28-Oct-2004
 	- Jorrit did some small work on foliage mesh.
+	- Eric Sunshine removed some redundant assignments from Jamrules which
+	  were merely duplicating the default assignments. Also changed default
+	  value of LOCATE.DOCS from 'out' to 'out/docs' (which is where CS has
+	  been placing generated documentation the entire time anyhow).
 27-Oct-2004
 	- Eric Sunshine added two mechanisms to msvcgen allowing clients to
 	  have control over the generated project name:
