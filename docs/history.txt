@@ -19,6 +19,11 @@ chronological order.
 	- Eric Sunshine fixed all the places in the project where Matze forgot
 	  to change Jam/make variable PACKAGE.xxx to PACKAGE_xxx (except for
 	  win32.jam which Jorrit already patched).
+	- Eric Sunshine fixed Jorrit's fix to win32.jam, in which Jorrit
+	  incorrectly changed PACKAGE.VERSION.LIST to PACKAGE_VERSION.LIST.
+	- Eric Sunshine augmented win3.jam so that the "File Description"
+	  attribute emitted to the version .rc file has a reasonable default
+	  value if the target's Jamfile did not invoke the Help rule.
 27-Jan-2004
 	- Dentoid added a missing CS_IMPLEMENT_PLUGIN to the engine plugin.
 	- John Harger moved everything from iParticlesObjectState::Update into

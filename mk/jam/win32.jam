@@ -35,8 +35,8 @@ actions GenerateWin32VersionRc
 // This file is generated automatically.
 
 1 VERSIONINFO
-FILEVERSION $(PACKAGE_VERSION.LIST[1]), $(PACKAGE_VERSION.LIST[2]), $(PACKAGE_VERSION.LIST[3]), $(PACKAGE_VERSION.LIST[4])
-PRODUCTVERSION $(PACKAGE_VERSION.LIST[1]), $(PACKAGE_VERSION.LIST[2]), $(PACKAGE_VERSION.LIST[3]), $(PACKAGE_VERSION.LIST[4])
+FILEVERSION $(PACKAGE_VERSION_LIST[1]), $(PACKAGE_VERSION_LIST[2]), $(PACKAGE_VERSION_LIST[3]), $(PACKAGE_VERSION_LIST[4])
+PRODUCTVERSION $(PACKAGE_VERSION_LIST[1]), $(PACKAGE_VERSION_LIST[2]), $(PACKAGE_VERSION_LIST[3]), $(PACKAGE_VERSION_LIST[4])
 #ifdef CS_DEBUG
 FILEFLAGS 0x1
 #else
@@ -148,17 +148,22 @@ rule MakeVersionRc
 {
   # normalize version list
   local v1, v2, v3, v4 ;
-  v1 = $(PACKAGE_VERSION.LIST[1]) ;
+  v1 = $(PACKAGE_VERSION_LIST[1]) ;
   if ! $(v1) { v1 = 0 ; }
-  v2 = $(PACKAGE_VERSION.LIST[2]) ;
+  v2 = $(PACKAGE_VERSION_LIST[2]) ;
   if ! $(v2) { v2 = 0 ; }
-  v3 = $(PACKAGE_VERSION.LIST[3]) ;
+  v3 = $(PACKAGE_VERSION_LIST[3]) ;
   if ! $(v3) { v3 = 0 ; }
-  v4 = $(PACKAGE_VERSION.LIST[4]) ;
+  v4 = $(PACKAGE_VERSION_LIST[4]) ;
   if ! $(v4) { v4 = 0 ; }
-  PACKAGE_VERSION.LIST on $(<) = $(v1) $(v2) $(v3) $(v4) ;
+  PACKAGE_VERSION_LIST on $(<) = $(v1) $(v2) $(v3) $(v4) ;
       
-  DESCRIPTION on $(<) = $($(>)_help) ;
+  local desc = "Crystal Space $(>)" ;
+  if $($(>)_help)
+  {
+    desc = $($(>)_help) ;
+  }
+  DESCRIPTION on $(<) = $(desc) ;
       
   GenerateWin32VersionRc $(<) ;
 }
