@@ -13,53 +13,66 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 27-Mar-2000
-	- W.C.A. Wijngaards <wouterw@cs.vu.nl> made a small fix to
-	  line renderer.
-	- Updated docs/incoming/worldfmt.tex to conform to the latest
-	  changes related to TEXTURES, 2D sprites, and UVEC/VVEC.
-	- Added support for MIXMODE statement to 2D and 3D sprites.
-	  Now you can do things like MIXMODE (MULTIPLY () ADD ())
-	  or MIXMODE (ALPHA (.5)).
+	- W.C.A. Wijngaards <wouterw@cs.vu.nl> made a small fix to line
+	  renderer.
+	- Updated docs/incoming/worldfmt.tex to conform to the latest changes
+	  related to TEXTURES, 2D sprites, and UVEC/VVEC.
+	- Added support for MIXMODE statement to 2D and 3D sprites.  Now you
+	  can do things like MIXMODE (MULTIPLY () ADD ()) or
+	  MIXMODE (ALPHA (.5)).
 	- Implemented support for lighting of 2D sprites.
-	- Added support for explicit color setting of the 2D sprite
-	  vertices. This can be used instead of the default lighting
-	  if you want the vertices to have a fixed color.
-	  Use the COLORS keyword in the loader.
+	- Added support for explicit color setting of the 2D sprite vertices.
+	  This can be used instead of the default lighting if you want the
+	  vertices to have a fixed color.  Use the COLORS keyword in the
+	  loader.
 	- Andrew Zabolotny did the following changes:
-	    - Further work on MazeD. Well, it is already useable: you
-	      can build simple levels in MazeD (from scratch) without
-	      having to change almost anything in the output world file
-	      except adding the START(room,x,y,z) statement.
-	      In fact, I already created some simple rooms for testing.
-	    - Added normals display in MazeD. By default this is off, the
-	      toggle is operated with 'N' key. Useful to see from which side
+	    - Further work on MazeD.  Well, it is already useable: you can
+	      build simple levels in MazeD (from scratch) without having to
+	      change almost anything in the output world file except adding
+	      the START(room,x,y,z) statement.  In fact, I already created
+	      some simple rooms for testing.
+	    - Added normals display in MazeD.  By default this is off, the
+	      toggle is operated with 'N' key.  Useful to see from which side
 	      a polygon is visible (also useful to see whenever there is a
 	      polygon somewhere at all).
-	    - Changed default scale and grid spacing to 1 unit instead of
-	      0.25.
-	    - Added saving of texture mapping. Now respective PLANE() and
+	    - Changed default scale and grid spacing to 1 unit instead of 0.25.
+	    - Added saving of texture mapping.  Now respective PLANE() and
 	      TEXTURE() statements are created (a plane is created only if
 	      some texture mapping parameters are used more than once).
      	    - Changed default light attenuation from "realistic" to "linear".
-	      The "realistic" lighting looks too unrealistic :-)
-	    - Added vertex compression routine. It is run after loading a
-	      room that contains a static thing (__static__). I'm planning
-	      to make this function separately available somehow (from menu
-	      and maybe via hot keys).
+	      The "realistic" lighting looks too unrealistic.  :-)
+	    - Added vertex compression routine.  It is run after loading a
+	      room that contains a static thing (__static__).  I'm planning to
+	      make this function separately available somehow (from menu and
+	      maybe via hot keys).
 	    - Fixed the routine that computes the polygons that make the
-	      convex hull of a room. It used to grab the wrong polygons
+	      convex hull of a room.  It used to grab the wrong polygons
 	      sometimes.
-	    - When a world file is saved, the "precalc_info" and "lm/*"
-	      files are removed since lighting information have to be
-	      recalculated anyway.
+	    - When a world file is saved, the "precalc_info" and "lm/*" files
+	      are removed since lighting information have to be recalculated
+	      anyway.
 	    - Added three flags to loader:
 		CS_LOADER_NOCOMPRESS
 		CS_LOADER_NOBSP
 		CS_LOADER_NOTRANSFORM
 	      They will tell the loader to not compress vertices, not create
 	      sector BSPs and not transform things right after they are
-	      loading. MazeD sets all these flags since otherwise it loads
+	      loading.  MazeD sets all these flags since otherwise it loads
 	      lots of garbage instead of the original world.
+	- Eric Sunshine completed Phase Three of Eric's Big Documentation
+	  Overhaul {tm}.
+	    - Created a custom tool (CS/bin/docconv.pl) for automated
+	      conversion of Texinfo to HTML.  Converted files are committed to
+	      the repository only if actual changes have been made to the
+	      Texinfo master files, so it is safe invoke the tool even when no
+	      changes have occurred.  The script takes special care to invoke
+	      the appropriate CVS commands to add new files and directories to
+	      the repository, and to remove obsolete files.  Furthermore, it
+	      correctly handles binary files, such as images, by committing
+	      them to the repository with the "-kb" CVS flag.
+	    - Enabled automatic conversion of Crystal Space's Texinfo
+	      documentation to HTML format.  Conversion occurs every six hours
+	      (or four times per day).
 25-Mar-2000
 	- Optimized sprites a bit more.
 	- Changed curve drawing using new clipper routine to get
