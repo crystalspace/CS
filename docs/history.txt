@@ -62,6 +62,9 @@ chronological order.
     		<meta plugin="crystalspace.pvscalc">
 		  <minnodesize x="..." y="..." z="..." />
 		</meta>
+	- res fixed viewmesh to compile with latest Cal3d.
+	- res fixed a crash in csGLVBOBuffer::FindEmptySlot() as per Martens
+	  instructions.
 15-Feb-2005
 	- Jorrit added csIntersect3::IntersectPolygon() to intersect
 	  a polygon with a segment.

@@ -767,14 +767,17 @@ csGLVBOBufferSlot* csGLVBOBufferManager::csGLVBOBuffer::FindEmptySlot (size_t si
     slot = slots[idx].head;
   }
 
-  TouchSlot (slot);
-
-  if (!splitStarted)
+  if (slot)
   {
-    if (slot->inUse) slots[idx].slotsReusedThisFrame++;
-    else slots[idx].usedSlots++;
+    TouchSlot (slot);
 
-    slot->inUse = true;
+    if (!splitStarted)
+    {
+      if (slot->inUse) slots[idx].slotsReusedThisFrame++;
+      else slots[idx].usedSlots++;
+
+      slot->inUse = true;
+    }
   }
   return slot;
 }
