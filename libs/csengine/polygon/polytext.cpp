@@ -530,7 +530,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   int mi;
   CHK (f_uv = new csVector2 [num_frustrum]);
 
-  rpv=polygon->GetVertices ().GetNumVertices();
+  rpv = polygon->GetVertices ().GetNumVertices ();
   CHK (rp = new csVector2 [rpv]);
 
   csVector3 projector;
@@ -687,7 +687,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
         if (dyn)
         {
           dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
-          l1 = l1 + QInt (lightness*(cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
+          l1 = l1 + QRound (lightness*(cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
           if (l1 > 255) l1 = 255;
           mapR[uv] = l1;
         }
@@ -697,19 +697,19 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
           if (lview.r > 0)
           {
-            l1 = l1 + QInt (lightness*(color.red * brightness));
+            l1 = l1 + QRound (lightness * (color.red * brightness));
             if (l1 > 255) l1 = 255;
             mapR[uv] = l1;
           }
           if (lview.g > 0 && mapG)
           {
-            l2 = mapG[uv] + QInt (lightness*(color.green * brightness));
+            l2 = mapG[uv] + QRound (lightness * (color.green * brightness));
             if (l2 > 255) l2 = 255;
             mapG[uv] = l2;
           }
           if (lview.b > 0 && mapB)
           {
-            l3 = mapB[uv] + QInt (lightness*(color.blue * brightness));
+            l3 = mapB[uv] + QRound (lightness * (color.blue * brightness));
             if (l3 > 255) l3 = 255;
             mapB[uv] = l3;
           }
