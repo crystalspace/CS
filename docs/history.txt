@@ -7,6 +7,9 @@ The history order is reversed so that new features are at the top.
 	- Added a patch from Loic Dachary <loic@gnu.org> to give more
 	  detailed error messages when plugins can't be loaded. This
 	  way it is easier to see what is wrong.
+	- Replaced DLERROR with WARNING while loading a plugin because
+	  failure to load a plugin is not always an error (for example
+	  for the sound and image multiplexers).
 19-Mar-2002
 	- Decreased maximum size of lightmaps for software renderer
 	  again. 16mil is WAY too much as that will not fit in the
