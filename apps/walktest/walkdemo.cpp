@@ -1004,6 +1004,7 @@ void fire_missile ()
   dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
   dyn->Setup ();
   MissileStruct* ms = new MissileStruct;
+  ms->snd = NULL;
   if (Sys->Sound)
     if ((ms->snd = Sys->Sound->CreateSource (Sys->wMissile_whoosh, SOUND3D_ABSOLUTE)))
     {

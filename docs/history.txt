@@ -5,6 +5,9 @@ The history order has been reversed so that new features are at the top.
 	  was not initialized.
 	- Rene Dudfield also made the sprite3d lighting functions only
 	  light the vertices that are used for the lod level.
+	- Fixed a bug in WalkTest with ms->snd not being initialized to
+	  NULL on systems that don't have sound support. This could result
+	  in crashes when firing missiles.
 17-Dec-2000
 	- Brandon Ehle fixed a quaternion bug, with r initializer in the
 	  wrong spot. The motion manager bug was fixed by this and
