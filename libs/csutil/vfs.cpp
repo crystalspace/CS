@@ -1347,7 +1347,7 @@ bool csVFS::SaveMounts (const char *FileName)
     for (j = 0; j < node->UPathV.Length (); j++)
       sl += strlen ((char *)node->UPathV.Get (j)) + 1;
 
-    char tmp [sl + 1];
+    char *tmp = new char[sl + 1];
     sl = 0;
     for (j = 0; j < node->UPathV.Length (); j++)
     {
@@ -1365,6 +1365,7 @@ bool csVFS::SaveMounts (const char *FileName)
       sl += rpl + 1;
     }
     config->SetStr ("VFS", node->ConfigKey, tmp);
+    delete[] tmp;
   }
   return config->Save (FileName);
 }
