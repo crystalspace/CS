@@ -1,5 +1,4 @@
 SubDir TOP libs ;
-SubDir TOP libs ;
 
 CSLIB.SOURCES = ;
 CSLIB.ROOT = $(SUBDIR_TOKENS) ;
