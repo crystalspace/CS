@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+28-Feb-2003
+	- Release of 0.96r003.
 27-Feb-2003
 	- Philip Wyett imported Matze's Cygwin socket changes from main CVS. 
 26-Feb-2003
