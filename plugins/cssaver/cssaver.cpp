@@ -242,7 +242,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 	      CreateValueNode (params, faceNames[face], 
 		imgName.Slice (pos, subStrLen));
 	    face++;
-	    pos = colon + 1;
+	    pos += subStrLen + 1;
 	  }
 	}
       }
@@ -274,7 +274,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
 	      subStrLen = colon - pos;
 	    if (subStrLen > 0)
 	      CreateValueNode (params, "layer", imgName.Slice (pos, subStrLen));
-	    pos = colon + 1;
+	    pos += subStrLen + 1;
 	  }
 	}
       }

@@ -13,6 +13,8 @@ chronological order.
 	- res added the ability to attach shader vars to mesh objects.
 	- res unbotched some string splitting code.
 	- Vincent fixed remaing init_token_table calls to InitTokenTable.
+	- res fixed endless loops in the $CRYSTAL and other string splitting 
+	  code.
 	- res added the ability to attach shader vars to mesh object factories.
 18-Feb-2005
 	- Jorrit worked further on PVSCalc:

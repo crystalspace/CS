@@ -89,7 +89,7 @@ csString csGetConfigPath()
 
       candidates.Push (crystalPath.Slice (pos, subStrLen));
       
-      pos = colon + 1;
+      pos += subStrLen + 1;
     }
   }
   candidates.Push(".");
