@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+18-Nov-2002
+	- Fixed software renderer procedural textures in 16-bit display
+	  mode. They worked fine in 32-bit display mode and that's why
+	  I didn't notice the bug :-)
 17-Nov-2002
 	- Fixed a huge memory leak in the XML loader. The main document
 	  node was never cleaned up which resulted in the entire node

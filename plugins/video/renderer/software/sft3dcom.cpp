@@ -1340,9 +1340,12 @@ void csGraphics3DSoftwareCommon::FinishDraw ()
 	      {
 		uint16 pix = *d++;
 		uint8 pix8;
-		pix8 = (((pix & pfmt.RedMask) >> pfmt.RedShift) >> 5) << 5;
-		pix8 |= (((pix & pfmt.GreenMask) >> pfmt.GreenShift) >> 5) << 2;
-		pix8 |= (((pix & pfmt.BlueMask) >> pfmt.BlueShift) >> 6);
+		pix8 = (((pix & pfmt.RedMask) >> pfmt.RedShift) >>
+			(pfmt.RedBits - 3)) << 5;
+		pix8 |= (((pix & pfmt.GreenMask) >> pfmt.GreenShift) >>
+			(pfmt.GreenBits - 3)) << 2;
+		pix8 |= (((pix & pfmt.BlueMask) >> pfmt.BlueShift) >>
+			(pfmt.BlueBits - 2));
 		*bitmap++ = pix8;
 	      }
 	    }
