@@ -17,6 +17,7 @@
 //
 //-----------------------------------------------------------------------------
 #include "NeXTDriver2D.h"
+#include "NeXTFrameBuffer.h"
 #include "NeXTProxy2D.h"
 #include "isystem.h"
 
@@ -27,22 +28,60 @@ NeXTDriver2D::~NeXTDriver2D()
     {
     Close();
     if (proxy != 0)
-	{
-	free( Memory );
 	delete proxy;
-	}
+    Memory = 0;
     }
 
 
 //-----------------------------------------------------------------------------
 // Initialize
+//	We only support depth of 15 or 32.  See README.NeXT for an explanation.
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::Initialize()
     {
     superclass::Initialize();
-    Depth = 8;	// FIXME: Hardcoded for now to simulate palette environment.
     proxy = new NeXTProxy2D( Width, Height );
-    Memory = (unsigned char*)malloc( Width * Height );
+    NeXTFrameBuffer const* const frame_buffer = proxy->get_frame_buffer();
+    if (frame_buffer != 0)
+	{
+	Depth  = frame_buffer->depth();
+	Memory = frame_buffer->get_raw_buffer();
+	pfmt.RedMask    = frame_buffer->red_mask();
+	pfmt.GreenMask  = frame_buffer->green_mask();
+	pfmt.BlueMask   = frame_buffer->blue_mask();
+	pfmt.PixelBytes = frame_buffer->bytes_per_pixel();
+	pfmt.PalEntries = frame_buffer->palette_entries();
+	complete_pixel_format();
+	switch (Depth)
+	    {
+	    case 15: setup_rgb_15(); break;
+	    case 32: setup_rgb_32(); break;
+	    }
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
+// setup_rgb_15
+//-----------------------------------------------------------------------------
+void NeXTDriver2D::setup_rgb_15()
+    {
+    DrawPixel  = DrawPixel16;
+    WriteChar  = WriteChar16;
+    GetPixelAt = GetPixelAt16;
+    DrawSprite = DrawSprite16;
+    }
+
+
+//-----------------------------------------------------------------------------
+// setup_rgb_32
+//-----------------------------------------------------------------------------
+void NeXTDriver2D::setup_rgb_32()
+    {
+    DrawPixel  = DrawPixel32;
+    WriteChar  = WriteChar32;
+    GetPixelAt = GetPixelAt32;
+    DrawSprite = DrawSprite32;
     }
 
 
@@ -51,7 +90,12 @@ void NeXTDriver2D::Initialize()
 //-----------------------------------------------------------------------------
 bool NeXTDriver2D::Open( char* title )
     {
-    return (superclass::Open(title) && proxy->open(title));
+    bool okay = false;
+    if (proxy->get_frame_buffer() == 0)
+	system->Print( MSG_FATAL_ERROR, "Unsupported display depth\n" );
+    else if (superclass::Open( title ))
+	okay = proxy->open( title );
+    return okay;
     }
 
 
@@ -70,17 +114,7 @@ void NeXTDriver2D::Close()
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::Print( csRect* )
     {
-    proxy->flush( Memory );
-    }
-
-
-//-----------------------------------------------------------------------------
-// SetRGB -- See README.NeXT for discussion of simulated palette environment.
-//-----------------------------------------------------------------------------
-void NeXTDriver2D::SetRGB( int i, int r, int g, int b )
-    {
-    superclass::SetRGB( i, r, g, b );
-    proxy->set_rgb( i, r, g, b );
+    proxy->flush();
     }
 
 

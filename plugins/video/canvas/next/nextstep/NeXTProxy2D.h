@@ -22,6 +22,7 @@
 //-----------------------------------------------------------------------------
 #include "types.h"	// For bool.
 @class NeXTView, Window;
+class NeXTFrameBuffer;
 class ITextureHandle;
 
 class NeXTProxy2D
@@ -31,21 +32,15 @@ private:
     NeXTView* view;
     unsigned int width;
     unsigned int height;
-    unsigned int frame_buffer_size;
-    unsigned char* frame_buffer;
-    unsigned char* palette;
-    int bits_per_sample;	// Always 4 or 8; see README.NeXT for details.
-
-    void flush_12( unsigned char const* );
-    void flush_24( unsigned char const* );
+    NeXTFrameBuffer* frame_buffer;
 
 public:
     NeXTProxy2D( unsigned int width, unsigned int height );
     ~NeXTProxy2D();
+    NeXTFrameBuffer* get_frame_buffer() const { return frame_buffer; }
     bool open( char const* title );
     void close();
-    void flush( unsigned char const* src );
-    void set_rgb( int i, int r, int g, int b );
+    void flush();
     bool set_mouse_cursor( int shape, ITextureHandle* );
     };
 

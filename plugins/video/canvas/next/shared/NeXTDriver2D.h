@@ -30,18 +30,16 @@ class NeXTDriver2D : public csGraphics2D
 private:
     NeXTProxy2D* proxy;	// Interface to Objective-C world; see README.NeXT.
 
+    void setup_rgb_15();
+    void setup_rgb_32();
+
 public:
     NeXTDriver2D::NeXTDriver2D( ISystem* s ) : csGraphics2D(s), proxy(0) {}
     virtual ~NeXTDriver2D();
-
     virtual void Initialize();
-
     virtual bool Open( char* title );
     virtual void Close();
-
     virtual void Print( csRect* = 0 );
-    virtual void SetRGB( int i, int r, int g, int b );
-
     virtual bool SetMouseCursor( int shape, ITextureHandle* );
     };
 

@@ -19,41 +19,49 @@
 // *WARNING* Do NOT include any COM headers in this file.
 //-----------------------------------------------------------------------------
 #include "NeXTProxy2D.h"
-#include "NeXTView.h"
 #include "NeXTDelegate.h"
+#include "NeXTFrameBuffer15.h"
+#include "NeXTFrameBuffer32.h"
+#include "NeXTView.h"
 
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSBitmapImageRep.h>
 #import <AppKit/NSCursor.h>
 #import <AppKit/NSDPSContext.h>
+#import <AppKit/NSImage.h>
 #import <AppKit/NSWindow.h>
 }
 extern "C" {
 #include <assert.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <string.h>
 }
 
 //-----------------------------------------------------------------------------
-// allocate_frame_buffer
-//	Allocation via NSAllocateMemoryPages() is guaranteed to be
-//	page-aligned (on Mach, at least) which is required for best video
-//	optimization.  See README.NeXT for details.
+// window_server_depth
+//	Directly query the Window Server for its preferred depth.  Note that
+//	this value may be different from the depth limit reported by the
+//	NSWindow class.  See get_device_depth() for a full discussion.  The
+//	Window Server is queried for its preferred depth by creating a small
+//	image cache which is painted with color so as to promote it from gray
+//	to color.  The Window Server is then asked to return an
+//	NSBitmapImageRep holding the contents of the image cache.  The Window
+//	Server always returns the NSBitmapImageRep in the format which it most
+//	prefers.
 //-----------------------------------------------------------------------------
-static unsigned char* allocate_frame_buffer( unsigned int nbytes )
+static NSWindowDepth window_server_depth()
     {
-    return (unsigned char*)NSAllocateMemoryPages( nbytes );
-    }
-
-
-//-----------------------------------------------------------------------------
-// free_frame_buffer
-//-----------------------------------------------------------------------------
-static void free_frame_buffer( void* p, unsigned int nbytes )
-    {
-    NSDeallocateMemoryPages( p, nbytes );
+    NSRect const r = {{ 0, 0 }, { 4, 4 }};
+    NSImage* image = [[NSImage alloc] initWithSize:r.size];
+    [image lockFocus];
+    [[NSColor blueColor] set];
+    NSRectFill(r);
+    NSBitmapImageRep* p = [[NSBitmapImageRep alloc] initWithFocusedViewRect:r];
+    NSWindowDepth depth = NSBestDepth( [p colorSpaceName], [p bitsPerSample],
+	[p bitsPerPixel], [p isPlanar], 0 );
+    [p release];
+    [image unlockFocus];
+    [image release];
+    return depth;
     }
 
 
@@ -65,11 +73,33 @@ static void free_frame_buffer( void* p, unsigned int nbytes )
 //	reports 4 or 8 bits per sample, representing 12-bit and 24-bit depths,
 //	respectively.  Other depths still work, but more slowly.  See
 //	README.NeXT for details.
+//
+//	Note that as of OpenStep 4.1, the Window Server may prefer a depth
+//	greater than that of the "deepest" screen as reported by the Window
+//	class.  The reason for this is that "true" RGB/5:5:5 was implemented
+//	in OpenStep 4.1.  Previously this had been simulated with 4:4:4.  A
+//	consequence of this change is that for 5:5:5 displays, the Window
+//	Server actually prefers 24-bit rather than 12-bit RGB as was the case
+//	with previous versions.  It is important to note that the NSWindow
+//	class still reports a depth limit of 12-bit even though the Window
+//	Server prefers 24-bit.  Consequently, window_server_depth() is used to
+//	directly query the WindowServer for its preference instead.  The
+//	behavior in the OpenStep Window Server impacts all applications,
+//	including those compiled with earlier versions of OpenStep or
+//	NextStep.
 //-----------------------------------------------------------------------------
 static int best_bits_per_sample()
     {
-    int const bps = NSBitsPerSampleFromDepth( [[NSScreen mainScreen] depth] );
-    return (bps == 8 ? 8 : 4);
+    NSWindowDepth const depth = window_server_depth();
+    NSString* const s = NSColorSpaceFromDepth( depth );
+    if ([s isEqualToString:NSCalibratedRGBColorSpace] ||
+	[s isEqualToString:NSDeviceRGBColorSpace])
+        {
+	int const bps = NSBitsPerSampleFromDepth( depth );
+	if (bps == 4 || bps == 8)
+	    return bps;
+	}
+    return 4;
     }
 
 
@@ -77,19 +107,13 @@ static int best_bits_per_sample()
 // Constructor
 //-----------------------------------------------------------------------------
 NeXTProxy2D::NeXTProxy2D( unsigned int w, unsigned int h ) :
-    window(0), view(0), width(w), height(h)
+    window(0), view(0), width(w), height(h), frame_buffer(0)
     {
-    bits_per_sample = best_bits_per_sample();
-
-    int const bytes_per_pixel = bits_per_sample / 2;
-    frame_buffer_size =
-	NSRoundUpToMultipleOfPageSize( bytes_per_pixel * width * height );
-    frame_buffer = allocate_frame_buffer( frame_buffer_size );
-    memset( frame_buffer, 0xff, frame_buffer_size );
-
-    unsigned int const psize = 256 * bytes_per_pixel;
-    palette = (unsigned char*)malloc( psize );
-    memset( palette, 0xff, psize );	// 0xff == Opaque; see README.NeXT.
+    switch (best_bits_per_sample())
+	{
+	case 4: frame_buffer = new NeXTFrameBuffer15( width, height ); break;
+	case 8: frame_buffer = new NeXTFrameBuffer32( width, height ); break;
+	}
     }
 
 
@@ -101,9 +125,9 @@ NeXTProxy2D::~NeXTProxy2D()
     [[NSApp delegate] showMouse];
     [[NSApp delegate] registerAnimationWindow:0];
     [window setDelegate:0];
+    [window close];
     [window release];	// Window releases NeXTView.
-    free( palette );
-    free_frame_buffer( frame_buffer, frame_buffer_size );
+    delete frame_buffer;
     }
 
 
@@ -115,12 +139,12 @@ NeXTProxy2D::~NeXTProxy2D()
 //	it directly to the WindowServer via NXBitmapImageRep.
 //
 // *NOTE*
-//	Window must have valid PostScript windowNum before registering with 
-//	application's delegate since a tracking rectangle is set up.  
-//	Therefore window must be on-screen before registering the window.  The 
-//	alternative of using a non-deferred window does not seem to be an 
-//	option since, for some inexplicable reason, the contents of a Retained 
-//	non-deferred window are never drawn.  
+//	Window must have valid PostScript windowNum before registering with
+//	application's delegate since a tracking rectangle is set up.
+//	Therefore window must be on-screen before registering the window.  The
+//	alternative of using a non-deferred window does not seem to be an
+//	option since, for some inexplicable reason, the contents of a Retained
+//	non-deferred window are never drawn.
 //-----------------------------------------------------------------------------
 bool NeXTProxy2D::open( char const* title )
     {
@@ -134,7 +158,8 @@ bool NeXTProxy2D::open( char const* title )
     [window setReleasedWhenClosed:NO];
 
     view = [[NeXTView alloc] initWithFrame:r];
-    [view setFrameBuffer:frame_buffer bitsPerSample:bits_per_sample];
+    [view setFrameBuffer:frame_buffer->get_cooked_buffer()
+	bitsPerSample:frame_buffer->bits_per_sample()];
     [window setContentView:view];
 
     NSSize const s = [[NSScreen mainScreen] frame].size; // Center window.
@@ -160,71 +185,16 @@ void NeXTProxy2D::close()
 
 
 //-----------------------------------------------------------------------------
-// flush_12
-//-----------------------------------------------------------------------------
-void NeXTProxy2D::flush_12( unsigned char const* src )
-    {
-    unsigned short* dst = (unsigned short*)frame_buffer;
-    unsigned short* pal = (unsigned short*)palette;
-    for (unsigned int n = width * height; n-- > 0; )
-	*dst++ = pal[ *src++ ];
-    }
-
-
-//-----------------------------------------------------------------------------
-// flush_24
-//-----------------------------------------------------------------------------
-void NeXTProxy2D::flush_24( unsigned char const* src )
-    {
-    unsigned long* dst = (unsigned long*)frame_buffer;
-    unsigned long* pal = (unsigned long*)palette;
-    for (unsigned int n = width * height; n-- > 0; )
-	*dst++ = pal[ *src++ ];
-    }
-
-
-//-----------------------------------------------------------------------------
 // flush
-//	Convert the palettized CrystalSpace frame-buffer into NeXT format
-//	"true color" data which includes an alpha-channel, then blit the image
-//	to the display.
+//	Convert the CrystalSpace frame-buffer into NeXT format and blit the
+//	image to the display.
 //-----------------------------------------------------------------------------
-void NeXTProxy2D::flush( unsigned char const* src )
+void NeXTProxy2D::flush()
     {
-    assert( bits_per_sample == 4 || bits_per_sample == 8 );
-    if (bits_per_sample == 4)
-	flush_12( src );
-    else // (bits_per_sample == 8)
-	flush_24( src );
+    assert( frame_buffer != 0 );
+    frame_buffer->cook();
     [view flush];
     [[NSDPSContext currentContext] flush];
-    }
-
-
-//-----------------------------------------------------------------------------
-// set_rgb
-//	Video optimizations require that frame-buffer sent to WindowServer
-//	have an alpha-channel (always opaque), so we build a palette, parallel
-//	to the CrystalSpace palette, which includes an alpha-channel.  See
-//	README.NeXT for a full discussion.
-//-----------------------------------------------------------------------------
-void NeXTProxy2D::set_rgb( int i, int r, int g, int b )
-    {
-    assert( bits_per_sample == 4 || bits_per_sample == 8 );
-    int const bytes_per_pixel = bits_per_sample / 2;
-    unsigned char* p = palette + i * bytes_per_pixel;
-    if (bits_per_sample == 4)
-	{
-	*p++ = (r & 0xf0) | (g >> 4);
-	*p++ = (b & 0xf0) | 0x0f;	// 0x0f == opaque
-	}
-    else // (bits_per_sample == 8)
-	{
-	*p++ = r;
-	*p++ = g;
-	*p++ = b;
-	*p++ = 0xff;			// 0xff == opaque
-	}
     }
 
 
