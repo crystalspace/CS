@@ -497,3 +497,10 @@ parts of the driver considered joystick numbers 0-based, while other parts
 considered them 1-based.  It now uniformly treats joystick numbers as
 1-based. This is consistent with button numbers for joysticks and mice, which
 are also 1-based.
+
+@subheading iGraphics2D Alpha Color Support
+
+@samp{iGraphics2D} now supports an alpha channel. @code{iGraphics2D::FindRGB()}
+now supports an optional alpha value (0 being completely transparent, and
+255 being fully opaque) which defaults to 255. All canvases that support 32-bit
+mode will then blend the pixels appropriately.
