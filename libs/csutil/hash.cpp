@@ -15,28 +15,25 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "csutil/hash.h"
-
-inline unsigned int rotate_bits_right_3 (unsigned int h)
-{
-  return (h >> 3) | (h << 29);
-}
 
 unsigned int csHashCompute (char const* s, int n)
 {
   unsigned int h = 0;
-  char const* slim = s + n;
-  while (s < slim)
-    h = rotate_bits_right_3(h) + *s++;
+  const char* end = s + n;
+  for(const char* c = s; c != end; ++c)
+    h = ((h << 5) + h) + *c;
+
   return h;
 }
 
 unsigned int csHashCompute (char const* s)
 {
+  // based on D.J. Bernsteins algo
   unsigned int h = 0;
-  while (*s != 0)
-    h = rotate_bits_right_3(h) + *s++;
+  for(const char* c = s; *c != 0; ++c)
+    h = ((h << 5) + h) + *c;
+  
   return h;
 }
