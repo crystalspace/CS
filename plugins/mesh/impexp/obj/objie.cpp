@@ -25,7 +25,7 @@
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
 #include "csutil/objiter.h"
-#include <ctype.h
+#include <ctype.h>
 
 class csModelConverterOBJ : iModelConverter
 {
