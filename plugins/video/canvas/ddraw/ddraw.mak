@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.ddraw = Crystal Space Windows DirectDraw 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make ddraw        Make the $(DESCRIPTION.ddraw)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make ddraw        Make the $(DESCRIPTION.ddraw)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: ddraw
+.PHONY: ddraw ddrawclean
 
 all plugins drivers drivers2d: ddraw
 
@@ -26,7 +27,7 @@ ddrawclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 ifeq ($(COMP),GCC)
@@ -45,7 +46,7 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
   LIBS.LOCAL.DDRAW=$(LIBS.DDRAW)
 else
 # Generate Static Libs
-  DDRAW=$(OUT)$(LIB_PREFIX)csddraw$(LIB)
+  DDRAW=$(OUT)$(LIB_PREFIX)csdrw$(LIB)
   DEP.EXE+=$(DDRAW)
   ifeq ($(COMP),GCC)
     LIBS.EXE+=$(LIBS.DDRAW)
@@ -64,7 +65,7 @@ OBJ.DDRAW = $(addprefix $(OUT),$(notdir $(SRC.DDRAW:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/ddraw plugins/video/canvas/common
@@ -80,7 +81,7 @@ $(DDRAW): $(OBJ.DDRAW) $(DEP.DDRAW)
 	$(DO.PLUGIN) $(LIBS.LOCAL.DDRAW)
 
 ddrawclean:
-	$(RM) $(DDRAW) $(OBJ.DDRAW)
+	$(RM) $(DDRAW) $(OBJ.DDRAW) $(OUTOS)ddraw.dep
 
 ifdef DO_DEPEND
 depend: $(OUTOS)ddraw.dep
@@ -91,4 +92,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-

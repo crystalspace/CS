@@ -4,15 +4,16 @@
 # Driver description
 DESCRIPTION.alleg2d = Crystal Space Allegro driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make alleg2d      Make the $(DESCRIPTION.alleg2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make alleg2d      Make the $(DESCRIPTION.alleg2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: alleg2d
@@ -26,11 +27,11 @@ alleg2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # The Allegro 2D DOS driver
-ALLEG2D=$(OUT)$(LIB_PREFIX)alleg2d$(LIB)
+ALLEG2D=$(OUT)$(LIB_PREFIX)alg2d$(LIB)
 DEP.EXE+=$(ALLEG2D)
 DESCRIPTION.$(ALLEG2D) = $(DESCRIPTION.alleg2d)
 SRC.ALLEG2D=$(wildcard plugins/video/canvas/dosalleg/*.cpp $(SRC.COMMON.DRV2D))
@@ -39,7 +40,7 @@ CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_ALLEG2D
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/dosalleg
