@@ -6,7 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Sep-2003
+	- Jorrit moved ParseTextureMapping() and ParsePoly3d() from syntax
+	  services to thing loader. It doesn't make much sense to make those
+	  parsing functions public. Especially since iPolygon3DStatic is
+	  going to be removed in the future.
 28-Sep-2003
+	- Jorrit implemented csEngine::CreatePortal() which makes a portal
+	  container as a child of another mesh.
 	- Eric Sunshine corrected erroneous comments in
 	  CS/mk/autoconf/compiler.m4.
 	- Eric Sunshine performed clean-up of

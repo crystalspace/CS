@@ -3353,7 +3353,11 @@ csPtr<iMeshWrapper> csEngine::CreatePortal (
 	csVector3* vertices, int num_vertices)
 {
   csRef<iMeshWrapper> mesh = CreatePortalContainer ("__dummy__");
-  /* @@@ TODO */
+  parentMesh->GetChildren ()->Add (mesh);
+  csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  	iPortalContainer);
+  iPortal* portal = pc->CreatePortal (vertices, num_vertices);
+  portal->SetSector (destSector);
   return csPtr<iMeshWrapper> (mesh);
 }
 

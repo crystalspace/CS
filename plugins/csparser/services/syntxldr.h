@@ -55,8 +55,8 @@ protected:
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);
   bool ParseGradientShade (iDocumentNode* node, csGradientShade& shade);
-public:
 
+public:
   SCF_DECLARE_IBASE;
   csTextSyntaxService (iBase *parent);
   virtual ~csTextSyntaxService ();
@@ -69,28 +69,12 @@ public:
   virtual bool ParseBox (iDocumentNode* node, csBox3 &v);
   virtual bool ParseColor (iDocumentNode* node, csColor &c);
   virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode);
-  virtual bool ParseTextureMapping (iDocumentNode* node,
-  			     const csVector3* vref, uint &texspec,
-			     csVector3 &tx_orig, csVector3 &tx1,
-			     csVector3 &tx2, csVector3 &len,
-			     csMatrix3 &tx_m, csVector3 &tx_v,
-			     csVector2 &uv_shift,
-			     int &idx1, csVector2 &uv1,
-			     int &idx2, csVector2 &uv2,
-			     int &idx3, csVector2 &uv3,
-			     const char *polyname);
   virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
 		  	   iPolygon3DStatic* poly_3d,
 		  	   uint32 &flags, bool &mirror,
   			   bool& warp, int& msv,
 			   csMatrix3 &m, csVector3 &before,
 			   csVector3 &after);
-  virtual bool ParsePoly3d (iDocumentNode* node,
-   			    iLoaderContext* ldr_context,
-  			    iEngine* engine, iPolygon3DStatic* poly3d,
-			    float default_texlen,
-			    iThingFactoryState* thing_fact_state,
-			    int vt_offset);
   virtual bool ParseGradient (iDocumentNode* node,
 			      csGradient& gradient);
   virtual bool ParseShaderParam (iDocumentNode* node,

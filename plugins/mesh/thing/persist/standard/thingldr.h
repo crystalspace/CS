@@ -72,14 +72,53 @@ public:
   iObjectRegistry* object_reg;
   csRef<iSyntaxService> synldr;
   csRef<iReporter> reporter;
+  csRef<iMeshObjectType> thing_type;
   
   csStringHash xmltokens;
 
+  /**
+   * Parse a texture mapping specification.
+   * <ul>
+   * <li>vref: is the array containing vertices which can be referenced
+   *     by indices in the description.
+   * <li>texspec: describes the data found for the texture transformation.
+   *     It consists of or'ed CSTEX_.
+   * <li>tx_orig, tx1, tx2, len: texture transformation is given by 3
+   *     points describing a 3d space (third vector is implicitly given to
+   *     be perpendicular on the 2 vectors described by the 3 points),
+   * <li>width and height of the texture.
+   * <li>tx_m and tx_v: if texture transformation is given explicitly by
+   *     matrix/vector.
+   * <li>uv_shift: contains UV_SHIFT value.
+   * <li>idx? and uv?: if texture mapping is given explicitly by defining
+   *     the u,v coordinate that belongs to vertex idx? of the polygon.
+   * <li>polyname: name of polygon to which this texture description belongs.
+   *     This is used to make errormessages more verbose.
+   * </ul>
+   * \sa #CSTEX_UV
+   */
+  bool ParseTextureMapping (iDocumentNode* node,
+  	const csVector3* vref, uint &texspec,
+	csVector3 &tx_orig, csVector3 &tx1,
+	csVector3 &tx2, csVector3 &len,
+	csMatrix3 &tx_m, csVector3 &tx_v,
+	csVector2 &uv_shift,
+	int &idx1, csVector2 &uv1,
+	int &idx2, csVector2 &uv2,
+	int &idx3, csVector2 &uv3,
+	const char *polyname);
+  bool ParsePoly3d (iDocumentNode* node,
+   	iLoaderContext* ldr_context,
+  	iEngine* engine, iPolygon3DStatic* poly3d,
+	float default_texlen,
+	iThingFactoryState* thing_fact_state,
+	int vt_offset);
   bool LoadThingPart (iThingEnvironment* te,
   	iDocumentNode* node, iLoaderContext* ldr_context,
 	iObjectRegistry* object_reg, iReporter* reporter,
 	iSyntaxService *synldr, ThingLoadInfo& info,
 	iEngine* engine, int vt_offset, bool isParent);
+  void OptimizePolygon (iPolygon3DStatic *p);
 
 public:
   SCF_DECLARE_IBASE;
