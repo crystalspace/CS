@@ -1,11 +1,9 @@
-# Application description
 DESCRIPTION.csarts = Crystal Space aRts sound renderer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-# Application-specific help commands
-APPHELP += \
+PLUGINHELP += \
   $(NEWLINE)echo $"  make csarts       Make the $(DESCRIPTION.csarts)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
@@ -15,10 +13,9 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csarts csartsclean csartsinstall csartstest
 
-all apps: csarts 
-#csartstest
+all plugins drivers: csarts 
 
-csartsinstall csarts csartstest:
+csarts csartsinstall csartstest:
 	$(MAKE_TARGET) MAKE_DLL=yes
 csartsclean:
 	$(MAKE_CLEAN)
@@ -27,9 +24,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
-
-vpath %.cpp $(SRCDIR)/%.cc
-# plugins/sound/renderer/arts
 
 CSARTS.DIR = plugins/sound/renderer/arts
 MCOP.LIBDIR = $(KDEDIR)/lib
@@ -40,48 +34,51 @@ ARTSTEST.EXE = artstest$(EXE)
 SRC.ARTSTEST = $(CSARTS.DIR)/tt.cpp
 OBJ.ARTSTEST = $(addprefix $(OUT)/,$(notdir $(SRC.ARTSTEST:.cpp=$O)))
 
-# Unlike CS interfaces, mcop interfaces need to be precompiled and are, in the end,
-# represemted by 3 classes (foo_skel, foo_stub, foo)
-# Our final renderer plugin will only access foos and not their implementation, so we create
-# two libraries: csarts and csart_idl, where csarts_idl only holds the interface classes
-# The final renderer will be linked with csarts_idl, whereas the implementation library csarts will live
-# in a path that is searched by mcop's objectmanager
-
-# these are the files we feed the MCOP idl compiler with
+# Unlike CS interfaces, mcop interfaces need to be precompiled and are, in the
+# end, represemted by 3 classes (foo_skel, foo_stub, foo) Our final renderer
+# plugin will only access foos and not their implementation, so we create two
+# libraries: csarts and csart_idl, where csarts_idl only holds the interface
+# classes The final renderer will be linked with csarts_idl, whereas the
+# implementation library csarts will live in a path that is searched by mcop's
+# objectmanager these are the files we feed the MCOP idl compiler with.
 IDL.CSARTS = $(wildcard $(CSARTS.DIR)/*.idl)
 
-# the mcop compiler will spill out the following files, we keep track of them separatly to link those
-# (and only those) into the csarts_idl library
+# The mcop compiler will spill out the following files, we keep track of them
+# separatly to link those (and only those) into the csarts_idl library.
 SRC.CSARTS.IDL = $(IDL.CSARTS:.idl=.cc)
 
-# Next we will need the implementation sources for the interfaces.
-# We introduce the convention, that the implementation sources are named *_impl.cpp.
-# We keep track of them explicitly because we'll send them through libtool.
+# Next we will need the implementation sources for the interfaces.  We
+# introduce the convention, that the implementation sources are named
+# *_impl.cpp.  We keep track of them explicitly because we'll send them through
+# libtool.
 SRC.CSARTS.IMPL = $(wildcard $(CSARTS.DIR)/*_impl.cpp)
 
-# what follows are the source only needed by the csarts renderer itself
-SRC.CSARTS = $(filter-out $(SRC.CSARTS.IMPL) $(SRC.ARTSTEST), $(wildcard $(CSARTS.DIR)/*.cpp))
+# What follows are the source only needed by the csarts renderer itself.
+SRC.CSARTS = $(filter-out $(SRC.CSARTS.IMPL) $(SRC.ARTSTEST), \
+  $(wildcard $(CSARTS.DIR)/*.cpp))
 
 OBJ.CSARTS.IDL = $(addprefix $(OUT)/,$(notdir $(SRC.CSARTS.IDL:.cc=$O)))
 OBJ.CSARTS.IMPL = $(addprefix $(OUT)/,$(notdir $(SRC.CSARTS.IMPL:.cpp=$O)))
 
-# the others use the usual suffix
+# The others use the usual suffix.
 OBJ.CSARTS = $(addprefix $(OUT)/,$(notdir $(SRC.CSARTS:.cpp=$O)))
 
-# the lib that will be used by mcop and that ends up in a directory visible by mcop
+# The lib that will be used by mcop and that ends up in a directory visible by
+# mcop.
 CSARTS.IMPL.LIB = $(OUT)/$(LIB_PREFIX)csarts.la
 
-# the iterface lib we'll link to our csarts renderer
+# The iterface lib we'll link to our csarts renderer.
 CSARTS.IDL.LIB  = $(OUT)/$(LIB_PREFIX)csarts_idl$(LIB_SUFFIX)
 
-# the csarts renderer plugin
+# The csarts renderer plugin.
 CSARTS  = $(OUTDLL)/csarts$(DLL)
 
-# common lib we need to link
+# Common library we need to link.
 LIB.CSARTS.COMMON = -lartsflow -lartsflow_idl -lmcop
 
-# additional libs we need to link the csarts plugin
-LIB.LINK.CSARTS =-L$(MCOP.LIBDIR) $(LIB.CSARTS.COMMON) -lsoundserver_idl -lstdc++
+# Additional libs we need to link the csarts plugin.
+LIB.LINK.CSARTS = \
+  -L$(MCOP.LIBDIR) $(LIB.CSARTS.COMMON) -lsoundserver_idl -lstdc++
 
 DEP.CSARTS = CSGEOM CSTOOL CSUTIL CSSYS CSUTIL CSARTS.IDL
 LIB.CSARTS = $(foreach d,$(DEP.CSARTS),$($d.LIB))
@@ -90,15 +87,12 @@ ARTS.CXX = libtool --mode=compile g++
 ARTS.LD  = libtool --mode=link g++
 ARTS.CP  = libtool --mode=install cp
 ARTS.RM  = libtool --mode=uninstall $(RM)
-ARTS.LDFLAGS= -module -rpath $(MCOP.LIBDIR) -L$(MCOP.LIBDIR) $(LIB.CSARTS.COMMON) -ldl -lartsmodules
+ARTS.LDFLAGS = -module -rpath $(MCOP.LIBDIR) -L$(MCOP.LIBDIR) \
+  $(LIB.CSARTS.COMMON) -ldl -lartsmodules
 
 CSARTS.LA.OBJ = $(OBJ.CSARTS.IDL:$O=.lo) $(OBJ.CSARTS.IMPL:$O=.lo)
 
 TO_INSTALL.EXE += $(ARTSTEST.EXE)
-
-#MSVC.DSP += ARTSTEST
-#DSP.ARTSTEST.NAME = artstest
-#DSP.ARTSTEST.TYPE = appcon
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

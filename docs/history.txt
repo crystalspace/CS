@@ -18,6 +18,7 @@ The history order is reversed so that new features are at the top.
 	  directly in $(OUT).  Finally, fixed it to respect $(SRCDIR), so that
 	  it can be built when the build directory differs from the source
 	  directory.
+	- Eric Sunshine removed invalid vpath directive from csarts.mak.
 7-May-2003
 	- Eric Sunshine removed MSVC project-related variables from
 	  csjoylin.mak.  This module is Linux-specific, therefore there is no
