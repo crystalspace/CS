@@ -447,18 +447,6 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
       rawCode = CSKEY_F12;
       cookedCode = CSKEY_F12;
       return true;
-    case VK_ADD:
-      DISTINGUISH_EXTENDED ('+', CSKEY_PADPLUS, '+');
-      return true;
-    case VK_SUBTRACT:
-      DISTINGUISH_EXTENDED ('-', CSKEY_PADMINUS, '-');
-      return true;
-    case VK_MULTIPLY: 
-      DISTINGUISH_EXTENDED ('*', CSKEY_PADMULT, '*');
-      return true;
-    case VK_DIVIDE:
-      DISTINGUISH_EXTENDED ('/', CSKEY_PADDIV, '/');
-      return true;
     case VK_NUMLOCK:
       rawCode = CSKEY_PADNUM;
       cookedCode = CSKEY_PADNUM;
@@ -488,42 +476,70 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
 	WCHAR wCh[2];
 	int ret;
 	uint8 keystate[256];
-
-	// First, calculate the raw code. This is done by retrieving the key's
-	// character without any pressed modifiers.
-	memset (&keystate, 0, sizeof (keystate));
-	if (cswinIsWinNT ())
-	{
-	  ret = ToUnicode (vKey, keyFlags, keystate, wCh, 2, 0);
-	}
-	else
-	{
-	  char outCh[2];
-	  ret = ToAscii (vKey, keyFlags, keystate, (PWORD)&outCh, 0);
-	  if (ret != 0)
-	  {
-	    MultiByteToWideChar (CP_ACP, MB_PRECOMPOSED, outCh, 
-	      (ret > 0) ? ret : 0, wCh,  sizeof (wCh) / sizeof (WCHAR));
-	  }
-	}
 	/*
-	  In case 2 chars were emitted (couldn't compose from dead key),
-	  put the last one into 'cooked'.
-	*/
-	if (ret > 0)
+	  For a number of keys, emit a special raw code,
+	  but a proecessed cooked code.
+	 */
+	switch (vKey)
 	{
-	  rawCode = wCh[(ret == 1) ? 0 : 1];
-	}
-	else if (ret < 0)
-	{
-	  // Dead char
-	  rawCode = wCh[0];
-	}
-	else
-	{
-	  // Couldn't get a code for that key
-	  rawCode = cookedCode = 0;
-	  return false;
+	  case VK_ADD:
+	    rawCode = CSKEY_PADPLUS;
+	    break;
+	  case VK_SUBTRACT:
+	    rawCode = CSKEY_PADMINUS;
+	    break;
+	  case VK_MULTIPLY:
+	    rawCode = CSKEY_PADMULT;
+	    break;
+	  case VK_DECIMAL:
+	    rawCode = CSKEY_PADDECIMAL;
+	    break;
+	  case VK_DIVIDE:
+	    if (keyFlags & 0x01000000)
+	    {
+	      rawCode = CSKEY_PADDIV;
+	      break;
+	    }
+	    // No extended key?... fall through
+	  default:
+	    {
+	      // First, calculate the raw code. This is done by retrieving the 
+	      // key's character without any pressed modifiers.
+	      memset (&keystate, 0, sizeof (keystate));
+	      if (cswinIsWinNT ())
+	      {
+		ret = ToUnicode (vKey, keyFlags, keystate, wCh, 2, 0);
+	      }
+	      else
+	      {
+		char outCh[2];
+		ret = ToAscii (vKey, keyFlags, keystate, (PWORD)&outCh, 0);
+		if (ret != 0)
+		{
+		  MultiByteToWideChar (CP_ACP, MB_PRECOMPOSED, outCh, 
+		    (ret > 0) ? ret : 0, wCh,  sizeof (wCh) / sizeof (WCHAR));
+		}
+	      }
+	      /*
+		In case 2 chars were emitted (couldn't compose from dead key),
+		put the last one into 'cooked'.
+	      */
+	      if (ret > 0)
+	      {
+		rawCode = wCh[(ret == 1) ? 0 : 1];
+	      }
+	      else if (ret < 0)
+	      {
+		// Dead char
+		rawCode = wCh[0];
+	      }
+	      else
+	      {
+		// Couldn't get a code for that key
+		rawCode = cookedCode = 0;
+		return false;
+	      }
+	    }
 	}
 
 	// Now, the cooked code
@@ -548,8 +564,7 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
 	if (ret > 0)
 	{
 	  cookedCode = wCh[(ret == 1) ? 0 : 1];
-	  // Composed char
-	  /*if ((lastDeadVk != 0) && (ret == 1)) charType = csKeyCharTypeComposed;*/
+	  // Composed or normal char. (Composed shouldn't happen.)
 	}
   	else if (ret < 0)
 	{

@@ -29,6 +29,9 @@ chronological order.
 	  will now correctly return true for "foo" and "foo/bar".  Previously,
 	  it would return false.  Eric also applied a bit of cleanup to the
 	  patch to reduce coupling and increase safety.
+	- res fixed problems in the handling of the Pad+, Pad-, Pad* and 
+	  PadDecimal keys on Win32, as pointed out by Fritz Elfert 
+	  <felfert@to.com>.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,
