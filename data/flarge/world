@@ -564,22 +564,52 @@
                 <min x="-0.1" y="-0.1" z="-0.1" />
                 <max x="0.1" y="0.1" z="0.1" />
             </box>
+	    <lighting>no</lighting>
+	    <manualcolors />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
+	    <color red="1" green="1" blue="1" />
             <autonormals />
 	    <animcontrol plugin="crystalspace.mesh.anim.genmesh">
 	    	<group name="one">
-		    <range from="0" to="11" weight=".5" />
+		    <range from="0" to="11" weight=".5" col_weight="1" />
 		</group>
 	    	<group name="two">
-		    <range from="12" to="23" weight=".5" />
+		    <range from="12" to="23" weight=".5" col_weight="1" />
 		</group>
 		<script name="main">
 		    <rotz group="two" duration="1000" angle="2" />
 		    <move group="one" duration="1000" dy="-.2" />
 		    <move group="two" duration="1000" dy=".2" />
+		    <color group="one" duration="1000" red="0" green="1" blue="0" />
+		    <color group="two" duration="1000" red="1" green="0" blue="0" />
 		    <delay time="1000" />
 		    <rotx group="one" duration="1000" angle="2" />
 		    <move group="one" duration="1000" dy=".2" />
 		    <move group="two" duration="1000" dy="-.2" />
+		    <color group="one" duration="1000" red="1" green="0" blue="1" />
+		    <color group="two" duration="1000" red="0" green="0" blue="1" />
 		    <delay time="1000" />
 		    <repeat />
 		</script>

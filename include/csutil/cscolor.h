@@ -47,6 +47,9 @@ public:
   /// Set color to given R,G,B components
   void Set (float r, float g, float b)
   { red = r; green = g; blue = b; }
+  /// Set color to given color.
+  void Set (const csColor& c)
+  { red = c.red; green = c.green; blue = c.blue; }
   /// Clamp color to given R,G,B values
   void Clamp (float r, float g, float b)
   {
@@ -79,6 +82,17 @@ public:
   /// Subtract given R,G,B components from color.
   void Subtract (float r, float g, float b)
   { red -= r; green -= g; blue -= b; }
+  /// Divide a color by a scalar.
+  inline friend csColor operator/ (const csColor& v, float f)
+  { f = 1.0f/f; return csColor(v.red*f, v.green*f, v.blue*f); }
+  /// Multiply two colors.
+  inline friend csColor operator* (const csColor& v1, const csColor& v2)
+  {
+    return csColor (v1.red * v2.red,
+    		    v1.green * v2.green,
+		    v1.blue * v2.blue);
+  }
+
 };
 
 /**

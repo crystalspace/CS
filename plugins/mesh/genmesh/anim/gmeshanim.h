@@ -24,6 +24,7 @@
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/csstring.h"
+#include "csutil/cscolor.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshanim.h"
 #include "iutil/comp.h"
@@ -40,6 +41,7 @@ struct ac_vertex_data
 {
   int idx;
   float weight;
+  float col_weight;
 };
 
 /**
@@ -64,6 +66,7 @@ private:
   csAnimControlGroup* parent;
   csArray<csAnimControlGroup*> groups;
   csReversibleTransform transform;
+  csColor color;
 
 public:
   csAnimControlGroup (const char* name);
@@ -71,13 +74,24 @@ public:
 
   const char* GetName () const { return name; }
 
-  void AddVertex (int idx, float weight);
+  void AddVertex (int idx, float weight, float col_weight);
   const csArray<ac_vertex_data>& GetVertexData () const { return vertices; }
 
   void AddGroup (csAnimControlGroup* group) { groups.Push (group); }
   const csArray<csAnimControlGroup*>& GetGroups () const { return groups; }
 
+  csColor& GetColor () { return color; }
+  csColor GetFullColor ()
+  {
+    if (!parent) return GetColor ();
+    else return GetColor () * parent->GetFullColor ();
+  }
   csReversibleTransform& GetTransform () { return transform; }
+  csReversibleTransform GetFullTransform ()
+  {
+    if (!parent) return GetTransform ();
+    else return GetTransform () * parent->GetFullTransform ();
+  }
   void SetParent (csAnimControlGroup* p) { parent = p; }
   csAnimControlGroup* GetParent () const { return parent; }
 };
@@ -90,6 +104,7 @@ enum ac_opcode
   AC_STOP,
   AC_DELAY,
   AC_REPEAT,
+  AC_COLOR,
   AC_MOVE,
   AC_ROTX,
   AC_ROTY,
@@ -113,6 +128,14 @@ struct ac_instruction
       float dy;
       float dz;
     } movement;
+    struct
+    {
+      size_t group_id;
+      csTicks duration;
+      float red;
+      float green;
+      float blue;
+    } color;
     struct
     {
       size_t group_id;
@@ -178,6 +201,17 @@ struct ac_rotate_execution
 };
 
 /**
+ * A running color operation.
+ */
+struct ac_color_execution
+{
+  csAnimControlGroup* group;
+  csTicks final;
+  csColor delta_per_tick;
+  csColor final_color;
+};
+
+/**
  * The runtime state information for a running script. This class does
  * the actual operations in the script in a time based fashion.
  */
@@ -188,6 +222,8 @@ private:
   csGenmeshAnimationControlFactory* factory;
   size_t current_instruction;
 
+  // Current color operations.
+  csArray<ac_color_execution> colors;
   // Current movement operations.
   csArray<ac_move_execution> moves;
   // Current rotate operations.
@@ -222,16 +258,34 @@ private:
 
   int num_animated_verts;
   csVector3* animated_verts;
+  csColor* animated_colors;
 
   csTicks last_update_time;
   uint32 last_version_id;
+
+  // Work tables.
+  static csArray<csReversibleTransform> group_transforms;
+  static csArray<csColor> group_colors;
+
+  // Copied from the factory.
+  bool animates_vertices;
+  bool animates_texels;
+  bool animates_colors;
+  bool animates_normals;
+
+  // Set to true if the animated version of that array needs updating.
+  bool dirty_vertices;
+  bool dirty_texels;
+  bool dirty_colors;
+  bool dirty_normals;
 
   // Update the arrays to have correct size. If a realloc was
   // needed then last_version_id will be forced to ~0.
   void UpdateArrays (int num_verts);
 
-  // Return true if one of scripts updated something.
-  bool UpdateAnimation (csTicks current);
+  // Update animation state. Set the 'dirty_XXX' flags to true if
+  // the arrays need updating too.
+  void UpdateAnimation (csTicks current, int num_verts, uint32 version_id);
 
 public:
   /// Constructor.
@@ -242,10 +296,10 @@ public:
   SCF_DECLARE_IBASE;
 
   // --- For iGenMeshAnimationControl --------------------------------
-  virtual bool AnimatesVertices () const { return true; }
-  virtual bool AnimatesTexels () const { return false; }
-  virtual bool AnimatesNormals () const { return false; }
-  virtual bool AnimatesColors () const { return false; }
+  virtual bool AnimatesVertices () const { return animates_vertices; }
+  virtual bool AnimatesTexels () const { return animates_texels; }
+  virtual bool AnimatesNormals () const { return animates_normals; }
+  virtual bool AnimatesColors () const { return animates_colors; }
   virtual const csVector3* UpdateVertices (csTicks current,
   	const csVector3* verts, int num_verts, uint32 version_id);
   virtual const csVector2* UpdateTexels (csTicks current,
@@ -275,10 +329,21 @@ private:
   csPDelArray<csAnimControlGroup> groups;
   csPDelArray<csAnimControlScript> scripts;
 
+  // These flags are set during script compilation to see if
+  // the script can possibly affect the given attributes.
+  bool animates_vertices;
+  bool animates_texels;
+  bool animates_colors;
+  bool animates_normals;
+
+  // This flag is set to true if there are hierarchical groups.
+  bool has_hierarchical_groups;
+
   // This is a table that contains a mapping for every vertex to the groups
   // that contain that vertex.
-  csArray<csArray<ac_group_data> > groups_per_vertex;
-  void UpdateGroupsPerVertexMapping ();
+  csArray<csArray<ac_group_data> > groups_vertices;
+  csArray<csArray<ac_group_data> > groups_colors;
+  void UpdateGroupsMapping ();
 
   const char* ParseGroup (iDocumentNode* node, csAnimControlGroup* parent);
   const char* ParseScript (iDocumentNode* node);
@@ -302,10 +367,20 @@ public:
   csAnimControlGroup* FindGroup (const char* groupname) const;
   size_t FindGroupIndex (const char* groupname) const;
 
+  bool AnimatesVertices () const { return animates_vertices; }
+  bool AnimatesTexels () const { return animates_texels; }
+  bool AnimatesNormals () const { return animates_normals; }
+  bool AnimatesColors () const { return animates_colors; }
+  bool HasHierarchicalGroups() const { return has_hierarchical_groups; }
+
   const csPDelArray<csAnimControlGroup>& GetGroups () const { return groups; }
-  const csArray<csArray<ac_group_data> >& GetGroupsPerVertexMapping () const
+  const csArray<csArray<ac_group_data> >& GetGroupsVerticesMapping () const
   {
-    return groups_per_vertex;
+    return groups_vertices;
+  }
+  const csArray<csArray<ac_group_data> >& GetGroupsColorsMapping () const
+  {
+    return groups_colors;
   }
 
   SCF_DECLARE_IBASE;

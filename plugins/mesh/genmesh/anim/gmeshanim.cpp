@@ -57,13 +57,15 @@ csAnimControlGroup::csAnimControlGroup (const char* name)
 {
   csAnimControlGroup::name = csStrNew (name);
   parent = 0;
+  color.Set (1, 1, 1);
 }
 
-void csAnimControlGroup::AddVertex (int idx, float weight)
+void csAnimControlGroup::AddVertex (int idx, float weight, float col_weight)
 {
   ac_vertex_data vt;
   vt.idx = idx;
   vt.weight = weight;
+  vt.col_weight = col_weight;
   vertices.Push (vt);
 }
 
@@ -105,9 +107,30 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
   const csPDelArray<csAnimControlGroup>& groups = factory->GetGroups ();
 
   //-------
+  // Perform all running colors.
+  //-------
+  size_t i = colors.Length ();
+  while (i > 0)
+  {
+    i--;
+    ac_color_execution& m = colors[i];
+    if (current < m.final)
+    {
+      m.group->GetColor ().Set (m.final_color
+	  -float (m.final-current) * m.delta_per_tick);
+    }
+    else
+    {
+      m.group->GetColor ().Set (m.final_color);
+      colors.DeleteIndexFast (i);
+    }
+    mod = true;
+  }
+
+  //-------
   // Perform all running moves.
   //-------
-  size_t i = moves.Length ();
+  i = moves.Length ();
   while (i > 0)
   {
     i--;
@@ -201,22 +224,46 @@ bool csAnimControlRunnable::Do (csTicks current, bool& stop)
 	      case 1: rot = csYRotMatrix3 (m.final_angle); break;
 	      case 2: rot = csZRotMatrix3 (m.final_angle); break;
 	    }
-	    m.group->GetTransform () *= csReversibleTransform (rot, csVector3 (0));
+	    m.group->GetTransform () *= csReversibleTransform (rot,
+	    	csVector3 (0));
 	  }
 	  else
 	  {
-	    m.delta_angle_per_tick = m.final_angle / float (inst.rotate.duration);
+	    m.delta_angle_per_tick = m.final_angle
+	    	/ float (inst.rotate.duration);
 	    rotates.Push (m);
 	  }
 	}
 	break;
+      case AC_COLOR:
+	{
+	  ac_color_execution m;
+	  m.final = current + inst.color.duration;
+	  m.group = groups[inst.color.group_id];
+	  csColor current_col = m.group->GetColor ();
+	  m.final_color.Set (inst.color.red, inst.color.green,
+	  	inst.color.blue);
+	  if (inst.color.duration == 0)
+	  {
+	    // Move instantly.
+	    m.group->GetColor ().Set (m.final_color);
+	  }
+	  else
+	  {
+	    m.delta_per_tick = (m.final_color-current_col)
+	    	/ float (inst.color.duration);
+	    colors.Push (m);
+	  }
+	}
+        break;
       case AC_MOVE:
 	{
 	  ac_move_execution m;
 	  m.final = current + inst.movement.duration;
 	  m.group = groups[inst.movement.group_id];
 	  csVector3 current_pos = m.group->GetTransform ().GetOrigin ();
-	  csVector3 delta (inst.movement.dx, inst.movement.dy, inst.movement.dz);
+	  csVector3 delta (inst.movement.dx, inst.movement.dy,
+	  	inst.movement.dz);
 	  m.final_position = current_pos + delta;
 	  if (inst.movement.duration == 0)
 	  {
@@ -245,20 +292,36 @@ csGenmeshAnimationControl::csGenmeshAnimationControl (
   factory = fact;
   num_animated_verts = 0;
   animated_verts = 0;
+  animated_colors = 0;
 
   last_update_time = ~0;
   last_version_id = ~0;
+
+  animates_vertices = fact->AnimatesVertices ();
+  animates_texels = fact->AnimatesTexels ();
+  animates_colors = fact->AnimatesColors ();
+  animates_normals = fact->AnimatesNormals ();
+
+  dirty_vertices = true;
+  dirty_texels = true;
+  dirty_colors = true;
+  dirty_normals = true;
 }
 
 csGenmeshAnimationControl::~csGenmeshAnimationControl ()
 {
   delete[] animated_verts;
+  delete[] animated_colors;
 
   SCF_DESTRUCT_IBASE ();
 }
 
-bool csGenmeshAnimationControl::UpdateAnimation (csTicks current)
+void csGenmeshAnimationControl::UpdateAnimation (csTicks current,
+	int num_verts, uint32 version_id)
 {
+  // Make sure our arrays have the correct size.
+  UpdateArrays (num_verts);
+
   bool mod = false;
   if (current != last_update_time)
   {
@@ -276,27 +339,6 @@ bool csGenmeshAnimationControl::UpdateAnimation (csTicks current)
       }
     }
   }
-  return mod;
-}
-
-void csGenmeshAnimationControl::UpdateArrays (int num_verts)
-{
-  if (num_verts != num_animated_verts)
-  {
-    num_animated_verts = num_verts;
-    animated_verts = new csVector3[num_verts];
-    last_version_id = ~0;
-  }
-}
-
-const csVector3* csGenmeshAnimationControl::UpdateVertices (csTicks current,
-	const csVector3* verts, int num_verts, uint32 version_id)
-{
-  // Make sure our arrays have the correct size.
-  UpdateArrays (num_verts);
-
-  // Perform all running scripts.
-  bool mod = UpdateAnimation (current);
 
   // If the input arrays changed we need to update animated vertex arrays
   // anyway.
@@ -306,45 +348,86 @@ const csVector3* csGenmeshAnimationControl::UpdateVertices (csTicks current,
     last_version_id = version_id;
   }
 
-  // Update the animated vertices now.
   if (mod)
   {
+    dirty_vertices = true;
+    dirty_texels = true;
+    dirty_colors = true;
+    dirty_normals = true;
+  }
+}
+
+void csGenmeshAnimationControl::UpdateArrays (int num_verts)
+{
+  if (num_verts != num_animated_verts)
+  {
+    num_animated_verts = num_verts;
+    delete[] animated_verts;
+    animated_verts = new csVector3[num_verts];
+    delete[] animated_colors;
+    animated_colors = new csColor[num_verts];
+    last_version_id = ~0;
+  }
+}
+
+csArray<csReversibleTransform> csGenmeshAnimationControl::group_transforms;
+csArray<csColor> csGenmeshAnimationControl::group_colors;
+
+const csVector3* csGenmeshAnimationControl::UpdateVertices (csTicks current,
+	const csVector3* verts, int num_verts, uint32 version_id)
+{
+  if (!animates_vertices) return verts;
+
+  // Perform all running scripts.
+  UpdateAnimation (current, num_verts, version_id);
+
+  // Update the animated vertices now.
+  if (dirty_vertices)
+  {
     const csPDelArray<csAnimControlGroup>& groups = factory->GetGroups ();
-    const csArray<csArray<ac_group_data> >& groups_per_vertex = factory
-    	->GetGroupsPerVertexMapping ();
     size_t i;
+
+    if (groups.Length () > group_transforms.Length ())
+      group_transforms.SetLength (groups.Length ());
+
+    if (factory->HasHierarchicalGroups ())
+      for (i = 0 ; i < groups.Length () ; i++)
+        group_transforms[i] = groups[i]->GetFullTransform ();
+    else
+      for (i = 0 ; i < groups.Length () ; i++)
+        group_transforms[i] = groups[i]->GetTransform ();
+
+    const csArray<csArray<ac_group_data> >& groups_vertices = factory
+    	->GetGroupsVerticesMapping ();
     for (i = 0 ; i < (size_t)num_verts ; i++)
     {
-      if (i >= groups_per_vertex.Length ())
+      if (i >= groups_vertices.Length ())
         animated_verts[i] = verts[i];
       else
       {
-        const csArray<ac_group_data>& vtgr = groups_per_vertex[i];
+        const csArray<ac_group_data>& vtgr = groups_vertices[i];
 	if (vtgr.Length () == 0)
 	{
 	  animated_verts[i] = verts[i];
 	}
         else if (vtgr.Length () == 1)
 	{
-	  csReversibleTransform& transform = groups[vtgr[0].idx]
-	  	->GetTransform ();
+	  csReversibleTransform& transform = group_transforms[vtgr[0].idx];
 	  animated_verts[i] = transform.Other2This (verts[i]);
 	}
 	else
 	{
-	  csReversibleTransform& transform = groups[vtgr[0].idx]
-	  	->GetTransform ();
+	  csReversibleTransform& transform = group_transforms[vtgr[0].idx];
 	  float total_weight = vtgr[0].weight;
 	  csVector3 orig = vtgr[0].weight * transform.Other2This (verts[i]);
 	  size_t j;
 	  for (j = 1 ; j < vtgr.Length () ; j++)
 	  {
-	    csReversibleTransform& transform2 = groups[vtgr[j].idx]
-	    	->GetTransform ();
+	    csReversibleTransform& transform2 = group_transforms[vtgr[j].idx];
 	    total_weight += vtgr[j].weight;
 	    orig += vtgr[j].weight * transform2.Other2This (verts[i]);
 	  }
-	  orig /= total_weight;
+	  animated_verts[i] = orig / total_weight;
 	}
       }
     }
@@ -356,6 +439,7 @@ const csVector3* csGenmeshAnimationControl::UpdateVertices (csTicks current,
 const csVector2* csGenmeshAnimationControl::UpdateTexels (csTicks current,
 	const csVector2* texels, int num_texels, uint32 version_id)
 {
+  if (!animates_texels) return texels;
   //UpdateAnimation (current);
   return texels;
 }
@@ -363,15 +447,72 @@ const csVector2* csGenmeshAnimationControl::UpdateTexels (csTicks current,
 const csVector3* csGenmeshAnimationControl::UpdateNormals (csTicks current,
 	const csVector3* normals, int num_normals, uint32 version_id)
 {
-  //UpdateAnimation (current);
+  if (!animates_normals) return normals;
+
   return normals;
 }
 
 const csColor* csGenmeshAnimationControl::UpdateColors (csTicks current,
 	const csColor* colors, int num_colors, uint32 version_id)
 {
-  //UpdateAnimation (current);
-  return colors;
+  if (!animates_colors) return colors;
+
+  // Perform all running scripts if needed.
+  UpdateAnimation (current, num_colors, version_id);
+
+  // Update the animated colors now.
+  if (dirty_colors)
+  {
+    const csPDelArray<csAnimControlGroup>& groups = factory->GetGroups ();
+    size_t i;
+
+    if (groups.Length () > group_colors.Length ())
+      group_colors.SetLength (groups.Length ());
+
+    if (factory->HasHierarchicalGroups ())
+      for (i = 0 ; i < groups.Length () ; i++)
+        group_colors[i] = groups[i]->GetFullColor ();
+    else
+      for (i = 0 ; i < groups.Length () ; i++)
+        group_colors[i] = groups[i]->GetColor ();
+
+    const csArray<csArray<ac_group_data> >& gc = factory
+    	->GetGroupsColorsMapping ();
+    for (i = 0 ; i < (size_t)num_colors ; i++)
+    {
+      if (i >= gc.Length ())
+        animated_colors[i] = colors[i];
+      else
+      {
+        const csArray<ac_group_data>& vtgr = gc[i];
+	if (vtgr.Length () == 0)
+	{
+	  animated_colors[i] = colors[i];
+	}
+        else if (vtgr.Length () == 1)
+	{
+	  csColor& color = group_colors[vtgr[0].idx];
+	  animated_colors[i] = color * colors[i];
+	}
+	else
+	{
+	  csColor& color = group_colors[vtgr[0].idx];
+	  float total_weight = vtgr[0].weight;
+	  csColor orig = vtgr[0].weight * color * colors[i];
+	  size_t j;
+	  for (j = 1 ; j < vtgr.Length () ; j++)
+	  {
+	    csColor& color2 = group_colors[vtgr[j].idx];
+	    total_weight += vtgr[j].weight;
+	    orig += vtgr[j].weight * color2 * colors[i];
+	  }
+	  animated_colors[i] = orig / total_weight;
+	}
+      }
+    }
+  }
+
+  return animated_colors;
 }
 
 bool csGenmeshAnimationControl::Execute (const char* scriptname)
@@ -394,6 +535,12 @@ csGenmeshAnimationControlFactory::csGenmeshAnimationControlFactory (
   csGenmeshAnimationControlFactory::object_reg = object_reg;
   init_token_table (xmltokens);
 
+  animates_vertices = false;
+  animates_texels = false;
+  animates_colors = false;
+  animates_normals = false;
+  has_hierarchical_groups = false;
+
   autorun_script = 0;
 }
 
@@ -412,7 +559,7 @@ csPtr<iGenMeshAnimationControl> csGenmeshAnimationControlFactory::
   return csPtr<iGenMeshAnimationControl> (ctrl);
 }
 
-void csGenmeshAnimationControlFactory::UpdateGroupsPerVertexMapping ()
+void csGenmeshAnimationControlFactory::UpdateGroupsMapping ()
 {
   size_t i;
   for (i = 0 ; i < groups.Length () ; i++)
@@ -422,12 +569,24 @@ void csGenmeshAnimationControlFactory::UpdateGroupsPerVertexMapping ()
     size_t j;
     for (j = 0 ; j < vtdata.Length () ; j++)
     {
-      csArray<ac_group_data>& vertices = groups_per_vertex
-      	.GetExtend (vtdata[j].idx);
-      ac_group_data gd;
-      gd.idx = i;
-      gd.weight = vtdata[j].weight;
-      vertices.Push (gd);	// Push group index.
+      if (vtdata[j].weight > SMALL_EPSILON)
+      {
+        csArray<ac_group_data>& vertices = groups_vertices
+      	  .GetExtend (vtdata[j].idx);
+        ac_group_data gd;
+        gd.idx = i;
+        gd.weight = vtdata[j].weight;
+        vertices.Push (gd);	// Push group index.
+      }
+      if (vtdata[j].col_weight > SMALL_EPSILON)
+      {
+        csArray<ac_group_data>& colors = groups_colors
+      	  .GetExtend (vtdata[j].idx);
+        ac_group_data gd;
+        gd.idx = i;
+        gd.weight = vtdata[j].col_weight;
+        colors.Push (gd);	// Push group index.
+      }
     }
   }
 }
@@ -486,16 +645,18 @@ const char* csGenmeshAnimationControlFactory::ParseGroup (iDocumentNode* node,
 	  if (to_idx < from_idx)
 	    return "Bad range in group definition!";
 	  float weight = child->GetAttributeValueAsFloat ("weight");
+	  float col_weight = child->GetAttributeValueAsFloat ("col_weight");
 	  int i;
 	  for (i = from_idx ; i <= to_idx ; i++)
-	    group->AddVertex (i, weight);
+	    group->AddVertex (i, weight, col_weight);
 	}
         break;
       case XMLTOKEN_VERTEX:
         {
 	  int idx = child->GetAttributeValueAsInt ("idx");
 	  float weight = child->GetAttributeValueAsFloat ("weight");
-	  group->AddVertex (idx, weight);
+	  float col_weight = child->GetAttributeValueAsFloat ("col_weight");
+	  group->AddVertex (idx, weight, col_weight);
 	}
         break;
       case XMLTOKEN_GROUP:
@@ -516,6 +677,7 @@ const char* csGenmeshAnimationControlFactory::ParseGroup (iDocumentNode* node,
   {
     parent->AddGroup (group);
     group->SetParent (parent);
+    has_hierarchical_groups = true;
   }
   groups.Push (group);
   return 0;
@@ -544,6 +706,21 @@ const char* csGenmeshAnimationControlFactory::ParseScript (iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
+      case XMLTOKEN_COLOR:
+        {
+	  const char* groupname = child->GetAttributeValue ("group");
+	  if (!groupname) return "Missing group name for <color>!";
+	  size_t group_id = FindGroupIndex (groupname);
+	  if (group_id == (size_t)~0) return "Can't find group for <color>!";
+	  ac_instruction& instr = ad.script->AddInstruction (AC_COLOR);
+	  instr.color.group_id = group_id;
+	  instr.color.duration = child->GetAttributeValueAsInt ("duration");
+	  instr.color.red = child->GetAttributeValueAsFloat ("red");
+	  instr.color.green = child->GetAttributeValueAsFloat ("green");
+	  instr.color.blue = child->GetAttributeValueAsFloat ("blue");
+	  animates_colors = true;
+	}
+        break;
       case XMLTOKEN_MOVE:
         {
 	  const char* groupname = child->GetAttributeValue ("group");
@@ -556,6 +733,7 @@ const char* csGenmeshAnimationControlFactory::ParseScript (iDocumentNode* node)
 	  instr.movement.dx = child->GetAttributeValueAsFloat ("dx");
 	  instr.movement.dy = child->GetAttributeValueAsFloat ("dy");
 	  instr.movement.dz = child->GetAttributeValueAsFloat ("dz");
+	  animates_vertices = true;
 	}
         break;
       case XMLTOKEN_ROTX:
@@ -568,6 +746,7 @@ const char* csGenmeshAnimationControlFactory::ParseScript (iDocumentNode* node)
 	  instr.rotate.group_id = group_id;
 	  instr.rotate.duration = child->GetAttributeValueAsInt ("duration");
 	  instr.rotate.angle = child->GetAttributeValueAsFloat ("angle");
+	  animates_vertices = true;
 	}
 	break;
       case XMLTOKEN_ROTY:
@@ -580,6 +759,7 @@ const char* csGenmeshAnimationControlFactory::ParseScript (iDocumentNode* node)
 	  instr.rotate.group_id = group_id;
 	  instr.rotate.duration = child->GetAttributeValueAsInt ("duration");
 	  instr.rotate.angle = child->GetAttributeValueAsFloat ("angle");
+	  animates_vertices = true;
 	}
 	break;
       case XMLTOKEN_ROTZ:
@@ -592,6 +772,7 @@ const char* csGenmeshAnimationControlFactory::ParseScript (iDocumentNode* node)
 	  instr.rotate.group_id = group_id;
 	  instr.rotate.duration = child->GetAttributeValueAsInt ("duration");
 	  instr.rotate.angle = child->GetAttributeValueAsFloat ("angle");
+	  animates_vertices = true;
 	}
 	break;
       case XMLTOKEN_DELAY:
@@ -656,7 +837,7 @@ const char* csGenmeshAnimationControlFactory::Load (iDocumentNode* node)
     }
   }
 
-  UpdateGroupsPerVertexMapping ();
+  UpdateGroupsMapping ();
 
   return 0;
 }

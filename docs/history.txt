@@ -28,6 +28,12 @@ chronological order.
 	- Jorrit finished the basic gmeshanim plugin. Moving and rotating of
 	  vertex groups works. Still a lot todo but all the basics are there
 	  now.
+	- Jorrit added a Set(csColor) and a divide operator to csColor. Also
+	  added a color multiplication operator.
+	- Jorrit implemented color animation in gmeshanim.
+	- Jorrit implemented support for hierarchical transforms (both for
+	  vertices and color) in gmeshanim.
+	- Jorrit did several other small fixes and optimizations to gmeshanim.
 14-Sep-2004
 	- Eric Sunshine fixed bug in msvcgen.jam's LinkWith override where it
 	  did not distinguish between release and debug libraries & linker
