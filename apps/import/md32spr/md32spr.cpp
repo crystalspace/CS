@@ -595,6 +595,7 @@ bool MD32spr::LoadAnimation(char *animFile)
   headModel->numActions = headActions;
   upperModel->numActions = upperActions;
   lowerModel->numActions = lowerActions;
+  printf("%d %d %d\n", headActions, upperActions, lowerActions);
   /*
    * Post Processing:
    * In some of the animation config files, the numbering leg animations of start frames continue 
@@ -603,11 +604,15 @@ bool MD32spr::LoadAnimation(char *animFile)
    */
   int upperActionStart = 0, lowerActionStart = 0;
   for(i = 0; i < NUM_ACTIONS; i++)
-    strcmp(upperModel->animInfo[i].actionName, "TORSO_GESTURE");
+    if(strcmp(upperModel->animInfo[i].actionName, "TORSO_GESTURE") == 0)
+      break;
   upperActionStart = i;
+
   for(i = 0; i < NUM_ACTIONS; i++)
-    strcmp(lowerModel->animInfo[i].actionName, "LEGS_WALKCR");
+    if(strcmp(lowerModel->animInfo[i].actionName, "LEGS_WALKCR") == 0)
+      break;
   lowerActionStart = i;
+
   if (upperModel->animInfo[upperActionStart].startFrame !=
       lowerModel->animInfo[lowerActionStart].startFrame) {
     int numTorsoFrames = 0;
