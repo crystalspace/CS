@@ -24,6 +24,8 @@
 #include "csutil/scf.h"
 
 class csSector;
+class csColor;
+class csBox3;
 struct iTerrainWrapper;
 struct iMeshWrapper;
 struct iThing;
