@@ -41,6 +41,10 @@ public:
   inline void Set (float ix, float iy)
   { x = ix; y = iy; }
 
+  /// Set vector to given values.
+  inline void Set (const csVector2& v)
+  { x = v.x; y = v.y; }
+
   /// Return the norm (magnitude) of a 2D vector.
   static float Norm (const csVector2& v);
 

@@ -1562,14 +1562,7 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
     lp->Initialize (lview.light_frustum->GetNumVertices ());
 
     // Copy shadow frustums.
-    csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
-    while (shadow_it->HasNext ())
-    {
-      shadow_it->Next ();
-      if (shadow_it->IsRelevant ())
-	shadow_it->AppendToShadowBlock (&lp->shadows);
-    }
-    delete shadow_it;
+    lp->shadows.AddRelevantShadows (lview.shadows);
 
     int i, mi;
     for (i = 0 ; i < lp->num_vertices ; i++)

@@ -1160,20 +1160,18 @@ void* CheckFrustumPolygonsFB (csThing* thing,
     {
       lview->poly_func ((csObject*)p, lview);
 
-      csShadowFrustum* frust;
       if (!lview->shadows->GetLastShadowBlock ())
       {
 	csShadowBlock* slist = new csShadowBlock ();
         lview->shadows->AppendShadowBlock (slist);
       }
-      frust = lview->shadows->GetLastShadowBlock ()->AddShadow (center);
       csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
       pl.DD += center * pl.norm;
       pl.Invert ();
-      frust->SetBackPlane (pl);
-      frust->SetShadowPolygon (p);
+      csFrustum* frust = lview->shadows->GetLastShadowBlock ()->AddShadow (center,
+	  	(void*)p, p->GetVertices ().GetNumVertices (), pl);
       for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
-        frust->AddVertex (p->Vwor (j)-center);
+        frust->GetVertex (j).Set (p->Vwor (j)-center);
       frust_cnt--;
       if (frust_cnt < 0)
       {

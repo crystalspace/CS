@@ -1025,7 +1025,7 @@ csShadowBlock* csThing::GetShadows (csVector3& origin)
 {
   csShadowBlock* list = new csShadowBlock (movable.GetSector (0),
   	polygons.Length ());
-  csShadowFrustum* frust;
+  csFrustum* frust;
   int i, j;
   csPolygon3D* p;
   bool cw = true; //@@@ Use mirroring parameter here!
@@ -1037,14 +1037,13 @@ csShadowBlock* csThing::GetShadows (csVector3& origin)
     if (ABS (clas) < EPSILON) continue;
     if ((clas <= 0) != cw) continue;
 
-    frust = list->AddShadow (origin);
     csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
     pl.DD += origin * pl.norm;
     pl.Invert ();
-    frust->SetBackPlane (pl);
-    frust->SetShadowPolygon (p);	//@@@ TO BE AVOIDED. Engine doesn't know about polygons
+    frust = list->AddShadow (origin, (void*)p, p->GetVertices ().GetNumVertices (),
+	pl);
     for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
-      frust->AddVertex (p->Vwor (j)-origin);
+      frust->GetVertex (j).Set (p->Vwor (j)-origin);
   }
   return list;
 }

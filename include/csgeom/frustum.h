@@ -115,7 +115,16 @@ public:
    * The polygon is given relative to the origin 'o'.
    * If the given polygon is NULL then we create an empty frustum.
    */
-  csFrustum (const csVector3& o, csVector3* verts, int num_verts, csPlane3* backp = NULL);
+  csFrustum (const csVector3& o, csVector3* verts, int num_verts,
+      	csPlane3* backp = NULL);
+
+  /**
+   * Create a frustum given a number of vertices and a backplane.
+   * The vertices are not initialized but space is reserved for them.
+   * The polygon is given relative to the origin 'o'.
+   */
+  csFrustum (const csVector3& o, int num_verts,
+      	csVertexArrayPool* pl, csPlane3* backp = NULL);
 
   /// Copy constructor.
   csFrustum (const csFrustum &copy);

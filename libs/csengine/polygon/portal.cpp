@@ -254,25 +254,13 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     // We know that csPolygon3D::CalculateLighting() called
     // csPolygon3D::MarkRelevantShadowFrustums() some time before
     // calling this function so the 'relevant' flags are still valid.
-
-    // @@@ THIS IS A VERY INEFFICIENT OPERATION! IS THERE ANOTHER WAY!
     csShadowBlock* slist = lview.shadows->GetFirstShadowBlock ();
     while (slist)
     {
       csShadowBlock* copy_slist = new csShadowBlock (slist->GetSector (),
       	slist->GetDrawBusy ());
       new_lview.shadows->AppendShadowBlock (copy_slist);
-
-      csShadowIterator* shadow_it = slist->GetShadowIterator ();
-      while (shadow_it->HasNext ())
-      {
-        shadow_it->Next ();
-        if (shadow_it->IsRelevant ())
-	  shadow_it->AppendToShadowBlock (copy_slist);
-      }
-      delete shadow_it;
-      copy_slist->Transform (&warp_wor);
-
+      copy_slist->AddRelevantShadows (slist, &warp_wor);
       slist = lview.shadows->GetNextShadowBlock (slist);
     }
 
@@ -317,15 +305,7 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
       csShadowBlock* copy_slist = new csShadowBlock (slist->GetSector (),
       	slist->GetDrawBusy ());
       new_lview.shadows->AppendShadowBlock (copy_slist);
-
-      csShadowIterator* shadow_it = slist->GetShadowIterator ();
-      while (shadow_it->HasNext ())
-      {
-        shadow_it->Next ();
-        if (shadow_it->IsRelevant ())
-	  shadow_it->AppendToShadowBlock (copy_slist, false);
-      }
-      delete shadow_it;
+      copy_slist->AddRelevantShadows (slist);
 
       slist = lview.shadows->GetNextShadowBlock (slist);
     }

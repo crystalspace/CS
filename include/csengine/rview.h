@@ -303,23 +303,27 @@ public:
 class csShadowFrustum: public csFrustum
 {
 private:
-  csPolygon3D* shadow_polygon;
+  void* userData;
   bool relevant;
 public:
   /// Create empty frustum.
   csShadowFrustum () :
     csFrustum (csVector3 (0), &csPooledVertexArrayPool::GetDefaultPool()),
-    shadow_polygon (NULL) { }
+    userData (NULL) { }
   /// Create empty frustum.
   csShadowFrustum (const csVector3& origin) :
     csFrustum (origin, &csPooledVertexArrayPool::GetDefaultPool()),
-    shadow_polygon (NULL) { }
+    userData (NULL) { }
+  /// Create empty frustum.
+  csShadowFrustum (const csVector3& origin, int num_verts) :
+    csFrustum (origin, num_verts, &csPooledVertexArrayPool::GetDefaultPool()),
+    userData (NULL) { }
   /// Copy constructor.
   csShadowFrustum (const csShadowFrustum& orig);
-  /// Set shadow polygon @@@ UGLY!
-  void SetShadowPolygon (csPolygon3D* sp) { shadow_polygon = sp; }
-  /// Get shadow polygon @@@ UGLY
-  csPolygon3D* GetShadowPolygon () { return shadow_polygon; }
+  /// Set user data.
+  void SetUserData (void* ud) { userData = ud; }
+  /// Get user data.
+  void* GetUserData () { return userData; }
   /// Mark shadow as relevant or not.
   void MarkRelevant (bool rel = true) { relevant = rel; }
   /// Is shadow relevant?
@@ -357,7 +361,7 @@ public:
   /// Return the next element.
   csFrustum* Next ();
   /// Get the user data for the last shadow.
-  void* GetUserData () { return (void*)cur_shad->GetShadowPolygon (); }
+  void* GetUserData () { return cur_shad->GetUserData (); }
   /// Return if the last shadow is relevant or not.
   bool IsRelevant () { return cur_shad->IsRelevant (); }
   /// Mark the last shadow as relevant.
@@ -370,8 +374,6 @@ public:
   csShadowBlock* GetCurrentShadowBlock ();
   /// Return the shadow list for the 'next' element.
   csShadowBlock* GetNextShadowBlock () { return cur; }
-  /// Append the current shadow to some other shadow block.
-  void AppendToShadowBlock (csShadowBlock* sb, bool copy = true);
 };
 
 /**
@@ -411,12 +413,42 @@ public:
     shadows.DeleteAll ();
   }
 
-  /// Add a new frustum and return a reference.
-  csShadowFrustum* AddShadow (const csVector3& origin);
-  /// Copy and add a new frustum and return a reference.
-  csShadowFrustum* AddShadow (csShadowFrustum* sf);
-  /// Add a new frustum (without copy).
-  void AddShadowNoCopy (csShadowFrustum* sf);
+  /**
+   * Copy all relevant shadow frustums from another shadow block
+   * into this block. The frustums are not really copied but a new
+   * reference is kept. However, if a transformation is given then
+   * a copy is made and the shadows are transformed.
+   */
+  void AddRelevantShadows (csShadowBlock* source, csTransform* trans = NULL);
+  
+  /**
+   * Copy all relevant shadow frustums from another shadow block list
+   * into this block. The frustums are not really copied but a new
+   * reference is kept.
+   */
+  void AddRelevantShadows (csShadowBlockList* source);
+  
+  /**
+   * Copy all shadow frustums from another shadow block list
+   * into this block. The frustums are not really copied but a new
+   * reference is kept.
+   */
+  void AddAllShadows (csShadowBlockList* source);
+
+  /**
+   * Add unique shadows. Only add relevant shadow frustums that are not
+   * already in the current list. The frustums are not really copied
+   * but a new reference is kept.
+   */
+  void AddUniqueRelevantShadows (csShadowBlockList* source);
+  
+  /**
+   * Add a new frustum and return a reference.
+   * The frustum will have the specified number of vertices but the
+   * vertices still need to be initialized.
+   */
+  csFrustum* AddShadow (const csVector3& origin, void* userData, int num_verts,
+      	csPlane3& backplane);
   /// Unlink a shadow frustum from the list and dereference it.
   void UnlinkShadow (int idx);
 
@@ -427,9 +459,10 @@ public:
   }
 
   /// Get the specified shadow.
-  csShadowFrustum* GetShadow (int idx)
+  csFrustum* GetShadow (int idx)
   {
-    return (csShadowFrustum*)(idx < shadows.Length () ? shadows[idx] : NULL);
+    return (csFrustum*)(
+	(csShadowFrustum*)(idx < shadows.Length () ? shadows[idx] : NULL));
   }
 
   /**

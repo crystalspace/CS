@@ -1,5 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
+12-Mar-2001
+	- Added a new constructor csFrustum with which you can create
+	  a frustum that already has place for the right number of vertices
+	  but the vertices are not initialized yet.
+	- Added new csVector3 and csVector2 Set() routine that accepts
+	  another csVector3 or csVector2 respectively.
+	- Did more work on cleaning up the shadow frustum code in order
+	  to make it easier to make it SCF interfaces. For example,
+	  csShadowFrustum is now completely private to the shadow block
+	  classes.
 11-Mar-2001
 	- Norman Kramer renamed avi codec classnames from codec.*
 	  to codec.avi.*.

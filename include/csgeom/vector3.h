@@ -219,6 +219,9 @@ public:
   /// Set the value of this vector.
   inline void Set (float sx, float sy, float sz) { x = sx; y = sy; z = sz; }
 
+  /// Set the value of this vector.
+  inline void Set (const csVector3& v) { x = v.x; y = v.y; z = v.z; }
+
   /// Returns the norm of this vector.
   float Norm () const;
 

@@ -523,17 +523,11 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     lp->Initialize (4);
 
     // Copy shadow frustums.
-    csFrustum* sf;
-    csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
     lp->shadows.DeleteShadows ();
-    while (shadow_it->HasNext ())
-    {
-      sf = shadow_it->Next ();
-      //if (sf->relevant) @@@: It would be nice if we could optimize earlier 
-      //                       to determine relevant shadow frustums in curves
-      shadow_it->AppendToShadowBlock (&lp->shadows);
-    }
-    delete shadow_it;
+    // @@@: It would be nice if we could optimize earlier 
+    // to determine relevant shadow frustums in curves and use
+    // AddRelevantShadows instead.
+    lp->shadows.AddAllShadows (lview.shadows);
 
     lp->light_frustum = new csFrustum(*lview.light_frustum);
 

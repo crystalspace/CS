@@ -101,24 +101,90 @@ csShadowBlock::~csShadowBlock ()
   DeleteShadows ();
 }
 
-csShadowFrustum* csShadowBlock::AddShadow (const csVector3& origin)
+void csShadowBlock::AddRelevantShadows (csShadowBlock* source,
+    	csTransform* trans)
 {
-  csShadowFrustum* sf = new csShadowFrustum (origin);
-  shadows.Push (sf);
-  return sf;
+  csShadowIterator* shadow_it = source->GetShadowIterator ();
+  while (shadow_it->HasNext ())
+  {
+    csShadowFrustum* csf = (csShadowFrustum*)shadow_it->Next ();
+    if (csf->IsRelevant ())
+    {
+      if (trans)
+      {
+	csShadowFrustum* copycsf = new csShadowFrustum (*csf);
+	copycsf->Transform (trans);
+	shadows.Push (copycsf);
+      }
+      else
+      {
+        csf->IncRef ();
+        shadows.Push (csf);
+      }
+    }
+  }
+  delete shadow_it;
 }
 
-csShadowFrustum* csShadowBlock::AddShadow (csShadowFrustum* origsf)
+void csShadowBlock::AddRelevantShadows (csShadowBlockList* source)
 {
-  csShadowFrustum* sf = new csShadowFrustum (*origsf);
-  shadows.Push (sf);
-  return sf;
+  csShadowIterator* shadow_it = source->GetShadowIterator ();
+  while (shadow_it->HasNext ())
+  {
+    csShadowFrustum* csf = (csShadowFrustum*)shadow_it->Next ();
+    if (csf->IsRelevant ())
+    {
+      csf->IncRef ();
+      shadows.Push (csf);
+    }
+  }
+  delete shadow_it;
 }
 
-void csShadowBlock::AddShadowNoCopy (csShadowFrustum* sf)
+void csShadowBlock::AddAllShadows (csShadowBlockList* source)
 {
-  sf->IncRef ();
+  csShadowIterator* shadow_it = source->GetShadowIterator ();
+  while (shadow_it->HasNext ())
+  {
+    csShadowFrustum* csf = (csShadowFrustum*)shadow_it->Next ();
+    csf->IncRef ();
+    shadows.Push (csf);
+  }
+  delete shadow_it;
+}
+
+void csShadowBlock::AddUniqueRelevantShadows (csShadowBlockList* source)
+{
+  int i;
+  int cnt = shadows.Length ();
+
+  csShadowIterator* shadow_it = source->GetShadowIterator ();
+  while (shadow_it->HasNext ())
+  {
+    csShadowFrustum* csf = (csShadowFrustum*)shadow_it->Next ();
+    if (csf->IsRelevant ())
+    {
+      for (i = 0 ; i < cnt ; i++)
+	if (((csShadowFrustum*)shadows[i]) == csf)
+	  break;
+      if (i >= cnt)
+      {
+        csf->IncRef ();
+        shadows.Push (csf);
+      }
+    }
+  }
+  delete shadow_it;
+}
+
+csFrustum* csShadowBlock::AddShadow (const csVector3& origin, void* userData,
+    	int num_verts, csPlane3& backplane)
+{
+  csShadowFrustum* sf = new csShadowFrustum (origin, num_verts);
+  sf->SetBackPlane (backplane);
+  sf->SetUserData (userData);
   shadows.Push (sf);
+  return (csFrustum*)sf;
 }
 
 void csShadowBlock::UnlinkShadow (int idx)
@@ -133,7 +199,7 @@ void csShadowBlock::UnlinkShadow (int idx)
 csShadowFrustum::csShadowFrustum (const csShadowFrustum& orig)
 	: csFrustum ((const csFrustum&)orig)
 {
-  this->shadow_polygon = orig.shadow_polygon;
+  this->userData = orig.userData;
   this->relevant = orig.relevant;
 }
 
@@ -141,10 +207,10 @@ csShadowFrustum::csShadowFrustum (const csShadowFrustum& orig)
 
 csFrustum* csShadowIterator::Next ()
 {
-  if (!cur) return NULL;
+  if (!cur) { cur_shad = NULL; return NULL; }
   csShadowFrustum* s;
   if (i >= 0 && i < cur_num)
-    s = cur->GetShadow (i);
+    s = (csShadowFrustum*)cur->GetShadow (i);
   else
     s = NULL;
   i += dir;
@@ -175,14 +241,6 @@ csShadowBlock* csShadowIterator::GetCurrentShadowBlock ()
     else if (onlycur || !cur->prev) return NULL;
     else return cur->prev;
   }
-}
-
-void csShadowIterator::AppendToShadowBlock (csShadowBlock* sb, bool copy)
-{
-  if (copy)
-    sb->AddShadow (cur_shad);
-  else
-    sb->AddShadowNoCopy (cur_shad);
 }
 
 void csShadowIterator::DeleteCurrent ()

@@ -90,9 +90,6 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
     int GetShadowCount ()
     { return shadows.GetNumShadows (); }
 
-    csShadowFrustum *GetShadow (int idx)
-    { return shadows.GetShadow (idx); }
-
     csShadowIterator* GetShadowIterator ()
     {
       return shadows.GetShadowIterator ();
@@ -101,16 +98,6 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
     ~LightViewInfo ()
     {
       shadows.DeleteShadows ();
-    }
-
-    void CheckShadow (csShadowIterator* shadow_it, csFrustum *frust, int count)
-    {
-      if (!shadow_it->IsRelevant ())
-        return;
-      for (int i = 0; i < count; i++)
-        if (GetShadow (i) == frust)
-          return;
-      shadow_it->AppendToShadowBlock (&shadows, false);
     }
   };
 
@@ -127,9 +114,6 @@ public:
   // Return total number of shadows
   int GetShadowCount ()
   { return lvlist.Get (lvlist.Length () - 1)->GetShadowCount (); }
-  // Get Nth shadow frustum
-  csShadowFrustum *GetShadow (int idx)
-  { return lvlist.Get (lvlist.Length () - 1)->GetShadow (idx); }
   // Get iterator to iterate over all shadows.
   csShadowIterator* GetShadowIterator ()
   {
@@ -210,14 +194,7 @@ bool csDelayedLightingInfo::Collect (csFrustumView *lview, csPolygon3D *poly)
   CS_ASSERT (cur_poly);
 
   // Check if any shadow frustums we have now have not been seen in the past
-  csShadowIterator* shadow_it = lview->shadows->GetShadowIterator ();
-  int ns = lvi->shadows.GetNumShadows ();
-  while (shadow_it->HasNext ())
-  {
-    csFrustum* csf = shadow_it->Next ();
-    lvi->CheckShadow (shadow_it, csf, ns);
-  }
-  delete shadow_it;
+  lvi->shadows.AddUniqueRelevantShadows (lview->shadows);
   return !lvi->unlit_poly;
 }
 

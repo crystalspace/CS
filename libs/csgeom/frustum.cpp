@@ -41,6 +41,20 @@ csFrustum::csFrustum (const csVector3& o, csVector3* verts, int num_verts,
   backplane = backp ? new csPlane3 (*backp) : NULL;
 }
 
+csFrustum::csFrustum (const csVector3& o, int num_verts, csVertexArrayPool* pl,
+  csPlane3* backp) : pool (pl)
+{
+  origin = o;
+  num_vertices = num_verts;
+  max_vertices = num_verts;
+  wide = false;
+  mirrored = false;
+  ref_count = 1;
+
+  vertices = pool->GetVertexArray (max_vertices);
+  backplane = backp ? new csPlane3 (*backp) : NULL;
+}
+
 csFrustum::csFrustum (const csFrustum &copy)
 {
   pool = copy.pool;
