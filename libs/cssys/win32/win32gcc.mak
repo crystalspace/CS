@@ -5,6 +5,7 @@ DESCRIPTION.win32gcc = Windows with MinGW32 GNU C/C++
 DESCRIPTION.OS.win32gcc = Win32
 
 # Choose which drivers you want to build/use
+PLUGINS+= cscript/cspython
 PLUGINS+= sound/renderer/software
 PLUGINS+= video/canvas/ddraw
 PLUGINS+= video/canvas/ddraw61 video/renderer/direct3d61

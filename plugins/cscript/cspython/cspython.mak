@@ -35,8 +35,11 @@ ifeq ($(MAKESECTION),postdefines)
 #TCLTK=-ltk8.0 -ltcl8.0 -L/usr/X11R6/lib -lX11
 PTHREAD=-lpthread
 
+ifneq ($(OS),WIN32)
 CFLAGS.PYTHON += $(CFLAGS.I)$(PYTHON_INC)
+endif
 
+ifneq ($(OS),WIN32)
 # PYTHON_LIB points at the Python library directory (often /usr/lib/python1.5).
 # The actual static link library usually resides in a "config" subdirectory of
 # the library directory.  The library's name is the same as the directory,
@@ -44,6 +47,14 @@ CFLAGS.PYTHON += $(CFLAGS.I)$(PYTHON_INC)
 LIB.CSPYTHON.SYSTEM += \
   $(LFLAGS.L)$(PYTHON_LIB)/config $(LFLAGS.L)$(PYTHON_LIB) \
   $(LFLAGS.l)$(notdir $(PYTHON_LIB)) $(TCLTK) $(PTHREAD)
+else
+LIB.CSPYTHON.SYSTEM +=
+ifndef LIBS.CSPYTHON.SYSTEM
+  LIB.CSPYTHON.SYSTEM = -lpython15
+else
+  LIB.CSPYTHON.SYSTEM = $(LIBS.CSPYTHON.SYSTEM)
+endif
+endif
 
 ifeq ($(USE_PLUGINS),yes)
   CSPYTHON = $(OUTDLL)cspython$(DLL)
