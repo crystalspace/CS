@@ -54,6 +54,8 @@ csMetaBalls::csMetaBalls (iBase *iParent)
   memset(poly, 0, sizeof(*poly));
   poly->num = 3;
   alpha = frame = 0;
+  triangles_array = NULL;
+  meta_balls = NULL;
 }
 
 csMetaBalls::~csMetaBalls ()
