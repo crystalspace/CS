@@ -101,7 +101,7 @@ public:
     isomesh->SetTransform( matrix * isomesh->GetTransform() );
     updatenumber++;
   }
-  virtual void AddListener (iMovableListener* /*listener*/, void* /*userdata*/)
+  virtual void AddListener (iMovableListener* /*listener*/)
   {
      /// does not work
   }
@@ -386,7 +386,7 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
     //position.z);
 
   /// update animation
-  mesh->NextFrame(csGetTicks ());
+  mesh->NextFrame(csGetTicks (), csVector3 (0, 0, 0));
 
   //iGraphics3D* g3d = rview->GetG3D ();
   iIsoView* view = rview->GetView ();

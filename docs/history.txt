@@ -12,6 +12,7 @@ The history order is reversed so that new features are at the top.
 	  of just marking the objects. This is a LOT faster in levels
 	  with a huge number of objects. Fixed Dynavis, Frustvis, and
 	  old style octree based culler for this change.
+	- Fixed iso engine for some recent changes to CS.
 3-Nov-2002
 	- Changed DynaVis to use the new movable and object model
 	  listeners. This significantly speeds up rendering and walking
