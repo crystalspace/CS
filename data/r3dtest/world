@@ -1726,11 +1726,11 @@
             <radius>5</radius>
             <color red="1.5625" green="1.5625" blue="0.784314" />
         </light>
-        <!-- light>
+        <light>
             <center x="1.8" y="-12" z="-8.2" />
             <radius>5</radius>
             <color red="1.5625" green="0.784314" blue="0.392157" />
-        </light -->
+        </light>
         <meshobj name="e6">
             <plugin>thing</plugin>
             <zuse />
