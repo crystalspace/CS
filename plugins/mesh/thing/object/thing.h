@@ -498,7 +498,7 @@ public:
   //----------------------------------------------------------------------
 
   /// Add a polygon to this thing.
-  void AddPolygon (csPolygon3DStatic* spoly, csPolygon3D* spoly);
+  void AddPolygon (csPolygon3DStatic* spoly, csPolygon3D* poly);
 
   /// Create a new polygon in this thing and add it.
   csPolygon3D* NewPolygon (iMaterialWrapper* material);
