@@ -22,6 +22,7 @@
 #include "csphyzik/refframe.h"
 #include "csphyzik/rigidbod.h"
 #include "csphyzik/debug.h"
+#include "csphyzik/contact.h"
 
 ctRigidBody::ctRigidBody()
 {
@@ -176,4 +177,82 @@ void ctRigidBody::set_m( real pm )
 		I_inv *= ( m/pm );
 		m = pm;
 	}
+}
+
+
+void ctRigidBody::resolve_collision( ctCollidingContact &cont )
+{
+ctVector3 j;
+real v_rel;       // relative velocity of collision points
+ctVector3 ra_v, rb_v;
+real j_magnitude;
+real bottom;
+real ma_inv, mb_inv;   // 1/mass_body_a
+real rota, rotb;       // contribution from rotational inertia
+ctVector3 & n = cont.n;
+ctVector3 ra, rb;      // center of body to collision point in inertail ref frame 
+
+  if( cont.body_a != NULL ){
+
+ //   ra = cont.body_a->get_this_to_world()*cont.p_a;
+    ctVector3 body_x = cont.body_a->get_pos();
+    ra = cont.contact_p - body_x;
+
+    ra_v = cont.body_a->get_angular_v()%ra + cont.body_a->get_v();
+ 
+    if( cont.body_b == NULL ){
+      v_rel = n*ra_v;
+    }else{
+      //rb = (cont.body_b->get_this_to_world())*cont.p_b;
+      rb = cont.contact_p - cont.body_b->get_pos();
+      rb_v = cont.body_b->get_angular_v()%rb + cont.body_b->get_v();
+      v_rel = n*(ra_v - rb_v);
+    }
+
+    // if the objects are traveling towards each other do collision response
+    if( v_rel < 0 ){
+
+ //         DEBUGLOGF2( "contact %lf o %lf, ", cont.contact_p[0], body_x[0] );
+ //   DEBUGLOGF2( "contact %lf o %lf, ", cont.contact_p[1], body_x[1] );
+ //   DEBUGLOGF2( "contact %lf o %lf\n ", cont.contact_p[2], body_x[2] );
+
+      ma_inv = 1.0/cont.body_a->get_impulse_m();
+      rota = n * ((cont.body_a->get_impulse_I_inv()*( ra%n ) )%ra);  
+
+      if( cont.body_b == NULL ){
+        // hit some kind of immovable object
+        mb_inv = 0;
+        rotb = 0;
+      }else{
+        mb_inv = 1.0/cont.body_b->get_impulse_m();
+        rotb = n * ((cont.body_b->get_impulse_I_inv()*( rb%n ) )%rb);
+      }
+
+      bottom = ma_inv + mb_inv + rota + rotb;
+      j_magnitude = -(1.0 + cont.restitution ) * v_rel / bottom;
+
+      j = n*j_magnitude;
+      cont.body_a->apply_impulse( ra, j );
+
+      if( cont.body_b != NULL ){
+        cont.body_b->apply_impulse( rb, j*(-1.0) );
+      }
+    }
+  }
+  
+}
+
+void ctRigidBody::apply_impulse( ctVector3 jx, ctVector3 jv )
+{
+real mass = get_impulse_m();
+  
+  P += jv;
+  v = P * (( mass > MIN_REAL ) ? 1.0/mass : MAX_REAL);
+
+  L += jx % jv;
+
+  const ctMatrix3 &R = RF.get_R();
+	ctMatrix3 I_inv_world = R * I_inv * (R.get_transpose());
+  w = I_inv_world * L;
+
 }

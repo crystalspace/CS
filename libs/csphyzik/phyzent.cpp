@@ -19,6 +19,7 @@
 */
 
 #include "csphyzik/phyzent.h"
+#include "csphyzik/contact.h"
 #include "csphyzik/refframe.h"
 #include "csphyzik/mathutil.h"
 #include "csphyzik/solver.h"
@@ -64,7 +65,8 @@ void ctPhysicalEntity::rotate_around_line( ctVector3 &paxis, real ptheta )
 	ctMatrix3 new_T;
 	
 	R_from_vector_and_angle( paxis, -ptheta, new_T );
-	RF.set_T(new_T*RF.get_T());
+//	RF.set_T(new_T*RF.get_T());  //!me is this right?
+	RF.set_R(new_T*RF.get_R());  //!me is this right?
 
 }
 
@@ -165,6 +167,34 @@ void ctPhysicalEntity::set_angular_v( const ctVector3 &pw )
   w = pw; 
 }
 
+// PONG collision model
+// basic collision model for for objects with no mass.
+void ctPhysicalEntity::resolve_collision( ctCollidingContact &cont )
+{
+ctVector3 j;
+
+  // this is the dumbest collision model, so the other body may have
+  // something better, so resolve collision from that bodies "perspective"
+  if( this == cont.body_a && cont.body_b != NULL ){
+    cont.body_b->resolve_collision( cont );
+  }
+
+  if( cont.body_a != NULL ){
+    j = ( cont.n*((cont.body_a->get_v())*cont.n) )*( -1.0 - cont.restitution );
+    cont.body_a->apply_impulse( cont.contact_p, j );
+  }
+
+  if( cont.body_b != NULL ){
+    j = ( cont.n*((cont.body_b->get_v())*cont.n) )*( -1.0 - cont.restitution );
+    cont.body_b->apply_impulse( cont.contact_p, j );
+  }
+  
+}
+
+void ctPhysicalEntity::apply_impulse( ctVector3 jx, ctVector3 jv )
+{
+  set_v( v + jv );
+}
 
 //************ ctDynamicEntity
 
