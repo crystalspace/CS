@@ -302,6 +302,14 @@ void scfFactory::IncRef ()
       ClassInfo = Library->Find (ClassID);
     if (!Library->ok () || !ClassInfo)
     {
+      // If the library was not in the library-registry (libidx<0), then we
+      // just created it with `new'.  As a side-effect of creation, the library
+      // added itself to the library-registry, so we call TryUnload(), which
+      // will remove the library from the registry, so as not to leak the
+      // instance.  In other circumstances, scfFactory::TryUnload() would free
+      // the instance (if needed), but it only does so if the `Library'
+      // variable is non-null.
+      Library->TryUnload();
       Library = NULL;
       return;
     }
