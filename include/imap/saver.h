@@ -23,8 +23,6 @@
 #include "iutil/string.h"
 #include "iutil/document.h"
 
-struct iString;
-
 SCF_VERSION (iSaver, 0, 0, 3);
 
 /**
