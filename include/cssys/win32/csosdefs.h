@@ -185,13 +185,13 @@
 // The Microsoft Visual C compiler miserably crashes on boxclip.inc
 // because of memcpy(). This is a replacement for memcpy() which is
 // supposed to fix the problem.
-#ifdef COMP_MSVC___DISABLED_UNTIL_ITS_TESTED
+#ifdef COMP_VC
 #  define memcpy better_memcpy
-static inline void better_memcpy (void *dst, void *src, size_t size)
+static inline void *better_memcpy (void *dst, const void *src, size_t bsize)
 {
   _asm		mov	esi,src
   _asm		mov	edi,dst
-  _asm		mov	ecx,size
+  _asm		mov	ecx,bsize
   _asm		mov	al,cl
   _asm		shr	ecx,2
   _asm		cld
@@ -199,6 +199,7 @@ static inline void better_memcpy (void *dst, void *src, size_t size)
   _asm		mov	cl,al
   _asm		and	cl,3
   _asm		rep	movsb
+  return dst;
 }
 #endif
 
