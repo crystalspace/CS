@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+17-Oct-2001
+	- M Voase did the following
+	  - Small typo fix to data/walktest.cfg. This just fixes up
+	    the PerfStats loading problem, but doesnt fix the fact
+	    that the plugin was taking the name tag from the walktest
+	    config file.
 16-Oct-2001
 	- iObjectRegistry::Register() will now return false if something
 	  is registered with a duplicate tag (exception is the NULL tag).
