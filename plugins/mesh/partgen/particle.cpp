@@ -76,6 +76,9 @@ csNewParticleSystem::csNewParticleSystem (
   triangles = 0;
 
   mesh.dynDomain.AttachNew (new csShaderVariableContext);
+  mesh.object2camera = csReversibleTransform ();
+  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
+  meshPtr = &mesh;
 #endif
 }
 
@@ -267,7 +270,6 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
     return false;
 
 #ifdef CS_USE_NEW_RENDERER
-  mesh.object2camera = csReversibleTransform ();
   mesh.clip_portal = ClipPortal;
   mesh.clip_plane = ClipPlane;
   mesh.clip_z_plane = ClipZ;
@@ -570,14 +572,10 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num)
 
   // Prepare for rendering.
   mesh.mixmode = MixMode;
-
   mesh.indexstart = 0;
   mesh.indexend = TriangleCount * 3;
-  //mesh.mathandle = mater->GetMaterialHandle();
   mesh.material = Material;
 
-  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
-  meshPtr = &mesh;
   num = 1;
   return &meshPtr;
 #else
