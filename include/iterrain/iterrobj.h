@@ -33,6 +33,9 @@ struct iTerrainObjectFactory;
 
 SCF_VERSION (iTerrainObject, 0, 0, 1);
 
+/**
+ * This object represents a terrain mesh.
+ */
 struct iTerrainObject : public iBase
 {
   /// Set a directional light.
