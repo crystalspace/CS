@@ -102,7 +102,7 @@ public:
   /**
    * Check if the hash contains a particular string.
    * \remarks This is rigidly equivalent to
-   *   \code return Request(s) != csInvalidStringID \endcode.
+   *   <tt>return Request(s) != csInvalidStringID</tt>.
    */
   bool Contains(char const* s) const
   { return Request(s) != csInvalidStringID; }
