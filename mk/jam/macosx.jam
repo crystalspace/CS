@@ -55,7 +55,7 @@ rule ConstructApplicationTarget
 
 # ConstructLibraryTarget target : options
 #    Constructs the library target name.
-rule ConstructLibraryTarget
+rule ConstructStaticLibraryTarget
 {
       return lib$(<).a ;
 }

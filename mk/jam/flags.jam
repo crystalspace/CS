@@ -25,16 +25,20 @@
 ##    the leading "lib".
 rule LinkWith
 {
-  local libs = [ ResolveLibs $(>) ] ;
+  local rawlibs = [ ResolveLibs $(>) ] ;
 
   if $($(<)_TYPE) = library
   {
-    LibDepends $(<) : $(libs) ;
+    LibDepends $(<) : $(rawlibs) ;
   }                           
   
-  LFlags $(<) : $($($(libs).EXTERNALLIBS).LFLAGS) ;
+  LFlags $(<) : $($($(rawlibs).EXTERNALLIBS).LFLAGS) ;
   
-  libs = lib$(libs)$(SUFLIB) ;
+  local libs ;
+  for i in $(rawlibs)
+  {
+    libs += [ ConstructLibraryTarget $(i) : $($(i)_SHARED) ] ;
+  }
       
   DEPENDS $($(<)_TARGET) : $(libs) ;
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;

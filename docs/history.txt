@@ -23,6 +23,7 @@ chronological order.
 	  render speed. You can enable this option in thing.cfg (uncomment
 	  the EnableLightmaps=false line) or you can use the
 	  '-nolightmapping' commandline option.
+        - res added shared libs support for unix platforms.
 29-Nov-2004
 	- res changed the static variable cleanup code to employ a variable
 	  with a pointer to the cleanup function instead of using it directly.

@@ -38,9 +38,17 @@ rule ConstructApplicationTarget
 {
   return $(<) ;
 }
-rule ConstructLibraryTarget
+rule ConstructStaticLibraryTarget
 {
   return lib$(<)$(SUFLIB) ;
+}
+rule ConstructSharedLibraryTarget
+{
+  return $(<).so.0 ; # @@@ Hardcoded
+}
+rule ConstructSharedLibraryLinkLib
+{
+  return $(<).so.0 ; # @@@ Hardcoded
 }
 rule ConstructPluginTarget
 {
@@ -106,6 +114,16 @@ rule SystemLinkPlugin
   Clean $(<)clean : $(target) ;
 }
 
+rule SystemLinkSharedLibrary
+{
+  LFlags $(<) : $(LINKLIBS) ;
+  Depends $(<) : $(>) ;
+  LinkSharedLibrary $(<) : $(>) : $(3) ;
+
+  Clean clean : $(<) ;
+  Clean $(<)clean : $(<) ;
+}
+
 actions LinkApplication bind NEEDLIBS bind EXTRAOBJECTS
 {
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
@@ -126,3 +144,10 @@ else
     $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
   }
 }
+
+actions LinkSharedLibrary bind NEEDLIBS bind EXTRAOBJECTS
+{
+  $(CMD.LINK) -shared -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS) \
+    -Wl,-soname,$(<:BS)
+}
+

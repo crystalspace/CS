@@ -76,89 +76,13 @@ rule Library
 
   if ( ! [ IsElem shared : $(3) ] ) || ( $(BUILD_SHARED_LIBS) != "yes" )
   {
-    # Set LOCATE for the library and its contents.  The bound
-    # value shows up as $(NEEDLIBS) on the Link actions.
-    # For compatibility, we only do this if the library doesn't
-    # already have a path.
-    if ! $(target:D)
-    {
-      MakeLocate $(target) $(target)($(objects:BS)) : $(LOCATE_TARGET) ;
-    }
-  
-    if $(NOARSCAN)
-    {
-      # If we can't scan the library to timestamp its contents,
-      # we have to just make the library depend directly on the
-      # on-disk object files.  
-      Depends $(target) : $(objects) ;
-    }
-    else
-    {
-      # If we can scan the library, we make the library depend
-      # on its members and each member depend on the on-disk
-      # object file.
-      Depends $(target) : $(target)($(objects:BS)) ;
-  
-      local i ;
-      for i in $(objects)
-      {
-	Depends $(target)($(i:BS)) : $(i) ;
-      }
-    }
-  
-    # Generate install rules
-    if ! [ IsElem noinstall : $(3) ]
-    {
-      if "$(RANLIB)"
-      {
-	Depends install_lib : [ DoInstall $(target) : $(libdir) : : Ranlib ] ;
-      }
-      else
-      {
-	Depends install_lib : [ DoInstall $(target) : $(libdir)  ] ;
-      }
-      
-      # Add to global library list
-      INSTALLEDLIBS += $(<) ;
-    }
-  
-    if $(CRELIB)
-    {
-      CreLib $(target) : $(objects[1]) ;
-    }
-  
-    Archive $(target) : $(objects) ;
-    Clean $(<)clean : $(target) ;
-    Depends clean : $(<)clean ;
-  
-    if $(RANLIB)
-    {
-      Ranlib $(target) ;
-    }
-  
-    # If we can't scan the library, we have to leave the .o's around.
-    if ! ( $(NOARSCAN) || $(NOARUPDATE) )
-    {
-      RmTemps $(target) : $(objects) ;
-    }
+    $(<)_SHARED = "" ;
+    LibraryStatic $(<) : $(objects) : $(3) : $(target) ;
   }
   else
   {
-    local deplibs = lib$($(<)_depends).a ;
-  
-    if ! $(target:D)
-    {
-      MakeLocate $(target) : $(LOCATE.TARGETS) ;
-    }
-    Depends $(target) : $(objects) ;
-    Clean $(<)clean : $(target) ;
-    Depends clean : $(<)clean ;
-    Depends $(target) : $(deplibs) ;
-      
-    CFlags $(<) : [ FDefines CS_$(<:U)_LIB  ] ;
-    LFlags $(<) : $(LINKLIBS) $(deplibs) ;
-      
-    SystemLinkLibrary $(<) : $(objects) ;
+    $(<)_SHARED = "shared" ;
+    LibraryShared $(<) : $(objects) : $(3) : $(target) ;
   }
   CFlags $(<) : $(LIBRARY.CFLAGS) ;
   LFlags $(<) : $(LIBRARY.LFLAGS) ;
@@ -184,6 +108,122 @@ rule LibDepends
 
 #----------------------------------------------------------------------------
 # private part
+
+rule LibraryStatic
+{
+  local objects = $(>) ;
+  local target = $(4) ;
+
+  # Set LOCATE for the library and its contents.  The bound
+  # value shows up as $(NEEDLIBS) on the Link actions.
+  # For compatibility, we only do this if the library doesn't
+  # already have a path.
+  if ! $(target:D)
+  {
+    MakeLocate $(target) $(target)($(objects:BS)) : $(LOCATE_TARGET) ;
+  }
+
+  if $(NOARSCAN)
+  {
+    # If we can't scan the library to timestamp its contents,
+    # we have to just make the library depend directly on the
+    # on-disk object files.  
+    Depends $(target) : $(objects) ;
+  }
+  else
+  {
+    # If we can scan the library, we make the library depend
+    # on its members and each member depend on the on-disk
+    # object file.
+    Depends $(target) : $(target)($(objects:BS)) ;
+
+    local i ;
+    for i in $(objects)
+    {
+      Depends $(target)($(i:BS)) : $(i) ;
+    }
+  }
+
+  # Generate install rules
+  if ! [ IsElem noinstall : $(3) ]
+  {
+    if "$(RANLIB)"
+    {
+      Depends install_lib : [ DoInstall $(target) : $(libdir) : : Ranlib ] ;
+    }
+    else
+    {
+      Depends install_lib : [ DoInstall $(target) : $(libdir)  ] ;
+    }
+    
+    # Add to global library list
+    INSTALLEDLIBS += $(<) ;
+  }
+
+  if $(CRELIB)
+  {
+    CreLib $(target) : $(objects[1]) ;
+  }
+
+  Archive $(target) : $(objects) ;
+  Clean $(<)clean : $(target) ;
+  Depends clean : $(<)clean ;
+
+  if $(RANLIB)
+  {
+    Ranlib $(target) ;
+  }
+
+  # If we can't scan the library, we have to leave the .o's around.
+  if ! ( $(NOARSCAN) || $(NOARUPDATE) )
+  {
+    RmTemps $(target) : $(objects) ;
+  }
+}
+
+rule LibraryShared
+{
+  local objects = $(>) ;
+  local target = $(4) ;
+  local sharedlib = [ ConstructSharedLibraryTarget $(<) : $(3) ] ;
+
+  local deplibs ;
+  local i ;
+  for i in $($(<)_deplibs)
+  {
+    deplibs += [ ConstructLibraryTarget $(i) : $(3) ] ;
+  }
+  
+  if ! $(target:D)
+  {
+    MakeLocate $(target) : $(LOCATE.TARGETS) ;
+  }
+  if $(target) != $(sharedlib)
+  {
+    Depends $(target) : $(sharedlib) ;
+  }
+  Depends $(sharedlib) : $(objects) ;
+  Clean $(<)clean : $(target) $(sharedlib) ;
+  Depends clean : $(<)clean ;
+  Depends $(sharedlib) : $(deplibs) ;
+    
+  CFlags $(<) : [ FDefines CS_$(<:U)_LIB  ] ;
+  LFlags $(<) : $(LINKLIBS) $(deplibs) ;
+    
+  SystemLinkSharedLibrary $(sharedlib) : $(objects) : $(target) ;
+}
+
+rule ConstructLibraryTarget
+{
+  if ( ! [ IsElem shared : $(>) ] ) || ( $(BUILD_SHARED_LIBS) != "yes" )
+  {
+    return [ ConstructStaticLibraryTarget $(<) : $(>) ] ; 
+  }
+  else
+  {
+    return [ ConstructSharedLibraryLinkLib $(<) : $(>) ] ; 
+  }
+}
 
 actions together Ranlib
 {
