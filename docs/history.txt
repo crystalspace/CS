@@ -19,6 +19,10 @@ chronological order.
 	- Marten added a few helper functions to csgeom for math calculations.
 	- Marten added a general per vertex light calculation system. It is not
 	  finished, and not yet used though.
+	- Eric Sunshine fixed spelling, grammatical, and Texinfo mark-up
+	  problems in material recently added to the CS manual.
+	- Eric Sunshine cleaned up and re-wrote portions of the new Dev-CPP
+	  HOWTO.
 24-Feb-2005
 	- Jorrit fixed edge drawing by the OpenGL renderer by using
 	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently

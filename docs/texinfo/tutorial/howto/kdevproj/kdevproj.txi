@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Creating External Application Using KDevelop, HOWTO Create RPM, HOWTO Creating External MSVC 7 Application, HOWTO
+@node HOWTO Creating External Application Using KDevelop, HOWTO CS Project DevCPP, HOWTO Creating External MSVC 7 Application, HOWTO
 @subsection Creating an External Application using KDevelop
 
 @emph{Written by Andreas Busch, @email{nobita@@t-online.de}.  Last updated

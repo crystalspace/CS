@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Create RPM, HOWTO Setting the CRYSTAL environment variable, HOWTO Creating External Application Using KDevelop, HOWTO
+@node HOWTO Create RPM, HOWTO Setting the CRYSTAL environment variable, HOWTO CS Project DevCPP, HOWTO
 @subsection Creating Crystal Space @sc{rpm}'s
 @cindex @sc{rpm}
 @cindex Package, @sc{rpm} 
