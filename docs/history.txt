@@ -65,6 +65,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Replaced 'framevec' in perfstat with csPDelArray<FrameEntry>.
 	    - Replaced 'statvec' in perfstat with csPDelArray<StatEntry>.
 	- res improved the doxygen documentation of the UTF converters.
+	- res fixed a "assuming & on overloaded member function" error on
+	  older GCCs.
 29-Jul-2003
 	- Jorrit made scfStringArray actually work by adding the needed
 	  SCF_CONSTRUCT stuff.
