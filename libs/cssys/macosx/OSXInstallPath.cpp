@@ -57,9 +57,9 @@ char** csGetPluginPaths()
   char*  buff  = new char[1024];    // Caller frees.
   char*  cpath = csGetConfigPath(); // Caller frees.
 
-  strncpy(buff, cpath, sizeof(buff));
-  strncat(buff, OS_MACOSX_PLUGIN_DIR, sizeof(buff));
-  buff[sizeof(buff) - 1] = '\0';
+  strncpy(buff, cpath, 1024);
+  strncat(buff, OS_MACOSX_PLUGIN_DIR, 1024);
+  buff[1023] = '\0';
 
   paths[0] = buff;
   paths[1] = cpath;
