@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Jul-2004
+	- Peter Amstutz added the wxgl canvas (initially developed by
+	  Daniel Fryer) which makes it fairly easy to embed Crystal Space
+	  into a WxWindows application using wxGLCanvas.  Mouse
+	  and keyboard events are translated from WxWidgets to Crystal
+	  Space, so users have the option of using either the CS or
+	  WxWidgets event systems for getting input.  Note: currently
+	  only supports OpenGL; the software renderer cannot be used
+	  with this canvas.
 26-Jul-2004
 	- Eric Sunshine made the following changes:
 	    - Added 'install' targets to csjava/Jamfile.
