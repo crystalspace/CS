@@ -539,7 +539,7 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   current_lod = 1;
   current_features = 0;
   vbufmgr = NULL;
-  quaddiv_enabled = true;
+  quaddiv_enabled = false;
   quad_height = NULL;
   quad_normal = NULL;
   qd_framenum = 1;

@@ -14,6 +14,8 @@ The history order is reversed so that new features are at the top.
 	  removed the call to GetBezierCache().
 	- Eric Sunshine eliminated several overfull and underfull `hbox'
 	  warnings reported by TeX for msdos.txi and qtaws.txi.
+	- Temporarily disabled the experimental quaddiv in the landscape
+	  engine again because there seem to be some problems with it.
 28-Mar-2002
 	- Reverted part of 'res' changes to the lightmap checker because
 	  they cause big problems.
