@@ -254,7 +254,7 @@ csConfigFile::csConfigFile(const char *file, iVFS *vfs)
 
   Iterators = new csVector();
   Filename = NULL;
-  vfs = NULL;
+  VFS = NULL;
   Dirty = false;
   
   if (file) Load(file, vfs);
@@ -392,7 +392,7 @@ bool csConfigFile::SaveNow(const char *file, iVFS *vfs) const
     Filedata += '\n';
   }
 
-  if (VFS) {
+  if (vfs) {
     return vfs->WriteFile(file, Filedata.GetData(), Filedata.Length());
   } else {
     FILE *fp = fopen(file, "wb");
