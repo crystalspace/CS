@@ -26,6 +26,8 @@ The history order is reversed so that new features are at the top.
 	  cause the lightmaps to be updated correctly.
 	- Jorrit forgot to remove a parameter to the second version of
 	  ForceRelight().
+	- Eric Sunshine augmented the Jam system so that it now builds the
+	  new renderer if --enable-new-renderer was specified with configure.
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.
