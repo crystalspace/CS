@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+3-Nov-2002
+	- Keith Fulton implemented distance displacement between keyframes
+	  of a sprite3d animation.  New attribute "displacement" can be used
+	  in place of "delay" on frame definitions to indicate this.  Delays
+	  and displacements can be mixed in the same sprite and same anims if
+	  desired.  See http://www.gamasutra.com/features/20021018/hansson_01.htm
+	  for more info on how this eliminates the "skating" effect from
+	  walking or running sprite meshes.
 2-Nov-2002
 	- Completed implementation of the new listener system in
 	  iObjectModel. The next step will be to change the visibility
