@@ -488,7 +488,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
 		trigname);
 	    return NULL;
 	  }
-	  int oper;
+	  int oper = -1;
 	  float r,g,b;
 	  const char *operation = child->GetAttributeValue ("operator");
 	  if (!operation)
@@ -500,7 +500,7 @@ iSequenceTrigger* csLoader::LoadTrigger (iDocumentNode* node)
 	  r = child->GetAttributeValueAsFloat ("red");
 	  g = child->GetAttributeValueAsFloat ("green");
 	  b = child->GetAttributeValueAsFloat ("blue");
-	  csColor const c(r,g,b);
+	  const csColor c(r,g,b);
 	  trigger->AddConditionLightChange (light, oper, c);
 	}
 	break;
