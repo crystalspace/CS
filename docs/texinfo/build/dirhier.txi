@@ -137,9 +137,9 @@ BeOS
 @item CS/libs/cssys/djgpp
 @sc{dos} using the @sc{djgpp} compiler
 @item CS/libs/cssys/mac
-Macintosh
+MacOS/9
 @item CS/libs/cssys/next
-MacOS/X Server, OpenStep, NextStep
+MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, NextStep
 @item CS/libs/cssys/os2
 @sc{os/2}
 @item CS/libs/cssys/unix
@@ -164,7 +164,7 @@ This directory contains the common parts of the makefiles for many systems
 
 @table @code
 @item CS/mk/mwcw
-Project files for Macintosh CodeWarrior
+Project files for MacOS/9 CodeWarrior
 @item CS/mk/msvcgen
 Component for automatic generation of Visual C++ project files based upon
 information gleaned from @sc{gnu} makefiles project-wide.
@@ -205,9 +205,9 @@ Unix, using X
 @item CS/plugins/video/canvas/svgalib
 Unix, using @sc{svga}lib
 @item CS/plugins/video/canvas/mac
-Macintosh
+MacOS/9
 @item CS/plugins/video/canvas/next
-MacOS/X Server, OpenStep, NextStep
+MacOS/X, MacOS/X Server, OpenStep, NextStep
 @item CS/plugins/video/canvas/glide2common
 Common code for to Glide2 drivers
 @item CS/plugins/video/canvas/beglide2
@@ -219,7 +219,7 @@ Common code for all OpenGL 2D drivers
 @item CS/plugins/video/canvas/openglbe
 OpenGL 2D driver for BeOS
 @item CS/plugins/video/canvas/openglmac
-OpenGL 2D driver for Macintosh
+OpenGL 2D driver for MacOS/9
 @item CS/plugins/video/canvas/openglos2
 OpenGL 2D driver for @sc{os}/2
 @item CS/plugins/video/canvas/openglwin
@@ -272,12 +272,12 @@ will be the prefered way.
 
 @table @code
 @item CS/plugins/sound/driver
-System dependent sound drivers.  There are currently drivers for Macintosh,
+System dependent sound drivers.  There are currently drivers for MacOS/9,
 @sc{oss} (Linux), and Windows.
 
 @table @code
 @item CS/plugins/sound/driver/macsnd
-Sounddriver for Macintosh
+Sounddriver for MacOS/9
 @item CS/plugins/sound/driver/oss
 Sounddriver for Unix
 @item CS/plugins/sound/driver/waveoutsd

@@ -12,8 +12,8 @@ you really need depends on the situation (the map file). Just try it.
 
 @item
 Operating System: One of the supported systems. Currently supported
-are: Windows, Unix/Linux, MacOS/X Server, OpenStep, NextStep,
-OS/2, BeOS, Irix, MacOS, and MS-DOS.
+are: Windows, Unix/Linux, MacOS/X, MacOS/X Server, OpenStep,
+NextStep, OS/2, BeOS, MacOS/9, and MS-DOS.
 
 @item
 C++ Development Environment: Crystal Space must be built with a C++

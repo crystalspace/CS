@@ -38,9 +38,9 @@
 #include "itxtmgr.h"
 #include "ilghtmap.h"
 #include "igraph2d.h"
+#include "icfgnew.h"
 
 #include "csgeom/plane3.h"
-#include "csutil/inifile.h"
 #include "csutil/scanstr.h"
 #include "qint.h"
 

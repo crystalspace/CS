@@ -3,24 +3,22 @@
 @subsection Windows - Using @sc{msvc}++ Compiler
 @cindex Windows, Building
 
-@emph{Originally written by Dan Ogles @email{dogles@@peachtree.com}
+@emph{Originally written by Dan Ogles @email{dogles@@peachtree.com}.
+Updated by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com}; Thomas
+Hieber, @email{thieber@@gmx.net}; Frank O'Connor, @email{frank@@oconnors.org};
+Philip Wyett, @email{philip.wyett@@lineone.net}.
+Last updated February 13, 2001.}
 
-Updated by Nathaniel ``Noote'' Saint Martin, @email{noote@@bigfoot.com}, Thomas
-Hieber, @email{thieber@@gmx.net}, Frank O'Connor, @email{frank@@oconnors.org};
-Philip Wyett @email{philip.wyett@@lineone.net}.
-
-Last updated Feb 13, 2001.}
-
-The Windows port of Crystal Space is currently maintained by Philip Wyett,
+The Windows port of Crystal Space is currently maintained by Philip Wyett
 @email{philip.wyett@@lineone.net}.
 
 @menu
 * Win32 General:: General Information
 * Win32 MSVC5:: Special Notes for @sc{msvc} 5
-* Win32 Compile:: Compiling CS
-* Win32 Rundemo:: Running the demo apps
+* Win32 Compile:: Compiling
+* Win32 Rundemo:: Running the Demonstration Applications
 * Win32 Workspace:: Structure of the Workspace
-* Win32 User App:: Compiling your own Program using CS
+* Win32 User App:: Compiling Your Own Program Using Crystal Space
 * Win32 FAQ:: Frequently Asked Questions (@sc{faq})
 @end menu
 
@@ -119,7 +117,7 @@ it wasn't an important one!
 @end itemize
 
 @node Win32 Compile, Win32 Rundemo, Win32 MSVC5, Win32
-@subsubsection Compiling CS
+@subsubsection Compiling
 
 To compile Crystal Space, you'll have to perform the following steps.
 If anything doesn't work, see the Win32 @sc{faq}, @ref{Win32 FAQ}.
@@ -131,9 +129,13 @@ Load @file{CS\mk\visualc\csall.dsw}.
 @item
 Remove all projects you don't want to compile. To do this, right-click on
 the project in the list and select @emph{Unload Project}.
+Examples of projects which you don't want to compile might include
+@samp{plgopengl} if you do not have the OpenGL @sc{sdk}
+insatalled, or @samp{plgcspython} if you do not have the Python
+@sc{sdk} installed.
 
 @item
-Make @samp{grpAll} your active project.
+Make @samp{grpall} your active project.
 
 @item
 Select menu @emph{Build/Rebuild All}.
@@ -143,7 +145,7 @@ After a while the compilation should finish without errors.
 @end enumerate
 
 @node Win32 Rundemo, Win32 Workspace, Win32 Compile, Win32
-@subsubsection Running the demo apps
+@subsubsection Running the Demonstration Applications
 
 The first app you should try is @emph{Walktest}. This program shows many of
 the features of the 3d engine. You can run it either by starting it from the
@@ -153,15 +155,13 @@ select Walktest as the active project and then select
 
 If you want to run a debug session, you first have to set the working
 directory. Open @emph{Project/Settings}, select the appWalktest project,
-switch to the @emph{Debug} tab and enter the base CS directory as the
-working directory for debug sessions (for example, @file{c:\cs\}). Be sure
-to to this for @emph{Debug} and @emph{Release} builds. @*
-This is some sort of bug. We are currently looking for a way to add this to
-the CVS repository, so you don't have to set the directory yourself.
+switch to the @emph{Debug} tab and enter the base @file{CS} directory
+as the working directory for debug sessions (for example, @file{c:\cs\}).
+Be sure to to this for @emph{Debug} and @emph{Release} builds.
 
 You can now continue with the next platform-independent step. The remaining
 Windows-specific sections are only important when you want to compile your
-own application using CS.
+own application using Crystal Space.
 
 @node Win32 Workspace, Win32 User App, Win32 Rundemo, Win32
 @subsubsection Structure of the Workspace
@@ -180,13 +180,13 @@ The workspace uses a prefix system for naming the projects and grouping them.
 There are currently four prefixes in use.  The prefix @file{grp} is used to
 group the projects into the three main categories: @emph{libraries},
 @emph{plug-ins}, and @emph{applications}.  There is also a special group
-@samp{grpAll} that contains the three major groups @samp{grpLibs},
-@samp{grpApplications}, and @samp{grpPlugins}.
+@samp{grpall} that contains the three major groups @samp{grplibs},
+@samp{grpapps}, and @samp{grpplugins}.
 
 The @emph{Libraries} are C++ libraries that you can link into your own
-programs. Some of these libraries are part of the core of CS. You can find
-more information about this in @ref{Libraries}. Their output are @file{.LIB}
-files.
+programs. Some of these libraries are part of the core of Crystal Space.
+You can find more information about this in @ref{Libraries}. Their output
+are @file{.LIB} files.
 
 The @emph{Plugins} are also programming libraries, but they use a special
 mechanism called @sc{scf} as their interface to your program. This
@@ -201,20 +201,21 @@ The @emph{Applications} are programs using some of these libraries, so they
 produce @file{.EXE} files.
 
 @node Win32 User App, Win32 FAQ, Win32 Workspace, Win32
-@subsubsection Compiling your own Program using CS
+@subsubsection Compiling Your Own Program Using Crystal Space
 
 I assume that you have set up @sc{msvc} projects before. If you want to create
 a project using Crystal Space, you have two possibilities how to do this:
-You can either create the project inside the CS workspace, or you can create
-a new workspace. Either way, you have to do the usual setup, like adding the
-source files. In addition to this, you must:
+You can either create the project inside the Crystal Space workspace, or you
+can create a new workspace. Either way, you have to do the usual setup, like
+adding the source files. In addition to this, you must:
 
 @itemize @bullet
 @item
-Set the output path to the CS root directory. Any CS application must be
-executed in this directory. If you want to run it in another directory, you
-must move the files @file{scf.cfg} and @file{vfs.cfg}, the data directory and
-all plugins (@file{.DLL}) into this new directory.
+Set the output path to the @file{CS} root directory. Any Crystal Space
+application must be executed in this directory. If you want to run it in
+another directory, you must copy the files @file{scf.cfg} and
+@file{vfs.cfg}, the data directory and all plugins (@file{.DLL}) into
+this new directory.
 
 @item
 Set the include paths. Simply open one of the application projects coming
@@ -223,19 +224,20 @@ select @emph{Project Settings/C/C++} and copy all command line options
 that look like this: @samp{/I "../../anything"}.
 
 @item
-Add the CS libraries. If you are using the CS workspace, simply add
-dependencies to the CS projects. Otherwise you have to link to the
+Add the Crystal Space libraries. If you are using the Crystal Space
+workspace, simply add dependencies to the Crystal Space projects.
+Otherwise you have to link to the
 @file{.LIB} files. To do this, either add these files to the project like
 source files or add them as command line options in
 @emph{Project Settings/C/C++}.
 Note that if you add them like source files, you may not correctly
-use the debug version of CS in debug builds and the release version in
-release builds.
+use the debug version of Crystal Space in debug builds and the release
+version in release builds.
 
 @item
 Add external libraries (@file{zlib}, @file{libjpeg}, @file{DirectX}, ...).
-They can be added just like the CS libraries, except that you cannot use
-project dependencies.
+They can be added just like the Crystal Space libraries, except that
+you cannot use project dependencies.
 @end itemize
             
 @node Win32 FAQ, , Win32 User App, Win32

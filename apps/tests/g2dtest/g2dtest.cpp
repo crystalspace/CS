@@ -804,6 +804,6 @@ int main (int argc, char *argv[])
   }
 
   System.Loop ();
-
+  System.G2D->Close();
   return 0;
 }

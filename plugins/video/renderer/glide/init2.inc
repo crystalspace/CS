@@ -233,7 +233,7 @@
       iTMULightMap=0;
     } break;
   }
-  if(config->GetYesNo("Glide","FORCEMULTIPASS",FALSE)&& m_iMultiPass==false)
+  if(config->GetBool("Video.Glide.ForceMultipass",false)&& m_iMultiPass==false)
     {
       SysPrintf (MSG_INITIALIZATION, " MultiPass Rendering enable by user.\n");
       m_iMultiPass=true;

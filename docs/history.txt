@@ -4,6 +4,18 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine defined the missing DESCRIPTION.OS.beos variable in
 	  lib/cssys/beos/beos.mak.
 	- Eric Sunshine eliminated a compilation error in cfgfile.cpp on BeOS.
+	- Eric Sunshine eliminated a compilation warning in levtool.cpp on
+	  BeOS.
+	- Eric Sunshine finished the conversion of the Glide 3D driver to the
+	  new configuration file system.  This conversion had been started by
+	  someone else previously, but was incomplete.
+	- Eric Sunshine fixed g2dtest.cpp so that it now explicitly closes the
+	  iGraphics2D context which it creates (much like the 3D context is
+	  explicitly closed by 3D applications).
+	- Eric Sunshine began updating the documentation for the Apple/NeXT
+	  port:
+	    - Mentions new (untested) MacOS/X port.
+	    - Major changes in code and file organization.
 16-Feb-2001
 	- Dynamic lights do not traverse through mirroring portals anymore.
 	  This caused a bug because the dynamic lighting routine can't handle
