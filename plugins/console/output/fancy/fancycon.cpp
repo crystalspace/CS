@@ -224,9 +224,6 @@ void csFancyConsole::Draw3D (csRect *oArea)
   size.ymin +=  bordersize.ymin - deco.p2ty - deco.ty;
   size.ymax += -bordersize.ymax + deco.p2by + deco.by;
 
-  float hw = float (G3D->GetWidth () / 2);
-  float hh = float (G3D->GetHeight () / 2);
-
   static uint indices[4] = {0, 1, 2, 3};
   csVector3 vertices[4];
   csVector2 texels[4];
