@@ -43,7 +43,7 @@ class ClipperObjectStencil : public iClipperObject
 {
 public:
   ClipperObjectStencil(iGraphics3D *g3d, unsigned char layercount, gl_states_ext &states);
-  ~ClipperObjectStencil();
+  virtual ~ClipperObjectStencil();
 
   virtual void SetClipper(iClipper2D *clipper);
   virtual iClipper2D * GetCurClipper();
@@ -65,6 +65,5 @@ private:
   iClipper2D *  m_curclip;  
   iGraphics3D * m_g3d;
 };
-
 
 #endif

@@ -67,7 +67,7 @@ class csVertexBufferManagerEXT : public iVertexBufferManager
 
 public:
     csVertexBufferManagerEXT(iObjectRegistry* object_reg);
-    ~csVertexBufferManagerEXT();
+    virtual ~csVertexBufferManagerEXT();
  
    SCF_DECLARE_IBASE;
 

@@ -564,5 +564,3 @@ void csGraphics3DGLext::Report (int severity, const char* msg, ...)
 /* -----------------------------------------------------------------
  * Private Function Defintions
  * ----------------------------------------------------------------- */
-
-

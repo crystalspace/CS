@@ -36,5 +36,4 @@ struct gl_states_ext
   bool glcsenabled_texture_coord_array;
 };
 
-
 #endif
