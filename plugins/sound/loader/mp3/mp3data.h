@@ -16,11 +16,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CS_OGG_SOUNDDATA_H_
-#define _CS_OGG_SOUNDDATA_H_
+#ifndef _CS_MP3_SOUNDDATA_H_
+#define _CS_MP3_SOUNDDATA_H_
 
 /**
- * iSoundData implementation for ogg bitdata. Hmm, sounds ogg.
+ * iSoundData implementation for mp3 bitdata.
  */
 
 #include "isound/data.h"
