@@ -299,6 +299,11 @@ public:
   //----------------------------------------------------------------------
 
   /**
+   * Prepare this sector for drawing.
+   */
+  void PrepareDraw (iRenderView* rview);
+
+  /**
    * Draw the sector in the given view and with the given transformation.
    */
   void Draw (iRenderView* rview);

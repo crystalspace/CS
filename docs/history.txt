@@ -24,6 +24,7 @@ The history order is reversed so that new features are at the top.
 	- Bugplug no longer depends on the existance of the font server.
 	- OpenGL canvases no longer depend on the existance of the font
 	  server.
+	- Cleaned up csSector a bit. Added PrepareDraw().
 23-Jan-2003
 	- Fixed genmesh so it compiles again.
 	- Fixed effects plugin so it compiles again.

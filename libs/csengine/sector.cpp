@@ -449,6 +449,62 @@ iPolygon3D *csSector::IntersectSphere (
   return min_p;
 }
 
+void csSector::PrepareDraw (iRenderView *rview)
+{
+  draw_busy++;
+
+  // Make sure the visibility culler is loaded.
+  GetVisibilityCuller ();
+
+  int i;
+  iCamera *icam = rview->GetCamera ();
+  rview->SetThisSector (&scfiSector);
+
+  i = sector_cb_vector.Length ()-1;
+  while (i >= 0)
+  {
+    iSectorCallback* cb = sector_cb_vector.Get (i);
+    cb->Traverse (&scfiSector, rview);
+    i--;
+  }
+
+  // Here we check all render queues to see if there is a render queue
+  // that has the 'do_camera' flag set. If so then we check all meshes
+  // in that render queue to see if there is one that has CS_ENTITY_CAMERA
+  // set. If so we move that mesh to the right position.
+  for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
+  {
+    if (csEngine::current_engine->GetRenderPriorityCamera (i))
+    {
+      csMeshVectorNodelete* mv = RenderQueues.GetQueue (i);
+      if (mv)
+      {
+        int j;
+	for (j = 0 ; j < mv->Length () ; j++)
+	{
+	  iMeshWrapper* m = mv->Get (j);
+	  if (m->GetFlags ().Check (CS_ENTITY_CAMERA))
+	  {
+	    iMovable* mov = m->GetMovable ();
+	    // Temporarily move the object to the current camera.
+	    csReversibleTransform &mov_trans = mov->GetTransform ();
+// @@@ TEMPORARY: now CS_ENTITY_CAMERA only works at 0,0,0 position.
+mov_trans.SetOrigin (csVector3 (0));
+	    csVector3 old_movable_pos = mov_trans.GetOrigin ();
+	    iCamera *orig_cam = rview->GetOriginalCamera ();
+	    csOrthoTransform &orig_trans = orig_cam->GetTransform ();
+	    csVector3 v = orig_trans.GetO2TTranslation ();
+	    mov_trans.SetOrigin (mov_trans.GetOrigin () + v);
+	    mov->UpdateMove ();
+    //mov_trans.SetOrigin (old_movable_pos);
+    //movable.UpdateMove ();
+	  }
+	}
+      }
+    }
+  }
+}
+
 /*
  * @@@ THE NOTES BELOW ARE MOSTLY OBSOLETE NOW. I DON'T REMOVE THEM
  * BECAUSE THERE IS STILL A GRAIN OF USEFUL INFORMATION IN THEM.
@@ -569,60 +625,10 @@ iPolygon3D *csSector::IntersectSphere (
  */
 void csSector::Draw (iRenderView *rview)
 {
-  draw_busy++;
-
-  // Make sure the visibility culler is loaded.
-  GetVisibilityCuller ();
-
-  int i;
-  iCamera *icam = rview->GetCamera ();
-  rview->SetThisSector (&scfiSector);
-
-  i = sector_cb_vector.Length ()-1;
-  while (i >= 0)
-  {
-    iSectorCallback* cb = sector_cb_vector.Get (i);
-    cb->Traverse (&scfiSector, rview);
-    i--;
-  }
-
-  // Here we check all render queues to see if there is a render queue
-  // that has the 'do_camera' flag set. If so then we check all meshes
-  // in that render queue to see if there is one that has CS_ENTITY_CAMERA
-  // set. If so we move that mesh to the right position.
-  for (i = 0 ; i < RenderQueues.GetQueueCount () ; i++)
-  {
-    if (csEngine::current_engine->GetRenderPriorityCamera (i))
-    {
-      csMeshVectorNodelete* mv = RenderQueues.GetQueue (i);
-      if (mv)
-      {
-        int j;
-	for (j = 0 ; j < mv->Length () ; j++)
-	{
-	  iMeshWrapper* m = mv->Get (j);
-	  if (m->GetFlags ().Check (CS_ENTITY_CAMERA))
-	  {
-	    iMovable* mov = m->GetMovable ();
-	    // Temporarily move the object to the current camera.
-	    csReversibleTransform &mov_trans = mov->GetTransform ();
-// @@@ TEMPORARY: now CS_ENTITY_CAMERA only works at 0,0,0 position.
-mov_trans.SetOrigin (csVector3 (0));
-	    csVector3 old_movable_pos = mov_trans.GetOrigin ();
-	    iCamera *orig_cam = rview->GetOriginalCamera ();
-	    csOrthoTransform &orig_trans = orig_cam->GetTransform ();
-	    csVector3 v = orig_trans.GetO2TTranslation ();
-	    mov_trans.SetOrigin (mov_trans.GetOrigin () + v);
-	    mov->UpdateMove ();
-    //mov_trans.SetOrigin (old_movable_pos);
-    //movable.UpdateMove ();
-	  }
-	}
-      }
-    }
-  }
-
 #ifndef CS_USE_NEW_RENDERER
+  PrepareDraw (rview);
+  iCamera *icam = rview->GetCamera ();
+  int i;
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
@@ -806,21 +812,9 @@ mov_trans.SetOrigin (csVector3 (0));
 #ifdef CS_USE_NEW_RENDERER
 void csSector::DrawZ (iRenderView* rview)
 {
-  draw_busy++;
-
-  // Make sure the visibility culler is loaded.
-  GetVisibilityCuller ();
-
+  PrepareDraw (rview);
+  iCamera *icam = rview->GetCamera ();
   int i;
-  rview->SetThisSector (&scfiSector);
-
-  i = sector_cb_vector.Length ()-1;
-  while (i >= 0)
-  {
-    iSectorCallback* cb = sector_cb_vector.Get (i);
-    cb->Traverse (&scfiSector, rview);
-    i--;
-  }
 
   // Mark visible objects.
   culler->VisTest (rview);
