@@ -12,6 +12,22 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+23-Feb-2000
+	- Michael Dale Long did the following changes to Crystal Clear:
+	    - More csConsole bugfixes.
+	    - Added following new methods to csString:
+		LTrim() - Trims all whitespace from left side of string.
+		RTrim() - Trims all whitespace from right side of string.
+		Trim() - Does both LTrim() and RTrim().
+		Collapse() - Does Trim(), then collapses any interior whitespace, i.e.
+     	            "  Hi   There    " becomes "Hi There".
+		Also added a Format() function to provide printf capabilities,
+		but it is disabled because the function needed to do the
+		operation safely (vsnprintf) is not available on all the
+		platforms CS supports.
+	    - Used new csString functionality to enhance cctest's console.
+	    - Fixed a minor compile bug in cspython that cropped up a while back.
+	- Gary Haussmann removed extraneous include of ext_w32.h file in OpenGL.
 22-Feb-2000
 	- Gary Haussmann fixed another mipmap bug in the OpenGL rasterizer.
 	  The problem was that the maximum mipmap level required is actually
@@ -28,8 +44,19 @@ Short-term cleanups that need to be done:
 	  The problem was that creation of mipmap level 0 did not respect the
 	  csPixelFormat properties of the target system, thus resulting in
 	  corrupted colors on some platforms.
+	- Simplified the BSP splitter and also added a criterium that should
+	  create a tree which is both more balanced and minimizes splits.
+	  Unfortunatelly the tree does not seem to be as good with this new
+	  splitter in comparison to just minimzing splits.
+	- Removed the old and obsolete support for dynamic polygons in polygon
+	  trees. This is not supported through other means.
 	- Martin Geisse submitted updates to some of the Texinfo documents
 	  which improve formatting.
+	- Thomas Hieber worked around a workaround from Eric Sunshine in MazeD.
+	- Some changes to physics library from Michael Ewert.
+	- Daniel Fannar Gudbjartsson did a few small changes to the physics
+	  library. He fixed several bugs.
+	- Robert Bate updated the Macintosh project files.
 21-Feb-2000
 	- Martin Geisse submitted more Texinfo conversions of the LaTeX files
 	  from newdoc.  These files still need a lot of work, but it is a
