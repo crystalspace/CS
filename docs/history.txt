@@ -47,6 +47,9 @@ The history order is reversed so that new features are at the top.
 	  message.
 	- Eric Sunshine eliminated a compiler warning from polytext.cpp where
 	  it was trying to implicitly convert (void*) to (iLight*).
+	- Eric Sunshine removed some unnecessary and incorrectly used `-F'
+	  directives from CFLAGS in the MacOS/X, MacOS/X Server 1.0, and
+	  OpenStep makefiles.
 11-Aug-2001
 	- Michael Voase made the following change: Texture manager (all
 	  drivers): Removed GetRefCount() kludge in the delete method.  This

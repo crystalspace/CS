@@ -88,7 +88,7 @@
 //	keymapping resource.  This is the only known documentation regarding
 //	the layout of keymapping resources.
 //
-//	This file (NeXTKeymap.cpp) makes no attempt to describe the layout of a
+//	This file (NeXTKeymap.m) makes no attempt to describe the layout of a
 //	keymapping resource nor is the actual extraction method explained.  For
 //	an exhaustively detailed explanation of each of these topics, refer
 //	instead to the original dumpkeymap package.
