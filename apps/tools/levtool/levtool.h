@@ -175,8 +175,6 @@ public:
    */
   void RemoveDuplicateVertices ();
 
-  void CreateBoundingBox ();
-
   /**
    * Warning! Don't call this function BEFORE CompressVertices(),
    * RemoveUnusedVertices(), or RemoveDuplicateVertices().
@@ -184,6 +182,25 @@ public:
    * a table of all polygon indices that use these vertices.
    */
   void CreateVertexInfo ();
+
+  /**
+   * Duplicate all vertices so that all polygons use distinct
+   * vertices (no longer connected to each other).
+   */
+  void DuplicateSharedVertices ();
+
+  /// Create a bounding box for this thing.
+  void CreateBoundingBox ();
+  /// Get the bounding box.
+  const csBox3& GetBoundingBox () const { return bbox; }
+
+  /**
+   * Warning! Call this function AFTER DuplicateSharedVertices().
+   * This function will divide this object in 8 sub-objects by
+   * taking the center point and then distributing all polygons
+   * according to that center point.
+   */
+  void SplitThingInCenter ();
 
   /**
    * Warning! Call this function AFTER CreateVertexInfo().
@@ -282,11 +299,6 @@ public:
   	int obj_number);
 
   /**
-   * Clone a document but split all things in the process.
-   */
-  void CloneAndSplit (iDocumentNode* node, iDocumentNode* newnode);
-
-  /**
    * Split a thing and output on the given parent node (a sector node).
    */
   void SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode);
@@ -294,7 +306,14 @@ public:
   /**
    * Clone a document but split all things in the process.
    */
-  void CloneAndSplit (iDocument* doc, iDocument* newdoc);
+  void CloneAndSplitDynavis (iDocumentNode* node, iDocumentNode* newnode,
+  	bool is_dynavis);
+
+  /**
+   * Clone a document but split all things in the process.
+   */
+  void CloneAndSplitDynavis (iDocument* doc, iDocument* newdoc,
+  	bool is_dynavis);
 
   /**
    * Clone a node and children.

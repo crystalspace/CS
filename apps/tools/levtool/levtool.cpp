@@ -490,6 +490,31 @@ void ltThing::PaintConnectedPolygons (ltPolygon* sweep, int obj_number)
   }
 }
 
+void ltThing::SplitThingInCenter ()
+{
+  const csVector3& center = bbox.GetCenter ();
+  max_obj_number = 7;
+  int i, j;
+  for (i = 0 ; i < num_polygons ; i++)
+  {
+    ltPolygon* p = polygons[i];
+    int where = 0;
+    for (j = 0 ; j < p->GetVertexCount () ; j++)
+    {
+      ltVertex* vt = vertices[p->GetVertex (j)];
+      if (vt->x < center.x) where |= 1;
+      if (vt->y < center.y) where |= 2;
+      if (vt->z < center.z) where |= 4;
+    }
+    p->SetObjectNumber (where);
+    for (j = 0 ; j < p->GetVertexCount () ; j++)
+    {
+      ltVertex* vt = vertices[p->GetVertex (j)];
+      vt->SetObjectNumber (where);
+    }
+  }
+}
+
 void ltThing::SplitThingSeperateUnits ()
 {
   max_obj_number = -1;
@@ -558,6 +583,35 @@ int* ltThing::CreateUnitMapping (int obj_number)
   }
 
   return map;
+}
+
+void ltThing::DuplicateSharedVertices ()
+{
+  int i;
+  int total_vt = 0;
+  for (i = 0 ; i < num_polygons ; i++)
+  {
+    total_vt += polygons[i]->GetVertexCount ();
+  }
+  ltVertex** new_vt = new ltVertex* [total_vt];
+  int vt_idx = 0; 
+  for (i = 0 ; i < num_polygons ; i++)
+  {
+    ltPolygon* p = polygons[i];
+    int* idx = p->GetVertexIndices ();
+    int j;
+    for (j = 0 ; j < p->GetVertexCount () ; j++)
+    {
+      new_vt[vt_idx] = new ltVertex ();
+      new_vt[vt_idx]->Set ((const csVector3&) *vertices[idx[j]]);
+      idx[j] = vt_idx;
+      vt_idx++;
+    }
+  }
+  CS_ASSERT (total_vt == vt_idx);
+  delete[] vertices;
+  vertices = new_vt;
+  num_vertices = max_vertices = total_vt;
 }
 
 //-----------------------------------------------------------------------------
@@ -798,15 +852,17 @@ void LevTool::WriteOutThing (iDocumentNode* params_node, ltThing* th,
       for (i = 0 ; i < th->GetPolygonCount () ; i++)
       {
         ltPolygon* p = th->GetPolygon (i);
-	if (p->GetObjectNumber () == obj_number
-		&& p->GetNode ()->Equals (child))
+	if (p->GetNode ()->Equals (child))
 	{
-	  csRef<iDocumentNode> newchild = params_node->CreateNodeBefore (
-	    CS_NODE_ELEMENT);
-	  newchild->SetValue ("p");
-	  if (p->GetName ())
-	    newchild->SetAttribute ("name", p->GetName ());
-	  WriteOutPolygon (newchild, p, mapping);
+	  if (p->GetObjectNumber () == obj_number)
+	  {
+	    csRef<iDocumentNode> newchild = params_node->CreateNodeBefore (
+	      CS_NODE_ELEMENT);
+	    newchild->SetValue ("p");
+	    if (p->GetName ())
+	      newchild->SetAttribute ("name", p->GetName ());
+	    WriteOutPolygon (newchild, p, mapping);
+	  }
 	  break;
 	}
       }
@@ -837,7 +893,6 @@ void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
     if (th->GetMeshNode ()->Equals (meshnode))
     {
       if (th->GetPolygonCount () == 0) continue;
-
       int j;
       for (j = 0 ; j <= th->GetMaxObjectNumber () ; j++)
       {
@@ -853,12 +908,14 @@ void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
 	if (j == 0)
 	{
           newmesh->SetAttribute ("name", th->GetName ());
+	  printf ("Processing '%s' ...\n", th->GetName ()); fflush (stdout);
 	}
 	else
 	{
 	  char newname[512];
 	  sprintf (newname, "%s_%d", th->GetName (), j);
           newmesh->SetAttribute ("name", newname);
+	  printf ("Processing '%s' ...\n", newname); fflush (stdout);
 	}
 
         csRef<iDocumentNodeIterator> it = meshnode->GetNodes ();
@@ -894,7 +951,8 @@ void LevTool::SplitThing (iDocumentNode* meshnode, iDocumentNode* parentnode)
   }
 }
 
-void LevTool::CloneAndSplit (iDocumentNode* node, iDocumentNode* newnode)
+void LevTool::CloneAndSplitDynavis (iDocumentNode* node, iDocumentNode* newnode,
+	bool is_dynavis)
 {
   const char* parentvalue = node->GetValue ();
 
@@ -928,7 +986,7 @@ void LevTool::CloneAndSplit (iDocumentNode* node, iDocumentNode* newnode)
     {
       SplitThing (child, newnode);
     }
-    else if (is_sector && child->GetType () == CS_NODE_ELEMENT &&
+    else if (is_dynavis && is_sector && child->GetType () == CS_NODE_ELEMENT &&
     	(!strcmp (value, "culler")))
     {
       csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
@@ -942,13 +1000,13 @@ void LevTool::CloneAndSplit (iDocumentNode* node, iDocumentNode* newnode)
     {
       csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
       	child->GetType ());
-      CloneAndSplit (child, newchild);
+      CloneAndSplitDynavis (child, newchild, is_dynavis);
     }
     else if (is_world && !strcmp (value, "sector"))
     {
       csRef<iDocumentNode> newchild = newnode->CreateNodeBefore (
       	child->GetType ());
-      CloneAndSplit (child, newchild);
+      CloneAndSplitDynavis (child, newchild, is_dynavis);
     }
     else
     {
@@ -959,13 +1017,13 @@ void LevTool::CloneAndSplit (iDocumentNode* node, iDocumentNode* newnode)
         settingsnode = newchild;
     }
   }
-  if (is_world && settingsnode == NULL)
+  if (is_dynavis && is_world)
   {
-    settingsnode = newnode->CreateNodeBefore (CS_NODE_ELEMENT);
-    settingsnode->SetValue ("settings");
-  }
-  if (is_world)
-  {
+    if (settingsnode == NULL)
+    {
+      settingsnode = newnode->CreateNodeBefore (CS_NODE_ELEMENT);
+      settingsnode->SetValue ("settings");
+    }
     bool found = false;
     csRef<iDocumentNodeIterator> it = settingsnode->GetNodes ();
     while (it->HasNext ())
@@ -989,11 +1047,12 @@ void LevTool::CloneAndSplit (iDocumentNode* node, iDocumentNode* newnode)
   }
 }
 
-void LevTool::CloneAndSplit (iDocument* doc, iDocument* newdoc)
+void LevTool::CloneAndSplitDynavis (iDocument* doc, iDocument* newdoc,
+	bool is_dynavis)
 {
   csRef<iDocumentNode> root = doc->GetRoot ();
   csRef<iDocumentNode> newroot = newdoc->CreateRoot ();
-  CloneAndSplit (root, newroot);
+  CloneAndSplitDynavis (root, newroot, is_dynavis);
 }
 
 void LevTool::CloneNode (iDocumentNode* from, iDocumentNode* to)
@@ -1182,11 +1241,14 @@ LevTool::~LevTool ()
 #define OP_LIST 1
 #define OP_DYNAVIS 2
 #define OP_VALIDATE 3
-
-#define FLAG_NOSPLIT 1
-#define FLAG_NOCOMPRESS 2
+#define OP_SPLITUNIT 4
+#define OP_SPLITGEOM 5
+#define OP_COMPRESS 6
+#define OP_ANALYZE 7
 
 //----------------------------------------------------------------------------
+
+// @@@ TODO: ignore movable things for splitting!
 
 void LevTool::Main ()
 {
@@ -1199,18 +1261,45 @@ void LevTool::Main ()
   if (cmdline->GetOption ("help"))
   {
     printf ("levtool <options> <zipfile>\n");
-    printf ("  -list: list world contents\n");
-    printf ("  -validate: validate world contents\n");
-    printf ("  -dynavis: convert to Dynavis\n");
-    printf ("      -nosplit: don't split parts in seperate units\n");
-    printf ("      -nocompress: don't compress vertices (implies -nosplit)\n");
+    printf ("  -list:      List world contents.\n");
+    printf ("  -analyze:   Analyze all things and show the distribution of size.\n");
+    printf ("              You can use this to decide on the 'minsize' parameter.\n");
+    printf ("  -validate:  Validate world contents. This will currently check\n");
+    printf ("              only for non-coplanar polygons.\n");
+    printf ("  -compress : Compress all vertices and remove duplicate and unused vertices.\n");
+    printf ("              Unless you specify -nocompress, -dynavis does this by default.\n");
+    printf ("  -dynavis:   Convert to Dynavis. This takes a level that uses\n");
+    printf ("              old style octree culler and convert it to Dynavis.\n");
+    printf ("              All objects will be split in their logical parts.\n");
+    printf ("  -splitunit: Split large things into seperate units. A seperate unit\n");
+    printf ("              is defined as a collection of connected polygons that doesn't\n");
+    printf ("              connect with any other polygon from the thing.\n");
+    printf ("              This option will first do -compress.\n");
+    printf ("              -minsize=<percent>: Only split objects larger than the given\n");
+    printf ("              percentage. Default 20%%.\n");
+    printf ("  -splitgeom: Split large things geometrically. After doing this you\n");
+    printf ("              should run levtool with -compress option for efficiency.\n");
+    printf ("              -minsize=<percent>: Only split objects larger than the given\n");
+    printf ("              percentage. Default 20%%.\n");
     exit (0);
   }
+
   if (cmdline->GetOption ("dynavis")) op = OP_DYNAVIS;
   if (cmdline->GetOption ("list")) op = OP_LIST;
+  if (cmdline->GetOption ("analyze")) op = OP_ANALYZE;
   if (cmdline->GetOption ("validate")) op = OP_VALIDATE;
-  if (cmdline->GetOption ("nosplit")) flag = FLAG_NOSPLIT;
-  if (cmdline->GetOption ("nocompress")) flag = FLAG_NOCOMPRESS;
+  if (cmdline->GetOption ("splitunit")) op = OP_SPLITUNIT;
+  if (cmdline->GetOption ("splitgeom")) op = OP_SPLITGEOM;
+  if (cmdline->GetOption ("compress")) op = OP_COMPRESS;
+
+  int minsize = 20;
+  {
+    const char* minsize_arg = cmdline->GetOption ("minsize");
+    if (minsize_arg != NULL)
+    {
+      sscanf (minsize_arg, "%d", &minsize_arg);
+    }
+  }
 
   const char* val = cmdline->GetName ();
   if (!val)
@@ -1267,12 +1356,59 @@ void LevTool::Main ()
 	ValidateContents ();
       }
       break;
+
     case OP_LIST:
       {
 	AnalyzePluginSection (doc);
         ListContents (doc->GetRoot ());
       }
       break;
+
+    case OP_ANALYZE:
+      {
+	AnalyzePluginSection (doc);
+	FindAllThings (doc);
+	csBox3 global_bbox;
+	global_bbox.StartBoundingBox ();
+	int i;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  th->CreateBoundingBox ();
+	  global_bbox += th->GetBoundingBox ();
+	}
+	printf ("Global bounding box: (%g,%g,%g) - (%g,%g,%g)\n",
+		global_bbox.MinX (), global_bbox.MinY (), global_bbox.MinZ (),
+		global_bbox.MaxX (), global_bbox.MaxY (), global_bbox.MaxZ ());
+	float global_area = (global_bbox.MaxX () - global_bbox.MinX ()) *
+		     (global_bbox.MaxY () - global_bbox.MinY ()) *
+		     (global_bbox.MaxZ () - global_bbox.MinZ ());
+	global_area = pow (global_area, 1./3.);
+        int counts[51];
+	for (i = 0 ; i <= 50 ; i++)
+	  counts[i] = 0;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  const csBox3& b = th->GetBoundingBox ();
+	  float area = (b.MaxX () - b.MinX ()) *
+		     (b.MaxY () - b.MinY ()) *
+		     (b.MaxZ () - b.MinZ ());
+	  area = pow (area, 1./3.);
+	  int where = int (50 * (area / global_area));
+	  counts[where]++;
+	}
+	int sum = 0;
+	for (i = 0 ; i <= 50 ; i++)
+	{
+	  sum += counts[i];
+	  printf ("  %3d%% #local=%-5d #<=thissize=%d\n", i*2,
+	  	counts[i], sum);
+	}
+	fflush (stdout);
+      }
+      break;
+
     case OP_DYNAVIS:
       {
 	AnalyzePluginSection (doc);
@@ -1283,22 +1419,138 @@ void LevTool::Main ()
 	for (i = 0 ; i < things.Length () ; i++)
 	{
 	  ltThing* th = (ltThing*)things.Get (i);
-	  if (!(flag & FLAG_NOCOMPRESS))
-	  {
-	    th->CompressVertices ();
-	    th->RemoveUnusedVertices ();
-	    th->RemoveDuplicateVertices ();
-	    th->CreateVertexInfo ();
-	    if (flag & FLAG_NOSPLIT)
-	      th->DoNotSplitThingSeperateUnits ();
-	    else
-	      th->SplitThingSeperateUnits ();
-	  }
+	  th->CreateVertexInfo ();
+	  th->DoNotSplitThingSeperateUnits ();
 	}
 
-	CloneAndSplit (doc, newdoc);
+	CloneAndSplitDynavis (doc, newdoc, true);
         error = newdoc->Write (vfs, filename);
-	//error = newdoc->Write (vfs, "/this/world");
+	if (error != NULL)
+	{
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
+	}
+      }
+      break;
+
+    case OP_COMPRESS:
+      {
+	AnalyzePluginSection (doc);
+	FindAllThings (doc);
+	csRef<iDocument> newdoc = xml->CreateDocument ();
+
+	int i;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  th->CompressVertices ();
+	  th->RemoveUnusedVertices ();
+	  th->RemoveDuplicateVertices ();
+	  th->CreateVertexInfo ();
+	  th->DoNotSplitThingSeperateUnits ();
+	}
+
+	CloneAndSplitDynavis (doc, newdoc, false);
+        error = newdoc->Write (vfs, filename);
+	if (error != NULL)
+	{
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
+	}
+      }
+      break;
+
+    case OP_SPLITUNIT:
+      {
+	AnalyzePluginSection (doc);
+	FindAllThings (doc);
+	csRef<iDocument> newdoc = xml->CreateDocument ();
+
+	csBox3 global_bbox;
+	global_bbox.StartBoundingBox ();
+	int i;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  th->CompressVertices ();
+	  th->RemoveUnusedVertices ();
+	  th->RemoveDuplicateVertices ();
+	  th->CreateVertexInfo ();
+	  th->CreateBoundingBox ();
+	  global_bbox += th->GetBoundingBox ();
+	}
+
+	float global_area = (global_bbox.MaxX () - global_bbox.MinX ()) *
+		     (global_bbox.MaxY () - global_bbox.MinY ()) *
+		     (global_bbox.MaxZ () - global_bbox.MinZ ());
+	global_area = pow (global_area, 1./3.);
+
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  const csBox3& b = th->GetBoundingBox ();
+	  float area = (b.MaxX () - b.MinX ()) *
+		     (b.MaxY () - b.MinY ()) *
+		     (b.MaxZ () - b.MinZ ());
+	  area = pow (area, 1./3.);
+	  int where = int (100 * (area / global_area));
+	  if (where >= minsize)
+	    th->SplitThingSeperateUnits ();
+	  else
+	    th->DoNotSplitThingSeperateUnits ();
+        }
+
+	CloneAndSplitDynavis (doc, newdoc, false);
+        error = newdoc->Write (vfs, filename);
+	if (error != NULL)
+	{
+	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);
+	  return;
+	}
+      }
+      break;
+
+    case OP_SPLITGEOM:
+      {
+	AnalyzePluginSection (doc);
+	FindAllThings (doc);
+	csRef<iDocument> newdoc = xml->CreateDocument ();
+
+	csBox3 global_bbox;
+	global_bbox.StartBoundingBox ();
+	int i;
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  th->CreateBoundingBox ();
+	  global_bbox += th->GetBoundingBox ();
+	}
+
+	float global_area = (global_bbox.MaxX () - global_bbox.MinX ()) *
+		     (global_bbox.MaxY () - global_bbox.MinY ()) *
+		     (global_bbox.MaxZ () - global_bbox.MinZ ());
+	global_area = pow (global_area, 1./3.);
+
+	for (i = 0 ; i < things.Length () ; i++)
+	{
+	  ltThing* th = (ltThing*)things.Get (i);
+	  const csBox3& b = th->GetBoundingBox ();
+	  float area = (b.MaxX () - b.MinX ()) *
+		     (b.MaxY () - b.MinY ()) *
+		     (b.MaxZ () - b.MinZ ());
+	  area = pow (area, 1./3.);
+	  int where = int (100 * (area / global_area));
+	  if (where >= minsize)
+	  {
+	    th->DuplicateSharedVertices ();
+	    th->SplitThingInCenter ();
+	  }
+	  else
+	    th->DoNotSplitThingSeperateUnits ();
+        }
+
+	CloneAndSplitDynavis (doc, newdoc, false);
+        error = newdoc->Write (vfs, filename);
 	if (error != NULL)
 	{
 	  ReportError ("Error writing '%s': %s!", (const char*)filename, error);

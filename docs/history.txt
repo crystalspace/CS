@@ -4,6 +4,18 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the engine where children of mesh objects wouldn't
 	  get registered to the visibility culler. This could cause culling
 	  errors and it would also cause HitBeam to fail on mesh children.
+	- Changed levtool to work in seperate steps. The -dynavis option
+	  will only split in parts now. After that you can run -splitunit
+	  to split in seperate units (takes a long time on large
+	  levels).
+	- Added -analyze to levtool so you can see the distribution
+	  of objects and their relative size to the global bounding box.
+	- Added -compress to levtool to compress all vertices (remove
+	  duplicates and unused vertices). -dynavis no longer does
+	  this by itself but -splitunit still does.
+	- Added -splitgeom which will try to split all large objects
+	  (using -minsize option which defaults to 20%) into smaller
+	  objects (i.e. it will divide them in 8 sub-objects).
 5-Dec-2002
 	- 'levtool' will now split all parts in seperate units. A unit
 	  is defined as a set of polygons that are connected and that
