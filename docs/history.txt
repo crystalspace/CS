@@ -42,8 +42,8 @@ chronological order.
 	- Eric Sunshine propagated the CS_EMIT_BUILD_PROPERTY(),
 	  CS_EMIT_BUILD_RESULT(), and CS_EMIT_BUILD_FLAGS() Autoconf macros out
 	  of configure.ac and into the new CS/mk/autoconf/emit.m4.  These
-	  macros are now sufficiently generic for use in external projects now
-	  that the legacy GNU make-based build system has been removed.
+	  macros are sufficiently generic for use in external projects now that
+	  the legacy GNU make-based build system has been removed.
 	- Eric Sunshine added a --disable-make-emulation switch to configure.ac
 	  which allows the user to disable synthesis of the new makefile
 	  emulation layer.
