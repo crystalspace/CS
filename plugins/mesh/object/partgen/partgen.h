@@ -26,7 +26,6 @@
 #include "csutil/csvector.h"
 #include "ivideo/igraph3d.h"
 #include "imesh/imeshobj.h"
-#include "iengine/imeshobj.h"
 #include "imesh/impartic.h"
 #include "imesh/iparticl.h"
 

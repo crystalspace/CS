@@ -35,7 +35,6 @@
 #include "ivideo/imater.h"
 #include "iengine/imater.h"
 #include "imesh/imeshobj.h"
-#include "iengine/imeshobj.h"
 #include "iutil/iconfig.h"
 
 struct iSystem;

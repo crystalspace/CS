@@ -23,7 +23,6 @@
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"
 #include "imesh/imeshobj.h"
-#include "iengine/imeshobj.h"
 #include "imesh/imcube.h"
 #include "ivideo/igraph3d.h"
 #include "iutil/iconfig.h"
