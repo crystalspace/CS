@@ -1967,6 +1967,9 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle,
         pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA100];
       }
       break;
+    case FX_Transparent:
+      pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA100];
+      break;
     case FX_Copy:
     default:
       pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_COPY];
