@@ -25,7 +25,7 @@
 #include "csutil/util.h"
 #include "qint.h"
 #include "video/canvas/common/graph2d.h"
-#include "video/canvas/openglcommon/iglstates.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 #include "gl2d_font.h"
 

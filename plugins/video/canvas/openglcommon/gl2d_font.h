@@ -29,7 +29,7 @@
 #include "csutil/csvector.h"
 #include "ivideo/fontserv.h"
 #include "video/canvas/common/graph2d.h"
-#include "video/canvas/openglcommon/iglstates.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 // Define the following macro to use glBitmap() text drawing approach
 // rather than default "font-on-a-texture" approach.
@@ -118,7 +118,7 @@ protected:
   // Graphics2D
   csRef<iGraphics2D> g2d;
   // State cache
-  iGLStateCache *statecache;
+  csGLStateCache *statecache;
 #ifndef OPENGL_BITMAP_FONT
   // Auxiliary routine for "font-on-a-texture" approach
   bool ClipRect (float x, float y,

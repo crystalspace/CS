@@ -172,7 +172,7 @@ SCF_IMPLEMENT_IBASE (csGraphics3DOGLCommon::EventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
-iGLStateCache* csGraphics3DOGLCommon::statecache = NULL;
+csGLStateCache* csGraphics3DOGLCommon::statecache = NULL;
 
 #define USE_OGL_EXT(ext) \
   bool csGraphics3DOGLCommon::ext = false;

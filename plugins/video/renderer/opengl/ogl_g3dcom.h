@@ -44,7 +44,7 @@
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "video/canvas/openglcommon/iogl.h"
-#include "video/canvas/openglcommon/iglstates.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 #include "ivideo/effects/efserver.h"
 #include "ivideo/effects/efclient.h"
@@ -189,7 +189,7 @@ class csGraphics3DOGLCommon : public iGraphics3D
 public:
   static csGraphics3DOGLCommon* ogl_g3d;
 
-  static iGLStateCache* statecache;
+  static csGLStateCache* statecache;
 
   /**
    * Set proper GL flags based on ZBufMode.

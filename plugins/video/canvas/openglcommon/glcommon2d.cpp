@@ -24,7 +24,6 @@
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "qint.h"
-#include "video/canvas/openglcommon/iglstates.h"
 #include "video/canvas/openglcommon/glstates.h"
 
 // This header should be moved
@@ -583,10 +582,8 @@ bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list args)
   }
   if (!strcasecmp (command, "getstatecache"))
   {
-    iGLStateCache** cache = va_arg (args, iGLStateCache**);
-    csRef<iGLStateCache> st (SCF_QUERY_INTERFACE( statecache, iGLStateCache));
-    (*cache) = st;
-    st->IncRef ();	// Avoid smart pointer release.
+    csGLStateCache** cache = va_arg (args, csGLStateCache**);
+    *cache = statecache;
   }
   return false;
 }

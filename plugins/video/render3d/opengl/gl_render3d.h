@@ -40,7 +40,7 @@
 #include "ivideo/render3d.h"
 
 #include "ivideo/shader/shader.h"
-#include "video/canvas/openglcommon/iglstates.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 #include "glextmanager.h"
 #include "gl_sysbufmgr.h"
@@ -89,7 +89,7 @@ private:
   csRef<iLightingManager> lightmgr;
   csRef<iShaderManager> shadermgr;
 
-  static iGLStateCache* statecache;
+  static csGLStateCache* statecache;
 
   csGLExtensionManager ext;
   csGLTextureCache *txtcache;

@@ -38,7 +38,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-#include "video/canvas/openglcommon/iglstates.h"
+#include "video/canvas/openglcommon/glstates.h"
 
 #include "../../opengl/glextmanager.h"
 #include "../../opengl/gl_txtmgr.h"
