@@ -45,6 +45,11 @@ public:
   virtual void SetVelocity(csVector3 spd);
   virtual csVector3 GetVelocity();
 
+  bool IsPlaying();
+  void Update();
+  void Write(void *d, unsigned long NumBytes);
+  void WriteMute(unsigned long NumBytes);
+
 private:
   // Position and velocity of sound object. These are copies of the internal
   // values to assure correct return values when calling Get*() while
@@ -60,6 +65,21 @@ private:
 
   // frequency of sound data
   unsigned long BaseFrequency;
+
+  // if this is false new samples must be written all the time
+  bool Precached;
+
+  // the stream for the sample data. This is NULL if sound is precached.
+  iSoundStream *SoundStream;
+
+  // size of the sound buffer in bytes, size of one sample in bytes
+  unsigned long BufferBytes, SampleBytes;
+
+  // true if the sound is looped
+  bool Looped;
+
+  // if this is set the source must be stopped in the next call to Update().
+  bool StopNextUpdate;
 };
 
 #endif

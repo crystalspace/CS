@@ -27,6 +27,8 @@
 #include "sndsrc.h"
 #include "isystem.h"
 
+#define REFRESH_RATE    10
+
 IMPLEMENT_FACTORY(csSoundSourceDS3D)
 
 IMPLEMENT_IBASE(csSoundSourceDS3D)
@@ -39,6 +41,7 @@ csSoundSourceDS3D::csSoundSourceDS3D(iBase *piBase) {
   Buffer3D = NULL;
   Buffer2D = NULL;
   Renderer = NULL;
+  SoundStream = NULL;
 }
 
 csSoundSourceDS3D::~csSoundSourceDS3D() {
@@ -48,6 +51,7 @@ csSoundSourceDS3D::~csSoundSourceDS3D() {
     Buffer2D->Release();
   }
   if (Renderer) Renderer->DecRef();
+  if (SoundStream) SoundStream->DecRef();
 }
 
 bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
@@ -55,14 +59,13 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
   srdr->IncRef();
   Renderer = srdr;
 
-  // @@@ if we may not precache build a streamed sound
-  if (!Data->MayPrecache()) return false;
+  Precached = Data->MayPrecache();
 
-  long NumSamples = -1;
+  long NumSamples = Precached?-1:(Data->GetFormat()->Freq/REFRESH_RATE);
   void *databuf = Data->Read(NumSamples);
-    
-  unsigned long BufferBytes = NumSamples *
-    Data->GetFormat()->Channels * Data->GetFormat()->Bits/8;
+
+  SampleBytes = Data->GetFormat()->Channels * Data->GetFormat()->Bits/8;
+  BufferBytes = NumSamples * SampleBytes;
 
   DSBUFFERDESC dsbd;
   ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
@@ -83,21 +86,12 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
   if (Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, NULL) != DS_OK)
     return false;
 	
-  void *pbWrite1 = NULL, *pbWrite2 = NULL;
-  DWORD cbLen1, cbLen2;
-
-  if (Buffer2D->Lock(0, BufferBytes, &pbWrite1, &cbLen1,
-        &pbWrite2, &cbLen2, 0L) != DS_OK) {
-    if (pbWrite1) Buffer2D->Unlock(pbWrite1, BufferBytes, pbWrite2, 0);
-    return false;
-  }
-
-  CopyMemory(pbWrite1, databuf, BufferBytes);
+  Write(databuf, BufferBytes);
   Data->DiscardBuffer(databuf);
 
-  if (Buffer2D->Unlock(pbWrite1, BufferBytes, pbWrite2, 0) != DS_OK) {
-    if (pbWrite1) Buffer2D->Unlock(pbWrite1, BufferBytes, pbWrite2, 0);
-    return false;
+  if (!Precached) {
+    SoundStream = Data;
+    SoundStream->IncRef();
   }
 
   if (is3d) {
@@ -111,6 +105,8 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
   BaseFrequency = Data->GetFormat()->Freq;
   SetPosition(csVector3(0,0,0));
   SetVelocity(csVector3(0,0,0));
+  Looped = false;
+  StopNextUpdate = false;
 
   return true;
 }
@@ -152,15 +148,19 @@ float csSoundSourceDS3D::GetVolume()
 
 void csSoundSourceDS3D::Play(unsigned long PlayMethod)
 {
+  Looped = PlayMethod & SOUND_LOOP;
+
   Buffer2D->Stop();
   if (PlayMethod & SOUND_RESTART) Buffer2D->SetCurrentPosition(0);
-  Buffer2D->Play(0, 0, (PlayMethod & SOUND_LOOP) ? DSBPLAY_LOOPING : 0);
-  IncRef(); // @@@
+  Buffer2D->Play(0, 0, (Looped || !Precached) ? DSBPLAY_LOOPING : 0);
+  Renderer->AddSource(this);
+  StopNextUpdate = false;
 }
 
 void csSoundSourceDS3D::Stop()
 {
   Buffer2D->Stop();
+  Renderer->RemoveSource(this);
 }
 
 bool csSoundSourceDS3D::Is3d() {
@@ -175,4 +175,90 @@ float csSoundSourceDS3D::GetFrequencyFactor() {
   DWORD frq;
   Buffer2D->GetFrequency(&frq);
   return (frq/BaseFrequency);
+}
+
+bool csSoundSourceDS3D::IsPlaying() {
+  DWORD r;
+  Buffer2D->GetStatus(&r);
+  return (r & DSBSTATUS_PLAYING);
+}
+
+void csSoundSourceDS3D::Update() {
+  // check if source must be stopped. Don't call stop directly. Instead wait
+  // for automatic removing by the renderer. Otherwise the list of sources
+  // will be corrupt. (no source may be added/removed in this function).
+  if (StopNextUpdate) {
+    StopNextUpdate = false;
+    Buffer2D->Stop();
+  }
+
+  // check if new data must be read from the stream
+  if (!Precached) {
+    DWORD PlayPos, WritePos;
+    Buffer2D->GetCurrentPosition(&PlayPos, &WritePos);
+
+    // get number of bytes to write
+    unsigned long WriteBytes = BufferBytes + WritePos - PlayPos;
+    if (WriteBytes >= BufferBytes) WriteBytes -= BufferBytes;
+
+    // get number of samples to transfer
+    long NumSamples = WriteBytes / SampleBytes;
+
+    // read data from the sound stream; NumSamples may change
+    void *d = SoundStream->Read(NumSamples);
+
+    // calculate number of bytes to transfer and bytes to clear
+    unsigned long TransferBytes = NumSamples * SampleBytes;
+    unsigned long ClearBytes = WriteBytes - TransferBytes;
+
+    // get rid of inaccuracies (if we are mistaken and these are no
+    // inaccuracies, i.e. sound has really finished, destruction of
+    // this sound source will simply be delayed 1 round).
+    if (ClearBytes<=4) ClearBytes = 0;
+
+    // write everything
+    Write(d, TransferBytes);
+
+    // discard the stream buffer
+    SoundStream->DiscardBuffer(d);
+
+    // check if stream is finished (i.e. we had to clear bytes)
+    if (ClearBytes) {
+      if (Looped) {
+        SoundStream->Restart();
+        Update();
+      } else {
+        WriteMute(ClearBytes);
+        StopNextUpdate = true;
+      }
+    }
+  }
+}
+
+void csSoundSourceDS3D::Write(void *Data, unsigned long NumBytes) {
+  void *Pointer1 = NULL, *Pointer2 = NULL;
+  DWORD Length1, Length2;
+
+  if (Buffer2D->Lock(0, NumBytes, &Pointer1, &Length1, &Pointer2, &Length2,
+        DSBLOCK_FROMWRITECURSOR) != DS_OK) return;
+
+  if (Pointer1) CopyMemory(Pointer1, Data, Length1);
+  if (Pointer2) CopyMemory(Pointer2, (unsigned char *)Data+Length1, Length2);
+
+  Buffer2D->Unlock(Pointer1, Length1, Pointer2, Length2);
+}
+
+void csSoundSourceDS3D::WriteMute(unsigned long NumBytes) {
+  void *Pointer1 = NULL, *Pointer2 = NULL;
+  DWORD Length1, Length2;
+
+  if (Buffer2D->Lock(0, NumBytes, &Pointer1, &Length1, &Pointer2, &Length2,
+        DSBLOCK_FROMWRITECURSOR) != DS_OK) return;
+
+  unsigned char Byte = (SoundStream->GetFormat()->Bits==8)?128:0;
+
+  if (Pointer1) FillMemory(Pointer1, Byte, Length1);
+  if (Pointer2) FillMemory(Pointer2, Byte, Length2);
+
+  Buffer2D->Unlock(Pointer1, Length1, Pointer2, Length2);
 }

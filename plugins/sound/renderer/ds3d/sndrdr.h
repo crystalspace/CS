@@ -26,8 +26,10 @@
 
 #include "isnddata.h"
 #include "isndrdr.h"
+#include "csutil/csvector.h"
 
 class csSoundListenerDS3D;
+class csSoundSourceDS3D;
 
 class csSoundRenderDS3D : public iSoundRender
 {
@@ -54,13 +56,15 @@ public:
   virtual void MixingFunction ();
 
   void SetDirty();
+  void AddSource(csSoundSourceDS3D *src);
+  void RemoveSource(csSoundSourceDS3D *src);
 
 public:
   LPDIRECTSOUND AudioRenderer;
   iSystem *System;
   csSoundListenerDS3D *Listener;
   csSoundFormat LoadFormat;
+  csVector ActiveSources;
 };
 
 #endif	//__SOUND_RENDER_DS3D_H__
-

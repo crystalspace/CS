@@ -131,14 +131,38 @@ iSoundListener *csSoundRenderDS3D::GetListener() {
 
 void csSoundRenderDS3D::Update() {
   Listener->Prepare();
+
+  for (int i=0;i<ActiveSources.Length();i++) {
+    csSoundSourceDS3D *src = (csSoundSourceDS3D*)ActiveSources.Get(i);
+    if (!src->IsPlaying()) {
+      ActiveSources.Delete(i);
+      i--;
+    } else src->Update();
+  }
 }
 
 const csSoundFormat *csSoundRenderDS3D::GetLoadFormat() {
   return &LoadFormat;
 }
 
-void csSoundRenderDS3D::MixingFunction() {}
+void csSoundRenderDS3D::MixingFunction() {
+}
 
 void csSoundRenderDS3D::SetDirty() {
   Listener->Dirty = true;
+}
+
+void csSoundRenderDS3D::AddSource(csSoundSourceDS3D *src) {
+  if (ActiveSources.Find(src)==-1) {
+    src->IncRef();
+    ActiveSources.Push(src);
+  }
+}
+
+void csSoundRenderDS3D::RemoveSource(csSoundSourceDS3D *src) {
+  int n=ActiveSources.Find(src);
+  if (n!=-1) {
+    ActiveSources.Delete(n);
+    src->DecRef();
+  }
 }
