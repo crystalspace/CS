@@ -367,8 +367,6 @@ subddirectories of @file{CS/include}.  A few brief examples:
 @code{imeshobj.h} @result{} @code{imesh/object.h} and @code{iengine/mesh.h}
 @item
 @code{light.h} @result{} @code{iengine/light.h}
-@item
-@code{ipolygon.h} @result{} @code{imesh/thing/polygon.h}
 @end itemize
 
 The following new header directories exist:
@@ -391,7 +389,7 @@ savers (@code{parser.h}, @code{reader.h}, and @code{writer.h}).
 @item include/imesh
 For everything related to mesh objects and the
 state interfaces of mesh objects (@code{object.h}, @code{spr3d.h},
-@code{ball.h}, @code{thing/thing.h}, @code{thing/polygon.h}, @dots{}).
+@code{ball.h}, @code{thing.h}, @dots{}).
 @item include/inetwork
 For networking plugins (@code{driver.h} and @code{socket.h}).
 @item include/isound

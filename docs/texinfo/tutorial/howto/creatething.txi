@@ -122,5 +122,5 @@ additional polygons here.
 The include files useful for this section are:
 
 @example
-#include "imesh/thing/thing.h"
+#include "imesh/thing.h"
 @end example

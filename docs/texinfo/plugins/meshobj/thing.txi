@@ -78,16 +78,12 @@ Implements @samp{iThingEnvironment}
 
 @samp{iThingFactoryState} is the @sc{scf} interface that you can use to
 set/get settings for a thing. The definition of this interface
-can be found in @file{CS/include/imesh/thing/thing.h} and that is also the
+can be found in @file{CS/include/imesh/thing.h} and that is also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the vertices, polygons, materials,
 and various other configuration parameters for a thing.
 
 @samp{iThingState} is for thing instances.
-
-All include files for the thing mesh can be found in the
-@file{CS/include/imesh/thing} directory. There are include files for
-lightmaps, polygons, portals, ...
 
 @subsubheading Factory and Object Loader
 
