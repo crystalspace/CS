@@ -17,6 +17,8 @@ chronological order.
 	  SRC.SOFTSHADER.  This resulted in the values of OBJ.GLSHADER_FIXED
 	  and OBJ.SOFTSHADER becoming corrupted, which caused the build to
 	  fail.
+	- Jorrit added 'xmlread' to Jamrules for the static compile of
+	  walktest.
 17-Dec-2003
 	- Jorrit fixed an initialition bug in the xmlshader compiler.
 	  It would not initialize the writemask which means that you could

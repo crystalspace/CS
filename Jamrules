@@ -94,6 +94,7 @@ if $(USE_NEW_RENDERER) = "yes"
     thing
     thingldr
     vfs
+    xmlread
     rendstep_stencil
     rendstep_std
     rendloop_loader
@@ -167,6 +168,7 @@ else
     thing
     thingldr
     vfs
+    xmlread
     ;
 }
 
