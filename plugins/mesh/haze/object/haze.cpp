@@ -848,7 +848,7 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
     tri_uvs[1] = layer_uvs[nexti];
     //printf("drawing a polygon\n");
     //DrawPoly(rview, g3d, mat, 3, tri_pts, tri_uvs);
-    float quality = 0.90;
+    float quality = 0.90f;
     int maxdepth = 10;
     DrawPolyAdapt(rview, g3d, mat, 3, tri_pts, tri_uvs, layer_scale,
       quality, 0, maxdepth);

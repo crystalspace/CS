@@ -108,8 +108,8 @@ csODEDynamics::csODEDynamics (iBase* parent)
   c.dtor = 0;
   geomclassnum = dCreateGeomClass (&c);
 
-  erp = 0.2;
-  cfm = 1e-5;
+  erp = 0.2f;
+  cfm = 1e-5f;
 
   rateenabled = false;
   steptime = limittime = total_elapsed = 0.0;
@@ -228,7 +228,7 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
         | dContactSlip1 | dContactSlip2 | dContactApprox1;
       contact[i].surface.mu = f1[0]*f2[0];
       contact[i].surface.bounce = f1[1]*f2[1];
-      contact[i].surface.bounce_vel = 0.1;
+      contact[i].surface.bounce_vel = 0.1f;
       contact[i].surface.slip1 = SMALL_EPSILON;
       contact[i].surface.slip2 = SMALL_EPSILON;
       contact[i].surface.soft_cfm = f1[2]*f2[2];

@@ -651,10 +651,10 @@ csEmitMeshObject::csEmitMeshObject (iObjectRegistry* object_reg,
   aging = 0;
   nr_aging_els = 0;
   using_rect_sprites = true;
-  drop_width = 0.2;
-  drop_height = 0.2;
+  drop_width = 0.2f;
+  drop_height = 0.2f;
   drop_sides = 6;
-  drop_radius = 0.1;
+  drop_radius = 0.1f;
   has_container_box = false;
   container_min.Set(0,0,0);
   container_max.Set(0,0,0);

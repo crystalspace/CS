@@ -192,7 +192,7 @@ void csExactCuller::InsertPolygon (csVector2* tr_verts, int num_verts,
 	      if (ABS (invz) > 0.001)
 	        z = 1.0 / invz;
 	      else
-	        z = 9999999999999.0;
+	        z = 9999999999999.0f;
 	      if (z < *z_buf)
 	      {
 	        *scr_buf = obj_number;
@@ -296,7 +296,7 @@ void csExactCuller::AddObject (void* obj,
       csPoly3D* spoly;
       if (cnt_vis < num_verts)
       {
-        clippoly.SplitWithPlaneZ (front, back, 0.1);
+        clippoly.SplitWithPlaneZ (front, back, 0.1f);
 	spoly = &back;
       }
       else

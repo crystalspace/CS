@@ -507,7 +507,7 @@ void csGenmeshMeshObject::SetupObject ()
       num_lit_mesh_colors = factory->GetVertexCount ();
       lit_mesh_colors = new csColor [num_lit_mesh_colors];
       for (int i = 0 ; i <  num_lit_mesh_colors; i++)
-          lit_mesh_colors[i].Set (.2, .2, .2);  // @@@ ???
+          lit_mesh_colors[i].Set (0.2f, 0.2f, 0.2f);  // @@@ ???
       static_mesh_colors = new csColor [num_lit_mesh_colors];
       for (int i = 0 ; i <  num_lit_mesh_colors; i++)
           static_mesh_colors[i].Set (0, 0, 0);

@@ -21,6 +21,7 @@
 #include <string.h>
 #include "cssysdef.h"
 #include "qsqrt.h"
+#include "cssys/sysfunc.h"
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
 #include "csutil/virtclk.h"
@@ -108,15 +109,19 @@ void csStuffObject::SetupMesh()
 {
   if (setup) return;
 
-  printf( " setting up the mesh... \n");	
+#ifdef CS_DEBUG
+  csPrintf (" setting up the mesh... \n");
+#endif
   setup      = true;
-  fact_state = SCF_QUERY_INTERFACE ( factory , iClothFactoryState );
-  Fabric     = new Cloth ( fact_state , shift , object_bbox , csVector3( 0.0, -0.15 , 0.0 ) );
+  fact_state = SCF_QUERY_INTERFACE (factory, iClothFactoryState);
+  Fabric     = new Cloth (fact_state, shift, object_bbox, csVector3 (0.0f, -0.15f, 0.0f));
   
   // after initializing a Cloth, all triangulation and eventually refinement is already done,
   // and i want to copy that to factory just once (and maybe save/cache it)
   //memcpy ( factory_mesh->GetTriangles() , Fabric->triangles , sizeof(csTriangle)*num_triangles );
-  printf( " setting up the mesh2... \n");	
+#ifdef CS_DEBUG
+  csPrintf (" setting up the mesh2... \n");	
+#endif
   Dynamics      = new Integrator ( Fabric );
   num_vertices  = Fabric -> nverts;
   vertices      = Fabric -> vertices;

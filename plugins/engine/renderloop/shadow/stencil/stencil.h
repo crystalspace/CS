@@ -152,13 +152,13 @@ public:
     csStencilShadowStep* parent;
 
     SCF_DECLARE_IBASE;
-    ShadowDrawVisCallback (csStencilShadowStep* parent);
+    ShadowDrawVisCallback ();
     virtual ~ShadowDrawVisCallback ();
 
     virtual void ObjectVisible (iVisibilityObject *visobject, 
       iMeshWrapper *mesh);
   } shadowDrawVisCallback;
-	friend struct ShadowDrawVisCallback;
+  friend struct ShadowDrawVisCallback;
 };
 
 class csStencilShadowFactory : public iRenderStepFactory

@@ -169,7 +169,7 @@ csPtr<iString> csRapidCollideSystem::Debug_UnitTest ()
   tri2->verts[2].Set (csVector3 (4, 3, -1));
   csReversibleTransform trans2;
   trans2.Translate (csVector3 (0, 0, 8));
-  trans2.RotateThis (csVector3 (0, 1, 0), 1.4);
+  trans2.RotateThis (csVector3 (0, 1, 0), 1.4f);
 
   csRef<iCollider> cd1 (CreateCollider (tri1));
   csRef<iCollider> cd2 (CreateCollider (tri2));

@@ -44,6 +44,23 @@
 #define WINDOW_STYLE (WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
 #define FULLSCREEN_STYLE (WS_POPUP | WS_SYSMENU)
 
+// These don't exist on some older SDKs
+#ifndef _WIN64
+  #ifndef SetWindowLongPtrA
+    #define SetWindowLongPtrA SetWindowLongA
+  #endif
+  #ifndef SetWindowLongPtrW
+    #define SetWindowLongPtrW SetWindowLongW
+  #endif
+  
+  #ifndef GetWindowLongPtrA
+    #define GetWindowLongPtrA GetWindowLongA
+  #endif
+  #ifndef GetWindowLongPtrW
+    #define GetWindowLongPtrW GetWindowLongW
+  #endif
+#endif
+
 //--//--//--//--//--//--//--//--//--//--//--//--//-- csGraphics2DDDraw3 --//--//
 
 CS_IMPLEMENT_PLUGIN

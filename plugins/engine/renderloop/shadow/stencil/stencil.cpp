@@ -457,10 +457,11 @@ csStringID csStencilShadowStep::shadow_normal_name = csInvalidStringID;
 csStringID csStencilShadowStep::shadow_vertex_name = csInvalidStringID;
 
 csStencilShadowStep::csStencilShadowStep (csStencilShadowType* type) :  
-  shadowDrawVisCallback (this)
+  shadowDrawVisCallback ()
 {
   SCF_CONSTRUCT_IBASE (0);
   csStencilShadowStep::type = type;
+  shadowDrawVisCallback.parent = this;
 }
 
 csStencilShadowStep::~csStencilShadowStep ()
@@ -749,12 +750,9 @@ SCF_IMPLEMENT_IBASE(csStencilShadowStep::ShadowDrawVisCallback)
   SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListener)
 SCF_IMPLEMENT_IBASE_END
 
-csStencilShadowStep::ShadowDrawVisCallback::ShadowDrawVisCallback (
-  csStencilShadowStep* parent)
+csStencilShadowStep::ShadowDrawVisCallback::ShadowDrawVisCallback ()
 {
   SCF_CONSTRUCT_IBASE(0);
-
-  ShadowDrawVisCallback::parent = parent;
 }
 
 csStencilShadowStep::ShadowDrawVisCallback::~ShadowDrawVisCallback ()

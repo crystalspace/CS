@@ -368,8 +368,8 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
   csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform);
   co->AddConnector (ocon);
 
-  m.Set (.4, 0, 0, 0, .4, 0, 0, 0, .4);
-  m *= csZRotMatrix3 (.7);
+  m.Set (0.4f, 0, 0, 0, 0.4f, 0, 0, 0, 0.4f);
+  m *= csZRotMatrix3 (0.7f);
   v = m.GetInverse () * csVector3 (0.165f, -0.845f * height, 0);
   transform.SetO2TTranslation (v);
   transform.SetO2T (m);
@@ -395,14 +395,14 @@ void csGeneralTreeFactoryLoader::GenerateDebug4 (csConstructionGeometry* co)
   int vtidx[100];
 
   j = 0;
-  vt[j++].Set (-.1, 0, .1);
-  vt[j++].Set (.1, 0, .1);
-  vt[j++].Set (.1, 0, -.1);
-  vt[j++].Set (-.1, 0, -.1);
-  vt[j++].Set (-.1, 1, .1);
-  vt[j++].Set (.1, 1, .1);
-  vt[j++].Set (.1, 1, -.1);
-  vt[j++].Set (-.1, 1, -.1);
+  vt[j++].Set (-0.1f, 0.0f,  0.1f);
+  vt[j++].Set ( 0.1f, 0.0f,  0.1f);
+  vt[j++].Set ( 0.1f, 0.0f, -0.1f);
+  vt[j++].Set (-0.1f, 0.0f, -0.1f);
+  vt[j++].Set (-0.1f, 1.0f,  0.1f);
+  vt[j++].Set ( 0.1f, 1.0f,  0.1f);
+  vt[j++].Set ( 0.1f, 1.0f, -0.1f);
+  vt[j++].Set (-0.1f, 1.0f, -0.1f);
   co->SetVertices (j, 4, vt);
   j = 0;
   tri[j].a = 0; tri[j].b = 4; tri[j].c = 7; j++;
@@ -522,8 +522,8 @@ void csGeneralTreeFactoryLoader::GenerateSmallBranch (
   csOutputConnector* ocon = new csOutputConnector (j, vtidx, transform);
   co->AddConnector (ocon);
 
-  m.Set (.3, 0, 0, 0, .3, 0, 0, 0, .3);
-  m *= csZRotMatrix3 (.7);
+  m.Set (0.3f, 0, 0, 0, 0.3f, 0, 0, 0, 0.3f);
+  m *= csZRotMatrix3 (0.7f);
   v = m.GetInverse () * csVector3 (0.165f, -0.545f * height, 0);
   transform.SetO2TTranslation (v);
   transform.SetO2T (m);
@@ -563,19 +563,19 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   //---------
   // A trunk that shrinks at the top.
   //---------
-  GenerateTrunk (cg_shrinktrunk, 1, .8, .5);
+  GenerateTrunk (cg_shrinktrunk, 1, 0.8f, 0.5f);
 
   //---------
   // A tip with no output connectors.
   //---------
   j = 0;
-  vt[j++].Set (-.1, 0, 0);
-  vt[j++].Set (-.03, 0, .07);
-  vt[j++].Set (.03, 0, .07);
-  vt[j++].Set (.1, 0, 0);
-  vt[j++].Set (.03, 0, -.07);
-  vt[j++].Set (-.03, 0, -.07);
-  vt[j++].Set (0, .5, 0);
+  vt[j++].Set (-0.1f,  0.0f,  0.0f);
+  vt[j++].Set (-0.03f, 0.0f,  0.07f);
+  vt[j++].Set ( 0.03f, 0.0f,  0.07f);
+  vt[j++].Set ( 0.1f,  0.0f,  0.0f);
+  vt[j++].Set ( 0.03f, 0.0f, -0.07f);
+  vt[j++].Set (-0.03f, 0.0f, -0.07f);
+  vt[j++].Set ( 0.0f,  0.5f,  0.0f);
   cg_tip->SetVertices (j, 6, vt);
   j = 0;
   tri[j].a = 0; tri[j].b = 1; tri[j].c = 6; j++;
@@ -594,8 +594,8 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   //---------
   // A branch.
   //---------
-  GenerateBranch (cg_branch, 1, 1, .15);
-  GenerateSmallBranch (cg_smallbranch, 1, 1, .2);
+  GenerateBranch (cg_branch, 1, 1, 0.15f);
+  GenerateSmallBranch (cg_smallbranch, 1, 1, 0.2f);
 
   //---------
   // Rules.
@@ -706,12 +706,12 @@ csPtr<iBase> csGeneralTreeFactoryLoader::Parse (
   	4, vtidx, 0, co_tree);
 #else
   int j = 0;
-  vertices[j++].Set (-.1, 0, 0);
-  vertices[j++].Set (-.03, 0, .07);
-  vertices[j++].Set (.03, 0, .07);
-  vertices[j++].Set (.1, 0, 0);
-  vertices[j++].Set (.03, 0, -.07);
-  vertices[j++].Set (-.03, 0, -.07);
+  vertices[j++].Set (-0.1f,  0.0f,  0.0f);
+  vertices[j++].Set (-0.03f, 0.0f,  0.07f);
+  vertices[j++].Set ( 0.03f, 0.0f,  0.07f);
+  vertices[j++].Set ( 0.1f,  0.0f,  0.0f);
+  vertices[j++].Set ( 0.03f, 0.0f, -0.07f);
+  vertices[j++].Set (-0.03f, 0.0f, -0.07f);
   construction->SetupInitialVertices (6, vertices);
   int vtidx[6];
   j = 0;

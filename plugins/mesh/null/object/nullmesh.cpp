@@ -65,7 +65,7 @@ csNullmeshMeshObject::csNullmeshMeshObject (iMeshObjectFactory* factory)
   csNullmeshMeshObject::factory = factory;
   logparent = 0;
   vis_cb = 0;
-  radius = .0001;
+  radius = 0.0001f;
   box.Set (-radius, -radius, -radius, radius, radius, radius);
 }
 

@@ -65,7 +65,7 @@ csStarsMeshObject::csStarsMeshObject (iMeshObjectFactory* factory)
   use_max_color = false;
   max_color.Set(0,0,0);
   max_dist = 20;
-  density = .1;
+  density = 0.1f;
   seed = 3939394;
   current_lod = 1;
   current_features = 0;
@@ -171,7 +171,7 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
   //printf("boxsize.x %g %g %g\n", boxsize.x, boxsize.y, boxsize.z);
   number = QInt(
     boxsize.x * boxsize.y * boxsize.z * density
-    * ( GetRandom(0.4) + 0.8 ) /// * 0.8 ... * 1.2, so +- 20%
+    * ( GetRandom(0.4f) + 0.8f ) /// * 0.8 ... * 1.2, so +- 20%
     );
   //printf("number is %d\n", number);
 
@@ -182,9 +182,9 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
 
   if(color_per_box)
   {
-  starcolor.red = 0.2 + GetRandom(0.8);
-  starcolor.green = 0.2 + GetRandom(0.8);
-  starcolor.blue = 0.2 + GetRandom(0.8);
+  starcolor.red = 0.2f + GetRandom(0.8f);
+  starcolor.green = 0.2f + GetRandom(0.8f);
+  starcolor.blue = 0.2f + GetRandom(0.8f);
   }
   int i;
   int drawn = 0;
@@ -198,10 +198,10 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
     if(!color_per_box)
     {
       starcolor = color;
-      starcolor.red += -0.3 + GetRandom(0.6);
-      starcolor.green += -0.3 + GetRandom(0.6);
-      starcolor.blue += -0.3 + GetRandom(0.6);
-      starcolor.Clamp(1.,1.,1.);
+      starcolor.red += -0.3f + GetRandom(0.6f);
+      starcolor.green += -0.3f + GetRandom(0.6f);
+      starcolor.blue += -0.3f + GetRandom(0.6f);
+      starcolor.Clamp(1.0f, 1.0f, 1.0f);
       starcolor.ClampDown();
     }
     if(sqdist > sqmaxdist) continue;

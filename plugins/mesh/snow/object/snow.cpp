@@ -84,7 +84,7 @@ csSnowMeshObject::csSnowMeshObject (iObjectRegistry* object_reg,
   rainbox.Set (csVector3 (0, 0, 0), csVector3 (1, 1, 1));
   swirl_amount = 1;
   rain_dir.Set (0, -1, 0);
-  drop_width = drop_height = .1;
+  drop_width = drop_height = 0.1f;
   lighted_particles = false;
   number = 50;
 }

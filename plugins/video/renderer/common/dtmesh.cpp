@@ -487,8 +487,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       //=====
 
       // The following com_iz is valid for all points on Z-plane.
-      float com_zv = 1. / (SMALL_Z*10);
-      float com_iz = aspect * (1. / (SMALL_Z*10));
+      float com_zv = 1.0f / (SMALL_Z*10);
+      float com_iz = aspect * (1.0f / (SMALL_Z*10));
 
       csVector3 va = work_verts[a];
       csVector3 vb = work_verts[b];
@@ -588,8 +588,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       //=====
 
       // The following com_iz is valid for all points on Z-plane.
-      float com_zv = 1. / (SMALL_Z*10);
-      float com_iz = aspect * (1. / (SMALL_Z*10));
+      float com_zv = 1.0f / (SMALL_Z*10);
+      float com_iz = aspect * (1.0f / (SMALL_Z*10));
 
       csVector3 va = work_verts[a];
       csVector3 vb = work_verts[b];

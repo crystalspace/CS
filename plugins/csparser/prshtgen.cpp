@@ -57,14 +57,14 @@ SCF_IMPLEMENT_IBASE_END
 
 float PrsHeightMapData::GetSlope (float x, float y)
 {
-  float div = 0.02;
-  float mx = x-.01; if (mx < 0) { mx = x; div = .01; }
-  float px = x+.01; if (px > 1) { px = x; div = .01; }
+  float div = 0.02f;
+  float mx = x - 0.01f; if (mx < 0) { mx = x; div = 0.01f; }
+  float px = x + 0.01f; if (px > 1) { px = x; div = 0.01f; }
   float dhdx = GetHeight (px, y) - GetHeight (mx, y);
   dhdx /= div;
-  div = 0.02;
-  float my = y-.01; if (my < 0) { my = y; div = .01; }
-  float py = y+.01; if (py > 1) { py = y; div = .01; }
+  div = 0.02f;
+  float my = y - 0.01f; if (my < 0) { my = y; div = 0.01f; }
+  float py = y + 0.01f; if (py > 1) { py = y; div = 0.01f; }
   float dhdy = GetHeight (x, py) - GetHeight (x, my);
   dhdy /= div;
   //printf ("x=%g y=%g dhdx=%g dhdy=%g slope=%g , %g\n", x, y, dhdx, dhdy,

@@ -42,17 +42,17 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csFireMeshObject::FireState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 // Aging ratios
-#define COL_AGE0	0.0
-#define COL_AGE1	0.05
-#define COL_AGE2	0.2
-#define COL_AGE3	0.5
-#define COL_AGE4	1.0
+#define COL_AGE0	0.0f
+#define COL_AGE1	0.05f
+#define COL_AGE2	0.2f
+#define COL_AGE3	0.5f
+#define COL_AGE4	1.0f
 // COL_DAGE(x) = 1.0 / (COL_AGE(x) - COL_AGE(x-1))
-#define COL_DAGE0	0.0
-#define COL_DAGE1	(1.0 / (COL_AGE1-COL_AGE0))
-#define COL_DAGE2	(1.0 / (COL_AGE2-COL_AGE1))
-#define COL_DAGE3	(1.0 / (COL_AGE3-COL_AGE2))
-#define COL_DAGE4	(1.0 / (COL_AGE4-COL_AGE3))
+#define COL_DAGE0	0.0f
+#define COL_DAGE1	(1.0f / (COL_AGE1-COL_AGE0))
+#define COL_DAGE2	(1.0f / (COL_AGE2-COL_AGE1))
+#define COL_DAGE3	(1.0f / (COL_AGE3-COL_AGE2))
+#define COL_DAGE4	(1.0f / (COL_AGE4-COL_AGE3))
 
 csFireMeshObject::ColorInfo* csFireMeshObject::Colors = 0;
 
@@ -61,11 +61,11 @@ void csFireMeshObject::SetupColors()
   if (Colors == 0)
   {
     static ColorInfo c[MAX_COLORS];
-    c[0].c.Set(1.0,1.0,1.0); c[0].age = COL_AGE0; c[0].dage = COL_DAGE0;
-    c[1].c.Set(1.0,1.0,0.0); c[1].age = COL_AGE1; c[1].dage = COL_DAGE1;
-    c[2].c.Set(1.0,0.0,0.0); c[2].age = COL_AGE2; c[2].dage = COL_DAGE2;
-    c[3].c.Set(0.6,0.6,0.6); c[3].age = COL_AGE3; c[3].dage = COL_DAGE3;
-    c[4].c.Set(0.1,0.1,0.1); c[4].age = COL_AGE4; c[4].dage = COL_DAGE4;
+    c[0].c.Set(1.0f,1.0f,1.0f); c[0].age = COL_AGE0; c[0].dage = COL_DAGE0;
+    c[1].c.Set(1.0f,1.0f,0.0f); c[1].age = COL_AGE1; c[1].dage = COL_DAGE1;
+    c[2].c.Set(1.0f,0.0f,0.0f); c[2].age = COL_AGE2; c[2].dage = COL_DAGE2;
+    c[3].c.Set(0.6f,0.6f,0.6f); c[3].age = COL_AGE3; c[3].dage = COL_DAGE3;
+    c[4].c.Set(0.1f,0.1f,0.1f); c[4].age = COL_AGE4; c[4].dage = COL_DAGE4;
     Colors = c;
   }
 }

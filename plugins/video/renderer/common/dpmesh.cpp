@@ -79,7 +79,7 @@ static bool ClipPolygonZ (
   bool zs, z1s;
   bool vis[100];
 
-  float z = 0.01;
+  float z = 0.01f;
 
   for (i = 0; i < num_vertices; i++)
   {

@@ -90,6 +90,23 @@ CS_IMPLEMENT_PLUGIN
 #define ENUM_CURRENT_SETTINGS       ((DWORD)-1)
 #endif
 
+// These don't exist on some older SDKs
+#ifndef _WIN64
+  #ifndef SetWindowLongPtrA
+    #define SetWindowLongPtrA SetWindowLongA
+  #endif
+  #ifndef SetWindowLongPtrW
+    #define SetWindowLongPtrW SetWindowLongW
+  #endif
+  
+  #ifndef GetWindowLongPtrA
+    #define GetWindowLongPtrA GetWindowLongA
+  #endif
+  #ifndef GetWindowLongPtrW
+    #define GetWindowLongPtrW GetWindowLongW
+  #endif
+#endif
+
 /*
     in fs mode, the window is topmost, means above every other
     window, all the time. but when debugging a break it is really annoying to 

@@ -42,8 +42,8 @@ static int const SIZEOF_MD2SKINNAME = 64;
 static int const SIZEOF_MD2FRAMENAME = 16;
 static int const SIZEOF_MD2HEADER = 15*SIZEOF_MD2LONG;
 
-static const float SCALE_FACTOR = 0.025;
-static const float FRAME_DELAY = 0.1;
+static const float SCALE_FACTOR = 0.025f;
+static const float FRAME_DELAY = 0.1f;
 
 typedef csPDelArray<csString> csStringVector;
 

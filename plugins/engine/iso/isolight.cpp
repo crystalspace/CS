@@ -165,11 +165,11 @@ void csIsoLight::CalcVis()
       // check if line from my position to ground cell pos is possible
       res = 0.0;
       if(grid->GroundHitBeam(position, pos+csVector3(xinc*0.5,0,zinc*0.5)))
-        res += 0.2; // test center, then 4 corners
-      if(grid->GroundHitBeam(position, pos)) res += 0.2;
-      if(grid->GroundHitBeam(position, pos+csVector3(0,0,zinc))) res += 0.2;
-      if(grid->GroundHitBeam(position, pos+csVector3(xinc,0,0))) res += 0.2;
-      if(grid->GroundHitBeam(position, pos+csVector3(xinc,0,zinc))) res += 0.2;
+        res += 0.2f; // test center, then 4 corners
+      if(grid->GroundHitBeam(position, pos)) res += 0.2f;
+      if(grid->GroundHitBeam(position, pos+csVector3(0,0,zinc))) res += 0.2f;
+      if(grid->GroundHitBeam(position, pos+csVector3(xinc,0,0))) res += 0.2f;
+      if(grid->GroundHitBeam(position, pos+csVector3(xinc,0,zinc))) res += 0.2f;
       SetVis(x,y,res);
       pos.z += zinc;
     }
@@ -275,7 +275,7 @@ void csIsoLight::ShineSprite(iIsoSprite *sprite)
     int y = QInt(vpos.x * multy) + spry;
     float vis = GetVis(x,y);
     vis += GetVis(x-1,y) + GetVis(x,y-1) + GetVis(x+1,y) + GetVis(x,y+1);
-    vis *= 0.2;
+    vis *= 0.2f;
     if(vis==0.0) continue;
     csVector3 path = vpos - relpos;
     float dist = path.Norm();

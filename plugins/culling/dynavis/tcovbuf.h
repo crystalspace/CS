@@ -143,8 +143,8 @@ public:
     tile_full = false;
   }
 
-#define INIT_MIN_DEPTH     999999999.0
-#define INIT_MIN_DEPTH_CMP 999900000.0
+#define INIT_MIN_DEPTH     999999999.0f
+#define INIT_MIN_DEPTH_CMP 999900000.0f
 
   /**
    * Really make the tile empty (as opposed to just marking it as

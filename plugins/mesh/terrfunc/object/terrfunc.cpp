@@ -394,14 +394,14 @@ struct QuadDivNormalFunc : public iTerrainNormalFunction
     CS_ASSERT(hf);
     csVector3 n(0,0,0);
     csVector3 v[8];
-    v[0].Set(-.1, hf->GetHeight (dx-inv_totx, dy-inv_toty), -.1);
-    v[1].Set(  0, hf->GetHeight (dx, dy-inv_toty), -.1);
-    v[2].Set( .1, hf->GetHeight (dx+inv_totx, dy-inv_toty), -.1);
-    v[3].Set( .1, hf->GetHeight (dx+inv_totx, dy), 0);
-    v[4].Set( .1, hf->GetHeight (dx+inv_totx, dy+inv_toty),  .1);
-    v[5].Set(  0, hf->GetHeight (dx, dy+inv_toty),  .1);
-    v[6].Set(-.1, hf->GetHeight (dx-inv_totx, dy+inv_toty),  .1);
-    v[7].Set(-.1, hf->GetHeight (dx-inv_totx, dy), 0);
+    v[0].Set(-0.1f, hf->GetHeight (dx-inv_totx, dy-inv_toty), -0.1f);
+    v[1].Set( 0.0f, hf->GetHeight (dx, dy-inv_toty), -0.1f);
+    v[2].Set( 0.1f, hf->GetHeight (dx+inv_totx, dy-inv_toty), -0.1f);
+    v[3].Set( 0.1f, hf->GetHeight (dx+inv_totx, dy), 0);
+    v[4].Set( 0.1f, hf->GetHeight (dx+inv_totx, dy+inv_toty),  0.1f);
+    v[5].Set( 0.0f, hf->GetHeight (dx, dy+inv_toty),  0.1f);
+    v[6].Set(-0.1f, hf->GetHeight (dx-inv_totx, dy+inv_toty),  0.1f);
+    v[7].Set(-0.1f, hf->GetHeight (dx-inv_totx, dy), 0);
     int j1, j;
     j1 = 7;
     for(j = 0; j < 8; j++)
@@ -533,9 +533,9 @@ csTerrFuncObject::csTerrFuncObject (iObjectRegistry* object_reg,
   lod_sqdist[0] = 100*100;
   lod_sqdist[1] = 400*400;
   lod_sqdist[2] = 800*800;
-  max_cost[0] = .03;
-  max_cost[1] = .08;
-  max_cost[2] = .2;
+  max_cost[0] = 0.03f;
+  max_cost[1] = 0.08f;
+  max_cost[2] = 0.2f;
   CorrectSeams (0, 0);
   quad_depth = 6;
   quadtree = 0;
@@ -1222,14 +1222,14 @@ void csTerrFuncObject::ComputeNormals (const G3DTriangleMesh& /*mesh*/,
       n = normal_func->GetNormal (dx, dy);
     else
     {
-      v[0].Set(-.1, GetClampedHeight (dx-inv_totx, dy-inv_toty), -.1);
-      v[1].Set(  0, GetClampedHeight (dx, dy-inv_toty), -.1);
-      v[2].Set( .1, GetClampedHeight (dx+inv_totx, dy-inv_toty), -.1);
-      v[3].Set( .1, GetClampedHeight (dx+inv_totx, dy), 0);
-      v[4].Set( .1, GetClampedHeight (dx+inv_totx, dy+inv_toty),  .1);
-      v[5].Set(  0, GetClampedHeight (dx, dy+inv_toty),  .1);
-      v[6].Set(-.1, GetClampedHeight (dx-inv_totx, dy+inv_toty),  .1);
-      v[7].Set(-.1, GetClampedHeight (dx-inv_totx, dy), 0);
+      v[0].Set(-0.1f, GetClampedHeight (dx-inv_totx, dy-inv_toty), -0.1f);
+      v[1].Set( 0.0f, GetClampedHeight (dx, dy-inv_toty), -0.1f);
+      v[2].Set( 0.1f, GetClampedHeight (dx+inv_totx, dy-inv_toty), -0.1f);
+      v[3].Set( 0.1f, GetClampedHeight (dx+inv_totx, dy), 0);
+      v[4].Set( 0.1f, GetClampedHeight (dx+inv_totx, dy+inv_toty),  0.1f);
+      v[5].Set( 0.0f, GetClampedHeight (dx, dy+inv_toty),  0.1f);
+      v[6].Set(-0.1f, GetClampedHeight (dx-inv_totx, dy+inv_toty),  0.1f);
+      v[7].Set(-0.1f, GetClampedHeight (dx-inv_totx, dy), 0);
       n.Set (0, 0, 0);
       int j1, j;
       j1 = 7;

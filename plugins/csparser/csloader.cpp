@@ -3497,8 +3497,8 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  if (!strcasecmp (type, "cross"))
 	  {
 	    halo.type = 1;
-            halo.cross.Intensity = 2.0;
-	    halo.cross.Cross = 0.45;
+            halo.cross.Intensity = 2.0f;
+	    halo.cross.Cross = 0.45f;
 	    csRef<iDocumentNode> intnode = child->GetNode ("intensity");
 	    if (intnode)
 	    {
@@ -3696,21 +3696,21 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	iMaterialWrapper* ifm4 = halo.flare.mat_spark4;
 	iMaterialWrapper* ifm5 = halo.flare.mat_spark5;
         iFlareHalo* flare = l->QueryLight ()->CreateFlareHalo ();
-	flare->AddComponent (0.0, 1.2, 1.2, CS_FX_ADD, ifmc);
-	flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifm3);
-	flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifm4);
-	flare->AddComponent (0.8, .05, .05, CS_FX_ADD, ifm5);
-	flare->AddComponent (1.0, 0.7, 0.7, CS_FX_ADD, ifm1);
-	flare->AddComponent (1.3, 0.1, 0.1, CS_FX_ADD, ifm3);
-	flare->AddComponent (1.5, 0.3, 0.3, CS_FX_ADD, ifm4);
-	flare->AddComponent (1.8, 0.1, 0.1, CS_FX_ADD, ifm5);
-	flare->AddComponent (2.0, 0.5, 0.5, CS_FX_ADD, ifm2);
-	flare->AddComponent (2.1, .15, .15, CS_FX_ADD, ifm3);
-	flare->AddComponent (2.5, 0.2, 0.2, CS_FX_ADD, ifm3);
-	flare->AddComponent (2.8, 0.4, 0.4, CS_FX_ADD, ifm4);
-	flare->AddComponent (3.0, 3.0, 3.0, CS_FX_ADD, ifm1);
-	flare->AddComponent (3.1, 0.05, 0.05, CS_FX_ADD, ifm5);
-	flare->AddComponent (3.3, .15, .15, CS_FX_ADD, ifm2);
+	flare->AddComponent (0.0f, 1.2f, 1.2f, CS_FX_ADD, ifmc);
+	flare->AddComponent (0.3f, 0.1f, 0.1f, CS_FX_ADD, ifm3);
+	flare->AddComponent (0.6f, 0.4f, 0.4f, CS_FX_ADD, ifm4);
+	flare->AddComponent (0.8f, 0.05f, 0.05f, CS_FX_ADD, ifm5);
+	flare->AddComponent (1.0f, 0.7f, 0.7f, CS_FX_ADD, ifm1);
+	flare->AddComponent (1.3f, 0.1f, 0.1f, CS_FX_ADD, ifm3);
+	flare->AddComponent (1.5f, 0.3f, 0.3f, CS_FX_ADD, ifm4);
+	flare->AddComponent (1.8f, 0.1f, 0.1f, CS_FX_ADD, ifm5);
+	flare->AddComponent (2.0f, 0.5f, 0.5f, CS_FX_ADD, ifm2);
+	flare->AddComponent (2.1f, 0.15f, 0.15f, CS_FX_ADD, ifm3);
+	flare->AddComponent (2.5f, 0.2f, 0.2f, CS_FX_ADD, ifm3);
+	flare->AddComponent (2.8f, 0.4f, 0.4f, CS_FX_ADD, ifm4);
+	flare->AddComponent (3.0f, 3.0f, 3.0f, CS_FX_ADD, ifm1);
+	flare->AddComponent (3.1f, 0.05f, 0.05f, CS_FX_ADD, ifm5);
+	flare->AddComponent (3.3f, 0.15f, 0.15f, CS_FX_ADD, ifm2);
 #endif // CS_USE_NEW_RENDERER
       }
       break;

@@ -62,8 +62,8 @@ void csTerrainQuad::Build (int depth)
 }
 
 /// smallest value for horizon
-#define MININF (-99999999.0)
-#define MAXINF (-MININF)
+#define MAXINF (99999999.0f)
+#define MININF (-MAXINF)
 
 void csTerrainQuad::InitHorizon (float *horizon, int horsize)
 {
@@ -224,27 +224,27 @@ void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
   if(minh < 0.0)
   {
     /// below zero, smallest height at minimal distance is the steepest down
-    if(mindist == 0.0) mindy = MININF;
+    if(mindist == 0.0f) mindy = MININF;
     else mindy = minh * qisqrt(mindist);
   }
   else
   {
     /// above zero, the smallest height at maximal distance is the smallest
     /// upslope
-    if(maxdist == 0.0) mindy = MAXINF;
+    if(maxdist == 0.0f) mindy = MAXINF;
     else mindy = minh * qisqrt(maxdist);
   }
 
   if(maxh < 0.0)
   {
     /// below zero, biggest height at maximal distance is the least downslope
-    if(maxdist == 0.0) maxdy = MININF;
+    if(maxdist == 0.0f) maxdy = MININF;
     else maxdy = maxh * qisqrt(maxdist);
   }
   else
   {
     /// above zero, the biggest height at minimum distance is steepest upslope
-    if(mindist == 0.0) maxdy = MAXINF;
+    if(mindist == 0.0f) maxdy = MAXINF;
     else maxdy = maxh * qisqrt(mindist);
   }
 

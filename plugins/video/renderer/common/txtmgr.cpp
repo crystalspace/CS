@@ -261,7 +261,7 @@ csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
   DG_ADDI (this, 0);
   DG_TYPE (this, "csMaterialHandle");
   num_texture_layers = 0;
-  diffuse = 0.7; ambient = 0; reflection = 0;
+  diffuse = 0.7f; ambient = 0.0f; reflection = 0.0f;
   texture = t;
   if (texture != 0)
   {

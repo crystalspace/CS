@@ -161,7 +161,7 @@ bool csSoundRenderDS3D::Open()
     "crystalspace.sound.ds3d",
     "  Volume: %g\n", GetVolume());
 
-  BufferLengthSeconds = Config->GetFloat("Sound.ds3d.StreamingBufferLength", 0.2);
+  BufferLengthSeconds = Config->GetFloat("Sound.ds3d.StreamingBufferLength", 0.2f);
   BackgroundProcessing = Config->GetBool("Sound.ds3d.BackgroundProcessing", true);
   MuteInBackground = Config->GetBool("Sound.ds3d.MuteInBackground", true);
   LazySourceSync = Config->GetBool("Sound.ds3d.LazySourceSync",true);

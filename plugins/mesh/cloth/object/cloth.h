@@ -150,14 +150,14 @@ class           Integrator {
       obj->ReallocFields(&fields, &field_size, &shear_fields,&shearfield_size);
 #endif
       gravity = obj->gravity;
-      structural_k        = 7.0;
-      shear_k             = 7.0;
-      density             = 1.0;
-      friction            = 0.95;
-      structural_rigidity = 0.9;
-      shear_rigidity      = 0.8;
-      dt      = 0.07;
-      time    = 0.0;
+      structural_k        = 7.0f;
+      shear_k             = 7.0f;
+      density             = 1.0f;
+      friction            = 0.95f;
+      structural_rigidity = 0.9f;
+      shear_rigidity      = 0.8f;
+      dt      = 0.07f;
+      time    = 0.0f;
       int            i;
       velocities = new csVector3[nverts];
       forces = new csVector3[nverts];
@@ -197,8 +197,8 @@ class           Integrator {
       };
       ConstrainedVertices->SetBit(45);
       ConstrainedVertices->SetBit(46);
-      vertices[45] += csVector3(0, 0, 1.1);
-      vertices[46] += csVector3(0, 0, 1.2);
+      vertices[45] += csVector3(0.0f, 0.0f, 1.1f);
+      vertices[46] += csVector3(0.0f, 0.0f, 1.2f);
     };
     ~Integrator() 
     {

@@ -721,7 +721,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
       }
       csPoly3D front, back;
       // @@@ Make specific version that doesn't fill 'front' version.
-      poly.SplitWithPlaneZ (front, back, 0.1);
+      poly.SplitWithPlaneZ (front, back, 0.1f);
       max_depth = -1.0;
       num_verts = back.GetVertexCount ();
       for (j = 0 ; j < num_verts ; j++)

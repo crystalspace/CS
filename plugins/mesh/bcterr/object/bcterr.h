@@ -44,7 +44,7 @@ class csBCTerrFactoryObject;
 
 #define user_lod_start 2
 #define cpu_time_limit 500
-#define max_lod_distance 5000000000000000000.0
+#define max_lod_distance 5000000000000000000.0f
 
 /*
  * csSharedLODMesh

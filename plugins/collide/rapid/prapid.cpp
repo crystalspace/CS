@@ -155,7 +155,7 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
   float dy = object_bbox.MaxY () - object_bbox.MinY ();
   float dz = object_bbox.MaxZ () - object_bbox.MinZ ();
   smallest_box_dim = min3 (dx, dy, dz);
-  if (smallest_box_dim < .1) smallest_box_dim = .1;
+  if (smallest_box_dim < 0.1f) smallest_box_dim = 0.1f;
 }
 
 csRapidCollider::~csRapidCollider ()
@@ -778,7 +778,7 @@ int obb_disjoint (const csMatrix3& B, const csVector3& T,
   register float t, s;
   register int r;
   csMatrix3 Bf;
-  const float reps = 1e-6;
+  const float reps = 1e-6f;
 
   // Bf = ABS (B)
   Bf.m11 = ABS (B.m11);  Bf.m11 += reps;
