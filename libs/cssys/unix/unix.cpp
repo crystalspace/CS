@@ -100,10 +100,8 @@ void SysSystemDriver::SetSystemDefaults ()
   if (config)
   {
     SimDepth = config->GetYesNo ("VideoDriver", "SIMULATE_DEPTH", SimDepth);
-    if (config)
-      UseSHM = config->GetYesNo ("VideoDriver", "XSHM", UseSHM);
-    if (config)
-      HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor);
+    UseSHM = config->GetYesNo ("VideoDriver", "XSHM", UseSHM);
+    HardwareCursor = config->GetYesNo ("VideoDriver", "SYS_MOUSE_CURSOR", HardwareCursor);
   }
 }
 
