@@ -1,3 +1,4 @@
+/*  -*- Mode: C++; -*- */
 /*
    This is the well-known Southerland-Hodgemen polygon clipping algorythm
    which works by successively clipping target polygon against every clipper

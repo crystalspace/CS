@@ -40,7 +40,6 @@ csProcTextureSoft2D::csProcTextureSoft2D (iSystem *isys) :
 
 csProcTextureSoft2D::~csProcTextureSoft2D ()
 {
-  //  Close ();
   if (destroy_memory)
     delete [] Memory;
 }
@@ -88,14 +87,9 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
     pfmt.GreenMask = 0;
     pfmt.BlueMask = 0;
 
-    Palette = palette;
+    for (int i = 0; i < 256; i++)
+      PaletteAlloc [i] = false;
 
-    if (hint == csosbSoftware)
-      for (int i = 0; i < 256; i++)
-	PaletteAlloc [i] = false;
-    else
-      for (int i = 0; i < 256; i++)
-	PaletteAlloc [i] = true;
     pfmt.complete ();
   }
   else
@@ -131,12 +125,6 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 		  (((UShort)image_buffer[i].green >> gb) << pfmt.GreenShift) +
 		  (((UShort)image_buffer[i].red >> rb) << pfmt.RedShift));
       
-      }
-      else if ((hint == csosbHardware) || (hint == csosbHardwareAlone))
-      {
-	// Here we are in hardware mode and the image buffer masquerades
-	// as the palette through the interface.
-	image_buffer = palette;
       }
     } 
     else

@@ -24,28 +24,34 @@
 
 class csTextureMMSoftware;
 
+
 class csSoftProcTexture3D : public csGraphics3DSoftwareCommon, 
 			    public iSoftProcTexture
 {
-  /// When utilised by a hardware renderer and in alone mode its texture handle
-  /// is stored here, in case ConvertMode eventually gets called.
-  csTextureMMSoftware *tex_mm_alone;
-public:
-  DECLARE_IBASE;
-  // This procedural texture as referenced by the texture manager
-  csTextureMMSoftware *tex_mm;
+  /// True when it is necessary to reprepare a texture each update.
+  bool reprepare;
 
-  // The renderer we are sharing with..either the main renderer or another
-  // procedural texture.
-  csGraphics3DSoftwareCommon *partner_g3d;
+  /**
+   * The first instance of a procedural texture utilising a dedicated 
+   * 8bit texture manager.
+   */
+  static csSoftProcTexture3D *head_texG3D;
+
+  csGraphics3DSoftwareCommon* partner;
+
+public:
+  csTextureMMSoftware *soft_tex_mm;
+  csTextureMMSoftware *parent_tex_mm;
+  DECLARE_IBASE;
 
   csSoftProcTexture3D (iBase *iParent);
   virtual ~csSoftProcTexture3D ();
 
   bool Prepare (csTextureMMSoftware *tex_mm,
 		csGraphics3DSoftwareCommon *parent_g3d,
-		csSoftProcTexture3D *partner_g3d, bool alone_hint,
-	    void *buffer, csPixelFormat *pfmt, RGBPixel *palette, int pal_size);
+		csSoftProcTexture3D *partner_g3d,
+		void *buffer, uint8 *bitmap,
+		csPixelFormat *pfmt, RGBPixel *palette, bool alone_hint);
 
   virtual bool Initialize (iSystem *iSys);
 

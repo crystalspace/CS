@@ -1,5 +1,27 @@
 The history order has been reversed so that new features are at the top.
-
+16-Jul-2000
+	- Samuel Humphreys did the following changes..
+            - Added two new procedural textures to dtsimple. This is to complete
+              dtsimple as a test suite for all the current procedural texture 
+              implementations and flags. If you enable both test1 and test2 then
+              all the procedural textures get printed to the screen with DrawPixmap
+              as this uses a different rendering pathway than DrawPixmap to the 
+              texture. These changes highlighted a fundamental bug in the 
+              implementations within the software driver.
+            - Fixed all known bugs in the software and opengl implementations of
+              procedural textures. Cleaned up the code, things are looking much
+              better now, and I don't anticipate needing any further overhauls.
+              Three features remain to be done: mip mapping and the ability to 
+              update sub rectangles of the texture buffer. These changes will be
+              propagated up into the mip map as subrectangles also. Lastly the
+              flag CS_TEXTURE_PROC_MIPMAP_ON_SYNC needs to be implemented.
+	      Then a few optimisations...
+            - Changed the metaball texture so instead of clearing the screen, it
+              prints the bot_view texture as a background...this gives an 
+              unexpected but IMHO seriously cool effect. Check it out :)
+            - Removed the opengl 16bit procedural texture pathway for now. As its
+              very slow on my machine.
+	    - Added some emacs fontification friendly comments to .inc files
 14-Jul-2000
 	- Brandon Ehle restarted work on Crystal Script (python).
 	  New layout is interface based, which allos for more dynamicism
@@ -130,7 +152,7 @@ The history order has been reversed so that new features are at the top.
 	      aswell as the pure software drivers...see documentation for further
               details. Only mip-mapping to deal with now.
             - Fixed the software 32bit RGB transpositions problem, I think :)
-              32bit software procedural clours should now be correct. Please 
+              32bit software procedural colours should now be correct. Please 
               people on big endian machines check this!!
             - Optimised the GL back buffer implementation so it now clears Zbuffer
               and/or screen with QUADS rather than the whole screen ;).

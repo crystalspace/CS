@@ -121,30 +121,42 @@ void csTextureMMOpenGL::InitTexture (csTextureManagerOpenGL *texman,
       }
       case SOFTWARE_TEXTURE:
       {
-	// This pathway allows native 16bit support if screen is in this mode
+	// This is always in 32bit no matter what the pfmt.
 	csOpenGLProcSoftware *stexG3D = new csOpenGLProcSoftware (NULL);
-	if (stexG3D->Prepare (texman->G3D, texman->head_soft_proc_tex, 
-			      this, pfmt, image->GetImageData (), alone_hint))
-	{
-	  ((csTextureProcOpenGL*)tex[0])->texG3D = (iGraphics3D*) stexG3D;
-	  if (!texman->head_soft_proc_tex)
-	    texman->head_soft_proc_tex = stexG3D;
-	}
-	break;
-      }
-      case SOFTWARE_TEXTURE_32BIT:
-      {
-	// This path forces the software procedural textures to be in 32bit
-	// no matter what the pfmt.
-	csOpenGLProcSoftware *stexG3D = new csOpenGLProcSoftware (NULL);
+	// We generate a 32 bit pfmt taking into account endianness and whether
+	// frame buffer is RGB or BGR...there must be a better way...
 	csPixelFormat pfmt2;
-	// @@ BAD need to work out endianness issues etc.
+#if defined (CS_BIG_ENDIAN)
+	if (pfmt->RedMask > pfmt->BlueMask)
+	{
+	  pfmt2.RedMask   = 0xff000000;
+	  pfmt2.GreenMask = 0x00ff0000;
+	  pfmt2.BlueMask  = 0x0000ff00;
+	}
+	else
+	{
+	  pfmt2.RedMask   = 0x0000ff00;
+	  pfmt2.GreenMask = 0x00ff0000;
+	  pfmt2.BlueMask  = 0xff000000;
+	}
+#else
+	if (pfmt->RedMask > pfmt->BlueMask)
+	{
+	  pfmt2.RedMask   = 0x00ff0000;
+	  pfmt2.GreenMask = 0x0000ff00;
+	  pfmt2.BlueMask  = 0x000000ff;
+	}
+	else
+	{
+	  pfmt2.RedMask   = 0x000000ff;
+	  pfmt2.GreenMask = 0x0000ff00;
+	  pfmt2.BlueMask  = 0x00ff0000;
+	}
+#endif
 	pfmt2.PixelBytes = 4;
-	pfmt2.RedMask = 16711680;
-	pfmt2.GreenMask = 65280;
-	pfmt2.BlueMask = 255;
 	pfmt2.PalEntries = 0;
 	pfmt2.complete ();
+
 	if (stexG3D->Prepare (texman->G3D, texman->head_soft_proc_tex, 
 			      this, &pfmt2, image->GetImageData (), alone_hint))
 	{
@@ -221,8 +233,6 @@ void csTextureManagerOpenGL::read_config (csIniFile *config)
 
   if (!strcmp (proc_texture_type, "software"))
     proc_tex_type = SOFTWARE_TEXTURE;
-  else if (!strcmp (proc_texture_type, "force32bitsoftware"))
-    proc_tex_type = SOFTWARE_TEXTURE_32BIT;
   else if (!strcmp (proc_texture_type, "back_buffer"))
     proc_tex_type = BACK_BUFFER_TEXTURE;
   else if (!strcmp (proc_texture_type, "auxiliary_buffer"))

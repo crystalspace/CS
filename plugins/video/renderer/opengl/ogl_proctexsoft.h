@@ -72,6 +72,9 @@ class csOpenGLProcSoftware : public iGraphics3D
   /// The instance of csSoftProcTexture3D this instance wraps
   iGraphics3D *g3d;
 
+  /// The redirector to the real G2D
+  iGraphics2D *dummy_g2d;
+
   /// We keep a singly linked list of software textures
   csOpenGLProcSoftware *head_soft_tex;
   csOpenGLProcSoftware *next_soft_tex;
@@ -143,4 +146,175 @@ class csOpenGLProcSoftware : public iGraphics3D
 			     int tx, int ty, int tw, int th);
 };
 
+
+class csOpenGLProcSoftware2D : public iGraphics2D
+{
+  iGraphics2D *g2d;
+
+  int ConvertColour (int col)
+  {
+    return soft_texman->FindRGB 
+      (((col & gl_pfmt->RedMask) >> gl_pfmt->RedShift) << (8-gl_pfmt->RedBits),
+       ((col&gl_pfmt->GreenMask) >> gl_pfmt->GreenShift) << (8-gl_pfmt->GreenBits),
+       ((col & gl_pfmt->BlueMask) >> gl_pfmt->BlueShift) << (8-gl_pfmt->BlueBits));
+  }
+
+  iTextureManager *soft_texman;
+  csPixelFormat *gl_pfmt;
+
+ public:
+  DECLARE_IBASE;
+
+  csOpenGLProcSoftware2D (iGraphics3D *g3d, csPixelFormat *pfmt)
+  {
+    g2d = g3d->GetDriver2D ();
+    soft_texman = g3d->GetTextureManager ();
+    gl_pfmt = pfmt;
+  }
+
+  virtual ~csOpenGLProcSoftware2D () {};
+
+  virtual bool Initialize (iSystem* /*System*/)
+  { return false; }
+
+  virtual bool Open (const char* /*Title*/)
+  { return false; }
+
+  virtual void Close () {};
+
+  virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY)
+  { g2d->SetClipRect (nMinX, nMinY, nMaxX, nMaxY); }
+
+  virtual void GetClipRect (int& nMinX, int& nMinY, int& nMaxX, int& nMaxY)
+  { g2d->GetClipRect (nMinX, nMinY, nMaxX, nMaxY); }
+
+  virtual bool BeginDraw ()
+  { return g2d->BeginDraw (); }
+
+  virtual void FinishDraw ()
+  { g2d->FinishDraw (); }
+
+  virtual void Print (csRect* pArea) 
+  { g2d->Print (pArea); }
+
+  virtual int GetPage ()
+  { return g2d->GetPage (); }
+
+  virtual bool DoubleBuffer (bool /*Enable*/)
+  { return false; }
+
+  virtual bool GetDoubleBufferState ()
+  { return false; }
+
+  virtual void Clear (int color)
+  { g2d->Clear (ConvertColour (color)); }
+
+  virtual void ClearAll (int color)
+  { g2d->ClearAll (ConvertColour (color)); }
+
+  virtual void DrawLine (float x1, float y1, float x2, float y2, int color)
+  { g2d->DrawLine (x1, y1, x2, y2, ConvertColour (color)); }
+
+  virtual void DrawBox (int x, int y, int w, int h, int color)
+  { g2d->DrawBox (x, y, w, h, ConvertColour (color)); }
+
+  virtual bool ClipLine (float& x1, float& y1, float& x2, float& y2,
+    int xmin, int ymin, int xmax, int ymax)
+  { return g2d->ClipLine (x1, y1, x2, y2, xmin, ymin, xmax, ymax); }
+
+  virtual void DrawPixel (int x, int y, int color)
+  { g2d->DrawPixel (x, y, ConvertColour (color)); }
+
+  virtual unsigned char *GetPixelAt (int x, int y)
+  { return g2d->GetPixelAt (x, y); }
+
+  virtual csImageArea *SaveArea (int x, int y, int w, int h)
+  { return g2d->SaveArea (x, y, w, h); }
+
+  virtual void RestoreArea (csImageArea *Area, bool Free)
+  { g2d->RestoreArea (Area, Free); }
+
+  virtual void FreeArea (csImageArea *Area)
+  { g2d->FreeArea (Area); }
+
+  virtual bool SetMousePosition (int /*x*/, int /*y*/)
+  { return false; }
+
+  virtual bool SetMouseCursor (csMouseCursorID /*iShape*/)
+  { return false; }
+
+  virtual void SetRGB (int i, int r, int g, int b)
+  { g2d->SetRGB (i, r, g, b); }
+  ///
+  virtual void Write (int x, int y, int fg, int bg, const char *str)
+  { 
+    int cbg; 
+    if (bg == -1) cbg = bg;
+    else cbg = ConvertColour (bg);
+    g2d->Write (x, y, ConvertColour (fg), cbg, str);
+  }
+
+  virtual void WriteChar (int x, int y, int fg, int bg, char c)
+  { 
+    int cbg; 
+    if (bg == -1) cbg = bg;
+    else cbg = ConvertColour (bg);
+    g2d->WriteChar (x, y, ConvertColour (fg), cbg, c);
+  }
+
+  virtual int GetFontID ()
+  { return g2d->GetFontID (); }
+
+  virtual void SetFontID (int FontID)
+  { g2d->SetFontID (FontID); }
+
+  virtual bool SetFontSize (int FontSize)
+  { return g2d->SetFontSize (FontSize); }
+
+  virtual int GetFontSize ()
+  { return g2d->GetFontSize (); }
+
+  virtual bool PerformExtension (const char *args)
+  { return g2d->PerformExtension (args); }
+
+  virtual int GetPixelBytes ()
+  { return g2d->GetPixelBytes (); }
+
+  virtual csPixelFormat *GetPixelFormat ()
+  { return g2d->GetPixelFormat (); }
+
+  virtual int GetWidth ()
+  { return g2d->GetWidth (); }
+
+  virtual int GetHeight ()
+  { return g2d->GetHeight (); }
+
+  virtual bool GetFullScreen ()
+  { return false; }
+
+  virtual int GetNumPalEntries ()
+  { return g2d->GetNumPalEntries (); }
+
+  virtual RGBPixel *GetPalette ()
+  { return g2d->GetPalette (); }
+
+  virtual int GetTextWidth (int FontID, const char *text)
+  { return g2d->GetTextWidth (FontID, text); }
+
+  virtual int GetTextHeight (int FontID)
+  { return g2d->GetTextHeight (FontID); }
+
+  virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
+  { g2d->GetPixel (x, y, oR, oG, oB); }
+
+  virtual iImage *ScreenShot () 
+  { return g2d->ScreenShot(); }
+
+  virtual iGraphics2D *CreateOffScreenCanvas 
+  (int /*width*/, int /*height*/, void* /*buffer*/, csOffScreenBuffer /*hint*/, 
+   csPixelFormat* /*ipfmt = NULL*/, RGBPixel* /*palette = NULL*/, 
+   int /*pal_size = 0*/)
+  { return NULL; }
+
+};
 #endif // _OGL_PROCEXSOFT_H_

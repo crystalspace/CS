@@ -23,6 +23,7 @@
 #include "soft_txt.h"
 #include "csgfxldr/memimage.h"
 #include "csgfxldr/rgbpixel.h"
+#include "itexture.h"
 
 DECLARE_FACTORY (csSoftProcTexture3D)
 
@@ -32,19 +33,21 @@ IMPLEMENT_IBASE (csSoftProcTexture3D)
   IMPLEMENTS_INTERFACE (iSoftProcTexture)
 IMPLEMENT_IBASE_END
 
+csSoftProcTexture3D *csSoftProcTexture3D::head_texG3D = NULL;
+
 csSoftProcTexture3D::csSoftProcTexture3D (iBase *iParent)
   : csGraphics3DSoftwareCommon ()
 {
   CONSTRUCT_IBASE (iParent);
-  tex_mm = NULL;
+  soft_tex_mm = NULL;
   System = NULL;
-  partner_g3d = NULL;
   G2D = NULL;
+  reprepare = false;
 }
 
 csSoftProcTexture3D::~csSoftProcTexture3D ()
 { 
-  if (partner_g3d || tex_mm)
+  if ((head_texG3D != this) || reprepare)
   {
     // We are sharing the cache and texture manager
     tcache = NULL;
@@ -62,25 +65,23 @@ void csSoftProcTexture3D::Print (csRect *area)
 {
   csGraphics3DSoftwareCommon::Print (area);
 
-  if (tex_mm && pfmt.PixelBytes != 1)
-    tex_mm->RePrepareProcTexture ();
+  if (reprepare)
+    soft_tex_mm->ReprepareProcTexture ();
 }
 
 bool csSoftProcTexture3D::Prepare 
     (csTextureMMSoftware *tex_mm, csGraphics3DSoftwareCommon *parent_g3d,
-     csSoftProcTexture3D *partner_g3d, bool alone_hint, void *buffer, 
-     csPixelFormat *ipfmt, RGBPixel *palette, int pal_size)
+     csSoftProcTexture3D *first_texG3D, void *buffer,  uint8 *bitmap, 
+     csPixelFormat *ipfmt, RGBPixel *palette, bool alone_hint)
 {
-  int width, height;
+  parent_tex_mm = tex_mm;
   tex_mm->GetMipMapDimensions (0, width, height);
   (System = parent_g3d->System)->IncRef ();
-  this->partner_g3d = partner_g3d;
-
   iGraphics2D *g2d = parent_g3d->G2D;
-    
-  G2D = g2d->CreateOffScreenCanvas (width, height, buffer, 
+  G2D = g2d->CreateOffScreenCanvas (width, height, 
+				    bitmap ? (void*) bitmap : (void*) buffer, 
 			      alone_hint ? csosbSoftwareAlone : csosbSoftware,
- 			      ipfmt, palette, pal_size);
+ 			      ipfmt, palette, 256);
 
   if (!G2D)
   {
@@ -89,70 +90,72 @@ bool csSoftProcTexture3D::Prepare
     return false;
   }
 
-  if (partner_g3d)
+  if (!alone_hint && (ipfmt->PixelBytes != 1))
+    reprepare = true;
+
+  if ((ipfmt->PixelBytes == 1) || !alone_hint)
   {
-    SharedInitialize ((csGraphics3DSoftwareCommon*)partner_g3d);
-    if (!Open (NULL) || !SharedOpen ())
-      return false;
-  }
-  else if (!alone_hint)
-  {
-    this->tex_mm = tex_mm;
+    // We are utilising the main texture manager only
     SharedInitialize ((csGraphics3DSoftwareCommon*)parent_g3d);
     if (!Open (NULL) || !SharedOpen ())
       return false;
+    soft_tex_mm = tex_mm;
   }
   else
   {
-    // alone_hint is true and we are the first procedural texture
-    NewInitialize ();
-    if (!Open (NULL) || !NewOpen ())
-      return false;
+    if (!first_texG3D)
+    {
+      // We are the first procedural texture utilising a dedicated 
+      // procedural texture manager working in 8bit
+      head_texG3D = this;
+      NewInitialize ();
+      if (!Open (NULL) || !NewOpen ())
+	return false;
+      csTextureManagerSoftware *main_txtmgr = (csTextureManagerSoftware*)parent_g3d->GetTextureManager();
+      texman->SetMainTextureManager (main_txtmgr);
+      main_txtmgr->SetProcTextureManager (texman);
+    }
+    else
+    {
+      SharedInitialize ((csGraphics3DSoftwareCommon*)head_texG3D);
+      if (!Open (NULL) || !SharedOpen ())
+	return false;
+    }
+
+    // In order to keep the palette synchronised we register ourselves with
+    // this texture manager.
+    iImage *im = (iImage*) new csImageMemory (width, height, 
+					      (RGBPixel*) buffer, false);
+    soft_tex_mm = (csTextureMMSoftware *)
+                  texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
   }
 
   return true;
 }
 
+
   // The entry point for other than software graphics drivers..
 iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer 
-    (iGraphics3D *parent_g3d, iGraphics3D* partner, int width, int height, 
+    (iGraphics3D *parent_g3d, iGraphics3D* g3d_partner, int width, int height, 
      void *buffer, csOffScreenBuffer hint, csPixelFormat *ipfmt)
 {
-  partner_g3d = (csGraphics3DSoftwareCommon*)partner;
-  iGraphics2D *parent_g2d = parent_g3d->GetDriver2D ();
-
+  // Always in 32bit
   // Here we create additional images for this texture which are registered as 
   // procedural textures with our own texture manager. This way if the procedural
   // texture is written to with itself, this texture manager will know about it
   // and act accordingly. This is done for both alone and sharing procedural
   // textures. In the case of the alone procedural texture it will never be 
-  // utilised unless there is another sharing procedural texture in the system
-  // in which case the previous alone procedural textures are converted to
-  // sharing ones.
- 
-  // We set the 'destroy' parameter for csImageMemory to false as these buffers 
-  // are destroyed else where.
-  iImage *tex_image;
+  // utilised unless a sharing procedural texture is introduced into the 
+  // system in which case the previous alone procedural textures are all converted
+  // to sharing ones.
 
-  if (ipfmt->PixelBytes == 4)
-  {
-    tex_image = new csImageMemory (width, height, 
-				   (RGBPixel*)buffer, false);
-    G2D = parent_g2d->CreateOffScreenCanvas (width, height, buffer, 
-					     hint, ipfmt, NULL, 0);
-  }
-  else
-  {
-    // 16bit, no paletted opengl
-    RGBPixel *image_buffer = new RGBPixel[width*height];
-    tex_image = new csImageMemory (width, height, 
-				  image_buffer, true);
+  // If this is a sharing procedural texture then the texture needs repreparing
+  // each update.
+  if (hint == csosbHardware)
+    reprepare = true;
 
-    // Here we pass the image_buffer which is updated within our own texture
-    // manager through the 'palette' parameter
-    G2D = parent_g2d->CreateOffScreenCanvas (width, height, buffer, 
-					     hint, ipfmt, image_buffer, 0);
-  }
+  G2D = parent_g3d->GetDriver2D ()->CreateOffScreenCanvas (width, height, buffer, 
+							   hint, ipfmt, NULL, 0);
 
   if (!G2D)
   {
@@ -161,9 +164,10 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
     return NULL;
   }
 
-  if (partner)
+  if (g3d_partner)
   {
-    SharedInitialize (partner_g3d);
+    partner = (csGraphics3DSoftwareCommon*)g3d_partner;
+    SharedInitialize (partner);
     if (!Open (NULL) || !SharedOpen ())
       return NULL;
   }
@@ -177,20 +181,21 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
   // Register our own buffer as a procedural texture. 
   // The texture handles GetProcTextureInterface () is never called so
   // no additional interfaces are created.
-  int flags = CS_TEXTURE_PROC | CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS;
-  iTextureHandle *soft_tex_handle = texman->RegisterTexture (tex_image, flags);
-  texman->PrepareTexture (soft_tex_handle);
 
-  if (hint == csosbHardware)
-    tex_mm = (csTextureMMSoftware*) soft_tex_handle;
-  else
-    tex_mm_alone = (csTextureMMSoftware*) soft_tex_handle;
+  // We set the 'destroy' parameter for csImageMemory to false as these buffers 
+  // are destroyed else where.
+  iImage *tex_image = new csImageMemory (width, height, 
+					 (RGBPixel*)buffer, false);
+
+  soft_tex_mm = (csTextureMMSoftware *) texman->RegisterTexture (tex_image,
+						 CS_TEXTURE_PROC | CS_TEXTURE_2D);
+  texman->PrepareTexture ((iTextureHandle*)soft_tex_mm);
 
   // Return the software texture managers handle for this procedural texture.
-  return soft_tex_handle;
+  return soft_tex_mm;
 }
 
 void csSoftProcTexture3D::ConvertMode ()
 {
-  if (!tex_mm) tex_mm = tex_mm_alone;
+  reprepare = true;
 }

@@ -189,7 +189,6 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
     glTexCoord2i (0, 0);
     glVertex3i (0, height, 0);
     glEnd ();
-    glFlush ();
   }
 
   DrawMode = DrawFlags;
@@ -336,28 +335,29 @@ void csOpenGLProcBackBuffer2D::SetFontID (int FontID)
 void csOpenGLProcBackBuffer2D::DrawLine (float x1, float y1, 
 					    float x2, float y2, int color)
 { 
-  g2d->DrawLine (x1, height - y1, x2, height - y2, color); 
+  g2d->DrawLine (x1, frame_height - height + y1, 
+		 x2, frame_height - height + y2, color); 
 }
 
 void csOpenGLProcBackBuffer2D::DrawBox (int x, int y, int w, int h, 
 					   int color)
 {
-    g2d->DrawBox (x, height - y, w, h, color); 
+  g2d->DrawBox (x, frame_height - height + y, w, h, color); 
 }
 
 void csOpenGLProcBackBuffer2D::DrawPixel (int x, int y, int color)
 { 
-  g2d->DrawPixel (x, height - y, color); 
+  g2d->DrawPixel (x, frame_height - height + y, color); 
 }
 
 unsigned char *csOpenGLProcBackBuffer2D::GetPixelAt (int x, int y)
 { 
-  return g2d->GetPixelAt (x, height - y); 
+  return g2d->GetPixelAt (x, frame_height - height + y); 
 }
 
 csImageArea *csOpenGLProcBackBuffer2D::SaveArea (int x, int y, int w, int h)
 { 
-  return g2d->SaveArea (x, height - y, w, h); 
+  return g2d->SaveArea (x, frame_height - height + y, w, h); 
 }
 
 void csOpenGLProcBackBuffer2D::Write (int x, int y, int fg, int bg, 
@@ -387,5 +387,5 @@ int csOpenGLProcBackBuffer2D::GetHeight ()
 void csOpenGLProcBackBuffer2D::GetPixel (int x, int y, 
 					    UByte &oR, UByte &oG, UByte &oB)
 { 
-  g2d->GetPixel (x, height - y, oR, oG, oB); 
+  g2d->GetPixel (x, frame_height - height + y, oR, oG, oB); 
 }

@@ -1,3 +1,4 @@
+/*  -*- Mode: C++; -*- */
 /*
     This include file contains the loop that clips the polygon pointed by
     InP to the output array pointed by OutP against a single edge of clipper

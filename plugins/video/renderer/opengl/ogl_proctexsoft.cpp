@@ -31,6 +31,9 @@
 IMPLEMENT_IBASE (csOpenGLProcSoftware)
   IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END;
+IMPLEMENT_IBASE (csOpenGLProcSoftware2D)
+  IMPLEMENTS_INTERFACE (iGraphics2D)
+IMPLEMENT_IBASE_END;
 
 #define SysPrintf system->Printf
 
@@ -75,6 +78,8 @@ public:
   void AddTextureHandles (iTextureHandle *soft, iTextureHandle *ogl);
 };
 
+//----------------------------------------------------------------------------
+
 iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 {
   csTextureMM *txtmm = (csTextureMM*)ogl_txt->GetPrivateObject();
@@ -114,8 +119,10 @@ void TxtHandleVector::AddTextureHandles (iTextureHandle *soft,
   Push (new txt_handles (soft, ogl));
   
 }
-//-----------------------------------------------------------------------------
 
+
+
+//-------------------------------------------------------------------------------
 
 csOpenGLProcSoftware::csOpenGLProcSoftware (iBase * pParent)
 { 
@@ -150,6 +157,7 @@ csOpenGLProcSoftware::~csOpenGLProcSoftware ()
       last = last->next_soft_tex;
     last->next_soft_tex = next_soft_tex;
   }
+  delete dummy_g2d;
 }
 
 void csOpenGLProcSoftware::ConvertAloneMode ()
@@ -205,10 +213,10 @@ bool csOpenGLProcSoftware::Prepare
   // temporarily assign parent_g3d as g3d so that the software 3d driver
   // can get the 2d software procedural texture driver from the opengl 2d 
   // driver.
-  g3d = parent_g3d;
+//    g3d = parent_g3d;
 
   iTextureHandle *soft_proc_tex = isoft_proc->CreateOffScreenRenderer 
-    ((iGraphics3D*)this, 
+    ((iGraphics3D*) parent_g3d, 
      head_soft_tex ? head_soft_tex->g3d : NULL, 
      width, height, buffer, 
      alone_mode ? csosbHardwareAlone : csosbHardware, ipfmt);
@@ -220,6 +228,10 @@ bool csOpenGLProcSoftware::Prepare
   }
   // set to correct value.
   g3d = soft_proc_g3d;
+
+  // Get the main renderers pixel format as this is not necessarily 32bit
+  csPixelFormat *main_pfmt = parent_g3d->GetDriver2D()->GetPixelFormat ();
+  dummy_g2d = (iGraphics2D*) new csOpenGLProcSoftware2D (g3d, main_pfmt);
 
   if (!head_soft_tex)
     txts_vector = new TxtHandleVector (system, g3d->GetTextureManager ());
@@ -256,31 +268,9 @@ void csOpenGLProcSoftware::Print (csRect *area)
     // Texture is in tha cache, update texture directly.
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
     csglBindTexture (GL_TEXTURE_2D, tex_data->Handle);
-
-    switch (pfmt.PixelBytes)
-    {
-#ifdef GL_VERSION_1_2
-      case 2:
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-			width, height,
-			GL_RGB, GL_UNSIGNED_SHORT_5_6_5, buffer);
-	break;
-#endif
-      case 4:
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-			width, height,
-			GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-	break;
-
-      default:
-	 SysPrintf (MSG_STDOUT,
-		    "Either you are attempting paletted opengl or have a\n");
-	 SysPrintf (MSG_STDOUT, 
-		    "16/24bit display. In the latter case set proc texture to\n");
-	 SysPrintf (MSG_STDOUT, 
-		    "FORCE32BITSOFTWARE in data/config/opengl.cfg\n");
-	 break;
-    }
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
+		    width, height,
+		    GL_RGBA, GL_UNSIGNED_BYTE, buffer);
   }
   else
   {
@@ -292,7 +282,7 @@ void csOpenGLProcSoftware::Print (csRect *area)
 
 iGraphics2D *csOpenGLProcSoftware::GetDriver2D ()
 { 
-  return g3d->GetDriver2D (); 
+  return dummy_g2d; 
 }
 
 bool csOpenGLProcSoftware::BeginDraw (int DrawFlags)
@@ -533,6 +523,3 @@ void csOpenGLProcSoftware::DrawPixmap (iTextureHandle *hTex, int sx,
     soft_txt_handle = (iTextureHandle*)txts_vector->Get (idx)->soft_txt;
   g3d->DrawPixmap (soft_txt_handle, sx, sy, sw, sh, tx, ty, tw, th); 
 }
-
-
-

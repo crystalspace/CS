@@ -139,9 +139,10 @@ class csTextureSoftwareProc : public csTextureSoftware
 {
 public:
   csSoftProcTexture3D *texG3D;
+  bool proc_ok;
 
   csTextureSoftwareProc (csTextureMM *Parent, iImage *Image)
-    : csTextureSoftware (Parent, Image), texG3D(NULL)
+    : csTextureSoftware (Parent, Image), texG3D(NULL), proc_ok(false)
   {};
   /// Destroy the texture
   virtual ~csTextureSoftwareProc ();
@@ -155,6 +156,7 @@ public:
  */
 class csTextureMMSoftware : public csTextureMM
 {
+  friend class csSoftProcTexture3D;
 protected:
   /**
    * Private colormap -> global colormap table
@@ -181,6 +183,9 @@ protected:
 
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();
+
+  /// Helper function: Initialises according to given palette
+  void SetupFromPalette ();
 
   /// the texture manager
   csTextureManagerSoftware *texman;
@@ -216,20 +221,6 @@ public:
   /// Apply gamma correction to private palette
   void ApplyGamma (UByte *GammaTable);
 
-  /// Used in 8bit when more than one procedural texture 
-  void MapToGlobalPalette (RGBPixel *pal_8bit);
-
-  /// Return the interfaces to the procedural texture buffer
-  virtual iGraphics3D *GetProcTextureInterface ();
-
-  /// Called to update pal2glob with palette information created elsewhere
-  virtual void ProcTextureSync ();
-
-  /// Called when the procedural texture shares texture manager with parent 
-  /// context and in either 16 or 32bit. The 8bit version doesn't require 
-  /// repreparing.
-  void RePrepareProcTexture ();
-
   /**
    * Query if the texture has an alpha channel.<p>
    * This depends both on whenever the original image had an alpha channel
@@ -237,6 +228,25 @@ public:
    */
   virtual bool GetAlphaMap ()
   { return !!((csTextureSoftware *)get_texture (0))->get_alphamap (); }
+
+  /// Return the interfaces to the procedural texture buffer
+  virtual iGraphics3D *GetProcTextureInterface ();
+
+  virtual void ProcTextureSync ();
+
+  /**
+   * Called when the procedural texture shares texture manager with parent 
+   * context and in either 16 or 32bit. The 8bit version doesn't require 
+   * repreparing. Recalculates palette and remaps texture.
+   */
+  void ReprepareProcTexture ();
+
+  /**
+   * Remaps 8bit procedural texture to the global palette as calculated either
+   * by a dedicated 8bit texture manager or the main texture manager in 8bit
+   * display mode
+   */
+  void RemapProcToGlobalPalette (csTextureManagerSoftware *txtmgr);
 };
 
 
@@ -250,19 +260,6 @@ public:
 class csTextureManagerSoftware : public csTextureManager
 {
 private:
-  /// Structure to help manage multiple 8bit canvases
-  struct canvas8bit
-  {
-    canvas8bit (iGraphics2D *new_canvas)
-      : g2d(new_canvas), next(NULL) {};
-    canvas8bit (iGraphics2D *new_canvas, canvas8bit *head_canvas)
-      : g2d(new_canvas), next(head_canvas) {};
-
-    iGraphics2D *g2d;
-    canvas8bit *next;
-  };
-  /// Head of a linked list of 8bit canvases sharing this texture manager.
-  canvas8bit *mG2D;
   /// How strong texture manager should push 128 colors towards 
   /// a uniform palette
   int uniform_bias;
@@ -279,15 +276,11 @@ private:
   /// Configuration values for color matching.
   int prefered_dist;
 
-  /// We need a pointer to the 2D driver
-  iGraphics2D *G2D;
-
 public:
 
   /// We need a pointer to the 3D driver
   csGraphics3DSoftwareCommon *G3D;
 
-  csSoftProcTexture3D *alone_proc_tex;
   /// Apply dithering to textures while reducing from 24-bit to 8-bit paletted?
   bool dither_textures;
 
@@ -344,10 +337,6 @@ public:
   /// Set gamma correction value.
   void SetGamma (float iGamma);
 
-  /// Maintain a linked list of 8bit canvases for the procedural textures
-  void Register8BitCanvas (iGraphics2D *g2d8bit);
-  void UnRegister8BitCanvas (iGraphics2D *g2d8bit);
-
   /// Read configuration values from config file.
   virtual void read_config (csIniFile *config);
 
@@ -376,6 +365,31 @@ public:
   virtual void ReserveColor (int r, int g, int b);
   /// Really allocate the palette on the system.
   virtual void SetPalette ();
+
+  ///The dedicated procedural texture manager (if there is one)
+  csTextureManagerSoftware *proc_txtmgr;
+
+  /// The main texture manager (if this is a dedicated procedural texture manager)
+  csTextureManagerSoftware *main_txtmgr;
+
+  /**
+   * If this instance is not a proc_only_txtmgr but there are 8bit procedural 
+   * textures in the system, remember the first one.
+   */
+  csSoftProcTexture3D *first_8bit_proc_tex;
+
+  void SetMainTextureManager (csTextureManagerSoftware *main_txt_mgr) 
+  { main_txtmgr = main_txt_mgr; }
+
+  void SetProcTextureManager (csTextureManagerSoftware *proc_txt_mgr) 
+  { proc_txtmgr =  proc_txt_mgr; }
+
+  /**
+   * When in 16/32bit mode and the proc textures are in 8bit the palettes are
+   * managed by the 8bit texture manager. This function is called to remap the 
+   * textures according to the new palette etc.
+   */
+  void ReprepareAloneProcs ();
 };
 
 #endif // __SOFT_TXT_H__
