@@ -2,7 +2,7 @@ SubDir TOP plugins cscript cspython ;
 
 if $(PYTHON.AVAILABLE) = "yes"
 {
-  if $(CMD.SWIG)
+  if $(CMD.SSSWIG)
   {
     Swig cs_pyth.cpp : include/ivaria/cspace.i : 
 		       include/ivaria/pythpre.i include/ivaria/pythpost.i : 
