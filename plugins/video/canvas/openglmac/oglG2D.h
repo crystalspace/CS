@@ -24,11 +24,9 @@
 #include <gl/gl.h>
 #include <agl.h>
 #include "cscom/com.h"
-#include "cs2d/common/graph2d.h"
 #include "cs2d/mac/xsysg2d.h"
+#include "cs2d/openglcommon/glcommon2d.h"
 
-class csTextureHandle;
-class csGraphics2DOpenGLFontServer;
 
 // the CLSID to create csGraphics2DWin32 instances.
 extern const CLSID CLSID_OpenGLGraphics2D;
@@ -51,14 +49,10 @@ public:
 };
 
 /// Windows version.
-class csGraphics2DOpenGL : public csGraphics2D
+class csGraphics2DOpenGL : public csGraphics2DGLCommon
 {
 	friend class csGraphics3DOpenGL;
 
-private:
-	// Calculate the OpenGL pixel format.
-	void CalcPixelFormat ();
-  
 public:
 	csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D);
 	virtual ~csGraphics2DOpenGL(void);
@@ -90,23 +84,6 @@ public:
 
 	int mGraphicsReady;
 
-	/// Draw a line
-	virtual void	DrawLine(float x1, float y1, float x2, float y2, int color);
-	/// Draw a pixel
-	static void		DrawPixelGL(int x, int y, int color);
-	/// Write a single character
-	static void		WriteCharGL(int x, int y, int fg, int bg, char c);
-	/// Draw a 2D sprite
-	static void		DrawSpriteGL(ITextureHandle *hTex, int sx, int sy, int sw, int sh,
-											int tx, int ty, int tw, int th);
-	/**
-	 * Get address of video RAM at given x,y coordinates.
-	 * The OpenGL version of this function just returns NULL.
-	 */
-	static unsigned char* GetPixelAtGL (int x, int y);
-
-	void			Clear( int color );
-
 protected:
 	CWindowPtr			mMainWindow;
 	GDHandle			mMainGDevice;
@@ -120,9 +97,6 @@ protected:
 	GDHandle			mSavedGDHandle;
     short				mActivePage;
 
-	static csGraphics2DOpenGLFontServer *sLocalFontServer;
-
-	static void			SetGLColorfromInt( int color );
 	void				DisplayErrorDialog( short errorIndex );
 
 	DECLARE_IUNKNOWN()
