@@ -16,6 +16,11 @@ chronological order.
 	  the _cspace.so module and RPM building where it complained that it
 	  was unable to find "required and provided libraries".  Reported by
 	  Vincent Knecht and Andre Duclos.
+	- res made some minor changes to csApplicationFramework: some 
+	  nomenclature changes (DisplayError -> ReportError, mp_object_reg ->
+	  object_reg), made object_reg protected, made dtor protected, added
+	  new Free() method (to delete the instance and call 
+	  DestroyApplication() afterwards).
 9-May-2004
 	- Vincent Knecht made the following changes to cs.spec:
 	    - Added current dir to PATH when invoking jam, so building

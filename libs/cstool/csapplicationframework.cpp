@@ -22,9 +22,10 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/event.h"
 
 // Static 
-iObjectRegistry* csApplicationFramework::mp_object_reg = 0;
+iObjectRegistry* csApplicationFramework::object_reg = 0;
 csApplicationFramework* csApplicationFramework::m_Ptr = 0;
 char* csApplicationFramework::m_ApplicationStringName = "user app";
 const char* csApplicationFramework::m_FoundationStringName =
@@ -55,23 +56,33 @@ bool csApplicationFramework::Start ()
 void csApplicationFramework::End ()
 {
   CS_ASSERT (0 != m_Ptr);
-  DestroyApplication (mp_object_reg);
-  mp_object_reg = 0;
   m_Ptr->OnExit ();
+}
+
+void csApplicationFramework::Free ()
+{
+  iObjectRegistry* object_reg = csApplicationFramework::object_reg;
+  delete this;
+  // Calling DestroyApplication is okay - it's static
+  DestroyApplication (object_reg);
+  object_reg = 0;
 }
 
 void csApplicationFramework::OnExit ()
 {
 }
-
+  
 bool csApplicationFramework::Initialize (int argc, char *argv[])
 {
-  mp_object_reg = CreateEnvironment (argc, argv);
+  object_reg = CreateEnvironment (argc, argv);
 
-  if (mp_object_reg == 0)
+  if (object_reg == 0)
+  {
+    ReportLibError ("Environment could not be created!");
     return false;
-
+  }
   CS_ASSERT (0 != m_Ptr);
+  
   return m_Ptr->OnInitialize (argc, argv);
 }
 
