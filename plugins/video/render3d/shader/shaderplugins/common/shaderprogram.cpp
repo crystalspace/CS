@@ -48,6 +48,199 @@ csShaderProgram::~csShaderProgram ()
   delete[] description;
   SCF_DESTRUCT_IBASE();
 }
+  
+void csShaderProgram::ResolveParamStatic (ProgramParam& param,
+  csArray<iShaderVariableContext*> &staticContexts)
+{
+  if (param.name != csInvalidStringID)
+  {
+    for (int j=0; j < staticContexts.Length(); j++)
+    {
+      if (!param.var)
+      {
+	param.var = staticContexts[j]->GetVariable (param.name);
+	if (param.var) break;
+      }
+    }
+  }
+}
+
+bool csShaderProgram::ParseProgramParam (iDocumentNode* node,
+  ProgramParam& param, uint types)
+{
+  const char* type = node->GetAttributeValue ("type");
+  if (type == 0)
+  {
+    synsrv->Report ("crystalspace.graphics3d.shader.common",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "No 'type' attribute");
+    return false;
+  }
+  ProgramParamType paramType = ParamInvalid;
+  if (strcmp (type, "shadervar") == 0)
+  {
+    const char* value = node->GetContentsValue();
+    if (!value)
+    {
+      synsrv->Report ("crystalspace.graphics3d.shader.common",
+	CS_REPORTER_SEVERITY_WARNING,
+	node,
+	"Node has no contents");
+      return false;
+    }
+    param.name = strings->Request (value);
+    param.valid = true;
+    return true;
+  }
+  else if (strcmp (type, "float") == 0)
+  {
+    paramType = ParamFloat;
+  }
+  else if (strcmp (type, "vector2") == 0)
+  {
+    paramType = ParamVector2;
+  }
+  else if (strcmp (type, "vector3") == 0)
+  {
+    paramType = ParamVector3;
+  }
+  else if (strcmp (type, "vector4") == 0)
+  {
+    paramType = ParamVector4;
+  }
+  else if (strcmp (type, "matrix") == 0)
+  {
+    paramType = ParamMatrix;
+  }
+  else 
+  {
+    synsrv->Report ("crystalspace.graphics3d.shader.common",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "Unknown type '%s'", type);
+    return false;
+  }
+
+  if (!types & paramType)
+  {
+    synsrv->Report ("crystalspace.graphics3d.shader.common",
+      CS_REPORTER_SEVERITY_WARNING,
+      node,
+      "Type '%s' not supported by this parameter", type);
+    return false;
+  }
+
+  switch (paramType)
+  {
+    case ParamInvalid:
+      return false;
+      break;
+    case ParamFloat:
+      {
+	float x = node->GetContentsValueAsFloat ();
+	param.vectorValue.Set (x, x, x, x);
+      }
+      break;
+    case ParamVector2:
+      {
+	float x, y;
+	const char* value = node->GetContentsValue();
+	if (!value)
+	{
+	  synsrv->Report ("crystalspace.graphics3d.shader.common",
+	    CS_REPORTER_SEVERITY_WARNING,
+	    node,
+	    "Node has no contents");
+	  return false;
+	}
+	if (sscanf (value, "%f,%f", &x, &y) != 2)
+	{
+	  synsrv->Report ("crystalspace.graphics3d.shader.common",
+	    CS_REPORTER_SEVERITY_WARNING,
+	    node,
+	    "Couldn't parse vector2 '%s'", value);
+	  return false;
+	}
+	param.vectorValue.Set (x, y, 0.0f, 1.0f);
+      }
+      break;
+    case ParamVector3:
+      {
+	float x, y, z;
+	const char* value = node->GetContentsValue();
+	if (!value)
+	{
+	  synsrv->Report ("crystalspace.graphics3d.shader.common",
+	    CS_REPORTER_SEVERITY_WARNING,
+	    node,
+	    "Node has no contents");
+	  return false;
+	}
+	if (sscanf (value, "%f,%f,%f", &x, &y, &z) != 3)
+	{
+	  synsrv->Report ("crystalspace.graphics3d.shader.common",
+	    CS_REPORTER_SEVERITY_WARNING,
+	    node,
+	    "Couldn't parse vector3 '%s'", value);
+	  return false;
+	}
+	param.vectorValue.Set (x, y, z, 1.0f);
+      }
+      break;
+    case ParamVector4:
+      {
+	float x, y, z, w;
+	const char* value = node->GetContentsValue();
+	if (!value)
+	{
+	  synsrv->Report ("crystalspace.graphics3d.shader.common",
+	    CS_REPORTER_SEVERITY_WARNING,
+	    node,
+	    "Node has no contents");
+	  return false;
+	}
+	if (sscanf (value, "%f,%f,%f,%f", &x, &y, &z, &w) != 4)
+	{
+	  synsrv->Report ("crystalspace.graphics3d.shader.common",
+	    CS_REPORTER_SEVERITY_WARNING,
+	    node,
+	    "Couldn't parse vector4 '%s'", value);
+	  return false;
+	}
+	param.vectorValue.Set (x, y, z, w);
+      }
+      break;
+    case ParamMatrix:
+      {
+	if (!synsrv->ParseMatrix (node, param.matrixValue))
+	  return false;
+      }
+      break;
+  }
+
+  param.valid = true;
+  return true;
+}
+
+bool csShaderProgram::RetrieveParamValue (ProgramParam& param, 
+  const csShaderVarStack& stacks)
+{
+  csRef<csShaderVariable> var = param.var;
+  if (!var && (param.name != csInvalidStringID) &&
+      param.name < (csStringID)stacks.Length () && 
+      stacks[param.name].Length () > 0)
+    var = stacks[param.name].Top ();
+  if (var)
+  {
+    if (var->GetType() == csShaderVariable::MATRIX)
+      var->GetValue (param.matrixValue);
+    else
+      var->GetValue (param.vectorValue);
+  }
+
+  return ((var != 0) || (param.name == csInvalidStringID));
+}
 
 bool csShaderProgram::ParseCommon (iDocumentNode* child)
 {

@@ -75,9 +75,38 @@ protected:
       userPtr = 0;
     }
   };
+  csArray<VariableMapEntry> variablemap;
+
+  struct ProgramParam
+  {
+    bool valid;
+    csVector4 vectorValue;
+    csMatrix3 matrixValue;
+    csStringID name;
+    csRef<csShaderVariable> var;
+
+    ProgramParam() : valid (false), vectorValue (0.0f), 
+      name(csInvalidStringID) { }
+    ProgramParam(const csVector4& def) : valid (false), 
+      vectorValue (def), name(csInvalidStringID) { }
+  };
+  enum ProgramParamType
+  {
+    ParamInvalid    = 0,
+    ParamFloat	    = 0x01,
+    ParamVector2    = 0x02,
+    ParamVector3    = 0x04,
+    ParamVector4    = 0x08,
+    ParamMatrix	    = 0x10,
+  };
+  void ResolveParamStatic (ProgramParam& param,
+    csArray<iShaderVariableContext*> &staticContexts);
+  bool ParseProgramParam (iDocumentNode* node,
+    ProgramParam& param, uint types = ~0);
+  bool RetrieveParamValue (ProgramParam& param, 
+    const csShaderVarStack& stacks);
 
   char* description;
-  csArray<VariableMapEntry> variablemap;
   csRef<iDocumentNode> programNode;
   csRef<iFile> programFile;
   csString programFileName;

@@ -232,58 +232,32 @@ void csGLShaderFVP::SetupState (
       {
 	TexMatrixOp& op = layers[i].texMatrixOps[j];
 
-	if (op.valueVar != csInvalidStringID)
-	{
-	  if (!op.valueVarRef && 
-	      op.valueVar < (csStringID)stacks.Length () && 
-	      stacks[op.valueVar].Length () > 0)
-	    op.valueVarRef = stacks[op.valueVar].Top ();
-	}
+	RetrieveParamValue (op.param, stacks);
 
 	switch (op.type)
 	{
 	  case TexMatrixScale:
 	    {
-	      csVector3 v;
-	      if (op.valueVarRef.IsValid())
-		op.valueVarRef->GetValue (v);
-	      else
-		v = op.vectorValue;
-
-	      glScalef (v.x, v.y, v.z);
+	      glScalef (op.param.vectorValue.x, op.param.vectorValue.y, 
+		op.param.vectorValue.z);
 	    }
 	    break;
 	  case TexMatrixRotate:
 	    {
-	      csVector3 v;
-	      if (op.valueVarRef.IsValid())
-		op.valueVarRef->GetValue (v);
-	      else
-		v = op.vectorValue;
-
-	      glRotatef (v.x, 1.0f, 0.0f, 0.0f);
-	      glRotatef (v.y, 0.0f, 1.0f, 0.0f);
-	      glRotatef (v.z, 0.0f, 0.0f, 1.0f);
+	      glRotatef (op.param.vectorValue.x, 1.0f, 0.0f, 0.0f);
+	      glRotatef (op.param.vectorValue.y, 0.0f, 1.0f, 0.0f);
+	      glRotatef (op.param.vectorValue.z, 0.0f, 0.0f, 1.0f);
 	    }
 	    break;
 	  case TexMatrixTranslate:
 	    {
-	      csVector3 v;
-	      if (op.valueVarRef.IsValid())
-		op.valueVarRef->GetValue (v);
-	      else
-		v = op.vectorValue;
-
-	      glTranslatef (v.x, v.y, v.z);
+	      glTranslatef (op.param.vectorValue.x, op.param.vectorValue.y, 
+		op.param.vectorValue.z);
 	    }
 	    break;
 	  case TexMatrixMatrix:
 	    {
-	      csMatrix3 m;
-	      if (op.valueVarRef.IsValid())
-		op.valueVarRef->GetValue (m);
-	      else
-		m = op.matrixValue;
+	      const csMatrix3& m = op.param.matrixValue;
 
 	      float matrix[16];
 	      matrix[0] = m.m11; 
@@ -309,19 +283,12 @@ void csGLShaderFVP::SetupState (
       }
     }
 
-    var = layers[i].constcolorVarRef;
-    if (!var && layers[i].constcolorvar != csInvalidStringID &&
-        layers[i].constcolorvar < (csStringID)stacks.Length () && 
-        stacks[layers[i].constcolorvar].Length () > 0)
-      var = stacks[layers[i].constcolorvar].Top ();
 
-    if (var)
+    if (layers[i].constcolor.valid)
     {
-      csVector4 col;
-      var->GetValue (col);
-      GLfloat glcol[] = {col.x, col.y, col.z, col.w};
-
-      glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, glcol);
+      RetrieveParamValue (layers[i].constcolor, stacks);
+      glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, 
+	&layers[i].constcolor.vectorValue.x);
     }
   }
 
@@ -381,82 +348,11 @@ bool csGLShaderFVP::ParseTexMatrixOp (iDocumentNode* node,
       "No 'type' attribute");
     return false;
   }
-  if (!matrix && (strcmp (type, "float") == 0))
-  {
-    float x = node->GetContentsValueAsFloat ();
-    op.vectorValue.Set (x, x, x);
-  }
-  else if (!matrix && (strcmp (type, "vector2") == 0))
-  {
-    float x, y;
-    const char* value = node->GetContentsValue();
-    if (!value)
-    {
-      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-	CS_REPORTER_SEVERITY_WARNING,
-	node,
-	"Node has no contents");
-      return false;
-    }
-    if (sscanf (value, "%f,%f", &x, &y) != 2)
-    {
-      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-	CS_REPORTER_SEVERITY_WARNING,
-	node,
-	"Couldn't parse vector2 '%s'", value);
-      return false;
-    }
-    op.vectorValue.Set (x, y, 0.0f);
-  }
-  else if (!matrix && (strcmp (type, "vector3") == 0))
-  {
-    float x, y, z;
-    const char* value = node->GetContentsValue();
-    if (!value)
-    {
-      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-	CS_REPORTER_SEVERITY_WARNING,
-	node,
-	"Node has no contents");
-      return false;
-    }
-    if (sscanf (value, "%f,%f,%f", &x, &y, &z) != 3)
-    {
-      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-	CS_REPORTER_SEVERITY_WARNING,
-	node,
-	"Couldn't parse vector3 '%s'", value);
-      return false;
-    }
-    op.vectorValue.Set (x, y, z);
-  }
-  else if (matrix && (strcmp (type, "matrix") == 0))
-  {
-    if (!synsrv->ParseMatrix (node, op.matrixValue))
-      return false;
-    op.vectorValue.Set (0.0f);
-  }
-  else if (strcmp (type, "shadervar") == 0)
-  {
-    const char* value = node->GetContentsValue();
-    if (!value)
-    {
-      synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-	CS_REPORTER_SEVERITY_WARNING,
-	node,
-	"Node has no contents");
-      return false;
-    }
-    op.valueVar = strings->Request (value);
-  }
-  else 
-  {
-    synsrv->Report ("crystalspace.graphics3d.shader.glfixed",
-      CS_REPORTER_SEVERITY_WARNING,
-      node,
-      "Unknown type '%s'", type);
+  if (!ParseProgramParam (node, op.param,
+    matrix ? ParamMatrix : ParamFloat | ParamVector2 | ParamVector3 |
+    ParamVector4))
     return false;
-  }
+
   return true;
 }
 
@@ -474,7 +370,7 @@ bool csGLShaderFVP::ParseTexMatrix (iDocumentNode* node,
     {
       case XMLTOKEN_SCALE:
 	{
-	  TexMatrixOp newOp;
+	  TexMatrixOp newOp (1.0f);
 	  newOp.type = TexMatrixScale;
 	  if (!ParseTexMatrixOp (child, newOp))
 	    return false;
@@ -483,7 +379,7 @@ bool csGLShaderFVP::ParseTexMatrix (iDocumentNode* node,
 	break;
       case XMLTOKEN_ROTATE:
 	{
-	  TexMatrixOp newOp;
+	  TexMatrixOp newOp (0.0f);
 	  newOp.type = TexMatrixRotate;
 	  if (!ParseTexMatrixOp (child, newOp))
 	    return false;
@@ -492,7 +388,7 @@ bool csGLShaderFVP::ParseTexMatrix (iDocumentNode* node,
 	break;
       case XMLTOKEN_TRANSLATE:
 	{
-	  TexMatrixOp newOp;
+	  TexMatrixOp newOp (0.0f);
 	  newOp.type = TexMatrixTranslate;
 	  if (!ParseTexMatrixOp (child, newOp))
 	    return false;
@@ -501,7 +397,7 @@ bool csGLShaderFVP::ParseTexMatrix (iDocumentNode* node,
 	break;
       case XMLTOKEN_MATRIX:
 	{
-	  TexMatrixOp newOp;
+	  TexMatrixOp newOp (0.0f);
 	  newOp.type = TexMatrixMatrix;
 	  if (!ParseTexMatrixOp (child, newOp, true))
 	    return false;
@@ -557,8 +453,8 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
               lights[i].positionvar = strings->Request (str);
             else
             {
-              char buf[40];
-              sprintf (buf, "STANDARD_LIGHT_%d_POSITION", lights[i].lightnum);
+              char buf[64];
+              sprintf (buf, "STANDARD_LIGHT_%d_POSITION_WORLD", lights[i].lightnum);
               lights[i].positionvar = strings->Request (buf);
             }
 
@@ -602,14 +498,12 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
         case XMLTOKEN_CONSTANTCOLOR:
           {
 	    // @@@ Realize as var mapping?
-            const char* str;
-            if ((str = child->GetContentsValue ()) != 0)
-            {
-              int layer = child->GetAttributeValueAsInt ("layer");
-              if (layers.Length ()<=layer)
-                layers.SetLength (layer+1);
-              layers[layer].constcolorvar = strings->Request (str);
-            }
+            int layer = child->GetAttributeValueAsInt ("layer");
+            if (layers.Length ()<=layer)
+              layers.SetLength (layer+1);
+	    if (!ParseProgramParam (child, layers[layer].constcolor, ParamFloat | 
+	      ParamVector3 | ParamVector4))
+	      return false;
           }
           break;
         case XMLTOKEN_AMBIENT:
@@ -720,13 +614,7 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
   for (i = 0; i < layers.Length (); i++)
   {
-    layers[i].constcolorVarRef = 0;
-    for (j=0; j<staticContexts.Length(); j++)
-    {
-      if (!layers[i].constcolorVarRef)
-        layers[i].constcolorVarRef = staticContexts[j]->GetVariable (
-		layers[i].constcolorvar);
-    }
+    ResolveParamStatic (layers[i].constcolor, staticContexts);
   }
 
   for (i = 0; i < lights.Length (); i++)

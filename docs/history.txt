@@ -132,6 +132,16 @@ chronological order.
 	  active tab dynamically.
 	- Remi Bonnet made csSet::Delete returns whether an object was deleted
 	  or not.
+	- res added a facility to the common shader plugins to simplify the use
+	  of program parameters that can either be constants or shader 
+	  variables. (Functionality overlaps with variable mappings; would be
+	  nice colllapse var mappings and shader params at some point.)
+	- res augmented the light iter step to also provide the light position
+	  in world coordinates.
+	- res fixed the GL fixed vertex program to correctly use the light
+	  world position by default.
+	- res added fixed function-only terrain shaders. Support splatting and
+	  fading to flat, but not yet lighting.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.

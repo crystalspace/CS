@@ -46,12 +46,9 @@ public:
   struct TexMatrixOp
   {
     TexMatrixOpType type;
-    csStringID valueVar;
-    csRef<csShaderVariable> valueVarRef;
-    csVector3 vectorValue;
-    csMatrix3 matrixValue;
+    ProgramParam param;
 
-    TexMatrixOp() : valueVar(csInvalidStringID) { }
+    TexMatrixOp (float def) : param (def) { }
   };
 private:
   csStringHash tokens;
@@ -89,11 +86,10 @@ private:
   struct layerentry
   {
     TEXGENMODE texgen;
-    csStringID constcolorvar; 
-    csRef<csShaderVariable> constcolorVarRef;
+    ProgramParam constcolor;
     csArray<TexMatrixOp> texMatrixOps;
 
-    layerentry () : texgen(TEXGEN_NONE), constcolorvar (csInvalidStringID) {}
+    layerentry () : texgen(TEXGEN_NONE) {}
   };
 
   csArray<layerentry> layers;

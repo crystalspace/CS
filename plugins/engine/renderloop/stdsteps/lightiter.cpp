@@ -169,6 +169,7 @@ void csLightIterRenderStep::Init ()
       object_reg, "crystalspace.shared.stringset", iStringSet);
 
     csStringID posname = strings->Request ("STANDARD_LIGHT_0_POSITION");
+    csStringID poswname = strings->Request ("STANDARD_LIGHT_0_POSITION_WORLD");
     csStringID difname = strings->Request ("STANDARD_LIGHT_0_DIFFUSE");
     csStringID spcname = strings->Request ("STANDARD_LIGHT_0_SPECULAR");
     csStringID attname = strings->Request ("STANDARD_LIGHT_0_ATTENUATION");
@@ -183,6 +184,14 @@ void csLightIterRenderStep::Init ()
       shvar_light_0_position = new csShaderVariable (posname);
       shvar_light_0_position->SetType (csShaderVariable::VECTOR4);
       shadermgr->AddVariable (shvar_light_0_position);
+    }
+
+    shvar_light_0_position_world = shadermgr->GetVariable (poswname);
+    if (!shvar_light_0_position_world)
+    {
+      shvar_light_0_position_world = new csShaderVariable (poswname);
+      shvar_light_0_position_world->SetType (csShaderVariable::VECTOR4);
+      shadermgr->AddVariable (shvar_light_0_position_world);
     }
 
     shvar_light_0_diffuse = shadermgr->GetVariable (difname);
@@ -260,6 +269,7 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     shvar_light_0_specular->SetValue (csVector3 (1));
     shvar_light_0_attenuation->SetValue (light->GetAttenuationVector ());
     shvar_light_0_position->SetValue (lightPos * camTransR);
+    shvar_light_0_position_world->SetValue (lightPos);
 
     shvar_light_0_attenuationtex->SetAccessor (GetLightAccessor (light));
 

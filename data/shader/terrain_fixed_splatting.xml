@@ -1,0 +1,44 @@
+<shader type="xmlshader" name="terrain_fixed_splatting">
+  <shadervars>
+    <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.8, 0.8, 0.8</shadervar>
+  </shadervars>
+
+  <technique priority="300"> 
+    <pass>
+      <mixmode><destalphaadd /></mixmode>
+      <alphamode><smooth /></alphamode>
+      <buffer name="vertices" destination="position" />
+      <buffer name="texture coordinates normalized" destination="texture coordinate 0" />
+      <buffer name="texture coordinates normalized" destination="texture coordinate 1" />
+      <vp plugin="glfixed">
+	<fixedvp>
+	  <texmatrix destination="unit 0">
+	    <scale type="shadervar">texture scale</scale>
+	  </texmatrix>
+	</fixedvp>
+      </vp>
+      <texture name="tex diffuse" destination="unit 0"/>
+      <texture name="splat alpha map" destination="unit 1"/>
+      <fp plugin="glfixed">
+        <fixedfp>
+	  <fog>
+	    <mode>linear</mode>
+	    <start type="float">0</start>
+	    <end type="shadervar">texture lod distance</end>
+	    <fogcolor type="vector3">0,0,0</fogcolor>
+	  </fog>
+          <layer> 
+            <colorsource num="0" source="texture" modifier="color"/>
+            <colorsource num="1" source="primary color" modifier="color"/>
+            <coloroperation operation="modulate"/>
+          </layer>
+          <layer> 
+            <colorsource num="0" source="previous layer" modifier="color"/>
+            <colorsource num="1" source="texture" modifier="alpha"/>
+            <coloroperation operation="modulate"/>
+          </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

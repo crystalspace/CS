@@ -1,0 +1,37 @@
+<shader type="xmlshader" name="terrain_fixed_base">
+  <shadervars>
+    <shadervar name="STANDARD_LIGHT_AMBIENT" type="vector3">0.8, 0.8, 0.8</shadervar>
+  </shadervars>
+
+  <technique priority="300">
+    <pass>
+      <mixmode><copy /></mixmode>
+      <buffer name="vertices" destination="position" />
+      <buffer name="texture coordinates normalized" destination="texture coordinate" />
+      <vp plugin="glfixed">
+	<fixedvp>
+	  <ambient />
+	  <constantcolor layer="0" type="vector4">0,0,0,1</constantcolor>
+	</fixedvp>
+      </vp>
+      <texture name="tex diffuse" destination="unit 0" />
+      <fp plugin="glfixed">
+        <fixedfp>
+	  <fog>
+	    <mode>linear</mode>
+	    <start type="shadervar">texture lod distance</start>
+	    <end type="float">0</end>
+	    <fogcolor type="vector4">0,0,0,0</fogcolor>	
+	  </fog>
+	  <layer>
+	    <colorsource num="0" source="texture" modifier="color"/>
+	    <colorsource num="1" source="primary color" modifier="color"/>
+	    <coloroperation operation="modulate" />
+            <alphasource num="0" source="constant color" modifier="alpha"/>
+	    <alphaoperation operation="replace"/>
+	  </layer>
+        </fixedfp>
+      </fp>
+    </pass>
+  </technique>
+</shader>

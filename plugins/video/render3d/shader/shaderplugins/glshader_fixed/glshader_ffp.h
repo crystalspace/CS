@@ -56,22 +56,12 @@ private:
   {
     FogMode mode;
 
-    float densityVal;
-    csStringID densityName;
-    csRef<csShaderVariable> densityVar;
-    float startVal;
-    csStringID startName;
-    csRef<csShaderVariable> startVar;
-    float endVal;
-    csStringID endName;
-    csRef<csShaderVariable> endVar;
-    csVector4 colorVal;
-    csStringID colorName;
-    csRef<csShaderVariable> colorVar;
+    ProgramParam density;
+    ProgramParam start;
+    ProgramParam end;
+    ProgramParam color;
 
-    FogInfo () : mode (FogOff), densityName (csInvalidStringID), 
-      startName (csInvalidStringID), endName (csInvalidStringID),
-      colorVal (0.0f), colorName (csInvalidStringID) {}
+    FogInfo () : mode (FogOff) {}
   };
 
   FogInfo fog;
