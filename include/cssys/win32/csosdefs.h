@@ -350,7 +350,7 @@ static inline void* fast_mem_copy(void* dest, const void* src, int count)
   #define CS_WIN32_ARGV __argv
 #endif
 
-#define CS_IMPLEMENT_APPLICATION \
+#define CS_IMPLEMENT_PLATFORM_APPLICATION \
 int main (int argc, char* argv[]); \
 HINSTANCE ModuleHandle = NULL; \
 int ApplicationShow = SW_SHOWNORMAL; \
@@ -365,7 +365,7 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
 
 #if !defined(CS_STATIC_LINKED)
 
-#define CS_IMPLEMENT_PLUGIN \
+#define CS_IMPLEMENT_PLATFORM_PLUGIN \
 HINSTANCE ModuleHandle = NULL; \
 extern "C" BOOL WINAPI \
 DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/) \

@@ -177,7 +177,7 @@ _DLL_InitTerm (unsigned long mod_handle, unsigned long flag) \
 
 #endif // __EMX__
 
-#define CS_IMPLEMENT_PLUGIN \
+#define CS_IMPLEMENT_PLATFORM_PLUGIN \
 unsigned long dll_handle; \
 extern "C" int DosScanEnv (const char *pszName, char **ppszValue); \
 extern "C" char *getenv (const char *name) /* getenv() that works in DLLs */ \

@@ -124,7 +124,7 @@ extern "C" int usleep (unsigned);
 // Dummy main function required for plugin modules on some Unix platforms.
 // Implementing this function ensures that global constructors in plugin
 // modules are invoked.
-#define CS_IMPLEMENT_PLUGIN \
+#define CS_IMPLEMENT_PLATFORM_PLUGIN \
 int main (int argc, char* argv[]) \
 { \
   (void)argc; (void)argv; \

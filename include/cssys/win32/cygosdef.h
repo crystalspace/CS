@@ -107,13 +107,13 @@
 
 /* Cygwin should implement it's own winMain...
    but how to get ModuleHandle from then? */
-#define CS_IMPLEMENT_APPLICATION \
+#define CS_IMPLEMENT_PLATFORM_APPLICATION \
 HINSTANCE ModuleHandle = NULL; \
 int ApplicationShow = SW_SHOWNORMAL;
 
 /* plugins */
 #if !defined(CS_STATIC_LINKED)
-#define CS_IMPLEMENT_PLUGIN \
+#define CS_IMPLEMENT_PLATFORM_PLUGIN \
 HINSTANCE ModuleHandle = NULL; \
 int ApplicationShow = SW_SHOWNORMAL; \
 extern "C" BOOL WINAPI \

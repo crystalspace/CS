@@ -342,6 +342,47 @@
 #define CS_HEADER_LOCAL_COMPOSE1(X,Y) CS_HEADER_LOCAL_COMPOSE2(X ## / ## Y)
 #define CS_HEADER_LOCAL_COMPOSE2(X) #X
 
+#ifndef CS_IMPLEMENT_PLATFORM_PLUGIN
+#  define CS_IMPLEMENT_PLATFORM_PLUGIN
+#endif
+
+#ifndef CS_IMPLEMENT_PLATFORM_APPLICATION
+#  define CS_IMPLEMENT_PLATFORM_APPLICATION
+#endif
+
+#ifndef CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION
+#  define CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION cs_static_var_cleanup
+#endif
+
+#ifndef CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP
+#  define CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP                         \
+extern "C" {                                                           \
+static void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)()) \
+{                                                                      \
+  static void (**a)()=0;                                               \
+  static int lastEntry=0;                                              \
+  static int maxEntries=0;                                             \
+                                                                       \
+  if (p)                                                               \
+  {                                                                    \
+    if (lastEntry >= maxEntries)                                       \
+    {                                                                  \
+      maxEntries+=10;                                                  \
+      a = (void (**)())realloc (a, maxEntries*sizeof(void*));          \
+    }                                                                  \
+    a[lastEntry++] = p;                                                \
+  }                                                                    \
+  else                                                                 \
+  {                                                                    \
+    int i;                                                             \
+    for (i=0; i < lastEntry; i++)                                      \
+      a[i] ();                                                         \
+    free (a);                                                          \
+  }                                                                    \
+}                                                                      \
+}
+#endif
+
 /**
  * The CS_IMPLEMENT_PLUGIN macro should be placed at the global scope in
  * exactly one compilation unit comprising a plugin module.  For maximum
@@ -351,7 +392,9 @@
  * platform.
  */
 #ifndef CS_IMPLEMENT_PLUGIN
-#  define CS_IMPLEMENT_PLUGIN
+#  define CS_IMPLEMENT_PLUGIN        \
+CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP \
+CS_IMPLEMENT_PLATFORM_PLUGIN 
 #endif
 
 /**
@@ -363,8 +406,11 @@
  * platform.
  */
 #ifndef CS_IMPLEMENT_APPLICATION
-#  define CS_IMPLEMENT_APPLICATION
+#  define CS_IMPLEMENT_APPLICATION   \
+CS_IMPLEMENT_STATIC_VARIABLE_CLEANUP \
+CS_IMPLEMENT_PLATFORM_APPLICATION 
 #endif
+
 
 // The following define should only be enabled if you have defined
 // a special version of overloaded new that accepts two additional
