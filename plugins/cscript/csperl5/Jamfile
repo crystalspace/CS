@@ -1,6 +1,6 @@
 SubDir TOP plugins cscript csperl5 ;
 
-if $(PERL5.SDK.AVAILABLE)
+if $(PERL5.SDK.AVAILABLE) = "yes"
 {
   if $(PERL5.EXTUTILS.EMBED.AVAILABLE) = "yes"
   {
@@ -32,7 +32,7 @@ if $(PERL5.SDK.AVAILABLE)
   if $(CMD.SWIG)
   {
     # for details and comments look at the cspython Jamfile
-    local target = [ FGristFiles cswigpl5.inc ] ;
+    local target = cswigpl5.inc ;
     local sources = [ FGristFiles cspace.i ] ;
 
     SEARCH on $(sources) = $(TOP)/include/ivaria ;
