@@ -220,7 +220,7 @@ public:
    */
   void SetCapacity (int n)
   {
-    if (n > capacity)
+    if (n > Length ())
       AdjustCapacity (n);
   }
 
