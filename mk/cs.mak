@@ -31,13 +31,13 @@ CFLAGS.I = -I
 # Object file extension
 O=.o
 
-# The following include should re/define system-dependent variables
-MAKESECTION=defines
-include mk/subs.mak
-
 ifeq ($(USE_DLL),no)
   override MAKE_DLL=no
 endif
+
+# The following include should re/define system-dependent variables
+MAKESECTION=defines
+include mk/subs.mak
 
 .SUFFIXES: $O $(EXE) $(LIB) $(DLL) .S .c .cpp .h
 
@@ -108,7 +108,7 @@ DO.COMPILE.C = $(CC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a .cpp source
 DO.COMPILE.CPP = $(CXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a GAS source
-DO.COMPILE.S = $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+DO.COMPILE.S = $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS)
 # How to make a static library
 DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $@ $(^^)
 # How to make a dynamic library
@@ -125,7 +125,7 @@ else
 endif
 
 # The sed script used to build dependencies
-SED_DEPEND=-e 's/^\([^ ].*\)/$$\(OUT\)\1/' $(SYS_SED_DEPEND)
+SED_DEPEND=-e 's|^\([^ ].*\)|$$\(OUT\)\1|' $(SYS_SED_DEPEND)
 # How to build a source dependency file
 ifndef DO.DEP
   DO.DEP = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $^ | sed $(SED_DEPEND) >
@@ -176,6 +176,8 @@ api:
 		$(wildcard include/csobject/*.h) \
 		$(wildcard include/csgeom/*.h)
 
+depend: $(OUTBASE) $(OUTOS) # cleandep
+
 $(OUT)static$O: static.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.STATIC_COM)
 
@@ -197,9 +199,3 @@ $(OUTDIRS):
 # The following include should define system-dependent targets
 MAKESECTION=targets
 include mk/subs.mak
-
-ifdef DO_DEPEND
-# GNU Make considers target makefiles in backward direction,
-# so the following targets will be considered first (and remade)
--include $(OUTOS) $(OUTBASE)
-endif

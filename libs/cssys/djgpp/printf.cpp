@@ -50,7 +50,7 @@ void printf_Enable (bool Enable)
 }
 
 // to be called instead of printf (exact same prototype/functionality of printf)
-int csSystemDriver::printf (const char *str, ...)
+int csSystemDriver::printf(const char *str, ...)
 {
   if (ShutUp)
     return 0;
