@@ -339,7 +339,7 @@ public:
   void CalculateNormals ();
 
   /**
-   * Get the static 
+   * Get the static data number.
    */
   uint32 GetStaticDataNumber () const
   {
@@ -1255,4 +1255,3 @@ public:
 };
 
 #endif // __CS_THING_H__
-
