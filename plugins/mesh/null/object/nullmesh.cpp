@@ -97,6 +97,20 @@ bool csNullmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
+void csNullmeshMeshObject::SetRadius (float radius)
+{
+  csNullmeshMeshObject::radius = radius;
+  box.Set (-radius, -radius, -radius, radius, radius, radius);
+  scfiObjectModel.ShapeChanged ();
+}
+
+void csNullmeshMeshObject::SetBoundingBox (const csBox3& box)
+{
+  csNullmeshMeshObject::box = box;
+  radius = qsqrt (csSquaredDist::PointPoint (box.Max (), box.Min ())) / 2.0;
+  scfiObjectModel.ShapeChanged ();
+}
+
 void csNullmeshMeshObject::UpdateLighting (iLight**, int, iMovable*)
 {
   return;

@@ -70,9 +70,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
-#include "imesh/thing/polygon.h"
-#include "imesh/thing/portal.h"
 #include "imesh/thing/thing.h"
+#include "imesh/nullmesh.h"
 #include "imesh/mdlconv.h"
 #include "imesh/mdldata.h"
 #include "imesh/crossbld.h"
@@ -224,8 +223,8 @@ ThreadedLoaderContext::ThreadedLoaderContext (iEngine* Engine,
 	bool checkDupes)
 {
   SCF_CONSTRUCT_IBASE (NULL);
-  ThreadedLoaderContext::Engine = Engine;
   ThreadedLoaderContext::resolveOnlyRegion = resolveOnlyRegion;
+  iRegion* region;
   if (resolveOnlyRegion)
     region = Engine->GetCurrentRegion ();
   else
@@ -1458,6 +1457,73 @@ SCF_IMPLEMENT_IBASE (PolygonMeshCube)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_IBASE_END
 
+bool csLoader::ParsePolyMeshChildBox (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh)
+{
+  csBox3 b;
+  if (!SyntaxService->ParseBox (child, b))
+    return false;
+  polymesh = csPtr<iPolygonMesh> (
+    new PolygonMeshCube (b.Min (), b.Max ()));
+  return true;
+}
+
+bool csLoader::ParsePolyMeshChildMesh (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh)
+{
+  int num_vt = 0;
+  int num_tri = 0;
+  csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+  while (child_it->HasNext ())
+  {
+    csRef<iDocumentNode> child_child = child_it->Next ();
+    if (child_child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* child_value = child_child->GetValue ();
+    csStringID child_id = xmltokens.Request (child_value);
+    switch (child_id)
+    {
+      case XMLTOKEN_V: num_vt++; break;
+      case XMLTOKEN_T: num_tri++; break;
+      default:
+	SyntaxService->ReportBadToken (child_child);
+	return false;
+    }
+  }
+
+  polymesh = csPtr<iPolygonMesh> (new PolygonMeshMesh (num_vt, num_tri));
+  csVector3* vt = polymesh->GetVertices ();
+  csMeshedPolygon* po = polymesh->GetPolygons ();
+  num_vt = 0;
+  num_tri = 0;
+
+  child_it = child->GetNodes ();
+  while (child_it->HasNext ())
+  {
+    csRef<iDocumentNode> child_child = child_it->Next ();
+    if (child_child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* child_value = child_child->GetValue ();
+    csStringID child_id = xmltokens.Request (child_value);
+    switch (child_id)
+    {
+      case XMLTOKEN_V:
+	if (!SyntaxService->ParseVector (child_child, vt[num_vt]))
+	  return false;
+	num_vt++;
+	break;
+      case XMLTOKEN_T:
+	po[num_tri].vertices[0] = child_child->GetAttributeValueAsInt ("v1");
+	po[num_tri].vertices[1] = child_child->GetAttributeValueAsInt ("v2");
+	po[num_tri].vertices[2] = child_child->GetAttributeValueAsInt ("v3");
+	num_tri++;
+	break;
+      default:
+	SyntaxService->ReportBadToken (child_child);
+	return false;
+    }
+  }
+  return true;
+}
+
 bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
 {
   csRef<iPolygonMesh> polymesh;
@@ -1473,71 +1539,12 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
     switch (id)
     {
       case XMLTOKEN_BOX:
-        {
-	  csBox3 b;
-	  if (!SyntaxService->ParseBox (child, b))
-	    return false;
-	  polymesh = csPtr<iPolygonMesh> (
-	  	new PolygonMeshCube (b.Min (), b.Max ()));
-	}
+        if (!ParsePolyMeshChildBox (child, polymesh))
+	  return false;
         break;
       case XMLTOKEN_MESH:
-	{
-	  int num_vt = 0;
-	  int num_tri = 0;
-	  csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
-	  while (child_it->HasNext ())
-	  {
-	    csRef<iDocumentNode> child_child = child_it->Next ();
-	    if (child_child->GetType () != CS_NODE_ELEMENT) continue;
-	    const char* child_value = child_child->GetValue ();
-	    csStringID child_id = xmltokens.Request (child_value);
-	    switch (child_id)
-	    {
-	      case XMLTOKEN_V: num_vt++; break;
-	      case XMLTOKEN_T: num_tri++; break;
-	      default:
-		SyntaxService->ReportBadToken (child_child);
-		return false;
-	    }
-	  }
-
-	  polymesh = csPtr<iPolygonMesh> (
-	  	new PolygonMeshMesh (num_vt, num_tri));
-	  csVector3* vt = polymesh->GetVertices ();
-	  csMeshedPolygon* po = polymesh->GetPolygons ();
-	  num_vt = 0;
-	  num_tri = 0;
-
-	  child_it = child->GetNodes ();
-	  while (child_it->HasNext ())
-	  {
-	    csRef<iDocumentNode> child_child = child_it->Next ();
-	    if (child_child->GetType () != CS_NODE_ELEMENT) continue;
-	    const char* child_value = child_child->GetValue ();
-	    csStringID child_id = xmltokens.Request (child_value);
-	    switch (child_id)
-	    {
-	      case XMLTOKEN_V:
-	        if (!SyntaxService->ParseVector (child_child, vt[num_vt]))
-		  return false;
-		num_vt++;
-		break;
-	      case XMLTOKEN_T:
-		po[num_tri].vertices[0] = child_child->GetAttributeValueAsInt (
-			"v1");
-		po[num_tri].vertices[1] = child_child->GetAttributeValueAsInt (
-			"v2");
-		po[num_tri].vertices[2] = child_child->GetAttributeValueAsInt (
-			"v3");
-	        num_tri++;
-		break;
-	      default:
-		SyntaxService->ReportBadToken (child_child);
-		return false;
-	    }
-	  }
-	}
+        if (!ParsePolyMeshChildMesh (child, polymesh))
+	  return false;
         break;
       case XMLTOKEN_COLLDET:
         colldet = true;
@@ -2296,6 +2303,106 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
   mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
 
   return mesh;
+}
+
+bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
+	iMeshWrapper* mesh, iDocumentNode* node)
+{
+  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+  csRef<iPolygonMesh> polymesh;
+  bool colldet = false;
+  bool viscull = false;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_ADDON:
+        if (!LoadAddOn (ldr_context, child, mesh))
+	  return false;
+        break;
+      case XMLTOKEN_MOVE:
+      {
+        mesh->GetMovable ()->SetTransform (csMatrix3 ());     // Identity
+        mesh->GetMovable ()->SetPosition (csVector3 (0));
+	csRef<iDocumentNode> matrix_node = child->GetNode ("matrix");
+	if (matrix_node)
+	{
+	  csMatrix3 m;
+	  if (!SyntaxService->ParseMatrix (matrix_node, m))
+	    return false;
+          mesh->GetMovable ()->SetTransform (m);
+	}
+	csRef<iDocumentNode> vector_node = child->GetNode ("v");
+	if (vector_node)
+	{
+	  csVector3 v;
+	  if (!SyntaxService->ParseVector (vector_node, v))
+	    return false;
+          mesh->GetMovable ()->SetPosition (v);
+	}
+	mesh->GetMovable ()->UpdateMove ();
+        break;
+      }
+      case XMLTOKEN_BOX:
+        if (!ParsePolyMeshChildBox (child, polymesh))
+	  return false;
+        break;
+      case XMLTOKEN_MESH:
+        if (!ParsePolyMeshChildMesh (child, polymesh))
+	  return false;
+        break;
+      case XMLTOKEN_COLLDET:
+        colldet = true;
+	break;
+      case XMLTOKEN_VISCULL:
+        viscull = true;
+	break;
+      default:
+	SyntaxService->ReportBadToken (child);
+        return false;
+    }
+  }
+
+  if (!colldet && !viscull)
+  {
+    SyntaxService->ReportError (
+	"crystalspace.maploader.parse.polymesh",
+	node, "Please specify either <viscull/> or <colldet/>!");
+    return false;
+  }
+  if (!polymesh)
+  {
+    SyntaxService->ReportError (
+	"crystalspace.maploader.parse.sector.polymesh",
+	node, "Please specify either <mesh/> or <box/>!");
+    return false;
+  }
+
+  if (colldet)
+    objmodel->SetPolygonMeshColldet (polymesh);
+  if (viscull)
+    objmodel->SetPolygonMeshViscull (polymesh);
+
+  csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
+    	mesh->GetMeshObject (), iNullMeshState);
+  CS_ASSERT (nullmesh != NULL);
+  int i;
+  csBox3 bbox;
+  csVector3* vt = polymesh->GetVertices ();
+  bbox.StartBoundingBox (vt[0]);
+  for (i = 1 ; i < polymesh->GetVertexCount () ; i++)
+  {
+    bbox.AddBoundingVertexSmart (vt[i]);
+  }
+  nullmesh->SetBoundingBox (bbox);
+
+  return true;
 }
 
 bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
@@ -3479,6 +3586,28 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  mesh->GetMovable ()->UpdateMove ();
 	  Engine->GetMeshes ()->Add (mesh);
 	  mesh->DecRef ();
+        }
+        break;
+      case XMLTOKEN_POLYMESH:
+        {
+	  const char* meshname = child->GetAttributeValue ("name");
+	  if (!meshname)
+	  {
+      	    SyntaxService->ReportError (
+	      	"crystalspace.maploader.load.polymesh",
+		child, "'polymesh' requires a name in sector '%s'!",
+		secname ? secname : "<noname>");
+	    return NULL;
+	  }
+	  csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (
+	  	"crystalspace.mesh.object.nullmesh", meshname));
+          if (!LoadPolyMeshInSector (ldr_context, mesh, child))
+	  {
+	    // Error is already reported.
+	    return NULL;
+	  }
+          mesh->GetMovable ()->SetSector (sector);
+	  mesh->GetMovable ()->UpdateMove ();
         }
         break;
       case XMLTOKEN_MESHOBJ:

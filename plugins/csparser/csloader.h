@@ -29,6 +29,7 @@
 #include "csutil/util.h"
 #include "csutil/strhash.h"
 #include "csutil/parray.h"
+#include "csutil/refarr.h"
 #include "csutil/scopedmutexlock.h"
 #include "csgeom/quaterni.h"
 #include "iutil/plugin.h"
@@ -66,6 +67,7 @@ struct iCameraPosition;
 struct iDocumentNode;
 struct iDocument;
 struct iFile;
+struct iPolygonMesh;
 
 struct iObject;
 struct iThingState;
@@ -304,6 +306,13 @@ private:
   csLoader* loader;
   bool checkDupes;
   bool resolveOnlyRegion;
+  csRefArray<iSector> sectors;
+  csRefArray<iMaterialWrapper> materials;
+  csRefArray<iTextureWrapper> textures;
+  csRefArray<iMeshFactoryWrapper> factories;
+  csRefArray<iMeshWrapper> meshes;
+  csRefArray<iLight> lights;
+
 public:
   ThreadedLoaderContext (iEngine* Engine, bool resolveOnlyRegion,
     csLoader* loader, bool checkDupes);
@@ -471,6 +480,10 @@ private:
 				      int verify_type );
   /// Parse a 'polymesh' block.
   bool ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel);
+  bool ParsePolyMeshChildBox (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh);
+  bool ParsePolyMeshChildMesh (iDocumentNode* child,
+	csRef<iPolygonMesh>& polymesh);
 
   /// -----------------------------------------------------------------------
 
@@ -525,6 +538,11 @@ private:
    * Load the mesh object from the map file.
    */
   bool LoadMeshObject (iLoaderContext* ldr_context,
+  	iMeshWrapper* mesh, iDocumentNode* node);
+  /**
+   * Load the polymesh object from the map file.
+   */
+  bool LoadPolyMeshInSector (iLoaderContext* ldr_context,
   	iMeshWrapper* mesh, iDocumentNode* node);
 
   /**

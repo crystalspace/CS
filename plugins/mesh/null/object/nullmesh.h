@@ -44,6 +44,7 @@ private:
   iBase* logparent;
   iMeshObjectDrawCallback* vis_cb;
   float radius;
+  csBox3 box;
 
 public:
   /// Constructor.
@@ -55,12 +56,13 @@ public:
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& cent);
 
-  void SetRadius (float radius)
-  {
-    csNullmeshMeshObject::radius = radius;
-    scfiObjectModel.ShapeChanged ();
-  }
+  void SetRadius (float radius);
   float GetRadius () const { return radius; }
+  void SetBoundingBox (const csBox3& box);
+  void GetBoundingBox (csBox3& box)
+  {
+    box = csNullmeshMeshObject::box;
+  }
 
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;
@@ -125,6 +127,14 @@ public:
     virtual float GetRadius () const
     {
       return scfParent->GetRadius ();
+    }
+    virtual void SetBoundingBox (const csBox3& box)
+    {
+      scfParent->SetBoundingBox (box);
+    }
+    virtual void GetBoundingBox (csBox3& box)
+    {
+      scfParent->GetBoundingBox (box);
     }
   } scfiNullMeshState;
   friend class NullMeshState;

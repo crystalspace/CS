@@ -1,4 +1,4 @@
-DESCRIPTION.nullmesh = General mesh object plug-in
+DESCRIPTION.nullmesh = Null mesh object plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)

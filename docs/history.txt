@@ -7,6 +7,15 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed a very weird bug in genmesh where SCF_CONSTRUCT_IBASE
 	  was called in the destructor of the embedded PolyMesh instead of
 	  the constructor. This could cause crashes at exit in some cases.
+	- Jorrit added SetBoundingBox() and GetBoundingBox() to iNullMeshState.
+	- Jorrit added a shortcut feature to the loader. You can now specify
+	  a <polymesh/> outside a <meshobj/> (but inside a <sector/>).
+	  Previously it was only possible to replace the polymesh for CD
+	  or visibility culling of a mesh. With this new syntax it is possible
+	  to create invisible objects that can be used for occlusion or for
+	  collision detection without having to define a mesh object.
+	  Internally this shortcut will make a regular mesh object that uses
+	  a 'nullmesh' internally.
 15-May-2003
 	- res made the following changes to the fire proctex:
 	    - changed the algorithm a bit so it doesn't look tilted any more.
