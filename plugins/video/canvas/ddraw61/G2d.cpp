@@ -27,35 +27,35 @@ DirectDetectionDevice * DirectDevice;
 
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
-	LPVOID lpMsgBuf;
-	char* szMsg;
-	char szStdMessage[] = "Last Error: ";
-	if (FAILED(hRes))
-	{
-		DWORD dwResult;
-		dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
-								 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-							     (LPTSTR) &lpMsgBuf, 0, NULL );
-	
-		if (dwResult != 0)
-		{
-			szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
-			strcpy( szMsg, str );
-			strcat( szMsg, szStdMessage );
-			strcat( szMsg, (const char*)lpMsgBuf );
-			
-			LocalFree( lpMsgBuf );
-			
-			MessageBox (NULL, szMsg, "Fatal Error in DirectDraw2DDX61.dll", MB_OK|MB_TOPMOST);
-			delete szMsg;
+  LPVOID lpMsgBuf;
+  char* szMsg;
+  char szStdMessage[] = "Last Error: ";
+  if (FAILED(hRes))
+  {
+    DWORD dwResult;
+    dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+                 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+                   (LPTSTR) &lpMsgBuf, 0, NULL );
+  
+    if (dwResult != 0)
+    {
+      szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
+      strcpy( szMsg, str );
+      strcat( szMsg, szStdMessage );
+      strcat( szMsg, (const char*)lpMsgBuf );
+      
+      LocalFree( lpMsgBuf );
+      
+      MessageBox (NULL, szMsg, "Fatal Error in DirectDraw2DDX61.dll", MB_OK|MB_TOPMOST);
+      delete szMsg;
 
-			exit(1);
-		}
-	}
+      exit(1);
+    }
+  }
 
-	MessageBox(NULL, str, "Fatal Error in DirectDraw2DDX61.dll", MB_OK|MB_TOPMOST);
-	
-	exit(1);
+  MessageBox(NULL, str, "Fatal Error in DirectDraw2DDX61.dll", MB_OK|MB_TOPMOST);
+  
+  exit(1);
 }
 
 /////The 2D Graphics Driver//////////////
@@ -285,8 +285,8 @@ void csGraphics2DDDraw6::SecondaryInit()
       m_nDepth=8;
     else if(ddpf.dwRGBBitCount == 16)
       m_nDepth=16;
-	else if(ddpf.dwRGBBitCount == 32)
-	  m_nDepth=32;
+  else if(ddpf.dwRGBBitCount == 32)
+    m_nDepth=32;
     else
     {
       MessageBox(NULL,"Desktop display depth has to be set in either 8-bit, 16-bit or 32-bit mode to display in a window, or use full screen mode instead.", "Fatal Error", MB_OK | MB_ICONEXCLAMATION|MB_TOPMOST);
@@ -333,18 +333,18 @@ void csGraphics2DDDraw6::SecondaryInit()
     _DrawPixel = DrawPixel32;   _WriteChar = WriteChar32;
     _GetPixelAt = GetPixelAt32; _DrawSprite = DrawSprite32;
       
-	RedMask = 0xff << 16;
-	GreenMask = 0xff << 8;
-	BlueMask = 0xff;
-	// calculate CS's pixel format structure.
+  RedMask = 0xff << 16;
+  GreenMask = 0xff << 8;
+  BlueMask = 0xff;
+  // calculate CS's pixel format structure.
     pfmt.PixelBytes = 4;
     pfmt.PalEntries = 0;
    // pfmt.RedMask    = ddpf.dwRBitMask;
    // pfmt.GreenMask  = ddpf.dwGBitMask;
    // pfmt.BlueMask   = ddpf.dwBBitMask;
-	pfmt.RedMask   = RedMask;
-	pfmt.GreenMask = GreenMask;
-	pfmt.BlueMask  = BlueMask;
+  pfmt.RedMask   = RedMask;
+  pfmt.GreenMask = GreenMask;
+  pfmt.BlueMask  = BlueMask;
     
     complete_pixel_format();
   }
@@ -379,14 +379,14 @@ bool csGraphics2DDDraw6::Open(const char *Title)
   DWORD exStyle = 0;
   DWORD style = WS_POPUP;
   if (!FullScreen)
-	  style |= WS_CAPTION;
+    style |= WS_CAPTION;
   
   int wwidth,wheight;
   wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
   wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
   
   m_hWnd = CreateWindowEx(exStyle, WINDOWCLASSNAME, Title, style,
-	                      (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
+                        (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
                           (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
                           wwidth, wheight, NULL, NULL, m_hInstance, NULL );
   if( !m_hWnd )
@@ -435,7 +435,7 @@ bool csGraphics2DDDraw6::Open(const char *Title)
     if(!DirectDevice->Only2D)
       ddsd.ddsCaps.dwCaps |= DDSCAPS_3DDEVICE | DDSCAPS_VIDEOMEMORY;
     
-	// create backbuffer
+  // create backbuffer
 
     ddrval = m_lpDD4->CreateSurface (&ddsd, &m_lpddsPrimary, NULL);
     if (ddrval != DD_OK)
@@ -560,7 +560,7 @@ bool csGraphics2DDDraw6::DoubleBuffer ()
 void csGraphics2DDDraw6::Print (csRect* /*area*/)
 {
   RECT r={0,0,Width,Height};
-  POINT	pt;
+  POINT pt;
   HRESULT ddrval;
   
   while( 1 )
@@ -571,11 +571,11 @@ void csGraphics2DDDraw6::Print (csRect* /*area*/)
       if( ddrval == DDERR_SURFACELOST ) 
       { 
         ddrval = m_lpddsPrimary->Restore();
-	if( m_lpddsBack ) 
+  if( m_lpddsBack ) 
         { 
           if( m_lpddsBack->IsLost() != DD_OK ) 
             m_lpddsBack->Restore(); 
-	} 
+  } 
       }
     }
     else
@@ -643,7 +643,7 @@ unsigned char *csGraphics2DDDraw6::LockBackBuf()
     ret=m_lpddsBack->Lock(NULL, &ddsd, DDLOCK_SURFACEMEMORYPTR, NULL);
   
   if (ret!=DD_OK)
-	  sys_fatalerror("There was an error locking the DirectDraw surface.", ret);
+    sys_fatalerror("There was an error locking the DirectDraw surface.", ret);
 
   m_bLocked = true;
 
