@@ -91,12 +91,15 @@ public:
 
   csSubRectangles* region;
 
-  csTrianglesPerSuperLightmap();
-  ~csTrianglesPerSuperLightmap();
+  csTrianglesPerSuperLightmap (int size, int queue_num);
+  ~csTrianglesPerSuperLightmap ();
 
   /// Pointer to the cache data
   csSLMCacheData* cacheData;
   bool isUnlit;
+
+  /// Number of the queue to use for this super lightmap.
+  int queue_num;
 
   // Checks if the superlightmap is initialized or not
   bool initialized;
@@ -180,8 +183,9 @@ private:
   void ClearLmQueue ();
   void AddLmQueue (iPolygonTexture* polytext, const csVector2* uv,
 		  int num_uv, int vt_idx);
+  // size is the size of the super lightmap to use.
   void ProcessLmQueue (iPolygonTexture* polytext, const csVector2* uv,
-		  int num_uv, int vt_idx);
+		  int num_uv, int vt_idx, int size, int queue_num);
 
 public:
   // SuperLightMap list.
@@ -208,15 +212,21 @@ protected:
   int verticesCount;
   csGrowingArray<csTriangle> orig_triangles;
 
+  /**
+   * Search a superlightmap to fit the lighmap in the superLM list
+   * if it can't find any it creates a new one.
+   * The case that the polygon has no superlightmap is supported too.
+   * If the polygontexture has no lightmap it means its not lighted,
+   * then a special superlightmap has to be created, just to store
+   * the triangles and vertices that will be used in fog.
+   * 'size' is the size of the super lightmap to use.
+   * 'queue_num' is the number of the super lightmap queue to use (0 to 3).
+   */
   csTrianglesPerSuperLightmap* SearchFittingSuperLightmap (
-    iPolygonTexture* poly_texture, csRect& rect);
-
-  csTrianglesPerSuperLightmap* unlitPolysSL;
+    iPolygonTexture* poly_texture, csRect& rect, int size,
+    int queue_num);
 
 public:
-
-  bool HaveUnlitPolys() {return unlitPolysSL != NULL;};
-
   csTrianglesPerMaterial* GetFirst () { return polygons.first; }
   csTrianglesPerSuperLightmap* GetFirstTrianglesSLM () { return superLM.last; }
 
@@ -246,9 +256,6 @@ public:
   {
     return materials[idx];
   }
-
-  /// Gets the unlit polygons
-  csTrianglesPerSuperLightmap* GetUnlitPolys(){ return unlitPolysSL;};
 
   /// Sets a material
   virtual void SetMaterial (int idx, iMaterialHandle* mat_handle);

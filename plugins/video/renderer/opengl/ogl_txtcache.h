@@ -159,12 +159,16 @@ public:
 class OpenGLLightmapCache
 {
 public:
-  /// Number of static lightmaps.
-  static int super_lm_num;
-  /// Size of static lightmaps.
+  /// Number of static lightmaps (one size per queue).
+  static int super_lm_num[4];
+  /// Size of static lightmaps (queue 0).
   static int super_lm_size;
   /// Global timestamp for super lightmaps.
   uint32 global_timestamp;
+
+  /// For statistics (with -verbose option).
+  int stats_hit[4];
+  int stats_fail[4];
 
   // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // This OpenGL texture handle is temporary for the version of
@@ -176,8 +180,8 @@ public:
 private:
   csGraphics3DOGLCommon* g3d;
 
-  /// A number of super-lightmaps to contain all other lightmaps.
-  csSuperLightMap* suplm;
+  /// Four queues with super lightmaps.
+  csSuperLightMap* suplm[4];
   /// If true then setup is ok.
   bool initialized;
 
@@ -197,8 +201,8 @@ public:
   void Cache(csTrianglesPerSuperLightmap* s, bool dirty,
              bool* modified);
 
-  /// Finds an empty superlightmap (returns -1 if none is found)
-  int FindFreeSuperLightmap();
+  /// Finds an empty superlightmap in a queue (returns -1 if none is found)
+  int FindFreeSuperLightmap (int queue_num);
 
   /// Clear the entire lightmap cache.
   void Clear ();

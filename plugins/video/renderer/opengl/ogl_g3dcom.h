@@ -494,14 +494,6 @@ protected:
      * the number of textures that can be mixed together in one pass.
      */
     int do_multitexture_level;
-
-    /**
-     * Brighten rendered textures in an extra pass.
-     * This slows down rendering (we should use multi-texturing)
-     * but is simulates 2*SRC*DST on cards that only support SRC*DST.
-     * At least it seems to do this on a RIVA 128.
-     */
-    bool do_extra_bright;
   } m_config_options;
 
   /// DrawFlags on last BeginDraw ()
@@ -517,7 +509,7 @@ protected:
   float J1, J2, J3, K1, K2, K3;
 
   /**
-   * if true, CheckGLError() will report errors
+   * If true, CheckGLError() will report errors
    */
   bool report_gl_errors;
 
@@ -555,7 +547,10 @@ public:
   /// The lightmap cache.
   OpenGLLightmapCache* lightmap_cache;
 
-
+  /**
+   * If true, be verbose.
+   */
+  bool verbose;
 
   /**
    * Low-level 2D graphics layer.

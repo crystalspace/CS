@@ -76,12 +76,12 @@ void csTrianglesPerMaterial::ClearVertexArray ()
 
 //--------------------------------------------------------------------------
 
-csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap()
+csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap (int size,
+	int queue_num)
 {
-  region = new csSubRectangles (
-    csRect (0, 0, OpenGLLightmapCache::super_lm_size,
-  OpenGLLightmapCache::super_lm_size));
+  region = new csSubRectangles (csRect (0, 0, size, size));
 
+  csTrianglesPerSuperLightmap::queue_num = queue_num;
   cacheData = NULL;
   isUnlit = false;
   initialized = false;
@@ -135,7 +135,6 @@ csTriangleArrayPolygonBuffer::csTriangleArrayPolygonBuffer (
 {
   vertices = NULL;
   matCount = 0;
-  unlitPolysSL = NULL;
 }
 
 csTriangleArrayPolygonBuffer::~csTriangleArrayPolygonBuffer ()
@@ -143,27 +142,13 @@ csTriangleArrayPolygonBuffer::~csTriangleArrayPolygonBuffer ()
   Clear ();
 }
 
-/**
- * Search a superlightmap to fit the lighmap in the superLM list
- * if it can't find any creates a new one.
- * The case that the polygon has no superlightmap is supported too.
- * If the polygontexture has no lightmap it means its not lighted,
- * then a special superlightmap has to be created, just to store
- * the triangles and vertices that will be used in fog
- */
 csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
     SearchFittingSuperLightmap (iPolygonTexture* poly_texture,
-                                csRect& rect)
+                                csRect& rect, int size, int queue_num)
 {
   if (poly_texture == NULL || poly_texture->GetLightMap () == NULL)
   {
-    // OK This polygon has no lightmap.
-    // Let's check if we have to create a unlitPolygonsSL or is already
-    // created
-    if (unlitPolysSL) return unlitPolysSL;
-    unlitPolysSL = new csTrianglesPerSuperLightmap ();
-    unlitPolysSL->isUnlit = true;
-    return unlitPolysSL;
+    return NULL;
   }
   iLightMap* piLM = poly_texture->GetLightMap();
   int lm_width = piLM->GetWidth();
@@ -179,7 +164,7 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
 
   //We haven't found any, let's create a new one
 
-  curr = new csTrianglesPerSuperLightmap ();
+  curr = new csTrianglesPerSuperLightmap (size, queue_num);
 
   if (!curr->region->Alloc (lm_width, lm_height, rect))
   {
@@ -268,31 +253,24 @@ void csTriangleArrayPolygonBuffer::AddLmQueue (iPolygonTexture* polytext,
 
 void csTriangleArrayPolygonBuffer::ProcessLmQueue (
 	iPolygonTexture* poly_texture,
-	const csVector2* uv, int num_uv, int vt_idx)
+	const csVector2* uv, int num_uv, int vt_idx,
+	int size, int queue_num)
 {
   // Lightmap handling.
   csRect rect;
   csTrianglesPerSuperLightmap* triSuperLM = SearchFittingSuperLightmap (
-  	poly_texture, rect);
-  CS_ASSERT (triSuperLM != NULL);
+  	poly_texture, rect, size, queue_num);
+  if (!triSuperLM) return;	// No lightmaps.
 
   /*
    * We have the superlightmap where the poly_texture fits
    * Now we can add the triangles
    */
 
-  /*
-   * Let's check if it's the unlitPolySL
-   */
-  if (triSuperLM == unlitPolysSL)
-  {
-    return;
-  }
-
   iLightMap* piLM = poly_texture->GetLightMap();
   float lm_width = float(piLM->GetWidth());
   float lm_height = float(piLM->GetHeight());
-  int superLMsize = OpenGLLightmapCache::super_lm_size;
+  int superLMsize = size;
 
   float lm_low_u, lm_low_v, lm_high_u, lm_high_v;
   float lm_scale_u, lm_scale_v, lm_offset_u, lm_offset_v;
@@ -397,54 +375,46 @@ static int sort_lmqueue (const void* p1, const void* p2)
 
 void csTriangleArrayPolygonBuffer::Prepare ()
 {
-#if 0
-// Debug stuff for printing out statistics information.
-if (verts == NULL)
-{
-int cnt_mat = 0;
-csTrianglesPerMaterial* t = GetFirst ();
-while (t) { cnt_mat++; t = t->next; }
-int cnt_lm = 0;
-csTrianglesPerSuperLightmap* sln = GetFirstTrianglesSLM ();
-while (sln) { cnt_lm++; sln = sln->prev; }
-printf ("vtcnt=%d cnt_mat=%d cnt_lm=%d   ", GetVertexCount (), cnt_mat, cnt_lm);
-sln = GetFirstTrianglesSLM ();
-while (sln)
-{
-	int i;
-	int tot_area = 0;
-	int maxx = 0;
-	int maxy = 0;
-	for (i = 0 ; i < sln->rectangles.Length () ; i++)
-	{
-          iLightMap* lm = sln->lightmaps[i]->GetLightMap();
-          int lmwidth = lm->GetWidth ();
-          int lmheigth = lm->GetHeight ();
-	  const csRect& r = sln->rectangles[i];
-	  if (r.xmax > maxx) maxx = r.xmax;
-	  if (r.ymax > maxy) maxy = r.ymax;
-	  int area = lmwidth * lmheigth;
-	  tot_area += area;
-	  //printf ("%dx%d  %dx%d\n", lmwidth, lmheigth, r.xmax-r.xmin, r.ymax-r.ymin);
-	}
-	printf ("    num=%d maxx=%d maxy=%d tot_area=%d smallest=%d\n", sln->rectangles.Length (), maxx, maxy, tot_area, maxx*maxy);
-	sln = sln->prev;
-}
-fflush (stdout);
-return;
-}
-#endif
-
   qsort (lmqueue.GetArray (), lmqueue.Length (), sizeof (csLmQueue),
 		  sort_lmqueue);
+  int i;
 
-#if 0
-  int size = 16;
+  //------------------
+  // First calculate the maximum dimension of a single lightmap.
+  //------------------
+  int max_dim = 0;
+  for (i = 0 ; i < lmqueue.Length () ; i++)
+  {
+    csLmQueue& q = lmqueue[i];
+    iLightMap* lm = q.polytext->GetLightMap ();
+    if (lm)
+    {
+      int lmw = lm->GetWidth ();
+      int lmh = lm->GetHeight ();
+      if (lmw > max_dim) max_dim = lmw;
+      if (lmh > max_dim) max_dim = lmh;
+    }
+  }
+  int suplmsize = OpenGLLightmapCache::super_lm_size;
+
+  int qn;
+  if      (max_dim > (suplmsize >> 1)) { qn = 0; max_dim = suplmsize; }
+  else if (max_dim > (suplmsize >> 2)) { qn = 1; max_dim = suplmsize >> 1; }
+  else if (max_dim > (suplmsize >> 3)) { qn = 2; max_dim = suplmsize >> 2; }
+  else                                 { qn = 3; max_dim = suplmsize >> 3; }
+
+  //------------------
+  // Now look for the best size to use for fitting all lightmaps.
+  // The size of queue 0 is only selected if there is a lightmap that has
+  // a dimension bigger than queue 1. Otherwise we will go up only to queue 1.
+  //------------------
+  int size = max_dim;
   bool fit = false;
-  while (size <= 256)
+  // No need to test queue 1 size because we will certainly use that if
+  // queue 2 size fails.
+  while (size <= suplmsize / 4)
   {
     csSubRectangles* tr = new csSubRectangles (csRect (0, 0, size, size));
-    int i;
     fit = true;
     for (i = 0 ; i < lmqueue.Length () ; i++)
     {
@@ -463,16 +433,24 @@ return;
     delete tr;
     if (fit) break;
     size = size + size;
+    qn--;
   }
-printf ("size=d\n", size); fflush (stdout);
-#endif
+  // If some size is not available in the cache we will use the next one.
+  while (qn > 0 && !OpenGLLightmapCache::super_lm_num[qn])
+  {
+    qn--;
+    size = size + size;
+  }
+  printf ("size=%d\n", size); fflush (stdout);
 
-
-  int i;
+  //------------------
+  // We now have an optimal size for the super lightmap. Start allocating
+  // for real.
+  //------------------
   for (i = 0 ; i < lmqueue.Length () ; i++)
   {
     csLmQueue& q = lmqueue[i];
-    ProcessLmQueue (q.polytext, q.uv, q.num_uv, q.vt_idx);
+    ProcessLmQueue (q.polytext, q.uv, q.num_uv, q.vt_idx, size, qn);
   }
   ClearLmQueue ();
 }
@@ -580,8 +558,6 @@ void csTriangleArrayPolygonBuffer::Clear ()
 {
   delete[] vertices; vertices = NULL;
   materials.DeleteAll ();
-  delete unlitPolysSL;
-  unlitPolysSL = NULL;
   ClearLmQueue ();
 }
 

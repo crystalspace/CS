@@ -211,6 +211,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   m_fogtexturehandle = 0;
   fps_limit = 0;
   debug_edges = false;
+  verbose = false;
 
   /// caps will be read from config or reset to defaults during Initialize.
   Caps.CanClip = false;
@@ -453,6 +454,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
+  verbose = (cmdline->GetOption ("verbose") != 0);
   report_gl_errors = config->GetBool ("Video.OpenGL.ReportGLErrors"
 #ifdef CS_DEBUG
     , true
@@ -779,7 +781,6 @@ void csGraphics3DOGLCommon::SharedInitialize (csGraphics3DOGLCommon *d)
   m_renderstate.textured = true;
 
   m_config_options.do_multitexture_level = 0;
-  m_config_options.do_extra_bright = false;
 }
 
 bool csGraphics3DOGLCommon::NewOpen ()
@@ -878,17 +879,26 @@ bool csGraphics3DOGLCommon::NewOpen ()
     config->GetBool ("Video.OpenGL.Caps.NeedScreenClipping", false);
   GLCaps.nr_hardware_planes = config->GetInt ("Video.OpenGL.Caps.HWPlanes", 6);
   fps_limit = config->GetInt ("Video.OpenGL.FpsLimit", 0);
-  OpenGLLightmapCache::super_lm_num = config->GetInt (
-    "Video.OpenGL.SuperLightMapNum", 10);
+  OpenGLLightmapCache::super_lm_num[0] = config->GetInt (
+    "Video.OpenGL.SuperLightMapNum0", 1);
+  OpenGLLightmapCache::super_lm_num[1] = config->GetInt (
+    "Video.OpenGL.SuperLightMapNum1", 12);
+  OpenGLLightmapCache::super_lm_num[2] = config->GetInt (
+    "Video.OpenGL.SuperLightMapNum2", 64);
+  OpenGLLightmapCache::super_lm_num[3] = config->GetInt (
+    "Video.OpenGL.SuperLightMapNum3", 128);
   OpenGLLightmapCache::super_lm_size = config->GetInt (
     "Video.OpenGL.SuperLightMapSize", 256);
   if (OpenGLLightmapCache::super_lm_size > Caps.maxTexWidth)
     OpenGLLightmapCache::super_lm_size = Caps.maxTexWidth;
   Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "  Super lightmaps: num=%d size=%dx%d",
-    OpenGLLightmapCache::super_lm_num,
-  OpenGLLightmapCache::super_lm_size,
-  OpenGLLightmapCache::super_lm_size);
+    "  Super lightmaps: max_size=%dx%d num=%d %d %d %d",
+    OpenGLLightmapCache::super_lm_size,
+    OpenGLLightmapCache::super_lm_size,
+    OpenGLLightmapCache::super_lm_num[0],
+    OpenGLLightmapCache::super_lm_num[1],
+    OpenGLLightmapCache::super_lm_num[2],
+    OpenGLLightmapCache::super_lm_num[3]);
 
   unsigned int i, j;
   const char* clip_opt = config->GetStr ("Video.OpenGL.ClipOptional", "auto");
@@ -958,7 +968,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
   m_renderstate.textured = true;
 
   m_config_options.do_multitexture_level = 0;
-  m_config_options.do_extra_bright = false;
 
   // See if we find any OpenGL extensions, and set the corresponding
   // flags.
@@ -974,8 +983,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
   else
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-  m_config_options.do_extra_bright = config->GetBool
-        ("Video.OpenGL.ExtraBright", false);
   // determine what blend mode to use when combining lightmaps with
   // their  underlying textures.  This mode is set in the Opengl
   // configuration  file
@@ -1152,7 +1159,6 @@ void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
 
   m_config_options.do_multitexture_level =
   d->m_config_options.do_multitexture_level;
-  m_config_options.do_extra_bright = d->m_config_options.do_extra_bright;
   m_config_options.m_lightmap_src_blend =
     d->m_config_options.m_lightmap_src_blend;
   m_config_options.m_lightmap_dst_blend =
@@ -1164,6 +1170,23 @@ void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
 
 void csGraphics3DOGLCommon::Close ()
 {
+  if (verbose)
+  {
+    if (lightmap_cache)
+    {
+      printf ("Super lightmap cache usage:\n");
+      int i;
+      for (i = 0 ; i < 4 ; i++)
+      {
+        printf ("  queue %d: hits=%d fails=%d\n",
+	  i,
+      	  lightmap_cache->stats_hit[i],
+      	  lightmap_cache->stats_fail[i]);
+      }
+      fflush (stdout);
+    }
+  }
+
   if ((width == height) && height == -1)
     return;
 
@@ -1986,7 +2009,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   // If we have need other texture passes (for whatever reason)
   // we set the z-buffer to second pass state.
   //=================
-  if (m_config_options.do_extra_bright || queue.use_fog || multimat)
+  if (queue.use_fog || multimat)
   {
     SetGLZBufferFlagsPass2 (queue.z_buf_mode, true);
   }
