@@ -260,6 +260,64 @@ void csSprite3D::Move (float dx, float dy, float dz)
   v_obj2world.y += dy;
   v_obj2world.z += dz;
 }
+/*
+BOOL gePosition::MoveTo(csVector3 Pos)
+{
+  //A valid position needs to be set first!
+  ASSERT(m_pSector);
+
+  csOrthoTransform OldPos (csMatrix3(1,0,0,0,1,0,0,0,1), m_Pos);
+
+  csVector3 NewPos     = Pos;
+  csSector* pNewSector = m_pSector;
+
+  bool mirror = false;
+  pNewSector = m_pSector->FollowSegment (OldPos, NewPos, mirror);
+
+  if (pNewSector &&
+      ABS (NewPos.x-Pos.x) < SMALL_EPSILON &&
+      ABS (NewPos.y-Pos.y) < SMALL_EPSILON &&
+      ABS (NewPos.z-Pos.z) < SMALL_EPSILON)
+  {
+    m_pSector = pNewSector;
+    m_Pos     = NewPos;
+    return TRUE;
+  }
+  else
+  {
+    return FALSE; //Object would leave space...
+  }
+}
+*/
+bool csSprite3D::MoveTo(csVector3 &move_to)
+{
+  csVector3 old_place(v_obj2world.x,v_obj2world.y,v_obj2world.z);
+  csOrthoTransform OldPos (csMatrix3(1,0,0,0,1,0,0,0,1), old_place);
+
+  csVector3 new_pos     = move_to;
+  csSector* pNewSector;//  = currentSector;
+
+  bool mirror = false;
+  pNewSector = currentSector->FollowSegment (OldPos, new_pos, mirror);
+
+  if (pNewSector &&
+      ABS (new_pos.x-move_to.x) < SMALL_EPSILON &&
+      ABS (new_pos.y-move_to.y) < SMALL_EPSILON &&
+      ABS (new_pos.z-move_to.z) < SMALL_EPSILON)
+  {
+    MoveToSector(pNewSector);
+    //Move(new_pos);
+/*  v_obj2world.x=move_to.x;//new_pos.x;
+    v_obj2world.y=move_to.y;//new_pos.y;
+    v_obj2world.z=move_to.z;//new_pos.z;*/
+    v_obj2world=-new_pos;
+    return true;
+  }
+  else
+  {
+    return false; //Object would leave space...
+  }
+}
 
 void csSprite3D::Transform (csMatrix3& matrix)
 {
@@ -558,6 +616,7 @@ void csSprite3D::MoveToSector (csSector* s)
   RemoveFromSectors ();
   sectors.Push (s);
   s->sprites.Push (this);
+  currentSector=s;
 }
 
 void csSprite3D::RemoveFromSectors ()

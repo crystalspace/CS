@@ -233,6 +233,7 @@ class csSprite3D : public csObject
 public:
   /// List of sectors where this sprite is.
   csObjVector sectors;
+  csSector *currentSector;
 
   /**
    * Configuration value for global LOD. 0 is lowest detail, 1 is maximum.
@@ -333,19 +334,29 @@ public:
 
   /**
    * Set the transformation matrix to rotate the sprite in some
-   * orientation.
+   * orientation
    */
   void SetTransform (csMatrix3& matrix);
 
   /**
-   * Relative move.
+   * Relative move
    */
   void Move (float dx, float dy, float dz);
 
   /**
-   * Relative move.
+   * Relative move
    */
   void Move (csVector3& v) { Move (v.x, v.y, v.z); }
+
+  /**
+   * Absolute move
+   */
+  bool MoveTo(csVector3& v);
+
+  /**
+   * The same as above
+   */
+  bool MoveTo(float x,float y,float z) {return MoveTo(csVector3(x,y,z));}
 
   /**
    * Relative transform.
