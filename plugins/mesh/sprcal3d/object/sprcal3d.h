@@ -497,6 +497,7 @@ private:
   protected:
     csSpriteCal3DMeshObject* meshobj;
     int mesh, submesh;
+    uint meshVersion;
 
     csRef<iRenderBuffer> vertex_buffer;
     int vertex_size;
@@ -517,7 +518,8 @@ private:
       SCF_CONSTRUCT_IBASE (0);
       BaseAccessor::meshobj = meshobj;
       BaseAccessor::mesh = mesh;
-      BaseAccessor::submesh = submesh;
+      BaseAccessor::submesh = submesh;    
+      meshVersion = (uint)-1;
     }
     virtual ~BaseAccessor() 
     {
@@ -527,7 +529,7 @@ private:
   };
 
   bool rmeshesSetup;
-  bool meshChanged;
+  uint meshVersion;
   csRef<iStringSet> strings;
   csDirtyAccessArray<csRenderMesh*> allRenderMeshes;
   csArray<csArray<csRenderMesh> > renderMeshes;

@@ -602,7 +602,7 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   is_initialized = 0;
 #ifdef CS_USE_NEW_RENDERER
   rmeshesSetup = false;
-  meshChanged = true;
+  meshVersion = 0;
 #endif
 }
 
@@ -1346,7 +1346,7 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   calModel.update(delta);
   last_update_time = current_time;
 #ifdef CS_USE_NEW_RENDERER
-  meshChanged = true;
+  meshVersion++;
 #endif
   lighting_dirty = true;
   return true;
@@ -1668,7 +1668,7 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
     (id == csSpriteCal3DMeshObjectFactory::normal_name) ||
     (id == csSpriteCal3DMeshObjectFactory::color_name))
   {
-    if (meshobj->meshChanged)
+    if (meshobj->meshVersion != meshVersion)
     {
       CalRenderer* render = meshobj->calModel.getRenderer();
       render->beginRendering();
@@ -1730,7 +1730,7 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
 
       render->endRendering();
 
-      meshobj->meshChanged = false;
+      meshVersion = meshobj->meshVersion;
     }
 
     if (id == csSpriteCal3DMeshObjectFactory::index_name)
