@@ -288,32 +288,62 @@ iImage *csImageFile::MipMap (int steps, RGBPixel *transp)
     case CS_IMGFMT_PALETTED8:
       if (Image)
         if (transpidx < 0)
-          (void)(steps == 0 ? mipmap_0_p :
-                 steps == 1 ? mipmap_1_p :
-                 steps == 2 ? mipmap_2_p :
-                 mipmap_3_p) (Width, Height, (UByte *)Image, mipmap, Palette);
+	{
+	  if (steps == 0)
+	    mipmap_0_p (Width, Height, (UByte *)Image, mipmap, Palette);
+	  else if (steps == 1)
+	    mipmap_1_p (Width, Height, (UByte *)Image, mipmap, Palette);
+	  else if (steps == 2)
+	    mipmap_2_p (Width, Height, (UByte *)Image, mipmap, Palette);
+	  else
+	    mipmap_3_p (Width, Height, (UByte *)Image, mipmap, Palette);
+	}
         else
-          (void)(steps == 0 ? mipmap_0_pt :
-                 steps == 1 ? mipmap_1_pt :
-                 steps == 2 ? mipmap_2_pt :
-                 mipmap_3_pt) (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+	{
+	  if (steps == 0)
+	    mipmap_0_pt (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+	  else if (steps == 1)
+	    mipmap_1_pt (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+	  else if (steps == 2)
+	    mipmap_2_pt (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+	  else
+	    mipmap_3_pt (Width, Height, (UByte *)Image, mipmap, Palette, transpidx);
+	}
       if (Alpha)
-        (void)(steps == 0 ? mipmap_0_a :
-               steps == 1 ? mipmap_1_a :
-               steps == 2 ? mipmap_2_a :
-               mipmap_3_a) (Width, Height, (UByte *)Alpha, nimg->Alpha);
+      {
+	  if (steps == 0)
+	    mipmap_0_a (Width, Height, (UByte *)Alpha, nimg->Alpha);
+	  else if (steps == 1)
+	    mipmap_1_a (Width, Height, (UByte *)Alpha, nimg->Alpha);
+	  else if (steps == 2)
+	    mipmap_2_a (Width, Height, (UByte *)Alpha, nimg->Alpha);
+	  else
+	    mipmap_3_a (Width, Height, (UByte *)Alpha, nimg->Alpha);
+      }
       break;
     case CS_IMGFMT_TRUECOLOR:
       if (!transp)
-        (void)(steps == 0 ? mipmap_0 :
-               steps == 1 ? mipmap_1 :
-               steps == 2 ? mipmap_2 :
-               mipmap_3) (Width, Height, (RGBPixel *)Image, mipmap);
+      {
+	if (steps == 0)
+	  mipmap_0 (Width, Height, (RGBPixel *)Image, mipmap);
+	else if (steps == 1)
+	  mipmap_1 (Width, Height, (RGBPixel *)Image, mipmap);
+	else if (steps == 2)
+	  mipmap_2 (Width, Height, (RGBPixel *)Image, mipmap);
+	else
+	  mipmap_3 (Width, Height, (RGBPixel *)Image, mipmap);
+      }
       else
-        (void)(steps == 0 ? mipmap_0_t :
-               steps == 1 ? mipmap_1_t :
-               steps == 2 ? mipmap_2_t :
-               mipmap_3_t) (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+      {
+	if (steps == 0)
+	  mipmap_0_t (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+	else if (steps == 1)
+	  mipmap_1_t (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+	else if (steps == 2)
+	  mipmap_2_t (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+	else
+	  mipmap_3_t (Width, Height, (RGBPixel *)Image, mipmap, *transp);
+      }
       break;
   }
 
