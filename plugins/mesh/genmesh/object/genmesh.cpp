@@ -417,6 +417,15 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
   delete[] vt_array_to_delete;
 }
 
+bool csGenmeshMeshObject::SetMaterialWrapper (iMaterialWrapper* mat)
+{
+  material = mat;
+  iMaterialWrapper* mater = material;
+  if (!mater) mater = factory->GetMaterialWrapper ();
+  material_needs_visit = mater->IsVisitRequired ();
+  return true;
+}
+
 void csGenmeshMeshObject::SetupObject ()
 {
   if (!initialized)
@@ -431,6 +440,9 @@ void csGenmeshMeshObject::SetupObject ()
       for (int i = 0 ; i <  num_lit_mesh_colors; i++)
           lit_mesh_colors[i].Set (.2, .2, .2);
     }
+    iMaterialWrapper* mater = material;
+    if (!mater) mater = factory->GetMaterialWrapper ();
+    material_needs_visit = mater->IsVisitRequired ();
   }
 }
 
@@ -662,6 +674,7 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
     printf ("INTERNAL ERROR: mesh used without material!\n");
     return false;
   }
+  if (material_needs_visit) mater->Visit ();
   iMaterialHandle* mat = mater->GetMaterialHandle ();
   if (!mat)
   {
@@ -676,10 +689,7 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
   // Prepare for rendering.
 #ifndef CS_USE_NEW_RENDERER
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
-#endif
 
-  mater->Visit ();
-#ifndef CS_USE_NEW_RENDERER
   G3DTriangleMesh& m = factory->GetMesh ();
   iVertexBuffer* vbuf = factory->GetVertexBuffer ();
   iVertexBufferManager* vbufmgr = factory->GetVertexBufferManager ();
@@ -712,6 +722,7 @@ iRenderBuffer *csGenmeshMeshObject::GetRenderBuffer (csStringID name)
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 {
 #ifdef CS_USE_NEW_RENDERER
+  SetupObject ();
   //if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   // iGraphics3D* g3d = rview->GetGraphics3D ();
@@ -732,7 +743,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 
   // iGraphics3D* g3d = rview->GetGraphics3D ();
 
-  mater->Visit ();
+  if (material_needs_visit) mater->Visit ();
   mesh.transform = &tr_o2c;
 
   // Prepare for rendering.

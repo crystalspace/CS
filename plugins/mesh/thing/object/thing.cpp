@@ -1391,8 +1391,6 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) : polygons(32, 64)
 #ifndef CS_USE_NEW_RENDERER
   polybuf = 0;
 #endif // CS_USE_NEW_RENDERER
-  polybuf_materials = 0;
-
   current_visnr = 1;
 
   lightmapsPrepared = false;
@@ -1404,7 +1402,6 @@ csThing::~csThing ()
 #ifndef CS_USE_NEW_RENDERER
   if (polybuf) polybuf->DecRef ();
 #endif // CS_USE_NEW_RENDERER
-  delete[] polybuf_materials;
 
   ClearLMs ();
 
@@ -1667,8 +1664,8 @@ void csThing::Prepare ()
     #endif // CS_USE_NEW_RENDERER
 
 #if 1
-      delete[] polybuf_materials;
-      polybuf_materials = 0;
+      polybuf_materials.DeleteAll ();
+      materials_to_visit.DeleteAll ();
 
       int i;
       csPolygon3D *p;
@@ -1770,8 +1767,8 @@ void csThing::Prepare ()
   }
 #endif // CS_USE_NEW_RENDERER
 
-  delete[] polybuf_materials;
-  polybuf_materials = 0;
+  polybuf_materials.DeleteAll ();
+  materials_to_visit.DeleteAll ();
 
   int i;
   csPolygon3DStatic *ps;
@@ -1838,8 +1835,8 @@ void csThing::InvalidateThing ()
   }
 #endif // CS_USE_NEW_RENDERER
 
-  delete[] polybuf_materials;
-  polybuf_materials = 0;
+  polybuf_materials.DeleteAll ();
+  materials_to_visit.DeleteAll ();
   prepared = false;
   static_data->obj_bbox_valid = false;
 
@@ -2055,6 +2052,14 @@ struct MatPol
 
 #endif // CS_USE_NEW_RENDERER
 
+static int ComparePointer (void const* item1,
+	void const* item2)
+{
+  if (item1 < item2) return -1;
+  if (item1 > item2) return 1;
+  return 0;
+}
+
 void csThing::PreparePolygonBuffer ()
 {
 #ifndef CS_USE_NEW_RENDERER
@@ -2073,17 +2078,18 @@ void csThing::PreparePolygonBuffer ()
 
   polybuf->SetVertexArray (static_data->obj_verts, static_data->num_vertices);
 
-  polybuf_material_count = 0;
-  delete[] polybuf_materials;
-  polybuf_materials = new iMaterialWrapper* [litPolys.Length () + unlitPolys.Length ()];
+  polybuf_materials.DeleteAll ();
+  materials_to_visit.DeleteAll ();
+  polybuf_materials.SetCapacity (
+  	litPolys.Length () + unlitPolys.Length ());
 
   int i;
   for (i = 0; i < litPolys.Length (); i++)
   {
     int mi = polybuf->GetMaterialCount ();
-    polybuf_materials[polybuf_material_count] = 
-      litPolys[i]->material;
-    polybuf_material_count++;
+    polybuf_materials.Push (litPolys[i]->material);
+    if (litPolys[i]->material->IsVisitRequired ())
+      materials_to_visit.Push (litPolys[i]->material);
     polybuf->AddMaterial (litPolys[i]->material->GetMaterialHandle ());
     int j;
     for (j = 0; j < litPolys[i]->polys.Length (); j++)
@@ -2112,9 +2118,9 @@ void csThing::PreparePolygonBuffer ()
   for (i = 0; i < unlitPolys.Length (); i++)
   {
     int mi = polybuf->GetMaterialCount ();
-    polybuf_materials[polybuf_material_count] = 
-      unlitPolys[i]->material;
-    polybuf_material_count++;
+    polybuf_materials.Push (unlitPolys[i]->material);
+    if (unlitPolys[i]->material->IsVisitRequired ())
+      materials_to_visit.Push (unlitPolys[i]->material);
     polybuf->AddMaterial (unlitPolys[i]->material->GetMaterialHandle ());
     int j;
     for (j = 0; j < unlitPolys[i]->polys.Length (); j++)
@@ -2137,6 +2143,21 @@ void csThing::PreparePolygonBuffer ()
 	mi, 0);
     }
   }
+
+  // Optimize the array of materials to visit.
+  materials_to_visit.Sort (ComparePointer);	// Sort on pointer.
+  i = 0;
+  int ni = 0;
+  iMaterialWrapper* prev = 0;
+  for (i = 0 ; i < materials_to_visit.Length () ; i++)
+  {
+    if (materials_to_visit[i] != prev)
+    {
+      prev = materials_to_visit[i];
+      materials_to_visit[ni++] = prev;
+    }
+  }
+  materials_to_visit.Truncate (ni);
 
   polybuf->Prepare ();
 #endif // CS_USE_NEW_RENDERER
@@ -2169,9 +2190,12 @@ void csThing::DrawPolygonArrayDPM (
 
   mesh.polybuf = polybuf;
   int i;
-  for (i = 0; i < polybuf_material_count; i++)
+  for (i = 0 ; i < materials_to_visit.Length () ; i++)
   {
-    polybuf_materials[i]->Visit ();
+    materials_to_visit[i]->Visit ();
+  }
+  for (i = 0; i < polybuf_materials.Length (); i++)
+  {
     polybuf->SetMaterial (i, polybuf_materials[i]->GetMaterialHandle ());
   }
 
@@ -2624,6 +2648,13 @@ void csThing::Merge (csThing *other)
 void csThing::PrepareRenderMeshes ()
 {
   static_data->FillRenderMeshes (renderMeshes, replace_materials);
+  int i;
+  materials_to_visit.DeleteAll ();
+  for (i = 0 ; i < renderMeshes.Length () ; i++)
+  {
+    if (renderMeshes[i]->material->IsVisitRequired ())
+      materials_to_visit.Push (renderMeshes[i]->material);
+  }
 }
 
 void csThing::ClearRenderMeshes ()
@@ -2648,10 +2679,9 @@ csRenderMesh **csThing::GetRenderMeshes (int &num)
 
   //PrepareLMs (); // @@@ Maybe more here ?
 
-  num = renderMeshes.Length();
-  for (int i = 0; i < num; i++)
+  for (int i = 0; i < materials_to_visit.Length (); i++)
   {
-    renderMeshes[i]->material->Visit ();
+    materials_to_visit[i]->Visit ();
   }
   return renderMeshes.GetArray ();
 #else

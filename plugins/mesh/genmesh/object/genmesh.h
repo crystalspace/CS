@@ -88,6 +88,7 @@ private:
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
   iMaterialWrapper* material;
+  bool material_needs_visit;
   uint MixMode;
   iMeshObjectDrawCallback* vis_cb;
   bool do_lighting;
@@ -238,11 +239,7 @@ public:
   virtual iObjectModel* GetObjectModel ();
   virtual bool SetColor (const csColor& col) { color = col; return true; }
   virtual bool GetColor (csColor& col) const { col = color; return true; }
-  virtual bool SetMaterialWrapper (iMaterialWrapper* mat)
-  {
-    material = mat;
-    return true;
-  }
+  virtual bool SetMaterialWrapper (iMaterialWrapper* mat);
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
   virtual int GetPortalCount () const { return 0; }
   virtual iPortal* GetPortal (int) const { return 0; }

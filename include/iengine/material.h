@@ -35,7 +35,7 @@ struct iTextureManager;
 struct iTextureWrapper;
 struct iObject;
 
-SCF_VERSION (iMaterialWrapper, 0, 0, 4);
+SCF_VERSION (iMaterialWrapper, 0, 0, 5);
 
 /**
  * A material wrapper is an engine-level object that wraps around an actual
@@ -77,9 +77,14 @@ struct iMaterialWrapper : public iBase
    * that are used.
    */
   virtual void Visit () = 0;
+
+  /**
+   * Return true if it is needed to call Visit().
+   */
+  virtual bool IsVisitRequired () const = 0;
 };
 
-SCF_VERSION (iMaterialEngine, 0, 0, 1);
+SCF_VERSION (iMaterialEngine, 0, 0, 2);
 
 /**
  * This interface represents the engine part of the material definition.
@@ -112,6 +117,11 @@ struct iMaterialEngine : public iBase
    * Visit all textures.
    */
   virtual void Visit () = 0;
+
+  /**
+   * Return true if it is needed to call Visit().
+   */
+  virtual bool IsVisitRequired () const = 0;
 };
 
 SCF_VERSION (iMaterialList, 0, 0, 1);

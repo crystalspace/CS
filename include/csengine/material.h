@@ -241,6 +241,7 @@ public:
    * Visit all textures.
    */
   void Visit ();
+  bool IsVisitRequired () const;
 
   SCF_DECLARE_IBASE;
 
@@ -271,6 +272,10 @@ public:
     virtual void Visit ()
     {
       scfParent->Visit ();
+    }
+    virtual bool IsVisitRequired () const
+    {
+      return scfParent->IsVisitRequired ();
     }
   } scfiMaterialEngine;
   friend struct MaterialEngine;
@@ -327,6 +332,7 @@ public:
    * that are used.
    */
   void Visit ();
+  bool IsVisitRequired () const;
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -350,6 +356,10 @@ public:
     { scfParent->Register (txtmng); }
     virtual void Visit ()
     { scfParent->Visit (); }
+    virtual bool IsVisitRequired () const
+    {
+      return scfParent->IsVisitRequired ();
+    }
   } scfiMaterialWrapper;
   friend struct MaterialWrapper;
 };

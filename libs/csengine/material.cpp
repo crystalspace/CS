@@ -386,7 +386,8 @@ csTextureLayer *csMaterial::GetTextureLayer (int idx)
 {
   if (idx >= 0 && idx < num_texture_layers)
   {
-    texture_layers[idx].txt_handle = texture_layer_wrappers[idx]->GetTextureHandle ();
+    texture_layers[idx].txt_handle = texture_layer_wrappers[idx]
+    	->GetTextureHandle ();
     return &texture_layers[idx];
   }
   else
@@ -431,11 +432,35 @@ void csMaterial::SetReflection (float oDiffuse, float oAmbient,
 void csMaterial::Visit ()
 {
 #ifdef CS_USE_NEW_RENDERER
+  // @@@ Implement me!!!!!!!!!!
 #else
   if (texture)
   {
     texture->Visit ();
+    int i;
+    for (i = 0 ; i < num_texture_layers ; i++)
+    {
+      texture_layer_wrappers[i]->Visit ();
+    }
   }
+#endif
+}
+
+bool csMaterial::IsVisitRequired () const
+{
+#ifdef CS_USE_NEW_RENDERER
+  // @@@ Implement me!!!!!!!!!!
+  return false;
+#else
+  if (texture)
+  {
+    if (texture->IsVisitRequired ()) return true;
+    int i;
+    for (i = 0 ; i < num_texture_layers ; i++)
+       if (texture_layer_wrappers[i]->IsVisitRequired ())
+         return true;
+  }
+  return false;
 #endif
 }
 
@@ -522,6 +547,15 @@ void csMaterialWrapper::Visit ()
   {
     matEngine->Visit ();
   }
+}
+
+bool csMaterialWrapper::IsVisitRequired () const
+{
+  if (matEngine)
+  {
+    return matEngine->IsVisitRequired ();
+  }
+  return false;
 }
 
 //------------------------------------------------------ csMaterialList -----//

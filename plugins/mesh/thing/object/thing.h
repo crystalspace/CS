@@ -542,8 +542,11 @@ private:
   /**
    * An array of materials that are used with the polygon buffer.
    */
-  iMaterialWrapper** polybuf_materials;
-  int polybuf_material_count;
+  csArray<iMaterialWrapper*> polybuf_materials;
+  /**
+   * An array of materials that must be visited before use.
+   */
+  csArray<iMaterialWrapper*> materials_to_visit;
 
   /**
    * Bounding box in world space.

@@ -171,6 +171,7 @@ public:
    * that are used.
    */
   void Visit ();
+  bool IsVisitRequired () const { return false; }
 
   /// Get the material index
   int GetIndex() const {return index;}
@@ -201,6 +202,10 @@ public:
       return scfParent;
     }
     virtual void Visit () { scfParent->Visit (); }
+    virtual bool IsVisitRequired () const
+    {
+      return scfParent->IsVisitRequired ();
+    }
     virtual void Register (iTextureManager *mng) { scfParent->Register (mng); }
     virtual void SetMaterial (iMaterial* m)
     {

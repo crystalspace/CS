@@ -45,7 +45,7 @@ struct iTextureCallback : public iBase
   virtual void UseTexture (iTextureWrapper* wrap) = 0;
 };
 
-SCF_VERSION (iTextureWrapper, 0, 0, 5);
+SCF_VERSION (iTextureWrapper, 0, 1, 0);
 
 /**
  * A texture wrapper is an engine-level object that wraps around an actual
@@ -110,6 +110,11 @@ struct iTextureWrapper : public iBase
    * callback if there is one.
    */
   virtual void Visit () = 0;
+
+  /**
+   * Return true if it is needed to call Visit().
+   */
+  virtual bool IsVisitRequired () const = 0;
 
   /**
    * Set the keep image flag. See KeepImage() function for explanation.

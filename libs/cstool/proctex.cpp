@@ -333,6 +333,11 @@ void csProcTexture::eiTextureWrapper::Visit ()
   scfParent->tex->Visit();
 }
 
+bool csProcTexture::eiTextureWrapper::IsVisitRequired () const
+{
+  return scfParent->tex->IsVisitRequired ();
+}
+
 void csProcTexture::eiTextureWrapper::SetKeepImage (bool k)
 {
   scfParent->tex->SetKeepImage (k);

@@ -102,6 +102,7 @@ protected:
     virtual void SetUseCallback (iTextureCallback* callback);
     virtual iTextureCallback* GetUseCallback ();
     virtual void Visit ();
+    virtual bool IsVisitRequired () const;
     virtual void SetKeepImage (bool k);
     virtual bool KeepImage () const;
   } scfiTextureWrapper;

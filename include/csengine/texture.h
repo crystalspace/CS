@@ -157,6 +157,12 @@ public:
       use_callback->UseTexture (&scfiTextureWrapper);
   }
 
+  bool IsVisitRequired () const
+  {
+    return use_callback != 0;
+  }
+
+
   SCF_DECLARE_IBASE_EXT (csObject);
 
   //-------------------- iTextureWrapper implementation -----------------------
@@ -170,7 +176,10 @@ public:
     virtual void SetImageFile (iImage *Image);
     virtual iImage* GetImageFile ();
     virtual void SetTextureHandle (iTextureHandle *tex);
-    virtual iTextureHandle* GetTextureHandle ();
+    virtual iTextureHandle* GetTextureHandle ()
+    {
+      return scfParent->GetTextureHandle ();
+    }
     virtual void SetKeyColor (int red, int green, int blue);
     virtual void GetKeyColor (int &red, int &green, int &blue);
     virtual void SetFlags (int flags);
@@ -178,7 +187,14 @@ public:
     virtual void Register (iTextureManager *txtmng);
     virtual void SetUseCallback (iTextureCallback* callback);
     virtual iTextureCallback* GetUseCallback ();
-    virtual void Visit ();
+    virtual void Visit ()
+    {
+      scfParent->Visit ();
+    }
+    virtual bool IsVisitRequired () const
+    {
+      return scfParent->IsVisitRequired ();
+    }
     virtual void SetKeepImage (bool k) { scfParent->keep_image = k; }
     virtual bool KeepImage () const { return scfParent->keep_image; }
   } scfiTextureWrapper;

@@ -212,11 +212,6 @@ void csTextureWrapper::TextureWrapper::SetTextureHandle (iTextureHandle *tex)
   scfParent->SetTextureHandle (tex);
 }
 
-iTextureHandle *csTextureWrapper::TextureWrapper::GetTextureHandle ()
-{
-  return scfParent->GetTextureHandle ();
-}
-
 void csTextureWrapper::TextureWrapper::SetKeyColor (
   int red,
   int green,
@@ -257,11 +252,6 @@ void csTextureWrapper::TextureWrapper::SetUseCallback (
 iTextureCallback *csTextureWrapper::TextureWrapper::GetUseCallback ()
 {
   return scfParent->GetUseCallback ();
-}
-
-void csTextureWrapper::TextureWrapper::Visit ()
-{
-  scfParent->Visit ();
 }
 
 //------------------------------------------------------- csTextureList -----//

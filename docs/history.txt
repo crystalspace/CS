@@ -11,6 +11,23 @@ chronological order.
 	  mesh object. Unfortunatelly this means that this plugin now
 	  requires the CVS version of cal3d. Version 0.9 is no longer
 	  sufficient.
+	- Jorrit added iTextureWrapper->IsVisitRequired() (and also
+	  equivalent iMaterial->IsVisitRequired() and
+	  iMaterialWrapper->IsVisitRequired()). This function will return
+	  true if it is needed to call visit(). Basically this function
+	  tests if the texture has a use callback. Mesh objects can use
+	  this function to avoid the need to call Visit(). The Visit() function
+	  comes up pretty high in profiling runs so this is not
+	  insignificant.
+	- Jorrit also fixed a bug in csMaterial. It was not calling Visit()
+	  on the layered textures. This caused procedural textures not to
+	  work if in a layer.
+	- Jorrit modified the thing mesh so that it only calls Visit() on
+	  materials that actually require this. This should have some
+	  impact on performance since Visit() comes up pretty high in
+	  profiling runs.
+	- Jorrit also modified the genmesh mesh so that it only calls
+	  Visit() when needed.
         - Philip Wyett removed the sprcal3d plugin from the default MSVC build.
 31-Aug-2003
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
