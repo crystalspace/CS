@@ -402,7 +402,7 @@ proc		%%name,52+%%scanloop_args,ebx,esi,edi,ebp
 ; do
 ; {
 %$loop:
-;   if (width < INTERPOL_STEP)
+;   if (width > INTERPOL_STEP)
 ;   {
 		mov	eax,%$width
 		cmp	eax,InterpolStep
@@ -470,6 +470,9 @@ proc		%%name,52+%%scanloop_args,ebx,esi,edi,ebp
 			sar	edx,cl					; 6(4)
 			mov	%$duu,eax				; 10
 			mov	%$dvv,edx				; 10
+;   z1 = 1 / inv_z;
+			fld1		; 1, inv_z			; 11/2
+			fdiv	st1	; z1, inv_z			; 13/39
 ;   }
 ;   else
 ;   {
@@ -524,13 +527,13 @@ proc		%%name,52+%%scanloop_args,ebx,esi,edi,ebp
 			fdivrp	st1	; dvv, inv_z			; 9/39
 			mov	%$width,0				; 10
 		; 38 clocks stall: two divisions at once
-			fistp	%$dvv	; inv_z
+			fist	%$dvv	; dvv, inv_z
+; Note that we don't do "fistp" above because we have to leave something
+; on FPU stack in place where usually "z" resides. It does not really matter
+; what we have there on last pass, just to keep two "fstp"s below happy.
 			mov	%$duu,eax
 ;   }
 		endif
-;   z1 = 1 / inv_z;
-		fld1			; 1, inv_z			; 0/2
-		fdiv	st1		; z1, inv_z			; 2/39
 
 		%%scanloop_body
 
@@ -545,7 +548,7 @@ proc		%%name,52+%%scanloop_args,ebx,esi,edi,ebp
 		test	eax,eax						; 3
 		jne	near %$loop					; 3
 
-; pop z1 and inv_z from the FPU stack; mmx %%scanloop_fini routines do emms
+; pop z and inv_z from the FPU stack; mmx %%scanloop_fini routines do emms
 	%if (%%flags & SCANPROC_MMX) == 0
 		fstp	st0
 		fstp	st0

@@ -1283,6 +1283,12 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
       goto finish;              // nothing to do
 
+  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
+  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
+  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
+  int xL, xR;
+  int screenY;
+
   // If sub-texture optimization is enabled we will convert the 2D screen polygon
   // to texture space and then triangulate this texture polygon to cache all
   // needed sub-textures.
@@ -1300,39 +1306,34 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     // @@@ When everything works this algorithm needs to be rewritten so
     // that only the visible shape is used. One way to do this would be
     // to triangulate and do this thing a triangle at a time.
-
-    float cx = (poly.vertices[0].sx - (float)width2);
-    float cy = ((poly.vertices[0].sy - 0.5) - height2);
-    float inv_z = M * cx + N * cy + O;
-    float u_div_z = J1 * cx + J2 * cy + J3;
-    float v_div_z = K1 * cx + K2 * cy + K3;
-    float z = 1. / inv_z;
-    float u = u_div_z*z;
-    float v = v_div_z*z;
-    float min_u = u;
-    float max_u = u;
-    float min_v = v;
-    float max_v = v;
-
-    for (i = 1 ; i < poly.num ; i++)
+    float min_u = 0, max_u = 0, min_v = 0, max_v = 0;
+    for (int vertex = 0; vertex < poly.num; vertex++)
     {
-      cx = poly.vertices[i].sx - (float)width2;
-      cy = (poly.vertices[i].sy - 0.5) - height2;
-      inv_z = M * cx + N * cy + O;
-      u_div_z = J1 * cx + J2 * cy + J3;
-      v_div_z = K1 * cx + K2 * cy + K3;
-      z = 1. / inv_z;
-      u = u_div_z*z;
-      v = v_div_z*z;
-      if (u < min_u) min_u = u; else if (u > max_u) max_u = u;
-      if (v < min_v) min_v = v; else if (v > max_v) max_v = v;
-    }
+      float cx = QRound (poly.vertices [vertex].sx - width2);
+      float cy = (QRound (poly.vertices [vertex].sy) - 0.5) - height2;
+      float inv_z = M * cx + N * cy + O;
+      float u_div_z = J1 * cx + J2 * cy + J3;
+      float v_div_z = K1 * cx + K2 * cy + K3;
+      float z = 1. / inv_z;
+      float u = u_div_z * z;
+      float v = v_div_z * z;
 
-    int imin_u = QInt (min_u);
-    int imin_v = QInt (min_v);
-    int imax_u = QInt (max_u);
-    int imax_v = QInt (max_v);
-    CacheRectTexture (tex, imin_u, imin_v, imax_u, imax_v);
+      if (vertex == 0)
+        min_u = max_u = u, min_v = max_v = v;
+      else
+      {
+        if (u < min_u) min_u = u; else if (u > max_u) max_u = u;
+        if (v < min_v) min_v = v; else if (v > max_v) max_v = v;
+      }
+    } /* endfor */
+    if (min_u < 0) min_u = 0; else if (max_u > Scan.tw2) max_u = Scan.tw2;
+    if (min_v < 0) min_v = 0; else if (max_v > Scan.th2) max_v = Scan.th2;
+
+    if ((min_u < Scan.tw2)
+     && (min_v < Scan.th2)
+     && (max_u > 0)
+     && (max_v > 0))
+      CacheRectTexture (tex, QInt (min_u), QInt (min_v), QInt (max_u), QInt (max_v));
   }
 
   // Scan both sides of the polygon at once.
@@ -1344,12 +1345,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   // and vice versa.
   // Using this we effectively partition our polygon in trapezoids
   // with at most two triangles (one at the top and one at the bottom).
-
-  int scanL1, scanL2, scanR1, scanR2;   // scan vertex left/right start/final
-  float sxL, sxR, dxL, dxR;             // scanline X left/right and deltas
-  int sy, fyL, fyR;                     // scanline Y, final Y left, final Y right
-  int xL, xR;
-  int screenY;
 
   sxL = sxR = dxL = dxR = 0;            // avoid GCC warnings about "uninitialized variables"
   scanL2 = scanR2 = max_i;
@@ -1408,7 +1403,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
     float vd_u_div_z = - dxL * J1 + J2;
     float vd_v_div_z = - dxL * K1 + K2;
 
-    float cx = (sxL - (float)width2);
+    float cx = (sxL - width2);
     float cy = ((sy - 0.5) - height2);
     float inv_z = M * cx + N * cy + O;
     float u_div_z = J1 * cx + J2 * cy + J3;
@@ -1442,23 +1437,17 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
         float deltaX = (float)xL - sxL;
 
         //m_piG2D->GetPixelAt(xL, screenY, &d);
-        d = line_table[screenY] + (xL << pixel_shift);
+        d = line_table [screenY] + (xL << pixel_shift);
         z_buf = z_buffer + width * screenY + xL;
 
         // Select the right filter depending if we are drawing an odd or even line.
         // This is only used by draw_scanline_map_filt_zfil currently and is still
         // experimental.
         extern int filter_bf;
-        if (sy&1) filter_bf = 3; else filter_bf = 1;
+        if (sy & 1) filter_bf = 3; else filter_bf = 1;
 
         // do not draw the rightmost pixel - it will be covered
         // by neightbour polygon's left bound
-        Scan.M = M;
-        Scan.J1 = J1;
-        Scan.K1 = K1;
-        Scan.dM = M * Scan.InterpolStep;
-        Scan.dJ1 = J1 * Scan.InterpolStep;
-        Scan.dK1 = K1 * Scan.InterpolStep;
         dscan (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1);
       }
 
