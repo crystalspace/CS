@@ -28,10 +28,73 @@ The history order is reversed so that new features are at the top.
 	  disables all functionality that has to do with iEngine (like the
 	  Spider). All other functionality will work though.
 	- Fixed some documentation with regards to recent changes.
+	- Fixed a bug in a CS_ASSERT in spider.
 	- Eric Sunshine applied a more correct fix to SCF following Jorrit's
 	  patch today.  DECLARE_FAST_INTERFACE() now correctly employs the
 	  opaque scfInterfaceID rather than uint32.
 	- Eric Sunshine removed the now obsolete DO_COREDUMP makefile variable.
+	- Martin Geisse did the following:
+	    - Some cleanup of csparser: Renamed some functions that
+	      involve parsing to Parse??? (example: load_vector to
+	      ParseVector). The goal of this is to make a clear difference
+	      between functions that load data from files and functions that
+	      interpret parts of the world file. Also changes usage of
+	      fatal_exit() to returning 'false' in some cases.
+	    - Continued work on csparser (renaming functions and removing
+	      fatal_exit). To make the code more readable, I added a function
+	      to handle the error output for unknown tokens (as all those
+	      error messages were up to 3 lines of identical code except one
+	      word). Also added a convenience method to csObject that adds
+	      all child objects of another object as children. Using this
+	      method I fixed the bug that allowed static lights to have
+	      only one key-value pair attached to them.
+	- Christopher Nelson made some more progress on the parser. 
+	  Implemented the very helpful patches sent to me by Eric Sunshine,
+	  so the test harness now functions properly with the plugin.
+	  The parser now recognizes complete skin definitions, and constructs
+	  a proper parse tree of the results, though it currently discards
+	  the results at the top level.
+	- Christopher reports:
+	  Lots more work on the parser. The parse tree is nearly completely
+	  constructed, only discarded at the very top layer. The parser can
+	  currently properly parse the following definition:
+		skin "Normal Window"
+		{
+  		  Texture: "/lib/windows/texture.png"
+		  Another: "/lib/tex/windows/defbackgr.png"
+		  Wack:  "/libandstuff/dir/garbage.png"
+		}
+		window "New User" from "Normal Window"
+		{
+		  Frame: (100, 200) - (400, 500)
+		  Style: Bitmapped
+		  Overlay: "/lib/windows/newuserovl.png"
+		  Back:    "/lib/windows/newuserbck.png"
+  		  component "User Name" is "Textbox"
+		  {
+		    Frame: (10, 30) - (390, 45)
+		    Style: NoFrame
+		    Caption: "Name:"
+		  }
+		  ...
+	  Components can be nested as deeply as you want. So far I'm assuming
+	  that coordinates of children are expressed inside their parent's
+	  rectangle. Any integers that occur can be normal infix expressions
+	  using addition, subtraction, multiplication, and division
+	  (parenthetical solving is, of course, included).  I don't expect
+	  you to need more than that, but if you do let me know.
+	  I'm vaguely thinking of adding some sort of macro variable system
+	  where you can assign certain variables a value, and then use those
+	  values later down as offsets. As in:
+		define FirstRadFrame = (10,10) - (100,35)
+		component "bla" is "Radio Button"
+		{
+		  Frame: (FirstRadFrame.Left, FirstRadFrame.Top+15)
+		  	- (FirstRadFrame.Right, FirstRadFrame.Bottom+15)
+		}
+	- Justin Miller fixed a bug in OpenGL renderer so that resize
+	  of window should work correctly. I have been told however that
+	  it is still not working completely ok.
 11-Jun-2001
 	- Created a new 'bugplug' plugin. This plugin will give debugging
 	  functionality to any CS app. To use it just add the following
