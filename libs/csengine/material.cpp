@@ -50,7 +50,6 @@ csMaterial::csMaterial (csEngine* engine)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
 
 #ifdef CS_USE_NEW_RENDERER
-  shaders = new csHashMap();
   csMaterial::engine = engine;
 #endif // CS_USE_NEW_RENDERER
 
@@ -86,7 +85,6 @@ csMaterial::csMaterial (csEngine* engine,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
 
 #ifdef CS_USE_NEW_RENDERER
-  shaders = new csHashMap();
   csMaterial::engine = engine;
 
   nameDiffuseParam = engine->Strings->Request (CS_MATERIAL_VARNAME_DIFFUSE);
@@ -110,18 +108,6 @@ csMaterial::csMaterial (csEngine* engine,
 
 csMaterial::~csMaterial ()
 {
-#ifdef CS_USE_NEW_RENDERER
-  csGlobalHashIterator cIter (shaders);
-
-  while(cIter.HasNext() )
-  {
-    iShader* i = (iShader*)cIter.Next();
-    i->DecRef();
-  }
-  shaders->DeleteAll ();
-  delete shaders;
-#endif // CS_USE_NEW_RENDERER
-
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
   SCF_DESTRUCT_IBASE ();
 }
@@ -354,8 +340,7 @@ iEffectDefinition *csMaterial::GetEffect ()
 void csMaterial::SetShader (csStringID type, iShader* shd)
 {
 #ifdef CS_USE_NEW_RENDERER
-  shd->IncRef ();
-  shaders->Put (type, shd);
+  shaders.Put (type, shd);
 #else
   (void)type;
   (void)shd;
@@ -365,7 +350,7 @@ void csMaterial::SetShader (csStringID type, iShader* shd)
 iShader* csMaterial::GetShader(csStringID type)
 {
 #ifdef CS_USE_NEW_RENDERER
-  return (iShader *) shaders->Get (type);
+  return shaders.Get (type);
 #else
   return 0;
 #endif

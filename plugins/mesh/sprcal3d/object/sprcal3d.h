@@ -544,6 +544,7 @@ private:
 #endif
   bool arrays_initialized;
   csBox3 object_bbox;
+  uint bboxVersion;
   csArray<csColor*>         *meshes_colors;
   csArray<int>		     attached_ids;
   csArray<bool>             *is_initialized;

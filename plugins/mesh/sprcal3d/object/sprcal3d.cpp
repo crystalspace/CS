@@ -667,6 +667,7 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
 #ifdef CS_USE_NEW_RENDERER
   rmeshesSetup = false;
   meshVersion = 0;
+  bboxVersion = (uint)-1;
 #endif
 }
 
@@ -769,9 +770,10 @@ void csSpriteCal3DMeshObject::SetupVertexBuffer (int mesh,int submesh,int num_ve
 
 void csSpriteCal3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
 {
-  cent.Set(object_bbox.GetCenter());
-  csVector3 maxbox,minbox;
+  cent.Set (object_bbox.GetCenter());
+  csVector3 maxbox, minbox;
 
+  RecalcBoundingBox (object_bbox);
   maxbox = object_bbox.Max();
   minbox = object_bbox.Min();
   float r1 = (maxbox.x-minbox.x)/2;
@@ -780,9 +782,11 @@ void csSpriteCal3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
   rad.Set(r1,r2,r3);
 }
 
-void csSpriteCal3DMeshObject::RecalcBoundingBox(csBox3& bbox)
+void csSpriteCal3DMeshObject::RecalcBoundingBox (csBox3& bbox)
 {
 //  bbox.Set(-1,0,-1,1,2,1);
+
+  if (bboxVersion == meshVersion) return;
 
   CalBoundingBox &calBoundingBox  = calModel.getBoundingBox();
   CalVector p[8];
@@ -792,13 +796,14 @@ void csSpriteCal3DMeshObject::RecalcBoundingBox(csBox3& bbox)
   {
     bbox.AddBoundingVertexSmart(p[i].x,p[i].y,p[i].z);
   }
+
+  bboxVersion = meshVersion;
 }
 
 
 void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox, int type)
 {
-  if (object_bbox.Empty())
-    RecalcBoundingBox(object_bbox);
+  RecalcBoundingBox (object_bbox);
   bbox = object_bbox;
 }
 
@@ -1849,13 +1854,9 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
 	vertex_size = vertexCount;
       }
 
-      // @@@ Not the most optimal place to do that.
-      CS_ALLOC_STACK_ARRAY (float, vertexData, vertexCount * 3);
-      render->getVertices (vertexData);
-      meshobj->GetObjectBoundingBox (meshobj->object_bbox, 0, 
-	(csVector3 *)vertexData, vertexCount);
-      vertex_buffer->CopyToBuffer (vertexData, 
-	sizeof (float) * vertexCount * 3);
+      float* vertices = (float*)vertex_buffer->Lock (CS_BUF_LOCK_NORMAL);
+      render->getVertices (vertices);
+      vertex_buffer->Release ();
 
       float* normals = (float*)normal_buffer->Lock (CS_BUF_LOCK_NORMAL);
       render->getNormals (normals);
@@ -1865,9 +1866,6 @@ void csSpriteCal3DMeshObject::BaseAccessor::PreGetValue (
       render->getTextureCoordinates (0, texels);
       texel_buffer->Release ();
 
-      /*float* colors = (float*)color_buffer->Lock (CS_BUF_LOCK_NORMAL);
-      render->getNormals (colors);
-      color_buffer->Release ();*/
       meshobj->UpdateLighting (meshobj->currentMovable, render);
       color_buffer->CopyToBuffer (meshobj->meshes_colors[mesh][submesh],
 	sizeof (float) * vertexCount * 3);

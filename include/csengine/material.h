@@ -35,43 +35,6 @@ struct iTextureManager;
 SCF_VERSION (csMaterialWrapper, 0, 0, 1);
 
 /**
- * A hash that stores ref-counted objects, exactly one
- * object per hash key.
- */
-template <class T>
-class csRefHash : csHashMap
-{
-public:
-  csRefHash ()
-  { }
-
-  ~csRefHash ()
-  {
-    csGlobalHashIterator it (this);
-
-    while (it.HasNext ())
-    {
-      T* obj = (T*)it.Next ();
-      if (obj != 0) obj->DecRef ();
-    }
-  }
-
-  void Put (csHashKey key, T* object)
-  {
-    T* oldobj = (T*)csHashMap::Get (key);
-    if (oldobj != 0) oldobj->DecRef ();
-    Delete (key, (csHashObject)oldobj);
-    if (object != 0) object->IncRef ();
-    csHashMap::Put (key, (csHashObject)object);
-  }
-
-  T* Get (csHashKey key) const
-  {
-    return (T*)csHashMap::Get (key);
-  }
-};
-
-/**
  * A material class.
  */
 class csMaterial : public iMaterial
@@ -103,7 +66,7 @@ private:
 #endif
 
   /// Shader associated with material
-  csHashMap* shaders;
+  csHash<csRef<iShader>, csStringID> shaders;
   csEngine* engine;
 
 #ifdef CS_USE_NEW_RENDERER
