@@ -129,8 +129,13 @@ g_error csPGVideoDriver::Load (hwrbitmap *b, const uint8 *data, __u32 len)
   hwrbitmap picobmp;
 
   def_bitmap_new (&picobmp, img->GetWidth (), img->GetHeight (), 32);
-  memcpy (picobmp->bits, img->GetImageData (), 
-    img->GetWidth ()*img->GetHeight ()*4);
+  for (int i=0; i<img->GetWidth ()*img->GetHeight ()*4; i+=4)
+  {
+    picobmp->bits[i] = ((unsigned char*)img->GetImageData ())[i+2];
+    picobmp->bits[i+1] = ((unsigned char*)img->GetImageData ())[i+1];
+    picobmp->bits[i+2] = ((unsigned char*)img->GetImageData ())[i];
+    picobmp->bits[i+3] = ((unsigned char*)img->GetImageData ())[i+3];
+  }
 
   csHwrBitmap** csbmp = (csHwrBitmap**)b;
   *csbmp = new csHwrBitmap (picobmp, Gfx3D);
