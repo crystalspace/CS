@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include "sysdef.h"
 #include "csutil/scf.h"
-#include "cs3d/glide2/glidelib.h"
+#include "cs3d/glide2/gllib2.h"
 #include "glidedsp.h"
 #include "cs2d/openglx/iogldisp.h"
 #include "iplugin.h"

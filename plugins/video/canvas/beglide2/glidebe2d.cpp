@@ -24,7 +24,7 @@
 #include "csinput/csinput.h"
 #include "cssys/be/beitf.h"
 #include "csutil/csrect.h"
-#include "cs3d/glide2/glidelib.h"
+#include "cs3d/glide2/gllib2.h"
 #include "isystem.h"
 
 IMPLEMENT_FACTORY (csGraphics2DBeGlide)

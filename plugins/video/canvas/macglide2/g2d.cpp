@@ -41,7 +41,7 @@ extern void out(char *str, ...);
 #include "cs2d/macglide2/ig2d.h"
 #include "cs2d/macglide2/xg2d.h"
 #include "cs3d/glide2/g3dglide.h"
-#include "cs3d/glide2/glidelib.h"
+#include "cs3d/glide2/gllib2.h"
 
 IMPLEMENT_FACTORY (csGraphics2DGlide2x)
 
