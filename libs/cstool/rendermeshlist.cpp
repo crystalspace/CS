@@ -144,6 +144,19 @@ static int SortMeshFront2Back (void const* item1,
   return 0;
 }
 
+static int SortMeshMaterial (void const* item1,
+                             void const* item2)
+{
+  csRenderMesh* m1 = *(csRenderMesh**) item1;
+  csRenderMesh* m2 = *(csRenderMesh**) item2;
+
+  if (m1->material > m2->material)
+    return 1;
+  if (m1->material < m2->material)
+    return -1;
+  return 0;
+}
+
 void csRenderMeshList::GetSortedMeshList (
 	csArray<csRenderMesh*>& meshes)
 {
@@ -160,7 +173,6 @@ void csRenderMeshList::GetSortedMeshList (
     if (0 == listEnt)
       continue;
 
-
     if (listEnt->sortingOption == CS_RENDPRI_BACK2FRONT)
     {
       listEnt->meshList.Sort (SortMeshBack2Front);
@@ -169,6 +181,8 @@ void csRenderMeshList::GetSortedMeshList (
     {
       listEnt->meshList.Sort (SortMeshFront2Back);
     }
+
+    listEnt->meshList.Sort (SortMeshMaterial);
 
     numObjects += listEnt->meshList.Length ();
   }

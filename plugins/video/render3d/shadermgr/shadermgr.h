@@ -414,8 +414,11 @@ private:
   csSymbolTable *symtab;
 
   // Optimization fields for SetupState.
+  static buffercount;
+  static texturecount;
   static csVertexAttrib attribs[STREAMMAX*2];
   static iRenderBuffer* buffers[STREAMMAX*2];
+  static csStringID buffernames[STREAMMAX*2];
   static iRenderBuffer* clear_buffers[STREAMMAX*2];	// For quick clearing...
   static int units[TEXMAX];
   static iTextureHandle* textures[TEXMAX];
@@ -426,6 +429,7 @@ private:
   csStringID streammapping[STREAMMAX];
   bool streammappinggeneric[STREAMMAX];
   csStringID texmapping[TEXMAX];
+
 
   //loading related
   enum

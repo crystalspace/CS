@@ -508,8 +508,11 @@ bool csShader::Prepare()
 }
 
 //==================== csShaderPass ==============//
+int csShaderPass::buffercount = 0;
+int csShaderPass::texturecount = 0;
 csVertexAttrib csShaderPass::attribs[STREAMMAX*2];
 iRenderBuffer* csShaderPass::buffers[STREAMMAX*2];
+csStringID csShaderPass::buffernames[STREAMMAX*2];
 iRenderBuffer* csShaderPass::clear_buffers[STREAMMAX*2];
 int csShaderPass::units[TEXMAX];
 iTextureHandle* csShaderPass::textures[TEXMAX];
@@ -519,6 +522,25 @@ void csShaderPass::Activate(csRenderMesh* mesh)
 {
   if(vp) vp->Activate(this, mesh);
   if(fp) fp->Activate(this, mesh);
+
+  buffercount = 0;
+  int i;
+  for (i=0; i<STREAMMAX; i++)
+  {
+    if (streammapping[i] != csInvalidStringID)
+    {
+      bool gen = streammappinggeneric[i];
+      buffernames[buffercount] = streammapping[i];
+      attribs[buffercount] = 
+        (csVertexAttrib)(i+(gen?0:CS_VATTRIB_SPECIFIC_FIRST));
+      buffercount++;
+    }
+  }
+
+  texturecount = 0;
+  for (i=0; i<TEXMAX; i++)
+    if (texmapping[i] != csInvalidStringID)
+      units[texturecount++] = i;
 }
 
 void csShaderPass::Deactivate()
@@ -526,43 +548,28 @@ void csShaderPass::Deactivate()
   if(vp) vp->Deactivate(this);
   if(fp) fp->Deactivate(this);
 
-  g3d->SetTextureState (units, clear_textures, TEXMAX);
-  g3d->SetBufferState (attribs, clear_buffers, STREAMMAX*2);
+  g3d->SetTextureState (units, clear_textures, texturecount);
+  g3d->SetBufferState (attribs, clear_buffers, buffercount);
+  texturecount = buffercount = 0;
 }
 
 void csShaderPass::SetupState (csRenderMesh *mesh)
 {
   int i;
-  memset (buffers, 0, sizeof (iRenderBuffer*)*STREAMMAX*2);
-  for (i=0; i<STREAMMAX; i++)
-  {
-    if (streammapping[i] != csInvalidStringID)
-    {
-      iRenderBuffer* buf  = 
-        mesh->buffersource->GetRenderBuffer (streammapping[i]);
-      if (buf)
-      {
-        bool gen = streammappinggeneric[i];
-        buffers[(i<<1)+(gen?0:1)] = buf;
-      }
-    }
-  }
-  g3d->SetBufferState (attribs, buffers, STREAMMAX*2);
+  for (i=0; i<buffercount; i++)
+    buffers[i] = mesh->buffersource->GetRenderBuffer (buffernames[i]);
+  g3d->SetBufferState (attribs, buffers, buffercount);
 
   //iMaterialHandle* mathandle =
     //(mesh->material) ? (mesh->material->GetMaterialHandle()) : 0;
 
-  memset (textures, 0, sizeof (iTextureHandle*)*TEXMAX);
-  for (i=0; i<TEXMAX; i++)
+  for (i=0; i<texturecount; i++)
   {
-    if (texmapping[i] != csInvalidStringID)
-    {
-      csShaderVariable* var = GetVariable (texmapping[i]);
-      if (var)
-        var->GetValue (textures[i]);
-    }
+    csShaderVariable* var = GetVariable (texmapping[units[i]]);
+    if (var)
+      var->GetValue (textures[i]);
   }
-  g3d->SetTextureState (units, textures, TEXMAX);
+  g3d->SetTextureState (units, textures, texturecount);
 
   g3d->GetWriteMask (OrigWMRed, OrigWMGreen, OrigWMBlue, OrigWMAlpha);
   g3d->SetWriteMask (writemaskRed, writemaskGreen, writemaskBlue, writemaskAlpha);
