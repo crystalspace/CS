@@ -103,6 +103,7 @@
 #include "iengine/viscull.h"
 #include "igeom/clip2d.h"
 #include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "imap/parser.h"
@@ -231,6 +232,7 @@
 #include "csgeom/vector3.h"
 #include "csgeom/vtpool.h"
 #include "csgeom/crysball.h"
+#include "csgeom/objmodel.h"
 #endif
 
 // CS Tool

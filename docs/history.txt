@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 16-May-2003
+	- Wouter added csgeom/objmodel.h and igeom/objmodel.h to css.h.
 	- Jorrit fixed a very weird bug in genmesh where SCF_CONSTRUCT_IBASE
 	  was called in the destructor of the embedded PolyMesh instead of
 	  the constructor. This could cause crashes at exit in some cases.
