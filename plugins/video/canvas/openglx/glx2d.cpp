@@ -220,6 +220,7 @@ bool csGraphics2DGLX::Open(const char *Title)
     GLX_RED_SIZE, 4,
     GLX_BLUE_SIZE, 4,
     GLX_GREEN_SIZE, 4,
+    GLX_STENCIL_SIZE, 1,
     GLX_DOUBLEBUFFER,
     None
   };
