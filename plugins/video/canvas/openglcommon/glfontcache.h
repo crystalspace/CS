@@ -74,7 +74,7 @@ class csGLFontCache : public csFontCache
     { 
       delete glyphRects; 
 #ifdef HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
-      delete data;
+      delete [] data;
 #endif
     }
     void InitRects (int size) 

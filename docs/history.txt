@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 13-Sep-2003
+	- Philipp Aumayr removed changed a delete data; to delete[] data; in
+	  plugins/video/openglcommon/glfontcache.h. mentioned by unaek in 
+	  #crystalspace
 	- Jorrit cleaned up the shadermanager. Also fixed a small bug in the
 	  registration of the event handler where it would use || to combine
 	  two masks instead of |. Additionally removed some warnings.
