@@ -451,6 +451,8 @@ void csSpriteTemplate::MergeTexels ()
     }
   }
 
+	delete unique_texel_maps;
+
 /*
   // now you can compare the frame count to the unique texel map count
   System->Printf (MSG_INITIALIZATION, "Merged %d/%d texel maps, saving %d bytes.\n",

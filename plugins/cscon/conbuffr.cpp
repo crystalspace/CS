@@ -26,6 +26,10 @@ csConsoleBuffer::csConsoleBuffer(int length, int size)
   SetLength(length);
   SetPageSize(size);
   empty = new csString(" ");
+
+	 // Initialize the state variables
+  current_line = display_top = 0;
+  display_bottom = page_size;
 }
 
 csConsoleBuffer::~csConsoleBuffer()

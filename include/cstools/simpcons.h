@@ -127,7 +127,7 @@ public:
   /// iConsole compatibility methods
   virtual bool Initialize(iSystem *system) { return (system->RegisterDriver("iConsole", this)); }
   virtual void PutText(const char *text);
-  virtual const csString *GetText(int line = -1) const { (void)line; return NULL; } /* Not supported */
+  virtual const csString *GetText(int = -1) const { return NULL; } /* Not supported */
   virtual void Draw(csRect *rect = NULL) { Print(rect); }
   virtual void SetBufferSize(int lines) { SetMaxLines(lines); }
   virtual void CacheColors(iTextureManager *txtmgr) { SetupColors(txtmgr); }
