@@ -1,5 +1,5 @@
 /*
-    cOPYRIGHT (c) 1998,2000 BY jORRIT tYBERGHEIN
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -215,6 +215,125 @@ public:
   /// Get light from iterator. Return NULL at end.
   csLight* Fetch ();
 };
+
+/**
+ * Iterator to iterate over sectors in the world which are within
+ * a radius from a given point.
+ * This iterator assumes there are no fundamental changes
+ * in the world while it is being used.
+ * If changes to the world happen the results are unpredictable.
+ */
+class csSectorIt
+{
+private:
+  // The position and radius.
+  csSector* sector;
+  csVector3 pos;
+  float sqradius;
+  // Polygon index (to loop over all portals).
+  // If -1 then we return current sector first.
+  int cur_poly;
+  // If not null then this is a recursive sector iterator
+  // that we are currently using.
+  csSectorIt* recursive_it;
+  // If true then this iterator has ended.
+  bool has_ended;
+
+public:
+  /// Construct an iterator and initialize to start.
+  csSectorIt (csSector* sector, const csVector3& pos, float sqradius);
+
+  /// Destructor.
+  ~csSectorIt ();
+
+  /// Restart iterator.
+  void Restart ();
+
+  /// Get sector from iterator. Return NULL at end.
+  csSector* Fetch ();
+};
+
+#if 0
+/**
+ * Iterator to iterate over objects in the world.
+ * This iterator assumes there are no fundamental changes
+ * in the world while it is being used.
+ * If changes to the world happen the results are unpredictable.
+ */
+class csObjectIt
+{
+  friend class csWorld;
+
+private:
+  // The world for this iterator.
+  csWorld* world;
+  // The type to use.
+  csIdType* type;
+  bool derived;
+  // The starting position and radius.
+  csSector* start_sector;
+  csVector3 start_pos;
+  float radius;
+  // Current position ('pos' can be warped so that's why it is here).
+  csSector* cur_sector;
+  csVector3 cur_pos;
+  // Object type we are currently iterating over.
+  csIdType* cur_type;
+  // Current object.
+  csObject* cur_object;
+  // Current index.
+  int cur_idx;
+  // If true then we first return this sector.
+  bool do_this_sector;
+
+private:
+  /// Return true if object has right type.
+  bool CheckType (csObject* obj);
+  /// Return true if object has right type.
+  bool CheckType (csIdType* ctype);
+
+  /// Start looking for things.
+  void StartThings ()
+  {
+    cur_type = &csThing::Type;
+    cur_object = cur_sector->GetFirstThing ();
+  }
+  /// Start looking for static lights.
+  void StartStatLights ()
+  {
+    cur_type = &csStatLight::Type;
+    cur_idx = 0;
+  }
+  /// Start looking for sprites.
+  void StartSprites ()
+  {
+    cur_type = &csSprite::Type;
+    cur_idx = 0;
+  }
+  /// Start looking for nearby sectors (through portals).
+  void StartSectors ()
+  {
+    cur_type = &csSector::Type;
+    cur_idx = 0;
+  }
+  /// End search.
+  void EndSearch ()
+  {
+    cur_type = NULL;
+  }
+
+  /// Construct an iterator and initialize to start.
+  csObjectIt (csWorld* w, const csIdType& type, bool derived,
+  	csSector* sector, const csVector3& pos, float radius);
+
+public:
+  /// Restart iterator.
+  void Restart ();
+
+  /// Get object from iterator. Return NULL at end.
+  csObject* Fetch ();
+};
+#endif
 
 /**
  * The world! This class basicly represents the 3D engine.
@@ -752,6 +871,29 @@ public:
    */
   int GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
   	csLight** lights, int max_num_lights);
+
+  /**
+   * This routine returns an iterator to iterate over
+   * all nearby sectors.
+   * Delete the iterator with 'delete' when ready.
+   */
+  csSectorIt* GetNearbySectors (csSector* sector,
+  	const csVector3& pos, float radius);
+
+#if 0
+  /**
+   * This routine returns an iterator to iterate over
+   * all objects of a given type that are within a radius
+   * of a given position. If 'derived' is false then
+   * only objects of the exact type are returned. If 'derived' is
+   * true then also objects of subclasses are returned. With 'derived'
+   * set to true and csObject::Type as the type you can get all nearby
+   * objects.<p>
+   * Delete the iterator with 'delete' when ready.
+   */
+  csObjectIt* GetNearbyObjects (const csIdType& type, bool derived,
+  	csSector* sector, const csVector3& pos, float radius);
+#endif
 
   /**
    * Add a halo attached to given light to the world.

@@ -191,28 +191,16 @@ int num_our_cd;
 
 int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
 {
-  sa[0] = s;
-  int i, c = 1;
-  float size = d.x * d.x + d.y * d.y + d.z * d.z;
-  for(i = 0;i < s->GetNumPolygons() && c < MAXSECTORSOCCUPIED; i++)
+  int c = 0;
+  float sqsize = d.x * d.x + d.y * d.y + d.z * d.z;
+  csSectorIt* it = Sys->world->GetNearbySectors (s, v, sqsize);
+  csSector* sector;
+  while ((sector = it->Fetch ()) != NULL)
   {
-    // Get the polygon of for this sector.
-    csPolygon3D* p = s->GetPolygon3D (i);
-    csPortal* portal = p->GetPortal ();
-    // Handle only portals.
-    if (portal != NULL)
-    {
-      if (p->GetPlane ()->SquaredDistance (v) < size)
-      {
-        if (Sys->do_infinite && !portal->GetSector ())
-	{
-	  ((InfPortalCS*)portal)->CompleteSector ();
-	}
-        sa[c] = portal->GetSector ();
-        c++;
-      }
-    }
+    sa[c++] = sector;
+    if (c >= MAXSECTORSOCCUPIED) break;
   }
+  delete it;
   return c;
 }
 

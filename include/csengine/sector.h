@@ -60,13 +60,6 @@ public:
   csNamedObjVector sprites;
 
   /**
-   * List of particle systems in this sector. Note that particle systems also
-   * need to be in the world list. This vector contains objects
-   * of type csParticleSystem*.
-   */
-  csNamedObjVector particle_systems;
-
-  /**
    * All static and pseudo-dynamic lights in this sector.
    * This vector contains objects of type csStatLight*.
    */

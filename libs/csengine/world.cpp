@@ -255,6 +255,215 @@ csLight* csLightIt::Fetch ()
 
 //---------------------------------------------------------------------------
 
+csSectorIt::csSectorIt (csSector* sector, const csVector3& pos, float sqradius)
+{
+  csSectorIt::sector = sector;
+  csSectorIt::pos = pos;
+  csSectorIt::sqradius = sqradius;
+  recursive_it = NULL;
+
+  Restart ();
+}
+
+csSectorIt::~csSectorIt ()
+{
+  delete recursive_it;
+}
+
+void csSectorIt::Restart ()
+{
+  cur_poly = -1;
+  delete recursive_it;
+  recursive_it = NULL;
+  has_ended = false;
+}
+
+csSector* csSectorIt::Fetch ()
+{
+  if (has_ended) return NULL;
+
+  if (recursive_it)
+  {
+    csSector* rc = recursive_it->Fetch ();
+    if (rc) return rc;
+    delete recursive_it;
+    recursive_it = NULL;
+  }
+
+  if (cur_poly == -1)
+  {
+    cur_poly = 0;
+    return sector;
+  }
+
+  // @@@ This function should try to use the octree if available to
+  // quickly discard lots of polygons that cannot be close enough.
+  while (cur_poly < sector->GetNumPolygons ())
+  {
+    csPolygon3D* p = sector->GetPolygon3D (cur_poly);
+    cur_poly++;
+    csPortal* po = p->GetPortal ();
+    if (po)
+    {
+      const csPlane3& wpl = p->GetPlane ()->GetWorldPlane ();
+      float d = wpl.Distance (pos);
+      if (d*d < sqradius && csMath3::Visible (pos, wpl))
+      {
+        if (!po->GetSector ()) po->CompleteSector ();
+	csVector3 new_pos;
+	if (po->flags.Check (CS_PORTAL_WARP))
+	  new_pos = po->Warp (pos);
+	else
+	  new_pos = pos;
+	recursive_it = new csSectorIt (po->GetSector (), new_pos, sqradius);
+	return Fetch ();
+      }
+    }
+  }
+
+  // End search.
+  has_ended = true;
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+
+#if 0
+csObjectIt::csObjectIt (csWorld* w, const csIdType& type, bool derived,
+  	csSector* sector, const csVector3& pos, float radius)
+{
+  csObjectIt::world = w;
+  csObjectIt::type = &type;
+  csObjectIt::derived = derived;
+  csObjectIt::start_sector = sector;
+  csObjectIt::start_pos = pos;
+  csObjectIt::radius = radius;
+
+  Restart ();
+}
+
+bool csObjectIt::CheckType (csObject* obj)
+{
+  if (derived) return obj->GetType () >= *type;
+  else return &obj->GetType () == type;
+}
+
+bool csObjectIt::CheckType (csIdType* ctype)
+{
+  if (derived) return *ctype >= *type;
+  else return ctype == type;
+}
+
+void csObjectIt::Restart ()
+{
+  cur_sector = start_sector;
+  cur_pos = start_pos;
+  cur_type = &csDynLight::Type;
+  cur_object = world->GetFirstDynLight ();
+  do_this_sector = true;
+}
+
+csObject* csObjectIt::Fetch ()
+{
+  // Handle csDynLight.
+  if (cur_type == &csDynLight::Type)
+  {
+    if (CheckType (cur_type))
+    {
+      if (cur_object == NULL)
+        StartStatLights ();
+      else
+      {
+        csObject* rc = cur_object;
+        cur_object = ((csDynLight*)cur_object)->GetNext ();
+        return rc;
+      }
+    }
+    else
+      StartStatLights ();
+  }
+  // Handle this sector first.
+  if (cur_type == &csSector::Type)
+  {
+    if (CheckType (cur_type))
+    {
+      StartThings ();
+      return cur_sector;
+    }
+    else
+      StartThings ();
+  }
+  // Handle csThing.
+  if (cur_type == &csThing::Type)
+  {
+    if (CheckType (cur_type))
+    {
+      if (cur_object == NULL)
+        StartStatLights ();
+      else
+      {
+        csObject* rc = cur_object;
+        cur_object = ((csThing*)cur_object)->GetNext ();
+        return rc;
+      }
+    }
+    else
+      StartStatLights ();
+  }
+  // Handle csLight.
+  if (cur_type == &csStatLight::Type)
+  {
+    if (CheckType (cur_type))
+    {
+      if (cur_idx >= cur_sector->lights.Length ())
+        StartSprites ();
+      else
+      {
+        csObject* rc = cur_sector->lights[cur_idx];
+	cur_idx++;
+        return rc;
+      }
+    }
+    else
+      StartSprites ();
+  }
+  // Handle csSprite.
+  if (cur_type == &csSprite::Type)
+  {
+    if (CheckType (cur_type))
+    {
+      if (cur_idx >= cur_sector->sprites.Length ())
+        StartSectors ();
+      else
+      {
+        csObject* rc = cur_sector->sprites[cur_idx];
+	cur_idx++;
+        return rc;
+      }
+    }
+    else
+      StartSectors ();
+  }
+  // Handle csSector.
+  if (cur_type == &csSector::Type)
+  {
+    if (CheckType (cur_type))
+    {
+      if (cur_idx >= cur_sector->GetNumPolygons ())
+        EndSearch ();
+      else
+      {
+        return NULL;
+      }
+    }
+    else
+      EndSearch ();
+  }
+}
+#endif
+
+//---------------------------------------------------------------------------
+
 int csWorld::frame_width;
 int csWorld::frame_height;
 iSystem* csWorld::System = NULL;
@@ -1441,6 +1650,22 @@ int csWorld::GetNearbyLights (csSector* sector, const csVector3& pos, ULong flag
     return max_num_lights;
   }
 }
+
+csSectorIt* csWorld::GetNearbySectors (csSector* sector,
+	const csVector3& pos, float radius)
+{
+  csSectorIt* it = new csSectorIt (sector, pos, radius);
+  return it;
+}
+
+#if 0
+csObjectIt* csWorld::GetNearbyObjects (const csIdType& type, bool derived,
+  	csSector* sector, const csVector3& pos, float radius)
+{
+  csObjectIt* it = new csObjectIt (this, type, derived, sector, pos, radius);
+  return it;
+}
+#endif
 
 int csWorld::GetTextureFormat ()
 {

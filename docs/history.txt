@@ -4,6 +4,19 @@ The history order has been reversed so that new features are at the top.
 	- Accidently left on PVS building. I wonder why nobody complained
 	  about dmburg needing several hours to start up :-)
 	- Fixed BMP loader so that it doesn't enable ALPHA anymore.
+	- Removed the particle list that was still in csSector. This is
+	  not needed as particles are in the 'sprites' list.
+	- Added new csWorld::GetNearbySectors() which returns an iterator
+	  to iterate over all sectors near some position and a radius. This
+	  function takes space warping portals into account. A GetNearbyObjects
+	  function is also planned which will be able to get all nearby
+	  objects (lights, sectors, things, sprites, ...).
+	- Changed WalkTest collision detection to use the new iterator
+	  to find nearby sectors. This is better because:
+	    - Easier to read like this.
+	    - Correct: the old version only looked at adjacent polygons
+	      and not further.
+	    - Takes space warping portals into account.
 17-Aug-2000
 	- Martin Geisse fixed a bug in csloader related to sound.
 	- Martin also added the cssysdef.h include to getopt.cpp.
