@@ -23,6 +23,8 @@ chronological order.
 	  missing FinishDraw() call and made some code cleanups.
 	- Eric Sunshine fixed the Jamfile modfications by Jorrit so that they
 	  work correctly with msvcgen project generation.
+	- Jorrit modified the parser so that you can now nest libraries
+	  (i.e. include a library from another library).
 5-Jun-2004
 	- res made the following changes:
 	    - Added the *f versions of floor and ceil to csdef.h.

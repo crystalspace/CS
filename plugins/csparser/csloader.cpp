@@ -1302,6 +1302,11 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
       csStringID id = xmltokens.Request (value);
       switch (id)
       {
+        case XMLTOKEN_LIBRARY:
+	  if (!LoadLibraryFile (child->GetContentsValue (),
+	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly ()))
+	    return false;
+	  break;
         case XMLTOKEN_ADDON:
 	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine))
 	    return false;
