@@ -428,10 +428,10 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	case K_KP_INSERT:    k = CSKEY_INS;      break;
 	case K_KP_DELETE:    k = CSKEY_DEL;      break;
 	case K_KP_MULTIPLY:  k = CSKEY_PADMULT;  break;
-	case K_KP_DIVIDE:    k = CSKEY_DEL;      break;
+	case K_KP_DIVIDE:    k = CSKEY_PADDIV;   break;
 	case K_KP_PLUS:      k = CSKEY_PADPLUS;  break;
 	case K_KP_MINUS:     k = CSKEY_PADMINUS; break;
-	case K_KP_ENTER:     k = CSKEY_PADDIV;   break;
+	case K_KP_ENTER:     k = CSKEY_ENTER;    break;
 	};
     return k;
     }
