@@ -14,7 +14,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csjpgimg csjpgimgclean
-all plugins: csjpgimg
+all plugins imgplexall: csjpgimg
 
 csjpgimg:
 	$(MAKE_TARGET) MAKE_DLL=yes
