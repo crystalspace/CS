@@ -12,6 +12,8 @@ The history order is reversed so that new features are at the top.
 	- Jorrit fixed the include file in the collision detection howto and
 	  also replaced the use of SCF_QUERY_INTERFACE for the iPolygonMesh
 	  with the proper usage of GetObjectModel().
+	- Jorrit added a few references towards individual HOWTO's from the
+	  rest of the documentation.
 20-Jul-2003
 	- Jorrit forgot to link the new howto into the howto chapter.
 	- Jorrit fixed a small note about curves in the thing mesh object

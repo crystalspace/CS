@@ -23,6 +23,9 @@ configurations supported: using shared libraries and using static linkage
 
 @sc{scf} is currently part of the @file{csUtil} library.
 
+Note that there is a HOWTO that explains how to make using @sc{scf} easier
+by using smart pointers (@pxref{HOWTO Smart Pointers}).
+
 @menu
 * SCF Explained:: How it Works
 * SCF Using:: Using @sc{scf}

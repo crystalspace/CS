@@ -25,6 +25,8 @@ Things support polygons. Things also support portals which means that they can
 be used to define transition polygons between adjacent or non-adjacent
 sectors.
 
+There is also a howto on creating things (@pxref{HOWTO Create Thing}).
+
 @subsubheading Basic Structure
 
 The following @sc{scf} class names are used (for @code{CS_LOAD_PLUGIN()}):

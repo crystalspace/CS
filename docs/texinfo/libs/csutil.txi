@@ -82,6 +82,10 @@ returned). This is slightly faster.
 Note that all these macros increase the reference count of the returned
 object by 1.
 
+Note that there are a few HOWTO's describing possible uses for the
+@code{csObject} system (@pxref{HOWTO User Objects} and
+@pxref{HOWTO User Objects in Maps}).
+
 @node Typed Arrays, , csObject, csUtil
 @subsection Typed Arrays
 @cindex Typed Arrays

@@ -8,6 +8,9 @@
 This section describes the the Crystal Space map, which uses @sc{xml}, and is a
 companion to the @sc{xml} schema file residing at:
 
+There is also a HOWTO on loading a map file (@pxref{HOWTO Level Loading})
+and a HOWTO with a simple map example (@pxref{HOWTO Simple Map Example}).
+
 @noindent
 @code{CS/scripts/xml/cs_world.xsd}
 
