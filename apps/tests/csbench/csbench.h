@@ -37,10 +37,10 @@ struct iDocumentSystem;
 struct iGeneralMeshState;
 struct iStringSet;
 
-#define BIGOBJECT_DIM 128
-#define SMALLOBJECT_DIM 24
+#define BIGOBJECT_DIM 160
+#define SMALLOBJECT_DIM 17
 #define SMALLOBJECT_NUM 100
-#define BENCHTIME 2000
+#define BENCHTIME 3000
 
 class CsBench
 {

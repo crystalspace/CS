@@ -17,6 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <unistd.h>
+
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/xmltiny.h"
@@ -223,7 +225,7 @@ bool CsBench::CreateTestCaseSingleBigObject ()
   portal_vts[3].Set (-1.5, -1.5, 0);
   iPortal* portal;
   csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
-  	"portal_room2", room_single, csVector3 (0, 0, 5),
+  	"portal_room2_single", room_single, csVector3 (0, 0, 5),
   	room2, portal_vts, 4, portal);
   return true;
 }
@@ -234,20 +236,21 @@ bool CsBench::CreateTestCaseMultipleObjects ()
   	csVector3 (-5, -5, 5), csVector3 (5, 5, 15));
   // Create our factory.
   iMeshFactoryWrapper* fact = CreateGenmeshLattice (SMALLOBJECT_DIM,
-  	2.0f, "smallmesh");
+  	4.0f, "smallmesh");
   if (!fact) return false;
 
   // Now create the instances:
   int i;
+  csVector3 p (-9, -9, 10);
+  float step = 18.0 / float (SMALLOBJECT_NUM);
   for (i = 0 ; i < SMALLOBJECT_NUM ; i++)
   {
-    csVector3 p (
-    	0.0, 0.0, 10.0
-    	);
     csRef<iMeshWrapper> mesh =
       engine->CreateMeshWrapper (fact, "small", room2, p);
     genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
     genmesh->SetMaterialWrapper (material);
+    p.x += step;
+    p.y += step;
   }
 
   csRef<iLight> l;
@@ -267,7 +270,7 @@ bool CsBench::CreateTestCaseMultipleObjects ()
   portal_vts[3].Set (-1.5, -1.5, 0);
   iPortal* portal;
   csRef<iMeshWrapper> portal_mesh = engine->CreatePortal (
-  	"portal_room2", room_multi, csVector3 (0, 0, 5),
+  	"portal_room2_multi", room_multi, csVector3 (0, 0, 5),
   	room2, portal_vts, 4, portal);
   return true;
 }
@@ -318,6 +321,7 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   iNativeWindow* nw = g2d->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Graphics Benchmark App");
 
+  unlink ("csbench_report.zip");
   vfs->Mount ("/lib/report", "csbench_report.zip");
 
   csRef<iStandardReporterListener> stdrep = CS_QUERY_REGISTRY (object_reg,
@@ -514,9 +518,17 @@ void CsBench::PerformTests ()
   	2*(SMALLOBJECT_DIM-1)*(SMALLOBJECT_DIM-1), SMALLOBJECT_NUM);
 
   g3d->SetOption ("StencilThreshold", "0");
-  float stencil0 = BenchMark ("stencilclip", "Stencil clipping is used");
+  view->GetCamera ()->SetSector (room_single);
+  float stencil0 = BenchMark ("stencilclip_single",
+  	"Stencil clipping, single object");
+  view->GetCamera ()->SetSector (room_multi);
+  BenchMark ("stencilclip_multi", "Stencil clipping, multiple objects");
+
   g3d->SetOption ("StencilThreshold", "100000000");
-  float stencil1 = BenchMark ("planeclip", "glClipPlane clipping is used");
+  view->GetCamera ()->SetSector (room_single);
+  float stencil1 = BenchMark ("planeclip_single", "glClipPlane, single object");
+  view->GetCamera ()->SetSector (room_multi);
+  BenchMark ("planeclip_multi", "glClipPlane, multiple objects");
   // Set back to stencil0 if that method was faster.
   if (stencil0 > stencil1)
   {
@@ -524,6 +536,7 @@ void CsBench::PerformTests ()
     g3d->SetOption ("StencilThreshold", "0");
   }
 
+  view->GetCamera ()->SetSector (room_single);
   PerformShaderTest ("/shader/or_lighting.xml", "OR compatibility", 0, 0);
 
   iRenderLoopManager* rlmgr = engine->GetRenderLoopManager ();

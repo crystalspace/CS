@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Jul-2004
+	- Jorrit fixed csbench so it first removes the csbench_report.zip.
+	  Not doing that causes corrupted zip files due to bugs in VFS.
+	- Jorrit added a new test to csbench to do multiple objects in one
+	  sector. Unfortunatelly this breaks bumpmapping for some reason.
+	  To be investigated.
 22-Jul-2004
 	- Jorrit started work on adding a new test to csbench to test lots
 	  of smaller objects.
