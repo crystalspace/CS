@@ -8,7 +8,8 @@ The history order is reversed so that new features are at the top.
 	- Further work on tree. At this moment it doesn't even resemble
 	  a tree :-) I'm still debugging. Added texture mapping.
         - Matze added a null canvas for the null 3d renderer, this makes it
-          possible to use CS on dediacted servers that can't display anything
+          possible to use CS on dedicated servers that can't display
+	  anything.
 28-Jan-2002
 	- Seperated geometry and rule in the tree generator. This will make
 	  it easier to setup better rules.
