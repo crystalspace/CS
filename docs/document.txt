@@ -35,7 +35,8 @@ Currently Crystal Space has the following features:
 	  accurate shadows and can change intensity/color randomly.
 	- Dynamic colored lighting with support for shadows (Things and
 	  sprites are ignored currently).
-	- Support for 3D triangle mesh sprites!
+	- Support for frame and skeletal based 3D triangle mesh sprites with
+	  LOD via progressive meshes!
 	- Portals are used for efficient and easy visibility sorting.
 	  In addition you can optionally enable a BSP for some
 	  sectors to allow for even more powerful world definitions.

@@ -13,6 +13,25 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+19-Jul-1999
+	- Added GetXRotation(), GetYRotation() and GetZRotation() to
+	  csMatrix3.
+	- Added 'addskel' command to demonstrate the new skeletal sprites.
+	  The first argument is the depth. A depth of 1 will create a
+	  root and one layer above. The second argument is the width. This
+	  is the number of branches created at every depth. A good tree
+	  is 'addskel 3,3'. Be careful with large numbers here. The
+	  number of triangles grows VERY fast!
+18-Jul-1999
+	- Thomas Hieber replaced DrawPolygonQuick by DrawPolygonFX. He also
+	  extended DrawPolygonFX with a new FX_Transparent mixing mode.
+	- Thomas also improved the menu of Crystal Shooter.
+	- Implemented first proposal for skeleton sprites based on the current
+	  sprite system.
+17-Jul-1999
+	- Thomas Hieber updated documentation for Windows.
+	- Thomas added all library headers and libraries for non-CS libraries
+	  to CVS to make building CS easier.
 16-Jul-1999
 	- Jorrit decreased SMALL_Z from 0.1 to 0.01.  This should reduce the
 	  chances of the variaus stages of the clipper going wrong and thus
@@ -52,6 +71,9 @@ Short-term cleanups that need to be done:
 	  support.  It is not finished yet.
 	- Moved Primitive Editor (PrimEdit) to the attic on account of
 	  obsolescence.
+	- Andrew Zabolotny corrected sprite lighting and also implemented
+	  sprite lighting for sprites from world file in WalkTest.
+	- Robert Bate fixed the Macintosh port.
 15-Jul-1999
 	- Added support for multi-sector sprites. Also simplified the
 	  rendering process through portals a bit.
