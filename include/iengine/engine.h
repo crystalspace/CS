@@ -48,7 +48,7 @@ struct iClipper2D;
 struct iPolyTxtPlane;
 struct iCurveTemplate;
 
-SCF_VERSION (iEngine, 0, 1, 20);
+SCF_VERSION (iEngine, 0, 1, 21);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -126,6 +126,14 @@ struct iEngine : public iPlugIn
    * If link == true (default) the sector will be linked to the engine.
    */
   virtual iSector *CreateSector (const char *iName, bool link = true) = 0;
+
+  /**
+   * Conveniance function to create the thing containing the
+   * convex outline of a sector. The thing will be empty but
+   * it will have CS_ZBUF_FILL set. This version creates a mesh wrapper.
+   */
+  virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
+      const char* name) = 0;
 
   /// Query number of sectors in engine
   virtual int GetSectorCount () = 0;

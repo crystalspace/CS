@@ -1799,6 +1799,12 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
   return mesh_wrap;
 }
 
+iMeshWrapper* csEngine::CreateSectorWallsMesh (iSector* sector,
+	const char *iName)
+{
+  return CreateSectorWallsMesh (sector->GetPrivateObject (), iName);
+}
+
 iSector* csEngine::CreateSector (const char *iName, bool link)
 {
   csSector* sector = CreateCsSector (iName, link);

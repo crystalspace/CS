@@ -1,5 +1,28 @@
 The history order has been reversed so that new features are at the top.
 
+16-Apr-2001
+	- Added iEngine::CreateSectorWallsMesh().
+	- Fixed simplep (plugin version of simple) so that it works
+	  again.
+	- Philip Wyett fixed a little nasty bug under Windows 2000 for
+	  Blocks. Removed void cleanup() and all it's calls
+	  and moved all it's contents to the blocks
+	  destructor.
+	  This fixes where Windows 2000 could not successfully close
+	  the app and locked up (non responding).
+	- Philip also removed lots of compiler warnings in VC6 port.
+	  85% of CS warnings many VC specific and some which should have
+	  been apparrent in other compilers.
+	- Wouter Wijngaards did some more work on the isometric engine:
+	    - Changed size of front facing sprites to be more correct.
+	      (less fat).
+	    - Added a 'halo' sprite for the blue light in isotest - you
+	      can see the alpha problems using both transparent sprites
+	      now. However, when I try to enable ZBUF_TEST, the effect
+	      is ZBUF_NONE.
+	- Wouter also changed the demo particle systems in walktest to
+	  use ZBUF_TEST mode. This makes them look a lot better. For
+	  the 'flame' commans (a fire particle system), this helps a lot.
 15-Apr-2001
 	- Martin Geisse removed csstdldr, the test application for it,
 	  the iLoader interface and renamed iLoaderNew to iLoader.
