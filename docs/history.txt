@@ -12,6 +12,9 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+18-Feb-2000
+	- Fixed Z-buffering for sprites. Was broken after the
+	  DrawTriangleMesh changes.
 17-Feb-2000
 	- Seth did some fixes to sprite code again.
 	- Added the first versions of the TeXInfo converted docs from
