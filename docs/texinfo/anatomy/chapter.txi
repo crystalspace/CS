@@ -12,9 +12,6 @@ resides in LaTeX format.
 
 @itemize @bullet
 @item
-@anchor{VFS}
-Virtual File System (@sc{vfs})
-@item
 Format of @emph{World} File
 @item
 @anchor{CSWS}
@@ -43,6 +40,7 @@ Utility Library (@code{csutil})
 * Makefile How-To::
 * csPhyziks:: csPhyziks Library (@code{csphyzik})
 * SCF:: Shared Class Facility (@sc{scf})
+* VFS:: Virtual File System (@sc{vfs})
 * Platform Details:: Platform-Specific Details
 @end menu
 
@@ -52,4 +50,5 @@ Utility Library (@code{csutil})
 @imports{anatomy,makefile.txi}
 @imports{anatomy,phyziks.txi}
 @imports{anatomy,scf.txi}
+@imports{anatomy,vfs.txi}
 @importss{anatomy,platform,details.txi}

@@ -1,0 +1,208 @@
+@c -*-texinfo-*-
+@node VFS, Platform Details, SCF, Anatomy
+@section Virtual File System (@sc{vfs})
+@cindex Virtual File System (@sc{vfs})
+@cindex @sc{vfs}, Virtual File System
+
+@noindent
+@emph{Written by Andrew Zabolotny, @email{bit@@eltech.ru}.}
+
+Since many even basic concepts in file systems on different operating systems
+often differ, you often should take care to use the right path separators on
+the right platform, search on different ``drives'', ``mounts'' and so on for
+required files.  This library achieves the goal of making the file system
+appear ``the same'' on various operating systems, and adds many bonus features
+such as archive support and overlaid directories.
+
+Each ``directory'' on the @sc{vfs} @dfn{virtual volume} is mapped to some
+@dfn{real-world} directory or @sc{zip} archive.  Additionally, you can make
+one ``virtual directory'' map to several real-world directories (and/or
+@sc{zip} files) at one time, thus covering such cases as having files either
+on compact disc (@sc{cd}) or hard disk (depending upon the user's choice),
+distributing data file updates (thus overriding some files on write-only
+media) and so on.
+
+The Virtual File System is driven by a configuration file.
+@xref{VFS Configuration File}.
+
+@subheading Details
+@cindex @sc{vfs} Details
+@cindex Details, @sc{vfs}
+
+To make difference between @sc{zip} archives and physical disk directories
+@sc{vfs} uses a simple convention: directories ends with a path separator
+character (@samp{$/}) while archives do not.  @samp{$/} is a special
+configuration file variable which represents the path separator on any
+particular platform (@pxref{VFS Configuration File}).  For example
+@samp{$/data} refers to an archive, while @samp{$/data$/} refers to an actual
+directory named @file{data}.  Failure to understand this distinction is often
+the major cause of errors; so if you're getting unexpected results check in
+the first place if directories have trailing path separators.
+
+There are several differences between filesystems between operating systems
+that you should always keep in mind because @sc{vfs} doesn't hide these
+details from you.  To avoid inconsistencies between different file systems you
+should follow this list of guidelines:
+
+@itemize @bullet
+@item
+Choose filenames that are well suited for all operating systems you are
+targeting.  As of today @sc{dos} has the most restricted rules for naming
+files (8.3 file names with only @sc{ascii7} characters except ``?*+'' and
+space, and with only one dot per filename).  @sc{vfs} does not make any
+attempt to mimic long file names on systems that does not support them.
+Although some @sc{c} compiler runtimes (for example, @sc{djgpp}) have limited
+support for working with long filenames, they are automatically truncated to
+8.3 creation and truncated before comparisons, in most cases this is enough.
+The part of @sc{vfs} that is located in archives support virtually any
+filenames, so if you're sure that you will never have to place some file on a
+``real'' filesystem, you can give it any name you desire.
+
+@item
+Different platforms use different filename comparison criteria.  On Unix
+filenames are case-sensitive, while on @sc{dos}, @sc{os/2}, Windows, and
+Macintosh they are case-insensitive.  To avoid problems always refer to files
+by their exact names.  For example, if you have a file on @sc{vfs} called
+@file{GaMe.DaT} you should open it exactly as @file{GaMe.DaT} and not as
+@file{game.dat} or @file{GAME.DAT}.  On @sc{dos}, the file will appear to be
+entirely upper-case @file{GAME.DAT}, but you should still use the correct
+name, @file{GaMe.DaT}, when opening it.
+
+@item
+Keep in mind that Unix @emph{can} delete currently opened files while
+@sc{dos}, @sc{os/2}, Windows and possibly others can not.  So you should avoid
+deleting open files.  (@emph{Technical Note}: Actually this should work for
+files which are located in archives but is not advisable to do so---and has
+not been tested.)
+@end itemize
+
+@node VFS Configuration File, , VFS, VFS
+@subsection Configuration File (@file{vfs.cfg})
+@cindex @sc{vfs} Configuration File
+@cindex @file{vfs.cfg}, @sc{vfs} Configuration File
+
+The main @code{[VFS]} section describes the layout of the ``virtual'' file
+system.  Imagine a clean disk drive onto which you start to create directories
+by making links to existing ``real'' directories and archive (@file{.zip})
+files.  An archive is treated exactly like a subdirectory; you even can link
+one ``virtual directory'' to several ``real'' paths and archives; however if
+you write files they will be written to the first directory or archive in
+list.
+
+This section contains a list of virtual-to-real path mappings, where the
+``real'' path can represent a list of @dfn{physical} directories and @sc{zip}
+archives.  The path lists should be separated by commas (,), so commas cannot
+be used in directory names.  This should not be much of a restriction, but if
+it is for a particular application, change @samp{VFS_PATH_DIVIDER} macro in
+@file{vfs.cpp}.
+
+The @code{[VFS]} section usually makes heavy use of variable data since most
+operating systems have different pathname semantics and syntax.  The ``common
+denominator'' that @sc{vfs} emulates is a Unix-like filesystem.  To include
+the value of a variable in a @sc{vfs} path use the
+@samp{$(@var{variable-name})} construct.  In the case where
+@samp{@var{variable-name}} consists of a single letter, you can omit the
+parenthesese, as in @code{$@var{variable-name}} (for example @samp{$A}).
+
+Variables that are defined in the environment overrides those defined in this
+file.  For example, the @samp{$HOME} environment variable is set in all
+Unixes, but is undefined in many other operating systems.  They can define
+their own values for these variables in system-dependent sections, but if the
+user defines the @samp{$HOME} environment variable it will always override the
+one from this file.  You also can refer the variables in the following way:
+@samp{$(@var{var}:@var{expr})} which means ``use the contents of
+@samp{@var{var}} if @samp{@var{var}} is set (usually in environment), or use
+@samp{@var{expr}} if not''.  This can be used for more complex expressions,
+for example:
+
+@example
+$(HOME:$(HOMEDIR:$(HOMEPATH:/home)))
+@end example
+
+This expression means ``take the value of the @samp{$HOME} variable; if it is
+not set, use the contents of @samp{$HOMEDIR}; if it is also not set, use
+@samp{$HOMEPATH}; and if none are set, use the literal string @samp{/home} as
+the resulting value.
+
+The @sc{vfs} class defines a variable called @samp{/} that contains the path
+delimiter for the current operating system (i.e. @samp{/} for Unix, @samp{\}
+for Windows/@sc{dos}, and @samp{:} for Macintosh).  You reference this
+variable by writing @samp{$/} rather than using the ``real-world'' delimiters
+@samp{/}, @samp{\}, or @samp{:}.
+
+The following is an example @sc{vfs} configuration file.
+
+Assume we wrote a game with three levels; the game is located on @sc{cd-rom}
+and we want to be able to release patches in the future which will replace
+several files from level archives (each level is presumed to be placed in a
+separate @sc{zip} archive on either @sc{cd-rom} or cached on the hard drive).
+Additionally, we will add a link to user's home directory (something somewhat
+vaguely defined on non-Unix platforms) so that game can store the user's
+settings into the file @file{~/game.profile}.
+
+@example
+[VFS]
+; The following variables should be defined either in
+; the environment or in system-dependent sections:
+;
+; $. - The current directory (or the directory into which the
+;      game has been installed).
+; $/ - The native path separator character; this value is
+;      supplied by the VFS manager, so you do not need to define
+;      it here; you can do so, however, if you really want to.
+; $CD - The path to CD-ROM.
+; $HOME - user's home directory
+
+; A common error is to omit the last $/ from directories.
+; This is an error since VFS will treat any path not ending
+; in $/ as an archive file name and not as a physical
+; directory.
+
+~ = $(HOME)$/
+level1 = $.$/patches$/level1$/, $.$/cache$/level1.zip,
+  $(CD)$/data$/level1.zip
+level2 = $.$/patches$/level2$/, $.$/cache$/level2.zip,
+  $(CD)$/data$/level2.zip
+level3 = $.$/patches$/level3$/, $.$/cache$/level3.zip,
+  $(CD)$/data$/level3.zip
+
+; Platform aliases.  Aliases are always read first; VFS
+; entries specific to each platform override those defined
+; in the platform alias section.  For example, if your
+; current platform is Solaris, VFS will look for the value
+; of a variable first in the environment, then in
+; [VFS.Solaris], and finally in [VFS.Unix] (as specified in
+; section below).
+
+[VFS.Alias]
+; Unix-style filesystems
+Solaris		= VFS.Unix
+Linux		= VFS.Unix
+BSD		= VFS.Unix
+Irix		= VFS.Unix
+NextStep	= VFS.Unix
+OpenStep	= VFS.Unix
+MacOS/X Server	= VFS.Unix
+BeOS		= VFS.Unix
+
+; CP/M-style filesystems
+DOS		= VFS.CP/M
+OS/2		= VFS.CP/M
+Win32		= VFS.CP/M
+
+[VFS.Unix]
+. = .
+.. = ..
+CD = /mnt/cdrom
+
+[VFS.CP/M]
+. = .
+.. = ..
+HOME = $(HOMEDIR:$(HOMEPATH:.))
+CD = x:
+
+[VFS.Macintosh]
+. = :
+.. = ::
+HOME =
+@end example
