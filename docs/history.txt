@@ -4,6 +4,9 @@ The history order has been reversed so that new features are at the top.
 	- Andrew Zabolotny did another try to fix the Windows port
 	  by adding an assembly version of memcpy.
 	- Chris Bruner did a small fix to the Windows port.
+	- As suggested by Chris Bruner, Jorrit did a small fix to Blocks
+	  so that it doesn't confuse the Borland compiler and is also more
+	  robust (i.e. don't compare floats with 0).
 19-Apr-2000
 	- Andrew Zabolotny did a few changes to the windows port to
 	  try to get it working after his large changes from a few

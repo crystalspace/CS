@@ -1810,7 +1810,8 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int
     menus[i]->Transform ();
   }
   // Move the old menu item away.
-  if (menu_hor_trans && menu_hor_old_menu)
+  if ((ABS (menu_hor_trans) < SMALL_EPSILON) &&
+  	menu_hor_old_menu)
   {
     float x = menu_hor_trans * menu_hor_old_x_src +
     		(1-menu_hor_trans) * menu_hor_old_x_dst;
@@ -1827,7 +1828,9 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu, int
     menu_hor_old_menu = NULL;
   }
 
-  if (!menu_trans && !menu_hor_trans && leftright_menus[cur_menu])
+  if (!(ABS (menu_trans) < SMALL_EPSILON) &&
+  	!(ABS (menu_hor_trans) < SMALL_EPSILON) &&
+  	leftright_menus[cur_menu])
   {
     float angle = 0;
     float x = 0;
