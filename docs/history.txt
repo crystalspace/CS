@@ -39,6 +39,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed the unused and broken borland.mak.  If someone
 	  wants to revive this in the future, it can be resurrected from the
 	  CVS Attic.
+	- Eric Sunshine corrected the makefile DESCRIPTION variables for the
+	  MetaBalls plugins.
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the

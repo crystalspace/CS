@@ -1,10 +1,10 @@
-DESCRIPTION.mballldr = Metaball mesh object loader
+DESCRIPTION.mballldr = MetaBalls mesh object loader
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make mballldr      Make the $(DESCRIPTION.mballldr)$"
+  $(NEWLINE)echo $"  make mballldr     Make the $(DESCRIPTION.mballldr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

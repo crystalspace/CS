@@ -2,7 +2,7 @@
 # to build the metaball plug-in.
 
 # Plug-in description
-DESCRIPTION.metaball = Crystal Space MetaBall mesh object plug-in
+DESCRIPTION.metaball = MetaBalls mesh object plug-in
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
