@@ -25,6 +25,7 @@ class csWsTest : public csApp
 {
   void NotebookDialog ();
   void GridDialog ();
+  void TreeDialog ();
 
 public:
   /// Initialize maze editor
@@ -256,6 +257,7 @@ bool csWsTest::InitialSetup (int argc, const char* const argv[],
       sprintf (tmp, "item %d - dummy", i);
       (void)new csListBoxItem (lb, tmp, i);
     }
+
   }
 
   window = new csWindow (this, "SetState (CSS_TOPSELECT, false)",
@@ -276,9 +278,66 @@ bool csWsTest::InitialSetup (int argc, const char* const argv[],
 
     but = new csButton (this, 9996);
     but->SetText ("Grid"); but->SetRect (400, 45, 500, 65);
+
+    but = new csButton (this, 9995);
+    but->SetText ("Tree"); but->SetRect (520, 45, 620, 65);
   }
 
   return true;
+}
+
+void csWsTest::TreeDialog ()
+{
+  csComponent *window = new csWindow (this, "Tree test",
+    CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
+    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+  window->SetSize (400, 300);
+  window->Center ();
+
+  csTreeCtrl *tc = new csTreeCtrl (window, CSTS_HSCROLL | CSTS_VSCROLL | CSTS_MULTIPLESEL, cstfsThinRect);
+  //  tc->SetRect (320, 20, 410, 110);
+  tc->SetFont (csFontCourier);
+  csTreeItem *ti;
+  csComponent *p = tc;
+  ti = new csTreeItem (p, "CrystalSpace Platforms");
+  //  csComponent *u = new csTreeItem (ti, "Unix");
+  
+  csComponent *u = new csTreeItem (ti, "Unix");
+  new csTreeItem (u, "FreeBSD");
+  csComponent *li = new csTreeItem (u, "Linux");
+  new csTreeItem (u, "Solaris");
+  new csTreeItem (u, "Cygnus");
+  new csTreeItem (ti, "BeOS");
+  new csTreeItem (ti, "Mac");
+  new csTreeItem (ti, "Next");
+  new csTreeItem (ti, "OS/2");
+  new csTreeItem (ti, "DJGPP");
+  csComponent *w = new csTreeItem (ti, "Win32");
+  new csTreeItem (w, "Win95");
+  new csTreeItem (w, "Win98");
+  new csTreeItem (w, "Win2000");
+  new csTreeItem (w, "WinNT");
+
+  csComponent *d3 = new csTreeItem (li, "3D Renderer");
+  csComponent *sw = new csTreeItem (d3, "Software");
+  new csTreeItem (sw, "X-Windows");
+  new csTreeItem (sw, "SVGALIB console");
+  new csTreeItem (sw, "GGI console");
+  csComponent *hw = new csTreeItem (d3, "Hardware");
+  csComponent *gl = new csTreeItem (hw, "Glide/Voodoo");
+  new csTreeItem (gl, "Glide2");
+  new csTreeItem (gl, "Glide3");
+  csComponent *ogl= new csTreeItem (hw, "OpenGL");
+  new csTreeItem (ogl, "Mesa");
+  new csTreeItem (ogl, "MGL");
+  
+  csComponent *sd = new csTreeItem (li, "SoundDriver");
+  new csTreeItem (sd, "OSS");
+  
+  //  ti->SetState (CSS_FOCUSED|CSS_TREEITEM_SELECTED, true);
+  Execute (window);
+  delete window;
+
 }
 
 void csWsTest::GridDialog ()
@@ -506,6 +565,11 @@ bool csWsTest::HandleEvent (csEvent &Event)
         case 9996:
         {
           GridDialog ();
+          return true;
+        }
+        case 9995:
+        {
+          TreeDialog ();
           return true;
         }
       }
