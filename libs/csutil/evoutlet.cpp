@@ -42,7 +42,7 @@ csEventOutlet::~csEventOutlet ()
   if (idx >= 0)
   {
     Queue->EventOutlets [idx] = 0;
-    Queue->EventOutlets.Delete (idx);
+    Queue->EventOutlets.DeleteIndex (idx);
   }
 }
 

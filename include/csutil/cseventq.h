@@ -27,9 +27,9 @@
 
 #include "csutil/csevent.h"
 #include "csutil/csevcord.h"
-#include "csutil/csvector.h"
 #include "csutil/evoutlet.h"
 #include "csutil/garray.h"
+#include "csutil/refarr.h"
 #include "iutil/eventq.h"
 
 struct iObjectRegistry;
@@ -61,36 +61,7 @@ private:
   };
   typedef csGrowingArray<Listener> ListenerVector;
 
-  /**
-   * The array of all allocated event outlets.  *NOTE* It is not the
-   * responsibility of this class to free the contained event outlets, thus
-   * this class does not override FreeItem ().  Instead, it is the
-   * responsibility of the caller of iEventQueue::CreateEventOutlet () to send
-   * the outlet a DecRef () message (which, incidentally, will result in the
-   * automatic removal of the outlet from this list if no references to the
-   * outlet remain).
-   */
-  class EventOutletsVector : public csVector
-  {
-  public:
-    EventOutletsVector () : csVector (16, 16) {}
-    virtual ~EventOutletsVector () { DeleteAll (); }
-    csEventOutlet* Get (int i)
-      { return (csEventOutlet*)csVector::Get (i); }
-  };
-
-  /// The array of all allocated event cords.
-  class EventCordsVector : public csVector
-  {
-  public:
-    EventCordsVector () : csVector (16, 16) {}
-    virtual ~EventCordsVector () { DeleteAll (); }
-    virtual bool FreeItem (void* p)
-      { ((csEventCord*)p)->DecRef (); return true; }
-    csEventCord* Get (int i)
-      { return (csEventCord*)csVector::Get (i); }
-    int Find (int Category, int SubCategory);
-  };
+  int EventCordsFind (int cat, int subcat);
 
   // Shared-object registry
   iObjectRegistry* Registry;
@@ -112,9 +83,9 @@ private:
   // Registered listeners.
   ListenerVector Listeners;
   // Array of allocated event outlets.
-  EventOutletsVector EventOutlets;
+  csArray<csEventOutlet*> EventOutlets;
   // Array of allocated event cords.
-  EventCordsVector EventCords;
+  csRefArray<csEventCord> EventCords;
   // Pool of event objects
   csPoolEvent *EventPool;
 

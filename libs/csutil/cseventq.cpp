@@ -330,23 +330,24 @@ iEventOutlet* csEventQueue::GetEventOutlet()
 iEventCord* csEventQueue::GetEventCord (int cat, int subcat)
 {
   csEventCord* cord;
-  int const n = EventCords.Find (cat, subcat);
+  int const n = EventCordsFind (cat, subcat);
   if (n >= 0)
     cord = EventCords.Get(n);
   else
   {
     cord = new csEventCord (cat, subcat);
     EventCords.Push (cord);
+    cord->DecRef ();
   }
   return cord;
 }
 
-int csEventQueue::EventCordsVector::Find (int cat, int subcat)
+int csEventQueue::EventCordsFind (int cat, int subcat)
 {
   int i;
-  for (i = Length() - 1; i >= 0; i--)
+  for (i = EventCords.Length() - 1; i >= 0; i--)
   {
-    csEventCord *cord = Get(i);
+    csEventCord *cord = EventCords[i];
     if (cat == cord->GetCategory() && subcat == cord->GetSubcategory())
       return i;
   }

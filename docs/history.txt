@@ -23,10 +23,15 @@ for each given day, however, are in normal (ascending) chronological order.
 	- Jorrit also fixed the python plugin for all latest changes.
 	- Jorrit renamed FindSortedKey to FindSorted in csStringArray
 	  and iStringArray.
+	- Jorrit performed the next bunch of csVector removal:
+	    - Replaced csEventQueue::EventOutlets with
+	      csArray<csEventOutlet*>.
+	    - Replaced csEventQueue::EventCords with csRefArray<csEventCord>.
 	- res added some utility functions to convert between UTF encodings.
 	- res changed the Win32 port to assume UTF8 strings for console output
 	  and window titles and such.
-	- res fixed a bug where WGL extensions weren't always initialized properly.
+	- res fixed a bug where WGL extensions weren't always initialized
+	  properly.
 	- res removed the unused DirectInput keyboard handling code.
 	- res augmented configure to check the sizeof(long). This is used 
 	  to determine whether the platform is a 32 or 64 bit environment.
@@ -39,8 +44,8 @@ for each given day, however, are in normal (ascending) chronological order.
 	  csGlobalHashIterator that allow them to be initialized from const
 	  hashmaps, and added methods to them for the manipulation of
 	  iterators initialized from const hashmaps.
-    - Reed Hedges added csInitializer::SetupVFS, and changed
-      csInitializer::SetupConfigManager to use that function.
+	- Reed Hedges added csInitializer::SetupVFS, and changed
+	  csInitializer::SetupConfigManager to use that function.
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.
