@@ -173,8 +173,8 @@ class csQuadTree {
 private:
   /// bounding box of the quadtree
   csBox2 bbox;
-  /// depth of the tree, 1 == 1 node only.
-  int depth;
+  /// depth of the tree, 1 == 1 node only, a root.
+  int max_depth;
   /// the state of the root node.
   int root_state;
 
@@ -196,28 +196,40 @@ private:
    *  all these are this node's values.
    *  and custom clientdata.
    *  It can return an integer.
+   *  node_depth==1 means you are the root, and so on,
+   *  if the node_depth == max_depth you are a leaf.
    */
   typedef int (csQuadTree::quad_traverse_func)(const csBox2& node_bbox, 
-    int node_state, int offset, int node_nr, void* data);
+    int node_depth, int node_state, int offset, int node_nr, void* data);
 
   /** private functions to help dealing with quadtree
-   *  call all four children of the node with it's state at offset and node_nr
-   *  box is the bounding box of the node.
+   *  call all four children. Of the node with it's state at offset and node_nr
+   *  box is the bounding box of the node, depth is its depth.
    *  each will be passed the data.
    *  returns return values of children in retval.
    *  note that theoretically the state of the caller could be changed.
    *  also: the offset -1 denotes the root node is calling.
-   *  func is of type quad_traverse_func
+   *  func is of type quad_traverse_func.
    */
   void CallChildren(int (csQuadTree::*func)(const csBox2& node_bbox,
-    int node_state, int offset, int node_nr, void* data), const csBox2& box,
-    int offset, int node_nr, void *data, int retval[4]);
+    int node_depth, int node_state, int offset, int node_nr, void* data), 
+    const csBox2& box, int depth, int offset, int node_nr, 
+    void *data, int retval[4]);
 
+  /** Convenience version, the retval argument is omitted, return values
+   * are discarded.
+   */
+  void CallChildren(int (csQuadTree::*func)(const csBox2& node_bbox,
+    int node_depth, int node_state, int offset, int node_nr, void* data), 
+    const csBox2& box, int depth, int offset, int node_nr, 
+    void *data);
   /** Get the state of a node, in byte offset , nodenr given.
+   *  offset -1 means root node.
    */
   int GetNodeState(int offset, int nodenr);
 
   /** Set the state of a node, in byte offset , nodenr given.
+   *  offset -1 means root node.
    */
   void SetNodeState(int offset, int nodenr, int newstate);
 
@@ -230,6 +242,25 @@ private:
   /** gather result from retval for testpoint
    */
   int GetTestPointResult(int retval[4]); 
+
+  /** struct with info for polygon being inserted
+   */
+  struct insert_poly_info {
+    csVector2* verts;
+    int num_verts;
+    const csBox2& pol_bbox;
+  };
+  
+  /** for a node, insert polygon into it (possibly in its children too)
+   * expects data to be a struct insert_poly_info*
+   * returns true if the polygon covered previously empty space.
+   */
+  quad_traverse_func insert_polygon_func;
+
+  /** for a node, mark it by casting (void*)data to an int.
+   *  that is the new state.
+   */
+  quad_traverse_func mark_node_func;
 
 public:
   /** create a quadtree of depth, using about 2**twice depth bytes. depth >= 1
@@ -244,6 +275,11 @@ public:
    * Is the tree full?
    */
   bool IsFull () { return root_state == CS_QUAD_FULL; }
+
+  /** 
+   * Make the tree empty again
+   */
+  void MakeEmpty();
 
   /**
    * Insert a polygon into the quad-tree.
