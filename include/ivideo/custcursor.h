@@ -19,6 +19,7 @@
 #ifndef __CS_IVIDEO_CUSTCURSOR_H__
 #define __CS_IVIDEO_CUSTCURSOR_H__
 
+#include "csgfx/rgbpixel.h"
 #include "csutil/scf.h"
 #include "csgeom/cspoint.h"
 #include "igraphic/image.h"
@@ -57,7 +58,7 @@ struct iCursor : public iBase
    */
   virtual void SetCursor (const char *name, iImage *image, csRGBcolor keycolor, 
                           csPoint hotspot = csPoint (0,0),
-			  uint8 transparency = 0, 
+                            uint8 transparency = 0, 
                           csRGBcolor fg = csRGBcolor (255,255,255),
                           csRGBcolor bg = csRGBcolor (0,0,0)) = 0;
       
