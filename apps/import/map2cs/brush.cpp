@@ -26,6 +26,7 @@
 #include "map.h"
 #include "mpoly.h"
 #include "texplane.h"
+#include <ctype.h>
 
 void CMapBrushBoundingBox::Extend(CMapPolygon* pPoly)
 {
@@ -223,20 +224,32 @@ bool CMapBrush::Read(CMapParser* pParser, CMapFile* pMap)
       {
         if (strcmp(Buffer, "(") != 0 && strcmp(Buffer, "}") != 0)
         {
-          //Looks like a Quake3 Arena Map. I don't know the meaning of these numbers,
-          //but there are always three of them
-		  int i;
-          for (i=0; i<3; i++)
+          // Looks like a Quake3 Arena Map. I don't know the meaning of these
+          // numbers, but there are always three of them
+          for (int i=0; i<3; i++)
           {
-            char         cDummy;
-            unsigned int val;
-            if (sscanf(Buffer, "%ud%c", &val, &cDummy)!=1)
-            {
-              pParser->ReportError("Invalid Numeric format. Expected int, found \"%s\"", 
+	    bool malformed = false;
+	    bool intseen = false;
+	    char const* q = Buffer;
+	    while (*q != '\0' && isspace(*q))
+	      q++;
+	    while (*q != '\0' && isdigit(*q))
+	    {
+	      q++;
+	      intseen = true;
+	    }
+	    malformed = (*q != '\0' && !isspace(*q));
+
+	    if (malformed || !intseen)
+	    {
+	      pParser->ReportError(
+		"Invalid Numeric format. Expected int, found \"%s\"", 
 		Buffer.GetData());
-              return false;
-            }
-            if (!pParser->GetSafeToken(Buffer)) return false;
+		return false;
+	    }
+
+            if (!pParser->GetSafeToken(Buffer))
+	      return false;
           }
         }
       }
