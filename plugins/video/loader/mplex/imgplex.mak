@@ -17,7 +17,7 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: imgplex imgplexclean imgplexall
-all plugins: imgplex
+all plugins imgplexall: imgplex
 
 imgplex:
 	$(MAKE_TARGET) MAKE_DLL=yes
