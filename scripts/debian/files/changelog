@@ -1,3 +1,17 @@
+crystalspace (0.94-20020502-3) unstable; urgency=low
+
+  * Added support for HPPA and M68K in arch.sh commited upstream
+  this should (Closes: bug#146076) and (Closes: bug#146688), please reopen
+  in case of problem
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.94-20020502-2) unstable; urgency=low
+
+  * Upstream change, should solve ia64 compile problems (CLoses: bug#145631)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
 crystalspace (0.94-20020502-1) unstable; urgency=low
 
   * New snapshot
