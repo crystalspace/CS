@@ -459,7 +459,7 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
   glyphset->maxH = maxrows;
   glyphset->ascend = (face->size->metrics.ascender + 63)>>6;
   glyphset->descend = (-face->size->metrics.descender + 63)>>6;
-  int bitmapsize, stride;
+  int bitmapsize, stride, n, i;
 
   memset (glyphset->glyphs, 0, sizeof (glyphset->glyphs));
   cache.Push (glyphset);
@@ -481,7 +481,7 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
     int endrow = startrow+((FT_BitmapGlyph)glyph)->bitmap.rows;
     if (startrow < 0) startrow = 0;
     if (endrow > maxrows) endrow = maxrows;
-    for (int n=0,i=startrow; i < endrow; i++,n++)
+    for (n=0,i=startrow; i < endrow; i++,n++)
       memcpy (g.bitmap + stride*i, 
               ((FT_BitmapGlyph)glyph)->bitmap.buffer + n*((FT_BitmapGlyph)glyph)->bitmap.pitch,
               /*((FT_BitmapGlyph)glyph)->bitmap.pitch*/MIN(stride, ((FT_BitmapGlyph)glyph)->bitmap.pitch));
@@ -505,7 +505,7 @@ bool csFreeType2Font::CreateGlyphBitmaps (int size)
     endrow = startrow+((FT_BitmapGlyph)glyph)->bitmap.rows;
     if (startrow < 0) startrow = 0;
     if (endrow > maxrows) endrow = maxrows;
-    for (int n=0,i=startrow; i < endrow; i++,n++)
+    for (n=0,i=startrow; i < endrow; i++,n++)
       memcpy (g.alphabitmap + stride*i, 
               ((FT_BitmapGlyph)glyph)->bitmap.buffer + n*((FT_BitmapGlyph)glyph)->bitmap.pitch,
               MIN(stride, ((FT_BitmapGlyph)glyph)->bitmap.pitch));
