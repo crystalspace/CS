@@ -317,7 +317,7 @@ class csSectorIt :
 {
 private:
   // The position and radius.
-  csSector *sector;
+  iSector *sector;
   csVector3 pos;
   float radius;
 
@@ -336,7 +336,7 @@ private:
   csVector3 last_pos;
 public:
   /// Construct an iterator and initialize to start.
-  csSectorIt (csSector *sector, const csVector3 &pos, float radius);
+  csSectorIt (iSector *sector, const csVector3 &pos, float radius);
 
   /// Destructor.
   virtual ~csSectorIt ();
@@ -410,7 +410,7 @@ bool csLightIt::NextSector ()
   sector_idx++;
   if (region)
     while ( sector_idx < engine->sectors.GetCount () &&
-      	!region->IsInRegion (GetLastSector ()->GetPrivateObject ()))
+      	!region->IsInRegion (GetLastSector ()->QueryObject ()))
       sector_idx++;
   if (sector_idx >= engine->sectors.GetCount ()) return false;
   return true;
@@ -424,7 +424,7 @@ void csLightIt::Restart ()
 
 iLight *csLightIt::Fetch ()
 {
-  csSector *sector;
+  iSector *sector;
   if (sector_idx == -1)
   {
     if (!NextSector ()) return NULL;
@@ -432,12 +432,12 @@ iLight *csLightIt::Fetch ()
   }
 
   if (sector_idx >= engine->sectors.GetCount ()) return NULL;
-  sector = engine->sectors.Get (sector_idx)->GetPrivateObject ();
+  sector = engine->sectors.Get (sector_idx);
 
   // Try next light.
   light_idx++;
 
-  if (light_idx >= sector->scfiSector.GetLights ()->GetCount ())
+  if (light_idx >= sector->GetLights ()->GetCount ())
   {
     // Go to next sector.
     light_idx = -1;
@@ -447,7 +447,7 @@ iLight *csLightIt::Fetch ()
     return Fetch ();
   }
 
-  return sector->scfiSector.GetLights ()->Get (light_idx);
+  return sector->GetLights ()->Get (light_idx);
 }
 
 iSector *csLightIt::GetLastSector ()
@@ -461,7 +461,7 @@ SCF_IMPLEMENT_IBASE(csSectorIt)
 SCF_IMPLEMENT_IBASE_END
 
 csSectorIt::csSectorIt (
-  csSector *sector,
+  iSector *sector,
   const csVector3 &pos,
   float radius)
 {
@@ -508,7 +508,7 @@ iSector *csSectorIt::Fetch ()
   {
     cur_poly = 0;
     last_pos = pos;
-    return sector ? &(sector->scfiSector) : NULL;
+    return sector;
   }
 
   // End search.
@@ -835,18 +835,8 @@ void csEngine::DeleteAll ()
   int i;
 
   GetMeshes ()->RemoveAll ();
-
   mesh_factories.RemoveAll ();
-
-  // @@@ I suppose the loop below is no longer needed?
-  for (i = 0; i < sectors.GetCount (); i++)
-  {
-    csSector *sect = sectors.Get (i)->GetPrivateObject ();
-    if (sect) sect->CleanupReferences ();
-  }
-
   sectors.RemoveAll ();
-
   camera_positions.DeleteAll ();
 
   while (first_dyn_lights)
@@ -2101,7 +2091,7 @@ int csEngine::GetNearbyLights (
     csDynLight *dl = first_dyn_lights;
     while (dl)
     {
-      if (dl->GetSector () == sector->GetPrivateObject ())
+      if (&(dl->GetSector ()->scfiSector) == sector)
       {
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
 #ifdef CS_USE_NEW_RENDERER
@@ -2176,7 +2166,7 @@ int csEngine::GetNearbyLights (
     csDynLight *dl = first_dyn_lights;
     while (dl)
     {
-      if (dl->GetSector () == sector->GetPrivateObject ())
+      if (&(dl->GetSector ()->scfiSector) == sector)
       {
         csBox3 b (box.Min () - dl->GetCenter (), box.Max () - dl->GetCenter ());
         sqdist = b.SquaredOriginDist ();
@@ -2232,7 +2222,7 @@ csPtr<iSectorIterator> csEngine::GetNearbySectors (
   const csVector3 &pos,
   float radius)
 {
-  csSectorIt *it = new csSectorIt (sector->GetPrivateObject (), pos, radius);
+  csSectorIt *it = new csSectorIt (sector, pos, radius);
   return csPtr<iSectorIterator> (it);
 }
 
@@ -2755,7 +2745,7 @@ iLight* EngineLoaderContext::FindLight(const char *name)
 
   while ((light = li->Fetch ()) != NULL)
   {
-      if (!strcmp (light->GetPrivateObject ()->GetName (),name))
+      if (!strcmp (light->QueryObject ()->GetName (),name))
 	  return light;
   }
   return NULL;

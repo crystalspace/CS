@@ -450,7 +450,7 @@ public:
    * filled with the polygon that was hit.
    * If polygonPtr is null then the polygon will not be filled in.
    */
-  csMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
+  iMeshWrapper* HitBeam (const csVector3& start, const csVector3& end,
     csVector3& intersect, iPolygon3D** polygonPtr, bool accurate = false);
 
   /**
@@ -498,7 +498,7 @@ public:
    * is a lot faster but it does mean that you need to use another
    * collision detection system to test with walls.
    */
-  csSector* FollowSegment (csReversibleTransform& t, csVector3& new_position,
+  iSector* FollowSegment (csReversibleTransform& t, csVector3& new_position,
                           bool& mirror, bool only_portals = false);
 
   /**
@@ -518,9 +518,9 @@ public:
    * If 'mesh' != NULL the mesh will be filled in.
    */
   iPolygon3D* IntersectSegment (const csVector3& start,
-  const csVector3& end, csVector3& isect,
-  float* pr = NULL, bool only_portals = false,
-  csMeshWrapper** p_mesh = NULL);
+	const csVector3& end, csVector3& isect,
+	float* pr = NULL, bool only_portals = false,
+	iMeshWrapper** p_mesh = NULL);
 
   /**
    * Calculate the bounding box of all objects in this sector.

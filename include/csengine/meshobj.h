@@ -251,7 +251,7 @@ public:
 
 protected:
   /// Move this object to the specified sector. Can be called multiple times.
-  void MoveToSector (csSector* s);
+  void MoveToSector (iSector* s);
 
   /// Remove this object from all sectors it is in (but not from the engine).
   void RemoveFromSectors ();

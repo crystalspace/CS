@@ -24,7 +24,6 @@
 #include "iengine/camera.h"
 #include "csengine/sector.h"
 
-class csSector;
 class Vertex;
 class csEngine;
 struct iPolygon3D;
@@ -36,7 +35,7 @@ class csCamera : public csOrthoTransform, public iBase
 {
 private:
   /// The sector the camera is in.
-  csSector* sector;
+  iSector* sector;
   /// If true we are in a mirrored world.
   bool mirror;
 
@@ -158,7 +157,7 @@ public:
    * it is legal to have a camera which is viewing the
    * current sector from outside.
    */
-  void SetSector (csSector *s)
+  void SetSector (iSector *s)
   {
     sector = s;
     cameranr = cur_cameranr++;
@@ -167,7 +166,7 @@ public:
   /**
    * Get the current sector of the camera.
    */
-  csSector* GetSector () const { return sector; }
+  iSector* GetSector () const { return sector; }
 
   /**
    * Returns true if we are in a mirrored world.
@@ -379,11 +378,8 @@ public:
     virtual void MoveUnrestricted (const csVector3& v)
     { scfParent->MoveUnrestricted (v); }
 
-    virtual iSector* GetSector () const
-    { return scfParent->GetSector() ?
-      &scfParent->GetSector()->scfiSector : NULL; }
-    virtual void SetSector (iSector *s)
-    { scfParent->SetSector (s->GetPrivateObject ()); }
+    virtual iSector* GetSector () const { return scfParent->GetSector(); }
+    virtual void SetSector (iSector *s) { scfParent->SetSector (s); }
 
     virtual iPolygon3D* GetHit (csVector3& v)
     {

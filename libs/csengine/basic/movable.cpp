@@ -55,7 +55,7 @@ bool csMovableSectorList::PrepareItem (iSector* sector)
   if (movable->GetParent ()) return false;
 
   csMeshWrapper *mw = movable->GetMeshWrapper ();
-  if (mw) mw->MoveToSector (sector->GetPrivateObject ());
+  if (mw) mw->MoveToSector (sector);
   return true;
 }
 

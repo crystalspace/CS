@@ -153,7 +153,7 @@ void csMeshWrapper::UpdateMove ()
   }
 }
 
-void csMeshWrapper::MoveToSector (csSector *s)
+void csMeshWrapper::MoveToSector (iSector *s)
 {
   // Only add this mesh to a sector if the parent is the engine.
   // Otherwise we have a hierarchical object and in that case

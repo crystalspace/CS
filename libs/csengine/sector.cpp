@@ -699,7 +699,7 @@ iPolygon3D *csSector::HitBeam (
   const csVector3 &end,
   csVector3 &isect)
 {
-  csMeshWrapper* mesh;
+  iMeshWrapper* mesh;
   iPolygon3D *p = IntersectSegment (start, end, isect, NULL, false,
 		  &mesh);
   if (p)
@@ -711,7 +711,7 @@ iPolygon3D *csSector::HitBeam (
       draw_busy++;
 
       csVector3 new_start = isect;
-      p = po->HitBeam (mesh->GetMovable ().GetTransform (),
+      p = po->HitBeam (mesh->GetMovable ()->GetTransform (),
 		      new_start, end, isect);
       draw_busy--;
       return p;
@@ -723,7 +723,7 @@ iPolygon3D *csSector::HitBeam (
     return NULL;
 }
 
-csMeshWrapper *csSector::HitBeam (
+iMeshWrapper *csSector::HitBeam (
   const csVector3 &start,
   const csVector3 &end,
   csVector3 &isect,
@@ -737,8 +737,8 @@ csMeshWrapper *csSector::HitBeam (
   bool rc = culler->IntersectSegment (start, end, isect, &r, &mesh, &poly,
   	accurate);
   if (polygonPtr) *polygonPtr = poly;
-  if (rc && mesh)
-    return mesh->GetPrivateObject ();
+  if (rc)
+    return mesh;
   else
     return NULL;
 }
@@ -749,7 +749,7 @@ iPolygon3D *csSector::IntersectSegment (
   csVector3 &isect,
   float *pr,
   bool only_portals,
-  csMeshWrapper **p_mesh)
+  iMeshWrapper **p_mesh)
 {
   GetVisibilityCuller ();
   float r, best_r = 10000000000.;
@@ -766,8 +766,7 @@ iPolygon3D *csSector::IntersectSegment (
     {
       best_p = poly;
       best_r = r;
-      if (p_mesh)
-        *p_mesh = mesh ? mesh->GetPrivateObject () : NULL;
+      if (p_mesh) *p_mesh = mesh;
     }
     if (pr) *pr = best_r;
     return best_p;
@@ -827,7 +826,7 @@ iPolygon3D *csSector::IntersectSegment (
         best_r = r;
         best_p = p;
         isect = cur_isect;
-        if (p_mesh) *p_mesh = mesh->GetPrivateObject ();
+        if (p_mesh) *p_mesh = mesh;
       }
     }
   }
@@ -836,14 +835,14 @@ iPolygon3D *csSector::IntersectSegment (
   return best_p;
 }
 
-csSector *csSector::FollowSegment (
+iSector *csSector::FollowSegment (
   csReversibleTransform &t,
   csVector3 &new_position,
   bool &mirror,
   bool only_portals)
 {
   csVector3 isect;
-  csMeshWrapper* mesh;
+  iMeshWrapper* mesh;
   iPolygon3D *p = IntersectSegment (
       t.GetOrigin (),
       new_position,
@@ -863,25 +862,25 @@ csSector *csSector::FollowSegment (
       if (!po->GetSector ())
       {
         new_position = isect;
-        return this;
+        return &scfiSector;
       }
 
       if (po->GetFlags ().Check (CS_PORTAL_WARP))
       {
 	csReversibleTransform warp_wor;
-	po->ObjectToWorld (mesh->GetMovable ().GetTransform (), warp_wor);
+	po->ObjectToWorld (mesh->GetMovable ()->GetTransform (), warp_wor);
         po->WarpSpace (warp_wor, t, mirror);
         new_position = po->Warp (warp_wor, new_position);
       }
 
-      csSector *dest_sect = po->GetSector ()->GetPrivateObject ();
+      iSector *dest_sect = po->GetSector ();
       return dest_sect->FollowSegment (t, new_position, mirror);
     }
     else
       new_position = isect;
   }
 
-  return this;
+  return &scfiSector;
 }
 
 iPolygon3D *csSector::IntersectSphere (
@@ -1725,7 +1724,7 @@ iMeshWrapper *csSector::eiSector::HitBeam (
   bool accurate)
 {
   iPolygon3D *p = NULL;
-  csMeshWrapper *obj = scfParent->HitBeam (
+  iMeshWrapper *obj = scfParent->HitBeam (
       start, end, isect,
       polygonPtr ? &p : NULL, accurate);
   if (obj)
@@ -1736,7 +1735,7 @@ iMeshWrapper *csSector::eiSector::HitBeam (
     }
   }
 
-  return obj ? &(obj->scfiMeshWrapper) : NULL;
+  return obj;
 }
 
 iSector *csSector::eiSector::FollowSegment (
@@ -1745,15 +1744,12 @@ iSector *csSector::eiSector::FollowSegment (
   bool &mirror,
   bool only_portals)
 {
-  csSector *s = scfParent->FollowSegment (
+  iSector *s = scfParent->FollowSegment (
       t,
       new_position,
       mirror,
       only_portals);
-  if (s)
-    return &(s->scfiSector);
-  else
-    return NULL;
+  return s;
 }
 
 void csSector::ReferencedObject::AddReference (iReference *ref)

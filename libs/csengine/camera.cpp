@@ -111,7 +111,7 @@ void csCamera::MoveWorld (const csVector3 &v, bool cd)
   if (sector)
   {
     csVector3 remember_position = new_position;
-    csSector *new_sector = sector->FollowSegment (
+    iSector *new_sector = sector->FollowSegment (
         *this,
         new_position,
         mirror,
