@@ -4,8 +4,8 @@
 
 # Set modus related flags
 CCFLAGS += $(COMPILER.CFLAGS.$(MODE)) ;
-C++FLAGS += $(CFLAGS.$(MODE)) $(C++FLAGS.$(MODE)) ;
-LINKLIBS += $(LFLAGS.$(MODE)) ;
+C++FLAGS += $(COMPILER.CFLAGS.$(MODE)) $(COMPILER.C++FLAGS.$(MODE)) ;
+LINKLIBS += $(COMPILER.LFLAGS.$(MODE)) ;
 LOCATE.OBJECTS = $(LOCATE.OBJECTS)/$(MODE) ;
 
 # Configuration for debug/optimized mode
