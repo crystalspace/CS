@@ -4810,6 +4810,7 @@ class iVisibilityCuller(iBase):
     def UnregisterVisObject(*args): return _cspace.iVisibilityCuller_UnregisterVisObject(*args)
     def PrecacheCulling(*args): return _cspace.iVisibilityCuller_PrecacheCulling(*args)
     def VisTest(*args): return _cspace.iVisibilityCuller_VisTest(*args)
+    def IntersectSegmentSloppy(*args): return _cspace.iVisibilityCuller_IntersectSegmentSloppy(*args)
     def IntersectSegment(*args): return _cspace.iVisibilityCuller_IntersectSegment(*args)
     def CastShadows(*args): return _cspace.iVisibilityCuller_CastShadows(*args)
     def __del__(self, destroy=_cspace.delete_iVisibilityCuller):
@@ -11203,6 +11204,8 @@ class csColliderHelper(_object):
     if _newclass:CollideArray = staticmethod(_cspace.csColliderHelper_CollideArray)
     __swig_getmethods__["CollidePath"] = lambda x: _cspace.csColliderHelper_CollidePath
     if _newclass:CollidePath = staticmethod(_cspace.csColliderHelper_CollidePath)
+    __swig_getmethods__["TraceBeam"] = lambda x: _cspace.csColliderHelper_TraceBeam
+    if _newclass:TraceBeam = staticmethod(_cspace.csColliderHelper_TraceBeam)
     def __init__(self, *args):
         _swig_setattr(self, csColliderHelper, 'this', _cspace.new_csColliderHelper(*args))
         _swig_setattr(self, csColliderHelper, 'thisown', 1)
@@ -11225,6 +11228,8 @@ csColliderHelper_InitializeCollisionWrappers = _cspace.csColliderHelper_Initiali
 csColliderHelper_CollideArray = _cspace.csColliderHelper_CollideArray
 
 csColliderHelper_CollidePath = _cspace.csColliderHelper_CollidePath
+
+csColliderHelper_TraceBeam = _cspace.csColliderHelper_TraceBeam
 
 
 csfxInterference = _cspace.csfxInterference
