@@ -1136,6 +1136,8 @@ void CompressShadowFrustums (csFrustumList* list)
   }
 }
 
+static int frust_cnt = 50;
+
 //@@@ Needs to be part of sector?
 void* CheckFrustumPolygonsFB (csSector*,
   csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
@@ -1147,7 +1149,6 @@ void* CheckFrustumPolygonsFB (csSector*,
   csCovcube* cc = csWorld::current_world->GetCovcube ();
   bool cw = true;	// @@@ Mirror flag?
   int i, j;
-  static int frust_cnt = 50;
   for (i = 0 ; i < num ; i++)
   {
     if (polygon[i]->GetType () != 1) continue;
@@ -1158,11 +1159,6 @@ void* CheckFrustumPolygonsFB (csSector*,
       poly[j] = p->Vwor (j)-center;
     bool vis = false;
 
-#define QUADTREE_SHADOW 0
-#if QUADTREE_SHADOW
-    if (cb) vis = cb->TestPolygon (poly, p->GetNumVertices ());
-    else vis = cc->TestPolygon (poly, p->GetNumVertices ());
-#else
     if (p->GetPortal ())
     {
       if (cb) vis = cb->TestPolygon (poly, p->GetNumVertices ());
@@ -1173,18 +1169,9 @@ void* CheckFrustumPolygonsFB (csSector*,
       if (cb) vis = cb->InsertPolygon (poly, p->GetNumVertices ());
       else vis = cc->InsertPolygon (poly, p->GetNumVertices ());
     }
-#endif
     if (vis)
     {
       lview->poly_func ((csObject*)p, lview);
-
-#if QUADTREE_SHADOW
-      if (!p->GetPortal ())
-        if (cb)
-	  cb->InsertPolygon (poly, p->GetNumVertices ());
-        else
-	  cc->InsertPolygon (poly, p->GetNumVertices ());
-#endif
 
       //if (p->GetPlane ()->VisibleFromPoint (center) != cw) continue;
       float clas = p->GetPlane ()->GetWorldPlane ().Classify (center);
@@ -1452,8 +1439,10 @@ void csSector::RealCheckFrustum (csFrustumView& lview)
     count_cull_quad = 0;
     count_cull_not = 0;
     static_thing->UpdateTransformation (center);
+    frust_cnt = 50;
     static_tree->Front2Back (center, CheckFrustumPolygonsFB, (void*)&lview,
       	CullOctreeNodeLighting, (void*)&lview);
+    frust_cnt = 50;
     CheckFrustumPolygonsFB (this, polygons.GetArray (),
       polygons.Length (), false, (void*)&lview);
     //printf ("Cull: dist=%d quad=%d not=%d\n",

@@ -317,11 +317,14 @@ bool csCBuffer::TestPolygon (csVector2* verts, int num_verts)
       fin_y = fyR;
 
     // Make sure we work correctly for both orientations of the polygon.
-    if (sxL > sxR)
+    bool swap;
+    if (sxL+dxL > sxR+dxR)
     {
       float xs = sxR; sxR = sxL; sxL = xs;
       float dxs = dxR; dxR = dxL; dxL = dxs;
+      swap = true;
     }
+    else swap = false;
 
     while (sy > fin_y)
     {
@@ -333,6 +336,11 @@ bool csCBuffer::TestPolygon (csVector2* verts, int num_verts)
       sxL += dxL;
       sxR += dxR;
       sy--;
+    }
+    if (swap)
+    {
+      float xs = sxR; sxR = sxL; sxL = xs;
+      float dxs = dxR; dxR = dxL; dxL = dxs;
     }
   }
 
@@ -471,11 +479,14 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
     // x coordinates being almost equal and rounding errors causing the
     // wrong swap here.
     // @@@ INVESTIGATE IF THIS IS THE RIGHT FIX!
+    bool swap;
     if (sxL+dxL > sxR+dxR)
     {
       float xs = sxR; sxR = sxL; sxL = xs;
       float dxs = dxR; dxR = dxL; dxL = dxs;
+      swap = true;
     }
+    else swap = false;
 
     while (sy > fin_y)
     {
@@ -515,6 +526,12 @@ bool csCBuffer::InsertPolygon (csVector2* verts, int num_verts, bool negative)
       sxL += dxL;
       sxR += dxR;
       sy--;
+    }
+
+    if (swap)
+    {
+      float xs = sxR; sxR = sxL; sxL = xs;
+      float dxs = dxR; dxR = dxL; dxL = dxs;
     }
   }
 

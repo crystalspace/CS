@@ -95,7 +95,7 @@ private:
 
 public:
   /// Create a new empty frustum.
-  csFrustum (csVector3& o) : origin (o), vertices (NULL),
+  csFrustum (const csVector3& o) : origin (o), vertices (NULL),
     num_vertices (0), max_vertices (0), backplane (NULL),
     wide (false), mirrored (false), ref_count (1)
   { }
@@ -105,7 +105,7 @@ public:
    * The polygon is given relative to the origin 'o'.
    * If the given polygon is NULL then we create an empty frustum.
    */
-  csFrustum (csVector3& o, csVector3* verts, int num_verts, csPlane3* backp = NULL);
+  csFrustum (const csVector3& o, csVector3* verts, int num_verts, csPlane3* backp = NULL);
 
   /// Copy constructor.
   csFrustum (const csFrustum &copy);

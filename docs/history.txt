@@ -4,11 +4,28 @@ The history order has been reversed so that new features are at the top.
 	- Added new command 'db_frustum' to debug the CheckFrustum routine.
 	  This function expects an integer parameter and will draw an outline
 	  around the first 'num' polygons that are reached by CheckFrustum.
+	- Changed csFrustum constructor to accept a 'const' parameter.
+	- Did the same fix to csCBuffer::TestPolygon() as was done with
+	  csCBuffer::InsertPolygon() a few days ago.
+	- Fixed a small bug in CheckFrustum which could cause different
+	  results in different runs. i.e. it made the result of CheckFrustum
+	  a bit unpredictable in some cases.
+	- FINALLY fixed a very severe bug in the c-buffer which really
+	  triggered only in VERY rare cases indeed. This bug caused errors
+	  in lighting, PVS, rendering (in some cases), radiosity, ... (you
+	  name it :-)
 	- Got the first patch from Travis McIntosh
 	  <Travis.McIntosh@student.oc.edu>. He changed the dynamic lighting
 	  system to work on lightmaps instead of polygons. This is the
 	  first step towards getting dynamic lights working with curves
 	  too.
+	- Andrew Zabolotny added a new CS_ZBUF_FILLONLY mode for
+	  DrawPolygon() to be able to draw non-textured polygons with
+	  Z-Fill mode. The hardware guys still need to implement it.
+	- Norman Kramer fixed a warning about unused parameter in
+	  freefont.cpp.
+	- Norman also cleaned up some of the changes that Samuel did to the
+	  glide port.
 13-Jun-2000
        - Samuel verbosely has been busy with the now called procedural textures:
            - Changed names from dynamic textures to the more correct term 
@@ -121,6 +138,8 @@ The history order has been reversed so that new features are at the top.
 	      models in MazeD). Also it should be a little faster now.
 	    - Fixed an old-standing bug that caused wrong window resizes
 	      when switching MazeD screen resolution.
+	- Andrew also updated the dimensions of the player in WalkTest
+	  to be more realistic.
 	- Frank O' Connor fixed a VerticesAreCompressed() call which Jorrit
 	  forgot to remove in MazeD.
 	- Frank also updated some of the VC project files.

@@ -212,7 +212,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("-*- Additional commands -*-\n");
     CONPRI("Visibility:\n");
     CONPRI("  dumpvis cbuffer covtree solidbsp pvs freezepvs pvsonly\n");
-    CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer\n");
+    CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum\n");
     CONPRI("Lights:\n");
     CONPRI("  addlight dellight dellights picklight droplight\n");
     CONPRI("  clrlights setlight\n");
@@ -275,6 +275,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     Command::change_boolean (arg, &Sys->do_show_z, "zbuf");
   else if (!strcasecmp (cmd, "db_cbuffer"))
     Command::change_boolean (arg, &Sys->do_show_cbuffer, "debug cbuffer");
+  else if (!strcasecmp (cmd, "db_frustum"))
+    Command::change_int (arg, &Sys->cfg_debug_check_frustum, "debug check frustum", 0, 2000000000);
   else if (!strcasecmp (cmd, "db_octree"))
     Command::change_int (arg, &Sys->cfg_draw_octree, "debug octree", -1, 10);
   else if (!strcasecmp (cmd, "db_dumpstubs"))

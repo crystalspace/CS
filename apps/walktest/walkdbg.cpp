@@ -604,4 +604,76 @@ void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int 
     CreateSolidThings (world, room, node->GetChild (i), depth+1);
 }
 
+struct db_frust
+{
+  int max_vis;
+  int num_vis;
+  csVector queue;
+};
+
+static db_frust dbf;
+
+// Callback for DrawFunc() to show an outline for all polygons that
+// are in the dbf queue.
+void draw_frust_edges (csRenderView* rview, int type, void* entity)
+{
+  iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
+  int col = txtmgr->FindRGB (0, 0, 255);
+  static csPolygon3D* last_poly;
+
+  if (type == CALLBACK_POLYGON)
+  {
+    // Here we depend on CALLBACK_POLYGON being called right before CALLBACK_POLYGON2D.
+    last_poly = (csPolygon3D*)entity;
+  }
+  else if (type == CALLBACK_POLYGON2D)
+  {
+    csPolygon2D* polygon = (csPolygon2D*)entity;
+    int idx = dbf.queue.Find (last_poly);
+    if (idx != -1)
+      polygon->Draw (rview->g2d, col);
+  }
+}
+
+void poly_db_func (csObject* obj, csFrustumView* /*lview*/)
+{
+  csPolygon3D* poly = (csPolygon3D*)obj;
+  if (dbf.num_vis < dbf.max_vis)
+  {
+    dbf.num_vis++;
+    dbf.queue.Push ((void*)poly);
+  }
+}
+
+void curve_db_func (csObject*, csFrustumView*)
+{
+  //csCurve* curve = (csCurve*)obj;
+}
+
+void ShowCheckFrustum (csView* view,
+	csSector* room, const csVector3& pos, int num_vis)
+{
+  csFrustumView lview;
+  lview.poly_func = poly_db_func;
+  lview.curve_func = curve_db_func;
+  dbf.max_vis = num_vis;
+  dbf.num_vis = 0;
+  dbf.queue.SetLength (0);
+  lview.userdata = (void*)&dbf;
+  lview.radius = 1000000000.;
+  lview.sq_radius = 1000000000.;
+  lview.things_shadow = false;
+  lview.mirror = false;
+  lview.gouraud_only = false;
+  lview.gouraud_color_reset = false;
+  lview.r = 1;
+  lview.g = 1;
+  lview.b = 1;
+  lview.dynamic = false;
+  lview.light_frustum = new csFrustum (pos);
+  lview.light_frustum->MakeInfinite ();
+  room->CheckFrustum (lview);
+  view->GetWorld ()->DrawFunc (view->GetCamera (), view->GetClipper (),
+    	draw_frust_edges);
+}
 

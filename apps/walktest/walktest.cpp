@@ -134,6 +134,7 @@ WalkTest::WalkTest () :
   selected_polygon = NULL;
   move_forward = false;
   cfg_draw_octree = 0;
+  cfg_debug_check_frustum = 0;
 
   plbody = pllegs = NULL;
 
@@ -371,6 +372,13 @@ void WalkTest::DrawFrameDebug ()
   {
     extern void DrawOctreeBoxes (int);
     DrawOctreeBoxes (cfg_draw_octree == -1 ? -1 : cfg_draw_octree-1);
+  }
+  if (cfg_debug_check_frustum)
+  {
+    extern void ShowCheckFrustum (csView* view, csSector* room,
+    	const csVector3& pos, int num_vis);
+    ShowCheckFrustum (view, view->GetCamera ()->GetSector (),
+    	view->GetCamera ()->GetOrigin (), cfg_debug_check_frustum);
   }
   if (do_show_cbuffer)
   {
@@ -1235,16 +1243,17 @@ srand (12345678);
 csCBuffer* cbuf = new csCBuffer (0, 1023, 1024);
 //csQuadTree* qtree = new csQuadTree (csBox2 (0, 0, 1023, 1023), 11);
 csBox2 bbox (-1, -1, 1024, 1024);
-csPoly2D poly;
+csPoly2D polys[5];
 csVector2 v;
-int i;
+int i, j, k;
 float x, y;
-for (; ;)
+for (;;)
 {
 printf ("New cbuffer\n");
   cbuf->Initialize ();
-  while (!cbuf->IsFull ())
+  for (j = 0 ; j < 5 ; j++)
   {
+    csPoly2D& poly = polys[j];
     poly.Random (3, bbox);
     if (poly.GetSignedArea () > 0)
     {
@@ -1255,7 +1264,6 @@ printf ("New cbuffer\n");
 	poly[poly.GetNumVertices ()-i-1] = sw;
       }
     }
-    printf ("Insert polygon...\n");
     cbuf->InsertPolygon (poly.GetVertices (), poly.GetNumVertices ());
     //qtree->InsertPolygon (poly.GetVertices (), poly.GetNumVertices (),
     	//poly.GetBoundingBox ());
@@ -1263,7 +1271,35 @@ printf ("New cbuffer\n");
       for (y = 1 ; y < 1023 ; y+= 10)
       {
         v.Set (x, y);
-	bool 
+	bool cvis = cbuf->TestPoint (v);
+	bool pin = false;
+	bool ignore = false;
+	for (k = 0 ; k <= j ; k++)
+	{
+	  for (i = 0 ; i < polys[k].GetNumVertices () ; i++)
+	  {
+	    csPlane2 pl (polys[k][i], polys[k][(i+1)%polys[k].GetNumVertices ()]);
+	    pl.Normalize ();
+	    if (pl.Distance (v) < 5)
+	    {
+	      ignore = true;
+	      break;
+	    }
+	  }
+	  if (ignore) break;
+	  pin = polys[k].In (v);
+	  if (pin) break;
+	}
+	if (!ignore)
+	{
+	  if (cvis != pin)
+	  {
+            printf ("Insert polygon...\n");
+            for (i = 0 ; i < poly.GetNumVertices () ; i++)
+              printf ("  %d: %f,%f\n", i, poly[i].x, poly[i].y);
+	    printf ("  Mismatch v=(%f,%f) cbuf=%d pin=%d\n", x, y, cvis, pin);
+	  }
+	}
 	//int qvis = qtree->TestPoint (v);
 	//if (qvis != CS_QUAD_PARTIAL)
 	//{

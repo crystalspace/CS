@@ -120,6 +120,7 @@ csCBufferCube::csCBufferCube (int dim)
   trees[5] = new csCBufferPersp (0, dim-1, dim);
   csBox2 b (0, 0, dim, dim);
   clipper = new csBoxClipper (b);
+  MakeEmpty ();
 }
 
 csCBufferCube::~csCBufferCube ()

@@ -169,6 +169,7 @@ public:
   bool do_gravity;
   bool do_light_frust;
   int cfg_draw_octree;
+  int cfg_debug_check_frustum;
 
   /// The selected light.
   csLight* selected_light;
