@@ -83,7 +83,6 @@ SCF_EXPORT_CLASS_TABLE (clothldr)
   SCF_EXPORT_CLASS (csClothFactorySaver, "crystalspace.mesh.saver.factory.cloth",
     "Crystal Space Cloth Mesh Factory Saver")
   SCF_EXPORT_CLASS (csClothMeshLoader, "crystalspace.mesh.loader.cloth","Crystal Space Cloth Mesh Object Loader")
-  //SCF_EXPORT_CLASS (csClothMeshSaver, "crystalspace.mesh.saver.cloth","Crystal Space General Mesh Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
 // the following function might be unused

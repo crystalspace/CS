@@ -41,6 +41,9 @@ The history order is reversed so that new features are at the top.
 	- res updated some render loop interfaces.
 	- res fixed the light attenuation choices in the Hammer fgd script.
 	- Jorrit forgot to replace a few NULL -> 0.
+	- Eric Sunshine eliminated the unimplemented
+	  crystalspace.mesh.saver.cloth SCF registration from the cloth loader
+	  plugin export table.
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line
