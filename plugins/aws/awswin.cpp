@@ -526,10 +526,18 @@ awsWindow::OnDraw(csRect clip)
 
       }
 
+      
+      int mtw, mth, mxtw, mxth, ctw, cth;
+
+      min_button->GetOriginalDimensions(mtw, mth);
+      max_button->GetOriginalDimensions(mxtw, mxth);
+      close_button->GetOriginalDimensions(ctw, cth);
 
       // Draw min/max/close buttons
-      //g3d->DrawPixmap(min_button, Frame().xmin+4, Frame().ymin+4, 16, 16, 0,0, 16, 16, 0);
-      
+      g3d->DrawPixmap(min_button, Frame().xmax-ctw-mxtw-mtw-8, Frame().ymin+8, mtw, mth, 0,0, mtw, mth, 0);
+      g3d->DrawPixmap(max_button, Frame().xmax-ctw-mxtw-8, Frame().ymin+8, mxtw, mth, 0,0, mxtw, mxth, 0);
+      g3d->DrawPixmap(close_button, Frame().xmax-ctw-6, Frame().ymin+8, ctw, cth, 0,0, ctw, cth, 0);
+           
     } 
     break;
 

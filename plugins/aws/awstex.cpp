@@ -184,13 +184,19 @@ awsTextureManager::GetTexturebyID(unsigned long id, char *filename, bool replace
   }
   else
   {
+    txtmgr->UnregisterTexture(awstxt->tex);
+
     awstxt->img->DecRef();
     awstxt->tex->DecRef();
   }
 
   awstxt->img = ifile;
-  awstxt->tex = txtmgr->RegisterTexture(ifile, CS_TEXTURE_2D);
+  awstxt->tex = txtmgr->RegisterTexture(ifile, CS_TEXTURE_2D | CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS);
   awstxt->id = id;
+
+  // Post load work...
+  awstxt->tex->SetKeyColor(255,0,255);
+  awstxt->tex->Prepare();
 
   textures.Push(awstxt);
 

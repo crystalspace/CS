@@ -184,11 +184,11 @@ awsManager::SetDefaultContext(iEngine* engine, iTextureManager* txtmgr)
     else
       printf("aws-debug: Prepare anim succeeded.\n");
    
-    if (engine!=NULL)
-    {
+//    if (engine!=NULL)
+//    {
 //       iTextureWrapper *tw = engine->GetTextureList()->NewTexture(canvas.GetTextureWrapper()->GetTextureHandle());
 //       iMaterialWrapper *canvasMat = engine->CreateMaterial("awsCanvasMat", tw);
-    }
+//    }
     
     DefaultContextInitialized=true;
   }

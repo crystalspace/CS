@@ -190,8 +190,13 @@ awsPrefManager::SetupPalette()
  
  LookupRGBKey("FillColor", red, green, blue); 
  sys_colors[AC_FILL] = txtmgr->FindRGB(red,green,blue);
+  
+ // Create a slightly darker fill
+ sys_colors[AC_DARKFILL] = txtmgr->FindRGB((red   > GRADIENT_STEP ? red-GRADIENT_STEP   : 0),
+                                           (green > GRADIENT_STEP ? green-GRADIENT_STEP : 0),
+                                           (blue  > GRADIENT_STEP ? blue-GRADIENT_STEP  : 0));
  
- LookupRGBKey("TextForeColor", red, green, blue); 
+  LookupRGBKey("TextForeColor", red, green, blue); 
  sys_colors[AC_TEXTFORE] = txtmgr->FindRGB(red,green,blue);
  
  LookupRGBKey("TextBackColor", red, green, blue); 

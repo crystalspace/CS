@@ -50,7 +50,7 @@ awsCmdButton::OnDraw(csRect clip)
   int hi2   = WindowManager()->GetPrefMgr()->GetColor(AC_HIGHLIGHT2);
   int lo    = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW);
   int lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2);
-  int fill  = WindowManager()->GetPrefMgr()->GetColor(AC_FILL);
+  int dfill = WindowManager()->GetPrefMgr()->GetColor(AC_DARKFILL);
   int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
   
   switch(frame_style)
@@ -71,6 +71,8 @@ awsCmdButton::OnDraw(csRect clip)
       g2d->DrawLine(Frame().xmin+2, Frame().ymin+2, Frame().xmin+2, Frame().ymax-1, black);
       g2d->DrawLine(Frame().xmin+2, Frame().ymax-1, Frame().xmax-1, Frame().ymax-1, hi2);
       g2d->DrawLine(Frame().xmax-1, Frame().ymin+2, Frame().xmax-1, Frame().ymax-1, hi2);
+
+      g2d->DrawBox(Frame().xmin+3, Frame().ymin+3, Frame().Width()-3, Frame().Height()-3, dfill);
     }
     else
     {
