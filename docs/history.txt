@@ -27,6 +27,11 @@ chronological order.
 	  libs/generic/scanplugins.cpp where it was incorrectly copying strings
 	  with csStrNew() before pushing them onto iStringArrays.  iStringArray
 	  makes its own copy, so the manual copy was not needed.
+	- Eric Sunshine removed the following obsolete, unused, unmaintained
+	  and/or buggy modules. To simplify revival of these modules from the
+	  CVS Attic, they have been tagged as indicated.
+	    mdltest --> MDLTEST_OBSOLETE
+	    svgalib --> SVGALIB_OBSOLETE
 9-May-2004
 	- Vincent Knecht made the following changes to cs.spec:
 	    - Added current dir to PATH when invoking jam, so building
@@ -331,7 +336,6 @@ chronological order.
 	    demosky     --> DEMOSKY_OBSOLETE
 	    demosky2    --> DEMOSKY_OBSOLETE
 	    simplecloth --> CLOTH_OBSOLETE
-	    svgalib     --> SVGALIB_OBSOLETE
 	- res added a note about the CS_FX_GOURAUD removal to the API 
 	  modification appendix.
 1-May-2004

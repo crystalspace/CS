@@ -1,5 +1,0 @@
-SubDir TOP apps mdltest ;
-
-Description mdltest : "Model import test" ;
-Application mdltest : [ Wildcard *.cpp *.h ] : noinstall ;
-LinkWith mdltest : csgeom csgfx cstool csutil ;
