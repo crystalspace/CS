@@ -125,8 +125,7 @@ bool csDDSImageFile::Load (dds::Loader* loader)
     csRGBpixel* img = loader->LoadMipmap(i);
     if (!img)
       return false;
-    csRef<csDDSImageFile> image;
-    image.AttachNew(new csDDSImageFile (object_reg, Format));
+    csDDSImageFile* image = new csDDSImageFile (object_reg, Format);
     int newW = loader->GetWidth() >> (i+1);
     newW = MAX(newW, 1);
     int newH = loader->GetHeight() >> (i+1);
