@@ -84,7 +84,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '14';
+my $PROG_VERSION = '15';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000,2001,2002 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -211,7 +211,7 @@ my @TARGETS =
     ({ 'name'   => 'Visual-C++ DSW and DSP files',
        'action' => 'Repairing',
        'make'   => 'msvcgen',
-       'newdir' => 'out/mk/visualc',
+       'newdir' => 'out/mk/msvcgen/visualc',
        'olddir' => 'mk/visualc',
        'log'    => 'Automated Visual-C++ DSW and DSP project file repair.' },
      { 'name'   => 'Texinfo files',
