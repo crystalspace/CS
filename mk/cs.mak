@@ -118,12 +118,12 @@ L^=$(addprefix $(LFLAGS.l),$(subst $(SPACE)$(LIB_PREFIX),$(SPACE),\
   $(basename $(notdir $(filter %$(LIB_SUFFIX),$+)))))
 
 # How to compile a .c source
-DO.COMPILE.C = $(CC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+DO.COMPILE.C = $(DO.CC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a .cpp source
-DO.COMPILE.CPP = $(CXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+DO.COMPILE.CPP = $(DO.CXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a GAS source
 DO.COMPILE.S = \
-  $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+  $(DO.CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a NASM source
 DO.COMPILE.ASM = $(CMD.NASM) $(NASM.@) $(NASMFLAGS) $(<<)
 

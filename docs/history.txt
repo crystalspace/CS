@@ -6,6 +6,38 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Feb-2004
+	- Eric Sunshine augmented the configure.ac Python check so that it can
+	  detect a working Python installation on MacOS/X despite the fact that
+	  the Python link library is missing.  Apparently, the Python
+	  installation on MacOS/X is still using the one-level linker
+	  namespace, which means that undefined symbolic references in
+	  extension modules will be satisfied by the executable itself as the
+	  extensions are loaded, rather than being resolved by a link library.
+	  This allows CS's pure Python `pythmod' extension to work on MacOS/X.
+	  Unfortunately, however, it does not help for the CS plugin `cspython'
+	  since none of the CS Python example programs will be able to link
+	  against the missing link library.
+	- Eric Sunshine augmented cspython/pythmod_setup.py so that it now
+	  accepts additional compiler and linker flags, and so that multiple
+	  library directories can be specified rather than only a single one.
+	  It is also now possible to tell pythmod_setup.py which compiler to
+	  use, rather than hard-coding g++.
+	- Eric Sunshine added "-framework AppKit -framework Foundation" to the
+	  linker flags for the `pythmod' extension to ensure that it can be
+	  loaded on MacOS/X.
+	- Eric Sunshine augmented pythmod_setup.py so that it filters out
+	  "-arch i386" from the linker arguments if present.  This allows the
+	  `pythmod' extension to build cleanly on MacOS/X for PowerPC.
+	- Eric Sunshine fixed problem with Cygwin when linking the `pythmod'
+	  extension where "-lgdi32 -lshell32" appeared in the link statement
+	  before the standard CS libraries (cstool, csutil, etc.).  This
+	  resulted in unresolved symbolic references since the CS libraries
+	  rely upon gdi32 and shell32.
+	- Eric Sunshine sanitized the definitions of CC, CXX, OBJC, and OBJCXX
+	  in the makefile build system so that they no longer contain a
+	  trailing "-c".  This makes these variables more consistent with
+	  like-named variables in makefiles the world over.
 28-Feb-2004
 	- Philip Wyett removed reference to 'include/imesh/thing' dir from
 	  CS spec file.

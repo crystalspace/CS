@@ -42,10 +42,10 @@ include $(SRCDIR)/mk/unix.mak
 .SUFFIXES: .m .mm
 
 # How to compile an Objective-C .m source
-DO.COMPILE.M = $(OBJC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+DO.COMPILE.M = $(DO.OBJC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 
 # How to compile an Objective-C++ .mm source
-DO.COMPILE.MM = $(OBJCXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+DO.COMPILE.MM = $(DO.OBJCXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 
 # Directories containing platform-specific source code.
 MACOSX.SOURCE_PATHS = $(SRCDIR)/libs/csutil/macosx
@@ -158,6 +158,9 @@ STRIP = strip
 
 # We don't need separate directories for dynamic libraries
 OUTSUFX.yes =
+
+# Extra libraries needed for Python cspace module.
+PYTHMOD.LFLAGS.PLATFORM = -framework AppKit -framework Foundation
 
 endif # ifeq ($(MAKESECTION),defines)
 

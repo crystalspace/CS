@@ -116,7 +116,7 @@ SRC.CSPYTHON = $(SWIG.CSPYTHON) $(filter-out \
   $(wildcard $(SRCDIR)/plugins/cscript/cspython/*.cpp))
 endif
 OBJ.CSPYTHON = $(addprefix $(OUT)/, $(notdir $(SRC.CSPYTHON:.cpp=$O)))
-DEP.CSPYTHON = CSTOOL CSGFX CSGEOM CSUTIL CSUTIL
+DEP.CSPYTHON = CSTOOL CSGFX CSGEOM CSUTIL
 
 INC.PYTHMOD =
 SRC.PYTHMOD = $(SRCDIR)/plugins/cscript/cspython/pythmod.cpp $(SWIG.CSPYTHON)
@@ -217,10 +217,17 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 ifeq ($(PYTHON.DISTUTILS),yes)
 $(PYTHMOD): $(SRC.PYTHMOD) $(LIB.PYTHMOD)
 	$(PYTHON) $(SRCDIR)/plugins/cscript/cspython/pythmod_setup.py \
-	$(SWIG.CSPYTHON.OUTDIR) $(SRCDIR) $(SRCDIR)/include ./include $(OUT) \
-	-- $(OUT) $(PYTHMOD.LIBS.PLATFORM) -- build -q \
-	--build-base=$(PYTHMOD.BUILDBASE) install -q \
-	--install-lib=$(PYTHMOD.INSTALLDIR)
+	$(CXX) \
+	$(SWIG.CSPYTHON.OUTDIR) \
+	$(SRCDIR) \
+	$(SRCDIR)/include ./include $(OUT) -- \
+	$(OUT) -- \
+	$(patsubst $(LIB_PREFIX)%,%,$(patsubst %$(LIB_SUFFIX),%, \
+	$(notdir $(LIB.CSPYTHON)))) $(PYTHMOD.LIBS.PLATFORM) -- \
+	$(CFLAGS.SYSTEM.MANDATORY) -- \
+	$(PYTHMOD.LFLAGS.PLATFORM) -- \
+	build -q --build-base=$(PYTHMOD.BUILDBASE) \
+	install -q --install-lib=$(PYTHMOD.INSTALLDIR)
 else
 $(PYTHMOD):
 	@echo $(DESCRIPTION.pythmod)" not supported: distutils not available!"

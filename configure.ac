@@ -163,15 +163,17 @@ AC_CANONICAL_HOST
 # Check for compilers and common tools.
 #------------------------------------------------------------------------------
 AC_PROG_CC
-CS_MAKEFILE_PROPERTY([CC], [$CC -c])
+CS_MAKEFILE_PROPERTY([CC], [$CC])
+CS_MAKEFILE_PROPERTY([DO.CC], [AS_ESCAPE([$(CC) -c])])
 CS_JAMCONFIG_PROPERTY([CMD.CC], [$CC])
 
 AC_PROG_CXX
-CS_MAKEFILE_PROPERTY([CXX], [$CXX -c])
+CS_MAKEFILE_PROPERTY([CXX], [$CXX])
+CS_MAKEFILE_PROPERTY([DO.CXX], [AS_ESCAPE([$(CXX) -c])])
 CS_JAMCONFIG_PROPERTY([CMD.C++], [$CXX])
 
 # C++ compiler is used as linker.
-CS_MAKEFILE_PROPERTY([LINK], [$CXX])
+CS_MAKEFILE_PROPERTY([LINK], [AS_ESCAPE([$(CXX)])])
 CS_JAMCONFIG_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.C++)])])
 
 AS_IF([test $ac_compiler_gnu = yes],
@@ -410,6 +412,118 @@ CS_CHECK_RTLD
 
 
 #------------------------------------------------------------------------------
+# Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
+#
+# CS_CHECK_HOST
+#	Sets the shell variables cs_host_target, cs_host_makefile, and
+#	cs_host_family.  Client code can use these variables to emit
+#	appropriate TARGET and TARGET_MAKEFILE makefile variables, and OS_FOO
+#	header define.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_HOST],
+    [AC_REQUIRE([AC_CANONICAL_HOST])
+    cs_host_os_normalized=''
+    case $host_os in
+	mingw*|cygwin*)
+	    cs_host_target=win32gcc
+	    cs_host_makefile=libs/csutil/win32/win32gcc.mak
+	    cs_host_family=windows
+	    ;;
+	darwin*)
+	    _CS_CHECK_HOST_DARWIN
+	    ;;
+	*)
+	    # Everything else is assumed to be Unix or Unix-like.
+	    cs_host_target=unix
+	    cs_host_makefile=libs/csutil/unix/unix.mak
+	    cs_host_family=unix
+	    ;;
+    esac])
+
+AC_DEFUN([_CS_CHECK_HOST_DARWIN],
+    [AC_REQUIRE([AC_PROG_CC])
+    AC_REQUIRE([AC_PROG_CXX])
+
+    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
+    # a way to distinguish between the two.  If Carbon.h is present, then
+    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
+    # Carbon.h is present, then assume that user wants to cross-build for
+    # Darwin even though build host is MacOS/X.  Implementation note: At least
+    # one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a script
+    # which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP was
+    # being set to run the preprocessor directly ("cpp", for instance) rather
+    # than running it via the compiler ("gcc -E", for instance).  The problem
+    # with running the preprocessor directly is that __APPLE__ and __GNUC__ are
+    # not defined, which causes the Carbon.h check to fail.  We avoid this
+    # problem by supplying a non-empty fourth argument to AC_CHECK_HEADER(),
+    # which causes it to test compile the header only (which is a more robust
+    # test), rather than also testing it via the preprocessor.
+
+    AC_CHECK_HEADER([Carbon/Carbon.h],
+	[cs_host_macosx=yes], [cs_host_macosx=no], [/* force compile */])
+
+    AS_IF([test $cs_host_macosx = yes],
+	[AC_MSG_CHECKING([for --with-x])
+	AS_IF([test "${with_x+set}" = set && test "$with_x" = "yes"],
+	    [AC_MSG_RESULT([yes (assume Darwin)])
+	    cs_host_macosx=no],
+	    [AC_MSG_RESULT([no])])])
+
+    AS_IF([test $cs_host_macosx = yes],
+	[cs_host_target=macosx
+	cs_host_makefile=libs/csutil/macosx/macosx.mak
+	cs_host_family=unix
+	cs_host_os_normalized='MacOS/X'
+
+	CS_HEADER_PROPERTY([OS_MACOSX])
+	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT], [CS_24BIT_PIXEL_ARGB])
+
+	# We assume that we always have CoreAudio available on MacOS/X.
+	CS_JAMCONFIG_PROPERTY([COREAUDIO.AVAILABLE], [yes])
+	CS_JAMCONFIG_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])
+
+	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
+	    [cs_cv_prog_objc="$CC"])
+	CS_MAKEFILE_PROPERTY([OBJC], [$cs_cv_prog_objc -c])
+	CS_MAKEFILE_PROPERTY([DO.OBJC], [AS_ESCAPE([$(OBJC) -c])])
+	CS_JAMCONFIG_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc])
+	AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
+	    [cs_cv_prog_objcxx="$CXX"])
+	CS_MAKEFILE_PROPERTY([OBJCXX], [$cs_cv_prog_objcxx])
+	CS_MAKEFILE_PROPERTY([DO.OBJCXX], [AS_ESCAPE([$(OBJCXX) -c])])
+	CS_JAMCONFIG_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])],
+
+	[cs_host_target=unix
+	cs_host_makefile=libs/csutil/unix/unix.mak
+	cs_host_family=unix])])
+
+CS_CHECK_HOST
+
+case $cs_host_family in
+    windows)
+	CS_HEADER_PROPERTY([OS_WIN32])
+	AS_IF([test -z "$cs_host_os_normalized"],
+	    [cs_host_os_normalized='Win32'])
+	;;
+    unix)
+	CS_HEADER_PROPERTY([OS_UNIX])
+	AS_IF([test -z "$cs_host_os_normalized"],
+	    [cs_host_os_normalized='Unix'])
+	;;
+esac
+
+cs_host_os_normalized_uc="AS_TR_CPP([$cs_host_os_normalized])"
+CS_MAKEFILE_PROPERTY([TARGET], [$cs_host_target])
+CS_MAKEFILE_PROPERTY([TARGET_MAKEFILE], [$cs_host_makefile])
+CS_MAKEFILE_PROPERTY([OS], [$cs_host_os_normalized_uc])
+CS_JAMCONFIG_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
+CS_JAMCONFIG_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized])
+CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
+    [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if Perl SDK is installed and which compiler and linker flags are
 # required to embed Perl.  Also determine if the glue file can be created with
 # ExtUtils::Embed or if it must be created manually.
@@ -613,27 +727,34 @@ for p in sys.path: print p'])`
 		    cs_cv_pybase_libs="$cs_pylibs $cs_pylibm $cs_pylibc"
     		    cs_cv_python_sdk=yes])])])])
     
-    # Check if Python SDK is usable.  Some distributions (such as the one
-    # shipped with MacOS/X Jaguar which is missing the static link library) are
-    # broken.  The most common library name is the basename with a few
-    # decorations (for example, "libpython2.2.a"), however some Windows
-    # libraries lack the decimal point (for example, "libpython22.a" or
-    # "python22.lib"), so we must check for both variations.
     cs_cv_pybase_cflags=CS_PATH_NORMALIZE([$cs_cv_pybase_cflags])
     cs_cv_pybase_cflags=CS_TRIM([$cs_cv_pybase_cflags])
     cs_cv_pybase_lflags=CS_PATH_NORMALIZE([$cs_cv_pybase_lflags])
     cs_cv_pybase_lflags=CS_TRIM([$cs_cv_pybase_lflags])
     cs_cv_pybase_libs=CS_PATH_NORMALIZE([$cs_cv_pybase_libs])
     cs_cv_pybase_libs=CS_TRIM([$cs_cv_pybase_libs])
+
+    # Check if Python SDK is usable.  The most common library name is the
+    # basename with a few decorations (for example, libpython2.2.a), however
+    # some Windows libraries lack the decimal point (for example, libpython22.a
+    # or python22.lib), so we must check for both variations.  Furthermore,
+    # Python on MacOS/X still uses a one-level linker namespace, which means
+    # that loadable Python modules do not link against the Python library;
+    # instead, unresolved symbols in the modules are satisfied by the Python
+    # executable when the module is loaded into the executable.  For this
+    # reason, Python on MacOS/X does not even provide a Python link library.
     AS_IF([test $cs_cv_python_sdk = yes],
-	[cs_pylib1="-l$cs_cv_pybase"
-	cs_pylib2=`echo "-l$cs_cv_pybase" | sed 's/\.//g'`
+	[cs_pywinlib=`echo "$cs_cv_pybase" | sed 's/\.//g'`
+	cs_pytuples="$cs_pytuples CS_CREATE_TUPLE([],[],[-l$cs_cv_pybase])"
+	cs_pytuples="$cs_pytuples CS_CREATE_TUPLE([],[],[-l$cs_pywinlib])"
+	AS_IF([test "$cs_host_macosx" = yes],
+	    [cs_pytuples="$cs_pytuples CS_CREATE_TUPLE(
+		[],[-bundle -flat_namespace -undefined suppress])"])
 	CS_CHECK_BUILD([if python SDK is usable], [cs_cv_python],
 	    [AC_LANG_PROGRAM([[#include <Python.h>]],
 		[Py_Initialize(); Py_Finalize();])],
-	    [CS_CREATE_TUPLE([],[],[$cs_pylib1]) \
-	    CS_CREATE_TUPLE([],[],[$cs_pylib2])],
-	    [], [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
+	    [$cs_pytuples], [],
+	    [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
 	    [$cs_cv_pybase_cflags $cs_cv_sys_pthread_cflags],
 	    [$cs_cv_pybase_lflags $cs_cv_sys_pthread_lflags],
 	    [$cs_cv_pybase_libs   $cs_cv_sys_pthread_libs])])])
@@ -966,116 +1087,6 @@ AS_IF([test $cs_cv_prog_cxx_local_include = yes],
 AS_IF([test -d /usr/local/lib],
     [CS_BUILD_PROPERTY([LFLAGS.SYSTEM], [-L/usr/local/lib], [+])
     LDFLAGS="$LDFLAGS -L/usr/local/lib"])
-
-
-
-#------------------------------------------------------------------------------
-# Determine host platform.  Recognized families: Unix, Windows, MacOS/X.
-#
-# CS_CHECK_HOST
-#	Sets the shell variables cs_host_target, cs_host_makefile, and
-#	cs_host_family.  Client code can use these variables to emit
-#	appropriate TARGET and TARGET_MAKEFILE makefile variables, and OS_FOO
-#	header define.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_HOST],
-    [AC_REQUIRE([AC_CANONICAL_HOST])
-    cs_host_os_normalized=''
-    case $host_os in
-	mingw*|cygwin*)
-	    cs_host_target=win32gcc
-	    cs_host_makefile=libs/csutil/win32/win32gcc.mak
-	    cs_host_family=windows
-	    ;;
-	darwin*)
-	    _CS_CHECK_HOST_DARWIN
-	    ;;
-	*)
-	    # Everything else is assumed to be Unix or Unix-like.
-	    cs_host_target=unix
-	    cs_host_makefile=libs/csutil/unix/unix.mak
-	    cs_host_family=unix
-	    ;;
-    esac])
-
-AC_DEFUN([_CS_CHECK_HOST_DARWIN],
-    [AC_REQUIRE([AC_PROG_CC])
-    AC_REQUIRE([AC_PROG_CXX])
-
-    # Both MacOS/X and Darwin are identified via $host_os as "darwin".  We need
-    # a way to distinguish between the two.  If Carbon.h is present, then
-    # assume MacOX/S; if not, assume Darwin.  If --with-x=yes was invoked, and
-    # Carbon.h is present, then assume that user wants to cross-build for
-    # Darwin even though build host is MacOS/X.  Implementation note: At least
-    # one MacOS/X user switches between gcc 2.95 and gcc 3.3 with a script
-    # which toggles the values of CC, CXX, and CPP.  Unfortunately, CPP was
-    # being set to run the preprocessor directly ("cpp", for instance) rather
-    # than running it via the compiler ("gcc -E", for instance).  The problem
-    # with running the preprocessor directly is that __APPLE__ and __GNUC__ are
-    # not defined, which causes the Carbon.h check to fail.  We avoid this
-    # problem by supplying a non-empty fourth argument to AC_CHECK_HEADER(),
-    # which causes it to test compile the header only (which is a more robust
-    # test), rather than also testing it via the preprocessor.
-
-    AC_CHECK_HEADER([Carbon/Carbon.h],
-	[cs_host_macosx=yes], [cs_host_macosx=no], [/* force compile */])
-
-    AS_IF([test $cs_host_macosx = yes],
-	[AC_MSG_CHECKING([for --with-x])
-	AS_IF([test "${with_x+set}" = set && test "$with_x" = "yes"],
-	    [AC_MSG_RESULT([yes (assume Darwin)])
-	    cs_host_macosx=no],
-	    [AC_MSG_RESULT([no])])])
-
-    AS_IF([test $cs_host_macosx = yes],
-	[cs_host_target=macosx
-	cs_host_makefile=libs/csutil/macosx/macosx.mak
-	cs_host_family=unix
-	cs_host_os_normalized='MacOS/X'
-
-	CS_HEADER_PROPERTY([OS_MACOSX])
-	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT], [CS_24BIT_PIXEL_ARGB])
-
-	# We assume that we always have CoreAudio available on MacOS/X.
-	CS_JAMCONFIG_PROPERTY([COREAUDIO.AVAILABLE], [yes])
-	CS_JAMCONFIG_PROPERTY([COREAUDIO.LFLAGS], [-framework CoreAudio])
-
-	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
-	    [cs_cv_prog_objc="$CC"])
-	CS_MAKEFILE_PROPERTY([OBJC], [$cs_cv_prog_objc -c])
-	CS_JAMCONFIG_PROPERTY([CMD.OBJC], [$cs_cv_prog_objc])
-	AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
-	    [cs_cv_prog_objcxx="$CXX"])
-	CS_MAKEFILE_PROPERTY([OBJCXX], [$cs_cv_prog_objcxx -c])
-	CS_JAMCONFIG_PROPERTY([CMD.OBJC++], [$cs_cv_prog_objcxx])],
-
-	[cs_host_target=unix
-	cs_host_makefile=libs/csutil/unix/unix.mak
-	cs_host_family=unix])])
-
-CS_CHECK_HOST
-
-case $cs_host_family in
-    windows)
-	CS_HEADER_PROPERTY([OS_WIN32])
-	AS_IF([test -z "$cs_host_os_normalized"],
-	    [cs_host_os_normalized='Win32'])
-	;;
-    unix)
-	CS_HEADER_PROPERTY([OS_UNIX])
-	AS_IF([test -z "$cs_host_os_normalized"],
-	    [cs_host_os_normalized='Unix'])
-	;;
-esac
-
-cs_host_os_normalized_uc="AS_TR_CPP([$cs_host_os_normalized])"
-CS_MAKEFILE_PROPERTY([TARGET], [$cs_host_target])
-CS_MAKEFILE_PROPERTY([TARGET_MAKEFILE], [$cs_host_makefile])
-CS_MAKEFILE_PROPERTY([OS], [$cs_host_os_normalized_uc])
-CS_JAMCONFIG_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
-CS_JAMCONFIG_PROPERTY([TARGET.OS.NORMALIZED], [$cs_host_os_normalized])
-CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
-    [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
 
 
