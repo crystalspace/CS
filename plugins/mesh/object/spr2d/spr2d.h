@@ -99,7 +99,7 @@ public:
   class Sprite2DState : public iSprite2DState
   {
     DECLARE_EMBEDDED_IBASE (csSprite2DMeshObject);
-    virtual void SetLighting (bool l) { scfParent->lighting = l; }
+    virtual void SetLighting (bool l) { scfParent->initialized = false; scfParent->lighting = l; }
     virtual bool HasLighting () { return scfParent->lighting; }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
