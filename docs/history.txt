@@ -1,30 +1,32 @@
 The history order is reversed so that new features are at the top.
 
 21-Feb-2003
-	- Wyatt Miler suggested a work around for what seems to be a
-	  gcc 3.1 compiler bug which triggers on MacOS/X (PowerPC) in
-	  the tiny XML parser.
-	- Fixed a bug in iEngine->GetNearbyObjects(). This bug could cause
-	  infinite loops in cases where there is a portal from A->B and
-	  then another portal back from B->A which is also visible from
-	  the viewpoint of the center.
-        - Philip Wyett fixed map2cs dependacy problem which lead to link
-          errors under MSVC 6. He also removed ddraw8 canvas from win32gcc
-          build process.
+	- Wyatt Miler suggested a work around for what seems to be a gcc 3.1
+	  compiler bug which triggers on MacOS/X (PowerPC) in the tiny XML
+	  parser.
+	- Fixed a bug in iEngine->GetNearbyObjects().  This bug could cause
+	  infinite loops in cases where there is a portal from A->B and then
+	  another portal back from B->A which is also visible from the
+	  viewpoint of the center.
+        - Philip Wyett fixed map2cs dependacy problem which lead to link errors
+	  under MSVC 6.  He also removed ddraw8 canvas from win32gcc build
+	  process.
+	- Eric Sunshine augmented the configure script so that it uses libm.a
+	  (if available) when testing for GLU, since apparently some GLU tests
+	  (such as RedHat 8.0) fail without it.
 19-Feb-2003
 	- Fixed a memory leak in the OpenGL renderer.
 18-Feb-2003
 	- Eric Sunshine applied Matze's fix for TO_INSTALL.CONFIG in demo.mak
 	  to the 0.96 branch.
-	- Light ID's are now MD5 keys instead of simple numbers. This is
-	  done to solve a bug with multiple regions and light id's not
-	  matching with the cached light id's in the lightmap cache.
-	  This fixes a bug with pseudo-dynamic lights not working if they
-	  are loaded differently from when they were loading at relighting
-	  time.
+	- Light ID's are now MD5 keys instead of simple numbers.  This is done
+	  to solve a bug with multiple regions and light id's not matching with
+	  the cached light id's in the lightmap cache.  This fixes a bug with
+	  pseudo-dynamic lights not working if they are loaded differently from
+	  when they were loading at relighting time.
 	- Changed iEngine->FindLight(id) to iEngine->FindLightID().
-	- Changed the engine so it now reports the first 4 objects for which
-	  it couldn't load lighting.
+	- Changed the engine so it now reports the first 4 objects for which it
+	  couldn't load lighting.
 17-Feb-2003
 	- Christian Bayle made debian package build ok, but it remains some
 	  problems with csdemo that is not installed by make install and

@@ -6809,9 +6809,9 @@ echo "${ECHO_T}$ac_cv_lib_m_pow" >&6
 if test $ac_cv_lib_m_pow = yes; then
   cs_makefile_text="${cs_makefile_text}LIBS.EXE += -lm
 "
-	cs_cv_libm=yes
+	cs_cv_libm=yes cs_cv_libm_libs='-lm'
 else
-  cs_cv_libm=no
+  cs_cv_libm=no cs_cv_libm_libs=''
 fi
 
     echo "$as_me:$LINENO: checking for dlopen in -ldl" >&5
@@ -9547,6 +9547,7 @@ done
 
 
 
+
     echo "$as_me:$LINENO: checking for int32" >&5
 echo $ECHO_N "checking for int32... $ECHO_C" >&6
 if test "${ac_cv_type_int32+set}" = set; then
@@ -9661,6 +9662,12 @@ done
 cs_gl_plat_cflags=''
 cs_gl_plat_lflags=''
 cs_gl_plat_libs=''
+if test $cs_cv_libm = yes; then
+  cs_gl_plat_cflags="$cs_cv_libm_cflags $cs_gl_plat_cflags"
+    cs_gl_plat_lflags="$cs_cv_libm_lflags $cs_gl_plat_lflags"
+    cs_gl_plat_libs="$cs_cv_libm_libs $cs_gl_plat_libs"
+fi
+
 if test $cs_cv_sys_pthread = yes; then
   cs_gl_plat_cflags="$cs_cv_sys_pthread_cflags $cs_gl_plat_cflags"
     cs_gl_plat_lflags="$cs_cv_sys_pthread_lflags $cs_gl_plat_lflags"
@@ -14839,12 +14846,6 @@ fi
 
 
 
-    if test $cs_cv_libm = yes; then
-  cs_3ds_libs_test='-lm'
-else
-  cs_3ds_libs_test=''
-fi
-
 
 
 # Check whether --with-lib3ds or --without-lib3ds was given.
@@ -15043,7 +15044,7 @@ fi
 
 	CFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_3ds_libs_test $cs_libs_save"
+	LIBS="$cs_libs_test $cs_cv_libm_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -15094,7 +15095,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_3ds_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libm_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_lib3ds=yes
 		cs_cv_lib3ds_cflags=$cs_build_cflags
 		cs_cv_lib3ds_lflags=$cs_build_lflags
@@ -15178,7 +15179,7 @@ fi
 
 	CFLAGS="$cs_cflags_test  $cs_cflags_save"
 	LDFLAGS="$cs_lflags_test  $cs_lflags_save"
-	LIBS="$cs_libs_test $cs_3ds_libs_test $cs_libs_save"
+	LIBS="$cs_libs_test $cs_cv_libm_libs $cs_libs_save"
 	cat >conftest.$ac_ext <<_ACEOF
 #line $LINENO "configure"
 /* confdefs.h.  */
@@ -15229,7 +15230,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     if test $cs_build_ok = yes; then
   cs_build_cflags=`echo x$cs_cflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_build_lflags=`echo x$cs_lflags_test  | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
-	cs_build_libs=`echo x$cs_libs_test $cs_3ds_libs_test | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
+	cs_build_libs=`echo x$cs_libs_test $cs_cv_libm_libs | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`
 	cs_cv_lib3ds=yes
 		cs_cv_lib3ds_cflags=$cs_build_cflags
 		cs_cv_lib3ds_lflags=$cs_build_lflags
@@ -16326,6 +16327,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'` \
+    `echo @@@-lalut -lopenal -ldsound | sed 'y% %#%'` \
+    `echo @@@-lalut -lopenal | sed 'y% %#%'` \
     `echo @@@-lopenal -ldsound | sed 'y% %#%'` \
     `echo @@@-lopenal | sed 'y% %#%'`
     do
@@ -16471,6 +16474,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'` \
+    `echo @@@-lalut -lopenal -ldsound | sed 'y% %#%'` \
+    `echo @@@-lalut -lopenal | sed 'y% %#%'` \
     `echo @@@-lopenal -ldsound | sed 'y% %#%'` \
     `echo @@@-lopenal | sed 'y% %#%'`
     do
