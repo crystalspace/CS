@@ -159,7 +159,7 @@ csFrustumVis::~csFrustumVis ()
 {
   while (visobj_vector.Length () > 0)
   {
-    csFrustVisObjectWrapper* visobj_wrap = visobj_vector[0];
+    csFrustVisObjectWrapper* visobj_wrap = visobj_vector.Pop ();
     iVisibilityObject* visobj = visobj_wrap->visobj;
     visobj->GetObjectModel ()->RemoveListener (
 		      (iObjectModelListener*)visobj_wrap);
@@ -167,7 +167,6 @@ csFrustumVis::~csFrustumVis ()
     movable->RemoveListener ((iMovableListener*)visobj_wrap);
     kdtree->RemoveObject (visobj_wrap->child);
     visobj->DecRef ();
-    visobj_vector.DeleteIndex (0);
   }
   delete kdtree;
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
@@ -286,7 +285,7 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
       // To easily recognize that the vis wrapper has been deleted:
       visobj_wrap->frustvis = (csFrustumVis*)0xdeadbeef;
 #endif
-      visobj_vector.DeleteIndex (i);
+      visobj_vector.DeleteIndexFast (i);
       return;
     }
   }

@@ -598,7 +598,7 @@ void csSoftwareTextureManager::UnregisterTexture (
 		csSoftwareTextureHandle* handle)
 {
   int idx = textures.Find (handle);
-  if (idx >= 0) textures.DeleteIndex (idx);
+  if (idx >= 0) textures.DeleteIndexFast (idx);
 }
 
 csPtr<iSuperLightmap> csSoftwareTextureManager::CreateSuperLightmap (

@@ -260,7 +260,7 @@ csPtr<iTextureHandle> csTextureManagerNull::RegisterTexture (iImageVector *image
 void csTextureManagerNull::UnregisterTexture (csTextureHandleNull* handle)
 {
   int idx = textures.Find (handle);
-  if (idx >= 0) textures.DeleteIndex (idx);
+  if (idx >= 0) textures.DeleteIndexFast (idx);
 }
 
 csPtr<iSuperLightmap> csTextureManagerNull::CreateSuperLightmap (int w, int h)

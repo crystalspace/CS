@@ -183,7 +183,7 @@ bool csGenmeshAnimationControl::UpdateAnimation (csTicks current)
         mod = true;
       if (stop)
       {
-        running_scripts.DeleteIndex (i);
+        running_scripts.DeleteIndexFast (i);
       }
     }
   }

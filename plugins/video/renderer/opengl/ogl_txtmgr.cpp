@@ -869,7 +869,7 @@ csPtr<iTextureHandle> csTextureManagerOpenGL::RegisterTexture (
 void csTextureManagerOpenGL::UnregisterTexture (csTextureHandleOpenGL *handle)
 {
   int idx = textures.Find (handle);
-  if (idx >= 0) textures.DeleteIndex (idx);
+  if (idx >= 0) textures.DeleteIndexFast (idx);
 }
 
 void csTextureManagerOpenGL::Clear ()

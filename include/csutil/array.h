@@ -871,6 +871,28 @@ public:
   }
 
   /**
+   * Delete element number 'n' from vector.
+   * This is a special version of DeleteIndex() that doesn't
+   * preserve the order of the elements that remain. This is
+   * a lot faster for big arrays though.
+   */
+  bool DeleteIndexFast (size_t n)
+  {
+    if (n < count)
+    {
+      size_t const ncount = count - 1;
+      size_t const nmove = ncount - n;
+      ElementHandler::Destroy (root + n);
+      if (nmove > 0)
+        MemoryAllocator::MemMove (root, n, ncount, 1);
+      SetLengthUnsafe (ncount);
+      return true;
+    }
+    else
+      return false;
+  }
+
+  /**
    * Delete a given range (inclusive). This routine will clamp start and end
    * to the size of the array.
    */
@@ -898,6 +920,20 @@ public:
     size_t const n = Find (item);
     if (n != csArrayItemNotFound)
       return DeleteIndex (n);
+    return false;
+  }
+
+  /**
+   * Delete the given element from vector.
+   * This is a special version of Delete() that doesn't
+   * preserve the order of the elements that remain. This is
+   * a lot faster for big arrays though.
+   */
+  bool DeleteFast (T const& item)
+  {
+    size_t const n = Find (item);
+    if (n != csArrayItemNotFound)
+      return DeleteIndexFast (n);
     return false;
   }
 

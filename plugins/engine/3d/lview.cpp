@@ -224,7 +224,7 @@ csFrustum *csShadowBlock::AddShadow (
 
 void csShadowBlock::UnlinkShadow (int idx)
 {
-  shadows.DeleteIndex (idx);
+  shadows.DeleteIndexFast (idx);
   bbox_valid = false;
 }
 

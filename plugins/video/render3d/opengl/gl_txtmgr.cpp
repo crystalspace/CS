@@ -1218,7 +1218,7 @@ void csGLTextureManager::Clear()
 void csGLTextureManager::UnregisterMaterial (csGLMaterialHandle* handle)
 {
   int idx = materials.Find (handle);
-  if (idx >= 0) materials.DeleteIndex (idx);
+  if (idx >= 0) materials.DeleteIndexFast (idx);
 }
 
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)

@@ -387,8 +387,10 @@ const csArray<csParticlesData> *csODEParticlePhysics::RegisterParticles (iPartic
 
 void csODEParticlePhysics::RemoveParticles (iParticlesObjectState *particles)
 {
-  for (size_t i = 0; i < partobjects.Length(); i ++) {
-    if (partobjects[i].particles == particles) {
+  for (size_t i = 0; i < partobjects.Length(); i ++)
+  {
+    if (partobjects[i].particles == particles)
+    {
       partobjects[i].bodies.SetLength (0);
       dyn->RemoveSystem (partobjects[i].dynsys);
       partobjects.DeleteIndex (i);

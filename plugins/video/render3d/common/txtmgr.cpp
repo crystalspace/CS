@@ -361,7 +361,7 @@ csPtr<iMaterialHandle> csTextureManager::RegisterMaterial (
 void csTextureManager::UnregisterMaterial (csMaterialHandle* handle)
 {
   size_t idx = materials.Find (handle);
-  if (idx != csArrayItemNotFound) materials.DeleteIndex (idx);
+  if (idx != csArrayItemNotFound) materials.DeleteIndexFast (idx);
 }
 
 void csTextureManager::FreeMaterials ()

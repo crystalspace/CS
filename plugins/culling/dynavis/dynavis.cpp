@@ -227,7 +227,7 @@ csDynaVis::~csDynaVis ()
 {
   while (visobj_vector.Length () > 0)
   {
-    csVisibilityObjectWrapper* visobj_wrap = visobj_vector[0];
+    csVisibilityObjectWrapper* visobj_wrap = visobj_vector.Pop ();
     iVisibilityObject* visobj = visobj_wrap->visobj;
     visobj_wrap->model->GetModel ()->RemoveListener (
 		      (iObjectModelListener*)visobj_wrap);
@@ -236,7 +236,6 @@ csDynaVis::~csDynaVis ()
     model_mgr->ReleaseObjectModel (visobj_wrap->model);
     kdtree->RemoveObject (visobj_wrap->child);
     visobj->DecRef ();
-    visobj_vector.DeleteIndex (0);
     visobj_wrappers.Free (visobj_wrap);
   }
   delete kdtree;
@@ -436,7 +435,7 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       // To easily recognize that the vis wrapper has been deleted:
       visobj_wrap->dynavis = (csDynaVis*)0xdeadbeef;
 #endif
-      visobj_vector.DeleteIndex (i);
+      visobj_vector.DeleteIndexFast (i);
       visobj_wrappers.Free (visobj_wrap);
       return;
     }
