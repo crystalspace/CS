@@ -27,7 +27,7 @@ Short-term cleanups that need to be done:
 	  compiles on NextStep.
 	- Eric Sunshine updated many out-of-date documents in the 'docs'
 	  directory.  He also renamed a number of documents in order to
-	  achieve better naming consistency.
+	  achieve a more sensible organization and better naming consistency.
 	- Split polygon.cpp into polygon.cpp and pol2d.cpp.
 	- Fixed memory debugger again. It had unneeded depencies on the
 	  system stuff.
@@ -45,13 +45,15 @@ Short-term cleanups that need to be done:
 	  calculations and csWorld::DrawFunc().
 	- Everything seems to work well. Here is the list of currently known
 	  bugs (in the c-buffer/bsp system):
-	  	- A crash at exit when deallocating a csPolygon3D.
-		- Edge display does not work correctly when c-buffer is enabled.
-		- Space warping portals still have problems with c-buffer.
-		- There are still cases that drawing with the BSP tree gives
-		  incorrect results. Very rare though.
-		- The falling blocks in Blocks are not correctly lighted
-		  anymore.
+	    - A crash at exit when deallocating a csPolygon3D.
+	    - Edge display does not work correctly when c-buffer is enabled.
+	    - Space warping portals still have problems with c-buffer.
+	    - There are still cases that drawing with the BSP tree gives
+	      incorrect results.  Very rare though.
+	    - The falling blocks in Blocks are not correctly lighted anymore.
+	- Eric Sunshine moved the MacOS/X Server MAKE_VOLATILE_H bug fix out
+	  of Makefile and into macosxs.mak, thus localizing the bug fix and
+	  simplifying the configuration phase for other platforms.
 9-Aug-1999
 	- Changed merged things (static_thing) so that the original things
 	  are removed instead of kept in memory for no useful purpose.
