@@ -28,7 +28,17 @@
 #include "iengine/movable.h"
 #include "iengine/skelbone.h"
 #include "iutil/comp.h"
+
+#define int8 ode_int8
+#define uint8 ode_uint8
+#define int32 ode_int32
+#define uint32 ode_uint32
 #include "ode/ode.h"
+#undef ode_uint32
+#undef ode_int32
+#undef ode_uint8
+#undef ode_int8
+
 #include "ivaria/dynamics.h"
 
 struct iObjectRegistry;
