@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+20-Nov-2002
+	- Fixed csVfsCacheManager so it no longer tries to use 'scope' if
+	  that is NULL. This has an effect on 'precalc_info' which will now
+	  be placed in that file instead of in '(null)'.
 19-Nov-2002
 	- 'genmesh' objects now also cast shadows (they don't receive
 	  shadows yet). Generalized the shadow casting system in the engine
