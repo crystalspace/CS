@@ -4,6 +4,9 @@ The history order is reversed so that new features are at the top.
 	- 'reverse_action' in 3D sprites was not initialized to false.
 	- Fixed odedynam plugin so it compiles again.
 	- Fixed ie3ds plugin so it compiles again.
+	- Eric Sunshine removed the -ggdb check from configure.ac since it
+	  breaks the MacOS/X Jaguar port (assembler barfs on generated
+	  assembly), and it wasn't really used/needed anyhow.
 15-Jan-2003
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:

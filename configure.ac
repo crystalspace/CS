@@ -1023,11 +1023,6 @@ CS_MAKEFILE_BUILD_FLAGS([how to enable compiler debug output],
 AS_IF([test $cs_cv_prog_cxx_debug != no],
     [CS_MAKEFILE_PROPERTY([LFLAGS.debug], [$cs_cv_prog_cxx_debug], [+])])
 
-CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -ggdb], [cs_cv_prog_cxx_debug_gdb],
-    [CS_CREATE_TUPLE([-ggdb])], [C++], [CFLAGS.debug], [+])
-AS_IF([test $cs_cv_prog_cxx_debug_gdb != no],
-    [CS_MAKEFILE_PROPERTY([LFLAGS.debug], [$cs_cv_prog_cxx_debug_gdb], [+])])
-
 
 
 #------------------------------------------------------------------------------
