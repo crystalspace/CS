@@ -238,6 +238,8 @@ bool csOpenGLProcSoftware::Prepare
     last->next_soft_tex = this;
   }
 
+  SysPrintf (MSG_STDOUT, 
+	     "Successfully initialised GL software procedural texture\n");
   return true;
 }
 

@@ -806,7 +806,7 @@ void csTextureManagerSoftware::UnRegister8BitCanvas (iGraphics2D* g2d8bit)
   	if (last->next->g2d == g2d8bit)
 	{
   	  dead = last->next;
-  	  last->next = last->next->next;
+  	  last->next = dead->next;
   	  delete dead;
   	  break;
   	}

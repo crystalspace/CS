@@ -150,18 +150,11 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
       destroy_memory = true;
       Memory = new unsigned char[width*height*4];
       image_buffer = (RGBPixel*) buffer;
-      ULong red, green, blue, total;
       ULong *dst = (ULong*) Memory;
       for (int i = 0; i < width*height; i++, dst++)
-      {
-	red = image_buffer[i].red << pfmt.RedShift;
-	green = image_buffer[i].green << pfmt.GreenShift;
-	blue = image_buffer[i].blue << pfmt.BlueShift;
-	total = red + green + blue;
 	*dst = (image_buffer[i].red << pfmt.RedShift) +
 	  (image_buffer[i].green << pfmt.GreenShift) +
 	  (image_buffer[i].blue << pfmt.BlueShift);
-      }
     }
   }
 

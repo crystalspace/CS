@@ -28,6 +28,8 @@ IMPLEMENT_IBASE (csOpenGLProcBackBuffer)
   IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END;
 
+#define SysPrintf System->Printf
+
 extern void csglBindTexture (GLenum target, GLuint handle);
 
 csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
@@ -36,8 +38,6 @@ csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
   CONSTRUCT_IBASE (parent);
   tex_mm = NULL; 
   g3d = NULL;
-  System = NULL;
-
   rstate_bilinearmap = false;
 }
 
@@ -65,6 +65,8 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
   persistent = bpersistent;
   this->g3d = g3d;
   this->tex_mm = tex_mm;
+  System = g3d->System;
+  System->IncRef ();
   g2d = g3d->GetDriver2D ();
 
   tex_mm->GetMipMapDimensions(0, width, height);
@@ -93,9 +95,12 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
   else
   {
     // need to test this.
-    buffer = new char[width*height*3];
+    buffer = new char[width*height*4];
     memset (buffer, 0, sizeof(char)*width*height*3);
   }
+
+  SysPrintf (MSG_STDOUT, 
+	     "Successfully initialised GL backbuffer procedural texture\n");
 }
 
 bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
@@ -173,17 +178,18 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
   {
     glBegin (GL_QUADS);
     glTexCoord2i (0, 1);
-    glVertex3i (0, 0, 10);
+    glVertex3i (0, 0, 0);
 
     glTexCoord2i (1, 1);
-    glVertex3i (width,0, 10);
+    glVertex3i (width,0, 0);
 
     glTexCoord2i (1, 0);
-    glVertex3i (width, height, 10);
+    glVertex3i (width, height, 0);
 
     glTexCoord2i (0, 0);
-    glVertex3i (0, height, 10);
+    glVertex3i (0, height, 0);
     glEnd ();
+    glFlush ();
   }
 
   DrawMode = DrawFlags;
@@ -239,7 +245,6 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
   else
   {
     // Not in cache.
-
     if (pfmt.PixelBytes == 2)
     {
 
@@ -248,21 +253,21 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
 		    buffer);
 
       RGBPixel *dst = tex_0->get_image_data();
+      UShort bb = 8 - pfmt.BlueBits;
+      UShort gb = 8 - pfmt.GreenBits;
+      UShort rb = 8 - pfmt.RedBits;
       UShort *src = (UShort*) buffer;
       for (int i = 0; i < width*height; i++, src++, dst++)
       {
-	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << (8 - pfmt.RedBits);
-	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) 
-					     << (8 - pfmt.GreenBits);
-	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) 
-					   << (8 - pfmt.BlueBits); 
+	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
+	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
+	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb; 
       }
 #endif
     }
     else
-
       glReadPixels (0, 0, width, height,
-		    GL_RGB, GL_UNSIGNED_BYTE, tex_0->get_image_data());
+		    GL_RGBA, GL_UNSIGNED_BYTE, tex_0->get_image_data());
   }
 }
 
@@ -274,6 +279,7 @@ float csOpenGLProcBackBuffer::GetZBuffValue (int x, int y)
   // glOrtho. Where 0.090834 comes from, I don't know
   return (0.090834 / (zvalue - (0.090909)));
 }
+
 //---------------------------------------------------------------------------
 // Dummy iGraphics2D
 //---------------------------------------------------------------------------

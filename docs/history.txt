@@ -1,6 +1,10 @@
 The history order has been reversed so that new features are at the top.
 10-Jul-2000
 	- Samuel did the following changes:
+            - Added messages to distinguish between backbuffer and software GL
+              implementations
+            - Cleared out debugging junk I left in.
+            - Adjusted Zbuffer clear...
             - Added new Clear (RGBPixel &colour) function to csImageMemory. This 
               clears the image to the specified colour.
 	    - Implemented new procedural texture flag: CS_TEXTURE_PROC_PERSISTENT
