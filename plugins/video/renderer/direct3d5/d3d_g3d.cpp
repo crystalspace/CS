@@ -1067,8 +1067,8 @@ void csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
   {
     VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE),  DD_OK);
     VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC, D3DCMP_LESSEQUAL), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA), DD_OK); 
-    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA), DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCALPHA), DD_OK); 
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_SRCALPHA), DD_OK);
     VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, 0), DD_OK);
 
     VERIFY_RESULT(m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK);
@@ -1089,14 +1089,27 @@ void csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
 
       vx.rhw = 1/z;
       
-      
-      float I = 1.0f-poly.fog_info[i].intensity;
+      float I = poly.fog_info[i].intensity; 
+      float r = poly.fog_info[i].r; 
+      float g = poly.fog_info[i].g; 
+      float b = poly.fog_info[i].b; 
 
-      if (I<0.01f) I=0.01f; //Workaround for a bug, at least in the RivaTNT drivers.
+      if (I > 1.0) 
+      {
+        I = 1.0;
+      }
 
-      float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
-      float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
-      float b = poly.fog_info[i].b > 1.0f ? 1.0f : poly.fog_info[i].b;
+      if (r>1.0f || g>1.0f || b>1.0f)
+      {
+        float      max = r;
+        if (g>max) max = g;
+        if (b>max) max = b;
+
+        float f = 1/max;
+        r *= f;
+        g *= f;
+        b *= f;
+      }
 
       vx.color    = D3DRGBA(r, g, b, I);
       vx.specular = 0;
@@ -1129,7 +1142,11 @@ void csGraphics3DDirect3DDx5::StartPolygonFX (iTextureHandle* handle,
   UInt mode)
 {
   ASSERT(handle);
-  float alpha = float (mode & CS_FX_MASK_ALPHA) / 255.;
+  
+  //In the Crystal Space DirectX renderer, we handle Alpha differently: 0.0 is transparent, and
+  //1.0 opaque. It looks like this is more close to the way DirectX will internall handle Alpha 
+  //transparency.
+  float alpha = float (255 - (mode & CS_FX_MASK_ALPHA)) / 255.;
   m_gouraud = rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
   m_alpha   = alpha;
@@ -1155,26 +1172,26 @@ void csGraphics3DDirect3DDx5::StartPolygonFX (iTextureHandle* handle,
   {
     case CS_FX_MULTIPLY:
       //Color = SRC * DEST +   0 * SRC = DEST * SRC
-      m_alpha = 0.0f;
+      m_alpha = 1.0f;
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK);
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ZERO), DD_OK);
       break;
     case CS_FX_MULTIPLY2:
       //Color = SRC * DEST + DEST * SRC = 2 * DEST * SRC
-      m_alpha = 0.0f;
+      m_alpha = 1.0f;
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCCOLOR), DD_OK); 
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR), DD_OK);
       break;
     case CS_FX_ADD:
       //Color = 1 * DEST + 1 * SRC = DEST + SRC
-      m_alpha = 0.0f;
+      m_alpha = 1.0f;
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE), DD_OK); 
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE), DD_OK);
       break;
     case CS_FX_ALPHA:
       //Color = Alpha * DEST + (1-Alpha) * SRC 
-      VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA), DD_OK); 
-      VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_INVSRCALPHA), DD_OK);
+      VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_INVSRCALPHA), DD_OK); 
+      VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_SRCALPHA),    DD_OK);
       break;
     case CS_FX_TRANSPARENT:
       //Color = 1 * DEST + 0 * SRC = DEST
@@ -1184,18 +1201,10 @@ void csGraphics3DDirect3DDx5::StartPolygonFX (iTextureHandle* handle,
     case CS_FX_COPY:
     default:
       //Color = 0 * DEST + 1 * SRC = SRC
-      m_alpha = 0.0f;
+      m_alpha = 1.0f;
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ZERO), DD_OK); 
       VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_ONE), DD_OK);
       break;
-  }
-
-  if (m_alpha == 0.0f && (m_mixmode & CS_FX_MASK_MIXMODE) == CS_FX_ALPHA)
-  {
-    // workaround for a bug in alpha transparency. It looks like on some cards
-    // you may not select alpha == 0, (opaque) because that will make
-    // the result invisible. :-(
-    m_alpha = 0.01f; 
   }
 
   VERIFY_RESULT (m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE, ((D3DTextureCache_Data *)pTexData->pData)->htex), DD_OK);
@@ -1259,8 +1268,8 @@ void csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly)
    
     VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE),  DD_OK);
     VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ZFUNC,            D3DCMP_LESSEQUAL), DD_OK);
-    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,        D3DBLEND_SRCALPHA), DD_OK); 
-    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,         D3DBLEND_INVSRCALPHA), DD_OK);
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND,        D3DBLEND_INVSRCALPHA), DD_OK); 
+    VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,         D3DBLEND_SRCALPHA), DD_OK);
     VERIFY_RESULT(m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_TEXTUREHANDLE,    0), DD_OK);
 
     VERIFY_RESULT( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS), DD_OK );
@@ -1272,16 +1281,29 @@ void csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly)
       vx.sz = SCALE_FACTOR / poly.vertices[i].z;
       vx.rhw = poly.vertices[i].z;
 
-      float I = 1.0f-poly.fog_info[i].intensity;
+      float I = poly.fog_info[i].intensity; 
+      float r = poly.fog_info[i].r; 
+      float g = poly.fog_info[i].g; 
+      float b = poly.fog_info[i].b; 
 
-      if (I<0.01f) I=0.01f; //Workaround for a bug, at least in the RivaTNT drivers.
+      if (I > 1.0) 
+      {
+        I = 1.0;
+      }
 
-      float r = poly.fog_info[i].r > 1.0f ? 1.0f : poly.fog_info[i].r;
-      float g = poly.fog_info[i].g > 1.0f ? 1.0f : poly.fog_info[i].g;
-      float b = poly.fog_info[i].b > 1.0f ? 1.0f : poly.fog_info[i].b;
+      if (r>1.0f || g>1.0f || b>1.0f)
+      {
+        float      max = r;
+        if (g>max) max = g;
+        if (b>max) max = b;
+
+        float f = 1/max;
+        r *= f;
+        g *= f;
+        b *= f;
+      }
 
       vx.color    = D3DRGBA(r, g, b, I);
-
       vx.specular = D3DRGB(0.0, 0.0, 0.0);
       vx.tu = poly.vertices[i].u;
       vx.tv = poly.vertices[i].v;
