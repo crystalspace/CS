@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+14-Nov-2000
+	- Eric Sunshine eliminated the obsolete crystalspace.sound.driver.null
+	  entry from scf.cfg.
 13-Nov-2000
 	- Philip Wyett added /nodefaultlib:"LIBC" to template/plugin.tpl.
 	- Eric Sunshine corrected the long standing misnomer where USE_PLUGINS
