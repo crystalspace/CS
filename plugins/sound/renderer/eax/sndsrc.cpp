@@ -139,12 +139,15 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
 
   //give the sound source a eax-property-set
   r = Buffer3D->QueryInterface(IID_IKsPropertySet, (void**) EaxKsPropertiesSet);
-    if (r != DS_OK) {
+  if (r != DS_OK) 
+  {
 	  Report (CS_REPORTER_SEVERITY_WARNING,
 	    "cannot query EAX interface "
 	    "for Sound source (%s)." , srdr->GetError(r)
 	    );
-	}
+  }
+  else
+  {
 
     //default Properties
     EAXBUFFERPROPERTIES BufferProperties ={0, 0, 0, 0, 0.0f, 0, 0.25f, 0.5f, 0.0, 1, 1.0f, 0x700000};
@@ -154,10 +157,10 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
                             DSPROPERTY_EAXBUFFER_ALLPARAMETERS, NULL, 0, &BufferProperties,
                             sizeof(EAXBUFFERPROPERTIES));
 
-  if (r != DS_OK)
-    Report (CS_REPORTER_SEVERITY_WARNING,
-	"can´t set default Properties");
-
+    if (r != DS_OK)
+      Report (CS_REPORTER_SEVERITY_WARNING,
+      "can´t set default Properties");
+  }
 
   SetMode3D(mode3d);
   BaseFrequency = SoundHandle->Data->GetFormat()->Freq;

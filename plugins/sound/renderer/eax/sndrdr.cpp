@@ -40,29 +40,30 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY(csSoundRenderEAX);
 
-SCF_EXPORT_CLASS_TABLE (sndrdrds3d)
-SCF_EXPORT_CLASS (csSoundRenderEAX, "crystalspace.sound.render.ds3d",
+SCF_EXPORT_CLASS_TABLE (sndeax)
+SCF_EXPORT_CLASS (csSoundRenderEAX, "crystalspace.sound.render.eax",
         "EAX on Direct Sound Driver for Crystal Space")
-SCF_EXPORT_CLASS_TABLE_END;
+SCF_EXPORT_CLASS_TABLE_END
 
 SCF_IMPLEMENT_IBASE(csSoundRenderEAX)
   SCF_IMPLEMENTS_INTERFACE(iSoundRender)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
-SCF_IMPLEMENT_IBASE_END;
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iEventHandler)
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundRenderEAX::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csSoundRenderEAX::EventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSoundRenderEAX::eiEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSoundRenderEAX::csSoundRenderEAX(iBase *piBase)
 {
   SCF_CONSTRUCT_IBASE(piBase);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  scfiEventHandler = NULL;
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   Listener = NULL;
   AudioRenderer = NULL;
   object_reg = NULL;
@@ -71,11 +72,9 @@ csSoundRenderEAX::csSoundRenderEAX(iBase *piBase)
 bool csSoundRenderEAX::Initialize(iObjectRegistry *r)
 {
   object_reg = r;
-  if (!scfiEventHandler)
-    scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
-    q->RegisterListener (scfiEventHandler,
+    q->RegisterListener (&scfiEventHandler,
       CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
@@ -86,13 +85,9 @@ bool csSoundRenderEAX::Initialize(iObjectRegistry *r)
 
 csSoundRenderEAX::~csSoundRenderEAX()
 {
-  if (scfiEventHandler)
-  {
-    csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
-    if (q != 0)
-      q->RemoveListener (scfiEventHandler);
-    scfiEventHandler->DecRef ();
-  }
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  if (q != 0)
+    q->RemoveListener (&scfiEventHandler);
   Close();
 }
 
