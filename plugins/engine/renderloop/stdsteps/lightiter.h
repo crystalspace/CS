@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
+              (C) 2005 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -94,6 +95,7 @@ private:
   csRef<csShaderVariable> shvar_light_0_specular;
   csRef<csShaderVariable> shvar_light_0_attenuation;
   csRef<csShaderVariable> shvar_light_0_attenuationtex;
+  csRef<iShaderManager> shadermgr;
   bool initialized;
 
   class LightSVAccessor : public iLightCallback,

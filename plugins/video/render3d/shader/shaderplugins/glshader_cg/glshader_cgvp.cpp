@@ -89,15 +89,16 @@ void csShaderGLCGVP::Deactivate()
 }
 
 void csShaderGLCGVP::SetupState (const csRenderMesh* mesh,
+  csRenderMeshModes& modes,
   const csShaderVarStack &stacks)
 {
   if (override.IsValid())
   {
-    override->SetupState (mesh, stacks);
+    override->SetupState (mesh, modes, stacks);
     return;
   } 
 
-  csShaderGLCGCommon::SetupState (mesh, stacks);
+  csShaderGLCGCommon::SetupState (mesh, modes, stacks);
 }
 
 void csShaderGLCGVP::ResetState()

@@ -102,6 +102,7 @@ protected:
   uint32 current_features;
 
   csFlags flags;
+  csStringID string_object2world;
 
   // Number of particles.
   size_t number;

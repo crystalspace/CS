@@ -76,6 +76,9 @@ public:
   /// Subtract another color to this one.
   csColor& operator-= (const csColor& c)
   { red -= c.red; green -= c.green; blue -= c.blue; return *this; }
+  /// Multiply another color with this one.
+  csColor& operator*= (const csColor& c)
+  { red *= c.red; green *= c.green; blue *= c.blue; return *this; }
   /// Compare equality of two colors
   bool operator== (const csColor& c) const
   { return red == c.red && green == c.green && blue == c.blue; }

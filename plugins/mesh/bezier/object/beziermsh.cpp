@@ -165,6 +165,7 @@ csStringID csBezierMesh::vertex_name = csInvalidStringID;
 csStringID csBezierMesh::texel_name = csInvalidStringID;
 csStringID csBezierMesh::color_name = csInvalidStringID;
 csStringID csBezierMesh::index_name = csInvalidStringID;
+csStringID csBezierMesh::string_object2world = csInvalidStringID;
 
 csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   curves (4, 16)
@@ -222,12 +223,14 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
     (color_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID))
+    (index_name == csInvalidStringID) ||
+    (string_object2world == csInvalidStringID))
   {
     vertex_name = strings->Request ("vertices");
     texel_name = strings->Request ("texture coordinates");
     color_name = strings->Request ("colors");
     index_name = strings->Request ("indices");
+    string_object2world = strings->Request ("object2world transform");
   }
 }
 
@@ -884,15 +887,15 @@ csRenderMesh** csBezierMesh::GetRenderMeshes (int &n, iRenderView* rview,
     {
       rm = meshes[i] = new csRenderMesh;
       rm->buffers.AttachNew (new csRenderBufferHolder);
+      rm->variablecontext.AttachNew (new csShaderVariableContext);
     }
-    rm->object2camera = obj_cam;
-    rm->camera_origin = camera_origin;
-    rm->camera_transform = &icam->GetTransform();
+    rm->worldspace_origin = world_coord;
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = icam->IsMirrored ();
     rm->lastFrame = currentFrame;
+    rm->variablecontext->GetVariableAdd (string_object2world)->SetValue (movtrans);
 
     c = curves.Get (i);
 

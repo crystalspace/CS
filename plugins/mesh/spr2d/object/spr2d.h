@@ -102,6 +102,7 @@ protected:
   bool colors_dirty;
   csRef<iRenderBuffer> index_buffer;
   size_t indicesSize;
+  csRef<csShaderVariableContext> svcontext;
 
 private:
   csRef<iMeshObjectFactory> ifactory;
@@ -349,6 +350,7 @@ public:
   csRef<iLightManager> light_mgr;
   iObjectRegistry* object_reg;
   csWeakRef<iGraphics3D> g3d;
+  csStringID string_object2world;
 public:
   /// Constructor.
   csSprite2DMeshObjectFactory (iMeshObjectType* pParent,

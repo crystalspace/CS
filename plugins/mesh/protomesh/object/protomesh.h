@@ -50,6 +50,10 @@ private:
   // the renderer all required renderbuffers.
   csRef<csRenderBufferHolder> bufferHolder;
 
+  // The shader variable context. Holds shader variables like the
+  // object to world transform.
+  csRef<csShaderVariableContext> variableContext;
+
   // Since every mesh can have a different color we need to have
   // the color buffer here. But we will use the basic colors
   // from the factory.
@@ -290,7 +294,7 @@ private:
 
 public:
   static csStringID vertex_name, texel_name, normal_name, color_name, 
-    index_name;
+    index_name, string_object2world;
 
   iObjectRegistry* object_reg;
   iBase* logparent;

@@ -38,6 +38,7 @@ struct iString;
 struct iDataBuffer;
 struct iDocumentNode;
 struct iMaterial;
+struct iLight;
 struct iObject;
 
 struct iShaderManager;
@@ -173,6 +174,17 @@ struct iShaderManager : public iShaderVariableContext
    */
   virtual const csSet<csStringID>& GetTags (csShaderTagPresence presence,
     int& count) = 0;
+
+  /**
+   * Set the list of active lights.
+   * Active lights is lights that the shader should use.
+   */
+  virtual void SetActiveLights (const csArray<iLight*>& lights) = 0;
+
+  /**
+   * Get the list of active lights. 
+   */
+  virtual const csArray<iLight*>& GetActiveLights () const = 0;
 };
 
 SCF_VERSION (iShaderRenderInterface, 0,0,1);
@@ -182,6 +194,34 @@ struct iShaderRenderInterface : public iBase
 {
   /// Get a implementationspecific object
   virtual void* GetPrivateObject(const char* name) = 0;
+};
+
+/**
+ * Shader metadata.
+ * This struct holds shader metadata such as how many lights per pass
+ * the shader supports, description etc that is not directly describing
+ * exactly what the shader does, but tells the rest of the engine how it
+ * should be used.
+ */
+struct csShaderMetadata
+{
+  /// Name of the shader
+  const char *name;
+
+  /// Descriptive string
+  const char *description;
+
+  /**
+   * Number of lights this shader can process in a pass. 
+   * 0 means either that the shader does not do any lighting,
+   * or that it can provide any number of lights.
+   */
+  uint numberOfLights;
+
+  /// Constructor to null out parameters
+  csShaderMetadata ()
+    : name (0), description (0), numberOfLights (0)
+  {}
 };
 
 SCF_VERSION (iShader, 0, 3, 0);
@@ -233,6 +273,9 @@ struct iShader : public iShaderVariableContext
 
   /// Completly deactivate a pass
   virtual bool DeactivatePass (size_t ticket) = 0;
+
+  /// Get shader metadata
+  virtual const csShaderMetadata& GetMetadata (size_t ticket) const = 0;
 };
 
 

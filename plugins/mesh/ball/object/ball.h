@@ -427,6 +427,7 @@ public:
   iEngine* engine;
   csRef<iLightManager> light_mgr;
   csFlags flags;
+  csStringID string_object2world;
 
   /// Constructor.
   csBallMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry* object_reg);

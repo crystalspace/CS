@@ -663,7 +663,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     glDisable ((GLenum)(GL_CLIP_PLANE0+i));
 }
 
-void csGLGraphics3D::ApplyObjectToCamera ()
+/*void csGLGraphics3D::ApplyObjectToCamera ()
 {
   GLfloat matrixholder[16];
   const csMatrix3 &orientation = object2camera.GetO2T();
@@ -693,6 +693,7 @@ void csGLGraphics3D::ApplyObjectToCamera ()
   glLoadMatrixf (matrixholder);
   glTranslatef (-translation.x, -translation.y, -translation.z);
 }
+*/
 
 void csGLGraphics3D::SetupProjection ()
 {
@@ -959,6 +960,8 @@ bool csGLGraphics3D::Open ()
   string_point_radius = strings->Request ("point radius");
   string_point_scale = strings->Request ("point scale");
   string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
+  string_world2camera = strings->Request ("world2camera transform");
+  string_object2world = strings->Request ("object2world transform");
 
   /* @@@ All those default textures, better put them into the engine? */
 
@@ -1151,7 +1154,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
     statecache->SetMatrixMode (GL_MODELVIEW);
     glLoadIdentity ();
-    object2camera.Identity ();
+//    object2camera.Identity ();
+    //@@@ TODO FIX
     return true;
   }
   else if (drawflags & CSDRAW_2DGRAPHICS)
@@ -1198,7 +1202,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
 
       statecache->SetMatrixMode (GL_MODELVIEW);
       glLoadIdentity ();
-      object2camera.Identity ();
+//      object2camera.Identity ();
+      //@@@ TODO FIX
 
       SetZMode (CS_ZBUF_NONE);
       
@@ -1340,10 +1345,10 @@ void csGLGraphics3D::Print (csRect const* area)
 
 const csReversibleTransform& csGLGraphics3D::GetObjectToCamera()
 {
-  return object2camera;
+  return csReversibleTransform();
 }
 
-void csGLGraphics3D::SetObjectToCameraInternal (
+/*void csGLGraphics3D::SetObjectToCameraInternal (
 	const csReversibleTransform& object2cam)
 {
   const csMatrix3 &orientation1 = object2camera.GetO2T();
@@ -1357,7 +1362,7 @@ void csGLGraphics3D::SetObjectToCameraInternal (
     return;
   object2camera = object2cam;
   ApplyObjectToCamera ();
-}
+}*/
 
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
 	float fov, int color)
@@ -1778,6 +1783,44 @@ GLvoid csGLGraphics3D::myDrawRangeElements (GLenum mode, GLuint start,
   glDrawElements (mode, count, type, indices);
 }
 
+void makeGLMatrix (const csReversibleTransform& t, float matrix[16])
+{
+  const csMatrix3 &orientation = t.GetO2T();
+  const csVector3 &translation = t.GetO2TTranslation();
+
+  matrix[0] = orientation.m11;
+  matrix[1] = orientation.m12;
+  matrix[2] = orientation.m13;
+  matrix[3] = 0.0f;
+
+  matrix[4] = orientation.m21;
+  matrix[5] = orientation.m22;
+  matrix[6] = orientation.m23;
+  matrix[7] = 0.0f;
+
+  matrix[8] = orientation.m31;
+  matrix[9] = orientation.m32;
+  matrix[10] = orientation.m33;
+  matrix[11] = 0.0f;
+
+  matrix[12] = translation.x;
+  matrix[13] = translation.y;
+  matrix[14] = translation.z;
+  matrix[15] = 1.0f;
+}
+
+void csGLGraphics3D::SetWorldToCamera (const csReversibleTransform& w2c)
+{
+  world2camera = w2c;
+  float m[16];
+
+  shadermgr->GetVariableAdd (string_world2camera)->SetValue (w2c);
+
+  makeGLMatrix (world2camera.GetInverse (), m);
+  statecache->SetMatrixMode (GL_MODELVIEW);
+  glLoadMatrixf (m);
+}
+
 void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks)
@@ -1794,9 +1837,24 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
 		num_tri);
   if (debug_inhibit_draw) return;
 
-  SetObjectToCameraInternal (mymesh->object2camera);
+//  SetObjectToCameraInternal (mymesh->object2camera);
+  csReversibleTransform o2w;
+
+  if (string_object2world>=(csStringID)stacks.Length () 
+      || stacks[string_object2world].Length () == 0)
+    o2w = mymesh->object2camera.GetInverse ()*world2camera;
+  else
+    stacks[string_object2world].Top ()->GetValue (o2w);
+  
+
+  float matrix[16];
+  makeGLMatrix (o2w, matrix);
+  statecache->SetMatrixMode (GL_MODELVIEW);
+  glPushMatrix ();
+  glMultMatrixf (matrix);
+
     
-  iRenderBuffer* iIndexbuf = (mymesh->buffers ? mymesh->buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
+  iRenderBuffer* iIndexbuf = (modes.buffers ? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
   
   if (!iIndexbuf)
   {
@@ -1990,6 +2048,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
     glDisable (GL_POINT_SPRITE_ARB);
   }
+  glPopMatrix ();
   //indexbuf->RenderRelease ();
   RenderRelease (iIndexbuf);
   SetMirrorMode (false);
@@ -2661,7 +2720,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh,
     {
       // Bring it back, that old new york rap! 
       // Or well, at least that old identity transform
-      SetObjectToCameraInternal (csReversibleTransform ());
+      //SetObjectToCameraInternal (csReversibleTransform ());
     }
   }
 

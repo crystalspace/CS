@@ -500,6 +500,8 @@ protected:
   csStringID string_texture_diffuse;
   csStringID string_texture_lightmap;
   csStringID string_material_flatcolor;
+  csStringID string_object2world;
+  csStringID string_world2camera;
 
   csRef<iShaderManager> shadermgr;
 
@@ -730,9 +732,10 @@ public:
   {
     this->o2c = *o2c;
   }
-  virtual void SetWorldToCamera (csReversibleTransform* w2c)
+  virtual void SetWorldToCamera (const csReversibleTransform& w2c)
   {
-    this->w2c = *w2c;
+    this->w2c = w2c;
+    shadermgr->GetVariableAdd (string_world2camera)->SetValue (w2c);
   }
   /// Get object to camera transformation.
   virtual const csReversibleTransform& GetObjectToCamera ()

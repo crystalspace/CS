@@ -616,8 +616,7 @@ public:
 
   csRef<iVirtualClock> vc;
 
-  static csStringID vertex_name, texel_name, normal_name, color_name, 
-    index_name, tangent_name, binormal_name;
+  static csStringID string_object2world;
   uint buffers_version;
 
   bool back2front;

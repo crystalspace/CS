@@ -24,7 +24,7 @@
 
 csShaderVariable::csShaderVariable (csStringID name) :
   csRefCount (), TextureHandValue (0), TextureWrapValue (0), VectorValue (0),
-  MatrixValuePtr(0), accessor (0), Name (name)
+  MatrixValuePtr(0), TransformPtr (0), accessor (0), Name (name)
 {
 }
 

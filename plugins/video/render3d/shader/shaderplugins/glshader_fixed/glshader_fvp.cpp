@@ -68,6 +68,7 @@ void csGLShaderFVP::Deactivate()
 }
 
 void csGLShaderFVP::SetupState (const csRenderMesh *mesh, 
+                                csRenderMeshModes& modes,
 				const csShaderVarStack &stacks)
 {
   size_t i;
@@ -189,6 +190,9 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
     statecache->ActivateTU ();
     if (layers[i].texgen == TEXGEN_REFLECT_CUBE)
     {
+      csShaderVariable* sv = stacks[string_world2camera].Top ();
+      if (!sv) continue;
+
       //setup for environmental cubemapping
       glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
       glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_REFLECTION_MAP_ARB);
@@ -197,9 +201,10 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       statecache->Enable_GL_TEXTURE_GEN_S ();
       statecache->Enable_GL_TEXTURE_GEN_T ();
       statecache->Enable_GL_TEXTURE_GEN_R ();
-
-      const csReversibleTransform *t = mesh->camera_transform;
-      const csMatrix3 &orientation = t->GetO2T();
+      
+      csReversibleTransform t;
+      sv->GetValue (t);
+      const csMatrix3 &orientation = t.GetO2T();
 
       float mAutoTextureMatrix[16];
       // Transpose 3x3 in order to invert matrix (rotation)
@@ -576,6 +581,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
   do_lighting = false;
   ambientvar = csInvalidStringID;
   primcolvar = csInvalidStringID;
+  string_world2camera = strings->Request ("world2camera transform");
 
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
   	objectReg, iShaderManager);
@@ -698,7 +704,7 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
                   {
                     layers[layer].texgen = TEXGEN_REFLECT_CUBE;
                   }
-		  else if (!strcasecmp(str, "sphere"))
+                  else if (!strcasecmp(str, "sphere"))
                   {
                     layers[layer].texgen = TEXGEN_REFLECT_SPHERE;
                   }
@@ -709,14 +715,8 @@ bool csGLShaderFVP::Load(iShaderTUResolver* tuResolve, iDocumentNode* program)
 		    return false;
 		  }
                 }
-		else
-		{
-		  synsrv->ReportError ("crystalspace.graphics3d.shader.fixed.vp",
-		    variablesnode, "'mapping' attribute missing");
-		  return false;
-		}
-              } 
-	      else if (!strcasecmp(str, "fog"))
+              }
+              else if (!strcasecmp(str, "fog"))
               {
                 layers[layer].texgen = TEXGEN_FOG;
 

@@ -147,6 +147,8 @@ protected:
   /// Rotate particles, angle in radians.
   bool change_rotation; float anglepersecond;
 
+  csStringID string_object2world;
+
   /**
    * This function re-allocates the data arrays to 'newsize' and copies
    * 'copysize' items from the old arrays. Subclasses can override this

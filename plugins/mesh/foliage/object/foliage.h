@@ -223,6 +223,10 @@ private:
   // the renderer all required renderbuffers.
   csRef<csRenderBufferHolder> bufferHolder;
 
+  // The shader variable context. Holds shader variables like the
+  // object to world transform.
+  csRef<csShaderVariableContext> variableContext;
+
   // Since every mesh can have a different color we need to have
   // the color buffer here. But we will use the basic colors
   // from the factory.
@@ -263,6 +267,8 @@ private:
   // by SetupObject() after object is initialized. Some functions
   // can set this to false again to force reinit.
   bool initialized;
+
+  // 
 
   /**
    * Setup this object. This function will check if setup is needed.
@@ -461,7 +467,7 @@ private:
   void SetupFactory ();
 
 public:
-  static csStringID heights_name, foliage_density_name, foliage_types_name;
+  static csStringID heights_name, foliage_density_name, foliage_types_name, string_object2world;
 
   iObjectRegistry* object_reg;
   iBase* logparent;

@@ -309,6 +309,7 @@ public:
   csRefArray<iPolygonRenderer> polyRenderers;
 
   static csStringID texLightmapName;
+  static csStringID string_object2world;
 
 public:
   csThingStatic (iBase* parent, csThingObjectType* thing_type);
@@ -338,7 +339,7 @@ public:
   void CalculateNormals ();
 
   /**
-   * Get the static data number.
+   * Get the static 
    */
   uint32 GetStaticDataNumber () const
   {

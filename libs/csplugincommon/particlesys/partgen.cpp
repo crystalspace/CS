@@ -95,6 +95,9 @@ csParticleSystem::csParticleSystem (iObjectRegistry* object_reg,
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  string_object2world = strings->Request ("object2world transform");
 
   vertices = 0;
   texels = 0;
@@ -389,6 +392,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   if (meshCreated)
   {
     rm->buffers = bufferHolder;
+    rm->variablecontext.AttachNew (new csShaderVariableContext);
   }
 
   // Prepare for rendering.
@@ -406,9 +410,8 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   rm->indexend = (uint)TriangleCount * 3;
   rm->material = m;
   CS_ASSERT (m != 0);
-  rm->object2camera = csReversibleTransform ();
-  rm->camera_origin = vertices[0];
-  rm->camera_transform = &camera->GetTransform();
+  rm->worldspace_origin = movable->GetFullPosition ();
+  rm->variablecontext->GetVariableAdd (string_object2world)->SetValue (camera->GetTransform ());  
 
   n = 1;
   return &rm;

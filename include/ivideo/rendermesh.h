@@ -71,6 +71,9 @@ struct csRenderMeshModes
 
   /// Alpha mode this mesh is drawn.
   csAlphaMode::AlphaType alphaType;
+
+  /// Holder of default render buffers
+  csRef<csRenderBufferHolder> buffers;
 };
 
 /**
@@ -91,7 +94,6 @@ struct csCoreRenderMesh
     clip_z_plane = 0;
     do_mirror = false;
     indexstart = indexend = 0;
-    buffers = 0;
     db_mesh_name = "<unknown>";
   }
 
@@ -126,9 +128,6 @@ struct csCoreRenderMesh
 
   /// Mesh type
   csRenderMeshType meshtype;
-
-  /// Holder of default render buffers
-  csRef<csRenderBufferHolder> buffers;
 
   /** @{ */
   /**
@@ -188,6 +187,9 @@ struct csRenderMesh : public csCoreRenderMesh, public csRenderMeshModes
 
   /// Camera coordinate of the local 0,0,0 point of the object.
   csVector3 camera_origin;
+
+  /// Worldspace origin of the mesh
+  csVector3 worldspace_origin;
 };
 
 /** @} */

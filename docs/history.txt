@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+28-Mar-2005
+	- Marten changed how transforms are sent from meshobjects to the
+	  renderer.
+	- Marten added a "vertex preprocessor" (vproc) shaderprogramplugin-type.
+	- Marten removed chunklod terrain engine. Instead use bruteblock.
 27-Mar-2005
 	- Eric Sunshine added FStripCommon to jamcompatibility.jam since Jam
 	  2.4 lacks it and it is needed by StripCommon in helper.jam.

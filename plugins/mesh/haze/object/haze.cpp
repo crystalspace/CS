@@ -432,6 +432,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 csStringID csHazeMeshObject::vertex_name = csInvalidStringID;
 csStringID csHazeMeshObject::texel_name = csInvalidStringID;
 csStringID csHazeMeshObject::index_name = csInvalidStringID;
+csStringID csHazeMeshObject::string_object2world = csInvalidStringID;
 
 csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 {
@@ -469,11 +470,13 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
 
   if ((vertex_name == csInvalidStringID) ||
     (texel_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID))
+    (index_name == csInvalidStringID) ||
+    (string_object2world == csInvalidStringID))
   {
     vertex_name = strings->Request ("vertices");
     texel_name = strings->Request ("texture coordinates");
     index_name = strings->Request ("indices");
+    string_object2world = strings->Request ("object2world transform");
   }
 }
 
@@ -783,6 +786,7 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
   if (rmCreated)
   {
     rm->buffers.AttachNew (new csRenderBufferHolder);
+    rm->variablecontext.AttachNew (new csShaderVariableContext);
     rm->meshtype = CS_MESHTYPE_TRIANGLES;
     rm->material = material;
     rm->mixmode = MixMode;
@@ -793,14 +797,14 @@ csRenderMesh** csHazeMeshObject::GetRenderMeshes (int &n, iRenderView* rview,
       clip_z_plane);
   csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
-  rm->camera_origin = camera_origin;
-  rm->camera_transform = &camera->GetTransform();
+  rm->worldspace_origin = movable->GetFullPosition ();
   rm->clip_portal = clip_portal;
   rm->clip_plane = clip_plane;
   rm->clip_z_plane = clip_z_plane;
   rm->do_mirror = camera->IsMirrored ();
 
-  //rm->object2camera = tr_o2c;
+  rm->variablecontext->GetVariableAdd (string_object2world)->
+    SetValue (movable->GetFullTransform ());
 
   rm->indexend = (uint)GetTempIndices()->Length();
 

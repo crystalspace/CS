@@ -69,6 +69,7 @@ public:
   virtual void Deactivate();
 
   virtual void SetupState (const csRenderMesh* mesh,
+    csRenderMeshModes& modes,
     const csShaderVarStack &stacks) {}
 
   virtual void ResetState () {}

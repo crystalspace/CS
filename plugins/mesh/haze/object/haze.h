@@ -231,7 +231,7 @@ private:
   };
   csFrameDataHolder<HazeRenderBuffer> renderBuffers;
   csFrameDataHolder<HazeRenderBuffer> indexBuffers;
-  static csStringID vertex_name, texel_name, index_name;
+  static csStringID vertex_name, texel_name, index_name, string_object2world;
 
   /**
    * Setup this object. This function will check if setup is needed.

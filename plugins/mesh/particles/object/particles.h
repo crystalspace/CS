@@ -492,6 +492,7 @@ private:
   csStringID index_name;
   csStringID radius_name;
   csStringID scale_name;
+  csStringID string_object2world;
 
   int camera_fov;
   int camera_pixels;

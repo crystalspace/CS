@@ -33,6 +33,7 @@
 #include "csutil/refarr.h"
 #include "csutil/leakguard.h"
 #include "ivideo/rndbuf.h"
+#include "csgeom/transfrm.h"
 
 struct iTextureHandle;
 struct iTextureWrapper;
@@ -85,7 +86,9 @@ public:
     /// Vector with 4 components
     VECTOR4,
     /// Matrix
-    MATRIX
+    MATRIX,
+    /// Transform
+    TRANSFORM
   };
 
   //CS_LEAKGUARD_DECLARE (csShaderVariable);
@@ -93,12 +96,14 @@ private:
 
   VariableType Type;
 
-  int Int;
   csRef<iTextureHandle> TextureHandValue;
   csRef<iTextureWrapper> TextureWrapValue;
   csRef<iRenderBuffer> RenderBuffer;
   csVector4 VectorValue;
+  
+  int Int;
   csMatrix3* MatrixValuePtr;
+  csReversibleTransform* TransformPtr;
 
   csRef<iShaderVariableAccessor> accessor;
 
@@ -218,6 +223,22 @@ public:
     return false;
   }
 
+  /// Retrieve a csReversibleTransform
+  bool GetValue (csReversibleTransform& value)
+  {
+    if (accessor) accessor->PreGetValue (this);
+    if (TransformPtr)
+    {
+      value = *TransformPtr;
+      return true;
+    }
+    else
+    {
+      value = csReversibleTransform();
+    }
+    return false;
+  }
+
 
   /// Store an int
   bool SetValue (int value) 
@@ -311,6 +332,21 @@ public:
     else
     {
       MatrixValuePtr = new csMatrix3 (value);
+    }
+    return true;
+  }
+
+  /// Store a csReversibleTransform
+  bool SetValue (const csReversibleTransform &value)
+  {
+    Type = TRANSFORM;
+    if (TransformPtr)
+    {
+      *TransformPtr = value;
+    }
+    else
+    {
+      TransformPtr = new csReversibleTransform (value);
     }
     return true;
   }

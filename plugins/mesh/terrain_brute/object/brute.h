@@ -129,7 +129,7 @@ public:
 
   void UpdateStaticLighting ();
   void DrawTest (iGraphics3D* g3d, iRenderView *rview, uint32 frustum_mask, 
-                 csReversibleTransform &transform);
+                 csReversibleTransform &transform, iMovable *movable);
 
   bool detach;
 
@@ -292,7 +292,7 @@ private:
   // Use for clipping during rendering.
   csPlane3 planes[10];
 
-  csStringID vertices_name, normals_name, texcoords_name, colors_name;
+  csStringID vertices_name, normals_name, texcoords_name, colors_name, string_object2world;
 
   bool initialized;
 

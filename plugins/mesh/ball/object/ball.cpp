@@ -119,10 +119,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   
   g3d = CS_QUERY_REGISTRY (
   	((csBallMeshObjectFactory*)factory)->object_reg, iGraphics3D);
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    	((csBallMeshObjectFactory*)factory)->object_reg, 
-	"crystalspace.shared.stringset", iStringSet);
-
+  
   ball_vertices_dirty_flag = false;
   ball_texels_dirty_flag = false;
   ball_normals_dirty_flag = false;
@@ -598,6 +595,9 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   csRenderMesh*& meshPtr = rmHolder.GetUnusedMesh (rmCreated,
     rview->GetCurrentFrameNumber ());
   
+  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csVector3 &wo = o2wt.GetOrigin ();
+
   meshPtr->mixmode = MixMode;
   meshPtr->clip_portal = clip_portal;
   meshPtr->clip_plane = clip_plane;
@@ -607,13 +607,14 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   meshPtr->indexstart = 0;
   meshPtr->indexend = ball_triangles * 3;
   meshPtr->material = mater;
-  meshPtr->object2camera = tr_o2c;
-  meshPtr->camera_origin = camera_origin;
-  meshPtr->camera_transform = &camera->GetTransform();
+  meshPtr->worldspace_origin = wo;
   if (rmCreated)
   {
     meshPtr->buffers = bufferHolder;
+    meshPtr->variablecontext.AttachNew (new csShaderVariableContext);
   }
+  meshPtr->variablecontext->GetVariableAdd (((csBallMeshObjectFactory*)factory)->string_object2world)->
+    SetValue (o2wt);
   meshPtr->geometryInstance = (void*)factory;
   
   num = 1;
@@ -1068,6 +1069,10 @@ csBallMeshObjectFactory::csBallMeshObjectFactory (iMeshObjectType* pParent,
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng;	// We don't want a circular reference.
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, 
+    "crystalspace.shared.stringset", iStringSet);
+  string_object2world = strings->Request ("object2world transform");
 }
 
 csBallMeshObjectFactory::~csBallMeshObjectFactory ()

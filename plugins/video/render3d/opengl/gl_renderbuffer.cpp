@@ -271,7 +271,7 @@ void csGLVBOBufferManager::AttachBuffer (csGLVBOBufferSlot *slot,
 					 iRenderBuffer* buffer)
 {
   RenderBufferAux auxData;
-  if ((slot->inUse) && (slot->renderBuffer != buffer))
+  if ((slot->inUse) && slot->renderBuffer && (slot->renderBuffer != buffer))
     DetachBuffer (slot);
   slot->renderBuffer = buffer;
   slot->renderBufferPtr = buffer;

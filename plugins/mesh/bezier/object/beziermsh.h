@@ -349,7 +349,7 @@ private:
   };
   csFrameDataHolder<BezierRenderBuffer> renderBuffers;
   csFrameDataHolder<BezierRenderBuffer> indexBuffers;
-  static csStringID vertex_name, texel_name, color_name, index_name;
+  static csStringID vertex_name, texel_name, color_name, index_name, string_object2world;
 private:
   /**
    * Invalidate a thing. This has to be called when new polygons are

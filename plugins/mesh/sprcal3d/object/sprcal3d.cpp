@@ -187,6 +187,7 @@ csStringID csSpriteCal3DMeshObjectFactory::texel_name = csInvalidStringID;
 csStringID csSpriteCal3DMeshObjectFactory::normal_name = csInvalidStringID;
 csStringID csSpriteCal3DMeshObjectFactory::color_name = csInvalidStringID;
 csStringID csSpriteCal3DMeshObjectFactory::index_name = csInvalidStringID;
+csStringID csSpriteCal3DMeshObjectFactory::string_object2world = csInvalidStringID;
 
 void csSpriteCal3DMeshObjectFactory::Report (int severity, const char* msg, ...)
 {
@@ -226,7 +227,8 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
     (texel_name == csInvalidStringID) ||
     (normal_name == csInvalidStringID) ||
     (color_name == csInvalidStringID) ||
-    (index_name == csInvalidStringID))
+    (index_name == csInvalidStringID) ||
+    (string_object2world == csInvalidStringID))
   {
     csRef<iStringSet> strings = 
       CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
@@ -236,6 +238,7 @@ csSpriteCal3DMeshObjectFactory::csSpriteCal3DMeshObjectFactory (
     normal_name = strings->Request ("normals");
     color_name = strings->Request ("colors");
     index_name = strings->Request ("indices");
+    string_object2world = strings->Request ("object2world transform");
   }
 
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
@@ -1653,11 +1656,6 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
 
-  //  float scale = factory->GetRenderScale();
-  //  csMatrix3 scale_mat(scale,0,0,0,scale,0,0,0,scale);
-
-  //  tr_o2c *= scale_mat;
-
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
   	clip_z_plane);
@@ -1688,6 +1686,9 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
   csDirtyAccessArray<csRenderMesh*>& meshes = 
     rmHolder.GetUnusedMeshes (rview->GetCurrentFrameNumber ());
 
+  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csVector3& wo = o2wt.GetOrigin ();
+
   for (size_t m = 0; m < allRenderMeshes.Length(); m++)
   {
     csRenderMesh* rm;
@@ -1708,9 +1709,8 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
     rm->do_mirror = camera->IsMirrored ();
-    rm->object2camera = tr_o2c;
-    rm->camera_origin = camera_origin;
-    rm->camera_transform = &camera->GetTransform();
+    rm->worldspace_origin = wo;
+    rm->variablecontext->GetVariableAdd (factory->string_object2world)->SetValue (o2wt);
     rm->geometryInstance = this;
   }
   currentMovable = movable;
@@ -1739,6 +1739,7 @@ void csSpriteCal3DMeshObject::SetupRenderMeshes ()
       rm.meshtype = CS_MESHTYPE_TRIANGLES;
       rm.material = materialMapper.GetMaterialForId (submesh->getCoreMaterialId ());
       rm.buffers.AttachNew (new csRenderBufferHolder );
+      rm.variablecontext.AttachNew (new csShaderVariableContext);
 
       csRef<iRenderBufferAccessor> accessor (
 	csPtr<iRenderBufferAccessor> (new BaseAccessor (this, (int)m, (int)s)));

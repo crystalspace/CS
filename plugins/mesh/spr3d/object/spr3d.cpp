@@ -219,7 +219,8 @@ void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iMeshObjectType* pParent) :
+csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iMeshObjectType* pParent,
+                                                          iObjectRegistry* object_reg) :
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
   SCF_CONSTRUCT_IBASE (pParent);
@@ -242,6 +243,8 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iMeshObjectType* pPare
 
   texel_mesh = new csTriangleMesh ();
 
+  this->object_reg = object_reg;
+
   tri_verts = 0;
   do_tweening = true;
   lighting_quality = DEFAULT_LIGHTING;
@@ -253,6 +256,9 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iMeshObjectType* pPare
   MixMode = CS_FX_COPY;
 
   initialized = false;
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  string_object2world = strings->Request ("object2world transform");
 }
 
 csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
@@ -1063,6 +1069,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   frame_increment = 1;
   bufferHolder.AttachNew (new csRenderBufferHolder);
   scfiRenderBufferAccessor.AttachNew (new eiRenderBufferAccessor(this));
+  svcontext.AttachNew (new csShaderVariableContext);
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
@@ -1422,13 +1429,6 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   // Get next frame for animation tweening.
   csSpriteFrame * next_frame = cur_action->GetCsNextFrame (cur_frame);
 
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-
 
   bool do_tween = false;
   if (tween_ratio) do_tween = true;
@@ -1568,9 +1568,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   }
 
   n = 1;
-  rmesh->object2camera = tr_o2c;
-  rmesh->camera_origin = camera_origin;
-  rmesh->camera_transform = &camera->GetTransform();
+  rmesh->worldspace_origin = movable->GetFullPosition ();
   rmesh->mixmode = MixMode;
   rmesh->indexstart = 0;
   rmesh->indexend = final_num_triangles * 3;
@@ -1578,7 +1576,11 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   if (rmCreated)
   {
     rmesh->buffers = bufferHolder;
+    rmesh->variablecontext = svcontext;
   }
+  rmesh->variablecontext->GetVariableAdd (factory->string_object2world)->
+    SetValue (movable->GetFullTransform ());
+
   rmesh->meshtype = CS_MESHTYPE_TRIANGLES;
   n = 1;
   return &rmesh;
@@ -2530,8 +2532,7 @@ bool csSprite3DMeshObjectType::Initialize (iObjectRegistry* object_reg)
 
 csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
 {
-  csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this);
-  cm->object_reg = object_reg;
+  csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this, object_reg);
   cm->vc = vc;
   cm->engine = engine;
 

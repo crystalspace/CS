@@ -80,12 +80,6 @@ private:
     csArray<bool> custommapping_generic;
     csDirtyAccessArray<csRef<csShaderVariable> > custommapping_variables;
 
-/*    csStringID bufferID[STREAMMAX];
-    csRef<csShaderVariable> bufferRef[TEXTUREMAX];
-    csVertexAttrib vertexattributes[STREAMMAX];
-    bool bufferGeneric[STREAMMAX];
-    int bufferCount;*/
-
     //texture mappings
     csStringID textureID[TEXTUREMAX];
     csRef<csShaderVariable> textureRef[TEXTUREMAX];
@@ -95,6 +89,7 @@ private:
     //programs
     csRef<iShaderProgram> vp;
     csRef<iShaderProgram> fp;
+    csRef<iShaderProgram> vproc;
 
     //writemasks
     bool wmRed, wmGreen, wmBlue, wmAlpha;
@@ -133,6 +128,9 @@ private:
   const csStringHash& xmltokens;
   bool do_verbose;
   csString fail_reason;
+
+  // metadata
+  csShaderMetadata metadata;
 
   // load one pass, return false if it fails
   bool LoadPass (iDocumentNode *node, shaderPass *pass);
@@ -363,6 +361,15 @@ public:
   /// Completly deactivate a pass
   virtual bool DeactivatePass (size_t ticket);	
 
+  /// Get shader metadata
+  virtual const csShaderMetadata& GetMetadata (size_t ticket) const
+  {
+    if (ticket == csArrayItemNotFound)
+      return allShaderMeta;
+    else
+      return variants[ticket].tech->metadata;
+  }
+
   friend class csXMLShaderCompiler;
 
   //=================== iShaderVariableContext ================//
@@ -401,6 +408,21 @@ public:
     GetUsedSVContext().PopVariables (stacks); 
   }
 
+  /// Set object name
+  virtual void SetName (const char *iName)
+  {
+    csObject::SetName (iName);
+    delete [] allShaderMeta.name;
+    allShaderMeta.name = csStrNew (iName);
+  }
+  
+  /// Set object description
+  void SetDescription (const char *desc)
+  {
+    delete [] allShaderMeta.description;
+    allShaderMeta.description = csStrNew (desc);
+  }
+
   bool IsEmpty() const
   {
     return GetUsedSVContext().IsEmpty();
@@ -415,6 +437,8 @@ public:
   csWeakRef<iGraphics3D> g3d;
   csWeakRef<iShaderManager> shadermgr;
   char* filename;
+
+  csShaderMetadata allShaderMeta;
 
   csStringHash xmltokens;
 #define CS_TOKEN_ITEM_FILE \

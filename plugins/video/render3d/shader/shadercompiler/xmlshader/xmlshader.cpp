@@ -129,6 +129,25 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
     }
   }
 
+  //load vproc
+  programNode = node->GetNode(xmltokens.Request (
+    csXMLShaderCompiler::XMLTOKEN_VPROC));
+
+  if (programNode)
+  {
+    program = LoadProgram (tuResolve, programNode, pass);
+    if (program)
+    {
+      pass->vproc = program;
+    }
+    else
+    {
+      if (do_verbose)
+        SetFailReason ("vertex preprocessor failed to load");
+      return false;
+    }
+  }
+
   {
     csRef<iDocumentNode> nodeMixMode = node->GetNode ("mixmode");
     if (nodeMixMode != 0)
@@ -550,6 +569,11 @@ bool csXMLShaderTech::Load (iDocumentNode* node, iDocumentNode* parentSV)
   if (varNode)
     parent->compiler->LoadSVBlock (varNode, &svcontext);
 
+  // copy over metadata from parent
+  metadata.name = csStrNew (parent->allShaderMeta.name);
+  metadata.description = csStrNew (parent->allShaderMeta.description);
+  metadata.numberOfLights = node->GetAttributeValueAsInt ("lights");
+
   //alloc passes
   passes = new shaderPass[passesCount];
   uint i;
@@ -587,10 +611,9 @@ bool csXMLShaderTech::ActivatePass (size_t number)
   currentPass = number;
 
   shaderPass *thispass = &passes[currentPass];
-  if(thispass->vp)
-    thispass->vp->Activate ();
-  if(thispass->fp)
-    thispass->fp->Activate ();
+  if(thispass->vproc) thispass->vproc->Activate ();
+  if(thispass->vp) thispass->vp->Activate ();
+  if(thispass->fp) thispass->fp->Activate ();
   
   iGraphics3D* g3d = parent->g3d;
   if (thispass->overrideZmode)
@@ -613,6 +636,7 @@ bool csXMLShaderTech::DeactivatePass ()
   shaderPass *thispass = &passes[currentPass];
   currentPass = ~0;
 
+  if(thispass->vproc) thispass->vproc->Deactivate ();
   if(thispass->vp) thispass->vp->Deactivate ();
   if(thispass->fp) thispass->fp->Deactivate ();
 
@@ -635,14 +659,17 @@ bool csXMLShaderTech::DeactivatePass ()
 }
 
 bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh, 
-			     csRenderMeshModes& modes,
-			     const csShaderVarStack &stacks)
+			         csRenderMeshModes& modes,
+			         const csShaderVarStack &stacks)
 {
   if(currentPass>=passesCount)
     return false;
 
   iGraphics3D* g3d = parent->g3d;
   shaderPass *thispass = &passes[currentPass];
+
+  //first run the preprocessor
+  if(thispass->vproc) thispass->vproc->SetupState (mesh, modes, stacks);
 
   //now map our buffers. all refs should be set
   size_t i;
@@ -663,7 +690,7 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
     else
       last_buffers[i] = 0;
   }
-  g3d->ActivateBuffers (mesh->buffers, thispass->defaultMappings);
+  g3d->ActivateBuffers (modes.buffers, thispass->defaultMappings);
   g3d->ActivateBuffers (thispass->custommaping_attrib.GetArray (), last_buffers, 
     (uint)thispass->custommaping_attrib.Length ());
   lastBufferCount = thispass->custommaping_attrib.Length ();
@@ -742,8 +769,8 @@ bool csXMLShaderTech::SetupPass (const csRenderMesh *mesh,
   else
     modes.mixmode = thispass->mixMode;
 
-  if(thispass->vp) thispass->vp->SetupState (mesh, stacks);
-  if(thispass->fp) thispass->fp->SetupState (mesh, stacks);
+  if(thispass->vp) thispass->vp->SetupState (mesh, modes, stacks);
+  if(thispass->fp) thispass->fp->SetupState (mesh, modes, stacks);
 
   return true;
 }
@@ -752,6 +779,7 @@ bool csXMLShaderTech::TeardownPass ()
 {
   shaderPass *thispass = &passes[currentPass];
 
+  if(thispass->vproc) thispass->vproc->ResetState ();
   if(thispass->vp) thispass->vp->ResetState ();
   if(thispass->fp) thispass->fp->ResetState ();
 
@@ -1108,6 +1136,7 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
   csRef<csXMLShader> shader;
   shader.AttachNew (new csXMLShader (this, templ, forcepriority));
   shader->SetName (templ->GetAttributeValue ("name"));
+  shader->SetDescription (templ->GetAttributeValue ("description"));
   if (do_verbose)
   {
     csString str;

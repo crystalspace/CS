@@ -61,15 +61,15 @@ T csClamp (const T& a, T max, T min)
 template<class T>
 T csSmoothStep (const T& a, T max, T min)
 {
-  T tmp;
+  T tmp, tmp2;
   if (a <= min)
     tmp = min;
   else if (a >= max)
     tmp = max;
   else
   {
-    a = (a - min) / (max-min);
-    tmp = a*a * (3.0 - 2.0*a);
+    tmp2 = (a - min) / (max-min);
+    tmp = tmp2*tmp2 * (3.0 - 2.0*tmp2);
   }
   return tmp;
 }

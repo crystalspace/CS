@@ -5,3 +5,4 @@ SubInclude TOP plugins video render3d shader shaderplugins glshader_cg ;
 SubInclude TOP plugins video render3d shader shaderplugins glshader_fixed ;
 SubInclude TOP plugins video render3d shader shaderplugins glshader_ps1 ;
 SubInclude TOP plugins video render3d shader shaderplugins softshader ;
+SubInclude TOP plugins video render3d shader shaderplugins vproc_std ;

@@ -65,12 +65,23 @@ void* csRenderBuffer::Lock (csRenderBufferLockType lockType)
 
   lastLock = lockType;
   isLocked = true;
-  CS_ASSERT(buffer != 0);
-  return (void*)buffer;
+
+  void *rb = 0;
+
+  if (masterBuffer.IsValid ())
+    rb = ((uint8*)masterBuffer->Lock (lockType)) + offset;
+  else
+    rb = buffer;
+
+  CS_ASSERT(rb != 0);
+  return (void*)rb;
 }
 
 void csRenderBuffer::Release ()
 {
+  if (masterBuffer.IsValid ())
+    masterBuffer->Release ();
+
   if (lastLock == CS_BUF_LOCK_NORMAL)
   {
     version++;
@@ -98,6 +109,9 @@ void csRenderBuffer::CopyInto (const void *data, size_t elementCount,
 
 size_t csRenderBuffer::GetElementCount() const
 {
+  if (masterBuffer.IsValid ())
+    return masterBuffer->GetElementCount ();
+
   return bufferSize / (compCount * csRenderBufferComponentSizes[comptype]);
 }
 
@@ -184,7 +198,7 @@ csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
     {"generic 2",		    CS_BUFFER_GENERIC2},
     {"generic 3",		    CS_BUFFER_GENERIC3},
     {"index",			    CS_BUFFER_INDEX},
-    {"lit color",		    CS_BUFFER_COLOR_LIGHTING},
+    {"unlit color",		    CS_BUFFER_COLOR_UNLIT},
     {"normal",			    CS_BUFFER_NORMAL},
     {"position",		    CS_BUFFER_POSITION},
     {"primary color",		    CS_BUFFER_COLOR},

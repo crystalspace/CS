@@ -1,4 +1,3 @@
 SubDir TOP plugins mesh terrain ;
 
-SubInclude TOP plugins mesh terrain object ;
 SubInclude TOP plugins mesh terrain persist ;

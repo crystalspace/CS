@@ -16,13 +16,18 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_VERTEXLIGHT_H__
-#define __CS_VERTEXLIGHT_H__
+#ifndef __CS_CSGFX_VERTEXLIGHT_H__
+#define __CS_CSGFX_VERTEXLIGHT_H__
 
 #include "csgeom/math.h"
 #include "csgeom/vector3.h"
+#include "csutil/cscolor.h"
+#include "csqsqrt.h"
+
 #include "iengine/movable.h"
 #include "iengine/light.h"
+
+#include "csgfx/vertexlistwalker.h"
 
 // Attenuation functors
 
@@ -115,11 +120,10 @@ template<class AttenuationProc>
 class csPointLightProc
 {
 public:
-  csPointLightProc (iLight *light, iMovable *objectMovable,
+  csPointLightProc (iLight *light, const csReversibleTransform &objT,
     float blackLimit = 0.0001f)
     : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
-  {
-    csReversibleTransform objT = objectMovable->GetFullTransform ();
+  {    
     lightPos = objT.Other2This (light->GetMovable ()->GetFullPosition ());
     lightCol = light->GetColor ();
   }
@@ -128,9 +132,9 @@ public:
   csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
   {
     //compute gouraud shading..
-    csVector3 direction = v-lightPos;
+    csVector3 direction = lightPos-v;
     float distance = csQsqrt(direction.SquaredNorm ());
-    float dp = direction*n/distance;
+    float dp = (direction*n)/distance;
     if (dp > blackLimit)
     {
       attn (distance, dp);
@@ -156,11 +160,10 @@ template<class AttenuationProc>
 class csDirectionalLightProc
 {
 public:
-  csDirectionalLightProc (iLight *light, iMovable *objectMovable,
+  csDirectionalLightProc (iLight *light, const csReversibleTransform &objT,
     float blackLimit = 0.0001f)
     : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
   {
-    csReversibleTransform objT = objectMovable->GetFullTransform ();
     csReversibleTransform lightT = light->GetMovable ()->GetFullTransform ();
     lightPos = objT.Other2This (lightT.GetOrigin ());
     lightDir = objT.Other2ThisRelative (lightT.This2OtherRelative (
@@ -176,7 +179,7 @@ public:
     float dp = lightDir*n;
     if (dp > blackLimit)
     {
-      csVector3 direction = v-lightPos;
+      csVector3 direction = lightPos-v;
       float distance = csQsqrt(direction.SquaredNorm ());
       attn (distance, dp);
       return lightCol*dp;
@@ -202,11 +205,10 @@ template<class AttenuationProc>
 class csSpotLightProc
 {
 public:
-  csSpotLightProc (iLight *light, iMovable *objectMovable,
+  csSpotLightProc (iLight *light, const csReversibleTransform &objT,
     float blackLimit = 0.0001f)
     : attn (light), nullColor (0.0f, 0.0f, 0.0f), blackLimit (blackLimit)
   {
-    csReversibleTransform objT = objectMovable->GetFullTransform ();
     csReversibleTransform lightT = light->GetMovable ()->GetFullTransform ();
     lightPos = objT.Other2This (lightT.GetOrigin ());
     lightDir = objT.Other2ThisRelative (lightT.This2OtherRelative (
@@ -220,7 +222,7 @@ public:
   CS_FORCEINLINE
   csColor ProcessVertex (const csVector3 &v,const csVector3 &n) const
   {
-    csVector3 direction = (v-lightPos).Unit ();
+    csVector3 direction = (lightPos-v).Unit ();
 
     //compute gouraud shading..
     float dp = direction*n;
@@ -248,20 +250,32 @@ private:
   float falloffInner, falloffOuter;
 };
 
-template<class LightProc, class VertexType = csVector3,
-  class ColorType = csColor>
-class csVertexLightCalculator
+struct iVertexLightCalculator
+{
+public:
+  virtual void CalculateLighting (iLight *light, const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
+
+  virtual void CalculateLightingAdd (iLight *light, const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
+
+  virtual void CalculateLightingMul (iLight *light, const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const = 0;
+};
+
+template<class LightProc>
+class csVertexLightCalculator : public iVertexLightCalculator
 {
 public:
   csVertexLightCalculator ()
   {
   }
 
-  void CalculateLighting (iLight *light, iMovable *objectMovable,
-    size_t numvert, VertexType *vb, csVector3 *nb, ColorType *litColor) const
+  virtual void CalculateLighting (iLight *light, const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const
   {
     // setup the light calculator
-    LightProc lighter (light, objectMovable);
+    LightProc lighter (light, objtransform);
 
     for (size_t n = 0; n < numvert; n++)
     {
@@ -269,11 +283,11 @@ public:
     }
   }
 
-  void CalculateLightingAdd (iLight *light, iMovable *objectMovable,
-    size_t numvert, VertexType *vb, csVector3 *nb, ColorType *litColor) const
+  virtual void CalculateLightingAdd (iLight *light, const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const
   {
     // setup the light calculator
-    LightProc lighter (light, objectMovable);
+    LightProc lighter (light, objtransform);
 
     for (size_t n = 0; n < numvert; n++)
     {
@@ -281,11 +295,11 @@ public:
     }
   }
 
-  void CalculateLightingMul (iLight *light, iMovable *objectMovable,
-    size_t numvert, VertexType *vb, csVector3 *nb, ColorType *litColor) const
+  virtual void CalculateLightingMul (iLight *light, const csReversibleTransform &objtransform,
+    size_t numvert, csVertexListWalker<csVector3> vb, csVertexListWalker<csVector3> nb, csColor *litColor) const
   {
     // setup the light calculator
-    LightProc lighter (light, objectMovable);
+    LightProc lighter (light, objtransform);
 
     for (size_t n = 0; n < numvert; n++)
     {

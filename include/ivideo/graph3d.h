@@ -828,10 +828,11 @@ struct iGraphics3D : public iBase
     
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer () = 0;
 
-  /*
-    @@@ Needed for SW poly drawing ATM.
+  /**
+   * Set the world to camera transform.
+   * This affects rendering in DrawMesh and DrawSimpleMesh.
    */
-  virtual void SetWorldToCamera (csReversibleTransform* w2c) = 0;
+  virtual void SetWorldToCamera (const csReversibleTransform& w2c) = 0;
 
   /**
    * Draw a csSimpleRenderMesh on the screen.

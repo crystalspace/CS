@@ -337,6 +337,8 @@ bool csSoftwareGraphics3DCommon::Initialize (iObjectRegistry* p)
   string_indices = strings->Request ("indices");
   string_texture_diffuse = strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
   string_texture_lightmap = strings->Request ("tex lightmap");
+  string_object2world = strings->Request ("object2world transform");
+  string_world2camera = strings->Request ("world2camera transform");
 
   return true;
 }
@@ -4466,7 +4468,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   csSoftPolygonRenderer* polyRender = (csSoftPolygonRenderer*)source;
   */
 
-  iRenderBuffer* indexbuf = (mesh->buffers ? mesh->buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
+  iRenderBuffer* indexbuf = (modes.buffers ? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
   size_t i;
   
   if (!indexbuf)
@@ -4549,10 +4551,13 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
   poly.mixmode = modes.mixmode;
   z_buf_mode = modes.z_buf_mode;
 
+  csReversibleTransform object2world;
+  stacks[string_object2world].Top ()->GetValue (object2world);
+  csReversibleTransform object2camera = w2c / object2world;
 
   for (i = 0; i < polyRender->polys.Length (); i++)
   {
-    const csReversibleTransform& object2camera = mesh->object2camera;
+    
     csPolygonRenderData* spoly = polyRender->polys[i];
 
     int numVerts = spoly->num_vertices;
@@ -4622,23 +4627,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (const csCoreRenderMesh* mesh,
       }
       csReversibleTransform obj2tex (m_o2t, v_o2t);
 
-      /*csReversibleTransform obj2world; // @@@ 
-      obj2world = w2c / mesh->object2camera;
-
-      csMatrix3 m_world2tex = m_o2t;
-      m_world2tex *= obj2world.GetO2T ();
-      csVector3 v_world2tex = obj2world.This2Other (v_o2t);
-
-      poly.cam2tex.m_cam2tex = &m_world2tex;
-      *poly.cam2tex.m_cam2tex *= w2c.GetT2O ();
-
-      csVector3 v = w2c.Other2This (v_world2tex);
-      poly.cam2tex.v_cam2tex = &v;*/
-
-      //csReversibleTransform cam2tex (obj2tex / object2camera.GetInverse ());
-
-      //poly.cam2tex.m_cam2tex = (csMatrix3*)&cam2tex.GetO2T ();
-      //poly.cam2tex.v_cam2tex = (csVector3*)&cam2tex.GetOrigin ();
+      
       csMatrix3 m_cam2tex = obj2tex.GetO2T () * object2camera.GetT2O ();
       csVector3 v_cam2tex = object2camera.Other2This (obj2tex.GetO2TTranslation ());
       
@@ -4693,7 +4682,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     color_verts = Get_color_verts ();
   }
 
-  iRenderBuffer* indexbuf = (mesh->buffers ? mesh->buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
+  iRenderBuffer* indexbuf = (modes.buffers ? modes.buffers->GetRenderBuffer(CS_BUFFER_INDEX) : 0);
 
   if (!indexbuf)
   {
@@ -4705,6 +4694,17 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   CS_ASSERT(indexbuf);
 
   uint32 *indices = (uint32*)indexbuf->Lock (CS_BUF_LOCK_NORMAL);
+  indexbuf->Release ();
+
+  csReversibleTransform object2world;
+
+  if (string_object2world>=(csStringID)stacks.Length () 
+    || stacks[string_object2world].Length () == 0)
+    object2world = mesh->object2camera.GetInverse ()*w2c;
+  else
+    stacks[string_object2world].Top ()->GetValue (object2world);
+
+  csReversibleTransform object2camera = w2c / object2world;
 
   //do_lighting = false;
   bool lazyclip = false;
@@ -4713,16 +4713,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   //z_buf_mode = CS_ZBUF_USE;
   z_buf_mode = modes.z_buf_mode;
 
-  const unsigned int numBuffers =
-    sizeof (activebuffers) / sizeof (iRenderBuffer*);
-  void* locks[numBuffers];
-  for (i=0; i<numBuffers; ++i)
-  {
-    if (activebuffers[i] != 0)
-      locks[i] = activebuffers[i]->Lock (CS_BUF_LOCK_NORMAL);
-    else
-      locks[i] = 0;
-  }
+
 
 /*#if CS_DEBUG
   // Check if the vertex buffers are locked.
@@ -4836,6 +4827,17 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
     workIndices = indices;
   }
 
+  const unsigned int numBuffers =
+    sizeof (activebuffers) / sizeof (iRenderBuffer*);
+  void* locks[numBuffers];
+  for (i=0; i<numBuffers; ++i)
+  {
+    if (activebuffers[i] != 0)
+      locks[i] = activebuffers[i]->Lock (CS_BUF_LOCK_NORMAL);
+    else
+      locks[i] = 0;
+  }
+
   // Update work tables.
   if (num_vertices > (unsigned int)tr_verts->Capacity ())
   {
@@ -4868,7 +4870,7 @@ void csSoftwareGraphics3DCommon::DrawMesh (const csCoreRenderMesh* mesh,
   {
     tr_verts->SetLength (num_vertices);
     for (i = 0 ; i < num_vertices ; i++)
-      (*tr_verts)[i] = mesh->object2camera * f1[i];
+      (*tr_verts)[i] = object2camera * f1[i];
     work_verts = tr_verts->GetArray ();
   }
   /*else

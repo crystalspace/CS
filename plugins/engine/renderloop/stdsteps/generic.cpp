@@ -430,6 +430,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   }
 
   ShaderTicketHelper ticketHelper (stacks, shadervars, shadervars.Length ()-1);
+  const csReversibleTransform& camt = rview->GetCamera ()->GetTransform ();
 
   for (size_t n = 0; n < num; n++)
   {
@@ -441,6 +442,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       {
         if (shader != 0)
 	{
+          g3d->SetWorldToCamera (camt);
 	  RenderMeshes (g3d, shader, currentTicket, sameShaderMeshSvcs + lastidx,
 	    sameShaderMeshes+lastidx, numSSM, stacks);
           shader = 0;
@@ -491,6 +493,7 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
         // @@@ Need error reporter
         if (shader != 0)
 	{
+          g3d->SetWorldToCamera (camt);
           RenderMeshes (g3d, shader, currentTicket, sameShaderMeshSvcs + lastidx, 
 	    sameShaderMeshes + lastidx, numSSM, stacks);
 	}
@@ -507,8 +510,11 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   {
     // @@@ Need error reporter
     if (shader != 0)
+    {
+      g3d->SetWorldToCamera (camt);
       RenderMeshes (g3d, shader, currentTicket, sameShaderMeshSvcs + lastidx,
         sameShaderMeshes + lastidx, numSSM, stacks);
+    }
   }
 
   shadervars.Pop ();

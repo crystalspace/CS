@@ -129,6 +129,7 @@ void csSprite2DMeshObject::SetupObject ()
     csRef<iRenderBufferAccessor> newAccessor;
     newAccessor.AttachNew (new eiRenderBufferAccessor (this));
     bufferHolder->SetAccessor (newAccessor, CS_BUFFER_ALL_MASK);
+    svcontext.AttachNew (new csShaderVariableContext);
   }
 }
 
@@ -228,6 +229,7 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
   {
     rm->meshtype = CS_MESHTYPE_TRIANGLEFAN;
     rm->buffers = bufferHolder;
+    rm->variablecontext = svcontext;
     rm->geometryInstance = this;
   }
   
@@ -245,9 +247,12 @@ csRenderMesh** csSprite2DMeshObject::GetRenderMeshes (int &n,
       disappear. 
      */
   rm->indexstart = 0;
+  rm->worldspace_origin = movable->GetFullPosition ();
+
+  rm->variablecontext->GetVariableAdd (factory->string_object2world)->
+    SetValue (tr_o2c.GetInverse ()* camera->GetTransform ());
   rm->indexend = (uint)vertices.Length();
-  rm->object2camera = tr_o2c;
-  rm->camera_origin = camera_origin;
+
 
   n = 1; 
   return &rm; 
@@ -734,6 +739,9 @@ csSprite2DMeshObjectFactory::csSprite2DMeshObjectFactory (iMeshObjectType* pPare
   csSprite2DMeshObjectFactory::object_reg = object_reg;
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  string_object2world = strings->Request ("object2world transform");
 }
 
 csSprite2DMeshObjectFactory::~csSprite2DMeshObjectFactory ()

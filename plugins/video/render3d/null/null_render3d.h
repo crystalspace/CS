@@ -167,7 +167,7 @@ public:
   void RemoveFromCache (iRendererLightmap* rlm) { }
   bool IsLightmapOK (int lmw, int lmh, int lightCellSize) { return false; }
   csPtr<iPolygonRenderer> CreatePolygonRenderer ();
-  void SetWorldToCamera (csReversibleTransform* w2c) { }
+  void SetWorldToCamera (const csReversibleTransform& w2c) { }
   void DrawSimpleMesh (const csSimpleRenderMesh& mesh, uint flags = 0) { }
 private:
   iObjectRegistry* object_reg;

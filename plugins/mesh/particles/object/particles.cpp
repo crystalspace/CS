@@ -185,6 +185,7 @@ csParticlesObject::csParticlesObject (csParticlesFactory* p)
 
   radius_name = strings->Request ("point radius");
   scale_name = strings->Request ("point scale");
+  string_object2world = strings->Request ("object2world transform");
 
   matwrap = p->material;
 
@@ -525,23 +526,21 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
 {
   iCamera* cam = rview->GetCamera ();
 
-  tr_o2c = cam->GetTransform ();
+  csReversibleTransform o2wt;
+
   if (!transform_mode)
   {
     emitter = movable->GetFullPosition();
-    csReversibleTransform trans;
     // @@@ The code below is not very efficient!
-    trans.Identity();
-    trans.SetOrigin (emitter);
-    tr_o2c /= trans;
+    o2wt.Identity();
+    o2wt.SetOrigin (emitter);
   }
   else
   {
-    if (!movable->IsFullTransformIdentity ())
-      tr_o2c /= movable->GetFullTransform ();
+    o2wt = movable->GetFullTransform ();
   }
   // @@@ GetTransform??? Shouldn't this be GetFullTransform?
-  rotation_matrix = movable->GetTransform ().GetT2O ();
+  rotation_matrix = movable->GetFullTransform ().GetT2O ();
 
   int vertnum = 0;
   float new_radius = 0.0f;
@@ -577,7 +576,6 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
   	clip_z_plane);
-  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   if (!point_sprites)
   {
@@ -614,13 +612,11 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   mesh->do_mirror = rview->GetCamera()->IsMirrored();
   matwrap->Visit ();
   mesh->material = matwrap;
-  mesh->object2camera = tr_o2c;
-  mesh->camera_origin = camera_origin;
-  mesh->camera_transform = &cam->GetTransform();
+  mesh->worldspace_origin = o2wt.GetOrigin ();
   mesh->indexstart = 0;
   mesh->indexend = vertnum;
-  mesh->variablecontext = 
-    (iShaderVariableContext*)svcontext; // Cast for gcc 2.95.x.
+  mesh->variablecontext = svcontext; // Cast for gcc 2.95.x.
+  mesh->variablecontext->GetVariableAdd (string_object2world)->SetValue (o2wt);
   mesh->buffers = bufferHolder;
   if (point_sprites)
     mesh->meshtype = CS_MESHTYPE_POINT_SPRITES;

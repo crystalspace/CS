@@ -85,6 +85,7 @@ private:
   csGLStateCache* statecache;  
 
   csStringID ambientvar;
+  csStringID string_world2camera;
   csRef<csShaderVariable> ambientVarRef;
   csArray<lightingentry> lights;
   bool do_lighting;
@@ -130,6 +131,7 @@ public:
 
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const csRenderMesh* mesh,
+    csRenderMeshModes& modes,
     const csShaderVarStack &stacks);
 
   /// Reset states to original

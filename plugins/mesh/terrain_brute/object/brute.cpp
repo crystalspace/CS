@@ -493,7 +493,8 @@ void csTerrBlock::UpdateStaticLighting ()
 
 void csTerrBlock::DrawTest (iGraphics3D* g3d,
 			    iRenderView *rview, uint32 frustum_mask,
-                            csReversibleTransform &transform)
+                            csReversibleTransform &transform,
+                            iMovable *movable)
 {
   if (!built)
     return;
@@ -505,10 +506,10 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
                     children[2]->built &&
                     children[3]->built)
   {
-    children[0]->DrawTest (g3d, rview, frustum_mask, transform);
-    children[1]->DrawTest (g3d, rview, frustum_mask, transform);
-    children[2]->DrawTest (g3d, rview, frustum_mask, transform);
-    children[3]->DrawTest (g3d, rview, frustum_mask, transform);
+    children[0]->DrawTest (g3d, rview, frustum_mask, transform, movable);
+    children[1]->DrawTest (g3d, rview, frustum_mask, transform, movable);
+    children[2]->DrawTest (g3d, rview, frustum_mask, transform, movable);
+    children[3]->DrawTest (g3d, rview, frustum_mask, transform, movable);
     return;
   }
 
@@ -574,6 +575,9 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
   
   bufferHolder->SetRenderBuffer (CS_BUFFER_INDEX, terr->mesh_indices[idx]);
 
+  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csVector3& wo = o2wt.GetOrigin ();
+
   for (int i=0; i<=(baseonly?0:(int)terr->palette.Length ()); ++i)
   {
     if ((i > 0) && !IsMaterialUsed (i - 1)) continue;
@@ -586,7 +590,6 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;
-    rm->object2camera = transform;
     rm->indexstart = 0;
     rm->indexend = terr->numindices[idx];
     if (i==0)
@@ -597,6 +600,8 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
       rm->material = terr->palette[i-1];
       rm->variablecontext = terr->paletteContexts[i-1];
     }
+    rm->variablecontext->GetVariableAdd (terr->string_object2world)->SetValue (o2wt);
+    rm->worldspace_origin = wo;
     terr->returnMeshes->Push (rm);
   }
 }
@@ -1150,6 +1155,7 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   normals_name = strings->Request ("normals");
   texcoords_name = strings->Request ("texture coordinates");
   colors_name = strings->Request ("colors");
+  string_object2world = strings->Request ("object2world transform");
 
   //terr_func = &((csTerrainFactory*)pFactory)->terr_func;
   terraformer = ((csTerrainFactory*)pFactory)->terraformer;
@@ -2012,7 +2018,7 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
   rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
 
   //rendermeshes.Empty ();
-  rootblock->DrawTest (g3d, rview, 0, tr_o2c);
+  rootblock->DrawTest (g3d, rview, 0, tr_o2c, movable);
   if (staticlighting)
     rootblock->UpdateStaticLighting ();
 

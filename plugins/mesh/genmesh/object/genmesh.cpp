@@ -1031,22 +1031,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
 
   iCamera* camera = rview->GetCamera ();
 
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c;
-  // Shouldn't this be done in the renderer?
-  tr_o2c = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
       clip_z_plane);
-  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   lighting_movable = movable;
 
@@ -1056,6 +1043,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     relevant_lights = factory->light_mgr->GetRelevantLights (
     	logparent, -1, false);
   }
+
+  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csVector3& wo = o2wt.GetOrigin ();
 
   if (subMeshes.Length () == 0)
   {
@@ -1095,7 +1085,7 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
         back2front_tree = factory->back2front_tree;
       }
       const csDirtyAccessArray<int>& triidx = back2front_tree->Back2Front (
-        tr_o2c.GetOrigin ());
+        camera->GetTransform ().Other2This (wo));
       CS_ASSERT (triidx.Length () == (size_t)num_sorted_mesh_triangles);
 
       csTriangle* factory_triangles = factory->GetTriangles ();
@@ -1122,12 +1112,12 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     meshPtr->indexend = factory->GetTriangleCount () * 3;
     meshPtr->material = mater;
     CS_ASSERT (mater != 0);
-    meshPtr->object2camera = tr_o2c;
-    meshPtr->camera_origin = camera_origin;
-    meshPtr->camera_transform = &camera->GetTransform();
+    meshPtr->worldspace_origin = wo;
     meshPtr->variablecontext = svcontext;
     meshPtr->buffers = bufferHolder;
     meshPtr->geometryInstance = (void*)factory;
+    meshPtr->variablecontext->GetVariableAdd (factory->string_object2world)->
+      SetValue (o2wt);
 
     renderMeshes[0] = meshPtr;
   } else {
@@ -1159,10 +1149,10 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       meshPtr->indexend = subMeshes[i]->tricount * 3;
       meshPtr->material = mater;
       CS_ASSERT (mater != 0);
-      meshPtr->object2camera = tr_o2c;
-      meshPtr->camera_origin = camera_origin;
-      meshPtr->camera_transform = &camera->GetTransform();
+      meshPtr->worldspace_origin = wo;
       meshPtr->variablecontext = svcontext;
+      meshPtr->variablecontext->GetVariableAdd (factory->string_object2world)->
+        SetValue (o2wt);
 
       subMeshes[i]->bufferHolder->SetAccessor (scfiRenderBufferAccessor, 
         bufferHolder->GetAccessorMask() 
@@ -1481,6 +1471,8 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory::eiRenderBufferAccessor)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferAccessor)
 SCF_IMPLEMENT_IBASE_END
 
+csStringID csGenmeshMeshObjectFactory::string_object2world = csInvalidStringID;
+
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   iMeshObjectType *pParent, iObjectRegistry* object_reg)
 {
@@ -1523,6 +1515,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
+  string_object2world = strings->Request ("object2world transform");
 
   mesh_vertices_dirty_flag = false;
   mesh_texels_dirty_flag = false;

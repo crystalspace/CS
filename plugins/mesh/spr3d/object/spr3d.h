@@ -357,6 +357,7 @@ private:
   csPDelArray<csPoly3D> normals;
 
   csFlags flags;
+  csStringID string_object2world;
 
   /**
    * Connectivity information for this sprite template.
@@ -391,7 +392,7 @@ public:
 
 public:
   /// Create the sprite template.
-  csSprite3DMeshObjectFactory (iMeshObjectType* pParent);
+  csSprite3DMeshObjectFactory (iMeshObjectType* pParent, iObjectRegistry *object_reg);
   /// Destroy the template.
   virtual ~csSprite3DMeshObjectFactory ();
 
@@ -1314,6 +1315,7 @@ private:
   csRef<iRenderBuffer> colors;
   csRef<iRenderBuffer> indices;
   csRef<csRenderBufferHolder> bufferHolder;
+  csRef<csShaderVariableContext> svcontext;
 
   /// Setup this object.
   void SetupObject ();

@@ -44,10 +44,6 @@
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
 
-// (These are undeffed at end of shadermgr.cpp. Ugly?)
-#define STREAMMAX 16  // @@@ Hardcoded max streams to 16 
-#define TEXMAX 16  // @@@ Hardcoded max texture units to 16
-
 
 class csShaderManager : public iShaderManager
 {
@@ -84,6 +80,8 @@ private:
   };
   csSet<csStringID>& GetTagSet (csShaderTagPresence presence);
   csHash<TagInfo, csStringID> tagInfo;
+
+  csArray<iLight*> activeLights;
 public:
   SCF_DECLARE_IBASE;
 
@@ -128,6 +126,20 @@ public:
 
   virtual const csSet<csStringID>& GetTags (csShaderTagPresence presence,
     int& count);
+
+  /**
+  * Set the list of active lights.
+  * Active lights is lights that the shader should use.
+  */
+  virtual void SetActiveLights (const csArray<iLight*>& lights);
+
+  /**
+  * Get the list of active lights. 
+  */
+  virtual const csArray<iLight*>& GetActiveLights () const
+  {
+    return activeLights;
+  }
 
   //=================== iShaderVariableContext ================//
 

@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
+              (C) 2005 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -180,7 +181,7 @@ void csLightIterRenderStep::Init ()
     csStringID attname = strings->Request ("STANDARD_LIGHT_0_ATTENUATION");
     csStringID atxname = strings->Request ("STANDARD_LIGHT_0_ATTENUATIONTEX");
 
-    csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY (
+    shadermgr = CS_QUERY_REGISTRY (
     	object_reg, iShaderManager);
 
     shvar_light_0_position = shadermgr->GetVariable (posname);
@@ -256,6 +257,8 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
   iLightList* lights = sector->GetLights();
   int nlights = lights->GetCount();
 
+  csArray<iLight*> lightList;
+
   while (nlights-- > 0)
   {
     iLight* light = lights->Get (nlights);
@@ -287,6 +290,10 @@ void csLightIterRenderStep::Perform (iRenderView* rview, iSector* sector,
     shvar_light_0_position_world->SetValue (lightPos);
 
     shvar_light_0_attenuationtex->SetAccessor (GetLightAccessor (light));
+
+    lightList.Push (light);
+    shadermgr->SetActiveLights (lightList);
+    lightList.Empty ();
 
     csSphere lightSphere (lightPos, light->GetCutoffDistance ());
     if (rview->TestBSphere (camTransR, lightSphere))

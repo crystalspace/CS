@@ -75,6 +75,8 @@ csProtoMeshObject::csProtoMeshObject (csProtoMeshObjectFactory* factory)
   current_features = 0;
 
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
+
+  variableContext.AttachNew (new csShaderVariableContext);
 }
 
 csProtoMeshObject::~csProtoMeshObject ()
@@ -153,21 +155,12 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
 
   iCamera* camera = rview->GetCamera ();
 
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c;
-  tr_o2c = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-
   int clip_portal, clip_plane, clip_z_plane;
   rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
       clip_z_plane);
-  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
+
+  const csReversibleTransform& o2wt = movable->GetFullTransform ();
+  const csVector3& wo = o2wt.GetOrigin ();
 
   CS_ASSERT (material != 0);
   material->Visit ();
@@ -195,11 +188,15 @@ csRenderMesh** csProtoMeshObject::GetRenderMeshes (
   meshPtr->indexstart = 0;
   meshPtr->indexend = PROTO_TRIS * 3;	// 12 triangles.
   meshPtr->material = material;
-  meshPtr->object2camera = tr_o2c;
-  meshPtr->camera_origin = camera_origin;
-  meshPtr->camera_transform = &camera->GetTransform();
+  meshPtr->worldspace_origin = wo;
   if (rmCreated)
+  {
     meshPtr->buffers = bufferHolder;
+    meshPtr->variablecontext = variableContext;
+  }
+  meshPtr->variablecontext->GetVariableAdd (factory->string_object2world)->
+    SetValue (o2wt);
+
   meshPtr->geometryInstance = (void*)factory;
  
   n = 1;
@@ -320,6 +317,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csProtoMeshObjectFactory::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+csStringID csProtoMeshObjectFactory::string_object2world = csInvalidStringID;
 
 csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
       iObjectRegistry* object_reg)
@@ -345,6 +343,12 @@ csProtoMeshObjectFactory::csProtoMeshObjectFactory (iMeshObjectType *pParent,
   polygons = 0;
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
+    "crystalspace.shared.stringset", iStringSet);
+  if (string_object2world == csInvalidStringID)
+  {
+    string_object2world = strings->Request ("object2world transform");
+  }
 
   mesh_vertices_dirty_flag = true;
   mesh_texels_dirty_flag = true;

@@ -1,6 +1,5 @@
 /*
-  Copyright (C) 2002 by Marten Svanfeldt
-                        Anders Stenberg
+  Copyright (C) 2005 by Marten Svanfeldt
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -17,47 +16,21 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GLSHADER_AVP_H__
-#define __GLSHADER_AVP_H__
+#ifndef __CS_VPROC_VPROC_PROGRAM_H__
+#define __CS_VPROC_VPROC_PROGRAM_H__
 
 #include "csplugincommon/shader/shaderplugin.h"
 #include "csplugincommon/shader/shaderprogram.h"
-#include "csgfx/shadervarcontext.h"
-#include "ivideo/shader/shader.h"
-#include "csutil/strhash.h"
-#include "csutil/leakguard.h"
+#include "vproc_std.h"
 
-#include "glshader_arb.h"
-
-class csShaderGLAVP : public csShaderProgram
+class csVProcStandardProgram : csShaderProgram
 {
-private:
-  csGLShader_ARB* shaderPlug;
-
-  GLuint program_num;
-
-  bool validProgram;
-  csRef<iDataBuffer> programBuffer;
-
-  void Report (int severity, const char* msg, ...);
 public:
   SCF_DECLARE_IBASE_EXT (csShaderProgram);
+  CS_LEAKGUARD_DECLARE (csVProcStandardProgram);
 
-  CS_LEAKGUARD_DECLARE (csShaderGLAVP);
-
-  csShaderGLAVP(csGLShader_ARB* shaderPlug) : 
-    csShaderProgram (shaderPlug->object_reg)
-  {
-    validProgram = true;
-    this->shaderPlug = shaderPlug;
-  }
-  virtual ~csShaderGLAVP ()
-  {
-  }
-
-  bool LoadProgramStringToGL ();
-
-  void SetValid(bool val) { validProgram = val; }
+  csVProcStandardProgram (csVProc_Std *plug);
+  virtual ~csVProcStandardProgram ();
 
   ////////////////////////////////////////////////////////////////////
   //                      iShaderProgram
@@ -71,26 +44,49 @@ public:
 
   /// Setup states needed for proper operation of the shader
   virtual void SetupState (const csRenderMesh* mesh,
-    csRenderMeshModes& modes,
-    const csShaderVarStack &stacks);
+                           csRenderMeshModes& modes,
+                           const csShaderVarStack &stacks);
 
   /// Reset states to original
   virtual void ResetState ();
 
   /// Check if valid
-  virtual bool IsValid() { return validProgram;} 
+  virtual bool IsValid() { return true; } 
 
   /// Loads from a document-node
-  virtual bool Load (iShaderTUResolver*, iDocumentNode* node);
+  virtual bool Load(iShaderTUResolver* tuResolve, iDocumentNode* node);
 
   /// Loads from raw text
-  virtual bool Load (iShaderTUResolver*, const char* program, 
-    csArray<csShaderVarMapping> &mappings);
+  virtual bool Load (iShaderTUResolver* tuResolve, const char* program, 
+    csArray<csShaderVarMapping>& mappings);
+
 
   /// Compile a program
   virtual bool Compile(csArray<iShaderVariableContext*> &staticContexts);
+
+  virtual int ResolveTextureBinding (const char* binding)
+  { return -1; }
+
+private:
+  csVProc_Std *shaderPlugin;
+
+  csStringHash tokens;
+#define CS_TOKEN_ITEM_FILE \
+  "plugins/video/render3d/shader/shaderplugins/vproc_std/vproc_program.tok"
+#include "cstool/tokenlist.h"
+#undef CS_TOKEN_ITEM_FILE
+
+  //light calculation parameters
+  enum LightMixmode
+  {
+    LIGHTMIXMODE_NONE = 0,
+    LIGHTMIXMODE_ADD = 1,
+    LIGHTMIXMODE_MUL = 2
+  } lightMixMode;
+
+  float finalLightFactor;
+  uint numLights;
+  bool useAttenuation;
 };
 
-
-#endif //__GLSHADER_AVP_H__
-
+#endif //__CS_VPROC_VPROC_PROGRAM_H__
