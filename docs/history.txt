@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+30-Jun-2004
+	- Peter Amstutz added search support to the csvosa3dl plugin,
+	  so that VOS servers with search support can send the world
+	  as a single large download rather than requiring many
+	  separate requests.  This improves performance greatly.
+	- Peter Amstutz modified the the log level of logging statements
+	  in the csvosa3dl plugin so that there isn't so much
+	  logging spew at the default log level.
 29-Jun-2004
 	- Jorrit fixed a bug in spr3d where manually specifying sprite normals
 	  didn't work.
