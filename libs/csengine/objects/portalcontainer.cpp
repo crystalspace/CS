@@ -912,7 +912,6 @@ bool csPortalContainer::Draw (iRenderView* rview, iMovable* movable,
 
 void csPortalContainer::HardTransform (const csReversibleTransform& t)
 {
-  Prepare ();
   int i;
   world_vertices.SetLength (vertices.Length ());
   for (i = 0 ; i < vertices.Length () ; i++)
@@ -932,6 +931,7 @@ void csPortalContainer::HardTransform (const csReversibleTransform& t)
       prt->ObjectToWorld (t, prt->warp_obj);
   }
   movable_nr--;	// Make sure object to world will be recalculated.
+  prepared = false;
 }
 
 bool csPortalContainer::HitBeamOutline (const csVector3& start,

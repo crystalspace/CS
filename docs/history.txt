@@ -59,8 +59,11 @@ chronological order.
 	      - In Software mode the rotating door no longer has correct
 	        reflection. In OpenGL it is fine.
 	      - The <float/> keyword for the rotating door had to be removed
-	        so there may be some issues there. This needs to be investigated.
+	        so there may be some issues there. This needs to be
+		investigated.
 	      - Wavy sector doesn't work yet.
+	- Jorrit fixed a bug in the HardTransform() implementation of
+	  the portal container. This fixes the partsys level.
 1-Oct-2003
 	- Jorrit fixed a bug reported by valgrind in the portal container.
 	  It was using an uninitialized variable.
