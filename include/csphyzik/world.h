@@ -28,6 +28,9 @@
 
 enum errorcode { WORLD_NOERR, WORLD_ERR_NULLPARAMETER, WORLD_ERR_NOODE, WORLD_ERR_SHITHAPPEND, WORLD_ERR_OTHERSTUFF };
 
+#define DEFAULT_INIT_MAX_STATE_SIZE  1024
+#define STATE_RESIZE_EXTRA 256
+
 class ctRigidBody;
 class ctArticulatedBody;
 class ctForce;
@@ -40,8 +43,14 @@ public:
 	virtual ~ctWorld();  //!me delete _lists and ode
 
 	void calc_delta_state( real t, const real y[], real ydot[] );
+
+  // evolve the state of the system.  calc forces, determine new v, etc..
 	errorcode evolve( real t1, real t2 );
-	void solve( real t );
+  
+  // rewind the state of the system to the time just before evolve was called.
+  errorcode rewind();  
+	
+  void solve( real t );
 	errorcode add_rigidbody( ctRigidBody *rb );
 	errorcode add_articulatedbodybase( ctArticulatedBody *ab );
 	errorcode add_enviro_force( ctForce *f );
@@ -65,10 +74,20 @@ protected:
 
 	void collide();
 
+  void resize_state_vector( long new_size );
+
 	ctLinkList_ctPhysicalEntity body_list;
 	ctLinkList_ctForce enviro_force_list;
 
 	OdeSolver *ode_to_math;  // would an equation by any other name smell as sweet?
+
+  // state vectors for ODE interface
+  real *y_save;  // used to save state so it can be rewound to pre-ODE state
+	real *y0;
+	real *y1;
+
+  long y_save_size;
+  long max_state_size;
 
 };
 
