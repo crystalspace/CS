@@ -355,14 +355,6 @@ public:
     return sect;
   }
 
-  /// The default ArraySortCompareFunction for Sort()
-  static int DefaultSortCompare (void const *item1, void const *item2)
-  {
-    if ((int) item1 < (int) item2) return -1;
-    else if ((int) item2 > (int) item1) return 1;
-    else return 0;
-  }
-
   /// The default ArrayCompareFunction for InsertSorted()
   static int DefaultCompare (T const &item1, T const &item2)
   {
@@ -440,7 +432,7 @@ public:
   /**
    * Sort array.
    */
-  void Sort (ArraySortCompareFunction* compare = DefaultSortCompare)
+  void Sort (ArraySortCompareFunction* compare)
   {
     qsort (root, Length (), sizeof (T), compare);
   }
