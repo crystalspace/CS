@@ -19,7 +19,7 @@ chronological order.
             - Added newline to end of 'plugins/csparser/prstex.cpp'.
             - Added 'ODE.AVAILABLE' test to physics loader plugin jamfile.
               This brings it into line with make build. There is no need for
-              it's loader, if the odedyman plugin isn't being built.
+              it's loader, if the odedynam plugin isn't being built.
             - Manually updated cs_pyth.cpp and cspace.py after recent
               changes.
 3-Aug-2003
