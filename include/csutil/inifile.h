@@ -21,10 +21,13 @@
 #define __CS_INIFILE_H__
 
 #include "csutil/csvector.h"
+#include "ivfs.h"
 
 class csVFS;
 class csStrVector;
 
+typedef bool (csIniWriteFunc)( csSome Stream, void *data, unsigned int iniWriteType, size_t len);
+	
 class csIniFile : public csBase
 {
 private:
@@ -107,11 +110,15 @@ public:
   csIniFile (const char* path, char Comment = ';');
   /// Initialize INI file object and load it from a file on VFS volume
   csIniFile (csVFS* vfs, const char* path, char iCommentChar = ';');
+  /// Initialize INI file object and load it from an iFile
+  csIniFile (iFile* f, char iCommentChar = ';');
   /// Destroy the object
   virtual ~csIniFile ();
 
   /// Load INI from file
   bool Load (const char *fName);
+  /// Load INI from iFile
+  bool Load (iFile *f);
   /// Load INI from memory buffer
   bool Load (const char *Data, size_t DataSize);
   /// Override to type your own error messages
@@ -119,6 +126,7 @@ public:
 
   /// Save INI file
   bool Save (const char *fName);
+  bool Save (iFile *f);
 
   /// A section iterator
   class SectionIterator : public Iterator
@@ -263,14 +271,14 @@ private:
   bool Load (bool (*ReadLine) (csSome Stream, void *data, size_t size),
     csSome Stream);
   /// Save a comment
-  void SaveComment (const char* Text, FILE*) const;
+  void SaveComment (const char* Text, csIniWriteFunc writeFunc, csSome Stream ) const;
   /// Save comments for a section or key
-  void SaveComments (const PrvINIbranch*, FILE*) const;
+  void SaveComments (const PrvINIbranch*, csIniWriteFunc writeFunc, csSome Stream ) const;
   /// Save all the keys within a section
   void SaveData (const char* Name, csSome Data, size_t DataSize,
-    const PrvINIbranch* comments, FILE*) const;
+    const PrvINIbranch* comments, csIniWriteFunc writeFunc, csSome Stream ) const;
   /// Save all the data in a section
-  void SaveSection (const PrvINInode*, FILE*) const;
+  void SaveSection (const PrvINInode*, csIniWriteFunc writeFunc, csSome Stream ) const;
 };
 
 #endif // __CS_INIFILE_H__
