@@ -449,6 +449,10 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 
 %}
 
+%pythoncode %{
+        CS_POLYRANGE_LAST = csPolygonRange (-1, -1)
+%}
+
 %include "ivaria/pythvarg.i"
 
 #endif // SWIGPYTHON

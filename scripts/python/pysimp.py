@@ -11,6 +11,8 @@ except:
 
 print 'imported cspace'
 
+
+# This is never used in here? - jamest
 def CreateRoom(matname):
     print 'Start creating polygons from Python script...'
     engine = CS_QUERY_REGISTRY(object_reg, iEngine)
@@ -18,53 +20,10 @@ def CreateRoom(matname):
     walls = engine.CreateSectorWallsMesh(room,"walls")
     thingstate = SCF_QUERY_INTERFACE(walls.GetMeshObject(), iThingState)
     material=engine.GetMaterialList().FindByName(matname)
-
-    poly=thingstate.GetFactory().CreatePolygon('floor')
-    poly.CreateVertex(csVector3(-5,0,5))
-    poly.CreateVertex(csVector3(5,0,5))
-    poly.CreateVertex(csVector3(5,0,-5))
-    poly.CreateVertex(csVector3(-5,0,-5))
-    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-    poly.SetMaterial(material)
-
-    poly=thingstate.GetFactory().CreatePolygon('ceiling')
-    poly.CreateVertex(csVector3(-5,20,-5))
-    poly.CreateVertex(csVector3(5,20,-5))
-    poly.CreateVertex(csVector3(5,20,5))
-    poly.CreateVertex(csVector3(-5,20,5))
-    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-    poly.SetMaterial(material)
-
-    poly=thingstate.GetFactory().CreatePolygon('w1')
-    poly.CreateVertex(csVector3(-5,20,5))
-    poly.CreateVertex(csVector3(5,20,5))
-    poly.CreateVertex(csVector3(5,0,5))
-    poly.CreateVertex(csVector3(-5,0,5))
-    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-    poly.SetMaterial(material)
-
-    poly=thingstate.GetFactory().CreatePolygon('w2')
-    poly.CreateVertex(csVector3(5,20,5))
-    poly.CreateVertex(csVector3(5,20,-5))
-    poly.CreateVertex(csVector3(5,0,-5))
-    poly.CreateVertex(csVector3(5,0,5))
-    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-    poly.SetMaterial(material)
-
-    poly=thingstate.GetFactory().CreatePolygon('w3')
-    poly.CreateVertex(csVector3(-5,20,-5))
-    poly.CreateVertex(csVector3(-5,20,5))
-    poly.CreateVertex(csVector3(-5,0,5))
-    poly.CreateVertex(csVector3(-5,0,-5))
-    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-    poly.SetMaterial(material)
-
-    poly=thingstate.GetFactory().CreatePolygon('w4')
-    poly.CreateVertex(csVector3(5,20,-5))
-    poly.CreateVertex(csVector3(-5,20,-5))
-    poly.CreateVertex(csVector3(-5,0,-5))
-    poly.CreateVertex(csVector3(5,0,-5))
-    poly.SetTextureSpace(poly.GetVertex(0), poly.GetVertex(1), 3)
-    poly.SetMaterial(material)
+    walls_state = thingstate.GetFactory()
+    walls_state.AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5))
+    walls_state.SetPolygonMaterial (CS_POLYRANGE_LAST, material);
+    walls_state.SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+                                        
     print 'Finished!'
 

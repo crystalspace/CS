@@ -195,6 +195,7 @@
 	INTERFACE_APPLY(iScriptObject)
 	INTERFACE_APPLY(iSector)
 	INTERFACE_APPLY(iSectorList)
+	INTERFACE_APPLY(iShaderBranch)
 	INTERFACE_APPLY(iSoundHandle)
 	INTERFACE_APPLY(iSoundLoader)
 	INTERFACE_APPLY(iSoundRender)
@@ -822,6 +823,7 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "ivideo/halo.h"
 
+%include "ivideo/shader/shader.h"
 %rename(GetKeyColorStatus) iTextureHandle::GetKeyColor();
 %include "ivideo/texture.h"
 

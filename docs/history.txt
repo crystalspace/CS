@@ -42,6 +42,12 @@ chronological order.
 	- Eric Sunshine worked around MSVC6 crasher reported by Fritz Elfert
 	  <felfert@to.com> in sequence.cpp where compiler couldn't deal with
 	  `if ((*seq) != 0)' where `seq' is a `csWeakRef<csSequence>*'.
+	- jamest changed the swig wrapper to support the new polygon creation 
+	  and manipulation API (AddInsideBox).  The python samples have been
+	  updated to reflect the new API.  added iShaderBranch to the wrapper 
+	  to eliminate a warning/ignore during swigpythgen.
+	- jamest removed css.h references to the recently removed metaball, 
+	  metagen, and csTesselator.  
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,
