@@ -311,7 +311,7 @@ csPtr<iBase> csSprite3DBinFactoryLoader::Parse (void* data,
       float disp = 0;
       if (!delay)  // read optional displacement if no delay
       {
-        disp = convert_endian(*((float *)p)); p += sizeof(float);
+        disp = convert_endian(long2float(*((long *)p))); p += sizeof(float);
       }
       act->AddFrame (ff, delay,disp);
     }
@@ -479,6 +479,12 @@ void csSprite3DBinFactorySaver::WriteDown (iBase* obj, iFile * file)
       int frame_delay = action->GetFrameDelay(j);
       int fd = convert_endian((int32)frame_delay);
       file->Write ((char *)&fd, 4);
+      if (!frame_delay)  // write optional displacement if no delay
+      {
+        float disp = action->GetFrameDisplacement(j);
+	long ce_disp = convert_endian(float2long(disp));
+        file->Write ((char *)&ce_disp, 4);
+      }
     }
   }
 
