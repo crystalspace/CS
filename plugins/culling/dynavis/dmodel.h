@@ -19,15 +19,15 @@
 #ifndef __CS_DMODEL_H__
 #define __CS_DMODEL_H__
 
-#include "csutil/scf.h"
-#include "csutil/hashmap.h"
 #include "csgeom/obb.h"
+#include "csutil/hash.h"
+#include "csutil/scf.h"
 
-struct iObjectModel;
 class csDynavisObjectModel;
 class csObjectModelManager;
 struct csPolygonMeshEdge;
 struct iMeshWrapper;
+struct iObjectModel;
 
 /**
  * Outline information.
@@ -135,13 +135,14 @@ public:
 
 /**
  * An object model manager. This class will manage instances of
- * csDynavisObjectModel for every iObjectModel that is received by the visibility
- * system.
+ * csDynavisObjectModel for every iObjectModel that is received by the
+ * visibility system.
  */
 class csObjectModelManager
 {
 private:
-  csHashMap models;
+  typedef csHash<csDynavisObjectModel*,iObjectModel*> ModelHash;
+  ModelHash models;
 
 public:
   csObjectModelManager ();
@@ -168,4 +169,3 @@ public:
 };
 
 #endif // __CS_DMODEL_H__
-

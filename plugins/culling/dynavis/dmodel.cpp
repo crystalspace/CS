@@ -113,16 +113,16 @@ const csOBB& csDynavisObjectModel::GetOBB ()
 
 //---------------------------------------------------------------------------
 
-csObjectModelManager::csObjectModelManager () : models (12263)
+csObjectModelManager::csObjectModelManager () : models (193)
 {
 }
 
 csObjectModelManager::~csObjectModelManager ()
 {
-  csGlobalHashIterator it (&models);
+  ModelHash::GlobalIterator it = models.GetIterator();
   while (it.HasNext ())
   {
-    csDynavisObjectModel* model = (csDynavisObjectModel*)it.Next ();
+    csDynavisObjectModel* model = it.Next ();
     delete model;
   }
 }
@@ -130,8 +130,7 @@ csObjectModelManager::~csObjectModelManager ()
 csDynavisObjectModel* csObjectModelManager::CreateObjectModel (
 	iObjectModel* imodel)
 {
-  csDynavisObjectModel* model = (csDynavisObjectModel*)models.Get (
-  	(csHashKey)imodel);
+  csDynavisObjectModel* model = models.Get (imodel, 0);
   if (model)
   {
     model->ref_cnt++;
@@ -155,7 +154,7 @@ void csObjectModelManager::ReleaseObjectModel (csDynavisObjectModel* model)
   if (model->ref_cnt == 1)
   {
     // We are about to delete the model.
-    models.DeleteAll ((csHashKey)(model->imodel));
+    models.DeleteAll (model->imodel);
     delete model;
     return;
   }
