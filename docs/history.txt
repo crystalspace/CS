@@ -22,6 +22,8 @@ The history order is reversed so that new features are at the top.
 	  read 'object' instead of 'factory'.
 	- Philip Wyett updated MSVC build docs to reflect a new msvc_libs
 	  release. This release has a number of fixes and removes libmikmod.
+	- Eric Sunshine fixed bugs in cspython.mak where it failed to respect
+	  $(SRCDIR) in some cases.
 8-May-2003
 	- Eric Sunshine fixed problem in MacOS/X OpenGL canvas where it was not
 	  specifying its SCF dependency properly.

@@ -85,8 +85,8 @@ SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 TRASH.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/scripts/python/,*.pyc *.pyo))
 
 INC.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/cspython/*.h))
-SRC.CSPYTHON = $(filter-out plugins/cscript/cspython/pythmod.cpp, \
-  $(sort $(wildcard plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)))
+SRC.CSPYTHON = $(filter-out $(SRCDIR)/plugins/cscript/cspython/pythmod.cpp, \
+  $(sort $(wildcard $(SRCDIR)/plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)))
 OBJ.CSPYTHON = $(addprefix $(OUT)/, $(notdir $(SRC.CSPYTHON:.cpp=$O)))
 DEP.CSPYTHON = CSTOOL CSGFX CSGEOM CSSYS CSUTIL CSSYS CSUTIL
 
