@@ -94,6 +94,91 @@ public:
   friend bool operator== (const csVector2& v1, const csVector2& v2);
   /// Check if two vectors are not equal.
   friend bool operator!= (const csVector2& v1, const csVector2& v2);
+
+  /// Test if each component of a vector is less than a small epsilon value.
+  inline friend bool operator< (const csVector2& v, float f)
+  { return ABS(v.x)<f && ABS(v.y)<f; }
+
+  /// Test if each component of a vector is greater than a small epsilon value.
+  inline friend bool operator> (float f, const csVector2& v)
+  { return ABS(v.x)<f && ABS(v.y)<f; }
+};
+
+/**
+ * A plane in 2D space.
+ * The plane is given by the equation AAx + BBy + CCz + DD = 0,
+ * Where (AA,BB,CC) is given by the vector 'norm'.
+ */
+class csPlane2
+{
+public:
+  /// The normal vector (or the (A,B) components).
+  csVector2 norm;
+
+  /// The C component of the plane.
+  float CC;
+
+  /// Initialize to the xy plane.
+  csPlane2 () : norm (0,1), CC (0) {}
+
+  /// Initialize the plane.
+  csPlane2 (const csVector2& plane_norm, float c=0) : norm (plane_norm), CC (c) {}
+
+  /// Initialize the plane.
+  csPlane2 (float a, float b, float c=0) : norm (a,b), CC (c) {}
+
+  /// Initialize the plane given two vectors.
+  csPlane2 (const csVector2& v1, const csVector2& v2);
+
+  /// Return the normal vector of this plane.
+  inline csVector2& Normal () { return norm; }
+
+  /// Return the normal vector of this plane (const version).
+  inline csVector2 GetNormal () const { return norm; }
+
+  /// Return the A component of this plane.
+  inline float A () const { return norm.x; }
+  /// Return the B component of this plane.
+  inline float B () const { return norm.y; }
+  /// Return the C component of this plane.
+  inline float C () const { return CC; }
+
+  /// Return the A component of this plane.
+  inline float& A () { return norm.x; }
+  /// Return the B component of this plane.
+  inline float& B () { return norm.y; }
+  /// Return the C component of this plane.
+  inline float& C () { return CC; }
+
+  /// Set the value of the four plane components.
+  inline void Set (float a, float b, float c)
+  { norm.x = a; norm.y = b; CC = c; }
+
+  /// Classify the given vector with regards to this plane.
+  inline float Classify (const csVector2& pt) const { return norm*pt+CC; }
+
+  /// Classify a vector with regards to three plane components.
+  static float Classify (float A, float B, float C,
+                         const csVector2& pt)
+  { return A*pt.x + B*pt.y + C; }
+
+  /**
+   * Compute the distance from the given vector to this plane.
+   * This function assumes that 'norm' is a unit vector.  If not, the function
+   * returns distance times the magnitude of 'norm'.
+   */
+  inline float Distance (const csVector2& pt) const
+  { return ABS (Classify (pt)); }
+
+  /// Reverses the direction of the plane while maintianing the plane itself.
+  void Invert () { norm = -norm;  CC = -CC; }
+
+  /// Normalizes the plane equation so that 'norm' is a unit vector.
+  void Normalize ()
+  {
+    float f = norm.Norm ();
+    if (f) { norm /= f;  CC /= f; }
+  }
 };
 
 /** 
@@ -161,6 +246,32 @@ public:
     return Area2 (ax, ay, bx, by, cx, cy) >= SMALL_EPSILON;
   }
 
+  /**
+   * Check if the plane is visible from the given point.
+   * This function does a back-face culling test to see whether the front
+   * face of plane pl is visible from point p.
+   */
+  static bool Visible (const csVector2& p, const csPlane2& pl)
+  { return pl.Classify (p) <= 0; }
+
+  /**
+   * Check if two planes are almost equal.
+   * The function returns true iff each component of the plane equation for
+   * one plane is within .001 of the corresponding component of the other
+   * plane.
+   */
+  static bool PlanesEqual (const csPlane2& p1, const csPlane2& p2)
+  {
+    return ( ( p1.norm - p2.norm) < (float).001 ) &&
+             (  ABS (p1.CC-p2.CC) < (float).001 );
+  }
+
+  /**
+   * Check if two planes are close together.
+   * Two planes are close if there are almost equal OR if
+   * the normalized versions are almost equal.
+   */
+  static bool PlanesClose (const csPlane2& p1, const csPlane2& p2);
 };
 
 /** 
@@ -199,6 +310,20 @@ public:
     const csVector2& a1, const csVector2& a2, // first line
     const csVector2& b1, const csVector2& b2, // second line
     csVector2& isect);                      // intersection point
+
+  /**
+   * Intersect a 2D segment with a plane.  Returns true if there is an
+   * intersection, with the intersection point returned in isect.
+   * The distance from u to the intersection point is returned in dist.
+   * The distance that is returned is a normalized distance with respect
+   * to the given input vector. i.e. a distance of 0.5 means that the
+   * intersection point is halfway u and v.
+   */
+  static bool Plane (
+    const csVector2& u, const csVector2& v, // segment
+    const csPlane2& p,                     // plane Ax+By+Cz+D=0
+    csVector2& isect,                     // intersection point
+    float& dist);                       // distance from u to isect
 };
 
 #endif /*MATH_H*/

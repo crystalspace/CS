@@ -57,6 +57,14 @@ int csMath2::InPoly2D (const csVector2& v,
   return CS_POLY_IN;
 }
 
+bool csMath2::PlanesClose (const csPlane2& p1, const csPlane2& p2)
+{
+  if (PlanesEqual (p1, p2)) return true;
+  csPlane2 p1n = p1; p1n.Normalize ();
+  csPlane2 p2n = p2; p2n.Normalize ();
+  return PlanesEqual (p1n, p2n);
+}
+
 //---------------------------------------------------------------------------
 
 float csVector2::Norm (const csVector2& v)
@@ -169,6 +177,42 @@ bool csIntersect2::Lines (
   isect.y = a1.y + r*(a2.y-a1.y);
 
   return true;
+}
+
+bool csIntersect2::Plane(const csVector2& u, const csVector2& v,
+                         const csPlane2& p, csVector2& isect, float& dist)
+{
+  float x,y, denom;
+
+  x = v.x-u.x;  y = v.y-u.y;
+  denom = p.norm.x*x + p.norm.y*y;
+  if (ABS (denom) < SMALL_EPSILON) return false; // they are parallel
+
+  dist = -(p.norm*u + p.CC) / denom;
+  if (dist < -SMALL_EPSILON || dist > 1+SMALL_EPSILON) return false;
+
+  isect.x = u.x + dist*x;  isect.y = u.y + dist*y;
+  return true;
+}
+
+//---------------------------------------------------------------------------
+
+csPlane2::csPlane2 (const csVector2& v1, const csVector2& v2)
+{
+  if (ABS (v1.x-v2.x) > ABS (v1.y-v2.y))
+  {
+    float fact = (v2.y-v1.y) / (v2.x-v1.x);
+    norm.x = fact;
+    norm.y = -1;
+    CC = v1.y - v1.x * fact;
+  }
+  else
+  {
+    float fact = (v2.x-v1.x) / (v2.y-v1.y);
+    norm.x = -1;
+    norm.y = fact;
+    CC = v1.x - v1.y * fact;
+  }
 }
 
 //---------------------------------------------------------------------------

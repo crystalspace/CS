@@ -1,6 +1,5 @@
 /*
     Copyright (C) 1998 by Jorrit Tyberghein
-    Camera code written by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,6 +31,7 @@
 #include "csengine/stats.h"
 #include "csengine/dumper.h"
 #include "csengine/cbuffer.h"
+#include "csengine/solidbsp.h"
 #include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
 #include "csengine/cssprite.h"
@@ -469,6 +470,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   csVector3* verts;
   int num_verts;
   int i;
+  csSolidBsp* solidbsp = csWorld::current_world->GetSolidBsp ();
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
   csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
@@ -516,6 +518,12 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	    	clip->GetNumVertices (), clip->GetBoundingBox ()))
               sp->MarkVisible ();
 	  }
+	  else if (solidbsp)
+	  {
+	    if (solidbsp->TestPolygon (clip->GetVertices (),
+	    	clip->GetNumVertices ()))
+              sp->MarkVisible ();
+	  }
 	  else if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	clip->GetNumVertices ()))
             sp->MarkVisible ();
@@ -554,6 +562,9 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  else if (covtree)
             visible = covtree->TestPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
+	  else if (solidbsp)
+            visible = solidbsp->TestPolygon (clip->GetVertices (),
+		  clip->GetNumVertices ());
 	  else
             visible = c_buffer->TestPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
@@ -566,6 +577,9 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  else if (covtree)
             visible = covtree->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
+	  else if (solidbsp)
+            visible = solidbsp->InsertPolygon (clip->GetVertices (),
+		  clip->GetNumVertices ());
 	  else
             visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());

@@ -134,9 +134,13 @@ public:
 
   /**
    * Set all polygon vertices at once.
+   * Note! This doesn't update the bounding box!
    */
   void SetVertices (csVector2 *v, int num)
   { memcpy (vertices, v, (num_vertices = num) * sizeof (csVector2)); }
+
+  /// Update the bounding box (useful after SetVertices).
+  void UpdateBoundingBox ();
 
   /// Get the bounding box (in 2D space) for this polygon.
   csBox& GetBoundingBox () { return bbox; }
@@ -150,6 +154,16 @@ public:
    * in place of the original 2D polygon.
    */
   bool ClipAgainst (csClipper* view);
+
+  /**
+   * Intersect this polygon with a given plane and return the
+   * two resulting polygons in left and right. This version is
+   * robust. If one of the edges of this polygon happens to be
+   * on the same plane as 'plane' then the edge will go to the
+   * polygon which already has most edges. i.e. you will not
+   * get degenerate polygons.
+   */
+  void Intersect (const csPlane2& plane, csPoly2D* left, csPoly2D* right);
 };
 
 /**

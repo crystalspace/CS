@@ -43,6 +43,7 @@ class csDynLight;
 class csSpriteTemplate;
 class csClipper;
 class csQuadcube;
+class csSolidBsp;
 class csCovcube;
 class csWorld;
 class Dumper;
@@ -267,6 +268,9 @@ private:
   /// Optional quad-tree used for rendering.
   csQuadtree* quadtree;
 
+  /// Optional solid BSP used for rendering.
+  csSolidBsp* solidbsp;
+
   /// Optional coverage mask tree used for rendering.
   csCoverageMaskTree* covtree;
 
@@ -386,6 +390,16 @@ public:
    * Return the lookup table used for the coverage mask tree.
    */
   csCovMaskLUT* GetCovMaskLUT () { return covtree_lut; }
+
+  /**
+   * Enable/disable solidbsp.
+   */
+  void EnableSolidBsp (bool en);
+
+  /**
+   * Return solidbsp (or NULL if not used).
+   */
+  csSolidBsp* GetSolidBsp () { return solidbsp; }
 
   /**
    * Enable/disable quadtree.

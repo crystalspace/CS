@@ -12,6 +12,63 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+13-Mar-2000
+	- Further implemented csSolidBsp.
+	- Added the new csSolidBsp as a new 2D culler next to the quadtree,
+	  coverage mask tree and c-buffer. I don't expect it to be better
+	  than the c-buffer but I'm going to have to test if it works ok.
+	  The main use of the csSolidBsp will be for visibility and maybe
+	  for lighting.
+	- Added 'solidbsp' command to test the above feature.
+	  DON'T DO THIS YET. It will crash CS.
+	- Andrew Zabolotny did another set of changes:
+	    - Serious change: Re-implemented DECLARE_TYPED_VECTOR so that
+	      it defines a *correct* overriden vector. Previously it
+	      worked incorrectly, that is, FreeItem() was incorrect.
+	      Because of this declared vectors missed the auto-clean
+	      feature. Note that map2cs used that much (mis-)features of the
+	      old DECLARE_TYPED_VECTOR that I had to make a local copy
+	      of the old-behavioured DECLARE_TYPED_VECTOR inside map2cs.
+	      Another user of DECLARE_TYPED_VECTOR is Crystal Clear, but
+	      I did not seen any manual cleanup of vectors: this is
+	      either a memory leak or possibly a design issue. In the
+	      later case Crystal Clear is slightly broken: you should
+	      decide whenever you want the auto-clean feature or not, and
+	      if not you should override FreeItem() with an empty
+	      declaration.
+	    - cskeys.h & cskeys.cpp: Two new routines for parsing a
+	      free-format string into a keyboard event and vice versa.
+	      Useful for supporting user-defined hot-keys.
+	    - I've added four new key codes to csinput: CSKEY_PADPLUS,
+	      CSKEY_PADMINUS, CSKEY_PADMULT, CSKEY_PADDIV. I've
+	      implemented support for them in OS/2, DOS/DJGPP, Win32.
+	      Other platforms will have to implement it. Note that
+	      MazeD already uses these keys, so you can use it as a test
+	      tool :)
+	    - Added fully configurable keyboard support in MazeD. You can
+	      assign any key combination supported by CS to any of more
+	      than 100 commands. You can have different layouts in
+	      MazeD.cfg file.
+	    - Implemented some more of the texture mapping dialog.
+	      Not complete yet but already something to look at :-)
+12-Mar-2000
+	- Paul Garceau restored several of the changes he did yesterday
+	  because his changes are broken a little.
+	- Eric Sunshine further reverted Paul's changes and he also
+	  removed a bunch of compilation warnings.
+	- Michael Dale Long elminiated several compilation warnings in
+	  cctest and did some other changes to Crystal Clear.
+	- Added csPlane2 to csgeom similar to csPlane.
+	- Added csPoly2D::Intersect() to intersect with a csPlane2.
+	- Added csPoly2D::UpdateBoundingBox().
+	- Added a new csPoly2DEdges class and a corresponding
+	  csPoly2DEdgesPool. This is a class similar to csPoly2D but instead
+	  of using vertices it uses edges.
+11-Mar-2000
+	- Paul Garceau commited some changes to make the Mingw/NT4 port
+	  possible. Unfortunatelly his changes broke things a little.
+	- Thomas Hieber added support for skydome and skybox in Map2CS.
+	- Started work on new solid 2D bsp for culling/PVS.
 10-Mar-2000
 	- Fixed a bug with deletion of sprites.
 	- New patch from Andrew Zabolotny:

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -33,6 +33,7 @@
 #include "csengine/stats.h"
 #include "csengine/csppulse.h"
 #include "csengine/cbuffer.h"
+#include "csengine/solidbsp.h"
 #include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
 #include "csengine/terrain.h"
@@ -406,6 +407,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   }
 
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
+  csSolidBsp* solidbsp = csWorld::current_world->GetSolidBsp ();
   csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
   csRenderView* rview = (csRenderView*)data;
@@ -491,6 +493,9 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     else if (covtree)
       vis = covtree->TestPolygon (persp.GetVertices (),
 	persp.GetNumVertices (), persp.GetBoundingBox ());
+    else if (solidbsp)
+      vis = solidbsp->TestPolygon (persp.GetVertices (),
+	persp.GetNumVertices ());
     else
       vis = c_buffer->TestPolygon (persp.GetVertices (),
       	persp.GetNumVertices ());
@@ -681,9 +686,10 @@ void csSector::Draw (csRenderView& rview)
   int num_sprite_queue = 0;
 
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
+  csSolidBsp* solidbsp = csWorld::current_world->GetSolidBsp ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
   csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
-  if (c_buffer || quadtree || covtree)
+  if (solidbsp || c_buffer || quadtree || covtree)
   {
     // @@@ We should make a pool for queues. The number of queues allocated
     // at the same time is bounded by the recursion through portals. So a

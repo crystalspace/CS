@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -36,6 +36,7 @@
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
 #include "csengine/quadcube.h"
+#include "csengine/solidbsp.h"
 #include "csengine/covcube.h"
 #include "csengine/texture.h"
 #include "csengine/lghtmap.h"
@@ -208,6 +209,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   G3D = NULL;
   textures = NULL;
   c_buffer = NULL;
+  solidbsp = NULL;
   quadtree = NULL;
   quadcube = NULL;
   covcube = NULL;
@@ -349,6 +351,7 @@ void csWorld::Clear ()
   CHK (textures = new csTextureList ());
   CHK (delete c_buffer); c_buffer = NULL;
   CHK (delete quadtree); quadtree = NULL;
+  CHK (delete solidbsp); solidbsp = NULL;
   CHK (delete covtree); covtree = NULL;
   CHK (delete render_pol2d_pool);
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
@@ -363,11 +366,29 @@ void csWorld::EnableLightingCache (bool en)
   if (!do_lighting_cache) csPolygon3D::do_force_recalc = true;
 }
 
+void csWorld::EnableSolidBsp (bool en)
+{
+  if (en)
+  {
+    CHK (delete quadtree); quadtree = NULL;
+    CHK (delete c_buffer); c_buffer = NULL;
+    CHK (delete covtree); covtree = NULL;
+    if (solidbsp) return;
+    CHK (solidbsp = new csSolidBsp ());
+  }
+  else
+  {
+    CHK (delete solidbsp);
+    solidbsp = NULL;
+  }
+}
+
 void csWorld::EnableCBuffer (bool en)
 {
   if (en)
   {
     CHK (delete quadtree); quadtree = NULL;
+    CHK (delete solidbsp); solidbsp = NULL;
     CHK (delete covtree); covtree = NULL;
     if (c_buffer) return;
     CHK (c_buffer = new csCBuffer (0, frame_width-1, frame_height));
@@ -384,6 +405,7 @@ void csWorld::EnableQuadtree (bool en)
   if (en)
   {
     CHK (delete c_buffer); c_buffer = NULL;
+    CHK (delete solidbsp); solidbsp = NULL;
     CHK (delete covtree); covtree = NULL;
     if (quadtree) return;
     csBox box (0, 0, frame_width, frame_height);
@@ -401,6 +423,7 @@ void csWorld::EnableCovtree (bool en)
   if (en)
   {
     CHK (delete quadtree); quadtree = NULL;
+    CHK (delete solidbsp); solidbsp = NULL;
     CHK (delete c_buffer); c_buffer = NULL;
     if (covtree) return;
     csBox box (0, 0, frame_width, frame_height);
@@ -908,9 +931,10 @@ void csWorld::Draw (csCamera* c, csClipper* view)
   {
     frame_width = G2D->GetWidth ();
     frame_height = G2D->GetHeight ();
-    if (c_buffer) { EnableCBuffer (false); EnableCBuffer (true); }
-    if (covtree) { EnableCovtree (false); EnableCovtree (true); }
-    if (quadtree) { EnableQuadtree (false); EnableQuadtree (true); }
+    if (c_buffer) { EnableCBuffer (false); EnableCBuffer (true); EnableSolidBsp (false); }
+    if (covtree) { EnableCovtree (false); EnableCovtree (true); EnableSolidBsp (false); }
+    if (quadtree) { EnableQuadtree (false); EnableQuadtree (true); EnableSolidBsp (false); }
+    if (solidbsp) { EnableQuadtree (false); EnableQuadtree (false); EnableSolidBsp (true); }
   }
 
   current_camera = c;
@@ -945,9 +969,11 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     for (i = 0 ; i < num ; i++) verts[i] = view->GetVertex (i);
     c_buffer->InsertPolygon (verts, num, true);
   }
-  if (quadtree)
+  else if (quadtree)
     quadtree->MakeEmpty ();
-  if (covtree)
+  else if (solidbsp)
+    solidbsp->MakeEmpty ();
+  else if (covtree)
   {
     covtree->MakeEmpty ();
     csVector2 verts[50];	// @@@ BAD! Hardcoded!
@@ -1019,6 +1045,7 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
     if (c_buffer) EnableCBuffer (true);
     if (covtree) EnableCovtree (true);//hmmmmmmm necessary?
     if (quadtree) EnableQuadtree (true);      
+    if (solidbsp) EnableSolidBsp (true);      
   }
 
   // Calculate frustrum for screen dimensions (at z=1).
@@ -1032,6 +1059,7 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
 
   if (c_buffer) c_buffer->Initialize ();
   if (quadtree) quadtree->MakeEmpty ();
+  if (solidbsp) solidbsp->MakeEmpty ();
   if (covtree) covtree->MakeEmpty ();
 
   csSector* s = c->GetSector ();
