@@ -19,7 +19,7 @@ chronological order.
 	      a manually specified <portals> statement then the names
 	      of the individual portals will no longer be used for the portal
 	      container (only for the portals).
-	- Jorrit marked everything with the PRE_THING_PORTALDELETE tag.
+	- Jorrit marked everything with the PRE_THING_PORTALREMOVE tag.
 	- Jorrit removed portal support from thing. There are still some issues:
 	    - 'portal' command in walktest is now temporarily broken.
 	    - Infinite maze is now temporarily broken.
