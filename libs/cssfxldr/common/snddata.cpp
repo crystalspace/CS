@@ -42,8 +42,8 @@ void csSoundData::Clean()
 {
   if(Data) 
   {
-	  Data = NULL;
-	  CHKB (delete Data);
+    CHKB (delete Data);
+    Data = NULL;
   }
   Size = 0;
   Frequency = 0;
