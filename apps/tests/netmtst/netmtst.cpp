@@ -115,7 +115,7 @@ bool HandleEvent (iEvent &ev)
   return true;
 }
 
-int main (int argc, char *argv[], char *env[])
+int main (int argc, char *argv[]/*, char *env[]*/)
 {
   objreg = csInitializer::CreateEnvironment (argc, argv);
   if (! objreg)
