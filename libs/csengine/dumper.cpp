@@ -403,6 +403,7 @@ void Dumper::dump (csQuadtreeNode* node, char* buf, int bufdim, int depth,
 
 void Dumper::dump (csQuadcube* cube)
 {
+#if 0
   CsPrintf (MSG_DEBUG_0, "---------------------------------------\n");
   CsPrintf (MSG_DEBUG_0, "Quadtree 0:\n"); dump (cube->quad[0]);
   CsPrintf (MSG_DEBUG_0, "Quadtree 1:\n"); dump (cube->quad[1]);
@@ -411,6 +412,7 @@ void Dumper::dump (csQuadcube* cube)
   CsPrintf (MSG_DEBUG_0, "Quadtree 4:\n"); dump (cube->quad[4]);
   CsPrintf (MSG_DEBUG_0, "Quadtree 5:\n"); dump (cube->quad[5]);
   CsPrintf (MSG_DEBUG_0, "---------------------------------------\n");
+#endif // Disabled (gcc says class csQuadcube has no member named 'quad')
 }
 
 void Dumper::dump (csQuadtree* tree)
