@@ -182,7 +182,6 @@ bool csSoundDriverOSS::AudioDevice::Open(int& frequency, bool& bit16, bool& ster
     if (succ)
     {
       block_size=8192;
-      fprintf(stderr, "block_size: %d\n", block_size);
       frequency = dsp_speed;
       stereo = dsp_stereo;
       bit16 = (dsp_sample == 16 ? true : false);
