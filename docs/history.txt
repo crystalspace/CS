@@ -48,6 +48,8 @@ chronological order.
           have made it's way to CVS by accident.
 	- Jorrit fixed the stencil shadow plugin to also use GetTriangles()
 	  now.
+	- Jorrit fixed mk/user.mak so that it no longer compiles
+	  glrender3d if NR is not enabled. Similarly for jam.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:
