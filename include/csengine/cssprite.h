@@ -861,7 +861,7 @@ public:
   /**
    * Select an action.
    */
-  void SetAction (const char * name)
+  bool SetAction (const char * name)
   {
     csSpriteAction *act;
     if ((act = tpl->FindAction (name)) != NULL)
@@ -869,6 +869,8 @@ public:
       SetFrame (0);
       cur_action = act;
     }
+    else
+      return false;
   }
 
   /**
