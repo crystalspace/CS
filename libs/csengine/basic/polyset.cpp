@@ -394,7 +394,7 @@ void csPolygonSet::DrawPolygonArray (csPolygonInt** polygon, int num, csRenderVi
   {
     csVector2 orig_triangle[3];
     p = (csPolygon3D*)polygon[i];
-    if (p->GetUVCoords () || p->UseFlatColor ())
+    if (p->GetUVCoords () || p->CheckFlags (CS_POLY_FLATSHADING))
     {
       //@@@ NOT OPTIMAL AT ALL!
       //@@@@@@@@

@@ -49,6 +49,26 @@ interface IGraphics3D;
 #define POL_SPLIT_NEEDED 3
 
 /**
+ * If CS_POLY_MIPMAP is set for a polygon then mipmapping will be used.
+ * It is set by default.
+ */
+#define CS_POLY_MIPMAP 1
+
+/**
+ * If CS_POLY_LIGHTING is set for a polygon then the polygon will be lit.
+ * It is set by default.
+ */
+#define CS_POLY_LIGHTING 2
+
+/**
+ * If CS_POLY_FLATSHADING is set for a polygon then the polygon will not
+ * be texture mapped but instead it will be flat shaded (possibly with gouraud).
+ * It is unset by default.
+ */
+#define CS_POLY_FLATSHADING 4
+
+
+/**
  * This is our main 3D polygon class. Polygons are used to construct the
  * outer hull of sectors and the faces of 3D things.
  * Polygons can be transformed in 3D (usually they are transformed so
@@ -156,6 +176,9 @@ private:
   /// The light-map for this polygon (mipmap level 3)
   csLightMap* lightmap3;
 
+  /// Set of flags
+  ULong flags;
+
   /**
    * If 'delete_tex_info' is true this polygon is responsible for
    * cleaning the csPolyTextures.
@@ -177,17 +200,6 @@ private:
   csPolygon3D* orig_poly;
 
   /**
-   * This flag indicates that we want no mipmapping for this polygon.
-   * This is useful for sky-textures (for example).
-   */
-  int no_mipmap;
-
-  /**
-   * This flag indicates that we want no lighting for this polygon.
-   */
-  int no_lighting;
-
-  /**
    * This field describes how the light hitting this polygon is affected
    * by the angle by which the beam hits the polygon. If this value is
    * equal to -1 (default) then the global csPolyTexture::cfg_cosinus_factor
@@ -199,12 +211,6 @@ private:
    * List of light patches for this polygon.
    */
   csLightPatch* lightpatches;
-
-  /**
-   * If this value is true then the polygon is not texture mapped
-   * (does not every require a texture) but flat-shaded instead.
-   */
-  bool use_flat_color;
 
   /**
    * Flat shading color.
@@ -222,7 +228,7 @@ private:
 
   /**
    * If uv_coords is given then this can be an optional array of vertex
-   * colors. If this array is given then gouroud shading is used. Otherwise
+   * colors. If this array is given then gouraud shading is used. Otherwise
    * flatshading.
    */
   csColor* colors;
@@ -282,6 +288,15 @@ public:
    * Clone this polygon. This is a virtual function used by the BSP routines.
    */
   csPolygonInt* Clone () { CHK (csPolygonInt* p = (csPolygonInt*)new csPolygon3D (*this)); return p; }
+
+  /// Set all flags with the given mask.
+  void SetFlags (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
+
+  /// Get flags.
+  ULong GetFlags () { return flags; }
+
+  /// Check if all the given flags are set.
+  bool CheckFlags (ULong to_check) { return (flags & to_check) != 0; }
 
   /**
    * Clear the polygon (remove all vertices).
@@ -346,9 +361,6 @@ public:
   /// Get the pointer to the vertex color table.
   csColor* GetColors () { return colors; }
 
-  /// Return true if flat color is used (instead of texture).
-  bool UseFlatColor () { return use_flat_color; }
-
   /// Get the flat color for this polygon.
   csColor& GetFlatColor () { return flat_color; }
 
@@ -358,14 +370,15 @@ public:
     flat_color.red = r;
     flat_color.green = g;
     flat_color.blue = b;
-    use_flat_color = true;
+    SetFlags (CS_POLY_FLATSHADING, CS_POLY_FLATSHADING);
   }
 
   /// Set the flat color for this polygon.
-  void SetFlatColor (csColor& fc) { flat_color = fc; use_flat_color = true; }
+  void SetFlatColor (csColor& fc)
+  { flat_color = fc; SetFlags (CS_POLY_FLATSHADING, CS_POLY_FLATSHADING); }
 
   /// Reset flat color (i.e. use texturing again).
-  void ResetFlatColor () { use_flat_color = false; }
+  void ResetFlatColor () { SetFlags (CS_POLY_FLATSHADING, 0); }
 
   /**
    * Set a color. Only use after 'set_uv' has been called for this index.
@@ -509,26 +522,6 @@ public:
    * Return true if this polygon or the texture it uses is transparent.
    */
   bool IsTransparent ();
-
-  /**
-   * Enable/disable lighting for this polygon.
-   */
-  void SetLighting (int yes) { no_lighting = !yes; }
-
-  /**
-   * Is lighting enabled?
-   */
-  int IsLighted () { return !no_lighting; }
-
-  /**
-   * Enable/disable mipmapping for this polygon.
-   */
-  void SetMipmapping (int yes) { no_mipmap = !yes; }
-
-  /**
-   * Is mipmapping enabled?
-   */
-  int IsMipmapped () { return !no_mipmap; }
 
   /**
    * Get the cosinus factor. This factor is used

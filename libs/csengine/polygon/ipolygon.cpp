@@ -77,7 +77,7 @@ STDMETHODIMP IPolygon3D::GetAlpha(int& retval)
 STDMETHODIMP IPolygon3D::UsesMipMaps(void)
 {
 	METHOD_PROLOGUE( csPolygon3D, Polygon3D );
-	return pThis->no_mipmap ? S_FALSE : S_OK;
+	return pThis->CheckFlags (CS_POLY_MIPMAP) ? S_OK : S_FALSE;
 }
 
 STDMETHODIMP IPolygon3D::GetTexture(int mipmap, IPolygonTexture** retval)

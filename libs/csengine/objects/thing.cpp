@@ -42,9 +42,8 @@ CSOBJTYPE_IMPL(csThing,csPolygonSet);
 
 csThing::csThing () : csPolygonSet (), obj()
 {
-  moveable = false;
   merged = NULL;
-  convex = false;
+  flags = 0;
   center_idx = -1;
 }
 
@@ -60,8 +59,8 @@ csThing::~csThing ()
 
 void csThing::SetConvex (bool c)
 {
-  convex = c;
-  if (convex)
+  SetFlags (CS_ENTITY_CONVEX, c ? CS_ENTITY_CONVEX : 0);
+  if (c)
   {
     if (center_idx == -1) center_idx = AddVertex (0, 0, 0);
     int i;
@@ -310,7 +309,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	//poly.pi_triangle = ; //DPQFIX
         PreparePolygonQuick (&poly, (csVector2 *)persp, gouraud);
 	// Draw resulting polygon
-	rview.g3d->DrawPolygonQuick (poly, gouraud);
+	rview.g3d->DrawPolygonQuick (poly);
       }
     }
     rview.g3d->FinishPolygonQuick ();
@@ -479,9 +478,9 @@ void csThing::CalculateLighting (csLightView& lview)
   if (light_frame_number != current_light_frame_number)
   {
     light_frame_number = current_light_frame_number;
-    lview.gouroud_color_reset = true;
+    lview.gouraud_color_reset = true;
   }
-  else lview.gouroud_color_reset = false;
+  else lview.gouraud_color_reset = false;
 
   for (i = 0 ; i < num_polygon ; i++)
   {
@@ -623,11 +622,11 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     int* idx = pt->GetVerticesIdx ();
     for (j = 0 ; j < pt->GetNumVertices () ; j++)
       p->AddVertex (merge_vertices[idx[j]]);
-    p->SetLighting (pt->IsLighted ());
-    p->SetMipmapping (pt->IsMipmapped ());
+    p->SetFlags (CS_POLY_LIGHTING|CS_POLY_MIPMAP|CS_POLY_FLATSHADING,
+    	(pt->IsLighted () ? CS_POLY_LIGHTING : 0) |
+    	(pt->IsMipmapped () ? CS_POLY_MIPMAP : 0) |
+    	(pt->UseFlatColor () ? CS_POLY_FLATSHADING : 0));
     p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
-    if (pt->UseFlatColor ())
-      p->SetFlatColor (pt->GetFlatColor ());
     if (pt->UseGouraud ())
       p->SetColor (0, 0, 0, 0);
   }

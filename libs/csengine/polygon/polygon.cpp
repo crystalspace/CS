@@ -103,16 +103,14 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture)
   orig_poly = NULL;
   dont_draw = false;
 
-  no_mipmap = false;
-  no_lighting = false;
+  flags = CS_POLY_MIPMAP | CS_POLY_LIGHTING;
+
   cosinus_factor = -1;
   lightmap_up_to_date = false;
 
   lightpatches = NULL;
   uv_coords = NULL;
   colors = NULL;
-
-  use_flat_color = false;
 }
 
 csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
@@ -147,8 +145,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
   dont_draw = false;
   orig_poly = poly.orig_poly ? poly.orig_poly : &poly;
 
-  no_mipmap = poly.no_mipmap;
-  no_lighting = poly.no_lighting;
+  flags = poly.flags;
   cosinus_factor = poly.cosinus_factor;
   lightmap_up_to_date = false;
 
@@ -157,7 +154,6 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt ()
   colors = NULL;
 
   flat_color = poly.flat_color;
-  use_flat_color = poly.use_flat_color;
 }
 
 csPolygon3D::~csPolygon3D ()
@@ -382,7 +378,7 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
 void csPolygon3D::Finish ()
 {
   if (orig_poly) return;
-  if (uv_coords || use_flat_color) return;
+  if (uv_coords || CheckFlags (CS_POLY_FLATSHADING)) return;
 
   tex->SetTextureHandle (txtMM->GetTextureHandle ());
   tex1->SetTextureHandle (txtMM->GetTextureHandle ());
@@ -396,7 +392,7 @@ void csPolygon3D::Finish ()
   tex3->CreateBoundingTextureBox (); tex3->lm = NULL;
 
   lightmap = lightmap1 = lightmap2 = lightmap3 = NULL;
-  if (!no_lighting && TEXW(tex)*TEXH(tex) < 1000000)
+  if (CheckFlags (CS_POLY_LIGHTING) && TEXW(tex)*TEXH(tex) < 1000000)
   {
     CHK (lightmap = new csLightMap ());
     int r, g, b;
@@ -907,7 +903,7 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     // we stop here because the triangle is only visible if all
     // vertices are visible (this is not exactly true but it is
     // easier this way! @@@ CHANGE IN FUTURE).
-    if (uv_coords || use_flat_color) return false;
+    if (uv_coords || CheckFlags (CS_POLY_FLATSHADING)) return false;
 
     csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
     csVector2 *evert = NULL;
@@ -1176,7 +1172,7 @@ void csPolygon3D::FillLightmap (csLightView& lview)
 {
   if (orig_poly) return;
 
-  if (uv_coords || use_flat_color)
+  if (uv_coords || CheckFlags (CS_POLY_FLATSHADING))
   {
     // We are working for a vertex lighted polygon.
     csLight* light = (csLight*)lview.l;
@@ -1198,7 +1194,7 @@ void csPolygon3D::FillLightmap (csLightView& lview)
 
       for (i = 0 ; i < num_vertices ; i++)
       {
-        if (colors && !lview.gouroud_color_reset) col = colors[i];
+        if (colors && !lview.gouraud_color_reset) col = colors[i];
 	else col.Set (0, 0, 0);
         float d = csSquaredDist::PointPoint (light->GetCenter (), Vwor (i));
 	if (d >= light->GetSquaredRadius ()) continue;
@@ -1220,7 +1216,7 @@ void csPolygon3D::FillLightmap (csLightView& lview)
     return;
   }
 
-  if (lview.gouroud_only) return;
+  if (lview.gouraud_only) return;
 
   if (lview.dynamic)
   {
@@ -1321,6 +1317,17 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview)
   return true;
 }
 
+// csVectorArray is a subclass of csCleanable which is registered
+// to csWorld.cleanup.
+class csVectorArray : public csCleanable
+{
+public:
+  csVector3* array;
+  int size;
+  csVectorArray () : array (NULL), size (0) { }
+  virtual ~csVectorArray () { CHK (delete [] array); }
+};
+
 void csPolygon3D::CalculateLighting (csLightView* lview)
 {
   csPortal* po;
@@ -1337,16 +1344,6 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
   // come here. We register this memory to the 'cleanup' array
   // in csWorld so that it will be freed later.
 
-  // csVectorArray is a subclass of csCleanable which is registered
-  // to csWorld.cleanup.
-  class csVectorArray : public csCleanable
-  {
-  public:
-    csVector3* array;
-    int size;
-    csVectorArray () : array (NULL), size (0) { }
-    virtual ~csVectorArray () { CHK (delete [] array); }
-  };
   static csVectorArray* cleanable = NULL;
   if (!cleanable)
   {
@@ -1721,7 +1718,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   }
 
-  if (poly->GetUVCoords () || poly->UseFlatColor ())
+  if (poly->GetUVCoords () || poly->CheckFlags (CS_POLY_FLATSHADING))
   {
     G3DPolygonDPQ g3dpoly;
 
@@ -1734,7 +1731,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     g3dpoly.flat_color_r = poly->GetFlatColor ().red;
     g3dpoly.flat_color_g = poly->GetFlatColor ().green;
     g3dpoly.flat_color_b = poly->GetFlatColor ().blue;
-    if (poly->UseFlatColor ()) g3dpoly.txt_handle = NULL;
+    if (poly->CheckFlags (CS_POLY_FLATSHADING)) g3dpoly.txt_handle = NULL;
 
     // We are going to use DrawPolygonQuick.
     g3dpoly.vertices[0].z = 1. / poly->Vcam (0).z;
@@ -1768,7 +1765,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     }
     PreparePolygonQuick (&g3dpoly, orig_triangle, po_colors != NULL);
     g3d->StartPolygonQuick (g3dpoly.txt_handle, po_colors != NULL);
-    g3d->DrawPolygonQuick (g3dpoly, po_colors != NULL);
+    g3d->DrawPolygonQuick (g3dpoly);
     g3d->FinishPolygonQuick ();
   }
   else
@@ -1795,7 +1792,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
       }
 
     g3dpoly.alpha           = poly->GetAlpha();
-    g3dpoly.uses_mipmaps    = poly->IsMipmapped();
+    g3dpoly.uses_mipmaps    = poly->CheckFlags (CS_POLY_MIPMAP);
     g3dpoly.z_value         = poly->Vcam(0).z;
 
     for (int mipmaplevel = 0; mipmaplevel<4; mipmaplevel++)

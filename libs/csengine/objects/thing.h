@@ -32,6 +32,25 @@ class csThingTemplate;
 interface IGraphics3D;
 
 /**
+ * If CS_ENTITY_CONVEX is set then this entity is convex (what did
+ * you expect :-)
+ * This means the 3D engine can do various optimizations.
+ * If you set 'convex' to true the center vertex will also be calculated.
+ * It is unset by default (@@@ should be calculated).
+ */
+#define CS_ENTITY_CONVEX 1
+
+/**
+ * If CS_ENTITY_MOVEABLE is set then this entity can move.
+ * This is used by several optimizations in the 3D Engine.
+ * If the Engine knows that a Thing cannot move it can put
+ * it's polygons in a BSP tree for example.
+ * This flag is false by default (it is assumed that most Things
+ * will not move).
+ */
+#define CS_ENTITY_MOVEABLE 2
+
+/**
  * A Thing is a polygonset just like a csSector.
  * It can be used to augment the sectors with features that
  * are difficult to describe using portals and sectors.<P>
@@ -49,11 +68,8 @@ private:
   /// World to object transformation.
   csReversibleTransform obj;
 
-  /// If true this thing is allowed to move.
-  bool moveable;
-
-  /// If true this thing is convex.
-  bool convex;
+  /// Set of flags
+  ULong flags;
 
   /// If convex, this holds the index to the center vertex.
   int center_idx;
@@ -73,26 +89,19 @@ public:
   /// Destructor.
   virtual ~csThing ();
 
-  /// Return true if this thing can move.
-  bool IsMoveable () { return moveable; }
+  /// Set all flags with the given mask.
+  void SetFlags (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
+
+  /// Get flags.
+  ULong GetFlags () { return flags; }
+
+  /// Check if all the given flags are set.
+  bool CheckFlags (ULong to_check) { return (flags & to_check) != 0; }
 
   /**
-   * Set the flag that indicates if this Thing will ever move.
-   * This is used by several optimizations in the 3D Engine.
-   * If the Engine knows that a Thing cannot move it can put
-   * it's polygons in a BSP tree for example.
-   * This flag is false by default (it is assumed that most Things
-   * will not move).
-   */
-  void SetMoveable (bool m) { moveable = m; }
-
-  /// Return true if this thing is convex.
-  bool IsConvex () { return convex; }
-
-  /**
-   * If true this thing is convex. This means the 3D engine can do
-   * various optimizations. If you set 'convex' to true the center
-   * vertex will also be calculated.
+   * Set convexity flag of this thing. You should call this instead
+   * of SetFlags (CS_ENTITY_CONVEX, CS_ENTITY_CONVEX) because this function
+   * does some extra calculations.
    */
   void SetConvex (bool c);
 

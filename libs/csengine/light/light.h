@@ -39,6 +39,12 @@ class csThing;
 #define CS_LIGHT_THINGSHADOWS 1
 
 /**
+ * If CS_LIGHT_HALO is set for a light then the light generates an additional halo.
+ * This flag is unset by default.
+ */
+#define CS_LIGHT_HALO 2
+
+/**
  * Superclass of all positional lights.
  * A light subclassing from this has a color, a position
  * and a radius.<P>
@@ -78,8 +84,6 @@ protected:
   /// Color.
   csColor color;
 
-  /// If a halo is enabled for this light.
-  bool halo_enabled;
   /// the current intensity of the attached halo.
   float halo_intensity;
   /// the maximum intensity of the attached halo.
@@ -119,11 +123,14 @@ public:
    */
   virtual ~csLight ();
 
-  /// Set flags for this light.
+  /// Set all flags with the given mask.
   void SetFlags (ULong mask, ULong value) { flags = (flags & ~mask) | value; }
 
-  /// Get flags for this light.
+  /// Get flags.
   ULong GetFlags () { return flags; }
+
+  /// Check if all the given flags are set.
+  bool CheckFlags (ULong to_check) { return (flags & to_check) != 0; }
 
   /**
    * Set the current sector for this light.
@@ -163,21 +170,6 @@ public:
    * as that is a time consuming process.
    */
   virtual void SetColor (const csColor& col) { color = col; }
-
-  /**
-   * Enable halo.
-   */
-  void EnableHalo () { halo_enabled = true; }
-
-  /**
-   * Disable halo.
-   */
-  void DisableHalo () { halo_enabled = false; }
-
-  /**
-   * Is the halo enabled?
-   */
-  bool IsHaloEnabled () { return halo_enabled; }
 
   /**
    * Return the maximum intensity of the halo.

@@ -46,7 +46,6 @@ csLight::csLight (float x, float y, float z, float dist,
   color.blue = blue;
   flags = 0;
 
-  halo_enabled = false;
   halo_intensity = 0.0f;
   halo_max_intensity = 1.0f;
   halo_ref_count = 0;
@@ -160,8 +159,8 @@ void csStatLight::CalculateLighting ()
   csLightView lview;
   lview.l = this;
   lview.mirror = false;
-  lview.gouroud_only = false;
-  lview.gouroud_color_reset = false;
+  lview.gouraud_only = false;
+  lview.gouraud_color_reset = false;
   lview.r = GetColor ().red;
   lview.g = GetColor ().green;
   lview.b = GetColor ().blue;
@@ -178,8 +177,8 @@ void csStatLight::CalculateLighting (csThing* th)
   csLightView lview;
   lview.l = this;
   lview.mirror = false;
-  lview.gouroud_only = false;
-  lview.gouroud_color_reset = false;
+  lview.gouraud_only = false;
+  lview.gouraud_color_reset = false;
   lview.r = GetColor ().red;
   lview.g = GetColor ().green;
   lview.b = GetColor ().blue;
@@ -264,8 +263,8 @@ void csDynLight::Setup ()
   csLightView lview;
   lview.l = this;
   lview.mirror = false;
-  lview.gouroud_only = false;
-  lview.gouroud_color_reset = false;
+  lview.gouraud_only = false;
+  lview.gouraud_color_reset = false;
   lview.r = GetColor ().red;
   lview.g = GetColor ().green;
   lview.b = GetColor ().blue;

@@ -119,7 +119,7 @@ void csSector::UseStaticBSP ()
   csThing* sp = first_thing;
   while (sp)
   {
-    if (!sp->IsMoveable () && !sp->GetFog ().enabled) static_thing->Merge (sp);
+    if (!sp->CheckFlags (CS_ENTITY_MOVEABLE) && !sp->GetFog ().enabled) static_thing->Merge (sp);
     sp = (csThing*)(sp->GetNext ());
   }
 
@@ -358,7 +358,7 @@ void csSector::Draw (csRenderView& rview)
       // hulls (convex csThings) and foggy csThings in the sort_list.
       while (sp)
       {
-        if (sp->IsConvex () || sp->GetFog ().enabled)
+        if (sp->CheckFlags (CS_ENTITY_CONVEX) || sp->GetFog ().enabled)
 	  sort_list[sort_idx++] = sp;
         sp = (csThing*)(sp->GetNext ());
       }
@@ -374,7 +374,7 @@ void csSector::Draw (csRenderView& rview)
       {
         sp = sort_list[i];
         if (sp->GetFog ().enabled) sp->DrawFoggy (rview);
-        else if (!sp->IsMerged () && sp->IsConvex ())
+        else if (!sp->IsMerged () && sp->CheckFlags (CS_ENTITY_CONVEX))
       	  sp->Draw (rview, false);
       }
     }
@@ -386,7 +386,7 @@ void csSector::Draw (csRenderView& rview)
       sp = first_thing;
       while (sp)
       {
-        if (!sp->IsConvex () && !sp->GetFog ().enabled) sp->Draw (rview);
+        if (!sp->CheckFlags (CS_ENTITY_CONVEX) && !sp->GetFog ().enabled) sp->Draw (rview);
         sp = (csThing*)(sp->GetNext ());
       }
     }
@@ -408,7 +408,7 @@ void csSector::Draw (csRenderView& rview)
     for (int i = 0; i<numlights; i++)
     {
       csStatLight* light = (csStatLight*)(lights[i]);
-      if (!light->IsHaloEnabled ()) continue;
+      if (!light->CheckFlags (CS_LIGHT_HALO)) continue;
       
       // this light is already in the queue.
       if (light->GetHaloInQueue ())
@@ -624,6 +624,17 @@ void* csSector::CalculateLightingPolygons (csPolygonParentInt*, csPolygonInt** p
   return NULL;
 }
 
+// csThingArray is a subclass of csCleanable which is registered
+// to csWorld.cleanup.
+class csThingArray : public csCleanable
+{
+public:
+  csThing** array;
+  int size;
+  csThingArray () : array (NULL), size (0) { }
+  virtual ~csThingArray () { CHK (delete [] array); }
+};
+
 csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
 {
   csFrustrum* lf = lview.light_frustrum;
@@ -633,16 +644,6 @@ csThing** csSector::MarkVisibleThings (csLightView& lview, int& num_things)
   csPolygonSetBBox* bbox;
   bool vis;
 
-  // csThingArray is a subclass of csCleanable which is registered
-  // to csWorld.cleanup.
-  class csThingArray : public csCleanable
-  {
-  public:
-    csThing** array;
-    int size;
-    csThingArray () : array (NULL), size (0) { }
-    virtual ~csThingArray () { CHK (delete [] array); }
-  };
   // This is a static vector array which is adapted to the
   // right size everytime it is used. In the beginning it means
   // that this array will grow a lot but finally it will
@@ -753,9 +754,9 @@ void csSector::CalculateLighting (csLightView& lview)
   if (light_frame_number != current_light_frame_number)
   {
     light_frame_number = current_light_frame_number;
-    lview.gouroud_color_reset = true;
+    lview.gouraud_color_reset = true;
   }
-  else lview.gouroud_color_reset = false;
+  else lview.gouraud_color_reset = false;
 
   // First mark all things which are visible in the current
   // frustrum.
