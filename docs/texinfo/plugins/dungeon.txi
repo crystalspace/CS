@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node Dungeon, csPython, CrystalClear, PlugIns
-@subsection Dungeon
+@section Dungeon
 @cindex Dungeon Plug-In
 
 This section will describe the random level generator for Crystal Space

@@ -1,0 +1,16 @@
+@c -*-texinfo-*-
+@node Network Drivers
+@section Network Drivers
+@cindex Network Drivers
+
+The networking system consists of two drivers:
+
+@itemize @bullet
+@item
+@emph{Network Driver}: System dependent network drivers. There is currently
+only a sockets driver.
+
+@item
+@emph{Network Manager}: System dependent network managers. There is currently
+only a simple manager.
+@end itemize

@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 @node CrystalClear, Dungeon, PlugIns, PlugIns
-@subsection CrystalClear
+@section CrystalClear
 @cindex CrystalClear Plug-In
 @cindex Plug-In, CrystalClear
 
@@ -53,7 +53,7 @@ implementing the plug-ins for it, or help with existing plugins.
 @end menu
 
 @node CrystalClear Structure, CrystalClear Entities, CrystalClear, CrystalClear
-@subsubsection Structure of CrystalClear
+@subsection Structure of CrystalClear
 
 CrystalClear is organized into several conceptual layers.
 
@@ -176,7 +176,7 @@ default version of the implementations.
 @end itemize
 
 @node CrystalClear Entities, , CrystalClear Structure, CrystalClear
-@subsubsection CrystalClear Entity Library Overview (@file{csclearlib})
+@subsection CrystalClear Entity Library Overview (@file{csclearlib})
 
 Here's a quick over view of the CrystalClear entity hierarchy.  The tree
 shows the inheritance chain, and a more detailed description of each subclass

@@ -1,0 +1,8 @@
+@node csPython, , Dungeon, PlugIns
+@section csPython
+@cindex csPython Plug-In
+@cindex Python Plug-In
+@cindex Scripting, Python
+
+The plug-in module brings Python scripting support to Crystal Space.  It is
+currently in an early developmental state.

@@ -21,10 +21,26 @@ that which is used by all other plug-in modules.
 The mechansim by which communication is carried out with plug-in modules
 and drivers is known as @sc{scf}.  @xref{SCF}.
 
+The following drivers are available in Crystal Space:
 @menu
-* PlugIns:: Plug-In Modules
-* Drivers::
+* Graphics Drivers::
+* Sound Drivers::
+* Network Drivers::
 @end menu
 
-@imports{plugins,plugins.txi}
-@imports{plugins,drivers.txi}
+The following plug-ins are available:
+@menu
+* csEngine:: The 3D Engine (@code{csEngine})
+* CrystalClear::
+* Dungeon::
+* csPython::
+@end menu
+
+@imports{plugins,graphics.txi}
+@imports{plugins,sound.txi}
+@imports{plugins,network.txi}
+
+@importss{plugins,engine,engine.txi}
+@imports{plugins,csclear.txi}
+@imports{plugins,dungeon.txi}
+@imports{plugins,python.txi}

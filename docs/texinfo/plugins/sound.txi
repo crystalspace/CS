@@ -1,38 +1,28 @@
 @c -*-texinfo-*-
-@node Sound System, , Drivers, Drivers
-@subsection Sound System
-@cindex Sound System
+@node Sound Drivers
+@section Sound Drivers
+@cindex Sound Drivers
 
-@noindent
-@emph{Written by Nathaniel Saint Martin, @email{noote@@bigfoot.com}.  Last
-updated 22 September 1999.}
-
-This is a description of the Crystal Space sound system which is comprised of
-several sound renderers and sound drivers.
-
-@subsubheading Supported Operating Systems
-
-The Crystal Space sound system supports these operating systems:
+The sound system consists of three drivers:
 
 @itemize @bullet
 @item
-Microsoft Windows using the @emph{WaveOut} functions (standard Win32
-@sc{api}), Aureal3D 2.0, DirectSound3D (@sc{dx5}), @sc{eax} 2.0 and the
-software renderer.
+@emph{Sound Driver}: System dependent sound drivers. This driver is used to
+pass one audio stream to the sound hardware (it does not mix several streams),
+and is only used by the software sound renderer. The other renderers do not
+need this driver. There are currently drivers for Macintosh, @sc{oss} (Linux)
+and WaveOut (Windows). @*
+Note: You need not load the sound driver yourself. It is loaded automatically
+by the software sound renderer.
 
 @item
-Linux using an @sc{oss} driver by Gert Steenssens
-(@email{gsteenss@@eps.agfa.be}).
-(OSS).
+@emph{Sound Renderer}: System dependent sound renderers. This driver can be
+used to play sound. There are currently renderers for DirectSound3d and
+software.
 
 @item
-Macintosh using the MacOS toolbox.
-@end itemize
-
-@subsubheading Supported File Formats
-
-The following file formats are supported:
-
+@emph{Sound Loader}: This module is used to load sound files. There is only
+one implementation for this module. Supported file formats are:
 @itemize @bullet
 @item
 Sun standard @file{.au} (or @file{.snd}), 8- and 16-bit @sc{pcm} and 8-bit
@@ -44,183 +34,127 @@ Amiga @file{.8svx} and @file{.iff}, 8-bit @sc{pcm}.
 @item
 Macintosh @file{.aiff}, 8- and 16-bit @sc{pcm}.
 @end itemize
-
-@subsubheading How It Works
-
-The sound system architecture is a bit like graphics system.  There are
-different sound renderers and low-level driver accessed by the software
-renderer.  The sound renderer enables 2D buffer (via the @samp{iSoundBuffer}
-@sc{scf} interface) and 3D sound source (via the @samp{iSoundSource}
-interface).  Attached with renderer (@samp{iSoundRender}) there is a listener
-(@samp{iSoundListener})---basically the ears of the viewer/player---for the
-3D mode.
-
-Here is a run-down of the abstract @sc{scf} interface architecture :
-
-@table @code
-@item iSoundRender
-This mixes and calculates all @samp{iSoundBuffer}.
-
-@item iSoundDriver
-This provides low-level access to the operating system sound facilities.  Only
-used by software renderer.
-
-@item iSoundBuffer
-This is the played sound.  We can create this with via @samp{csSoundData}.
-
-@item iSoundSource
-The 3D sound emmitter control.
-
-@item iSoundListener
-The 3D listener.
-@end table
-
-@subsubheading Examples
-
-Some examples may help to clarify the architecture.
-
-@example
-// The sound data object.
-csSoundData* data;
-// Load a sound file.
-data = csSoundDataObject::GetSound(world, "beep.wav");
-// Create a 2D sound buffer.
-iSoundBuffer* buffer;
-system->Sound->CreateSoundBuffer(&buffer, data);
-// Play the sound.
-buffer->Play();
-// Stop this sound.
-buffer->Stop();
-@end example
-
-And now a more complex example illustrating how to play a 3D sound:
-
-@example
-// The 3D source object.
-iSoundSource* source;
-// There are two methods to create a 3D source.  Either
-// directly from iSoundRender or from an iSoundBuffer.
-system->Sound->CreateSource(&source, data);
-// Or...
-buffer->CreateSource->(&source);
-@end example
-
-@subsubheading Sound System Configuration
-
-In the configuration file (e.g. @file{cryst.cfg}) you can create a
-@code{[SoundDriver]} section similar to the sample below:
-
-@example
-[SoundDriver]
-; Maximum of channels to mix.
-MAX_CHANNELS=16
-; Frequency supported by sound device.
-; (44100, 22050, 11025, etc.)
-FREQUENCY=11025
-; Control whether sound device uses 16-bits (if supported).
-16BITS=false
-; Enable stereo output on sound device (if it supported).
-; For a 3D sound it is useful.
-STEREO=true
-; Enable or disable sound driver.
-ACTIVE=true
-; Set general volume in th range [0..1].  If you put -1
-; or a value inferior to 0, current device volume is used.
-VOLUME=-1
-@end example
-
-The variables from the configuration file are described below.
-
-@table @code
-@item MAX_CHANNELS
-The maximum number of channels you can mix--only for software mixing (for a
-hardware multi-voice the sound card fixes this).  The higher this value is,
-the more @sc{cpu} resources it consumes.
-
-@item FREQUENCY
-The sample frequency for playing.  The higher this value is, the more @sc{cpu}
-resources it consumes.  This value can be fixed by a hardware limit; verify
-this by checking with your manual, driver, manufacturer, etc.
-
-@item 16BITS
-Use 16 bits instead of 8 bits for playing sounds.  Your sound card
-capabilities may also place a limit on this value.
-
-@item STEREO
-Use stereo output if ``true''.  This one depends on your sound card too.  It
-can be useful for 3D sound.
-
-@item ACTIVE
-Set this one to true to activate the sound driver.  Otherwise you won't hear
-anything.
-
-@item VOLUME
-A software or hardware value, from 0 (no sound) to 1 (full volume); it depends
-on your sound card and/or driver.
-@end table
-
-@subsubheading WaveOut Win32 Driver Configuration
-
-The Waveout Win32 driver has its own configuration file (@file{wodrv.cfg}) in
-addition to general sound driver configuration.  It has the following
-contents:
-
-@example
-[SoundDriver.waveOut]
-; Call-back type can be 'function' or 'thread'.
-CALLBACK=thread
-; Priority can be 'lowest', 'normal' or 'highest'.
-THREAD_PRIORITY=highest
-; Number of refreshes per second.
-REFRESH=10
-@end example
-
-The variables from the configuration file are described below.
-
-@table @code
-@item CALLBACK
-The call-back method has two possible settings, @samp{thread} or
-@samp{function}.  The @emph{thread} method starts a process which fills sound
-data when it receive order (by WaveOut).  The @emph{function} method
-@dfn{blocks} the program while filling sound data, the call of the function is
-done by WaveOut but if the @dfn{frames per second} (@sc{fps}) is low or system
-idle is very low, calls to function can't be done (it is unstable).  I prefer
-the thread method, which is (theoretically) independent of the main process
-idle.
-
-@item THREAD_PRIORITY
-Only for thread method.  It sets the priority of the thread.  Possible values
-are @samp{lowest}, meaning that the sound thread has a very low priority
-compared to the main process; @samp{normal} meaning that the priority is equal
-to the priority of the main process; and @samp{highest} meaning that the
-thread priority is higher than main process.
-
-@item REFRESH
-The time of refresh of sound data.  A value of 10 means refresh the sound data
-10 times per second.  But a warning, if you get an @sc{fps} value inferior to
-this refresh value, it can crash for function call-back or cut sound for
-thread method.
-@end table
-
-@subsubheading Problems
-
-If you have problems with the sound output, consult the following list.
-
-@itemize @bullet
-@item
-Are you sure to have a sound card?
-
-@item
-Are you sure that sound card is supported by your operating system?
-
-@item
-Are you sure Crystal Space has a sound driver for your operating system?
-
-@item
-Verify that @samp{ACTIVE} is set to @samp{true} in the configuration file.
-
-@item
-Consult the @file{CS/debug.txt} file.  If an error was reported in this file
-by the sound driver try another configuration by changing @samp{FREQUENCY},
-@samp{STEREO}, @samp{16BITS}, and @samp{VOLUME}.
 @end itemize
+
+The options for all these modules must be set in the (virtual) file
+@file{/config/sound.cfg}.
+
+@node Sound Data
+@subsection Sound Data and Sound Streams
+
+When a sound is loaded, it is represented as a sound data object (using the
+@code{iSoundData} interface). Internally this can be raw sample data,
+@sc{mp3} encoded music, or anything. Every time you want to play the sound,
+a @emph{sound stream} (@code{iSoundStream}) is created from it and this
+stream is used by the renderer. The stream is an instance of the sound. For
+example, if you have five cars and five trucks driving around in your level,
+you would have two sound data objects, one containing the car sound and one
+containing the truck sound, and ten sound streams.
+
+This is important as the sound loader also contains methods that return a
+sound stream directly. Some ways to load sounds do not allow several
+instances, for example if a very big file is loaded in small parts while it
+is played. In this case you directly get a sound stream, so you can play only
+one instance of the sound. This can be useful for example for playing
+background music.
+
+From the point of view of the sound renderer, you must somehow create a sound
+stream and pass it to the renderer. For convenience, the renderer also
+contains methods that take a sound data object, create a stream from it and
+play this stream. But in the end it is the stream that is played.
+
+Looking at the sound loader's methods, you have probably noticed that it
+takes an object of @code{csSoundFormat} type. This object tells the sound
+loader in what format (frequency, 8 or 16 bits, stereo or mono) the samples
+should be supplied by the stream. You can get this from the sound renderer.
+
+@node Playing Sound
+@subsection Playing Sound
+
+The simple way to play a sound is the @code{PlaySound} method. This plays the
+sound without 3d effects and without further control. So it is useful to play
+a sound when the user selects something in the menu. The sound cannot be
+stopped anymore and will play until it is finished.
+
+If you want 3d effects or more control over the sound, you have to use
+@emph{sound sources} (@code{iSoundSource}). A sound source represents one
+instance of a sound. Now you're totally confused: You thought that sound
+streams are instances of a sound. That's right. Sound streams and sound
+sources are 1-to-1 related. When a sound stream is played, it is attached
+to a sound source. Think of it this way: The sound stream supplied the sound
+information and the sound source pushes this information to the speakers.
+
+When creating a sound source, you have to choose whether you want a 3d or
+non-3d source. A non-3d source will always be at your own position, while a
+3d source can be set to any position. Non-3d sources will ignore the
+@code{SetPosition} and @code{SetVelocity} methods.
+
+Sound sources also allow more control over the sound: You can begin and stop
+playing the sound at any time. Note that one sound source is still one
+instance of the sound. If you play the source twice with the
+@code{SOUND_RESTART} option, the source will start playing, then suddenly
+stop and restart from the beginning. You won't hear the sound twice at the
+same time. To do this, you must create another sound source.
+
+@node Sound Listener
+@subsection The Sound Listener
+
+The sound renderer uses one global listener object. It controls how you hear
+sounds. This includes your own position and velocity (only for 3d sounds),
+and environmental effects.
+@@@@@@ do env effects affect non-3d sounds?
+
+@node Advanced Sound FX
+@subsection Advanced Sound Effects
+
+The environmental effects of the listener are not enough for you? You want to
+dynamically generate the sound? This is possible. You have to create your own
+implementation of the sound stream.
+
+As said earlier, sound streams supply the sample data. They can dynamically
+create this data, or modify data they read from another stream. Note that
+if you modify data from another stream, you must copy it before doing this.
+You may not modify the buffer returned by @code{Read()}.
+
+The methods of @code{iSoundStream} are:
+
+@table @code
+@item Read()
+This function should return a block of sample data. This can be memory
+created with @code{new} or not, as you can get rid of it in
+@code{DiscardBuffer}. The sound must be given in the format returned by
+@code{GetFormat()}. The @code{NumSamples} parameter sets the number of
+samples to read, or @code{-1} to read as much as possible. You must set this
+to the number of samples actually read. If it wasn't @code{-1} before the
+call, it may not be altered unless the sound is finished, in which case it
+may be set to a lower number.
+
+@item DiscardBuffer()
+This function should discard a buffer returned by @code{Read()}, for example
+@code{delete} a buffer created by @code{new}.
+
+@item GetFormat()
+This method should return the format (frequency, bits, channels) of the
+sound data returned by @code{Read}. This must match the format returned by
+the @code{GetLoadFormat()} method of the sound renderer. This means that all
+three elements of the @code{csSoundFormat} must be the same. The only
+exception are elements set to -1 by the sound renderer, where you can choose
+the format. If the sound renderer tells you the sound's frequency must be -1,
+it can be anything, but it must be the format returned by @code{Read()}.
+
+@item Restart()
+This function should restart the stream to the beginning. If your stream
+cannot be reset, implement this function as a NOP, but then the
+@code{SOUND_RESTART} option for playing sounds will not work. Don't abuse
+this method and do anything else than restarting! The renderer is not forced
+to use this function to restart the sound. If you're reading data from
+another stream to produce your output, you should reset that stream as well.
+
+@item MayPrecache()
+This function should return @code{true} if the sound renderer may read the
+sound data in advance. So if you don't know all data at this moment (for
+runtime generated speech, or special effects that can be reconfigured later),
+this is @code{false}. Otherwise return @code{true}, this makes hardware
+mixing possible on some soundcards (faster).
+@end table
+
