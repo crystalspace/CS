@@ -426,8 +426,8 @@ void csFireSaver::WriteDown (iBase* obj, iStrVector *str,
   sprintf(buf, "LIGHTING (%s)\n", state->GetLighting()?"true":"false");
   str->Push(strnew(buf));
   // REDEYE: Temp hack to fix compile errors
-  sprintf(buf, "ORIGIN (%g, %g, %g)\n", state->GetOrigin().MinX,
-    state->GetOrigin().MinY, state->GetOrigin().MinZ);
+  sprintf(buf, "ORIGIN (%g, %g, %g)\n", state->GetOrigin().MinX (),
+    state->GetOrigin().MinY (), state->GetOrigin().MinZ ());
   str->Push(strnew(buf));
   sprintf(buf, "SWIRL (%g)\n", state->GetSwirl());
   str->Push(strnew(buf));

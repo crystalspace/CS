@@ -1,6 +1,41 @@
 The history order has been reversed so that new features are at the top.
 
+22-Apr-2001
+	- Fixed a small compiler error in the fire loader.
+21-Apr-2001
+	- Wouter Wijngaards did the following for the iso engine:
+	  Added optimization to the iso Engine:
+	    - A complex system of material registration (by the engine object)
+  	      which allows the polygons in the main pass to be rendered out
+	      of order, sorted by material. This is supposed to be very good
+	      for certain hardware. But not my hardware. Perhaps someone
+	      with better hardware can test if framerates have improved.
+	    - The iso engine can create iMaterialWrappers for you. Those
+	      have the same interface as the regular 3d engine of CS.
+	      Except that private object returns the iso object (which
+	      is almost compatible). Also they implement
+	      iIsoMaterialWrapperIndex, an interface that allows the iso
+	      engine to get the index to sort by material. If no such
+	      interface is detected, the polygon is drawn immediately.
+	    - The isorenderview contains the buckets for sorting by
+	      material. The buckets are kept preallocated (in an ever
+	      growing queue).
+	  For all this, the framerates in my software and opengl renderers
+	  is exactly as it was before :-)
+	- Wouter Wijngaards also says:
+	  After getting a request to make a 3d fire particle system,
+	  and due consideration of how other fire particle systems look,
+	  I have come to the conclusion that the current fire particle
+	  system is adequate for the task.
+	  I have, however, ameliorated the current fire particle system
+	  by allowing the starting origin to be given as a Box (possible
+	  min=max, a point). Each particle is randomly started in the box.
+	  The walktest demo 'flame' now starts the particles in a
+	  square upon the ground. This is already pretty fiery. An
+	  improvement would be having the artists for your game make a
+	  nice particle texture.
 20-Apr-2001
+	- Philip Wyett added WinCVS tutorial to the CS docs.
 	- Moved all flags from csMeshWrapper to iMeshWrapper.
 	  Also added GetFlags() to iMeshWrapper.
 	- Added SetMeshObjectFactory() to iMeshFactoryWrapper.
