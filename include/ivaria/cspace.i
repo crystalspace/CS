@@ -193,6 +193,7 @@
 	INTERFACE_APPLY(iPolygonTexture)
 	INTERFACE_APPLY(iSCF)
 	INTERFACE_APPLY(iScript)
+	INTERFACE_APPLY(iScriptObject)
 	INTERFACE_APPLY(iSector)
 	INTERFACE_APPLY(iSectorList)
 	INTERFACE_APPLY(iSoundHandle)
@@ -332,7 +333,9 @@
 	// as template functions.
 	// Examples are SCF_QUERY_INTERFACE and CS_QUERY_REGISTRY.
 	// Thanks to Mat Sutcliffe <oktal@gmx.co.uk>.
-	// Note that this works _only_ if you're _not_ using virtual inheritance!
+	// Note that this works only if you're not using virtual inheritance.
+	// Also note that CS should never need to use virtual inheritance as
+	// long as it has SCF.
 	//
 	// renej: The VoidPtr is added to handle case where the void pointer is
 	// the actual pointer. Ref<iBase> is used for pointers that need casting
@@ -348,7 +351,7 @@
 	  csWrapPtr (const char *t, csPtr<iBase> r)
 		: Ref (r), VoidPtr (0), Type (t) {}
 	  csWrapPtr (const char *t, csRef<iBase> r)
-		: Ref (r), VoidPtr(0), Type (t) {}
+		: Ref (r), VoidPtr (0), Type (t) {}
 	  csWrapPtr (const char *t, void *p)
 		: VoidPtr (p), Type (t) {}
 	  csWrapPtr (const csWrapPtr &p)
@@ -844,8 +847,34 @@ TYPEMAP_OUT_csWrapPtr
 %include "ivaria/collider.h"
 %include "ivaria/dynamics.h"
 %include "ivaria/conout.h"
-%include "ivaria/script.h"
 %include "ivaria/engseq.h"
+
+%rename(IntCall) *::Call(const char*, int&, const char*, ...);
+%rename(FloatCall) *::Call(const char*, float&, const char*, ...);
+%rename(DoubleCall) *::Call(const char*, double&, const char*, ...);
+%rename(StringCall) *::Call(const char*, char**, const char*, ...);
+%rename(ObjectCall) *::Call(const char*, csRef<iScriptObject>&, const char*, ...);
+%rename(StoreInt) iScript::Store(const char*, int);
+%rename(StoreFloat) iScript::Store(const char*, float);
+%rename(StoreDouble) iScript::Store(const char*, double);
+%rename(StoreString) iScript::Store(const char*, const char*);
+%rename(StoreObject) iScript::Store(const char*, iStringObject*);
+%rename(RetrieveInt) iScript::Retrieve(const char*, int);
+%rename(RetrieveFloat) iScript::Retrieve(const char*, float&);
+%rename(RetrieveDouble) iScript::Retrieve(const char*, double&);
+%rename(RetrieveString) iScript::Retrieve(const char*, char**);
+%rename(RetrieveObject) iScript::Retrieve(const char*, csRef<iStringObject>&);
+%rename(SetInt) iScriptObject::Set(const char*, int);
+%rename(SetFloat) iScriptObject::Set(const char*, float);
+%rename(SetDouble) iScriptObject::Set(const char*, double);
+%rename(SetString) iScriptObject::Set(const char*, const char*);
+%rename(SetObject) iScriptObject::Set(const char*, iStringObject*);
+%rename(GetInt) iScriptObject::Get(const char*, int);
+%rename(GetFloat) iScriptObject::Get(const char*, float&);
+%rename(GetDouble) iScriptObject::Get(const char*, double&);
+%rename(GetString) iScriptObject::Get(const char*, char**);
+%rename(GetObject) iScriptObject::Get(const char*, csRef<iStringObject>&);
+%include "ivaria/script.h"
 
 %include "inetwork/netman.h"
 %include "inetwork/sockerr.h"
@@ -893,6 +922,15 @@ APPLY_FOR_EACH_INTERFACE
 }
 
 #undef CAST_FROM_BASE
+
+// iutil/csinput.h
+%extend iKeyboardDriver
+{
+	bool GetKeyState (const char * key)
+	{
+		return self->GetKeyState ((int) key[0]);
+	}
+}
 
 // iutil/event.h
 %extend iEvent

@@ -76,10 +76,10 @@
 /****************************************************************************
  * Applying this Perl code is the second and final stage of wrapping
  * operator overloads. It is commented out since Swig doesn't yet have a
- * %perl5code directive.
+ * %perlcode directive.
  ****************************************************************************/
 #if 0
-%perl5code %{
+%perlcode %{
   use overload (
     'abs'	=> '__abs__',
     'bool'	=> '__bool__',
@@ -163,6 +163,23 @@
 {
   $result = newSViv ($1);
 }
+
+/****************************************************************************
+ * Allow event key characters to be given as strings of length 1. Otherwise,
+ * they would have to be passed as ASCII integers.
+ ****************************************************************************/
+%typemap(out) int Char
+{
+  static char event_key_char[2] = " ";
+  event_key_char[0] = (char) $1;
+  $result = newSVpv (event_key_char, 0);
+}
+%typemap(in) int Char
+{
+  $1 = (int) * SvPV_nolen ($input);
+}
+%apply(int Char) { int iChar };
+%apply(int Char) { int kchar };
 
 /****************************************************************************
  * Define typemaps to get the pointers out of csRef, csPtr and csWrapPtr.
@@ -300,11 +317,6 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
 %enddef
 
 /****************************************************************************
- * It seems there's a bug in Swig with this function.
- ****************************************************************************/
-%ignore scfInitialize(int argc, const char * const argv[]);
-
-/****************************************************************************
  * Typemaps to convert an argc/argv pair to a Perl array.
  ****************************************************************************/
 %typemap(in) (int argc, const char * argv[])
@@ -327,11 +339,16 @@ _TYPEMAP_csArray(double,		newSVnv,	SvNV)
   delete [] $2;
 }
 
+/****************************************************************************
+ * Typemap to handle format/vararg input functions.
+ ****************************************************************************/
 %typemap(in) (const char * description, ...)
 {
   $1 = "%s";
   $2 = SvPV_nolen ($input);
 }
+%apply(const char * description, ...) { (const char * format, ...) };
+%apply(const char * description, ...) { (const char * fmt, ...) };
 
 /****************************************************************************
  * Typemaps to handle arrays.

@@ -1,5 +1,7 @@
 SubDir TOP plugins cscript csperl5 ;
 
+if 0
+{
 if $(PERL5.SDK.AVAILABLE) = "yes"
 {
   if $(PERL5.EXTUTILS.EMBED.AVAILABLE) = "yes"
@@ -41,7 +43,7 @@ if $(PERL5.SDK.AVAILABLE) = "yes"
       $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
     HDRRULE on $(sources) = HeaderRule ;
     HDRSCAN on $(sources) = $(SWIG.HDRPATTERN) ;
-    SWIG.FLAGS on $(target) += -perl5 -c++ -v -shadow -I$(TOP)/include 
+    SWIG.FLAGS on $(target) += -perl5 -c++ -v -shadow -const -I$(TOP)/include 
 			       -module cspace ;
 		    
     Swig $(target) : $(sources) ;
@@ -57,10 +59,11 @@ if $(PERL5.SDK.AVAILABLE) = "yes"
   Plugin csperl5
 	  : $(FILES)
   ;
-  CFlags csperl5 : -Wno-unused ;
+  CFlags csperl5 : -I$(TOP)/scripts/perl5 -Wno-unused ;
   LinkWith csperl5 : cstool csgeom cssys csutil ;
   ExternalLibs csperl5 : PERL5 ;
   Help csperl5 : "Crystal Script Perl5 plug-in" ;
   Clean clean : $(perlxs) ;
   Clean csperl5clean : $(perlxs) ;
 }
+} # 0 = 1

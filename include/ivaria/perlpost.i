@@ -51,6 +51,21 @@
 %}
 
 /****************************************************************************
+ * Create an scfInitialize function in Perl which grabs the program path
+ * automatically, then remove the C argc/argv version.
+ ****************************************************************************/
+%inline %{
+  void scfInitialize ()
+  {
+    static char *argv[] = { 0, 0 };
+    argv[0] = SvPV_nolen (get_sv ("0", 0));
+    scfInitialize (0, argv);
+  }
+%}
+
+%ignore scfInitialize(int argc, const char * const argv []);
+
+/****************************************************************************
  * This is CS's interface to the Perl script's event handler.
  ****************************************************************************/
 %{
@@ -189,7 +204,7 @@
 
 /****************************************************************************
  * These functions are replacements for CS's macros of the same names.
- * These functions can be wrapped by Swig.
+ * These functions can be wrapped by Swig but the macros can't.
  * They use scfGetVersion defined above.
  ****************************************************************************/
 %inline %{
@@ -304,7 +319,7 @@
 
 /****************************************************************************
  * These functions are replacements for CS's macros of the same names.
- * These functions can be wrapped by Swig.
+ * These functions can be wrapped by Swig but the macros can't.
  * They use csRequestPlugin defined above, and the typemaps.
  ****************************************************************************/
 %inline %{
@@ -498,7 +513,7 @@
 
 /****************************************************************************
  * These functions are replacements for CS's macros of the same names.
- * These functions can be wrapped by Swig.
+ * These functions can be wrapped by Swig, but the macros can't.
  ****************************************************************************/
 %inline %{
   #undef CS_VEC_FORWARD
@@ -856,8 +871,5 @@ WRAP_SCRIPT_CLASS (iAwsSink,
     POPu
   )
 )
-
-// TODO: It is easy to add here more interfaces that you might want to
-//       implement in script with WRAP_SCRIPT_CLASS().
 
 #endif // SWIGPERL5

@@ -50,6 +50,14 @@ chronological order.
 	  now.
 	- Jorrit fixed mk/user.mak so that it no longer compiles
 	  glrender3d if NR is not enabled. Similarly for jam.
+	- Oktal made the following changes to the perl5 plugin:
+	    - Accumulation of many different updates to the Swig interface
+	      files. Regenerated the Swig files.
+	    - Fixed the makefile so it should now by reasonably easy to add
+	      Swig code regeneration to jobber.pl. This involved moving
+	      cswigpl5.inc to CS/scripts/perl5/.
+	    - Commented out the Jamfile since I don't know how to make it do
+	      what I want it to do.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:
