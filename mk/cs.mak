@@ -105,7 +105,7 @@ DO.LINK.EXE = $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) $(L^) $(LIBS)
 ifeq ($(MAKE_DLL),yes)
   DO.PLUGIN = $(DO.SHARED.PLUGIN)
 else
-  DO.PLUGIN = $(DO.SHARED.PLUGIN)
+  DO.PLUGIN = $(DO.STATIC.PLUGIN)
 endif
 
 # The sed script used to build dependencies
