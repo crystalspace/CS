@@ -23,7 +23,7 @@
     Mark game-over height so that you can see it.
     Improve 'Game Over' screen!
     Cleanup of several 'Screens' in Blocks (code cleanup).
-    Psuedo-AI module to play automatically.
+    Pseudo-AI module to play automatically.
     Add confirmation before quitting game.
     Fix bugs with marker on floor (wrong size...).
  */
@@ -410,10 +410,22 @@ Blocks::Blocks ()
   menu_hor_new_x_dst = 0.0;
 
   menu_hor_old_menu = NULL;
+  cube_tmpl = NULL;
+  hrast_tmpl = NULL;
+  vrast_tmpl = NULL;
+  pillar_tmpl = NULL;
+  for (int i=0; i < MAX_MENUS; i++) src_menus[i] = NULL;
+  arrow_left = arrow_right = NULL;
 }
 
 Blocks::~Blocks ()
 {
+  if (arrow_left) arrow_left->DecRef ();
+  if (arrow_right) arrow_right->DecRef ();
+  if (cube_tmpl) cube_tmpl->DecRef ();
+  if (hrast_tmpl) hrast_tmpl->DecRef ();
+  if (vrast_tmpl) vrast_tmpl->DecRef ();
+  if (pillar_tmpl) pillar_tmpl->DecRef ();
   if (dynlight) dynlight->DecRef ();
   if (engine)
   {
@@ -700,6 +712,7 @@ void Blocks::add_pillar (int x, int y)
   pillar->HardTransform (csTransform (csMatrix3 (), v));
   pillar->GetMovable ()->SetSector (room);
   pillar->GetMovable ()->UpdateMove ();
+  pillar->DecRef ();
 }
 
 void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
@@ -711,6 +724,7 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   csMatrix3 rot = create_rotate_y (rot_z);
   vrast->HardTransform (csTransform (rot, v));
   vrast->GetMovable ()->UpdateMove ();
+  vrast->DecRef ();
 }
 
 void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
@@ -722,6 +736,7 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   csMatrix3 rot = create_rotate_y (rot_z);
   hrast->HardTransform (csTransform (rot, v));
   hrast->GetMovable ()->UpdateMove ();
+  hrast->DecRef ();
 }
 
 void Blocks::ChangeThingMaterial (iMeshWrapper* thing,
@@ -851,6 +866,7 @@ void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
   cube_info[num_cubes].dy = dy;
   cube_info[num_cubes].dz = dz;
   num_cubes++;
+  cube->DecRef ();
 }
 
 // dx,dy,dz are logical coordinates (Z vertical).
@@ -1029,70 +1045,70 @@ void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
   switch (type)
   {
     case SHAPE_DEMO_B:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
       break;
     case SHAPE_DEMO_L:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  -2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0,  -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0,  -2, x, y, z, cube_tmpl)->DecRef ();
       break;
     case SHAPE_DEMO_O:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
       break;
     case SHAPE_DEMO_C:
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
       break;
     case SHAPE_DEMO_K:
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0, -1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0,  1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
       break;
     case SHAPE_DEMO_S:
-      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl);
-      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl);
+      add_cube_thing (demo_room,  1, 0, -1, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  1, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room,  0, 0,  2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0, -2, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  0, x, y, z, cube_tmpl)->DecRef ();
+      add_cube_thing (demo_room, -1, 0,  1, x, y, z, cube_tmpl)->DecRef ();
       break;
     default: break;
   }
@@ -1950,6 +1966,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
     csVector3 v (x, y, z);
+
     arrow_left->GetMovable ()->SetSector (demo_room);
     arrow_right->GetMovable ()->SetSector (demo_room);
     arrow_left->GetMovable ()->SetPosition (demo_room, v);
@@ -2003,6 +2020,7 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
   thing_state->DecRef ();
 
   src_menus[menu_nr] = thing_wrap;
+  thing_wrap->DecRef ();
 }
 
 iMeshWrapper* Blocks::CreateMenuArrow (bool left)
@@ -2065,6 +2083,7 @@ void Blocks::InitMenu ()
     src_menus[i]->GetMovable ()->ClearSectors ();
     src_menus[i]->GetMovable ()->UpdateMove ();
   }
+
   arrow_left->GetMovable ()->ClearSectors ();
   arrow_right->GetMovable ()->ClearSectors ();
   arrow_left->GetMovable ()->UpdateMove ();
@@ -2202,8 +2221,8 @@ void Blocks::InitGameRoom ()
   walls_state->DecRef ();
   walls->DecRef ();
 
-  Sys->add_pillar_template ();
   Sys->add_cube_template ();
+  Sys->add_pillar_template ();
   Sys->add_vrast_template ();
   Sys->add_hrast_template ();
 
@@ -2276,13 +2295,14 @@ void Blocks::InitDemoRoom ()
 
   float char_width = CUBE_DIM*4.;
   float offset_x = -char_width * (6/2)+CUBE_DIM*2;
+  
   start_demo_shape (SHAPE_DEMO_B, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_L, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_O, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_C, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_K, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_S, offset_x, 3, 4); offset_x += char_width;
-
+  
   CreateMenuEntry ("menu_novice", MENU_NOVICE);
   CreateMenuEntry ("menu_average", MENU_AVERAGE);
   CreateMenuEntry ("menu_expert", MENU_EXPERT);
