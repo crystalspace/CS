@@ -29,6 +29,8 @@ chronological order.
 	      function.
 	    - Enabled iEngine->CreateBaseMaterial() again which was disabled
 	      for some bizare reason. This fixes bugplug again.
+	    - Fixed the ball mesh object for real. The index parameter should
+	      be 'true' for the triangle buffer.
 	- Jorrit added stdpt, ieplex, motion, and gtreeldr to walkall target
 	  for jam.
 26-Aug-2003

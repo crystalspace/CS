@@ -574,7 +574,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     {
       vertex_buffer = r3d->CreateRenderBuffer (
         sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 3, false);	// Jorrit @@@, not sure if false is ok!
+        CS_BUFCOMP_FLOAT, 3, false);
       ball_vertices_dirty_flag = false;
       csVector3* vbuf = (csVector3*)vertex_buffer->Lock(CS_BUF_LOCK_NORMAL);
       memcpy (vbuf, ball_vertices, sizeof(csVector3)*num_ball_vertices);
@@ -592,7 +592,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     {
       texel_buffer = r3d->CreateRenderBuffer (
         sizeof (csVector2)*num_ball_vertices, CS_BUF_STATIC, 
-        CS_BUFCOMP_FLOAT, 2, false);	// Jorrit @@@, not sure if false is ok!
+        CS_BUFCOMP_FLOAT, 2, false);
       ball_texels_dirty_flag = false;
       csVector2* tbuf = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
       memcpy (tbuf, ball_texels, sizeof (csVector2) * num_ball_vertices);
@@ -610,7 +610,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     {
       normal_buffer = r3d->CreateRenderBuffer (
         sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3, false);	// Jorrit @@@, not sure if false is ok!
+        CS_BUFCOMP_FLOAT, 3, false);
       ball_normals_dirty_flag = false;
       csVector3 *nbuf = (csVector3*)normal_buffer->Lock(CS_BUF_LOCK_NORMAL);
       memcpy (nbuf, top_normals, sizeof (csVector3)*num_ball_vertices);
@@ -628,7 +628,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     {
       color_buffer = r3d->CreateRenderBuffer (
         sizeof (csColor)*num_ball_vertices, CS_BUF_STATIC,
-        CS_BUFCOMP_FLOAT, 3, false);	// Jorrit @@@, not sure if false is ok!
+        CS_BUFCOMP_FLOAT, 3, false);
       ball_colors_dirty_flag = false;
       csColor *cbuf = (csColor*)color_buffer->Lock(CS_BUF_LOCK_NORMAL);
       memcpy (cbuf, ball_colors, sizeof (csColor) * num_ball_vertices);
@@ -646,7 +646,7 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
     {
       index_buffer = r3d->CreateRenderBuffer (
         sizeof (unsigned int)*ball_triangles*3, CS_BUF_STATIC,
-        CS_BUFCOMP_UNSIGNED_INT, 1, false);	// Jorrit @@@, not sure if false is ok!
+        CS_BUFCOMP_UNSIGNED_INT, 1, true);
       ball_triangle_dirty_flag = false;
       unsigned int *ibuf = (unsigned int *)index_buffer->Lock(
         CS_BUF_LOCK_NORMAL);
