@@ -123,7 +123,7 @@ csChunkLodTerrainFactory::csChunkLodTerrainFactory (csChunkLodTerrainType* p,
   compressed_vertex_name = strings->Request ("compressed vertices");
   texcors_name = strings->Request ("texture coordinates");
   compressed_texcors_name = strings->Request("compressed texture coordinates");
-  texcoords_norm_name = strings->Request ("texture coordinates normalized");
+  //texcoords_norm_name = strings->Request ("texture coordinates normalized");
   normal_name = strings->Request ("normals");
   compressed_normal_name = strings->Request ("compressed normals");
   tangent_name = strings->Request ("tangents");
@@ -220,7 +220,7 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
   const csVector3* normals = fullsample->SampleVector3 (normal_name);
   const csVector2* texcoords = fullsample->SampleVector2 (texcors_name);
 
-  const csVector2 tcScale (hm_x, hm_y);
+  //const csVector2 tcScale (hm_x, hm_y);
 
   int i, j;
   for (j = 0; j < hm_y; j ++)
@@ -232,8 +232,9 @@ void csChunkLodTerrainFactory::SetSamplerRegion (
       datamap[pos].pos = positions[pos];
       datamap[pos].norm = normals[pos];
       const csVector2& tc = texcoords[pos];
-      datamap[pos].tex.x = tc.x * tcScale.x;
-      datamap[pos].tex.y = tc.y * tcScale.y;
+      //datamap[pos].tex.x = tc.x * tcScale.x;
+      //datamap[pos].tex.y = tc.y * tcScale.y;
+      datamap[pos].tex = tc;
       datamap[pos].col = pos;
     }
   }
@@ -636,7 +637,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
   {
     return 0;
   }
-  else if (name == pFactory->texcoords_norm_name)
+  /*else if (name == pFactory->texcoords_norm_name)
   {
     if (!texcoords_norm_buffer)
     {
@@ -658,7 +659,7 @@ iRenderBuffer *csChunkLodTerrainFactory::MeshTreeNode::GetRenderBuffer (
       }
     }
     return texcoords_norm_buffer;
-  }
+  }*/
   else if (name == pFactory->compressed_color_name)
   {
     return 0;
@@ -1030,12 +1031,6 @@ bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
 	CS_QUERY_REGISTRY_TAG_INTERFACE (pFactory->object_reg,
 	"crystalspace.shared.stringset", iStringSet);
   csRef<iTextureManager> mgr = pFactory->r3d->GetTextureManager ();
-  csRef<csShaderVariable> splat_var = 
-    new csShaderVariable (strings->Request ("splat map scale"));
-  splat_var->SetType (csShaderVariable::VECTOR2);
-  splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x,
-  	1.0 / (float)pFactory->hm_y));
-  matwrap->GetMaterial()->AddVariable (splat_var);
 
   csRef<csShaderVariable> lod_var = 
     new csShaderVariable (strings->Request ("texture lod distance"));
@@ -1066,13 +1061,6 @@ bool csChunkLodTerrainObject::SetMaterialMap (const csArray<char>& data,
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
     palette[i]->GetMaterial()->AddVariable (var);
-    csRef<csShaderVariable> splat_var = 
-      new csShaderVariable (strings->Request ("splat map scale"));
-    splat_var->SetType (csShaderVariable::VECTOR2);
-    splat_var->SetValue (csVector2 (1.0 / (float)pFactory->hm_x,
-    	1.0 / (float)pFactory->hm_y));
-    matwrap->GetMaterial()->AddVariable (splat_var);
-    palette[i]->GetMaterial()->AddVariable (splat_var);
 
     csRef<csShaderVariable> lod_var = 
       new csShaderVariable (strings->Request ("texture lod distance"));
@@ -1755,8 +1743,6 @@ csChunkLodTerrainObject::MeshTreeNodeWrapper::MeshTreeNodeWrapper (
   sv = svcontext->GetVariableAdd (obj->pFactory->binormal_name);
   sv->SetAccessor (sva);
   sv = svcontext->GetVariableAdd (obj->pFactory->texcors_name);
-  sv->SetAccessor (sva);
-  sv = svcontext->GetVariableAdd (obj->pFactory->texcoords_norm_name);
   sv->SetAccessor (sva);
   sv = svcontext->GetVariableAdd (obj->pFactory->color_name);
   sv->SetAccessor (sva);

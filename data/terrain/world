@@ -63,7 +63,7 @@
     <material name="Stone">
       <texture>stone4.gif</texture>
       <shadervar name="tex normal" type="texture">stone2DOT3.png</shadervar>
-      <shadervar name="texture scale" type="vector2">8,8</shadervar>
+      <shadervar name="texture scale" type="vector2">32,32</shadervar>
       <!-- <shader type="diffuse">splatting_bump</shader> -->
       <shader type="diffuse">splatting_scattering</shader>
     </material>
@@ -159,8 +159,8 @@
       <plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>
       <terraformer>simple</terraformer>
       <sampleregion>
-        <min x="-128" y="-128" />
-        <max x="128" y="128" />
+        <min x="-256" y="-256" />
+        <max x="256" y="256" />
       </sampleregion>
     </params>
   </meshfact>

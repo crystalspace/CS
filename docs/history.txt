@@ -9,6 +9,10 @@ chronological order.
 21-May-2004
 	- res added some cleanup code to NR halo drawing to fix the problem 
 	  with the disappearing HUD (or, more general, stuff not being drawn).
+	- res removed the support for "normalized texture coordinates" from
+	  chunklod. (The unnormalized TCs where scaled to [0..1] in the shaders
+	  anyway).
+	- res fixed the texture coord generation in simpleformer.
 20-May-2004
 	- res updated map2cs to not write <camera /> into the sky render 
 	  priority.

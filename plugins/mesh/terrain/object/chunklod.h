@@ -123,7 +123,7 @@ public:
   csStringID normal_name, compressed_normal_name;
   csStringID tangent_name, compressed_tangent_name;
   csStringID binormal_name, compressed_binormal_name;
-  csStringID texcors_name, compressed_texcors_name, texcoords_norm_name;
+  csStringID texcors_name, compressed_texcors_name;
   csStringID color_name, compressed_color_name;
   csStringID index_name;
   csRef<iGraphics3D> r3d;

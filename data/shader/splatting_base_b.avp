@@ -4,7 +4,6 @@
   <variablemap variable="STANDARD_LIGHT_0_SPECULAR" destination="register 2"/>
   <variablemap variable="STANDARD_LIGHT_0_ATTENUATION" destination="register 3"/>
 
-  <variablemap variable="splat map scale" destination="register 4" />
   <variablemap variable="texture lod distance" destination="register 5"/>
 
 <program>
@@ -21,7 +20,6 @@ PARAM lightPos  	= program.local[0];
 PARAM lightDiffuse 	= program.local[1];
 PARAM lightSpecular 	= program.local[2];
 PARAM lightAttenuation 	= program.local[3];
-PARAM splatscale 	= program.local[4];
 PARAM loddist   	= program.local[5];
 
 # Per vertex inputs
@@ -43,7 +41,7 @@ DP4 oPos.y, mvp[1], iPos;
 DP4 oPos.z, mvp[2], iPos;
 DP4 oPos.w, mvp[3], iPos;
 
-MUL oSplat, splatscale, iTex0;
+MOV oSplat, iTex0;
 
 DP4 objEye.x, mvi[0], eyePos;
 DP4 objEye.y, mvi[1], eyePos;

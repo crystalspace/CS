@@ -8,8 +8,8 @@
       <mixmode><destalphaadd /></mixmode>
       <alphamode><smooth /></alphamode>
       <buffer name="vertices" destination="position" />
-      <buffer name="texture coordinates normalized" destination="texture coordinate 0" />
-      <buffer name="texture coordinates normalized" destination="texture coordinate 1" />
+      <buffer name="texture coordinates" destination="texture coordinate 0" />
+      <buffer name="texture coordinates" destination="texture coordinate 1" />
       <buffer name="colors" destination="primary color" />
       <vp plugin="glfixed">
 	<fixedvp>

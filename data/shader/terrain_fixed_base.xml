@@ -7,7 +7,7 @@
     <pass>
       <mixmode><copy /></mixmode>
       <buffer name="vertices" destination="position" />
-      <buffer name="texture coordinates normalized" destination="texture coordinate" />
+      <buffer name="texture coordinates" destination="texture coordinate" />
       <buffer name="colors" destination="primary color" />
       <vp plugin="glfixed">
 	<fixedvp>

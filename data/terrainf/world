@@ -151,8 +151,8 @@
       <!--<plugin>crystalspace.mesh.object.terrain.bruteblock</plugin>-->
       <terraformer>simple</terraformer>
       <sampleregion>
-        <min x="-128" y="-128" />
-        <max x="128" y="128" />
+        <min x="-256" y="-256" />
+        <max x="256" y="256" />
       </sampleregion>
     </params>
   </meshfact>
@@ -198,6 +198,7 @@
   <lodvalue name="block split distance">8</lodvalue>
   <lodvalue name="minimum block size">32</lodvalue>
 	<materialmap image="/lev/terrain/materialmap.png" />
+	<staticlighting>yes</staticlighting>
       </params>
       <move> 
         <v x="0" y="0" z="0" /> 

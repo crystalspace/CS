@@ -73,11 +73,7 @@
       SGE tangLight.w, tangLight.x, tangLight.x;
 
       #Just pass on normal
-      RCP scale.x, texscale.x;
-      RCP scale.y, texscale.y;
-      SGE scale.z, scale.z, scale.z;
-      SGE scale.w, scale.x, scale.x;
-      MUL oNormal, scale, iTex0;
+      MUL oNormal, texscale, iTex0;
       
       #calculate vector from vertex to light in object-space
       MOV oLightDir, tangLight;

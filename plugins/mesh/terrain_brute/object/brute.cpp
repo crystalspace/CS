@@ -201,13 +201,6 @@ void csTerrBlock::SetupMesh ()
             (res+1)*(res+1)*sizeof(csVector2));
   terrasampler->Cleanup ();
 
-  const csBox2& terrRegion = terr->region;
-  //float terrW = terrRegion.MaxX() - terrRegion.MinX();
-  //float terrH = terrRegion.MaxY() - terrRegion.MinY();
-  const csVector2 tcOffset (-terrRegion.MinX() + (center.x - size / 2.0),
-    -terrRegion.MinY() + (center.z - size / 2.0));
-  const csVector2 tcScale (size, size);
-
   bbox.Empty ();
   for (int j=0; j<(res+1); ++j)
   {
@@ -215,11 +208,6 @@ void csTerrBlock::SetupMesh ()
     {
       const int pos = i+j*(res+1);
       bbox.AddBoundingVertexSmart (vertex_data[pos]);
-      // @@@ Not nice:
-      csVector2 tc (texcoord_data[pos]);
-      tc.x = (tc.x * tcScale.x) + tcOffset.x;
-      tc.y = (tc.y * tcScale.y) + tcOffset.y;
-      texcoord_data[pos] = tc;
       /*if ((j%2) && (i%2))
       {
         morphvertex_data[i+j*(res+1)] = (vertex_data[i-1+(j-1)*(res+1)]+
@@ -752,12 +740,6 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
     "crystalspace.shared.stringset", iStringSet);
   csRef<iTextureManager> mgr = g3d->GetTextureManager ();
-  csRef<csShaderVariable> splat_var = 
-    new csShaderVariable (strings->Request ("splat map scale"));
-  splat_var->SetType (csShaderVariable::VECTOR2);
-  splat_var->SetValue (csVector2 (1.0 / block_maxsize, 
-                                  1.0 / block_maxsize));
-  matwrap->GetMaterial()->AddVariable (splat_var);
 
   csRef<csShaderVariable> lod_var = 
     new csShaderVariable (strings->Request ("texture lod distance"));
@@ -787,13 +769,6 @@ bool csTerrainObject::SetMaterialMap (const csArray<char>& data, int w, int h)
     var->SetType (csShaderVariable::TEXTURE);
     var->SetValue (hdl);
     palette[i]->GetMaterial()->AddVariable (var);
-    csRef<csShaderVariable> splat_var = 
-      new csShaderVariable (strings->Request ("splat map scale"));
-    splat_var->SetType (csShaderVariable::VECTOR2);
-    splat_var->SetValue (csVector2 (1.0 / block_maxsize, 
-                                    1.0 / block_maxsize));
-    matwrap->GetMaterial()->AddVariable (splat_var);
-    palette[i]->GetMaterial()->AddVariable (splat_var);
 
     csRef<csShaderVariable> lod_var = 
       new csShaderVariable (strings->Request ("texture lod distance"));
@@ -1067,7 +1042,7 @@ csTerrainFactory::csTerrainFactory (iObjectRegistry* object_reg)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiObjectModel);
   csTerrainFactory::object_reg = object_reg;
   logparent = 0;
-
+				
   /*terraformer = 
     CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, "terrain", iTerraFormer);*/
 

@@ -1,7 +1,6 @@
 <arbvp>
 <variablemap variable="STANDARD_LIGHT_AMBIENT" destination="register 0"/>
 <variablemap variable="texture scale" destination="register 1" />
-<variablemap variable="splat map scale" destination="register 2" />
 <program>
 <![CDATA[
 !!ARBvp1.0
@@ -12,7 +11,6 @@
 PARAM mvp[4]		= { state.matrix.mvp };
 PARAM lightAmbient  	= program.local[0];
 PARAM texscale  	= program.local[1];
-PARAM alphascale  	= program.local[2];
 
 # Per-Vertex data used
 ATTRIB iPos		= vertex.attrib[0];
@@ -44,8 +42,7 @@ ADD scale.z, scale.z, -scale.z;
 SGE scale.w, scale.x, scale.x;
 MUL oTex, scale, iTex0;
 
-# scale splat alpha by terrain size
-MUL oSplat, alphascale, iTex0;
+MOV oSplat, iTex0;
 
 # pass through ambient light color
 MOV oCol0, lightAmbient;
