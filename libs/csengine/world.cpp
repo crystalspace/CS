@@ -197,6 +197,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
   textures = NULL;
   c_buffer = NULL;
   quadtree = NULL;
+  current_camera = NULL;
 
   CHK (quadcube = new csQuadcube (10, 8));
 
