@@ -4,6 +4,8 @@
 #include "awskcfct.h"
 #include "awsslot.h"
 #include "awsscrbr.h"
+#include "awsfparm.h"
+
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
@@ -121,6 +123,26 @@ bool awsNotebook::SetProperty (const char *name, void *parm)
   }
 
   return false;
+}
+
+bool awsNotebook::Execute (const char* action, iAwsParmList* parmlist)
+{
+  if (strcmp (action, "ActivateTab") == 0) 
+  {
+    if (!parmlist) return false;
+
+    iString* comp_name = 0;
+    if (!parmlist->GetString ("Tab", &comp_name)) return false;
+    
+    iAwsComponent* comp = FindChild (comp_name->GetData ());
+    if (!comp) return false;
+
+    tab_ctrl.ActivateTab((void*) comp);
+
+    return true;
+  }
+
+  return awsComponent::Execute (action, parmlist);
 }
 
 void awsNotebook::OnDraw (csRect r)

@@ -366,6 +366,10 @@ public:
   /// Set properties.
   bool SetProperty (const char *name, void *parm);
 
+  /// Executres a scriptable action. Currently supported (on top of standard
+  /// ones from awsComponent) : ActivateTab.
+  virtual bool Execute(const char* action, iAwsParmList* parmlist);
+
   /// Returns the named TYPE of the component, like "Notebook Page", etc.
   virtual const char *Type ();
 

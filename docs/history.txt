@@ -127,6 +127,9 @@ chronological order.
 	      these new facilities so that they no longer emit generated files
 	      to the source tree, which was broken behavior since that
 	      directory migth be read-only or shared.
+	- Remi Bonnet added a scriptable action in aws for the notebook
+	  component. This allow a program using Crystal Space to change the
+	  active tab dynamically.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.
