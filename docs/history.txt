@@ -15,6 +15,10 @@ chronological order.
 	  it is used as the value of CS_MAXPATHLEN. Also changed the default
 	  CS_MAXPATHLEN for Unix from the unusually low 256 to the standardized
 	  1024, if MAXPATHLEN is unknown.  (bug #1064997)
+	- Eric Sunshine fixed some header checks in configure.ac to use
+	  AC_CHECK_HEADERS() rather than AC_CHECK_HEADER(), since the former
+	  also invokes AC_DEFINE() for the detected header(s). This is needed
+	  by some subsequent build tests.
 11-Nov-2004
 	- Eric Sunshine augmented configure.ac/cstypes.h so that they also
 	  consult <inttypes.h> (in addition to <stdint.h>) when checking for
