@@ -43,6 +43,8 @@ chronological order.
 	- Jorrit eliminated another 12 bytes per polygon and then another
 	  12 bytes for every polygon and pseudo-dynamic light that affects
 	  the polygon.
+	- Jorrit fixed a new bug in the thing loader which incorrectly tests
+	  for duplicate vertices.
 	- Eric Sunshine rewrote almost completely the configuration section of
 	  the user manual.  Expanded discussion of configuration domains and
 	  how priority-based system works.  Added missing material.  Clarified

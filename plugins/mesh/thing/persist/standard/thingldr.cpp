@@ -529,14 +529,12 @@ bool csThingLoader::ParsePoly3d (
         break;
       case XMLTOKEN_V:
         {
-	  int* vts = thing_fact_state->GetPolygonVertexIndices (
-	  	CS_POLYINDEX_LAST);
 	  int vt_idx = child->GetContentsValueAsInt ();
 	  bool ignore = false;
-	  int cnt = thing_fact_state->GetPolygonVertexCount (CS_POLYINDEX_LAST);
+	  int cnt = vertices_to_add.Length ();
 	  for (int i = 0 ; i < cnt ; i++)
 	  {
-	    if (vts[i] == vt_idx+vt_offset)
+	    if (vertices_to_add[i] == vt_idx+vt_offset)
 	    {
 	      csPrintf ("Duplicate vertex-index found! "
 			"(polygon '%s') ignored ...\n",
