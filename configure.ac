@@ -1237,16 +1237,22 @@ CS_CHECK_LIB_WITH([jpeg],
 
 #------------------------------------------------------------------------------
 # Check for libmng.  In addition to the standard installed locations, we also
-# search CS/libs/libmng*.
+# search CS/libs/libmng*. Note that libmng on some OpenBSD installations has a
+# dependency on lcms (http://www.littlecms.com/), so we must check for this
+# library, and utilize it explicitly if present.
 #------------------------------------------------------------------------------
-AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
-    [CS_CHECK_LIB_WITH([mng],
-	[AC_LANG_PROGRAM([[#include <libmng.h>]], [mng_version_release()])],
-	[$srcdir/libs/libmng*], [],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libmng], [MNG])], [],
-	[$cs_cv_libjpeg_cflags $cs_cv_libz_cflags],
-	[$cs_cv_libjpeg_lflags $cs_cv_libz_lflags],
-	[$cs_cv_libjpeg_libs $cs_cv_libz_libs], [libmng])])
+CS_CHECK_LIB_WITH([lcms],
+    [AC_LANG_PROGRAM([[#include <lcms.h>]],
+	[LPLUT p = cmsAllocLUT(); cmsFreeLUT(p);])])
+
+CS_CHECK_LIB_WITH([mng],
+    [AC_LANG_PROGRAM([[#include <libmng.h>]], [mng_version_release()])],
+    [$srcdir/libs/libmng*], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libmng], [MNG])], [],
+    [$cs_cv_liblcms_cflags $cs_cv_libjpeg_cflags $cs_cv_libz_cflags],
+    [$cs_cv_liblcms_lflags $cs_cv_libjpeg_lflags $cs_cv_libz_lflags],
+    [$cs_cv_liblcms_libs $cs_cv_libjpeg_libs $cs_cv_libz_libs],
+    [libmng])
 
 
 
@@ -1412,17 +1418,16 @@ CS_CHECK_LIBOPENAL
 #------------------------------------------------------------------------------
 # Check for FreeType2.
 #------------------------------------------------------------------------------
-AC_CHECK_TOOLS([FT2CONFIG], [freetype-config])
-AC_CACHE_CHECK([for FreeType2], [cs_cv_libft2],
-    [AS_IF([test -n "$FT2CONFIG"],
-	[cs_cv_libft2=yes
-	cs_cv_libft2_cflags=CS_RUN_PATH_NORMALIZE([$FT2CONFIG --cflags])
-	cs_cv_libft2_lflags=''
-	cs_cv_libft2_libs=CS_RUN_PATH_NORMALIZE([$FT2CONFIG --libs])],
-	[cs_cv_libft2=no])])
+CS_CHECK_LIB_WITH([freetype2],
+    [AC_LANG_PROGRAM(
+	[[#include <ft2build.h>
+	#include FT_FREETYPE_H]],
+	[FT_Library p; FT_Init_FreeType(&p); FT_Done_FreeType(p);])],
+	[], [], [], [], [], [], [], [freetype])
 
-AS_IF([test $cs_cv_libft2 = yes],
-    [CS_CHECK_BUILD([if freetype2 is sufficiently recent], [cs_cv_ft2_recent],
+AS_IF([test $cs_cv_libfreetype2 = yes],
+    [CS_CHECK_BUILD([if freetype2 is sufficiently recent],
+	[cs_cv_freetype2_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <ft2build.h>
 	    #include FT_INTERNAL_OBJECTS_H
@@ -1430,8 +1435,10 @@ AS_IF([test $cs_cv_libft2 = yes],
 	    #include FT_GLYPH_H
 	    #include FT_MODULE_H]], [return
 	    FT_LOAD_TARGET_MONO|FT_RENDER_MODE_NORMAL|FT_ENCODING_UNICODE])],
-	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libft2], [FT2])], [], [],
-	[$cs_cv_libft2_cflags], [$cs_cv_libft2_lflags], [$cs_cv_libft2_libs])])
+	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libfreetype2], [FT2])], [], [],
+	[$cs_cv_libfreetype2_cflags],
+	[$cs_cv_libfreetype2_lflags],
+	[$cs_cv_libfreetype2_libs])])
 
 
 
@@ -1487,15 +1494,8 @@ AS_IF([test $cs_cv_libcal3d = yes],
 #------------------------------------------------------------------------------
 # Check for SDL.
 #------------------------------------------------------------------------------
-AC_CHECK_TOOLS([SDLCONFIG], [sdl12-config sdl11-config sdl-config])
-
-AC_CACHE_CHECK([for SDL], [cs_cv_libsdl],
-    [AS_IF([test -n "$SDLCONFIG"],
-	[cs_cv_libsdl=yes
-	cs_cv_libsdl_cflags=CS_RUN_PATH_NORMALIZE([$SDLCONFIG --cflags])
-	cs_cv_libsdl_lflags=''
-	cs_cv_libsdl_libs=CS_RUN_PATH_NORMALIZE([$SDLCONFIG --libs])],
-	[cs_cv_libsdl=no])])
+CS_CHECK_LIB_WITH([sdl],
+    [AC_LANG_PROGRAM([#include <SDL.h>], [SDL_Init(0); SDL_Quit();])])
 
 AS_IF([test $cs_cv_libsdl = yes],
     [CS_CHECK_BUILD([if SDL is sufficiently recent], [cs_cv_sdl_recent],
@@ -1517,19 +1517,19 @@ AS_IF([test "$with_vos" != no && test "$with_vos" != yes],
  	[PKG_CONFIG_PATH="$PKG_CONFIG_PATH$PATH_SEPARATOR$with_vos"],
 	[PKG_CONFIG_PATH="$with_vos"])
     export PKG_CONFIG_PATH])
-AC_CHECK_TOOLS([PKGCONFIG], [pkg-config])
+AC_CHECK_TOOLS([PKG_CONFIG], [pkg-config])
 
 m4_define([cs_vos_pkgs], [libmetaobject_a3dl libmetaobject_misc])
 AS_IF([test "$with_vos" != no],
     [AC_CACHE_CHECK([for VOS], [cs_cv_libvos],
-	[AS_IF([test -n "$PKGCONFIG"],
-	    [AS_IF([AC_RUN_LOG([$PKGCONFIG --exists libmetaobject_a3dl])],
+	[AS_IF([test -n "$PKG_CONFIG"],
+	    [AS_IF([AC_RUN_LOG([$PKG_CONFIG --exists libmetaobject_a3dl])],
 		[cs_cv_libvos=yes
 		cs_cv_libvos_cflags=CS_RUN_PATH_NORMALIZE(
-		    [$PKGCONFIG --cflags cs_vos_pkgs])
+		    [$PKG_CONFIG --cflags cs_vos_pkgs])
 		cs_cv_libvos_lflags=''
 		cs_cv_libvos_libs=CS_RUN_PATH_NORMALIZE(
-		    [$PKGCONFIG --libs cs_vos_pkgs])],
+		    [$PKG_CONFIG --libs cs_vos_pkgs])],
 		[cs_cv_libvos=no])],
 	    [cs_cv_libvos=no])])
     AS_IF([test $cs_cv_libvos = yes],
@@ -1648,7 +1648,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	[$cs_cv_libm_cflags $cs_cv_sys_pthread_cflags], 
 	[$cs_cv_libm_lflags $cs_cv_sys_pthread_lflags], 
 	[$cs_cv_libm_libs   $cs_cv_sys_pthread_libs],
-	[cg CG])
+	[cg, CG])
 
     AS_IF([test $cs_cv_libCg = yes],
 	[CS_CHECK_BUILD([if Cg is sufficiently recent], [cs_cv_libCg_recent],
@@ -1671,7 +1671,7 @@ AC_DEFUN([CS_CHECK_LIBCG],
 	    [$cs_cv_libCg_cflags $cs_cv_libgl_cflags $cs_cv_libglu_cflags],
 	    [$cs_cv_libCg_lflags $cs_cv_libgl_lflags $cs_cv_libglu_lflags],
 	    [$cs_cv_libCg_libs   $cs_cv_libgl_libs   $cs_cv_libglu_libs],
-	    [cggl cgGL CGGL])])])
+	    [cggl, cgGL, CGGL])])])
 
 CS_CHECK_LIBCG
 
@@ -1742,15 +1742,10 @@ AS_IF([test $cs_cv_libdivxdecore4 != yes],
 #------------------------------------------------------------------------------
 # Check for Ascii Art library (aalib).
 #------------------------------------------------------------------------------
-AC_CHECK_TOOLS([AALIBCONFIG], [aalib-config])
-AC_CACHE_CHECK([for AAlib], [cs_cv_libaa],
-    [AS_IF([test -n "$AALIBCONFIG"],
-	[cs_cv_libaa=yes
-	cs_cv_libaa_cflags=CS_RUN_PATH_NORMALIZE([$AALIBCONFIG --cflags])
-	cs_cv_libaa_lflags=''
-	cs_cv_libaa_libs=CS_RUN_PATH_NORMALIZE([$AALIBCONFIG --libs])
-	CS_EMIT_BUILD_RESULT([cs_cv_libaa], [AALIB])],
-	[cs_cv_libaa=no])])
+CS_CHECK_LIB_WITH([aa],
+    [AC_LANG_PROGRAM([[#include <aalib.h>]], [aa_autoinit(0); aa_close(0);])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libaa], [AALIB])], [], [], [], [],
+    [aalib])
 
 
 

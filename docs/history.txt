@@ -10,7 +10,23 @@ chronological order.
 	- Eric Sunshine augmented configure.ac/cstypes.h so that they also
 	  consult <inttypes.h> (in addition to <stdint.h>) when checking for
 	  intptr_t and uintptr_t since these types are declared in <inttypes.h>
-	  on BSD platforms.
+	  on BSD platforms. (bug #1064199)
+	- Eric Sunshine augmented the CS_CHECK_LIB_WITH() macro in checklib.m4
+	  so that it employs the following additional methods for gleaning
+	  compiler and linker flags for the specified library (in addition to
+	  the older, existing heuristic of searching a set of directories):
+	    (1) If the `pkg-config' command is present and knows about the
+	        library (or one of its aliases), then glean information from
+	        its --cflags and --libs options.
+	    (2) If a command named `{library}-config' or `{alias}-config'
+	        exists (i.e. `sdl-config', `wx-config', etc.), and if it
+	        responds to --cflags and --libs, then use those options to
+	        glean information about the library.
+	  Additionally, CS_CHECK_LIB_WITH()'s "ALIASES" argument is now
+	  comma-delimited, rather than space-delimited.
+	- Eric Sunshine added a check for lcms (http://www.littlecms.com/) to
+	  configure.ac. This library apparently is needed by libmng on some
+	  OpenBSD installations. (bug #1062197)
 9-Nov-2004
 	- Jorrit did some further work on foliage.
 	- Eric Sunshine added a number of CS_ASSERT()'s to csList<> to catch

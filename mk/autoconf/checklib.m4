@@ -41,8 +41,10 @@ m4_define([cs_lib_paths_default], [])
 #                   [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND], [OTHER-CFLAGS],
 #                   [OTHER-LFLAGS], [OTHER-LIBS], [ALIASES])
 #	Similar to AC_CHECK_LIB(), but allows caller to to provide list of
-#	directories in which to search for LIBRARY, and allows user to override
-#	library location via --with-libLIBRARY=dir.  LIBRARY is the name of the
+#	directories in which to search for LIBRARY; allows user to override
+#	library location via --with-libLIBRARY=dir; and consults `pkg-config'
+#	(if present) and `LIBRARY-config' (if present, i.e. `sdl-config') in
+#	order to obtain compiler and linker flags.  LIBRARY is the name of the
 #	library which is to be located (for example, "readline" for
 #	libreadline.a).  PROGRAM, which is typically composed with
 #	AC_LANG_PROGRAM(), is a program which references at least one function
@@ -66,8 +68,8 @@ m4_define([cs_lib_paths_default], [])
 #	LANGUAGE is omitted, C is used.  OTHER-CFLAGS, OTHER-LFLAGS, and
 #	OTHER-LIBS can specify additional compiler flags, linker flags, and
 #	libraries needed to successfully link with LIBRARY.  The optional
-#	ALIASES is a whitespace-delimited list of library names to search for
-#	in case LIBRARY is not located (for example "sdl1.2 sdl12" for
+#	ALIASES is a comma-delimited list of library names for which to search
+#	in case LIBRARY is not located (for example "[sdl1.2, sdl12]" for
 #	libsdl1.2.a and libsdl12.a).  If the library or one of its aliases is
 #	found and can be successfully linked into a program, then the shell
 #	cache variable cs_cv_libLIBRARY is set to "yes";
@@ -76,7 +78,7 @@ m4_define([cs_lib_paths_default], [])
 #	(including OTHER-CFLAGS), linker flags (including OTHER-LFLAGS), and
 #	library references (including OTHER-LIBS) which resulted in a
 #	successful build; and ACTION-IF-FOUND is invoked.  If the library was
-#	not found or was unlinkable, or if the user disabled the library with
+#	not found or was unlinkable, or if the user disabled the library via
 #	--without-libLIBRARY, then cs_cv_libLIBRARY is set to "no" and
 #	ACTION-IF-NOT-FOUND is invoked.  Note that the exported shell variable
 #	names are always composed from LIBRARY regardless of whether the test
@@ -95,16 +97,22 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 	AS_IF([test "$with_lib$1" != "$cs_cv_with_lib$1"],
 	    [cs_ignore_cache=yes], [cs_ignore_cache=no])
 
+	cs_check_lib_flags=''
+	AS_IF([test $with_lib$1 = yes],
+	    [m4_foreach([cs_check_lib_alias], [$1, $10],
+		[_CS_CHECK_LIB_PKG_CONFIG_FLAGS([cs_check_lib_flags],
+		    cs_check_lib_alias)
+		_CS_CHECK_LIB_CONFIG_FLAGS([cs_check_lib_flags],
+		    cs_check_lib_alias)
+		])])
+
 	AS_IF([test $with_lib$1 != yes],
 	    [cs_check_lib_paths=$with_lib$1],
 	    [cs_check_lib_paths="| cs_lib_paths_default $3"])
-
-	cs_check_lib_flags=''
-	for cs_check_lib_alias in $1 $10
-	do
-	    _CS_CHECK_LIB_CREATE_FLAGS([cs_check_lib_flags],
-		[$cs_check_lib_alias], [$cs_check_lib_paths])
-	done
+	m4_foreach([cs_check_lib_alias], [$1, $10],
+	    [_CS_CHECK_LIB_CREATE_FLAGS([cs_check_lib_flags],
+		cs_check_lib_alias, [$cs_check_lib_paths])
+	    ])
 
 	CS_CHECK_BUILD([for lib$1], [cs_cv_lib$1], [$2], [$cs_check_lib_flags],
 	    [$4], [], [], [$cs_ignore_cache], [$7], [$8], [$9])],
@@ -116,9 +124,80 @@ AC_DEFUN([CS_CHECK_LIB_WITH],
 
 
 #------------------------------------------------------------------------------
+# CS_CHECK_PKG_CONFIG
+#	Check if the `pkg-config' command is available and reasonably recent.
+#	This program acts as a central repository of build flags for various
+#	packages.  For example, to determine the compiler flags for FreeType2
+#	use, "pkg-config --cflags freetype2"; and "pkg-config --libs freetype2"
+#	to determine the linker flags. If `pkg-config' is found and is
+#	sufficiently recent, PKG_CONFIG is set and AC_SUBST() invoked.
+#------------------------------------------------------------------------------
+m4_define([CS_PKG_CONFIG_MIN_VER], [0.9.0])
+AC_DEFUN([CS_CHECK_PKG_CONFIG],
+    [AC_CHECK_TOOLS([PKG_CONFIG], [pkg-config])
+    AS_IF([test -n "$PKG_CONFIG"],
+	[AS_IF([$PKG_CONFIG --atleast-pkgconfig-version=CS_PKG_CONFIG_MIN_VER],
+	    [], [PKG_CONFIG=''])])])
+
+
+
+#------------------------------------------------------------------------------
+# _CS_CHECK_LIB_PKG_CONFIG_FLAGS(VARIABLE, LIBRARY)
+#	Helper macro for CS_CHECK_LIB_WITH().  Checks if `pkg-config' knows
+#	about LIBRARY and, if so, appends a build tuple consisting of the
+#	compiler and linker flags reported by `pkg-config' to the list of
+#	tuples stored in the shell variable VARIABLE.
+#------------------------------------------------------------------------------
+AC_DEFUN([_CS_CHECK_LIB_PKG_CONFIG_FLAGS],
+    [AC_REQUIRE([CS_CHECK_PKG_CONFIG])
+    AS_IF([test -n "$PKG_CONFIG"],
+	[AS_IF([$PKG_CONFIG --exists $2],
+	    [_CS_CHECK_LIB_CONFIG_PROG_FLAGS([$1], [$PKG_CONFIG], [$2])])])])
+
+
+
+#------------------------------------------------------------------------------
+# _CS_CHECK_LIB_CONFIG_FLAGS(VARIABLE, LIBRARY)
+#	Helper macro for CS_CHECK_LIB_WITH().  Checks if `LIBRARY-config'
+#	(i.e. `sdl-config') exists and, if so, appends a build tuple consisting
+#	of the compiler and linker flags reported by `LIBRARY-config' to the
+#	list of tuples stored in the shell variable VARIABLE.
+#------------------------------------------------------------------------------
+AC_DEFUN([_CS_CHECK_LIB_CONFIG_FLAGS],
+    [AC_CHECK_TOOLS(m4_toupper([$2_CONFIG]), [$2-config])
+    AS_IF([test -n "$m4_toupper([$2_CONFIG])"],
+	[AS_IF([$m4_toupper([$2_CONFIG]) --cflags --libs >/dev/null 2>&1],
+	    [_CS_CHECK_LIB_CONFIG_PROG_FLAGS([$1],
+		[$m4_toupper([$2_CONFIG])])])])])
+
+
+
+#------------------------------------------------------------------------------
+# _CS_CHECK_LIB_CONFIG_PROG_FLAGS(VARIABLE, CONFIG-PROGRAM, [ARGS])
+#	Helper macro for _CS_CHECK_LIB_PKG_CONFIG_FLAGS() and
+#	_CS_CHECK_LIB_CONFIG_FLAGS(). CONFIG-PROGRAM is a command which
+#	responds to the --cflags and --libs options and returns suitable
+#	compiler and linker flags for some package. ARGS, if supplied, is
+#	passed to CONFIG-PROGRAM after the --cflags or --libs argument. The
+#	results of the --cflags and --libs options are packed into a build
+#	tuple and appended to the list of tuples stored in the shell variable
+#	VARIABLE.
+#------------------------------------------------------------------------------
+AC_DEFUN([_CS_CHECK_LIB_CONFIG_PROG_FLAGS],
+    [cs_check_lib_cflag=CS_RUN_PATH_NORMALIZE([$2 --cflags $3])
+    cs_check_lib_lflag=''
+    cs_check_lib_libs=CS_RUN_PATH_NORMALIZE([$2 --libs $3])
+    $1="$$1 CS_CREATE_TUPLE(
+	[$cs_check_lib_cflag],
+	[$cs_check_lib_lflag],
+	[$cs_check_lib_libs])"])
+
+
+
+#------------------------------------------------------------------------------
 # _CS_CHECK_LIB_CREATE_FLAGS(VARIABLE, LIBRARY, PATHS)
 #	Helper macro for CS_CHECK_LIB_WITH().  Constructs a list of build
-#	tuples suitable for CS_CHECK_BUILD() and assigns the tuple list to the
+#	tuples suitable for CS_CHECK_BUILD() and appends the tuple list to the
 #	shell variable VARIABLE.  LIBRARY and PATHS have the same meanings as
 #	the like-named arguments of CS_CHECK_LIB_WITH().
 #------------------------------------------------------------------------------
