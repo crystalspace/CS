@@ -44,6 +44,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated the unimplemented
 	  crystalspace.mesh.saver.cloth SCF registration from the cloth loader
 	  plugin export table.
+	- Eric Sunshine added missing crystalspace.video.codec.avi.dvx1
+	  registration to odivx4.csplugin.
 3-June-2003
 	- Philipp Aumayr fixed the fancycon bug, where the borders
 	  were visibile in SW but not in GL mode. (wrong mixmode at line

@@ -8,6 +8,10 @@
         <name>crystalspace.video.codec.avi.divx</name>
         <description>CrystalSpace OpenDivX codec</description>
       </class>
+      <class>
+        <name>crystalspace.video.codec.avi.dvx1</name>
+        <description>CrystalSpace OpenDivX codec</description>
+      </class>
     </classes>
   </scf>
 </plugin>
