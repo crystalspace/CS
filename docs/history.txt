@@ -22,6 +22,8 @@ chronological order.
 	  then have to do the prepare again later. Also for some reason it
 	  caused memory leaks. This is probably a bug in thing as there
 	  should be no leak on multiple prepare calls.
+	- Jorrit added a new bugplug 'unprepare' command to unprepare all
+	  thing meshes. Assigned to alt-u.
 12-Feb-2004
 	- Jorrit did several documentation enhancements:
 	    - Added a link to the new level building section in the

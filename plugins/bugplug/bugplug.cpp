@@ -1218,6 +1218,24 @@ bool csBugPlug::EatKey (iEvent& event)
 	    	"BugPlug %s counting.",
 		counter_freeze ? "disabled" : "enabled");
 	break;
+      case DEBUGCMD_UNPREPARE:
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Unprepare all things...");
+	{
+	  int i;
+	  iMeshList* ml = Engine->GetMeshes ();
+	  for (i = 0 ; i < ml->GetCount () ; i++)
+	  {
+	    iMeshWrapper* m = ml->Get (i);
+	    csRef<iThingState> th = SCF_QUERY_INTERFACE (m->GetMeshObject (),
+	    	iThingState);
+	    if (th)
+	    {
+	      th->Unprepare ();
+	    }
+	  }
+	}
+        break;
       case DEBUGCMD_SHADOWDEBUG:
 	// swap the default shadow volume material shader to/from a version
 	// better visualizing the volume.
@@ -1707,6 +1725,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "counterremove"))	return DEBUGCMD_COUNTERREMOVE;
   if (!strcmp (cmd, "shadowdebug"))	return DEBUGCMD_SHADOWDEBUG;
   if (!strcmp (cmd, "debugcmd"))	return DEBUGCMD_DEBUGCMD;
+  if (!strcmp (cmd, "unprepare"))	return DEBUGCMD_UNPREPARE;
 
   return DEBUGCMD_UNKNOWN;
 }
