@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Nov-2004
+	- PK fixed the mesh attaching to sockets in viewmesh by adding
+	  sprite->GetMovable()->UpdateMove() to ViewMesh::AttachMeshToSocket.
 18-Nov-2004
 	- Eric Sunshine changed CS_CHECK_PKG_CONFIG in checklib.h so that it
 	  also augments pkg-config's search path to reference directories which

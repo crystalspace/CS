@@ -1117,6 +1117,7 @@ bool ViewMesh::AttachMeshToSocket( int socketNumber, char* meshFile,
       }                                  
       sprite->GetChildren()->Add( meshWrap );
       socket->SetMeshWrapper( meshWrap );
+      sprite->GetMovable()->UpdateMove();
     }                
   }
   else
