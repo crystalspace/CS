@@ -304,7 +304,7 @@ public:
     int fill,
     csRect insets,
     int ipadx,
-    intipady);
+    int ipady);
 
   awsGridBagConstraints *Clone ();
 };

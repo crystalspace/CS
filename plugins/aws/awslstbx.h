@@ -1,8 +1,5 @@
-#ifndef __CS_AWS_LIST_BOX_H__
-#define __CS_AWS_LIST_BOX_H__
-
-/**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson
+/*
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,15 +14,21 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*****************************************************************************/
-# include "awsPanel.h"
-# include "awsscr.h"
-# include "awsscrbr.h"
-# include "csutil/parray.h"
+*/
+
+#ifndef __CS_AWS_LSTBX_H__
+#define __CS_AWS_LSTBX_H__
+
+#include "awsPanel.h"
+#include "awsscr.h"
+#include "awsscrbr.h"
+#include "csutil/parray.h"
 
 class awsListRowVector;
 
-/// Knows how to draw items that have several properties.
+/**
+ * Knows how to draw items that have several properties.
+ */
 struct awsListItem
 {
   /// An image, if it contains one.
@@ -34,79 +37,88 @@ struct awsListItem
   /// The text string, if it has one.
   iString *text;
 
-  /// user supplied parameter
+  /// User supplied parameter.
   int param;
   
-  /// The state of the item, if it has one
+  /// The state of the item, if it has one.
   bool state;
 
-  /// Whether or not the item is stateful
+  /// Whether or not the item is stateful.
   bool has_state;
 
-  /// Whether this is a group state item or not (like radio-buttons vs. checkboxes)
+  /**
+   * Whether this is a group state item or not (like radio-buttons vs
+   * checkboxes).
+   */
   bool group_state;
 
-  /// Alignment of text (left or right) and stateful box (if one)
+  /// Alignment of text (left or right) and stateful box (if one).
   int txt_align;
 
-  /// Alignment of image (left or right)
+  /// Alignment of image (left or right).
   int img_align;
 
-  /// Draws item
+  /// Draws item.
   void DrawItem (iAws *wmgr, csRect frame);
 
-  /// Tells what the minimum height of this item needs to be
+  /// Tells what the minimum height of this item needs to be.
   int GetHeight (iAwsPrefManager *pm);
 
   /// Destroys this particular list item.
   ~awsListItem();
 };
 
-/// Manages a row of items
+/**
+ * Manages a row of items.
+ */
 struct awsListRow
 {
-  /// Pointer to parent (if it has one)
+  /// Pointer to parent (if it has one).
   awsListRow *parent;
 
-  /// Pointer to list of children (if there are some)
+  /// Pointer to list of children (if there are some).
   awsListRowVector *children;
 
-  /// Pointer to columns of items in this row
+  /// Pointer to columns of items in this row.
   awsListItem *cols;
 
-  /// If this is selectable
+  /// If this is selectable.
   bool selectable;
 
-  /// If this is expanded (tree control)
+  /// If this is expanded (tree control).
   bool expanded;
 
   /// Gets the minimum height of the row, does NOT recurse for children.
   int GetHeight (iAwsPrefManager *pm, int colcount);
 
-  /// Destroys a list row properly ( but not it's children. )
+  /// Destroys a list row properly (but not it's children).
   ~awsListRow();
 };
 
-/// Holds a vector of awsListRows
+/**
+ * Holds a vector of awsListRows.
+ */
 class awsListRowVector : public csPDelArray<awsListRow>
 {
 public:
   int local_sortcol;
   static int sortcol;
-public:
+
   awsListRowVector () : local_sortcol (0) { }
 
-  /// Compare two array elements in given Mode
+  /// Compare two array elements in given Mode.
   static int Compare (awsListRow* const& Item1, awsListRow* const& Item2);
 
-  /// Compare entry with a key
+  /// Compare entry with a key.
   static int CompareKey (awsListRow* const& Item, void* Key);
 
-  /// Set the sort column
-  void SetSortCol (int sc)  { local_sortcol = sc; }
+  /// Set the sort column.
+  void SetSortCol (int sc) { local_sortcol = sc; }
 };
 
-/// Manages a column of items
+/**
+ * Manages a column of items.
+ */
 struct awsListColumn
 {
   /// The image for the header, if it has one.
@@ -118,75 +130,77 @@ struct awsListColumn
   /// The caption of the header, if it has one.
   iString *caption;
 
-  /// Alignment
+  /// Alignment.
   int align;
 
-  /// The width of this column
+  /// The width of this column.
   int width;
 };
 
-/// Manages clickable parts of the listbox
+/**
+ * Manages clickable parts of the listbox.
+ */
 struct awsListHotspot
 {
-  /// The region that contains the hotspot
+  /// The region that contains the hotspot.
   csRect r;
 
-  /// The owner of the hotspot (either an item or row)
+  /// The owner of the hotspot (either an item or row).
   void *obj;
 
-  /// The type of hotspot (tree box, stateful item, etc.)
+  /// The type of hotspot (tree box, stateful item, etc.).
   int type;
 };
 
-/// The actual listbox control that puts all this stuff together.
-class awsListBox :
-  public awsPanel
+/**
+ * The actual listbox control that puts all this stuff together.
+ */
+class awsListBox : public awsPanel
 {
-  /// True when button is down, false if up
+private:
+  /// True when button is down, false if up.
   bool is_down;
 
-  /// True if the component has the mouse over it
+  /// True if the component has the mouse over it.
   bool mouse_is_over;
 
-  /// True if this acts as a push-button switch (like tool-bar mode)
+  /// True if this acts as a push-button switch (like tool-bar mode).
   bool is_switch;
 
-  /// True if button was down, and button is in switch mode (toggle=yes)
+  /// True if button was down, and button is in switch mode (toggle = yes).
   bool was_down;
 
-  /// Holds the background texture (either the global one, or an overridden one
+  /// Holds the background texture (either the global one, or an overridden one.
   //iTextureHandle *bkg;
 
-  /// Holds the highlight overlay texture
+  /// Holds the highlight overlay texture.
   iTextureHandle *highlight;
 
-  /// Image of a collapsed tree box
+  /// Image of a collapsed tree box.
   iTextureHandle *tree_collapsed;
 
-  /// Image of an expanded tree box
+  /// Image of an expanded tree box.
   iTextureHandle *tree_expanded;
 
-  /// Image of horizontal "line"
+  /// Image of horizontal "line".
   iTextureHandle *tree_hline;
 
-  /// Image of vertical "line"
+  /// Image of vertical "line".
   iTextureHandle *tree_vline;
 
-  /// Image of checkbox type item (unmarked)
+  /// Image of checkbox type item (unmarked).
   iTextureHandle *tree_chke;
 
-  /// Image of checkbox type item (marked)
+  /// Image of checkbox type item (marked).
   iTextureHandle *tree_chkf;
 
-  /// Image of radio button type item (unmarked)
+  /// Image of radio button type item (unmarked).
   iTextureHandle *tree_grpe;
 
-  /// Image of radio button type item (marked)
+  /// Image of radio button type item (marked).
   iTextureHandle *tree_grpf;
 
-  //////////////////////////////////////////
-  //
-  //   /// Flags for frame style.
+  /// Flags for frame style.
   //int frame_style;
 
   /// Alpha level for this component
@@ -195,94 +209,92 @@ class awsListBox :
   /// Alpha level for highlight bitmap.
   int hi_alpha_level;
 
-  /// Type of control (list/tree/etc)
+  /// Type of control (list/tree/etc).
   int control_type;
 
-  /// Column to sort by
+  /// Column to sort by.
   int sortcol;
 
-  /// Number of columns to deal with
+  /// Number of columns to deal with.
   int ncolumns;
 
-  /// Column container (always static)
+  /// Column container (always static).
   awsListColumn *columns;
 
-  /// Row container (grows and shrinks as items are manipulated)
+  /// Row container (grows and shrinks as items are manipulated).
   awsListRowVector rows;
 
-  /// Container of hotspots
+  /// Container of hotspots.
   csPDelArray<awsListHotspot> hotspots;
 
-  /// Currently selected row
+  /// Currently selected row.
   awsListRow *sel;
 
-  /// Row to item-number mapping
+  /// Row to item-number mapping.
   awsListRow **map;
 
-  /// Size of item-number map
+  /// Size of item-number map.
   int map_size;
 
-  /// True if item-number map needs refreshed
+  /// True if item-number map needs refreshed.
   bool map_dirty;
 
-  /// Position of where we start drawing
+  /// Position of where we start drawing.
   int scroll_start;
 
-  /// Number of items that can be drawn
+  /// Number of items that can be drawn.
   int drawable_count;
-private:
-  ///////////////////////////// Embedded items
-  //
-  //   /// The sink that gets scroll notifications
+
+  /// The sink that gets scroll notifications.
   iAwsSink *sink;
 
-  /// The slot that handles scroll notifications
+  /// The slot that handles scroll notifications.
   iAwsSlot *slot;
 
-  /// Our embedded scrollbar
+  /// Our embedded scrollbar.
   awsScrollBar *scrollbar;
 
-  /// Trigger for catching scroll signals
+  /// Trigger for catching scroll signals.
   static void ScrollChanged (void *sk, iAwsSource *source);
 
-  ///////////////////////////// Actions
-  //
-  //   /// Action dispatcher
+  /// Action dispatcher.
   awsActionDispatcher actions;
 
-  /// Inserts an item
+  /// Inserts an item.
   static void InsertItem (void *owner, iAwsParmList* parmlist);
 
-  /// Deletes an item
+  /// Deletes an item.
   static void DeleteItem (void *owner, iAwsParmList* parmlist);
 
-  /// Get the selected item
+  /// Get the selected item.
   static void GetSelectedItem (void *owner, iAwsParmList* parmlist);
 
-  /// Get an item by row number
+  /// Get an item by row number.
   static void GetItem (void *owner, iAwsParmList* parmlist);
 
-  /// Clears the entire list
+  /// Clears the entire list.
   static void ClearList (void *owner, iAwsParmList* parmlist);
 
-  //////////////////////////// Static member helper functions
-  //
-  //   /// Counts the number of visible items recursively, given the starting vector.
+  // Static member helper functions
+
+  /**
+   * Counts the number of visible items recursively, given the starting vector.
+   */
   static int CountVisibleItems (awsListRowVector *v);
 
   /// Maps the visible items in the list recursively onto a flat index.
   static void MapVisibleItems (
-                awsListRowVector *v,
-                int &start,
-                awsListRow **map);
+    awsListRowVector *v,
+    int &start,
+    awsListRow **map);
 protected:
-  /// Updates the row-map if it's dirty
+  /// Updates the row-map if it's dirty.
   void UpdateMap ();
 
-  /// Used, but shouldn't be (remnant of radio-button code)
+  /// Used, but shouldn't be (remnant of radio-button code).
   void ClearGroup ();
 
-  /// Used internally to clear group items, called by ClearPeers
+  /// Used internally to clear group items, called by ClearPeers.
   bool RecursiveClearPeers (awsListItem *itm, awsListRow *row);
 
   /// Used internally to clear peers of some item.
@@ -291,105 +303,111 @@ protected:
   /// Used internally to reset the hotspots list.
   void ClearHotspots ();
 
-  /// Find out how depp this row is
+  /// Find out how depp this row is.
   int GetRowDepth (awsListRow *row);
 
-  /// get requested items for this row
+  /// get requested items for this row.
   bool GetItems (awsListRow *row, iAwsParmList* parmlist);
 
-  /// Find out if this row is the last child in it's parent's list
+  /// Find out if this row is the last child in it's parent's list.
   bool IsLastChild (awsListRow *row);
 
-  /// Used internally to redraw the list recursively (support tree/hierarchical drawing)
+  /**
+   * Used internally to redraw the list recursively (support tree/hierarchical
+   * drawing).
+   */
   bool DrawItemsRecursively (
-        awsListRow *row,
-        int &x,
-        int &y,
-        int border,
-        int depth,
-        bool last_child);
+    awsListRow *row,
+    int &x,
+    int &y,
+    int border,
+    int depth,
+    bool last_child);
 public:
   awsListBox ();
   virtual ~awsListBox ();
 
-  /******* Control Types **********************/
+  // Control Types
 
-  /// A multi-column list
+  /// A multi-column list.
   static const int ctList;
 
-  /// A multi-column tree
+  /// A multi-column tree.
   static const int ctTree;
 
-  /******* Signals **********************/
+  // Signals
 
-  /// An item was selected
+  /// An item was selected.
   static const int signalSelected;
 
   /// The box was scrolled programmatically, or by a keypress.
   static const int signalScrolled;
 
-  /// Component becomes focused
+  /// Component becomes focused.
   static const int signalFocused;
 
-  /// The state of a stateful column was changed
+  /// The state of a stateful column was changed.
   static const int signalStateChanged;
 
-public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties
+  /// Gets properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties
+  /// Sets properties.
   bool SetProperty (const char *name, void *parm);
 
-  /// Executes some actions
+  /// Executes some actions.
   bool Execute (const char *action, iAwsParmList* parmlist);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();
-public:
 
   bool HandleEvent (iEvent &Event);
 
-  /// Triggered when the component needs to draw
+  /// Triggered when the component needs to draw.
   virtual void OnDraw (csRect clip);
 
-  /// Triggered when the user presses a mouse button down
+  /// Triggered when the user presses a mouse button down.
   virtual bool OnMouseDown (int button, int x, int y);
 
-  /// Triggered when this component loses mouse focus
+  /// Triggered when this component loses mouse focus.
   virtual bool OnMouseExit ();
 
-  /// Triggered when this component gains mouse focus
+  /// Triggered when this component gains mouse focus.
   virtual bool OnMouseEnter ();
 
-  /// Triggered when the user presses a key
+  /// Triggered when the user presses a key.
   virtual bool OnKeyboard (const csKeyEventData& eventData);
 
-  /// Triggered when the component becomes focused
+  /// Triggered when the component becomes focused.
   virtual void OnSetFocus ();
 
-  /// Updates the scrollbar so that it's in the right place and has the right stuff.
+  /**
+   * Updates the scrollbar so that it's in the right place and has the
+   * right stuff.
+   */
   virtual void OnAdded ();
 
   /// Updates the scrollbar so that it's in the right place, etc.
   virtual void OnResized ();
 };
 
-class awsListBoxFactory :
-  public awsComponentFactory
+class awsListBoxFactory : public awsComponentFactory
 {
 public:
-
-  /// Calls register to register the component that it builds with the window manager
+  /**
+   * Calls register to register the component that it builds with
+   * the window manager.
+   */
   awsListBoxFactory (iAws *wmgr);
 
-  /// Does nothing
+  /// Does nothing.
   virtual ~awsListBoxFactory ();
 
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
-#endif // __CS_AWS_LIST_BOX_H__
+
+#endif // __CS_AWS_LSTBX_H__

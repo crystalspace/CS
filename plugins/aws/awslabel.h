@@ -1,8 +1,5 @@
-#ifndef __CS_AWS_LABEL_H__
-#define __CS_AWS_LABEL_H__
-
-/**************************************************************************
-    Copyright (C) 2000-2001 by Christopher Nelson
+/*
+    Copyright (C) 2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,53 +14,53 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*****************************************************************************/
-# include "awscomp.h"
+*/
 
-class awsLabel :
-  public awsComponent
+#ifndef __CS_AWS_LABEL_H__
+#define __CS_AWS_LABEL_H__
+
+#include "awscomp.h"
+
+class awsLabel : public awsComponent
 {
-  /// True when button is down, false if up
+private:
+  /// True when button is down, false if up.
   bool is_down;
 
-  /// True if the component has the mouse over it
+  /// True if the component has the mouse over it.
   bool mouse_is_over;
 
-  /// Alignment of text (defaults to left)
+  /// Alignment of text (defaults to left).
   int alignment;
 
-  /// Caption text for this component
+  /// Caption text for this component.
   iString *caption;
 public:
   awsLabel ();
   virtual ~awsLabel ();
 
-  /******* Signals **********************/
-
-  /// An up and down motion for the button
+  /// An up and down motion for the button.
   static const int signalClicked;
 
-  /// Component becomes focused
+  /// Component becomes focused.
   static const int signalFocused;
-
-  /******* Alignment Options ************/
 
   /// Align text to left.
   static const int alignLeft;
 
-  /// Align text to right
+  /// Align text to right.
   static const int alignRight;
 
-  /// Align text centered
+  /// Align text centered.
   static const int alignCenter;
-public:
+
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties
+  /// Gets properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties
+  /// Sets properties.
   bool SetProperty (const char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
@@ -71,9 +68,6 @@ public:
 
   /// Returns the smallest this label can be.
   virtual csRect getMinimumSize ();
-
-
-public:
 
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
@@ -97,18 +91,20 @@ public:
   virtual void OnSetFocus ();
 };
 
-class awsLabelFactory :
-  public awsComponentFactory
+class awsLabelFactory : public awsComponentFactory
 {
 public:
-
-  /// Calls register to register the component that it builds with the window manager
+  /**
+   * Calls register to register the component that it builds with the
+   * window manager.
+   */
   awsLabelFactory (iAws *wmgr);
 
-  /// Does nothing
+  /// Does nothing.
   virtual ~awsLabelFactory ();
 
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
+
 #endif // __CS_AWS_LABEL_H__
