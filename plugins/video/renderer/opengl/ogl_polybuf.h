@@ -63,12 +63,12 @@ public:
   CS_DECLARE_GROWING_ARRAY(texels, csVector2);
   CS_DECLARE_GROWING_ARRAY(verticesPoints, csVector3);
 
-  csTrianglesPerMaterial();
-  csTrianglesPerMaterial(int numVertex);
+  csTrianglesPerMaterial ();
+  csTrianglesPerMaterial (int numVertex);
 
-  ~csTrianglesPerMaterial();
+  ~csTrianglesPerMaterial ();
 
-  void ClearVertexArray();
+  void ClearVertexArray ();
 
   /// Return the number of triangles
   int TriangleCount () const { return numTriangles; }
@@ -89,13 +89,16 @@ class TrianglesList
 public:
   TrianglesNode* first;
   TrianglesNode* last;
-  int numElems;
 
   TrianglesList ();
   ~TrianglesList ();
-  int GetLastMaterial ();
+  int GetLastMaterial ()
+  {
+    if (last == NULL) return -1;
+    return last->info->matIndex;
+  }
   void Add (TrianglesNode* t);
-  TrianglesNode* GetLast ();
+  TrianglesNode* GetLast () { return last; }
 };
 
 /**
@@ -183,12 +186,11 @@ class TrianglesSuperLightmapList
 public:
   TrianglesSuperLightmapNode* first;
   TrianglesSuperLightmapNode* last;
-  int numElems;
 
   TrianglesSuperLightmapList ();
   ~TrianglesSuperLightmapList ();
   void Add (TrianglesSuperLightmapNode* t);
-  TrianglesSuperLightmapNode* GetLast ();
+  TrianglesSuperLightmapNode* GetLast () { return last; }
 
   // Dirty due dynamic lights, needs recalculating.
   bool dirty;

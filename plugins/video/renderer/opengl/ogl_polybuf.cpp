@@ -31,68 +31,47 @@
 #include "ogl_txtcache.h"
 
 
-TrianglesNode::TrianglesNode()
+TrianglesNode::TrianglesNode ()
 {
   info = NULL;
   next = NULL;
 }
 
-TrianglesNode::~TrianglesNode()
+TrianglesNode::~TrianglesNode ()
 {
   delete info;
-  next = NULL;
 }
 
-TrianglesList::TrianglesList()
+TrianglesList::TrianglesList ()
 {
   first = NULL;
   last = NULL;
-  numElems = 0;
 }
 
-TrianglesList::~TrianglesList()
+TrianglesList::~TrianglesList ()
 {
-  int i;
-  TrianglesNode* aux = first;
-  TrianglesNode* aux2;
-
-  for ( i = 0; i < numElems; i++)
+  while (first)
   {
-    aux2 = aux->next;
-    delete aux;
-    aux = aux2;
+    TrianglesNode* aux = first->next;
+    delete first;
+    first = aux;
   }
 }
 
-int TrianglesList::GetLastMaterial()
+void TrianglesList::Add (TrianglesNode* t)
 {
-  if(numElems == 0) return -1;
-  return last->info->matIndex;
-}
-
-void TrianglesList::Add(TrianglesNode* t)
-{
-  if(first == NULL)
+  if (first == NULL)
   {
     first = last = t;
-    numElems++;
     return;
   }
   last->next = t;
   last = t;
-  numElems++;
 }
-
-TrianglesNode* TrianglesList::GetLast()
-{
-  return last;
-}
-
 
 csTriangleArrayPolygonBuffer::csTriangleArrayPolygonBuffer (
   iVertexBufferManager* mgr) : csPolygonBuffer (mgr)
 {
-
   vertices = NULL;
   matCount = 0;
   unlitPolysSL = NULL;
@@ -103,7 +82,6 @@ csTriangleArrayPolygonBuffer::~csTriangleArrayPolygonBuffer ()
 {
   Clear ();
 }
-
 
 csTrianglesPerMaterial::csTrianglesPerMaterial()
 {
@@ -192,41 +170,29 @@ TrianglesSuperLightmapNode::~TrianglesSuperLightmapNode()
   delete info;
 }
 
-TrianglesSuperLightmapList::TrianglesSuperLightmapList()
+TrianglesSuperLightmapList::TrianglesSuperLightmapList ()
 {
   first = NULL;
   last = NULL;
-  numElems = 0;
   dirty = true;
   firstTime = true;
 }
 
-TrianglesSuperLightmapList::~TrianglesSuperLightmapList()
+TrianglesSuperLightmapList::~TrianglesSuperLightmapList ()
 {
-  TrianglesSuperLightmapNode* cur;
-  int i;
-  for(i = 0; i < numElems; i++)
+  while (last)
   {
-    cur = last;
-    last = last->prev;
-    delete cur;
+    TrianglesSuperLightmapNode* aux = last->prev;
+    delete last;
+    last = aux;
   }
-  first = NULL;
-  last = NULL;
-  numElems = 0;
 }
 
-TrianglesSuperLightmapNode* TrianglesSuperLightmapList::GetLast()
+void TrianglesSuperLightmapList::Add (TrianglesSuperLightmapNode* t)
 {
-  return last;
-}
-
-void TrianglesSuperLightmapList::Add(TrianglesSuperLightmapNode* t)
-{
-  if (numElems == 0) first = t;
+  if (first == NULL) first = t;
   t->prev = last;
   last = t;
-  numElems++;
 }
 
 /**
@@ -257,7 +223,7 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
   int lm_height = piLM->GetHeight();
 
   TrianglesSuperLightmapNode* curr = superLM.last;
-  for (i = 0; i < superLM.numElems; i++)
+  while (curr)
   {
     if (curr->info->region->Alloc (lm_width, lm_height, rect))
       return curr->info;
