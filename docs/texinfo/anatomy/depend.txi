@@ -64,8 +64,6 @@ than actually linking with a library.
 @code{csengine}
 @item
 @code{csparser}
-@item
-@code{csscript}
 @end itemize
 
 @item Level 5: @emph{Support---Adds a Common Layer of Engine Abstraction}

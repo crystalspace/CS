@@ -124,11 +124,6 @@ dynamically be attached to objects at run-time.
 A library which parses @sc{ascii} world files and imports the world into the
 3D engine.
 
-@item CS/libs/csscript
-This library contains a very primitive scripting engine.  It is not very
-powerful and needs to be replaced by something better.  However, it is still
-used by some of the current levels.
-
 @item CS/libs/cssfxldr
 Routines to support loading various sound file formats and put them internally
 in the same format.  This library supports @sc{wav}, @sc{aiff}, @sc{au}, etc.
