@@ -135,15 +135,13 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
   //has_alpha = false;
   this->sourceFormat = GL_RGBA;
   size = 0;
-  was_render_target = false;
   Handle = 0;
 
   images = csPtr<iImageVector> (new csImageVector());
   //image->IncRef();
   images->AddImage(image);
 
-  this->flags = flags;
-  transp = false;
+  texFlags.Set (flagsPublicMask, flags);
   transp_color.red = transp_color.green = transp_color.blue = 0;
   if (image->GetFormat () & CS_IMGFMT_ALPHA)
     alphaType = csAlphaMode::alphaSmooth;
@@ -160,8 +158,6 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
     SetKeyColor (r, g, b);
   }
   cachedata = 0;
-
-  prepared = false;
 }
 
 csGLTextureHandle::csGLTextureHandle (iImageVector* image,
@@ -175,13 +171,11 @@ csGLTextureHandle::csGLTextureHandle (iImageVector* image,
   //has_alpha = false;
   this->sourceFormat = GL_RGBA;
   size = 0;
-  was_render_target = false;
   Handle = 0;
 
   images = image;
 
-  this->flags = flags;
-  transp = false;
+  texFlags.Set (flagsPublicMask, flags);
   transp_color.red = transp_color.green = transp_color.blue = 0;
   if (images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA)
     alphaType = csAlphaMode::alphaSmooth;
@@ -197,8 +191,6 @@ csGLTextureHandle::csGLTextureHandle (iImageVector* image,
     SetKeyColor (r, g, b);
   }
   cachedata = 0;
-
-  prepared = false;
 }
 
 csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle, 
@@ -210,12 +202,13 @@ csGLTextureHandle::csGLTextureHandle (int target, GLuint Handle,
   this->target = target;
   csGLTextureHandle::Handle = Handle;
   alphaType = csAlphaMode::alphaNone;
-  prepared = false;
+  SetForeignHandle (true);
 }
 
 csGLTextureHandle::~csGLTextureHandle()
 {
   Clear ();
+  txtmgr->UnregisterTexture (this);
   SCF_DESTRUCT_IBASE()
 }
 
@@ -234,14 +227,13 @@ void csGLTextureHandle::FreeImage ()
 
 int csGLTextureHandle::GetFlags () const
 {
-  return flags;
+  return texFlags.Get() & flagsPublicMask;
 }
 
 void csGLTextureHandle::SetKeyColor (bool Enable)
 {
-  //transp_color.alpha = (uint8) Enable;
-  transp = Enable;
-  texupdate_needed = true;
+  SetTransp (Enable);
+  SetTexupdateNeeded (true);
 }
 
 void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
@@ -249,14 +241,13 @@ void csGLTextureHandle::SetKeyColor (uint8 red, uint8 green, uint8 blue)
   transp_color.red = red;
   transp_color.green = green;
   transp_color.blue = blue;
-  //transp_color.alpha = 1;
-  transp = true;
-  texupdate_needed = true;
+  SetTransp (true);
+  SetTexupdateNeeded (true);
 }
 
 bool csGLTextureHandle::GetKeyColor () const
 {
-  return (transp);
+  return IsTransp();
 }
 
 bool csGLTextureHandle::FindFormatType ()
@@ -266,7 +257,7 @@ bool csGLTextureHandle::FindFormatType ()
   GLenum sourceFormat = csGLTextureHandle::sourceFormat;
   if (sourceFormat == GL_RGBA)
   {
-    if (!transp)
+    if (!IsTransp())
     {
       if (!(images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA))
       {
@@ -405,8 +396,8 @@ void csGLTextureHandle::PrepareInt ()
 {
   //@@@ Images may be lost if preparing twice. Some better way of solving it?
   if (!images) return;
-  if (prepared) return;
-  prepared = true;
+  if (IsPrepared ()) return;
+  SetPrepared (true);
 
   // In opengl all textures, even non-mipmapped textures are required
   // to be powers of 2.
@@ -417,7 +408,7 @@ void csGLTextureHandle::PrepareInt ()
   for(i = 0; i < images->Length(); i++)
   {
     csAlphaMode::AlphaType newAlphaType = csAlphaMode::alphaNone;
-    if (transp)
+    if (IsTransp())
       PrepareKeycolor (images->GetImage (i), transp_color, newAlphaType);
     else
       /*
@@ -450,7 +441,7 @@ void csGLTextureHandle::AdjustSizePo2 ()
       orig_width, orig_height, newwidth, newheight);
 
     // downsample textures, if requested, but not 2D textures
-    if (!(flags & (CS_TEXTURE_2D)))
+    if (!texFlags.Check (CS_TEXTURE_2D))
     {
       /*
         @@@ FIXME: for some special 3d textures (eg normalization cube)
@@ -486,7 +477,7 @@ csGLTexture* csGLTextureHandle::NewTexture (iImage *Image, bool ismipmap)
 void csGLTextureHandle::CreateMipMaps()
 {
   //int thissize;
-  csRGBpixel *tc = transp ? &transp_color : (csRGBpixel *)0;
+  csRGBpixel *tc = IsTransp() ? &transp_color : (csRGBpixel *)0;
 
   //  printf ("delete old\n");
   // Delete existing mipmaps, if any
@@ -648,12 +639,12 @@ void csGLTextureHandle::Load ()
 
   glGenTextures (1, &Handle);
 
-  const int texFilter = flags & CS_TEXTURE_NOFILTER ? 0 : 
+  const int texFilter = texFlags.Check (CS_TEXTURE_NOFILTER) ? 0 : 
     txtmgr->rstate_bilinearmap;
   const GLint magFilter = textureMagFilters[texFilter];
   const GLint minFilter = textureMinFilters[texFilter];
   const GLint wrapMode = 
-    (flags & CS_TEXTURE_CLAMP) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+    (texFlags.Check (CS_TEXTURE_CLAMP)) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
 
   if (target == CS_TEX_IMG_1D)
   {
@@ -678,7 +669,7 @@ void csGLTextureHandle::Load ()
 
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-      (flags & CS_TEXTURE_NOMIPMAPS) ? magFilter : minFilter);
+      (texFlags.Check (CS_TEXTURE_NOMIPMAPS)) ? magFilter : minFilter);
 
     if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
     {
@@ -751,7 +742,7 @@ void csGLTextureHandle::Load ()
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, magFilter);
 
     glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,
-      (flags & CS_TEXTURE_NOMIPMAPS) ? magFilter : minFilter);
+      (texFlags.Check (CS_TEXTURE_NOMIPMAPS)) ? magFilter : minFilter);
 
     if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
     {
@@ -782,7 +773,7 @@ void csGLTextureHandle::Load ()
 
 void csGLTextureHandle::Unload ()
 {
-  if (Handle == 0) return;
+  if ((Handle == 0) || IsForeignHandle()) return;
   if (target == CS_TEX_IMG_1D)
     csGLTextureManager::UnsetTexture (GL_TEXTURE_1D, Handle);
   else if (target == CS_TEX_IMG_2D)
@@ -1233,7 +1224,7 @@ void csGLTextureManager::Clear()
   for (i=0; i < textures.Length (); i++)
   {
     csGLTextureHandle* tex = textures[i];
-    if (tex) tex->Clear ();
+    if (tex != 0) tex->Clear ();
   }
   for (i = 0; i < superLMs.Length(); i++)
   {
@@ -1244,7 +1235,7 @@ void csGLTextureManager::Clear()
 void csGLTextureManager::UnregisterMaterial (csGLMaterialHandle* handle)
 {
   int idx = materials.Find (handle);
-  if (idx >= 0) materials.DeleteIndexFast (idx);
+  if (idx != csArrayItemNotFound) materials.DeleteIndexFast (idx);
 }
 
 void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
@@ -1304,6 +1295,12 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image,
     target, G3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
+}
+
+void csGLTextureManager::UnregisterTexture (csGLTextureHandle* handle)
+{
+  int idx = textures.Find (handle);
+  if (idx != csArrayItemNotFound) textures.DeleteIndexFast (idx);
 }
 
 csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (

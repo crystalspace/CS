@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Dec-2004
+        - res fixed the GL renderer to not call glDeleteTextures() on super
+          lightmap textures.
+        - res added a patch from Karl Dietz <dekarl@users.sourceforge.net> to
+          add support for DDS textures to map2cs. (patch #1078844)
 3-Dec-2004
         - res added a missing 0 check to the GL halo cleaning code.
 	- Jorrit removed the GetValueNames() from iKeyValuePair again as it
@@ -23,7 +28,6 @@ chronological order.
 	  that case the first mesh factory in that library will be shown.
         - res fixed the or_lighting shader to respect the alpha of the vertex
           colors again.
-	- Squee did some more work on cssaver.
 2-Dec-2004
 	- Eric Sunshine fixed the various extension checks in glextmanager.h so
 	  that they won't crash if glGetString(GL_EXTENSIONS) and/or

@@ -1199,7 +1199,7 @@ void csGLGraphics3D::PrepareAsRenderTarget (csGLTextureHandle* tex_mm)
 {
   // Texture was not used as a render target before.
   // Make some necessary adjustments.
-  if (!tex_mm->was_render_target)
+  if (!tex_mm->IsWasRenderTarget())
   {
     if (!(tex_mm->GetFlags() & CS_TEXTURE_NOMIPMAPS))
     {
@@ -1213,7 +1213,7 @@ void csGLGraphics3D::PrepareAsRenderTarget (csGLTextureHandle* tex_mm)
 	  txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
       }
     }
-    tex_mm->was_render_target = true;
+    tex_mm->SetWasRenderTarget (true);
   }
 }
 
@@ -1263,7 +1263,7 @@ void csGLGraphics3D::FinishDraw ()
        */
       if (tex_mm->GetKeyColor ())
       {
-	tex_mm->was_render_target = true;
+	tex_mm->SetWasRenderTarget (true);
 	csRef<iImageVector>& images = tex_mm->GetImages();
 	if (!images.IsValid()) images.AttachNew (new csImageVector ());
 	csRef<iImage> image;

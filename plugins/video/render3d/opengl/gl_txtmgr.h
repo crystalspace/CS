@@ -30,6 +30,7 @@
 #include "iengine/texture.h"
 #include "igraphic/imgvec.h"
 #include "csutil/blockallocator.h"
+#include "csutil/flags.h"
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
 #include "csutil/weakref.h"
@@ -111,23 +112,41 @@ private:
   csRef<iGraphics2D> canvas;
   /// The transparent color
   csRGBpixel transp_color;
-  /// Mean color used when texture mapping is disabled.
-  //csRGBpixel mean_color;
   
   /// Used until Prepare() is called
   csRef<iImageVector> images;
 
-  /// Does color 0 mean "transparent" for this texture?
-  bool transp;
+  /// Texture flags (combined public and private)
+  csFlags texFlags;
+  /// Private texture flags
+  enum
+  {
+    flagTexupdateNeeded = 1 << 31, 
+    flagPrepared = 1 << 30, 
+    /// Does it have a keycolor?
+    flagTransp = 1 << 29,
+    flagForeignHandle = 1 << 28,
+    flagWasRenderTarget = 1 << 27,
+
+    flagLast,
+    /// Mask to get only the "public" flags
+    flagsPublicMask = flagLast - 2
+  };
 
   //bool has_alpha;
   csAlphaMode::AlphaType alphaType;
-  bool texupdate_needed;
-  bool prepared;
+  bool IsTexupdateNeeded() const { return texFlags.Check (flagTexupdateNeeded); }
+  void SetTexupdateNeeded (bool b) { texFlags.SetBool (flagTexupdateNeeded, b); }
+  bool IsPrepared() const { return texFlags.Check (flagPrepared); }
+  void SetPrepared (bool b) { texFlags.SetBool (flagPrepared, b); }
+  bool IsTransp() const { return texFlags.Check (flagTransp); }
+  void SetTransp (bool b) { texFlags.SetBool (flagTransp, b); }
+  bool IsForeignHandle() const { return texFlags.Check (flagForeignHandle); }
+  void SetForeignHandle (bool b) { texFlags.SetBool (flagForeignHandle, b); }
 
   void *cachedata;
 
-  bool Compressable () { return !(flags & CS_TEXTURE_2D); }
+  bool Compressable () { return !texFlags.Check (CS_TEXTURE_2D); }
   bool transform (iImageVector *ImageVec, csGLTexture *tex);
 
   csGLTexture* NewTexture (iImage *Image, bool ismipmap);
@@ -142,9 +161,9 @@ public:
   csArray<csGLTexture*> vTex;
   csWeakRef<csGLGraphics3D> G3D;
   long size;
-  int flags;
   int target;
-  bool was_render_target;
+  bool IsWasRenderTarget() const { return texFlags.Check (flagWasRenderTarget); }
+  void SetWasRenderTarget (bool b) { texFlags.SetBool (flagWasRenderTarget, b); }
 
   csGLTextureHandle (iImage* image, int flags, int target, 
     csGLGraphics3D *iG3D);
@@ -172,7 +191,7 @@ public:
   void CheckAlpha (int w, int h, csRGBpixel *src, 
     const csRGBpixel* transp_color, csAlphaMode::AlphaType& alphaType);
   csRef<iImageVector>& GetImages () { return images; }
-  void Unprepare () { prepared = false; }
+  void Unprepare () { SetPrepared (false); }
   /// Merge this texture into current palette, compute mipmaps and so on.
   void PrepareInt ();
 
@@ -402,7 +421,7 @@ private:
   /// Number of lightmaps on this SLM.
   int numRLMs;
 
-  csRef<iTextureHandle> th;
+  csRef<csGLTextureHandle> th;
 
   /// Actually create the GL texture.
   void CreateTexture ();
@@ -531,6 +550,12 @@ public:
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
   	int flags, int target);
+
+  /**
+   * Called from csGLTextureHandle destructor to notify parent texture
+   * manager that a material is going to be destroyed.
+   */
+  void UnregisterTexture (csGLTextureHandle* handle);
 
   /**
    * Register a material. The input material is IncRef'd and DecRef'ed
