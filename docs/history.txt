@@ -56,6 +56,11 @@ The history order is reversed so that new features are at the top.
 	      csGetConfigPath
 	- Oktal fixed a preprocessor directive in csprocessorcap.h,
 	  it's "#elif" not "#else if".
+	- res added the missing pluginpaths.cpp to MSVC libcssys.
+	- res changed the plain "#elif" to "#elif defined()" in 
+	  csprocessorcap.h.
+	- res fixed a couple of NR makefiles for proper MSVC project 
+	  generation.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older

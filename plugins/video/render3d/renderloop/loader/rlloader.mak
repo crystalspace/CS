@@ -46,10 +46,10 @@ endif
 DIR.RLLOADER = plugins/video/render3d/renderloop/loader
 OUT.RLLOADER = $(OUT)/$(DIR.RLLOADER)
 INF.RLLOADER = $(SRCDIR)/$(DIR.RLLOADER)/rlloader.csplugin
-INC.RLLOADER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLLOADER)/*.h)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLLOADER)/../common/parserenderstep.h)) 
-SRC.RLLOADER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLLOADER)/*.cpp)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLLOADER)/../common/parserenderstep.cpp)) 
+INC.RLLOADER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLLOADER)/*.h \
+  plugins/video/render3d/renderloop/common/parserenderstep.h)) 
+SRC.RLLOADER = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLLOADER)/*.cpp \
+  plugins/video/render3d/renderloop/common/parserenderstep.cpp)) 
 OBJ.RLLOADER = $(addprefix $(OUT.RLLOADER)/,$(notdir $(SRC.RLLOADER:.cpp=$O)))
 DEP.RLLOADER = CSSYS CSUTIL
 

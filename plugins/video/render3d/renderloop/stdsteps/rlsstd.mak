@@ -46,16 +46,10 @@ endif
 DIR.RLSSTD = plugins/video/render3d/renderloop/stdsteps
 OUT.RLSSTD = $(OUT)/$(DIR.RLSSTD)
 INF.RLSSTD = $(SRCDIR)/$(DIR.RLSSTD)/rlsstd.csplugin
-INC.RLSSTD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/*.h)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/parserenderstep.h)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/basesteptype.h)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/basestepfactory.h)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/basesteploader.h)) 
-SRC.RLSSTD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/*.cpp)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/parserenderstep.cpp)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/basesteptype.cpp)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/basestepfactory.cpp)) \
-  $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/../common/basesteploader.cpp)) 
+INC.RLSSTD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/*.h \
+  plugins/video/render3d/renderloop/common/*.h))
+SRC.RLSSTD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RLSSTD)/*.cpp \
+  plugins/video/render3d/renderloop/common/*.cpp))
 OBJ.RLSSTD = $(addprefix $(OUT.RLSSTD)/,$(notdir $(SRC.RLSSTD:.cpp=$O)))
 DEP.RLSSTD = CSSYS CSUTIL CSGEOM
 

@@ -94,7 +94,7 @@ private:
     bool have_cpuid;
     char *processorName = new char [14];
 
-    #ifdef COMP_VC
+    #if defined(COMP_VC)
     __asm
     {
       // save vars
@@ -159,7 +159,7 @@ end_detect:
         pop ebx
         pop eax
     }
-    #elif COMP_GCC 
+    #elif defined(COMP_GCC)
     __asm__(
     //detect 386/486
     "  pushfl                           \n"
