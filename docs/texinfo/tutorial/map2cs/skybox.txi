@@ -65,8 +65,9 @@ Convert the generated bitmaps to a format readable by @file{map2cs} (@sc{tga},
 Then you need to add a setting ``skybox'' with the value of your basename in
 the general world properties.  (For example, if your textures are called
 @file{sample_f.bmp}, @file{sample_r.bmp}, you will set ``skybox'' to
-``sample'').  Now every brush you assign the classname ``cs_sky'' will look
-like your skybox.  Just try this out.  It is a really amazing effect.
+``sample'').  Now every brush you assign a key ``sky'' with a value of ``1'' 
+will look like your skybox.  Just try this out.  It is a really amazing 
+effect.
 @ifnotinfo
 
 This screenshot doesn't really do justice to the skybox effect, but it looks
