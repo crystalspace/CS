@@ -146,12 +146,10 @@ private:
   iCamera* debug_camera;
   float debug_lx, debug_rx, debug_ty, debug_by;	// Frustum.
 
-  // For statistics. Count the number of times VisTest() was called.
-  int stats_cnt_vistest;
-  // For statistics. Count the total time we spend in VisTest().
-  csTicks stats_total_vistest_time;
-  // For statistics. Count the total time we do NOT spend in VisTest().
-  csTicks stats_total_notvistest_time;
+  // Count the number of objects marked as visible.
+  int cnt_visible;
+  // Count the number of nodes marked as visible.
+  int cnt_node_visible;
 
   // Various flags to enable/disable parts of the culling algorithm.
   bool do_cull_frustum;

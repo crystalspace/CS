@@ -121,7 +121,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 uint32 csKDTree::global_timestamp = 1;
 
-#define KDTREE_MAX 10000000.
+#define KDTREE_MAX 100000.
 
 csKDTree::csKDTree (csKDTree* parent)
 {

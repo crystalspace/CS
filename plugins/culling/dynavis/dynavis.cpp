@@ -31,6 +31,7 @@
 #include "csgeom/obb.h"
 #include "csgeom/segment.h"
 #include "csgeom/sphere.h"
+#include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/kdtree.h"
 #include "igeom/polymesh.h"
@@ -179,10 +180,6 @@ csDynaVis::csDynaVis (iBase *iParent)
   current_vistest_nr = 1;
   history_frame_cnt = 2;
   vistest_objects_inuse = false;
-
-  stats_cnt_vistest = 0;
-  stats_total_vistest_time = 0;
-  stats_total_notvistest_time = 0;
 
   updating = false;
 
@@ -490,6 +487,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   {
     hist->reason = VISIBLE_HISTORY;
     hist->vis_cnt--;
+    cnt_node_visible++;
     goto end;
   }
 
@@ -497,6 +495,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   {
     hist->reason = VISIBLE_INSIDE;
     hist->vis_cnt = RAND_HISTORY;
+    cnt_node_visible++;
     goto end;
   }
 
@@ -519,10 +518,12 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   {
     // @@@ Do write queue here too? First tests indicate that this is not a good idea.
     iCamera* camera = data->rview->GetCamera ();
+    const csReversibleTransform& camtrans = camera->GetTransform ();
+    float fov = camera->GetFOV ();
+    float sx = camera->GetShiftX ();
+    float sy = camera->GetShiftY ();
     float max_depth;
-    if (node_bbox.ProjectBox (camera->GetTransform (), camera->GetFOV (),
-    	camera->GetShiftX (), camera->GetShiftY (), sbox,
-	min_depth, max_depth))
+    if (node_bbox.ProjectBox (camtrans, fov, sx, sy, sbox, min_depth, max_depth))
     {
 #     ifdef CS_DEBUG
       if (do_state_dump)
@@ -532,7 +533,9 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
       }
 #     endif
       // @@@ VPT tracking for nodes!!!
-      bool rc = tcovbuf->TestRectangle (sbox, min_depth);
+      csTestRectData data;
+      bool rc = tcovbuf->PrepareTestRectangle (sbox, data);
+      if (rc) rc = tcovbuf->TestRectangle (data, min_depth);
 
       if (!rc)
       {
@@ -540,11 +543,30 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
         vis = false;
         goto end;
       }
+      else if (false)
+      {
+        csPoly2D outline;
+        if (node_bbox.ProjectOutline (camtrans, fov, sx, sy, outline,
+		min_depth, max_depth))
+        {
+          // @@@ VPT tracking for nodes!!!
+          rc = tcovbuf->TestPolygon (outline.GetVertices (), outline.GetVertexCount (),
+      	    min_depth);
+
+          if (!rc)
+          {
+            hist->reason = INVISIBLE_TESTRECT;
+            vis = false;
+            goto end;
+          }
+        }
+      }
     }
   }
 
   hist->reason = VISIBLE;
   hist->vis_cnt = RAND_HISTORY;
+  cnt_node_visible++;
 
 end:
 # ifdef CS_DEBUG
@@ -949,6 +971,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       obj->MarkVisible (VISIBLE_HISTORY, hist->vis_cnt-1, current_vistest_nr,
 		      history_frame_cnt);
       data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+      cnt_visible++;
       goto end;
     }
 
@@ -959,6 +982,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       obj->MarkVisible (VISIBLE_INSIDE, RAND_HISTORY, current_vistest_nr,
 		      history_frame_cnt);
       data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+      cnt_visible++;
       goto end;
     }
   
@@ -1014,6 +1038,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	    obj->MarkVisible (VISIBLE_VPT, RAND_HISTORY, current_vistest_nr,
 	      	  history_frame_cnt);
 	    data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+	    cnt_visible++;
 	    goto end;
 	  }
         }
@@ -1032,6 +1057,8 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
         rc = obj_bbox.ProjectBox (camtrans, fov, sx, sy, sbox, min_depth, max_depth);
       }
 
+      csTestRectData testrect_data;
+      bool cont_check = true;
       if (rc)
       {
 #       ifdef CS_DEBUG
@@ -1041,10 +1068,21 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
           printf ("Before obj test:\n%s\n", str->GetData ());
         }
 #       endif
-	rc = tcovbuf->TestRectangle (sbox, min_depth);
+	rc = tcovbuf->PrepareTestRectangle (sbox, testrect_data);
+	if (rc)
+	{
+	  rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+	}
+	else
+	{
+	  // If PrepareTestRectangle() fails then we know that the rectangle
+	  // test fails regardless of write queue contents. So we don't have
+	  // to continue.
+	  cont_check = false;
+	}
       }
 
-      if (rc)
+      if (rc && cont_check)
       {
 	// Object is visible. If we have a write queue we will first
 	// test if there are objects in the queue that may mark the
@@ -1077,20 +1115,20 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	      else
 		UpdateCoverageBufferOutline (data->rview->GetCamera (),
 		    qobj->visobj, qobj->model);
+	      // Now try again.
+              rc = tcovbuf->TestRectangle (testrect_data, min_depth);
+              if (!rc)
+	      {
+	        // It really is invisible.
+                hist->reason = INVISIBLE_TESTRECT;
+	        hist->has_vpt_point = false;
+	        vis = false;
+                goto end;
+	      }
 	      qobj = (csVisibilityObjectWrapper*)
 	    	  write_queue->Fetch (sbox, min_depth, out_depth);
 	    }
 	    while (qobj);
-	    // Now try again.
-            rc = tcovbuf->TestRectangle (sbox, min_depth);
-            if (!rc)
-	    {
-	      // It really is invisible.
-              hist->reason = INVISIBLE_TESTRECT;
-	      hist->has_vpt_point = false;
-	      vis = false;
-              goto end;
-	    }
 	  }
 	}
       }
@@ -1153,6 +1191,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
     // Object is visible so we should write it to the coverage buffer.
     obj->MarkVisible (VISIBLE, RAND_HISTORY, current_vistest_nr, history_frame_cnt);
     data->viscallback->ObjectVisible (obj->visobj, obj->mesh);
+    cnt_visible++;
   }
 
 end:
@@ -1257,10 +1296,10 @@ bool csDynaVis::VisTest (iRenderView* rview,
   UpdateObjects ();
   current_vistest_nr++;
   history_frame_cnt++;	// Only for history culling.
+  cnt_visible = 0;
+  cnt_node_visible = 0;
 
   // Statistics and debugging.
-  static csTicks t2 = 0;
-  csTicks t1 = csGetTicks ();
   debug_camera = rview->GetOriginalCamera ();
   float lx, rx, ty, by;
   rview->GetFrustum (lx, rx, ty, by);
@@ -1343,13 +1382,6 @@ bool csDynaVis::VisTest (iRenderView* rview,
   data.dynavis = this;
   data.viscallback = viscallback;
   kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data, frustum_mask);
-
-  // Conclude statistics.
-  if (t2 != 0)
-    stats_total_notvistest_time += t1-t2;
-  t2 = csGetTicks ();
-  stats_total_vistest_time += t2-t1;
-  stats_cnt_vistest++;
 
   do_state_dump = false;
 
@@ -2090,8 +2122,6 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 {
   if (debug_camera)
   {
-    csTicks t1 = csGetTicks ();
-
     iGraphics2D* g2d = g3d->GetDriver2D ();
     iFontServer* fntsvr = g2d->GetFontServer ();
     csRef<iFont> fnt;
@@ -2112,23 +2142,9 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
       g2d->Clear (col_fgtext);
     }
 
-    if (stats_cnt_vistest > 1)
-    {
-      char buf[200];
-      float average_vistest_time = stats_total_vistest_time
-    	  / float (stats_cnt_vistest);
-      float average_notvistest_time = stats_total_notvistest_time
-    	  / float (stats_cnt_vistest-1);
-      sprintf (buf,
-    	  "  cnt:%d vistest:%1.2g notvistest:%1.2g tot:%1.2g cull:%1.2g%%  ",
-    	  stats_cnt_vistest,
-	  average_vistest_time,
-	  average_notvistest_time,
-	  average_vistest_time+average_notvistest_time,
-	  average_vistest_time * 100.0
-		  / (average_vistest_time+average_notvistest_time));
-      g2d->Write (fnt, 10, 5, col_fgtext, col_bgtext, buf);
-    }
+    char buf[200];
+    sprintf (buf, "#visobj=%d #visnode=%d", cnt_visible, cnt_node_visible);
+    g2d->Write (fnt, 10, 5, col_fgtext, col_bgtext, buf);
 
     if (cfg_view_mode == VIEWMODE_STATSOVERLAY
     	|| cfg_view_mode == VIEWMODE_CLEARSTATSOVERLAY)
@@ -2257,10 +2273,6 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 	}
       }
     }
-
-    // Try to correct for the time taken to print this debug info.
-    csTicks t2 = csGetTicks ();
-    stats_total_notvistest_time -= t2-t1;
   }
 }
 
@@ -2434,7 +2446,9 @@ public:
     csBox2 box;
     box.Set (bugplug->DebugViewGetPoint (box_idx1),
     	bugplug->DebugViewGetPoint (box_idx2));
-    bool rc = tcovbuf->TestRectangle (box, 100);
+    csTestRectData testrect_data;
+    bool rc = tcovbuf->PrepareTestRectangle (box, testrect_data);
+    if (rc) rc = tcovbuf->TestRectangle (testrect_data, 100);
     if (rc)
     {
       int colred = g3d->GetDriver2D ()->FindRGB (255, 0, 0);
@@ -2642,9 +2656,6 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
   }
   else if (!strcmp (cmd, "clear_stats"))
   {
-    stats_cnt_vistest = 0;
-    stats_total_vistest_time = 0;
-    stats_total_notvistest_time = 0;
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"Statistics cleared.");
     return true;

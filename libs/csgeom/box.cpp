@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "csgeom/box.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/poly2d.h"
 
 //---------------------------------------------------------------------------
 csBox2::bEdge csBox2:: edges[8] =
@@ -281,13 +282,20 @@ float csBox2::SquaredOriginMaxDist () const
  *	5: right/down/back
  *	6: right/up/front
  *	7: right/up/back
+ * Note that every entry in this table contains 8 vertices.
+ * The first are for the outline but the remaining non-outline
+ * indexes are also included.
+ * Note that even though 'num' may be equal to 7 there are always
+ * at most 6 vertices valid for the real outline. If there is a
+ * seventh element then that's one additional vertex that is visible
+ * but not part of the outline (i.e. the center point).
  */
 
 // This table also contains an array of sides visible from that region.
 struct Outline
 {
   int num;
-  int vertices[7];
+  int vertices[8];
   int num_sides;
   int sides[3];
 };
@@ -295,93 +303,60 @@ struct Outline
 /// Outline lookup table.
 static Outline outlines[27] =
 {
-  { 7, { 3, 2, 6, 4, 5, 1, 0 }, 3, { CS_BOX_SIDE_x, CS_BOX_SIDE_y,
-        CS_BOX_SIDE_z } },
-
-  //000
-  { 6, { 3, 2, 0, 4, 5, 1, -1 }, 2, { CS_BOX_SIDE_x, CS_BOX_SIDE_y, -1 } },
-
-  //001
-  { 7, { 7, 3, 2, 0, 4, 5, 1 }, 3, { CS_BOX_SIDE_x, CS_BOX_SIDE_y,
-        CS_BOX_SIDE_Z } },
-
-  //002
-  { 6, { 3, 2, 6, 4, 0, 1, -1 }, 2, { CS_BOX_SIDE_x, CS_BOX_SIDE_z, -1 } },
-
-  //010
-  { 4, { 3, 2, 0, 1, -1, -1, -1 }, 1, { CS_BOX_SIDE_x, -1, -1 } },
-
-  //011
-  { 6, { 7, 3, 2, 0, 1, 5, -1 }, 2, { CS_BOX_SIDE_x, CS_BOX_SIDE_Z, -1 } },
-
-  //012
-  { 7, { 3, 7, 6, 4, 0, 1, 2 }, 3, { CS_BOX_SIDE_x, CS_BOX_SIDE_Y,
-        CS_BOX_SIDE_z } },
-
-  //020
-  { 6, { 3, 7, 6, 2, 0, 1, -1 }, 2, { CS_BOX_SIDE_x, CS_BOX_SIDE_Y, -1 } },
-
-  //021
-  { 7, { 7, 6, 2, 0, 1, 5, 3 }, 3, { CS_BOX_SIDE_x, CS_BOX_SIDE_Y,
-        CS_BOX_SIDE_Z } },
-
-  //022
-  { 6, { 2, 6, 4, 5, 1, 0, -1 }, 2, { CS_BOX_SIDE_y, CS_BOX_SIDE_z, -1 } },
-
-  //100
-  { 4, { 0, 4, 5, 1, -1, -1, -1 }, 1, { CS_BOX_SIDE_y, -1, -1 } },
-
-  //101
-  { 6, { 3, 1, 0, 4, 5, 7, -1 }, 2, { CS_BOX_SIDE_y, CS_BOX_SIDE_Z, -1 } },
-
-  //102
-  { 4, { 2, 6, 4, 0, -1, -1, -1 }, 1, { CS_BOX_SIDE_z, -1, -1 } },
-
-  //110
-  { 0, { -1, -1, -1, -1, -1, -1, -1 }, 0, { -1, -1, -1 } },
-
-  //111
-  { 4, { 7, 3, 1, 5, -1, -1, -1 }, 1, { CS_BOX_SIDE_Z, -1, -1 } },
-
-  //112
-  { 6, { 3, 7, 6, 4, 0, 2, -1 }, 2, { CS_BOX_SIDE_Y, CS_BOX_SIDE_z, -1 } },
-
-  //120
-  { 4, { 3, 7, 6, 2, -1, -1, -1 }, 1, { CS_BOX_SIDE_Y, -1, -1 } },
-
-  //121
-  { 6, { 2, 3, 1, 5, 7, 6, -1 }, 2, { CS_BOX_SIDE_Y, CS_BOX_SIDE_Z, -1 } },
-
-  //122
-  { 7, { 2, 6, 7, 5, 1, 0, 4 }, 3, { CS_BOX_SIDE_X, CS_BOX_SIDE_y,
-        CS_BOX_SIDE_z } },
-
-  //200
-  { 6, { 6, 7, 5, 1, 0, 4, -1 }, 2, { CS_BOX_SIDE_X, CS_BOX_SIDE_y, -1 } },
-
-  //201
-  { 7, { 6, 7, 3, 1, 0, 4, 5 }, 3, { CS_BOX_SIDE_X, CS_BOX_SIDE_y,
-        CS_BOX_SIDE_Z } },
-
-  //202
-  { 6, { 2, 6, 7, 5, 4, 0, -1 }, 2, { CS_BOX_SIDE_X, CS_BOX_SIDE_z, -1 } },
-
-  //210
-  { 4, { 6, 7, 5, 4, -1, -1, -1 }, 1, { CS_BOX_SIDE_X, -1, -1 } },
-
-  //211
-  { 6, { 6, 7, 3, 1, 5, 4, -1 }, 2, { CS_BOX_SIDE_X, CS_BOX_SIDE_Z, -1 } },
-
-  //212
-  { 7, { 2, 3, 7, 5, 4, 0, 6 }, 3, { CS_BOX_SIDE_X, CS_BOX_SIDE_Y,
-        CS_BOX_SIDE_z } },
-
-  //220
-  { 6, { 2, 3, 7, 5, 4, 6, -1 }, 2, { CS_BOX_SIDE_X, CS_BOX_SIDE_Y, -1 } },
-
-  //221
-  { 7, { 6, 2, 3, 1, 5, 4, 7 }, 3, { CS_BOX_SIDE_X, CS_BOX_SIDE_Y,
-        CS_BOX_SIDE_Z } } //222
+  { 7, { 3, 2, 6, 4, 5, 1, 0, /**/ 7 },
+    3, { CS_BOX_SIDE_x, CS_BOX_SIDE_y, CS_BOX_SIDE_z } }, //000
+  { 6, { 3, 2, 0, 4, 5, 1, /**/ 6, 7 },
+    2, { CS_BOX_SIDE_x, CS_BOX_SIDE_y, -1 } }, //001
+  { 7, { 7, 3, 2, 0, 4, 5, 1, /**/ 6 },
+    3, { CS_BOX_SIDE_x, CS_BOX_SIDE_y, CS_BOX_SIDE_Z } }, //002
+  { 6, { 3, 2, 6, 4, 0, 1, /**/ 5, 7 },
+    2, { CS_BOX_SIDE_x, CS_BOX_SIDE_z, -1 } }, //010
+  { 4, { 3, 2, 0, 1, /**/ 4, 5, 6, 7 },
+    1, { CS_BOX_SIDE_x, -1, -1 } }, //011
+  { 6, { 7, 3, 2, 0, 1, 5, /**/ 4, 6 },
+    2, { CS_BOX_SIDE_x, CS_BOX_SIDE_Z, -1 } }, //012
+  { 7, { 3, 7, 6, 4, 0, 1, 2, /**/ 5 },
+    3, { CS_BOX_SIDE_x, CS_BOX_SIDE_Y, CS_BOX_SIDE_z } }, //020
+  { 6, { 3, 7, 6, 2, 0, 1, /**/ 4, 5 },
+    2, { CS_BOX_SIDE_x, CS_BOX_SIDE_Y, -1 } }, //021
+  { 7, { 7, 6, 2, 0, 1, 5, 3, /**/ 4 },
+    3, { CS_BOX_SIDE_x, CS_BOX_SIDE_Y, CS_BOX_SIDE_Z } }, //022
+  { 6, { 2, 6, 4, 5, 1, 0, /**/ 3, 7 },
+    2, { CS_BOX_SIDE_y, CS_BOX_SIDE_z, -1 } }, //100
+  { 4, { 0, 4, 5, 1, /**/ 2, 3, 6, 7 },
+    1, { CS_BOX_SIDE_y, -1, -1 } }, //101
+  { 6, { 3, 1, 0, 4, 5, 7, /**/ 2, 6 },
+    2, { CS_BOX_SIDE_y, CS_BOX_SIDE_Z, -1 } }, //102
+  { 4, { 2, 6, 4, 0, /**/ 1, 3, 5, 7 },
+    1, { CS_BOX_SIDE_z, -1, -1 } }, //110
+  { 0, { /**/ 0, 1, 2, 3, 4, 5, 6, 7 },
+    0, { -1, -1, -1 } }, //111
+  { 4, { 7, 3, 1, 5, /**/ 0, 2, 4, 6 },
+    1, { CS_BOX_SIDE_Z, -1, -1 } }, //112
+  { 6, { 3, 7, 6, 4, 0, 2, /**/ 1, 5 },
+    2, { CS_BOX_SIDE_Y, CS_BOX_SIDE_z, -1 } }, //120
+  { 4, { 3, 7, 6, 2, /**/ 0, 1, 4, 5 },
+    1, { CS_BOX_SIDE_Y, -1, -1 } }, //121
+  { 6, { 2, 3, 1, 5, 7, 6, /**/ 0, 4 },
+    2, { CS_BOX_SIDE_Y, CS_BOX_SIDE_Z, -1 } }, //122
+  { 7, { 2, 6, 7, 5, 1, 0, 4, /**/ 3 },
+    3, { CS_BOX_SIDE_X, CS_BOX_SIDE_y, CS_BOX_SIDE_z } }, //200
+  { 6, { 6, 7, 5, 1, 0, 4, /**/ 2, 3 },
+    2, { CS_BOX_SIDE_X, CS_BOX_SIDE_y, -1 } }, //201
+  { 7, { 6, 7, 3, 1, 0, 4, 5, /**/ 2 },
+    3, { CS_BOX_SIDE_X, CS_BOX_SIDE_y, CS_BOX_SIDE_Z } }, //202
+  { 6, { 2, 6, 7, 5, 4, 0, /**/ 1, 3 },
+    2, { CS_BOX_SIDE_X, CS_BOX_SIDE_z, -1 } }, //210
+  { 4, { 6, 7, 5, 4, /**/ 0, 1, 2, 3 },
+    1, { CS_BOX_SIDE_X, -1, -1 } }, //211
+  { 6, { 6, 7, 3, 1, 5, 4, /**/ 0, 2 },
+    2, { CS_BOX_SIDE_X, CS_BOX_SIDE_Z, -1 } }, //212
+  { 7, { 2, 3, 7, 5, 4, 0, 6, /**/ 1 },
+    3, { CS_BOX_SIDE_X, CS_BOX_SIDE_Y, CS_BOX_SIDE_z } }, //220
+  { 6, { 2, 3, 7, 5, 4, 6, /**/ 0, 1 },
+    2, { CS_BOX_SIDE_X, CS_BOX_SIDE_Y, -1 } }, //221
+  { 7, { 6, 2, 3, 1, 5, 4, 7, /**/ 0 },
+    3, { CS_BOX_SIDE_X, CS_BOX_SIDE_Y, CS_BOX_SIDE_Z } } //222
 };
 
 csBox3::bEdge csBox3:: edges[24] =
@@ -735,13 +710,24 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
 
   csBox3 cbox (trans * GetCorner (ol.vertices[0]));
   int i;
-  for (i = 1; i < num_array; i++)
+  // We go to 8 so that we can calculate the correct min_z/max_z.
+  // If we only go to num_array we will only calculate min_z/max_z
+  // for the outine vertices.
+  for (i = 1; i < 8; i++)
   {
-    cbox.AddBoundingVertexSmart (trans * GetCorner (ol.vertices[i]));
+    csVector3 v = trans * GetCorner (ol.vertices[i]);
+    if (i < num_array)
+    {
+      cbox.AddBoundingVertexSmart (v);
+      min_z = cbox.MinZ ();
+      max_z = cbox.MaxZ ();
+    }
+    else
+    {
+      if (v.z < min_z) min_z = v.z;
+      if (v.z > max_z) max_z = v.z;
+    }
   }
-
-  min_z = cbox.MinZ ();
-  max_z = cbox.MaxZ ();
 
   if (max_z < 0.01) return false;
 
@@ -802,6 +788,43 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
   sbox.AddBoundingVertexSmart (oneCorner);
 
   return true;
+}
+
+bool csBox3::ProjectOutline (const csTransform& trans, float fov, float sx, float sy,
+  	csPoly2D& poly, float& min_z, float& max_z) const
+{
+  const csVector3& origin = trans.GetOrigin ();
+  int idx = CalculatePointSegment (origin);
+  const Outline &ol = outlines[idx];
+  int num_array = MIN (ol.num, 6);
+  poly.SetVertexCount (num_array);
+
+  min_z = 100000000.0;
+  max_z = 0;
+  int i;
+  // We go to 8 so that we can calculate the correct min_z/max_z.
+  // If we only go to num_array we will only calculate min_z/max_z
+  // for the outine vertices.
+  for (i = 0 ; i < 8 ; i++)
+  {
+    csVector3 v = trans * GetCorner (ol.vertices[i]);
+    if (v.z > max_z) max_z = v.z;
+    if (v.z < min_z) min_z = v.z;
+    if (i < num_array)
+    {
+      if (v.z < .1)
+      {
+        float iz = fov * 10;
+        poly[i].x = v.x * iz + sx;
+        poly[i].y = v.y * iz + sy;
+      }
+      else
+      {
+        Perspective (v, poly[i], fov, sx, sy);
+      }
+    }
+  }
+  return max_z >= .1;
 }
 
 csBox3 &csBox3::operator+= (const csBox3 &box)

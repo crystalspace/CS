@@ -34,6 +34,18 @@ public:
   int maxx, maxy;
 };
 
+/**
+ * A structure used by TestRectangle() and initialized by
+ * PrepareTestRectangle().
+ */
+struct csTestRectData
+{
+  csBox2Int bbox;
+  int startrow, endrow;
+  int startcol, endcol;
+  int start_x, end_x;
+};
+
 struct iGraphics2D;
 struct iGraphics3D;
 struct iBugPlug;
@@ -235,9 +247,25 @@ public:
   void FlushNoDepth (csBits64& fvalue, float maxdepth);
 
   /**
-   * General flush version (least efficient).
+   * General Flush (slowest version).
    */
   void FlushGeneral (csBits64& fvalue, float maxdepth);
+
+  /**
+   * Perform a non-modifying flush and return true if Flush would
+   * have affected the coverage buffer.
+   */
+  bool TestFlush (csBits64& fvalue, float mindepth);
+
+  /**
+   * Version of TestFlush that handles the case where the tile is full.
+   */
+  bool TestFlushForFull (csBits64& fvalue, float mindepth);
+
+  /**
+   * General TestFlush version (least efficient).
+   */
+  bool TestFlushGeneral (csBits64& fvalue, float maxdepth);
 
   /**
    * Test if a given rectangle with exactly the size of this tile
@@ -372,6 +400,17 @@ public:
   void Initialize ();
 
   /**
+   * Test if a polygon would modify the coverage buffer if it
+   * was inserted.
+   * This function will not do any backface culling and it will work
+   * perfectly in all orientations. Polygon has to be convex.
+   * It will NOT update the screen buffer.
+   * Function returns false if polygon was not visible (i.e.
+   * screen buffer was not modified).
+   */
+  bool TestPolygon (csVector2* verts, int num_verts, float min_depth);
+
+  /**
    * Insert a polygon in the coverage buffer.
    * This function will not do any backface culling and it will work
    * perfectly in all orientations. Polygon has to be convex.
@@ -395,11 +434,28 @@ public:
   	int* edges, int num_edges, float max_depth);
 
   /**
+   * Prepare data for TestRectangle. If this returns false you have
+   * an early exit since the rectangle cannot be visible regardless
+   * of depth and coverage buffer contents.
+   */
+  bool PrepareTestRectangle (const csBox2& rect, csTestRectData& data);
+
+  /**
    * Test a rectangle with the coverage buffer.
    * Function returns false if rectangle was not visible (i.e.
    * screen buffer would not have been modified).
+   * Call PrepareTestRectangle() to fill in csTestRectData.
    */
-  bool TestRectangle (const csBox2& rect, float min_depth);
+  bool TestRectangle (const csTestRectData& data, float min_depth);
+
+  /**
+   * Quickly test a rectangle with the coverage buffer.
+   * This is only a very rough test but it is faster then TestRectangle().
+   * If this function returns false then the rectangle is not visible.
+   * If this function returns true it is possible that the
+   * rectangle is visible.
+   */
+  bool QuickTestRectangle (const csTestRectData& data, float min_depth);
 
   /**
    * Test a point with the coverage buffer.

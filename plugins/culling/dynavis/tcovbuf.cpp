@@ -478,11 +478,166 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
   FlushGeneral (fvalue, maxdepth);
 }
 
+bool csCoverageTile::TestFlushForFull (csBits64& fvalue, float mindepth)
+{
+  int i;
+
+  // First test depth.
+  // @@@ This is a simple depth test. We should test every 8x8 block
+  // for a more accurate test.
+  if (mindepth <= tile_max_depth)
+    return true;
+
+  // Not visible, so we should update the fvalue.
+  for (i = 0 ; i < num_operations ; i++)
+  {
+    csLineOperation& op = operations[i];
+    if (op.op == OP_FULLVLINE)
+    {
+      // We have a full line (from top to bottom). In this case
+      // we simply invert the fvalue.
+      fvalue.Invert ();
+    }
+    else
+    {
+      // We can ignore the x value of the line here. So VLINE and
+      // LINE are equivalent in this case.
+      CS_ASSERT (op.y1 >= 0);
+      CS_ASSERT (op.y1 < 64);
+      CS_ASSERT (op.y2 >= 0);
+      CS_ASSERT (op.y2 < 64);
+      int y1, y2;
+      if (op.y1 < op.y2) { y1 = op.y1; y2 = op.y2; }
+      else { y1 = op.y2; y2 = op.y1; }
+      const csBits64& start = precalc_start_lines[y2];
+      const csBits64& end = precalc_end_lines[y1];
+      // Xor the line with the fvalue. This happens in three stages:
+      fvalue ^= start;
+      fvalue ^= end;
+      fvalue.Invert ();
+    }
+  }
+  num_operations = 0;
+  return false;
+}
+
+bool csCoverageTile::TestFlushGeneral (csBits64& fvalue, float mindepth)
+{
+  FlushOperations ();
+  int i;
+
+  // The general case.
+  // Now perform the XOR sweep and test-OR with main coverage buffer.
+  // fvalue will be the modified from left to right and will be
+  // OR-ed with the main buffer.
+  csBits64* cc = coverage_cache;
+  csBits64* c = coverage;      
+
+  for (i = 0 ; i < 32 ; i++)
+  {
+    fvalue ^= *cc;
+    *cc = fvalue;
+    cc->AndInverted (*c);
+    if (!cc->IsEmpty ())
+      return true;		// We modify coverage buffer so we are visible!
+    cc++;
+    c++;
+  }
+
+  // First a quick depth test.
+  if (mindepth <= tile_min_depth)
+    return true;
+
+  // Now do the depth test but only where the coverage cache is set.
+  for (i = 0 ; i < 4 ; i++)
+  {
+    float* ldepth = &depth[i];
+    int idx = i << 3;
+    int j = 1;
+    csBits64 mods = coverage_cache[idx++];
+    while (j < 8)
+    {
+      mods |= coverage_cache[idx++];
+      j++;
+    }
+    if (!mods.IsEmpty ())
+    {
+      if (mods.CheckByte0 ())
+      {
+	if (mindepth <= ldepth[0]) return true;
+      }
+      if (mods.CheckByte1 ())
+      {
+        if (mindepth <= ldepth[4]) return true;
+      }
+      if (mods.CheckByte2 ())
+      {
+        if (mindepth <= ldepth[8]) return true;
+      }
+      if (mods.CheckByte3 ())
+      {
+        if (mindepth <= ldepth[12]) return true;
+      }
+      if (mods.CheckByte4 ())
+      {
+        if (mindepth <= ldepth[16]) return true;
+      }
+      if (mods.CheckByte5 ())
+      {
+        if (mindepth <= ldepth[20]) return true;
+      }
+      if (mods.CheckByte6 ())
+      {
+        if (mindepth <= ldepth[24]) return true;
+      }
+      if (mods.CheckByte7 ())
+      {
+        if (mindepth <= ldepth[28]) return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool csCoverageTile::TestFlush (csBits64& fvalue, float mindepth)
+{
+  if (num_operations == 0 && fvalue.IsEmpty ())
+  {
+    // If there are no operations and fvalue is empty then it is not
+    // possible for the polygon to become visible in this tile.
+    return false;
+  }
+
+  if (queue_tile_empty)
+  {
+    // There are operations or the fvalue is not empty so we know the
+    // polygon is visible in this tile.
+    return true;
+  }
+
+  if (tile_full)
+  {
+    return TestFlushForFull (fvalue, mindepth);
+  }
+
+  // @@@ TODO?
+  //if (tile_min_depth < INIT_MIN_DEPTH_CMP && mindepth <= tile_min_depth)
+  //{
+    //return TestFlushNoDepth (fvalue, mindepth);
+  //}
+
+  return TestFlushGeneral (fvalue, mindepth);
+}
+
 bool csCoverageTile::TestFullRect (float testdepth)
 {
   if (tile_full)
   {
     // Tile is full so check for depth.
+    if (testdepth <= tile_min_depth)
+      return true;
+    if (testdepth > tile_max_depth)
+      return false;
     int i;
     for (i = 0 ; i < 32 ; i++)
       if (testdepth <= depth[i])
@@ -527,9 +682,8 @@ bool csCoverageTile::TestRect (int start, int end, float testdepth)
   if (testdepth > tile_max_depth) return false;
 
   // Initialize the coverage cache.
-  for (i = 0 ; i < start ; i++) coverage_cache[i].Empty ();
-  for (i = start ; i <= end ; i++) coverage_cache[i].Full ();
-  for (i = end ; i < 32 ; i++) coverage_cache[i].Empty ();
+  memset (&coverage_cache[0], 0, sizeof (csBits64) * 32);
+  memset (&coverage_cache[start], 0xff, sizeof (csBits64) * (end-start+1));
 
   // Test depth where appropriate.
   for (i = (start>>3) ; i <= (end>>3) ; i++)
@@ -1484,6 +1638,43 @@ bool csTiledCoverageBuffer::DrawOutline (csVector2* verts, int num_verts,
   return true;
 }
 
+bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
+	float min_depth)
+{
+  csBox2Int bbox;
+  if (!DrawPolygon (verts, num_verts, bbox))
+    return false;
+
+  int tx, ty;
+  int startrow, endrow;
+  startrow = bbox.miny >> 6;
+  if (startrow < 0) startrow = 0;
+  endrow = bbox.maxy >> 6;
+  if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
+
+  bool rc = false;
+  for (ty = startrow ; ty <= endrow ; ty++)
+  {
+    csBits64 fvalue;
+    fvalue.Empty ();
+    csCoverageTile* tile = GetTile (dirty_left[ty], ty);
+    int dr = dirty_right[ty];
+    if (dr >= (width_po2 >> 5)) dr = (width_po2 >> 5)-1;
+    for (tx = dirty_left[ty] ; tx <= dr ; tx++)
+    {
+      // Even if we found a visible tile we need to continue to clear
+      // all operations.
+      if (!rc)
+      {
+        rc = tile->TestFlush (fvalue, min_depth);
+      }
+      tile->ClearOperations ();
+      tile++;
+    }
+  }
+  return rc;
+}
+
 void csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 	float max_depth)
 {
@@ -1503,7 +1694,6 @@ void csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
     csBits64 fvalue;
     fvalue.Empty ();
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
-//printf ("ty=%d dirty_left=%d dirty_right=%d\n", ty, dirty_left[ty], dirty_right[ty]); fflush (stdout);
     int dr = dirty_right[ty];
     if (dr >= (width_po2 >> 5)) dr = (width_po2 >> 5)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
@@ -1544,81 +1734,85 @@ void csTiledCoverageBuffer::InsertOutline (csVector2* verts, int num_verts,
   }
 }
 
-bool csTiledCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
+bool csTiledCoverageBuffer::PrepareTestRectangle (const csBox2& rect,
+	csTestRectData& data)
 {
-  csBox2Int bbox;
-  if (rect.MaxX () > 10000.0) bbox.maxx = 10000;
+  if (rect.MaxX () > 10000.0) data.bbox.maxx = 10000;
   else
   {
     if (rect.MaxX () <= 0) return false;
-    bbox.maxx = QRound (rect.MaxX ());
+    data.bbox.maxx = QRound (rect.MaxX ());
   }
-  if (rect.MaxY () > 10000.0) bbox.maxy = 10000;
+  if (rect.MaxY () > 10000.0) data.bbox.maxy = 10000;
   else
   {
     if (rect.MaxY () <= 0) return false;
-    bbox.maxy = QRound (rect.MaxY ());
+    data.bbox.maxy = QRound (rect.MaxY ());
   }
 
-  if (rect.MinX () < -10000.0) bbox.minx = -10000;
+  if (rect.MinX () < -10000.0) data.bbox.minx = -10000;
   else
   {
     if (rect.MinX () > 10000.0) return false;
-    bbox.minx = QRound (rect.MinX ());
-    if (bbox.minx >= width) return false;
+    data.bbox.minx = QRound (rect.MinX ());
+    if (data.bbox.minx >= width) return false;
   }
-  if (rect.MinY () < -10000.0) bbox.miny = -10000;
+  if (rect.MinY () < -10000.0) data.bbox.miny = -10000;
   else
   {
     if (rect.MinY () > 10000.0) return false;
-    bbox.miny = QRound (rect.MinY ());
-    if (bbox.miny >= height) return false;
+    data.bbox.miny = QRound (rect.MinY ());
+    if (data.bbox.miny >= height) return false;
   }
 
+  if (data.bbox.miny < 0) data.bbox.miny = 0;
+  data.startrow = data.bbox.miny >> 6;
+  if (data.bbox.maxy >= height) data.bbox.maxy = height-1;
+  data.endrow = data.bbox.maxy >> 6;
+  CS_ASSERT (data.endrow < num_tile_rows);
+  if (data.bbox.minx < 0) data.bbox.minx = 0;
+  data.startcol = data.bbox.minx >> 5;
+  if (data.bbox.maxx >= width) data.bbox.maxx = width-1;
+  CS_ASSERT (data.bbox.maxx < width);
+  data.endcol = data.bbox.maxx >> 5;
+
+  data.start_x = data.bbox.minx & 31;
+  data.end_x = data.bbox.maxx & 31;
+  return true;
+}
+
+bool csTiledCoverageBuffer::TestRectangle (const csTestRectData& data, float min_depth)
+{
   int tx, ty;
-  if (bbox.miny < 0) bbox.miny = 0;
-  int startrow = bbox.miny >> 6;
-  if (bbox.maxy >= height) bbox.maxy = height-1;
-  int endrow = bbox.maxy >> 6;
-  CS_ASSERT (endrow < num_tile_rows);
-  if (bbox.minx < 0) bbox.minx = 0;
-  int startcol = bbox.minx >> 5;
-  if (bbox.maxx >= width) bbox.maxx = width-1;
-  CS_ASSERT (bbox.maxx < width);
-  int endcol = bbox.maxx >> 5;
-
   csBits64 vermask;
-  int start_x = bbox.minx & 31;
-  int end_x = bbox.maxx & 31;
-
-  for (ty = startrow ; ty <= endrow ; ty++)
+  for (ty = data.startrow ; ty <= data.endrow ; ty++)
   {
     bool do_vermask = false;
     vermask.Full ();
-    if (ty == startrow && (bbox.miny & 63) != 0)
+    if (ty == data.startrow && (data.bbox.miny & 63) != 0)
     {
-      vermask = csCoverageTile::precalc_end_lines[bbox.miny & 63];
+      vermask = csCoverageTile::precalc_end_lines[data.bbox.miny & 63];
       do_vermask = true;
     }
-    if (ty == endrow && (bbox.maxy & 63) != 63)
+    if (ty == data.endrow && (data.bbox.maxy & 63) != 63)
     {
-      vermask &= csCoverageTile::precalc_start_lines[bbox.maxy & 63];
+      vermask &= csCoverageTile::precalc_start_lines[data.bbox.maxy & 63];
       do_vermask = true;
     }
 
-    csCoverageTile* tile = GetTile (startcol, ty);
-    for (tx = startcol ; tx <= endcol ; tx++)
+    csCoverageTile* tile = GetTile (data.startcol, ty);
+    for (tx = data.startcol ; tx <= data.endcol ; tx++)
     {
       int sx = 0, ex = 31;
       bool do_hor = false;
-      if (tx == startcol && start_x != 0)
+      if (tx == data.startcol && data.start_x != 0)
       {
-        sx = start_x;
+        sx = data.start_x;
 	do_hor = true;
       }
-      if (tx == endcol && end_x != 31)
+      if (tx == data.endcol && data.end_x != 31)
       {
-        ex = end_x;
+        ex = data.end_x;
 	do_hor = true;
       }
 
@@ -1646,6 +1840,22 @@ bool csTiledCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
           return true;
         }
       }
+      tile++;
+    }
+  }
+  return false;
+}
+
+bool csTiledCoverageBuffer::QuickTestRectangle (const csTestRectData& data, float min_depth)
+{
+  int tx, ty;
+  for (ty = data.startrow ; ty <= data.endrow ; ty++)
+  {
+    csCoverageTile* tile = GetTile (data.startcol, ty);
+    for (tx = data.startcol ; tx <= data.endcol ; tx++)
+    {
+      if (tile->TestFullRect (min_depth))
+          return true;
       tile++;
     }
   }

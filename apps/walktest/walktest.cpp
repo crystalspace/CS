@@ -928,12 +928,17 @@ void perf_test (int num)
   for (i = 0 ; i < num ; i++)
   {
     Sys->DrawFrame (csGetTicks ()-t, csGetTicks ());
+    Sys->FinishFrame ();
     t = csGetTicks ();
   }
   t2 = csGetTicks ();
   Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
     "%f secs to render %d frames: %f fps", (float) (t2 - t1) / 1000., num,
-    100000. / (float) (t2 - t1));
+    float (num) * 1000. / (float) (t2 - t1));
+  printf (
+    "%f secs to render %d frames: %f fps\n", (float) (t2 - t1) / 1000., num,
+    float (num) * 1000. / (float) (t2 - t1));
+  fflush (stdout);
   cnt = 1;
   time0 = (csTicks)-1;
   Sys->busy_perf_test = false;

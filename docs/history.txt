@@ -9,6 +9,42 @@ chronological order.
 24-Oct-2003
 	- res 'un-disabled' a couple of MSVC warnings and fixed some occurances
 	  of VC warnings in the source.
+	- Jorrit changed walktest perftest so that it prints to standard
+	  output and it will also call FinishFrame() now for a more
+	  realistic result. Also fixed a bug with perftest if a number
+	  of iterations != 100 was used.
+	- Jorrit fixed stats in Dynavis so that it now reports the number
+	  of visible objects and nodes instead of the time it takes to
+	  calculate Dynavis. This is more useful.
+	- Jorrit added csBox3::ProjectOutline() which works similarly
+	  to ProjectBox() except that it projects the outline to a 2D
+	  polygon.
+	- Jorrit fixed csBox3::ProjectBox() so that the calculated min_z/max_z
+	  actually accounts for all 8 vertices and not only the vertices
+	  of the outline.
+	- Jorrit changed the kdtree so that it sets the bounding boxes of
+	  the nodes maximum to -100000/100000. This avoids bugs in Dynavis
+	  which cannot easily handle these big bounding boxes. Unfortunatelly
+	  that restricts worlds that use Dynavis to be within that range.
+	  We'll have to see about better solutions in the future.
+	- Jorrit changed the write queue operation in Dynavis to test every
+	  rectangle again after fetching an item from the write queue
+	  instead of only testing after fetching all items. This seems
+	  to improve performance slightly.
+	- Jorrit added code to test for polygons instead of just rectangles.
+	  This allows a test that better matches the shape of the node box.
+	  Using that does not help improve performance though. Perhaps
+	  we need to do this test only if the node is complex enough (i.e.
+	  has sufficient objects in it).
+	- Jorrit optimized Dynavis TestRectangle() a bit by splitting it
+	  in two routines which allows for early exit in case of write
+	  queue and also allows for faster second-time calls of
+	  TestRectangle().
+	- Jorrit added early exit code in Dynavis TestFullRect() to avoid
+	  comparing all 32 depths.
+	- Jorrit fixed a bug in Dynavis TestRect() which was initializing
+	  one row wrongly. The chance of this bug manifesting in real
+	  culling errors is very small though.
 23-Oct-2003
 	- Jorrit reduced the 'yellow-message-time' in the standard reporter
 	  from 10 to 5 seconds.

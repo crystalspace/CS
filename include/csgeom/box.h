@@ -34,6 +34,7 @@
 
 class csPlane3;
 class csTransform;
+class csPoly2D;
 
 /**
  * The maximum value that a coordinate in the bounding box can use.
@@ -876,10 +877,22 @@ public:
    * then the 'sbox' will not be calculated (min_z and max_z are
    * still calculated) and the function will return false.
    * If the camera is inside the transformed box then this function will
-   * return true and a very big screen space bounding box is returned.
+   * return true and a conservative screen space bounding box is returned.
    */
   bool ProjectBox (const csTransform& trans, float fov, float sx, float sy,
   	csBox2& sbox, float& min_z, float& max_z) const;
+
+  /**
+   * Project this box to the 2D outline given the view point
+   * transformation and also the field-of-view and shift values (for
+   * perspective correction). The minimum and maximum z are also
+   * calculated. If the box is fully behind the camera
+   * then false is returned and this function will not do anything.
+   * If the box is partially behind the camera you will get an outline
+   * that is conservatively correct (i.e. it will overestimate the box).
+   */
+  bool ProjectOutline (const csTransform& trans, float fov, float sx, float sy,
+  	csPoly2D& poly, float& min_z, float& max_z) const;
 
   /// Compute the union of two bounding boxes.
   csBox3& operator+= (const csBox3& box);
