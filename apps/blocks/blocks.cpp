@@ -2776,7 +2776,7 @@ void Blocks::FinishFrame ()
 
 bool Blocks::BlHandleEvent (iEvent &Event)
 {
-  switch (Event.Type)
+  if (!initscreen) switch (Event.Type)
   {
     case csevKeyDown:
       HandleKey (Event.Key.Code, Event.Key.Modifiers & CSMASK_SHIFT,
