@@ -58,12 +58,16 @@ MSVC.DSP += WIN32SYS
 DSP.WIN32SYS.NAME = cssys
 DSP.WIN32SYS.TYPE = library
 DSP.WIN32SYS.RESOURCES = \
-  $(wildcard libs/cssys/*.cpp libs/cssys/win32/*.cpp \
-  include/cssys/win32/csosdefs.h include/cssys/win32/volatile.h \
-  include/cssys/win32/win32.h include/cssys/win32/winhelp.h) \
-  libs/cssys/general/findlib.cpp libs/cssys/general/getopt.cpp \
-  libs/cssys/general/printf.cpp
-
+  $(wildcard libs/cssys/*.cpp libs/cssys/win32/*.cpp) \
+  include/cssys/win32/csosdefs.h \
+  include/cssys/win32/volatile.h \
+  include/cssys/win32/win32.h \
+  include/cssys/win32/winhelp.h \
+  libs/cssys/general/findlib.cpp \
+  libs/cssys/general/getopt.cpp \
+  libs/cssys/general/printf.cpp \
+  libs/cssys/general/runloop.cpp \
+  libs/cssys/general/sysinit.cpp
 
 # grpall -- represents all other projects indirectly through grpapps,
 # grpplugins, and grplibs.
