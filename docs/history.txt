@@ -12,6 +12,8 @@ chronological order.
 	  apps.
 	- Jorrit also added fixed the csEvent assignement operator so that
 	  it copies the 'attributes' field too.
+	- Jorrit enhanced the build instructions so they invite people to try
+	  out the new renderer first.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.

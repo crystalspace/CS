@@ -87,6 +87,20 @@ full advantage of the debug elements - you should have Python 2.2.3 or 2.3.0
 installed on your system. Whichever version you decide to use, make sure you
 download the comparable msvc_libs.
 
+@subsubheading Selecting the Renderer Architecture
+
+At this moment we have two completely different renderer architectures
+in Crystal Space. The old renderer (which is still default) and the new
+renderer. The new renderer hasn't been made default yet because it is still
+considered to be experimental and some features haven't been ported yet
+(like software renderer which works only partially and fog). On the other
+hand the new renderer supports shaders, stencil shadows, and other advanced
+OpenGL stuff and for most people it seems to work very well. So we personally
+recommend trying out the new renderer first. If it doesn't work right for
+you then you should send us a report and go back to old renderer then.
+To use the new renderer you should use the @file{wksnewrenderer.sln} instead
+of @file{wkstypical.sln} (see below).
+
 @subsubheading Compiling Crystal Space
 
 To compile Crystal Space, you'll have to perform the following steps.  If
@@ -94,14 +108,17 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC7 FAQ}.
 
 @enumerate
 @item
-Load @file{CS\mk\visualc7\wkstypical.sln}.
+Load @file{CS\mk\visualc7\wkstypical.sln} (or
+@file{CS\mk\visualc7\wksnewrenderer.sln} if you want to try the new renderer).
 
 @item
 From the file menu select @emph{Build->Build Solution}.  @strong{Note} that you
 must build the project using the @emph{Release} or @emph{Debug} build modes.
 Do @strong{not} use the special-purpose @emph{Release_NR}, @emph{Debug_NR}, or
 @emph{ExtensiveMemDebug} build modes (which are reserved for specific
-developmental activities on Crystal Space itself).
+developmental activities on Crystal Space itself).  @strong{Note} that you
+@strong{must} use @emph{Release_NR} or @emph{Debug_NR} if you selected
+@file{wksnewrenderer.sln}.
 
 @item
 After a while the compilation should finish.  The signal for a

@@ -82,6 +82,20 @@ must install Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
 
+@subsubheading Selecting the Renderer Architecture
+
+At this moment we have two completely different renderer architectures
+in Crystal Space. The old renderer (which is still default) and the new
+renderer. The new renderer hasn't been made default yet because it is still
+considered to be experimental and some features haven't been ported yet
+(like software renderer which works only partially and fog). On the other
+hand the new renderer supports shaders, stencil shadows, and other advanced
+OpenGL stuff and for most people it seems to work very well. So we personally
+recommend trying out the new renderer first. If it doesn't work right for
+you then you should send us a report and go back to old renderer then.
+To use the new renderer you should use the @file{wksnewrenderer.dsw} instead
+of @file{wkstypical.dsw} (see below).
+
 @subsubheading Compiling Crystal Space
 
 To compile Crystal Space, you'll have to perform the following steps.  If
@@ -89,7 +103,8 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC6 FAQ}.
 
 @enumerate
 @item
-Load @file{CS\mk\visualc6\wkstypical.dsw}.
+Load @file{CS\mk\visualc6\wkstypical.dsw} (or
+@file{CS\mk\visualc6\wksnewrenderer.dsw} if you want to try the new renderer).
 
 @item
 Remove all projects you don't want to compile.  To do this, right-click on the
@@ -107,7 +122,9 @@ From the file menu select @emph{Build->Rebuild All} or alternatively hit your
 @emph{Release} or @emph{Debug} build modes.  Do @strong{not} use the
 special-purpose @emph{Release_NR}, @emph{Debug_NR}, or @emph{ExtensiveMemDebug}
 build modes (which are reserved for specific developmental activities on
-Crystal Space itself).
+Crystal Space itself).  @strong{Note} that you
+@strong{must} use @emph{Release_NR} or @emph{Debug_NR} if you selected
+@file{wksnewrenderer.dsw}.
 
 @item
 After a while the compilation should finish without error.  The signal for a
