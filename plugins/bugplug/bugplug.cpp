@@ -316,9 +316,6 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'/%d",
     v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>", poly_id);
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'/%d",
-    v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>", poly_id);
 
   if (sel)
   {
