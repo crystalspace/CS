@@ -107,9 +107,12 @@ ifndef DO.DEP
     DO.DEP = $(CC) -MM $(CFLAGS) $(CFLAGS.INCLUDE) $(filter-out %.asm,$^) | sed $(SED_DEPEND) >$@
   else
     ifeq ($(DEPEND_TOOL),mkdep)
-      depend: mkdep
+      # If mkdep is already installed, don't build it
+      ifeq ($(DEPEND_TOOL.INSTALLED),yes)
+        depend: mkdep
+      endif
       DO.DEP = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE)) \
-        $(filter-out %.asm,$^) -o $O -p $(OUT) -r -c -f $@
+        $(filter-out %.asm,$^) -o $(BUCK)O -p $(OUT) -r -c -f $@
     else
       DO.DEP = echo Building dependencies is not supported on this platform
     endif

@@ -14,6 +14,15 @@ EMPTY=
 SPACE=$(EMPTY) $(EMPTY)
 SEPARATOR=$"*-------------------------------------------------------------------------*$"
 
+# Unix shells tend to use "$" as delimiter for variable names.
+# Test for this behaviour and set $(BUCK) variable correspondigly ...
+__TMP__:=$(shell echo $$$$)
+ifeq ($(__TMP__),$$$$)
+  BUCK = $$
+else
+  BUCK = \$$
+endif
+
 # The suffixes for $(OUT) directory when making PIC and non-PIC code
 # Can be changed from system-dependent makefile
 OUTSUFX. =

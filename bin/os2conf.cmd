@@ -171,6 +171,21 @@
       " be able to re-build automatically-generated documentation files"NL,
       " ('make doc' and 'make api' targets)";
 
+  call saycon ANSI.LGREEN"Checking for suitable version of installed makedep"
+  if (SysSearchPath("PATH", "makedep.exe") \= "") then
+  do
+    "makedep -V | rxqueue 2>nul"
+    version = "";
+    do while queued() > 0
+      pull var;
+      verpos = pos("VERSION ", var);
+      if (verpos > 0) then
+        version = substr(var, verpos + length("VERSION "));
+    end;
+    if (version >= "0.0.1") then
+      say 'DEPEND_TOOL.INSTALLED = yes';
+  end;
+
   /* Restore console color to gray */
   call outcon ANSI.LGRAY;
 
