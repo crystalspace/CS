@@ -73,6 +73,8 @@ Short-term cleanups that need to be done:
 	    - Enabled automatic conversion of Crystal Space's Texinfo
 	      documentation to HTML format.  Conversion occurs every six hours
 	      (or four times per day).
+	    - Fixed a typographical error and added more content to
+	      authors.txi.
 25-Mar-2000
 	- Optimized sprites a bit more.
 	- Changed curve drawing using new clipper routine to get

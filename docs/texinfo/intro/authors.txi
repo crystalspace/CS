@@ -18,15 +18,15 @@ chapters or sections to their name.
 As the creator of Crystal Space, Jorrit wrote the original documentation
 included with the package.  Although some of that original work has since been
 subsumed by more recent work by himself and others, much of his writing can
-still be found in this document.  In particular, we has authored several
+still be found in this document.  In particular, he has authored several
 sections which detail inner workings of the 3D engine as well as sections
 which describe the theory behind the engine.
 
 @item Andrew Zabolotny (@email{bit@@eltech.ru})
-Andrew has contributed many sections to this manual which document the various
-large-scale contributions which he has made to the project.  They include the
-SCF and VFS systems, CSWS, MazeD, memory debugger, makefiles, and detailed
-information pertaining to the OS/2 port.
+Andrew has contributed several sections to this manual which document the
+various large-scale contributions which he has made to the project.  They
+include the SCF and VFS systems, CSWS, MazeD, memory debugger, makefiles, and
+detailed information pertaining to the OS/2 port.
 
 @item Eric Sunshine (@email{sunshine@@sunshineco.com})
 In addition to writing several documents describing various ports of Crystal
@@ -35,7 +35,9 @@ manual.  As part of this job, he has written much of the content which ties
 together the various portions of the manual, fleshed out much of the bare
 skeleton, and written many otherwise absent sections.  His editing efforts
 have been very extensive, and he is responsible for the manual's current
-organization, look, and feel.
+organization, look, and feel.  He also created several utilities and Texinfo
+extension packages which allow the documentation to build cleanly on all
+platforms supported by Crystal Space.
 @end table
 
 The following list of people have contributed to the Crystal Space
