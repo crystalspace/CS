@@ -65,17 +65,29 @@ echo "PROC = ${PROC}"
 
 # Find the C++ compiler
 [ -z "${CXX}" ] && CXX=`which g++ 2>&1 | grep -v "[Nn]o"`
-[ -z "${CXX}" ] && CXX=`which gcc 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which egcs 2>&1 | grep -v "[Nn]o"`
 [ -z "${CXX}" ] && CXX=`which c++ 2>&1 | grep -v "[Nn]o"`
+
 
 if [ -z "${CXX}" ]; then
   echo "$0: Cannot find an installed C++ compiler!" >&2
   exit 1
 fi
 
+#Find a C compiler
+
+[ -z "${CC}" ] && CC=`which gcc 2>&1 | grep -v "[Nn]o"`
+[ -z "${CC}" ] && CC=`which egcs 2>&1 | grep -v "[Nn]o"`
+[ -z "${CC}" ] && CC=`which cc 2>&1 | grep -v "[Nn]o"`
+
+if [ -z "${CC}" ]; then
+  echo "$0: Cannot find an installed C compiler!" >&2
+  exit 1
+fi
+
 CXX=`basename ${CXX}`
-echo "CC = ${CXX} -c"
+CC=`basename ${CC}`
+echo "CC = ${CC} -c"
 echo "CXX = ${CXX} -c"
 echo "LINK = ${CXX}"
 
