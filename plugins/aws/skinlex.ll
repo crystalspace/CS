@@ -52,7 +52,7 @@ from                    /* printf("from-");   */ return TOKEN_FROM;
 [a-zA-Z]+[a-zA-Z0-9]*   /* printf("<attr>-"); */ awslval->str = strdup(awstext); return TOKEN_ATTR;
 \"[^\n\"]*\"             /* printf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = strdup(awstext+1); return TOKEN_STR;
 [ \t\r\n]+              /* eat all spaces and stuff */
-.                       /* printf("%c-", awstext[0]); */ return awstext[0];
 \/\/.*\n 		/* eat comments */
+#.*\n                   /* eat comments */
 .                       return awstext[0];
 %%

@@ -1,4 +1,6 @@
-skin "Normal Windows"
+# AWS Test file
+
+skin "Normal Windows" // this defines the appeareance of aws components
 {
   Texture: 		"/aws/texture.png"
   HighlightColor: 		230,230,230

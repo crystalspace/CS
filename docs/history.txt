@@ -54,6 +54,8 @@ chronological order.
 	  creates buffers for normals if normals are actually asked for.
 	  Need to do the same for binormals, tangents, and others but it
 	  already helps a bit for memory usage.
+        - Matze fixed aws lexer to accept comments. The // and # tokens now
+          start a comment till the end of the line
 28-Sep-2004
 	- Rhad mutexed some portions of the software renderer to reduce
 	  thread contention issues.  This is not a complete fix but should
