@@ -1,3 +1,9 @@
+crystalspace (0.95-20020813) unstable; urgency=low
+
+  * Updates to make compilation easier with recent CVS
+
+ -- Peter Amstutz <tetron@interreality.org>  Tue, 13 Aug 2002 08:31:56 +0100
+
 crystalspace (0.94-20020502-3) unstable; urgency=low
 
   * Added support for HPPA and M68K in arch.sh commited upstream
