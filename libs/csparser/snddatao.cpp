@@ -24,8 +24,6 @@
 #include "csparser/snddatao.h"
 #include "csobject/csobject.h"
 
-IMPLEMENT_CSOBJTYPE (csSoundWrapper, csObject);
-
 IMPLEMENT_IBASE (csSoundWrapper);
   IMPLEMENTS_EMBEDDED_INTERFACE (iSoundWrapper);
 IMPLEMENT_IBASE_END;

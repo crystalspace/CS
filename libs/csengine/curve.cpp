@@ -34,11 +34,6 @@ unsigned long csCurve::last_curve_id = 0;
 // Initialize the cache for Bezier curves
 static csBezier2 bezierCache;
 
-IMPLEMENT_CSOBJTYPE (csCurve,csObject);
-IMPLEMENT_CSOBJTYPE (csCurveTemplate,csPObject);
-IMPLEMENT_CSOBJTYPE (csBezierCurve,csCurve);
-IMPLEMENT_CSOBJTYPE (csBezierTemplate,csCurveTemplate);
-
 IMPLEMENT_IBASE_EXT (csCurve)
   IMPLEMENTS_EMBEDDED_INTERFACE (iCurve)
 IMPLEMENT_IBASE_EXT_END

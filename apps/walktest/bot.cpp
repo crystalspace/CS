@@ -22,8 +22,6 @@
 #include "csengine/light.h"
 #include "csengine/engine.h"
 
-IMPLEMENT_CSOBJTYPE (Bot,csMeshWrapper);
-
 Bot::Bot (csEngine* Engine, iMeshObject* botmesh) :
   csMeshWrapper (Engine->QueryCsObject (), botmesh)
 {

@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "csobject/csobject.h"
-#include "csobject/objiter.h"
 #include "csobject/dataobj.h"
 #include "csobject/pobject.h"
 
@@ -126,13 +125,6 @@ void csObjContainer::SetLimit (csObjContainer *&iContainer, int iLimit)
   iContainer->limit = iLimit;
 }
 
-const csIdType csObject::Type ("csObject");
-
-const csIdType& csObject::GetType () const
-{
-  return Type;
-}
-
 IMPLEMENT_IBASE (csObject)
   IMPLEMENTS_INTERFACE (iObject)
 IMPLEMENT_IBASE_END
@@ -202,26 +194,6 @@ csObjectNoDel::~csObjectNoDel ()
     free (children);
     children = NULL;
   }
-}
-
-csObject *csObject::GetChild (const csIdType& iType, bool derived) const
-{
-  if (!children)
-    return NULL;
-  int i;
-  if (derived)
-  {
-    for (i = 0; i < children->count; i++)
-      if (children->obj [i]->GetType () >= iType)
-        return children->obj [i];
-  }
-  else
-  {
-    for (i = 0; i < children->count; i++)
-      if (&children->obj [i]->GetType () == &iType)
-        return children->obj [i];
-  }
-  return NULL;
 }
 
 void csObject::ObjAdd (csObject *obj)
@@ -335,68 +307,7 @@ iObjectIterator *csObject::GetIterator ()
   return new csObjectIterator (this);
 }
 
-//----------------------------------------------------- Object iterator -----//
-
-csObjIterator::csObjIterator (const csIdType &iType, const csObject &iObj,
-	bool derived)
-{
-  csObjIterator::derived = derived;
-  Reset (iType, iObj);
-}
-
-void csObjIterator::Reset (const csIdType &iType, const csObject &iObj)
-{
-  Type = &iType;
-  Container = iObj.children;
-  Index = -1;
-  Next ();
-}
-
-csObject* csObjIterator::GetObj () const
-{
-  return Container ? Container->obj [Index] : NULL;
-}
-
-void csObjIterator::Next ()
-{
-  if (Container)
-  {
-    for (;;)
-    {
-      Index++;
-      if (Index >= Container->count)
-      {
-        Container = NULL;
-        break;
-      }
-      if (derived)
-      {
-        if (Container->obj [Index]->GetType () >= *Type)
-	  break;
-      }
-      else
-      {
-        if (&Container->obj [Index]->GetType () == Type)
-	  break;
-      }
-    }
-  }
-}
-
-bool csObjIterator::FindName(const char* name)
-{
-  while (!IsFinished ())
-  {
-    if (strcmp (GetObj ()->GetName (), name) == 0)
-      return true;
-    Next ();
-  }
-  return false;
-}
-
 //------------------- miscelaneous simple classes derived from csObject -----//
-
-IMPLEMENT_CSOBJTYPE (csDataObject, csObject);
 
 IMPLEMENT_IBASE_EXT (csDataObject)
   IMPLEMENTS_EMBEDDED_INTERFACE (iDataObject)
@@ -405,8 +316,6 @@ IMPLEMENT_IBASE_EXT_END
 IMPLEMENT_EMBEDDED_IBASE (csDataObject::DataObject)
   IMPLEMENTS_INTERFACE (iDataObject)
 IMPLEMENT_EMBEDDED_IBASE_END
-
-IMPLEMENT_CSOBJTYPE (csPObject, csObject);
 
 csPObject::~csPObject ()
 {

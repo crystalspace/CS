@@ -27,8 +27,6 @@
 
 #include "csfx/prplasma.h"
 
-IMPLEMENT_CSOBJTYPE (csProcPlasma, csProcTexture);
-
 /// the implementation of the plasma texture
 csProcPlasma::csProcPlasma () : csProcTexture()
 {

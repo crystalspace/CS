@@ -23,8 +23,6 @@
 #include "csengine/engine.h"
 #include "csengine/light.h"
 
-IMPLEMENT_CSOBJTYPE (csTerrainWrapper, csObject)
-
 IMPLEMENT_IBASE_EXT (csTerrainWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iTerrainWrapper)
 IMPLEMENT_IBASE_EXT_END
@@ -121,8 +119,6 @@ IMPLEMENT_IBASE_END
 IMPLEMENT_EMBEDDED_IBASE (csTerrainFactoryWrapper::TerrainFactoryWrapper)
   IMPLEMENTS_INTERFACE (iTerrainFactoryWrapper)
 IMPLEMENT_EMBEDDED_IBASE_END
-
-IMPLEMENT_CSOBJTYPE (csTerrainFactoryWrapper, csObject)
 
 csTerrainFactoryWrapper::csTerrainFactoryWrapper (iTerrainObjectFactory *pFactory)
 {

@@ -61,8 +61,6 @@ public:
 
   /// Draw the next frame.
   virtual void Animate (cs_time current_time);
-
-  CSOBJTYPE;
 };
 
 #endif // __PROCPLASMATEX_H__

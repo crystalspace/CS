@@ -1025,7 +1025,6 @@ public:
     return (iMeshObjectType*)thing_type;
   }
 
-  CSOBJTYPE;
   DECLARE_IBASE;
 
   //--------------------- iPlugIn interface implementation --------------------

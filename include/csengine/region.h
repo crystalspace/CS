@@ -58,21 +58,12 @@ public:
   void ReleaseFromRegion (iObject* obj);
 
   /**
-   * Find an object of a given name and type.
-   * If 'derived' == true it will also consider objects
-   * which are of derived types of the given type.
-   */
-  iObject* FindObject (const char* iName, const csIdType& type,
-      	bool derived = false);
-
-  /**
    * Check if some object is in this region.
    * The speed of this function is independent of the number of
    * objects in this region (i.e. very fast).
    */
   virtual bool IsInRegion (iObject* obj);
 
-  CSOBJTYPE;
   DECLARE_IBASE;
 
   //--------------------- iRegion implementation ---------------------

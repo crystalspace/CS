@@ -595,11 +595,7 @@ public:
   float dir;
 
   DECLARE_IBASE_EXT (csObject);
-
-  CSOBJTYPE;
 };
-
-IMPLEMENT_CSOBJTYPE (GhostSpriteInfo, csObject);
 
 IMPLEMENT_IBASE_EXT (GhostSpriteInfo)
   IMPLEMENTS_INTERFACE (GhostSpriteInfo)
@@ -987,14 +983,14 @@ struct RandomLight
 
 void HandleDynLight (iDynLight* dyn)
 {
-  LightStruct* ls = (LightStruct*)(csDataObject::GetData(*(dyn->GetPrivateObject ())));
+  LightStruct* ls = (LightStruct*)(csDataObject::GetData(dyn->QueryObject ()));
   iLight* l = QUERY_INTERFACE (dyn, iLight);
   l->DecRef ();
   switch (ls->type)
   {
     case DYN_TYPE_MISSILE:
     {
-      MissileStruct* ms = (MissileStruct*)(csDataObject::GetData(*(dyn->GetPrivateObject ())));
+      MissileStruct* ms = (MissileStruct*)(csDataObject::GetData(dyn->QueryObject ()));
       csVector3 v (0, 0, 2.5);
       csVector3 old = l->GetCenter ();
       v = old + ms->dir.GetT2O () * v;
@@ -1057,7 +1053,7 @@ void HandleDynLight (iDynLight* dyn)
     case DYN_TYPE_EXPLOSION:
     {
       ExplosionStruct* es = (ExplosionStruct*)(csDataObject::GetData(
-      	*(dyn->GetPrivateObject ())));
+      	dyn->QueryObject ()));
       if (es->dir == 1)
       {
         es->radius += 3;
@@ -1080,7 +1076,7 @@ void HandleDynLight (iDynLight* dyn)
     }
     case DYN_TYPE_RANDOM:
     {
-      RandomLight* rl = (RandomLight*)(csDataObject::GetData(*(dyn->GetPrivateObject ())));
+      RandomLight* rl = (RandomLight*)(csDataObject::GetData(dyn->QueryObject ()));
       rl->dyn_move += rl->dyn_move_dir;
       if (rl->dyn_move < 0 || rl->dyn_move > 2)
       	rl->dyn_move_dir = -rl->dyn_move_dir;

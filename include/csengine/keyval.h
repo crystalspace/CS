@@ -60,7 +60,6 @@ public:
 
 private:
   char *m_Value;
-  CSOBJTYPE;
 };
 
 /**
@@ -109,7 +108,6 @@ public:
 private:
   csSector *m_pSector;
   csVector3 m_Position;
-  CSOBJTYPE;
 };
 
 /**

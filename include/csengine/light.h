@@ -232,8 +232,6 @@ public:
    */
   static void CorrectForNocolor (float* rp, float* gp, float* bp);  
 
-  CSOBJTYPE;
-
   //------------------------ iLight interface -----------------------------
   DECLARE_IBASE_EXT (csObject);
 
@@ -370,8 +368,6 @@ public:
    * or draw debugging information.
    */
   void LightingFunc (csLightingFunc* callback, void* callback_data = NULL);
-
-  CSOBJTYPE;
 
   //------------------------ iStatLight interface -----------------------------
   DECLARE_IBASE_EXT (csLight);
@@ -613,8 +609,6 @@ public:
   csDynLight* GetNext () { return next; }
   ///
   csDynLight* GetPrev () { return prev; }
-
-  CSOBJTYPE;
 
   //------------------------ iDynLight interface -----------------------------
   DECLARE_IBASE_EXT (csLight);

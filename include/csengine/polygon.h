@@ -1222,7 +1222,6 @@ public:
   void SetNextShare (csPolygon3D *next)
   { txt_share_list = next; }
 
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csObject);
 
   //------------------- iPolygon3D interface implementation -------------------

@@ -96,7 +96,6 @@ public:
    */
   static csCollider* GetCollider (iObject* object);
 
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
 };
 

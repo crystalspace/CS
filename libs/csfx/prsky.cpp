@@ -26,8 +26,6 @@
 
 //---------- csProcSkyTexture ------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csProcSkyTexture, csProcTexture);
-
 csProcSkyTexture::csProcSkyTexture(csProcSky *par) : csProcTexture()
 {
   sky = par;

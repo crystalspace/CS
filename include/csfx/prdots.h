@@ -46,8 +46,6 @@ public:
 
   /// Draw the next frame.
   virtual void Animate (cs_time current_time);
-
-  CSOBJTYPE;
 };
 
 #endif // __PROCDOTSTEX_H__

@@ -66,8 +66,6 @@ public:
   void MakePuddle (int sx, int sy, int rad, int val);
   /// Press down at x,y,radius, strength.
   void PressAt (int sx, int sy, int rad, int val);
-
-  CSOBJTYPE;
 };
 
 #endif // __PROCWATERTEX_H__

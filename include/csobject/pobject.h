@@ -43,8 +43,6 @@ public:
   /// Query the parent object
   virtual csObject *GetObjectParent () const
   { return parent; }
-  
-  CSOBJTYPE;
 };
 
 #endif /* __POBJECT_H_ */

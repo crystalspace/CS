@@ -26,8 +26,6 @@
 
 #include "csfx/prdots.h"
 
-IMPLEMENT_CSOBJTYPE (csProcDots, csProcTexture);
-
 /// the implementation of the plasma texture
 csProcDots::csProcDots () : csProcTexture()
 {

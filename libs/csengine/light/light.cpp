@@ -39,8 +39,6 @@ int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
 unsigned long csLight::last_light_id = 0;
 
-IMPLEMENT_CSOBJTYPE (csLight,csObject);
-
 IMPLEMENT_IBASE_EXT (csLight)
   IMPLEMENTS_EMBEDDED_INTERFACE (iLight)
 IMPLEMENT_IBASE_EXT_END
@@ -204,8 +202,6 @@ iFlareHalo* csLight::Light::CreateFlareHalo ()
 
 
 //---------------------------------------------------------------------------
-
-IMPLEMENT_CSOBJTYPE (csStatLight,csLight);
 
 IMPLEMENT_IBASE_EXT (csStatLight)
   IMPLEMENTS_EMBEDDED_INTERFACE (iStatLight)
@@ -401,8 +397,6 @@ void csLightPatch::Initialize (int n)
 }
 
 //---------------------------------------------------------------------------
-
-IMPLEMENT_CSOBJTYPE (csDynLight,csLight);
 
 IMPLEMENT_IBASE_EXT (csDynLight)
   IMPLEMENTS_EMBEDDED_INTERFACE (iDynLight)

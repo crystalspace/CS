@@ -270,7 +270,6 @@ public:
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);
   
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csObject);
 
   //----------------------- iCurve interface implementation -----------------
@@ -323,7 +322,6 @@ public:
   ///
   void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
 
   //------------------ iCurveTemplate interface implementation --------------
@@ -369,7 +367,6 @@ public:
   virtual int GetVertex (int index);
   virtual int NumVertices ();
 
-  CSOBJTYPE;
   // Should not be necessary, but without this buggy NextStep compiler
   // incorrectly calls csObject::QueryInterface() rather than correctly
   // calling csCurveTemplate::QueryInterface().
@@ -426,8 +423,6 @@ public:
 
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);
-
-  CSOBJTYPE;
 };
 
 #endif // __CS_CURVE_H__

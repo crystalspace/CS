@@ -24,8 +24,6 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csPolyTxtPlane,csPObject);
-
 IMPLEMENT_IBASE_EXT (csPolyTxtPlane)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTxtPlane)
   IMPLEMENTS_INTERFACE (csPolyTxtPlane);

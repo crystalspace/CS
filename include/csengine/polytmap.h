@@ -131,7 +131,6 @@ public:
   /// Get the transformation from object to texture space.
   void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
 
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
 
   //----------------- iPolyTxtPlane interface implementation -----------------

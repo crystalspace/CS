@@ -506,7 +506,6 @@ public:
   /// Disable fog.
   void DisableFog () { fog.enabled = false; }
 
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
 
   //------------------------- iSector interface -------------------------------

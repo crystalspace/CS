@@ -102,7 +102,6 @@ public:
   
   virtual int CollisionDetect (csTransform *p);
 
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csObject);
 
   //------------------- iTerrainWrapper implementation ------------------//
@@ -168,7 +167,6 @@ public:
    */
   csTerrainWrapper* NewTerrainObject( iEngine *pEng );
 
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csObject);
 
   //------------------ iTerrainFactoryWrapper implementation -----------------//

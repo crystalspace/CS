@@ -22,8 +22,6 @@
 #include "csengine/engine.h"
 #include "csengine/sector.h"
 
-IMPLEMENT_CSOBJTYPE (csCollection,csPObject);
-
 IMPLEMENT_IBASE (csCollection)
   IMPLEMENTS_EMBEDDED_INTERFACE (iCollection)
   IMPLEMENTS_INTERFACE (csCollection)

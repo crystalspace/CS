@@ -42,15 +42,16 @@ public:
   /// Get the data associated with this object
   void* GetData () const
   { return data; }
-  /// Get first data pointer associated with other object
-  static void* GetData (csObject& csobj)
+  /**
+   * Get first data pointer associated with other object (warning: SCF
+   * call is not speed-optimized, i.e. GET_CHILD_OBJECT_FAST could be used).
+   */
+  static void* GetData (iObject* obj)
   {
-    csDataObject *d = (csDataObject*)(csobj.GetChild (csDataObject::Type));
+    iDataObject *d = GET_CHILD_OBJECT (obj, iDataObject);
     return d ? d->GetData () : NULL;
   }
   
-  CSOBJTYPE;
-
   DECLARE_IBASE_EXT (csObject);
 
   struct DataObject : public iDataObject

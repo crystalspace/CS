@@ -252,8 +252,6 @@ void csPolyTexGouraud::SetDynamicColor (int i, float r, float g, float b)
 
 unsigned long csPolygon3D::last_polygon_id = 0;
 
-IMPLEMENT_CSOBJTYPE (csPolygon3D,csObject);
-
 IMPLEMENT_IBASE_EXT (csPolygon3D)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygon3D)
 IMPLEMENT_IBASE_EXT_END

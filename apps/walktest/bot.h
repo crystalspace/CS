@@ -61,8 +61,6 @@ public:
   void set_bot_move (const csVector3& v);
   /// Set bot's sector.
   void set_bot_sector (iSector* s) { f_sector = s; }
-
-  CSOBJTYPE;
 };
 
 #endif // __CS_BOT_H__

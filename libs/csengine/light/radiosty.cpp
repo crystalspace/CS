@@ -55,8 +55,6 @@ float FastPow2(float x, const int y)
 
 //--------------- csRadElement -----------------------------------
 
-IMPLEMENT_CSOBJTYPE(csRadElement, csObject);
-
 csRadElement::csRadElement()
 {
   last_shoot_priority = 0.0f;
@@ -385,8 +383,6 @@ void csRadElement::RestoreStaticMap ()
 
 //--------------- csRadPoly --------------------------------------
 
-IMPLEMENT_CSOBJTYPE(csRadPoly, csObject);
-
 IMPLEMENT_IBASE_EXT (csRadPoly)
   IMPLEMENTS_INTERFACE (csRadPoly)
 IMPLEMENT_IBASE_EXT_END
@@ -486,8 +482,6 @@ csColor csRadPoly::GetFlatColor() const
 }
 
 //--------------- csRadCurve -------------------------------------
-
-IMPLEMENT_CSOBJTYPE(csRadCurve, csObject);
 
 IMPLEMENT_IBASE_EXT (csRadCurve)
   IMPLEMENTS_INTERFACE (csRadCurve)

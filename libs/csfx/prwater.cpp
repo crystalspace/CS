@@ -27,8 +27,6 @@
 
 #include "csfx/prwater.h"
 
-IMPLEMENT_CSOBJTYPE (csProcWater, csProcTexture);
-
 /// the implementation of the plasma texture
 csProcWater::csProcWater () : csProcTexture()
 {

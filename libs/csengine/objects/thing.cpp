@@ -52,8 +52,6 @@ long csThing::current_light_frame_number = 0;
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csThing,csPObject);
-
 IMPLEMENT_IBASE_EXT (csThing)
   IMPLEMENTS_EMBEDDED_INTERFACE (iThingState)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)

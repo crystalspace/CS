@@ -24,11 +24,6 @@
 
 extern WalkTest* Sys;
 
-IMPLEMENT_CSOBJTYPE (csWalkEntity, csObject);
-IMPLEMENT_CSOBJTYPE (csDoor, csWalkEntity);
-IMPLEMENT_CSOBJTYPE (csRotatingObject, csWalkEntity);
-IMPLEMENT_CSOBJTYPE (csLightObject, csWalkEntity);
-
 IMPLEMENT_IBASE_EXT (csWalkEntity)
   IMPLEMENTS_INTERFACE (csWalkEntity)
 IMPLEMENT_IBASE_EXT_END

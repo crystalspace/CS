@@ -27,8 +27,6 @@
 
 #include "csfx/prfire.h"
 
-IMPLEMENT_CSOBJTYPE (csProcFire, csProcTexture);
-
 /// the implementation of the plasma texture
 csProcFire::csProcFire () : csProcTexture()
 {

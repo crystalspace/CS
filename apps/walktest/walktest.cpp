@@ -51,7 +51,6 @@
 #include "csutil/scanstr.h"
 #include "csobject/dataobj.h"
 #include "csobject/csobject.h"
-#include "csobject/objiter.h"
 #include "csparser/snddatao.h"
 #include "cssys/system.h"
 #include "csfx/cspixmap.h"

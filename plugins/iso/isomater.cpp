@@ -89,8 +89,6 @@ IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialWrapper::IsoMaterialWrapperIndex)
   IMPLEMENTS_INTERFACE (iIsoMaterialWrapperIndex)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_CSOBJTYPE (csIsoMaterialWrapper, csPObject);
-
 csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterial* material) :
   csPObject (), handle (NULL)
 {

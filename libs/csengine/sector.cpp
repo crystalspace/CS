@@ -62,8 +62,6 @@ bool csSector::do_radiosity = false;
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csSector,csPObject);
-
 IMPLEMENT_IBASE_EXT (csSector)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSector)
   IMPLEMENTS_INTERFACE (csSector);

@@ -79,8 +79,6 @@ public:
   { single_flame_mode = enable; halfbase = halfflame; }
   /// is the flame in singleflame(true) or in leftright tiling mode?
   bool GetSingleFlame() const {return single_flame_mode;}
-
-  CSOBJTYPE;
 };
 
 #endif // __PROCFIRETEX_H__

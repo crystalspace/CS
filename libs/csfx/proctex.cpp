@@ -34,8 +34,6 @@
 
 #include "csfx/proctex.h"
 
-IMPLEMENT_CSOBJTYPE (csProcTexture, csObject);
-
 csProcTexture::csProcTexture ()
 {
   ptReady = false;

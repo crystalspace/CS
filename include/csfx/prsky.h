@@ -92,8 +92,6 @@ public:
   */
   void SetTextureSpace(const csVector3& tex_orig, const csVector3& total_u,
     const csVector3& total_v) {txtorig=tex_orig; txtu=total_u; txtv=total_v;}
-
-  CSOBJTYPE;
 };
 
 

@@ -24,8 +24,6 @@
 
 //----------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csCollider, csObject);
-
 IMPLEMENT_IBASE_EXT (csCollider)
   IMPLEMENTS_INTERFACE (csCollider)
 IMPLEMENT_IBASE_EXT_END

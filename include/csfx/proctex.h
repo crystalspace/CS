@@ -136,8 +136,6 @@ public:
   {
     return (int)(float(max)*rand()/(RAND_MAX+1.0));
   }
-
-  CSOBJTYPE;
 };
 
 

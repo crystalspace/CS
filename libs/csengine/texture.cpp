@@ -35,8 +35,6 @@ IMPLEMENT_EMBEDDED_IBASE (csTextureWrapper::TextureWrapper)
   IMPLEMENTS_INTERFACE (iTextureWrapper)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-IMPLEMENT_CSOBJTYPE (csTextureWrapper,csPObject);
-
 csTextureWrapper::csTextureWrapper (iImage* Image) :
   csPObject (), handle (NULL), flags (CS_TEXTURE_3D), use_callback (NULL)
 {

@@ -25,8 +25,6 @@
 #include "ivideo/graph3d.h"
 #include "iengine/rview.h"
 
-IMPLEMENT_CSOBJTYPE (csMeshWrapper, csPObject)
-
 IMPLEMENT_IBASE_EXT (csMeshWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMeshWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iVisibilityObject)
@@ -434,8 +432,6 @@ IMPLEMENT_IBASE_END
 IMPLEMENT_EMBEDDED_IBASE (csMeshFactoryWrapper::MeshFactoryWrapper)
   IMPLEMENTS_INTERFACE (iMeshFactoryWrapper)
 IMPLEMENT_EMBEDDED_IBASE_END
-
-IMPLEMENT_CSOBJTYPE (csMeshFactoryWrapper, csObject)
 
 csMeshFactoryWrapper::csMeshFactoryWrapper (iMeshObjectFactory* meshFact)
 {

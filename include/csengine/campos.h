@@ -63,7 +63,6 @@ public:
   /// Load the camera position into a camera object
   bool Load (iCamera*, iEngine*);
 
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
 
   //--------------------- iCameraPosition implementation ----------------------

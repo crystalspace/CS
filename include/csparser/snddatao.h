@@ -39,7 +39,6 @@ public:
   ///
   iSoundHandle* GetSound();
 
-  CSOBJTYPE;
   DECLARE_IBASE;
 
   struct SoundWrapper : public iSoundWrapper

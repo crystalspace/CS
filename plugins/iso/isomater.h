@@ -169,7 +169,6 @@ public:
   /// Set the material index
   void SetIndex(int i) {index = i;}
 
-  CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
 
   //------------------- iMaterialWrapper implementation -----------------------

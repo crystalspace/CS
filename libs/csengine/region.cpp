@@ -29,7 +29,6 @@
 #include "csengine/material.h"
 #include "csengine/polytmap.h"
 #include "csengine/curve.h"
-#include "csobject/objiter.h"
 #include "csengine/terrobj.h"
 #include "csutil/csvector.h"
 #include "ivideo/txtmgr.h"
@@ -43,8 +42,6 @@ IMPLEMENT_IBASE_END
 IMPLEMENT_EMBEDDED_IBASE (csRegion::Region)
   IMPLEMENTS_INTERFACE (iRegion)
 IMPLEMENT_EMBEDDED_IBASE_END
-
-IMPLEMENT_CSOBJTYPE (csRegion,csObjectNoDel);
 
 csRegion::csRegion (csEngine* e) : csObjectNoDel ()
 {
@@ -328,19 +325,6 @@ void csRegion::AddToRegion (iObject* obj)
 void csRegion::ReleaseFromRegion (iObject* obj)
 {
   ObjRelease (obj);
-}
-
-iObject* csRegion::FindObject (const char* iName, const csIdType& type,
-      	bool derived)
-{
-  for (csObjIterator iter = GetIterator (type, derived);
-  	!iter.IsFinished () ; ++iter)
-  {
-    csObject* o = iter.GetObj ();
-    const char* on = o->GetName ();
-    if (on && !strcmp (on, iName)) return o;
-  }
-  return NULL;
 }
 
 iSector* csRegion::Region::FindSector (const char *iName)

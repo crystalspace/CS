@@ -33,8 +33,6 @@
 #include "iengine/light.h"
 
 
-IMPLEMENT_CSOBJTYPE (csProcBump, csProcTexture);
-
 csProcBump::csProcBump () : csProcTexture()
 {
   bumpmap = NULL;

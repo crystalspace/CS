@@ -21,22 +21,16 @@
 #define __CSOBJ_H__
 
 #include "cstypes.h"
-#include "csobject/fakertti.h"
-#include "csobject/objiter.h"
 #include "csutil/csbase.h"
 #include "csutil/util.h"
 #include "iobject/object.h"
 
+class csObjContainer;
+
 /**
- * A generic csObject class.
- * Any csObject can have any number of csObject children attached to it.
- *<p>
- * In order to make a class (let's call it newClass) that derives from 
- * csObject, the class must contain "CSOBJTYPE;" in the declaration.  The
- * corresponding .cpp file should contain the line:
- * <pre>
- * IMPLEMENT_CSOBJTYPE (newClass,parentClass);
- * </pre>
+ * A generic csObject class. Any csObject can have any number of iObject
+ * children attached to it. You can use QUERY_INTERFACE to get interfaces
+ * from the child objects.
  */ 
 class csObject : public csBase, public iObject
 {
@@ -88,22 +82,6 @@ public:
   virtual iObject* GetObjectParentI () const
   { return QUERY_INTERFACE_SAFE (GetObjectParent (), iObject); }
 
-  /**
-   * Return the first subobject instance of the given type.
-   * If 'derived' is true then this function will return the
-   * first object which has the given type or a subclass of that type.
-   */
-  csObject *GetChild (const csIdType& iType, bool derived = false) const;
-
-  /**
-   * Return an iterator referencing all objects of the given type.
-   * If 'derived' is true this iterator will also iterate over
-   * all derived entities (derived from the given type).
-   * Default is to iterate only over elements of the exact type.
-   */
-  csObjIterator GetIterator (const csIdType& iType, bool derived = false) const
-  { return csObjIterator (iType, *this, derived); }
-
   /// Attach a new csObject to the tree
   void ObjAdd (csObject *obj);
 
@@ -150,7 +128,6 @@ public:
    */
   virtual iObjectIterator *GetIterator ();
 
-  CSOBJTYPE;
   DECLARE_IBASE;
 };
 
