@@ -66,8 +66,8 @@ rule LinkStaticPlugins
   NEEDLIBS on $($(<)_TARGET) += $(libs) ;
 
   # construct initialization sourcefile
-  local staticobject = [ BuildStaticFile $(>) ] ;
-  ExtraObjects $(<) : $(staticobject) : inheritcflags ;
+  #local staticobject = [ BuildStaticFile $(>) ] ;
+  #ExtraObjects $(<) : $(staticobject) : inheritcflags ;
 }
 
 #----------------------------------------------------------------------------

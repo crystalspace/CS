@@ -343,7 +343,7 @@ public:
   { return direction; }
   /// Set the light direction. Used for directional and spotlight.
   void SetDirection (const csVector3& v)
-  { direction = v.Unit (); }
+  { if (v.IsZero()) return; direction = v.Unit (); }
 
   /**
    * Get the spotlight fall-off coefficients. First is cosine of

@@ -161,7 +161,7 @@ actions GenerateIconRc
 
 actions together CompileResources
 {
-    cat $(>) | $(CMD.WINDRES) $(WINDRES.FLAGS) --include-dir=$(>:D) -o $(<)
+    cat $(>) | $(CMD.WINDRES) $(WINDRES.FLAGS) $(RCFLAGS) --include-dir=$(>:D) -o $(<)
 }
 
 rule CompileResources
@@ -187,6 +187,15 @@ rule Win32Resource
     }
 
     CompileResources $(rcobject) : $(>) ;
+}
+
+##  Win32RcFlags basename : rcfiles
+##    Specify flags passed to the resource compiler when compiling resources
+##    for the target known as basename.
+rule Win32RcFlags
+{
+    local rcobject = [ DoObjectGrist $(<)_resource.o ] ;
+    RCFLAGS on $(rcobject) += $(>) ;
 }
 
 if $(USE_DLLWRAP) = "yes"

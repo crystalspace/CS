@@ -4059,7 +4059,7 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 
   csVector3 attenvec (0, 0, 0);
   csVector2 spotlightfalloff (1,1);
-  csVector3 direction;
+  csVector3 direction (1, 0, 0);
   csLightType type = CS_LIGHT_POINTLIGHT;
 
   float distbright = 1;

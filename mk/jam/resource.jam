@@ -102,3 +102,8 @@ rule ApplicationIcon
 ##    Specify .rc files for the target known as basename.  The .rc files should
 ##    already have SEARCH set appropriately.
 rule Win32Resource { }
+
+##  Win32RcFlags basename : rcfiles
+##    Specify flags passed to the resource compiler when compiling resources
+##    for the target known as basename.
+rule Win32RcFlags { }

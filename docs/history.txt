@@ -29,6 +29,13 @@ chronological order.
 	  only used if the program is not debugged.
 	- res changed csRefCount to also use the ref tracker.
 	- res made CRYSTAL be treated like a list of paths.
+	- res added a Jam helper to split space-separated vars into a list.
+	- res added the Win32RcFlags rule to the Jam system to allow passing of
+	  flags to the resource compiler.
+	- res fixed the level loader to initialize the light direction with
+	  a non-0.0f vector.
+	- res changed csLight::SetDirection() to refuse directions with 0
+	  length.
 17-Feb-2005
 	- Jorrit added csPoly3D::ClassifyAxis().
 	- Jorrit added constants CS_AXIS_X, CS_AXIS_Y, and CS_AXIS_Z, to
