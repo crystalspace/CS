@@ -25,6 +25,9 @@ chronological order.
 	  was only updated when the image changed.
 	- res fixed an occasional Depth value of 0 in csImageMemory.
 	- res added ability to pass an initial image to csProcTexture.
+	- res fixed a refcounting issue in cspython. Interfaces returned by
+	  SCF_QUERY_INTERFACE* were IncRef()ed in addition to the implicit
+	  QueryInterface() IncRef().
 6-Mar-2005
 	- Eric Sunshine removed invocation of SWIGEXTERN() from definition of
 	  csWrapTypedObject() in pythpost.i since the meaning of SWIGEXTERN

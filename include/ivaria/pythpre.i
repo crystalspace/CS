@@ -136,10 +136,12 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   {
     ptr = wp.VoidPtr;
     ibase = (iBase *)SWIG_TypeCast(SWIG_TypeQuery("iBase *"), ptr);
+    // Assume that VoidPtrs have been IncRef()ed
   }
   else
   {
     ibase = (iBase *)wp.Ref;
+    ibase->IncRef();
     ptr = iBase__DynamicCast(ibase, wp.Type).VoidPtr;
   }
 
@@ -160,7 +162,7 @@ _csWrapPtr_to_Python (const csWrapPtr & wp)
   // internal correctness.)
 
   result = SWIG_NewPointerObj(ptr, SWIG_TypeQuery(type_name), 1);
-  ibase->IncRef();
+  //ibase->IncRef();
   PyObject * ibase_obj = SWIG_NewPointerObj(
     (void *) ibase, SWIG_TypeQuery(type_name), 1);
   PyObject * res_obj = PyObject_CallMethod(ibase_obj, "IncRef", "()");
