@@ -901,7 +901,7 @@ void* CalculateLightingPolygonsFB (csPolygonParentInt*,
   csQuadcube* qc = csWorld::current_world->GetQuadcube ();
   bool cw = true;	// @@@ Mirror flag?
   int i, j;
-static int frust_cnt = 20;
+  static int frust_cnt = 50;
   for (i = 0 ; i < num ; i++)
   {
     p = (csPolygon3D*)polygon[i];
@@ -930,12 +930,21 @@ static int frust_cnt = 20;
       for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
         frust->AddVertex (p->Vwor (j)-center);
       lview->shadows.AddLast (frust);
-frust_cnt--;
-if (frust_cnt<0){frust_cnt=50;CompressShadowFrustrums (&(lview->shadows));}
+      frust_cnt--;
+      if (frust_cnt < 0) 
+      {
+        frust_cnt = 50;
+	CompressShadowFrustrums (&(lview->shadows));
+      }
     }
   }
   return NULL;
 }
+
+static int count_cull_dist;
+static int count_cull_quad;
+static int count_cull_frust;
+static int count_cull_not;
 
 // @@@ This routine need to be cleaned up!!! It needs to
 // be part of the class.
@@ -964,10 +973,10 @@ bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
   float dist = result.Norm ();
   float radius = lview->l->GetRadius ();
   if (radius < dist)
-{
-//printf("CULLDIST!\n");
-return false;
-}
+  {
+    count_cull_dist++;
+    return false;
+  }
 
   // Test node against quad-tree.
   csVector3 outline[6];
@@ -979,10 +988,10 @@ return false;
     for (i = 0 ; i < num_outline ; i++)
       outline[i] -= center;
     if (!csWorld::current_world->GetQuadcube ()->TestPolygon (outline, num_outline))
-{
-//printf("CULLQUAD!\n");
+    {
+      count_cull_quad++;
       return false;
-}
+    }
   }
 
   csShadowFrustrum* sf = lview->shadows.GetFirst ();
@@ -1004,10 +1013,10 @@ return false;
     v.x = bmax.x; v.y = bmax.y; v.z = bmin.z;
     if (!sf->Contains (v)) continue;
     // Node is completely shadowed by frustrum.
-//printf("CULLFRUST!\n");
+    count_cull_frust++;
     return false;
   }
-//printf ("ENTER (%f,%f,%f)\n", bmax.x-bmin.x, bmax.y-bmin.y, bmax.z-bmin.z);
+  count_cull_not++;
   return true;
 }
 
@@ -1163,10 +1172,16 @@ void csSector::CalculateLighting (csLightView& lview)
   // quad-trees arranged in a cube around the light).
   if (static_tree)
   {
+    count_cull_dist = 0;
+    count_cull_quad = 0;
+    count_cull_frust = 0;
+    count_cull_not = 0;
     static_thing->UpdateTransformation (center);
     static_tree->Front2Back (center, &CalculateLightingPolygonsFB, (void*)&lview,
       	CullOctreeNodeLighting, (void*)&lview);
     CalculateLightingPolygonsFB ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
+    printf ("Cull: dist=%d quad=%d frust=%d not=%d\n",
+    	count_cull_dist, count_cull_quad, count_cull_frust, count_cull_not);
   }
   else
   {

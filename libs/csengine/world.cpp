@@ -194,7 +194,7 @@ csWorld::csWorld () : csObject (), start_vec (0, 0, 0)
 
   csVector3 min_qbox (-10, -10, -10);
   csVector3 max_qbox (10, 10, 10);
-  CHK (quadcube = new csQuadcube (min_qbox, max_qbox, 5)); //@@@ SET HIGHER
+  CHK (quadcube = new csQuadcube (min_qbox, max_qbox, 8));
 
   CHK (render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory()));
   CHK (lightpatch_pool = new csLightPatchPool ());
@@ -325,9 +325,13 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
 
   StartWorld ();
 
-
 //quadcube->MakeEmpty ();
 //csVector3 poly[10];
+//poly[0] = csVector3 (10, 5, 5);
+//poly[1] = csVector3 (10, 5, -5);
+//poly[2] = csVector3 (10, -5, -5);
+//poly[3] = csVector3 (10, -5, 5);
+
 //poly[0] = csVector3 (-50, 50, 10);
 //poly[1] = csVector3 (50, 50, 10);
 //poly[2] = csVector3 (50, -50, 10);
@@ -337,9 +341,14 @@ bool csWorld::Initialize (ISystem* sys, IGraphics3D* g3d, csIniFile* config, csV
 //poly[1] = csVector3 (5, -5, -10);
 //poly[2] = csVector3 (5, 5, -10);
 //poly[3] = csVector3 (-5, 5, -10);
+
+//poly[0] = csVector3 (-15, 15, 10);
+//poly[1] = csVector3 (15, 15, 10);
+//poly[2] = csVector3 (15, -15, 10);
+//poly[3] = csVector3 (-15, -15, 10);
+
 //quadcube->InsertPolygon (poly, 4);
 //Dumper::dump (quadcube);
-
 
   return true;
 }

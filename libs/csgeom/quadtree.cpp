@@ -154,6 +154,9 @@ bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
     // of the node has changed (note that going from
     // CS_QUAD_PARTIAL to CS_QUAD_PARTIAL is also seen as a state
     // change because this means that the polygon may be visible here).
+//@@@The following line is not completely correct but it improves
+//speed a LOT!
+node->SetState (CS_QUAD_FULL);
     return true;
   }
   else
@@ -196,7 +199,8 @@ bool csQuadtree::InsertPolygon (csVector3* verts, int num_verts)
   bool i01 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (1));
   bool i11 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (2));
   bool i10 = csFrustrum::Contains (verts, num_verts, plane_normal, root->GetCorner (3));
-  return InsertPolygon (root, verts, num_verts, i00, i01, i11, i10);
+  bool rc = InsertPolygon (root, verts, num_verts, i00, i01, i11, i10);
+  return rc;
 }
 
 bool csQuadtree::TestPolygon (csQuadtreeNode* node,
