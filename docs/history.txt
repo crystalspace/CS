@@ -35,6 +35,9 @@ The history order is reversed so that new features are at the top.
 	  csCommandLineHelper.
 	- Fixed csView::SetEngine(), SetCamera(), and SetContext() which
 	  were doing IncRef()/DecRef() in wrong order.
+	- Also fixed the dangling references on the reporter and reporter
+	  listener. The reporter listener should not keep a permanent
+	  reference to the reporter.
 17-Oct-2001
 	- M Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up

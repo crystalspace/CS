@@ -117,7 +117,6 @@ csReporterListener::~csReporterListener ()
   // DontUseMeAnymoreSincerelyYourReporterOfChoice () which is called by
   // iReporter destructor for all listeners still in the listenerqueue
   //  .. norman
-  if (reporter) reporter->DecRef ();
   iReporter *rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
   {
@@ -212,10 +211,13 @@ void csReporterListener::SetDefaults ()
   if (reporter)
   {
     reporter->RemoveReporterListener (&scfiReporterListener);
-    reporter->DecRef ();
   }
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  if (reporter) reporter->AddReporterListener (&scfiReporterListener);
+  if (reporter)
+  {
+    reporter->AddReporterListener (&scfiReporterListener);
+    reporter->DecRef ();
+  }
   delete[] debug_file;
   debug_file = csStrNew ("debug.txt");
 }
