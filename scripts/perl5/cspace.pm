@@ -4388,6 +4388,8 @@ package cspace::iSector;
 %ITERATORS = ();
 *GetPrivateObject = *cspacec::iSector_GetPrivateObject;
 *QueryObject = *cspacec::iSector_QueryObject;
+*SetRenderLoop = *cspacec::iSector_SetRenderLoop;
+*GetRenderLoop = *cspacec::iSector_GetRenderLoop;
 *HasFog = *cspacec::iSector_HasFog;
 *GetFog = *cspacec::iSector_GetFog;
 *SetFog = *cspacec::iSector_SetFog;
