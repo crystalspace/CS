@@ -5,8 +5,8 @@ SubDir TOP ;
 
 # Common include directories.
 IncludeDir ;
-IncludeDir "include" ;
 IncludeDir $(BUILDTOP) include : : ignoresubdir ;
+IncludeDir "include" ;
 
 # Define our compile groups
 Description sounddrivers : "sound drivers" ;

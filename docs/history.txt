@@ -21,6 +21,9 @@ chronological order.
 	  CD system so it fits better in csColliderHelper.
 	- aarobber added a Clone function to iMeshObject.  None of them are
 	  currently implemented and will return 0.
+	- Jorrit changed the order of the include directories in Jamfile.in
+	  so that $(BUILDTOP) include is used before the global include
+	  in CS. That fixes compilation of CS in another build dir.
 2-Jun-2004
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where
