@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	- res changed the proctex loader to support plugins. Specifying a
 	  proctex the 'old' style will result in a notification.
 	- res wrote a plugin wrapping the four built-in proctexes.
+	- res also moved the <plugins> block in flarge since they are needed
+	  before the textures now.
 6-May-2003
 	- Eric Sunshine made the following changes:
 	    - Fixed Linux joystick makefile so that makefile target and
