@@ -281,7 +281,7 @@ void csSoundSourceOpenAL::Play(unsigned long PlayMethod)
         long bytesleft=SoundHandle->buffer_length;
         long towrite;
 
-        FillMemory(SilenceBuffer,10240, Byte);
+        memset(SilenceBuffer,Byte,10240);
 
         while (bytesleft)
         {
@@ -340,8 +340,6 @@ void csSoundSourceOpenAL::NotifyStreamEnd()
 //  Here we check for the last of the buffers to finish emptying.
 void csSoundSourceOpenAL::WatchBufferEnd()
 {
-  int buffer_index;
-  int bufferqueuedcount;
   ALuint use_buffer;
   ALint lasterror;
 
@@ -362,11 +360,9 @@ void csSoundSourceOpenAL::WatchBufferEnd()
   if (sourcestate!=AL_PLAYING && sourcestate!=AL_PAUSED)
     SourcePlaying=false;
 
-  /* Clear the last error value - I don't know if this is necessary, the OpenAL spec isn't clear on wether
-  *  alGetError() is reset to AL_NO_ERROR after each OpenAL call, or if it's reset after alGetError().
-  * We cover both possibilities here.  There should be no harm in doing this and no real performance hit.
-  *
-  */
+  /* Clear the last error value. This is required per 
+   * ftp://opensource.creative.com/pub/sdk/OpenAL_PGuide.pdf
+   */  
   lasterror=alGetError ();
   lasterror=AL_NO_ERROR;
 
@@ -409,11 +405,9 @@ void csSoundSourceOpenAL::Write(void *Data, unsigned long NumBytes)
     "There are %d buffers queued and %d buffers processed.",queued,processed);
 #endif
 
-  /* Clear the last error value - I don't know if this is necessary, the OpenAL spec isn't clear on wether
-  *  alGetError() is reset to AL_NO_ERROR after each OpenAL call, or if it's reset after alGetError().
-  * We cover both possibilities here.  There should be no harm in doing this and no real performance hit.
-  *
-  */
+  /* Clear the last error value. This is required per 
+   * ftp://opensource.creative.com/pub/sdk/OpenAL_PGuide.pdf
+   */  
   lasterror=alGetError ();
   lasterror=AL_NO_ERROR;
 

@@ -32,7 +32,7 @@ csSoundHandleOpenAL::csSoundHandleOpenAL(csSoundRenderOpenAL *srdr, iSoundData *
   local_buffer=NULL;  
 
   NumSamples = snd->IsStatic() ? snd->GetStaticSampleCount() :
-  (((float)(snd->GetFormat()->Freq)) * BufferLengthSeconds);
+  (long int)(((float)(snd->GetFormat()->Freq)) * BufferLengthSeconds);
 
   buffer_length=(NumSamples* snd->GetFormat()->Bits * snd->GetFormat()->Channels)/8;
   if (LocalBuffer)
@@ -82,11 +82,9 @@ void csSoundHandleOpenAL::Update_Time(csTicks Time)
 
 void csSoundHandleOpenAL::UpdateCount(long NumSamples)
 {
-  int32 freespace;
   csSoundSourceOpenAL *src;
   long Num;
   long bytespersample;
-  bool noneplaying=true;
 
 
   // If the stream is not active, allow the source to check for buffer end

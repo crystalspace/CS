@@ -4,6 +4,10 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 9-Apr-2003
+        - Rhad fixed OpenAL compile with compilers other than MSVC.
+          - Changed FillMemory() to memset()
+          - Removed some unused local variables
+          - Clarified some comments
         - Boyan added boolean property "Stretched" on AWS Command Button
 	- Matze
 	  - fixed (blindly) lots of errors when using the jambuild on  macosx.
