@@ -34,6 +34,7 @@
 #include "csutil/util.h"
 #include "iobject/object.h"
 #include "igraphic/imageio.h"
+#include "imesh/object.h"
 
 
 IMPLEMENT_IBASE (csIsoEngine)
@@ -322,3 +323,46 @@ int csIsoEngine::GetNumMaterials() const
 {
   return materials.Length();
 }
+
+
+iMeshObjectFactory *csIsoEngine::CreateMeshFactory(const char* classId,
+    const char *name) 
+{
+  if(name && FindMeshFactory(name))
+    return FindMeshFactory(name);
+  iMeshObjectType *mesh_type = QUERY_PLUGIN_CLASS (system, classId, "MeshObj", 
+    iMeshObjectType);
+  if(!mesh_type) mesh_type = LOAD_PLUGIN( system, classId,  "MeshObj", 
+    iMeshObjectType);
+  if(!mesh_type) return NULL;
+  iMeshObjectFactory *mesh_fact = mesh_type->NewFactory();
+  if(!mesh_fact) return NULL;
+  AddMeshFactory(mesh_fact, name);
+  mesh_fact->DecRef();
+  return mesh_fact;
+}
+
+void csIsoEngine::AddMeshFactory(iMeshObjectFactory *fact, const char *name)
+{
+  if(name && FindMeshFactory(name))
+    return;
+  fact->IncRef();
+  meshfactories.Push(new csIsoObjWrapper(fact, name));
+}
+
+iMeshObjectFactory *csIsoEngine::FindMeshFactory(const char *name)
+{
+  return (iMeshObjectFactory *)meshfactories.FindContentByName(name);
+}
+
+void csIsoEngine::RemoveMeshFactory(const char *name)
+{
+  int idx = meshfactories.FindIndexByName(name);
+  if(idx==-1) return;
+  csIsoObjWrapper *wrap = (csIsoObjWrapper*) meshfactories.Get(idx);
+  meshfactories.Delete(idx);
+  if(wrap->GetContent())
+    wrap->GetContent()->DecRef();
+  delete wrap;
+}
+

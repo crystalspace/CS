@@ -21,9 +21,75 @@
 
 #include "ivaria/iso.h"
 #include "isomater.h"
+#include "csutil/csvector.h"
+#include "csobject/csobject.h"
+
+/// generic wrapper around iBase that is a csObject 
+class csIsoObjWrapper : public csObject
+{
+public:
+  iBase *content;
+public:
+  csIsoObjWrapper() {content = NULL;}
+  csIsoObjWrapper(iBase *p) {content = p;}
+  csIsoObjWrapper(iBase *p, const char* name) {content = p; SetName(name);}
+  /// you must decref content on your own
+  virtual ~csIsoObjWrapper() {}
+  /// get content
+  iBase* GetContent() const {return content;}
+  /// set content
+  void SetContent(iBase *p) {content = p;}
+};
+
+/// a basicvector - with csIsoObjWrapper contents that supports names.
+class csIsoNamedVector : public csBasicVector
+{
+public:
+  /// create
+  csIsoNamedVector(int ilimit = 0, int ithreshold = 0) 
+    : csBasicVector(ilimit, ithreshold) {}
+  /// delete, but and the wrapperobjects in it (but no decref of content)
+  ~csIsoNamedVector() {for(int i=0; i<Length(); i++) 
+    delete (csIsoObjWrapper*)Get(i); }
+
+  /// find a wrapper by name
+  csIsoObjWrapper *FindByName(const char* name) const
+  {
+    for(int i=0; i<Length(); i++)
+    {
+      csIsoObjWrapper *o = (csIsoObjWrapper*)Get(i);
+      if(o->GetName() && (strcmp(o->GetName(), name) == 0))
+	return o;
+    }
+    return NULL;
+  }
+  /// find iBase by name
+  iBase *FindContentByName(const char* name) const
+  {
+    for(int i=0; i<Length(); i++)
+    {
+      csIsoObjWrapper *o = (csIsoObjWrapper*)Get(i);
+      if(o->GetName() && (strcmp(o->GetName(), name) == 0))
+	return o->GetContent();
+    }
+    return NULL;
+  }
+  /// find index by name, -1 means not found
+  int FindIndexByName(const char* name) const
+  {
+    for(int i=0; i<Length(); i++)
+    {
+      csIsoObjWrapper *o = (csIsoObjWrapper*)Get(i);
+      if(o->GetName() && (strcmp(o->GetName(), name) == 0))
+	return i;
+    }
+    return -1;
+  }
+};
+
 
 /**
- *
+ * This class implements the isometric engine.
 */
 class csIsoEngine : public iIsoEngine {
 private:
@@ -37,6 +103,8 @@ private:
   iTextureManager* txtmgr;
   /// the material list
   csIsoMaterialList materials;
+  /// mesh factories list (iMeshObjectFactory *)
+  csIsoNamedVector meshfactories;
 
   /// current world
   iIsoWorld *world;
@@ -87,7 +155,11 @@ public:
   virtual void RemoveMaterial(const char *name);
   virtual void RemoveMaterial(int index);
   virtual int GetNumMaterials() const ;
-
+  virtual iMeshObjectFactory *CreateMeshFactory(const char* classId,
+      const char *name);
+  virtual void AddMeshFactory(iMeshObjectFactory *fact, const char *name);
+  virtual iMeshObjectFactory *FindMeshFactory(const char *name);
+  virtual void RemoveMeshFactory(const char *name);
 };
 
 #endif

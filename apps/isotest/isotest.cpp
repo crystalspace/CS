@@ -268,13 +268,10 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   //res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(20,0,10));
   //printf("Hitbeam gave %d\n", (int)res);
 
-
   /// create a mesh object
   const char* classId = "crystalspace.mesh.object.cube";
-  //const char* classId = "crystalspace.mesh.object.sprite.2d";
-  iMeshObjectType *mesh_type = LOAD_PLUGIN( System, classId, 
-    "MeshObj", iMeshObjectType);
-  iMeshObjectFactory *mesh_fact = mesh_type->NewFactory();
+  iMeshObjectFactory *mesh_fact = engine->CreateMeshFactory(classId, 
+    "cubeFact");
 
   ///*
   iCubeFactoryState* cubelook = QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
@@ -310,10 +307,11 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   //meshspr->SetZBufMode(CS_ZBUF_NONE);
   meshspr->SetPosition( csVector3(12 + 0.5, +0.5, 2+0.5) );
   world->AddSprite(meshspr);
+
+  //player = meshspr;
   
   const char* fo_classId = "crystalspace.mesh.object.fountain";
-  mesh_type = LOAD_PLUGIN( System, fo_classId, "MeshObj", iMeshObjectType);
-  mesh_fact = mesh_type->NewFactory();
+  mesh_fact = engine->CreateMeshFactory(fo_classId, "fountainFact");
 
   mesh_obj = mesh_fact->NewInstance();
   iParticleState *pastate = QUERY_INTERFACE(mesh_obj, iParticleState);

@@ -50,6 +50,7 @@ struct G3DPolygonDPFX;
 struct iMeshObject;
 struct iCamera;
 struct iLight;
+struct iMeshObjectFactory;
 
 SCF_VERSION (iIsoEngine, 0, 0, 1);
 
@@ -118,6 +119,16 @@ struct iIsoEngine : public iPlugIn
   virtual void RemoveMaterial(int index) = 0;
   /// get the possible number of materials (indices 0..n-1), some are NULL.
   virtual int GetNumMaterials() const = 0;
+
+  /// load and add a mesh factory, given classID under given name.
+  virtual iMeshObjectFactory *CreateMeshFactory(const char* classId,
+    const char *name) = 0;
+  /// add a mesh factory, to the list of mesh factories under given name.
+  virtual void AddMeshFactory(iMeshObjectFactory *fact, const char *name) = 0;
+  /// find a mesh factory by name
+  virtual iMeshObjectFactory *FindMeshFactory(const char *name) = 0;
+  /// remove a mesh factory
+  virtual void RemoveMeshFactory(const char *name) = 0;
 
 };
 
