@@ -353,7 +353,7 @@ csPtr<iModelData> csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
       // swap y and z
       float t = v.y;
       v.y = v.z;
-      v.z = v.y;
+      v.z = t;
       
       VertexFrame->AddVertex (v);
     }	
