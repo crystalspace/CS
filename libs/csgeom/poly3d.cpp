@@ -185,6 +185,7 @@ int csPoly3D::ClassifyX (float x) const
       back++;
   }
 
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
   if (back == 0) return CS_POL_FRONT;
   if (front == 0) return CS_POL_BACK;
   return CS_POL_SPLIT_NEEDED;
@@ -204,6 +205,7 @@ int csPoly3D::ClassifyY (float y) const
       back++;
   }
 
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
   if (back == 0) return CS_POL_FRONT;
   if (front == 0) return CS_POL_BACK;
   return CS_POL_SPLIT_NEEDED;
@@ -223,6 +225,7 @@ int csPoly3D::ClassifyZ (float z) const
       back++;
   }
 
+  if (back == 0 && front == 0) return CS_POL_SAME_PLANE;
   if (back == 0) return CS_POL_FRONT;
   if (front == 0) return CS_POL_BACK;
   return CS_POL_SPLIT_NEEDED;
