@@ -65,10 +65,7 @@ TO_INSTALL.CONFIG += $(CFG.SOFT3D)
 MSVC.DSP += SOFT3D
 DSP.SOFT3D.NAME = soft3d
 DSP.SOFT3D.TYPE = plugin
-DSP.SOFT3D.RESOURCES = \
-  plugins/video/renderer/software/i386/scanln16vc.h \
-  plugins/video/renderer/software/i386/scanln8vc.h \
-  $(wildcard plugins/video/renderer/software/*.inc)
+DSP.SOFT3D.RESOURCES = $(wildcard plugins/video/renderer/software/*.inc)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
