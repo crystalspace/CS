@@ -57,13 +57,19 @@ PyMethodDef PytocsMethods[]={
   {NULL, NULL, 0, ""}
 };
 
-extern "C" void init_cspace();
+#ifdef USE_NEW_CSPYTHON_PLUGIN
+#	define SWIG_INIT init_cspace
+#else
+#	define SWIG_INIT initcspacec
+#endif
+
+extern "C" void SWIG_INIT();
 
 //TODO temporary
 
 void InitPytocs() {
   Py_InitModule("pytocs", PytocsMethods);
-  init_cspace();
+  SWIG_INIT();
 //TODO temporary
 }
 

@@ -27,6 +27,8 @@
 	$CRYSTAL/scripts/python can be found by python. And don't forget
 	to set the CRYSTAL environment variable.
 	See $CRYSTAL/scripts/python/testpymod.py for an example of usage.
+
+	NOTE: tested with swig 1.3.17, swig 1.1 won't work!
 */
 
 %module cspace

@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+8-Jan-2002
+	- Committed a 'backwards compatibility' set from Rene Jager for the
+	  Python plugin and SWIG 1.1. The new cspython plugin is built when\
+	  USE_NEW_CSPYTHON_PLUGIN=yes during make. It is now put in
+	  mk/local.mak.
 7-Jan-2002
 	- Keith Fulton added SetReverseAction to the Sprite3d so that
 	  they can walk backwards without defining a new action.  Call this

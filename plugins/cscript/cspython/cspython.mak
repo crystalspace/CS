@@ -3,8 +3,8 @@ ifneq (,$(findstring cspython,$(PLUGINS)))
 
 # Plugin description
 DESCRIPTION.cspython = Crystal Script Python plug-in
+DESCRIPTION.cspymod = Crystal Space Python module
 DESCRIPTION.cspythonswig = Crystal Script Python SWIG interface
-DESCRIPTION.cspymod = Crystal Script Python module
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -12,6 +12,10 @@ ifeq ($(MAKESECTION),rootdefines)
 # Plugin-specific help commands
 PLUGINHELP += \
   $(NEWLINE)echo $"  make cspython     Make the $(DESCRIPTION.cspython)$"
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
+PLUGINHELP += \
+  $(NEWLINE)echo $"  make cspymod      Make the $(DESCRIPTION.cspymod)$"
+endif
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -19,12 +23,18 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: cspython cspythonclean cspythonswig
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
 all plugins: cspython cspymod
+else
+all plugins: cspython
+endif
 
 cspython:
 	$(MAKE_TARGET) MAKE_DLL=yes
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
 cspymod:
 	$(MAKE_TARGET) MAKE_DLL=yes
+endif
 cspythonclean:
 	$(MAKE_CLEAN)
 cspythonswig:
@@ -36,6 +46,9 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 PYTHON.CFLAGS += -DSWIG_GLOBAL
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
+  PYTHON.CFLAGS += -DUSE_NEW_CSPYTHON_PLUGIN
+endif
 
 ifeq ($(USE_PLUGINS),yes)
   CSPYTHON = $(OUTDLL)/cspython$(DLL)
@@ -50,14 +63,20 @@ else
   TO_INSTALL.STATIC_LIBS += $(CSPYTHON)
 endif
 
-CSPYMOD = scripts/python/_cspace$(DLL)
-LIB.CSPYMOD = $(LIB.CSPYTHON)
-LIB.CSPYMOD.LOCAL = $(LIB.CSPYTHON.LOCAL)
-TO_INSTALL.DYNAMIC_LIBS += $(CSPYMOD)
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
+  CSPYMOD = scripts/python/_cspace$(DLL)
+  LIB.CSPYMOD = $(LIB.CSPYTHON)
+  LIB.CSPYMOD.LOCAL = $(LIB.CSPYTHON.LOCAL)
+  TO_INSTALL.DYNAMIC_LIBS += $(CSPYMOD)
+endif
 
 TO_INSTALL.EXE += python.cex
 
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
 SWIG.INTERFACE = include/ivaria/cspace.i
+else
+SWIG.INTERFACE = include/ivaria/cs.i
+endif
 SWIG.CSPYTHON = plugins/cscript/cspython/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 
@@ -87,9 +106,15 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: cspython cspythonclean cspythonswig csjavaswigclean
 
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
 all: $(CSPYTHON.LIB) $(CSPYMOD.LIB)
+else
+all: $(CSPYTHON.LIB)
+endif
 cspython: $(OUTDIRS) $(CSPYTHON) python.cex
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
 cspymod: $(CSPYMOD) python.cex
+endif
 clean: cspythonclean
 
 $(SWIG.CSPYTHON.OBJ): $(SWIG.CSPYTHON)
@@ -105,8 +130,14 @@ ifeq (,$(SWIGBIN))
   SWIGBIN = swig
 endif
 
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
+  SWIGFLAGS=-python -c++ -shadow -Iinclude/ -DUSE_NEW_CSPYTHON_PLUGIN
+else
+  SWIGFLAGS=-python -c++ -docstring -dascii -Sbefore -shadow -Iinclude/
+endif
+
 $(SWIG.CSPYTHON): $(SWIG.INTERFACE)
-	$(SWIGBIN) -python -c++ -shadow -Iinclude/ -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
+	$(SWIGBIN) $(SWIGFLAGS) -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
 	$(MV) plugins/cscript/cspython/cspace.py scripts/python/
 
 python.cex: plugins/cscript/cspython/python.cin
@@ -124,10 +155,12 @@ $(CSPYTHON): $(OBJ.CSPYTHON) $(LIB.CSPYTHON)
 	$(DO.PLUGIN.CORE) $(LIB.CSPYTHON.LOCAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
+ifeq ($(USE_NEW_CSPYTHON_PLUGIN),yes)
 $(CSPYMOD): $(OBJ.CSPYMOD) $(LIB.CSPYMOD)
 	$(DO.PLUGIN.PREAMBLE) \
 	$(DO.PLUGIN.CORE) $(LIB.CSPYMOD.LOCAL) \
 	$(DO.PLUGIN.POSTAMBLE)
+endif
 
 cspythonclean:
 	-$(RM) $(CSPYTHON) $(OBJ.CSPYTHON) $(TRASH.CSPYTHON) python.cex
