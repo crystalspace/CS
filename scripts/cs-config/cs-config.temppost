@@ -9,7 +9,6 @@ depends()
 	-lcsgfx) DEPS="-lcssys -lcsutil";;
 	-lcstool) DEPS="-lcsutil -lcssys -lcsgeom";;
 	-lcsws) DEPS="-lcsgfx -lcsgeom -lcsutil -lcssys";;
-	-lcsphyzik) DEPS="-lcsgeom -lcsutil -lcssys";;
 	*)
 	    CEXFILE=`echo "$1.cex" | sed -e "s/\-l//"`
 	    findcexfile "$CEXFILE"
@@ -62,7 +61,6 @@ Libraries:
 	csengine
 	csgeom
 	csgfx
-	csphyzik
 	cssys
 	cstool
 	csutil
@@ -246,9 +244,6 @@ while test $# -gt 0; do
 	;; 
     csws)
 	addlib "-lcsws"
-	;;
-    csphyzik)
-	addlib "-lcsphyzik"
 	;;
     *)
 	findcexfile "$1"

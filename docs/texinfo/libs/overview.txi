@@ -52,8 +52,4 @@ Basic image support.
 @item csWS
 A window system nicely integrated with Crystal Space. It is also platform
 independent, as it is based on the CS graphics drivers. @xref{CSWS}.
-
-@item csPhyzik
-This module supports calculation of various physical properties.
-@xref{csPhyziks}.
 @end table

@@ -65,8 +65,6 @@ than actually linking with a library.
 @itemize @minus
 @item
 @code{csws}
-@item
-@code{csphyzik}
 @end itemize
 
 @item Level 6: @emph{Application}

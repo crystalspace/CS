@@ -854,8 +854,8 @@ Stephan added makefile targets for full dynamic linking.
 @item
 Michael Ewert (@email{mewert99@@yahoo.com})
 
-Michael contributed the @file{csPhyzik} library to Crystal Space and also a
-test application.
+Michael contributed the now defunct @file{csPhyzik} library to Crystal Space
+and also a test application.
 
 @item
 Void (@email{glitia@@texnet.ro})

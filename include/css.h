@@ -384,46 +384,6 @@
 #include "csgfx/xorpat.h"
 #endif
 
-// CS Phyzik
-#ifndef NO_CSPHYZIK
-#include "csphyzik/articula.h"
-#include "csphyzik/bodyforc.h"
-#include "csphyzik/contact.h"
-#include "csphyzik/ctcat.h"
-#include "csphyzik/ctcontct.h"
-#include "csphyzik/ctmatrix.h"
-#include "csphyzik/ctmspat.h"
-#include "csphyzik/ctquat.h"
-#include "csphyzik/ctvector.h"
-#include "csphyzik/ctvspat.h"
-#include "csphyzik/debug.h"
-#include "csphyzik/entity.h"
-#include "csphyzik/feathers.h"
-#include "csphyzik/force.h"
-#include "csphyzik/forces.h"
-#include "csphyzik/ik.h"
-#include "csphyzik/joint.h"
-#include "csphyzik/kinemat.h"
-#include "csphyzik/linklist.h"
-#include "csphyzik/math3d.h"
-#include "csphyzik/mathutil.h"
-#include "csphyzik/mc.h"
-#include "csphyzik/mtrxutil.h"
-#include "csphyzik/odesolve.h"
-#include "csphyzik/phyzent.h"
-#include "csphyzik/phyziks.h"
-#include "csphyzik/phyztype.h"
-#include "csphyzik/point.h"
-#include "csphyzik/ptforce.h"
-#include "csphyzik/ptmass.h"
-#include "csphyzik/qtrbconn.h"
-#include "csphyzik/qtrigid.h"
-#include "csphyzik/refframe.h"
-#include "csphyzik/rigidbod.h"
-#include "csphyzik/solver.h"
-#include "csphyzik/world.h"
-#endif
-
 // CSWS
 #ifndef NO_CSWS
 #include "csws/csws.h"

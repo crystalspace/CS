@@ -39,7 +39,6 @@
 #include "iengine/mesh.h"
 #include "cssys/csendian.h"
 #include "qsqrt.h"
-#include "csphyzik/mathutil.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -51,7 +50,6 @@ CS_IMPLEMENT_PLUGIN
 
 // Set the default lod used.
 #define DEFAULT_LOD 1
-
 
 
 //--------------------------------------------------------------------------
@@ -1613,7 +1611,7 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
       if (current_time > last_time+
       	cur_action->GetFrameDelay (cur_frame)/speedfactor)
       {
-        last_time += cur_action->GetFrameDelay (cur_frame)/speedfactor;
+        last_time += csTicks(cur_action->GetFrameDelay (cur_frame)/speedfactor);
         cur_frame++;
         if (cur_frame >= cur_action->GetFrameCount ())
         {

@@ -132,10 +132,6 @@ The graphics library. Here you will find bumpmapping, mipmapping, quantizers,
 and routines to support loading an image file (through the various image
 loading plug-ins).
 
-@item CS/libs/csphyzik
-The phyzik library. A collection of algorithms for simulating the real-world
-physics of motion. A solver for friction, joints, kinematics, and more.
-
 @item CS/libs/cssys
 All system-dependent source and make files (non-graphics and non-sound related)
 are located here.

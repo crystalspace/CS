@@ -88,12 +88,6 @@ free-form, dynamic blob.
 @item perftest
 This is a tool to test graphics performance.
 
-@cindex @file{phyztest}
-@cindex Applications, @file{phyztest}
-@item phyztest
-This application tests the physics library for proper operation.
-@xref{csPhyziks}.
-
 @cindex @file{pysimp}
 @cindex Applications, @file{pysimp}
 @item pysimp
