@@ -96,9 +96,12 @@ public:
   /// Set vector length to n.
   void SetLength (int n)
   {
-    // Free all items between new count and old count.
+    // Clear all items between new count and old count.
     int i;
-    for (i = n ; i < count ; i++) { delete[] root[i]; root[i] = 0; }
+    for (i = n ; i < count ; i++)
+    { 
+      root[i] = 0;
+    }
 
     int old_count = count;
     count = n;
