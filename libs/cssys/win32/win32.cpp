@@ -61,7 +61,7 @@ extern void cleanup();
 
 void sys_fatalerror(char *s)
 {
-  CsPrintf (MSG_FATAL_ERROR, "%s", s);
+  csSystemDriver::Printf (MSG_FATAL_ERROR, "%s", s);
   cleanup ();
   exit (1);
 }
