@@ -1,0 +1,15 @@
+This file lists all API changes which have happened after 0.14
+was released. This file may help you convert your application
+to 0.16 when that will be released. It can also help you convert
+to 0.15 if you want to do that.
+
+csSector::UseStaticBSP(int mode = BSP_MINIMIZE_SPLITS) has changed to
+csSector::UseStaticTree(int mode = BSP_MINIMIZE_SPLITS, bool octree = false).
+
+Added void csPolygonSet::GetBoundingBox(csVector3& min_bbox, csVector3& max_bbox).
+
+Added const csReversibleTransform& csPortal::GetWarp ().
+
+csBspTree inherits from new class csPolygonTree.
+Added csOctree which also inherits from csPolygonTree.
+
