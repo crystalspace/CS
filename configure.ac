@@ -1010,18 +1010,19 @@ AC_DEFUN([CS_CHECK_OPTIMIZE_FLAGS],
 	[cs_cv_prog_cxx_optimize],
 	[CS_CREATE_TUPLE([-O3]) CS_CREATE_TUPLE([-O2]) CS_CREATE_TUPLE([-O])],
 	[C++], [CFLAGS.optimize], [+], [],
-	[cs_optimize_flags="$cs_optimize_flags $cs_build_cflags"])
+	[cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_optimize"])
 
     CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -fomit-frame-pointer],
 	[cs_cv_prog_cxx_omit_frame_pointer],
 	[CS_CREATE_TUPLE([-fomit-frame-pointer])],
 	[C++], [CFLAGS.optimize], [+], [],
-	[cs_optimize_flags="$cs_optimize_flags $cs_build_cflags"])
+	[cs_optimize_flags="$cs_optimize_flags \
+	    $cs_cv_prog_cxx_omit_frame_pointer"])
 
     CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -ffast-math],
 	[cs_cv_prog_cxx_fast_math],
 	[CS_CREATE_TUPLE([-ffast-math])], [C++], [CFLAGS.optimize], [+], [],
-	[cs_optimize_flags="$cs_optimize_flags $cs_build_cflags"])])
+	[cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_fast_math"])])
 
 CS_CHECK_OPTIMIZE_FLAGS
 
@@ -1303,14 +1304,22 @@ CS_CHECK_LIB_WITH([z], [AC_LANG_PROGRAM([#include <zlib.h>], [zlibVersion()])],
 
 #------------------------------------------------------------------------------
 # Check for libpng.  In addition to the standard installed locations, we also
-# search CS/libs/libpng*.
+# search CS/libs/libpng*.  Some platforms, such as RedHat 8.x require libm.a to
+# be linked with libpng, so use libm.a if available.
 #------------------------------------------------------------------------------
+AC_DEFUN([CS_CHECK_LIBPNG_PREPARE],
+    [AC_REQUIRE([CS_CHECK_COMMON_LIBS])])
+
 AS_IF([test "$cs_cv_libz" = yes],
-    [CS_CHECK_LIB_WITH([png],
+    [CS_CHECK_LIBPNG_PREPARE
+    CS_CHECK_LIB_WITH([png],
 	[AC_LANG_PROGRAM([#include <png.h>],
 	    [png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0)])],
-	[libs/libpng*], [], [CS_MAKEFILE_BUILD_RESULT([cs_cv_libpng], [PNG])],
-	[], [$cs_cv_libz_cflags], [$cs_cv_libz_lflags], [$cs_cv_libz_libs])])
+	[libs/libpng*], [],
+	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libpng], [PNG])], [],
+	[$cs_cv_libz_cflags $cs_cv_libm_cflags],
+	[$cs_cv_libz_lflags $cs_cv_libm_lflags],
+	[$cs_cv_libz_libs $cs_cv_libm_libs])])
 
 
 
@@ -1820,10 +1829,11 @@ AS_IF([test $cs_cv_cxx_new_casts = no],
 #	Check if gcc is able to understand CS/include/qsqrt.h.  This test will
 #	catch not only versions of gcc which do not understand the assembly
 #	content, but also buggy versions which fail with an internal error on
-#	this file (such as the RedHat 7 gcc).  Furthermore, check if qsqrt()
-#	actually returns reasonable results with compiler optimizations
-#	enabled, since it is reported that some versions of gcc 3.2.x return
-#	incorrect results, such as qsqrt(1)=0.  Sets the shell variable
+#	this file (such as the RedHat 7 gcc).  Furthermore, it is reported that
+#	some versions of gcc 3.2.x cause qsqrt() to return bogus results when
+#	compiled in optimize mode.  It is reported that this same compiler
+#	crashes with an internal error when -fPIC is used, so we use -fPIC as a
+#	way to detect this buggy compiler.  Sets the shell variable
 #	cs_cv_cxx_qsqrt_ok to "yes" if qsqrt.h is usable, otherwise "no".
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_QSQRT],
@@ -1831,21 +1841,21 @@ AC_DEFUN([CS_CHECK_QSQRT],
     AC_REQUIRE([AC_PROG_CXX])
     AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
     AS_IF([test $ac_compiler_gnu = yes],
-	[AC_CACHE_CHECK([if qsqrt() is usable], [cs_cv_cxx_qsqrt_ok],
-	    [AC_LANG_PUSH([C++])
-	    cs_cflags_save="$CXXFLAGS"
-	    CXXFLAGS="$CXXFLAGS -fPIC $cs_optimize_flags"
-	    AC_RUN_IFELSE(
+	[AC_CACHE_CHECK([if $CXX recognizes -fPIC], [cs_cv_prog_cxx_fpic],
+	    [CS_BUILD_IFELSE([], [CS_CREATE_TUPLE([-fPIC])], [C++],
+	    [cs_cv_prog_cxx_fpic=-fPIC], [cs_cv_prog_cxx_fpic=no])])
+	AC_CACHE_CHECK([if qsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
+	    [cs_qsqrt_cflags="$cs_optimize_flags"
+	    AS_IF([test $cs_cv_prog_cxx_fpic != no],
+		[cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_fpic"])
+	    CS_BUILD_IFELSE(
 		[AC_LANG_PROGRAM(
 		    [#define PROC_$cs_host_cpu_normalized
 		    #define COMP_GCC
 		    #include "include/qsqrt.h"],
-		    [float n = qsqrt(1); exit (n == 0);])],
-		[cs_cv_cxx_qsqrt_ok=yes],
-		[cs_cv_cxx_qsqrt_ok=no],
-		[cs_cv_cxx_qsqrt_ok=no])
-	    CXXFLAGS="$cs_cflags_save"
-	    AC_LANG_POP([C++])])],
+		    [float n = qsqrt(1.0f); (void)n;])],
+		[CS_CREATE_TUPLE([$cs_qsqrt_cflags])], [C++],
+		[cs_cv_cxx_qsqrt_ok=yes], [cs_cv_cxx_qsqrt_ok=no])])],
 	[cs_cv_cxx_qsqrt_ok=no])])
 
 CS_CHECK_QSQRT
