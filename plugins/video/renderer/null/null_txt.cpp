@@ -164,11 +164,14 @@ void csTextureMMNull::ComputeMeanColor ()
     {
       csTextureNull *t = (csTextureNull *)tex [i];
       if (!t->image) break;
+      if (flags & CS_TEXTURE_DITHER)
+        csQuantizeRemapDither ((RGBPixel *)t->image->GetImageData (),
+          t->get_size (), t->get_width (), pal, palette_size, t->bitmap, tc);
+      else
+        csQuantizeRemap ((RGBPixel *)t->image->GetImageData (),
+          t->get_size (), t->bitmap, tc);
 
-      csQuantizeRemap ((RGBPixel *)t->image->GetImageData (),
-        t->get_size (), t->bitmap, tc);
-
-      // Very well. Now we don'tex need the iImage anymore, so free it
+      // Very well, we don't need the iImage anymore, so free it
       t->image->DecRef ();
       t->image = NULL;
     }
