@@ -436,12 +436,6 @@ void csGraphics2DGLX::Close(void)
   XSync (dpy, False);
     MouseCursor [i] = None;
   }
-  if (window)
-  {
-    XDestroyWindow (dpy, window);
-    window = 0;
-  }
-
   if ( dispdriver ){
       dispdriver->close();
   }
@@ -452,6 +446,12 @@ void csGraphics2DGLX::Close(void)
     glXDestroyContext(dpy,active_GLContext);
     active_GLContext = NULL;
   }
+  if (window)
+  {
+    XDestroyWindow (dpy, window);
+    window = 0;
+  }
+
   if (leader_window)
   {
     XDestroyWindow (dpy, leader_window);
