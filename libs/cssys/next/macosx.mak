@@ -33,11 +33,13 @@ NEXT.LFLAGS.GENERAL=
 NEXT.LFLAGS.EXE=-framework AppKit -framework Foundation
 NEXT.LFLAGS.EXE.CONSOLE=-framework AppKit -framework Foundation
 NEXT.LFLAGS.DLL=-bundle -framework AppKit -framework Foundation
+
 NEXT.PLUGINS+=video/renderer/opengl
-#NEXT.PLUGINS+=video/canvas/macosx/glosx
-#NEXT.PLUGINS+=video/canvas/macosx/coregraphics
+NEXT.PLUGINS+=video/canvas/macosx/coregraphics
+NEXT.PLUGINS+=video/canvas/macosx/opengl
+NEXT.PLUGINS+=sound/driver/coreaudio
 NEXT.PLUGINS+=sound/renderer/software
-#NEXT.PLUGINS+=sound/driver/coreaudio
+
 NEXT.SYSCONFIG=$(NEWLINE)sh libs/cssys/next/macosx.sh cc>>config.tmp
 
 NEXT.FRIEND=yes
