@@ -117,7 +117,7 @@ csGLGraphics3D::csGLGraphics3D (iBase *parent)
   current_shadow_state = 0;
 
   use_hw_render_buffers = false;
-  stencil_thresshold = 500;
+  stencil_threshold = 500;
   broken_stencil = false;
 
   int i;
@@ -554,7 +554,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   bool do_z_plane_clipping = (clip_z_plane != CS_CLIP_NOT);
 
   bool m_prefer_stencil;
-  if (tri_count > stencil_thresshold) m_prefer_stencil = true;
+  if (tri_count > stencil_threshold) m_prefer_stencil = true;
   else m_prefer_stencil = false;
 
   // First we see how many additional planes we might need because of
@@ -800,19 +800,19 @@ bool csGLGraphics3D::Open ()
     else
       Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is NOT supported.");
 
-  stencil_thresshold = config->GetInt ("Video.OpenGL.StencilThresshold", 500);
+  stencil_threshold = config->GetInt ("Video.OpenGL.StencilThreshold", 500);
   broken_stencil = false;
   if (config->GetBool ("Video.OpenGL.BrokenStencil", false))
   {
     broken_stencil = true;
-    stencil_thresshold = 1000000000;
+    stencil_threshold = 1000000000;
   }
   if (verbose)
     if (broken_stencil)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is broken!");
     else
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is used for objects >= %d triangles.", stencil_thresshold);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Stencil clipping is used for objects >= %d triangles.", stencil_threshold);
     }
 
   shadermgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);

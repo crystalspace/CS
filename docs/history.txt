@@ -30,7 +30,7 @@ chronological order.
 	  clipper if the clipper is not optional. That seems to help a
 	  great deal already.
 	- Jorrit removed the Video.OpenGL.PreferClipPlane setting. Instead
-	  there is now a Video.OpenGL.StencilThresshold setting. This is
+	  there is now a Video.OpenGL.StencilThreshold setting. This is
 	  the number of triangles for a single object after which the
 	  NR GL renderer will use stencil clipping instead of plane
 	  clipping. By default this is set to 500. With this optimization
@@ -40,6 +40,8 @@ chronological order.
 	  Application rule was employgin an incorrect mechanism for detecting
 	  console applications.  Also eliminated hard-coded use of Unix-style
 	  pathnames.
+	- Eric Sunshine performed project-wide spelling correction:
+	    thresshold --> threshold
 15-Apr-2004
 	- Eric Sunshine added a blurb to the Unix and MacOS/X build
 	  instructions cautioning about potential problems caused by
@@ -6116,7 +6118,7 @@ chronological order.
 	  change.  However, the alpha is still to dark in combination with a
 	  lightmap.  The old OpenGL renderer still needs fixing for that.
 	- Jorrit removed support for individual polygon drawing in thing.  This
-	  greatly cleans up thing.  The fastmesh thresshold flag has been
+	  greatly cleans up thing.  The fastmesh threshold flag has been
 	  removed too as this no longer makes sense: all thing meshes are
 	  fastmesh now.
 	- Jorrit removed csPolygon2D in thing mesh plugin completely.  This
@@ -10552,7 +10554,7 @@ chronological order.
 	  and it was very hard to get completely right. It was also not
 	  very efficient.
 	- Jorrit fixed a bug in the engine. It would forget to set the
-	  fastmesh_thresshold from the config. So if you would load a map
+	  fastmesh_threshold from the config. So if you would load a map
 	  without clearing the engine it would use the default 500.
 	- Jorrit fixed Dynavis setup so that it will also switch to debug
 	  mode (for unittest app) in case there is a g3d but the g3d isn't
@@ -14786,7 +14788,7 @@ chronological order.
 	- Software renderer implementation of DrawPolygonMesh now does
 	  backface culling. This makes it a LOT faster and now performance
 	  compares to old style single-polygon drawing.
-	- Because of this optimization I reduced the FastMeshThresshold to
+	- Because of this optimization I reduced the FastMeshThreshold to
 	  10 by default now.
 	- Eric Sunshine made the following changes to configure's OpenGL tests:
 	    - Now checks for opengl32 and cousins before libGL and libMesaGL.
@@ -15002,13 +15004,13 @@ chronological order.
 	  number of polygons after which CS_THING_FASTMESH is automatically
 	  enabled for things (use DrawPolygonMesh then). The default value
 	  is 500:
-	      - Added Engine.FastMeshThresshold config option.
-	      - Added SetFastMeshThresshold() function to iEngine.
-	      - Added GetFastMeshThresshold() function to iEngine.
+	      - Added Engine.FastMeshThreshold config option.
+	      - Added SetFastMeshThreshold() function to iEngine.
+	      - Added GetFastMeshThreshold() function to iEngine.
 	      - Added <fastmesh> keyword to the <settings> block.
 	  Currently this will only work for things that have no portals and
 	  no curves.
-	- Set the fastmesh thresshold in flarge to 10. That causes a few
+	- Set the fastmesh threshold in flarge to 10. That causes a few
 	  objects to use fastmesh now.
 	- Matze Braun added configure tests for: libmikmod, libogg, libvorbis,
 	  libvorbisfile, lib3ds, libode, libopenal, libfreetype2, a switch for

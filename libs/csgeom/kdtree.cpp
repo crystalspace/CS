@@ -244,7 +244,7 @@ float csKDTree::FindBestSplitLocation (int axis, float& split_loc)
     const csBox3& bbox1 = objects[1]->bbox;
     float max0 = bbox0.Max (axis);
     float min1 = bbox1.Min (axis);
-    if (max0 < min1-.01)	// Small thresshold to avoid bad split location.
+    if (max0 < min1-.01)	// Small threshold to avoid bad split location.
     {
       split_loc = max0 + (min1-max0) * 0.5;
       CS_ASSERT (split_loc > max0);
@@ -363,7 +363,7 @@ void csKDTree::DistributeLeafObjects ()
 
   num_objects = 0;
   // @@@ Clean up objects array if there are too many objects?
-  // There should be some thresshold at least.
+  // There should be some threshold at least.
 }
 
 void csKDTree::AddObject (const csBox3& bbox, csKDTreeChild* obj)

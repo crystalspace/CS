@@ -660,10 +660,10 @@ void csLightMap::CalcMaxStatic (int r, int g, int b)
   if (min_static_color_values.green < g) min_static_color_values.green = g;
   if (min_static_color_values.blue < b) min_static_color_values.blue = b;
 
-#define THRESSHOLD 2
-  if (max_static_color_values.red - min_static_color_values.red <= THRESSHOLD &&
-      max_static_color_values.green - min_static_color_values.green <= THRESSHOLD &&
-      max_static_color_values.blue - min_static_color_values.blue <= THRESSHOLD)
+#define THRESHOLD 2
+  if (max_static_color_values.red - min_static_color_values.red <= THRESHOLD &&
+      max_static_color_values.green - min_static_color_values.green <= THRESHOLD &&
+      max_static_color_values.blue - min_static_color_values.blue <= THRESHOLD)
   {
     // Optimize!
     delete[] static_lm;

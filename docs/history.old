@@ -2305,7 +2305,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  operation.  Also added support for an additional offset to the
 	  rotation.
 	- Fixed a bad bug in csRefArray which manifested the first time the
-	  thresshold size was exceeded.
+	  threshold size was exceeded.
 	- Implemented relative move with duration.
 	- Flarge now has a nice animating model using these new sequence
 	  features.

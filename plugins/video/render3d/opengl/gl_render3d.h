@@ -136,7 +136,7 @@ private:
    */
 
   // If number of triangles>this value we use stencil instead of plane clipping.
-  int stencil_thresshold;
+  int stencil_threshold;
   bool broken_stencil;		// Stencil clipping is broken and avoided.
   bool do_near_plane;
   csPlane3 near_plane;
