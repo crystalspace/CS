@@ -1756,13 +1756,18 @@ void CalculateFogPolygon (csRenderView* rview, G3DPolygonDP& poly)
     {
       csVector3 isect;
       float dist1, dist2;
-      // @@@ Plane() is too general. For more efficiency we should use a
-      // more specific function.
       if (fog_info->has_incoming_plane)
-        csIntersect3::Plane (csVector3 (0, 0, 0), v, fog_info->incoming_plane, isect, dist1);
+      {
+	const csPlane& pl = fog_info->incoming_plane;
+	float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
+	dist1 = -pl.DD;// / denom;
+      }
       else
         dist1 = 0;
-      csIntersect3::Plane (csVector3 (0, 0, 0), v, fog_info->outgoing_plane, isect, dist2);
+      const csPlane& pl = fog_info->outgoing_plane;
+      float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
+      dist2 = -pl.DD;// / denom;
+
       // @@@ The following updates are not correct. We should use better formulas
       // to combine several differently colored layers of fog (and different densities).
       poly.fog_info[i].thickness += ABS (dist2-dist1);
