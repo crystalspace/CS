@@ -158,6 +158,8 @@ public:
   ///
   csRenderView (const csRenderView& c);
 
+  virtual ~csRenderView ();
+
   /// Set the engine.
   void SetEngine (csEngine* engine);
   /// Get the engine.
