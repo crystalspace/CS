@@ -45,7 +45,7 @@
 #endif
 
 #include "cssys/system.h"
-
+#include "csinput/csinput.h"
 // Maximal path length
 #ifndef MAXPATHLEN
 #  ifdef _MAX_FNAME
