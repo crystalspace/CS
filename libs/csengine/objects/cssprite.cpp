@@ -779,7 +779,7 @@ void csSprite3D::FixVertexColors ()
 }
 
 csTriangleMesh csSprite3D::mesh;
-float csSprite3D::cfg_lod_detail = 1;
+float csSprite3D::cfg_lod_detail = 30;
 
 // Set the default lighting quality.
 int csSprite3D::lighting_quality = DEFAULT_LIGHTING;
@@ -1085,33 +1085,57 @@ void csSprite3D::Draw (csRenderView& rview)
   }
 
   // Calculate the right LOD level for this sprite.
+
   // Select the appropriate mesh.
   csTriangleMesh* m;
   int* emerge_from = NULL;
   int num_verts;
   float fnum = 0.0f;
-  if (cfg_lod_detail < 0 || cfg_lod_detail == 1)
+
+  // level of detail is cfg_lod_detail squared because the LOD
+  // decreases with distance squared.
+  // cfg_lod_detail is the distance at which you will see full detail
+  float level_of_detail = cfg_lod_detail * cfg_lod_detail;
+
+  if (level_of_detail > 0)
   {
-    m = tpl->GetTexelMesh ();
-    num_verts = tpl->GetNumTexels ();
+    // reduce LOD based on distance from camera to center of sprite
+    csBox3 obox;
+    GetObjectBoundingBox (obox);
+    csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
+    csVector3 wor_center = movable.GetTransform ().This2Other (obj_center);
+    csVector3 cam_origin = rview.GetOrigin ();
+    float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
+    level_of_detail /= wor_sq_dist;
+
+    // reduce LOD based on feild-of-view
+    float aspect = 2 * tan (rview.GetFOVAngle () * M_PI / 360);
+    level_of_detail *= aspect;
   }
-  else
+
+  if (level_of_detail > 0 && level_of_detail < 1)
   {
-    m = &mesh;
     // We calculate the number of vertices to use for this LOD
     // level. The integer part will be the number of vertices.
     // The fractional part will determine how much to morph
     // between the new vertex and the previous last vertex.
-    fnum = cfg_lod_detail*(float)(tpl->GetNumTexels()+1);
+    fnum = level_of_detail * (tpl->GetNumTexels() + 1);
     num_verts = (int)fnum;
     fnum -= num_verts;  // fnum is now the fractional part.
+
     GenerateSpriteLOD (num_verts);
     emerge_from = tpl->GetEmergeFrom ();
+    m = &mesh;
+  }
+  else
+  {
+    num_verts = tpl->GetNumTexels ();
+    m = tpl->GetTexelMesh ();
   }
 
   csVector2* real_uv_verts;
   // Do vertex morphing if needed.
-  if (cfg_lod_detail < 0 || cfg_lod_detail == 1)
+  if (level_of_detail <= 0 || level_of_detail >= 1)
   {
     real_uv_verts = tpl->GetTexels (cf_idx);
   }
