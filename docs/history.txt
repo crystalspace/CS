@@ -18,6 +18,7 @@ chronological order.
 	  the superclass (csImageFile) does that. Solved by overriding the
 	  destructor and FreeImage() and clearing the 'Image' pointer if
 	  destroy_image is not set. This fixes a bug with map2cs.
+	- duhprey removed collision detection for the sky in terrain
 10-Mar-2004
 	- res made the following changes related to fonts:
 	    - Removed iFontServer::GetFont() and GetFontCount().
