@@ -45,6 +45,33 @@ chronological order.
 	  "/path2, /path3".
 	    VFS.Mount.foo = $/path1$/, $(FOO)
 	    VFS.Unix.FOO = /path2, /path3
+	- Eric Sunshine reverted Jorrit's 11-Aug-2004 change to csVFS::ChDir()
+	  which caused it to reject the requested directory if it did not
+	  represent a physical mount point. That change seriously broke
+	  ChDir(). There are valid cases when you may want to ChDir() to a
+	  directory for which there is no physical mount. For example:
+	    VFS.Mount.lib/textures = textures.zip
+	    VFS.Mount.lib/materials = materials.zip
+	  In this case, "/lib" _is_ a valid VFS path, despite the fact that
+	  there is no physical mount at that location. Jorrit's change caused
+	  it reject ChDir("/lib") even though it should have been accepted. An
+	  obvious place where this error manifested was in 'vsh'. It became
+	  impossible to "cd /lib", "cd /lev", and even "cd /", or to change to
+	  any other directory which was entirely virtual. The problem almost
+	  certainly impacted other portions of the project, as well.
+	- Eric Sunshine added csVFS::CheckIfMounted(). This provides
+	  replacement functionality for the reverted change to ChDir().
+	  ChDirAuto() now uses CheckIfMounted() rather than relying on the
+	  bogus/broken behavior of ChDir().
+	- Eric Sunshine fixed csVFS::GetRealPath() so that it returns the
+	  slightly more sensible "/foo/bar.zip/cow" instead of
+	  "/foo/bar.zipcow" when the queried path points at an entry inside an
+	  archive.
+	- Eric Sunshine removed the unused csVFS::cnode and csVFS::cnsufx
+	  instance variables.
+	- Eric Sunshine fixed bug in vsh's "mounts" command where it failed to
+	  emit a final newline after displaying the active mount list.
+	- Eric Sunshine added a few more command aliases to vsh.
 17-Dec-2004
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.

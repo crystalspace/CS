@@ -17,19 +17,19 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <ctype.h>
 #include "cssysdef.h"
-#include "csutil/util.h"
-#include "csutil/ref.h"
-#include "csutil/databuf.h"
 #include "cstool/initapp.h"
 #include "csutil/csstring.h"
-#include "iutil/vfs.h"
+#include "csutil/databuf.h"
+#include "csutil/ref.h"
+#include "csutil/util.h"
 #include "iutil/cfgmgr.h"
-#include "iutil/plugin.h"
-#include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/eventh.h"
 #include "iutil/objreg.h"
-#include <ctype.h>
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
 
 #define VFS_CONFIG_FILE	"vfs.cfg"
 
@@ -42,9 +42,9 @@ static bool ShutDown = false;
 // forward declaration for command handlers
 static void cmd_cat (char *args);
 static void cmd_chdir (char *args);
-static void cmd_conf (char *args);
+static void cmd_config (char *args);
 static void cmd_cp (char *args);
-static void cmd_creat (char *args);
+static void cmd_create (char *args);
 static void cmd_exists (char *args);
 static void cmd_help (char *args);
 static void cmd_ls (char *args);
@@ -66,28 +66,32 @@ struct
   void (*handler) (char *args);
 } cmdlist [] =
 {
-  { "cat", cmd_cat },
-  { "cd", cmd_chdir },
-  { "chdir", cmd_chdir },
-  { "conf", cmd_conf },
-  { "cp", cmd_cp },
-  { "creat", cmd_creat },
-  { "dir", cmd_ls },
-  { "exists", cmd_exists },
-  { "exit", cmd_quit },
-  { "help", cmd_help },
-  { "ls", cmd_ls },
-  { "mount", cmd_mount },
-  { "pwd", cmd_pwd },
-  { "quit", cmd_quit },
-  { "rm", cmd_rm },
-  { "save", cmd_save },
-  { "sync", cmd_sync },
-  { "time", cmd_time },
-  { "unmount", cmd_unmount },
-  { "rpath", cmd_rpath },
-  { "mounts", cmd_mounts },
+  { "?",       cmd_help    },
+  { "cat",     cmd_cat     },
+  { "cd",      cmd_chdir   },
+  { "chdir",   cmd_chdir   },
+  { "config",  cmd_config  },
+  { "copy",    cmd_cp      },
+  { "cp",      cmd_cp      },
+  { "create",  cmd_create  },
+  { "del",     cmd_rm      },
+  { "dir",     cmd_ls      },
+  { "exists",  cmd_exists  },
+  { "exit",    cmd_quit    },
+  { "help",    cmd_help    },
+  { "ls",      cmd_ls      },
+  { "mount",   cmd_mount   },
+  { "mounts",  cmd_mounts  },
+  { "pwd",     cmd_pwd     },
+  { "quit",    cmd_quit    },
+  { "rm",      cmd_rm      },
   { "rmounts", cmd_rmounts },
+  { "rpath",   cmd_rpath   },
+  { "save",    cmd_save    },
+  { "sync",    cmd_sync    },
+  { "time",    cmd_time    },
+  { "type",    cmd_cat     },
+  { "unmount", cmd_unmount },
   { 0, 0 }
 };
 
@@ -156,29 +160,32 @@ static void get_option (char *&args, bool &opt)
 
 static void cmd_help (char *)
 {
-  printf
-  (
-       "----========************* Virtual Shell commands: *************========----\n"
-       "pwd			Print work directory\n"
-       "[cd|chdir] {path}	Change directory\n"
-       "[ls|dir] {-} {path}	List files; with '-' shows full pathname\n"
-       "cat {-} [file]		Display file contents to console; with '-' in one pass\n"
-       "cp {-} [src] [dst]	Copy file src to file dst; with '-' in one pass\n"
-       "creat [file]		Create a file and copy from stdin to file until EOF\n"
-       "rm [file]		Delete a file on VFS\n"
-       "exists [file]		Test whenever a file exists on VFS\n"
-       "sync			Synchronize virtual file system\n"
-       "mount [vpath] [rpath]	Add a virtual path mapped to given real path\n"
-       "unmount [vpath] {rpath}	Remove a virtual path; if no rpath is given, completely\n"
-       "conf {-} [file]         Parse a VFS config file; with '-' file is on real FS\n"
-       "save			Save current virtual file system state to " VFS_CONFIG_FILE "\n"
-       "time [file]             Display the file's modification time\n"
-       "rpath [file]            Convert the virtual path into `real-world' path\n"
-       "mounts                  Display current virtual mount paths\n"
-       "rmounts [vpath]         Display real-world paths mounted at virtual mount\n"
-       "exit			Exit Virtual Shell\n"
-       "------------------------\n"
-       "Wildcards are okay in these commands: ls, cp, rm\n"
+  printf(
+"----========************* Virtual Shell commands: *************========----\n"
+"cat {-} file           Display file contents to console; with '-' in one pass\n"
+"cd {path}              Change directory to path; or to root if path not given\n"
+"config {-} file        Parse a VFS config file; with '-' file is on real FS\n"
+"cp {-} src dst         Copy file src to file dst; with '-' in one pass\n"
+"create file            Create a file and copy from stdin to file until EOF\n"
+"exists file            Test if file exists on VFS\n"
+"exit                   Exit Virtual Shell\n"
+"ls {-} {path}          List files; with '-' shows full pathname\n"
+"mount vpath rpath      Add a virtual path mapped to given real path\n"
+"mounts                 Display all virtual mounts\n"
+"pwd                    Print working directory\n"
+"rm file                Delete file on VFS\n"
+"rmounts vpath          Display real paths mounted at virtual path\n"
+"rpath file             Convert the virtual path into real path\n"
+"save                   Save current virtual file system state to " VFS_CONFIG_FILE "\n"
+"sync                   Synchronize virtual file system (flush pending writes)\n"
+"time file              Display file's modification time\n"
+"unmount vpath {rpath}  Remove a virtual path; completely if no rpath is given\n"
+"------------------------\n"
+"The following aliases are also recognized:\n"
+"chdir --> cd        copy --> cp         del --> rm\n"
+"dir   --> ls        quit --> exit       type --> cat\n"
+"------------------------\n"
+"Wildcards are okay in these commands: ls, cp, rm\n"
   );
 }
 
@@ -227,12 +234,13 @@ static void cmd_cat (char *args)
   }
 }
 
-static void cmd_creat (char *args)
+static void cmd_create (char *args)
 {
   csRef<iFile> F (VFS->Open (args, VFS_FILE_WRITE));
   if (!F)
   {
-    fprintf (stderr, "creat: cannot create or open for writing file \"%s\"\n", args);
+    fprintf (stderr, "create: cannot create or open for writing file \"%s\"\n",
+      args);
     return;
   }
 
@@ -245,7 +253,7 @@ static void cmd_creat (char *args)
     size_t len = F->Write (buff, strlen (buff));
     if (len < strlen (buff))
     {
-      fprintf (stderr, "creat: error writing to file \"%s\"\n", args);
+      fprintf (stderr, "create: error writing to file \"%s\"\n", args);
       break;
     }
   }
@@ -417,28 +425,29 @@ static void cmd_unmount (char *args)
     rpath = 0;
 
   if (!VFS->Unmount (vpath, rpath))
-    fprintf (stderr, "unmount: cannot unmount \"%s\" from \"%s\"\n", rpath, vpath);
+    fprintf (stderr, "unmount: cannot unmount \"%s\" from \"%s\"\n",
+      rpath, vpath);
 }
 
-static void cmd_conf (char *args)
+static void cmd_config (char *args)
 {
   bool real_fs;
   get_option (args, real_fs);
-  iVFS *CfgVFS;
-  if (real_fs) CfgVFS = 0; else CfgVFS = VFS;
+  iVFS *CfgVFS = real_fs ? 0 : VFS;
 
-  iConfigFile *config = Cfg->AddDomain (args, CfgVFS, iConfigManager::ConfigPriorityCmdLine);
+  iConfigFile *config =
+    Cfg->AddDomain (args, CfgVFS, iConfigManager::ConfigPriorityCmdLine);
 
   if (!config)
   {
-    fprintf (stderr, "conf: cannot load config file \"%s\" in %s\n", args, real_fs ? "real filesystem" : "VFS");
+    fprintf (stderr, "config: cannot load config file \"%s\" in %s\n",
+      args, real_fs ? "real filesystem" : "VFS");
     return;
   }
 
   if (!VFS->LoadMountsFromFile (config))
-    fprintf (stderr, "conf: mount: cannot mount all directories found in "
-	     "config file.\n");
-
+    fprintf (stderr,
+      "config: mount: cannot mount all directories found in config file.\n");
 }
 
 static void cmd_sync (char *)
@@ -475,7 +484,7 @@ static void cmd_time (char *args)
   csFileTime flmt;
   if (!VFS->GetFileTime (args, flmt))
   {
-    fprintf (stderr, "time: cannot query file time (no such file maybe)\n");
+    fprintf (stderr, "time: can not query file time (no such file maybe)\n");
     return;
   }
 
@@ -503,7 +512,7 @@ static void cmd_rpath (char *args)
   csRef<iDataBuffer> db (VFS->GetRealPath (args));
   if (!db)
   {
-    fprintf (stderr, "rpath: no real-world path corresponding to `%s'\n", args);
+    fprintf(stderr, "rpath: no real-world path corresponding to `%s'\n", args);
     return;
   }
 
@@ -526,10 +535,11 @@ static void cmd_mounts (char *args)
         nl = false;
       }
     }
-
+    if (nl)
+      printf ("\n");
   }
   else
-    printf ("mounts: No current mounts to display!\n");
+    printf ("mounts: no current mounts to display!\n");
 }
 
 static void cmd_rmounts (char *args)
@@ -549,7 +559,7 @@ static void cmd_rmounts (char *args)
     }
   }
   else
-    printf ("rmounts: No virtual mount at path `%s'\n", args);
+    printf ("rmounts: no virtual mount at path `%s'\n", args);
 }
 
 static bool execute (char *command)
@@ -631,6 +641,5 @@ int main (int argc, char *argv [])
   Cfg = 0;
   VFS = 0;
   csInitializer::DestroyApplication (object_reg);
-
   return 0;
 }

@@ -297,7 +297,7 @@ public:
   csStringArray RPathV;
   // The array of unexpanded real paths
   csStringArray UPathV;
-  // The system interface
+  // The object registry.
   iObjectRegistry *object_reg;
 
   // Initialize the object
@@ -1486,16 +1486,13 @@ csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
   cwd = new char [2];
   cwd [0] = VFS_PATH_SEPARATOR;
   cwd [1] = 0;
-  cnode = 0;
-  cnsufx [0] = 0;
   basedir = 0;
   resdir = 0;
   appdir = 0;
+  auto_name_counter = 0;
   CS_ASSERT (!ArchiveCache);
   ArchiveCache = new VfsArchiveCache ();
-
-  // We need a recursive mutex.
-  mutex = csMutex::Create (true);
+  mutex = csMutex::Create (true); // We need a recursive mutex.
 }
 
 csVFS::~csVFS ()
@@ -1693,7 +1690,7 @@ VfsNode *csVFS::GetNode (const char *Path, char *NodePrefix,
   }
   if (best_i != (size_t)-1)
   {
-    if (NodePrefixSize)
+    if (NodePrefix != 0 && NodePrefixSize != 0)
     {
       size_t taillen = path_l - best_l + 1;
       if (taillen > NodePrefixSize)
@@ -1719,6 +1716,19 @@ bool csVFS::PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
   return (Node != 0);
 }
 
+bool csVFS::CheckIfMounted(char const* virtual_path) const
+{
+  bool ok = false;
+  csScopedMutexLock lock(mutex);
+  char const* const s = _ExpandPath(virtual_path, true);
+  if (s != 0)
+  {
+    ok = GetNode(s, 0, 0) != 0;
+    delete[] s;
+  }
+  return ok;
+}
+
 bool csVFS::ChDir (const char *Path)
 {
   csScopedMutexLock lock (mutex);
@@ -1726,18 +1736,8 @@ bool csVFS::ChDir (const char *Path)
   char *newwd = _ExpandPath (Path, true);
   if (!newwd)
     return false;
-  // Find the current directory node and directory suffix
-  VfsNode* newcnode = GetNode (newwd, cnsufx, sizeof (cnsufx));
-  if (!newcnode)
-  {
-    delete[] newwd;
-    return false;
-  }
-  cnode = newcnode;
-
-  delete [] cwd;
+  delete[] cwd;
   cwd = newwd;
-
   ArchiveCache->CheckUp ();
   return true;
 }
@@ -2141,9 +2141,11 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
 	const char* vfspath, const char* filename)
 {
   // If the VFS path is valid we can use that.
-  if (ChDir (path))
-    if (filename == 0 || Exists (filename))
-      return true;
+  if (CheckIfMounted(path) && (filename == 0 || Exists (filename)))
+  {
+    ChDir(path);
+    return true;
+  }
 
   // Now try to see if we can get it from one of the paths.
   if (paths)
@@ -2155,36 +2157,34 @@ bool csVFS::ChDirAuto (const char* path, const csStringArray* paths,
       if (testpath[testpath.Length ()-1] != '/')
         testpath += "/";
       testpath += path;
-      if (ChDir ((const char*)testpath))
-        if (filename == 0 || Exists (filename))
-	  return true;
+      if (CheckIfMounted(testpath) && (filename == 0 || Exists (filename)))
+      {
+	ChDir(testpath);
+	return true;
+      }
     }
   }
 
   // First check if it is a zip file.
   size_t pathlen = strlen (path);
-  bool is_zip = pathlen >= 5 && !strcmp (path+pathlen-4, ".zip");
+  bool is_zip = pathlen >= 5 && !strcasecmp (path+pathlen-4, ".zip");
   char* npath = TransformPath (path, !is_zip);
 
   // See if we have to generate a unique VFS name.
   csString tryvfspath;
   if (vfspath)
-  {
     tryvfspath = vfspath;
-  }
   else
   {
-    // To generate unique names.
-    static int cnt = 0;
-    tryvfspath.Format ("/tmp/__auto%d__", cnt);
-    cnt++;
+    tryvfspath.Format ("/tmp/__automount%d__", auto_name_counter);
+    auto_name_counter++;
   }
   
-  bool rc = Mount ((const char*)tryvfspath, npath);
+  bool rc = Mount (tryvfspath, npath);
   delete[] npath;
   if (!rc)
     return false;
-  return ChDir ((const char*)tryvfspath);
+  return ChDir (tryvfspath);
 }
 
 bool csVFS::GetFileTime (const char *FileName, csFileTime &oTime) const
@@ -2244,20 +2244,32 @@ csPtr<iDataBuffer> csVFS::GetRealPath (const char *FileName)
   char suffix [VFS_MAX_PATH_LEN + 1];
   csScopedMutexLock lock (mutex);
   PreparePath (FileName, false, node, suffix, sizeof (suffix));
-  if (!node) return 0;
+  if (!node)
+    return 0;
 
+  bool ok = false;
   char path [CS_MAXPATHLEN + 1];
   size_t i;
-  for (i = 0; i < node->RPathV.Length (); i++)
+  for (i = 0; !ok && i < node->RPathV.Length (); i++)
   {
     const char *rpath = node->RPathV.Get (i);
+    sprintf(path, "%s%s", rpath, suffix);
     strcat (strcpy (path, rpath), suffix);
-    if (!access (path, F_OK))
-      goto done;
+    ok = access (path, F_OK) == 0;
   }
 
-  strcat (strcpy (path, node->RPathV.Get (0)), suffix);
-done:
+  if (!ok)
+  {
+    CS_ASSERT(node->RPathV.Length() != 0);
+    char const* defpath = node->RPathV.Get(0);
+    CS_ASSERT(defpath != 0);
+    int const len = strlen(defpath);
+    if (len > 0 && defpath[len - 1] != VFS_PATH_SEPARATOR)
+      sprintf(path, "%s%c%s", defpath, VFS_PATH_SEPARATOR, suffix);
+    else
+      sprintf(path, "%s%s", defpath, suffix);
+  }
+
   return csPtr<iDataBuffer> (
   	new csDataBuffer (csStrNew (path), strlen (path) + 1));
 }

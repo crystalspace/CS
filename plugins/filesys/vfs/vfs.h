@@ -107,10 +107,10 @@ protected:
 class csVFS : public iVFS
 {
 private:
+  friend class VfsNode;
+
   /// Mutex to make VFS thread-safe.
   csRef<csMutex> mutex;
-
-  friend class VfsNode;
 
   // A vector of VFS nodes
   class VfsVector : public csPDelArray<VfsNode>
@@ -119,7 +119,7 @@ private:
     static int Compare (VfsNode* const&, VfsNode* const&);
   } NodeList;
 
-  // Current working directory (in fact, the automaticaly-added prefix path)
+  // Current working directory (in fact, the automatically-added prefix path)
   // NOTE: cwd ALWAYS ends in '/'!
   char *cwd;
   // The installation directory (the value of $@)
@@ -129,16 +129,15 @@ private:
   // Full path of the directory containing the application executable or
   // the Cocoa application wrapper (the value of $^)
   char *appdir;
-  // Current node
-  const VfsNode *cnode;
-  // The current directory minus current node (cnode suffix)
-  char cnsufx [VFS_MAX_PATH_LEN + 1];
   // The initialization file
   csConfigFile config;
   // Directory stack (used in PushDir () and PopDir ())
   csStringArray dirstack;
-  // The pointer to system driver interface
+  // Reference to the object registry.
   iObjectRegistry *object_reg;
+  // ChDirAuto() may need to generate unique temporary names for mount points.
+  // It uses a counter to do so.
+  int auto_name_counter;
 
 public:
   SCF_DECLARE_IBASE;
@@ -257,6 +256,23 @@ private:
   /// Common routine for many functions
   bool PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
     char *Suffix, size_t SuffixSize) const;
+
+  /**
+   * Check if a virtual path represents an actual physical mount point.  Note
+   * that there are cases where the virtual path itself may be valid yet not in
+   * fact point at a physical mount point (i.e. not be represented by a
+   * VfsNode).  This can occur, for example, in cases such as the following:
+   *
+   * VFS.Mount.lib/textures = textures.zip
+   * VFS.Mount.lib/materials = materials.zip
+   *
+   * The virtual directory "/lib" is a valid path, yet it has no VfsNode
+   * representation because there is nothing actually mounted at "/lib", thus
+   * false will be returned. On the other hand, the virtual directories
+   * "/lib/textures" and "/lib/materials" are both valid and represented by
+   * physical mount points, so true will be returned.
+   */
+  bool CheckIfMounted(char const* virtual_path) const;
 };
 
 #endif // __CS_VFS_H__
