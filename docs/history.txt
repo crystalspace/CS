@@ -12,6 +12,11 @@ The history order has been reversed so that new features are at the top.
 	  drivers for OpenGL. The reason for this is that some specific
 	  canvas (used for embedding for example) may want another
 	  viewport.
+	- Cleaned up debug_dump() and cleanup() junk from all apps.
+	  WalkTest now does this on its own with code inside
+	  #ifdef OS_UNIX. This isn't pretty but it is debugging stuff
+	  anyway and at least it doesn't contaminate other apps that
+	  don't need this.
 14-Jun-2000
 	- Added new command 'db_frustum' to debug the CheckFrustum routine.
 	  This function expects an integer parameter and will draw an outline

@@ -1231,10 +1231,72 @@ void CreateSystem(void)
 #endif
 
 /*---------------------------------------------------------------------*
+ * Signal handling for unix only.
+ *---------------------------------------------------------------------*/
+
+#ifdef OS_UNIX
+
+/*
+ * Signal handler to clean up and give some
+ * final debugging information.
+ */
+void debug_dump ();
+void cleanup ();
+void handler (int sig)
+{
+  static bool in_exit = false;
+  if (in_exit)
+    exit (1);
+  in_exit = true;
+
+  int err = errno;
+#if defined (__USE_GNU)
+  fprintf (stderr, "\n%s signal caught; last error: %s\n",
+    strsignal (sig), strerror (err));
+#elif defined (OS_LINUX) || defined (OS_FREEBSD)
+  fprintf (stderr, "\n%s signal caught; last error: %s\n",
+    sys_siglist [sig], strerror (err));
+#else
+  fprintf (stderr, "\nSignal %d caught; last error: %s\n",
+    sig, strerror (err));
+#endif
+
+  if (sig != SIGINT)
+    debug_dump ();
+
+  SysSystemDriver::Shutdown = true;
+  cleanup ();
+  exit (1);
+}
+
+void init_sig ()
+{
+#ifndef DO_COREDUMP
+  signal (SIGHUP, handler);
+  signal (SIGINT, handler);
+  signal (SIGTRAP, handler);
+  signal (SIGABRT, handler);
+  signal (SIGALRM, handler);
+  signal (SIGTERM, handler);
+  signal (SIGPIPE, handler);
+  signal (SIGSEGV, handler);
+  signal (SIGBUS, handler);
+  signal (SIGFPE, handler);
+  signal (SIGILL, handler);
+#endif // ! DO_COREDUMP
+}
+
+#endif //OS_UNIX
+
+/*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
+#ifdef OS_UNIX
+  init_sig ();
+#endif
+
   // Initialize the random number generator
   srand (time (NULL));
 

@@ -337,15 +337,6 @@ bool PerfTest::HandleEvent (csEvent &Event)
   return false;
 }
 
-/*
- * This is a debug handler that is called when your
- * program crashes (only on Unix/Linux right now).
- * You can use this to perform some last minutes dumps
- */
-void debug_dump ()
-{
-}
-
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/

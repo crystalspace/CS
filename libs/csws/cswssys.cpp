@@ -27,23 +27,6 @@
 REGISTER_STATIC_CLASS (csVFS, "crystalspace.kernel.vfs",
   "Crystal Space Virtual File System plug-in")
 
-/*
- * Do a large debug dump just before the program
- * exits. This function can be installed as a last signal
- * handler if the program crashes (for systems that support
- * this).
- */
-void debug_dump ()
-{
-}
-
-/*
- * This function is installed with atexit()
- */
-void cleanup ()
-{
-}
-
 // -------------------------------------------------- cswsSystemDriver class ---
 
 cswsSystemDriver::cswsSystemDriver (csApp *ParentApp) :
@@ -97,7 +80,6 @@ bool cswsSystemDriver::Initialize (int argc, const char* const argv[],
   // Initialize palette etc (no textures at this time anyway)
   application->PrepareTextures ();
 
-  atexit (cleanup);
   return true;
 };
 

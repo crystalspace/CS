@@ -2925,22 +2925,6 @@ void Blocks::TerminateConnection()
  * Our main event loop.
  *---------------------------------------------*/
 
-/*
- * Do a large debug dump just before the program
- * exits. This function can be installed as a last signal
- * handler if the program crashes (for systems that support
- * this).
- */
-void debug_dump ()
-{
-  Dumper::dump (view->GetCamera ());
-  Sys->Printf (MSG_DEBUG_0, "Camera dumped in debug.txt\n");
-  Dumper::dump (Sys->world);
-  Sys->Printf (MSG_DEBUG_0, "World dumped in debug.txt\n");
-}
-
-//---------------------------------------------------------------------------
-
 void cleanup ()
 {
   Sys->console_out ("Cleaning up...\n");
