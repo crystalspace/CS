@@ -159,7 +159,10 @@ struct iGraphics2D : public iBase
   /// Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b) = 0;
 
-  /// Set clipping rectangle
+  /** Set clipping rectangle.
+   * The clipping rectangle is inclusive the top and left edges and exclusive
+   * for the right and bottom borders.
+   */
   virtual void SetClipRect (int nMinX, int nMinY, int nMaxX, int nMaxY) = 0;
 
   /// Retrieve clipping rectangle
