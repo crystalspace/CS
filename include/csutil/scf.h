@@ -280,7 +280,7 @@ struct scfClassInfo
  * the table is called LibraryName_GetClassTable.
  */
 #define EXPORT_CLASS_TABLE(LibraryName)					\
-EXPORTED_FUNCTION (scfClassInfo *EXPORTED_NAME (LibraryName,_GetClassTable)) ()	\
+EXPORTED_FUNCTION (scfClassInfo *EXPORTED_NAME(LibraryName,_GetClassTable)) ()\
 {									\
   static scfClassInfo ExportClassTable [] =				\
   {
@@ -289,7 +289,7 @@ EXPORTED_FUNCTION (scfClassInfo *EXPORTED_NAME (LibraryName,_GetClassTable)) ()	
 #define EXPORT_CLASS(Class, ClassID, Description)			\
     { ClassID, Description, NULL, Create_##Class },
 
-/** Add information about a exported class and dependency info into the table. */
+/** Add information about an exported class and dependency info into table. */
 #define EXPORT_CLASS_DEP(Class, ClassID, Description, Dependencies)	\
     { ClassID, Description, Dependencies, Create_##Class },
 
@@ -339,7 +339,7 @@ EXPORTED_FUNCTION (scfClassInfo *EXPORTED_NAME (LibraryName,_GetClassTable)) ()	
     { scfRegisterStaticClass (&Class##_ClassInfo); }			\
   } __##Class##_dummy;
 
-//---------------------------------------------- Class factory interface -----//
+//--------------------------------------------- Class factory interface -----//
 
 SCF_VERSION (iFactory, 0, 0, 1);
 
@@ -367,7 +367,7 @@ struct iFactory : public iBase
   virtual const char *QueryDependencies () = 0;
 };
 
-//------------------------------------------------ Client-side functions -----//
+//----------------------------------------------- Client-side functions -----//
 
 // We'll use csIniFile to read SCF.CFG
 class csIniFile;
@@ -470,10 +470,10 @@ extern bool scfRegisterStaticClass (scfClassInfo *iClassInfo);
 
 /**
  * Register a set of static classes (used with static linking).
- * If you design a SCF module that contains a number of SCF classes, and
- * you want that module to be useable when using either static and dynamic
- * linkage, you can use scfRegisterClassList (or the SCF_REGISTER_STATIC_LIBRARY
- * macro) to register the export class table with the SCF kernel.
+ * If you design a SCF module that contains a number of SCF classes, and you
+ * want that module to be usable when using either static and dynamic linkage,
+ * you can use scfRegisterClassList (or the SCF_REGISTER_STATIC_LIBRARY macro)
+ * to register the export class table with the SCF kernel.
  */
 extern bool scfRegisterClassList (scfClassInfo *iClassInfo);
 
@@ -510,15 +510,15 @@ struct iSCF : public iBase
   /// Wrapper for scfClassRegistered ()
   virtual bool scfClassRegistered (const char *iClassID) = 0;
   /// Wrapper for scfCreateInstance ()
-  virtual void *scfCreateInstance (const char *iClassID, const char *iInterfaceID,
-    int iVersion) = 0;
+  virtual void *scfCreateInstance (const char *iClassID,
+    const char *iInterfaceID, int iVersion) = 0;
   /// Wrapper for scfGetClassDescription ()
   virtual const char *scfGetClassDescription (const char *iClassID) = 0;
   /// Wrapper for scfGetClassDependencies ()
   virtual const char *scfGetClassDependencies (const char *iClassID) = 0;
   /// Wrapper for scfRegisterClass ()
-  virtual bool scfRegisterClass (const char *iClassID, const char *iLibraryName,
-    const char *Dependencies = NULL) = 0;
+  virtual bool scfRegisterClass (const char *iClassID,
+    const char *iLibraryName, const char *Dependencies = NULL) = 0;
   /// Wrapper for scfRegisterStaticClass ()
   virtual bool scfRegisterStaticClass (scfClassInfo *iClassInfo) = 0;
   /// Wrapper for scfRegisterClassList ()
@@ -527,7 +527,7 @@ struct iSCF : public iBase
   virtual bool scfUnregisterClass (char *iClassID) = 0;
 };
 
-//--------------------------------------------- System-dependent defines -----//
+//-------------------------------------------- System-dependent defines -----//
 
 // A macro to declare a symbol that should be exported from shared libraries
 #if defined (OS_WIN32) || defined (OS_BE)
@@ -551,6 +551,11 @@ struct iSCF : public iBase
 #  define EXPORTED_NAME(Prefix, Suffix) Suffix
 #else
 #  define EXPORTED_NAME(Prefix, Suffix) Prefix ## Suffix
+#endif
+
+//------------------------ Pacify Doc++ which complains about extra '{' -----//
+#if 0
+}
 #endif
 
 #endif // __CSSCF_H__

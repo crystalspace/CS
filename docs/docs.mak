@@ -30,8 +30,8 @@
 #------------------------------------------------------------------------------
 
 # Target descriptions
-DESCRIPTION.devdoc = developer class reference via Doc++
-DESCRIPTION.apidoc = public API reference via Doc++
+DESCRIPTION.devapi = developer API reference via Doc++
+DESCRIPTION.pubapi = public API reference via Doc++
 DESCRIPTION.htmldoc = documentation as HTML
 DESCRIPTION.dvidoc = documentation as DVI
 DESCRIPTION.psdoc = documentation as PostScript
@@ -46,8 +46,8 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
 DOCHELP += \
-  $(NEWLINE)echo $"  make devdoc       Make the $(DESCRIPTION.devdoc)$" \
-  $(NEWLINE)echo $"  make apidoc       Make the $(DESCRIPTION.apidoc)$" \
+  $(NEWLINE)echo $"  make devapi       Make the $(DESCRIPTION.devapi)$" \
+  $(NEWLINE)echo $"  make pubapi       Make the $(DESCRIPTION.pubapi)$" \
   $(NEWLINE)echo $"  make htmldoc      Make the $(DESCRIPTION.htmldoc)$" \
   $(NEWLINE)echo $"  make dvidoc       Make the $(DESCRIPTION.dvidoc)$" \
   $(NEWLINE)echo $"  make psdoc        Make the $(DESCRIPTION.psdoc)$" \
@@ -61,9 +61,9 @@ endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: devdoc apidoc htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
+.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
 
-devdoc apidoc htmldoc dvidoc psdoc pdfdoc infodoc:
+devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc:
 	$(MAKE_TARGET)
 
 repairdoc:
@@ -96,7 +96,7 @@ CSMANUAL_DIR  = docs/texinfo
 CSMANUAL_FILE = cs-unix.txi
 
 # Root of the target directory hierarchy.
-OUT.DOC      = $(OUTBASE)docs
+OUT.DOC = $(OUTBASE)docs
 
 # Relative path which refers to main CS directory from within one of the
 # specific output directories, such as $(OUT.DOC.HTML).  The value of this
@@ -104,17 +104,17 @@ OUT.DOC      = $(OUTBASE)docs
 OUT.DOC.UNDO = ../../..
 
 # Target directory for each output format.
-OUT.DOC.DEV  = $(OUT.DOC)/dev
-OUT.DOC.API  = $(OUT.DOC)/api
-OUT.DOC.HTML = $(OUT.DOC)/html
-OUT.DOC.DVI  = $(OUT.DOC)/dvi
-OUT.DOC.PS   = $(OUT.DOC)/ps
-OUT.DOC.PDF  = $(OUT.DOC)/pdf
-OUT.DOC.INFO = $(OUT.DOC)/info
+OUT.DOC.API.DEV = $(OUT.DOC)/devapi
+OUT.DOC.API.PUB = $(OUT.DOC)/pubapi
+OUT.DOC.HTML    = $(OUT.DOC)/html
+OUT.DOC.DVI     = $(OUT.DOC)/dvi
+OUT.DOC.PS      = $(OUT.DOC)/ps
+OUT.DOC.PDF     = $(OUT.DOC)/pdf
+OUT.DOC.INFO    = $(OUT.DOC)/info
 
-# Header files used to generate public API and developer documentation.
-CSDOC_FILES = $(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
-CSAPI_FILES = $(wildcard include/*.h include/*/*.h include/*/*/*.h)
+# Header files used to generate public API and developer API references.
+API.DEV.FILES = $(wildcard *.h */*.h */*/*.h */*/*/*.h */*/*/*/*.h)
+API.PUB.FILES = $(wildcard include/*.h include/*/*.h include/*/*/*.h)
 
 # List of potential image types understood by Texinfo's @image{} directive.
 DOC.IMAGE.EXTS = png jpg gif eps txt
@@ -178,7 +178,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: devdoc apidoc htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
+.PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
 .PHONY: do-htmldoc do-dvidoc do-infodoc
 
 clean: cleandoc
@@ -187,8 +187,8 @@ clean: cleandoc
 $(OUT.DOC): $(OUTBASE)
 	-$(MKDIR)
 
-$(OUT.DOC.DEV) $(OUT.DOC.API) $(OUT.DOC.HTML) $(OUT.DOC.DVI) $(OUT.DOC.PS) \
-$(OUT.DOC.PDF) $(OUT.DOC.INFO): $(OUT.DOC)
+$(OUT.DOC.API.DEV) $(OUT.DOC.API.PUB) $(OUT.DOC.HTML) $(OUT.DOC.DVI) \
+$(OUT.DOC.PS) $(OUT.DOC.PDF) $(OUT.DOC.INFO): $(OUT.DOC)
 	-$(MKDIR)
 
 $(OUT.DOC.IMAGE.DIRS.HTML) $(OUT.DOC.IMAGE.DIRS.DVI) $(OUT.DOC.IMAGE.DIRS.PS) \
@@ -237,18 +237,19 @@ ifneq ($(OUT.DOC.IMAGE.DIRS.TOP),)
 endif
 endif
 
-# Rules to generate developer documentation from all header files.
-$(OUT.DOC.DEV)/index.html: $(OUT.DOC.DEV)
-	$(DOCXX) -F -j -H -d $(OUT.DOC.DEV) -f $(CSDOC_FILES)
-	$(RM) $(OUT.DOC.DEV)/HIERjava.html
+# Rules to generate developer API documentation from all header files.
+$(OUT.DOC.API.DEV)/index.htm: $(OUT.DOC.API.DEV)
+	$(DOCXX) -F -j -H -d $(OUT.DOC.API.DEV) -f -x .htm $(API.DEV.FILES)
+	$(RM) $(OUT.DOC.API.DEV)/.*.htm # Buggy Doc++ junk.
 
-devdoc: $(OUT.DOC.DEV).CLEAN $(OUT.DOC.DEV)/index.html
+devapi: $(OUT.DOC.API.DEV).CLEAN $(OUT.DOC.API.DEV)/index.htm
 
 # Rules to generate public API documentation from public header files.
-$(OUT.DOC.API)/index.html: $(OUT.DOC.API)
-	$(DOCXX) -F -j -H -d $(OUT.DOC.API) -f $(CSAPI_FILES)
+$(OUT.DOC.API.PUB)/index.htm: $(OUT.DOC.API.PUB)
+	$(DOCXX) -F -j -H -d $(OUT.DOC.API.PUB) -f -x .htm $(API.PUB.FILES)
+	$(RM) $(OUT.DOC.API.PUB)/.*.htm # Buggy Doc++ junk.
 
-apidoc: $(OUT.DOC.API).CLEAN $(OUT.DOC.API)/index.html
+pubapi: $(OUT.DOC.API.PUB).CLEAN $(OUT.DOC.API.PUB)/index.htm
 
 # Rule to perform actual HTML conversion of $(CSMANUAL_FILE).
 do-htmldoc:

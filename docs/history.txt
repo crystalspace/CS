@@ -135,6 +135,14 @@ The history order has been reversed so that new features are at the top.
 	    - Added a note about C_INCLUDE_PATH needed to be set up correctly
 	      before you do "make depend" to the win32gcc.txi file.
 	- Release of 0.17r001.
+	- Eric sunshine made the following documentation-related changes:
+	    - Renamed documentation targets: apidoc --> pubapi, devdoc -->
+	      devapi.
+	    - Worked around obnoxious bug in DOC++ 3.4.2 where it accidentally
+	      creates hidden output files.  (Maybe we should move to Doxygen,
+	      as DOC++ seems excessively buggy.)
+	    - Minor modifications to scf.h and dungeon/dnfnodes.h to pacify
+	      DOC++.
 4-Sep-2000
 	- Brandon Ehle did some maintenance to the Python scripting stuff.
 	  Need to wait for next SWIG release for everything to fall in place.
