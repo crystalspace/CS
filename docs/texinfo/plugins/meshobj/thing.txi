@@ -82,7 +82,7 @@ set/get settings for a thing. The definition of this interface
 can be found in @file{CS/include/imesh/thing/thing.h} and that is also the
 include file you need to include in your applications to use this plugin.
 Using this interface you can access the vertices, polygons, materials,
-curved surfaces, and various other configuration parameters for a thing.
+and various other configuration parameters for a thing.
 
 @samp{iThingState} is for thing instances.
 
