@@ -137,7 +137,7 @@ void csApp::SetWorld (csWorld *AppWorld)
   System->piG3D->GetTextureManager (&txtmgr);
   if (txtmgr)
   {
-    txtmgr->Prepare ();
+    //txtmgr->Prepare (); //fill cause a crash, but looks unnecessary anyway.
     txtmgr->AllocPalette ();
   }
   SetupPalette ();

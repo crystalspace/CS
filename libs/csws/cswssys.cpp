@@ -115,7 +115,7 @@ void appSystemDriver::CloseConsole ()
 /*
  * The routine to update the screen in demo mode.
  */
-void appSystemDriver::DemoWrite (char* buf)
+void appSystemDriver::DemoWrite (const char* buf)
 {
   char *crpos;
   while ((crpos = strchr (buf, '\n')))
@@ -143,7 +143,7 @@ void appSystemDriver::DemoWrite (char* buf)
   strcpy (textline [curline], buf);
   linecolor [curline] = textcolor;
 
-  if (piG2D)
+  if (Console && piG2D)
   {
     if (SUCCEEDED (piG2D->BeginDraw ()))
     {

@@ -49,7 +49,7 @@ public:
   /// Call application to process queued events
   virtual void NextFrame (long elapsed_time, long current_time);
   /// Replace DemoWrite() for output to debug console
-  virtual void DemoWrite (char* buf);
+  virtual void DemoWrite (const char* buf);
   /// Display an alert message
   virtual void Alert (char* msg);
   /// Display a warning message
