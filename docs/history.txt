@@ -11,6 +11,7 @@ chronological order.
         - Matze changed some jam/configure things:
             - install docu in $datadir/doc/$PACKAGE_NAME-$PACKAGE_VERSION
             - change PACKAGE_NAME to crystalspace
+	- res fixed some casts in hashmap.cpp causing grief on 64bit systems.
 7-Jul-2004
 	- Jorrit fixed several compile errors for gcc 2.95 as reported by
 	  Darius Dawidowski. Darius also reported a warning in spr2d
@@ -29,7 +30,6 @@ chronological order.
 	- Keith modified the sprcal3d loader to automatically call this function
 	  when models are loaded from a .cal3d file.  Loading sprcal3d models
 	  is about 4x faster now due to this refactoring.
-
 6-Jul-2004
 	- Reed changed VOSA3DL to load required plugins on demand rather than 
 	  assume they were already loaded.

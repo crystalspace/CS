@@ -32,8 +32,8 @@ csGlobalHashIterator::csGlobalHashIterator (csHashMap *hm)
   cbucket = bucket = 0;
   bucket_len = 0;
   element_index = 0;
-  bucket_index = (unsigned int)-1;
-  nbuckets = (unsigned int)hash->Buckets.Length();
+  bucket_index = (size_t)-1;
+  nbuckets = hash->Buckets.Length();
   GotoNextElement ();
 }
 
