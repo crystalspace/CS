@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Sep-2004
+	- Eric Sunshine fixed the Jam 'install' target so that it also installs
+	  Marten's new parallax data files.
+	- Eric Sunshine propagated Marten's new parallaxtest VFS mounting in
+	  vfs.cfg to plugins/filesys/vfs/vfs.cfg.template.
 18-Sep-2004
 	- Eric Sunshine changed the executable subsystem type in the MSVC
 	  project files for GUI applications from "windows" to "console". This
@@ -28,7 +33,8 @@ chronological order.
 	  used by Jam build system.
 	- Marten Svanfeldt added a parallax mapping (also known as virtual
 	  displacement mapping or offset mapping) shader and testlevel to CS.
-	  The testlevel and shader requires NR, and a pretty highend card to work.
+	  The testlevel and shader requires NR, and a pretty highend card to
+	  work.
 17-Sep-2004
 	- Eric Sunshine fixed a couple methods in odedynam which were returning
 	  a value despite being declared as returning void. Reported by Brendon

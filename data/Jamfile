@@ -12,6 +12,7 @@ InstallData
 maps =
   flarge
   isomap
+  parallaxtest
   particles
   partsys
   r3dtest
@@ -20,9 +21,8 @@ maps =
   terrainf ;
 for map in $(maps)
 {
-    local mapfiles =
-        [ Wildcard $(map) : *.jpg *.png *.map *.tga *.dds world ] ;
-    InstallData $(mapfiles) : maps $(map) ;
+    local files = [ Wildcard $(map) : *.jpg *.png *.map *.tga *.dds world ] ;
+    InstallData $(files) : maps $(map) ;
 }
 
 SubInclude TOP data aws ;
