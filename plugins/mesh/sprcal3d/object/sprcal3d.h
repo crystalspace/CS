@@ -152,8 +152,8 @@ private:
 
   /// This is the factory equivalent class in cal3d.
   CalCoreModel calCoreModel;
-  csArray<csCal3DAnimation*> anims;
-  csArray<csCal3DMesh*>      submeshes;
+  csPDelArray<csCal3DAnimation> anims;
+  csPDelArray<csCal3DMesh>      submeshes;
   csArray<csString>          morph_animation_names;
 
   csString     basePath;

@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Aug-2004
+ 	- Jorrit fixed a bug in Dynavis where it would try to use the
+ 	  hint_goodoccluder flag before setting the value of that.
+	- Jorrit fixed a crash bug in walktest/flarge when you tried to jump
+	  on the car.
+	- Jorrit added some leak guards.
+23-Aug-2004
+	- Jorrit fixed a big memory leak in sprcal3d. The csCal3DAnimation
+	  and csCal3DMesh structures where never freed and csCal3DMesh
+	  kept a reference to the material which caused a number of other
+	  leaks as a result.
 22-Aug-2004
 	- Eric Sunshine fixed bug in csString::Replace(csString const&) where
 	  it failed to take into account the case where the replacement
@@ -20,6 +31,8 @@ chronological order.
 	- Eric Sunshine fixed bug in csString::Replace(char const*,count) where
 	  it was documented as accepting -1 for `count', but did not correctly
 	  handle the case.
+	- Jorrit fixed a leak in genmesh with shader variable contexts. This
+	  caused many other things to leak.
 21-Aug-2004
         - Philip Wyett made the following changes:
           - Fixed attempts to load "crystalspace.graphics3d.shader.soft"

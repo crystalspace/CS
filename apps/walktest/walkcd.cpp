@@ -268,7 +268,11 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
     for (j=0 ; j<num_our_cd; j++)
     {
       csCollisionPair& cd = our_cd_contact[j];
-      csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();
+      csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2));
+      float nn = n.Norm ();
+      if (fabs (nn) < SMALL_EPSILON)
+	continue;
+      n /= nn;
       if (n*vel<0)
         continue;
       vel = -(vel%n)%n;
@@ -316,7 +320,11 @@ void DoGravity (iEngine* Engine, csVector3& pos, csVector3& vel)
       for (j=0 ; j<num_our_cd ; j++)
       {
 	csCollisionPair cd = our_cd_contact[j];
-        csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();
+        csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2));
+	float nn = n.Norm ();
+	if (fabs (nn) < SMALL_EPSILON)
+	  continue;
+        n /= nn;
 
 	if (n*csVector3(0,-1,0)<0.7) continue;
 

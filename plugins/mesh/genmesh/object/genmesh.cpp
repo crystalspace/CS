@@ -164,6 +164,8 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
   delete[] sorted_mesh_triangles;
 #endif
 
+  if (svcontext) svcontext->DecRef ();
+
   ClearPseudoDynLights ();
 
 #ifdef CS_USE_NEW_RENDERER
