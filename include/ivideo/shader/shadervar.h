@@ -1,4 +1,3 @@
-
 /*
     Copyright (C) 2002 by Mårten Svanfeldt
                           Anders Stenberg
@@ -19,8 +18,8 @@
 */
 
 
-#ifndef __SHADERVAR_H__
-#define __SHADERVAR_H__
+#ifndef __CS_IVIDEO_SHADERVAR_H__
+#define __CS_IVIDEO_SHADERVAR_H__
 
 #include "csutil/csstring.h"
 
@@ -69,5 +68,5 @@ SCF_IMPLEMENT_IBASE( csShaderVariable )
   SCF_IMPLEMENTS_INTERFACE( iShaderVariable )
 SCF_IMPLEMENT_IBASE_END
 
-#endif
+#endif // __CS_IVIDEO_SHADERVAR_H__
 
