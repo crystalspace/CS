@@ -20,7 +20,7 @@ the order below (only if you need the elapsed and current time, of course):
 void MySubclass::NextFrame()
 @{
   SysSystemDriver::NextFrame();
-  csTime elapsed_time, current_time;
+  cs_time elapsed_time, current_time;
   GetElapsedTime(elapsed_time,current_time);
   @dots{}
 @end example
@@ -100,7 +100,7 @@ plugin.  You can do this with the following code:
 char const* p = Config->GetStr (
   "YourGame",
   "COLLDET_PLUGIN",
-  "crystalspace.collisiondetection.rapid");
+  "crystalspace.colldet.rapid");
 collide_system =
   LOAD_PLUGIN(this, p, "CollDet", iCollideSystem);
 if (!collide_system)
