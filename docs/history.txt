@@ -46,6 +46,8 @@ The history order has been reversed so that new features are at the top.
 	  construction of global BSP-polygon pool was being botched.
 	- Eric Sunshine eliminated several compilation warnings throughout the
 	  project which were flagged by the OpenStep compiler.
+	- Eric Sunshine eliminated several compilation warnings in the
+	  Dungeon plug-in.
 18-Jun-2000
 	- Norman Kramer fixed Squawk and csgame following the recent
 	  modifications in sprite creation.
