@@ -1,6 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
 18-Aug-2000
+	- Wouter Wijngaards:
+	    Unix system now checks $CRYSTAL or defaults to
+	    /usr/local/crystal/ dir. Thus you can create .rpms, or .tgzs
+	    that are easy to install, by installing to /usr/local/crystal.
+	- Wouter Wijngaards added registry searching to find install path
+	  for win32. If that fails the environment variable CRYSTAL is used.
+	  If that fails too, the default C:\Program Files\Crystal\ is used.
+	  I cannot compile this code, it is untested. Also, the registry
+	  entry 'SOFTWARE\CrystalSpace', key 'installpath' is a guess for
+	  a reasonable value.
+	- Wouter fixed lib/ addition to be platform independent.
+	- Norman Kramer made LibPath in findlib.cpp a pointer. Previously it
+	  caused trouble with plugins binding CSSYS itself like the enginep
+	  plugin (LibPath was created again but was zeroed out) (NOTE:
+	  its not destructed - os has to take care of it).
 	- Accidently left on PVS building. I wonder why nobody complained
 	  about dmburg needing several hours to start up :-)
 	- Fixed BMP loader so that it doesn't enable ALPHA anymore.
