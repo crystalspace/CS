@@ -9,10 +9,10 @@ case WIN32 :
 		csprocessorcap.cpp
 		findlib.cpp
 		getopt.cpp
-		pluginpaths.cpp ;
+		pluginpaths.cpp
 		printf.cpp
 		resdir.cpp
-		runloop.cpp 
+		runloop.cpp ;
 case MACOS_X :
   SearchSubdir macosx ;
   SearchSubdir general ;
@@ -24,10 +24,10 @@ case MACOS_X :
 		findlib.cpp
 		getopt.cpp
 		pathutil.cpp 
-		pluginpaths.cpp ;
+		pluginpaths.cpp
 		printf.cpp
 		scanplugins.cpp
-		sysroot.cpp
+		sysroot.cpp ;
   InstallConfig macosx.cfg ;
 case * :		# posix/unix/linux mode
   SearchSubdir unix ;
@@ -42,13 +42,13 @@ case * :		# posix/unix/linux mode
 		getopt.cpp
 		pathutil.cpp
 		platformconfig.cpp 
-		pluginpaths.cpp ;
+		pluginpaths.cpp
 		printf.cpp
 		resdir.cpp
 		runloop.cpp 
 		scanplugins.cpp
 		sysinit.cpp
-		sysroot.cpp
+		sysroot.cpp ;
 }
 
 Library cssys :
