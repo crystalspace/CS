@@ -47,7 +47,7 @@ private:
   csRef<iFile> input;
   FILE *output;
 
-  float scale;
+  csVector3 scale;
 };
 
 #endif

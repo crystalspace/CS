@@ -48,7 +48,9 @@ TerrBigTool::TerrBigTool (iObjectRegistry* object_reg)
     ReportError ("Cannot query command line parser\n");
     abort ();
   }
-  cmdline->AddOption ("scale", "10.0");
+  cmdline->AddOption ("scale_x", "1.0");
+  cmdline->AddOption ("scale_y", "10.0");
+  cmdline->AddOption ("scale_z", "1.0");
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (vfs == NULL)
   {
@@ -69,16 +71,23 @@ TerrBigTool::~TerrBigTool ()
 
 bool TerrBigTool::Init ()
 {
-  float scale;
   const char *scalestr;
-  if ((scalestr = cmdline->GetOption ("scale")) == NULL)
-  {
-    scale = 10.0;
+  if ((scalestr = cmdline->GetOption ("scale_x")) == NULL) {
+    scale.x = 1.0;
+  } else {
+    sscanf (scalestr, "%f", &scale.x);
   }
-  else
-  {
-    sscanf (scalestr, "%f", &scale);
+  if ((scalestr = cmdline->GetOption ("scale_y")) == NULL) {
+    scale.y = 10.0;
+  } else {
+    sscanf (scalestr, "%f", &scale.y);
   }
+  if ((scalestr = cmdline->GetOption ("scale_z")) == NULL) {
+    scale.z = 1.0;
+  } else {
+    sscanf (scalestr, "%f", &scale.z);
+  }
+
   if (!cmdline->GetName(0) || !cmdline->GetName(1))
   {
     ReportError ("Format tbtool inputfile outputfile\n");
@@ -114,6 +123,7 @@ bool TerrBigTool::Convert ()
   terrobj->IncRef ();	// @@@ MEMORY LEAK!!!
   csRef<iTerrBigState> terrstate (SCF_QUERY_INTERFACE (terrobj, iTerrBigState));
 
+  terrstate->SetScaleFactor (scale);
   terrstate->ConvertImageToMapFile (input, imageio, cmdline->GetName(1));
 
   return true;
