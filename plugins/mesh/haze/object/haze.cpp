@@ -942,11 +942,12 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
 
 
 void csHazeMeshObject::DrawPolyAdapt(iRenderView *rview, iGraphics3D *g3d,
-				     iMaterialHandle *mat, int /*num_sides*/, csVector3* pts, csVector2* uvs,
-        float layer_scale, float quality)
+     iMaterialHandle *mat, int num_sides, csVector3* pts, csVector2* uvs,
+     float layer_scale, float quality)
 {
   /// only triangles
-  //CS_ASSERT(num_sides == 3);
+  (void)num_sides;
+  CS_ASSERT(num_sides == 3);
   // check if the angle is OK
   csVector2 dir1;
   dir1.x = pts[1].x - pts[0].x;
