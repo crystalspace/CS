@@ -18,8 +18,19 @@
 
 #define CS_SYSDEF_PROVIDE_DIR
 #include "cssysdef.h"
-
 #ifdef __NEED_OPENDIR_PROTOTYPE
+
+struct DIR
+{
+  HANDLE findHandle;
+  dirent currentEntry;
+  WIN32_FIND_DATA findData;
+
+  DIR()
+  {
+    findHandle = INVALID_HANDLE_VALUE;
+  }
+};
 
 extern "C"
 {
@@ -30,40 +41,59 @@ DIR *opendir (const char *name)
   if (!dh)
     return 0;
 
-  char tname [CS_MAXPATHLEN + 1];
-  strcpy (tname, name);
-  strcat (tname, "\\*");
+  const size_t namelen = strlen (name);
+  CS_ALLOC_STACK_ARRAY (char, fullname, namelen + 3);
+  strcpy (fullname, name);
+  char* nameend = &fullname[namelen - 1];
+  if (*nameend != PATH_SEPARATOR)
+  {
+    nameend++;
+    *nameend = PATH_SEPARATOR;
+  }
+  strcpy (nameend + 1, "*");
 
-  if ((dh->handle = _findfirst (tname, &dh->fd)) == -1L)
+  if ((dh->findHandle = FindFirstFileA (fullname, &dh->findData)) == 
+    INVALID_HANDLE_VALUE)
   {
     delete dh;
     return 0;
-  } /* endif */
-
-  dh->valid = true;
+  }
+ 
   return dh;
 }
 
 dirent *readdir (DIR *dirp)
 {
-  while (dirp->valid)
+  if (dirp->findHandle != INVALID_HANDLE_VALUE)
   {
-    strcpy (dirp->de.d_name, dirp->fd.name);
-    dirp->de.d_size = dirp->fd.size;
-    dirp->de.d_attr = dirp->fd.attrib;
-    dirp->valid = (_findnext (dirp->handle, &dirp->fd) == 0);
-    if (strcmp (dirp->de.d_name, ".")
-     && strcmp (dirp->de.d_name, ".."))
-      return &dirp->de;
-  } /* endwhile */
+    strncpy (dirp->currentEntry.d_name, dirp->findData.cFileName, 
+      sizeof (dirp->currentEntry.d_name) - 1);
+    dirp->currentEntry.d_size = dirp->findData.nFileSizeLow;
+    dirp->currentEntry.dwFileAttributes = dirp->findData.dwFileAttributes;
+    if (!FindNextFileA (dirp->findHandle, &dirp->findData))
+    {
+      FindClose (dirp->findHandle);
+      dirp->findHandle = INVALID_HANDLE_VALUE;
+    }
+    return &dirp->currentEntry;
+  }
   return 0;
 }
 
 int closedir (DIR *dirp)
 {
-  _findclose (dirp->handle);
+  if (dirp->findHandle != INVALID_HANDLE_VALUE)
+  {
+    FindClose (dirp->findHandle);
+  }
   delete dirp;
   return 0;
+}
+    
+bool isdir (const char *path, dirent *de)
+{
+  (void)path;
+  return (de->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 }
 
 }

@@ -1153,6 +1153,8 @@ void VfsNode::FindFiles (const char *Suffix, const char *Mask,
       if ((rpl > 1)
 #if defined (OS_DOS) || defined (OS_WIN32)
        && ((rpl > 2) || (tpath [1] != ':'))
+       && (!((rpl == 3) && (tpath [1] == ':') && (tpath [2] == '\\')))
+       // keep trailing backslash for drive letters
 #endif
        && ((tpath [rpl - 1] == '/') || (tpath [rpl - 1] == PATH_SEPARATOR)))
         tpath [rpl - 1] = 0;		// remove trailing PATH_SEPARATOR

@@ -284,14 +284,8 @@ struct mmioInfo
 #define CS_EXPORTED_FUNCTION extern "C" __declspec(dllexport)
 
 #if defined (CS_SYSDEF_PROVIDE_DIR) || defined (CS_SYSDEF_PROVIDE_GETCWD) || defined (CS_SYSDEF_PROVIDE_MKDIR)
-#ifdef __CYGWIN32__
-#  include <dirent.h>
-#  define __NEED_GENERIC_ISDIR
-#else
+#ifndef __CYGWIN32__
 #  include <direct.h>
-#  if defined(COMP_BC) || defined(COMP_GCC)
-#    include <dirent.h>
-#  endif
 #endif
 #endif
 
@@ -339,60 +333,33 @@ struct mmioInfo
 
 #endif
 
-// COMP_GCC has generic opendir(), readdir(), closedir()
-
+// Although COMP_GCC has opendir, readdir, CS' versions are preferred.
 #if defined(CS_SYSDEF_PROVIDE_DIR)
 // Directory read functions
-# if !defined(COMP_GCC)
-#  if !defined(COMP_BC)
-    #define __NEED_OPENDIR_PROTOTYPE
-    #include <io.h>
+  #define __NEED_OPENDIR_PROTOTYPE
+  #include <io.h>
 
-    // Directory entry
-    struct dirent
-    {
-      char d_name [CS_MAXPATHLEN + 1]; // File name, 0 terminated
-      long d_size; // File size (bytes)
-      unsigned d_attr; // File attributes (Windows-specific)
-    };
-    // Directory handle
-    struct DIR
-    {
-      bool valid;
-      long handle;
-      dirent de;
-      _finddata_t fd;
-    };
-    static inline bool isdir (const char *path, dirent *de)
-    {
-      (void)path;
-      return !!(de->d_attr & _A_SUBDIR);
-    }
+  // Directory entry
+  struct dirent
+  {
+    char d_name [CS_MAXPATHLEN + 1]; // File name, 0 terminated
+    size_t d_size; // File size (bytes)
+    long dwFileAttributes; // File attributes (Windows-specific)
+  };
+  // Directory handle
+  struct DIR;
 
-#    ifdef CS_CSUTIL_LIB
-    extern "C" CS_EXPORT_SYM DIR *opendir (const char *name);
-    extern "C" CS_EXPORT_SYM dirent *readdir (DIR *dirp);
-    extern "C" CS_EXPORT_SYM int closedir (DIR *dirp);
-#    else
-    extern "C" CS_IMPORT_SYM DIR *opendir (const char *name);
-    extern "C" CS_IMPORT_SYM dirent *readdir (DIR *dirp);
-    extern "C" CS_IMPORT_SYM int closedir (DIR *dirp);
-#    endif // CS_BUILD_SHARED_LIBS
-#  endif // end if !defined(COMP_BC)
-# endif
-#endif
-
-#ifdef CS_SYSDEF_PROVIDE_DIR
-#  if defined(COMP_BC) || defined(COMP_GCC)
-#    define __NEED_GENERIC_ISDIR
-#  else
-#    define __NO_GENERIC_ISDIR
-     static inline bool isdir (char *path, dirent *de)
-     {
-       (void)path;
-       return !!(de->d_attr & _A_SUBDIR);
-     }
-#  endif
+# ifdef CS_CSUTIL_LIB
+  extern "C" CS_EXPORT_SYM DIR *opendir (const char *name);
+  extern "C" CS_EXPORT_SYM dirent *readdir (DIR *dirp);
+  extern "C" CS_EXPORT_SYM int closedir (DIR *dirp);
+  extern "C" CS_EXPORT_SYM bool isdir (const char *path, dirent *de);
+# else
+  extern "C" CS_IMPORT_SYM DIR *opendir (const char *name);
+  extern "C" CS_IMPORT_SYM dirent *readdir (DIR *dirp);
+  extern "C" CS_IMPORT_SYM int closedir (DIR *dirp);
+  extern "C" CS_IMPORT_SYM bool isdir (const char *path, dirent *de);
+# endif // CS_BUILD_SHARED_LIBS
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_SOCKETS

@@ -123,9 +123,8 @@
 
 #ifdef CS_SYSDEF_PROVIDE_DIR
 // For systems without opendir()
-// COMP_GCC has opendir, readdir 
-# if !defined(COMP_GCC)
-#  if defined(__NEED_OPENDIR_PROTOTYPE)
+// Although COMP_GCC has opendir, readdir, CS' versions are preferred.
+# if defined(__NEED_OPENDIR_PROTOTYPE)
      struct DIR;
      struct dirent;
      extern "C" CS_CSUTIL_EXPORT DIR *opendir (const char *name);
@@ -134,9 +133,8 @@
      //extern "C" void seekdir (DIR *dirp, long off);
      //extern "C" long telldir (DIR *dirp);
      //extern "C" void rewinddir (DIR *dirp);
-#  endif
 # endif
-// Generic ISDIR needed for COMP_GCC
+// Generic ISDIR where needed
 #  ifdef __NEED_GENERIC_ISDIR
 #    if defined (OS_WIN32) || defined (OS_DOS)
 #      include <io.h>
@@ -145,20 +143,17 @@
 #    if !defined(OS_WIN32)
 #      include <dirent.h>
 #    endif
-#    if defined(__CYGWIN32__)
-#      include <sys/dirent.h>
-#    endif
 #    include <sys/stat.h>
      static inline bool isdir (const char *path, struct dirent *de)
      {
-       char fullname [CS_MAXPATHLEN];
        int pathlen = strlen (path);
+       CS_ALLOC_STACK_ARRAY(char, fullname, pathlen + 2 + strlen (de->d_name));
        memcpy (fullname, path, pathlen + 1);
        
        if ((pathlen) && (fullname[pathlen-1] != PATH_SEPARATOR))
        {
-   fullname[pathlen++] = PATH_SEPARATOR;
-   fullname[pathlen] = 0;
+	 fullname[pathlen++] = PATH_SEPARATOR;
+	 fullname[pathlen] = 0;
        }
               
        strcat (&fullname [pathlen], de->d_name);

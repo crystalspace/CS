@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+12-Jun-2004
+	- res made all Win32 platforms, not only VC, use CS' own opendir() etc 
+	  functions.
+	- res changed CS' Win32 opendir() etc to use native Win32 functions
+	  instead of the VC only _findfirst() etc.
+	- res fixed VfsNode::FindFiles() to not remove a trailing backslash
+	  from drive letters on Win32.
 11-Jun-2004
 	- Peter Amstutz added support for setting animation loops on
 	  models to the csvosa3dl plugin
