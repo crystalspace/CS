@@ -958,8 +958,8 @@ void csGraphics3DGlide2x::SetupPolygon ( G3DPolygonDP& poly, float& J1, float& J
 
 void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
 {
-  if (poly.num < 3) return;
-
+  if (poly.num < 3 || poly.normal.D == 0.0) return;
+  
   iPolygonTexture* pTex;
   iLightMap* piLM = NULL;
   csGlideCacheData* tcache = NULL;
@@ -1118,7 +1118,7 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
       m_dpverts[i].tmuvtx[1].tow= lv; 
     }
   }
-  
+
   if (is_colorkeyed)
     GlideLib_grChromakeyMode (GR_CHROMAKEY_ENABLE);
   
@@ -1134,7 +1134,6 @@ void csGraphics3DGlide2x::DrawPolygon (G3DPolygonDP& poly)
     else
       GlideLib_grFogMode ( GR_FOG_DISABLE );
   }
-      
   RenderPolygon (m_dpverts,poly.num,lm_exists,thTex,thLm,is_transparent);
 
   if (is_colorkeyed)
