@@ -31,6 +31,7 @@ class ddgVArray;
 class ddgContext;
 class csTextureHandle;
 class csVector3;
+typedef unsigned int ddgVBIndex;
 
 /**
  * This object encapsulates a terrain surface so that it
@@ -51,8 +52,6 @@ private:
   ddgContext *context;
   /// Terrain handle.
   csTextureHandle **_textureMap;
-  /// World to camera transformation matrix.
-  double wtoc[16];
   /// Texture scale factor.
   float _texturescale;
   /// Terrain's location offset in world space.
@@ -91,7 +90,7 @@ public:
   /// Set the amount of triangles
   void SetDetail(unsigned int detail);
   /// Put a triangle into the vertex buffer.
-  bool drawTriangle(ddgTBinTree *bt, unsigned int tvc, ddgVArray *vbuf);
+  bool drawTriangle(ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf);
   /**
    * If current transformation puts us below the terrain at the given x,z location
    * then we have hit the terrain.  We adjust position to be at level of terrain
