@@ -254,7 +254,7 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
 void Class::IncRef ()							\
 {									\
   SCF_TRACE (("  (%s *)%p->IncRef (%d)\n", #Class, this,		\
-    scfParent->scfRefCount + 1));					\
+    scfParent->GetRefCount () + 1));					\
   scfParent->IncRef ();							\
 }
 
@@ -269,7 +269,7 @@ void Class::DecRef ()							\
 {									\
   scfParent->DecRef ();							\
   SCF_TRACE (("  (%s *)%p->DecRef (%d)\n", #Class, this, 		\
-    scfParent->scfRefCount));						\
+    scfParent->GetRefCount ()));						\
 }
 
 /**
