@@ -105,7 +105,8 @@ void csGenMaze::GenOrder(int order[4], int direction)
   for(;i<4; i++)
   {
     /// skip from 0 ... 4-i-1
-    int skip = int(float(rand()+1)/RAND_MAX*(4-i));
+    int skip = int(float(4-i)*float(rand()+1)/RAND_MAX);
+    if(skip > 4-i-1) skip = 4-i-1;
     CS_ASSERT( skip >= 0 && skip <= 4-i-1 );
     /// find it
     int numskipped = 0;
