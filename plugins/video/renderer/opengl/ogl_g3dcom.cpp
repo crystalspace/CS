@@ -1540,7 +1540,8 @@ void csGraphics3DOGLCommon::CacheTexture (iPolygonTexture *texture)
 {
   iTextureHandle* txt_handle = texture->GetTextureHandle ();
   texture_cache->cache_texture (txt_handle);
-  lightmap_cache->cache_lightmap (texture);
+  if (m_renderstate.lighting)
+    lightmap_cache->cache_lightmap (texture);
 }
   
 void csGraphics3DOGLCommon::CacheLightedTexture (iPolygonTexture* /*texture*/)

@@ -1,4 +1,19 @@
 The history order has been reversed so that new features are at the top.
+
+17-Jul-2000
+	- Added LGPL notice to a few .inc files.
+	- Change to OpenGL renderer so that lightmaps are only cached
+	  when lighting is enabled. This speeds up rendering considerably
+	  when you disable lighting. This speed increase suggests that
+	  sending over new lightmaps to the hardware is slow. So combining
+	  lightmaps makes sense probably.
+	- Samuel Humphreys did the following changes:
+	    - Fixed perftest so that it exits after finishing tests.
+	    - dtmesh.cpp (I think) didnt take into account
+	      mesh.use_vertex_color = false; and so segfaulted into
+	      perftest..I have fixed it I think :)
+	- Paul Garceau modified mingw.mak to fully accomodate Working
+	  Static Library Build.
 16-Jul-2000
 	- Samuel Humphreys did the following changes..
             - Added two new procedural textures to dtsimple. This is to complete
@@ -22,6 +37,8 @@ The history order has been reversed so that new features are at the top.
             - Removed the opengl 16bit procedural texture pathway for now. As its
               very slow on my machine.
 	    - Added some emacs fontification friendly comments to .inc files
+15-Jul-2000
+	- Wyatt Miler updated the Macintosh project files.
 14-Jul-2000
 	- Brandon Ehle restarted work on Crystal Script (python).
 	  New layout is interface based, which allos for more dynamicism
@@ -54,6 +71,8 @@ The history order has been reversed so that new features are at the top.
 	    - Check out apps/blocks/todo.txt for more information.
 	  Note that this is work in progress. Currently you cannot really
 	  do a network game yet.
+	- Wouter Wijngaards improved the spiral particle system. It
+	  looks a little nicer but not yet very good.
 13-Jul-2000
 	- Removed 'solidbsp' command from documentation.
 	- Added SetMainFrustum to csQuadTree3D to change the frustum for an
