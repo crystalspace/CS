@@ -44,6 +44,16 @@ The history order has been reversed so that new features are at the top.
 	    - Renamed funcon.cfg to fancycon.cfg.
 	    - Renamed funcon.zip to fancycon.zip.
 	    - Fixed several positional computation bugs in csFancyConsole.
+	- Eric Sunshine modified jobber.pl so that it now batches CVS `add' and
+	  `remove' operations rather than invoking them indiviudally for each
+	  file or directory added to, or removed from the repository.  This
+	  speeds up the script significantly when many files need to be added
+	  and removed since the old method of invoking a CVS command for each
+	  file was quit slow on account of the fact that a new session with
+	  both the SSH and CVS servers had to be initiated for every single
+	  file.  Takes special care to add directories before files, and also
+	  batches binary files separately from text files so that `-kb' can be
+	  applied as appropriate.
 23-Mar-2001:
 	- Wouter Wijngaards made 'make win32gcc' correctly detect the
 	  presence of a bash (or other) shell used by the makefile system.

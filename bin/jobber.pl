@@ -60,15 +60,6 @@
 #    access to the repository.
 #
 # To-Do List
-#    * Batch the CVS `add' and `remove' commands whenever possible.  This
-#      should speed up the script significantly when many files need to be
-#      added and removed since the current method of invoking a CVS command for
-#      each file is quit slow on account of the fact that a new session with
-#      both the SSH and CVS servers must be initiated each time.  Files which
-#      are being added must be batched into three groups: (1) directories, (2)
-#      binary files, and (3) text files.  Furthermore, the directories must be
-#      added to the repository before the other files are added.  Binary and
-#      text files can be added in any order after that.
 #    * Generalize into a "job" processing mechanism.  Each job should reside
 #      within its own source file.  There can be jobs to check out files from
 #      CVS, run the various `make' commands (make platform, make htmldoc, make
@@ -93,7 +84,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '11';
+my $PROG_VERSION = '12';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -177,7 +168,7 @@ my $COPYRIGHT = "Copyright (C) 2000 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 $ENV{'CVS_RSH'} = 'ssh';
 
 # Doxygen resides in /usr/local/bin on SourceForge, so add that to path.
-$ENV{'PATH'} .= ':/usr/local/bin';
+$ENV{'PATH'} .= ':/usr/local/bin:/home/groups/crystal/bin';
 
 # The Visual-C++ DSW and DSP generation process is a bit too noisy.
 $ENV{'MSVC_QUIET'} = 'yes';
@@ -261,6 +252,11 @@ my @SCRIPT_OPTIONS = (
     '<>'        => \&option_error
 );
 
+my @NEW_DIRECTORIES = ();
+my @NEW_TEXT_FILES = ();
+my @NEW_BINARY_FILES = ();
+my @OUTDATED_FILES = ();
+
 #------------------------------------------------------------------------------
 # Terminate abnormally and print a textual representation of "errno".
 #------------------------------------------------------------------------------
@@ -270,6 +266,20 @@ sub expire {
     dump_captured();
     destroy_transient($CONV_DIR);
     croak 'Stopped';
+}
+
+#------------------------------------------------------------------------------
+# Convert a list of pathnames into a string which can be passed to a shell
+# command via the command-line.  Also protect special characters from the
+# shell by escaping them.
+#------------------------------------------------------------------------------
+sub prepare_pathnames {
+    my ($path, @paths);
+    foreach $path (@_) {
+	$path =~ s/ /\\ /g;
+	push(@paths, $path);
+    }
+    return join(' ', @paths);
 }
 
 #------------------------------------------------------------------------------
@@ -398,12 +408,23 @@ sub scandir {
 }
 
 #------------------------------------------------------------------------------
-# Remove an entry from the CVS repository if it does not exist in the newly
-# generated documentation hierarchy.  Note that for directories, no action is
-# taken since CVS automatically removes empty directories on the client side
-# when the "-P" switch is used with the CVS "update" command.
+# Apply the CVS `remove' command to a batch of files.
 #------------------------------------------------------------------------------
 sub cvs_remove {
+    my $files = shift;
+    return unless @{$files};
+    my $paths = prepare_pathnames(@{$files});
+    print "Inovking CVS remove: ${\scalar(@{$files})} paths\n";
+    run_command("cvs -Q remove $paths") unless $TESTING;
+}
+
+#------------------------------------------------------------------------------
+# Queue an entry for removal from the CVS repository if it does not exist in
+# the newly generated directory hierarchy.  Note that for directories, no
+# action is taken since CVS automatically removes empty directories on the
+# client side when the "-P" switch is used with the CVS "update" command.
+#------------------------------------------------------------------------------
+sub cvs_queue_remove {
     my $dst = shift;
     my $file = basename($dst);
     if (-d $dst) {
@@ -412,29 +433,43 @@ sub cvs_remove {
     else {
 	print "Removing file: $file\n";
 	remove_file($dst);
-	run_command("cvs -Q remove $dst") unless $TESTING;
+	push(@OUTDATED_FILES, $dst);
     }
 }
 
 #------------------------------------------------------------------------------
-# Add a file or directory from the newly generated documentation hierarchy to
-# the CVS repository.  Take special care to use the "-kb" CVS flag when adding
-# a binary file (such as an image) to the repository.
+# Apply the CVS `add' command to a batch of files.  Allows specification of
+# extra CVS flags (such as `-kb').
 #------------------------------------------------------------------------------
 sub cvs_add {
+    my ($files, $flags) = @_;
+    return unless @{$files};
+    my $paths = prepare_pathnames(@{$files});
+    $flags = '' unless defined($flags);
+    print "Inovking CVS add: ${\scalar(@{$files})} paths" .
+	($flags ? " [$flags]" : '') . "\n";
+    run_command("cvs -Q add $flags $paths") unless $TESTING;
+}
+
+#------------------------------------------------------------------------------
+# Queue a file or directory from the newly generated directory hierarchy for
+# addition to the CVS repository.  Takes special care to use the "-kb" CVS flag
+# when adding a binary file (such as an image) to the repository.
+#------------------------------------------------------------------------------
+sub cvs_queue_add {
     my ($src, $dst) = @_;
     my $file = basename($dst);
     if (-d $src) {
 	print "Adding directory: $file\n";
 	create_directory($dst);
-	run_command("cvs -Q add $dst") unless $TESTING;
+	push(@NEW_DIRECTORIES, $dst);
     }
     else {
 	my $isbin = is_binary($src);
-	my $flags = ($isbin ? '-kb' : '');
 	print "Adding file: $file [", ($isbin ? 'binary' : 'text'), "]\n";
+	push(@NEW_TEXT_FILES, $dst) unless $isbin;
+	push(@NEW_BINARY_FILES, $dst) if $isbin;
 	copy_file($src, $dst);
-	run_command("cvs -Q add $flags $dst") unless $TESTING;
     }
 }
 
@@ -534,11 +569,11 @@ sub apply_diffs {
 	while (defined($oldfile) || defined($newfile)) {
 	    if (!defined($newfile) ||
 		(defined($oldfile) && $oldfile lt $newfile)) {
-		cvs_remove("$olddir/$oldfile");
+		cvs_queue_remove("$olddir/$oldfile");
 		$oldfile = shift @oldfiles;
 	    }
 	    elsif (!defined($oldfile) || $oldfile gt $newfile) {
-		cvs_add("$newdir/$newfile", "$olddir/$newfile");
+		cvs_queue_add("$newdir/$newfile", "$olddir/$newfile");
 		$newfile = shift @newfiles;
 	    }
 	    else { # Filenames are identical.
@@ -548,6 +583,10 @@ sub apply_diffs {
 	    }
 	}
     }
+    cvs_add(\@NEW_DIRECTORIES);
+    cvs_add(\@NEW_TEXT_FILES);
+    cvs_add(\@NEW_BINARY_FILES, '-kb');
+    cvs_remove(\@OUTDATED_FILES);
 }
 
 #------------------------------------------------------------------------------
