@@ -130,6 +130,8 @@ csBugPlug::csBugPlug (iBase *iParent)
   fps_frame_count = 0;
   fps_tottime = 0;
   fps_cur = -1;
+  counter_frames = 0;
+  counter_freeze = false;
 
   debug_sector.sector = NULL;
   debug_sector.view = NULL;
@@ -1059,6 +1061,18 @@ bool csBugPlug::EatKey (iEvent& event)
 	  prev_selected_mesh = NULL;
 	}
         break;
+      case DEBUGCMD_COUNTERRESET:
+        FullResetCounters ();
+	break;
+      case DEBUGCMD_COUNTERREMOVE:
+        counters.DeleteAll ();
+	break;
+      case DEBUGCMD_COUNTERFREEZE:
+        counter_freeze = !counter_freeze;
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s counting.",
+		counter_freeze ? "disabled" : "enabled");
+	break;
     }
     process_next_key = false;
   }
@@ -1265,6 +1279,8 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     }
   }
 
+  ShowCounters ();
+
   if (spider_hunting)
   {
     iCamera* camera = spider->GetCamera ();
@@ -1437,6 +1453,9 @@ int csBugPlug::GetCommandCode (const char* cmd, char* args)
   if (!strcmp (cmd, "fps"))		return DEBUGCMD_FPS;
   if (!strcmp (cmd, "hideselected"))	return DEBUGCMD_HIDESELECTED;
   if (!strcmp (cmd, "undohide"))	return DEBUGCMD_UNDOHIDE;
+  if (!strcmp (cmd, "counterreset"))	return DEBUGCMD_COUNTERRESET;
+  if (!strcmp (cmd, "counterfreeze"))	return DEBUGCMD_COUNTERFREEZE;
+  if (!strcmp (cmd, "counterremove"))	return DEBUGCMD_COUNTERREMOVE;
 
   return DEBUGCMD_UNKNOWN;
 }
@@ -2065,6 +2084,189 @@ void csBugPlug::SwitchDebugView ()
     debug_sector.show = false;
     debug_view.drag_point = -1;
   }
+}
+
+int csBugPlug::FindCounter (const char* countername)
+{
+  int i;
+  for (i = 0 ; i < counters.Length () ; i++)
+    if (!strcmp (counters[i]->countername, countername))
+      return i;
+  return -1;
+}
+
+void csBugPlug::FullResetCounters ()
+{
+  int i;
+  for (i = 0 ; i < counters.Length () ; i++)
+  {
+    int j;
+    for (j = 0 ; j < 10 ; j++)
+    {
+      counters[i]->values[j].total = 0;
+      counters[i]->values[j].current = 0;
+    }
+  }
+  counter_frames = 0;
+}
+
+void csBugPlug::ShowCounters ()
+{
+  if (counters.Length () == 0) return;
+
+  G3D->BeginDraw (CSDRAW_2DGRAPHICS);
+  iFontServer* fntsvr = G2D->GetFontServer ();
+  if (!fntsvr) return;
+  csRef<iFont> fnt (fntsvr->GetFont (0));
+  if (fnt == NULL)
+  {
+    fnt = fntsvr->LoadFont (CSFONT_COURIER);
+  }
+  CS_ASSERT (fnt != NULL);
+  int fw, fh;
+  fnt->GetMaxSize (fw, fh);
+  int sh = G2D->GetHeight ();
+  int bgcolor = G2D->FindRGB (255, 255, 255);
+  int fgcolor = G2D->FindRGB (0, 0, 0);
+
+  if (!counter_freeze) counter_frames++;
+  int i;
+  int cur_y = 10;
+  for (i = 0 ; i < counters.Length () ; i++)
+  {
+    csCounter* c = counters[i];
+    int j;
+    for (j = 0 ; j < 10 ; j++)
+    {
+      c->values[j].total += c->values[j].current;
+    }
+    if (c->is_enum)
+    {
+      float tottotal = 0;
+      float totcurrent = 0;
+      for (j = 0 ; j < 10 ; j++)
+      {
+        tottotal += c->values[j].total;
+	totcurrent += float (c->values[j].current);
+      }
+      if (totcurrent == 0) totcurrent = 1;
+      GfxWrite (G2D, fnt, 10, cur_y, fgcolor, bgcolor,
+    	"%s: %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f / %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f %3.0f",
+	c->countername,
+	c->values[0].total * 100.0 / tottotal,
+	c->values[1].total * 100.0 / tottotal,
+	c->values[2].total * 100.0 / tottotal,
+	c->values[3].total * 100.0 / tottotal,
+	c->values[4].total * 100.0 / tottotal,
+	c->values[5].total * 100.0 / tottotal,
+	c->values[6].total * 100.0 / tottotal,
+	c->values[7].total * 100.0 / tottotal,
+	c->values[8].total * 100.0 / tottotal,
+	c->values[9].total * 100.0 / tottotal,
+	c->values[0].current * 100.0 / totcurrent,
+	c->values[1].current * 100.0 / totcurrent,
+	c->values[2].current * 100.0 / totcurrent,
+	c->values[3].current * 100.0 / totcurrent,
+	c->values[4].current * 100.0 / totcurrent,
+	c->values[5].current * 100.0 / totcurrent,
+	c->values[6].current * 100.0 / totcurrent,
+	c->values[7].current * 100.0 / totcurrent,
+	c->values[8].current * 100.0 / totcurrent,
+	c->values[9].current * 100.0 / totcurrent);
+      for (j = 0 ; j < 10 ; j++)
+      {
+	c->values[j].current = 0;
+      }
+    }
+    else
+    {
+      GfxWrite (G2D, fnt, 10, cur_y, fgcolor, bgcolor,
+    	"%s: last=%d tot=%g avg=%g",
+	c->countername,
+	c->values[0].current, c->values[0].total,
+	c->values[0].total / float (counter_frames));
+      c->values[0].current = 0;
+    }
+    cur_y += fh+4;
+    if (cur_y > sh-10) break;
+  }
+}
+
+void csBugPlug::AddCounter (const char* countername, int amount)
+{
+  if (counter_freeze) return;
+  int i = FindCounter (countername);
+  if (i == -1)
+  {
+    csCounter* c = new csCounter ();
+    c->is_enum = false;
+    c->countername = csStrNew (countername);
+    c->values[0].total = 0;
+    c->values[0].current = amount;
+    counters.Push (c);
+  }
+  else
+  {
+    counters[i]->is_enum = false;
+    counters[i]->values[0].current += amount;
+  }
+}
+
+void csBugPlug::AddCounterEnum (const char* countername, int enumval,
+	int amount)
+{
+  if (counter_freeze) return;
+  if (enumval < 0 || enumval > 9) return;
+  int i = FindCounter (countername);
+  if (i == -1)
+  {
+    csCounter* c = new csCounter ();
+    c->is_enum = true;
+    c->countername = csStrNew (countername);
+    int j;
+    for (j = 0 ; j < 10 ; j++)
+    {
+      c->values[j].total = 0;
+      c->values[j].current = 0;
+    }
+    c->values[enumval].current = amount;
+    counters.Push (c);
+  }
+  else
+  {
+    if (!counters[i]->is_enum)
+    {
+      int j;
+      for (j = 0 ; j < 10 ; j++)
+      {
+        counters[i]->values[j].total = 0;
+        counters[i]->values[j].current = 0;
+      }
+      counters[i]->is_enum = true;
+    }
+    counters[i]->values[enumval].current += amount;
+  }
+}
+
+void csBugPlug::ResetCounter (const char* countername, int value)
+{
+  if (counter_freeze) return;
+  int i = FindCounter (countername);
+  if (i != -1)
+  {
+    int j;
+    for (j = 0 ; j < 10 ; j++)
+    {
+      counters[i]->values[j].current = value;
+    }
+  }
+}
+
+void csBugPlug::RemoveCounter (const char* countername)
+{
+  int i = FindCounter (countername);
+  if (i != -1)
+    counters.Delete (i);
 }
 
 //---------------------------------------------------------------------------

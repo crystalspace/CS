@@ -256,7 +256,11 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   kdtree = new csKDTree (NULL);
 
   if (do_cull_tiled)
+  {
     tcovbuf = new csTiledCoverageBuffer (scr_width, scr_height);
+    csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+    tcovbuf->bugplug = bugplug;
+  }
   else
     covbuf = new csCoverageBuffer (scr_width, scr_height);
 

@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
+#include "csutil/ptrarr.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/bugplug.h"
@@ -118,6 +119,9 @@ class csShadow;
 #define DEBUGCMD_FPS		1040	// Toggle fps (default on)
 #define DEBUGCMD_HIDESELECTED	1041	// Remove selected obj from sectors.
 #define DEBUGCMD_UNDOHIDE	1042	// Undo last hide.
+#define DEBUGCMD_COUNTERRESET	1043	// Reset all counters.
+#define DEBUGCMD_COUNTERREMOVE	1044	// Remove all counters.
+#define DEBUGCMD_COUNTERFREEZE	1045	// Freeze all counters.
 
 /**
  * For key mappings.
@@ -129,6 +133,28 @@ struct csKeyMap
   bool shift, alt, ctrl;
   int cmd;	// One of DEBUGCMD_...
   char* args;
+};
+
+struct csCounterValue
+{
+  float total;
+  int current;
+};
+
+/**
+ * For counters.
+ */
+struct csCounter
+{
+  char* countername;
+  bool is_enum;
+  // Values: if is_enum == false only value[0] is used.
+  csCounterValue values[10];
+
+  ~csCounter ()
+  {
+    delete[] countername;
+  }
 };
 
 //--------------------------------------------------------------------------
@@ -153,16 +179,23 @@ private:
   // Specific debugging options.
   //------------------------------------------------------------------
 
-  /// For fps
+  // All the counters.
+  csPDelArray<csCounter> counters;
+  // Frame counter for the counters.
+  int counter_frames;
+  // If true the counters are frozen but still displayed.
+  bool counter_freeze;
+
+  // For fps
   bool do_fps;
   int fps_frame_count;
   int fps_tottime;
   float fps_cur;
 
-  /// For 'clear' command.
+  // For 'clear' command.
   bool do_clear;
 
-  /// Dump various structures.
+  // Dump various structures.
   void Dump (iEngine* engine);
   void Dump (iSector* sector);
   void Dump (iMeshWrapper* mesh);
@@ -178,37 +211,37 @@ private:
 
   void Report (int severity, const char* msg, ...);
 
-  /// Toggle a G3D boolean option.
+  // Toggle a G3D boolean option.
 #ifndef CS_USE_NEW_RENDERER
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
 #endif
 
-  /// The selected mesh.
+  // The selected mesh.
   iMeshWrapper* selected_mesh;
-  /// Previous selected mesh (after DEBUGCMD_HIDESELECTED).
+  // Previous selected mesh (after DEBUGCMD_HIDESELECTED).
   iMeshWrapper* prev_selected_mesh;
   int mesh_num_sectors;
   iSector* mesh_sectors[10];
 
-  /// Shadow!
+  // Shadow!
   csShadow* shadow;
 
-  /// Spider!
+  // Spider!
   csSpider* spider;
-  /// If true then spider is hunting.
+  // If true then spider is hunting.
   bool spider_hunting;
-  /**
+  /*
    * Timeout. Every frame this value is decreased.
    * If it reaches 0 and no camera has been found we stop hunting.
    */
   int spider_timeout;
-  /// Command to execute when spider found a camera.
+  // Command to execute when spider found a camera.
   int spider_command;
-  /// Mouse x and y for the command (if a selection command).
+  // Mouse x and y for the command (if a selection command).
   int mouse_x, mouse_y;
-  /// Send the Spider on a hunt.
+  // Send the Spider on a hunt.
   void UnleashSpider (int cmd);
-  /**
+  /*
    * The Spider has done its job. Send him back to his hiding place.
    * Also perform the Spider command on the camera we found (only if
    * camera != NULL).
@@ -365,6 +398,15 @@ public:
   void SwitchDebugView ();
   bool CheckDebugView () const { return debug_view.show; }
 
+  int FindCounter (const char* countername);
+  void FullResetCounters ();
+  void ShowCounters ();
+
+  void AddCounter (const char* countername, int amount = 1);
+  void AddCounterEnum (const char* countername, int enumval, int amount = 1);
+  void ResetCounter (const char* countername, int value = 0);
+  void RemoveCounter (const char* countername);
+
   struct BugPlug : public iBugPlug
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBugPlug);
@@ -445,6 +487,23 @@ public:
     virtual bool CheckDebugView () const
     {
       return scfParent->CheckDebugView ();
+    }
+    virtual void AddCounter (const char* countername, int amount = 1)
+    {
+      scfParent->AddCounter (countername, amount);
+    }
+    virtual void AddCounterEnum (const char* countername, int enumval,
+  	int amount = 1)
+    {
+      scfParent->AddCounterEnum (countername, enumval, amount);
+    }
+    virtual void ResetCounter (const char* countername, int value = 0)
+    {
+      scfParent->ResetCounter (countername, value);
+    }
+    virtual void RemoveCounter (const char* countername)
+    {
+      scfParent->RemoveCounter (countername);
     }
   } scfiBugPlug;
 

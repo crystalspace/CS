@@ -27,6 +27,7 @@
 
 struct iGraphics2D;
 struct iGraphics3D;
+struct iBugPlug;
 class csString;
 class csBox2;
 class csTiledCoverageBuffer;
@@ -245,6 +246,9 @@ public:
  */
 class csTiledCoverageBuffer : public iBase
 {
+public:
+  iBugPlug* bugplug;	// For debugging...
+
 private:
   int width, height;
   int width_po2;	// Width after correcting for power of two.

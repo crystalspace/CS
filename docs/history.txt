@@ -5,6 +5,30 @@ The history order is reversed so that new features are at the top.
 	  bit safer again.
 	- Dynavis tiled coverage buffer now uses ClipLine(). This greatly
 	  cleans up the code and makes it a lot more robust.
+	- Made a new counter system in BugPlug. Using this system it is now
+	  a lot easier to manage counters that should count something every
+	  frame. Basically the application only has to do
+	  bugplug->AddCounter("countername") to increase a named counter
+	  and BugPlug will do the following at the end of every frame:
+	      - Show the last value.
+	      - Show the total value accumulated over several frames.
+	      - Show the average per frame.
+	  The user of these counters doesn't have to take care of clearing
+	  them every frame and displaying them.
+	  There are two types of counters: normal counters and enum counters.
+	  An enum counter keeps track of 10 different values and calculates
+	  relative percentages. To use an enum counter an application or
+	  plugin can do bugplug->AddCounterEnum ("countername", enumval).
+	  enumval should be between 0 and 9.
+	- Added commands 'counterfreeze', 'counterreset', and 'counterremove'
+	  to BugPlug. With 'counterfreeze' the counters stop counting and
+	  you can examine the current values of the counters more easily.
+	  With 'counterreset' all counters are reset to initial values.
+	  With 'counterremove' all counters are removed. Commands
+	  are assigned as follows:
+	      - shift-p: counterfreeze
+	      - ctrl-p: counterreset
+	      - alt-p: counterremove
 12-Feb-2003
 	- Performed several optimizations on the tinyxml parser. Hopefully
 	  it is now a little faster.

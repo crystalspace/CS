@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 
 class csBox3;
+class csVector2;
 class csVector3;
 class csReversibleTransform;
 struct iMeshObject;
@@ -41,7 +42,7 @@ struct iBugPlugRenderObject : public iBase
   virtual void Render (iGraphics3D* g3d, iBugPlug* bugplug) = 0;
 };
 
-SCF_VERSION (iBugPlug, 0, 0, 2);
+SCF_VERSION (iBugPlug, 0, 0, 3);
 
 /**
  * Using this interface you can communicate with the BugPlug plugin.
@@ -162,6 +163,41 @@ struct iBugPlug : public iBase
    * Returns true if the debug view is currently visible.
    */
   virtual bool CheckDebugView () const = 0;
+
+  //=========================================================================
+
+  /**
+   * Add an amount to a counter. Bugplug will automatically clear this counter
+   * every frame and show the last number, the average, the number of frames,
+   * and the total for every known counter. You don't have to specficially
+   * register a counter. Just by using this function BugPlug will know about
+   * the counter.
+   */
+  virtual void AddCounter (const char* countername, int amount = 1) = 0;
+
+  /**
+   * Add an amount to a enum-counter. This is similar to a regular counter
+   * except that BugPlug will keep track of how many times every particular
+   * value is encountered. Enum-counters are displayed differently.
+   * BugPlug will automatically convert a counter to an enum-counter if you
+   * use this function on an existing counter and vice versa.
+   * BugPlug currently only supports enum values between 0 and 9.
+   */
+  virtual void AddCounterEnum (const char* countername, int enumval,
+  	int amount = 1) = 0;
+
+  /**
+   * Reset some counter manually. Normally BugPlug will reset counters
+   * every frame but you can also reset it manually. If you reset an
+   * enum-counter all enum types are reset at once.
+   */
+  virtual void ResetCounter (const char* countername, int value = 0) = 0;
+
+  /**
+   * Remove a counter. From this point on BugPlug will no longer show this
+   * counter (BugPlug will remove the counter internally).
+   */
+  virtual void RemoveCounter (const char* countername) = 0;
 
   //=========================================================================
 };

@@ -20,6 +20,7 @@
 #include "cssys/sysfunc.h"
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
+#include "ivaria/bugplug.h"
 #include "qint.h"
 #include "qsqrt.h"
 #include "csgeom/box.h"
@@ -683,6 +684,7 @@ csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
   tiles = NULL;
   dirty_left = NULL;
   dirty_right = NULL;
+  bugplug = NULL;
 
   Setup (w, h);
 }
