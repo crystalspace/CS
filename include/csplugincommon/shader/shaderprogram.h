@@ -99,7 +99,7 @@ protected:
     ParamVector2    = 0x02,
     ParamVector3    = 0x04,
     ParamVector4    = 0x08,
-    ParamMatrix	    = 0x10,
+    ParamMatrix	    = 0x10
   };
   void ResolveParamStatic (ProgramParam& param,
     csArray<iShaderVariableContext*> &staticContexts);

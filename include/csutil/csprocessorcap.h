@@ -234,7 +234,7 @@ end_detect:
     //AMD3dnowSupported = capFlags & (1<<31);
   }
 #else //CS_PROCESSOR_X86
-  static inline void csProcessorCapability::CheckX86Processor() {}
+  static inline void CheckX86Processor() {}
 #endif //CS_PROCESSOR_X86
 };
 
