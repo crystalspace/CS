@@ -18,6 +18,14 @@ Short-term cleanups that need to be done:
 	  to SetName in csObject.
 	- Norman Kramer removed the test for important colors in 256-color
 	  bitmaps (BMP loading).
+	- More updates to Map2CS from Thomas Hieber.
+          The default sector is now generated using black flatshading
+	  instead of using an randomly selected texture. (this will
+	  also help a little bit with performance).
+	- Thomas also updated the Win VC project files to reflect Jorrits
+	  latest move of files.
+	- Eric Sunshine did a few changes to NeXT documentation.
+	- Norman Kramer added support for RLE8 encoded BMP-files.
 8-Jan-2000
 	- Michael Dale Long added support for configurable colors using
 	  the iTextureManager to iConsole.  He also removed all dependencies
