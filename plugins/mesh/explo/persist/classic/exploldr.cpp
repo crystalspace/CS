@@ -34,11 +34,13 @@
 #include "iutil/vfs.h"
 #include "csutil/csstring.h"
 #include "iutil/object.h"
+#include "iutil/document.h"
 #include "iengine/material.h"
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "imap/ldrctxt.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -58,6 +60,24 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SPREADSPEED)
   CS_TOKEN_DEF (SPREADACCEL)
 CS_TOKEN_DEF_END
+
+enum
+{
+  XMLTOKEN_CENTER = 1,
+  XMLTOKEN_COLOR,
+  XMLTOKEN_FACTORY,
+  XMLTOKEN_FADE,
+  XMLTOKEN_LIGHTING,
+  XMLTOKEN_MATERIAL,
+  XMLTOKEN_MIXMODE,
+  XMLTOKEN_NUMBER,
+  XMLTOKEN_NRSIDES,
+  XMLTOKEN_PARTRADIUS,
+  XMLTOKEN_PUSH,
+  XMLTOKEN_SPREADPOS,
+  XMLTOKEN_SPREADSPEED,
+  XMLTOKEN_SPREADACCEL
+};
 
 SCF_IMPLEMENT_IBASE (csExplosionFactoryLoader)
   SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
@@ -148,6 +168,22 @@ iBase* csExplosionFactoryLoader::Parse (const char* /*string*/,
   return fact;
 }
 
+iBase* csExplosionFactoryLoader::Parse (iDocumentNode* /*node*/,
+	iLoaderContext*, iBase* /* context */)
+{
+  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.explosion", iMeshObjectType);
+  if (!type)
+  {
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.explosion",
+    	iMeshObjectType);
+    printf ("Load TYPE plugin crystalspace.mesh.object.explosion\n");
+  }
+  iMeshObjectFactory* fact = type->NewFactory ();
+  type->DecRef ();
+  return fact;
+}
+
 //---------------------------------------------------------------------------
 
 csExplosionFactorySaver::csExplosionFactorySaver (iBase* pParent)
@@ -181,12 +217,15 @@ csExplosionLoader::csExplosionLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   plugin_mgr = NULL;
+  synldr = NULL;
+  reporter = NULL;
 }
 
 csExplosionLoader::~csExplosionLoader ()
 {
   SCF_DEC_REF (plugin_mgr);
   SCF_DEC_REF (synldr);
+  SCF_DEC_REF (reporter);
 }
 
 bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
@@ -194,6 +233,23 @@ bool csExplosionLoader::Initialize (iObjectRegistry* object_reg)
   csExplosionLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
+  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+
+  xmltokens.Register ("center", XMLTOKEN_CENTER);
+  xmltokens.Register ("color", XMLTOKEN_COLOR);
+  xmltokens.Register ("factory", XMLTOKEN_FACTORY);
+  xmltokens.Register ("fade", XMLTOKEN_FADE);
+  xmltokens.Register ("lighting", XMLTOKEN_LIGHTING);
+  xmltokens.Register ("material", XMLTOKEN_MATERIAL);
+  xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
+  xmltokens.Register ("number", XMLTOKEN_NUMBER);
+  xmltokens.Register ("nrsides", XMLTOKEN_NRSIDES);
+  xmltokens.Register ("partradius", XMLTOKEN_PARTRADIUS);
+  xmltokens.Register ("push", XMLTOKEN_PUSH);
+  xmltokens.Register ("spreadpos", XMLTOKEN_SPREADPOS);
+  xmltokens.Register ("spreadspeed", XMLTOKEN_SPREADSPEED);
+  xmltokens.Register ("spreadaccel", XMLTOKEN_SPREADACCEL);
+
   return true;
 }
 
@@ -358,6 +414,123 @@ iBase* csExplosionLoader::Parse (const char* string,
 
   if (partstate) partstate->DecRef ();
   if (explostate) explostate->DecRef ();
+  return mesh;
+}
+
+iBase* csExplosionLoader::Parse (iDocumentNode* node,
+	iLoaderContext* ldr_context, iBase*)
+{
+  csRef<iMeshObject> mesh;
+  csRef<iParticleState> partstate;
+  csRef<iExplosionState> explostate;
+
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_COLOR:
+	{
+	  csColor color;
+	  if (!synldr->ParseColor (child, color))
+	    return NULL;
+	  partstate->SetColor (color);
+	}
+	break;
+      case XMLTOKEN_CENTER:
+	{
+	  csVector3 center;
+	  if (!synldr->ParseVector (child, center))
+	    return NULL;
+	  explostate->SetCenter (center);
+	}
+	break;
+      case XMLTOKEN_PUSH:
+	{
+	  csVector3 push;
+	  if (!synldr->ParseVector (child, push))
+	    return NULL;
+	  explostate->SetPush (push);
+	}
+	break;
+      case XMLTOKEN_FACTORY:
+	{
+	  const char* factname = child->GetContentsValue ();
+	  iMeshFactoryWrapper* fact = ldr_context->FindMeshFactory (factname);
+	  if (!fact)
+	  {
+      	    synldr->ReportError ("crystalspace.exploader.parse.unknownfactory",
+		child, "Couldn't find factory '%s'!", factname);
+	    return NULL;
+	  }
+	  mesh = csPtr<iMeshObject> (
+	  	fact->GetMeshObjectFactory ()->NewInstance ());
+          partstate = SCF_QUERY_INTERFACE (mesh, iParticleState);
+          explostate = SCF_QUERY_INTERFACE (mesh, iExplosionState);
+	}
+	break;
+      case XMLTOKEN_MATERIAL:
+	{
+	  const char* matname = child->GetContentsValue ();
+          iMaterialWrapper* mat = ldr_context->FindMaterial (matname);
+	  if (!mat)
+	  {
+      	    synldr->ReportError ("crystalspace.exploader.parse.unknownmaterial",
+		child, "Couldn't find material '%s'!", matname);
+	    return NULL;
+	  }
+	  partstate->SetMaterialWrapper (mat);
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+        {
+	  uint mode;
+	  if (!synldr->ParseMixmode (child, mode))
+	    return NULL;
+          partstate->SetMixMode (mode);
+	}
+	break;
+      case XMLTOKEN_LIGHTING:
+        {
+          bool do_lighting;
+	  if (!synldr->ParseBool (child, do_lighting, true))
+	    return NULL;
+          explostate->SetLighting (do_lighting);
+        }
+        break;
+      case XMLTOKEN_NUMBER:
+        explostate->SetParticleCount (child->GetContentsValueAsInt ());
+        break;
+      case XMLTOKEN_NRSIDES:
+        explostate->SetNrSides (child->GetContentsValueAsInt ());
+        break;
+      case XMLTOKEN_FADE:
+        explostate->SetFadeSprites (child->GetContentsValueAsInt ());
+        break;
+      case XMLTOKEN_PARTRADIUS:
+        explostate->SetPartRadius (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_SPREADPOS:
+        explostate->SetSpreadPos (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_SPREADSPEED:
+        explostate->SetSpreadSpeed (child->GetContentsValueAsFloat ());
+        break;
+      case XMLTOKEN_SPREADACCEL:
+        explostate->SetSpreadAcceleration (child->GetContentsValueAsFloat ());
+        break;
+      default:
+        synldr->ReportBadToken (child);
+	return NULL;
+    }
+  }
+
+  // IncRef() to avoid smart pointer releasing mesh.
+  if (mesh) mesh->IncRef ();
   return mesh;
 }
 
