@@ -21,6 +21,7 @@
 
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
+#include "igeom/polymesh.h"
 #include "csutil/cscolor.h"
 #include "iengine/mesh.h"
 #include "imesh/object.h"
@@ -86,7 +87,7 @@ public:
   csVector2 texels[16];
   csColor color[16];
 
-  bool vis;
+  //bool vis;
   char max_LOD; // max user lod
   //unsigned char lod_level;
   // shared edges in Vertex Buffers
@@ -115,6 +116,51 @@ public:
   ~csBCTerrBlock ();
 };
 
+struct BCPolyMesh : public iPolygonMesh
+{
+public:
+  csMeshedPolygon* culling_mesh;
+  bool culling;
+  csVector3* square_verts;
+
+  SCF_DECLARE_IBASE;
+  BCPolyMesh ();
+  ~BCPolyMesh ();
+  
+  virtual int GetVertexCount ()
+  {
+    if (culling)
+      return 4;
+    else
+      return 0;
+  }
+  virtual csVector3* GetVertices ()
+  {
+    if (culling)
+      return square_verts;
+    else
+      return NULL;
+  }
+  virtual int GetPolygonCount ()
+  {
+    if (culling)
+      return 1;
+    else
+      return 0;
+  }
+  virtual csMeshedPolygon* GetPolygons ()
+  {
+    if (culling)
+      return culling_mesh;
+    else
+      return NULL;
+  }
+  virtual void Cleanup () 
+  {
+    return;
+  }
+};
+
 /**
  *  csBCTerrObject : Bezier Curve Terrain Object
  */
@@ -122,8 +168,15 @@ public:
 class csBCTerrObject : public iMeshObject
 {
 private:
+  // should we flatten colinearally?
+  bool flattenheight, initheight;
+  // flatten to this height if not colinearally
+  float  toph, righth, downh, lefth;   
+
   void SetupControlPoints (iImage* im);
   int GetHeightFromImage (iImage* im, float x, float z);
+  void FlattenSides ();
+  void BuildCullMesh ();
 public:
   // todo: clean this up?
   iObjectRegistry* object_reg;
@@ -134,6 +187,9 @@ public:
   iVertexBufferManager *vbufmgr;
   csBox3 bbox;
   csVector3 radius;
+
+  BCPolyMesh culling_mesh;
+  bool vis;
 
   csVector3* control_points;
   csBCCollisionQuad *collision;
@@ -153,6 +209,9 @@ public:
   void SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&vbuf2);
   void GetRadius (csVector3& rad, csVector3& cent);
   int HeightTest (csVector3 *point);
+  int HeightTestExt (csVector3 *point);
+  void FreeSharedLOD (const csVector3 point);
+
 
   ///--------------------- iMeshObject implementation ---------------------
   SCF_DECLARE_IBASE;
@@ -265,6 +324,7 @@ public:
     {
     }
   } scfiBCTerrState;
+  
   //------------------------- iObjectModel implementation ----------------
   class BCTerrModel : public iObjectModel
   {
@@ -272,15 +332,15 @@ public:
     virtual long GetShapeNumber () const { return 1; }
     virtual iPolygonMesh* GetPolygonMesh ()
     {
-      return NULL;
+      return (iPolygonMesh*)&scfParent->culling_mesh;
     }
     virtual iPolygonMesh* GetSmallerPolygonMesh ()
     {
-      return NULL;
+      return (iPolygonMesh*)&scfParent->culling_mesh;
     }
     virtual iPolygonMesh* CreateLowerDetailPolygonMesh (float detail)
     {
-      return NULL;
+      return (iPolygonMesh*)&scfParent->culling_mesh;
     }
     virtual void GetObjectBoundingBox (csBox3& bbox,
         int type = CS_BBOX_NORMAL)
@@ -292,10 +352,174 @@ public:
       scfParent->GetRadius (radius, center);
     }
   } scfiObjectModel;
-
+  
+  ///--------------------- iMeshObject implementation ---------------------
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel;}
 
-  /// interface to receive state of vertexbuffermanager
+  //------------------------- iTerrFuncState implementation ----------------
+  // only here for walktest use
+  class TerrFuncState : public iTerrFuncState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csBCTerrObject);
+    virtual void LoadMaterialGroup (iLoaderContext* ldr_context,
+    	const char *pName, int iStart, int iEnd)
+    {
+      return;
+    }
+    virtual void SetTopLeftCorner (const csVector3& topleft)
+    {
+      return;
+    }
+    virtual csVector3 GetTopLeftCorner ()
+    {
+      return scfParent->topleft;
+    }
+    virtual void SetScale (const csVector3& scale)
+    {
+      return;
+    }
+    virtual csVector3 GetScale ()
+    {
+      csVector3 nreturn;
+      return nreturn;
+    }
+    virtual void SetResolution (int x, int y)
+    {
+      return;
+    }
+    virtual int GetXResolution ()
+    {
+      return 0;
+    }
+    virtual int GetYResolution ()
+    {
+      return 0;
+    }
+    virtual void SetGridResolution (int x, int y)
+    {
+      return;
+    }
+    virtual int GetXGridResolution ()
+    {
+      return 0;
+    }
+    virtual int GetYGridResolution ()
+    {
+      return 0;
+    }
+    virtual void SetColor (const csColor& col)
+    {
+      return;
+    }
+    virtual csColor GetColor () const
+    {
+      csColor ncolor;
+      return ncolor;
+    }
+    virtual void SetHeightFunction (iTerrainHeightFunction* func)
+    {
+      return;;
+    }
+    virtual void SetNormalFunction (iTerrainNormalFunction* func)
+    {
+      return;;
+    }
+    virtual void SetHeightMap (iImage* im, float hscale, float hshift)
+    {
+      return;
+    }
+    virtual iTerrainHeightFunction* GetHeightFunction () const
+    {
+      return NULL;
+    }
+    virtual iTerrainNormalFunction* GetNormalFunction () const
+    {
+      return NULL;
+    }
+    virtual void SetLODDistance (int lod, float dist)
+    {
+      return;
+    }
+    virtual float GetLODDistance (int lod)
+    {
+      return 0;
+    }
+    virtual void SetMaximumLODCost (int lod, float maxcost)
+    {
+      return;
+    }
+    virtual float GetMaximumLODCost (int lod)
+    {
+      return 0;
+    }
+    virtual void CorrectSeams (int tw, int th)
+    {
+      return;
+    }
+    virtual void GetCorrectSeams (int& tw, int& th) const
+    {
+      return;
+    }
+    virtual void SetQuadDepth (int qd)
+    {
+      return;
+    }
+    virtual int GetQuadDepth () const
+    {
+      return 0;
+    }
+    virtual void SetVisTesting (bool en)
+    {
+      return;
+    }
+    virtual bool IsVisTestingEnabled ()
+    {
+      return false;
+    }
+    virtual void SetDirLight (const csVector3& pos, const csColor& col)
+    {
+      return;
+    }
+    virtual csVector3 GetDirLightPosition () const
+    {
+      csVector3 dir;
+      return dir;
+    }
+    virtual csColor GetDirLightColor () const
+    {
+      csColor dir;
+      return dir;
+    }
+    virtual void DisableDirLight ()
+    {
+      return;
+    }
+    virtual bool IsDirLightEnabled () const
+    {
+      return false;
+    }
+    virtual void SetMaterial (int i, iMaterialWrapper* mat)
+    {
+      return;
+    }
+    virtual int GetMaterialCount () const
+    {
+      return 0;
+    }
+    virtual int CollisionDetect (csTransform *p)
+    {
+      int hits;
+      csVector3 new_point = p->GetOrigin ();
+      hits = scfParent->HeightTestExt (&new_point);
+      p->SetOrigin (new_point);
+      return hits;
+    }
+
+  } scfiTerrFuncState;
+  friend class TerrFuncState;
+
+ 
+  ///--------- interface to receive state of vertexbuffermanager-----------
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBCTerrObject);
@@ -303,7 +527,7 @@ public:
   } scfiVertexBufferManagerClient;
 
 private:
-  void SetAllVisible ()
+  /*void SetAllVisible ()
   {
     if (blocks)
     {
@@ -313,7 +537,7 @@ private:
         blocks[i].vis = true;
       }
     }
-  }
+  }*/
 };
 
 class csBCLODOwner
@@ -339,12 +563,16 @@ private:
     last_level = 0;
     last_owner = 0;
   }
+  void AddTerrObject (csBCTerrObject* obj);
 
 public:
   iObjectRegistry *object_reg;
   int edge_res; // # of shared vertices per block edge, includes control points
   csVector2 blocksize;
   float height_multiplier;
+  csBCTerrObject** object_list;
+  int num_objects;
+  bool free_lods;
 
   // a pointer to an array of pointers to shared_mesh type
   // this is used to share resources and save memory
@@ -359,8 +587,8 @@ public:
 
   csBCLODOwner** owners;
   int last_level, last_owner;
+  csVector3 focus;
   csTicks time;
-  csVector3* focus;
 
   csBCTerrObjectFactory (iObjectRegistry* object_reg);
   virtual ~csBCTerrObjectFactory ();
@@ -429,7 +657,7 @@ public:
     }
     virtual void AddTime (csTicks addtime)
     {
-      scfParent->time += addtime;
+      scfParent->time = addtime;
       //scfParent->CheckShared ();
     }
     virtual csVector2* GetSize ()
@@ -440,7 +668,7 @@ public:
     {
       return scfParent->CreateFreeMesh ();
     }
-    virtual void SetFocusPoint (csVector3* nfocus)
+    virtual void SetFocusPoint (const csVector3 nfocus)
     {
       scfParent->focus = nfocus;
     }
