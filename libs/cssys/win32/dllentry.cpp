@@ -19,8 +19,9 @@
 #include "sysdef.h"
 #include "csutil/scf.h"
 
-// ModuleHandle is defined once in libCsCOM
-extern HINSTANCE ModuleHandle;
+#include <windows.h>
+
+HINSTANCE ModuleHandle;
 
 // Main DLL entry point... should be called when we're loaded.
 extern "C" BOOL WINAPI DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/)

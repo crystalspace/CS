@@ -27,7 +27,16 @@ csLibraryHandle csLoadLibrary (const char* szLibName)
 
 void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
 {
-  return GetProcAddress ((HMODULE)Handle, Name);
+  void* ptr=GetProcAddress ((HMODULE)Handle, Name);
+  if(!ptr) {
+    char *Name2;
+    Name2=new char[strlen(Name)+1];
+    strcpy(Name2, "_");
+    strcat(Name2, Name);
+    ptr=GetProcAddress ((HMODULE)Handle, Name2);
+    delete [] Name2;
+  }
+  return ptr;
 }
 
 bool csUnloadLibrary (csLibraryHandle Handle)
