@@ -21,12 +21,8 @@
 #include "isystem.h"
 #include "csutil/csrect.h"
 #include "cssys/csevent.h"
-
-// Some mumbo-jumbo with CHK since MGL also defines this macros :-)
-#undef CHK
 #include "mgl2d.h"
-#undef CHK
-#define x x
+#define x x /* @@@ Why this, Andrew? */
 
 extern int ScancodeToChar[];
 
