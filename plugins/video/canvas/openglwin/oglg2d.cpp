@@ -72,7 +72,7 @@
 #define DISP_CHANGE_BADPARAM        -5
 #endif
 
-#define WINDOW_STYLE (WS_CAPTION | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
+#define WINDOW_STYLE (WS_POPUP | WS_MINIMIZEBOX | WS_POPUP | WS_SYSMENU)
 
 void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
