@@ -89,7 +89,8 @@ bool csMultiplexImageIO::Initialize (iObjectRegistry *object_reg)
     }
     classlist->DecRef();
     plugin_mgr->DecRef ();
-    return (list.Length() > 0);
+    //return (list.Length() > 0);
+    return true;
   }
   return false;
 }
