@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 10-May-2004
+	- Jorrit added a missing file in the new 3dsmax exporter from Luca
+	  Pancallo. Now it should work.
 	- Eric Sunshine changed LinkPlugin rule in unix.jam so that it only
 	  uses the plugin's basename as an argument to -soname rather than the
 	  full path to the plugin in the build directory, since that was not
