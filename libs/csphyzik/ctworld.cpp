@@ -201,12 +201,16 @@ errorcode ctWorld::evolve( real t1, real t2 )
     max_cat_dist = 0;
     recent_cat.remove_all();
     cat = catastrophe_list.get_first();
+    bool no_great_cat_dist = true;
     while( cat != NULL ){
       this_cat_dist = cat->check_catastrophe();
       if( this_cat_dist > 0 ){
         recent_cat.add_link( cat );
         if( this_cat_dist > max_cat_dist ){
           max_cat_dist = this_cat_dist;
+        }
+        if (this_cat_dist > cat->get_epsilon()) {
+          no_great_cat_dist = false;
         }
       }
       cat = catastrophe_list.get_next();
@@ -216,16 +220,17 @@ errorcode ctWorld::evolve( real t1, real t2 )
     if( max_cat_dist > 0 ){
       // if interpenetrations distance is very small => time of impact found
       // or if the time step is really small
-      if( max_cat_dist <= cat->get_epsilon() || ( tb - ta ) <= TIME_EPSILON ){
+      if( no_great_cat_dist || ( tb - ta ) <= TIME_EPSILON ){
         // respond to collision
         //!me collision_response( space_world );
-
+        
         // resolve all catastrophes that occurred at this approx point in time.
         cat = recent_cat.get_first();
         while( cat ){
           cat->handle_catastrophe();
+          cat = recent_cat.get_next();
         }
-
+        
         ta = tb;
         tb = t2;
       }else{
