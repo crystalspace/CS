@@ -69,7 +69,8 @@ csApp::csApp (const char *AppTitle, csAppBackgroundStyle iBackgroundStyle) : csC
   BackgroundStyle = iBackgroundStyle;
   insert = true;
   SetFontSize (12);
-  
+  GfxPpl   = NULL;
+
   OldMouseCursorID = csmcNone;
   MouseCursorID = csmcArrow;
 
