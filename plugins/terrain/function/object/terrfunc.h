@@ -106,19 +106,6 @@ private:
   bool do_vis_test;
 
   /**
-   * Take a part of a mesh and calculate the minimum/maximum height.
-   * The part is specified with the coordinates cx, cy given a certain
-   * dimension. i.e. if w is 2 this means the mesh is divided into 2*2
-   * sub-meshes and coordinate 0,1 (for example) means that we take
-   * the sub-mesh at coordinate 0,1.
-   * This function assumes the bbox in csTerrBlock is ok.
-   */
-  static void GetMinMaxMesh (const G3DTriangleMesh& mesh,
-  	const csBox3& bbox,
-  	int cx, int cy, int w,
-	float& min_height, float& max_height);
-
-  /**
    * Clear a mesh and initialize it for new usage (call before
    * SetupBaseMesh() or ComputeLODLevel() (as dest)).
    */

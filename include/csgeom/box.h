@@ -217,6 +217,19 @@ public:
     return false;
   }
 
+  /**
+   * Calculate the squared distance between (0,0) and the box
+   * This routine is extremely efficient.
+   */
+  float SquaredOriginDist () const;
+
+  /**
+   * Calculate the squared distance between (0,0) and the point
+   * on the box which is furthest away from (0,0).
+   * This routine is extremely efficient.
+   */
+  float SquaredOriginMaxDist () const;
+
   /// Initialize this box to empty.
   void StartBoundingBox ()
   {
@@ -729,7 +742,14 @@ public:
    * Calculate the squared distance between (0,0,0) and the box
    * This routine is extremely efficient.
    */
-  float SquaredOriginDist() const;
+  float SquaredOriginDist () const;
+
+  /**
+   * Calculate the squared distance between (0,0,0) and the point
+   * on the box which is furthest away from (0,0,0).
+   * This routine is extremely efficient.
+   */
+  float SquaredOriginMaxDist () const;
 
   /// Compute the union of two bounding boxes.
   csBox3& operator+= (const csBox3& box);

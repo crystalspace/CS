@@ -962,40 +962,6 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
     }
 }
 
-void csTerrFuncObject::GetMinMaxMesh (const G3DTriangleMesh& mesh,
-	const csBox3& bbox,
-  	int cx, int cy, int w,
-	float& min_height, float& max_height)
-{
-//@@@ OBSOLETE
-  float boxw = bbox.MaxX () - bbox.MinX ();
-  float boxh = bbox.MaxY () - bbox.MinY ();
-  float minx = bbox.MinX () + float (cx) * boxw / float (w);
-  float miny = bbox.MinY () + float (cy) * boxh / float (w);
-  float maxx = bbox.MinX () + float (cx+1) * boxw / float (w);
-  float maxy = bbox.MinY () + float (cy+1) * boxh / float (w);
-  // Add a small border to min/max so that points at the
-  // border are also counted.
-  minx -= boxw / 1000.;
-  miny -= boxh / 1000.;
-  maxx += boxw / 1000.;
-  maxy += boxh / 1000.;
-  min_height = bbox.MaxY ();
-  max_height = bbox.MinY ();
-  int i;
-  for (i = 0 ; i < mesh.num_vertices ; i++)
-  {
-    float x = mesh.vertices[0][i].x;
-    float z = mesh.vertices[0][i].z;
-    if (x >= minx && x <= maxx && z >= miny && z <= maxy)
-    {
-      float y = mesh.vertices[0][i].y;
-      if (y < min_height) min_height = y;
-      if (y > max_height) max_height = y;
-    }
-  }
-}
-
 void csTerrFuncObject::SetupVisibilityTree (csTerrainQuad* quad,
 	int x1, int y1, int x2, int y2, int depth)
 {

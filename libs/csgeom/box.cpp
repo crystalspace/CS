@@ -90,20 +90,23 @@ csBox2& csBox2::operator*= (const csBox2& box)
 
 csBox2 operator+ (const csBox2& box1, const csBox2& box2)
 {
-  return csBox2( MIN(box1.minbox.x,box2.minbox.x), MIN(box1.minbox.y,box2.minbox.y),
-              MAX(box1.maxbox.x,box2.maxbox.x), MAX(box1.maxbox.y,box2.maxbox.y) );
+  return csBox2(
+  	MIN(box1.minbox.x,box2.minbox.x), MIN(box1.minbox.y,box2.minbox.y),
+	MAX(box1.maxbox.x,box2.maxbox.x), MAX(box1.maxbox.y,box2.maxbox.y) );
 }
 
 csBox2 operator+ (const csBox2& box, const csVector2& point)
 {
-  return csBox2( MIN(box.minbox.x,point.x), MIN(box.minbox.y,point.y),
-              MAX(box.maxbox.x,point.x), MAX(box.maxbox.y,point.y) );
+  return csBox2(
+  	MIN(box.minbox.x,point.x), MIN(box.minbox.y,point.y),
+        MAX(box.maxbox.x,point.x), MAX(box.maxbox.y,point.y) );
 }
 
 csBox2 operator* (const csBox2& box1, const csBox2& box2)
 {
-  return csBox2( MAX(box1.minbox.x,box2.minbox.x), MAX(box1.minbox.y,box2.minbox.y),
-              MIN(box1.maxbox.x,box2.maxbox.x), MIN(box1.maxbox.y,box2.maxbox.y) );
+  return csBox2(
+  	MAX(box1.minbox.x,box2.minbox.x), MAX(box1.minbox.y,box2.minbox.y),
+        MIN(box1.maxbox.x,box2.maxbox.x), MIN(box1.maxbox.y,box2.maxbox.y) );
 }
 
 bool operator== (const csBox2& box1, const csBox2& box2)
@@ -185,6 +188,32 @@ bool csBox2::Intersect (float minx, float miny, float maxx, float maxy,
   }
 
   return false;
+}
+
+float csBox2::SquaredOriginDist () const
+{
+  // Thanks to Ivan Avramovic for the original.
+  // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
+  float res = 0;
+  if (minbox.x > 0) res = minbox.x*minbox.x;
+  else if (maxbox.x < 0) res = maxbox.x*maxbox.x;
+  if (minbox.y > 0) res += minbox.y*minbox.y;
+  else if (maxbox.y < 0) res += maxbox.y*maxbox.y;
+  return res;
+}
+
+float csBox2::SquaredOriginMaxDist () const
+{
+  // Thanks to Ivan Avramovic for the original.
+  // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
+  float res;
+  if (minbox.x > 0) res = maxbox.x*maxbox.x;
+  else if (maxbox.x < 0) res = minbox.x*minbox.x;
+  else res = MAX (maxbox.x*maxbox.x, minbox.x*minbox.x);
+  if (minbox.y > 0) res += maxbox.y*maxbox.y;
+  else if (maxbox.y < 0) res += minbox.y*minbox.y;
+  else res += MAX (maxbox.y*maxbox.y, minbox.y*minbox.y);
+  return res;
 }
 
 //---------------------------------------------------------------------------
@@ -482,17 +511,34 @@ void csBox3::ManhattanDistance (const csBox3& other, csVector3& dist) const
 }
 
 
-float csBox3::SquaredOriginDist() const
+float csBox3::SquaredOriginDist () const
 {
   // Thanks to Ivan Avramovic for the original.
   // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
-  float res=0;
-  if (minbox.x > 0) res += minbox.x*minbox.x;
-  else if (maxbox.x < 0) res += maxbox.x*maxbox.x;
+  float res = 0;
+  if (minbox.x > 0) res = minbox.x*minbox.x;
+  else if (maxbox.x < 0) res = maxbox.x*maxbox.x;
   if (minbox.y > 0) res += minbox.y*minbox.y;
   else if (maxbox.y < 0) res += maxbox.y*maxbox.y;
   if (minbox.z > 0) res += minbox.z*minbox.z;
   else if (maxbox.z < 0) res += maxbox.z*maxbox.z;;
+  return res;
+}
+
+float csBox3::SquaredOriginMaxDist () const
+{
+  // Thanks to Ivan Avramovic for the original.
+  // Adapted by Norman Kramer, Jorrit Tyberghein and Wouter Wijngaards.
+  float res;
+  if (minbox.x > 0) res = maxbox.x*maxbox.x;
+  else if (maxbox.x < 0) res = minbox.x*minbox.x;
+  else res = MAX (maxbox.x*maxbox.x, minbox.x*minbox.x);
+  if (minbox.y > 0) res += maxbox.y*maxbox.y;
+  else if (maxbox.y < 0) res += minbox.y*minbox.y;
+  else res += MAX (maxbox.y*maxbox.y, minbox.y*minbox.y);
+  if (minbox.z > 0) res += maxbox.z*maxbox.z;
+  else if (maxbox.z < 0) res += minbox.z*minbox.z;
+  else res += MAX (maxbox.z*maxbox.z, minbox.z*minbox.z);
   return res;
 }
 

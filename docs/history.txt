@@ -8,6 +8,12 @@ The history order is reversed so that new features are at the top.
 	  all four vertices. This speeds up vis testing a little.
 	  Unfortunatelly it doesn't solve a bug which seems to cull away
 	  terrain blocks wrongly.
+	- Added csBox2::SquaredOriginDist() similar to the already existing
+	  csBox3 version.
+	- Added csBox2/3::SquaredOriginMaxDist() which returnes the maximum
+	  squared distance instead of the minimum one.
+	- Using the above functions added another optimization to the
+	  terrain visibility checker. Again this does not solve the bug though.
 13-Jun-2001
 	- Increased robustness of the Spider in BugPlug a little. If there
 	  are no sectors it will not start hunting. There is also a timeout

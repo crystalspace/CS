@@ -199,68 +199,53 @@ void csTerrainQuad::ComputeExtent(const csVector3& campos, const csBox3& bbox,
 void csTerrainQuad::ComputeMinMaxDY(const csVector3& campos, const csBox3& bbox,
     float &mindy, float &maxdy)
 {
-  /// idea is this:
-  /// dy (change of y) is the deltay / deltadistance.
-  /// maximum dy, is the max_height / minimumdistance
-  /// minimum dy, is the min_height / maximumdistance
+  // idea is this:
+  // dy (change of y) is the deltay / deltadistance.
+  // maximum dy, is the max_height / minimumdistance
+  // minimum dy, is the min_height / maximumdistance
 
-  /// compute ground-distance to each of the four points.
-  /// squared distance is used
-  float sqdist[4];
-  csVector2 d;
-  d.Set(bbox.MinX() - campos.x, bbox.MinZ() - campos.z);
-  sqdist[0] = d.SquaredNorm();
-  d.Set(bbox.MaxX() - campos.x, bbox.MinZ() - campos.z);
-  sqdist[1] = d.SquaredNorm();
-  d.Set(bbox.MinX() - campos.x, bbox.MaxZ() - campos.z);
-  sqdist[2] = d.SquaredNorm();
-  d.Set(bbox.MaxX() - campos.x, bbox.MaxZ() - campos.z);
-  sqdist[3] = d.SquaredNorm();
+  csBox2 tr_box (bbox.MinX ()-campos.x, bbox.MinZ ()-campos.z,
+  		 bbox.MaxX ()-campos.x, bbox.MaxZ ()-campos.z);
+  // Compute minimum and maximum squared distance to the box as seen
+  // from the camera position.
+  float mindist = tr_box.SquaredOriginDist ();
+  float maxdist = tr_box.SquaredOriginMaxDist ();
 
-  /// compute min/max squared distance
-  float mindist = sqdist[0];
-  float maxdist = sqdist[0];
-  for(int i=1; i<4; i++)
-  {
-    if(sqdist[i] < mindist) mindist = sqdist[i];
-    else if(sqdist[i] > maxdist) maxdist = sqdist[i];
-  }
-
-  /// use difference between camera.y and min,maxheight
-  /// to get min and max height change
+  // Use difference between camera.y and min,maxheight
+  // to get min and max height change
   float minh = min_height - campos.y;
   float maxh = max_height - campos.y;
 
-  /// divide by distance, correctly using infinite if divbyzero.
-  /// like this:
-  /// if divbyzero, use infinity with the same sign.
-  /// see if negative values occur, distances get swapped in that case
+  // Divide by distance, correctly using infinite if divbyzero.
+  // like this:
+  // if divbyzero, use infinity with the same sign.
+  // see if negative values occur, distances get swapped in that case
 
   if(minh < 0.0) 
   {
     /// below zero, smallest height at minimal distance is the steepest down
     if(mindist == 0.0) mindy = MININF;
-    else mindy = minh / qsqrt(mindist);
+    else mindy = minh * qisqrt(mindist);
   }
   else 
   {
     /// above zero, the smallest height at maximal distance is the smallest 
     /// upslope
     if(maxdist == 0.0) mindy = MAXINF;
-    else mindy = minh / qsqrt(maxdist);
+    else mindy = minh * qisqrt(maxdist);
   }
 
   if(maxh < 0.0) 
   {
     /// below zero, biggest height at maximal distance is the least downslope
     if(maxdist == 0.0) maxdy = MININF;
-    else maxdy = maxh / qsqrt(maxdist);
+    else maxdy = maxh * qisqrt(maxdist);
   }
   else 
   {
     /// above zero, the biggest height at minimum distance is steepest upslope
     if(mindist == 0.0) maxdy = MAXINF;
-    else maxdy = maxh / qsqrt(mindist);
+    else maxdy = maxh * qisqrt(mindist);
   }
 
 //printf ("sqdist[0]=%g\n", sqdist[0]);
