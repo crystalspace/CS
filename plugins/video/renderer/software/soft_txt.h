@@ -262,23 +262,6 @@ public:
    * and to the global palette (inside csTextureManagerSoftware).
    */
   void remap_palette_private (csTextureManagerSoftware* new_palette);
-
-  /**
-   * This function does not really remap but it converts
-   * the format to an ULong format suitable for 24-bit
-   * internal texture format.
-   */
-  void remap_palette_24bit (csTextureManagerSoftware* new_palette);
-
-  /**
-   * Remap the 2d texture to 16-bit display format.
-   */
-  void remap_texture_16 (csTextureManagerSoftware* new_palette);
-
-  /**
-   * Remap the 2d texture to 32-bit display format.
-   */
-  void remap_texture_32 (csTextureManagerSoftware* new_palette);
 };
 
 /**
@@ -527,8 +510,6 @@ public:
 	   pil->blue[b>>16];
   }
 
-  /// Query the "almost-black" color used for opaque black in transparent textures
-  int get_almost_black ();
 };
 
 

@@ -23,9 +23,7 @@
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 
-class csTextureMMOpenGL;
 class csTextureManagerOpenGL;
-struct HighColorCache_Data;
 interface IImageFile;
 
 // Colors are encoded in a 16-bit short using the following
@@ -76,59 +74,7 @@ struct PalIdxLookup
 #define G24(rgb) (((rgb)>>8)&0xff)
 #define B24(rgb) ((rgb)&0xff)
 
-/**
- * csTextureMMOpenGL represents a texture and all its mipmapped
- * variants.
- */
-class csTextureMMOpenGL : public csTextureMM
-{
-private:
-  ///
-  HighColorCache_Data *hicolorcache;
-  ///
-  bool in_memory;
-
-  /// Convert ImageFile to internal format.
-  virtual void convert_to_internal (csTextureManager* tex, IImageFile* imfile, unsigned char* bm);
-
-public:
-  ///
-  csTextureMMOpenGL (IImageFile* image);
-  ///
-  virtual ~csTextureMMOpenGL ();
-
-  ///
-  HighColorCache_Data *get_hicolorcache () { return hicolorcache; }
-  ///
-  void set_hicolorcache (HighColorCache_Data *d) { hicolorcache = d; }
-
-  ///
-  bool is_in_videomemory () { return in_memory; }
-  ///
-  void set_in_videomemory (bool vm) { in_memory = vm; }
-
-  /**
-   * Remap the texture in the best possible way.
-   */
-  virtual void remap_texture (csTextureManager* new_palette);
-
-  /**
-   * This function does not really remap but it converts
-   * the format to an ULong format suitable for 24-bit
-   * internal texture format.
-   */
-  void remap_palette_24bit (csTextureManager* new_palette);
-
-  /**
-   * Remap the 2d texture to 16-bit display format.
-   */
-  void remap_texture_16 (csTextureManager* new_palette);
-
-  /**
-   * Remap the 2d texture to 32-bit display format.
-   */
-  void remap_texture_32 (csTextureManager* new_palette);
-};
+typedef csHardwareAcceleratedTextureMM csTextureMMOpenGL;
 
 /**
  * OpenGL version of the texture manager. This

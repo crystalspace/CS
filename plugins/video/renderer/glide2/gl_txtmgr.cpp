@@ -40,10 +40,9 @@
 
 //---------------------------------------------------------------------------
 
-csTextureMMGlide::csTextureMMGlide (IImageFile* image) : csTextureMM (image)
+csTextureMMGlide::csTextureMMGlide (IImageFile* image) : 
+  csHardwareAcceleratedTextureMM (image)
 {
-  hicolorcache = NULL;
-  in_memory = false;
 }
 
 csTextureMMGlide::~csTextureMMGlide ()
@@ -79,19 +78,6 @@ void csTextureMMGlide::convert_to_internal (csTextureManager* tex,
   }
 }
 
-void csTextureMMGlide::remap_texture (csTextureManager* new_palette)
-{
-  if (!ifile) return;
-
-  if (for_2d ())
-    if (((csTextureManagerGlide*)new_palette)->get_display_depth () == 16) remap_texture_16 (new_palette);
-    else remap_texture_32 (new_palette);
-
-  // gsteenss: note this now converts to 16bit !
-  if (for_3d ()) remap_palette_24bit (new_palette);
-    
-}
-
 void csTextureMMGlide::remap_palette_24bit (csTextureManager*)
 {
   compute_color_usage ();
@@ -113,46 +99,6 @@ void csTextureMMGlide::remap_palette_24bit (csTextureManager*)
       *dest++ = ((src->red >> 3 ) << 11) |
                 ((src->green >> 2 ) << 5) |
                 ((src->blue >> 3));
-      src++;
-    }
-}
-
-void csTextureMMGlide::remap_texture_16 (csTextureManager* new_palette)
-{
-  int w, h, r, g, b;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
-  RGBPixel* src;
-  ifile->GetImageData (&src);
-  UShort* dest = t2d->get_bitmap16 ();
-  int x, y;
-  for (y = 0 ; y < h ; y++)
-    for (x = 0 ; x < w ; x++)
-    {
-      r = src->red;
-      g = src->green;
-      b = src->blue;
-      *dest++ = new_palette->find_color (r, g, b);
-      src++;
-    }
-}
-
-void csTextureMMGlide::remap_texture_32 (csTextureManager* new_palette)
-{
-  int w, h, r, g, b;
-  ifile->GetWidth (w);
-  ifile->GetHeight (h);
-  RGBPixel* src;
-  ifile->GetImageData (&src);
-  ULong* dest = t2d->get_bitmap32 ();
-  int x, y;
-  for (y = 0 ; y < h ; y++)
-    for (x = 0 ; x < w ; x++)
-    {
-      r = src->red;
-      g = src->green;
-      b = src->blue;
-      *dest++ = new_palette->find_color (r, g, b);
       src++;
     }
 }

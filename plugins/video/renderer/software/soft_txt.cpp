@@ -330,70 +330,6 @@ void csTextureMMSoftware::remap_palette_private (csTextureManagerSoftware* new_p
          priv_cmap->rgb_values[(i<<2)+2]);
 }
 
-void csTextureMMSoftware::remap_palette_24bit (csTextureManagerSoftware*)
-{
-  compute_color_usage ();
-  if (!usage)
-    return;
-
-  int size;
-  ifile->GetSize (size);
-  RGBPixel* src;
-  ifile->GetImageData (&src);
-  ULong *dest = t1->get_bitmap32 ();
-  ULong *last = dest + size;
-
-  // Map the texture to the RGB palette.
-  for (; dest < last; src++)
-    *dest++ = (src->red << 16) | (src->green << 8) | src->blue;
-}
-
-void csTextureMMSoftware::remap_texture_16 (csTextureManagerSoftware* new_palette)
-{
-  int size;
-  ifile->GetSize (size);
-  RGBPixel *src;
-  ifile->GetImageData (&src);
-  UShort *dest = t2d->get_bitmap16 ();
-  UShort *last = dest + size;
-  UShort black = new_palette->get_almost_black ();
-  if (get_transparent ())
-    for (; dest < last; src++, dest++)
-      if (transp_color == *src)
-        *dest = 0;
-      else
-      {
-        UShort texel = new_palette->find_color (src->red, src->green, src->blue);
-        *dest = texel ? texel : black;
-      }
-  else
-    for (; dest < last; src++, dest++)
-      *dest = new_palette->find_color (src->red, src->green, src->blue);
-}
-
-void csTextureMMSoftware::remap_texture_32 (csTextureManagerSoftware* new_palette)
-{
-  int size;
-  ifile->GetSize (size);
-  RGBPixel* src;
-  ifile->GetImageData (&src);
-  ULong *dest = t2d->get_bitmap32 ();
-  ULong *last = dest + size;
-  ULong black = new_palette->get_almost_black ();
-  if (get_transparent ())
-    for (; dest < last; src++, dest++)
-      if (transp_color == *src)
-        *dest = 0;
-      else
-      {
-        ULong texel = new_palette->find_color (src->red, src->green, src->blue);
-        *dest = texel ? texel : black;
-      }
-  else
-    for (; dest < last; src++, dest++)
-      *dest = new_palette->find_color (src->red, src->green, src->blue);
-}
-
 //---------------------------------------------------------------------------
 
 UShort csTextureManagerSoftware::alpha_mask;
@@ -1231,34 +1167,6 @@ void csTextureManagerSoftware::alloc_palette ()
     white_color = 255;
     black_color = 0;
   }
-}
-
-int csTextureManagerSoftware::get_almost_black ()
-{
-  // Since color 0 is used for transparent, prepare an "almost-black"
-  // color to use instead of opaque black texels.
-  switch (pfmt.PixelBytes)
-  {
-    case 1:
-      // find_color cares about color 0 in 8-bit mode
-      return find_color (0, 0, 0);
-    case 2:
-    {
-      // Since the green channel usually has most bits (in all of
-      // 5:5:5, 5:6:5 and 6:6:4 encodings), set a "1" in the LSB
-      // of that channel and rest bits to zero
-      return (1 << pfmt.GreenShift);
-    }
-    case 4:
-    {
-      // Since the human eye is less sensible to blue than to
-      // other colors, we set a 1 in LSB of blue channel, and
-      // all other bits to zero.
-      return (1 << pfmt.BlueShift);
-    }
-  }
-  // huh ?!
-  return 0;
 }
 
 STDMETHODIMP csTextureManagerSoftware::Initialize ()

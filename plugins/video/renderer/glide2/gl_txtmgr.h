@@ -82,14 +82,9 @@ struct PalIdxLookup
  * csTextureMMGlide represents a texture and all its mipmapped
  * variants.
  */
-class csTextureMMGlide : public csTextureMM
+class csTextureMMGlide : public csHardwareAcceleratedTextureMM
 {
 private:
-  ///
-  HighColorCache_Data *hicolorcache;
-  ///
-  bool in_memory;
-
   /// Convert ImageFile to internal format.
   virtual void convert_to_internal (csTextureManager* tex, IImageFile* imfile, unsigned char* bm);
 
@@ -99,37 +94,12 @@ public:
   ///
   virtual ~csTextureMMGlide ();
 
-  ///
-  HighColorCache_Data *get_hicolorcache () { return hicolorcache; }
-  ///
-  void set_hicolorcache (HighColorCache_Data *d) { hicolorcache = d; }
-
-  ///
-  bool is_in_videomemory () { return in_memory; }
-  ///
-  void set_in_videomemory (bool vm) { in_memory = vm; }
-
-  /**
-   * Remap the texture in the best possible way.
-   */
-  virtual void remap_texture (csTextureManager* new_palette);
-
   /**
    * This function does not really remap but it converts
    * the format to an ULong format suitable for 24-bit
    * internal texture format.
    */
-  void remap_palette_24bit (csTextureManager* new_palette);
-
-  /**
-   * Remap the 2d texture to 16-bit display format.
-   */
-  void remap_texture_16 (csTextureManager* new_palette);
-
-  /**
-   * Remap the 2d texture to 32-bit display format.
-   */
-  void remap_texture_32 (csTextureManager* new_palette);
+  virtual void remap_palette_24bit (csTextureManager* new_palette);
 };
 
 /**

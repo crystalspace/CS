@@ -59,16 +59,8 @@ void OpenGLTextureCache::Load (HighColorCache_Data *d)
     int texture_width, texture_height;
     texture_width = txt_unl->get_width ();
     texture_height = txt_unl->get_height ();
-    bool active_alpha = txt_mm->get_transparent ();
+    bool transparent = txt_mm->get_transparent ();
    
-    int transparentcolor = 0;
-    if (active_alpha)
-    {
-      int transparentr, transparentg, transparentb;
-      txt_mm->get_transparent(transparentr,transparentg,transparentb);
-      transparentcolor = (transparentr<<16)|(transparentg<<8)|(transparentb);
-    }
-
     CHK (GLuint *texturehandle = new GLuint);
     glGenTextures (1,texturehandle);
 
@@ -76,40 +68,40 @@ void OpenGLTextureCache::Load (HighColorCache_Data *d)
     CsPrintf(MSG_DEBUG_0,"size (%d,%d)\n",texture_width,texture_height);
     CsPrintf(MSG_DEBUG_0,"texture data location %x\n",texture->get_bitmap32());*/
 
-   glBindTexture (GL_TEXTURE_2D, *texturehandle);
+    glBindTexture (GL_TEXTURE_2D, *texturehandle);
 
-   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
 
-   CHK (unsigned char *tempdata = new unsigned char[texture_width*texture_height*4]);
-   ULong *source = txt_unl->get_bitmap32 ();
-  unsigned char *dest = tempdata;
-  for (int count = texture_width * texture_height;
-        count > 0; count--)
-  {
+    CHK (unsigned char *tempdata = new unsigned char[texture_width*texture_height*4]);
+    ULong *source = txt_unl->get_bitmap32 ();
+    unsigned char *dest = tempdata;
+    for (int count = texture_width * texture_height;
+          count > 0; count--)
+    {
       dest[0] = R24(*source);
       dest[1] = G24(*source);
       dest[2] = B24(*source);
-      // transparent textures for OpenGL are BROKEN!
-      if (active_alpha && (*source == transparentcolor) )
-	dest[3] = 0;
+
+      if (transparent && (*source == 0))
+        dest[3] = 0;
       else
-	dest[3] = 255;
+        dest[3] = 255;
 
       dest+=4; source++;
-  }
-  if (active_alpha)
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,texture_width,
-		texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
-		tempdata);
-  else
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,texture_width,
-		texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
-		tempdata);
+    }
+    if (transparent)
+      glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,texture_width,
+                   texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
+                   tempdata);
+    else
+      glTexImage2D(GL_TEXTURE_2D,0,GL_RGB,texture_width,
+                   texture_height,0,GL_RGBA,GL_UNSIGNED_BYTE,
+                   tempdata);
 
-  delete []tempdata;
+    delete []tempdata;
 
     d->pData = texturehandle;
     

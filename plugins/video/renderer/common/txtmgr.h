@@ -154,20 +154,71 @@ public:
   /// Compute the 'usage' table.
   void compute_color_usage ();
 
+  /**
+   * Remap the texture in the best possible way. The default implementation
+   * will switch only between 16Bit and 32Bit modes. That is simple, but enough 
+   * for OpenGL and DirectX. Other renderers will have to override this 
+   * method for appropriate results.
+   */
+  virtual void remap_texture (csTextureManager* new_palette);
+
+  /**
+   * This function does not really remap but it converts
+   * the format to an ULong format suitable for 24-bit
+   * internal texture format.
+   */
+  virtual void remap_palette_24bit (csTextureManager* new_palette);
+
+  /**
+   * Remap the 2d texture to 16-bit display format.
+   */
+  virtual void remap_texture_16 (csTextureManager* new_palette);
+
+  /**
+   * Remap the 2d texture to 32-bit display format.
+   */
+  virtual void remap_texture_32 (csTextureManager* new_palette);
+
   ///
   const RGBPalEntry& get_usage (int idx) 
   { return usage->get_color_table()[idx]; }
-
-  /**
-   * Remap this texture in the most optimal way
-   * for the 3D/2D driver.
-   */
-  virtual void remap_texture (csTextureManager* new_palette) = 0;
 
   DECLARE_INTERFACE_TABLE (csTextureMM)
   DECLARE_IUNKNOWN()
   DECLARE_COMPOSITE_INTERFACE (TextureHandle)
 };
+
+struct HighColorCache_Data;
+
+/**
+ * adds some methods and members needed for hardware accelerated renderers
+ */
+class csHardwareAcceleratedTextureMM : public csTextureMM
+{
+protected:
+  ///
+  HighColorCache_Data *hicolorcache;
+  ///
+  bool in_memory;
+
+  /// Convert ImageFile to internal format. Will just convert to 24 bit in most HW renderers
+  virtual void convert_to_internal (csTextureManager* tex, IImageFile* imfile, unsigned char* bm);
+public:
+  ///
+  csHardwareAcceleratedTextureMM (IImageFile* image) 
+   : csTextureMM(image) {in_memory = false; hicolorcache=NULL;}
+
+  ///
+  HighColorCache_Data *get_hicolorcache () { return hicolorcache; }
+  ///
+  void set_hicolorcache (HighColorCache_Data *d) { hicolorcache = d; }
+
+  ///
+  bool is_in_videomemory () { return in_memory; }
+  ///
+  void set_in_videomemory (bool vm) { in_memory = vm; }
+};
+
 
 #define GetITextureHandleFromcsTextureMM(a)  &a->m_xTextureHandle
 #define GetcsTextureMMFromITextureHandle(a)  ((csTextureMM*)((size_t)a - offsetof(csTextureMM, m_xTextureHandle)))
@@ -469,6 +520,9 @@ public:
   int white () { return white_color; }
   ///
   int black () { return black_color; }
+
+  /// Query the "almost-black" color used for opaque black in transparent textures
+  int get_almost_black ();
 };
 
 
