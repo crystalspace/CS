@@ -31,7 +31,7 @@
  * csRGBcolor structs onto it.  It has overrides for
  * Compare and CompareKey.  
  */
-class CS_CSGFX_EXPORT csRGBVector : public csArray<csRGBcolor*>
+class csRGBVector : public csArray<csRGBcolor*>
 {
 public:
   /// Compare two csRGBcolor structs.
