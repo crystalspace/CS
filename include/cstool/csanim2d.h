@@ -73,16 +73,16 @@ public:
 };
 
 
-/// a pixmap with a 2d animation
+/// A pixmap with a 2d animation.
 class csAnimatedPixmap : public csPixmap
 {
 public:
-  /// create an animated pixmap
+  /// Create an animated pixmap.
   csAnimatedPixmap(csAnimationTemplate *tpl);
-  /// destroy this object
+  /// Destroy this object.
   virtual ~csAnimatedPixmap();
 
-  // implementation of csPixmap
+  // Implementation of csPixmap.
   virtual int Width();
   virtual int Height();
   virtual iTextureHandle *GetTextureHandle();

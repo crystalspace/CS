@@ -27,6 +27,9 @@
  * A Key Value pair. This object contains a 'key' string and a 'value' string.
  * The 'key' string is the same as the name of the object as returned from
  * the iObject.
+ * <p>
+ * One way to attach key value pairs to CS objects is to add the following
+ * xml to your object: <key name="somename" value="somevalue" />
  */
 class csKeyValuePair : public csObject
 {

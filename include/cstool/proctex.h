@@ -202,7 +202,8 @@ public:
   }
 
   /// Get the texture corresponding with this procedural texture.
-  iTextureWrapper* GetTextureWrapper () { return &scfiTextureWrapper; /*return tex;*/ }
+  iTextureWrapper* GetTextureWrapper ()
+  { return &scfiTextureWrapper; /*return tex;*/ }
 };
 
 

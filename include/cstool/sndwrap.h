@@ -24,6 +24,7 @@
 #include "csutil/csobject.h"
 #include "isound/wrapper.h"
 
+/// Document me and possible move me to some sound manager! @@@
 class csSoundWrapper : public csObject
 {
 protected:

@@ -20,16 +20,17 @@
 #define __CS_CSFXSCR_H__
 
 #include "ivideo/graph3d.h"
+
 class csColor;
 struct iGraphics2D;
 struct iTextureManager;
 
-/**
+/*
  * Some full screen special effects.
  * Most need to be called, either during 2d drawing phase - between
  * the g2d->BeginDraw and FinishDraw calls, or they need to be called
  * in the 3d drawing phase, between the g3d->BeginDraw and FinishDraw calls.
-*/
+ */
 
 /**
  * Shows lines of interference on the screen.
@@ -41,7 +42,7 @@ struct iTextureManager;
  * polygons). For good speed, use amount ~0.3, length >= 30 or so.
  * Use this routine in 2D drawing mode.
  */
-void csfxInterference(iGraphics2D *g2d, iTextureManager *txtmgr,
+void csfxInterference (iGraphics2D *g2d, iTextureManager *txtmgr,
   float amount, float anim, float length);
 
 /**
@@ -50,49 +51,49 @@ void csfxInterference(iGraphics2D *g2d, iTextureManager *txtmgr,
  * Hardware acceleration is used, if available.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-void csfxFadeOut(iGraphics3D *g3d, float fadevalue);
+void csfxFadeOut (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Fade to given pixmap (which must be prepared for 3D usage),
  * fadevalue 0: no fading, fadevalue 1: only given texture is visible.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-void csfxFadeTo(iGraphics3D *g3d, iMaterialHandle *mat, float fadevalue);
+void csfxFadeTo (iGraphics3D *g3d, iMaterialHandle *mat, float fadevalue);
 
 /**
  * Fade the screen to a specific color, passed as parameter.
  * fadevalue 0: no fading, fadevalue 1: screen filled with the given color.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-void csfxFadeToColor(iGraphics3D *g3d, float fadevalue, const csColor& color);
+void csfxFadeToColor (iGraphics3D *g3d, float fadevalue, const csColor& color);
 
 /**
  * Make the screen look like an old fashioned green-only monitor.
  * fadevalue 0: no fading, fadevalue 1: only green is visible.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-void csfxGreenScreen(iGraphics3D *g3d, float fadevalue);
+void csfxGreenScreen (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Similar to csfxGreenScreen, but makes the screen show only red.
  * fadevalue 0: no fading, fadevalue 1: only green is visible.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-void csfxRedScreen(iGraphics3D *g3d, float fadevalue);
+void csfxRedScreen (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Similar to csfxGreenScreen, but makes the screen show only blue
  * fadevalue 0: no fading, fadevalue 1: only green is visible.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-void csfxBlueScreen(iGraphics3D *g3d, float fadevalue);
+void csfxBlueScreen (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Increase the brightness of the image.
  * fadevalue 0: no fading, fadevalue 1: full white.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
-void csfxWhiteOut(iGraphics3D *g3d, float fadevalue);
+void csfxWhiteOut (iGraphics3D *g3d, float fadevalue);
 
 /**
  * Create a vertical shading from topcolor to bottomcolor.
@@ -101,10 +102,10 @@ void csfxWhiteOut(iGraphics3D *g3d, float fadevalue);
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
  */
 #ifndef CS_USE_NEW_RENDERER
-void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
+void csfxShadeVert (iGraphics3D *g3d, const csColor& topcolor,
   const csColor& bottomcolor, uint mixmode = CS_FX_COPY);
 #else
-void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
+void csfxShadeVert (iGraphics3D *g3d, const csColor& topcolor,
   const csColor& bottomcolor, uint mixmode);
 #endif // CS_USE_NEW_RENDERER
 
@@ -112,8 +113,8 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
 /**
  * Do a fullscreen drawpolygonFX draw, used by some other routines.
  * This routine must only be used between g3d->BeginDraw and FinishDraw calls.
-*/
-void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
+ */
+void csfxScreenDPFX (iGraphics3D *g3d, iMaterialHandle *mat, uint mixmode,
   uint8 r, uint8 g, uint8 b);
 
 #endif // __CS_CSFXSCR_H__

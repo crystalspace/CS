@@ -23,7 +23,7 @@
 #include "cstool/proctex.h"
 
 /**
- *  Random dots (demonstration procedural texture).
+ * Random dots (demonstration procedural texture).
  */
 class csProcDots : public csProcTexture
 {

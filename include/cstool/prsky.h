@@ -28,7 +28,7 @@ class csProcSky;
 
 /**
  * A polygon of a sky.
-*/
+ */
 class csProcSkyTexture : public csProcTexture
 {
   /// the sky this is a part of
@@ -94,7 +94,7 @@ public:
 /**
  * a sky, this represents a whole sphere of sky - so multiple polygons
  * can be rendered to.
-*/
+ */
 class csProcSky
 {
   /// the proc sky textures of this sky
@@ -182,14 +182,14 @@ public:
   /// Make intersection point cache in a texture
   void MakeIntersectCache(csProcSkyTexture *skytex);
 
-  /** Enable or disable sky animation. Sky animation is very slow.
-     If you wish to continue the animated where it left off
-     (seamlessly) pass the current time,
-     if you wish to continue where the animated would be if
-     it had been running all the time - pass 0 for time.
-
-     current_time has no meaning when disabling the animation.
-  */
+  /**
+   * Enable or disable sky animation. Sky animation is very slow.
+   * If you wish to continue the animated where it left off
+   * (seamlessly) pass the current time,
+   * if you wish to continue where the animated would be if
+   * it had been running all the time - pass 0 for time.
+   * current_time has no meaning when disabling the animation.
+   */
   void SetAnimated (iObjectRegistry* object_reg,
   	bool anim=true, csTicks current_time=0);
   /// See if the prsky is animated

@@ -71,12 +71,14 @@ class csIntArray;
 
 //----------------------------------------------------------------------------
 
+/// Document me!@@@
 class csModelDataTexture : public iModelDataTexture
 {
 private:
   char *FileName;
   csRef<iImage> Image;
   csRef<iTextureWrapper> TextureWrapper;
+
 public:
   SCF_DECLARE_IBASE;
   CS_DECLARE_OBJECT_INTERFACE;
@@ -107,11 +109,13 @@ public:
   iModelDataTexture *Clone () const;
 };
 
+/// Document me!@@@
 class csModelDataMaterial : public iModelDataMaterial
 {
 private:
   iMaterial *BaseMaterial;
   iMaterialWrapper *MaterialWrapper;
+
 public:
   SCF_DECLARE_IBASE;
   CS_DECLARE_OBJECT_INTERFACE;
@@ -130,6 +134,7 @@ public:
   iModelDataMaterial *Clone () const;
 };
 
+/// Document me!@@@
 class csModelDataVertices : public iModelDataVertices
 {
 private:
@@ -165,6 +170,7 @@ public:
   iModelDataVertices *Clone () const;
 };
 
+/// Document me!@@@
 class csModelDataAction : public iModelDataAction
 {
 private:
@@ -198,6 +204,7 @@ public:
   virtual float GetTotalTime () const;
 };
 
+/// Document me!@@@
 class csModelDataPolygon : public iModelDataPolygon
 {
 private:
@@ -232,6 +239,7 @@ public:
   iModelDataPolygon *Clone () const;
 };
 
+/// Document me!@@@
 class csModelDataObject : public iModelDataObject
 {
 private:
@@ -249,6 +257,7 @@ public:
   CS_DECLARE_ACCESSOR_METHODS (iModelDataVertices*, DefaultVertices);
 };
 
+/// Document me!@@@
 class csModelDataCamera : public iModelDataCamera
 {
 private:
@@ -283,6 +292,7 @@ public:
   iModelDataCamera *Clone () const;
 };
 
+/// Document me!@@@
 class csModelDataLight : public iModelDataLight
 {
 private:

@@ -79,7 +79,7 @@ public:
   /// Fill a rectangle with the pixmap, tiled.
   inline void DrawTiled (iGraphics3D* g3d, int sx, int sy, int w, int h,
       uint8 Alpha = 0)
-    { DrawTiled (g3d, sx, sy, w, h, sx, sy, Alpha); }
+  { DrawTiled (g3d, sx, sy, w, h, sx, sy, Alpha); }
 };
 
 /// This is the simple implementation of csPixmap that uses a single texture

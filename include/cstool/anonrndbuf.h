@@ -28,6 +28,7 @@
 #include "ivideo/rndbuf.h"
 #include "iutil/strset.h"
 
+/// Document me! @@@
 class csAnonRenderBufferManager
 {
   class anonbuffer
@@ -50,12 +51,15 @@ public:
   virtual ~csAnonRenderBufferManager();
 
   iRenderBuffer * GetRenderBuffer(csStringID name);
-  bool AddRenderBuffer(const char *name, csRenderBufferComponentType component_type, int component_size, int num_verts);
-  bool SetRenderBufferComponent (const char *name, int index, int component, float value);
-  bool SetRenderBufferComponent (const char *name, int index, int component, int value);
+  bool AddRenderBuffer (const char *name,
+	csRenderBufferComponentType component_type, int component_size,
+	int num_verts);
+  bool SetRenderBufferComponent (const char *name, int index,
+  	int component, float value);
+  bool SetRenderBufferComponent (const char *name, int index,
+  	int component, int value);
   bool SetRenderBuffer (const char *name, float *value, int num_verts);
   bool SetRenderBuffer (const char *name, int *value, int num_verts);
-
 };
 
 

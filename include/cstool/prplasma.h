@@ -24,7 +24,7 @@
 #include "cstool/proctex.h"
 
 /**
- *  Plasma.
+ * Plasma.
  */
 class csProcPlasma : public csProcTexture
 {

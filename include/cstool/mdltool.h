@@ -48,8 +48,8 @@ private:
   int Count;
   // the lists
   csIntArray *Vertices, *Normals, *Colors, *Texels;
-public:
 
+public:
   /**
    * Create a new set. You can chosse which lists to use. For example, if
    * you choose not to use a color list then colors will not be used when
@@ -95,7 +95,7 @@ public:
   int GetTexel (int n) const;
 };
 
-/// A set of utility functions to deal with model data components
+/// A set of utility functions to deal with model data components.
 struct csModelDataTools
 {
   /**

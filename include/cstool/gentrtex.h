@@ -233,7 +233,7 @@ public:
   /// the texture to use
   csGenerateImageTexture *tex;
   ///
-  ~csGenerateImageValueFuncTex();
+  virtual ~csGenerateImageValueFuncTex();
   /// get the value for location
   virtual float GetValue(float x, float y);
 };
