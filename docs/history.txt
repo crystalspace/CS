@@ -28,6 +28,9 @@ chronological order.
 	  incorrectly creep into MSVC project files. (These flags are almost
 	  always undesirable because they are specific to the host's build
 	  tools -- the one running 'msvcgen' -- rather than to MSVC.)
+	- Eric Sunshine worked around a problem where some Python installations
+	  have an apparently bad prototype for PyRun_SimpleString() taking a
+	  (char*) rather than (char const*).
 5-Dec-2004
 	- res made the following changes:
 	    - Fixed the Win32 shared library linking.
