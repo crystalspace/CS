@@ -807,5 +807,5 @@ bool csIniFile::GetYesNo (const char *SectionPath, const char *KeyName,
   char *s = GetStr (SectionPath, KeyName, NULL);
   if (!s)
     return def;
-  return (!strcmp (s, "yes")) || (!strcmp (s, "true")) || (!strcmp (s, "on"));
+  return (!stricmp (s, "yes")) || (!stricmp (s, "true")) || (!stricmp (s, "on"));
 }
