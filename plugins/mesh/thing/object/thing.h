@@ -1332,7 +1332,11 @@ public:
   iObjectRegistry* object_reg;
   bool do_verbose;	// Verbose error reporting.
   iEngine* engine;
-  iGraphics3D* G3D;
+  /**
+   * csThingObjectType must keep a reference to G3D because when polygons
+   * are destructed they actually refer to G3D to clear the cache.
+   */
+  csRef<iGraphics3D> G3D;
   /// An object pool for 2D polygons used by the rendering process.
   csPoly2DPool* render_pol2d_pool;
   /// An object pool for lightpatches.

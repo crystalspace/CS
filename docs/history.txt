@@ -16,6 +16,11 @@ The history order is reversed so that new features are at the top.
 	- If the -verbose commandline option is given then the genmesh plugin
 	  will report accurate errors explaining why the lighting info failed to
 	  load.
+	- The thing object type now maintains a real reference to G3D. This
+	  is needed because when polygons are removed they clear themselves
+	  from the G3D cache so G3D has to stay in memory until the thing
+	  object type itself has disappeared. This bug was not easy to
+	  reproduce but it happened.
 3-Mar-2003
 	- Philip Wyett added libxml2 link flag for msvc project file.
 	- Philip Wyett removed 'divx' dir and '.cvsignore' file from
