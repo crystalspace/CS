@@ -30,9 +30,6 @@
 #include "csengine/halo.h"
 #include "csengine/meshobj.h"
 
-/// Max number of polygons that can be lit by one light. (bad practice !!!@@@)
-#define MAX_NUM_LIGHTMAP 2000
-
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
@@ -137,29 +134,59 @@ csStatLight::csStatLight (float x, float y, float z, float dist,
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStatLight);
   csStatLight::dynamic = dynamic;
-  lightmaps = NULL;
-  num_lightmap = 0;
   flags.SetAll (CS_LIGHT_THINGSHADOWS);
 }
 
 csStatLight::~csStatLight ()
 {
-  delete [] lightmaps;
 }
 
-void poly_light_func (csObject* obj, csFrustumView* lview)
+static void node_light_func (csOctreeNode* node, csFrustumView* lview, bool vis)
+{
+  if (vis) return;
+  if (!vis)
+  {
+    // If this node is not visible we still have to mark all polygons
+    // in this node as having no light.
+    csPolygonIntArray& pols = node->GetUnsplitPolygons ();
+    int i;
+    for (i = 0 ; i < pols.GetPolygonCount () ; i++)
+    {
+      csPolygonInt* pi = pols.GetPolygon (i);
+      if (pi->GetType () == 1)
+      {
+        csPolygon3D* p = (csPolygon3D*)pi;
+	// If this polygon is the top-level polygon (i.e. base or original
+	// polygon) then we know the entire polygon is shadowed. In that
+	// case we have to do nothing.
+	if (p->GetBasePolygon () != p)
+	{
+	  // Otherwise we have to calculate lighting (but with vis set
+	  // to false).
+	  p->CalculateLightingNew (lview, false);
+	}
+      }
+    }
+  }
+}
+
+static void poly_light_func (csObject* obj, csFrustumView* lview, bool vis)
 {
   csPolygon3D* poly = (csPolygon3D*)obj;
   //if (lview->IsDynamic ())
+  //{
+    if (!vis) return;
     poly->CalculateLighting (lview);
+  //}
   //else
-    //poly->CalculateLightingNew (lview);
+    //poly->CalculateLightingNew (lview, vis);
 }
 
-void curve_light_func (csObject* obj, csFrustumView* lview)
+static void curve_light_func (csObject* obj, csFrustumView* lview, bool vis)
 {
   csCurve* curve = (csCurve*)obj;
-  curve->CalculateLighting (*lview);
+  if (vis)
+    curve->CalculateLighting (*lview);
 }
 
 void csStatLight::CalculateLighting ()
@@ -170,6 +197,7 @@ void csStatLight::CalculateLighting ()
   linfo.SetGouraudOnly (false);
   linfo.SetColor (GetColor ());
   lview.SetUserData ((void*)this);
+  lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());
@@ -197,6 +225,7 @@ void csStatLight::CalculateLighting (iMeshWrapper* th)
   linfo.SetGouraudOnly (false);
   linfo.SetColor (GetColor ());
   lview.SetUserData ((void*)this);
+  lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());
@@ -236,6 +265,7 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
   linfo.SetGouraudOnly (false);
   linfo.SetColor (GetColor ());
   lview.SetUserData ((void*)this);
+  lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());
@@ -258,32 +288,22 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 void csStatLight::RegisterLightMap (csLightMap* lmap)
 {
   if (!dynamic) return;
-  if (!lightmaps)
-  {
-    num_lightmap = 0;
-    lightmaps = new csLightMap* [MAX_NUM_LIGHTMAP];
-  }
+  lightmaps.SetLength (0);
 
   int i;
-  for (i = 0 ; i < num_lightmap ; i++)
-    if (lightmaps[i] == lmap)
+  for (i = 0 ; i < lightmaps.Length () ; i++)
+    if (((csLightMap*)lightmaps[i]) == lmap)
       return;
-  lightmaps[num_lightmap++] = lmap;
-  if (num_lightmap >= MAX_NUM_LIGHTMAP)
-  {
-    //@@@ BAD CODE! We should not have a max!
-    csEngine::current_engine->Warn (
-    	"Overflow number of lightmaps for dynamic light!\n");
-  }
+  lightmaps.Push (lmap);
 }
 
 void csStatLight::SetColor (const csColor& col)
 {
   csLight::SetColor (col);
   int i;
-  for (i = 0 ; i < num_lightmap ; i++)
+  for (i = 0 ; i < lightmaps.Length () ; i++)
   {
-    lightmaps[i]->MakeDirtyDynamicLights ();
+    ((csLightMap*)lightmaps[i])->MakeDirtyDynamicLights ();
   }
 }
 
@@ -367,6 +387,7 @@ void csDynLight::Setup ()
   linfo.SetGouraudOnly (false);
   linfo.SetColor (GetColor ());
   lview.SetUserData ((void*)this);
+  lview.SetNodeFunction (node_light_func);
   lview.SetPolygonFunction (poly_light_func);
   lview.SetCurveFunction (curve_light_func);
   lview.SetRadius (GetRadius ());

@@ -81,7 +81,8 @@ public:
 class csShadowBitmap
 {
 private:
-  char* bitmap;		// Shadow bitmap.
+  char* light;		// Light bitmap.
+  char* shadow;		// Shadow bitmap.
   int lm_w, lm_h;	// Original lightmap size.
   int sb_w, sb_h;	// Shadow bitmap size.
   int quality;		// Quality factor.
@@ -94,6 +95,14 @@ private:
    * fully lit and 0 meaning fully shadowed.
    */
   float GetLighting (int lm_u, int lm_v);
+
+  /*
+   * For csAntialiasedPolyFill().
+   */
+  static void LightPutPixel (int x, int y, float area, void *arg);
+  static void LightDrawBox (int x, int y, int w, int h, void *arg);
+  static void ShadowPutPixel (int x, int y, float area, void *arg);
+  static void ShadowDrawBox (int x, int y, int w, int h, void *arg);
 
 public:
   /**
@@ -110,14 +119,16 @@ public:
   /**
    * Destroy the shadow bitmap.
    */
-  ~csShadowBitmap () { delete[] bitmap; }
+  ~csShadowBitmap () { delete[] shadow; delete[] light; }
 
   /**
-   * Render a shadow polygon on this bitmap. The coordinates of this
+   * Render a polygon on this bitmap. The coordinates of this
    * polygon are given in lightmap coordinates. WARNING the given polygon
    * will be modified by this function!
+   * 'val' can be 0 or 1 and will be used to fill the polygon. To render
+   * a shadow you would use 1 and for light you would use 0.
    */
-  void RenderShadow (csVector2* shadow_poly, int num_vertices);
+  void RenderPolygon (csVector2* poly, int num_vertices, int val);
 
   /**
    * Take a light and update the lightmap using the information in
@@ -324,8 +335,11 @@ public:
 
   /**
    * Update the lightmap for the given light.
+   * 'vis' will be false if the polygon is totally shadowed. In this
+   * case we should use 'subpoly' to see where the shadow must go and
+   * not the base polygon which this csPolyTexture points too.
    */
-  void FillLightMapNew (csFrustumView* lview);
+  void FillLightMapNew (csFrustumView* lview, bool vis, csPolygon3D* subpoly);
 
   /**
    * Update the lightmap of this polygon using the current shadow-bitmap

@@ -1099,8 +1099,8 @@ void csRadiosity :: PrepareShootSource(csRadElement *src)
 }
 
 
-static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview);
-static void frustum_curve_report_func (csObject *obj, csFrustumView* lview);
+static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview, bool vis);
+static void frustum_curve_report_func (csObject *obj, csFrustumView* lview, bool vis);
 
 void csRadiosity :: StartFrustum()
 {
@@ -1148,8 +1148,10 @@ void csRadiosity :: StartFrustum()
 }
 
 
-static void frustum_curve_report_func (csObject *obj, csFrustumView* lview)
-{ 
+static void frustum_curve_report_func (csObject *obj, csFrustumView* lview,
+	bool vis)
+{
+  if (!vis) return;
   // obtain RadCurve
   csRadElement *dest = csRadElement::GetRadElement(*(csCurve*)obj);
 
@@ -1161,8 +1163,10 @@ static void frustum_curve_report_func (csObject *obj, csFrustumView* lview)
   }
 }
 
-static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
+static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview,
+  bool vis)
 {
+  if (!vis) return;
   csPlane3 poly_plane;
   // radiosity works with the base, unsplit polygon.
   csPolygon3D *destpoly3d = ((csPolygon3D*)obj)->GetBasePolygon();

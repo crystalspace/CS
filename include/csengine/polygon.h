@@ -1041,11 +1041,15 @@ public:
    * of the frustum). The camera space used is just world space translated
    * so that the center of the light is at (0,0,0).
    * If the lightmaps were cached in the level archive this function will
-   * do nothing.
+   * do nothing.<p>
+   *
    * The "frustum" parameter defines the original light frustum (not the
-   * one bounded by this polygon as given by "lview").
+   * one bounded by this polygon as given by "lview").<p>
+   *
+   * If 'vis' == false this means that the lighting system already discovered
+   * that the polygon is totally shadowed.
    */
-  void FillLightMapNew (csFrustumView* lview);
+  void FillLightMapNew (csFrustumView* lview, bool vis);
 
   /**
    * Update vertex lighting for this polygon. Only works if the
@@ -1091,8 +1095,10 @@ public:
    * Check visibility of this polygon with the given csFrustumView
    * and fill the lightmap if needed (this function calls FillLightMap ()).
    * This function will also traverse through a portal if so needed.
+   * If 'vis' == false this means that the lighting system already discovered
+   * that the polygon is totally shadowed.
    */
-  void CalculateLightingNew (csFrustumView* lview);
+  void CalculateLightingNew (csFrustumView* lview, bool vis);
 
   /**
    * Transform the plane of this polygon from object space to world space.

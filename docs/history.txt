@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+13-Jul-2001
+	- Removed a hard-coded limit to the number of lightmaps that
+	  can be affected by a pseudo-dynamic light. This used to be
+	  2000 but I implemented this by using a csVector now.
+	- Changed the callback functions in iFrustumView with an additional
+	  'vis' parameter. This means that those functions will now also
+	  be called when a polygon or curve is totally shadowed. In this
+	  case 'vis' will be set to false.
+	- Continued working on the new lighting system. It is almost
+	  starting to work now. But the last straw is always the most
+	  difficult one :-) It is still not enabled by default.
 12-Jul-2001
 	- Added iPolygon3D::GetPolygonID ().
 	- Extended BugPlug to show the name and ID of the selected polygon.
@@ -15,6 +26,17 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bad bug in the isotest maze generator. However the way
 	  the maze is used now it will not cause harm since width==height.
 	- Fixed another related bug in isotest maze generator.
+	- Christopher Nelson did the following changes to AWS:
+	    - Fixed parser to allow RGB values like:
+		Highlight: 255,255,0
+	    - Added in Get/SetColor and SetPalette to awsPrefs for global
+	      colors.
+	    - Fixed the color indexes, made them into an enum.
+	    - Fixed silly problem where the canvas wasn't drawing properly.
+	- Wyatt Miler applied a fix reported by garrett@memesis.org to
+	  linex2d.mak.
+	- Martin Geisse added a description of his recent iSprite3DFactory
+	  changes to apimod19.txi.
 11-Jul-2001
 	- Removed csLight::CorrectForNoColor() since it is obsolete.
 	- Added a virtual destructor to mdldata.h.

@@ -407,8 +407,9 @@ public:
 class csFrustumView;
 class csObject;
 class csOctreeNode;
-typedef void (csFrustumViewFunc)(csObject* obj, csFrustumView* lview);
-typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview);
+typedef void (csFrustumViewFunc)(csObject* obj, csFrustumView* lview, bool vis);
+typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview,
+	bool vis);
 
 /**
  * This structure represents all information needed for the frustum
@@ -502,14 +503,20 @@ public:
   /// Set the function that is called for every curve to visit.
   void SetCurveFunction (csFrustumViewFunc* func) { curve_func = func; }
   /// Call the node function.
-  virtual void CallNodeFunction (csOctreeNode* onode)
+  virtual void CallNodeFunction (csOctreeNode* onode, bool vis)
   {
-    if (node_func) node_func (onode, this);
+    if (node_func) node_func (onode, this, vis);
   }
   /// Call the polygon function.
-  virtual void CallPolygonFunction (csObject* poly) { poly_func (poly, this); }
+  virtual void CallPolygonFunction (csObject* poly, bool vis)
+  {
+    poly_func (poly, this, vis);
+  }
   /// Call the curve function.
-  virtual void CallCurveFunction (csObject* curve) { curve_func (curve, this); }
+  virtual void CallCurveFunction (csObject* curve, bool vis)
+  {
+    curve_func (curve, this, vis);
+  }
   /// Set the userdata.
   void SetUserData (void* ud) { func_userdata = ud; }
   /// Get the userdata.

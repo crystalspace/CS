@@ -2259,10 +2259,9 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
     {
       vis = cb->InsertPolygon (poly, p->GetVertexCount ());
     }
+    fview->CallPolygonFunction ((csObject*)p, vis);
     if (vis)
     {
-      fview->CallPolygonFunction ((csObject*)p);
-
       if (!shadows->GetLastShadowBlock ())
       {
         shadows->NewShadowBlock ();
@@ -2323,7 +2322,7 @@ static bool CullOctreeNodeLighting (csPolygonTree* tree,
   if (ABS (dist) < EPSILON)
   {
     // We are in the node.
-    fview->CallNodeFunction (onode);
+    fview->CallNodeFunction (onode, true);
     return true;
   }
 
@@ -2331,6 +2330,7 @@ static bool CullOctreeNodeLighting (csPolygonTree* tree,
   csVector3 outline[6];
   int num_outline;
   otree->GetConvexOutline (onode, center, outline, num_outline);
+  bool vis = true;
   if (num_outline > 0)
   {
     int i;
@@ -2338,10 +2338,10 @@ static bool CullOctreeNodeLighting (csPolygonTree* tree,
       outline[i] -= center;
     csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();
     if (cb && !cb->TestPolygon (outline, num_outline))
-      return false;
+      vis = false;
   }
-  fview->CallNodeFunction (onode);
-  return true;
+  fview->CallNodeFunction (onode, vis);
+  return vis;
 }
 
 void csThing::CastShadows (iFrustumView* fview)
@@ -2438,7 +2438,7 @@ void csThing::RealCheckFrustum (iFrustumView* lview, iMovable* movable)
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     p = GetPolygon3D (i);
-    lview->CallPolygonFunction ((csObject*)p);
+    lview->CallPolygonFunction ((csObject*)p, true);
   }
 
   for (i = 0 ; i < GetCurveCount () ; i++)
@@ -2451,7 +2451,7 @@ void csThing::RealCheckFrustum (iFrustumView* lview, iMovable* movable)
       c->SetObject2World (&o2w);
     }
     
-    lview->CallCurveFunction ((csObject*)c);
+    lview->CallCurveFunction ((csObject*)c, true);
   }
 
   draw_busy--;

@@ -863,9 +863,23 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   }
 }
 
-void csPolyTexture::FillLightMapNew (csFrustumView* lview)
+static void Enlarge (csVector2* v, int nv)
+{
+  csBox2 box;
+  int i;
+  box.StartBoundingBox ();
+  for (i = 0 ; i < nv ; i++)
+    box.AddBoundingVertex (v[i]);
+  csVector2 center = box.GetCenter ();
+  for (i = 0 ; i < nv ; i++)
+    v[i] = (v[i]-center) * 1.1 + center;
+}
+
+void csPolyTexture::FillLightMapNew (csFrustumView* lview, bool vis,
+	csPolygon3D* subpoly)
 {
   if (!lm) return;
+  int j;
 
   csFrustum* light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   csVector3& lightpos = light_frustum->GetOrigin ();
@@ -877,75 +891,98 @@ void csPolyTexture::FillLightMapNew (csFrustumView* lview)
     ww = hh = 64;
   csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
 
+if (!vis) return;
+
   if (!shadow_bitmap)
   {
     int lm_w = lm->rwidth;
     int lm_h = lm->rheight;
-    shadow_bitmap = new csShadowBitmap (lm_w, lm_h, 0);
+    shadow_bitmap = new csShadowBitmap (lm_w, lm_h, 4);
     iFrustumViewUserdata* ud = lview->GetUserdata ();
     csLightingPolyTexQueue* lptq = (csLightingPolyTexQueue*)ud;
     lptq->AddPolyTexture (this);
   }
 
-  // Our polygon in light space (i.e. frustum).
-  // Here we will actually go back to the original polygon so that
-  // our shadows will cover the entire polygon and not the sub-part (split
-  // polygon).
-  csVector3 poly[MAX_OUTPUT_VERTICES];
-  csPolygon3D* base_poly = polygon->GetBasePolygon ();
-  int num_vertices = base_poly->GetVertexCount ();
-  int j;
-  if (lview->GetFrustumContext ()->IsMirrored ())
-    for (j = 0 ; j < num_vertices ; j++)
-      poly[j] = base_poly->Vwor (num_vertices - j - 1) - lightpos;
-  else
-    for (j = 0 ; j < num_vertices ; j++)
-      poly[j] = base_poly->Vwor (j) - lightpos;
-
   // Room for our shadow in lightmap space.
   csVector2 s2d[MAX_OUTPUT_VERTICES];
 
-  // Render all shadow polygons on the shadow-bitmap.
-  csFrustumContext* ctxt = lview->GetFrustumContext ();
-  iShadowIterator* shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
-  while (shadow_it->HasNext ())
+#if 1
+  //if (!vis)
   {
-    csFrustum* shadow_frust = shadow_it->Next ();
-
-    //@@@ QUESTION!
-    //Why do we have to copy the polygon data to the shadow frustum?
-    //We have a pointer to the polygon in the shadow frustum. That should
-    //be enough. On the other hand, we have to be careful with space
-    //warping portals. In that case the list of shadow frustums is
-    //currently transformed and we cannot do that to the original polygon.
-
-    // @@@ Optimization: Check for shadow_it->IsRelevant() here.
-    if (((csPolygon3D*)(shadow_it->GetUserData ()))->GetBasePolygon ()
-    	!= base_poly)
+    // Here we know that the entire polygon is not visible. So we don't
+    // actually traverse all shadow frustums here but just render the
+    // entire polygon as a shadow.
+    for (j = 0 ; j < subpoly->GetVertexCount () ; j++)
     {
-      // @@@ TODO: Optimize. Custom version of Intersect that is more
-      // optimial (doesn't require to copy 'poly') and detects cases
-      // that should not shadow.
-      csFrustum* new_shadow = shadow_frust->Intersect (poly, num_vertices);
-      if (new_shadow)
+      // @@@ TODO: Optimize. Combine the calculations below.
+      csVector3 v = txt_pl->m_world2tex *
+	  	(subpoly->Vwor (j) - txt_pl->v_world2tex);
+      s2d[j].x = (v.x * ww - Imin_u) * inv_lightcell_size;
+      s2d[j].y = (v.y * hh - Imin_v) * inv_lightcell_size;
+    }
+    Enlarge (s2d, subpoly->GetVertexCount ());
+    shadow_bitmap->RenderPolygon (s2d, subpoly->GetVertexCount (), 0);
+  }
+  //else
+#endif
+  {
+    // Our polygon in light space (i.e. frustum).
+    // Here we will actually go back to the original polygon so that
+    // our shadows will cover the entire polygon and not the sub-part (split
+    // polygon).
+    csVector3 poly[MAX_OUTPUT_VERTICES];
+    csPolygon3D* base_poly = polygon->GetBasePolygon ();
+    int num_vertices = base_poly->GetVertexCount ();
+    if (lview->GetFrustumContext ()->IsMirrored ())
+      for (j = 0 ; j < num_vertices ; j++)
+        poly[j] = base_poly->Vwor (num_vertices - j - 1) - lightpos;
+    else
+      for (j = 0 ; j < num_vertices ; j++)
+        poly[j] = base_poly->Vwor (j) - lightpos;
+
+    // Render all shadow polygons on the shadow-bitmap.
+    csFrustumContext* ctxt = lview->GetFrustumContext ();
+    iShadowIterator* shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
+    while (shadow_it->HasNext ())
+    {
+      csFrustum* shadow_frust = shadow_it->Next ();
+
+      //@@@ QUESTION!
+      //Why do we have to copy the polygon data to the shadow frustum?
+      //We have a pointer to the polygon in the shadow frustum. That should
+      //be enough. On the other hand, we have to be careful with space
+      //warping portals. In that case the list of shadow frustums is
+      //currently transformed and we cannot do that to the original polygon.
+
+      // @@@ Optimization: Check for shadow_it->IsRelevant() here.
+      if (((csPolygon3D*)(shadow_it->GetUserData ()))->GetBasePolygon ()
+    	!= base_poly)
       {
-        int nv = new_shadow->GetVertexCount ();
-        if (nv > MAX_OUTPUT_VERTICES) nv = MAX_OUTPUT_VERTICES;
-        csVector3* s3d = new_shadow->GetVertices ();
-        for (int j = 0; j < nv; j++)
+        // @@@ TODO: Optimize. Custom version of Intersect that is more
+        // optimial (doesn't require to copy 'poly') and detects cases
+        // that should not shadow.
+        csFrustum* new_shadow = shadow_frust->Intersect (poly, num_vertices);
+        if (new_shadow)
         {
-	// @@@ TODO: Optimize. Combine the calculations below.
-          csVector3 v = txt_pl->m_world2tex *
+          int nv = new_shadow->GetVertexCount ();
+          if (nv > MAX_OUTPUT_VERTICES) nv = MAX_OUTPUT_VERTICES;
+          csVector3* s3d = new_shadow->GetVertices ();
+          for (j = 0; j < nv; j++)
+          {
+	    // @@@ TODO: Optimize. Combine the calculations below.
+            csVector3 v = txt_pl->m_world2tex *
 	  	(s3d[j] + lightpos - txt_pl->v_world2tex);
-          s2d[j].x = (v.x * ww - Imin_u) * inv_lightcell_size;
-          s2d[j].y = (v.y * hh - Imin_v) * inv_lightcell_size;
+            s2d[j].x = (v.x * ww - Imin_u) * inv_lightcell_size;
+            s2d[j].y = (v.y * hh - Imin_v) * inv_lightcell_size;
+          }
+	  new_shadow->DecRef ();
+	  //Enlarge (s2d, nv);
+          shadow_bitmap->RenderPolygon (s2d, nv, 1);
         }
-	new_shadow->DecRef ();
-        shadow_bitmap->RenderShadow (s2d, nv);
       }
     }
+    shadow_it->DecRef ();
   }
-  shadow_it->DecRef ();
 }
 
 /* Modified by me to correct some lightmap's border problems -- D.D. */
@@ -1307,7 +1344,8 @@ int csPolyTexture::GetLightCellShift () { return csLightMap::lightcell_shift; }
 
 csShadowBitmap::csShadowBitmap (int lm_w, int lm_h, int quality)
 {
-  bitmap = NULL;
+  shadow = NULL;
+  light = NULL;
   full_shadow = false;
   csShadowBitmap::lm_w = lm_w;
   csShadowBitmap::lm_h = lm_h;
@@ -1326,7 +1364,78 @@ csShadowBitmap::csShadowBitmap (int lm_w, int lm_h, int quality)
   }
 }
 
-void csShadowBitmap::RenderShadow (csVector2* shadow_poly, int num_vertices)
+void csShadowBitmap::LightPutPixel (int x, int y, float area, void *arg)
+{
+  csShadowBitmap* sb = (csShadowBitmap*)arg;
+  if (x >= sb->sb_w || y >= sb->sb_h || x < 0 || y < 0)
+  {
+#ifdef CS_DEBUG
+    //printf ("Array bound error.\n"); fflush (stdout);
+#endif
+    return;
+  }
+  if (area < EPSILON) return;
+  sb->light[sb->sb_w * y + x] = 1;
+}
+
+void csShadowBitmap::LightDrawBox (int x, int y, int w, int h, void *arg)
+{
+  csShadowBitmap* sb = (csShadowBitmap*)arg;
+  if (x >= sb->sb_w || y >= sb->sb_h || x < 0 || y < 0 ||
+      x + w > sb->sb_w || y + h > sb->sb_h || w < 0 || h < 0)
+  {
+#ifdef CS_DEBUG
+    //printf ("Array bound error.\n"); fflush (stdout);
+#endif
+    return;
+  }
+  int ofs = sb->sb_w * y + x;
+  int delta = sb->sb_w - w;
+  for (int yy = h; yy > 0; yy--)
+  {
+    for (int xx = w; xx > 0; xx--)
+      sb->light[ofs++] = 1;
+    ofs += delta;
+  }
+}
+
+void csShadowBitmap::ShadowPutPixel (int x, int y, float area, void *arg)
+{
+  csShadowBitmap* sb = (csShadowBitmap*)arg;
+  if (x >= sb->sb_w || y >= sb->sb_h || x < 0 || y < 0)
+  {
+#ifdef CS_DEBUG
+    //printf ("Array bound error.\n"); fflush (stdout);
+#endif
+    return;
+  }
+  if (area < EPSILON) return;
+  sb->shadow[sb->sb_w * y + x] = 1;
+}
+
+void csShadowBitmap::ShadowDrawBox (int x, int y, int w, int h, void *arg)
+{
+  csShadowBitmap* sb = (csShadowBitmap*)arg;
+  if (x >= sb->sb_w || y >= sb->sb_h || x < 0 || y < 0 ||
+      x + w > sb->sb_w || y + h > sb->sb_h || w < 0 || h < 0)
+  {
+#ifdef CS_DEBUG
+    //printf ("Array bound error.\n"); fflush (stdout);
+#endif
+    return;
+  }
+  int ofs = sb->sb_w * y + x;
+  int delta = sb->sb_w - w;
+  for (int yy = h; yy > 0; yy--)
+  {
+    for (int xx = w; xx > 0; xx--)
+      sb->shadow[ofs++] = 1;
+    ofs += delta;
+  }
+}
+
+void csShadowBitmap::RenderPolygon (csVector2* shadow_poly, int num_vertices,
+	int val)
 {
   int i;
   //-------------------
@@ -1346,6 +1455,23 @@ void csShadowBitmap::RenderShadow (csVector2* shadow_poly, int num_vertices)
       shadow_poly[i] = shadow_poly[i] * div;
   }
 
+  if (!shadow)
+  {
+    shadow = new char [sb_w * sb_h];
+    memset (shadow, 0, sb_w * sb_h);
+    light = new char [sb_w * sb_h];
+    memset (light, 0, sb_w * sb_h);
+  }
+
+  if (val == 1)
+    csAntialiasedPolyFill (shadow_poly, num_vertices, this,
+  	ShadowPutPixel, ShadowDrawBox);
+  else
+    csAntialiasedPolyFill (shadow_poly, num_vertices, this,
+  	LightPutPixel, LightDrawBox);
+  return;
+
+#if 0
   //-------------------
   // First calculate the minimum and maximum indices (for 'y').
   //-------------------
@@ -1361,7 +1487,7 @@ void csShadowBitmap::RenderShadow (csVector2* shadow_poly, int num_vertices)
     if (sp[i].x > maxx) maxx = sp[i].x;
   }
 
-  // The shadow does touch the shadow-bitmap.
+  // The shadow does not touch the shadow-bitmap.
   if (maxy < 0 || miny > sb_h-1) return;
   if (maxx < 0 || minx > sb_w-1) return;
 
@@ -1373,7 +1499,7 @@ void csShadowBitmap::RenderShadow (csVector2* shadow_poly, int num_vertices)
   if (!bitmap)
   {
     bitmap = new char [sb_w * sb_h];
-    memset (bitmap, 0, sb_w * sb_h);
+    memset (bitmap, 1, sb_w * sb_h);
   }
 
   //-------------------
@@ -1474,7 +1600,7 @@ b:      if (scanL2 == MinIndex) return;
       {
         char* uv = &bitmap[sy * sb_w + xR];
         char* uv_end = uv + (xL-xR);
-        while (uv < uv_end) *uv++ = 1;
+        while (uv < uv_end) *uv++ = val;
       }
 
       if (!sy) return;
@@ -1483,24 +1609,50 @@ b:      if (scanL2 == MinIndex) return;
       sy--;
     }
   }
+#endif
 }
 
 float csShadowBitmap::GetLighting (int lm_u, int lm_v)
 {
-  if (!bitmap) return 1;
+  if (!shadow) return 1;
   CS_ASSERT (lm_u >= 0 && lm_u < lm_w);
   CS_ASSERT (lm_v >= 0 && lm_v < lm_h);
   if (quality == 0)
   {
     // Shadow-bitmap has equal quality.
-    return float (1-bitmap[lm_v * sb_w + lm_u]);
+    int idx = lm_v * sb_w + lm_u;
+    bool l = light[idx] && !shadow[idx];
+    return float (l);
   }
   else if (quality > 0)
   {
     // Shadow-bitmap has better quality.
     // Here we will take an average of all shadow-bitmap values.
-    // @@@ TODO!!!
-    return 1;
+    int d = 1 << (quality-1);
+    int u = lm_u << quality;
+    int v = lm_v << quality;
+    // Calculate the bounds in shadow-bitmap space for which we
+    // are going to take the average. Make sure we don't exceed
+    // the total bounds of the shadow-bitmap.
+    int minu = u-d; if (minu < 0) minu = 0;
+    int maxu = u+d; if (maxu > sb_w-1) maxu = sb_w-1;
+    int minv = v-d; if (minv < 0) minv = 0;
+    int maxv = v+d; if (maxv > sb_h-1) maxv = sb_h-1;
+    int total = (maxu-minu+1) * (maxv-minv+1);
+    int s = 0;
+    for (v = minv ; v <= maxv ; v++)
+    {
+      int idx = v * sb_w + minu;
+      char* bml = &light[idx];
+      char* bms = &shadow[idx];
+      for (u = minu ; u <= maxu ; u++)
+      {
+        int l = *bml && !*bms;
+	bml++; bms++;
+        s += l;
+      }
+    }
+    return float (s) / float (total);
   }
   else
   {

@@ -23,6 +23,7 @@
 #include "csutil/csobject.h"
 #include "csutil/cscolor.h"
 #include "csutil/flags.h"
+#include "csutil/csvector.h"
 #include "csengine/lview.h"
 #include "csengine/sector.h"
 #include "iengine/light.h"
@@ -272,16 +273,13 @@ private:
   /**
    * The following three variables are used if the light intensity
    * can vary. 'dynamic' is set to true in that case.
-   * 'num_polygon' and 'polygons' indicate all polygons that are
+   * The 'lightmaps' vector indicates all lightmaps that are
    * possibly lit by this light.
    */
   bool dynamic;
 
-  /// Number of lightmaps affected by this dynamic light.
-  int num_lightmap;
-
-  /// List of lightmaps that are affected by this dynamic light.
-  csLightMap** lightmaps;
+  /// Vector of lightmaps that are affected by this dynamic light.
+  csVector lightmaps;
 
 public:
   /**

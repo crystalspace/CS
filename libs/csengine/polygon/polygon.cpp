@@ -2062,7 +2062,7 @@ void csPolygon3D::CalculateDelayedLighting (csFrustumView *lview,
   lview->RestoreFrustumContext (old_ctxt);
 }
 
-void csPolygon3D::CalculateLightingNew (csFrustumView* lview)
+void csPolygon3D::CalculateLightingNew (csFrustumView* lview, bool vis)
 {
   csFrustum* light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   const csVector3& center = light_frustum->GetOrigin ();
@@ -2104,7 +2104,7 @@ void csPolygon3D::CalculateLightingNew (csFrustumView* lview)
   bool calc_lmap = lmi && lmi->tex && lmi->tex->lm && !lmi->lightmap_up_to_date;
 
   // Update the lightmap given light and shadow frustums in lview.
-  if (calc_lmap) FillLightMapNew (lview);
+  if (calc_lmap) FillLightMapNew (lview, vis);
 
   csPortal* po = GetPortal ();
   // @@@@@@@@ We temporarily don't do lighting through space-warping portals.
@@ -2141,7 +2141,7 @@ void csPolygon3D::CalculateLightingNew (csFrustumView* lview)
   }
 }
 
-void csPolygon3D::FillLightMapNew (csFrustumView* lview)
+void csPolygon3D::FillLightMapNew (csFrustumView* lview, bool vis)
 {
   csFrustumContext* ctxt = lview->GetFrustumContext ();
   csLightingInfo& linfo = ctxt->GetLightingInfo ();
@@ -2161,6 +2161,6 @@ void csPolygon3D::FillLightMapNew (csFrustumView* lview)
 
   csPolyTexLightMap* lmi = GetLightMapInfo ();
   if (lmi->lightmap_up_to_date) return;
-  lmi->tex->FillLightMapNew (lview);
+  lmi->tex->FillLightMapNew (lview, vis, this);
 }
 

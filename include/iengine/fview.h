@@ -245,7 +245,7 @@ public:
   bool IsFirstTime () { return first_time; }
 };
 
-SCF_VERSION (iFrustumView, 0, 1, 4);
+SCF_VERSION (iFrustumView, 0, 1, 5);
 
 /**
  * This structure represents all information needed for the frustum
@@ -281,11 +281,11 @@ struct iFrustumView : public iBase
   virtual void RestoreFrustumContext (csFrustumContext* original) = 0;
 
   /// Call the node function. @@@ csOctreeNode!!!!!!!
-  virtual void CallNodeFunction (csOctreeNode* onode) = 0;
+  virtual void CallNodeFunction (csOctreeNode* onode, bool vis) = 0;
   /// Call the polygon function. @@@ csObject!!!!!
-  virtual void CallPolygonFunction (csObject* poly) = 0;
+  virtual void CallPolygonFunction (csObject* poly, bool vis) = 0;
   /// Call the curve function. @@@ csObject!!!!!
-  virtual void CallCurveFunction (csObject* curve) = 0;
+  virtual void CallCurveFunction (csObject* curve, bool vis) = 0;
 
   /// Get the radius.
   virtual float GetRadius () = 0;
