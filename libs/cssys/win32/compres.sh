@@ -8,7 +8,7 @@
 files=
 
 # distributing resources over multiple files doesn't work...
-# do merge everything into only file and compile this one.
+# so merge everything into only file and compile this one.
 debug=$1
 shift
 outfile=$1

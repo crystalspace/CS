@@ -239,8 +239,26 @@ MSVC.OUTPUT = $(MSVC.OUT.DIR)/$(MSVC.PROJECT).$(MSVC.EXT.PROJECT)
 # (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.dwi")
 MSVC.FRAGMENT = $(MSVC.OUT.FRAGMENT)/$(MSVC.PROJECT).$(MSVC.EXT.FRAGMENT)
 
+# Only generate version info for apps and plugins
+MSVC.VERSIONRC = \
+  $(if $(subst appcon,,$(DSP.$*.TYPE)),$(if \
+    $(subst plugin,,$(DSP.$*.TYPE)),,$(MSVC.PROJECT).rc),$(MSVC.PROJECT).rc)
+
+# Get description
+MSVC.VERSIONDESC = \
+  $(DESCRIPTION.$(shell echo $* | \
+    sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
+
+# Generate the .RC file
+MSVC.MAKEVERRC = \
+  $(if $(MSVC.VERSIONRC),libs/cssys/win32/mkverres.sh \
+  $(MSVC.OUT.DIR)/$(MSVC.VERSIONRC) \
+  "$(if $(MSVC.VERSIONDESC),$(MSVC.VERSIONDESC),$*)",)
+
 # Macro to compose entire list of resources which comprise a project.
-MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) $($*.WINRSRC)
+MSVC.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) \
+	$($($*).WINRSRC) $($($*.EXE).WINRSRC) \
+	$(if $(MSVC.VERSIONRC),$(MSVC.CVS.DIR)/$(MSVC.VERSIONRC))
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -276,9 +294,9 @@ MSVC.CFLAGS.DIRECTIVE = $(subst --cflags='',,--cflags='$(DSP.$*.CFLAGS)')
 
 # Macros to compose lists of existing and newly created DSW and DSP files.
 MSVC.CVS.FILES = $(sort $(subst $(MSVC.CVS.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC.CVS.DIR)/*,.$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE)))))
+  $(addprefix $(MSVC.CVS.DIR)/*,.$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) .rc))))
 MSVC.OUT.FILES = $(sort $(subst $(MSVC.OUT.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC.OUT.DIR)/*,.$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE)))))
+  $(addprefix $(MSVC.OUT.DIR)/*,.$(MSVC.EXT.PROJECT) .$(MSVC.EXT.WORKSPACE) .rc))))
 
 # Quick'n'dirty macro to compare two file lists and report the appropriate
 # CVS "add" and "remove" commands which the user will need to invoke in order
@@ -319,6 +337,7 @@ $(MSVC.OUT.DIR) $(MSVC.OUT.FRAGMENT): $(MSVC.OUT.BASE)
 
 # Build a DSP project file and an associated DSW fragment file.
 %.MAKEDSP:
+	$(MSVC.MAKEVERRC)
 	$(MSVC.SILENT)$(MSVCGEN) --quiet --project \
 	--projext=$(MSVC.EXT.PROJECT) --wsext=$(MSVC.EXT.WORKSPACE) \
 	--name=$(DSP.$*.NAME) \

@@ -241,8 +241,26 @@ MSVC7.OUTPUT = $(MSVC7.OUT.DIR)/$(MSVC7.PROJECT).$(MSVC7.EXT.PROJECT)
 # (ex: "CSGEOM" becomes "out/mk/fragment/libcsgeom.frag")
 MSVC7.FRAGMENT = $(MSVC7.OUT.FRAGMENT)/$(MSVC7.PROJECT).$(MSVC7.EXT.FRAGMENT)
 
+# Only generate version info for apps and plugins
+MSVC7.VERSIONRC = \
+  $(if $(subst appcon,,$(DSP.$*.TYPE)),$(if \
+    $(subst plugin,,$(DSP.$*.TYPE)),,$(MSVC7.PROJECT).rc),$(MSVC7.PROJECT).rc)
+
+# Get description
+MSVC7.VERSIONDESC = \
+  $(DESCRIPTION.$(shell echo $* | \
+    sed -e y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/))
+
+# Generate the .RC file
+MSVC7.MAKEVERRC = \
+  $(if $(MSVC7.VERSIONRC),libs/cssys/win32/mkverres.sh \
+  $(MSVC7.OUT.DIR)/$(MSVC7.VERSIONRC) \
+  "$(if $(MSVC7.VERSIONDESC),$(MSVC7.VERSIONDESC),$*)",)
+
 # Macro to compose entire list of resources which comprise a project.
-MSVC7.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) $($*.WINRSRC)
+MSVC7.CONTENTS = $(SRC.$*) $(INC.$*) $(CFG.$*) $(DSP.$*.RESOURCES) \
+	$($($*).WINRSRC) $($($*.EXE).WINRSRC) \
+	$(if $(MSVC7.VERSIONRC),$(MSVC7.CVS.DIR)/$(MSVC7.VERSIONRC))
 
 # Macro to compose the entire dependency list for a particular project.
 # Dependencies are gleaned from three variables: DSP.PROJECT.DEPEND,
@@ -278,9 +296,9 @@ MSVC7.CFLAGS.DIRECTIVE = $(subst --cflags='',,--cflags='$(DSP.$*.CFLAGS)')
 
 # Macros to compose lists of existing and newly created .SLN and .VCPROJ files.
 MSVC7.CVS.FILES = $(sort $(subst $(MSVC7.CVS.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC7.CVS.DIR)/*,.$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE)))))
+  $(addprefix $(MSVC7.CVS.DIR)/*,.$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE) .rc))))
 MSVC7.OUT.FILES = $(sort $(subst $(MSVC7.OUT.DIR)/,,$(wildcard \
-  $(addprefix $(MSVC7.OUT.DIR)/*,.$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE)))))
+  $(addprefix $(MSVC7.OUT.DIR)/*,.$(MSVC7.EXT.PROJECT) .$(MSVC7.EXT.WORKSPACE) .rc))))
 
 # Quick'n'dirty macro to compare two file lists and report the appropriate
 # CVS "add" and "remove" commands which the user will need to invoke in order
@@ -322,6 +340,7 @@ $(MSVC7.OUT.DIR) $(MSVC7.OUT.FRAGMENT): $(MSVC7.OUT.BASE)
 
 # Build a .VCPROJ project file and associated .SLN fragment files.
 %.MAKEVCPROJ:
+	$(MSVC7.MAKEVERRC)
 	$(MSVC7.SILENT)$(MSVC7GEN) --quiet --project \
 	--htmlents \
 	--projext=$(MSVC7.EXT.PROJECT) --wsext=$(MSVC7.EXT.WORKSPACE) \

@@ -147,7 +147,7 @@ copy &quot;$(TargetPath)&quot;  csdebug\bin
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG"
+				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
 				Culture="1033"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>
