@@ -406,6 +406,12 @@ public:
   bool IsLightingCacheEnabled () { return do_lighting_cache; }
 
   /**
+   * Set the desired size for the dynamic light subtexture
+   * optimization. This is the ONLY legal way to change the size!
+   */
+  void SetSubtexSize (int s);
+
+  /**
    * Read configuration file (using the system driver) for all engine
    * specific values. This function is called by Initialize() so you
    * normally do not need to call it yourselves.

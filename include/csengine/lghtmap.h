@@ -71,60 +71,51 @@ private:
  */
 class csRGBLightMap
 {
-public:
-  int max_sizeR;
-  int max_sizeG;
-  int max_sizeB;
-  unsigned char* mapR;
-  unsigned char* mapG;
-  unsigned char* mapB;
+private:
+  int max_sizeRGB;	// Max size for every map.
+  unsigned char* map;
 
+public:
   ///
   void Clear ()
   {
-    CHK (delete [] mapR); mapR = NULL;
-    CHK (delete [] mapG); mapG = NULL;
-    CHK (delete [] mapB); mapB = NULL;
-    max_sizeR = max_sizeG = max_sizeB = 0;
+    CHK (delete [] map); map = NULL;
+    max_sizeRGB = 0;
   }
 
   ///
-  csRGBLightMap () : max_sizeR (0), max_sizeG (0), max_sizeB (0),
-  	mapR (NULL), mapG (NULL), mapB (NULL) { }
+  csRGBLightMap () : max_sizeRGB (0), map (NULL) { }
   ///
   ~csRGBLightMap () { Clear (); }
 
   ///
-  void AllocRed (int size)
-  {
-    max_sizeR = size;
-    CHK (delete [] mapR);
-    CHK (mapR = new unsigned char [size]);
-  }
+  int GetMaxSize () { return max_sizeRGB; }
+
+  /// Get data.
+  unsigned char* GetMap () { return map; }
+  /// Get red map.
+  unsigned char* GetRed () { return map; }
+  /// Get green map.
+  unsigned char* GetGreen () { return map+max_sizeRGB; }
+  /// Get blue map.
+  unsigned char* GetBlue () { return map+(max_sizeRGB<<1); }
+
+  /// Set color maps.
+  void SetMap (unsigned char* m) { map = m; }
 
   ///
-  void AllocGreen (int size)
+  void Alloc (int size)
   {
-    max_sizeG = size;
-    CHK (delete [] mapG);
-    CHK (mapG = new unsigned char [size]);
-  }
-
-  ///
-  void AllocBlue (int size)
-  {
-    max_sizeB = size;
-    CHK (delete [] mapB);
-    CHK (mapB = new unsigned char [size]);
+    max_sizeRGB = size;
+    CHK (delete [] map);
+    CHK (map = new unsigned char [size*3]);
   }
 
   ///
   void Copy (csRGBLightMap& other, int size)
   {
     Clear ();
-    if (other.mapR) { AllocRed (size); memcpy (mapR, other.mapR, size); }
-    if (other.mapG) { AllocGreen (size); memcpy (mapG, other.mapG, size); }
-    if (other.mapB) { AllocBlue (size); memcpy (mapB, other.mapB, size); }
+    if (other.map) { Alloc (size); memcpy (map, other.map, size*3); }
   }
 };
 
@@ -176,10 +167,10 @@ private:
    * Mean lighting value of this lightmap.
    * (only for static lighting currently).
    */
-  int mean_r;
-  int mean_g;
-  int mean_b;
-  
+  unsigned char mean_r;
+  unsigned char mean_g;
+  unsigned char mean_b;
+
   /**
    * Convert three lightmap tables to the right mixing mode.
    * This function assumes that mixing mode is one of FAST_Wxx

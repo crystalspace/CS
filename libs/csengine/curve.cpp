@@ -184,9 +184,9 @@ void csCurve::CalculateLighting (csLightView& lview)
   lm_width = lightmap->GetWidth ()-2;
   lm_height = lightmap->GetHeight ()-2;
   csRGBLightMap& map = lightmap->GetStaticMap ();
-  UByte* mapR = map.mapR;
-  UByte* mapG = map.mapG;
-  UByte* mapB = map.mapB;
+  UByte* mapR = map.GetRed ();
+  UByte* mapG = map.GetGreen ();
+  UByte* mapB = map.GetBlue ();
   csStatLight* light = (csStatLight*)lview.l;
 
   csColor color = csColor (lview.r, lview.g, lview.b) * NORMAL_LIGHT_LEVEL;

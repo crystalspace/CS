@@ -168,19 +168,19 @@ void csLightMap::Alloc (int w, int h, int lms, int r, int g, int b)
   else
 #endif
   {
-    static_lm.AllocRed (lm_size);
-    static_lm.AllocGreen (lm_size);
-    static_lm.AllocBlue (lm_size);
-    real_lm.AllocRed (lm_size);
-    real_lm.AllocGreen (lm_size);
-    real_lm.AllocBlue (lm_size);
+    static_lm.Alloc (lm_size);
+    real_lm.Alloc (lm_size);
   }
 
+  unsigned char* mr, * mg, * mb;
+  mr = static_lm.GetRed ();
+  mg = static_lm.GetGreen ();
+  mb = static_lm.GetBlue ();
   for (i = 0 ; i < lm_size ; i++)
   {
-    static_lm.mapR[i] = r;
-    if (static_lm.mapG) static_lm.mapG[i] = g;
-    if (static_lm.mapB) static_lm.mapB[i] = b;
+    mr[i] = r;
+    if (mg) mg[i] = g;
+    if (mb) mb[i] = b;
   }
 }
 
@@ -192,6 +192,15 @@ void csLightMap::MipmapLightMap (int w, int h, int lms, csLightMap* source,
   int lw2 = source->GetWidth ();
   int lh2 = source->GetHeight ();
   int u, v, uv, uv2;
+
+  unsigned char* mr, * mg, * mb;
+  mr = static_lm.GetRed ();
+  mg = static_lm.GetGreen ();
+  mb = static_lm.GetBlue ();
+  unsigned char* src_mr, * src_mg, * src_mb;
+  src_mr = source->static_lm.GetRed ();
+  src_mg = source->static_lm.GetGreen ();
+  src_mb = source->static_lm.GetBlue ();
 
   uv2 = 0;
   for (v = 0 ; v < lheight ; v++)
@@ -206,9 +215,9 @@ void csLightMap::MipmapLightMap (int w, int h, int lms, csLightMap* source,
       }
       else uv2 = (v+v)*lw2 + u+u;
 
-      static_lm.mapR[uv] = source->static_lm.mapR[uv2];
-      if (static_lm.mapG) static_lm.mapG[uv] = source->static_lm.mapG[uv2];
-      if (static_lm.mapB) static_lm.mapB[uv] = source->static_lm.mapB[uv2];
+      mr[uv] = src_mr[uv2];
+      if (mg) mg[uv] = src_mg[uv2];
+      if (mb) mb[uv] = src_mb[uv2];
     }
 
   csShadowMap* smap, * smap2;
@@ -357,19 +366,9 @@ bool csLightMap::ReadFromCache (int w, int h, int lms, csPolygonSet* owner,
   //-------------------------------
   static_lm.Clear ();
 
-  static_lm.AllocRed (lm_size);
-  memcpy (static_lm.mapR, d, lm_size);
-  d += lm_size;
-
-//@@@
-  //if (Textures::mixing != MIX_NOCOLOR)
-  {
-    static_lm.AllocGreen (lm_size);
-    memcpy (static_lm.mapG, d, lm_size);
-    d += lm_size;
-    static_lm.AllocBlue (lm_size);
-    memcpy (static_lm.mapB, d, lm_size);
-  }
+  static_lm.Alloc (lm_size);
+  memcpy (static_lm.GetMap (), d, (lm_size<<1)+lm_size);
+  d += (lm_size<<1)+lm_size;
 
   CHK (delete [] data);
 
@@ -435,9 +434,9 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   }
   ps.lm_size = lm_size;
   ps.lm_cnt = 0;
-  if (static_lm.mapR) ps.lm_cnt++;
-  if (static_lm.mapG) ps.lm_cnt++;
-  if (static_lm.mapB) ps.lm_cnt++;
+  if (static_lm.GetRed ()) ps.lm_cnt++;
+  if (static_lm.GetGreen ()) ps.lm_cnt++;
+  if (static_lm.GetBlue ()) ps.lm_cnt++;
 
   //-------------------------------
   // Write the normal lightmap data.
@@ -454,9 +453,9 @@ void csLightMap::Cache (csPolygonSet* owner, csPolygon3D* poly, int index, csWor
   l = convert_endian (ps.lm_size); cf->Write ((char*)&l, 4);
   l = convert_endian (ps.lm_cnt);  cf->Write ((char*)&l, 4);
 
-  if (static_lm.mapR) cf->Write ((char*)static_lm.mapR, lm_size);
-  if (static_lm.mapG) cf->Write ((char*)static_lm.mapG, lm_size);
-  if (static_lm.mapB) cf->Write ((char*)static_lm.mapB, lm_size);
+  if (static_lm.GetRed ()) cf->Write ((char*)static_lm.GetRed (), lm_size);
+  if (static_lm.GetGreen ()) cf->Write ((char*)static_lm.GetGreen (), lm_size);
+  if (static_lm.GetBlue ()) cf->Write ((char*)static_lm.GetBlue (), lm_size);
 
   // close the file
   cf->DecRef ();
@@ -509,42 +508,50 @@ void csLightMap::Scale (int w, int h, int new_lms)
   int old_rheight = rheight;
   Alloc (w, h, new_lms, 0, 0, 0);
   int x, y, new_val;
+  unsigned char* mr, * mg, * mb;
+  mr = static_lm.GetRed ();
+  mg = static_lm.GetGreen ();
+  mb = static_lm.GetBlue ();
+  unsigned char* old_mr, * old_mg, * old_mb;
+  old_mr = old_static_lm.GetRed ();
+  old_mg = old_static_lm.GetGreen ();
+  old_mb = old_static_lm.GetBlue ();
   for (y = 0 ; y < old_rheight-1 ; y += 2)
   {
     for (x = 0 ; x < old_rwidth-1 ; x += 2)
     {
       int old_idx = y*old_rwidth+x;
       int new_idx = (y>>1)*rwidth + (x>>1);
-      new_val = ((int)old_static_lm.mapR[old_idx]) +
-      	        ((int)old_static_lm.mapR[old_idx+1]) +
-      	        ((int)old_static_lm.mapR[old_idx+old_rwidth]) +
-      	        ((int)old_static_lm.mapR[old_idx+old_rwidth+1]);
-      static_lm.mapR[new_idx] = new_val/4;
-      new_val = ((int)old_static_lm.mapG[old_idx]) +
-      	        ((int)old_static_lm.mapG[old_idx+1]) +
-      	        ((int)old_static_lm.mapG[old_idx+old_rwidth]) +
-      	        ((int)old_static_lm.mapG[old_idx+old_rwidth+1]);
-      static_lm.mapG[new_idx] = new_val/4;
-      new_val = ((int)old_static_lm.mapB[old_idx]) +
-      	        ((int)old_static_lm.mapB[old_idx+1]) +
-      	        ((int)old_static_lm.mapB[old_idx+old_rwidth]) +
-      	        ((int)old_static_lm.mapB[old_idx+old_rwidth+1]);
-      static_lm.mapB[new_idx] = new_val/4;
+      new_val = ((int)old_mr[old_idx]) +
+      	        ((int)old_mr[old_idx+1]) +
+      	        ((int)old_mr[old_idx+old_rwidth]) +
+      	        ((int)old_mr[old_idx+old_rwidth+1]);
+      mr[new_idx] = new_val/4;
+      new_val = ((int)old_mg[old_idx]) +
+      	        ((int)old_mg[old_idx+1]) +
+      	        ((int)old_mg[old_idx+old_rwidth]) +
+      	        ((int)old_mg[old_idx+old_rwidth+1]);
+      mg[new_idx] = new_val/4;
+      new_val = ((int)old_mb[old_idx]) +
+      	        ((int)old_mb[old_idx+1]) +
+      	        ((int)old_mb[old_idx+old_rwidth]) +
+      	        ((int)old_mb[old_idx+old_rwidth+1]);
+      mb[new_idx] = new_val/4;
     }
     if (old_rwidth & 1)
     {
       x = old_rwidth-1;
       int old_idx = y*old_rwidth+x;
       int new_idx = (y>>1)*rwidth + (x>>1);
-      new_val = ((int)old_static_lm.mapR[old_idx]) +
-      	        ((int)old_static_lm.mapR[old_idx+old_rwidth]);
-      static_lm.mapR[new_idx] = new_val/2;
-      new_val = ((int)old_static_lm.mapG[old_idx]) +
-      	        ((int)old_static_lm.mapG[old_idx+old_rwidth]);
-      static_lm.mapG[new_idx] = new_val/2;
-      new_val = ((int)old_static_lm.mapB[old_idx]) +
-      	        ((int)old_static_lm.mapB[old_idx+old_rwidth]);
-      static_lm.mapB[new_idx] = new_val/2;
+      new_val = ((int)old_mr[old_idx]) +
+      	        ((int)old_mr[old_idx+old_rwidth]);
+      mr[new_idx] = new_val/2;
+      new_val = ((int)old_mg[old_idx]) +
+      	        ((int)old_mg[old_idx+old_rwidth]);
+      mg[new_idx] = new_val/2;
+      new_val = ((int)old_mb[old_idx]) +
+      	        ((int)old_mb[old_idx+old_rwidth]);
+      mb[new_idx] = new_val/2;
     }
   }
   if (old_rheight & 1)
@@ -554,27 +561,27 @@ void csLightMap::Scale (int w, int h, int new_lms)
     {
       int old_idx = y*old_rwidth+x;
       int new_idx = (y>>1)*rwidth + (x>>1);
-      new_val = ((int)old_static_lm.mapR[old_idx]) +
-      	        ((int)old_static_lm.mapR[old_idx+1]);
-      static_lm.mapR[new_idx] = new_val/2;
-      new_val = ((int)old_static_lm.mapG[old_idx]) +
-      	        ((int)old_static_lm.mapG[old_idx+1]);
-      static_lm.mapG[new_idx] = new_val/2;
-      new_val = ((int)old_static_lm.mapB[old_idx]) +
-      	        ((int)old_static_lm.mapB[old_idx+1]);
-      static_lm.mapB[new_idx] = new_val/2;
+      new_val = ((int)old_mr[old_idx]) +
+      	        ((int)old_mr[old_idx+1]);
+      mr[new_idx] = new_val/2;
+      new_val = ((int)old_mg[old_idx]) +
+      	        ((int)old_mg[old_idx+1]);
+      mg[new_idx] = new_val/2;
+      new_val = ((int)old_mb[old_idx]) +
+      	        ((int)old_mb[old_idx+1]);
+      mb[new_idx] = new_val/2;
     }
     if (old_rwidth & 1)
     {
       x = old_rwidth-1;
       int old_idx = y*old_rwidth+x;
       int new_idx = (y>>1)*rwidth + (x>>1);
-      new_val = ((int)old_static_lm.mapR[old_idx]);
-      static_lm.mapR[new_idx] = new_val;
-      new_val = ((int)old_static_lm.mapG[old_idx]);
-      static_lm.mapG[new_idx] = new_val;
-      new_val = ((int)old_static_lm.mapB[old_idx]);
-      static_lm.mapB[new_idx] = new_val;
+      new_val = ((int)old_mr[old_idx]);
+      mr[new_idx] = new_val;
+      new_val = ((int)old_mg[old_idx]);
+      mg[new_idx] = new_val;
+      new_val = ((int)old_mb[old_idx]);
+      mb[new_idx] = new_val;
     }
   }
 
@@ -635,18 +642,23 @@ void csLightMap::Scale (int w, int h, int new_lms)
 void csLightMap::ConvertToMixingMode ()
 {
   int i;
-  mean_r = 0;
-  mean_g = 0;
-  mean_b = 0;
+  int mer, meg, meb;
+  mer = 0;
+  meg = 0;
+  meb = 0;
+  unsigned char* mr, * mg, * mb;
+  mr = static_lm.GetRed ();
+  mg = static_lm.GetGreen ();
+  mb = static_lm.GetBlue ();
   for (i = 0 ; i < lm_size ; i++)
   {
-    mean_r += static_lm.mapR[i];
-    mean_g += static_lm.mapG[i];
-    mean_b += static_lm.mapB[i];
+    mer += mr[i];
+    meg += mg[i];
+    meb += mb[i];
   }
-  mean_r /= lm_size;
-  mean_g /= lm_size;
-  mean_b /= lm_size;
+  mean_r = mer/lm_size;
+  mean_g = meg/lm_size;
+  mean_b = meb/lm_size;
 
   //@@@
   //if (Textures::mixing == MIX_TRUE_RGB) return;
@@ -692,42 +704,21 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
 
   // Move the old data to o_stat and o_real.
   csRGBLightMap o_stat, o_real;
-  o_stat.mapR = static_lm.mapR; static_lm.mapR = NULL;
-  o_stat.mapG = static_lm.mapG; static_lm.mapG = NULL;
-  o_stat.mapB = static_lm.mapB; static_lm.mapB = NULL;
-  o_real.mapR = real_lm.mapR; real_lm.mapR = NULL;
-  o_real.mapG = real_lm.mapG; real_lm.mapG = NULL;
-  o_real.mapB = real_lm.mapB; real_lm.mapB = NULL;
+  o_stat.SetMap (static_lm.GetMap ()); static_lm.SetMap (NULL);
+  o_real.SetMap (real_lm.GetMap ()); real_lm.SetMap (NULL);
 
   lm_size = lwidth*lheight;
  
   // Allocate new data and transform old to new.
-//@@@
-#if 0
-  if (Textures::mixing == MIX_NOCOLOR)
-  {
-    static_lm.AllocRed (lm_size);
-    ResizeMap (o_stat.mapR, oldw, oldh, static_lm.mapR, lwidth, lheight);
-    real_lm.AllocRed (lm_size);
-    ResizeMap (o_real.mapR, oldw, oldh, real_lm.mapR, lwidth, lheight);
-  }
-  else
-#endif
-  {
-    static_lm.AllocRed (lm_size);
-    ResizeMap (o_stat.mapR, oldw, oldh, static_lm.mapR, lwidth, lheight);
-    static_lm.AllocGreen (lm_size);
-    ResizeMap (o_stat.mapG, oldw, oldh, static_lm.mapG, lwidth, lheight);
-    static_lm.AllocBlue (lm_size);
-    ResizeMap (o_stat.mapB, oldw, oldh, static_lm.mapB, lwidth, lheight);
+  static_lm.Alloc (lm_size);
+  ResizeMap (o_stat.GetRed (), oldw, oldh, static_lm.GetRed (), lwidth, lheight);
+  ResizeMap (o_stat.GetGreen (), oldw, oldh, static_lm.GetGreen (), lwidth, lheight);
+  ResizeMap (o_stat.GetBlue (), oldw, oldh, static_lm.GetBlue (), lwidth, lheight);
 
-    real_lm.AllocRed (lm_size);
-    ResizeMap (o_real.mapR, oldw, oldh, real_lm.mapR, lwidth, lheight);
-    real_lm.AllocGreen (lm_size);
-    ResizeMap (o_real.mapG, oldw, oldh, real_lm.mapG, lwidth, lheight);
-    real_lm.AllocBlue (lm_size);
-    ResizeMap (o_real.mapB, oldw, oldh, real_lm.mapB, lwidth, lheight);
-  }
+  real_lm.Alloc (lm_size);
+  ResizeMap (o_real.GetRed (), oldw, oldh, real_lm.GetRed (), lwidth, lheight);
+  ResizeMap (o_real.GetGreen (), oldw, oldh, real_lm.GetGreen (), lwidth, lheight);
+  ResizeMap (o_real.GetBlue (), oldw, oldh, real_lm.GetBlue (), lwidth, lheight);
 
   // Convert all shadowmaps.
   csShadowMap* smap = first_smap;
@@ -746,13 +737,13 @@ unsigned char *csLightMap::GetMap (int nMap)
   switch (nMap)
   {
     case 0:
-      return GetRealMap ().mapR;
+      return GetRealMap ().GetRed ();
       break;
     case 1:
-      return GetRealMap ().mapG;
+      return GetRealMap ().GetGreen ();
       break;
     case 2:
-      return GetRealMap ().mapB;
+      return GetRealMap ().GetBlue ();
       break;
   }
   return NULL;

@@ -813,6 +813,27 @@ void csWorld::ShineLights ()
 #endif
 }
 
+void csWorld::SetSubtexSize (int s)
+{
+  csPolyTexture::subtex_size = s;
+  csPolygon3D* p;
+  csPolyIt* pit = NewPolyIterator ();
+  pit->Restart ();
+  while ((p = pit->Fetch ()) != NULL)
+  {
+    csLightMapped* lmi = p->GetLightMapInfo ();
+    if (lmi)
+    {
+      lmi->GetPolyTex (0)->DestroyDirtyMatrix ();
+      lmi->GetPolyTex (1)->DestroyDirtyMatrix ();
+      lmi->GetPolyTex (2)->DestroyDirtyMatrix ();
+      lmi->GetPolyTex (3)->DestroyDirtyMatrix ();
+    }
+  }
+
+  CHK (delete pit);
+}
+
 bool csWorld::CheckConsistency ()
 {
   csPolyIt* pit = NewPolyIterator ();

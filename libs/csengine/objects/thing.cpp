@@ -230,9 +230,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
     {
       gouraud = true;
       csRGBLightMap& map = c->lightmap->GetStaticMap ();
-      mapR = map.mapR;
-      mapG = map.mapG;
-      mapB = map.mapB;
+      mapR = map.GetRed ();
+      mapG = map.GetGreen ();
+      mapB = map.GetBlue ();
       lm_width = c->lightmap->GetWidth ()-2;
       lm_height = c->lightmap->GetWidth ()-2;
     }

@@ -235,7 +235,7 @@ void Dumper::dump (csPolyTexture* p, char* name)
 {
   CsPrintf (MSG_DEBUG_0, "  PolyTexture '%s'\n", name);
   //@@@CsPrintf (MSG_DEBUG_0, "    in_cache=%d dyn_dirty=%d\n", in_cache, dyn_dirty);
-  CsPrintf (MSG_DEBUG_0, "    dirty_size=%d=%dx%d dirty_cnt=%d\n", p->dirty_size, p->dirty_w, p->dirty_h, p->dirty_cnt);
+  CsPrintf (MSG_DEBUG_0, "    dirty_size=%dx%d dirty_cnt=%d\n", p->dirty_w, p->dirty_h, p->dirty_cnt);
   if (p->dirty_matrix)
   {
     CsPrintf (MSG_DEBUG_0, "    dirty_matrix=[\n");
@@ -253,12 +253,16 @@ void Dumper::dump (csPolyTexture* p, char* name)
   CsPrintf (MSG_DEBUG_0, "    Imin_u=%d Imin_v=%d Imax_u=%d Imax_v=%d\n", p->Imin_u, p->Imin_v, p->Imax_u, p->Imax_v);
   CsPrintf (MSG_DEBUG_0, "    Fmin_u=%f Fmin_v=%f Fmax_u=%f Fmax_v=%f\n", p->Fmin_u, p->Fmin_v, p->Fmax_u, p->Fmax_v);
   if (p->lm)
+  {
     CsPrintf (MSG_DEBUG_0, "    lm: lwidth=%d lheight=%d rwidth=%d rheight=%d lm_size=%d\n", p->lm->lwidth,
   	p->lm->lheight, p->lm->rwidth, p->lm->rheight, p->lm->lm_size);
+    CsPrintf (MSG_DEBUG_0, "    lm: size=%ld lm_size=%ld\n",
+    	p->lm->size, p->lm->lm_size);
+  }
   else
     CsPrintf (MSG_DEBUG_0, "    lm: no lightmap\n");
   CsPrintf (MSG_DEBUG_0, "    shf_u=%d and_u=%d\n", p->shf_u, p->and_u);
-  CsPrintf (MSG_DEBUG_0, "    du=%d dv=%d fdu=%f fdv=%f\n", p->du, p->dv, p->fdu, p->fdv);
+  CsPrintf (MSG_DEBUG_0, "    fdu=%f fdv=%f\n", p->fdu, p->fdv);
   CsPrintf (MSG_DEBUG_0, "    w=%d h=%d w_orig=%d size=%d\n", p->w, p->h, p->w_orig, p->size);
   CsPrintf (MSG_DEBUG_0, "    mipmap_size=%d mipmap_shift=%d\n", p->mipmap_size, p->mipmap_shift);
 }

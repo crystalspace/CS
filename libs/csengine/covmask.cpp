@@ -517,13 +517,13 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
     case 0x3:	// Left and right side.
       if (sta.x < sto.x)
       {
-        from = ((y_left << dim_shift) >> box_shift) + 2*dimension;
-        to   = ((y_right << dim_shift) >> box_shift) + 3*dimension;
+        from = ((y_left << dim_shift) >> box_shift) + (dimension<<1);
+        to   = ((y_right << dim_shift) >> box_shift) + (dimension<<1)+dimension;
       }
       else
       {
-        from = ((y_right << dim_shift) >> box_shift) + 3*dimension;
-        to   = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+        from = ((y_right << dim_shift) >> box_shift) + (dimension<<1)+dimension;
+        to   = ((y_left << dim_shift) >> box_shift) + (dimension<<1);
       }
       break;
     case 0xe:	// Top, left, and bottom side.
@@ -543,36 +543,36 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
     case 0xa:	// Left and top side.
       if (sta.x < sto.x)
       {
-        from = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+        from = ((y_left << dim_shift) >> box_shift) + (dimension<<1);
         to   = ((x_top << dim_shift) >> box_shift);
       }
       else
       {
         from = ((x_top << dim_shift) >> box_shift);
-        to   = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+        to   = ((y_left << dim_shift) >> box_shift) + (dimension<<1);
       }
       break;
     case 0x6:	// Left and bottom side.
       if (sta.x < sto.x)
       {
-        from = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+        from = ((y_left << dim_shift) >> box_shift) + (dimension<<1);
         to   = ((x_bot << dim_shift) >> box_shift) + dimension;
       }
       else
       {
         from = ((x_bot << dim_shift) >> box_shift) + dimension;
-        to   = ((y_left << dim_shift) >> box_shift) + 2*dimension;
+        to   = ((y_left << dim_shift) >> box_shift) + (dimension<<1);
       }
       break;
     case 0x9:	// Top and right side.
       if (sta.x < sto.x)
       {
         from = ((x_top << dim_shift) >> box_shift);
-        to   = ((y_right << dim_shift) >> box_shift) + 3*dimension;
+        to   = ((y_right << dim_shift) >> box_shift) + (dimension<<1)+dimension;
       }
       else
       {
-        from = ((y_right << dim_shift) >> box_shift) + 3*dimension;
+        from = ((y_right << dim_shift) >> box_shift) + (dimension<<1)+dimension;
         to   = ((x_top << dim_shift) >> box_shift);
       }
       break;
@@ -580,11 +580,11 @@ int csCovMaskLUT::GetIndex (const csVector2& start,
       if (sta.x < sto.x)
       {
         from = ((x_bot << dim_shift) >> box_shift) + dimension;
-        to   = ((y_right << dim_shift) >> box_shift) + 3*dimension;
+        to   = ((y_right << dim_shift) >> box_shift) + (dimension<<1)+dimension;
       }
       else
       {
-        from = ((y_right << dim_shift) >> box_shift) + 3*dimension;
+        from = ((y_right << dim_shift) >> box_shift) + (dimension<<1)+dimension;
         to   = ((x_bot << dim_shift) >> box_shift) + dimension;
       }
       break;

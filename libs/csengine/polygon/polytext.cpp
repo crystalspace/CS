@@ -53,7 +53,6 @@ csPolyTexture::csPolyTexture ()
   lm = NULL;
   tcache_data = NULL;
   dirty_w = dirty_h = 0;
-  dirty_size = 0;
   dirty_cnt = 0;
   mipmap_level = 0;
   mipmap_size = 0;
@@ -132,8 +131,6 @@ void csPolyTexture::CreateBoundingTextureBox ()
 
   fdu = min_u*ww;
   fdv = min_v*hh;
-  du = QInt16 (fdu);
-  dv = QInt16 (fdv);
 
   // The size of the whole texture is extended by an upper and lower
   // margin to prevent overflow in the texture mapper.
@@ -166,30 +163,10 @@ bool csPolyTexture::RecalculateDynamicLights ()
 
   if (dm)
   {
-    if (lm_size > oldmap.max_sizeR) oldmap.AllocRed (lm_size);
-    memcpy (oldmap.mapR, remap.mapR, lm_size);
+    if (lm_size > oldmap.GetMaxSize ()) oldmap.Alloc (lm_size);
+    memcpy (oldmap.GetMap (), remap.GetMap (), (lm_size<<1)+lm_size);
   }
-  memcpy (remap.mapR, stmap.mapR, lm_size);
-
-  if (remap.mapG)
-  {
-    if (dm)
-    {
-      if (lm_size > oldmap.max_sizeG) oldmap.AllocGreen (lm_size);
-      memcpy (oldmap.mapG, remap.mapG, lm_size);
-    }
-    memcpy (remap.mapG, stmap.mapG, lm_size);
-  }
-
-  if (remap.mapB)
-  {
-    if (dm)
-    {
-      if (lm_size > oldmap.max_sizeB) oldmap.AllocBlue (lm_size);
-      memcpy (oldmap.mapB, remap.mapB, lm_size);
-    }
-    memcpy (remap.mapB, stmap.mapB, lm_size);
-  }
+  memcpy (remap.GetMap (), stmap.GetMap (), (lm_size<<1)+lm_size);
 
   //---
   // Then add all pseudo-dynamic lights.
@@ -210,9 +187,9 @@ bool csPolyTexture::RecalculateDynamicLights ()
       // Color mode.
       do
       {
-        mapR = remap.mapR;
-        mapG = remap.mapG;
-        mapB = remap.mapB;
+        mapR = remap.GetRed ();
+        mapG = remap.GetGreen ();
+        mapB = remap.GetBlue ();
         light = smap->light;
         red = light->GetColor ().red;
         green = light->GetColor ().green;
@@ -246,7 +223,7 @@ bool csPolyTexture::RecalculateDynamicLights ()
       // NOCOLOR mode.
       do
       {
-        mapR = remap.mapR;
+        mapR = remap.GetRed ();
         light = smap->light;
         red = light->get_red ();
         green = light->get_green ();
@@ -294,6 +271,12 @@ bool csPolyTexture::RecalculateDynamicLights ()
     int numu, numv;
     int uu, vv;
 
+    unsigned char* old_mr = oldmap.GetRed ();
+    unsigned char* old_mg = oldmap.GetGreen ();
+    unsigned char* old_mb = oldmap.GetBlue ();
+    unsigned char* re_mr = remap.GetRed ();
+    unsigned char* re_mg = remap.GetGreen ();
+    unsigned char* re_mb = remap.GetBlue ();
     idx = 0;
     for (rv = 0 ; rv < dirty_h ; rv++)
     {
@@ -322,9 +305,9 @@ bool csPolyTexture::RecalculateDynamicLights ()
 	      // like to have a multi-break statement but unfortunatelly C++
 	      // does not have this. That's why I use the goto. Yes I know!
 	      // goto's are EVIL!
-              if ((oldmap.mapR[luv] != remap.mapR[luv]) ||
-                  (oldmap.mapG && (oldmap.mapG[luv] != remap.mapG[luv])) ||
-                  (oldmap.mapB && (oldmap.mapB[luv] != remap.mapB[luv])))
+              if ((old_mr[luv] != re_mr[luv]) ||
+                  (old_mg && (old_mg[luv] != re_mg[luv])) ||
+                  (old_mb && (old_mb[luv] != re_mb[luv])))
               {
           	dirty_matrix[idx] = 1;
     		dirty_cnt++;
@@ -655,9 +638,9 @@ void csPolyTexture::FillLightMap (csLightView& lview)
   }
   else
   {
-    mapR = lm->GetStaticMap ().mapR;
-    mapG = lm->GetStaticMap ().mapG;
-    mapB = lm->GetStaticMap ().mapB;
+    mapR = lm->GetStaticMap ().GetRed ();
+    mapG = lm->GetStaticMap ().GetGreen ();
+    mapB = lm->GetStaticMap ().GetBlue ();
   }
   long lm_size = lm->lm_size;
 
@@ -951,9 +934,9 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 
   csRGBLightMap& remap = lm->GetRealMap ();
   csDynLight* light = (csDynLight*)(lp->light);
-  unsigned char* mapR = remap.mapR;
-  unsigned char* mapG = remap.mapG;
-  unsigned char* mapB = remap.mapB;
+  unsigned char* mapR = remap.GetRed ();
+  unsigned char* mapG = remap.GetGreen ();
+  unsigned char* mapB = remap.GetBlue ();
   long lm_size = lm->lm_size;
 
   int i;
@@ -1181,26 +1164,28 @@ finish:
 
 void csPolyTexture::CreateDirtyMatrix ()
 {
+  if (dirty_matrix) return;
   int dw = w/csPolyTexture::subtex_size + 1;
   int dh = h/csPolyTexture::subtex_size + 1;
-  if (!dirty_matrix || dw != dirty_w || dh != dirty_h)
-  {
-    // Dirty matrix does not exist or the size is not correct
-    CHK (delete [] dirty_matrix);
-    dirty_w = dw;
-    dirty_h = dh;
-    dirty_size = dw*dh;
-    CHK (dirty_matrix = new UByte [dirty_size]);
-    MakeAllDirty ();
-  }
+  // Dirty matrix does not exist.
+  dirty_w = dw;
+  dirty_h = dh;
+  CHK (dirty_matrix = new UByte [dw*dh]);
+  MakeAllDirty ();
+}
+
+void csPolyTexture::DestroyDirtyMatrix ()
+{
+  CHK (delete [] dirty_matrix);
+  dirty_matrix = NULL;
 }
 
 void csPolyTexture::MakeAllDirty ()
 {
   if (dirty_matrix)
   {
-    memset (dirty_matrix, 1, dirty_size);
-    dirty_cnt = dirty_size;
+    dirty_cnt = dirty_w*dirty_h;
+    memset (dirty_matrix, 1, dirty_cnt);
   }
 }
 
@@ -1246,6 +1231,5 @@ int csPolyTexture::GetMipmapLevel () { return mipmap_level; }
 int csPolyTexture::GetIMinU () { return Imin_u; }
 int csPolyTexture::GetIMinV () { return Imin_v; }
 int csPolyTexture::GetNumberDirtySubTex (){ return dirty_cnt; }
-int csPolyTexture::GetNumberCleanSubTex (){ return dirty_size-dirty_cnt; }
 int csPolyTexture::GetSubtexSize () { return subtex_size; }
 bool csPolyTexture::GetDynlightOpt () { return subtex_dynlight; }

@@ -13,6 +13,25 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+2-Jan-2000
+	- Removed another 16 bytes from csLightMap. This change also
+	  makes dynamic lighting more efficient (slightly).
+	- Started cleaning up csPolyTexture.
+	- Optimization in the software renderer (CreateDirtyMatrix).
+	- VERY significant memory optimization. Instead of storing four
+	  lightmap structures (and lightmaps) for every polygon we now only
+	  store one. The four lightmaps were the same anyway. I don't know
+	  why there should be four. This is left-over from a long time ago.
+	  This optimization means we save 4800 bytes for every lightmapped
+	  polygon with a 16x16 lightmap.
+1-Jan-2000
+	- My computer is still working :-)
+	  And so is Crystal Space.
+	- Removed 16 bytes from every csLightMap. This means a saving
+	  of 64 bytes for every lightmapped polygon since there are four
+	  lightmaps for the four mipmap levels.
+	- Removed another 12 bytes from csLightMap.
+	- Small optimization in coverage mask tree.
 31-Dec-1999
 	- First significant memory optimization in csPolyTxtPlane. The
 	  camera transformation fields are removed and calculated only

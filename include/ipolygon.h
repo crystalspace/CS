@@ -120,8 +120,6 @@ struct iPolygonTexture : public iBase
 
   /// Return the number of dirty sub-textures.
   virtual int GetNumberDirtySubTex () = 0;
-  /// Return the number of clean sub-textures.
-  virtual int GetNumberCleanSubTex () = 0;
   ///
   virtual int GetSubtexSize () = 0;
   ///

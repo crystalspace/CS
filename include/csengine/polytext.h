@@ -63,19 +63,16 @@ private:
   UByte* dirty_matrix;
 
   /// Width of dirty matrix.
-  int dirty_w;
+  UShort dirty_w;
 
   /// Height of dirty matrix.
-  int dirty_h;
-
-  /// Size of dirty matrix (dirty_w*dirty_h).
-  int dirty_size;
+  UShort dirty_h;
 
   /**
    * Number of dirty sub-textures (if 0 whole texture is clean
    * and in the cache.
    */
-  int dirty_cnt;
+  UShort dirty_cnt;
 
   /// The corresponding polygon.
   csPolygon3D* polygon;
@@ -90,10 +87,15 @@ private:
    */
   int Imin_u, Imin_v, Imax_u, Imax_v;
 
+  //@@@Fmin... Fmax... is the same for all four csPolyTexture.
+  //SHARE!
+  /// fp bounding box (0..1 texture space)
+  float Fmin_u, Fmin_v, Fmax_u, Fmax_v;
+
   ///
-  int shf_u;
+  UShort shf_u;
   ///
-  int and_u;
+  UShort and_u;
 
   /*
    * New texture data with lighting added. This is an untiled texture
@@ -119,10 +121,6 @@ private:
   int size;
 
   ///
-  int du;
-  ///
-  int dv;
-  ///
   float fdu;
   ///
   float fdv;
@@ -131,16 +129,16 @@ private:
   csLightMap* lm;
 
   /// The mipmap level (0..3) that this PolyTexture is used for.
-  int mipmap_level;
+  UByte mipmap_level;
 
   /// Mipmap size to use for lightmap boxes: 16, 8, 4, or 2.
-  int mipmap_size;
+  UByte mipmap_size;
 
   /// Mipmap shift corresponding to the mipmap_size above.
-  int mipmap_shift;
+  UByte mipmap_shift;
 
   /// If true, dynamic lighting needs to be recalculated.
-  bool dyn_dirty;
+  UByte dyn_dirty;
 
 public:
   /// Option variable: do accurate lighting of things. This is much slower however.
@@ -222,8 +220,11 @@ public:
   ///
   void MakeDirtyDynamicLights ();
 
-  /// fp bounding box (0..1 texture space)
-  float Fmin_u, Fmin_v, Fmax_u, Fmax_v;
+  /**
+   * Destroy the dirty matrix. This needs to be done after
+   * changing subtex_size.
+   */
+  void DestroyDirtyMatrix ();
 
   //--------------------- iPolygonTexture implementation ---------------------
   DECLARE_IBASE;
@@ -292,8 +293,6 @@ public:
 
   /// Return the number of dirty sub-textures.
   virtual int GetNumberDirtySubTex ();
-  /// Return the number of clean sub-textures.
-  virtual int GetNumberCleanSubTex ();
   ///
   virtual int GetSubtexSize ();
   ///
