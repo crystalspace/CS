@@ -721,7 +721,7 @@ bool csEvent::Print(int level)
 		|| (object->type == attribute::tag_int32)
 		|| (object->type == attribute::tag_uint32))
           {
-            IndentLevel(level); printf (" Value: %ld\n", object->Integer);
+            IndentLevel(level); printf (" Value: %d\n", object->Integer);
           }
           
           if ((object->type == attribute::tag_float)
@@ -738,7 +738,7 @@ bool csEvent::Print(int level)
           if (object->type == attribute::tag_databuffer)
           {
             IndentLevel(level); printf (" Value: 0x%X\n", (int)object->String);
-            IndentLevel(level); printf (" Length: %ld\n", object->length);
+            IndentLevel(level); printf (" Length: %d\n", object->length);
           }
           if (object->type == attribute::tag_string)
           {
