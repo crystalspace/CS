@@ -103,9 +103,6 @@ csPortalContainer::csPortalContainer (iEngine* engine) :
 	scfiPolygonMeshCD (CS_PORTAL_COLLDET),
 	scfiPolygonMeshLOD (CS_PORTAL_VISCULL)
 {
-  scfiPolygonMesh.SetPortalContainer (this);
-  scfiPolygonMeshCD.SetPortalContainer (this);
-  scfiPolygonMeshLOD.SetPortalContainer (this);
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMeshCD);
   scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
@@ -115,6 +112,10 @@ csPortalContainer::csPortalContainer (iEngine* engine) :
   data_nr = 0;
   movable_nr = -1;
   movable_identity = false;
+
+  scfiPolygonMesh.SetPortalContainer (this);
+  scfiPolygonMeshCD.SetPortalContainer (this);
+  scfiPolygonMeshLOD.SetPortalContainer (this);
 }
 
 csPortalContainer::~csPortalContainer ()
