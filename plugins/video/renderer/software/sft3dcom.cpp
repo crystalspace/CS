@@ -1463,6 +1463,14 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 
   // Check if polygon has a lightmap (i.e. if it is lighted)
   bool has_lightmap = tex->GetLightMap () && do_lighting;
+  if (has_lightmap)
+  {
+    // If there is a lightmap we check if the size of the lighted
+    // texture would not exceed 1000000 bytes. In that case we
+    // revert to unlighted texture mapping.
+    long size = tex->GetWidth () * tex->GetHeight ();
+    if (size > 1000000) has_lightmap = false;
+  }
 
   // Continue with texture mapping
   Scan.tw = txt_unl->get_width ();

@@ -642,7 +642,9 @@ void csPolygon3D::Finish ()
     portal->SetTexture (material->GetTextureHandle()->GetTextureHandle ());
 
   if (flags.Check (CS_POLY_LIGHTING)
-   && TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
+  	&& csLightMap::CalcLightMapWidth (lmi->tex->w_orig) <= 256
+  	&& csLightMap::CalcLightMapHeight (lmi->tex->h) <= 256)
+   //&& TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
   {
     csLightMap *lm = new csLightMap ();
     lmi->tex->SetLightMap (lm);

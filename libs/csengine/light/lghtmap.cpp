@@ -45,8 +45,8 @@ void csShadowMap::Alloc (csLight*, int w, int h)
 {
   delete [] map; map = NULL;
 
-  int lw = 1 + ((w + lightcell_size - 1) >> lightcell_shift);
-  int lh = 1 + ((h + lightcell_size - 1) >> lightcell_shift);
+  int lw = csLightMap::CalcLightMapWidth (w);
+  int lh = csLightMap::CalcLightMapHeight (h);
 
   long lm_size = lw * lh;
   map = new unsigned char [lm_size];
@@ -131,8 +131,8 @@ csShadowMap* csLightMap::FindShadowMap (csLight* light)
 
 void csLightMap::SetSize (int w, int h)
 {
-  rwidth  = lwidth  = 1 + ((w + lightcell_size - 1) >> lightcell_shift);
-  rheight = lheight = 1 + ((h + lightcell_size - 1) >> lightcell_shift);
+  rwidth  = lwidth  = csLightMap::CalcLightMapWidth (w);
+  rheight = lheight = csLightMap::CalcLightMapHeight (h);
   lm_size = lwidth * lheight;
 }
 

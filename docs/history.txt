@@ -28,6 +28,13 @@ The history order has been reversed so that new features are at the top.
 	  Note that this will probably not work in all cases now because
 	  the bbox calculation in particle systems is not completely
 	  ok at the moment.
+	- The limitation of 1000000 texels for lighting has now moved
+	  from the engine to the software renderer. This means that for
+	  OpenGL, D3D, and Glide, this limitation is gone and you can have
+	  bigger lighted polygons. Note that there is still a limitation
+	  though. If the lightmap is bigger than 256x256 it will not
+	  be used. This is to avoid problems with some cards that have
+	  this texture size limitation.
 16-Jul-2000
 	- Samuel Humphreys did the following changes..
             - Added two new procedural textures to dtsimple. This is to complete

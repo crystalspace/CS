@@ -202,6 +202,17 @@ public:
   /// Log base 2 of lightcell_size
   static int lightcell_shift;
 
+  /// Return the width of a lightmap given a texture size.
+  static int CalcLightMapWidth (int w)
+  {
+    return 1 + ((w + lightcell_size - 1) >> lightcell_shift);
+  }
+  /// Return the height of a lightmap given a texture size.
+  static int CalcLightMapHeight (int h)
+  {
+    return 1 + ((h + lightcell_size - 1) >> lightcell_shift);
+  }
+
   ///
   csLightMap ();
   ///
