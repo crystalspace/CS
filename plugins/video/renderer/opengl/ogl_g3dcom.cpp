@@ -3721,6 +3721,10 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       use_lazy_clipping = true;
       how_clip = tolower (how_clip);
     }
+    else
+    {
+      use_lazy_clipping = false;
+    }
   }
 
   // Check for the near-plane.
@@ -4286,6 +4290,10 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
     {
       use_lazy_clipping = true;
       how_clip = tolower (how_clip);
+    }
+    else
+    {
+      use_lazy_clipping = false;
     }
   }
 

@@ -23,6 +23,7 @@ The history order is reversed so that new features are at the top.
 	  that to true initially and only set it to false when it is
 	  required (OpenGL renderer).
 	- Increased the number of super lightmaps from 10 to 16 for OpenGL.
+	- Improved setting of use_lazy_clipping flag a bit.
 22-Jan-2003
 	- Made iEngine->CreateDynLight() a bit more efficient by avoiding
 	  the SCF_QUERY_INTERFACE.
