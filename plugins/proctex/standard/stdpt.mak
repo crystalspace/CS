@@ -1,4 +1,4 @@
-DESCRIPTION.stdpt = standard procedural textures
+DESCRIPTION.stdpt = Crystal Space standard procedural textures
 
 #-----------------------------------------------------------------------------#
 ifeq ($(MAKESECTION),rootdefines)

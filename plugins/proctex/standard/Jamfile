@@ -5,6 +5,6 @@ Plugin stdpt
 ;
 LinkWith stdpt : cstool csgfx cssys csutil ;
 
-Help stdpt : "standard procedural textures" ;
-CompileGroups csbmpimg :  proctexes ;
+Help stdpt : "Crystal Space standard procedural textures" ;
+CompileGroups stdpt :  proctexes ;
 

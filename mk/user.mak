@@ -58,7 +58,7 @@ PLUGINS += sound/loader/au
 PLUGINS += sound/loader/aiff
 PLUGINS += sound/loader/iff
 PLUGINS += sound/loader/wav
-PLUGINS += font/server/csfont 
+PLUGINS += font/server/csfont
 PLUGINS += console/output/simple
 PLUGINS += console/input/standard
 PLUGINS += collide/rapid
@@ -118,6 +118,7 @@ PLUGINS.DYNAMIC += video/loader/wal
 ifeq ($(MNG.AVAILABLE),yes)
 PLUGINS.DYNAMIC += video/loader/jng
 endif
+PLUGINS.DYNAMIC += proctex/ptanimimg
 ifeq ($(SOCKET.AVAILABLE),yes)
 PLUGINS.DYNAMIC += net/driver/socket
 PLUGINS.DYNAMIC += net/driver/ensocket

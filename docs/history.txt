@@ -49,6 +49,9 @@ The history order is reversed so that new features are at the top.
 	  been made to the DO.SHARED.PLUGIN.PREAMBLE's invocation of
 	  mergeres.sh as part of Eric's changes yesterday, but DO.LINK.EXE
 	  slipped by unaltered.
+	- res added an iAnimatedImage interface to support animnated images.
+	- res added a plugin for a proctex for animated images.
+	- res fixed a cut'n'paste error in plugins/proctex/standard/Jamfile.
 11-May-2003
 	- Oktal removed one of two instances of the same phony target,
 	  swigperl5gen, in the csperl5 makefile.
