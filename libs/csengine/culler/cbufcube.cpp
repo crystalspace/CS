@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -18,11 +18,10 @@
 
 #include "sysdef.h"
 #include "csgeom/polyclip.h"
-#include "csengine/covcube.h"
+#include "csengine/cbufcube.h"
 #include "csengine/world.h"
-#include "csengine/dumper.h"
 
-bool csCoverageMaskTreePersp::DoPerspective (csVector3* verts, int num_verts,
+bool csCBufferPersp::DoPerspective (csVector3* verts, int num_verts,
 	csPolygon2D& persp)
 {
   int num_z_0;
@@ -89,53 +88,39 @@ bool csCoverageMaskTreePersp::DoPerspective (csVector3* verts, int num_verts,
   return true;
 }
 
-bool csCoverageMaskTreePersp::InsertPolygon (csVector3* verts, int num_verts,
+bool csCBufferPersp::InsertPolygon (csVector3* verts, int num_verts,
 	csClipper* /*clipper*/)
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
   //if (clipper && !persp.ClipAgainst (clipper)) return false;
-  return csCoverageMaskTree::InsertPolygon (persp.GetVertices (),
-  	persp.GetNumVertices (), persp.GetBoundingBox ());
+  return csCBuffer::InsertPolygon (persp.GetVertices (),
+  	persp.GetNumVertices ());
 }
 
-bool csCoverageMaskTreePersp::TestPolygon (csVector3* verts, int num_verts,
+bool csCBufferPersp::TestPolygon (csVector3* verts, int num_verts,
 	csClipper* /*clipper*/)
 {
   static csPolygon2D persp;
   if (!DoPerspective (verts, num_verts, persp)) return false;
   //if (clipper && !persp.ClipAgainst (clipper)) return false;
-  return csCoverageMaskTree::TestPolygon (persp.GetVertices (),
-  	persp.GetNumVertices (), persp.GetBoundingBox ());
-}
-
-int csCoverageMaskTreePersp::TestPoint (const csVector3& point)
-{
-  //@@@ to be implemented...
-  //if (point.z < EPSILON) return CS_QUAD_UNKNOWN;
-  //float iz = 1. / point.z;
-  //csVector2 persp (point.x * iz, point.y * iz);
-  //return csQuadtree::TestPoint (persp);
-  (void) point;
-  return 0;
+  return csCBuffer::TestPolygon (persp.GetVertices (),
+  	persp.GetNumVertices ());
 }
 
 //-----------------------------------------------------------------
 
-csCovcube::csCovcube (csCovMaskLUT* lut)
+csCBufferCube::csCBufferCube (int dim)
 {
-  //@@@Depends on coverage mask tree depth.
-  csBox box (0, 0, 1024, 1024);
-
-  CHK (trees[0] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[1] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[2] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[3] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[4] = new csCoverageMaskTreePersp (lut, box));
-  CHK (trees[5] = new csCoverageMaskTreePersp (lut, box));
+  CHK (trees[0] = new csCBufferPersp (0, dim-1, dim));
+  CHK (trees[1] = new csCBufferPersp (0, dim-1, dim));
+  CHK (trees[2] = new csCBufferPersp (0, dim-1, dim));
+  CHK (trees[3] = new csCBufferPersp (0, dim-1, dim));
+  CHK (trees[4] = new csCBufferPersp (0, dim-1, dim));
+  CHK (trees[5] = new csCBufferPersp (0, dim-1, dim));
 }
 
-csCovcube::~csCovcube ()
+csCBufferCube::~csCBufferCube ()
 {
   CHK (delete trees[0]);
   CHK (delete trees[1]);
@@ -145,17 +130,17 @@ csCovcube::~csCovcube ()
   CHK (delete trees[5]);
 }
 
-void csCovcube::MakeEmpty ()
+void csCBufferCube::MakeEmpty ()
 {
-  trees[0]->MakeEmpty ();
-  trees[1]->MakeEmpty ();
-  trees[2]->MakeEmpty ();
-  trees[3]->MakeEmpty ();
-  trees[4]->MakeEmpty ();
-  trees[5]->MakeEmpty ();
+  trees[0]->Initialize ();
+  trees[1]->Initialize ();
+  trees[2]->Initialize ();
+  trees[3]->Initialize ();
+  trees[4]->Initialize ();
+  trees[5]->Initialize ();
 }
 
-bool csCovcube::IsFull ()
+bool csCBufferCube::IsFull ()
 {
   if (trees[0]->IsFull ()) return true;
   if (trees[1]->IsFull ()) return true;
@@ -166,7 +151,7 @@ bool csCovcube::IsFull ()
   return false;
 }
 
-bool csCovcube::InsertPolygon (csVector3* verts, int num_verts)
+bool csCBufferCube::InsertPolygon (csVector3* verts, int num_verts)
 {
   csVector3 cam[40];	// @@@ HARDCODED! BAD!
   int i;
@@ -251,7 +236,7 @@ bool csCovcube::InsertPolygon (csVector3* verts, int num_verts)
   return rc1 || rc2 || rc3 || rc4 || rc5 || rc6;
 }
 
-bool csCovcube::TestPolygon (csVector3* verts, int num_verts)
+bool csCBufferCube::TestPolygon (csVector3* verts, int num_verts)
 {
   csVector3 cam[40];	// @@@ HARDCODED! BAD!
   int i;
@@ -321,52 +306,5 @@ bool csCovcube::TestPolygon (csVector3* verts, int num_verts)
   }
 
   return false;
-}
-
-int csCovcube::TestPoint (const csVector3& point)
-{
-#if 0
-  int state;
-  csVector3 cam;
-  // -> Z
-  state = trees[0]->TestPoint (point);
-  if (state != CS_QUAD_UNKNOWN) return state;
-
-  // -> -Z
-  cam.x = -point.x;
-  cam.y = point.y;
-  cam.z = -point.z;
-  state = trees[1]->TestPoint (cam);
-  if (state != CS_QUAD_UNKNOWN) return state;
-
-  // -> X
-  cam.x = point.z;
-  cam.y = point.y;
-  cam.z = -point.x;
-  state = trees[2]->TestPoint (cam);
-  if (state != CS_QUAD_UNKNOWN) return state;
-
-  // -> -X
-  cam.x = -point.z;
-  cam.y = point.y;
-  cam.z = point.x;
-  state = trees[3]->TestPoint (cam);
-  if (state != CS_QUAD_UNKNOWN) return state;
-
-  // -> Y
-  cam.x = point.x;
-  cam.y = point.z;
-  cam.z = -point.y;
-  state = trees[4]->TestPoint (cam);
-  if (state != CS_QUAD_UNKNOWN) return state;
-
-  // -> -Y
-  cam.x = point.x;
-  cam.y = -point.z;
-  cam.z = point.y;
-  return trees[5]->TestPoint (cam);
-#endif
-  (void) point;
-  return 0;
 }
 

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -43,14 +43,13 @@ class csStatLight;
 class csDynLight;
 class csSpriteTemplate;
 class csClipper;
-class csQuadcube;
 class csSolidBsp;
 class csCovcube;
+class csCBufferCube;
 class csWorld;
 class Dumper;
 class csLight;
 class csCBuffer;
-class csQuadtree;
 class csCoverageMaskTree;
 class csCovMaskLUT;
 class csPoly2DPool;
@@ -275,9 +274,6 @@ private:
   /// Optional c-buffer used for rendering.
   csCBuffer* c_buffer;
 
-  /// Optional quad-tree used for rendering.
-  csQuadtree* quadtree;
-
   /// Optional solid BSP used for rendering.
   csSolidBsp* solidbsp;
 
@@ -287,11 +283,11 @@ private:
   /// Lookup table for coverage mask trees.
   csCovMaskLUT* covtree_lut;
 
-  /// Quad-cube used for lighting.
-  csQuadcube* quadcube;
-
   /// Coverage mask cube used for lighting.
   csCovcube* covcube;
+
+  /// C-buffer cube used for lighting.
+  csCBufferCube* cbufcube;
 
   /// Use PVS.
   bool use_pvs;
@@ -442,24 +438,14 @@ public:
   csSolidBsp* GetSolidBsp () { return solidbsp; }
 
   /**
-   * Enable/disable quadtree.
-   */
-  void EnableQuadtree (bool en);
-
-  /**
-   * Return quadtree (or NULL if not used).
-   */
-  csQuadtree* GetQuadtree () { return quadtree; }
-
-  /**
-   * Return quad-cube.
-   */
-  csQuadcube* GetQuadcube () { return quadcube; }
-
-  /**
    * Return coverage mask cube.
    */
   csCovcube* GetCovcube () { return covcube; }
+
+  /**
+   * Return cbuffer cube.
+   */
+  csCBufferCube* GetCBufCube () { return cbufcube; }
 
   /**
    * Enable PVS.

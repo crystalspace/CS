@@ -12,6 +12,46 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+24-Mar-2000
+	- Norman Kramer did some work on glide3 support.
+	- Changes from Michael Dale Long:
+	    - Fixed breakage from updated csPixmap.
+	    - Fixed duplicate default parameters in csMD5 and ccActor.
+	- Added csCBufferCube which is a cube of six c-buffers :-)
+	- Tried to use csCBufferCube for lighting instead of coverage mask tree
+	  cube. I was expecting to get more performance for lighting because
+	  the c-buffer is faster than the coverage mask tree. At least that
+	  was what I thought! But I discovered that the coverage mask tree
+	  implementation does not test for IsFull to stop processing
+	  a tree if it is full! This can make a HUGE difference. So now
+	  I'm not so sure that the c-buffer is really better. This needs
+	  to be reevalulated.
+	- Removed csQuadtree and csQuadcube usage from the engine since the
+	  quadtree is the worst of all 2D cullers we have now.
+	- Removed 'quadtree' command from WalkTest.
+	- Fixed bug in WalkTest movement code on systems that return negative
+	  values for Time() (movement would not be possible on such systems).
+	- Thanks to Andrew's changes to the clipper I implemented a new
+	  clipper in DrawTriangleMesh. This also solves the bug when sprite
+	  triangles were clipped. Note that this bug ONLY fixes sprites. The
+	  bug will still be present in the other triangle drawers.
+	  This fix fixes Squawk as well I think.
+	- Andrew Zabolotny did the following changes:
+	    - Introduced two new keywords in world file (to make them smaller
+	      when generating world files automatically such as from MazeD or
+	      map2cs): 
+		UVEC(x,y,z)
+		VVEC(x,y,z)
+	      They are a replacement for FIRST(x,y,z)/FIRST_LEN(l) and
+	      SECOND(x,y,z)/SECOND_LEN(l). The UVEC() defines the vector of
+	      top texture edge, and the VVEC() defines the vector of left texture
+	      edge. The length of the vector is same value that is usually
+	      specified with FIRST_LEN and SECOND_LEN. Also take into account
+	      that the vectors start from ORIG() point.
+	      These two keywords are recognized in PLANE(), POLYGON() and
+	      polygon template, BEZIER() and bezier template (although it looks
+	      like it is unused there yet) contexts.
+	    - Implemented texture mapping saving in MazeD; about 90% done.
 23-Mar-2000
 	- Gary Haussmann added basic support for DrawTriangleMesh(). All
 	  triangles are sent via a glDrawElements() call.  May crash some
@@ -41,6 +81,7 @@ Short-term cleanups that need to be done:
 	      Software driver works and OpenGL driver should work too
 	      (at least it compiles okay).
 	    - Fixed a minor bug with texture transparency in MazeD.
+	- Robert Bate updated the Macintosh project files.
 22-Mar-2000
 	- Continued debugging work on solid BSP. Still not perfect
 	  although I'm getting closer all the time.

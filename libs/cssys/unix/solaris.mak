@@ -8,7 +8,7 @@ DESCRIPTION.solaris = Solaris
 DRIVERS+=cs2d/softx cs3d/software
 
 # Networking manager.
-DRIVERS+=csnetman/simple
+#DRIVERS+=csnetman/simple
 
 # uncomment the following to build sound renderer
 #DRIVERS+=cssndrdr/software

@@ -33,188 +33,129 @@
 // 3D rasterizer if you can't do it better :-)
 //------------------------------------------------------------------------
 
+#define INTERPOLATE(component) \
+{ \
+  float v1 = tritexcoords[edge1[0]].##component## + t1 * (tritexcoords[edge1[1]].##component## - tritexcoords[edge1[0]].##component##); \
+  float v2 = tritexcoords[edge2[0]].##component## + t2 * (tritexcoords[edge2[1]].##component## - tritexcoords[edge2[0]].##component##); \
+  g3dpoly->vertices[i].##component## = v1 + t * (v2 - v1); \
+}
+#define INTERPOLATE_FOG(component) \
+{ \
+  float v1 = trifoginfo[edge1[0]].##component## + t1 * (trifoginfo[edge1[1]].##component## - trifoginfo[edge1[0]].##component##); \
+  float v2 = trifoginfo[edge2[0]].##component## + t2 * (trifoginfo[edge2[1]].##component## - trifoginfo[edge2[0]].##component##); \
+  g3dpoly->fog_info[i].##component## = v1 + t * (v2 - v1); \
+}
+
 static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
-	int num_vertices, csVector2* orig_triangle, bool use_fog, bool gouraud)
+	int num_vertices, csVertexStatus* clipped_vtstats,
+	csVector2* orig_triangle, bool use_fog, bool gouraud)
 {
-  // Note: Assumes clockwise vertices, otherwise wouldn't be visible :).
-  // 'was_clipped' will be true if the triangle was clipped.
-  // This is the case if rescount != 3 (because we then don't have
-  // a triangle) or else if any of the clipped vertices is different.
-  bool was_clipped = (num_vertices != 3);
-  int j;
-  for (j = 0; j < num_vertices; j++)
-  {
-    g3dpoly->vertices [j].sx = clipped_verts [j].x;
-    g3dpoly->vertices [j].sy = clipped_verts [j].y;
-    if (!was_clipped && clipped_verts[j] != orig_triangle[j])
-    	was_clipped = true;
-  }
-
-  // If it was not clipped we don't have to do anything.
-  if (!was_clipped) return;
-
   // first we copy the first three texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
   G3DTexturedVertex tritexcoords[3];
   G3DFogInfo trifoginfo[3];
   for (int i = 0; i < 3; i++)
   {
-    tritexcoords [i] = g3dpoly->vertices [i];
-    trifoginfo [i] = g3dpoly->fog_info [i];
+    tritexcoords[i] = g3dpoly->vertices[i];
+    trifoginfo[i] = g3dpoly->fog_info[i];
   }
 
-  // Now we have to find the u,v coordinates for every
-  // point in the clipped polygon. We know we started
-  // from orig_triangle and that texture mapping is not perspective correct.
-
-  // Compute U & V in vertices of the polygon
-  // First find the topmost triangle vertex
-  int top;
-  if (orig_triangle [0].y < orig_triangle [1].y)
-    if (orig_triangle [0].y < orig_triangle [2].y)
-      top = 0;
-    else
-      top = 2;
-  else
-    if (orig_triangle [1].y < orig_triangle [2].y)
-      top = 1;
-    else
-      top = 2;
-
-  int _vbl, _vbr;
-  if (top <= 0) _vbl = 2; else _vbl = top - 1;
-  if (top >= 2) _vbr = 0; else _vbr = top + 1;
-
-  // Rare special case is when triangle edge on, vertices satisfy
-  //  *--------->x     a == b && (a.y < c.y) && (a.x > c.x)
-  //  |  *a,b          and is clipped at c, where orig_triangle[0]
-  //  | /              can be either a, b or c. In other words when
-  //  |/               the single vertex is not 'top' and clipped.
-  // /|*c              
-  //  |                The '-= EPSILON' for both left and right 
-  //  y     fig. 2     is fairly arbitrary, this probably needs to be refined.
-
-  if (orig_triangle[top] == orig_triangle[_vbl]) 
-      orig_triangle[_vbl].x -= EPSILON;
-  if (orig_triangle[top] == orig_triangle[_vbr]) 
-      orig_triangle[_vbr].x -= EPSILON;
-
-  for (j = 0 ; j < g3dpoly->num ; j++)
+  int i, vt, vt2;
+  float t;
+  for (i = 0 ; i < num_vertices ; i++)
+  {
+    g3dpoly->vertices[i].sx = clipped_verts[i].x;
+    g3dpoly->vertices[i].sy = clipped_verts[i].y;
+    switch (clipped_vtstats[i].Type)
     {
-    float x = g3dpoly->vertices [j].sx;
-    float y = g3dpoly->vertices [j].sy;
-
-    // Find the original triangle top/left/bottom/right vertices
-    // between which the currently examined point is located.
-    // There are two possible major cases:
-    // A*       A*       When DrawPolygonFX works, it will switch
-    //  |\       |\      start/final values and deltas ONCE (not more)
-    //  | \      | \     per triangle.On the left pictures this happens
-    //  |*X\     |  \    at the point B. This means we should "emulate"
-    //  |   *B   |   *B  this switch bytaking different start/final values
-    //  |  /     |*X/    for interpolation if examined point X is below
-    //  | /      | /     the point B.
-    //  |/       |/
-    // C*       C*  Fig.1 :-)
-    int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
-    int ry = QRound (y); 
-    if (ry > QRound (orig_triangle [vbl].y))
-    {
-      vtl = vbl;
-      if (--vbl < 0) vbl = 2;
-    }
-    else if (ry > QRound (orig_triangle [vbr].y))
-    {
-      vtr = vbr;
-      if (++vbr > 2) vbr = 0;
-    }
-
-    // Now interpolate Z,U,V,R,G,B by Y
-    float tL, tR, xL, xR, tX;
-    if (QRound (orig_triangle [vbl].y) != QRound (orig_triangle [vtl].y))
-      tL = (y - orig_triangle [vtl].y) / (orig_triangle [vbl].y - orig_triangle [vtl].y);
-    else
-	tL = (x - orig_triangle [vtl].x) / (orig_triangle [vbl].x - orig_triangle [vtl].x);
-    if (QRound (orig_triangle [vbr].y) != QRound (orig_triangle [vtr].y))
-      tR = (y - orig_triangle [vtr].y) / (orig_triangle [vbr].y - orig_triangle [vtr].y);
-    else
-	tR = (x - orig_triangle [vtr].x) / (orig_triangle [vbr].x - orig_triangle [vtr].x);
-
-    xL = orig_triangle [vtl].x + tL * (orig_triangle [vbl].x - orig_triangle [vtl].x);
-    xR = orig_triangle [vtr].x + tR * (orig_triangle [vbr].x - orig_triangle [vtr].x);
-    tX = xR - xL;
-    if (tX) tX = (x - xL) / tX;
-
-#   define INTERPOLATE(val,tl,bl,tr,br)	\
-    {					\
-      float vl,vr;				\
-      if (tl != bl)				\
-        vl = tl + (bl - tl) * tL;		\
-      else					\
-        vl = tl;				\
-      if (tr != br)				\
-        vr = tr + (br - tr) * tR;		\
-      else					\
-        vr = tr;				\
-      val = vl + (vr - vl) * tX;		\
-    }
-
-    // Calculate Z
-    INTERPOLATE(g3dpoly->vertices [j].z,
-                tritexcoords [vtl].z, tritexcoords [vbl].z,
-                tritexcoords [vtr].z, tritexcoords [vbr].z);
-    if (g3dpoly->txt_handle)
-    {
-      // Calculate U
-      INTERPOLATE(g3dpoly->vertices [j].u,
-                  tritexcoords [vtl].u, tritexcoords [vbl].u,
-                  tritexcoords [vtr].u, tritexcoords [vbr].u);
-      // Calculate V
-      INTERPOLATE(g3dpoly->vertices [j].v,
-                  tritexcoords [vtl].v, tritexcoords [vbl].v,
-                  tritexcoords [vtr].v, tritexcoords [vbr].v);
-    }
-    if (use_fog)
-    {
-      // Calculate R
-      INTERPOLATE(g3dpoly->fog_info [j].r,
-      		  trifoginfo [vtl].r, trifoginfo [vbl].r,
-      		  trifoginfo [vtr].r, trifoginfo [vbr].r);
-      // Calculate G
-      INTERPOLATE(g3dpoly->fog_info [j].g,
-      		  trifoginfo [vtl].g, trifoginfo [vbl].g,
-      		  trifoginfo [vtr].g, trifoginfo [vbr].g);
-      // Calculate B
-      INTERPOLATE(g3dpoly->fog_info [j].b,
-      		  trifoginfo [vtl].b, trifoginfo [vbl].b,
-      		  trifoginfo [vtr].b, trifoginfo [vbr].b);
-      // Calculate intensity
-      INTERPOLATE(g3dpoly->fog_info [j].intensity,
-      		  trifoginfo [vtl].intensity, trifoginfo [vbl].intensity,
-      		  trifoginfo [vtr].intensity, trifoginfo [vbr].intensity);
-    }
-    if (gouraud)
-    {
-      // Calculate R
-      INTERPOLATE(g3dpoly->vertices [j].r,
-                  tritexcoords [vtl].r, tritexcoords [vbl].r,
-                  tritexcoords [vtr].r, tritexcoords [vbr].r);
-      // Calculate G
-      INTERPOLATE (g3dpoly->vertices [j].g,
-                  tritexcoords [vtl].g, tritexcoords [vbl].g,
-                  tritexcoords [vtr].g, tritexcoords [vbr].g);
-      // Calculate B
-      INTERPOLATE (g3dpoly->vertices [j].b,
-                  tritexcoords [vtl].b, tritexcoords [vbl].b,
-                  tritexcoords [vtr].b, tritexcoords [vbr].b);
-    }
-    else
-    {
-    
-      g3dpoly->vertices[j].r = 1;
-      g3dpoly->vertices[j].g = 1;
-      g3dpoly->vertices[j].b = 1;
-      
+      case CS_VERTEX_ORIGINAL:
+        vt = clipped_vtstats[i].Vertex;
+        g3dpoly->vertices[i].z = tritexcoords[vt].z;
+        g3dpoly->vertices[i].u = tritexcoords[vt].u;
+        g3dpoly->vertices[i].v = tritexcoords[vt].v;
+	if (gouraud)
+	{
+          g3dpoly->vertices[i].r = tritexcoords[vt].r;
+          g3dpoly->vertices[i].g = tritexcoords[vt].g;
+          g3dpoly->vertices[i].b = tritexcoords[vt].b;
+	}
+	if (use_fog) g3dpoly->fog_info[i] = trifoginfo[vt];
+	break;
+      case CS_VERTEX_ONEDGE:
+        vt = clipped_vtstats[i].Vertex;
+	vt2 = (vt+1)%3;
+	t = clipped_vtstats[i].Pos;
+	g3dpoly->vertices[i].z = tritexcoords[vt].z + t*(tritexcoords[vt2].z-tritexcoords[vt].z);
+	g3dpoly->vertices[i].u = tritexcoords[vt].u + t*(tritexcoords[vt2].u-tritexcoords[vt].u);
+	g3dpoly->vertices[i].v = tritexcoords[vt].v + t*(tritexcoords[vt2].v-tritexcoords[vt].v);
+	if (gouraud)
+	{
+	  g3dpoly->vertices[i].r = tritexcoords[vt].r + t*(tritexcoords[vt2].r-tritexcoords[vt].r);
+	  g3dpoly->vertices[i].g = tritexcoords[vt].g + t*(tritexcoords[vt2].g-tritexcoords[vt].g);
+	  g3dpoly->vertices[i].b = tritexcoords[vt].b + t*(tritexcoords[vt2].b-tritexcoords[vt].b);
+	}
+	if (use_fog)
+	{
+	  g3dpoly->fog_info[i].r = trifoginfo[vt].r + t*(trifoginfo[vt2].r-trifoginfo[vt].r);
+	  g3dpoly->fog_info[i].g = trifoginfo[vt].g + t*(trifoginfo[vt2].g-trifoginfo[vt].g);
+	  g3dpoly->fog_info[i].b = trifoginfo[vt].b + t*(trifoginfo[vt2].b-trifoginfo[vt].b);
+	  g3dpoly->fog_info[i].intensity = trifoginfo[vt].intensity + t*(trifoginfo[vt2].intensity-trifoginfo[vt].intensity);
+	}
+	break;
+      case CS_VERTEX_INSIDE:
+        float x = clipped_verts[i].x;
+        float y = clipped_verts[i].y;
+        int edge1[2], edge2[2];
+        if ((y >= orig_triangle[0].y && y <= orig_triangle[1].y) ||
+	    (y <= orig_triangle[0].y && y >= orig_triangle[1].y))
+	{
+	  edge1[0] = 0;
+	  edge1[1] = 1;
+          if ((y >= orig_triangle[1].y && y <= orig_triangle[2].y) ||
+	      (y <= orig_triangle[1].y && y >= orig_triangle[2].y))
+	  {
+	    edge2[0] = 1;
+	    edge2[1] = 2;
+	  }
+	  else
+	  {
+	    edge2[0] = 0;
+	    edge2[1] = 2;
+	  }
+	}
+	else
+	{
+	  edge1[0] = 1;
+	  edge1[1] = 2;
+	  edge2[0] = 0;
+	  edge2[1] = 2;
+	}
+	csVector2& A = orig_triangle[edge1[0]];
+	csVector2& B = orig_triangle[edge1[1]];
+	csVector2& C = orig_triangle[edge2[0]];
+	csVector2& D = orig_triangle[edge2[1]];
+	float t1 = (y - A.y) / (B.y - A.y);
+	float t2 = (y - C.y) / (D.y - C.y);
+	float x1 = A.x + t1 * (B.x - A.x);
+	float x2 = C.x + t2 * (D.x - C.x);
+	t = (x - x1) / (x2 - x1);
+	INTERPOLATE(z);
+	INTERPOLATE(u);
+	INTERPOLATE(v);
+	if (gouraud)
+	{
+	  INTERPOLATE(r);
+	  INTERPOLATE(g);
+	  INTERPOLATE(b);
+	}
+	if (use_fog)
+	{
+	  INTERPOLATE_FOG(r);
+	  INTERPOLATE_FOG(g);
+	  INTERPOLATE_FOG(b);
+	  INTERPOLATE_FOG(intensity);
+	}
+	break;
     }
   }
 }
@@ -345,8 +286,10 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   poly.use_fog = mesh.do_fog;
 
   // The triangle in question
-  csVector2 triangle [3];
-  csVector2 clipped_triangle [10];	//@@@BAD HARCODED!
+  csVector2 triangle[3];
+  csVector2 clipped_triangle[MAX_OUTPUT_VERTICES];	//@@@BAD HARCODED!
+  csVertexStatus clipped_vtstats[MAX_OUTPUT_VERTICES];
+  UByte clip_result;
 
   g3d->StartPolygonFX (mesh.txt_handle[0], mesh.fxmode);
 
@@ -393,11 +336,15 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
       int rescount = 0;
       if (mesh.do_clip && clipper)
       {
-        if (!clipper->Clip (triangle, 3, clipped_triangle, rescount)) continue;
+        clip_result = clipper->Clip (triangle, 3, clipped_triangle, rescount, clipped_vtstats);
+        if (clip_result == CS_CLIP_OUTSIDE) continue;
         poly.num = rescount;
       }
       else
+      {
+        clip_result = CS_CLIP_INSIDE;
         poly.num = 3;
+      }
 
       int trivert [3] = { a, b, c };
       // If mirroring we store the vertices in the other direction.
@@ -416,8 +363,8 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 	  poly.fog_info [idx] = mesh.vertex_fog[trivert[j]];
 	idx += dir;
       }
-      if (mesh.do_clip)
-	G3DPreparePolygonFX (&poly, clipped_triangle, rescount,
+      if (clip_result != CS_CLIP_INSIDE)
+	G3DPreparePolygonFX (&poly, clipped_triangle, rescount, clipped_vtstats,
 		(csVector2 *)triangle, poly.use_fog, work_colors != NULL);
       else
       {

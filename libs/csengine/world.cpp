@@ -35,9 +35,9 @@
 #include "csengine/cssprite.h"
 #include "csengine/cscoll.h"
 #include "csengine/sector.h"
-#include "csengine/quadcube.h"
 #include "csengine/solidbsp.h"
 #include "csengine/covcube.h"
+#include "csengine/cbufcube.h"
 #include "csengine/texture.h"
 #include "csengine/lghtmap.h"
 #include "csengine/stats.h"
@@ -212,22 +212,20 @@ csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
   textures = NULL;
   c_buffer = NULL;
   solidbsp = NULL;
-  quadtree = NULL;
-  quadcube = NULL;
   covcube = NULL;
+  cbufcube = NULL;
   covtree = NULL;
   covtree_lut = NULL;
   current_camera = NULL;
   current_world = this;
   use_pvs = false;
  
-  //@@@
-  //CHK (quadcube = new csQuadcube (8));
   if (!covtree_lut)
   {
     CHK (covtree_lut = new csCovMaskLUT (16));
   }
   CHK (covcube = new csCovcube (covtree_lut));
+  //CHK (cbufcube = new csCBufferCube (1024));
 
   CHK (textures = new csTextureList ());
 
@@ -249,8 +247,8 @@ csWorld::~csWorld ()
   CHK (delete textures);
   CHK (delete render_pol2d_pool);
   CHK (delete lightpatch_pool);
-  CHK (delete quadcube);
   CHK (delete covcube);
+  CHK (delete cbufcube);
   CHK (delete covtree_lut);
 
   // @@@ temp hack
@@ -357,7 +355,6 @@ void csWorld::Clear ()
   CHK (delete textures); textures = NULL;
   CHK (textures = new csTextureList ());
   CHK (delete c_buffer); c_buffer = NULL;
-  CHK (delete quadtree); quadtree = NULL;
   CHK (delete solidbsp); solidbsp = NULL;
   CHK (delete covtree); covtree = NULL;
   CHK (delete render_pol2d_pool);
@@ -377,7 +374,6 @@ void csWorld::EnableSolidBsp (bool en)
 {
   if (en)
   {
-    CHK (delete quadtree); quadtree = NULL;
     CHK (delete c_buffer); c_buffer = NULL;
     CHK (delete covtree); covtree = NULL;
     if (solidbsp) return;
@@ -394,7 +390,6 @@ void csWorld::EnableCBuffer (bool en)
 {
   if (en)
   {
-    CHK (delete quadtree); quadtree = NULL;
     CHK (delete solidbsp); solidbsp = NULL;
     CHK (delete covtree); covtree = NULL;
     if (c_buffer) return;
@@ -407,29 +402,10 @@ void csWorld::EnableCBuffer (bool en)
   }
 }
 
-void csWorld::EnableQuadtree (bool en)
-{
-  if (en)
-  {
-    CHK (delete c_buffer); c_buffer = NULL;
-    CHK (delete solidbsp); solidbsp = NULL;
-    CHK (delete covtree); covtree = NULL;
-    if (quadtree) return;
-    csBox box (0, 0, frame_width, frame_height);
-    CHK (quadtree = new csQuadtree (box, 8));
-  }
-  else
-  {
-    CHK (delete quadtree);
-    quadtree = NULL;
-  }
-}
-
 void csWorld::EnableCovtree (bool en)
 {
   if (en)
   {
-    CHK (delete quadtree); quadtree = NULL;
     CHK (delete solidbsp); solidbsp = NULL;
     CHK (delete c_buffer); c_buffer = NULL;
     if (covtree) return;
@@ -940,8 +916,7 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     frame_height = G2D->GetHeight ();
     if (c_buffer) { EnableCBuffer (false); EnableCBuffer (true); EnableSolidBsp (false); }
     if (covtree) { EnableCovtree (false); EnableCovtree (true); EnableSolidBsp (false); }
-    if (quadtree) { EnableQuadtree (false); EnableQuadtree (true); EnableSolidBsp (false); }
-    if (solidbsp) { EnableQuadtree (false); EnableQuadtree (false); EnableSolidBsp (true); }
+    if (solidbsp) { EnableSolidBsp (true); }
   }
 
   current_camera = c;
@@ -977,8 +952,6 @@ void csWorld::Draw (csCamera* c, csClipper* view)
     solidbsp->MakeEmpty ();
     solidbsp->InsertPolygonInv (view->GetClipPoly (), view->GetNumVertices ());
   }
-  else if (quadtree)
-    quadtree->MakeEmpty ();
   else if (covtree)
   {
     covtree->MakeEmpty ();
@@ -1047,7 +1020,6 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
     frame_height = G2D->GetHeight ();
     if (c_buffer) EnableCBuffer (true);
     if (covtree) EnableCovtree (true);//hmmmmmmm necessary?
-    if (quadtree) EnableQuadtree (true);      
     if (solidbsp) EnableSolidBsp (true);      
   }
 
@@ -1061,7 +1033,6 @@ void csWorld::DrawFunc (csCamera* c, csClipper* view,
   tr_manager.NewFrame ();
 
   if (c_buffer) c_buffer->Initialize ();
-  if (quadtree) quadtree->MakeEmpty ();
   if (solidbsp) solidbsp->MakeEmpty ();
   if (covtree) covtree->MakeEmpty ();
 

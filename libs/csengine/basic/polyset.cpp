@@ -35,8 +35,6 @@
 #include "csengine/covtree.h"
 #include "csengine/bspbbox.h"
 #include "csengine/cssprite.h"
-#include "csengine/quadcube.h"
-#include "csengine/quadtree.h"
 #include "csengine/bsp.h"
 #include "csgeom/polypool.h"
 #include "igraph3d.h"
@@ -472,7 +470,6 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
   csSolidBsp* solidbsp = csWorld::current_world->GetSolidBsp ();
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
-  csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
   bool visible;
   csPoly2DPool* render_pool = csWorld::current_world->render_pol2d_pool;
   csPolygon2D* clip;
@@ -506,13 +503,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	 	d->IsMirrored ()) &&
              clip->ClipAgainst (d->view) )
         {
-	  if (quadtree)
-	  {
-	    if (quadtree->TestPolygon (clip->GetVertices (),
-	    	clip->GetNumVertices (), clip->GetBoundingBox ()))
-              sp->MarkVisible ();
-	  }
-	  else if (covtree)
+	  if (covtree)
 	  {
 	    if (covtree->TestPolygon (clip->GetVertices (),
 	    	clip->GetNumVertices (), clip->GetBoundingBox ()))
@@ -556,10 +547,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         po = p->GetPortal ();
         if (csSector::do_portals && po)
         {
-	  if (quadtree)
-            visible = quadtree->TestPolygon (clip->GetVertices (),
-		  clip->GetNumVertices (), clip->GetBoundingBox ());
-	  else if (covtree)
+	  if (covtree)
             visible = covtree->TestPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else if (solidbsp)
@@ -571,10 +559,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         }
         else
         {
-	  if (quadtree)
-            visible = quadtree->InsertPolygon (clip->GetVertices (),
-		  clip->GetNumVertices (), clip->GetBoundingBox ());
-	  else if (covtree)
+	  if (covtree)
             visible = covtree->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else if (solidbsp)
@@ -590,6 +575,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         poly_queue->Push (p, clip);
 	Stats::polygons_accepted++;
 	if (c_buffer && c_buffer->IsFull ()) return (void*)1;	// End BSP processing
+	if (covtree && covtree->IsFull ()) return (void*)1;	// End BSP processing
 	if (solidbsp && solidbsp->IsFull ()) return (void*)1;	// End BSP processing
       }
       else

@@ -143,6 +143,121 @@ void csSolidBsp::MakeEmpty ()
 bool ddd = false;
 static int ddd_level;
 
+#if 0
+bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
+{
+  if (node->solid) return false;
+  if (poly->GetNumEdges () == 0) return false;
+
+  if (node->left)
+  {
+    // If this node has children then we split to the given
+    // splitter in this node.
+    csPoly2DEdges* left_poly, * right_poly;
+    left_poly = poly_pool.Alloc ();
+    right_poly = poly_pool.Alloc ();
+    bool onplane;
+    poly->Intersect (node->splitter, left_poly, right_poly, onplane);
+    bool rc1, rc2;
+
+    if (onplane)
+    {
+      rc1 = InsertPolygon (node->left, left_poly);
+      rc2 = InsertPolygon (node->right, right_poly);
+    }
+    else
+    {
+      if (left_poly->GetNumEdges () == 0)
+      {
+        // Left polygon has no edges. We test if the left node
+        // is completely contained in the right polygon. In that
+        // case we can clear the subtree and mark it as solid.
+        if (!node->left->solid && right_poly->In (node->left->split_center))
+        {
+          node->left->solid = true;
+	  node_pool.Free (node->left->left); node->left->left = NULL;
+	  node_pool.Free (node->left->right); node->left->right = NULL;
+	  rc1 = true;
+        }
+        else rc1 = false;
+      }
+      rc1 = InsertPolygon (node->left, left_poly);
+
+      if (right_poly->GetNumEdges () == 0)
+      {
+        if (!node->right->solid && left_poly->In (node->right->split_center))
+        {
+          node->right->solid = true;
+	  node_pool.Free (node->right->left); node->right->left = NULL;
+	  node_pool.Free (node->right->right); node->right->right = NULL;
+	  rc2 = true;
+        }
+        else rc2 = false;
+      }
+      rc2 = InsertPolygon (node->right, right_poly);
+    }
+
+    if (node->left->solid && node->right->solid)
+    {
+      node_pool.Free (node->left); node->left = NULL;
+      node_pool.Free (node->right); node->right = NULL;
+      node->solid = true;
+    }
+
+    poly_pool.Free (left_poly);
+    poly_pool.Free (right_poly);
+    return rc1 || rc2;
+  }
+  else
+  {
+    // Node has no children so we take a new splitter and
+    // create children.
+
+    // This flag indicates wether or not we added an edge.
+    // If false then we ignored everything.
+    bool edge_added = false;
+
+    csSolidBspNode* n = node;
+    int i, i1;
+    i1 = poly->GetNumEdges ()-1;
+    for (i = 0 ; i < poly->GetNumEdges () ; i++)
+    {
+      // If we have more than one edge then we test if this edge
+      // is colinear with the previous one. In that case we simply
+      // ignore the edge.
+      if (i1 != i)
+        if (ABS (csMath2::Area2 ((*poly)[i1].v1, (*poly)[i1].v2,
+		(*poly)[i].v2)) < EPSILON &&
+            ABS (csMath2::Area2 ((*poly)[i1].v1, (*poly)[i1].v2,
+		(*poly)[i].v1)) < EPSILON)
+	{
+	  i1 = i;
+	  continue;
+	}
+      edge_added = true;
+      csVector2 start = (*poly)[i].v1;
+      csVector2 end = (*poly)[i].v2;
+      n->splitter.Set (start, end);
+      n->split_center = (start + end) / 2;
+     n->split_start = start;
+     n->split_end = end;
+      n->left = node_pool.Alloc ();
+      n->right = node_pool.Alloc ();
+      // @@@ This can potentially go wrong if we have a very thin node.
+      // In that case the calculated split_center might be outside the node.
+      // So we should have a more robust way to calculate this.
+      n->left->split_center = n->split_center-n->splitter.norm / 20.;
+      n->right->split_center = n->split_center+n->splitter.norm / 20.;
+      n = n->right;
+      i1 = i;
+    }
+    if (edge_added) n->solid = true;
+
+    return true;
+  }
+  return false;
+}
+#else
 bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
 {
 char ddd_spaces[200];
@@ -348,6 +463,7 @@ if (ddd) printf ("%s   BRANCH: no children\n", ddd_spaces);
   }
   return false;
 }
+#endif
 
 void csSolidBsp::InsertPolygonInv (csSolidBspNode* node, csPoly2DEdges* poly)
 {
@@ -371,6 +487,62 @@ void csSolidBsp::InsertPolygonInv (csSolidBspNode* node, csPoly2DEdges* poly)
   }
 }
 
+#if 0
+bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
+{
+  if (node->solid) return false;
+  if (poly->GetNumEdges () == 0) return false;
+  bool rc;
+
+  if (node->left)
+  {
+    // If this node has children then we split to the given
+    // splitter in this node.
+    csPoly2DEdges* left_poly, * right_poly;
+    left_poly = poly_pool.Alloc ();
+    right_poly = poly_pool.Alloc ();
+    bool onplane;
+    poly->Intersect (node->splitter, left_poly, right_poly, onplane);
+
+    if (onplane)
+    {
+      if (TestPolygon (node->left, left_poly)) { rc = true; goto end; }
+      if (TestPolygon (node->right, right_poly)) { rc = true; goto end; }
+    }
+    else
+    {
+      if (left_poly->GetNumEdges () == 0)
+      {
+        // Left polygon has no edges. We test if the left node
+        // is completely contained in the right polygon. In that
+        // case the solid state of that node is important for visibility.
+        if (!node->left->solid && right_poly->In (node->left->split_center))
+        { rc = true; goto end; }
+      }
+      else if (TestPolygon (node->left, left_poly)) { rc = true; goto end; }
+
+      if (right_poly->GetNumEdges () == 0)
+      {
+        if (!node->right->solid && left_poly->In (node->right->split_center))
+        { rc = true; goto end; }
+      }
+      else if (TestPolygon (node->right, right_poly)) { rc = true; goto end; }
+    }
+
+    rc = false;
+
+    end:
+    poly_pool.Free (left_poly);
+    poly_pool.Free (right_poly);
+    return rc;
+  }
+  else
+  {
+    return true;
+  }
+  return false;
+}
+#else
 bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
 {
   if (node->solid) return false;
@@ -458,6 +630,7 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
   }
   return false;
 }
+#endif
 
 csPolygon2D debug_poly2d;
 

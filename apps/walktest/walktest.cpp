@@ -985,6 +985,7 @@ void DoGravity (csVector3& pos, csVector3& vel)
 void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
 {
   static time_t prev_time = 0;
+  if (prev_time == 0) prev_time = Time () - 10;
 
   // If the time interval is too big, limit to something reasonable
   // This will help a little for software OpenGL :-)

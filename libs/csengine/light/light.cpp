@@ -18,7 +18,7 @@
 
 #include "sysdef.h"
 #include "csgeom/frustrum.h"
-#include "csengine/quadcube.h"
+#include "csengine/cbufcube.h"
 #include "csengine/covcube.h"
 #include "csengine/light.h"
 #include "csengine/sector.h"
@@ -175,9 +175,9 @@ csStatLight::~csStatLight ()
 
 void csStatLight::CalculateLighting ()
 {
-  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
+  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
   csCovcube* cc = csWorld::current_world->GetCovcube ();
-  if (qc) qc->MakeEmpty ();
+  if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csLightView lview;
@@ -197,9 +197,9 @@ void csStatLight::CalculateLighting ()
 
 void csStatLight::CalculateLighting (csThing* th)
 {
-  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
+  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
   csCovcube* cc = csWorld::current_world->GetCovcube ();
-  if (qc) qc->MakeEmpty ();
+  if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   //CsPrintf (MSG_INITIALIZATION, "  Shine light (%f,%f,%f).\n", center.x, center.y, center.z);
   csLightView lview;
@@ -219,9 +219,9 @@ void csStatLight::CalculateLighting (csThing* th)
 
 void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 {
-  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
+  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
   csCovcube* cc = csWorld::current_world->GetCovcube ();
-  if (qc) qc->MakeEmpty ();
+  if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   csLightView lview;
   lview.l = this;
@@ -341,9 +341,9 @@ csDynLight::~csDynLight ()
 
 void csDynLight::Setup ()
 {
-  csQuadcube* qc = csWorld::current_world->GetQuadcube ();
+  csCBufferCube* cb = csWorld::current_world->GetCBufCube ();
   csCovcube* cc = csWorld::current_world->GetCovcube ();
-  if (qc) qc->MakeEmpty ();
+  if (cb) cb->MakeEmpty ();
   else cc->MakeEmpty ();
   while (lightpatches)
     csWorld::current_world->lightpatch_pool->Free (lightpatches);

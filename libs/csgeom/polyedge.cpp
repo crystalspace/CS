@@ -87,6 +87,7 @@ int csPoly2DEdges::AddEdge (const csVector2& v1, const csVector2& v2)
 
 // The thickness of the plane used in the intersection routine below.
 #define THICK (EPSILON*EPSILON)
+//#define THICK (.00001*.00001)
 
 #define ONPLANE(c) ((c) > -THICK && (c) < THICK)
 #define ATLEFT(c) ((c) <= -THICK)
