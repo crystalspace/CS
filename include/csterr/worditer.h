@@ -17,28 +17,32 @@
 #ifndef HEADER_WORDITER_H
 #define HEADER_WORDITER_H
 
-/*
-	Breaks a string in words seperated by user-defined characters.
+/**
+*	Breaks a string in words seperated by user-defined characters.
 */
 class WordIterator
 {
 	protected:
+		///
 		char* string_pos;
+		///
 		char* token;
+		///
 		int token_length;
+		///
 		const char* delimiters;
 		
 	public:
-		/*
-			Creates a new iterator using string as the source
-			and delim as the list of characters that seperate
-			words
+		/**
+		*	Creates a new iterator using string as the source
+		*	and delim as the list of characters that seperate
+		*	words
 		*/
 		WordIterator(char* string, const char* delim);
 		~WordIterator();
 		
-		/*
-			Returns the next word, or 0 if there are none.
+		/**
+		*	Returns the next word, or 0 if there are none.
 		*/
 		char* nextWord();
 };
