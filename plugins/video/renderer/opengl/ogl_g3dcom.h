@@ -280,6 +280,12 @@ protected:
   /// Render capabilities
   csGraphics3DCaps Caps;
 
+  /**
+   * An artificial limitation on fps. On some hardware this may help
+   * improve smoothness of the OpenGL renderer if frame rates get too high.
+   */
+  int fps_limit;
+
   /// Width of display.
   int width;
   /// Height of display.

@@ -385,7 +385,8 @@ void csLightMapQueue::Flush (GLuint Handle)
 csSuperLightMap::csSuperLightMap ()
 {
   region = new csSubRectangles (
-  	csRect (0, 0, SUPER_LM_SIZE, SUPER_LM_SIZE)); // @@@ Make configurable.
+  	csRect (0, 0, OpenGLLightmapCache::super_lm_size,
+	OpenGLLightmapCache::super_lm_size));
   head = tail = NULL;
 }
 
@@ -430,9 +431,14 @@ void csSuperLightMap::Clear ()
 
 //----------------------------------------------------------------------------//
 
+int OpenGLLightmapCache::super_lm_num = DEFAULT_SUPER_LM_NUM;
+int OpenGLLightmapCache::super_lm_size = DEFAULT_SUPER_LM_SIZE;
+
 OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
 {
+  suplm = new csSuperLightMap [super_lm_num];
   cur_lm = 0;
+  num_lm_processed = 0;
   initialized = false;
   OpenGLLightmapCache::g3d = g3d;
 }
@@ -440,6 +446,7 @@ OpenGLLightmapCache::OpenGLLightmapCache (csGraphics3DOGLCommon* g3d)
 OpenGLLightmapCache::~OpenGLLightmapCache ()
 {
   Clear ();
+  delete[] suplm;
 }
 
 void OpenGLLightmapCache::Setup ()
@@ -447,7 +454,7 @@ void OpenGLLightmapCache::Setup ()
   if (initialized) return;
   initialized = true;
   int i;
-  for (i = 0 ; i < SUPER_LM_NUM ; i++)
+  for (i = 0 ; i < super_lm_num ; i++)
   {
     GLuint lightmaphandle;
     glGenTextures (1, &lightmaphandle);
@@ -460,17 +467,19 @@ void OpenGLLightmapCache::Setup ()
     // Normally OpenGL specs say that the last parameter to glTexImage2D
     // can be a NULL pointer. Unfortunatelly not all drivers seem to
     // support that. So I give a dummy texture here.
-    char buf[SUPER_LM_SIZE*SUPER_LM_SIZE*4];
-    glTexImage2D (GL_TEXTURE_2D, 0, 3, SUPER_LM_SIZE, SUPER_LM_SIZE,
-		    0, GL_RGBA, GL_UNSIGNED_BYTE, &buf);
+    char* buf = new char [super_lm_size*super_lm_size*4];
+    glTexImage2D (GL_TEXTURE_2D, 0, 3, super_lm_size, super_lm_size,
+		    0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+    delete[] buf;
   }
 }
 
 void OpenGLLightmapCache::Clear ()
 {
   cur_lm = 0;
+  num_lm_processed = 0;
   int i;
-  for (i = 0 ; i < SUPER_LM_NUM ; i++)
+  for (i = 0 ; i < super_lm_num ; i++)
   {
     suplm[i].Clear ();
   }
@@ -496,31 +505,91 @@ void OpenGLLightmapCache::Cache (iPolygonTexture *polytex)
   {
     int lmwidth = piLM->GetWidth ();
     int lmheight = piLM->GetHeight ();
-    for (;;)
+    // First try to allocate in the current super lightmap.
+    clm = suplm[cur_lm].Alloc (lmwidth, lmheight);
+    if (clm)
     {
-      clm = suplm[cur_lm].Alloc (lmwidth, lmheight);
-      if (clm) break;
-      // No room in this super lightmap. Try the next one.
-      // @@@ This is not really optimal. We should at least try a
-      // few older super-lightmaps first.
-      cur_lm = (cur_lm+1)%SUPER_LM_NUM;
-printf ("New cur_lm=%d\n", cur_lm); fflush (stdout);
-      // Make sure all lightmaps are rendered.
-      // If this actually renders lightmap then we might have a problem.
-      // The number of super-lightmaps should be big enough so that
-      // this is never needed.
-      Flush (cur_lm);
-      // Then free all lightmaps previously in this super lightmap.
-      suplm[cur_lm].Clear ();
+      clm->super_lm_idx = cur_lm;
     }
+    else
+    {
+      // There is no room in the current one. So we first try if we
+      // can allocate in a number of super-lightmaps (if there are some).
+      int num_proc = num_lm_processed;
+      if (num_proc > 2) num_proc = 2;
+      int prev_lm = cur_lm;
+      while (num_proc > 0)
+      {
+	prev_lm = (prev_lm+super_lm_num-1)%super_lm_num;
+        clm = suplm[prev_lm].Alloc (lmwidth, lmheight);
+	if (clm)
+	{
+	  clm->super_lm_idx = prev_lm;
+	  num_proc = 0;	// Stop.
+        }
+	else num_proc--;
+      }
+
+      if (!clm)
+      {
+        // There was no room in the current super-lightmap and neither
+	// was there room in the previous one. We allocate a new
+	// super-lightmap here.
+        cur_lm = (cur_lm+1)%super_lm_num;
+	printf ("New cur_lm=%d\n", cur_lm); fflush (stdout);//@@@
+        num_lm_processed++;
+
+        // Make sure all lightmaps are rendered.
+        // If this actually renders lightmap then we might have a problem.
+        // The number of super-lightmaps should be big enough so that
+        // this is never needed.
+        Flush (cur_lm);
+        // Then free all lightmaps previously in this super lightmap.
+        suplm[cur_lm].Clear ();
+
+	// Now allocate the first lightmap in this super-lightmap.
+	// This can not fail.
+	clm = suplm[cur_lm].Alloc (lmwidth, lmheight);
+	clm->super_lm_idx = cur_lm;
+      }
+    }
+
     piLM->SetCacheData (clm);
     clm->Source = piLM;
-    clm->super_lm_idx = cur_lm;
     Load (clm);
 
     float lm_low_u, lm_low_v, lm_high_u, lm_high_v;
     polytex->GetTextureBox (lm_low_u, lm_low_v, lm_high_u, lm_high_v);
 
+#if 0
+    // @@@ Experiment to try to get the lightmap mapped correctly
+    // on the texture.
+    if (lm_high_u <= lm_low_u)
+      clm->lm_scale_u = 1.;       // @@@ Is this right?
+    else
+      clm->lm_scale_u = 1. / (lm_high_u - lm_low_u);
+
+    if (lm_high_v <= lm_low_v)
+      clm->lm_scale_v = 1.;       // @@@ Is this right?
+    else
+      clm->lm_scale_v = 1. / (lm_high_v - lm_low_v);
+
+    lm_low_u -= 0.5 / (float (lmwidth) * clm->lm_scale_u);
+    lm_low_v -= 0.5 / (float (lmheight) * clm->lm_scale_v);
+    //lm_low_u -= .06;
+    //lm_low_v -= .06;
+    //clm->lm_scale_u *= .96;
+    //clm->lm_scale_v *= .96;
+
+    // Calculate position in super texture.
+    float dlm = 1. / float (super_lm_size);
+    float sup_u = float (clm->super_lm_rect.xmin) * dlm;
+    float sup_v = float (clm->super_lm_rect.ymin) * dlm;
+    clm->lm_scale_u = clm->lm_scale_u * float (lmwidth-1) * dlm;
+    clm->lm_scale_v = clm->lm_scale_v * float (lmheight-1) * dlm;
+    clm->lm_offset_u = lm_low_u - sup_u / clm->lm_scale_u;
+    clm->lm_offset_v = lm_low_v - sup_v / clm->lm_scale_v;
+#else
     // lightmap fudge factor
     lm_low_u -= 0.125;
     lm_low_v -= 0.125;
@@ -538,13 +607,14 @@ printf ("New cur_lm=%d\n", cur_lm); fflush (stdout);
       clm->lm_scale_v = 1. / (lm_high_v - lm_low_v);
 
     // Calculate position in super texture.
-    float dlm = 1. / float (SUPER_LM_SIZE);
+    float dlm = 1. / float (super_lm_size);
     float sup_u = float (clm->super_lm_rect.xmin) * dlm;
     float sup_v = float (clm->super_lm_rect.ymin) * dlm;
     clm->lm_scale_u = clm->lm_scale_u * float (lmwidth) * dlm;
     clm->lm_scale_v = clm->lm_scale_v * float (lmheight) * dlm;
     clm->lm_offset_u = lm_low_u - sup_u / clm->lm_scale_u;
     clm->lm_offset_v = lm_low_v - sup_v / clm->lm_scale_v;
+#endif
   }
 }
 
@@ -574,7 +644,7 @@ void OpenGLLightmapCache::Flush ()
 
   int i;
   bool flush_needed = false;
-  for (i = 0 ; i < SUPER_LM_NUM ; i++)
+  for (i = 0 ; i < super_lm_num ; i++)
   {
     csLightMapQueue& lm_queue = suplm[i].queue;
     if (lm_queue.num_triangles > 0 && lm_queue.num_vertices > 0)
@@ -593,7 +663,7 @@ void OpenGLLightmapCache::Flush ()
 	       g3d->m_config_options.m_lightmap_dst_blend);
   glEnableClientState (GL_VERTEX_ARRAY);
   glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-  for (i = 0 ; i < SUPER_LM_NUM ; i++)
+  for (i = 0 ; i < super_lm_num ; i++)
   {
     suplm[i].queue.Flush (suplm[i].Handle);
   }

@@ -118,6 +118,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   lightmap_cache = NULL;
   txtmgr = NULL;
   m_fogtexturehandle = 0;
+  fps_limit = 0;
 
   /// caps will be read from config or reset to defaults during Initialize.
   Caps.CanClip = false;
@@ -140,7 +141,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   clip_outer[1] = OPENGL_CLIP_SOFTWARE;
   clip_outer[2] = OPENGL_CLIP_SOFTWARE;
 
-  // default extension state is for all extensions to be OFF
+  // Default extension state is for all extensions to be OFF
   ARB_multitexture = false;
   clipper = NULL;
   cliptype = CS_CLIPPER_NONE;
@@ -149,7 +150,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   planes_init = false;
   frustum_valid = false;
 
-  // see note above
+  // See note above.
   tr_verts.IncRef ();
   uv_verts.IncRef ();
   uv_mul_verts.IncRef ();
@@ -205,10 +206,10 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   z_buf_mode = CS_ZBUF_NONE;
   width = height = -1;
   Caps.CanClip = config->GetBool("Video.OpenGL.Caps.CanClip", false);
-  Caps.minTexHeight = config->GetInt("Video.OpenGL.Caps.minTexHeight", 2);
-  Caps.minTexWidth = config->GetInt("Video.OpenGL.Caps.minTexWidth", 2);
-  Caps.maxTexHeight = config->GetInt("Video.OpenGL.Caps.maxTexHeight", 1024);
-  Caps.maxTexWidth = config->GetInt("Video.OpenGL.Caps.maxTexWidth", 1024);
+  Caps.minTexHeight = config->GetInt("Video.OpenGL.Caps.MinTexHeight", 2);
+  Caps.minTexWidth = config->GetInt("Video.OpenGL.Caps.MinTexWidth", 2);
+  Caps.maxTexHeight = config->GetInt("Video.OpenGL.Caps.MaxTexHeight", 1024);
+  Caps.maxTexWidth = config->GetInt("Video.OpenGL.Caps.MaxTexWidth", 1024);
   Caps.fog = G3DFOGMETHOD_VERTEX;
   Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", false);
   Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio", 
@@ -217,6 +218,17 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
   GLCaps.need_screen_clipping =
   	config->GetBool ("Video.OpenGL.Caps.NeedScreenClipping", false);
   GLCaps.nr_hardware_planes = config->GetInt ("Video.OpenGL.Caps.HWPlanes", 6);
+  fps_limit = config->GetInt ("Video.OpenGL.FpsLimit", 0);
+  OpenGLLightmapCache::super_lm_num = config->GetInt (
+  	"Video.OpenGL.SuperLightMapNum", 10);
+  OpenGLLightmapCache::super_lm_size = config->GetInt (
+  	"Video.OpenGL.SuperLightMapSize", 256);
+  if (OpenGLLightmapCache::super_lm_size > Caps.maxTexWidth)
+    OpenGLLightmapCache::super_lm_size = Caps.maxTexWidth;
+  SysPrintf (MSG_INITIALIZATION, "  Super lightmaps: num=%d size=%dx%d\n",
+  	OpenGLLightmapCache::super_lm_num,
+	OpenGLLightmapCache::super_lm_size,
+	OpenGLLightmapCache::super_lm_size);
 
   unsigned int i, j;
   const char* clip_opt = config->GetStr ("Video.OpenGL.ClipOptional", "auto");
@@ -967,22 +979,21 @@ void csGraphics3DOGLCommon::FinishDraw ()
 
 void csGraphics3DOGLCommon::Print (csRect * area)
 {
-#if 0
-  //@@@ TODO: make config!
-  int fps_limit = 40; // for G400, 40 msec ( a fps limit of 50 fps )
-  cs_time elapsed_time, current_time;
-  System->GetElapsedTime (elapsed_time, current_time);
-  /// Smooth last n frames, to avoid jitter when objects appear/disappear.
-  static int num = 10;
-  static int times[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-  static int cur = 0;
-  static int totaltime = 0;
-  totaltime -= times[cur];
-  times[cur] = elapsed_time;
-  totaltime += times[cur];
-  cur = (cur+1)%num;
-  if (totaltime/10 < fps_limit) System->Sleep (fps_limit - totaltime/10);
-#endif
+  if (fps_limit)
+  {
+    cs_time elapsed_time, current_time;
+    System->GetElapsedTime (elapsed_time, current_time);
+    /// Smooth last n frames, to avoid jitter when objects appear/disappear.
+    static int num = 10;
+    static int times[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    static int cur = 0;
+    static int totaltime = 0;
+    totaltime -= times[cur];
+    times[cur] = elapsed_time;
+    totaltime += times[cur];
+    cur = (cur+1)%num;
+    if (totaltime/10 < fps_limit) System->Sleep (fps_limit - totaltime/10);
+  }
   G2D->Print (area);
 }
 
@@ -3267,7 +3278,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
  * reasonably well supported and suggest using 2*SRC*DST mode.  Otherwise we
  * suggest using SRC*DST mode which is pretty well supported.
  */
-void csGraphics3DOGLCommon::Guess_BlendMode(GLenum *src, GLenum*dst)
+void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
 {
   // colors of the 2 polys to blend
   float testcolor1[3] = {0.5,0.5,0.5};
@@ -3299,7 +3310,7 @@ void csGraphics3DOGLCommon::Guess_BlendMode(GLenum *src, GLenum*dst)
   glVertex2i (0,0); glVertex2i(5,0); glVertex2i(5,5); glVertex2i(0,5);
   glEnd ();
 
-  glReadPixels (0,0,1,1,GL_RGB,GL_FLOAT, &blendresult1);
+  glReadPixels (2,2,1,1,GL_RGB,GL_FLOAT, &blendresult1);
 
   // blend mode two
 
@@ -3316,9 +3327,12 @@ void csGraphics3DOGLCommon::Guess_BlendMode(GLenum *src, GLenum*dst)
   glVertex2i (0,0); glVertex2i (5,0); glVertex2i (5,5); glVertex2i (0,5);
   glEnd ();
 
-  glReadPixels (0,0,1,1,GL_RGB,GL_FLOAT, &blendresult2);
+  glReadPixels (2,2,1,1,GL_RGB,GL_FLOAT, &blendresult2);
 
-  SysPrintf (MSG_INITIALIZATION, "Blend mode values are %f and %f...", blendresult1[1], blendresult2[1]);
+  SysPrintf (MSG_INITIALIZATION,
+  	"Blend mode values are %f and %f...",
+	blendresult1[1],
+	blendresult2[1]);
 
   // compare the green component between the two results, A and B.  In the
   // ideal case B = 2*A.  If SRC*DST blend mode is supported but 2*SRC*DST is

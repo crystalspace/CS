@@ -95,8 +95,8 @@ protected:
   void Unload (csTxtCacheData *d);
 };
 
-#define SUPER_LM_SIZE 256
-#define SUPER_LM_NUM 10
+#define DEFAULT_SUPER_LM_SIZE 256
+#define DEFAULT_SUPER_LM_NUM 10
 
 /**
  * Cache data for lightmap. This is stored in one of the super
@@ -208,13 +208,25 @@ public:
  */
 class OpenGLLightmapCache
 {
+public:
+  /// Number of static lightmaps.
+  static int super_lm_num;
+  /// Size of static lightmaps.
+  static int super_lm_size;
+
 private:
   csGraphics3DOGLCommon* g3d;
 
   /// A number of super-lightmaps to contain all other lightmaps.
-  csSuperLightMap suplm[SUPER_LM_NUM];	// @@@ Make configurable.
+  csSuperLightMap* suplm;
   /// Current super lightmap.
   int cur_lm;
+  /**
+   * Number of super lightmaps we already processed. This is
+   * used to see how many super lightmaps we can go back to try
+   * allocating lightmaps.
+   */
+  int num_lm_processed;
   /// If true then setup is ok.
   bool initialized;
 

@@ -5,6 +5,22 @@ The history order is reversed so that new features are at the top.
 	  warning in the csView constructor.
 	- Fixed a warning in csLightMap.
 	- Fixed a compile error in map2cs.
+	- Improved OpenGL super-lightmap handling a little. If there is
+	  no more room in the current super-lightmap it will try the
+	  two older ones first before creating a new super-lightmap. This
+	  should improve usage of the super-lightmaps a little.
+	- Added new Video.OpenGL.FpsLimit config for OpenGL with which you
+	  can artificially decrease FPS speed. This is useful on some cards
+	  where very high framerates actually cause congestion in the OpenGL
+	  queue (or something like that) and slowing down helps to get
+	  smoother results. This is disabled by default.
+	- Made the number of super-lightmaps configurable (default is still
+	  10). Also made the size configurable (default 256). The options
+	  are Video.OpenGL.SuperLightMapNum and Video.OpenGL.SuperLightMapSize.
+	  Note that the super-lightmap size will automatically be capped
+	  to the maximum allowed texture size. So you can safely set it
+	  to 10000000x10000000 :-) Also note that this size should be a power
+	  of two.
 22-May-2001
 	- Implemented improved OpenGL lightmap cache. There is now the notion
 	  of a super-lightmap which is a collection of smaller lightmaps.
