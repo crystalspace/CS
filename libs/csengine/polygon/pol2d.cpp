@@ -255,9 +255,11 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
     }
     else
     {
-      g3dpoly->vertices[j].r = 0;
-      g3dpoly->vertices[j].g = 0;
-      g3dpoly->vertices[j].b = 0;
+    
+      g3dpoly->vertices[j].r = 1;
+      g3dpoly->vertices[j].g = 1;
+      g3dpoly->vertices[j].b = 1;
+      
     }
   }
 }
@@ -566,7 +568,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
     g3dpolyfx.txt_handle = poly->GetTextureHandle ();
     g3dpolyfx.inv_aspect = rview->inv_aspect;
 
-    csColor* po_colors = do_light ? gs->GetColors () : NULL;
+    csColor* po_colors = do_light && gs ? gs->GetColors () : NULL;
     if (poly->CheckFlags (CS_POLY_FLATSHADING)) g3dpolyfx.txt_handle = NULL;
 
     // We are going to use DrawPolygonFX.
@@ -626,7 +628,7 @@ void csPolygon2D::DrawFilled (csRenderView* rview, csPolygon3D* poly, csPolyPlan
     PreparePolygonFX (&g3dpolyfx, vertices, num_vertices, orig_triangle,
     	po_colors != NULL);
     rview->g3d->StartPolygonFX (g3dpolyfx.txt_handle,
-    	CS_FX_COPY | (po_colors ? CS_FX_GOURAUD : 0));
+    	CS_FX_COPY | ( po_colors ? CS_FX_GOURAUD : 0));
     CalculateFogPolygon (rview, g3dpolyfx);
     rview->g3d->DrawPolygonFX (g3dpolyfx);
     rview->g3d->FinishPolygonFX ();

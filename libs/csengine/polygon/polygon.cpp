@@ -1055,8 +1055,8 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
     // we stop here because the triangle is only visible if all
     // vertices are visible (this is not exactly true but it is
     // easier this way! @@@ CHANGE IN FUTURE).
-    if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
-      return false;
+//    if (GetTextureType () == POLYTXT_GOURAUD || CheckFlags (CS_POLY_FLATSHADING))
+//      return false;
 
     csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
     csVector2 *evert = NULL;
@@ -1322,6 +1322,8 @@ void csPolygon3D::InitLightMaps (csPolygonSet* owner, bool do_cache, int index)
 void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
 	bool dynamic, bool reset)
 {
+  if ( CheckFlags (CS_POLY_FLATSHADING)) return;
+  
   csColor poly_color (0,0,0), vert_color;
   if (light) poly_color = lcol;
 
