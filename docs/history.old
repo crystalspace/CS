@@ -4673,7 +4673,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Brandon Ehle did the following in caltocs:
 	    - Fixed a bug regarding windows and mac text .cfg files.
 	    - Fixed a bug with GCC that does not include stdc++ by default.
-	- Chrisopher Nelson did the following:
+	- Christopher Nelson did the following:
 	    - Committed fix for an error that was found by Craig Ching.
 	    - Committed the changes posted by Andrew Craig. Also fixed
 	      my previous fix from Craig Ching.
