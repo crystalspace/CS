@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Map Creation, , Sequence Manager, csEngine
+@node Map Creation, Internal Workings, Sequence Manager, csEngine
 @subsection How to Create Optimal Maps for Crystal Space
 @cindex Visibility Culling
 @cindex Culling, Visibility
