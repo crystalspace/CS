@@ -9156,6 +9156,7 @@ class iShaderManager(iShaderVariableContext):
     def __repr__(self):
         return "<C iShaderManager instance at %s>" % (self.this,)
     def RegisterShader(*args): return _cspace.iShaderManager_RegisterShader(*args)
+    def UnregisterShader(*args): return _cspace.iShaderManager_UnregisterShader(*args)
     def GetShader(*args): return _cspace.iShaderManager_GetShader(*args)
     def GetShaders(*args): return _cspace.iShaderManager_GetShaders(*args)
     def RegisterCompiler(*args): return _cspace.iShaderManager_RegisterCompiler(*args)
@@ -9209,7 +9210,7 @@ class iShader(iShaderVariableContext):
     def __init__(self): raise RuntimeError, "No constructor defined"
     def __repr__(self):
         return "<C iShader instance at %s>" % (self.this,)
-    def GetName(*args): return _cspace.iShader_GetName(*args)
+    def QueryObject(*args): return _cspace.iShader_QueryObject(*args)
     def GetNumberOfPasses(*args): return _cspace.iShader_GetNumberOfPasses(*args)
     def ActivatePass(*args): return _cspace.iShader_ActivatePass(*args)
     def SetupPass(*args): return _cspace.iShader_SetupPass(*args)
