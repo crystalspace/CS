@@ -38,6 +38,7 @@
 #pragma warning(disable:4189)   // local variable is intialized but not referenced
 #pragma warning(disable:4706)   // Assignmet in conditional expression
 #pragma warning(disable:4611)   // interaction between _setjmp and C++ destructors not portable
+#pragma warning(disable:4710)   // function not inlined
 #endif
 
 #if defined(COMP_WCC) || defined(COMP_BC)
