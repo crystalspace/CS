@@ -16,6 +16,7 @@ chronological order.
 	  has been rewritten to use the 3D engine and it 'simulates' isometric
 	  view only in the way that the camera moves. It does require new
 	  renderer though as it uses stencil shadows.
+	- Jorrit added views to the new isotest. You can switch with tab.
 3-Jun-2004
 	- Eric Sunshine added MsvcGenVariable rule to msvcgen.jam, which allows
 	  clients to create msvcgen %foo%-style template variables on-the-fly.

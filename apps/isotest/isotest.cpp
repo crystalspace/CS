@@ -63,6 +63,12 @@ IsoTest *isotest;
 IsoTest::IsoTest (iObjectRegistry* object_reg)
 {
   IsoTest::object_reg = object_reg;
+
+  current_view = 0;
+  views[0].camera_offset.Set (-4, 4, -4);
+  views[1].camera_offset.Set (-9, 9, -9);
+  views[2].camera_offset.Set (4, 4, -4);
+  views[3].camera_offset.Set (0, 4, -4);
 }
 
 IsoTest::~IsoTest ()
@@ -104,7 +110,7 @@ void IsoTest::SetupFrame ()
 
   // Let the camera look at the actor.
   csOrthoTransform& cam_trans = c->GetTransform ();
-  cam_trans.SetOrigin (actor_pos + csVector3 (-4, 4, -4));
+  cam_trans.SetOrigin (actor_pos + views[current_view].camera_offset);
   cam_trans.LookAt (actor_pos-cam_trans.GetOrigin (), csVector3 (0, 1, 0));
 
   // Tell 3D driver we're going to display 3D things.
@@ -136,12 +142,18 @@ bool IsoTest::HandleEvent (iEvent& ev)
   else if ((ev.Type == csevKeyboard) && 
     (csKeyEventHelper::GetEventType (&ev) == csKeyEventTypeDown))
   {
-    if (csKeyEventHelper::GetCookedCode (&ev) == CSKEY_ESC)
+    utf32_char c = csKeyEventHelper::GetCookedCode (&ev);
+    if (c == CSKEY_ESC)
     {
       csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
       if (q)
 	q->GetEventOutlet()->Broadcast (cscmdQuit);
       return true;
+    }
+    else if (c == CSKEY_TAB)
+    {
+      current_view++;
+      if (current_view >= 4) current_view = 0;
     }
   }
 

@@ -21,6 +21,7 @@
 
 #include <stdarg.h>
 #include "csutil/ref.h"
+#include "csgeom/vector3.h"
 
 struct iEngine;
 struct iLoader;
@@ -33,6 +34,11 @@ struct iSector;
 struct iView;
 struct iMeshWrapper;
 struct iLight;
+
+struct IsoView
+{
+  csVector3 camera_offset;
+};
 
 class IsoTest
 {
@@ -48,6 +54,9 @@ private:
   csRef<iMeshWrapper> actor;
   iMeshWrapper* plane;
   csRef<iLight> actor_light;
+
+  int current_view;
+  IsoView views[4];
 
   static bool IsoTestEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
