@@ -26,21 +26,24 @@ IMPLEMENT_IBASE (csMaterial)
   IMPLEMENTS_INTERFACE (iMaterial)
 IMPLEMENT_IBASE_END
 
-csMaterial::csMaterial ()
+csMaterial::csMaterial () :
+  texture(0),
+  diffuse(CS_DEFMAT_DIFFUSE),
+  ambient(CS_DEFMAT_AMBIENT),
+  reflection(CS_DEFMAT_REFLECTION)
 {
   CONSTRUCT_IBASE (NULL);
-  // set default state to white flat shaded.
-  flat_color.Set (255, 255, 255);
-  texture = NULL;
-  diffuse = CS_DEFMAT_DIFFUSE;
-  ambient = CS_DEFMAT_AMBIENT;
-  reflection = CS_DEFMAT_REFLECTION;
+  flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
 }
 
-csMaterial::csMaterial (csTextureWrapper *txt)
+csMaterial::csMaterial (csTextureWrapper* w) :
+  texture(w),
+  diffuse(CS_DEFMAT_DIFFUSE),
+  ambient(CS_DEFMAT_AMBIENT),
+  reflection(CS_DEFMAT_REFLECTION)
 {
-  csMaterial ();
-  texture = txt;
+  CONSTRUCT_IBASE (NULL);
+  flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
 }
 
 csMaterial::~csMaterial () 

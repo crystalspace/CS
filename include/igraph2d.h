@@ -1,7 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
-    Ported to COM by Dan Ogles <dogles@peachtree.com>
+    Copyright (C) 1998-2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -25,42 +23,12 @@
 #include "csgfxldr/rgbpixel.h"
 #include "iplugin.h"
 #include "itexture.h"
+#include "icursor.h"
 
 class csRect;
 struct iImage;
 struct iFontServer;
 struct iFont;
-
-/**
- * Standard mouse cursor IDs
- */
-enum csMouseCursorID
-{
-  /// No cursor
-  csmcNone = -1,
-  /// Arrow cursor
-  csmcArrow = 0,
-  /// Lens cursor
-  csmcLens,
-  /// Cross-hatch cursor
-  csmcCross,
-  /// Pen cursor
-  csmcPen,
-  /// Window move cursor
-  csmcMove,
-  /// Diagonal (\) resizing cursor
-  csmcSizeNWSE,
-  /// Diagonal (/) resizing cursor
-  csmcSizeNESW,
-  /// Vertical sizing cursor
-  csmcSizeNS,
-  /// Horizontal sizing cursor
-  csmcSizeEW,
-  /// Invalid operation cursor
-  csmcStop,
-  /// Wait (longplay operation) cursor
-  csmcWait
-};
 
 /**
  * Structure describing the pixel format.

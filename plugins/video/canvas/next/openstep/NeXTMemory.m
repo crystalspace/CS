@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -10,48 +10,39 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTFrameBuffer.cpp
+// NeXTMemory.m
 //
-//	A mostly abstract 2D frame buffer which is capabile of converting
-//	a raw Crystal Space frame buffer into a NeXT format frame buffer.
+//	Platform-specific functions for allocating and manipulating
+//	page-aligned memory blocks.
 //
 //-----------------------------------------------------------------------------
-#include "cssysdef.h"
-#include "NeXTFrameBuffer.h"
-extern "Objective-C" {
+#include "NeXTMemory.h"
 #import <Foundation/NSZone.h>
-}
-
-NeXTFrameBuffer::NeXTFrameBuffer( unsigned int w, unsigned int h ) :
-    width(w), height(h) {}
-NeXTFrameBuffer::~NeXTFrameBuffer() {}
 
 //-----------------------------------------------------------------------------
-// adjust_allocation_size
+// NeXTMemory_round_up_to_multiple_of_page_size
 //-----------------------------------------------------------------------------
-unsigned int NeXTFrameBuffer::adjust_allocation_size( unsigned int size )
+unsigned int NeXTMemory_round_up_to_multiple_of_page_size( unsigned int size )
     {
     return NSRoundUpToMultipleOfPageSize( size );
     }
 
 
 //-----------------------------------------------------------------------------
-// allocate_memory
-//	Allocation via NSAllocateMemoryPages() is guaranteed to be
-//	page-aligned (on Mach, at least) which is required for best video
-//	optimization.  See CS/docs/texinfo/internal/platform/next.txi for
-//	details.
+// NeXTMemory_allocate_memory_pages
+//	Allocation via NSAllocateMemoryPages() is guaranteed to be page-aligned
+//	(on Mach, at least).
 //-----------------------------------------------------------------------------
-unsigned char* NeXTFrameBuffer::allocate_memory( unsigned int nbytes )
+unsigned char* NeXTMemory_allocate_memory_pages( unsigned int nbytes )
     {
     return (unsigned char*)NSAllocateMemoryPages( nbytes );
     }
 
 
 //-----------------------------------------------------------------------------
-// deallocate_memory
+// NeXTMemory_deallocate_memory_pages
 //-----------------------------------------------------------------------------
-void NeXTFrameBuffer::deallocate_memory(unsigned char* p, unsigned int nbytes)
+void NeXTMemory_deallocate_memory_pages(unsigned char* p, unsigned int nbytes)
     {
     NSDeallocateMemoryPages( p, nbytes );
     }

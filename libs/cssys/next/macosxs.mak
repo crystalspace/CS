@@ -1,6 +1,6 @@
 #==============================================================================
 #
-#	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+#	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # The contents of this file are copyrighted by Eric Sunshine.  This work is
 # distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -12,7 +12,8 @@
 #------------------------------------------------------------------------------
 # macosxs.mak
 #
-#	Build-time configuration options for the MacOS/X Server platform.
+#	Build-time configuration options for the MacOS/X Server 1.0
+#	(Rhapsody) platform.
 #
 # BUG *1*
 #	The MacOS/X Server Objective-C++ compiler has a register allocation

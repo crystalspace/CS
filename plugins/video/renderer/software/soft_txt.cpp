@@ -189,7 +189,7 @@ void csTextureHandleSoftware::ComputeMeanColor ()
   // Compute a common palette for all three mipmaps
   csQuantizeBegin ();
 
-  csRGBpixel *tc = transp ? &transp_color : NULL;
+  csRGBpixel *tc = transp ? &transp_color : 0;
 
   for (i = 0; i < 4; i++)
     if (tex [i])

@@ -1,7 +1,6 @@
 /*
     Crystal Space 3D engine: Event Queue interface
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@freya.etu.ru>
+    Copyright (C) 1998 by Andrew Zabolotny <bit@freya.etu.ru>
     Minor fixes added by Olivier Langlois <olanglois@sympatico.ca>
 
     This library is free software; you can redistribute it and/or
@@ -67,7 +66,7 @@ private:
   void Resize (size_t iLength);
   /// Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
   inline void Lock ()
-  { while (SpinLock) ; SpinLock++; }
+  { while (SpinLock) {} SpinLock++; }
   /// Unlock the queue
   inline void Unlock ()
   { SpinLock--; }

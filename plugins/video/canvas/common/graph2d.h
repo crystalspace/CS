@@ -208,7 +208,7 @@ public:
 
   /// Get the palette (if there is one)
   virtual csRGBpixel *GetPalette ()
-  { return pfmt.PalEntries ? Palette : NULL; }
+  { return pfmt.PalEntries ? Palette : 0; }
 
   /// Query pixel R,G,B at given screen location
   virtual void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB);

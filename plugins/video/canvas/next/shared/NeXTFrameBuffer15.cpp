@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -48,8 +48,10 @@
 //
 //-----------------------------------------------------------------------------
 #include "NeXTFrameBuffer15.h"
+#include "NeXTMemory.h"
 extern "C" {
 #include <stdlib.h>
+#include <string.h>
 }
 
 #define RED_SHIFT   10
@@ -100,9 +102,11 @@ unsigned char* NeXTFrameBuffer15::get_cooked_buffer() const
 NeXTFrameBuffer15::NeXTFrameBuffer15( unsigned int w, unsigned int h ) :
     NeXTFrameBuffer(w,h)
     {
-    buffer_size   = adjust_allocation_size( CS_NEXT_BPP * width * height );
-    raw_buffer    = allocate_memory( buffer_size );
-    cooked_buffer = allocate_memory( buffer_size );
+    buffer_size   = NeXTMemory_round_up_to_multiple_of_page_size(
+		    CS_NEXT_BPP * width * height );
+    raw_buffer    = NeXTMemory_allocate_memory_pages( buffer_size );
+    cooked_buffer = NeXTMemory_allocate_memory_pages( buffer_size );
+    memset( cooked_buffer, 0, buffer_size );
     lookup_table  = build_15_to_12_rgb_table();
     }
 
@@ -113,8 +117,8 @@ NeXTFrameBuffer15::NeXTFrameBuffer15( unsigned int w, unsigned int h ) :
 NeXTFrameBuffer15::~NeXTFrameBuffer15()
     {
     free( lookup_table );
-    deallocate_memory( cooked_buffer, buffer_size );
-    deallocate_memory( raw_buffer,    buffer_size );
+    NeXTMemory_deallocate_memory_pages( cooked_buffer, buffer_size );
+    NeXTMemory_deallocate_memory_pages( raw_buffer,    buffer_size );
     }
 
 

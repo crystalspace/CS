@@ -1,8 +1,8 @@
-#ifndef __NeXT_malloc_h
-#define __NeXT_malloc_h
+#ifndef __NeXT_NeXTLoadLibrary_h
+#define __NeXT_NeXTLoadLibrary_h
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -12,15 +12,24 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// malloc.h
+// NeXTLoadLibrary.h
 //
-//	Some modules still include <malloc.h> even though it has been 
-//	deprecated in favor of <stdlib.h>.  On NeXT, the prototype for 
-//	malloc() in <malloc.h> is incorrect and conflicts with <stdlib.h>.  
-//	Therefore provide this fake "malloc.h" which includes the real 
-//	prototype from <stdlib.h>.  
+//	Platform-specific functions for loading dynamic link libraries.
 //
 //-----------------------------------------------------------------------------
-#include <stdlib.h>
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
-#endif // __NeXT_malloc_h
+typedef void* NeXTLibraryHandle;
+
+NeXTLibraryHandle NeXTLoadLibrary( char const* path );
+void* NeXTGetLibrarySymbol( NeXTLibraryHandle, char const* name );
+int NeXTUnloadLibrary( NeXTLibraryHandle );
+char const* NeXTGetLibraryError();
+
+#if defined(__cplusplus)
+}
+#endif
+
+#endif // __NeXT_NeXTLoadLibrary_h

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -10,29 +10,27 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTDelegate.cpp
+// NeXTDelegate.m
 //
-//	A delegate to the Application and animation Window.  Acts as a gateway
-//	between the AppKit and CrystalSpace by forwarding Objective-C messages
-//	and events to the C++ system driver, NeXTSystemDriver.  In particular,
-//	mouse and keyboard related events from the animation view are
-//	translated into CrystalSpace format and forwarded.  Application and
-//	Window events (such as application termination) are also handled.
+//	The application's delegate.  Acts as a gateway between the AppKit and
+//	Crystal Space by forwarding Objective-C messages and events to the C++
+//	system driver, NeXTSystemDriver.
 //
 //-----------------------------------------------------------------------------
-#include "cssysdef.h"
 #include "NeXTDelegate.h"
 #include "NeXTKeymap.h"
+#include "NeXTMenu.h"
+#include "ievdefs.h"
 #include "cssys/next/NeXTSystemDriver.h"
-extern "Objective-C" {
 #import <appkit/Application.h>
+#import <appkit/Menu.h>
 #import <appkit/View.h>
 #import <dpsclient/wraps.h>
-}
-extern "C" {
-#include <string.h>
-}
-int const TRACK_TAG = 9797;
+
+typedef void* NeXTDelegateHandle;
+typedef void* NeXTEventHandle;
+typedef void* NeXTViewHandle;
+#define ND_PROTO(RET,FUNC) RET NeXTDelegate_##FUNC
 
 #if !defined(NX_FUNCTIONSET)
 #define NX_FUNCTIONSET 0xfe /* Cousin to NX_ASCIISET and NX_SYMBOLSET. */
@@ -74,7 +72,7 @@ static char const CS_DOWN_CASE[] =
 
 
 //-----------------------------------------------------------------------------
-// Keystrokes which must be translated to CrystalSpace-specific codes.
+// Keystrokes which must be translated to Crystal Space-specific codes.
 //-----------------------------------------------------------------------------
 enum
     {
@@ -124,18 +122,48 @@ enum
     };
 
 
+//-----------------------------------------------------------------------------
+// continue_running
+//-----------------------------------------------------------------------------
+static inline BOOL continue_running( NeXTSystemDriver driver )
+    {
+    int run;
+    NeXTSystemDriver_system_extension( driver, "continuerunning", &run, 0, 0 );
+    return run;
+    }
+
+
 //=============================================================================
-// IMPLEMENTATION
+// Category of Application which supports recursive run loops.
+//=============================================================================
+@interface Application (NeXTDelegate)
+- (void)runRecursively:(NeXTSystemDriver)driver;
+@end
+@implementation Application (NeXTDelegate)
+- (void)runRecursively:(NeXTSystemDriver)driver
+    {
+    int const was_running = running; // The old run-loop invocation depth.
+    [self run];
+    if (continue_running( driver ))
+	running = was_running; // Restore old depth rather than terminating.
+    }
+@end
+
+
+//=============================================================================
+// NeXTDelegate Implementation
 //=============================================================================
 @implementation NeXTDelegate
 
 //-----------------------------------------------------------------------------
 // timer_handler
-//	Target of timer; forwards timer event to driver; runs in child thread.
+//	Target of timer; forwards timer event to the NeXTSystemDriver.
 //-----------------------------------------------------------------------------
-static void timer_handler( DPSTimedEntry, double, void* data )
+static void timer_handler( DPSTimedEntry timer, double now, void* data )
     {
-    ((NeXTSystemDriver*)data)->timer_fired();
+    (void)timer; (void)now;
+    NeXTSystemDriver_system_extension(
+	(NeXTSystemDriver)data, "timerfired", 0, 0, 0 );
     }
 
 
@@ -177,37 +205,6 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 
 
 //-----------------------------------------------------------------------------
-// startTracking:
-//-----------------------------------------------------------------------------
-- (void)startTracking:(Window*)w
-    {
-    if (!tracking)
-	{
-	tracking = YES;
-	View* const v = [w contentView];
-	NXRect r; [v getBounds:&r];
-	[v convertRect:&r toView:0];
-	[w setTrackingRect:&r inside:NO owner:self tag:TRACK_TAG
-	    left:NO right:NO];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
-// stopTracking:
-//-----------------------------------------------------------------------------
-- (void)stopTracking:(Window*)w
-    {
-    if (tracking)
-	{
-	tracking = NO;
-	[w removeFromEventMask:NX_MOUSEMOVEDMASK];
-	[w discardTrackingRect:TRACK_TAG];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
 // showMouse
 //-----------------------------------------------------------------------------
 - (void)showMouse
@@ -218,6 +215,9 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	PSshowcursor();
 	}
     }
+
+ND_PROTO(void,show_mouse)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle showMouse]; }
 
 
 //-----------------------------------------------------------------------------
@@ -232,174 +232,16 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	}
     }
 
-
-//-----------------------------------------------------------------------------
-// freeWindowTitle
-//-----------------------------------------------------------------------------
-- (void)freeWindowTitle
-    {
-    if (savedTitle != 0)
-	{
-	free( savedTitle );
-	savedTitle = 0;
-	}
-    }
+ND_PROTO(void,hide_mouse)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle hideMouse]; }
 
 
 //-----------------------------------------------------------------------------
-// copyWindowTitleWithExtraBytes:
-//-----------------------------------------------------------------------------
-- (char*)copyWindowTitleWithExtraBytes:(int)extra
-    {
-    char const* title = [animationWindow title];
-    char* s = (char*)malloc( strlen(title) + extra + 1 );
-    strcpy( s, title );
-    return s;
-    }
-
-
-//-----------------------------------------------------------------------------
-// saveWindowTitle
-//-----------------------------------------------------------------------------
-- (void)saveWindowTitle
-    {
-    [self freeWindowTitle];
-    savedTitle = [self copyWindowTitleWithExtraBytes:0];
-    }
-
-
-//-----------------------------------------------------------------------------
-// restoreWindowTitle
-//-----------------------------------------------------------------------------
-- (void)restoreWindowTitle
-    {
-    if (savedTitle != 0)
-	{
-	[animationWindow setTitle:savedTitle];
-	[self freeWindowTitle];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
-// appendToWindowTitle:
-//-----------------------------------------------------------------------------
-- (void)appendToWindowTitle:(char const*)s
-    {
-    char* title = [self copyWindowTitleWithExtraBytes:strlen(s)];
-    strcat( title, s );
-    [animationWindow setTitle:title];
-    free( title );
-    }
-
-
-//-----------------------------------------------------------------------------
-// adjustWindowPosition:
-//	For best video performance align left-edge of NeXTView (the window's
-//	contentView) at a position divisible by 8.
-//
-//	See also: CS/docs/texinfo/internal/platform/next.txi and the
-//	NextStep 3.0 WindowServer release notes.
-//-----------------------------------------------------------------------------
-- (void)adjustWindowPosition:(Window*)w
-    {
-    View* v = [w contentView];		// The NeXTView.
-    NXRect vr; [v getBounds:&vr];
-    [v convertPoint:&vr.origin toView:0];
-    [w convertBaseToScreen:&vr.origin];
-    int const ALIGN = (1 << 3) - 1;	// 8-pixel alignment
-    int x = int( vr.origin.x );
-    if ((x & ALIGN) != 0)
-	{
-	x &= ~ALIGN;
-	NXRect wr; [w getFrame:&wr];
-	float const dx = vr.origin.x - wr.origin.x;
-	[w moveTo:(x - dx):wr.origin.y];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
-// prepareWindow:
-//	Register for additional events we are interested in: flags-changed, 
-//	mouse-dragged.  Also set up a tracking area so that we can request 
-//	mouse-moved events when mouse is inside the window's content area.  
-//-----------------------------------------------------------------------------
-- (void)prepareWindow:(Window*)w
-    {
-    if (w != 0)
-	{
-	int const MASK =
-		NX_FLAGSCHANGEDMASK  |
-		NX_LMOUSEDRAGGEDMASK |
-		NX_RMOUSEDRAGGEDMASK;
-	oldEventMask = [w addToEventMask:MASK];
-	[self startTracking:w];
-	[self adjustWindowPosition:w];
-	[w setDelegate:self];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
-// unprepareWindow:
-//-----------------------------------------------------------------------------
-- (void)unprepareWindow:(Window*)w
-    {
-    if (w != 0)
-	{
-	[self stopTracking:w];
-	[w setDelegate:0];
-	[w setEventMask:oldEventMask];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
-// registerAnimationWindow:
-//-----------------------------------------------------------------------------
-- (void)registerAnimationWindow:(Window*)w
-    {
-    [self unprepareWindow:animationWindow];
-    animationWindow = w;
-    [self prepareWindow:animationWindow];
-    [self startTimer];
-    }
-
-
-//-----------------------------------------------------------------------------
-// quit: -- Terminate the application.
+// quit: -- Target of "Quit" menu item.  Terminate the application.
 //-----------------------------------------------------------------------------
 - (id)quit:(id)sender
     {
-    [self showMouse];
-    [self stopTimer];
-    [self unprepareWindow:animationWindow];
-    [animationWindow close];
-    driver->terminate();
-    return self;
-    }
-
-
-//-----------------------------------------------------------------------------
-// windowWillClose:
-//	Terminate the application when the animation-window closes.
-//-----------------------------------------------------------------------------
-- (id)windowWillClose:(id)sender
-    {
-    if (sender == animationWindow)
-	[self quit:0];
-    return self;
-    }
-
-
-//-----------------------------------------------------------------------------
-// windowDidMove:
-//-----------------------------------------------------------------------------
-- (id)windowDidMove:(id)sender
-    {
-    if (sender == animationWindow)
-	[self adjustWindowPosition:animationWindow];
+    NeXTSystemDriver_system_extension( driver, "requestshutdown", 0, 0, 0 );
     return self;
     }
 
@@ -412,8 +254,8 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     NXPoint p = event->location;
     NXRect r; [view getBounds:&r];
     [view convertPoint:&p fromView:0];
-    *x = int(p.x);
-    *y = int(r.size.height - p.y - 1);	// CrystalSpace coords flipped.
+    *x = (int)p.x;
+    *y = (int)(r.size.height - p.y - 1); // Crystal Space coordinates flipped.
     return (*x >= 0 && *y >= 0 && *x < r.size.width && *y < r.size.height);
     }
 
@@ -502,7 +344,8 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 
 
 //-----------------------------------------------------------------------------
-// classifyKeyDown:raw:cooked: -- Translate NextStep keystroke to CrystalSpace.
+// classifyKeyDown:raw:cooked:
+//	Translate NextStep keystroke to Crystal Space codes.
 //-----------------------------------------------------------------------------
 - (BOOL)classifyKeyDown:(NXEvent const*)p raw:(int*)raw cooked:(int*)cooked
     {
@@ -510,17 +353,18 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     *raw = *cooked = 0;
     if ((p->flags & NX_COMMANDMASK) == 0)
 	{
-	NeXTKeymap::Binding const& binding =
-	    keymap->binding_for_scan_code( p->data.key.keyCode );
-	if (binding.is_bound())
+	if ([keymap isScanCodeBound:p->data.key.keyCode])
 	    {
-	    *raw = binding.code;
+	    NeXTKeymapBinding const* binding =
+		[keymap bindingForScanCode:p->data.key.keyCode];
+
+	    *raw = binding->code;
 	    *cooked = p->data.key.charCode;
 	    if ((p->flags & NX_NUMERICPADMASK) != 0)
 		[self classifyKeypad:raw:cooked];
-	    else if (binding.character_set == NX_FUNCTIONSET)
+	    else if (binding->character_set == NX_FUNCTIONSET)
 		[self classifyFunctionSet:raw:cooked];
-	    else if (binding.character_set == NX_ASCIISET)
+	    else if (binding->character_set == NX_ASCIISET)
 		[self classifyAsciiSet:raw:cooked];
 	    ok = YES;
 	    }
@@ -542,16 +386,19 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     BOOL const old_state = ((modifiers & csmask) != 0);
     if (new_state != old_state)
 	{
+	char const* request;
 	if (new_state)
 	    {
 	    modifiers |= csmask;
-	    driver->SystemExtension( "keydown", key, -1 );
+	    request = "keydown";
 	    }
 	else
 	    {
 	    modifiers &= ~csmask;
-	    driver->SystemExtension( "keyup", key, -1 );
+	    request = "keyup";
 	    }
+	NeXTSystemDriver_system_extension(
+	    driver, request, (void*)key, (void*)-1, 0 );
 	}
     }
 
@@ -567,22 +414,23 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	if ([self classifyKeyDown:p raw:&raw cooked:&cooked])
 	    {
 	    char const* request = flag ? "keydown" : "keyup";
-	    driver->SystemExtension( request, raw, cooked );
+	    NeXTSystemDriver_system_extension(
+		driver, request, (void*)raw, (void*)cooked, 0 );
 	    }
 	}
     }
 
-- (void)keyDown:(NXEvent*)p inView:(View*)v
+- (void)keyDown:(NXEvent*)p forView:(View*)v
     {
     [self keyEvent:p down:YES];
     }
 
-- (void)keyUp:(NXEvent*)p inView:(View*)v
+- (void)keyUp:(NXEvent*)p forView:(View*)v
     {
     [self keyEvent:p down:NO];
     }
 
-- (void)flagsChanged:(NXEvent*)p inView:(View*)v
+- (void)flagsChanged:(NXEvent*)p forView:(View*)v
     {
     if (!paused)
 	{
@@ -594,75 +442,85 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 
 
 //-----------------------------------------------------------------------------
-// Mouse -- Note: CrystalSpace button numbers start at 1.
+// Mouse -- Note: Crystal Space button numbers start at 1.
 //-----------------------------------------------------------------------------
-- (void)mouseEntered:(NXEvent*)p
-    {
-    if (!paused && p->data.tracking.trackingNum == TRACK_TAG)
-	[animationWindow addToEventMask:NX_MOUSEMOVEDMASK];
-    }
-
-- (void)mouseExited: (NXEvent*)p
-    {
-    if (p->data.tracking.trackingNum == TRACK_TAG)
-	{
-	[animationWindow removeFromEventMask:NX_MOUSEMOVEDMASK];
-	[self showMouse];
-	}
-    }
-
-- (void)mouseMoved:(NXEvent*)p inView:(View*)v
+- (void)mouseMoved:(NXEvent*)p forView:(View*)v
     {
     if (!paused)
 	{
 	int x, y;
 	if ([self localize:p toView:v x:&x y:&y])
-	    driver->SystemExtension( "mousemoved", x, y );
+	    NeXTSystemDriver_system_extension(
+		driver, "mousemoved", (void*)x, (void*)y, 0 );
 	}
     }
 
-- (void)mouseUp:(NXEvent*)p inView:(View*)v button:(int)button
+- (void)mouseUp:(NXEvent*)p forView:(View*)v button:(int)button
     {
     if (!paused)
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->SystemExtension( "mouseup", button, x, y );
+	NeXTSystemDriver_system_extension(
+	    driver, "mouseup", (void*)button, (void*)x, (void*)y );
 	}
     }
 
-- (void)mouseDown:(NXEvent*)p inView:(View*)v button:(int)button
+- (void)mouseDown:(NXEvent*)p forView:(View*)v button:(int)button
     {
     if (!paused)
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->SystemExtension( "mousedown", button, x, y );
+	NeXTSystemDriver_system_extension(
+	    driver, "mousedown", (void*)button, (void*)x, (void*)y );
 	}
     }
 
-- (void)mouseDragged:(NXEvent*)p inView:(View*)v
-    { [self mouseMoved:p inView:v]; }
+- (void)mouseDragged:(NXEvent*)p forView:(View*)v
+    { [self mouseMoved:p forView:v]; }
 
-- (void)mouseUp:(NXEvent*)p inView:(View*)v
-    { [self mouseUp:p inView:v button:1]; }
+- (void)mouseUp:(NXEvent*)p forView:(View*)v
+    { [self mouseUp:p forView:v button:1]; }
 
-- (void)mouseDown:(NXEvent*)p inView:(View*)v
-    { [self mouseDown:p inView:v button:1]; }
+- (void)mouseDown:(NXEvent*)p forView:(View*)v
+    { [self mouseDown:p forView:v button:1]; }
 
-- (void)rightMouseDragged:(NXEvent*)p inView:(View*)v
-    { [self mouseMoved:p inView:v]; }
+- (void)rightMouseDragged:(NXEvent*)p forView:(View*)v
+    { [self mouseMoved:p forView:v]; }
 
-- (void)rightMouseUp:(NXEvent*)p inView:(View*)v
-    { [self mouseUp:p inView:v button:2]; }
+- (void)rightMouseUp:(NXEvent*)p forView:(View*)v
+    { [self mouseUp:p forView:v button:2]; }
 
-- (void)rightMouseDown:(NXEvent*)p inView:(View*)v
+- (void)rightMouseDown:(NXEvent*)p forView:(View*)v
     {
     if (paused)
-	[[v nextResponder] rightMouseDown:p];	// Allow main menu to pop up.
+	[[v nextResponder] rightMouseDown:p]; // Allow main menu to pop up.
     else
-	[self mouseDown:p inView:v button:2];
+	[self mouseDown:p forView:v button:2];
     }
+
+- (void)dispatchEvent:(NXEvent*)e forView:(View*)v
+    {
+    switch (e->type)
+	{
+	case NX_KEYDOWN:       [self keyDown:e           forView:v]; break;
+	case NX_KEYUP:         [self keyUp:e             forView:v]; break;
+	case NX_FLAGSCHANGED:  [self flagsChanged:e      forView:v]; break;
+	case NX_MOUSEMOVED:    [self mouseMoved:e        forView:v]; break;
+	case NX_LMOUSEDOWN:    [self mouseDown:e         forView:v]; break;
+	case NX_LMOUSEUP:      [self mouseUp:e           forView:v]; break;
+	case NX_LMOUSEDRAGGED: [self mouseDragged:e      forView:v]; break;
+	case NX_RMOUSEDOWN:    [self rightMouseDown:e    forView:v]; break;
+	case NX_RMOUSEUP:      [self rightMouseUp:e      forView:v]; break;
+	case NX_RMOUSEDRAGGED: [self rightMouseDragged:e forView:v]; break;
+	default:                                                     break;
+	}
+    }
+
+ND_PROTO(void,dispatch_event)
+    ( NeXTDelegateHandle h, NeXTEventHandle event, NeXTViewHandle view )
+    { [(NeXTDelegate*)h dispatchEvent:(NXEvent*)event forView:(View*)view]; }
 
 
 //-----------------------------------------------------------------------------
@@ -675,11 +533,7 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	paused = YES;
 	[self showMouse];
 	[self stopTimer];
-	[self stopTracking:animationWindow];
-	[self saveWindowTitle];
-	[self appendToWindowTitle:"  [Paused]"];
-	driver->pause_clock();
-	driver->SystemExtension( "appdeactivated" );
+	NeXTSystemDriver_system_extension( driver, "appdeactivated", 0, 0, 0 );
 	}
     }
 
@@ -688,11 +542,8 @@ static void timer_handler( DPSTimedEntry, double, void* data )
     if (paused)
 	{
 	paused = NO;
-	[self restoreWindowTitle];
-	[self startTracking:animationWindow];
 	[self startTimer];
-	driver->resume_clock();
-	driver->SystemExtension( "appactivated" );
+	NeXTSystemDriver_system_extension( driver, "appactivated", 0, 0, 0 );
 	}
     }
 
@@ -702,40 +553,120 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 	[self unpause];
     else
 	[self pause];
+    return self;
     }
 
-- (id)windowDidBecomeKey:(id)sender
+- (id)appDidBecomeActive:(id)sender
     {
-    if (autoResume && sender == animationWindow)
+    if (autoResume)
 	[self unpause];
+    return self;
     }
 
-- (id)windowDidResignKey:(id)sender
+- (id)appDidResignActive:(id)sender
     {
-    if (sender == animationWindow)
+    autoResume = !paused;
+    [self pause];
+    return self;
+    }
+
+
+//-----------------------------------------------------------------------------
+// initApplicationMenu:style:
+//	Generate application menu based upon platform configuration.
+//-----------------------------------------------------------------------------
+- (void)initApplicationMenu:(NeXTConfigHandle)config style:(char const*)style
+    {
+    Menu* const menu = NeXTMenuGenerate( style, config );
+    [menu setTitle:[NXApp appName]];
+    [NXApp setMainMenu:menu];
+    }
+
+ND_PROTO(void,init_app_menu)
+    ( NeXTDelegateHandle handle, NeXTConfigHandle config, char const* style )
+    { [(NeXTDelegate*)handle initApplicationMenu:config style:style]; }
+
+
+//-----------------------------------------------------------------------------
+// startEventLoop
+//	Begin running an event-loop.  May be called recursively by CSWS.  Uses
+//	special -runRecursively: method to handle recursive invocations of
+//	event-loop.
+//
+// *CONTINUE-RUNNING*
+//	Since -startEventLoop may be invoked recursively, special care must be
+//	taken to avoid starting the new event-loop if the user has requested
+//	application termination via an external means, such as closing the
+//	AppKit window.  When the user does perform an external request for
+//	termination, we forcibly terminate all CSWS modal loops.
+//	Unfortunately, however, code which employs CSWS may not itself check
+//	that termination has been requested, and may try launching another
+//	modal session by recursively invoking -startEventLoop immediately
+//	following the one which was just forcibly aborted.  In order to prevent
+//	another modal session from actually launching in this circumstance we
+//	check continue_running() before even starting the event-loop.
+//
+// *RESET-TIMER*
+//	Because of the way timers are handled by the AppKit, if -startEventLoop
+//	is called recursively while the timer is being fired, the timer will
+//	not fire again until the recursive event-loop invocation exits.  Since
+//	we want the timer to fire even in recursive invocations, it is
+//	necessary to cancel it and re-install it.  Furthermore, since
+//	-stopEventLoop cancels the timer when exiting an event-loop, we restart
+//	the timer again after the recursive event-loop invocation has exited,
+//	but only if the user has not requested application termination.
+//-----------------------------------------------------------------------------
+- (void)startEventLoop
+    {
+    if (continue_running( driver ))	// *CONTINUE-RUNNING*
 	{
-	autoResume = !paused;
-	[self pause];
+	[self resetTimer];		// *RESET-TIMER*
+	[NXApp runRecursively:driver];
+	if (continue_running( driver ))
+	    [self resetTimer];		// *RESET-TIMER*
 	}
     }
+
+ND_PROTO(void,start_event_loop)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle startEventLoop]; }
+
+
+//-----------------------------------------------------------------------------
+// stopEventLoop
+//	Stops the application's event-loop.  Unfortunately the run-loop does
+//	not actually stop until another event arrives, so we fake one up.
+//-----------------------------------------------------------------------------
+- (void)stopEventLoop
+    {
+    NXEvent e;
+    e.type = NX_APPDEFINED;
+    e.ctxt = [NXApp context];
+    e.time = 0;
+    e.flags = 0;
+    e.window = 0;
+
+    [self stopTimer];
+    [NXApp stop:0];
+    DPSPostEvent( &e, TRUE );
+    }
+
+ND_PROTO(void,stop_event_loop)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle stopEventLoop]; }
 
 
 //-----------------------------------------------------------------------------
 // initWithDriver:
 //-----------------------------------------------------------------------------
-- (id)initWithDriver:(NeXTSystemDriver*)p
+- (id)initWithDriver:(NeXTSystemDriver)p
     {
     [super init];
-    animationWindow = 0;
-    oldEventMask = 0;
     driver = p;
-    keymap = new NeXTKeymap;
+    keymap = [[NeXTKeymap alloc] init];
     timer = 0;
     modifiers = 0;
     mouseHidden = NO;
     paused = NO;
-    tracking = NO;
-    savedTitle = 0;
+    autoResume = NO;
     return self;
     }
 
@@ -746,9 +677,45 @@ static void timer_handler( DPSTimedEntry, double, void* data )
 - (id)free
     {
     [self stopTimer];
-    [self freeWindowTitle];
-    delete keymap;
+    [keymap free];
     return [super free];
     }
 
+
+//-----------------------------------------------------------------------------
+// startup
+//	Interaction with AppKit is initiated here with instantiation of an
+//	Application object and a NeXTDelegate which oversees AppKit-related
+//	events and messages.
+//-----------------------------------------------------------------------------
++ (NeXTDelegate*)startup:(NeXTSystemDriver)handle
+    {
+    NeXTDelegate* controller;
+    NXApp = [Application new];
+    DPSSetDeadKeysEnabled( [NXApp context], 0 );
+    controller = [[NeXTDelegate alloc] initWithDriver:handle];
+    [NXApp setDelegate:controller];
+    return controller;
+    }
+
+ND_PROTO(NeXTDelegateHandle,startup)( NeXTSystemDriver handle )
+    { return (NeXTDelegateHandle)[NeXTDelegate startup:handle]; }
+
+
+//-----------------------------------------------------------------------------
+// shutdown:
+//-----------------------------------------------------------------------------
++ (void)shutdown:(NeXTDelegate*)controller
+    {
+    [NXApp setDelegate:0];
+    [controller showMouse];
+    [controller free];
+    DPSFlush();	// Flush any pending 'showcursor' if necessary.
+    }
+
+ND_PROTO(void,shutdown)( NeXTDelegateHandle handle )
+    { [NeXTDelegate shutdown:(NeXTDelegate*)handle]; }
+
 @end
+
+#undef ND_PROTO

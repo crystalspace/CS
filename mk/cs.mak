@@ -198,7 +198,6 @@ cleandep: $(OUTBASE) $(OUTOS)
 $(OUT)%$O: %.cpp
 	$(DO.COMPILE.CPP)
 
-
 $(OUT)%$O: %.c
 	$(DO.COMPILE.C)
 

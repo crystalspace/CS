@@ -16,17 +16,19 @@
 //	Crystal Space RGB:888 to NeXT RGBA:8888.
 //
 //	For performance reasons, the Crystal Space software renderer has
-//	hard-coded notions of pixel format (in particular, BGRA on
+//	hard-coded notions of pixel format (in particular, ARGB on
 //	little-endian and ABGR on big-endian).  The AppKit, on the other hand
-//	expects pixel data to be in the format RGBA regardless of endian.  It
-//	is possible to remove the hard-coded notions of pixel format from the
-//	renderer, but the loss of performance would likely be dramatic.
-//	Consequently, this frame buffer implementation cooks the Crystal Space
-//	generated BGRA or ABGR data into the RGBA:8888 data expected by the
-//	AppKit.  Thus modification to the software renderer is unnecessary.
-//	(Modifying the renderer would also tightly couple it to this 2D driver
-//	implementation.  That would be undesirable since it would make it
-//	difficult to use a different 2D driver with the same renderer.)
+//	expects pixel data to be in the format (from a CPU register perspetive)
+//	ABGR on little-endian and RGBA on big-endian.  (In memory, the pixel
+//	format is RGBA regardless of endian.)  It is possible to remove the
+//	hard-coded notions of pixel format from the renderer, but the loss of
+//	performance would likely be dramatic.  Consequently, this frame buffer
+//	implementation cooks the Crystal Space generated ARGB or ABGR data into
+//	the RGBA:8888 data expected by the AppKit.  Thus modification to the
+//	software renderer is unnecessary.  (Modifying the renderer would also
+//	tightly couple it to this 2D driver implementation.  That would be
+//	undesirable since it would make it difficult to use a different 2D
+//	driver with the same renderer.)
 //
 //	A further restriction is that the NeXT Window Server release notes for
 //	NextStep 3.0 stipulate that the alpha byte must be set to 0xff.  (See
@@ -36,6 +38,7 @@
 //
 //-----------------------------------------------------------------------------
 #include "NeXTFrameBuffer32.h"
+#include "NeXTMemory.h"
 #include <string.h>
 
 #if defined(__LITTLE_ENDIAN__)
@@ -78,10 +81,14 @@ unsigned char* NeXTFrameBuffer32::get_cooked_buffer() const
 NeXTFrameBuffer32::NeXTFrameBuffer32( unsigned int w, unsigned int h ) :
     NeXTFrameBuffer(w,h)
     {
-    buffer_size = adjust_allocation_size( CS_NEXT_BPP * width * height );
-    raw_buffer    = allocate_memory( buffer_size );
-    cooked_buffer = allocate_memory( buffer_size );
-    memset( cooked_buffer, 0xff, buffer_size ); // See 0xff note above.
+    buffer_size   = NeXTMemory_round_up_to_multiple_of_page_size(
+		    CS_NEXT_BPP * width * height );
+    raw_buffer    = NeXTMemory_allocate_memory_pages( buffer_size );
+    cooked_buffer = NeXTMemory_allocate_memory_pages( buffer_size );
+    memset( cooked_buffer, 0, buffer_size );
+    unsigned char* p = cooked_buffer + 3;	// See 0xff note above.
+    for (unsigned int n = width * height; n > 0; n--, p += 4)
+	*p = 0xff;
     }
 
 
@@ -90,8 +97,8 @@ NeXTFrameBuffer32::NeXTFrameBuffer32( unsigned int w, unsigned int h ) :
 //-----------------------------------------------------------------------------
 NeXTFrameBuffer32::~NeXTFrameBuffer32()
     {
-    deallocate_memory( cooked_buffer, buffer_size );
-    deallocate_memory( raw_buffer,    buffer_size );
+    NeXTMemory_deallocate_memory_pages( cooked_buffer, buffer_size );
+    NeXTMemory_deallocate_memory_pages( raw_buffer,    buffer_size );
     }
 
 
@@ -102,7 +109,7 @@ void NeXTFrameBuffer32::cook()
     {
     unsigned char const* p = raw_buffer;
     unsigned char* q = cooked_buffer;
-    for (unsigned int n = width * height; n-- > 0; p += 4, q += 1)
+    for (unsigned int n = width * height; n > 0; n--, p += 4, q += 1)
 	{
 	*q++ = *(p +   RED_OFFSET);
 	*q++ = *(p + GREEN_OFFSET);

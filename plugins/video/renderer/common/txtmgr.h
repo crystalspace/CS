@@ -89,7 +89,7 @@ public:
 
   /// Get the texture at the corresponding mipmap level (0..3)
   csTexture *get_texture (int mipmap)
-  { return (mipmap >= 0) && (mipmap < 4) ? tex [mipmap] : NULL; }
+  { return (mipmap >= 0) && (mipmap < 4) ? tex [mipmap] : 0; }
 
   /**
    * Adjusts the textures size, to ensure some restrictions like

@@ -2,7 +2,7 @@
 #define __NeXTFrameBuffer_h
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -47,6 +47,7 @@
 //	    "cooked" buffer should be in a format native to the NeXT Window
 //	    Server (or as close as possible) such that the Window Server has
 //	    to do little or no work to actually display the data on-screen.
+//
 //-----------------------------------------------------------------------------
 class NeXTFrameBuffer
     {
@@ -54,13 +55,9 @@ protected:
 	unsigned int width;
 	unsigned int height;
 
-static	unsigned int adjust_allocation_size( unsigned int );
-static	unsigned char* allocate_memory( unsigned int nbytes );
-static	void deallocate_memory( unsigned char*, unsigned int nbytes );
-
 public:
-	NeXTFrameBuffer( unsigned int width, unsigned int height );
-virtual	~NeXTFrameBuffer();
+	NeXTFrameBuffer(unsigned int w, unsigned int h) : width(w),height(h) {}
+virtual	~NeXTFrameBuffer() {}
 
 virtual int depth() const = 0;
 virtual int bits_per_sample() const = 0;

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -10,7 +10,7 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTLoadLibrary.cpp
+// NeXTLoadLibrary.m
 //
 //	OpenStep-specific dynamic library loading and symbol lookup.
 //
@@ -43,22 +43,38 @@
 //	changes.)
 //
 //-----------------------------------------------------------------------------
-#include "cssysdef.h"
-#include "cssys/csshlib.h"
-#include "csutil/csstring.h"
-
-extern "C" {
-#include <stdio.h>
+#include "NeXTLoadLibrary.h"
+#include <stdlib.h>
 #include <unistd.h> // access()
-#define bool dyld_bool
-#define __private_extern__
 #include <mach-o/dyld.h>
-#undef __private_extern__
-#undef bool
-}
+#import <Foundation/NSAutoreleasePool.h>
+#import <Foundation/NSString.h>
 
-static csString CS_ERROR_MESSAGE;
-static void clear_error_message() { CS_ERROR_MESSAGE.Free(); }
+static char* CS_ERROR_MESSAGE = 0;
+
+//-----------------------------------------------------------------------------
+// clear_error_message
+//-----------------------------------------------------------------------------
+static void clear_error_message()
+    {
+    if (CS_ERROR_MESSAGE != 0)
+	{
+	free( CS_ERROR_MESSAGE );
+	CS_ERROR_MESSAGE = 0;
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
+// set_error_message
+//-----------------------------------------------------------------------------
+static void set_error_message( NSString* s )
+    {
+    clear_error_message();
+    CS_ERROR_MESSAGE = (char*)malloc( [s cStringLength] + 1 );
+    [s getCString:CS_ERROR_MESSAGE];
+    }
+
 
 //-----------------------------------------------------------------------------
 // handle_collision
@@ -76,40 +92,25 @@ static NSModule handle_collision(NSSymbol sym, NSModule m_old, NSModule m_new)
 //-----------------------------------------------------------------------------
 static void initialize_loader()
     {
-    static bool installed = false;
+    static BOOL installed = NO;
     if (!installed)
         {
-        installed = true;
         static NSLinkEditErrorHandlers const handlers =
                 { 0, handle_collision, 0 };
         NSInstallLinkEditErrorHandlers( (NSLinkEditErrorHandlers*)&handlers );
+        installed = YES;
         }
     }
 
 
 //-----------------------------------------------------------------------------
-// csFindLoadLibrary
+// NeXTLoadLibrary
 //-----------------------------------------------------------------------------
-csLibraryHandle csFindLoadLibrary( char const* name )
+NeXTLibraryHandle NeXTLoadLibrary( char const* path )
     {
-    static bool initialized = false;
-    if (!initialized)
-	{
-	initialized = true;
-        csAddLibraryPath( OS_NEXT_PLUGIN_DIR );
-	}
-    return csFindLoadLibrary( 0, name, OS_NEXT_PLUGIN_EXT );
-    }
-
-
-//-----------------------------------------------------------------------------
-// csLoadLibrary
-//-----------------------------------------------------------------------------
-csLibraryHandle csLoadLibrary( char const* path )
-    {
-    csLibraryHandle handle = 0;
+    NeXTLibraryHandle handle = 0;
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     initialize_loader();
-    clear_error_message();
     if (access( path, F_OK ) == 0)
 	{
 	NSObjectFileImage image = 0;
@@ -119,56 +120,54 @@ csLibraryHandle csLoadLibrary( char const* path )
 	    {
 	    NSModule const module = NSLinkModule( image, path, TRUE );
 	    if (module != 0)
-		handle = (csLibraryHandle)module;
+		handle = (NeXTLibraryHandle)module;
 	    else
-		CS_ERROR_MESSAGE << "NSLinkModule(" << path << ") failed";
+		set_error_message( [NSString stringWithFormat:
+		    @"NSLinkModule(%s) failed", path] );
 	    }
 	else
-	    CS_ERROR_MESSAGE << "NSCreateObjectFileImageFromFile(" << path
-		<< ") " << "failed (error " << rc << ')';
+	    set_error_message( [NSString stringWithFormat:
+		@"NSCreateObjectFileImageFromFile(%s) failed (error %d)",
+		path, rc] );
 	}
     else
-	CS_ERROR_MESSAGE << "File does not exist (" << path << ')';
+	set_error_message(
+	    [NSString stringWithFormat:@"File does not exist (%s)", path] );
+    [pool release];
     return handle;
     }
 
 
 //-----------------------------------------------------------------------------
-// csGetLibrarySymbol
+// NeXTGetLibrarySymbol
 //-----------------------------------------------------------------------------
-void* csGetLibrarySymbol( csLibraryHandle handle, char const* s )
+void* NeXTGetLibrarySymbol( NeXTLibraryHandle handle, char const* s )
     {
-    char* symbol = new char[ strlen(s) + 2 ]; // Prepend an underscore '_'.
-    *symbol = '_';
-    strcpy( symbol + 1, s );
-
-    void* const address = NSAddressOfSymbol( NSLookupAndBindSymbol(symbol) );
+    void* address = 0;
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    NSString* symbol = [NSString stringWithFormat:@"_%s", s];
+    address = NSAddressOfSymbol( NSLookupAndBindSymbol([symbol cString]) );
     if (address == 0)
-	fprintf( stderr, "Symbol undefined: %s\n", symbol );
-
-    delete[] symbol;
+	NSLog( @"Symbol undefined: %@", symbol );
+    [pool release];
     return address;
     }
 
 
 //-----------------------------------------------------------------------------
-// csUnloadLibrary
+// NeXTUnloadLibrary
 //-----------------------------------------------------------------------------
-bool csUnloadLibrary( csLibraryHandle )
+int NeXTUnloadLibrary( NeXTLibraryHandle handle )
     {
-    return true; // Unimplemented.
+    (void)handle;
+    return 1; // Unimplemented (1=success).
     }
 
 
 //-----------------------------------------------------------------------------
-// csPrintLibraryError
+// NeXTGetLibraryError
 //-----------------------------------------------------------------------------
-void csPrintLibraryError( char const* name )
+char const* NeXTGetLibraryError()
     {
-    fprintf( stderr, "ERROR: Failed to load plug-in module `%s'.\n", name );
-    if (!CS_ERROR_MESSAGE.IsEmpty())
-	{
-	fprintf( stderr, "Reason: %s\n", CS_ERROR_MESSAGE.GetData() );
-	clear_error_message();
-	}
+    return CS_ERROR_MESSAGE;
     }

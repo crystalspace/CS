@@ -40,6 +40,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp libs/cssys $(sort $(dir $(SRC.SYS_CSSYS)))
+vpath %.c   libs/cssys $(sort $(dir $(SRC.SYS_CSSYS)))
 
 INC.CSSYS = $(wildcard include/cssys/*.h)
 SRC.CSSYS = $(wildcard libs/cssys/*.cpp $(SRC.SYS_CSSYS))
@@ -56,7 +57,7 @@ else
   endif
   SRC.CSSYS += $(SRC.SYS_CSSYS_EXE)
 endif
-OBJ.CSSYS = $(addprefix $(OUT),$(notdir \
+OBJ.CSSYS ?= $(addprefix $(OUT),$(notdir \
   $(subst .s,$O,$(subst .c,$O,$(SRC.CSSYS:.cpp=$O)))))
 
 TO_INSTALL.STATIC_LIBS += $(CSSYS.LIB)

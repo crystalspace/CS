@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -10,26 +10,29 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTDelegate.cpp
+// NeXTDelegate.m
 //
-//	A delegate to the Application and animation Window.  Acts as a gateway
-//	between the AppKit and CrystalSpace by forwarding Objective-C messages
-//	and events to the C++ system driver, NeXTSystemDriver.  In particular,
-//	mouse and keyboard related events from the animation view are
-//	translated into CrystalSpace format and forwarded.  Application and
-//	Window events (such as application termination) are also handled.
+//	The application's delegate.  Acts as a gateway between the AppKit and
+//	Crystal Space by forwarding Objective-C messages and events to the C++
+//	system driver, NeXTSystemDriver.
 //
 //-----------------------------------------------------------------------------
-#include "cssysdef.h"
 #include "NeXTDelegate.h"
+#include "NeXTMenu.h"
+#include "ievdefs.h"
 #include "cssys/next/NeXTSystemDriver.h"
-extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>
 #import <AppKit/NSEvent.h>
+#import <AppKit/NSMenu.h>
 #import <AppKit/NSView.h>
-#import <AppKit/NSWindow.h>
-}
+
+typedef void* NeXTDelegateHandle;
+typedef void* NeXTEventHandle;
+typedef void* NeXTViewHandle;
+#define ND_PROTO(RET,FUNC) RET NeXTDelegate_##FUNC
+
+static NSAutoreleasePool* CS_GLOBAL_POOL = 0;
 
 //-----------------------------------------------------------------------------
 // For each keystroke, Crystal Space expects a raw key code and a cooked
@@ -67,7 +70,7 @@ static char const CS_DOWN_CASE[] =
 
 
 //-----------------------------------------------------------------------------
-// Keystrokes which must be translated to CrystalSpace-specific codes.
+// Keystrokes which must be translated to Crystal Space-specific codes.
 //-----------------------------------------------------------------------------
 enum
     {
@@ -116,18 +119,47 @@ enum
     K_F12		= NSF12FunctionKey,
     };
 
+
+//-----------------------------------------------------------------------------
+// continue_running
+//-----------------------------------------------------------------------------
+static inline BOOL continue_running( NeXTSystemDriver driver )
+    {
+    int run;
+    NeXTSystemDriver_system_extension( driver, "continuerunning", &run, 0, 0 );
+    return run;
+    }
+
+
 //=============================================================================
-// IMPLEMENTATION
+// Category of NSApplication which supports recursive run loops.
+//=============================================================================
+@interface NSApplication (NeXTDelegate)
+- (void)runRecursively:(NeXTSystemDriver)driver;
+@end
+@implementation NSApplication (NeXTDelegate)
+- (void)runRecursively:(NeXTSystemDriver)driver
+    {
+    int const was_running = _running; // The old run-loop invocation depth.
+    [self run];
+    if (continue_running( driver ))
+	_running = was_running; // Restore old depth rather than terminating.
+    }
+@end
+
+
+//=============================================================================
+// NeXTDelegate Implementation
 //=============================================================================
 @implementation NeXTDelegate
 
 //-----------------------------------------------------------------------------
 // timerFired:
-//	Target of timer; forwards timer event to driver; runs in child thread.
+//	Target of timer; forwards timer event to the NeXTSystemDriver.
 //-----------------------------------------------------------------------------
 - (void)timerFired:(NSTimer*)p
     {
-    driver->timer_fired();
+    NeXTSystemDriver_system_extension( driver, "timerfired", 0, 0, 0 );
     }
 
 
@@ -171,35 +203,6 @@ enum
 
 
 //-----------------------------------------------------------------------------
-// startTracking:
-//-----------------------------------------------------------------------------
-- (void)startTracking:(NSWindow*)w
-    {
-    if (!tracking)
-	{
-	tracking = YES;
-	NSView* const v = [w contentView];
-	trackingTag = [v addTrackingRect:[v bounds] owner:self userData:0
-		assumeInside:NO];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
-// stopTracking:
-//-----------------------------------------------------------------------------
-- (void)stopTracking:(NSWindow*)w
-    {
-    if (tracking)
-	{
-	tracking = NO;
-	[w setAcceptsMouseMovedEvents:NO];
-	[[w contentView] removeTrackingRect:trackingTag];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
 // showMouse
 //-----------------------------------------------------------------------------
 - (void)showMouse
@@ -210,6 +213,9 @@ enum
 	[NSCursor unhide];
 	}
     }
+
+ND_PROTO(void,show_mouse)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle showMouse]; }
 
 
 //-----------------------------------------------------------------------------
@@ -224,105 +230,16 @@ enum
 	}
     }
 
-
-//-----------------------------------------------------------------------------
-// adjustWindowPosition:
-//	For best video performance align left-edge of NeXTView (the window's
-//	contentView) at a position divisible by 8.
-//
-//	See also: CS/docs/texinfo/internal/platform/next.txi and the
-//	NextStep 3.0 WindowServer release notes.
-//-----------------------------------------------------------------------------
-- (void)adjustWindowPosition:(NSWindow*)w
-    {
-    NSView* const v = [w contentView];	// The NeXTView.
-    NSPoint const p =
-	[w convertBaseToScreen:[v convertPoint:[v bounds].origin toView:0]];
-    int const ALIGN = (1 << 3) - 1;	// 8-pixel alignment
-    int x = int( p.x );
-    if ((x & ALIGN) != 0)
-	{
-	x &= ~ALIGN;
-	NSRect const wr = [w frame];
-	float const dx = p.x - wr.origin.x;
-	[w setFrameOrigin:NSMakePoint(x - dx, wr.origin.y)];
-	}
-    }
+ND_PROTO(void,hide_mouse)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle hideMouse]; }
 
 
 //-----------------------------------------------------------------------------
-// prepareWindow:
-//	Set up a tracking area so that we can request mouse-moved events when 
-//	mouse is inside the window's content area.  
-//-----------------------------------------------------------------------------
-- (void)prepareWindow:(NSWindow*)w
-    {
-    if (w != 0)
-	{
-	[self startTracking:w];
-	[self adjustWindowPosition:w];
-	[w setDelegate:self];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
-// unprepareWindow:
-//-----------------------------------------------------------------------------
-- (void)unprepareWindow:(NSWindow*)w
-    {
-    if (w != 0)
-	{
-	[self stopTracking:w];
-	[w setDelegate:0];
-	}
-    }
-
-
-//-----------------------------------------------------------------------------
-// registerAnimationWindow:
-//-----------------------------------------------------------------------------
-- (void)registerAnimationWindow:(NSWindow*)w
-    {
-    [self unprepareWindow:animationWindow];
-    animationWindow = w;
-    [self prepareWindow:animationWindow];
-    [self startTimer];
-    }
-
-
-//-----------------------------------------------------------------------------
-// quit: -- Terminate the application.
+// quit: -- Target of "Quit" menu item.  Terminate the application.
 //-----------------------------------------------------------------------------
 - (void)quit:(id)sender
     {
-    [self showMouse];
-    [self stopTimer];
-    [self unprepareWindow:animationWindow];
-    [animationWindow close];
-    driver->terminate();
-    }
-
-
-//-----------------------------------------------------------------------------
-// windowShouldClose:
-//	Terminate the application when the animation-window closes.
-//-----------------------------------------------------------------------------
-- (BOOL)windowShouldClose:(id)sender
-    {
-    if (sender == animationWindow)
-	[self quit:0];
-    return YES;
-    }
-
-
-//-----------------------------------------------------------------------------
-// windowDidMove:
-//-----------------------------------------------------------------------------
-- (void)windowDidMove:(NSNotification*)n
-    {
-    if ([n object] == animationWindow)
-	[self adjustWindowPosition:animationWindow];
+    NeXTSystemDriver_system_extension( driver, "requestshutdown", 0, 0, 0 );
     }
 
 
@@ -333,8 +250,8 @@ enum
     {
     NSPoint const p = [view convertPoint:[event locationInWindow] fromView:0];
     NSRect const r = [view bounds];
-    *x = int(p.x);
-    *y = int(r.size.height - p.y - 1);	// CrystalSpace coords flipped.
+    *x = (int)p.x;
+    *y = (int)(r.size.height - p.y - 1); // Crystal Space coordinates flipped.
     return (*x >= 0 && *y >= 0 && *x < r.size.width && *y < r.size.height);
     }
 
@@ -423,13 +340,14 @@ enum
 
 
 //-----------------------------------------------------------------------------
-// classifyKeyDown:raw:cooked: -- Translate OpenStep keystroke to CrystalSpace.
+// classifyKeyDown:raw:cooked:
+//	Translate OpenStep keystroke to Crystal Space codes.
 //-----------------------------------------------------------------------------
 - (BOOL)classifyKeyDown:(NSEvent*)p raw:(int*)raw cooked:(int*)cooked
     {
     BOOL ok = NO;
-    *raw = *cooked = 0;
     unsigned int const flags = [p modifierFlags];
+    *raw = *cooked = 0;
     if ((flags & NSCommandKeyMask) == 0)
 	{
 	*raw = [[p charactersIgnoringModifiers] characterAtIndex:0];
@@ -459,16 +377,19 @@ enum
     BOOL const old_state = ((modifiers & csmask) != 0);
     if (new_state != old_state)
 	{
+	char const* request;
 	if (new_state)
 	    {
 	    modifiers |= csmask;
-	    driver->SystemExtension( "keydown", key, -1 );
+	    request = "keydown";
 	    }
 	else
 	    {
 	    modifiers &= ~csmask;
-	    driver->SystemExtension( "keyup", key, -1 );
+	    request = "keyup";
 	    }
+	NeXTSystemDriver_system_extension(
+	    driver, request, (void*)key, (void*)-1, 0 );
 	}
     }
 
@@ -483,23 +404,24 @@ enum
 	int raw, cooked;
 	if ([self classifyKeyDown:p raw:&raw cooked:&cooked])
 	    {
-	    char const* const request = flag ? "keydown" : "keyup";
-	    driver->SystemExtension( request, raw, cooked );
+	    char const* request = flag ? "keydown" : "keyup";
+	    NeXTSystemDriver_system_extension(
+		driver, request, (void*)raw, (void*)cooked, 0 );
 	    }
 	}
     }
 
-- (void)keyDown:(NSEvent*)p inView:(NSView*)v
+- (void)keyDown:(NSEvent*)p forView:(NSView*)v
     {
     [self keyEvent:p down:YES];
     }
 
-- (void)keyUp:(NSEvent*)p inView:(NSView*)v
+- (void)keyUp:(NSEvent*)p forView:(NSView*)v
     {
     [self keyEvent:p down:NO];
     }
 
-- (void)flagsChanged:(NSEvent*)p inView:(NSView*)v
+- (void)flagsChanged:(NSEvent*)p forView:(NSView*)v
     {
     if (!paused)
 	{
@@ -511,75 +433,85 @@ enum
 
 
 //-----------------------------------------------------------------------------
-// Mouse -- Note: CrystalSpace button numbers start at 1.
+// Mouse -- Note: Crystal Space button numbers start at 1.
 //-----------------------------------------------------------------------------
-- (void)mouseEntered:(NSEvent*)p 
-    {
-    if (!paused && [p trackingNumber] == trackingTag)
-	[animationWindow setAcceptsMouseMovedEvents:YES];
-    }
-
-- (void)mouseExited:(NSEvent*)p 
-    {
-    if ([p trackingNumber] == trackingTag)
-	{
-	[animationWindow setAcceptsMouseMovedEvents:NO];
-	[self showMouse];
-	}
-    }
-
-- (void)mouseMoved:(NSEvent*)p inView:(NSView*)v
+- (void)mouseMoved:(NSEvent*)p forView:(NSView*)v
     {
     if (!paused)
 	{
 	int x, y;
 	if ([self localize:p toView:v x:&x y:&y])
-	    driver->SystemExtension( "mousemoved", x, y );
+	    NeXTSystemDriver_system_extension(
+		driver, "mousemoved", (void*)x, (void*)y, 0 );
 	}
     }
 
-- (void)mouseUp:(NSEvent*)p inView:(NSView*)v button:(int)button
+- (void)mouseUp:(NSEvent*)p forView:(NSView*)v button:(int)button
     {
     if (!paused)
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->SystemExtension( "mouseup", button, x, y );
+	NeXTSystemDriver_system_extension(
+	    driver, "mouseup", (void*)button, (void*)x, (void*)y );
 	}
     }
 
-- (void)mouseDown:(NSEvent*)p inView:(NSView*)v button:(int)button
+- (void)mouseDown:(NSEvent*)p forView:(NSView*)v button:(int)button
     {
     if (!paused)
 	{
 	int x, y;
 	[self localize:p toView:v x:&x y:&y];
-	driver->SystemExtension( "mousedown", button, x, y );
+	NeXTSystemDriver_system_extension(
+	    driver, "mousedown", (void*)button, (void*)x, (void*)y );
 	}
     }
 
-- (void)mouseDragged:(NSEvent*)p inView:(NSView*)v
-    { [self mouseMoved:p inView:v]; }
+- (void)mouseDragged:(NSEvent*)p forView:(NSView*)v
+    { [self mouseMoved:p forView:v]; }
 
-- (void)mouseUp:(NSEvent*)p inView:(NSView*)v
-    { [self mouseUp:p inView:v button:1]; }
+- (void)mouseUp:(NSEvent*)p forView:(NSView*)v
+    { [self mouseUp:p forView:v button:1]; }
 
-- (void)mouseDown:(NSEvent*)p inView:(NSView*)v
-    { [self mouseDown:p inView:v button:1]; }
+- (void)mouseDown:(NSEvent*)p forView:(NSView*)v
+    { [self mouseDown:p forView:v button:1]; }
 
-- (void)rightMouseDragged:(NSEvent*)p inView:(NSView*)v
-    { [self mouseMoved:p inView:v]; }
+- (void)rightMouseDragged:(NSEvent*)p forView:(NSView*)v
+    { [self mouseMoved:p forView:v]; }
 
-- (void)rightMouseUp:(NSEvent*)p inView:(NSView*)v
-    { [self mouseUp:p inView:v button:2]; }
+- (void)rightMouseUp:(NSEvent*)p forView:(NSView*)v
+    { [self mouseUp:p forView:v button:2]; }
 
-- (void)rightMouseDown:(NSEvent*)p inView:(NSView*)v
+- (void)rightMouseDown:(NSEvent*)p forView:(NSView*)v
     {
     if (paused)
-	[[v nextResponder] rightMouseDown:p];
+	[[v nextResponder] rightMouseDown:p]; // Allow main menu to pop up.
     else
-	[self mouseDown:p inView:v button:2];
+	[self mouseDown:p forView:v button:2];
     }
+
+- (void)dispatchEvent:(NSEvent*)e forView:(NSView*)v
+    {
+    switch ([e type])
+	{
+	case NSKeyDown:           [self keyDown:e           forView:v]; break;
+	case NSKeyUp:             [self keyUp:e             forView:v]; break;
+	case NSFlagsChanged:      [self flagsChanged:e      forView:v]; break;
+	case NSMouseMoved:        [self mouseMoved:e        forView:v]; break;
+	case NSLeftMouseDown:     [self mouseDown:e         forView:v]; break;
+	case NSLeftMouseUp:       [self mouseUp:e           forView:v]; break;
+	case NSLeftMouseDragged:  [self mouseDragged:e      forView:v]; break;
+	case NSRightMouseDown:    [self rightMouseDown:e    forView:v]; break;
+	case NSRightMouseUp:      [self rightMouseUp:e      forView:v]; break;
+	case NSRightMouseDragged: [self rightMouseDragged:e forView:v]; break;
+	default:                                                        break;
+	}
+    }
+
+ND_PROTO(void,dispatch_event)
+    ( NeXTDelegateHandle h, NeXTEventHandle event, NeXTViewHandle view )
+    { [(NeXTDelegate*)h dispatchEvent:(NSEvent*)event forView:(NSView*)view]; }
 
 
 //-----------------------------------------------------------------------------
@@ -592,13 +524,7 @@ enum
 	paused = YES;
 	[self showMouse];
 	[self stopTimer];
-	[self stopTracking:animationWindow];
-	[savedTitle release];
-	savedTitle = [[animationWindow title] copy];
-	[animationWindow setTitle:
-		[savedTitle stringByAppendingString:@"  [Paused]"]];
-	driver->pause_clock();
-	driver->SystemExtension( "appdeactivated" );
+	NeXTSystemDriver_system_extension( driver, "appdeactivated", 0, 0, 0 );
 	}
     }
 
@@ -607,11 +533,8 @@ enum
     if (paused)
 	{
 	paused = NO;
-	[animationWindow setTitle:savedTitle];
-	[self startTracking:animationWindow];
 	[self startTimer];
-	driver->resume_clock();
-	driver->SystemExtension( "appactivated" );
+	NeXTSystemDriver_system_extension( driver, "appactivated", 0, 0, 0 );
 	}
     }
 
@@ -623,36 +546,113 @@ enum
 	[self pause];
     }
 
-- (void)windowDidBecomeKey:(NSNotification*)n
+- (void)applicationDidBecomeActive:(NSNotification*)n
     {
-    if (autoResume && [n object] == animationWindow)
+    if (autoResume)
 	[self unpause];
     }
 
-- (void)windowDidResignKey:(NSNotification*)n
+- (void)applicationDidResignActive:(NSNotification*)n
     {
-    if ([n object] == animationWindow)
+    autoResume = !paused;
+    [self pause];
+    }
+
+
+//-----------------------------------------------------------------------------
+// initApplicationMenu:style:
+//	Generate application menu based upon platform configuration.
+//-----------------------------------------------------------------------------
+- (void)initApplicationMenu:(NeXTConfigHandle)config style:(char const*)style
+    {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    NSMenu* const menu = NeXTMenuGenerate( style, config );
+    [menu setTitle:[[NSProcessInfo processInfo] processName]];
+    [NSApp setMainMenu:menu];
+    [pool release];
+    }
+
+ND_PROTO(void,init_app_menu)
+    ( NeXTDelegateHandle handle, NeXTConfigHandle config, char const* style )
+    { [(NeXTDelegate*)handle initApplicationMenu:config style:style]; }
+
+
+//-----------------------------------------------------------------------------
+// startEventLoop
+//	Begin running an event-loop.  May be called recursively by CSWS.  Uses
+//	special -runRecursively: method to handle recursive invocations of
+//	event-loop.
+//
+// *CONTINUE-RUNNING*
+//	Since -startEventLoop may be invoked recursively, special care must be
+//	taken to avoid starting the new event-loop if the user has requested
+//	application termination via an external means, such as closing the
+//	AppKit window.  When the user does perform an external request for
+//	termination, we forcibly terminate all CSWS modal loops.
+//	Unfortunately, however, code which employs CSWS may not itself check
+//	that termination has been requested, and may try launching another
+//	modal session by recursively invoking -startEventLoop immediately
+//	following the one which was just forcibly aborted.  In order to prevent
+//	another modal session from actually launching in this circumstance we
+//	check continue_running() before even starting the event-loop.
+//
+// *RESET-TIMER*
+//	Because of the way timers are handled by the AppKit, if -startEventLoop
+//	is called recursively while the timer is being fired, the timer will
+//	not fire again until the recursive event-loop invocation exits.  Since
+//	we want the timer to fire even in recursive invocations, it is
+//	necessary to cancel it and re-install it.  Furthermore, since
+//	-stopEventLoop cancels the timer when exiting an event-loop, we restart
+//	the timer again after the recursive event-loop invocation has exited,
+//	but only if the user has not requested application termination.
+//-----------------------------------------------------------------------------
+- (void)startEventLoop
+    {
+    if (continue_running( driver ))	// *CONTINUE-RUNNING*
 	{
-	autoResume = !paused;
-	[self pause];
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	[self resetTimer];		// *RESET-TIMER*
+	[NSApp runRecursively:driver];
+	if (continue_running( driver ))
+	    [self resetTimer];		// *RESET-TIMER*
+	[pool release];
 	}
     }
+
+ND_PROTO(void,start_event_loop)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle startEventLoop]; }
+
+
+//-----------------------------------------------------------------------------
+// stopEventLoop
+//	Stops the application's event-loop.  Unfortunately the run-loop does
+//	not actually stop until another event arrives, so we fake one up.
+//-----------------------------------------------------------------------------
+- (void)stopEventLoop
+    {
+    [self stopTimer];
+    [NSApp stop:0];
+    [NSApp postEvent:[NSEvent otherEventWithType:NSApplicationDefined
+	location:NSMakePoint(0,0) modifierFlags:0 timestamp:0 windowNumber:0
+	context:[NSApp context] subtype:0 data1:0 data2:0] atStart:YES];
+    }
+
+ND_PROTO(void,stop_event_loop)( NeXTDelegateHandle handle )
+    { [(NeXTDelegate*)handle stopEventLoop]; }
 
 
 //-----------------------------------------------------------------------------
 // initWithDriver:
 //-----------------------------------------------------------------------------
-- (id)initWithDriver:(NeXTSystemDriver*)p
+- (id)initWithDriver:(NeXTSystemDriver)p
     {
     [super init];
-    animationWindow = 0;
     driver = p;
     timer = 0;
     modifiers = 0;
     mouseHidden = NO;
     paused = NO;
-    tracking = NO;
-    savedTitle = [@"" retain];
+    autoResume = NO;
     return self;
     }
 
@@ -663,8 +663,49 @@ enum
 - (void)dealloc
     {
     [self stopTimer];
-    [savedTitle release];
     [super dealloc];
     }
 
+
+//-----------------------------------------------------------------------------
+// startup
+//	Interaction with AppKit is initiated here with instantiation of an
+//	NSApplication object and a NeXTDelegate which oversees AppKit-related
+//	events and messages.
+//-----------------------------------------------------------------------------
++ (NeXTDelegate*)startup:(NeXTSystemDriver)handle
+    {
+    NSAutoreleasePool* pool;
+    NeXTDelegate* controller;
+    if (CS_GLOBAL_POOL == 0) CS_GLOBAL_POOL = [[NSAutoreleasePool alloc] init];
+    pool = [[NSAutoreleasePool alloc] init];
+    NSApp = [NSApplication sharedApplication];
+    controller = [[NeXTDelegate alloc] initWithDriver:handle];
+    [NSApp setDelegate:controller];
+    [pool release];
+    return controller;
+    }
+
+ND_PROTO(NeXTDelegateHandle,startup)( NeXTSystemDriver handle )
+    { return (NeXTDelegateHandle)[NeXTDelegate startup:handle]; }
+
+
+//-----------------------------------------------------------------------------
+// shutdown:
+//-----------------------------------------------------------------------------
++ (void)shutdown:(NeXTDelegate*)controller
+    {
+    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+    [NSApp setDelegate:0];
+    [controller showMouse];
+    [controller release];
+    [[NSDPSContext currentContext] flush]; // Flush any pending 'showcursor'.
+    [pool release];
+    }
+
+ND_PROTO(void,shutdown)( NeXTDelegateHandle handle )
+    { [NeXTDelegate shutdown:(NeXTDelegate*)handle]; }
+
 @end
+
+#undef ND_PROTO

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -9,16 +9,19 @@
 // copyright notice is retained.  Send comments to <sunshine@sunshineco.com>.
 //
 //=============================================================================
-#include "cssysdef.h"
+//-----------------------------------------------------------------------------
+// NeXTView.m
+//
+//	View subclass which provides the AppKit mechanism for blitting
+//	Crystal Space's rendered frame buffer to screen.
+//
+//-----------------------------------------------------------------------------
 #include "NeXTView.h"
-#include "NeXTDelegate.h"
-extern "Objective-C" {
+#include "NeXTDelegate2D.h"
+#include <limits.h>	// CHAR_BIT
+#include <assert.h>
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSBitmapImageRep.h>
-}
-extern "C" {
-#include <limits.h>	// CHAR_BIT
-}
 
 //=============================================================================
 // IMPLEMENTATION
@@ -28,18 +31,21 @@ extern "C" {
 - (BOOL)acceptsFirstResponder { return YES; }
 - (BOOL)isOpaque { return YES; }
 
-#define DEL(C,E) [[NSApp delegate] C:E inView:self]
-- (void)keyDown:(NSEvent*)p  { DEL( keyDown,           p ); } 
-- (void)keyUp:            (NSEvent*)p  { DEL( keyUp,             p ); }
-- (void)flagsChanged:     (NSEvent*)p  { DEL( flagsChanged,      p ); }
-- (void)mouseMoved:       (NSEvent*)p  { DEL( mouseMoved,        p ); }
-- (void)mouseDown:        (NSEvent*)p  { DEL( mouseDown,         p ); }
-- (void)mouseUp:          (NSEvent*)p  { DEL( mouseUp,           p ); }
-- (void)mouseDragged:     (NSEvent*)p  { DEL( mouseDragged,      p ); }
-- (void)rightMouseDown:   (NSEvent*)p  { DEL( rightMouseDown,    p ); }
-- (void)rightMouseUp:     (NSEvent*)p  { DEL( rightMouseUp,      p ); }
-- (void)rightMouseDragged:(NSEvent*)p  { DEL( rightMouseDragged, p ); }
-#undef DEL
+#define MSG(M) - (void)M:(NSEvent*)e \
+    { [[[self window] delegate] dispatchEvent:e forView:self]; }
+
+MSG(keyDown)
+MSG(keyUp)
+MSG(flagsChanged)
+MSG(mouseMoved)
+MSG(mouseDown)
+MSG(mouseUp)
+MSG(mouseDragged)
+MSG(rightMouseDown)
+MSG(rightMouseUp)
+MSG(rightMouseDragged)
+
+#undef MSG
 
 //-----------------------------------------------------------------------------
 // initWithFrame:
@@ -75,14 +81,15 @@ extern "C" {
 - (void)setFrameBuffer:(unsigned char*)buff bitsPerSample:(int)bits_per_sample
     {
     NSRect const r = [self bounds];
-    unsigned int const w = int(r.size.width);
-    unsigned int const h = int(r.size.height);
+    unsigned int const w = (int)r.size.width;
+    unsigned int const h = (int)r.size.height;
 
-    CS_ASSERT( bits_per_sample == 4 || bits_per_sample == 8 );
     unsigned int const samples_per_pixel = 3;	// RGB (A is not included).
     unsigned int const bytes_per_pixel = bits_per_sample / 2;
     unsigned int const bytes_per_row = bytes_per_pixel * w;
     unsigned int const bits_per_pixel = bytes_per_pixel * CHAR_BIT;
+
+    assert( bits_per_sample == 4 || bits_per_sample == 8 );
 
     rep = [[NSBitmapImageRep allocWithZone:[self zone]]
 	initWithBitmapDataPlanes:&buff

@@ -66,7 +66,7 @@ public:
 	/// Multiplication of this by another matrix.
 	ddgMatrix4& operator *= ( const ddgMatrix4& m1 );
 	/// Multiply 2 matrices together and return result.
-	friend ddgMatrix4 operator *( const ddgMatrix4& m1, const ddgMatrix4& m2 )
+	inline friend ddgMatrix4 operator *( const ddgMatrix4& m1, const ddgMatrix4& m2 )
 	{
 	ddgMatrix4 out(m1);
 	out *= m2;
@@ -90,26 +90,26 @@ public:
 		m[2].set(0,0,1,0);
 		m[3].set(0,0,0,1);
 	}
-	friend ddgMatrix4 operator - (const ddgMatrix4& a)					// -m1
+	inline friend ddgMatrix4 operator - (const ddgMatrix4& a)					// -m1
 	{
 		ddgMatrix4 m1;
 		m1 = a;
 		m1.m[0] *= -1; m1.m[1] *= -1; m1.m[2] *= -1; m1.m[3] *= -1;
 		return m1;
 	}
-	friend ddgMatrix4 operator + (const ddgMatrix4& a, const ddgMatrix4& b)  // m1 + m2
+	inline friend ddgMatrix4 operator + (const ddgMatrix4& a, const ddgMatrix4& b)  // m1 + m2
 	{
 		ddgMatrix4 m1;
 		m1.m[0] = a.m[0] + b.m[0]; m1.m[1] = a.m[1] + b.m[1]; m1.m[2] = a.m[2] + b.m[2]; m1.m[3] = a.m[3] + b.m[3]; 
 		return m1;
 	}
-	friend ddgMatrix4 operator - (const ddgMatrix4& a, const ddgMatrix4& b)  // m1 - m2
+	inline friend ddgMatrix4 operator - (const ddgMatrix4& a, const ddgMatrix4& b)  // m1 - m2
 	{
 		ddgMatrix4 m1;
 		m1.m[0] = a.m[0] - b.m[0]; m1.m[1] = a.m[1] - b.m[1]; m1.m[2] = a.m[2] - b.m[2]; m1.m[3] = a.m[3] - b.m[3]; 
 		return m1;
 	}
-	friend ddgMatrix4 operator / (const ddgMatrix4& a, const float d)  // m1 / d
+	inline friend ddgMatrix4 operator / (const ddgMatrix4& a, const float d)  // m1 / d
 	{
 		ddgMatrix4 m1;
 		m1 = a;
@@ -118,12 +118,12 @@ public:
 	}
 
 	// Check equality
-	friend bool operator == (const ddgMatrix4& a, const ddgMatrix4& b)  // m1 == m2 ?
+	inline friend bool operator == (const ddgMatrix4& a, const ddgMatrix4& b)  // m1 == m2 ?
 	{
 		return a.m[0] == b.m[0] && a.m[1] == b.m[1] && a.m[2] == b.m[2] && a.m[3] == b.m[3];
 	}
 	// Check inequality
-	friend bool operator != (const ddgMatrix4& a, const ddgMatrix4& b)  // m1 != m2 ?
+	inline friend bool operator != (const ddgMatrix4& a, const ddgMatrix4& b)  // m1 != m2 ?
 	{
 		return (a.m[0] != b.m[0]) || (a.m[1] != b.m[1]) || (a.m[2] != b.m[2]) || (a.m[3] != b.m[3]);
 	}

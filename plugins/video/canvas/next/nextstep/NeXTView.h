@@ -2,7 +2,7 @@
 #define __NeXT_NeXTView_h
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -11,9 +11,14 @@
 // copyright notice is retained.  Send comments to <sunshine@sunshineco.com>.
 //
 //=============================================================================
-extern "Objective-C" {
+//-----------------------------------------------------------------------------
+// NeXTView.h
+//
+//	View subclass which provides the AppKit mechanism for blitting
+//	Crystal Space's rendered frame buffer to screen.
+//
+//-----------------------------------------------------------------------------
 #import <appkit/View.h>
-}
 @class NXBitmapImageRep;
 
 @interface NeXTView : View

@@ -39,11 +39,11 @@ public:
 	/// Test for inequivalence.
 	bool operator!=(ddgVector2 u) { return v[0] != u[0] || v[1] != u[1]; }
 	/// Test for equivalence
-	friend bool operator == (const ddgVector2& u, const ddgVector2& v)
+	inline friend bool operator == (const ddgVector2& u, const ddgVector2& v)
 	{ return v[0] == u[0] && v[1] == u[1]; 
 	}
 	/// Test for inequivalence.
-	friend bool operator != (const ddgVector2& u, const ddgVector2& v)
+	inline friend bool operator != (const ddgVector2& u, const ddgVector2& v)
 	{ return v[0] != u[0] || v[1] != u[1]; 
 	}
 	/// Assign the value of a float array to this vector.
@@ -181,11 +181,11 @@ public:
 	/// Test for inequivalence.
 	bool operator!=(ddgVector3& u) { return v[0] != u[0] || v[1] != u[1] || v[2] != u[2]; }
 	/// Test for equivalence
-	friend bool operator == (const ddgVector3& u, const ddgVector3& v)
+	inline friend bool operator == (const ddgVector3& u, const ddgVector3& v)
 	{ return v[0] == u[0] && v[1] == u[1] && v[2] == u[2]; 
 	}
 	/// Test for inequivalence.
-	friend bool operator != (const ddgVector3& u, const ddgVector3& v)
+	inline friend bool operator != (const ddgVector3& u, const ddgVector3& v)
 	{ return v[0] != u[0] || v[1] != u[1] || v[2] != u[2]; 
 	}
 	/// Assign the value of a float array to this vector.
@@ -448,11 +448,11 @@ public:
 	bool operator!=(ddgVector4& u)
 	{ return v[0] != u[0] || v[1] != u[1] || v[2] != u[2] || v[3] != u[3]; }
 	/// Test for equivalence
-	friend bool operator == (const ddgVector4& u, const ddgVector4& v)
+	inline friend bool operator == (const ddgVector4& u, const ddgVector4& v)
 	{ return v[0] == u[0] && v[1] == u[1] && v[2] == u[2] && v[3] == u[3]; 
 	}
 	/// Test for inequivalence.
-	friend bool operator != (const ddgVector4& u, const ddgVector4& v)
+	inline friend bool operator != (const ddgVector4& u, const ddgVector4& v)
 	{ return v[0] != u[0] || v[1] != u[1] || v[2] != u[2] || v[3] != u[3]; 
 	}
 	/// Create uninitialized.

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -10,57 +10,28 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTLocal2D.cpp
+// NeXTDelegate2D.m
 //
-//	NeXT-specific subclass of csGraphics2D which implements 2D-graphic
-//	functionality via the AppKit.  This file contains methods which are
-//	shared between the MacOS/X Server and OpenStep platforms.  See
-//	NeXTDriver2D.cpp for methods which are shared between MacOS/X Server,
-//	OpenStep, and NextStep.
+//	Objective-C component of the AppKit-based 2D driver for Crystal Space.
+//	This file contains methods which are specific to NextStep.  See
+//	NeXTDriver2D.cpp for driver code which is shared between MacOS/X,
+//	MacOS/X Server 1.0 (Rhapsody), OpenStep, and NextStep.
 //
 //-----------------------------------------------------------------------------
-#include "cssysdef.h"
-#include "NeXTDriver2D.h"
-#include "NeXTDelegate.h"
-#include "NeXTFrameBuffer.h"
+#include "NeXTDelegate2D.h"
 #include "NeXTView.h"
-
-extern "Objective-C" {
+#include <string.h>
 #import <appkit/Application.h>
-#import <appkit/NXBitmapImageRep.h>
 #import <appkit/NXCursor.h>
 #import <appkit/NXImage.h>
 #import <appkit/Window.h>
-}
 
-//-----------------------------------------------------------------------------
-// window_server_depth
-//	Directly query the Window Server for its preferred depth.  Note that
-//	this value may be different from the depth limit reported by the
-//	Window class.  See get_device_depth() for a full discussion.  The
-//	Window Server is queried for its preferred depth by creating a small
-//	image cache which is painted with color so as to promote it from gray
-//	to color.  The Window Server is then asked to return an
-//	NXBitmapImageRep holding the contents of the image cache.  The Window
-//	Server always returns the NXBitmapImageRep in the format which it most
-//	prefers.
-//-----------------------------------------------------------------------------
-static NXWindowDepth window_server_depth()
-    {
-    NXRect const r = {{ 0, 0 }, { 4, 4 }};
-    NXImage* image = [[NXImage alloc] initSize:&r.size];
-    [image lockFocus];
-    NXSetColor( NX_COLORBLUE );
-    NXRectFill(&r);
-    NXBitmapImageRep* rep = [[NXBitmapImageRep alloc] initData:0 fromRect:&r];
-    NXWindowDepth depth;
-    NXGetBestDepth( &depth, [rep numColors], [rep bitsPerSample] );
-    [rep free];
-    [image unlockFocus];
-    [image free];
-    return depth;
-    }
+typedef void* NeXTDelegateHandle2D;
+#define N2D_PROTO(RET,FUNC) RET NeXTDelegate2D_##FUNC
 
+#define TRACK_TAG 9797
+
+@implementation NeXTDelegate2D
 
 //-----------------------------------------------------------------------------
 // best_bits_per_sample
@@ -70,24 +41,10 @@ static NXWindowDepth window_server_depth()
 //	reports 4 or 8 bits per sample, representing 12-bit and 24-bit depths,
 //	respectively.  Other depths still work, but more slowly.  See
 //	CS/docs/texinfo/internal/platform/next.txi for details.
-//
-//	Note that as of OpenStep 4.1, the Window Server may prefer a depth
-//	greater than that of the "deepest" screen as reported by the Window
-//	class.  The reason for this is that "true" RGB/5:5:5 was implemented
-//	in OpenStep 4.1.  Previously this had been simulated with 4:4:4.  A
-//	consequence of this change is that for 5:5:5 displays, the Window
-//	Server actually prefers 24-bit rather than 12-bit RGB as was the case
-//	with previous versions.  It is important to note that the Window class
-//	still reports a depth limit of 12-bit even though the Window Server
-//	prefers 24-bit.  Consequently, window_server_depth() is used to
-//	directly query the WindowServer for its preference instead.  The
-//	behavior in the OpenStep Window Server impacts all applications,
-//	including those compiled with earlier versions of OpenStep or
-//	NextStep.
 //-----------------------------------------------------------------------------
-int NeXTDriver2D::best_bits_per_sample()
+- (int)bestBitsPerSample
     {
-    NXWindowDepth const depth = window_server_depth();
+    NXWindowDepth const depth = [Window defaultDepthLimit];
     if (NXColorSpaceFromDepth( depth ) == NX_RGBColorSpace)
         {
 	int const bps = NXBPSFromDepth( depth );
@@ -97,96 +54,365 @@ int NeXTDriver2D::best_bits_per_sample()
     return 4;
     }
 
+N2D_PROTO(int,best_bits_per_sample)( NeXTDelegateHandle2D handle )
+    { return [(NeXTDelegate2D*)handle bestBitsPerSample]; }
+
 
 //-----------------------------------------------------------------------------
-// shutdown_driver
+// copyString:suffix:
 //-----------------------------------------------------------------------------
-void NeXTDriver2D::shutdown_driver()
+- (char*)copyString:(char const*)s suffix:(char const*)x
     {
-    [[NXApp delegate] showMouse];
-    [[NXApp delegate] registerAnimationWindow:0];
-    Window* window = [view window];
-    [window setDelegate:0];
-    [window close];
-    [window free];	// Window frees NeXTView.
+    char* p = (char*)malloc( strlen(s) + (x == 0 ? 0 : strlen(x)) + 1 );
+    strcpy( p, s );
+    if (x != 0)
+	strcat( p, x );
+    return p;
     }
 
 
 //-----------------------------------------------------------------------------
-// open_window
-//	Opens a titled Window and installs a NeXTView as its contentView.
-//	Registers the window with the application's delegate as its "animation
-//	window".  Passes the raw frame-buffer along to the NeXTView which blits
-//	it directly to the WindowServer via NXBitmapImageRep.
+// freeTitles
+//-----------------------------------------------------------------------------
+- (void)freeTitles
+    {
+    if (plainTitle != 0)
+	{
+	free( plainTitle  ); plainTitle  = 0;
+	free( pausedTitle ); pausedTitle = 0;
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
+// configureTitles
+//-----------------------------------------------------------------------------
+- (void)configureTitles:(char const*)title
+    {
+    [self freeTitles]; // Should not be requried, but just in case.
+    plainTitle  = [self copyString:title suffix:0];
+    pausedTitle = [self copyString:title suffix:"  [Paused]"];
+    }
+
+
+//-----------------------------------------------------------------------------
+// enableMouseMoved:
+//-----------------------------------------------------------------------------
+- (void)enableMouseMoved:(BOOL)enable
+    {
+    if (enable)
+	[window addToEventMask:NX_MOUSEMOVEDMASK];
+    else
+	[window removeFromEventMask:NX_MOUSEMOVEDMASK];
+    }
+
+
+//-----------------------------------------------------------------------------
+// startTrackingMouse
+//-----------------------------------------------------------------------------
+- (void)startTrackingMouse
+    {
+    if (!trackingMouse)
+	{
+	NXPoint p;
+	NXRect r;
+	BOOL mouseInside;
+	[window getMouseLocation:&p];
+	[view getBounds:&r];
+	[view convertRect:&r toView:0];
+	mouseInside = [view mouse:&p inRect:&r];
+	[window setTrackingRect:&r inside:mouseInside owner:self
+	    tag:TRACK_TAG left:NO right:NO];
+	[self enableMouseMoved:mouseInside];
+	if (hideMouse && mouseInside)
+	    NeXTDriver2D_system_extension( driver, "hidemouse", 0, 0 );
+	trackingMouse = YES;
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
+// stopTrackingMouse
+//-----------------------------------------------------------------------------
+- (void)stopTrackingMouse
+    {
+    if (trackingMouse)
+	{
+	[self enableMouseMoved:NO];
+	[window discardTrackingRect:TRACK_TAG];
+	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
+	trackingMouse = NO;
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
+// adjustWindowPosition
+//	For best video performance on NeXT hardware, align left-edge of
+//	NeXTView (the window's contentView) at a position divisible by 8.
+//
+//	See also: CS/docs/texinfo/internal/platform/next.txi and the
+//	NextStep 3.0 WindowServer release notes for an explanation.
+//-----------------------------------------------------------------------------
+- (void)adjustWindowPosition
+    {
+    int const ALIGN = (1 << 3) - 1;	// 8-pixel alignment
+    int x;
+    NXRect vr;
+    [view getBounds:&vr];
+    [view convertPoint:&vr.origin toView:0];
+    [window convertBaseToScreen:&vr.origin];
+    x = (int)vr.origin.x;
+    if ((x & ALIGN) != 0)
+	{
+	NXRect wr;
+	float dx;
+	x &= ~ALIGN;
+	[window getFrame:&wr];
+	dx = vr.origin.x - wr.origin.x;
+	[window moveTo:(x - dx):wr.origin.y];
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
+// openWindow:frameBuffer:bitsPerSample:
+//	Opens a titled window and installs a NeXTView as its contentView.
+//	Modifies the window's event mask to accept flags-changed, and
+//	mouse-dragged events.  Sets up a tracking rectangle around the NeXTView
+//	to capture the mouse when it enters the view's area so that mouse-moved
+//	events can be enabled.  Passes the raw frame-buffer along to the
+//	NeXTView which blits it directly to the WindowServer via
+//	NXBitmapImageRep.
 //
 // *NOTE*
-//	Window must have valid PostScript windowNum before registering with
-//	application's delegate since a tracking rectangle is set up.
-//	Therefore window must be on-screen before registering the window.  The
-//	alternative of using a non-deferred window does not seem to be an
-//	option since, for some inexplicable reason, the contents of a Retained
-//	non-deferred window are never drawn.
+//	Window must have valid WindowServer context (called a `windowNum' in
+//	AppKit parlance) before setting up the tracking rectangle.  Therefore,
+//	the window must be on-screen before doing so.  The alternative approach
+//	of using a non-deferred window to ensure a valid `windowNum' does not
+//	seem to be an option since, for some inexplicable reason, the contents
+//	of a Retained non-deferred window are never drawn.
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::open_window( char const* title )
+- (BOOL)openWindow:(char const*)title width:(int)width height:(int)height
+    frameBuffer:(unsigned char*)frameBuffer bitsPerSample:(int)bitsPerSample
     {
-    NXRect const r = {{ 0, 0 }, { Width, Height }};
-    Window* window = [[Window alloc]
+    NXRect r = {{ 0, 0 }, { width, height }};
+    window = [[Window alloc]
 	initContent:&r
 	style:NX_TITLEDSTYLE
 	backing:NX_RETAINED
 	buttonMask:NX_CLOSEBUTTONMASK
 	defer:YES];
-    [window setTitle:title];
-    [window setFreeWhenClosed:NO];
 
     view = [[NeXTView alloc] initFrame:&r];
-    [view setFrameBuffer:frame_buffer->get_cooked_buffer()
-	bitsPerSample:frame_buffer->bits_per_sample()];
+    [view setFrameBuffer:frameBuffer bitsPerSample:bitsPerSample];
     [[window setContentView:view] free];
 
+    [self configureTitles:title];
+    [window setTitle:plainTitle];
+    [window setFreeWhenClosed:NO];
+    [window addToEventMask:
+	NX_FLAGSCHANGEDMASK | NX_LMOUSEDRAGGEDMASK | NX_RMOUSEDRAGGEDMASK];
     [window center];
+    [self adjustWindowPosition];
+    [window setDelegate:self];
     [window makeFirstResponder:view];
     [window makeKeyAndOrderFront:0];
-    [[NXApp delegate] registerAnimationWindow:window];	// *NOTE*
-    return true;
+
+    [self startTrackingMouse];	// *NOTE*
+    return YES;
     }
 
+N2D_PROTO(int,open_window)( NeXTDelegateHandle2D handle, char const* title,
+    int w, int h, unsigned char* frame_buffer, int bits_per_sample )
+    { return [(NeXTDelegate2D*)handle openWindow:title width:w height:h
+    frameBuffer:frame_buffer bitsPerSample:bits_per_sample]; }
+
 
 //-----------------------------------------------------------------------------
-// Close
+// closeWindow
 //-----------------------------------------------------------------------------
-void NeXTDriver2D::Close()
+- (void)closeWindow
     {
-    [[view window] close];
-    superclass::Close();
+    [self stopTrackingMouse];
+    [window close];
     }
+
+N2D_PROTO(void,close_window)( NeXTDelegateHandle2D handle )
+    { [(NeXTDelegate2D*)handle closeWindow]; }
+
+
+//-----------------------------------------------------------------------------
+// focusChanged
+//-----------------------------------------------------------------------------
+- (void)focusChanged:(BOOL)focused
+    {
+    [window setTitle:(focused ? plainTitle : pausedTitle)];
+    if (focused)
+	[self startTrackingMouse];
+    else
+	[self stopTrackingMouse];
+    }
+
+N2D_PROTO(void,focus_changed)( NeXTDelegateHandle2D handle, int focused )
+    { [(NeXTDelegate2D*)handle focusChanged:(BOOL)focused]; }
 
 
 //-----------------------------------------------------------------------------
 // flush
 //-----------------------------------------------------------------------------
-void NeXTDriver2D::flush()
+- (void)flush
     {
     [view flush];
     DPSFlush();
     }
 
+N2D_PROTO(void,flush)( NeXTDelegateHandle2D handle )
+    { [(NeXTDelegate2D*)handle flush]; }
+
 
 //-----------------------------------------------------------------------------
-// SetMouseCursor
+// setMouseCursor:
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::SetMouseCursor( csMouseCursorID shape )
+- (BOOL)setMouseCursor:(csMouseCursorID)shape
     {
-    bool handled = false;
+    hideMouse = YES;
     if (shape == csmcArrow)
 	{
 	[NXArrow set];
-	handled = true;
+	hideMouse = NO;
 	}
 
-    if (handled)
-	[[NXApp delegate] showMouse];
+    if (hideMouse)
+	NeXTDriver2D_system_extension( driver, "hidemouse", 0, 0 );
     else
-	[[NXApp delegate] hideMouse];
-    return handled;
+	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
+    return !hideMouse;
     }
+
+N2D_PROTO(int,set_mouse_cursor)
+    ( NeXTDelegateHandle2D handle, csMouseCursorID shape )
+    { return [(NeXTDelegate2D*)handle setMouseCursor:shape]; }
+
+
+//-----------------------------------------------------------------------------
+// mouseEntered:
+//-----------------------------------------------------------------------------
+- (id)mouseEntered:(NXEvent*)p
+    {
+    if (p->data.tracking.trackingNum == TRACK_TAG)
+	{
+	[self enableMouseMoved:YES];
+	if (hideMouse)
+	    NeXTDriver2D_system_extension( driver, "hidemouse", 0, 0 );
+	}
+    return self;
+    }
+
+
+//-----------------------------------------------------------------------------
+// mouseExited:
+//-----------------------------------------------------------------------------
+- (id)mouseExited:(NXEvent*)p
+    {
+    if (p->data.tracking.trackingNum == TRACK_TAG)
+	{
+	[self enableMouseMoved:NO];
+	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
+	}
+    return self;
+    }
+
+
+//-----------------------------------------------------------------------------
+// windowDidBecomeKey:
+//-----------------------------------------------------------------------------
+- (id)windowDidBecomeKey:(id)sender
+    {
+    [self startTrackingMouse];
+    return self;
+    }
+
+
+//-----------------------------------------------------------------------------
+// windowDidResignKey:
+//-----------------------------------------------------------------------------
+- (id)windowDidResignKey:(id)sender
+    {
+    [self stopTrackingMouse];
+    return self;
+    }
+
+
+//-----------------------------------------------------------------------------
+// windowDidMove:
+//-----------------------------------------------------------------------------
+- (id)windowDidMove:(id)sender
+    {
+    [self adjustWindowPosition];
+    return self;
+    }
+
+
+//-----------------------------------------------------------------------------
+// windowWillClose:
+//	Terminate the application when the animation-window closes.
+//-----------------------------------------------------------------------------
+- (id)windowWillClose:(id)sender
+    {
+    [self stopTrackingMouse];
+    if (hideMouse)
+	NeXTDriver2D_system_extension( driver, "showmouse", 0, 0 );
+    NeXTDriver2D_user_close( driver );
+    return self;
+    }
+
+
+//-----------------------------------------------------------------------------
+// dispatchEvent:forView:
+//-----------------------------------------------------------------------------
+- (void)dispatchEvent:(NXEvent*)e forView:(View*)v
+    {
+    NeXTDriver2D_system_extension( driver, "dispatchevent", e, v );
+    }
+
+
+//-----------------------------------------------------------------------------
+// initWithDriver:
+//-----------------------------------------------------------------------------
+- (id)initWithDriver:(NeXTDriver2D)p
+    {
+    [super init];
+    driver = p;
+    window = 0;
+    view = 0;
+    trackingMouse = NO;
+    hideMouse = NO;
+    plainTitle = 0;
+    pausedTitle = 0;
+    return self;
+    }
+
+N2D_PROTO(NeXTDelegateHandle2D,new)( NeXTDriver2D driver )
+    { return [[NeXTDelegate2D alloc] initWithDriver:driver]; }
+
+
+//-----------------------------------------------------------------------------
+// free
+//-----------------------------------------------------------------------------
+- (id)free
+    {
+    [window setDelegate:0];
+    [window close];
+    [window free];	// Window frees NeXTView.
+    [self freeTitles];
+    return [super free];
+    }
+
+N2D_PROTO(void,dispose)( NeXTDelegateHandle2D handle )
+    { [(NeXTDelegate2D*)handle free]; }
+
+@end
+
+#undef TRACK_TAG
+#undef N2D_PROTO

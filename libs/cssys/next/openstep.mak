@@ -1,6 +1,6 @@
 #==============================================================================
 #
-#	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+#	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 #
 # The contents of this file are copyrighted by Eric Sunshine.  This work is
 # distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;

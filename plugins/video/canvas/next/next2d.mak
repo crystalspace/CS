@@ -1,10 +1,10 @@
 #==============================================================================
 # This is the default 2D graphics driver makefile for MacOS/X Server,
-# OpenStep, and NextStep.
-# Copyright (C)1998,1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+# OpenStep, and NextStep.  It is based upon the AppKit/Cocoa API.
+# Copyright (C)1998-2001 by Eric Sunshine <sunshine@sunshineco.com>
 #==============================================================================
 
-DESCRIPTION.next2d = Crystal Space Apple/NeXT 2D driver
+DESCRIPTION.next2d = Crystal Space $(NEXT.DESCRIPTION) 2D driver
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -22,7 +22,7 @@ ifeq ($(MAKESECTION),roottargets)
 all plugins drivers drivers2d: next2d
 
 next2d:
-	$(MAKE_TARGET) MAKE_DLL=yes
+	$(MAKE_TARGET) MAKE_DLL=yes DO_NEXT2D=yes
 next2dclean:
 	$(MAKE_CLEAN)
 
@@ -33,7 +33,12 @@ ifeq ($(MAKESECTION),defines)
 
 NEXT.SOURCE_2D_PATHS = \
   $(addprefix plugins/video/canvas/next/,$(NEXT.SEARCH_PATH))
-CFLAGS.INCLUDE += $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_2D_PATHS))
+NEXT.HEADER_2D_PATHS = $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_2D_PATHS))
+
+# Only add header search paths if actually building this plug-in.
+ifeq ($(DO_NEXT2D),yes)
+  CFLAGS.INCLUDE += $(NEXT.HEADER_2D_PATHS)
+endif
 
 endif # ifeq ($(MAKESECTION),defines)
 
@@ -41,6 +46,7 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp $(NEXT.SOURCE_2D_PATHS)
+vpath %.m   $(NEXT.SOURCE_2D_PATHS)
 
 ifeq ($(USE_PLUGINS),yes)
   NEXT2D = $(OUTDLL)next2d$(DLL)
@@ -53,11 +59,13 @@ else
   TO_INSTALL.STATIC_LIBS += $(NEXT2D)
 endif
 
-INC.NEXT2D = $(wildcard $(addsuffix /*.h,$(NEXT.SOURCE_2D_PATHS)) \
-  $(INC.COMMON.DRV2D))
-SRC.NEXT2D = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_2D_PATHS)) \
-  $(SRC.COMMON.DRV2D))
-OBJ.NEXT2D = $(addprefix $(OUT),$(notdir $(SRC.NEXT2D:.cpp=$O)))
+INC.NEXT2D = $(wildcard $(INC.COMMON.DRV2D) \
+  $(addsuffix /*.h,$(NEXT.SOURCE_2D_PATHS)))
+SRC.NEXT2D = $(wildcard $(SRC.COMMON.DRV2D) \
+  $(addsuffix /*.cpp,$(NEXT.SOURCE_2D_PATHS)) \
+  $(addsuffix /*.m,$(NEXT.SOURCE_2D_PATHS)))
+OBJ.NEXT2D = $(addprefix $(OUT), \
+  $(notdir $(subst .cpp,$O,$(SRC.NEXT2D:.m=$O))))
 DEP.NEXT2D =
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -79,7 +87,7 @@ next2dclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)next2d.dep
 $(OUTOS)next2d.dep: $(SRC.NEXT2D)
-	$(DO.DEP)
+	$(DO.DEP1) $(NEXT.HEADER_2D_PATHS) $(DO.DEP2)
 else
 -include $(OUTOS)next2d.dep
 endif

@@ -2,7 +2,7 @@
 #define __NeXT_NeXTMenu_h
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -14,12 +14,20 @@
 //-----------------------------------------------------------------------------
 // NeXTMenu.h
 //
-//	Generate a menu from an INI file definition.
+//	Generate a menu from a configuration file definition.
 //
 //-----------------------------------------------------------------------------
+#include "NeXTConfigFile.h"
 @class Menu;
-struct iConfigFile;
 
-Menu* NeXTMenuGenerate( char const* menu_ident, iConfigFile const* );
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+Menu* NeXTMenuGenerate( char const* menu_ident, NeXTConfigHandle );
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif // __NeXT_NeXTMenu_h

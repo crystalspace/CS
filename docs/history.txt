@@ -1,9 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
 29-Jan-2001
-	- Philip Wyett added a divide by zero check in csSprite3D.
-	  This fixes ptlab on Windows.
-	- Fixed the fix from Philip Wyett to make it slightly more
+	- Philip Wyett added a divide by zero check in csSprite3D.  This fixes
+	  ptlab on Windows.
+	- Jorrit fixed the fix from Philip Wyett to make it slightly more
 	  robust.
 	- Eric Sunshine fixed a bug in csConfigFile where the SetInt(),
 	  SetFloat(), and SetBool() methods would not actually set the key
@@ -12,6 +12,159 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed a bug in csConfigFile where the SetInt(),
 	  SetFloat(), and SetBool() methods were applying `delete[]' to the
 	  Data value twice.
+	- Eric Sunshine made the following changes to the project:
+	    - Added a makefile (macosx.mak) for MacOS/X.  This makefile is for
+	      Apple's new MacOS/X platform using the Cocoa-based Apple/NeXT
+	      port.  Since I do not have access to either MacOS/X or recent
+	      Macintosh hardware, this makefile is currently untested, but I
+	      believe that the project should build cleanly.
+	    - Added new menu definition to next.cfg for MacOS/X which respects
+	      the new Aqua-style interface.  This differs from the existing
+	      menu definition for MacOS/X Server 1.0 (Rhapsody) which is
+	      specific to the Platinum-style interface.
+	    - Eliminated reliance upon the Objective-C++ compiler for the
+	      Apple/NeXT port by reorganizing the code and writing plain-C
+	      stubs which interface between the C++ world of Crystal Space and
+	      the Objective-C world of the AppKit frameworks of Cocoa,
+	      OpenStep, and NextStep.  By eliminating the need for an
+	      Objective-C++ compiler, the project can now be built on MacOS/X
+	      (which does not ship with an Objective-C++ compiler).  The
+	      port-specific .cpp files now contain only pure C++ code.  All of
+	      the Objective-C code has been moved to .m files.  (The standard
+	      file extension for Objective-C source files is .m.)
+	    - Added icursor.h.  This is a pure-C header which contains the
+	      csMouseCursorID constants which used to reside in igraph2d.h.
+	      Also added ievdefs.h.  This is a pure-C header which contains all
+	      of the event-related constants which used to reside in ievent.h.
+	      These files are pure-C, rather than C++, because they must be
+	      included by the Objective-C source files of the Apple/NeXT port.
+	    - Added NeXTDynamicLibrary.cpp, which is the C++ portion of the
+	      plugin loading facility for the Apple/NeXT ports.  The existing
+	      NeXTLoadLibrary.m is now pure Objective-C and publishes a plain-C
+	      interface for use by NeXTDynamicLibrary.
+	    - Added NeXTConfigFile which is a plain-C wrapper over the C++
+	      Crystal Space configuration facility.
+	    - Added rules and support facilities to the Apple/NeXT makefile
+	      (next.mak) for recognition and compilation of Objective-C (.m)
+	      files.  Also added Objective-C support to next2d.mak.
+	    - cssys.mak now sets OBJ.CSSYS conditionally; only if it has not
+	      already been set.  This allows the platform-specific makefile to
+	      override the list of object files for the system driver.  This
+	      facility is used by the Apple/NeXT port to mention Objective-C
+	      (.m) object files in OBJ.CSSYS as well as C and C++ files.
+	    - cssys.mak now automatically invokes `vpath' for all C files in
+	      the system driver source directories (in addition to the `vpath'
+	      for C++ files which it has always invoked).
+	    - NeXTSystemDriver::SystemExtension() understands the following new
+	      messages: "timerfired", "continuelooping", "continuerunning",
+	      "dispatchevent", "hidemouse", "showmouse", and "requestshutdown".
+	    - De-coupled the tight binding which existed between the
+	      AppKit-based NeXT 2D canvas and the NeXT system driver's
+	      Objective-C delegate.  Some of the functionality in NeXTDelegate
+	      was actually specific to the AppKit-based canvas and may not have
+	      been useful or correct for other drivers, such as the planned
+	      OpenGL and CoreGraphics drivers.  The following functionality has
+	      been moved from NeXTDelegate into the canvas plugin:
+		o Setting of "Paused" status message on window when application
+		  is suspended.  The canvas now listens for cscmdFocusChanged
+		  events to implement this behavior.
+		o Creation and management of the window's tracking-rectangle as
+		  well as the associated behavior.
+		o Window event mask management.
+		o Window position adjustment for video optimization.
+		o Response to user initiated window-close events.
+	      Other functionality which may be useful to any canvas
+	      implementation for Apple/NeXT is published by the system driver
+	      via iSystem::SystemExtension().  The messages which may be useful
+	      to 2D drivers include "dispatchevent", "keydown", "keyup",
+	      "mousedown", "mouseup", "mousemoved", "hidemouse", "showmouse",
+	      and "requestshutdown".  Furthermore, the canvas no longer
+	      communicates directly with the system driver's Objective-C proxy
+	      object; nor vice-versa.  All platform-specific communication with
+	      the system driver is now accomplished via
+	      iSystem::SystemExtension().
+	    - The default NeXT 2D canvas plugin no longer includes
+	      NeXTDelegate.h from the CS/libs/cssys/next directory.  2D drivers
+	      now communicate with the platform-specific library strictly via
+	      iSystemDriver::SystemExtension().
+	    - The Objective-C application delegate in the Apple/NeXT port now
+	      listens for application-activation and application-deactivation
+	      notifications in order to suspend and resume the engine rather
+	      than relying on window-activation and window-deactivation
+	      messages.  Not only is this more sensible, but it also helped to
+	      de-couple the AppKit-based 2D canvas from the system driver.
+	    - Fixed a simple logic problem in the AppKit-based Apple/NeXT 2D
+	      graphics driver where it failed to emit a warning message when
+	      the user selected an invalid display depth via the -simdepth
+	      option.
+	    - The AppKit-based 2D canvas for the Apple/NeXT port no longer
+	      relies upon the WindowServer to report its own preferred
+	      bit-depth.  It turns out (so I discovered) that this is an
+	      unreliable operation on OpenStep since the WindowServer will
+	      actually report a different value the very first time the program
+	      is run versus subsequent runs.  Instead, the driver now relies
+	      upon the preferred depth as reported by the NSWindow or Window
+	      class.
+	    - Mouse tracking in the canvas' window is now more accurate when
+	      user switches away from the window or application and then
+	      returns.  In particular, the driver now pays attention to the
+	      mouse's location at the time that it once again begins tracking
+	      the mouse.
+	    - Fixed a problem with the AppKit-based Apple/NeXT 2D driver.  If
+	      the mouse was hidden prior to the application being paused, it
+	      would not be re-hidden when the application resumed.
+	    - The special CFLAGS needed to build the AppKit-based 2D driver
+	      (next2d.mak) are now only applied when explicitly building that
+	      driver rather than being applied to all modules.
+	    - Added a new `inherit' keyword to the list of keywords understood
+	      by NeXTMenu when processing a menu item entry.  This keyword
+	      allows a menu item to inherit attributes from some other menu
+	      item.  These attributes can then be overridden locally.  This
+	      facility is useful, for example, when one menu item definition
+	      differs from another only by its title.
+	    - Added a copious amount of documentation to next.cfg describing
+	      all of the supported configuration options.
+	    - Fixed a bug in NeXTMenu on NextStep where it would fail to
+	      properly build submenus on account of a mis-constructed submenu
+	      key prefix.
+	    - Converted NeXTMenu and NeXTConfigFile to work with new
+	      csConfigFile and related SCF interfaces rather than the
+	      deprecated csIniFile.
+	    - Fixed vfs.cfg so that it works with MacOS/X Server again
+	      following Andrew's change to the meaning of CS_PLATFORM_NAME.
+	    - Fixed the Apple/NeXT system driver and next.cfg so that they once
+	      again work following andrew's change to the meaning of
+	      CS_PLATFORM_NAME.  More importantly, re-added the
+	      OS_NEXT_DESCRIPTION macro since it is needed to properly
+	      distinguish between platform options in next.cfg.  This is
+	      necessary since the menu layout differs between MacOS/X and
+	      MacOS/X Server 1.0 (Rhapsody).  However, Andrew's change made it
+	      impossible to make this distinction.
+	    - Fixed the csMaterial(csTextureWrapper*) constructor so that it
+	      works correctly for the Apple/NeXT platforms when the engine is
+	      used as a plugin module.  The problem was that this constructor
+	      was invoking another constructor in the same class.  The result
+	      of invoking a constructor in this situation is undefined at best
+	      since the C++ specification leaves the behavior up to the
+	      compiler implementation.  In this case, the result was that none
+	      of the instance variables, except `texture', were being
+	      initialized.  In particular, the lack of initialization of the
+	      SCF goop resulted in IncRef() being called infinitely.  Having
+	      fixed this bug, Simplep finally works on Apple/NeXT.
+	    - Fixed a problem where many `friend' functions of ddgMatrix4 and
+	      ddgVector2 were not declared as `inline' in the respective
+	      headers.  This resulted in implementations of these functions
+	      appearing in every file which included those headers, which
+	      ultimately caused linkage errors.
+	    - Eliminated all remaining imports of the deprecated <malloc.h>
+	      from platform-independent project sources files.  (Some
+	      platform-specific files may still include malloc.h, though.)
+	    - Eliminated several compilation warnings reported by the OpenStep
+	      compiler throughout the project regarding implicit conversion of
+	      void* to some other type.
+	    - Eliminated a compilation warning reported by CodeWarrior in
+	      csEventQueue::Lock().  The compiler did not like the empty
+	      statement following the while() loop.
 28-Jan-2001
 	- Eric Sunshine fixed a crasher in PTLab where it was trying to
 	  access a texture (cslogo.gif) which it had never loaded.

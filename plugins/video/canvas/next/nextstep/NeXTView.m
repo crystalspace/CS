@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -9,16 +9,19 @@
 // copyright notice is retained.  Send comments to <sunshine@sunshineco.com>.
 //
 //=============================================================================
-#include "cssysdef.h"
+//-----------------------------------------------------------------------------
+// NeXTView.m
+//
+//	View subclass which provides the AppKit mechanism for blitting
+//	Crystal Space's rendered frame buffer to screen.
+//
+//-----------------------------------------------------------------------------
 #include "NeXTView.h"
-#include "NeXTDelegate.h"
-extern "Objective-C" {
+#include "NeXTDelegate2D.h"
+#include <limits.h>	// CHAR_BIT
+#include <assert.h>
 #import <appkit/Application.h>
 #import <appkit/NXBitmapImageRep.h>
-}
-extern "C" {
-#include <limits.h>	// CHAR_BIT
-}
 
 //=============================================================================
 // IMPLEMENTATION
@@ -27,18 +30,21 @@ extern "C" {
 
 - (BOOL)acceptsFirstResponder { return YES; }
 
-#define DEL(C,E) [[NXApp delegate] C:E inView:self]; return self
-- (id)keyDown:          (NXEvent*)p { DEL( keyDown,           p ); } 
-- (id)keyUp:            (NXEvent*)p { DEL( keyUp,             p ); }
-- (id)flagsChanged:     (NXEvent*)p { DEL( flagsChanged,      p ); }
-- (id)mouseMoved:       (NXEvent*)p { DEL( mouseMoved,        p ); }
-- (id)mouseDown:        (NXEvent*)p { DEL( mouseDown,         p ); }
-- (id)mouseUp:          (NXEvent*)p { DEL( mouseUp,           p ); }
-- (id)mouseDragged:     (NXEvent*)p { DEL( mouseDragged,      p ); }
-- (id)rightMouseDown:   (NXEvent*)p { DEL( rightMouseDown,    p ); }
-- (id)rightMouseUp:     (NXEvent*)p { DEL( rightMouseUp,      p ); }
-- (id)rightMouseDragged:(NXEvent*)p { DEL( rightMouseDragged, p ); }
-#undef DEL
+#define MSG(M) - (id)M:(NXEvent*)e \
+    { [[[self window] delegate] dispatchEvent:e forView:self]; return self; }
+
+MSG(keyDown)
+MSG(keyUp)
+MSG(flagsChanged)
+MSG(mouseMoved)
+MSG(mouseDown)
+MSG(mouseUp)
+MSG(mouseDragged)
+MSG(rightMouseDown)
+MSG(rightMouseUp)
+MSG(rightMouseDragged)
+
+#undef MSG
 
 //-----------------------------------------------------------------------------
 // initFrame:
@@ -75,14 +81,16 @@ extern "C" {
 //-----------------------------------------------------------------------------
 - (void)setFrameBuffer:(unsigned char*)buff bitsPerSample:(int)bits_per_sample
     {
-    unsigned int const w = int(bounds.size.width);
-    unsigned int const h = int(bounds.size.height);
+    NXSize s;
+    unsigned int const w = (unsigned int)bounds.size.width;
+    unsigned int const h = (unsigned int)bounds.size.height;
 
-    CS_ASSERT( bits_per_sample == 4 || bits_per_sample == 8 );
     unsigned int const samples_per_pixel = 3;	// RGB (A is not included).
     unsigned int const bytes_per_pixel = bits_per_sample / 2;
     unsigned int const bytes_per_row = bytes_per_pixel * w;
     unsigned int const bits_per_pixel = bytes_per_pixel * CHAR_BIT;
+
+    assert( bits_per_sample == 4 || bits_per_sample == 8 );
 
     rep = [[NXBitmapImageRep allocFromZone:[self zone]]
 	initData:buff
@@ -95,8 +103,8 @@ extern "C" {
 	colorSpace:NX_RGBColorSpace
 	bytesPerRow:bytes_per_row
 	bitsPerPixel:bits_per_pixel];
-
-    NXSize const s = { w, h };
+    s.width  = w;
+    s.height = h;
     [rep setSize:&s];
     }
 

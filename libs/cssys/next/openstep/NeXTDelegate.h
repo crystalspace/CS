@@ -2,7 +2,7 @@
 #define __NeXT_NeXTDelegate_h
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -14,39 +14,37 @@
 //-----------------------------------------------------------------------------
 // NeXTDelegate.h
 //
-//	A delegate to the Application and animation Window.  Acts as a gateway
-//	between the AppKit and CrystalSpace by forwarding Objective-C messages
-//	and events to the C++ system driver, NeXTSystemDriver.  In particular,
-//	mouse and keyboard related events from the animation view are
-//	translated into CrystalSpace format and forwarded.  Application and
-//	Window events (such as application termination) are also handled.
+//	The application's delegate.  Acts as a gateway between the AppKit and
+//	Crystal Space by forwarding Objective-C messages and events to the C++
+//	system driver, NeXTSystemDriver.
 //
 //-----------------------------------------------------------------------------
-extern "Objective-C" {
+#include "NeXTConfigFile.h"
+
+#if !defined(__cplusplus)
+
 #import <Foundation/NSObject.h>
-#import <AppKit/NSView.h>	// NSTrackingRectTag
-}
-@class NSString, NSTimer, NSWindow;
-class NeXTSystemDriver;
+#include "cssys/next/NeXTSystemDriver.h"
+@class NSEvent, NSTimer, NSView, NSWindow;
 
 @interface NeXTDelegate : NSObject
     {
-    NeXTSystemDriver* driver;
-    NSWindow* animationWindow;
+    NeXTSystemDriver driver;
     NSTimer* timer;
     unsigned long modifiers;
     BOOL mouseHidden;
     BOOL paused;
     BOOL autoResume;
-    BOOL tracking;
-    NSTrackingRectTag trackingTag;
-    NSString* savedTitle;
     }
 
-- (id)initWithDriver:(NeXTSystemDriver*)driver;
-- (BOOL)windowShouldClose:(id)sender;
-- (void)windowDidMove:(NSNotification*)n;
-- (void)registerAnimationWindow:(NSWindow*)w; // Must have valid windowNum.
++ (NeXTDelegate*)startup:(NeXTSystemDriver)driver;
++ (void)shutdown:(NeXTDelegate*)controller;
+
+- (id)initWithDriver:(NeXTSystemDriver)driver;
+- (void)initApplicationMenu:(NeXTConfigHandle)handle style:(char const*)style;
+
+- (void)startTimer;
+- (void)stopTimer;
 - (void)resetTimer;
 
 - (void)pause;
@@ -56,20 +54,40 @@ class NeXTSystemDriver;
 - (void)showMouse;
 - (void)hideMouse;
 
-- (void)mouseEntered:(NSEvent*)p;
-- (void)mouseExited: (NSEvent*)p;
-
-- (void)keyDown:          (NSEvent*)p inView:(NSView*)v;
-- (void)keyUp:            (NSEvent*)p inView:(NSView*)v;
-- (void)flagsChanged:     (NSEvent*)p inView:(NSView*)v;
-- (void)mouseMoved:       (NSEvent*)p inView:(NSView*)v;
-- (void)mouseDown:        (NSEvent*)p inView:(NSView*)v;
-- (void)mouseUp:          (NSEvent*)p inView:(NSView*)v;
-- (void)mouseDragged:     (NSEvent*)p inView:(NSView*)v;
-- (void)rightMouseDown:   (NSEvent*)p inView:(NSView*)v;
-- (void)rightMouseUp:     (NSEvent*)p inView:(NSView*)v;
-- (void)rightMouseDragged:(NSEvent*)p inView:(NSView*)v;
+- (void)dispatchEvent:    (NSEvent*)p forView:(NSView*)v;
+- (void)keyDown:          (NSEvent*)p forView:(NSView*)v;
+- (void)keyUp:            (NSEvent*)p forView:(NSView*)v;
+- (void)flagsChanged:     (NSEvent*)p forView:(NSView*)v;
+- (void)mouseMoved:       (NSEvent*)p forView:(NSView*)v;
+- (void)mouseDown:        (NSEvent*)p forView:(NSView*)v;
+- (void)mouseUp:          (NSEvent*)p forView:(NSView*)v;
+- (void)mouseDragged:     (NSEvent*)p forView:(NSView*)v;
+- (void)rightMouseDown:   (NSEvent*)p forView:(NSView*)v;
+- (void)rightMouseUp:     (NSEvent*)p forView:(NSView*)v;
+- (void)rightMouseDragged:(NSEvent*)p forView:(NSView*)v;
 
 @end
+
+#else // __cplusplus
+
+#define ND_PROTO(RET,FUNC) extern "C" RET NeXTDelegate_##FUNC
+
+typedef void* NeXTSystemHandle;
+typedef void* NeXTDelegate;
+typedef void* NeXTEvent;
+typedef void* NeXTView;
+
+ND_PROTO(NeXTDelegate,startup)( NeXTSystemHandle );
+ND_PROTO(void,shutdown)( NeXTDelegate );
+ND_PROTO(void,init_app_menu)( NeXTDelegate, NeXTConfigHandle, char const* );
+ND_PROTO(void,start_event_loop)( NeXTDelegate );
+ND_PROTO(void,stop_event_loop)( NeXTDelegate );
+ND_PROTO(void,dispatch_event)( NeXTDelegate, NeXTEvent, NeXTView );
+ND_PROTO(void,hide_mouse)( NeXTDelegate );
+ND_PROTO(void,show_mouse)( NeXTDelegate );
+
+#undef ND_PROTO
+
+#endif // __cplusplus
 
 #endif // __NeXT_NeXTDelegate_h

@@ -12,7 +12,7 @@
 
 #include <string.h>
 #include <math.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 unsigned char*
 GenerateNova (int iSize, int iSeed, int iNumSpokes, float iRoundness)

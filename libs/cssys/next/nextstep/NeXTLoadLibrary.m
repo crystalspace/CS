@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -10,7 +10,7 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTLoadLibrary.cpp
+// NeXTLoadLibrary.m
 //
 //	NextStep-specific dynamic library loading and symbol lookup.
 //
@@ -28,98 +28,101 @@
 //	`module_GetClassTable' symbol to be present.)
 //
 //-----------------------------------------------------------------------------
-#include "cssysdef.h"
-#include "cssys/csshlib.h"
-#include "csutil/csstring.h"
-
-extern "C" {
+#include "NeXTLoadLibrary.h"
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h> // access()
 #include <mach-o/rld.h>
 #include <objc/objc-load.h>
 #include <streams/streams.h>
-}
 
-static csString CS_ERROR_MESSAGE;
-static void clear_error_message() { CS_ERROR_MESSAGE.Free(); }
+static char* CS_ERROR_MESSAGE = 0;
 
 //-----------------------------------------------------------------------------
-// csFindLoadLibrary
+// clear_error_message
 //-----------------------------------------------------------------------------
-csLibraryHandle csFindLoadLibrary( char const* name )
+static void clear_error_message()
     {
-    static bool initialized = false;
-    if (!initialized)
+    if (CS_ERROR_MESSAGE != 0)
 	{
-	initialized = true;
-        csAddLibraryPath( OS_NEXT_PLUGIN_DIR );
+	free( CS_ERROR_MESSAGE );
+	CS_ERROR_MESSAGE = 0;
 	}
-    return csFindLoadLibrary( 0, name, OS_NEXT_PLUGIN_EXT );
     }
 
 
 //-----------------------------------------------------------------------------
-// csLoadLibrary
+// set_error_message
 //-----------------------------------------------------------------------------
-csLibraryHandle csLoadLibrary( char const* path )
+static void set_error_message( NXStream* stream )
     {
-    csLibraryHandle handle = 0;
+    char* buff;
+    int len, maxlen;
     clear_error_message();
+    NXGetMemoryBuffer( stream, &buff, &len, &maxlen );
+    if (len > 0)
+	{
+	CS_ERROR_MESSAGE = (char*)malloc( len + 1 );
+	strncpy( CS_ERROR_MESSAGE, buff, len );
+	CS_ERROR_MESSAGE[ len ] = '\0';
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
+// NeXTLoadLibrary
+//-----------------------------------------------------------------------------
+NeXTLibraryHandle NeXTLoadLibrary( char const* path )
+    {
+    NeXTLibraryHandle handle = 0;
+    NXStream* stream = NXOpenMemory( 0, 0, NX_WRITEONLY );
     if (access( path, F_OK ) == 0)
 	{
 	char const* const files[2] = { path, 0 };
 	struct mach_header* header = 0;
-	NXStream* stream = NXOpenMemory( 0, 0, NX_WRITEONLY );
 	if (objc_loadModules( (char**)files, stream, 0, &header, 0 ) == 0)
-	    handle = (csLibraryHandle)header;
-	else
-	    {
-	    char* buff;
-	    int len, maxlen;
-	    NXGetMemoryBuffer( stream, &buff, &len, &maxlen );
-	    CS_ERROR_MESSAGE.Append( buff, len );
-	    }
-	NXCloseMemory( stream, NX_FREEBUFFER );
+	    handle = (NeXTLibraryHandle)header;
 	}
     else
-	CS_ERROR_MESSAGE << "File does not exist (" << path << ')';
+	NXPrintf( stream, "File does not exist (%s)", path );
+    set_error_message( stream );
+    NXCloseMemory( stream, NX_FREEBUFFER );
     return handle;
     }
 
 
 //-----------------------------------------------------------------------------
-// csGetLibrarySymbol
+// NeXTGetLibrarySymbol
 //-----------------------------------------------------------------------------
-void* csGetLibrarySymbol( csLibraryHandle handle, char const* s )
+void* NeXTGetLibrarySymbol( NeXTLibraryHandle handle, char const* s )
     {
-    csString symbol;
-    symbol << '_' << s;
     unsigned long address = 0;
     NXStream* stream = NXOpenFile( 2, NX_WRITEONLY );
+    char* symbol = (char*)malloc( strlen(s) + 2 ); // '_' + s + '\0'
+    *symbol = '_';
+    strcpy( symbol + 1, s );
     if (rld_lookup( stream, symbol, &address ) == 0)
-	NXPrintf( stream, "Symbol undefined: %s\n", symbol.GetData() );
+	NXPrintf( stream, "Symbol undefined: %s\n", symbol );
     NXClose( stream );
+    free( symbol );
     return (void*)address;
     }
 
 
 //-----------------------------------------------------------------------------
-// csUnloadLibrary
+// NeXTUnloadLibrary
 //-----------------------------------------------------------------------------
-bool csUnloadLibrary( csLibraryHandle )
+int NeXTUnloadLibrary( NeXTLibraryHandle handle )
     {
-    return true; // Unimplemented.
+    (void)handle;
+    return 1; // Unimplemented (1=success).
     }
 
 
 //-----------------------------------------------------------------------------
-// csPrintLibraryError
+// NeXTGetLibraryError
 //-----------------------------------------------------------------------------
-void csPrintLibraryError( char const* name )
+char const* NeXTGetLibraryError()
     {
-    fprintf( stderr, "ERROR: Failed to load plug-in module `%s'.\n", name );
-    if (!CS_ERROR_MESSAGE.IsEmpty())
-	{
-	fprintf( stderr, "Reason: %s\n", CS_ERROR_MESSAGE.GetData() );
-	clear_error_message();
-	}
+    return CS_ERROR_MESSAGE;
     }

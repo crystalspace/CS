@@ -1,6 +1,6 @@
 #==============================================================================
 # This is the system makefile for MacOS/X Server, OpenStep, and NextStep.
-# Copyright (C)1998,1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)1998-2001 by Eric Sunshine <sunshine@sunshineco.com>
 #==============================================================================
 
 # Only one of the cover makefiles should be including this file. Ignore others.
@@ -69,6 +69,12 @@ ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
 
+# Add support for Objective-C (.m) source code.
+.SUFFIXES: .m
+
+# How to compile a .m source
+DO.COMPILE.M = $(OBJC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+
 # Multi-architecture binary (MAB) support.
 NEXT.ARCH_FLAGS = $(foreach arch,$(NEXT.TARGET_ARCHS),-arch $(arch))
 
@@ -106,17 +112,13 @@ JPG_LIBS = $(LFLAGS.l)jpeg
 SOUND_LIBS =
 
 # Indicate where special include files can be found.
-# @@@FIXME: Should not be using CS/libs/csys/next as include path.  This is
-# only currently needed because 2D driver includes NeXTDelegate.h.  In the
-# future, decouple 2D driver from dependence upon system driver.
 CFLAGS.INCLUDE = $(NEXT.INCLUDE_DIRS) \
   $(addprefix $(CFLAGS.I),$(NEXT.SOURCE_PATHS)) \
   $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
-#CFLAGS.INCLUDE = $(NEXT.INCLUDE_DIRS) \
-#  $(CFLAGS.I)libs/zlib $(CFLAGS.I)libs/libpng $(CFLAGS.I)libs/libjpeg
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL = $(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) -fno-common -pipe
+CFLAGS.GENERAL = $(NEXT.CFLAGS.GENERAL) $(NEXT.ARCH_FLAGS) \
+  -Wno-precomp -fno-common -pipe
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize = $(NEXT.CFLAGS.OPTIMIZE)
@@ -153,7 +155,10 @@ LFLAGS.DLL = $(NEXT.LFLAGS.DLL)
 NASMFLAGS.SYSTEM =
 
 # System dependent source files included into CSSYS library
-SRC.SYS_CSSYS = $(wildcard $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS))) \
+SRC.SYS_CSSYS = $(wildcard \
+  $(addsuffix /*.cpp,$(NEXT.SOURCE_PATHS)) \
+  $(addsuffix /*.c,$(NEXT.SOURCE_PATHS))) \
+  $(addsuffix /*.m,$(NEXT.SOURCE_PATHS))) \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp
@@ -165,7 +170,10 @@ OUTDLL = $(NEXT.PLUGIN_DIR)
 CC = cc -c
 
 # The C++ compiler.
-CXX = cc -ObjC++ -c
+CXX = cc -c
+
+# The Objective-C compiler.
+OBJC = cc -c
 
 # The linker.
 LINK = cc
@@ -185,6 +193,15 @@ endif # ifeq ($(MAKESECTION),defines)
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+# Add support for Objective-C (.m) source code.
+$(OUT)%$O: %.m
+	$(DO.COMPILE.M)
+
+OBJ.CSSYS = $(addprefix $(OUT),$(notdir \
+  $(subst .s,$O,$(subst .c,$O,$(subst .cpp,$O,$(SRC.CSSYS:.m=$O))))))
+
+vpath %.m libs/cssys $(sort $(dir $(SRC.SYS_CSSYS)))
+
 # Multiple -arch flags cause the compiler to barf when generating dependency
 # information, so we filter out -arch commands.  This step is performed under
 # `postdefines' rather than `defines' since we want to use the existing
@@ -192,7 +209,10 @@ ifeq ($(MAKESECTION),postdefines)
 DO.DEP1 := $(subst $(NEXT.ARCH_FLAGS),,$(DO.DEP1))
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND = -e "s/\.cpp\.o \:/\.o\:/g"
+SYS_SED_DEPEND = \
+  -e "s/\.cpp\.o \:/\.o\:/g" \
+  -e "s/\.c\.o \:/\.o\:/g" \
+  -e "s/\.m\.o \:/\.o\:/g"
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -208,7 +228,8 @@ SYSHELP += $(NEXT.SYSHELP)
 
 # System-dependent help commands
 SYSMODIFIERSHELP += \
-  $(NEWLINE)echo $"  TARGET_ARCHS="$(sort $(NEXT.ARCHS.ALL))" ($(strip $(NEXT.DESCRIPTION.ALL)))$" \
+  $(NEWLINE)echo $"  TARGET_ARCHS="$(sort $(NEXT.ARCHS.ALL))" $" \
+  $(NEWLINE)echo $"      Specific to: $(strip $(NEXT.DESCRIPTION.ALL))$" \
   $(NEWLINE)echo $"      Target architectures to build.  If not specified, then the current$" \
   $(NEWLINE)echo $"      architecture is used.  Possible values are:$" \
   $(NEXT.ARCHS.HELP)
@@ -240,7 +261,7 @@ ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
 SYSCONFIG += \
-  $(NEWLINE)bin/comptest.sh "cc -ObjC++">>config.tmp \
+  $(NEWLINE)bin/comptest.sh cc>>config.tmp \
   $(NEWLINE)bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
@@ -250,6 +271,7 @@ ifeq ($(ROOTCONFIG),volatile)
 
 MAKE_VOLATILE_H += \
   $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp \
+  $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp \
   $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_DIR "$(NEXT.PLUGIN_DIR)"$">>volatile.tmp \
   $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_EXT "$(NEXT.PLUGIN_EXT)"$">>volatile.tmp
 
