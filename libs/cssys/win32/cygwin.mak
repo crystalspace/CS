@@ -2,6 +2,7 @@
 
 # Friendly names for building environment
 DESCRIPTION.cygwin = Win32 with Cygnus GCC
+DESCRIPTION.OS.cygwin = Win32
 
 # Choose which drivers you want to build/use
 # video/canvas/ddraw6 video/canvas/openglwin video/renderer/direct3d5 

@@ -3,6 +3,7 @@
 
 # Friendly names for building environment
 DESCRIPTION.solaris = Solaris
+DESCRIPTION.OS.solaris = Solaris
 
 # Choose which 2D/3D driver combinations you want to build/use
 PLUGINS+=video/renderer/software video/canvas/softx

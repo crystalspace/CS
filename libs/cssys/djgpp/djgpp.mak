@@ -4,6 +4,7 @@
 
 # Friendly names for building environment
 DESCRIPTION.djgpp = DOS/DJGPP
+DESCRIPTION.OS.djgpp = DOS
 
 PLUGINS+=video/renderer/software
 

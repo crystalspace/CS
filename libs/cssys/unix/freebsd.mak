@@ -3,6 +3,7 @@
 
 # Friendly names for building environment
 DESCRIPTION.freebsd = FreeBSD
+DESCRIPTION.OS.freebsd = FreeBSD
 
 # Choose which drivers you want to build/use
 PLUGINS+=video/canvas/softx video/renderer/software \

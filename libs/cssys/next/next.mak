@@ -11,6 +11,7 @@ PLUGINS += video/canvas/next video/renderer/software
 
 ifneq ($(NEXT.TARGET),)
   DESCRIPTION.$(NEXT.TARGET) := $(NEXT.DESCRIPTION)
+  DESCRIPTION.OS.$(NEXT.TARGET) = $(NEXT.DESCRIPTION.OS)
 endif
 
 #----------------------------------------- rootdefines, defines, config ------#

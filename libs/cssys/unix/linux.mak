@@ -3,6 +3,7 @@
 
 # Friendly names for building environment
 DESCRIPTION.linux = Linux
+DESCRIPTION.OS.linux = Linux
 
 # Choose which 2D/3D driver combinations you want to build/use
 PLUGINS+=video/canvas/softx video/renderer/software

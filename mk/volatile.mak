@@ -54,7 +54,7 @@ MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define PROC_$(PROC)$">>volatile.tmp
 MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define COMP_$(COMP)$">>volatile.tmp
 
 ifneq ($(DESCRIPTION.$(TARGET)),)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_PLATFORM_NAME "$(DESCRIPTION.$(TARGET))"$">>volatile.tmp
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_PLATFORM_NAME "$(DESCRIPTION.OS.$(TARGET))"$">>volatile.tmp
 endif
 ifneq ($(PROC.NAME),)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_PROCESSOR_NAME "$(PROC.NAME)"$">>volatile.tmp

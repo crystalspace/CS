@@ -2,6 +2,7 @@
 
 # Friendly names for building environment
 DESCRIPTION.borland = Windows with Borland
+DESCRIPTION.OS.borland = Win32
 
 # Choose which drivers you want to build/use
 # video/canvas/ddraw6 video/canvas/openglwin video/renderer/direct3d5 

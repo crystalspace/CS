@@ -2,6 +2,7 @@
 
 # Friendly names for building environment
 DESCRIPTION.win32gcc = Windows with MinGW32 GNU C/C++
+DESCRIPTION.OS.win32gcc = Win32
 
 # Choose which drivers you want to build/use
 PLUGINS+= sound/renderer/software
