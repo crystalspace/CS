@@ -94,10 +94,7 @@ csTextureDirect3D::~csTextureDirect3D ()
 
 void *csTextureDirect3D::get_bitmap ()
 {
-  csGraphics3DDirect3DDx6 *G3D = ((csTextureMMDirect3D *)parent)->G3D;
-  G3D->GetTextureCache()->cache_texture (parent);
-  csD3DCacheData *cd = (csD3DCacheData *)parent->GetCacheData ();
-  return (void *)cd;
+  return image;
 }
 
 //---------------------------------------------------------------------------
