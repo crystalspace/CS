@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Collision Detection, HOWTO Mesh LightAnim, HOWTO, HOWTO
+@node HOWTO Collision Detection, HOWTO Mesh LightAnim, HOWTO Smart Pointers, HOWTO
 @subsection Doing Collision Detection
 @cindex @code{csColliderWrapper}
 @cindex @code{iCollideSystem}
