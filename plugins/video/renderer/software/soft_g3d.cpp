@@ -439,7 +439,7 @@ void csGraphics3DSoftware::ScanSetup ()
   } /* endswitch */
 }
 
-csDrawScanline csGraphics3DSoftware::ScanProc_8_Alpha
+csDrawScanline* csGraphics3DSoftware::ScanProc_8_Alpha
   (csGraphics3DSoftware *This, int alpha)
 {
   TextureTablesAlpha *lt_alpha = This->txtmgr->lt_alpha;
@@ -465,7 +465,7 @@ csDrawScanline csGraphics3DSoftware::ScanProc_8_Alpha
   return csScan_8_draw_scanline_map_zfil;
 }
 
-csDrawScanline csGraphics3DSoftware::ScanProc_16_Alpha
+csDrawScanline* csGraphics3DSoftware::ScanProc_16_Alpha
   (csGraphics3DSoftware *This, int alpha)
 {
   Scan.AlphaMask = This->txtmgr->alpha_mask;
@@ -487,7 +487,7 @@ csDrawScanline csGraphics3DSoftware::ScanProc_16_Alpha
     return csScan_16_draw_scanline_map_alpha_565;
 }
 
-csDrawScanline csGraphics3DSoftware::ScanProc_32_Alpha
+csDrawScanline* csGraphics3DSoftware::ScanProc_32_Alpha
   (csGraphics3DSoftware* /*This*/, int alpha)
 {
   Scan.AlphaFact = (alpha * 256) / 100;
@@ -863,7 +863,7 @@ HRESULT csGraphics3DSoftware::DrawPolygonFlat (G3DPolygonDPF& poly)
   int scan_index = SCANPROC_FLAT_ZFIL;
   if (z_buf_mode == ZBuf_Use)
     scan_index++;
-  csDrawScanline dscan = ScanProc [scan_index];
+  csDrawScanline* dscan = ScanProc [scan_index];
   if (!dscan)
     goto finish;			// Nothing to do.
 
@@ -1182,7 +1182,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
   // Select the right scanline drawing function.
   bool tex_transp = Scan.Texture->get_transparent ();
   int  scan_index = -2;
-  csDrawScanline dscan = NULL;
+  csDrawScanline* dscan = NULL;
 
   if (Scan.tmap2)
   {
@@ -1595,7 +1595,7 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
   Scan.dM = M*Scan.InterpolStep;
 
   // Select the right scanline drawing function.
-  csDrawScanline dscan = NULL;
+  csDrawScanline* dscan = NULL;
   int scan_index = fog_type == CS_FOG_FRONT ?
     SCANPROC_FOG : fog_type == CS_FOG_BACK ?
     SCANPROC_ZFIL : fog_type == CS_FOG_VIEW ?
@@ -1752,8 +1752,8 @@ static struct
   bool textured;
   bool do_gouraud;
   float r, g, b;
-  csDrawPIScanline drawline;
-  csDrawPIScanlineGouraud drawline_gouraud;
+  csDrawPIScanline* drawline;
+  csDrawPIScanlineGouraud* drawline_gouraud;
 } pqinfo;
 
 STDMETHODIMP csGraphics3DSoftware::StartPolygonQuick (ITextureHandle* handle,

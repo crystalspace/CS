@@ -135,20 +135,20 @@ private:
   int DrawMode;
 
   /// draw_scanline_xxx routines
-  csDrawScanline ScanProc [0x14];
+  csDrawScanline* ScanProc [0x14];
   /// draw_pi_scanline_xxx routines
-  csDrawPIScanline ScanProcPI [4];
+  csDrawPIScanline* ScanProcPI [4];
   /// draw_pi_scanline_gouraud_xxx routines
-  csDrawPIScanlineGouraud ScanProcPIG [4];
+  csDrawPIScanlineGouraud* ScanProcPIG [4];
   /// The routine for getting the address of needed scanline_xxx_alpha
-  csDrawScanline (*ScanProc_Alpha) (csGraphics3DSoftware *This, int alpha);
+  csDrawScanline* (*ScanProc_Alpha) (csGraphics3DSoftware *This, int alpha);
 
   /// ScanProc_Alpha for 8 bpp modes
-  static csDrawScanline ScanProc_8_Alpha (csGraphics3DSoftware *This, int alpha);
+  static csDrawScanline* ScanProc_8_Alpha (csGraphics3DSoftware *This, int alpha);
   /// ScanProc_Alpha for 16 bpp modes
-  static csDrawScanline ScanProc_16_Alpha (csGraphics3DSoftware *This, int alpha);
+  static csDrawScanline* ScanProc_16_Alpha (csGraphics3DSoftware *This, int alpha);
   /// ScanProc_Alpha for 32 bpp modes
-  static csDrawScanline ScanProc_32_Alpha (csGraphics3DSoftware *This, int alpha);
+  static csDrawScanline* ScanProc_32_Alpha (csGraphics3DSoftware *This, int alpha);
 
   G3D_FOGMETHOD fogMode;
 

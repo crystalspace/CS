@@ -153,17 +153,17 @@ struct csScanSetup
 extern csScanSetup Scan;
 
 /// The interface definition for all draw_scanline_XXX routines
-typedef void (*csDrawScanline)
+typedef void (csDrawScanline)
   (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
    float u_div_z, float v_div_z);
 /// The interface definition for all draw_pi_scanline_XXX routines
-typedef void (*csDrawPIScanline)
+typedef void (csDrawPIScanline)
   (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
    unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
-typedef void (*csDrawPIScanlineGouraud)
+typedef void (csDrawPIScanlineGouraud)
   (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
    unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+   ULong r, ULong g, ULong b, long dr, long dg, long db);
 
 //---//---//---//---//---//---//---//---//---//---//---//---//- Routines //---//
 
@@ -268,18 +268,12 @@ extern "C" void csScan_8_mmx_draw_scanline_tex_zfil
  * to be called before using.
  */
 /// Draw a perspective-incorrect texture mapped polygon scanline. Z fill only
-extern "C" void csScan_8_draw_pi_scanline_tex_zfil
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline csScan_8_draw_pi_scanline_tex_zfil;
 /// Draw a perspective-incorrect texture mapped polygon scanline
-extern "C" void csScan_8_draw_pi_scanline_tex_zuse
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline csScan_8_draw_pi_scanline_tex_zuse;
 #ifdef DO_MMX
 /// Draw a perspective-incorrect texture mapped polygon scanline using MMX
-extern "C" void csScan_8_mmx_draw_pi_scanline_tex_zuse
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline csScan_8_mmx_draw_pi_scanline_tex_zuse;
 #endif
 
 //---//---//---//---//---//---//---//---//---//- 16-bit drawing routines //---//
@@ -378,80 +372,45 @@ extern "C" void csScan_16_mmx_draw_scanline_tex_zfil
    float u_div_z, float v_div_z);
 #endif
 
+
 /// Draw a perspective-incorrect texture mapped polygon scanline. Z fill only
-extern "C" void csScan_16_draw_pi_scanline_tex_zfil
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline csScan_16_draw_pi_scanline_tex_zfil;
+
 /// Draw a perspective-incorrect texture mapped polygon scanline
-extern "C" void csScan_16_draw_pi_scanline_tex_zuse
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline csScan_16_draw_pi_scanline_tex_zuse;
+
 /// Draw a flat-lighted perspective-incorrect texture mapped polygon scanline
-extern "C" void csScan_16_draw_pi_scanline_flat_zuse
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline csScan_16_draw_pi_scanline_flat_zuse;
+
 /// Draw a flat-lighted perspective-incorrect textured scanline with Z-fill
-extern "C" void csScan_16_draw_pi_scanline_flat_zfil
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline csScan_16_draw_pi_scanline_flat_zfil;
+
 #ifdef DO_MMX
 /// Draw a perspective-incorrect texture mapped polygon scanline
-extern "C" void csScan_16_mmx_draw_pi_scanline_tex_zuse
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline csScan_16_mmx_draw_pi_scanline_tex_zuse;
 #endif
 
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading. Z fill only
-extern "C" void csScan_16_draw_pi_scanline_tex_gouraud_zfil_555
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_tex_gouraud_zfil_555;
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading. Z fill only
-extern "C" void csScan_16_draw_pi_scanline_tex_gouraud_zfil_565
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_tex_gouraud_zfil_565;
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading.
-extern "C" void csScan_16_draw_pi_scanline_tex_gouraud_zuse_555
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_tex_gouraud_zuse_555;
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading.
-extern "C" void csScan_16_draw_pi_scanline_tex_gouraud_zuse_565
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_tex_gouraud_zuse_565;
 
 /// Draw a single-color Gouraud-shaded polygon in 5-5-5 pixel format with Z-fill
-extern "C" void csScan_16_draw_pi_scanline_flat_gouraud_zfil_555
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zfil_555;
 /// Draw a single-color Gouraud-shaded polygon in 5-6-5 pixel format with Z-fill
-extern "C" void csScan_16_draw_pi_scanline_flat_gouraud_zfil_565
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zfil_565;
 /// Draw a single-color Gouraud-shaded polygon in 5-5-5 pixel format
-extern "C" void csScan_16_draw_pi_scanline_flat_gouraud_zuse_555
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zuse_555;
 /// Draw a single-color Gouraud-shaded polygon in 5-6-5 pixel format
-extern "C" void csScan_16_draw_pi_scanline_flat_gouraud_zuse_565
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_flat_gouraud_zuse_565;
 
-extern "C" void csScan_16_draw_pi_scanline_transp_gouraud_565
-  (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_transp_gouraud_565;
 
-extern "C" void csScan_16_draw_pi_scanline_transp_gouraud_555
-  (void *dest, int len, long *zbuff, long u, long du,
-  long v, long dv, long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-  long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_16_draw_pi_scanline_transp_gouraud_555;
 
 //---//---//---//---//---//---//---//---//---//- 32-bit scanline drawers //---//
 
@@ -481,8 +440,6 @@ extern "C" void csScan_32_draw_scanline_map_zuse
    float u_div_z, float v_div_z);
 
 
-
-
 /// Draw one horizontal scanline for fog.
 extern "C" void csScan_32_draw_scanline_fog
   (int xx, unsigned char* d, unsigned long* z_buf, float inv_z,
@@ -506,41 +463,27 @@ extern "C" void csScan_32_draw_scanline_map_alpha
    float u_div_z, float v_div_z);
 
 /// Draw a perspective-incorrect flat shaded polygon scanline with Z-fill
-extern "C" void csScan_32_draw_pi_scanline_flat_zfil
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline        csScan_32_draw_pi_scanline_flat_zfil;
+
 /// Draw a perspective-incorrect flat shaded polygon scanline
-extern "C" void csScan_32_draw_pi_scanline_flat_zuse
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline        csScan_32_draw_pi_scanline_flat_zuse;
+
 /// Draw a perspective-incorrect texture mapped polygon scanline. Z fill only
-extern "C" void csScan_32_draw_pi_scanline_tex_zfil
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline        csScan_32_draw_pi_scanline_tex_zfil;
+
 /// Draw a perspective-incorrect texture mapped polygon scanline
-extern "C" void csScan_32_draw_pi_scanline_tex_zuse
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w);
+extern "C" csDrawPIScanline        csScan_32_draw_pi_scanline_tex_zuse;
 
 /// Draw a perspective-incorrect flat shaded polygon scanline with Gouraud and Z-fill
-extern "C" void csScan_32_draw_pi_scanline_flat_gouraud_zfil
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_flat_gouraud_zfil;
+
 /// Draw a perspective-incorrect flat shaded polygon scanline with Gouraud shading
-extern "C" void csScan_32_draw_pi_scanline_flat_gouraud_zuse
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_flat_gouraud_zuse;
+
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading.
-extern "C" void csScan_32_draw_pi_scanline_tex_gouraud_zfil
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zfil;
+
 /// Draw a perspective-incorrect texture mapped polygon scanline with gouraud shading. Z fill only
-extern "C" void csScan_32_draw_pi_scanline_tex_gouraud_zuse
-  (void *dest, int len, unsigned long *zbuff, long u, long du, long v, long dv,
-   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w,
-   long r, long g, long b, long dr, long dg, long db);
+extern "C" csDrawPIScanlineGouraud csScan_32_draw_pi_scanline_tex_gouraud_zuse;
 
 #endif // __SCAN_H__

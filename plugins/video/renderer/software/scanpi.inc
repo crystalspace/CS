@@ -71,7 +71,7 @@ void PI_SCANFUNC (void *dest, int len,
   unsigned long *zbuff, long u, long du, long v, long dv,
   unsigned long z, long dz, unsigned char *bitmap, int bitmap_log2w
 #ifdef GOURAUD
-  ,long r, long g, long b, long dr, long dg, long db
+  ,ULong r, ULong g, ULong b, long dr, long dg, long db
 #endif
   )
 {
@@ -125,9 +125,9 @@ void PI_SCANFUNC (void *dest, int len,
             r1 =  tex >> REDSHIFT;
             g1 = (tex >> GREENSHIFT) & GREENMASK;
             b1 =  tex  & BLUEMASK;
-            r1 = (r1*(ULong)r) >> (16+REDBITS);
-            g1 = (g1*(ULong)g) >> (16+GREENBITS);
-            b1 = (b1*(ULong)b) >> (16+BLUEBITS);
+            r1 = (r1*r) >> (16+REDBITS);
+            g1 = (g1*g) >> (16+GREENBITS);
+            b1 = (b1*b) >> (16+BLUEBITS);
           #endif
           tex = (r1<<REDSHIFT) | (g1<<GREENSHIFT) | b1;
         #endif
