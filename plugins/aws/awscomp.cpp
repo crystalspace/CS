@@ -7,8 +7,9 @@
 #include <stdio.h>
 
 
-awsComponent::awsComponent():children(NULL)
+awsComponent::awsComponent():wmgr(NULL),children(NULL)
 {
+  hidden = true; // initially set it hidden to cause the marking of a dirty rectangle upon first Show ()
 }
 
 awsComponent::~awsComponent()
@@ -39,7 +40,7 @@ awsComponent::~awsComponent()
 bool 
 awsComponent::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
-  if (!wmgr) return false;
+  if (wmgr) return false;
 
   wmgr = _wmgr;
   
