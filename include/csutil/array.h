@@ -72,8 +72,9 @@ public:
 
   // The 'relevantcount' parameter should be the number of items
   // in the old array that are initialized.
-  static T* Realloc (T* mem, int /*relevantcount*/, int /*oldcount*/, int newcount)
+  static T* Realloc (T* mem, int relevantcount, int oldcount, int newcount)
   {
+    (void)relevantcount; (void)oldcount;
     return (T*)realloc (mem, newcount * sizeof(T));
   }
 };
