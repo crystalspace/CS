@@ -2291,7 +2291,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     tr_verts.SetLimit (num_vertices);
     uv_verts.SetLimit (num_vertices);
-    uv_mul_verts.SetLimit (num_vertices);//@@@ Should not be needed?
+		// @@@ Should not be needed - Work-around for ATI bug ... REDEYE
+    uv_mul_verts.SetLimit (num_vertices);
+		// @@@
     color_verts.SetLimit (num_vertices);
   }
 
