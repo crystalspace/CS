@@ -152,7 +152,7 @@ public:
        return false;
      }
  
-     /// Gets the property specified, setting the parameter to a COPY of the property's value. Returns false if there's no such property.
+    /// Gets the property specified, setting the parameter to a COPY of the property's value. Returns false if there's no such property.
     virtual bool GetProperty(const char *name, void **parm)
     { return comp->GetProperty(name, parm); }
 

@@ -1,6 +1,4 @@
-
 #include "csutil/scf.h"
-
 
 struct iAwsDockSite;
 struct iAwsDockableWindow;

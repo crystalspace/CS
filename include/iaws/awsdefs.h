@@ -85,7 +85,7 @@ const unsigned int AWS_TRANSITION_SLIDE_DOWN  = 11;
  * @{ */
  
 //! no error
-const unsigned int AWS_ERR_SINK_NONE	      	= 0;  
+const unsigned int AWS_ERR_SINK_NONE	      	    = 0;  
 //! the requested trigger was not found
 const unsigned int AWS_ERR_SINK_TRIGGER_NOT_FOUND   = 1;  
 //! could not handle trigger, because there are none.

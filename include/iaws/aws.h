@@ -87,6 +87,11 @@ const int AWSF_AlwaysRedrawWindows=2;
   */
 const int AWSF_RaiseOnMouseOver = 4;
 
+/** This flag allwos focusing controls using TAB (CTR + TAB) key, calling Click events
+  * using ENTER key and some other features that are not finifshed yet.
+  */
+const int AWSF_KeyboardControl = 8;
+
 /** @} */
 
 
@@ -242,6 +247,12 @@ public:
 
   /// Set the top component
   virtual void SetTopComponent(iAwsComponent *win)=0;
+
+  /// Get the focused component
+  virtual iAwsComponent *GetFocusedComponent()=0;
+
+  /// Set the focused component
+  virtual void SetFocusedComponent(iAwsComponent * _focused)=0;
 
   /// Finds the smallest visible component which contains the point (x,y)
   virtual iAwsComponent* ComponentAt(int x, int y)=0;
@@ -702,6 +713,15 @@ struct iAwsComponent : public iAwsSource
   /// Returns the state of the hidden flag
   virtual bool isHidden()=0;
 
+  /// Sets focusable flag
+  virtual void SetFocusable(bool _focusable)=0;
+
+  /// Returns focusable flag
+  virtual bool Focusable()=0;
+
+  /// Returns the state of the focused flag
+  virtual bool isFocused()=0;
+
   /// Returns true if the component is maximized
   virtual bool IsMaximized()=0;
 
@@ -710,6 +730,12 @@ struct iAwsComponent : public iAwsSource
 
   /// Shows a component
   virtual void Show()=0;
+
+  /// Focus a component
+  virtual void SetFocus()=0;
+
+  /// Unfocus a component
+  virtual void UnsetFocus()=0;
 
   /// Moves a component
   virtual void Move(int delta_x, int delta_y)=0;
@@ -765,7 +791,7 @@ struct iAwsComponent : public iAwsSource
   /// Get's a specific child
   virtual iAwsComponent *GetTopChild()=0;
 
-    /// Get's the component above this one, NULL if there is none.
+  /// Get's the component above this one, NULL if there is none.
   virtual iAwsComponent *ComponentAbove()=0;
 
   /// Get's the component below this one, NULL if there is none.
@@ -776,6 +802,27 @@ struct iAwsComponent : public iAwsSource
 
   /// Set's the component below this one
   virtual void SetComponentBelow(iAwsComponent *comp)=0;
+
+	//Add child to TabOrder
+
+	/*Actually at this moment TabOrder is csVector that contains all children
+	of component ordered by their creation.*/ 
+
+  virtual bool AddToTabOrder(iAwsComponent *child)=0;
+
+  /// Get's next child component in parent TabOrder, 
+	//  First if there is none, NULL, if child not belongs to this component
+  virtual iAwsComponent *TabNext(iAwsComponent *child)=0;
+
+  /// Get's previous child component in parent TabOrder,
+	//  Last if there is none, NULL, if child not belongs to this component
+  virtual iAwsComponent *TabPrev(iAwsComponent *child)=0;
+
+  /// Returns TabOrder length
+  virtual int GetTabLength()=0;
+
+  /// Returns component from TabOrder, NULL if there is none or index is invalid
+  virtual iAwsComponent *GetTabComponent(int index)=0;
 
   /// Moves this component above all its siblings
   virtual void Raise()=0;
@@ -849,6 +896,11 @@ struct iAwsComponent : public iAwsSource
   /// Triggered when a child becomes shown
   virtual void OnChildShow()=0;
 
+  /// Triggered when a child becomes focused
+  virtual void OnSetFocus()=0;
+
+  /// Triggered when a child becomes unfocused
+  virtual void OnUnsetFocus()=0;
 
   /* Only awsComponent should make use of the funcs below. Nothing else =) */
 
