@@ -28,6 +28,10 @@ chronological order.
 	      structures than projects created by jamtemplate).
 	    - Augmented the CS msvcgen templates to utilize %sourceroot% and
 	      %buildroot%.
+	- Eric Sunshine fixed CS_CHECK_PTHREAD (checkpthread.m4) so that it
+	  sets cs_cv_sys_pthread_recursive=no if cs_cv_sys_pthread == no. This
+	  fixes problem where AS_IF() configure.ac emitted error about missing
+	  argument to 'test' binary operator if pthread was absent.
 16-May-2004
         - Philip Wyett eliminated gcc compiler warnings in simpleformer.cpp.
         - Andrew Craig enhanced viewmesh by letting the user select a mesh 

@@ -74,7 +74,8 @@ AC_DEFUN([CS_CHECK_PTHREAD],
 		[cs_cv_sys_pthread_recursive=no],
 		[$cs_cv_sys_pthread_cflags -D_GNU_SOURCE],
 		[$cs_cv_sys_pthread_lflags],
-		[$cs_cv_sys_pthread_libs])])])])])
+		[$cs_cv_sys_pthread_libs])])],
+	[cs_cv_sys_pthread_recursive=no])])])
 
 m4_define([cs_pthread_flags],
     [CS_CREATE_TUPLE() \

@@ -5505,6 +5505,8 @@ fi
 fi
 echo "$as_me:$LINENO: result: $cs_cv_sys_pthread_recursive" >&5
 echo "${ECHO_T}$cs_cv_sys_pthread_recursive" >&6
+else
+  cs_cv_sys_pthread_recursive=no
 fi
 
 if test "$cs_cv_sys_pthread" = yes; then
