@@ -79,6 +79,7 @@ void WalkTest::CreateColliders ()
     ThingType = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.mesh.object.thing", iMeshObjectType);
 
+  plugin_mgr->DecRef ();
   iMeshObjectFactory* thing_fact = ThingType->NewFactory ();
   iMeshObject* mesh_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
   thing_fact->DecRef ();
