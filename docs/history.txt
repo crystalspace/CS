@@ -29,6 +29,17 @@ chronological order.
 	  the array of visible meshes on the stack. This can potentially cause
 	  a stack overflow very soon. Especially in combination with portal
 	  based worlds.
+	- Jorrit created a new PVS tree structure in the PVS visibility
+	  culler. There is also an interface (iStaticPVSTree) to access
+	  this tree from outside the plugin. The idea is that this interface
+	  will be used by the PVS calculation tool to actually fill in the
+	  PVS for the culler. The tree implementation should be mostly
+	  finished but of course it is totally untested since neither PVSvis
+	  nor PVScalc work.
+	- Jorrit added the iPVSCuller interface which is implemented by
+	  the PVSvis culler. This is the first time a culler implements
+	  a specific interface. This will be used to fetch the PVS tree
+	  from a culler (for PVScalc).
 22-Dec-2004
 	- Philipp Aumayr fixed a bug in the thing where the bounding box was not
 	  invalidated when a quad was added.. this fixes a culling probs with

@@ -33,6 +33,7 @@
 #include "iengine/shadcast.h"
 #include "iengine/mesh.h"
 #include "imesh/thing.h"
+#include "pvstree.h"
 
 class csKDTree;
 class csKDTreeChild;
@@ -84,7 +85,7 @@ public:
 /**
  * A PVS based visisibility culling system.
  */
-class csPVSVis : public iVisibilityCuller
+class csPVSVis : public iVisibilityCuller, public iPVSCuller
 {
 public:
   // List of objects to iterate over (after VisTest()).
@@ -101,6 +102,9 @@ private:
   csPDelArray<csPVSVisObjectWrapper> visobj_vector;
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_vistest_nr;
+
+  // The PVS information.
+  csStaticPVSTree pvstree;
 
   // This hash set holds references to csPVSVisObjectWrapper instances
   // that require updating in the culler.
@@ -181,6 +185,9 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
   } scfiComponent;
+
+  // For iPVSCuller
+  virtual iStaticPVSTree* GetPVSTree () { return &pvstree; }
 };
 
 #endif // __CS_PVSVIS_H__
