@@ -111,7 +111,7 @@ csOBBLine3::csOBBLine3 (const csVector3 &a, const csVector3 &b)
   mDir = mA - mB;
   mLength = mDir.SquaredNorm();
   if (ABS (mLength) < 0.0001)
-    mDir.Set (99999999, 99999999, 99999999);
+    mDir.Set (1, 0, 0);
   else
     mDir /= qsqrt (mLength);
 }
@@ -180,7 +180,7 @@ bool csOBBTreeNode::Split ()
 
 csOBBTreePair::csOBBTreePair (csOBBTreePairHeap &heap,
 	csOBBTreeNode *a, csOBBTreeNode *b)
-	: mHeap(heap), mPointPair (a->GetLeftPoint(), b->GetRightPoint())
+	: mHeap(heap)
 {
   CS_ASSERT (a && b);
   mA = a; mB = b;
@@ -198,7 +198,7 @@ csOBBTreePair::csOBBTreePair (csOBBTreePairHeap &heap,
 
   csVector3 vmax = a->GetLeftPoint(), vmin = b->GetRightPoint();
   csVector3 **c;
-  for (c = a->GetLeftPointRef(); c < a->GetRightPointRef(); c ++)
+  for (c = a->GetLeftPointRef(); c <= a->GetRightPointRef(); c ++)
   {
     if ((**c)[dim] > vmax[dim])
     {
@@ -209,7 +209,7 @@ csOBBTreePair::csOBBTreePair (csOBBTreePairHeap &heap,
       vmin = **c;
     }
   }
-  for (c = b->GetLeftPointRef(); c < b->GetRightPointRef(); c ++)
+  for (c = b->GetLeftPointRef(); c <= b->GetRightPointRef(); c ++)
   {
     if ((**c)[dim] > vmax[dim])
     {
@@ -408,7 +408,14 @@ void csOBB::FindOBB (const csVector3 *vertex_table, int num, float eps)
   tree = new csOBBTree (proj_vt, num);
   csOBBLine3 l2;
   tree->Diameter (l2, eps);
-  csVector3 dir2 = l2.Direction();
+  csVector3 dir2;
+  if (ABS (l2.Length()) < 0.0001) {
+    dir2 = l2.Direction();
+    dir2 = dir2 - dir1 * (dir1 * dir2);
+    dir2.Normalize();
+  } else {
+    dir2 = l2.Direction();
+  }
   delete tree;
   delete[] proj_vt;
 
