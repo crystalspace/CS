@@ -19,32 +19,22 @@
 */
 
 #include "cssysdef.h"
-
-#include "csutil/hashmap.h"
+#include "csgeom/vector3.h"
+#include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glstates.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/csmd5.h"
-#include "csutil/scfstr.h"
-#include "csgeom/vector3.h"
-#include "csutil/xmltiny.h"
-
-#include "iutil/document.h"
 #include "iutil/comp.h"
+#include "iutil/document.h"
 #include "iutil/plugin.h"
-#include "ivideo/material.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/rndbuf.h"
+#include "ivideo/material.h"
 #include "ivideo/shader/shader.h"
-
-#include "csplugincommon/opengl/glextmanager.h"
-#include "csplugincommon/opengl/glstates.h"
-
 #include "glshader_ffp.h"
 #include "glshader_fixed.h"
-
 
 ////////////////////////////////////////////////////////////////////
 //                          csGLShaderFFP

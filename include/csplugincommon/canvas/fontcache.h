@@ -27,7 +27,6 @@
 #include "csextern.h"
 #include "csutil/csunicode.h"
 #include "csutil/list.h"
-#include "csutil/hashmap.h"
 #include "csutil/blockallocator.h"
 #include "csutil/refcount.h"
 #include "ivideo/fontserv.h"

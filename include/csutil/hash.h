@@ -604,7 +604,7 @@ public:
 
   /**
    * Construct a new empty set.
-   * The given size will be passed to the hashmap.
+   * The given size will be passed to the hash map.
    */
   csSet (int size = 23, int grow_rate = 5, int max_size = 20000)
   	: map (size, grow_rate, max_size)

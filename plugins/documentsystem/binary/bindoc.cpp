@@ -18,26 +18,21 @@
 */
 
 #include "cssysdef.h"
-
-#include "iutil/document.h"
-#include "iutil/databuff.h"
-#include "iutil/vfs.h"
-#include "iutil/string.h"
-#include "csutil/databuf.h"
 #include "csutil/csstring.h"
-#include "csutil/util.h"
+#include "csutil/databuf.h"
 #include "csutil/memfile.h"
-#include "csutil/hashmap.h"
-#include "csutil/hashmapr.h"
 #include "csutil/snprintf.h"
 #include "csutil/sysfunc.h"
-
+#include "csutil/util.h"
+#include "iutil/databuff.h"
+#include "iutil/document.h"
+#include "iutil/string.h"
+#include "iutil/vfs.h"
 #include "bindoc.h"
 
 // =================================================
 //  csBinaryDocAttributeIterator
 // =================================================
-
 
 SCF_IMPLEMENT_IBASE(csBinaryDocAttributeIterator)
   SCF_IMPLEMENTS_INTERFACE(iDocumentAttributeIterator)

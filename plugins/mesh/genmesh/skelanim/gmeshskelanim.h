@@ -23,29 +23,27 @@
 #ifndef __CS_GENMESHSKELANIM_H__
 #define __CS_GENMESHSKELANIM_H__
 
-#include "csgeom/vector3.h"
-#include "csgeom/transfrm.h"
 #include "csgeom/quaterni.h"
+#include "csgeom/transfrm.h"
+#include "csgeom/vector3.h"
 #include "csutil/array.h"
-#include "csutil/parray.h"
-#include "csutil/stringarray.h"
-#include "csutil/csstring.h"
 #include "csutil/cscolor.h"
+#include "csutil/csstring.h"
+#include "csutil/parray.h"
+#include "csutil/refarr.h"
+#include "csutil/stringarray.h"
 #include "imesh/genmesh.h"
 #include "imesh/gmeshskel.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"
-#include "csutil/refarr.h"
-#include "csutil/hashmap.h"
-//#include "iphysics/dynamics.h"
 #include "ivaria/dynamics.h"
 
-struct iEvent;
 class csGenmeshSkelAnimationControl;
 class csGenmeshSkelAnimationControlFactory;
 class csGenmeshSkelAnimationControlType;
 class csSkelAnimControlRunnable;
+struct iEvent;
 
 /**
  * Vertex information for a bone.

@@ -17,26 +17,16 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-
+#include "csgeom/vector3.h"
 #include "csutil/databuf.h"
-#include "csutil/hashmap.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/scfstr.h"
-#include "csutil/csmd5.h"
-#include "csgeom/vector3.h"
-#include "csutil/xmltiny.h"
-
 #include "iutil/document.h"
 #include "iutil/string.h"
-#include "iutil/strset.h"
-#include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-
 #include "glshader_ps1.h"
 #include "ps1_emu_common.h"
 
@@ -118,4 +108,3 @@ bool csShaderGLPS1_Common::Compile(
 
   return LoadProgramStringToGL();
 }
-

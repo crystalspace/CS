@@ -63,8 +63,6 @@
 #include "csutil/fpu80x86.h"
 #include "csutil/hash.h"
 #include "csutil/hashhandlers.h"
-#include "csutil/hashmap.h"
-#include "csutil/hashmapr.h"
 #include "csutil/hashr.h"
 #include "csutil/indprint.h"
 #include "csutil/inputdef.h"

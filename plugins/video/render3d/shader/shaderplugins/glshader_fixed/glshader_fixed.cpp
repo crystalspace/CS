@@ -18,29 +18,21 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-
-#include "csutil/hashmap.h"
+#include "csgeom/vector3.h"
+#include "csplugincommon/opengl/glextmanager.h"
+#include "csplugincommon/opengl/glstates.h"
+#include "csplugincommon/shader/shaderplugin.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/csmd5.h"
-#include "csutil/scfstr.h"
-#include "csgeom/vector3.h"
-
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
-
-#include "csplugincommon/opengl/glextmanager.h"
-#include "csplugincommon/opengl/glstates.h"
-
 #include "glshader_ffp.h"
 #include "glshader_fvp.h"
 #include "glshader_fixed.h"
-
-#include "csplugincommon/shader/shaderplugin.h"
 
 CS_LEAKGUARD_IMPLEMENT (csGLShader_FIXED);
 

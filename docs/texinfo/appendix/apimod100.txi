@@ -312,6 +312,8 @@ global namespace.
 @code{PROC_FOO} @result{} @code{CS_PROCESSOR_FOO} (where @samp{FOO} is
 @samp{X86}, @samp{M68K}, etc.)
 @item
+@code{ProcEventHandler()} @result{} @code{csProcEventHandler}
+@item
 @code{QInt()} @result{} @code{csQint()}
 @item
 @code{QInt8()} @result{} @code{csQfixed8()}
@@ -1518,3 +1520,11 @@ Instead use the @samp{bruteblock} terrain engine.
 
 @noindent
 @code{crystalspace.mesh.object.terrain.bruteblock}
+
+@subheading @samp{csHashMap} and @samp{csHashSet} Removal
+
+The long-deprecated @samp{csHashMap}, @samp{csHashMapReversible}, and
+@samp{csHashSet} classes have been removed. Instead, use the templated classes
+@code{csHash<>}, @code{csHashReversible<>}, and @code{csSet<>}.  For
+string-related @dfn{set} functionality, you may also want to consider using
+@samp{csStringHash} and @samp{csStringSet}.

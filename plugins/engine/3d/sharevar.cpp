@@ -17,10 +17,8 @@
 */
 #include "cssysdef.h"
 #include "csqint.h"
-#include "plugins/engine/3d/sharevar.h"
 #include "csutil/csstring.h"
-#include "csutil/hashmap.h"
-
+#include "plugins/engine/3d/sharevar.h"
 
 CS_LEAKGUARD_IMPLEMENT (csSharedVariable);
 

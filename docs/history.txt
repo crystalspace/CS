@@ -39,6 +39,9 @@ chronological order.
 	  order to avoid global namespace pollution.
 	- Eric Sunshine converted csProcTexEventHandler to use csSet<> rather
 	  than the deprecated csHashSet.
+	- Eric Sunshine removed the long-deprecated csHashMap,
+	  csHashMapReversible, and csHashSet classes. Use instead the templated
+	  classes csHash<>, csHashReversible<>, and csSet<>.
 29-Mar-2005
 	- Jorrit disabled the new `clearWithBox' rule in gldrivers.xml
 	  because it breaks screen clearing on his nVidia card. If this is

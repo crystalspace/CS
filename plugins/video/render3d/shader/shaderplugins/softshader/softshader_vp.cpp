@@ -18,25 +18,17 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-
-#include "csutil/hashmap.h"
+#include "csgeom/vector3.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/scfstr.h"
-#include "csutil/csmd5.h"
-#include "csgeom/vector3.h"
 #include "csutil/xmltiny.h"
-
 #include "iutil/document.h"
 #include "iutil/string.h"
 #include "iutil/vfs.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
-//#include "ivideo/shader/shadervar.h"
-
 #include "softshader_vp.h"
 
 SCF_IMPLEMENT_IBASE(csSoftShader_VP)

@@ -21,23 +21,21 @@
 #ifndef __CS_ODEDYNAMICS_H__
 #define __CS_ODEDYNAMICS_H__
 
-#include "csgeom/vector3.h"
-#include "csutil/nobjvec.h"
-#include "csutil/dirtyaccessarray.h"
-#include "csutil/refarr.h"
-#include "csutil/hashmap.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/vector3.h"
+#include "csutil/dirtyaccessarray.h"
+#include "csutil/nobjvec.h"
+#include "csutil/refarr.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
 #include "iutil/comp.h"
-
 #include "ivaria/dynamics.h"
 #include "ivaria/ode.h"
 
-struct iObjectRegistry;
-struct iVirtualClock;
 struct iMeshWrapper;
 struct iODEFrameUpdateCallback;
+struct iObjectRegistry;
+struct iVirtualClock;
 
 ////////////////////////////////////////////
 // NOTE

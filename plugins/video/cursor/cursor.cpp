@@ -329,7 +329,7 @@ bool csCursor::SwitchCursor (const char *name)
   return true;
 }
 
-// Uses a hashmap to store named cursors
+// Uses a hash map to store named cursors
 void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor* key,
                           csPoint hotspot, uint8 transparency, 
                           csRGBcolor fg, csRGBcolor bg)

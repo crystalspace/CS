@@ -43,7 +43,7 @@ box routines, rectangle subdivision, etc. @xref{csGeom}.
 
 @item
 General utility library with stuff like templated arrays, smart pointer,
-hashmap, object registry, plugin manager, radix sort, bit array, optimized
+hash map, object registry, plugin manager, radix sort, bit array, optimized
 allocators, strings, etc. @xref{csUtil}.
 
 @item

@@ -18,35 +18,31 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/kdtree.h"
 #include "csqint.h"
 #include "csqsqrt.h"
-#include "csutil/csstring.h"
-#include "csutil/hashmap.h"
 #include "csutil/csppulse.h"
+#include "csutil/csstring.h"
 #include "csutil/debug.h"
-#include "iutil/vfs.h"
-#include "iutil/plugin.h"
-#include "iutil/objreg.h"
-#include "iutil/virtclk.h"
-#include "csgeom/kdtree.h"
+#include "iengine/portal.h"
+#include "iengine/rview.h"
 #include "igeom/clip2d.h"
+#include "imesh/lighting.h"
+#include "iutil/objreg.h"
+#include "iutil/plugin.h"
+#include "iutil/vfs.h"
+#include "iutil/virtclk.h"
+#include "ivaria/bugplug.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
-#include "ivideo/txtmgr.h"
+#include "ivideo/rendermesh.h"
 #include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 #include "plugins/engine/3d/engine.h"
-#include "plugins/engine/3d/sector.h"
 #include "plugins/engine/3d/light.h"
 #include "plugins/engine/3d/material.h"
 #include "plugins/engine/3d/rview.h"
-#include "iengine/rview.h"
-#include "iengine/portal.h"
-#include "imesh/lighting.h"
-
-#include "ivaria/bugplug.h"
-
-#include "ivideo/rendermesh.h"
-
+#include "plugins/engine/3d/sector.h"
 
 // Configuration variable: number of allowed reflections for static lighting.
 int csSector:: cfg_reflections = 1;

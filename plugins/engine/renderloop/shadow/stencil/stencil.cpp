@@ -455,7 +455,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
     shadowcache.Get (mesh, 0);
   if (shadowCacheEntry == 0) 
   {
-    /* need the extra reference for the hashmap */
+    /* need the extra reference for the hash map */
     shadowCacheEntry = new csStencilShadowCacheEntry (this, mesh);
     shadowcache.Put (mesh, shadowCacheEntry);
   }
@@ -602,7 +602,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
       csRef<iObjectModel> model = 
 	obj->GetMeshObject ()->GetObjectModel ();
       if (!model) { continue; } // Can't do shadows on this
-      /* need the extra reference for the hashmap */
+      /* need the extra reference for the hash map */
       shadowCacheEntry = new csStencilShadowCacheEntry (this, obj);
       shadowcache.Put (obj, shadowCacheEntry);
     }

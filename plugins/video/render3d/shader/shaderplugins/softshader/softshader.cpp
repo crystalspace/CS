@@ -18,24 +18,17 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-
-#include "csutil/hashmap.h"
+#include "csgeom/vector3.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
 #include "csutil/scf.h"
-#include "csutil/csmd5.h"
-#include "csutil/scfstr.h"
-#include "csgeom/vector3.h"
-
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "ivaria/reporter.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
-
 #include "softshader_vp.h"
 #include "softshader_fp.h"
-
 #include "softshader.h"
 
 iObjectRegistry* csSoftShader::object_reg = 0;

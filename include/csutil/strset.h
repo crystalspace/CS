@@ -42,8 +42,8 @@ private:
 public:
 
   /**
-   * Constructor for an iterator to iterate over all elements in a hashmap.
-   * Note that you should not do changes on the hashmap when you have
+   * Constructor for an iterator to iterate over all elements in a hash map.
+   * Note that you should not do changes on the hash map when you have
    * open iterators.
    */
   csStringSetIterator (csStringSet* hash);

@@ -131,7 +131,7 @@ public:
 
   /**
    * Construct an iterator to iterate over all elements in the string hash.
-   * \remarks You should not make changes to the hashmap when you have open
+   * \remarks You should not make changes to the hash map when you have open
    *   iterators.
    */
   csStringHashIterator (csStringHash*);
