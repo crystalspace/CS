@@ -17,6 +17,8 @@ chronological order.
 	  typedef to morph into a semantic error.
 	- Eric Sunshine retired the long-deprecated CS_SYSDEF_PROVIDE_SOCKETS.
 	  Instead, #include <csutil/sockets.h> explicitly.
+	- Eric Sunshine updated the cal3d "sufficiently recent" check in
+	  configure.ac so that it demands the latest CVS version of cal3d.
 1-Aug-2004
 	- Eric Sunshine made csBaseEventHandler::HandleEvent() protected rather
 	  than private. This makes it possible for subclasses to deal with

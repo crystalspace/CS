@@ -27000,7 +27000,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalModel m; m.getMixer()->removeAction(0);
+CalCoreModel m; m.addAnimationName("",0);
   ;
   return 0;
 }
@@ -27151,7 +27151,7 @@ cat >>conftest.$ac_ext <<_ACEOF
 int
 main ()
 {
-CalModel m; m.getMixer()->removeAction(0);
+CalCoreModel m; m.addAnimationName("",0);
   ;
   return 0;
 }
