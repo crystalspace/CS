@@ -805,9 +805,6 @@ int converter::data_read ( void ) {
   else if ( leqi ( filein_type, "VLA" ) == TRUE ) {
     ierror = vla_read ( filein );
   }
-  else if ( leqi ( filein_type, "MDL" ) == TRUE) {
-    ierror = mdl_read ( filein );
-  }
   else {
     fprintf ( logfile,  "\n" );
     fprintf ( logfile,  "DATA_READ - Error!\n" );

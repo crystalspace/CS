@@ -50,6 +50,12 @@ bool csDataStream::Finished ()
   return (Position == Size);
 }
 
+void csDataStream::Skip (int num)
+{
+  Position += num;
+  if (Position > Size) Position = Size;
+}
+
 int csDataStream::Read (void *buf, int n)
 {
   if (Position + n > Size)

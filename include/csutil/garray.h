@@ -63,10 +63,11 @@
       SetLength (length-1); }						\
     ga_type *GetArray ()						\
     { return root; }							\
-    void Push (const ga_type &val, int iGrowStep = 8)			\
+    int Push (const ga_type &val, int iGrowStep = 8)			\
     {									\
       SetLength (length + 1, iGrowStep);				\
       memcpy (root + length - 1, &val, sizeof (ga_type));		\
+      return length-1;							\
     }									\
     void Insert (int pos, const ga_type &val, int iGrowStep = 8)	\
     {									\

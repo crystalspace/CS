@@ -46,6 +46,8 @@ public:
   int GetLength ();
   /// Returns true if the stream has finished
   bool Finished ();
+  /// Skip the given amount of bytes
+  void Skip (int num);
 
   /// Read a buffer of data. Returns the number of bytes actually read.
   int Read (void *buf, int NumBytes);

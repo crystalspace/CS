@@ -232,7 +232,6 @@ int                iv_read ( FILE *filein );
 int                iv_write ( FILE *fileout );
 int                ivec_max ( int n, int *a );
 int                leqi ( char* string1, char* string2 );
-int		   mdl_read ( FILE *filein );
 void               minmax ( void );
 void               news ( void );
 int                obj_read ( FILE *filein );

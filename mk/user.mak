@@ -44,6 +44,7 @@ PLUGINS += mesh/impexp/iv          mesh/impexp/md2
 PLUGINS += mesh/impexp/obj         mesh/impexp/pov
 PLUGINS += mesh/impexp/smf         mesh/impexp/spr
 PLUGINS += mesh/impexp/stla        mesh/impexp/vla
+PLUGINS += mesh/impexp/mdl
 PLUGINS += mesh/cube/object        mesh/cube/persist/classic
 PLUGINS += mesh/spr2d/object       mesh/spr2d/persist/classic
 PLUGINS += mesh/spr3d/object       mesh/spr3d/persist/classic

@@ -24,8 +24,8 @@
 #include "csutil/datastrm.h"
 #include "csutil/csstring.h"
 #include "csutil/nobjvec.h"
+#include "csutil/garray.h"
 
-/*
 // all int's in an MDL file are little endian
 #include "cssys/csendian.h"
 
@@ -38,9 +38,7 @@ static int const SIZEOF_MDLLONG = 4;
 static int const SIZEOF_MDLFLOAT = 4;
 static int const SIZEOF_MDLSKINNAME = 64;
 static int const SIZEOF_MDLFRAMENAME = 16;
-
-CS_DECLARE_TYPED_VECTOR (csStringVector, csString);
-CS_DECLARE_OBJECT_VECTOR (csVertexFrameVector, iModelDataVertices);
+static int const SIZEOF_MDLHEADER = 11 * SIZEOF_MDLFLOAT + 8 * SIZEOF_MDLLONG;
 
 struct csMDLHeader
 {
@@ -52,14 +50,15 @@ struct csMDLHeader
   csVector3 CameraPosition;
   // number of skins, width and height of the skin texture
   long SkinCount, SkinWidth, SkinHeight;
-  // number of vertices, triangles and frames
-  long VertexCount, TriangleCount, FrameCount;
+  // number of vertices, triangles and actions
+  long VertexCount, TriangleCount, ActionCount;
   // ???
   long SyncType, Flags;
   // average triangle size (?)
   float AverageTriangleSize;
 };
-*/
+
+CS_TYPEDEF_GROWING_ARRAY (csVector2Array, csVector2);
 
 // ---------------------------------------------------------------------------
 
@@ -159,7 +158,6 @@ const csModelConverterFormat *csModelConverterMDL::GetFormat (int idx) const
   Modified by Martin Geisse to work with the new converter system.
 */
 
-/*
 static bool CheckMDLVersion (csDataStream &in)
 {
   // Read in header and check for a correct file.  The
@@ -183,32 +181,49 @@ static bool CheckMDLVersion (csDataStream &in)
 
 #define CS_MDL_READ_LONG(name)						\
   hdr->name = get_le_long (buf + Position);				\
-  Position += SIZEOF_MDL_LONG;
+  Position += SIZEOF_MDLLONG;
 
 #define CS_MDL_READ_FLOAT(name)						\
-  hrd->name = convert_endian(*((float*)(buf + Position)));		\
-  Position += SIZEOF_MDL_FLOAT;
+  hdr->name = convert_endian(*((float*)(buf + Position)));		\
+  Position += SIZEOF_MDLFLOAT;
 
 static void ReadMDLHeader (csMDLHeader *hdr, csDataStream *in)
 {
-  char buf [SIZEOF_MD2_HEADER];
-  in.Read (buf, SIZEOF_MD2_HEADER);
+  char buf [SIZEOF_MDLHEADER];
+  in->Read (buf, SIZEOF_MDLHEADER);
   int Position = 0;
 
-  @@@
+  CS_MDL_READ_FLOAT (Scale.x);
+  CS_MDL_READ_FLOAT (Scale.y);
+  CS_MDL_READ_FLOAT (Scale.z);
+  CS_MDL_READ_FLOAT (Origin.x);
+  CS_MDL_READ_FLOAT (Origin.y);
+  CS_MDL_READ_FLOAT (Origin.z);
+  CS_MDL_READ_FLOAT (BoundingSphereRadius);
+  CS_MDL_READ_FLOAT (CameraPosition.x);
+  CS_MDL_READ_FLOAT (CameraPosition.y);
+  CS_MDL_READ_FLOAT (CameraPosition.z);
+  CS_MDL_READ_LONG (SkinCount);
+  CS_MDL_READ_LONG (SkinWidth);
+  CS_MDL_READ_LONG (SkinHeight);
+  CS_MDL_READ_LONG (VertexCount);
+  CS_MDL_READ_LONG (TriangleCount);
+  CS_MDL_READ_LONG (ActionCount);
+  CS_MDL_READ_LONG (SyncType);
+  CS_MDL_READ_LONG (Flags);
+  CS_MDL_READ_FLOAT (AverageTriangleSize);
 }
 #undef CS_MDL_READ_LONG
 #undef CS_MDL_READ_FLOAT
-*/
 
 iModelData *csModelConverterMDL::Load (UByte *Buffer, ULong Size)
 {
   return NULL;
-/*
+
   // prepare input buffer
   csDataStream in (Buffer, Size, false);
-  unsigned char readbuffer[MAX_DATAELEMENT_SIZE];
-  int i,j;
+  unsigned char Readbuffer[MAX_DATAELEMENT_SIZE];
+  int i,j,k;
 
   // check for the correct version
   if (!CheckMDLVersion (in))
@@ -223,104 +238,140 @@ iModelData *csModelConverterMDL::Load (UByte *Buffer, ULong Size)
   csMDLHeader Header;
   ReadMDLHeader (&Header, &in);
 
-  // read in texmap (skin) names - skin names are 64 bytes long
-  csStringVector SkinNames;
-  in.SetPosition (Header.SkinOffset);
-  for (i = 0; i < Header.SkinCount; i++)
+  // skip skin data
+  for (i=0; i<Header.SkinCount; i++)
   {
-    csString *s = new csString (SIZEOF_MDLSKINNAME);
-    in.Read (s->GetData (), SIZEOF_MDLSKINNAME);
-    SkinNames.Push (s);
+    in.Read (Readbuffer, SIZEOF_MDLLONG);
+    int Type = get_le_long (Readbuffer);
+    if (Type == 0) {
+      // single skin
+      in.Skip (Header.SkinWidth * Header.SkinHeight);
+    } else if (Type == 1) {
+      in.Read (Readbuffer, SIZEOF_MDLLONG);
+      int MultiskinCount = get_le_long (Readbuffer);
+      for (j=0; j<MultiskinCount; j++)
+        in.Skip (Header.SkinWidth * Header.SkinHeight);
+    } else {
+      Scene->DecRef ();
+      Object->DecRef ();
+      return NULL;
+    }
   }
 
-  // read in skin data. This contains texture map coordinates for each
-  // vertex; the spatial location of each vertex varies with each
-  // frame, and is stored elsewhere, in the frame data section.
-  // The only data we read here
-  // are the static texture map (uv) locations for each vertex!
-  csVector2 *Texels = new csVector2 [Header.TexelCount];
-  in.SetPosition (Header.TexelOffset);
-  for (i = 0; i < Header.TexelCount; i++)
+  /*
+   * read texel and seam information. After this is done, the following
+   * information is available:
+   *   Texels [0..VertexCount]: Base texels
+   *   Texels [VertexCount..VertexCount+n] Seam texels (using n s-texels)
+   *   SeamTexels [0..VertexCount]: Maps vertex indices to seam texel
+   *     indices in the (VertexCount..VertexCount+n) range, or -1 for
+   *     seamless vertices.
+   */
+  csVector2Array Texels;
+  Texels.SetLength (Header.VertexCount);
+  int *SeamTexels = new int [Header.VertexCount];
+
+  for (i=0; i<Header.VertexCount; i++)
   {
-    in.Read (readbuffer, SIZEOF_MDLSHORT*2);
-    Texels [i].Set (get_le_short(readbuffer)/(float)Header.SkinWidth,
-                    get_le_short(readbuffer+2)/(float)Header.SkinHeight);
+    in.Read (Readbuffer, SIZEOF_MDLLONG * 3);
+    int IsSeamVertex = get_le_long (Readbuffer);
+    Texels [i].Set (
+      get_le_long(Readbuffer + SIZEOF_MDLLONG) / (float)Header.SkinWidth,
+      get_le_long(Readbuffer + 2*SIZEOF_MDLLONG) / (float)Header.SkinHeight);
+    if (IsSeamVertex) {
+      csVector2 SeamTexel = Texels [i] + csVector2 (0.5, 0);
+      SeamTexels [i] = Texels.Push (SeamTexel);
+    } else SeamTexels [i] = -1;
   }
 
-  // next we read in the triangle connectivity data.  This data describes
-  // each triangle as three indices, referring to three numbered vertices.
-  // This data is, like the skin texture coords, independent of frame number.
-  // There are actually two set of indices in the original quake file;
-  // one indexes into the xyz coordinate table, the other indexes into
-  // the uv texture coordinate table.
-  in.SetPosition (Header.TriangleOffset);
-  for (i = 0; i < Header.TriangleCount; i++)
+  // read triangle data
+  for (i=0; i<Header.TriangleCount; i++)
   {
     iModelDataPolygon *Polygon = new csModelDataPolygon ();
     Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
 
-    in.Read (readbuffer, SIZEOF_MDLSHORT*6);
-    for (j = 2; j>=0; j--)
-    {
-      short xyzindex = get_le_short(readbuffer + j * SIZEOF_MDLSHORT);
-      short texindex = get_le_short(readbuffer + (j+3) * SIZEOF_MDLSHORT);
-      Polygon->AddVertex (xyzindex, 0, 0, texindex);
-    }
+    in.Read (Readbuffer, SIZEOF_MDLLONG * 4);
+    int FrontPolygon = get_le_long (Readbuffer);
 
+    for (j=0; j<3; j++) {
+      int VertexIndex = get_le_long (Readbuffer + (j+1) * SIZEOF_MDLLONG);
+      if ((SeamTexels [VertexIndex] != -1) && !FrontPolygon) {
+        Polygon->AddVertex (VertexIndex, 0, 0, SeamTexels [VertexIndex]);
+      } else {
+        Polygon->AddVertex (VertexIndex, 0, 0, VertexIndex);
+      }
+    }
     Polygon->DecRef ();
   }
 
-  // now we read in the frames.  The number of frames is stored in 'num_object'
-  float scale[3],translate[3];
-  csVertexFrameVector Frames;
-  iModelDataVertices *DefaultFrame = NULL;
+  // read action information
+  csVector3 *Vertices = new csVector3 [Header.VertexCount];
+  iModelDataVertices *DefaultVertices = NULL;
 
-  for (i = 0; i < Header.FrameCount; i++)
+  for (i=0; i<Header.ActionCount; i++)
   {
-    // read in scale and translate info
-    in.Read (scale, SIZEOF_MDLFLOAT*3);
-    in.Read (translate, SIZEOF_MDLFLOAT*3);
-    for (j = 0; j<3; j++)
+    int FrameCount;
+    in.Read (Readbuffer, SIZEOF_MDLLONG);
+    int ActionType = get_le_long (Readbuffer);
+    if (ActionType == 0)
+      FrameCount = 1;
+    else 
     {
-      scale[j] = convert_endian(scale[j]);
-      translate[j] = convert_endian(translate[j]);
+      in.Read (Readbuffer, SIZEOF_MDLLONG);
+      FrameCount = get_le_long (Readbuffer);
+
+      // skip some stuff--general min/max, frame timings
+      in.Skip (SIZEOF_MDLLONG * (2 + FrameCount));
     }
 
-    // name of this frame
-    char FrameName [SIZEOF_MDLFRAMENAME];
-    in.Read (FrameName, SIZEOF_MDLFRAMENAME);
+    iModelDataAction *Action = new csModelDataAction ();
+    char buf [20];
+    sprintf (buf, "action%d", i);
+    Action->QueryObject ()->SetName (buf);
+    Object->QueryObject ()->ObjAdd (Action->QueryObject ());
 
-    // read in vertex coordinate data for the frame
-    float *raw_vertexcoords = new float[3*Header.VertexCount];
-    in.Read (readbuffer, 4*Header.VertexCount);
-
-    iModelDataVertices *VertexFrame = new csModelDataVertices ();
-    Frames.Push (VertexFrame);
-    if (!DefaultFrame)
-       DefaultFrame = VertexFrame;
-
-    for (j = 0; j < Header.TexelCount; j++)
+    for (j=0; j<FrameCount; j++)
     {
-      VertexFrame->AddTexel (Texels [j]);
+      iModelDataVertices *Vertices = new csModelDataVertices ();
+      if (DefaultVertices) DefaultVertices = Vertices;
+      Vertices->AddNormal (csVector3 (1, 0, 0));
+      Vertices->AddColor (csColor (1, 1, 1));
+
+      // skip min/max info
+      in.Skip (SIZEOF_MDLLONG * 2);
+
+      // get frame name
+      in.Read (buf, 16);
+      buf [16] = 0;
+      Vertices->QueryObject ()->SetName (buf);
+
+      // read vertex positions
+      in.Read (Readbuffer, 4 * Header.VertexCount);
+
+      // store vertex positions
+      for (k=0; k<Header.VertexCount; k++) {
+        csVector3 ver (
+	  Readbuffer [4*k + 0] * Header.Scale.x + Header.Origin.x,
+	  Readbuffer [4*k + 1] * Header.Scale.y + Header.Origin.y,
+	  Readbuffer [4*k + 2] * Header.Scale.z + Header.Origin.z);
+        Vertices->AddVertex (ver);
+      }
+
+      // store texel positions
+      for (k=0; k<Texels.Length (); k++)
+        Vertices->AddTexel (Texels [k]);
+
+      Vertices->DecRef ();
     }
 
-    for (j = 0; j < Header.VertexCount; j++)
-    {
-      csVector3 Vertex (readbuffer[j*4] * scale[0] + translate[0],
-                        readbuffer[j*4+1] * scale[1] + translate[1],
-			readbuffer[j*4+2] * scale[2] + translate[2]);
-      VertexFrame->AddVertex (Vertex);
-    }
-    
-    VertexFrame->AddColor (csColor (1, 1, 1));
-    VertexFrame->AddNormal (csVector3 (1, 0, 0));
-    VertexFrame->DecRef ();
+    Action->DecRef ();
   }
+  delete[] Vertices;
 
-  Object->SetDefaultVertices (DefaultFrame);  
+  delete[] SeamTexels;
+  Object->SetDefaultVertices (DefaultVertices);
   Object->DecRef ();
   return Scene;
-*/
 }
 
 iDataBuffer *csModelConverterMDL::Save (iModelData *Data, const char *Format)
