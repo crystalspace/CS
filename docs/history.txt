@@ -130,6 +130,18 @@ The history order is reversed so that new features are at the top.
 	  useful, but we need to think it out more before re-enabling it.
         - Philip Wyett removed '#include "csutil/string.h"' which does not
           exist from appdir.cpp.
+	- Wouter fixed off-by-one bugs in opengl 2d drawing. This causes
+	  aws and csws to draw correctly (for me).
+	  In gl3d the DrawPixmap routine is fixed to use the same
+	  computation as glcommon2d is using. 
+	  Computation of a y location is gly = height - y.
+	  The gly then has a range of 1..height. Still is is OK.
+	  On opengl gly=0.0 is off screen. gly=height is also off screen.
+	  Also, using gly=height-y gives results where absolute pixel
+	  values (as seen with screenshots) are equal to the pixels
+	  written by the software version. Thus height-y is used instead
+	  of the height-y-1.
+	  Closed three sf-bugs on this topic.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

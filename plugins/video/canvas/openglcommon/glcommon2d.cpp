@@ -322,14 +322,37 @@ void csGraphics2DGLCommon::DrawLine (
     if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
     setGLColorfromint (color);
 
+    // opengl doesn't draw the last pixel of a line, but we
+    // want that pixel anyway, add the pixel.
+    if(y1==y2){ // horizontal lines
+      if(x2>x1) x2++;
+      else if(x1>x2) x1++;
+    }
+    if(x1==x2) { // vertical lines
+      if(y2>y1) y2++;
+      else if(y1>y2) y1++;
+    }
+    if(x1!=x2 && y1!=y2) // diagonal lines
+    {
+      if(x2>x1) x2++;
+      else if(x1>x2) x1++;
+    }
+
     // This is a workaround for a hard-to-really fix problem with OpenGL:
     // whole Y coordinates are "rounded" up, this leads to one-pixel-shift
     // compared to software line drawing. This is not exactly a bug (because
     // this is an on-the-edge case) but it's different, thus we'll slightly
     // shift whole coordinates down.
-    if (QInt (y1) == y1) { y1 += 0.05; }
-    if (QInt (y2) == y2) { y2 += 0.05; }
+    // but QInt(y1) == y1 is too coarse a test.
+    if (fabs(float(int(y1))-y1) < 0.1) { y1 += 0.05; }
+    if (fabs(float(int(y2))-y2) < 0.1) { y2 += 0.05; }
 
+    // Notice: using height-y has range 1..height, but this is OK.
+    //    This is because on opengl y=0.0 is off screen, as is y=height.
+    //    using height-sy gives output on screen which is identical to
+    //    using the software canvas.
+    //    the same goes for all the other DrawX functions.
+    
     glBegin (GL_LINES);
     glVertex2f (x1, Height - y1);
     glVertex2f (x2, Height - y2);
@@ -478,6 +501,8 @@ void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
 
 unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 {
+  /// left as Height-y-1 to keep within offscreen bitmap.
+  /// but for opengl itself you'd need Height-y.
   return screen_shot ?
     (screen_shot + pfmt.PixelBytes * ((Height - y - 1) * Width + x)) : 0;
 }

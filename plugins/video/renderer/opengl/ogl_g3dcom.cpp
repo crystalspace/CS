@@ -5999,14 +5999,18 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
 //    glVertex2i (sx, height - sy - sh - 1);
 
   // smgh: This works in software opengl and with cswstest
+  // wouter: removed height-sy-1 to be height-sy.
+  //    this is because on opengl y=0.0 is off screen, as is y=height.
+  //    using height-sy gives output on screen which is identical to 
+  //    using the software canvas.
   glTexCoord2f (ntx1, nty1);
-  glVertex2i (sx, height - sy - 1);
+  glVertex2i (sx, height - sy);
   glTexCoord2f (ntx2, nty1);
-  glVertex2i (sx + sw, height - sy - 1);
+  glVertex2i (sx + sw, height - sy);
   glTexCoord2f (ntx2, nty2);
-  glVertex2i (sx + sw, height - (sy+1 + sh));
+  glVertex2i (sx + sw, height - (sy + sh));
   glTexCoord2f (ntx1, nty2);
-  glVertex2i (sx, height - (sy+1 + sh));
+  glVertex2i (sx, height - (sy + sh));
   glEnd ();
 }
 
