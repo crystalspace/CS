@@ -33,7 +33,7 @@
 #define uint8 ode_uint8
 #define int32 ode_int32
 #define uint32 ode_uint32
-#include "ode/ode.h"
+#include <ode/ode.h>
 #undef ode_uint32
 #undef ode_int32
 #undef ode_uint8
