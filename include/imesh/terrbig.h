@@ -35,6 +35,14 @@ struct iTerrBigState : public iBase
 {
   /// Memory maps the file on disk and associates it with the terrain
   virtual bool LoadHeightMapFile (const char *hm) = 0;
+  /// Sets the scale factor on the map x = horz, y = vert, z = height
+  virtual void SetScaleFactor (const csVector3 &scale) = 0;
+  /**
+   * Sets the error tolerance.  This should be in pixels, meaning a
+   * tolerance of 1 will allow gaps in the hieghtmap of 1 pixel, a 
+   * tolerance of 0 means the heightmap will perform no LOD
+   */
+  virtual void SetErrorTolerance (float tolerance) = 0;
   /** 
    * Converts an image to a height map file usable by LoadHeighMapFile()
    * and saves it into hm.  It will also load the file.
