@@ -115,6 +115,11 @@ which he authored.  For a while, he also maintained the documentation which
 details the Windows port of Crystal Space.
 
 @item
+David Asbell (@email{dasbell@@yahoo.com})
+
+David contributed the binary sprite loader and saver to CS.
+
+@item
 David Huen (@email{smh1008@@cus.cam.ac.uk})
 
 David wrote some detailed documentation about the BeOS port of Crystal Space

@@ -11,13 +11,13 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
 
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 /* ViewMesh: tool for displaying mesh objects (3d sprites) */
-
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
@@ -59,11 +59,16 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "iutil/vfs.h"
+#include "csutil/csstrvec.h"
+
+#include "iutil/plugin.h"
+#include "imap/writer.h"
 
 CS_IMPLEMENT_APPLICATION
 
 #define VIEWMESH_COMMAND_LOADMESH 77701
-#define VIEWMESH_COMMAND_LOADLIB  77702
+#define VIEWMESH_COMMAND_SAVEMESH 77702
+#define VIEWMESH_COMMAND_LOADLIB  77703
 #define VIEWMESH_STATES_SELECT_START  77800
 #define VIEWMESH_COMMAND_CAMMODE1 77711
 #define VIEWMESH_COMMAND_CAMMODE2 77712
@@ -82,6 +87,7 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
   menu = NULL;
   sprite = NULL;
   dialog = NULL;
+  imeshfact = NULL;
   cammode = movenormal;
   spritepos = csVector3(0,10,0);
 }
@@ -105,12 +111,12 @@ void ViewMesh::Help ()
   printf ("  <meshfile>         Load the specified mesh object\n");
 }
 
-/* This is the data we keeep for modal processing */
+/* This is the data we keep for modal processing */
 struct ModalData : public iBase
 {
-    uint code;
-    SCF_DECLARE_IBASE;
-    ModalData() { SCF_CONSTRUCT_IBASE(NULL); }
+  uint code;
+  SCF_DECLARE_IBASE;
+  ModalData() { SCF_CONSTRUCT_IBASE(NULL); }
 };
 
 SCF_IMPLEMENT_IBASE (ModalData)
@@ -157,11 +163,10 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       switch(ev.Command.Code)
       {
 	case VIEWMESH_COMMAND_LOADMESH:
-	  {
+	{
 	  menu->Hide();
-      	  if (dialog)
-	    delete dialog;
-	  dialog= csFileDialog (this, "Select Mesh Object", "/this/", "Open",
+	  delete dialog;
+	  dialog = csFileDialog (this, "Select Mesh Object", "/this/", "Open",
 	      true);
 
 	  ModalData *data=new ModalData;
@@ -169,12 +174,24 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  StartModal (dialog, data);
 
 	  return true;
-	  }
-	case VIEWMESH_COMMAND_LOADLIB:
-	  {
+	}
+	case VIEWMESH_COMMAND_SAVEMESH:
+	{
 	  menu->Hide();
-	  if (dialog)
-	    delete dialog;
+	  delete dialog;
+	  dialog= csFileDialog (this, "Save As...", "/this/", "Save",
+	      true);
+
+	  ModalData *data=new ModalData;
+	  data->code = VIEWMESH_COMMAND_SAVEMESH;
+	  StartModal (dialog, data);
+
+	  return true;
+	}
+	case VIEWMESH_COMMAND_LOADLIB:
+	{
+	  menu->Hide();
+	  delete dialog;
 	  dialog = csFileDialog (this, "Select Texture Lib", "/this/", "Open",
 	      true);
 
@@ -183,7 +200,7 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  StartModal (dialog, data);
 
 	  return true;
-	  }
+	}
 
 	case VIEWMESH_COMMAND_CAMMODE1:
 	  cammode = movenormal;
@@ -211,6 +228,13 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	      if (!LoadSprite(filename,1))
 	      {
 		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh %s",
+		    filename);
+	      }
+	      break;
+	    case VIEWMESH_COMMAND_SAVEMESH:
+	      if (!SaveSprite(filename))
+	      {
+		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't save mesh %s",
 		    filename);
 	      }
 	      break;
@@ -257,6 +281,7 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
 {
   iMeshFactoryWrapper *imeshfactwrap = loader->LoadMeshObjectFactory (filename);
 
+
   if (!imeshfactwrap)
     return false;
 
@@ -282,9 +307,11 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
   }
 
   // Update Sprite States menu
-  stateslist.DeleteAll();
-  stateslist.Push (csStrNew("default"));
-  iMeshObjectFactory *imeshfact= imeshfactwrap->GetMeshObjectFactory();
+	stateslist.Push (csStrNew("default"));
+  if (imeshfact)
+		imeshfact->DecRef();
+
+	imeshfact= imeshfactwrap->GetMeshObjectFactory();
   iSprite3DFactoryState *factstate= SCF_QUERY_INTERFACE(imeshfact,
       iSprite3DFactoryState);
   if (factstate)
@@ -304,6 +331,27 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
   sprite->GetWorldBoundingBox(box);
   spritepos = box.GetCenter();
 
+	return true;
+}
+
+bool ViewMesh::SaveSprite(const char *filename)
+{
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+
+  iSaverPlugin* saver = CS_LOAD_PLUGIN (plugin_mgr,
+    "crystalspace.mesh.saver.factory.sprite.3d.binary", iSaverPlugin);
+	
+	
+  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+
+  iFile* cf;
+  cf = VFS->Open (filename, VFS_FILE_WRITE);
+  saver->WriteDown(imeshfact, cf);
+
+  saver->DecRef();
+  cf->DecRef();
+  VFS->DecRef ();
+  plugin_mgr->DecRef ();
   return true;
 }
 
@@ -311,8 +359,10 @@ void ViewMesh::ConstructMenu()
 {
   if (menu)
     delete menu;
+
   menu = new csMenu(this, csmfs3D, 0);
   (void)new csMenuItem(menu,"Load Mesh", VIEWMESH_COMMAND_LOADMESH);
+  (void)new csMenuItem(menu,"Save Mesh (Binary)", VIEWMESH_COMMAND_SAVEMESH);
   (void)new csMenuItem(menu,"Load TextureLib", VIEWMESH_COMMAND_LOADLIB);
 
   // StateMenu
@@ -639,7 +689,7 @@ int main (int argc, char* argv[])
 	"crystalspace.application.viewmesh", "Couldn't load config file!");
     return 1;
   }
-
+	
   if (!csInitializer::RequestPlugins (object_reg,
 	      CS_REQUEST_VFS,
 	      CS_REQUEST_SOFTWARE3D,

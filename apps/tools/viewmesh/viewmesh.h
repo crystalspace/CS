@@ -34,6 +34,7 @@ struct iObjectRegistry;
 struct iVirtualClock;
 struct iSector;
 struct iView;
+struct iMeshObjectFactory;
 
 class ViewMesh : public csApp
 {
@@ -45,6 +46,7 @@ private:
   iView* view;
   iMeshWrapper *sprite;
   csVector3 spritepos;
+	iMeshObjectFactory *imeshfact;
 
   csMenu *menu;
   csWindow *dialog;
@@ -56,6 +58,7 @@ public:
 
   static void Help ();
   bool LoadSprite (const char *filename,float scale);
+  bool SaveSprite (const char *filename);
   void ConstructMenu();
 
   virtual bool Initialize ();
