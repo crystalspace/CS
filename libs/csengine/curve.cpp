@@ -475,14 +475,14 @@ void csCurve::CalculateLighting (csFrustumView& lview)
   }
   else
   {
-    if (!lightmap || lightmap_up_to_date) 
-      return;
-
     // if our UV buffers have not been intialized, create them
     if (!_uv2World)
     {
       CalcUVBuffers();
     }
+
+    if (!lightmap || lightmap_up_to_date) 
+      return;
 
     int lm_width = lightmap->GetWidth () - 2;
     int lm_height = lightmap->GetHeight () - 2;
@@ -615,7 +615,7 @@ void csCurve::SetObject2World (csReversibleTransform* o2w)
   int uv;
   
   // if there was already an object to world transform specified
-  if (_o2w) 
+  if (_o2w && _uv2World) 
   {
     // untransform our buffers
     for(int ui=0; ui < lm_width - 1; ui++)
