@@ -243,14 +243,18 @@ public:
 
   int GetVertexCount () { SetupObject(); return num_ball_vertices; }
   csVector3* GetVertices () { SetupObject (); return ball_vertices; }
+  virtual csRenderMesh **GetRenderMeshes (int &num);
+
 #ifndef CS_USE_NEW_RENDERER
   int GetTriangleCount () { SetupObject(); return top_mesh.num_triangles; }
   csTriangle* GetTriangles () { SetupObject (); return top_mesh.triangles; }
 #else
   int GetTriangleCount () { SetupObject(); return ball_triangles; }
-  csTriangle* GetTriangles () { SetupObject (); return (csTriangle*)ball_indices; }
-
-  virtual csRenderMesh **GetRenderMeshes (int &num);
+  csTriangle* GetTriangles ()
+  {
+    SetupObject ();
+    return (csTriangle*)ball_indices;
+  }
 
   iRenderBuffer *GetRenderBuffer (csStringID name);
   //------------------------- iRenderBufferSource implementation ----------------

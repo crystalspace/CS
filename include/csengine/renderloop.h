@@ -21,7 +21,6 @@
 #ifndef __CS_CSENGINE_RENDERLOOP_H__
 #define __CS_CSENGINE_RENDERLOOP_H__
 
-#ifdef CS_USE_NEW_RENDERER
 #define CS_NR_ALTERNATE_RENDERLOOP
 
 #ifdef CS_NR_ALTERNATE_RENDERLOOP
@@ -80,7 +79,6 @@ public:
   virtual bool Unregister (iRenderLoop* loop);
 };
 
-#endif
 #endif
 
 #endif

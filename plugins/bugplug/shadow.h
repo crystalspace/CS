@@ -119,6 +119,7 @@ public:
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight**, int, iMovable*) { }
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode);
+  virtual csRenderMesh** GetRenderMeshes (int&) { return 0; }
 #ifdef CS_USE_NEW_RENDERER
   virtual bool DrawZ (iRenderView*, iMovable*, csZBufMode) { return false; }
   virtual bool DrawShadow (iRenderView*, iMovable*, csZBufMode, iLight *light) { return false; }

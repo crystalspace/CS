@@ -454,3 +454,11 @@ You must now call it like this:
 Events created with @code{iEventQueue::CreateEvent()} or
 @code{iEventOutlet::CreateEvent()} are unaffected by this change.
 
+@subheading New Renderer Related Changes
+
+The mesh object @sc{api} has changed considerably so we recommend looking at the
+documentation on that to see how to modify your own mesh object for the new
+@sc{api}. In this section we describe @sc{api} modifications that are relevant
+for user applications:
+
+

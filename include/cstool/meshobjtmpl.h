@@ -82,7 +82,7 @@ public:
   virtual ~csMeshObject ();
 
   /**
-   * See imesh/object.h for sepcification. There is no default
+   * See imesh/object.h for specification. There is no default
    * implementation for this method.
    */
   virtual iMeshObjectFactory* GetFactory () const = 0;
@@ -92,6 +92,17 @@ public:
    * does nothing and always returns true.
    */
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+
+  /**
+   * See imesh/object.h for sepcification. The default implementation
+   * does nothing and always returns 0.
+   * @@@ Note: in future it would be better that the default implementation
+   * does nothing as this function has to be implemented by mesh objects.
+   */
+  virtual csRenderMesh** GetRenderMeshes (int& num)
+  {
+    return 0;
+  }
 
 #ifdef CS_USE_NEW_RENDERER
   virtual void EnableShadowCaps () = 0;

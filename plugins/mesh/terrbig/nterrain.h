@@ -363,6 +363,7 @@ public:
 
   /// Does some pre-draw work (buffers all vertices to be drawn, draw will render these.)
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  virtual csRenderMesh** GetRenderMeshes (int&) { return 0; }
 
   /// Update lighting on the terrain.
   virtual void UpdateLighting (iLight** lights, int num_lights, iMovable* movable);

@@ -200,9 +200,7 @@ public:
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
-#ifdef CS_USE_NEW_RENDERER
   virtual csRenderMesh** GetRenderMeshes (int &n);
-#endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {
     if (cb) cb->IncRef ();

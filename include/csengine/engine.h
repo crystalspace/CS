@@ -40,12 +40,10 @@
 #include "iengine/campos.h"
 #include "iutil/dbghelp.h"
 #include "ivideo/graph3d.h"
-#if defined(CS_USE_NEW_RENDERER)
 #include "iengine/renderloop.h"
 #include "csengine/renderloop.h"
 #include "ivideo/shader/shader.h"
 #include "iutil/strset.h"
-#endif
 
 class csPoly2DPool;
 //class csRadiosity;
@@ -223,7 +221,7 @@ struct csEngineConfig : public iConfig
  */
 class csEngine : public iEngine
 {
-#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
+#if defined(CS_NR_ALTERNATE_RENDERLOOP)
   friend class csRenderLoop;
 #endif
 
@@ -311,20 +309,18 @@ public:
   csRef<iGraphics2D> G2D;
   /// The graphics loader
   csRef<iImageIO> ImageLoader;
-#ifdef CS_USE_NEW_RENDERER
+  /// For NR: @@@ Document me!
   csRef<iStringSet> Strings;
+  /// For NR: @@@ Document me!
   csRef<iShaderManager> ShaderManager;
-#endif // CS_USE_NEW_RENDERER
   /**
    * The following variable is only set if the engine had to create its
    * own cache manager. In that case the engine is also responsible
    * for cleaning this up.
    */
   csRef<iCacheManager> cache_mgr;
-#ifndef CS_USE_NEW_RENDERER
   /// The fog mode this G3D implements
   G3D_FOGMETHOD fogmethod;
-#endif // CS_USE_NEW_RENDERER
   /// Does the 3D driver require power-of-two lightmaps?
   bool NeedPO2Maps;
   /// Maximum texture aspect ratio
@@ -353,7 +349,7 @@ public:
   long render_priority_object;
   long render_priority_alpha;
 
-#if defined(CS_USE_NEW_RENDERER) && defined(CS_NR_ALTERNATE_RENDERLOOP)
+#if defined(CS_NR_ALTERNATE_RENDERLOOP)
   /// Default render loop
   csRef<iRenderLoop> defaultRenderLoop;
   /// Render loop manager
@@ -1054,7 +1050,6 @@ public:
   /// Return the current drawing context.
   virtual iTextureHandle *GetContext () const;
 
-#ifdef CS_USE_NEW_RENDERER
   // ======================================================================
   // Render loop stuff
   // ======================================================================
@@ -1062,7 +1057,7 @@ public:
   virtual iRenderLoopManager* GetRenderLoopManager ();
   virtual iRenderLoop* GetCurrentDefaultRenderloop ();
   virtual bool SetCurrentDefaultRenderloop (iRenderLoop* loop);
-#endif
+
 private:
   /// Resizes frame width and height dependent data members
   void Resize ();

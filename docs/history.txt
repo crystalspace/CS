@@ -15,6 +15,26 @@ chronological order.
 	- renej updated python scripting: initial support for easy extending
 	  VARG functions by means of include/ivaria/pythvarg.i
 	- Anders Stenberg changed 2 occurances of "render3d" to "graphics3d"
+	- Jorrit started the work of merging the old renderer and new renderer
+	  branches (basically eliminating all CS_USE_NEW_RENDERER checks).
+	  This includes the following:
+	      - GetRenderMeshes() is now also present in old renderer but
+	        it is not used. All mesh objects now have an empty stub
+		implementation for GetRenderMeshes().
+	      - Moved over the render loop calls in iEngine to old renderer.
+	      - Similar for iSector. Also moved iSectorRenderMeshList to
+	        old renderer.
+	      - Made sure all the render loop headers compile with old
+	        renderer.
+	      - Moved csFog from render3d.h to common part in graph3d.h.
+	      - Moved csZBufMode from render3d to common part in graph3d.h.
+	      - Moved csVertexAttrib from render3d to common part in
+	        graph3d.h.
+	      - Moved G3D_FOGMETHOD to common part of graph3d.h.
+	      - Moved all new renderer specific methods in iMeshWrapper
+	        to old renderer branch.
+	      - Started work on documenting the API changes for the new
+	        renderer that are relevant for user applications.
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.

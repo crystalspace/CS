@@ -1890,9 +1890,9 @@ bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   return true;
 }
 
-#ifdef CS_USE_NEW_RENDERER
 csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n)
 {
+#ifdef CS_USE_NEW_RENDERER
   n = 1;
   if (skeleton_state) {
     /* set to identify for software skeleton */
@@ -1908,8 +1908,10 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n)
   rendermesh.meshtype = CS_MESHTYPE_TRIANGLES;
   meshptr = &rendermesh;
   return &meshptr;
-}
+#else
+  return 0;
 #endif
+}
 
 void csSprite3DMeshObject::InitSprite ()
 {

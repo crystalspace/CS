@@ -31,12 +31,10 @@
 #include "csengine/rdrprior.h"
 #include "iengine/sector.h"
 #include "ivideo/graph3d.h"
-#ifdef CS_USE_NEW_RENDERER
 #include "csutil/array.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/shader/shader.h"
 #include "iengine/viscull.h"
-#endif
 
 class csEngine;
 class csProgressPulse;
@@ -418,9 +416,7 @@ public:
    * Draw the sector in the given view and with the given transformation.
    */
   void Draw (iRenderView* rview);
-#ifdef CS_USE_NEW_RENDERER
   virtual iSectorRenderMeshList* GetRenderMeshes ();
-#endif
 
   //----------------------------------------------------------------------
   // Utility Functions
@@ -640,12 +636,10 @@ public:
     csVector3& new_position, bool& mirror, bool only_portals = false);
     virtual void Draw (iRenderView* rview)
       { scfParent->Draw (rview); }
-#ifdef CS_USE_NEW_RENDERER
     virtual void PrepareDraw (iRenderView* rview)
     { scfParent->PrepareDraw (rview); }
     virtual iSectorRenderMeshList* GetRenderMeshes ()
     { return scfParent->GetRenderMeshes (); }
-#endif // CS_USE_NEW_RENDERER
     virtual void SetSectorCallback (iSectorCallback* cb)
     {
       scfParent->SetSectorCallback (cb);

@@ -168,16 +168,14 @@ protected:
   /// Flags to use for defered lighting.
   int defered_lighting_flags;
 
-#ifdef CS_USE_NEW_RENDERER
-  /// Cached value from DrawTest
+  /// For NR: Cached value from DrawTest
   bool draw_test;
-  /// Cached light test
+  /// For NR: Cached light test
   bool in_light;
-  /// Should we draw anything in drawshadow at all?
+  /// For NR: Should we draw anything in drawshadow at all?
   bool cast_hardware_shadow;
-  /// should we draw last
+  /// For NR: should we draw last
   bool draw_after_fancy_stuff;
-#endif
 
   /**
    * This value indicates the last time that was used to do animation.
@@ -386,7 +384,6 @@ public:
   void RemoveMeshFromStaticLOD (iMeshWrapper* mesh);
   void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh);
 
-#ifdef CS_USE_NEW_RENDERER
   /**
    * Draw the zpass for the object.  If this object doesn't use lighting
    * then it can be drawn fully here.
@@ -402,7 +399,6 @@ public:
   void SetDrawAfterShadow (bool drawAfter);
   /// Get if the meshobject is rendered after all fancy HW-shadow-stuff
   bool GetDrawAfterShadow ();
-#endif
 
   /**
    * Calculate the squared distance between the camera and the object.
@@ -729,7 +725,6 @@ public:
     {
       scfParent->AddMeshToStaticLOD (lod, mesh);
     }
-#ifdef CS_USE_NEW_RENDERER
     virtual csRenderMesh** GetRenderMeshes (int& num) 
     {
       return scfParent->GetRenderMeshes (num);
@@ -754,7 +749,6 @@ public:
     {
       return scfParent->GetDrawAfterShadow ();
     }
-#endif
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 

@@ -68,11 +68,12 @@ struct iSectorCallback : public iBase
   virtual void Traverse (iSector* sector, iBase* context) = 0;
 };
 
-#ifdef CS_USE_NEW_RENDERER
-
 SCF_VERSION (iSectorRenderMeshList, 0, 0, 1);
 
-/// A list of rendermeshes in a sector.
+/**
+ * For NR:
+ * A list of rendermeshes in a sector.
+ */
 struct iSectorRenderMeshList : public iBase
 {
   /// Get the number of RMs in this list.
@@ -94,8 +95,6 @@ struct iSectorRenderMeshList : public iBase
     iMeshWrapper*& mw, iVisibilityObject*& visobj, csRenderMesh*& rm,
     bool* visible) = 0;
 };
-
-#endif
 
 SCF_VERSION (iSector, 0, 5, 2);
 
@@ -212,7 +211,6 @@ struct iSector : public iBase
 
   /// Draw the sector with the given render view
   virtual void Draw (iRenderView* rview) = 0;
-#ifdef CS_USE_NEW_RENDERER
   /**
    * Prepare the sector to draw.
    * Must be called before any rendermesh is requested.
@@ -220,7 +218,6 @@ struct iSector : public iBase
   virtual void PrepareDraw (iRenderView* rview) = 0;
 
   virtual iSectorRenderMeshList* GetRenderMeshes () = 0;
-#endif
 
   /**
    * Set the sector callback. This will call IncRef() on the callback

@@ -226,6 +226,7 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  virtual csRenderMesh** GetRenderMeshes (int&) { return 0; }
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);

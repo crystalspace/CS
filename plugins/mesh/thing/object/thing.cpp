@@ -2624,8 +2624,11 @@ void csThing::ClearRenderMeshes ()
   renderMeshes.DeleteAll ();
 }
 
+#endif
+
 csRenderMesh **csThing::GetRenderMeshes (int &num)
 {
+#ifdef CS_USE_NEW_RENDERER
   // @@@ "dirtiness" check
   if (renderMeshes.Length() == 0)
   {
@@ -2640,8 +2643,10 @@ csRenderMesh **csThing::GetRenderMeshes (int &num)
     renderMeshes[i]->material->Visit ();
   }
   return renderMeshes.GetArray ();
-}
+#else
+  return 0;
 #endif
+}
 
 struct PolyGroupSLM
 {

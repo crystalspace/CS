@@ -707,9 +707,11 @@ iRenderBuffer *csGenmeshMeshObject::GetRenderBuffer (csStringID name)
 {
   return factory->GetRenderBuffer (name);
 }
+#endif
 
 csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
 {
+#ifdef CS_USE_NEW_RENDERER
   //if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
   // iGraphics3D* g3d = rview->GetGraphics3D ();
@@ -747,9 +749,10 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (int& n)
   meshPtr = &mesh;
   n = 1;
   return &meshPtr;
+#else
+  return 0;
+#endif
 }
-
-#endif // CS_USE_NEW_RENDERER
 
 void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {

@@ -71,11 +71,9 @@
 #include "ivideo/graph3d.h"
 #include "igeom/clip2d.h"
 
-#if defined(CS_USE_NEW_RENDERER)
 #include "ivideo/rendersteps/irenderstep.h"
 #include "ivideo/rendersteps/irsfact.h"
 #include "ivideo/rendersteps/igeneric.h"
-#endif
 
 //---------------------------------------------------------------------------
 void csEngine::Report (const char *description, ...)
@@ -1699,7 +1697,7 @@ void csEngine::Draw (iCamera *c, iClipper2D *view)
 }
 #endif
 
-#if defined(CS_NR_ALTERNATE_RENDERLOOP)
+#if defined(CS_NR_ALTERNATE_RENDERLOOP) && defined(CS_USE_NEW_RENDERER)
 void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
 }
@@ -3499,7 +3497,6 @@ bool csEngine::DebugCommand (const char* cmd)
 
 //-------------------End-Multi-Context-Support--------------------------------
 
-#ifdef CS_USE_NEW_RENDERER
 // ======================================================================
 // Render loop stuff
 // ======================================================================
@@ -3511,6 +3508,7 @@ iRenderLoopManager* csEngine::GetRenderLoopManager ()
 
 iRenderLoop* csEngine::GetCurrentDefaultRenderloop ()
 {
+
   return defaultRenderLoop;
 }
 
@@ -3521,4 +3519,3 @@ bool csEngine::SetCurrentDefaultRenderloop (iRenderLoop* loop)
   return true;
 }
 
-#endif

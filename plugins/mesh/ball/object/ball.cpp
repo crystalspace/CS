@@ -662,9 +662,11 @@ iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
   }
   return 0;
 }
+#endif
 
 csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
 {
+#ifdef CS_USE_NEW_RENDERER
   iMaterialWrapper* mater = material;
 
   if (!mater)
@@ -692,8 +694,10 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
   meshPtr = &mesh;
   num = 1;
   return &meshPtr;
-}
+#else
+  return 0;
 #endif
+}
 
 #ifndef CS_USE_NEW_RENDERER
 

@@ -46,6 +46,7 @@ struct iLightingInfo;
 struct iShadowReceiver;
 struct iObject;
 class csFlags;
+class csRenderMesh;
 
 /** \name Meshwrapper flags
  * @{ */
@@ -436,7 +437,6 @@ struct iMeshWrapper : public iBase
    */
   virtual void RemoveMeshFromStaticLOD (iMeshWrapper* mesh) = 0;
 
-#ifdef CS_USE_NEW_RENDERER
   /**
    * Returns the render mesh.
    */
@@ -462,7 +462,6 @@ struct iMeshWrapper : public iBase
    * Get if the meshobject is rendered after all fancy HW-shadow-stuff
    */
   virtual bool GetDrawAfterShadow () = 0;
-#endif
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 1, 7);

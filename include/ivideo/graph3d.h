@@ -58,6 +58,88 @@ struct csPixelFormat;
 struct csPolyTextureMapping;
 struct csPolyLightMapMapping;
 
+/**
+ * Fog structure.
+ */
+struct csFog
+{
+  /// If true then fog is enabled.
+  bool enabled;
+  /// Density (0 is off).
+  float density;
+  /// Color (red).
+  float red;
+  /// Color (green).
+  float green;
+  /// Color (blue).
+  float blue;
+};
+
+/// Z-buffer modes
+enum csZBufMode
+{
+  // values below are sometimes used as bit masks, so don't change them!
+  /// Don't test/write
+  CS_ZBUF_NONE     = 0x00000000,
+  /// write
+  CS_ZBUF_FILL     = 0x00000001,
+  /// test
+  CS_ZBUF_TEST     = 0x00000002,
+  /// write/test
+  CS_ZBUF_USE      = 0x00000003,
+  /// only write
+  CS_ZBUF_FILLONLY = 0x00000004,
+  /// test if equal
+  CS_ZBUF_EQUAL    = 0x00000005,
+  /// inverted test
+  CS_ZBUF_INVERT   = 0x00000006
+};
+
+/**
+ * For NR:
+ * Vertex attributes.
+ * @@@ Document me better!
+ */
+enum csVertexAttrib
+{
+  CS_VATTRIB_0 = 0,
+  CS_VATTRIB_1 = 1,
+  CS_VATTRIB_2 = 2,
+  CS_VATTRIB_3 = 3,
+  CS_VATTRIB_4 = 4,
+  CS_VATTRIB_5 = 5,
+  CS_VATTRIB_6 = 6,
+  CS_VATTRIB_7 = 7,
+  CS_VATTRIB_8 = 8,
+  CS_VATTRIB_9 = 9,
+  CS_VATTRIB_10 = 10,
+  CS_VATTRIB_11 = 11,
+  CS_VATTRIB_12 = 12,
+  CS_VATTRIB_13 = 13,
+  CS_VATTRIB_14 = 14,
+  CS_VATTRIB_15 = 15,
+  CS_VATTRIB_POSITION = 100,
+  CS_VATTRIB_WEIGHT = 101,
+  CS_VATTRIB_NORMAL = 102,
+  CS_VATTRIB_COLOR = 103,
+  CS_VATTRIB_PRIMARY_COLOR = 103,
+  CS_VATTRIB_SECONDARY_COLOR = 104,
+  CS_VATTRIB_FOGCOORD = 105,
+  CS_VATTRIB_TEXCOORD = 108,
+  CS_VATTRIB_TEXCOORD0 = 108,
+  CS_VATTRIB_TEXCOORD1 = 109,
+  CS_VATTRIB_TEXCOORD2 = 110,
+  CS_VATTRIB_TEXCOORD3 = 111
+};
+
+/// 
+enum G3D_FOGMETHOD
+{
+  G3DFOGMETHOD_NONE = 0x00,
+  G3DFOGMETHOD_ZBUFFER = 0x01,
+  G3DFOGMETHOD_VERTEX = 0x02
+};
+
 #ifndef CS_USE_NEW_RENDERER
 
 #define CS_FOG_FRONT  0
@@ -224,26 +306,6 @@ struct G3DPolygonDP : public G3DPolygonDFP
 /// Structure containing all info needed by DrawPolygonFlat (DPF)
 typedef G3DPolygonDP G3DPolygonDPF;
 
-/// Z-buffer modes
-enum csZBufMode
-{
-  // values below are sometimes used as bit masks, so don't change them!
-  /// Don't test/write
-  CS_ZBUF_NONE     = 0x00000000,
-  /// write
-  CS_ZBUF_FILL     = 0x00000001,
-  /// test
-  CS_ZBUF_TEST     = 0x00000002,
-  /// write/test
-  CS_ZBUF_USE      = 0x00000003,
-  /// only write
-  CS_ZBUF_FILLONLY = 0x00000004,
-  /// test if equal
-  CS_ZBUF_EQUAL    = 0x00000005,
-  /// 
-  CS_ZBUF_SPECIAL  = 0x00000006
-};
-
 /// Graphics3D render state options
 enum G3D_RENDERSTATEOPTION
 {
@@ -288,14 +350,6 @@ enum G3D_RENDERSTATEOPTION
 /// Clear frame buffer ?
 #define CSDRAW_CLEARSCREEN  0x00000020
 /** @} */
-
-/// 
-enum G3D_FOGMETHOD
-{
-  G3DFOGMETHOD_NONE = 0x00,
-  G3DFOGMETHOD_ZBUFFER = 0x01,
-  G3DFOGMETHOD_VERTEX = 0x02
-};
 
 /// Information about 3d renderer capabilities.
 struct csGraphics3DCaps
@@ -467,23 +521,6 @@ struct G3DPolygonMesh
 
   /// Information for fogging the vertices.
   G3DFogInfo* vertex_fog;
-};
-
-/**
- * Fog structure.
- */
-struct csFog
-{
-  /// If true then fog is enabled.
-  bool enabled;
-  /// Density (0 is off).
-  float density;
-  /// Color (red).
-  float red;
-  /// Color (green).
-  float green;
-  /// Color (blue).
-  float blue;
 };
 
 SCF_VERSION (iGraphics3D, 5, 2, 0);
@@ -775,7 +812,6 @@ struct iGraphics3D : public iBase
 };
 #else
 #include "ivideo/render3d.h"
-#define iGraphics3D iGraphics3D
 #endif // CS_USE_NEW_RENDERER
 
 /** @} */

@@ -60,6 +60,11 @@ protected:
   iSector* sector;
   /// Position of the light.
   csVector3 center;
+  /// Color.
+  csColor color;
+  /// The associated halo (if not 0)
+  csHalo *halo;
+
 #ifndef CS_USE_NEW_RENDERER
   /// Radius of light.
   float dist;
@@ -67,13 +72,6 @@ protected:
   float sqdist;
   /// Inverse radius of light.
   float inv_dist;
-#endif
-  /// Color.
-  csColor color;
-  /// The associated halo (if not 0)
-  csHalo *halo;
-
-#ifndef CS_USE_NEW_RENDERER
   /// Attenuation type
   int attenuation;
 

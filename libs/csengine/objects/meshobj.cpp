@@ -86,10 +86,8 @@ csMeshWrapper::csMeshWrapper (
   children.SetMesh (this);
   imposter_active = false;
   imposter_mesh = 0;
-#ifdef CS_USE_NEW_RENDERER
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
-#endif
 }
 
 csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
@@ -116,10 +114,8 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
   zbufMode = CS_ZBUF_USE;
   render_priority = csEngine::current_engine->GetObjectRenderPriority ();
   children.SetMesh (this);
-#ifdef CS_USE_NEW_RENDERER
   cast_hardware_shadow = true;
   draw_after_fancy_stuff = false;
-#endif
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject *meshobj)
@@ -224,7 +220,6 @@ void csMeshWrapper::Draw (iRenderView *rview)
   DrawInt (rview);
 }
 
-#ifdef CS_USE_NEW_RENDERER
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
@@ -299,7 +294,6 @@ bool csMeshWrapper::GetDrawAfterShadow ()
 {
   return draw_after_fancy_stuff;
 }
-#endif // CS_USE_NEW_RENDERER
 
 //----- Static LOD ----------------------------------------------------------
 

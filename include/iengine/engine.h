@@ -875,17 +875,18 @@ struct iEngine : public iBase
    */
   virtual void WantToDie (iMeshWrapper* mesh) = 0;
   
-#ifdef CS_USE_NEW_RENDERER
   // ======================================================================
   // Render loop stuff
   // ======================================================================
   
   /**
+   * For NR:
    * Retrieve the render loop manager.
    */
   virtual iRenderLoopManager* GetRenderLoopManager () = 0;
   
   /**
+   * For NR:
    * Returns the current render loop.
    * \remark This will the loop that is set to be the current default
    *  with SetCurrentDefaultRenderloop(). This doesn't have to be the engine's
@@ -906,7 +907,6 @@ struct iEngine : public iBase
    *   let the method fail.)
    */
   virtual bool SetCurrentDefaultRenderloop (iRenderLoop* loop) = 0;
-#endif
 };
 
 /** @} */

@@ -281,17 +281,20 @@ static void LitVertex( const csVector3 &n, csColor &c )
 }
 #endif
 
-#ifdef CS_USE_NEW_RENDERER
-
 csRenderMesh** csMetaBall::GetRenderMeshes (int &n)
 {
+#ifdef CS_USE_NEW_RENDERER
   n = 1;
      
   meshPtr = &mesh;
   return &meshPtr;
+#else
+  return 0;
+#endif
 }
 
 
+#ifdef CS_USE_NEW_RENDERER
 iRenderBuffer *csMetaBall::GetRenderBuffer (csStringID name)
 {
   /*

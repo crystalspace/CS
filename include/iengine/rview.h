@@ -33,9 +33,7 @@
 
 #include "ivideo/graph3d.h"
 
-#ifndef CS_USE_NEW_RENDERER
 struct csFog;
-#endif // CS_USE_NEW_RENDERER
 struct iEngine;
 struct iClipper2D;
 struct iGraphics2D;
@@ -78,10 +76,8 @@ public:
    */
   bool has_outgoing_plane;
 
-#ifndef CS_USE_NEW_RENDERER
   /// The structure describing the fog.
   csFog* fog;
-#endif // CS_USE_NEW_RENDERER
 };
 
 /**
@@ -169,7 +165,6 @@ public:
    */
   bool do_clip_frustum;
 
-#ifndef CS_USE_NEW_RENDERER
   /**
    * Every fogged sector we encountered results in an extra structure in the
    * following list. This is only used if we are doing vertex based fog.
@@ -181,7 +176,6 @@ public:
    * recursion level.
    */
   bool added_fog_info;
-#endif // CS_USE_NEW_RENDERER
 
   /**
    * A number indicating the recursion level we are in. Starts with 0.
@@ -268,7 +262,6 @@ struct iRenderView : public iBase
   /// Enable the use of a clip frustum.
   virtual void UseClipFrustum (bool u) = 0;
 
-#ifndef CS_USE_NEW_RENDERER
   /**
    * Every fogged sector we encountered results in an extra structure in the
    * following list. This is only used if we are doing vertex based fog.
@@ -287,7 +280,6 @@ struct iRenderView : public iBase
    * Reset fog info.
    */
   virtual void ResetFogInfo () = 0;
-#endif // CS_USE_NEW_RENDERER
   /**
    * Get the current camera.
    */

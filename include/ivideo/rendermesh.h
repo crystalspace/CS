@@ -37,6 +37,7 @@ class csColor;
 class csReversibleTransform;
 struct iTextureHandle;
 struct iMaterialWrapper;
+struct iRenderBufferSource;
 
 /// Type of mesh
 enum csRenderMeshType

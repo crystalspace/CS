@@ -190,9 +190,9 @@ public:
   void GetRadius (csVector3& radius, csVector3& cent)
   { radius =  rad; cent = object_bbox.GetCenter(); }
 
-#ifdef CS_USE_NEW_RENDERER
-
   virtual csRenderMesh** GetRenderMeshes (int &n);
+
+#ifdef CS_USE_NEW_RENDERER
 
   iRenderBuffer *GetRenderBuffer (csStringID name);
   //------------------------- iStreamSource implementation ----------------

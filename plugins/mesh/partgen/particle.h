@@ -164,6 +164,7 @@ public:
 
   /// quick visibility test
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  virtual csRenderMesh** GetRenderMeshes (int&) { return 0; }
 
   /// update lighting info
   void UpdateLighting (iLight**, int, iMovable*);

@@ -1051,9 +1051,7 @@ public:
   } scfiShadowReceiver;
   friend struct ShadowReceiver;
 
-#ifdef CS_USE_NEW_RENDERER
   virtual csRenderMesh **GetRenderMeshes (int &num);
-#endif
 
   //-------------------- iMeshObject interface implementation ----------
   struct MeshObject : public iMeshObject
@@ -1090,11 +1088,11 @@ public:
       /// The following enable/disable shadow caps for stencil shadow rendering
     virtual void EnableShadowCaps () {}
     virtual void DisableShadowCaps () {}
+#endif // CS_USE_NEW_RENDERER
     virtual csRenderMesh** GetRenderMeshes (int &n)
     {
       return scfParent->GetRenderMeshes (n);
     }
-#endif // CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
     { return 0; }

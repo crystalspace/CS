@@ -115,20 +115,10 @@ csBugPlug::csBugPlug (iBase *iParent)
   edit_mode = false;
   edit_string[0] = 0;
   initialized = false;
-#ifndef CS_USE_NEW_RENDERER
   spider = new csSpider ();
-#else
-  spider = 0;
-#endif
-#ifndef CS_USE_NEW_RENDERER
   shadow = new csShadow ();
-#else
-  shadow = 0;
-#endif
   selected_mesh = 0;
-#ifndef CS_USE_NEW_RENDERER
   shadow->SetShadowMesh (selected_mesh);
-#endif
   spider_hunting = false;
   prev_selected_mesh = 0;
   scfiEventHandler = 0;
@@ -217,11 +207,7 @@ void csBugPlug::SetupPlugin ()
 
   if (!Engine) Engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
-#ifdef CS_USE_NEW_RENDERER
   if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#else
-  if (!G3D) G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-#endif
 
   if (!G3D)
   {

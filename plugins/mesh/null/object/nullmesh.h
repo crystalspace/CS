@@ -95,13 +95,12 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 
-#ifdef CS_USE_NEW_RENDERER
   virtual csRenderMesh **GetRenderMeshes (int &num)
   {
     num = 0;
     return 0;
   }
-#endif
+
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public csObjectModel
   {

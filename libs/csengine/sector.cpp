@@ -1239,12 +1239,14 @@ void csSector::Draw (iRenderView *rview)
 }
 
 
-#ifdef CS_USE_NEW_RENDERER
 iSectorRenderMeshList* csSector::GetRenderMeshes ()
 {
+#ifdef CS_USE_NEW_RENDERER
   return &rmeshes;
-}
+#else
+  return 0;
 #endif // CS_USE_NEW_RENDERER
+}
 
 void csSector::CheckFrustum (iFrustumView *lview)
 {
