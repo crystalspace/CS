@@ -77,6 +77,11 @@ public:
     return strcmp (item1, item2);
   }
 
+  static int CaseSensitiveCompare (const char* const &item1, const char* const &item2)
+  {
+    return strcasecmp (item1, item2);
+  }
+
   static int CaseSensitiveCompareSort (void const* item1, void const* item2)
   {
     return strcmp (*(char const**)item1, *(char const**)item2);
