@@ -854,7 +854,6 @@ void csRadiosity :: ProcessDest(csRadPoly *dest, csFrustumView *lview)
   // prepare to send/receive light.
   PrepareShootDest(dest, lview);
   ShootRadiosityToPolygon(dest);
-  printf("deleteing matrix %x\n", (int)shadow_matrix);
   delete shadow_matrix; 
   shadow_matrix = 0;
   list->DeleteElement(dest); // get out of tree
@@ -932,11 +931,22 @@ void csRadiosity :: PrepareShootDest(csRadPoly *dest, csFrustumView *lview)
   // between regular lighting and radiosity lighting, prevents bugs.
   shadow_matrix = new csPolyTexture::csCoverageMatrix(
     dest->GetWidth(), dest->GetHeight());
-  printf("created matrix %x\n", (int)shadow_matrix);
+  for(int i=0; i<dest->GetSize(); i++)
+    shadow_matrix->coverage[i] = 0.0;
   //for(int i=0; i<dest->GetSize(); i++)
   //  static_shadow_map[i] = 0.0; // start with none visible.
+  csFrustumView new_lview = *lview;
+  csVector3 poly[4];
+  int num_vert = 4;
+  if( !dest->GetPolygon3D()->GetLightMapInfo()->GetPolyTex()->
+    GetLightmapBounds(lview, poly) )
+    // empty intersection, none covered (will be skipped)
+    return;
+  new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vert);
+  // @@@ memory leak in line above? delete at end of function?
+  if(!new_lview.light_frustum) return;
   dest->GetPolygon3D()->GetLightMapInfo()->GetPolyTex()->GetCoverageMatrix(
-    *lview, *shadow_matrix);
+    new_lview, *shadow_matrix);
 }
 
 
