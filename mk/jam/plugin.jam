@@ -3,7 +3,7 @@
 #============================================================================
 
 ##  Plugin pluginname : sources [ : options ]
-##    Build an application out of sourcefiles. All sourcefiles will be passed
+##    Build a plugin out of sourcefiles. All sourcefiles will be passed
 ##    to the Objects rule which tries to compile them into object-files. You
 ##    can create rules for your own filetypes with the UserObject rule. Header
 ##    files will just be ignored. They are only used for MSVC projectfile
