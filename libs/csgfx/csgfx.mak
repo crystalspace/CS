@@ -46,7 +46,7 @@ TO_INSTALL.STATIC_LIBS += $(CSGFX.LIB)
 MSVC.DSP += CSGFX
 DSP.CSGFX.NAME = csgfx
 DSP.CSGFX.TYPE = library
-DSP.CSGFX.RESOURCES = $(wildcard $(SRCDIR)/libs/csgfx/*.inc)
+DSP.CSGFX.RESOURCES = $(wildcard $(SRCDIR)/$(DIR.CSGFX)/*.inc)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

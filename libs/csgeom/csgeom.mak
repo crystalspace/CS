@@ -40,7 +40,7 @@ TO_INSTALL.STATIC_LIBS += $(CSGEOM.LIB)
 MSVC.DSP += CSGEOM
 DSP.CSGEOM.NAME = csgeom
 DSP.CSGEOM.TYPE = library
-DSP.CSGEOM.RESOURCES = $(wildcard $(SRCDIR)/libs/csgeom/*.inc)
+DSP.CSGEOM.RESOURCES = $(wildcard $(SRCDIR)/$(DIR.CSGEOM)/*.inc)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
