@@ -33,6 +33,7 @@ class csVector2;
 class csColor;
 class csBox3;
 class csGradient;
+struct csAlphaMode;
 struct iEngine;
 struct iSector;
 struct iMaterialWrapper;
@@ -40,6 +41,7 @@ struct iThingFactoryState;
 struct iLoaderContext;
 struct iDocumentNode;
 struct iString;
+struct iStringSet;
 
 /**\name Texture transformation description
  * @{ */
@@ -53,7 +55,7 @@ struct iString;
 #define CSTEX_UV_SHIFT 8 
 /** @} */
 
-SCF_VERSION (iSyntaxService, 1, 3, 1);
+SCF_VERSION (iSyntaxService, 1, 3, 2);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -144,6 +146,12 @@ struct iSyntaxService : public iBase
    */
   virtual void Report (const char* msgid, int severity, 
     iDocumentNode* errornode, const char* msg, ...) CS_GNUC_PRINTF(5,6) = 0;
+  
+  /**
+   * Parse an alphamode description. Returns true if successful.
+   */
+  virtual bool ParseAlphaMode (iDocumentNode* node, iStringSet* strings,
+    csAlphaMode& alphaMode) = 0;
 };
 
 /** @} */
