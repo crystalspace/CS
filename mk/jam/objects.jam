@@ -7,16 +7,29 @@
 # can only have 1 such rule. Thus we construct a more flexible toolkit here
 # which let's you register rules for certain filetypes.
 
-##  RegisterFileType Rulename : extension
+##  RegisterFileType Rulename : extensions
 ##    Register a rule which is used to compile a filetype into object
 ##    files. The registered rule is called with 2 arguments: the name of the
 ##    objectfile which should be created and the name of the sourcefile.
 rule RegisterFileType
 {
-  local type ;
+  local suffix ;
   for suffix in $(>)
   {
     FILETYPE_$(suffix) = $(<) ;
+  }
+}
+
+##  RegisterHeaderRule rulename : regexpattern : extensions
+##    Registers a rule and a regular expression which will be used for header
+##    file scanning of the specified extensions.
+rule RegisterHeaderRule
+{
+  local suffix ;
+  for suffix in $(3)
+  {
+    HDRRULE_$(suffix) = $(<) ;
+    HDRPATTERN_$(suffix) = $(>) ;
   }
 }
 
@@ -72,13 +85,22 @@ rule CompileObject
   # $(SEARCH_SOURCE:E) is where cc first looks for #include 
   # "foo.h" files.  If the source file is in a distant directory, 
   # look there.  Else, look in "" (the current directory).
-
-  HDRRULE on $(>) = HdrRule ;
-  HDRSCAN on $(>) = $(HDRPATTERN) ;
   HDRSEARCH on $(>) = 
-      $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;
-
+    $(SEARCH_SOURCE:E) $(SUBDIRHDRS) $(HDRS) $(STDHDRS) ;  
   HDRGRIST on $(>) = $(HDRGRIST) ;
+  
+  if $(HDRRULE_$(>:S))
+  {
+    echo Customrule: $(>) ;
+    HDRRULE on $(>) = $(HDRRULE_$(>:S)) ;
+    HDRSCAN on $(>) = $(HDRPATTERN_$(>:S)) ;
+    echo pattern: $(HDRPATTERN_$(>:S)) ;
+  }
+  else
+  {
+    HDRRULE on $(>) = HeaderRule ;
+    HDRSCAN on $(>) = $(HDRPATTERN) ;
+  }
 
   # propagate target specific-defines
   DEFINES on $(<) += $(DEFINES) ;
@@ -96,8 +118,50 @@ rule CompileObject
   }
 }
 
+##  HeaderRule source : headers
+##    This rule is the default header rule used by the objects rules. You
+##    might register custom rules with the RegisterHeaderRule rule.
+rule HeaderRule
+{
+  # N.B.  This rule is called during binding, potentially after
+  # the fate of many targets has been determined, and must be
+  # used with caution: don't add dependencies to unrelated
+  # targets, and don't set variables on $(<).
+                                                                                
+  # Tell Jam that anything depending on $(<) also depends on $(>),
+  # set SEARCH so Jam can find the headers, but then say we don't
+  # care if we can't actually find the headers (they may have been
+  # within ifdefs),
+
+  echo H: $(<) $(>) ;
+
+  local s = $(>:G=$(HDRGRIST:E)) ;
+                                                                                
+  Includes $(<) : $(s) ;
+  SEARCH on $(s) = $(HDRSEARCH) ;
+  NoCare $(s) ;
+                                                                                
+  local i ;
+  for i in $(s)
+  {
+    HDRGRIST on $(s) = $(HDRGRIST) ;
+    HDRSEARCH on $(s) = $(HDRSEARCH) ;
+                                                                                
+    if $(HDRRULE_$(i:S))
+    {
+      HDRRULE on $(s) = $(HDRRULE_$(i:S)) ;
+      HDRSCAN on $(s) = $(HDRPATTERN_$(i:S)) ;
+    }
+    else
+    {
+      HDRRULE on $(s) = HeaderRule ;
+      HDRSCAN on $(s) = $(HDRPATTERN) ;
+    }
+  }
+}
+
 # dummy rule: .o files are used as is
-rule UseObject
+rule UseObjectFile
 {
 }
-RegisterFileType UseObject : .o ;
+RegisterFileType UseObjectFile : .o ;

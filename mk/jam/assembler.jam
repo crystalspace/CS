@@ -13,6 +13,9 @@ rule Nasm
 }
 RegisterFileType Nasm : .asm ;
 
+NASM.HDRPATTERN = "^[ 	]*%[ 	]*include[ 	]*[<\"]([^\">]*)[\">].*$" ;
+RegisterHeaderRule HeaderRule : $(NASM.HDRPATTERN) : .asm ;
+
 actions Nasm
 {
   $(CMD.NASM) $(NASM.FLAGS) $(INCLUDEFLAGS) -o $(<) $(>)
