@@ -153,12 +153,12 @@ awsManager::FindComponentFactory(char *name)
   return NULL;
 }
 
-awsWindow *
+iAwsWindow *
 awsManager::GetTopWindow()
 { return top; }
     
 void 
-awsManager::SetTopWindow(awsWindow *_top)
+awsManager::SetTopWindow(iAwsWindow *_top)
 { top = _top; }
 
 void 
@@ -249,7 +249,7 @@ awsManager::InvalidateUpdateStore()
 
 
 bool
-awsManager::WindowIsDirty(awsWindow *win)
+awsManager::WindowIsDirty(iAwsWindow *win)
 {
   int i;
    
@@ -265,7 +265,7 @@ awsManager::UpdateStore()
  if (updatestore_dirty)
   {
  
-   awsWindow *curwin=top;
+   iAwsWindow *curwin=top;
    
    updatestore.makeEmpty();
 
@@ -342,7 +342,7 @@ awsManager::Redraw()
      //ptG2D->DrawBox(0,0, proctex_width,proctex_height,erasefill);
 
 
-   awsWindow *curwin=top, *oldwin = 0;
+   iAwsWindow *curwin=top, *oldwin = 0;
    
    // check to see if any part of this window needs redrawn
    while(curwin)
@@ -429,7 +429,7 @@ awsManager::Redraw()
 }
 
 void
-awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
+awsManager::RedrawWindow(iAwsWindow *win, csRect &dirtyarea)
 {
      if (DEBUG_MANAGER) printf("aws-debug: start drawing window.\n");
 
@@ -454,10 +454,10 @@ awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
 }
 
 void
-awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
+awsManager::RecursiveDrawChildren(iAwsComponent *cmp, csRect &dirtyarea)
 {
    int i; 
-   awsComponent *child;
+   iAwsComponent *child;
 
    if (DEBUG_MANAGER) printf("aws-debug: start drawing children.\n");
 
@@ -488,7 +488,7 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
 
 }
 
-awsWindow *
+iAwsWindow *
 awsManager::CreateWindowFrom(char *defname)
 {
    printf("aws-debug: Searching for window def \"%s\"\n", defname);
@@ -502,7 +502,7 @@ awsManager::CreateWindowFrom(char *defname)
    if (winnode==NULL) return NULL;
    
    // Create a new window
-   awsWindow *win = new awsWindow();
+   iAwsWindow *win = new awsWindow();
 
    // Setup the name of the window
    win->SetID(winnode->Name());
@@ -520,7 +520,7 @@ awsManager::CreateWindowFrom(char *defname)
 }
 
 void
-awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponentNode *settings)
+awsManager::CreateChildrenFromDef(iAws *wmgr, iAwsComponent *parent, awsComponentNode *settings)
 {
   int i;
   for(i=0; i<settings->GetLength(); ++i)
@@ -535,7 +535,7 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponent
       // If we have a factory for this component, then create it and set it up.
       if (factory)
       {
-	awsComponent *comp = factory->Create();
+	iAwsComponent *comp = factory->Create();
 
         // Setup the name of the component
         comp->SetID(comp_node->Name());
@@ -605,7 +605,7 @@ awsManager::HandleEvent(iEvent& Event)
       {
         // Find the window that DOES contain the mouse.
       
-        awsWindow *win=GetTopWindow();
+        iAwsWindow *win=GetTopWindow();
       
         // Skip the top 'cause we already checked it.
         if (win) win=win->WindowBelow();
@@ -642,10 +642,10 @@ awsManager::HandleEvent(iEvent& Event)
 }
 
 bool 
-awsManager::RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &Event)
+awsManager::RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &Event)
 {
   int i;
-  awsComponent *child;
+  iAwsComponent *child;
 
   for(i=0; i<cmp->GetChildCount(); ++i)
    {

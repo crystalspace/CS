@@ -3,6 +3,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
+#include "iutil/event.h"
 
 #include <stdio.h>
 
@@ -30,11 +31,6 @@ const int grip_size=16;
 // Set to true to get printf info about events, false to disable them.
 const bool DEBUG_WINDOW_EVENTS = false;
 
-
-SCF_IMPLEMENT_IBASE(awsWindow)
-  SCF_IMPLEMENTS_INTERFACE(awsComponent)
-SCF_IMPLEMENT_IBASE_END
-
 awsWindow::awsWindow():above(NULL), below(NULL), 
   min_button(NULL), max_button(NULL), close_button(NULL), btxt(NULL),
   frame_style(fsNormal), 
@@ -52,10 +48,22 @@ awsWindow::~awsWindow()
 
 }
 
+void 
+awsWindow::SetWindowAbove(iAwsWindow *win)
+{
+  above=win;
+}
+
+void 
+awsWindow::SetWindowBelow(iAwsWindow *win)
+{
+  below=win;
+}
+
 bool 
 awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
-  if (!awsComponent::Setup(_wmgr, settings)) return false;
+  if (!comp.Setup(_wmgr, settings)) return false;
 
   iAwsPrefManager *pm = WindowManager()->GetPrefMgr();
   
@@ -118,10 +126,10 @@ void
 awsWindow::Unlink()
 {
     // If there's someone below us, set their above to our above.
-    if (below) below->above = above;
+    if (below) below->SetWindowAbove(above);
 
     // If there's someone above us, then set their below to our below
-    if (above) above->below = below;
+    if (above) above->SetWindowBelow(below);
     else
     {
         /*  This means that we're the top level window, and we're going away.  We need to tell the window manager to
@@ -133,24 +141,24 @@ awsWindow::Unlink()
 }
 
 void 
-awsWindow::LinkAbove(awsWindow *win)
+awsWindow::LinkAbove(iAwsWindow *win)
 {
   if (win) {
-     above=win->above;
-     win->above=this;
+     above=win->WindowAbove();
+     win->SetWindowAbove(this);
 
      below=win;
   }
 }
 
 void 
-awsWindow::LinkBelow(awsWindow *win)
+awsWindow::LinkBelow(iAwsWindow *win)
 {
   if (win) {
      above=win;
      
-     below=win->below;
-     win->below=this;
+     below=win->WindowBelow();
+     win->SetWindowBelow(this);
   }
 }
 
@@ -182,7 +190,7 @@ awsWindow::Lower()
    // Only lower if we're not already the bottom
    if (below != NULL)
    {
-      awsWindow *next = below;
+      iAwsWindow *next = below;
 
       // Get us out of the window hierachy.
       Unlink();
@@ -458,6 +466,38 @@ awsWindow::OnMouseMove(int button, int x, int y)
 }
 
 bool 
+awsWindow::HandleEvent(iEvent& Event)
+{  
+  switch(Event.Type)
+  {
+  case csevMouseMove:
+    return OnMouseMove(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
+
+  case csevMouseUp:
+    return OnMouseUp(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
+
+  case csevMouseDown:
+    return OnMouseDown(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
+
+  case csevMouseClick:
+    return OnMouseClick(Event.Mouse.Button, Event.Mouse.x, Event.Mouse.y);
+
+  case csevMouseEnter:
+    return OnMouseEnter();
+
+  case csevMouseExit:
+    return OnMouseExit();
+
+  case csevKeyDown:
+    return OnKeypress(Event.Key.Char, Event.Key.Modifiers);
+    
+  }
+
+  return false;
+
+}
+
+bool 
 awsWindow::OnMouseExit()
 {
   return false;
@@ -704,3 +744,77 @@ awsWindow::Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo)
   g2d->DrawLine(f.xmax, f.ymin, f.xmax, f.ymax, lo);
 }
 
+
+    
+void 
+awsWindow::Invalidate() 
+{ comp.Invalidate(); }
+
+void 
+awsWindow::Invalidate(csRect area) 
+{ comp.Invalidate(area); }
+
+csRect& 
+awsWindow::Frame()
+{ return comp.Frame(); }
+
+bool 
+awsWindow::Overlaps(csRect &r)
+{ return comp.Overlaps(r); }
+
+bool 
+awsWindow::isHidden()
+{ return comp.isHidden(); }
+
+void 
+awsWindow::Hide()
+{ comp.Hide(); }
+
+void 
+awsWindow::Show()
+{ comp.Show(); }
+
+unsigned 
+long 
+awsWindow::GetID()
+{ return comp.GetID(); }
+
+void 
+awsWindow::SetID(unsigned long _id)
+{ comp.SetID(_id); }
+
+void 
+awsWindow::MoveChildren(int delta_x, int delta_y)
+{ comp.MoveChildren(delta_x, delta_y); }
+
+void 
+awsWindow::AddChild(iAwsComponent* child, bool owner=true)
+{ comp.AddChild(child, owner); }
+
+void 
+awsWindow::RemoveChild(iAwsComponent *child)
+{ comp.RemoveChild(child); }
+
+int 
+awsWindow::GetChildCount()
+{ return comp.GetChildCount(); }
+
+iAwsComponent *
+awsWindow::GetChildAt(int i)
+{ return comp.GetChildAt(i); }
+
+bool 
+awsWindow::HasChildren()
+{ return comp.HasChildren(); }
+
+bool 
+awsWindow::RegisterSlot(iAwsSlot *slot, unsigned long signal)
+{ return comp.RegisterSlot(slot, signal); }
+
+bool 
+awsWindow::UnregisterSlot(iAwsSlot *slot, unsigned long signal)
+{ return comp.UnregisterSlot(slot, signal); } 
+
+void 
+awsWindow::Broadcast(unsigned long signal)
+{ comp.Broadcast(signal); }

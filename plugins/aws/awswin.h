@@ -31,23 +31,23 @@
 *                                                                                                                          *
 ***************************************************************************************************************************/
 
-class awsWindow : public awsComponent
+class awsWindow : public iAwsWindow
 {
 private:
     /// Pointer to the window above this one.  Is null if there isn't one.
-    awsWindow *above;
+    iAwsWindow *above;
 
     /// Pointer to the window below this one.  Is null if there isn't one.
-    awsWindow *below;
+    iAwsWindow *below;
 
     /// Unlinks this window from the window hierarchy.
     void Unlink();
 
     /// Links this window in above the passed in window.  This window must be unlinked!
-    void LinkAbove(awsWindow *win);
+    void LinkAbove(iAwsWindow *win);
 
     /// Links this window in below the passed in window.  This window must be unlinked!
-    void LinkBelow(awsWindow *win);
+    void LinkBelow(iAwsWindow *win);
 
     /// Texture handles for buttons
     iTextureHandle *min_button, *max_button, *close_button, *btxt;
@@ -88,8 +88,65 @@ private:
     /// The frame cache for storing frame state while the window is zoomed.
     csRect unzoomed_frame;
 
+    /// Embedded component
+    awsComponent comp;
+
 private:
     void Draw3DRect(iGraphics2D *g2d, csRect &f, int hi, int lo);
+    
+    /// Get's this components idea of the window manager.  Should be used internally by the component ONLY.
+    iAws *WindowManager()
+    { return comp.WindowManager(); }
+
+    ////////////// Component declarations for embedded wrappers ///////////////////////////////
+
+    /// Invalidation routine: allow the component to be redrawn when you call this
+    virtual void Invalidate();
+
+    /// Invalidation routine: allow component to be redrawn, but only part of it
+    virtual void Invalidate(csRect area);
+
+    /// Get this component's frame
+    virtual csRect& Frame();
+
+    /// Returns true if this window overlaps the given rect.
+    virtual bool Overlaps(csRect &r);
+
+    /// Returns the state of the hidden flag
+    virtual bool isHidden();
+    
+    /// Hides a component
+    virtual void Hide();
+
+    /// Shows a component
+    virtual void Show();
+
+    /// Get's the unique id of this component.
+    virtual unsigned long GetID();
+    
+    /// Set's the unique id of this component. Note: only to be used by window manager.
+    virtual void SetID(unsigned long _id);
+
+    /// Recursively moves children (and all nested children) by relative amount given.
+    virtual void MoveChildren(int delta_x, int delta_y);
+  
+    /// Adds a child
+    virtual void AddChild(iAwsComponent* child, bool owner=true);
+
+    /// Removes a child
+    virtual void RemoveChild(iAwsComponent *child);
+
+    /// Get's the number of children
+    virtual int GetChildCount();
+
+    /// Get's a specific child
+    virtual iAwsComponent *GetChildAt(int i);
+    
+    /// Returns true if this component has children
+    virtual bool HasChildren();
+
+    /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
+    virtual bool HandleEvent(iEvent& Event);
     
 public:
    static const unsigned long sWindowRaised;
@@ -144,10 +201,10 @@ public:
    }
 
    /// Sets the value of the redraw tag
-   void SetRedrawTag(unsigned int tag);
+   virtual void SetRedrawTag(unsigned int tag);
 
    /// Gets the value of the redraw tag
-   unsigned int RedrawTag()
+   virtual unsigned int RedrawTag()
    { return redraw_tag; }
 
 public:
@@ -158,20 +215,36 @@ public:
     virtual ~awsWindow();
 
 public:
+    /// Registers a slot for a signal
+    virtual bool RegisterSlot(iAwsSlot *slot, unsigned long signal);
+
+    /// Unregisters a slot for a signal.
+    virtual bool UnregisterSlot(iAwsSlot *slot, unsigned long signal);
+
+    /// Broadcasts a signal to all slots that are interested.
+    virtual void Broadcast(unsigned long signal);
+
+public:
     /// Raises a window to the top.
-    void Raise();
+    virtual void Raise();
 
     /// Lowers a window to the bottom.
-    void Lower();
+    virtual void Lower();
 
     /// Get's the window above this one, NULL if there is none.
-    awsWindow *WindowAbove()
+    virtual iAwsWindow *WindowAbove()
     { return above; }
 
     /// Get's the window below this one, NULL if there is none.
-    awsWindow *WindowBelow()
+    virtual iAwsWindow *WindowBelow()
     { return below; }
 
+    /// Set's the window above this one
+    virtual void SetWindowAbove(iAwsWindow *win);
+    
+    /// Set's the window below this one
+    virtual void SetWindowBelow(iAwsWindow *win);
+    
     /// Does some additional setup for windows, including linking into the window hierarchy.
     virtual bool Setup(iAws *_wmgr, awsComponentNode *settings);
 

@@ -28,7 +28,7 @@ class awsCanvas;
 
 SCF_VERSION (awsComponent, 0, 0, 1);
 
-/** ************************************************************************************************************************
+/**************************************************************************************************************************
 *   The general idea for a component's initialization stage is like this:                                                 *
 *       1. construction - any internal structures should be created and intialized.                                       *
 *       2. setup - the window manager calls Setup() on the component being created when it is added into the window       *
@@ -49,7 +49,7 @@ SCF_VERSION (awsComponent, 0, 0, 1);
 **************************************************************************************************************************/
 class awsComponent : public iAwsComponent
 {
-   /// The stored handle to the window manager, in case a component needs it.
+     /// The stored handle to the window manager, in case a component needs it. 
    iAws  *wmgr;
 
    /// The rectangle marking the frame of this component
@@ -66,8 +66,10 @@ class awsComponent : public iAwsComponent
 
    /// Embedded awsSource
    awsSource signalsrc;
-  
+   
 public:
+    SCF_DECLARE_IBASE;
+
     awsComponent();
     virtual ~awsComponent();
 
@@ -102,7 +104,8 @@ public:
     { return frame; }
 
     /// Returns the named TYPE of the component, like "Radio Button", etc.
-    virtual char *Type()=0;
+    virtual char *Type()
+    { return "Component"; }
 
     /// Returns true if this window overlaps the given rect.
     virtual bool Overlaps(csRect &r);
@@ -118,7 +121,7 @@ public:
     virtual void Show();
 
     /// Get's the unique id of this component.
-    unsigned long GetID()
+    virtual unsigned long GetID()
     { return id; }
 
     /// Set's the unique id of this component. Note: only to be used by window manager.
@@ -145,52 +148,51 @@ public:
     virtual int GetChildCount();
 
     /// Get's a specific child
-    virtual awsComponent *GetChildAt(int i);
+    virtual iAwsComponent *GetChildAt(int i);
     
     /// Returns true if this component has children
     virtual bool HasChildren()
     { return children!=NULL; }
 
-
-protected:
-    /// Get's this components idea of the window manager.  Should be used internally by the component ONLY.
+    /** Get's this components idea of the window manager.  
+      * Should be used internally by the component ONLY,
+      * or by embedding classes. */
     iAws *WindowManager()
     { return wmgr; }
 
 public:
     /// Triggered when the component needs to draw
-    virtual void OnDraw(csRect clip)=0;
+    virtual void OnDraw(csRect clip);
 
     /// Triggered when the user presses a mouse button down
-    virtual bool OnMouseDown(int button, int x, int y)=0;
+    virtual bool OnMouseDown(int button, int x, int y);
     
     /// Triggered when the user unpresses a mouse button 
-    virtual bool OnMouseUp(int button, int x, int y)=0;
+    virtual bool OnMouseUp(int button, int x, int y);
     
     /// Triggered when the user moves the mouse
-    virtual bool OnMouseMove(int button, int x, int y)=0;
+    virtual bool OnMouseMove(int button, int x, int y);
 
     /// Triggered when the user clicks the mouse
-    virtual bool OnMouseClick(int button, int x, int y)=0;
+    virtual bool OnMouseClick(int button, int x, int y);
 
     /// Triggered when the user double clicks the mouse
-    virtual bool OnMouseDoubleClick(int button, int x, int y)=0;
+    virtual bool OnMouseDoubleClick(int button, int x, int y);
 
     /// Triggered when this component loses mouse focus
-    virtual bool OnMouseExit()=0;
+    virtual bool OnMouseExit();
 
     /// Triggered when this component gains mouse focus
-    virtual bool OnMouseEnter()=0;
+    virtual bool OnMouseEnter();
 
     /// Triggered when the user presses a key
-    virtual bool OnKeypress(int key, int modifiers)=0;
+    virtual bool OnKeypress(int key, int modifiers);
     
     /// Triggered when the keyboard focus is lost
-    virtual bool OnLostFocus()=0;
+    virtual bool OnLostFocus();
 
     /// Triggered when the keyboard focus is gained
-    virtual bool OnGainFocus()=0;
-
+    virtual bool OnGainFocus();
 };
 
 class awsComponentFactory : public iAwsComponentFactory

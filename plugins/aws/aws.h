@@ -67,13 +67,13 @@ class awsManager : public iAws
    csRect frame;
 
    /// The current top window
-   awsWindow   *top;
+   iAwsWindow    *top;
 
    /// The current component that the mouse was in.
-   awsComponent *mouse_in;
+   iAwsComponent *mouse_in;
 
    /// True if mouse events are locked into the top window
-   bool         mouse_captured;
+   bool          mouse_captured;
 
    /// The 2d graphics context
    iGraphics2D *ptG2D;
@@ -163,13 +163,13 @@ public:
     virtual awsComponentFactory *FindComponentFactory(char *name);
 
     /// Get the top window
-    virtual awsWindow *GetTopWindow();
+    virtual iAwsWindow *GetTopWindow();
 
     /// Set the top window
-    virtual void       SetTopWindow(awsWindow *_top);
+    virtual void       SetTopWindow(iAwsWindow *_top);
 
     /// Returns true if part of this window is inside the dirty zones
-    virtual bool       WindowIsDirty(awsWindow *win);
+    virtual bool       WindowIsDirty(iAwsWindow *win);
     
     /// Causes the current view of the window system to be drawn to the given graphics device.
     virtual void       Print(iGraphics3D *g3d);
@@ -194,16 +194,16 @@ public:
 
 protected:
     /// Redraws a window only if it has areas in the dirtyarea
-    void RedrawWindow(awsWindow *win, csRect &dirtyarea);
+    void RedrawWindow(iAwsWindow *win, csRect &dirtyarea);
                 
     /// Redraws all children recursively, but only if they have an part in dirty area
-    void RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea);
+    void RecursiveDrawChildren(iAwsComponent *cmp, csRect &dirtyarea);
 
     /// Recursively broadcasts events to children, but only if they deserve it.
-    bool RecursiveBroadcastToChildren(awsComponent *cmp, iEvent &event);
+    bool RecursiveBroadcastToChildren(iAwsComponent *cmp, iEvent &event);
     
     /// Recursively creates child components and adds them into a parent.  Used internally.
-    void CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponentNode *settings);
+    void CreateChildrenFromDef(iAws *wmgr, iAwsComponent *parent, awsComponentNode *settings);
 
     /// Checks the updatestore_dirty flag and refreshes the store accordingly.
     void UpdateStore();
@@ -213,7 +213,7 @@ protected:
     
 public:
     /// Instantiates a window based on a window definition.
-    virtual awsWindow *CreateWindowFrom(char *defname);
+    virtual iAwsWindow *CreateWindowFrom(char *defname);
 
 public:
     /// Set the contexts however you want

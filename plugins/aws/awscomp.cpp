@@ -166,11 +166,11 @@ awsComponent::GetChildCount()
     return 0;
 }
 
-awsComponent *
+iAwsComponent *
 awsComponent::GetChildAt(int i)
 {
   if (children)
-    return (awsComponent *)((*children)[i]);
+    return (iAwsComponent *)((*children)[i]);
   else
     return NULL;
 }
@@ -206,7 +206,7 @@ awsComponent::MoveChildren(int delta_x, int delta_y)
   int i;
   for(i=0; i<GetChildCount(); ++i)
   {
-    awsComponent *child = GetChildAt(i);
+    iAwsComponent *child = GetChildAt(i);
     
     if (child->HasChildren())
       child->MoveChildren(delta_x, delta_y);
@@ -233,6 +233,18 @@ awsComponent::Broadcast(unsigned long signal)
 {
   signalsrc.Broadcast(signal);
 }
+
+void awsComponent::OnDraw(csRect clip)                           { return; }
+bool awsComponent::OnMouseDown(int button, int x, int y)         { return false; }
+bool awsComponent::OnMouseUp(int button, int x, int y)           { return false; }
+bool awsComponent::OnMouseMove(int button, int x, int y)         { return false; }
+bool awsComponent::OnMouseClick(int button, int x, int y)        { return false; }
+bool awsComponent::OnMouseDoubleClick(int button, int x, int y)  { return false; }
+bool awsComponent::OnMouseExit()                                 { return false; }
+bool awsComponent::OnMouseEnter()                                { return false; }
+bool awsComponent::OnKeypress(int key, int modifiers)            { return false; }
+bool awsComponent::OnLostFocus()                                 { return false; }
+bool awsComponent::OnGainFocus()                                 { return false; }
 
 /////////////////////////////////////  awsComponentFactory ////////////////////////////////////////////////////////
 
