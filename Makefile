@@ -62,9 +62,9 @@ define SYSMODIFIERSHELP
   echo $"The following optional configuration modifiers may be specified:$"
   echo $"$"
   echo $"  USE_PLUGINS=yes$|no$"
-  echo $"      Build drivers/plugins as dynamic/static modules$"
+  echo $"      Build drivers/plugins as dynamic/static modules.$"
   echo $"  MODE=optimize$|debug$|profile$"
-  echo $"      Select one of three available compilation modes$"
+  echo $"      Select one of three available compilation modes.$"
 endef
 
 # If there is no target defined (makefile system was not configured),
@@ -72,6 +72,7 @@ endef
 ifeq ($(TARGET),)
 
 MAKESECTION=confighelp
+include mk/cache.mak
 include mk/install.mak
 -include $(SYSMAKEFILES)
 
@@ -94,8 +95,7 @@ clean cleanlib cleandep distclean show:
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 
 unknown:
-	$(RM) config.mak
-	$(RM) include/volatile.h
+	$(RM) config.mak include/volatile.h
 
 platforms:
 	@echo $(SEPARATOR)
@@ -192,4 +192,3 @@ endif
 
 MAKESECTION=roottargets
 include mk/subs.mak
-# DO NOT DELETE

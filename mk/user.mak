@@ -2,6 +2,8 @@
 # This is an configuration file which describes user options global to all
 # Crystal Space programs and libraries.  Edit it to suit your taste.  Also
 # have a look at the platform-dependent makefile for system settings.
+#
+# Documentation copyright (C)1999-2001 by Eric Sunshine.
 #=============================================================================
 
 #-----------------------------------------------------------------------------
@@ -111,6 +113,32 @@ endif
 # Default build mode
 ifndef MODE
   MODE=optimize
+endif
+
+# Should we cache makefile information?  Caching information speeds up the
+# build process by avoiding the time-consuming scanning which locates and then
+# reads makefiles throughout the project.  Usually caching is desirable.
+ifndef USE_MAKEFILE_CACHE
+  USE_MAKEFILE_CACHE=yes
+endif
+
+# Should we monitor and automatically refresh an outdated makefile cache?
+# The makefile cache is created when the makefile system is first configured,
+# and then automatically refreshed when the chosen platform-specific makefile
+# changes, user.mak changes, or one of the source makefiles for the cache
+# changes.  Unfortunately, monitoring the source makefiles for changes adds
+# some overhead and slows down the build process slightly.  If you have a slow
+# disk subsystem, then you may want to disable the cache monitoring facility
+# since even this small amount of extra overhead may become annoying.  In most
+# cases, it is safe to disable this facility since makefiles rarely change,
+# thus it is unlikely that the cache will become outdated.  Even if it does
+# become outdated, you can still rebuild it manually by invoking the `recache'
+# makefile target (i.e. "make recache").  Beware, however, that if you update
+# the project frequently from the CVS repository, it is probably safest to
+# leave the cache monitor enabled, just in case other developers modify
+# makefiles in the repository.
+ifndef MONITOR_MAKEFILE_CACHE
+  MONITOR_MAKEFILE_CACHE=yes
 endif
 
 # Should we use NASM for assembly?

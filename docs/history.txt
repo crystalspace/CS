@@ -54,6 +54,65 @@ The history order is reversed so that new features are at the top.
 	  has a constructor).
 	- Eric Sunshine fixed incorrect documentation for the new iComponent
 	  and iEventHandler interfaces.
+	- Eric Sunshine added a makefile caching mechanism to the project.  The
+	  caching mechanism can significantly reduce the amount of time each
+	  `make' invocation takes to actually start building the desired
+	  target.  Details follow.
+	    - The makefile caching facility is aimed at speeding up the build
+	      process on machines with slow disk subsystems.  In general, the
+	      build process is slowed considerably by GNU make having to search
+	      out and read subcomponent makefiles repeatedly during a build
+	      session.  At the time of this writing, the makefile system
+	      invokes CS/mk/subs.mak a total of five times in order to search
+	      out and read nearly every single makefile in the project.  On
+	      machines with slow disk subsystems, this repeated searching and
+	      reading can be agonizingly time-consuming.  In order to alleviate
+	      this particular problem, makefile information is cached so that
+	      it can be retrieved quickly when later needed.
+	    - Makefile caching is controlled by the USE_MAKEFILE_CACHE
+	      variable.  The default value of this variable is set to `yes' in
+	      user.mak.  This variable can also be set from the command line at
+	      makefile configuration time and becomes a persistent setting in
+	      config.mak.  Example: make linux USE_MAKEFILE_CACHE=yes
+	    - In order to prevent the makefile cache from becoming outdated, it
+	      can be refreshed automatically anytime any of its source
+	      makefiles is changed.  However, monitoring the source makefiles
+	      for changes slows down the build process slightly, so this option
+	      can be disabled, if desired, by setting the
+	      MONITOR_MAKEFILE_CACHE variable to `no'.  By default, for safety
+	      and accuracy, this variable is set to `yes' in user.mak.  It can
+	      also be set from the command line at makefile configuration time
+	      and becomes a persistent setting in config.mak.
+	      Example: make linux MONITOR_MAKEFILE_CACHE=yes
+	    - Note that the makefile cache is also refreshed any time user.mak
+	      or the configured platform-specific makefile is changed.  These
+	      two files are monitored unconditionally, regardless of the
+	      setting of MONITOR_MAKEFILE_CACHE.
+	    - The makefile target `recache' can be used to manually refresh the
+	      makefile cache at any time.  This can be useful after editing a
+	      makefile if automatic refresh has been disabled by setting
+	      MONITOR_MAKEFILE_CACHE to `no'.
+	    - USE_MAKEFILE_CACHE and MONITOR_MAKEFILE_CACHE are written to
+	      config.mak at makefile configuration time in order to make the
+	      settings persistent.
+	    - The actual cache is stored in the file cache.mak in the root
+	      directory of the project.  It is removed when the makefile
+	      targets `distclean' and `unknown' are invoked.
+	  The new makefile CS/mk/cache.mak contains the above description, as
+	  well as documentation explaining how caching is carried out
+	  internally.  The cache is created using the `echo' and `cat'
+	  commands.  If you find that these commands are not available on your
+	  platform, you can disable caching altogether by using
+	  "USE_MAKEFILE_CACHE=no" on the command line when configuring the
+	  makefile system.  If this is a permanent or persistent issue, then
+	  USE_MAKEFILE_CACHE=no can be inserted into the appropriate
+	  platform-specific makefile.  For anyone using a machine with a slow
+	  disk subsystem, consider setting MONITOR_MAKEFILE_CACHE to `no' to
+	  make the build process even speedier.  On my machine, the difference
+	  is considerable.  Be aware, however, that if developers change
+	  makefiles (*.mak) in the CVS repository, you will need to manually
+	  refresh the makefile cache by invoking "make recache" after updating
+	  from CVS.
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
 	  csVector2 instead.

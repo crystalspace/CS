@@ -1,76 +1,32 @@
-# This submakefile dynamically compute the name for all
-# plugins, libs, and apps submakefiles and includes them.
+# This submakefile dynamically computes the name for all plugin, library, and
+# application submakefiles and includes them.
+
+# SUBMAKEFILES is cached along with other makefile elements.  If it is still
+# empty after including cache.mak, then assume that nothing was cached and
+# load the submakefiles manually (below).
+SUBMAKEFILES = $(EMPTY)
+
+include mk/cache.mak
 
 ifneq ($(TARGET_MAKEFILE),)
   include $(TARGET_MAKEFILE)
 endif
 
-ifeq ($(LIBRARY_SUBMAKEFILES),)
-  LIBRARY_SUBMAKEFILES=$(wildcard libs/*/*.mak)
-endif
-ifneq ($(LIBRARY_SUBMAKEFILES),)
-  include $(LIBRARY_SUBMAKEFILES)
+PLUGINS += video/renderer video/canvas # Special defines.
+ifeq ($(USE_PLUGINS),yes)
+  PLUGINS += $(PLUGINS.DYNAMIC)
 endif
 
-ifeq ($(PLUGINS_SUBMAKEFILES),)
-  ifeq ($(USE_PLUGINS),yes)
-    PLUGINS += $(PLUGINS.DYNAMIC)
-  endif
-  PLUGINS_SUBMAKEFILES=\
-    $(wildcard $(addsuffix /*.mak,$(addprefix plugins/,$(sort $(PLUGINS)))))
-endif
-ifneq ($(PLUGINS_SUBMAKEFILES),)
-  PLUGINS.AUGMENTATION += video/renderer video/canvas # Special defines.
-  include $(wildcard $(addsuffix /*.mak,$(addprefix plugins/,\
-    $(sort $(PLUGINS.AUGMENTATION))))) $(PLUGINS_SUBMAKEFILES)
-endif
-
-ifeq ($(APPLICATION_SUBMAKEFILES),)
-  APPLICATION_SUBMAKEFILES=$(wildcard apps/*/*.mak)
-endif
-ifneq ($(APPLICATION_SUBMAKEFILES),)
-  include $(APPLICATION_SUBMAKEFILES)
-endif
-
-ifeq ($(TESTS_SUBMAKEFILES),)
-  TESTS_SUBMAKEFILES=$(wildcard apps/tests/*/*.mak)
-endif
-ifneq ($(TESTS_SUBMAKEFILES),)
-  include $(TESTS_SUBMAKEFILES)
-endif
-
-ifeq ($(TUTORIAL_SUBMAKEFILES),)
-  TUTORIAL_SUBMAKEFILES=$(wildcard apps/tutorial/*/*.mak)
-endif
-ifneq ($(TUTORIAL_SUBMAKEFILES),)
-  include $(TUTORIAL_SUBMAKEFILES)
-endif
-
-ifeq ($(EXAMPLES_SUBMAKEFILES),)
-  EXAMPLES_SUBMAKEFILES=$(wildcard apps/examples/*/*.mak)
-endif
-ifneq ($(EXAMPLES_SUBMAKEFILES),)
-  include $(EXAMPLES_SUBMAKEFILES)
-endif
-
-ifeq ($(IMPORT_SUBMAKEFILES),)
-  IMPORT_SUBMAKEFILES=$(wildcard apps/import/*/*.mak)
-endif
-ifneq ($(IMPORT_SUBMAKEFILES),)
-  include $(IMPORT_SUBMAKEFILES)
-endif
-
-ifeq ($(TOOLS_SUBMAKEFILES),)
-  TOOLS_SUBMAKEFILES=$(wildcard apps/tools/*/*.mak)
-endif
-ifneq ($(TOOLS_SUBMAKEFILES),)
-  include $(TOOLS_SUBMAKEFILES)
-endif
-
-ifeq ($(COMPOSITE_SUBMAKEFILES),)
-  COMPOSITE_SUBMAKEFILES=docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak \
-    mk/static.mak
-endif
-ifneq ($(COMPOSITE_SUBMAKEFILES),)
-  include $(COMPOSITE_SUBMAKEFILES)
+ifeq ($(strip $(SUBMAKEFILES)),)
+  SUBMAKEFILES = $(sort \
+    docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak \
+    $(wildcard $(addsuffix /*.mak,$(addprefix plugins/,$(sort $(PLUGINS)))) \
+    apps/*/*.mak \
+    apps/tests/*/*.mak \
+    apps/tutorial/*/*.mak \
+    apps/examples/*/*.mak \
+    apps/import/*/*.mak \
+    apps/tools/*/*.mak \
+    libs/*/*.mak))
+  include $(SUBMAKEFILES)
 endif
