@@ -31,6 +31,7 @@ struct iSystem;
 SCF_VERSION (iScript, 0, 0, 1);
 
 /**
+ * @@@ Please document me using Doc++!
  */
 struct iScript : public iBase
 {

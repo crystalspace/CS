@@ -29,6 +29,9 @@ enum CS_FONTPROPERTY
   CS_FONTSIZE
 };
 
+/**
+ * @@@ Please document me using Doc++!
+ */
 struct iFontRender : public iPlugIn
 {
   /**

@@ -23,11 +23,13 @@
 #include "iplugin.h"
 #include "iproto.h"
 
-/// This is a pain... the error handling has to match that in inetdrv.h
-/// what a royal pain in the neck.
-/// These have to be synced with the errors in inetdrv.h (Thomas Riemer)
-/// (Note from ES: Error handling will be revised in the future to be easily
-/// extensible and will be string-based or class-based with string ID's.)
+/**
+ * This is a pain... the error handling has to match that in inetdrv.h
+ * what a royal pain in the neck.
+ * These have to be synced with the errors in inetdrv.h (Thomas Riemer)
+ * (Note from ES: Error handling will be revised in the future to be easily
+ * extensible and will be string-based or class-based with string ID's.)
+ */
 enum csNetworkManagerError 
 {
   /// Errors from netdriver
@@ -104,8 +106,8 @@ SCF_VERSION (iNetworkManager, 0, 0, 1);
 /**
  * This is the network manager interface for CS.  It represents a plug-in
  * network manager module.  All network managers must implement this interface.
+ * @@@ Please add additional comments to methods using Doc++!
  */
-
 struct iNetworkManager : public iPlugIn
 {
   virtual void AssignHostName(const char *hostname) = 0;

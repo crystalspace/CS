@@ -37,13 +37,16 @@ enum {
  * This is a set of statistics variables. You can get a pointer to the
  * creator's statistics by calling GetStatistics();
  */
-class dnStats {
+class dnStats
+{
 public:
   long NumAreas,NumAreaTemplates,NumAutoCons;
   char **AreaTemplateNames;
   long *AreaTemplates;
   long NumDirectCons,NumAngleCons,NumDAngleCons;
 };
+
+SCF_VERSION (iDungeon, 0, 0, 1);
 
 /**
  * This is the randomizer plug-in itself. To use it, first set all options
@@ -55,8 +58,8 @@ public:
  * as a path to a CS world by your program. Optionally you can then get a
  * pointer to the statistics info.
  */
-SCF_VERSION (iDungeon, 0, 0, 1);
-class iDungeon : public iPlugIn {
+class iDungeon : public iPlugIn
+{
 public:
   /// plugin initialization
   virtual bool Initialize(iSystem *sys)=0;

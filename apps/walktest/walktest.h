@@ -40,6 +40,7 @@ class csWireFrameCam;
 class PhysicsLibrary;
 class InfiniteMaze;
 class HugeRoom;
+struct iCollideSystem;
 
 // Several map modes.
 #define MAP_OFF 0
@@ -184,6 +185,9 @@ public:
   bool on_ground;
   bool inverse_mouse;
   bool move_forward;
+
+  /// Collision detection plugin.
+  iCollideSystem* collide_system;
 
 public:
   ///

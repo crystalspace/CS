@@ -226,8 +226,10 @@ public:
    * that it hits with. This function properly acounts for space
    * warping portals and also checks for infinite recursion (does
    * not allow traversing the same sector more than five times).
+   * Returns the intersection point with the polygon in 'isect'.
    */
-  virtual csPolygon3D* HitBeam (const csVector3& start, const csVector3& end);
+  virtual csPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& isect);
 
   /**
    * Intersects world-space sphere through this sector. Return closest

@@ -124,7 +124,8 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
   return true;
 }
 
-csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end)
+csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
+	csVector3& isect)
 {
   if (sector->draw_busy >= 5)
     return NULL;
@@ -132,9 +133,13 @@ csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end)
   {
     csVector3 new_start = warp_wor.Other2This (start);
     csVector3 new_end = warp_wor.Other2This (end);
-    return sector->HitBeam (new_start, new_end);
+    csVector3 new_isect;
+    csPolygon3D* p = sector->HitBeam (new_start, new_end, new_isect);
+    if (p)
+      isect = warp_wor.This2Other (new_isect);
+    return p;
   }
-  else return sector->HitBeam (start, end);
+  else return sector->HitBeam (start, end, isect);
 }
 
 csPolygon3D* csPortal::IntersectSphere (csVector3& center, float radius, float* pr)

@@ -1,11 +1,53 @@
 The history order has been reversed so that new features are at the top.
 
+26-May-2000
+	- Fixed bug in PVS building. The selection of the plane for the
+	  c-buffer could fail with nodes that are close together.
+	- Added csBox3::GetVisibleSides() to return all visible sides of
+	  a box as seen from a point in space.
+	- Added csIntersect3::BoxSegment() routine to test if a segment
+	  intersects with a box. This routine will also return the
+	  intersection point.
+	- Greatly optimized csSector::HitBeam() so that it is now LOTS
+	  faster. It now uses the octree node hierarchy to avoid traversing
+	  nodes that the beam doesn't intersect with.
+	- Added iPolygonMesh interface so that the engine can communicate
+	  3D geometry to other plugins. This will be used by the collision
+	  detection system plugin. iPolygonMesh is not implemented yet
+	  though.
+	- Added iCollider and iCollideSystem interfaces. iCollideSystem
+	  is an SCF plugin that implements a particular collision
+	  detection algorithm. Further work will be to make the current
+	  RAPID CD system a plugin implementing this interface.
+	- Added implementation for RAPID CD plugin (UNTESTED). This
+	  should be our current implementation of RAPID CD.
+	- WalkTest now loads the iCollideSystem plugin at startup.
+	- Implemented csPluginCollider inside the engine which encapsulates
+	  a collider using the plugin system. This is temporary until
+	  the plugin CD system has been debugged. After that engine will
+	  only work through plugins.
+	- Did various cleanups on the include/i*.h files. Many files are
+	  missing Doc++ comments and some were missing LGPL header.
+	- Paul Garceau did some changes to terrain renderer to set default
+	  for P-III to zero (for the SIMD code that is in the terrain engine).
+	- Wouter Wijngaards did some further debugging on radiosity.
 25-May-2000
 	- Moved initialization of 2D culler cube into CheckFrustum.
 	  This fixes radiosity. As it was now it simply could not work
 	  correctly because of this bug.
 	- Fixed another bug in radiosity with handling of the light
 	  frustum.
+	- Extended csSector::HitBeam() with an extra parameter that returns
+	  the intersection point with the polygon that is hit.
+	- Added csOctree::BoxCanSeeOccludeeSuperSlow() function. This function
+	  tests if two nodes can see each other. It is very very slow and
+	  will actually NEVER return if the nodes cannot see each other.
+	  So the only expected result of this function is 'true' or
+	  else infinite loop. This function is for debugging only.
+	- Fixed the huge room so that it no longer crashes (-huge option
+	  for WalkTest).
+	- Wouter Wijngaards fixed various other problems in radiosity
+	  based on the fixes from Jorrit.
 24-May-2000
 	- Some changes to terrain engine from Alex Pfaffe.
 	- Fixed another problem in octree building which could cause

@@ -68,6 +68,7 @@
 #include "isndbuf.h"
 #include "isndrdr.h"
 #include "iimage.h"
+#include "icollide.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
@@ -143,8 +144,8 @@ WalkTest::WalkTest () :
 
 WalkTest::~WalkTest ()
 {
-  if (World)
-    World->DecRef ();
+  if (World) World->DecRef ();
+  if (collide_system) collide_system->DecRef ();
   delete wf;
   delete [] auto_script;
   delete layer;
@@ -903,6 +904,15 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   // easier.
   view = new csView (world, Gfx3D);
 
+  // Get the collide system plugin.
+  const char* p = Config->GetStr ("WalkTest", "COLLDET_PLUGIN" "");
+  collide_system = LOAD_PLUGIN (Sys, p, "CollDet", iCollideSystem);
+  if (!collide_system)
+  {
+    Printf (MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
+    return false;
+  }
+
   // Initialize the command processor with the world and camera.
   Command::Initialize (world, view->GetCamera (), Gfx3D, System->Console, System);
 
@@ -1002,12 +1012,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
         name++;
         //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
         //  name, name, name);
-	    const char *valfiletype = "";
-	    valfiletype = Config->GetStr ("World", "WORLDZIPTYPE" "");
-	    if(strcmp (valfiletype, "") ==0)
-		{
-	      valfiletype = "zip";
-		}
+	const char *valfiletype = "";
+	valfiletype = Config->GetStr ("World", "WORLDZIPTYPE" "");
+	if (strcmp (valfiletype, "") ==0)
+	{
+	  valfiletype = "zip";
+	}
         sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
            name, valfiletype, name, valfiletype, name, valfiletype );
         VFS->Mount (world_dir, tmp);

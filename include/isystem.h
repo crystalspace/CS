@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 
-/**
+/*
  * Several types of messages.
  * The type of message is indicated when you call iSystem::Printf().
  * Depending on message type, the message will be put into debug log,
@@ -52,7 +52,7 @@
 /// Show message if debug level 2 (verbose mode) and flush
 #define MSG_DEBUG_2F		12
 
-/**
+/*
  * Plugins have an additional characteristic called "functionality ID".
  * This identifier is used by other plugins/engine/system driver to
  * find some plugin that user assigned to perform some function.

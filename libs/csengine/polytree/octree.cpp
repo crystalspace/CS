@@ -33,6 +33,10 @@
 #include "isystem.h"
 #include "ivfs.h"
 
+#define DO_SOLID_NODE_OPT 1
+#define DO_SOLID_SPACE_OPT 1
+#define DO_QAD_PVS 0
+
 //---------------------------------------------------------------------------
 
 csPVS::~csPVS ()
@@ -1308,6 +1312,7 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
     // First see if this occluder can see occludee. If not then
     // we take the outline of this node and insert that instead
     // of the polygons in the node.
+#   if DO_SOLID_NODE_OPT
     if (!occluder->PVSCanSee (occludee_center))
     {
       total_total_solid_opt++;
@@ -1315,6 +1320,7 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
 	cbuffer, scale, shift, plane_nr, plane_pos))
       return;
     }
+#   endif
 
     // Here we first take the solid space outlines of the occluder
     // and insert them in the c-buffer as well.
@@ -1429,16 +1435,22 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
   // First find a suitable plane between box and occludee. We take a plane
   // as close to box as possible (i.e. it will be a plane containing one
   // of the sides of 'box').
+  csVector3 man_dist;
+  box.ManhattanDistance (occludee_box, man_dist);
+  // Take as the plane the component with the largest manhattan
+  // distance value.
+  int plane_nr;
+  if (man_dist.x >= man_dist.y && man_dist.x >= man_dist.z)
+    plane_nr = PLANE_X;
+  else if (man_dist.y >= man_dist.z && man_dist.y >= man_dist.x)
+    plane_nr = PLANE_Y;
+  else
+    plane_nr = PLANE_Z;
+
   csVector3 box_center = box.GetCenter ();
   csVector3 occludee_center = occludee_box.GetCenter ();
-  float dx = ABS (box_center.x - occludee_center.x);
-  float dy = ABS (box_center.y - occludee_center.y);
-  float dz = ABS (box_center.z - occludee_center.z);
-  int plane_nr;
+
   float plane_pos;
-  if (dx > dy && dx > dz) plane_nr = PLANE_X;
-  else if (dy > dz) plane_nr = PLANE_Y;
-  else plane_nr = PLANE_Z;
   if (box_center[plane_nr] > occludee_center[plane_nr])
     plane_pos = box.Min (plane_nr);
   else
@@ -1467,6 +1479,46 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee_box)
   bool full = cbuffer->IsFull ();
   delete cbuffer;
   return !full;
+}
+
+static float randflt ()
+{
+  return ((float)rand ()) / RAND_MAX;
+}
+
+bool csOctree::BoxCanSeeOccludeeSuperSlow (const csBox3& box,
+	const csBox3& occludee_box)
+{
+  int tries = 0;
+  csVector3 box_pos, occludee_pos;
+  for (;;)
+  {
+    box_pos.Set (
+      box.MinX ()+randflt ()*(box.MaxX ()-box.MinX ()),
+      box.MinY ()+randflt ()*(box.MaxY ()-box.MinY ()),
+      box.MinZ ()+randflt ()*(box.MaxZ ()-box.MinZ ()));
+    occludee_pos.Set (
+      occludee_box.MinX ()+randflt ()*(occludee_box.MaxX ()-occludee_box.MinX ()),
+      occludee_box.MinY ()+randflt ()*(occludee_box.MaxY ()-occludee_box.MinY ()),
+      occludee_box.MinZ ()+randflt ()*(occludee_box.MaxZ ()-occludee_box.MinZ ()));
+    csVector3 isect;
+    csPolygon3D* p = sector->HitBeam (box_pos, occludee_pos, isect);
+    if (!p) goto error;
+    // We hit a polygon. Check if intersection is in occludee node.
+    if (occludee_box.In (isect)) goto error;
+    tries++;
+    if (tries % 1000 == 0) printf ("Tries %d\n", tries);
+    if (tries > 40000) return false;
+  }
+  // This function will actually never return false. It will just try finding
+  // intersections forever.
+  return false;
+
+error:
+printf ("(%f,%f,%f) - (%f,%f,%f)\n", box_pos.x, box_pos.y, box_pos.z,
+occludee_pos.x, occludee_pos.y, occludee_pos.z);
+  exit (0);
+  return true;
 }
 
 void csOctree::DeleteNodeAndChildrenFromPVS (csPVS& pvs, csOctreeNode* occludee)
@@ -1543,11 +1595,14 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
       	thing, leaf);
   else
   {
+#   if DO_QAD_PVS
     if (ovis->IsReallyVisible ())
     {
       // @@@ ERROR!!!
       printf ("E");
+      BoxCanSeeOccludeeSuperSlow (leaf->GetBox (), occludee->GetBox ());
     }
+#   endif
     total_cull_node += 1+occludee->CountChildren ();
     total_total_cull_node += 1+occludee->CountChildren ();
     DeleteNodeAndChildrenFromPVS (pvs, occludee);
@@ -1641,6 +1696,7 @@ void csOctree::BuildPVS (csThing* thing)
   	(bbox.MaxY ()-bbox.MinY ())/10.,
   	(bbox.MaxZ ()-bbox.MinZ ())/10.);
 
+# if DO_QAD_PVS
   // First build a Quick And Dirty PVS which is going to be used to
   // optimize the real PVS building.
   CsPrintf (MSG_INITIALIZATION, "  QAD Pass 0...\n");
@@ -1648,6 +1704,7 @@ void csOctree::BuildPVS (csThing* thing)
   count_leaves = 0;
   BuildQADPVS ((csOctreeNode*)root);
   printf ("\nTotal culled nodes=%d\n", total_total_cull_node);
+# endif
 
   // Then build the PVS for real which will remove nodes from the
   // PVS (hopefully).
@@ -1678,7 +1735,7 @@ void csOctree::BuildPVS (csThing* thing)
 
 static csOctreeNode* next_visible = NULL;
 
-static void node_pvs_func (csOctreeNode* node, csFrustumView* lview)
+static void node_pvs_func (csOctreeNode* node, csFrustumView* /*lview*/)
 {
   // When we discover a node we only mark it visible if we will
   // hit a polygon in this node.
@@ -1884,6 +1941,7 @@ int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
 UShort csOctree::ClassifyRectangle (int plane_nr, float plane_pos,
   	const csBox2& box)
 {
+#if DO_SOLID_SPACE_OPT
   csVector2 cor_xy = box.GetCorner (BOX_CORNER_xy);
   csVector2 cor_Xy = box.GetCorner (BOX_CORNER_Xy);
   csVector2 cor_xY = box.GetCorner (BOX_CORNER_xY);
@@ -1922,6 +1980,12 @@ UShort csOctree::ClassifyRectangle (int plane_nr, float plane_pos,
       bitnr++;
     }
   return result;
+#else
+  (void)plane_nr;
+  (void)plane_pos;
+  (void)box;
+  return 0;
+#endif // DO_SOLID_SPACE_OPT
 }
 
 static csBox2 GetSideBox (int octree_side, const csBox3& box)

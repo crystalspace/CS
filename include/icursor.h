@@ -22,13 +22,14 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION(iCursor, 0, 0, 1);
+
 /**
  * This is the iCursor interface.  You can implement to provide customized
  * cursor abilities (animated cursors and so on).  iConsole uses it to allow
  * customized cursors for text input.  Using it for drawing customized mouse
  * and other types of cursors should also be possible.
  */
-SCF_VERSION(iCursor, 0, 0, 1);
 struct iCursor : public iBase
 {
   /** 

@@ -254,9 +254,11 @@ public:
    * Follow a beam from start to end and return the first polygon that
    * is hit. This function correctly traverse portals and space warping
    * portals. Normally the sector you call this on should be the sector
-   * containing the 'start' point.
+   * containing the 'start' point. 'isect' will be the intersection point
+   * if a polygon is returned.
    */
-  csPolygon3D* HitBeam (const csVector3& start, const csVector3& end);
+  csPolygon3D* HitBeam (const csVector3& start, const csVector3& end,
+  	csVector3& isect);
 
   /**
    * Prepare the lightmaps so that they are suitable for the

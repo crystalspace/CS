@@ -26,6 +26,7 @@
 #include "csgeom/matrix3.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/segment.h"
+#include "csgeom/box.h"
 
 //---------------------------------------------------------------------------
 
@@ -521,3 +522,76 @@ float csIntersect3::YFrustum(
   isect.z = r * (v.z-u.z) + u.z;
   return r;
 }
+
+bool csIntersect3::BoxSegment (const csBox3& box, const csSegment3& seg,
+	csVector3& isect)
+{
+  const csVector3& u = seg.Start ();
+  const csVector3& v = seg.End ();
+  float r, plane_pos;
+  int sides[3];
+  int num_sides = box.GetVisibleSides (u, sides);
+  int i;
+  // If there are no sides then we're in the box so we can return true.
+  if (num_sides == 0) return true;
+  for (i = 0 ; i < num_sides ; i++)
+  {
+    switch (sides[i])
+    {
+      case BOX_SIDE_x:
+        plane_pos = box.MinX ();
+	// Fall THRU...
+      case BOX_SIDE_X:
+        if (sides[i] == BOX_SIDE_X) plane_pos = box.MaxX ();
+        if (ABS (v.x - u.x) > SMALL_EPSILON)
+	{
+          r = (plane_pos-u.x) / (v.x-u.x);
+	  if (r < 0 || r > 1) break;
+	  isect.x = plane_pos;
+          isect.y = r * (v.y-u.y) + u.y;
+          isect.z = r * (v.z-u.z) + u.z;
+          if (isect.y >= box.MinY () && isect.y <= box.MaxY () &&
+    	      isect.z >= box.MinZ () && isect.z <= box.MaxZ ())
+            return true;
+	}
+	break;
+      case BOX_SIDE_y:
+        plane_pos = box.MinY ();
+	// Fall THRU...
+      case BOX_SIDE_Y:
+        if (sides[i] == BOX_SIDE_Y) plane_pos = box.MaxY ();
+        if (ABS (v.y - u.y) > SMALL_EPSILON)
+        {
+          r = (plane_pos-u.y) / (v.y-u.y);
+	  if (r < 0 || r > 1) break;
+          isect.x = r * (v.x-u.x) + u.x;
+	  isect.y = plane_pos;
+          isect.z = r * (v.z-u.z) + u.z;
+          if (isect.x >= box.MinX () && isect.x <= box.MaxX () &&
+    	      isect.z >= box.MinZ () && isect.z <= box.MaxZ ())
+            return true;
+	}
+	break;
+      case BOX_SIDE_z:
+        plane_pos = box.MinZ ();
+	// Fall THRU...
+      case BOX_SIDE_Z:
+        if (sides[i] == BOX_SIDE_Z) plane_pos = box.MaxZ ();
+        if (ABS (v.z - u.z) > SMALL_EPSILON)
+        {
+          r = (plane_pos-u.z) / (v.z-u.z);
+	  if (r < 0 || r > 1) break;
+          isect.x = r * (v.x-u.x) + u.x;
+          isect.y = r * (v.y-u.y) + u.y;
+	  isect.z = plane_pos;
+          if (isect.x >= box.MinX () && isect.x <= box.MaxX () &&
+    	      isect.y >= box.MinY () && isect.y <= box.MaxY ())
+            return true;
+	}
+	break;
+    }
+  }
+  return false;
+}
+
+

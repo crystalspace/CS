@@ -27,6 +27,10 @@ struct iConsole;
 class csString;
 
 SCF_VERSION(iConsoleInput, 0, 0, 1);
+
+/**
+ * @@@ Please document me using Doc++!
+ */
 struct iConsoleInput : public iPlugIn
 {
   /// Initialize the plugin, and return success status

@@ -50,10 +50,10 @@ SCF_VERSION(iConsole, 0, 0, 4);
 /**
  * This is the Crystal Space Console interface.  It is an output only system.
  * It can be used in conjunction with the iConsoleInput interface in iconinp.h
- * to form an interactive console.
+ * to form an interactive console.<p>
  *
  * These some ideas for future additions, but they might be better suited for
- * a subclass of iConsole:
+ * a subclass of iConsole:<p>
  *
  * Alpha transparency (not directly supported by 2D driver)
  * Background texture(s) (may not be available during startup)

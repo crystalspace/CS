@@ -97,7 +97,7 @@ private:
   ///
   csPolygon3D* create_polygon (csSector* sector, csPolygonSet* thing,
   	const csVector3& p1, const csVector3& p2, const csVector3& p3,
-	int txt, csPolyTxtPlane* txt_plane = NULL);
+	int txt);
 
   ///
   void create_wall (csSector* sector, csPolygonSet* thing,

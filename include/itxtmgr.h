@@ -30,7 +30,7 @@ class csRect;
 struct iImage;
 struct iTextureHandle;
 
-/**
+/*
  * Texture registration flags. During texture registration you should tell
  * the manager which way you're going to use the texture: whenever you're
  * going to use it for 2D (DrawPixmap ()), for 3D (DrawPolygon ()), whenever

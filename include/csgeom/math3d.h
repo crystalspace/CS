@@ -32,10 +32,10 @@
 #include "csgeom/plane3.h"
 #include "csgeom/plane2.h"
 #include "csgeom/segment.h"
-#include "csgeom/box.h"
 
 class csDVector3;
 class csPoly3D;
+class csBox3;
 
 inline float fSqr (float f)
 {
@@ -469,6 +469,13 @@ public:
   {
     return YFrustum (B, uv.Start (), uv.End (), isect);
   }
+
+  /**
+   * Intersect a segment with a box and returns true if it intersects.
+   * The intersection point is also returned.
+   */
+  static bool BoxSegment (const csBox3& box, const csSegment3& segment,
+  	csVector3& isect);
 };
 
 #endif // __CS_MATH3D_H__

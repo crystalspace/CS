@@ -61,7 +61,8 @@ csCamera::~csCamera ()
 
 csPolygon3D* csCamera::GetHit (csVector3& v)
 {
-  return sector->HitBeam (v_o2t, v);
+  csVector3 isect;
+  return sector->HitBeam (v_o2t, v, isect);
 }
 
 void csCamera::MoveWorld (const csVector3& v)

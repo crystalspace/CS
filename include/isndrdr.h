@@ -37,6 +37,9 @@ class csSoundData;
 
 SCF_VERSION (iSoundRender, 0, 0, 1);
 
+/**
+ * @@@ Please document me using Doc++!
+ */
 struct iSoundRender : public iPlugIn
 {
 public:

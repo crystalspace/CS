@@ -22,6 +22,7 @@ ifndef PLUGINS
 # PLUGINS += font/server/freefont
   PLUGINS += netspace/nstp netspace/nsmgr 
   PLUGINS += csauth/simple 
+  PLUGINS += colldet/rapid
   PLUGINS += $(DETECTED_PLUGINS)
 endif
 

@@ -25,6 +25,9 @@ struct iSoundBuffer;
 
 SCF_VERSION (iSoundSource, 0, 0, 1);
 
+/**
+ * @@@ Please document me using Doc++!
+ */
 struct iSoundSource : public iBase
 {
   /// Set position of sound object

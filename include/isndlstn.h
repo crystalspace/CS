@@ -55,6 +55,9 @@ enum SoundEnvironment
 
 SCF_VERSION (iSoundListener, 0, 0, 1);
 
+/**
+ * @@@ Please document me using Doc++!
+ */
 struct iSoundListener : public iBase
 {
   /// Set direction of listener (front and top 3d vectors)

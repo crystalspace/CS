@@ -254,9 +254,9 @@ void csSector::UseStaticTree (int mode, bool octree)
   CsPrintf (MSG_INITIALIZATION, "DONE!\n");
 }
 
-csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end)
+csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end,
+	csVector3& isect)
 {
-  csVector3 isect;
   csPolygon3D* p = IntersectSegment (start, end, isect);
   if (p)
   {
@@ -264,7 +264,8 @@ csPolygon3D* csSector::HitBeam (const csVector3& start, const csVector3& end)
     if (po)
     {
       draw_busy++;
-      p = po->HitBeam (isect, end);
+      csVector3 new_start = isect;
+      p = po->HitBeam (new_start, end, isect);
       draw_busy--;
       return p;
     }
@@ -291,6 +292,13 @@ void csSector::CreateLightMaps (iGraphics3D* g3d)
 }
 
 
+struct ISectData
+{
+  csSegment3 seg;
+  csVector3 isect;
+  float r;
+};
+
 /*
  * @@@
  * This function does not yet do anything but it should
@@ -298,20 +306,20 @@ void csSector::CreateLightMaps (iGraphics3D* g3d)
  * even faster.
  */
 bool IntersectSegmentCull (csPolygonTree* /*tree*/,
-	csPolygonTreeNode* /*node*/,
-	const csVector3& /*pos*/, void* /*data*/)
+	csPolygonTreeNode* node,
+	const csVector3& /*pos*/, void* data)
 {
-  // @@@ at least test if the node we go too is further away
-  // than the end of the segment we want to test.
-  return true;
-}
+  if (!node) return false;
+  if (node->Type () != NODE_OCTREE) return true;
 
-struct ISectData
-{
-  csVector3 start, end;
+  ISectData* idata = (ISectData*)data;
+  csOctreeNode* onode = (csOctreeNode*)node;
   csVector3 isect;
-  float r;
-};
+  if (csIntersect3::BoxSegment (onode->GetBox (), idata->seg, isect))
+    return true;
+  // Segment does not intersect with node so we return false here.
+  return false;
+}
 
 void* IntersectSegmentTestPol (csSector*,
 	csPolygonInt** polygon, int num, void* data)
@@ -324,7 +332,8 @@ void* IntersectSegmentTestPol (csSector*,
     if (polygon[i]->GetType () == 1)
     {
       csPolygon3D* p = (csPolygon3D*)polygon[i];
-      if (p->IntersectSegment (idata->start, idata->end, idata->isect, &(idata->r)))
+      if (p->IntersectSegment (idata->seg.Start (), idata->seg.End (),
+      		idata->isect, &(idata->r)))
         return (void*)p;
     }
   }
@@ -358,10 +367,9 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   {
     // Handle the octree.
     ISectData idata;
-    idata.start = start;
-    idata.end = end;
+    idata.seg.Set (start, end);
     void* rc = static_tree->Front2Back (start, IntersectSegmentTestPol,
-      (void*)&idata, IntersectSegmentCull, NULL);
+      (void*)&idata, IntersectSegmentCull, (void*)&idata);
     if (rc && idata.r < best_r)
     {
       best_r = idata.r;
@@ -1211,6 +1219,8 @@ static int count_cull_not;
 
 // @@@ This routine need to be cleaned up!!! It needs to
 // be part of the class.
+// @@@ This function needs to use the PVS. However, this function itself
+// is used for the PVS so we need to take care!
 bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
 	const csVector3& /*pos*/, void* data)
 {

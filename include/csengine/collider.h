@@ -25,6 +25,9 @@
 #include "csgeom/vector3.h"
 
 class csTransform;
+struct iPolygonMesh;
+struct iCollideSystem;
+struct iCollider;
 
 /// Abstract class for low level collision detection.
 class csCollider : public csPObject
@@ -64,6 +67,49 @@ public:
   virtual bool Collide (csObject &otherObject,
                         csTransform *pThisTransform = 0,
                         csTransform *pOtherTransform = 0) = 0;
+  
+  CSOBJTYPE;
+};
+
+/**
+ * Collision detection system using the CD plugin.
+ * This is only temporary until the CD plugin is perfectly working
+ * and we can remove all internal CD support from the engine.
+ */
+class csPluginCollider : public csCollider
+{
+private:
+  iCollideSystem* collide_system;
+  iCollider* collider;
+
+public:
+  /// Create a collider based on a mesh.
+  csPluginCollider (csObject& parent, iCollideSystem* collide_system,
+  	iPolygonMesh* mesh);
+
+  /// Destroy the plugin collider object
+  virtual ~csPluginCollider ();
+
+  /**
+   * Check if this collider collides with pOtherCollider.
+   * Returns true if collision detected and adds the pair to the collisions
+   * hists vector.
+   * This collider and pOtherCollider must be of comparable subclasses, if
+   * not false is returned.
+   */
+  virtual bool Collide (csCollider &pOtherCollider,
+                        csTransform *pThisTransform = NULL,
+                        csTransform *pOtherTransform = NULL);
+  /// Similar to Collide for csCollider. Calls GetCollider for otherCollider.
+  virtual bool Collide (csObject &otherObject,
+                        csTransform *pThisTransform = 0,
+                        csTransform *pOtherTransform = 0);
+
+  /**
+   * If object has a child of type csCollider it is returned. Otherwise 0
+   * is returned.
+   */
+  static csPluginCollider *GetPluginCollider (csObject &object);
   
   CSOBJTYPE;
 };

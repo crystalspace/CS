@@ -438,6 +438,14 @@ private:
   bool BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee);
 
   /**
+   * Test if 'box' can see 'occludee' through all the polygons
+   * in this octree. This function is VERY VERY slow and when the
+   * two nodes cannot see each other it will actually never return.
+   * This function is only useful for debugging.
+   */
+  bool BoxCanSeeOccludeeSuperSlow (const csBox3& box, const csBox3& occludee);
+
+  /**
    * Build PVS for this leaf.
    */
   void BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,

@@ -34,6 +34,9 @@ struct iSoundSource;
 
 SCF_VERSION (iSoundBuffer, 0, 0, 1);
 
+/**
+ * @@@ Please document me using Doc++!
+ */
 struct iSoundBuffer : public iBase
 {
   /// Play the sound

@@ -639,7 +639,8 @@ bool WalkTest::HandleEvent (csEvent &Event)
 
 	csSector* sector = view->GetCamera ()->GetSector ();
 	csVector3 origin = view->GetCamera ()->GetW2CTranslation ();
-	csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 10);
+	csVector3 isect;
+	csPolygon3D* sel = sector->HitBeam (origin, origin + (vw-origin) * 10, isect);
 	if (sel)
 	{
           if (Sys->selected_polygon == sel) Sys->selected_polygon = NULL;

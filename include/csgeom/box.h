@@ -353,6 +353,14 @@ public:
   csBox2 GetSide (int side) const;
 
   /**
+   * Fill the array (which should be three long at least)
+   * with all visible sides (BOX_SIDE_??? defines) as seen
+   * from the given point.
+   * Returns the number of visible sides.
+   */
+  int GetVisibleSides (const csVector3& pos, int* visible_sides) const;
+
+  /**
    * Static function to get the 'other' side (i.e. BOX_SIDE_X
    * to BOX_SIDE_x, ...).
    */

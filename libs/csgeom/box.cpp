@@ -190,41 +190,44 @@ bool csBox2::Intersect (float minx, float miny, float maxx, float maxy,
 //	5: right/down/back
 //	6: right/up/front
 //	7: right/up/back
+// This table also contains an array of sides visible from that region.
 struct Outline
 {
   int num;
   int vertices[6];
+  int num_sides;
+  int sides[3];
 };
 /// Outline lookup table.
 static Outline outlines[27] =
 {
-  { 6, { 3, 2, 6, 4, 5, 1 } },		// 0,0,0
-  { 6, { 3, 2, 0, 4, 5, 1 } },		// 0,0,1
-  { 6, { 7, 3, 2, 0, 4, 5 } },		// 0,0,2
-  { 6, { 3, 2, 6, 4, 0, 1 } },		// 0,1,0
-  { 4, { 3, 2, 0, 1, -1, -1 } },	// 0,1,1
-  { 6, { 7, 3, 2, 0, 1, 5 } },		// 0,1,2
-  { 6, { 3, 7, 6, 4, 0, 1 } },		// 0,2,0
-  { 6, { 3, 7, 6, 2, 0, 1 } },		// 0,2,1
-  { 6, { 7, 6, 2, 0, 1, 5 } },		// 0,2,2
-  { 6, { 2, 6, 4, 5, 1, 0 } },		// 1,0,0
-  { 4, { 0, 4, 5, 1, -1, -1 } },	// 1,0,1
-  { 6, { 3, 1, 0, 4, 5, 7 } },		// 1,0,2
-  { 4, { 2, 6, 4, 0, -1, -1 } },	// 1,1,0
-  { 0, { -1, -1, -1, -1, -1, -1 } },	// 1,1,1
-  { 4, { 7, 3, 1, 5, -1, -1 } },	// 1,1,2
-  { 6, { 3, 7, 6, 4, 0, 2 } },		// 1,2,0
-  { 4, { 3, 7, 6, 2, -1, -1 } },	// 1,2,1
-  { 6, { 2, 3, 1, 5, 7, 6 } },		// 1,2,2
-  { 6, { 2, 6, 7, 5, 1, 0 } },		// 2,0,0
-  { 6, { 6, 7, 5, 1, 0, 4 } },		// 2,0,1
-  { 6, { 6, 7, 3, 1, 0, 4 } },		// 2,0,2
-  { 6, { 2, 6, 7, 5, 4, 0 } },		// 2,1,0
-  { 4, { 6, 7, 5, 4, -1, -1 } },	// 2,1,1
-  { 6, { 6, 7, 3, 1, 5, 4 } },		// 2,1,2
-  { 6, { 2, 3, 7, 5, 4, 0 } },		// 2,2,0
-  { 6, { 2, 3, 7, 5, 4, 6 } },		// 2,2,1
-  { 6, { 6, 2, 3, 1, 5, 4 } }		// 2,2,2
+  { 6, {3,2,6,4,5,1},       3, {BOX_SIDE_x,BOX_SIDE_y,BOX_SIDE_z} },	// 0,0,0
+  { 6, {3,2,0,4,5,1},       2, {BOX_SIDE_x,BOX_SIDE_y,-1} },		// 0,0,1
+  { 6, {7,3,2,0,4,5},       3, {BOX_SIDE_x,BOX_SIDE_y,BOX_SIDE_Z} },	// 0,0,2
+  { 6, {3,2,6,4,0,1},       2, {BOX_SIDE_x,BOX_SIDE_z,-1} },		// 0,1,0
+  { 4, {3,2,0,1,-1,-1},     1, {BOX_SIDE_x,-1,-1} },			// 0,1,1
+  { 6, {7,3,2,0,1,5},       2, {BOX_SIDE_x,BOX_SIDE_Z,-1} },		// 0,1,2
+  { 6, {3,7,6,4,0,1},       3, {BOX_SIDE_x,BOX_SIDE_Y,BOX_SIDE_z} },	// 0,2,0
+  { 6, {3,7,6,2,0,1},       2, {BOX_SIDE_x,BOX_SIDE_Y,-1} },		// 0,2,1
+  { 6, {7,6,2,0,1,5},       3, {BOX_SIDE_x,BOX_SIDE_Y,BOX_SIDE_Z} },	// 0,2,2
+  { 6, {2,6,4,5,1,0},       2, {BOX_SIDE_y,BOX_SIDE_z,-1} },		// 1,0,0
+  { 4, {0,4,5,1,-1,-1},     1, {BOX_SIDE_y,-1,-1} },			// 1,0,1
+  { 6, {3,1,0,4,5,7},       2, {BOX_SIDE_y,BOX_SIDE_Z,-1} },		// 1,0,2
+  { 4, {2,6,4,0,-1,-1},     1, {BOX_SIDE_z,-1,-1} },			// 1,1,0
+  { 0, {-1,-1,-1,-1,-1,-1}, 0, {-1,-1,-1} },				// 1,1,1
+  { 4, {7,3,1,5,-1,-1},     1, {BOX_SIDE_Z,-1,-1} },			// 1,1,2
+  { 6, {3,7,6,4,0,2},       2, {BOX_SIDE_Y,BOX_SIDE_z,-1} },		// 1,2,0
+  { 4, {3,7,6,2,-1,-1},     1, {BOX_SIDE_Y,-1,-1} },			// 1,2,1
+  { 6, {2,3,1,5,7,6},       2, {BOX_SIDE_Y,BOX_SIDE_Z,-1} },		// 1,2,2
+  { 6, {2,6,7,5,1,0},       3, {BOX_SIDE_X,BOX_SIDE_y,BOX_SIDE_z} },	// 2,0,0
+  { 6, {6,7,5,1,0,4},       2, {BOX_SIDE_X,BOX_SIDE_y,-1} },		// 2,0,1
+  { 6, {6,7,3,1,0,4},       3, {BOX_SIDE_X,BOX_SIDE_y,BOX_SIDE_Z} },	// 2,0,2
+  { 6, {2,6,7,5,4,0},       2, {BOX_SIDE_X,BOX_SIDE_z,-1} },		// 2,1,0
+  { 4, {6,7,5,4,-1,-1},     1, {BOX_SIDE_X,-1,-1} },			// 2,1,1
+  { 6, {6,7,3,1,5,4},       2, {BOX_SIDE_X,BOX_SIDE_Z,-1} },		// 2,1,2
+  { 6, {2,3,7,5,4,0},       3, {BOX_SIDE_X,BOX_SIDE_Y,BOX_SIDE_z} },	// 2,2,0
+  { 6, {2,3,7,5,4,6},       2, {BOX_SIDE_X,BOX_SIDE_Y,-1} },		// 2,2,1
+  { 6, {6,2,3,1,5,4},       3, {BOX_SIDE_X,BOX_SIDE_Y,BOX_SIDE_Z} }	// 2,2,2
 };
 
 csVector3 csBox3::GetCorner (int corner) const
@@ -334,6 +337,31 @@ int csBox3::Adjacent (const csBox3& other) const
     else return BOX_SIDE_z;
   }
   return -1;
+}
+
+int csBox3::GetVisibleSides (const csVector3& pos, int* visible_sides) const
+{
+  const csVector3& bmin = Min ();
+  const csVector3& bmax = Max ();
+  int idx;
+  // First select x part of coordinate.
+  if (pos.x < bmin.x)		idx = 0*9;
+  else if (pos.x > bmax.x)	idx = 2*9;
+  else				idx = 1*9;
+  // Then y part.
+  if (pos.y < bmin.y)		idx += 0*3;
+  else if (pos.y > bmax.y)	idx += 2*3;
+  else				idx += 1*3;
+  // Then z part.
+  if (pos.z < bmin.z)		idx += 0;
+  else if (pos.z > bmax.z)	idx += 2;
+  else				idx += 1;
+  const Outline& ol = outlines[idx];
+  int num_array = ol.num_sides;
+  int i;
+  for (i = 0 ; i < num_array ; i++)
+    visible_sides[i] = ol.sides[i];
+  return num_array;
 }
 
 void csBox3::GetConvexOutline (const csVector3& pos,

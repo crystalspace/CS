@@ -77,7 +77,6 @@ void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
 {
   int i, j;
   csPolygon3D* p;
-  csPolyTxtPlane* txt_plane = NULL;
   for (i = 0 ; i < hor_res ; i++)
     for (j = 0 ; j < ver_res ; j++)
     {
@@ -89,15 +88,14 @@ void HugeRoom::create_wall (csSector* sector, csPolygonSet* thing,
       csVector3 v2 = v12b + ((float)j/(float)ver_res) * (v43b-v12b);
       csVector3 v3 = v12b + ((float)(j+1)/(float)ver_res) * (v43b-v12b);
       csVector3 v4 = v12a + ((float)(j+1)/(float)ver_res) * (v43a-v12a);
-      p = create_polygon (sector, thing, v1, v2, v3, txt, txt_plane);
-      if (!txt_plane) txt_plane = p->GetLightMapInfo ()->GetTxtPlane ();
-      create_polygon (sector, thing, v1, v3, v4, txt, txt_plane);
+      p = create_polygon (sector, thing, v1, v2, v3, txt);
+      create_polygon (sector, thing, v1, v3, v4, txt);
     }
 }
 
 csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
 	const csVector3& p1, const csVector3& p2, const csVector3& p3,
-	int txt, csPolyTxtPlane* txt_plane)
+	int txt)
 {
   csMatrix3 t_m;
   csVector3 t_v (0, 0, 0);
@@ -136,10 +134,7 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
     	rand1 (wall_max_green-wall_min_green)+wall_min_green,
     	rand1 (wall_max_blue-wall_min_blue)+wall_min_blue);
 
-  if (txt_plane)
-    p->SetTextureSpace (txt_plane);
-  else
-    p->SetTextureSpace (t_m, t_v);
+  p->SetTextureSpace (t_m, t_v);
 
   return p;
 }
@@ -240,8 +235,8 @@ csThing* HugeRoom::create_building (csSector* sector, const csVector3& pos,
   csVector3 p6 (xdim/2,y_high,zdim/2);
   csVector3 p7 (xdim/2,y_high,-zdim/2);
   csVector3 p8 (-xdim/2,y_high,-zdim/2);
-  int hor_div = 7;//7	(10)
-  int ver_div = 14;//14	(20)
+  int hor_div = 3;//7	(10)
+  int ver_div = 4;//14	(20)
   create_wall (sector, thing, p5, p6, p7, p8, hor_div, hor_div, txt);	// Top
   create_wall (sector, thing, p8, p7, p3, p4, hor_div, ver_div, txt);	// Front
   create_wall (sector, thing, p7, p6, p2, p3, hor_div, ver_div, txt);	// Right
