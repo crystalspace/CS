@@ -19,8 +19,7 @@
 #ifndef __CS_UTIL_BINDER_H__
 #define __CS_UTIL_BINDER_H__
 
-#include "iutil/event.h"
-#include "csutil/csevent.h"
+#include "iutil/binder.h"
 #include "iutil/eventh.h"
 #include "csutil/hashmap.h"
 
@@ -28,64 +27,127 @@
  * Create a csHashMap key from an iEvent.
  * Used internally by csInputBinder.
  */
-extern csHashKey csHashComputeEvent (iEvent *ev);
+extern csHashKey csHashComputeEvent (iEvent &ev);
 
 /**
  * Bind an input event to a pointer to a variable,
  * so that that variable will reflect the state of a given key, button or axis.
  */
-class csInputBinder : public iEventHandler
+class csInputBinder : public iInputBinder
 {
-  private:
-    csHashMap *Hash;
+ private:
+  csHashMap Hash;
 
-  public:
-    SCF_DECLARE_IBASE;
+ protected:
+  inline bool HandleEvent (iEvent &ev);
 
-    /**
-     * Create a new binder with initial bindings hash size size.
-     * size should be a prime number.
-     */
-    csInputBinder (int size = 127);
+ public:
+  SCF_DECLARE_IBASE;
 
-    /**
-     * Destructor does UnbindAll automatically.
-     */
-    virtual ~csInputBinder ();
+  /**
+   * Create a new binder with an initial bindings hash size.
+   * For optimum hash storage, size should be a prime number.
+   */
+  csInputBinder (iBase *parent = NULL, int size = 127);
 
-    /**
-     * Handle an event, a method of iEventHandler
-     * This class can be registered with the event queue:
-     * iEventQueue::RegisterListener(this, CSMASK_Input);
-     */
-    bool HandleEvent (iEvent &ev);
+  /**
+   * Destructor does UnbindAll automatically.
+   */
+  virtual ~csInputBinder ();
 
-    /**
-     * Bind one or two variables to an event.
-     * Bind one or two 'int's to a csev*Move type event.
-     * You can bind the two axes simultaneously or separately.
-     * If yvar is NULL and the event is a y-axis type, xvar is used as yvar.
-     * Or bind a button status '(int)bool' to a csev*Up/Down type event.
-     * Will modify the existing binding if any.
-     * It is recommended that you use this in conjuction with csParseKeyDef
-     * The axis (either x, y or both) is given by whether ev.*.x is greater
-     * than ev.*.y (x) or visa versa (y) or if they are equal (both).
-     */
-    void Bind (iEvent *ev, int *xvar = NULL, int *yvar = NULL);
+  struct eiEventHandler : public iEventHandler
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csInputBinder);
+    bool HandleEvent (iEvent &ev) { return scfParent->HandleEvent (ev); }
+  } scfiEventHandler;
+  friend struct eiEventHandler;
 
-    void Bind (csEvent &ev, int *xvar = NULL, int *yvar = NULL);
+  /**
+   * Get a pointer to the embedded event handler.
+   * This class can be registered with the event queue:
+   * iEventQueue::RegisterListener(this, CSMASK_Input);
+   */
+  virtual iEventHandler* QueryHandler () { return & scfiEventHandler; }
 
-    /**
-     * Remove a binding.
-     */
-    bool Unbind (iEvent *ev);
+  /**
+   * Bind a bool to a keyboard key or mouse or joystick button status.
+   * If toggle is true, one press activates and the second deactivates.
+   * Otherwise, keydown activates and keyup deactivates.
+   */
+  virtual void Bind (iEvent &ev, iInputBinderBoolean *var, bool toggle = false);
 
-    bool Unbind (csEvent &ev);
+  /**
+   * Bind two int's to the x and y axes of a mouse or joystick.
+   */
+  virtual void Bind (iEvent &ev, iInputBinderPosition *var);
 
-    /**
-     * Remove all bindings.
-     */
-    bool UnbindAll();
+  /**
+   * Remove a binding.
+   */
+  virtual bool Unbind (iEvent &ev);
+
+  /**
+   * Remove all bindings.
+   */
+  virtual bool UnbindAll();
+};
+
+/// Represents the position of a mouse
+/// or joystick axis, shared between plugins.
+class csInputBinderPosition : public iInputBinderPosition
+{
+ private:
+  /// The internally held value of the position.
+  int p;
+
+ public:
+  SCF_DECLARE_IBASE;
+
+  /// Initialize Constructor.
+  csInputBinderPosition (int pp) : p (pp)
+    { SCF_CONSTRUCT_IBASE (NULL); }
+  /// Empty Constructor.
+  csInputBinderPosition () : p (0)
+    { SCF_CONSTRUCT_IBASE (NULL); }
+  /// Copy Constructor.
+  csInputBinderPosition (iInputBinderPosition *pp) : p (pp->Get ())
+    { SCF_CONSTRUCT_IBASE (NULL); }
+  /// Destructor.
+  virtual ~csInputBinderPosition () {}
+
+  /// Set the position; called by csInputBinder.
+  virtual void Set (int pp) { p = pp; }
+  /// Get the position; called by the application.
+  virtual int Get () const { return p; }
+};
+
+/// Represents the up or down state of a keyboard key
+/// or a mouse or joystick button, shared between plugins.
+class csInputBinderBoolean : public iInputBinderBoolean
+{
+ private:
+  /// The internally held state of the button.
+  bool s;
+
+ public:
+  SCF_DECLARE_IBASE;
+
+  /// Initialize Constructor.
+  csInputBinderBoolean (bool ss) : s (ss)
+    { SCF_CONSTRUCT_IBASE (NULL); }
+  /// Empty Constructor.
+  csInputBinderBoolean () : s (0)
+    { SCF_CONSTRUCT_IBASE (NULL); }
+  /// Copy Constructor.
+  csInputBinderBoolean (iInputBinderBoolean *ss) : s (ss->Get ())
+    { SCF_CONSTRUCT_IBASE (NULL); }
+  /// Destructor.
+  virtual ~csInputBinderBoolean () {}
+
+  /// Set the state; called by csInputBinder.
+  virtual void Set (bool ss) { s = ss; }
+  /// Get the state; called by the application.
+  virtual bool Get () const { return s; }
 };
 
 #endif // __CS_UTIL_BINDER_H__

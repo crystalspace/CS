@@ -17,41 +17,69 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/binder.h"
 #include "iutil/event.h"
 #include "iutil/evdefs.h"
-#include "csutil/hashmap.h"
-#include "csutil/binder.h"
 
 struct csEvBind
 {
-  void *x, *y;
+  bool pos;
+  bool tgl;
+  bool up;
+  union
+  {
+    iInputBinderPosition *p;
+    iInputBinderBoolean *b;
+  };
+  csEvBind (iInputBinderPosition *pp)
+  {
+    p = pp;
+    if (p) p->IncRef ();
+    pos = true;
+  }
+  csEvBind (iInputBinderBoolean *bb, bool toggle)
+  {
+    b = bb;
+    if (b) b->IncRef ();
+    pos = false;
+    tgl = toggle;
+    up = true;
+  }
+  ~csEvBind ()
+  {
+    if (pos)
+      if (p) p->DecRef ();
+    else
+      if (b) b->DecRef ();
+  }
 };
 
-csHashKey csHashComputeEvent (iEvent *ev)
+csHashKey csHashComputeEvent (iEvent &ev)
 {
-  switch (ev->Type)
+  switch (ev.Type)
   {
     case csevKeyDown:
     case csevKeyUp:
-      return (csHashKey)
-        (CSMASK_Keyboard +
-          (ev->Key.Code >= CSKEY_FIRST ? ev->Key.Code : ev->Key.Char));
+      return CSMASK_Keyboard
+        | ((ev.Key.Char < 256 ? ev.Key.Char : ev.Key.Code) << 16);
 
     case csevMouseMove:
-      return (csHashKey) CSMASK_MouseMove;
+      return CSMASK_MouseMove
+        | ((abs (ev.Mouse.x) > abs (ev.Mouse.y) ? 0 : 1) << 16);
 
     case csevMouseDown:
     case csevMouseUp:
-      return (csHashKey)
-        ((CSMASK_MouseDown | CSMASK_MouseUp) + ev->Mouse.Button);
+      return CSMASK_MouseDown
+        | (ev.Mouse.Button << 16);
 
     case csevJoystickMove:
-      return (csHashKey) CSMASK_JoystickMove;
+      return CSMASK_JoystickMove
+        | ((abs (ev.Joystick.x) > abs (ev.Joystick.y) ? 0 : 1) << 16);
 
     case csevJoystickDown:
     case csevJoystickUp:
-      return (csHashKey)
-        (CSMASK_JoystickDown | CSMASK_JoystickUp);
+      return CSMASK_JoystickDown
+        | (ev.Joystick.Button << 16);
 
     default:
       return 0;
@@ -59,46 +87,67 @@ csHashKey csHashComputeEvent (iEvent *ev)
 }
 
 SCF_IMPLEMENT_IBASE (csInputBinder)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iInputBinder)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
-csInputBinder::csInputBinder (int size)
+SCF_IMPLEMENT_EMBEDDED_IBASE (csInputBinder::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csInputBinder::csInputBinder (iBase *parent, int size)
+  : Hash (size)
 {
-  SCF_CONSTRUCT_IBASE (NULL);
-  Hash = new csHashMap (size);
+  SCF_CONSTRUCT_IBASE (parent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 }
 
 csInputBinder::~csInputBinder ()
 {
   UnbindAll ();
-  delete Hash;
 }
 
-bool csInputBinder::HandleEvent (iEvent &ev)
+inline bool csInputBinder::HandleEvent (iEvent &ev)
 {
-  csEvBind *pair = (csEvBind *)Hash->Get (csHashComputeEvent (&ev));
+  csEvBind *pair = (csEvBind *) Hash.Get (csHashComputeEvent (ev));
   if (pair) switch (ev.Type)
   {
     case csevKeyDown:
     case csevMouseDown:
     case csevJoystickDown:
-      if (pair->x) *(bool *)(pair->x) = true;
+      if (pair->b)
+      {
+        if (pair->tgl)
+        {
+          if (pair->up)
+          {
+            pair->up = false;
+            pair->b->Set (! pair->b->Get ());
+          }
+        }
+        else
+          pair->b->Set (true);
+      }
       return true;
 
     case csevKeyUp:
     case csevMouseUp:
     case csevJoystickUp:
-      if (pair->x) *(bool *)(pair->x) = false;
+      if (pair->b)
+      {
+        if (pair->tgl)
+          pair->up = true;
+        else
+          pair->b->Set (false);
+      }
       return true;
 
     case csevMouseMove:
-      if (pair->x) *(int *)(pair->x) = ev.Mouse.x;
-      if (pair->y) *(int *)(pair->y) = ev.Mouse.y;
+      //TODO
       return true;
 
     case csevJoystickMove:
-      if (pair->x) *(int *)(pair->x) = ev.Joystick.x;
-      if (pair->y) *(int *)(pair->y) = ev.Joystick.y;
+      //TODO
       return true;
 
     default:
@@ -107,62 +156,35 @@ bool csInputBinder::HandleEvent (iEvent &ev)
   return false;
 }
 
-void csInputBinder::Bind (iEvent *ev, int *xvar, int *yvar)
+void csInputBinder::Bind (iEvent &ev, iInputBinderBoolean *var, bool toggle)
 {
-  if (! yvar) switch (ev->Type) {
-    case csevMouseMove:
-      if (ev->Mouse.y > ev->Mouse.x) { yvar = xvar; xvar = NULL; }
-      break;
-
-    case csevJoystickMove:
-      if (ev->Joystick.y > ev->Joystick.x) { yvar = xvar; xvar = NULL; }
-      break;
-
-    default:
-      break;
-  }
-  csHashKey key = csHashComputeEvent (ev);
-  csEvBind *pair = (csEvBind *)Hash->Get (key);
-  if (! pair) pair = new csEvBind;
-  if (xvar) pair->x = xvar;
-  if (yvar) pair->y = yvar;
-  Hash->DeleteAll (key);
-  Hash->Put (key, (csHashObject)pair);
+  Hash.Put (csHashComputeEvent (ev),
+    (csHashObject) new csEvBind (var, toggle));
 }
 
-void csInputBinder::Bind (csEvent &ev, int *xvar, int *yvar)
+void csInputBinder::Bind (iEvent &ev, iInputBinderPosition *var)
 {
-  Bind (&ev, xvar, yvar);
+  Hash.Put (csHashComputeEvent (ev),
+    (csHashObject) new csEvBind (var));
 }
 
-bool csInputBinder::Unbind (iEvent *ev)
+bool csInputBinder::Unbind (iEvent &ev)
 {
-  csHashIterator iter (Hash, csHashComputeEvent (ev));
+  csHashIterator iter (& Hash, csHashComputeEvent (ev));
   if (! iter.HasNext ()) return false;
   while (iter.HasNext ())
-  {
-    csEvBind *pair = (csEvBind *)iter.Next ();
-    delete pair;
-  }
-  Hash->DeleteAll (csHashComputeEvent (ev));
+    delete (csEvBind *) iter.Next ();
+  Hash.DeleteAll (csHashComputeEvent (ev));
   return true;
-}
-
-bool csInputBinder::Unbind (csEvent &ev)
-{
-  return Unbind (&ev);
 }
 
 bool csInputBinder::UnbindAll ()
 {
-  csHashIterator iter (Hash);
+  csHashIterator iter (& Hash);
   if (! iter.HasNext ()) return false;
   while (iter.HasNext ())
-  {
-    csEvBind *pair = (csEvBind *)iter.Next ();
-    delete pair;
-  }
-  Hash->DeleteAll ();
+    delete (csEvBind *) iter.Next ();
+  Hash.DeleteAll ();
   return true;
 }
 
