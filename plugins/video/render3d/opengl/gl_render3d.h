@@ -234,30 +234,32 @@ public:
   /// Activate a vertex buffer
   bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);
   void DeactivateBuffer (csVertexAttrib attrib);
-  virtual void SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, int count);
+  virtual void SetBufferState (csVertexAttrib* attribs,
+  	iRenderBuffer** buffers, int count);
 
   /// Activate a texture
   bool ActivateTexture (iTextureHandle *txthandle, int unit = 0);
   /// Activate a texture (Should probably handled some better way)
   bool ActivateTexture (iMaterialHandle *mathandle, int layer, int unit = 0);
   void DeactivateTexture (int unit = 0);
-  virtual void SetTextureState (int* units, iTextureHandle** textures, int count);
+  virtual void SetTextureState (int* units, iTextureHandle** textures,
+  	int count);
 
   /// Set dimensions of window
   void SetDimensions (int width, int height)
-    { viewwidth = width; viewheight = height; }
+  { viewwidth = width; viewheight = height; }
   
   /// Get width of window
   int GetWidth () const
-    { return viewwidth; }
+  { return viewwidth; }
   
   /// Get height of window
   int GetHeight () const
-    { return viewheight; }
+  { return viewheight; }
 
   /// Capabilities of the driver
   const csGraphics3DCaps* GetCaps() const
-    { return &rendercaps; }
+  { return &rendercaps; }
 
   /// Set center of projection.
   virtual void SetPerspectiveCenter (int x, int y)
@@ -335,7 +337,8 @@ public:
     glColorMask (red, green, blue, alpha); 
   }
 
-  virtual void GetWriteMask (bool &red, bool &green, bool &blue, bool &alpha) const
+  virtual void GetWriteMask (bool &red, bool &green, bool &blue,
+  	bool &alpha) const
   {
     red = color_red_enabled;
     green = color_green_enabled;
@@ -359,11 +362,11 @@ public:
 
   /// Get clipper that was used.
   iClipper2D* GetClipper ()
-    { return clipper; }
+  { return clipper; }
 
   /// Return type of clipper.
   int GetClipType () const
-    { return cliptype; }
+  { return cliptype; }
 
   /// Set near clip plane.
   virtual void SetNearPlane (const csPlane3& pl)
@@ -374,15 +377,15 @@ public:
 
   /// Reset near clip plane (i.e. disable it).
   virtual void ResetNearPlane () 
-    { do_near_plane = false; }
+  { do_near_plane = false; }
 
   /// Get near clip plane.
   virtual const csPlane3& GetNearPlane () const
-    { return near_plane; }
+  { return near_plane; }
 
   /// Return true if we have near plane.
   virtual bool HasNearPlane () const
-    { return do_near_plane; }
+  { return do_near_plane; }
 
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;

@@ -19,6 +19,7 @@ chronological order.
 	- Jorrit fixed a bug in csRenderMeshList with front2back and
 	  back2front sorting. The sorting functions were casting the
 	  pointers wrong.
+	- Jorrit did some cleanups to glrender3d.
 10-Sep-2003
 	- Philip Wyett made struct ShadowDrawVisCallback a friend to
 	  class csStencilShadowStep. This works round C2248 MSVC 6

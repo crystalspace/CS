@@ -204,43 +204,43 @@ void csGLGraphics3D::SetZMode (csZBufMode mode)
 {
   switch (mode)
   {
-  case CS_ZBUF_NONE:
-    current_zmode = mode;
-    statecache->Disable_GL_DEPTH_TEST ();
-    break;
-  case CS_ZBUF_FILL:
-  case CS_ZBUF_FILLONLY:
-    current_zmode = mode;
-    statecache->Enable_GL_DEPTH_TEST ();
-    statecache->SetDepthFunc (GL_ALWAYS);
-    statecache->SetDepthMask (GL_TRUE);
-    break;
-  case CS_ZBUF_EQUAL:
-    current_zmode = mode;
-    statecache->Enable_GL_DEPTH_TEST ();
-    statecache->SetDepthFunc (GL_EQUAL);
-    statecache->SetDepthMask (GL_FALSE);
-    break;
-  case CS_ZBUF_TEST:
-    current_zmode = mode;
-    statecache->Enable_GL_DEPTH_TEST ();
-    statecache->SetDepthFunc (GL_GREATER);
-    statecache->SetDepthMask (GL_FALSE);
-    break;
-  case CS_ZBUF_INVERT:
-    current_zmode = mode;
-    statecache->Enable_GL_DEPTH_TEST ();
-    statecache->SetDepthFunc (GL_LESS);
-    statecache->SetDepthMask (GL_FALSE);
-    break;
-  case CS_ZBUF_USE:
-    current_zmode = mode;
-    statecache->Enable_GL_DEPTH_TEST ();
-    statecache->SetDepthFunc (GL_GEQUAL);
-    statecache->SetDepthMask (GL_TRUE);
-    break;
-  default:
-    break;
+    case CS_ZBUF_NONE:
+      current_zmode = mode;
+      statecache->Disable_GL_DEPTH_TEST ();
+      break;
+    case CS_ZBUF_FILL:
+    case CS_ZBUF_FILLONLY:
+      current_zmode = mode;
+      statecache->Enable_GL_DEPTH_TEST ();
+      statecache->SetDepthFunc (GL_ALWAYS);
+      statecache->SetDepthMask (GL_TRUE);
+      break;
+    case CS_ZBUF_EQUAL:
+      current_zmode = mode;
+      statecache->Enable_GL_DEPTH_TEST ();
+      statecache->SetDepthFunc (GL_EQUAL);
+      statecache->SetDepthMask (GL_FALSE);
+      break;
+    case CS_ZBUF_TEST:
+      current_zmode = mode;
+      statecache->Enable_GL_DEPTH_TEST ();
+      statecache->SetDepthFunc (GL_GREATER);
+      statecache->SetDepthMask (GL_FALSE);
+      break;
+    case CS_ZBUF_INVERT:
+      current_zmode = mode;
+      statecache->Enable_GL_DEPTH_TEST ();
+      statecache->SetDepthFunc (GL_LESS);
+      statecache->SetDepthMask (GL_FALSE);
+      break;
+    case CS_ZBUF_USE:
+      current_zmode = mode;
+      statecache->Enable_GL_DEPTH_TEST ();
+      statecache->SetDepthFunc (GL_GEQUAL);
+      statecache->SetDepthMask (GL_TRUE);
+      break;
+    default:
+      break;
   }
 }
 
@@ -502,10 +502,10 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
     char* clip_modes;
     switch (ct)
     {
-    case CS_CLIPPER_OPTIONAL: clip_modes = clip_optional; break;
-    case CS_CLIPPER_REQUIRED: clip_modes = clip_required; break;
-    case CS_CLIPPER_TOPLEVEL: clip_modes = clip_outer; break;
-    default: clip_modes = clip_optional;
+      case CS_CLIPPER_OPTIONAL: clip_modes = clip_optional; break;
+      case CS_CLIPPER_REQUIRED: clip_modes = clip_required; break;
+      case CS_CLIPPER_TOPLEVEL: clip_modes = clip_outer; break;
+      default: clip_modes = clip_optional;
     }
     // Go through all the modes and select the first one that is appropriate.
     for (int i = 0 ; i < 3 ; i++)
@@ -517,8 +517,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
       // We cannot use p or P if the clipper has more vertices than the
       // number of hardware planes minus one (for the view plane).
       if ((c == 'p' || c == 'P') &&
-        clipper->GetVertexCount ()
-        > 6-reserved_planes)
+        clipper->GetVertexCount () > 6-reserved_planes)
         continue;
       how_clip = c;
       break;
@@ -614,9 +613,12 @@ void csGLGraphics3D::ApplyObjectToCamera ()
   matrixholder[10] = orientation.m33;
   matrixholder[11] = 0.0f;
 
-  matrixholder[12] = orientation.m11*-translation.x + orientation.m12*-translation.y + orientation.m13*-translation.z;
-  matrixholder[13] = orientation.m21*-translation.x + orientation.m22*-translation.y + orientation.m23*-translation.z;
-  matrixholder[14] = orientation.m31*-translation.x + orientation.m32*-translation.y + orientation.m33*-translation.z;
+  matrixholder[12] = orientation.m11*-translation.x
+  	+ orientation.m12*-translation.y + orientation.m13*-translation.z;
+  matrixholder[13] = orientation.m21*-translation.x
+  	+ orientation.m22*-translation.y + orientation.m23*-translation.z;
+  matrixholder[14] = orientation.m31*-translation.x
+  	+ orientation.m32*-translation.y + orientation.m33*-translation.z;
   matrixholder[15] = 1.0f;
 
   
@@ -630,7 +632,7 @@ void csGLGraphics3D::ApplyObjectToCamera ()
 ////////////////////////////////////////////////////////////////////
 
 
-void FillNormalizationMapSide (unsigned char *normdata, int size, 
+static void FillNormalizationMapSide (unsigned char *normdata, int size, 
                           int xx, int xy, int xo,
                           int yx, int yy, int yo,
                           int zx, int zy, int zo)
@@ -658,11 +660,10 @@ void FillNormalizationMapSide (unsigned char *normdata, int size,
 
 bool csGLGraphics3D::Open ()
 {
-  csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (object_reg, iPluginManager));
-
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-    iCommandLineParser));
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
+  	object_reg, iPluginManager);
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
+  	object_reg, iCommandLineParser);
 
   config.AddConfig(object_reg, "/config/r3dopengl.cfg");
 
@@ -720,20 +721,22 @@ bool csGLGraphics3D::Open ()
   {
     //no special ati extensions atm
   }
+
   // check for support of VBO
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
 
   shadermgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
   if (!shadermgr)
   {
-    shadermgr = csPtr<iShaderManager>
-      (CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
+    shadermgr = csPtr<iShaderManager> (CS_LOAD_PLUGIN (
+    	plugin_mgr, "crystalspace.graphics3d.shadermanager", iShaderManager));
     object_reg->Register (shadermgr, "iShaderManager");
   }
 
-  txtcache 
-      = csPtr<csGLTextureCache> (new csGLTextureCache (1024*1024*32, this));
-  txtmgr.AttachNew (new csGLTextureManager (object_reg, GetDriver2D (), config, this));
+  txtcache = csPtr<csGLTextureCache> (new csGLTextureCache (
+  	1024*1024*32, this));
+  txtmgr.AttachNew (new csGLTextureManager (
+  	object_reg, GetDriver2D (), config, this));
 
   glClearDepth (0.0);
   statecache->Enable_GL_CULL_FACE ();
@@ -770,10 +773,10 @@ bool csGLGraphics3D::Open ()
   }
   transientfogdata[(CS_FOGTABLE_SIZE - 1) * 4 + 3] = 0;
 
-  csRef<iImage> img (csPtr<iImage> (new csImageMemory (
+  csRef<iImage> img = csPtr<iImage> (new csImageMemory (
     CS_FOGTABLE_SIZE, 1, transientfogdata, true, 
-    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA)));
-  csRef<iImageVector> imgvec (csPtr<iImageVector> (new csImageVector ()));
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+  csRef<iImageVector> imgvec = csPtr<iImageVector> (new csImageVector ());
   imgvec->AddImage (img);
   csRef<iTextureHandle> fogtex = txtmgr->RegisterTexture (
     imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
@@ -925,7 +928,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     lastUsedShaderpass->Deactivate ();
   }
 
-  SetWriteMask (true,true,true,true);
+  SetWriteMask (true, true, true, true);
 
   int i = 0;
   for (i = 0; i < 16; i++)
@@ -971,7 +974,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   {
     statecache->SetDepthMask (GL_TRUE);
     if (drawflags & CSDRAW_CLEARSCREEN)
-      glClear (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+      glClear (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT
+      	| GL_COLOR_BUFFER_BIT);
     else
       glClear (GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
   }
@@ -997,7 +1001,8 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     glLoadIdentity ();
     object2camera = csReversibleTransform();
     return true;
-  } else if (drawflags & CSDRAW_2DGRAPHICS)
+  }
+  else if (drawflags & CSDRAW_2DGRAPHICS)
   {
     if (use_hw_render_buffers)
     {
@@ -1141,12 +1146,13 @@ void csGLGraphics3D::SetObjectToCamera (csReversibleTransform* object2cam)
       orientation1.Col1 () == orientation2.Col1 () &&
       orientation1.Col2 () == orientation2.Col2 () &&
       orientation1.Col3 () == orientation2.Col3 ())
-      return;
+    return;
   object2camera = *object2cam;
   ApplyObjectToCamera ();
 }
 
-void csGLGraphics3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float fov, int color)
+void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
+	float fov, int color)
 {
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;
@@ -1184,7 +1190,8 @@ void csGLGraphics3D::DrawLine(const csVector3 & v1, const csVector3 & v2, float 
   G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
+bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
+	iRenderBuffer* buffer)
 {
   bool bind = true;
   int att;
@@ -1214,7 +1221,8 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffe
     vertattrib[att] = 0;
   }
 
-  void* data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
+  void* data = ((csGLRenderBuffer*)buffer)->RenderLock (
+  	CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
   if (data != (void*)-1)
   {
     if (ext->glEnableVertexAttribArrayARB && attrib<100)
@@ -1236,27 +1244,27 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffe
     {
       switch (attrib)
       {
-      case CS_VATTRIB_POSITION:
-        glVertexPointer (buffer->GetComponentCount (),
-          ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
-        glEnableClientState (GL_VERTEX_ARRAY);
-        break;
-      case CS_VATTRIB_NORMAL:
-        glNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, 0, data);
-        glEnableClientState (GL_NORMAL_ARRAY);
-        break;
-      case CS_VATTRIB_PRIMARY_COLOR:
-        glColorPointer (buffer->GetComponentCount (),
-          ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
-        glEnableClientState (GL_COLOR_ARRAY);
-	break;
-      case CS_VATTRIB_TEXCOORD:
-        glTexCoordPointer (buffer->GetComponentCount (), 
-          ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
-        glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-	break;
-      default:
-	break;
+        case CS_VATTRIB_POSITION:
+          glVertexPointer (buffer->GetComponentCount (),
+            ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+          glEnableClientState (GL_VERTEX_ARRAY);
+          break;
+        case CS_VATTRIB_NORMAL:
+          glNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+          glEnableClientState (GL_NORMAL_ARRAY);
+          break;
+        case CS_VATTRIB_PRIMARY_COLOR:
+          glColorPointer (buffer->GetComponentCount (),
+            ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+          glEnableClientState (GL_COLOR_ARRAY);
+	  break;
+        case CS_VATTRIB_TEXCOORD:
+          glTexCoordPointer (buffer->GetComponentCount (), 
+            ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+          glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+	  break;
+        default:
+	  break;
       }
     }
     vertattrib[att] = buffer;
@@ -1293,20 +1301,20 @@ void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
   {
     switch (attrib)
     {
-    case CS_VATTRIB_POSITION:
-      glDisableClientState (GL_VERTEX_ARRAY);
-      break;
-    case CS_VATTRIB_NORMAL:
-      glDisableClientState (GL_NORMAL_ARRAY);
-      break;
-    case CS_VATTRIB_PRIMARY_COLOR:
-      glDisableClientState (GL_COLOR_ARRAY);
-      break;
-    case CS_VATTRIB_TEXCOORD:
-      glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-      break;
-    default:
-      break;
+      case CS_VATTRIB_POSITION:
+        glDisableClientState (GL_VERTEX_ARRAY);
+        break;
+      case CS_VATTRIB_NORMAL:
+        glDisableClientState (GL_NORMAL_ARRAY);
+        break;
+      case CS_VATTRIB_PRIMARY_COLOR:
+        glDisableClientState (GL_COLOR_ARRAY);
+        break;
+      case CS_VATTRIB_TEXCOORD:
+        glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+        break;
+      default:
+        break;
     }
   }
   if (vertattrib[att])
@@ -1320,7 +1328,8 @@ void csGLGraphics3D::DeactivateBuffer (csVertexAttrib attrib)
   }
 }
 
-void csGLGraphics3D::SetBufferState (csVertexAttrib* attribs, iRenderBuffer** buffers, int count)
+void csGLGraphics3D::SetBufferState (csVertexAttrib* attribs,
+	iRenderBuffer** buffers, int count)
 {
   int i;
   for (i = 0 ; i < count ; i++)
@@ -1353,7 +1362,8 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
   {
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
     ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
-  } else if (unit != 0) return false;
+  }
+  else if (unit != 0) return false;
 
   txtcache->Cache (txthandle);
   csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
@@ -1363,46 +1373,47 @@ bool csGLGraphics3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 
   switch (gltxthandle->target)
   {
-  case iTextureHandle::CS_TEX_IMG_1D:
-    statecache->Enable_GL_TEXTURE_1D (unit);
-    if (bind)
-      statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle, unit);
-    texunit[unit] = txthandle;
-    texunitenabled[unit] = true;
-    break;
-  case iTextureHandle::CS_TEX_IMG_2D:
-    statecache->Enable_GL_TEXTURE_2D (unit);
-    if (bind)
-      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle, unit);
-    if (ext->CS_GL_EXT_texture_lod_bias)
-    {
-      glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	GL_TEXTURE_LOD_BIAS_EXT, (int) textureLodBias); //big hack
-    }
-    texunit[unit] = txthandle;
-    texunitenabled[unit] = true;
-    break;
-  case iTextureHandle::CS_TEX_IMG_3D:
-    statecache->Enable_GL_TEXTURE_3D (unit);
-    if (bind)
-      statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle, unit);
-    texunit[unit] = txthandle;
-    texunitenabled[unit] = true;
-    break;
-  case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-    statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
-    if (bind)
-      statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle, unit);
-    texunit[unit] = txthandle;
-    texunitenabled[unit] = true;
-    break;
-  default:
-    return false;
+    case iTextureHandle::CS_TEX_IMG_1D:
+      statecache->Enable_GL_TEXTURE_1D (unit);
+      if (bind)
+        statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle, unit);
+      texunit[unit] = txthandle;
+      texunitenabled[unit] = true;
+      break;
+    case iTextureHandle::CS_TEX_IMG_2D:
+      statecache->Enable_GL_TEXTURE_2D (unit);
+      if (bind)
+        statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle, unit);
+      if (ext->CS_GL_EXT_texture_lod_bias)
+      {
+        glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
+	  GL_TEXTURE_LOD_BIAS_EXT, (int) textureLodBias); //big hack
+      }
+      texunit[unit] = txthandle;
+      texunitenabled[unit] = true;
+      break;
+    case iTextureHandle::CS_TEX_IMG_3D:
+      statecache->Enable_GL_TEXTURE_3D (unit);
+      if (bind)
+        statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle, unit);
+      texunit[unit] = txthandle;
+      texunitenabled[unit] = true;
+      break;
+    case iTextureHandle::CS_TEX_IMG_CUBEMAP:
+      statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
+      if (bind)
+        statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle, unit);
+      texunit[unit] = txthandle;
+      texunitenabled[unit] = true;
+      break;
+    default:
+      return false;
   }
   return true;
 }
 
-bool csGLGraphics3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int unit)
+bool csGLGraphics3D::ActivateTexture (iMaterialHandle *mathandle, int layer,
+	int unit)
 {
   // @@@ deal with multiple textures
   iTextureHandle* txthandle = 0;
@@ -1412,7 +1423,8 @@ bool csGLGraphics3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int
     txthandle = mathand->GetTexture();
     if (!txthandle)
       return false;
-  } else return false;
+  }
+  else return false;
 
   bool bind = true;
   if (texunit[unit] == txthandle)
@@ -1431,7 +1443,8 @@ bool csGLGraphics3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int
   {
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
     ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
-  } else if (unit != 0) return false;
+  }
+  else if (unit != 0) return false;
 
   txtcache->Cache (txthandle);
   csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
@@ -1441,41 +1454,41 @@ bool csGLGraphics3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int
 
   switch (gltxthandle->target)
   {
-  case iTextureHandle::CS_TEX_IMG_1D:
-    statecache->Enable_GL_TEXTURE_1D (unit);
-    if (bind)
-      statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle );
-    texunit[unit] = txthandle;
-    texunitenabled[unit] = true;
-    break;
-  case iTextureHandle::CS_TEX_IMG_2D:
-    statecache->Enable_GL_TEXTURE_2D (unit);
-    if (bind)
-      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle );
-    if (ext->CS_GL_EXT_texture_lod_bias)
-    {
-      glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
-	GL_TEXTURE_LOD_BIAS_EXT, (int) textureLodBias); //big hack
-    }
-    texunit[unit] = txthandle;
-    texunitenabled[unit] = true;
-    break;
-  case iTextureHandle::CS_TEX_IMG_3D:
-    statecache->Enable_GL_TEXTURE_3D (unit);
-    if (bind)
-      statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle );
-    texunit[unit] = txthandle;
-    texunitenabled[unit] = true;
-    break;
-  case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-    statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
-    if (bind)
-      statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
-    texunit[unit] = txthandle;
-    texunitenabled[unit] = true;
-    break;
-  default:
-    return false;
+    case iTextureHandle::CS_TEX_IMG_1D:
+      statecache->Enable_GL_TEXTURE_1D (unit);
+      if (bind)
+        statecache->SetTexture (GL_TEXTURE_1D, cachedata->Handle );
+      texunit[unit] = txthandle;
+      texunitenabled[unit] = true;
+      break;
+    case iTextureHandle::CS_TEX_IMG_2D:
+      statecache->Enable_GL_TEXTURE_2D (unit);
+      if (bind)
+        statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle );
+      if (ext->CS_GL_EXT_texture_lod_bias)
+      {
+        glTexEnvi (GL_TEXTURE_FILTER_CONTROL_EXT, 
+	  GL_TEXTURE_LOD_BIAS_EXT, (int) textureLodBias); //big hack
+      }
+      texunit[unit] = txthandle;
+      texunitenabled[unit] = true;
+      break;
+    case iTextureHandle::CS_TEX_IMG_3D:
+      statecache->Enable_GL_TEXTURE_3D (unit);
+      if (bind)
+        statecache->SetTexture (GL_TEXTURE_3D, cachedata->Handle );
+      texunit[unit] = txthandle;
+      texunitenabled[unit] = true;
+      break;
+    case iTextureHandle::CS_TEX_IMG_CUBEMAP:
+      statecache->Enable_GL_TEXTURE_CUBE_MAP (unit);
+      if (bind)
+        statecache->SetTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
+      texunit[unit] = txthandle;
+      texunitenabled[unit] = true;
+      break;
+    default:
+      return false;
   }
   return true;
 }
@@ -1490,33 +1503,35 @@ void csGLGraphics3D::DeactivateTexture (int unit)
   {
     ext->glActiveTextureARB(GL_TEXTURE0_ARB + unit);
     ext->glClientActiveTextureARB(GL_TEXTURE0_ARB + unit);
-  } else if (unit != 0) return;
+  }
+  else if (unit != 0) return;
 
   csGLTextureHandle *gltxthandle = (csGLTextureHandle *)
     texunit[unit]->GetPrivateObject ();
   switch (gltxthandle->target)
   {
-  case iTextureHandle::CS_TEX_IMG_1D:
-    statecache->Disable_GL_TEXTURE_1D (unit);
-    //glBindTexture (GL_TEXTURE_1D, 0);
-    break;
-  case iTextureHandle::CS_TEX_IMG_2D:
-    statecache->Disable_GL_TEXTURE_2D (unit);
-    //glBindTexture (GL_TEXTURE_2D, 0);
-    break;
-  case iTextureHandle::CS_TEX_IMG_3D:
-    statecache->Disable_GL_TEXTURE_3D (unit);
-    //glBindTexture (GL_TEXTURE_3D, 0);
-    break;
-  case iTextureHandle::CS_TEX_IMG_CUBEMAP:
-    statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
-    //glBindTexture (GL_TEXTURE_CUBE_MAP, 0);
-    break;
+    case iTextureHandle::CS_TEX_IMG_1D:
+      statecache->Disable_GL_TEXTURE_1D (unit);
+      //glBindTexture (GL_TEXTURE_1D, 0);
+      break;
+    case iTextureHandle::CS_TEX_IMG_2D:
+      statecache->Disable_GL_TEXTURE_2D (unit);
+      //glBindTexture (GL_TEXTURE_2D, 0);
+      break;
+    case iTextureHandle::CS_TEX_IMG_3D:
+      statecache->Disable_GL_TEXTURE_3D (unit);
+      //glBindTexture (GL_TEXTURE_3D, 0);
+      break;
+    case iTextureHandle::CS_TEX_IMG_CUBEMAP:
+      statecache->Disable_GL_TEXTURE_CUBE_MAP (unit);
+      //glBindTexture (GL_TEXTURE_CUBE_MAP, 0);
+      break;
   }
   texunitenabled[unit] = false;
 }
 
-void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures, int count)
+void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures,
+	int count)
 {
   int i;
   for (i = 0 ; i < count ; i++)
@@ -1532,7 +1547,7 @@ void csGLGraphics3D::SetTextureState (int* units, iTextureHandle** textures, int
   ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
 }
 
-void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)
+void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
 {
   /*SetupClipper (mymesh->clip_portal, 
                 mymesh->clip_plane, 
@@ -1544,56 +1559,56 @@ void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)
   GLenum primitivetype;
   switch (mymesh->meshtype)
   {
-  case CS_MESHTYPE_QUADS:
-    primitivetype = GL_QUADS;
-    break;
-  case CS_MESHTYPE_TRIANGLESTRIP:
-    primitivetype = GL_TRIANGLE_STRIP;
-    break;
-  //case CS_MESHTYPE_POLYGON:
-  case CS_MESHTYPE_TRIANGLEFAN:
-    primitivetype = GL_TRIANGLE_FAN;
-    break;
-  case CS_MESHTYPE_POINTS:
-    primitivetype = GL_POINTS;
-    break;
-  case CS_MESHTYPE_LINES:
-    primitivetype = GL_LINES;
-    break;
-  case CS_MESHTYPE_LINESTRIP:
-    primitivetype = GL_LINE_STRIP;
-    break;
-  case CS_MESHTYPE_TRIANGLES:
-  default:
-    primitivetype = GL_TRIANGLES;
-    break;
+    case CS_MESHTYPE_QUADS:
+      primitivetype = GL_QUADS;
+      break;
+    case CS_MESHTYPE_TRIANGLESTRIP:
+      primitivetype = GL_TRIANGLE_STRIP;
+      break;
+    //case CS_MESHTYPE_POLYGON:
+    case CS_MESHTYPE_TRIANGLEFAN:
+      primitivetype = GL_TRIANGLE_FAN;
+      break;
+    case CS_MESHTYPE_POINTS:
+      primitivetype = GL_POINTS;
+      break;
+    case CS_MESHTYPE_LINES:
+      primitivetype = GL_LINES;
+      break;
+    case CS_MESHTYPE_LINESTRIP:
+      primitivetype = GL_LINE_STRIP;
+      break;
+    case CS_MESHTYPE_TRIANGLES:
+    default:
+      primitivetype = GL_TRIANGLES;
+      break;
   }
 
   switch (current_shadow_state)
   {
-  case CS_SHADOW_VOLUME_PASS1:
-    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_INCR);
-    statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
-    break;
-  case CS_SHADOW_VOLUME_FAIL1:
-    statecache->SetStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
-    statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
-    break;
-  case CS_SHADOW_VOLUME_PASS2:
-    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_DECR);
-    statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
-    break;
-  case CS_SHADOW_VOLUME_FAIL2:
-    statecache->SetStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
-    statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
-    break;
-  case CS_SHADOW_VOLUME_USE:
-    statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-    if (stencil_enabled)
-      statecache->SetStencilFunc (GL_EQUAL, 0, 255);
-    else
-      statecache->SetStencilFunc (GL_EQUAL, 0, 127);
-    break;
+    case CS_SHADOW_VOLUME_PASS1:
+      statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_INCR);
+      statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+      break;
+    case CS_SHADOW_VOLUME_FAIL1:
+      statecache->SetStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
+      statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+      break;
+    case CS_SHADOW_VOLUME_PASS2:
+      statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_DECR);
+      statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+      break;
+    case CS_SHADOW_VOLUME_FAIL2:
+      statecache->SetStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
+      statecache->SetStencilFunc (GL_ALWAYS, 0, 255);
+      break;
+    case CS_SHADOW_VOLUME_USE:
+      statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+      if (stencil_enabled)
+        statecache->SetStencilFunc (GL_EQUAL, 0, 255);
+      else
+        statecache->SetStencilFunc (GL_EQUAL, 0, 127);
+      break;
   }
 
   if (current_shadow_state == CS_SHADOW_VOLUME_PASS2 ||
@@ -1616,7 +1631,8 @@ void csGLGraphics3D::DrawMesh(csRenderMesh* mymesh)
   if (!indexbuf)
     return;
 
-  void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS); //indexbuf->Lock(CS_BUF_LOCK_RENDER);
+  //indexbuf->Lock(CS_BUF_LOCK_RENDER);
+  void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
   if (bufData != (void*)-1)
   {
     SetMixMode (mymesh->mixmode);
@@ -1793,37 +1809,37 @@ void csGLGraphics3D::SetShadowState (int state)
 {
   switch (state)
   {
-  case CS_SHADOW_VOLUME_BEGIN:
-    current_shadow_state = CS_SHADOW_VOLUME_BEGIN;
-    stencil_initialized = false;
-    glClearStencil (0);
-    glClear (GL_STENCIL_BUFFER_BIT);
-    statecache->Enable_GL_STENCIL_TEST ();
-    statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
-    //statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-    glPolygonOffset (-0.1, -4); 
-    statecache->Enable_GL_POLYGON_OFFSET_FILL ();
-    break;
-  case CS_SHADOW_VOLUME_PASS1:
-    current_shadow_state = CS_SHADOW_VOLUME_PASS1;
-    break;
-  case CS_SHADOW_VOLUME_FAIL1:
-    current_shadow_state = CS_SHADOW_VOLUME_FAIL1;
-	break;
-  case CS_SHADOW_VOLUME_PASS2:
-    current_shadow_state = CS_SHADOW_VOLUME_PASS2;
-    break;
-  case CS_SHADOW_VOLUME_FAIL2:
-    current_shadow_state = CS_SHADOW_VOLUME_FAIL2;
-    break;
-  case CS_SHADOW_VOLUME_USE:
-    current_shadow_state = CS_SHADOW_VOLUME_USE;
-    statecache->Disable_GL_POLYGON_OFFSET_FILL ();
-    break;
-  case CS_SHADOW_VOLUME_FINISH:
-    current_shadow_state = 0;
-    statecache->Disable_GL_STENCIL_TEST ();
-    break;
+    case CS_SHADOW_VOLUME_BEGIN:
+      current_shadow_state = CS_SHADOW_VOLUME_BEGIN;
+      stencil_initialized = false;
+      glClearStencil (0);
+      glClear (GL_STENCIL_BUFFER_BIT);
+      statecache->Enable_GL_STENCIL_TEST ();
+      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
+      //statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+      glPolygonOffset (-0.1, -4); 
+      statecache->Enable_GL_POLYGON_OFFSET_FILL ();
+      break;
+    case CS_SHADOW_VOLUME_PASS1:
+      current_shadow_state = CS_SHADOW_VOLUME_PASS1;
+      break;
+    case CS_SHADOW_VOLUME_FAIL1:
+      current_shadow_state = CS_SHADOW_VOLUME_FAIL1;
+      break;
+    case CS_SHADOW_VOLUME_PASS2:
+      current_shadow_state = CS_SHADOW_VOLUME_PASS2;
+      break;
+    case CS_SHADOW_VOLUME_FAIL2:
+      current_shadow_state = CS_SHADOW_VOLUME_FAIL2;
+      break;
+    case CS_SHADOW_VOLUME_USE:
+      current_shadow_state = CS_SHADOW_VOLUME_USE;
+      statecache->Disable_GL_POLYGON_OFFSET_FILL ();
+      break;
+    case CS_SHADOW_VOLUME_FINISH:
+      current_shadow_state = 0;
+      statecache->Disable_GL_STENCIL_TEST ();
+      break;
   }
 }
 
@@ -1865,7 +1881,7 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
   if (!scfiEventHandler)
     scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
 
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
+  csRef<iEventQueue> q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
 
@@ -1881,11 +1897,10 @@ bool csGLGraphics3D::Initialize (iObjectRegistry* p)
     object_reg->Register (strings, "crystalspace.renderer.stringset");
   }
 
-  csRef<iPluginManager> plugin_mgr (
-    CS_QUERY_REGISTRY (object_reg, iPluginManager));
-
-  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
-    iCommandLineParser));
+  csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
+  	object_reg, iPluginManager);
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
+  	object_reg, iCommandLineParser);
 
   config.AddConfig(object_reg, "/config/r3dopengl.cfg");
 
@@ -1915,18 +1930,14 @@ bool csGLGraphics3D::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevBroadcast)
     switch (Event.Command.Code)
-  {
-    case cscmdSystemOpen:
-      {
+    {
+      case cscmdSystemOpen:
         Open ();
         return true;
-      }
-    case cscmdSystemClose:
-      {
+      case cscmdSystemClose:
         Close ();
         return true;
-      }
-  }
+    }
   return false;
 }
 
@@ -1944,16 +1955,17 @@ csGLGraphics3D::eiShaderRenderInterface::~eiShaderRenderInterface()
 
 }
 
-void* csGLGraphics3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
+void* csGLGraphics3D::eiShaderRenderInterface::GetPrivateObject (
+	const char* name)
 {
-  if(strcasecmp(name, "ext") == 0)
+  if (strcasecmp(name, "ext") == 0)
     return (void*) (scfParent->ext);
-  if(strcasecmp(name, "txtcache") == 0)
+  if (strcasecmp(name, "txtcache") == 0)
     return (void*) (scfParent->txtcache);
   return 0;
 }
 
-void csGLGraphics3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)
+void csGLGraphics3D::eiShaderRenderInterface::Initialize (iObjectRegistry *reg)
 {
   object_reg = reg;
 }
@@ -1980,8 +1992,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
 
   if (strcasecmp (cmd, "dump_slms") == 0)
   {
-    csRef<iImageIO> imgsaver =
-      CS_QUERY_REGISTRY (object_reg, iImageIO);
+    csRef<iImageIO> imgsaver = CS_QUERY_REGISTRY (object_reg, iImageIO);
     if (!imgsaver)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
@@ -1989,8 +2000,7 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
       return false;
     }
 
-    csRef<iVFS> vfs =
-      CS_QUERY_REGISTRY (object_reg, iVFS);
+    csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
     if (!vfs)
     {
       Report (CS_REPORTER_SEVERITY_WARNING, 

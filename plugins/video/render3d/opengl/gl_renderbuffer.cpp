@@ -26,23 +26,25 @@ SCF_IMPLEMENT_IBASE (csGLRenderBuffer)
   SCF_IMPLEMENTS_INTERFACE (iRenderBuffer)
 SCF_IMPLEMENT_IBASE_END
 
-csGLRenderBuffer::csGLRenderBuffer 
-  (int size, csRenderBufferType type, csRenderBufferComponentType comptype, 
-   int compcount)
+csGLRenderBuffer::csGLRenderBuffer (int size, csRenderBufferType type,
+	csRenderBufferComponentType comptype, int compcount)
 {
   static const int compSizes[] = 
-    {sizeof (char), sizeof (unsigned char), 
-     sizeof (short), sizeof (unsigned short),
-     sizeof (int), sizeof (unsigned int),
-     sizeof (float),
-     sizeof (double)
-    };
+  {
+    sizeof (char), sizeof (unsigned char), 
+    sizeof (short), sizeof (unsigned short),
+    sizeof (int), sizeof (unsigned int),
+    sizeof (float),
+    sizeof (double)
+  };
   static const GLenum compGLtypes[] =
-    {GL_BYTE, GL_UNSIGNED_BYTE,
-     GL_SHORT, GL_UNSIGNED_SHORT,
-     GL_INT, GL_UNSIGNED_INT,
-     GL_FLOAT,
-     GL_DOUBLE};
+  {
+    GL_BYTE, GL_UNSIGNED_BYTE,
+    GL_SHORT, GL_UNSIGNED_SHORT,
+    GL_INT, GL_UNSIGNED_INT,
+    GL_FLOAT,
+    GL_DOUBLE
+  };
 
   SCF_CONSTRUCT_IBASE (0)
   csGLRenderBuffer::size = size;
@@ -73,7 +75,7 @@ void* csVBORenderBuffer::RenderLock (csGLRenderBufferLockType type)
       GL_ELEMENT_ARRAY_BUFFER_ARB, bufferId);
   lastRLock = type;
 
-  return (void*)0;
+  return 0;
 }
 
 //-----------------------------------------------------------------
@@ -96,3 +98,4 @@ csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (int size,
   }
   return csPtr<iRenderBuffer> (0);
 }
+

@@ -37,7 +37,7 @@
 #endif
 
 SCF_IMPLEMENT_IBASE(csGLTextureCache)
-SCF_IMPLEMENTS_INTERFACE(iGLTextureCache)
+  SCF_IMPLEMENTS_INTERFACE(iGLTextureCache)
 SCF_IMPLEMENT_IBASE_END
 
 //---------------------------------------------------------------------------//
@@ -69,8 +69,7 @@ void csGLTextureCache::Unload (csTxtCacheData *d)
 
 //----------------------------------------------------------------------------//
 
-csGLTextureCache::csGLTextureCache (int max_size,
-  csGLGraphics3D* G3D)
+csGLTextureCache::csGLTextureCache (int max_size, csGLGraphics3D* G3D)
 {
   rstate_bilinearmap = true;
   cache_size = max_size;
@@ -195,7 +194,9 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       if (txt_mm->flags & CS_TEXTURE_CLAMP)
       {
         glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      } else {
+      }
+      else
+      {
         glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT);
       }
 
@@ -220,7 +221,9 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       {
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-      } else {
+      }
+      else
+      {
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
       }
@@ -384,7 +387,8 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       // >>= 3 == /= 8 ... turning bits per pixel int bytes per pixel
       // componentcount
 
-      int compcount = csGLTextureManager::glformats[txt_mm->formatidx].components;
+      int compcount = csGLTextureManager::glformats[txt_mm->formatidx]
+      	.components;
       int cursize = togl->get_width() * togl->get_height () * compcount;
 
       uint8 *data = togl->image_data;

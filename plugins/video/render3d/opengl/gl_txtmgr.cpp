@@ -85,18 +85,18 @@ csGLTexture::~csGLTexture()
 {
   delete[] image_data;
 }
+
 /*
-*
-* New iTextureHandle Implementation
-* done by Phil Aumayr (phil@rarebyte.com)
-*
-*/
+ * New iTextureHandle Implementation
+ * done by Phil Aumayr (phil@rarebyte.com)
+ */
+
 SCF_IMPLEMENT_IBASE(csGLTextureHandle)
   SCF_IMPLEMENTS_INTERFACE(iTextureHandle)
 SCF_IMPLEMENT_IBASE_END
 
-csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int bpp,
-                                      GLenum sourceFormat, csGLGraphics3D *iG3D)
+csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
+	int bpp, GLenum sourceFormat, csGLGraphics3D *iG3D)
 {
   SCF_CONSTRUCT_IBASE(0);
   this->target = target;
@@ -129,8 +129,9 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target, int 
   prepared = false;
 }
 
-csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int target, int bpp,
-    GLenum sourceFormat, csGLGraphics3D *iG3D)
+csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image,
+	int flags, int target, int bpp, GLenum sourceFormat,
+	csGLGraphics3D *iG3D)
 {
   SCF_CONSTRUCT_IBASE(0);
   this->target = target;
@@ -165,7 +166,7 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int 
 
 csGLTextureHandle::~csGLTextureHandle()
 {
-  for(int i=0; i<vTex.Length(); i++)
+  for (int i=0; i<vTex.Length(); i++)
     delete vTex[i];
 }
 
@@ -299,12 +300,13 @@ bool csGLTextureHandle::FindFormatType ()
       }
       else
       {
-	targetFormat = (bpp == 8 ? GL_RGBA : (bpp < 24 ? GL_RGB5_A1 : GL_RGBA8));
+	targetFormat = (bpp==8 ? GL_RGBA : (bpp < 24 ? GL_RGB5_A1 : GL_RGBA8));
 	for (i=0; csGLTextureManager::glformats[i].targetFormat
 	  != targetFormat; i++);
 	formatidx = i;
 
-	int pixels = images->GetImage (0)->GetWidth () * images->GetImage (0)->GetHeight ();
+	int pixels = images->GetImage (0)->GetWidth ()
+		* images->GetImage (0)->GetHeight ();
 	csRGBpixel *_src = (csRGBpixel *)images->GetImage (0)->GetImageData ();
 
 	while (pixels--)
@@ -369,7 +371,7 @@ bool csGLTextureHandle::FindFormatType ()
     r+=_src[(d)].red; \
     g+=_src[(d)].green; \
     b+=_src[(d)].blue; \
-        } \
+  } \
 }
 	      CHECK_PIXEL((yt*w)+xl);
 	      CHECK_PIXEL((yt*w)+cols);
@@ -434,7 +436,8 @@ void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 }
 
 // Check the two below for correctness
-bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
+bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh,
+	int &md)
 {
   if(cachedata)
   {
@@ -584,7 +587,7 @@ void csGLTextureHandle::CreateMipMaps()
 
   for (i=0; i < prevImages->Length(); i++)
   {
-      nMipmaps.Push (prevImages->GetImage (i)->HasMipmaps());
+    nMipmaps.Push (prevImages->GetImage (i)->HasMipmaps());
   }
   
   while (w != 1 || h != 1)
@@ -792,17 +795,16 @@ void csGLTextureHandle::UpdateTexture ()
 }
 
 /*
-*
-*New iMaterialHandle Implementation
-*done by Phil Aumayr (phil@rarebyte.com)
-*
-*/
+ *New iMaterialHandle Implementation
+ *done by Phil Aumayr (phil@rarebyte.com)
+ */
 
 SCF_IMPLEMENT_IBASE (csGLMaterialHandle)
   SCF_IMPLEMENTS_INTERFACE (iMaterialHandle)
 SCF_IMPLEMENT_IBASE_END
 
-csGLMaterialHandle::csGLMaterialHandle (iMaterial* m, csGLTextureManager *parent)
+csGLMaterialHandle::csGLMaterialHandle (iMaterial* m,
+	csGLTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (0);
   material = m;
@@ -810,7 +812,8 @@ csGLMaterialHandle::csGLMaterialHandle (iMaterial* m, csGLTextureManager *parent
   texman = parent;
 }
 
-csGLMaterialHandle::csGLMaterialHandle (iTextureHandle* t, csGLTextureManager *parent)
+csGLMaterialHandle::csGLMaterialHandle (iTextureHandle* t,
+	csGLTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (0);
   texman = parent;
@@ -892,11 +895,9 @@ iShaderBranch* csGLMaterialHandle::QueryShaderBranch ()
 } 
 
 /*
-*
-* New iTextureManager Implementation
-* done by Phil Aumayr (phil@rarebyte.com)
-*
-*/
+ * New iTextureManager Implementation
+ * done by Phil Aumayr (phil@rarebyte.com)
+ */
 
 
 // make sure the lenient versions are listed ahead of specific ones
@@ -985,7 +986,8 @@ void csGLTextureManager::read_config (iConfigFile *config)
     AlterTargetFormat (it->GetKey (true)+1, it->GetStr ());
 }
 
-void csGLTextureManager::AlterTargetFormat (const char *oldTarget, const char *newTarget)
+void csGLTextureManager::AlterTargetFormat (const char *oldTarget,
+	const char *newTarget)
 {
     // first find the old target
   int theOld=0;
@@ -994,43 +996,40 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget, const char *n
 
   if (glformats[theOld].name)
   {
-    if (!strcmp (newTarget, "compressed") && G3D->ext->CS_GL_ARB_texture_compression)
+    if (!strcmp (newTarget, "compressed")
+    	&& G3D->ext->CS_GL_ARB_texture_compression)
     {
       GLint compressedFormat;
       // is the format compressable at all ?
       switch (glformats[theOld].sourceFormat)
       {
-      case GL_RGB:
-	compressedFormat = GL_COMPRESSED_RGB_ARB;
-	break;
-      case GL_RGBA:
-	compressedFormat = GL_COMPRESSED_RGBA_ARB;
-	break;
-      case GL_RGB5_A1:
-	if (G3D->ext->CS_GL_EXT_texture_compression_s3tc)
-	{
-	  compressedFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-	}
-	else
-	{
+        case GL_RGB:
+	  compressedFormat = GL_COMPRESSED_RGB_ARB;
+	  break;
+        case GL_RGBA:
 	  compressedFormat = GL_COMPRESSED_RGBA_ARB;
-	}
-	break;
-      case GL_ALPHA:
-	compressedFormat = GL_COMPRESSED_ALPHA_ARB;
-	break;
-      case GL_LUMINANCE:
-	compressedFormat = GL_COMPRESSED_LUMINANCE_ARB;
-	break;
-      case GL_LUMINANCE_ALPHA:
-	compressedFormat = GL_COMPRESSED_LUMINANCE_ALPHA_ARB;
-	break;
-      case GL_INTENSITY:
-	compressedFormat = GL_COMPRESSED_INTENSITY_ARB;
-	break;
-      default:
-	printf ("%s is not compressable !\n", oldTarget);
-	return;
+	  break;
+        case GL_RGB5_A1:
+	  if (G3D->ext->CS_GL_EXT_texture_compression_s3tc)
+	    compressedFormat = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+	  else
+	    compressedFormat = GL_COMPRESSED_RGBA_ARB;
+	  break;
+        case GL_ALPHA:
+	  compressedFormat = GL_COMPRESSED_ALPHA_ARB;
+	  break;
+        case GL_LUMINANCE:
+	  compressedFormat = GL_COMPRESSED_LUMINANCE_ARB;
+	  break;
+        case GL_LUMINANCE_ALPHA:
+	  compressedFormat = GL_COMPRESSED_LUMINANCE_ALPHA_ARB;
+	  break;
+        case GL_INTENSITY:
+	  compressedFormat = GL_COMPRESSED_INTENSITY_ARB;
+	  break;
+        default:
+	  printf ("%s is not compressable !\n", oldTarget);
+	  return;
       }
       glformats[theOld].compressedFormat = compressedFormat;
     }
@@ -1053,6 +1052,7 @@ void csGLTextureManager::AlterTargetFormat (const char *oldTarget, const char *n
     }
   }
 }
+
 void csGLTextureManager::Clear()
 {
   for (int i=0; i < textures.Length (); i++)
@@ -1065,7 +1065,8 @@ void csGLTextureManager::UnregisterMaterial (csGLMaterialHandle* handle)
   if (idx >= 0) materials.DeleteIndex (idx);
 }
 
-csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image, int flags)
+csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image,
+	int flags)
 {
   if (!image)
   {
@@ -1074,12 +1075,14 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImage *image, int fl
     return 0;
   }
 
-  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, iTextureHandle::CS_TEX_IMG_2D,pfmt.PixelBytes*8, GL_RGBA, G3D);
+  csGLTextureHandle *txt = new csGLTextureHandle (image, flags,
+  	iTextureHandle::CS_TEX_IMG_2D,pfmt.PixelBytes*8, GL_RGBA, G3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }
 
-csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image, int flags, int target)
+csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image,
+	int flags, int target)
 {
   if (!image)
   {
@@ -1088,7 +1091,8 @@ csPtr<iTextureHandle> csGLTextureManager::RegisterTexture (iImageVector *image, 
     return 0;
   }
 
-  csGLTextureHandle *txt = new csGLTextureHandle (image, flags, target,pfmt.PixelBytes*8, GL_RGBA, G3D);
+  csGLTextureHandle *txt = new csGLTextureHandle (image, flags,
+  	target,pfmt.PixelBytes*8, GL_RGBA, G3D);
   textures.Push(txt);
   return csPtr<iTextureHandle> (txt);
 }
@@ -1108,7 +1112,8 @@ void csGLTextureManager::FreeImages ()
     textures.Get (i)->FreeImage ();
 }
 
-csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (iMaterial* material)
+csPtr<iMaterialHandle> csGLTextureManager::RegisterMaterial (
+	iMaterial* material)
 {
   if (!material) return 0;
   csGLMaterialHandle *mat = new csGLMaterialHandle (material, this);
@@ -1209,7 +1214,8 @@ void csGLTextureManager::DumpSuperLightmaps (iVFS* VFS, iImageIO* iio,
 	else
 	{
 	  G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
-	    "Dumped %dx%d SLM to %s", superLMs[i]->w, superLMs[i]->h, outfn.GetData ());
+	    "Dumped %dx%d SLM to %s", superLMs[i]->w, superLMs[i]->h,
+	    	outfn.GetData ());
 	}
       }
     }
@@ -1386,7 +1392,7 @@ void csGLSuperLightmap::CreateTexture ()
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
     csRGBpixel* data = new csRGBpixel [w * h];
-  #ifdef CS_DEBUG
+#ifdef CS_DEBUG
     // Fill the background for debugging purposes (to quickly see what's
     // a lightmap and what's not; esp. useful when LMs are rather dark -
     // would be hardly visible if at all on black)
@@ -1417,7 +1423,7 @@ void csGLSuperLightmap::CreateTexture ()
 	p++;
       }
     }
-  #endif
+#endif
     glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, 
       GL_RGBA, GL_UNSIGNED_BYTE, data);
     delete[] data;
@@ -1452,8 +1458,8 @@ void csGLSuperLightmap::FreeRLM (csGLRendererLightmap* rlm)
   DecRef ();
 }
 
-csPtr<iRendererLightmap> csGLSuperLightmap::RegisterLightmap (int left, int top, 
-  int width, int height)
+csPtr<iRendererLightmap> csGLSuperLightmap::RegisterLightmap (int left, int top,
+	int width, int height)
 {
   csGLRendererLightmap* rlm = RLMs.Alloc ();
   rlm->slm = this;
