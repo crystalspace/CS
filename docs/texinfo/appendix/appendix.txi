@@ -1,4 +1,5 @@
 @c -*-texinfo-*-
 @imports{appendix,faq.txi}
 @imports{appendix,todo.txi}
+@imports{appendix,apimod17.txi}
 @imports{appendix,history.txi}

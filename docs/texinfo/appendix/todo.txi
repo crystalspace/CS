@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Todo, History, FAQ, Top
+@node Todo, ApiMods17, FAQ, Top
 @appendix To-Do List
 
 This file describes some of the missing features and shortcomings of Crystal

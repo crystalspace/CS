@@ -4,6 +4,18 @@ The history order has been reversed so that new features are at the top.
 	- Got a small patch from Rene Dudfield with new console command
 	  (for WalkTest) 'listactions', and a new sprite name argument
 	  for 'addsprite'.
+	- Added apimod17.txi documentation which explains how to go
+	  from 0.16 to 0.17. It is not complete though.
+	- Fixed loadlib.cpp so that it again prints the error message
+	  from dlerror. This is ugly but it is the only way to get the
+	  useful error messages back.
+	- Wouter Wijngaards did some fixes to the install system.
+	- Andrew Zabolotny found one BigBug {tm} and one small bug that
+	  prevented DOS port from working. Now it works in both static
+	  and dynamic linking mode, with gcc 2.95.2 and binutils 2.9.5.
+	  Hurray. FPS for some reason stays at zero, but I'm not sure this
+	  is DJGPP-specific.  Also for static linking mode
+	  csAddLibraryPath() is not called since it is not even present.
 21-Aug-2000
 	- Andrew Zabolotny did the following:
 	    - Changed perfstat plugin to compute fps once per 1/2 second
@@ -55,7 +67,7 @@ The history order has been reversed so that new features are at the top.
 	      directory since those classes are absolutely independent
 	      and completely inline.
 	    - Changed the way engine defines and uses texturing. There are
-	      four polygon texturing types now: POLYTXT_NONE (no texturing,o
+	      four polygon texturing types now: POLYTXT_NONE (no texturing,
 	      useful when using materials without textures -- it defines no
 	      texturing parameters at all thus saves memory), POLYTXT_FLAT
 	      (flat-shading, only the angle between light and polygon
