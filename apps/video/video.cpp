@@ -397,7 +397,6 @@ iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
 	  iGraphics2D* g2d = myG3D->GetDriver2D ();
 	  int x = (g2d->GetWidth ()  - desc.width) / 2;
 	  int y = (g2d->GetHeight ()  - desc.height) / 2;
-	  //pVStream->SetRect (x, y, desc.width, desc.height);
 	  pVStream->SetRect (x, y, desc.width, desc.height);
  	}
 	else
