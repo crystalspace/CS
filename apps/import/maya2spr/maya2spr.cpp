@@ -160,6 +160,11 @@ int main(int argc,char *argv[])
         anim->name = "default";
         anim->startframe = 1;
 
+	DisplacementGroup dg;
+	dg.startframe=0;
+	dg.stopframe =0;
+	dg.vertex=0;
+	anim->displacements.Push(dg); // dummy displacement group
         anims.Push(anim);
   }
 

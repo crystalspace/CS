@@ -33,7 +33,7 @@ void DAGNode::PrintStats(FILE *s,int level)
 NodeTransform::NodeTransform()
 {
     trans.Set(0,0,0);
-    scale.Set(0,0,0);
+    scale.Set(1,1,1);
     rot.Set(0,0,0);
 }
 
@@ -875,7 +875,7 @@ void NodeMesh::ApplyAnimDeltas(NodeAnimCurveTL *anim,int frame)
         if (n.IsZero())    // Arbitrary normal for vertex not used by ANY poly
         {
             n.Set(1,0,0);
-            printf("Warning:  Vertex %d is not used in any face.\n",i);
+            printf("Warning:  Vertex %d is not used in any face or normals are not specified.\n",i);
         }
 
         vertnorms[i] = n;  // Save so it is written out with the frame.

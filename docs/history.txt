@@ -10,6 +10,7 @@ chronological order.
 	- Peter Amstutz added a check to "scan.cpp" of the software
 	  renderer so that it would not defer a null pointer (and hence crash)
 	  when rendering polygons that have a null lightmap.
+	- Keith Fulton committed 2 more fixes to maya2spr for very simple sprites.
 9-Aug-2003
         - Philip Wyett moved int j out of 'for' loop within
           csSpriteCal3DMeshObject::DetachCoreMesh () and fixed compile error.

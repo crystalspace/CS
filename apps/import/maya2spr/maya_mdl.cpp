@@ -252,7 +252,12 @@ bool Maya4Model::WriteSPR(const char* spritename, csArray<Animation*>& anims)
 	    frame_duration = 67; // default is 15 fps.
 
 	// now determine displacement to use
-	DisplacementGroup &dg = curr_anim->displacements[0];
+	DisplacementGroup disg;
+	disg.startframe=0;
+	disg.stopframe =0;
+	disg.vertex=0;
+
+	DisplacementGroup &dg = (curr_anim->displacements.Length())? curr_anim->displacements[0] : disg;
 	int displacementnum = 1;
 
         fprintf(f,"     <action name=\"%s\">\n",(const char *)name);
