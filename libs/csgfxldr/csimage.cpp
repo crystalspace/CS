@@ -333,7 +333,7 @@ csVector *ImageLoader::loaderlist = NULL;
 bool ImageLoader::Register (ImageLoader* loader)
 {
   if (!loaderlist)
-    loaderlist = new csVector (8, 8);
+    { CHK (loaderlist = new csVector (8, 8)); }
   loaderlist->Push ((csSome)loader);
   return true;
 }

@@ -74,9 +74,9 @@ static bool RecursiveCombinations (int *vector, int top, int mask, int m, int n,
 void Combinations (int m, int n, bool (*callback) (int *vector, int count,
   void *arg), void *arg)
 {
-  int *vector = new int [m];
+  CHK (int *vector = new int [m]);
   RecursiveCombinations (vector, 0, 0, m, n, callback, arg);
-  delete [] vector;
+  CHK (delete [] vector);
 }
 
 char *expandname (char *iName)
@@ -178,7 +178,7 @@ char *expandname (char *iName)
       inp++;
   } /* endwhile */
 
-  char *ret = new char [outp + 1];
+  CHK (char *ret = new char [outp + 1]);
   memcpy (ret, outname, outp);
   ret [outp] = 0;
   return ret;

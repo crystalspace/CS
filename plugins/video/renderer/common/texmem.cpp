@@ -60,7 +60,7 @@ int FixedTextureMemoryManager::getFragmentationState(void)
 FixedTextureMemoryManager::FixedTextureMemoryManager(size_t _size) : size(_size)
 {
 	allocatedSpace=0;
-	freeSpace=new chunck;
+	CHK (freeSpace=new chunck);
 	freeSpace->prev=freeSpace->next=0;
 	freeSpace->self.offset=0;
 	freeSpace->self.size=size;
@@ -127,7 +127,7 @@ found:
 		//   if first chunck, change chunck
 		if(f==freeSpace)
 			freeSpace=f->next;
-		delete f;
+		CHK (delete f);
 	}
 	f=allocatedSpace;
 	chunck *a[2]; 
@@ -151,7 +151,7 @@ found:
 	{
 	case 0:
 		// if none 
-		f=new chunck;
+		CHK (f=new chunck);
 		//   add a chunck
 		f->self.offset=entry->offset;
 		f->self.size=entry->size;
@@ -182,7 +182,7 @@ found:
 			a[1]->next->prev=a[1]->prev;
 		if(allocatedSpace==a[1])
 			allocatedSpace=a[1]->next;
-		delete a[1];
+		CHK (delete a[1]);
 		break;
 	}
 	// return Info
@@ -210,7 +210,7 @@ void FixedTextureMemoryManager::freeSpaceMem(textMemSpace entry) {
 		// if first chunck
 		if(c==allocatedSpace)
 			allocatedSpace=c->next;
-		delete c;
+		CHK (delete c);
 		
 	}
 	// else if at a border of the chunck
@@ -229,7 +229,7 @@ void FixedTextureMemoryManager::freeSpaceMem(textMemSpace entry) {
 	else
 	{
 		//   split it in two
-		chunck *n=new chunck;
+		CHK (chunck *n=new chunck);
 		/* In the list:
 		 * current <-> after
 		 * must become:
@@ -267,7 +267,7 @@ void FixedTextureMemoryManager::freeSpaceMem(textMemSpace entry) {
 	case 0:
 		// if none found 
 		{
-			chunck * n=new chunck;
+			CHK (chunck * n=new chunck);
 			//     Create a new chunck.
 			n->self.size=entry->size;
 			n->self.offset=entry->offset;
@@ -298,7 +298,7 @@ void FixedTextureMemoryManager::freeSpaceMem(textMemSpace entry) {
 			f[1]->next->prev=f[1]->prev;
 		if(f[1]==freeSpace)
 			freeSpace=f[1]->next;
-		delete f[1];
+		CHK (delete f[1]);
 		break;
 	}
 }

@@ -96,7 +96,8 @@ csSoundBuffer* AULoader::loadsound(UByte* buf, ULong size)
   canAddStream(nbytes);
   if(flag==BIT8)
   {
-    if((data=new char[nbytes])==NULL)
+    CHK (data=new char[nbytes]);
+    if (data==NULL)
       goto exit_read;
 
     unsigned long i=0;
@@ -111,7 +112,8 @@ csSoundBuffer* AULoader::loadsound(UByte* buf, ULong size)
   }
   else if(flag==BIT16)
   {
-    if((data=new char[nbytes])==NULL)
+    CHK (data=new char[nbytes]);
+    if(data==NULL)
       goto exit_read;
 
     int i=0;
@@ -127,7 +129,8 @@ csSoundBuffer* AULoader::loadsound(UByte* buf, ULong size)
   }
   else if(flag==BIT8ULAW)
   {
-    if((data=new char[nbytes*2])==NULL)
+    CHK (data=new char[nbytes*2]);
+    if(data==NULL)
       goto exit_read;
 
     int i=0;
@@ -141,18 +144,18 @@ csSoundBuffer* AULoader::loadsound(UByte* buf, ULong size)
     }
   }
 
-  sb = new csSoundBuffer(freq,
+  CHK (sb = new csSoundBuffer(freq,
     (flag==BIT16 || flag==BIT8ULAW)?true:false,
     (nchannels==2)?true:false,
     (flag==BIT16)?true:false,
     (flag==BIT16)?(nbytes/2)-1:nbytes-1,
-    data);
+    data));
   
   if(sb==NULL) goto exit_read;
 
   goto exit_ok;
 exit_read:
-  if(data) delete [] data;
+  CHK (delete [] data);
 
 exit_ok:
   return sb;

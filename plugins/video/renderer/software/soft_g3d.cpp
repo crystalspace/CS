@@ -2679,7 +2679,7 @@ STDMETHODIMP csGraphics3DSoftware::CreateHalo(float r, float g, float b, HALOINF
   m_piG2D->AddRef();
   csHaloDrawer halo(m_piG2D, r, g, b);
 
-  csG3DSoftwareHaloInfo* retval = new csG3DSoftwareHaloInfo();
+  CHK (csG3DSoftwareHaloInfo* retval = new csG3DSoftwareHaloInfo());
 
   retval->pbuf = halo.GetBuffer();
   retval->palpha = halo.GetAlphaBuffer();
@@ -2691,10 +2691,10 @@ STDMETHODIMP csGraphics3DSoftware::CreateHalo(float r, float g, float b, HALOINF
 
 STDMETHODIMP csGraphics3DSoftware::DestroyHalo(HALOINFO haloInfo)
 {
-  delete [] ((csG3DSoftwareHaloInfo*)haloInfo)->pbuf;
-  delete [] ((csG3DSoftwareHaloInfo*)haloInfo)->palpha;
+  CHK (delete [] ((csG3DSoftwareHaloInfo*)haloInfo)->pbuf);
+  CHK (delete [] ((csG3DSoftwareHaloInfo*)haloInfo)->palpha);
 
-  delete (csG3DSoftwareHaloInfo*)haloInfo;
+  CHK (delete (csG3DSoftwareHaloInfo*)haloInfo);
   return S_OK;
 }
 
@@ -2763,8 +2763,8 @@ csGraphics3DSoftware::csHaloDrawer::csHaloDrawer(IGraphics2D* piG2D, float r, fl
   // decision variable
   int d = 1 - y;
 
-  mpBuffer = new unsigned short[dim*dim];
-  mpAlphaBuffer = new unsigned char[dim*dim];
+  CHK (mpBuffer = new unsigned short[dim*dim]);
+  CHK (mpAlphaBuffer = new unsigned char[dim*dim]);
   memset(mpBuffer, 0, dim*dim*sizeof(short));
   memset(mpAlphaBuffer, 0, dim*dim*sizeof(char));
 

@@ -119,7 +119,8 @@ csSoundBuffer* IFFLoader::loadsound(UByte* buf, ULong size)
     {
       int i=0;
 
-      if((data= new char[chunk_size])==NULL) goto exit_read;
+      CHK (data= new char[chunk_size]);
+      if(data==NULL) goto exit_read;
       char *ptr=(char *)data;
 
       while(i<chunk_size)
@@ -139,18 +140,18 @@ csSoundBuffer* IFFLoader::loadsound(UByte* buf, ULong size)
 
   if(data==NULL) goto exit_read;
 
-  sb = new csSoundBuffer(freq,
+  CHK (sb = new csSoundBuffer(freq,
     false,
     false,
     false,
     samples_size,
-    data);
+    data));
 
   if(sb==NULL) goto exit_read;
 
   goto exit_ok;
 exit_read:
-  if(data) delete [] data;
+  CHK (delete [] data);
 
 exit_ok:
   return sb;

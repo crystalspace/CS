@@ -80,7 +80,9 @@ void csKeyboardDriver::do_keypress (time_t evtime, int key)
   if ((key >= 32) && (key < 128))
     if (Key.shift) key = ShiftedKey [key - 32];
   if (EventQueue)
-    EventQueue->Put (new csEvent (evtime, csevKeyDown, key, smask));
+  {
+    CHK (EventQueue->Put (new csEvent (evtime, csevKeyDown, key, smask)));
+  }
   SetKey (key, true);
 }
 
@@ -91,7 +93,9 @@ void csKeyboardDriver::do_keyrelease (time_t evtime, int key)
   if ((key >= 32) && (key < 128))
     if (Key.shift) key = ShiftedKey [key - 32];
   if (EventQueue)
-    EventQueue->Put (new csEvent (evtime, csevKeyUp, key, 0));
+  {
+    CHK (EventQueue->Put (new csEvent (evtime, csevKeyUp, key, 0)));
+  }
   SetKey (key, false);
 }
 
@@ -187,14 +191,18 @@ void csMouseDriver::do_buttonpress (time_t evtime, int button, int x, int y, boo
   LastMouseY = LastClickY = y;
 
   if (EventQueue)
-    EventQueue->Put (new csEvent (evtime, ev, x, y, button, smask));
+  {
+    CHK (EventQueue->Put (new csEvent (evtime, ev, x, y, button, smask)));
+  }
 }
 
 void csMouseDriver::do_buttonrelease (time_t evtime, int button, int x, int y)
 {
   Button [button] = false;
   if (EventQueue)
-    EventQueue->Put (new csEvent (evtime, csevMouseUp, x, y, button, 0));
+  {
+    CHK (EventQueue->Put (new csEvent (evtime, csevMouseUp, x, y, button, 0)));
+  }
 }
 
 void csMouseDriver::do_mousemotion (time_t evtime, int x, int y)
@@ -206,6 +214,8 @@ void csMouseDriver::do_mousemotion (time_t evtime, int x, int y)
     LastMouseY = y;
 
     if (EventQueue)
-      EventQueue->Put (new csEvent (evtime, csevMouseMove, x, y, 0, 0));
+    {
+      CHK (EventQueue->Put (new csEvent (evtime, csevMouseMove, x, y, 0, 0)));
+    }
   }
 }

@@ -114,7 +114,8 @@ csSoundBuffer* WAVLoader::loadsound(UByte* buf, ULong size)
     ptr+=wavchk.len;
   }
   
-  if((data=new char[wavchk.len])==NULL)
+  CHK (data=new char[wavchk.len]);
+  if(data==NULL)
     goto exit_read;
   
   if(memcpy(data, ptr, wavchk.len)==NULL)
@@ -126,12 +127,12 @@ csSoundBuffer* WAVLoader::loadsound(UByte* buf, ULong size)
   }
 #endif // PORT_BYTESEX_BIG_ENDIAN
 
-  sb = new csSoundBuffer(wavhdr.samples_per_sec,
+  CHK (sb = new csSoundBuffer(wavhdr.samples_per_sec,
     (wavhdr.bits_per_sample==16)?true:false,
     (wavhdr.channel==2)?true:false,
     (wavhdr.bits_per_sample==16)?true:false,
     (wavhdr.bits_per_sample==16)?(wavchk.len/2)-1:wavchk.len-1,
-    data);
+    data));
 
   if(sb==NULL) goto exit_read;
 

@@ -3746,7 +3746,7 @@ csLibrary* CSLoader::LoadLibrary (csWorld* world, char* name, char* fname)
   else
   {
     //Something went wrong loading the lib. So we do some cleanup now
-    delete lib;
+    CHK (delete lib);
     return NULL;
   }
 }

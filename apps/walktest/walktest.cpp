@@ -706,7 +706,7 @@ int main (int argc, char* argv[])
       int w, h;
       ITextureHandle* phTex = texh->GetTextureHandle();
       phTex->GetBitmapDimensions(w,h);
-      Sys->cslogo = new csSprite2D (texh, 0, 0, w, h);
+      CHK (Sys->cslogo = new csSprite2D (texh, 0, 0, w, h));
     }
 
     // Look for the start sector in this world.

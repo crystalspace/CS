@@ -392,15 +392,15 @@ void ImageGifFile::decode_gif(UByte* ptr, long filesize,
 
 ImageGifFile::ImageGifFile (UByte* ptr, long filesize) : ImageFile ()
 {
-  int* Prefix  = new int [4096]; // Hash table used by decompressor.
-  int* Suffix  = new int [4096]; // Hash table used by decompressor.
-  int* OutCode = new int [1025]; // Output array used by decompressor.
+  CHK (int* Prefix  = new int [4096]); // Hash table used by decompressor.
+  CHK (int* Suffix  = new int [4096]); // Hash table used by decompressor.
+  CHK (int* OutCode = new int [1025]); // Output array used by decompressor.
 
   decode_gif(ptr, filesize, Prefix, Suffix, OutCode);
 
-  delete[] Prefix;
-  delete[] Suffix;
-  delete[] OutCode;
+  CHK (delete[] Prefix);
+  CHK (delete[] Suffix);
+  CHK (delete[] OutCode);
 }
 
 ImageGifFile::~ImageGifFile ()

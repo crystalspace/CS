@@ -54,11 +54,11 @@ void csVolume::AddPlane (float A, float B, float C, float D)
 {
   if (num_planes >= max_planes)
   {
-    csPlane* new_planes = new csPlane [max_planes+10];
+    CHK (csPlane* new_planes = new csPlane [max_planes+10]);
     if (planes)
     {
       memcpy (new_planes, planes, sizeof (csPlane)*max_planes);
-      delete [] planes;
+      CHK (delete [] planes);
     }
     planes = new_planes;
     max_planes += 10;
