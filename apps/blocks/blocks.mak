@@ -32,7 +32,7 @@ INC.BLOCKS = $(wildcard apps/blocks/*.h)
 SRC.BLOCKS = $(wildcard apps/blocks/*.cpp)
 OBJ.BLOCKS = $(addprefix $(OUT),$(notdir $(SRC.BLOCKS:.cpp=$O)))
 DEP.BLOCKS = \
-  CSPARSER CSENGINE CSTERR CSGFXLDR CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL
+  CSPARSER CSFX CSENGINE CSTERR CSGFXLDR CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL
 LIB.BLOCKS = $(foreach d,$(DEP.BLOCKS),$($d.LIB))
 CFG.BLOCKS = data/config/blocks.cfg
 
