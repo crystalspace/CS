@@ -220,11 +220,6 @@ struct G3DPolygonDP : public G3DPolygonDFP
 
   /// Z value (in camera space) of vertex[0].
   float z_value;
-
-#ifdef DO_HW_UVZ
-  csVector3* uvz;
-  bool mirror;
-#endif
 };
 
 /// Structure containing all info needed by DrawPolygonFlat (DPF)

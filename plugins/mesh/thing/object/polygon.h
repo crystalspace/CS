@@ -129,12 +129,7 @@ public:
 
 /**
  * This is our main 3D polygon class. Polygons are used to construct the
- * outer hull of sectors and the faces of 3D things.
- * Polygons can be transformed in 3D (usually they are transformed so
- * that the camera position is at (0,0,0) and the Z-axis is forward).
- * Polygons cannot be transformed in 2D. That's what csPolygon2D is for.
- * It is possible to convert a csPolygon3D to a csPolygon2D though, at
- * which point processing continues with the csPolygon2D object.
+ * faces of things.
  *<p>
  * Polygons have a texture and lie on a plane. The plane does not
  * define the orientation of the polygon but is derived from it. The plane
@@ -142,12 +137,6 @@ public:
  * of the polygon (in case we are talking about lightmapped polygons).
  * Several planes can be shared for different polygons. As a result of this
  * their textures will be correctly aligned.
- *<p>
- * If a polygon is part of a sector it can be a portal to another sector.
- * A portal-polygon is a see-through polygon that defines a view to another
- * sector. Normally the texture for a portal-polygon is not drawn unless
- * the texture is filtered in which case it is drawn on top of the other
- * sector.
  */
 class csPolygon3D : public iBase
 {
@@ -230,28 +219,11 @@ private:
    */
   void PlaneNormal (float* yz, float* zx, float* xy);
 
-#ifdef DO_HW_UVZ
-  /// Precompute the (u,v) values for all vertices of the polygon
-  void SetupHWUV();
-#endif
-
-  /**
-   * Same as CalculateLighting but called before light view destruction
-   * through callbacks and csPolyTexture::ProcessDelayedLightmaps ().
-   * Called only for lightmapped polygons with shared lightmap.
-   */
-  void CalculateDelayedLighting (iFrustumView *lview, csFrustumContext* ctxt);
-
 public:
   /// Set of flags
   csFlags flags;
 
 public:
-#ifdef DO_HW_UVZ
-  csVector3 *uvz;
-  bool isClipped;
-#endif
-
   /**
    * Construct a new polygon with the given material.
    */

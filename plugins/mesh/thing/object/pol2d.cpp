@@ -143,26 +143,6 @@ void csPolygon2D::DrawFilled (
   }
 
   g3dpoly.z_value = poly->Vcam (0).z;
-#ifdef DO_HW_UVZ
-# if 0
-    g3dpoly.mirror = mirror;
-    if (
-      poly->isClipped ||
-      rview->GetView ()->LastClipResult () == CS_CLIP_INSIDE)
-      g3dpoly.uvz = NULL;
-    else
-    {
-      g3dpoly.uvz = poly->uvz;
-      for (i = 0; i < num_vertices; i++)
-      {
-        g3dpoly.uvz[i].z = poly->Vcam (i).z;
-      }
-    }
-
-# else
-  g3dpoly.uvz = NULL;
-# endif
-#endif
   g3dpoly.poly_texture = poly->GetLightMapInfo ()->GetPolyTex ();
   g3dpoly.do_fullbright = poly->flags.Check (CS_POLY_LM_REFUSED);
 
@@ -181,11 +161,6 @@ void csPolygon2D::DrawFilled (
     rview->CalculateFogPolygon (g3dpoly);
     rview->GetGraphics3D ()->DrawPolygon (g3dpoly);
   }
-
-#ifdef DO_HW_UVZ
-  poly->isClipped = false;
-  g3dpoly.uvz = NULL;
-#endif
 }
 
 void csPolygon2D::FillZBuf (

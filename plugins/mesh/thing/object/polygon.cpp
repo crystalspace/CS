@@ -136,10 +136,6 @@ csPolygon3D::csPolygon3D (iMaterialWrapper *material) : vertices(4)
   EnableTextureMapping (true);
 
   VectorArray->IncRef ();
-#ifdef DO_HW_UVZ
-  uvz = NULL;
-  isClipped = false;
-#endif
 
   Alpha = 0;
 #ifndef CS_USE_NEW_RENDERER
@@ -173,9 +169,6 @@ csPolygon3D::~csPolygon3D ()
     }
   }
   VectorArray->DecRef ();
-#ifdef DO_HW_UVZ
-  delete[] uvz;
-#endif
 }
 
 void csPolygon3D::CreateBoundingTextureBox ()
@@ -282,13 +275,6 @@ void csPolygon3D::CopyTextureType (iPolygon3DStatic *ipt)
 void csPolygon3D::Reset ()
 {
   vertices.MakeEmpty ();
-#ifdef DO_HW_UVZ
-  if (uvz)
-  {
-    delete[] uvz;
-    uvz = NULL;
-  }
-#endif
 }
 
 void csPolygon3D::SetCSPortal (iSector *sector, bool null)
@@ -555,15 +541,6 @@ void csPolygon3D::Finish ()
 {
 #ifndef CS_USE_NEW_RENDERER
 
-#ifdef DO_HW_UVZ
-  if (uvz)
-  {
-    delete[] uvz;
-    uvz = NULL;
-  }
-
-  isClipped = false;
-#endif
   if (thing->flags.Check (CS_ENTITY_NOLIGHTING))
     flags.Reset (CS_POLY_LIGHTING);
 
@@ -621,28 +598,9 @@ void csPolygon3D::Finish ()
     }
   }
 
-#ifdef DO_HW_UVZ
-  SetupHWUV ();
-#endif
 #endif // CS_USE_NEW_RENDERER
 }
 
-#ifdef DO_HW_UVZ
-void csPolygon3D::SetupHWUV ()
-{
-  csVector3 v_o2t;
-  csMatrix3 m_o2t;
-  int i;
-
-  txt_info->txt_plane->GetTextureSpace (m_o2t, v_o2t);
-  uvz = new csVector3[GetVertexCount ()];
-
-  for (i = 0; i < GetVertexCount (); i++)
-  {
-    uvz[i] = m_o2t * (Vobj (i) - v_o2t);
-  }
-}
-#endif
 float csPolygon3D::GetArea ()
 {
   float area = 0.0f;
@@ -1109,9 +1067,6 @@ bool csPolygon3D::ClipToPlane (
           r);
       num_verts++;
       verts[num_verts++] = Vcam (i);
-#ifdef DO_HW_UVZ
-      isClipped = true;
-#endif
     }
     else if (z1s && !zs)
     {
@@ -1122,9 +1077,6 @@ bool csPolygon3D::ClipToPlane (
           verts[num_verts],
           r);
       num_verts++;
-#ifdef DO_HW_UVZ
-      isClipped = true;
-#endif
     }
     else if (z1s && zs)
     {
@@ -1177,9 +1129,6 @@ bool csPolygon3D::DoPerspective (
   // we stop here because the triangle is only visible if all
   // vertices are visible (this is not exactly true but it is
   // easier this way! @@@ CHANGE IN FUTURE).
-#ifdef DO_HW_UVZ
-  isClipped = true;
-#endif
 
   csVector3 *exit = NULL, *exitn = NULL, *reenter = NULL, *reentern = NULL;
   csVector2 *evert = NULL;
