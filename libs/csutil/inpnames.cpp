@@ -227,7 +227,8 @@ bool csGetInputDesc (iEvent *ev, char *buf, bool use_shift)
   switch (ev->Type)
   {
     case csevKeyUp:
-    case csevKeyDown:
+    case csevKeyDown: 
+    {
       for (csKeyCodeDef *k = KeyDefs; k->key; k++)
         if (k->code == ev->Key.Code) key = k->key;
       if (key)
@@ -241,7 +242,7 @@ bool csGetInputDesc (iEvent *ev, char *buf, bool use_shift)
         *++buf = 0;
         return true;
       }
-      break;
+    }  break;
 
     case csevMouseUp:
     case csevMouseDown:
