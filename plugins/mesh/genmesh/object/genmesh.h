@@ -90,7 +90,9 @@ private:
   csColor color;
   float current_lod;
   uint32 current_features;
-  csReversibleTransform tr_o2c;
+
+  // Optional hard transform.
+  csReversibleTransform* hard_transform;
 
   bool do_shadows;
   bool do_shadow_rec;
@@ -155,20 +157,6 @@ public:
 
   /// Destructor.
   virtual ~csGenmeshMeshObject ();
-
-  /// Get the bounding box in transformed space.
-  void GetTransformedBoundingBox (long cameranr, long movablenr,
-      const csReversibleTransform& trans, csBox3& cbox);
-  /**
-   * Get the coordinates of the mesh in screen coordinates.
-   * Fills in the boundingBox with the X and Y locations of the mesh.
-   * Returns the max Z location of the mesh, or -1 if not
-   * on-screen. If the mesh is not on-screen, the X and Y values are not
-   * valid.
-   */
-  float GetScreenBoundingBox (long cameranr, long movablenr, float fov,
-  	float sx, float sy,
-	const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
 
   uint GetMixMode () const { return MixMode; }
   void SetLighting (bool l) { do_lighting = l; }
@@ -236,8 +224,8 @@ public:
     return vis_cb;
   }
   virtual void NextFrame (csTicks /*current_time*/, const csVector3& /*pos*/) { }
-  virtual void HardTransform (const csReversibleTransform&) { }
-  virtual bool SupportsHardTransform () const { return false; }
+  virtual void HardTransform (const csReversibleTransform&);
+  virtual bool SupportsHardTransform () const { return true; }
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float *pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,

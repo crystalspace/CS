@@ -21,6 +21,15 @@ The history order is reversed so that new features are at the top.
 	  from the G3D cache so G3D has to stay in memory until the thing
 	  object type itself has disappeared. This bug was not easy to
 	  reproduce but it happened.
+	- Removed csReversibleTransform tr_o2c from genmesh object. This
+	  is a big transform class that adds too much memory for every
+	  object without being needed. Made sure SetObjectToCamera() is
+	  called in DrawTest() now even for new renderer.
+	- Implemented HardTransform() for genmesh objects (and not only
+	  for factories). This is slightly less efficient as an additional
+	  transform is used when rendering now.
+	- Started converting blocks to use genmesh instead of thing for
+	  the blocks. Not fully finished yet.
 	- Eric Sunshine fixed a number of problems introduced into bugplug.mak
 	  yesterday.  (Yesterday's conversion of this makefile was incomplete.)
 	- Eric Sunshine fixed a problem in win32gcc.mak which caused plugin

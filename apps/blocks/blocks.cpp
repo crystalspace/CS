@@ -77,6 +77,7 @@
 #include "iengine/camera.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
+#include "imesh/genmesh.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
 
@@ -452,19 +453,6 @@ void Blocks::InitGame ()
   pause = false;
 }
 
-static void reset_vertex_colors (iMeshWrapper* th)
-{
-  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (th->GetMeshObject (),
-  	iThingState));
-  int i;
-  for (i = 0 ; i < thing_state->GetPolygonCount () ; i++)
-  {
-    iPolygon3D* p = thing_state->GetPolygon (i);
-    p->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
-    p->UpdateVertexLighting (NULL, csColor (0, 0, 0), false, true);
-  }
-}
-
 csMatrix3 Blocks::create_rotate_x (float angle)
 {
   csMatrix3 rotate_x;
@@ -508,6 +496,14 @@ iPolygon3D* add_polygon_template (iThingState* tmpl,
   // method instead of SetTextureSpace().
   p->SetTextureSpace (csMatrix3 (), csVector3 (0));
   return p;
+}
+
+static csRef<iMeshFactoryWrapper> CreateMeshFactoryWrapperGenmesh (
+	const char* name)
+{
+  csRef<iMeshFactoryWrapper> wrap = Sys->engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", name);
+  return wrap;
 }
 
 static csRef<iMeshFactoryWrapper> CreateMeshFactoryWrapper (
@@ -704,6 +700,11 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
 void Blocks::ChangeThingMaterial (iMeshWrapper* thing,
 	iMaterialWrapper* mat)
 {
+#if 1
+  csRef<iGeneralMeshState> gm_state (SCF_QUERY_INTERFACE (
+  	thing->GetMeshObject (), iGeneralMeshState));
+  gm_state->SetMaterialWrapper (mat);
+#else
   csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (thing->GetMeshObject (),
   	iThingState));
   int i;
@@ -712,57 +713,54 @@ void Blocks::ChangeThingMaterial (iMeshWrapper* thing,
     iPolygon3D* p = thing_state->GetPolygon (i);
     p->SetMaterial (mat);
   }
+#endif
 }
 
 void Blocks::add_cube_template ()
 {
   float dim = CUBE_DIM/2.;
-  cube_tmpl = CreateMeshFactoryWrapper ("cube");
-  csRef<iThingState> cube_state (
-  	SCF_QUERY_INTERFACE (cube_tmpl->GetMeshObjectFactory (),
-  	iThingState));
-  cube_state->CreateVertex (csVector3 (-dim, -dim, dim));
-  cube_state->CreateVertex (csVector3 (dim, -dim, dim));
-  cube_state->CreateVertex (csVector3 (dim, -dim, -dim));
-  cube_state->CreateVertex (csVector3 (-dim, -dim, -dim));
-  cube_state->CreateVertex (csVector3 (-dim, dim, dim));
-  cube_state->CreateVertex (csVector3 (dim, dim, dim));
-  cube_state->CreateVertex (csVector3 (dim, dim, -dim));
-  cube_state->CreateVertex (csVector3 (-dim, dim, -dim));
+  cube_tmpl = CreateMeshFactoryWrapperGenmesh ("cube");
+  csRef<iGeneralFactoryState> genmesh = SCF_QUERY_INTERFACE (
+  	cube_tmpl->GetMeshObjectFactory (), iGeneralFactoryState);
+  genmesh->SetMaterialWrapper (cube_mat);
 
-  iPolygon3D* p;
-  csMatrix3 tx_matrix;
-  csVector3 tx_vector;
+  genmesh->SetVertexCount (8);
+  csVector3* verts = genmesh->GetVertices ();
+  verts[0].Set (-dim, -dim, dim);
+  verts[1].Set (dim, -dim, dim);
+  verts[2].Set (dim, -dim, -dim);
+  verts[3].Set (-dim, -dim, -dim);
+  verts[4].Set (-dim, dim, dim);
+  verts[5].Set (dim, dim, dim);
+  verts[6].Set (dim, dim, -dim);
+  verts[7].Set (-dim, dim, -dim);
 
-  p = add_polygon_template (cube_state, "d1", cube_mat, 3, 2, 1);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_state, "d2", cube_mat, 3, 1, 0);
-  p->SetTextureSpace (tx_matrix, tx_vector);
+  csVector2* texels = genmesh->GetTexels ();
+  texels[0].Set (.5, 0);
+  texels[1].Set (0, 0);
+  texels[2].Set (1, 0);
+  texels[3].Set (0, 1);
+  texels[4].Set (1, 1);
+  texels[5].Set (0, .5);
+  texels[6].Set (.5, 1);
+  texels[7].Set (.5, .5);
 
-  p = add_polygon_template (cube_state, "b1", cube_mat, 0, 1, 5);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_state, "b2", cube_mat, 0, 5, 4);
-  p->SetTextureSpace (tx_matrix, tx_vector);
+  genmesh->SetTriangleCount (12);
+  csTriangle* tris = genmesh->GetTriangles ();
+  tris[0] = csTriangle (3, 2, 1);
+  tris[1] = csTriangle (3, 1, 0);
+  tris[2] = csTriangle (0, 1, 5);
+  tris[3] = csTriangle (0, 5, 4);
+  tris[4] = csTriangle (4, 5, 6);
+  tris[5] = csTriangle (4, 6, 7);
+  tris[6] = csTriangle (7, 6, 2);
+  tris[7] = csTriangle (7, 2, 3);
+  tris[8] = csTriangle (4, 7, 3);
+  tris[9] = csTriangle (4, 3, 0);
+  tris[10] = csTriangle (6, 5, 1);
+  tris[11] = csTriangle (6, 1, 2);
 
-  p = add_polygon_template (cube_state, "t1", cube_mat, 4, 5, 6);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_state, "t2", cube_mat, 4, 6, 7);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = add_polygon_template (cube_state, "f1", cube_mat, 7, 6, 2);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_state, "f2", cube_mat, 7, 2, 3);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = add_polygon_template (cube_state, "l1", cube_mat, 4, 7, 3);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_state, "l2", cube_mat, 4, 3, 0);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = add_polygon_template (cube_state, "r1", cube_mat, 6, 5, 1);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-  p = add_polygon_template (cube_state, "r2", cube_mat, 6, 1, 2);
-  p->SetTextureSpace (tx_matrix, tx_vector);
+  genmesh->CalculateNormals ();
 }
 
 void set_uv (iPolygon3D* p, float u1, float v1, float u2, float v2,
@@ -788,25 +786,7 @@ csRef<iMeshWrapper> Blocks::create_cube_thing (float dx, float dy, float dz,
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
-  	iThingState));
-  thing_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ should be OFTEN!
-
-  iPolygon3D* p;
-  p = thing_state->GetPolygon ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = thing_state->GetPolygon ("f2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = thing_state->GetPolygon ("t1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = thing_state->GetPolygon ("t2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = thing_state->GetPolygon ("b1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = thing_state->GetPolygon ("b2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = thing_state->GetPolygon ("d1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = thing_state->GetPolygon ("d2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = thing_state->GetPolygon ("l1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = thing_state->GetPolygon ("l2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = thing_state->GetPolygon ("r1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = thing_state->GetPolygon ("r2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-
-  cube->HardTransform (csTransform (csMatrix3 (), shift));//@@@@@@@@@@@@@@
+  cube->HardTransform (csTransform (csMatrix3 (), shift));
   return cube;
 }
 
@@ -832,17 +812,20 @@ csRef<iMeshWrapper> Blocks::add_cube_thing (iSector* sect,
 	float x, float y, float z, iMeshFactoryWrapper* tmpl)
 {
   csRef<iMeshWrapper> cube (create_cube_thing (dx, dy, dz, tmpl));
-  csRef<iThingState> cube_state (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
-  	iThingState));
+  csRef<iGeneralMeshState> gm_state = SCF_QUERY_INTERFACE (
+  	cube->GetMeshObject (), iGeneralMeshState);
+  gm_state->SetShadowReceiving (true);
+  //csRef<iThingState> cube_state (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
+  	//iThingState));
   cube->GetMovable ()->SetSector (sect);
   csVector3 v (x, y, z);
   cube->GetMovable ()->SetPosition (sect, v);
   cube->GetMovable ()->UpdateMove ();
-  csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
-  	iLightingInfo));
-  linfo->InitializeDefault ();
-  room->ShineLights (cube);
-  linfo->PrepareLighting ();
+  //csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (cube->GetMeshObject (),
+  	//iLightingInfo));
+  //linfo->InitializeDefault ();
+  //room->ShineLights (cube);
+  //linfo->PrepareLighting ();
   return cube;
 }
 
@@ -988,7 +971,6 @@ again:
   for (i = 0 ; i < num_cubes ; i++)
   {
     iMeshWrapper* t = cube_info[i].thing;
-    reset_vertex_colors (t);
     room->ShineLights (t);
   }
 }
@@ -1808,7 +1790,6 @@ void Blocks::HandleGameMovement (csTicks elapsed_time)
       t->GetMovable ()->Transform (rot);
     t->GetMovable ()->MovePosition (csVector3 (dx, -elapsed_fall, dy));
     t->GetMovable ()->UpdateMove ();
-    reset_vertex_colors (t);
     room->ShineLights (t);
   }
 }
@@ -2495,7 +2476,6 @@ void Blocks::HandleLoweringPlanes (csTicks elapsed_time)
 	{
           t->GetMovable ()->MovePosition (csVector3 (0, -elapsed_fall, 0));
           t->GetMovable ()->UpdateMove ();
-          reset_vertex_colors (t);
 	  csRef<iMeshWrapper> it (SCF_QUERY_INTERFACE (t, iMeshWrapper));
           room->ShineLights (it);
 	}

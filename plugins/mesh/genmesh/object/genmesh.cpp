@@ -128,6 +128,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   do_shadow_rec = false;
   lighting_dirty = true;
   shadow_caps = false;
+  hard_transform = NULL;
 
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
@@ -143,6 +144,7 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
   delete[] lit_mesh_colors;
+  delete hard_transform;
 }
 
 void csGenmeshMeshObject::CheckLitColors ()
@@ -434,84 +436,6 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
   delete[] vt_array_to_delete;
 }
 
-void csGenmeshMeshObject::GetTransformedBoundingBox (long cameranr,
-	long movablenr, const csReversibleTransform& trans, csBox3& cbox)
-{
-  if (cur_cameranr == cameranr && cur_movablenr == movablenr)
-  {
-    cbox = camera_bbox;
-    return;
-  }
-  cur_cameranr = cameranr;
-  cur_movablenr = movablenr;
-  const csBox3& b = factory->GetObjectBoundingBox ();
-
-  camera_bbox.StartBoundingBox (
-    trans * b.GetCorner (CS_BOX_CORNER_xyz));
-  camera_bbox.AddBoundingVertexSmart (
-    trans * b.GetCorner (CS_BOX_CORNER_Xyz));
-  camera_bbox.AddBoundingVertexSmart (
-    trans * b.GetCorner (CS_BOX_CORNER_xYz));
-  camera_bbox.AddBoundingVertexSmart (
-    trans * b.GetCorner (CS_BOX_CORNER_XYz));
-  camera_bbox.AddBoundingVertexSmart (
-    trans * b.GetCorner (CS_BOX_CORNER_xyZ));
-  camera_bbox.AddBoundingVertexSmart (
-    trans * b.GetCorner (CS_BOX_CORNER_XyZ));
-  camera_bbox.AddBoundingVertexSmart (
-    trans * b.GetCorner (CS_BOX_CORNER_xYZ));
-  camera_bbox.AddBoundingVertexSmart (
-    trans * b.GetCorner (CS_BOX_CORNER_XYZ));
-
-  cbox = camera_bbox;
-}
-
-static void Perspective (const csVector3& v, csVector2& p, float fov,
-    	float sx, float sy)
-{
-  float iz = fov / v.z;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
-}
-
-float csGenmeshMeshObject::GetScreenBoundingBox (long cameranr,
-      long movablenr, float fov, float sx, float sy,
-      const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox)
-{
-  csVector2 oneCorner;
-
-  GetTransformedBoundingBox (cameranr, movablenr, trans, cbox);
-
-  // if the entire bounding box is behind the camera, we're done
-  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
-  {
-    return -1;
-  }
-
-  // Transform from camera to screen space.
-  if (cbox.MinZ () <= 0)
-  {
-    // Sprite is very close to camera.
-    // Just return a maximum bounding box.
-    sbox.Set (-10000, -10000, 10000, 10000);
-  }
-  else
-  {
-    Perspective (cbox.Max (), oneCorner, fov, sx, sy);
-    sbox.StartBoundingBox (oneCorner);
-    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-    Perspective (v, oneCorner, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (oneCorner);
-    Perspective (cbox.Min (), oneCorner, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (oneCorner);
-    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-    Perspective (v, oneCorner, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (oneCorner);
-  }
-
-  return cbox.MaxZ ();
-}
-
 void csGenmeshMeshObject::SetupObject ()
 {
   if (!initialized)
@@ -563,9 +487,11 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  tr_o2c = camera->GetTransform ();
+  csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
+  if (hard_transform)
+    tr_o2c /= *hard_transform;
 
   csVector3 radius;
   csSphere sphere;
@@ -587,6 +513,7 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   m.clip_z_plane = clip_z_plane;
   m.do_mirror = camera->IsMirrored ();
 #else
+  r3d->SetObjectToCamera (&tr_o2c);
   mesh.clip_portal = clip_portal;
   mesh.clip_plane = clip_plane;
   mesh.clip_z_plane = clip_z_plane;
@@ -838,7 +765,6 @@ bool csGenmeshMeshObject::DrawZ (iRenderView* rview, iMovable* /*movable*/,
   mesh.z_buf_mode = mode;
   mesh.mixmode = CS_FX_COPY;
 
-  r3d->SetObjectToCamera (&tr_o2c);
   mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
   mesh.SetMaterialHandle (NULL);
   csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
@@ -860,13 +786,16 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  tr_o2c = camera->GetTransform ();
+  csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
+  if (hard_transform)
+    tr_o2c /= *hard_transform;
 
   csRef<iMaterialWrapper> mater = factory->shadowmat;
 
   iRender3D* r3d = rview->GetGraphics3D ();
+  r3d->SetObjectToCamera (&tr_o2c);
 
   mater->Visit ();
   if(!factory->GetEdgeMidpoint()) return false; //bad hack.. EdgeMidpoint might not be initialized on first rendering
@@ -923,7 +852,6 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   else 
     mesh.SetIndexRange (edge_start, index_range);
 
-  r3d->SetObjectToCamera (&tr_o2c);
   if (shadow_caps)
     r3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
   else 
@@ -1089,6 +1017,19 @@ int csGenmeshMeshObject::PolyMesh::GetPolygonCount ()
 csMeshedPolygon* csGenmeshMeshObject::PolyMesh::GetPolygons ()
 {
   return scfParent->factory->GetPolygons ();
+}
+
+void csGenmeshMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  if (!hard_transform)
+  {
+    hard_transform = new csReversibleTransform ();
+    *hard_transform = t;
+  }
+  else
+  {
+    *hard_transform = t * *hard_transform;
+  }
 }
 
 //----------------------------------------------------------------------
