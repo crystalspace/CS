@@ -1399,6 +1399,7 @@ void csGraphics3DOpenGL::SysPrintf (int mode, char* szMsg, ...)
   m_piSystem->Print(mode, buf);
 }
 
+#if USE_MULTITEXTURE
 // extension detection code blatantly lifted from Mark J. Kilgard's
 // "All about OpenGL extensions" paper.
 static int isExtensionSupported(const char *extension)
@@ -1428,6 +1429,7 @@ static int isExtensionSupported(const char *extension)
   }
   return 0;
 }
+#endif
 
 /// Shortcut to override standard polygon drawing when we have multitexture
 bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
@@ -1682,13 +1684,13 @@ bool csGraphics3DOpenGL::MultitextureDrawPolygon(G3DPolygonDP &poly)
 /// Shortcuts to replace the standard Start/Draw/Finish set of Draw...FX functions;
 /// this set collects up polygons and then draws them in batches, instead
 /// of drawing each individual poly with gl calls
-bool csGraphics3DOpenGL::BatchStartPolygonFX(ITextureHandle *handle, UInt mode)
+bool csGraphics3DOpenGL::BatchStartPolygonFX(ITextureHandle*, UInt /*mode*/)
 {
   // not done yet
   return false;
 }
 
-bool csGraphics3DOpenGL::BatchAccumulatePolygonFX(G3DPolygonDPFX &poly)
+bool csGraphics3DOpenGL::BatchAccumulatePolygonFX(G3DPolygonDPFX&)
 {
   // not done yet
   return false;
