@@ -24,7 +24,9 @@
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/event.h"
-#include "csutil/hashmapr.h"
+#include "csutil/hash.h"
+#include "csutil/hashhandlers.h"
+#include "cstool/cspixmap.h"
 
 struct iObjectRegistry;
 struct iEventQueue;
@@ -42,12 +44,25 @@ struct iImageIO;
 class csCursor : public iCursor
 {
 private:
+  /// Internal structure for use in the cursors hash list
+  struct CursorInfo
+  {
+    csPixmap *pixmap;
+    csRef<iImage> image;
+    csPoint hotspot;
+    uint8 alpha;
+    csRGBcolor keycolor, fg, bg;
+
+    CursorInfo () : pixmap(0), image(0) {}
+    ~CursorInfo () { delete pixmap; }
+  };
+
   iObjectRegistry* reg;
   csRef<iEventQueue> eventq;
   csRef<iGraphics3D> g3d;
   csRef<iTextureManager> txtmgr;
   csRef<iImageIO> io;
-  csHashMapReversible cursors;
+  csHash<CursorInfo *, csStrKey, csConstCharHashKeyHandler> cursors;
   
   /// The currently selected cursor
   const char *current;

@@ -20,10 +20,8 @@
 #include "csutil/cfgacc.h"
 #include "csutil/csstring.h"
 #include "csutil/stringarray.h"
-#include "cstool/cspixmap.h"
 #include "iutil/objreg.h"
 #include "iutil/eventq.h"
-#include "iutil/event.h"
 #include "iutil/evdefs.h"
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
@@ -52,19 +50,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 // String to define our SCF name - only used when reporting 
 static const char * const CURSOR_SCF_NAME = "crystalspace.graphic.cursor";
 
-// Basic storage structure of a cursor
-struct cursor_image
-{
-  csRef<iImage> image;
-  csPixmap *pixmap;
-  csPoint hotspot;
-  uint8 alpha;
-  csRGBcolor keycolor, fg, bg;
-
-  cursor_image () : image(0) {}
-  ~cursor_image () { delete pixmap; }
-};
-
 csCursor::csCursor (iBase *parent)
 {
   SCF_CONSTRUCT_IBASE (parent);
@@ -74,6 +59,15 @@ csCursor::csCursor (iBase *parent)
   isActive = false;
   checkedOSsupport = false;
   useOS = false;
+}
+
+csCursor::~csCursor ()
+{
+  eventq->RemoveListener (&scfiEventHandler);
+  RemoveAllCursors ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csCursor::Initialize (iObjectRegistry *objreg)
@@ -120,7 +114,7 @@ bool csCursor::ParseConfigFile (const char *iFile)
 
     // Check if we've already added it or there was a problem with it.
     // If so, ignore it
-    if (cursors.Get (name) || ignorelist.Find (name) != -1)
+    if (cursors.Get ((const char *) name) || ignorelist.Find (name) != -1)
       continue;
 
     // Get all parameters for this cursor
@@ -218,7 +212,7 @@ bool csCursor::HandleEvent (iEvent &ev)
   {
     if (ev.Type == csevBroadcast && ev.Command.Code == cscmdPostProcess)
     {
-      cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (current));
+      CursorInfo *ci = cursors.Get (current);
       if (!ci)
         return false;
 
@@ -247,15 +241,6 @@ bool csCursor::HandleEvent (iEvent &ev)
   return false;
 }
 
-csCursor::~csCursor ()
-{
-  eventq->RemoveListener (&scfiEventHandler);
-  RemoveAllCursors ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
-}
-
 // Deactivates system cursor, activates event handling
 bool csCursor::Setup (iGraphics3D *ig3d, bool forceEmulation)
 {
@@ -281,8 +266,8 @@ bool csCursor::SwitchCursor (const char *name)
   if (!strcmp (current, name))
     return true;
 
-  // Get cursor_image and return false if we can't get it
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  // Get CursorInfo and return false if we can't get it
+  CursorInfo *ci = cursors.Get (name);
   if (!ci) return false;
 
   iGraphics2D *g2d = g3d->GetDriver2D();
@@ -317,7 +302,7 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
                           csRGBcolor fg, csRGBcolor bg)
 {
   // Set up structure
-  cursor_image *ci = new cursor_image;
+  CursorInfo *ci = new CursorInfo;
   ci->image = image;
   ci->alpha = alpha;
   ci->keycolor = key;
@@ -328,13 +313,16 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
   // If the image has no name then we give it the name of the cursor.  This is
   // so that the 2D graphics canvas can remember the image each time we switch
   // between cursors
-  if (!image->GetName())
-      image->SetName (name);
+  if (!image->GetName()) image->SetName (name);
 
   // Create texture 
   csRef<iTextureHandle> txt = txtmgr->RegisterTexture (image, CS_TEXTURE_2D);
   if (!txt)
-  { /* handle error */ }
+  { 
+    csReport (reg, CS_REPORTER_SEVERITY_ERROR, CURSOR_SCF_NAME,
+              "Could not register texture for cursor %s, ignoring", name);
+    return;
+  }
 
   // Prepare texture and set up keycolour
   txt->SetKeyColor (key.red, key.green, key.blue);
@@ -343,19 +331,23 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor key,
   // Create pixmap from texture
   csSimplePixmap *pixmap = new csSimplePixmap (txt);
   if (!pixmap)
-  { /* handle error */ }
+  { 
+    csReport (reg, CS_REPORTER_SEVERITY_ERROR, CURSOR_SCF_NAME,
+              "Could not create pixmap for cursor %s, ignoring", name);
+    return;
+  }
 
   // Set pixmap in the structure
   ci->pixmap = pixmap;
 
   // Add to hashlist
-  cursors.DeleteAll (csHashCompute (name));
-  cursors.Put (name, (csHashObject) ci);
+  cursors.DeleteAll (name);
+  cursors.Put (name, ci);
 }
 
 void csCursor::SetHotspot (const char *name, csPoint hotspot)
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci)
   {
     SetCursor (name, ci->image, ci->keycolor, hotspot, ci->alpha, 
@@ -366,7 +358,7 @@ void csCursor::SetHotspot (const char *name, csPoint hotspot)
 
 void csCursor::SetAlpha (const char *name, uint8 alpha)
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci)
   {
     SetCursor (name, ci->image, ci->keycolor, ci->hotspot, alpha,
@@ -377,18 +369,17 @@ void csCursor::SetAlpha (const char *name, uint8 alpha)
 
 void csCursor::SetKeyColor (const char *name, csRGBcolor color)
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci)
   {
-    SetCursor (name, ci->image, color, ci->hotspot, ci->alpha, 
-               ci->fg, ci->bg);
+    SetCursor (name, ci->image, color, ci->hotspot, ci->alpha, ci->fg, ci->bg);
     delete ci;
   }
 }
 
 void csCursor::SetColor (const char *name, csRGBcolor fg, csRGBcolor bg)
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci)
   {
     SetCursor (name, ci->image, ci->keycolor, ci->hotspot, ci->alpha,
@@ -399,7 +390,7 @@ void csCursor::SetColor (const char *name, csRGBcolor fg, csRGBcolor bg)
 
 const csRef<iImage> csCursor::GetCursorImage (const char *name) const
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci) return ci->image;
 
   return 0;
@@ -407,7 +398,7 @@ const csRef<iImage> csCursor::GetCursorImage (const char *name) const
 
 csPoint csCursor::GetHotspot (const char *name) const
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci) return ci->hotspot;
 
   return csPoint (0,0);
@@ -415,7 +406,7 @@ csPoint csCursor::GetHotspot (const char *name) const
 
 uint8 csCursor::GetAlpha (const char *name) const
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci) return ci->alpha;
 
   return 0;
@@ -423,7 +414,7 @@ uint8 csCursor::GetAlpha (const char *name) const
 
 csRGBcolor csCursor::GetKeyColor (const char *name) const
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci) return ci->keycolor;
 
   return csRGBcolor (0,0,0);
@@ -431,7 +422,7 @@ csRGBcolor csCursor::GetKeyColor (const char *name) const
 
 csRGBcolor csCursor::GetFGColor (const char *name) const
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci) return ci->fg;
 
   return csRGBcolor (255,255,255);
@@ -439,7 +430,7 @@ csRGBcolor csCursor::GetFGColor (const char *name) const
 
 csRGBcolor csCursor::GetBGColor (const char *name) const
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci) return ci->bg;
 
   return csRGBcolor (0,0,0);
@@ -447,10 +438,10 @@ csRGBcolor csCursor::GetBGColor (const char *name) const
 
 bool csCursor::RemoveCursor (const char *name)
 {
-  cursor_image *ci = (cursor_image*) cursors.Get (csHashCompute (name));
+  CursorInfo *ci = cursors.Get (name);
   if (ci)
   {
-    cursors.Delete (name, (csHashObject) ci);
+    cursors.Delete (name, ci);
     delete ci;
     return true;
   }
