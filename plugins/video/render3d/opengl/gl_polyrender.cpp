@@ -80,7 +80,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 
 #define INTERLEAVE 1
 #if INTERLEAVE
-    static const csInterleavedBufferElement interleavedElements[3] =
+    static const csInterleavedSubBufferOptions interleavedElements[3] =
       {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 2}, {CS_BUFCOMP_FLOAT, 2}};
     csRef<iRenderBuffer> buffers[3];
     masterBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (num_verts, 

@@ -142,6 +142,8 @@ public:
   virtual size_t GetRangeEnd() const
   { return rangeEnd; }
 
+  virtual size_t GetElementCount() const;
+
   /**
    * Create a render buffer.
    * \param elementCount Number of elements in the buffer.

@@ -19,22 +19,9 @@
 
 #include "cssysdef.h"
 #include "csutil/scf.h"
+#include "csgeom/math.h"
 
 #include "csgfx/renderbuffer.h"
-
-#undef min
-#undef max
-template<typename T>
-T min(T a, T b)
-{
-  return (a<b?a:b);
-}
-
-template<typename T>
-T max(T a, T b)
-{
-  return (a>b?a:b);
-}
 
 CS_LEAKGUARD_IMPLEMENT (csRenderBuffer);
 SCF_IMPLEMENT_IBASE (csRenderBuffer)
@@ -97,13 +84,18 @@ void csRenderBuffer::CopyInto (const void *data, size_t elementCount)
   version++;
   if (doCopy)
   {
-    memcpy (buffer, data, min (bufferSize, 
+    memcpy (buffer, data, csMin (bufferSize, 
       elementCount * csRenderBufferComponentSizes[comptype] * compCount));
   }
   else
   {
     buffer = (unsigned char*)data;
   }
+}
+
+size_t csRenderBuffer::GetElementCount() const
+{
+  return bufferSize / (compCount * csRenderBufferComponentSizes[comptype]);
 }
 
 csRef<iRenderBuffer> csRenderBuffer::CreateRenderBuffer (size_t elementCount, 
@@ -129,7 +121,7 @@ csRef<iRenderBuffer> csRenderBuffer::CreateIndexRenderBuffer (size_t elementCoun
 }
 
 csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elementCount, 
-  csRenderBufferType type, uint count, const csInterleavedBufferElement* elements, 
+  csRenderBufferType type, uint count, const csInterleavedSubBufferOptions* elements, 
   csRef<iRenderBuffer>* buffers)
 {
   size_t elementSize = 0;
@@ -138,7 +130,7 @@ csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elem
   offsets[0] = 0;
   for (i = 0; i < count; i++)
   {
-    const csInterleavedBufferElement& element = elements[i];
+    const csInterleavedSubBufferOptions& element = elements[i];
     offsets[i+1] = offsets[i] + element.componentCount
       * csRenderBufferComponentSizes[element.componentType];
   }
@@ -148,12 +140,11 @@ csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elem
     type, CS_BUFCOMP_BYTE, elementSize, 0, 0, true));
   for (i = 0; i < count; i++)
   {
-    const csInterleavedBufferElement& element = elements[i];
+    const csInterleavedSubBufferOptions& element = elements[i];
     csRenderBuffer* rbuf = new csRenderBuffer (0, type, 
       element.componentType, element.componentCount, 0, 0, false);
     rbuf->offset = offsets[i];
-    rbuf->stride = elementSize /*- (element.componentCount 
-      * csRenderBufferComponentSizes[element.componentType])*/;
+    rbuf->stride = elementSize;
     rbuf->masterBuffer = master;
     (buffers + i)->AttachNew (rbuf);
   }

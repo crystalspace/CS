@@ -158,9 +158,15 @@ struct iRenderBuffer : public iBase
    */
   virtual iRenderBuffer* GetMasterBuffer () const = 0;
 
+  /// Whether the buffer is an index buffer.
   virtual bool IsIndexBuffer() const = 0;
+  /// The lowest index contained in this buffer, only valid for index buffers.
   virtual size_t GetRangeStart() const = 0;
+  /// The highest index contained in this buffer, only valid for index buffers.
   virtual size_t GetRangeEnd() const = 0;
+
+  /// Number of elements in a buffer.
+  virtual size_t GetElementCount() const = 0;
 };
 
 /**

@@ -407,12 +407,12 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csRenderBufferName name)
   if (!vertex_buffer || buffer_length != point_data->Length ())
   {
     buffer_length = point_data->Length ();
-    static const csInterleavedBufferElement interleavedElements[2] =
+    static const csInterleavedSubBufferOptions interleavedElements[2] =
       {{CS_BUFCOMP_FLOAT, 3}, {CS_BUFCOMP_FLOAT, 4}};
     csRef<iRenderBuffer> buffers[2];
     int bufsize = (point_sprites ? buffer_length : buffer_length * 4);
-    masterBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (bufsize, CS_BUF_DYNAMIC, 2, 
-      interleavedElements, buffers);
+    masterBuffer = csRenderBuffer::CreateInterleavedRenderBuffers (bufsize, 
+      CS_BUF_DYNAMIC, 2, interleavedElements, buffers);
     vertex_buffer = buffers[0];
     color_buffer = buffers[1];
 
