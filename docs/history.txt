@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 	  DrawPolygonMesh and DrawTriangleMesh in mirror mode.
 	- Optimization in DrawPolygonMesh so that RecalculateDynamicLights
 	  is only called when the polygon buffer is marked as dirty.
+	- Optimization in DrawPolygonMesh: the OpenGL transforms are only
+	  setup once for one DrawPolygonMesh call as opposed to several
+	  times for every internal DrawTriangleMesh call.
 	- Eric Sunshine fixed bug in walktest.mak.  The "walkall" target was
 	  not declared .PHONY.
 24-Jan-2003

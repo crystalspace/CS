@@ -3173,6 +3173,8 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   else
     trimesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 
+  SetupDTMTransforms (trimesh.vertex_mode);
+  
   // Loop over all sub-meshes. Every sub-mesh represents a different material.
   TrianglesNode *t = polbuf->GetFirst ();
   while (t != NULL)
@@ -3191,7 +3193,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       tpm->numVertices, 0);
     trimesh.triangles = tpm->triangles.GetArray ();
     trimesh.num_triangles = tpm->numTriangles;
-    DrawTriangleMesh (trimesh);
+    EffectDrawTriangleMesh (trimesh, false);
     vbman->UnlockBuffer (vb);
     t = t->next;
   }
@@ -3228,12 +3230,40 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       trimesh.triangles = tplm->triangles.GetArray ();
       trimesh.num_triangles = tplm->numTriangles;
 
-      EffectDrawTriangleMesh (trimesh, tplm->cacheData->Handle);
+      EffectDrawTriangleMesh (trimesh, false, tplm->cacheData->Handle);
       vbman->UnlockBuffer (vb);
     }
     sln = sln->prev;
   }
   polbuf->superLM.ClearLightmapsDirty ();
+
+#if 0
+  //===========
+  // If there is vertex fog then we apply that last.
+  //===========
+  if (mesh.do_fog)
+  {
+    // we need to texture and blend, with vertex color
+    // interpolation
+    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    SetupBlend (CS_FX_ALPHA, 0, false);
+
+    statecache->SetShadeModel (GL_SMOOTH);
+    SetClientStates (CS_CLIENTSTATE_ALL);
+    glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
+    glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo), &work_fog[0].intensity);
+    glColorPointer (3, GL_FLOAT, sizeof (G3DFogInfo), &work_fog[0].r);
+    glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
+
+    if (!m_textured)
+      statecache->DisableState (GL_TEXTURE_2D);
+    if (!m_gouraud)
+      statecache->SetShadeModel (GL_FLAT);
+  }
+#endif
+
+  RestoreDTMTransforms ();
 }
 
 csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
@@ -3600,6 +3630,72 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique (
   }
 }
 
+void csGraphics3DOGLCommon::SetupDTMTransforms (int vertex_mode)
+{
+  // set up coordinate transform
+  GLfloat matrixholder[16];
+
+  //glPushAttrib( GL_ALL_ATTRIB_BITS );
+  //glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
+
+  glMatrixMode (GL_MODELVIEW);
+  glPushMatrix ();
+  glLoadIdentity ();
+
+  //===========
+  // set up world->camera transform, if needed
+  //===========
+  if (vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
+  {
+    const csMatrix3 &orientation = o2c.GetO2T();
+
+    matrixholder[0] = orientation.m11;
+    matrixholder[1] = orientation.m21;
+    matrixholder[2] = orientation.m31;
+
+    matrixholder[4] = orientation.m12;
+    matrixholder[5] = orientation.m22;
+    matrixholder[6] = orientation.m32;
+
+    matrixholder[8] = orientation.m13;
+    matrixholder[9] = orientation.m23;
+    matrixholder[10] = orientation.m33;
+
+    matrixholder[3] = matrixholder[7] = matrixholder[11] =
+    matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
+    matrixholder[15] = 1.0;
+
+    const csVector3 &translation = o2c.GetO2TTranslation();
+
+    glMultMatrixf (matrixholder);
+    glTranslatef (-translation.x, -translation.y, -translation.z);
+  }
+
+  glMatrixMode (GL_PROJECTION);
+  glPushMatrix ();
+  glLoadIdentity ();
+
+  // With the back buffer procedural textures the orthographic projection
+  // matrix is inverted.
+  SetGlOrtho (inverted);
+
+  glTranslatef (asp_center_x, asp_center_y, 0);
+  int i;
+  for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
+  matrixholder[0] = matrixholder[5] = 1.0;
+  matrixholder[11] = inv_aspect;
+  matrixholder[14] = -inv_aspect;
+  glMultMatrixf (matrixholder);
+}
+
+void csGraphics3DOGLCommon::RestoreDTMTransforms ()
+{
+  glMatrixMode (GL_PROJECTION);
+  glPopMatrix ();
+  glMatrixMode (GL_MODELVIEW);
+  glPopMatrix ();
+}
+
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
 #if 0
@@ -3614,7 +3710,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 }
 
 void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
-  G3DTriangleMesh& mesh, GLuint lightmap, csVector2* lightmapcoords)
+  G3DTriangleMesh& mesh, bool setup_trans,
+  GLuint lightmap, csVector2* lightmapcoords)
 {
   int i, l;
   if (!lightmap)
@@ -3623,7 +3720,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     {
       // If there is no material (which is legal) we temporarily use
       // OldDrawTriangleMesh().
-      OldDrawTriangleMesh (mesh);
+      OldDrawTriangleMesh (mesh, setup_trans);
       return;
     }
   }
@@ -3648,7 +3745,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     technique = GetStockTechnique (mesh);
     if (!technique)
     {
-      OldDrawTriangleMesh (mesh); // Should never get here.
+      OldDrawTriangleMesh (mesh, setup_trans); // Should never get here.
       return;
     }
   }
@@ -3911,60 +4008,11 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       statecache->EnableState ((GLenum)(GL_CLIP_PLANE0+i));
   }
 
-  // set up coordinate transform
-  GLfloat matrixholder[16];
-
-  //glPushAttrib( GL_ALL_ATTRIB_BITS );
-  //glPushClientAttrib(GL_CLIENT_ALL_ATTRIB_BITS);
-
-  glMatrixMode (GL_MODELVIEW);
-  glPushMatrix ();
-  glLoadIdentity ();
-
   //===========
-  // set up world->camera transform, if needed
+  // Setup transforms.
   //===========
-  if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
-  {
-    const csMatrix3 &orientation = o2c.GetO2T();
-
-    matrixholder[0] = orientation.m11;
-    matrixholder[1] = orientation.m21;
-    matrixholder[2] = orientation.m31;
-
-    matrixholder[4] = orientation.m12;
-    matrixholder[5] = orientation.m22;
-    matrixholder[6] = orientation.m32;
-
-    matrixholder[8] = orientation.m13;
-    matrixholder[9] = orientation.m23;
-    matrixholder[10] = orientation.m33;
-
-    matrixholder[3] = matrixholder[7] = matrixholder[11] =
-    matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
-    matrixholder[15] = 1.0;
-
-    const csVector3 &translation = o2c.GetO2TTranslation();
-
-    glMultMatrixf (matrixholder);
-    glTranslatef (-translation.x, -translation.y, -translation.z);
-  }
-
-  glMatrixMode (GL_PROJECTION);
-  glPushMatrix ();
-  glLoadIdentity ();
-
-  // With the back buffer procedural textures the orthographic projection
-  // matrix is inverted.
-  SetGlOrtho (inverted);
-
-  glTranslatef (asp_center_x, asp_center_y, 0);
-  for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
-  matrixholder[0] = matrixholder[5] = 1.0;
-  matrixholder[11] = inv_aspect;
-  matrixholder[14] = -inv_aspect;
-  glMultMatrixf (matrixholder);
-
+  if (setup_trans) SetupDTMTransforms (mesh.vertex_mode);
+  SetMirrorMode (mesh.do_mirror);
 
   //===========
   // Draw the base mesh.
@@ -3977,8 +4025,6 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
   //@@@EXPERIMENTAL!!
   //CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Mårten Svanfeldt
-
-  SetMirrorMode (mesh.do_mirror);
 
   int maxlayers = 0;
   for (int p=0 ; p<technique->GetPassCount () ; p++)
@@ -4212,15 +4258,14 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
       statecache->DisableState ((GLenum)(GL_CLIP_PLANE0+i));
 
-  glPopMatrix ();
-  glMatrixMode (GL_MODELVIEW);
-  glPopMatrix ();
+  if (setup_trans) RestoreDTMTransforms ();
 
   //glPopClientAttrib();
   //glPopAttrib();
 }
 
-void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
+void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
+		bool setup_trans)
 {
 #if CS_DEBUG
   // Check if the vertex buffers are locked.
@@ -4472,82 +4517,11 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
       statecache->EnableState ((GLenum)(GL_CLIP_PLANE0+i));
   }
 
-  // set up coordinate transform
-  GLfloat matrixholder[16];
-
-  glMatrixMode (GL_MODELVIEW);
-  glPushMatrix ();
-  glLoadIdentity ();
-
   //===========
   // set up world->camera transform, if needed
   //===========
-  if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
-  {
-    // we basically have to duplicate the
-    // original transformation code:
-    //   tr_verts[i] = o2c.GetO2T() *  (f1[i] - o2c.GetO2TTranslation() );
-    //
-    // we do this by applying both a translation and rotation matrix
-    // using values pulled from the o2c quantity, which represents
-    // the current world->camera transform
-    //
-    // Wonder why we do the orientation before the translation?
-    // Many 3D graphics and OpenGL books discuss how the order
-    // of 4x4 transform matrices represent certain transformations,
-    // and they do a much better job than I ever could.  Please refer
-    // to an OpenGL reference for good insight into proper manipulation
-    // of the modelview matrix.
-
-    const csMatrix3 &orientation = o2c.GetO2T();
-
-    matrixholder[0] = orientation.m11;
-    matrixholder[1] = orientation.m21;
-    matrixholder[2] = orientation.m31;
-
-    matrixholder[4] = orientation.m12;
-    matrixholder[5] = orientation.m22;
-    matrixholder[6] = orientation.m32;
-
-    matrixholder[8] = orientation.m13;
-    matrixholder[9] = orientation.m23;
-    matrixholder[10] = orientation.m33;
-
-    matrixholder[3] = matrixholder[7] = matrixholder[11] =
-    matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
-    matrixholder[15] = 1.0;
-
-    const csVector3 &translation = o2c.GetO2TTranslation();
-
-    glMultMatrixf (matrixholder);
-    glTranslatef (-translation.x, -translation.y, -translation.z);
-  }
-
-  //===========
-  // Set up perspective transform.
-  // we have to change the standard projection matrix used for
-  // drawing in other parts of CS.  Normally an orthogonal projection
-  // is used since CS does the perspective projection for us.
-  // Here, we need to reproduce CS's perspective projection using
-  // OpenGL matrices.
-  //===========
-
-  // @@@ CACHE matrix mode too!!!???
-  // Probably very worthwhile!
-  glMatrixMode (GL_PROJECTION);
-  glPushMatrix ();
-  glLoadIdentity ();
-
-  // With the back buffer procedural textures the orthographic projection
-  // matrix is inverted.
-  SetGlOrtho (inverted);
-
-  glTranslatef (asp_center_x, asp_center_y, 0);
-  for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
-  matrixholder[0] = matrixholder[5] = 1.0;
-  matrixholder[11] = inv_aspect;
-  matrixholder[14] = -inv_aspect;
-  glMultMatrixf (matrixholder);
+  if (setup_trans) SetupDTMTransforms (mesh.vertex_mode);
+  SetMirrorMode (mesh.do_mirror);
 
   //===========
   // Setup states
@@ -4577,7 +4551,6 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
       m_multimat = (csMaterialHandle*)mesh.mat_handle;
   }
   m_alpha = SetupBlend (m_mixmode, m_alpha, txt_alpha);
-  SetMirrorMode (mesh.do_mirror);
 
   bool m_textured = (texturehandle != 0);
   if (m_textured)
@@ -4828,10 +4801,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh)
       statecache->SetShadeModel (GL_FLAT);
   }
 
-  glMatrixMode (GL_MODELVIEW);
-  glPopMatrix ();
-  glMatrixMode (GL_PROJECTION);
-  glPopMatrix ();
+  if (setup_trans) RestoreDTMTransforms ();
 
   //===========
   // Disable/cleanup all clipping stuff.

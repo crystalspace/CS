@@ -703,10 +703,19 @@ public:
   /// Return true if we have near plane.
   virtual bool HasNearPlane () { return do_near_plane; }
 
+  /// Setup OpenGL transforms for DrawTriangleMesh().
+  void SetupDTMTransforms (int vertex_mode);
+  /// Restore OpenGL transforms after DrawTriangleMesh().
+  void RestoreDTMTransforms ();
+
   /// Draw a triangle mesh.
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
-  void OldDrawTriangleMesh (G3DTriangleMesh& mesh);
-  void EffectDrawTriangleMesh (G3DTriangleMesh& mesh,
+  /**
+   * If setup_trans == true then this function will call SetupDTMTransforms()
+   * and RestoreDTMTransforms().
+   */
+  void OldDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup_trans = true);
+  void EffectDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup_trans = true,
     GLuint lightmap = 0, csVector2* lightmapcoords = 0);
 
   /**
