@@ -384,14 +384,6 @@ int csQuadTree3D::insert_polygon_func (csQuadTree3D* pObj,
     return CS_QUAD3D_NOCHANGE;
   }
 
-  /// perhaps none of the node is covered?
-  if (covered == CS_FRUST_OUTSIDE)
-    return CS_QUAD3D_NOCHANGE;
-
-  ///----------------------------------------------------
-  /// So, the polygon bbox overlaps this node. How much?
-  ///----------------------------------------------------
-
   if(0)
   printf("quadtree3d at %d Checking node %d+%d %d,%d (%d)\n", node_pos->depth,
     node_pos->offset, node_pos->bytepos, node_pos->node_x, node_pos->node_y,
@@ -410,7 +402,16 @@ int csQuadTree3D::insert_polygon_func (csQuadTree3D* pObj,
     node_pos->frust->GetVertices()[3].x,
     node_pos->frust->GetVertices()[3].y,
     node_pos->frust->GetVertices()[3].z );
-    
+  if(0)
+  printf("quadtree3d classified as %d\n", covered);
+
+  /// perhaps none of the node is covered?
+  if (covered == CS_FRUST_OUTSIDE)
+    return CS_QUAD3D_NOCHANGE;
+
+  ///----------------------------------------------------
+  /// So, the polygon bbox overlaps this node. How much?
+  ///----------------------------------------------------
 
   /// is the whole node covered?
   /// // first check bounding boxes then precisely.
