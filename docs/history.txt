@@ -1,9 +1,12 @@
 The history order is reversed so that new features are at the top.
 
-3-Jan-2001
+4-Jan-2002
+	- Eric Sunshine fixed a bad booboo from some time ago which clobbered
+	  csTimer by mutating it into csTicksr.
+3-Jan-2002
 	- Fixed a bug with the portal console command so that the
 	  portal back to the original level is now correct.
-2-Jan-2001
+2-Jan-2002
 	- Fixed software renderer after 'res' broke it.
 	- Fixed csparser after 'res' broke it.
 	- Fixed OpenGL renderer after 'res' broke it.
@@ -28,7 +31,7 @@ The history order is reversed so that new features are at the top.
 	  routines. They both would handle the portal clip plane inverted
 	  which means that objects were culled wrong. The best place to
 	  see this bug was to do 'portal sydney' in the console of WalkTest.
-1-Jan-2001
+1-Jan-2002
 	- Fixed bug [497461] from sf.net. This bug prevented joystick
 	  button handling to work properly. Reported by J.F. Miller.
 	- Eric Sunshine fixed the following documentation-related problems:

@@ -102,7 +102,7 @@ class csSpinBox : public csInputLine
   // Spin box state
   int SpinState;
   // Spin timer
-  csTicksr *SpinTimer;
+  csTimer *SpinTimer;
   // spin box size in pixels
   int SpinBoxSize;
   // Number of autorepeats since spin beginning

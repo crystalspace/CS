@@ -97,7 +97,7 @@ CS_DECLARE_TYPED_VECTOR (cswsRectVector, csRect);
  *       <li>0x00000000 ... 0x000000FF: Non-class specific commands
  *       <li>0x00000100 ... 0x000001FF: csWindow class messages
  *       <li>0x00000200 ... 0x000002FF: csMenu class messages
- *       <li>0x00000300 ... 0x000003FF: csTicksr class messages
+ *       <li>0x00000300 ... 0x000003FF: csTimer class messages
  *       <li>0x00000400 ... 0x000004FF: csListBox class messages
  *       <li>0x00000500 ... 0x000005FF: csButton class messages
  *       <li>0x00000600 ... 0x000006FF: csScrollBar class messages

@@ -21,7 +21,7 @@
 #include "csws/cstimer.h"
 #include "csws/csapp.h"
 
-csTicksr::csTicksr (csComponent *iParent, unsigned iPeriod)
+csTimer::csTimer (csComponent *iParent, unsigned iPeriod)
   : csComponent (iParent)
 {
   state |= CSS_TRANSPARENT;
@@ -32,7 +32,7 @@ csTicksr::csTicksr (csComponent *iParent, unsigned iPeriod)
     start = app->GetCurrentTime ();
 }
 
-bool csTicksr::HandleEvent (iEvent &Event)
+bool csTimer::HandleEvent (iEvent &Event)
 {
   if (!Stopped
    && (Event.Type == csevBroadcast)
@@ -56,18 +56,18 @@ bool csTicksr::HandleEvent (iEvent &Event)
   return false;
 }
 
-void csTicksr::Stop ()
+void csTimer::Stop ()
 {
   Stopped = true;
 }
 
-void csTicksr::Restart ()
+void csTimer::Restart ()
 {
   Stopped = false;
   start = app->GetCurrentTime ();
 }
 
-void csTicksr::Pause (unsigned iPause)
+void csTimer::Pause (unsigned iPause)
 {
   pause = iPause;
   Restart ();

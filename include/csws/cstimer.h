@@ -22,15 +22,15 @@
 
 #include "cscomp.h"
 
-/// csTicksr class messages
+/// csTimer class messages
 enum
 {
   /**
    * The TimerPulse event is generated each time timer crosses
-   * the bound between two periods. This command is sent to csTicksr
+   * the bound between two periods. This command is sent to csTimer
    * object owner.
    * <pre>
-   * IN: (csTicksr *)source
+   * IN: (csTimer *)source
    * </pre>
    */
   cscmdTimerPulse = 0x00000300
@@ -42,7 +42,7 @@ enum
  * bound between two periods. Timer period can be set either at run time
  * or during object creation. This component is always invisible.
  */
-class csTicksr : public csComponent
+class csTimer : public csComponent
 {
   /// Timer period in milliseconds
   unsigned timeout;
@@ -55,7 +55,7 @@ class csTicksr : public csComponent
 
 public:
   /// Create timer object: the timer is created in running state
-  csTicksr (csComponent *iParent, unsigned iPeriod);
+  csTimer (csComponent *iParent, unsigned iPeriod);
 
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (iEvent &Event);

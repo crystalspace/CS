@@ -46,7 +46,7 @@ csSpinBox::csSpinBox (csComponent *iParent, csInputLineFrameStyle iFrameStyle)
   SpinState = 0;
   Value = NumLimits.MinValue = NumLimits.MaxValue = 0;
   NumLimits.ValueFormat = NULL;
-  SpinTimer = new csTicksr (this, AUTO_SPIN_INTERVAL);
+  SpinTimer = new csTimer (this, AUTO_SPIN_INTERVAL);
   SpinTimer->Stop ();
 
   spinboxref++;
