@@ -1055,7 +1055,7 @@ a mesh object plugin and added a blobby texture for them. He wrote the
 motion manager and contributed a shuttle model for ``csdemo''. 
 
 @item
-Oktal
+Mathew Sutcliffe (Oktal)
 
 Oktal added new functions to parse input (keyboard, mouse, joystick)
 into ascii form and vice versa.
