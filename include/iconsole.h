@@ -56,7 +56,7 @@ enum CursorConst
  * Alpha transparency (not directly supported by 2D driver)
  * Background texture(s) (may not be available during startup)
  */
-SCF_VERSION(iConsole, 0, 0, 3);
+SCF_VERSION(iConsole, 0, 0, 4);
 struct iConsole : public iPlugIn
 {
   /// Show the console   !DEPRECATED!
