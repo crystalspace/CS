@@ -351,11 +351,15 @@ csPolygon3D *csSector::IntersectSegment (
 
   csReversibleTransform movtrans;
 
-  int i;
-  for (i = 0; i < meshes.Length (); i++)
+  csRef<iVisibilityObjectIterator> visit = culler->VisTest (
+  	csBox3 (start, end));
+
+  while (!visit->IsFinished ())
   {
-    iMeshWrapper *mesh = meshes.Get (i);
-    if (mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
+    iVisibilityObject* vo = visit->GetObject ();
+    visit->Next ();
+    csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (vo, iMeshWrapper));
+    if (!mesh || mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
 
     // @@@ UGLY!!!
     csRef<iThingState> ith (SCF_QUERY_INTERFACE (
