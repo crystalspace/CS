@@ -4174,12 +4174,13 @@ bool csLoader::LoadMap (char* buf, bool onlyRegion)
   }
 
   int sn = Engine->sectors.Length ();
-  csRegion* cur_region = Engine->GetCsCurrentRegion ();
+  csRegion* cur_region = NULL;
+  if (onlyRegion) cur_region = Engine->GetCsCurrentRegion ();
   while (sn > 0)
   {
     sn--;
     csSector* s = (csSector*)(Engine->sectors)[sn];
-    if (onlyRegion && cur_region && s->GetObjectParent () != cur_region)
+    if (cur_region && !cur_region->IsInRegion (s))
       continue;
     int st = s->things.Length ();
     int j = -1;

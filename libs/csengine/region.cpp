@@ -383,12 +383,7 @@ iMaterialWrapper* csRegion::FindMaterial (const char *iName)
 bool csRegion::IsInRegion (iObject* iobj)
 {
   csObject* obj = (csObject*)iobj;
-  for (csObjIterator iter = GetIterator (obj->GetType (), false);
-  	!iter.IsFinished () ; ++iter)
-  {
-    csObject* o = iter.GetObj ();
-    if (o == obj) return true;
-  }
-  return false;
+  csObject* objpar = obj->GetObjectParent ();
+  return objpar == (csObject*)this;
 }
 

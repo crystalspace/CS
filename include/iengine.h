@@ -114,29 +114,76 @@ struct iEngine : public iPlugIn
   virtual int GetSectorCount () = 0;
   /// Get a sector by index
   virtual iSector *GetSector (int iIndex) = 0;
-  /// Find a sector by name
+  /**
+   * Find a sector by name. If regionOnly is true then the returned
+   * sector will belong to the current region. Note that this is different
+   * from calling iRegion::FindSector() because the latter will also
+   * return sectors that belong in a region but are not connected to the
+   * engine.
+   */
   virtual iSector *FindSector (const char *iName, bool regionOnly = false) = 0;
 
-  /// Find a thing by name
+  /**
+   * Find a thing by name. If regionOnly is true then the returned
+   * thing will belong to the current region. Note that this is different
+   * from calling iRegion::FindThing() because the latter will also
+   * return things that belong in a region but are not connected to the
+   * engine.
+   */
   virtual iThing *FindThing (const char *iName, bool regionOnly = false) = 0;
-  /// Find a sky thing by name
+  /**
+   * Find a sky thing by name. If regionOnly is true then the returned
+   * thing will belong to the current region. Note that this is different
+   * from calling iRegion::FindSky() because the latter will also
+   * return things that belong in a region but are not connected to the
+   * engine.
+   */
   virtual iThing *FindSky (const char *iName, bool regionOnly = false) = 0;
-  /// Find a thing template by name
+  /**
+   * Find a thing template by name. If regionOnly is true then the returned
+   * thing will belong to the current region. Note that this is different
+   * from calling iRegion::FindThingTemplate() because the latter will also
+   * return things that belong in a region but are not connected to the
+   * engine.
+   */
   virtual iThing *FindThingTemplate (const char *iName, bool regionOnly = false) = 0;
-  /// Find a sprite by name
+  /**
+   * Find a sprite by name. If regionOnly is true then the returned
+   * sprite will belong to the current region. Note that this is different
+   * from calling iRegion::FindSprite() because the latter will also
+   * return sprites that belong in a region but are not connected to the
+   * engine.
+   */
   virtual iSprite *FindSprite (const char *iName, bool regionOnly = false) = 0;
-  /// Find a sprite template by name
+  /**
+   * Find a sprite template by name. If regionOnly is true then the returned
+   * sprite will belong to the current region. Note that this is different
+   * from calling iRegion::FindSprite() because the latter will also
+   * return sprites that belong in a region but are not connected to the
+   * engine.
+   */
   virtual iSpriteTemplate *FindSpriteTemplate (const char *iName, bool regionOnly = false) = 0;
+  /**
+   * Find a texture by name. If regionOnly is true then the returned
+   * texture will belong to the current region. Note that this is different
+   * from calling iRegion::FindTexture() because the latter will also
+   * return textures that belong in a region but are not connected to the
+   * engine.
+   */
+  virtual iTextureWrapper* FindTexture (const char* iName, bool regionOnly = false) = 0;
+  /**
+   * Find a material by name. If regionOnly is true then the returned
+   * material will belong to the current region. Note that this is different
+   * from calling iRegion::FindMaterial() because the latter will also
+   * return materials that belong in a region but are not connected to the
+   * engine.
+   */
+  virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false) = 0;
 
   /// Enable/disable the lighting cache.
   virtual void EnableLightingCache (bool do_cache) = 0;
   /// Return true if lighting cache is enabled.
   virtual bool IsLightingCacheEnabled () = 0;
-
-  /// Find a loaded texture.
-  virtual iTextureWrapper* FindTexture (const char* iName, bool regionOnly = false) = 0;
-  /// Find a loaded material.
-  virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false) = 0;
 
   /// Create a new view on the engine.
   virtual iView* CreateView (iGraphics3D* g3d) = 0;

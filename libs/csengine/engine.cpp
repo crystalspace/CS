@@ -1986,108 +1986,98 @@ iSector *csEngine::GetSector (int iIndex)
   return &((csSector *)sectors.Get (iIndex))->scfiSector;
 }
 
+csObject* csEngine::FindObjectInRegion (csRegion* region,
+	csNamedObjVector& vector, const char* name)
+{
+  for (int i = vector.Length () - 1; i >= 0; i--)
+  {
+    csObject* o = (csObject *)vector[i];
+    if (!region->IsInRegion (o)) continue;
+    const char* oname = o->GetName ();
+    if (name == oname || (name && oname && !strcmp (oname, name)))
+      return o;
+  }
+  return NULL;
+}
+
 iSector *csEngine::FindSector (const char *iName, bool regionOnly)
 {
+  csSector* sec;
   if (regionOnly && region)
-  {
-    return region->FindSector (iName);
-  }
+    sec = (csSector*)FindObjectInRegion (region, sectors, iName);
   else
-  {
-    csSector *sec = (csSector *)sectors.FindByName (iName);
-    return sec ? &sec->scfiSector : NULL;
-  }
+    sec = (csSector *)sectors.FindByName (iName);
+  return sec ? &sec->scfiSector : NULL;
 }
 
 iThing *csEngine::FindThing (const char *iName, bool regionOnly)
 {
+  csThing* thing;
   if (regionOnly && region)
-  {
-    return region->FindThing (iName);
-  }
+    thing = (csThing*)FindObjectInRegion (region, things, iName);
   else
-  {
-    csThing* thing = (csThing*)things.FindByName (iName);
-    return thing ? &thing->scfiThing : NULL;
-  }
+    thing = (csThing*)things.FindByName (iName);
+  return thing ? &thing->scfiThing : NULL;
 }
 
 iThing *csEngine::FindSky (const char *iName, bool regionOnly)
 {
+  csThing* thing;
   if (regionOnly && region)
-  {
-    return region->FindSky (iName);
-  }
+    thing = (csThing*)FindObjectInRegion (region, skies, iName);
   else
-  {
-    csThing* thing = (csThing*)skies.FindByName (iName);
-    return thing ? &thing->scfiThing : NULL;
-  }
+    thing = (csThing*)skies.FindByName (iName);
+  return thing ? &thing->scfiThing : NULL;
 }
 
 iThing *csEngine::FindThingTemplate (const char *iName, bool regionOnly)
 {
+  csThing* thing;
   if (regionOnly && region)
-  {
-    return region->FindThingTemplate (iName);
-  }
+    thing = (csThing*)FindObjectInRegion (region, thing_templates, iName);
   else
-  {
-    csThing* thing = (csThing*)thing_templates.FindByName (iName);
-    return thing ? &thing->scfiThing : NULL;
-  }
+    thing = (csThing*)thing_templates.FindByName (iName);
+  return thing ? &thing->scfiThing : NULL;
 }
 
 iSprite *csEngine::FindSprite (const char *iName, bool regionOnly)
 {
+  csSprite* sprite;
   if (regionOnly && region)
-  {
-    return region->FindSprite (iName);
-  }
+    sprite = (csSprite*)FindObjectInRegion (region, sprites, iName);
   else
-  {
-    csSprite* sprite = (csSprite*)sprites.FindByName (iName);
-    return sprite ? &sprite->scfiSprite : NULL;
-  }
+    sprite = (csSprite*)sprites.FindByName (iName);
+  return sprite ? &sprite->scfiSprite : NULL;
 }
 
 iSpriteTemplate *csEngine::FindSpriteTemplate (const char *iName, bool regionOnly)
 {
+  csSpriteTemplate* sprite;
   if (regionOnly && region)
-  {
-    return region->FindSpriteTemplate (iName);
-  }
+    sprite = (csSpriteTemplate*)FindObjectInRegion (region, sprite_templates, iName);
   else
-  {
-    csSpriteTemplate* sprite = (csSpriteTemplate*)sprite_templates.FindByName (iName);
-    return (iSpriteTemplate*)sprite;
-  }
+    sprite = (csSpriteTemplate*)sprite_templates.FindByName (iName);
+  return (iSpriteTemplate*)sprite;
 }
 
 iMaterialWrapper* csEngine::FindMaterial (const char* iName, bool regionOnly)
 {
+  csMaterialWrapper* wr;
   if (regionOnly && region)
-  {
-    return region->FindMaterial (iName);
-  }
+    wr = (csMaterialWrapper*)FindObjectInRegion (region, *materials, iName);
   else
-  {
-    csMaterialWrapper* wr = materials->FindByName (iName);
-    return (iMaterialWrapper*)wr;
-  }
+    wr = materials->FindByName (iName);
+  return (iMaterialWrapper*)wr;
 }
 
 iTextureWrapper* csEngine::FindTexture (const char* iName, bool regionOnly)
 {
+  csTextureWrapper* wr;
   if (regionOnly && region)
-  {
-    return region->FindTexture (iName);
-  }
+    wr = (csTextureWrapper*)FindObjectInRegion (region, *textures, iName);
   else
-  {
-    csTextureWrapper* wr = textures->FindByName (iName);
-    return (iTextureWrapper*)wr;
-  }
+    wr = textures->FindByName (iName);
+  return (iTextureWrapper*)wr;
 }
 
 iView* csEngine::CreateView (iGraphics3D* g3d)

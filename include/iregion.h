@@ -89,7 +89,11 @@ struct iRegion : public iBase
   /// Find a material in this region by name
   virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
 
-  /// Check if some object is in this region.
+  /**
+   * Check if some object is in this region.
+   * The speed of this function is independent of the number of
+   * objects in this region (i.e. very fast).
+   */
   virtual bool IsInRegion (iObject* obj) = 0;
 };
 

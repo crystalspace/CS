@@ -578,6 +578,13 @@ private:
    */
   void StartDraw (csCamera* c, csClipper* view, csRenderView& rview);
 
+  /**
+   * Find some object (given a name) which is both in a region
+   * and the given vector.
+   */
+  csObject* FindObjectInRegion (csRegion* region,
+	csNamedObjVector& vector, const char* name);
+
 public:
   /**
    * The current camera for drawing the world.

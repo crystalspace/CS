@@ -1089,47 +1089,47 @@ void OpenPortal (csView* view, char* lev)
   csPolygon3D* portalPoly;
   csPolygon3D* p;
   p = thing->NewPolygon (tm);
+  p->AddVertex (-dx, -1, -dz);
+  p->AddVertex (dx, -1, -dz);
+  p->AddVertex (dx, -1, dz);
   p->AddVertex (-dx, -1, dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = thing->NewPolygon (tm);
+  p->AddVertex (-dx, dy-1, dz);
+  p->AddVertex (dx, dy-1, dz);
+  p->AddVertex (dx, dy-1, -dz);
+  p->AddVertex (-dx, dy-1, -dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = thing->NewPolygon (tm);
+  p->AddVertex (-dx, -1, dz);
+  p->AddVertex (dx, -1, dz);
+  p->AddVertex (dx, dy-1, dz);
+  p->AddVertex (-dx, dy-1, dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = thing->NewPolygon (tm);
   p->AddVertex (dx, -1, dz);
   p->AddVertex (dx, -1, -dz);
-  p->AddVertex (-dx, -1, -dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = thing->NewPolygon (tm);
-  p->AddVertex (-dx, dy-1, -dz);
   p->AddVertex (dx, dy-1, -dz);
   p->AddVertex (dx, dy-1, dz);
-  p->AddVertex (-dx, dy-1, dz);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = thing->NewPolygon (tm);
-  p->AddVertex (-dx, dy-1, dz);
-  p->AddVertex (dx, dy-1, dz);
-  p->AddVertex (dx, -1, dz);
+  p->AddVertex (-dx, -1, -dz);
   p->AddVertex (-dx, -1, dz);
+  p->AddVertex (-dx, dy-1, dz);
+  p->AddVertex (-dx, dy-1, -dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = thing->NewPolygon (tm);
+  p->AddVertex (dx, -1, -dz);
+  p->AddVertex (-dx, -1, -dz);
+  p->AddVertex (-dx, dy-1, -dz);
+  p->AddVertex (dx, dy-1, -dz);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
   portalPoly = p;
-
-  p = thing->NewPolygon (tm);
-  p->AddVertex (dx, dy-1, dz);
-  p->AddVertex (dx, dy-1, -dz);
-  p->AddVertex (dx, -1, -dz);
-  p->AddVertex (dx, -1, dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = thing->NewPolygon (tm);
-  p->AddVertex (-dx, dy-1, -dz);
-  p->AddVertex (-dx, dy-1, dz);
-  p->AddVertex (-dx, -1, dz);
-  p->AddVertex (-dx, -1, -dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
-
-  p = thing->NewPolygon (tm);
-  p->AddVertex (dx, dy-1, -dz);
-  p->AddVertex (-dx, dy-1, -dz);
-  p->AddVertex (-dx, -1, -dz);
-  p->AddVertex (dx, -1, -dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   thing->Prepare (room);
   thing->InitLightMaps (false);
@@ -1155,6 +1155,7 @@ void OpenPortal (csView* view, char* lev)
     csPortal* portal = portalPoly->GetPortal ();
     portal->flags.Set (CS_PORTAL_ZFILL);
     portal->flags.Set (CS_PORTAL_CLIPDEST);
+    portal->SetWarp (csMatrix3 (), csVector3 (0), pos);
   }
 
   Sys->engine->SelectRegion (NULL);
