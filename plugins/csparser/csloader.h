@@ -392,10 +392,10 @@ private:
   /// Pointer to built-in checkerboard texture loader.
   csRef<iLoaderPlugin> BuiltinCheckerTexLoader;
 
-  //Returns in the 'meshesSet' set all the meshes encountered walking thru
+  //Returns in the 'meshesArray' array all the meshes encountered walking thru
   //the hierarchy of meshes starting from 'meshWrapper'.
-  void CollectAllChildren (iMeshWrapper* meshWrapper, csSet<iMeshWrapper*>&
-    meshesSet);
+  void CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
+    meshesArray);
   //Two useful private functions to set the CS_POLYMESH_CLOSED and
   //CS_POLYMESH_CONVEX flags on a single mesh wrapper.
   void ConvexFlags (iMeshWrapper* mesh);

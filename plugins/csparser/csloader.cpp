@@ -2561,13 +2561,13 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       {
 	//Apply the flag CS_CULLER_HINT_BADOCCLUDER to all the meshes in 
         //the meshes' hierarchy, starting from the 'mesh' mesh object.
-        csSet<iMeshWrapper*> set;
-        CollectAllChildren (mesh, set);
-        csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
-        while (children.HasNext ())
+        csRefArray<iMeshWrapper> meshesArray;
+        CollectAllChildren (mesh, meshesArray);
+        int i, count = meshesArray.Length ();
+        for (i = 0; i < count; i++)
         {
           csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
-            (children.Next (), iVisibilityObject);
+            (meshesArray[i], iVisibilityObject);
           if (visobj)
             visobj->GetCullerFlags ().Set (CS_CULLER_HINT_BADOCCLUDER);
         }
@@ -2579,13 +2579,13 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       {
 	//Apply the flag CS_CULLER_HINT_GOODOCCLUDER to all the meshes in 
         //the meshes' hierarchy, starting from the 'mesh' mesh object.
-        csSet<iMeshWrapper*> set;
-        CollectAllChildren (mesh, set);
-        csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
-        while (children.HasNext ())
+        csRefArray<iMeshWrapper> meshesArray;
+        CollectAllChildren (mesh, meshesArray);
+        int i, count = meshesArray.Length ();
+        for (i = 0; i < count; i++)
         {
           csRef<iVisibilityObject> visobj = SCF_QUERY_INTERFACE 
-            (children.Next (), iVisibilityObject);
+            (meshesArray[i], iVisibilityObject);
           if (visobj)
             visobj->GetCullerFlags ().Set (CS_CULLER_HINT_GOODOCCLUDER);
         }
@@ -2597,12 +2597,12 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       {
         if (recursive)//Test if recursion on children has been specified.
         {
-          csSet<iMeshWrapper*> set;
-          CollectAllChildren (mesh, set);
-          csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
-          while (children.HasNext ())
+          csRefArray<iMeshWrapper> meshesArray;
+          CollectAllChildren (mesh, meshesArray);
+          int i, count = meshesArray.Length ();
+          for (i = 0; i < count; i++)
           {
-            ClosedFlags (children.Next ());
+            ClosedFlags (meshesArray[i]);
           }
         }//if
         else
@@ -2613,15 +2613,14 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       TEST_MISSING_MESH
       else
       {
-        //Test if recursion on children has been specified.
-        if (recursive)
+        if (recursive)//Test if recursion on children has been specified.
         {
-          csSet<iMeshWrapper*> set;
-          CollectAllChildren (mesh, set);
-          csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
-          while (children.HasNext ())
+          csRefArray<iMeshWrapper> meshesArray;
+          CollectAllChildren (mesh, meshesArray);
+          int i, count = meshesArray.Length ();
+          for (i = 0; i < count; i++)
           {
-            ConvexFlags (children.Next ());
+            ConvexFlags (meshesArray[i]);
           }
         }//if
         else
@@ -2792,12 +2791,12 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
   //I had to put these ugly curly brackets. It's due to the uglier label
   //below! 'children' and 'set' need an initialization indeed. Luca
   {
-    csSet<iMeshWrapper*> set;
-    CollectAllChildren (mesh, set);
-    csSet<iMeshWrapper*>::GlobalIterator children (set.GetIterator ());
-    while (children.HasNext ())
+    csRefArray<iMeshWrapper> meshesArray;
+    CollectAllChildren (mesh, meshesArray);
+    int i, count = meshesArray.Length ();
+    for (i = 0; i < count; i++)
     {
-      iMeshWrapper* mesh = children.Next ();
+      iMeshWrapper* mesh = meshesArray[i];
       mesh->GetMeshObject ()->GetFlags ().SetBool (
         CS_MESH_STATICPOS, staticpos);
       mesh->GetMeshObject ()->GetFlags ().SetBool (
@@ -4924,33 +4923,20 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 }
 #endif //CS_USE_NEW_RENDERER
 
-void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper, csSet<iMeshWrapper*>&
-  meshesSet)
+void csLoader::CollectAllChildren (iMeshWrapper* meshWrapper, csRefArray<iMeshWrapper>&
+  meshesArray)
 {  
-  csRef<iMeshWrapper> mesh = meshWrapper;
-
-  //
-  //This array below contains all the meshwrappers that had
-  //havent added to the set yet.
-  csRefArray<iMeshWrapper> meshesArray;
-  
-  while (mesh)
-  {
-    meshesSet.Add (mesh);
+  int lastMeshVisited = 0;
+  meshesArray.Push (meshWrapper);
     
+  while (lastMeshVisited < meshesArray.Length ())
+  {
     //
     //Get the children of the current mesh (ie 'mesh').
-    csRef<iMeshList> mL = mesh->GetChildren ();
+    csRef<iMeshList> mL = meshesArray[lastMeshVisited++]->GetChildren ();
     int i;
     for (i = 0; i < mL->GetCount (); i++)
         meshesArray.Push (mL->Get (i));
-    
-    //
-    //Proceed to next meshwrapper or exit the while loop.
-    if (meshesArray.Length ())
-      mesh = meshesArray.Pop ();
-    else
-      mesh = 0;
   }//while
 
   return;
