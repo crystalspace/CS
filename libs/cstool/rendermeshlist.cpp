@@ -158,7 +158,7 @@ csRenderMesh** csRenderMeshList::GetSortedMeshList (int &n)
   int totalNum = 0;
   int currentElement;
   
-  it.Return ();
+  it.Reset ();
 
   while (it.HasNext ())
   {
