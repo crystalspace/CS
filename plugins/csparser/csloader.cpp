@@ -1075,6 +1075,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  iMeshFactoryList* mfl = stemp->GetChildren ();
 	  for (i=0; i<mfl2->GetCount (); i++)
 	    mfl->Add (mfl2->Get (i));
+	  stemp2->DecRef ();
         }
         break;
 
