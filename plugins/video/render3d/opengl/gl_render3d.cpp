@@ -555,6 +555,7 @@ bool csGLRender3D::Open ()
   asp_center_x = w/2;
   asp_center_y = h/2;
 
+
 /*  effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
   if( !effectserver )
   {

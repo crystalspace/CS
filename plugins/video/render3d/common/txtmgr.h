@@ -26,7 +26,7 @@
 #include "iengine/material.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
-#include "ivideo/graph3d.h"
+//#include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "csgfx/rgbpixel.h"
 
