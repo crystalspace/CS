@@ -39,15 +39,15 @@ public:
 
     void SetStateFloat( csStringID state, float value )
     {
-      return scfParent->SetStateFloat( state, value );
+      scfParent->SetStateFloat( state, value );
     }
     void SetStateString( csStringID state, csStringID value )
     {
-      return scfParent->SetStateString( state, value );
+      scfParent->SetStateString( state, value );
     }
     void SetStateOpaque( csStringID state, void *value )
     {
-      return scfParent->SetStateOpaque( state, value );
+      scfParent->SetStateOpaque( state, value );
     }
     
     float GetStateFloat( csStringID state )
