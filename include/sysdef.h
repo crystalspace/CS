@@ -258,6 +258,8 @@
 #    include <malloc.h>
 #  elif defined(COMP_GCC) && defined(OS_DOS)
 #    include <stdlib.h>
+#  elif defined(OS_BSD)
+#    include <stdlib.h>
 #  else
 #    include <alloca.h>
 #  endif
