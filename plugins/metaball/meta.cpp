@@ -86,6 +86,24 @@ void csMetaBalls::InitTables(void)
 bool csMetaBalls::Initialize (iSystem *sys)
 {
   Sys = sys;
+  iConfigFile *Config = Sys->GetConfig ();
+  // Read the config here: earlier than Sys->Initialize we can't
+  mp.d_alpha = Config->GetFloat ("MetaBalls", "INITIAL_SPEED", 0.03);
+
+  num_meta_balls = Config->GetInt ("MetaBalls", "NUM_META_BALLS", 3);
+  
+  mp.iso_level = Config->GetFloat ("MetaBalls", "ISO_LEVEL", 1.0);
+  max_triangles = Config->GetInt ("MetaBalls", "MAX_TRIANGLES", 2000);
+
+  env_map_mult = Config->GetFloat ("MetaBalls", "ENV_MAP_MULTIPLIER", 1.0);
+  env_mapping = Config->GetYesNo ("MetaBalls", "USE_TRUE_ENV_MAP", true) 
+                ? TRUE_ENV_MAP : FAKE_ENV_MAP;
+
+  meta_balls = new MetaBall[num_meta_balls];
+  triangles_array = new Triangle[max_triangles];
+
+  mp.charge = Config->GetFloat ("MetaBalls", "CHARGE", 3.5);
+  InitTables();
   return true;
 }
 
@@ -115,29 +133,7 @@ void csMetaBalls::SetEnvironmentMappingFactor (float env_mult)
   InitTables ();
 }
 
-void csMetaBalls::SetMetaBallDefaults (iConfigFile *Config)
-{
-  this->Config = Config;
 
-  // Read the config here: earlier than Sys->Initialize we can't
-  mp.d_alpha = Config->GetFloat ("MetaBalls", "INITIAL_SPEED", 0.03);
-
-  num_meta_balls = Config->GetInt ("MetaBalls", "NUM_META_BALLS", 3);
-  
-  mp.iso_level = Config->GetFloat ("MetaBalls", "ISO_LEVEL", 1.0);
-  max_triangles = Config->GetInt ("MetaBalls", "MAX_TRIANGLES", 2000);
-
-  env_map_mult = Config->GetFloat ("MetaBalls", "ENV_MAP_MULTIPLIER", 1.0);
-  env_mapping = Config->GetYesNo ("MetaBalls", "USE_TRUE_ENV_MAP", true) 
-                ? TRUE_ENV_MAP : FAKE_ENV_MAP;
-
-  meta_balls = new MetaBall[num_meta_balls];
-  triangles_array = new Triangle[max_triangles];
-
-  mp.charge = Config->GetFloat ("MetaBalls", "CHARGE", 3.5);
-
-  InitTables();
-}
 
 void LitVertex(const csVector3 &n, G3DTexturedVertex &c)
 {

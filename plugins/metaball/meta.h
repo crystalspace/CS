@@ -27,7 +27,6 @@
 #include "imetabal.h"
 
 class csMaterialHandle;
-struct iConfigFile;
 struct G3DPolygonDPFX;
 struct iSystem;
 struct iGraphics3D;
@@ -62,7 +61,6 @@ class csMetaBalls : public iMetaBalls
   float alpha;
   MetaParameters mp;
 
-  iConfigFile *Config;
   iGraphics3D *G3D;
   iSystem *Sys;
   iMaterialHandle *th;
@@ -79,7 +77,7 @@ public:
   csMetaBalls (iBase *iParent);
   virtual ~csMetaBalls ();
   virtual bool Initialize (iSystem *sys);
-  virtual void SetMetaBallDefaults (iConfigFile *Config);
+
   virtual void SetContext (iGraphics3D *g3d);
   virtual void SetMaterial (iMaterialHandle *tex)
   { th = tex; }

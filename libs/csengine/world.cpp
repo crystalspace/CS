@@ -745,9 +745,11 @@ void csWorld::Clear ()
     delete first_dyn_lights;
     first_dyn_lights = dyn;
   }
-  delete textures; textures = NULL;
+  delete textures; 
+  textures = NULL;
   textures = new csTextureList ();
-  delete materials; materials = NULL;
+  delete materials; 
+  materials = NULL;
   materials = new csMaterialList ();
 
   // Delete world states and their references to cullers before cullers are
@@ -1936,6 +1938,7 @@ csWorld::csWorldState::csWorldState (csWorld *w)
 {
   world    = w;
   c_buffer = w->c_buffer;
+  cbufcube = w->cbufcube;
   covtree  = w->covtree;
   quad3d   = w->quad3d;
   G2D      = w->G2D;
@@ -1948,13 +1951,15 @@ csWorld::csWorldState::~csWorldState ()
   if (world->G2D == G2D)
   {
     world->G3D->DecRef ();
-    world->G3D = NULL;
-    world->G2D = NULL;
+    world->G3D      = NULL;
+    world->G2D      = NULL;
     world->c_buffer = NULL;
-    world->quad3d = NULL;
-    world->covtree = NULL;
+    world->quad3d   = NULL;
+    world->covtree  = NULL;
+    world->cbufcube = NULL;
   }
   delete c_buffer;
+  delete cbufcube;
   delete quad3d;
   delete covtree;
 }
@@ -1962,6 +1967,7 @@ csWorld::csWorldState::~csWorldState ()
 void csWorld::csWorldState::Activate ()
 {
   world->c_buffer     = c_buffer;
+  world->cbufcube     = cbufcube;
   world->quad3d       = quad3d;
   world->covtree      = covtree;
   world->frame_width  = G3D->GetWidth ();
@@ -1972,6 +1978,7 @@ void csWorld::csWorldState::Activate ()
     world->Resize ();
 
     c_buffer = world->c_buffer;
+    cbufcube = world->cbufcube;
     quad3d   = world->quad3d;
     covtree  = world->covtree;
     resize   = false;
@@ -1987,7 +1994,10 @@ void csWorld::csWorldStateVector::Close (iGraphics2D *g2d)
   // with this G2D
   for (int i = 0; i < Length (); i++)
     if (((csWorldState*)root [i])->G2D == g2d)
-      Delete (i);
+    {
+      //Delete (i);
+      break;
+    }
 }
 
 void csWorld::csWorldStateVector::Resize (iGraphics2D *g2d)
@@ -2026,10 +2036,12 @@ void csWorld::SetContext (iGraphics3D* g3d)
 	int c = GetCuller ();
 	// Null out the culler which belongs to another state so its not deleted.
 	c_buffer = NULL;
-	covtree = NULL;
-	quad3d = NULL;
+	cbufcube = NULL;
+	covtree  = NULL;
+	quad3d   = NULL;
 	frame_width = G3D->GetWidth ();
 	frame_height = G3D->GetHeight ();
+	cbufcube = new csCBufferCube (1024);
 	SetCuller (c);
 	world_states->Push (new csWorldState (this));
       }

@@ -44,9 +44,6 @@ struct iMetaBalls : public iPlugIn
   /// 
   virtual bool Initialize (iSystem *sys) = 0;
 
-  /// Pass the config file which carries info about parameters
-  virtual void SetMetaBallDefaults (iConfigFile *Config) = 0;
-
   /// Get number of balls currently being animated
   virtual int GetNumberMetaBalls () = 0;
 

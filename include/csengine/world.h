@@ -1115,6 +1115,7 @@ private:
     iGraphics2D *G2D;
     iGraphics3D *G3D;
     csCBuffer* c_buffer;
+    csCBufferCube* cbufcube;
     csQuadTree3D* quad3d;
     csCoverageMaskTree* covtree;
     /// Creates a world state by copying the relevant data members

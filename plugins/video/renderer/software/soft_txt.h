@@ -365,8 +365,9 @@ public:
 
   //-----------------------Procedural Texture Support--------------------------
   /**
-   * If this instance is not a proc_only_txtmgr but there are 8bit procedural 
-   * textures in the system, remember the first one.
+   * When in 16/32 bit mode and a dedicated procedural texture manager is present
+   * the main texture manager needs to keep track of the first 8bit procedural 
+   * texture
    */
   csGraphics3DSoftwareCommon *first_8bit_proc_tex;
 
@@ -383,16 +384,15 @@ public:
 
 private:
   /**
-   * When in 16/32bit mode and the proc textures are in 8bit the palettes are
-   * managed by the 8bit texture manager. This function is called to remap the 
-   * textures according to the new palette etc.
+   * When in 16/32bit mode and a dedicated 8bit procedural texture manager is 
+   * present, its' textures are remapped to the global palette.
    */
-  void ReprepareAloneProcs ();
+  void Reprepare8BitProcs ();
 
-  ///The dedicated procedural texture manager (if there is one)
+  ///The dedicated procedural txtmgr (if there is one)
   csTextureManagerSoftware *proc_txtmgr;
 
-  /// The main texture manager (if this is a dedicated procedural texture manager)
+  /// The main txtmgr (if this is the dedicated procedural texture manager)
   csTextureManagerSoftware *main_txtmgr;
 
 };

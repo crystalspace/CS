@@ -39,7 +39,6 @@ csSoftProcTexture3D::csSoftProcTexture3D (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
   soft_tex_mm = NULL;
-  dummy_soft_tex_mm = NULL;
   parent_tex_mm = NULL;
   System = NULL;
   G2D = NULL;
@@ -54,7 +53,6 @@ csSoftProcTexture3D::~csSoftProcTexture3D ()
     tcache = NULL;
     texman = NULL;
   }
-  delete dummy_soft_tex_mm;
 }
 
 bool csSoftProcTexture3D::Initialize (iSystem *iSys)
@@ -152,6 +150,18 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *parent_texman, csTe
 	// Inform each texture manager aboout the other
 	texman->SetMainTextureManager (parent_texman);
 	parent_texman->SetProcTextureManager (texman);
+	texman->ResetPalette ();
+#ifdef CS_DEBUG
+	System->Printf (MSG_INITIALIZATION, 
+			"Preparing dedicated procedural texture manager\n");
+#endif
+	// Initialize the texture manager
+	int r,g,b;
+	for (r = 0; r < 8; r++)
+	  for (g = 0; g < 8; g++)
+	    for (b = 0; b < 4; b++)
+	      texman->ReserveColor (r * 32, g * 32, b * 64);
+	texman->PrepareTextures ();
       }
       else
       {
@@ -160,13 +170,19 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *parent_texman, csTe
 	if (!Open (NULL) || !SharedOpen ())
 	  return false;
       }
-      // In order to keep the palette synchronised we register ourselves with
-      // this texture manager.
-      iImage *im = (iImage*) new csImageMemory (width, height, 
-						(csRGBpixel*) buffer, false);
-      dummy_soft_tex_mm = (csTextureMMSoftware *)
-	texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
-      texman->PrepareTexture (dummy_soft_tex_mm);
+
+      if (buffer)
+      {
+	// In order to keep the palette synchronised 
+	iImage *im = (iImage*) new csImageMemory (width, height, 
+						  (csRGBpixel*) buffer, false);
+	iTextureHandle *dummy =
+	  texman->RegisterTexture (im, CS_TEXTURE_2D | CS_TEXTURE_PROC);
+	texman->PrepareTexture (dummy);
+	texman->UnregisterTexture (dummy);
+	dummy->DecRef ();
+      }
+
 #ifdef CS_DEBUG
       System->Printf (MSG_INITIALIZATION, "%s/8bit procedural texture\n",
 		      parent_texman->pfmt.PixelBytes == 2 ? "16" : "32");

@@ -34,8 +34,6 @@ class csSoftProcTexture3D : public csGraphics3DSoftwareCommon,
   bool reprepare;
   /// If reprepare is true soft_tex_mm is reprepared
   csTextureMMSoftware *soft_tex_mm;
-  /// Registered with dedicated 8bit texture manager when in true colour mode 
-  csTextureMMSoftware *dummy_soft_tex_mm;
   /// The parent procedural texture as registered with the main texture manager
   csTextureMMSoftware *parent_tex_mm;
   /// The main gfx contexts texture cache
