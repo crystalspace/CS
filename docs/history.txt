@@ -45,6 +45,7 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Replaced 'layers' in haze with csPDelArray<csHazeLayer>.
 	    - Replaced 'particles' in csParticleSystem with
 	      csRefArray<iParticle>.
+	- res removed csVector from the Win32 WaveOut plugin.
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'frames' in csSpriteAction2 with csArray<csSpriteFrame*>.
 	    - Replaced 'delays' in csSpriteAction2 with csArray<int>.
@@ -63,7 +64,7 @@ for each given day, however, are in normal (ascending) chronological order.
 	      csRefArray<iPortalCallback*>.
 	    - Replaced 'framevec' in perfstat with csPDelArray<FrameEntry>.
 	    - Replaced 'statvec' in perfstat with csPDelArray<StatEntry>.
-	- res removed csVector from the Win32 WaveOut plugin.
+	- res improved the doxygen documentation of the UTF converters.
 29-Jul-2003
 	- Jorrit made scfStringArray actually work by adding the needed
 	  SCF_CONSTRUCT stuff.

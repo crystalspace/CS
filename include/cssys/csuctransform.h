@@ -21,6 +21,13 @@
 
 #include "csunicode.h"
 
+/**\file 
+ * Converter between UTF encodings.
+ */
+ 
+/**\addtogroup util
+ * @{ */
+
 /**
  * Contains functions to convert between several UTF encodings.
  */
@@ -50,8 +57,23 @@ public:
   }						\
   chUsed++; 					
   
+  /**\name UTF Decoders
+   * @{ */
+  /**
+   * Decode an Unicode character encoded in UTF-8.
+   * \param str Pointer to the encoded character.
+   * \param strlen Number of chars in the string.
+   * \param ch Decoded character.
+   * \param isValid When an error occured during decoding, \p ch contains the
+   *  replacement character (#CS_UC_CHAR_REPLACER). In this case, the bool
+   *  pointed to by \p isValid will be set to false. The parameter can be 0,
+   *  but in this case the information whether the decoded char is the 
+   *  replacement character because the source data is errorneous is lost.
+   * \return The number of characters in str that have to be skipped to 
+   *  retrieve the next encoding character.
+   */
   inline static int UTF8Decode (const utf8_char* str, size_t strlen, 
-    utf32_char& ch, bool* isValid)
+    utf32_char& ch, bool* isValid = 0)
   {
     if (str == 0)
     {
@@ -128,8 +150,12 @@ public:
     }
   }
   
+  /**
+   * Decode an Unicode character encoded in UTF-16.
+   * \copydoc UTF8Decode()
+   */
   inline static int UTF16Decode (const utf16_char* str, size_t strlen, 
-    utf32_char& ch, bool* isValid)
+    utf32_char& ch, bool* isValid = 0)
   {
     if (str == 0)
     {
@@ -169,8 +195,12 @@ public:
     SUCCEED;
   }
   
+  /**
+   * Decode an Unicode character encoded in UTF-32.
+   * \copydoc UTF8Decode()
+   */
   inline static int UTF32Decode (const utf32_char* str, size_t strlen, 
-    utf32_char& ch, bool* isValid)
+    utf32_char& ch, bool* isValid = 0)
   {
     if (str == 0)
     {
@@ -183,6 +213,7 @@ public:
       FAIL(chUsed);
     SUCCEED;
   }
+  /** @} */
 #undef FAIL
 #undef SUCCEED
 #undef GET_NEXT
@@ -197,6 +228,18 @@ public:
 
 #define OUTPUT_CHAR(chr) _OUTPUT_CHAR(buf, chr)
   
+  /**\name UTF Encoders
+   * @{ */
+  /**
+   * Encode an Unicode character to UTF-8.
+   * \param ch Character to encode.
+   * \param buf Pointer to the buffer receiving the encoded character.
+   * \param bufsize Number of chars in the buffer.
+   * \return The number of characters needed to encode \p ch.
+   * \remark The buffer will be filled up as much as possible.
+   *  Check the returned value whether the encoded character fit into the
+   *  buffer.
+   */
   inline static int EncodeUTF8 (const utf32_char ch, utf8_char* buf, 
     size_t bufsize)
   {
@@ -246,6 +289,10 @@ public:
     return encodedLen;
   }
     
+  /**
+   * Encode an Unicode character to UTF-16.
+   * \copydoc EncodeUTF8()
+   */
   inline static int EncodeUTF16 (const utf32_char ch, utf16_char* buf, 
     size_t bufsize)
   {
@@ -268,6 +315,10 @@ public:
     return encodedLen;
   }
 
+  /**
+   * Encode an Unicode character to UTF-32.
+   * \copydoc EncodeUTF8()
+   */
   inline static int EncodeUTF32 (const utf32_char ch, utf32_char* buf, 
     size_t bufsize)
   {
@@ -279,13 +330,14 @@ public:
     
     return encodedLen;
   }
+  /** @} */
 #undef OUTPUT_CHAR
   
 #define OUTPUT_CHAR(chr) _OUTPUT_CHAR(dest, chr)
   
 #define UCTF_CONVERTER(funcName, fromType, decoder, toType, encoder)	\
-  inline static size_t funcName (toType* dest, const fromType* source,	\
-    size_t destSize, size_t srcSize)					\
+  inline static size_t funcName (toType* dest, size_t destSize, 	\
+    const fromType* source, size_t srcSize = (size_t)-1)		\
   {									\
     if ((srcSize == 0) || (source == 0))				\
       return 0;								\
@@ -334,45 +386,59 @@ public:
     return encodedLen + 1;						\
   }
 
+  /**\name Converters between strings in different UTF encodings
+   * @{ */
   /**
    * Convert UTF-8 to UTF-16.
    * \param dest Destination buffer.
+   * \param destSize Number of characters the destination buffer can hold.
    * \param source Source buffer.
-   * \param destSize Number of widechars the destination buffer can hold.
-   * \return Number of widechars in the complete UTF-16 string, including null 
-   *  terminator.
+   * \param srcSize Number of characters contained in the source buffer.
+   *   If this is -1, the length will be determined automatically.
+   * \return Number of characters in the complete converted string, including 
+   *  null terminator.
    * \remark If the complete converted string wouldn't fit the destination 
-   *  buffer, it is truncated. However, it'll also be null-terminated.
+   *  buffer, it is truncated. However, it'll also be null-terminated. Hence,
+   *  if it has a size of 1, you get an empty string.
    *  The returned value is the number of characters needed for the *whole* 
    *  converted string.
    */
   UCTF_CONVERTER (UTF8to16, utf8_char, UTF8Decode, utf16_char, EncodeUTF16);
+  /**
+   * Convert UTF-8 to UTF-32.
+   * \copydoc UTF8to16()
+   */
   UCTF_CONVERTER (UTF8to32, utf8_char, UTF8Decode, utf32_char, EncodeUTF32);
 
   /**
    * Convert UTF-16 to UTF-8.
-   * \param dest Destination buffer.
-   * \param source Source buffer.
-   * \param destSize Number of chars the destination buffer can hold.
-   * \return Number of chars in the complete UTF-8 string, including null 
-   *  terminator.
-   * \remark If the complete converted string wouldn't fit the destination 
-   *  buffer, it is truncated. However, it'll also be null-terminated.
-   *  The returned value is the number of characters needed for the *whole* 
-   *  converted string.
+   * \copydoc UTF8to16()
    */
   UCTF_CONVERTER (UTF16to8, utf16_char, UTF16Decode, utf8_char, EncodeUTF8);
+  /**
+   * Convert UTF-16 to UTF-32.
+   * \copydoc UTF8to16()
+   */
   UCTF_CONVERTER (UTF16to32, utf16_char, UTF16Decode, utf32_char, EncodeUTF32);
   
+  /**
+   * Convert UTF-32 to UTF-8.
+   * \copydoc UTF8to16()
+   */
   UCTF_CONVERTER (UTF32to8, utf32_char, UTF32Decode, utf8_char, EncodeUTF8);
+  /**
+   * Convert UTF-32 to UTF-16.
+   * \copydoc UTF8to16()
+   */
   UCTF_CONVERTER (UTF32to16, utf32_char, UTF32Decode, utf16_char, EncodeUTF16);
+  /** @} */
   
 #undef UCTF_CONVERTER
 #undef OUTPUT_CHAR
 
 #if (CS_WCHAR_T_SIZE == 1)
-  inline static size_t UTF8toWC (wchar_t* dest, const utf8_char* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t UTF8toWC (wchar_t* dest, size_t destSize, 
+    const utf8_char* source, size_t srcSize)
   {
     size_t srcChars = srcSize;						
     if (srcSize == (size_t)-1)						
@@ -390,20 +456,20 @@ public:
     return srcChars + 1;
   };
 
-  inline static size_t UTF16toWC (wchar_t* dest, const utf16_char* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t UTF16toWC (wchar_t* dest, size_t destSize, 
+    const utf16_char* source, size_t srcSize)
   {
-    return UTF16to8 ((utf8_char*)dest, source, destSize, srcSize);
+    return UTF16to8 ((utf8_char*)dest, destSize, source, srcSize);
   };
 
-  inline static size_t UTF32toWC (wchar_t* dest, const utf32_char* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t UTF32toWC (wchar_t* dest, size_t destSize, 
+    const utf32_char* source, size_t srcSize)
   {
-    return UTF32to8 ((utf8_char*)dest, source, destSize, srcSize);
+    return UTF32to8 ((utf8_char*)dest, destSize, source, srcSize);
   };
   
-  inline static size_t WCtoUTF8 (utf8_char* dest, const wchar_t* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t WCtoUTF8 (utf8_char* dest, size_t destSize, 
+    const wchar_t* source, size_t srcSize)
   {
     size_t srcChars = srcSize;						
     if (srcSize == (size_t)-1)						
@@ -421,26 +487,39 @@ public:
     return srcChars + 1;
   };
 
-  inline static size_t WCtoUTF16 (utf16_char* dest, const wchar_t* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t WCtoUTF16 (utf16_char* dest, size_t destSize, 
+    const wchar_t* source, size_t srcSize)
   {
-    return UTF8to16 (dest, source, destSize, srcSize);
+    return UTF8to16 (dest, destSize, source, srcSize);
   };
 
-  inline static size_t WCtoUTF32 (utf32_char* dest, const wchar_t* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t WCtoUTF32 (utf32_char* dest, size_t destSize, 
+    const wchar_t* source, size_t srcSize)
   {
-    return UTF8to32 (dest, source, destSize, srcSize);
+    return UTF8to32 (dest, destSize, source, srcSize);
   };
 #elif (CS_WCHAR_T_SIZE == 2)
-  inline static size_t UTF8toWC (wchar_t* dest, const utf8_char* source,
-    size_t destSize, size_t srcSize)
+  // Methods below for doxygen documentation are here as the size '2' is 
+  // default.
+  
+  /**\name Converters UTF and platform-specific wchar_t
+   * @{ */
+  /**
+   * Convert UTF-8 to platform-specific wide chars.
+   * \copydoc UTF8to16()
+   */
+  inline static size_t UTF8toWC (wchar_t* dest, size_t destSize, 
+    const utf8_char* source, size_t srcSize)
   {
-    return UTF8to16 ((utf16_char*)dest, source, destSize, srcSize);
+    return UTF8to16 ((utf16_char*)dest, destSize, source, srcSize);
   };
 
-  inline static size_t UTF16toWC (wchar_t* dest, const utf16_char* source,
-    size_t destSize, size_t srcSize)
+  /**
+   * Convert UTF-16 to platform-specific wide chars.
+   * \copydoc UTF8toWC()
+   */
+  inline static size_t UTF16toWC (wchar_t* dest, size_t destSize, 
+    const utf16_char* source, size_t srcSize)
   {
     size_t srcChars = srcSize;						
     if (srcSize == (size_t)-1)						
@@ -458,20 +537,32 @@ public:
     return srcChars + 1;
   };
 
-  inline static size_t UTF32toWC (wchar_t* dest, const utf32_char* source,
-    size_t destSize, size_t srcSize)
+  /**
+   * Convert UTF-32 to platform-specific wide chars.
+   * \copydoc UTF8toWC()
+   */
+  inline static size_t UTF32toWC (wchar_t* dest, size_t destSize, 
+    const utf32_char* source, size_t srcSize)
   {
-    return UTF32to16 ((utf16_char*)dest, source, destSize, srcSize);
+    return UTF32to16 ((utf16_char*)dest, destSize, source, srcSize);
   };
   
-  inline static size_t WCtoUTF8 (utf8_char* dest, const wchar_t* source,
-    size_t destSize, size_t srcSize)
+  /**
+   * Convert platform-specific wide chars to UTF-8.
+   * \copydoc UTF8toWC()
+   */
+  inline static size_t WCtoUTF8 (utf8_char* dest, size_t destSize, 
+    const wchar_t* source, size_t srcSize)
   {
-    return UTF16to8 (dest, (utf16_char*)source, destSize, srcSize);
+    return UTF16to8 (dest, destSize, (utf16_char*)source, srcSize);
   };
 
-  inline static size_t WCtoUTF16 (utf16_char* dest, const wchar_t* source,
-    size_t destSize, size_t srcSize)
+  /**
+   * Convert platform-specific wide chars to UTF-16.
+   * \copydoc UTF8toWC()
+   */
+  inline static size_t WCtoUTF16 (utf16_char* dest, size_t destSize, 
+    const wchar_t* source, size_t srcSize)
   {
     size_t srcChars = srcSize;						
     if (srcSize == (size_t)-1)						
@@ -489,26 +580,31 @@ public:
     return srcChars + 1;
   };
 
-  inline static size_t WCtoUTF32 (utf32_char* dest, const wchar_t* source,
-    size_t destSize, size_t srcSize)
+  /**
+   * Convert platform-specific wide chars to UTF-32.
+   * \copydoc UTF8toWC()
+   */
+  inline static size_t WCtoUTF32 (utf32_char* dest, size_t destSize, 
+    const wchar_t* source, size_t srcSize)
   {
-    return UTF16to32 (dest, (utf16_char*)source, destSize, srcSize);
+    return UTF16to32 (dest, destSize, (utf16_char*)source, srcSize);
   };
+  /** @} */
 #elif (CS_WCHAR_T_SIZE == 4)
-  inline static size_t UTF8toWC (wchar_t* dest, const utf8_char* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t UTF8toWC (wchar_t* dest, size_t destSize, 
+    const utf8_char* source, size_t srcSize)
   {
-    return UTF8to32 ((utf32_char*)dest, source, destSize, srcSize);
+    return UTF8to32 ((utf32_char*)dest, destSize, source, srcSize);
   };
 
-  inline static size_t UTF16toWC (wchar_t* dest, const utf16_char* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t UTF16toWC (wchar_t* dest, size_t destSize, 
+    const utf16_char* source, size_t srcSize)
   {
-    return UTF16to32 ((utf32_char*)dest, source, destSize, srcSize);
+    return UTF16to32 ((utf32_char*)dest, destSize, source, srcSize);
   };
 
-  inline static size_t UTF32toWC (wchar_t* dest, const utf32_char* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t UTF32toWC (wchar_t* dest, size_t destSize, 
+    const utf32_char* source,  size_t srcSize)
   {
     size_t srcChars = srcSize;						
     if (srcSize == (size_t)-1)						
@@ -526,20 +622,20 @@ public:
     return srcChars + 1;
   };
   
-  inline static size_t WCtoUTF8 (utf8_char* dest, const wchar_t* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t WCtoUTF8 (utf8_char* dest, size_t destSize, 
+    const wchar_t* source, size_t srcSize)
   {
-    return UTF32to8 (dest, (utf32_char*)source, destSize, srcSize);
+    return UTF32to8 (dest, destSize, (utf32_char*)source, srcSize);
   };
 
-  inline static size_t WCtoUTF16 (utf16_char* dest, const wchar_t* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t WCtoUTF16 (utf16_char* dest, size_t destSize, 
+    const wchar_t* source, size_t srcSize)
   {
-    return UTF32to16 (dest, (utf32_char*)source, destSize, srcSize);
+    return UTF32to16 (dest, destSize, (utf32_char*)source, srcSize);
   };
 
-  inline static size_t WCtoUTF32 (utf32_char* dest, const wchar_t* source,
-    size_t destSize, size_t srcSize)
+  inline static size_t WCtoUTF32 (utf32_char* dest, size_t destSize, 
+    const wchar_t* source, size_t srcSize)
   {
     size_t srcChars = srcSize;						
     if (srcSize == (size_t)-1)						
@@ -561,6 +657,8 @@ public:
 #endif
 
 };
+
+/** @} */
 
 #endif
 

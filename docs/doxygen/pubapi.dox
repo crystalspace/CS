@@ -614,7 +614,10 @@ PREDEFINED             = "CS_GNUC_PRINTF(a,b)=" \
 			 CS_HAS_MEMORY_MAPPED_IO \
 			 "CS_STRUCT_ALIGN_4BYTE_BEGIN=" \
 			 "CS_STRUCT_ALIGN_4BYTE_END=" \
-			 "SCF_VERSION(a,b,c,d)="
+			 "SCF_VERSION(a,b,c,d)=" \
+			 "UCTF_CONVERTER(a,b,c,d,e)=inline static size_t a \
+			   (d* dest, size_t destSize, \
+			    const b* source, size_t srcSize = (size_t)-1) {}"
 
 # If the MACRO_EXPANSION and EXPAND_PREDEF_ONLY tags are set to YES then 
 # this tag can be used to specify a list of macro names that should be expanded. 
