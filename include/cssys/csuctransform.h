@@ -86,7 +86,7 @@ public:
     {
       FAIL(0);
     }
-    size_t chUsed = 0;
+    int chUsed = 0;
     
     utf8_char curCh;
     GET_NEXT(curCh);
@@ -168,7 +168,7 @@ public:
     {
       FAIL(0);
     }
-    size_t chUsed = 0;
+    int chUsed = 0;
     
     utf16_char curCh;
     GET_NEXT(curCh);
@@ -213,7 +213,7 @@ public:
     {
       FAIL(0);
     }
-    size_t chUsed = 0;
+    int chUsed = 0;
     
     GET_NEXT(ch);
     if (CS_UC_IS_INVALID(ch))
@@ -252,7 +252,8 @@ public:
   {
     if ((CS_UC_IS_INVALID(ch)) || (CS_UC_IS_SURROGATE(ch))) 
       return 0;
-    size_t bufRemaining = bufsize, encodedLen = 0;
+    size_t bufRemaining = bufsize;
+    int encodedLen = 0;
     
     if (ch < 0x80)
     {
@@ -305,7 +306,8 @@ public:
   {
     if ((CS_UC_IS_INVALID(ch)) || (CS_UC_IS_SURROGATE(ch))) 
       return 0;
-    size_t bufRemaining = bufsize, encodedLen = 0;
+    size_t bufRemaining = bufsize;
+    int encodedLen = 0;
     
     if (ch < 0x10000)
     {
@@ -331,7 +333,8 @@ public:
   {
     if ((CS_UC_IS_INVALID(ch)) || (CS_UC_IS_SURROGATE(ch))) 
       return 0;
-    size_t bufRemaining = bufsize, encodedLen = 0;
+    size_t bufRemaining = bufsize;
+    int encodedLen = 0;
     
     OUTPUT_CHAR(ch);
     
@@ -663,6 +666,135 @@ public:
   #error Odd-sized, unsupported wchar_t!
 #endif
 
+  /**\name Helpers to skip encoded chars in different UTF encodings
+   * @{ */
+   
+  /**
+   * Determine how many characters in an UTF-8 buffer need to be skipped to 
+   * get to the next encoded char.
+   * \param str Pointer to buffer with encoded character.
+   * \param maxSkip The number of characters to skip at max. Usually, this is
+   *  the number of chars from \a str to the end of the buffer.
+   * \return Number of chars to skip in the buffer. Returns 0 if \p maxSkip is
+   *  0.
+   */
+  inline static int UTF8Skip (const utf8_char* str, size_t maxSkip)
+  {
+    if (maxSkip < 1) return 0;
+  
+    if ((*str & 0x80) == 0)
+    {
+      return 1;
+    }
+    else
+    {
+      int n = 0;
+      while ((n < 7) && ((*str & (1 << (7 - n))) != 0)) { n++; }
+
+      if ((n < 2) || (n > 6))
+      {
+	return 1;
+      }
+
+      int skip = 1;
+      
+      for (; skip < n; skip++)
+      {
+	if (((str[skip] & 0xc0) != 0x80) || ((size_t)skip > maxSkip))
+	{
+	  break;
+	}
+      }
+      return skip;
+    }
+  }
+  
+  /**
+   * Determine how many characters in an UTF-8 buffer need to skipped back to
+   * get to the start of the previous encoded character.
+   * \param str Pointer to buffer with encoded character.
+   * \param maxRew The number of characters to go back at max. Typically, this 
+   *  is the number of chars from \a str to the start of the buffer.
+   * \return Number of chars to skip back in the buffer. Returns 0 if 
+   *  \p maxRew is 0.
+   */
+  inline static int UTF8Rewind (const utf8_char* str, size_t maxRew)
+  {
+    if (maxRew < 1) return 0;
+    
+    const utf8_char* pos = str - 1;
+    
+    if ((*pos & 0x80) == 0)
+    {
+      return 1;
+    }
+    
+    // Skip backward to the first byte of the sequence.
+    int skip = 1;
+    while (((*pos & 0xc0) == 0x80) && (skip < maxRew))
+    {
+      skip++;
+      pos--;
+    }
+    
+    return skip;
+  }
+  
+  /**
+   * Determine how many characters in an UTF-16 buffer need to be skipped to 
+   * get to the next encoded char.
+   * \copydoc UTF8Skip()
+   */
+  inline static int UTF16Skip (const utf16_char* str, size_t maxSkip)
+  {
+    if (CS_UC_IS_HIGH_SURROGATE (*str))
+      return (int)(MIN(maxSkip, 2));
+    else
+      return (int)(MIN(maxSkip, 1));
+  }
+  
+  /**
+   * Determine how many characters in an UTF-16 buffer need to skipped back to
+   * get to the start of the previous encoded character.
+   * \copydoc UTF8Rewind()
+   */
+  inline static int UTF16Rewind (const utf16_char* str, size_t maxRew)
+  {
+    if (maxRew < 1) return 0;
+    
+    const utf16_char* pos = str - 1;
+    if (!CS_UC_IS_SURROGATE(*pos)) 
+      return 1;
+    else
+    {
+      if ((maxRew > 1) && (CS_UC_IS_HIGH_SURROGATE(*(pos - 1))))
+        return 2;
+      else
+        return 1;
+    }
+  }
+  
+  /**
+   * Determine how many characters in an UTF-32 buffer need to be skipped to 
+   * get to the next encoded char.
+   * \copydoc UTF8Skip()
+   */
+  inline static int UTF32Skip (const utf32_char* str, size_t maxSkip)
+  {
+    return (int)(MIN(maxSkip, 1));
+  }
+
+  /**
+   * Determine how many characters in an UTF-32 buffer need to skipped back to
+   * get to the start of the previous encoded character.
+   * \copydoc UTF8Rewind()
+   */
+  inline static int UTF32Rewind (const utf32_char* str, size_t maxRew)
+  {
+    if (maxRew < 1) return 0;
+    return 1;
+  }
+   /** @} */
 };
 
 /** @} */

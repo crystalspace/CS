@@ -46,6 +46,18 @@ chronological order.
 	      less fragmented feel.
 	- Eric Sunshine brought vfs.txi in the user manual up to date.  Also
 	  added mention of new $@, $*, and $^ pseudo-variables.
+	- res made the following changes:
+	    - Added some functions to csUnicodeTransform helper class to 
+	      determine how many encoding characters a Unicode character from
+	      an encoded string occupies.
+	    - Fixed some cats from size_t to int in csUnicodeTransform.
+	    - Added a version of Insert() to csString that accepts a const 
+	      char*.
+	    - csReport(V) won't attempt to query a reporter from the registry
+	      if the supplied pointer to the object registry is 0. Instead,
+	      they print the error.
+	    - Small tweak to fontplex.cfg; now contains standard Arial as well,
+	      not just Arial Unicode.
 12-Oct-2003
 	- Eric Sunshine clarified documentation for csGetResourceDir(),
 	  iCommandLineParser::GetResourceDir(), and

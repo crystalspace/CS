@@ -171,6 +171,12 @@ public:
   csString& Insert (size_t Pos, const csString&);
 
   /**
+   * Insert another string into this one at position iPos.  Returns a reference
+   * to itself.
+   */
+  csString& Insert (size_t iPos, const char *);
+
+  /**
    * Insert a character into this string at position Pos.  Returns a reference
    * to itself.
    */

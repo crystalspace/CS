@@ -140,6 +140,22 @@ csString &csString::Insert (size_t iPos, const char iChar)
   return Insert(iPos, s);
 }
 
+csString &csString::Insert (size_t iPos, const char* str)
+{
+  CS_ASSERT(iPos <= Size);
+
+  if (Data == 0 || iPos == Size)
+    return Append (str);
+
+  size_t const sl = strlen (str);
+  size_t const NewSize = sl + Size;
+  ExpandIfNeeded (NewSize);
+  memmove (Data + iPos + sl, Data + iPos, Size - iPos + 1); // Also move null.
+  memcpy (Data + iPos, str, sl);
+  Size = NewSize;
+  return *this;
+}
+
 csString &csString::Overwrite (size_t iPos, const csString &iStr)
 {
   CS_ASSERT (iPos <= Size);
