@@ -26,8 +26,9 @@
 class csVFS;
 class csStrVector;
 
-typedef bool (csIniWriteFunc)( csSome Stream, void *data, unsigned int iniWriteType, size_t len);
-	
+typedef bool (csIniWriteFunc) (csSome Stream, const void *data,
+  unsigned int iniWriteType, size_t len);
+
 class csIniFile : public csBase
 {
 private:
@@ -271,14 +272,14 @@ private:
   bool Load (bool (*ReadLine) (csSome Stream, void *data, size_t size),
     csSome Stream);
   /// Save a comment
-  void SaveComment (const char* Text, csIniWriteFunc writeFunc, csSome Stream ) const;
+  void SaveComment (const char* Text, csIniWriteFunc writeFunc, csSome Stream) const;
   /// Save comments for a section or key
-  void SaveComments (const PrvINIbranch*, csIniWriteFunc writeFunc, csSome Stream ) const;
+  void SaveComments (const PrvINIbranch*, csIniWriteFunc writeFunc, csSome Stream) const;
   /// Save all the keys within a section
   void SaveData (const char* Name, csSome Data, size_t DataSize,
-    const PrvINIbranch* comments, csIniWriteFunc writeFunc, csSome Stream ) const;
+    const PrvINIbranch* comments, csIniWriteFunc writeFunc, csSome Stream) const;
   /// Save all the data in a section
-  void SaveSection (const PrvINInode*, csIniWriteFunc writeFunc, csSome Stream ) const;
+  void SaveSection (const PrvINInode*, csIniWriteFunc writeFunc, csSome Stream) const;
 };
 
 #endif // __CS_INIFILE_H__

@@ -461,37 +461,20 @@ out:
 
 //--------------------------------------------------------- csIniFile::Save ---
 
-static bool WriteiFileLine (csSome Stream, void *data, unsigned int iniWriteType, size_t len )
+static bool WriteiFileLine (csSome Stream, const void *data,
+  unsigned int iniWriteType, size_t len)
 {
-  size_t len_in;
-  if ( iniWriteType == CS_INI_WRITETYPE_CHAR )
-     len_in = 1;
-  else
-     len_in = ( len > 0 ? len : strlen ((const char*)data));
-  size_t len_out = ((iFile*)Stream)->Write ((const char *)data, len_in);
-  return ( len_in == len_out );
+  size_t len_in = (iniWriteType == CS_INI_WRITETYPE_CHAR) ? 1 :
+    (iniWriteType == CS_INI_WRITETYPE_STR) ? strlen ((const char*)data) : len;
+  return (len_in == ((iFile *)Stream)->Write ((const char *)data, len_in));
 }
 
-static bool WriteFileLine (csSome Stream, void *data, unsigned int iniWriteType, size_t len )
+static bool WriteFileLine (csSome Stream, const void *data,
+  unsigned int iniWriteType, size_t len)
 {
-  size_t len_in;
-  size_t len_out;
-  if ( iniWriteType == CS_INI_WRITETYPE_CHAR )
-  {
-     len_in = 1;
-     len_out = putc((int)(*(char *)data), (FILE*)Stream);
-  }
-  else if ( iniWriteType == CS_INI_WRITETYPE_STR )
-  {
-     len_in = ( len > 0 ? len : strlen ((const char*)data) );
-     len_out = fputs((const char *)data, (FILE*)Stream);
-  }
-  else if ( iniWriteType == CS_INI_WRITETYPE_RAW )
-  {
-     len_in = len;
-     len_out = fwrite(data, 1, len_in, (FILE*)Stream);
-  }
-  return ( len_in == len_out );
+  size_t len_in = (iniWriteType == CS_INI_WRITETYPE_CHAR) ? 1 :
+    (iniWriteType == CS_INI_WRITETYPE_STR) ? strlen ((const char*)data) : len;
+  return (len_in == fwrite (data, 1, len_in, (FILE *)Stream));
 }
 
 void csIniFile::SaveComment (const char* Text, csIniWriteFunc writeFunc, csSome Stream ) const
@@ -504,7 +487,8 @@ void csIniFile::SaveComment (const char* Text, csIniWriteFunc writeFunc, csSome 
   writeFunc (Stream, "\n", CS_INI_WRITETYPE_STR, 0);
 }
 
-void csIniFile::SaveComments (const PrvINIbranch* branch, csIniWriteFunc writeFunc, csSome Stream) const
+void csIniFile::SaveComments (const PrvINIbranch* branch,
+  csIniWriteFunc writeFunc, csSome Stream) const
 {
   CommentIterator iterator (*this, branch, "", "");
   while (iterator.NextItem())
@@ -512,10 +496,10 @@ void csIniFile::SaveComments (const PrvINIbranch* branch, csIniWriteFunc writeFu
 }
 
 void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
-    const PrvINIbranch* comments, csIniWriteFunc writeFunc, csSome Stream ) const
+  const PrvINIbranch* comments, csIniWriteFunc writeFunc, csSome Stream) const
 {
   const char* data = (const char*)Data;
-  SaveComments (comments, writeFunc, Stream );
+  SaveComments (comments, writeFunc, Stream);
   writeFunc (Stream, (void *)Name, CS_INI_WRITETYPE_STR, 0);
   writeFunc (Stream, " = ", CS_INI_WRITETYPE_STR, 0);
   if (Data && DataSize)
@@ -523,7 +507,7 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
     size_t i;
     bool binary = false;
 
-    if ((data[0] <= ' ') || (data[DataSize - 1] <= ' '))
+    if ((data [0] <= ' ') || (data [DataSize - 1] <= ' '))
       binary = true;
     else
       for (i = 0; i < DataSize; i++)
@@ -537,7 +521,7 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
           break;
         }
     if (!binary)
-      writeFunc (Stream, Data, CS_INI_WRITETYPE_STR, DataSize);
+      writeFunc (Stream, Data, CS_INI_WRITETYPE_RAW, DataSize);
     else                         // Save in Base64 mode
     {
       char tmp[CS_B64INILINELEN];
@@ -558,7 +542,7 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
         {
           if (top >= CS_B64INILINELEN)
           {
-            writeFunc (Stream, "\n", CS_INI_WRITETYPE_STR, 0);
+            writeFunc (Stream, "\n", CS_INI_WRITETYPE_CHAR, 0);
             writeFunc (Stream, tmp, CS_INI_WRITETYPE_RAW, top);
             memset (tmp, 0, sizeof (tmp));
             top = 0;
@@ -583,24 +567,25 @@ void csIniFile::SaveData (const char* Name, csSome Data, size_t DataSize,
           tmp[top++] = INIbase64[acc];
           total++;
         }
-        writeFunc (Stream, "\n", CS_INI_WRITETYPE_STR, 0);
+        writeFunc (Stream, "\n", CS_INI_WRITETYPE_CHAR, 0);
         writeFunc (Stream, tmp, CS_INI_WRITETYPE_RAW, top);
-        writeFunc (Stream, "===", CS_INI_WRITETYPE_STR, tail[total & 3]);
+        writeFunc (Stream, "===", CS_INI_WRITETYPE_RAW, tail[total & 3]);
       }
-      writeFunc (Stream, "\n", CS_INI_WRITETYPE_STR, 0);
+      writeFunc (Stream, "\n", CS_INI_WRITETYPE_CHAR, 0);
       writeFunc (Stream, endofbin, CS_INI_WRITETYPE_STR, 0);
       writeFunc (Stream, (void *)Name, CS_INI_WRITETYPE_STR, 0);
     } // else if Save in Base64 mode
   }
-  writeFunc (Stream, "\n", CS_INI_WRITETYPE_STR, 0);
+  writeFunc (Stream, "\n", CS_INI_WRITETYPE_CHAR, 0);
 }
 
-void csIniFile::SaveSection (const PrvINInode* node, csIniWriteFunc writeFunc, csSome Stream ) const
+void csIniFile::SaveSection (const PrvINInode* node, csIniWriteFunc writeFunc,
+  csSome Stream) const
 {
   SaveComments (node->Comments, writeFunc, Stream);
-  writeFunc (Stream, "[", CS_INI_WRITETYPE_STR, 0);
+  writeFunc (Stream, "[", CS_INI_WRITETYPE_CHAR, 0);
   writeFunc (Stream, node->Section.Name, CS_INI_WRITETYPE_STR, 0);
-  writeFunc (Stream, "]\n", CS_INI_WRITETYPE_STR, 0);
+  writeFunc (Stream, "]\n", CS_INI_WRITETYPE_RAW, 2);
 
   DataIterator iterator (*this, node->Section.Vector, node->Section.Name);
   while (iterator.NextItem())
