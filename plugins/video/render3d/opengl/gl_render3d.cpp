@@ -681,7 +681,7 @@ bool csGLRender3D::Open ()
     //no special ati extensions atm
   }
   // check for support of VBO
-  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object && false;
+  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
 
   shadermgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
   if( !shadermgr )
@@ -1094,7 +1094,9 @@ void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
     if (ext->glDisableVertexAttribArrayARB) 
     {
       ext->glDisableVertexAttribArrayARB (attrib);
-      ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+      if (use_hw_render_buffers)
+        ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
+
       ext->glVertexAttribPointerARB(attrib, 1, GL_FLOAT, true, 0, 0);
     } else
     {
@@ -1117,6 +1119,7 @@ void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
       }
     }
     vertattrib[attrib]->Release ();
+    vertattrib[attrib] = 0;
     vertattribenabled[attrib] = false;
   }
 }

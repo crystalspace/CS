@@ -278,6 +278,11 @@ int csRenderMeshList::SortRPCompare (csRMLitem* a, csRMLitem* b, int order)
 
 void csRenderMeshList::CheckVisibility (csRMLitem* item)
 {
+  if (item->visobj->GetVisibilityNumber () != currentVisNr)
+  {
+    item->mwi->potvis = false;
+    return;
+  }
   if ((item->mwi->lastFrame != currentFrame) || 
     (item->mwi->lastView != currentView))
   {
@@ -1128,9 +1133,10 @@ void csSector::Draw (iRenderView *rview)
    * draw it clipped (in 3D) to the portal polygon. This is currently not
    * done.
    */
+#ifndef CS_USE_NEW_RENDERER
+
   if (meshes.GetCount () > 0)
   {
-#ifndef CS_USE_NEW_RENDERER
     // Mark visible objects.
     culler->VisTest (rview);
     uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
@@ -1176,104 +1182,9 @@ void csSector::Draw (iRenderView *rview)
     }
 
     delete[] objects;
-#else
 
-    /*
-     * Culling in the new renderer
-     * - Lights are culled using their radius against the screen.
-     *   Normally the intensity at radius is 1/(256, 512 or 1024) and can
-     *   be said to be invisible.
-     *
-     * - DrawZ pass only draw objects on screen
-     * - DrawShadow is the most complicated in terms of culling. First it
-     *   uses a bounding-sphere calculation against the light influence 
-     *   radius. Thereafter it checks wheter the light is in front of or 
-     *   behind the camera-plane. Depending on that we can do two things
-     *    1. In front of - don't cull any meshes based on that.
-     *    2. Behind. Go through all meshes in the boundingsphere and test
-     *       if they are behind or infront of the light. If they are behind
-     *       don't draw shadow, otherwise draw it.
-     *   At last we go through and check if we should use Carmacks Reversed
-     *   for objects which we are in the shadow of.
-     * - DrawLight uses the objectlist created by DrawZ and does an additional
-     *   check to see that object is in influenceradius of a light.
-     */
-
-
-    csLightList alllights;
-    csRef<iSectorList> secs = csEngine::current_engine->GetSectors ();
-
-    int i;
-    const csOrthoTransform camTransO = rview->GetCamera()->GetTransform();
-    for (i = secs->GetCount () - 1; i >= 0; i --)
-    {
-      csRef<iLightList> seclights = secs->Get(i)->GetLights ();
-      int j;
-      for (j = seclights->GetCount() - 1; j >= 0; j --)
-      {
-        // Sphere check against rview before adding it.
-	    iLight* light = seclights->Get (j);
-        csSphere s = csSphere (light->GetCenter (), 
-                               light->GetInfluenceRadius ());
-        if (rview->TestBSphere (camTransO, s))
-	    {
-	      alllights.Add (light);
-	    }
-      }
-    }
-
-    PrepareDraw (rview);
-
-    
-    // Mark visible objects.
-    culler->VisTest (rview);
-    uint32 current_visnr = culler->GetCurrentVisibilityNumber ();
-
-    objects = RenderQueues.SortAll (rview, num_objects, current_visnr);
-
-    r3d->EnableZOffset ();
-    DrawZ (rview);
-    r3d->DisableZOffset ();
-
-    csReversibleTransform camTransR = 
-      rview->GetCamera()->GetTransform();
-    for (i = alllights.GetCount () - 1; i >= 0; i--) 
-    //for (i = 0; i < alllights.GetCount (); i++) 
-    {
-      iLight* light = alllights.Get (i);
-      r3d->SetObjectToCamera (&camTransR);
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
-  	    light->GetCenter());
-      r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
-  	    light->GetAttenuationVector());
-
-	  /*
-      r3d->SetWriteMask (false, false, false, false);
-      r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
-      DrawShadow (rview, light);
-      r3d->SetWriteMask (true, true, true, true);
-      r3d->SetShadowState (CS_SHADOW_VOLUME_USE);
-	  */
-
-      DrawLight (rview, light);
-
-      // r3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
-    }
-
-	/*
-    for (i = alllights.GetCount () - 1; i >= 0; i--) 
-    {
-      DrawLight (rview, alllights.Get(i), true);
-    }
-	*/
-
-    
-    delete[] objects;
-    draw_busy --;
-#endif
   }
 
-#ifndef CS_USE_NEW_RENDERER
   // queue all halos in this sector to be drawn.
   for (i = lights.GetCount () - 1; i >= 0; i--)
     // Tell the engine to try to add this light into the halo queue
@@ -1317,264 +1228,12 @@ void csSector::Draw (iRenderView *rview)
 #endif // CS_USE_NEW_RENDERER
 }
 
+
 #ifdef CS_USE_NEW_RENDERER
-int qsort_meshobjs_callback (const void *b1, const void *b2)
-{
-  const csRenderMesh *r1 = (const csRenderMesh *)b1;
-  const csRenderMesh *r2 = (const csRenderMesh *)b2;
-  if (r1->material == r2->material || r1->buffersource == r2->buffersource)
-    return 0;
-  return r2 - r1;
-}
-void csSector::DrawZ (iRenderView* rview)
-{
-  int i;
-
-  // get a pointer to the previous sector
-  iSector *prev_sector = rview->GetPreviousSector ();
-
-  // look if meshes from the previous sector should be drawn
-  bool draw_prev_sector = false;
-
-  if (prev_sector)
-  {
-    iPolygon3DStatic* st = rview->GetPortalPolygon ()->GetStaticData ();
-      draw_prev_sector =  st->IsTransparent () ||
-        st->GetPortal ()->GetFlags ().Check (CS_PORTAL_WARP);
-  }
-
-  draw_objects.SetLength(0);
-  for (i = 0; i < num_objects; i ++)
-  {
-    iMeshWrapper *sp = objects[i];
-    if (
-          !prev_sector ||
-          sp->GetMovable ()->GetSectors ()->Find (prev_sector) == -1 ||
-          draw_prev_sector)
-    {
-      // Mesh is not in the previous sector or there is no previous
-      // sector.
-      int n;
-      csRenderMesh** r = sp->GetRenderMeshes (n);
-      while (n-- > 0)
-      {
-        if (r[n]) 
-	{ 
-	  draw_objects.Push (r[n]); 
-	}
-      }
-    }
-  }
-  qsort (draw_objects.GetArray(), draw_objects.Length(), sizeof (csRenderMesh*),
-    qsort_meshobjs_callback);
-
-  // TODO: Sort draw_objects here based on Shader
-
-  for (i = 0; i < draw_objects.Length(); i ++) 
-  {
-/*	iMaterialHandle *matsave;
-    matsave = draw_objects[i]->mathandle;
-    draw_objects[i]->mathandle = 0;
-    uint mixsave = draw_objects[i]->mixmode;
-	draw_objects[i]->mixmode = CS_FX_COPY;
-    r3d->DrawMesh (draw_objects[i]);
-    draw_objects[i]->mathandle = matsave;
-	draw_objects[i]->mixmode = mixsave;*/
-  }
-}
-
-void csSector::DrawShadow (iRenderView* rview, iLight* light)
-{
-#if 0
-  int number = 0;
-  //test if light is in front of or behind camera
-  bool lightBehindCamera = false;
-  csReversibleTransform ct = rview->GetCamera ()->GetTransform ();
-  const csVector3 camPlaneZ = ct.GetT2O().Col3 ();
-  const csVector3 camPos = ct.GetOrigin ();
-  const csVector3 lightPos = light->GetCenter ();
-  csVector3 v = lightPos - camPos;
-  
-  if (camPlaneZ * v <= 0)
-    lightBehindCamera = true;
-
-  // mark those objects where we are in the shadow-volume
-  // construct five planes, top, bottom, right, left and camera
-  float top, bottom, left, right;
-  rview->GetFrustum (left, right, bottom, top);
-  
-  //construct the vectors for middlepoint of each side of the camera
-  csVector3 midbottom = ct.This2Other (csVector3 (0,bottom,0));
-  csVector3 midtop = ct.This2Other (csVector3 (0,top,0));
-  csVector3 midleft = ct.This2Other (csVector3 (left,0,0));
-  csVector3 midright = ct.This2Other (csVector3 (right,0,0));
-
-  //get camera x-vector
-  csVector3 cameraXVec = ct.This2Other (csVector3 (1,0,0));
-  csVector3 cameraYVec = ct.This2Other (csVector3 (0,1,0));
-
-  csPlane3* planes = new csPlane3[5];
-  planes[0] = csPlane3(midbottom, lightPos, midbottom + cameraXVec);
-  planes[1] = csPlane3(midtop, lightPos, midtop - cameraXVec);
-  planes[2] = csPlane3(midleft, lightPos, midleft + cameraYVec);
-  planes[3] = csPlane3(midright, lightPos, midright - cameraYVec);
-  
-  if (lightBehindCamera)
-  {
-    planes[4] = csPlane3(camPos,cameraYVec, cameraXVec );
-    //planes[5] = csPlane3(lightPos,cameraYVec, cameraXVec );
-  }
-  else
-  {
-    planes[4] = csPlane3(camPos,cameraXVec, cameraYVec );
-    //planes[5] = csPlane3(lightPos,cameraXVec, cameraYVec );
-  }
-
-  csRef<iVisibilityObjectIterator> objInShadow = culler->VisTest (planes, 5);
-
-  while (objInShadow->HasNext() )
-  {
-    iMeshWrapper *sp = objInShadow->Next() ->GetMeshWrapper ();
-    sp->GetMeshObject ()->EnableShadowCaps ();
-    number++;
-  }
-
-  //printf ("# ZFAIL %d\n", number++);
-
-  //cull against the boundingsphere of the light
-  //csSphere lightSphere (csVector3(0,0,0), 10000);
-  csSphere lightSphere (lightPos, light->GetInfluenceRadius ());
-  csRef<iVisibilityObjectIterator> objInLight = culler->VisTest (lightSphere);
-  
-  csVector3 rad, center;
-  float maxRadius = 0;
-  while (objInLight->HasNext ())
-  {
-    number++;
-    iMeshWrapper *sp = objInLight->Next() ->GetMeshWrapper ();
-    if (sp) 
-    {
-      sp->GetRadius (rad, center);
-      
-      csVector3 pos = sp->GetMovable() ->GetTransform ().This2Other (center); //transform it
-      csVector3 radWorld = sp->GetMovable ()->GetTransform ().This2Other (rad);
-      maxRadius = MAX(radWorld.x, MAX(radWorld.y, radWorld.z));
-
-      if (!lightBehindCamera) {
-        // light is in front of camera
-        //test if mesh is behind camera
-        v = pos - camPos;
-        if (!(camPlaneZ*v < -maxRadius))
-        {
-          sp->DrawShadow (rview, light); //mesh is also infront of camera, draw the shadow
-        }
-      }
-      else {
-        // light is behind camera
-        // if mesh is behind the light we don't draw it
-        v = pos - lightPos;
-        if (!(camPlaneZ*v < -maxRadius))
-        {
-          sp->DrawShadow (rview, light); //mesh is infront of the light, draw the shadow
-        }
-      } 
-    }
-  }
-
-  //disable the reverses
-  objInShadow->Reset ();
-  while (objInShadow->HasNext() )
-  {
-    iMeshWrapper *sp = objInShadow->Next() ->GetMeshWrapper ();
-    sp->GetMeshObject ()->DisableShadowCaps ();
-  }  
-  //printf ("%x - %d\n",(int)light, number);
-#endif
-}
-
-void csSector::DrawLight (iRenderView* rview, iLight* light, bool drawAfter)
-{
-  int i;
-  /*
-  for (i = 0; i < num_objects; i ++) {
-    iMeshWrapper *sp = objects[i];
-    if (sp)
-    {
-      if (sp->GetDrawAfterShadow () == drawAfter)
-        sp->DrawLight (rview, light);
-    }
-  }
-  */
-
-  csHashMap shader_sort;
-  for (i = 0; i < draw_objects.Length(); i ++) {
-//    shader_sort.Put ((csHashKey)draw_objects[i]->mathandle->GetShader(), (csHashObject)draw_objects[i]);
-  }
-
-  csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (csEngine::object_reg, iBugPlug);
-
-  if (bugplug)
-    bugplug->ResetCounter ("Activates");
-  const csRefArray<iShaderWrapper> &shader_list = shmgr->GetShaders ();
-  for (i = 0; i < shader_list.Length(); i ++) {
-	if (shader_sort.Get ((csHashKey)((iShaderWrapper*)shader_list[i])) == 0) { continue; }
-    iShaderTechnique *tech = 0;// to have it compile // shader_list[i]->GetBestTechnique ();
-
-    for (int p=0; p<tech->GetPassCount (); p++)
-    {
-      iShaderPass *pass = tech->GetPass (p);
-      pass->Activate (0);
-      csHashIterator iter (&shader_sort, (csHashKey)((iShaderWrapper*)shader_list[i]));
-      while (iter.HasNext ()) {
-        csRenderMesh *mesh = (csRenderMesh *)iter.Next();
-        // if (mesh->mathandle->GetShader() != shader_list[i]) { continue; }
-        pass->SetupState (mesh);
-        if (bugplug)
-          bugplug->AddCounter ("Activates", 1);
-
-        float diffuse, specular, ambient;
-        csRGBpixel matcolor;
-        csVector3 color (light->GetColor().red, light->GetColor().blue, light->GetColor().green);
-//        mesh->mathandle->GetReflection (diffuse, specular, ambient);
-//        mesh->mathandle->GetFlatColor (matcolor);
-        // color.x *= matcolor.red/255.0;
-        // color.y *= matcolor.blue/255.0;
-        // color.z *= matcolor.green/255.0;
-        //r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE, color * diffuse);
-        //r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR, color * specular);
-        csZBufMode zsave = mesh->z_buf_mode;
-        uint mixsave = mesh->mixmode;
-        
-        uint mixmode = pass->GetMixmodeOverride ();
-        if (mixmode != 0)
-          mesh->mixmode = mixmode;
-        
-        mesh->z_buf_mode = CS_ZBUF_TEST;
-        r3d->DrawMesh (mesh);
-        mesh->z_buf_mode = zsave;
-        mesh->mixmode = mixsave;
-
-        pass->ResetState ();
-      }
-      pass->Deactivate ();
-    }
-  }
-// printf ("Good DrawMesh %.9lf\n", end-start);
-  //delete [] objects;
-   
-  // queue all halos in this sector to be drawn.
-  for (i = lights.GetCount () - 1; i >= 0; i--)
-    // Tell the engine to try to add this light into the halo queue
-    csEngine::current_engine->AddHalo (lights.Get (i)->GetPrivateObject ());
-
-
-}
-
 iSectorRenderMeshList* csSector::GetRenderMeshes ()
 {
   return &rmeshes;
 }
-
 #endif // CS_USE_NEW_RENDERER
 
 void csSector::CheckFrustum (iFrustumView *lview)

@@ -58,7 +58,13 @@ public:
 
   csRenderMesh () 
   {
+    z_buf_mode = CS_ZBUF_NONE;
     mixmode = CS_FX_COPY;
+    clip_portal = 0;
+    clip_plane = 0;
+    clip_z_plane = 0;
+    do_mirror = false;
+    indexstart = indexend = 0;
   }
 
   virtual ~csRenderMesh () {}

@@ -417,13 +417,6 @@ public:
    */
   void Draw (iRenderView* rview);
 #ifdef CS_USE_NEW_RENDERER
-  /// First pass of the Draw
-  void DrawZ (iRenderView* rview);
-  /// Second pass
-  void DrawShadow (iRenderView* rview, iLight *light);
-  /// Third pass
-  void DrawLight (iRenderView* rview, iLight *light, bool drawAfter = false);
-
   virtual iSectorRenderMeshList* GetRenderMeshes ();
 #endif
 
@@ -637,12 +630,6 @@ public:
     virtual void Draw (iRenderView* rview)
       { scfParent->Draw (rview); }
 #ifdef CS_USE_NEW_RENDERER
-    virtual void DrawZ (iRenderView* rview)
-      { scfParent->DrawZ (rview); }
-    virtual void DrawShadow (iRenderView* rview, iLight* light)
-      { scfParent->DrawShadow (rview, light); }
-    virtual void DrawLight (iRenderView* rview, iLight* light)
-      { scfParent->DrawLight (rview, light); }
     virtual void PrepareDraw (iRenderView* rview)
     { scfParent->PrepareDraw (rview); }
     virtual iSectorRenderMeshList* GetRenderMeshes ()
