@@ -99,6 +99,9 @@ $(OUT.AWS)/skinpars$O: $(AWS.DERIVED.DIR)/skinpars.cpp
 $(OUT.AWS)/skinlex$O: $(AWS.DERIVED.DIR)/skinlex.cpp
 	$(DO.COMPILE.CPP) -Wno-unused $(CFLAGS.I)$(SRCDIR)/$(DIR.AWS)
 
+$(OUT.AWS)/%$O: $(SRCDIR)/$(DIR.AWS)/%.cpp
+	$(DO.COMPILE.CPP)
+
 $(AWS): $(OBJ.AWS) $(LIB.AWS)
 	$(DO.PLUGIN)
 
