@@ -26,8 +26,10 @@ typedef void *csLibraryHandle;
  * Load a shared library and return:
  * - a library handle (used to unload the library)
  * - a pointer to an array of scfClassInfo structures
+ * The installpath points to the CS install dir.
  */
-extern csLibraryHandle csLoadLibrary (const char* iName);
+extern csLibraryHandle csLoadLibrary (
+  const char *installpath, const char* iName);
 /// Return a pointer to a symbol within given shared library
 extern void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName);
 /// Unload a shared library given its handle

@@ -353,8 +353,10 @@ csSystemDriver::~csSystemDriver ()
 bool csSystemDriver::Initialize (int argc, const char* const argv[], const char *iConfigName)
 {
   // Initialize Shared Class Facility
-  csIniFile scfconfig ("scf.cfg");
+  char *scfconfigpath = InferInstallLocationOf("scf.cfg");
+  csIniFile scfconfig (scfconfigpath);
   scfInitialize (&scfconfig);
+  free(scfconfigpath);
 
   // @@@ This is ugly.  We need a better, more generalized way of doing this.
   // Hard-coding the name of the VFS plugin (crytalspace.kernel.vfs) is bad.
@@ -947,6 +949,26 @@ void csSystemDriver::Printf (int mode, const char *format, ...)
       break;
   } /* endswitch */
 }
+
+
+char * csSystemDriver::InferInstallLocationOf(char *filename)
+{
+  char *installdir = 0;
+  installdir = getenv("CRYSTAL");
+  if(installdir == 0)
+    installdir = ""; // default to 'current' dir, in this general case.
+  // For a system specific version you could look for scf.cfg, vfs.cfg or
+  // install.log in a directory, to see is you want to default to "." or
+  // to some other predefined value (e.g. /usr/local/crystal);
+
+  // concat strings.
+  char buf[256];
+  if(strlen(installdir) + strlen(filename) > 250)
+    return strdup(filename);
+  sprintf(buf, "%s%s", installdir, filename);
+  return strdup(buf);
+}
+
 
 iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)

@@ -235,7 +235,7 @@ public:
   // Remove a real-world path
   bool RemoveRPath (const char *RealPath);
   // Get value of a variable
-  static const char *GetValue (const csIniFile *Config, const char *VarName);
+  const char *GetValue (const csIniFile *Config, const char *VarName);
   // Find all files in a subpath
   void FindFiles (const char *Suffix, const char *Mask, iStrVector *FileList);
   // Find a file and return the appropiate csFile object
@@ -732,6 +732,9 @@ const char *VfsNode::GetValue (const csIniFile *Config, const char *VarName)
   if (value)
     return value;
 
+  if(strcmp(VarName, "@") == 0)
+    return System->InferInstallLocationOf(""); /// @@@ small memory leak.
+
   // Now look in "VFS.Solaris" section, for example
   value = Config->GetStr ("VFS." OS_VERSION, VarName, NULL);
   if (value)
@@ -1096,9 +1099,12 @@ csVFS::~csVFS ()
 bool csVFS::Initialize (iSystem *iSys)
 {
   (System = iSys)->IncRef ();
-  csIniFile *vfsconfig =
-    new csIniFile (System->ConfigGetStr ("VFS.Options", "Config", "vfs.cfg"));
-  return ReadConfig (vfsconfig);
+  char *vfsconfigpath = iSys->InferInstallLocationOf("vfs.cfg");
+  csIniFile *vfsconfig = new csIniFile (System->ConfigGetStr ("VFS.Options", 
+    "Config", vfsconfigpath));
+  bool retval = ReadConfig (vfsconfig);
+  free(vfsconfigpath);
+  return retval;
 }
 
 bool csVFS::ReadConfig (csIniFile *Config)

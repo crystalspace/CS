@@ -26,6 +26,7 @@
 #include "csutil/csvector.h"
 #include "csutil/csobjvec.h"
 #include "csutil/inifile.h"
+#include "cssys/system.h"
 #include "debug/memory.h"
 
 #ifndef CS_STATIC_LINKED
@@ -93,7 +94,9 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
 
   RefCount = 0;
   ClassTable = NULL;
-  LibraryHandle = csLoadLibrary (LibraryName = iLibraryName);
+  char *installpath = System->InferInstallLocationOf("");
+  LibraryHandle = csLoadLibrary (installpath, LibraryName = iLibraryName);
+  free(installpath);
   if (!LibraryHandle)
     return;
 

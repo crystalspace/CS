@@ -34,6 +34,7 @@ SRC.CSENGINE = $(wildcard libs/csengine/*.cpp libs/csengine/*/*.cpp)
 OBJ.CSENGINE = $(addprefix $(OUT),$(notdir $(SRC.CSENGINE:.cpp=$O)))
 CFLAGS.CSENGINE = -Ilibs/csterr
 
+TO_INSTALL.ROOT += vfs.cfg scf.cfg
 TO_INSTALL.CONFIG += 
 TO_INSTALL.DATA += data/standard.zip 
 TO_INSTALL.DYNAMIC_LIBS +=
