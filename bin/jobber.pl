@@ -432,7 +432,7 @@ sub cvs_remove {
     my $files = shift;
     return unless @{$files};
     my $paths = prepare_pathnames(@{$files});
-    print "Inovking CVS remove: ${\scalar(@{$files})} paths\n";
+    print "Invoking CVS remove: ${\scalar(@{$files})} paths\n";
     run_command("cvs -Q remove $paths") unless $TESTING;
 }
 
@@ -464,7 +464,7 @@ sub cvs_add {
     return unless @{$files};
     my $paths = prepare_pathnames(@{$files});
     $flags = '' unless defined($flags);
-    print "Inovking CVS add: ${\scalar(@{$files})} paths" .
+    print "Invoking CVS add: ${\scalar(@{$files})} paths" .
 	($flags ? " [$flags]" : '') . "\n";
     run_command("cvs -Q add $flags $paths") unless $TESTING;
 }
