@@ -35,6 +35,10 @@ chronological order.
 	  failed when regions are used because the textures that are internally
 	  created will not be part of that region and when region->Prepare()
 	  is called those textures will not be prepared.
+	- Jorrit fixed a bug in the thing mesh. When it warned about oversized
+	  lightmaps it would still allocate the lightmap memory. For some
+	  huge oversized objects this could cause a blowup of memory usage.
+	  Now lighting is disabled for such polygons.
 26-Jul-2004
 	- Eric Sunshine made the following changes:
 	    - Added 'install' targets to csjava/Jamfile.
