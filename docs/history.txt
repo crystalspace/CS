@@ -28,6 +28,9 @@ The history order is reversed so that new features are at the top.
 	  bumptest.cpp where the type iTextureWrapper was unknown.
 	- Eric Sunshine fixed several compilation errors recently introduced
 	  into demosky.cpp where iGraphics2D was unknown.
+	- Eric Sunshine added CSUTIL to the DEP.NEXT2D dependency list in
+	  next2d.mak so that the `next2d' plugin can be loaded by scfreg.
+	  Without this dependency, the csConfigAccess class was unresolved.
 23-May-2001
 	- Added 'virtual' before the csView destructor and also fixed a
 	  warning in the csView constructor.
