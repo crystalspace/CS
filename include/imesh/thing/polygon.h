@@ -21,6 +21,8 @@
 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
+#include "csgeom/vector3.h"
+#include "csgeom/matrix3.h"
 #include "csutil/flags.h"
 
 struct iMaterialHandle;
@@ -296,6 +298,11 @@ struct iPolygon3D : public iBase
  */
 struct csLightMapMapping
 {
+  /// Transformation from object to texture space.
+  csMatrix3 m_obj2tex;
+  /// Translation from object to texture space.
+  csVector3 v_obj2tex;
+
   float fdu, fdv;
 
   /**

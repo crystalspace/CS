@@ -20,12 +20,12 @@
 #include "polygon.h"
 #include "pol2d.h"
 #include "polytext.h"
-#include "polytmap.h"
 #include "lghtmap.h"
 #include "portal.h"
 #include "lppool.h"
 #include "thing.h"
 #include "csgeom/frustum.h"
+#include "csgeom/textrans.h"
 #include "csutil/garray.h"
 #include "csutil/debug.h"
 #include "csutil/memfile.h"
@@ -77,6 +77,44 @@ csPolyTexLightMap::~csPolyTexLightMap ()
 csPolyTexture *csPolyTexLightMap::GetPolyTex ()
 {
   return tex;
+}
+
+void csPolyTexLightMap::WorldToCamera (
+  const csReversibleTransform &t,
+  csMatrix3 &m_cam2tex,
+  csVector3 &v_cam2tex)
+{
+  // Create the matrix to transform camera space to texture space.
+  // From: T = Mwt * (W - Vwt)
+  //       C = Mwc * (W - Vwc)
+  // To:   T = Mct * (C - Vct)
+  // Mcw * C + Vwc = W
+  // T = Mwt * (Mcw * C + Mcw * Mwc * (Vwc - Vwt))
+  // T = Mwt * Mcw * (C - Mwc * (Vwt-Vwc))
+  // ===>
+  // Mct = Mwt * Mcw
+  // Vct = Mwc * (Vwt - Vwc)
+  m_cam2tex = m_world2tex;
+  m_cam2tex *= t.GetT2O ();
+
+  v_cam2tex = t.Other2This (v_world2tex);
+}
+
+void csPolyTexLightMap::ObjectToWorld (const csMatrix3& m_obj2tex,
+	const csVector3& v_obj2tex, const csReversibleTransform &obj)
+{
+  // From: T = Mot * (O - Vot)
+  //       W = Mow * O - Vow
+  // To:   T = Mwt * (W - Vwt)
+  // Mwo * (W + Vow) = O
+  // T = Mot * (Mwo * (W + Vow) - (Mwo * Mow) * Vot)
+  // T = Mot * Mwo * (W + Vow - Mow * Vot)
+  // ===>
+  // Mwt = Mot * Mwo
+  // Vwt = Mow * Vot - Vow
+  m_world2tex = m_obj2tex;
+  m_world2tex *= obj.GetO2T ();
+  v_world2tex = obj.This2Other (v_obj2tex);
 }
 
 //---------------------------------------------------------------------------
@@ -161,15 +199,13 @@ void csPolygon3D::CreateBoundingTextureBox ()
   float max_u = -1000000000.;
   float max_v = -1000000000.;
 
-  csPolyTxtPlane& txt_pl = txt_info->GetTxtPlane ();
-
   int i;
   csVector3 v1, v2;
   for (i = 0; i < GetVertices ().GetVertexCount (); i++)
   {
     v1 = Vobj (i);           	      // Coordinates of vertex in object space.
-    v1 -= txt_pl.v_obj2tex;
-    v2 = (txt_pl.m_obj2tex) * v1;     // Coordinates of vertex in texture space.
+    v1 -= mapping->v_obj2tex;
+    v2 = (mapping->m_obj2tex) * v1;   // Coordinates of vertex in texture space.
     if (v2.x < min_u) min_u = v2.x;
     if (v2.x > max_u) max_u = v2.x;
     if (v2.y < min_v) min_v = v2.y;
@@ -208,6 +244,121 @@ void csPolygon3D::CreateBoundingTextureBox ()
   mapping->fdv = min_v * hh;
 }
 
+void csPolygon3D::MappingSetTextureSpace (
+  const csPlane3 &plane_wor,
+  const csVector3 &v_orig,
+  const csVector3 &v1,
+  float len)
+{
+  MappingSetTextureSpace (
+    plane_wor,
+    v_orig.x, v_orig.y, v_orig.z,
+    v1.x, v1.y, v1.z,
+    len);
+}
+
+void csPolygon3D::MappingSetTextureSpace (
+  const csPlane3 &plane_wor,
+  float xo,
+  float yo,
+  float zo,
+  float x1,
+  float y1,
+  float z1,
+  float len1)
+{
+  float A = plane_wor.A ();
+  float B = plane_wor.B ();
+  float C = plane_wor.C ();
+  csTextureTrans::compute_texture_space (
+      mapping->m_obj2tex, mapping->v_obj2tex,
+      xo, yo, zo,
+      x1, y1, z1,
+      len1,
+      A, B, C);
+  txt_info->m_world2tex = mapping->m_obj2tex;
+  txt_info->v_world2tex = mapping->v_obj2tex;
+}
+
+void csPolygon3D::MappingSetTextureSpace (
+  const csVector3 &v_orig,
+  const csVector3 &v1,
+  float len1,
+  const csVector3 &v2,
+  float len2)
+{
+  csTextureTrans::compute_texture_space (
+      mapping->m_obj2tex, mapping->v_obj2tex,
+      v_orig, v1,
+      len1, v2,
+      len2);
+  txt_info->m_world2tex = mapping->m_obj2tex;
+  txt_info->v_world2tex = mapping->v_obj2tex;
+}
+
+void csPolygon3D::MappingSetTextureSpace (
+  const csVector3 &v_orig,
+  const csVector3 &v_u,
+  const csVector3 &v_v)
+{
+  csTextureTrans::compute_texture_space (
+      mapping->m_obj2tex,
+      mapping->v_obj2tex,
+      v_orig,
+      v_u,
+      v_v);
+  txt_info->m_world2tex = mapping->m_obj2tex;
+  txt_info->v_world2tex = mapping->v_obj2tex;
+}
+
+void csPolygon3D::MappingSetTextureSpace (
+  float xo, float yo, float zo,
+  float xu, float yu, float zu,
+  float xv, float yv, float zv)
+{
+  const csVector3 o (xo, yo, zo);
+  const csVector3 u (xu, yu, zu);
+  const csVector3 v (xv, yv, zv);
+  csTextureTrans::compute_texture_space (mapping->m_obj2tex,
+  	mapping->v_obj2tex, o, u, v);
+  txt_info->m_world2tex = mapping->m_obj2tex;
+  txt_info->v_world2tex = mapping->v_obj2tex;
+}
+
+void csPolygon3D::MappingSetTextureSpace (
+  float xo, float yo, float zo,
+  float xu, float yu, float zu,
+  float xv, float yv, float zv,
+  float xw, float yw, float zw)
+{
+  csTextureTrans::compute_texture_space (
+      mapping->m_obj2tex, mapping->v_obj2tex,
+      xo, yo, zo,
+      xu, yu, zu,
+      xv, yv, zv,
+      xw, yw, zw);
+  txt_info->m_world2tex = mapping->m_obj2tex;
+  txt_info->v_world2tex = mapping->v_obj2tex;
+}
+
+void csPolygon3D::MappingSetTextureSpace (
+  const csMatrix3 &tx_matrix,
+  const csVector3 &tx_vector)
+{
+  mapping->m_obj2tex = tx_matrix;
+  txt_info->m_world2tex = tx_matrix;
+  mapping->v_obj2tex = tx_vector;
+  txt_info->v_world2tex = tx_vector;
+}
+
+void csPolygon3D::MappingGetTextureSpace (
+  csMatrix3 &tx_matrix,
+  csVector3 &tx_vector)
+{
+  tx_matrix = mapping->m_obj2tex;
+  tx_vector = mapping->v_obj2tex;
+}
+
 void csPolygon3D::SetParent (csThing *thing)
 {
   if (thing == csPolygon3D::thing) return ;           // Nothing to do.
@@ -243,10 +394,9 @@ void csPolygon3D::CopyTextureType (iPolygon3DStatic *ipt)
 
   csMatrix3 m;
   csVector3 v (0);
-  csPolyTexLightMap *txtlmi_src = pt->GetLightMapInfo ();
-  if (txtlmi_src)
+  if (pt->IsTextureMappingEnabled ())
   {
-    txtlmi_src->GetTxtPlane ().GetTextureSpace (m, v);
+    pt->MappingGetTextureSpace (m, v);
   }
 
   SetTextureSpace (m, v);
@@ -492,7 +642,8 @@ void csPolygon3D::ObjectToWorld (
   // So normally it should not be a problem.
   plane_wor.Normalize ();
 
-  if (txt_info) txt_info->GetTxtPlane ().ObjectToWorld (t);
+  if (txt_info) txt_info->ObjectToWorld (mapping->m_obj2tex,
+  	mapping->v_obj2tex, t);
   if (portal) portal->ObjectToWorld (t);
 }
 
@@ -503,10 +654,10 @@ void csPolygon3D::HardTransform (const csReversibleTransform &t)
   t.This2Other (GetObjectPlane (), Vobj (0), new_plane);
   GetObjectPlane () = new_plane;
   GetWorldPlane () = new_plane;
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (lmi)
+  if (mapping)
   {
-    lmi->GetTxtPlane ().HardTransform (t);
+    mapping->m_obj2tex *= t.GetO2T ();
+    mapping->v_obj2tex = t.This2Other (mapping->v_obj2tex);
   }
 }
 
@@ -595,7 +746,7 @@ void csPolygon3D::SetTextureSpace (
   ComputeNormal ();
   if (IsTextureMappingEnabled ())
   {
-    txt_info->GetTxtPlane ().SetTextureSpace (tx_matrix, tx_vector);
+    MappingSetTextureSpace (tx_matrix, tx_vector);
   }
 }
 
@@ -605,7 +756,7 @@ void csPolygon3D::GetTextureSpace (
 {
   if (IsTextureMappingEnabled ())
   {
-    txt_info->GetTxtPlane ().GetTextureSpace (tx_matrix, tx_vector);
+    MappingGetTextureSpace (tx_matrix, tx_vector);
   }
 }
 
@@ -697,7 +848,7 @@ void csPolygon3D::SetTextureSpace (
   ComputeNormal ();
   if (IsTextureMappingEnabled ())
   {
-    txt_info->GetTxtPlane ().SetTextureSpace (
+    MappingSetTextureSpace (
           plane_obj,
           xo, yo, zo,
           x1, y1, z1,
@@ -715,7 +866,7 @@ void csPolygon3D::SetTextureSpace (
   ComputeNormal ();
   if (IsTextureMappingEnabled ())
   {
-    txt_info->GetTxtPlane ().SetTextureSpace (v_orig, v1, len1, v2, len2);
+    MappingSetTextureSpace (v_orig, v1, len1, v2, len2);
   }
 }
 

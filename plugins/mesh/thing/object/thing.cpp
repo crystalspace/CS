@@ -20,7 +20,6 @@
 #include "qint.h"
 #include "thing.h"
 #include "polygon.h"
-#include "polytmap.h"
 #include "pol2d.h"
 #include "polytext.h"
 #include "lppool.h"
@@ -1446,23 +1445,20 @@ void csThing::PreparePolygonBuffer ()
   for (i = 0; i < polygons.Length (); i++)
   {
     csPolygon3D *poly = matpol[i].poly;
-    csPolyTexLightMap *lmi = poly->GetLightMapInfo ();
+    csLightMapMapping *mapping = poly->GetLightMapMapping ();
+    csPolyTexLightMap* lmi = poly->GetLightMapInfo ();
 
     // @@@ what if lmi == NULL?
     //CS_ASSERT (lmi != NULL);
-    if (lmi)
+    if (mapping)
     {
-      csPolyTxtPlane& txt_plane = lmi->GetTxtPlane ();
-      csMatrix3 *m_obj2tex;
-      csVector3 *v_obj2tex;
-      txt_plane.GetObjectToTexture (m_obj2tex, v_obj2tex);
       polybuf->AddPolygon (
           poly->GetVertexIndices (),
           poly->GetVertexCount (),
           poly->GetObjectPlane (),
           matpol[i].mat_index,
-          *m_obj2tex,
-          *v_obj2tex,
+          mapping->m_obj2tex,
+          mapping->v_obj2tex,
           lmi->GetPolyTex ());
     }
     else

@@ -29,7 +29,6 @@
 #include "portal.h"
 #include "thing.h"
 #include "polytext.h"
-#include "polytmap.h"
 #include "iengine/sector.h"
 #include "imesh/thing/polygon.h"
 
@@ -57,14 +56,15 @@ class csPolyTexLightMap
 {
   friend class csPolygon3D;
 
+public:
+  /// Transformation from world to texture space.
+  csMatrix3 m_world2tex;
+  /// Translation from world to texture space.
+  csVector3 v_world2tex;
+
 private:
   /// The transformed texture for this polygon.
   csPolyTexture *tex;
-
-  /**
-   * The csPolyTxtPlane for this polygon.
-   */
-  csPolyTxtPlane txt_plane;
 
   /**
    * This bool indicates if the lightmap is up-to-date (read from the
@@ -84,19 +84,29 @@ public:
   csPolyTexture* GetPolyTex ();
 
   /**
-   * Return the texture plane of this polygon.
-   */
-  csPolyTxtPlane& GetTxtPlane () { return txt_plane; }
-
-  /**
    * Get the lightmap belonging with this polygon.
    */
   iLightMap* GetLightMap () { return tex->GetLightMap (); }
+
+  /**
+   * Transform this plane from object space to world space using
+   * the given transform.
+   */
+  void ObjectToWorld (const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
+  	const csReversibleTransform& obj);
+
+  /**
+   * Transform this plane from world space to camera space using
+   * the given transform. The resulting transform is put in m_cam2tex
+   * and v_cam2tex.
+   */
+  void WorldToCamera (const csReversibleTransform& t,
+  	csMatrix3& m_cam2tex, csVector3& v_cam2tex);
 };
 
 /*---------------------------------------------------------------------------*/
 
-/**
+/*
  * Additional polygon flags. These flags are private,
  * unlike those defined in ipolygon.h
  */
@@ -122,8 +132,6 @@ public:
  * define the orientation of the polygon but is derived from it. The plane
  * does define how the texture is scaled and translated accross the surface
  * of the polygon (in case we are talking about lightmapped polygons).
- * Several planes can be shared for different polygons. As a result of this
- * their textures will be correctly aligned.
  */
 class csPolygon3D : public iBase
 {
@@ -229,6 +237,39 @@ public:
    */
   void CreateBoundingTextureBox ();
 
+  ///
+  void MappingSetTextureSpace (const csVector3& v_orig,
+			const csVector3& v1, float len1,
+			const csVector3& v2, float len2);
+  ///
+  void MappingSetTextureSpace (const csPlane3& plane_wor,
+  			float xo, float yo, float zo,
+			float x1, float y1, float z1,
+			float len);
+  ///
+  void MappingSetTextureSpace (const csPlane3& plane_wor,
+  			const csVector3& v_orig,
+  			const csVector3& v1, float len);
+  ///
+  void MappingSetTextureSpace (const csVector3& v_orig,
+  			const csVector3& v_u,
+			const csVector3& v_v);
+  ///
+  void MappingSetTextureSpace (float xo, float yo, float zo,
+			float xu, float yu, float zu,
+			float xv, float yv, float zv);
+  ///
+  void MappingSetTextureSpace (float xo, float yo, float zo,
+			float xu, float yu, float zu,
+			float xv, float yv, float zv,
+			float xw, float yw, float zw);
+  ///
+  void MappingSetTextureSpace (const csMatrix3& tx_matrix,
+  			const csVector3& tx_vector);
+
+  /// Get the transformation from object to texture space.
+  void MappingGetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
+
   /**
    * Enable or disable texture mapping.
    */
@@ -245,7 +286,12 @@ public:
   /**
    * Get the lightmap information.
    */
-  csPolyTexLightMap *GetLightMapInfo () { return txt_info; }
+  csPolyTexLightMap *GetLightMapInfo () const { return txt_info; }
+
+  /**
+   * Get the lightmap mapping information.
+   */
+  csLightMapMapping* GetLightMapMapping () const { return mapping; }
 
   /**
    * Clear the polygon (remove all vertices).
