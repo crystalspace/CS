@@ -1,13 +1,20 @@
-// cuscomp.h: interface for the CustomComponent class.
-//
-//////////////////////////////////////////////////////////////////////
+/*
+    Copyright (C) 2001
 
-#if !defined(AFX_CUSCOMP_H__C8C58B44_6906_4474_B1E2_37F085A11DC7__INCLUDED_)
-#define AFX_CUSCOMP_H__C8C58B44_6906_4474_B1E2_37F085A11DC7__INCLUDED_
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
 #include "iaws/awsecomp.h"
 
@@ -24,7 +31,6 @@ public:
   virtual bool Setup(iAws* manager, iAwsComponentNode* settings);
 };
 
-
 class CustomComponentFactory : public awsEmbeddedComponentFactory
 {
 public:
@@ -35,5 +41,4 @@ public:
   iAwsComponent* Create();
 };
 
-
-#endif // !defined(AFX_CUSCOMP_H__C8C58B44_6906_4474_B1E2_37F085A11DC7__INCLUDED_)
+#endif
