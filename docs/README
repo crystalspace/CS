@@ -1,7 +1,7 @@
 0. Contents of This Document
 ----------------------------
 
-    1. Introduction to Crystal Space V0.13
+    1. Introduction to Crystal Space V0.14
     2. Disclaimer
     3. Current Status
     4. Using Crystal Space For Your Project
@@ -14,30 +14,30 @@
 
 
 
-1. Introduction to Crystal Space (V0.13)
+1. Introduction to Crystal Space (V0.14)
 ----------------------------------------
 
-Crystal Space is a 6DOF 3D engine (like Quake) with static colored
-lighting (not like Quake) and many other features. See 'docs/document.txt'
-for a complete list of features and some explanation about the algorithms
-that are used.
+Crystal Space is a 6DOF 3D engine (like Quake) with static colored lighting
+(not like Quake) and many other features.  See 'docs/engine.txt' for a
+complete list of features and some explanation about the algorithms that are
+used.
 
-Crystal Space is still very much in development. It has now
-become a real Internet Project! Everyone who feels inclined can
-contribute to the source. There are several things that still
-need to be done. See the 'docs/todo.html' file for more information
-about what is missing and a list of current known bugs.
+Crystal Space is still very much in development.  It has now become a real
+Internet Project! Everyone who feels inclined can contribute to the source.
+There are several things that still need to be done.  See the 'docs/todo.html'
+file for more information about what is missing and a list of current known
+bugs.  [NOTE: todo.html is out of date.]
 
-Crystal Space is free and should remain free. Crystal Space
-falls under the GNU copyleft license for libraries. To see what
-this means read the COPYING file that should be included with
-this archive. In short it means that you are allowed to use Crystal
-Space in your products. You are even allowed to sell your product
-using Crystal Space provided Crystal Space itself remains free.
+Crystal Space is free and should remain free.  Crystal Space falls under the
+GNU copyleft license for libraries.  To see what this means read the COPYING
+file that should be included with this archive.  In short it means that you
+are allowed to use Crystal Space in your products.  You are even allowed to
+sell your product using Crystal Space provided Crystal Space itself remains
+free.
 
-Please read the 'docs/faq.html' file if you have a question. If you
-don't find the answer there you can always E-Mail me (address
-below in this readme).
+Please read the 'docs/faq.html' file if you have a question.  If you don't
+find the answer there you can always E-Mail me (address below in this readme).
+[NOTE: faq.html is extremely out of date.]
 
 
 2. Disclaimer
@@ -45,10 +45,9 @@ below in this readme).
 
 [LAWYER MODE ON]
 
-DISCLAIMER! I'm not responsible in any way for any damage
-this program may incur on you, your family or your computer.
-I think nothing harmful will happen but if it does, the
-author (Jorrit Tyberghein) is not responsible!
+DISCLAIMER!  I'm not responsible in any way for any damage this program may
+incur on you, your family or your computer.  I think nothing harmful will
+happen but if it does, the author (Jorrit Tyberghein) is not responsible!
 
 [LAWYER MODE OFF]
 
@@ -56,52 +55,52 @@ author (Jorrit Tyberghein) is not responsible!
 3. Current Status
 -----------------
 
-Important Note! Crystal Space is still in beta. This means that there
-are many known and unknown bugs and that things in general may not work
-as expected (or may not work at all). The known bugs are in docs/todo.html;
-I'm currently still busy making the list of unknown bugs :-)
+Important Note! Crystal Space is still in beta.  This means that there are
+many known and unknown bugs and that things in general may not work as
+expected (or may not work at all).  The known bugs are in docs/todo.html; I'm
+currently still busy making the list of unknown bugs :-)  [NOTE: todo.html is
+out of date.]
 
-However Crystal Space starts to become useful. There are actually
-already a few projects starting to use CS.
+However Crystal Space starts to become useful.  There are actually already a
+few projects starting to use CS.
 
-Crystal Space is also not fully optimized yet. Performance is adequate
+Crystal Space is also not fully optimized yet.  Performance is adequate
 provided you have a Pentium but things could certainly be better.
 
-We also have a very active developers team working to make it as useable
-as possible. We are are getting there :-)
+We also have a very active developers team working to make it as useable as
+possible.  We are are getting there :-)
 
 
 4. Using Crystal Space For Your Project
 ---------------------------------------
 
-What if you want to use Crystal Space in your project? Well this is
-possible. The best approach at this point in time is to become a member of
-the developers mailing list (more about this later) and listen how
-everything develops. If you're really serious about things you can even join
-discussions and develop stuff. I will gladly add contributed code
-to Crystal Space (provided I can use the stuff, I will not add code
-to format disks as I think that this is a little off topic :-)
+What if you want to use Crystal Space in your project? Well this is possible.
+The best approach at this point in time is to become a member of the
+developers mailing list (more about this later) and listen how everything
+develops.  If you're really serious about things you can even join discussions
+and develop stuff.  I will gladly add contributed code to Crystal Space
+(provided I can use the stuff, I will not add code to format disks as I think
+that this is a little off topic :-)
 
-Note that you also need to agree to the LGPL (read the COPYING file for
-more details) but I don't think that this is a real problem.
+Note that you also need to agree to the LGPL (read the COPYING file for more
+details) but I don't think that this is a real problem.
 
-I'm always interested in hearing what other people are doing with
-Crystal Space. Even if it is only for small private projects I'd like
-to hear about it (just out of curiosity).
+I'm always interested in hearing what other people are doing with Crystal
+Space.  Even if it is only for small private projects I'd like to hear about
+it (just out of curiosity).
 
 
 5. Reporting Bugs
 -----------------
 
-If you find a bug in Crystal Space and it is not in docs/todo.html you
-should contact me (Jorrit.Tyberghein@uz.kuleuven.ac.be).
+If you find a bug in Crystal Space and it is not in docs/todo.html you should
+send a bug report to the Crystal Space mailing list at: crystal@lists.linux.it
 Try to give as much information as possible:
 
     - The computer/OS (Windows, DOS, OS/2, Unix, Linux, ...)
     - Type of processor (Pentium, SPARC, 680x0, ...)
     - The display type (8-bit, 16-bit, 640x480, ...)
-    - The exact output of Crystal Space (so that I can see where
-      the crash happens).
+    - The exact output of Crystal Space
     - How to reproduce the crash (if it is reproducable).
     - A fix for the bug :-)
 
@@ -109,57 +108,52 @@ Try to give as much information as possible:
 6. Where To Get Crystal Space...
 --------------------------------
 
-The Crystal Space home page. This page contains the latest development
-and official releases of Crystal Space. Here is a small note about the
-difference between the official and the development (beta) releases:
-both the official and development versions are actually beta. The difference
-is that the official release should be more stable and will be easier
-to get working as all documentation and makefiles are up-to-date. The
-development release will probably have more features but it may not
-work very well on your particular system, it may not work at all, or
-you might not be able to compile it. But the development release may
-also work very well. You never know.
-My page also contains some documents, some links, a few screenshots
-and levels for Crystal Space. Here is the URL:
+The Crystal Space home page.  This page contains the latest development and
+official releases of Crystal Space.  Here is a small note about the difference
+between the official and the development (beta) releases: both the official
+and development versions are actually beta.  The difference is that the
+official release should be more stable and will be easier to get working as
+all documentation and makefiles are up-to-date.  The development release will
+probably have more features but it may not work very well on your particular
+system, it may not work at all, or you might not be able to compile it.  But
+the development release may also work very well.  You never know.  My page
+also contains some documents, some links, a few screenshots and levels for
+Crystal Space.  Here is the URL:
 
   http://crystal.linuxgames.com/
 
-If you want to keep in touch with the latest development of CS you
-can try to access the CVS server. Have a look at the above page to
-see how this works.
+If you want to keep in touch with the latest development of CS you can try to
+access the CVS server.  Have a look at the above page to see how this works.
 
 
 7. Mailing Lists
 ----------------
 
-There are currently two mailing lists for Crystal Space. The first one
-is just a list of E-mails that I maintain. Everyone who is just
-interested in hearing from me whenever there is a new version of
-Crystal Space can be put on this list. Just send a mail with something
-like 'subscribe new version' to me (Jorrit.Tyberghein@uz.kuleuven.ac.be)
-and I will put your E-mail address in this list.
-On the Crystal Space home page there is also a little form that can be used
-to subscribe (BUT DON'T FORGET TO FILL IN YOUR E-MAIL THERE!!!)
-Note that if you make a mistake in your E-mail I will not be able to
-contact you. So be very careful when you type that E-mail of yours :-)
+There are currently two mailing lists for Crystal Space.  The first one is
+just a list of E-mails that I maintain.  Everyone who is just interested in
+hearing from me whenever there is a new version of Crystal Space can be put on
+this list.  Just send a mail with something like 'subscribe new version' to me
+(Jorrit.Tyberghein@uz.kuleuven.ac.be) and I will put your E-mail address in
+this list.  On the Crystal Space home page there is also a little form that
+can be used to subscribe (BUT DON'T FORGET TO FILL IN YOUR E-MAIL THERE!!!)
+Note that if you make a mistake in your E-mail I will not be able to contact
+you.  So be very careful when you type that E-mail of yours :-)
 
-For more general and in-depth discussion of Crystal Space and related
-projects (I mean games and such using Crystal Space) there is a real
-mailing list: crystal@lists.linux.it.
-To subscribe on this list send a mail to crystal-request@lists.linux.it
-containing as subject: 'subscribe your@email' (replace your@email with
-your email :-)
-Messages should be sent to crystal@lists.linux.it.
-To unsubscribe send a mail to crystal-request@lists.linux.it (NOT to
-crystal@lists.linux.it) with as subject: 'unsubscrube your@email'.
+For more general and in-depth discussion of Crystal Space and related projects
+(I mean games and such using Crystal Space) there is a real mailing list:
+crystal@lists.linux.it.  To subscribe on this list send a mail to
+crystal-request@lists.linux.it containing as subject: 'subscribe your@email'
+(replace your@email with your email :-)  Messages should be sent to
+crystal@lists.linux.it.  To unsubscribe send a mail to
+crystal-request@lists.linux.it (NOT to crystal@lists.linux.it) with as
+subject: 'unsubscrube your@email'.
 
 
 8. The Texture Archive
 ----------------------
 
-The textures from Crystal Space have now been split of
-into a seperate project at http://server.empathy.com/crystal
-(the Crystal Space Texture Archive).
+The textures from Crystal Space have now been split of into a seperate project
+at http://server.empathy.com/crystal (the Crystal Space Texture Archive).
 
 
 9. Other Documents
@@ -170,50 +164,47 @@ It also contains information about some of the most useful commandline
 options.
 
 docs/COPYING contains the conditions by which you can use the Crystal Space
-engine in your own products. These conditions are from LGPL.
+engine in your own products.  These conditions are from LGPL.
 
 docs/dir.txt contains a list and description of the directory structure of
-Crystal Space. It also explains what all documents are for.
+Crystal Space.  It also explains what all documents are for.
 
-docs/authors.html contains a list of all people who contributed in some way
-to the Crystal Space project. Many thanks to them all.
+docs/authors.html contains a list of all people who contributed in some way to
+the Crystal Space project.  Many thanks to them all.
 
-The 'docs' directory contains a lot of useful documents about Crystal
-Space.
+The 'docs' directory contains a lot of useful documents about Crystal Space.
 
 
 10. The Author and Some History
 -------------------------------
 
-My name is Jorrit Tyberghein. I'm currently 29 (born 17-Oct-69) and I
-have a lovely wife and a lovely daughter (she is born 1-Jan-98 :-)
+My name is Jorrit Tyberghein.  I was born on 17-Oct-69 and I have a lovely
+wife and a lovely daughter (she was born 1-Jan-98 :-)
 
 I can be reached at: Jorrit.Tyberghein@uz.kuleuven.ac.be
 My home page is: http://crystal.linuxgames.com/
 
-I created this project by accident. I was always fascinated by games
-like Doom, Hexen, Duke Nukem 3D and later Quake and I wondered how one
-would write such a game. My first effort was a Doom like engine. It had
-some nice features (like static lighting with shadows and sectors above
-other sectors) but it was VERY SLOW!!! I abandoned the project (it became
-a bit clumsy) and forgot about 3D for a short while. But the urge was
-still there. Every now and then I would think about 3D engines. But I
-wasn't thinking about Doom anymore. I wanted something more. After months
-of thinking I still wasn't planning to start writing code. But then
-I read an article about portals. I wasn't sure what they were but from the
-little explanation in that article things started to become clear. Portals
-were the perfect way for me to write a 3D engine quickly. It was a very
-easy technique with which I could achieve real 6DOF 3D!! At that point
-the knowledge I gathered during the past few months had to get out of my
-head. In a bit more than one month I wrote the first version of Crystal
-Space (during my free time). At that point I had a portal engine with
-6DOF, colored static lighting with shadows, primitive scripting,
-mipmapping and moving objects. Since time became a precious resource
-I decided to release Crystal Space to the general public and I put an
-announcement in comp.graphics.algorithms. And this was the start of the
+I created this project by accident.  I was always fascinated by games like
+Doom, Hexen, Duke Nukem 3D and later Quake and I wondered how one would write
+such a game.  My first effort was a Doom like engine.  It had some nice
+features (like static lighting with shadows and sectors above other sectors)
+but it was VERY SLOW!!! I abandoned the project (it became a bit clumsy) and
+forgot about 3D for a short while.  But the urge was still there.  Every now
+and then I would think about 3D engines.  But I wasn't thinking about Doom
+anymore.  I wanted something more.  After months of thinking I still wasn't
+planning to start writing code.  But then I read an article about portals.  I
+wasn't sure what they were but from the little explanation in that article
+things started to become clear.  Portals were the perfect way for me to write
+a 3D engine quickly.  It was a very easy technique with which I could achieve
+real 6DOF 3D!! At that point the knowledge I gathered during the past few
+months had to get out of my head.  In a bit more than one month I wrote the
+first version of Crystal Space (during my free time).  At that point I had a
+portal engine with 6DOF, colored static lighting with shadows, primitive
+scripting, mipmapping and moving objects.  Since time became a precious
+resource I decided to release Crystal Space to the general public and I put an
+announcement in comp.graphics.algorithms.  And this was the start of the
 Crystal Space project.
 
 I must say that I didn't expect the kind of response that I got (I received
-mails from hundreds of people and all were very positive). Many thanks to
-all of you.
-
+mails from hundreds of people and all were very positive).  Many thanks to all
+of you.
