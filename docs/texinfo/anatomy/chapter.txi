@@ -26,7 +26,7 @@ Scripting
 * Makefile How-To::
 * SCF:: Shared Class Facility (@sc{scf})
 * VFS:: Virtual File System (@sc{vfs})
-* Memory Debugger::
+* Memory Debugger:: Crystal Space Memory Debugger
 * Platform Details:: Platform-Specific Details
 @end menu
 

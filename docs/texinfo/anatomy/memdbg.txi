@@ -1,14 +1,18 @@
 @c -*-texinfo-*-
-@node Memory Debugger
+@node Memory Debugger, Platform Details, VFS, Anatomy
 @section Crystal Space Memory Debugger
 @cindex Memory Debugger
 
 By Andrew Zabolotny (@email{bit@eltech.ru}).
 
 @menu
+* MemDbg Goals:: Memory debugging tool goals:
+* MemDbg Usage:: Usage
+* MemDbg mapfile:: Map file format
+* Memdbg HowWorks:: How it works
 @end menu
 
-@node MemDbg Goals
+@node MemDbg Goals, MemDbg Usage, Memory Debugger, Memory Debugger
 @subsection Memory debugging tool goals:
 
 @itemize @bullet
@@ -33,7 +37,7 @@ memory block.
 Help gather some memory usage information about the program.
 @end itemize
 
-@node MemDbg Usage
+@node MemDbg Usage, MemDbg mapfile, MemDbg Goals, Memory Debugger
 @subsection Usage
 
 To enable memory debugger you should first of all compile in debug mode. Not
@@ -151,7 +155,7 @@ find out the source module and the line number that is closest to given
 address; for GNU set of development tools this is done with the
 @file{addr2line} tool; you also can do it with @file{gdb}.
 
-@node MemDbg mapfile
+@node MemDbg mapfile, Memdbg HowWorks, MemDbg Usage, Memory Debugger
 @subsection Map file format
 
 Map file has a very simple format. Currently the map file is created by
@@ -212,7 +216,7 @@ memdbg supposes that all lines are pre-sorted by increasing value of their
 address. Otherwise you will get very strange line references (or hex
 addresses like at the end of previous chapter).
 
-@node Memdbg HowWorks
+@node Memdbg HowWorks, , MemDbg mapfile, Memory Debugger
 @subsection How it works
 Here are some technical details about the functioning of the memory debugger.
 This can help understand you more detailed how it works, and I think this can

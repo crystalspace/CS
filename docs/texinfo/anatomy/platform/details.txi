@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Platform Details, , VFS, Anatomy
+@node Platform Details, , Memory Debugger, Anatomy
 @section Platform-Specific Details
 @cindex Platform-Specific Details
 @cindex Details, Platform-Specific
