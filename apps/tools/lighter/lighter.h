@@ -26,6 +26,7 @@ struct iEngine;
 struct iLoader;
 struct iGraphics3D;
 struct iGraphics2D;
+struct iVFS;
 struct iFont;
 struct iTextureHandle;
 struct iObjectRegistry;
@@ -108,6 +109,7 @@ class Lighter
 public:
   csRef<iEngine> engine;
   csRef<iLoader> loader;
+  csRef<iVFS> vfs;
   csRef<iGraphics3D> g3d;
   csRef<iGraphics2D> g2d;
   csRef<iFont> font;
@@ -133,7 +135,7 @@ public:
   bool Initialize ();
 
   // This function always returns false.
-  bool Report (int severity, const char* msg, ...);
+  bool Report (const char* msg, ...);
 };
 
 #endif // __LIGHTER_H__

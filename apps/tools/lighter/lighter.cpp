@@ -41,6 +41,7 @@
 #include "igraphic/imageio.h"
 
 #include "lighter.h"
+#include "litparsecfg.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -170,13 +171,14 @@ Lighter::~Lighter ()
 {
 }
 
-bool Lighter::Report (int severity, const char* msg, ...)
+bool Lighter::Report (const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
   csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
-    rep->ReportV (severity, "crystalspace.application.lighter", msg, arg);
+    rep->ReportV (CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.lighter", msg, arg);
   else
   {
     csPrintfV (msg, arg);
@@ -192,15 +194,14 @@ bool Lighter::SetMapDir (const char* map_dir)
   csStringArray paths;
   paths.Push ("/lev/");
   if (!myVFS->ChDirAuto (map_dir, &paths))
-    return Report (CS_REPORTER_SEVERITY_ERROR, "Error setting directory '%s'!",
-    	map_dir);
+    return Report ("Error setting directory '%s'!", map_dir);
   return true;
 }
 
 bool Lighter::Initialize ()
 {
   if (!csInitializer::SetupConfigManager (object_reg, 0))
-    return Report (CS_REPORTER_SEVERITY_ERROR, "Can't init app!");
+    return Report ("Can't init app!");
 
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
@@ -213,7 +214,7 @@ bool Lighter::Initialize ()
 	CS_REQUEST_REPORTERLISTENER,
 	CS_REQUEST_REPORTER,
 	CS_REQUEST_END))
-    return Report (CS_REPORTER_SEVERITY_ERROR, "Can't init app!");
+    return Report ("Can't init app!");
 
   csRef<iStandardReporterListener> repl = CS_QUERY_REGISTRY (object_reg,
   	iStandardReporterListener);
@@ -246,23 +247,23 @@ bool Lighter::Initialize ()
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  if (!engine)
-    return Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
+  if (!engine) return Report ("No iEngine plugin!");
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
-  if (!loader)
-    return Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
+  if (!loader) return Report ("No iLoader plugin!");
+
+  vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!vfs) return Report ("No iVFS plugin!");
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  if (!g3d)
-    return Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
+  if (!g3d) return Report ("No iGraphics3D plugin!");
 
   // Open the main system. This will open all the previously loaded plug-ins.
   g2d = g3d->GetDriver2D ();
   iNativeWindow* nw = g2d->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Lighting Application");
   if (!csInitializer::OpenApplication (object_reg))
-    return Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
+    return Report ("Error opening system!");
 
   // Setup the texture manager.
   iTextureManager* txtmgr = g3d->GetTextureManager ();
@@ -287,6 +288,13 @@ bool Lighter::Initialize ()
 
   engine->SetLightingCacheMode (CS_ENGINE_CACHE_WRITE);
 
+  litConfigParser parser (this, object_reg);
+  csRef<litMeshSelect> casters_selector;
+  csRef<litMeshSelect> receivers_selector;
+  if (!parser.ParseConfigFile ("/config/lighter.xml", casters_selector,
+  	receivers_selector))
+    return false;
+
   // First look for a cache: entry.
   int cmd_idx = 0;
   for (;;)
@@ -300,8 +308,7 @@ bool Lighter::Initialize ()
     {
       val += 6;
       if (!SetMapDir (val))
-        return Report (CS_REPORTER_SEVERITY_ERROR,
-      	  "Error setting map dir '%s'!", val);
+        return Report ("Error setting map dir '%s'!", val);
 
       // First we force a clear of the cache manager in the engine
       // so that a new one will be made soon.
@@ -328,8 +335,7 @@ bool Lighter::Initialize ()
 	// We already have one map so it is sufficient here.
 	break;
       }
-      return Report (CS_REPORTER_SEVERITY_ERROR,
-    	  "Please give a level (either a zip file or a VFS dir)!");
+      return Report ("Please give a level (either a zip file or a VFS dir)!");
     }
     if (strlen (val) > 7 && !strncmp ("cache:", val, 6))
     {
@@ -338,14 +344,12 @@ bool Lighter::Initialize ()
     }
 
     if (!SetMapDir (val))
-      return Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Error setting map dir '%s'!", val);
+      return Report ("Error setting map dir '%s'!", val);
 
     // Load the level file which is called 'world'.
     // Only clear engine for first level.
     if (!loader->LoadMapFile ("world", map_idx == 0))
-      return Report (CS_REPORTER_SEVERITY_ERROR,
-      	"Couldn't load level '%s'!", val);
+      return Report ("Couldn't load level '%s'!", val);
     map_idx++;
   }
 

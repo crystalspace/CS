@@ -10,6 +10,8 @@ chronological order.
 	- Steven Geens added an example of how to view a cal3d file with
 	  viewmesh to the docs and how to load a cal3d file in code.
 	- Jorrit fixed flarge so that the billboard has <ztest/> mode.
+	- Jorrit worked a bit more on the parsing of the config file of
+	  lighter.
 15-Aug-2004
 	- Jorrit extended iEngine->PrecacheDraw() so that it also causes
 	  the cullers to precache. To do that it calls a new
