@@ -39,6 +39,12 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Replaced 'del' in csArchive.
 	    - Replaced 'Names' in csCommandLineParser.
 	    - Replaced 'Values' in csSpinBox.
+	- Jorrit added iStringArray. This is an SCF interface for
+	  csStringArray. csStringArray does not directly implement this
+	  interface though. Instead there is scfStringArray which embeds
+	  an csStringArray and implements iStringArray. This is similar
+	  to iStrVector and the idea is that iStringArray will completely
+	  replace iStrVector.
 27-Jul-2003
 	- Philipp Aumayr added Cubemap and Texture3d Parser/Loader
 	- Marten Svanfeldt made a few changes related to new renderer
