@@ -69,8 +69,7 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk->id[4] = '\0';
 
   nStream = nStreamNumber;
-  if (pSystem) pSystem->DecRef ();
-  (pSystem = pTheSystem)->IncRef ();
+  pSystem = pTheSystem;
 
   bTimeSynced = false;
   // load the CODEC
@@ -81,7 +80,6 @@ csAVIStreamAudio::~csAVIStreamAudio ()
 {
   delete pChunk;
   if (pCodec) pCodec->DecRef ();
-  if (pSystem) pSystem->DecRef ();
 }
 
 void csAVIStreamAudio::GetStreamDescription (csStreamDescription &desc)

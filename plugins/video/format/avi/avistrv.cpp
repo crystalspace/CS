@@ -76,8 +76,7 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk->id[4] = '\0';
 
   nStream = nStreamNumber;
-  if (pSystem) pSystem->DecRef ();
-  (pSystem = pTheSystem)->IncRef ();
+  pSystem = pTheSystem;
   if (pG3D) pG3D->DecRef ();
   pG3D = QUERY_PLUGIN (pSystem, iGraphics3D);
   if (pG2D) pG2D->DecRef ();
@@ -126,7 +125,6 @@ csAVIStreamVideo::~csAVIStreamVideo ()
   if (pCodec) pCodec->DecRef ();
   if (pG2D) pG2D->DecRef ();
   if (pG3D) pG3D->DecRef ();
-  if (pSystem) pSystem->DecRef ();
 }
 
 void csAVIStreamVideo::GetStreamDescription (csStreamDescription &desc)

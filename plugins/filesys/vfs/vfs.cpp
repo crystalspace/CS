@@ -1132,6 +1132,7 @@ EXPORT_CLASS_TABLE_END
 
 csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 {
+  System = NULL;
   CONSTRUCT_IBASE (iParent);
   cwd = new char [2];
   cwd [0] = VFS_PATH_SEPARATOR;
@@ -1150,12 +1151,11 @@ csVFS::~csVFS ()
   CS_ASSERT (ArchiveCache);
   delete ArchiveCache;
   ArchiveCache = NULL;
-  if (System) System->DecRef ();
 }
 
 bool csVFS::Initialize (iSystem *iSys)
 {
-  (System = iSys)->IncRef ();
+  System = iSys;
   char vfsconfigpath [MAXPATHLEN + 1];
   iSys->GetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
   basedir = strnew (vfsconfigpath);

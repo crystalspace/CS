@@ -449,7 +449,6 @@ csEngine::~csEngine ()
   if (G3D) G3D->DecRef ();
   if (ImageLoader) ImageLoader->DecRef();
   if (VFS) VFS->DecRef ();
-  if (System) System->DecRef ();
   delete textures;
   delete materials;
   delete render_pol2d_pool;
@@ -480,7 +479,7 @@ bool csEngine::Initialize (iSystem* sys)
   printf ("csLightMap %ld\n", (long)sizeof (csLightMap));
 #endif
 
-  (System = sys)->IncRef ();
+  System = sys;
 
   if (!(G3D = QUERY_PLUGIN_ID (sys, CS_FUNCID_VIDEO, iGraphics3D)))
     return false;

@@ -64,12 +64,11 @@ csIsoEngine::~csIsoEngine ()
   for(int i=0; i<materials.Length(); i++)
     RemoveMaterial(i);
   if(g3d) g3d->DecRef();
-  if(system) system->DecRef();
 }
 
 bool csIsoEngine::Initialize (iSystem* p)
 {
-  (system = p)->IncRef();
+  system = p;
   // Tell system driver that we want to handle broadcast events
   if (!system->CallOnEvents (this, CSMASK_Broadcast))
     return false;

@@ -69,13 +69,11 @@ csFancyConsole::~csFancyConsole ()
     base->DecRef ();
   if (VFS)
     VFS->DecRef ();
-  if (System)
-    System->DecRef ();
 }
 
 bool csFancyConsole::Initialize (iSystem *system) 
 {
-  (System = system)->IncRef();
+  System = system;
 
   VFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   if (!VFS)

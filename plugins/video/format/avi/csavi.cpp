@@ -63,8 +63,6 @@ csAVIFormat::~csAVIFormat ()
     delete [] pData;
     if (pChunkList) delete pChunkList;
   }
-
-  if (pSystem) pSystem->DecRef ();
 }
 
 bool csAVIFormat::Initialize (iSystem *iSys)
@@ -72,7 +70,6 @@ bool csAVIFormat::Initialize (iSystem *iSys)
   datalen = 0;
 
   pSystem = iSys;
-  pSystem->IncRef ();
   pFile = NULL;
   pData = NULL;
   pChunkList = NULL;

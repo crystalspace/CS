@@ -104,7 +104,7 @@ csApp::csApp (iSystem *sys, csSkin &Skin)
   DefaultFont = NULL;
   InFrame = false;
   ImageLoader = NULL;
-  (System = sys)->IncRef ();
+  System = sys;
   LastMouseContainer = NULL;
 
   OldMouseCursorID = csmcNone;
@@ -138,7 +138,6 @@ csApp::~csApp ()
   // Delete all textures prior to deleting the texture manager
   Textures.DeleteAll ();
 
-  System->DecRef ();
   // Set app to NULL so that ~csComponent() won't call NotifyDelete()
   app = NULL;
 

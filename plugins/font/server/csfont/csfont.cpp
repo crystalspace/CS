@@ -70,13 +70,11 @@ csDefaultFontServer::csDefaultFontServer (iBase *pParent) : System(0)
 
 csDefaultFontServer::~csDefaultFontServer()
 {
-  if (System)
-    System->DecRef();
 }
 
 bool csDefaultFontServer::Initialize (iSystem* sys)
 {
-  (System = sys)->IncRef ();
+  System = sys;
   return true;
 }
 

@@ -46,12 +46,11 @@ csFreeTypeServer::csFreeTypeServer (iBase *pParent)
 csFreeTypeServer::~csFreeTypeServer ()
 {
   if (VFS) VFS->DecRef ();
-  if (System) System->DecRef ();
 }
 
 bool csFreeTypeServer::Initialize (iSystem *Sys)
 {
-  (System = Sys)->IncRef ();
+  System = Sys;
 
   if (TT_Init_FreeType (&engine))
   {

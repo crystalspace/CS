@@ -75,8 +75,6 @@ csConsoleOutput::~csConsoleOutput ()
 {
   if (font)
     font->DecRef ();
-  if (System)
-    System->DecRef ();
   if (G2D)
     G2D->DecRef ();
   if (G3D)
@@ -86,7 +84,7 @@ csConsoleOutput::~csConsoleOutput ()
 
 bool csConsoleOutput::Initialize (iSystem *system)
 {
-  (System = system)->IncRef ();
+  System = system;
   G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();

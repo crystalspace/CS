@@ -69,13 +69,11 @@ csPerfStats::~csPerfStats ()
   delete [] file_name;
   delete [] margin;
   delete frame;
-  if (head_section == this)
-    System->DecRef ();
 }
 
 bool csPerfStats::Initialize (iSystem *system)
 {
-  (System = system)->IncRef ();
+  System = system;
   if (!System->CallOnEvents (this, CSMASK_Nothing))
     return false;
   sub_section = super_section = NULL;

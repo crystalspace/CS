@@ -2469,7 +2469,6 @@ csLoader::csLoader(iBase *p)
 
 csLoader::~csLoader()
 {
-  DEC_REF(System);
   DEC_REF(VFS);
   DEC_REF(ImageLoader);
   DEC_REF(SoundLoader);

@@ -83,13 +83,11 @@ csSimpleConsole::~csSimpleConsole ()
     console_font->DecRef ();
   if (G3D)
     G3D->DecRef ();
-  if (System)
-    System->DecRef ();
 }
 
 bool csSimpleConsole::Initialize (iSystem *iSys)
 {
-  (System = iSys)->IncRef ();
+  System = iSys;
 
   G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
   if (!G3D) return false;
