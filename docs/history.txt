@@ -12,7 +12,7 @@ chronological order.
           Also for the second time changed instances of NULL for 0!
         - Philip Wyett changed some executable names to match their target
           name under the make build and MSVC. Jambuild did not require these
-          changes as it is correct already. 'perl5tst' is now 'perl5test'and
+          changes as it is correct already. 'perl5tst' is now 'perl5test' and
           'netmntst' is now 'netmantest'. Also made these changes in CS/ root
           .cvsignore and also added 'partedit' and 'uninst'.
 8-Aug-2003
