@@ -22,6 +22,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/bsp.h"
 #include "csgeom/polyclip.h"
+#include "csgeom/frustrum.h"
 #include "csengine/sysitf.h"
 #include "csengine/camera.h"
 #include "csengine/polygon/polyplan.h"
@@ -272,5 +273,29 @@ void Dumper::dump (csPolygonClipper* clipper, char* name)
   int i;
   for (i = 0 ; i < clipper->ClipPolyVertices ; i++)
     CsPrintf (MSG_DEBUG_0, "  %d: (%f,%f)\n", i, clipper->ClipPoly[i].x, clipper->ClipPoly[i].y);
+}
+
+void Dumper::dump (csFrustrum* frustrum, char* name)
+{
+  CsPrintf (MSG_DEBUG_0, "csFrustrum '%s'\n", name);
+  if (!frustrum)
+  {
+    CsPrintf (MSG_DEBUG_0, "  NULL\n");
+    return;
+  }
+  int i;
+  CsPrintf (MSG_DEBUG_0, "  "); dump (&frustrum->GetOrigin (), "origin");
+  for (i = 0 ; i < frustrum->GetNumVertices () ; i++)
+  {
+    CsPrintf (MSG_DEBUG_0, "  ");
+    char buf[20];
+    sprintf (buf, "[%d]", i);
+    dump (&frustrum->GetVertex (i), buf);
+  }
+  if (frustrum->GetBackPlane ())
+  {
+    CsPrintf (MSG_DEBUG_0, "  ");
+    dump (frustrum->GetBackPlane ());
+  }
 }
 

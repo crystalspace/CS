@@ -37,6 +37,7 @@ class csSprite3D;
 class csBspTree;
 class csBspNode;
 class csPolygonClipper;
+class csFrustrum;
 
 /**
  * This class knows how to dump debug information about several
@@ -67,6 +68,7 @@ public:
   static void dump (csSprite3D* s);
   static void dump (csBspTree* tree);
   static void dump (csPolygonClipper* clipper, char* name);
+  static void dump (csFrustrum* frustrum, char* name);
 };
 
 #endif
