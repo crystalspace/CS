@@ -28,6 +28,8 @@
 #include "iengine/material.h"
 
 struct iImage;
+struct iMovable;
+class csTransform;
 
 SCF_VERSION (iTerrainObjectState, 0, 0, 1);
 
@@ -57,6 +59,13 @@ struct iTerrainObjectState : public iBase
   virtual csArray<char> GetMaterialMap () = 0;
 
   /**
+   * The distance at which splatting is no longer in effect and the
+   * base texture is the only layer.
+   */
+  virtual void SetLODDistance (float distance) = 0;
+  virtual float GetLODDistance () = 0;
+
+  /**
    * Sets the screenspace error tolerance in numbers of pixels. 
    * Error will be less than the given tolerance so setting the tolerance
    * to values less than 1 is worthless.
@@ -74,6 +83,8 @@ struct iTerrainObjectState : public iBase
   virtual bool SaveState (const char *filename) = 0;
   virtual bool RestoreState (const char *filename) = 0;
 
+  /// Detects collision with a specific transform
+  virtual int CollisionDetect (iMovable *m, csTransform *p) = 0;
 };
 
 SCF_VERSION (iTerrainFactoryState, 0, 0, 1);
