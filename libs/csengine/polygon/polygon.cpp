@@ -63,16 +63,28 @@ IMPLEMENT_IBASE (csPolyTexType)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_IBASE_EXT (csPolyTexFlat)
-  IMPLEMENTS_INTERFACE (iPolyTexFlat)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTexFlat)
 IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csPolyTexFlat::eiPolyTexFlat)
+  IMPLEMENTS_INTERFACE (iPolyTexFlat)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_IBASE_EXT (csPolyTexGouraud)
-  IMPLEMENTS_INTERFACE (iPolyTexGouraud)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTexGouraud)
 IMPLEMENT_IBASE_EXT_END
 
+IMPLEMENT_EMBEDDED_IBASE (csPolyTexGouraud::eiPolyTexGouraud)
+  IMPLEMENTS_INTERFACE (iPolyTexGouraud)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 IMPLEMENT_IBASE_EXT (csPolyTexLightMap)
-  IMPLEMENTS_INTERFACE (iPolyTexLightMap)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPolyTexLightMap)
 IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csPolyTexLightMap::eiPolyTexLightMap)
+  IMPLEMENTS_INTERFACE (iPolyTexLightMap)
+IMPLEMENT_EMBEDDED_IBASE_END
 
 csPolyTexType::csPolyTexType ()
 {
@@ -83,6 +95,7 @@ csPolyTexType::csPolyTexType ()
 
 csPolyTexLightMap::csPolyTexLightMap () : csPolyTexType ()
 {
+  CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexLightMap);
   txt_plane = NULL;
   tex = new csPolyTexture ();
   lightmap_up_to_date = false;

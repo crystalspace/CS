@@ -31,9 +31,9 @@ The history order is reversed so that new features are at the top.
 	- Added iEngine::GetNumMeshFactories() and GetMeshFactory().
 	- Rationalized a bit of the engine API. Changed the following (replace
 	  'Bla' in the following with whatever it is you are working on):
-		- csSector: GetNumberBla() to GetBlaCount()
-		- iSector: RemoveBla() to UnlinkBla()
-		- iSector: FindBla(char* name) to GetBla()
+	    - csSector: GetNumberBla() to GetBlaCount()
+	    - iSector: RemoveBla() to UnlinkBla()
+	    - iSector: FindBla(char* name) to GetBla()
 	- Changed csCameraPosition::Load() to work with iCamera and iEngine
 	  instead of csCamera and csEngine.
 	- Added iMeshWrapper::GetChildCount() and GetChild().
@@ -78,6 +78,12 @@ The history order is reversed so that new features are at the top.
 	- Philip fixed some warnings in the python plugin.
 	- Eric Sunshine disabled CS_EXTENSIVE_MEMDEBUG for the Apple/NeXT ports
 	  since some of the Apple/NeXT compilers can't properly grok it.
+	- Eric Sunshine modified the following classes to embed SCF interfaces
+	  rather than inheriting them in order to work around multiple-
+	  inheritance problems with the NextStep compiler:
+	    iPolyTexFlat     -> csPolyTexFlat
+	    iPolyTexGouraud  -> csPolyTexGouraud
+	    iPolyTexLightMap -> csPolyTexLightMap
 31-May-2001
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents

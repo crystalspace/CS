@@ -134,7 +134,7 @@ public:
  * flat-shaded (do not mix with flat-colored!) texture mapped
  * (or flat-shaded) polygons.
  */
-class csPolyTexFlat : public csPolyTexType, public iPolyTexFlat
+class csPolyTexFlat : public csPolyTexType
 {
   friend class csPolygon3D;
 
@@ -147,7 +147,8 @@ private:
 
 protected:
   /// Constructor.
-  csPolyTexFlat () : csPolyTexType () { uv_coords = NULL; }
+  csPolyTexFlat () : csPolyTexType ()
+  { CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexFlat); uv_coords = NULL; }
 
   /// Destructor.
   virtual ~csPolyTexFlat ();
@@ -192,13 +193,22 @@ public:
   virtual csVector2 *GetUVCoords () { return uv_coords; }
 
   DECLARE_IBASE_EXT (csPolyTexType);
+
+  struct eiPolyTexFlat : public iPolyTexFlat
+  {
+    DECLARE_EMBEDDED_IBASE(csPolyTexFlat);
+    virtual void Setup (iPolygon3D *p) { scfParent->Setup(p); }
+    virtual void SetUV (int i, float u, float v) { scfParent->SetUV(i,u,v); }
+    virtual void ClearUV () { scfParent->ClearUV(); }
+    virtual csVector2 *GetUVCoords () { return scfParent->GetUVCoords(); }
+  } scfiPolyTexFlat;
 };
 
 /**
  * Structure containing information about texture mapping
  * and vertex colors for Gouraud-shaded polygons.
  */
-class csPolyTexGouraud : public csPolyTexFlat, public iPolyTexGouraud
+class csPolyTexGouraud : public csPolyTexFlat
 {
   friend class csPolygon3D;
 
@@ -218,7 +228,8 @@ private:
 
 protected:
   /// Constructor.
-  csPolyTexGouraud () : csPolyTexFlat () { colors = static_colors = NULL; }
+  csPolyTexGouraud () : csPolyTexFlat ()
+  { CONSTRUCT_EMBEDDED_IBASE(scfiPolyTexGouraud); colors = static_colors = 0; }
 
   /// Destructor.
   virtual ~csPolyTexGouraud ();
@@ -290,13 +301,26 @@ public:
   { SetColor (i, c.red, c.green, c.blue); }
 
   DECLARE_IBASE_EXT (csPolyTexFlat);
+
+  struct eiPolyTexGouraud : public iPolyTexGouraud
+  {
+    DECLARE_EMBEDDED_IBASE(csPolyTexGouraud);
+    virtual void Setup (iPolygon3D *p) { scfParent->Setup(p); }
+    virtual void ClearColors () { scfParent->ClearColors(); }
+    virtual csColor *GetColors () { return scfParent->GetColors(); }
+    virtual csColor *GetStaticColors() { return scfParent->GetStaticColors(); }
+    virtual void ResetDynamicColor (int i) { scfParent->ResetDynamicColor(i); }
+    virtual void SetDynamicColor (int i, const csColor& c)
+    { scfParent->SetDynamicColor(i,c); }
+    virtual void SetColor(int i,const csColor& c) { scfParent->SetColor(i,c); }
+  } scfiPolyTexGouraud;
 };
 
 /**
  * Structure containing all required information
  * for lightmapped polygons.
  */
-class csPolyTexLightMap : public csPolyTexType, public iPolyTexLightMap
+class csPolyTexLightMap : public csPolyTexType
 {
   friend class csPolygon3D;
 
@@ -357,6 +381,13 @@ public:
   iLightMap* GetLightMap () { return tex->GetLightMap (); }
 
   DECLARE_IBASE_EXT (csPolyTexType);
+
+  struct eiPolyTexLightMap : public iPolyTexLightMap
+  {
+    DECLARE_EMBEDDED_IBASE(csPolyTexLightMap);
+    virtual iPolyTxtPlane* GetPolyTxtPlane () const
+    { return scfParent->GetPolyTxtPlane(); }
+  } scfiPolyTexLightMap;
 };
 
 /*---------------------------------------------------------------------------*/
