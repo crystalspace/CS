@@ -25,6 +25,7 @@ The history order is reversed so that new features are at the top.
 	  The idea is that you will be able to define sequences that can
 	  work with different sets of objects (i.e. a sequence to open a
 	  door that you can reuse for several doors).
+	- Fixed a bug recently introduced in the sequence manager.
 30-Sep-2002
 	- Reverted a downscaling fix in OpenGL renderer for 2D images.
 	- Fixed simplept so it works again. Basically there was a problem

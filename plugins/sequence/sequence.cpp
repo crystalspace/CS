@@ -269,15 +269,18 @@ void csSequenceManager::TimeWarp (csTicks time, bool skip)
     // before performing it. Because DeleteFirstSequence() does a
     // DecRef() we first IncRef() it.
     csRef<iSequenceOperation> op = seqOp->operation;
+    csRef<iBase> params = seqOp->params;
     csTicks opt = seqOp->time;
     main_sequence->DeleteFirstSequence ();
 
     if (!skip)
     {
-      op->Do (main_time - opt, seqOp->params);
+      op->Do (main_time - opt, params);
     }
+
     // Now really delete the operation.
     op = NULL;
+    params = NULL;
 
     // And fetch the next one.
     seqOp = main_sequence->GetFirstSequence ();
