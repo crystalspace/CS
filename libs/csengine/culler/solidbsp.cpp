@@ -156,11 +156,11 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
       // Left polygon has no edges. We test if the left node
       // is completely contained in the right polygon. In that
       // case we can clear the subtree and mark it as solid.
-      if (right_poly->In (node->split_center))
+      if (!node->left->solid && right_poly->In (node->split_center))
       {
-        node->right->solid = true;
-	node_pool.Free (node->right->left); node->right->left = NULL;
-	node_pool.Free (node->right->right); node->right->right = NULL;
+        node->left->solid = true;
+	node_pool.Free (node->left->left); node->left->left = NULL;
+	node_pool.Free (node->left->right); node->left->right = NULL;
 	rc1 = true;
       }
       else rc1 = false;
@@ -169,11 +169,11 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
 
     if (right_poly->GetNumEdges () == 0)
     {
-      if (left_poly->In (node->split_center))
+      if (!node->right->solid && left_poly->In (node->split_center))
       {
-        node->left->solid = true;
-	node_pool.Free (node->left->left); node->left->left = NULL;
-	node_pool.Free (node->left->right); node->left->right = NULL;
+        node->right->solid = true;
+	node_pool.Free (node->right->left); node->right->left = NULL;
+	node_pool.Free (node->right->right); node->right->right = NULL;
 	rc2 = true;
       }
       else rc2 = false;
@@ -197,18 +197,17 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
     // create children.
     // @@@ Consider a lazy option where you don't subdivide
     // the polygon until really needed.
-    node->left = node_pool.Alloc ();
-    node->right = node_pool.Alloc ();
-
-    // @@@ This routine could be more efficient...
-    csPoly2DEdges* left_poly, * right_poly;
-    left_poly = poly_pool.Alloc ();
-    right_poly = poly_pool.Alloc ();
-    node->splitter = csPlane2 ((*poly)[0].v1, (*poly)[0].v2);
-    node->split_center = ((*poly)[0].v1 + (*poly)[0].v2) / 2;
-    poly->Intersect (node->splitter, left_poly, right_poly);
-    InsertPolygon (node->left, left_poly);
-    InsertPolygon (node->right, right_poly);
+    csSolidBspNode* n = node;
+    int i;
+    for (i = 0 ; i < poly->GetNumEdges () ; i++)
+    {
+      n->splitter = csPlane2 ((*poly)[i].v1, (*poly)[i].v2);
+      n->split_center = ((*poly)[i].v1 + (*poly)[i].v2) / 2;
+      n->left = node_pool.Alloc ();
+      n->right = node_pool.Alloc ();
+      n = n->right;
+    }
+    n->solid = true;
 
     return true;
   }
@@ -235,19 +234,15 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
       // Left polygon has no edges. We test if the left node
       // is completely contained in the right polygon. In that
       // case the solid state of that node is important for visibility.
-      if (right_poly->In (node->split_center))
-      {
-        if (!node->right->solid) { rc = true; goto end; }
-      }
+      if (!node->left->solid && right_poly->In (node->split_center))
+      { rc = true; goto end; }
     }
     else if (TestPolygon (node->left, left_poly)) { rc = true; goto end; }
 
     if (right_poly->GetNumEdges () == 0)
     {
-      if (left_poly->In (node->split_center))
-      {
-        if (!node->left->solid) { rc = true; goto end; }
-      }
+      if (!node->right->solid && left_poly->In (node->split_center))
+      { rc = true; goto end; }
     }
     else if (TestPolygon (node->right, right_poly)) { rc = true; goto end; }
 
@@ -268,7 +263,7 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
 bool csSolidBsp::InsertPolygon (csVector2* verts, int num_verts)
 {
   csPoly2DEdges* poly = poly_pool.Alloc ();
-  poly->MakeRoom (num_verts);
+  poly->SetNumEdges (0);
   int i, i1;
   i1 = num_verts-1;
   for (i = 0 ; i < num_verts ; i++)
@@ -284,7 +279,7 @@ bool csSolidBsp::InsertPolygon (csVector2* verts, int num_verts)
 bool csSolidBsp::TestPolygon (csVector2* verts, int num_verts)
 {
   csPoly2DEdges* poly = poly_pool.Alloc ();
-  poly->MakeRoom (num_verts);
+  poly->SetNumEdges (0);
   int i, i1;
   i1 = num_verts-1;
   for (i = 0 ; i < num_verts ; i++)

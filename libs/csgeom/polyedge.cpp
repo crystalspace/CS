@@ -99,13 +99,14 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
   csVector2 isect;
   float dist;
 
-  // If 0 then don't know, else if 1 then prefer right,
-  // else prefer left. This is used for trying to put edges
-  // that coincide with the splitter plane on the prefered
+  // If NULL then don't know, else points to the preferred
+  // polygon to add the edges too.
+  // This is used for trying to put edges
+  // that coincide with the splitter plane on the preferred
   // side (i.e. a side that contains other edges).
-  int preferred_dir = 0;
+  csPoly2DEdges* preferred_edge = NULL;
 
-  // If skip is > 0 then we skipped the 'skip' edges because
+  // If skip is > 0 then we skipped the first 'skip' edges because
   // we didn't have enough information for putting them
   // on the 'right' polygon.
   int skip = 0;
@@ -125,22 +126,20 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
         // Both vertices are on the plane. In this case
 	// we add the edge to the preferred side. If we don't
 	// have a preferred side yet then we skip it.
-	if (preferred_dir == 0)
+	if (preferred_edge == NULL)
 	  skip++;
-	else if (preferred_dir < 0)
-	  left->AddEdge (edges[i]);
 	else
-	  right->AddEdge (edges[i]);
+	  preferred_edge->AddEdge (edges[i]);
       }
-      else if (ATLEFT(c2))
+      else if (ATLEFT (c2))
       {
         left->AddEdge (edges[i]);
-	preferred_dir = -1;
+	preferred_edge = left;
       }
       else
       {
         right->AddEdge (edges[i]);
-	preferred_dir = 1;
+	preferred_edge = right;
       }
     }
     else if (ATLEFT (c1))
@@ -148,7 +147,7 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
       if (ATLEFTORPLANE (c2))
       {
         left->AddEdge (edges[i]);
-        preferred_dir = -1;
+        preferred_edge = left;
       }
       else
       {
@@ -156,7 +155,7 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
       	  plane, isect, dist);
 	left->AddEdge (edges[i].v1, isect);
 	right->AddEdge (isect, edges[i].v2);
-        preferred_dir = 1;
+        preferred_edge = right;
       }
     }
     else // ATRIGHT (c1)
@@ -164,7 +163,7 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
       if (ATRIGHTORPLANE (c2))
       {
         right->AddEdge (edges[i]);
-	preferred_dir = 1;
+	preferred_edge = right;
       }
       else
       {
@@ -172,10 +171,12 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
       	  plane, isect, dist);
 	right->AddEdge (edges[i].v1, isect);
 	left->AddEdge (isect, edges[i].v2);
-        preferred_dir = -1;
+        preferred_edge = left;
       }
     }
   }
+
+  if (!preferred_edge) return; //@@@ INVESTIGATE THIS CASE!!!
 
   // If skip > 0 then there are a number of edges in
   // the beginning that we ignored. These edges are all coplanar
@@ -183,10 +184,7 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
   i = 0;
   while (skip > 0)
   {
-    if (preferred_dir == -1)
-      left->AddEdge (edges[i]);
-    else
-      right->AddEdge (edges[i]);
+    preferred_edge->AddEdge (edges[i]);
     i++;
     skip--;
   }

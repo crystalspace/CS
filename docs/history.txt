@@ -12,6 +12,13 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+14-Mar-2000
+	- Michael Dale Long did a major rewrite of the iEntityManager
+	  interface.  Replaced Entity and Render lists with "associative
+	  lists".  A CrystalClear plugin can now have an entity associate
+	  itself with the plugin and supply data needed by the plugin,
+	  without the plugin having to maintain the list itself and provide
+	  it's own interfaces for maintaining the lists.
 13-Mar-2000
 	- Further implemented csSolidBsp.
 	- Added the new csSolidBsp as a new 2D culler next to the quadtree,
@@ -21,6 +28,7 @@ Short-term cleanups that need to be done:
 	  lighting.
 	- Added 'solidbsp' command to test the above feature.
 	  DON'T DO THIS YET. It will crash CS.
+	- Fixed transparency after a change of QInt by Andrew.
 	- Andrew Zabolotny did another set of changes:
 	    - Serious change: Re-implemented DECLARE_TYPED_VECTOR so that it
 	      defines a *correct* overriden vector.  Previously it worked
@@ -48,6 +56,8 @@ Short-term cleanups that need to be done:
 	      100 commands.  You can have different layouts in MazeD.cfg file.
 	    - Implemented some more of the texture mapping dialog.  Not
 	      complete yet but already something to look at :-)
+	- Did some serious debugging on the new csSolidBsp. It still
+	  doesn't work properly but it is ALMOST working ok now :-)
 	- Texinfo update from Martin Geisse.  Conversions for authors.html,
 	  cvsguid.txt, and Makefile.txt.  Updated msdos.txi.
 	- Eric Sunshine created makefile stubs mk/unix.mak and mk/dos.mak.
@@ -56,6 +66,35 @@ Short-term cleanups that need to be done:
 	  these files (if desired) and possibly override the defined values
 	  (if necessary).  Also modified all existing platform-specific
 	  makefiles to utilize these new stubs.
+	- Thomas Hieber removed some warnings from cclear, but still cc
+	  doesn't compile any more on Win32. (probably due to andrews
+	  changes to DECLARE_TYPED_VECTOR and the conversion of crystal
+	  clear to become a real plugin.
+	- Thomas also added support for generic zip files to contain
+	  textures and made the skybox size behave consistent with its
+	  documentation.
+	- Thomas removed a warning in MazeD: MSVC complained about kb and
+	  command being used without being safely initialised, afer looking
+	  at the code, I assume MSVC is right. The code should now be much
+	  safer.
+	- Thomas fixed the VC project files a little.
+	- Michael Ewert added a flag for improved near simultaneous
+	  collision response to csPhyzik.
+	- Michael also improved catastrophe handing loop (collisions) so
+	  it responds when backed up to a point where there is _no_
+	  catastrophe (collision).  This is more correct and is how CD
+	  packages like SOLID and I-Collide expect it to behave.  Got it
+	  working very nicely with SOLID. Email me if you want the
+	  SOLID-csphyziks interface code mewert99@yahoo.com.
+	- Michael Dale Long did the following changes to CrystalClear:
+	    - Initial ccActor code added.  Currently supports loading and
+	      manipulating csSprite3Ds and csThings(untested).
+	    - cctest has been updated to place a sprite near the player
+	      whenever SPACE is pressed.  Requires cctest.zip, which can
+	      be found at http://php.indiana.edu/crystalclear/cctest.html
+	    - Major cleanup of cctest code.  Could stand some more
+	      cleaning, but this reorganization went a long way towards
+	      improving readability.
 12-Mar-2000
 	- Paul Garceau restored several of the changes he did yesterday
 	  because his changes are broken.
