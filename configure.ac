@@ -1243,6 +1243,17 @@ CS_CHECK_LIB_WITH([mikmod],
     [libs/libmikmod*], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])])
 
+#-----------------------------------------------------------------------------
+# Check for libogg.  In addition to the standard installed locations, we
+# also search CS/libs/libmikmod*.
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([ogg],
+    [AC_LANG_PROGRAM(
+	[#include <ogg/ogg.h>],
+	[/*some test would be nice here...*/])],
+    [libs/libogg*], [],                                                         
+    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libogg], [OGG])])
+
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older
 # versions of Mingw did not have this library, whereas newer interim versions

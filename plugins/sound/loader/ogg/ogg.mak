@@ -58,8 +58,10 @@ ifeq ($(MAKESECTION),targets)
 
 sndogg: $(OUTDIRS) $(SNDOGG)
 
+# XXX: not that nice here, should add a test for vorbisfile and libvorbis to
+# configure as well...
 $(SNDOGG): $(OBJ.SNDOGG) $(LIB.SNDOGG)
-	$(DO.PLUGIN) -lvorbisfile -lvorbis -logg
+	$(DO.PLUGIN) $(OGG.LFLAGS) -lvorbisfile -lvorbis
 
 clean: sndoggclean
 sndoggclean:
