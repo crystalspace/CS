@@ -36,11 +36,11 @@ The latest version of this archive can be downloaded from:
 
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.95dev002.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.95dev003.zip}
 @end ifnottex
 @iftex
 @code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/}@*
-@code{msvc7_libs_0.95dev002.zip}
+@code{msvc7_libs_0.95dev003.zip}
 @end iftex
 
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
