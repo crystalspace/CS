@@ -1,5 +1,5 @@
 Crystal Space detailed change log.
-http://crystal.sourceforge.net/
+http://www.crystalspace3d.org/
 
 The overall history is in reverse (descending) chronological order, so that
 each new day's entries apears before the previous day's entries.  The
@@ -21,6 +21,10 @@ chronological order.
 	      USE_NEW_RENDERER. Likewise, the Jam property {build:oldrenderer}
 	      replaces the retired {build:newrenderer}.
 	- Eric Sunshine eliminated numerous compilation warnings.
+	- Eric Sunshine updated documentation and other URL's throughout the
+	  project to point at Crystal Space's new official domain
+	  crystalspace3d.org.  (We also respond to crystalspace3d.net and
+	  crystalspace3d.com.)
 27-Nov-2004
 	- Jorrit did a few minor changes to foliage. Nothing significant.
 	- Jorrit submitted a patch from Marc Prussmeier which adds the

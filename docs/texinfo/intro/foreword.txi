@@ -7,8 +7,7 @@ within the manual are not always the same. Where possible, the overall
 maintainers of this manual have modified the original documents to fit a more
 standard convention for easier reading. If you find anything in this manual
 which is not correct, please submit a bug report either to the mailing list,
-or to the sourceforge bug tracking system.
-@xref{Feedback}.
+or to the SourceForge bug tracking system. @xref{Feedback}.
 
 This manual can be read in just about any order, however, if you are a first
 time user of Crystal Space, you may want to read it in order from front
@@ -22,9 +21,9 @@ what's new.
 @node Current Status, UsingForProject, HowToRead, CS Introduction
 @section Current Status
 
-@emph{Note}: Crystal Space (@sc{cs}) is still in beta. This means that there
-are known and unknown bugs and that things in general may not work as
-expected (or may not work at all).  For information about known bugs and
+Crystal Space (@sc{cs}) is a mature project, though portions are still under
+development. This means that there may be some bugs and some things may not
+work as expected or might be incomplete.  For information about known bugs and
 unfinished items, refer to the Developer's Project page at SourceForge:
 
 @noindent
@@ -35,10 +34,10 @@ information, please visit the Related Projects page:
 
 @noindent
 @ifnottex
-@uref{http://crystal.sourceforge.net/tikiwiki/tiki-index.php?page=Related+Projects}
+@uref{http://www.crystalspace3d.org/tikiwiki/tiki-index.php?page=Related+Projects}
 @end ifnottex
 @iftex
-@code{http://crystal.sourceforge.net/tikiwiki/tiki-index.php?}@*
+@code{http://www.crystalspace3d.org/tikiwiki/tiki-index.php?}@*
 @code{page=Related+Projects}
 @end iftex
 

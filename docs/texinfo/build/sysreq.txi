@@ -26,7 +26,7 @@ scripting language you use.
 downloaded from:
 
 @noindent
-@uref{http://crystal.sourceforge.net/tikiwiki/tiki-index.php?page=Download}
+@uref{http://www.crystalspace3d.org/tikiwiki/tiki-index.php?page=Download}
 
 The release includes all of the source code, some pre-generated documentation,
 and a few example data files.  Alternately, you can download the latest
@@ -34,7 +34,7 @@ and a few example data files.  Alternately, you can download the latest
 and often as, or more, stable.
 
 @noindent
-@uref{http://crystal.sourceforge.net/cvs-snapshots/}
+@uref{http://www.crystalspace3d.org/cvs-snapshots/}
 
 You can also checkout the source directly from the @sc{cvs} repository.
 Directions for doing this can be found here:

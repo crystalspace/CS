@@ -1,24 +1,24 @@
 %define name    crystalspace
 %define version 0.99
-%define release 5
+%define release 6
 %define prefix	/usr
 
 %define with_DEBUG 0
 %{?_without_debug: %{expand: %%global with_DEBUG 0}}
 %{?_with_debug: %{expand: %%global with_DEBUG 1}}
                                                                                                          
-%define with_NR 0
-%{?_without_newrenderer: %{expand: %%global with_NR 0}}
-%{?_with_newrenderer: %{expand: %%global with_NR 1}}
+%define with_OR 0
+%{?_without_oldrenderer: %{expand: %%global with_OR 0}}
+%{?_with_oldrenderer: %{expand: %%global with_OR 1}}
                                                                                                          
 %define with_PERL 0
 %{?_without_perl: %{expand: %%global with_PERL 0}}
 %{?_with_perl: %{expand: %%global with_PERL 1}}
 
 Group: Development/C++
-Source: http://crystal.sourceforge.net/cvs-snapshots/bzip2/cs-current-snapshot.tar.bz2
+Source: http://www.crystalspace3d.org/cvs-snapshots/bzip2/cs-current-snapshot.tar.bz2
 BuildRoot: %{_tmppath}/%{name}-%{version}-root
-URL: http://crystal.sourceforge.net/
+URL: http://www.crystalspace3d.org/
 #Requires: 
 #Obsoletes:
 
@@ -56,8 +56,8 @@ sh  configure \
 %if %{with_DEBUG}
  --enable-debug \
 %endif
-%if %{with_NR}
- --enable-new-renderer \
+%if %{with_OR}
+ --enable-old-renderer \
 %endif
 %if %{with_PERL}
  --with-perl \
@@ -143,6 +143,10 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/%{name}/igraphic/*.h
 
 %changelog
+* Sun Nov 28 2004 Eric Sunshine <sunsihne@sunshineco.com> 0.99-6
+- Crystal Space now has its own domain: crystalspace3d.org.
+- New renderer is now default (configure with --enable-old-renderer for old).
+
 * Mon Nov 22 2004 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-5
 - Moved cslight invokations to post-install step.
 - Changed cslight invokations to use null instead of null2d.

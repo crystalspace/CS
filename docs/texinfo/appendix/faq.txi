@@ -13,7 +13,7 @@ section (see later) contains more technical questions.
 More FAQs can also be found online in the Crystal Space Wiki:@*
 
 @noindent
-(@uref{http://crystal.sourceforge.net/phpwiki/index.php?FAQ}).
+(@uref{http://www.crystalspace3d.org/phpwiki/index.php?FAQ}).
 
 @itemize @bullet
 @item

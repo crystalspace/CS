@@ -22,7 +22,7 @@ if ($action=="") {
     print "commenting facility only to add suggestions/notes regarding the ";
     print "documentation.<br>\n";
     print "For questions on the usage of CrystalSpace please see the ";
-    print "<a href=\"http://crystal.sourceforge.net/tikiwiki/tiki-index.php";
+    print "<a href=\"http://www.crystalspace3d.org/tikiwiki/tiki-index.php";
     print "?page=Contact+Us\">list of available contact options on the home ";
     print "page</a>.<p>";
     print "<form action=\"$self?action=add#comments\" method=\"post\">\n";

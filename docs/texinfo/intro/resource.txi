@@ -18,7 +18,7 @@ know.
 @noindent
 The Crystal Space home page is located at:
 
-@uref{http://crystal.sourceforge.net/}
+@uref{http://www.crystalspace3d.org/}
 
 @noindent
 The Crystal Space Developer's Project page is located at:
@@ -63,12 +63,12 @@ Second, you can download a snapshot of the @sc{cvs} repository using @sc{http}.
 Snapshots are generated daily and are accompanied by standard @samp{diff}-style
 @dfn{patch} files.
 
-@uref{http://crystal.sourceforge.net/cvs-snapshots/}
+@uref{http://www.crystalspace3d.org/cvs-snapshots/}
 
 You can also view the contents of the @sc{cvs} repository online including
 all of the historical information and administrative information.
 
-@uref{http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/crystal/CS/}
+@uref{http://cvs.crystalspace3d.org/cgi-bin/viewcvs.cgi/crystal/CS/}
 
 @subheading Documentation
 @cindex Documentation, Obtaining
@@ -90,17 +90,17 @@ web browser by loading the file @file{CS/docs/html/manual/index.html}, or the
 Documentation is available for online viewing.  The @cite{Crystal Space
 User's Manual} is available for online viewing at this location:
 
-@url{http://crystal.sourceforge.net/docs/online/manual/}
+@url{http://www.crystalspace3d.org/docs/online/manual/}
 
 The @cite{Public @sc{api} Reference Manual} is available for online viewing
 here:
 
-@url{http://crystal.sourceforge.net/docs/online/api/}
+@url{http://www.crystalspace3d.org/docs/online/api/}
 
 In addition, all of the above documents may be downloaded for offline viewing
 from the following location.
 
-@url{http://crystal.sourceforge.net/docs/download/}
+@url{http://www.crystalspace3d.org/docs/download/}
 
 @noindent
 The downloadable documentation may be available in a number of formats.  At the

@@ -18,10 +18,11 @@ repository, then before you commit changes, you should also read
 If you are not a registered developer, but still have code or bug fixes to
 submit, you can send your code to any developer with write access to the CVS
 repository.  To see which developers have write-access, look at the Crystal
-Space web page on SourceForge (@uref{http://www.sourceforge.net}).  It is also
+Space web page on SourceForge (@uref{http://www.sourceforge.net/}).  It is also
 acceptable to send small changes or patches to the Crystal Space mailing list.
 If all else fails, you can always send your code to Jorrit Tyberghein
-(@email{Jorrit.Tyberghein@@uz.kuleuven.ac.be}) for inclusion in the project.
+(@email{jorrit.tyberghein@@gmail.com}) or Eric Sunshine
+(@email{sunshine@@sunshineco.com}) for inclusion in the project.
 
 If you would like to contribute to the project in general by working on
 features which are missing or lacking, you might want to see the To-Do

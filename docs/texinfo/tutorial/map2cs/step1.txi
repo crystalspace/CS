@@ -13,7 +13,7 @@ require a quite complex setup, which we shall explain later in this tutorial.
 Crystal Space - This sounds obvious, but you require a release distribution
 of the Crystal Space SDK. You can obtain it from:
 
-@uref{http://crystal.sourceforge.net/}
+@uref{http://www.crystalspace3d.org/}
 
 @item
 Valve Hammer 3.4 - The Half-Life editor.  You might be technically or legally
