@@ -96,7 +96,7 @@ class ctQuatRigidBody : public ctEntity {
     return R;
   }
   void      set_R(ctMatrix3& new_R) {
-    quat.from_matrix(R);
+    quat.from_matrix(new_R);
     precalculated = false;
   }
 
@@ -108,6 +108,10 @@ class ctQuatRigidBody : public ctEntity {
   }
 
   ctMatrix3    get_Ibodyinv(void) { return Ibodyinv; }
+  ctMatrix3    get_Iinv(void) {
+    Precalculate();
+    return Iinv;
+  }
 
   ctVector3    get_angular_velocity() {
     Precalculate();
