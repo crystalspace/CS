@@ -19,10 +19,6 @@ backbuffer implementation and a 16/32-bit software implementation.  (The
 16-bit implementation works with OpenGL 1.2, only.)
 
 @item
-In Glide on platforms which support Glide.  Currently there is a hardware
-backbuffer implementation.
-
-@item
 DirectX support has yet to be added.
 @end itemize
 
@@ -177,11 +173,6 @@ With the back buffer implementation, this flag has no effect as it always
 utilizes the same texture manager as the main renderer.  With the software
 implementation, this flag has the same effect as with the pure software
 version, as detailed above.
-
-@item
-Glide Specific Details
-
-This flag has no effect on the Glide implementation.
 @end itemize
 
 @item
@@ -213,12 +204,6 @@ backbuffer is of course overwritten by the main renderer.  If you set this
 flag then the backbuffer drivers will rewrite the texture to the backbuffer
 when you call BeginDraw so you can carry on working as usual as if it was
 always there.
-
-@item
-Glide Specific Details
-
-The same thing happens with the glide back buffer implementation as it does
-with opengl.
 @end itemize
 
 @item
@@ -254,7 +239,7 @@ current situation, I don't expect this to change.
 
 The biggest thing to definitely do when rendering to procedural textures is to
 do it before you render to the main screen.  This is because with OpenGL and
-Glide, the procedural texture buffer may be the backbuffer.  Lastly, of
+the procedural texture buffer may be the backbuffer.  Lastly, of
 course, try and utilize the @code{iGraphics3D->Print(csRect*)} ability to just
 update a small portion of the buffer.
 

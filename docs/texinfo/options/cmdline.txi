@@ -30,9 +30,9 @@ Use this option to set the size of the display.
 Use this option to select the type of 2D canvas to use.
 
 @item -video=opengl
-(or direct3d, glide, software, ...).
+(or direct3d, software, ...).
 Use this option to select type of display driver to use.  Other options
-are @code{software}, @code{glide}, @code{direct3d}, etc.
+are @code{software}, @code{direct3d}, etc.
 
 @item -recalc
 Use this option to force recalculation of all cached information about a

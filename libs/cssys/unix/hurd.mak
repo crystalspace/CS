@@ -19,26 +19,12 @@ PLUGINS+=video/format/avi
 # www.projectmayo.com
 #PLUGINS+=video/format/codecs/opendivx
 
-# Uncomment the following to build GGI 2D and/or SDL drivers
-#PLUGINS+=video/canvas/ggi 
+# Uncomment the following to build SDL 2D driver
 #PLUGINS+=video/canvas/sdl 
 
 # Uncomment the following to build sound drivers
 #PLUGINS+=sound/driver/oss sound/renderer/software
 
-# Uncomment some of the following if you have a special MESA version that uses
-# some of the following hardware/software renderers.  Also set the entry Driver
-# in section Display of opengl.cfg
-#PLUGINS+=video/canvas/openglx/glide
-
-# uncomment the following to build Glide stuff
-#GLIDE_VERSIONS=2 3
-#ifneq ($(strip $(GLIDE_VERSIONS)),)
-#PLUGINS+=video/canvas/unxglide
-#PLUGINS+=video/renderer/glide
-#endif
-#GLIDE2_PATH=$(CFLAGS.I)/usr/include/glide2
-#GLIDE3_PATH=$(CFLAGS.I)/usr/include/glide3
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 

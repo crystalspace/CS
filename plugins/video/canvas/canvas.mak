@@ -18,7 +18,4 @@ SRC.COMMON.DRV2D = \
 INC.COMMON.DRV2D.OPENGL = plugins/video/canvas/openglcommon/*.h
 SRC.COMMON.DRV2D.OPENGL = plugins/video/canvas/openglcommon/*.cpp
 
-INC.COMMON.DRV2D.GLIDE = plugins/video/canvas/glide2common/*.h
-SRC.COMMON.DRV2D.GLIDE = plugins/video/canvas/glide2common/*.cpp
-
 endif # ifeq ($(MAKESECTION),postdefines)

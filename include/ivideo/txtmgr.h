@@ -76,7 +76,7 @@ struct iMaterialHandle;
 /**
  * By setting this flag it guarantess that the procedural texture buffers
  * contents persists between frames. There is a small performance penalty
- * on the opengl and glide implementations with this flag.
+ * on the OpenGL implementations with this flag.
  */
 #define CS_TEXTURE_PROC_PERSISTENT  	0x00000040
 /**

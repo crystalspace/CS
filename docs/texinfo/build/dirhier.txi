@@ -202,12 +202,6 @@ Unix, using @sc{svga}lib
 MacOS/9
 @item CS/plugins/video/canvas/next
 MacOS/X, MacOS/X Server, OpenStep, NextStep
-@item CS/plugins/video/canvas/glide2common
-Common code for to Glide2 drivers
-@item CS/plugins/video/canvas/beglide2
-Glide2X 2D driver for BeOS
-@item CS/plugins/video/canvas/unxglide2
-Glide2x 2D driver for Unix
 @item CS/plugins/video/canvas/openglcommon
 Common code for all OpenGL 2D drivers
 @item CS/plugins/video/canvas/openglbe
@@ -226,7 +220,7 @@ OpenGL 2D driver for Unix/X Windows
 The 3D rasterizer component is required by the 3D engine but may also be
 useful standalone.  It needs a 2D Driver.  There are currently several classes
 of this component which correspond to particular @sc{api}s: software, OpenGL,
-Glide, and Direct3D.  Some rasterizers are operating system independent, such
+and Direct3D.  Some rasterizers are operating system independent, such
 as OpenGL and software.  Some rasterizer techonolgy is only available on
 certain operating systems, such as DirectX.
 
@@ -235,8 +229,6 @@ certain operating systems, such as DirectX.
 Common code for 3D rasterizers
 @item CS/plugins/video/renderer/direct3d61
 Direct3D rasterizer using DirectX 6.1
-@item CS/plugins/video/renderer/glide
-3D rasterizer using glide
 @item CS/plugins/video/renderer/opengl
 3D rasterizer using OpenGL
 @item CS/plugins/video/renderer/software

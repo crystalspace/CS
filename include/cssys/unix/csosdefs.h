@@ -43,11 +43,6 @@
 // The 2D graphics driver used by OpenGL renderer
 #define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glx"
 
-// The 2D graphics driver used by Glide renderer
-#define CS_GLIDE_2D_DRIVER	"crystalspace.graphics2d.glide.x.2"
-
-// The 2D graphics driver used by Glide renderer Version 3
-#define CS_GLIDE_2D_DRIVER_V3 "crystalspace.graphics2d.glide.x.3"
 // The sound driver
 #define CS_SOUND_DRIVER "crystalspace.sound.driver.oss"
 

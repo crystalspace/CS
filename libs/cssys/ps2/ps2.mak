@@ -5,26 +5,12 @@
 DESCRIPTION.ps2 = PS2
 
 # Choose which 2D/3D driver combinations you want to build/use
-#PLUGINS+=video/canvas/softx video/renderer/software
-#PLUGINS+=video/renderer/opengl video/canvas/openglx
-#PLUGINS+=video/canvas/linex
-#PLUGINS+=video/renderer/null 
 #PLUGINS+=video/renderer/software
+#PLUGINS+=video/renderer/opengl
 PLUGINS+=video/renderer/opengl video/canvas/ps2d
 
-# uncomment the following to build SVGALIB and/or GGI 2D drivers
-#PLUGINS+=video/canvas/svgalib
-#PLUGINS+=video/canvas/ggi 
-
 # uncomment the following to build sound drivers
-#PLUGINS+=sound/driver/oss sound/renderer/software
-
-# uncomment some of the following if you have a special MESA version that uses some 
-# of the following hardware/software renderers
-# Also set the entry Driver in section Display of opengl.cfg
-#PLUGINS+=video/canvas/openglx/glide
-#PLUGINS+=video/canvas/openglx/svga
-#PLUGINS+=video/canvas/openglx/empty
+#PLUGINS+=sound/renderer/software
 
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))

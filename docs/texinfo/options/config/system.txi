@@ -74,12 +74,6 @@ acceleration. Requires installed OpenGL run-time libraries.
 Similar to the above. Requires installed DirectX 6.1 or higher run-time
 libraries.
 
-@item crystalspace.graphics3d.glide.2
-Uses Glide 2 for 3D output. Requires Glide 2 run-time libraries.
-
-@item crystalspace.graphics3d.glide.3
-Uses Glide 3 for 3D output. Requires Glide 3 run-time libraries.
-
 @item crystalspace.graphics3d.line
 This is a variant of the software renderer.
 @end table

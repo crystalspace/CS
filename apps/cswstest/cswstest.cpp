@@ -491,9 +491,6 @@ void csWsTest::TreeDialog ()
       (void)new csTreeItem (i2, "glwin32 (Windows OpenGL)");
       (void)new csTreeItem (i2, "glmac (MacOS/9 OpenGL)");
       (void)new csTreeItem (i2, "glbe (BeOS OpenGL)");
-    i2 = new csTreeItem (i1, "Glide");
-      (void)new csTreeItem (i2, "unxglide (Glide on Linux, possibly on FreeBSD)");
-      (void)new csTreeItem (i2, "beglide (Glide on BeOS)");
     i2 = new csTreeItem (i1, "Direct3D");
       (void)new csTreeItem (i2, "ddraw61 (Direct Draw 6.1)");
     i2 = new csTreeItem (i1, "X11");

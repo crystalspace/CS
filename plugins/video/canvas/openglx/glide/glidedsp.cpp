@@ -19,9 +19,8 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "video/renderer/glide/gllib.h"
 #include "glidedsp.h"
-#include "video/canvas/openglx/iogldisp.h"
+#include "../iogldisp.h"
 #include "isys/plugin.h"
 #include "isys/system.h"
 

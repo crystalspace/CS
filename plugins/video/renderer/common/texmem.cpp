@@ -23,11 +23,10 @@
 #include "isys/system.h"
 
 /**
-  * This function provides a state of the current fragmentation 
-  * of the memory. 
+  * This function provides a state of the current fragmentation of the memory.
   *
-  * I have not implemented any unfragmentation procedure, mainly
-  * because there is no way (through glide) to read Data from Texture Memory.
+  * I have not implemented any unfragmentation procedure, mainly because it is
+  * not always possible to read Data from Texture Memory.
   * 
   * With this current implementation, it will be difficult to add.
   */

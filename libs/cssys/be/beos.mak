@@ -8,21 +8,6 @@ DESCRIPTION.OS.beos = BeOS
 # Choose which drivers you want to build/use
 PLUGINS += video/canvas/be video/canvas/openglbe video/renderer/opengl
 
-# Automatically detect presence of Glide packages.
-GLIDE_VERSIONS =
-
-# Glide 2 package.
-GLIDE2_INCLUDE = /boot/develop/headers/3dfx/glide2
-ifneq ($(wildcard $(GLIDE2_INCLUDE)),)
-GLIDE_VERSIONS += 2
-PLUGINS += video/canvas/beglide2
-endif
-
-# Glide 3D renderer.
-ifneq ($(strip $(GLIDE_VERSIONS)),)
-PLUGINS += video/renderer/glide
-endif
-
 # Be compiler does not currently grok CS assembly
 override DO_ASM=no
 
@@ -126,13 +111,6 @@ LINK=gcc
 # Defines for OpenGL 3D driver
 CFLAGS.GL3D+=$(CFLAGS.I)/boot/develop/headers/be/opengl
 LIBS.OPENGL.SYSTEM+=$(LFLAGS.l)GL
-
-# Defines for Glide2 driver.
-ifneq ($(findstring 2,$(GLIDE_VERSIONS)),)
-GLIDE2_PATH=$(CFLAGS.I)$(GLIDE2_INCLUDE)
-# Should be libglide2x.so for linker flag '-l' to work, but Be goofed name.
-GLIDE2_LIB=/system/lib/glide2x.so
-endif
 
 endif # ifeq ($(MAKESECTION),defines)
 

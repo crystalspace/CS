@@ -29,6 +29,8 @@ The history order is reversed so that new features are at the top.
 	      set too low.
 	- Fixed texture mapping of one of the sides of the skybox in csdemo.
 	  Two weeks ago Norman changed this for some reason?
+	- Eric Sunshine removed a bunch of Glide references from documentation,
+	  sources, headers, and makefiles.
 4-Jul-2001
 	- Added iCamera::SetTransform() which should be used to directly
 	  set the transform. It is illegal to assign to the result of

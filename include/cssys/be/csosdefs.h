@@ -27,9 +27,6 @@
 // The 2D graphics driver used by OpenGL renderer
 #define CS_OPENGL_2D_DRIVER "crystalspace.graphics2d.glbe"
 
-// The 2D graphics driver used by Glide renderer
-#define CS_GLIDE_2D_DRIVER "crystalspace.graphics2d.glide.be.2"
-
 // BeOS param.h unconditionally defines MAX and MIN, so we must remove the
 // definitions set up by csdefs.h in order to avoid redifinition warnings.
 #undef MIN

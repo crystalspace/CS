@@ -18,16 +18,6 @@ PLUGINS+=video/format/avi
 # OpenDivX : you need an additional library you can get from www.projectmayo.com
 #PLUGINS+=video/format/codecs/opendivx                                                                  
 #PLUGINS+=video/format/codecs/rle                                                                  
-# Uncomment some of the following if you have a special MESA version that uses
-# some of the following hardware/software renderers. Also set the entry Driver
-# in section Display of opengl.cfg
-
-#PLUGINS+=video/canvas/openglx/glide
-#PLUGINS+=video/canvas/openglx/svga
-#PLUGINS+=video/canvas/openglx/empty
-
-# Uncomment the following to build GGI 2D driver
-#PLUGINS+=video/canvas/ggi
 
 # Uncomment the following to build sound renderer
 #PLUGINS+=sound/renderer/software

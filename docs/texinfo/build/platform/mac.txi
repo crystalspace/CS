@@ -37,18 +37,6 @@ folder in the @file{Metrowerks CodeWarrior:MacOS Support} folder called
 @file{Resources} from the @file{OpenGL SDK} disk and place them into the
 @file{OpenGL SDK} folder you just created.
 
-If you are going to build the Glide Renderer you need to download the Glide
-@sc{sdk} from 3dfx:
-
-@uref{http://www.3dfx.com/downloads/SDK/sdk_glidemacppc/glide2xsdk_sea.hqx}
-
-This will download a self extracting archive.  Double click on @file{Glide2x
-SDK.sea}.  No drivers are included.  The @sc{sdk} depends upon the operating
-system, not the cards.  The Glide 2x drivers are available from the
-manufacturer of your Voodoo-based Macintosh accelerator card.  You will need
-to place a copy of your driver (library) into the @sc{lib} folder in order to
-build your projects.
-
 @subsubheading Working with the Crystal Space Projects
 
 There are 22 Crystal Space projects in the @file{mwcw} folder:
@@ -82,14 +70,6 @@ Generates the OpenGL Render shared library.
 @item Sound.mcp
 Generates the mac sound driver shared library and software sound render shared
 library.
-@end table
-
-@noindent
-These projects are not up to date:
-
-@table @code
-@item GlideRender.mcp
-Generates the Glide Render shared library.
 @end table
 
 @noindent

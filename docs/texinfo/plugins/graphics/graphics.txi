@@ -24,7 +24,7 @@ automatically by the according 3D driver.
 This component is required by the 3D Engine but is also useful standalone.
 This driver is used to draw 3d graphics and also 2D bitmaps on screen.  It
 automatically loads a 2D driver on startup.  There are currently several
-implementations of this component: Software, OpenGL, Glide, and Direct3D, as
+implementations of this component: Software, OpenGL, and Direct3D, as
 well as debugging drivers such as Line and Infinite.
 @end itemize
 

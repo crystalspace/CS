@@ -120,8 +120,6 @@ and some default 2D driver. Here are some other options:
 @item
 OpenGL with X11
 @item
-Glide with X11
-@item
 Software with SVGALIB
 @item
 Software with GGI

@@ -38,9 +38,6 @@ Direct3D for Windows port.
 OpenGL support for GNU/Linux, BeOS, MacOS/9, OS/2, and Windows.
 
 @item
-Glide support for GNU/Linux and BeOS.
-
-@item
 Drawing arbitrary sloped convex polygons.
 
 @item

@@ -115,19 +115,6 @@ OpenGL
 make glbe2d
 make gl3d
 @end example
-
-@item
-Glide
-
-@example
-make glidebe2d
-make glide3d2
-@end example
-
-@emph{Note}: The Glide2 driver for @BeOS{} is untested---owing to lack of
-appropriate hardware on the maintainer's part---however, it does compile.
-Also, it is only meaningful to invoke this makefile target if Be's experimental
-Glide2 support package has been installed on your system.
 @end enumerate
 
 @node BeOS Running, BeOS Notes, BeOS Building, BeOS
@@ -178,7 +165,6 @@ specifying the @samp{--video} option on the command-line:
 @example
 walktest --video=software  # @r{Runs in software mode}
 walktest --video=opengl    # @r{Runs in OpenGL mode}
-walktest --video=glide     # @r{Runs in Glide mode}
 @end example
 
 If you are using the OpenGL renderer, then invoking @kbd{@key{ALT}-f} will
@@ -235,12 +221,12 @@ Add full-screen support for software mode.  Be careful about the resolution,
 since Crystal Space can use any arbitrary window dimension.
 
 @item
-The various 2D graphics drivers (software, OpenGL, Glide) should all be
+The various 2D graphics drivers (software, OpenGL) should all be
 derived from a common class rather than being nearly identical copies of one
 another.
 
 @item
-Technically, the software and Glide 2D drivers should be employing
+Technically, the software 2D drivers should be employing
 double-buffering since a @dfn{window-exposed} event in the sub-thread which is
 running the @samp{BApplication} will draw using the @samp{BBitmap} even though
 the main thread, in which Crystal Space is running, may be in the process of
