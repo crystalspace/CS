@@ -3,6 +3,24 @@ The history order has been reversed so that new features are at the top.
 9-Mar-2001
 	- Fixed some include files in the Direct3D6.1 plugin which were
 	  not converted to the new structure.
+	- Wouter Wijngaards committed six textures to stdtex.zip, which
+	  will be useful for making nice lens flares. They are:
+	  flare_center.jpg flare_grcir.jpg flare_picir.jpg flare_pink.jpg
+	  flare_purp.jpg flare_rbow.jpg.
+	  These will look nice when added in different sizes, with mixmode
+	  CS_FX_ADD.
+	- Wouter also added a method to scf's iFactory: QueryClassID that
+	  will return the class ID of the plugin from which the object
+	  originates. Of course this will cause massive re-compilation,
+	  but the header changes require compilation anyway.
+	- Wouter also added to csutil/util.h the function csFindReplace,
+	  that copies a string from source to dest, whilst find&replacing
+	  substrings inside. It will also check destination buffer overflow.
+	- Wouter started support for saving in the mesh loader plugins.
+	- Wouter added access methods for Radius and Shift in iBallState.
+	- Wouter implemented the ball factory and object savers.
+	- Wouter fixed another halo bug (a line of garbage on the top side
+	  of the halo).
 8-Mar-2001
 	- Eric Sunshine moved all of the pure SCF interface header files (the
 	  filenames beginning with `i') into subdirectories of CS/include.
