@@ -21,7 +21,7 @@
 #define __CS_IE3DS_H__
 
 #include "imesh/mdlconv.h"
-#include "lib3ds/types.h"
+#include <lib3ds/types.h>
 
 class csModelConverter3ds : iModelConverter
 {

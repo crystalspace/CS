@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
     This is built around the lib3ds open source library. It requires a version
-    laster than 1.1.0.
+    later than July 7th 2001.
 
     More information can be found at http://sourceforge.net/projects/lib3ds/
 */
@@ -33,15 +33,15 @@
 #include "iutil/databuff.h"
 
 #include "ie3ds.h"
-#include "lib3ds/camera.h"
-#include "lib3ds/file.h"
-#include "lib3ds/io.h"
-#include "lib3ds/light.h"
-#include "lib3ds/material.h"
-#include "lib3ds/matrix.h"
-#include "lib3ds/mesh.h"
-#include "lib3ds/node.h"
-#include "lib3ds/vector.h"
+#include <lib3ds/camera.h>
+#include <lib3ds/file.h>
+#include <lib3ds/io.h>
+#include <lib3ds/light.h>
+#include <lib3ds/material.h>
+#include <lib3ds/matrix.h>
+#include <lib3ds/mesh.h>
+#include <lib3ds/node.h>
+#include <lib3ds/vector.h>
 
 CS_IMPLEMENT_PLUGIN
 
@@ -72,7 +72,7 @@ static Lib3dsBool DataErrorFunc( void * )
 }
 
 
-static Lib3dsBool DataSeekFunc( void *self, long offset, Lib3dsIoSeek origin )
+static long DataSeekFunc( void *self, long offset, Lib3dsIoSeek origin )
 {
   csDataStream *pData = (csDataStream*)self;
 
@@ -87,10 +87,10 @@ static Lib3dsBool DataSeekFunc( void *self, long offset, Lib3dsIoSeek origin )
       offset += pData->GetLength();
       break;
     default:
-      return LIB3DS_TRUE;
+      return 1;
   }
   pData->SetPosition( offset );
-  return LIB3DS_FALSE;
+  return 0;
 }
 
 
