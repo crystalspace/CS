@@ -64,8 +64,6 @@ public:
   void CalcVis();
   /// set visibility value 
   void SetVis(int x, int y, float val);
-  /// get visibility value 
-  float GetVis(int x, int y) const;
   /// get the maximum radius when this light still has effect
   float MaxRadius() const;
 
@@ -84,6 +82,7 @@ public:
   virtual void ShineSprite(iIsoSprite *sprite);
   virtual csFlags& Flags() {return flags;}
   virtual iLight* GetFakeLight();
+  virtual float GetVis(int x, int y) const;
 
 };
 
@@ -96,7 +95,7 @@ public:
   DECLARE_IBASE;
 
   csIsoFakeLight(csIsoLight *par) {isolight = par;}
-  virtual ~csIsoFakeLight();
+  virtual ~csIsoFakeLight() {}
 
   //------------ iLight ------------------------------------------
   virtual csLight* GetPrivateObject () {return 0;}

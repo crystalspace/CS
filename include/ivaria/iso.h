@@ -212,6 +212,9 @@ struct iIsoGrid : public iBase
   virtual void RegisterDynamicLight(iIsoLight *light) = 0;
   /// unregister a dynamic light with this grid
   virtual void UnRegisterDynamicLight(iIsoLight *light) = 0;
+  /// get a list of fake iLight interfaces for a spot on the grid
+  virtual void GetFakeLights(const csVector3& pos, iLight **& flights, 
+    int& num) = 0;
 
   /// Add a sprite to this grid
   virtual void AddSprite(iIsoSprite *sprite) = 0;
@@ -512,6 +515,8 @@ struct iIsoLight : public iBase
   virtual void ShineSprite(iIsoSprite *sprite) = 0;
   /// return an iLight interface that mostly works. For internal use.
   virtual iLight* GetFakeLight() = 0;
+  /// how much does the light shine on a particular grid square?
+  virtual float GetVis(int gridx, int gridy) const = 0;
 };
 
 SCF_VERSION (iIsoMaterialWrapperIndex, 0, 0, 1);

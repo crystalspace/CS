@@ -266,6 +266,10 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
   {
     //printf("mesh draw()\n");
     /// UpdateLighting ....
+    iLight **lights = NULL;
+    int numlights = 0;
+    grid->GetFakeLights(position, lights, numlights);
+    mesh->UpdateLighting(lights, numlights, movable);
     if(mesh->Draw(fakerview, movable, zbufmode))
     {
       //printf("mesh prob vis\n");
