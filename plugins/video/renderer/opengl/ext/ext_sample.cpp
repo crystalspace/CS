@@ -65,3 +65,7 @@ void csGraphics3DOpenGL::DetectExtensions()
 	}
 }
 
+
+// We must defined this symbol so that the default detection function is not used
+#define _DEFINED_DETECTION_METHOD
+

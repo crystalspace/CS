@@ -17,9 +17,11 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#define NUM_EXTENSIONS 1
+#define NUM_EXTENSIONS 3
 
-const char *knownExtensions[] = {"GL_ARB_multitexture"};
+const char *knownExtensions[] = {"GL_ARB_multitexture", 
+                                 "GL_EXT_compiled_vertex_array",
+				 "GLX_ARB_get_proc_address"};
 
 void csGraphics3DOpenGL::DetectExtensions()
 {
@@ -61,4 +63,7 @@ void csGraphics3DOpenGL::DetectExtensions()
 		}
 	}
 }
+
+
+#define _DEFINED_DETECTION_METHOD
 

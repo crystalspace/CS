@@ -33,7 +33,6 @@
 
 // win32 extension detection by Robert Bergkvist
 #ifdef OS_WIN32
-#define GLEXT_DETECTION_DEFINED_
 #include "ext_w32.cpp"
 #endif
 
@@ -41,7 +40,6 @@
 // if you get CS to compile and detect extensions on another
 // Mesa platform besides LINUX plz add a test here
 #ifdef MESA
-#define GLEXT_DETECTION_DEFINED_
 #include "ext_mesa.cpp"
 #endif
 
@@ -50,7 +48,7 @@
 // some sort of base/subclass hierarchy for extension
 // detection, but that seems like a needless mess.  Of
 // course this module is kind of a mess :)
-#ifndef GLEXT_DETECTION_DEFINED_
+#ifndef _DEFINED_DETECTION_METHOD
 #error Opengl extension detection not supported on this platform.
 #endif
 

@@ -55,11 +55,8 @@
 //#define USE_MULTITEXTURE 1
 
 // Whether or not we should try  and use OpenGL extensions. This should be 
-// removed eventually,
-// when all platforms have been updated. See at Win32/ogl_ext.cpp and
-// Win32/ogl_ext.h for an 
-// idea  of what has to be done.
-//#define USE_EXTENSIONS 1
+// removed eventually, when all platforms have been updated.
+#define USE_EXTENSIONS 1
 
 // ---------------------------------------------------------------------------
 
@@ -239,25 +236,11 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   }
   blendstyles[] =
   {
-    {
-      "multiplydouble", GL_DST_COLOR, GL_SRC_COLOR
-    }
-    ,
-    {
-      "multiply", GL_DST_COLOR, GL_ZERO
-    }
-    ,
-    {
-      "add", GL_ONE, GL_ONE
-    }
-    ,
-    {
-      "coloradd", GL_ONE, GL_SRC_COLOR
-    }
-    ,
-    {
-      NULL, GL_DST_COLOR, GL_ZERO
-    }
+    { "multiplydouble", GL_DST_COLOR, GL_SRC_COLOR } ,
+    { "multiply", GL_DST_COLOR, GL_ZERO } ,
+    { "add", GL_ONE, GL_ONE } ,
+    { "coloradd", GL_ONE, GL_SRC_COLOR } ,
+    { NULL, GL_DST_COLOR, GL_ZERO }
   };
   // default lightmap blend style
   m_config_options.m_lightmap_src_blend = GL_DST_COLOR;
@@ -313,7 +296,8 @@ bool csGraphics3DOpenGL::Open (const char *Title)
 
   // generate the exponential 1D texture for use in vertex fogging
   // this texture holds a 'table' of alpha values forming an exponential
-  // curve, to use for generating exponential fog.
+  // curve, used for generating exponential fog by mapping it onto
+  // fogged polygons as we draw them.
   const unsigned int FOGTABLE_SIZE = 64;
   unsigned char *transientfogdata = new unsigned char[FOGTABLE_SIZE * 4];
   for (unsigned int fogindex = 0; fogindex < FOGTABLE_SIZE; fogindex++)
@@ -1174,8 +1158,6 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
     // the current world->camera transform
     //
     // Wonder why we do the orientation before the translation?
-    // Wonder why we apply this AFTER the perspective transform,
-    // applied in the preceding code block?
     // Many 3D graphics and OpenGL books discuss how the order
     // of 4x4 transform matrices represent certain transformations,
     // and they do a much better job than I ever could.  Please refer
@@ -1235,7 +1217,8 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glPushMatrix();
   glLoadIdentity();
 
-  glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 1.0);
+  glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
+
   glTranslatef(width2,height2,0);
 
   for (i = 0 ; i < 16 ; i++)
@@ -1244,7 +1227,7 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
   
   matrixholder[10] = 0.0;
-  matrixholder[11] = 1.0/aspect;
+  matrixholder[11] = +1.0/aspect;
   matrixholder[14] = -1.0/aspect;
   matrixholder[15] = 0.0;
 
