@@ -151,7 +151,7 @@ void csAVIStreamVideo::GetStreamDescription (csVideoStreamDescription &desc)
 
 bool csAVIStreamVideo::SetRect (int x, int y, int w, int h)
 {
-  int height = pG3D->GetHeight ()-1;
+//  int height = pG3D->GetHeight ()-1;
 
   rc.Set (x, y, x+w, y+h);
 /*  polyfx.vertices[0].x = x;
