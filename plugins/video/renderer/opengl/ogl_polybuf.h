@@ -81,124 +81,11 @@ public:
 };
 
 /**
- * This class stores triangles that could share the same superlightmap
- */
-/*class csTrianglesPerSuperLightmap
-{
-public:
-  csTrianglesPerSuperLightmap* prev;
-
-  /// triangles which shares the same superlightmap
-  csDirtyAccessArray<csTriangle> triangles;
-
-  /// The lightmaps in the superlightmap
-  csRefArray<iPolygonTexture> lightmaps;
-  csDirtyAccessArray<csRGBpixel*> lm_info;
-
-  csDirtyAccessArray<csRect> rectangles;
-
-  csSubRectangles* region;
-
-  csTrianglesPerSuperLightmap (int size, int queue_num);
-  ~csTrianglesPerSuperLightmap ();
-
-  /// Pointer to the cache data
-  csSLMCacheData* cacheData;
-  bool isUnlit;
-  csLightmapHandle lmh;
-
-  /// Number of the queue to use for this super lightmap.
-  int queue_num;
-
-  // Checks if the superlightmap is initialized or not
-  bool initialized;
-
-  // Cost of this super lightmap. A high number means that
-  // this super lightmap requires a lot of work to update. This number
-  // is related to the number of lightmaps in it and the total area.
-  int cost;
-  int CalculateCost ();
-
-  // Timestamp indicating when this super lightmap was last used.
-  uint32 timestamp;
-};*/
-
-/**
- * Single Linked List that stores all the lightmap's triangles and uv's.
- * every node strores all the lightmaps that could share the same
- * superlightmap and all the triangles and uv needed for lighting
- * with that superlightmap.
- * The list goes from the last to the first (as a stack would do, but without
- * popping)
- */
-/*class TrianglesSuperLightmapList
-{
-public:
-  csTrianglesPerSuperLightmap* first;
-  csTrianglesPerSuperLightmap* last;
-
-  TrianglesSuperLightmapList ();
-  ~TrianglesSuperLightmapList ();
-  void Add (csTrianglesPerSuperLightmap* t);
-  csTrianglesPerSuperLightmap* GetLast () { return last; }
-
-  // Dirty due dynamic lights, needs recalculating.
-  bool dirty;
-
-  // Marks as dirty.
-  void MarkLightmapsDirty () { dirty = true; }
-  // Clear the dirty state.
-  void ClearLightmapsDirty() { dirty = false; }
-  // Gets the dirty state.
-  bool GetLightmapsDirtyState () const { return dirty; }
-};*/
-
-
-/**
- * This structure has enough information so that we can later
- * construct the super lightmaps.
- */
-struct csLmQueue
-{
-  iPolygonTexture* polytext;
-  csVector2* uv;	// Texture coordinates.
-  int num_uv;
-  int vt_idx;		// Index to continue adding lumels.
-};
-
-/**
  * This implementation is optimized to use glDrawElements.
  * It groups polygons per materials
  */
 class csTriangleArrayPolygonBuffer : public csPolygonBuffer
 {
-private:
-  /*
-   * Add a single vertex to the given tri/mat buffer.
-   * Returns vertex index.
-   */
-/*  int AddSingleVertex (csTrianglesPerMaterial* pol,
-	int* verts, int i, const csVector2& uv, int& cur_vt_idx);*/
-
-  /*
-   * Add a single vertex to the given suplm.
-   * Returns vertex index.
-   */
-  //int AddSingleVertexLM (const csVector2& uvLightmap, int& cur_vt_idx);
-
-  // Queue with lightmaps we still have to process.
-  //csDirtyAccessArray<csLmQueue> lmqueue;
-
-  //void ClearLmQueue ();
-  //void AddLmQueue (iPolygonTexture* polytext, const csVector2* uv,
-		  //int num_uv, int vt_idx);
-  // size is the size of the super lightmap to use.
-  //void ProcessLmQueue (iPolygonTexture* polytext, const csVector2* uv,
-		  //int num_uv, int vt_idx, int size, int queue_num);
-public:
-  // SuperLightMap list.
-//  TrianglesSuperLightmapList superLM;
-
 protected:
   // Mesh triangles grouped by material list.
   TrianglesList polygons;
@@ -222,22 +109,8 @@ protected:
 
   csBox3 bbox;
 
-  /**
-   * Search a superlightmap to fit the lighmap in the superLM list
-   * if it can't find any it creates a new one.
-   * The case that the polygon has no superlightmap is supported too.
-   * If the polygontexture has no lightmap it means its not lighted,
-   * then a special superlightmap has to be created, just to store
-   * the triangles and vertices that will be used in fog.
-   * 'size' is the size of the super lightmap to use.
-   * 'queue_num' is the number of the super lightmap queue to use (0 to 3).
-   */
-/*  csTrianglesPerSuperLightmap* SearchFittingSuperLightmap (
-    iPolygonTexture* poly_texture, csRect& rect, int size,
-    int queue_num);*/
 public:
   csTrianglesPerMaterial* GetFirst () { return polygons.first; }
-  //csTrianglesPerSuperLightmap* GetFirstTrianglesSLM () { return superLM.last; }
 
   /// Gets the number of materials of the mesh
   virtual int GetMaterialCount() const { return matCount;}

@@ -431,10 +431,6 @@ public:
 
   virtual void* GetPrivateObject () { return (void*)this; }
   virtual int GetPolygonCount () { return static_polygons.Length (); }
-  virtual iPolygon3DStatic *GetPolygon (int idx);
-  virtual iPolygon3DStatic *GetPolygon (const char* name);
-  virtual iPolygon3DStatic *CreatePolygon (const char *iName);
-  virtual int FindPolygonIndex (iPolygon3DStatic* polygon) const;
   virtual void RemovePolygon (int idx);
   virtual void RemovePolygons ();
 
@@ -755,12 +751,6 @@ public:
   /// Get the entire array of polygons.
   csPolygonArray& GetPolygonArray () { return polygons; }
 
-  /// Find a polygon index.
-  int FindPolygonIndex (iPolygon3D* polygon) const;
-
-  /// Find a polygon index.
-  int FindPolygonIndex (iPolygon3DStatic* polygon) const;
-
   /// Remove a single polygon.
   void RemovePolygon (int idx);
 
@@ -970,11 +960,6 @@ public:
     {
       return (iThingFactoryState*)(scfParent->static_data);
     }
-
-    virtual iPolygon3D *GetPolygon (int idx);
-    virtual iPolygon3D *GetPolygon (const char* name);
-    virtual int FindPolygonIndex (iPolygon3D* polygon) const
-    { return scfParent->FindPolygonIndex (polygon); }
 
     virtual const csVector3 &GetVertexW (int i) const
     { return scfParent->wor_verts[i]; }

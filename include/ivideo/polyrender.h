@@ -28,9 +28,38 @@
  * @{ */
  
 #include "csutil/scf.h"
+#include "csgeom/plane3.h"
+#include "csgeom/matrix3.h"
+#include "csgeom/vector3.h"
+#include "csgeom/polyidx.h"
 
 struct iRenderBufferSource;
-struct iPolygon3DStatic;
+
+/**
+ * This structure is used for communicating polygon information to the
+ * polygon renderer.
+ */
+struct csPolygonRenderData
+{
+  /// Object space plane of the polygon.
+  csPlane3 plane_obj;
+  /// Texture mapping information.
+  csPolyTextureMapping* tmapping;
+  /**
+   * Number of vertices in this polygon.
+   * Warning! This structure should be considered read-only for the
+   * renderer!
+   */
+  csPolyIndexed vertices;
+  /**
+   * Double pointer to the array of vertices in object space.
+   */
+  csVector3** p_obj_verts;
+
+  csPolygonRenderData (int start_size) : vertices (start_size) { }
+};
+
+
 
 SCF_VERSION (iPolygonRenderer, 0, 0, 1);
 
@@ -41,9 +70,10 @@ struct iPolygonRenderer : public iBase
     uint& indexEnd) = 0;
   
   virtual void Clear () = 0;
-  virtual void AddPolygon (iPolygon3DStatic* poly) = 0;
+  virtual void AddPolygon (csPolygonRenderData* poly) = 0;
 };
 
 /** @} */
 
 #endif // __CS_IVIDEO_POLYRENDER_H__
+

@@ -1514,14 +1514,6 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (dbg_current_polygon >= dbg_max_polygons_to_draw-1)
     return;
 
-  //iPolygonTexture *tex = 0;
-  //iLightMap *lm = 0;
-  //if (do_lighting)
-  //{
-    //tex = poly.poly_texture;
-    //lm = tex->GetLightMap ();
-  //}
-
   csRGBpixel color;
   //@@@iTextureHandle *txt_handle = poly.mat_handle->GetTexture ();
   //@@@if (txt_handle)
@@ -1828,7 +1820,6 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
         + Q2 * poly.cam2tex.v_cam2tex->y
         + Q3 * poly.cam2tex.v_cam2tex->z);
 
-  //iPolygonTexture *tex = poly.poly_texture;
   csPolyLightMapMapping* mapping = poly.lmap; //tex->GetMapping ();
   csTextureHandleSoftware *tex_mm =
     (csTextureHandleSoftware *)poly.mat_handle->GetTexture ()
@@ -3294,8 +3285,7 @@ void csGraphics3DSoftwareCommon::ClearCache()
 }
 
 void csGraphics3DSoftwareCommon::RemoveFromCache (
-	      iRendererLightmap* rlm
-  /*iPolygonTexture* poly_texture*/)
+	      iRendererLightmap* rlm)
 {
   if (tcache)
   {

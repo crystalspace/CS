@@ -44,7 +44,6 @@ class csReversibleTransform;
 class csRenderMesh;
 
 struct iGraphics2D;
-struct iPolygonTexture;
 struct iPolygonBuffer;
 struct iVertexBuffer;
 struct iVertexBufferManager;
@@ -443,7 +442,6 @@ struct G3DPolygonDP : public G3DPolygonDFP
   G3DCam2TextureTransform cam2tex;
 
   /// Handle to lighted textures (texture + lightmap)
-  //iPolygonTexture* poly_texture;
   csPolyTextureMapping* texmap;
   csPolyLightMapMapping* lmap;
   iRendererLightmap* rlm;

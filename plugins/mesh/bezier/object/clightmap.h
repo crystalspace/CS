@@ -55,7 +55,7 @@ public:
 /**
  * The static and all dynamic lightmaps for one polygon.
  */
-class csCurveLightMap : public iLightMap
+class csCurveLightMap
 {
   ///
   friend class csPolyTexture;
@@ -102,9 +102,6 @@ private:
 
   /// need recalculation of mean color?
   bool mean_recalc;
-
-  /// The hicolor cache ptr.
-  void *cachedata;
 
   /// Used when computing lightmaps shared by several polygons
   csDelayedLightingInfo *delayed_light_info;
@@ -155,7 +152,7 @@ public:
   ///
   csCurveLightMap ();
   ///
-  virtual ~csCurveLightMap ();
+  ~csCurveLightMap ();
 
   /**
    * Rebuilds the lightmap for the poly from all the lightmaps + the ambient
@@ -237,38 +234,25 @@ public:
    */
   void CalcMeanLighting ();
 
-  //------------------------ iLightMap implementation ------------------------
-  SCF_DECLARE_IBASE;
   ///
-  virtual csRGBpixel *GetMapData ();
+  csRGBpixel *GetMapData ();
   ///
-  virtual int GetWidth ()
-  { return lwidth; }
+  int GetWidth () const { return lwidth; }
   ///
-  virtual int GetHeight ()
-  { return lheight; }
+  int GetHeight () const { return lheight; }
   ///
-  virtual int GetRealWidth ()
-  { return rwidth; }
+  int GetRealWidth () const { return rwidth; }
   ///
-  virtual int GetRealHeight ()
-  { return rheight; }
-  ///
-  virtual void *GetCacheData ()
-  { return cachedata; }
-  ///
-  virtual void SetCacheData (void *d)
-  { cachedata = d; }
+  int GetRealHeight () const { return rheight; }
   /** 
    * calculate (if needed) and return mean lightmap color
    * Note: won't include true dynamic lights
    * until RecalculateDynamicLights() of the owning
    * csPolyTexture is called
    */
-  virtual void GetMeanLighting (int &r, int &g, int &b);
+  void GetMeanLighting (int &r, int &g, int &b);
   /// Get size of one lightmap
-  virtual long GetSize ()
-  { return lm_size; }
+  long GetSize () const { return lm_size; }
 };
 
 #endif // __CS_BEZIER_LIGHTMAP_H__

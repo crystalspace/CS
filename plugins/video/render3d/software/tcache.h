@@ -74,7 +74,6 @@ public:
   uint8 *bitmap;
 
   /// The original polygon texture
-  //iPolygonTexture *source;
   csSoftRendererLightmap* source;
   iTextureHandle* sourceTexH;
 
@@ -86,8 +85,7 @@ public:
 
   /// Initialize the lighted texture object
   SoftwareCachedTexture (int MipMap, 
-    csSoftRendererLightmap* srlm, iTextureHandle* texh
-    /*iPolygonTexture *Source*/)
+    csSoftRendererLightmap* srlm, iTextureHandle* texh)
   {
     data = bitmap = 0; next = prev = 0;
     sourceTexH = texh;
@@ -142,7 +140,7 @@ protected:
 
 public:
   void (csSoftwareTextureCache::*create_lighted_texture)
-                        (/*iPolygonTexture *pt, */
+                        (
 			 csPolyLightMapMapping* mapping,
 			 csPolyTextureMapping* tmapping,
 			 csSoftRendererLightmap* rlm, 
@@ -151,7 +149,7 @@ public:
 			 csSoftwareTextureManager *texman,
 		         float u_min, float v_min, float u_max, float v_max);
 
-  void create_lighted_texture_8 (/*iPolygonTexture *pt, */
+  void create_lighted_texture_8 (
 				 csPolyLightMapMapping* mapping,
 				 csPolyTextureMapping* tmapping,
 				 csSoftRendererLightmap* rlm, 
@@ -161,7 +159,7 @@ public:
 				 float u_min, float v_min, 
 				 float u_max, float v_max);
 
-  void create_lighted_texture_555(/*iPolygonTexture *pt, */
+  void create_lighted_texture_555(
 				  csPolyLightMapMapping* mapping,
 				  csPolyTextureMapping* tmapping,
 				  csSoftRendererLightmap* rlm, 
@@ -171,7 +169,7 @@ public:
 				  float u_min, float v_min, 
 				  float u_max, float v_max);
 
-  void create_lighted_texture_565(/*iPolygonTexture *pt, */
+  void create_lighted_texture_565(
 				  csPolyLightMapMapping* mapping,
 				  csPolyTextureMapping* tmapping,
 				  csSoftRendererLightmap* rlm, 
@@ -181,7 +179,7 @@ public:
 				  float u_min, float v_min, 
 				  float u_max, float v_max);
 
-  void create_lighted_texture_888(/*iPolygonTexture *pt, */
+  void create_lighted_texture_888(
 				  csPolyLightMapMapping* mapping,
 				  csPolyTextureMapping* tmapping,
 				  csSoftRendererLightmap* rlm, 
@@ -218,14 +216,11 @@ public:
     csPolyLightMapMapping* mapping,
     csPolyTextureMapping* tmapping,
     csSoftRendererLightmap* rlm,
-    iTextureHandle* itexh
-    // Texture coords
-    /*iPolygonTexture* pt*/);
+    iTextureHandle* itexh);
 
   /// Remove a texture from the cache.
   void uncache_texture (int MipMap,
-    csSoftRendererLightmap* rlm
-    /*iPolygonTexture* pt*/);
+    csSoftRendererLightmap* rlm);
 
   /// Remove all cached textures dependent on iTextureHandle
   void uncache_texture (int MipMap, iTextureHandle *itexh);
@@ -235,7 +230,7 @@ public:
    * add it if not. The parts of lighted texture that were changed
    * will be recomputed.
    */
-  void fill_texture (int MipMap, /*iPolygonTexture* pt,*/
+  void fill_texture (int MipMap,
 		     csPolyLightMapMapping* mapping,
 		     csPolyTextureMapping* tmapping,
 		     csSoftRendererLightmap* rlm, 

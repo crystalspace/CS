@@ -29,7 +29,7 @@ class csGLPolygonRenderer : public iPolygonRenderer,
   uint renderBufferNum;
   uint polysNum;
 
-  csArray<iPolygon3DStatic*> polys;
+  csArray<csPolygonRenderData*> polys;
 
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
@@ -60,7 +60,7 @@ public:
     uint& indexEnd);
   
   virtual void Clear ();
-  virtual void AddPolygon (iPolygon3DStatic* poly);
+  virtual void AddPolygon (csPolygonRenderData* poly);
 
   // ---- iRenderBufferSource ----
   virtual iRenderBuffer* GetRenderBuffer (csStringID name);

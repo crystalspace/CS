@@ -38,13 +38,12 @@
     to classify them and introduce a notation for intermediate variable
     that will (I hope) ease the understanding:
 
-	- iPolygonTexture is the object that is in charge for containing
-	  all parameters related to a single mipmap level on a Polygon3D.
-	  The variables that contain values related to iPolygonTexture
-	  will have the "pt" prefix, i.e. pt_h for example is PolygonTexture's
-	  height.
-	- iLightMap is the object that is in charge for containing all
-	  lighting information for the iPolygonTexture. Basically it contains
+	- csPolyLightMapMapping and csPolyTextureMapping are the objects that
+	  are in charge for containing all parameters related to a single
+	  mipmap level on a Polygon3D. The variables that contain values
+	  related to these variables will have the "pt" prefix.
+	- The lightmap is the object that is in charge for containing all
+	  lighting information for the polygon. Basically it contains
 	  three lightmaps: red, green an blue, each cell of the lightmap
 	  covers a square of texels. The square size can be queried from
 	  polygontexture object using GetMipMapSize () method. For example,
@@ -60,8 +59,7 @@
 
 #include "pixtype.inc"
 
-void LM_NAME (/*iPolygonTexture *pt, */
-	      csPolyLightMapMapping* mapping,
+void LM_NAME (csPolyLightMapMapping* mapping,
 	      csPolyTextureMapping* tmapping,
 	      csSoftRendererLightmap* rlm, 
 	      SoftwareCachedTexture *ct,
@@ -97,7 +95,6 @@ void LM_NAME (/*iPolygonTexture *pt, */
 	
 	int lm_color_shift = 6 - pt_cell_shift*2;
 
-	//iLightMap *lm = pt->GetLightMap ();
 	int lm_w = rlm->rect.Width (); //lm->GetWidth ();
 	csRGBpixel *lm_data = rlm->data; //lm->GetMapData ();
 	int lm_size = rlm->rect.Width () * rlm->rect.Height (); //lm->GetSize ();
@@ -197,7 +194,6 @@ void LM_NAME (/*iPolygonTexture *pt, */
 	int pt_w = 1 << pt_shfw;
 	int pt_h = (mapping->GetHeight () + mipmap_delta) >> mipmap;
 
-	//iLightMap *lm = pt->GetLightMap ();
 	int lm_w = rlm->rect.Width (); //lm->GetWidth ();
 	csRGBpixel *lm_data = rlm->data; //lm->GetMapData ();
 	int lm_size = rlm->rect.Width () * rlm->rect.Height (); //lm->GetSize ();

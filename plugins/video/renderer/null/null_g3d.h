@@ -143,18 +143,6 @@ public:
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
 
-  ///
-  void CacheTexture (iPolygonTexture*) { }
-
-  ///
-  void CacheInitTexture (iPolygonTexture*) { }
-
-  ///
-  void CacheSubTexture (iPolygonTexture*, int, int) { }
-
-  ///
-  void CacheRectTexture (iPolygonTexture*, int, int, int, int) { }
-
   /// Set a renderstate boolean.
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION op, long val);
 

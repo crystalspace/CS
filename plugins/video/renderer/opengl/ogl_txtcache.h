@@ -33,7 +33,6 @@
 
 struct iLightMap;
 struct iTextureHandle;
-struct iPolygonTexture;
 struct iObjectRegistry;
 class csGraphics3DOGLCommon;
 

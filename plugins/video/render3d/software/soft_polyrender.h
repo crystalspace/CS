@@ -43,7 +43,7 @@ class csSoftPolygonRenderer : public iPolygonRenderer,
 
   uint rbIndexStart, rbIndexEnd;
 public:
-  csArray<iPolygon3DStatic*> polys;
+  csArray<csPolygonRenderData*> polys;
 
   SCF_DECLARE_IBASE;
 
@@ -55,7 +55,7 @@ public:
     uint& indexEnd);
   
   virtual void Clear ();
-  virtual void AddPolygon (iPolygon3DStatic* poly);
+  virtual void AddPolygon (csPolygonRenderData* poly);
 
   // ---- iRenderBufferSource ----
   virtual iRenderBuffer* GetRenderBuffer (csStringID name);

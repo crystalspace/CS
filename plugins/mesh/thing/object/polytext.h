@@ -232,7 +232,7 @@ public:
 /**
  * This class represents a lighted texture for a polygon.
  */
-class csPolyTexture : public iPolygonTexture
+class csPolyTexture
 {
   friend class csPolygon3D;
 
@@ -265,9 +265,6 @@ private:
    */
   csShadowBitmap* shadow_bitmap;
 
-  /// Internally used by (software) texture cache
-  void **cache_data;
-
   /**
    * Compared against csThing version to know whether lightmap needs updating.
    */
@@ -287,10 +284,8 @@ public:
   /// Constructor.
   csPolyTexture ();
   /// Destructor.
-  virtual ~csPolyTexture ();
+  ~csPolyTexture ();
 
-  /// Set Lightmap mapping.
-  void SetLightMapMapping (csPolyLightMapMapping* mapping);
   void SetTextureMapping (csPolyTextureMapping* mapping);
   void SetRendererLightmap (iRendererLightmap* rlm);
 
@@ -311,8 +306,8 @@ public:
    */
   void SetLightMap (csLightMap* lightmap);
 
-  /// Get the cslightmap, for engine internal use (users see GetLightMap below)
-  csLightMap *GetCSLightMap() { return lm; }
+  /// Get the cslightmap, for engine internal use.
+  csLightMap *GetLightMap() { return lm; }
 
   /**
    * Initialize the lightmaps.
@@ -356,18 +351,8 @@ public:
   void WorldToCamera (const csReversibleTransform& t,
   	csMatrix3& m_cam2tex, csVector3& v_cam2tex);
 
-  //--------------------- iPolygonTexture implementation ---------------------
-  SCF_DECLARE_IBASE;
-  virtual iMaterialHandle *GetMaterialHandle ();
-  virtual csPolyLightMapMapping* GetLMapping () const
-  {
-    return mapping;
-  }
-  virtual csPolyTextureMapping* GetTMapping () const
-  {
-    return tmapping;
-  }
-  virtual iRendererLightmap* GetRendererLightmap () const
+  iMaterialHandle *GetMaterialHandle ();
+  iRendererLightmap* GetRendererLightmap () const
   {
     return rlm;
   }
@@ -382,19 +367,11 @@ public:
    */
   bool RecalculateDynamicLights ();
 
-  /// None-virtual version of GetLightMap().
-  csLightMap *GetLightMapFast () { return lm; }
-  ///
-  virtual iLightMap *GetLightMap () { return lm; }
   /// Query the size of one light cell
-  virtual int GetLightCellSize ();
+  int GetLightCellSize ();
   /// Query log2 (cell size)
-  virtual int GetLightCellShift ();
-
-  /// Get data used internally by texture cache
-  virtual void *GetCacheData (int idx);
-  /// Set data used internally by texture cache
-  virtual void SetCacheData (int idx, void *d);
+  int GetLightCellShift ();
 };
 
 #endif // __CS_POLYTEXT_H__
+

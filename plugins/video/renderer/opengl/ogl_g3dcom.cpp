@@ -2285,9 +2285,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
   float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
 
-  //iPolygonTexture *tex = poly.poly_texture;
-  //iLightMap* lm = tex->GetLightMap ();
-
   bool tex_transp = false;
   bool multimat = false;
   csMaterialHandle* mat_handle = (csMaterialHandle*)poly.mat_handle;
@@ -2821,9 +2818,6 @@ void csGraphics3DOGLCommon::DrawPolygonMaterialOnly (G3DPolygonDP& poly)
 void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
 {
   if (poly.num < 3) return;
-
-  //iPolygonTexture *tex = poly.poly_texture;
-  //iLightMap* lm = tex->GetLightMap ();
   if (!poly.rlm) return;
 
   int i;

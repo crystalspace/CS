@@ -63,19 +63,9 @@ static engine3d_VectorArray *VectorArray = 0;
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csPolygon3DStatic)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3DStatic)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3DStatic::eiPolygon3DStatic)
-  SCF_IMPLEMENTS_INTERFACE(iPolygon3DStatic)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csPolygon3DStatic::csPolygon3DStatic () : vertices(4)
+csPolygon3DStatic::csPolygon3DStatic () : polygon_data (4)
 {
   VectorArray = GetStaticVectorArray();
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3DStatic);
   thing_static = 0;
   plane_obj_need_update = true;
 
@@ -83,7 +73,7 @@ csPolygon3DStatic::csPolygon3DStatic () : vertices(4)
   name = 0;
 
   mapping = 0;
-  tmapping = 0;
+  polygon_data.tmapping = 0;
 
   flags.SetAll (CS_POLY_LIGHTING | CS_POLY_COLLDET | CS_POLY_VISCULL);
 
@@ -95,7 +85,7 @@ csPolygon3DStatic::~csPolygon3DStatic ()
   delete[] name;
 
   thing_static->thing_type->blk_lightmapmapping.Free (mapping);
-  thing_static->thing_type->blk_texturemapping.Free (tmapping);
+  thing_static->thing_type->blk_texturemapping.Free (polygon_data.tmapping);
 
   VectorArray->DecRef ();
 }
@@ -106,8 +96,8 @@ csPolygon3DStatic* csPolygon3DStatic::Clone ()
     ->blk_polygon3dstatic.Alloc ();
   clone->SetMaterial (material);
   clone->SetName (name);
-  clone->vertices = vertices;
-  clone->plane_obj = plane_obj;
+  clone->polygon_data.vertices = polygon_data.vertices;
+  clone->polygon_data.plane_obj = polygon_data.plane_obj;
   if (mapping)
   {
     clone->mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
@@ -119,24 +109,25 @@ csPolygon3DStatic* csPolygon3DStatic::Clone ()
   {
     clone->mapping = 0;
   }
-  if (tmapping)
+  if (polygon_data.tmapping)
   {
-    clone->tmapping = thing_static->thing_type->blk_texturemapping.Alloc ();
-    clone->tmapping->m_obj2tex = tmapping->m_obj2tex;
-    clone->tmapping->v_obj2tex = tmapping->v_obj2tex;
-    clone->tmapping->fdu = tmapping->fdu;
-    clone->tmapping->fdv = tmapping->fdv;
-    clone->tmapping->Imin_u = tmapping->Imin_u;
-    clone->tmapping->Imin_v = tmapping->Imin_v;
-    clone->tmapping->Fmin_u = tmapping->Fmin_u;
-    clone->tmapping->Fmin_v = tmapping->Fmin_v;
-    clone->tmapping->Fmax_u = tmapping->Fmax_u;
-    clone->tmapping->Fmax_v = tmapping->Fmax_v;
-    clone->tmapping->shf_u = tmapping->shf_u;
+    clone->polygon_data.tmapping = thing_static->thing_type
+    	->blk_texturemapping.Alloc ();
+    clone->polygon_data.tmapping->m_obj2tex = polygon_data.tmapping->m_obj2tex;
+    clone->polygon_data.tmapping->v_obj2tex = polygon_data.tmapping->v_obj2tex;
+    clone->polygon_data.tmapping->fdu = polygon_data.tmapping->fdu;
+    clone->polygon_data.tmapping->fdv = polygon_data.tmapping->fdv;
+    clone->polygon_data.tmapping->Imin_u = polygon_data.tmapping->Imin_u;
+    clone->polygon_data.tmapping->Imin_v = polygon_data.tmapping->Imin_v;
+    clone->polygon_data.tmapping->Fmin_u = polygon_data.tmapping->Fmin_u;
+    clone->polygon_data.tmapping->Fmin_v = polygon_data.tmapping->Fmin_v;
+    clone->polygon_data.tmapping->Fmax_u = polygon_data.tmapping->Fmax_u;
+    clone->polygon_data.tmapping->Fmax_v = polygon_data.tmapping->Fmax_v;
+    clone->polygon_data.tmapping->shf_u = polygon_data.tmapping->shf_u;
   }
   else
   {
-    clone->tmapping = 0;
+    clone->polygon_data.tmapping = 0;
   }
   clone->flags.SetAll (flags.Get ());
 
@@ -170,7 +161,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   float B = plane_wor.B ();
   float C = plane_wor.C ();
   csTextureTrans::compute_texture_space (
-      tmapping->m_obj2tex, tmapping->v_obj2tex,
+      polygon_data.tmapping->m_obj2tex, polygon_data.tmapping->v_obj2tex,
       xo, yo, zo,
       x1, y1, z1,
       len1,
@@ -186,7 +177,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   float len2)
 {
   csTextureTrans::compute_texture_space (
-      tmapping->m_obj2tex, tmapping->v_obj2tex,
+      polygon_data.tmapping->m_obj2tex, polygon_data.tmapping->v_obj2tex,
       v_orig, v1,
       len1, v2,
       len2);
@@ -199,8 +190,8 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 &v_v)
 {
   csTextureTrans::compute_texture_space (
-      tmapping->m_obj2tex,
-      tmapping->v_obj2tex,
+      polygon_data.tmapping->m_obj2tex,
+      polygon_data.tmapping->v_obj2tex,
       v_orig,
       v_u,
       v_v);
@@ -215,8 +206,8 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csVector3 o (xo, yo, zo);
   const csVector3 u (xu, yu, zu);
   const csVector3 v (xv, yv, zv);
-  csTextureTrans::compute_texture_space (tmapping->m_obj2tex,
-    tmapping->v_obj2tex, o, u, v);
+  csTextureTrans::compute_texture_space (polygon_data.tmapping->m_obj2tex,
+    polygon_data.tmapping->v_obj2tex, o, u, v);
   thing_static->scfiObjectModel.ShapeChanged ();
 }
 
@@ -227,7 +218,7 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   float xw, float yw, float zw)
 {
   csTextureTrans::compute_texture_space (
-      tmapping->m_obj2tex, tmapping->v_obj2tex,
+      polygon_data.tmapping->m_obj2tex, polygon_data.tmapping->v_obj2tex,
       xo, yo, zo,
       xu, yu, zu,
       xv, yv, zv,
@@ -239,8 +230,8 @@ void csPolygon3DStatic::MappingSetTextureSpace (
   const csMatrix3 &tx_matrix,
   const csVector3 &tx_vector)
 {
-  tmapping->m_obj2tex = tx_matrix;
-  tmapping->v_obj2tex = tx_vector;
+  polygon_data.tmapping->m_obj2tex = tx_matrix;
+  polygon_data.tmapping->v_obj2tex = tx_vector;
   thing_static->scfiObjectModel.ShapeChanged ();
 }
 
@@ -248,13 +239,17 @@ void csPolygon3DStatic::MappingGetTextureSpace (
   csMatrix3 &tx_matrix,
   csVector3 &tx_vector)
 {
-  tx_matrix = tmapping->m_obj2tex;
-  tx_vector = tmapping->v_obj2tex;
+  tx_matrix = polygon_data.tmapping->m_obj2tex;
+  tx_vector = polygon_data.tmapping->v_obj2tex;
 }
 
 void csPolygon3DStatic::SetParent (csThingStatic *thing_static)
 {
   csPolygon3DStatic::thing_static = thing_static;
+  if (thing_static)
+  {
+    polygon_data.p_obj_verts = &thing_static->obj_verts;
+  }
 }
 
 void csPolygon3DStatic::EnableTextureMapping (bool enable)
@@ -266,35 +261,21 @@ void csPolygon3DStatic::EnableTextureMapping (bool enable)
   if (enable)
   {
     mapping = thing_static->thing_type->blk_lightmapmapping.Alloc ();
-    tmapping = thing_static->thing_type->blk_texturemapping.Alloc ();
+    polygon_data.tmapping = thing_static->thing_type
+    	->blk_texturemapping.Alloc ();
   }
   else
   {
     thing_static->thing_type->blk_lightmapmapping.Free (mapping);
     mapping = 0;
-    thing_static->thing_type->blk_texturemapping.Free (tmapping);
-    tmapping = 0;
+    thing_static->thing_type->blk_texturemapping.Free (polygon_data.tmapping);
+    polygon_data.tmapping = 0;
   }
-}
-
-void csPolygon3DStatic::CopyTextureType (iPolygon3DStatic *ipt)
-{
-  csPolygon3DStatic *pt = ipt->GetPrivateObject ();
-  EnableTextureMapping (pt->IsTextureMappingEnabled ());
-
-  csMatrix3 m;
-  csVector3 v (0);
-  if (pt->IsTextureMappingEnabled ())
-  {
-    pt->MappingGetTextureSpace (m, v);
-  }
-
-  SetTextureSpace (m, v);
 }
 
 void csPolygon3DStatic::Reset ()
 {
-  vertices.MakeEmpty ();
+  polygon_data.vertices.MakeEmpty ();
 }
 
 bool csPolygon3DStatic::Overlaps (csPolygon3DStatic *overlapped)
@@ -309,15 +290,15 @@ bool csPolygon3DStatic::Overlaps (csPolygon3DStatic *overlapped)
   // itself not facing away from this polygon. To test that we see if
   // there is a vertex of this polygon that is in front of the 'totest'
   // polygon. If that is the case then we return true.
-  csPlane3 &this_plane = plane_obj;
-  csPlane3 &test_plane = totest->plane_obj;
+  csPlane3 &this_plane = polygon_data.plane_obj;
+  csPlane3 &test_plane = totest->polygon_data.plane_obj;
   int i;
-  for (i = 0; i < totest->vertices.GetVertexCount (); i++)
+  for (i = 0; i < totest->polygon_data.vertices.GetVertexCount (); i++)
   {
     if (this_plane.Classify (totest->Vobj (i)) >= SMALL_EPSILON)
     {
       int j;
-      for (j = 0; j < vertices.GetVertexCount (); j++)
+      for (j = 0; j < polygon_data.vertices.GetVertexCount (); j++)
       {
         if (test_plane.Classify (Vobj (j)) <= SMALL_EPSILON)
         {
@@ -340,18 +321,6 @@ void csPolygon3DStatic::SetMaterial (iMaterialWrapper *material)
 iMaterialHandle *csPolygon3DStatic::GetMaterialHandle ()
 {
   return material ? material->GetMaterialHandle () : 0;
-}
-
-iThingFactoryState *csPolygon3DStatic::eiPolygon3DStatic::GetParent ()
-{
-  return (iThingFactoryState*)(scfParent->GetParent ());
-}
-
-void csPolygon3DStatic::eiPolygon3DStatic::CreatePlane (
-  const csVector3 &iOrigin,
-  const csMatrix3 &iMatrix)
-{
-  scfParent->SetTextureSpace (iMatrix, iOrigin);
 }
 
 bool csPolygon3DStatic::IsTransparent ()
@@ -451,7 +420,7 @@ void csPolygon3DStatic::ComputeNormal ()
   D = -A * Vobj (0).x - B * Vobj (0).y - C * Vobj (0).z;
 
   // By default the world space normal is equal to the object space normal.
-  plane_obj.Set (A, B, C, D);
+  polygon_data.plane_obj.Set (A, B, C, D);
   plane_obj_need_update = false;
   thing_static->scfiObjectModel.ShapeChanged ();
 }
@@ -462,10 +431,11 @@ void csPolygon3DStatic::HardTransform (const csReversibleTransform &t)
   t.This2Other (GetObjectPlane (), Vobj (0), new_plane);
   GetObjectPlane () = new_plane;
   thing_static->scfiObjectModel.ShapeChanged ();
-  if (tmapping)
+  if (polygon_data.tmapping)
   {
-    tmapping->m_obj2tex *= t.GetO2T ();
-    tmapping->v_obj2tex = t.This2Other (tmapping->v_obj2tex);
+    polygon_data.tmapping->m_obj2tex *= t.GetO2T ();
+    polygon_data.tmapping->v_obj2tex = t.This2Other (
+    	polygon_data.tmapping->v_obj2tex);
   }
 }
 
@@ -486,8 +456,8 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   for (i = 0; i < GetVertices ().GetVertexCount (); i++)
   {
     v1 = Vobj (i);                  // Coordinates of vertex in object space.
-    v1 -= tmapping->v_obj2tex;
-    v2 = (tmapping->m_obj2tex) * v1;   // Coordinates of vertex in texture space.
+    v1 -= polygon_data.tmapping->v_obj2tex;
+    v2 = (polygon_data.tmapping->m_obj2tex) * v1;   // Coordinates of vertex in texture space.
     if (v2.x < min_u) min_u = v2.x;
     if (v2.x > max_u) max_u = v2.x;
     if (v2.y < min_v) min_v = v2.y;
@@ -495,10 +465,10 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
   }
 
   // used in hardware accel drivers
-  tmapping->Fmin_u = min_u;
-  tmapping->Fmax_u = max_u;
-  tmapping->Fmin_v = min_v;
-  tmapping->Fmax_v = max_v;
+  polygon_data.tmapping->Fmin_u = min_u;
+  polygon_data.tmapping->Fmax_u = max_u;
+  polygon_data.tmapping->Fmin_v = min_v;
+  polygon_data.tmapping->Fmax_v = max_v;
 
   int ww, hh;
   iMaterialHandle* mat_handle = GetMaterialHandle ();
@@ -512,24 +482,24 @@ bool csPolygon3DStatic::CreateBoundingTextureBox ()
     ww = hh = 64;
     rc = false;
   }
-  tmapping->Imin_u = QRound (min_u * ww);
-  tmapping->Imin_v = QRound (min_v * hh);
+  polygon_data.tmapping->Imin_u = QRound (min_u * ww);
+  polygon_data.tmapping->Imin_v = QRound (min_v * hh);
   int Imax_u = QRound (max_u * ww);
   int Imax_v = QRound (max_v * hh);
 
-  mapping->h = Imax_v - tmapping->Imin_v;
-  mapping->w_orig = Imax_u - tmapping->Imin_u;
+  mapping->h = Imax_v - polygon_data.tmapping->Imin_v;
+  mapping->w_orig = Imax_u - polygon_data.tmapping->Imin_u;
   mapping->w = 1;
-  tmapping->shf_u = 0;
+  polygon_data.tmapping->shf_u = 0;
   while (true)
   {
     if (mapping->w_orig <= mapping->w) break;
     mapping->w <<= 1;
-    tmapping->shf_u++;
+    polygon_data.tmapping->shf_u++;
   }
 
-  tmapping->fdu = min_u * ww;
-  tmapping->fdv = min_v * hh;
+  polygon_data.tmapping->fdu = min_u * ww;
+  polygon_data.tmapping->fdv = min_v * hh;
   return rc;
 }
 
@@ -581,7 +551,7 @@ float csPolygon3DStatic::GetArea ()
 
   // triangulize the polygon, triangles are (0,1,2), (0,2,3), (0,3,4), etc..
   int i;
-  for (i = 0; i < vertices.GetVertexCount () - 2; i++)
+  for (i = 0; i < polygon_data.vertices.GetVertexCount () - 2; i++)
     area += ABS (csMath3::Area3 (Vobj (0), Vobj (i + 1), Vobj (i + 2)));
   return area / 2.0f;
 }
@@ -696,7 +666,7 @@ void csPolygon3DStatic::SetTextureSpace (
   if (IsTextureMappingEnabled ())
   {
     MappingSetTextureSpace (
-          plane_obj,
+          polygon_data.plane_obj,
           xo, yo, zo,
           x1, y1, z1,
           len1);
@@ -757,8 +727,8 @@ int csPolygon3DStatic::AddVertex (int v)
     return 0;
   }
 
-  vertices.AddVertex (v);
-  return vertices.GetVertexCount () - 1;
+  polygon_data.vertices.AddVertex (v);
+  return polygon_data.vertices.GetVertexCount () - 1;
 }
 
 int csPolygon3DStatic::AddVertex (const csVector3 &v)
@@ -813,7 +783,7 @@ void csPolygon3DStatic::PlaneNormal (float *yz, float *zx, float *xy)
 bool csPolygon3DStatic::PointOnPolygon (const csVector3 &v)
 {
   // First check if point is on the plane.
-  csPlane3 &pl = plane_obj;
+  csPlane3 &pl = polygon_data.plane_obj;
   float dot = pl.D () + pl.A () * v.x + pl.B () * v.y + pl.C () * v.z;
   if (ABS (dot) >= EPSILON) return false;
 
@@ -840,7 +810,7 @@ bool csPolygon3DStatic::IntersectRay (const csVector3 &start,
 {
   // First we do backface culling on the polygon with respect to
   // the starting point of the beam.
-  csPlane3 &pl = plane_obj;
+  csPlane3 &pl = polygon_data.plane_obj;
   float dot1 = pl.D () +
     pl.A () * start.x + pl.B () * start.y + pl.C () * start.z;
   if (dot1 > 0) return false;
@@ -876,7 +846,7 @@ bool csPolygon3DStatic::IntersectRayNoBackFace (
 {
   // If this vector is perpendicular to the plane of the polygon we
   // need to catch this case here.
-  csPlane3 &pl = plane_obj;
+  csPlane3 &pl = polygon_data.plane_obj;
   float dot1 = pl.D () +
     pl.A () *
     start.x +
@@ -955,14 +925,14 @@ bool csPolygon3DStatic::IntersectSegmentPlane (
   // Set *pr to -1 to indicate error if we return false now.
   if (pr) *pr = -1;
 
-  denom = plane_obj.A () * (x2 - x1) +
-    plane_obj.B () * (y2 - y1) +
-    plane_obj.C () * (z2 - z1);
+  denom = polygon_data.plane_obj.A () * (x2 - x1) +
+    polygon_data.plane_obj.B () * (y2 - y1) +
+    polygon_data.plane_obj.C () * (z2 - z1);
   if (ABS (denom) < SMALL_EPSILON) return false;  // Lines are parallel
-  num = -(plane_obj.A () * x1 +
-    plane_obj.B () * y1 +
-    plane_obj.C () * z1 +
-    plane_obj.D ());
+  num = -(polygon_data.plane_obj.A () * x1 +
+    polygon_data.plane_obj.B () * y1 +
+    polygon_data.plane_obj.C () * z1 +
+    polygon_data.plane_obj.D ());
   r = num / denom;
 
   // Calculate 'r' and 'isect' even if the intersection point is
@@ -991,19 +961,10 @@ bool csPolygon3DStatic::IntersectRayPlane (
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE(csPolygon3D)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolygon3D)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
-  SCF_IMPLEMENTS_INTERFACE(iPolygon3D)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csPolygon3D::csPolygon3D ()
 {
   VectorArray = GetStaticVectorArray();
-  SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
   thing = 0;
   static_data = 0;
 
@@ -1038,11 +999,6 @@ void csPolygon3D::SetParent (csThing *thing)
   csPolygon3D::thing = thing;
 }
 
-iThingState *csPolygon3D::eiPolygon3D::GetParent ()
-{
-  return &(scfParent->GetParent ()->scfiThingState);
-}
-
 void csPolygon3D::RefreshFromStaticData ()
 {
   static_data->thing_static->thing_type->blk_polytex.Free (txt_info);
@@ -1051,7 +1007,6 @@ void csPolygon3D::RefreshFromStaticData ()
   if (static_data->IsTextureMappingEnabled ())
   {
     txt_info = static_data->thing_static->thing_type->blk_polytex.Alloc ();
-    txt_info->SetLightMapMapping (static_data->GetLightMapMapping ());
     txt_info->SetTextureMapping (static_data->GetTextureMapping ());
     txt_info->m_world2tex = static_data->GetTextureMapping ()->m_obj2tex;
     txt_info->v_world2tex = static_data->GetTextureMapping ()->v_obj2tex;
@@ -1078,15 +1033,16 @@ void csPolygon3D::ObjectToWorld (
   const csReversibleTransform &t,
   const csVector3 &vwor)
 {
-  t.This2Other (static_data->plane_obj, vwor, plane_wor);
+  t.This2Other (static_data->polygon_data.plane_obj, vwor, plane_wor);
   // This is not efficient and only needed in those cases where the
   // thing is really scaled. We have to see if this is a problem. Normally
   // it is a good thing to avoid calling csThing::Transform() to often.
   // So normally it should not be a problem.
   plane_wor.Normalize ();
 
-  if (txt_info) txt_info->ObjectToWorld (static_data->tmapping->m_obj2tex,
-    static_data->tmapping->v_obj2tex, t);
+  if (txt_info) txt_info->ObjectToWorld (
+    static_data->polygon_data.tmapping->m_obj2tex,
+    static_data->polygon_data.tmapping->v_obj2tex, t);
 }
 
 #define TEXW(t) ((t)->w_orig)
@@ -1142,7 +1098,7 @@ void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
 void csPolygon3D::StaticLightDisconnect (iStatLight* statlight)
 {
   if (!txt_info) return;
-  csLightMap* lm = txt_info->GetLightMapFast ();
+  csLightMap* lm = txt_info->GetLightMap ();
   if (!lm) return;
   csShadowMap* sm = lm->FindShadowMap (statlight->QueryLight ());
   if (!sm) return;

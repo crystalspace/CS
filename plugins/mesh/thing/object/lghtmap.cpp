@@ -64,23 +64,15 @@ int csLightMap::lightcell_size = 16;
 int csLightMap::lightcell_shift = 4;
 int csLightMap::default_lightmap_cell_size = 16;
 
-SCF_IMPLEMENT_IBASE(csLightMap)
-  SCF_IMPLEMENTS_INTERFACE(iLightMap)
-SCF_IMPLEMENT_IBASE_END
-
 csLightMap::csLightMap ()
 {
-  SCF_CONSTRUCT_IBASE (0);
   first_smap = 0;
-  cachedata = 0;
-  delayed_light_info = 0;
   mean_recalc = true;
   max_static_color_values.Set(255,255,255);  // use slowest safest method by default
 }
 
 csLightMap::~csLightMap ()
 {
-  CS_ASSERT (cachedata == 0);
   while (first_smap)
   {
     csShadowMap *smap = first_smap->next;
@@ -737,11 +729,6 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
     delete[] old_map;
     smap = smap->next;
   }
-}
-
-csRGBpixel *csLightMap::GetMapDataFast ()
-{
-  return GetRealMap ().GetArray ();
 }
 
 csRGBpixel *csLightMap::GetMapData ()

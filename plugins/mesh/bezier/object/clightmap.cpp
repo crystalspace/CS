@@ -65,15 +65,9 @@ int csCurveLightMap::lightcell_size = 16;
 int csCurveLightMap::lightcell_shift = 4;
 int csCurveLightMap::default_lightmap_cell_size = 16;
 
-SCF_IMPLEMENT_IBASE(csCurveLightMap)
-  SCF_IMPLEMENTS_INTERFACE(iLightMap)
-SCF_IMPLEMENT_IBASE_END
-
 csCurveLightMap::csCurveLightMap ()
 {
-  SCF_CONSTRUCT_IBASE (0);
   first_smap = 0;
-  cachedata = 0;
   delayed_light_info = 0;
   mean_recalc = true;
   max_static_color_values.Set(255,255,255);  // use slowest safest method by default
@@ -81,7 +75,6 @@ csCurveLightMap::csCurveLightMap ()
 
 csCurveLightMap::~csCurveLightMap ()
 {
-  CS_ASSERT (cachedata == 0);
   while (first_smap)
   {
     csCurveShadowMap *smap = first_smap->next;

@@ -30,6 +30,7 @@
 #include "polytext.h"
 #include "iengine/sector.h"
 #include "imesh/thing/polygon.h"
+#include "ivideo/polyrender.h"
 
 class csFrustumView;
 class csFrustumContext;
@@ -70,28 +71,28 @@ struct iMaterialWrapper;
  * does define how the texture is scaled and translated accross the surface
  * of the polygon (in case we are talking about lightmapped polygons).
  */
-class csPolygon3DStatic : public iBase
+class csPolygon3DStatic
 {
   friend class csPolyTexture;
   friend class csPolygon3D;
+  friend class csThingStatic;
 
 private:
   /// Name of this polygon.
   char* name;
-
-  /*
-   * A table of indices into the vertices of the parent csThing
-   * (container).
-   */
-  csPolyIndexed vertices;
 
   /**
    * The physical parent of this polygon.
    */
   csThingStatic* thing_static;
 
-  /// The object space plane equation (this is fixed).
-  csPlane3 plane_obj;
+  /**
+   * Render data for the renderer. This contains information like
+   * object plane, the vertices (in index form) and texture mapping information.
+   */
+  csPolygonRenderData polygon_data;
+
+  /// True if the object space plane equation needs updating.
   bool plane_obj_need_update;
 
   /**
@@ -105,9 +106,7 @@ private:
    * Warning! Objects of this type are allocated on
    * csThingObjectType->blk_lightmapmapping.
    */
-  //csLightMapMapping* mapping;
   csPolyLightMapMapping* mapping;
-  csPolyTextureMapping* tmapping;
 
   /**
    * Return twice the signed area of the polygon in world space coordinates
@@ -133,7 +132,7 @@ public:
    * deleted if this polygon is a copy of another one (because
    * some stuff is shared).
    */
-  virtual ~csPolygon3DStatic ();
+  ~csPolygon3DStatic ();
 
   ///
   void MappingSetTextureSpace (const csVector3& v_orig,
@@ -175,17 +174,13 @@ public:
   bool IsTextureMappingEnabled () const { return mapping != 0; }
 
   /**
-   * Copy texture type settings from another polygon.
-   * (this will not copy the actual material that is used, just the
-   * information on how to apply that material to the polygon).
-   */
-  void CopyTextureType (iPolygon3DStatic* other_polygon);
-
-  /**
    * Get the lightmap mapping information.
    */
   csPolyLightMapMapping* GetLightMapMapping () const { return mapping; }
-  csPolyTextureMapping* GetTextureMapping () const { return tmapping; }
+  csPolyTextureMapping* GetTextureMapping () const
+  {
+    return polygon_data.tmapping;
+  }
 
   /**
    * Clear the polygon (remove all vertices).
@@ -275,23 +270,23 @@ public:
   csPlane3& GetObjectPlane ()
   { 
     //if (plane_obj_need_update) ComputeNormal();
-    return plane_obj;
+    return polygon_data.plane_obj;
   }
 
   /**
    * Get the vertices.
    */
-  csPolyIndexed& GetVertices () { return vertices; }
+  csPolyIndexed& GetVertices () { return polygon_data.vertices; }
 
   /**
    * Get number of vertices.
    */
-  int GetVertexCount () { return vertices.GetVertexCount (); }
+  int GetVertexCount () { return polygon_data.vertices.GetVertexCount (); }
 
   /**
    * Get vertex index table.
    */
-  int* GetVertexIndices () { return vertices.GetVertexIndices (); }
+  int* GetVertexIndices () { return polygon_data.vertices.GetVertexIndices (); }
 
   /**
    * 'idx' is a local index into the vertices table of the polygon.
@@ -299,7 +294,7 @@ public:
    * a reference to the vertex in object-space is returned.
    */
   const csVector3& Vobj (int idx) const
-  { return thing_static->Vobj (vertices.GetVertexIndices ()[idx]); }
+  { return thing_static->Vobj (polygon_data.vertices.GetVertexIndices ()[idx]); }
 
   /**
    * Set the material for this polygon.
@@ -494,136 +489,13 @@ public:
 
   /// Make a clone of this static polygon.
   csPolygon3DStatic* Clone ();
-
-  SCF_DECLARE_IBASE;
-
-  //--------------- iPolygon3DStatic interface implementation ---------------
-
-  struct eiPolygon3DStatic : public iPolygon3DStatic
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csPolygon3DStatic);
-
-    virtual csPolygon3DStatic *GetPrivateObject () { return scfParent; }
-    virtual const char* GetName () const { return scfParent->GetName (); }
-    virtual void SetName (const char* name) { scfParent->SetName (name); }
-    virtual iThingFactoryState *GetParent ();
-    virtual iMaterialHandle *GetMaterialHandle ()
-    { return scfParent->GetMaterialHandle (); }
-    virtual void SetMaterial (iMaterialWrapper* mat)
-    {
-      scfParent->SetMaterial (mat);
-    }
-    virtual iMaterialWrapper* GetMaterial ()
-    {
-      return scfParent->GetMaterialWrapper ();
-    }
-
-    virtual int GetVertexCount ()
-    { return scfParent->vertices.GetVertexCount (); }
-    virtual int* GetVertexIndices ()
-    { return scfParent->vertices.GetVertexIndices (); }
-    virtual const csVector3 &GetVertex (int idx) const
-    { return scfParent->Vobj (idx); }
-    virtual int CreateVertex (int idx)
-    { return scfParent->AddVertex (idx); }
-    virtual int CreateVertex (const csVector3 &vertex)
-    { return scfParent->AddVertex (vertex); }
-
-    virtual void CreatePlane (const csVector3 &origin,
-      const csMatrix3 &matrix);
-
-    virtual csFlags& GetFlags ()
-    { return scfParent->flags; }
-
-    virtual void SetTextureSpace (
-  	const csVector3& p1, const csVector2& uv1,
-  	const csVector3& p2, const csVector2& uv2,
-  	const csVector3& p3, const csVector2& uv3)
-    {
-      scfParent->SetTextureSpace (p1, uv1, p2, uv2, p3, uv3);
-    }
-    virtual void SetTextureSpace (const csVector3& v_orig,
-      const csVector3& v1, float l1)
-    {
-      scfParent->SetTextureSpace (v_orig, v1, l1);
-    }
-    virtual void SetTextureSpace (
-        const csVector3& v_orig,
-        const csVector3& v1, float len1,
-        const csVector3& v2, float len2)
-    {
-      scfParent->SetTextureSpace (v_orig, v1, len1, v2, len2);
-    }
-    virtual void SetTextureSpace (const csMatrix3& m, const csVector3& v)
-    {
-      scfParent->SetTextureSpace (m, v);
-    }
-    virtual void GetTextureSpace (csMatrix3& m, csVector3& v)
-    {
-      scfParent->GetTextureSpace (m, v);
-    }
-    virtual void EnableTextureMapping (bool enabled)
-    {
-      scfParent->EnableTextureMapping (enabled);
-    }
-    virtual bool IsTextureMappingEnabled () const
-    {
-      return scfParent->IsTextureMappingEnabled ();
-    }
-    virtual void CopyTextureType (iPolygon3DStatic* other_polygon)
-    {
-      scfParent->CopyTextureType (other_polygon);
-    }
-
-    virtual const csPlane3& GetObjectPlane ()
-    {
-      return scfParent->GetObjectPlane();
-    }
-    virtual bool IsTransparent ()
-    {
-      return scfParent->IsTransparent ();
-    }
-    virtual bool IntersectSegment (const csVector3& start, const csVector3& end,
-                          csVector3& isect, float* pr = 0)
-    {
-      return scfParent->IntersectSegment (start, end, isect, pr);
-    }
-    virtual bool IntersectRay (const csVector3& start, const csVector3& end)
-    {
-      return scfParent->IntersectRay (start, end);
-    }
-    virtual bool IntersectRayNoBackFace (const csVector3& start,
-      const csVector3& end)
-    {
-      return scfParent->IntersectRayNoBackFace (start, end);
-    }
-    virtual bool IntersectRayPlane (const csVector3& start,
-      const csVector3& end, csVector3& isect)
-    {
-      return scfParent->IntersectRayPlane (start, end, isect);
-    }
-    virtual bool PointOnPolygon (const csVector3& v)
-    {
-      return scfParent->PointOnPolygon (v);
-    }
-
-    virtual csPolyLightMapMapping* GetLightMapMapping () const 
-    { 
-      return scfParent->GetLightMapMapping ();
-    }
-    csPolyTextureMapping* GetTextureMapping () const 
-    { 
-      return scfParent->GetTextureMapping (); 
-    }
-  } scfiPolygon3DStatic;
-  friend struct eiPolygon3DStatic;
 };
 
 /**
  * This is our main 3D polygon class. Polygons are used to construct the
  * faces of things.
  */
-class csPolygon3D : public iBase
+class csPolygon3D
 {
   friend class csPolyTexture;
 
@@ -667,7 +539,7 @@ public:
    * deleted if this polygon is a copy of another one (because
    * some stuff is shared).
    */
-  virtual ~csPolygon3D ();
+  ~csPolygon3D ();
 
   /**
    * Get the lightmap information.
@@ -758,7 +630,10 @@ public:
    * a reference to the vertex in world-space is returned.
    */
   const csVector3& Vwor (int idx) const
-  { return thing->Vwor (static_data->vertices.GetVertexIndices ()[idx]); }
+  {
+    return thing->Vwor (
+    	static_data->polygon_data.vertices.GetVertexIndices ()[idx]);
+  }
 
   /**
    * Before calling a series of Vwor() you should call
@@ -894,53 +769,6 @@ public:
    * 'vt' is a vertex of this polygon in world space.
    */
   void ObjectToWorld (const csReversibleTransform& t, const csVector3& vwor);
-
-  SCF_DECLARE_IBASE;
-
-  //------------------- iPolygon3D interface implementation -------------------
-
-  struct eiPolygon3D : public iPolygon3D
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csPolygon3D);
-
-    virtual csPolygon3D *GetPrivateObject () { return scfParent; }
-    virtual iThingState *GetParent ();
-    virtual iPolygon3DStatic* GetStaticData () const
-    {
-      return &(scfParent->GetStaticData ()->scfiPolygon3DStatic);
-    }
-
-    virtual iLightMap *GetLightMap ()
-    {
-      csPolyTexture *lm = scfParent->txt_info;
-      return lm ? (iLightMap*)(lm->GetLightMapFast) () : (iLightMap*)0;
-    }
-    virtual iPolygonTexture *GetTexture ()
-    {
-      return scfParent->GetPolyTexture ();
-    }
-    virtual const csVector3 &GetVertexW (int idx) const
-    { return scfParent->Vwor (idx); }
-
-    virtual const csPlane3& GetWorldPlane ()
-    {
-      return scfParent->plane_wor;
-    }
-    virtual void ComputeCameraPlane (const csReversibleTransform& t,
-  	csPlane3& pl)
-    {
-      scfParent->ComputeCameraPlane (t, pl);
-    }
-    virtual void SetMaterial (iMaterialWrapper* mat)
-    {
-      scfParent->SetMaterial (mat);
-    }
-    virtual iMaterialWrapper* GetMaterial ()
-    {
-      return scfParent->GetMaterial ();
-    }
-  } scfiPolygon3D;
-  friend struct eiPolygon3D;
 };
 
 #endif // __CS_POLYGON_H__

@@ -42,7 +42,6 @@ struct iTextureHandle;
 struct iMaterial;
 struct iMaterialHandle;
 struct iImageVector;
-struct iLightMap;
 
 /**\name Texture registration flags.
  * During texture registration you should tell

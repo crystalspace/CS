@@ -24,7 +24,6 @@
 #include "csgeom/csrect.h"
 
 struct iTextureHandle;
-struct iPolygonTexture;
 struct iObjectRegistry;
 class csGLGraphics3D;
 

@@ -189,7 +189,6 @@
 	INTERFACE_APPLY(iObjectRegistry)
 	INTERFACE_APPLY(iPluginManager)
 	INTERFACE_APPLY(iPolygonMesh)
-	INTERFACE_APPLY(iPolygonTexture)
 	INTERFACE_APPLY(iSCF)
 	INTERFACE_APPLY(iScript)
 	INTERFACE_APPLY(iScriptObject)

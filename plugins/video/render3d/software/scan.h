@@ -30,7 +30,6 @@ class csSoftwareGraphics3DCommon;
 class csSoftRendererLightmap;
 struct csPolyTextureMapping;
 struct csPolyLightMapMapping;
-struct iPolygonTexture;
 
 //---//---//---//---//---//---//---//---//---//---//---//---// Constants //---//
 

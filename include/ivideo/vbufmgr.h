@@ -38,7 +38,6 @@ class csVector3;
 class csVector2;
 class csColor;
 class csTransform;
-struct iPolygonTexture;
 struct iMaterialHandle;
 struct csPolyTextureMapping;
 struct csPolyLightMapMapping;

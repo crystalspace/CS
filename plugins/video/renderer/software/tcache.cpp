@@ -42,10 +42,6 @@ static int hash_table [384];
 
 //------------------------------------------------- csTextureCacheSoftware ---//
 
-//  static void (*create_lighted_texture) (iPolygonTexture *pt,
-//    SoftwareCachedTexture *ct, csTextureManagerSoftware *texman,
-//    float u_min, float v_min, float u_max, float v_max);
-
 static void compute_hash_table ()
 {
   int i;
@@ -98,8 +94,7 @@ void csTextureCacheSoftware::Clear ()
 }
 
 void csTextureCacheSoftware::uncache_texture (int MipMap, 
-	      csSoftRendererLightmap* rlm
-/*iPolygonTexture* pt*/)
+	      csSoftRendererLightmap* rlm)
 {
   SoftwareCachedTexture* cached_texture;
   cached_texture = (SoftwareCachedTexture*)
@@ -150,7 +145,7 @@ void csTextureCacheSoftware::uncache_texture (int MipMap, iTextureHandle *itexh)
 
 SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (
   int MipMap, csPolyLightMapMapping* mapping, csPolyTextureMapping* tmapping,
-  csSoftRendererLightmap* rlm, iTextureHandle* itexh/*iPolygonTexture* pt*/)
+  csSoftRendererLightmap* rlm, iTextureHandle* itexh)
 {
 //  SoftwareCachedTexture *cached_texture =
 //    (SoftwareCachedTexture *)pt->GetCacheData (MipMap);
@@ -289,7 +284,7 @@ SoftwareCachedTexture *csTextureCacheSoftware::cache_texture (
   return cached_texture;
 }
 
-void csTextureCacheSoftware::fill_texture (int MipMap, /*iPolygonTexture* pt,*/
+void csTextureCacheSoftware::fill_texture (int MipMap,
 					   csPolyLightMapMapping* mapping,
 					   csPolyTextureMapping* tmapping,
 					   csSoftRendererLightmap* rlm,

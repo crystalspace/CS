@@ -43,15 +43,9 @@
 // Option variable: cosinus factor.
 float csPolyTexture:: cfg_cosinus_factor = 0;
 
-SCF_IMPLEMENT_IBASE(csPolyTexture)
-  SCF_IMPLEMENTS_INTERFACE(iPolygonTexture)
-SCF_IMPLEMENT_IBASE_END
-
 csPolyTexture::csPolyTexture ()
 {
-  SCF_CONSTRUCT_IBASE (0);
   lm = 0;
-  cache_data = 0;
   polygon = 0;
   shadow_bitmap = 0;
   light_version = 0;
@@ -97,11 +91,6 @@ void csPolyTexture::ObjectToWorld (const csMatrix3& m_obj2tex,
   v_world2tex = obj.This2Other (v_obj2tex);
 }
 
-void csPolyTexture::SetLightMapMapping (csPolyLightMapMapping* mapping)
-{
-  csPolyTexture::mapping = mapping;
-}
-
 void csPolyTexture::SetTextureMapping (csPolyTextureMapping* mapping)
 {
   csPolyTexture::tmapping = mapping;
@@ -120,14 +109,6 @@ csPolyTexture::~csPolyTexture ()
     if (G3D && rlm) G3D->RemoveFromCache (/*thismapping, tmapping, */
       rlm);
   }
-  if (cache_data)
-  {
-    CS_ASSERT (cache_data[0] == 0);
-    CS_ASSERT (cache_data[1] == 0);
-    CS_ASSERT (cache_data[2] == 0);
-    CS_ASSERT (cache_data[3] == 0);
-    delete[] cache_data;
-  }
   delete shadow_bitmap;
   if (polygon && lm)
   {
@@ -138,32 +119,6 @@ csPolyTexture::~csPolyTexture ()
 iMaterialHandle *csPolyTexture::GetMaterialHandle ()
 {
   return polygon->GetStaticData ()->GetMaterialHandle ();
-}
-
-void* csPolyTexture::GetCacheData (int idx)
-{
-  if (!cache_data)
-  {
-    cache_data = new void*[4];
-    cache_data[0] = 0;
-    cache_data[1] = 0;
-    cache_data[2] = 0;
-    cache_data[3] = 0;
-  }
-  return cache_data[idx];
-}
-
-void csPolyTexture::SetCacheData (int idx, void *d)
-{
-  if (!cache_data)
-  {
-    cache_data = new void*[4];
-    cache_data[0] = 0;
-    cache_data[1] = 0;
-    cache_data[2] = 0;
-    cache_data[3] = 0;
-  }
-  cache_data[idx] = d;
 }
 
 void csPolyTexture::SetLightMap (csLightMap *lightmap)

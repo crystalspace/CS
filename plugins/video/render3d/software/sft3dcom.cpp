@@ -1543,7 +1543,6 @@ void csSoftwareGraphics3DCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   if (dbg_current_polygon >= dbg_max_polygons_to_draw-1)
     return;
 
-  //  iPolygonTexture *tex = 0;
   iLightMap *lm = 0;
 /*  if (do_lighting)
   {
@@ -1856,7 +1855,6 @@ void csSoftwareGraphics3DCommon::DrawPolygon (G3DPolygonDP& poly)
         + Q2 * poly.cam2tex.v_cam2tex->y
         + Q3 * poly.cam2tex.v_cam2tex->z);
 
-  //iPolygonTexture *tex = poly.poly_texture;
   csPolyLightMapMapping* mapping = poly.lmap; //tex->GetMapping ();
   csSoftwareTextureHandle *tex_mm =
     (csSoftwareTextureHandle *)poly.mat_handle->GetTexture ()
@@ -3389,12 +3387,6 @@ float csSoftwareGraphics3DCommon::GetZBuffValue (int x, int y)
   return 16777216.0 / float (zbf);
 }
 
-/*bool csSoftwareGraphics3DCommon::IsLightmapOK (iPolygonTexture* poly_texture)
-{
-  const csLightMapMapping& mapping = poly_texture->GetMapping ();
-  return ((mapping.GetWidth () * mapping.GetHeight ()) < MAX_LIGHTMAP_SIZE);
-}*/
-
 void csSoftwareGraphics3DCommon::SetRenderTarget (iTextureHandle* handle,
 	bool persistent)
 {
@@ -4105,16 +4097,18 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh)
   for (i = 0; i < polyRender->polys.Length (); i++)
   {
     const csReversibleTransform& object2camera = mesh->object2camera;
-    iPolygon3DStatic* spoly = polyRender->polys[i];
+    csPolygonRenderData* spoly = polyRender->polys[i];
 
-    int numVerts = spoly->GetVertexCount ();
+    int numVerts = spoly->vertices.GetVertexCount ();
     CS_ALLOC_STACK_ARRAY(csVector3, camVerts, numVerts);
 
     int v;
     int cnt_vis = 0;
+    csVector3* obj_verts = *(spoly->p_obj_verts);
     for (v = 0; v < numVerts; v++)
     {
-      camVerts[v] = object2camera.Other2This (spoly->GetVertex (v));
+      camVerts[v] = object2camera.Other2This (obj_verts[
+      	spoly->vertices.GetVertex (v)]);
       if (camVerts[v].z >= 0)
       {
 	cnt_vis++;
@@ -4122,7 +4116,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh)
     }
     if (cnt_vis == 0) continue;
 
-    const csPlane3 &wplane = spoly->GetObjectPlane ();
+    const csPlane3 &wplane = spoly->plane_obj;
     float cl = wplane.Classify (w2c.GetOrigin ());
     if (cl > EPSILON) continue;
 
@@ -4143,11 +4137,23 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh)
       memcpy (poly.vertices, p2d.GetVertices (), sizeof (csVector2) * poly.num);
       poly.z_value = camVerts[0].z;
       poly.normal = plane_cam;
-      poly.mat_handle = spoly->GetMaterialHandle ();
+      //@@@@@ poly.mat_handle = spoly->material;
+      // Adding the material handle to csPolygonRenderData is not
+      // really an option but we need the material here. Perhaps use
+      // same technique as OpenGL renderer uses?
+      CS_ASSERT (false);
 
       csMatrix3 m_o2t;
       csVector3 v_o2t;
-      spoly->GetTextureSpace (m_o2t, v_o2t);
+      if (spoly->tmapping)
+      {
+        m_o2t = spoly->tmapping->m_obj2tex;
+        v_o2t = spoly->tmapping->v_obj2tex;
+      }
+      else
+      {
+        CS_ASSERT (false);	// @@@ Support flat-shading!
+      }
       //csReversibleTransform obj2tex (m_o2t, v_o2t);
 
       csReversibleTransform obj2world; // @@@ 
@@ -4166,7 +4172,7 @@ void csSoftwareGraphics3DCommon::DrawPolysMesh (csRenderMesh* mesh)
 
       //poly.cam2tex.m_cam2tex = (csMatrix3*)&cam2tex.GetO2T ();
       //poly.cam2tex.v_cam2tex = (csVector3*)&cam2tex.GetOrigin ();
-      poly.texmap = spoly->GetTextureMapping ();
+      poly.texmap = spoly->tmapping;
       poly.lmap = 0;
 
       DrawPolygon (poly);

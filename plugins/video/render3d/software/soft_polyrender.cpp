@@ -79,7 +79,7 @@ void csSoftPolygonRenderer::Clear ()
   polysNum++;
 }
 
-void csSoftPolygonRenderer::AddPolygon (iPolygon3DStatic* poly)
+void csSoftPolygonRenderer::AddPolygon (csPolygonRenderData* poly)
 {
   polys.Push (poly);
   polysNum++;

@@ -834,23 +834,6 @@ void csThingStatic::CalculateNormals ()
   delete[] pvv;
 }
 
-int csThingStatic::FindPolygonIndex (iPolygon3DStatic *polygon) const
-{
-  csPolygon3DStatic *p = polygon->GetPrivateObject ();
-  return static_polygons.Find (p);
-}
-
-iPolygon3DStatic *csThingStatic::GetPolygon (int idx)
-{
-  return &(static_polygons.Get (idx)->scfiPolygon3DStatic);
-}
-
-iPolygon3DStatic *csThingStatic::GetPolygon (const char* name)
-{
-  int idx = static_polygons.FindKey ((void*)name, static_polygons.CompareKey);
-  return idx >= 0 ? &(static_polygons.Get (idx)->scfiPolygon3DStatic) : 0;
-}
-
 int csThingStatic::AddPolygon (csPolygon3DStatic* spoly)
 {
   spoly->SetParent (this);
@@ -859,14 +842,6 @@ int csThingStatic::AddPolygon (csPolygon3DStatic* spoly)
   scfiObjectModel.ShapeChanged ();
   UnprepareLMLayout ();
   return idx;
-}
-
-iPolygon3DStatic *csThingStatic::CreatePolygon (const char *name)
-{
-  csPolygon3DStatic* sp = thing_type->blk_polygon3dstatic.Alloc ();
-  if (name) sp->SetName (name);
-  AddPolygon (sp);
-  return &(sp->scfiPolygon3DStatic);
 }
 
 void csThingStatic::RemovePolygon (int idx)
@@ -1140,9 +1115,7 @@ void csThingStatic::FillRenderMeshes (
     int j;
     for (j = 0; j< pg.polys.Length(); j++)
     {
-      csRef<iPolygon3DStatic> iStatic = 
-        SCF_QUERY_INTERFACE(static_polygons[pg.polys[j]], iPolygon3DStatic);
-      polyRenderer->AddPolygon (iStatic);
+      polyRenderer->AddPolygon (&static_polygons[pg.polys[j]]->polygon_data);
 
 #if 0
       csPolygon3DStatic* static_data = static_polygons[pg.polys[j]];
@@ -2055,12 +2028,6 @@ void csThing::SetPolygonMaterial (const csPolygonRange& range,
   }
 }
 
-int csThing::FindPolygonIndex (iPolygon3D *polygon) const
-{
-  csPolygon3D *p = polygon->GetPrivateObject ();
-  return polygons.Find (p);
-}
-
 void csThing::InvalidateThing ()
 {
 #ifndef CS_USE_NEW_RENDERER
@@ -2911,7 +2878,7 @@ void csThing::UpdateDirtyLMs ()
       if (lmi->DynamicLightsDirty () && lmi->RecalculateDynamicLights ())	
       {
 	litPolys[i]->lightmaps[j]->SetData (
-	  lmi->GetLightMapFast ()->GetMapDataFast ());
+	  lmi->GetLightMap ()->GetMapData ());
       }
     }
   }
@@ -2921,21 +2888,6 @@ void csThing::UpdateDirtyLMs ()
 
 //---------------------------------------------------------------------------
 
-iPolygon3D *csThing::ThingState::GetPolygon (int idx)
-{
-  csPolygon3D *p = scfParent->GetPolygon3D (idx);
-  if (!p) return 0;
-  return &(p->scfiPolygon3D);
-}
-
-iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
-{
-  csPolygon3D *p = scfParent->GetPolygon3D (name);
-  if (!p) return 0;
-  return &(p->scfiPolygon3D);
-}
-
-//---------------------------------------------------------------------------
 iMeshObjectFactory *csThing::MeshObject::GetFactory () const
 {
   if (!scfParent->ParentTemplate) return 0;

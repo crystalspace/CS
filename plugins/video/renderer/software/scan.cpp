@@ -176,7 +176,7 @@ void csScan_Finalize ()
 }
 
 void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
-  /*iPolygonTexture* tex*/csPolyTextureMapping* tmapping,
+  csPolyTextureMapping* tmapping,
   csPolyLightMapMapping* mapping, csSoftRendererLightmap* rlm,
   csTextureHandleSoftware* texture,
   csTextureSoftware *untxt)

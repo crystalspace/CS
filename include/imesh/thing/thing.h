@@ -27,8 +27,6 @@ class csVector3;
 class csMatrix3;
 class csPlane3;
 struct iSector;
-struct iPolygon3D;
-struct iPolygon3DStatic;
 struct iGraphics3D;
 struct iFrustumView;
 struct iMaterialWrapper;
@@ -62,6 +60,26 @@ struct csPolygonRange
   }
 };
 
+/** \name Polygon flags
+ * @{ */
+/**
+ * If CS_POLY_LIGHTING is set for a polygon then the polygon will be lit.
+ * It is set by default.
+ */
+#define CS_POLY_LIGHTING 0x00000001
+
+/**
+ * If this flag is set then this polygon is used for collision detection.
+ */
+#define CS_POLY_COLLDET	0x00000002
+
+/**
+ * If this flag is set then this polygon is used for visibility culling.
+ */
+#define CS_POLY_VISCULL	0x00000004
+/** @} */
+
+
 /** \name Polygon ranges
  * @{ */
 /**
@@ -87,6 +105,8 @@ struct csPolygonRange
  */
 #define CS_POLYINDEX_LAST -1
 
+/** \name Thing flags
+ * @{ */
 /**
  * If CS_THING_FASTMESH is set then this thing will be drawn using
  * the faster DrawPolygonMesh.
@@ -107,6 +127,7 @@ struct csPolygonRange
  */
 #define CS_THING_MOVE_NEVER 0
 #define CS_THING_MOVE_OCCASIONAL 2
+/** @} */
 
 SCF_VERSION (iPolygonHandle, 0, 0, 1);
 
@@ -174,14 +195,6 @@ struct iThingFactoryState : public iBase
 
   /// Query number of polygons in this thing.
   virtual int GetPolygonCount () = 0;
-  /// Get a polygon from set by his index. @@@ DEPRECATED
-  virtual iPolygon3DStatic *GetPolygon (int idx) = 0;
-  /// Get a polygon from set by name. @@@ DEPRECATED
-  virtual iPolygon3DStatic *GetPolygon (const char* name) = 0;
-  /// Create a new polygon and return a pointer to it. @@@ DEPRECATED
-  virtual iPolygon3DStatic *CreatePolygon (const char *iName = 0) = 0;
-  /// Find the index for a polygon. Returns -1 if polygon cannot be found. @@@ DEPRECATED
-  virtual int FindPolygonIndex (iPolygon3DStatic* polygon) const = 0;
   /// Delete a polygon given an index.
   virtual void RemovePolygon (int idx) = 0;
   /// Delete all polygons.
@@ -566,13 +579,6 @@ struct iThingState : public iBase
 
   /// Get the factory.
   virtual iThingFactoryState* GetFactory () = 0;
-
-  /// Get a polygon from set by his index.
-  virtual iPolygon3D *GetPolygon (int idx) = 0;
-  /// Get a polygon from set by name.
-  virtual iPolygon3D *GetPolygon (const char* name) = 0;
-  /// Find the index for a polygon. Returns -1 if polygon cannot be found.
-  virtual int FindPolygonIndex (iPolygon3D* polygon) const = 0;
 
   /// Get the given vertex coordinates in world space
   virtual const csVector3 &GetVertexW (int idx) const = 0;

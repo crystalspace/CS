@@ -81,9 +81,9 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 
     for (i = 0; i < polys.Length(); i++)
     {
-      iPolygon3DStatic* poly = polys[i];
+      csPolygonRenderData* poly = polys[i];
 
-      int pvc = poly->GetVertexCount ();
+      int pvc = poly->vertices.GetVertexCount ();
 
       num_verts += pvc;
       num_indices += (pvc - 2) * 3;
@@ -121,7 +121,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
 
     for (i = 0; i < polys.Length(); i++)
     {
-      iPolygon3DStatic* static_data = polys[i];
+      csPolygonRenderData* static_data = polys[i];
 
       //int* poly_indices = static_data->GetVertexIndices ();
 
@@ -130,7 +130,7 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       //{
 	// hmm... It seems that both polynormal and obj_normals[] need to be inverted.
 	//  Don't know why, just found it out empirical.
-	polynormal = -static_data->GetObjectPlane().Normal();
+	polynormal = -static_data->plane_obj.Normal();
       //}
 
       /*
@@ -140,7 +140,15 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       */
       csMatrix3 t_m;
       csVector3 t_v;
-      static_data->GetTextureSpace (t_m, t_v);
+      if (static_data->tmapping)
+      {
+        t_m = static_data->tmapping->m_obj2tex;
+        t_v = static_data->tmapping->v_obj2tex;
+      }
+      else
+      {
+        CS_ASSERT (false);	// @@@ NEED TO SUPPORT FLAT SHADING!!!
+      }
       csTransform object2texture (t_m, t_v);
 
       /*
@@ -165,11 +173,13 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       binormal.Normalize ();
 
       // First, fill the normal/texel/vertex buffers.
-      int j, vc = static_data->GetVertexCount();
+      csVector3* obj_verts = *(static_data->p_obj_verts);
+      int j, vc = static_data->vertices.GetVertexCount();
       for (j = 0; j < vc; j++)
       {
 	//int vidx = *poly_indices++;
-        const csVector3& vertex = static_data->GetVertex (j);
+        const csVector3& vertex = obj_verts[
+		static_data->vertices.GetVertex (j)];
         *vertices++ = vertex;
 /*	*vertices++ = obj_verts[vidx];
 	@@@ FIXME
@@ -231,7 +241,7 @@ void csGLPolygonRenderer::Clear ()
   polysNum++;
 }
 
-void csGLPolygonRenderer::AddPolygon (iPolygon3DStatic* poly)
+void csGLPolygonRenderer::AddPolygon (csPolygonRenderData* poly)
 {
   polys.Push (poly);
   polysNum++;
