@@ -24,6 +24,12 @@ class ctLinkList{
 public:
   ctLinkList(){ size = 0; head = new llLink(); prev = NULL; current = head; }
 
+  // clean up nodes.  Does NOT delete contents of nodes
+  ~ctLinkList(){
+    remove_all();
+    delete head;
+  }
+
   void reset(){ prev = NULL; current = head; }
 
   void * get_first(){  if( head->next != NULL ){
@@ -92,6 +98,33 @@ public:
         ll = ll->next;
       }
     }
+  }
+
+  // remove all nodes, doesn't delete contents of nodes
+  void remove_all(){
+    if( head == NULL )
+      return;
+    prev = head->next;
+    while( prev ){
+      current = prev->next;
+      delete prev;
+      prev = current;
+    }
+    size = 0; prev = NULL; current = head;
+  }
+
+  // remove all nodes, delete contents of nodes
+  void delete_all(){
+    if( head == NULL )
+      return;
+    prev = head->next;
+    while( prev ){
+      current = prev->next;
+      prev->delete_contents();
+      delete prev;
+      prev = current;
+    }
+    size = 0; prev = NULL; current = head;
   }
 
   long get_size(){ return size; }
@@ -294,5 +327,31 @@ public:
 
 };
 
+class ctCatastropheManager;
+
+class ctLinkList_ctCatastropheManager : public ctLinkList
+{
+public:
+  ctCatastropheManager * get_first(){
+    return (ctCatastropheManager *)ctLinkList::get_first();
+  }
+
+  ctCatastropheManager * get_next(){
+    return (ctCatastropheManager *)ctLinkList::get_next();
+  }
+
+  void add_link( ctCatastropheManager * plink ){
+    ctLinkList::add_link( (void *)plink );
+  }
+
+  void remove_link( ctCatastropheManager * plink ){
+    ctLinkList::remove_link( (void *)plink );
+  }
+
+  void delete_link( ctCatastropheManager * plink ){
+    ctLinkList::delete_link( (void *)plink );
+  }
+
+};
 
 #endif
