@@ -111,6 +111,7 @@ public:
     bitmap = NULL;
     alphamap = NULL;
     image = Image;
+    if (image) image->IncRef ();
     w = Image->GetWidth ();
     h = Image->GetHeight ();
     compute_masks ();
@@ -118,7 +119,12 @@ public:
   /// Destroy the texture
   virtual ~csTextureSoftware ()
   { 
-    delete [] bitmap; if (image) image->DecRef (); 
+    printf("*** csTextureSoftware dtor\n");
+    printf("*** del bmap\n");
+    delete [] bitmap; 
+    printf("*** decref image %p\n", image);
+    if (image) image->DecRef (); 
+    printf("*** exit csTextureSoftware dtor\n");
   }
 
   /// Return a pointer to texture data

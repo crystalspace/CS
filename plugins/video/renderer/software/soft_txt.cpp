@@ -128,7 +128,6 @@ int csColorMap::FreeEntries ()
 csTextureSoftwareProc::~csTextureSoftwareProc ()
 { 
   if (texG3D) texG3D->DecRef ();
-  if (image) image->DecRef ();
 }
 
 //---------------------------------------------------- csTextureHandleSoftware ---//
