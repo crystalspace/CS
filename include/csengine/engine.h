@@ -309,7 +309,7 @@ public:
 #ifndef CS_USE_NEW_RENDERER
   /// The fog mode this G3D implements
   G3D_FOGMETHOD fogmethod;
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
   /// Does the 3D driver require power-of-two lightmaps?
   bool NeedPO2Maps;
   /// Maximum texture aspect ratio

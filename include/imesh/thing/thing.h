@@ -271,7 +271,7 @@ struct iThingState : public iBase
   virtual bool HasFog () const = 0;
   /// Return the fog structure (even if fog is disabled).
   virtual csFog* GetFog () const = 0;
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
   /// Sets dynamic ambient light for this thing
   virtual void SetDynamicAmbientLight(const csColor& color) = 0;

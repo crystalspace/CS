@@ -418,7 +418,7 @@ private:
    */
   static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
 	iRenderView* d, csZBufMode zMode);
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
   /**
    * This function is called by the BSP tree traversal routine
@@ -1177,7 +1177,7 @@ public:
     { return scfParent->HasFog (); }
     virtual csFog *GetFog () const
     { return &scfParent->GetFog (); }
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
     /// Sets dynamic ambient light for this thing
     virtual void SetDynamicAmbientLight (const csColor& color)
@@ -1366,7 +1366,7 @@ public:
     {
       return scfParent->Draw (rview, movable, zMode);
     }
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
     virtual void SetVisibleCallback (iMeshObjectDrawCallback* /*cb*/) { }
     virtual iMeshObjectDrawCallback* GetVisibleCallback () const
     { return NULL; }

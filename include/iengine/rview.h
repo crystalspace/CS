@@ -40,7 +40,7 @@
 
 #ifndef CS_USE_NEW_RENDERER
 struct csFog;
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 struct iEngine;
 struct iClipper2D;
 struct iGraphics2D;
@@ -86,7 +86,7 @@ public:
 #ifndef CS_USE_NEW_RENDERER
   /// The structure describing the fog.
   csFog* fog;
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 };
 
 /**
@@ -324,7 +324,7 @@ struct iRenderView : public iBase
 
   virtual void CalculateFogMesh (const csTransform &tr_o2c, 
     G3DPolygonMesh &mesh) = 0;
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
 
 
   /**

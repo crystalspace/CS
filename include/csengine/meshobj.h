@@ -599,7 +599,7 @@ public:
     {
       return scfParent->GetZBufMode ();
     }
-#endif CS_USE_NEW_RENDERER
+#endif // CS_USE_NEW_RENDERER
     virtual void HardTransform (const csReversibleTransform& t)
     {
       scfParent->HardTransform (t);
