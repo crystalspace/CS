@@ -147,7 +147,7 @@ endif
 # usage of csPtr (i.e. calling a function that returns csPtr and not using
 # the result will be detected at runtime).
 ifndef STRICT_SMART_POINTERS
-  STRICT_SMART_POINTERS=no
+  STRICT_SMART_POINTERS=yes
 endif
 
 # Should we cache makefile information?  Caching information speeds up the

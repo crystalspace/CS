@@ -9,6 +9,9 @@ The history order is reversed so that new features are at the top.
 	  DecRef() on ldr_context.
 	- Fixed decref bug in odedynam. Don't do DecRef() on
 	  csRef's! (collidesys in this case).
+	- Enabled STRICT_SMART_POINTERS by default. If you want to disable
+	  this (for compatibility reasons) then edit mk/user.mak or
+	  else do 'make <platform> STRICT_SMART_POINTERS=no'.
 14-Sep-2002
 	- Fixed a ref counting bug in picview.
 	- Fixed the bug in the OpenGL state cache (canvas). It was not
