@@ -44,6 +44,8 @@ The history order is reversed so that new features are at the top.
 	      will follow over time.
 	- res made some common functions 'intrinsic' on MSVC.
 	- res fixed a few compiler warnings.
+        - Philip Wyett eliminated link errors in mnay of the applications
+          under GNU Linux.
 14-Jun-2003
 	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
 	  leaks in AWS.
