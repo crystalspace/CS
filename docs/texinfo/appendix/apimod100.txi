@@ -1497,15 +1497,16 @@ documentations.
 The long-deprecated Crystal Space Windowing System (@sc{csws}) was removed. 
 Instead use @sc{aws}. @xref{AWS}.
 
-@subheading Transform split
+@subheading Transform Split
 
 To allow more control over how geometry is transformed when using shaders the
-@code{csRenderMehs::object2camera} have been split up into one transform
-object2world and one world2camera. The object2world transform is sent via a
-shader variable, while world2camera is specified via @code{iGraphics3D::SetWorldToCamera}
-(but it is also available as shader variable.
+@samp{csRenderMesh::object2camera} has been split into two transforms:
+@samp{object2world} and @samp{world2camera}. The @samp{object2world} transform
+is sent via a shader variable, while @samp{world2camera} is specified via
+@code{iGraphics3D::SetWorldToCamera()} (but it is also available as shader
+variable.
 
-@subheading @sc{chunklod} Removal
+@subheading @samp{chunklod} Terrain Removal
 
-The @sc{chunklod} terrain engine was removed. Instead use @sc{bruteblock} terrain
-engine.
+The @samp{chunklod} terrain plugin has been removed. Instead use the
+@samp{bruteblock} terrain engine.
