@@ -671,6 +671,9 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("ambient", XMLTOKEN_AMBIENT);
   xmltokens.Register ("addon", XMLTOKEN_ADDON);
   xmltokens.Register ("attenuation", XMLTOKEN_ATTENUATION);
+#ifdef CS_USE_NEW_RENDERER
+  xmltokens.Register ("attenuationvec", XMLTOKEN_ATTENUATIONVECTOR);
+#endif CS_USE_NEW_RENDERER
   xmltokens.Register ("badoccluder", XMLTOKEN_BADOCCLUDER);
   xmltokens.Register ("camera", XMLTOKEN_CAMERA);
   xmltokens.Register ("center", XMLTOKEN_CENTER);
@@ -2525,6 +2528,11 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 
   Stats->lights_loaded++;
   csVector3 pos;
+
+#ifdef CS_USE_NEW_RENDERER
+  csVector3 attenvec;
+#endif
+
   csColor color;
   float dist = 0;
   bool dyn;
@@ -2730,6 +2738,14 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	  }
 	}
 	break;
+      #ifdef CS_USE_NEW_RENDERER
+      case XMLTOKEN_ATTENUATIONVECTOR:
+        {
+          if (!SyntaxService->ParseVector (child, attenvec))
+	    return NULL;
+        }
+        break;
+      #endif CS_USE_NEW_RENDERER
       default:
 	SyntaxService->ReportBadToken (child);
 	return NULL;
@@ -2793,6 +2809,10 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
       break;
   }
   l->QueryLight ()->SetAttenuation (attenuation);
+
+#ifdef CS_USE_NEW_RENDERER
+  l->QueryLight ()->SetAttenuationVector (attenvec);
+#endif
 
   // Move the key-value pairs from 'Keys' to the light object
   l->QueryObject ()->ObjAddChildren (&Keys);
