@@ -261,7 +261,7 @@ chronological order.
 	  Other compilers correctly apply Point's float* operator and then
 	  treat the returned result as an array.  Borland, however, was unable
 	  to choose if it should use the const or non-const float* operator.
-	- Eric Sunshine revised outdated and incomplete Doxygen comments
+	- Eric Sunshine revised outdated and incomplete Doxygen comments for
 	  iNetworkEndPoint, iNetworkConnection, iNetworkListener,
 	  iNetworkDriver, and csNetworkDriverCapabilities.
 	- John Harger fixed a sorting problem (though the back2front sorting
@@ -324,7 +324,7 @@ chronological order.
 	  Foo : public Bar, public Cow, public Smoo".
 	- Eric Sunshine fixed csVosA3DL and csVosSector so that they do not use
 	  csRef<> for storing iObjectRegistry, since this tends to lead to
-	  circular reference loops.
+	  reference loops.
 	- Eric Sunshine removed numerous unnecessary #includes from csvosa3dl
 	  plugin.
 	- Eric Sunshine fixed bug in csVosObject3D.  It failed to invoke
@@ -344,7 +344,7 @@ chronological order.
 	  classes used as template arguments, rather than simply forward
 	  declaring them.  This will allow it to work correctly with older
 	  compilers, such as the Borland compiler, which must see the entire
-	  class delcaration before the class is used as a template argument.
+	  class declaration before the class is used as a template argument.
 	- Eric Sunshine protected vostest.mak via a conditional so that the
 	  vostest application is built only if VOS has been detected.
 	- Eric Sunshine fixed bad copy/paste error in the configure.ac VOS
