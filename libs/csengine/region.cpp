@@ -360,6 +360,14 @@ iCameraPosition* csRegion::Region::FindCameraPosition (const char *iName)
   return &campos->scfiCameraPosition;
 }
 
+iCollection* csRegion::Region::FindCollection (const char *iName)
+{
+  csObject* obj = scfParent->FindObject (iName, csCollection::Type, false);
+  if (!obj) return NULL;
+  csCollection* coll = (csCollection*)obj;
+  return &coll->scfiCollection;
+}
+
 bool csRegion::IsInRegion (iObject* iobj)
 {
   csObject* obj = (csObject*)iobj;

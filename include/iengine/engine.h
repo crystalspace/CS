@@ -49,6 +49,7 @@ struct iClipper2D;
 struct iPolyTxtPlane;
 struct iCurveTemplate;
 struct iObject;
+struct iCollection;
 
 /**
  * Flag for GetNearbyLights().
@@ -302,6 +303,19 @@ struct iEngine : public iPlugIn
    */
   virtual iCameraPosition* FindCameraPosition (const char* iName,
   	bool regionOnly = false) = 0;
+  /**
+   * Find a collection by name. If regionOnly is true then the returned
+   * collection will belong to the current region. Note that this is different
+   * from calling iRegion::FindCollection() because the latter will also
+   * return collections that belong in a region but are not connected
+   * to the engine.
+   */
+  virtual iCollection* FindCollection (const char* iName,
+  	bool regionOnly = false) = 0;
+  /**
+   * Create a new collection.
+   */
+  virtual iCollection* CreateCollection (const char* iName) = 0;
 
   /// Enable/disable the lighting cache.
   virtual void EnableLightingCache (bool do_cache) = 0;

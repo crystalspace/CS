@@ -1059,6 +1059,10 @@ public:
   virtual iMaterialWrapper* FindMaterial (const char* iName, bool regionOnly = false);
   /// Find a loaded camera position by name.
   virtual iCameraPosition* FindCameraPosition (const char* iName, bool regionOnly = false);
+  /// Find a collection by name
+  virtual iCollection* FindCollection (const char* iName, bool regionOnly = false);
+  /// Create a new collection.
+  virtual iCollection* CreateCollection (const char* iName);
 
   /// Create a new view on the engine.
   virtual iView* CreateView (iGraphics3D* g3d);

@@ -1965,6 +1965,25 @@ iCameraPosition* csEngine::FindCameraPosition (const char* iName, bool regionOnl
   return &wr->scfiCameraPosition;
 }
 
+iCollection* csEngine::FindCollection (const char* iName, bool regionOnly)
+{
+  csCollection* c;
+  if (regionOnly && region)
+    c = (csCollection*)FindObjectInRegion (region, collections, iName);
+  else
+    c = (csCollection*)collections.FindByName (iName);
+  if (!c) return NULL;
+  return &c->scfiCollection;
+}
+
+iCollection* csEngine::CreateCollection (const char* iName)
+{
+  csCollection *c = new csCollection(this);
+  c->SetName(iName);
+  collections.Push(c);
+  return &(c->scfiCollection);
+}
+
 iView* csEngine::CreateView (iGraphics3D* g3d)
 {
   csView* view = new csView (this, g3d);

@@ -34,6 +34,7 @@ struct iVFS;
 struct iGraphics3D;
 struct iSoundRender;
 struct iLoaderPlugIn;
+struct iCollection;
 
 struct csRGBcolor;
 struct iMotion;
@@ -108,8 +109,8 @@ class csLoader : public iLoader
   bool load_quaternion (char* buf, csQuaternion &q);
   /// Parse a color definition
   bool load_color (char *buf, csRGBcolor &c);
-  /// Parse a collection definition and return a new object
-  csCollection* load_collection (char* name, char* buf);
+  /// Parse a collection definition and add it to the engine
+  iCollection* load_collection (char* name, char* buf);
   /// Parse a static light definition and return a new object
   csStatLight* load_statlight (char* name, char* buf);
   /// Parse a key definition and return a new object

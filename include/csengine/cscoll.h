@@ -24,6 +24,7 @@
 #include "csobject/pobject.h"
 #include "csutil/csvector.h"
 #include "csengine/movable.h"
+#include "iengine/collectn.h"
 
 class csSector;
 class csEngine;
@@ -86,7 +87,7 @@ public:
   /**
    * Find an object with the given name inside this collection.
    */
-  csObject* FindObject (char* name);
+  iObject* FindObject (char* name);
 
   /**
    * Get the number of objects in this collection.
@@ -94,12 +95,34 @@ public:
   int GetNumObjects () const { return objects.Length(); }
 
   /// Add an object to the collection.
-  void AddObject (csObject* obj) { objects.Push((csSome)obj); }
+  void AddObject (iObject* obj) { objects.Push((csSome)obj); }
 
   ///
-  csObject* operator[] (int i) { return (csObject*) (objects[i]); }
+  iObject* operator[] (int i) { return (iObject*) (objects[i]); }
   
   CSOBJTYPE;
+  DECLARE_IBASE;
+
+  //------------------------- iCollection interface --------------------------
+  struct Collection : public iCollection
+  {
+    DECLARE_EMBEDDED_IBASE (csCollection);
+    virtual iObject *QueryObject()
+      { return scfParent; }
+    virtual iMovable* GetMovable () const
+      { return &(scfParent->GetMovable().scfiMovable); }
+    virtual iObject* FindObject (char* name) const
+      { return scfParent->FindObject(name); }
+    virtual int GetNumObjects () const
+      { return scfParent->GetNumObjects(); }
+    virtual void AddObject (iObject* obj)
+      { scfParent->AddObject(obj); }
+    virtual iObject* operator[] (int i) const
+      { return (*scfParent)[i]; }
+    virtual iObject* GetObject (int i) const
+      { return (*scfParent)[i]; }
+  } scfiCollection;
+  friend struct Collection;
 };
 
 #endif // __CS_CSCOLL_H__

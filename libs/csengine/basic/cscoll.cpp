@@ -24,9 +24,20 @@
 
 IMPLEMENT_CSOBJTYPE (csCollection,csPObject);
 
+IMPLEMENT_IBASE (csCollection)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iCollection)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csCollection::Collection)
+  IMPLEMENTS_INTERFACE (iCollection)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csCollection::csCollection (csEngine* engine) :
   csPObject(), objects (8,8), movable ()
 {
+  CONSTRUCT_IBASE(NULL);
+  CONSTRUCT_EMBEDDED_IBASE(scfiCollection);
+
   movable.SetObject (this);
   csCollection::engine = engine;
   engine->AddToCurrentRegion (this);
@@ -37,12 +48,12 @@ csCollection::~csCollection ()
   engine->UnlinkCollection (this);
 }
 
-csObject* csCollection::FindObject (char* name)
+iObject* csCollection::FindObject (char* name)
 {
   for (int i = 0 ; i < objects.Length() ; i++)
   {
-    csObject* csobj = (csObject*)(objects[i]);
-    if (!strcmp ( csobj->GetName (), name)) return csobj;
+    iObject* obj = (iObject*)(objects[i]);
+    if (!strcmp ( obj->GetName (), name)) return obj;
   }
   return NULL;
 }

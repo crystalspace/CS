@@ -33,6 +33,7 @@ struct iTextureWrapper;
 struct iMaterialWrapper;
 struct iCameraPosition;
 struct iObject;
+struct iCollection;
 
 SCF_VERSION (iRegion, 0, 1, 5);
 
@@ -90,6 +91,8 @@ struct iRegion : public iBase
   virtual iMaterialWrapper *FindMaterial (const char *iName) = 0;
   /// Find a camera position in this region by name
   virtual iCameraPosition *FindCameraPosition (const char *iName) = 0;
+  /// Find a collection in this region by name
+  virtual iCollection *FindCollection (const char *iName) = 0;
 
   /**
    * Check if some object is in this region.

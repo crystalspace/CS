@@ -24,7 +24,6 @@
 #include "csparser/snddatao.h"
 
 #include "csengine/campos.h"
-#include "csengine/cscoll.h"
 #include "csengine/curve.h"
 #include "csengine/dumper.h"
 #include "csengine/engine.h"
@@ -52,19 +51,19 @@
 #include "iengine/skelbone.h"
 #include "iengine/region.h"
 #include "iengine/texture.h"
+#include "iengine/terrain.h"
+#include "iengine/collectn.h"
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
-#include "iengine/terrain.h"
 #include "iterrain/object.h"
+#include "iterrain/ddg.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "isys/vfs.h"
 #include "igraphic/image.h"
 #include "igraphic/imageio.h"
 #include "csgfx/csimage.h"
-
-#include "iterrain/ddg.h"
 
 //---------------------------------------------------------------------------
 
@@ -327,7 +326,7 @@ csMaterialWrapper *csLoader::FindMaterial (const char *iName)
 
 //---------------------------------------------------------------------------
 
-csCollection* csLoader::load_collection (char* name, char* buf)
+iCollection* csLoader::load_collection (char* name, char* buf)
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE (ADDON)
@@ -341,8 +340,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
   long cmd;
   char* params;
 
-  csCollection* collection = new csCollection (Engine->GetCsEngine());
-  collection->SetName (name);
+  iCollection* collection = Engine->CreateCollection(name);
 
   char str[255];
   while ((cmd = csGetObject (&buf, commands, &xname, &params)) > 0)
@@ -369,7 +367,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
             CsPrintf (MSG_FATAL_ERROR, "Mesh object '%s' not found!\n", str);
             fatal_exit (0, false);
           }
-          collection->AddObject ((csObject*)(spr->GetPrivateObject ()));
+          collection->AddObject (spr->QueryObject());
 # endif
         }
         break;
@@ -380,7 +378,7 @@ csCollection* csLoader::load_collection (char* name, char* buf)
           if (!l)
             CsPrintf (MSG_WARNING, "Light '%s' not found!\n", str);
 	  else
-	    collection->AddObject ((csObject*)l);
+	    collection->AddObject (l);
         }
         break;
       case CS_TOKEN_SECTOR:
@@ -392,20 +390,20 @@ csCollection* csLoader::load_collection (char* name, char* buf)
             CsPrintf (MSG_FATAL_ERROR, "Sector '%s' not found!\n", str);
             fatal_exit (0, false);
           }
-          collection->AddObject ((csObject*)(s->GetPrivateObject ()));
+          collection->AddObject (s->QueryObject ());
         }
         break;
       case CS_TOKEN_COLLECTION:
         {
           ScanStr (params, "%s", str);
 	  //@@@$$$ TODO: Collection in regions.
-          csCollection* th = (csCollection*)Engine->GetCsEngine()->collections.FindByName (str);
+          iCollection* th = Engine->FindCollection(str);
           if (!th)
           {
             CsPrintf (MSG_FATAL_ERROR, "Collection '%s' not found!\n", str);
             fatal_exit (0, false);
           }
-          collection->AddObject (th);
+          collection->AddObject (th->QueryObject());
         }
         break;
     }
@@ -1043,7 +1041,7 @@ bool csLoader::LoadMap (char* buf)
             Engine->GetCsEngine()->sectors.Push (load_sector (name, params));
           break;
         case CS_TOKEN_COLLECTION:
-          Engine->GetCsEngine()->collections.Push (load_collection (name, params));
+          load_collection (name, params);
           break;
 	case CS_TOKEN_MAT_SET:
           if (!LoadMaterials (params, name))
