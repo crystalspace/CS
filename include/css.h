@@ -294,7 +294,6 @@
 
 // CS Gfx
 #ifndef NO_CSGFX
-#include "csgfx/bumpmap.h"
 #include "csgfx/csimage.h"
 #include "csgfx/inv_cmap.h"
 #include "csgfx/memimage.h"
