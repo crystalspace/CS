@@ -1,4 +1,3 @@
-
 ############################################
 # These are the dependencies for Crystal Space.
 # This is an include file for the makefiles.
