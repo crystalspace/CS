@@ -222,7 +222,7 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
   /// update animation
   mesh->NextFrame(rview->GetView()->GetEngine()->GetSystem()->GetTime());
 
-  iGraphics3D* g3d = rview->GetG3D ();
+  //iGraphics3D* g3d = rview->GetG3D ();
   iIsoView* view = rview->GetView ();
 
   // Prepare for rendering.
@@ -261,9 +261,6 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
   /// create fake renderview
   csIsoFakeRenderView *fakerview = new csIsoFakeRenderView();
   fakerview->SetIsoData(rview, fakecam);
-
-  /// guesstimate of fov (angle) of view. 1/fov.
-  g3d->SetPerspectiveAspect (180.);
 
   if(mesh->DrawTest(fakerview, movable))
   {
