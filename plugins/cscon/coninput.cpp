@@ -118,7 +118,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	  line = buffer->WriteLine();
 	  if(cursor==line->Length())
 	    line->Append((char) event.Key.Code);
-#ifdef DEBUG
+#ifdef CS_DEBUG
 	  else if(cursor>line->Length())
 	    piSystem->Print(MSG_FATAL_ERROR, "csConsoleInput:  Cursor past end of line!\n");
 #endif
@@ -135,11 +135,11 @@ bool csConsoleInput::HandleEvent(csEvent &event)
       }
     }
   }
-#ifdef DEBUG
+#ifdef CS_DEBUG
   else {
     piSystem->Print(MSG_WARNING, "csConsoleInput:  Received an unknown event!\n");
   }
-#endif // DEBUG
+#endif // CS_DEBUG
   
   // Just in case the application adds us into the input loop
   return false;

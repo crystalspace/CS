@@ -5,9 +5,6 @@ DO.MAKE.VOLATILE=$(MAKE_VOLATILE_H)
 ifeq ($(USE_SHARED_PLUGINS),no)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_STATIC_LINKED$">>volatile.tmp
 endif
-ifeq ($(MODE),debug)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DEBUG$">>volatile.tmp
-endif
 ifeq ($(DO_SOUND),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SOUND$">>volatile.tmp
 endif

@@ -78,7 +78,7 @@ public:
   /// Get a reference to iPos'th character
   inline char &operator [] (size_t iPos)
   {
-#ifdef DEBUG
+#ifdef CS_DEBUG
     if (iPos > Size)
       STR_FATAL(("Trying to access string `%s' at position %lu\n",
         Data, (unsigned long)iPos))
@@ -89,7 +89,7 @@ public:
   /// Set characetr number iPos to iChar
   void SetAt (size_t iPos, const char iChar)
   {
-#ifdef DEBUG
+#ifdef CS_DEBUG
     if (iPos > Size)
       STR_FATAL (("Trying to do `%s'.SetAt (%lu)\n",
         Data, (unsigned long)iPos))
@@ -100,7 +100,7 @@ public:
   /// Get character at position iPos
   char GetAt (size_t iPos) const
   {
-#ifdef DEBUG
+#ifdef CS_DEBUG
     if (iPos > Size)
       STR_FATAL (("Trying to do `%s'.GetAt (%lu)\n",
         Data, (unsigned long)iPos));

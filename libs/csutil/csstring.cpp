@@ -39,7 +39,7 @@ void csString::SetSize (size_t NewSize)
 
 csString &csString::DeleteAt (size_t iPos, size_t iCount)
 {
-#ifdef DEBUG
+#ifdef CS_DEBUG
   if ( (iPos > Size) || (iPos + iCount > Size) )
     STR_FATAL (("Tried to delete characters beyond the end of the string!\n"))
 #endif
@@ -51,7 +51,7 @@ csString &csString::DeleteAt (size_t iPos, size_t iCount)
 
 csString &csString::Insert (size_t iPos, const csString &iStr)
 {
-#ifdef DEBUG
+#ifdef CS_DEBUG
   if (iPos > Size)
     STR_FATAL (("Inserting `%s' into `%s' at position %lu\n",
       iStr.GetData (), Data, (unsigned long)iPos))
@@ -76,7 +76,7 @@ csString &csString::Insert (size_t iPos, const csString &iStr)
 
 csString &csString::Insert (size_t iPos, const char iChar)
 {
-#ifdef DEBUG
+#ifdef CS_DEBUG
   if (iPos > Size)
     STR_FATAL (("Inserting `%c' into `%s' at position %lu\n",
       iChar, Data, (unsigned long)iPos))
@@ -100,7 +100,7 @@ csString &csString::Insert (size_t iPos, const char iChar)
 
 csString &csString::Overwrite (size_t iPos, const csString &iStr)
 {
-#ifdef DEBUG
+#ifdef CS_DEBUG
   if (iPos > Size)
     STR_FATAL (("Overwriting `%s' into `%s' at position %lu\n",
       iStr.GetData (), Data, (unsigned long)iPos))

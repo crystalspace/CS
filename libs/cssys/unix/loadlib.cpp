@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include "csutil/csstring.h"
 
-#ifdef DEBUG
+#ifdef CS_DEBUG
 #  define DLOPEN_MODE 	RTLD_NOW		// handy for debugging
 #else
 #  define DLOPEN_MODE 	RTLD_LAZY

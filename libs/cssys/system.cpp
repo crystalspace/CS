@@ -289,7 +289,7 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), OptionList (16, 16),
 
 csSystemDriver::~csSystemDriver ()
 {
-#ifdef DEBUG
+#ifdef CS_DEBUG
   printf ("System driver is going to shut down now!\n");
 #endif
 

@@ -69,9 +69,13 @@ public:
   { RefCount++; }
 
   /// Decrement reference count for the library
-  bool DecRef ()
+  void DecRef ()
+  { RefCount--; }
+
+  /// Try to free the library, if refcount is zero
+  bool TryUnload ()
   {
-    if ((--RefCount) <= 0)
+    if (RefCount <= 0)
     {
       LibraryRegistry->Delete (LibraryRegistry->Find (this));
       return true;
@@ -182,7 +186,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iDepend)
 {
   // Don't use CONSTRUCT_IBASE (NULL) since it will call IncRef()
-  scfRefCount = 1; scfParent = NULL;
+  scfRefCount = 0; scfParent = NULL;
   ClassID = strnew (iClassID);
   ClassInfo = NULL;
   Dependencies = strnew (iDepend);
@@ -199,7 +203,7 @@ scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
 scfFactory::scfFactory (const scfClassInfo *iClassInfo)
 {
   // Don't use CONSTRUCT_IBASE (NULL) since it will call IncRef()
-  scfRefCount = 1; scfParent = NULL;
+  scfRefCount = 0; scfParent = NULL;
   ClassID = strnew (iClassInfo->ClassID);
   ClassInfo = iClassInfo;
   Dependencies = strnew (iClassInfo->Dependencies);
@@ -211,11 +215,11 @@ scfFactory::scfFactory (const scfClassInfo *iClassInfo)
 
 scfFactory::~scfFactory ()
 {
-#ifdef DEBUG
+#ifdef CS_DEBUG
   // Warn user about unreleased instances of this class
-  if (scfRefCount > 1)
+  if (scfRefCount)
     fprintf (stderr, "SCF WARNING: %d unreleased instances of class %s left!\n",
-      scfRefCount - 1, ClassID);
+      scfRefCount, ClassID);
 #endif
 
 #ifndef CS_STATIC_LINKED
@@ -241,7 +245,6 @@ void scfFactory::IncRef ()
       ClassInfo = Library->Find (ClassID);
     if (!Library->ok () || !ClassInfo)
     {
-      Library->DecRef ();
       Library = NULL;
       return;
     }
@@ -254,7 +257,7 @@ void scfFactory::IncRef ()
 
 void scfFactory::DecRef ()
 {
-#ifdef DEBUG
+#ifdef CS_DEBUG
   if (!scfRefCount)
   {
     fprintf (stderr, "SCF WARNING: Extra calls to scfFactory::DecRef () for class %s\n", ClassID);
@@ -264,8 +267,7 @@ void scfFactory::DecRef ()
   scfRefCount--;
 #ifndef CS_STATIC_LINKED
   if (Library)
-    if (Library->DecRef ())
-      Library = NULL;
+    Library->DecRef ();
 #endif
 }
 
@@ -282,13 +284,21 @@ void *scfFactory::CreateInstance ()
   if (!scfRefCount)
     return NULL;
 
-  return ClassInfo->Factory (this);
+  void *instance = ClassInfo->Factory (this);
+
+  // No matter whenever we succeeded or not, decrement the refcount
+  DecRef ();
+
+  return instance;
 }
 
 void scfFactory::TryUnload ()
 {
-  if (scfRefCount == 1)
-    DecRef ();
+#ifndef CS_STATIC_LINKED
+  if (Library)
+    if (Library->TryUnload ())
+      Library = NULL;
+#endif
 }
 
 const char *scfFactory::QueryDescription ()

@@ -220,7 +220,7 @@ VideoSystem::VideoSystem ()
     VideoRAM = 0;
   } /* endif */
 
-#ifdef DEBUG
+#ifdef CS_DEBUG
   char __oem [200];
   __oem [sizeof (__oem)] = 0;
   dosmemget ((size_t (vi.OEM) >> 16) * 16 + (size_t (vi.OEM) & 0xffff),
@@ -489,7 +489,7 @@ allocate:
   }
 
   DoubleBuffer (true);
-#ifdef DEBUG
+#ifdef CS_DEBUG
   printf("IsBanked: %d\n" "IsXmode: %d\n" "VideoPages: %d\n"
          "VRAMSelector: %08lX\n" "VRAMBuffer: %08lX\n" "VRAM: %08lX\n",
          IsBanked, IsXmode, VideoPages, (unsigned long)VRAMSelector,

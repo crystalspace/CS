@@ -243,10 +243,10 @@ void csConsole::Draw(csRect *area)
 
     if(text==NULL) {
 
-#ifdef DEBUG
+#ifdef CS_DEBUG
       if(cx!=0)
 	piSystem->Print(MSG_WARNING, "csConsole:  Current line is empty but cursor x != 0!\n");
-#endif // DEBUG
+#endif // CS_DEBUG
 
       cx_pix = 1;
 
@@ -273,17 +273,17 @@ void csConsole::Draw(csRect *area)
       piG2D->DrawBox(cx_pix + 1, (cy * height) + 1, line.xmax - 1, (cy * height) + (height-1), fg);
       break;
     case csConCustomCursor:
-#ifdef DEBUG
+#ifdef CS_DEBUG
       if(custom_cursor==NULL)
 	piSystem->Print(MSG_FATAL_ERROR, "csConsole:  Tried to display NULL custom cursor!!!\n");
-#endif // DEBUG
+#endif // CS_DEBUG
       line.ymin++; line.xmax--; line.ymax--;
       custom_cursor->Draw(line);
       break;
-#ifdef DEBUG
+#ifdef CS_DEBUG
     default:
       piSystem->Print(MSG_WARNING, "csConsole:  Invalid cursor setting!\n");
-#endif // DEBUG
+#endif // CS_DEBUG
     }
 
   }
@@ -470,7 +470,7 @@ void csConsole::SetCursorStyle(int style, bool flashing, iCursor *custom)
 {
   // Setup the custom cursor
   if(style==csConCustomCursor) {
-#ifdef DEBUG
+#ifdef CS_DEBUG
     if(custom==NULL)
       piSystem->Print(MSG_FATAL_ERROR, "csConsole:  Tried to assign NULL pointer for cursor texture!");
 #endif

@@ -65,7 +65,7 @@ iWorm *csWorm::Split (int iLen1, int iLen2)
   csWorm *newworm = new csWorm (scfParent);
   newworm->SetLength (length - newlength);
   length = newlength;
-  return QUERY_INTERFACE (newworm, iWorm);
+  return newworm;
 }
 
 // ... and now export all classes
