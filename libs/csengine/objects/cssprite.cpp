@@ -1094,6 +1094,17 @@ void csSprite3D::UpdateLighting (csLight** lights, int num_lights)
 
   // this is so that sprite gets blackened if no light strikes it
   AddVertexColor (0, csColor (0, 0, 0));
+
+  csSector * sect = (csSector*)sectors[0];
+  if (sect)
+  {
+    int r, g, b;
+    sect->GetAmbientColor (r, g, b);
+    csColor ambient_color (r / 128.0, g / 128.0, b / 128.0);
+    for (int i = 0 ; i < tpl->GetNumVertices (); i++)
+      AddVertexColor (i, ambient_color);
+  }
+
   if (do_quality_lighting)
     UpdateLightingHQ (lights, num_lights, object_vertices);
   else
