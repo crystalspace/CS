@@ -576,7 +576,7 @@ void Blocks::add_pillar (int x, int y)
   pillar->SetName ("pillar");
   pillar->GetMovable ().SetSector (room);
   pillar->flags.Set (CS_ENTITY_MOVEABLE, 0);
-  pillar->MergeTemplate (pillar_tmpl, pillar_mat, 1);
+  pillar->MergeTemplate (pillar_tmpl, room, pillar_mat, 1);
   pillar->GetMovable ().SetSector (room);
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
@@ -592,7 +592,7 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   vrast->SetName ("vrast");
   vrast->GetMovable ().SetSector (room);
   vrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
-  vrast->MergeTemplate (vrast_tmpl, raster_mat, 1);
+  vrast->MergeTemplate (vrast_tmpl, room, raster_mat, 1);
   vrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -610,7 +610,7 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast->SetName ("hrast");
   hrast->GetMovable ().SetSector (room);
   hrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
-  hrast->MergeTemplate (hrast_tmpl, raster_mat, 1);
+  hrast->MergeTemplate (hrast_tmpl, room, raster_mat, 1);
   hrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -705,7 +705,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  cube->MergeTemplate (tmpl, cube_mat, 1, true, &shift, NULL);
+  cube->MergeTemplate (tmpl, room, cube_mat, 1, true, &shift, NULL);
 
   csPolygon3D* p;
   p = cube->GetPolygon3D ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);

@@ -1,6 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 2-Oct-2000
+	- Fixed compile bug in Blocks that I caused by a change yesterday.
 	- Added new conversion utility to convert 3DS files to CS world
 	  files. This is only a very primitive first version. It converts
 	  geometry in a 3DS file to one big sector. The polygons and
