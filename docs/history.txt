@@ -14,6 +14,11 @@ chronological order.
 	  is used. In addition it will now report the name of the object
 	  that is causing the problematic polygons too. In the past it was
 	  nearly impossible to get that information.
+	- Erotoman added support to export bones movements in 
+	  export_genmesh_skelanim.mcr (not only bones rotations).
+	- Erotoman updated "walk" script of animated mesh with some bones 
+	  movements and now it looks better.
+	
 6-Mar-2005
 	- Eric Sunshine removed invocation of SWIGEXTERN() from definition of
 	  csWrapTypedObject() in pythpost.i since the meaning of SWIGEXTERN
