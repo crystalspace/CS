@@ -1,5 +1,25 @@
 The history order has been reversed so that new features are at the top.
 
+9-Jun-2000
+	- Moved a lot of PVS algorithm code into csPVSAlgo. That cleans
+	  up csOctree a little.
+	- Created new db_osolid debug command. This command will create
+	  things for all solid space boundaries in an octree node.
+8-Jun-2000
+	- In an effort to completly fix PVS and make sure that everything is
+	  ok I started adding extensive comments everywhere.
+	- Changed the eight frustums in PVS to only one. This is more
+	  efficient because we only need to clip the occluder polygon once
+	  in that case.
+	- Further work on csQuadtree from Wouter Wijngaards.
+	- Wouter also made csBox2::Intersect() a const routine.
+	- Did a very significant bug fix in PVS. This seems to improve
+	  quality ENOURMOUSLY. It also results in a few errors but I'll have
+	  to debug these seperately. This looks very promising indeed.
+	- Fix for OpenGL 8 bit mode and palette from Thomas Krug
+	  <thomas.krug@assix.de>.
+	- Thomas Hieber fixed csQuadtree to make it compile on VC again.
+	  MSVC was complaining about the various function pointer operators.
 7-Jun-2000
 	- Paul Garceau added RMDIR equivalent to mingw.mak for cross platform
 	  compatibility.
@@ -21,6 +41,7 @@ The history order has been reversed so that new features are at the top.
 	- Fixed another bug in PVS.
 	- Did a new optimization for PVS. If all children of a node are
 	  not visible then the node itself will not be visible as well.
+	- Wouter Wijngaards further worked on the new csQuadTree code.
 6-Jun-2000
 	- Fixed OpenGL GLX driver (2D driver for OpenGL/X Windows).
 	  It was trying to find a visual with AUX buffers.

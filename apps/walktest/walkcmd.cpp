@@ -212,7 +212,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("-*- Additional commands -*-\n");
     CONPRI("Visibility:\n");
     CONPRI("  dumpvis cbuffer covtree solidbsp pvs freezepvs pvsonly\n");
-    CONPRI("  db_octree\n");
+    CONPRI("  db_octree, db_osolid\n");
     CONPRI("Lights:\n");
     CONPRI("  addlight dellight dellights picklight droplight\n");
     CONPRI("  clrlights setlight\n");
@@ -275,6 +275,17 @@ bool CommandHandler (const char *cmd, const char *arg)
     Command::change_boolean (arg, &Sys->do_show_z, "zbuf");
   else if (!strcasecmp (cmd, "db_octree"))
     Command::change_int (arg, &Sys->cfg_draw_octree, "debug octree", -1, 10);
+  else if (!strcasecmp (cmd, "db_osolid"))
+  {
+    extern void CreateSolidThings (csWorld*, csSector*, csOctreeNode*, int);
+    csSector* room = Sys->view->GetCamera ()->GetSector ();
+    csPolygonTree* tree = room->GetStaticTree ();
+    if (tree)
+    {
+      csOctree* otree = (csOctree*)tree;
+      CreateSolidThings (Sys->world, room, otree->GetRoot (), 0);
+    }
+  }
   else if (!strcasecmp (cmd, "palette"))
     Command::change_boolean (arg, &Sys->do_show_palette, "palette");
   else if (!strcasecmp (cmd, "move3d"))

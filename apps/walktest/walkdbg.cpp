@@ -39,6 +39,7 @@
 #include "csengine/solidbsp.h"
 #include "csengine/cssprite.h"
 #include "csengine/csview.h"
+#include "csengine/octree.h"
 #include "csutil/csrect.h"
 #include "csobject/dataobj.h"
 #include "igraph3d.h"
@@ -489,4 +490,118 @@ void DrawOctreeBoxes (int draw_level)
   csOctreeNode* node = tree->GetRoot ();
   DrawOctreeBoxes (node, 0, draw_level);
 }
+
+#define PLANE_X 0
+#define PLANE_Y 1
+#define PLANE_Z 2
+
+static csVector3 GetVector3 (int plane_nr, float plane_pos,
+	const csVector2& p)
+{
+  csVector3 v;
+  switch (plane_nr)
+  {
+    case PLANE_X: v.Set (plane_pos, p.x, p.y); break;
+    case PLANE_Y: v.Set (p.x, plane_pos, p.y); break;
+    case PLANE_Z: v.Set (p.x, p.y, plane_pos); break;
+    default: v.Set (0, 0, 0); break;
+  }
+  return v;
+}
+
+void CreateSolidThings (csWorld* world, csSector* room, csOctreeNode* node, int depth)
+{
+  if (!node) return;
+  int side;
+  csVector2 v;
+  const csBox3& bbox = node->GetBox ();
+  for (side = 0 ; side < 6 ; side++)
+  {
+    UShort mask = node->GetSolidMask (side);
+    if (mask)
+    {
+      csBox2 box = bbox.GetSide (side);
+      csVector2 cor_xy = box.GetCorner (BOX_CORNER_xy);
+      csVector2 cor_XY = box.GetCorner (BOX_CORNER_XY);
+      int plane_nr = side/2;
+      float plane_pos = (side&1) ? bbox.Max (plane_nr) : bbox.Min (plane_nr);
+
+      int bitnr, x, y;
+      for (y = 0 ; y < 4 ; y++)
+        for (x = 0 ; x < 4 ; x++)
+	{
+	  bitnr = y*4+x;
+          if (mask & (1<<bitnr))
+	  {
+	    v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+      	    v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+	    csVector3 v1 = GetVector3 (plane_nr, plane_pos, v);
+	    v.x = cor_xy.x + (x+1)*(cor_XY.x-cor_xy.x)/4;
+	    v.y = cor_xy.y + y*(cor_XY.y-cor_xy.y)/4;
+	    csVector3 v2 = GetVector3 (plane_nr, plane_pos, v);
+	    v.x = cor_xy.x + (x+1)*(cor_XY.x-cor_xy.x)/4;
+	    v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4;
+	    csVector3 v3 = GetVector3 (plane_nr, plane_pos, v);
+	    v.x = cor_xy.x + x*(cor_XY.x-cor_xy.x)/4;
+	    v.y = cor_xy.y + (y+1)*(cor_XY.y-cor_xy.y)/4;
+	    csVector3 v4 = GetVector3 (plane_nr, plane_pos, v);
+	    csTextureHandle* white = world->GetTextures ()->FindByName ("white.gif");
+	    csThing* thing = new csThing ();
+	    thing->AddVertex (v1);
+	    thing->AddVertex (v2);
+	    thing->AddVertex (v3);
+	    thing->AddVertex (v4);
+	    csPolygon3D* p;
+	    csGouraudShaded* gs;
+	    csMatrix3 tx_matrix;
+	    csVector3 tx_vector;
+
+	    p = thing->NewPolygon (white);
+	    p->AddVertex (0); p->AddVertex (1); p->AddVertex (2);
+	    p->SetTextureSpace (tx_matrix, tx_vector);
+	    p->SetTextureType (POLYTXT_GOURAUD);
+	    gs = p->GetGouraudInfo ();
+  	    gs->Setup (p->GetVertices ().GetNumVertices ());
+  	    gs->EnableGouraud (true);
+  	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
+	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
+	    p = thing->NewPolygon (white);
+	    p->AddVertex (0); p->AddVertex (2); p->AddVertex (3);
+	    p->SetTextureSpace (tx_matrix, tx_vector);
+	    p->SetTextureType (POLYTXT_GOURAUD);
+	    gs = p->GetGouraudInfo ();
+  	    gs->Setup (p->GetVertices ().GetNumVertices ());
+  	    gs->EnableGouraud (true);
+  	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
+	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
+
+	    p = thing->NewPolygon (white);
+	    p->AddVertex (0); p->AddVertex (3); p->AddVertex (2);
+	    p->SetTextureSpace (tx_matrix, tx_vector);
+	    p->SetTextureType (POLYTXT_GOURAUD);
+	    gs = p->GetGouraudInfo ();
+  	    gs->Setup (p->GetVertices ().GetNumVertices ());
+  	    gs->EnableGouraud (true);
+  	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
+	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
+	    p = thing->NewPolygon (white);
+	    p->AddVertex (0); p->AddVertex (2); p->AddVertex (1);
+	    p->SetTextureSpace (tx_matrix, tx_vector);
+	    p->SetTextureType (POLYTXT_GOURAUD);
+	    gs = p->GetGouraudInfo ();
+  	    gs->Setup (p->GetVertices ().GetNumVertices ());
+  	    gs->EnableGouraud (true);
+  	    gs->SetUV (0, 0, 0); gs->SetUV (1, 1, 0); gs->SetUV (2, 1, 1);
+	    gs->AddColor (0, 1, 0, 0); gs->AddColor (1, 0, 1, 0); gs->AddColor (2, 0, 0, 1);
+
+	    room->AddThing (thing);
+	  }
+	}
+    }
+  }
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+    CreateSolidThings (world, room, node->GetChild (i), depth+1);
+}
+
 
