@@ -1,0 +1,7 @@
+
+#include "cssysdef.h"
+
+CS_IMPLEMENT_PLUGIN
+
+EXPORT_CLASS_TABLE (crossbld)
+EXPORT_CLASS_TABLE_END

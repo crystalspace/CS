@@ -1,0 +1,7 @@
+
+#include "cssysdef.h"
+
+CS_IMPLEMENT_PLUGIN
+
+EXPORT_CLASS_TABLE (ieplex)
+EXPORT_CLASS_TABLE_END
