@@ -161,7 +161,9 @@ public:
 
   /// Set configuration file for use inside Initialize () call
   void SetConfig (csIniFile* newconfig)
-  { config = newconfig; }
+  {
+    config = newconfig;
+  }
 };
 
 #endif // TXTMGR_OPENGL_H

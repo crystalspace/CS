@@ -174,6 +174,14 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
+  /// The texture manager
+  csTextureManagerOpenGL* txtmgr;
+
+  /// The texture cache.
+  OpenGLTextureCache* texture_cache;
+
+  /// The lightmap cache.
+  OpenGLLightmapCache* lightmap_cache;
 public:
   DECLARE_IBASE;
 
@@ -185,15 +193,6 @@ public:
 
   /// The configuration file
   csIniFile* config;
-
-  /// The texture manager
-  csTextureManagerOpenGL* txtmgr;
-
-  /// The texture cache.
-  OpenGLTextureCache* texture_cache;
-
-  /// The lightmap cache.
-  OpenGLLightmapCache* lightmap_cache;
 
   /// The System interface. 
   iSystem* System;
