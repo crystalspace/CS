@@ -557,6 +557,16 @@ int csLineX2DFontServer::csLineX2DFont::GetLength (const char *text, int maxwidt
   return i;
 }
 
+int csLineX2DFontServer::csLineX2DFont::GetDescent ()
+{
+  return xfont ? xfont->descent : 0;
+}
+
+int csLineX2DFontServer::csLineX2DFont::GetAscent ()
+{
+  return xfont ? xfont->ascent : 0;
+}
+
 //----------
 
 csLineX2DFontServer::csLineX2DFontServer (iBase *iParent)
@@ -566,7 +576,7 @@ csLineX2DFontServer::csLineX2DFontServer (iBase *iParent)
   font.xfont = NULL;
 }
 
-iFont *csLineX2DFontServer::LoadFont (const char *filename)
+csPtr<iFont> csLineX2DFontServer::LoadFont (const char *filename)
 {
   (void)filename;
   if (!font.xfont)

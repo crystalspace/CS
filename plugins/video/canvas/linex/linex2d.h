@@ -140,6 +140,8 @@ class csLineX2DFontServer : public iFontServer
     virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc);
     virtual void GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &);
     virtual int GetLength (const char *text, int maxwidth);
+    virtual int GetAscent ();
+    virtual int GetDescent ();
     virtual void AddDeleteCallback (iFontDeleteNotify*)
     { }
     virtual bool RemoveDeleteCallback (iFontDeleteNotify*)
@@ -155,7 +157,7 @@ public:
   virtual ~csLineX2DFontServer () {}
   virtual bool Initialize (iObjectRegistry *)
   { return true; }
-  virtual iFont *LoadFont (const char *filename);
+  virtual csPtr<iFont> LoadFont (const char *filename);
   virtual int GetFontCount ()
   { return font.xfont ? 1 : 0; }
   virtual iFont *GetFont (int iIndex)
