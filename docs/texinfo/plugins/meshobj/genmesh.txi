@@ -39,7 +39,7 @@ can retrieve with @code{SCF_QUERY_INTERFACE()}:
 
 @itemize @bullet
 @item
-@code{MeshObject}
+@emph{MeshObject}
 @itemize @bullet
 @item
 Implements @samp{iMeshObject}
@@ -47,7 +47,7 @@ Implements @samp{iMeshObject}
 Implements @samp{iGeneralMeshState}
 @end itemize
 @item
-@code{MeshObjectFactory}
+@emph{MeshObjectFactory}
 @itemize @bullet
 @item
 Implements @samp{iMeshObjectFactory}
@@ -55,7 +55,7 @@ Implements @samp{iMeshObjectFactory}
 Implements @samp{iGeneralFactoryState}
 @end itemize
 @item
-@code{MeshObjectType}
+@emph{MeshObjectType}
 @itemize @bullet
 @item
 Implements @samp{iMeshObjectType}

@@ -27,7 +27,7 @@ For a good discussion about sectors and visibility cullers, see
 A sector is the basic building block in a map (@pxref{Visibility Culling}).
 When you create a map you should decide upon how to partition your map in
 sectors. The easiest solution is to use a single sector. In many cases that may
-even be acceptible. Here are some points to consider when deciding upon how to
+even be acceptable. Here are some points to consider when deciding upon how to
 partition your map into sectors:
 
 @itemize @bullet
@@ -86,8 +86,8 @@ coverage test is usually wasted.
 
 @item
 Complex sectors that nevertheless do not have sufficient objects which
-can occlude other objects. This is on accont of the same reason as described in
-the previous case.
+can occlude other objects. This is on account of the same reason as described
+in the previous case.
 @end itemize
 
 On the other hand, if you have a complex map with lots of large objects then
