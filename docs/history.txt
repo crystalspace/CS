@@ -7,14 +7,19 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Mar-2004
-	- Jorrit added back the Get() to csHash that res removed a while ago.
-	  Having that Get() there does NOT restrict the csHash to be used
-	  on objects that have a default constructor. It only adds that
-	  restriction if that Get() is actually used.
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.
 	  Most of the enhancements are to minimize calls to 
 	  CalRenderer::getNormals due to a lot of unnecessary lighting updates.
+	- Jorrit added back the Get() to csHash that res removed a while ago.
+	  Having that Get() there does NOT restrict the csHash to be used on
+	  objects that have a default constructor.  It only adds that
+	  restriction if that Get() is actually used.  [Eric notes that for
+	  slightly older compilers, the restriction is placed upon the entire
+	  template, even if the Get() method is never invoked.]
+	- Eric Sunshine reverted Jorrit's reversion to Frank's csHash<>::Get()
+	  changes (after explaining why the original Get() method was so
+	  undisirable that it warranted removal).
 13-Mar-2004
 	- John Harger fixed the nVidia part of the PS1 plugin so that it will
 	  use the correct texture target on a 'tex' instruction.
