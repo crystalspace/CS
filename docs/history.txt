@@ -7,6 +7,24 @@ The history order is reversed so that new features are at the top.
 	  correctly remove objects from the region they were in. It would
 	  only remove objects from the region if the region happened to be
 	  the current region.
+	- Implemented an experimental patch to the OpenGL super lightmap
+	  cache. To enable this you have to enable the USE_MEMORY_COPY
+	  define (i.e. set to 1) which you can find in
+	  plugins/video/renderer/opengl/ogl_txtcache.h. With that flag set
+	  to 1 the lightmaps are copied to a memory buffer before one
+	  glTexImage2D() will send them to the card. With that flag set
+	  to 0 (default) glTexSubImage2D() is used instead. Since
+	  glTexSubImage2D() is faster on linux and windows I will keep it
+	  disabled for now. But someone on MacOS/X should try to set this
+	  flag to 1 to see if it helps performance for fastmesh objects.
+	- Another patch to DrawPolygonSingleTexture in the OpenGL renderer.
+	  Previously the lightmap for that polygon would also be placed
+	  on a 256x256 texture. Since transfering that texture to the hardware
+	  seems to be slow in some cases (i.e. MacOS/X) it seems worthwhile
+	  to have at least two other texture sizes to use here. So I added
+	  a 64x64 and 16x16 texture on which smaller lightmaps will fit.
+	  On linux this doesn't seem to have any effect at all on performance
+	  but perhaps it will help on MacOS/X.
 12-Mar-2003
 	- Added csArray::ShrinkBestFit() routine. This routine will set
 	  the capacity of the array exactly to the current length. This

@@ -2503,11 +2503,13 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     glColor4f (1, 1, 1, 0);
     SetupBlend (CS_FX_SRCDST, 0, false);
 
-    GLuint TempHandle = lightmap_cache->GetTempHandle ();
-    tex->RecalculateDynamicLights ();
-    statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
+    float txtsize;
     int lmwidth = lm->GetWidth ();
     int lmheight = lm->GetHeight ();
+    GLuint TempHandle = lightmap_cache->GetTempHandle (lmwidth, lmheight,
+	txtsize);
+    tex->RecalculateDynamicLights ();
+    statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
     csRGBpixel* lm_data = lm->GetMapData ();
     glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
 	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
@@ -2533,8 +2535,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     lm_offset_v -= .75 / (float (lmheight) * lm_scale_v);
     lm_high_v += .75 / (float (lmheight) * lm_scale_v);
 
-    lm_scale_u = float (lmwidth) / (256. * (lm_high_u - lm_offset_u));
-    lm_scale_v = float (lmheight) / (256. * (lm_high_v - lm_offset_v));
+    lm_scale_u = float (lmwidth) / (txtsize * (lm_high_u - lm_offset_u));
+    lm_scale_v = float (lmheight) / (txtsize * (lm_high_v - lm_offset_v));
 
     glt = gltxt;
     GLfloat* gltt = gltxttrans;
@@ -2960,11 +2962,13 @@ void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
     glColor4f (1, 1, 1, 0);
     SetupBlend (CS_FX_SRCDST, 0, false);
 
-    GLuint TempHandle = lightmap_cache->GetTempHandle ();
-    tex->RecalculateDynamicLights ();
-    statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
+    float txtsize;
     int lmwidth = lm->GetWidth ();
     int lmheight = lm->GetHeight ();
+    GLuint TempHandle = lightmap_cache->GetTempHandle (lmwidth, lmheight,
+		    txtsize);
+    tex->RecalculateDynamicLights ();
+    statecache->SetTexture (GL_TEXTURE_2D, TempHandle);
     csRGBpixel* lm_data = lm->GetMapData ();
     glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
 	lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
@@ -2990,8 +2994,8 @@ void csGraphics3DOGLCommon::DrawPolygonLightmapOnly (G3DPolygonDP& poly)
     lm_offset_v -= .75 / (float (lmheight) * lm_scale_v);
     lm_high_v += .75 / (float (lmheight) * lm_scale_v);
 
-    lm_scale_u = float (lmwidth) / (256. * (lm_high_u - lm_offset_u));
-    lm_scale_v = float (lmheight) / (256. * (lm_high_v - lm_offset_v));
+    lm_scale_u = float (lmwidth) / (txtsize * (lm_high_u - lm_offset_u));
+    lm_scale_v = float (lmheight) / (txtsize * (lm_high_v - lm_offset_v));
 
     glt = gltxt;
     GLfloat* gltt = gltxttrans;
