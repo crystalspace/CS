@@ -50,6 +50,8 @@ The history order has been reversed so that new features are at the top.
 	  class.  (Martin forgot to do this when he converted SCF to use the
 	  new configuration file format.  The result was that scfreg would
 	  blast the contents of scf.cfg.)
+	- Eric Sunshine augmented cspython.mak so that it is more permissive
+	  about locating the Python static link library.
 23-Jan-2001
 	- Martin Geisse moved the following to the new config system:
 	    - SCF.
