@@ -1,6 +1,6 @@
 /*
     Crystal Space input library
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
     Written by Andrew Zabolotny <bit@eltech.ru>
   
     This library is free software; you can redistribute it and/or
@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSINPUT_H__
-#define __CSINPUT_H__
+#ifndef __CS_CSINPUT_H__
+#define __CS_CSINPUT_H__
 
 /**
  * These are the low-level interfaces to input devices like keyboard
@@ -32,6 +32,7 @@
 #include "csutil/bitset.h"
 #include "cssys/csevent.h"
 #include "cssys/cseventq.h"
+class csSystemDriver;
 
 /// Maximal number of mouse buttons supported
 #define CS_MAX_MOUSE_BUTTONS	10
@@ -39,8 +40,6 @@
 #define CS_MAX_JOYSTICK_COUNT	2
 /// Maximal number of joystick buttons supported
 #define CS_MAX_JOYSTICK_BUTTONS	10
-
-class csSystemDriver;
 
 /**
  * System Keyboard Driver.<p>
@@ -56,7 +55,11 @@ class csKeyboardDriver
 
 public:
   /// Initialize keyboard interface
-  csKeyboardDriver (csSystemDriver *system);
+  csKeyboardDriver (csSystemDriver* = NULL);
+
+  /// Set the system driver.
+  void SetSystemDriver (csSystemDriver* system)
+  { System = system; }
 
   /**
    * Call to release all key down flags
@@ -112,7 +115,11 @@ class csMouseDriver
 
 public:
   /// Initialize mouse interface
-  csMouseDriver (csSystemDriver *system);
+  csMouseDriver (csSystemDriver* = NULL);
+
+  /// Set the system driver.
+  void SetSystemDriver (csSystemDriver* system)
+  { System = system; }
 
   /// Set double-click mouse parameters
   static void SetDoubleClickTime (int iTime, size_t iDist);
@@ -156,7 +163,11 @@ class csJoystickDriver
 
 public:
   /// Initialize joystick interface
-  csJoystickDriver (csSystemDriver *system);
+  csJoystickDriver (csSystemDriver* = NULL);
+
+  /// Set the system driver.
+  void SetSystemDriver (csSystemDriver* system)
+  { System = system; }
 
   /**
    * Call to release all joystick buttons
@@ -182,4 +193,4 @@ public:
   void do_motion (int number, int x, int y);
 };
 
-#endif // __CSINPUT_H__
+#endif // __CS_CSINPUT_H__

@@ -285,14 +285,17 @@ IMPLEMENT_IBASE (csSystemDriver)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSCF)
 IMPLEMENT_IBASE_END
 
-csSystemDriver::csSystemDriver () : PlugIns (8, 8),
-  EventQueue (), Keyboard (this), Mouse (this), Joystick (this),
+csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   OptionList (16, 16), CommandLine (16, 16), CommandLineNames (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiSCF);
 
+  Keyboard.SetSystemDriver (this);
+  Mouse.SetSystemDriver    (this);
+  Joystick.SetSystemDriver (this);
   console_open ();
+
   System = this;
   IsFocused = true;
   FullScreen = false;
