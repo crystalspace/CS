@@ -1,7 +1,5 @@
 SubDir TOP libs csws ;
 
-SearchSubdir skins/default ;
-
 Library csws :
 	[ Wildcard *.cpp *.h ]
 	[ Wildcard skins/default : *.cpp *.h ]

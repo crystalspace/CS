@@ -1,61 +1,54 @@
 SubDir TOP libs cssys ;
 
-CSSYS_SRC = [ Wildcard *.cpp *.h ] ;
+CSSYS_SRC = "" ;
 
 switch $(TARGET.OS)
 {
-case WIN32 :					# Windows
-  SearchSubdir win32 ;
-  SearchSubdir general ; 
+case WIN32 :					# Windows 
   CSSYS_SRC += [ Wildcard win32 : *.cpp *.h ] 
-		csprocessorcap.cpp
-		findlib.cpp
-		getopt.cpp
-		pluginpaths.cpp
-		resdir.cpp
-		runloop.cpp ;
+		general/csprocessorcap.cpp
+		general/findlib.cpp
+		general/getopt.cpp
+		general/pluginpaths.cpp
+		general/resdir.cpp
+		general/runloop.cpp ;
 case MACOS_X :					# MacOS/X
-  SearchSubdir macosx ;
-  SearchSubdir general ;
   CSSYS_SRC += [ Wildcard macosx : *.cpp *.m *.mm *.h ] 
-		apppath.cpp
-		csprocessorcap.cpp
-		cspthrd.cpp 
-		cspthrd.h
-		findlib.cpp
-		getopt.cpp
-		pathutil.cpp 
-		pluginpaths.cpp
-		printf.cpp
-		scanplugins.cpp
-		sysroot.cpp ;
+		general/apppath.cpp
+		general/csprocessorcap.cpp
+		general/cspthrd.cpp 
+		general/cspthrd.h
+		general/findlib.cpp
+		general/getopt.cpp
+		general/pathutil.cpp 
+		general/pluginpaths.cpp
+		general/printf.cpp
+		general/scanplugins.cpp
+		general/sysroot.cpp ;
   InstallConfig macosx.cfg ;
 case * :					# Posix, Unix, Linux, etc.
-  SearchSubdir unix ;
-  SearchSubdir general ;
-  CSSYS_SRC += [ Filter [ Wildcard unix : *.cpp *.h ] : bfdplugins.cpp ]
-		appdir.cpp
-		apppath.cpp
-		csprocessorcap.cpp
-		cspthrd.cpp
-		cspthrd.h
-		findlib.cpp
-		getopt.cpp
-		pathutil.cpp
-		platformconfig.cpp 
-		pluginpaths.cpp
-		printf.cpp
-		resdir.cpp
-		runloop.cpp 
-		sysroot.cpp ;
+  CSSYS_SRC += [ Filter [ Wildcard unix : *.cpp *.h ] : unix/bfdplugins.cpp ]
+		general/appdir.cpp
+		general/apppath.cpp
+		general/csprocessorcap.cpp
+		general/cspthrd.cpp
+		general/cspthrd.h
+		general/findlib.cpp
+		general/getopt.cpp
+		general/pathutil.cpp
+		general/platformconfig.cpp 
+		general/pluginpaths.cpp
+		general/printf.cpp
+		general/resdir.cpp
+		general/runloop.cpp 
+		general/sysroot.cpp ;
   if $(EMBED_META) = "yes" && $(LIBBFD.AVAILABLE) = "yes"
   {
-    CSSYS_SRC += bfdplugins.cpp ;
+    CSSYS_SRC += unix/bfdplugins.cpp ;
   }
   else
   {
-    CSSYS_SRC += scanplugins.cpp ;
+    CSSYS_SRC += general/scanplugins.cpp ;
   }
 }
 
-CSSYS_OBJ = [ CompileObjects [ DoSourceGrist $(CSSYS_SRC) ] ] ;

@@ -308,28 +308,3 @@ SUBDIR_ROOT = $(TOP-ROOT) ;
 
 } # end if $(JAMVERSION) = 2.4
 
-# MakeLocate rule from jam 2.4 isn't optimal. Use improved version from jam
-# 2.5
-if $(JAMVERSION) = 2.4
-{
-
-rule MakeLocate
-{
-	# MakeLocate targets : directory ;
-
-	# Sets special variable LOCATE on targets, and arranges    
-	# with MkDir to create target directory.
-
-	# Note we grist the directory name with 'dir',
-	# so that directory path components and other
-	# targets don't conflict.
-
-	if $(>)
-	{
-	    LOCATE on $(<) = $(>) ;
-	    Depends $(<) : $(>[1]:G=dir) ;
-	    MkDir $(>[1]:G=dir) ;
-	}
-}
-
-}

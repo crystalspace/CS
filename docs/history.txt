@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Dec-2003
+        - Matze reworked some jam rules so that subdirs are more robust now.
+          This should also fix some msvcgen problems on jam.
 14-Dec-2003
 	- Eric Sunshine added --with[out]-python and --with[out]-perl options
 	  to configure.ac to allow users to disable these modules if desired.

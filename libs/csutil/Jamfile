@@ -1,9 +1,10 @@
 SubDir TOP libs csutil ;
 
+CSSYS_SRC = $(CSSYS_SRC:R=../cssys) ;
 Library csutil
-	: [ Wildcard *.cpp *.h ]
+	: [ Wildcard *.cpp *.h ] $(CSSYS_SRC)
+          [ Wildcard ../../include/csutil : *.h ]
 	:
-	: $(CSSYS_OBJ)
 ;
 CFlags csutil :
   -DCS_CONFIGDIR='\"$(INSTALLDIR.CONFIG)\"' 

@@ -55,20 +55,22 @@ rule SearchSubdir
 ##    subdirectories which may have been entered with the SubDir rule.
 rule Wildcard
 {
-  local files dir wildcards ;
+  local files dir sdir wildcards ;
   
   # Is a directory given?
   if $(>) {
     dir = $(<)/ ;
+    sdir = $(<) ;
     wildcards = $(>) ;
   } else {
     dir = "" ;
+    sdir = "" ;
     wildcards = $(<) ;
   }
 
   files = [ GLOB [ FDirName $(SUBDIR) $(dir) ] : $(wildcards) ] ;
 
-  return $(files:BS) ;
+  return $(files:BSR=$(sdir)) ;
 }
 
 ##  Prefix list : prefix

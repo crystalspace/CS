@@ -1,9 +1,5 @@
 SubDir TOP libs csengine ;
 
-SearchSubdir basic ;
-SearchSubdir light ;
-SearchSubdir objects ;
-
 Library csengine :
 	[ Wildcard *.cpp *.h ]
 	[ Wildcard basic : *.cpp *.h ]
