@@ -467,7 +467,7 @@ void csGraphics3DSoftware::ScanSetup ()
   } /* endswitch */
 
   int MaxColorcomponent = 64; // (pfmt.PixelBytes == 4) ? 256 : 32;
-  
+
   // For DrawPolygonFX we will need to do some blending of textures with current
   // screen content.
   int i;
@@ -492,7 +492,7 @@ void csGraphics3DSoftware::ScanSetup ()
       m_BlendingTable [BLENDTABLE_ALPHA100 ][index] =  dest;
 
       for (i = 0; i < 8; i++)
-        if (m_BlendingTable[i][index] >= MaxColorcomponent) 
+        if (m_BlendingTable[i][index] >= MaxColorcomponent)
           m_BlendingTable[i][index] = MaxColorcomponent-1;
     }
   }
@@ -1444,12 +1444,12 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygon (G3DPolygonDP& poly)
 
         // do not draw the rightmost pixel - it will be covered
         // by neightbour polygon's left bound
-  Scan.M = M;
-  Scan.J1 = J1;
-  Scan.K1 = K1;
-  Scan.dM = M*Scan.InterpolStep;
-  Scan.dJ1 = J1*Scan.InterpolStep;
-  Scan.dK1 = K1*Scan.InterpolStep;
+        Scan.M = M;
+        Scan.J1 = J1;
+        Scan.K1 = K1;
+        Scan.dM = M * Scan.InterpolStep;
+        Scan.dJ1 = J1 * Scan.InterpolStep;
+        Scan.dK1 = K1 * Scan.InterpolStep;
         dscan (xR - xL, d, z_buf, inv_z + deltaX * M, u_div_z + deltaX * J1, v_div_z + deltaX * K1);
       }
 
@@ -1497,7 +1497,6 @@ finish:
         }
       }
 #endif // ---------------------------------------------------------------------
-
 
 STDMETHODIMP csGraphics3DSoftware::DrawPolygonDebug (G3DPolygonDP& poly)
 {
@@ -1637,21 +1636,18 @@ STDMETHODIMP csGraphics3DSoftware::AddFogPolygon (CS_ID id, G3DPolygonAFP& poly,
     exit (0);
   }
 
-  Scan.FogDensity = QInt16 (fb->density) << 16;
-  if (pfmt.PixelBytes == 4)
+  Scan.FogDensity = QInt (fb->density * 100);
+  if (pfmt.PalEntries == 0)
   {
-    Scan.FogR = QInt (fb->red * 256);
-    Scan.FogG = QInt (fb->green * 256);
-    Scan.FogB = QInt (fb->blue * 256);
+    Scan.FogR = QInt (fb->red * ((1 << pfmt.RedBits) - 1)) << pfmt.RedShift;
+    Scan.FogG = QInt (fb->green * ((1 << pfmt.GreenBits) - 1)) << pfmt.GreenShift;
+    Scan.FogB = QInt (fb->blue * ((1 << pfmt.BlueBits) - 1)) << pfmt.BlueShift;
   }
   else
   {
-    Scan.FogR = QInt (fb->red * 32);
-    if (pfmt.GreenBits == 5)
-      Scan.FogG = QInt (fb->green * 32);
-    else
-      Scan.FogG = QInt (fb->green * 64);
-    Scan.FogB = QInt (fb->blue * 32);
+    Scan.FogR = QInt (fb->red * 255);
+    Scan.FogG = QInt (fb->green * 255);
+    Scan.FogB = QInt (fb->blue * 255);
   }
 
   // Steps for interpolating horizontally accross a scanline.
@@ -2032,12 +2028,12 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
 	if (++scanR2 >= poly.num)
 	  scanR2 = 0;
 
-        // Do we have a flat bottom?
-        //@@@ this looks like it needs to be rethought -- A.Z.
-        if (fabs (poly.vertices [scanR2].sy - poly.vertices [top].sy) < EPS)
-          continue;
+        leave = false;
+	int newFY = QRound (poly.vertices [scanR2].sy);
+	if (newFY == fyR)
+	  continue;
 
-        fyR = QRound (poly.vertices [scanR2].sy);
+        fyR = newFY;
         float dyR = poly.vertices [scanR1].sy - poly.vertices [scanR2].sy;
         if (dyR > 0)
         {
@@ -2047,7 +2043,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
           xR += QRound (dxdyR * (poly.vertices [scanR1].sy -
             ((float)QRound (poly.vertices [scanR1].sy) - 0.5)));
         } /* endif */
-        leave = false;
       } /* endif */
       if (sy <= fyL)
       {
@@ -2060,12 +2055,12 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
 	if (--scanL2 < 0)
 	  scanL2 = poly.num - 1;
 
-        // Do we have a flat bottom?
-        //@@@ this looks like it needs to be rethought -- A.Z.
-        if (fabs (poly.vertices [scanL2].sy - poly.vertices [top].sy) < EPS)
-          continue;
+        leave = false;
+	int newFY = QRound (poly.vertices [scanL2].sy);
+	if (newFY == fyL)
+	  continue;
 
-        fyL = QRound (poly.vertices [scanL2].sy);
+        fyL = newFY;
         float dyL = poly.vertices [scanL1].sy - poly.vertices [scanL2].sy;
         if (dyL > 0)
         {
@@ -2110,7 +2105,6 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygonDPQ& poly)
             bL = QInt16 (bb [scanL1] + (bb [scanL2] - bb [scanL1]) * Factor);
           }
         } /* endif */
-        leave = false;
       } /* endif */
     } while (!leave); /* enddo */
 
@@ -2234,8 +2228,8 @@ finish:
   return S_OK;
 }
 
-STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle, 
-                                                  DPFXMixMode mode, 
+STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle,
+                                                  DPFXMixMode mode,
                                                   float alpha,
                                                   bool gouraud)
 {
@@ -2304,7 +2298,7 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle,
       pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_MULTIPLY2];
       break;
     case FX_Alpha:
-      if (alpha<0.05) 
+      if (alpha<0.05)
       {
         pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_COPY];
       }
@@ -2320,7 +2314,7 @@ STDMETHODIMP csGraphics3DSoftware::StartPolygonFX(ITextureHandle* handle,
       {
         pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA75];
       }
-      else 
+      else
       {
         pqinfo.BlendingTable = m_BlendingTable[BLENDTABLE_ALPHA100];
       }
@@ -2613,18 +2607,18 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
               if (gouraud)
               {
                 pqinfo.drawline_fx (pixel_at, xr-xl, zbuff, 0, 0,
-                      0, 0, zL, dz, NULL, 0, 
+                      0, 0, zL, dz, NULL, 0,
                       rL, gL, bL, dr, dg, db,
                       pqinfo.BlendingTable);
               }
               else
               {
                 pqinfo.drawline_fx (pixel_at, xr-xl, zbuff, 0, 0,
-                      0, 0, zL, dz, NULL, 0, 
-                      pqinfo.redFact << 16, 
-                      pqinfo.greenFact << 16, 
-                      pqinfo.blueFact << 16, 
-                      0, 0, 0, 
+                      0, 0, zL, dz, NULL, 0,
+                      pqinfo.redFact << 16,
+                      pqinfo.greenFact << 16,
+                      pqinfo.blueFact << 16,
+                      0, 0, 0,
                       pqinfo.BlendingTable);
               }
             }
@@ -2692,18 +2686,18 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonFX(G3DPolygonDPFX& poly)
               if (gouraud)
               {
                 pqinfo.drawline_fx (pixel_at, xr - xl, zbuff, uu, duu,
-                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, 
-                      rL, gL, bL, dr, dg, db, 
+                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w,
+                      rL, gL, bL, dr, dg, db,
                       pqinfo.BlendingTable);
               }
               else
               {
                 pqinfo.drawline_fx (pixel_at, xr - xl, zbuff, uu, duu,
-                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w, 
-                      pqinfo.redFact << 16, 
-                      pqinfo.greenFact << 16, 
-                      pqinfo.blueFact << 16, 
-                      0, 0, 0, 
+                      vv, dvv, zL, dz, pqinfo.bm, pqinfo.shf_w,
+                      pqinfo.redFact << 16,
+                      pqinfo.greenFact << 16,
+                      pqinfo.blueFact << 16,
+                      0, 0, 0,
                       pqinfo.BlendingTable);
               }
             }
@@ -3661,7 +3655,7 @@ STDMETHODIMP IXConfig3DSoft::GetOption (int id, csVariant* value)
     default: return E_FAIL;
   }
   return S_OK;
-}                                
+}
 
 STDMETHODIMP IXConfig3DSoft::GetNumberOptions (int& num)
 {

@@ -36,56 +36,47 @@
 #define Y_AND_FILTER			(0xffff-(1<<(17-LOG2_STEPS_Y))+1)
 
 /**
+ * At this point QInt (255.9999 * exp (zero
+ */
+#define EXP_256_SIZE			1420
+
+/**
  * This class represents all precalculated tables that are needed.
- * Currently there are only some tables for FltLights.
- * Note: all angle measures in the tables are in degrees, NOT radians
  */
 class csTables
 {
 public:
-  /// Sinus table.
-  float* sin_tab;
-  /// Cosinus table.
-  float* cos_tab;
-  /// Arc-cosinus table.
-  int* acos_tab;
-  /// Arc-sinus table.
-  int* asin_tab;
   /**
-   * Combined cos(asin(x)) table,
-   * which equals sin(acos(x)), and sqrt(1-x*x)
-   */
-  long* cos_asin_tab;	// F20:12
-  /**
-   * Exponent table used for fogging.
-   * Index is dist*density in 8:8 fixed point format.
-   * Result is 1-exp(-dist*density) between 0 and 255.
-   */
-  UByte* exp_table;
-
-  /// Multiplication table (for fog). Added by Denis Dmitriev
-  int* mul_table;
-  int* exp_table_2_real;	// Real table (extra 20 overflow fields in front)
-  int* exp_table_2;		// Points to exp_real_2_table+20.
-
-  /*
    * These tables are used for bilinear filtering. This feature is still
    * (and IMHO, till Merced III-10GHz, will remain) experimental. - D.D.
-   * @@@ To all familiar with MMX: implementation in MMX can be fast -- routine
-   *     makes the same things for four pixels values. And quality could jump
-   *     (for speed and memory consumption I'm using 16 grades).
+   * <i>To all familiar with MMX: implementation in MMX can be fast -- routine
+   *    makes the same things for four pixels values. And quality could jump
+   *    (for speed and memory consumption I'm using 16 grades).</i>
+   * <p>
+   * This table incorporates values (1-x)*(1-y), (1-x)*y, x*(1-y), and x*y
    */
-  /** This table incorporates values (1-x)*(1-y), (1-x)*y, x*(1-y), and x*y */
-  int* another_mul_table;
+  int* filter_mul_table;
+
   /**
    * This table is really two tables in one (they have the same size --
    * notice the 2 as a multiplier). It removes all the multiplications from
    * the function. Sorry for lack of details, but there's a lot to be said.
    * If you really want to know what is this table for, see "math3d.cpp" and
    * "scan16.cpp" -- generation of the table, and it's usage respectively.
-   *                                                                  - D.D.
    */
-  unsigned short* color_565_table;
+  unsigned short *color_565_table;
+
+  /**
+   * A table of 4096 1/z values where z is in fixed-point 0.12 format
+   * Used in fog routines to get the real value of Z. The result is
+   * an 8.24 fixed-point number.
+   */
+  unsigned int *one_div_z;
+
+  /**
+   * A table of exp(x) in the range 0..255; x == 0..EXP_256_SIZE
+   */
+  unsigned char *exp_256;
 
   /**
    * Compute all of the values of the tables.
@@ -93,10 +84,9 @@ public:
    * need to be invoked explicitly, because the constructor never gets
    * called.
    */
-  csTables() : sin_tab (NULL), cos_tab (NULL), acos_tab (NULL), asin_tab (NULL),
-  	cos_asin_tab (NULL), exp_table (NULL), mul_table (NULL), exp_table_2_real (NULL), exp_table_2 (NULL),
-	another_mul_table (NULL), color_565_table (NULL)
-	{ }
+  csTables() : filter_mul_table (NULL), color_565_table (NULL),
+    one_div_z (NULL), exp_256 (NULL)
+  { }
 
   /// Clean all tables.
   ~csTables ();

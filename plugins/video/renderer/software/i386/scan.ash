@@ -23,6 +23,8 @@
 %ifndef __SCAN_ASH__
 %define __SCAN_ASH__
 
+__TEXT_SECT__
+
 ; WARNING: Please use 8-space tabs while viewing/modifying this file -
 ; please don't convert tabs to spaces or to awful 2- or 4-space tabs
 ; some brain-dead editors uses.

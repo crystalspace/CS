@@ -142,22 +142,22 @@ extern int filter_bf;
         int addr=(((vv>>16))<<shifter)+(uu>>16);\
         int _=((uu&X_AND_FILTER)>>(14-LOG2_STEPS_X))+((vv&Y_AND_FILTER)>>((14-LOG2_STEPS_X)-LOG2_STEPS_Y));\
 \
-        w=tables.another_mul_table[_+0];\
+        w=tables.filter_mul_table[_+0];\
         color=srcTex[addr];				\
         r=tables.color_565_table[NUM_LIGHT_INTENSITIES*2048+w+(color>>11)];\
         gb=tables.color_565_table[w+(color&2047)];	\
 \
-        w=tables.another_mul_table[_+2];\
+        w=tables.filter_mul_table[_+2];\
 	color=srcTex[addr+1];				\
         r+=tables.color_565_table[NUM_LIGHT_INTENSITIES*2048+w+(color>>11)];\
         gb+=tables.color_565_table[w+(color&2047)];	\
 \
-        w=tables.another_mul_table[_+1];\
+        w=tables.filter_mul_table[_+1];\
 	color=srcTex[addr+(1<<shifter)];		\
         r+=tables.color_565_table[NUM_LIGHT_INTENSITIES*2048+w+(color>>11)];\
         gb+=tables.color_565_table[w+(color&2047)];	\
 \
-        w=tables.another_mul_table[_+3];\
+        w=tables.filter_mul_table[_+3];\
 	color=srcTex[addr+(1<<shifter)+1];		\
         r+=tables.color_565_table[NUM_LIGHT_INTENSITIES*2048+w+(color>>11)];\
         gb+=tables.color_565_table[w+(color&2047)];	\
@@ -516,41 +516,51 @@ void csScan_16_draw_scanline_fog_555 (int xx, unsigned char* d,
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
-  UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx-1;
+  UShort *_dest = (UShort *)d;
+  UShort *_destend = _dest + xx;
   unsigned long izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
-
+  int fog_r = Scan.FogR;
+  int fog_g = Scan.FogG;
+  int fog_b = Scan.FogB;
+  UShort fog_pix = fog_r | fog_g | fog_b;
   ULong fog_dens = Scan.FogDensity;
-  int fog_r = 256+Scan.FogR;
-  int fog_g = 256+Scan.FogG;
-  int fog_b = 256+Scan.FogB;
 
   do
   {
-    if (izz < *z_buf)
+    int fd;
+    unsigned long izb = *z_buf;
+    if (izz >= 0x1000000)
     {
-      _dest++;
-      izz += dzz;
-      z_buf++;
+      // izz exceeds our 1/x table, so compute fd aproximatively and go on.
+      // This happens seldom, only when we're very close to fog, but not
+      // inside it; however we should handle this case as well.
+      if ((izb < 0x1000000) && (izz > izb))
+      {
+        fd = fog_dens * (tables.one_div_z [izb >> 12] - (tables.one_div_z [izz >> 20] >> 8)) >> 12;
+        goto fd_done;
+      }
     }
-    else
+    else if (izz > izb)
     {
-      int dens_dist = tables.exp_table_2 [fog_dens / *(z_buf) - fog_dens / izz];
-      int r = (*_dest) >> 10;
-      int g = ((*_dest) >> 5) & 0x1f;
-      int b = (*_dest) & 0x1f;
-
-      r += tables.mul_table[dens_dist+fog_r - r];
-      g += tables.mul_table[dens_dist+fog_g - g];
-      b += tables.mul_table[dens_dist+fog_b - b];
-
-      *_dest++ = (r<<10) | (g<<5) | b;
-      z_buf++;
-      izz += dzz;
+      fd = fog_dens * (tables.one_div_z [izb >> 12] - tables.one_div_z [izz >> 12]) >> 12;
+fd_done:
+      if (fd < EXP_256_SIZE)
+      {
+        fd = tables.exp_256 [fd];
+        register int r = ((fd * ((*_dest & 0x7c00) - fog_r) >> 8) + fog_r);
+        register int g = ((fd * ((*_dest & 0x03e0) - fog_g) >> 8) + fog_g);
+        register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+        *_dest = (r & 0x7c00) | (g & 0x03e0) | b;
+      }
+      else
+        *_dest = fog_pix;
     }
+    _dest++;
+    z_buf++;
+    izz += dzz;
   }
-  while (_dest <= _destend);
+  while (_dest < _destend);
 }
 
 #endif // NO_draw_scanline_fog_555
@@ -564,41 +574,51 @@ void csScan_16_draw_scanline_fog_565 (int xx, unsigned char* d,
 {
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
-  UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx-1;
+  UShort *_dest = (UShort *)d;
+  UShort *_destend = _dest + xx;
   unsigned long izz = QInt24 (inv_z);
   int dzz = QInt24 (Scan.M);
-
+  int fog_r = Scan.FogR;
+  int fog_g = Scan.FogG;
+  int fog_b = Scan.FogB;
+  UShort fog_pix = fog_r | fog_g | fog_b;
   ULong fog_dens = Scan.FogDensity;
-  int fog_r = 256+Scan.FogR;
-  int fog_g = 256+Scan.FogG;
-  int fog_b = 256+Scan.FogB;
 
   do
   {
-    if (izz < *z_buf)
+    int fd;
+    unsigned long izb = *z_buf;
+    if (izz >= 0x1000000)
     {
-      _dest++;
-      izz+=dzz;
-      z_buf++;
+      // izz exceeds our 1/x table, so compute fd aproximatively and go on.
+      // This happens seldom, only when we're very close to fog, but not
+      // inside it; however we should handle this case as well.
+      if ((izb < 0x1000000) && (izz > izb))
+      {
+        fd = fog_dens * (tables.one_div_z [izb >> 12] - (tables.one_div_z [izz >> 20] >> 8)) >> 12;
+        goto fd_done;
+      }
     }
-    else
+    else if (izz > izb)
     {
-      int dens_dist = tables.exp_table_2[fog_dens / *(z_buf) - fog_dens / izz];
-      int r = (*_dest) >> 11;
-      int g = ((*_dest) >> 5) & 0x3f;
-      int b = (*_dest) & 0x1f;
-
-      r += tables.mul_table[dens_dist+fog_r - r];
-      g += tables.mul_table[dens_dist+fog_g - g];
-      b += tables.mul_table[dens_dist+fog_b - b];
-
-      *_dest++ = (r<<11) | (g<<5) | b;
-      z_buf++;
-      izz += dzz;
+      fd = fog_dens * (tables.one_div_z [izb >> 12] - tables.one_div_z [izz >> 12]) >> 12;
+fd_done:
+      if (fd < EXP_256_SIZE)
+      {
+        fd = tables.exp_256 [fd];
+        register int r = ((fd * ((*_dest & 0xf800) - fog_r) >> 8) + fog_r);
+        register int g = ((fd * ((*_dest & 0x07e0) - fog_g) >> 8) + fog_g);
+        register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+        *_dest = (r & 0xf800) | (g & 0x07e0) | b;
+      }
+      else
+        *_dest = fog_pix;
     }
+    _dest++;
+    z_buf++;
+    izz += dzz;
   }
-  while (_dest <= _destend);
+  while (_dest < _destend);
 }
 
 #endif // NO_draw_scanline_fog_565
@@ -613,31 +633,34 @@ void csScan_16_draw_scanline_fog_view_555 (int xx, unsigned char* d,
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
   UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx-1;
-
+  UShort* _destend = _dest + xx;
+  int fog_r = Scan.FogR;
+  int fog_g = Scan.FogG;
+  int fog_b = Scan.FogB;
+  UShort fog_pix = fog_r | fog_g | fog_b;
   ULong fog_dens = Scan.FogDensity;
-  int fog_r = 256+Scan.FogR;
-  int fog_g = 256+Scan.FogG;
-  int fog_b = 256+Scan.FogB;
 
   do
   {
-    int dens_dist = tables.exp_table_2[fog_dens / *(z_buf)];
-    int r = (*_dest) >> 10;
-    int g = ((*_dest) >> 5) & 0x1f;
-    int b = (*_dest) & 0x1f;
-
-    //Thomas Hieber: range check is still necessary (May, 24th, 1999)
-    if (dens_dist < 0) dens_dist = 0;
-
-    r += tables.mul_table[dens_dist+fog_r - r];
-    g += tables.mul_table[dens_dist+fog_g - g];
-    b += tables.mul_table[dens_dist+fog_b - b];
-
-    *_dest++ = (r<<10) | (g<<5) | b;
+    unsigned long izb = *z_buf;
+    if (izb < 0x1000000)
+    {
+      int fd = fog_dens * tables.one_div_z [izb >> 12] >> 12;
+      if (fd < EXP_256_SIZE)
+      {
+        fd = tables.exp_256 [fd];
+        register int r = ((fd * ((*_dest & 0x7c00) - fog_r) >> 8) + fog_r);
+        register int g = ((fd * ((*_dest & 0x03e0) - fog_g) >> 8) + fog_g);
+        register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+        *_dest = (r & 0x7c00) | (g & 0x03e0) | b;
+      }
+      else
+        *_dest = fog_pix;
+    } /* endif */
+    _dest++;
     z_buf++;
   }
-  while (_dest <= _destend);
+  while (_dest < _destend);
 }
 
 #endif // NO_draw_scanline_fog_view_555
@@ -652,31 +675,34 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z; (void)inv_z;
   UShort* _dest = (UShort*)d;
-  UShort* _destend = _dest + xx-1;
-
+  UShort* _destend = _dest + xx;
+  int fog_r = Scan.FogR;
+  int fog_g = Scan.FogG;
+  int fog_b = Scan.FogB;
+  UShort fog_pix = fog_r | fog_g | fog_b;
   ULong fog_dens = Scan.FogDensity;
-  int fog_r = 256+Scan.FogR;
-  int fog_g = 256+Scan.FogG;
-  int fog_b = 256+Scan.FogB;
 
   do
   {
-    int dens_dist = tables.exp_table_2[fog_dens / *(z_buf)];
-    int r = (*_dest) >> 11;
-    int g = ((*_dest) >> 5) & 0x3f;
-    int b = (*_dest) & 0x1f;
-
-    // Thomas Hieber: range check is still necessary (May, 24th, 1999)
-    if (dens_dist<0) dens_dist = 0;
-
-    r += tables.mul_table[dens_dist+fog_r - r];
-    g += tables.mul_table[dens_dist+fog_g - g];
-    b += tables.mul_table[dens_dist+fog_b - b];
-
-    *_dest++ = (r<<11) | (g<<5) | b;
+    unsigned long izb = *z_buf;
+    if (izb < 0x1000000)
+    {
+      int fd = fog_dens * tables.one_div_z [izb >> 12] >> 12;
+      if (fd < EXP_256_SIZE)
+      {
+        fd = tables.exp_256 [fd];
+        register int r = ((fd * ((*_dest & 0xf800) - fog_r) >> 8) + fog_r);
+        register int g = ((fd * ((*_dest & 0x07e0) - fog_g) >> 8) + fog_g);
+        register int b = ((fd * ((*_dest & 0x001f) - fog_b) >> 8) + fog_b);
+        *_dest = (r & 0xf800) | (g & 0x07e0) | b;
+      }
+      else
+        *_dest = fog_pix;
+    } /* endif */
+    _dest++;
     z_buf++;
   }
-  while (_dest <= _destend);
+  while (_dest < _destend);
 }
 
 #endif // NO_draw_scanline_fog_view_565
@@ -685,9 +711,12 @@ void csScan_16_draw_scanline_fog_view_565 (int xx, unsigned char* d,
 
 #ifndef NO_draw_scanline_fog_plane_555
 
-void csScan_16_draw_scanline_fog_plane_555 (int xx, unsigned char* d,
-  unsigned long* z_buf, float inv_z, float u_div_z, float v_div_z)
+void csScan_16_draw_scanline_fog_plane_555 (int /*xx*/, unsigned char* /*d*/,
+  unsigned long* /*z_buf*/, float /*inv_z*/, float /*u_div_z*/, float /*v_div_z*/)
 {
+  // this should be either redone like Z fog above
+  // or completely removed. It looks completely unoptimal to me - A.Z.
+#if 0
   if (xx <= 0) return;
   (void)u_div_z; (void)v_div_z;
   UShort* _dest = (UShort*)d;
@@ -710,14 +739,15 @@ void csScan_16_draw_scanline_fog_plane_555 (int xx, unsigned char* d,
     int g = ((*_dest) >> 5) & 0x1f;
     int b = (*_dest) & 0x1f;
 
-    r += tables.mul_table[dens_dist+fog_r - r];
-    g += tables.mul_table[dens_dist+fog_g - g];
-    b += tables.mul_table[dens_dist+fog_b - b];
+    r += tables.mul_table [dens_dist + fog_r - r];
+    g += tables.mul_table [dens_dist + fog_g - g];
+    b += tables.mul_table [dens_dist + fog_b - b];
 
     *_dest++ = (r<<10) | (g<<5) | b;
     z_buf++;
   }
   while (_dest <= _destend);
+#endif
 }
 
 #endif // NO_draw_scanline_fog_plane_555
@@ -761,7 +791,7 @@ void csScan_16_draw_pi_scanline_tex_zuse (void *dest, int len,
     u += du;
     v += dv;
     z += dz;
-  } 
+  }
 }
 */
 
@@ -830,7 +860,7 @@ void csScan_16_draw_pi_scanline_tex_gouraud_zfil_555 (void *dest, int len,
     *zbuff++ = z;
     u += du; v += dv; z += dz;
     r += dr; g += dg; b += db;
-  } 
+  }
 }
 */
 
@@ -870,7 +900,7 @@ void csScan_16_draw_pi_scanline_tex_gouraud_zfil_565 (void *dest, int len,
     *zbuff++ = z;
     u += du; v += dv; z += dz;
     r += dr; g += dg; b += db;
-  } 
+  }
 }
 */
 
@@ -915,7 +945,7 @@ void csScan_16_draw_pi_scanline_tex_gouraud_zuse_555 (void *dest, int len,
     zbuff++;
     u += du; v += dv; z += dz;
     r += dr; g += dg; b += db;
-  } 
+  }
 }
 */
 
@@ -961,7 +991,7 @@ void csScan_16_draw_pi_scanline_tex_gouraud_zuse_565 (void *dest, int len,
     zbuff++;
     u += du; v += dv; z += dz;
     r += dr; g += dg; b += db;
-  } 
+  }
 }
 
 */
@@ -1011,7 +1041,7 @@ void csScan_16_draw_pi_scanline_transp_gouraud_555 (void *dest, int len, long *z
     zbuff++;
     u += du; v += dv; z += dz;
     r += dr; g += dg; b += db;
-  } 
+  }
 }
 */
 
@@ -1059,7 +1089,7 @@ void csScan_16_draw_pi_scanline_transp_gouraud_565 (void *dest, int len, long *z
     zbuff++;
     u += du; v += dv; z += dz;
     r += dr; g += dg; b += db;
-  } 
+  }
 }
 */
 
@@ -1209,7 +1239,7 @@ void csScan_16_draw_pi_scanline_flat_zuse (void *dest, int len,
     _dest++;
     zbuff++;
     z += dz;
-  } 
+  }
 }
 */
 
@@ -1238,7 +1268,7 @@ void csScan_16_draw_pi_scanline_flat_zfil (void *dest, int len,
     *_dest++ = 0xffff;
     *zbuff++ = z;
     z += dz;
-  } 
+  }
 }
 */
 
@@ -1275,7 +1305,7 @@ void csScan_16_draw_pi_scanline_flat_gouraud_zfil_555 (void *dest, int len,
     *zbuff++ = z;
     z += dz;
     r += dr; g += dg; b += db;
-  } 
+  }
 }
 */
 
@@ -1312,7 +1342,7 @@ void csScan_16_draw_pi_scanline_flat_gouraud_zfil_565 (void *dest, int len,
     *zbuff++ = z;
     z += dz;
     r += dr; g += dg; b += db;
-  } 
+  }
 }
 */
 
@@ -1322,7 +1352,7 @@ void csScan_16_draw_pi_scanline_flat_gouraud_zfil_565 (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_flat_gouraud_zuse_555
 
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zuse_555 
+#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zuse_555
 #define ZUSE
 #define FLAT
 #define GOURAUD
@@ -1364,7 +1394,7 @@ void csScan_16_draw_pi_scanline_flat_gouraud_zuse_555 (void *dest, int len,
 
 #ifndef NO_draw_pi_scanline_flat_gouraud_zuse_565
 
-#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zuse_565 
+#define PI_SCANFUNC csScan_16_draw_pi_scanline_flat_gouraud_zuse_565
 #define ZUSE
 #define FLAT
 #define GOURAUD
@@ -1396,7 +1426,7 @@ void csScan_16_draw_pi_scanline_flat_gouraud_zuse_565 (void *dest, int len,
     zbuff++;
     z += dz;
     r += dr; g += dg; b += db;
-  } 
+  }
 }
 */
 

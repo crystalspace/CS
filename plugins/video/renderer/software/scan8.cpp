@@ -499,7 +499,7 @@ int filter_bf;
 #ifndef NO_draw_scanline_flat_zfil
 
 void csScan_8_draw_scanline_flat_zfil (int xx, unsigned char* d,
-  unsigned long *zbuf, float inv_z, float u_div_z, float v_div_z)
+  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
@@ -510,7 +510,7 @@ void csScan_8_draw_scanline_flat_zfil (int xx, unsigned char* d,
   do
   {
     *_dest++ = color;
-    *zbuf++ = izz;
+    *z_buf++ = izz;
     izz += dzz;
   }
   while (_dest <= _destend);
@@ -523,7 +523,7 @@ void csScan_8_draw_scanline_flat_zfil (int xx, unsigned char* d,
 #ifndef NO_draw_scanline_flat_zuse
 
 void csScan_8_draw_scanline_flat_zuse (int xx, unsigned char* d,
-  unsigned long *zbuf, float inv_z, float u_div_z, float v_div_z)
+  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   (void)u_div_z; (void)v_div_z;
   int color = Scan.FlatColor;
@@ -533,15 +533,15 @@ void csScan_8_draw_scanline_flat_zuse (int xx, unsigned char* d,
   UByte* _destend = _dest + xx-1;
   do
   {
-    if (izz >= (int)(*zbuf))
+    if (izz >= (int)(*z_buf))
     {
       *_dest++ = color;
-      *zbuf++ = izz;
+      *z_buf++ = izz;
     }
     else
     {
       _dest++;
-      zbuf++;
+      z_buf++;
     }
     izz += dzz;
   }
@@ -555,10 +555,10 @@ void csScan_8_draw_scanline_flat_zuse (int xx, unsigned char* d,
 #ifndef NO_draw_scanline_fog
 
 void csScan_8_draw_scanline_fog (int xx, unsigned char* d,
-  unsigned long *zbuf, float inv_z, float u_div_z, float v_div_z)
+  unsigned long *z_buf, float inv_z, float u_div_z, float v_div_z)
 {
   //@@@ Not implemented yet!
-  (void)xx; (void)d; (void)zbuf; (void)inv_z; (void)u_div_z; (void)v_div_z;
+  (void)xx; (void)d; (void)z_buf; (void)inv_z; (void)u_div_z; (void)v_div_z;
 }
 
 #endif // NO_draw_scanline_fog

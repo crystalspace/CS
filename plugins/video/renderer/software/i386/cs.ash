@@ -25,9 +25,20 @@
 
 [WARNING -macro-selfref]
 
-; Start the code segment here
+; Define macros for switching to code, data and bss segments
 %ifidni __OUTPUT_FORMAT__,obj
-[segment	TEXT32 use32]
+		segment	TEXT32 use32 align=4 class=CODE
+		segment	DATA32 use32 align=4 class=DATA
+		segment	BSS32  use32 align=4 class=BSS
+		group	FLAT
+		group	DGROUP BSS32 DATA32
+		%xdefine __TEXT_SECT__ segment TEXT32
+		%xdefine __DATA_SECT__ segment DATA32
+		%xdefine __BSS_SECT__ segment BSS32
+%else
+		%xdefine __TEXT_SECT__
+		%xdefine __DATA_SECT__
+		%xdefine __BSS_SECT__
 %endif
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
@@ -54,7 +65,11 @@
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
 %macro		cextern	1
 		%xdefine %1 cname(%1)
+	%ifidni __OUTPUT_FORMAT__,obj
+		extern	%1:wrt FLAT
+	%else
 		extern	%1
+	%endif
 %endmacro
 
 ;-----======xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx======-----
