@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Mar-2005
+	- res made the following changes to csStringBase:
+	    - Removed static Pad*() methods. Provided nothing that can't 
+	      already be done with non-static methods.
+	    - Removed static integer and float Format() routines. Same 
+	      functionality can be achievedby utilizing the Replace() or 
+	      Format() methods.
+	    - Templated csStringBase::Replace(), csStringBase::operator=(), 
+	      csStringBase::operator+=, csStringBase::operator<<().
+	    - Added ShrinkBestFit() and Empty() methods. The idea has to use
+	      the same names as in csArray<> as essentially the same is done.
 12-Mar-2005
 	- res fixed csPrintfFormatter to actually properly handle argument
 	  number specification (like in %3$d to take the 3rd argument).

@@ -1280,3 +1280,22 @@ the mesh provides them). They are:
 @item
 @samp{texture coordinate 0} @result{} @samp{texture coordinate 0}
 @end itemize
+
+@subheading @code{csString} Changes
+
+The class hierarchy of csString was changed. Most functionality is provided by
+csStringBase, from which csStringFast<> and csString descend. csStringFast<>
+is a templated class that features an internal buffer which is used instead of 
+dynamically allocated memory if its size suffices, and is also faster in this 
+case. csString inherits from csStringFast<> and uses the default size for the 
+internal buffer.
+
+Several methods have been removed from csStringBase:
+@itemize @bullet
+@item
+Static @code{Pad*()} methods 
+@result{} Functionality can be achieved with non-static @code{Pad*()} methods.
+@item
+Static integer and float @code{Format()} routines
+@result{} Functionality can be achieved by utilizing the Replace() or Format() methods.
+@end itemize

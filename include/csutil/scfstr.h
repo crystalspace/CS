@@ -22,7 +22,7 @@
 
 #include "csextern.h"
 #include "iutil/string.h"
-#include "csstring.h"
+#include "csutil/csstring.h"
 
 /// This is a thin SCF wrapper around csString
 class CS_CSUTIL_EXPORT scfString : public iString
