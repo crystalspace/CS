@@ -29,6 +29,7 @@ bool csPolyBufMatLightmap::AddPolygon(csVector3 *origverts,
       const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
       iPolygonTexture* poly_texture)
 {
+  return false; //@@@ Fake return to keep MSVC happy until implementation
 }
 
 void csPolyBufMatLightmap::MarkLightmapsDirty()
@@ -39,5 +40,5 @@ void csPolyBufMatLightmap::MarkLightmapsDirty()
 bool csPolyBufMatLightmap::CreateLightmap(int width, int height)
 {
   glGenTextures(1, &m_texhandle);
-
+  return false; //@@@ Fake return to keep MSVC happy until implementation
 }
