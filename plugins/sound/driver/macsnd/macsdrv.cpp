@@ -23,10 +23,9 @@
 
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "macsdrv.h"
 #include "isystem.h"
-#include "isndlstn.h"
-#include "isndsrc.h"
+#include "isndrdr.h"
+#include "macsdrv.h"
 
 static pascal void SoundDoubleBackProc(
 	SndChannelPtr		channel,
@@ -42,8 +41,8 @@ EXPORT_CLASS_TABLE (snddrv)
 EXPORT_CLASS_TABLE_END
 
 IMPLEMENT_IBASE(csSoundDriverMac)
+  IMPLEMENTS_INTERFACE(iPlugIn)
   IMPLEMENTS_INTERFACE(iSoundDriver)
-	IMPLEMENTS_INTERFACE(iPlugIn)
 IMPLEMENT_IBASE_END;
 
 csSoundDriverMac::csSoundDriverMac(iBase *piBase)
@@ -260,8 +259,7 @@ void csSoundDriverMac::SndDoubleBackProc(
 	/*
 	 *	Get more sound samples from the mixing function.
 	 */
-// @@@ WHM Commented out for now to compile. Will work on this in the future.
-//	m_piSoundRender->MixingFunction();
+	m_piSoundRender->MixingFunction();
 
 	/*
 	 *	Mark the buffer as ready to be emptied.
