@@ -11,6 +11,7 @@ The history order is reversed so that new features are at the top.
 	  OpenGL implementation doesn't work yet.
 	- Modified simplept so it 'shimmers' the proc texture portal.
 	  This gives a water like effect.
+	- From Jochen Moench: patch to iCamera->SetFovAngle().
 19-Oct-2002
 	- After my changes yesterday the NASM version of the software
 	  renderer was totally broken. After long debugging I found

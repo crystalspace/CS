@@ -189,13 +189,30 @@ void csCamera::Correct (int n, float *vals[])
 
 void csCamera::SetFOVAngle (float a, int width)
 {
-  float disp_width = (float)width / 2.0f;
-  float disp_radius = disp_width /
-    (float)cos (a / (2.0f * (360.0f / TWO_PI)));
-  float rview_fov = qsqrt (
-      disp_radius * disp_radius - disp_width * disp_width);
-  aspect = int (rview_fov * 2.0f);
-  inv_aspect = 1.0f / (rview_fov * 2.0f);
+  // make sure we have valid angles
+  if (a >= 180)
+  {
+    a = 180 - SMALL_EPSILON;
+  }
+  else if (a <= 0)
+  {
+    a = SMALL_EPSILON;
+  }
+
+  // This is our reference point.
+  // It must be somewhere on the function graph.
+  // This reference point was composed by testing.
+  // If anyone knows a 100 percent correct reference point, please put it here.
+  // But for now it's about 99% correct
+  float vRefFOVAngle = 53;
+  float vRefFOV = width;
+
+  // We calculate the new aspect relative to a reference point
+  aspect = (int) ((tan((vRefFOVAngle * 0.5) / 180 * PI) * vRefFOV) /
+           tan((a * 0.5)  / 180 * PI));
+
+  // set the other neccessary variables
+  inv_aspect = 1.0f / aspect;
   fov_angle = a;
   cameranr = cur_cameranr++;
 }
