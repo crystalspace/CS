@@ -1420,6 +1420,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // check visibility
   float visibility;
   //@@@ REWRITE visibility = shadow_matrix->coverage[ruv];
+  visibility = 1;
   //if(visibility <= SMALL_EPSILON) return;
 
   // prepare dest lumel info

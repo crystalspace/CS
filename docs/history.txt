@@ -40,6 +40,8 @@ The history order is reversed so that new features are at the top.
 	  renderer when USE_PLUGINS=no.
 	- Eric Sunshine eliminated compilation warning from radiosity.h
 	  regarding undefined csCoverageMatrix.
+	- Eric Sunshine eliminated compilation warning from radiosity.cpp
+	  regarding variable `visibility' being used uninitialized.
 	- Michael Voasse did the following:
 	    - polytext.cpp: hid the overloaded *PutPixel and *DrawBox
 	      by prepending underbars to the overloaded methods. Adapts
