@@ -4,6 +4,11 @@ to 0.16 when that will be released. It can also help you convert
 to 0.15 if you want to do that.
 
 -*- Changed
+	csSoundBuffer, csSoundBufferObject
+    to
+    	csSoundData, csSoundDataObject
+
+-*- Changed
 	csSector::UseStaticBSP(int mode = BSP_MINIMIZE_SPLITS)
     to
 	csSector::UseStaticTree(int mode = BSP_MINIMIZE_SPLITS, bool octree = false).

@@ -13,6 +13,28 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+23-Sep-1999
+	- Big optimization in sprite drawing. I eliminated 3*num_triangles
+	  divides for every sprite!
+	- Inlined csMath2::Area2() for faster backface culling. This should
+	  improve sprite speed again.
+	- Small optimization to lighting for sprites (suggested by Ivan
+	  Avramovic).
+	- New setting for sprite lighting. You can enable high quality
+	  lighting for sprites which will use the current way to light
+	  sprites. Or you can disable this feature (default) and get an
+	  approximation which still looks good but is a LOT faster.
+	- I added the 'sprlight' console command to control the above
+	  setting. Also assigned the 's' key to 'sprlight toggle'.
+	- Also added the SPRITE_HIGHQUAL config setting to control the
+	  default.
+	- Added a big patch from Nathaniel Saint Martin to the 3D sound
+	  system. The EAX sound renderer is now version 2.0. 2D streaming
+	  for hardware sound renderers (eax, aureal3d, and directsound3d).
+	  A new ISoundBuffer interface for 2D sound. csSoundBuffer and
+	  csSoundBufferObject are now csSoundData and csSoundDataObject.
+	  You can construct 2D or 3D buffer from sound renderer and
+	  you can create a 3D buffer from a 2D buffer.
 22-Sep-1999
 	- Optimization for sprites. Sprites are now only clipped to the
 	  frustrum when really needed. This means they are clipped to the

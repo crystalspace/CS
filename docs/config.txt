@@ -344,6 +344,11 @@ in the config file.
 	don't use this feature.
   	Note that you can also specify this option in the local cryst.cfg
 	file.
+  Lighting/SPRITE_HIGHQUAL=<yesno>
+  	With this option enabled (default no) sprites are lit using a
+	higher quality algorithm in which the distance between the light
+	and every vertex is calculated. The default setting doesn't do this
+	and just calculates the distance once to the center of the sprite.
 
   SoundDriver/MAX_CHANNELS=<number>
 	Set the maximum number of channels we can mix.
