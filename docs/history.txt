@@ -57,6 +57,37 @@ The history order is reversed so that new features are at the top.
 	  illegal for datagram sockets.
 	- Eric Sunshine fixed sed invocation in CS/mk/autoconf/jam/csbuild.m4
 	  which failed to work with some older sed implementations.
+	- Eric Sunshine made the following changes:
+	    - Merged configure.ac and configure-jam.ac.  There is now a single
+	      configure script which automatically configures for both GNU make
+	      and Jam.  Not only does this change eliminate the maintenance
+	      headache associated with trying to keep two nearly identical
+	      scripts synchronized, but it also fixes a lot of bugs with the
+	      Jam configuration.  A significant number of changes which had
+	      been applied to configure.ac were never propogated to
+	      configure-jam.ac.
+	    - Replaced CS/Jamfile with CS/Jamfile.in.  CS/Jamfile is now
+	      created automatically from Jamfile.in as part of the
+	      configuration process.  Consistent with the reasoning behind
+	      Makefile.in, this change forces people to configure the project
+	      before trying to build it with Jam.
+	    - Fixed a number of problems with the Jam configuration where it
+	      was performing tasks incorrectly, incompletely, or
+	      inconsistently.  Also fixed some problems where variables emitted
+	      to Jamconfig did not agree with those mentioned in various
+	      Jamfiles.
+	    - Fixed numerous issues with CS/mk/jam/clean.jam.  Renamed cvsclean
+	      target to maintainerclean (for consistency with other projects).
+	      Completed implementation of the Configure rule.  Fixed bugs in
+	      the Autogen and Configure rules.  The distclean target now also
+	      removes Makefile and config.mak.  This is necessary since the
+	      united configure script configures both build systems in
+	      parallel.
+	    - Still to do: Factor utility functionality out of configure.ac
+	      into re-usable .m4 scripts residing in CS/mk/autoconf.  Provide a
+	      united crystal.m4 for external projects which works for makefiles
+	      and Jamfiles.  Having two crystal.m4 scripts, as is presently the
+	      case, is a bad idea and a maintenance headache.
 10-Apr-2003
 	- Fixed a compile error in binary XML reader. I wonder if people
 	  compile after changing something...

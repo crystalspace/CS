@@ -1,6 +1,6 @@
 SubDir TOP plugins video canvas svgalib ;
 
-if $(VGA.AVAILABLE) = "yes" 
+if $(SVGA.AVAILABLE) = "yes" 
 {
 Plugin svgalib2d
 	: [ Wildcard *.cpp *.h ]

@@ -5,7 +5,6 @@
 # Autoconf input script for Crystal Space.  Process this file with Autoconf
 # to produce a configure script.
 #==============================================================================
-
 AC_PREREQ([2.56])
 
 
@@ -112,16 +111,26 @@ AC_DEFUN([CS_TRIM], [`echo x$1 | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`])
 #	references will be expanded.  If expansion is not desired, then protect
 #	the text with AS_ESCAPE().
 #
-# CS_TEXT_CACHE_OUTPUT(VARIABLE, FILENAME)
+# CS_TEXT_CACHE_OUTPUT(VARIABLE, FILENAME, [FILTER])
 #	Instruct config.status to write the contents of the named shell
 #	variable to the given filename.  If the file resides in a directory,
 #	the directory will be created, if necessary.  If the output file
 #	already exists, and if the cached text is identical to the contents of
 #	the existing file, then the existing file is left alone, thus its time
 #	stamp remains unmolested.  This heuristic may help to minimize rebuilds
-#	when the file is listed as a dependency in a makefile.  NOTE: There is
-#	a bug in Autoconf, at least as recently as 2.57, which forces us to
-#	invoke AS_MKDIR_P in the third argument to AC_CONFIG_COMMANDS (the
+#	when the file is listed as a dependency in a makefile.  If FILTER is
+#	supplied, it should be a shell command which accepts text (the content
+#	of VARIABLE) on its standard input and emits a filtered or transformed
+#	version of that text to its standard output.  The filtered text will
+#	instead be written to FILENAME.  Be aware that the text sent through
+#	the filter is exactly the text stored in the cache variable, and that
+#	this text might not end with a line terminator, thus the filter command
+#	should be capable of editing non-terminated text, if you expect such
+#	text to exist in the cache variable.  This issue might affect some
+#	older versions of sed, for instance, which would discard the last line
+#	of text if the line terminator was missing.  NOTE: There is a bug in
+#	Autoconf, at least as recently as 2.57, which forces us to invoke
+#	AS_MKDIR_P in the third argument to AC_CONFIG_COMMANDS (the
 #	`init-cmds') rather than the second (the `cmds') This is undesirable
 #	because it means that the directory will be created anytime
 #	config.status is invoked (even for a simple --help), rather than being
@@ -132,7 +141,7 @@ AC_DEFUN([CS_TEXT_CACHE_APPEND], [$1="${$1}$2"])
 AC_DEFUN([CS_TEXT_CACHE_PREPEND], [$1="$2${$1}"])
 AC_DEFUN([CS_TEXT_CACHE_OUTPUT],
     [AC_CONFIG_COMMANDS([$2],
-	[echo $ECHO_N "$$1$ECHO_C" > $tmp/tcache
+	[echo $ECHO_N "$$1$ECHO_C"m4_ifval([$3],[|$3]) > $tmp/tcache
 	    if diff $2 $tmp/tcache >/dev/null 2>&1; then
 		AC_MSG_NOTICE([$2 is unchanged])
 	    else
@@ -141,6 +150,36 @@ AC_DEFUN([CS_TEXT_CACHE_OUTPUT],
 	    fi],
 	[$1='$$1' cs_dir=`AS_DIRNAME([$2])`
 	    AS_MKDIR_P([AS_ESCAPE([$cs_dir])])])])
+
+
+
+#------------------------------------------------------------------------------
+# Text cache facility for C-style #define properties.  The cache is stored in
+# the shell variable cs_header_text.
+#
+# CS_HEADER_APPEND(TEXT)
+#	Append text to the C header text cache.  This is a cover for
+#	CS_TEXT_CACHE_APPEND().
+#
+# CS_HEADER_PREPEND(TEXT)
+#	Prepend text to the C header text cache.  This is a cover for
+#	CS_TEXT_CACHE_PREPEND().
+#
+# CS_HEADER_PROPERTY(KEY, [VALUE])
+#	Append a line of the form "#define KEY VALUE" to the C header text
+#	cache.  If the VALUE argument is omitted, then the appended line has
+#	the simplified form "#define KEY".
+#
+# CS_HEADER_OUTPUT(FILENAME)
+#	Instruct config.status to write the C header text cache to the given
+#	filename.  This is a cover for CS_TEXT_CACHE_OUTPUT().
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_HEADER_APPEND], [CS_TEXT_CACHE_APPEND([cs_header_text], [$1])])
+AC_DEFUN([CS_HEADER_PREPEND], [CS_TEXT_CACHE_PREPEND([cs_header_text], [$1])])
+AC_DEFUN([CS_HEADER_PROPERTY],
+[CS_HEADER_APPEND([@%:@define $1[]m4_ifval([$2], [ $2], [])
+])])
+AC_DEFUN([CS_HEADER_OUTPUT], [CS_TEXT_CACHE_OUTPUT([cs_header_text], [$1])])
 
 
 
@@ -173,39 +212,93 @@ AC_DEFUN([CS_MAKEFILE_APPEND],
 AC_DEFUN([CS_MAKEFILE_PREPEND],
     [CS_TEXT_CACHE_PREPEND([cs_makefile_text], [$1])])
 AC_DEFUN([CS_MAKEFILE_PROPERTY],
-[CS_MAKEFILE_APPEND([$1 m4_ifval([$3], [+=], [=]) $2
+    [CS_MAKEFILE_APPEND([$1 m4_ifval([$3], [+=], [=]) $2
 ])])
 AC_DEFUN([CS_MAKEFILE_OUTPUT],[CS_TEXT_CACHE_OUTPUT([cs_makefile_text], [$1])])
 
 
 
 #------------------------------------------------------------------------------
-# Text cache facility for C-style #define properties.  The cache is stored in
-# the shell variable cs_header_text.
+# Text cache facility for Jam-style properties.  The cache is stored in
+# the shell variable cs_jamfile_text.
 #
-# CS_HEADER_APPEND(TEXT)
-#	Append text to the C header text cache.  This is a cover for
+# CS_JAMCONFIG_APPEND(TEXT)
+#	Append text to the Jam text cache.  This is a cover for
 #	CS_TEXT_CACHE_APPEND().
 #
-# CS_HEADER_PREPEND(TEXT)
-#	Prepend text to the C header text cache.  This is a cover for
+# CS_JAMCONFIG_PREPEND(TEXT)
+#	Prepend text to the Jam text cache.  This is a cover for
 #	CS_TEXT_CACHE_PREPEND().
 #
-# CS_HEADER_PROPERTY(KEY, [VALUE])
-#	Append a line of the form "#define KEY VALUE" to the C header text
-#	cache.  If the VALUE argument is omitted, then the appended line has
-#	the simplified form "#define KEY".
+# CS_JAMCONFIG_PROPERTY(KEY, VALUE, [APPEND])
+#	Append a line of the form "KEY = VALUE" to the Jam text cache.  If the
+#	APPEND argument is not the empty string, then VALUE is appended to the
+#	existing value of KEY using the form "KEY += VALUE".  Note that if
+#	VALUE references other Jam variables, for example $(OBJS), then be sure
+#	to protect the value with AS_ESCAPE().  For example:
+#	CS_JAMCONFIG_PROPERTY([ALLOBJS], [AS_ESCAPE([$(OBJS) $(LIBOBJS)])])
 #
-# CS_HEADER_OUTPUT(FILENAME)
-#	Instruct config.status to write the C header text cache to the given
+# CS_JAMCONFIG_OUTPUT(FILENAME)
+#	Instruct config.status to write the Jam text cache to the given
 #	filename.  This is a cover for CS_TEXT_CACHE_OUTPUT().
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_HEADER_APPEND], [CS_TEXT_CACHE_APPEND([cs_header_text], [$1])])
-AC_DEFUN([CS_HEADER_PREPEND], [CS_TEXT_CACHE_PREPEND([cs_header_text], [$1])])
-AC_DEFUN([CS_HEADER_PROPERTY],
-[CS_HEADER_APPEND([@%:@define $1[]m4_ifval([$2], [ $2], [])
+AC_DEFUN([CS_JAMCONFIG_APPEND],
+    [CS_TEXT_CACHE_APPEND([cs_jamconfig_text], [$1])])
+AC_DEFUN([CS_JAMCONFIG_PREPEND],
+    [CS_TEXT_CACHE_PREPEND([cs_jamconfig_text], [$1])])
+AC_DEFUN([CS_JAMCONFIG_PROPERTY],
+    [CS_JAMCONFIG_APPEND([$1 m4_ifval([$3], [+=], [=]) \"$2\" ;
 ])])
-AC_DEFUN([CS_HEADER_OUTPUT], [CS_TEXT_CACHE_OUTPUT([cs_header_text], [$1])])
+AC_DEFUN([CS_JAMCONFIG_OUTPUT],
+     [CS_TEXT_CACHE_OUTPUT([cs_jamconfig_text], [$1],
+	 [sed 's/\${\([[a-zA-Z_]]\+\)}/$(\1)/g;s/\\/\\\\/g'])])
+
+
+
+#------------------------------------------------------------------------------
+# CS_BUILD_PROPERTY(KEY, VALUE, [APPEND])
+#	A utility function which invokes both CS_MAKEFILE_PROPERTY() and
+#	CS_JAMCONFIG_PROPERTY(), thereby emitting a build property suitable for
+#	each build system (GNU make & Jam).  Some variable names differ between
+#	the makefile and the Jam build systems, thus it is necessary to perform
+#	some translation on KEY from the makefile variable name to the Jam
+#	variable name.  If you have a situation in which a build variable is
+#	mentioned in VALUE, then you should instead invoke
+#	CS_MAKEFILE_PROPERTY() and CS_JAMCONFIG_PROPERTY() manually with the
+#	appropriate values.
+#------------------------------------------------------------------------------
+AC_DEFUN([CS_BUILD_PROPERTY],
+    [CS_MAKEFILE_PROPERTY([$1], [$2], [$3])
+    CS_JAMCONFIG_PROPERTY([_CS_TRANSLATE_MAKE_TO_JAM([$1])], [$2], [$3])])
+
+
+
+#------------------------------------------------------------------------------
+# _CS_TRANSLATE_MAKE_TO_JAM([TEXT])
+#	Helper function for CS_EMIT_PROPERTY() which translates makefile-style
+#	names to Jam style names.  This is necessary since the makefile and Jam
+#	build systems use different names in some cases.  It is more convenient
+#	to perform the name translation here in one place, than manually in
+#	each place a build property is emitted.
+#------------------------------------------------------------------------------
+AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
+    [m4_case([$1],
+	[FLEXBIN], [CMD.FLEX],
+	[BISONBIN], [CMD.BISON],
+	[SWIGBIN], [CMD.SWIG],
+	[LUASWIGBIN], [CMD.LUASWIG],
+	[NASM.BIN], [CMD.NASM],
+	[CFLAGS.SYSTEM], [COMPILER.CFLAGS],
+	[CXXFLAGS.SYSTEM], [COMPILER.C++FLAGS],
+	[MACOSX.LFLAGS.CONFIG], [COMPILER.LFLAGS],
+	[CFLAGS.optimize], [COMPILER.CFLAGS.optimize],
+	[CFLAGS.debug], [COMPILER.CFLAGS.debug],
+	[LFLAGS.debug], [COMPILER.LFLAGS.debug],
+	[LIBS.EXE], [COMPILER.LFLAGS],
+	[LIBS.SYSTEM], [COMPILER.LFLAGS],
+	[USE_XFREE86VM], [XFREE86VM.AVAILABLE],
+	[PROC], [TARGET.PROCESSOR],
+	[$1])])
 
 
 
@@ -504,31 +597,31 @@ AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAG],
 
 
 #------------------------------------------------------------------------------
-# CS_MAKEFILE_BUILD_RESULT(CACHE-VAR, PREFIX)
+# CS_EMIT_BUILD_RESULT(CACHE-VAR, PREFIX)
 #	Record the results of CS_CHECK_BUILD() via makefile variables in the
-#	makefile text cache.  If CACHE-VAR indicates that the build succeeded,
-#	then the following makefile properties are emitted:
+#	makefile and Jam text caches.  If CACHE-VAR indicates that the build
+#	succeeded, then the following properties are emitted:
 #
 #	PREFIX.AVAILABLE = yes
 #	PREFIX.CFLAGS = $CACHE-VAR_cflags
 #	PREFIX.LFLAGS = $CACHE-VAR_lflags $CACHE-VAR_libs
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_MAKEFILE_BUILD_RESULT],
+AC_DEFUN([CS_EMIT_BUILD_RESULT],
     [AS_IF([test "$$1" = yes],
-	[CS_MAKEFILE_PROPERTY([$2.AVAILABLE], [yes])
+	[CS_BUILD_PROPERTY([$2.AVAILABLE], [yes])
 	cs_result_cflags=CS_TRIM([$$1_cflags])
 	cs_result_lflags=CS_TRIM([$$1_lflags $$1_libs])
 	AS_IF([test -n "$cs_result_cflags"],
-	    [CS_MAKEFILE_PROPERTY([$2.CFLAGS], [$cs_result_cflags])])
+	    [CS_BUILD_PROPERTY([$2.CFLAGS], [$cs_result_cflags])])
 	AS_IF([test -n "$cs_result_lflags"],
-	    [CS_MAKEFILE_PROPERTY([$2.LFLAGS], [$cs_result_lflags])])])])
+	    [CS_BUILD_PROPERTY([$2.LFLAGS], [$cs_result_lflags])])])])
 
 
 
 #------------------------------------------------------------------------------
-# CS_MAKEFILE_BUILD_FLAGS(MESSAGE, CACHE-VAR, FLAGS, [LANGUAGE],
-#                         MAKEFILE-VARIABLE, [APPEND], [CACHE-VALUE],
-#                         [ACTION-IF-RECOGNIED], [ACTION-IF-NOT-RECOGNIED])
+# CS_EMIT_BUILD_FLAGS(MESSAGE, CACHE-VAR, FLAGS, [LANGUAGE],
+#                     MAKEFILE-VARIABLE, [APPEND], [CACHE-VALUE],
+#                     [ACTION-IF-RECOGNIED], [ACTION-IF-NOT-RECOGNIED])
 #	Check if the compiler or linker recognizes a command-line option.
 #	MESSAGE is the "checking" message.  CACHE-VAR is the shell cache
 #	variable which receives the flag recognized by the compiler or linker,
@@ -549,13 +642,13 @@ AC_DEFUN([CS_MAKEFILE_BUILD_RESULT],
 #	ACTION-IF-RECOGNIZED is invoked, otherwise ACTION-IF-NOT-RECOGNIZED is
 #	invoked.
 #------------------------------------------------------------------------------
-AC_DEFUN([CS_MAKEFILE_BUILD_FLAGS],
+AC_DEFUN([CS_EMIT_BUILD_FLAGS],
     [AC_CACHE_CHECK([$1], [$2],
 	[CS_BUILD_IFELSE([], [$3], [$4],
 	    [$2=m4_default([$7],[$cs_build_cflags])], [$2=no])])
     AS_IF([test "$$2" != no],
 	[$8
-	CS_MAKEFILE_PROPERTY([$5], [$$2], [$6])],
+	CS_BUILD_PROPERTY([$5], [$$2], [$6])],
 	[m4_default([$9],[:])])])
 
 
@@ -563,8 +656,7 @@ AC_DEFUN([CS_MAKEFILE_BUILD_FLAGS],
 #===============================================================================
 # INITIALIZATION
 #===============================================================================
-AC_INIT([Crystal Space], [cs_version_number],
-    [crystal-main@lists.sourceforge.net])
+AC_INIT([crystal], [cs_version_number], [crystal-main@lists.sourceforge.net])
 AC_CONFIG_SRCDIR([libs/cssys/cssys.mak])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_PREFIX_DEFAULT([cs_install_dir_default])
@@ -577,34 +669,54 @@ AC_CANONICAL_HOST
 #------------------------------------------------------------------------------
 AC_PROG_CC
 CS_MAKEFILE_PROPERTY([CC], [$CC -c])
+CS_JAMCONFIG_PROPERTY([CMD.CC], [$CC])
 
 AC_PROG_CXX
 CS_MAKEFILE_PROPERTY([CXX], [$CXX -c])
+CS_JAMCONFIG_PROPERTY([CMD.C++], [$CXX])
+
+# C++ compiler is used as linker.
 CS_MAKEFILE_PROPERTY([LINK], [$CXX])
+CS_JAMCONFIG_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.C++)])])
+
 AS_IF([test $ac_compiler_gnu = yes],
     [cs_compiler_name=GCC CS_HEADER_PROPERTY([COMP_GCC])],
     [cs_compiler_name="AS_TR_CPP([$CXX])"])
 CS_MAKEFILE_PROPERTY([COMP], [$cs_compiler_name])
+CS_JAMCONFIG_PROPERTY([COMPILER.TYPE], [$cs_compiler_name])
 CS_HEADER_PROPERTY([CS_COMPILER_NAME],
     [AS_ESCAPE(["])$cs_compiler_name[]AS_ESCAPE(["])])
 
 AC_CHECK_PROGS([FLEXBIN], [flex])
-AS_IF([test -n "$FLEXBIN"], [CS_MAKEFILE_PROPERTY([FLEXBIN], [$FLEXBIN])])
+AS_IF([test -n "$FLEXBIN"], [CS_BUILD_PROPERTY([FLEXBIN], [$FLEXBIN])])
 
 AC_CHECK_PROGS([BISONBIN], [bison])
-AS_IF([test -n "$BISONBIN"], [CS_MAKEFILE_PROPERTY([BISONBIN], [$BISONBIN])])
+AS_IF([test -n "$BISONBIN"], [CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])
+
+AC_CHECK_PROGS([DOXYGEN], [doxygen])
+AS_IF([test -n "$DOXYGEN"], [CS_BUILD_PROPERTY([CMD.DOXYGEN], [$DOXYGEN])])
+
+AC_CHECK_PROGS([TEXI2DVI], [texi2dvi])
+AS_IF([test -n "$TEXI2DVI"], [CS_BUILD_PROPERTY([CMD.TEXI2DVI], [$TEXI2DVI])])
+
+AC_CHECK_PROGS([TEXI2PDF], [texi2pdf])
+AS_IF([test -n "$TEXI2PDF"], [CS_BUILD_PROPERTY([CMD.TEXI2PDF], [$TEXI2PDF])])
+
+AC_CHECK_PROGS([INSTALL], [install])
+AS_IF([test -n "$INSTALL"], [CS_BUILD_PROPERTY([CMD.INSTALL], [$INSTALL])])
 
 AC_PROG_RANLIB
-AS_IF([test -n "$RANLIB"], [CS_MAKEFILE_PROPERTY([CMD.RANLIB], [$RANLIB])])
+AS_IF([test -n "$RANLIB"], [CS_BUILD_PROPERTY([CMD.RANLIB], [$RANLIB])])
 
 AC_CHECK_PROGS([SWIGBIN], [swig])
-AS_IF([test -n "$SWIGBIN"], [CS_MAKEFILE_PROPERTY([SWIGBIN], [$SWIGBIN])])
+AS_IF([test -n "$SWIGBIN"], [CS_BUILD_PROPERTY([SWIGBIN], [$SWIGBIN])])
 
 AC_CHECK_PROGS([LUASWIGBIN], [luaswig])
 AS_IF([test -n "$LUASWIGBIN"],
-    [CS_MAKEFILE_PROPERTY([LUASWIGBIN], [$LUASWIGBIN])])
+    [CS_BUILD_PROPERTY([LUASWIGBIN], [$LUASWIGBIN])])
 
 AC_CHECK_PROGS([MAKE], [gnumake gmake make])
+AC_CHECK_PROGS([JAM], [jam])
 AC_PROG_MAKE_SET
 
 
@@ -618,7 +730,7 @@ AC_PROG_MAKE_SET
 #------------------------------------------------------------------------------
 AC_CACHE_CHECK([how to create a directory], [cs_cv_shell_mkdir],
     [cs_cv_shell_mkdir='mkdir'])
-CS_MAKEFILE_PROPERTY([CMD.MKDIR], [$cs_cv_shell_mkdir])
+CS_BUILD_PROPERTY([CMD.MKDIR], [$cs_cv_shell_mkdir])
 
 AC_CACHE_CHECK([how to create a directory tree], [cs_cv_shell_mkdir_p],
     [if $cs_cv_shell_mkdir -p . 2>/dev/null; then
@@ -629,7 +741,7 @@ AC_CACHE_CHECK([how to create a directory tree], [cs_cv_shell_mkdir_p],
     test -r ./-p && rm -rf ./-p])
 
 AS_VAR_SET_IF([cs_cv_shell_mkdir_p],
-    [CS_MAKEFILE_PROPERTY([CMD.MKDIRS], [$cs_cv_shell_mkdir_p])],
+    [CS_BUILD_PROPERTY([CMD.MKDIRS], [$cs_cv_shell_mkdir_p])],
     [AC_MSG_ERROR([do not know how to create a directory tree])])
 
 
@@ -646,8 +758,8 @@ AS_IF([test -n "$NASM"],
 	    [cs_cv_prog_nasm_ok=yes], [cs_cv_prog_nasm_ok=no])
 	rm -f conftest.*])
     AS_IF([test $cs_cv_prog_nasm_ok = yes],
-	[CS_MAKEFILE_PROPERTY([NASM.AVAILABLE], [yes])
-	CS_MAKEFILE_PROPERTY([NASM.BIN], [$NASM])
+	[CS_BUILD_PROPERTY([NASM.AVAILABLE], [yes])
+	CS_BUILD_PROPERTY([NASM.BIN], [$NASM])
 	CS_HEADER_PROPERTY([DO_NASM])])])
 
 
@@ -680,15 +792,15 @@ AS_IF([test $cs_cv_prog_makedep_ok = yes],
 #------------------------------------------------------------------------------
 AC_CHECK_PROGS([PERL], [perl5 perl])
 AS_IF([test -n "$PERL"],
-    [CS_MAKEFILE_PROPERTY([PERL5.AVAILABLE], [yes])
-    CS_MAKEFILE_PROPERTY([PERL5], [$PERL])
-    CS_MAKEFILE_PROPERTY([PERL], [$PERL])
+    [CS_BUILD_PROPERTY([PERL5.AVAILABLE], [yes])
+    CS_BUILD_PROPERTY([PERL5], [$PERL])
+    CS_BUILD_PROPERTY([PERL], [$PERL])
 
     AC_CACHE_CHECK([for perl ExtUtils::Embed module], [cs_cv_perl_mod_embed],
 	[AS_IF([AC_RUN_LOG([$PERL -MExtUtils::Embed -e 0 1>&2])],
 	    [cs_cv_perl_mod_embed=yes], [cs_cv_perl_mod_embed=no])])
     AS_IF([test $cs_cv_perl_mod_embed = yes],
-	[CS_MAKEFILE_PROPERTY([PERL5.EXTUTILS.AVAILABLE], [yes])
+	[CS_BUILD_PROPERTY([PERL5.EXTUTILS.AVAILABLE], [yes])
 
 	AC_CACHE_CHECK([for perl DynaLoader module],
 	    [cs_cv_perl_mod_dynaloader],
@@ -696,7 +808,7 @@ AS_IF([test -n "$PERL"],
 		[cs_cv_perl_mod_dynaloader=yes],
 		[cs_cv_perl_mod_dynaloader=no])])
 	AS_IF([test $cs_cv_perl_mod_dynaloader = yes],
-	    [CS_MAKEFILE_PROPERTY([PERL5.EXTUTILS.DYNALOADER], [DynaLoader])])
+	    [CS_BUILD_PROPERTY([PERL5.EXTUTILS.DYNALOADER], [DynaLoader])])
 
 	cs_cv_perl_cflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ccopts])`
 	cs_cv_perl_lflags=`AC_RUN_LOG([$PERL -MExtUtils::Embed -e ldopts])`],
@@ -731,11 +843,11 @@ AS_IF([test -n "$PERL"],
     cs_cv_perl_cflags=CS_TRIM([$cs_cv_perl_cflags])
     cs_cv_perl_lflags=CS_TRIM([$cs_cv_perl_lflags])
     AS_IF([test -n "$cs_cv_perl_cflags$cs_cv_perl_lflags"],
-	[CS_MAKEFILE_PROPERTY([PERL5.SDK.AVAILABLE], [yes])
+	[CS_BUILD_PROPERTY([PERL5.SDK.AVAILABLE], [yes])
 	AS_IF([test -n "$cs_cv_perl_cflags"],
-	    [CS_MAKEFILE_PROPERTY([PERL5.CFLAGS], [$cs_cv_perl_cflags])])
+	    [CS_BUILD_PROPERTY([PERL5.CFLAGS], [$cs_cv_perl_cflags])])
 	AS_IF([test -n "$cs_cv_perl_lflags"],
-	    [CS_MAKEFILE_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])])])
+	    [CS_BUILD_PROPERTY([PERL5.LFLAGS], [$cs_cv_perl_lflags])])])])
 
 
 
@@ -861,7 +973,7 @@ CS_CHECK_BUILD([if Python SDK is usable], [cs_cv_python],
     [AC_LANG_PROGRAM([#include <Python.h>],[Py_Initialize(); Py_Finalize();])],
 
     [CS_CREATE_TUPLE([],[],[$cs_pylib1]) CS_CREATE_TUPLE([],[],[$cs_pylib2])],
-    [], [CS_MAKEFILE_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
+    [], [CS_EMIT_BUILD_RESULT([cs_cv_python], [PYTHON])], [], [],
     [$cs_cv_python_base_cflags], [$cs_cv_python_base_lflags],
     [$cs_cv_python_base_libs])
 
@@ -872,7 +984,7 @@ CS_CHECK_BUILD([if Python SDK is usable], [cs_cv_python],
 # more appropriate to use -Wmost rather than -Wall even if the compiler
 # understands both, thus we attempt -Wmost before -Wall.
 #------------------------------------------------------------------------------
-CS_MAKEFILE_BUILD_FLAGS([how to enable compilation warnings],
+CS_EMIT_BUILD_FLAGS([how to enable compilation warnings],
     [cs_cv_prog_cxx_enable_warnings],
     [CS_CREATE_TUPLE([-Wmost]) CS_CREATE_TUPLE([-Wall])], [C++],
     [CFLAGS.SYSTEM], [+])
@@ -894,7 +1006,7 @@ AC_CACHE_CHECK([how to treat warnings as errors],
 # Check if warnings about unknown #pragmas can be disabled.  (MSVC and Borland
 # use a number of pragmas not understood by GCC, for instance.)
 #------------------------------------------------------------------------------
-CS_MAKEFILE_BUILD_FLAGS([how to disable unknown @%:@pragma warnings],
+CS_EMIT_BUILD_FLAGS([how to disable unknown @%:@pragma warnings],
     [cs_cv_prog_cxx_disable_pragma_warnings],
     [CS_CREATE_TUPLE([-Wno-unknown-pragmas])], [C++], [CFLAGS.SYSTEM], [+])
 
@@ -903,9 +1015,9 @@ CS_MAKEFILE_BUILD_FLAGS([how to disable unknown @%:@pragma warnings],
 #------------------------------------------------------------------------------
 # Check if C++ exceptions can be disabled.
 #------------------------------------------------------------------------------
-CS_MAKEFILE_BUILD_FLAGS([how to disable C++ exceptions],
+CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
     [cs_cv_prog_cxx_disable_exceptions], [CS_CREATE_TUPLE([-fno-exceptions])],
-    [C++], [CFLAGS.SYSTEM], [+])
+    [C++], [CXXFLAGS.SYSTEM], [+])
 
 
 
@@ -915,7 +1027,7 @@ CS_MAKEFILE_BUILD_FLAGS([how to disable C++ exceptions],
 # with "-framework Foundation" if that program does not actually employ any
 # Objective-C.
 #------------------------------------------------------------------------------
-CS_MAKEFILE_BUILD_FLAGS([if -multiply_defined suppress is needed],
+CS_EMIT_BUILD_FLAGS([if -multiply_defined suppress is needed],
     [cs_cv_prog_link_suppress_multiple],
     [CS_CREATE_TUPLE([], [-multiply_defined suppress])], [],
     [MACOSX.LFLAGS.CONFIG], [+], [$cs_build_lflags])
@@ -933,10 +1045,10 @@ AC_DEFUN([CS_CHECK_MINGW_VTABLE_THUNKS],
     [AC_REQUIRE([AC_CANONICAL_HOST])
     case $host_os in
 	mingw*)
-	    CS_MAKEFILE_BUILD_FLAGS([if -fvtable-thunks is needed],
+	    CS_EMIT_BUILD_FLAGS([if -fvtable-thunks is needed],
 		[cs_cv_prog_cxx_vtable_thunks],
 		[CS_CREATE_TUPLE([-fvtable-thunks -Werror])],
-		[C++], [CFLAGS.SYSTEM], [+], [-fvtable-thunks])
+		[C++], [CXXFLAGS.SYSTEM], [+], [-fvtable-thunks])
 	    ;;
     esac])
 
@@ -993,7 +1105,7 @@ AS_IF([test $enable_cpu_specific_instructions = yes],
 	CS_CHECK_CODE_GEN_FLAG([alpha], [-mieee])])
 
     AS_IF([test "$cs_cv_prog_cxx_code_gen" != no],
-	[CS_MAKEFILE_PROPERTY(
+	[CS_BUILD_PROPERTY(
 	    [CFLAGS.SYSTEM], [$cs_cv_prog_cxx_code_gen], [+])])])
 
 
@@ -1007,20 +1119,20 @@ AC_DEFUN([CS_CHECK_OPTIMIZE_FLAGS],
 
     cs_optimize_flags=''
 
-    CS_MAKEFILE_BUILD_FLAGS([how to enable optimizations],
+    CS_EMIT_BUILD_FLAGS([how to enable optimizations],
 	[cs_cv_prog_cxx_optimize],
 	[CS_CREATE_TUPLE([-O3]) CS_CREATE_TUPLE([-O2]) CS_CREATE_TUPLE([-O])],
 	[C++], [CFLAGS.optimize], [+], [],
 	[cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_optimize"])
 
-    CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -fomit-frame-pointer],
+    CS_EMIT_BUILD_FLAGS([if $CXX recognizes -fomit-frame-pointer],
 	[cs_cv_prog_cxx_omit_frame_pointer],
 	[CS_CREATE_TUPLE([-fomit-frame-pointer])],
 	[C++], [CFLAGS.optimize], [+], [],
 	[cs_optimize_flags="$cs_optimize_flags \
 	    $cs_cv_prog_cxx_omit_frame_pointer"])
 
-    CS_MAKEFILE_BUILD_FLAGS([if $CXX recognizes -ffast-math],
+    CS_EMIT_BUILD_FLAGS([if $CXX recognizes -ffast-math],
 	[cs_cv_prog_cxx_fast_math],
 	[CS_CREATE_TUPLE([-ffast-math])], [C++], [CFLAGS.optimize], [+], [],
 	[cs_optimize_flags="$cs_optimize_flags $cs_cv_prog_cxx_fast_math"])])
@@ -1032,12 +1144,12 @@ CS_CHECK_OPTIMIZE_FLAGS
 #------------------------------------------------------------------------------
 # Check for compiler debug flags.
 #------------------------------------------------------------------------------
-CS_MAKEFILE_BUILD_FLAGS([how to enable compiler debug output],
+CS_EMIT_BUILD_FLAGS([how to enable compiler debug output],
     [cs_cv_prog_cxx_debug],
     [CS_CREATE_TUPLE([-g3]) CS_CREATE_TUPLE([-g2]) CS_CREATE_TUPLE([-g])],
     [C++], [CFLAGS.debug], [+])
 AS_IF([test $cs_cv_prog_cxx_debug != no],
-    [CS_MAKEFILE_PROPERTY([LFLAGS.debug], [$cs_cv_prog_cxx_debug], [+])])
+    [CS_BUILD_PROPERTY([LFLAGS.debug], [$cs_cv_prog_cxx_debug], [+])])
 
 
 
@@ -1062,7 +1174,7 @@ AS_IF([test -d /usr/local/include],
 	[cs_cv_prog_cxx_local_include=yes])
 
     AS_IF([test $cs_cv_prog_cxx_local_include = yes],
-	[CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])])])
+	[CS_BUILD_PROPERTY([CFLAGS.SYSTEM], [-I/usr/local/include], [+])])])
 
 
 
@@ -1072,13 +1184,13 @@ AS_IF([test -d /usr/local/include],
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
     [AC_LANG_PUSH([C])
     AC_CHECK_LIB([m], [pow],
-	[CS_MAKEFILE_PROPERTY([LIBS.EXE], [-lm], [+])
+	[CS_BUILD_PROPERTY([LIBS.EXE], [-lm], [+])
 	cs_cv_libm=yes cs_cv_libm_libs='-lm'],
 	[cs_cv_libm=no cs_cv_libm_libs=''])
     AC_CHECK_LIB([dl], [dlopen],
-	[CS_MAKEFILE_PROPERTY([LIBS.EXE], [-ldl], [+])])
+	[CS_BUILD_PROPERTY([LIBS.EXE], [-ldl], [+])])
     AC_CHECK_LIB([nsl], [gethostbyname],
-	[CS_MAKEFILE_PROPERTY([LIBS.EXE], [-lnsl], [+])])
+	[CS_BUILD_PROPERTY([LIBS.EXE], [-lnsl], [+])])
     AC_LANG_POP([C])])
 
 CS_CHECK_COMMON_LIBS
@@ -1096,13 +1208,21 @@ m4_define([cs_pthread_flags],
     CS_CREATE_TUPLE([-pthread], [], [-lpthread])])
 
 AC_DEFUN([CS_CHECK_PTHREAD],
-    [CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
-	[AC_LANG_PROGRAM(
-	    [#include <pthread.h>
-	    void* worker(void* p) { (void)p; return p; }],
-	    [pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
-	[cs_pthread_flags], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])])
+    [AC_REQUIRE([AC_CANONICAL_HOST])
+    case $host_os in
+	cygwin*)
+	    cs_cv_sys_pthread=no
+	    ;;
+	*)
+	    CS_CHECK_BUILD([for pthread], [cs_cv_sys_pthread],
+		[AC_LANG_PROGRAM(
+		    [#include <pthread.h>
+		    void* worker(void* p) { (void)p; return p; }],
+		    [pthread_t tid; pthread_create(&tid, 0, worker, 0);])],
+		[cs_pthread_flags], [],
+		[CS_EMIT_BUILD_RESULT([cs_cv_sys_pthread], [PTHREAD])])
+	    ;;
+    esac])
 
 CS_CHECK_PTHREAD
 
@@ -1144,11 +1264,14 @@ AC_PATH_X
 AC_PATH_XTRA
 
 AS_IF([test "$no_x" != yes],
-    [CS_MAKEFILE_PROPERTY([X11.AVAILABLE], [yes])
+    [CS_BUILD_PROPERTY([X11.AVAILABLE], [yes])
     CS_MAKEFILE_PROPERTY([X_CFLAGS], [$X_CFLAGS])
     CS_MAKEFILE_PROPERTY([X_LIBS], [$X_LIBS])
     CS_MAKEFILE_PROPERTY([X_PRE_LIBS], [$X_PRE_LIBS])
     CS_MAKEFILE_PROPERTY([X_EXTRA_LIBS], [$X_EXTRA_LIBS])
+    CS_JAMCONFIG_PROPERTY([X11.CFLAGS], [$X_CFLAGS])
+    CS_JAMCONFIG_PROPERTY([X11.LFLAGS],
+      [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXext -lX11 $(X_EXTRA_LIBS)])])
 
     CS_CHECK_LIB_WITH([Xxf86vm],
 	[AC_LANG_PROGRAM(
@@ -1158,7 +1281,10 @@ AS_IF([test "$no_x" != yes],
 	    #include <X11/Xatom.h>
 	    #include <X11/extensions/xf86vmode.h>],
 	    [XF86VidModeLockModeSwitch(0, 0, 0)])], [], [],
-	[CS_MAKEFILE_PROPERTY([USE_XFREE86VM], [yes])], [],
+	[CS_BUILD_PROPERTY([USE_XFREE86VM], [yes])
+	CS_JAMCONFIG_PROPERTY([XFREE86VM.LFLAGS],
+	    [AS_ESCAPE([$(X_PRE_LIBS) $(X_LIBS) -lXxf86vm -lXext -lX11 dnl
+	    $(X_EXTRA_LIBS)])])], [],
 	[$X_CFLAGS], [], [$X_PRE_LIBS $X_LIBS -lX11 -lXext $X_EXTRA_LIBS])])
 
 
@@ -1246,7 +1372,7 @@ CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
     CS_CREATE_TUPLE([],[],[-lGL]) \
     CS_CREATE_TUPLE([],[],[-lgl]) \
     $cs_mesa_gl], [],
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libgl], [GL])], [], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libgl], [GL])], [], [],
     [$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
 
 AS_IF([test $cs_cv_libgl = yes],
@@ -1260,7 +1386,7 @@ AS_IF([test $cs_cv_libgl = yes],
 	CS_CREATE_TUPLE([],[],[-lGLU]) \
 	CS_CREATE_TUPLE([],[],[-lglu]) \
 	$cs_mesa_glu], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglu], [GLU])], [], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libglu], [GLU])], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
     # Check for GLUT.
@@ -1272,7 +1398,7 @@ AS_IF([test $cs_cv_libgl = yes],
 	CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT]) \
 	CS_CREATE_TUPLE([],[],[-lGLUT]) \
 	CS_CREATE_TUPLE([],[],[-lglut])], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglut], [GLUT])], [], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libglut], [GLUT])], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
     # Check for GLX.
@@ -1282,7 +1408,7 @@ AS_IF([test $cs_cv_libgl = yes],
 	CS_CREATE_TUPLE([],[],[-lGLX]) \
 	CS_CREATE_TUPLE([],[],[-lglx]) \
 	$cs_mesa_glx], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglx], [GLX])], [], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libglx], [GLX])], [], [],
 	[$cs_cv_libgl_cflags], [$cs_cv_libgl_lflags], [$cs_cv_libgl_libs])
 
     # Check for GLX extensions.  Define CSGL_EXT_STATIC_ASSERTION if _not_
@@ -1306,7 +1432,7 @@ AS_IF([test $cs_cv_libgl = yes],
 # search CS/libs/zlib*.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([z], [AC_LANG_PROGRAM([#include <zlib.h>], [zlibVersion()])],
-    [libs/zlib*], [], [CS_MAKEFILE_BUILD_RESULT([cs_cv_libz], [ZLIB])])
+    [libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])])
 
 
 
@@ -1324,7 +1450,7 @@ AS_IF([test "$cs_cv_libz" = yes],
 	[AC_LANG_PROGRAM([#include <png.h>],
 	    [png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0)])],
 	[libs/libpng*], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libpng], [PNG])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libpng], [PNG])], [],
 	[$cs_cv_libz_cflags $cs_cv_libm_cflags],
 	[$cs_cv_libz_lflags $cs_cv_libm_lflags],
 	[$cs_cv_libz_libs $cs_cv_libm_libs])])
@@ -1341,7 +1467,7 @@ CS_CHECK_LIB_WITH([jpeg],
 	#include <stdio.h>
 	#include <jpeglib.h>],
 	[jpeg_create_compress(0)])],
-    [libs/*jpeg*], [], [CS_MAKEFILE_BUILD_RESULT([cs_cv_libjpeg], [JPEG])])
+    [libs/*jpeg*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libjpeg], [JPEG])])
 
 
 
@@ -1353,7 +1479,7 @@ AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
     [CS_CHECK_LIB_WITH([mng],
 	[AC_LANG_PROGRAM([#include <libmng.h>], [mng_version_release()])],
 	[libs/libmng*], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libmng], [MNG])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libmng], [MNG])], [],
 	[$cs_cv_libjpeg_cflags $cs_cv_libz_cflags],
 	[$cs_cv_libjpeg_lflags $cs_cv_libz_lflags],
 	[$cs_cv_libjpeg_libs $cs_cv_libz_libs])])
@@ -1369,7 +1495,7 @@ CS_CHECK_LIB_WITH([mikmod],
 	[#include <mikmod.h>],
 	[MikMod_Init("mikmodtest"); MikMod_Exit();])],
     [libs/libmikmod*], [],
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libmikmod], [MIKMOD])])
 
 
 
@@ -1383,14 +1509,14 @@ CS_CHECK_LIB_WITH([ogg],
 	[#include <ogg/ogg.h>],
 	[ogg_sync_state state; ogg_sync_init(&state);])],
     [libs/libogg*], [],
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libogg], [OGG])])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libogg], [OGG])])
 
 AS_IF([test "$cs_cv_libogg" = yes],
     [CS_CHECK_LIB_WITH([vorbis],
 	[AC_LANG_PROGRAM([#include <vorbis/codec.h>],
 	  [vorbis_info info; vorbis_info_init(&info);])],
 	[libs/libvorbis.*], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libvorbis], [VORBIS])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libvorbis], [VORBIS])], [],
 	[$cs_cv_libogg_cflags],
 	[$cs_cv_libogg_lflags],
 	[$cs_cv_libogg_libs])])
@@ -1403,7 +1529,7 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 	  [ OggVorbis_File file;
 	    ov_test(stdin, &file, "", 0); ])],
 	[libs/libvorbisfile*], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libvorbisfile], [VORBISFILE])], [],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libvorbisfile], [VORBISFILE])], [],
 	[$cs_cv_libogg_cflags $cs_cv_libvorbis_cflags],
 	[$cs_cv_libogg_lflags $cs_cv_libvorbis_lflags],
 	[$cs_cv_libogg_libs $cs_cv_libvorbis_libs])])
@@ -1426,7 +1552,7 @@ CS_CHECK_LIB_WITH([3ds],
 AS_IF([test $cs_cv_lib3ds = yes],
     [CS_CHECK_BUILD([if lib3ds is sufficiently recent], [cs_cv_lib3ds_recent],
 	[AC_LANG_PROGRAM([#include <lib3ds/io.h>], [lib3ds_io_free(0);])],
-	[], [], [CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [], [],
+	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [], [],
 	[$cs_cv_lib3ds_cflags], [$cs_cv_lib3ds_lflags], [$cs_cv_lib3ds_libs])])
 
 
@@ -1447,7 +1573,7 @@ AS_IF([test $cs_cv_libode = yes],
 	    [dWorldCreate();
 	    dBodySetGravityMode(0,0);
 	    dCloseODE();])],
-	[], [C++], [CS_MAKEFILE_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
+	[], [C++], [CS_EMIT_BUILD_RESULT([cs_cv_libode], [ODE])], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])])
 
 
@@ -1477,7 +1603,7 @@ CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
     CS_CREATE_TUPLE([],[],[-lalut -lopenal]) \
     CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
     CS_CREATE_TUPLE([],[],[-lopenal])], [],
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libopenal], [OPENAL])])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libopenal], [OPENAL])])
 
 
 
@@ -1485,9 +1611,9 @@ CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
 # Check for FreeType2.
 #------------------------------------------------------------------------------
 AC_CHECK_FT2([2.0],
-    [CS_MAKEFILE_PROPERTY([FT2.AVAILABLE], [yes])
-    CS_MAKEFILE_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
-    CS_MAKEFILE_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
+    [CS_BUILD_PROPERTY([FT2.AVAILABLE], [yes])
+    CS_BUILD_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
+    CS_BUILD_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
 
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older
@@ -1514,7 +1640,7 @@ AC_DEFUN([CS_CHECK_LIBMINGWX],
 
 CS_CHECK_LIBMINGWX
 AS_IF([test $cs_cv_libmingwex = yes],
-    [CS_MAKEFILE_PROPERTY([LIBS.SYSTEM], [-lmingwex], [+])])
+    [CS_BUILD_PROPERTY([LIBS.SYSTEM], [-lmingwex], [+])])
 
 
 
@@ -1523,7 +1649,7 @@ AS_IF([test $cs_cv_libmingwex = yes],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([vga],
     [AC_LANG_PROGRAM([#include <vga.h>], [vga_init()])], [], [],
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libvga], [SVGA])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libvga], [SVGA])
 	CS_HEADER_PROPERTY([CS_HAS_SVGALIB])],
     [], [], [], [-lvgagl])
 
@@ -1536,7 +1662,7 @@ CS_CHECK_LIB_WITH([cal3d],
     [AC_LANG_PROGRAM([#include <cal3d/cal3d.h>],
 	[CalModel m; m.create(0); m.destroy();])],
     [], [C++],
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
+    [CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
 	CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])])
 
 
@@ -1603,29 +1729,32 @@ AC_DEFUN([_CS_CHECK_HOST_DARWIN],
     # If user explicitly requested --with-x, then assume Darwin+XFree86; else
     # assume MacOS/X.
     AC_MSG_CHECKING([for --with-x])
-    if test "$with_x" = "yes"; then
-	AC_MSG_RESULT([yes (assume Darwin)])
+    AS_IF([test $with_x = yes],
+	[AC_MSG_RESULT([yes (assume Darwin)])
 	cs_host_target=unix
 	cs_host_makefile=libs/cssys/unix/unix.mak
-	cs_host_family=unix
-    else
-	AC_MSG_RESULT([no (assume MacOS/X)])
+	cs_host_family=unix],
+	[AC_MSG_RESULT([no (assume MacOS/X)])
 	cs_host_target=macosx
 	cs_host_makefile=libs/cssys/macosx/macosx.mak
 	cs_host_family=unix
 	cs_host_os_normalized='MacOS/X'
 	CS_HEADER_PROPERTY([OS_MACOSX])
 	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_DIR],[AS_ESCAPE(["components/"])])
-	CS_MAKEFILE_PROPERTY([MACOSX.PLUGIN_DIR], [components])
+	CS_BUILD_PROPERTY([MACOSX.PLUGIN_DIR], [components])
 	CS_HEADER_PROPERTY([OS_MACOSX_PLUGIN_EXT],[AS_ESCAPE([".csplugin"])])
-	CS_MAKEFILE_PROPERTY([MACOSX.PLUGIN_EXT], [.csplugin])
+	CS_BUILD_PROPERTY([MACOSX.PLUGIN_EXT], [.csplugin])
+	CS_HEADER_PROPERTY([CS_24BIT_PIXEL_LAYOUT],
+	    [AS_ESCAPE(["CS_24BIT_PIXEL_ARGB"])])
+
 	AC_CACHE_CHECK([for Objective-C compiler], [cs_cv_prog_objc],
-	    [cs_cv_prog_objc="$CC -c"])
-	CS_MAKEFILE_PROPERTY([OBJC], [$cs_cv_prog_objc])
+	    [cs_cv_prog_objc="$CC"])
+	CS_MAKEFILE_PROPERTY([OBJC], [$cs_cv_prog_objc -c])
+	CS_JAMCONFIG_PROPERTY([CMD.OCC], [$cs_cv_prog_objc])
 	AC_CACHE_CHECK([for Objective-C++ compiler], [cs_cv_prog_objcxx],
-	    [cs_cv_prog_objcxx="$CXX -c"])
-	CS_MAKEFILE_PROPERTY([OBJCXX], [$cs_cv_prog_objcxx])
-    fi])
+	    [cs_cv_prog_objcxx="$CXX"])
+	CS_MAKEFILE_PROPERTY([OBJCXX], [$cs_cv_prog_objcxx -c])
+	CS_JAMCONFIG_PROPERTY([CMD.OC++], [$cs_cv_prog_objcxx])])])
 
 CS_CHECK_HOST
 
@@ -1646,6 +1775,7 @@ cs_host_os_normalized_uc="AS_TR_CPP([$cs_host_os_normalized])"
 CS_MAKEFILE_PROPERTY([TARGET], [$cs_host_target])
 CS_MAKEFILE_PROPERTY([TARGET_MAKEFILE], [$cs_host_makefile])
 CS_MAKEFILE_PROPERTY([OS], [$cs_host_os_normalized_uc])
+CS_JAMCONFIG_PROPERTY([TARGET.OS], [$cs_host_os_normalized_uc])
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [AS_ESCAPE(["])$cs_host_os_normalized[]AS_ESCAPE(["])])
 
@@ -1672,7 +1802,7 @@ AC_DEFUN([CS_CHECK_HOST_CPU],
     cs_host_cpu_normalized="AS_TR_CPP([$cs_host_cpu])"])
 
 CS_CHECK_HOST_CPU
-CS_MAKEFILE_PROPERTY([PROC], [$cs_host_cpu_normalized])
+CS_BUILD_PROPERTY([PROC], [$cs_host_cpu_normalized])
 CS_HEADER_PROPERTY([PROC_$cs_host_cpu_normalized])
 CS_HEADER_PROPERTY([CS_PROCESSOR_NAME],
     [AS_ESCAPE(["])$cs_host_cpu[]AS_ESCAPE(["])])
@@ -1731,7 +1861,7 @@ AC_CHECK_HEADER([soundcard.h],
 	      [cs_cv_header_soundcard_h=no])])])
 
 AS_IF([test $cs_cv_header_soundcard_h = yes],
-    [CS_MAKEFILE_PROPERTY([OSS.AVAILABLE], [yes])])
+    [CS_BUILD_PROPERTY([OSS.AVAILABLE], [yes])])
 
 
 
@@ -1785,7 +1915,7 @@ CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
 	@%:@endif],
 	[struct in_addr a; inet_ntoa(a); socket(0,0,0);])],
 	[cs_socket_flags], [],
-	[CS_MAKEFILE_BUILD_RESULT([cs_cv_sys_socket], [SOCKET])])
+	[CS_EMIT_BUILD_RESULT([cs_cv_sys_socket], [SOCKET])])
 
 AS_IF([test $cs_cv_sys_socket = yes],
     [AC_CHECK_TYPE([socklen_t], [], [CS_HEADER_PROPERTY([socklen_t],[int])],
@@ -1927,7 +2057,7 @@ AC_ARG_ENABLE([linux-joystick],
     [], [enable_linux_joystick=no])
 AC_MSG_RESULT([$enable_linux_joystick])
 AS_IF([test "$enable_linux_joystick" != no],
-    [CS_MAKEFILE_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])], [])
+    [CS_BUILD_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])], [])
 
 
 
@@ -1962,7 +2092,7 @@ AC_ARG_ENABLE([mode], [AC_HELP_STRING([--enable-mode=mode],
 AC_MSG_CHECKING([build mode])
 AS_VAR_SET_IF([cs_build_mode], [], [cs_build_mode=optimize])
 AC_MSG_RESULT([$cs_build_mode])
-CS_MAKEFILE_PROPERTY([MODE], [$cs_build_mode])
+CS_BUILD_PROPERTY([MODE], [$cs_build_mode])
 
 
 
@@ -1974,7 +2104,7 @@ AC_ARG_ENABLE([plugins], [AC_HELP_STRING([--enable-plugins],
     [create plugin modules instead of static link libraries (default YES)])],
     [], [enable_plugins=yes])
 AC_MSG_RESULT([$enable_plugins])
-CS_MAKEFILE_PROPERTY([USE_PLUGINS], [$enable_plugins])
+CS_BUILD_PROPERTY([USE_PLUGINS], [$enable_plugins])
 AS_IF([test $enable_plugins != yes], [CS_HEADER_PROPERTY([CS_STATIC_LINKED])])
 
 
@@ -2013,11 +2143,51 @@ AS_IF([test $enable_extensive_memory_debugger = yes],
 #------------------------------------------------------------------------------
 # Determine installation directory.
 #------------------------------------------------------------------------------
-AC_MSG_CHECKING([for installation directory])
+# GNU makefile build system.
 AS_IF([test $prefix = NONE],
     [cs_install_dir=cs_install_dir_default], [cs_install_dir=$prefix])
-AC_MSG_RESULT([$cs_install_dir])
 CS_MAKEFILE_PROPERTY([INSTALL_DIR], [$cs_install_dir])
+
+# Jam build system.
+AS_IF([test $prefix = NONE], [prefix="$ac_default_prefix"])
+AS_IF([test $exec_prefix = NONE],
+    [exec_prefix="AS_ESCAPE([$(INSTALLDIR.PREFIX)])"])
+	
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.PREFIX], [$prefix])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.EXEC_PREFIX], [$exec_prefix])
+
+# Hack: Unfortunately, values of the other directories often contain references
+# to prefix and exec_prefix in lowercase, thus we duplicate the above values.
+CS_JAMCONFIG_PROPERTY([prefix], [AS_ESCAPE([$(INSTALLDIR.PREFIX)])])
+CS_JAMCONFIG_PROPERTY([exec_prefix], [AS_ESCAPE([$(INSTALLDIR.EXEC_PREFIX)])])
+
+# Hack: Mutilate Autoconf's default paths.
+docdir="$datadir/doc/$PACKAGE_NAME";
+AS_IF([test "$includedir" = '${prefix}/include'],
+      [includedir="AS_ESCAPE([$(prefix)])/include/$PACKAGE_NAME"])
+AS_IF([test "$datadir" = '${prefix}/share'],
+      [datadir="AS_ESCAPE([$(prefix)])/share/$PACKAGE_NAME"])
+AS_IF([test "$sysconfdir" = '${prefix}/etc'],
+      [sysconfdir="AS_ESCAPE([$(prefix)])/etc/$PACKAGE_NAME"])
+
+mapdir="$datadir/maps" ;
+plugindir="$libdir/$PACKAGE_NAME" ;
+	  
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.APPLICATION], [$bindir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.SBIN], [$sbindir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.LIBEXEC], [$libexecdir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.DATA], [$datadir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.MAP], [$mapdir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.CONFIG], [$sysconfdir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.SHAREDSTATE], [$sharedstatedir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.LOCALSTATE], [$localstatedir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.PLUGIN], [$plugindir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.DOC], [$docdir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.LIBRARY], [$libdir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.INCLUDE], [$includedir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.OLDINCLUDE], [$oldincludedir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.INFO], [$infodir])
+CS_JAMCONFIG_PROPERTY([INSTALLDIR.MAN], [$mandir])
 
 
 
@@ -2063,11 +2233,38 @@ CS_HEADER_APPEND(
 
 
 #------------------------------------------------------------------------------
-# Output generated files.  Also create makefile cache if caching enabled.
+# Boilerplate: config.mak
+#------------------------------------------------------------------------------
+CS_MAKEFILE_APPEND(
+[dnl Hack: The makefile system presently assumes that CFLAGS.SYSTEM should be
+dnl used for both C and C++, and ignores CXXFLAGS.SYSTEM.  Eliminate this hack
+dnl when the makefile system has been repaired.
+CFLAGS.SYSTEM += AS_ESCAPE([$(CXXFLAGS.SYSTEM)])
+])
+
+
+
+#------------------------------------------------------------------------------
+# Boilerplate: Jamconfig
+#------------------------------------------------------------------------------
+CS_JAMCONFIG_PROPERTY([PACKAGE.NAME], [$PACKAGE_NAME])
+CS_JAMCONFIG_PROPERTY([PACKAGE.VERSION], [$PACKAGE_VERSION])
+CS_JAMCONFIG_PROPERTY([PACKAGE.STRING], [$PACKAGE_STRING])
+CS_JAMCONFIG_PROPERTY([PACKAGE.BUGREPORT], [$PACKAGE_BUGREPORT])
+CS_JAMCONFIG_PROPERTY([JAMCONFIG_READ], [yes])
+CS_JAMCONFIG_PROPERTY([CONFIGURE_INVOCATION], [$0 $ac_configure_args])
+
+
+
+#------------------------------------------------------------------------------
+# Output generated files.
 #------------------------------------------------------------------------------
 CS_HEADER_OUTPUT([include/volatile.h])
 CS_MAKEFILE_OUTPUT([config.mak])
-AC_CONFIG_FILES([Makefile])
+CS_JAMCONFIG_OUTPUT([Jamconfig])
+AC_CONFIG_FILES([Makefile Jamfile])
+
+# Queue makefile cache creation if caching enabled.
 AS_IF([test $enable_makefile_cache = yes],
     [AC_CONFIG_COMMANDS([cache.mak],
 	[rm -f cache.mak ; ${MAKE} recache], [MAKE=${MAKE-make}])])

@@ -1,3 +1,6 @@
+TOP ?= @top_srcdir@ ;
+BUILDTOP ?= @top_builddir@ ;
+
 SubDir TOP ;
 
 # Define our compile groups
@@ -11,11 +14,10 @@ Help drivers2d	  : "2d canvases compilegroup" ;
 Help drivers3d	  : "3d renderers compilegroup" ;
 Help meshes	  : "mesh plugin and loader compilegroup" ;
 
+SubInclude TOP apps ;
 SubInclude TOP data ;
+SubInclude TOP docs ;
+SubInclude TOP include ;
 SubInclude TOP libs ;
 SubInclude TOP plugins ;
-SubInclude TOP apps ;
 SubInclude TOP scripts ;
-SubInclude TOP include ;
-SubInclude TOP docs ;
-

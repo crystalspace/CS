@@ -226,7 +226,7 @@ maintainerclean: distclean
 
 distclean: clean
 	-$(RM) Makefile config.mak config.cache config.status \
-	include/volatile.h
+	include/volatile.h Jamfile Jamconfig
 
 clean:
 	-$(RM) config.log
