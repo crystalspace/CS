@@ -44,16 +44,6 @@
 #include "csutil/scanstr.h"
 #include "qint.h"
 
-#if defined (OS_WIN32)
-#include "video/canvas/winglide2/g2d.h"
-#include "video/canvas/winglide2/ig2d.h"
-#elif defined (OS_MACOS)
-#include "video/canvas/macglide2/g2d.h"
-#include "video/canvas/macglide2/ig2d.h"
-#include "cssys/mac/MacRSRCS.h"
-#else //Is there another platform Glide runs on?
-#endif
-
 #include "gllib.h"
 #include "g3dgl.h"
 #include "glalpha.h"
@@ -210,7 +200,8 @@ csGraphics3DGlide::~csGraphics3DGlide()
     m_pLightmapCache->DecRef ();
   if (m_pAlphamapCache)
     m_pAlphamapCache->DecRef ();
-  delete config;
+  if (config)
+    config->DecRef();
   delete txtmgr;
   if (m_pCamera)
     m_pCamera->DecRef ();
