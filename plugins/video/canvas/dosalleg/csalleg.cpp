@@ -21,7 +21,7 @@
 #include "sysdef.h"
 #include "csalleg.h"
 #include "cssys/djgpp/idjgpp.h"
-#include "csgeom/csrect.h"
+#include "csutil/csrect.h"
 #include "isystem.h"
 #include "allegro.h"
 
