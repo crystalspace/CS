@@ -49,7 +49,7 @@ struct iPlugIn : public iBase
   virtual bool HandleEvent (csEvent& /*Event*/)
   { return false; }
   /// Called before forced suspend / after resuming suspend
-  virtual void SuspendResume (bool iSuspend)
+  virtual void SuspendResume (bool /*iSuspend*/)
   { }
 };
 
