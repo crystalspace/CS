@@ -313,8 +313,6 @@ class WEXP ddgTBinMesh
 	unsigned int _triNo;
 	/// Index beyond which there are leaf triangles in the TBinTree.
 	unsigned int _leafTriNo;
-	/// Dirty state.
-	bool		_dirty;
 	/// Max number of bintrees to manage.
 	unsigned int _bintreeMax;
 	/// Bintree's managed by this mesh
@@ -323,6 +321,8 @@ class WEXP ddgTBinMesh
 	ddgTCache		_tcache;
 	/// Merge queue active.
 	bool			_merge;
+	/// Are we doing a split only run.
+	bool			_splitRun;
 	/// A Split Priority Queue.
 	ddgQCache		_qscache;
 	/// A Merge Priority Queue.
@@ -421,12 +421,21 @@ public:
     }
 	/// Return the index lookup table.
 	ddgTriIndex	*indexLUT(void) { return _indexLUT; }
+		/// Get triangle vertex 0.
+	inline ddgTriIndex v0(ddgTriIndex i)
+	{ ddgAssert(i < triNo()); return stri[i].v0; }
+	/// Get triangle vertex 1.
+	inline ddgTriIndex v1(ddgTriIndex i)
+	{ ddgAssert(i < triNo()); return stri[i].v1; }
+
 	/// Return the cache of active triangles.
 	ddgTCache *tcache(void) { return &_tcache; }
 	/// Return merge queue state.
 	bool merge(void) { return _merge; }
 	/// Set merge queue state.
 	void merge(bool m) { _merge = m; }
+	/// Are we doing a split only run.
+	bool splitRun(void) { return _splitRun; }
 	/// Return the cache of priority queue.
 	ddgQCache *qscache(void) { return &_qscache; }
 	/// Return the cache of priority queue.
@@ -464,11 +473,6 @@ public:
 	unsigned int leafTriNo(void) { return _leafTriNo; }
 	/// Return the number of split levels.
 	unsigned int maxLevel( void ) { return _maxLevel; }
-
-	/// Set dirty state.
-	void dirty( bool d ) { _dirty = d; }
-	/// Get dirty state.
-	bool dirty( void ) { return _dirty; }
 
 	/**
 	 * Calculate the optimal set of triangles for the mesh at current camera pos.

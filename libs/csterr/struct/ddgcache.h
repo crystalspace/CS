@@ -264,8 +264,8 @@ public:
 		_head = 0;
 		_tail = 0;
 		unsigned int i = _bucketNo;
-		while (i--)
-			_bucket[i] = 0;
+		while (i)
+			_bucket[--i] = 0;
 	}
 	/// Initialize the cache.
 	void init (unsigned int size, unsigned int nodeSize, unsigned int bn, bool r = false ) {
@@ -349,7 +349,7 @@ public:
 	{
 		ddgAssert(ci);
 		ddgSNode	*n = get(ci);
-		unsigned short	b = n->bucket();
+		short		b = n->bucket();
 		if (n->next())
 			return n->next();
 		// Find next bucket with something in it.

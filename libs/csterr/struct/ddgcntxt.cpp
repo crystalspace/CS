@@ -28,7 +28,7 @@ ddgContext::ddgContext(Mode m, Quality q, ddgControl *ctrl, ddgClock *cl)
 	_quality = q;
 	_clock = cl;
 	_clipbox.set(0,100,0,100,0.6,5100);  // 5 Km visibility.
-	_fov = 120;
+	_fov = 90;
 	_tanHalfFOV = tan(ddgAngle::degtorad(_fov/2.0));
 	_dirty = true;
 	_control = ctrl;

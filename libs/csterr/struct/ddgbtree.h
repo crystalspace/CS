@@ -51,8 +51,8 @@ const unsigned int ddgBintreeOffset[32] =
  */
 
 class WEXP ddgTBinTree {
-	/// The SharedBinTree data. (Could be static)
-    ddgTBinMesh	*_mesh;
+	/// The SharedBinTree data.
+    static ddgTBinMesh	*_mesh;
     /// Col offset in maps.
     int     _dc;
     /// Row offset in maps.
@@ -99,13 +99,52 @@ class WEXP ddgTBinTree {
 	ddgTBinTree   *_pNeighbourLeft;
 	/// Various static variables to avoid dereferencing _mesh.
 	static ddgContext	  *_ctx;
+	/// 2D X/Z projection of the observer's location.
 	static ddgVector2	_pos;
+	/// 2D X/Z projection of the observer's forward vector.
 	static ddgVector2	_forward;
+	/// Far clipping distance.
 	static float _farClip;
+	/// Near clipping distance.
 	static float _nearClip;
+	/// Squared far clipping distance.
 	static float _farClipSQ;
-	static int _priorityScale;
+	/**
+	 * This property is used to scale a wedgie's absolute variance
+	 * into the available variance range.
+	 * Variances beyond 1/4 the max variance are clamped to the max variance
+	 * The frame variance for a wedgie is calculated as follows:
+	 * priorityResolution * 4 / ( Tv * farClip) * Wv * Z.
+	 * To avoid recalculating this for each wedgie for each frame:
+	 * We precompute:
+	 * varianceScale = priorityResolution * 4 / ( Tv * farClip) once and
+	 * store this value.
+	 * Then we need only compute varianceScale * Wv * Z for each frame.
+	 * theoretically we could precompute varianceScale * Wv as well but
+	 * then we could not dynamically adjust farClip and priorityResolution
+	 * and we would probably need a float for each wedgie, instead we store
+	 * the Wv and compute varianceScale * Wv only when the wedgie enters
+	 * the visible set and store is as Wsv	(Wedgie scale variance)
+	 * Then for each frame we need to only compute Wsv * Z.
+	 *
+	 * Where:
+	 * Wv = wedgie variance (WmaxHeight-WminHeight)
+	 * Tv = max variance across the entire terrain (TmaxHeight-TminHeight)
+	 * Z = screen depth of wedgie centre point from the viewer.
+	 *     this is calculated by projecting the vector ET onto
+	 *     the forward vector.
+	 *    Where E is the eye location.
+	 *          T the wedgie's centre point.
+	 * 
+	 * Wsv = is the wedgies scaled variance (float).
+	 * 
+	 * Entry 0 contains the items with the highest variance
+	 * Entry priorityResolution-1 contains the items with lowest variance (0).
+	 */
+	static float _varianceScale;
+	/// Cached pointer to the static tree data.
 	static ddgMSTri	*_stri;
+	/// Cached pointer to the triangle cache.
 	static ddgTCache	*_tcache;
 	/// A cache chain for this bintree.
 	ddgCacheIndex		_chain;
@@ -120,7 +159,7 @@ public:
 	/**
 	 *  Construct a Bintree mesh.
 	 */
-	ddgTBinTree(ddgTBinMesh *m, ddgTreeIndex i, int dr = 0, int dc = 0, bool mirror = false);
+	ddgTBinTree(ddgTreeIndex i, int dr = 0, int dc = 0, bool mirror = false);
 	/// Destroy the Bintree mesh.
 	~ddgTBinTree(void);
 
@@ -158,28 +197,15 @@ public:
 
 	/// Initialize the bin tree.
 	bool init(void);
-	/// Get maxLevel.
-	inline unsigned int maxLevel(void) { return _mesh->maxLevel(); }
-	/// Get number of triangles in a single BinTree.
-	inline unsigned int triNo(void) { return _mesh->triNo(); }
+private:
 	/// Get triangle row in the bin tree.
-	inline unsigned int row(unsigned int i)
-	{ return _mesh->stri[i].row; }
+	unsigned int row(unsigned int i);
 	/// Get triangle col.
-	inline unsigned int col(unsigned int i)
-	{ return _mesh->stri[i].col; }
+	unsigned int col(unsigned int i);
 	/// Get the triangle row on the master mesh.
-	inline unsigned int mrow(unsigned int i)
-	{ return _mirror ? _dr - _mesh->stri[i].row : _dr + _mesh->stri[i].row; }
+	inline unsigned int mrow(unsigned int i);
 	/// Get the triangle column on the master mesh.
-	inline unsigned int mcol(unsigned int i)
-	{ return _mirror ? _dc - _mesh->stri[i].col : _dc + _mesh->stri[i].col; }
-	/// Get triangle vertex 0.
-	inline ddgTriIndex v0(ddgTriIndex i)
-	{ ddgAssert(i < _mesh->triNo()); return _mesh->stri[i].v0; }
-	/// Get triangle vertex 1.
-	inline ddgTriIndex v1(ddgTriIndex i)
-	{ ddgAssert(i < _mesh->triNo()); return _mesh->stri[i].v1; }
+	inline unsigned int mcol(unsigned int i);
 	/** Return the starting offset in the array where a
 	 * given level is stored.
 	 */
@@ -187,6 +213,7 @@ public:
 	{
 		return ddgBintreeOffset[l];
 	}
+public:
 
 	/// Return the level of this triangle based on its index.
 	inline static unsigned int level(ddgTriIndex i)
@@ -198,12 +225,12 @@ public:
 		return l;
 	}
 	/// If this is odd (right) or even(left) child in the tree.
-	inline static bool	isRight(ddgTriIndex i)
+	inline static bool isRight(ddgTriIndex i)
 	{
 		return ((i%2) == 1);
 	}
 	/// If this is odd (right) or even(left) child in the tree.
-	inline static bool	isLeft(ddgTriIndex i)
+	inline static bool isLeft(ddgTriIndex i)
 	{
 		return ((i%2) == 0);
 	}
@@ -226,43 +253,12 @@ public:
 	{
 		return right(i)+1;
 	}
+private:
 	/// Return the quad neighbour. If 0 there is no neighbour.
-	inline ddgTriIndex neighbour( ddgTriIndex i)
-	{
-		switch(_mesh->stri[i].edge())
-		{
-		case eINNER:
-			return _mesh->stri[i].neighbour;
-		case eTOP:
-			return _pNeighbourTop ? _mesh->stri[i].neighbour : 0;
-		case eLEFT:
-			return _pNeighbourLeft ? _mesh->stri[i].neighbour : 0;
-		case eDIAG:
-			return _pNeighbourDiag ? _mesh->stri[i].neighbour : 0;
-		default:
-			ddgAsserts(0,"Invalid edge");
-			return 0;
-		}
-	}
+	ddgTriIndex neighbour( ddgTriIndex i);
 	/// Return the bintree of the neighbour.
-	inline ddgTBinTree *neighbourTree( ddgTriIndex i)
-	{
-		switch(_mesh->stri[i].edge())
-		{
-		case eINNER:
-			return this;
-		case eTOP:
-			return _pNeighbourTop;
-		case eLEFT:
-			return _pNeighbourLeft;
-		case eDIAG:
-			return _pNeighbourDiag;
-		default:
-			ddgAsserts(0,"Invalid edge");
-			return 0;
-		}
-	}
-
+	ddgTBinTree *neighbourTree( ddgTriIndex i);
+public:
 	/// Set the cache index for a triangle
 	inline void tcacheId( ddgTriIndex tindex, ddgCacheIndex ci )
 	{
@@ -289,26 +285,20 @@ public:
 	{
 		return _rawMaxVal[tindex];
 	}
+private:
 	/**
 	 *  Return the cache node which stores the extra data for this triangle
 	 *  for the purpose of reading data.  If the cacheIndex = 0, we will
 	 *  get back the default node.
 	 */
-	inline ddgTNode *gnode(ddgTriIndex tindex)
-	{
-		return _mesh->tcache()->get(tcacheId(tindex));
-	}
-
+	ddgTNode *gnode(ddgTriIndex tindex);
 	/**
 	 * Return the cache node which stores the extra data for this triangle,
 	 * for the purpose of setting data.  If the cacheIndex = 0, we redirect
 	 * to the scratch entry.
 	 */
-	inline ddgTNode *snode(ddgTriIndex tindex)
-	{
-		return _mesh->tcache()->get(tcacheId(tindex)?tcacheId(tindex):1);
-	}
-	
+	ddgTNode *snode(ddgTriIndex tindex);
+public:
 	/// Return the objects visibility state.
 	inline ddgVisState vis(ddgTriIndex tindex)				{ return gnode(tindex)->vis(); }
 	/// Set the objects visibility state.
@@ -338,50 +328,16 @@ public:
 	inline ddgCacheIndex qmcacheIndex(ddgTriIndex tindex){ return gnode( tindex)->qmcacheIndex(); }
 	/// Set split cache index if any.
 	inline void qmcacheIndex(ddgTriIndex tindex, ddgCacheIndex i) { snode( tindex)->qmcacheIndex(i); }
-	
-	/// Return the height of a location on the mesh.
-    inline float height(ddgTriIndex tindex)
-    {
-        return // _cacheIndex[tindex] ? gnode( tindex)->height() :
-			 _mesh->wheight(_rawHeight[tindex]); 
-    }
-	/// Return the height of a location on the mesh.
-    inline float minVal(ddgTriIndex tindex)
-    {
-        return // _cacheIndex[tindex] ? gnode( tindex)->minHeight() :
-			 _mesh->wheight(_rawMinVal[tindex]); 
-    }
-	/// Return the height of a location on the mesh.
-    inline float maxVal(ddgTriIndex tindex)
-    {
-        return // _cacheIndex[tindex] ? gnode( tindex)->maxHeight() :
-			  _mesh->wheight(_rawMaxVal[tindex]); 
-    }
 
 	/// Return the height of a location on the bintree mesh.
-    inline float heightByPos(unsigned int r, unsigned int c)
-    {
-		// See if we are in the correct tree to find this location.
-		ddgAsserts(r + c <= ddgTBinMesh_size,"Looking for data out of range.");
-
-		ddgTriIndex tindex = _mesh->lookupIndex(r,c);
-		return height(tindex);
-    }
+    float heightByPos(unsigned int r, unsigned int c);
 
     /** Get height of mesh at a real location.
      * Coords should be unscaled in x,z direction.
      */
     float treeHeight(unsigned int r, unsigned int c, float dx, float dz);
     /// Get vertex location in world space from the cache, return the cache index if we have it.
-    inline unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout)
-    {
-		*vout = ddgVector3(mrow(tindex),height(tindex),mcol(tindex));
-
-        if (vbufferIndex(tindex))
-			return 0;
-
-        return vbufferIndex(tindex);
-    }
+    inline unsigned int vertex(ddgTriIndex tindex, ddgVector3 *vout);
 
     /// Get texture coord data, as a value from 0 to 1 on the bintree.
     void textureC(unsigned int tindex, ddgVector2 *vout)
@@ -438,10 +394,7 @@ public:
 	/// Update the merge info for a triangle which is in the mesh.
 	void updateMerge(ddgTriIndex tindex, ddgPriority pr);
 	/// Calculate priority of triangle tindex  We assume that we only get called
-	ddgPriority priorityCalc(ddgTriIndex tindex);
-
-	/// The mesh that manages this bintree.
-	inline ddgTBinMesh *mesh(void) { return _mesh; }
+	ddgPriority priorityCalc(ddgTriIndex tindex, float priorityFactor);
 
 	/// Return the index in the mesh.
 	inline unsigned int index(void) { return _index; }

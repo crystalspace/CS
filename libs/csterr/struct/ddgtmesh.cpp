@@ -33,15 +33,17 @@ ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 	_bintree = new ddgTBinTreeP[_bintreeMax];
 	ddgAsserts(_bintree,"Failed to Allocate memory");
 	ddgMemorySet(ddgTBinTreeP,_bintreeMax);
-	_minDetail = 3000;
-	_maxDetail = 3200;
-	_absMaxDetail = 5000;
+	_minDetail = 4000;
+	_maxDetail = 4200;
+	_absMaxDetail = 8000;
 	_absMaxHeight = -0xFFFF;
 	_absMinHeight = 0xFFFF;
 	_absDiffHeight = 0;
 	// Note Z axis is negative into the screen (Right Handed coord sys).
-	farClip(150);
-	_merge = true;
+	farClip(200);
+	// $TODO get merge working again.
+	_merge = false;
+	_splitRun = true;	// 1st run should be a split only run.
 	_nearClip = 1;
 	// Allocate memory for active triangles.
 	_tcache.init(((_bintreeMax + _absMaxDetail) * 11)/10);  // (# of tiles + #of triangles/frame ) + 10 %
@@ -157,16 +159,17 @@ bool ddgTBinMesh::init( ddgContext *ctx )
 	ddgConsole::s("Creating "); ddgConsole::i(_nc);ddgConsole::s(" x ");ddgConsole::i(_nr);ddgConsole::s(" Tiles");
 	ddgConsole::end();
 
+	ddgTBinTree::initContext(ctx,this);
 	ddgTreeIndex index = 0;
 	for (i = 0; i < _nr; i++)
 	{
 		for (j = 0; j < _nc; j++)
 		{
-			bintree1 = new ddgTBinTree(this,index,i*ddgTBinMesh_size,j*ddgTBinMesh_size);
+			bintree1 = new ddgTBinTree(index,i*ddgTBinMesh_size,j*ddgTBinMesh_size);
 			ddgMemorySet(ddgTBinTree,1);
 			addBinTree(bintree1);
 			index++;
-			bintree2 = new ddgTBinTree(this,index,(i+1)*ddgTBinMesh_size,(j+1)*ddgTBinMesh_size,true);
+			bintree2 = new ddgTBinTree(index,(i+1)*ddgTBinMesh_size,(j+1)*ddgTBinMesh_size,true);
 			ddgMemorySet(ddgTBinTree,1);
 			addBinTree(bintree2);
 			index++;
@@ -189,7 +192,6 @@ bool ddgTBinMesh::init( ddgContext *ctx )
 	}
 
 	// We call this function twice.
-	ddgTBinTree::initContext(ctx,this);
 	for (i = 0; i < _bintreeMax; i++)
 	{
 		if (_bintree[i])
@@ -288,7 +290,7 @@ void ddgTBinMesh::initNeighbours( void )
                 stri[klk+t].neighbour = stri[lk+t].neighbour + lk + b;
             }
     	    // Check Edge cases
-			else if ((b = edge(kt)))
+			else if (b = edge(kt))
 			{
 				if (b==3) // Diagonal.
 				{
@@ -333,51 +335,75 @@ void ddgTBinMesh::initNeighbours( void )
 
 bool ddgTBinMesh::calculate( ddgContext *ctx )
 {
-	static bool lastDirty = true;
-	// Dont do anything if we didnt move and the current frame is done.
-	if (!_dirty && !lastDirty)
+	static ddgVector3 lastForward(0,0,0);
+	static ddgVector3 lastPosition(0,0,0);
+	float	deltaMoveDistance = 0.0;
+	float	deltaViewAngle = 1.0;
+
+	_splitRun = false;
+	// Initialize world to camera space matrix and viewing frustrum. 
+	ddgTBinTree::updateContext(ctx,this);
+
+	// See if we moved.
+	if (lastPosition != ctx->control()->position())
+	{
+		lastPosition -= ctx->control()->position();
+		deltaMoveDistance = lastPosition.size();
+		lastPosition = ctx->control()->position();
+	}
+	// See if we changed our orientation.
+	if (lastForward != ctx->forward())
+	{
+		deltaViewAngle = lastForward.dot(ctx->forward());
+		lastForward.set(ctx->forward());
+		// If the view angle change was greater than ~70 degrees, do a split.
+		if (deltaViewAngle < 0.1)
+			_splitRun = true;
+	}
+
+	// Check if we didn't go anywhere and we have enough detail in the view.
+	if (deltaViewAngle == 1.0 && deltaMoveDistance == 0.0
+		&& _triVis >= _minDetail && _triVis <= _maxDetail)
 		return false;
 
-	lastDirty = false;
-	if (_dirty)
-		lastDirty = true;
-
-	// Initialize world to camera space matrix and viewing frustrum. 
-	ddgTBinTree::initContext(ctx,this);
 	// Calculate visibility info for all triangles currently in the mesh
 	// at the current camera position.
 	// Clear queue.
 	unsigned int i = 0;
-	static bool mergeOn = false;
+
+	// If the merge queue is not active we are only doing splits.
+	if (!merge())
+		_splitRun = true;
 
 	// Reset state in case of split only or if 1st run
 	// with merge enabled.
-	if (!mergeOn || !merge())
+	if (_splitRun)
 	{
-		// If the merge queue was just enabled, reset it.
-		if (merge())
+		// If the merge queue was enabled amd has content, reset it.
+		if (merge() && qmcache()->size())
 		{
 			qmcache()->reset();
 		}
-		if (!merge()||!mergeOn)
-		{
-			qscache()->reset();
-			tcache()->reset();
-			_triVis = 0;
-		}
-		mergeOn = merge();
+		qscache()->reset();
+		tcache()->reset();
+		_triVis = 0;
+
 		i = 0;
 		while (i < _bintreeMax)
 		{
 			if (_bintree[i])
 			{
+				// Clear any cache entries we were holding onto.
+				ddgCacheIndex ci = _bintree[i]->chain();
+				while (ci)
+				{
+					ddgTNode *tn = (ddgTNode*) tcache()->get(ci);
+					_bintree[i]->tcacheId(tn->tindex(), 0);
+					ci = tn->next();
+				}
+
 				// Empty the active triangles chain for the bintree.
 				_bintree[i]->freeChain();
-				// Reset Top level triangles.
-				_bintree[i]->tcacheId(0, 0);
-				_bintree[i]->tcacheId(1, 0);
-				_bintree[i]->tcacheId(triNo(), 0);
-				_bintree[i]->tcacheId(triNo()+1, 0);
 			}
 			i++;
 		}
@@ -395,7 +421,15 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	else 
 	{
 		i = 0;
-
+		while (i < _bintreeMax)
+		{
+			if (_bintree[i])
+			{
+				_bintree[i]->updateSplit(1,ddgUNDEF);
+			}
+			i++;
+		}
+/*
 		unsigned int r, c;
 		// Include a 2 block border.
 		float d = _farClip+2*ddgTBinMesh_size;
@@ -430,16 +464,28 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 					_bintree[i+1]->updateSplit(1,ddgUNDEF);
 				}
 		}
-
+*/
 		// Validate the merge queue.
 		ddgCacheIndex ci = qmcache()->head();
+		// $TODO Dynamically allocate this.
+		static ddgTBinTree * btl[5000];
+		static ddgTriIndex til[5000];
+		int i = 0;
 		while (ci)
 		{
-			// $BUG cannot iterate over this since it modifies the order of items in the queue
+			// Note cannot iterate over this and update directly since
+			// updateMerge modifies the order of items in the queue
 			ddgQNode *qn = qmcache()->get(ci);
-			ddgTBinTree *mbt = getBinTree(qn->tree());
+			btl[i] = getBinTree(qn->tree());
+			til[i] = qn->tindex();
 			ci = qmcache()->next(ci);
-			mbt->updateMerge(qn->tindex(),ddgMAXPRI);
+			i++;
+			ddgAssert(i < 5000);
+		}
+		while(i)
+		{
+			i--;
+			btl[i]->updateMerge(til[i],ddgMAXPRI);
 		}
 
 	}
@@ -451,6 +497,11 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	bool done = false;
 	unsigned int count = 0;
 
+	ddgQNode *qn;
+	ddgTBinTree *sbt = 0, *mbt = 0;
+	ddgTriIndex si = 0, mi = 0;
+	ddgPriority sp, mp;
+	ddgCacheIndex csi, cmi;
 	while (!done)
 	{
 		count++;
@@ -460,27 +511,41 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 			done = true;
 			break;
 		}
-		ddgCacheIndex csi = qscache()->head();
-		ddgQNode *qn = qscache()->get(csi);
-		ddgTBinTree *sbt = getBinTree(qn->tree());
-		ddgTriIndex si = qn->tindex();
-		ddgPriority ps = sbt->priority(si);
+		csi = qscache()->head();
+		sp = 0;
+		if (csi)
+		{
+			qn = qscache()->get(csi);
+			sbt = getBinTree(qn->tree());
+			si = qn->tindex();
+			// Split priority is stored in the tcache.
+			sp = sbt->priority(si);
+#ifdef _DEBUG
+			ddgAssert(sbt->tcacheId(qn->tindex()));
+			ddgTNode *tns = _tcache.get(sbt->tcacheId(qn->tindex()));
+#endif
+		}
 		if (merge())
 		{
-			ddgCacheIndex cmi = qmcache()->head();
+			cmi = qmcache()->head();
 			if (cmi)
 			{
 				qn = qmcache()->get(cmi);
-				ddgTBinTree *mbt = getBinTree(qn->tree());
-				ddgTriIndex mi = qn->tindex();
-				ddgPriority pm = qmcache()->convert(qn->bucket());
-				ddgAssert(ps == 0 || ps == qscache()->convert(qscache()->get(csi)->bucket()));
+				mbt = getBinTree(qn->tree());
+				mi = qn->tindex();
+				// Note merge priority is stored in the queue itself.
+				mp = qmcache()->convert(qn->bucket());
+#ifdef _DEBUG
+				ddgAssert(mbt->tcacheId(qn->tindex()));
+				ddgTNode *tnm = _tcache.get(mbt->tcacheId(qn->tindex()));
+#endif
+				ddgAssert(sp == 0 || sp == qscache()->convert(qscache()->get(csi)->bucket()));
 				if (( _triVis > _maxDetail) // We have too many triangles.
-					|| (pm == 0)			// We have useless merge diamonds, merge these 1st.
+					|| (mp == 0)			// We have useless merge diamonds, merge these 1st.
 										// We are safely beyond the minimum # of triangles, and
 										// there is significant difference between the
 										// priorities of the split and merge queues.
-				  ||(_triVis > minDiff && (ps > pm + priDiff)) )
+				  ||(_triVis > minDiff && (sp > mp + priDiff)) )
 				{
 					ddgAsserts(mi > 0,"Its a root node");
 					mbt->forceMerge(mi);
@@ -501,7 +566,6 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	_balCount = count;
     // Track the number of triangles produced by this calculation.
 	_triCount += _triVis;
-	_dirty = false;
 	return  true;
 }
 
