@@ -128,6 +128,7 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
     return false;
   }
 
+  // @@@ Not really good. G2D may not have been opened yet
   FrameWidth = G2D->GetWidth ();
   FrameHeight = G2D->GetHeight ();
 

@@ -96,7 +96,8 @@ SCF_IMPLEMENT_IBASE (csGLGraphics3D::EventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 
-csGLGraphics3D::csGLGraphics3D (iBase *parent) : isOpen (false)
+csGLGraphics3D::csGLGraphics3D (iBase *parent) : isOpen (false), 
+  wantToSwap (false)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -408,7 +409,7 @@ void csGLGraphics3D::SetupStencil ()
       glClear (GL_STENCIL_BUFFER_BIT);*/
       stencilclipnum = 1;
     }
-    int nv = clipper->GetVertexCount ();
+    size_t nv = clipper->GetVertexCount ();
     csVector2* v = clipper->GetClipPoly ();
 
     statecache->SetShadeModel (GL_FLAT);
@@ -435,7 +436,7 @@ void csGLGraphics3D::SetupStencil ()
     statecache->SetStencilFunc (GL_ALWAYS, 0, stencil_clip_mask);
 
     glBegin (GL_TRIANGLE_FAN);
-    int i;
+    size_t i;
     const float clipVertScaleX = 2.0f / (float)viewwidth;
     const float clipVertScaleY = 2.0f / (float)viewheight;
     for (i = 0 ; i < nv ; i++)
@@ -1113,6 +1114,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   }
   else if (drawflags & CSDRAW_2DGRAPHICS)
   {
+    SwapIfNeeded();
     // Don't set up the 2D stuff if we already are in 2D mode
     if (!(old_drawflags & CSDRAW_2DGRAPHICS))
     {
@@ -1220,12 +1222,22 @@ void csGLGraphics3D::Print (csRect const* area)
     vboManager->ResetFrameStats ();
   }
 
+#ifdef DELAYED_SWAP
+  if (area == 0)
+  {
+    wantToSwap = true;
+    return;
+  }
+  SwapIfNeeded();
+#endif
   G2D->Print (area);
 }
 
 void csGLGraphics3D::DrawLine (const csVector3 & v1, const csVector3 & v2,
 	float fov, int color)
 {
+  SwapIfNeeded();
+
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;
 
@@ -1687,6 +1699,8 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   if (cliptype == CS_CLIPPER_EMPTY) 
     return;
 
+  SwapIfNeeded();
+
   SetupProjection ();
 
   int num_tri = 0;
@@ -1917,6 +1931,8 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, 
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
+  SwapIfNeeded();
+
   /*
     @@@ DrawPixmap is called in 2D mode quite often.
     To reduce state changes, the text drawing states are reset as late
@@ -2170,6 +2186,8 @@ void csGLGraphics3D::RenderRelease (iRenderBuffer* buffer)
 void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
 	const csPlane3& normal)
 {
+  SwapIfNeeded();
+
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
   float M, N, O;
@@ -2200,6 +2218,17 @@ void csGLGraphics3D::Draw2DPolygon (csVector2* poly, int num_poly,
     vt++;
   }
   glEnd ();
+}
+
+void csGLGraphics3D::SwapIfNeeded()
+{
+#ifdef DELAYED_SWAP
+  if (wantToSwap)
+  {
+    G2D->Print (0);
+    wantToSwap = false;
+  }
+#endif
 }
 
 void csGLGraphics3D::SetupClipPortals ()
@@ -2687,6 +2716,7 @@ void csOpenGLHalo::DeleteTexture ()
 void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   csVector2 *iVertices, int iVertCount)
 {
+  //G3D->SwapIfNeeded();
   int swidth = G3D->GetWidth ();
   int sheight = G3D->GetHeight ();
   int i;

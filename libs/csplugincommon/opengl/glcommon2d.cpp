@@ -39,7 +39,7 @@ SCF_IMPLEMENT_IBASE_EXT_END
   
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   csGraphics2D (iParent), statecache (0), statecontext (0), 
-    hasRenderTarget (false)
+    hasRenderTarget (false), vpSet(false)
 {
   EventOutlet = 0;
   screen_shot = 0;
