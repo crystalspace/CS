@@ -23283,6 +23283,11 @@ fi
 
 fi
 
+else
+  { echo "$as_me:$LINENO:
+*** zlib not found. It is essential, CS will not build without zlib." >&5
+echo "$as_me:
+*** zlib not found. It is essential, CS will not build without zlib." >&6;}
 fi
 
 

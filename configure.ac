@@ -1197,7 +1197,9 @@ CS_CHECK_BUILD([for waveout], [cs_cv_libwaveout],
 CS_CHECK_LIB_WITH([z],
     [AC_LANG_PROGRAM([[#include <zlib.h>]], [zlibVersion()])],
     [$srcdir/libs/zlib*], [], [CS_EMIT_BUILD_RESULT([cs_cv_libz], [ZLIB])],
-    [], [], [], [], [zlib])
+    [AC_MSG_NOTICE([
+*** zlib not found. It is essential, CS will not build without zlib.])], 
+    [], [], [], [zlib])
 
 
 
