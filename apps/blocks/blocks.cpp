@@ -2228,14 +2228,16 @@ void Blocks::InitEngine ()
   InitDemoRoom ();
   Sys->engine->Prepare ();
 
-//#undef DO_SOUND
-#ifdef DO_SOUND
-  // Load the blocks.zip library where sound refs are stored
-  LevelLoader->LoadLibraryFile ("/data/blocks/Library");
-  iSoundWrapper* w = GET_NAMED_CHILD_OBJECT (
-    engine->QueryObject (), iSoundWrapper, "background.wav");
-  if (w) w->GetSound ()->Play (true);
-#endif
+  iSoundRender *snd = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
+  if (snd)
+  {
+    // Load the blocks.zip library where sound refs are stored
+    LevelLoader->LoadLibraryFile ("/data/blocks/Library");
+    iSoundWrapper* w = GET_NAMED_CHILD_OBJECT (
+      engine->QueryObject (), iSoundWrapper, "background.wav");
+    if (w) w->GetSound ()->Play (true);
+    snd->DecRef (); 
+  }
 }
 
 void Blocks::StartDemo ()

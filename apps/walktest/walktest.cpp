@@ -1543,15 +1543,16 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   wf = new csWireFrameCam (txtmgr);
 
   // Load a few sounds.
-#ifdef DO_SOUND
-  iSoundWrapper *w = GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
-    iSoundWrapper, "boom.wav");
-  wMissile_boom = w ? w->GetSound () : NULL;
+  if (mySound)
+  {
+    iSoundWrapper *w = GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
+      iSoundWrapper, "boom.wav");
+    wMissile_boom = w ? w->GetSound () : NULL;
 
-  w = GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
-    iSoundWrapper, "whoosh.wav");
-  wMissile_whoosh = w ? w->GetSound () : NULL;
-#endif
+    w = GET_NAMED_CHILD_OBJECT_FAST (Engine->QueryObject (),
+      iSoundWrapper, "whoosh.wav");
+    wMissile_whoosh = w ? w->GetSound () : NULL;
+   }
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
   if (myConsole)
