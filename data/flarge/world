@@ -69,6 +69,7 @@ WORLD (
     MATERIAL 'sky' (TEXTURE ('sky.gif'))
     MATERIAL 'misty' (TEXTURE ('misty.gif'))
     MATERIAL 'blobby' (TEXTURE ('blobby.jpg'))
+    MATERIAL 'green_color' (COLOR (0,1,0))
   )
   RENDERPRIORITIES (
     PRIORITY 'sky' (1,NONE)
@@ -207,7 +208,7 @@ WORLD (
   MESHFACT 'sprSkelFact' (
     PLUGIN ('spr3dFact')
     PARAMS (
-      MATERIAL ('robot')
+      MATERIAL ('green_color')
       FRAME 'f1' (
       	V (-.1,-1, .1:.5,.5)
       	V ( .1,-1, .1:0,.5)
