@@ -75,35 +75,26 @@ static bool RegisterServer (char *SharedLibraryFilename, csConfigFile &cfg,
     fflush (stdout);
   } /* endif */
 
-  char name [200], base [200], filename[200];
-  char *tmp, *tmp2;
-
-  // copy file name
-  strcpy (filename, SharedLibraryFilename);
-
-  // find beginning of base file name
-  tmp = filename + strlen (filename);
-  while ((tmp > filename)
+  char name [200], base [200];
+  char *tmp = SharedLibraryFilename + strlen (SharedLibraryFilename);
+  while ((tmp > SharedLibraryFilename)
       && (tmp [-1] != '/')
       && (tmp [-1] != PATH_SEPARATOR))
     tmp--;
+
   if ((tmp [0] == 'l')
    && (tmp [1] == 'i')
    && (tmp [2] == 'b'))
     tmp += 3;
-
-  // remove extension
-  if ((tmp2 = strchr (tmp, '.')))
-    *tmp2 = 0;
-
-  // copy base file name and compute SCF function name
   strcpy (base, tmp);
+  if ((tmp = strchr (base, '.')))
+    *tmp = 0;
   strcpy (name, base);
   strcat (name, "_scfInitialize");
 
-  csLibraryHandle Handle = csFindLoadLibrary (filename);
+  csLibraryHandle Handle = csFindLoadLibrary (base);
   if (!Handle)
-    Handle = csLoadLibrary (filename);
+    Handle = csLoadLibrary (base);
 
   if (!Handle)
   {
@@ -171,7 +162,7 @@ static bool RegisterServer (char *SharedLibraryFilename, csConfigFile &cfg,
     {
       char text [1000];
       bool AddComment = !cfg.KeyExists (ClassTable->ClassID);
-      strcpy (text, filename);
+      strcpy (text, base);
       if (ClassTable->Dependencies)
       {
         strcat (text, ":");
