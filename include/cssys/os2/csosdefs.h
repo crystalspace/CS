@@ -101,7 +101,7 @@
 
 #ifdef SYSDEF_MKDIR
 #  if defined (__EMX__)
-#    define MKDIR(path) mkdir (path, 0644)
+#    define MKDIR(path) mkdir (path, 0755)
 #  else
 #    define MKDIR(path) _mkdir (path)
 #  endif

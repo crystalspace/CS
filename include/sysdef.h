@@ -183,7 +183,7 @@
 #    if defined(OS_WIN32) || (defined(OS_DOS) && !defined(COMP_GCC))
 #      define MKDIR(path) _mkdir (path)
 #    else
-#      define MKDIR(path) mkdir (path, 0644)
+#      define MKDIR(path) mkdir (path, 0755)
 #    endif
 #  endif
 #endif // SYSDEF_MKDIR
