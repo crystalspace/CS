@@ -74,12 +74,11 @@ rm -rf "$RPM_BUILD_ROOT"
 /usr/local/crystal/include/csappframe/*.h
 /usr/local/crystal/include/csgeom/*.h
 /usr/local/crystal/include/csgfx/*.h
+/usr/local/crystal/include/cstool/*.h
 /usr/local/crystal/include/csutil/*.h
 /usr/local/crystal/include/csutil/macosx/*.h
 /usr/local/crystal/include/csutil/unix/*.h
 /usr/local/crystal/include/csutil/win32/*.h
-/usr/local/crystal/include/cstool/*.h
-/usr/local/crystal/include/csutil/*.h
 /usr/local/crystal/include/csws/*.h
 /usr/local/crystal/include/iaws/*.h
 /usr/local/crystal/include/iengine/*.h
