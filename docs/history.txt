@@ -8,6 +8,16 @@ The history order is reversed so that new features are at the top.
 	  the load. Since I don't fully understand neither the original
 	  nor the new code I decided to revert the changes for now.
 	- Small cosmetic change to csEngine::SelectRegion().
+	- Added iLoader::FindMaterial() and iLoader::FindSector(). These
+	  functions are relevant while busy loading a world. They correctly
+	  take account of the value of ResolveOnlyRegion which is given
+	  to iLoader::LoadMapFile().
+	- Modified the functions in the syntax loader services to correctly
+	  use the new functions in iLoader. This makes region loading useful
+	  again. The presence of iLoader is still optional though. If the
+	  loader cannot be found in the registry the syntax services will
+	  simply use the engine to find the material (ignoring
+	  region information).
 	- Eric Sunshine fixed a small error in winconf.bat where it was not
 	  properly making use of the result of its Bash quote-test.  (Was
 	  invoking the wrong filename.)

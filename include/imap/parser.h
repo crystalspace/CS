@@ -26,6 +26,8 @@
 
 struct iTextureHandle;
 struct iTextureWrapper;
+struct iMaterialWrapper;
+struct iSector;
 struct iSoundData;
 struct iSoundHandle;
 struct iMeshWrapper;
@@ -44,9 +46,10 @@ struct iSoundWrapper;
 #define CS_LOADER_NOTRANSFORM	0x00000004
 
 
-SCF_VERSION (iLoader, 0, 0, 1);
+SCF_VERSION (iLoader, 0, 0, 2);
+
 /**
- * This interface will replace iLoader somewhere in the future.
+ * This interface represents the map loader.
  */
 struct iLoader : public iBase
 {
@@ -105,6 +108,21 @@ struct iLoader : public iBase
    * The mesh object is not automatically added to the engine and sector.
    */
   virtual iMeshWrapper* LoadMeshObject (const char* fname) = 0;
+
+  /**
+   * Find a material relevant for our current loading session.
+   * The behaviour of this is dependent on the value of ResolveOnlyRegion
+   * given to LoadMapFile() above.
+   */
+  virtual iMaterialWrapper* FindMaterial (const char *iName) = 0;
+
+  /**
+   * Find a sector relevant for our current loading session.
+   * The behaviour of this is dependent on the value of ResolveOnlyRegion
+   * given to LoadMapFile() above.
+   */
+  virtual iSector* FindSector (const char *iName) = 0;
 };
 
 #endif // __IMAP_PARSER_H__
+

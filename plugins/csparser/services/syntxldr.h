@@ -35,6 +35,7 @@ struct iThingState;
 struct iEngine;
 struct iMaterialWrapper;
 struct iReporter;
+struct iLoader;
 
 class csTextSyntaxService : public iSyntaxService
 {
@@ -44,8 +45,11 @@ protected:
   csString text;
   iObjectRegistry* object_reg;
   iReporter* reporter;
+  iLoader* loader;
 
   void OptimizePolygon (iPolygon3D *p);
+
+  iMaterialWrapper* FindMaterial (iEngine* engine, const char* name);
 
 public:
 

@@ -119,7 +119,7 @@ private:
   /// -----------------------------------------------------------------------
  
   /// Find a sector (in engine or region).
-  iSector* FindSector (const char* name);
+  virtual iSector* FindSector (const char* name);
 
   /// Parse a matrix definition
   bool ParseMatrix (char* buf, csMatrix3 &m);
@@ -229,7 +229,7 @@ private:
   bool LoadMap (char* buf);
 
   /// Find a material (and create one from texture if possible)
-  iMaterialWrapper* FindMaterial (const char *iName);
+  virtual iMaterialWrapper* FindMaterial (const char *iName);
 
   /**
    * Print an error about an unknown token. 'object' is the type of object

@@ -40,6 +40,7 @@
 #include "imesh/object.h"
 #include "iutil/object.h"
 #include "ivaria/reporter.h"
+#include "imap/parser.h"
 
 CS_IMPLEMENT_PLUGIN;
 
@@ -140,11 +141,13 @@ csTextSyntaxService::csTextSyntaxService (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
 
   reporter = NULL;
+  loader = NULL;
 }
 
 csTextSyntaxService::~csTextSyntaxService ()
 {
   SCF_DEC_REF (reporter);
+  SCF_DEC_REF (loader);
 }
 
 bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
@@ -152,6 +155,17 @@ bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)
   csTextSyntaxService::object_reg = object_reg;
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
   return true;
+}
+
+iMaterialWrapper* csTextSyntaxService::FindMaterial (iEngine* engine,
+	const char* name)
+{
+  if (!loader)
+    loader = CS_QUERY_REGISTRY (object_reg, iLoader);
+  if (loader)
+    return loader->FindMaterial (name);
+  else
+    return engine->GetMaterialList ()->FindByName (name);
 }
 
 bool csTextSyntaxService::ParseMatrix (char *buf, csMatrix3 &m)
@@ -669,9 +683,7 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       case CS_TOKEN_MATERIAL:
         csScanStr (params, "%s", str);
-	//@@@ REGION SUPPORT? (below)
-        mat = engine->GetMaterialList ()->
-		FindByName (str/*@@@, onlyRegion*/);
+        mat = FindMaterial (engine, str);
         if (mat == NULL)
         {
           ReportError (reporter, "crystalspace.syntax.polygon",
