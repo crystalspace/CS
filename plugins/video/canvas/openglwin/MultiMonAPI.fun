@@ -1,6 +1,6 @@
 FUNC_GROUP_BEGIN(MultiMon)
   FUNC(HMONITOR, MonitorFromWindow, (HWND hWnd, DWORD dwFlags))
-  FUNC(BOOL, GetMonitorInfoA, (HMONITOR monitor, LPMONITORINFOA lpmi))
+  FUNC(BOOL, GetMonitorInfoA, (HMONITOR monitor, void* lpmi))
 FUNC_GROUP_END
 
 #undef FUNC_GROUP_BEGIN

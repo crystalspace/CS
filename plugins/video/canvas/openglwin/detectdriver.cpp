@@ -43,7 +43,6 @@ DECLARE_HANDLE(HMONITOR);
 #endif
 
 typedef MONITORINFOEXA* LPMONITORINFOEXA; 
-typedef void* LPMONITORINFOA;
 #define MONITOR_DEFAULTTONEAREST  2
 
 #endif
@@ -221,7 +220,7 @@ void csDetectDriver::DoDetection (HWND window, HDC dc)
       {
 	memset (&mi, 0, sizeof (mi));
 	mi.cbSize = sizeof (mi);
-	if (MultiMon::GetMonitorInfoA (monitor, (LPMONITORINFOA)&mi))
+	if (MultiMon::GetMonitorInfoA (monitor, &mi))
 	{
 	  screenDevice.Replace (mi.szDevice);
 	}

@@ -28,6 +28,8 @@ chronological order.
 	- Jorrit added a new iGraphics3D->SetOption() so that you can set
 	  renderer specific options from within the application. Implemented
 	  the "StencilThreshold" option for the NR GL renderer.
+	- res fixed a compile error in the glwin32 driver detection on some 
+	  older MinGW versions.
 17-Jun-2004
 	- Jorrit changed g3d->ClosePortal() to also have a new use_zfill_portal
 	  flag. When this flag is set the renderer will zfill the portal area.
