@@ -46,6 +46,7 @@ struct csRGBcolor;
 class csColor;
 
 struct iImageIO;
+struct iObjectModel;
 struct iSoundLoader;
 struct iEngine;
 struct iVFS;
@@ -88,11 +89,13 @@ enum
   XMLTOKEN_ATTENUATION,
   XMLTOKEN_ATTENUATIONVECTOR,
   XMLTOKEN_BADOCCLUDER,
+  XMLTOKEN_BOX,
   XMLTOKEN_CAMERA,
   XMLTOKEN_CENTER,
   XMLTOKEN_CLEARZBUF,
   XMLTOKEN_CLEARSCREEN,
   XMLTOKEN_CLOSED,
+  XMLTOKEN_COLLDET,
   XMLTOKEN_COLLECTION,
   XMLTOKEN_COLOR,
   XMLTOKEN_CONVEX,
@@ -127,6 +130,7 @@ enum
   XMLTOKEN_MATERIALS,
   XMLTOKEN_MATRIX,
   XMLTOKEN_MAXLIGHTMAPSIZE,
+  XMLTOKEN_MESH,
   XMLTOKEN_MESHFACT,
   XMLTOKEN_MESHLIB,
   XMLTOKEN_MESHOBJ,
@@ -141,6 +145,7 @@ enum
   XMLTOKEN_PARAMSFILE,
   XMLTOKEN_PLUGIN,
   XMLTOKEN_PLUGINS,
+  XMLTOKEN_POLYMESH,
   XMLTOKEN_POSITION,
   XMLTOKEN_PRIORITY,
   XMLTOKEN_PROCTEX,
@@ -162,6 +167,7 @@ enum
   XMLTOKEN_MATSET,
   XMLTOKEN_UP,
   XMLTOKEN_V,
+  XMLTOKEN_VISCULL,
   XMLTOKEN_WORLD,
   XMLTOKEN_IMPOSTER,
   XMLTOKEN_ZFILL,
@@ -392,6 +398,8 @@ private:
   /// Find the named shared variable and verify its type if specified
   iSharedVariable *FindSharedVariable(const char *colvar,
 				      int verify_type );
+  /// Parse a 'polymesh' block.
+  bool ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel);
 
   /// -----------------------------------------------------------------------
 

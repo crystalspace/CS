@@ -30,6 +30,21 @@ The history order is reversed so that new features are at the top.
 	- Fixed csMeshObject default implementation a bit. The bounding box
 	  stuff was not very good and the functions were not virtual so it
 	  was not possible to override them.
+	- It is now possible to specify alternative polygon meshes for
+	  objects in the map file. Here is an example:
+	    <polymesh>
+                <box>
+                    <min x="-1" y="-1" z="-1" />
+                    <max x="1" y="4" z="1" />
+                </box>
+	        <colldet />
+	    </polymesh>
+	  Add this inside a 'meshfact' or 'meshobj'. It will make a box
+	  mesh for the object at the given object-space coordinates.
+	  The mesh will be used for collision detection. If you want to use
+	  this mesh for visibility occlusion you can use the <viscull />
+	  keyword instead (or both). Check out data/flarge/world for an
+	  example.
 14-Apr-2003
 	- Philip Wyett removed makedep entry under apps/tools for Jam. This
 	  is no longer needed after recent changes.

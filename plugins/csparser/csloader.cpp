@@ -77,6 +77,8 @@
 #include "imesh/mdldata.h"
 #include "imesh/crossbld.h"
 #include "ivaria/reporter.h"
+#include "igeom/polymesh.h"
+#include "igeom/objmodel.h"
 
 #ifdef CS_USE_NEW_RENDERER
 #include "ivideo/shader/shader.h"
@@ -701,11 +703,13 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("attenuationvec", XMLTOKEN_ATTENUATIONVECTOR);
 #endif // CS_USE_NEW_RENDERER
   xmltokens.Register ("badoccluder", XMLTOKEN_BADOCCLUDER);
+  xmltokens.Register ("box", XMLTOKEN_BOX);
   xmltokens.Register ("camera", XMLTOKEN_CAMERA);
   xmltokens.Register ("center", XMLTOKEN_CENTER);
   xmltokens.Register ("clearzbuf", XMLTOKEN_CLEARZBUF);
   xmltokens.Register ("clearscreen", XMLTOKEN_CLEARSCREEN);
   xmltokens.Register ("closed", XMLTOKEN_CLOSED);
+  xmltokens.Register ("colldet", XMLTOKEN_COLLDET);
   xmltokens.Register ("collection", XMLTOKEN_COLLECTION);
   xmltokens.Register ("color", XMLTOKEN_COLOR);
   xmltokens.Register ("convex", XMLTOKEN_CONVEX);
@@ -740,6 +744,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("materials", XMLTOKEN_MATERIALS);
   xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
   xmltokens.Register ("maxlightmapsize", XMLTOKEN_MAXLIGHTMAPSIZE);
+  xmltokens.Register ("mesh", XMLTOKEN_MESH);
   xmltokens.Register ("meshfact", XMLTOKEN_MESHFACT);
   xmltokens.Register ("meshlib", XMLTOKEN_MESHLIB);
   xmltokens.Register ("meshobj", XMLTOKEN_MESHOBJ);
@@ -755,6 +760,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
   xmltokens.Register ("plugins", XMLTOKEN_PLUGINS);
   xmltokens.Register ("position", XMLTOKEN_POSITION);
+  xmltokens.Register ("polymesh", XMLTOKEN_POLYMESH);
   xmltokens.Register ("priority", XMLTOKEN_PRIORITY);
   xmltokens.Register ("proctex", XMLTOKEN_PROCTEX);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
@@ -774,6 +780,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("type", XMLTOKEN_TYPE);
   xmltokens.Register ("up", XMLTOKEN_UP);
   xmltokens.Register ("v", XMLTOKEN_V);
+  xmltokens.Register ("viscull", XMLTOKEN_VISCULL);
   xmltokens.Register ("world", XMLTOKEN_WORLD);
   xmltokens.Register ("imposter", XMLTOKEN_IMPOSTER);
   xmltokens.Register ("zfill", XMLTOKEN_ZFILL);
@@ -1255,6 +1262,137 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
   return true;
 }
 
+// Private class implementing iPolygonMesh for one cube.
+// This will be used for gravity collider.
+class PolygonMeshCube : public iPolygonMesh
+{
+private:
+  csVector3 vertices[8];
+  csMeshedPolygon polygons[6];
+  int vertex_indices[4*6];
+
+public:
+  PolygonMeshCube (const csVector3& bmin, const csVector3& bmax)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    vertices[0].Set (bmin.x, bmin.y, bmin.z);
+    vertices[1].Set (bmax.x, bmin.y, bmin.z);
+    vertices[2].Set (bmin.x, bmin.y, bmax.z);
+    vertices[3].Set (bmax.x, bmin.y, bmax.z);
+    vertices[4].Set (bmin.x, bmax.y, bmin.z);
+    vertices[5].Set (bmax.x, bmax.y, bmin.z);
+    vertices[6].Set (bmin.x, bmax.y, bmax.z);
+    vertices[7].Set (bmax.x, bmax.y, bmax.z);
+    int i;
+    for (i = 0 ; i < 6 ; i++)
+    {
+      polygons[i].num_vertices = 4;
+      polygons[i].vertices = &vertex_indices[i*4];
+    }
+    vertex_indices[0*4+0] = 4;
+    vertex_indices[0*4+1] = 5;
+    vertex_indices[0*4+2] = 1;
+    vertex_indices[0*4+3] = 0;
+    vertex_indices[1*4+0] = 5;
+    vertex_indices[1*4+1] = 7;
+    vertex_indices[1*4+2] = 3;
+    vertex_indices[1*4+3] = 1;
+    vertex_indices[2*4+0] = 7;
+    vertex_indices[2*4+1] = 6;
+    vertex_indices[2*4+2] = 2;
+    vertex_indices[2*4+3] = 3;
+    vertex_indices[3*4+0] = 6;
+    vertex_indices[3*4+1] = 4;
+    vertex_indices[3*4+2] = 0;
+    vertex_indices[3*4+3] = 2;
+    vertex_indices[4*4+0] = 6;
+    vertex_indices[4*4+1] = 7;
+    vertex_indices[4*4+2] = 5;
+    vertex_indices[4*4+3] = 4;
+    vertex_indices[5*4+0] = 0;
+    vertex_indices[5*4+1] = 1;
+    vertex_indices[5*4+2] = 3;
+    vertex_indices[5*4+3] = 2;
+  }
+  virtual ~PolygonMeshCube () { }
+
+  SCF_DECLARE_IBASE;
+
+  virtual int GetVertexCount () { return 8; }
+  virtual csVector3* GetVertices () { return vertices; }
+  virtual int GetPolygonCount () { return 6; }
+  virtual csMeshedPolygon* GetPolygons () { return polygons; }
+  virtual void Cleanup () { }
+  virtual bool IsDeformable () const { return false; }
+  virtual uint32 GetChangeNumber () const { return 0; }
+};
+
+SCF_IMPLEMENT_IBASE (PolygonMeshCube)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
+bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
+{
+  csRef<iPolygonMesh> polymesh;
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  bool colldet = false;
+  bool viscull = false;
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_BOX:
+        {
+	  csBox3 b;
+	  if (!SyntaxService->ParseBox (child, b))
+	    return false;
+	  polymesh = csPtr<iPolygonMesh> (
+	  	new PolygonMeshCube (b.Min (), b.Max ()));
+	}
+        break;
+      case XMLTOKEN_MESH:
+	SyntaxService->ReportError (
+	  "crystalspace.maploader.parse.polymesh",
+	  child, "<mesh> not yet implemented!");
+	return false;
+        break;
+      case XMLTOKEN_COLLDET:
+        colldet = true;
+	break;
+      case XMLTOKEN_VISCULL:
+        viscull = true;
+	break;
+      default:
+	SyntaxService->ReportBadToken (child);
+        return false;
+    }
+  }
+  if (!colldet && !viscull)
+  {
+    SyntaxService->ReportError (
+	"crystalspace.maploader.parse.polymesh",
+	node, "Please specify either <viscull/> or <colldet/>!");
+    return false;
+  }
+  if (!polymesh)
+  {
+    SyntaxService->ReportError (
+	"crystalspace.maploader.parse.polymesh",
+	node, "Please specify either <box> or <mesh>!");
+    return false;
+  }
+  if (colldet)
+    objmodel->SetPolygonMeshColldet (polymesh);
+  if (viscull)
+    objmodel->SetPolygonMeshViscull (polymesh);
+
+  return true;
+}
+
 bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	iDocumentNode* node, csReversibleTransform* transf)
 {
@@ -1400,6 +1538,32 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  }
         }
         break;
+
+      case XMLTOKEN_POLYMESH:
+        {
+	  if (!stemp->GetMeshObjectFactory ())
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshfactory",
+              child, "Please use 'params' before specifying 'polymesh'!");
+	    return false;
+	  }
+	  iObjectModel* objmodel = stemp->GetMeshObjectFactory ()
+	  	->GetObjectModel ();
+	  if (!objmodel)
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.meshfactory", child,
+	      "This factory doesn't support setting of other 'polymesh'!");
+	    return false;
+	  }
+	  if (!ParsePolyMesh (child, objmodel))
+	  {
+	    // Error already reported.
+	    return false;
+	  }
+	}
+	break;
 
       case XMLTOKEN_MATERIAL:
         {
@@ -2112,6 +2276,31 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 
         }
         break;
+
+      case XMLTOKEN_POLYMESH:
+        {
+	  if (!mesh->GetMeshObject ())
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.mesh",
+              child, "Please use 'params' before specifying 'polymesh'!");
+	    return false;
+	  }
+	  iObjectModel* objmodel = mesh->GetMeshObject ()->GetObjectModel ();
+	  if (!objmodel)
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.mesh", child,
+	      "This mesh doesn't support setting of other 'polymesh'!");
+	    return false;
+	  }
+	  if (!ParsePolyMesh (child, objmodel))
+	  {
+	    // Error already reported.
+	    return false;
+	  }
+	}
+	break;
 
       case XMLTOKEN_PLUGIN:
 	{

@@ -5660,6 +5660,13 @@
             <move>
                 <v x="-10" y="-1" z="14" />
             </move>
+	    <polymesh>
+                <box>
+                    <min x="-1" y="-1" z="-1" />
+                    <max x="1" y="4" z="1" />
+                </box>
+	        <colldet />
+	    </polymesh>
         </meshobj>
         <light>
             <center x="3.5" y="2" z="12.5" />
