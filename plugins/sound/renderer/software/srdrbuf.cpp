@@ -24,75 +24,67 @@
 #include "cssndrdr/software/srdrsrc.h"
 #include "isystem.h"
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundBufferSoftware)
+IMPLEMENT_FACTORY (csSoundBufferSoftware)
 
-BEGIN_INTERFACE_TABLE(csSoundBufferSoftware)
-  IMPLEMENTS_INTERFACE(ISoundBuffer)
-END_INTERFACE_TABLE()
+EXPORT_CLASS_TABLE (glwin32)
+  EXPORT_CLASS (csSoundBufferSoftware, "crystalspace.sound.render.software",
+    "Software sound driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-csSoundBufferSoftware::csSoundBufferSoftware()
+IMPLEMENT_IBASE(csSoundBufferSoftware)
+  IMPLEMENTS_INTERFACE(iSoundBuffer)
+IMPLEMENT_IBASE_END;
+
+csSoundBufferSoftware::csSoundBufferSoftware(iBase *piBase)
 {
+	CONSTRUCT_IBASE(piBase);
 }
 
 csSoundBufferSoftware::~csSoundBufferSoftware()
 {
 }
 
-STDMETHODIMP csSoundBufferSoftware::CreateSource(ISoundSource** ppv)
+iSoundSource *csSoundBufferSoftware::CreateSource()
 {
-  csSoundSourceSoftware* pNew = new csSoundSourceSoftware ();
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
+  csSoundSourceSoftware* pNew = new csSoundSourceSoftware (NULL);
+  if(!pNew) return NULL;
 
   pNew->pSoundBuffer = this;
 
-  return pNew->QueryInterface (IID_ISoundSource, (void**)ppv);
+  return QUERY_INTERFACE(pNew, iSoundSource);
 }
 
-STDMETHODIMP csSoundBufferSoftware::Play(SoundBufferPlayMethod playMethod)
+void csSoundBufferSoftware::Play(SoundBufferPlayMethod playMethod)
 {
   setStarted(true);
   if(playMethod == SoundBufferPlay_InLoop)
     inLoop(true);
   else
     inLoop(false);
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundBufferSoftware::Stop()
+void csSoundBufferSoftware::Stop()
 {
-  return S_OK;
 }
 
-STDMETHODIMP csSoundBufferSoftware::SetVolume(float vol)
+void csSoundBufferSoftware::SetVolume(float vol)
 {
   fVolume = vol;
-
   setVolume(fVolume);
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundBufferSoftware::GetVolume(float &vol)
+float csSoundBufferSoftware::GetVolume()
 {
-  vol = Channel::Volume;
-
-  return S_OK;
+  return Channel::Volume;
 }
 
-STDMETHODIMP csSoundBufferSoftware::SetFrequencyFactor(float factor)
+void csSoundBufferSoftware::SetFrequencyFactor(float factor)
 {
   fFrequencyFactor = factor;
-  return S_OK;
 }
 
-STDMETHODIMP csSoundBufferSoftware::GetFrequencyFactor(float &factor)
+float csSoundBufferSoftware::GetFrequencyFactor()
 {
-  factor = fFrequencyFactor;
-  return S_OK;
+  return fFrequencyFactor;
 }
 

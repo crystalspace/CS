@@ -17,13 +17,19 @@
 	License along with this library; if not, write to the Free
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#include <stdio.h>
-#include <windows.h>
 
+#include <objbase.h>
+#include <stdlib.h>
+#include <cguid.h>
+
+/* the A3D include file */
+#include <initguid.h>
 #include "ia3dapi.h"
+#include "ia3dutil.h"
 
 #include "sysdef.h"
 #include "csutil/scf.h"
+#include "ia3dapi.h"
 #include "cssndrdr/a3d/sndrdr.h"
 #include "cssndrdr/a3d/sndlstn.h"
 #include "cssndrdr/a3d/sndbuf.h"
@@ -33,169 +39,159 @@
 #include "isndsrc.h"
 #include "isndbuf.h"
 
+IMPLEMENT_FACTORY(csSoundRenderA3D);
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundRenderA3D)
+EXPORT_CLASS_TABLE (sndrdra3d)
+EXPORT_CLASS (csSoundRenderA3D, "crystalspace.sound.render.a3d",
+			  "Aureal 3D Sound Driver for Crystal Space")
+EXPORT_CLASS_TABLE_END;
 
-BEGIN_INTERFACE_TABLE(csSoundRenderA3D)
-  IMPLEMENTS_INTERFACE(ISoundRender)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE(csSoundRenderA3D)
+	IMPLEMENTS_INTERFACE(iSoundRender)
+	IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE_END;
 
-csSoundRenderA3D::csSoundRenderA3D(iSystem* piSystem) : m_pListener(NULL)
+csSoundRenderA3D::csSoundRenderA3D(iBase *piBase)
 {
-  m_p3DAudioRenderer = NULL;
-  m_piSystem = piSystem;
-  
-  m_pListener = new csSoundListenerA3D ();
+	CONSTRUCT_IBASE(piBase);
+	m_pListener = NULL;
+	m_piSystem = NULL;
+	m_pListener = NULL;
+}
+
+bool csSoundRenderA3D::Initialize(iSystem *iSys)
+{
+	if (!iSys->RegisterDriver ("iSoundRender", this))
+		return false;
+	
+	m_p3DAudioRenderer = NULL;
+	m_piSystem = iSys;
+	m_pListener = new csSoundListenerA3D(NULL);
+	return true;
 }
 
 csSoundRenderA3D::~csSoundRenderA3D()
 {
-  if(m_pListener)
-    delete m_pListener;
+	if(m_pListener)
+		delete m_pListener;
 }
 
-STDMETHODIMP csSoundRenderA3D::GetListener(ISoundListener** ppv )
+iSoundListener *csSoundRenderA3D::GetListener()
 {
-  if (!m_pListener)
-  {
-    *ppv = NULL;
-    return E_OUTOFMEMORY;
-  }
-  
-  return m_pListener->QueryInterface (IID_ISoundListener, (void**)ppv);
+	if (!m_pListener) return NULL;
+	return QUERY_INTERFACE(m_pListener, iSoundListener);
 }
 
-STDMETHODIMP csSoundRenderA3D::CreateSource(ISoundSource** ppv, csSoundData *snd)
+iSoundSource *csSoundRenderA3D::CreateSource(csSoundData *snd)
 {
-  csSoundBufferA3D* pNew = new csSoundBufferA3D ();
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-
-  pNew->CreateSoundBuffer(this, snd);
-  pNew->SetVolume (1.0);
-
-  return pNew->CreateSource(ppv);
+	csSoundBufferA3D* pNew = new csSoundBufferA3D (NULL);
+	if (!pNew) return NULL;
+	pNew->CreateSoundBuffer(this, snd);
+	pNew->SetVolume (1.0);
+	return pNew->CreateSource();
 }
 
-STDMETHODIMP csSoundRenderA3D::CreateSoundBuffer(ISoundBuffer** ppv, csSoundData *snd)
+iSoundBuffer *csSoundRenderA3D::CreateSoundBuffer(csSoundData *snd)
 {
-  csSoundBufferA3D* pNew = new csSoundBufferA3D ();
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-
-  pNew->CreateSoundBuffer(this, snd);
-  pNew->SetVolume (1.0);
-  
-  return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+	csSoundBufferA3D* pNew = new csSoundBufferA3D (NULL);
+	if (!pNew) return NULL;
+	
+	pNew->CreateSoundBuffer(this, snd);
+	pNew->SetVolume (1.0);
+	
+	return QUERY_INTERFACE(pNew, iSoundBuffer);
 }
 
-STDMETHODIMP csSoundRenderA3D::Open()
+bool csSoundRenderA3D::Open()
 {
-  HRESULT hr;
-  
-  SysPrintf (MSG_INITIALIZATION, "\nSoundRender Aureal3D selected\n");
-
+	HRESULT hr;
+	
+	SysPrintf (MSG_INITIALIZATION, "\nSoundRender Aureal3D selected\n");
+	
 	CoInitialize(NULL);
-
+	
 	hr = CoCreateInstance(CLSID_A3dApi, NULL, CLSCTX_INPROC_SERVER,
-	                      IID_IA3d4, (void **)&m_p3DAudioRenderer);
-  if (FAILED(hr))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error : Cannot CoCreateInstance Aureal3D Api !");
-    Close();
-    return(hr);
-  }
-
-  if (FAILED(hr = m_p3DAudioRenderer->Init(NULL, NULL, A3DRENDERPREFS_DEFAULT)))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize Aureal3D !");
-    Close();
-    return(hr);
-  }
-  
-  if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), A3D_CL_NORMAL)))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
-    Close();
-    return(hr);
-  }
-  
-  m_pListener->CreateListener(this);
-
-  return S_OK;
+		IID_IA3d4, (void **)&m_p3DAudioRenderer);
+	if (FAILED(hr))
+	{
+		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot CoCreateInstance Aureal3D Api !");
+		Close();
+		return false;
+	}
+	
+	if (FAILED(hr = m_p3DAudioRenderer->Init(NULL, NULL, A3DRENDERPREFS_DEFAULT)))
+	{
+		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize Aureal3D !");
+		Close();
+		return false;
+	}
+	
+	if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), A3D_CL_NORMAL)))
+	{
+		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
+		Close();
+		return false;
+	}
+	
+	m_pListener->CreateListener(this);
+	
+	return true;
 }
 
-STDMETHODIMP csSoundRenderA3D::Close()
+void csSoundRenderA3D::Close()
 {
-  HRESULT hr;
-  
-  if(m_pListener)
-  {
-    m_pListener->DestroyListener();
-    m_pListener->Release();
-  }
-
-  if (m_p3DAudioRenderer)
-  {
-    if ((hr = m_p3DAudioRenderer->Release()) < S_OK)
-      return(hr);
-    
-    m_p3DAudioRenderer = NULL;
-  }
-
-  CoUninitialize();
-
-  return S_OK;
+	if(m_pListener)
+	{
+		m_pListener->DestroyListener();
+		m_pListener->DecRef();
+	}
+	
+	if (m_p3DAudioRenderer)
+	{
+		m_p3DAudioRenderer->Release();    
+		m_p3DAudioRenderer = NULL;
+	}
+	
+	CoUninitialize();
 }
 
-STDMETHODIMP csSoundRenderA3D::Update()
+void csSoundRenderA3D::Update()
 {
-  if (m_p3DAudioRenderer)
-    m_p3DAudioRenderer->Flush();
-
-  return S_OK;
+	if (m_p3DAudioRenderer)
+		m_p3DAudioRenderer->Flush();
 }
 
-STDMETHODIMP csSoundRenderA3D::SetVolume(float vol)
+void csSoundRenderA3D::SetVolume(float vol)
 {
-  if (m_p3DAudioRenderer)
-    m_p3DAudioRenderer->SetOutputGain(vol);
-
-  return S_OK;
+	if (m_p3DAudioRenderer)
+		m_p3DAudioRenderer->SetOutputGain(vol);
 }
 
-STDMETHODIMP csSoundRenderA3D::GetVolume(float *vol)
+float csSoundRenderA3D::GetVolume()
 {
-  if (m_p3DAudioRenderer)
-    m_p3DAudioRenderer->GetOutputGain(vol);
-
-  return S_OK;
+	float vol = 0.0f;
+	if (m_p3DAudioRenderer)
+		m_p3DAudioRenderer->GetOutputGain(&vol);
+	return vol;
 }
 
-STDMETHODIMP csSoundRenderA3D::PlayEphemeral(csSoundData *snd)
+void csSoundRenderA3D::PlayEphemeral(csSoundData *snd)
 {
-  ISoundBuffer *played;
-  if(CreateSoundBuffer(&played, snd) == S_OK)
-  {
-    played->Play(SoundBufferPlay_DestroyAtEnd);
-  }
-  return S_OK;
+	iSoundBuffer *played = CreateSoundBuffer(snd);
+	if(played)
+	{
+		played->Play(SoundBufferPlay_DestroyAtEnd);
+	}
 }
 
 void csSoundRenderA3D::SysPrintf(int mode, char* szMsg, ...)
 {
-  char buf[1024];
-  va_list arg;
-  
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-  
-  m_piSystem->Print(mode, buf);
+	char buf[1024];
+	va_list arg;
+	
+	va_start (arg, szMsg);
+	vsprintf (buf, szMsg, arg);
+	va_end (arg);
+	
+	m_piSystem->Print(mode, buf);
 }

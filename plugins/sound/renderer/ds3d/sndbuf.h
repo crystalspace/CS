@@ -24,39 +24,37 @@
 #include "isndbuf.h"
 #include "isndsrc.h"
 
-interface ISoundRender;
+struct iSoundRender;
 class csSoundData;
 
-class csSoundBufferDS3D : public ISoundBuffer
+class csSoundBufferDS3D : public iSoundBuffer
 {
 public:
-	csSoundBufferDS3D();
+	DECLARE_IBASE;
+	csSoundBufferDS3D(iBase *piBase);
 	virtual ~csSoundBufferDS3D();
-
-	STDMETHODIMP Stop();
-	STDMETHODIMP Play(SoundBufferPlayMethod playMethod);
-
-  STDMETHODIMP SetVolume(float vol);
-  STDMETHODIMP GetVolume(float &vol);
-  
-  STDMETHODIMP SetFrequencyFactor(float vol);
-  STDMETHODIMP GetFrequencyFactor(float &vol);
-
-  STDMETHODIMP CreateSource(ISoundSource **source);
-
- 	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundBufferDS3D)
-
+	
+	void Stop();
+	void Play(SoundBufferPlayMethod playMethod);
+	
+	void SetVolume(float vol);
+	float GetVolume();
+	
+	void SetFrequencyFactor(float factor);
+	float GetFrequencyFactor();
+	
+	iSoundSource *CreateSource();
+	
 public:
-  float fFrequencyOrigin;
-  float fFrequencyFactor;
-  float fVolume;
-
-  int DestroySoundBuffer();
-	int CreateSoundBuffer(ISoundRender *render, csSoundData * sound);
-
-  LPDIRECTSOUNDBUFFER		m_pDS3DBuffer2D;
-  LPDIRECTSOUND		m_p3DAudioRenderer;
+	float fFrequencyOrigin;
+	float fFrequencyFactor;
+	float fVolume;
+	
+	int DestroySoundBuffer();
+	int CreateSoundBuffer(iSoundRender *render, csSoundData * sound);
+	
+	LPDIRECTSOUNDBUFFER		m_pDS3DBuffer2D;
+	LPDIRECTSOUND		m_p3DAudioRenderer;
 };
 
 #endif // __CSSOUNDBUFFERDS3D_H__

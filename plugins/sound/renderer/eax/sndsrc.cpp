@@ -29,14 +29,15 @@
 #include "cssndrdr/eax/sndsrc.h"
 #include "cssndrdr/eax/sndbuf.h"
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundSourceEAX)
+IMPLEMENT_FACTORY(csSoundSourceEAX)
 
-BEGIN_INTERFACE_TABLE(csSoundSourceEAX)
-  IMPLEMENTS_INTERFACE(ISoundSource)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE(csSoundSourceEAX)
+  IMPLEMENTS_INTERFACE(iSoundSource)
+IMPLEMENT_IBASE_END;
 
-csSoundSourceEAX::csSoundSourceEAX()
+csSoundSourceEAX::csSoundSourceEAX(iBase *piBase)
 {
+	CONSTRUCT_IBASE(piBase);
   fPosX = fPosY = fPosZ = 0.0;
   fVelX = fVelY = fVelZ = 0.0;
 
@@ -44,10 +45,7 @@ csSoundSourceEAX::csSoundSourceEAX()
   m_pDS3DBuffer3D = NULL;
 }
 
-csSoundSourceEAX::~csSoundSourceEAX()
-{
-
-}
+csSoundSourceEAX::~csSoundSourceEAX(){}
 
 int csSoundSourceEAX::CreateSource()
 {
@@ -74,7 +72,7 @@ int csSoundSourceEAX::DestroySource()
   
   if (m_pDS3DBuffer3D)
   {
-    if ((hr = m_pDS3DBuffer3D->DecRef()) < DS_OK)
+    if ((hr = m_pDS3DBuffer3D->Release()) < DS_OK)
       return(hr);
     
     m_pDS3DBuffer3D = NULL;
@@ -83,37 +81,29 @@ int csSoundSourceEAX::DestroySource()
   return S_OK;
 }
 
-STDMETHODIMP csSoundSourceEAX::GetSoundBuffer(ISoundBuffer **ppv)
+iSoundBuffer *csSoundSourceEAX::GetSoundBuffer()
 {
-  if(!pSoundBuffer)
-  {
-    return E_FAIL;
-  }
-
-  return pSoundBuffer->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+  if(!pSoundBuffer) return NULL;
+  return QUERY_INTERFACE(pSoundBuffer, iSoundBuffer);
 }
 
-STDMETHODIMP csSoundSourceEAX::SetPosition(float x, float y, float z)
+void csSoundSourceEAX::SetPosition(float x, float y, float z)
 {
   fPosX = x; fPosY = y; fPosZ = z;
 
   if (m_pDS3DBuffer3D)
     m_pDS3DBuffer3D->SetPosition(x, y ,z, DS3D_IMMEDIATE);
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceEAX::SetVelocity(float x, float y, float z)
+void csSoundSourceEAX::SetVelocity(float x, float y, float z)
 {
   fVelX = x; fVelY = y; fVelZ = z;
 
   if (m_pDS3DBuffer3D)
     m_pDS3DBuffer3D->SetVelocity(x, y ,z, DS3D_IMMEDIATE);
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceEAX::GetPosition(float &x, float &y, float &z)
+void csSoundSourceEAX::GetPosition(float &x, float &y, float &z)
 {
   x = fPosX; y = fPosY; z = fPosZ;
 
@@ -123,11 +113,9 @@ STDMETHODIMP csSoundSourceEAX::GetPosition(float &x, float &y, float &z)
     m_pDS3DBuffer3D->GetPosition(&v);
     x = v.x; y = v.y; z = v.z;
   }
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceEAX::GetVelocity(float &x, float &y, float &z)
+void csSoundSourceEAX::GetVelocity(float &x, float &y, float &z)
 {
   x = fVelX; y = fVelY; z = fVelZ;
 
@@ -137,6 +125,4 @@ STDMETHODIMP csSoundSourceEAX::GetVelocity(float &x, float &y, float &z)
     m_pDS3DBuffer3D->GetVelocity(&v);
     x = v.x; y = v.y; z = v.z;
   }
-
-  return S_OK;
 }

@@ -44,55 +44,40 @@ protected:
   bool m_bStereo;
 
 public:
-	csSoundDriverMac(iSystem* piSystem);
-
-	virtual ~csSoundDriverMac();
-
-	STDMETHODIMP Open(ISoundRender *render, int frequency, bool bit16, bool stereo);
-	STDMETHODIMP Close();
+  DECLARE_IBASE;
+  csSoundDriverMac(iBase *piBase);
+  virtual ~csSoundDriverMac();
+  bool Initialize(iSystem *iSys);
   
-	STDMETHODIMP SetVolume(float vol);
-	STDMETHODIMP GetVolume(float *vol);
-	STDMETHODIMP LockMemory(void **mem, int *memsize);
-	STDMETHODIMP UnlockMemory();
-	STDMETHODIMP IsBackground(bool *back);
-	STDMETHODIMP Is16Bits(bool *bit);
-	STDMETHODIMP IsStereo(bool *stereo);
-	STDMETHODIMP GetFrequency(int *freq);
-	STDMETHODIMP IsHandleVoidSound(bool *handle);
-
-	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundDriverMac)
+  bool Open(ISoundRender *render, int frequency, bool bit16, bool stereo);
+  void Close();
+	
+  void SetVolume(float vol);
+  float GetVolume();
+  void LockMemory(void **mem, int *memsize);
+  void UnlockMemory();
+  bool IsBackground();
+  bool Is16Bits();
+  bool IsStereo();
+  int GetFrequency();
+  bool IsHandleVoidSound();
 
   /// print to the system's device
-	void SysPrintf(int mode, char* str, ...);
-
-	void SndDoubleBackProc( SndChannelPtr channel, SndDoubleBufferPtr doubleBuffer );
-
-private:
-	SndDoubleBufferHeader	mSoundDBHeader;
-	SndDoubleBuffer			mSoundDoubleBuffer;
-	SndChannelPtr			mSoundChannel;
-
-	long	mFramesPerBuffer;
-	bool	mStopPlayback;
-	long	mOutputVolume;
-
-	long	mBuffersFilled;
-
+  void SysPrintf(int mode, char* str, ...);
+  
+  void SndDoubleBackProc( SndChannelPtr channel, SndDoubleBufferPtr doubleBuffer );
+  
+ private:
+  SndDoubleBufferHeader	mSoundDBHeader;
+  SndDoubleBuffer			mSoundDoubleBuffer;
+  SndChannelPtr			mSoundChannel;
+  
+  long	mFramesPerBuffer;
+  bool	mStopPlayback;
+  long	mOutputVolume;
+  
+  long	mBuffersFilled;
 };
-
-class csSoundDriverMacFactory : public ISoundDriverFactory
-{
-    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
-
-    /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(COMBOOL bLock);
-
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csSoundDriverMacFactory)
-};
-
 
 #endif	//__SOUND_DRIVER_MAC_H__
 

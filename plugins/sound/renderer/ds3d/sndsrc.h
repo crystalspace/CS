@@ -27,38 +27,36 @@
 
 class csSoundBufferDS3D;
 
-class csSoundSourceDS3D : public ISoundSource
+class csSoundSourceDS3D : public iSoundSource
 {
 public:
-	csSoundSourceDS3D();
+	DECLARE_IBASE;
+	csSoundSourceDS3D(iBase *piBase);
 	virtual ~csSoundSourceDS3D();
-
-	STDMETHODIMP SetPosition(float x, float y, float z);
-  STDMETHODIMP SetVelocity(float x, float y, float z);
-
-	STDMETHODIMP GetPosition(float &x, float &y, float &z);
-	STDMETHODIMP GetVelocity(float &x, float &y, float &z);
-
-  STDMETHODIMP GetSoundBuffer(ISoundBuffer **sound_buffer);
-
- 	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundSourceDS3D)
-
+	
+	void SetPosition(float x, float y, float z);
+	void SetVelocity(float x, float y, float z);
+	
+	void GetPosition(float &x, float &y, float &z);
+	void GetVelocity(float &x, float &y, float &z);
+	
+	iSoundBuffer *GetSoundBuffer();
+	
 public:
-  /// Position of sound object
-  float fPosX, fPosY, fPosZ;
-  /// Velocity of sound object
-  float fVelX, fVelY, fVelZ;
-
-  // SoundBuffer
-  csSoundBufferDS3D *pSoundBuffer;
-
+	/// Position of sound object
+	float fPosX, fPosY, fPosZ;
+	/// Velocity of sound object
+	float fVelX, fVelY, fVelZ;
+	
+	// SoundBuffer
+	csSoundBufferDS3D *pSoundBuffer;
+	
 	int DestroySource();
 	int CreateSource();
-
-  LPDIRECTSOUND3DBUFFER	m_pDS3DBuffer3D;
-  LPDIRECTSOUNDBUFFER	m_pDS3DBuffer2D;
-  LPDIRECTSOUND		m_p3DAudioRenderer;
+	
+	LPDIRECTSOUND3DBUFFER	m_pDS3DBuffer3D;
+	LPDIRECTSOUNDBUFFER	m_pDS3DBuffer2D;
+	LPDIRECTSOUND		m_p3DAudioRenderer;
 };
 
 #endif // __CSSOUNDSOURCEDS3D_H__

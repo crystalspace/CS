@@ -34,161 +34,156 @@
 #include "isndsrc.h"
 #include "isndbuf.h"
 
+IMPLEMENT_FACTORY(csSoundRenderDS3D);
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundRenderDS3D)
+EXPORT_CLASS_TABLE (sndrdrds3d)
+EXPORT_CLASS (csSoundRenderDS3D, "crystalspace.sound.render.ds3d",
+			  "DirectSound 3D Sound Driver for Crystal Space")
+EXPORT_CLASS_TABLE_END;
 
-BEGIN_INTERFACE_TABLE(csSoundRenderDS3D)
-  IMPLEMENTS_INTERFACE(ISoundRender)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE(csSoundRenderDS3D)
+	IMPLEMENTS_INTERFACE(iSoundRender)
+	IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE_END;
 
-csSoundRenderDS3D::csSoundRenderDS3D(iSystem* piSystem) : m_pListener(NULL)
+csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase)
 {
-  m_p3DAudioRenderer = NULL;
-  m_piSystem = piSystem;
-  
-  m_pListener = new csSoundListenerDS3D ();
+	CONSTRUCT_IBASE(piBase);
+	m_pListener = NULL;
+	m_p3DAudioRenderer = NULL;
+	m_piSystem = NULL;
+	m_pListener = NULL;
+}
+
+bool csSoundRenderDS3D::Initialize(iSystem *iSys)
+{
+	if (!iSys->RegisterDriver ("iSoundRender", this))
+		return false;
+
+	m_p3DAudioRenderer = NULL;
+	m_piSystem = iSys;
+	m_pListener = new csSoundListenerDS3D(NULL);
+	return true;
 }
 
 csSoundRenderDS3D::~csSoundRenderDS3D()
 {
-  if(m_pListener)
-    delete m_pListener;
+	if(m_pListener)
+		delete m_pListener;
 }
 
-STDMETHODIMP csSoundRenderDS3D::GetListener(ISoundListener** ppv )
+iSoundListener *csSoundRenderDS3D::GetListener()
 {
-  if (!m_pListener)
-  {
-    *ppv = NULL;
-    return E_OUTOFMEMORY;
-  }
-  
-  return m_pListener->QueryInterface (IID_ISoundListener, (void**)ppv);
+	if (!m_pListener) return NULL;  
+	return QUERY_INTERFACE(m_pListener, iSoundListener);
 }
 
-STDMETHODIMP csSoundRenderDS3D::CreateSource(ISoundSource** ppv, csSoundData *snd)
+iSoundSource *csSoundRenderDS3D::CreateSource(csSoundData *snd)
 {
-  csSoundBufferDS3D* pNew = new csSoundBufferDS3D();
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-  
-  pNew->CreateSoundBuffer(this, snd);
-  pNew->SetVolume (1.0);
-  
-  return pNew->CreateSource(ppv);
+	csSoundBufferDS3D* pNew = new csSoundBufferDS3D(NULL);
+	if (!pNew) return NULL;
+	pNew->CreateSoundBuffer(this, snd);
+	pNew->SetVolume (1.0);
+	return pNew->CreateSource();
 }
 
-STDMETHODIMP csSoundRenderDS3D::CreateSoundBuffer(ISoundBuffer** ppv, csSoundData *snd)
+iSoundBuffer *csSoundRenderDS3D::CreateSoundBuffer(csSoundData *snd)
 {  
-  csSoundBufferDS3D* pNew = new csSoundBufferDS3D ();
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-
-  pNew->CreateSoundBuffer(this, snd);
-  pNew->SetVolume (1.0);
-  
-  return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+	csSoundBufferDS3D* pNew = new csSoundBufferDS3D (NULL);
+	if (!pNew) return NULL;
+	
+	pNew->CreateSoundBuffer(this, snd);
+	pNew->SetVolume (1.0);
+	
+	return QUERY_INTERFACE(pNew, iSoundBuffer);
 }
 
-STDMETHODIMP csSoundRenderDS3D::PlayEphemeral(csSoundData* snd)
+void csSoundRenderDS3D::PlayEphemeral(csSoundData* snd)
 {
-  ISoundBuffer *played;
-  if(CreateSoundBuffer(&played, snd) == S_OK)
-  {
-    played->Play(SoundBufferPlay_DestroyAtEnd);
-  }
-  return S_OK;
+	iSoundBuffer *played = CreateSoundBuffer(snd);
+	if( NULL != played )
+	{
+		played->Play(SoundBufferPlay_DestroyAtEnd);
+	}
 }
 
-STDMETHODIMP csSoundRenderDS3D::Open()
+bool csSoundRenderDS3D::Open()
 {
-  HRESULT hr;
-  
-  SysPrintf (MSG_INITIALIZATION, "\nSoundRender DirectSound3D selected\n");
-
-  if (FAILED(hr = DirectSoundCreate(NULL, &m_p3DAudioRenderer, NULL)))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize DirectSound3D !");
-    Close();
-    return(hr);
-  }
-  
-  DWORD dwLevel = DSSCL_NORMAL;
-  if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel)))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
-    Close();
-    return(hr);
-  }
-  
-  m_pListener->CreateListener(this);
-
-  return S_OK;
+	HRESULT hr;
+	
+	SysPrintf (MSG_INITIALIZATION, "\nSoundRender DirectSound3D selected\n");
+	
+	if (FAILED(hr = DirectSoundCreate(NULL, &m_p3DAudioRenderer, NULL)))
+	{
+		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize DirectSound3D !");
+		Close();
+		return false;
+	}
+	
+	DWORD dwLevel = DSSCL_NORMAL;
+	if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel)))
+	{
+		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
+		Close();
+		return false;
+	}
+	
+	m_pListener->CreateListener(this);
+	
+	return true;
 }
 
-STDMETHODIMP csSoundRenderDS3D::Close()
+void csSoundRenderDS3D::Close()
 {
-  HRESULT hr;
-  
-  if(m_pListener)
-  {
-    m_pListener->DestroyListener();
-    m_pListener->Release();
-  }
-
-
-  if (m_p3DAudioRenderer)
-  {
-    if ((hr = m_p3DAudioRenderer->Release()) < DS_OK)
-      return(hr);
-    
-    m_p3DAudioRenderer = NULL;
-  }
-
-  return S_OK;
+	HRESULT hr;
+	
+	if(m_pListener)
+	{
+		m_pListener->DestroyListener();
+		m_pListener->DecRef();
+	}
+	
+	if (m_p3DAudioRenderer)
+	{
+		if ((hr = m_p3DAudioRenderer->Release()) < DS_OK)
+			return;
+		
+		m_p3DAudioRenderer = NULL;
+	}
 }
 
-STDMETHODIMP csSoundRenderDS3D::Update()
+void csSoundRenderDS3D::Update()
 {
-  return S_OK;
 }
 
-STDMETHODIMP csSoundRenderDS3D::SetVolume(float vol)
+void csSoundRenderDS3D::SetVolume(float vol)
 {
-  long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
-  if (m_pListener)
-  {
-    m_pListener->m_pDS3DPrimaryBuffer->SetVolume(dsvol);
-  }
-  return S_OK;
+	long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
+	if (m_pListener)
+	{
+		m_pListener->m_pDS3DPrimaryBuffer->SetVolume(dsvol);
+	}
 }
 
-STDMETHODIMP csSoundRenderDS3D::GetVolume(float *vol)
+float csSoundRenderDS3D::GetVolume()
 {
-  long dsvol=DSBVOLUME_MIN;
-  if (m_pListener)
-  {
-    m_pListener->m_pDS3DPrimaryBuffer->GetVolume(&dsvol);
-  }
-  *vol = (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
-
-  return S_OK;
+	long dsvol=DSBVOLUME_MIN;
+	if (m_pListener)
+	{
+		m_pListener->m_pDS3DPrimaryBuffer->GetVolume(&dsvol);
+	}
+	
+	return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }
 
 void csSoundRenderDS3D::SysPrintf(int mode, char* szMsg, ...)
 {
-  char buf[1024];
-  va_list arg;
-  
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-  
-  m_piSystem->Print(mode, buf);
+	char buf[1024];
+	va_list arg;
+	
+	va_start (arg, szMsg);
+	vsprintf (buf, szMsg, arg);
+	va_end (arg);
+	
+	m_piSystem->Print(mode, buf);
 }

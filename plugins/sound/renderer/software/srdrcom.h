@@ -29,96 +29,79 @@
 #include "cssndrdr/software/srdrchan.h"
 #include "isndrdr.h"
 #include "isnddrv.h"
+#include "iplugin.h"
 
 class csSoundListenerSoftware;
 
-extern const CLSID CLSID_SoftwareSoundRender;
-
-class csSoundRenderSoftware : public ISoundRender
+class csSoundRenderSoftware : public iSoundRender
 {
 public:
-	csSoundRenderSoftware(iSystem* piSystem);
-
+	DECLARE_IBASE;
+	csSoundRenderSoftware(iBase *piBase);
 	virtual ~csSoundRenderSoftware();
-
-  STDMETHODIMP Open();
-  STDMETHODIMP Close();
-  
-  STDMETHODIMP Update();
-
-  STDMETHODIMP SetVolume(float vol);
-  STDMETHODIMP GetVolume(float *vol);
-
-  STDMETHODIMP PlayEphemeral(csSoundData *snd);
-
-  STDMETHODIMP GetListener(ISoundListener ** ppv );
-  STDMETHODIMP CreateSource(ISoundSource ** ppv, csSoundData *snd);
-  STDMETHODIMP CreateSoundBuffer(ISoundBuffer ** ppv, csSoundData *snd);
 	
-  STDMETHODIMP MixingFunction();
-
-  DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundRenderSoftware)
-
+	//implementation of iPlugin
+	virtual bool Initialize (iSystem *iSys);
+	
+	//implementation of iSoundRender
+	virtual bool Open ();
+	virtual void Close ();
+	virtual void Update ();
+	virtual void SetVolume (float vol);
+	virtual float GetVolume ();
+	virtual void PlayEphemeral (csSoundData *snd);
+	virtual iSoundListener *GetListener ();
+	virtual iSoundSource *CreateSource (csSoundData *snd);
+	virtual iSoundBuffer *CreateSoundBuffer (csSoundData *snd);
+	virtual void MixingFunction ();
+	
 public:
 	void CalculEars3D();
 	void CalculSound3D(Channel *c);
-  iSystem* m_piSystem;
-  ISoundDriver *m_piSoundDriver;
-
-  /// print to the system's device
-  void SysPrintf(int mode, char* str, ...);
+	iSystem* m_piSystem;
+	iSoundDriver *m_piSoundDriver;
+	
+	/// print to the system's device
+	void SysPrintf(int mode, char* str, ...);
 private:
-  /// list of all stored channels
-  Channel *AllChannels;
-
-  /// delete a channel of the list and destroy it
-  bool delChannel (Channel_ID id);
-  /// add a channel
-  void addChannel(Channel *c);
-  /// this function choice in the 'list' of channels which are the 'n' channels will be mixed 
-  int setChannels();
-  /// update the channels in the 'list' whose aren't be choiced by setChannels()
-  void updateChannels();
-  /// kill the channels in 'list' which are finish to be played
-  void killChannels();
-
-  /// the channels
-  Channel ** Channels;
-  int numberChannels;
-
-  /// current priority function choice
-  int PriorityFunc;
-
-  /// is 16 bit mode device
-  bool is16Bits();
-  /// is a stereo device
-  bool isStereo();
-  /// return frequency
-  int getFrequency();
-
-  void *memory;
-  int memorysize;
-
-  float earL_x, earL_y, earL_z;
-  float earR_x, earR_y, earR_z;
-  float earL_DistanceFactor;
-  float earR_DistanceFactor;
-
-  csSoundListenerSoftware * m_pListener;
+	/// list of all stored channels
+	Channel *AllChannels;
+	
+	/// delete a channel of the list and destroy it
+	bool delChannel (Channel_ID id);
+	/// add a channel
+	void addChannel(Channel *c);
+	/// this function choice in the 'list' of channels which are the 'n' channels will be mixed 
+	int setChannels();
+	/// update the channels in the 'list' whose aren't be choiced by setChannels()
+	void updateChannels();
+	/// kill the channels in 'list' which are finish to be played
+	void killChannels();
+	
+	/// the channels
+	Channel ** Channels;
+	int numberChannels;
+	
+	/// current priority function choice
+	int PriorityFunc;
+	
+	/// is 16 bit mode device
+	bool is16Bits();
+	/// is a stereo device
+	bool isStereo();
+	/// return frequency
+	int getFrequency();
+	
+	void *memory;
+	int memorysize;
+	
+	float earL_x, earL_y, earL_z;
+	float earR_x, earR_y, earR_z;
+	float earL_DistanceFactor;
+	float earR_DistanceFactor;
+	
+	csSoundListenerSoftware * m_pListener;
 };
-
-class csSoundRenderSoftwareFactory : public ISoundRenderFactory
-{
-    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
-
-    /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(COMBOOL bLock);
-
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csSoundRenderSoftwareFactory)
-};
-
 
 #endif	//__NETWORK_DRIVER_SOFTWARE_H__
 

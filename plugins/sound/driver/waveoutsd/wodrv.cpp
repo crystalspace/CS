@@ -53,15 +53,23 @@ struct
   { THREAD_PRIORITY_HIGHEST, "highest"}
 };
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundDriverWaveOut)
+IMPLEMENT_FACTORY (csSoundDriverWaveOut)
 
-BEGIN_INTERFACE_TABLE(csSoundDriverWaveOut)
-  IMPLEMENTS_INTERFACE(ISoundDriver)
-END_INTERFACE_TABLE()
+EXPORT_CLASS_TABLE (sndwaveout)
+  EXPORT_CLASS (csSoundDriverWaveOut, "crystalspace.sound.driver.waveout",
+    "Software Sound Driver for Crystal Space")
+EXPORT_CLASS_TABLE_END
 
-csSoundDriverWaveOut::csSoundDriverWaveOut(iSystem* piSystem)
+IMPLEMENT_IBASE(csSoundDriverWaveOut)
+	IMPLEMENTS_INTERFACE(iPlugIn)
+	IMPLEMENTS_INTERFACE(iSoundDriver)
+IMPLEMENT_IBASE_END
+
+csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
 {
-  m_piSystem = piSystem;
+  CONSTRUCT_IBASE(piBase);
+
+  m_piSystem = NULL;
   m_piSoundRender = NULL;
   MemorySize = 0;
   Memory = NULL;
@@ -73,13 +81,24 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iSystem* piSystem)
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
 {
+	SysPrintf (MSG_CONSOLE, "\nSoundDriver Destructor !!!!\n");
 }
 
-STDMETHODIMP csSoundDriverWaveOut::Open(ISoundRender *render, int frequency, bool bit16, bool stereo)
+bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
+{
+	m_piSystem = iSys;
+	return true;
+}
+
+bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
   SysPrintf (MSG_INITIALIZATION, "\nSoundDriver waveOut selected\n");
 
   m_piSoundRender = render;
+  m_piSoundRender->IncRef();
+
+  SysPrintf (MSG_INITIALIZATION, "\nRender = %d\n",m_piSoundRender);
+
   configwodrv = new csIniFile ("wodrv.cfg");
 
   MMRESULT res;
@@ -195,7 +214,7 @@ STDMETHODIMP csSoundDriverWaveOut::Open(ISoundRender *render, int frequency, boo
   return E_FAIL;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::Close()
+void csSoundDriverWaveOut::Close()
 {
   if (hwo)
 	{
@@ -205,12 +224,16 @@ STDMETHODIMP csSoundDriverWaveOut::Close()
 		hwo=NULL;
 	}
 
-  Memory = NULL;
+  if( m_piSoundRender ) 
+  {
+	  m_piSoundRender->DecRef();
+	  m_piSoundRender = NULL;
+  }
 
-  return S_OK;
+  Memory = NULL;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::SetVolume(float vol)
+void csSoundDriverWaveOut::SetVolume(float vol)
 {
   if(vol<0)
     vol = 0;
@@ -225,59 +248,46 @@ STDMETHODIMP csSoundDriverWaveOut::SetVolume(float vol)
   }
 
   volume = vol;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::GetVolume(float *vol)
+float csSoundDriverWaveOut::GetVolume()
 {
-  *vol = volume;
-
-  return S_OK;
+  return volume;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::LockMemory(void **mem, int *memsize)
+void csSoundDriverWaveOut::LockMemory(void **mem, int *memsize)
 {
   *mem = Memory;
   *memsize = MemorySize;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::UnlockMemory()
+void csSoundDriverWaveOut::UnlockMemory()
 {
-  return S_OK;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::IsBackground(bool *back)
+bool csSoundDriverWaveOut::IsBackground()
 {
-  *back = true;
-
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::Is16Bits(bool *bit)
+bool csSoundDriverWaveOut::Is16Bits()
 {
-  *bit = m_b16Bits;
-  return S_OK;
+	return m_b16Bits;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::IsStereo(bool *stereo)
+bool csSoundDriverWaveOut::IsStereo()
 {
-  *stereo = m_bStereo;
-  return S_OK;
+  return m_bStereo;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::IsHandleVoidSound(bool *handle)
+bool csSoundDriverWaveOut::IsHandleVoidSound()
 {
-  *handle = false;
-  return S_OK;
+  return false;
 }
 
-STDMETHODIMP csSoundDriverWaveOut::GetFrequency(int *freq)
+int csSoundDriverWaveOut::GetFrequency()
 {
-  *freq = m_nFrequency;
-  return S_OK;
+  return m_nFrequency;
 }
 
 void csSoundDriverWaveOut::SysPrintf(int mode, char* szMsg, ...)
@@ -368,9 +378,10 @@ void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*hwo*/, UINT uMsg, DWO
     LPWAVEHDR lpWaveHdr = (LPWAVEHDR)dwParam1;
     // void data ?
     if(lpWaveHdr->dwUser==NULL
-      || lpWaveHdr->dwUser==0xcdcdcdcd) return;
+		|| lpWaveHdr->dwUser==0xcdcdcdcd ) return;
 
     SoundBlock * block = (SoundBlock *)lpWaveHdr->dwUser;
+
     csSoundDriverWaveOut *me = block->driver;
 
     if(me==NULL) return;
@@ -382,7 +393,7 @@ void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*hwo*/, UINT uMsg, DWO
     delete block;
 
     // If we're still playing then mix another chunk
-		me->MixChunk();
+	me->MixChunk();
     
     are_you_playing = false;
   } 

@@ -40,11 +40,11 @@
 #include "isndlstn.h"
 #include "isndsrc.h"
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundDriverOSS)
+IMPLEMENT_FACTORY(csSoundDriverOSS)
 
-BEGIN_INTERFACE_TABLE(csSoundDriverOSS)
-  IMPLEMENTS_INTERFACE(ISoundDriver)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE(csSoundDriverOSS)
+  IMPLEMENTS_INTERFACE(iSoundDriver)
+IMPLEMENT_IBASE_END;
 
 int lasterr=0;
 int gaudio;
@@ -195,7 +195,7 @@ static void* soundptr;
 
 void isTime(int)
 {
-    ISoundRender *mysound=(ISoundRender*)soundptr;
+    iSoundRender *mysound=(ISoundRender*)soundptr;
     if (!AudioDeviceBlocked())
        mysound->MixingFunction();
 }
@@ -236,9 +236,10 @@ bool csSoundDriverOSS::SetupTimer( int nTimesPerSecond )
     return bTimerInstalled;
 }
 
-csSoundDriverOSS::csSoundDriverOSS(iSystem* piSystem)
+csSoundDriverOSS::csSoundDriverOSS(iBase *piBase)
 {
-  m_piSystem = piSystem;
+  CONSTRUCT_IBASE(piBase);
+  m_piSystem = NULL;
   m_piSoundRender = NULL;
   memorysize = 0;
   memory = NULL;
@@ -256,7 +257,13 @@ csSoundDriverOSS::~csSoundDriverOSS()
   // if(memory) delete [] memory;
 }
 
-STDMETHODIMP csSoundDriverOSS::Open(ISoundRender *render, int frequency, bool bit16, bool stereo)
+bool csSoundDriverOSS::Initialize(iSystem *iSys)
+{
+  m_piSystem = iSys;
+  return true;
+}
+
+bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
   SysPrintf (MSG_INITIALIZATION, "\nSoundDriver OSS selected\n");
 
@@ -276,15 +283,15 @@ STDMETHODIMP csSoundDriverOSS::Open(ISoundRender *render, int frequency, bool bi
   if ( !Active )
   {
 	perror( err[ lasterr ] );
-	return E_FAIL;
+	return false;
   }
 
   SysPrintf (MSG_INITIALIZATION, "Sound initialized to %d Hz %d bits %s\n", m_nFrequency, (m_b16Bits)?16:8, (m_bStereo)?"Stereo":"Mono");
     
-  return S_OK;
+  return true;
 }
 
-STDMETHODIMP csSoundDriverOSS::Close()
+void csSoundDriverOSS::Close()
 {
     if (bTimerInstalled) setitimer (ITIMER_VIRTUAL, &otime, NULL);
     if (bSignalInstalled) sigaction (SIGVTALRM, &oldact, NULL);
@@ -292,71 +299,29 @@ STDMETHODIMP csSoundDriverOSS::Close()
     device.Close();
     memory=NULL;
     memorysize=0;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundDriverOSS::SetVolume(float vol)
-{
-  volume = vol;
+void csSoundDriverOSS::SetVolume(float vol) { volume = vol; }
+float csSoundDriverOSS::GetVolume() { return volume; }
 
-  return S_OK;
-}
-
-STDMETHODIMP csSoundDriverOSS::GetVolume(float *vol)
-{
-  *vol = volume;
-
-  return S_OK;
-}
-
-STDMETHODIMP csSoundDriverOSS::LockMemory(void **mem, int *memsize)
+void csSoundDriverOSS::LockMemory(void **mem, int *memsize)
 {
   *mem = &soundbuffer[ block * block_size ];
   *memsize = block_size;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundDriverOSS::UnlockMemory()
+void csSoundDriverOSS::UnlockMemory()
 {
-    // tell device to play this soundblock
-    device.Play( &soundbuffer[ block * block_size], block_size );
-    block = (block+1) % fragments;
-  return S_OK;
+  // tell device to play this soundblock
+  device.Play( &soundbuffer[ block * block_size], block_size );
+  block = (block+1) % fragments;
 }
 
-STDMETHODIMP csSoundDriverOSS::IsHandleVoidSound(bool *handle)
-{
-  *handle = true;
-
-  return S_OK;
-}
-
-STDMETHODIMP csSoundDriverOSS::IsBackground(bool *back)
-{
-  *back = true;
-
-  return S_OK;
-}
-
-STDMETHODIMP csSoundDriverOSS::Is16Bits(bool *bit)
-{
-  *bit = m_b16Bits;
-  return S_OK;
-}
-
-STDMETHODIMP csSoundDriverOSS::IsStereo(bool *stereo)
-{
-  *stereo = m_bStereo;
-  return S_OK;
-}
-
-STDMETHODIMP csSoundDriverOSS::GetFrequency(int *freq)
-{
-  *freq = m_nFrequency;
-  return S_OK;
-}
+bool csSoundDriverOSS::IsHandleVoidSound() { return true; }
+bool csSoundDriverOSS::IsBackground() { return true; }
+bool csSoundDriverOSS::Is16Bits() { return  m_b16Bits; }
+bool csSoundDriverOSS::IsStereo() { return m_bStereo; }
+int csSoundDriverOSS::GetFrequency() { return m_nFrequency; }
 
 void csSoundDriverOSS::SysPrintf(int mode, char* szMsg, ...)
 {

@@ -28,17 +28,18 @@
 #include "cssndrdr/ds3d/sndbuf.h"
 #include "isystem.h"
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundSourceDS3D)
+IMPLEMENT_FACTORY(csSoundSourceDS3D)
 
-BEGIN_INTERFACE_TABLE(csSoundSourceDS3D)
-  IMPLEMENTS_INTERFACE(ISoundSource)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE(csSoundSourceDS3D)
+  IMPLEMENTS_INTERFACE(iSoundSource)
+IMPLEMENT_IBASE_END;
 
-csSoundSourceDS3D::csSoundSourceDS3D()
+csSoundSourceDS3D::csSoundSourceDS3D(iBase *piBase)
 {
+  CONSTRUCT_IBASE(piBase);
+
   fPosX = fPosY = fPosZ = 0.0;
   fVelX = fVelY = fVelZ = 0.0;
-
   m_pDS3DBuffer3D = NULL;
 }
 
@@ -87,37 +88,29 @@ int csSoundSourceDS3D::DestroySource()
   return S_OK;
 }
 
-STDMETHODIMP csSoundSourceDS3D::GetSoundBuffer(ISoundBuffer **ppv)
+iSoundBuffer *csSoundSourceDS3D::GetSoundBuffer()
 {
-  if(!pSoundBuffer)
-  {
-    return E_FAIL;
-  }
-
-  return pSoundBuffer->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+  if(!pSoundBuffer) return NULL;
+  return QUERY_INTERFACE(pSoundBuffer, iSoundBuffer);
 }
 
-STDMETHODIMP csSoundSourceDS3D::SetPosition(float x, float y, float z)
+void csSoundSourceDS3D::SetPosition(float x, float y, float z)
 {
   fPosX = x; fPosY = y; fPosZ = z;
 
   if (m_pDS3DBuffer3D)
     m_pDS3DBuffer3D->SetPosition(x, y ,z, DS3D_IMMEDIATE);
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceDS3D::SetVelocity(float x, float y, float z)
+void csSoundSourceDS3D::SetVelocity(float x, float y, float z)
 {
   fVelX = x; fVelY = y; fVelZ = z;
 
   if (m_pDS3DBuffer3D)
     m_pDS3DBuffer3D->SetVelocity(x, y ,z, DS3D_IMMEDIATE);
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceDS3D::GetPosition(float &x, float &y, float &z)
+void csSoundSourceDS3D::GetPosition(float &x, float &y, float &z)
 {
   x = fPosX; y = fPosY; z = fPosZ;
 
@@ -127,11 +120,9 @@ STDMETHODIMP csSoundSourceDS3D::GetPosition(float &x, float &y, float &z)
     m_pDS3DBuffer3D->GetPosition(&v);
     x = v.x; y = v.y; z = v.z;
   }
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceDS3D::GetVelocity(float &x, float &y, float &z)
+void csSoundSourceDS3D::GetVelocity(float &x, float &y, float &z)
 {
   x = fVelX; y = fVelY; z = fVelZ;
 
@@ -141,6 +132,4 @@ STDMETHODIMP csSoundSourceDS3D::GetVelocity(float &x, float &y, float &z)
     m_pDS3DBuffer3D->GetVelocity(&v);
     x = v.x; y = v.y; z = v.z;
   }
-
-  return S_OK;
 }

@@ -28,14 +28,15 @@
 #include "cssndrdr/a3d/sndbuf.h"
 #include "cssndrdr/a3d/sndsrc.h"
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundSourceA3D)
+IMPLEMENT_TEMPLATE(csSoundSourceA3D);
 
-BEGIN_INTERFACE_TABLE(csSoundSourceA3D)
-  IMPLEMENTS_INTERFACE(ISoundSource)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE(csSoundSourceA3D)
+  IMPLEMENTS_INTERFACE(iSoundSource)
+IMPLEMENT_IBASE_END;
 
-csSoundSourceA3D::csSoundSourceA3D()
+csSoundSourceA3D::csSoundSourceA3D(iBase *piBase)
 {
+	CONSTRUCT_IBASE(piBase);
   fPosX = fPosY = fPosZ = 0.0;
   fVelX = fVelY = fVelZ = 0.0;
 
@@ -48,17 +49,13 @@ csSoundSourceA3D::~csSoundSourceA3D()
 
 }
 
-STDMETHODIMP csSoundSourceA3D::GetSoundBuffer(ISoundBuffer **ppv)
+iSoundBuffer *csSoundSourceA3D::GetSoundBuffer()
 {
-  if(!pSoundBuffer)
-  {
-    return E_FAIL;
-  }
-
-  return pSoundBuffer->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+  if(!pSoundBuffer) return NULL;
+  return QUERY_INTERFACE(pSoundBuffer, iSoundBuffer);
 }
 
-int csSoundSourceA3D::CreateSource(ISoundRender * render, csSoundData * sound)
+int csSoundSourceA3D::CreateSource(iSoundRender * render, csSoundData * sound)
 {
   HRESULT           hr;
   csSoundRenderA3D *renderA3D;
@@ -138,8 +135,6 @@ int csSoundSourceA3D::CreateSource(ISoundRender * render, csSoundData * sound)
     return(hr);
   }
 
-
-  
   return S_OK;
 }
 
@@ -164,50 +159,34 @@ int csSoundSourceA3D::DestroySource()
   return S_OK;
 }
 
-STDMETHODIMP csSoundSourceA3D::SetPosition(float x, float y, float z)
+void csSoundSourceA3D::SetPosition(float x, float y, float z)
 {
   fPosX = x; fPosY = y; fPosZ = z;
 
-  if(!m_p3DSource)
-    return E_FAIL;
+  if(!m_p3DSource) return;
 
   m_p3DSource->SetPosition3f(x, y, z);
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceA3D::SetVelocity(float x, float y, float z)
+void csSoundSourceA3D::SetVelocity(float x, float y, float z)
 {
   fVelX = x; fVelY = y; fVelZ = z;
 
-  if(!m_p3DSource)
-    return E_FAIL;
+  if(!m_p3DSource) return;
 
   m_p3DSource->SetVelocity3f(x, y, z);
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceA3D::GetPosition(float &x, float &y, float &z)
+void csSoundSourceA3D::GetPosition(float &x, float &y, float &z)
 {
   x = fPosX; y = fPosY; z = fPosZ;
-
-  if(!m_p3DSource)
-    return E_FAIL;
-
+  if(!m_p3DSource) return;
   m_p3DSource->GetPosition3f(&x, &y, &z);
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceA3D::GetVelocity(float &x, float &y, float &z)
+void csSoundSourceA3D::GetVelocity(float &x, float &y, float &z)
 {
   x = fVelX; y = fVelY; z = fVelZ;
-
-  if(!m_p3DSource)
-    return E_FAIL;
-
+  if(!m_p3DSource) return;
   m_p3DSource->GetVelocity3f(&x, &y, &z);
-
-  return S_OK;
 }

@@ -30,55 +30,40 @@
 
 class csSoundListenerEAX;
 
-extern const CLSID CLSID_EAXSoundRender;
-
-class csSoundRenderEAX : public ISoundRender
+class csSoundRenderEAX : public iSoundRender
 {
 public:
-	csSoundRenderEAX(iSystem* piSystem);
-
+	DECLARE_IBASE;
+	csSoundRenderEAX(iBase *piBase);
 	virtual ~csSoundRenderEAX();
+	
+	bool Initialize(iSystem *iSys);
 
-  STDMETHODIMP Open();
-  STDMETHODIMP Close();
-  
-  STDMETHODIMP Update();
-
-  STDMETHODIMP SetVolume(float vol);
-  STDMETHODIMP GetVolume(float *vol);
-
-  STDMETHODIMP PlayEphemeral(csSoundData *snd);
-
-  STDMETHODIMP GetListener(ISoundListener** ppv );
-  STDMETHODIMP CreateSource(ISoundSource** ppv, csSoundData *snd);
-  STDMETHODIMP CreateSoundBuffer(ISoundBuffer ** ppv, csSoundData *snd);
-
-  STDMETHODIMP MixingFunction() {return S_OK;}
-
-	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundRenderEAX)
-
+	bool Open();
+	void Close();
+	
+	void Update();
+	
+	void SetVolume(float vol);
+	float GetVolume();
+	
+	void PlayEphemeral(csSoundData *snd);
+	
+	iSoundListener *GetListener();
+	iSoundSource *CreateSource(csSoundData *snd);
+	iSoundBuffer *CreateSoundBuffer(csSoundData *snd);
+	
+	void MixingFunction() { }
+	
 public:
 	LPDIRECTSOUND		m_p3DAudioRenderer;
-  iSystem* m_piSystem;
-
-  /// print to the system's device
-  void SysPrintf(int mode, char* str, ...);
-
-  csSoundListenerEAX* m_pListener;
+	iSystem* m_piSystem;
+	
+	/// print to the system's device
+	void SysPrintf(int mode, char* str, ...);
+	
+	csSoundListenerEAX* m_pListener;
 };
-
-class csSoundRenderEAXFactory : public ISoundRenderFactory
-{
-    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
-
-    /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(COMBOOL bLock);
-
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csSoundRenderEAXFactory)
-};
-
 
 #endif	//__SOUND_RENDER_DS3D_H__
 

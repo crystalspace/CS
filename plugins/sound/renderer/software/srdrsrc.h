@@ -26,22 +26,20 @@
 
 class csSoundBufferSoftware;
 
-class csSoundSourceSoftware : public ISoundSource
+class csSoundSourceSoftware : public iSoundSource
 {
 public:
-	csSoundSourceSoftware();
+	DECLARE_IBASE;
+	csSoundSourceSoftware(iBase *piBase);
 	virtual ~csSoundSourceSoftware();
 
-	STDMETHODIMP SetPosition(float x, float y, float z);
-	STDMETHODIMP SetVelocity(float x, float y, float z);
+	void SetPosition(float x, float y, float z);
+	void SetVelocity(float x, float y, float z);
 
-	STDMETHODIMP GetPosition(float &x, float &y, float &z);
-	STDMETHODIMP GetVelocity(float &x, float &y, float &z);
+	void GetPosition(float &x, float &y, float &z);
+	void GetVelocity(float &x, float &y, float &z);
 
-  STDMETHODIMP GetSoundBuffer(ISoundBuffer **sound_buffer);
-
-	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundSourceSoftware)
+	iSoundBuffer *GetSoundBuffer();
 
 public:
   /// Position of sound object

@@ -62,7 +62,7 @@ private:
 
 };
 
-class csSoundDriverOSS : public ISoundDriver
+class csSoundDriverOSS : public iSoundDriver
 {
 protected:
   iSystem* m_piSystem;
@@ -78,51 +78,38 @@ protected:
   unsigned char *soundbuffer;
 
 public:
-	csSoundDriverOSS(iSystem* piSystem);
+  DECLARE_IBASE;
+  csSoundDriverOSS(iSystem* piSystem);
+  virtual ~csSoundDriverOSS();
 
-	virtual ~csSoundDriverOSS();
-
-  STDMETHODIMP Open(ISoundRender *render, int frequency, bool bit16, bool stereo);
-  STDMETHODIMP Close();
+  bool Initialize(iSystem *iSys);
   
-	STDMETHODIMP SetVolume(float vol);
-  STDMETHODIMP GetVolume(float *vol);
-	STDMETHODIMP LockMemory(void **mem, int *memsize);
-  STDMETHODIMP UnlockMemory();
-  STDMETHODIMP IsBackground(bool *back);
-	STDMETHODIMP Is16Bits(bool *bit);
-	STDMETHODIMP IsStereo(bool *stereo);
-	STDMETHODIMP GetFrequency(int *freq);
-  STDMETHODIMP IsHandleVoidSound(bool *handle);
-
-  DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundDriverOSS)
-
+  bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
+  void Close();
+  
+  void SetVolume(float vol);
+  float GetVolume();
+  void LockMemory(void **mem, int *memsize);
+  void UnlockMemory();
+  void IsBackground(bool *back);
+  bool Is16Bits();
+  bool IsStereo();
+  int GetFrequency();
+  bool IsHandleVoidSound();
+  
   /// print to the system's device
   void SysPrintf(int mode, char* str, ...);
 private:
   // used to setup timer when background=true (not currently used)
   bool SetupTimer( int nTimesPerSecond );
-
+  
   AudioDevice device;
   struct sigaction oldact;
   struct itimerval otime;
   bool bTimerInstalled, bSignalInstalled;
-public:
-  ISoundRender *m_piSoundRender;
+ public:
+  iSoundRender *m_piSoundRender;
 };
-
-class csSoundDriverOSSFactory : public ISoundDriverFactory
-{
-    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
-
-    /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(COMBOOL bLock);
-
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csSoundDriverOSSFactory)
-};
-
 
 #endif	//__SOUND_DRIVER_OSS_H__
 

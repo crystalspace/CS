@@ -33,10 +33,11 @@ struct iSoundListener;
 struct iSoundSource;
 struct iSoundBuffer;
 class csSoundData;
+#include "iplugin.h"
 
 SCF_VERSION (iSoundRender, 0, 0, 1);
 
-struct iSoundRender : public iBase
+struct iSoundRender : public iPlugIn
 {
 public:
   /// Open the sound render

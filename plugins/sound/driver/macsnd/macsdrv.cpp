@@ -34,264 +34,230 @@ static pascal void SoundDoubleBackProc(
 
 #define kDoubleBufferSize	4096L
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundDriverMac)
+IMPLEMENT_FACTORY(csSoundDriverMac);
 
-BEGIN_INTERFACE_TABLE(csSoundDriverMac)
-  IMPLEMENTS_INTERFACE(ISoundDriver)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE(csSoundDriverMac)
+  IMPLEMENTS_INTERFACE(iSoundDriver)
+IMPLEMENT_IBASE_END;
 
-csSoundDriverMac::csSoundDriverMac(iSystem* piSystem)
+csSoundDriverMac::csSoundDriverMac(iBase *piBase)
 {
-	m_piSystem = piSystem;
-	mStopPlayback = false;
-	mSoundDBHeader.dbhDoubleBack = NULL;
-	mSoundDBHeader.dbhBufferPtr[0] = NULL;
-	mSoundDBHeader.dbhBufferPtr[1] = NULL;
-	mSoundChannel = NULL;
-	mFramesPerBuffer = 0L;
-	mBuffersFilled = 0L;
+  CONSTRUCT_IBASE(piBase);
+  m_piSystem = NULL;
+  mStopPlayback = false;
+  mSoundDBHeader.dbhDoubleBack = NULL;
+  mSoundDBHeader.dbhBufferPtr[0] = NULL;
+  mSoundDBHeader.dbhBufferPtr[1] = NULL;
+  mSoundChannel = NULL;
+  mFramesPerBuffer = 0L;
+  mBuffersFilled = 0L;
 }
 
 csSoundDriverMac::~csSoundDriverMac()
 {
 }
 
-STDMETHODIMP csSoundDriverMac::Open(ISoundRender *render, int frequency, bool bit16, bool stereo)
+bool csSoundDriverMac::Initialize(iSystem *iSys)
 {
-	SysPrintf (MSG_INITIALIZATION, "\nSoundDriver Mac selected\n");
-
-	m_piSoundRender = render;
-	OSErr	theError;
-	short	outputChannels;
-
-	m_bStereo = stereo;
-	m_b16Bits = bit16;
-	m_nFrequency = frequency;
-	MemorySize = kDoubleBufferSize;
-
- 	if ( stereo ) {
- 		outputChannels = initStereo;
- 		mSoundDBHeader.dbhNumChannels = 2;
- 	} else {
-  		outputChannels = initMono;
- 		mSoundDBHeader.dbhNumChannels = 1;
-  	}
-
-	theError = SndNewChannel( &mSoundChannel, sampledSynth, outputChannels, NULL );
-	if ( theError != noErr ) {
-  		SysPrintf( MSG_FATAL_ERROR, "Unable to open a sound channel.");
-		return false;
-	}
-
-	/*
-	 *	Fill in the double buffer header
-	 */
-
-	if ( bit16 ) {
- 		mSoundDBHeader.dbhSampleSize = 16;
-	} else {
- 		mSoundDBHeader.dbhSampleSize = 8;
-	}
-
- 	mSoundDBHeader.dbhCompressionID = 0;
- 	mSoundDBHeader.dbhPacketSize = 0;
- 	mSoundDBHeader.dbhSampleRate = frequency << 16;
-	mSoundDBHeader.dbhDoubleBack = NewSndDoubleBackProc( SoundDoubleBackProc );
-
-	/*
-	 *	Calculate the number of frames per buffer.
-	 *	1 frame is = to 2 samples if stereo or 1 sample if mono.
-	 */
-	mFramesPerBuffer = kDoubleBufferSize;
-	if ( m_bStereo )
-		mFramesPerBuffer /= 2L;
-	if ( m_b16Bits )
-		mFramesPerBuffer /= 2L;
-
-	/*
-	 *	Get the space for the first buffer.
-	 */
-	mSoundDBHeader.dbhBufferPtr[0] = (SndDoubleBufferPtr)NewPtr( sizeof( SndDoubleBuffer ) + kDoubleBufferSize );
-	if ( mSoundDBHeader.dbhBufferPtr[0] == NULL ) {
-		SndDisposeChannel( mSoundChannel, TRUE );
-		mSoundChannel = NULL;
-		DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
-		mSoundDBHeader.dbhDoubleBack = NULL;
-  		SysPrintf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
-		return false;
-	}
-	mSoundDBHeader.dbhBufferPtr[0]->dbNumFrames = 0L;
-	mSoundDBHeader.dbhBufferPtr[0]->dbFlags = 0;
-	mSoundDBHeader.dbhBufferPtr[0]->dbUserInfo[0] = (long)this;
-
-	/*
-	 *	Fill in this buffer with sounds.
-	 */
-	SndDoubleBackProc( mSoundChannel, mSoundDBHeader.dbhBufferPtr[0] );
-
-	/*
-	 *	Get the space for the second buffer.
-	 */
-	mSoundDBHeader.dbhBufferPtr[1] = (SndDoubleBufferPtr)NewPtr( sizeof( SndDoubleBuffer ) + kDoubleBufferSize );
-	if ( mSoundDBHeader.dbhBufferPtr[1] == NULL ) {
-		SndDisposeChannel( mSoundChannel, TRUE );
-		mSoundChannel = NULL;
-		DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
-		mSoundDBHeader.dbhDoubleBack = NULL;
-		DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[0] );
-		mSoundDBHeader.dbhBufferPtr[0] = NULL;
-  		SysPrintf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
-		return false;
-	}
-	mSoundDBHeader.dbhBufferPtr[1]->dbNumFrames = 0L;
-	mSoundDBHeader.dbhBufferPtr[1]->dbFlags = 0;
-	mSoundDBHeader.dbhBufferPtr[1]->dbUserInfo[0] = (long)this;
-
-	/*
-	 *	Fill in this buffer with sounds.
-	 */
-	SndDoubleBackProc( mSoundChannel, mSoundDBHeader.dbhBufferPtr[1] );
-
-	/*
-	 *	Start the sounds playing.
-	 */
-	theError = SndPlayDoubleBuffer( mSoundChannel, &mSoundDBHeader );
-	if ( theError != noErr ) {
-		SndDisposeChannel( mSoundChannel, TRUE );
-		mSoundChannel = NULL;
-		DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
-		mSoundDBHeader.dbhDoubleBack = NULL;
-		DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[0] );
-		mSoundDBHeader.dbhBufferPtr[0] = NULL;
-		DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[1] );
-		mSoundDBHeader.dbhBufferPtr[1] = NULL;
-  		SysPrintf( MSG_FATAL_ERROR, "Unable to start the sound playing.");
-		return false;
-	}
-
-	GetDefaultOutputVolume( &mOutputVolume );
-
-  return S_OK;
+  m_piSystem = iSys;
+  return true;
 }
 
-STDMETHODIMP csSoundDriverMac::Close()
+bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16, bool stereo)
 {
-	SCStatus	theStatus;
+  SysPrintf (MSG_INITIALIZATION, "\nSoundDriver Mac selected\n");
+  
+  m_piSoundRender = render;
+  OSErr	theError;
+  short	outputChannels;
+  
+  m_bStereo = stereo;
+  m_b16Bits = bit16;
+  m_nFrequency = frequency;
+  MemorySize = kDoubleBufferSize;
+  
+  if ( stereo ) 
+    {
+      outputChannels = initStereo;
+      mSoundDBHeader.dbhNumChannels = 2;
+    } 
+  else 
+    {
+      outputChannels = initMono;
+      mSoundDBHeader.dbhNumChannels = 1;
+    }
 
-	/*
-	 *	Tell the double buffer callback that this is the end.
-	 */
-	mStopPlayback = true;
-
-	if ( mSoundChannel ) {
-		/*
-		 *	Wait until the sound channel is done.
-		 */
-		do {
-			SndChannelStatus( mSoundChannel, sizeof( SCStatus ), &theStatus );
-		} while ( theStatus.scChannelBusy );
-
-		/*
-		 *	Get rid of the sound channel.
-		 */
-		SndDisposeChannel( mSoundChannel, TRUE );
-	}
-
-	if ( mSoundDBHeader.dbhDoubleBack )
-		DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
-
-	/*
-	 *	Get rid of the memory used for the double buffers
-	 */
-	if ( mSoundDBHeader.dbhBufferPtr[0] )
-		DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[0] );
-	if ( mSoundDBHeader.dbhBufferPtr[1] )
-		DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[1] );
-
-	/*
-	 *	Make sure our superclass does not also go a dispose of the memory
-	 */
-	Memory = NULL;
-
-	SetDefaultOutputVolume( mOutputVolume );
-
-
-  return S_OK;
+  theError = SndNewChannel( &mSoundChannel, sampledSynth, outputChannels, NULL );
+  if ( theError != noErr ) {
+    SysPrintf( MSG_FATAL_ERROR, "Unable to open a sound channel.");
+    return false;
+  }
+  
+  /*
+   *	Fill in the double buffer header
+   */
+  
+  if ( bit16 ) {
+    mSoundDBHeader.dbhSampleSize = 16;
+  } else {
+    mSoundDBHeader.dbhSampleSize = 8;
+  }
+  
+  mSoundDBHeader.dbhCompressionID = 0;
+  mSoundDBHeader.dbhPacketSize = 0;
+  mSoundDBHeader.dbhSampleRate = frequency << 16;
+  mSoundDBHeader.dbhDoubleBack = NewSndDoubleBackProc( SoundDoubleBackProc );
+  
+  /*
+   *	Calculate the number of frames per buffer.
+   *	1 frame is = to 2 samples if stereo or 1 sample if mono.
+   */
+  mFramesPerBuffer = kDoubleBufferSize;
+  if ( m_bStereo )
+    mFramesPerBuffer /= 2L;
+  if ( m_b16Bits )
+    mFramesPerBuffer /= 2L;
+  
+  /*
+   *	Get the space for the first buffer.
+   */
+  mSoundDBHeader.dbhBufferPtr[0] = (SndDoubleBufferPtr)NewPtr( sizeof( SndDoubleBuffer ) + kDoubleBufferSize );
+  if ( mSoundDBHeader.dbhBufferPtr[0] == NULL ) {
+    SndDisposeChannel( mSoundChannel, TRUE );
+    mSoundChannel = NULL;
+    DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
+    mSoundDBHeader.dbhDoubleBack = NULL;
+    SysPrintf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
+    return false;
+  }
+  mSoundDBHeader.dbhBufferPtr[0]->dbNumFrames = 0L;
+  mSoundDBHeader.dbhBufferPtr[0]->dbFlags = 0;
+  mSoundDBHeader.dbhBufferPtr[0]->dbUserInfo[0] = (long)this;
+  
+  /*
+   *	Fill in this buffer with sounds.
+   */
+  SndDoubleBackProc( mSoundChannel, mSoundDBHeader.dbhBufferPtr[0] );
+  
+  /*
+   *	Get the space for the second buffer.
+   */
+  mSoundDBHeader.dbhBufferPtr[1] = (SndDoubleBufferPtr)NewPtr( sizeof( SndDoubleBuffer ) + kDoubleBufferSize );
+  if ( mSoundDBHeader.dbhBufferPtr[1] == NULL ) {
+    SndDisposeChannel( mSoundChannel, TRUE );
+    mSoundChannel = NULL;
+    DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
+    mSoundDBHeader.dbhDoubleBack = NULL;
+    DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[0] );
+    mSoundDBHeader.dbhBufferPtr[0] = NULL;
+    SysPrintf( MSG_FATAL_ERROR, "Unable to get the space for the sound buffer.");
+    return false;
+  }
+  mSoundDBHeader.dbhBufferPtr[1]->dbNumFrames = 0L;
+  mSoundDBHeader.dbhBufferPtr[1]->dbFlags = 0;
+  mSoundDBHeader.dbhBufferPtr[1]->dbUserInfo[0] = (long)this;
+  
+  /*
+   *	Fill in this buffer with sounds.
+   */
+  SndDoubleBackProc( mSoundChannel, mSoundDBHeader.dbhBufferPtr[1] );
+  
+  /*
+   *	Start the sounds playing.
+   */
+  theError = SndPlayDoubleBuffer( mSoundChannel, &mSoundDBHeader );
+  if ( theError != noErr ) {
+    SndDisposeChannel( mSoundChannel, TRUE );
+    mSoundChannel = NULL;
+    DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
+    mSoundDBHeader.dbhDoubleBack = NULL;
+    DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[0] );
+    mSoundDBHeader.dbhBufferPtr[0] = NULL;
+    DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[1] );
+    mSoundDBHeader.dbhBufferPtr[1] = NULL;
+    SysPrintf( MSG_FATAL_ERROR, "Unable to start the sound playing.");
+    return false;
+  }
+  
+  GetDefaultOutputVolume( &mOutputVolume );
+  
+  return true;
 }
 
-STDMETHODIMP csSoundDriverMac::SetVolume(float newVolume)
+void csSoundDriverMac::Close()
 {
-	long  theVolume;
-
-	/*
-	 *	Make sure the volume is between 0 and 1.
-	 */
-	if (( newVolume < 0 ) || ( newVolume > 1 ))
-		return S_FALSE;
-
-	/*
-	 *	The mac volume is between 0 and 256 so scale up the passed in volume.
-	 */
-	theVolume = newVolume * 256.0;
-	SetDefaultOutputVolume( theVolume );
-
-	return S_OK;
+  SCStatus	theStatus;
+  
+  /*
+   *	Tell the double buffer callback that this is the end.
+   */
+  mStopPlayback = true;
+  
+  if ( mSoundChannel ) {
+    /*
+     *	Wait until the sound channel is done.
+     */
+    do {
+      SndChannelStatus( mSoundChannel, sizeof( SCStatus ), &theStatus );
+    } while ( theStatus.scChannelBusy );
+    
+    /*
+     *	Get rid of the sound channel.
+     */
+    SndDisposeChannel( mSoundChannel, TRUE );
+  }
+  
+  if ( mSoundDBHeader.dbhDoubleBack )
+    DisposeRoutineDescriptor( mSoundDBHeader.dbhDoubleBack );
+  
+  /*
+   *	Get rid of the memory used for the double buffers
+   */
+  if ( mSoundDBHeader.dbhBufferPtr[0] )
+    DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[0] );
+  if ( mSoundDBHeader.dbhBufferPtr[1] )
+    DisposePtr( (Ptr)mSoundDBHeader.dbhBufferPtr[1] );
+  
+  /*
+   *	Make sure our superclass does not also go a dispose of the memory
+   */
+  Memory = NULL;
+  
+  SetDefaultOutputVolume( mOutputVolume );
 }
 
-STDMETHODIMP csSoundDriverMac::GetVolume(float *vol)
+void csSoundDriverMac::SetVolume(float newVolume)
 {
-	*vol = volume;
-
-	return S_OK;
+  long  theVolume;
+  
+  /*
+   *	Make sure the volume is between 0 and 1.
+   */
+  if (( newVolume < 0 ) || ( newVolume > 1 ))
+    return;
+  
+  /*
+   *	The mac volume is between 0 and 256 so scale up the passed in volume.
+   */
+  theVolume = newVolume * 256.0;
+  SetDefaultOutputVolume( theVolume );
 }
 
-STDMETHODIMP csSoundDriverMac::LockMemory(void **mem, int *memsize)
-{
-	*mem = Memory;
-	*memsize = MemorySize;
+float csSoundDriverMac::GetVolume() { return volume; }
 
-	return S_OK;
+void csSoundDriverMac::LockMemory(void **mem, int *memsize)
+{
+  *mem = Memory;
+  *memsize = MemorySize;
 }
 
-STDMETHODIMP csSoundDriverMac::UnlockMemory()
-{
-	return S_OK;
-}
+void csSoundDriverMac::UnlockMemory() {}
 
-STDMETHODIMP csSoundDriverMac::IsBackground(bool *back)
-{
-	*back = true;
-
-	return S_OK;
-}
-
-STDMETHODIMP csSoundDriverMac::Is16Bits(bool *bit)
-{
-	*bit = m_b16Bits;
-
-	return S_OK;
-}
-
-STDMETHODIMP csSoundDriverMac::IsStereo(bool *stereo)
-{
-	*stereo = m_bStereo;
-
-	return S_OK;
-}
-
-STDMETHODIMP csSoundDriverMac::GetFrequency(int *freq)
-{
-	*freq = m_nFrequency;
-
-	return S_OK;
-}
-
-STDMETHODIMP csSoundDriverMac::IsHandleVoidSound(bool *handle)
-{
-	*handle = false;
-
-	return S_OK;
-}
+bool csSoundDriverMac::IsBackground() { return true; }
+bool csSoundDriverMac::Is16Bits() { return m_b16Bits; }
+bool csSoundDriverMac::IsStereo() { return m_bStereo; }
+int csSoundDriverMac::GetFrequency() { return m_nFrequency; }
+bool csSoundDriverMac::IsHandleVoidSound() { return false; }
 
 void csSoundDriverMac::SysPrintf(int mode, char* szMsg, ...)
 {

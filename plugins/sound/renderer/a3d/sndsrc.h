@@ -27,37 +27,35 @@
 
 class csSoundBufferA3D;
 
-class csSoundSourceA3D : public ISoundSource
+class csSoundSourceA3D : public iSoundSource
 {
 public:
-	csSoundSourceA3D();
+	DECLARE_IBASE;
+	csSoundSourceA3D(iBase *piBase);
 	virtual ~csSoundSourceA3D();
-
-	STDMETHODIMP SetPosition(float x, float y, float z);
-	STDMETHODIMP SetVelocity(float x, float y, float z);
-
-  STDMETHODIMP GetPosition(float &x, float &y, float &z);
-	STDMETHODIMP GetVelocity(float &x, float &y, float &z);
-
-  STDMETHODIMP GetSoundBuffer(ISoundBuffer **sound_buffer);
-
- 	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundSourceA3D)
-
+	
+	void SetPosition(float x, float y, float z);
+	void SetVelocity(float x, float y, float z);
+	
+	void GetPosition(float &x, float &y, float &z);
+	void GetVelocity(float &x, float &y, float &z);
+	
+	iSoundBuffer *GetSoundBuffer();
+	
 public:
-  /// Position of sound object
-  float fPosX, fPosY, fPosZ;
-  /// Velocity of sound object
-  float fVelX, fVelY, fVelZ;
-
+	/// Position of sound object
+	float fPosX, fPosY, fPosZ;
+	/// Velocity of sound object
+	float fVelX, fVelY, fVelZ;
+	
 	int DestroySource();
-	int CreateSource(ISoundRender *render, csSoundData * sound);
-
-  // SoundBuffer
-  csSoundBufferA3D *pSoundBuffer;
-
-  IA3dSource *m_p3DSource;
-  IA3d4 *m_p3DAudioRenderer;
+	int CreateSource(iSoundRender *render, csSoundData * sound);
+	
+	// SoundBuffer
+	csSoundBufferA3D *pSoundBuffer;
+	
+	IA3dSource *m_p3DSource;
+	IA3d4 *m_p3DAudioRenderer;
 };
 
 #endif // __CSSOUNDSOURCEA3D_H__

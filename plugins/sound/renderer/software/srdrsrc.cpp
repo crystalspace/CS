@@ -24,58 +24,47 @@
 #include "cssndrdr/software/srdrsrc.h"
 #include "isystem.h"
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundSourceSoftware)
+IMPLEMENT_FACTORY (csSoundSourceSoftware)
 
-BEGIN_INTERFACE_TABLE(csSoundSourceSoftware)
-  IMPLEMENTS_INTERFACE(ISoundSource)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE(csSoundSourceSoftware)
+  IMPLEMENTS_INTERFACE(iSoundSource)
+IMPLEMENT_IBASE_END;
 
-csSoundSourceSoftware::csSoundSourceSoftware()
+csSoundSourceSoftware::csSoundSourceSoftware(iBase *piBase)
 {
+	CONSTRUCT_IBASE(piBase);
   fPosX = fPosY = fPosZ = 0.0;
   fVelX = fVelY = fVelZ = 0.0;
+  pSoundBuffer = NULL;
 }
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
 {
-
 }
 
-STDMETHODIMP csSoundSourceSoftware::GetSoundBuffer(ISoundBuffer **ppv)
+iSoundBuffer *csSoundSourceSoftware::GetSoundBuffer()
 {
-  if(!pSoundBuffer)
-  {
-    return E_FAIL;
-  }
-
-  return pSoundBuffer->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+  if(!pSoundBuffer) return NULL;
+  return QUERY_INTERFACE(pSoundBuffer, iSoundBuffer);
 }
 
-STDMETHODIMP csSoundSourceSoftware::SetPosition(float x, float y, float z)
+void csSoundSourceSoftware::SetPosition(float x, float y, float z)
 {
   fPosX = x; fPosY = y; fPosZ = z;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceSoftware::SetVelocity(float x, float y, float z)
+void csSoundSourceSoftware::SetVelocity(float x, float y, float z)
 {
   fVelX = x; fVelY = y; fVelZ = z;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceSoftware::GetPosition(float &x, float &y, float &z)
+void csSoundSourceSoftware::GetPosition(float &x, float &y, float &z)
 {
   x = fPosX; y = fPosY; z = fPosZ;
-
-  return S_OK;
 }
 
-STDMETHODIMP csSoundSourceSoftware::GetVelocity(float &x, float &y, float &z)
+void csSoundSourceSoftware::GetVelocity(float &x, float &y, float &z)
 {
   x = fVelX; y = fVelY; z = fVelZ;
-
-  return S_OK;
 }
 

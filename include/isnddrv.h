@@ -27,15 +27,17 @@ struct iSoundRender;
 
 SCF_VERSION (iSoundDriver, 0, 0, 1);
 
+#include "iplugin.h"
+
 /**
  * This is the sound render interface for CS.
  * All sound renders must implement this interface.
  * The standard implementation is ISoundDriver.
  */
-struct iSoundDriver : public iBase
+struct iSoundDriver : public iPlugIn
 {
   /// Open the sound render
-  virtual bool Open (ISoundRender *render, int frequency, bool bit16, bool stereo) = 0;
+  virtual bool Open (iSoundRender *render, int frequency, bool bit16, bool stereo) = 0;
   /// Close the sound render
   virtual void Close () = 0;
   /// Set Volume [0, 1]

@@ -26,41 +26,42 @@
 
 #include "csutil/scf.h"
 #include "isnddrv.h"
+#include "isystem.h"
 
-extern const CLSID CLSID_waveOutSoundDriver;
-
-class csSoundDriverWaveOut : public ISoundDriver
+class csSoundDriverWaveOut : public iSoundDriver
 {
 public:
-	csSoundDriverWaveOut(iSystem* piSystem);
-
+	DECLARE_IBASE;
+	
+	csSoundDriverWaveOut(iBase *piBase);
+	
 	virtual ~csSoundDriverWaveOut();
 
-  STDMETHODIMP Open(ISoundRender *render, int frequency, bool bit16, bool stereo);
-  STDMETHODIMP Close();
-  
-	STDMETHODIMP SetVolume(float vol);
-  STDMETHODIMP GetVolume(float *vol);
-	STDMETHODIMP LockMemory(void **mem, int *memsize);
-  STDMETHODIMP UnlockMemory();
-  STDMETHODIMP IsBackground(bool *back);
-	STDMETHODIMP Is16Bits(bool *bit);
-	STDMETHODIMP IsStereo(bool *stereo);
-	STDMETHODIMP GetFrequency(int *freq);
-  STDMETHODIMP IsHandleVoidSound(bool *handle);
-
-  DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundDriverWaveOut)
-
-  /// print to the system's device
-  void SysPrintf(int mode, char* str, ...);
+	/// implementation of interface for iPlugin
+	virtual bool Initialize (iSystem *iSys);
+	
+	bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
+	void Close();
+	
+	void SetVolume(float vol);
+	float GetVolume();
+	void LockMemory(void **mem, int *memsize);
+	void UnlockMemory();
+	bool IsBackground();
+	bool Is16Bits();
+	bool IsStereo();
+	int GetFrequency();
+	bool IsHandleVoidSound();
+	
+	/// print to the system's device
+	void SysPrintf(int mode, char* str, ...);
 protected:
   iSystem* m_piSystem;
-  ISoundRender *m_piSoundRender;
+  iSoundRender *m_piSoundRender;
   void * Memory;
   int MemorySize;
   float volume;
-	unsigned long old_Volume;
+  unsigned long old_Volume;
 
   int m_nFrequency;
   bool m_b16Bits;
@@ -74,18 +75,6 @@ protected:
   HANDLE hThread;
   DWORD dwThread;
 };
-
-class csSoundDriverWaveOutFactory : public ISoundDriverFactory
-{
-    STDMETHODIMP CreateInstance(REFIID riid, iSystem* piSystem, void** ppv);
-
-    /// Lock or unlock from memory.
-    STDMETHODIMP LockServer(COMBOOL bLock);
-
-    DECLARE_IUNKNOWN()
-    DECLARE_INTERFACE_TABLE(csSoundDriverWaveOutFactory)
-};
-
 
 #endif	//__SOUND_DRIVER_WAVEOUT_H__
 

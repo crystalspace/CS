@@ -24,37 +24,36 @@
 #include "isndbuf.h"
 #include "isndsrc.h"
 
-interface ISoundRender;
+struct iSoundRender;
 class csSoundData;
 
-class csSoundBufferA3D : public ISoundBuffer
+class csSoundBufferA3D : public iSoundBuffer
 {
 public:
-	csSoundBufferA3D();
+	DECLARE_IBASE;
+	csSoundBufferA3D(iBase *piBase);
 	virtual ~csSoundBufferA3D();
-
-	STDMETHODIMP Stop();
-	STDMETHODIMP Play(SoundBufferPlayMethod playMethod);
-
-  STDMETHODIMP SetVolume(float vol);
-  STDMETHODIMP GetVolume(float &vol);
-  
-  STDMETHODIMP SetFrequencyFactor(float vol);
-  STDMETHODIMP GetFrequencyFactor(float &vol);
-
-  STDMETHODIMP CreateSource(ISoundSource **source);
-
- 	DECLARE_IUNKNOWN()
-	DECLARE_INTERFACE_TABLE(csSoundBufferA3D)
+	
+	void Stop();
+	void Play(SoundBufferPlayMethod playMethod);
+	
+	void SetVolume(float vol);
+	float GetVolume();
+	
+	void SetFrequencyFactor(float factor);
+	float GetFrequencyFactor();
+	
+	iSoundSource *CreateSource();
+	
 public:
-  float fFrequencyFactor;
-  float fVolume;
-
-  int DestroySoundBuffer();
-	int CreateSoundBuffer(ISoundRender *render, csSoundData * sound);
-
-  IA3dSource *m_p3DSource;
-  IA3d4 *m_p3DAudioRenderer;
+	float fFrequencyFactor;
+	float fVolume;
+	
+	int DestroySoundBuffer();
+	int CreateSoundBuffer(iSoundRender *render, csSoundData * sound);
+	
+	IA3dSource *m_p3DSource;
+	IA3d4 *m_p3DAudioRenderer;
 };
 
 #endif // __CSSOUNDBUFFERA3D_H__

@@ -34,168 +34,159 @@
 #include "isndlstn.h"
 #include "isndsrc.h"
 
+IMPLEMENT_FACTORY(csSoundRenderEAX)
 
-IMPLEMENT_UNKNOWN_NODELETE (csSoundRenderEAX)
+EXPORT_CLASS_TABLE (sndrdrdseax)
+	EXPORT_CLASS (csSoundRenderEAX, "crystalspace.sound.render.eax",
+			  "EAX 3D Sound Driver for Crystal Space")
+EXPORT_CLASS_TABLE_END;
 
-BEGIN_INTERFACE_TABLE(csSoundRenderEAX)
-  IMPLEMENTS_INTERFACE(ISoundRender)
-END_INTERFACE_TABLE()
+IMPLEMENT_IBASE(csSoundRenderEAX)
+	IMPLEMENTS_INTERFACE(iSoundRender)
+	IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE_END;
 
-csSoundRenderEAX::csSoundRenderEAX(iSystem* piSystem) : m_pListener(NULL)
+csSoundRenderEAX::csSoundRenderEAX(iBase *piBase)
 {
-  m_p3DAudioRenderer = NULL;
-  m_piSystem = piSystem;
-  
-  m_pListener = new csSoundListenerEAX ();
+	CONSTRUCT_IBASE(piBase);
+	m_pListener = NULL;
+	m_piSystem = NULL;
+	m_p3DAudioRenderer = NULL;
+}
+
+bool csSoundRenderEAX::Initialize(iSystem *iSys)
+{
+	if (!iSys->RegisterDriver ("iSoundRender", this))
+		return false;
+	
+	m_piSystem = iSys;
+	m_pListener = new csSoundListenerEAX( NULL );
+	return true;
 }
 
 csSoundRenderEAX::~csSoundRenderEAX()
 {
-  if(m_pListener)
-    delete m_pListener;
+	if(m_pListener)
+		delete m_pListener;
 }
 
-STDMETHODIMP csSoundRenderEAX::GetListener(ISoundListener** ppv )
+iSoundListener *csSoundRenderEAX::GetListener()
 {
-  if (!m_pListener)
-  {
-    *ppv = NULL;
-    return E_OUTOFMEMORY;
-  }
-  
-  return m_pListener->QueryInterface (IID_ISoundListener, (void**)ppv);
+	if (!m_pListener) return NULL;
+	return QUERY_INTERFACE(m_pListener, iSoundListener);
 }
 
-STDMETHODIMP csSoundRenderEAX::CreateSource(ISoundSource** ppv, csSoundData *snd)
+iSoundSource *csSoundRenderEAX::CreateSource(csSoundData *snd)
 {
-  csSoundBufferEAX* pNew = new csSoundBufferEAX();
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-  
-  pNew->CreateSoundBuffer(this, snd);
-  pNew->SetVolume (1.0);
-
-  return pNew->CreateSource(ppv);
+	csSoundBufferEAX* pNew = new csSoundBufferEAX(NULL);
+	if (!pNew) return NULL;
+	pNew->CreateSoundBuffer(this, snd);
+	pNew->SetVolume (1.0);
+	return pNew->CreateSource();
 }
 
-STDMETHODIMP csSoundRenderEAX::CreateSoundBuffer(ISoundBuffer** ppv, csSoundData *snd)
+iSoundBuffer *csSoundRenderEAX::CreateSoundBuffer(csSoundData *snd)
 {
-  csSoundBufferEAX* pNew = new csSoundBufferEAX ();
-  if (!pNew)
-  {
-    *ppv = 0;
-    return E_OUTOFMEMORY;
-  }
-
-  pNew->CreateSoundBuffer(this, snd);
-  pNew->SetVolume (1.0);
-  
-  return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
+	csSoundBufferEAX* pNew = new csSoundBufferEAX (NULL);
+	if (!pNew) return NULL;
+	pNew->CreateSoundBuffer(this, snd);
+	pNew->SetVolume (1.0);
+	
+	return QUERY_INTERFACE(pNew, iSoundBuffer);
 }
 
-STDMETHODIMP csSoundRenderEAX::PlayEphemeral(csSoundData *snd)
+void csSoundRenderEAX::PlayEphemeral(csSoundData *snd)
 {
-  ISoundBuffer *played;
-  if(CreateSoundBuffer(&played, snd) == S_OK)
-  {
-    played->Play(SoundBufferPlay_DestroyAtEnd);
-  }
-  return S_OK;
+	iSoundBuffer *played = CreateSoundBuffer(snd);
+	if(played)
+	{
+		played->Play(SoundBufferPlay_DestroyAtEnd);
+	}
 }
 
-STDMETHODIMP csSoundRenderEAX::Open()
+bool csSoundRenderEAX::Open()
 {
-  HRESULT hr;
-  
-  SysPrintf (MSG_INITIALIZATION, "\nSoundRender DirectSound3D with EAX selected\n");
-
-  if (FAILED(hr = EAXDirectSoundCreate(NULL, &m_p3DAudioRenderer, NULL)))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize DirectSound3D !");
-    Close();
-    return(hr);
-  }
-  
-  
-  DWORD dwLevel = DSSCL_NORMAL;
-  if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel)))
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
-    Close();
-    return(hr);
-  }
-
-  m_pListener->CreateListener(this);
-
-  if(!m_pListener->m_pDS3DPrimaryBuffer)
-  {
-    SysPrintf(MSG_FATAL_ERROR, "Error : Listener isn't initialized !");
-    Close();
-    return(hr);
-  }
-
-  return S_OK;
+	HRESULT hr;
+	
+	SysPrintf (MSG_INITIALIZATION, "\nSoundRender DirectSound3D with EAX selected\n");
+	
+	if (FAILED(hr = EAXDirectSoundCreate(NULL, &m_p3DAudioRenderer, NULL)))
+	{
+		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize DirectSound3D !");
+		Close();
+		return false;
+	}
+	
+	DWORD dwLevel = DSSCL_NORMAL;
+	if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel)))
+	{
+		SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
+		Close();
+		return(hr);
+	}
+	
+	m_pListener->CreateListener(this);
+	
+	if(!m_pListener->m_pDS3DPrimaryBuffer)
+	{
+		SysPrintf(MSG_FATAL_ERROR, "Error : Listener isn't initialized !");
+		Close();
+		return false;
+	}
+	
+	return true;
 }
 
-STDMETHODIMP csSoundRenderEAX::Close()
+void csSoundRenderEAX::Close()
 {
-  HRESULT hr;
-  
-  if(m_pListener)
-  {
-    m_pListener->DestroyListener();
-    m_pListener->DecRef();
-  }
-
-  if (m_p3DAudioRenderer)
-  {
-    if ((hr = m_p3DAudioRenderer->DecRef()) < DS_OK)
-      return(hr);
-    
-    m_p3DAudioRenderer = NULL;
-  }
-
-  return S_OK;
+	HRESULT hr;
+	
+	if(m_pListener)
+	{
+		m_pListener->DestroyListener();
+		m_pListener->DecRef();
+	}
+	
+	if (m_p3DAudioRenderer)
+	{
+		if ((hr = m_p3DAudioRenderer->Release()) < DS_OK)
+			return;
+		
+		m_p3DAudioRenderer = NULL;
+	}
 }
 
-STDMETHODIMP csSoundRenderEAX::Update()
+void csSoundRenderEAX::Update()
 {
-  return S_OK;
 }
 
-STDMETHODIMP csSoundRenderEAX::SetVolume(float vol)
+void csSoundRenderEAX::SetVolume(float vol)
 {
-  long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
-  if (m_pListener)
-  {
-    m_pListener->m_pDS3DPrimaryBuffer->SetVolume(dsvol);
-  }
-  return S_OK;
+	long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
+	if (m_pListener)
+	{
+		m_pListener->m_pDS3DPrimaryBuffer->SetVolume(dsvol);
+	}
 }
 
-STDMETHODIMP csSoundRenderEAX::GetVolume(float *vol)
+float csSoundRenderEAX::GetVolume()
 {
-  long dsvol=DSBVOLUME_MIN;
-  if (m_pListener)
-  {
-    m_pListener->m_pDS3DPrimaryBuffer->GetVolume(&dsvol);
-  }
-  *vol = (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
-
-  return S_OK;
+	long dsvol=DSBVOLUME_MIN;
+	if (m_pListener)
+	{
+		m_pListener->m_pDS3DPrimaryBuffer->GetVolume(&dsvol);
+	}
+	return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }
 
 void csSoundRenderEAX::SysPrintf(int mode, char* szMsg, ...)
 {
-  char buf[1024];
-  va_list arg;
-  
-  va_start (arg, szMsg);
-  vsprintf (buf, szMsg, arg);
-  va_end (arg);
-  
-  m_piSystem->Print(mode, buf);
+	char buf[1024];
+	va_list arg;
+	
+	va_start (arg, szMsg);
+	vsprintf (buf, szMsg, arg);
+	va_end (arg);
+	
+	m_piSystem->Print(mode, buf);
 }
