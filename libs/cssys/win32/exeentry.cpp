@@ -21,6 +21,7 @@
 #include "csutil/scf.h"
 
 extern int csMain (int argc, char* argv[]);
+extern int ApplicationShow;
 HINSTANCE ModuleHandle;	
 
 #undef main
@@ -30,4 +31,21 @@ int main (int argc, char* argv[])
   // hInstance is really the handle of module
   ModuleHandle = GetModuleHandle (NULL);
   return csMain (argc, argv);
+}
+
+// The main entry for GUI applications
+int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance,
+  LPSTR lpCmdLine, int nCmdShow)
+{
+  ModuleHandle = hInstance;
+  ApplicationShow = nCmdShow;
+  (void)lpCmdLine;
+  (void)hPrevInstance;
+
+  return
+#ifdef COMP_BC
+    csMain ( _argc,  _argv);
+#else
+    csMain (__argc, __argv);
+#endif
 }

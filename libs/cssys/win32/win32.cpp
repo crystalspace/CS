@@ -233,8 +233,8 @@ DWORD WINAPI s_threadroutine (LPVOID param)
     MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
     ExitProcess (1);
   }
-  if (!DuplicateHandle (GetCurrentProcess(), System->m_hEvent, GetCurrentProcess (),
-        &hEvent [1], 0, FALSE, DUPLICATE_SAME_ACCESS))
+  if (!DuplicateHandle (GetCurrentProcess(), ((SysSystemDriver*)System)->m_hEvent, 
+                        GetCurrentProcess (), &hEvent [1], 0, FALSE, DUPLICATE_SAME_ACCESS))
   {
     MessageBox (NULL, "DuplicateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
     ExitProcess (1);
@@ -540,6 +540,8 @@ int SysSystemDriver::GetCmdShow () const
   return ApplicationShow;
 }
 
+#ifndef DO_DINPUT_KEYBOARD
+
 //----------------------------------------// Windows input translator //------//
 
 #define MAX_SCANCODE 0x3c
@@ -592,7 +594,7 @@ void WinKeyTrans (WPARAM wParam, bool down)
     case VK_RETURN:   key = CSKEY_ENTER; chr = '\n'; break;
     case VK_BACK:     key = CSKEY_BACKSPACE; chr = '\b'; break;
     case VK_TAB:      key = CSKEY_TAB; chr = '\t'; break;
-    case VK_ESCAPE:   key = CSKEY_ESC; chr = '\e'; break;
+    case VK_ESCAPE:   key = CSKEY_ESC; chr = 27; break;
     case VK_F1:       key = CSKEY_F1; break;
     case VK_F2:       key = CSKEY_F2; break;
     case VK_F3:       key = CSKEY_F3; break;
@@ -622,7 +624,9 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
   {
     case WM_ACTIVATEAPP:
       ApplicationActive = wParam;
+#ifndef DO_DINPUT_KEYBOARD
       memset (&LastCharCode, 0, sizeof (LastCharCode));
+#endif
       break;
     case WM_ACTIVATE:
       if (System)
