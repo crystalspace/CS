@@ -1,5 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+25-Aug-2000
+	- Andrew Zabolotny implemented the following for levtool:
+	  - Implemented the per-window key handling.
+	  - Implemented multiple views. Right now there are two engine views
+	    created upon startup.
+	- Andrew changed TEXTURING into SHADING.
+	- Andrew added a check for NT's CMD.EXE to win32gcc.mak.
+	- Andrew: now PLUGINS.DYNAMIC will compile if USE_SHARED_LIBS=yes.
+	  It used to be broken after my yesterday change.
+	- Andrew Moved <stdarg.h> to be before <stdio.h>. Please always
+	  put <stdarg.h> before any other system includes as on OS/2
+	  this gives compilation errors.
+	- Martin Geisse added a missing include in csutil/halogen2.cpp.
 24-Aug-2000
 	- Wouter Wijngaards did a few optimizations on the makefiles
 	  so that compilation should be somewhat faster.
