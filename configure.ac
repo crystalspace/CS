@@ -12,7 +12,7 @@ AC_PREREQ([2.56])
 # cs_version_number
 #	Keep this value synchronized with CS/include/csver.h.
 #------------------------------------------------------------------------------
-m4_define([cs_version_number], [0.97])
+m4_define([cs_version_number], [0.98])
 
 
 
@@ -1617,10 +1617,12 @@ CS_CHECK_BUILD([for regexp support], [cs_cv_regexp],
 # platforms to ensure that global constructors and functions which initialize
 # global variables in the plugin module get invoked.
 #
-# @@@ FIXME: Currently, we answer this question by making the (potentially
-# incorrect) assumption that plugins on platforms other than Windows, MacOS/X,
-# and Darwin require main().  In the future, we should use a proper test to
-# make this determination.
+# IMPLEMENTATION NOTES
+#
+# Currently, we answer this question by making the (potentially incorrect)
+# assumption that plugins on platforms other than Windows, MacOS/X, and Darwin
+# require main().  In the future, we should use a proper test to make this
+# determination.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_SYS_PLUGIN_MAIN],
     [AC_REQUIRE([AC_CANONICAL_HOST])
