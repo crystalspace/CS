@@ -70,3 +70,4 @@ Library csutil :
 CFlags csutil :
   [ FDefines CS_CONFIGDIR='\"$(appconfdir)\"' ]
   [ FDefines CS_PLUGINDIR='\"$(plugindir)\"'  ] ;
+ExternalLibs csutil : PTHREAD ZLIB ;

@@ -7,5 +7,3 @@ Application map2cs
 	: console
 ;
 LinkWith map2cs : csgeom csgfx cstool csutil ;
-ExternalLibs map2cs : ZLIB ;
-

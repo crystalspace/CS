@@ -7,4 +7,3 @@ Application md32spr
 	: console
 ;
 LinkWith md32spr : csgeom csgfx cstool csutil ;
-ExternalLibs md32spr : ZLIB ;

@@ -29,6 +29,12 @@ chronological order.
 	      - Material palette must be specified BEFORE material map.
 	      - LodDistance must be set before material map too.
 	- Jorrit fixed the terrain level for this change.
+	- res augmented the Jam build system to support ExternalLibs for 
+	  libraries. The required link flags are propagated to clients of the
+	  library. csutil now uses ExternalLibs to express it's dependency on
+	  zlib and pthread. The hardcoded linking of all apps resp. binaries
+	  against zlib and pthread has been removed from Jamrules. Also updated
+	  Jam msvcgen to handle ExternalLibs for libraries. 
 26-Apr-2004
 	- Eric Sunshine fixed bugs in cross-product functions of csVector4 and
 	  csDVector4 where it was accessing 'x' component of wrong vector.

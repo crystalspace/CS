@@ -5,7 +5,6 @@ if $(ZLIB.AVAILABLE) = "yes"
 Help vfs : "Virtual File System plug-in" ;
 Plugin vfs : [ Wildcard *.cpp *.h ] ;
 LinkWith vfs : csutil ;
-ExternalLibs vfs : ZLIB ;
 
 rule VfsCfgGen
 {

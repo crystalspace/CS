@@ -21,17 +21,6 @@ COMPILER.CFLAGS.debug += -DCS_DEBUG ;
 COMPILER.CFLAGS.profile += -g3 -pg ;
 COMPILER.LFLAGS.profile += -g3 -pg ;
 
-# csutil requires zlib
-APPLICATION.LFLAGS += $(ZLIB.LFLAGS) ;
-APPLICATION.CFLAGS += $(ZLIB.CFLAGS) ;
-# csThread may require pthread
-if $(PTHREAD.AVAILABLE) = "yes"
-{
-  LINKLIBS += $(PTHREAD.LFLAGS) ;
-  C++FLAGS += $(PTHREAD.CFLAGS) ;
-  CFLAGS += $(PTHREAD.CFLAGS) ;
-}
-
 # Put output files into out/systemname.
 LOCATE.OBJECTS = $(BUILDTOP)/out/$(OSFULL[1]:L) ;
 LOCATE.TARGETS = $(BUILDTOP) ;

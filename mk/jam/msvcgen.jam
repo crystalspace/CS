@@ -456,6 +456,7 @@ rule Plugin
 rule Library
 {
   RegisterWellKnownCompileGroups ;
+  $(<)_TYPE = library ;
   MsvcProject $(<) : library : $(<:S=.lib) : $(>) ;
   CompileGroups $(<) : all libs ;
 }
@@ -486,6 +487,8 @@ rule CompileGroups
 rule LinkWith
 {
   DEPEND on $($(<)_TARGET) += lib$(>) ;
+  MsvcLFlags $(<) : $($($(>).EXTERNALLIBS).LFLAGS) ;
+  MsvcExternalLibrary $(<) : $($($(>).EXTERNALLIBS).LIBS) ;
 }
 
 rule MsvcExternalLibrary
@@ -511,6 +514,11 @@ rule ExternalLibs
     MsvcCFlags $(<) : $($(i).CFLAGS) ;
     MsvcLFlags $(<) : $($(i).LFLAGS) ;
     MsvcExternalLibrary $(<) : $($(i).LIBS) ;
+    
+    if $($(<)_TYPE) = library
+    {
+      $(<).EXTERNALLIBS += $(i) ;
+    }
   }
 }
 
