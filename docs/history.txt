@@ -16,6 +16,8 @@ chronological order.
 	  map loader for this new feature.
 	- res updated the "External Libs" manual page for the new cs-win32libs
 	  release.
+	- Steven Geens made the HitBeam methods of sprcal3d faster.
+	  They require the newest cal3d cvs.
 15-May-2004
 	- Eric Sunshine added implementation of FReverse rule to 2.4 section of
 	  jamcompatibility.jam since it is missing in Jam 2.4 but is needed by

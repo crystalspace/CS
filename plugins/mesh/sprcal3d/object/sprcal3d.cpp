@@ -1192,13 +1192,19 @@ void csSpriteCal3DMeshObject::SetupVertices()
       for (s=0;s<vertices[m].Length();s++)
       {
 	vertices[m][s] = new csVector3[calModel.getMesh(m)->getSubmesh(s)->getVertexCount ()];
-	calModel.getPhysique()->calculateVertices(calModel.getMesh(m)->getSubmesh(s),
-	    (float*)vertices[m][s]);
+	int v;
+	for(v=0;v<calModel.getMesh(m)->getSubmesh(s)->getVertexCount ();v++)
+	{
+	  vertices[m][s][v].x = 0;
+	  vertices[m][s][v].y = 0;
+	  vertices[m][s][v].z = 0;
+	}
       }
     }
     vertices_allocated = true;
+    vertices_dirty = false;
   }
-  else
+  if(vertices_dirty)
   {
     int m;
     for (m=0;m<vertices.Length();m++)
@@ -1206,10 +1212,16 @@ void csSpriteCal3DMeshObject::SetupVertices()
       int s;
       for (s=0;s<vertices[m].Length();s++)
       {
-	calModel.getPhysique()->calculateVertices(calModel.getMesh(m)->getSubmesh(s),
-	    (float*)vertices[m][s]);
+	int v;
+	for(v=0;v<calModel.getMesh(m)->getSubmesh(s)->getVertexCount ();v++)
+	{
+	  vertices[m][s][v].x = 0;
+	  vertices[m][s][v].y = 0;
+	  vertices[m][s][v].z = 0;
+	}
       }
     }
+    vertices_dirty = false;
   }
 }
 
@@ -1217,7 +1229,7 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {
   SetupVertices();
-  
+ 
   //Checks all of the cal3d bounding boxes of each bone to see if they hit
 
   bool hit = false;
@@ -1292,16 +1304,33 @@ bool csSpriteCal3DMeshObject::HitBeamOutline (const csVector3& start,
 	      ++iteratorInflu;
 	    }
 	  }
-	  
-	  if (bboxhit &&  csIntersect3::IntersectTriangle (
-		vertices[m][s][(*iteratorFace).vertexId[0]],
-		vertices[m][s][(*iteratorFace).vertexId[1]],
-		vertices[m][s][(*iteratorFace).vertexId[2]], seg, tsect))
+	  if (bboxhit)
 	  {
-	    isect = tsect;
-	    if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
-		csSquaredDist::PointPoint (start, end));
-	    return true;
+	    for(f=0;f<3;f++)
+	    {
+	      //Did we allready calculate this vertex?
+	      if(vertices[m][s][(*iteratorFace).vertexId[f]].x == 0 &&
+	         vertices[m][s][(*iteratorFace).vertexId[f]].y == 0 &&
+		 vertices[m][s][(*iteratorFace).vertexId[f]].z == 0)
+	      {
+		CalVector calVector = calModel.getPhysique()->calculateVertex(
+		    calModel.getMesh(m)->getSubmesh(s),
+		    (*iteratorFace).vertexId[f]);
+		vertices[m][s][(*iteratorFace).vertexId[f]].x = calVector.x;
+		vertices[m][s][(*iteratorFace).vertexId[f]].y = calVector.y;
+		vertices[m][s][(*iteratorFace).vertexId[f]].z = calVector.z;
+	      }
+	    }
+	    if (csIntersect3::IntersectTriangle (
+		  vertices[m][s][(*iteratorFace).vertexId[0]],
+		  vertices[m][s][(*iteratorFace).vertexId[1]],
+		  vertices[m][s][(*iteratorFace).vertexId[2]], seg, tsect))
+	    {
+	      isect = tsect;
+	      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+		  csSquaredDist::PointPoint (start, end));
+	      return true;
+	    }
 	  }
 	  ++iteratorFace;
 	}
@@ -1395,17 +1424,35 @@ bool csSpriteCal3DMeshObject::HitBeamObject (const csVector3& start,
 	      ++iteratorInflu;
 	    }
 	  }
-
-	  if (bboxhit && csIntersect3::IntersectTriangle (
-		vertices[m][s][(*iteratorFace).vertexId[0]], 
-		vertices[m][s][(*iteratorFace).vertexId[1]],
-		vertices[m][s][(*iteratorFace).vertexId[2]], seg, tsect))
+	  if (bboxhit)
 	  {
-	    temp = csSquaredDist::PointPoint (start, tsect);
-	    if (temp < dist)
+	    for(f=0;f<3;f++)
 	    {
-	      dist = temp;
-	      isect = tsect;
+	      //Is the vertex calculated?
+	      if(vertices[m][s][(*iteratorFace).vertexId[f]].x == 0 &&
+		  vertices[m][s][(*iteratorFace).vertexId[f]].y == 0 &&
+		  vertices[m][s][(*iteratorFace).vertexId[f]].z == 0)
+	      {
+		CalVector calVector = calModel.getPhysique()->calculateVertex(
+		    calModel.getMesh(m)->getSubmesh(s),
+		    (*iteratorFace).vertexId[f]);
+		vertices[m][s][(*iteratorFace).vertexId[f]].x = calVector.x;
+		vertices[m][s][(*iteratorFace).vertexId[f]].y = calVector.y;
+		vertices[m][s][(*iteratorFace).vertexId[f]].z = calVector.z;
+	      }
+	    }
+
+	    if (csIntersect3::IntersectTriangle (
+		  vertices[m][s][(*iteratorFace).vertexId[0]], 
+		  vertices[m][s][(*iteratorFace).vertexId[1]],
+		  vertices[m][s][(*iteratorFace).vertexId[2]], seg, tsect))
+	    {
+	      temp = csSquaredDist::PointPoint (start, tsect);
+	      if (temp < dist)
+	      {
+		dist = temp;
+		isect = tsect;
+	      }
 	    }
 	  }
 	  ++iteratorFace;
@@ -1442,73 +1489,33 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
   {
     iMovable* movable = socket->GetMeshWrapper()->GetMovable();
     Advance(current_time);
+    int m = socket->GetMeshIndex();
+    int s = socket->GetSubmeshIndex();
+    int f = socket->GetTriangleIndex();
+    
     // Get the submesh
-    CalSubmesh* submesh = calModel.getMesh(socket->GetMeshIndex())
-    	->getSubmesh(socket->GetSubmeshIndex());
+    CalSubmesh* submesh = calModel.getMesh(m)->getSubmesh(s);
     // Get the core submesh
     CalCoreSubmesh* coresubmesh = calModel.getCoreModel()->
-      getCoreMesh(socket->GetMeshIndex())->getCoreSubmesh(
-      	socket->GetSubmeshIndex());
-    // get the sub morph target vector from the core sub mesh
-    std::vector<CalCoreSubMorphTarget*>& vectorSubMorphTarget =
-      coresubmesh->getVectorCoreSubMorphTarget();
-    // calculate the base weight
-    float baseWeight = submesh->getBaseWeight();
-    // get the number of morph targets
-    int morphTargetCount = submesh->getMorphTargetWeightCount();
+      getCoreMesh(m)->getCoreSubmesh(s);
     // get the triangle
-    CalCoreSubmesh::Face face = coresubmesh->getVectorFace()[
-    	socket->GetTriangleIndex()];
+    CalCoreSubmesh::Face face = coresubmesh->getVectorFace()[f];
     // get the vertices
-    CalCoreSubmesh::Vertex vertex[3];
-    vertex[0] = coresubmesh->getVectorVertex()[face.vertexId[0]];
-    vertex[1] = coresubmesh->getVectorVertex()[face.vertexId[1]];
-    vertex[2] = coresubmesh->getVectorVertex()[face.vertexId[2]];
     CalVector vector[3];
-    unsigned int i;
-    unsigned int j;
-    for(i=0;i<3;i++)
-    {
-      CalVector position(0,0,0);
-      if(baseWeight == 1.0f)
-      {
-	position.x = vertex[i].position.x;
-	position.y = vertex[i].position.y;
-	position.z = vertex[i].position.z;
-      }
-      else
-      {
-	position.x = baseWeight*vertex[i].position.x;
-	position.y = baseWeight*vertex[i].position.y;
-	position.z = baseWeight*vertex[i].position.z;
-	int morphTargetId;
-	for(morphTargetId=0; morphTargetId < morphTargetCount;++morphTargetId)
-	{
-	  CalCoreSubMorphTarget::BlendVertex& blendVertex =
-	    vectorSubMorphTarget[morphTargetId]->getVectorBlendVertex()[
-	    face.vertexId[i]];
-	  float currentWeight = submesh->getMorphTargetWeight(morphTargetId);
-	  position.x += currentWeight*blendVertex.position.x;
-	  position.y += currentWeight*blendVertex.position.y;
-	  position.z += currentWeight*blendVertex.position.z;
-	}
-      }
-      for(j=0;j<vertex[i].vectorInfluence.size();j++)
-      {
-	CalBone* bone = calModel.getSkeleton()->getBone(
-		vertex[i].vectorInfluence[j].boneId);
-	CalVector v(position);
-	v *= bone->getTransformMatrix();
-	v += bone->getTranslationBoneSpace();
-	vector[i] += vertex[i].vectorInfluence[j].weight*v;
-      }
-    }
+    vector[0] = calModel.getPhysique()->calculateVertex(
+	submesh,
+	face.vertexId[0]);
+    vector[1] = calModel.getPhysique()->calculateVertex(
+	submesh,
+	face.vertexId[1]);
+    vector[2] = calModel.getPhysique()->calculateVertex(
+	submesh,
+	face.vertexId[2]);
     csVector3 vert1(vector[0].x,vector[0].y,vector[0].z);
     csVector3 vert2(vector[1].x,vector[1].y,vector[1].z);
     csVector3 vert3(vector[2].x,vector[2].y,vector[2].z);
 
     csVector3 center= (vert1+vert2+vert3)/3;
-    
 
     csVector3 bc = vert3 - vert2;
         
@@ -1837,6 +1844,7 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   }
   meshVersion++;
   lighting_dirty = true;
+  vertices_dirty = true;
   return true;
 }
 

@@ -562,6 +562,7 @@ private:
   csColor dynamic_ambient;
   csArray<csArray<csVector3* > > vertices;
   bool vertices_allocated;
+  bool vertices_dirty;
 
   void SetupVertices();
   void SetupObject ();
