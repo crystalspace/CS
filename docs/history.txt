@@ -15,6 +15,11 @@ Short-term cleanups that need to be done:
 7-Mar-2000
 	- Added LIGHTING(yes/no) option to skydomes to be able to disable
 	  lighting for the generated triangles.
+	- Added an array of unsplit polygons to every octree node. This
+	  will be used by the PVS but it can also be used for other things
+	  (like faster rendering if BSP tree is disabled).
+	- Continued work on PVS building. Started work on a new
+	  algorithm for computing the PVS. Not functional yet.
 6-Mar-2000
 	- Started work on new csSprite superclass for csSprite3D (already
 	  done) and csSprite2D. csSprite3D now inherits from csSprite.

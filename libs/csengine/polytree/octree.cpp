@@ -349,6 +349,10 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
     return;
   }
 
+  int i;
+  for (i = 0 ; i < num ; i++)
+    node->unsplit_polygons.AddPolygon (polygons[i]);
+
   if (num <= bsp_num)
   {
     csBspTree* bsp;
@@ -363,7 +367,7 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
 
   const csVector3& center = node->GetCenter ();
 
-  int i, k;
+  int k;
 
   // Now we split the node according to the planes.
   csPolygonInt** polys[8];
@@ -615,6 +619,74 @@ bool CullOctreeNodePVS (csPolygonTree* tree, csPolygonTreeNode* node,
   return true;
 }
 
+struct PVSBuildData2
+{
+  // All collected leafs that can potentially block sight
+  // between the original leaf and the current node.
+  csVector leaf_queue;
+  // The box for the original leaf.
+  csBox3 leaf_box;
+};
+
+bool BuildPVSOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
+	const csVector3& /*pos*/, void* data)
+{
+  if (!node) return false;
+  if (node->Type () != NODE_OCTREE) return true;
+
+  csOctree* otree = (csOctree*)tree;
+  csOctreeNode* onode = (csOctreeNode*)node;
+
+  PVSBuildData2* pvsdata = (PVSBuildData2*)data;
+  csVector& leaf_queue = pvsdata->leaf_queue;
+
+  // Test this node against all polygons in all leafs in the
+  // queue already. If there is a polygon in there that completely
+  // shadows the original leaf then this node is not visible.
+  int leaf_num, poly_num, cor_num, i, i1;
+  bool invisible = false;
+  for (leaf_num = 0 ; i < leaf_queue.Length () ; i++)
+  {
+    csOctreeNode* leaf = (csOctreeNode*)leaf_queue[leaf_num];
+    csPolygonIntArray& polygons = leaf->GetUnsplitPolygons ();
+    for (poly_num = 0 ; poly_num < polygons.GetNumPolygons () ; poly_num++)
+    {
+      csPolygonInt* polygon = polygons.GetPolygon (poly_num);
+      if (polygon->GetType () == 1)
+      {
+        // csPolygon3D.
+	csPolygon3D* p = (csPolygon3D*)polygon;
+	csPlane* plane = p->GetPolyPlane ();
+	for (cor_num = 0 ; cor_num < 8 ; cor_num++)
+	{
+	  csVector3 corner = onode->GetBox ().GetCorner (cor_num);
+	  // Do backface culling first.
+	  if (csMath3::Visible (corner, *plane))
+	  {
+	    i1 = p->GetNumVertices ()-1;
+	    for (i = 0 ; i < p->GetNumVertices () ; i++)
+	    {
+	      csVector3& v1 = p->Vwor (i1);
+	      csVector3& v2 = p->Vwor (i);
+
+	      i1 = i;
+	    }
+	  }
+	  else
+	  {
+	    // If backface culling fails then we assume
+	    // that this polygon can never cull the node.
+	    break;
+	  }
+	}
+      }
+    }
+  }
+
+  onode->MarkVisible ();
+  return true;
+}
+
 void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
 {
   if (!node) return;
@@ -634,6 +706,36 @@ void csOctree::AddToPVS (csPVS& pvs, csOctreeNode* node)
     AddToPVS (pvs, (csOctreeNode*)node->children[i]);
 }
 
+#if 1
+void csOctree::BuildPVSForLeaf (csThing* thing,
+	csOctreeNode* leaf, csCovcube* cube)
+{
+printf ("*"); fflush (stdout);
+  // Here we traverse the octree starting from the leaf node.
+  // Every other leaf we encounter is first checked against
+  // the contents of the queue and if visible marked as visible
+  // and then added to the queue as well.
+
+  // Mark all objects in the world as invisible.
+  csOctreeNode::pvs_cur_vis_nr++;
+
+  // The root is always visible.
+  ((csOctreeNode*)root)->MarkVisible ();
+
+  const csVector3& center = leaf->GetCenter ();
+  thing->UpdateTransformation (center);
+  PVSBuildData2 pvsdata;
+  pvsdata.leaf_box = leaf->bbox;
+  Front2Back (center, NULL, NULL, BuildPVSOctreeNode, (void*)&pvsdata);
+
+  // Now that we have traversed the tree for several positions we have
+  // found a superset of all visible nodes and polygons. Here
+  // we will fetch them all and put them in the PVS for this leaf.
+  csPVS& pvs = leaf->GetPVS ();
+  pvs.Clear ();
+  AddToPVS (pvs, (csOctreeNode*)root);
+}
+#else
 void csOctree::BuildPVSForLeaf (csThing* thing,
 	csOctreeNode* leaf, csCovcube* cube)
 {
@@ -685,6 +787,7 @@ printf ("*"); fflush (stdout);
   pvs.Clear ();
   AddToPVS (pvs, (csOctreeNode*)root);
 }
+#endif
 
 void csOctree::BuildPVS (csThing* thing,
 	csOctreeNode* node, csCovcube* cube)

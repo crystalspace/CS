@@ -98,6 +98,8 @@ public:
 
 /**
  * An octree node.
+ * @@@ We should have seperate leaf/non-leaf structures as they
+ * are considerably different.
  */
 class csOctreeNode : public csPolygonTreeNode
 {
@@ -111,14 +113,25 @@ private:
   csBox3 bbox;
   /// Center point for this node.
   csVector3 center;
+
   /**
    * If true then this is a leaf.
    * If a node has no polygons then it will also be a leaf
    * but there will be no mini-bsp.
    */
   bool leaf;
+
+  /**
+   * A list of all polygons in this node. These are the original
+   * unsplit polygons. Further subdivision of this node will
+   * cause these polygons to be split into the children but
+   * the list here reflects the unsplit polygons.
+   */
+  csPolygonIntArray unsplit_polygons;
+
   /// Mini-bsp tree (in this case there are no children).
   csBspTree* minibsp;
+
   /**
    * If there is a mini-bsp tree this array contains the indices
    * of all vertices that are used by the polygons in the tree.
@@ -127,6 +140,7 @@ private:
    * need to be traversed.
    */
   int* minibsp_verts;
+
   /// Number of vertices in minibsp_verts.
   int minibsp_numverts;
 
@@ -194,6 +208,18 @@ public:
 
   /// Get maximum coordinate of box.
   const csVector3& GetMaxCorner () const { return bbox.Max (); }
+
+  /// Get box.
+  const csBox3& GetBox () { return bbox; }
+
+  /**
+   * Get the list of all unsplit polygons in this node.
+   * These are the original unsplit polygons. Further
+   * subdivision of this node will have caused these polygons to
+   * be split into the children but the list here reflects
+   * the unsplit polygons.
+   */
+  csPolygonIntArray& GetUnsplitPolygons () { return unsplit_polygons; }
 
   /// Get mini-bsp tree.
   csBspTree* GetMiniBsp () const { return minibsp; }
