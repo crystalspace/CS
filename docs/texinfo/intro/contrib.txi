@@ -54,6 +54,11 @@ Andon patched 3ds2lev so it works correctly for
 non-texture mapped @sc{3ds} objects.
 
 @item
+Boyan Hristov (@email{boyan_hristov@@newmail.ru})
+
+Boyan added a lightning plugin to CS.
+
+@item
 James Baicoianu (@email{james@@baicoianu.com})
 
 James added iPolygonMesh implementation to the ball mesh plugin.

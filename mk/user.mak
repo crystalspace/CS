@@ -81,6 +81,7 @@ PLUGINS += mesh/emit/object        mesh/emit/persist/standard
 PLUGINS += mesh/metaball/object    mesh/metaball/persist/standard
 PLUGINS += mesh/terrfunc/object    mesh/terrfunc/persist/standard
 PLUGINS += mesh/terrbig
+PLUGINS += mesh/lghtng/object
 PLUGINS += mesh/null/object
 PLUGINS += mesh/bcterr/object      mesh/bcterr/persist/standard
 PLUGINS += mesh/metagen/object

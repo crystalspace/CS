@@ -15,6 +15,9 @@ The history order is reversed so that new features are at the top.
 	- Parsing of attributes in TinyXML faster: less new/delete.
 	- Cleaned up TinyXML code a bit. Still messy though.
 	- Another optimization in TinyXML. My god! This is crappy code! :-)
+	- Added a lightning mesh object plugin from Boyan Hristov
+	  <boyan_hristov@newmail.ru>. There is also a lightning test
+	  application to try it out. Added energy.jpg to standard.zip.
 11-Mar-2003
 	- Fixed a leak in the prepare textures code of regions. It was
 	  forgetting to reset the image pointer to NULL. This means

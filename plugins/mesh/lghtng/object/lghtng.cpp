@@ -1,0 +1,348 @@
+/*
+    Copyright (C) 2003 by Boyan Hristov
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+
+#include <cssysdef.h>
+#include <csgeom/math3d.h>
+#include <csgeom/poly2d.h>
+#include <iengine/movable.h>
+#include <iengine/rview.h>
+#include <ivideo/graph3d.h>
+#include <ivideo/graph2d.h>
+#include <ivideo/material.h>
+#include <iengine/material.h>
+#include <iengine/camera.h>
+#include <igeom/clip2d.h>
+#include <iengine/engine.h>
+#include <iengine/light.h>
+#include <iutil/objreg.h>
+#include <iutil/plugin.h>
+#include <qsqrt.h>
+
+#include "lghtng.h"
+
+CS_IMPLEMENT_PLUGIN
+
+//------------ csLightningMeshObject -------------------------------
+
+SCF_IMPLEMENT_IBASE (csLightningMeshObject)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObject)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightningState)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningMeshObject::ObjectModel)
+  SCF_IMPLEMENTS_INTERFACE (iObjectModel)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningMeshObject::LightningState)
+  SCF_IMPLEMENTS_INTERFACE (iLightningState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csLightningMeshObject::csLightningMeshObject (csLightningMeshObjectFactory* factory)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightningState);
+  csLightningMeshObject::factory = factory;
+  logparent = NULL;
+  ifactory = SCF_QUERY_INTERFACE (factory, iMeshObjectFactory);
+
+  initialized = false;
+  vis_cb = NULL;
+  shapenr = 0;
+  origin.Set(0,0,0);  
+
+  CS_ASSERT(factory);
+  /// copy the factory settings
+  material = factory->GetMaterialWrapper ();
+  MixMode = factory->GetMixMode ();
+  points = factory->GetPointCount();
+  origin = factory->GetOrigin ();
+  directional = factory->GetDirectional ();
+
+  
+  GenMesh = factory->GetMeshFactory ()->NewInstance ();
+  if (GenMesh)
+  {
+    GenState = SCF_QUERY_INTERFACE (GenMesh, iGeneralMeshState);
+    GenState->SetMaterialWrapper (material);
+    GenState->SetLighting (false);
+    GenState->SetColor (csColor (1.f, 1.f, 1.f));
+    GenState->SetManualColors (true);
+    GenState->SetMixMode (MixMode);
+  }
+}
+
+csLightningMeshObject::~csLightningMeshObject ()
+{
+  if (vis_cb) vis_cb->DecRef ();
+}
+
+void csLightningMeshObject::SetupObject ()
+{
+  if (!initialized)
+  {    
+    csVector3 pos;
+	int l, i;
+    initialized = true;
+  }
+}
+
+
+void csLightningMeshObject::GetTransformedBoundingBox (long cameranr,
+        long movablenr, const csReversibleTransform& trans, csBox3& cbox)
+{
+
+}
+
+static void Perspective (const csVector3& v, csVector2& p, float fov,
+        float sx, float sy)
+{
+  float iz = fov / v.z;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
+
+void csLightningMeshObject::FireListeners ()
+{
+  int i;
+  for (i = 0 ; i < listeners.Length () ; i++)
+    listeners[i]->ObjectModelChanged (&scfiObjectModel);
+}
+
+void csLightningMeshObject::AddListener (iObjectModelListener *listener)
+{
+  RemoveListener (listener);
+  listeners.Push (listener);
+}
+
+void csLightningMeshObject::RemoveListener (iObjectModelListener *listener)
+{
+  int idx = listeners.Find (listener);
+  if (idx == -1) return ;
+  listeners.Delete (idx);
+}
+
+bool csLightningMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+{
+  return GenMesh->DrawTest (rview, movable);
+}
+
+bool csLightningMeshObject::Draw (iRenderView* rview, iMovable* movable,
+	csZBufMode mode)
+{ 
+  csReversibleTransform &camtr = rview->GetCamera ()->GetTransform ();
+  csReversibleTransform &sprtr = movable->GetTransform ();
+  sprtr.LookAt(directional,
+      camtr.GetOrigin () - sprtr.GetOrigin ());
+
+  movable->UpdateMove ();
+
+  return GenMesh->Draw (rview, movable, mode);  
+}
+
+void csLightningMeshObject::GetObjectBoundingBox (csBox3& retbbox, int /*type*/)
+{
+  SetupObject ();  
+}
+
+void csLightningMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  (void)t;
+}
+
+void csLightningMeshObject::NextFrame (csTicks current_time, const csVector3& /*pos*/)
+{
+  factory->NextFrame(current_time);
+}
+
+//----------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csLightningMeshObjectFactory)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightningFactoryState)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningMeshObjectFactory::LightningFactoryState)
+  SCF_IMPLEMENTS_INTERFACE (iLightningFactoryState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csLightningMeshObjectFactory::csLightningMeshObjectFactory (iBase *pParent, iObjectRegistry *object_registry)
+{
+  MaxPoints = 32;
+  wildness = 0.1f;
+  vibrate = 0.1f;
+  glowsize = 0.1f;
+  length = 10;
+  update_interval = 60;
+  update_counter = 0;
+  ZCalculated = false;
+  
+  SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightningFactoryState);
+  material = NULL;
+  MixMode = 0;
+  origin.Set (0, 0, 0);
+  directional.Set (0, 0, 1);  
+  logparent = NULL;
+  
+  SCF_CONSTRUCT_IBASE (pParent);  
+  csRef<iPluginManager> PlugMgr (CS_QUERY_REGISTRY (object_registry, iPluginManager));
+  CS_ASSERT (PlugMgr);
+  csRef<iMeshObjectType> MeshType (CS_LOAD_PLUGIN(PlugMgr,
+      "crystalspace.mesh.object.genmesh", iMeshObjectType));
+  if (MeshType)
+  {
+    GenMeshFact = MeshType->NewFactory ();
+    Invalidate ();
+  }
+}
+
+csLightningMeshObjectFactory::~csLightningMeshObjectFactory ()
+{
+}
+
+void csLightningMeshObjectFactory::CalculateFractal (int left, int right,
+    float lh, float rh, int xyz, csVector3 *Vertices)
+{
+  int mid = (left + right) / 2;
+  int res = (left + right) % 2;
+  float fracScale = ((float)(right - left)) / (float)(MaxPoints);
+  float midh = (lh + rh) / 2 + (fracScale * wildness * csRndNum(-10, 10))
+      - (fracScale * wildness) / 2;
+
+  const int mid2 = mid * 2;
+  switch (xyz)
+  {
+    case 0:
+      Vertices[mid2].x = origin.x + midh + (vibrate * csRndNum(-5, 5) - (vibrate / 2));
+      break;
+    case 1:
+      Vertices[mid2].y = origin.y + midh + (vibrate * csRndNum(-5, 5) - (vibrate / 2));
+      break;
+    case 2:
+      Vertices[mid2].z = origin.z + midh + (vibrate * csRndNum(-5, 5) - (vibrate / 2));
+
+  }
+
+  if (res == 1)
+    Vertices[(right - 1) * 2] = Vertices[right * 2];
+
+  if ((mid - left) > 1)
+    CalculateFractal(left, mid, lh, midh, xyz, Vertices);
+  if ((right - mid) > 1)
+    CalculateFractal(mid, right, midh, rh, xyz, Vertices);
+}
+
+void csLightningMeshObjectFactory::CalculateFractal()
+{
+  int i;
+  const int m2 = MaxPoints * 2;  
+
+  csVector3 *Vertices = GenFactState->GetVertices();
+
+
+  CalculateFractal(0, MaxPoints - 1, 0, 0, 0, GenFactState->GetVertices());
+  CalculateFractal(0, MaxPoints - 1, 0, 0, 1, GenFactState->GetVertices());
+  
+  
+  Vertices[0] = origin;
+  Vertices[MaxPoints * 2 - 1].x = origin.x;
+  Vertices[MaxPoints * 2 - 1].y = origin.y;
+  Vertices[MaxPoints * 2 - 2].x = origin.x;
+  Vertices[MaxPoints * 2 - 2].y = origin.y;
+  
+  
+
+  if (!ZCalculated)
+  {
+    float CurrZ = 0;
+    float ZStep = length/((float)MaxPoints);
+    for (i = 0; i < m2; i++)
+    {      
+      Vertices[i].z = CurrZ + origin.z;      
+      if (i & 1)
+        CurrZ += ZStep;
+    }
+    ZCalculated = true;
+  }
+
+  for ( i = 0; i < m2; i += 2 )
+  {
+    Vertices[i + 1] = Vertices[i];
+    Vertices[i + 1].x += 0.3f;
+  }
+
+}
+
+void csLightningMeshObjectFactory::NextFrame (csTicks CurrentTime)
+{
+  if (update_counter == (csTicks)-1 || CurrentTime - update_counter > update_interval)
+  {
+    update_counter = CurrentTime;      
+    CalculateFractal();
+  }
+}
+
+csPtr<iMeshObject> csLightningMeshObjectFactory::NewInstance ()
+{
+  csLightningMeshObject* cm = new csLightningMeshObject (this);
+  csRef<iMeshObject> im (SCF_QUERY_INTERFACE (cm, iMeshObject));
+  cm->DecRef ();
+  return csPtr<iMeshObject> (im);
+}
+
+//----------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csLightningMeshObjectType)
+  SCF_IMPLEMENTS_INTERFACE (iMeshObjectType)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csLightningMeshObjectType::eiComponent)
+  SCF_IMPLEMENTS_INTERFACE (iComponent)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_FACTORY (csLightningMeshObjectType)
+
+SCF_EXPORT_CLASS_TABLE (lghtng)
+  SCF_EXPORT_CLASS (csLightningMeshObjectType, "crystalspace.mesh.object.lightning",
+    "Crystal Space Lightning Mesh Type")
+SCF_EXPORT_CLASS_TABLE_END
+
+csLightningMeshObjectType::csLightningMeshObjectType (iBase* pParent)
+{
+  SCF_CONSTRUCT_IBASE (pParent);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+}
+
+csLightningMeshObjectType::~csLightningMeshObjectType ()
+{
+}
+
+csPtr<iMeshObjectFactory> csLightningMeshObjectType::NewFactory ()
+{
+  csLightningMeshObjectFactory* cm = new csLightningMeshObjectFactory (this, Registry);
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  cm->DecRef ();
+  return csPtr<iMeshObjectFactory> (ifact);
+}
+
