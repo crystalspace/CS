@@ -53,7 +53,7 @@ INC.CSDIVE = $(wildcard plugins/video/canvas/csdive/*.h $(INC.COMMON.DRV2D))
 SRC.CSDIVE = $(wildcard plugins/video/canvas/csdive/*.cpp \
   plugins/video/canvas/common/pc-keys.cpp $(SRC.COMMON.DRV2D))
 OBJ.CSDIVE = $(addprefix $(OUT),$(notdir $(SRC.CSDIVE:.cpp=$O)))
-DEP.CSDIVE = CSUTIL CSSYS
+DEP.CSDIVE = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

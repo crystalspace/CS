@@ -47,7 +47,7 @@ endif
 INC.SVGA2D = $(wildcard plugins/video/canvas/svgalib/*.h   $(INC.COMMON.DRV2D))
 SRC.SVGA2D = $(wildcard plugins/video/canvas/svgalib/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.SVGA2D = $(addprefix $(OUT),$(notdir $(SRC.SVGA2D:.cpp=$O)))
-DEP.SVGA2D = CSUTIL CSSYS
+DEP.SVGA2D = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

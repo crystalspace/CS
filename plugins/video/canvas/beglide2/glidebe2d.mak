@@ -50,7 +50,7 @@ INC.GLIDEBE2D = $(wildcard plugins/video/canvas/beglide2/*.h \
 SRC.GLIDEBE2D = $(wildcard plugins/video/canvas/beglide2/*.cpp \
 	$(SRC.COMMON.DRV2D.GLIDE) $(SRC.COMMON.DRV2D))
 OBJ.GLIDEBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLIDEBE2D:.cpp=$O)))
-DEP.GLIDEBE2D = CSUTIL CSSYS
+DEP.GLIDEBE2D = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

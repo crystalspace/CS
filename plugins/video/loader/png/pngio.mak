@@ -45,7 +45,7 @@ INC.PNGIMG = $(wildcard plugins/video/loader/png/*.h)
 SRC.PNGIMG = $(wildcard plugins/video/loader/png/*.cpp)
 
 OBJ.PNGIMG = $(addprefix $(OUT),$(notdir $(SRC.PNGIMG:.cpp=$O)))
-DEP.PNGIMG = CSUTIL CSSYS CSGFX CSUTIL 
+DEP.PNGIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += PNGIMG
 DSP.PNGIMG.NAME = cspngimg

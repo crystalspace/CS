@@ -47,7 +47,7 @@ endif
 INC.SNDWOS = $(wildcard plugins/sound/driver/waveoutsd/*.h)
 SRC.SNDWOS = $(wildcard plugins/sound/driver/waveoutsd/*.cpp)
 OBJ.SNDWOS = $(addprefix $(OUT),$(notdir $(SRC.SNDWOS:.cpp=$O)))
-DEP.SNDWOS = CSUTIL CSSYS
+DEP.SNDWOS = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += SNDWOS
 DSP.SNDWOS.NAME = sndwaveout

@@ -43,7 +43,7 @@ INC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.h) \
 SRC.SNDEAX = $(wildcard plugins/sound/renderer/eax/*.cpp) \
   $(wildcard plugins/sound/renderer/common/*.cpp)
 OBJ.SNDEAX = $(addprefix $(OUT),$(notdir $(SRC.SNDEAX:.cpp=$O)))
-DEP.SNDEAX = CSUTIL CSGEOM CSSYS
+DEP.SNDEAX = CSUTIL CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += SNDEAX
 DSP.SNDEAX.NAME = sndrdreax

@@ -43,7 +43,7 @@ INC.WALIMG = $(wildcard plugins/video/loader/wal/*.h)
 SRC.WALIMG = $(wildcard plugins/video/loader/wal/*.cpp)
 
 OBJ.WALIMG = $(addprefix $(OUT),$(notdir $(SRC.WALIMG:.cpp=$O)))
-DEP.WALIMG = CSUTIL CSSYS CSGFX CSUTIL 
+DEP.WALIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += WALIMG
 DSP.WALIMG.NAME = cswalimg

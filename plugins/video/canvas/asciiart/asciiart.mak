@@ -56,7 +56,7 @@ INC.ASCIIART = $(wildcard plugins/video/canvas/asciiart/*.h \
 SRC.ASCIIART = $(wildcard plugins/video/canvas/asciiart/*.cpp \
   $(SRC.COMMON.DRV2D))
 OBJ.ASCIIART = $(addprefix $(OUT),$(notdir $(SRC.ASCIIART:.cpp=$O)))
-DEP.ASCIIART = CSUTIL CSSYS
+DEP.ASCIIART = CSUTIL CSSYS CSUTIL
 CFG.ASCIIART = data/config/asciiart.cfg
 
 TO_INSTALL.CONFIG += $(CFG.ASCIIART)

@@ -43,7 +43,7 @@ INC.BMPIMG = $(wildcard plugins/video/loader/bmp/*.h)
 SRC.BMPIMG = $(wildcard plugins/video/loader/bmp/*.cpp)
 
 OBJ.BMPIMG = $(addprefix $(OUT),$(notdir $(SRC.BMPIMG:.cpp=$O)))
-DEP.BMPIMG = CSUTIL CSSYS CSGFX CSUTIL 
+DEP.BMPIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += BMPIMG
 DSP.BMPIMG.NAME = csbmpimg

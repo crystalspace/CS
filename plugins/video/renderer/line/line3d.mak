@@ -51,7 +51,7 @@ SRC.LINE3D = $(wildcard plugins/video/renderer/line/*.cpp) \
   plugins/video/renderer/common/dtmesh.cpp \
   plugins/video/renderer/common/dpmesh.cpp
 OBJ.LINE3D = $(addprefix $(OUT),$(notdir $(SRC.LINE3D:.cpp=$O)))
-DEP.LINE3D = CSGEOM CSGFX CSUTIL CSSYS
+DEP.LINE3D = CSGEOM CSGFX CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += LINE3D
 DSP.LINE3D.NAME = line3d

@@ -45,7 +45,7 @@ endif
 
 SRC.SNDOSS = $(wildcard plugins/sound/driver/oss/*.cpp)
 OBJ.SNDOSS = $(addprefix $(OUT),$(notdir $(SRC.SNDOSS:.cpp=$O)))
-DEP.SNDOSS = CSUTIL CSSYS
+DEP.SNDOSS = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

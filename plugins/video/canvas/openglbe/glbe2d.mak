@@ -49,7 +49,7 @@ INC.GLBE2D = $(wildcard plugins/video/canvas/openglbe/*.h \
 SRC.GLBE2D = $(wildcard plugins/video/canvas/openglbe/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLBE2D = $(addprefix $(OUT),$(notdir $(SRC.GLBE2D:.cpp=$O)))
-DEP.BE2D = CSUTIL CSSYS
+DEP.BE2D = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

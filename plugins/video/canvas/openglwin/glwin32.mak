@@ -55,7 +55,7 @@ INC.GLWIN32 = $(wildcard plugins/video/canvas/openglwin/*.h \
 SRC.GLWIN32 = $(wildcard plugins/video/canvas/openglwin/*.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLWIN32 = $(addprefix $(OUT),$(notdir $(SRC.GLWIN32:.cpp=$O)))
-DEP.GLWIN32 = CSUTIL CSSYS
+DEP.GLWIN32 = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += GLWIN32
 DSP.GLWIN32.NAME = glwin32

@@ -43,7 +43,7 @@ INC.SGIIMG = $(wildcard plugins/video/loader/sgi/*.h)
 SRC.SGIIMG = $(wildcard plugins/video/loader/sgi/*.cpp)
 
 OBJ.SGIIMG = $(addprefix $(OUT),$(notdir $(SRC.SGIIMG:.cpp=$O)))
-DEP.SGIIMG = CSUTIL CSSYS CSGFX CSUTIL 
+DEP.SGIIMG = CSUTIL CSSYS CSGFX CSUTIL
 
 MSVC.DSP += SGIIMG
 DSP.SGIIMG.NAME = cssgiimg

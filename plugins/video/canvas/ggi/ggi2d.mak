@@ -47,7 +47,7 @@ endif
 INC.GGI2D = $(wildcard plugins/video/canvas/ggi/*.h   $(INC.COMMON.DRV2D))
 SRC.GGI2D = $(wildcard plugins/video/canvas/ggi/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.GGI2D = $(addprefix $(OUT),$(notdir $(SRC.GGI2D:.cpp=$O)))
-DEP.GGI2D = CSUTIL CSSYS
+DEP.GGI2D = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

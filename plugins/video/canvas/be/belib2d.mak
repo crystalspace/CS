@@ -46,7 +46,7 @@ endif
 INC.BE2D = $(wildcard plugins/video/canvas/be/*.h   $(INC.COMMON.DRV2D))
 SRC.BE2D = $(wildcard plugins/video/canvas/be/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.BE2D = $(addprefix $(OUT),$(notdir $(SRC.BE2D:.cpp=$O)))
-DEP.BE2D = CSUTIL CSSYS
+DEP.BE2D = CSUTIL CSSYS CSUTIL
 
 #MSVC.DSP += BE2D
 #DSP.BE2D.NAME = be2d

@@ -61,7 +61,7 @@ INC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.h) \
 SRC.SNDSOFT = $(wildcard plugins/sound/renderer/software/*.cpp) \
   $(wildcard plugins/sound/renderer/common/*.cpp)
 OBJ.SNDSOFT = $(addprefix $(OUT),$(notdir $(SRC.SNDSOFT:.cpp=$O)))
-DEP.SNDSOFT = CSUTIL CSGEOM CSSYS
+DEP.SNDSOFT = CSUTIL CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += SNDSOFT
 DSP.SNDSOFT.NAME = sndsoft

@@ -57,7 +57,7 @@ SRC.X2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D)) \
   plugins/video/canvas/common/x11comm.cpp \
   plugins/video/canvas/common/x11-keys.cpp
 OBJ.X2D = $(addprefix $(OUT),$(notdir $(SRC.X2D:.cpp=$O)))
-DEP.X2D = CSUTIL CSSYS CSGEOM
+DEP.X2D = CSUTIL CSSYS CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

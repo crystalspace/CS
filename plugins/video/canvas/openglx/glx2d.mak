@@ -74,7 +74,7 @@ SRC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.cpp \
   plugins/video/canvas/common/x11comm.cpp \
   plugins/video/canvas/common/x11-keys.cpp
 OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
-DEP.GLX2D = CSUTIL CSSYS CSGEOM
+DEP.GLX2D = CSUTIL CSSYS CSGEOM CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

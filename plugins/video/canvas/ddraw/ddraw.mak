@@ -49,7 +49,7 @@ INC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.h $(INC.COMMON.DRV2D)) \
 SRC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.cpp $(SRC.COMMON.DRV2D)) \
   libs/cssys/win32/directdetection.cpp
 OBJ.DDRAW = $(addprefix $(OUT),$(notdir $(SRC.DDRAW:.cpp=$O)))
-DEP.DDRAW = CSUTIL CSSYS
+DEP.DDRAW = CSUTIL CSSYS CSUTIL
 
 TO_INSTALL.CONFIG += data/config/direct3ddx5.cfg data/config/direct3ddx6.cfg
 

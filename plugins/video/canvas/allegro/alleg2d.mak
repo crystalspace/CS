@@ -51,7 +51,7 @@ INC.ALLEG2D = \
 SRC.ALLEG2D = \
   $(wildcard plugins/video/canvas/allegro/*.cpp $(SRC.COMMON.DRV2D))
 OBJ.ALLEG2D = $(addprefix $(OUT),$(notdir $(SRC.ALLEG2D:.cpp=$O)))
-DEP.ALLEG2D = CSUTIL CSSYS
+DEP.ALLEG2D = CSUTIL CSSYS CSUTIL
 
 #MSVC.DSP += ALLEG2D
 #DSP.ALLEG2D.NAME = alleg2d

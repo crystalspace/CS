@@ -49,7 +49,7 @@ INC.DDRAW61 = $(wildcard plugins/video/canvas/ddraw61/*.h \
 SRC.DDRAW61 = $(wildcard plugins/video/canvas/ddraw61/*.cpp \
   $(SRC.COMMON.DRV2D)) libs/cssys/win32/directdetection.cpp
 OBJ.DDRAW61 = $(addprefix $(OUT),$(notdir $(SRC.DDRAW61:.cpp=$O)))
-DEP.DDRAW61 = CSUTIL CSSYS
+DEP.DDRAW61 = CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += DDRAW61
 DSP.DDRAW61.NAME = ddraw61

@@ -44,7 +44,7 @@ INC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.h) \
 SRC.SNDDS3D = $(wildcard plugins/sound/renderer/ds3d/*.cpp) \
   $(wildcard plugins/sound/renderer/common/*.cpp)
 OBJ.SNDDS3D = $(addprefix $(OUT),$(notdir $(SRC.SNDDS3D:.cpp=$O)))
-DEP.SNDDS3D = CSUTIL CSGEOM CSSYS
+DEP.SNDDS3D = CSUTIL CSGEOM CSSYS CSUTIL
 
 MSVC.DSP += SNDDS3D
 DSP.SNDDS3D.NAME = sndrdrds3d
