@@ -220,11 +220,15 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
   do_mmx = config->GetYesNo ("Hardware", "MMX", true);
 #endif
   do_smaller_rendering = config->GetYesNo ("Hardware", "SMALLER", false);
+  mipmap_coef = config->GetFloat ("TextureManager", "MIPMAP_COEF", 1.3);
   SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE,
     config->GetYesNo ("Hardware", "INTERLACING", false));
-  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION,
-    QInt16 (config->GetFloat ("Hardware", "GAMMA", 1.0)));
-  mipmap_coef = config->GetFloat ("TextureManager", "MIPMAP_COEF", 1.3);
+
+  const char *gamma = System->GetOptionCL ("gamma");
+  if (!gamma) gamma = config->GetStr ("Hardware", "GAMMA", "1");
+  float fGamma;
+  sscanf (gamma, "%f", &fGamma);
+  SetRenderState (G3DRENDERSTATE_GAMMACORRECTION, QInt16 (fGamma));
 
   return true;
 }

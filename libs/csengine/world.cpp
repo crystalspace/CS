@@ -1230,8 +1230,6 @@ void csWorld::ReadConfig ()
   csPolyTexture::do_accurate_things = System->ConfigGetYesNo ("Lighting", "ACCURATE_THINGS", csPolyTexture::do_accurate_things);
   csPolyTexture::cfg_cosinus_factor = System->ConfigGetFloat ("Lighting", "COSINUS_FACTOR", csPolyTexture::cfg_cosinus_factor);
   csSprite3D::do_quality_lighting = System->ConfigGetYesNo ("Lighting", "SPRITE_HIGHQUAL", csSprite3D::do_quality_lighting);
-  //@@@
-  //Textures::Gamma = System->ConfigGetFloat ("TextureMapper", "GAMMA", 1.0);
 }
 
 void csWorld::UnlinkSprite (csSprite* sprite)

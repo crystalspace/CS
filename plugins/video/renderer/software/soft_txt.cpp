@@ -308,9 +308,13 @@ csTextureManagerSoftware::csTextureManagerSoftware (iSystem *iSys,
 void csTextureManagerSoftware::SetGamma (float iGamma)
 {
   Gamma = iGamma;
+  if (Gamma < EPSILON)
+    Gamma = EPSILON;
+
   int i;
+  float inv_Gamma = 1 / Gamma;
   for (i = 0; i < 256; i++)
-    GammaTable [i] = QRound (255 * pow (i / 255.0, Gamma));
+    GammaTable [i] = QRound (255 * pow (i / 255.0, inv_Gamma));
   // Remap all textures according to the new colormap.
   if (truecolor)
     for (i = 0; i < textures.Length (); i++)
