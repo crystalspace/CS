@@ -978,9 +978,10 @@ bool awsManager::HandleEvent (iEvent &Event)
       break;
       
     case csevKeyDown:
-      if (keyb_focus)
-	keyb_focus->HandleEvent (Event);
-      
+		if (keyb_focus) 
+			return keyb_focus->HandleEvent (Event);
+			
+		      
       break;
   }
   
