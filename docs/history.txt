@@ -40,6 +40,8 @@ chronological order.
 	- Anders Stenberg fixed splatting in bruteblock which was broke
 	- Marten fixed an #include statement in csutil/win32/instpath.cpp. Also
 	  fixed a typo in a comment in same file.
+	- Rhad fixed csPNGImageIO::Save to correctly handle the default NULL mime
+	  string by presuming the only supported format of 'image/png'
 30-May-2004
 	- Jorrit fixed the lightning plugin so that it correctly gets the
 	  bounding box and radius from the genmesh.

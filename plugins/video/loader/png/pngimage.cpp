@@ -398,7 +398,9 @@ error2:
 csPtr<iDataBuffer> csPNGImageIO::Save (iImage *Image, const char *mime,
   const char* extraoptions)
 {
-  if (!strcasecmp (mime, PNG_MIME))
+  // The only supported mime format is 'image/png'.
+  // Default to that if no format is supplied.
+  if (!mime || !strcasecmp (mime, PNG_MIME))
     return Save (Image, (iImageIO::FileFormatDescription *)0,
       extraoptions);
   return 0;
