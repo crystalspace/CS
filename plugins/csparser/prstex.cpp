@@ -366,7 +366,9 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node,
 	  layers[num_txt_layer].vscale = 1;
 	  layers[num_txt_layer].ushift = 0;
 	  layers[num_txt_layer].vshift = 0;
-	  layers[num_txt_layer].mode = CS_FX_ADD | CS_FX_TILING;
+#ifndef CS_USE_NEW_RENDERER
+          layers[num_txt_layer].mode = CS_FX_ADD | CS_FX_TILING;
+#endif // CS_USE_NEW_RENDERER
 	  csRef<iDocumentNodeIterator> layer_it = child->GetNodes ();
 	  while (layer_it->HasNext ())
 	  {

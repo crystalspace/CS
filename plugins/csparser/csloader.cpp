@@ -1587,7 +1587,9 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	  return NULL;
 	}
         if (!priority) priority = "wall";
+#ifndef CS_USE_NEW_RENDERER
         mesh->SetZBufMode (CS_ZBUF_FILL);
+#endif // CS_USE_NEW_RENDERER        
         break;
       case XMLTOKEN_ZUSE:
         if (!mesh)
@@ -1598,7 +1600,9 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	  return NULL;
 	}
         if (!priority) priority = "object";
+#ifndef CS_USE_NEW_RENDERER
         mesh->SetZBufMode (CS_ZBUF_USE);
+#endif // CS_USE_NEW_RENDERER
         break;
       case XMLTOKEN_ZNONE:
         if (!mesh)
@@ -1609,7 +1613,9 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	  return NULL;
 	}
         if (!priority) priority = "sky";
+#ifndef CS_USE_NEW_RENDERER
         mesh->SetZBufMode (CS_ZBUF_NONE);
+#endif // CS_USE_NEW_RENDERER
         break;
       case XMLTOKEN_ZTEST:
         if (!mesh)
@@ -1620,7 +1626,9 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	  return NULL;
 	}
         if (!priority) priority = "alpha";
+#ifndef CS_USE_NEW_RENDERER
         mesh->SetZBufMode (CS_ZBUF_TEST);
+#endif // CS_USE_NEW_RENDERER
         break;
       case XMLTOKEN_CAMERA:
         if (!mesh)
@@ -1833,19 +1841,27 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
         break;
       case XMLTOKEN_ZFILL:
         if (!priority) priority = "wall";
+#ifndef CS_USE_NEW_RENDERER
         mesh->SetZBufMode (CS_ZBUF_FILL);
+#endif // CS_USE_NEW_RENDERER
         break;
       case XMLTOKEN_ZUSE:
         if (!priority) priority = "object";
+#ifndef CS_USE_NEW_RENDERER
         mesh->SetZBufMode (CS_ZBUF_USE);
+#endif // CS_USE_NEW_RENDERER
         break;
       case XMLTOKEN_ZNONE:
         if (!priority) priority = "sky";
+#ifndef CS_USE_NEW_RENDERER
         mesh->SetZBufMode (CS_ZBUF_NONE);
+#endif // CS_USE_NEW_RENDERER
         break;
       case XMLTOKEN_ZTEST:
         if (!priority) priority = "alpha";
+#ifndef CS_USE_NEW_RENDERER
         mesh->SetZBufMode (CS_ZBUF_TEST);
+#endif // CS_USE_NEW_RENDERER
         break;
       case XMLTOKEN_IMPOSTER:
 	ParseImposterSettings(mesh,child);
@@ -2783,6 +2799,7 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	iMaterialWrapper* ifm4 = halo.flare.mat_spark4;
 	iMaterialWrapper* ifm5 = halo.flare.mat_spark5;
         iFlareHalo* flare = l->QueryLight ()->CreateFlareHalo ();
+#ifndef CS_USE_NEW_RENDERER
 	flare->AddComponent (0.0, 1.2, 1.2, CS_FX_ADD, ifmc);
 	flare->AddComponent (0.3, 0.1, 0.1, CS_FX_ADD, ifm3);
 	flare->AddComponent (0.6, 0.4, 0.4, CS_FX_ADD, ifm4);
@@ -2798,6 +2815,7 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
 	flare->AddComponent (3.0, 3.0, 3.0, CS_FX_ADD, ifm1);
 	flare->AddComponent (3.1, 0.05, 0.05, CS_FX_ADD, ifm5);
 	flare->AddComponent (3.3, .15, .15, CS_FX_ADD, ifm2);
+#endif // CS_USE_NEW_RENDERER
       }
       break;
   }
@@ -3054,12 +3072,14 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
         break;
       case XMLTOKEN_FOG:
         {
+#ifndef CS_USE_NEW_RENDERER
           csFog *f = sector->GetFog ();
           f->enabled = true;
 	  f->red = child->GetAttributeValueAsFloat ("red");
 	  f->green = child->GetAttributeValueAsFloat ("green");
 	  f->blue = child->GetAttributeValueAsFloat ("blue");
 	  f->density = child->GetAttributeValueAsFloat ("density");
+#endif // CS_USE_NEW_RENDERER
         }
         break;
       case XMLTOKEN_KEY:
