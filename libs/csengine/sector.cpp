@@ -912,7 +912,7 @@ void CompressShadowFrustrums (csFrustrumList* list)
   csQuadcube* qc = csWorld::current_world->GetQuadcube ();
   csCovcube* cc = csWorld::current_world->GetCovcube ();
   if (qc) qc->MakeEmpty ();
-  else if (cc) cc->MakeEmpty ();
+  else cc->MakeEmpty ();
 
   csShadowFrustrum* sf = list->GetLast ();
 int cnt=0,del=0;
@@ -920,7 +920,7 @@ int cnt=0,del=0;
   {
     bool vis;
     if (qc) vis = qc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
-    else if (cc) vis = cc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
+    else vis = cc->InsertPolygon (sf->GetVertices (), sf->GetNumVertices ());
     if (!vis)
     {
       csShadowFrustrum* sfdel = sf;
