@@ -34,7 +34,7 @@ SCF_VERSION (iSaverPlugIn, 0, 0, 1);
 struct iSaverPlugIn : public iPlugIn
 {
   /** 
-   *  Take a given object and return a new string (in the string vector,
+   *  Take a given object and return a new string (in the string vector),
    *  Concatenating the strings in the vector will create the saved text.
    *  Or write them to a file consequtively.
    */
