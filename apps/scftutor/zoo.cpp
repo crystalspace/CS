@@ -35,7 +35,7 @@ SCF_REGISTER_STATIC_LIBRARY (Frog)
 void Clone (iBase *iObject)
 {
   printf ("--- cloning the object\n");
-  iFactory *factory = SCF_QUERY_INTERFACE (iObject, iFactory);
+  csRef<iFactory> factory (SCF_QUERY_INTERFACE (iObject, iFactory));
   if (!factory)
   {
     fprintf (stderr, "Object does not support the iFactory interface!\n");
@@ -46,9 +46,6 @@ void Clone (iBase *iObject)
   // Create a new instance of the class
   iBase *newobj = (iBase *)factory->CreateInstance ();
 
-  // Release the factory interface of the parent - we don't need it anymore
-  factory->DecRef ();
-
   if (!newobj)
   {
     fprintf (stderr, "Failed to create a object of the same type!\n");
@@ -56,7 +53,7 @@ void Clone (iBase *iObject)
   }
 
   // Check if the object supports the iName interface
-  iName *name = SCF_QUERY_INTERFACE (newobj, iName);
+  csRef<iName> name (SCF_QUERY_INTERFACE (newobj, iName));
   if (name)
   {
     if (!name->GetName())
@@ -65,7 +62,6 @@ void Clone (iBase *iObject)
       printf ("Object's name is \"%s\"; renaming to \"Clone\"\n",
         name->GetName ());
     name->SetName ("Clone");
-    name->DecRef ();
   }
 
   // Delete the clone
@@ -94,7 +90,7 @@ int main(int argc, char *argv[])
     fprintf (stderr, "No csDog shared class!\n");
   else
   {
-    iName *name = SCF_QUERY_INTERFACE (dog, iName);
+    csRef<iName> name (SCF_QUERY_INTERFACE (dog, iName));
     if (!name)
       fprintf (stderr, "dog does not support iName interface!\n");
     else
@@ -103,7 +99,6 @@ int main(int argc, char *argv[])
       dog->Walk ();
       dog->Barf ("hello!");
       printf ("Dog's name is %s\n", name->GetName ());
-      name->DecRef ();
     }
 
     Clone (dog);
@@ -142,7 +137,7 @@ int main(int argc, char *argv[])
     fprintf (stderr, "No csFrog shared class!\n");
   else
   {
-    iName *name = SCF_QUERY_INTERFACE (frog, iName);
+    csRef<iName> name (SCF_QUERY_INTERFACE (frog, iName));
     if (!name)
       fprintf (stderr, "frog does not support iName interface!\n");
     else
@@ -151,7 +146,6 @@ int main(int argc, char *argv[])
       frog->Jump ();
       frog->Croak ("Barf");
       printf ("Frog's name is %s\n", name->GetName ());
-      name->DecRef ();
     }
 
     Clone (frog);
