@@ -7,7 +7,6 @@
 
 @subheading Getting @sc{rpm}s packages
 
-There is no official release of @sc{rpm}s packages at the moment.
 Building your own @sc{rpm}s is probably the best option. This way you won't
 have to find distribution specific package, and you'll be able to set building
 options. For this purpose, @file{CS/scripts/rpm/cs.spec} file is provided with
@@ -59,8 +58,8 @@ otherwise @command{rpm} won't be able to do his job.
 @item To build source @sc{rpm}s as well, use @command{rpm -ba cs.spec}
 @end itemize
 
-Build options are specified by using @command{--with} switch. Actually, the
-following values are supported:
+Build options are specified by using @command{--with} switch. The following
+values are supported:
 
 @itemize @bullet
 @item
