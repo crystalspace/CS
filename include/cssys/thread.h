@@ -62,7 +62,16 @@ struct iRunnable : public iBase
   */
 };
 
-struct csThread 
+struct csRefCounter
+{
+  int refcount;
+  csRefCounter ():refcount(1) {}
+  virtual void IncRef (){ refcount++; }
+  virtual void DecRef (){ if (--refcount <= 0) delete this; }
+  virtual int GetRefCount () {return refcount;}
+};
+
+struct csThread : public csRefCounter
 {
   /**
    * This actually starts the thread.
@@ -89,22 +98,22 @@ struct csThread
    */
   virtual const char *GetLastError () = 0;
 
-  static csThread* Create (iRunnable *runnable, uint32 options=0);
+  static csPtr<csThread> Create (iRunnable *runnable, uint32 options=0);
 };
 
-struct csMutex
+struct csMutex : public csRefCounter
 {
   friend struct csCondition;
-  static csMutex* Create ();
+  static csPtr<csMutex> Create ();
   virtual bool LockWait() = 0;
   virtual bool LockTry () = 0;
   virtual bool Release () = 0;
   virtual const char* GetLastError () = 0;
 };
 
-struct csSemaphore
+struct csSemaphore : public csRefCounter
 {
-  static csSemaphore* Create (uint32 value);
+  static csPtr<csSemaphore> Create (uint32 value);
   virtual bool LockWait () = 0;
   virtual bool LockTry () = 0;
   virtual bool Release () = 0;
@@ -112,9 +121,9 @@ struct csSemaphore
   virtual const char* GetLastError () = 0;
 };
 
-struct csCondition
+struct csCondition : public csRefCounter
 {
-  static csCondition* Create (uint32 conditionAttributes=0);
+  static csPtr<csCondition> Create (uint32 conditionAttributes=0);
   virtual void Signal (bool bAll = false) = 0;
   virtual bool Wait (csMutex *mutex, csTicks timeout=0) = 0;
   virtual const char* GetLastError () = 0;

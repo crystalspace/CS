@@ -26,9 +26,9 @@
 #define CS_SHOW_ERROR
 #endif
 
-csMutex* csMutex::Create ()
+csPtr<csMutex> csMutex::Create ()
 {
-  return new csPosixMutex;
+  return csPtr<csMutex>(new csPosixMutex);
 }
 
 csPosixMutex::csPosixMutex ()
@@ -148,9 +148,9 @@ const char* csPosixMutex::GetLastError ()
   return lasterr;
 }
 
-csSemaphore* csSemaphore::Create (uint32 value)
+csPtr<csSemaphore> csSemaphore::Create (uint32 value)
 {
-  return new csPosixSemaphore (value);
+  return csPtr<csSemaphore>(new csPosixSemaphore (value));
 }
 
 csPosixSemaphore::csPosixSemaphore (uint32 value)
@@ -219,9 +219,9 @@ const char* csPosixSemaphore::GetLastError ()
   return lasterr;
 }
 
-csCondition* csCondition::Create (uint32 conditionAttributes)
+csPtr<csCondition> csCondition::Create (uint32 conditionAttributes)
 {
-  return new csPosixCondition (conditionAttributes);
+  return csPtr<csCondition>(new csPosixCondition (conditionAttributes));
 }
 
 csPosixCondition::csPosixCondition (uint32 /*conditionAttributes*/)
@@ -302,9 +302,9 @@ const char* csPosixCondition::GetLastError ()
 }
 
 
-csThread* csThread::Create (iRunnable *runnable, uint32 options)
+csPtr<csThread> csThread::Create (iRunnable *runnable, uint32 options)
 {
-  return new csPosixThread (runnable, options);
+  return csPtr<csThread>(new csPosixThread (runnable, options));
 }
 
 csPosixThread::csPosixThread (iRunnable *runnable, uint32 /*options*/)
@@ -437,7 +437,7 @@ bool csPosixThread::Kill ()
       running = false;
       break;
     default:
-      lasterr = "Unknown error while killing thread";;
+      lasterr = "Unknown error while killing thread";
       break;
     }
   }

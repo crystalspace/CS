@@ -109,7 +109,7 @@ class csPosixCondition : public csCondition
   const char* lasterr;
 };
 
-#define CS_SAFE_LOCKWAIT(m) m->LockWait(); pthread_cleanup_push(((csPosixMutex*)m)->Cleanup,m)
+#define CS_SAFE_LOCKWAIT(m) m->LockWait(); pthread_cleanup_push(((csPosixMutex*)(csMutex*)m)->Cleanup,m)
 #define CS_SAFE_RELEASE(m) pthread_cleanup_pop(0); m->Release()
 
 #endif
