@@ -39,6 +39,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug with things when adding a polygon that already
 	  contained a portal. In that case the array of portals for that
 	  thing would not be updated.
+	- Fixed a bug in iCamera::GetHit(). If there was no hit it would
+	  crash.
 24-Nov-2001
 	- Added more debug graph commands for iImage. Also added links to
 	  iImage and the texture manager for the 3D renderers. This reveals

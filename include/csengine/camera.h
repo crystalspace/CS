@@ -387,12 +387,15 @@ public:
 
     virtual iSector* GetSector () const
     { return scfParent->GetSector() ?
-      &scfParent->GetSector()->scfiSector : 0; }
+      &scfParent->GetSector()->scfiSector : NULL; }
     virtual void SetSector (iSector *s)
     { scfParent->SetSector (s->GetPrivateObject ()); }
 
     virtual iPolygon3D* GetHit (csVector3& v)
-    { return &(scfParent->GetHit (v)->scfiPolygon3D); }
+    {
+      iPolygon3D* poly = scfParent->GetHit (v);
+      return poly ? poly->scfiPolygon3D : NULL;
+    }
     virtual void Correct (int n)
     {
       scfParent->Correct (n);
