@@ -88,11 +88,8 @@ void Report (iObjectRegistry *object_reg, int severity, const char* msg, ...)
   va_start (arg, msg);
   csRef<iReporter> rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.graphic.image.io.jng", 
       msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintf ("crystalspace.graphic.image.io.jng: ");
