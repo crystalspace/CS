@@ -21,6 +21,7 @@ chronological order.
 	  instance, on Intel 64-bit, csQint() gives incorrect results for
 	  negative numbers.)
 	- res fixed an unit var in the OpenGL font cache.
+	- res fixed 'scfStaticallyLinked' not being defined in plugins.
 20-Feb-2005
 	- res made the following changes:
 	    - Added a flag that is set via a variable indicating whether the
