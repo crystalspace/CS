@@ -2432,7 +2432,7 @@ zfill_only:
   if (pqinfo.textured && pqinfo.keycolor)
     scan_index += 4;
   if ((mode & CS_FX_MASK_MIXMODE) != CS_FX_COPY)
-    scan_index += 16;
+    scan_index += 12;
   if (!pqinfo.drawline)
     pqinfo.drawline = ScanProcPI [scan_index];
   if (mode & CS_FX_GOURAUD)
