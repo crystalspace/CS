@@ -834,7 +834,8 @@ void csTextureManagerOpenGL::FreeImages()
     softtex = head_soft_proc_tex;
     while (softtex)
     {
-      softtex->txts_vector->RegisterAndPrepare(textures.Get(i));
+			if (softtex->txts_vector->FindKey(textures.Get(i)) == -1) 
+        softtex->txts_vector->RegisterAndPrepare(textures.Get(i));
       softtex = softtex->next_soft_tex;
     }
     textures.Get (i)->FreeImage ();
