@@ -8,6 +8,19 @@ override DO_ASM=no
 DRIVERS=cs2d/next cs3d/software csnetdrv/null csnetdrv/sockets \
   csnetman/null csnetman/simple cssnddrv/null cssndrdr/null
 
+#------------------------------------------ rootdefines, defines, configure ---#
+PROC.m68k  = M68K
+PROC.i386  = INTEL
+PROC.sparc = SPARC
+PROC.hppa  = HPPA
+PROC.ppc   = POWERPC
+
+NEXT.TARGET_ARCHS:=$(sort $(filter $(NEXT.ARCHS),$(TARGET_ARCHS)))
+
+ifeq ($(strip $(NEXT.TARGET_ARCHS)),)
+NEXT.TARGET_ARCHS:=$(shell /usr/bin/arch)
+endif
+
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
@@ -17,6 +30,7 @@ define SYSMODIFIERSHELP
   echo "      Target architectures to build.  Default if not specified is `/usr/bin/arch`."
   echo "      Possible values are: $(NEXT.ARCHS)"
 endef
+SYSMODIFIERS=TARGET_ARCHS="$(NEXT.TARGET_ARCHS)"
 
 # Add required defines to volatile.h
 MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>$@
@@ -30,18 +44,6 @@ ifneq (,$(findstring defines,$(MAKESECTION)))
 # Processor. Can be one of: INTEL, SPARC, POWERPC, M68K, HPPA, UNKNOWN
 # May use TARGET_ARCHS to specify multiple architectures at once.
 # Ex. TARGET_ARCHS="m68k i386 sparc hppa"
-
-PROC.m68k  = M68K
-PROC.i386  = INTEL
-PROC.sparc = SPARC
-PROC.hppa  = HPPA
-PROC.ppc   = POWERPC
-
-NEXT.TARGET_ARCHS:=$(sort $(filter $(NEXT.ARCHS),$(TARGET_ARCHS)))
-
-ifeq ($(strip $(NEXT.TARGET_ARCHS)),)
-NEXT.TARGET_ARCHS:=$(shell /usr/bin/arch)
-endif
 
 PROC=$(subst $(SPACE),_,$(foreach arch,$(NEXT.TARGET_ARCHS),$(PROC.$(arch))))
 
@@ -181,8 +183,25 @@ endif # ifeq ($(MAKESECTION),defines)
 #---------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION),configure)
 
+# Note that TARGET_ARCHS is purposely not "exported" in order to provide the
+# user with a way to clear its value if desired.  For instance:
+# % gnumake openstep TARGETS_ARCHS="i386 m68k sparc"
+# At this point the makefiles will compile for i386, m68k, and sparc.
+# The user can clear the setting with:
+# % gnumake openstep
+# This way TARGETS_ARCHS will also be cleared automatically if the user
+# reconfigures for a different platform.  For instance:
+# % gnumake macosx
+# At this point TARGETS_ARCHS has been cleared, so the MacOS/X Server
+# compiler will not be asked to compile for architectures of which it knows
+# nothing (such as m68k and sparc).
+
 .PHONY: configure
 configure:
 	@echo override USE_DLL = no>>config.mak
+	@echo override DO_ASM = $(DO_ASM)>>config.mak
+ifneq ($(strip $(TARGET_ARCHS)),)
+	@echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.mak
+endif
 
 endif # ifeq ($(MAKESECTION),configure)
