@@ -799,6 +799,9 @@ public:
    */
   void RemoveHalo (csLight* Light);
 
+  void PrecacheMesh (iMeshWrapper* s, iRenderView* rview);
+  virtual void PrecacheDraw (iCamera* c, iClipper2D* view);
+
   /**
    * Draw the 3D world given a camera and a clipper. Note that
    * in order to be able to draw using the given 3D driver

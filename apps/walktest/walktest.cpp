@@ -1441,6 +1441,9 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     if (cmdline->GetOption ("prepare"))
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Preparing all things...");
+#if 1
+      Engine->PrecacheDraw (view->GetCamera (), view->GetClipper ());
+#else
       iMeshList* ml = Engine->GetMeshes ();
       int i;
       for (i = 0 ; i < ml->GetCount () ; i++)
@@ -1453,6 +1456,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 	  if (thing) thing->Prepare ();
         }
       }
+#endif
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Preparing finished...");
     }
 

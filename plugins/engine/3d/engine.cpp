@@ -1780,6 +1780,34 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
   return eseqmgr;
 }
 
+void csEngine::PrecacheMesh (iMeshWrapper* s, iRenderView* rview)
+{
+#ifdef CS_USE_NEW_RENDERER
+  int num;
+  if (s->GetMeshObject ())
+    s->GetMeshObject ()->GetRenderMeshes (num, rview,
+      s->GetMovable (), 0xf);
+  iMeshList* children = s->GetChildren ();
+  int i;
+  for (i = 0 ; i < children->GetCount () ; i++)
+    PrecacheMesh (children->Get (i), rview);
+#endif
+}
+
+void csEngine::PrecacheDraw (iCamera* c, iClipper2D* view)
+{
+  current_framenumber++;
+  csRenderView rview (c, view, G3D, G2D);
+  StartDraw (c, view, rview);
+
+  int sn;
+  for (sn = 0; sn < meshes.GetCount (); sn++)
+  {
+    iMeshWrapper *s = meshes.Get (sn);
+    PrecacheMesh (s, &rview);
+  }
+}
+
 void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
   current_camera = c;

@@ -119,7 +119,7 @@ struct iRenderLoop;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 22, 0);
+SCF_VERSION (iEngine, 0, 23, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -881,6 +881,14 @@ struct iEngine : public iBase
 	iSector* destSector,
 	csVector3* vertices, int num_vertices,
 	iPortal*& portal) = 0;
+
+  /**
+   * This function precaches all meshes by calling GetRenderMeshes()
+   * on them. By doing this the level will run smoother if you walk
+   * through it because all meshes will have had a chance to update
+   * caches and stuff.
+   */
+  virtual void PrecacheDraw (iCamera* c, iClipper2D* view) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that
