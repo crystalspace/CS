@@ -52,7 +52,7 @@ public:
    */
   csWeakRef (T* newobj)
   {
-    obj = newobj.obj;
+    obj = newobj;
     if (obj) obj->AddRefOwner ((iBase**)&obj);
   }
 
@@ -61,7 +61,7 @@ public:
    */
   csWeakRef (csWeakRef const& other) : obj (other.obj)
   {
-    if (obj) obj->AddRefOwner ((iBase**)&iobj);
+    if (obj) obj->AddRefOwner ((iBase**)&obj);
   }
 
   /**
