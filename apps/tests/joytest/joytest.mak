@@ -51,7 +51,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: joytest joytestclean joytestcleandep
+.PHONY: build.joytest joytestclean joytestcleandep
 
 build.joytest: $(OUTDIRS) $(JOYTEST.EXE)
 
