@@ -586,45 +586,52 @@ void csBallMeshObject::HardTransform (const csReversibleTransform& t)
   shapenr++;
 }
 
-bool csBallMeshObject::HitBeamBBox (const csVector3& start,
-  const csVector3& end)
+int csBallMeshObject::HitBeamBBox (const csVector3& start,
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
+  csSegment3 seg (start, end);
+  return csIntersect3::BoxSegment (object_bbox, seg, isect, pr);
 }
 
 bool csBallMeshObject::HitBeamOutline (const csVector3& start,
-  const csVector3& end)
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
+  // This is now closer to an outline hitting method. It will
+  // return as soon as it touches any triangle in the ball, and
+  // will be a bit faster than its more accurate cousin (below).
+
+  csSegment3 seg (start, end);
+  int i, max = top_mesh.num_triangles;
+  csTriangle *tr = top_mesh.triangles;
+  csVector3 *vrt = top_mesh.vertices[0];
+  for (i = 0 ; i < max ; i++)
+  {
+    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
+    	vrt[tr[i].c], seg, isect))
+    {
+      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+		csSquaredDist::PointPoint (start, end));
+       
+      return true;
+    }
+  }
+  return false;
 }
 
 bool csBallMeshObject::HitBeamObject(const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr)
 {
-  // @@@ We might consider checking to a lower LOD version only.
-  // This function is not very fast if the bounding box test succeeds.
-
-#ifdef BALL_DEBUG
-  printf("Ball:Hit Beam Object\n");
-  printf("Debug:\n");
-  printf("Segment: (%f,%f,%f) to (%f,%f,%f)\n",start.x,start.y,start.z,
-	end.x,end.y,end.z);
-  printf("BBox: (%f,%f,%f) to (%f,%f,%f)\n",
-	object_bbox.Min().x,
-	object_bbox.Min().y,
-	object_bbox.Min().z,
-	object_bbox.Max().x,
-	object_bbox.Max().y,
-	object_bbox.Max().z
-	);
-#endif
+  // This is the slow version. Use for an accurate hit on the object.
+  // It will cycle through every triangle in the mesh serching for the
+  // closest intersection. Slower, but returns the closest hit. 
+  // Usegae is optional.
+  
   csSegment3 seg (start, end);
-  if (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0)
-    return false;
   int i, max = top_mesh.num_triangles;
-  float dist = 1.0, dist2;
+  float tot_dist = csSquaredDist::PointPoint (start, end);
+  float dist, temp; 
+  float itot_dist = 1 / tot_dist;
+  dist = temp = tot_dist;
   csVector3 *vrt = top_mesh.vertices[0], tmp;
   csTriangle *tr = top_mesh.triangles;
   for (i = 0 ; i < max ; i++)
@@ -632,25 +639,19 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
     	vrt[tr[i].c], seg, tmp))
     {
-      dist2 = qsqrt (csSquaredDist::PointPoint (start, tmp) /
-		csSquaredDist::PointPoint (start, end));
-      if ( dist2 < dist )
+      if ( dist > (temp = csSquaredDist::PointPoint (start, tmp)));
       {
           isect = tmp;
-	  dist = dist2;
-          if (pr) *pr = dist;
+	  dist = temp;
+          if (pr) *pr = qsqrt( dist * itot_dist);
       }
     }
   }
-  if ( dist == 1.0 )
+  if (dist == tot_dist)
       return false;
-
-#ifdef BALL_DEBUG
-      printf("Ball:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",
-        isect.x, isect.y, isect.z);
-#endif
   return true;
 }
+
 
 //----------------------------------------------------------------------
 

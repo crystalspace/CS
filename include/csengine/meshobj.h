@@ -248,12 +248,14 @@ public:
    * Check if this object is hit by this object space vector.
    * BBox version.
    */
-  bool HitBeamBBox (const csVector3& start, const csVector3& end);
+  int HitBeamBBox (const csVector3& start, const csVector3& end, 
+         csVector3& isect, float* pr);
   /**
    * Check if this object is hit by this object space vector.
    * Outline version.
    */
-  bool HitBeamOutline (const csVector3& start, const csVector3& end);
+  bool HitBeamOutline (const csVector3& start, const csVector3& end,
+         csVector3& isect, float* pr);
   /**
    * Check if this object is hit by this object space vector.
    * Return the collision point in object space coordinates.
@@ -362,13 +364,15 @@ public:
     {
       return &(scfParent->movable.scfiMovable);
     }
-    virtual bool HitBeamBBox (const csVector3& start, const csVector3& end)
+    virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
+          csVector3& isect, float* pr)
     {
-      return scfParent->HitBeamBBox (start, end);
+      return scfParent->HitBeamBBox (start, end, isect, pr);
     }
-    virtual bool HitBeamOutline (const csVector3& start, const csVector3& end)
+    virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
+          csVector3& isect, float* pr)
     {
-      return scfParent->HitBeamOutline (start, end);
+      return scfParent->HitBeamOutline (start, end, isect, pr);
     }
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr)

@@ -351,34 +351,25 @@ void csCubeMeshObject::HardTransform (const csReversibleTransform& t)
   shapenr++;
 }
 
-bool csCubeMeshObject::HitBeamBBox (const csVector3& start,
-  const csVector3& end)
+int csCubeMeshObject::HitBeamBBox (const csVector3& start,
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
+  csSegment3 seg (start, end);
+  return csIntersect3::BoxSegment (object_bbox, seg, isect, pr);
 }
 
 bool csCubeMeshObject::HitBeamOutline (const csVector3& start,
-  const csVector3& end)
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
+  if (HitBeamBBox (start, end, isect, pr) < 0) return true;
+  else return false;
 }
 
 bool csCubeMeshObject::HitBeamObject(const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr)
 {
-  // This function relies purely on the csBox collision test
-  // since the object being tested is a box ;).
-  
-  csSegment3 seg (start, end);
-  if (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0)
-    return false;
-
-  if (pr)
-    *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
-	csSquaredDist::PointPoint (start, end));
-  return true;
+  if (HitBeamBBox (start, end, isect, pr) < 0) return true;
+  else return false;
 }
 
 

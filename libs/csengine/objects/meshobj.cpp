@@ -291,16 +291,16 @@ void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
 }
 
 
-bool csMeshWrapper::HitBeamBBox (const csVector3& start,
-  const csVector3& end)
+int csMeshWrapper::HitBeamBBox (const csVector3& start,
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  return mesh->HitBeamBBox (start, end);
+  return mesh->HitBeamBBox (start, end, isect, pr);
 }
 
 bool csMeshWrapper::HitBeamOutline (const csVector3& start,
-  const csVector3& end)
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  return mesh->HitBeamOutline (start, end);
+  return mesh->HitBeamOutline (start, end, isect, pr);
 }
 
 bool csMeshWrapper::HitBeamObject (const csVector3& start,
@@ -315,9 +315,10 @@ bool csMeshWrapper::HitBeam (const csVector3& start, const csVector3& end,
   csReversibleTransform trans = movable.GetFullTransform ();
   csVector3 startObj = trans.Other2This (start);
   csVector3 endObj = trans.Other2This (end);
-  bool rc = HitBeamObject (startObj, endObj, isect, pr);
-  if (rc)
-    isect = trans.This2Other (isect);
+  bool rc = false;
+  if ((HitBeamBBox(startObj, endObj, isect, NULL) > -1)
+       && (rc = HitBeamOutline (startObj, endObj, isect, pr)))
+          isect = trans.This2Other (isect);
   return rc;
 }
 

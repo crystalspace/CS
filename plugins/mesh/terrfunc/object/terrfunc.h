@@ -442,8 +442,10 @@ public:
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
 
-  virtual bool HitBeamBBox (const csVector3&, const csVector3&);
-  virtual bool HitBeamOutline (const csVector3&, const csVector3&);
+  virtual int HitBeamBBox (const csVector3& start, const csVector3& end, 
+        csVector3& isect, float* pr);
+  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
+        csVector3& isect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr);
 

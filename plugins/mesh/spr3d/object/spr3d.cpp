@@ -1565,39 +1565,55 @@ void csSprite3DMeshObject::UpdateLightingHQ (iLight** lights, int num_lights,
   }
 }
 
-bool csSprite3DMeshObject::HitBeamBBox (const csVector3& start,
-	const csVector3& end)
+int csSprite3DMeshObject::HitBeamBBox (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
+  csBox3 b;
+  GetObjectBoundingBox (b);
+  csSegment3 seg (start, end);
+  return csIntersect3::BoxSegment (b, seg, isect, pr);
 }
 
 bool csSprite3DMeshObject::HitBeamOutline (const csVector3& start,
-	const csVector3& end)
-{
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
-}
-
-bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
 	const csVector3& end, csVector3& isect, float* pr)
 {
   // @@@ We might consider checking to a lower LOD version only.
   // This function is not very fast if the bounding box test succeeds.
   // Added a full check of all vertices in the sweep. Its a LOT
   // slower, but is 100% accurate.
-  csBox3 b;
-  GetObjectBoundingBox (b);
-  csSegment3 seg (start, end);
 
-  if (csIntersect3::BoxSegment (b, seg, isect, pr) < 0)
-    return false;
+  csSegment3 seg (start, end);
+  csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
+  csVector3* verts = GetObjectVerts (cframe);
+  csTriangle* tris = factory->GetTriangles ();
+  int i;
+  for (i = 0 ; i < factory->GetTriangleCount () ; i++)
+  {
+    csTriangle& tr = tris[i];
+    if (csIntersect3::IntersectTriangle (verts[tr.a], verts[tr.b],
+    	verts[tr.c], seg, isect))
+    {
+      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+	                     csSquaredDist::PointPoint (start, end));
+      return true;
+    }
+  }
+  return false;
+}
+
+bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
+	const csVector3& end, csVector3& isect, float* pr)
+{
+  // This routine is slow, but it is intended to be accurate.
+  
+  csSegment3 seg (start, end);
   csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
   csVector3* verts = GetObjectVerts (cframe), tsect;
   csTriangle* tris = factory->GetTriangles ();
   int i;
-  float d, t, max = csSquaredDist::PointPoint (start, end), ibeam_len = 1 /max;
-  t = d = max;
+  float dist, temp, max;
+  temp = dist = max = csSquaredDist::PointPoint (start, end);
+  float ibeam_len = 1 /max;
   for (i = 0 ; i < factory->GetTriangleCount () ; i++)
   {
     csTriangle& tr = tris[i];
@@ -1606,15 +1622,15 @@ bool csSprite3DMeshObject::HitBeamObject (const csVector3& start,
 	csIntersect3::IntersectTriangle (verts[tr.c], verts[tr.b],
     	verts[tr.a], seg, tsect))
     {
-      if (d > (t = csSquaredDist::PointPoint (start, tsect)))
+      if (dist > (temp = csSquaredDist::PointPoint (start, tsect)))
       {
-          d = t;
+          dist = temp;
 	  isect = tsect;
-          if (pr) *pr = qsqrt (d * ibeam_len);
+          if (pr) *pr = qsqrt (dist * ibeam_len);
       }
     }
   }
-  if ( d == max ) return false;
+  if ( dist == max ) return false;
   return true;
 }
 

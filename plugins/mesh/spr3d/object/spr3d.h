@@ -1176,10 +1176,12 @@ public:
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }
-  virtual bool HitBeamBBox (const csVector3&, const csVector3&);
-  virtual bool HitBeamOutline (const csVector3&, const csVector3&);
+  virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
+    csVector3& intersect, float* pr);
+  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
+    csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
-  	csVector3& isect, float* pr);
+    csVector3& intersect, float* pr);
   virtual long GetShapeNumber () const { return shapenr; }
   virtual uint32 GetLODFeatures () const { return current_features; }
   virtual void SetLODFeatures (uint32 mask, uint32 value)

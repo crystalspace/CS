@@ -158,14 +158,15 @@ struct iMeshWrapper : public iBase
    * Check if this object is hit by this object space vector.
    * Bounding box check.
    */
-  virtual bool HitBeamBBox (const csVector3& start, const csVector3& end) = 0;
+  virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
+                 csVector3& isect, float* pr) = 0;
 
   /**
    * Check if this object is hit by this object space vector.
    * Outline check.
    */
   virtual bool HitBeamOutline (const csVector3& start,
-  	const csVector3& end) = 0;
+  	const csVector3& end, csVector3& isect, float* pr) = 0;
 
   /**
    * Check if this object is hit by this object space vector.

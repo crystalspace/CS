@@ -190,19 +190,22 @@ struct iMeshObject : public iBase
    * This will do a rough but fast test based on bounding box only.
    * So this means that it might return a hit even though the object
    * isn't really hit at all. Depends on how much the bounding box
-   * overestimates the object.
+   * overestimates the object. This also returns the face number
+   * as defined in csBox3 on which face the hit occured. Usefull for
+   * grid structures. 
    */
-  virtual bool HitBeamBBox (const csVector3& start, const csVector3& end) = 0;
+  virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
+                csVector3& isect, float* pr) = 0;
 
   /**
    * Check if this mesh is hit by this object space vector.
    * This will do a test based on the outline of the object. This means
-   * that it is more accurate than HitBeamBBox() but it will not return
-   * detailed information like HitBeamObject(). Note that this routine
-   * will typically be faster than HitBeamObject().
+   * that it is more accurate than HitBeamBBox(). Note that this routine
+   * will typically be faster than HitBeamObject(). The hit may be on the front
+   * or the back of the object, but will indicate that it iterrupts the beam.
    */
   virtual bool HitBeamOutline (const csVector3& start,
-  	const csVector3& end) = 0;
+  	const csVector3& end, csVector3& isect, float* pr) = 0;
 
   /**
    * Check if this mesh is hit by this object space vector.

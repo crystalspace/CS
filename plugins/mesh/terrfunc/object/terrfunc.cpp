@@ -1375,21 +1375,76 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
 }
 
 // Notes: The terrain func mesh area consists of a number of blocks which
-// are encompassed by an overall bounding box. 
-//
+// are encompassed by an overall bounding box. Each block is then comprised
+// of a number smaller blocks, which each contain two triangles.
 
-bool csTerrFuncObject::HitBeamBBox (const csVector3& start,
-	const csVector3& end)
+int csTerrFuncObject::HitBeamBBox (const csVector3& start,
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
+  csSegment3 seg (start, end);
+  return csIntersect3::BoxSegment (global_bbox, seg, isect, pr);
 }
 
 bool csTerrFuncObject::HitBeamOutline (const csVector3& start,
-	const csVector3& end)
+	const csVector3& end, csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
+// Box walk. Not really fast as the name suggests. It works by stepping its way forward
+// through the terrain field. This is to be complemented yet with another routine which
+// will pick through the individual cells in each block.
+// This variant will return on the first hit, making it a bit faster than
+// the other variant.
+
+  HitBeamBBox (start, end, isect, NULL);
+  csSegment3 seg (start, end);
+  csVector3 v, *vrt;
+  csTriangle *tr;
+  csBox3 tbox;
+  csSegment3 rev ( end, isect );
+  float max_y = global_bbox.MaxY();
+  float min_y = global_bbox.MinY();
+  int max_index = blockxy*blockxy;
+  int x, y, index, i, max = 0;
+  
+  Object2Block( isect, x, y ); // Seed the routine
+  if ( x == blockxy ) x--; // Kludge to bring x and y back into bounds if hit
+  if ( y == blockxy ) y--; // from the positive x or z side. not perty but quick.
+
+  for (Block2Index(x, y, index); 
+      (index > -1) && (index < max_index); 
+      Block2Index(x, y, index))
+  {
+    rev.SetEnd(isect);
+    tbox = blocks[index].bbox; 
+    if (csIntersect3::BoxSegment (tbox, seg, isect, NULL) > -1) 
+    {
+      max = blocks[index].mesh[0].num_triangles;
+      vrt = blocks[index].mesh[0].vertices[0];
+      tr = blocks[index].mesh[0].triangles;
+      for (i = 0 ; i < max ; i++)
+      { // Check each triangle in both orientations. This is the slow version
+        if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
+    	     vrt[tr[i].c], seg, isect))
+        {
+	      
+            if (pr) *pr = qsqrt(csSquaredDist::PointPoint (start, isect) / 
+	                           csSquaredDist::PointPoint (start, end));
+	    return true;
+	}
+      }
+    }
+    v = tbox.Max();
+    tbox.AddBoundingVertex(v.x, max_y, v.z);
+    tbox.AddBoundingVertex(v.x, min_y, v.z);
+     
+    switch (csIntersect3::BoxSegment (tbox, rev, isect, NULL)) {
+      case BOX_SIDE_x: x--; break;
+      case BOX_SIDE_X: x++; break;
+      case BOX_SIDE_z: y--; break;
+      case BOX_SIDE_Z: y++; break;
+      default: return false;
+    }
+  }
+  return false;
 }
 
 bool csTerrFuncObject::HitBeamObject (const csVector3& start,
@@ -1398,9 +1453,6 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
 
   csSegment3 seg (start, end);
   csVector3 st;
-  if (csIntersect3::BoxSegment (global_bbox, seg, st, pr) < 0)
-    return false;
-
 // Box walk. Not really fast as the name suggests. It works by stepping its way forward
 // through the terrain field. This is to be complemented yet with another routine which
 // will pick through the individual cells in each block.

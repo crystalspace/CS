@@ -415,50 +415,29 @@ void csSurfMeshObject::HardTransform (const csReversibleTransform& t)
   shapenr++;
 }
 
-bool csSurfMeshObject::HitBeamBBox (const csVector3& start,
-  const csVector3& end)
+int csSurfMeshObject::HitBeamBBox (const csVector3& start,
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
+  csSegment3 seg (start, end);
+  return csIntersect3::BoxSegment (object_bbox, seg, isect, pr);
 }
 
 bool csSurfMeshObject::HitBeamOutline (const csVector3& start,
-  const csVector3& end)
+  const csVector3& end, csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
+  return HitBeamObject (start, end, isect, pr);
 }
 
 bool csSurfMeshObject::HitBeamObject(const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr)
 {
-  // The real corners of the surface are cached during generation to
-  // improve performance.
-
   csSegment3 seg (start, end);
-#ifdef SURF_DEBUG
-  printf("Surface:Hit Beam Object\n");
-  printf("Debug:\n");
-  printf("Top: (%f,%f,%f) to (%f,%f,%f)\n",
-	corner[0].x, corner[0].y, corner[0].z,
-	corner[1].x, corner[1].y, corner[1].z);
-  printf("Bottom: (%f,%f,%f) to (%f,%f,%f)\n",
-	corner[2].x, corner[2].y, corner[2].z,
-	corner[3].x, corner[3].y, corner[3].z);
-#endif
-
-    if (csIntersect3::IntersectTriangle (corner[0], corner[2], corner[1], seg, isect) 
+  if (csIntersect3::IntersectTriangle (corner[0], corner[2], corner[1], seg, isect) 
 	  || csIntersect3::IntersectTriangle (corner[0], corner[3], corner[2], seg, isect))
     {
       if (pr)
-      {
         *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
 		csSquaredDist::PointPoint (start, end));
-      }
-#ifdef SURF_DEBUG
-      printf("Surface:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",
-        isect.x, isect.y, isect.z);
-#endif
       return true;
     }
   return false;

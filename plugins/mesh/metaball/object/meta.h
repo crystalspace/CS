@@ -138,10 +138,12 @@ public:
   virtual bool WantToDie() const { return false; }
   virtual void HardTransform( const csReversibleTransform &t );
   virtual bool SupportsHardTransform() const { return false; }
-  virtual bool HitBeamBBox (const csVector3&, const csVector3&);
-  virtual bool HitBeamOutline (const csVector3&, const csVector3&);
-  virtual bool HitBeamObject( const csVector3&, const csVector3&,
-    csVector3 &, float *);
+  virtual int HitBeamBBox (const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr);
+  virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr);
+  virtual bool HitBeamObject( const csVector3& start, const csVector3& end,
+    csVector3& isect, float* pr);
   virtual long GetShapeNumber() const { return shape_num; }
   virtual void GetRadius(csVector3& radius, csVector3& cent) 
 	{ radius =  rad; cent = object_bbox.GetCenter(); }

@@ -324,27 +324,17 @@ void csMetaBall::GetTransformedBoundingBox( long cam_num, long move_num,
   cbox = camera_bbox;
 }
 
-bool csMetaBall::HitBeamBBox (const csVector3& start, const csVector3& end)
+int csMetaBall::HitBeamBBox (const csVector3& start, const csVector3& end,
+  csVector3& isect, float* pr)
 {
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
-}
-
-bool csMetaBall::HitBeamOutline (const csVector3& start, const csVector3& end)
-{
-  csVector3 isect;
-  return HitBeamObject (start, end, isect, NULL);
-}
-
-bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
-  csVector3& isect, float *pr)
-{
-  // @@@ We might consider checking to a lower LOD version only.
-  // This function is not very fast if the bounding box test succeeds.
-  // Plagarism notice: Ripped form Sprite3D.
   csSegment3 seg (start, end);
-  if (csIntersect3::BoxSegment (object_bbox, seg, isect, pr) < 0)
-    return false;
+  return csIntersect3::BoxSegment (object_bbox, seg, isect, pr);
+}
+
+bool csMetaBall::HitBeamOutline (const csVector3& start, const csVector3& end,
+  csVector3& isect, float* pr)
+{
+  csSegment3 seg (start, end);
   int i, max = int(vertices_tesselated/3);
   for (i = 0 ; i < max ; i++)
   {
@@ -360,6 +350,34 @@ bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
     }
   }
   return false;
+}
+
+bool csMetaBall::HitBeamObject( const csVector3& start, const csVector3& end,
+  csVector3& isect, float *pr)
+{
+  int i, max = int(vertices_tesselated/3);
+  csSegment3 seg (start, end);
+  csVector3 tmp;
+  float dist, temp;
+  float tot_dist = csSquaredDist::PointPoint(start, end);
+  dist = temp = tot_dist;
+  float itot_dist = 1. / tot_dist;
+  for (i = 0 ; i < max ; i++)
+  {
+    if (csIntersect3::IntersectTriangle (mesh.vertices[0][i+2], mesh.vertices[0][i+1],
+    	mesh.vertices[0][i], seg, tmp))
+    {
+      if ( dist > (temp = csSquaredDist::PointPoint (start, tmp)))
+      {
+        dist = temp;
+	isect = tmp;
+        if (pr) *pr = qsqrt(dist * itot_dist);
+      }
+    }
+  }
+  if (dist == tot_dist)
+    return false;
+  return true;
 }
 
 void csMetaBall::NextFrame(csTicks)
