@@ -956,6 +956,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
       src->ObjAdd (rotobj);
       if (always)
 	Sys->busy_entities.Push (rotobj);
+      rotobj->DecRef ();
     }
     else if (!strcmp (kp->GetKey (), "entity_WavePortal"))
     {
@@ -992,6 +993,7 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	      	xyz, max_angle, speed);
 	      src->ObjAdd (anportal);
 	      Sys->busy_entities.Push (anportal);
+              anportal->DecRef ();
 	    }
 	  }
 	  thing->DecRef ();
