@@ -105,8 +105,9 @@ bool csLua::Store(const char* type, const char* name, void* data)
 
 bool csLua::LoadModule(const char* name)
 {
-//Write me
-  return 0;
+  csString s;
+  s << "dofile('" << name << "')";
+  return RunText(s);
 }
 
 void csLua::Print(bool Error, const char *msg)

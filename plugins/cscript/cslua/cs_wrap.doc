@@ -93,10 +93,7 @@ iPlugIn_HandleEvent
 1.6.  class iTextureWrapper
 ---------------------------
 
-1.7.  class iMaterialWrapper
-----------------------------
-
-1.8.  class iTextureHandle
+1.7.  class iTextureHandle
 --------------------------
 
 iTextureHandle_GetMipMapDimensions
@@ -109,8 +106,24 @@ iTextureHandle_SetCacheData
 
 iTextureHandle_GetPrivateObject
 
-1.9.  class iGraphics3D
------------------------
+1.8.  class iMaterialHandle
+---------------------------
+
+iMaterialHandle_GetTexture
+
+iMaterialHandle_GetFlatColor
+
+iMaterialHandle_GetReflection
+
+iMaterialHandle_Prepare
+
+1.9.  class iMaterialWrapper
+----------------------------
+
+iMaterialWrapper_GetMaterialHandle
+
+1.10.  class iGraphics3D
+------------------------
 
 iGraphics3D_Initialize
 
@@ -179,19 +192,19 @@ iGraphics3D_CreateHalo
 
 iGraphics3D_DrawPixmap
 
-1.10.  class iCamera
+1.11.  class iCamera
 --------------------
 
 iCamera_GetFOV
 
 iCamera_GetInvFOV
 
-1.11.  class iSector
+1.12.  class iSector
 --------------------
 
 iSector_CreateBSP
 
-1.12.  class iThing
+1.13.  class iThing
 -------------------
 
 iThing_GetName
@@ -218,7 +231,7 @@ iThing_CreateVertex
 
 iThing_CreateKey
 
-1.13.  class iPolygon3D
+1.14.  class iPolygon3D
 -----------------------
 
 iPolygon3D_GetName
@@ -255,7 +268,7 @@ iPolygon3D_SetPlane
 
 iPolygon3D_SetTextureSpace
 
-1.14.  class iImage
+1.15.  class iImage
 -------------------
 
 iImage_GetImageData
@@ -286,7 +299,7 @@ iImage_Clone
 
 iImage_Crop
 
-1.15.  class iTextureManager
+1.16.  class iTextureManager
 ----------------------------
 
 iTextureManager_RegisterTexture
@@ -307,7 +320,7 @@ iTextureManager_SetVerbose
 
 iTextureManager_GetTextureFormat
 
-1.16.  class iPolygonTexture
+1.17.  class iPolygonTexture
 ----------------------------
 
 iPolygonTexture_GetMaterialHandle
@@ -347,7 +360,7 @@ iPolygonTexture_GetCacheData
 
 iPolygonTexture_SetCacheData
 
-1.17.  class iEngine
+1.18.  class iEngine
 --------------------
 
 iEngine_GetTextureFormat
@@ -376,12 +389,14 @@ iEngine_CreateThing
 
 iEngine_FindMaterial
 
-1.18.  class iSystem
+1.19.  class iSystem
 --------------------
 
 iSystem_Query_iEngine
 
 iSystem_Query_iGraphics3D
+
+iSystem_Print
 
 ----------
 

@@ -93,28 +93,42 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
-  // Initialize the python plugin.
-  iScript* is = LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
-  if (!is)
-    return 0;
-
   csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
-
-  // Load a python module (scripts/python/pysimp.py).
-  if (!is->LoadModule ("pysimp"))
-    return 0;
-
-  // Set up our room.
   csSector *room = engine->CreateCsSector ("room");
   csThing* walls = engine->CreateSectorWalls (room, "walls");
+
+  // Initialize the python plugin.
+  iScript* is = LOAD_PLUGIN (this, "crystalspace.script.python", "Python", iScript);
+  if (is) {
+
+  // Load a python module (scripts/python/pysimp.py).
+
+    if (!is->LoadModule ("pysimp"))
+      return 0;
+
+  // Set up our room.
 
 //@@@@@@@@@@@@@@@ PYTHON SCRIPT should create polygons on thing
   // Execute one method defined in pysimp.py
   // This will create the polygons in the room.
-  if (!is->RunText ("pysimp.CreateRoom('stone')"))
-    return 0;
+    if (!is->RunText ("pysimp.CreateRoom('stone')"))
+      return 0;
 
-  is->DecRef ();
+    is->DecRef ();
+  }
+
+//Now try some lua scripting stuff
+  is = LOAD_PLUGIN (this, "crystalspace.script.lua", "Lua", iScript);
+  if (is) {
+
+    if (!is->LoadModule ("scripts/lua/pysimp.lua"))
+      return 0;
+   
+    if (!is->RunText ("CreateRoom('stone')"))
+      return 0;
+
+    is->DecRef();
+  }
 
 printf ("verts:%d\n", walls->GetNumVertices ());
 printf ("poly:%d\n", walls->GetNumPolygons ());

@@ -41,7 +41,7 @@ define MAKE_TARGET
   @echo $"  Building $(DESCRIPTION.$@)$"
   @echo $"  Building for $(OS)/$(COMP)/$(PROC) in $(MODE) mode$"
   @echo $(SEPARATOR)
-  @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 endef
 
 # Macro used to make a sub-clean target
@@ -49,5 +49,5 @@ define MAKE_CLEAN
   @echo $(SEPARATOR)
   @echo $"  Cleaning up the $(DESCRIPTION.$(subst clean,,$@))$"
   @echo $(SEPARATOR)
-  @$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
+  +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 endef

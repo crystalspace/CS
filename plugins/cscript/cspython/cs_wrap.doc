@@ -198,10 +198,7 @@ HandleEvent(iEvent *)
 1.6.  class iTextureWrapper
 ---------------------------
 
-1.7.  class iMaterialWrapper
-----------------------------
-
-1.8.  class iTextureHandle
+1.7.  class iTextureHandle
 --------------------------
 
 GetMipMapDimensions(mipmap,mw,mh)
@@ -214,8 +211,24 @@ SetCacheData(d)
 
 GetPrivateObject()
 
-1.9.  class iGraphics3D
------------------------
+1.8.  class iMaterialHandle
+---------------------------
+
+GetTexture()
+
+GetFlatColor(oColor)
+
+GetReflection(oDiffuse,oAmbient,oReflection)
+
+Prepare()
+
+1.9.  class iMaterialWrapper
+----------------------------
+
+GetMaterialHandle()
+
+1.10.  class iGraphics3D
+------------------------
 
 Initialize(pSystem)
 
@@ -284,21 +297,19 @@ CreateHalo(iR,iG,iB,iAlpha,iWidth,iHeight)
 
 DrawPixmap(hTex,sx,sy,sw,sh,tx,ty,tw,th)
 
-1.10.  class iCamera
+1.11.  class iCamera
 --------------------
 
 GetFOV()
 
 GetInvFOV()
 
-1.11.  class iSector
+1.12.  class iSector
 --------------------
 
 CreateBSP()
 
-Query_iPolygonSet()
-
-1.12.  class iThing
+1.13.  class iThing
 -------------------
 
 GetName()
@@ -325,14 +336,12 @@ CreateVertex(iVertex)
 
 CreateKey(iName,iValue)
 
-1.13.  class iPolygon3D
+1.14.  class iPolygon3D
 -----------------------
 
 GetName()
 
 SetName(iName)
-
-GetContainer()
 
 GetLightMap()
 
@@ -364,7 +373,7 @@ SetPlane(iName)
 
 SetTextureSpace(v_orig,v1,len1)
 
-1.14.  class iImage
+1.15.  class iImage
 -------------------
 
 GetImageData()
@@ -395,7 +404,7 @@ Clone()
 
 Crop(x,y,width,height)
 
-1.15.  class iTextureManager
+1.16.  class iTextureManager
 ----------------------------
 
 RegisterTexture(image,flags)
@@ -416,7 +425,7 @@ SetVerbose(vb)
 
 GetTextureFormat()
 
-1.16.  class iPolygonTexture
+1.17.  class iPolygonTexture
 ----------------------------
 
 GetMaterialHandle()
@@ -456,7 +465,7 @@ GetCacheData(idx)
 
 SetCacheData(idx,d)
 
-1.17.  class iEngine
+1.18.  class iEngine
 --------------------
 
 GetTextureFormat()
@@ -485,12 +494,14 @@ CreateThing(iName,iParent)
 
 FindMaterial(iName,regionOnly)
 
-1.18.  class iSystem
+1.19.  class iSystem
 --------------------
 
 Query_iEngine()
 
 Query_iGraphics3D()
+
+Print(mode,format)
 
 ----------
 

@@ -30,7 +30,7 @@
     return SCF_CONSTRUCT_VERSION(version0, version1, version2);
   }
 
-#include "isystem.h"
+#include "isys/isystem.h"
 #include "csparser/csloader.h"
 #include "plugins/cscript/cspython/cspython.h"
 iSystem* GetSystem()
@@ -77,10 +77,6 @@ struct iTextureWrapper : public iBase
 {
 };
 
-struct iMaterialWrapper : public iBase
-{
-};
-
 struct iTextureHandle : public iBase
 {
   bool GetMipMapDimensions (int mipmap, int &mw, int &mh);
@@ -88,6 +84,20 @@ struct iTextureHandle : public iBase
   void *GetCacheData ();
   void SetCacheData (void *d);
   void *GetPrivateObject ();
+};
+
+struct iMaterialHandle : public iBase
+{
+  virtual iTextureHandle *GetTexture () = 0;
+  virtual void GetFlatColor (csRGBpixel &oColor) = 0;
+  virtual void GetReflection (float &oDiffuse, float &oAmbient, float &oReflection) = 0;
+  virtual void Prepare () = 0;
+};
+
+struct iMaterialWrapper : public iBase
+{
+public:
+  virtual iMaterialHandle* GetMaterialHandle () = 0;
 };
 
 struct iGraphics3D:public iPlugIn
@@ -142,14 +152,7 @@ struct iCamera:public iBase
 struct iSector:public iBase
 {
 public:
-  void CreateBSP();
-  %addmethods
-  {
-    iPolygonSet* Query_iPolygonSet()
-    {
-      return QUERY_INTERFACE(self, iPolygonSet);
-    }
-  }
+  void CreateBSP(); 
 }
 
 struct iThing:public iBase
@@ -172,7 +175,6 @@ struct iPolygon3D : public iBase
 {
   const char *GetName () const;
   void SetName (const char *iName);
-  iPolygonSet *GetContainer ();
   iLightMap *GetLightMap ();
   iMaterialHandle *GetMaterialHandle ();
   void SetMaterial (iMaterialWrapper* material);
@@ -265,7 +267,7 @@ struct iEngine : public iPlugIn
   virtual iSector *FindSector (const char *iName) = 0;
   virtual iSector *GetSector (int idx) = 0;
   virtual iThing *CreateThing (const char *iName, iSector *iParent) = 0;
-  virtual iMaterialWrapper *FindMaterial (const char *iName, bool regionOnly = false) = 0;
+  virtual iMaterialWrapper *FindMaterial (const char *iName, bool regionOnly) = 0;
 };
 
 //****** System Interface
@@ -282,6 +284,9 @@ public:
     {
       return QUERY_PLUGIN(self, iGraphics3D);
     }
+    void Print(int mode, const char* format) {
+      self->Printf(mode, format); 
+    }	
   }
 };
 
