@@ -77,6 +77,9 @@ Simple::Simple ()
   sprite2 = NULL;
   rot1_direction = 1;
   rot2_direction = -1;
+  sprite1_col = NULL;
+  sprite2_col = NULL;
+
 }
 
 Simple::~Simple ()
@@ -217,6 +220,7 @@ iCollider* Simple::InitCollider (iMeshWrapper* mesh)
     csColliderWrapper* wrap = new csColliderWrapper
     	(mesh->QueryObject (), cdsys, polmesh);
     polmesh->DecRef ();
+    wrap->DecRef ();
     return wrap->GetCollider ();
   }
   else
