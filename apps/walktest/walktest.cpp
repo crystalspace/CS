@@ -302,8 +302,6 @@ void WalkTest::NextFrame ()
   cs_time elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
-  if(elapsed_time == 0) return;
-
   if (perf_stats) timeFPS = perf_stats->GetFPS ();
   else timeFPS = 0;
 
