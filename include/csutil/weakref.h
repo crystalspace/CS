@@ -28,7 +28,7 @@
  * reference is useful if you want to maintain some kind of cached objects
  * that can safely be removed as soon as the last reference to it is gone.
  * <p>
- * Note: this class assumes that the T type implements the following two
+ * Note: this class assumes that the T type implements at least the following
  * functions:
  * <ul>
  * <li>AddRefOwner()
@@ -43,6 +43,27 @@ private:
 
 public:
   /**
+   * Unlink the object pointed to by this weak reference so that
+   * this weak references will not automatically be set to 0 after
+   * the object is destroyed. This is a dangerous function that you
+   * should normally not use. The intended use is for growing
+   * arrays which need to reallocate memory and thus have to cope
+   * with weak reference instances that move in memory.
+   */
+  void Unlink ()
+  {
+    if (obj) obj->RemoveRefOwner ((iBase**)&obj);
+  }
+
+  /**
+   * Link the object again. Please never call this function!
+   */
+  void Link ()
+  {
+    if (obj) obj->AddRefOwner ((iBase**)&obj);
+  }
+
+  /**
    * Construct an empty weak reference.
    */
   csWeakRef () : obj (0) {}
@@ -53,7 +74,7 @@ public:
   csWeakRef (T* newobj)
   {
     obj = newobj;
-    if (obj) obj->AddRefOwner ((iBase**)&obj);
+    Link ();
   }
 
   /**
@@ -61,7 +82,7 @@ public:
    */
   csWeakRef (csWeakRef const& other) : obj (other.obj)
   {
-    if (obj) obj->AddRefOwner ((iBase**)&obj);
+    Link ();
   }
 
   /**
@@ -69,7 +90,7 @@ public:
    */
   ~csWeakRef ()
   {
-    if (obj) obj->RemoveRefOwner ((iBase**)&obj);
+    Unlink ();
   }
 
   /**
@@ -79,9 +100,9 @@ public:
   {
     if (obj != newobj)
     {
-      if (obj) obj->RemoveRefOwner ((iBase**)&obj);
+      Unlink ();
       obj = newobj;
-      if (obj) obj->AddRefOwner ((iBase**)&obj);
+      Link ();
     }
     return *this;
   }

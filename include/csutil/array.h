@@ -50,6 +50,28 @@ public:
   }
 };
 
+template <class T>
+class csArrayMemoryAllocator
+{
+public:
+  static T* Alloc (int count)
+  {
+    return (T*)malloc (count * sizeof(T));
+  }
+
+  static void Free (T* mem)
+  {
+    free (mem);
+  }
+
+  // The 'relevantcount' parameter should be the number of items
+  // in the old array that are initialized.
+  static T* Realloc (T* mem, int /*relevantcount*/, int newcount)
+  {
+    return (T*)realloc (mem, newcount * sizeof(T));
+  }
+};
+
 /**
  * A templated array class.  The objects in this class are constructed via
  * copy-constructor and are destroyed when they are removed from the array or
@@ -57,7 +79,9 @@ public:
  * pointers (such as iSomething*), then you should look at csRefArray instead
  * of this class.
  */
-template <class T, class ElementHandler = csArrayElementHandler<T> >
+template <class T,
+	class ElementHandler = csArrayElementHandler<T>,
+	class MemoryAllocator = csArrayMemoryAllocator<T> >
 class csArray
 {
 private:
@@ -96,11 +120,11 @@ private:
     if (n > capacity || (capacity > threshold && n < capacity - threshold))
     {
       n = ((n + threshold - 1) / threshold ) * threshold;
-      capacity = n;
       if (root == 0)
-        root = (T*)malloc (capacity * sizeof(T));
+        root = MemoryAllocator::Alloc (n);
       else
-        root = (T*)realloc (root, capacity * sizeof(T));
+        root = MemoryAllocator::Realloc (root, count, n);
+      capacity = n;
     }
   }
 
@@ -130,7 +154,7 @@ public:
     capacity = (icapacity > 0 ? icapacity : 0);
     threshold = (ithreshold > 0 ? ithreshold : 16);
     if (capacity != 0)
-      root = (T*)malloc (capacity * sizeof(T));
+      root = MemoryAllocator::Alloc (capacity);
     else
       root = 0;
   }
@@ -457,7 +481,7 @@ public:
       int i;
       for (i = 0 ; i < count ; i++)
         ElementHandler::Destroy (root + i);
-      free (root);
+      MemoryAllocator::Free (root);
       root = 0;
       capacity = count = 0;
     }
@@ -515,8 +539,8 @@ public:
     }
     else if (count != capacity)
     {
+      root = MemoryAllocator::Realloc (root, count, count);
       capacity = count;
-      root = (T*)realloc (root, capacity * sizeof(T));
     }
   }
 
