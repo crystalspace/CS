@@ -13,6 +13,27 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+11-Aug-1999
+	- Only transform a polygon to camera space AFTER clipping instead
+	  of before. This improves performance slightly and also fixes
+	  a bug with the c-buffer and space warping portals (at least, the
+	  bug is almost fixed).
+	- Completely fixed the c-buffer problems with space warping
+	  portals (i.e. mirrors).
+	- Fixed bug with crash at exit when using a bsp tree and a uniform
+	  dynamic light.
+	- Create a new general csPoly2D class in the csgeom library.
+	  The old csPolygon2D class inherits from csPoly2D to add engine
+	  specific functions (like perspective correction, drawing, fog, ...)
+	  The reason is that we want to use the csPoly2D class in some other
+	  parts of csgeom and csgeom cannot depend on csPolygon2D since
+	  that lives in the engine.
+	- Also moved the csPolygon2DPool from csengine to csgeom and
+	  renamed it to csPoly2DPool. It accepts a csPoly2DFactory subclass
+	  which is a factory responsible for creating subclass of
+	  csPoly2D.
+	- csClipper now uses a polygon pool instead of creating new
+	  polygons every time we go through a portal.
 10-Aug-1999
 	- Eric Sunshine fixed a bug in MetaDemo.  It was not parsing its
 	  command line arguments correctly.  Instead of explicitly looking for
@@ -45,12 +66,20 @@ Short-term cleanups that need to be done:
 	  calculations and csWorld::DrawFunc().
 	- Everything seems to work well. Here is the list of currently known
 	  bugs (in the c-buffer/bsp system):
-	    - A crash at exit when deallocating a csPolygon3D.
-	    - Edge display does not work correctly when c-buffer is enabled.
-	    - Space warping portals still have problems with c-buffer.
-	    - There are still cases that drawing with the BSP tree gives
-	      incorrect results.  Very rare though.
-	    - The falling blocks in Blocks are not correctly lighted anymore.
+	  	- A crash at exit when deallocating a csPolygon3D.
+		- Edge display does not work correctly when c-buffer is enabled.
+		- Space warping portals still have problems with c-buffer.
+		- There are still cases that drawing with the BSP tree gives
+		  incorrect results. Very rare though.
+		- The falling blocks in Blocks are not correctly lighted
+		  anymore.
+	- Changes from Andrew Zabolotny. Fix for DJGPP so that volatile.h is
+	  correctly generated. Various other makefile changes.
+	- Andrew Zabolotny fixed bug with 32-bit lighted textures in BGRA
+	  modes. He also improved the speed of the 32-bit texture cache.
+	  He also created new texture caching code for 24-bit textures
+	  in 16-bit and 32-bit modes. Faster and allows for correct 2*SRC*DST
+	  handling (lights twice as bright).
 	- Eric Sunshine moved the MacOS/X Server MAKE_VOLATILE_H bug fix out
 	  of Makefile and into macosxs.mak, thus localizing the bug fix and
 	  simplifying the configuration phase for other platforms.
@@ -74,6 +103,17 @@ Short-term cleanups that need to be done:
 	  also make it easier to add future types. The cleanup is currently
 	  mostly in data seperation and API. Most of the lightmap handling
 	  code is still in csPolygon3D. This needs to move in the future.
+	- Andrew Zabolotny added the 'makedep' application which is a faster
+	  dependency generator. It is based on the 'makedepend' from X11
+	  distribution. This dependency generator does not need 'gcc' to run
+	  but even with 'gcc' it is better because it is faster. You can enable
+	  the new 'makedep' in mk/user.mak.
+	- Andrew also added changes received from Walt Armour <walt@armour.cx>)
+	  which removes warnings for gcc 2.95.
+	- Andrew also started a GCC/Win32 port (still incomplete).
+	- Thomas Hieber added a pragma to remove a warning for MSVC 5.0 and
+	  updated the VC project files.
+	- New Macintosh project files from Robert Bate.
 8-Aug-1999
 	- Continued work on new csTransformationManager class. It is now fully
 	  functional and the old NewTransformation()/RestoreTransformation()
