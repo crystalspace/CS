@@ -152,10 +152,13 @@ iDynamicSystem *csODEDynamics::FindSystem (const char *name)
 void csODEDynamics::Step (float elapsed_time)
 {
   float stepsize;
-  if (rateenabled) {
+  if (rateenabled) 
+  {
   	stepsize = steptime;
-	if (elapsed_time > limittime) { elapsed_time = limittime; }
-  } else {
+	if (elapsed_time > limittime) elapsed_time = limittime;
+  } 
+  else 
+  {
   	stepsize = elapsed_time;
   }
   total_elapsed += elapsed_time;
@@ -167,7 +170,8 @@ void csODEDynamics::Step (float elapsed_time)
     for (long i=0; i<systems.Length(); i++)
     {
       systems.Get (i)->Step (stepsize);
-      for (long j = 0; j < updates.Length(); j ++) {
+      for (long j = 0; j < updates.Length(); j ++) 
+      {
         updates[i]->Execute (stepsize);
       }
       dJointGroupEmpty (contactjoints);
@@ -701,7 +705,8 @@ void csODEDynamics::SetGlobalERP (float erp)
 {
   csODEDynamics::erp = erp;
 
-  for (int i = 0; i < systems.Length(); i ++) {
+  for (int i = 0; i < systems.Length(); i ++) 
+  {
 	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
 	  iODEDynamicSystemState);
   	sys->SetERP (erp);
@@ -711,7 +716,8 @@ void csODEDynamics::SetGlobalERP (float erp)
 void csODEDynamics::SetGlobalCFM (float cfm)
 {
   csODEDynamics::cfm = cfm;
-  for (int i = 0; i < systems.Length(); i ++) {
+  for (int i = 0; i < systems.Length(); i ++) 
+  {
 	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
 	  iODEDynamicSystemState);
   	sys->SetCFM (cfm);
@@ -722,7 +728,8 @@ void csODEDynamics::EnableStepFast (bool enable)
 {
   stepfast = enable;
 
-  for (int i = 0; i < systems.Length(); i ++) {
+  for (int i = 0; i < systems.Length(); i ++) 
+  {
 	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
 	  iODEDynamicSystemState);
   	sys->EnableStepFast (enable);
@@ -733,7 +740,8 @@ void csODEDynamics::SetStepFastIterations (int iter)
 {
   sfiter = iter;
 
-  for (int i = 0; i < systems.Length(); i ++) {
+  for (int i = 0; i < systems.Length(); i ++) 
+  {
 	csRef<iODEDynamicSystemState> sys = SCF_QUERY_INTERFACE (systems[i],
 	  iODEDynamicSystemState);
   	sys->SetStepFastIterations (iter);
@@ -838,28 +846,37 @@ void csODEDynamicSystem::Step (float elapsed_time)
 {
   dSpaceCollide (spaceID, this, &csODEDynamics::NearCallback);
   float stepsize;
-  if (rateenabled) {
+  if (rateenabled) 
+  {
   	stepsize = steptime;
 	if (elapsed_time > limittime) { elapsed_time = limittime; }
-  } else {
+  } 
+  else 
+  {
   	stepsize = elapsed_time;
   }
   total_elapsed += elapsed_time;
 
   // TODO handle fractional total_remaining (interpolate render)
-  while (total_elapsed > stepsize) {
+  while (total_elapsed > stepsize) 
+  {
     total_elapsed -= stepsize;
-    if (stepfast) {
+    if (!stepfast) 
+    {
       dWorldStep (worldID, stepsize);
-    } else {
+    } 
+    else 
+    {
       dWorldStepFast1 (worldID, stepsize, sfiter);
     }
-    for (long i = 0; i < bodies.Length(); i ++) {
+    for (long i = 0; i < bodies.Length(); i ++) 
+    {
         iRigidBody *b = bodies.Get(i);
         b->SetAngularVelocity (b->GetAngularVelocity () * roll_damp);
         b->SetLinearVelocity (b->GetLinearVelocity () * lin_damp);
     }
-    for (long j = 0; j < updates.Length(); j ++) {
+    for (long j = 0; j < updates.Length(); j ++) 
+    {
       updates[j]->Execute (stepsize);
     }
   }
@@ -1518,7 +1535,6 @@ void csODERigidBody::Update ()
   {
     csOrthoTransform trans;
     trans = GetTransform ();
-
     if (mesh) move_cb->Execute (mesh, trans);
     if (bone) move_cb->Execute (bone, trans);
     /* remainder case for all other callbacks */
