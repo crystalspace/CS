@@ -5,6 +5,8 @@ The history order has been reversed so that new features are at the top.
 	  nicer for csfedit.
 	- Norman Kramer fixed a bug in the AVI plugin. Red and blue
 	  chrominance values were swapped.
+	- Eric Sunshine eliminated a couple compilation warnings in
+	  csfedit.cpp.
 3-Feb-2001
 	- Wouter Wijngaards added full functionality to the .csf font
 	  editor. You can edit characters, see a preview, change individual
