@@ -8,6 +8,8 @@ chronological order.
 
 8-Mar-2004
         - Philip Wyett eliminated warning in odeparticles.cpp.
+	- Jorrit fixed the old OpenGL renderer so that disabling texture
+	  mapping again works correctly (only lightmaps are rendered).
 7-Mar-2004
 	- Jorrit added a db_mesh_name field to csRenderMesh (but only
 	  in debug mode!). This field is updated by the engine (before

@@ -3830,8 +3830,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     trimesh.num_triangles = t->triangles.Length ();
     GLuint lmtex = t->slmh ? ((csGLSuperLightmap*)
     	((iSuperLightmap*)t->slmh))->texHandle : 0;
-    bool drawn = EffectDrawTriangleMesh (trimesh, false,
-      lmtex);
+    bool drawn = EffectDrawTriangleMesh (trimesh, false, lmtex);
     something_was_drawn |= drawn;
     t = t->next;
   }
@@ -3855,6 +3854,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     default:
       break;
   }
+  if (!m_renderstate.textured) z_buf_mode = old_z_buf_mode;
 
   if (m_renderstate.lighting || mesh.do_fog)
   {
@@ -4531,6 +4531,12 @@ void csGraphics3DOGLCommon::SetupDTMEffect (G3DTriangleMesh& mesh)
 {
   if (mesh.mat_handle)
   {
+    if (!m_renderstate.textured)
+    {
+      ci.technique = 0;
+      return;
+    }
+
     iMaterial* material = ((csMaterialHandle*)(mesh.mat_handle))->GetMaterial();
     if (!material)
     {
