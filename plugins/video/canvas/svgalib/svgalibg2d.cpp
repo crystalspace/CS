@@ -225,13 +225,14 @@ bool csGraphics2DSVGALib::HandleEvent (csEvent &/*Event*/)
   { MOUSE_LEFTBUTTON, MOUSE_RIGHTBUTTON, MOUSE_MIDDLEBUTTON };
   
   keyboard_update ();
+/*
   bool shift = keyboard_keypressed (SCANCODE_LEFTSHIFT)
             || keyboard_keypressed (SCANCODE_RIGHTSHIFT);
   bool alt   = keyboard_keypressed (SCANCODE_LEFTALT)
             || keyboard_keypressed (SCANCODE_RIGHTALT);
   bool ctrl  = keyboard_keypressed (SCANCODE_LEFTCONTROL);
-//  int state = (shift ? CSMASK_SHIFT : 0) | (alt ? CSMASK_ALT : 0) | (ctrl ? CSMASK_CTRL : 0);
-
+  int state = (shift ? CSMASK_SHIFT : 0) | (alt ? CSMASK_ALT : 0) | (ctrl ? CSMASK_CTRL : 0);
+*/
   for (unsigned int scancode = 0; scancode < 128; scancode++)
   {
     int key = ScanCodeToChar [scancode];
@@ -267,7 +268,7 @@ bool csGraphics2DSVGALib::HandleEvent (csEvent &/*Event*/)
   return false;
 }
   
-void csGraphics2DSVGALib::Print (csRect *area)
+void csGraphics2DSVGALib::Print (csRect * /*area*/)
 {
   gl_copyscreen (&physicalscreen);
 }
