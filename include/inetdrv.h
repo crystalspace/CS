@@ -23,6 +23,27 @@
 #include "csutil/scf.h"
 #include "iplugin.h"
 
+/*
+ *  Random things you need for various systems.
+ */
+
+
+#define CS_NET_SOCKETS_MAX 64
+
+#define CS_NET_LISTEN_QUEUE_SIZE 5
+
+#if !defined(OS_WIN32)
+	#include <sys/select.h>
+	typedef unsigned int csNetworkSocket;
+	#define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
+#else
+	#include <WINSOCK.H>
+	typedef SOCKET csNetworkSocket;
+	#define CS_NET_SOCKET_INVALID INVALID_SOCKET
+	#define _WINSOCKAPI_
+#endif
+
+
 /**
  * Potential network driver error codes.
  */
@@ -95,6 +116,7 @@ struct iNetworkConnection : public iNetworkEndPoint
    * returns CS_NET_ERR_NO_ERROR.
    */
   virtual size_t Receive(void* buff, size_t maxbytes) = 0;
+  virtual csNetworkSocket Getfd() = 0;
 };
 
 
@@ -117,6 +139,7 @@ struct iNetworkListener : public iNetworkEndPoint
    * an error occurred, and GetLastError() returns the appropriate error code.
    */
   virtual iNetworkConnection* Accept() = 0;
+  virtual csNetworkSocket Getfd() = 0;
 };
 
 
@@ -163,6 +186,9 @@ struct iNetworkDriver : public iPlugIn
   /// Retrieve the code for the last error encountered.
   virtual csNetworkDriverError GetLastError () const = 0;
 
+  // Detect an event
+  virtual bool DetectEvents(int maxsock, fd_set *ReadMask, fd_set *ExceptMask) =0;
+
   // iPlugIn interface.
   virtual bool Initialize (iSystem*) = 0;
   virtual bool Open () = 0;
@@ -170,3 +196,4 @@ struct iNetworkDriver : public iPlugIn
 };
 
 #endif // __CS_INETWORK_H__
+

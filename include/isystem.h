@@ -82,6 +82,10 @@
 #define CS_FUNCID_NETDRV	"NetDriver"
 /// Network manager
 #define CS_FUNCID_NETMAN	"NetManager"
+/// Network Protocol layer
+#define CS_FUNCID_PROTOCOL      "Protocol"
+/// Network Cmd Manager layer 
+#define CS_FUNCID_CMDMGR        "CmdManager"
 /// Console
 #define CS_FUNCID_CONSOLE	"Console"
 /// 3D engine

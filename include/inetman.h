@@ -24,52 +24,110 @@
 #include "csutil/scf.h"
 #include "iplugin.h"
 
+#define NETPORT_PROTO_UNKNOWN (-1)
+#define NETPORT_PROTO_TCP     (1)
+#define NETPORT_PROTO_UDP     (2)
+#define NETPORT_PROTO_SOCKET  (3)
+
+/* Various roles that a port might play */
+#define NETPORT_ROLE_UNKNOWN    (-1)
+
+/* output connection role - connection originates from app
+  i.e. for server to server connection. or for 
+  client side app. */
+#define NETPORT_ROLE_OUTBOUND    (1)
+
+/* server connection role - port needs to be listened to */
+#define NETPORT_ROLE_SERVER      (2)
+
+/* server received a connection from outside  that has to be manhandled*/  
+#define NETPORT_ROLE_CONNECTION  (3)
+
+/* If the connection arrives from an external site, then the 
+   parent is defined as the port that it first arrived on */
+#define NETPORT_NOPARENT        (-1)
+#define NETPORT_PARENT_SERVER   (-2)
+
+/* Initial the port so that we don't accidently look at a port 
+   like port 0  - doh! */
+#define NETPORT_PORT_UNKNOWN    (-1)
+ 
+/* The status of the network socket */
+#define NETPORT_STATUS_CLEAR    (-1)
+#define NETPORT_STATUS_CONNECTED (1)
+
+
+/* Standard Error condition */
+#define NETMAN_ERROR            (-1)
+#define NETMAN_SUCCESS          (0)
+
+// Events passed to protocol layer... ::NetEventNotify.
+
+#define NETMAN_SERVER_STOP          (1)
+#define NETMAN_SERVER_START         (2)
+#define NETMAN_CONNECTION_CONNECT       (3) 
+#define NETMAN_CONNECTION_DISCONNECT    (4) 
+#define NETMAN_OUTBOUND_CONNECT     (5)
+#define NETMAN_OUTBOUND_DISCONNECT  (6)
+
 SCF_VERSION (iNetworkManager, 0, 0, 1);
 
 /**
  * This is the network manager interface for CS.  It represents a plug-in
  * network manager module.  All network managers must implement this interface.
  */
-struct iNetworkManager : public iPlugIn
-{
-  /// Should be called every frame
-  virtual void Refresh () = 0;
 
-  /// Game management
-  virtual bool CreateGame (int nplayers) = 0;
-  virtual bool KillGame () = 0;
-  virtual void JoinGame () = 0;
-  virtual void LeaveGame () = 0;
-  virtual void EnumerateGames () = 0;
-  virtual void GetGameData () = 0;
-  virtual void SetGameData () = 0;
+  struct iNetworkManager : public iPlugIn
+  {
 
-  /// Player management
-  virtual void CreatePlayer () = 0;
-  virtual void KillPlayer () = 0;
-  virtual void GetPlayerData () = 0;
-  virtual void SetPlayerData () = 0;
-  virtual void AddPlayerToGroup () = 0;
-  virtual void RemovePlayerFromGroup () = 0;
+  virtual void AssignHostName(char *hostname) = 0;
 
-  /// Group management
-  virtual void CreateGroup () = 0;
-  virtual void KillGroup () = 0;
-  virtual void GetGroupData () = 0;
-  virtual void SetGroupData () = 0;
+  virtual int AssignServer(int ipPortNumber,  
+			   int ipProtocol,  int maxConnects) =0;
 
-  /// Message management
-  virtual void Send () = 0;
-  virtual void Receive () = 0;
-  virtual void GetMessageCount () = 0;
-  virtual void PeekMessage () = 0;
+  virtual int AssociateAcceptHandler(int csNetPort, 
+				     int (*msghandler)(int,char *)) =0;
+  virtual int AssociateMsgHandler(int csNetPort, int (*accepthandler)(int)) =0;
 
+  virtual void SetPollCounter(int counter) = 0;
+
+  virtual int StartServer(int csNetPort) =0;
+  virtual int StartAllServers() =0;
+
+  virtual void Update() = 0;
+  virtual bool HandleEvent()= 0;
+
+
+  virtual int StopAllConnections() = 0;
+  virtual int StopAllServers() =0;
+  virtual int StopServer(int csNetPort) =0;
+  virtual int ResignNetPort(int csNetPort) =0;
+
+  virtual int AssignClient(char *hostname, int port, int protocol) =0;
+  virtual int AssignClient(char *hostandport, int protocol) =0;
+
+  virtual void NetControl(int NetPort, int len, char *msg)=0;
+
+  virtual void Reset() =0;
+    virtual void Refresh () = 0;
+  
+  virtual int SendMsg(int csNetPort, int len, char *msg) =0;
+  virtual int SendMsg(int csNetPort, char *hostname, int len, char *msg)=0;
+
+  virtual void Broadcast(char *) =0;
+  virtual void Broadcast(int csNetPort, int len, char *msg) =0;
+
+  // Glue to NSTP
+  virtual void AssignProtocol(iSystem *iSys) =0;
+    
   /// Utility stuff
   virtual int GetLastError () = 0;
   virtual void GetCapabilities () = 0;
 
   // iPlugIn interface.
   virtual bool Initialize (iSystem*) = 0;
+  virtual void CleanInit() = 0; 
+  virtual void CleanPort(int csNetPort) = 0;
   virtual bool Open () = 0;
   virtual bool Close () = 0;
 };

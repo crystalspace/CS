@@ -302,6 +302,8 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8),
   G2D = NULL;
   NetDrv = NULL;
   NetMan = NULL;
+  Protocol = NULL;
+  CmdManager = NULL;
   Sound = NULL;
 
   Console = NULL;
@@ -333,6 +335,8 @@ csSystemDriver::~csSystemDriver ()
   if (Sound) Sound->DecRef ();
   if (NetDrv) NetDrv->DecRef ();
   if (NetMan) NetMan->DecRef ();
+  if (Protocol) Protocol->DecRef ();
+  if (CmdManager) CmdManager->DecRef();
   if (Console) Console->DecRef ();
 
   // Free all plugins
@@ -433,6 +437,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
   NetDrv = QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
   NetMan = QUERY_PLUGIN_ID (this, CS_FUNCID_NETMAN, iNetworkManager);
+  Protocol = QUERY_PLUGIN_ID (this, CS_FUNCID_PROTOCOL, iPROTO);
+  CmdManager = QUERY_PLUGIN_ID (this, CS_FUNCID_CMDMGR, iCMDMGR);
   Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsole);
 
   // Check if the minimal required drivers are loaded
@@ -483,6 +489,10 @@ void csSystemDriver::Close ()
     NetMan->Close ();
   if (NetDrv)
     NetDrv->Close ();
+  if (Protocol)
+    Protocol->Close ();
+  if (CmdManager)
+    CmdManager->Close ();
   if (G3D)
     G3D->Close ();
 }
@@ -525,6 +535,8 @@ void csSystemDriver::NextFrame (time_t /*elapsed_time*/, time_t /*current_time*/
   ProcessEvents ();
   if (Sound)
     Sound->Update ();
+  if (NetMan)
+	NetMan->Update();
 }
 
 bool csSystemDriver::ProcessEvents ()

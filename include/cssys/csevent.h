@@ -37,7 +37,8 @@ enum
   csevJoystickDown,		// A joystick button has been pressed
   csevJoystickUp,		// A joystick button has been released
   csevCommand,			// Somebody(-thing) sent a command
-  csevBroadcast			// Somebody(-thing) sent a broadcast command
+  csevBroadcast,			// Somebody(-thing) sent a broadcast command
+  csevNetwork			// Something has arrived on network.
 };
 
 /**
@@ -72,6 +73,8 @@ enum
 #define CSMASK_Command		(1 << csevCommand)
 /// Broadcast message events
 #define CSMASK_Broadcast	(1 << csevBroadcast)
+/// Network message events
+#define CSMASK_Network		(1 << csevNetwork)
 
 /// Some handy macros
 /// Check if a event is a keyboard event
@@ -81,6 +84,8 @@ enum
 #define IS_MOUSE_EVENT(e)	((1 << (e).Type) & \
  (CSMASK_MouseMove | CSMASK_MouseDown | \
   CSMASK_MouseUp | CSMASK_MouseDoubleClick))
+#define IS_NETWORK_EVENT(e)	((1 << (e).Type) & \
+	(CSMASK_Network))
 /// Check if a event is a joystick event
 #define IS_JOYSTICK_EVENT(e)	((1 << (e).Type) & \
  (CSMASK_JoystickMove | CSMASK_JoystickDown | CSMASK_JoystickUp))

@@ -29,6 +29,7 @@
 #include "iconfig.h"
 #include "isystem.h"
 #include "ivfs.h"
+#include "iproto.h"
 
 class csEventQueue;
 class csKeyboardDriver;
@@ -162,6 +163,10 @@ public:
   iNetworkDriver* NetDrv;
   /// Network manager
   iNetworkManager* NetMan;
+  /// Network User Protocol Layer
+  iPROTO *Protocol;
+  /// Network Command Manager
+  iCMDMGR *CmdManager;
   /// System console
   iConsole *Console;
 
