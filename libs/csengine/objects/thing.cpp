@@ -810,20 +810,16 @@ void csThing::BuildStaticTree (const char *name, int mode)
   }
 
   bool recalc_octree = true;
-printf ("bst1\n"); fflush (stdout);
   if (!csEngine::do_force_revis)
   {
     recalc_octree = false;
     csEngine::current_engine->Report ("Loading bsp/octree...");
-printf ("bst2\n"); fflush (stdout);
     recalc_octree = !((csOctree *)static_tree)->ReadFromCache (
         cache_mgr,
         GetPolygonArray ().GetArray (),
         GetPolygonArray ().Length ());
-printf ("bst3\n"); fflush (stdout);
     if (recalc_octree)
     {
-printf ("bst4\n"); fflush (stdout);
       delete static_tree;
       static_tree = new csOctree (
           this,
@@ -836,13 +832,10 @@ printf ("bst4\n"); fflush (stdout);
     cache_mgr->SetCurrentScope (NULL);
   }
 
-printf ("bst5\n"); fflush (stdout);
   if (recalc_octree)
   {
-printf ("bst6\n"); fflush (stdout);
     csEngine::current_engine->Report ("Calculate bsp/octree...");
     static_tree->Build (GetPolygonArray ());
-printf ("bst7\n"); fflush (stdout);
 
     csEngine::current_engine->Report ("Caching bsp/octree...");
     ((csOctree *)static_tree)->Cache (cache_mgr);
@@ -850,7 +843,6 @@ printf ("bst7\n"); fflush (stdout);
     cache_mgr->SetCurrentScope (NULL);
   }
 
-printf ("bst8\n"); fflush (stdout);
   csEngine::current_engine->Report ("Compress vertices...");
   CompressVertices ();
   RemoveUnusedVertices ();
