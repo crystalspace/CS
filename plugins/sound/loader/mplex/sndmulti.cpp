@@ -17,11 +17,12 @@
 */
 
 #include "cssysdef.h"
-#include "csutil/csvector.h"
+#include "isound/data.h"
 #include "isound/loader.h"
 #include "isys/system.h"
 #include "isys/vfs.h"
-#include "isound/data.h"
+#include "iutil/strvec.h"
+#include "csutil/csvector.h"
 
 #define MY_CLASSNAME "crystalspace.sound.loader.multiplexer"
 
@@ -74,14 +75,13 @@ bool csSoundLoaderMultiplexer::Initialize(iSystem *sys)
     "Initializing sound loading multiplexer...\n"
     "  Looking for sound loader modules:\n");
 
-  int nmatches;
-  char const** list =
-    iSCF::SCF->QueryClassList ("crystalspace.sound.loader.", nmatches);
-  if (list)
+  iStrVector* list = iSCF::SCF->QueryClassList ("crystalspace.sound.loader.");
+  int const nmatches = list->Length();
+  if (nmatches != 0)
   {
     for (int i = 0; i < nmatches; i++)
     {
-      char const* classname = list[i];
+      char const* classname = list->Get(i);
       if (strcasecmp (classname, MY_CLASSNAME))
       {
         sys->Printf(MSG_INITIALIZATION, "  %s\n", classname);
@@ -90,8 +90,8 @@ bool csSoundLoaderMultiplexer::Initialize(iSystem *sys)
 	  Loaders.Push(ldr);
       }
     }
-    free(list);
   }
+  list->DecRef();
   return true;
 }
 

@@ -22,10 +22,11 @@
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"
-#include "csutil/util.h"
-#include "csutil/csobjvec.h"
 #include "csutil/cfgfile.h"
+#include "csutil/csobjvec.h"
+#include "csutil/scfstrv.h"
 #include "csutil/strset.h"
+#include "csutil/util.h"
 
 /// This is the registry for all class factories
 static class scfClassRegistry *ClassRegistry = NULL;
@@ -62,7 +63,7 @@ public:
   virtual void UnloadUnusedModules ();
   virtual scfInterfaceID GetInterfaceID (const char *iInterface);
   virtual void Finish ();
-  virtual char const** QueryClassList (char const* pattern, int& nmatches);
+  virtual iStrVector* QueryClassList (char const* pattern);
 };
 
 #ifndef CS_STATIC_LINKED
@@ -558,26 +559,19 @@ scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
   return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
 }
 
-char const** csSCF::QueryClassList (char const* pattern, int& nmatches)
+iStrVector* csSCF::QueryClassList (char const* pattern)
 {
-  char const** matches = 0;
-  nmatches = 0;
+  scfStrVector* v = new scfStrVector();
   int const rlen = ClassRegistry->Length();
   if (rlen != 0)
   {
     int const plen = (pattern ? strlen(pattern) : 0);
-    matches = (char const**)malloc(rlen * sizeof(matches[0]));
     for (int i = 0; i < rlen; i++)
     {
       char const* s = ((iFactory*)ClassRegistry->Get(i))->QueryClassID();
       if (plen == 0 || strncasecmp(pattern, s, plen) == 0)
-        matches[nmatches++] = s;
-    }
-    if (nmatches == 0)
-    {
-      free(matches);
-      matches = 0;
+        v->Push(strnew(s));
     }
   }
-  return matches;
+  return QUERY_INTERFACE(v, iStrVector);
 }

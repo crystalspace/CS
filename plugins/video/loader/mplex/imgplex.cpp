@@ -17,9 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 #include "cssysdef.h"
-#include "isys/system.h"
-#include "csgfx/csimage.h"
 #include "imgplex.h"
+#include "isys/system.h"
+#include "iutil/strvec.h"
+#include "csgfx/csimage.h"
 
 #define MY_CLASSNAME "crystalspace.graphic.image.io.multiplex"
 
@@ -54,14 +55,14 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
       "Initializing image loading multiplexer...\n"
       "  Looking for image loader modules:\n");
 
-    int nmatches;
-    char const** classlist =
-      iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io.", nmatches);
-    if (classlist)
+    iStrVector* classlist =
+      iSCF::SCF->QueryClassList ("crystalspace.graphic.image.io.");
+    int const nmatches = classlist->Length();
+    if (nmatches != 0)
     {
       for (int i = 0; i < nmatches; i++)
       {
-	char const* classname = classlist[i];
+	char const* classname = classlist->Get(i);
         if (strcasecmp (classname, MY_CLASSNAME))
         {
 	  pSystem->Printf(MSG_INITIALIZATION,"  %s\n",classname);
@@ -76,6 +77,7 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
         }
       }
     }
+    classlist->DecRef();
     return (list.Length() > 0);
   }
   return false;

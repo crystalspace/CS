@@ -50,6 +50,18 @@ The history order is reversed so that new features are at the top.
 	  feature the need for screen clipping is no longer there. The
 	  flag is still in opengl.cfg though in case it IS still needed
 	  but it may be that everything is ok now.
+	- Eric Sunshine changed the prototype of iSCF::QueryClassList() so that
+	  it now returns matches via an iStrVector object rather than a (char
+	  const**) which was free()'d by the caller.  It was necessary to
+	  return a reference-counted object in order to avoid the problem of
+	  allocating memory from one heap (the application's) and freeing it
+	  into another (a plugin's, for instance).  I am not terribly happy
+	  about using an SCF interface (iStrVector) in the declaration of the
+	  core SCF since it introduces a sort of circular dependency, however
+	  SCF was already polluted in this fashion by use of iConfigFile.  In
+	  the future, in order to address this chicken-and-egg problem, I think
+	  that we should eliminate both iConfigFile and iStrVector from the
+	  core scf.h interface.
 7-Jun-2001
 	- Justin Miller fixed a minor syntax error in csview.h.
 	- Wouter Wijngaards gave the start to implementing a visibility

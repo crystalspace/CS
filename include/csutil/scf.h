@@ -549,8 +549,8 @@ struct iFactory : public iBase
 
 //----------------------------------------------- Client-side functions -----//
 
-// We'll use iConfigFile to read `scf.cfg'.
 struct iConfigFile;
+struct iStrVector;
 
 /**
  * Handy macro to create an instance of a shared class.
@@ -742,23 +742,16 @@ struct iSCF : public iBase
   virtual void Finish () = 0;
 
   /**
-   * Retrieve a list of class names whose prefix matches a pattern string.
-   * For example, QueryClassList("crystalspace.sound.loader.", nmatches) will
-   * return a list of class names which begin with the string
-   * "crystalspace.sound.loader.".  If pattern is zero length or the null
-   * pointer, then all registered class names are returned.  The number of
-   * matches is returned by reference via the nmatches argument.  If no class
-   * names match the pattern string, then NULL is returned and nmatches is set
-   * to zero.  If any class names match the pattern, then the return value is
-   * an array of pointers to constant C-strings.  It is the caller's
-   * responsibility to free the returned pointer if non-NULL, but not the
-   * strings which the array references.  The strings themselves are owned by
-   * the SCF mechanism.  The caller should not rely upon the returned strings
-   * remaining valid following operations which may alter the database of
-   * registered SCF class names.  If the caller needs to maintain access to the
-   * returned strings, then the caller should make a copy of them.
+   * Retrieve a list of class names whose prefix matches a pattern string.  For
+   * example, QueryClassList("crystalspace.sound.loader.") will return a list
+   * of class names which begin with the string "crystalspace.sound.loader.".
+   * If pattern is zero length or the null pointer, then all registered class
+   * names are returned.  If any class names match the pattern, then the return
+   * value is a list strings.  If no class names match the pattern string, then
+   * the returned list is empty.  It is the caller's responsibility to invoke
+   * DecRef() on the returned list when the list is no longer needed.
    */
-  virtual char const** QueryClassList (char const* pattern, int& nmatches) = 0;
+  virtual iStrVector* QueryClassList (char const* pattern) = 0;
 };
 
 //-------------------------------------------- System-dependent defines -----//
