@@ -27,10 +27,8 @@
 #include "csgeom/quaterni.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
-// #include "csutil/hashmap.h"
 
 //#define MOTION_DEBUG
-
 
 CS_TOKEN_DEF_START
   CS_TOKEN_DEF(ANIM)

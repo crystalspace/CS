@@ -63,6 +63,16 @@ The history order is reversed so that new features are at the top.
 	    plugins/mesh/ball/persist/xml
 	    plugins/mesh/ball/persist/binary
 	- Eric Sunshine renamed plugins/colldet to plugins/collide.
+	- Eric Sunshine renamed the SCF class name for the Rapid plugin from
+	  crystalspace.colldet.rapid to crystalspace.collisiondetection.rapid.
+	- Eric Sunshine re-organized the plugins/motion directory hierarchy to
+	  resemble the new plugins/mesh directory organization.  Instead of
+	  these directories:
+	    plugins/motion/object/default
+	    plugins/motion/loader/default
+	  We now have:
+	    plugins/motion/standard/object
+	    plugins/motion/standard/persist/classic
 10-Jun-2001
 	- Norman Kramer did the following:
 	    - Blocks now decrefs its queried soundwrapper, releases/stops the

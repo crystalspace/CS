@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/motion/object/default
+vpath %.cpp plugins/motion/standard/object
 
 ifeq ($(USE_PLUGINS),yes)
   MOTION = $(OUTDLL)motion$(DLL)
@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(MOTION)
 endif
 
-INC.MOTION = $(wildcard plugins/motion/object/default/*.h)
-SRC.MOTION = $(wildcard plugins/motion/object/default/*.cpp)
+INC.MOTION = $(wildcard plugins/motion/standard/object/*.h)
+SRC.MOTION = $(wildcard plugins/motion/standard/object/*.cpp)
 OBJ.MOTION = $(addprefix $(OUT),$(notdir $(SRC.MOTION:.cpp=$O)))
 DEP.MOTION = CSGEOM CSUTIL CSSYS CSUTIL
 
