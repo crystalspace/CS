@@ -401,6 +401,83 @@ _cspace.iString_swigregister(iStringPtr)
 
 iString_scfGetVersion = _cspace.iString_scfGetVersion
 
+class csStringBase(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csStringBase, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csStringBase, name)
+    def __repr__(self):
+        return "<C csStringBase instance at %s>" % (self.this,)
+    def SetCapacity(*args): return _cspace.csStringBase_SetCapacity(*args)
+    def GetCapacity(*args): return _cspace.csStringBase_GetCapacity(*args)
+    def AppendFmt(*args): return _cspace.csStringBase_AppendFmt(*args)
+    def AppendFmtV(*args): return _cspace.csStringBase_AppendFmtV(*args)
+    def Append(*args): return _cspace.csStringBase_Append(*args)
+    def __init__(self, *args):
+        _swig_setattr(self, csStringBase, 'this', _cspace.new_csStringBase(*args))
+        _swig_setattr(self, csStringBase, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csStringBase):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+    def SetGrowsBy(*args): return _cspace.csStringBase_SetGrowsBy(*args)
+    def GetGrowsBy(*args): return _cspace.csStringBase_GetGrowsBy(*args)
+    def SetGrowsExponentially(*args): return _cspace.csStringBase_SetGrowsExponentially(*args)
+    def GetGrowsExponentially(*args): return _cspace.csStringBase_GetGrowsExponentially(*args)
+    def Free(*args): return _cspace.csStringBase_Free(*args)
+    def Truncate(*args): return _cspace.csStringBase_Truncate(*args)
+    def Empty(*args): return _cspace.csStringBase_Empty(*args)
+    def ShrinkBestFit(*args): return _cspace.csStringBase_ShrinkBestFit(*args)
+    def Reclaim(*args): return _cspace.csStringBase_Reclaim(*args)
+    def Clear(*args): return _cspace.csStringBase_Clear(*args)
+    def GetData(*args): return _cspace.csStringBase_GetData(*args)
+    def GetDataSafe(*args): return _cspace.csStringBase_GetDataSafe(*args)
+    def Length(*args): return _cspace.csStringBase_Length(*args)
+    def IsEmpty(*args): return _cspace.csStringBase_IsEmpty(*args)
+    def SetAt(*args): return _cspace.csStringBase_SetAt(*args)
+    def GetAt(*args): return _cspace.csStringBase_GetAt(*args)
+    def DeleteAt(*args): return _cspace.csStringBase_DeleteAt(*args)
+    def Insert(*args): return _cspace.csStringBase_Insert(*args)
+    def Overwrite(*args): return _cspace.csStringBase_Overwrite(*args)
+    def Slice(*args): return _cspace.csStringBase_Slice(*args)
+    def SubString(*args): return _cspace.csStringBase_SubString(*args)
+    def FindFirst(*args): return _cspace.csStringBase_FindFirst(*args)
+    def FindLast(*args): return _cspace.csStringBase_FindLast(*args)
+    def FindStr(*args): return _cspace.csStringBase_FindStr(*args)
+    def FindReplace(*args): return _cspace.csStringBase_FindReplace(*args)
+    def Format(*args): return _cspace.csStringBase_Format(*args)
+    def FormatV(*args): return _cspace.csStringBase_FormatV(*args)
+    def Replace(*args): return _cspace.csStringBase_Replace(*args)
+    def Compare(*args): return _cspace.csStringBase_Compare(*args)
+    def CompareNoCase(*args): return _cspace.csStringBase_CompareNoCase(*args)
+    def StartsWith(*args): return _cspace.csStringBase_StartsWith(*args)
+    def Clone(*args): return _cspace.csStringBase_Clone(*args)
+    def LTrim(*args): return _cspace.csStringBase_LTrim(*args)
+    def RTrim(*args): return _cspace.csStringBase_RTrim(*args)
+    def Trim(*args): return _cspace.csStringBase_Trim(*args)
+    def Collapse(*args): return _cspace.csStringBase_Collapse(*args)
+    def PadLeft(*args): return _cspace.csStringBase_PadLeft(*args)
+    def AsPadLeft(*args): return _cspace.csStringBase_AsPadLeft(*args)
+    def PadRight(*args): return _cspace.csStringBase_PadRight(*args)
+    def AsPadRight(*args): return _cspace.csStringBase_AsPadRight(*args)
+    def PadCenter(*args): return _cspace.csStringBase_PadCenter(*args)
+    def AsPadCenter(*args): return _cspace.csStringBase_AsPadCenter(*args)
+    def __add__(*args): return _cspace.csStringBase___add__(*args)
+    def __eq__(*args): return _cspace.csStringBase___eq__(*args)
+    def __lt__(*args): return _cspace.csStringBase___lt__(*args)
+    def __gt__(*args): return _cspace.csStringBase___gt__(*args)
+    def __ne__(*args): return _cspace.csStringBase___ne__(*args)
+    def Downcase(*args): return _cspace.csStringBase_Downcase(*args)
+    def Upcase(*args): return _cspace.csStringBase_Upcase(*args)
+    def Detach(*args): return _cspace.csStringBase_Detach(*args)
+
+class csStringBasePtr(csStringBase):
+    def __init__(self, this):
+        _swig_setattr(self, csStringBase, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csStringBase, 'thisown', 0)
+        _swig_setattr(self, csStringBase,self.__class__,csStringBase)
+_cspace.csStringBase_swigregister(csStringBasePtr)
+
 class csString(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, csString, name, value)
@@ -408,25 +485,16 @@ class csString(_object):
     __getattr__ = lambda self, name: _swig_getattr(self, csString, name)
     def __repr__(self):
         return "<C csString instance at %s>" % (self.this,)
-    def GetData(*args): return _cspace.csString_GetData(*args)
-    def GetDataSafe(*args): return _cspace.csString_GetDataSafe(*args)
-    def Length(*args): return _cspace.csString_Length(*args)
-    def IsEmpty(*args): return _cspace.csString_IsEmpty(*args)
-    def FindStr(*args): return _cspace.csString_FindStr(*args)
-    def FindReplace(*args): return _cspace.csString_FindReplace(*args)
-    def StartsWith(*args): return _cspace.csString_StartsWith(*args)
     def __init__(self, *args):
         _swig_setattr(self, csString, 'this', _cspace.new_csString(*args))
         _swig_setattr(self, csString, 'thisown', 1)
+    def __getitem__(*args): return _cspace.csString___getitem__(*args)
+    def __setitem__(*args): return _cspace.csString___setitem__(*args)
+    def __delitem__(*args): return _cspace.csString___delitem__(*args)
     def __del__(self, destroy=_cspace.delete_csString):
         try:
             if self.thisown: destroy(self)
         except: pass
-    def __lt__(*args): return _cspace.csString___lt__(*args)
-    def __gt__(*args): return _cspace.csString___gt__(*args)
-    def __getitem__(*args): return _cspace.csString___getitem__(*args)
-    def __setitem__(*args): return _cspace.csString___setitem__(*args)
-    def __delitem__(*args): return _cspace.csString___delitem__(*args)
 
 class csStringPtr(csString):
     def __init__(self, this):
