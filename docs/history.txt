@@ -42,6 +42,10 @@ chronological order.
 	  invokes the new celInitializer::SetupCelPluginDirs() rather than
 	  manually attempting to figure out where the CEL plugins are located
 	  and telling SCF where to scan.
+	- Eric Sunshine made all arguments to the csConfigManager constructor
+	  optional. This makes it more convenient to use csConfigManager as an
+	  instance variable when the containing object is not able to populate
+	  the manager immediately upon construction.
 5-Dec-2004
 	- res made the following changes:
 	    - Fixed the Win32 shared library linking.

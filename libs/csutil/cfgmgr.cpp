@@ -209,6 +209,10 @@ csConfigManager::csConfigManager(iConfigFile *dyn, bool opt)
   FirstDomain = new csConfigDomain(0, PriorityMin);
   LastDomain = new csConfigDomain(0, PriorityMax);
   LastDomain->InsertAfter(FirstDomain);
+
+  csRef<iConfigFile> dyndom(dyn);
+  if (!dyndom.IsValid())
+    dyndom.AttachNew(new csConfigFile);
   AddDomain(dyn, PriorityMedium);
   DynamicDomain = FindConfig(dyn);
 }

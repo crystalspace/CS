@@ -49,7 +49,7 @@ public:
    *      used instead.
    * </ul>
    */
-  csConfigManager(iConfigFile *DynamicDomain, bool Optimize);
+  csConfigManager(iConfigFile *DynamicDomain = 0, bool Optimize = false);
   /// Destroy configuration manager.
   virtual ~csConfigManager();
 
