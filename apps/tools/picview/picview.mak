@@ -64,6 +64,7 @@ $(OUT.PICVIEW):
 	$(MKDIRS)
 
 picviewclean:
+	-$(RM) picview.txt
 	-$(RMDIR) $(PICVIEW.EXE) $(OBJ.PICVIEW)
 
 cleandep: picviewcleandep

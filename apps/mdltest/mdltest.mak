@@ -62,6 +62,7 @@ $(OUT.MDLTEST):
 	$(MKDIRS)
 
 mdltestclean:
+	-$(RM) mdltest.txt
 	-$(RMDIR) $(MDLTEST.EXE) $(OBJ.MDLTEST)
 
 cleandep: mdltestcleandep

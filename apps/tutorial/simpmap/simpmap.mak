@@ -62,6 +62,7 @@ $(OUT.SIMPMAP):
 	$(MKDIRS)
 
 simpmapclean:
+	-$(RM) simpmap.txt
 	-$(RMDIR) $(SIMPMAP.EXE) $(OBJ.SIMPMAP)
 
 cleandep: simpmapcleandep

@@ -61,6 +61,7 @@ $(OUT.G2DTEST):
 	$(MKDIRS)
 
 g2dtestclean:
+	-$(RM) g2dtest.txt
 	-$(RMDIR) $(G2DTEST.EXE) $(OBJ.G2DTEST)
 
 cleandep: g2dtestcleandep

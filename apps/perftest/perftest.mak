@@ -61,6 +61,7 @@ $(OUT.PERFTEST):
 	$(MKDIRS)
 
 perftestclean:
+	-$(RM) perftest.txt
 	-$(RMDIR) $(PERFTEST.EXE) $(OBJ.PERFTEST)
 
 cleandep: perftestcleandep

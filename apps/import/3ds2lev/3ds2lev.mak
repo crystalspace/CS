@@ -58,6 +58,7 @@ $(3DS2LEV.EXE): $(OBJ.3DS2LEV) $(LIB.3DS2LEV)
 	$(DO.LINK.CONSOLE.EXE) $(3DS.LFLAGS)
 
 3ds2levclean:
+	-$(RM) 3ds2lev.txt
 	-$(RMDIR) $(3DS2LEV.EXE) $(OBJ.3DS2LEV)
 
 ifdef DO_DEPEND

@@ -63,6 +63,7 @@ $(OUT.SIMPCD):
 	$(MKDIRS)
 
 simpcdclean:
+	-$(RM) simpcd.txt
 	-$(RMDIR) $(SIMPCD.EXE) $(OBJ.SIMPCD)
 
 cleandep: simpcdcleandep

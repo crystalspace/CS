@@ -66,6 +66,7 @@ $(OUT.MAP2CS):
 	$(MKDIRS)
 
 map2csclean:
+	-$(RM) map2cs.txt
 	-$(RMDIR) $(MAP2CS.EXE) $(OBJ.MAP2CS)
 
 cleandep: map2cscleandep

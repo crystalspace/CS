@@ -61,6 +61,7 @@ $(OUT.DEMOSKY2):
 	$(MKDIRS)
 
 demosky2clean:
+	-$(RM) demosky2.txt
 	-$(RMDIR) $(DEMOSKY2.EXE) $(OBJ.DEMOSKY2)
 
 cleandep: demosky2cleandep

@@ -64,6 +64,7 @@ $(OUT.CSVID):
 	$(MKDIRS)
 
 csvidclean:
+	-$(RM) csvid.txt
 	-$(RMDIR) $(CSVID.EXE) $(OBJ.CSVID)
 
 cleandep: csvidcleandep

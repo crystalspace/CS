@@ -63,6 +63,7 @@ $(OUT.VSH):
 	$(MKDIRS)
 
 vshclean:
+	-$(RM) vsh.txt
 	-$(RMDIR) $(VSH.EXE) $(OBJ.VSH)
 
 cleandep: vshcleandep

@@ -65,6 +65,7 @@ $(OUT.CSFGEN):
 	$(MKDIRS)
 
 csfgenclean:
+	-$(RM) csfgen.txt
 	-$(RMDIR) $(CSFGEN.EXE) $(OBJ.CSFGEN)
 
 cleandep: csfgencleandep

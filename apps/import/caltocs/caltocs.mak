@@ -63,6 +63,7 @@ $(OUT.CALTOCS):
 	$(MKDIRS)
 
 caltocsclean:
+	-$(RM) caltocs.txt
 	-$(RMDIR) $(CALTOCS.EXE) $(OBJ.CALTOCS)
 
 cleandep: caltocscleandep

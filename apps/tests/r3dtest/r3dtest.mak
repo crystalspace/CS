@@ -63,6 +63,7 @@ $(OUT.R3DTEST):
 	$(MKDIRS)
 
 r3dtestclean:
+	-$(RM) r3dtest.txt
 	-$(RMDIR) $(R3DTEST.EXE) $(OBJ.R3DTEST)
 
 cleandep: r3dtestcleandep

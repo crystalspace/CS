@@ -63,6 +63,7 @@ $(OUT.SIMPLECLOTH):
 	$(MKDIRS)
 
 simpleclothclean:
+	-$(RM) simplecloth.txt
 	-$(RMDIR) $(SIMPLECLOTH.EXE) $(OBJ.SIMPLECLOTH)
 
 cleandep: simpleclothcleandep

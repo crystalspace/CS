@@ -53,6 +53,7 @@ $(NETMANTEST.EXE): $(OBJ.NETMANTEST) $(LIB.NETMANTEST)
 	$(DO.LINK.EXE)
 
 netmantestclean:
+	-$(RM) netmantest.txt
 	-$(RMDIR) $(NETMANTEST.EXE) $(OBJ.NETMANTEST)
 
 ifdef DO_DEPEND

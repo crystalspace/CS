@@ -67,6 +67,7 @@ $(OUT.MOTTEST):
 	$(MKDIRS)
 
 mottestclean:
+	-$(RM) mottest.txt
 	-$(RMDIR) $(MOTTEST.EXE) $(OBJ.MOTTEST)
 
 cleandep: mottestcleandep

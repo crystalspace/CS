@@ -64,6 +64,7 @@ $(OUT.MD32SPR):
 	$(MKDIRS)
 
 md32sprclean:
+	-$(RM) md32spr.txt
 	-$(RMDIR) $(MD32SPR.EXE) $(OBJ.MD32SPR)
 
 cleandep: md32sprcleandep

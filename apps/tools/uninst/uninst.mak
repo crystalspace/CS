@@ -63,6 +63,7 @@ $(OUT.UNINST):
 	$(MKDIRS)
 
 uninstclean:
+	-$(RM) uninst.txt
 	-$(RMDIR) $(UNINST.EXE) $(OBJ.UNINST)
 
 cleandep: uninstcleandep

@@ -62,6 +62,7 @@ $(OUT.SIMPLEVP):
 	$(MKDIRS)
 
 simplevpclean:
+	-$(RM) simplevp.txt
 	-$(RMDIR) $(SIMPLEVP.EXE) $(OBJ.SIMPLEVP)
 
 cleandep: simplevpcleandep

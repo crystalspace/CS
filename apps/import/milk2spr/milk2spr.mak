@@ -63,6 +63,7 @@ $(OUT.MILK2SPR):
 	$(MKDIRS)
 
 milk2sprclean:
+	-$(RM) milk2spr.txt
 	-$(RMDIR) $(MILK2SPR.EXE) $(OBJ.MILK2SPR)
 
 cleandep: milk2sprcleandep

@@ -63,6 +63,7 @@ $(OUT.MAYA2SPR):
 	$(MKDIRS)
 
 maya2sprclean:
+	-$(RM) maya2spr.txt
 	-$(RMDIR) $(MAYA2SPR.EXE) $(OBJ.MAYA2SPR)
 
 cleandep: maya2sprcleandep

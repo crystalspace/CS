@@ -63,6 +63,7 @@ $(OUT.CSWSTEST):
 	$(MKDIRS)
 
 cswstestclean:
+	-$(RM) cswstest.txt
 	-$(RMDIR) $(CSWSTEST.EXE) $(OBJ.CSWSTEST)
 
 cleandep: cswstestcleandep

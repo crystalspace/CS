@@ -64,6 +64,7 @@ $(OUT.BLOCKS):
 	$(MKDIRS)
 
 blocksclean:
+	-$(RM) blocks.txt
 	-$(RMDIR) $(BLOCKS.EXE) $(OBJ.BLOCKS)
 
 cleandep: blockscleandep

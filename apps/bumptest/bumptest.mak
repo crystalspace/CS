@@ -63,6 +63,7 @@ $(OUT.BUMPTEST):
 	$(MKDIRS)
 
 bumptestclean:
+	-$(RM) bumptest.txt
 	-$(RMDIR) $(BUMPTEST.EXE) $(OBJ.BUMPTEST)
 
 cleandep: bumptestcleandep

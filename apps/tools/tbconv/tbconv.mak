@@ -55,6 +55,7 @@ $(TBCONVERT.EXE): $(DEP.EXE) $(OBJ.TBCONVERT) $(LIB.TBCONVERT)
 	$(DO.LINK.CONSOLE.EXE)
 
 tbconvertclean:
+	-$(RM) tbconvert.txt
 	-$(RMDIR) $(TBCONVERT.EXE) $(OBJ.TBCONVERT)
 
 ifdef DO_DEPEND

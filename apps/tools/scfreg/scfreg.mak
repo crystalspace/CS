@@ -65,6 +65,7 @@ $(OUT.SCFREG):
 	$(MKDIRS)
 
 scfregclean:
+	-$(RM) scfreg.txt
 	-$(RMDIR) $(SCFREG.EXE) $(OBJ.SCFREG)
 
 cleandep: scfregcleandep

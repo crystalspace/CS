@@ -63,6 +63,7 @@ $(OUT.NETTUT):
 	$(MKDIRS)
 
 nettutclean:
+	-$(RM) nettut.txt
 	-$(RMDIR) $(NETTUT.EXE) $(OBJ.NETTUT)
 
 cleandep: nettutcleandep

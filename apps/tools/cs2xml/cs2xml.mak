@@ -62,6 +62,7 @@ $(OUT.CS2XML):
 	$(MKDIRS)
 
 cs2xmlclean:
+	-$(RM) cs2xml.txt
 	-$(RMDIR) $(CS2XML.EXE) $(OBJ.CS2XML)
 
 cleandep: cs2xmlcleandep

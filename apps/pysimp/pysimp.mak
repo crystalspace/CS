@@ -65,6 +65,7 @@ $(OUT.PYSIMP):
 	$(MKDIRS)
 
 pysimpclean:
+	-$(RM) pysimp.txt
 	-$(RMDIR) $(PYSIMP.EXE) $(OBJ.PYSIMP)
 
 cleandep: pysimpcleandep

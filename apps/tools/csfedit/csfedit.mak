@@ -62,6 +62,7 @@ $(OUT.CSFEDIT):
 	$(MKDIRS)
 
 csfeditclean:
+	-$(RM) csfedit.txt
 	-$(RMDIR) $(CSFEDIT.EXE) $(OBJ.CSFEDIT)
 
 cleandep: csfeditcleandep

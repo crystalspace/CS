@@ -67,6 +67,7 @@ $(OUT.AWSTUT):
 	$(MKDIRS)
 
 awstutclean:
+	-$(RM) awstut.txt
 	-$(RMDIR) $(AWSTUT.EXE) $(OBJ.AWSTUT)
 
 cleandep: awstutcleandep

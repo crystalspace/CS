@@ -63,6 +63,7 @@ $(OUT.VIEWMESH):
 	$(MKDIRS)
 
 viewmeshclean:
+	-$(RM) viewmesh.txt
 	-$(RMDIR) $(VIEWMESH.EXE) $(OBJ.VIEWMESH)
 
 cleandep: viewmeshcleandep

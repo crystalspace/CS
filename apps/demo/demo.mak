@@ -65,6 +65,7 @@ $(OUT.CSDEMO):
 	$(MKDIRS)
 
 csdemoclean:
+	-$(RM) csdemo.txt
 	-$(RMDIR) $(CSDEMO.EXE) $(OBJ.CSDEMO)
 
 cleandep: csdemocleandep

@@ -66,6 +66,7 @@ $(OUT.UNITTEST):
 	$(MKDIRS)
 
 unittestclean:
+	-$(RM) unittest.txt
 	-$(RMDIR) $(UNITTEST.EXE) $(OBJ.UNITTEST)
 
 cleandep: unittestcleandep

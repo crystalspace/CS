@@ -65,6 +65,7 @@ $(OUT.MAKEDEP):
 	$(MKDIRS)
 
 makedepclean:
+	-$(RM) makedep.txt
 	-$(RMDIR) $(MAKEDEP.EXE) $(OBJ.MAKEDEP)
 
 cleandep: makedepcleandep

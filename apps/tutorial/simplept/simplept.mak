@@ -63,6 +63,7 @@ $(OUT.SIMPLEPT):
 	$(MKDIRS)
 
 simpleptclean:
+	-$(RM) simplept.txt
 	-$(RMDIR) $(SIMPLEPT.EXE) $(OBJ.SIMPLEPT)
 
 cleandep: simpleptcleandep

@@ -64,6 +64,7 @@ $(OUT.LEVTOOL):
 	$(MKDIRS)
 
 levtoolclean:
+	-$(RM) levtool.txt
 	-$(RMDIR) $(LEVTOOL.EXE) $(OBJ.LEVTOOL)
 
 cleandep: levtoolcleandep

@@ -63,6 +63,7 @@ $(OUT.PATHTUT):
 	$(MKDIRS)
 
 pathtutclean:
+	-$(RM) pathtut.txt
 	-$(RMDIR) $(PATHTUT.EXE) $(OBJ.PATHTUT)
 
 cleandep: pathtutcleandep

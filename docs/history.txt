@@ -3,6 +3,20 @@ The history order is reversed so that new features are at the top.
 3-Mar-2003
 	- Philip Wyett added libxml2 link flag for msvc project file.
 2-Mar-2003
+        - Rudolf Potucek updated makefiles in the apps/ directory to 
+	  remove vpath and generate object files in individual 
+	  subdirectories of $(OUT). This should allow identical 
+	  filenames to coexist in different directories of the
+	  build tree. Also added a rule to remove the console output
+	  *.txt files generated on the windows platform. There may be an
+	  issue for the following files:
+	    apps/demo/demo.mak
+	    apps/tests/netmtst/netmtst.mak
+	    apps/tests/perl5tst/perl5tst.mak
+	    apps/tools/tbconv/tbconv.mak
+	    apps/video/video.mak
+	  as the filename and the internal build name differ and I cannot
+	  test which name the *.txt file will be given.
 	- Greg Block committed changes to the MacOS/X gl canvas to correctly
 	  support the necessary CS interfaces for loading extensions and being
 	  recognized as the correct SCF type.

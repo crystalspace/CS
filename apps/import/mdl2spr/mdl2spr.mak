@@ -63,6 +63,7 @@ $(OUT.MDL2SPR):
 	$(MKDIRS)
 
 mdl2sprclean:
+	-$(RM) mdl2spr.txt
 	-$(RMDIR) $(MDL2SPR.EXE) $(OBJ.MDL2SPR)
 
 cleandep: mdl2sprcleandep

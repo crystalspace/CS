@@ -63,6 +63,7 @@ $(OUT.ISOTEST):
 	$(MKDIRS)
 
 isotestclean:
+	-$(RM) isotest.txt
 	-$(RMDIR) $(ISOTEST.EXE) $(OBJ.ISOTEST)
 
 cleandep: isotestcleandep

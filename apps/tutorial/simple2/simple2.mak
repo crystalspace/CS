@@ -63,6 +63,7 @@ $(OUT.SIMPLE2):
 	$(MKDIRS)
 
 simple2clean:
+	-$(RM) simple2.txt
 	-$(RMDIR) $(SIMPLE2.EXE) $(OBJ.SIMPLE2)
 
 cleandep: simple2cleandep

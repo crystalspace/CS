@@ -62,6 +62,7 @@ $(OUT.CSWSENG):
 	$(MKDIRS)
 
 cswsengclean:
+	-$(RM) cswseng.txt
 	-$(RMDIR) $(CSWSENG.EXE) $(OBJ.CSWSENG)
 
 cleandep: cswsengcleandep

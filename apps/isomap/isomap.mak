@@ -64,6 +64,7 @@ $(OUT.ISOMAP):
 	$(MKDIRS)
 
 isomapclean:
+	-$(RM) isomap.txt
 	-$(RMDIR) $(ISOMAP.EXE) $(OBJ.ISOMAP)
 
 cleandep: isomapcleandep

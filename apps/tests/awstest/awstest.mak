@@ -67,6 +67,7 @@ $(OUT.AWSTEST):
 	$(MKDIRS)
 
 awstestclean:
+	-$(RM) awstest.txt
 	-$(RMDIR) $(AWSTEST.EXE) $(OBJ.AWSTEST)
 
 cleandep: awstestcleandep

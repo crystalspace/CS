@@ -74,6 +74,7 @@ $(OUT.WALKTEST):
 	$(MKDIRS)
 
 walktestclean:
+	-$(RM) walktest.txt
 	-$(RMDIR) $(WALKTEST.EXE) $(OBJ.WALKTEST)
 
 cleandep: walktestcleandep

@@ -65,6 +65,7 @@ $(OUT.CSLIGHT):
 	$(MKDIRS)
 
 cslightclean:
+	-$(RM) cslight.txt
 	-$(RMDIR) $(CSLIGHT.EXE) $(OBJ.CSLIGHT)
 
 cleandep: cslightcleandep

@@ -63,6 +63,7 @@ $(OUT.GFXTEST):
 	$(MKDIRS)
 
 gfxtestclean:
+	-$(RM) gfxtest.txt
 	-$(RMDIR) $(GFXTEST.EXE) $(OBJ.GFXTEST)
 
 cleandep: gfxtestcleandep

@@ -63,6 +63,7 @@ $(OUT.PHYSTUT):
 	$(MKDIRS)
 
 phystutclean:
+	-$(RM) phystut.txt
 	-$(RMDIR) $(PHYSTUT.EXE) $(OBJ.PHYSTUT)
 
 cleandep: phystutcleandep

@@ -63,6 +63,7 @@ $(OUT.TBTUT):
 	$(MKDIRS)
 
 tbtutclean:
+	-$(RM) tbtut.txt
 	-$(RMDIR) $(TBTUT.EXE) $(OBJ.TBTUT)
 
 cleandep: tbtutcleandep

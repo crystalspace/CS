@@ -55,6 +55,7 @@ $(PERL5TEST.EXE): $(OBJ.PERL5TEST) $(LIB.PERL5TEST)
 	$(DO.LINK.EXE)
 
 perl5testclean:
+	-$(RM) perl5test.txt
 	-$(RMDIR) $(PERL5TEST.EXE) $(OBJ.PERL5TEST)
 
 ifdef DO_DEPEND

@@ -63,6 +63,7 @@ $(OUT.SIMPVS):
 	$(MKDIRS)
 
 simpvsclean:
+	-$(RM) simpvs.txt
 	-$(RMDIR) $(SIMPVS.EXE) $(OBJ.SIMPVS)
 
 cleandep: simpvscleandep
