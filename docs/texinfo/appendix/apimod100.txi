@@ -443,3 +443,46 @@ by invoking the Jam rule @samp{ExternalLibs}. For @sc{msvc} project files, the
 location of the wxWidgets resources will have to be added as @dfn{additional
 include directories} and @dfn{additional library directories}, in the project
 settings or globally, to ensure that @sc{msvc} will be able to find them.
+
+@subheading Moving Procedural Textures to Plugin
+ 
+All procedural textures were moved from @file{CS/include/cstool} and @file{CS/lib/cstool} to
+@file{CS/plugins/proctex/standard}.
+ 
+The following files were moved:
+ 
+@itemize @bullet
+@item
+@code{cstool/prdots.h; cstool/prdots.cpp}
+@item
+@code{cstool/prfire.h; cstool/prfire.cpp}
+@item
+@code{cstool/prplasma.h; cstool/prplasma.cpp}
+@item
+@code{cstool/prsky.h; cstool/prsky.cpp}
+@item
+@code{cstool/prwater.h; cstool/prwater.cpp}
+@end itemize
+ 
+These headerfiles are no longer needed to be included.
+ 
+Procedural Texture cannot be created with @code{new csProcFire} anymore.
+Instead use the plugin system:
+ 
+@example
+csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  iPluginManager));
+csRef<iTextureType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  "crystalspace.texture.type.fire", iTextureType));
+if (!type)
+@{
+  type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.texture.type.fire",
+    iTextureType);
+@}
+csRef<iTextureFactory> fireFact = type->NewFactory();
+csRef<iTextureWrapper> tex = fireFact->Generate();
+csRef<iFireTexture> fire = csPtr<iFireTexture>
+  (SCF_QUERY_INTERFACE (tex, iFireTexture));
+@end example
+ 
+Please note that fire is the only proctex with an own interface like @code{iFireTexture}.
