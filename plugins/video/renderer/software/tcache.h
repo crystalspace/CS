@@ -144,22 +144,22 @@ private:
 
   /**
    * Create a texture in the texture cache.
-   * This routine will automatically select the right create_lighted_texture_???
+   * This routine will automatically select the right create_lighted_???
    * depending on the mode Crystal Space is in.
    */
   virtual void create_lighted_texture (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
 
   /// Create a texture in the texture cache (nocolor version).
-  void create_lighted_texture_nocolor (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
+  void create_lighted_nocolor (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
   /// Create a texture in the texture cache (true_rgb version).
-  void create_lighted_texture_true_rgb (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
+  void create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
   /// Create a texture in the texture cache (fast_wxx version).
-  void create_lighted_texture_fast_wxx (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
+  void create_lighted_fast_wxx (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
   /**
    * Create a texture in the texture cache (true_rgb version and for 'private'
    * colormap textures).
    */
-  void create_lighted_texture_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
+  void create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* pt, csTextureManagerSoftware* txtmgr);
 
   /**
    * Initialize the memory pool.
@@ -187,7 +187,7 @@ protected:
   void free_pool (void* mem, int size);
 
   /**
-   * Initialize the TCacheData structure for create_lighted_texture_...
+   * Initialize the TCacheData structure for create_lighted_...
    * If u and v are given (not equal to -1) then the cache filler will only
    * update the texture in the texture cache for the given sub-texture containing
    * that (u,v) coordinate.

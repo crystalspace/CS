@@ -36,12 +36,12 @@ private:
   virtual void create_lighted_texture (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
 
   /// Create a texture in the texture cache (24bit version).
-  void create_lighted_texture_24bit (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
+  void create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
 #if 0
   /// Create a texture in the texture cache (true_rgb version).
-  void create_lighted_texture_true_rgb (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
+  void create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
   /// Create a texture in the texture cache (true_rgb and private colormaps).
-  void create_lighted_texture_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
+  void create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr);
 #endif
 
   int red_shift, green_shift, blue_shift;

@@ -379,12 +379,12 @@ void TextureCache::create_lighted_texture (TCacheData& tcd, TCacheLightedTexture
 	csTextureManagerSoftware* txtmgr)
 {
   if (tcd.lm_only) create_lighted_texture_lightmaps (tcd, tclt, txtmgr);
-  else if (tcd.txtmode == TXT_PRIVATE) create_lighted_texture_true_rgb_priv (tcd, tclt, txtmgr);
+  else if (tcd.txtmode == TXT_PRIVATE) create_lighted_true_rgb_priv (tcd, tclt, txtmgr);
   else
     switch (tcd.mixing)
     {
-      case MIX_NOCOLOR: create_lighted_texture_nocolor (tcd, tclt, txtmgr); break;
-      case MIX_TRUE_RGB: create_lighted_texture_true_rgb (tcd, tclt, txtmgr); break;
+      case MIX_NOCOLOR: create_lighted_nocolor (tcd, tclt, txtmgr); break;
+      case MIX_TRUE_RGB: create_lighted_true_rgb (tcd, tclt, txtmgr); break;
     }
   if (tcd.lm_grid) show_lightmap_grid (tcd, tclt, txtmgr);
 }
@@ -457,7 +457,7 @@ void TextureCache::init_cache_filler (TCacheData& tcd, IPolygonTexture* pt, csTe
   tcd.d_lw = tcd.lw-(tcd.lu2-tcd.lu1);
 }
 
-void TextureCache::create_lighted_texture_nocolor (TCacheData& tcd, TCacheLightedTexture* tclt,
+void TextureCache::create_lighted_nocolor (TCacheData& tcd, TCacheLightedTexture* tclt,
 	csTextureManagerSoftware* txtmgr)
 {
   int w = tcd.width;
@@ -566,7 +566,7 @@ void TextureCache::create_lighted_texture_nocolor (TCacheData& tcd, TCacheLighte
   }
 }
 
-void TextureCache::create_lighted_texture_true_rgb (TCacheData& tcd, TCacheLightedTexture* tclt,
+void TextureCache::create_lighted_true_rgb (TCacheData& tcd, TCacheLightedTexture* tclt,
 	csTextureManagerSoftware* txtmgr)
 {
   //LightMap* lm = tcd.lm;
@@ -721,7 +721,7 @@ void TextureCache::create_lighted_texture_true_rgb (TCacheData& tcd, TCacheLight
   }
 }
 
-void TextureCache::create_lighted_texture_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* tclt,
+void TextureCache::create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* tclt,
 	csTextureManagerSoftware* txtmgr)
 {
   //LightMap* lm = tcd.lm;

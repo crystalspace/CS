@@ -42,11 +42,11 @@ void TextureCache32::create_lighted_texture (TCacheData& tcd, TCacheLightedTextu
 	csTextureManagerSoftware* txtmgr)
 {
   if (tcd.lm_only) create_lighted_texture_lightmaps (tcd, tclt, txtmgr);
-  else create_lighted_texture_24bit (tcd, tclt, txtmgr);
+  else create_lighted_24bit (tcd, tclt, txtmgr);
   if (tcd.lm_grid) show_lightmap_grid (tcd, tclt, txtmgr);
 }
 
-void TextureCache32::create_lighted_texture_24bit (TCacheData& tcd, TCacheLightedTexture* tclt,
+void TextureCache32::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture* tclt,
   csTextureManagerSoftware* txtmgr)
 {
   (void)txtmgr;

@@ -41,17 +41,17 @@ void TextureCache16::create_lighted_texture (TCacheData& tcd, TCacheLightedTextu
   if (tcd.lm_only)
     create_lighted_texture_lightmaps (tcd, tclt, txtmgr);
   else if (tcd.txtmode == TXT_PRIVATE)
-    create_lighted_texture_true_rgb_priv (tcd, tclt, txtmgr);
+    create_lighted_true_rgb_priv (tcd, tclt, txtmgr);
   else if (tcd.txtmode == TXT_24BIT)
-    create_lighted_texture_24bit (tcd, tclt, txtmgr);
+    create_lighted_24bit (tcd, tclt, txtmgr);
   else
-    create_lighted_texture_true_rgb (tcd, tclt, txtmgr);
+    create_lighted_true_rgb (tcd, tclt, txtmgr);
 
   if (tcd.lm_grid)
     show_lightmap_grid (tcd, tclt, txtmgr);
 }
 
-void TextureCache16::create_lighted_texture_true_rgb (TCacheData& tcd,
+void TextureCache16::create_lighted_true_rgb (TCacheData& tcd,
   TCacheLightedTexture* tclt, csTextureManagerSoftware* txtmgr)
 {
   int w = tcd.width;
@@ -204,7 +204,7 @@ void TextureCache16::create_lighted_texture_true_rgb (TCacheData& tcd,
   }
 }
 
-void TextureCache16::create_lighted_texture_24bit (TCacheData& tcd, TCacheLightedTexture* tclt,
+void TextureCache16::create_lighted_24bit (TCacheData& tcd, TCacheLightedTexture* tclt,
   csTextureManagerSoftware* txtmgr)
 {
   (void)txtmgr;
@@ -354,7 +354,7 @@ void TextureCache16::create_lighted_texture_24bit (TCacheData& tcd, TCacheLighte
   }
 }
 
-void TextureCache16::create_lighted_texture_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* tclt,
+void TextureCache16::create_lighted_true_rgb_priv (TCacheData& tcd, TCacheLightedTexture* tclt,
 	csTextureManagerSoftware* txtmgr)
 {
   int w = tcd.width;
