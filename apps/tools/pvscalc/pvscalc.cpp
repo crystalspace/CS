@@ -20,10 +20,12 @@
 
 CS_IMPLEMENT_APPLICATION
 
-//#define DB(x) printf##x
+#undef DB
+//#define DB(x) printf x
 #define DB(x)
 
-#define DBA(x) printf##x
+#undef DBA
+#define DBA(x) printf x
 
 //-----------------------------------------------------------------------------
 

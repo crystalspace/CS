@@ -21,6 +21,8 @@ chronological order.
 	- Jorrit fixed a VERY stupid bug in genmesh. Apparently it forgot
 	  to register a polygon mesh for visibility culling. That means
 	  that genmeshes never participated as occluders.
+	- Eric Sunshine fixed bogus use of preprocessor token-pasting in DB()
+	  and DBA() macros in pvscalc.cpp.
 13-Feb-2005
 	- Peter Amstutz reorganized loading in the csVosA3DL plugin so
 	  that texture, material or geometry changes to 3D objects are
