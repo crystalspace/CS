@@ -3057,7 +3057,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   trimesh.use_vertex_color = false;
   trimesh.mat_handle = NULL;
   TrianglesSuperLightmapNode *sln = polbuf->GetFirstTrianglesSLM ();
-  bool dirty = polbuf->superLM.GetLightmapsDirtyState();
+  bool dirty = polbuf->superLM.GetLightmapsDirtyState ();
   bool modified = false;
   while (sln != NULL)
   {
@@ -3932,12 +3932,12 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
           glTexCoordPointer (2, GL_FLOAT, 0, work_uv_verts);
           glEnableClientState (GL_TEXTURE_COORD_ARRAY);
         }
-	      else
-	      {
-	        /*glTexCoordPointer (2, GL_FLOAT, sizeof(csVector2),
+	else
+	{
+	  /*glTexCoordPointer (2, GL_FLOAT, sizeof(csVector2),
 	          &((csVector2*)work_userarrays[CS_GL_LIGHTMAP_USERA])->x);
-	          glEnableClientState(GL_TEXTURE_COORD_ARRAY);*/
-	        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	    glEnableClientState(GL_TEXTURE_COORD_ARRAY);*/
+	  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
         }
       }
       else if (layer_data->vcord_source == ED_SOURCE_MESH)
