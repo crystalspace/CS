@@ -127,8 +127,12 @@ ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : csImageFile ()
       // The last scanline in BMP corresponds to the top line in the image
      int buffer_y = bmp_width*(bmp_height - 1);
      int buffer_x = 0;
-
+/*
      if( (*BITCOUNT(ptr)) == _256Color && (*BICLRUSED(ptr)) && (*BICLRIMP(ptr)) )
+     @@@ I dont know why the number of "important colors" ( BICLRIMP )  matters.
+     In fact, many of my 256-color .bmp files have a ZERO there.
+*/
+     if( (*BITCOUNT(ptr)) == _256Color && (*BICLRUSED(ptr)) )
      {
        char *pal = BIPALETTE(ptr);
 
