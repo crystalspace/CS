@@ -118,6 +118,23 @@ struct iSpriteCal3DFactoryState : public iBase
 
   /**
    * This loads the supplied file as one animation action for the sprite.
+   * @param vfs The ref to the vfs plugin used when loading the anim file
+   * @param filename The VFS path to the anim file.
+   * @param type The type of anim this file represents.
+   * @param base_velocity On movement type anims, this represents the native traversal speed of the model implied by this animation.
+   *                      For example, a "walk" anim might specify 2m/sec.
+   * @param min_velocity  On movement type anims, this represents the minimum velocity for which this animation should be considered
+   *                      or used.  The anim will be blended with other anims to achieve the desired exact velocity.
+   * @param max_velocity  Same thing for max velocity for this anim to be blended in.
+   * @param min_interval  When the anim of type "idle" is playing, the model will randomly choose override actions to play every
+   *                      so often to enhance the realism of the idle.  (Thus a "standing" creature might shift his feet or scratch
+   *                      his nose every 30 seconds or so.)  This param is the minimum time between these overrides.
+   * @param max_interval  Max interval between these override idle actions.  The model will randomly choose a time between min and max.
+   * @idle_pct            For anims of type action, if the model is idling it will randomly choose among these based on the idle_pct
+   *                      weights specified here.  This param should total 100 across all anims for the model if used.
+   * @lock                This specifies whether the animation is to be locked on last frame or not.  If not locked, the action will return
+   *                      to the base keyframe when complete.  If locked, the action will stay in the final keyframe position until
+   *                      cleared.  (This is usually for anims like "death".)
    */
   virtual int  LoadCoreAnimation(iVFS *vfs,const char *filename,
 				 const char *name,
@@ -127,7 +144,8 @@ struct iSpriteCal3DFactoryState : public iBase
 				 float max_velocity,
                  int min_interval,
                  int max_interval,
-                 int idle_pct) = 0;
+                 int idle_pct,
+                 bool lock) = 0;
 
   /**
    * This loads a submesh which will attach to this skeleton.
@@ -399,6 +417,12 @@ struct iSpriteCal3DState : public iBase
 
   /// Change the material on a named submesh.  Returns true if successful.
   virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat) = 0;
+
+  /// Set the animation time adjustment factor.  1=normal speed.
+  virtual void SetTimeFactor(float timeFactor) = 0;
+
+  /// Return the current time factor of the model.
+  virtual float GetTimeFactor() = 0;
 };
 
 #endif// __CS_IMESH_SPRITECAL3D_H__

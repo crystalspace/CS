@@ -248,6 +248,10 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	{
 	  if (!newspr->LoadCoreSkeleton(vfs,file))
 	  {
+        synldr->ReportError (
+  	      "crystalspace.spritecal3dfactoryloader.parse.badfile",
+	      child,"Could not load cal3d skeleton file <%s>.",file);
+
 	    newspr->ReportLastError();
 	    return 0;
 	  }
@@ -293,6 +297,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	int  max_interval = child->GetAttributeValueAsInt("max_random");
 	int  min_interval = child->GetAttributeValueAsInt("min_random");
 	int  idle_pct     = child->GetAttributeValueAsInt("idle_pct");
+    bool lock         = child->GetAttributeValueAsBool("lock");
 	if (file)
 	{
 	  int animID = newspr->LoadCoreAnimation(vfs,file,
@@ -303,7 +308,7 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	    max_vel,
         min_interval,
         max_interval,
-        idle_pct);
+        idle_pct, lock);
 
 	  if (animID == -1)
 	  {
@@ -342,6 +347,9 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	  int mesh_index = newspr->LoadCoreMesh(vfs,file,name,attach,mat);
           if (mesh_index == -1)
 	  {
+	  synldr->ReportError (
+	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
+	    child,"Could not load mesh file <%s>.",file);
 	    newspr->ReportLastError();
 	    return 0;
 	  }

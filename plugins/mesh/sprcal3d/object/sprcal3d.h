@@ -71,6 +71,7 @@ struct csCal3DAnimation
     int      min_interval;
     int      max_interval;
     int      idle_pct;
+    bool     lock;
 };
 
 struct csCal3DMesh
@@ -193,7 +194,7 @@ public:
   float GetRenderScale() { return renderScale; }
   bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
   int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,
-                         float min_vel,float max_vel,int min_interval,int max_interval,int idle_pct);
+                         float min_vel,float max_vel,int min_interval,int max_interval,int idle_pct, bool lock);
   int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat);
   int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,const char *name);
   int AddMorphAnimation(const char *name);
@@ -354,8 +355,8 @@ public:
     virtual bool LoadCoreSkeleton(iVFS *vfs,const char *filename)
     { return scfParent->LoadCoreSkeleton(vfs,filename); }
 
-    virtual int LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel,int min_interval,int max_interval,int idle_pct)
-    { return scfParent->LoadCoreAnimation(vfs,filename,name,type,base_vel,min_vel,max_vel,min_interval,max_interval,idle_pct); }
+    virtual int LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel,int min_interval,int max_interval,int idle_pct, bool lock)
+    { return scfParent->LoadCoreAnimation(vfs,filename,name,type,base_vel,min_vel,max_vel,min_interval,max_interval,idle_pct,lock); }
 
     virtual int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat)
     { return scfParent->LoadCoreMesh(vfs,filename,name,attach,defmat); }
@@ -782,7 +783,9 @@ public:
   bool SetAnimAction(const char *name, float delayIn, float delayOut);
   bool SetVelocity(float vel,csRandomGen *rng=0);
   void SetLOD(float lod);
-  
+  void SetTimeFactor(float timeFactor);
+  float GetTimeFactor();
+
   bool AttachCoreMesh(const char *meshname);
   bool AttachCoreMesh(int mesh_id,int iMatWrapID);
   bool DetachCoreMesh(const char *meshname);
@@ -923,6 +926,14 @@ public:
     virtual bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat)
     {
       return scfParent->SetMaterial(mesh_name,mat);
+    }
+    virtual void SetTimeFactor(float timeFactor)
+    {
+        scfParent->SetTimeFactor(timeFactor);
+    }
+    virtual float GetTimeFactor()
+    {
+        return scfParent->GetTimeFactor();
     }
 
   } scfiSpriteCal3DState;

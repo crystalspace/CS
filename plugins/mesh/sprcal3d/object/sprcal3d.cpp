@@ -263,7 +263,8 @@ int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(iVFS *vfs,const char *fil
 						       float max_vel,
                                int min_interval,
                                int max_interval,
-                               int idle_pct)
+                               int idle_pct,
+                               bool lock)
 {
   csString path(basePath);
   path.Append(filename);
@@ -285,6 +286,7 @@ int  csSpriteCal3DMeshObjectFactory::LoadCoreAnimation(iVFS *vfs,const char *fil
         an->min_interval  = min_interval;
         an->max_interval  = max_interval;
         an->idle_pct      = idle_pct;
+        an->lock          = lock;
 
         an->index = anims.Push(an);
 
@@ -1615,7 +1617,7 @@ bool csSpriteCal3DMeshObject::SetAnimAction(const char *name, float delayIn, flo
   if (idx == -1)
     return false;
 
-  calModel.getMixer()->executeAction(idx,delayIn,delayOut);
+  calModel.getMixer()->executeAction(idx,delayIn,delayOut,1 /* ,factory->anims[idx]->lock */ );
 
   return true;
 }
@@ -1664,6 +1666,10 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
     }
   }
 
+  bool reversed = (vel<0);
+  if (reversed)
+    vel = -vel;
+
   is_idling = false;
   for (i=0; i<count; i++)
   {
@@ -1679,18 +1685,24 @@ bool csSpriteCal3DMeshObject::SetVelocity(float vel,csRandomGen *rng)
       else if (vel < factory->anims[i]->base_velocity)
       {
     	vel_diff = factory->anims[i]->base_velocity - factory->anims[i]->min_velocity;
-	    pct      = (vel - factory->anims[i]->min_velocity) / vel_diff;
+	    pct      = 1 - (vel - factory->anims[i]->min_velocity) / vel_diff;
       }
       else
       {
     	vel_diff = factory->anims[i]->max_velocity - factory->anims[i]->base_velocity;
-	    pct      = 1 - (factory->anims[i]->min_velocity - vel) / vel_diff;
+	    pct      = (factory->anims[i]->max_velocity - vel) / vel_diff;
       }
       AddAnimCycle(i,pct,0);
+//      printf("  Adding %s weight=%1.2f\n",factory->anims[i]->name.GetData(),pct);
+
       if (pct == 1)
     	break;
     }
   }
+  if (reversed)
+    SetTimeFactor(-1);
+  else
+    SetTimeFactor(1);
 
   return true;    
 }
@@ -1841,6 +1853,16 @@ bool csSpriteCal3DMeshObject::SetMaterial(const char *mesh_name,iMaterialWrapper
     }
   }
   return false;
+}
+
+void csSpriteCal3DMeshObject::SetTimeFactor(float timeFactor)
+{
+  calModel.getMixer()->setTimeFactor(timeFactor);
+}
+
+float csSpriteCal3DMeshObject::GetTimeFactor()
+{
+  return calModel.getMixer()->getTimeFactor();
 }
 
 

@@ -80,6 +80,11 @@ chronological order.
 	- res fixed Opcode after the recent operator-related changes. MSVC was 
 	  confused by the presence of both a float* and float[] operator. 
 	  Removed float* version.
+	- Keith added timeFactor for slow motion and reversible anims for sprcal3d.
+	  Improved error reporting on bad loads of .cal3d files.
+	  Added stopLock flag to animation mixer so that animation stops on the last
+	  keyframe if true.
+
 14-Jan-2004
 	- res changed glrender3d to not depend on GLU any more. Though a GLU
 	  header was #included, no GLU function was used anyway.
