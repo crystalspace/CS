@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SCFSTRV_H__
-#define __SCFSTRV_H__
+#ifndef __CS_SCFSTRV_H__
+#define __CS_SCFSTRV_H__
 
 #include "istrvec.h"
 #include "csutil/csstrvec.h"
@@ -32,11 +32,10 @@ public:
   DECLARE_IBASE
 
   /// Create a iStrVector from scratch
-  scfStrVector (int iLimit = 16, int iDelta = 16)
-  { v = new csStrVector (iLimit, iDelta); }
+  scfStrVector (int iLimit = 16, int iDelta = 16);
 
-  /// Create a iStrVector from given csStrVector
-  scfStrVector (csStrVector *iSrc) : v (iSrc) {}
+  /// Create a iStrVector from given csStrVector (takes ownership)
+  scfStrVector (csStrVector*);
 
   /// Destroy the iStrVector object
   virtual ~scfStrVector ();
@@ -57,7 +56,7 @@ public:
   virtual int Find (const char *iValue) const;
 
   /// Find index of a string in a pre-sorted string array
-  virtual int FindSorted (const char *iValue);
+  virtual int FindSorted (const char *iValue) const;
 
   /// Sort the string array
   virtual void QuickSort ();
@@ -72,4 +71,4 @@ public:
   virtual void DeleteAll ();
 };
 
-#endif // __SCFSTRV_H__
+#endif // __CS_SCFSTRV_H__

@@ -1,6 +1,6 @@
 /*
-    Crystal Space Virtual File System SCF interface
-    Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Shared String Vector class
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,11 +20,28 @@
 #include "sysdef.h"
 #include "csutil/scfstrv.h"
 
-scfStrVector::scfStrVector (int ilimit, int ithreshold) :
-  csStrVector (ilimit, ithreshold) { CONSTRUCT_IBASE(NULL); }
-int scfStrVector::Length() const { return superclass::Length(); }
-char* scfStrVector::Get (int n) const { return (char*)superclass::Get(n); }
-int scfStrVector::Find (const char* s) const
-  { return superclass::Find(csSome(s)); }
-int scfStrVector::Push (char* s) { return superclass::Push(s); }
-char* scfStrVector::Pop() { return (char*)superclass::Pop(); }
+scfStrVector::scfStrVector (int iLimit, int iDelta)
+{
+  CONSTRUCT_IBASE (NULL);
+  v = new csStrVector (iLimit, iDelta);
+}
+
+scfStrVector::scfStrVector (csStrVector *iSrc) : v (iSrc)
+{
+  CONSTRUCT_IBASE (NULL);
+}
+
+scfStrVector::~scfStrVector () { delete v; }
+int scfStrVector::Length () const { return v->Length(); }
+void scfStrVector::Push (char *iValue) { v->Push (iValue); }
+char *scfStrVector::Pop () { return v->Pop(); }
+char *scfStrVector::Get (int iIndex) const { return v->Get (iIndex); }
+int scfStrVector::Find (const char *iValue) const
+  { return v->FindKey (iValue); }
+int scfStrVector::FindSorted (const char *iValue) const
+  { return v->FindSortedKey (iValue); }
+void scfStrVector::QuickSort () { v->QuickSort(); }
+void scfStrVector::Delete (int iIndex) { v->Delete (iIndex); }
+void scfStrVector::Insert (int iIndex, char *iValue)
+  { v->Insert (iIndex, iValue); }
+void scfStrVector::DeleteAll () { v->DeleteAll(); }

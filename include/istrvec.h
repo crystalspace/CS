@@ -1,6 +1,6 @@
 /*
-    Crystal Space Virtual File System SCF interface
-    Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>
+    Crystal Space Shared String Vector class
+    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -24,11 +24,35 @@
 
 SCF_INTERFACE (iStrVector, 0, 0, 1) : public iBase
 {
-  virtual int   Length() const = 0;
-  virtual char* Get (int n) const = 0;
-  virtual int   Find (const char*) const = 0;
-  virtual void  Push (char*) = 0;
-  virtual char* Pop() = 0;
+  /// Query array length
+  virtual int Length () const = 0;
+
+  /// Push a string onto the stack
+  virtual void Push (char*) = 0;
+
+  /// Pop a string from the top of stack
+  virtual char *Pop () = 0;
+
+  /// Get Nth string in vector
+  virtual char *Get (int) const = 0;
+
+  /// Find index of given string
+  virtual int Find (const char*) const = 0;
+
+  /// Find index of a string in a pre-sorted string array
+  virtual int FindSorted (const char*) const = 0;
+
+  /// Sort the string array
+  virtual void QuickSort () = 0;
+
+  /// Delete Nth string in the array
+  virtual void Delete (int) = 0;
+
+  /// Insert a string before Nth string in the array
+  virtual void Insert (int, char*) = 0;
+
+  /// Delete all strings in array
+  virtual void DeleteAll () = 0;
 };
 
 #endif // __CS_ISTRVEC_H_
