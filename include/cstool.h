@@ -27,6 +27,7 @@
 #include "cstool/cspixmap.h"
 #include "cstool/csview.h"
 #include "cstool/debugimagewriter.h"
+#include "cstool/fogmath.h"
 #include "cstool/framedataholder.h"
 #include "cstool/gentrtex.h"
 #include "cstool/identstrings.h"
