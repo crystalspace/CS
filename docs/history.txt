@@ -19,6 +19,8 @@ chronological order.
 	- Jorrit added a new pvstest world file. This simple world will
 	  be used to test the efficiency of the PVS calculator and PVS
 	  visibility culler.
+	- Eric Sunshine augmented the joystick drivers so that they support and
+	  scan for up to sixteen joysticks.
 24-Jan-2005
 	- Jorrit reverted a fix from res2k in walktest/keys.cpp which changes
 	  the way keys are parsed. This fix breaks parsing of keys with

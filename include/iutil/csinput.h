@@ -40,7 +40,7 @@
 /// Maximal number of mouse buttons supported
 #define CS_MAX_MOUSE_BUTTONS	10
 /// Maximal number of joysticks supported
-#define CS_MAX_JOYSTICK_COUNT	4
+#define CS_MAX_JOYSTICK_COUNT	16
 /// Maximal number of joystick buttons supported
 #define CS_MAX_JOYSTICK_BUTTONS	10
 
