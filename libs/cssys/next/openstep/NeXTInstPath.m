@@ -23,7 +23,11 @@
 //	Cocoa/OpenStep-specific function to determine installation path.
 //
 //-----------------------------------------------------------------------------
-#import <Foundation/Foundation.h>
+#include "NeXTInstallPath.h"
+#import <Foundation/NSAutoreleasePool.h>
+#import <Foundation/NSUserDefaults.h>
+#import <Foundation/NSPathUtilities.h>
+#import <Foundation/NSString.h>
 
 int NeXTGetInstallPath(char* buff, size_t sz, char path_sep)
 {
