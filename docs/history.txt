@@ -19,6 +19,7 @@ The history order is reversed so that new features are at the top.
 	  associated loader. Use genmesh.
 	- Improved shape of the tree.
 	- Eric Sunshine fixed campos.cpp so that it compiled on NextStep.
+	- Eric Sunshine eliminated a compiler warning from rview.cpp.
 24-Jan-2002
 	- Jorge Acereda relaxed a limit in 3ds2lev that made it crash
 	  with scenes with more than 100 textures.

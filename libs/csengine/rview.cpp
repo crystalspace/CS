@@ -704,7 +704,7 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   clip_plane = CS_CLIP_NOT;
   if (ctxt->do_clip_plane)
   {
-    bool mirror = GetCamera ()->IsMirrored ();
+//bool mirror = GetCamera ()->IsMirrored ();
     float dist = ctxt->clip_plane.Classify (tr_center);
 //printf ("7 do_clip_plane mirror=%d dist=%g\n", mirror, dist); fflush (stdout);
     dist = -dist;
