@@ -107,7 +107,4 @@
 // The smallest Z at which 3D clipping occurs
 #define SMALL_Z 0.01f
 
-// This macro causes a crash. Can be useful for debugging.
-#define CRASH { int* a=0; *a = 1; }
-
 #endif // __CS_CSDEF_H__

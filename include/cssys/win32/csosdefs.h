@@ -75,10 +75,6 @@
   #undef  DEBUG_BREAK
   #define DEBUG_BREAK ::DebugBreak()
 
-  // less annoying
-  #undef  CRASH
-  #define CRASH { DEBUG_BREAK; }
-
 #else
   #define ASSERT(expression)
   #define VERIFY_SUCCESS(expression) expression

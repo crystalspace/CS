@@ -235,7 +235,7 @@ static void MemoryCheck ()
 	ShowBlockInfo (me);
         printf ("CHK: Size in table doesn't correspond with size in block!\n");
 	fflush (stdout);
-	CRASH;
+	DEBUG_BREAK;
       }
       if (me.freed)
       {
@@ -244,14 +244,14 @@ static void MemoryCheck ()
 	  ShowBlockInfo (me);
 	  printf ("CHK: Bad start of block for freed block!\n");
 	  fflush (stdout);
-	  CRASH;
+	  DEBUG_BREAK;
 	}
 	if (strncmp (rc+4+DETECT_WALL+s, DETECTFREE, DETECT_WALL) != 0)
 	{
 	  ShowBlockInfo (me);
 	  printf ("CHK: Bad end of block for freed block!\n");
 	  fflush (stdout);
-	  CRASH;
+	  DEBUG_BREAK;
 	}
 #       if DETECT_KEEP_FREE_MEMORY
         unsigned int j;
@@ -262,7 +262,7 @@ static void MemoryCheck ()
 	    ShowBlockInfo (me);
 	    printf ("CHK: Freed memory is used at offset (%d)!\n", j);
 	    fflush (stdout);
-	    CRASH;
+	    DEBUG_BREAK;
 	  }
 	}
 #       endif
@@ -274,14 +274,14 @@ static void MemoryCheck ()
 	  ShowBlockInfo (me);
 	  printf ("CHK: Bad start of block!\n");
 	  fflush (stdout);
-	  CRASH;
+	  DEBUG_BREAK;
 	}
 	if (strncmp (rc+4+DETECT_WALL+s, DETECT, DETECT_WALL_SAME) != 0)
 	{
 	  ShowBlockInfo (me);
 	  printf ("CHK: Bad end of block!\n");
 	  fflush (stdout);
-	  CRASH;
+	  DEBUG_BREAK;
 	}
       }
     }
@@ -316,7 +316,7 @@ static void DumpError (const char* msg, int info, char* rc)
   fflush (stdout);
   if (do_crash)
   {
-    CRASH;
+    DEBUG_BREAK;
   }
 }
 

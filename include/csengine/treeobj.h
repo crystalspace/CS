@@ -75,7 +75,7 @@ public:
   // Increment the ref counter.
   void IncRef () { ref_count++; }
   // Decrement the ref counter.
-  void DecRef () { if (ref_count <= 0) CRASH; ref_count--; }
+  void DecRef () { if (ref_count <= 0) DEBUG_BREAK; ref_count--; }
 
   /// Unlink this stub from all lists.
   void RemoveStub ();
