@@ -225,7 +225,7 @@ csWinThread::csWinThread (csRunnable* r, uint32 /*options*/)
 csWinThread::~csWinThread ()
 {
   if (running)
-    Kill ();
+    Stop ();
 }
 
 bool csWinThread::Start ()
@@ -234,11 +234,6 @@ bool csWinThread::Start ()
   running = ((unsigned long)thread != (unsigned long)~0);
   CS_TEST (running);
   return running;
-}
-
-bool csWinThread::Stop ()
-{
-  return Kill ();
 }
 
 bool csWinThread::Wait ()
@@ -252,7 +247,7 @@ bool csWinThread::Wait ()
   return true;
 }
 
-bool csWinThread::Kill ()
+bool csWinThread::Stop ()
 {
   if (running)
   {

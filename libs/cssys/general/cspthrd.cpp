@@ -312,7 +312,7 @@ csPosixThread::csPosixThread (csRunnable* r, uint32 /*options*/)
 csPosixThread::~csPosixThread ()
 {
   if (running)
-    Kill ();
+    Stop ();
 //if (created)
 //  pthread_join (thread, NULL); // clean up resources
 }
@@ -404,34 +404,6 @@ bool csPosixThread::Wait ()
     default:
       //      lasterr = "Unknown error while waiting for thread";
       lasterr = sys_errlist[errno];
-      break;
-    }
-  }
-  CS_SHOW_ERROR;
-  return !running;
-}
-
-bool csPosixThread::Kill ()
-{
-  if (running)
-  {
-    int rc;
-    rc = pthread_kill (thread, SIGKILL);
-    switch (rc)
-    {
-    case ESRCH:
-      lasterr = "Thread does not exist";
-      created = false;
-      break;
-    case EINVAL:
-      lasterr = "Unknown signal sent to thread";
-      break;
-    case 0:
-      lasterr = NULL;
-      running = false;
-      break;
-    default:
-      lasterr = "Unknown error while killing thread";
       break;
     }
   }

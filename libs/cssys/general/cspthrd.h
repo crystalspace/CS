@@ -40,20 +40,19 @@ class csPosixThread : public csThread
   virtual bool Start ();
 
   /**
-   * Ask the thread to stop. 
-   * This is eventually honred by the thread at cancellation points like
-   * MutexLocks.  You can then call Start () again; it does not resume
-   * operation where stopped but starts over again.
+   * Unmercifully stop the thread as soon as possible.
+   * This method performs a dirty shutdown of the thread.  The thread is not
+   * given a chance to exit normally.  Do not invoke this method unless you
+   * have a very good reason for doing so.  In general, it is best to implement
+   * some sort of communication with threads so that you can ask them to
+   * terminate in an orderly fashion.  Returns true if the thread was killed.
    */
   virtual bool Stop ();
 
-  /// Wait for the thread to die.  Only returns once the thread has terminated.
-  virtual bool Wait ();
-
   /**
-   * This brutally kills the thread. No kindly asking, no nothing.
+   * Wait for the thread to die.  Only returns once the thread has terminated.
    */
-  virtual bool Kill ();
+  virtual bool Wait ();
 
   /**
    * Return the last eror description and NULL if there was none.

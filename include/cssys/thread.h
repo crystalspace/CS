@@ -46,7 +46,7 @@
  * Abstract interface for objects which can be run in a thread.  Objects which
  * want to be run in a thread must implement this interface.
  */
-class csRunnable : public csRefCount
+class csRunnable
 {
 public:
   /**
@@ -61,6 +61,11 @@ public:
   virtual void PrepareCancel () = 0;
   virtual void PrepareDestroy () = 0;
   */
+
+  /// Increment reference count.
+  virtual void IncRef() = 0;
+  /// Decrement reference count.
+  virtual void DecRef() = 0;
 };
 
 
@@ -83,20 +88,19 @@ public:
   virtual bool Start () = 0;
 
   /**
-   * Ask the thread to stop. 
-   * This is eventually honred by the thread at cancellation points like
-   * MutexLocks.  You can then call Start () again; it does not resume
-   * operation where stopped but starts over again.
+   * Unmercifully stop the thread as soon as possible.
+   * This method performs a dirty shutdown of the thread.  The thread is not
+   * given a chance to exit normally.  Do not invoke this method unless you
+   * have a very good reason for doing so.  In general, it is best to implement
+   * some sort of communication with threads so that you can ask them to
+   * terminate in an orderly fashion.  Returns true if the thread was killed.
    */
   virtual bool Stop () = 0;
 
-  /// Wait for the thread to die.  Only returns once the thread has terminated.
-  virtual bool Wait () = 0;
-
   /**
-   * Brutally kill the thread.
+   * Wait for the thread to die.  Only returns once the thread has terminated.
    */
-  virtual bool Kill () = 0;
+  virtual bool Wait () = 0;
 
   /**
    * Return the last error description, else NULL if there was none.

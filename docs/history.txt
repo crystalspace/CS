@@ -47,6 +47,23 @@ The history order is reversed so that new features are at the top.
 	      an extra carriage return on each line.
 	- Eric Sunshine fixed bug in cs.mak where the "clean" target would
 	  invoke "rm -f" without any filenames.
+	- Eric Sunshine made the following additional changes to the CS
+	  threading API:
+	    - Merged csThread::Stop() and Kill() since it was not possible to
+	      reliably support both methods of killing a thread (semi-dirty and
+	      completely-dirty, respectively).  For instance, Windows only
+	      supports Kill()-style functionality via TerminateThread(),
+	      whereas many pthread implementations only support Stop()-style
+	      functionality via pthread_cancel(), though a few also support
+	      Kill()-style via pthread_kill().
+	    - Changed csRunnable so that it no longer inherits from csRefCount,
+	      nor from any other class.  It now declares abstract IncRef() and
+	      DecRef() methods itself.  This is an interim solution for the
+	      problem of an SCF class wanting to also implement csRunnable,
+	      until we provide more comprehensive support for multiple
+	      reference-counted interfaces per class without having to resort
+	      to SCF.  (That is, csRefCount should support more flexible usage
+	      in the future.)
 8-Oct-2002
 	- Eric Sunshine made the following changes:
 	    - Added the new makefile variable MKDIRS which, given a path
