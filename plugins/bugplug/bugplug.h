@@ -315,6 +315,7 @@ private:
     iSector* sector;
     csView* view;
     bool show;
+    bool clear;
   } debug_sector;
 
   /// The Debug View.
@@ -434,10 +435,13 @@ public:
   void CleanDebugSector ();
   void SetupDebugSector ();
   void DebugSectorBox (const csBox3& box, float r, float g, float b,
-  	const char* name = 0, iMeshObject* mesh = 0);
+  	const char* name = 0, iMeshObject* mesh = 0,
+	uint mixmode = CS_FX_COPY);
   void DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
-  	const csVector3& s3, float r, float g, float b);
-  void SwitchDebugSector (const csReversibleTransform& trans);
+  	const csVector3& s3, float r, float g, float b,
+	uint mixmode = CS_FX_ADD);
+  void SwitchDebugSector (const csReversibleTransform& trans,
+  	bool clear = true);
   bool CheckDebugSector () const { return debug_sector.show; }
 
   void CleanDebugView ();
@@ -464,7 +468,7 @@ public:
   }
   void DebugViewRenderObject (iBugPlugRenderObject* obj);
   void DebugViewClearScreen (bool cs) { debug_view.clear = cs; }
-  void SwitchDebugView ();
+  void SwitchDebugView (bool clear = true);
   bool CheckDebugView () const { return debug_view.show; }
 
   int FindCounter (const char* countername);
@@ -484,18 +488,21 @@ public:
       scfParent->SetupDebugSector ();
     }
     virtual void DebugSectorBox (const csBox3& box, float r, float g, float b,
-  	const char* name = 0, iMeshObject* mesh = 0)
+  	const char* name = 0, iMeshObject* mesh = 0,
+	uint mixmode = CS_FX_COPY)
     {
-      scfParent->DebugSectorBox (box, r, g, b, name, mesh);
+      scfParent->DebugSectorBox (box, r, g, b, name, mesh, mixmode);
     }
     virtual void DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
-  	const csVector3& s3, float r, float g, float b)
+  	const csVector3& s3, float r, float g, float b,
+	uint mixmode = CS_FX_ADD)
     {
-      scfParent->DebugSectorTriangle (s1, s2, s3, r, g, b);
+      scfParent->DebugSectorTriangle (s1, s2, s3, r, g, b, mixmode);
     }
-    virtual void SwitchDebugSector (const csReversibleTransform& trans)
+    virtual void SwitchDebugSector (const csReversibleTransform& trans,
+    	bool clear = true)
     {
-      scfParent->SwitchDebugSector (trans);
+      scfParent->SwitchDebugSector (trans, clear);
     }
     virtual bool CheckDebugSector () const
     {
@@ -549,9 +556,9 @@ public:
     {
       scfParent->DebugViewClearScreen (cs);
     }
-    virtual void SwitchDebugView ()
+    virtual void SwitchDebugView (bool clear = true)
     {
-      scfParent->SwitchDebugView ();
+      scfParent->SwitchDebugView (clear);
     }
     virtual bool CheckDebugView () const
     {

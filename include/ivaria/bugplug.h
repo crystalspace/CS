@@ -20,6 +20,7 @@
 #define __CS_IVARIA_BUGPLUG_H__
 
 #include "csutil/scf.h"
+#include "ivideo/graph3d.h"
 
 class csBox3;
 class csVector2;
@@ -68,20 +69,26 @@ struct iBugPlug : public iBase
    * is over the object.
    */
   virtual void DebugSectorBox (const csBox3& box, float r, float g, float b,
-  	const char* name = 0, iMeshObject* mesh = 0) = 0;
+  	const char* name = 0, iMeshObject* mesh = 0,
+	uint mixmode = CS_FX_COPY) = 0;
 
   /**
    * Add a transparent filled triangle to the debug sector.
    * The color will be max at s1 and completely black at s2 and s3.
    */
   virtual void DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
-  	const csVector3& s3, float r, float g, float b) = 0;
+  	const csVector3& s3, float r, float g, float b,
+	uint mixmode = CS_FX_ADD) = 0;
 
   /**
    * Switch BugPlug view to the debug sector. The given transform is
    * given to the camera.
+   * If clear is false then the 3D view will not be overwritten. In
+   * that case the transformation will not be used but the debug sector
+   * will follow the 3D view.
    */
-  virtual void SwitchDebugSector (const csReversibleTransform& trans) = 0;
+  virtual void SwitchDebugSector (const csReversibleTransform& trans,
+  	bool clear = true) = 0;
 
   /**
    * Returns true if the debug sector is currently visible.
@@ -156,8 +163,9 @@ struct iBugPlug : public iBase
 
   /**
    * Switch BugPlug view to the debug view.
+   * If clear is false then the 3D view will not be overwritten.
    */
-  virtual void SwitchDebugView () = 0;
+  virtual void SwitchDebugView (bool clear = true) = 0;
 
   /**
    * Returns true if the debug view is currently visible.

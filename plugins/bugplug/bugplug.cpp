@@ -140,6 +140,7 @@ csBugPlug::csBugPlug (iBase *iParent)
   debug_sector.sector = 0;
   debug_sector.view = 0;
   debug_sector.show = false;
+  debug_sector.clear = true;
 
   debug_view.show = false;
   debug_view.clear = true;
@@ -943,9 +944,10 @@ bool csBugPlug::EatKey (iEvent& event)
 
   // Return false if we are not processing our own keys.
   // If debug_sector.show is true we will process our own keys to...
-  if (!process_next_key && !debug_sector.show && !debug_view.show)
+  if (!process_next_key && !(debug_sector.show && debug_sector.clear)
+  	&& !debug_view.show)
     return false;
-  if (debug_sector.show || debug_view.show)
+  if ((debug_sector.show && debug_sector.clear) || debug_view.show)
   {
     process_next_key = false;
   }
@@ -1299,7 +1301,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	UnleashSpider (cmd, args);
         break;
       case DEBUGCMD_DS_LEFT:
-        if (debug_sector.show)
+        if (debug_sector.show && debug_sector.clear)
 	{
 	  debug_sector.view->GetCamera ()->Move (csVector3 (-1, 0, 0), false);
 	}
@@ -1310,7 +1312,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_RIGHT:
-        if (debug_sector.show)
+        if (debug_sector.show && debug_sector.clear)
 	{
 	  debug_sector.view->GetCamera ()->Move (csVector3 (1, 0, 0), false);
 	}
@@ -1321,7 +1323,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_FORWARD:
-        if (debug_sector.show)
+        if (debug_sector.show && debug_sector.clear)
 	{
 	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 0, 1), false);
 	}
@@ -1332,7 +1334,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_BACKWARD:
-        if (debug_sector.show)
+        if (debug_sector.show && debug_sector.clear)
 	{
 	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 0, -1), false);
 	}
@@ -1343,7 +1345,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_UP:
-        if (debug_sector.show)
+        if (debug_sector.show && debug_sector.clear)
 	{
 	  debug_sector.view->GetCamera ()->Move (csVector3 (0, 1, 0), false);
 	}
@@ -1354,7 +1356,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_DOWN:
-        if (debug_sector.show)
+        if (debug_sector.show && debug_sector.clear)
 	{
 	  debug_sector.view->GetCamera ()->Move (csVector3 (0, -1, 0), false);
 	}
@@ -1365,7 +1367,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_TURNLEFT:
-        if (debug_sector.show)
+        if (debug_sector.show && debug_sector.clear)
 	{
 	  debug_sector.view->GetCamera ()->GetTransform ().
 	  	RotateThis (CS_VEC_ROT_LEFT, 0.2f);
@@ -1377,7 +1379,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	}
         break;
       case DEBUGCMD_DS_TURNRIGHT:
-        if (debug_sector.show)
+        if (debug_sector.show && debug_sector.clear)
 	{
 	  debug_sector.view->GetCamera ()->GetTransform ().
 	  	RotateThis (CS_VEC_ROT_RIGHT, 0.2f);
@@ -1649,7 +1651,10 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
   if (debug_sector.show)
   {
     G3D->BeginDraw (CSDRAW_3DGRAPHICS |
-    	CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN);
+    	CSDRAW_CLEARZBUFFER | (debug_sector.clear ? CSDRAW_CLEARSCREEN : 0));
+    iCamera* camera = spider->GetCamera ();
+    if (camera)
+      debug_sector.view->GetCamera ()->SetTransform (camera->GetTransform ());
     debug_sector.view->Draw ();
   }
 
@@ -1788,7 +1793,8 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 	    j1 = pol.num_vertices - 1;
 	    for (j = 0 ; j < pol.num_vertices ; j++)
 	    {
-              G3D->DrawLine (vtt[pol.vertices[j]], vtt[pol.vertices[j1]], fov, pm_color);
+              G3D->DrawLine (vtt[pol.vertices[j]], vtt[pol.vertices[j1]],
+	      	fov, pm_color);
 	      j1 = j;
 	    }
 	  }
@@ -2595,7 +2601,7 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
 }
 
 void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
-  	const char* name, iMeshObject*)
+  	const char* name, iMeshObject*, uint mixmode)
 {
   if (!debug_sector.sector) return;
 
@@ -2631,6 +2637,7 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   gms->SetLighting (false);
   gms->SetColor (csColor (0, 0, 0));
   gms->SetManualColors (true);
+  gms->SetMixMode (mixmode);
 
   // The following two calls are not needed since CS_ZBUF_USE and
   // Object render priority are the default but they show how you
@@ -2640,7 +2647,8 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
 }
 
 void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
-  	const csVector3& s3, float r, float g, float b)
+  	const csVector3& s3, float r, float g, float b,
+	uint mixmode)
 {
   if (!debug_sector.sector) return;
 
@@ -2686,13 +2694,14 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   gms->SetLighting (false);
   gms->SetColor (csColor (0, 0, 0));
   gms->SetManualColors (true);
-  gms->SetMixMode (CS_FX_ADD);
+  gms->SetMixMode (mixmode);
 
   mw->SetZBufMode (CS_ZBUF_TEST);
   mw->SetRenderPriority (Engine->GetAlphaRenderPriority ());
 }
 
-void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans)
+void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans,
+	bool clear)
 {
   if (!debug_sector.sector)
   {
@@ -2700,6 +2709,7 @@ void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans)
     return;
   }
   debug_sector.show = !debug_sector.show;
+  debug_sector.clear = clear;
   if (debug_sector.show)
   {
     debug_sector.view->GetCamera ()->SetTransform (trans);
@@ -2798,9 +2808,10 @@ void csBugPlug::DebugViewRenderObject (iBugPlugRenderObject* obj)
   debug_view.object = obj;
 }
 
-void csBugPlug::SwitchDebugView ()
+void csBugPlug::SwitchDebugView (bool clear)
 {
   debug_view.show = !debug_view.show;
+  debug_sector.clear = clear;
   if (debug_view.show)
   {
     debug_sector.show = false;

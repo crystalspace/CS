@@ -9,6 +9,11 @@ chronological order.
 22-Mar-2005
 	- Jorrit removed the slow RAPID and memory consuming collision
 	  detection plugin. OPCODE is now a lot better.
+	- Jorrit improved the bugplug debugging framework slightly.
+	- Jorrit added support for 'setup_debugsector', 'navigate_child1',
+	  'navigate_child2', and 'navigate_parent' debug commands to pvsvis.
+	  Using bugplug you can now investigate the shape of the kdtree by
+	  navigating through the nodes.
 21-Mar-2005
 	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
 	  was fragile, obfuscated, and unnecessarily complex.

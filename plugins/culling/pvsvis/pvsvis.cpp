@@ -161,6 +161,7 @@ csPVSVis::csPVSVis (iBase *iParent)
   current_vistest_nr = 1;
   vistest_objects_inuse = false;
   updating = false;
+  debug_node = 0;
 }
 
 csPVSVis::~csPVSVis ()
@@ -1242,67 +1243,84 @@ void csPVSVis::CastShadows (iFrustumView* fview)
 
 bool csPVSVis::Debug_DebugCommand (const char* cmd)
 {
+  if (!debug_node)
+  {
+    debug_node = pvstree.GetRealRootNode ();
+    debug_nodepath.SetLength (0);
+  }
+  csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+  if (!bugplug || !debug_node) return false;
+
   if (!strcmp (cmd, "setup_debugsector"))
   {
-    csRef<iBugPlug> bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
-    if (bugplug)
-    {
-#if 0
-      bugplug->SetupDebugSector ();
-      size_t i;
-      for (i = 0 ; i < visobj_vector.Length () ; i++)
-      {
-        csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
-        iVisibilityObject* visobj = visobj_wrap->visobj;
-	csBox3 box;
-	iMovable* movable = visobj->GetMovable ();
-	visobj_wrap->full_transform_identity =
-		movable->IsFullTransformIdentity ();
-	CalculateVisObjBBox (visobj, box, visobj_wrap->full_transform_identity);
-	bugplug->DebugSectorBox (box,
-		float (reason_colors[visobj_wrap->history->reason].r) / 256.0,
-		float (reason_colors[visobj_wrap->history->reason].g) / 256.0,
-		float (reason_colors[visobj_wrap->history->reason].b) / 256.0);
-      }
-      csVector3 origin (0);
-      const csReversibleTransform& trans = debug_camera->GetTransform ();
-      csVector3 topleft (debug_lx, debug_ty, 1); topleft *= 100.0;
-      csVector3 topright (debug_rx, debug_ty, 1); topright *= 100.0;
-      csVector3 botleft (debug_lx, debug_by, 1); botleft *= 100.0;
-      csVector3 botright (debug_rx, debug_by, 1); botright *= 100.0;
-      origin = trans.This2Other (origin);
-      topleft = trans.This2Other (topleft);
-      topright = trans.This2Other (topright);
-      botleft = trans.This2Other (botleft);
-      botright = trans.This2Other (botright);
-
-      for (i = 0 ; i < 5 ; i++)
-      {
-	csVector3 v1, v2;
-	float fact = float (i) / 5.0;
-	v1 = topleft + fact * (topright-topleft);
-	v2 = topleft + (fact+.1) * (topright-topleft);
-        bugplug->DebugSectorTriangle (origin, v1, v2, .5, 0, 0);
-	v1 = botright + fact * (topright-botright);
-	v2 = botright + (fact+.1) * (topright-botright);
-        bugplug->DebugSectorTriangle (origin, v1, v2, 0, .5, 0);
-	v1 = topleft + fact * (botleft-topleft);
-	v2 = topleft + (fact+.1) * (botleft-topleft);
-        bugplug->DebugSectorTriangle (origin, v1, v2, 0, 0, .5);
-	v1 = botleft + fact * (botright-botleft);
-	v2 = botleft + (fact+.1) * (botright-botleft);
-        bugplug->DebugSectorTriangle (origin, v1, v2, .5, .5, 0);
-      }
-      bugplug->SwitchDebugSector (trans);
-#endif
-    }
-    else
-    {
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.dynavis", "BugPlug not found!");
-    }
+    bugplug->SetupDebugSector ();
+    bugplug->DebugSectorBox (debug_node->GetNodeBBox (),
+      	1.0, 1.0, 1.0, 0, 0, CS_FX_ADD);
+    csReversibleTransform trans;
+    bugplug->SwitchDebugSector (trans, false);
     return true;
   }
-  return false;
+  else if (!strcmp (cmd, "navigate_child1"))
+  {
+    if (debug_node->child1)
+    {
+      debug_node = debug_node->child1;
+      debug_nodepath.Push (1);
+      printf ("Going to child1 %p at (%g,%g,%g)-(%g,%g,%g)\n",
+      	debug_node,
+	debug_node->GetNodeBBox ().MinX (),
+	debug_node->GetNodeBBox ().MinY (),
+	debug_node->GetNodeBBox ().MinZ (),
+	debug_node->GetNodeBBox ().MaxX (),
+	debug_node->GetNodeBBox ().MaxY (),
+	debug_node->GetNodeBBox ().MaxZ ());
+    }
+  }
+  else if (!strcmp (cmd, "navigate_child2"))
+  {
+    if (debug_node->child2)
+    {
+      debug_node = debug_node->child2;
+      debug_nodepath.Push (2);
+      printf ("Going to child2 %p at (%g,%g,%g)-(%g,%g,%g)\n",
+      	debug_node,
+	debug_node->GetNodeBBox ().MinX (),
+	debug_node->GetNodeBBox ().MinY (),
+	debug_node->GetNodeBBox ().MinZ (),
+	debug_node->GetNodeBBox ().MaxX (),
+	debug_node->GetNodeBBox ().MaxY (),
+	debug_node->GetNodeBBox ().MaxZ ());
+    }
+  }
+  else if (!strcmp (cmd, "navigate_parent"))
+  {
+    debug_node = pvstree.GetRealRootNode ();
+    debug_nodepath.SetLength (debug_nodepath.Length ()-1);
+    size_t i;
+    for (i = 0 ; i < debug_nodepath.Length () ; i++)
+      if (debug_nodepath[i] == 1)
+        debug_node = debug_node->child1;
+      else
+        debug_node = debug_node->child2;
+      printf ("Going to parent %p at (%g,%g,%g)-(%g,%g,%g)\n",
+      	debug_node,
+	debug_node->GetNodeBBox ().MinX (),
+	debug_node->GetNodeBBox ().MinY (),
+	debug_node->GetNodeBBox ().MinZ (),
+	debug_node->GetNodeBBox ().MaxX (),
+	debug_node->GetNodeBBox ().MaxY (),
+	debug_node->GetNodeBBox ().MaxZ ());
+  }
+  else
+    return false;
+
+  bugplug->SetupDebugSector ();
+  bugplug->DebugSectorBox (debug_node->GetNodeBBox (),
+      	1.0, 1.0, 1.0, 0, 0, CS_FX_ADD);
+  csReversibleTransform trans;
+  if (!bugplug->CheckDebugSector ())
+    bugplug->SwitchDebugSector (trans, false);
+
+  return true;
 }
 

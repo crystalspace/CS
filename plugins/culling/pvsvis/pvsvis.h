@@ -101,6 +101,10 @@ private:
   // The PVS information.
   csStaticPVSTree pvstree;
 
+  // For debugging. The current node.
+  csStaticPVSNode* debug_node;
+  csArray<int> debug_nodepath;	// Array with 1 and 2 depending on child.
+
   // This hash set holds references to csPVSVisObjectWrapper instances
   // that require updating in the culler.
   csSet<csPVSVisObjectWrapper*> update_queue;
