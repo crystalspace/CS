@@ -12,6 +12,7 @@ chronological order.
 	- Jorrit added csPolygonMeshTools::SortTrianglesX() and
 	  csPolygonMeshTools::SortedIn(). These two routines allow you to
 	  check if a point is in a closed triangle or polygon mesh.
+	- res enabled "Treat wchar_t as builtin type" for VC7 projects.
 2-Mar-2005
 	- Jorrit changed pvscalc to use the Description() method to print
 	  out boxes and vectors instead of the ugly B2F and other macros.
