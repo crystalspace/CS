@@ -239,7 +239,8 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   const char *val;
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
-  if ((val = cmdline->GetOption ("2d")))
+  val = cmdline->GetOption ("2d");
+  if (val)
   {
     current_tester = new StringTester ();
     draw_3d = false;
@@ -247,7 +248,8 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   else
     current_tester = new SinglePolygonTester ();
 
-  if ((val = cmdline->GetOption ("3d")))
+  val = cmdline->GetOption ("3d");
+  if (val)
     draw_2d = false;
   cmdline->DecRef ();
 
