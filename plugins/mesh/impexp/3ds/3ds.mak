@@ -55,6 +55,9 @@ ie3ds: $(OUTDIRS) $(IE3DS)
 $(IE3DS): $(OBJ.IE3DS) $(LIB.IE3DS)
 	$(DO.PLUGIN) $(3DS.LFLAGS)
 
+$(OUT)/%$O: plugins/mesh/impexp/3ds/%.cpp
+	$(DO.COMPILE.CPP) $(3DS.CFLAGS)
+
 clean: ie3dsclean
 ie3dsclean:
 	-$(RM) $(IE3DS) $(OBJ.IE3DS)

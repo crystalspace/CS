@@ -53,6 +53,9 @@ ifeq ($(MAKESECTION),targets)
 build.3ds2lev: $(OUTDIRS) $(3DS2LEV.EXE)
 clean: 3ds2levclean
 
+$(OUT)/%$O: apps/import/3ds2lev/%.cpp
+	$(DO.COMPILE.CPP) $(3DS.CFLAGS)
+
 $(3DS2LEV.EXE): $(OBJ.3DS2LEV) $(LIB.3DS2LEV)
 	$(DO.LINK.CONSOLE.EXE) $(3DS.LFLAGS)
 
