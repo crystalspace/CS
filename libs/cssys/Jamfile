@@ -11,7 +11,7 @@ case MACOS_X :
   SearchSubdir macosx ;
   SearchSubdir general ;
   SYSFILES = [ Wildcard macosx : *.cpp *.m *.h ] 
-		findlib.cpp getopt.cpp printf.cpp sysroot.cpp pthrd.cpp 
+		findlib.cpp getopt.cpp printf.cpp sysroot.cpp cspthrd.cpp 
 		cspthrd.h ;
   InstallConfig macosx.cfg ;
 case * :
