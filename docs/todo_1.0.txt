@@ -14,6 +14,8 @@ can be given:
 	- **: bug or feature has been fixed or implemented.
 
 Bugs to fix:
+	[O]  Fix the problem with adding -lutil for more recent
+	     versions of python. This should be automatic and not manual.
 	[V]  Investigate if LOD for sprites is still working.
 	[S]  Investigate if there are any more memory leaks after
 	     unloading a level and if so fix them.
