@@ -135,7 +135,9 @@ csperl5clean:
 	$(CSPERL5.PM) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
 csperl5distclean: csperl5clean
-	$(RM) $(PERLXSI.C) $(SWIG.PERL5.PM) $(SWIG.PERL5.C) $(SWIG.PERL5.DOC)
+	$(RM) $(PERLXSI.C) $(SWIG.PERL5.DOC)
+# If these were not stored in CVS, we would also probably delete them.
+#	$(SWIG.PERL5.C) $(SWIG.PERL5.PM)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csperl5.dep
