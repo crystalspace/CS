@@ -30,6 +30,11 @@ chronological order.
 	  efficient way to get to the portal container of a mesh.
 	- Jorrit removed iMeshObject->GetPortalCount() and GetPortal().
 	- Jorrit changed api documentation to reflect new portal changes.
+	- res changed the GL extensions manager to set function pointers to
+	  0 only at initialization time, not when retrieving the ext fails.
+	  This should fix the crashes on GL implementations that support
+	  ARB_vertex_program, but not ARB_fragment_program. Also added 
+	  GL_ARB_texture_non_power_of_two and GL_ARB_point_sprite extensions.
 6-Oct-2003
         - Philip Wyett added 'waterdemo' to CS root .cvsignore file.
 	- Jorrit fixed waterdemo so it no longer uses '/this/data'. It is
