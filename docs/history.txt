@@ -23,6 +23,8 @@ he history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed csLightPatchPool::Free() so that it now compiles
 	  on NextStep.  Compiler was making apparently bogus complaint about
 	  invocation of Free() in the parent class' parent class.
+	- Eric Sunshine fixed the next2d canvas so that it once again displays
+	  the correct colors in 32-bit mode following changes by Matthew Reda.
 13-Jan-2002
 	- Matze changed cs-config --version to only output major number, the
 	  --longversion outputs all

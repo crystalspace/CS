@@ -44,9 +44,16 @@
 #define RED_MASK     0x00ff0000
 #define GREEN_MASK   0x0000ff00
 #define BLUE_MASK    0x000000ff
+
+#if defined(__LITTLE_ENDIAN__)
+#define RED_OFFSET   2
+#define GREEN_OFFSET 1
+#define BLUE_OFFSET  0
+#else
 #define RED_OFFSET   1
 #define GREEN_OFFSET 2
 #define BLUE_OFFSET  3
+#endif
 
 int const CS_NEXT_DEPTH = 32;
 int const CS_NEXT_BPS = 8;
