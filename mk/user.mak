@@ -13,7 +13,8 @@
 # Default list of plugins to build.  Note that you'll link all plugins into
 # executable in the case of static build
 ifndef PLUGINS
-  PLUGINS  = video/renderer/line video/renderer/null video/renderer/inf
+  PLUGINS  = video/renderer video/canvas
+  PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
   PLUGINS += cscon 
   PLUGINS += csclear 
   PLUGINS += dungeon 
