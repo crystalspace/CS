@@ -538,6 +538,9 @@ void csBugPlug::HideSpider (iCamera* camera)
       case DEBUGCMD_SELECTMESH:
         SelectMesh (camera->GetSector (), spider_args);
         break;
+      case DEBUGCMD_ONESECTOR:
+        OneSector (camera);
+        break;
     }
   }
 }
@@ -1196,6 +1199,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	SwitchDebugView ();
         break;
       case DEBUGCMD_SWITCHCULLER:
+      case DEBUGCMD_ONESECTOR:
       case DEBUGCMD_VISCULVIEW:
       case DEBUGCMD_DUMPCAM:
       case DEBUGCMD_FOV:
@@ -2008,6 +2012,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "colorsectors"))	return DEBUGCMD_COLORSECTORS;
   if (!strcmp (cmd, "switchculler"))	return DEBUGCMD_SWITCHCULLER;
   if (!strcmp (cmd, "selectmesh"))	return DEBUGCMD_SELECTMESH;
+  if (!strcmp (cmd, "onesector"))	return DEBUGCMD_ONESECTOR;
 
   return DEBUGCMD_UNKNOWN;
 }
@@ -2376,6 +2381,38 @@ bool csBugPlug::HandleEvent (iEvent& event)
   }
 
   return false;
+}
+
+//---------------------------------------------------------------------------
+
+void csBugPlug::OneSector (iCamera* camera)
+{
+  iSector* one = Engine->FindSector ("bugplug_one_sector");
+  if (!one)
+  {
+    int i;
+    iSectorList* sl = Engine->GetSectors ();
+    one = Engine->CreateSector ("bugplug_one_sector");
+    for (i = 0 ; i < sl->GetCount () ; i++)
+    {
+      iSector* sec = sl->Get (i);
+      if (sec != one)
+      {
+        iMeshList* ml = sec->GetMeshes ();
+	int j;
+	for (j = 0 ; j < ml->GetCount () ; j++)
+	{
+	  iMeshWrapper* m = ml->Get (j);
+	  if (!m->GetPortalContainer ())
+	  {
+	    m->GetMovable ()->GetSectors ()->Add (one);
+	    m->GetMovable ()->UpdateMove ();
+	  }
+	}
+      }
+    }
+  }
+  camera->SetSector (one);
 }
 
 //---------------------------------------------------------------------------

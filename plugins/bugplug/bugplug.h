@@ -138,6 +138,7 @@ class csShadow;
 #define DEBUGCMD_MESHVISMESH	1054	// Show viscul polymesh of selected mesh
 #define DEBUGCMD_MESHSHADMESH	1055	// Show shadow polymesh of selected mesh
 #define DEBUGCMD_MESHBASEMESH	1056	// Show base polymesh of selected mesh
+#define DEBUGCMD_ONESECTOR	1057	// Merge all in one sector
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0
@@ -411,6 +412,8 @@ public:
   virtual bool Initialize (iObjectRegistry *object_reg);
   /// This is set to receive the once per frame nothing  event
   bool HandleEvent (iEvent &event);
+
+  void OneSector (iCamera* camera);
 
   iMaterialWrapper* FindColor (float r, float g, float b);
   void CleanDebugSector ();

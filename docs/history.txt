@@ -9,6 +9,12 @@ chronological order.
 20-Jul-2004
 	- PK added GetMeshObjectType() to iMeshObjectFactory.
 	- PK worked a bit on iSaver.
+	- Jorrit added a new feature to bugplug to take all sectors that
+	  are loaded and merge them in a single sector. All portal containers
+	  will be removed too. The original sectors are still there. You can
+	  return to them if you first saved the camera position with 'C'
+	  (then press 'c' to return). This feature is assigned to
+	  ctrl-alt-o (don't forget ctrl-d first).
 19-Jul-2004
 	- PK made the following changes:
 	    - Changed viewmesh to support the iBinarySaverPlugin.
