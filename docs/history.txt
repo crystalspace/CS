@@ -18,6 +18,7 @@ chronological order.
 	- Jorrit added a few sequences to r3dtest so that the light now moves.
 	  This demonstrates how the shadows and bumpmaps are modified
 	  dynamically.
+	- Jorrit fixed a crash in old renderer related to light attenuation.
 10-Sep-2003
 	- Philip Wyett made struct ShadowDrawVisCallback a friend to
 	  class csStencilShadowStep. This works round C2248 MSVC 6

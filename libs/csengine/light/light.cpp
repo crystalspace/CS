@@ -207,7 +207,12 @@ void csLight::SetAttenuation (int a)
   float dist;
   if (!GetDistanceForBrightness (1.0f, dist))
     dist = HUGE_RADIUS; // can't determine distance
-  CalculateAttenuationVector (a, dist, 1.0f);
+  if (ABS (dist) > SMALL_EPSILON)
+  {
+    // Jorrit: @@@ To avoid a crash using old renderer I have to test
+    // for 'dist'.
+    CalculateAttenuationVector (a, dist, 1.0f);
+  }
   attenuation = a;
 }
 
