@@ -1,0 +1,335 @@
+If you want to get a more detailed listing of changes have a look
+at docs/history.txt.
+
+CHANGES FROM 0.12 to 0.14
+-------------------------
+
+- 3D Sound system has been rewritten to use COM.
+
+- 3D Rasterizers have been modified greatly. Textures are now
+  managed by the 3D rasterizer internally. There is also a new
+  DrawPolygonFX routine which replaces the old DrawPolygonQuick.
+  DrawPolygonFX is much more general and has more features. You can
+  now do flat shading and gouraud shading (without texture) for
+  example.
+
+- Almost all features in the 3D Rasterizers also support 2*SRC*DST
+  correctly. 2*SRC*DST is the prefered blending mode which Crystal Space
+  uses for lighting.
+
+- The OpenGL and Direct3D rasterizers have been updated greatly. They now
+  work much better than before and almost implement all functionality
+  that the software rasterizer has. Halo's are still missing. The console
+  also works now for those rasterizers. OpenGL is a lot faster.
+
+- Support for vertex based volumetric fog in OpenGL and Direct3D.
+
+- The software rasterizer has also improved a lot. For example, fog is
+  now MUCH faster which makes it usable. Other routines have also improved
+  in speed. The software renderer can now also use assembly code with the
+  NASM assembler.
+
+- The 3D engine has been cleaned up considerably. A lot of obsolete
+  or badly designed classes have been removed or rewritten. A new
+  csgeom library works together with csengine to have a clean seperation
+  of what is 3D geometry and what is 3D engine specific.
+
+- Many bugs in the engine have now been fixed.
+
+- Work has started on a very ambitious new visibility system. In addition
+  to portals and sectors you can now use the c-buffer (coverage buffer) in
+  combination with a BSP tree. This is only the beginning. I also plan to
+  add octrees and/or kd-trees for much improved culling. For hardware
+  geometry acceleration I also plan to replace the c-buffer with a quad-tree.
+  This will make Crystal Space very good for city like landscapes.
+
+- New LOD system for 3D triangle mesh sprites. It is based on progressive
+  meshes with edge collapsing and vertex morphing.
+
+- New skeletal sprite animation system. To see the new skeletal sprites
+  you should try out the 'addskel' and 'addghost' commands on the console.
+
+- Sprites are now lighted using gouraud shading!
+
+- In general many classes and method names have been renamed to the
+  new naming convention. A class always looks like this: 'csThisClass'
+  while a method name looks like this: 'ThisMethod'.
+
+- Much better and improved directory structure. Crystal Space is now more
+  a collection of libraries and tools. The goal is that those libraries
+  are as seperate as possible. For example: you should be able to use the
+  Crystal Space geometry library without having to require anything else.
+  With this new directory structure there is also a much better makefile
+  system.
+
+- One of the new libraries that has been created is the csobject library
+  which is a general object management system. Crystal Space uses it for
+  many important 3D engine classes but you can use it as well for your
+  own game objects. The system is general and hierarchical. You can easily
+  add any type of object to any other object.
+
+- Another new library is the 'csgame' library which is used by Crystal
+  Shooter. It contains game specific code which is not general enough
+  to go to Crystal Space itself.
+
+- Crystal Space now has the ability to read MD2 and 3DS objects directly.
+  Many other formats will follow. The system is very general.
+
+- MUCH better precalculation of the lightmaps. Now there are no more
+  black borders and lightmaps look much smoother too.
+
+- Curved surfaces are lighted now (using lightmaps).
+
+- Lighting system has been rewritten totally. It is much more efficient,
+  easier to read and has less bugs. Things can also optionally cast shadows
+  for dynamic lights.
+
+- Better movement system in WalkTest. We now have gravity and good
+  collision detection. You can also jump :-)
+
+- Many new console commands to test various things. The movement system
+  in WalkTest is also configurable via 'autoexec.cfg'.
+
+- MazeD is still not finished but many updates have happened and work
+  is going very well.
+
+- Various changes and improvements to many ports: Linux, OS/2, BeOS,
+  Macintosh, DOS, Windows, NextStep, ... and to the rest of Crystal
+  Space. It is too much to mention here (see history.txt for a very
+  detailed listing).
+
+
+CHANGES FROM 0.10 to 0.12
+-------------------------
+
+- Much improved Windows and Direct3D port. Many people have put a lot
+  of effort into this. The Direct3D port is still not completely
+  finished but on many systems it works very well (but NOT on the RIVA
+  128ZX for example).
+
+- Assembler routines for Visual C++ (there were already some for
+  GCC). This means that the Windows port is now a lot faster than
+  before.
+
+- New NextStep, OpenStep, & Rhapsody (MacOS/X Server) ports of Crystal Space!
+
+- New BeOS port of Crystal Space!
+
+- New and functional Macintosh port of Crystal Space!
+
+- New Glide and OpenGL ports for both Windows and Linux. These ports
+  are not completely functional yet but they do run.
+
+- Support for sound on Linux, Windows, and Macintosh. The sound code
+  is integrated into Crystal Space but we still need more support for
+  real 3D sound and also for attaching sound to objects.
+
+- Low-level support for networking on Linux, Unix, Windows, Macintosh,
+  OS/2, NextStep, OpenStep, Rhapsody (MacOS/X Server), and BeOS. Work will
+  now commence on the high-level support.
+
+- The 3D Rasterizer and the 2D Graphics driver have moved to seperate
+  components using COM. We ported a subset of COM to non-microsoft
+  platforms so that Crystal Space can use COM on every system. Using
+  this system Crystal Space can dynamically load the right driver
+  depending on the system and user settings. In future we will be using
+  COM for scripting and other communication issues (but optional for
+  people who would like to do it without COM as well).
+
+- The source of Crystal Space has been considerably restructured.
+  API design is much nicer now but most of the API is still not documented.
+  We're coming to that in the near future.
+
+- The lighting system has been considerably improved. It is much faster
+  and looks much better.
+
+- New colored dynamic lighting system WITH correct shadows (not for
+  things and entities though).
+
+- Various optimizations to make the software renderer faster. There is
+  still some work to do however.
+
+- Hierarchical oriented bounding box collision detection system (pfew :-)
+
+- Volumetric colored fog. Currently this works in 16-bit software mode only
+  and it is really slow right now. However we have some ideas for optimizing
+  this significantly.
+
+- Optional halos around lights (only in 16-bit software mode right now).
+
+- Support for spherical sky mapping. The sky is dynamically gouraud shading
+  so you could make a sky which slowly changes color as the sun rises.
+
+- General curved surface support. Currently Bezier curves with 3x3 control
+  points are supported but other curves can be implemented easily.
+
+- Support for gouraud shading triangles (16-bit mode only currently). This
+  can be used by sprites, curved surfaces and world triangles. Currently
+  it is only supported for world triangles.
+
+- Various other 3D Engine enhancements like portals in entities (things),
+  sprites have been considerably rewritten (frames, changing skins, ...),
+  pseudo radiosity system, light is reflected by mirrors and reflecting
+  surfaces, light color can be affected according to the color of a
+  texture on an transparent portal, ...
+
+- Many bugs have been fixed and there are many small enhancements everywhere.
+
+- Support for libraries of objects.
+
+- Most of the ports have been updated. Only the Amiga port is non-functional
+  but some people have come together to fix it.
+
+- A new Crystal Space editor MazeD has been created! It is now getting to a
+  useable point. You can already do limited editing jobs with it.
+
+- Quake MDL and MD2 to Crystal Space convertors. Convert all your popular
+  Quake models to Crystal Space!
+
+- New Blocks game which is similar to 3D-Tetris.
+
+
+CHANGES FROM 0.08 to 0.10
+-------------------------
+
+- Crystal Space is now LGPL instead of just GPL. This means that you CAN
+  use Crystal Space in commercial products provided you can comply with
+  the conditions as specificied by the LGPL (read the included file
+  COPYING for more details).
+
+- Textures are loaded as 24-bit truecolor format internally and
+  then converted to whatever format required.
+
+- Crystal Space can now also load TGA, PNG and JPG textures (in addition
+  to GIF).
+
+- Support for 15/16-bit truecolor modes in addition to the 8-bit palette
+  mode that was already supported. The X and OS/2 ports of Crystal Space
+  allow to simulate 15/16-bit on 8-bit and vice versa. This is mainly
+  useful for testing.
+
+- New private colormap option for textures. With this option every texture
+  gets its own colormap instead of sharing a common colormap. This gives
+  a major quality increase, especially if displaying in truecolor (15/16-bit
+  mode).
+
+- Transparent textures work good again (even with lighting).
+
+- Optional support for hardware acceleration via Direct3D (on the Windows
+  port only). OpenGL is planned for the future and will work on more
+  systems probably.
+
+- Input/output console has been greatly updated.
+
+- New port for OS/2.
+
+- New port for the GGI libraries.
+
+- Major update to the Amiga port.
+
+- Major update to the Watcom/DOS port.
+
+- The Windows port works much better now. Most of the bugs have been fixed.
+
+- Switch from custom made CSAR format to more general and compressed ZIP
+  files. CSAR files are no longer supported. A complete level can know
+  be stored in a ZIP file and will automatically be readed (and possibly
+  adjusted) by Crystal Space. In addition to this there is also support
+  for read-only archives. This will be useful when games using Crystal
+  Space are distributed on CD-ROM and you want to provide patches. The
+  patched files from the level file on the CD-ROM can be on another
+  medium.
+
+- Many new documents added (format of world file, space warping, ...)
+
+- Major restructering of the source. Everything is now in logical
+  directories. There are now seven main layers: geometry, util,
+  engine, render, scripts, general, and system.
+
+- Major cleanup of the source. Many global variables have been removed
+  and especially the system dependent stuff is much cleaner now.
+  Some classes have been reorganized. The calculation of the lookup tables
+  is now much clearer and cleaner ...
+
+- Crystal Space does much more sanity and error checking now. It
+  will try not to fail silently but really say what is wrong.
+
+- MIXING=nocolor works again. In addition the lightmaps in the ZIP files
+  are always generated in RGB format no matter what the MIXING option
+  says. This means that the lightmaps will not have to be recalculated
+  when you switch a MIXING mode.
+
+- Lights are also always represented in RGB internally no matter what
+  the actual MIXING format is (for example, even if you are using WRB
+  mixing the light will still be defined using RGB).
+
+- New 3D triangle mesh sprites with frame animation!
+
+- The polygon (for rendering the world) and triangle (for the 3D
+  sprites) drawers are much more accurate now. There are also no gaps anymore
+  between polygons.
+
+- New CSWS window system for Crystal Space that is going to be used
+  for a free CS editor.
+
+- Improved collision detection (but still not perfect).
+
+- New interlacing option which is a quick-and-dirty way to almost double
+  the frame rate. The downside is that you get motion-blur. Try it (but
+  not on OS/2 and not with Direct3D) and see if you like the effect (-ilace
+  commandline option).
+
+- Mipmapping is much better (looks better).
+
+- Limited MMX support (can be enabled/disabled at will).
+
+- Many other small enhancements, bug fixes and various improvements (see
+  history.txt for a very detailed listing).
+
+
+CHANGES FROM 0.06 TO 0.08
+-------------------------
+
+- A new kind of dynamic lighting allows for explosions and moving
+  objects. It is a spherical dynamic light which can move and change
+  intensity (and limited color capabilities). There are no shadows
+  computed with this kind of dynamic light.
+
+- There is now a true_rgb mode with which you can have true RGB lights
+  which mix correctly.
+
+- Crystal Space now supports mirrors!
+
+- Using mirrors in combination with the new alpha-transparency you can get
+  very nice looking reflecting surfaces.
+
+- Support for new archive format: CSAR. All the files needed for loading
+  a world are in such an archive. There is also a utility 'csar' for
+  managing those files. Precalculated lightmaps are also put in the CSAR
+  file so that Crystal Space has a very good startup time provided the
+  lightmaps are there.
+
+- Support for optional BSP tree in a sector. This means that you can
+  now combine the advantages of a BSP with the advantages of a portal
+  world.
+
+- Parsing of the world file is better internally (more consistant
+  parsing module).
+
+- Windows port has been updated and works better now (but still not
+  perfect). The other ports have also been enhanced.
+
+- Numerous commandline options, configuration options and console
+  commands have been added for more configurability and other nice
+  features.
+
+- Several optimizations make some aspects of Crystal Space faster (like
+  the speed of startup and the texture cache).
+
+- It is now possible to create libraries of Things (currently only inside
+  a world file though).
+
+- Several changes to scripting language.
+
+- Stubs for a future 3D sprite module have been added. The code is
+  non-functional yet.
