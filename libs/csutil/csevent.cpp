@@ -65,7 +65,7 @@ const char* csEvent::GetKeyName (csStringID id)
 csEvent::csEvent ()
 {
   SCF_CONSTRUCT_IBASE (0);
-  
+
   count = 0;
 }
 
@@ -244,7 +244,7 @@ bool csEvent::Add (const char *name, iEvent *v)
   }
   return false;
 }
-  
+
 bool csEvent::Add (const char *name, iBase* v)
 {
   if (attributes.In (GetKeyID (name))) return false;
@@ -258,13 +258,13 @@ bool csEvent::Add (const char *name, iBase* v)
   }
   return false;
 }
-  
+
 csEventError csEvent::Retrieve (const char *name, float &v) const
 {
   attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrFloat)
-  {									
+  {
     v = object->doubleVal;
     return csEventErrNone;
   }
@@ -279,7 +279,7 @@ csEventError csEvent::Retrieve (const char *name, double &v) const
   attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrFloat)
-  {									
+  {
     v = object->doubleVal;
     return csEventErrNone;
   }
@@ -294,7 +294,7 @@ csEventError csEvent::Retrieve (const char *name, const char *&v) const
   attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrDatabuffer)
-  {									
+  {
     v = object->bufferVal;
     return csEventErrNone;
   }
@@ -304,12 +304,13 @@ csEventError csEvent::Retrieve (const char *name, const char *&v) const
   }
 }
 
-csEventError csEvent::Retrieve (const char *name, void const *&v, size_t &size) const
+csEventError csEvent::Retrieve (const char *name, void const *&v,
+  size_t &size) const
 {
   attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrDatabuffer)
-  {									
+  {
     v = object->bufferVal;
     size = object->dataSize;
     return csEventErrNone;
@@ -325,7 +326,7 @@ csEventError csEvent::Retrieve (const char *name, bool &v) const
   attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrInt)
-  {									
+  {
     v = object->intVal != 0;
     return csEventErrNone;
   }
@@ -340,7 +341,7 @@ csEventError csEvent::Retrieve (const char *name, csRef<iEvent> &v) const
   attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttrEvent)
-  {									
+  {
     v = (iEvent*)object->ibaseVal;
     return csEventErrNone;
   }
@@ -355,7 +356,7 @@ csEventError csEvent::Retrieve (const char *name, csRef<iBase> &v) const
   attribute* object = attributes.Get (GetKeyID (name), 0);
   if (!object) return csEventErrNotFound;
   if (object->type == csEventAttriBase)
-  {									
+  {
     v = object->ibaseVal;
     return csEventErrNone;
   }
@@ -373,7 +374,7 @@ bool csEvent::AttributeExists (const char* name)
 csEventAttributeType csEvent::GetAttributeType (const char* name)
 {
   attribute* object = attributes.Get (GetKeyID (name), 0);
-  if (object) 
+  if (object)
   {
     return object->type;
   }
@@ -437,26 +438,28 @@ bool csEvent::Print (int level)
 	  GetTypeName(object->type));
     if (object->type == csEventAttrEvent)
     {
-      IndentLevel(level); csPrintf(" Sub-Event Contents:\n"); 
+      IndentLevel(level); csPrintf(" Sub-Event Contents:\n");
       csRef<csEvent> csev = SCF_QUERY_INTERFACE (object->ibaseVal, csEvent);
       if (csev)
 	csev->Print(level+1);
       else
       {
-	IndentLevel(level+1); csPrintf(" (Not an event!):\n"); 
+	IndentLevel(level+1); csPrintf(" (Not an event!):\n");
       }
 
     }
     if (object->type == csEventAttrInt)
     {
-        
-      IndentLevel(level); 
-      csPrintf (" Value: %" PRId64 "\n", object->intVal);
+
+      IndentLevel(level);
+      char const* fmt = " Value: %" PRId64 "\n"; // Pacify Mingw/gcc for PRId64
+      csPrintf (fmt, object->intVal);
     }
     else if (object->type == csEventAttrUInt)
     {
       IndentLevel(level);
-      csPrintf (" Value: %" PRIu64 "\n", (ulonglong) object->intVal);
+      char const* fmt = " Value: %" PRIu64 "\n"; // Pacify Mingw/gcc for PRIu64
+      csPrintf (fmt, (ulonglong) object->intVal);
     }
     else if (object->type == csEventAttrFloat)
     {
@@ -494,15 +497,15 @@ const char* csEventAttributeIterator::Next()
 //*****************************************************************************
 // csPoolEvent
 //*****************************************************************************
-csPoolEvent::csPoolEvent(csEventQueue *q) 
+csPoolEvent::csPoolEvent(csEventQueue *q)
 {
     pool = q;
     next = 0;
 }
- 
-void csPoolEvent::DecRef() 
+
+void csPoolEvent::DecRef()
 {
-  if (scfRefCount == 1) 
+  if (scfRefCount == 1)
   {
     if (!pool.IsValid())
       return;

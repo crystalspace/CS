@@ -243,7 +243,8 @@ bool cswinCallStack::GetFunctionName (size_t num, csString& str)
 
   if (symbolInfo->Name[0] != 0)
   {
-    str.Format ("[%p] (%s)%s+0x%" PRIx64, (void*)entries[num].instrPtr,
+    char const* fmt = "[%p] (%s)%s+0x%" PRIx64; // Pacify Mingw/gcc for PRIx64
+    str.Format (fmt, (void*)entries[num].instrPtr,
       (module.ImageName[0] != 0) ? module.ImageName : "<unknown>",
       symbolInfo->Name, displace);
   }

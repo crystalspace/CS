@@ -34,6 +34,12 @@ chronological order.
 	  paletted images are properly supported.
 	- res augmented configure to support a "--without-wx" option.
 	- res added documentation for csShaderExpressionAccessor.
+	- Eric Sunshine worked around a few compilation warnings resulting from
+	  use of PRId64, PRIu64, and PRIx64 from Mingw/gcc.  The problem is
+	  that Mingw's <inttypes.h> defines these as "I64d", "I64u", and
+	  "I64x", respectively, since these are understood by the MS C-runtime
+	  (which does not understand "ll", etc.), yet these directives are not
+	  recognized by Mingw/gcc, so it complains.
 5-Apr-2005
 	- res replaced use of printf() and relatives with csPrintf() and 
 	  relatives and use of sprintf() with use of csStrings.
