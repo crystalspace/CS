@@ -16,10 +16,10 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#include "util/ddgerror.h"
-#include "struct/ddgcolor.h"
 #include <stdio.h>
 
+#include "util/ddgerror.h"
+#include "struct/ddgcolor.h"
 // ----------------------------------------------------------------------
 
 ddgColor3::ddgColor3( void )
@@ -90,8 +90,6 @@ void ddgColor4::test(ddgColor4 *cs, ddgColor4 *ce )
 			<< cc << " "
 			<< cb << endl;
 	}
-#else
-	fprintf (stderr, "ddgColor4::test() unimplemented\n");
 #endif
 }
 

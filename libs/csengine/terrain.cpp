@@ -136,9 +136,9 @@ bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
     i2 = bt->vertex(tv0,&p2);
     i3 = bt->vertex(tv1,&p3);
 
-	if (!i1) bt->textureC(tva,t1);
-	if (!i2) bt->textureC(tv0,t2);
-	if (!i3) bt->textureC(tv1,t3);
+	if (!i1) bt->textureC(tva,&t1);
+	if (!i2) bt->textureC(tv0,&t2);
+	if (!i3) bt->textureC(tv1,&t3);
 
     if (!i1) i1 = vbuf->pushVT(&p1,&t1);
     if (!i2) i2 = vbuf->pushVT(&p2,&t2);

@@ -392,7 +392,39 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 	else 
 	{
 		i = 0;
-		// Recursively update the state of the mesh
+		/*
+		unsigned int r, c;
+		// Only update those triangles which could possibly be in visible range.
+		// See if the triangle is too far from the camera.  Ingore height component.
+		ddgVector2 pos( ctx->control()->position()->v[0], ctx->control()->position()->v[2]);
+		ddgVector2 min = pos - ddgVector2(farClip(),farClip());
+		ddgVector2 max = pos + ddgVector2(farClip(),farClip());
+		max /= ddgTBinMesh_size;
+		min /= ddgTBinMesh_size;
+		if (min[0] < 0) min[0] = 0;
+		if (min[1] < 0) min[1] = 0;
+		if (max[0] > _nc) max[0] = _nc;
+		if (max[1] > _nr) max[1] = _nr;
+		unsigned int rmin = (unsigned int)min[1];
+		unsigned int rmax = (unsigned int)max[1];
+		unsigned int cmin = (unsigned int)min[0];
+		unsigned int cmax = (unsigned int)max[0];
+		
+		for (r = rmin; r < rmax; r++)
+			for (c = cmin; c < cmax; c++)
+			{
+				i = 2*(_nc * r + c);
+				// Recursively update the state of the mesh
+				if ( _bintree[i])
+				{
+					_bintree[i]->updateSplit(1,ddgUNDEF);
+				}
+				if ( _bintree[i+1])
+				{
+					_bintree[i+1]->updateSplit(1,ddgUNDEF);
+				}
+		}
+*/
 		while (i < _bintreeMax)
 		{
 			if ( _bintree[i])
@@ -401,7 +433,6 @@ bool ddgTBinMesh::calculate( ddgContext *ctx )
 			}
 			i++;
 		}
-
 		// Validate the merge queue.
 		ddgCacheIndex ci = qmcache()->head();
 		while (ci)

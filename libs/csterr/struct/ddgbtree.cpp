@@ -716,7 +716,8 @@ ddgPriority ddgTBinTree::priorityCalc(ddgTriIndex tindex)
 	ddgVector2 f(_ctx->forward()->v[0],_ctx->forward()->v[2]);
 	// This is the same a f dot p1 - f dot p2, f dot p2 can be precomputed,
 	// but I don't think that will speed things up.
-	z = f.dot(p1 - p2);
+	p1.subtract(&p2);
+	z = f.dot(&p1);
 	if (z < _mesh->nearClip())
 		z = _mesh->nearClip();
 	// Priority is factor of:
@@ -779,13 +780,11 @@ bool ddgTBinTree::rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int
     vertex(tv0,&v1);
     vertex(tv1,&va);
 	// Find bounding square of this triangle.
-	ddgVector2 t_1 (v0[0], v0[2]);
-	ddgVector2 t_2 (v1[0], v1[2]);
-	ddgRect t(t_1,t_2);
+	ddgVector2 r1(v0[0],v0[2]), r2(v1[0],v1[2]);
+	ddgRect t(&r1, &r2);
 	// Find bounding rectangle of ray.
-	ddgVector2 r_1 (p1[0],p1[2]);
-	ddgVector2 r_2 (p2[0],p2[2]);
-	ddgRect r(r_1,r_2);
+	ddgVector2 r3(p1[0],p1[2]),r4(p2[0],p2[2]);
+	ddgRect r(&r3, &r4);
 	// See if rectangles intersect.
 	if (!t.intersect(&r))
 		return false;
@@ -794,16 +793,16 @@ bool ddgTBinTree::rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int
 	ddgVector3 e1(va);	// Edge1
 	ddgVector3 e2(va);	// Edge2
 	// Find the Z coord where X = Xa.
-	line.solve(e1,0);
+	line.solve(&e1,0);
 	// Find the X coord where Z = Za.
-	line.solve(e2,0);
+	line.solve(&e2,0);
 	// The two intersection points of the line with the triangle.
 	ddgVector3 s[2];
 	int i = 0;
 	if (e1[0] >= t.min[0] && e1[0] < t.max[0])
-		s[i++].set(e1);
+		s[i++] = e1;
 	if (e2[2] >= t.min[2] && e2[2] < t.max[2])
-		s[i++].set(e2);
+		s[i++] = e2;
 	// We must cross 2 of the three sides of the triangle with the line.
 	// If we haven't crossed any side yet, then we must have missed this triangle.
 	// See if segment fall outside of triangle.
@@ -813,12 +812,11 @@ bool ddgTBinTree::rayTest( ddgVector3 p1, ddgVector3 p2, ddgTriIndex tindex, int
 	{
 		// We must be crossing the diagonal, calculate that point.
 		ddgLine3 diag(v0,v1);
-		line.intersect(&diag,s[1]);
+		line.intersect(&diag,&(s[1]));
 	}
 	// We have the line segment which crosses this triangle in s[0]->s[1].
-	ddgVector2 sr_1 (s[0][0],s[0][1]);
-	ddgVector2 sr_2 (s[1][0],s[1][1]);
-	ddgRect sr(sr_1,sr_2),cs;
+	ddgVector2 sg1(s[0][0],s[0][1]), sg2(s[1][0],s[1][1]);
+	ddgRect sr(&sg1, &sg2),cs;
 	// Clip the segment to p1 and p2 incase p1 and p2 fall inside this triangle.
 	sr.intersect(&r,&cs);
 	// Now we have a line segment guaranteed to be both in the triangle and within the

@@ -57,16 +57,16 @@ public:
 	/// Concatenate another this to this one.
 	ddgStr& operator  +=( const ddgStr& s);
 	/// Return the length of this string.
-	unsigned int len(void)
+	unsigned int length(void)
 	{
 		return l;
 	}
 	/// Return the length of the string.
-	static unsigned int len( const char *s)
+	static unsigned int length( const char *s)
 	{
-		unsigned int i = 0;
-		while( *s ) { s++; i++; }
-		return i;
+		char *p = (char *)s;
+		while( *p ) { p++;}
+		return p-s;
 	} 
 	/// Compare two string objects.
 	static bool equal(const char * a, const char *b)

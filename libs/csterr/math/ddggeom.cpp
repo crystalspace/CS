@@ -28,7 +28,7 @@
 */
 ddgVector3 ddgPlane::project(ddgVector3 *p0)
 {
-	float inv_denom = 1.0F / _normal.dot(_normal);
+	float inv_denom = 1.0F / _normal.dot(&_normal);
 	ddgVector3 pp(_normal);
 	ddgVector3 p1;
 	if (d())
@@ -37,7 +37,7 @@ ddgVector3 ddgPlane::project(ddgVector3 *p0)
 		p1.set(0,-1*b()/d(),0);
 
 	pp.multiply(-inv_denom * _normal.dot(p0) * inv_denom);
-	pp.add(p1);
+	pp.add(&p1);
     return pp;
 }
 
@@ -54,7 +54,7 @@ float ddgPlane::distToPoint(const ddgVector3 q)
 
 	ddgVector3 pq(q);
 	pq -= p;
-	return pq.dot(_normal)/_normal.size();
+	return pq.dot(&_normal)/_normal.size();
 
 }
 /// Intersect a plane with a line (defined by 2 points) return point of intersection.

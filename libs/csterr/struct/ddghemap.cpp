@@ -155,9 +155,9 @@ bool ddgHeightMap::writeTGN(const char *filename)
 
 		for (i = 0; i < 2 * _rows * _cols; i=i+2)
 		{
-			s = _pixbuffer[i];
-			_pixbuffer[i] = _pixbuffer[i+1];
-			_pixbuffer[i+1] = s;
+			s = ((char*)_pixbuffer)[i];
+			((char*)_pixbuffer)[i] = ((char*)_pixbuffer)[i+1];
+			((char*)_pixbuffer)[i+1] = s;
 		}
 	}
 	int r;
@@ -489,9 +489,9 @@ bool ddgHeightMap::readTGN(const char *filename)
 
 				for (i = 0; i < 2 * _rows * _cols; i=i+2)
 				{
-					s = _pixbuffer[i];
-					_pixbuffer[i] = _pixbuffer[i+1];
-					_pixbuffer[i+1] = s;
+					s = ((char*)_pixbuffer)[i];
+					((char*)_pixbuffer)[i] = ((char*)_pixbuffer)[i+1];
+					((char*)_pixbuffer)[i+1] = s;
 				}
 			}
 			done = true;

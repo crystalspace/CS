@@ -58,7 +58,7 @@ bool ddgStr::_assign( const char * b, int size )
 	
 	if (b)
 	{
-		unsigned int i = len(b);
+		unsigned int i = length(b);
 		if (i != l)
 		{
 			delete[] s;
@@ -100,11 +100,11 @@ float ddgStr::stof(const char *s)
         else
         {
             if (b) b *= 10.0f;
-            r = r*10.0 + (float)(*s - '0');
+            r = r*10.0f + (float)(*s - '0');
         }
         s++;
     }
-    return (neg?-1.0:1.0)*(b ? r/b : r);
+    return (neg?-1.0f:1.0f)*(b ? r/b : r);
 }
 
 int ddgStr::stoi(const char *s)

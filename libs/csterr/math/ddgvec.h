@@ -29,8 +29,6 @@ public:
 	float v[2];
 	/// return the value of the vector as a float array.
 	operator float* () { return v; }
-	/// return a pointer to a vector from a vector.
-	operator ddgVector2* () { return this; }
 	/// Get value of one dimension of the vector.
 	inline float operator[](int n) const             { return v[n]; }
 	/// Returns n-th component of the vector.
@@ -173,8 +171,6 @@ public:
 	float v[3];
 	/// return the value of the vector as a float array.
 	operator float* () { return v; }
-	/// return a pointer to a vector from a vector.
-	operator ddgVector3* () { return this; }
 	/// Get value of one dimension of the vector.
 	inline float operator[](int n) const             { return v[n]; }
 	/// Returns n-th component of the vector.
@@ -362,7 +358,7 @@ public:
 	void normal( const ddgVector3 *p0, const ddgVector3 *p1, const ddgVector3 *p2 )
     {
 		ddgVector3 u( *p0 - *p1 ), v(*p2 - *p1);
-		cross(u,v);
+		cross(&u,&v);
     }
 	// Calculate a nicer normal useful for regular grids.
 	/// Uses all neigbouring points.
@@ -376,7 +372,7 @@ public:
 		r.multiply(-2*r.dot(n));
 		r.multiply(n);
 		r.add(this);
-		set(r);
+		set(&r);
     }
 	/** Refrect a vector w.r.t. a normal and a relative index of refraction.
 	 * eta is the ratio of the index of refraction inthe volume containing the
@@ -395,7 +391,7 @@ public:
 			ddgVector3 t(n);
 			t.multiply(eta*IdotN+sqrtf(k));
 			multiply(eta);
-			subtract(t);
+			subtract(&t);
 		}
 	}
 	/// Adjust this object to minimum values of given vector.
@@ -486,8 +482,6 @@ public:
 	inline float operator[](int n) const             { return v[n]; }
 	/// Returns n-th component of the vector.
 	inline float & operator[] (int n) { return v[n]; }
-	/// return a pointer to a vector from a vector.
-	operator ddgVector4* () { return this; }
 	/// Test for equivalence.
 	bool operator==(ddgVector4& u)
 	{ return v[0] == u[0] && v[1] == u[1] && v[2] == u[2] && v[3] == u[3]; }

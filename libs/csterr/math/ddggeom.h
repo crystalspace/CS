@@ -151,7 +151,7 @@ public:
 	ddgVector2 max;
 	ddgRect(void) {}
 	/// Constructor from 2 points.
-	ddgRect( ddgVector2 p1, ddgVector2 p2)
+	ddgRect( ddgVector2 *p1, ddgVector2 *p2)
 	{
 			min = p1;
 			max = p1;
@@ -170,8 +170,8 @@ public:
 		{
 			i->min = min;
 			i->max = max;
-			i->min.maximum(r->min);
-			i->max.minimum(r->max);
+			i->min.maximum(&(r->min));
+			i->max.minimum(&(r->max));
 		}
 		return true;
 	}
@@ -186,10 +186,11 @@ class WEXP ddgLine2 {
 	ddgVector2	_d;
 public:
 	/// Constructor using 2 points.
-	ddgLine2( ddgVector2 p1, ddgVector2 p2 )
+	ddgLine2( ddgVector2 *p1, ddgVector2 *p2 )
 	{
 		_p.set(p1);
-		_d.set(p2-p1);
+		_d.set(p2);
+		_d -=p1;
 		_d.normalize();
 	}
 	/// Return point vector.
@@ -202,7 +203,7 @@ public:
 		if (_d[dim] == 0.0)
 			return ddgFailure;
 		float t = (v->v[dim] - _p.v[dim])/_d[dim];
-		v = _p + (_d * t);
+		*v = _p + (_d * t);
 		return ddgSuccess;
 	}
 	/// Calculate the intersection point of this line with another.
@@ -252,14 +253,14 @@ public:
 			return ddgFailure;
 		float n = ((*u)[dim] - _p[dim])/_d[dim];
 
-		u->set( _d + ( _p * n));
+		*u =_d + ( _p * n);
 		return ddgSuccess;
 	}
 
 	/// Return the intersection point of this line with another.
 	ddgVector3 intersect( ddgLine3 *)
 	{
-		ddgVector3 p;
+		ddgVector3 p(0,0,0);
 		return p;
 	}
 	/// Calculate the intersection point of this line with another.
