@@ -185,8 +185,8 @@ public:
 
   protected:
     friend class csList<T>;
-    Iterator (csListElement* element) :
-      ptr(element), visited(false), reversed(false)
+    Iterator (csListElement* element, bool visit = true, bool rev = false) :
+      ptr(element), visited(visit), reversed(rev)
     {}
 
   private:
