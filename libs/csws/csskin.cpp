@@ -25,6 +25,7 @@
 #include "csws/csskin.h"
 #include "csws/csbackgr.h"
 #include "csutil/scanstr.h"
+#include "csutil/csstring.h"
 #include "icfgfile.h"
 
 //--//--//--//--//--//--//--//--//--//--//--// The skin repository class -//--//
@@ -74,12 +75,15 @@ const char *csSkin::GetConfigStr (const char *iSection, const char *iKey,
 {
   if (Prefix)
   {
-    char temp [100];
-    strcat (strcat (strcpy (temp, Prefix), "::"), iSection);
-    if (app->Config->KeyExists (temp, iKey))
-      return app->Config->GetStr (temp, iKey, iDefault);
+    csString Keyname;
+    Keyname << "CSWS." << Prefix << '.' << iSection << '.' << iKey;
+    if (app->config->KeyExists (Keyname))
+      return app->config->GetStr (Keyname, iDefault);
   }
-  return app->Config->GetStr (iSection, iKey, iDefault);
+
+  csString Keyname;
+  Keyname << "CSWS." << iSection << '.' << iKey;
+  return app->config->GetStr (Keyname, iDefault);
 }
 
 bool csSkin::GetConfigYesNo (const char *iSection, const char *iKey,
@@ -87,12 +91,15 @@ bool csSkin::GetConfigYesNo (const char *iSection, const char *iKey,
 {
   if (Prefix)
   {
-    char temp [100];
-    strcat (strcat (strcpy (temp, Prefix), "::"), iSection);
-    if (app->Config->KeyExists (temp, iKey))
-      return app->Config->GetYesNo (temp, iKey, iDefault);
+    csString Keyname;
+    Keyname << "CSWS." << Prefix << '.' << iSection << '.' << iKey;
+    if (app->config->KeyExists (Keyname))
+      return app->config->GetBool (Keyname, iDefault);
   }
-  return app->Config->GetYesNo (iSection, iKey, iDefault);
+
+  csString Keyname;
+  Keyname << "CSWS." << iSection << '.' << iKey;
+  return app->config->GetBool (Keyname, iDefault);
 }
 
 bool csSkin::ReadGradient (const char *iText, csRGBcolor *color, int iNum)

@@ -29,11 +29,11 @@
 #include "csgfxppl.h"
 #include "cssys/cseventq.h"
 #include "csutil/csstrvec.h"
+#include "csutil/cfgacc.h"
 #include "iplugin.h"
 #include "ievent.h"
 
 class csSkin;
-struct iConfigFile;
 
 /**
  * Application's background styles
@@ -112,8 +112,8 @@ public:
   iSystem *System;
   /// The virtual file system
   iVFS *VFS;
-  /// The Windowing System configuration file
-  iConfigFile *Config;
+  /// The system configuration
+  csConfigAccess config;
   /// The font server
   iFontServer *FontServer;
   /// Application's adaptive palette
@@ -143,7 +143,7 @@ public:
   virtual ~csApp ();
 
   /// Set up application layout (read configs, create windows, menus etc)
-  virtual bool Initialize (const char *iConfigName);
+  virtual bool Initialize ();
 
   /// Set the skin of the application
   void SetSkin (csSkin *Skin, bool DeleteOld = true);

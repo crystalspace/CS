@@ -24,6 +24,7 @@
 #include "csws/cslistbx.h"
 #include "csws/cswsaux.h"
 #include "csutil/scanstr.h"
+#include "csutil/csstring.h"
 #include "isystem.h"
 #include "icfgfile.h"
 
@@ -249,23 +250,30 @@ void RectUnion (csObjVector &rect, csRect &result)
 void ParseConfigBitmap (csApp *app, const char *prefix, const char *section,
   const char *id, int &x, int &y, int &w, int &h)
 {
-  char sec [50];
-  if (prefix)
-    strcat (strcpy (sec, prefix), "::");
+  const char *butdef = NULL;
 
-  const char *butdef = prefix ? app->Config->GetStr (sec, id, NULL) : NULL;
-  if (!butdef)
-    butdef = app->Config->GetStr (section, id, NULL);
+  if (prefix) {
+    csString Keyname;
+    Keyname << "CSWS." << prefix << '.' << section << '.' << id;
+    butdef = app->config->GetStr (Keyname, NULL);
+  }
+
+  if (!butdef) {
+    csString Keyname;
+    Keyname << "CSWS." << section << '.' << id;
+    butdef = app->config->GetStr (Keyname, NULL);
+  }
+
   if (!butdef)
   {
-    app->printf (MSG_FATAL_ERROR, "Cannot find bitmap definition %s:%s\n",
+    app->printf (MSG_FATAL_ERROR, "Cannot find bitmap definition %s.%s\n",
       section, id);
     fatal_exit (0, false);
   }
 
   if (ScanStr (butdef, "%d,%d,%d,%d", &x, &y, &w, &h) != 4)
   {
-    app->printf (MSG_FATAL_ERROR, "%s(%s): parse error in string: %s\n",
+    app->printf (MSG_FATAL_ERROR, "%s.%s): parse error in string: %s\n",
       section, id, butdef);
     fatal_exit (0, false);
   }

@@ -127,8 +127,6 @@ csApp::~csApp ()
 
   if (VFS)
     VFS->DecRef ();
-  if (Config)
-    Config->DecRef ();
   if (DefaultFont)
     DefaultFont->DecRef ();
   if (FontServer)
@@ -145,7 +143,7 @@ csApp::~csApp ()
   delete Mouse;
 }
 
-bool csApp::Initialize (const char *iConfigName)
+bool csApp::Initialize ()
 {
   if (!System->RegisterPlugIn ("crystalspace.windowing.system", "CSWS", scfiPlugIn))
     return false;
@@ -160,12 +158,7 @@ bool csApp::Initialize (const char *iConfigName)
   WindowListWidth = ScreenWidth / 3;
   WindowListHeight = ScreenWidth / 6;
 
-  Config = System->CreateINIConfig (iConfigName);
-  if (!Config)
-  {
-    printf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", iConfigName);
-    fatal_exit (0, true);			// cfg file not found
-  }
+  config.AddConfig(System, "/config/csws.cfg");
 
   FontServer = QUERY_PLUGIN_ID (System, CS_FUNCID_FONTSERVER, iFontServer);
   DefaultFont = FontServer->LoadFont (CSFONT_COURIER);
@@ -197,11 +190,12 @@ void csApp::InitializeSkin ()
     return;
 
   // Load all textures
-  char secname [50];
+  csString SectionName;
+  csString DefaultSection;
+
   if (skin->Prefix)
-    strcat (strcpy (secname, skin->Prefix), "::Textures");
-  else
-    secname [0] = 0;
+    SectionName << "CSWS." << skin->Prefix << ".Textures.";
+  DefaultSection << "CSWS.Textures.";
 
   int i;
   bool modified = false;
@@ -218,15 +212,21 @@ void csApp::InitializeSkin ()
       const char *fn1 = t->GetFileName ();
       if (fn1)
       {
-        if (secname [0])
+        if (skin->Prefix)
         {
-          const char *fn2 = Config->GetStr (secname, tn, NULL);
+          csString Keyname;
+          Keyname << SectionName << tn;
+
+          const char *fn2 = config->GetStr (Keyname, NULL);
           if (fn2 && !strcmp (fn1, fn2))
             unload = false;
         }
         if (unload)
         {
-          const char *fn2 = Config->GetStr ("Textures", tn, NULL);
+          csString Keyname;
+          Keyname << DefaultSection << tn;
+
+          const char *fn2 = config->GetStr (Keyname, NULL);
           if (fn2 && !strcmp (fn1, fn2))
             unload = false;
         }
@@ -239,38 +239,47 @@ void csApp::InitializeSkin ()
     }
   }
 
+  iConfigIterator *di;
+
   // Now load all textures from the skin-specific section
-  iConfigDataIterator *di = secname [0] ? Config->EnumData (secname) : NULL;
-  if (di)
-  {
+  if (skin->Prefix) {
+    di = config->Enumerate (SectionName);
     while (di->Next ())
-      modified |= LoadTexture (di->GetKey (), (char *)di->GetData (), CS_TEXTURE_2D);
-    di->DecRef ();
-  }
-  // And now load the textures from the common-for-all-skins section
-  di = Config->EnumData ("Textures");
-  if (di)
-  {
-    while (di->Next ())
-      modified |= LoadTexture (di->GetKey (), (char *)di->GetData (), CS_TEXTURE_2D);
+      modified |= LoadTexture (di->GetKey (true), di->GetStr (), CS_TEXTURE_2D);
     di->DecRef ();
   }
 
+  // And now load the textures from the common-for-all-skins section
+  di = config->Enumerate (DefaultSection);
+  while (di->Next ())
+    modified |= LoadTexture (di->GetKey (true), di->GetStr (), CS_TEXTURE_2D);
+  di->DecRef ();
+
   // Load definitions for all mouse cursors
-  if (skin->Prefix)
-    strcat (strcpy (secname, skin->Prefix), "::MouseCursor");
-  else
-    secname [0] = 0;
-  di = Config->EnumData (secname);
-  if (!di)
-    di = Config->EnumData ("MouseCursor");
-  if (di)
-  {
-    Mouse->ClearPointers ();
-    while (di->Next ())
-      Mouse->NewPointer (di->GetKey (), (char *)di->GetData ());
-    di->DecRef ();
+  // @@@ If the skin-specific mouse section exists, this does not load
+  // mouse cursors that appear in the default section but not in the
+  // skin-specific section. Is this correct behaviour?
+  // (I simply copied the old behaviour when moving to the new config
+  // system) -- mgeisse
+
+  SectionName.Clear();
+  SectionName << "CSWS." << skin->Prefix << ".MouseCursor.";
+  DefaultSection.Clear();
+  DefaultSection << "CSWS.MouseCursor.";
+
+  di = config->Enumerate(SectionName);
+  // look if there are keys in this section
+  if (di->Next()) {
+    di->Rewind();
+  } else {
+    di->DecRef();
+    di = config->Enumerate(DefaultSection);
   }
+
+  Mouse->ClearPointers ();
+  while (di->Next ())
+    Mouse->NewPointer (di->GetKey (true), di->GetStr ());
+  di->DecRef ();
 
   // Compute and set the work palette (instead of console palette)
   if (modified)

@@ -43,7 +43,7 @@ public:
   ///
   virtual bool HandleEvent (iEvent &Event);
 
-  virtual bool Initialize (const char *iConfigName);
+  virtual bool Initialize ();
 
   iFont *LucidiaFont;
 };
@@ -164,9 +164,9 @@ csWsTest::~csWsTest ()
     LucidiaFont->DecRef ();
 }
 
-bool csWsTest::Initialize (const char *iConfigName)
+bool csWsTest::Initialize ()
 {
-  if (!csApp::Initialize (iConfigName))
+  if (!csApp::Initialize ())
     return false;
 
   LucidiaFont = LoadFont ("/fonts/LucidiaTypewriterRegular.ttf");
@@ -982,7 +982,7 @@ int main (int argc, char* argv[])
   // Create our application object
   csWsTest app (&System, DefaultSkin);
 
-  if (app.Initialize ("/lib/csws/csws.cfg"))
+  if (app.Initialize ())
     System.Loop ();
 
   return 0;
