@@ -116,18 +116,7 @@ public:
   	dContactGeom *contact, int skip);
   static int CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   	dContactGeom *contact, int skip);
-  static dColliderFn* CollideSelector (int num)
-  {
-    if (num == geomclassnum)
-      return &CollideMeshMesh;
-    if (num == dBoxClass)
-      return &CollideMeshBox;
-    if (num == dCCylinderClass)
-      return &CollideMeshCylinder;
-    if (num == dSphereClass)
-      return &CollideMeshSphere;
-    return NULL;
-  }
+  static dColliderFn* CollideSelector (int num);
   static void GetAABB (dGeomID g, dReal aabb[6]);
 
   struct Component : public iComponent

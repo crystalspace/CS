@@ -16,7 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
 #include "cssysdef.h"
 #include "cstool/collider.h"
 #include "iutil/objreg.h"
@@ -29,7 +28,6 @@
 #include "qsqrt.h"
 
 #include "odedynam.h"
-
 
 CS_IMPLEMENT_PLUGIN
 
@@ -87,6 +85,10 @@ csODEDynamics::csODEDynamics (iBase* parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   object_reg = NULL;
 
+  // Initialize the colliders so that the class isn't overwritten
+  dGeomID id = dCreateSphere (0, 1);
+  dGeomDestroy (id);
+
   dGeomClass c;
   c.bytes = sizeof (iMeshWrapper *);
   c.collider = &CollideSelector;
@@ -137,6 +139,15 @@ void csODEDynamics::Step (float stepsize)
 
 void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
 {
+  if (dGeomIsSpace(o1) || dGeomIsSpace (o2)) {
+    dSpaceCollide2 (o1, o2, data, &csODEDynamics::NearCallback);
+	if (dGeomIsSpace(o1)) 
+	  dSpaceCollide ((dxSpace*)o1, data, &csODEDynamics::NearCallback);
+	if (dGeomIsSpace(o2)) 
+	  dSpaceCollide ((dxSpace*)o2, data, &csODEDynamics::NearCallback);
+    return;
+  }
+
   csODERigidBody *b1 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o1));
   csODERigidBody *b2 = (csODERigidBody *)dBodyGetData (dGeomGetBody(o2));
 
@@ -169,7 +180,6 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
       dJointAttach (c, dGeomGetBody(o1), dGeomGetBody(o2));
     }
   }
-  return;
 }
 
 csReversibleTransform GetGeomTransform (dGeomID id)
@@ -265,7 +275,9 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
   dGeomBoxGetLengths (box, sides);
   // box is symetric.
   csVector3 aabb(sides[0]/2, sides[1]/2, sides[2]/2);
-  csBox3 boxbox(aabb, -aabb);
+  csBox3 boxbox;
+  boxbox.AddBoundingVertex (aabb);
+  boxbox.AddBoundingVertex (-aabb);
   csReversibleTransform boxt = GetGeomTransform (box);
 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
@@ -287,10 +299,12 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
     }
     // aabb poly against aabb box for overlap.
     // Full collision later will weed out the rest;
+
     if (polybox.Overlap (boxbox)) {
       polycollide.Push (polygon_list[i]);
     }
   }
+
   int outcount = 0;
   // the value of N should be large, just in case.
   for (i = 0; i < polycollide.Length() && outcount < N; i ++) {
@@ -313,8 +327,8 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
       // make sure the point lies inside the polygon
       int vcount = polycollide[i].num_vertices;
       for (k = 0; k < vcount-1; k ++) {
-    int ind1 = polycollide[i].vertices[k];
-    int ind2 = polycollide[i].vertices[k+1];
+        int ind1 = polycollide[i].vertices[k];
+        int ind2 = polycollide[i].vertices[k+1];
         csVector3 v1 = vertex_table[ind1] / mesht;
         csVector3 v2 = vertex_table[ind2] / mesht;
         csPlane3 edgeplane(v1, v2, v2 - plane.Normal());
@@ -339,9 +353,9 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
         out->pos[0] = c->pos[0];
         out->pos[1] = c->pos[1];
         out->pos[2] = c->pos[2];
-        out->normal[0] = c->normal[0];
-        out->normal[1] = c->normal[1];
-        out->normal[2] = c->normal[2];
+        out->normal[0] = -c->normal[0];
+        out->normal[1] = -c->normal[1];
+        out->normal[2] = -c->normal[2];
         out->depth = c->depth;
         out->g1 = mesh;
         out->g2 = box;
@@ -372,7 +386,9 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
   dGeomCCylinderGetParams (cyl, &length, &radius);
   // box is symetric.
   csVector3 aabb(radius, radius, length/2);
-  csBox3 cylbox(aabb, -aabb);
+  csBox3 cylbox;
+  cylbox.AddBoundingVertex (aabb);
+  cylbox.AddBoundingVertex (-aabb);
   csReversibleTransform cylt = GetGeomTransform (cyl);
 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
@@ -446,9 +462,9 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
         out->pos[0] = c->pos[0];
         out->pos[1] = c->pos[1];
         out->pos[2] = c->pos[2];
-        out->normal[0] = c->normal[0];
-        out->normal[1] = c->normal[1];
-        out->normal[2] = c->normal[2];
+        out->normal[0] = -c->normal[0];
+        out->normal[1] = -c->normal[1];
+        out->normal[2] = -c->normal[2];
         out->depth = c->depth;
         out->g1 = mesh;
         out->g2 = cyl;
@@ -575,6 +591,15 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
     outcount ++;
   }
   return outcount;
+}
+
+dColliderFn* csODEDynamics::CollideSelector (int num)
+{
+  if (num == geomclassnum) return (dColliderFn *)&CollideMeshMesh;
+  if (num == dBoxClass) return (dColliderFn *)&CollideMeshBox;
+  if (num == dCCylinderClass) return (dColliderFn *)&CollideMeshCylinder;
+  if (num == dSphereClass) return (dColliderFn *)&CollideMeshSphere;
+  return NULL;
 }
 
 void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
