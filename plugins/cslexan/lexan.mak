@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------
 # Lexical Analyzer plugin submakefile
 #------------------------------------------------------------------------------
-DESCRIPTION.cslexan = Crystal Space lexical analyzer plug-in
+DESCRIPTION.cslexan = Crystal Space lexical analyzer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -18,7 +18,7 @@ all plugins: cslexan
 
 cslexan:
 	$(MAKE_TARGET) MAKE_DLL=yes
-lexanclean:
+cslexanclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -52,7 +52,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: cslexan cslexanclean
-cslexan: $(OUTDIRS) $(LEXAN)
+cslexan: $(OUTDIRS) $(CSLEXAN)
 
 $(CSLEXAN): $(OBJ.CSLEXAN) $(LIB.CSLEXAN)
 	$(DO.PLUGIN)
@@ -62,11 +62,11 @@ cslexanclean:
 	-$(RM) $(CSLEXAN) $(OBJ.CSLEXAN)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/lexan.dep
-$(OUTOS)/lexan.dep: $(SRC.CSLEXAN)
+dep: $(OUTOS)/cslexan.dep
+$(OUTOS)/cslexan.dep: $(SRC.CSLEXAN)
 	$(DO.DEP)
 else
--include $(OUTOS)/lexan.dep
+-include $(OUTOS)/cslexan.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
