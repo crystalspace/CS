@@ -102,16 +102,29 @@ private:
   static bool (csBaseEventHandler::*pmfnTriggers[
   	_CSBASEEVENT_MAXARRAYINDEX+1])(iEvent &event);
 
-private:
+protected:
   /**
-   * Implementation of the event handling mechanism.
+   * Implementation of the event handling mechanism. This low-level method
+   * examines the event dispatches it to the appropriate OnFoo() or FooFrame()
+   * method.
    * \remarks
-   * You should not override this function. It is declared private to prevent
-   * a developer from doing so.
+   * You should almost never need to override this function. Doing so breaks
+   * the message-oriented nature of this utility class. In almost all cases,
+   * should should simply override the various OnFoo() and FooFrame() methods
+   * which are applicable to your situation. Typically, the only valid reason
+   * to override this method is when you need to optionally delegate the event
+   * handling to some foreign mechanism. (For instance, iAWS::HandleEvent()
+   * expects to be handed the event under all circumstances, regardless of the
+   * event's type.) If you do override this method in order to optionally
+   * delegate event handling to some other entity, then you must remember to
+   * invoke csBaseEventHandler::HandleEvent() if the other entity did not
+   * handle the event. (Given the AWS example, this means that if
+   * iAWS::HandleEvent() returns false, the event should be passed along to
+   * csBaseEventHandler::HandleEvent() so that csBaseEventHandler can dispatch
+   * it to the appropriate OnFoo() or FooFrame() method as usual.)
    */
   virtual bool HandleEvent (iEvent &event);
 
-protected:
   /**
    * Invoked by the event handler when a broadcast event is received.
    * \remarks
@@ -137,7 +150,8 @@ protected:
   virtual bool OnJoystickMove (iEvent &event);
 
   /**
-   * Invoked by the event handler when a joystick button down event is received.
+   * Invoked by the event handler when a joystick button down event is
+   * received.
    */
   virtual bool OnJoystickDown (iEvent &event);
 

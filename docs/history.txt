@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+1-Aug-2004
+	- Eric Sunshine made csBaseEventHandler::HandleEvent() protected rather
+	  than private. This makes it possible for subclasses to deal with
+	  special cases without having to jump through excessively ugly
+	  hoops. For example, a client employing AWS will need to invoke
+	  iAWS::HandleEvent() in order to give AWS first crack at the event. If
+	  iAWS::HandleEvent() returns false (that is, did not handle the
+	  event), then the event should be passed along to
+	  csBaseEventHandler::HandleEvent() for dispatch as usual. Added an
+	  explicit warning against overriding csBaseEventHandler::HandleEvent()
+	  except for special cases, such as this.
 28-Jul-2004
 	- Eric Sunshine fixed bug in CS_CHECK_PROG_VERSION() (progver.m4) where
 	  it would become confused and crash if the version output of a program
