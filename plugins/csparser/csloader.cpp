@@ -32,7 +32,7 @@
 #include "cstool/crossbld.h"
 #include "cstool/sndwrap.h"
 #include "csgfx/csimage.h"
-#include "csparser/csloader.h"
+#include "csloader.h"
 
 #include "iutil/databuff.h"
 #include "imap/reader.h"
@@ -1870,7 +1870,7 @@ SCF_IMPLEMENT_IBASE_END;
 
 SCF_IMPLEMENT_FACTORY(csLoader);
 
-SCF_EXPORT_CLASS_TABLE (lvlload)
+SCF_EXPORT_CLASS_TABLE (csparser)
   SCF_EXPORT_CLASS_DEP (csLoader, "crystalspace.level.loader",
     "Level and library file loader", "crystalspace.kernel., "
     "crystalspace.sound.loader., crystalspace.image.loader, "
@@ -1878,6 +1878,8 @@ SCF_EXPORT_CLASS_TABLE (lvlload)
     "crystalspace.engine.3d, crystalspace.graphics3d., "
     "crystalspace.sound.render., crystalspace.motion.manager.")
 SCF_EXPORT_CLASS_TABLE_END
+
+CS_IMPLEMENT_PLUGIN
 
 csLoader::csLoader(iBase *p)
 {

@@ -49,6 +49,7 @@
 #include "ivideo/texture.h"
 #include "iengine/texture.h"
 #include "iengine/engine.h"
+#include "imap/parser.h"
 #endif
 
 // CS Geom
@@ -77,7 +78,6 @@
 
 // CS Parser
 #ifndef NO_CSPARSER
-#include "csparser/csloader.h"
 #endif
 
 #endif // BRANDON_NOTHING

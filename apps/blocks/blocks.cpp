@@ -116,7 +116,6 @@ Blocks* Sys = NULL;
 //------------------------------------------------- We need the 3D engine -----
 
 SCF_REGISTER_STATIC_LIBRARY (engine)
-SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 int Blocks::white, Blocks::black, Blocks::red;
 

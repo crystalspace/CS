@@ -45,7 +45,6 @@
 CS_IMPLEMENT_APPLICATION
 
 SCF_REGISTER_STATIC_LIBRARY (engine)
-SCF_REGISTER_STATIC_LIBRARY (lvlload)
 
 //-----------------------------------------------------------------------------
 
