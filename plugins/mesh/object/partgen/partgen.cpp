@@ -220,12 +220,13 @@ bool csParticleSystem::DrawTest (iRenderView*, iMovable*)
   return true;
 }
 
-bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable)
+bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable,
+	csZBufMode mode)
 {
   if (vis_cb) vis_cb (this, rview, vis_cbData);
   csReversibleTransform trans = movable->GetFullTransform ();
   for (int i = 0 ; i < particles.Length() ; i++)
-    GetParticle (i)->Draw (rview, trans);
+    GetParticle (i)->Draw (rview, trans, mode);
   return true;
 }
 

@@ -28,6 +28,7 @@
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
 #include "csengine/camera.h"
+#include "csengine/meshobj.h"
 #include "csengine/portal.h"
 #include "csengine/dumper.h"
 #include "csengine/lppool.h"

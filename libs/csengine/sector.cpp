@@ -337,7 +337,7 @@ void csSector::UseStaticTree (int mode, bool octree)
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* th = (csThing*)things[i];
-    if (th->flags.Check (CS_ENTITY_VISTREE))
+    if (th->flags.Check (CS_THING_VISTREE))
     {
       static_thing = th;
       static_thing->BuildStaticTree (mode, octree);
@@ -347,11 +347,17 @@ void csSector::UseStaticTree (int mode, bool octree)
     }
   }
 
-  // Loop through all things and update their bounding box in the
+  // Loop through all things and meshes and update their bounding box in the
   // polygon trees.
+  // @@@ Unify when csThing becomes a mesh object.
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* th = (csThing*)things[i];
+    th->GetMovable ().UpdateMove ();
+  }
+  for (i = 0 ; i < meshes.Length () ; i++)
+  {
+    csMeshWrapper* th = (csMeshWrapper*)meshes[i];
     th->GetMovable ().UpdateMove ();
   }
   

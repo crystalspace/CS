@@ -388,7 +388,7 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 //---------------------------------------------------------------------------
 
 void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
-  csPolyPlane* plane, bool use_z_buf)
+  csPolyPlane* plane, csZBufMode zbufMode)
 {
   int i;
   bool debug = false;
@@ -396,7 +396,7 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
   bool mirror = icam->IsMirrored ();
 
   rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
-    use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
+  	zbufMode);
 
   if (poly->GetTextureType () != POLYTXT_LIGHTMAP)
   {

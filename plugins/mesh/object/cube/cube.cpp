@@ -299,7 +299,8 @@ void csCubeMeshObject::UpdateLighting (iLight** lights, int num_lights,
     colors[i].Clamp (2., 2., 2.);
 }
 
-bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
+bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
+	csZBufMode mode)
 {
 // @@@ TODO:
 //     - Z fill vs Z use
@@ -320,7 +321,7 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
   iGraphics3D* g3d = rview->GetGraphics3D ();
 
   // Prepare for rendering.
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
   factory->GetMaterialWrapper ()->Visit ();
   mesh.mat_handle[0] = mat;

@@ -95,7 +95,7 @@ public:
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
-  virtual bool Draw (iRenderView* rview, iMovable* movable);
+  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (csMeshCallback* cb, void* cbData)
   {
     vis_cb = cb;
@@ -157,7 +157,8 @@ public:
       scfParent->MixMode = mode;
     }
     virtual void Rotate (float angle);
-    virtual void Draw (iRenderView* rview, const csReversibleTransform& transform);
+    virtual void Draw (iRenderView* rview,
+    	const csReversibleTransform& transform, csZBufMode mode);
     virtual void UpdateLighting (iLight** lights, int num_lights,
 	const csReversibleTransform& transform);
   } scfiParticle;

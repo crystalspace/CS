@@ -1,11 +1,37 @@
 The history order has been reversed so that new features are at the top.
 
 2-Apr-2001
+	- Michael Voase did the following:
+	    - Added iBase parameter to iLoaderPlugIn::Parse() command.
+	    - Added factory passing between LoadMeshObjectFactory()
+  	      in csloader and spr3dldr.
+	    - Corrects bug with sprite frames and smoothing.
 	- Renamed csSector::GetVisibleThings() to GetVisibleObjects() and
 	  let it return a list of general objects instead of only things.
 	- Added csMeshWrapper::GetWorldBoundingBox() to calculate the bounding
 	  box of a mesh object in world space. This function will also cache
 	  the bounding box.
+	- Renamed CS_ENTITY_VISTREE to CS_THING_VISTREE. Moved all remaining
+	  CS_ENTITY_... flags from thing.h to meshobj.h. They will now be
+	  global to both things and mesh objects (useful when things are later
+	  merged with mesh objects).
+	- csLoader will now also recognize the flags: NOLIGHTING, NOSHADOWS,
+	  BACK2FRONT, INVISIBLE, DETAIL, CAMERA, and CONVEX for mesh
+	  objects. They are currently ignored.
+	- Implemented INVISIBLE and CAMERA flags for mesh objects.
+	- Extended iMeshObject::Draw() with an extra zbuf mode parameter
+	  to control what Z-buffer drawing mode to use (NONE, FILL, USE,
+	  or TEST). USE is default.
+	- Extended all mesh plugins to implement this mode.
+	- Added zbufMode flag to csMeshWrapper and two functions to access
+	  it (SetZBufMode() and GetZBufMode()). The mesh object will be drawn
+	  with this mode.
+	- Also added zbufMode and same functions to csThing. This means that
+	  you can now let things be drawn using mode NONE and TEST as well
+	  (this was not possible in the past).
+	- Extended iParticle with a zbufMode parameter as well.
+	- Extended the loader to recognize the keywords ZNONE, ZUSE, and
+	  ZTEST in addition to ZFILL for both things and mesh objects.
 	- Added 'imgload' to the 'make walkall' target.
 	- Added nine new console commands to walktest to demonstrate the new
 	  full screen effects. The commands are: fs_inter, fs_red, fs_green,

@@ -26,7 +26,7 @@ class csReversibleTransform;
 struct iRenderView;
 struct iLight;
 
-SCF_VERSION (iParticle, 0, 0, 3);
+SCF_VERSION (iParticle, 0, 0, 4);
 
 /**
  * A iParticle can be used in particle Systems.
@@ -62,7 +62,8 @@ struct iParticle : public iBase
    * parent particle system. The position of this particle should be
    * relative to that transform.
    */
-  virtual void Draw (iRenderView* rview, const csReversibleTransform& transform) = 0;
+  virtual void Draw (iRenderView* rview, const csReversibleTransform& transform,
+  	csZBufMode zbufMode) = 0;
   /**
    * Light this particle.
    * The given transform is the transform of the parent particle system.

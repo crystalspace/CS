@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "csgeom/box.h"
 #include "isys/plugin.h"
+#include "ivideo/graph3d.h"
 
 struct iMeshObject;
 struct iMeshObjectFactory;
@@ -54,7 +55,7 @@ class csReversibleTransform;
 typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshObject, 0, 0, 13);
+SCF_VERSION (iMeshObject, 0, 0, 14);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -88,7 +89,8 @@ struct iMeshObject : public iBase
    * object was probably visible. DrawTest() will be called before
    * this function (possibly with an UpdateLighting() in between.
    */
-  virtual bool Draw (iRenderView* rview, iMovable* movable) = 0;
+  virtual bool Draw (iRenderView* rview, iMovable* movable,
+  	csZBufMode zbufMode) = 0;
 
   /**
    * Register a callback to the mesh object which will be called

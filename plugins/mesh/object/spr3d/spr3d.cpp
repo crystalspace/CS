@@ -927,8 +927,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // @@@ This should only be done when aspect changes...
   g3d->SetPerspectiveAspect (fov);
 
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
-
   bool do_tween = false;
   if (!skeleton_state && tween_ratio) do_tween = true;
 
@@ -1091,12 +1089,14 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
-bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
+bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
+	csZBufMode mode)
 {
   //@@@if (rview.callback)
     //rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);
   //else
   iGraphics3D* g3d = rview->GetGraphics3D ();
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
   g3d->DrawTriangleMesh (g3dmesh);
   //else
   // @@@ Provide functionality for visible edges here...

@@ -246,6 +246,9 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (WARP)
   CS_TOKEN_DEF (WORLD)
   CS_TOKEN_DEF (ZFILL)
+  CS_TOKEN_DEF (ZNONE)
+  CS_TOKEN_DEF (ZUSE)
+  CS_TOKEN_DEF (ZTEST)
 CS_TOKEN_DEF_END
 
 //---------------------------------------------------------------------------
@@ -916,6 +919,9 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (CAMERA)
     CS_TOKEN_TABLE (ZFILL)
+    CS_TOKEN_TABLE (ZNONE)
+    CS_TOKEN_TABLE (ZUSE)
+    CS_TOKEN_TABLE (ZTEST)
     CS_TOKEN_TABLE (INVISIBLE)
     CS_TOKEN_TABLE (BACK2FRONT)
     CS_TOKEN_TABLE (VISTREE)
@@ -959,7 +965,7 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
 	  CsPrintf (MSG_FATAL_ERROR, "VISTREE flag only for top-level thing!\n");
 	  fatal_exit (0, false);
 	}
-        else thing->flags.Set (CS_ENTITY_VISTREE);
+        else thing->flags.Set (CS_THING_VISTREE);
         break;
       case CS_TOKEN_NOSHADOWS:
         if (!isParent)
@@ -1007,7 +1013,31 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
 	  CsPrintf (MSG_FATAL_ERROR, "ZFILL flag only for top-level thing!\n");
 	  fatal_exit (0, false);
 	}
-        else thing->flags.Set (CS_ENTITY_ZFILL);
+        else thing->SetZBufMode (CS_ZBUF_FILL);
+        break;
+      case CS_TOKEN_ZUSE:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "ZUSE flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->SetZBufMode (CS_ZBUF_USE);
+        break;
+      case CS_TOKEN_ZNONE:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "ZNONE flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->SetZBufMode (CS_ZBUF_NONE);
+        break;
+      case CS_TOKEN_ZTEST:
+        if (!isParent)
+	{
+	  CsPrintf (MSG_FATAL_ERROR, "ZTEST flag only for top-level thing!\n");
+	  fatal_exit (0, false);
+	}
+        else thing->SetZBufMode (CS_ZBUF_TEST);
         break;
       case CS_TOKEN_CAMERA:
         if (!isParent)
@@ -3276,6 +3306,17 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
     CS_TOKEN_TABLE (MOVE)
     CS_TOKEN_TABLE (PLUGIN)
     CS_TOKEN_TABLE (PARAMS)
+    CS_TOKEN_TABLE (NOLIGHTING)
+    CS_TOKEN_TABLE (NOSHADOWS)
+    CS_TOKEN_TABLE (BACK2FRONT)
+    CS_TOKEN_TABLE (INVISIBLE)
+    CS_TOKEN_TABLE (DETAIL)
+    CS_TOKEN_TABLE (ZFILL)
+    CS_TOKEN_TABLE (ZNONE)
+    CS_TOKEN_TABLE (ZUSE)
+    CS_TOKEN_TABLE (ZTEST)
+    CS_TOKEN_TABLE (CAMERA)
+    CS_TOKEN_TABLE (CONVEX)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tok_matvec)
@@ -3301,6 +3342,39 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
     }
     switch (cmd)
     {
+      case CS_TOKEN_NOLIGHTING:
+        mesh->flags.Set (CS_ENTITY_NOLIGHTING);
+        break;
+      case CS_TOKEN_NOSHADOWS:
+        mesh->flags.Set (CS_ENTITY_NOSHADOWS);
+        break;
+      case CS_TOKEN_BACK2FRONT:
+        mesh->flags.Set (CS_ENTITY_BACK2FRONT);
+        break;
+      case CS_TOKEN_INVISIBLE:
+        mesh->flags.Set (CS_ENTITY_INVISIBLE);
+        break;
+      case CS_TOKEN_DETAIL:
+        mesh->flags.Set (CS_ENTITY_DETAIL);
+        break;
+      case CS_TOKEN_ZFILL:
+        mesh->SetZBufMode (CS_ZBUF_FILL);
+        break;
+      case CS_TOKEN_ZUSE:
+        mesh->SetZBufMode (CS_ZBUF_USE);
+        break;
+      case CS_TOKEN_ZNONE:
+        mesh->SetZBufMode (CS_ZBUF_NONE);
+        break;
+      case CS_TOKEN_ZTEST:
+        mesh->SetZBufMode (CS_ZBUF_TEST);
+        break;
+      case CS_TOKEN_CAMERA:
+        mesh->flags.Set (CS_ENTITY_CAMERA);
+        break;
+      case CS_TOKEN_CONVEX:
+        mesh->flags.Set (CS_ENTITY_CONVEX);
+        break;
       case CS_TOKEN_KEY:
         load_key (params, mesh);
         break;

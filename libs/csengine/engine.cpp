@@ -1975,7 +1975,8 @@ csThing* csEngine::CreateSectorWalls (csSector* sector, const char *iName)
 {
   csThing* thing = new csThing (this);
   thing->SetName (iName);
-  thing->flags.Set (CS_ENTITY_ZFILL|CS_ENTITY_CONVEX);
+  thing->flags.Set (CS_ENTITY_CONVEX);
+  thing->SetZBufMode (CS_ZBUF_FILL);
   thing->GetMovable ().SetSector (sector);
   thing->GetMovable ().UpdateMove ();
   return thing;

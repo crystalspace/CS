@@ -252,7 +252,8 @@ static void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 #undef INTERPOLATE
 #undef INTERPOLATE1
 
-bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
+bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
+	csZBufMode mode)
 {
 // @@@ TODO:
 //     - Z fill vs Z use
@@ -274,7 +275,7 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/)
   iCamera* camera = rview->GetCamera ();
 
   // Prepare for rendering.
-  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
   material->Visit ();
 
@@ -368,7 +369,7 @@ void csSprite2DMeshObject::Particle::UpdateLighting (iLight** lights,
 }
 
 void csSprite2DMeshObject::Particle::Draw (iRenderView* rview,
-    const csReversibleTransform& transform)
+    const csReversibleTransform& transform, csZBufMode mode)
 {
   scfParent->SetupObject ();
 
@@ -376,7 +377,7 @@ void csSprite2DMeshObject::Particle::Draw (iRenderView* rview,
   csVector3 new_pos = transform.This2Other (part_pos);
   scfParent->cam = rview->GetCamera ()->GetTransform ().Other2This (new_pos);
   if (scfParent->cam.z < SMALL_Z) return;
-  scfParent->Draw (rview, NULL);
+  scfParent->Draw (rview, NULL, mode);
 }
 
 void csSprite2DMeshObject::Particle::SetColor (const csColor& col)

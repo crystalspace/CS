@@ -77,74 +77,11 @@ struct csThingBBox
 };
 
 /**
- * If CS_ENTITY_CONVEX is set then this entity is convex (what did
- * you expect :-)
- * This means the 3D engine can do various optimizations.
- * If you set 'convex' to true the center vertex will also be calculated.
- * It is unset by default (@@@ should be calculated).
- */
-#define CS_ENTITY_CONVEX 1
-
-/**
- * If CS_ENTITY_DETAIL is set then this entity is a detail
- * object. A detail object is treated as a single object by
- * the engine. The engine can do several optimizations on this.
- * In general you should use this flag for small and detailed
- * objects. Detail objects are not included in BSP or octrees.
- */
-#define CS_ENTITY_DETAIL 2
-
-/**
- * If CS_ENTITY_CAMERA is set then this entity will be always
- * be centerer around the same spot relative to the camera. This
- * is useful for skyboxes or skydomes.
- */
-#define CS_ENTITY_CAMERA 4
-
-/**
- * If CS_ENTITY_ZFILL is set then this thing will be rendered with
- * ZFILL instead of fully using the Z-buffer. This is useful for
- * things that make the outer walls of a sector.
- */
-#define CS_ENTITY_ZFILL 8
-
-/**
- * If CS_ENTITY_INVISIBLE is set then this thing will not be rendered.
- * It will still cast shadows and be present otherwise. Use the
- * CS_ENTITY_NOSHADOWS flag to disable shadows.
- */
-#define CS_ENTITY_INVISIBLE 16
-
-/**
- * If CS_ENTITY_NOSHADOWS is set then this thing will not cast
- * shadows. Lighting will still be calculated for it though. Use the
- * CS_ENTITY_NOLIGHTING flag to disable that.
- */
-#define CS_ENTITY_NOSHADOWS 32
-
-/**
- * If CS_ENTITY_NOLIGHTING is set then this thing will not be lit.
- * It may still cast shadows though. Use the CS_ENTITY_NOSHADOWS flag
- * to disable that.
- */
-#define CS_ENTITY_NOLIGHTING 64
-
-/**
- * If CS_ENTITY_VISTREE is set then an octree will be calculated for the
+ * If CS_THING_VISTREE is set then an octree will be calculated for the
  * polygons in this thing. In this case the thing will implement a
  * fully working iVisibilityCuller which the sector can use.
  */
-#define CS_ENTITY_VISTREE 128
-
-/**
- * If CS_ENTITY_BACK2FRONT is set then all objects with the same
- * render order as this one and which also have this flag set will
- * be rendered in roughly back to front order. All objects with
- * the same render order but which do not have this flag set will
- * be rendered later. This flag is important if you want to have
- * alpha transparency rendered correctly.
- */
-#define CS_ENTITY_BACK2FRONT 256
+#define CS_THING_VISTREE 1
 
 /**
  * The following flags affect movement options for a thing. See
@@ -305,6 +242,9 @@ private:
   /// Maximum number of vertices.
   int max_curve_vertices;
 
+  /// Z-buf mode to use for drawing this object.
+  csZBufMode zbufMode;
+
 public:
   /// Set of flags
   csFlags flags;
@@ -333,13 +273,13 @@ private:
    * lightmapped polygons right now and is far from complete.
    */
   void DrawPolygonArrayDPM (csPolygonInt** polygon, int num,
-	iRenderView* rview, bool use_z_buf);
+	iRenderView* rview, csZBufMode zbufMode);
 
   /**
    * Draw the given array of polygons in the current csPolygonSet.
    */
   static void DrawPolygonArray (csPolygonInt** polygon, int num,
-	iRenderView* rview, bool use_z_buf);
+	iRenderView* rview, csZBufMode zbufMode);
 
   /**
    * Test a number of polygons against the c-buffer and insert them to the
@@ -354,7 +294,7 @@ private:
    * and clipped version of the 3D polygon.
    */
   static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
-	iRenderView* d, bool use_z_buf);
+	iRenderView* d, csZBufMode zbufMode);
 
   /**
    * This function is called by the BSP tree traversal routine
@@ -685,6 +625,11 @@ public:
   // Drawing
   //----------------------------------------------------------------------
   
+  /// Set the Z-buf drawing mode to use for this object.
+  void SetZBufMode (csZBufMode mode) { zbufMode = mode; }
+  /// Get the Z-buf drawing mode.
+  csZBufMode GetZBufMode () { return zbufMode; }
+
   /**
    * Draw this thing given a view and transformation.
    */
@@ -1000,7 +945,8 @@ public:
     }
     virtual void UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
       	iMovable* /*movable*/) { }
-    virtual bool Draw (iRenderView* rview, iMovable* movable)
+    virtual bool Draw (iRenderView* rview, iMovable* movable,
+    	csZBufMode zbufMode)
     {
       return scfParent->Draw (rview, movable);
     }

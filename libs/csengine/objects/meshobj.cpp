@@ -65,6 +65,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   mesh->IncRef ();
   draw_cb = NULL;
   factory = NULL;
+  zbufMode = CS_ZBUF_USE;
 }
 
 csMeshWrapper::csMeshWrapper (csObject* theParent)
@@ -91,6 +92,7 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   csMeshWrapper::mesh = NULL;
   draw_cb = NULL;
   factory = NULL;
+  zbufMode = CS_ZBUF_USE;
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
@@ -212,12 +214,26 @@ void csMeshWrapper::DeferUpdateLighting (int flags, int num_lights)
 
 void csMeshWrapper::Draw (iRenderView* rview)
 {
+  if (flags.Check (CS_ENTITY_INVISIBLE)) return;
+  if (flags.Check (CS_ENTITY_CAMERA))
+  {
+    csOrthoTransform& trans = rview->GetCamera ()->GetTransform ();
+    csVector3 old = trans.GetO2TTranslation ();
+    trans.SetO2TTranslation (csVector3 (0));
+    DrawInt (rview);
+    trans.SetO2TTranslation (old);
+  }
+  else DrawInt (rview);
+}
+
+void csMeshWrapper::DrawInt (iRenderView* rview)
+{
   iMeshWrapper* meshwrap = &scfiMeshWrapper;
   if (draw_cb) draw_cb (meshwrap, rview, draw_cbData);
   if (mesh->DrawTest (rview, &movable.scfiMovable))
   {
     UpdateDeferedLighting (movable.GetFullPosition ());
-    mesh->Draw (rview, &movable.scfiMovable);
+    mesh->Draw (rview, &movable.scfiMovable, zbufMode);
   }
   int i;
   for (i = 0 ; i < children.Length () ; i++)

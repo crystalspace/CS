@@ -31,6 +31,7 @@
 #include "csengine/material.h"
 #include "csengine/rview.h"
 #include "csengine/thing.h"
+#include "csengine/meshobj.h"
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
 #include "csgeom/frustum.h"

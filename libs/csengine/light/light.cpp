@@ -29,6 +29,7 @@
 #include "csengine/polygon.h"
 #include "csengine/curve.h"
 #include "csengine/halo.h"
+#include "csengine/meshobj.h"
 
 /// Max number of polygons that can be lit by one light. (bad practice !!!@@@)
 #define MAX_NUM_LIGHTMAP 2000

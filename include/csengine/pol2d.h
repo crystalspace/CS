@@ -75,7 +75,7 @@ public:
    * 'poly' is only used for debugging. The plane and vertices are not used.
    */
   void DrawFilled (iRenderView* rview, csPolygon3D* poly, csPolyPlane* plane,
-  	bool use_z_buf = false);
+	csZBufMode zbufMode = CS_ZBUF_FILL);
 
   /**
    * Z fill the Z buffer for this polygon.

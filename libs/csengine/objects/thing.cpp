@@ -124,7 +124,8 @@ csThing::csThing (csEngine* engine, bool is_sky, bool is_template) :
   ParentTemplate = NULL;
   csThing::is_sky = is_sky;
   csThing::is_template = is_template;
-  if (is_sky) flags.Set (CS_ENTITY_ZFILL);
+  if (is_sky) zbufMode = CS_ZBUF_FILL;
+  else zbufMode = CS_ZBUF_USE;
 
   cameranr = -1;
   movablenr = -1;
@@ -600,7 +601,7 @@ csPolygon3D* csThing::IntersectSegment (const csVector3& start,
 }
 
 void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
-	iRenderView* d, bool use_z_buf)
+	iRenderView* d, csZBufMode zbufMode)
 {
   //@@@@@@@@ EDGES if (d->GetCallback ())
   //{
@@ -647,7 +648,7 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
     {
       //@@@@ EDGESif (!d->GetCallback ())
       {
-	if (filtered) poly->DrawFilled (d, p, keep_plane, use_z_buf);
+	if (filtered) poly->DrawFilled (d, p, keep_plane, zbufMode);
 	if (is_this_fog) poly->AddFogPolygon (d->GetGraphics3D (), p, keep_plane,
 		icam->IsMirrored (), d->GetThisSector ()->GetID (), CS_FOG_BACK);
 	// Here we z-fill the portal contents to make sure that sprites
@@ -658,17 +659,17 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
       }
     }
     else //@@@@@@@@ EDGES if (!d->GetCallback ())
-      poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
+      poly->DrawFilled (d, p, p->GetPlane (), zbufMode);
 
     // Cleanup.
     if (keep_plane) keep_plane->DecRef ();
   }
   else //@@@@@ EDGES if (!d->GetCallback ())
-    poly->DrawFilled (d, p, p->GetPlane (), use_z_buf);
+    poly->DrawFilled (d, p, p->GetPlane (), zbufMode);
 }
 
 void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
-	iRenderView* d, bool use_z_buf)
+	iRenderView* d, csZBufMode zbufMode)
 {
   csPolygon3D* p;
   csVector3* verts;
@@ -703,7 +704,7 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
 		icam->IsMirrored ()) && clip->ClipAgainst (d->GetClipper ()))
         {
           p->GetPlane ()->WorldToCamera (camtrans, verts[0]);
-          DrawOnePolygon (p, clip, d, use_z_buf);
+          DrawOnePolygon (p, clip, d, zbufMode);
         }
         render_pool->Free (clip);
       }
@@ -712,7 +713,7 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
 }
 
 void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
-	iRenderView* d, bool use_z_buf)
+	iRenderView* d, csZBufMode zbufMode)
 {
   // @@@ We should include object 2 world transform here too like it
   // happens with sprites.
@@ -725,7 +726,7 @@ void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   // @@@ This should only be done when aspect changes...
   d->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
   d->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
-    use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
+    zbufMode);
 
   G3DPolygonMesh mesh;
   mesh.num_vertices = GetNumVertices ();
@@ -1324,8 +1325,6 @@ static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
 
 bool csThing::DrawCurves (iRenderView* rview, iMovable* movable)
 {
-  bool use_z_buf = !flags.Check (CS_ENTITY_ZFILL);
-
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
 
@@ -1354,7 +1353,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable)
   	rview->GetClipper ()->GetNumVertices ());
   rview->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
   rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
-      use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
+      zbufMode);
 
   // Base of the mesh.
   G3DTriangleMesh mesh;
@@ -1668,7 +1667,7 @@ void csThing::DrawPolygonsFromQueue (csPolygon2DQueue* queue,
     poly3d->UpdateTransformation (camtrans,
     	rview->GetCamera ()->GetCameraNumber ());
     poly3d->GetPlane ()->WorldToCamera (camtrans, poly3d->Vcam (0));
-    DrawOnePolygon (poly3d, poly2d, rview, false);
+    DrawOnePolygon (poly3d, poly2d, rview, CS_ZBUF_FILL);
     render_pool->Free (poly2d);
   }
 }
@@ -1677,13 +1676,12 @@ void* csThing::DrawPolygons (csThing* /*thing*/,
   csPolygonInt** polygon, int num, bool /*same_plane*/, void* data)
 {
   iRenderView* d = (iRenderView*)data;
-  csThing::DrawPolygonArray (polygon, num, d, false);
+  csThing::DrawPolygonArray (polygon, num, d, CS_ZBUF_FILL);
   return NULL;
 }
 
 bool csThing::DrawInt (iRenderView* rview, iMovable* movable)
 {
-  bool use_z_buf = !flags.Check (CS_ENTITY_ZFILL);
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
   csReversibleTransform movtrans = movable->GetFullTransform ();
@@ -1721,7 +1719,7 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable)
       csOctree* otree = (csOctree*)static_tree;
       csPolygonIntArray& unsplit = otree->GetRoot ()->GetUnsplitPolygons (); 
       DrawPolygonArray (unsplit.GetPolygons (), unsplit.GetNumPolygons (),
-    	  rview, true);
+    	  rview, CS_ZBUF_USE);
     }
   }
   else
@@ -1754,10 +1752,10 @@ bool csThing::DrawInt (iRenderView* rview, iMovable* movable)
 
     if (flags.Check (CS_ENTITY_DETAIL))
       DrawPolygonArrayDPM (polygons.GetArray (), polygons.Length (), rview,
-      	use_z_buf);
+      	zbufMode);
     else
       DrawPolygonArray (polygons.GetArray (), polygons.Length (), rview,
-      	use_z_buf);
+      	zbufMode);
     //@@@@@ EDGES if (rview.GetCallback ()) rview.CallCallback (CALLBACK_THINGEXIT, (void*)this);
   }
 
