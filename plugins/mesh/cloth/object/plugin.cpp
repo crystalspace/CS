@@ -108,8 +108,8 @@ void csStuffObject::SetupMesh()
        csTriangle *triangles;
 	int num_triangles;
 	//hardcoded for now
-	Xsize=20;
-	Ysize=20;
+	Xsize=40;
+	Ysize=40;
         num_vertices=( Xsize + 1 )*( Ysize + 1 );
 	num_triangles=4 * Xsize * Ysize;
 	int count;
@@ -186,12 +186,12 @@ void csStuffObject::SetupMesh()
     mesh.do_morph_colors = false;
     mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 
+    /*
     Integrator->ComputeInitial();
     Integrator->ComputeInitial();
     Integrator->ComputeInitial();
     Integrator->ComputeInitial();
-    
-
+    */
        printf( " finished setting up the mesh... \n");	
 
 };
@@ -251,7 +251,7 @@ csStuffObject::~csStuffObject()
 bool csStuffObject::DrawTest(iRenderView *rview, iMovable *movable) {
 //printf(" draw test \n");
 // SetupMesh();
- UpdateMesh();
+
  iCamera* camera = rview->GetCamera ();
  csReversibleTransform tr_o2c = camera->GetTransform () / movable->GetFullTransform ();
 
@@ -339,7 +339,10 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
  };
  void csStuffObject::SetVisibleCallback(iMeshObjectDrawCallback *cb) { vis_cb=cb; };
  iMeshObjectDrawCallback* csStuffObject::GetVisibleCallback () const { return vis_cb; };
- void csStuffObject::NextFrame (unsigned int) {};
+ void csStuffObject::NextFrame (unsigned int)
+ {
+   UpdateMesh();
+ };
  bool csStuffObject::WantToDie () const { return false; };
  void csStuffObject::HardTransform (const csReversibleTransform &) {};
  bool csStuffObject::SupportsHardTransform () const { return false; };
