@@ -35,6 +35,10 @@ chronological order.
 	    - Documented the path-related queries: csGetAppPath(),
 	      csGetAppDir(), csGetResourceDir(), and the corresponding
 	      iCommandLineParser methods.
+	    - Documented new VFS variables $* and $^, and fact that VFS now
+	      searches for vfs.cfg in the resource directory, then the
+	      application directory, and finally the installation directory,
+	      rather than only searching the installation directory.
 	    - Moved the warning about libbfd's GPL license so that it appears
 	      earlier in the discussion about meta-information embedding.
 	    - Re-organized sections a bit so that sections logically related to
