@@ -965,6 +965,7 @@ bool csTerrainObject::SetLODValue (const char* parameter, float value)
   else if (strcmp (parameter, "cd resolution") == 0)
   {
     cd_resolution = int (value);
+    return true;
   }
   return false;
 }
