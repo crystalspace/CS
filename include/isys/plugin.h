@@ -66,7 +66,7 @@ struct iComponent;
 /// Image loader
 #define CS_FUNCID_LVLLOADER	"LevelLoader"
 /// Font server
-#define CS_FUNCID_FONTSERVER	"FontServer"
+#define CS_FUNCID_FONTSERVER "FontServer"
 /// Network driver
 #define CS_FUNCID_NETDRV	"NetDriver"
 /// Console
@@ -80,7 +80,9 @@ struct iComponent;
 /// Model Importer
 #define CS_FUNCID_CONVERTER	"Converter"
 /// Model Crossbuilder
-#define CS_FUNCID_CROSSBUILDER	"CrossBuilder"
+#define CS_FUNCID_CROSSBUILDER "CrossBuilder"
+/// Text Syntax Service
+#define CS_FUNCID_SYNTAXSERVICE "TextSyntaxService"
 
 /**
  * Query a pointer to some plugin through the Plugin Manager interface.
