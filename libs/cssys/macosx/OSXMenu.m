@@ -103,7 +103,7 @@ static void menu_add_item(NSMenu* menu, char const* key,
   else
   {
     SEL cmd = 0;
-    NSMenuItem* item;
+    id item;
 
     if (action != 0)
       cmd = NSSelectorFromString([NSString stringWithCString:action]);
