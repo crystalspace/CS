@@ -43,7 +43,10 @@ if ! $(conftmpfiles)
 Clean maintainerclean : aclocal.m4 configure configure.scan ;
 Depends maintainerclean : distclean ;
 
-# Process subdirectories
+# Process subdirectories.  NOTE: Unfortunately, Jam rules are presently
+# order-sensitive; Library targets must be seen by Jam before Application and
+# Plugin targets, thus ordering of these SubInclude invocations is dictated by
+# this limitation.
 SubInclude TOP data ;
 SubInclude TOP libs ;
 SubInclude TOP plugins ;
