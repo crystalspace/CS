@@ -64,7 +64,7 @@ private:
   iDocumentSystem* GetDocumentSystem ();
   iShaderManager* GetShaderManager ();
   void PerformShaderTest (const char* shaderPath, const char* shname,
-		  const char* shtype);
+		  const char* shtype, const char* shaderPath2, const char* shtype2);
 
 public:
   CsBench ();

@@ -373,14 +373,27 @@ iDocumentSystem* CsBench::GetDocumentSystem ()
 }
 
 void CsBench::PerformShaderTest (const char* shaderPath, const char* shname,
-		const char* shtype)
+		const char* shtype, const char* shaderPath2, const char* shtype2)
 {
-  csRef<iDocument> shaderDoc = GetDocumentSystem ()->CreateDocument ();
   csRef<iShaderCompiler> shcom = GetShaderManager ()->GetCompiler ("XMLShader");
+  csRef<iDocument> shaderDoc = GetDocumentSystem ()->CreateDocument ();
   csRef<iFile> shaderFile = vfs->Open (shaderPath, VFS_FILE_READ);
   shaderDoc->Parse (shaderFile);
   csRef<iDocumentNode> shadernode = shaderDoc->GetRoot ()->GetNode ("shader");
   csStringID shadertype = strings->Request (shtype);
+
+  csStringID shadertype2 = 0;
+  csRef<iShader> shader2;
+  if (shaderPath2)
+  {
+    csRef<iDocument> shaderDoc2 = GetDocumentSystem ()->CreateDocument ();
+    csRef<iFile> shaderFile2 = vfs->Open (shaderPath2, VFS_FILE_READ);
+    shaderDoc2->Parse (shaderFile2);
+    csRef<iDocumentNode> shadernode2 = shaderDoc2->GetRoot ()->GetNode ("shader");
+    shadertype2 = strings->Request (shtype2);
+    shader2 = shcom->CompileShader (shadernode2);
+  }
+
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
   int i;
   for (i = 0 ; i < prilist->GetCount () ; i++)
@@ -392,6 +405,8 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shname,
       csRef<iMaterial> matinput = engine->CreateBaseMaterial (
 		      engine->GetTextureList ()->FindByName ("stone"));
       matinput->SetShader (shadertype, shader);
+      if (shader2)
+	matinput->SetShader (shadertype2, shader2);
       iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (matinput);
       mat->Register (g3d->GetTextureManager ());
       genmesh->SetMaterialWrapper (mat);
@@ -426,7 +441,8 @@ void CsBench::PerformTests ()
   g3d->SetOption ("StencilThreshold", "100000000");
   BenchMark ("planeclip", "glClipPlane clipping is used");
 
-  PerformShaderTest ("/shader/or_lighting.xml", "or_lighting", "OR compatibility");
+  PerformShaderTest ("/shader/or_lighting.xml", "or_lighting",
+		  "OR compatibility", 0, 0);
 
   iRenderLoopManager* rlmgr = engine->GetRenderLoopManager ();
   csRef<iRenderLoop> loop = rlmgr->Create ();
@@ -461,7 +477,8 @@ void CsBench::PerformTests ()
   engine->GetRenderLoopManager ()->Register ("bump", loop);
   engine->SetCurrentDefaultRenderloop (loop);
 
-  PerformShaderTest ("/shader/light_bumpmap.xml", "light_bumpmap", "diffuse");
+  PerformShaderTest ("/shader/light_bumpmap.xml", "light_bumpmap",
+		  "diffuse", "/shader/ambient.xml", "ambient");
 }
 
 /*---------------------------------------------------------------------*
