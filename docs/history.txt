@@ -29,6 +29,13 @@ The history order has been reversed so that new features are at the top.
 	  compilation warning in Blocks which was reported by MacOS/X Server.
 	- Fixed the alpha test in perftest which stated that it would
 	  do texture mapping while it didn't.
+	- Added a patch from Thomas Krug to enable perspective correct
+	  texture mapping for OpenGL DrawPolygonFX. The patch is disabled
+	  though becuase it is slower (does a divide) and also not consistant
+	  with how DrawTriangleMesh behaves. I think this is a feature
+	  that needs to be optional.
+	- Norman Kramer did a dramatic speed increase in the glide renderer.
+	  Performance went up with 0.1 FPS!!! :-)
 20-Jun-2000
 	- Changed csDynLight::SetColor() so that it will work without
 	  having to call Setup() later. This is MUCH more efficient if you

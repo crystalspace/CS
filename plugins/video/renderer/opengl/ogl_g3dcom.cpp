@@ -1104,7 +1104,18 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 		 flat_b * poly.vertices[i].b, m_alpha);
     else
       glColor4f (flat_r, flat_g, flat_b, m_alpha);
+#   if 0
+    // Patch from Thomas Krug to enable perspective correct texture
+    // mapping for DrawPolygonFX. I don't enable this by default yet
+    // because it is a slow-down. I need to think about how to avoid
+    // the divide if at all possible.
+    // Maybe this should be optional.
+    if (ABS (poly.vertices[i].z) < SMALL_EPSILON) sz = 1.0/ SMALL_EPSILON;
+    else sz = 1.0/poly.vertices[i].z;
+    glVertex4f (poly.vertices[i].sx * sz, poly.vertices[i].sy * sz, -1, sz);
+#   else
     glVertex3f (poly.vertices[i].sx, poly.vertices[i].sy, -poly.vertices[i].z);
+#   endif
   }
   glEnd ();
 
