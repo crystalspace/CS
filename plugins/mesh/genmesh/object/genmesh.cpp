@@ -1036,7 +1036,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
 #else
       vertex_buffer = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csVector3)*num_mesh_triangles*3+1, CS_BUF_STATIC);
+        sizeof (csVector3)*(num_mesh_triangles*3+1), CS_BUF_STATIC);
       csVector3* vbuf = (csVector3*)vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
       int vbuf_index = 0;
       for (int i = 0; i < num_mesh_triangles; i ++) {
@@ -1057,13 +1057,13 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     {
 #ifndef CS_USE_SHADOW_VOLUMES
       texel_buffer = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csVector2)*num_mesh_vertices+1, CS_BUF_STATIC);
+        sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC);
       csVector2* tbuf = (csVector2*)texel_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (tbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
 #else
       texel_buffer = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csVector2)*num_mesh_triangles*3, CS_BUF_STATIC);
+        sizeof (csVector2)*(num_mesh_triangles*3+1), CS_BUF_STATIC);
       csVector2* tbuf = (csVector2*)texel_buffer->Lock (iRenderBuffer::CS_BUF_LOCK_NORMAL);
       int tbuf_index = 0;
       for (int i = 0; i < num_mesh_triangles; i ++) {
@@ -1084,13 +1084,13 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     {
 #ifndef CS_USE_SHADOW_VOLUMES
       normal_buffer = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csVector3)*num_mesh_vertices+1, CS_BUF_STATIC);
+        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
       csVector3 *nbuf = (csVector3*)normal_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
 #else
       normal_buffer = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csVector3)*num_mesh_triangles*3, CS_BUF_STATIC);
+        sizeof (csVector3)*(num_mesh_triangles*3+1), CS_BUF_STATIC);
       csVector3 *nbuf = (csVector3*)normal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
       int nbuf_index = 0;
       for (int i = 0; i < num_mesh_triangles; i ++) {
@@ -1144,13 +1144,13 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
     {
 #ifndef CS_USE_SHADOW_VOLUMES
       color_buffer = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csColor)*num_mesh_vertices+1, CS_BUF_STATIC);
+        sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC);
       csColor *cbuf = (csColor*)color_buffer->Lock (
       	iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (cbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
 #else
       color_buffer = r3d->GetBufferManager ()->GetBuffer (
-        sizeof (csColor)*num_mesh_triangles*3, CS_BUF_STATIC);
+        sizeof (csColor)*(num_mesh_triangles*3+1), CS_BUF_STATIC);
       csColor *cbuf = (csColor*)color_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
       int cbuf_index = 0;
       for (int i = 0; i < num_mesh_triangles; i ++) {
