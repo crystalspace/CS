@@ -13,6 +13,18 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+26-Jul-1999
+	- Andrew made changes to DrawPolygonFX().  He fixed a number of small
+	  bugs and adjusted the prototype.  It also now safely supports 2*SRC
+	  mode.
+	- Andrew removed scanln8, scanln16, a& scanln32 and replaced them
+	  with scanln.inc.
+	- Unfortunately Andrew forgot to check in the new scanln.inc file,
+	  which prevents the software renderer from compiling.  Therefore,
+	  Eric Sunshine created a replacement scanln.inc file, as a stop-gap
+	  measure, which at least allows the software renderer to compile.
+	  Hopefully Andrew will commit his scanln.inc tomorrow if it is any
+	  different than the one which Eric created.
 25-Jul-1999
 	- Eric Sunshine worked around a variable redeclaration error in the
 	  new md2.cpp file.  This problem affected older C++ compilers in
@@ -21,7 +33,6 @@ Short-term cleanups that need to be done:
 	- Gary Haussmann added code for a 'cross builder' which can take the
 	  data read in from various file formats (MD2, 3DS, DXF, ...) and
 	  build standard Crystal Space objects from those files.
-	- Eric Sunshine fixed a few things again.
 	- Michael Dale Long fixed project files for new files from Gary
 	  Haussmann.
 	- Added version of win32.cpp from Xavier Trochu which uses
