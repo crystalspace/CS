@@ -21,7 +21,6 @@
 #include <math.h>
 #include "cssysdef.h"
 #include "gl_txtmgr.h"
-#include "gl_txtcache.h"
 #include "csutil/scanstr.h"
 #include "csutil/debug.h"
 #include "iutil/cfgfile.h"
@@ -213,6 +212,7 @@ csGLTextureHandle::~csGLTextureHandle()
 {
   for (size_t i=0; i<vTex.Length(); i++)
     delete vTex[i];
+  Unload ();
   SCF_DESTRUCT_IBASE()
 }
 
@@ -780,26 +780,174 @@ iGraphics2D* csGLTextureHandle::GetCanvas ()
   return canvas;
 }
 
+void csGLTextureHandle::Load ()
+{
+  if (Handle != 0) return;
+
+  static const GLint textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
+    GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
+  static const GLint textureMagFilters[3] = {GL_NEAREST, GL_LINEAR, 
+    GL_LINEAR};
+
+  glGenTextures (1, &Handle);
+
+  const int texFilter = flags & CS_TEXTURE_NOFILTER ? 0 : 
+    txtmgr->rstate_bilinearmap;
+  const GLint magFilter = textureMagFilters[texFilter];
+  const GLint minFilter = textureMinFilters[texFilter];
+  const GLint wrapMode = 
+    (flags & CS_TEXTURE_CLAMP) ? GL_CLAMP_TO_EDGE : GL_REPEAT;
+
+  if (target == CS_TEX_IMG_1D)
+  {
+    G3D->statecache->SetTexture (GL_TEXTURE_1D, Handle);
+    glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, wrapMode);
+    glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, magFilter);
+    glTexParameteri (GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, minFilter);
+
+    if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+    {
+      glTexParameterf (GL_TEXTURE_1D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+        txtmgr->texture_filter_anisotropy);
+    }
+
+    // @@@ Implement upload!
+  }
+  else if (target == CS_TEX_IMG_2D)
+  {
+    G3D->statecache->SetTexture (GL_TEXTURE_2D, Handle);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapMode);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapMode);
+
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+      (flags & CS_TEXTURE_NOMIPMAPS) ? magFilter : minFilter);
+
+    if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+    {
+      glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+        txtmgr->texture_filter_anisotropy);
+    }
+
+    size_t i;
+    for (i = 0; i < vTex.Length(); i++)
+    {
+      csGLTexture* togl = vTex[i];
+      if (togl->compressed == GL_FALSE)
+      {
+	glTexImage2D (GL_TEXTURE_2D, i, targetFormat, togl->get_width(), 
+	  togl->get_height(), 0, sourceFormat, sourceType, togl->image_data);
+      }
+      else
+      {
+	G3D->ext->glCompressedTexImage2DARB (GL_TEXTURE_2D, i, 
+	  (GLenum)togl->internalFormat, togl->get_width(),  togl->get_height(), 
+	  0, togl->size, togl->image_data);
+      }
+      togl->CleanupImageData ();
+    }
+  }
+  else if (target == CS_TEX_IMG_3D)
+  {
+    G3D->statecache->Enable_GL_TEXTURE_3D ();
+    G3D->statecache->SetTexture (GL_TEXTURE_3D, Handle);
+    glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, wrapMode);
+    glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, wrapMode);
+    glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, wrapMode);
+
+    // @@@ Not sure if the following makes sense with 3D textures.
+    glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, magFilter);
+
+    glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, minFilter);
+
+    if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+    {
+      glTexParameterf (GL_TEXTURE_3D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+        txtmgr->texture_filter_anisotropy);
+    }
+
+    for (size_t i = 0; i < vTex.Length (); i++)
+    {
+      csGLTexture* togl = vTex[i];
+      G3D->ext->glTexImage3DEXT (GL_TEXTURE_3D, i, targetFormat,
+	togl->get_width (), togl->get_height (),  togl->get_depth (),
+	0, sourceFormat, sourceType, togl->image_data);
+      togl->CleanupImageData ();
+    }
+  }
+  else if (target == CS_TEX_IMG_CUBEMAP)
+  {
+    G3D->statecache->SetTexture (GL_TEXTURE_CUBE_MAP, Handle);
+    // @@@ Temporarily force clamp, although I don't know if REPEAT
+    // makes sense with cubemaps.
+    glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, 
+      GL_CLAMP_TO_EDGE/*wrapMode*/);
+    glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, 
+      GL_CLAMP_TO_EDGE/*wrapMode*/);
+    glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, 
+      GL_CLAMP_TO_EDGE/*wrapMode*/);
+
+    glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, magFilter);
+
+    glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER,
+      (flags & CS_TEXTURE_NOMIPMAPS) ? magFilter : minFilter);
+
+    if (G3D->ext->CS_GL_EXT_texture_filter_anisotropic)
+    {
+      glTexParameterf (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT,
+        txtmgr->texture_filter_anisotropy);
+    }
+
+    for (size_t i=0; i < vTex.Length (); i++)
+    {
+      csGLTexture* togl = vTex[i];
+
+      int cursize = togl->get_width() * togl->get_height () * texelbytes;
+
+      uint8* data = togl->image_data;
+      int j;
+      for(j = 0; j < 6; j++)
+      {
+        glTexImage2D (GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, i, 
+	  /*targetFormat*/GL_RGBA8, togl->get_width (),	togl->get_height(),
+          0,  sourceFormat, sourceType,	data);
+        data += cursize;
+      }
+      togl->CleanupImageData ();
+    }
+  }
+}
+
+void csGLTextureHandle::Unload ()
+{
+  if (Handle == 0) return;
+  if (target == CS_TEX_IMG_1D)
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_1D, Handle);
+  else if (target == CS_TEX_IMG_2D)
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_2D, Handle);
+  else if (target == CS_TEX_IMG_3D)
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_3D, Handle);
+  else if (target == CS_TEX_IMG_CUBEMAP)
+    csGLTextureManager::UnsetTexture (GL_TEXTURE_CUBE_MAP, Handle);
+  glDeleteTextures (1, &Handle);
+  Handle = 0;
+}
+
+void csGLTextureHandle::Precache ()
+{
+  Load ();
+}
+
 void csGLTextureHandle::UpdateTexture ()
 {
-  if (G3D->txtcache)
-    G3D->txtcache->Uncache (this);
+  Unload ();
 }
 
 GLuint csGLTextureHandle::GetHandle ()
 {
   PrepareInt ();
-  if (Handle)
-  {
-    return Handle;
-  }
-  else
-  {
-    txtmgr->txtcache->Cache (this);
-    csTxtCacheData *cachedata =
-      (csTxtCacheData *)GetCacheData ();
-    return cachedata->Handle;
-  }
+  Load ();
+  return Handle;
 }
 
 void csGLTextureHandle::ComputeMeanColor (int w, int h, csRGBpixel *src,
@@ -1101,13 +1249,11 @@ SCF_IMPLEMENT_IBASE_END
 
 csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
-        csGLGraphics3D *iG3D, csGLTextureCache* txtcache) : 
+        csGLGraphics3D *iG3D) : 
   textures (16, 16), materials (16, 16)
 {
   SCF_CONSTRUCT_IBASE (0);
   csGLTextureManager::object_reg = object_reg;
-
-  csGLTextureManager::txtcache = txtcache;
 
   nameDiffuseTexture = iG3D->strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
@@ -1139,6 +1285,23 @@ void csGLTextureManager::read_config (iConfigFile *config)
   texture_bits = config->GetInt
     ("Video.OpenGL.TextureBits", 0);
   if (!texture_bits) texture_bits = pfmt.PixelBytes*8;
+  
+  const char* filterModeStr = config->GetStr (
+    "Video.OpenGL.TextureFilter", "trilinear");
+  rstate_bilinearmap = 2;
+  if (strcmp (filterModeStr, "none") == 0)
+    rstate_bilinearmap = 0;
+  else if (strcmp (filterModeStr, "nearest") == 0)
+    rstate_bilinearmap = 0;
+  else if (strcmp (filterModeStr, "bilinear") == 0)
+    rstate_bilinearmap = 1;
+  else if (strcmp (filterModeStr, "trilinear") == 0)
+    rstate_bilinearmap = 2;
+  else
+  {
+    G3D->Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Invalid texture filter mode '%s'.", filterModeStr);
+  }
 
   csRef<iConfigIterator> it (config->Enumerate ("Video.OpenGL.TargetFormat"));
   while (it->Next ())

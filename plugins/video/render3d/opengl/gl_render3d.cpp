@@ -54,7 +54,6 @@
 
 #include "gl_render3d.h"
 #include "gl_renderbuffer.h"
-#include "gl_txtcache.h"
 #include "gl_txtmgr.h"
 #include "gl_polyrender.h"
 
@@ -937,28 +936,8 @@ bool csGLGraphics3D::Open ()
     object_reg->Register (shadermgr, "iShaderManager");
   }
 
-  txtcache = csPtr<csGLTextureCache> (new csGLTextureCache (this)); 
-
-  const char* filterModeStr = config->GetStr (
-    "Video.OpenGL.TextureFilter", "trilinear");
-  int filterMode = 2;
-  if (strcmp (filterModeStr, "none") == 0)
-    filterMode = 0;
-  else if (strcmp (filterModeStr, "nearest") == 0)
-    filterMode = 0;
-  else if (strcmp (filterModeStr, "bilinear") == 0)
-    filterMode = 1;
-  else if (strcmp (filterModeStr, "trilinear") == 0)
-    filterMode = 2;
-  else
-  {
-    Report (CS_REPORTER_SEVERITY_WARNING, 
-      "Invalid texture filter mode '%s'.", filterModeStr);
-  }
-  txtcache->SetBilinearMapping (filterMode);
-
   txtmgr.AttachNew (new csGLTextureManager (
-  	object_reg, GetDriver2D (), config, this, txtcache));
+    object_reg, GetDriver2D (), config, this));
 
   glClearDepth (0.0);
   statecache->Enable_GL_CULL_FACE ();
@@ -1144,11 +1123,6 @@ void csGLGraphics3D::Close ()
     //delete txtmgr; txtmgr = 0;
   }
   txtmgr = 0;
-  if (txtcache)
-  {
-    txtcache->Clear ();
-    // txtcache = 0;
-  }
   shadermgr = 0;
 
   if (G2D)
@@ -1335,14 +1309,7 @@ void csGLGraphics3D::FinishDraw ()
       render_target->GetMipMapDimensions (0, txt_w, txt_h);
       csGLTextureHandle* tex_mm = (csGLTextureHandle *)
         render_target->GetPrivateObject ();
-      //csGLTexture *tex_0 = tex_mm->vTex[0];
-      csTxtCacheData *tex_data = (csTxtCacheData*)render_target->GetCacheData();
-      if (!tex_data)
-      {
-        // Make sure the texture is in the cache before updating it.
-	txtcache->Cache (render_target);
-        tex_data = (csTxtCacheData*)render_target->GetCacheData();
-      }
+      tex_mm->Precache ();
       //statecache->SetTexture (GL_TEXTURE_2D, tex_data->Handle);
       // Texture is in tha cache, update texture directly.
       ActivateTexture (render_target);
@@ -1379,8 +1346,7 @@ void csGLGraphics3D::FinishDraw ()
 	//tex_mm->InitTexture (txtmgr, G2D->GetPixelFormat ());
 	tex_mm->Unprepare ();
 	tex_mm->PrepareInt();
-	txtcache->Cache (tex_mm);
-
+	tex_mm->Precache ();
       }
       else
       {
@@ -1397,7 +1363,7 @@ void csGLGraphics3D::FinishDraw ()
             else
             {
               glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                txtcache->GetBilinearMapping() ? GL_LINEAR : GL_NEAREST);
+		txtmgr->rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
             }
           }
           tex_mm->was_render_target = true;
@@ -1965,11 +1931,6 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   SetMirrorMode (false);
 }
 
-void csGLGraphics3D::PrecacheTexture (iTextureHandle* texture)
-{
-  txtcache->Cache (texture);
-}
-
 void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, 
   int tx, int ty, int tw, int th, uint8 Alpha)
@@ -2000,7 +1961,7 @@ void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
   }
 
   // cache the texture if we haven't already.
-  txtcache->Cache (hTex);
+  hTex->Precache ();
 
   // as we are drawing in 2D, we disable some of the commonly used features
   // for fancy 3D drawing
@@ -2912,8 +2873,6 @@ void* csGLGraphics3D::eiShaderRenderInterface::GetPrivateObject (
 {
   if (strcasecmp(name, "ext") == 0)
     return (void*) (scfParent->ext);
-  if (strcasecmp(name, "txtcache") == 0)
-    return (void*) (scfParent->txtcache);
   return 0;
 }
 

@@ -118,6 +118,9 @@ private:
   csGLTexture* NewTexture (iImage *Image, bool ismipmap);
 
   GLuint Handle;
+  /// Upload the texture to GL.
+  void Load ();
+  void Unload ();
 public:
   int bpp;
   int formatidx;
@@ -272,6 +275,8 @@ public:
 
   virtual csAlphaMode::AlphaType GetAlphaType ()
   { return alphaType; }
+
+  virtual void Precache ();
 
   void UpdateTexture ();
 
@@ -464,7 +469,6 @@ private:
 public:
   CS_LEAKGUARD_DECLARE (csGLTextureManager);
 
-  csGLTextureCache* txtcache;
   csWeakRef<csGLGraphics3D> G3D;
 
   /// All SLMs currently in use.
@@ -479,6 +483,7 @@ public:
   float texture_filter_anisotropy;
   /// what bpp should textures have?
   int texture_bits;
+  int rstate_bilinearmap;
 
   csStringID nameDiffuseTexture;
 
@@ -486,7 +491,7 @@ public:
 
   csGLTextureManager (iObjectRegistry* object_reg,
         iGraphics2D* iG2D, iConfigFile *config,
-        csGLGraphics3D *G3D, csGLTextureCache* txtcache);
+        csGLGraphics3D *G3D);
 
   virtual ~csGLTextureManager ();
 

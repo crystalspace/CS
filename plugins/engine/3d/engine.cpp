@@ -1828,7 +1828,9 @@ void csEngine::PrecacheDraw (iRegion* region)
     iTextureWrapper* txt = textures->Get (i);
     if (txt->GetTextureHandle ())
       if (!region || region->IsInRegion (txt->QueryObject ()))
-        G3D->PrecacheTexture (txt->GetTextureHandle ());
+      {
+	txt->GetTextureHandle ()->Precache ();
+      }
   }
 }
 

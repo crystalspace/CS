@@ -51,7 +51,6 @@
 #include "plugins/video/canvas/openglcommon/glextmanager.h"
 
 
-class csGLTextureCache;
 class csGLTextureHandle;
 class csGLTextureManager;
 class csGLPolygonRenderer;
@@ -70,7 +69,6 @@ private:
   friend class csGLSuperLightmap;
   friend class csGLRendererLightmap;
   friend class csGLTextureHandle;
-  friend class csGLTextureCache;
   friend class csGLTextureManager;
   friend class eiShaderRenderInterface;
   friend class csShaderGLMTEX;
@@ -82,7 +80,6 @@ private:
 
   csWeakRef<iBugPlug> bugplug;
 
-  csRef<csGLTextureCache> txtcache;
   csRef<csGLTextureManager> txtmgr;
 
   int current_drawflags;
@@ -485,8 +482,6 @@ public:
   virtual iHalo* CreateHalo (float, float, float,
     unsigned char *, int, int);
   virtual float GetZBuffValue (int, int);
-
-  virtual void PrecacheTexture (iTextureHandle* texture);
 
   //=========================================================================
   // Below this line are all functions that are not yet implemented by

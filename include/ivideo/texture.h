@@ -34,7 +34,7 @@
 struct iGraphics2D;
 struct iGraphics3D;
 
-SCF_VERSION (iTextureHandle, 2, 2, 2);
+SCF_VERSION (iTextureHandle, 2, 2, 3);
 
 /**
  * A texture handle as returned by iTextureManager.
@@ -163,6 +163,12 @@ struct iTextureHandle : public iBase
   virtual iGraphics2D* GetCanvas () = 0;
 
   virtual csAlphaMode::AlphaType GetAlphaType () = 0;
+
+  /**
+   * Precache this texture. This might free up temporary memory and
+   * makes later usage of the texture faster.
+   */
+  virtual void Precache () = 0;
 };
 
 /** @} */

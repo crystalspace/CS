@@ -793,7 +793,7 @@ struct csSimpleRenderMesh
   };
 };
 
-SCF_VERSION (iGraphics3D, 5, 5, 0);
+SCF_VERSION (iGraphics3D, 5, 5, 1);
 
 /**
  * This is the standard 3D graphics interface.
@@ -1176,12 +1176,6 @@ struct iGraphics3D : public iBase
 
   /// Clear the texture cache.
   virtual void ClearCache () = 0;
-
-  /**
-   * Precache a texture. This might free up temporary memory and
-   * makes later usage of the texture faster.
-   */
-  virtual void PrecacheTexture (iTextureHandle* texture) = 0;
 
   /**
    * Remove some polygon from the cache.

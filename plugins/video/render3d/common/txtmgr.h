@@ -182,6 +182,8 @@ public:
 
   virtual csAlphaMode::AlphaType GetAlphaType ()
   { return csAlphaMode::alphaNone; }
+
+  virtual void Precache () {}
 };
 
 /**
