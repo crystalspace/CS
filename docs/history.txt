@@ -28,8 +28,15 @@ The history order is reversed so that new features are at the top.
 	    - Added VBO (vertex_buffer_object) based buffers.
 	- Marten cleaned up code in gl_render3d and genmesh. Removed old
 	  deprecated code and some general cleanup.
+	- res made the following changes:
+	    - Removed the csFindLoadLibrary() stuff. Plugins are now solely
+	      loaded via native, fully qualified paths.
+	    - Made storing the user config in "Documents & Setting" on Win32
+	      the default.
+	    - Some Jamfiles updated.
 	- Oktal fixed a pointer arithmetic error in res's changes to cssys.
         - Philip Wyett fixed formatting in the MSVC 6 project plugin template.
+	- res readded the VC6 templates as 'binary'.
 15-Jun-2003
         - Boyan added property "Image" that can be set in AWS component "Image
 	  View".

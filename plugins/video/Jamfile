@@ -4,9 +4,12 @@ SubInclude TOP plugins video canvas ;
 SubInclude TOP plugins video effects ;
 SubInclude TOP plugins video format ;
 SubInclude TOP plugins video loader ;
-SubInclude TOP plugins video renderer ;
 
 if $(USE_NEW_RENDERER) = "yes"
 {
   SubInclude TOP plugins video render3d ;
+}
+else
+{
+  SubInclude TOP plugins video renderer ;
 }
