@@ -33,15 +33,6 @@ C++FLAGS on [ DoObjectGrist skinpars$(SUFOBJ) skinlex$(SUFOBJ) ] +=
 
 LinkWith aws : csgeom csgfx cstool csutil ;
 
-if "$(USE_NEW_RENDERER)" = "yes"
-{
-  LinkWith aws : render3dcommon ;
-}
-else
-{
-  LinkWith aws : renderercommon ;
-}
-
 if $(CMD.BISON) && $(CMD.FLEX)
 {
   # Construct a rule for copying the generated sources from Bison and Flex into

@@ -55,32 +55,20 @@ endif
 FLEX.SED = $(OUTDERIVED)/flex.sed
 AWS.DERIVED.DIR = $(OUTDERIVED)/aws
 
-ifeq ($(USE_NEW_RENDERER),yes)
-  INC.AWS.COMMON = $(SRCDIR)/plugins/video/render3d/common/txtmgr.h
-  SRC.AWS.COMMON = $(SRCDIR)/plugins/video/render3d/common/txtmgr.cpp
-else
-  INC.AWS.COMMON = $(SRCDIR)/plugins/video/renderer/common/txtmgr.h
-  SRC.AWS.COMMON = $(SRCDIR)/plugins/video/renderer/common/txtmgr.cpp
-endif
-
 DIR.AWS = plugins/aws
 OUT.AWS = $(OUT)/$(DIR.AWS)
 INF.AWS = $(SRCDIR)/$(DIR.AWS)/aws.csplugin
 ifeq ($(DO_MSVCGEN),yes)
 INC.AWS = $(wildcard $(addprefix $(SRCDIR)/, \
-  $(DIR.AWS)/*.h $(DIR.AWS)/*.hpp include/iaws/*.h)) \
-  $(INC.AWS.COMMON)
-SRC.AWS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWS)/*.cpp)) \
-  $(SRC.AWS.COMMON)
+  $(DIR.AWS)/*.h $(DIR.AWS)/*.hpp include/iaws/*.h))
+SRC.AWS = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWS)/*.cpp))
 else
 INC.AWS = $(AWS.DERIVED.DIR)/skinpars.hpp \
   $(filter-out $(SRCDIR)/$(DIR.AWS)/skinpars.hpp,$(wildcard $(addprefix \
-  $(SRCDIR)/,$(DIR.AWS)/*.h $(DIR.AWS)/*.hpp include/iaws/*.h))) \
-  $(INC.AWS.COMMON)
+  $(SRCDIR)/,$(DIR.AWS)/*.h $(DIR.AWS)/*.hpp include/iaws/*.h)))
 SRC.AWS = $(AWS.DERIVED.DIR)/skinlex.cpp $(AWS.DERIVED.DIR)/skinpars.cpp \
   $(filter-out $(addprefix $(SRCDIR)/$(DIR.AWS)/,skinlex.cpp skinpars.cpp), \
-  $(wildcard $(SRCDIR)/$(DIR.AWS)/*.cpp)) \
-  $(SRC.AWS.COMMON)
+  $(wildcard $(SRCDIR)/$(DIR.AWS)/*.cpp))
 endif
 OBJ.AWS = $(addprefix $(OUT.AWS)/,$(notdir $(SRC.AWS:.cpp=$O)))
 DEP.AWS = CSTOOL CSGFX CSGEOM CSUTIL
