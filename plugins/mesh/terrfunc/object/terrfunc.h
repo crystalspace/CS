@@ -368,7 +368,6 @@ public:
    * This will call MarkVisible() for all quad nodes that are visible.
    */
   void TestVisibility (iRenderView* rview);
-  //  RDS NOTE: is this the same as DrawTest()????
 
   void SetDirLight (const csVector3& pos, const csColor& col)
   {
@@ -673,7 +672,7 @@ public:
   /// Destructor.
   virtual ~csTerrFuncObjectType ();
 
-  /// Draw.
+  /// create a new factory.
   virtual iMeshObjectFactory* NewFactory ();
 
   struct eiComponent : public iComponent
