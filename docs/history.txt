@@ -1,7 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
 27-Sep-2000
-	- Fix to csphyzik from Michael Ewert.
+	- Optimized csPolygon3D::MarkRelevantShadowFrustums by letting
+	  it use csFrustum::BatchClassify instead of csFrustum::Classify.
+	  This should improve the speed of radiosity and lighting somewhat.
+	- Continued work on levtool. Now saving of things and templates
+	  for things works better again.
+	- Levtool saved world file is now also less verbose by using
+	  %g instead of %f for floating point format output.
+	- Wouter Wijngaards and Jorrit Tyberghein did a lot of debugging
+	  and improvement of the radiosity code. At this moment it seems
+	  to be working reasonably well now.
+	- Michael Dale Long integrated a patch to input in cctest from
+	  admin@wwwconsulting.com to improve input under Windows.
+	- Fixes to csphyzik from Michael Ewert.
 	- Thomas Hieber did some cosmetic updates to icsgame.h.
 	- Further cosmetic changes to icsgame.h. I also added Doxygen
 	  comments to the methods.

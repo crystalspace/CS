@@ -1603,6 +1603,18 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
 
   csShadowFrustum* sf = lview.shadows.GetFirst ();
   csFrustum *lf = lview.light_frustum;
+
+  // Precalculate the normals for csFrustum::BatchClassify.
+  csVector3* lf_verts = lf->GetVertices ();
+  csVector3 lf_normals[100];	// @@@ HARDCODED!
+  i1 = lf->GetNumVertices ()-1;
+  for (i = 0 ; i < lf->GetNumVertices () ; i++)
+  {
+    lf_normals[i1] = lf_verts[i1] % lf_verts[i];
+    i1 = i;
+  }
+
+  // For every shadow frustum...
   while (sf)
   {
     // First check if the plane of the shadow frustum is close to the plane
@@ -1613,8 +1625,8 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
     else
     {
       csPolygon3D* sfp = sf->polygon;
-      switch (csFrustum::Classify (
-        lf->GetVertices (), lf->GetNumVertices (),
+      switch (csFrustum::BatchClassify (
+        lf_verts, lf_normals, lf->GetNumVertices (),
         sf->GetVertices (), sf->GetNumVertices ()))
       {
         case CS_FRUST_PARTIAL:
