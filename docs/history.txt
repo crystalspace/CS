@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+24-Feb-2003
+	- Eric Sunshine removed the recently added empty mottest.cfg and
+	  instead fixed the problem of Debian installation failing by repairing
+	  the broken mottest.mak so that it no longer refers to a non-existent
+	  file.
+
 23-Feb-2003
 	- Christian Bayle fixed menu in debian package
 	- Eric Sunshine made the following changes:

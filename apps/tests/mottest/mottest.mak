@@ -36,7 +36,7 @@ SRC.MOTTEST = $(wildcard apps/tests/mottest/*.cpp)
 OBJ.MOTTEST = $(addprefix $(OUT)/,$(notdir $(SRC.MOTTEST:.cpp=$O)))
 DEP.MOTTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.MOTTEST = $(foreach d,$(DEP.MOTTEST),$($d.LIB))
-CFG.MOTTEST = data/config/mottest.cfg
+#CFG.MOTTEST = data/config/mottest.cfg
 
 #TO_INSTALL.EXE    += $(MOTTEST.EXE)
 #TO_INSTALL.CONFIG += $(CFG.MOTTEST)
