@@ -29,6 +29,9 @@ The history order has been reversed so that new features are at the top.
 	  which were importing csengine, csparser, csfx, csgfxldr, and cssys
 	  headers.  Plugins should only interact with the system via SCF
 	  interfaces, so it was incorrect to include these headers.
+	- Thomas Hieber added a new class for XML loader.
+	- Thomas also updated vfs.cfg with a path to csgam data.
+	- Martin Geisse fixed a compilation problem in the linex canvas.
 5-Mar-2001
 	- Thomas Hieber did the following to the gamecore plugin:
 	    - Added to scf.cfg.
