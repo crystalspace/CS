@@ -66,10 +66,10 @@ csLightMapped::~csLightMapped ()
   CHK (delete tex1);
   CHK (delete tex2);
   CHK (delete tex3);
-  CHK (delete lightmap);
-  CHK (delete lightmap1);
-  CHK (delete lightmap2);
-  CHK (delete lightmap3);
+  if (lightmap) lightmap->Release ();
+  if (lightmap1) lightmap1->Release ();
+  if (lightmap2) lightmap2->Release ();
+  if (lightmap3) lightmap3->Release ();
 }
 
 void csLightMapped::Setup (csPolygon3D* poly3d, csTextureHandle* txtMM)
@@ -705,7 +705,9 @@ void csPolygon3D::SetTextureSpace (
   delete_plane = true;
 
   ComputeNormal ();
-  plane->SetTextureSpace (xo, yo, zo, x1, y1, z1, len1, x2, y2, z2, len2);
+  plane->SetTextureSpace (csVector3 (xo, yo, zo),
+  	csVector3 (x1, y1, z1), len1,
+	csVector3 (x2, y2, z2), len2);
 }
 
 

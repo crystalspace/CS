@@ -91,10 +91,6 @@ public:
   			  csVector3& v2, float len2);
   ///
   void SetTextureSpace (float xo, float yo, float zo,
-			  float x1, float y1, float z1, float len1,
-			  float x2, float y2, float z2, float len2);
-  ///
-  void SetTextureSpace (float xo, float yo, float zo,
   			  float x1, float y1, float z1,
   			  float len);
   ///
