@@ -24,7 +24,7 @@ and dynamic link libraries in pre-compiled form from the following location
 on the Crystal Space server:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19b.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19c.zip}
 
 @subheading zlib
 @cindex zlib
