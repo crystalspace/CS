@@ -6,9 +6,6 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-6-Oct-2003
-	- res fixed the borked recursive directory scan logic in the general
-	  .csplugin plugin scanner.
 5-Oct-2003
 	- Marten Svanfeldt added the posibility to automatically generate 
 	  texturecoordinates for reflective cubemaping.
@@ -20,6 +17,12 @@ chronological order.
 	  CompileGroup statements and the wrong Help.
 	- Marten applied a fix to csSet::GetIterator and the 
 	  csSet::GlobalIterator
+	- res fixed borked recursive directory scan logic in the cssys/general
+	  .csplugin plugin scanner.
+	- Eric Sunshine removed some unneccessary change-log entries which were
+	  recently added to the source and header files of the MacOS/X port.
+	  We already have CVS and history.txt for this purpose.  Also made
+	  minor formatting and whitespace corrections.
 3-Oct-2003
 	- Jorrit changed syntax services->ParsePortal() into
 	  HandlePortalParameter(). This is a more general function which can
