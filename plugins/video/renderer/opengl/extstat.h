@@ -29,9 +29,10 @@
  * Simply comment or uncomment the lines below.
  */
 
-#define CSGL_EXT_STATIC_ASSERTION_ARB_multitexture
-#define CSGL_EXT_STATIC_ASSERTION_ARB_texture_compression
-#define CSGL_EXT_STATIC_ASSERTION_NV_vertex_array_range
-#define CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_combine
+//#define CSGL_EXT_STATIC_ASSERTION_ARB_multitexture
+//#define CSGL_EXT_STATIC_ASSERTION_ARB_texture_compression
+//#define CSGL_EXT_STATIC_ASSERTION_NV_vertex_array_range
+//#define CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_combine
+//#define CSGL_EXT_STATIC_ASSERTION_SGIS_generate_mipmap
 
 #endif
