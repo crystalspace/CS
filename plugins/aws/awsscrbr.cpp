@@ -248,27 +248,60 @@ bool awsScrollBar::GetProperty (const char *name, void **parm)
     *parm = (void *) &value;
     return true;
   }
-
+  else if (strcmp ("Change", name) == 0)
+  {
+    *parm = (void*) &value_delta;
+    return true;
+  }
+  else if (strcmp ("BigChange", name) == 0)
+  {
+    *parm = (void*) &value_page_delta;
+    return true;
+  }
+  else if (strcmp ("Max", name) == 0)
+  {
+    *parm = (void*) &max;
+    return true;
+  }
+  else if (strcmp ("Min", name) == 0)
+  {
+    *parm = (void*) &min;
+    return true;
+  }
+  else if (strcmp ("PageSize", name) == 0)
+  {
+    *parm = (void*) &amntvis;
+    return true;
+  }
+ 
   return false;
 }
 
 bool awsScrollBar::SetProperty (const char *name, void *parm)
 {
-  if (awsComponent::SetProperty (name, parm)) return true;
+  if (awsComponent::SetProperty (name, parm)) 
+    return true;
 
   if (strcmp ("Change", name) == 0)
   {
     value_delta = *(int *)parm;
+    
+    Invalidate ();
     return true;
   }
   else if (strcmp ("BigChange", name) == 0)
   {
     value_page_delta = *(int *)parm;
+
+    Invalidate ();
     return true;
   }
   else if (strcmp ("Min", name) == 0)
   {
     min = *(int *)parm;
+
+    // Fix value in case it's out of range
+    value = (value < min) ? min : value;
 
     Invalidate ();
     return true;
@@ -283,7 +316,7 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
     int maxval = (int)(max - amntvis + 1);
 
     // Fix value in case it's out of range
-    value = (value < 0 ? 0 : (value > maxval ? maxval : value));
+    value = (value < min ? min : (value > maxval ? maxval : value));
 
     Invalidate ();
     return true;
@@ -298,11 +331,14 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
     int maxval = (int)(max - amntvis + 1);
 
     // Fix value in case it's out of range
-    value = (value < 0 ? 0 : (value > maxval ? maxval : value));
+    value = (value < min ? min : (value > maxval ? maxval : value));
 
     Invalidate ();
     return true;
   }
+/* @@@ The 'Value' property is read-only, as also stated in the documentation.
+  I wonder why this code is here then! Luca (groton@gmx.net)
+
   else if (strcmp ("Value", name) == 0)
   {
     value = *(int *)parm;
@@ -310,12 +346,11 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
     // Fix value in case it's out of range
     int maxval = (int)(max - amntvis + 1);
 
-    value = (value < 0 ? 0 : (value > maxval ? maxval : value));
+    value = (value < min ? min : (value > maxval ? maxval : value));
 
     Invalidate ();
     return true;
-  }
-
+  }*/
 
   return false;
 }
@@ -379,7 +414,7 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
 
   sb->value =
     (
-      sb->value < sb->min ? 0 :
+      sb->value < sb->min ? sb->min :
         (sb->value > maxval ? maxval : sb->value)
     );
   sb->Broadcast (signalChanged);
@@ -412,7 +447,7 @@ void awsScrollBar::TickTock (void *sk, iAwsSource *)
  int maxval = (int)(sb->max - sb->amntvis + 1);
   sb->value =
     (
-      sb->value < sb->min ? 0 :
+      sb->value < sb->min ? sb->min :
         (sb->value > maxval ? maxval : sb->value)
     );
 
@@ -430,7 +465,7 @@ void awsScrollBar::IncClicked (void *sk, iAwsSource *)
  int maxval = (int)(sb->max - sb->amntvis + 1);
   sb->value =
     (
-     sb->value < sb->min ? 0 :
+     sb->value < sb->min ? sb->min :
      (sb->value > maxval ? maxval : sb->value)
      );
 
@@ -448,7 +483,7 @@ void awsScrollBar::DecClicked (void *sk, iAwsSource *)
  int maxval = (int)(sb->max - sb->amntvis + 1);
   sb->value =
     (
-      sb->value < sb->min ? 0 :
+      sb->value < sb->min ? sb->min :
         (sb->value > maxval ? maxval : sb->value)
     );
 

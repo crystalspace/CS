@@ -2,7 +2,10 @@ Crystal Space detailed change log.
 http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
-
+29-Jun-2003
+	- Luca fixed the inconcistency of properties read and written by
+	  Set/GetProperty in the awsScrollBar class. He updated the texinfo
+	  docs about scrollbar's properties too.
 28-Jun-2003
 	- DeSigna fixed a small logic error in csGetKeyDesc(), where
 	  a ?: conditional had its values the wrong way round.
