@@ -179,7 +179,10 @@ private:
 
   // Enables offsetting of Z values
   void EnableZOffset ()
-  { glPolygonOffset (-0.05f, -2.0f); 
+  // @@@ Jorrit: to avoid flickering I had to increase the
+  // values below and multiply them with 3.
+  //{ glPolygonOffset (-0.05f, -2.0f); 
+  { glPolygonOffset (-0.15f, -6.0f); 
   statecache->Enable_GL_POLYGON_OFFSET_FILL (); }
 
   // Disables offsetting of Z values

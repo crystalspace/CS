@@ -1834,7 +1834,10 @@ void csGLGraphics3D::SetShadowState (int state)
       statecache->Enable_GL_STENCIL_TEST ();
       statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
       //statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-      glPolygonOffset (-0.1f, -4.0f); 
+      // @@@ Jorrit: to avoid flickering I had to increase the
+      // values below and multiply them with 3.
+      //glPolygonOffset (-0.1f, -4.0f); 
+      glPolygonOffset (-0.3f, -12.0f); 
       statecache->Enable_GL_POLYGON_OFFSET_FILL ();
       break;
     case CS_SHADOW_VOLUME_PASS1:
