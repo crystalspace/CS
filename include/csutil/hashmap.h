@@ -28,6 +28,8 @@
 #include "csextern.h"
 #include "parray.h"
 #include "array.h"
+// For csHashCompute() which used to be declared here.
+#include "hash.h"
 
 class csHashMapReversible;
 class csHashIteratorReversible;
@@ -35,14 +37,9 @@ class csHashIteratorReversible;
 class csHashMap;
 
 /// An opaque hash key.
-typedef uint32 csHashKey;
+typedef unsigned int csHashKey;
 /// An opaque hash value.
 typedef void* csHashObject;
-
-/// Compute a hash key for a null-terminated string.
-CS_CSUTIL_EXPORT csHashKey csHashCompute(char const*);
-/// Compute a hash key for a string of a given length.
-CS_CSUTIL_EXPORT csHashKey csHashCompute(char const*, int length);
 
 /**
  * An element inside the hashmap (private element).
@@ -79,11 +76,11 @@ private:
   /// index of next item in bucket.
   int element_index;
   /// Current bucket index in hashmap.
-  uint32 bucket_index;
+  unsigned int bucket_index;
   /// Current number of items in bucket.
-  uint32 bucket_len;
+  unsigned int bucket_len;
   /// Number of buckets.
-  uint32 nbuckets;
+  unsigned int nbuckets;
   /// Pointer to the hashmap.
   csHashMap* hash;
   /// Const version of hash.
@@ -145,7 +142,7 @@ private:
   /// Current index in bucket.
   int current_index;
   /// Current bucket index in hashmap.
-  uint32 bucket_index;
+  unsigned int bucket_index;
   /// Key to iterate over.
   csHashKey key;
   /// Pointer to the hashmap.
@@ -203,24 +200,24 @@ private:
   /// the list of buckets
   csHashBucketVector Buckets;
   /// Max size of this vector.
-  uint32 NumBuckets;
+  unsigned int NumBuckets;
   /// Number of elements in hash (to detect when to increase vector size).
   int hash_elements;
 
   /// Reorganize the hashmap with a different size of buckets.
-  void ChangeBuckets (uint32 newsize);
+  void ChangeBuckets (unsigned int newsize);
 
   /**
    * Put an object in the bucket vector.
    */
-  void PutInternal (uint32 idx, csHashKey key, csHashObject object);
+  void PutInternal (unsigned int idx, csHashKey key, csHashObject object);
 
 
   /// Find a prime number bigger then the given input number.
-  static uint32 FindNextPrime (uint32 num);
+  static unsigned int FindNextPrime (unsigned int num);
 
 public:
-  static uint32 prime_table[];
+  static unsigned int prime_table[];
 
   /**
    * Constructor. The parameter for the constructor
@@ -232,7 +229,7 @@ public:
    * For a bigger list go to www.utm.edu/research/primes.
    * The map will grow dynamically if needed.
    */
-  csHashMap (uint32 size = 53);
+  csHashMap (unsigned int size = 53);
 
   /**
    * Destructor. The objects referenced too in this hash
@@ -295,7 +292,7 @@ public:
    * Construct a new empty set.
    * The given size will be given to the hasmap.
    */
-  csHashSet (uint32 size = 211);
+  csHashSet (unsigned int size = 211);
 
   /**
    * Add an object to this set.

@@ -61,6 +61,9 @@ chronological order.
 	  documentation.
 	- Jorrit optimized the NR terrain engine by removing an unneeded
 	  call to ClipBBox(). If ClipBSphere() is used then that's sufficient.
+	- Eric Sunshine fixed bug in the deprecated csutil/hashmap.h where it
+	  was re-declaring the csHashCompute() functions with signatures
+	  different from the ones in csutil/hash.h.
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
