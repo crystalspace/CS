@@ -79,7 +79,7 @@ public:
     virtual void OnLower();
 
     /// Triggered when the component needs to draw
-    virtual void OnDraw(awsCanvas &canvas);
+    virtual void OnDraw();
 
     /// Triggered when the user presses a mouse button down
     virtual bool OnMouseDown(int button, int x, int y);

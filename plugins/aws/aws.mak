@@ -41,7 +41,7 @@ endif
 INC.AWS = $(wildcard plugins/aws/*.h)
 SRC.AWS = $(wildcard plugins/aws/*.cpp)
 OBJ.AWS = $(addprefix $(OUT),$(notdir $(SRC.AWS:.cpp=$O)))
-DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSFX CSGFX
+DEP.AWS = CSUTIL CSSYS CSUTIL CSGEOM CSTOOL CSGFX
 
 MSVC.DSP += AWS
 DSP.AWS.NAME = aws

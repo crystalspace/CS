@@ -91,3 +91,50 @@ awsWindow::OnLower()
    Broadcast(sWindowLowered);
    return;
 }
+
+bool 
+awsWindow::OnMouseDown(int button, int x, int y)
+{
+}
+    
+bool 
+awsWindow::OnMouseUp(int button, int x, int y)
+{
+}
+
+bool 
+awsWindow::OnMouseMove(int button, int x, int y)
+{
+}
+
+bool 
+awsWindow::OnMouseExit()
+{
+}
+
+bool 
+awsWindow::OnMouseEnter()
+{
+}
+
+bool 
+awsWindow::OnKeypress(int key)
+{
+}
+
+bool 
+awsWindow::OnLostFocus()
+{
+}
+
+bool 
+awsWindow::OnGainFocus()
+{
+}
+
+void 
+awsWindow::OnDraw()
+{
+
+}
+

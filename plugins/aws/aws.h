@@ -95,6 +95,18 @@ class awsManager : public iAws
    /// Procedural texture canvas instantiation
    awsCanvas canvas;
 
+   /** 
+    * Defines the mapping between a factory and it's interned name.  Used for window template instantiation.
+    */
+   struct awsComponentFactoryMap
+   {
+      awsComponentFactory *factory;
+      unsigned long        id;
+   };
+
+   /// Contains the list of factory to ID mappings.
+   csDLinkList component_factories;
+
 public:
     DECLARE_IBASE;
 
@@ -108,6 +120,9 @@ public:
 
     /// Set the preference manager used by the window system
     virtual void       SetPrefMgr(iAwsPrefs *pmgr);
+
+    /// Register a component factory
+    virtual void       RegisterComponentFactory(awsComponentFactory *factory, char *name);
 
     /// Get the top window
     virtual awsWindow *GetTopWindow();

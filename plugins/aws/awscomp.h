@@ -52,7 +52,7 @@ class awsComponent : public awsSigSrc
    /// The rectangle marking the frame of this component
    csRect frame;
 
-   ///Every component will have a name, which is translated to an id
+   /// Every component will have a name, which is translated to an id
    unsigned long id;
 
 public:
@@ -72,6 +72,9 @@ public:
     /// Invalidation routine: allow the component to be redrawn when you call this
     virtual void Invalidate();
 
+    /// Returns the named TYPE of the component, like "Radio Button", etc.
+    virtual char *Type()=0;
+
 protected:
     /// Get's this components idea of the window manager.  Should be used internally by the component ONLY.
     iAws *WindowManager()
@@ -79,7 +82,7 @@ protected:
 
 public:
     /// Triggered when the component needs to draw
-    virtual void OnDraw(awsCanvas &canvas)=0;
+    virtual void OnDraw()=0;
 
     /// Triggered when the user presses a mouse button down
     virtual bool OnMouseDown(int button, int x, int y)=0;
@@ -105,6 +108,22 @@ public:
     /// Triggered when the keyboard focus is gained
     virtual bool OnGainFocus()=0;
 
+};
+
+class awsComponentFactory : public iBase
+{
+public:
+    /// Calls register to register the component that it builds with the window manager
+    awsComponentFactory(iAws *wmgr);
+
+    /// Does nothing
+    virtual ~awsComponentFactory();
+
+    /// Returns a newly created component of the type this factory handles. 
+    virtual awsComponent *Create()=0;
+
+    /// Registers this factory with the window manager
+    void Register(iAws *wmgr, char *type);
 };
 
 #endif

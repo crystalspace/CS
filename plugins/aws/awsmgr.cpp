@@ -43,6 +43,20 @@ awsManager::SetPrefMgr(iAwsPrefs *pmgr)
    }
 }
 
+void
+awsManager::RegisterComponentFactory(awsComponentFactory *factory, char *name)
+{
+   awsComponentFactoryMap *cfm = new awsComponentFactoryMap;
+
+   factory->IncRef();
+
+   cfm->factory= factory;
+   cfm->id=prefmgr->NameToId(name);
+
+
+   component_factories.AddItem(cfm);
+}
+
 awsWindow *
 awsManager::GetTopWindow()
 { return top; }
