@@ -29,13 +29,13 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp apps/tests/gfxtst
 
 GFXTEST.EXE = gfxtest$(EXE)
-#INC.GFXTEST =
-SRC.GFXTEST = $(wildcard apps/tests/gfxtst/*.cpp)
+INC.GFXTEST =
+SRC.GFXTEST = apps/tests/gfxtst/gfxtest.cpp
 OBJ.GFXTEST = $(addprefix $(OUT),$(notdir $(SRC.GFXTEST:.cpp=$O)))
 DEP.GFXTEST = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.GFXTEST = $(foreach d,$(DEP.GFXTEST),$($d.LIB))
 
-#TO_INSTALL.EXE += $(GFXTEST.EXE)
+TO_INSTALL.EXE += $(GFXTEST.EXE)
 
 MSVC.DSP += GFXTEST
 DSP.GFXTEST.NAME = gfxtest

@@ -32,10 +32,18 @@ The history order is reversed so that new features are at the top.
 	- Added 'simpmap' tutorial app. This app is not yet in the tutorials
 	  because it doesn't work yet. I have to investigate why it is
 	  crashing.
-	- Seems like simpmap is working after all. I only had to recompile
-	  the engine plugin :-)
-	- Added a new simple tutorial to the documentation. Now there
-	  are three chapters.
+	- Seems like simpmap is working after all.  I only had to recompile the
+	  engine plugin :-)
+	- Added a new simple tutorial to the documentation.  Now there are
+	  three chapters.
+	- Eric Sunshine eliminated the new SUBAPPLICATION_SUBMAKEFILES variable
+	  from subs.mak and replaced it with TESTS_SUBMAKEFILES and
+	  TUTORIAL_SUBMAKEFILES.
+	- Eric Sunshine renamed apps/tutor to apps/tutorial.  Also renamed the
+	  `simple' tutorial to `simple1' to complement the `simple2' tutorial.
+	- Eric Sunshine reverted Philip's changes to gfxtest.mak, vfstest.mak,
+	  and g2dtest.mak.  Most of the changes were unnecessary, but in a few
+	  cases they were also undesirable.
 14-Jun-2001
 	- Made the terrain visibility checker more efficient and more robust.
 	  The calculation of the extent works completely different now and
