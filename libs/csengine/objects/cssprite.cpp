@@ -1346,7 +1346,9 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights, csVector3* 
       {
         normal = tween_ratio * normal
           + (1 - tween_ratio) * tpl->GetNormal (nf_idx, j);
-        normal = normal.Unit();
+	float norm = normal.Norm ();
+	if (ABS (norm) > SMALL_EPSILON)
+          normal /= norm;
       }
 
       float cosinus;
@@ -1412,7 +1414,9 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
       {
         normal = tween_ratio * normal
           + (1 - tween_ratio) * tpl->GetNormal (nf_idx, j);
-        normal = normal.Unit();
+	float norm = normal.Norm ();
+	if (ABS (norm) > SMALL_EPSILON)
+          normal /= norm;
       }
 
       float cosinus;
