@@ -39,6 +39,7 @@
 #pragma warning(disable:4706)   // Assignmet in conditional expression
 #pragma warning(disable:4611)   // interaction between _setjmp and C++ destructors not portable
 #pragma warning(disable:4710)   // function not inlined
+#pragma warning(disable:4201)   // structure/ union without name. (Only relevant on MSVC 5.0)
 #endif
 
 #if defined(COMP_WCC) || defined(COMP_BC)
