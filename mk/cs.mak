@@ -11,8 +11,7 @@ include mk/user.mak
 -include config.mak
 include mk/common.mak
 
-.PHONY: depend clean cleanlib cleandep distclean install install_mkdir \
-  install_config uninstall 
+.PHONY: depend clean cleanlib cleandep distclean
 
 # Remove all standard suffixes to speed up make lookups
 .SUFFIXES:
@@ -172,17 +171,6 @@ endif
 all: $(OUTDIRS)
 
 dep: $(OUTBASE) $(OUTOS)
-
--include mk/install.mak
-install: $(TO_INSTALL.ROOT) $(TO_INSTALL.CONFIG) $(TO_INSTALL.DATA) \
-  $(TO_INSTALL.EXE) $(TO_INSTALL.STATIC_LIBS) $(TO_INSTALL.DYNAMIC_LIBS) \
-  $(INSTALL_DIR) install_data install_config install_dynamiclibs \
-  install_staticlibs install_exe install_include install_docs \
-  install_root install_logfile
-	@echo Please export CRYSTAL=$(INSTALL_DIR) in your environment.
-
-uninstall: uninstexe
-	uninst $(INSTALL_DIR)/install.log
 
 distclean: clean
 	-$(RM) config.mak include/volatile.h

@@ -32,11 +32,11 @@
 # Target descriptions
 DESCRIPTION.devapi = developer API reference via Doxygen
 DESCRIPTION.pubapi = public API reference via Doxygen
-DESCRIPTION.htmldoc = documentation as HTML
-DESCRIPTION.dvidoc = documentation as DVI
-DESCRIPTION.psdoc = documentation as PostScript
-DESCRIPTION.pdfdoc = documentation as PDF
-DESCRIPTION.infodoc = documentation as Info
+DESCRIPTION.htmldoc = user manual as HTML
+DESCRIPTION.dvidoc = user manual as DVI
+DESCRIPTION.psdoc = user manual as PostScript
+DESCRIPTION.pdfdoc = user manual as PDF
+DESCRIPTION.infodoc = user manual as Info
 DESCRIPTION.repairdoc = Texinfo @node and @menu directives
 # For 'cleandoc' target
 DESCRIPTION.doc = generated documentation
@@ -64,13 +64,13 @@ ifeq ($(MAKESECTION),roottargets)
 .PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
 
 devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc:
-	$(MAKE_TARGET)
+	$(MAKE_TARGET) DO_DOC=yes
 
 repairdoc:
 	@echo $(SEPARATOR)
 	@echo $"  Repairing $(DESCRIPTION.$@)$"
 	@echo $(SEPARATOR)
-	@$(MAKE) --no-print-directory -f mk/cs.mak $@
+	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 
 cleandoc:
 	$(MAKE_CLEAN)
@@ -79,6 +79,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
+
+# This section is specially protected by DO_DOC in order to prevent the lengthy
+# $(wildcard) operations from impacting _all_ other build targets.  DO_DOC is
+# only defined when a top-level documentaiton target is invoked.
+
+ifeq ($(DO_DOC),yes)
 
 PERL = perl
 NODEFIX = bin/nodefix.pl
@@ -128,11 +134,6 @@ OUT.DOC.DVI     = $(OUT.DOC)/dvi
 OUT.DOC.PS      = $(OUT.DOC)/ps
 OUT.DOC.PDF     = $(OUT.DOC)/pdf
 OUT.DOC.INFO    = $(OUT.DOC)/info
-
-API.DEV.HTML.FILES = $(wildcard $(OUT.DOC.API.DEV)/*.html)
-API.PUB.HTML.FILES = $(wildcard $(OUT.DOC.API.PUB)/*.html)
-API.DEV.HTM.FILES  = $(API.DEV.HTML.FILES:.html=.htm)
-API.PUB.HTM.FILES  = $(API.PUB.HTML.FILES:.html=.htm)
 
 # List of potential image types understood by Texinfo's @image{} directive.
 DOC.IMAGE.EXTS = png jpg gif eps txt
@@ -191,10 +192,18 @@ OUT.DOC.IMAGE.DIRS.INFO = \
 OUT.DOC.IMAGE.DIRS.TOP := $(filter-out $(foreach dir,\
   $(dir $(OUT.DOC.IMAGE.DIRS.ALL)),$(dir)%),$(OUT.DOC.IMAGE.DIRS.ALL))
 
+endif # ifeq ($(DO_DOC),yes)
+
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
+
+# This section is specially protected by DO_DOC in order to prevent the lengthy
+# $(wildcard) operations from impacting _all_ other build targets.  DO_DOC is
+# only defined when a top-level documentaiton target is invoked.
+
+ifeq ($(DO_DOC),yes)
 
 .PHONY: devapi pubapi htmldoc dvidoc psdoc pdfdoc infodoc repairdoc cleandoc
 .PHONY: do-devapi do-pubapi do-htmldoc do-dvidoc do-infodoc
@@ -354,5 +363,7 @@ repairdoc:
 # Remove all target documentation directories.
 cleandoc:
 	$(RMDIR) $(OUT.DOC)
+
+endif # ifeq ($(DO_DOC),yes)
 
 endif # ifeq ($(MAKESECTION),targets)

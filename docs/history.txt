@@ -1,5 +1,38 @@
 The history order has been reversed so that new features are at the top.
 
+29-Sep-2000
+	- Eric Sunshine made the following changes to install.mak and the
+	  installation-related makefile targets:
+	    - Consolidated all of the installation-related makefile goop into
+	      install.mak rather than having it spread around Makefile,
+	      cs.mak, and install.mak.  This is a much cleaner approach.
+	    - Now only performs the very expensive $(wildcard) operations when
+	      'install' is invoked, rather than performing them for _all_
+	      build targets project-wide.  This helps to reduce the lengthy
+	      pause and excessive disk-thrashing which occur between the time
+	      when the banner is displayed and the time when actual
+	      compilation commences (for non-install targets).
+	    - install.mak is now a 'standard' CS makefile in every sense.  It
+	      now employs the standard MAKESECTIONS and ROOTCONFIG mechanisms.
+	    - The INSTALL_DIR setting is now persistent (it gets written to
+	      config.mak).  This means that it can be specified at makefile
+	      configuration time (i.e. 'make INSTALL_DIR=/usr/local/crystal
+	      linux'), and will be remembered and used automatically by the
+	      'install' target.
+	    - INSTALL_DIR now has a default value (/usr/local/crystal).  The
+	      user can override this value at configuration or installation
+	      time if desired.
+	    - The configuration summary printed by the 'help' target now
+	      indicates the value of INSTALL_DIR along with the other standard
+	      settings such as USE_SHARED_PLUGINS, MODE, etc.
+	- Eric Sunshine made the following changes to docs.mak:
+	    - Now only performs the expensive $(wildcard) operations when
+	      documentation targets are invoked, rather than performing them
+	      for _all_ build targets project-wide.
+	    - Removed some variables which became obsolete with the
+	      introduction of efed.pl.
+	- Eric Sunshine fixed formatting of the help message in
+	  fontmanager.mak.
 28-Sep-2000
 	- Philip Wyett updated a few VC project files.
 	- Thomas Hieber did a very small update to icsgame.h.

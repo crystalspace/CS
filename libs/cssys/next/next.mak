@@ -1,7 +1,9 @@
-# This is an include file for all the makefiles which describes system specific
-# settings. Also have a look at mk/user.mak.
+#==============================================================================
+# This is the system makefile for MacOS/X Server, OpenStep, and NextStep.
+# Copyright (C)1998, 1999, 2000 by Eric Sunshine <sunshine@sunshineco.com>
+#==============================================================================
 
-# Only one of the cover makefiles should be including this file.  Ignore others.
+# Only one of the cover makefiles should be including this file. Ignore others.
 ifeq ($(NEXT.FRIEND),yes)
 
 # Choose which drivers you want to build/use
@@ -11,7 +13,7 @@ ifneq ($(NEXT.TARGET),)
   DESCRIPTION.$(NEXT.TARGET):=$(NEXT.DESCRIPTION)
 endif
 
-#------------------------------------------ rootdefines, defines, config ------#
+#----------------------------------------- rootdefines, defines, config ------#
 ifneq ($(findstring defines,$(MAKESECTION))$(findstring config,$(ROOTCONFIG)),)
 
 PROC.m68k  = M68K
@@ -28,14 +30,14 @@ endif
 
 endif # MAKESECTION is rootdefines, defines; ROOTCONFIG is config
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-SYSMODIFIERS=TARGET_ARCHS="$(NEXT.TARGET_ARCHS)"
+SYSMODIFIERS += $(NEWLINE)echo $"  TARGET_ARCHS="$(NEXT.TARGET_ARCHS)"$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#---------------------------------------------------- rootdefines & defines ---#
+#--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
 # Processor. Can be one of: INTEL, SPARC, POWERPC, M68K, HPPA, UNKNOWN
@@ -58,7 +60,7 @@ override DO_ASM=no
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
-#------------------------------------------------------------------ defines ---#
+#----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
 
 include mk/unix.mak
@@ -170,7 +172,7 @@ OUTSUFX.yes=
 
 endif # ifeq ($(MAKESECTION),defines)
 
-#--------------------------------------------------------------- confighelp ---#
+#-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
 
 # This makefile can be included more than once, but help messages should be
@@ -206,25 +208,27 @@ NEXT.COMMA = ,
 
 endif # ifeq ($(MAKESECTION),confighelp)
 
-#---------------------------------------------------------------- configure ---#
+#--------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
 ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
 
-SYSCONFIG += $(NEWLINE)bin/booltest.sh "cc -ObjC++" >> config.tmp
-SYSCONFIG += $(NEWLINE)bin/haspythn.sh >> config.tmp
-SYSCONFIG += $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 ifneq ($(strip $(TARGET_ARCHS)),)
   SYSCONFIG += $(NEWLINE)echo TARGET_ARCHS = $(NEXT.TARGET_ARCHS)>>config.tmp
 endif
+SYSCONFIG += \
+  $(NEWLINE)bin/booltest.sh "cc -ObjC++" >> config.tmp \
+  $(NEWLINE)bin/haspythn.sh >> config.tmp \
+  $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
 
 ifeq ($(ROOTCONFIG),volatile)
 
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_DIR "$(NEXT.PLUGIN_DIR)"$">>volatile.tmp
-MAKE_VOLATILE_H += $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_EXT "$(NEXT.PLUGIN_EXT)"$">>volatile.tmp
+MAKE_VOLATILE_H += \
+  $(NEWLINE)echo $"\#define OS_NEXT_$(NEXT.FLAVOR)$">>volatile.tmp \
+  $(NEWLINE)echo $"\#define OS_NEXT_DESCRIPTION "$(NEXT.DESCRIPTION)"$">>volatile.tmp \
+  $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_DIR "$(NEXT.PLUGIN_DIR)"$">>volatile.tmp \
+  $(NEWLINE)echo $"\#define OS_NEXT_PLUGIN_EXT "$(NEXT.PLUGIN_EXT)"$">>volatile.tmp
 
 endif # ifeq ($(ROOTCONFIG),volatile)
 endif # ifeq ($(MAKESECTION),rootdefines)

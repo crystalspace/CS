@@ -32,7 +32,9 @@ OS=OS2
 # Compiler
 COMP=GCC
 
-SYSMODIFIERS=USE_OMF=$(USE_OMF) USE_CRTDLL=$(USE_CRTDLL)
+SYSMODIFIERS += \
+  $(NEWLINE)echo $"  USE_OMF=$(USE_OMF)$" \
+  $(NEWLINE)echo $"  USE_CRTDLL=$(USE_CRTDLL)$"
 
 # The command to update target
 UPD=cmd /c bin\\os2upd.cmd $@ DEST
