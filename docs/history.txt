@@ -13,6 +13,8 @@ chronological order.
 	  guards are enabled.
 	- Eric Sunshine fixed the 'install' target so that it also installs the
 	  *.tok files from the CS/include/csplugincommon subdirectories.
+	- Vincent upgraded rpm/cs.spec for csplugincommon include directory.
+	  Also added *.afp to CS/data/shader/Jamfile InstallData directive.
 24-Feb-2005
 	- Jorrit fixed edge drawing by the OpenGL renderer by using
 	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently

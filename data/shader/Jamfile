@@ -1,5 +1,5 @@
 SubDir TOP data shader ;
 
-InstallData [ Wildcard *.avp *.fvp *.xml ] : data shader ;
+InstallData [ Wildcard *.afp *.avp *.fvp *.xml ] : data shader ;
 
 SubInclude TOP data shader parallax ;

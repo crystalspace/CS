@@ -1,6 +1,6 @@
 %define name    crystalspace
 %define version 0.99
-%define release 8
+%define release 9
 %define prefix	/usr
 
 %define with_DEBUG 0
@@ -210,6 +210,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/%{name}/imesh/*.h
 %{prefix}/include/%{name}/iutil/*.h
 %{prefix}/include/%{name}/csgeom/*.h
+%{prefix}/include/%{name}/csplugincommon/*
 %{prefix}/include/%{name}/cstool/*.h
 %{prefix}/include/%{name}/csutil/*.h
 %{prefix}/include/%{name}/csutil/*.inc
@@ -231,6 +232,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/%{name}/igraphic/*.h
 
 %changelog
+* Fri Feb 25 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-9
+- Upgraded for new csplugincommon include directory.
+
 * Wed Jan 05 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-8
 - Made a separate package for utilities.
 
