@@ -311,11 +311,13 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
     BoxEntirelyInPolygon(info.verts, info.num_verts, node_bbox))
   {
     if(!info.test_only)
+    {
       pObj->SetNodeState(node_pos, CS_QUAD_FULL);
-    /// mark children (if any) as unknown, since they should not be reached.
-    if(node_pos->depth < pObj->max_depth)
-      pObj->CallChildren(&csQuadTree::mark_node_func, pObj, node_bbox, 
-        node_pos, (void*)CS_QUAD_UNKNOWN);
+      /// mark children (if any) as unknown, since they should not be reached.
+      if(node_pos->depth < pObj->max_depth)
+        pObj->CallChildren(&csQuadTree::mark_node_func, pObj, node_bbox, 
+          node_pos, (void*)CS_QUAD_UNKNOWN);
+    }
     return CS_QUAD_CERTAINCHANGE;
   }
   
