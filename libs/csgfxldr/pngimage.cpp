@@ -1,7 +1,6 @@
 /*
     PNG image file format support for CrystalSpace 3D library
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Contributed by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -37,7 +36,8 @@ bool RegisterPNG ()
   return csImageLoader::Register (&loader);
 }
 
-csImageFile* csPNGImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iFormat)
+csImageFile* csPNGImageLoader::LoadImage (UByte* iBuffer, ULong iSize,
+  int iFormat)
 {
   CHK (ImagePngFile* i = new ImagePngFile (iFormat));
   if (i && !i->Load (iBuffer, iSize))
@@ -50,9 +50,17 @@ csImageFile* csPNGImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iForm
 
 //---------------------------------------------------------------------------
 
-void ImagePngFile::PNG_read (png_structp png, png_bytep data, png_size_t size)
+struct ImagePngRawData
 {
-  ImagePngFile *self = (ImagePngFile *) png->io_ptr;
+  // The buffer to "read" from
+  UByte *r_data;
+  // The buffer size
+  size_t r_size;
+};
+
+void ImagePngRead (png_structp png, png_bytep data, png_size_t size)
+{
+  ImagePngRawData *self = (ImagePngRawData *) png->io_ptr;
 
   if (self->r_size < size)
     png_error (png, "Read Error");
@@ -67,21 +75,17 @@ void ImagePngFile::PNG_read (png_structp png, png_bytep data, png_size_t size)
 bool ImagePngFile::Load (UByte *iBuffer, ULong iSize)
 {
   size_t rowbytes, exp_rowbytes;
-  png_infop end_info;
   png_infop info;
 
   if (!png_check_sig (iBuffer, iSize))
     return false;
-  r_data = iBuffer;
-  r_size = iSize;
 
-  png_structp png = png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+  png_structp png =
+    png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
   if (!png)
   {
 nomem:
-    r_data = NULL;
-    r_size = 0;
     free_image ();
     return false;
   }
@@ -92,15 +96,13 @@ nomem2:
     png_destroy_read_struct (&png, (png_infopp) NULL, (png_infopp) NULL);
     goto nomem;
   }
-  end_info = png_create_info_struct (png);
-  if (!end_info)
-    goto nomem2;
 
   if (setjmp (png->jmpbuf))
     // If we get here, we had a problem reading the file
     goto nomem2;
 
-  png_set_read_fn (png, (void *) this, PNG_read);
+  ImagePngRawData raw = { iBuffer, iSize };
+  png_set_read_fn (png, &raw, ImagePngRead);
 
   png_read_info (png, info);
 
@@ -118,7 +120,7 @@ nomem2:
     // Expand pictures with less than 8bpp to 8bpp
     png_set_packing (png);
 
-  enum { imgRGB, imgPAL, imgPALALPHA } ImageType;
+  volatile enum { imgRGB, imgPAL, imgPALALPHA } ImageType;
   switch (color_type)
   {
     case PNG_COLOR_TYPE_GRAY:
@@ -140,8 +142,8 @@ nomem2:
       // If there is no alpha information, fill with zeros
       if (!(color_type & PNG_COLOR_MASK_ALPHA))
       {
-        // Expand paletted or RGB images with transparency to full alpha channels
-        // so the data will be available as RGBA quartets.
+        // Expand paletted or RGB images with transparency to full alpha
+	// channels so the data will be available as RGBA quartets.
         if (png_get_valid (png, info, PNG_INFO_tRNS))
           png_set_expand (png);
         else
@@ -157,26 +159,18 @@ nomem2:
 
   // Allocate the memory to hold the image
   set_dimensions (Width, Height);
-  void *NewImage;
   if (ImageType == imgRGB)
-    NewImage = new RGBPixel [Width * Height],
     exp_rowbytes = Width * sizeof (RGBPixel);
   else if (ImageType == imgPALALPHA)
-    NewImage = new UByte [Width * Height * 2],
     exp_rowbytes = Width * 2;
   else
-    NewImage = new UByte [Width * Height],
     exp_rowbytes = Width;
-  if (!NewImage)
-    goto nomem2;
 
   rowbytes = png_get_rowbytes (png, info);
   if (rowbytes != exp_rowbytes)
     goto nomem2;                        // Yuck! Something went wrong!
 
-  CHK (png_bytep *row_pointers = new png_bytep[Height]);
-  for (png_uint_32 row = 0; row < Height; row++)
-    row_pointers [row] = ((png_bytep)NewImage) + row * rowbytes;
+  CHK (png_bytep * const row_pointers = new png_bytep[Height]);
 
   if (setjmp (png->jmpbuf))             // Set a new exception handler
   {
@@ -184,11 +178,24 @@ nomem2:
     goto nomem2;
   }
 
+  void *NewImage = NULL;
+  if (ImageType == imgRGB)
+    NewImage = new RGBPixel [Width * Height];
+  else if (ImageType == imgPALALPHA)
+    NewImage = new UByte [Width * Height * 2];
+  else
+    NewImage = new UByte [Width * Height];
+  if (!NewImage)
+    goto nomem2;
+
+  for (png_uint_32 row = 0; row < Height; row++)
+    row_pointers [row] = ((png_bytep)NewImage) + row * rowbytes;
+
   // Read image data
   png_read_image (png, row_pointers);
 
   // read rest of file, and get additional chunks in info_ptr
-  png_read_end (png, info);
+  png_read_end (png, (png_infop)NULL);
 
   if (ImageType == imgRGB)
     convert_rgb ((RGBPixel *)NewImage);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -38,14 +38,6 @@ protected:
 class ImagePngFile : public csImageFile
 {
   friend class csPNGImageLoader;
-
-  // The buffer to "read" from
-  UByte *r_data;
-  // The buffer size
-  size_t r_size;
-  // An "read from file" function to feed the image to libpng through
-  static void PNG_read (png_structp png, png_bytep data, png_size_t size);
-
 private:
   /// Initialize the image object
   ImagePngFile (int iFormat) : csImageFile (iFormat) { };
