@@ -36,12 +36,30 @@ csShaderVariableContext::~csShaderVariableContext ()
   SCF_DESTRUCT_IBASE ();
 }
 
+class SvVarArrayCmp : public csArrayCmp<csShaderVariable*, csStringID>
+{
+  static int SvKeyCompare (csShaderVariable* const& r, csStringID const& k)
+  { 
+    return r->GetName() - k;
+  }
+public:
+  SvVarArrayCmp (csStringID key) : 
+    csArrayCmp<csShaderVariable*, csStringID> (key, SvKeyCompare)
+  {
+  }
+};
+
+static int SvCompare (csShaderVariable* const& r, csShaderVariable* const& k)
+{ 
+  return r->GetName() - k->GetName();
+}
+
 void csShaderVariableContext::AddVariable 
   (csShaderVariable *variable) 
 {
-  csShaderVariable* var = GetVariable(variable->Name);
+  csShaderVariable* var = GetVariable (variable->Name);
   if (var == 0)
-    variables.Push (variable);
+    variables.InsertSorted (variable, SvCompare);
   else
     *var = *variable;
 }
@@ -49,11 +67,9 @@ void csShaderVariableContext::AddVariable
 csShaderVariable* csShaderVariableContext::GetVariable 
   (csStringID name) const 
 {
-  for (size_t i=0; i<variables.Length (); ++i)
-  {
-    if (variables[i]->GetName () == name)
-      return variables[i];
-  }
+  size_t index = variables.FindSortedKey (SvVarArrayCmp (name));
+  if (index != csArrayItemNotFound)
+    return variables[index];
   return 0;
 }
 
