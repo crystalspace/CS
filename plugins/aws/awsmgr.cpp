@@ -40,6 +40,8 @@
 #include "awscscr.h"
 #include "awslayot.h"
 
+#include "awsntbk.h"
+
 #include <stdio.h>
 
 const int proctex_width = 512;
@@ -852,18 +854,21 @@ bool awsManager::RecursiveBroadcastToChildren (
   iAwsComponent *cmp,
   iEvent &Event)
 {
-  int i;
-  iAwsComponent *child;
-
-  for (i = 0; i < cmp->GetChildCount (); ++i)
+  if (!cmp->isHidden ())
   {
-    child = cmp->GetChildAt (i);
+    int i;
+    iAwsComponent *child;
 
-    // If it has children, broadcast to them (depth-first recursion)
-    if (child->HasChildren ())
-      if (RecursiveBroadcastToChildren (child, Event)) return true;
-    if (CheckFocus (child, Event)) return true;
-  }           // End for
+    for (i = 0; i < cmp->GetChildCount (); ++i)
+    {
+      child = cmp->GetChildAt (i);
+
+      // If it has children, broadcast to them (depth-first recursion)
+      if (child->HasChildren ())
+        if (RecursiveBroadcastToChildren (child, Event)) return true;
+      if (CheckFocus (child, Event)) return true;
+    }           // End for
+  }
   return false;
 }
 
@@ -948,6 +953,9 @@ void awsManager::RegisterCommonComponents ()
   (void)new awsScrollBarFactory (this);
   (void)new awsBarChartFactory (this);
   (void)new awsStatusBarFactory (this);
+  (void)new awsNotebookFactory (this);
+  (void)new awsNotebookPageFactory (this);
+  (void)new awsNotebookButtonFactory (this);
 
   // Standard sink
   GetSinkMgr ()->RegisterSink ("awsStandardSink", new awsStandardSink ());
