@@ -58,8 +58,7 @@ public:
    * Load a configuration file.
    * <p>
    * If the file resides in a real filesystem, rather than a VFS filesystem,
-   * then pass NULL for the VFS argument.  This will clear all options before
-   * loading the new options, even if the file cannot be opened.
+   * then pass NULL for the VFS argument.
    * <p>
    * You can set the Merge flag to merge the newly loaded configuration
    * information into the existing information.  If you do so, nothing will
