@@ -10,6 +10,10 @@ The history order is reversed so that new features are at the top.
 	  target, but `testecho' was subverting it.
 	- Eric Sunshine fixed several modules which were leaking iEventOutlets
 	  which they had created.
+	- Eric Sunshine made scfFactory's handling of reference counts for
+	  scfSharedLibrary objects more sane (and less insane).  Also fixed a
+	  bug where scfFactory was decrementing the reference count of the
+	  scfSharedLibrary one too many times.
 7-Nov-2001
 	- Eric Sunshine fixed simpcon.cpp so that it now uses an octal
 	  character constant for cursor assignment, rather than using an 8-bit
