@@ -461,20 +461,16 @@ struct iEventOutlet : public iBase
 
   /**
    * Put a keyboard event into event queue.<p>
-   * Note that iKey is the key code, either the alphanumeric symbol
+   * Note that codeRaw is the key code, either the alphanumeric symbol
    * that is emmited by the given key when no shift keys/modes are
    * active (e.g. 'a', 'b', '.', '/' and so on) or one of CSKEY_XXX
-   * values (with value above 255) and the iChar parameter is the
-   * translated key, after applying all modeshift keys. Never assume
-   * that any of these two codes is always less 127, not being 255
-   * or 224 -- these are common mistakes for English-speaking programmers.
+   * values (with value above 255) and the codeCooked parameter is the
+   * translated key, after applying all modeshift keys.
    * <p>
-   * if you pass -1 as character code, the iChar argument is computed
-   * using an simple internal translation table that takes care of
-   * Control/Shift/Alt for English characters. But in general it is
-   * hardly advised your driver to make the conversion using OS-specific
-   * National Language Support subsystem so that national characters
-   * are properly supported.
+   * If you pass 0 as codeCooked, a synthesized value is created based upon
+   * codeRaw using an simple internal translation table that takes care of
+   * Control/Shift/Alt for English characters. However, in general, it is
+   * best if the entity posting the event can provide both codes.
    */
   virtual void Key (utf32_char codeRaw, utf32_char codeCooked, bool iDown) = 0;
 
