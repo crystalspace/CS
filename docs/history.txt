@@ -31,6 +31,14 @@ The history order is reversed so that new features are at the top.
 	- Probably fixed a bug in the csdemo sequence manager with regards
 	  to time-warping. Not sure though. This is complicated stuff and
 	  I'll have to look a little closer at it.
+	- Added iSequence::GetMainTime() to get the current time from
+	  the sequence manager.
+	- Using the above new function I greatly simplified processing
+	  of time in the demo sequence manager. All operations that are
+	  supposed to be handled by the sequence manager now operate
+	  on sequence manager time and no longer use the real time.
+	  This possibly fixes a time misalignment bug that sometimes
+	  seemed to occur when doing big time warps.
 26-Apr-2001
 	- Philip Wyett fixed gcc outputting Worm.dll and Dog.dll. Now
 	  outputs worm.dll and dog.dll.

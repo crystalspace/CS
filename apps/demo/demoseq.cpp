@@ -60,7 +60,7 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
   do_fade = false;
   fade_value = 0;
   suspended = true;
-  suspend_time = demo->GetTime ();
+  suspend_time = seqmgr->GetMainTime ();
   suspend_one_frame = false;
   main_sequence = NULL;
 }
@@ -105,8 +105,6 @@ void DemoSequenceManager::Setup (const char* sequenceFileName)
   main_sequence = loader->GetSequence ("main");
   main_sequence->IncRef ();
   seqmgr->RunSequence (0, main_sequence);
-  if (suspended) main_start_time = suspend_time;
-  else main_start_time = demo->GetTime ();
   seqmgr->Resume ();
   suspended = false;
   delete loader;
@@ -118,7 +116,7 @@ void DemoSequenceManager::Suspend ()
   {
     suspended = true;
     seqmgr->Suspend ();
-    suspend_time = demo->GetTime ();
+    suspend_time = seqmgr->GetMainTime ();
   }
 }
 
@@ -128,21 +126,6 @@ void DemoSequenceManager::Resume ()
   {
     suspended = false;
     seqmgr->Resume ();
-    // Now we correct all time information in the sequencer
-    // so that it appears as if we just go on from here.
-    cs_time dt = demo->GetTime ()-suspend_time;
-    start_fade_time += dt;
-    int i;
-    for (i = 0 ; i < pathForMesh.Length () ; i++)
-    {
-      PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
-      pfm->start_path_time += dt;
-    }
-    for (i = 0 ; i < meshRotation.Length () ; i++)
-    {
-      MeshRotation* mrot = (MeshRotation*)meshRotation[i];
-      mrot->start_time += dt;
-    }
   }
 }
 
@@ -159,45 +142,11 @@ void DemoSequenceManager::Restart (const char* sequenceFileName)
 
 void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
 {
-#if 0
-  if (int (dt) < 0 && restart)
-  {
-    Clear ();
-    do_fade = false;
-    fade_value = 0;
-    seqmgr->RunSequence (0, main_sequence);
-    cs_time cur;
-    if (suspended) cur = suspend_time;
-    else cur = demo->GetTime ();
-    printf ("suspended=%d suspend_time=%d demo->GetTime()=%d cur=%d dt=%d\n",
-    	suspended, suspend_time, demo->GetTime (), cur, dt);
-    printf ("main_start_time=%d\n", main_start_time);
-    dt = cur+dt-main_start_time;
-    if (suspended) main_start_time = suspend_time;
-    else main_start_time = demo->GetTime ();
-    printf ("new dt=%d main_start_time=%d\n", dt, main_start_time);
-    fflush (stdout);
-  }
-#endif
+  (void)restart;
 
   // Temporarily resume everything to make sure our data is ok.
   bool sus = suspended;
   Resume ();
-
-  // Now we correct all time information in the sequencer
-  // so that it appears as if we just go on from here.
-  start_fade_time -= dt;
-  int i;
-  for (i = 0 ; i < pathForMesh.Length () ; i++)
-  {
-    PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
-    pfm->start_path_time -= dt;
-  }
-  for (i = 0 ; i < meshRotation.Length () ; i++)
-  {
-    MeshRotation* pfm = (MeshRotation*)meshRotation[i];
-    pfm->start_time -= dt;
-  }
 
   // If we were suspended we say to the sequence manager to
   // suspend after one frame again. But we will have to go on
@@ -210,13 +159,13 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
     // If the sequence manager is empty we insert the main sequence
     // again.
     seqmgr->RunSequence (0, main_sequence);
-    main_start_time = demo->GetTime ();
   }
 }
 
 
-void DemoSequenceManager::Draw3DEffects (iGraphics3D* g3d, cs_time current_time)
+void DemoSequenceManager::Draw3DEffects (iGraphics3D* g3d)
 {
+  cs_time current_time = seqmgr->GetMainTime ();
   if (!suspended)
   {
     if (do_fade)
@@ -236,8 +185,7 @@ void DemoSequenceManager::Draw3DEffects (iGraphics3D* g3d, cs_time current_time)
   if (fade_value > .001) csfxFadeOut (g3d, fade_value);
 }
 
-void DemoSequenceManager::Draw2DEffects (iGraphics2D* /*g2d*/,
-	cs_time /*current_time*/)
+void DemoSequenceManager::Draw2DEffects (iGraphics2D* /*g2d*/)
 {
 }
 
@@ -247,7 +195,7 @@ void DemoSequenceManager::SetupFade (float start_fade, float end_fade,
   DemoSequenceManager::start_fade = start_fade;
   DemoSequenceManager::end_fade = end_fade;
   DemoSequenceManager::total_fade_time = total_fade_time;
-  start_fade_time = demo->GetTime ()-already_elapsed;
+  start_fade_time = seqmgr->GetMainTime ()-already_elapsed;
   if (already_elapsed >= total_fade_time)
   {
     // The fading is already done so we just set the fade
@@ -285,14 +233,14 @@ void DemoSequenceManager::SetupPath (csNamedPath* path,
   pfm->path = path;
   pfm->mesh = mesh;
   pfm->total_path_time = total_path_time;
-  pfm->start_path_time = demo->GetTime ()-already_elapsed;
+  pfm->start_path_time = seqmgr->GetMainTime ()-already_elapsed;
   pathForMesh.Push (pfm);
 }
 
-void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time current_time,
-	cs_time elapsed_time)
+void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time elapsed_time)
 {
   if (suspended) return;
+  cs_time current_time = seqmgr->GetMainTime ();
   int i = 0;
   int len = pathForMesh.Length ();
   while (i < len)
@@ -466,12 +414,12 @@ void DemoSequenceManager::DrawSelPoint (
 }
 
 void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
-	cs_time current_time,
 	const char* hilight, const csVector2& tl, const csVector2& br,
 	int selpoint)
 {
   int i;
   int len = pathForMesh.Length ();
+  cs_time current_time = seqmgr->GetMainTime ();
 
   //=====
   // Draw the border around the map.
@@ -674,7 +622,7 @@ void DemoSequenceManager::SetupRotatePart (iMeshWrapper* mesh,
   }
   mrot->mesh = mesh;
   mrot->total_time = total_rotate_time;
-  mrot->start_time = demo->GetTime ()-already_elapsed;
+  mrot->start_time = seqmgr->GetMainTime ()-already_elapsed;
   mrot->angle_speed = angle_speed;
   meshRotation.Push (mrot);
 }

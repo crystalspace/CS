@@ -187,6 +187,7 @@ public:
   virtual bool IsSuspended () { return suspended; }
   virtual void Resume ();
   virtual void TimeWarp (cs_time time, bool skip);
+  virtual cs_time GetMainTime () { return main_time; }
   virtual iSequence* NewSequence ();
   virtual void RunSequence (cs_time time, iSequence* sequence);
 };

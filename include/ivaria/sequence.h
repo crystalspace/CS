@@ -112,7 +112,7 @@ struct iSequence : public iBase
   virtual bool IsEmpty () = 0;
 };
 
-SCF_VERSION (iSequenceManager, 0, 0, 1);
+SCF_VERSION (iSequenceManager, 0, 0, 2);
 
 /**
  * The sequence manager. The sequence manager is a plugin that will perform
@@ -168,6 +168,13 @@ struct iSequenceManager : public iBase
    * and will not be executed again.
    */
   virtual void TimeWarp (cs_time time, bool skip) = 0;
+
+  /**
+   * Get the current time for the sequence manager. This is not
+   * directly related to the real current time.
+   * Suspending the sequence manager will also freeze this time.
+   */
+  virtual cs_time GetMainTime () = 0;
 
   /**
    * Create a new empty sequence. This sequence is not attached to the

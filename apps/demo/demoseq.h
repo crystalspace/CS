@@ -92,7 +92,6 @@ private:
   iSequence* main_sequence;
   bool suspended;
   bool suspend_one_frame;
-  cs_time main_start_time;
   cs_time suspend_time;
 
   //=====
@@ -158,20 +157,19 @@ public:
    * be called while in 3D mode and after drawing the
    * world (view->Draw()).
    */
-  void Draw3DEffects (iGraphics3D* g3d, cs_time current_time);
+  void Draw3DEffects (iGraphics3D* g3d);
 
   /**
    * Perform 2D special effects operations. This should
    * be called while in 2D mode.
    */
-  void Draw2DEffects (iGraphics2D* g2d, cs_time current_time);
+  void Draw2DEffects (iGraphics2D* g2d);
 
   /**
    * Control all paths (including the one for the camera).
    * This should be called from within NextFrame().
    */
-  void ControlPaths (iCamera* camera, cs_time current_time,
-  	cs_time elapsed_time);
+  void ControlPaths (iCamera* camera, cs_time elapsed_time);
 
   /**
    * Correctly position all objects (including the camera)
@@ -183,7 +181,7 @@ public:
    * For debugging, draw all active paths on screen. Draw the
    * path with the given name highlighted.
    */
-  void DebugDrawPaths (iCamera* camera, cs_time current_time,
+  void DebugDrawPaths (iCamera* camera,
 	const char* hilight, const csVector2& tl,
 	const csVector2& br, int selpoint);
 

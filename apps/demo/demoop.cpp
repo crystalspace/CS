@@ -86,7 +86,7 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
   }
 }
 
-void AttachOp::Do (cs_time dt)
+void AttachOp::Do (cs_time /*dt*/)
 {
   DemoSequenceManager::demoseq->ReplacePathObject (path, mesh);
 }
@@ -141,7 +141,7 @@ SetupMeshOp::SetupMeshOp (const char* meshName, const char* sectName,
   }
 }
 
-void SetupMeshOp::Do (cs_time dt)
+void SetupMeshOp::Do (cs_time /*dt*/)
 {
   if (mesh)
   {
@@ -164,7 +164,7 @@ ShowMeshOp::ShowMeshOp (const char* meshName)
   }
 }
 
-void ShowMeshOp::Do (cs_time dt)
+void ShowMeshOp::Do (cs_time /*dt*/)
 {
   if (mesh)
   {
@@ -184,7 +184,7 @@ HideMeshOp::HideMeshOp (const char* meshName)
   }
 }
 
-void HideMeshOp::Do (cs_time dt)
+void HideMeshOp::Do (cs_time /*dt*/)
 {
   if (mesh)
   {

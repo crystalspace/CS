@@ -824,7 +824,7 @@ void Demo::NextFrame ()
   }
 
   if (map_enabled < MAP_EDIT_FORWARD)
-    seqmgr->ControlPaths (view->GetCamera (), current_time, elapsed_time);
+    seqmgr->ControlPaths (view->GetCamera (), elapsed_time);
   else if (map_enabled == MAP_EDIT_FORWARD)
     seqmgr->DebugPositionObjects (view->GetCamera ());
 
@@ -854,7 +854,7 @@ void Demo::NextFrame ()
   if (map_enabled != MAP_EDIT)
   {
     view->Draw ();
-    seqmgr->Draw3DEffects (G3D, current_time);
+    seqmgr->Draw3DEffects (G3D);
     if (map_enabled == MAP_EDIT_FORWARD)
       csfxFadeToColor (G3D, .3, csColor (0, 0, 1));
   }
@@ -865,9 +865,9 @@ void Demo::NextFrame ()
   if (map_enabled == MAP_EDIT)
     G2D->Clear (0);
   else if (map_enabled < MAP_EDIT)
-    seqmgr->Draw2DEffects (G2D, current_time);
+    seqmgr->Draw2DEffects (G2D);
   if (map_enabled >= MAP_OVERLAY)
-    seqmgr->DebugDrawPaths (view->GetCamera (), current_time, map_selpath,
+    seqmgr->DebugDrawPaths (view->GetCamera (), map_selpath,
     	map_tl, map_br, map_selpoint);
   if (map_enabled == MAP_EDIT)
     DrawEditInfo ();
