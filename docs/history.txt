@@ -28,6 +28,9 @@ chronological order.
 	  Unfortunatelly this still doesn't fix the problems.
 	- Jorrit replaced DeleteAll() with Empty() in csRenderMeshList
 	  for more efficiency.
+	- Jorrit removed the sorting of the renderMeshListInfo structures
+	  in csRenderMeshList. This is not needed since they are already
+	  inserted sorted.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during

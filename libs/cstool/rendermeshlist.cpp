@@ -87,35 +87,6 @@ void csRenderMeshList::Empty ()
   }
 }
 
-/**
- * NOTE! This function sorts a bit unusual. First, put all elements
- * which is 0 at the end. (no elements really). Then sort according to RP
- */
-int csRenderMeshList::CompareMeshListInfo (void const* item1,
-                                           void const* item2)
-{
-  renderMeshListInfo* it1 = *((renderMeshListInfo**)item1);
-  renderMeshListInfo* it2 = *((renderMeshListInfo**)item2);
-  if (0 == it1 && 0 != it2)
-  {
-    return 1;
-  }
-  else if (0 != it1 && 0 == it2)
-  {
-    return -1;
-  }
-  else if (0 != it1 && 0 != it2)
-  {
-    //sort on rp
-    if (it1->renderPriority < it2->renderPriority)
-      return -1;
-    else if (it1->renderPriority > it2->renderPriority)
-      return 1;
-  }
-
-  return 0;
-}
-
 static int SortMeshBack2Front (void const* item1,
                         void const* item2)
 {
@@ -172,7 +143,6 @@ void csRenderMeshList::GetSortedMeshList (
   // iterate, and if needed, sort the lists
   // also sum up how many objects we have
   int numObjects = 0;
-  renderList.Sort (CompareMeshListInfo);
 
   csPDelArray < renderMeshListInfo >::Iterator it = renderList.GetIterator ();
   

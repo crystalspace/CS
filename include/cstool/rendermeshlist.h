@@ -79,10 +79,6 @@ private:
 
   };
 
-  /// Function used when sorting renderList
-  static int CompareMeshListInfo (void const* item1, 
-    void const* item2);
-
   csPDelArray < renderMeshListInfo > renderList;
   csRef<iEngine> engine;
 };
