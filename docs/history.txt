@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Feb-2004
+	- Eric Sunshine fixed CS/data/Jamfile so that it no longer tries to
+	  install the non-existent unifont.csf file.  (Bug reported by Frank
+	  Richter.)
 9-Feb-2004
 	- Eric Sunshine fixed bug in csKeyValuePair where it was incorrectly
 	  invoking SCF_CONSTRUCT_IBASE() even though it should not have been
