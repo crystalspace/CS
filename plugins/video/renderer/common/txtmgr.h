@@ -244,7 +244,8 @@ protected:
   /// Original material.
   csRef<iMaterial> material;
   /// Parent texture manager
-  csRef<csTextureManager> texman;
+  csTextureManager* texman; // be sure not to use csRef here, since you'll get
+			    // a circular reference then.
 
 public:
   ///

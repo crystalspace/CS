@@ -15,8 +15,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
-#define SCF_DEBUG
-
 #include "cssysdef.h"
 
 #include <stdarg.h>
@@ -44,7 +42,8 @@ SCF_IMPLEMENT_FACTORY (csGraphics3DOpenGL)
 
 SCF_EXPORT_CLASS_TABLE (gl3d)
   SCF_EXPORT_CLASS_DEP (csGraphics3DOpenGL, "crystalspace.graphics3d.opengl",
-    "OpenGL 3D graphics driver for Crystal Space", "crystalspace.font.server.")
+    "OpenGL 3D graphics driver for Crystal Space",
+    "crystalspace.font.server.")
 SCF_EXPORT_CLASS_TABLE_END
 
 /*=========================================================================

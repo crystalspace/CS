@@ -15,10 +15,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#include "cssysdef.h"
 
 #include <stdarg.h>
 #include <math.h>
-#include "cssysdef.h"
+
 #include "ogl_g3dcom.h"
 #include "ogl_txtmgr.h"
 #include "ogl_txtcache.h"
@@ -338,7 +339,7 @@ csTextureHandleOpenGL::csTextureHandleOpenGL (
   iImage *image, int flags, GLenum sourceFormat, int bpp,
   csGraphics3DOGLCommon *iG3D) : csTextureHandle (image, flags)
 {
-  (G3D = iG3D)->IncRef ();
+  (G3D = iG3D);//->IncRef ();
   (txtmgr = G3D->txtmgr)->IncRef ();
   has_alpha = false;
   this->sourceFormat = sourceFormat;
@@ -354,7 +355,7 @@ csTextureHandleOpenGL::~csTextureHandleOpenGL ()
     G3D->texture_cache->Uncache (this);
   txtmgr->UnregisterTexture (this);
   txtmgr->DecRef();
-  G3D->DecRef ();
+  //G3D->DecRef ();
   int i;
   for (i = vTex.Length ()-1; i >= 0; i--)
   {
