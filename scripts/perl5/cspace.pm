@@ -1532,7 +1532,8 @@ package cspace::csMath3;
 *FindIntersection = *cspacec::csMath3_FindIntersection;
 *Between = *cspacec::csMath3_Between;
 *SetMinMax = *cspacec::csMath3_SetMinMax;
-*Area3 = *cspacec::csMath3_Area3;
+*DoubleArea3 = *cspacec::csMath3_DoubleArea3;
+*Direction3 = *cspacec::csMath3_Direction3;
 *CalcNormal = *cspacec::csMath3_CalcNormal;
 *CalcPlane = *cspacec::csMath3_CalcPlane;
 *PlanesEqual = *cspacec::csMath3_PlanesEqual;
@@ -1769,7 +1770,7 @@ sub DESTROY {
 *ComputeNormal = *cspacec::csPoly3D_ComputeNormal;
 *ComputePolygonPlane = *cspacec::csPoly3D_ComputePolygonPlane;
 *ComputePlane = *cspacec::csPoly3D_ComputePlane;
-*GetSignedArea = *cspacec::csPoly3D_GetSignedArea;
+*GetArea = *cspacec::csPoly3D_GetArea;
 *GetCenter = *cspacec::csPoly3D_GetCenter;
 sub DISOWN {
     my $self = shift;
