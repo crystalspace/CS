@@ -32,6 +32,8 @@ The history order is reversed so that new features are at the top.
 	  happens when inserting polygons from the write queue.
 	- Also fixed a similar problem with comparing a bool with a
 	  non-bool value for coverage buffer insertion.
+	- Fixed a crash bug in iso engine. An IncRef() was recently
+	  removed.
 9-Dec-2002
 	- Fixed a bug in Dynavis where it would consider polygons as possible
 	  occluders even if Z very close to 0. This could cause bad overflow.
