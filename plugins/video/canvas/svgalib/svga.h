@@ -54,7 +54,7 @@ public:
   virtual bool Initialize (iSystem *pSystem);
 
   virtual bool BeginDraw () { return (Memory != NULL); }
-  virtual bool DoubleBuffer (bool Enable) { return true; }
+  virtual bool DoubleBuffer (bool /*Enable*/) { return true; }
   virtual bool GetDoubleBufferState () { return true; }
 
   virtual void Print (csRect *area = NULL);
