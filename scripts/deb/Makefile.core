@@ -1,8 +1,8 @@
 BUILDDIR=$(HOME)/local/debian/crystal
 #DATE=$(shell date '+%Y%m%d')
-VERSION=0.96
+VERSION=$(shell head -1 core/debian/changelog | sed 's/.*(\(.*\)-.*-.*).*/\1/')
 TAG=R0_96_002
-DATE=20030205
+DATE=$(shell head -1 core/debian/changelog | sed 's/.*(.*-\(.*\)-.*).*/\1/')
 
 default:
 	@echo "=============================================================="
