@@ -62,11 +62,6 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 
   // read the config file
   Config = System->CreateConfig ("/config/sound.cfg");
-  if (!Config) {
-    System->Printf(MSG_INITIALIZATION, "csSoundRenderSoftware::Initialize(): "
-      "cannot open config file: /config/sound.cfg\n");
-    return false;
-  }
 
   // load the sound driver plug-in
 #ifdef SOUND_DRIVER
@@ -97,11 +92,11 @@ bool csSoundRenderSoftware::Open()
   System->Printf (MSG_INITIALIZATION, "Software Sound Renderer selected\n");
 
   SoundDriver->Open(this,
-    Config->GetInt("SoundRender.Software", "FREQUENCY", 22050),
-    Config->GetYesNo("SoundRender.Software", "16BITS", true),
-    Config->GetYesNo("SoundRender.Software", "STEREO", true));
+    Config->GetInt("Sound.Software", "Frequency", 22050),
+    Config->GetYesNo("Sound.Software", "16Bits", true),
+    Config->GetYesNo("Sound.Software", "Stereo", true));
 
-  float v=Config->GetFloat("SoundRender","VOLUME",-1);
+  float v=Config->GetFloat("Sound","Volume",-1);
   if (v>1) v=1;
   if (v>=0) SetVolume(v);
 
@@ -111,6 +106,7 @@ bool csSoundRenderSoftware::Open()
   LoadFormat.Bits = is16Bits() ? 16 : 8;
   LoadFormat.Channels = -1;
 
+  System->Printf (MSG_INITIALIZATION, "  Volume: %g\n", GetVolume());
   return true;
 }
 

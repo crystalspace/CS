@@ -25,6 +25,8 @@
 
 #include "csutil/scf.h"
 #include "isystem.h"
+#include "icfgfile.h"
+
 #include "sndrdr.h"
 #include "sndlstn.h"
 #include "sndsrc.h"
@@ -47,6 +49,7 @@ csSoundRenderDS3D::csSoundRenderDS3D(iBase *piBase) {
   Listener = NULL;
   AudioRenderer = NULL;
   System = NULL;
+  Config = NULL;
 }
 
 bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
@@ -54,11 +57,13 @@ bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
+  Config = iSys->CreateConfig("/config/sound.cfg");
   return true;
 }
 
 csSoundRenderDS3D::~csSoundRenderDS3D() {
   Close();
+  if (Config) Config->DecRef();
 }
 
 bool csSoundRenderDS3D::Open()
@@ -72,7 +77,7 @@ bool csSoundRenderDS3D::Open()
       return false;
     }
   
-    DWORD dwLevel = DSSCL_NORMAL;
+    DWORD dwLevel = DSSCL_EXCLUSIVE;
     if (FAILED(AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel)))
     {
       System->Printf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
@@ -85,6 +90,10 @@ bool csSoundRenderDS3D::Open()
     Listener = new csSoundListenerDS3D(this);
     if (!Listener->Initialize(this)) return false;
   }
+
+  float vol = Config->GetFloat("Sound","Volume",-1);
+  if (vol>=0) SetVolume(vol);
+  System->Printf (MSG_INITIALIZATION, "  Volume: %g\n", GetVolume());
   
   return true;
 }
@@ -102,7 +111,7 @@ void csSoundRenderDS3D::SetVolume(float vol)
 {
   if (!Listener) return;
   long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
-  Listener->PrimaryBuffer->SetVolume(dsvol);
+  int a = Listener->PrimaryBuffer->SetVolume(dsvol);
 }
 
 float csSoundRenderDS3D::GetVolume()
@@ -110,7 +119,7 @@ float csSoundRenderDS3D::GetVolume()
   if (!Listener) return 0;
 
   long dsvol;
-  Listener->PrimaryBuffer->GetVolume(&dsvol);
+  int a = Listener->PrimaryBuffer->GetVolume(&dsvol);
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }
 

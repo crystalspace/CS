@@ -121,15 +121,15 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   m_bStereo = stereo;
 
   const char *callback_func=Config->GetStr
-    ("SoundDriver.WaveOut", "CALLBACK", "function");
+    ("Sound.WaveOut", "Callback", "function");
   const char *thread_func=Config->GetStr
-    ("SoundDriver.WaveOut", "THREAD_PRIORITY", "normal");
+    ("Sound.WaveOut", "ThreadPriority", "normal");
   bool threading = false;
 
   if(stricmp(callback_func, "thread")==0)
     threading = true;
 
-  unsigned int refresh=Config->GetInt("SoundDriver.WaveOut", "REFRESH", 5);
+  unsigned int refresh=Config->GetInt("Sound.WaveOut", "Refresh", 5);
 
 //  if(refresh>format.nAvgBytesPerSec) refresh=format.nAvgBytesPerSec;
 
@@ -195,6 +195,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
     }
     return E_FAIL;
   }
+  m_piSystem->Printf (MSG_INITIALIZATION, "  updating %d times per second\n", refresh);
 
   waveOutGetVolume(hwo, &old_Volume);
   int old_v2=old_Volume&0xffff;
