@@ -207,6 +207,7 @@ package cspace::iFactory;
 *QueryDescription = *cspacec::iFactory_QueryDescription;
 *QueryDependencies = *cspacec::iFactory_QueryDependencies;
 *QueryClassID = *cspacec::iFactory_QueryClassID;
+*QueryModuleName = *cspacec::iFactory_QueryModuleName;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
