@@ -34,6 +34,7 @@ struct iShaderVariable;
 struct iShaderTechnique;
 struct iShaderPass;
 struct iShaderProgram;
+struct iShaderProgramPlugin;
 
 SCF_VERSION (iShaderManager, 0,0,1);
 
@@ -198,6 +199,13 @@ struct iShaderProgram : iBase
   virtual bool SetProperty(const char* name, int* string) = 0;
   virtual bool SetProperty(const char* name, csVector3* string) = 0;
 //  virtual bool SetProperty(const char* name, csVector4* string) = 0;
+};
+
+SCF_VERSION(iShaderProgramPlugin, 0,0,1);
+struct iShaderProgramPlugin : iBase
+{
+  virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type) = 0  ;
+  virtual bool SupportType(const char* type) = 0;
 };
 
 #endif //__SHADER_H__

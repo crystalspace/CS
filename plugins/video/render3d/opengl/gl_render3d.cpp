@@ -47,11 +47,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "gl_txtmgr.h"
 #include "glextmanager.h"
 
-#include "ivideo/effects/efserver.h"
-#include "ivideo/effects/efdef.h"
-#include "ivideo/effects/eftech.h"
-#include "ivideo/effects/efpass.h"
-#include "ivideo/effects/eflayer.h"
 
 
 csRef<iGLStateCache> csGLRender3D::statecache;
@@ -69,6 +64,7 @@ SCF_EXPORT_CLASS_TABLE_END
 
 
 SCF_IMPLEMENT_IBASE(csGLRender3D)
+  SCF_IMPLEMENTS_INTERFACE(csGLRender3D)
   SCF_IMPLEMENTS_INTERFACE(iRender3D)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iComponent)
 SCF_IMPLEMENT_IBASE_END
@@ -578,6 +574,8 @@ bool csGLRender3D::Open ()
     else
       Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't find any shadermanager, ignoring shaders");
   }
+  scfiShaderRenderInterface.Initialize(object_reg);
+
 
   csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
   ext.InitExtensions (gl);
@@ -973,6 +971,12 @@ bool csGLRender3D::HandleEvent (iEvent& Event)
 ////////////////////////////////////////////////////////////////////
 csPtr<iShaderProgram> csGLRender3D::eiShaderRenderInterface::CreateShaderProgram(const char* programstring, void* parameters, const char* type)
 {
+  int i;
+  for(i = 0; i < pluginlist.Length(); ++i)
+  {
+    if( ((iShaderProgramPlugin*)pluginlist.Get(i))->SupportType(type))
+      return ((iShaderProgramPlugin*)pluginlist.Get(i))->CreateShaderProgram(programstring, parameters, type);
+  }
   return NULL;
 }
 
@@ -982,4 +986,31 @@ csGLRender3D::eiShaderRenderInterface::eiShaderRenderInterface()
 
 csGLRender3D::eiShaderRenderInterface::~eiShaderRenderInterface()
 {
+}
+
+void csGLRender3D::eiShaderRenderInterface::Initialize(iObjectRegistry *reg)
+{
+  object_reg = reg;
+  if(object_reg)
+  {
+    csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
+
+    iStrVector* classlist = iSCF::SCF->QueryClassList("crystal.video.shader.opengl.*");
+    int const nmatches = classlist->Length();
+    if(nmatches != 0)
+    {
+      int i;
+      for(i = 0; i < nmatches; ++i)
+      {
+        const char* classname = classlist->Get(i);
+        csRef<iShaderProgramPlugin> plugin = CS_LOAD_PLUGIN(plugin_mgr, classname, iShaderProgramPlugin);
+        if(plugin)
+        {
+          scfParent->Report( CS_REPORTER_SEVERITY_NOTIFY, "Loaded plugin %s", classname);
+          pluginlist.Push(plugin);
+          plugin->IncRef();
+        }
+      }
+    }
+  }
 }

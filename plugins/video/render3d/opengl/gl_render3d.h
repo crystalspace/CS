@@ -68,6 +68,7 @@ struct iEvent;
 #define CS_GL_CLIP_LAZY_STENCIL  'S'
 #define CS_GL_CLIP_LAZY_PLANES   'P'
 
+SCF_VERSION(csGLRender3D, 0,0,1);
 class csGLRender3D : public iRender3D
 {
   //friend declarations
@@ -318,11 +319,14 @@ public:
   class eiShaderRenderInterface : public iShaderRenderInterface
   {
   private:
-
+    csBasicVector pluginlist;
+    csRef<iObjectRegistry> object_reg;
   public:
     SCF_DECLARE_EMBEDDED_IBASE(csGLRender3D);
     eiShaderRenderInterface();
     virtual ~eiShaderRenderInterface();
+
+    virtual void Initialize( iObjectRegistry *reg);
 
     /// Create a shaderprogram from a string describing it
     virtual csPtr<iShaderProgram> CreateShaderProgram(const char* programstring, void* parameters, const char* type);
