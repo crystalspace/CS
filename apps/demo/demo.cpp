@@ -60,6 +60,14 @@
     return -1; \
   }
 
+#define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
+  myPlug = QUERY_PLUGIN_ID (this, funcid, iFace); \
+  if (!myPlug) \
+  { \
+    Printf (MSG_FATAL_ERROR, errMsg); \
+    return -1; \
+  }
+
 Demo::Demo ()
 {
   engine = NULL;
@@ -755,10 +763,10 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Printf (MSG_FATAL_ERROR, "No engine!\n");
     abort ();
   }
-  QUERY_PLUG (myG3D, iGraphics3D, "No iGraphics3D plugin !\n");
+  QUERY_PLUG_ID (myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin !\n");
   QUERY_PLUG (myG2D, iGraphics2D, "No iGraphics2D plugin !\n");
-  QUERY_PLUG (myVFS, iVFS, "No iVFS plugin !\n");
-  QUERY_PLUG (myConsole, iConsoleOutput, "No iConsoleOutput plugin !\n");
+  QUERY_PLUG_ID (myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin !\n");
+  QUERY_PLUG_ID (myConsole, CS_FUNCID_CONSOLE, iConsoleOutput, "No iConsoleOutput plugin !\n");
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("The Crystal Space Demo."))
