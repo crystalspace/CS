@@ -28,6 +28,14 @@ The history order is reversed so that new features are at the top.
 		the polygon queue.
 	      - DrawPolygonMesh is the only function using the super lightmap
 	        queues.
+	- Changed iLoader->LoadTexture() so that there is now an additional
+	  parameter which indicates if you want the default material
+	  to be created or not. In the past LoadTexture() automatically
+	  created a material with the same name as the just loaded texture.
+	  This is still true by default but you can now disable this
+	  behaviour. The standard map file loader now calls this function
+	  with this parameter set at 'false' so the automatic define
+	  of the materials no longer happens.
 19-Sep-2002
 	- Fixed some memory leaks in csInitializer.
 	- Several enhancements to levtool. By default it now lists the

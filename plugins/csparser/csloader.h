@@ -470,7 +470,7 @@ public:
   virtual iTextureWrapper* LoadTexture (const char *name,
   	const char *fname,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL,
-	bool reg = false);
+	bool reg = false, bool create_material = true);
 
   virtual csPtr<iSoundData> LoadSoundData (const char *fname);
   virtual csPtr<iSoundHandle> LoadSound (const char *fname);

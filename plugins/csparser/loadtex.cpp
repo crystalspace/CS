@@ -120,7 +120,8 @@ csPtr<iTextureHandle> csLoader::LoadTexture (const char *fname, int Flags,
 }
 
 iTextureWrapper* csLoader::LoadTexture (const char *name,
-	const char *fname, int Flags, iTextureManager *tm, bool reg)
+	const char *fname, int Flags, iTextureManager *tm, bool reg,
+	bool create_material)
 {
   if (!Engine)
     return NULL;
@@ -133,18 +134,23 @@ iTextureWrapper* csLoader::LoadTexture (const char *name,
 	Engine->GetTextureList ()->NewTexture(TexHandle);
   TexWrapper->QueryObject ()->SetName (name);
 
-  csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
-
-  iMaterialWrapper *MatWrapper = Engine->GetMaterialList ()->
-    NewMaterial (material);
-  MatWrapper->QueryObject ()->SetName (name);
+  iMaterialWrapper* matwrap = NULL;
+  if (create_material)
+  {
+    csRef<iMaterial> material (Engine->CreateBaseMaterial (TexWrapper));
+    matwrap = Engine->GetMaterialList ()->NewMaterial (material);
+    matwrap->QueryObject ()->SetName (name);
+  }
 
   if (reg && tm)
   {
     TexWrapper->Register (tm);
     TexWrapper->GetTextureHandle()->Prepare ();
-    MatWrapper->Register (tm);
-    MatWrapper->GetMaterialHandle ()->Prepare ();
+    if (matwrap)
+    {
+      matwrap->Register (tm);
+      matwrap->GetMaterialHandle ()->Prepare ();
+    }
   }
 
   return TexWrapper;

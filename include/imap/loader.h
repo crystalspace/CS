@@ -84,7 +84,8 @@ struct iLoader : public iBase
   /**
    * Load a texture as with LoadTexture() above and register it with the
    * engine. 'Name' is the name that the engine will use for the wrapper.
-   * This function also creates a material for the texture.
+   * If 'create_material' is true then this function also creates a
+   * material for the texture.<br>
    * If 'register' is true then the texture and material will be registered
    * to the texture manager. Set 'register' to false if you plan on calling
    * 'engine->Prepare()' later as that function will take care of registering
@@ -93,7 +94,7 @@ struct iLoader : public iBase
   virtual iTextureWrapper* LoadTexture (const char *Name,
   	const char *FileName,
 	int Flags = CS_TEXTURE_3D, iTextureManager *tm = NULL,
-	bool reg = false) = 0;
+	bool reg = false, bool create_material = true) = 0;
 
   /// Load a sound file and return an iSoundData object
   virtual csPtr<iSoundData> LoadSoundData (const char *fname) = 0;

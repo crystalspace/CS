@@ -196,7 +196,8 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
   // the 3D or 2D driver... if the texture is used for 2D only, it can
   // not have power-of-two dimensions...
 
-  csRef<iTextureWrapper> tex (LoadTexture (txtname, filename, flags));
+  csRef<iTextureWrapper> tex (LoadTexture (txtname, filename, flags,
+  	NULL, false, false));	// Do not create a default material.
   if (tex && do_transp)
     tex->SetKeyColor (QInt (transp.red * 255.99),
       QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
