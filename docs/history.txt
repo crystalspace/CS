@@ -21,6 +21,7 @@ The history order is reversed so that new features are at the top.
           (developers can raise locally). This eliminates alot of spurious
           warnings. Also enabled C++ exeception handling, which I thought
           was enabled, but whatever.
+            - Made awscG2D public.
 10-May-2003
 	- Philip Wyett eliminated the 88 double to float conversion compiler
           warnings in gtreeldr.cpp under MSVC 6.

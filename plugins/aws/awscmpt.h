@@ -32,7 +32,7 @@
 class awsMultiProctexCanvas :
   public iAwsCanvas
 {
-private:
+public:
   class awscG2D : public iGraphics2D
   {
 private:
