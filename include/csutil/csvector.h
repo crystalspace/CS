@@ -316,7 +316,7 @@ inline void csVector::QuickSort (int Mode)
     inline int InsertSorted (TYPE *Item, int *oEqual = NULL, int Mode = 0) \
     { Item->IncRef (); return csVector::InsertSorted ((csSome)Item, oEqual, Mode); } \
     inline bool Replace (int n, TYPE *what)				\
-    { what->IncRef (); return csVector::Replace(n, (csSome)what, true); \
+    { what->IncRef (); return csVector::Replace(n, (csSome)what, true); } \
     virtual bool FreeItem (csSome Item)					\
     { ((TYPE *)Item)->DecRef (); return true;}				\
   }
