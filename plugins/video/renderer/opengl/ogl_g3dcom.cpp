@@ -62,7 +62,7 @@
 
 // Whether or not we should try  and use OpenGL extensions. This should be
 // removed eventually, when all platforms have been updated.
-// #define USE_EXTENSIONS 1
+//#define USE_EXTENSIONS 1
 
 // ---------------------------------------------------------------------------
 
@@ -71,6 +71,7 @@
 // directory and mangle the file 'ext/ext_auto.inc'
 // to access your extension code
 #if USE_EXTENSIONS
+#include <GL/glext.h>
 #include "ext/ext_auto.inc"
 #else
 void csGraphics3DOGLCommon::DetectExtensions() {}
