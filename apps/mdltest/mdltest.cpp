@@ -21,7 +21,7 @@
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/mdldata.h"
-#include "simple1.h"
+#include "mdltest.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
