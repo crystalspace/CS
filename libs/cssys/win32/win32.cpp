@@ -170,11 +170,21 @@ static int s_KeyTable[257]= {
  * The thread entry point. Called by CsKeyboardDriver::Open()
  *
 */
+
+#define AUTOREPEAT_WAITTIME 1000 // 1 seconde
+#define AUTOREPEAT_TIME      100 // 10 keystroke/seconds
+
 DWORD WINAPI s_threadroutine(LPVOID param)
 {
 	SysKeyboardDriver * kbd=(SysKeyboardDriver*)param;
 	HRESULT hr;
-	char * buffer, *oldbuffer=NULL;
+	DWORD dwWait=INFINITE;
+	char * buffer;
+	int lastkey=-1;
+#ifndef DI_USEGETDEVICEDATA
+	char *oldbuffer=NULL;
+#else
+#endif
 	LPDIRECTINPUT lpdi=NULL;
 	LPDIRECTINPUTDEVICE lpKbd=NULL; 
 	HANDLE hEvent[2];
@@ -184,6 +194,17 @@ DWORD WINAPI s_threadroutine(LPVOID param)
 	CHK_FAILED(lpdi->CreateDevice(GUID_SysKeyboard, &lpKbd, NULL));
 	CHK_FAILED(lpKbd->SetDataFormat(&c_dfDIKeyboard)); 
 	CHK_FAILED(lpKbd->SetCooperativeLevel(::FindWindow(NAME,NULL), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)); 
+#ifdef DI_USEGETDEVICEDATA
+	{
+		DIPROPDWORD dpd;
+		dpd.diph.dwSize=sizeof(DIPROPDWORD);
+		dpd.diph.dwHeaderSize=sizeof(DIPROPHEADER);
+		dpd.diph.dwObj=0;
+		dpd.diph.dwHow=DIPH_DEVICE;
+		dpd.dwData=10; // The size of the buffer (should be more than sufficient)
+		CHK_FAILED(lpKbd->SetProperty(DIPROP_BUFFERSIZE,&dpd));
+	}
+#endif
 	hEvent[0]=::CreateEvent(NULL,FALSE,FALSE,NULL);
 	if(hEvent[0]==NULL)
 	{
@@ -207,12 +228,15 @@ DWORD WINAPI s_threadroutine(LPVOID param)
 		break;
 	}
 	CHK_FAILED(lpKbd->Acquire());
+#ifndef DI_USEGETDEVICEDATA
 	oldbuffer=new char[256];
 	hr=lpKbd->GetDeviceState(256,oldbuffer);
+#endif
 	while(1) {
-		switch(::WaitForMultipleObjects(2,hEvent,FALSE,INFINITE))
+		switch(::WaitForMultipleObjects(2,hEvent,FALSE,dwWait))
 		{
 		case WAIT_OBJECT_0:
+#ifndef DI_USEGETDEVICEDATA
 			buffer=new char[256];
 			do {
 				hr=lpKbd->GetDeviceState(256,buffer);
@@ -233,22 +257,97 @@ DWORD WINAPI s_threadroutine(LPVOID param)
 			for(i=0;i<256;i++)
 				if(oldbuffer[i]!=buffer[i])
 				{
-					if(buffer[i]&0X80)
+					if(buffer[i]&0X80) {
+						lastkey=i;
+						dwWait=AUTOREPEAT_WAITTIME;
 						kbd->do_keypress(SysGetTime(),s_KeyTable[i]);
-					else
+					} else {
+						dwWait=INFINITE;
+						lastkey=-1;
 						kbd->do_keyrelease(SysGetTime(),s_KeyTable[i]);
+					}
 					break;
 				}
 			delete[] oldbuffer;
 			oldbuffer=buffer;
+#else
+			DIDEVICEOBJECTDATA  * lpdidod;
+			DWORD dwNb;
+			do {
+				dwNb=INFINITE;
+				hr=lpKbd->GetDeviceData(sizeof(DIDEVICEOBJECTDATA),NULL,&dwNb,DIGDD_PEEK);
+				switch(hr)
+				{
+				case DIERR_NOTACQUIRED:
+				case DIERR_INPUTLOST:
+					lpKbd->Acquire();
+					break;
+				case DI_OK:
+					break;
+				case DI_BUFFEROVERFLOW:
+					hr=DI_OK;
+					break;
+				default:
+					::MessageBox(::GetFocus(), "lpKbd->GetDeviceState(hEvent) Failed!", NULL,MB_OK|MB_ICONERROR);
+					::ExitProcess(1);
+					break;
+				}
+			} while(hr!=DI_OK);
+			if(!dwNb)
+				continue;
+			lpdidod=new DIDEVICEOBJECTDATA[dwNb];
+			CHK_FAILED(lpKbd->GetDeviceData(sizeof(DIDEVICEOBJECTDATA),lpdidod,&dwNb,0));
+			for(i=0;i<dwNb;i++)
+			{
+				if(lpdidod[i].dwData&0X80)
+				{
+					lastkey=lpdidod[i].dwOfs;
+					dwWait=AUTOREPEAT_WAITTIME:
+					kbd->do_keypress(SysGetTime(),s_KeyTable[lpdidod[i].dwOfs]);
+				} else {
+					dwWait=INFINITE;
+					lastkey=-1;
+					kbd->do_keyrelease(SysGetTime(),s_KeyTable[lpdidod[i].dwOfs]);
+				}
+			}
+			delete[] lpdidod;
+#endif
+			break;
+		case WAIT_TIMEOUT:	// HANDLE key autorepeat
+			buffer=new char[256];
+			do {
+				hr=lpKbd->GetDeviceState(256,buffer);
+				switch(hr)
+				{
+				case DIERR_NOTACQUIRED:
+				case DIERR_INPUTLOST:
+					lpKbd->Acquire();
+					break;
+				case DI_OK:
+					break;
+				default:
+					::MessageBox(::GetFocus(), "lpKbd->GetDeviceState(hEvent) Failed!", NULL,MB_OK|MB_ICONERROR);
+					::ExitProcess(1);
+					break;
+				}
+			} while(hr!=DI_OK);
+			if((lastkey>=0)&&(buffer[lastkey]&0X80)) // The lastkey is still pressed
+			{
+				dwWait=AUTOREPEAT_TIME;
+				kbd->do_keypress(SysGetTime(),s_KeyTable[lastkey]);
+			} else { // Strange.. we didn't get the message that the key was released !
+				dwWait=INFINITE;
+				lastkey=-1;
+			}
+			delete[] buffer;
 			break;
 		case WAIT_OBJECT_0+1:
-		case WAIT_TIMEOUT:
 			lpKbd->Unacquire();
 			CloseHandle(hEvent[0]);
 			CloseHandle(hEvent[1]);
 			CHK_RELEASE(lpKbd);
 			CHK_RELEASE(lpdi);
+			if(oldbuffer) delete[] oldbuffer;
 			return 0;
 		}
 	}
