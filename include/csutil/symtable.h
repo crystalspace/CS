@@ -37,12 +37,22 @@ class csShaderVariable;
 class csSymbolTable
 {
 private:
-  struct Symbol
+  struct Stack
   {
+    struct Symbol
+    {
+      csSymbolTable *Owner;
+      csRef<csShaderVariable> Val;
+
+      inline Symbol (csShaderVariable *value, csSymbolTable *owner);
+      inline Symbol (const Symbol &other);
+    };
+    csArray<Symbol> Vals;
     csStringID Name;
-    csRef<csShaderVariable> Val;
-    bool Auth;
-    inline Symbol (csStringID id, csShaderVariable *value, bool authoritative);
+
+    inline Stack (csStringID id);
+    inline Stack (csStringID id, const csArray<Symbol> &vals);
+    inline Stack (csStringID id, csShaderVariable *value, csSymbolTable *owner);
   };
 
 protected:
@@ -51,20 +61,7 @@ protected:
   csArray<csSymbolTable*> Children;
   csSymbolTable *Parent;
 
-  /// Inherit all symbols from the parent.
-  inline void SetParent (csSymbolTable *);
-
-  /// Set the symbol in all children.
-  inline void PropagateSymbol (csStringID name, csShaderVariable *value);
-
-  /// Delete the symbol in all children.
-  inline void PropagateDelete (csStringID name);
-
-  /// Same as SetSymbol only if there is not already a symbol with that name.
-  inline void SetSymbolSafe (csStringID name, csShaderVariable *value);
-
-  /// Same as DeleteSymbol only if the symbol is inherited from the parent.
-  inline void DeleteSymbolSafe (csStringID);
+  void Propagate (const Stack *stack);
 
 public:
   /**

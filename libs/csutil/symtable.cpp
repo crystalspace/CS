@@ -21,109 +21,101 @@
 #include "csgfx/shadervar.h"
 
 csSymbolTable::csSymbolTable (const csSymbolTable &other, int size)
- : Hash (size), Parent (0)
+  : Hash (size), Parent (0)
 {
-  csGlobalHashIterator iter (&other.Hash);
+  csGlobalHashIterator iter (& other.Hash);
   while (iter.HasNext ())
   {
-    Symbol *s = (Symbol *) iter.NextConst ();
-    if (s->Auth)
-      Hash.Put (s->Name, (csHashObject) new Symbol (s->Name, s->Val, true));
+    Stack *s = (Stack *) iter.NextConst ();
+    int i;
+    if (s->Vals[0].Owner == & other)
+    {
+      Hash.Put (s->Name,
+        (csHashObject) new Stack (s->Name, s->Vals[i].Val, this));
+      return;
+    }
   }
 }
 
 csSymbolTable::~csSymbolTable ()
 {
-  csGlobalHashIterator iter (&Hash); 
-  while (iter.HasNext ()) 
-    delete (Symbol *) iter.Next (); 
+  csGlobalHashIterator iter (& Hash); 
+  while (iter.HasNext ()) delete (Stack *) iter.Next (); 
 }
 
-inline csSymbolTable::Symbol::Symbol (csStringID id, csShaderVariable *value,
-  bool authoritative) : Name (id), Val (value), Auth (authoritative) {}
+inline csSymbolTable::Stack::Stack (csStringID id) : Vals (0, 1), Name (id) {}
 
-inline void csSymbolTable::SetParent (csSymbolTable *p)
-{ 
-  Parent = p;
-  csGlobalHashIterator i (& Parent->Hash);
-  while (i.HasNext ())
-  {
-    Symbol *s = (Symbol *) i.Next ();
-    SetSymbolSafe (s->Name, s->Val);
-  }
-}
+inline csSymbolTable::Stack::Stack (csStringID id, const csArray<Symbol> &vals)
+  : Vals (vals), Name (id) {}
 
-inline void csSymbolTable::PropagateSymbol (csStringID name,
-  csShaderVariable *value)
+inline csSymbolTable::Stack::Stack (csStringID id, csShaderVariable *value,
+  csSymbolTable *owner) : Vals (1, 1), Name (id)
 {
-  for (int i = 0; i < Children.Length (); i++)
-    Children[i]->SetSymbolSafe (name, value);
+  Vals.Push (Symbol (value, owner));
 }
 
-inline void csSymbolTable::PropagateDelete (csStringID name)
-{
-  for (int i = 0; i < Children.Length (); i++)
-    Children[i]->DeleteSymbolSafe (name);
-}
+inline csSymbolTable::Stack::Symbol::Symbol (csShaderVariable *value,
+  csSymbolTable *owner) : Owner (owner), Val (value) {}
 
-inline void csSymbolTable::SetSymbolSafe (csStringID name,
-  csShaderVariable *value)
-{
-  Symbol *s = (Symbol *) Hash.Get (name);
-  if (s)
-  {
-    if (! s->Auth)
-    {
-      s->Val = value;
-      s->Auth = true;
-      PropagateSymbol (name, value);
-    }
-  }
-  else
-  {
-    Hash.Put (name, new Symbol (name, value, true));
-    PropagateSymbol (name, value);
-  }
-}
-
-inline void csSymbolTable::DeleteSymbolSafe (csStringID name)
-{
-  Symbol *s = (Symbol *) Hash.Get (name);
-  if (s && ! s->Auth)
-  {
-    Hash.DeleteAll (s->Name);
-    PropagateDelete (s->Name);
-  }
-}
+inline csSymbolTable::Stack::Symbol::Symbol (const Symbol &other)
+  : Owner (other.Owner), Val (other.Val) {}
 
 void csSymbolTable::AddChild (csSymbolTable *child)
 {
   Children.Push (child);
-  child->SetParent (this);
+  child->Parent = this;
+  csGlobalHashIterator i (& Hash);
+  while (i.HasNext ())
+  {
+    Stack *src = (Stack *) i.Next ();
+    Stack *dst = (Stack *) child->Hash.Get (src->Name);
+    if (! dst) child->Hash.Put (src->Name,
+      (csHashObject) new Stack (src->Name, src->Vals));
+  }
 }
 
 void csSymbolTable::AddChildren (csArray<csSymbolTable*> &children)
 {
   for (int i = 0; i < children.Length (); i++)
+    AddChild (children[i]);
+}
+
+void csSymbolTable::Propagate (const Stack *stack)
+{
+  for (int i = 0; i < Children.Length (); i++)
   {
-    csSymbolTable *child = children[i];
-    Children.Push (child);
-    child->SetParent (this);
+    Stack *child = (Stack *) Children[i]->Hash.Get (stack->Name);
+
+    if (child->Vals[0].Owner == Children[i]) child->Vals.Truncate (1);
+    else child->Vals.Empty ();
+    child->Vals.SetCapacity (child->Vals.Length () + stack->Vals.Length ());
+
+    for (int j = 0; j < stack->Vals.Length (); j++)
+      child->Vals.Push (stack->Vals[j]);
+
+    Children[i]->Propagate (child);
   }
 }
 
 void csSymbolTable::SetSymbol (csStringID name, csShaderVariable *value)
 {
-  Symbol *s = (Symbol *) Hash.Get (name);
+  Stack *s = (Stack *) Hash.Get (name);
   if (s)
   {
-    s->Val = value;
-    s->Auth = true;
+    if (s->Vals[0].Owner == this)
+      s->Vals[0].Val = value;
+    else
+      s->Vals.Insert (0, Stack::Symbol (value, this));
+
+    Propagate (s);
   }
   else
-    Hash.Put (name, new Symbol (name, value, true));
+  {
+    s = new Stack (name, value, this);
+    Hash.Put (name, s);
 
-  PropagateSymbol (name, value);
+    Propagate (s);
+  }
 }
 
 void csSymbolTable::SetSymbols (const csArray<csStringID> &names,
@@ -136,14 +128,18 @@ void csSymbolTable::SetSymbols (const csArray<csStringID> &names,
 
 bool csSymbolTable::DeleteSymbol (csStringID name)
 {
-  Symbol *s = (Symbol *) Hash.Get (name);
-  if (s && s->Auth)
+  Stack *s = (Stack *) Hash.Get (name);
+  if (s && s->Vals[0].Owner == this)
   {
-    Hash.DeleteAll (s->Name);
-    PropagateDelete (s->Name);
+    if (s->Vals.Length () <= 1)
+      Hash.DeleteAll (name);
+    else
+      s->Vals.DeleteIndex (0);
+
+    Propagate (s);
     return true;
   }
-  return false;
+  else return false;
 }
 
 bool csSymbolTable::DeleteSymbols (const csArray<csStringID> &names)
@@ -156,8 +152,8 @@ bool csSymbolTable::DeleteSymbols (const csArray<csStringID> &names)
 
 csShaderVariable* csSymbolTable::GetSymbol (csStringID name)
 {
-  Symbol *s = (Symbol *) Hash.Get (name);
-  if (s) return s->Val;
+  Stack *s = (Stack *) Hash.Get (name);
+  if (s) return s->Vals.Top ().Val;
   else return 0;
 }
 
@@ -167,11 +163,9 @@ csArray<csShaderVariable *> csSymbolTable::GetSymbols
   csArray<csShaderVariable *> values;
   for (int i = 0; i < names.Length (); i++)
   {
-    Symbol *s = (Symbol *) Hash.Get (names[i]);
-    if (s != 0)
-      values.Push (s->Val);
-    else
-      values.Push (0);
+    Stack *s = (Stack *) Hash.Get (names[i]);
+    if (s) values.Push (s->Vals.Top ().Val);
+    else values.Push (0);
   }
   return values;
 }

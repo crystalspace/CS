@@ -26,6 +26,9 @@ chronological order.
 	  csRGBpixel (the four int members are stored as floats in csVector4.)
 	- Oktal added functions to iScriptObject to retrieve the pointer from
 	  an object which stores only an interface pointer.
+	- Oktal reversed the inheritance override order in csSymbolTable:
+	  now parent tables' symbols override the children's symbols of the
+	  same name.
 20-Aug-2003
 	- Jorrit moved the engine sequence manager documentation out of
 	  the xml format description. Also extended that documentation with
