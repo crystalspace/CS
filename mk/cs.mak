@@ -38,14 +38,11 @@ MAKESECTION=defines
 include mk/subs.mak
 include mk/nasm.mak
 
-ifeq ($(USE_SHARED_PLUGINS),no)
-  override MAKE_DLL=no
-endif
-
 ifeq ($(USE_SHARED_LIBS),yes)
   DO.LIBRARY = $(DO.SHARED.LIBRARY)
   LIB_SUFFIX = $(DLL)
 else
+  override MAKE_DLL=no
   DO.LIBRARY = $(DO.STATIC.LIBRARY)
   LIB_SUFFIX = $(LIB)
 endif
