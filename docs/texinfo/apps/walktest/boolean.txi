@@ -142,6 +142,16 @@ Toggle pvs visibility culling on/off. Use this in combination with the
 c-buffer (see cbuffer command) to enable the PVS. In the current release
 of CS this feature is still experimental.
 
+@item pvsonly
+With this command you can indicate that ONLY the PVS should be used
+for visibility culling and not any other technique. Default is off.
+
+@item freezepvs
+Use this command to freeze the PVS to a given position. This is very
+useful for debugging a PVS as you can then walk around and see where
+the PVS is culling nodes. Use this command with 'pvsonly' for better
+debugging.
+
 @item cbuffer
 Toggle c-buffer rendering on/off. In some levels (especially levels with
 many non-moving things) enabling the c-buffer for the engine can improve

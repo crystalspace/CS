@@ -319,6 +319,22 @@ private:
   /// Use PVS.
   bool use_pvs;
 
+  /**
+   * Use PVS only. If this flag is true (and use_pvs == true)
+   * then no other culling mechanisms will be used.
+   */
+  bool use_pvs_only;
+
+  /**
+   * Freeze the PVS.
+   * If this flag is true then the PVS will be 'frozen'.
+   * The freeze_pvs_pos will be used as the fixed position
+   * to calculate the PVS from.
+   */
+  bool freeze_pvs;
+  /// Frozen PVS position.
+  csVector3 freeze_pvs_pos;
+
   /// Flag set when window resized.
   bool resize;
 
@@ -463,7 +479,7 @@ public:
   /**
    * Enable PVS.
    */
-  void EnablePVS () { use_pvs = true; }
+  void EnablePVS () { use_pvs = true; use_pvs_only = false; }
 
   /**
    * Disable PVS.
@@ -474,6 +490,42 @@ public:
    * Is PVS enabled?
    */
   bool IsPVS () { return use_pvs; }
+
+  /**
+   * Use only PVS for culling. This flag only makes sense when
+   * PVS is enabled.
+   */
+  void EnablePVSOnly () { use_pvs_only = true; }
+
+  /**
+   * Don't use only PVS for culling.
+   */
+  void DisablePVSOnly () { use_pvs_only = false; }
+
+  /**
+   * Is PVS only enabled?
+   */
+  bool IsPVSOnly () { return use_pvs_only; }
+
+  /**
+   * Freeze the PVS for some position.
+   */
+  void FreezePVS (const csVector3& pos) { freeze_pvs = true; freeze_pvs_pos = pos; }
+
+  /**
+   * Unfreeze the PVS.
+   */
+  void UnfreezePVS () { freeze_pvs = false; }
+
+  /**
+   * Is the PVS frozen?
+   */
+  bool IsPVSFrozen () { return freeze_pvs; }
+
+  /**
+   * Return the frozen position for the PVS.
+   */
+  const csVector3& GetFrozenPosition () const { return freeze_pvs_pos; }
 
   /**
    * Cache lighting. If true (default) then lighting will be cached in

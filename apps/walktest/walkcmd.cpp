@@ -205,20 +205,31 @@ bool CommandHandler (const char *cmd, const char *arg)
   if (!strcasecmp (cmd, "help"))
   {
     Command::perform (cmd, arg);
-    Sys->Printf (MSG_CONSOLE, "-*- Additional commands -*-\n");
-    Sys->Printf (MSG_CONSOLE, " coordsave, coordload, dumpvis\n");
-    Sys->Printf (MSG_CONSOLE, " bind, fclear, addlight, dellight, dellights\n");
-    Sys->Printf (MSG_CONSOLE, " picklight, droplight, colldet, stats, hi, frustum\n");
-    Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
-    Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, edges, p_alpha, s_fog\n");
-    Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity, cbuffer, covtree, solidbsp, pvs\n");
-    Sys->Printf (MSG_CONSOLE, " addbot, delbot, loadsprite, addsprite, delsprite, addskel, addghost\n");
-    Sys->Printf (MSG_CONSOLE, " step_forward, step_backward, strafe_left, strafe_right\n");
-    Sys->Printf (MSG_CONSOLE, " look_up, look_down, rotate_left, rotate_right, jump, move3d\n");
-    Sys->Printf (MSG_CONSOLE, " i_forward, i_backward, i_left, i_right, i_up, i_down\n");
-    Sys->Printf (MSG_CONSOLE, " i_rotleftc, i_rotleftw, i_rotrightc, i_rotrightw\n");
-    Sys->Printf (MSG_CONSOLE, " i_rotleftx, i_rotleftz, i_rotrightx, i_rotrightz\n");
-    Sys->Printf (MSG_CONSOLE, " clrlights, setlight, palette, db_octree, explosion\n");
+#   undef CONPRI
+#   define CONPRI(m) Sys->Printf (MSG_CONSOLE, m);
+    CONPRI("-*- Additional commands -*-\n");
+    CONPRI("Visibility:\n");
+    CONPRI("  dumpvis cbuffer covtree solidbsp pvs freezepvs pvsonly\n");
+    CONPRI("  db_octree\n");
+    CONPRI("Lights:\n");
+    CONPRI("  addlight dellight dellights picklight droplight\n");
+    CONPRI("  clrlights setlight\n");
+    CONPRI("Movement:\n");
+    CONPRI("  step_forward step_backward strafe_left strafe_right\n");
+    CONPRI("  look_up look_down rotate_left rotate_right jump move3d\n");
+    CONPRI("  i_forward i_backward i_left i_right i_up i_down i_rotleftc\n");
+    CONPRI("  i_rotleftw i_rotrightc i_rotrightw i_rotleftx i_rotleftz\n");
+    CONPRI("  i_rotrightx i_rotrightz do_gravity colldet freelook\n");
+    CONPRI("Statistics:\n");
+    CONPRI("  stats fps perftest coordshow\n");
+    CONPRI("Special effects:\n");
+    CONPRI("  addbot delbot addskel addghost fire explosion spiral\n");
+    CONPRI("Debugging:\n");
+    CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
+    CONPRI("Various:\n");
+    CONPRI("  coordsave coordload bind capture map p_alpha s_fog\n");
+    CONPRI("  snd_play snd_volume loadsprite addsprite delsprite\n");
+#   undef CONPRI
   }
   else if (!strcasecmp (cmd, "coordsave"))
   {
@@ -274,6 +285,24 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->world->EnablePVS ();
     else
       Sys->world->DisablePVS ();
+  }
+  else if (!strcasecmp (cmd, "pvsonly"))
+  {
+    bool en = Sys->world->IsPVSOnly ();
+    Command::change_boolean (arg, &en, "pvs only");
+    if (en) 
+      Sys->world->EnablePVSOnly ();
+    else
+      Sys->world->DisablePVSOnly ();
+  }
+  else if (!strcasecmp (cmd, "freezepvs"))
+  {
+    bool en = Sys->world->IsPVSFrozen ();
+    Command::change_boolean (arg, &en, "freeze pvs");
+    if (en) 
+      Sys->world->FreezePVS (Sys->view->GetCamera ()->GetOrigin ());
+    else
+      Sys->world->UnfreezePVS ();
   }
   else if (!strcasecmp (cmd, "cbuffer"))
   {

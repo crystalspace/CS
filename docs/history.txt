@@ -1,5 +1,16 @@
 The history order has been reversed so that new features are at the top.
 
+12-May-2000
+	- Michael Dale Long did some bug fixes to csConsole. No longer has
+	  crashes when editing history items.
+	- Added 'freezepvs' command to freeze the PVS at some position. This
+	  is useful to debug the PVS. After freezing the PVS you can walk
+	  around and examine what is visible and what not.
+	- Added 'pvsonly' command so that you can force visibility culling
+	  to operate ONLY with the PVS and not use any other culling
+	  mechanisms (like c-buffer).
+	- Andrew Zabolotny fixed the Software renderer makefile that
+	  Paul broke a little.
 11-May-2000
 	- Changes from Michael Dale Long:
 	    - Added a CHK_DECREF() macro to cctest.h that checks if an
@@ -29,6 +40,21 @@ The history order has been reversed so that new features are at the top.
 	  only works on C++ memory allocators).
 	- Added 'pvs' command to toggle pvs usage (note that PVS is still
 	  not working properly).
+	- Norman Kramer added a method to iGraphics2D to set the font
+	  size.
+	- Norman changed CSWS so that components can now draw with their
+	  own fontsize.
+	- Norman merged the two glide2 and glide3 renderers into one
+	  glide renderer.
+	- Norman fixed a bug in the freefont plugin. The font was closed
+	  twice at closing time.
+	- Wouter almost fixed a bug in radiosity:
+	    "Now, the bug is almost fixed. And I know why it happens.
+	     The light frustum given to GetCoverage must be clipped to
+	     responsability rect, and this was not done yet.
+	     csPolyTexture::GetLightmapBounds will need some small
+	     change to work with this (the frustum_id check / code
+	     must go back to csPolygon I think.)"
 10-May-2000
 	- Michael Dale Long did a major update for CrystalClear.  A lot of
 	  work has been done on iActor.  The main thing was adding multiple
