@@ -80,7 +80,9 @@ enum csWindowFrameStyle
 {
   cswfsNone,
   cswfsThin,
-  cswfs3D
+  cswfs3D,
+  cswfsTexture,
+  cswfsTextureAlpha
 };
 
 /**
@@ -105,6 +107,7 @@ enum
   cscmdWindowSetClient
 };
 
+
 /**
  * A csWindow object is a rectangular area of screen with border
  * which optionally contains a titlebar, a menubar and a client
@@ -124,6 +127,28 @@ protected:
   int TitlebarHeight;
   /// Menu height
   int MenuHeight;
+  /// Border Light Color index
+  int BorderLightColor;
+  /// Border Dark Color index
+  int BorderDarkColor;
+  /// Background Color index
+  int BackgroundColor;
+
+  /// Record if the theme is active for various pieces
+  struct ThemeWindowActive
+  {
+    unsigned int BorderWidth:1;
+    unsigned int BorderHeight:1;
+    unsigned int TitlebarHeight:1;
+    unsigned int MenuHeight:1;
+    unsigned int CloseButton:1;
+    unsigned int HideButton:1;
+    unsigned int MaximizeButton:1;
+    unsigned int TitleBar:1;
+    unsigned int BorderLightColor:1;
+    unsigned int BorderDarkColor:1;
+    unsigned int BackgroundColor:1;
+  } ThemeActive;
 
 public:
   /// Create a window object
@@ -163,6 +188,9 @@ public:
   virtual void GetText (char *oText, int iTextSize) const;
   /// Same, but returns a readonly value
   virtual const char *GetText () const;
+
+  /// Handle a theme change event
+  virtual void ThemeChanged ();
 
   /// Get window border width and height
   void GetBorderSize (int &bw, int &bh)

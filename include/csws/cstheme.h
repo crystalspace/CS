@@ -22,9 +22,12 @@
 
 #include "csutil/hashmap.h"
 
+class csVectorThemeComponent;
 class csThemeComponent;
 class csComponent;
 class csApp;
+class csTitleBar;
+class csButton;
 
 /// Possible window frame styles
 enum csThemeFrameStyle
@@ -65,8 +68,7 @@ class csTheme
 {
 protected:
   csApp * g_app;
-  csHashMap * themeComponents;
-  csHashKey HashName(char * name);
+  csVectorThemeComponent * themeComponents;
 
 public:
   csTheme(csApp * napp);
@@ -115,12 +117,14 @@ public:
 class csThemeWindow : public csThemeComponent
 {
 protected:
+  int TitleBarHeight;
+  int MenuHeight;
   int BorderWidth;
   int BorderHeight;
   int BorderLightColor;
   int BorderDarkColor;
   int BackgroundColor;
-  csPixmap * BorderTexture;
+  csPixmap *BorderTexture;
   csPixmap *bmpClosen;
   csPixmap *bmpClosep;
   csPixmap *bmpHiden;
@@ -131,19 +135,46 @@ protected:
 public:
   csThemeWindow(csTheme * ntheme);
 
-  int GetTitleBarHeight();
-  int GetMenuHeight();
+  int GetTitleBarHeight(){return TitleBarHeight;};
+  void SetTitleBarHeight(int Height){TitleBarHeight=Height;};
+
+  int GetMenuHeight(){return MenuHeight;};
+  void SetMenuHeight(int Height){MenuHeight=Height;};
+
   int GetBorderLightColor(){return BorderLightColor;};
   void SetBorderLightColor(int Color){BorderLightColor = Color;};
+
   int GetBorderDarkColor(){return BorderDarkColor;};
   void SetBorderDarkColor(int Color){BorderDarkColor = Color;};
+
   int GetBackgroundColor(){return BackgroundColor;};
   void SetBackgroundColor(int Color){BackgroundColor = Color;};
 
-  csComponent * GetCloseButton(csComponent *window);
-  csComponent * GetHideButton(csComponent *window);
-  csComponent * GetMaximizeButton(csComponent *window);
-  csComponent * GetTitleBar(csComponent *window, char *iTitle);
+  csButton * GetCloseButton(csComponent *window);
+  csButton * GetHideButton(csComponent *window);
+  csButton * GetMaximizeButton(csComponent *window);
+  csTitleBar * GetTitleBar(csComponent *window, const char *iTitle);
+
+  void SetDefaultPallet(csComponent *window);
+
+  void GetSysMenu();
+  void GetToolbar();
+  void GetMenuBar();
+};
+
+/// This class holds a number of scfFactory structures
+class csVectorThemeComponent : public csVector
+{
+public:
+  csVectorThemeComponent () : csVector (16, 16) {}
+  virtual ~csVectorThemeComponent () { DeleteAll (); }
+  virtual bool FreeItem (csSome Item)
+  { delete (csThemeComponent *)Item; return true; }
+  virtual int CompareKey (csSome Item, csConstSome Key, int) const
+  { return strcmp (((csThemeComponent *)Item)->GetName(), (char *)Key); }
+  virtual int Compare (csSome Item1, csSome Item2, int) const
+  { return strcmp (((csThemeComponent *)Item1)->GetName(),
+                   ((csThemeComponent *)Item2)->GetName()); }
 };
 
 #endif // __CSTHEME_H__

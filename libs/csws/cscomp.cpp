@@ -1717,5 +1717,4 @@ void csComponent::SetTheme(csThemeComponent * nTheme)
 void csComponent::ThemeChanged(void)
 {
   Invalidate();
-  fprintf(stderr,"ThemeChanged called form Component %s : %p!\n",name,this);
 }

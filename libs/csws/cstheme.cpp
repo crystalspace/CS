@@ -43,38 +43,21 @@
 csTheme::csTheme(csApp * napp)
 {
   g_app = napp;
-  themeComponents = new csHashMap();
+  themeComponents = new csVectorThemeComponent();
 
   AddThemeComponent(new csThemeComponent(this));
   AddThemeComponent(new csThemeWindow(this));
   AddThemeComponent(new csThemeButton(this));
 };
 
-csHashKey csTheme::HashName(char * name)
-{
-  csMD5::Digest digest = csMD5::Encode(name);
-
-  unsigned int a, b, c, d, e;
-
-  // Convert the hash into four unsigned integers
-  a = convert_endian(*(REINTERPRET_CAST(int*)(digest.data +  0)));
-  b = convert_endian(*(REINTERPRET_CAST(int*)(digest.data +  4)));
-  c = convert_endian(*(REINTERPRET_CAST(int*)(digest.data +  8)));
-  d = convert_endian(*(REINTERPRET_CAST(int*)(digest.data + 12)));
-
-  // Return a "mesh" of the 4 values
-  e = (a * b * c * d) & 0x7fffffff;
-  return e;
-}
-
 void csTheme::AddThemeComponent(csThemeComponent * comp)
 {
-  themeComponents->Put(HashName(comp->GetName()),comp);
+  themeComponents->InsertSorted(comp);
 }
 
 csThemeComponent * csTheme::GetThemeComponent(char * name)
 {
-  return (csThemeComponent *) themeComponents->Get(HashName(name));
+  return (csThemeComponent *) themeComponents->Get(themeComponents->FindKey(name));
 }
 
 void csTheme::DrawBorder(csComponent &comp,int FrameStyle,int &bw, int &bh, int li, int di)
@@ -127,7 +110,7 @@ void csTheme::BroadcastThemeChange(csThemeComponent *tcomp)
   g_app->PutEvent(bmsg);
 }
 
-csComponent * csThemeWindow::GetCloseButton(csComponent * parent)
+csButton * csThemeWindow::GetCloseButton(csComponent * parent)
 {
   int tx,ty,tw,th;
 
@@ -143,12 +126,15 @@ csComponent * csThemeWindow::GetCloseButton(csComponent * parent)
     bmpClosep = new csPixmap (theme->GetApp()->GetTexture (
       TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   }
-  csButton *bt = new csButton (parent, cscmdClose, 0, csbfsNone);
+  csButton *bt = (csButton *)parent->GetChild (CSWID_BUTCLOSE);
+  if (bt == NULL) bt = new csButton (parent, cscmdClose, 0, csbfsNone);
+
   bt->SetBitmap(new csPixmap(*bmpClosen),new csPixmap(*bmpClosep));
+  bt->id = CSWID_BUTCLOSE;
   return bt;
 }
 
-csComponent * csThemeWindow::GetHideButton(csComponent * parent)
+csButton * csThemeWindow::GetHideButton(csComponent * parent)
 {
   int tx,ty,tw,th;
 
@@ -165,12 +151,15 @@ csComponent * csThemeWindow::GetHideButton(csComponent * parent)
       TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   }
 
-  csButton *bt = new csButton (parent, cscmdHide, 0, csbfsNone);
+  csButton *bt = (csButton *)parent->GetChild (CSWID_BUTHIDE);
+  if (bt == NULL) bt = new csButton (parent, cscmdHide, 0, csbfsNone);
+
   bt->SetBitmap(new csPixmap(*bmpHiden),new csPixmap(*bmpHidep));
+  bt->id = CSWID_BUTHIDE;
   return bt;
 }
 
-csComponent * csThemeWindow::GetMaximizeButton(csComponent * parent)
+csButton * csThemeWindow::GetMaximizeButton(csComponent * parent)
 {
   int tx,ty,tw,th;
 
@@ -187,25 +176,21 @@ csComponent * csThemeWindow::GetMaximizeButton(csComponent * parent)
       TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
   }
 
-  csButton *bt = new csButton (parent, cscmdMaximize, 0, csbfsNone);
+  csButton *bt = (csButton *)parent->GetChild (CSWID_BUTMAXIMIZE);
+  if (bt == NULL) bt = new csButton (parent, cscmdMaximize, 0, csbfsNone);
+
   bt->SetBitmap(new csPixmap(*bmpMaximizen),new csPixmap(*bmpMaximizep));
+  bt->id = CSWID_BUTMAXIMIZE;
   return bt;
 }
 
-csComponent * csThemeWindow::GetTitleBar(csComponent *parent, char *iTitle)
+csTitleBar * csThemeWindow::GetTitleBar(csComponent *parent, const char *iTitle)
 {
-  csComponent *tb = new csTitleBar (parent, iTitle);
+  csTitleBar *tb = (csTitleBar *) parent->GetChild (CSWID_TITLEBAR);
+  if (tb == NULL) tb = new csTitleBar (parent, (char *)iTitle);
+
+  tb->id = CSWID_TITLEBAR;
   return tb;
-}
-
-int csThemeWindow::GetMenuHeight()
-{
-  return 16;
-}
-
-int csThemeWindow::GetTitleBarHeight()
-{
-  return 16;
 }
 
 void csTheme::GetBorderSize(csComponent &comp,int FrameStyle,int &bw, int &bh)
@@ -268,6 +253,13 @@ csThemeWindow::csThemeWindow(csTheme * ntheme) : csThemeComponent(ntheme)
   bmpHiden = NULL;
   bmpMaximizep = NULL;
   bmpMaximizen = NULL;
+  TitleBarHeight=16;
+  MenuHeight=16;
+}
+
+void csThemeWindow::SetDefaultPallet(csComponent *window)
+{
+  window->SetPalette (CSPAL_WINDOW);
 }
 
 csThemeButton::csThemeButton(csTheme * ntheme) : csThemeComponent(ntheme)

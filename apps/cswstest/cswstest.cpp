@@ -114,6 +114,18 @@ public:
 
 //-----------------------------------------------------------------------------
 
+class csThemeTestWindow : public csWindow
+{
+protected:
+  csWindow *colordialog;
+public:
+  csThemeTestWindow (csComponent *iParent,char * iTitle,int iWindowStyle);
+  ///
+  virtual bool HandleEvent (iEvent &Event);
+};
+
+//-----------------------------------------------------------------------------
+
 // Scroll bar class default palette
 static int palette_csWsTest[] =
 {
@@ -430,7 +442,7 @@ void csWsTest::GridDialog ()
 void csWsTest::ThemeDialog ()
 {
   // create a window
-  csComponent *window = new csWindow (this, "Theme test",
+  csComponent *window = new csThemeTestWindow (this, "Theme test",
     CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
     CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
   window->SetSize (400, 300);
@@ -717,4 +729,65 @@ int main (int argc, char* argv[])
     System.Loop ();
 
   return 0;
+}
+
+
+bool csThemeTestWindow::HandleEvent (iEvent &Event)
+{
+  if (Event.Type == csevCommand)
+  {
+    switch (Event.Command.Code)
+    {
+      case cscmdButtonDown:
+      {
+        switch (((csButton *)Event.Command.Info)->id)
+        {
+          case 0x8f000000:
+            if (colordialog)
+            {
+              int color;
+              csQueryColorDialog (colordialog, color);
+              csThemeWindow * thwin = (csThemeWindow *)GetTheme();
+              thwin->SetBackgroundColor(color);
+              thwin->BroadcastThemeChange();
+            }
+            return true;
+          case 0x8f000001:
+            if (colordialog)
+            {
+              int color;
+              csQueryColorDialog (colordialog, color);;
+              csThemeWindow * thwin = (csThemeWindow *)GetTheme();
+              thwin->SetBorderDarkColor(color);
+              thwin->BroadcastThemeChange();
+            }
+            return true;
+          case 0x8f000002:
+            if (colordialog)
+            {
+              int color;
+              csQueryColorDialog (colordialog, color);
+              csThemeWindow * thwin = (csThemeWindow *)GetTheme();
+              thwin->SetBorderLightColor(color);
+              thwin->BroadcastThemeChange();
+            }
+            return true;
+        }
+      }
+    }
+  }
+  return csWindow::HandleEvent (Event);
+}
+
+csThemeTestWindow::csThemeTestWindow (csComponent *iParent,char * iTitle,int iWindowStyle) : csWindow (iParent,iTitle,iWindowStyle)
+{
+  SetState(CSS_TRANSPARENT,true);
+  csButton *but = new csButton (this, 0x8f000000);
+  but->SetText ("Select Background Color"); but->SetRect (20, 20, 190, 40);
+  but = new csButton (this, 0x8f000001);
+  but->SetText ("Select Dark Border Color"); but->SetRect (20, 40, 190, 60);
+  but = new csButton (this, 0x8f000002);
+  but->SetText ("Select Light Border Color"); but->SetRect (20, 60, 190, 80);
+  colordialog  = csColorDialog (this, "Theme Color Dialog",BackgroundColor);
+  colordialog->SetPos(240,40);
 }
