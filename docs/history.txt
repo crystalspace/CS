@@ -38,6 +38,9 @@ chronological order.
 	- Eric Sunshine updated user.mak and shaderplugins/Jamfile so that the
 	  new glshader_ps1 plugin actually gets built.  Also augmented
 	  msvcgen/workspaces.mak to take this new plugin into account.
+	- res removed regex.c from msvcgen/win32.mak again. Seems it appears 
+	  in some other place, and thus occurs twice in the generated VC 
+	  libcsutil project.
 1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
 	  window rectangle (via PerformExtension()).

@@ -51,7 +51,6 @@ SRC.SYS_CSUTIL = \
   $(SRCDIR)/libs/csutil/generic/findlib.cpp \
   $(SRCDIR)/libs/csutil/generic/getopt.cpp \
   $(SRCDIR)/libs/csutil/generic/pluginpaths.cpp \
-  $(SRCDIR)/libs/csutil/generic/regex.c \
   $(SRCDIR)/libs/csutil/generic/resdir.cpp \
   $(SRCDIR)/libs/csutil/generic/runloop.cpp
 endif
