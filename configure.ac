@@ -942,6 +942,28 @@ AS_IF([test -d /usr/local/lib],
 
 
 #------------------------------------------------------------------------------
+# Check if va_copy or __va_copy is available. 
+#------------------------------------------------------------------------------
+CS_CHECK_BUILD([for va_copy], [cs_cv_va_copy],
+    [AC_LANG_PROGRAM(
+	[[#include <stdio.h>
+	#include <stdarg.h>]],
+	[va_list ap1; va_list ap2; va_copy (ap1, ap2)])],
+    [], [], [CS_HEADER_PROPERTY([CS_HAVE_VA_COPY]) 
+    cs_cv_va_copy=yes], [cs_cv_va_copy=no], [],
+    [$cs_cv_prog_cxx_enable_pedantic])
+CS_CHECK_BUILD([for __va_copy], [cs_cv___va_copy],
+    [AC_LANG_PROGRAM(
+	[[#include <stdio.h>
+	#include <stdarg.h>]],
+	[va_list ap1; va_list ap2; __va_copy (ap1, ap2)])],
+    [], [], [CS_HEADER_PROPERTY([CS_HAVE___VA_COPY]) 
+    cs_cv___va_copy=yes], [cs_cv___va_copy=no], [],
+    [$cs_cv_prog_cxx_enable_pedantic])
+
+
+
+#------------------------------------------------------------------------------
 # Check for X-Windows.  If the X-Windows implementation is XFree86, then also
 # enable the `VideoMode' extension.
 #------------------------------------------------------------------------------

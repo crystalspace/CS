@@ -35,6 +35,9 @@ chronological order.
 	  be given.
 	- Eric Sunshine added a number of missing ">" tokens to the XML
 	  examples in rendpri.txi. (bug# 1158590)
+	- res fixed csString::FormatV() to properly use a copied va_list 
+	  instead of reusing the same for multiple cs_vsnprintf() invocations,
+	  which causes problems on x86_64 (and probably others).
 6-Mar-2005
 	- Eric Sunshine removed invocation of SWIGEXTERN() from definition of
 	  csWrapTypedObject() in pythpost.i since the meaning of SWIGEXTERN

@@ -787,4 +787,17 @@ extern void* operator new[] (size_t s, void* filename, int line);
 /// Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 
+/**\def CS_VA_COPY(dest, src)
+ * Copies the state of a va_list value.
+ */
+#ifdef CS_HAVE_VA_COPY
+#  define CS_VA_COPY(dest, src)		va_copy(dest, src)
+#else
+#  ifdef CS_HAVE___VA_COPY
+#    define CS_VA_COPY(dest, src)	__va_copy(dest, src)
+#  else
+#    define CS_VA_COPY(dest, src)	dest = src;
+#  endif
+#endif
+
 #endif // __CS_CSSYSDEF_H__

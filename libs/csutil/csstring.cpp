@@ -442,7 +442,10 @@ csString &csString::FormatV (const char *format, va_list args)
   int rc = 0;
   while (1)
   {
-    rc = cs_vsnprintf(Data, MaxSize, format, args);
+    va_list ap;
+    CS_VA_COPY (ap, args);
+    rc = cs_vsnprintf (Data, MaxSize, format, ap);
+    va_end (ap);
     // Buffer was big enough for entire string?
     if (rc >= 0 && rc < (int)MaxSize)
       break;
