@@ -16,11 +16,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#include "cssysdef.h"
 
 #include <string.h>
+#include <ctype.h>
 
-#define CS_SYSDEF_PROVIDE_CASE
-#include "cssysdef.h"
 #include "csws/cscomp.h"
 #include "csws/csmenu.h"
 #include "csws/csapp.h"
@@ -220,8 +220,8 @@ bool csMenuItem::HandleEvent (iEvent &Event)
       // Check hot key
       if ((underline_pos >= 0)
        && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
-       && ((UPPERCASE (Event.Key.Char) == UPPERCASE (text [underline_pos]))
-        || (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos]))))
+       && ((toupper (Event.Key.Char) == toupper (text [underline_pos]))
+        || (toupper (Event.Key.Code) == toupper (text [underline_pos]))))
       {
         Press ();
         return true;

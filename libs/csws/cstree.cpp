@@ -17,9 +17,10 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-#define CS_SYSDEF_PROVIDE_CASE
 #include "cssysdef.h"
+
+#include <ctype.h>
+
 #include "csws/cstree.h"
 #include "csws/cstimer.h"
 #include "csws/csscrbar.h"
@@ -905,7 +906,7 @@ bool csTreeBox::HandleEvent (iEvent &Event)
             {
               cur = (csTreeItem *)cur->SendCommand (cscmdTreeItemGetNext);
               if (!cur) cur = (csTreeItem *)clipview->top;
-            } while ((cur != active) && (cur->GetText () [0] != UPPERCASE (Event.Key.Char)));
+            } while ((cur != active) && (cur->GetText () [0] != toupper (Event.Key.Char)));
             if (cur != active)
             {
               FocusItem (cur);

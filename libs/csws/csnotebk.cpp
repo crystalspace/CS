@@ -16,10 +16,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #define CS_SYSDEF_PROVIDE_ALLOCA
-#define CS_SYSDEF_PROVIDE_CASE
 #include "cssysdef.h"
+
+#include <ctype.h>
+
 #include "csws/csapp.h"
 #include "csws/csnotebk.h"
 #include "csws/cswsutil.h"
@@ -135,7 +136,7 @@ bool csNotebook::cspPageData::IsHotKey (int iKey)
   if (!text || underline_pos < 0 || iKey > 255)
     return false;
 
-  return UPPERCASE (iKey) == UPPERCASE (text [underline_pos]);
+  return toupper (iKey) == toupper (text [underline_pos]);
 }
 
 //------------------------

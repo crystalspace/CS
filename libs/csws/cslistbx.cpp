@@ -16,9 +16,10 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-#define CS_SYSDEF_PROVIDE_CASE
 #include "cssysdef.h"
+
+#include <ctype.h>
+
 #include "csws/cslistbx.h"
 #include "csws/cstimer.h"
 #include "csws/csscrbar.h"
@@ -538,7 +539,7 @@ bool csListBox::HandleEvent (iEvent &Event)
             csComponent *cur = focused->next;
             while (cur != focused)
               if (cur->SendCommand (cscmdListBoxItemCheck, NULL)
-               && (UPPERCASE (cur->GetText () [0]) == UPPERCASE (Event.Key.Char)))
+               && (toupper (cur->GetText () [0]) == toupper (Event.Key.Char)))
               {
                 SendCommand (cscmdListBoxTrack, (void *)cur);
                 return true;

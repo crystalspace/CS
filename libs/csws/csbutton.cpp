@@ -16,11 +16,10 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-#include <string.h>
-
-#define CS_SYSDEF_PROVIDE_CASE
 #include "cssysdef.h"
+
+#include <ctype.h>
+
 #include "csws/cscomp.h"
 #include "csws/csapp.h"
 #include "csws/csbutton.h"
@@ -295,7 +294,7 @@ bool csButton::HandleEvent (iEvent &Event)
     case csevKeyUp:
       if (app->KeyboardOwner)
         if (((underline_pos >= 0)
-          && (UPPERCASE (Event.Key.Char) == UPPERCASE (text [underline_pos])))
+          && (toupper (Event.Key.Char) == toupper (text [underline_pos])))
          || ((Event.Key.Code == CSKEY_SPACE)
           && (GetState (CSS_FOCUSED))))
         {

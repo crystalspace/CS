@@ -16,9 +16,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
-#define CS_SYSDEF_PROVIDE_CASE
+#define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
+
+#include <ctype.h>
+
 #include "csws/csstatic.h"
 #include "csws/csapp.h"
 #include "csws/cswsaux.h"
@@ -219,7 +221,7 @@ bool csStatic::IsHotKey (iEvent &Event)
 {
   return ((underline_pos >= 0)
        && ((Event.Key.Modifiers & CSMASK_CTRL) == 0)
-       && (UPPERCASE (Event.Key.Code) == UPPERCASE (text [underline_pos])));
+       && (toupper (Event.Key.Code) == toupper (text [underline_pos])));
 }
 
 bool csStatic::HandleEvent (iEvent &Event)

@@ -104,21 +104,6 @@
  * configuration files may override these.
  */
 
-/**\def UPPERCASE(c)
- * Convert a character to upper case
- */
-/**\def LOWERCASE(c)
- * Convert a character to lower case
- */
-#ifdef CS_SYSDEF_PROVIDE_CASE
-#  ifndef UPPERCASE
-#    define UPPERCASE(c) ((c >= 'a' && c <= 'z') ? c - ('a' - 'A') : c)
-#  endif
-#  ifndef LOWERCASE
-#    define LOWERCASE(c) ((c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c)
-#  endif
-#endif // CS_SYSDEF_PROVIDE_CASE
-
 /**\def PATH_SEPARATOR
  * Path separator character
  */

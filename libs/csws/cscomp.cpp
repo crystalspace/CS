@@ -16,13 +16,12 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#define CS_SYSDEF_PROVIDE_ALLOCA
+#include "cssysdef.h"
 
 #include <stddef.h>
 #include <ctype.h>
 
-#define CS_SYSDEF_PROVIDE_ALLOCA
-#define CS_SYSDEF_PROVIDE_CASE
-#include "cssysdef.h"
 #include "cstool/cspixmap.h"
 #include "csutil/csinput.h"
 #include "qint.h"
@@ -2179,11 +2178,11 @@ bool csComponent::CheckHotKey (iEvent &iEvent, char iHotKey)
    || !(iEvent.Key.Modifiers & CSMASK_FIRST))
     return false;
 
-  iHotKey = UPPERCASE (iHotKey);
+  iHotKey = toupper (iHotKey);
   char Key;
   if (iEvent.Key.Modifiers & CSMASK_ALT)
-    Key = UPPERCASE (iEvent.Key.Code);
+    Key = toupper (iEvent.Key.Code);
   else
-    Key = UPPERCASE (iEvent.Key.Char);
+    Key = toupper (iEvent.Key.Char);
   return Key == iHotKey;
 }
