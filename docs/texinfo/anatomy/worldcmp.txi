@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node World Components
+@node World Components, World File Format, VFS, Anatomy
 @section Components of a World
 @cindex World, Components
 
@@ -61,7 +61,7 @@ as much as possible. @xref{Keylist Standards}.
 @emph{Particle Systems}. @strong{@@@@@@ document this}.
 @end itemize
 
-@node Keylist Standards
+@node Keylist Standards, , World Components, World Components
 @subsection Keylist Standards
 @cindex Keylist Standards
 

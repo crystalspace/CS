@@ -1,4 +1,4 @@
-@node World File Format, Memory Debugger, VFS, Anatomy
+@node World File Format, Memory Debugger, World Components, Anatomy
 @section Format of the World File
 @cindex World File Format
 
