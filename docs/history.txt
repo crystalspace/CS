@@ -48,6 +48,7 @@ chronological order.
 	      done when a value on the SV is set, so no need for the client
 	      code to do that itself.
 	    - Updated NR todo.
+        - Philip Wyett updated docs to reflect a new msvc_libs release.        
 2-Sep-2003
 	- Philip Wyett re-applied Eric Sunshine's Cygwin __argc/__argv fix in
           win32.cpp, which was overwritten by the old version by another

@@ -39,22 +39,22 @@ msvc7_libs with Python 2.2.3 debug components.
 
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.97dev005_py223.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.97dev006_py223.zip}
 @end ifnottex
 @iftex
 @code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
-@code{msvc7/msvc7_libs_0.97dev005_py223.zip}
+@code{msvc7/msvc7_libs_0.97dev006_py223.zip}
 @end iftex
 
 msvc7_libs with Python 2.3.0 debug components.
 
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.97dev005_py230.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.97dev006_py230.zip}
 @end ifnottex
 @iftex
 @code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/}@*
-@code{msvc7/msvc7_libs_0.97dev005_py230.zip}
+@code{msvc7/msvc7_libs_0.97dev006_py230.zip}
 @end iftex
 
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
