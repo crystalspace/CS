@@ -113,9 +113,9 @@ void csColQuad::HeightTestExact (csVector3  *point,
           temp[3] = BezierControlCompute (v, &blocks[i]->verts[3], 4);
           newpoint =  BezierCompute (u, temp);
           if ( (newpoint.y > point->y) || 
-               (point->y < (newpoint.y + 1.0f)))
+               (point->y < (newpoint.y + 2.0f)))
           {
-            point->y = newpoint.y + 1.0f;
+            point->y = newpoint.y + 2.0f;
             hits += 1;
           }
           //point->y = newpoint.y + 10.0f;
