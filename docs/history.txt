@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+23-Mar-2004
+	- Anders Stenberg brought stencil shadows back to life in NR.
+	  They should get along well with stencil clipping.
+	  Possible todo: Not assume 8-bit stencil, but allow different
+	  bitcounts. Also somehow avoid glClear of the stencil buffer.
 22-Mar-2004
 	- Anders Stenberg fixed several places where mesh objects would
 	  return "false" from GetRenderMeshes (which is supposed to return

@@ -404,7 +404,7 @@ void csGLGraphics3D::SetupStencil ()
     }
     int nv = clipper->GetVertexCount ();
     csVector2* v = clipper->GetClipPoly ();
-    glColor4f (1, 0, 0, 0);
+
     statecache->SetShadeModel (GL_FLAT);
 
     bool oldz = statecache->IsEnabled_GL_DEPTH_TEST ();
@@ -416,6 +416,7 @@ void csGLGraphics3D::SetupStencil ()
         alpha_enabled)
       glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
+    statecache->SetStencilMask (128);
     statecache->SetStencilFunc (GL_ALWAYS, 128, 128);
     statecache->SetStencilOp (GL_REPLACE, GL_REPLACE, GL_REPLACE);
     glBegin (GL_TRIANGLE_FAN);
@@ -424,7 +425,7 @@ void csGLGraphics3D::SetupStencil ()
       glVertex2f (-1,  1);
       glVertex2f ( 1,  1);
     glEnd ();
-    glColor4f (0, 1, 0, 0);
+
     statecache->SetStencilFunc (GL_ALWAYS, 0, 128);
 
     glBegin (GL_TRIANGLE_FAN);
@@ -438,6 +439,8 @@ void csGLGraphics3D::SetupStencil ()
         alpha_enabled)
       glColorMask (color_red_enabled, color_green_enabled, color_blue_enabled,
         alpha_enabled);
+
+    statecache->SetStencilMask (127);
 
     glPopMatrix ();
     glMatrixMode (GL_PROJECTION);
@@ -819,6 +822,8 @@ bool csGLGraphics3D::Open ()
   glClearDepth (0.0);
   statecache->Enable_GL_CULL_FACE ();
   statecache->SetCullFace (GL_FRONT);
+
+  statecache->SetStencilMask (127);
 
   // Set up texture LOD bias.
   if (ext->CS_GL_EXT_texture_lod_bias)
@@ -1656,28 +1661,33 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
   {
     case CS_SHADOW_VOLUME_PASS1:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_INCR);
-      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
+      statecache->SetStencilFunc (GL_ALWAYS, 0,
+        (clipping_stencil_enabled?128:0));
       break;
     case CS_SHADOW_VOLUME_FAIL1:
       statecache->SetStencilOp (GL_KEEP, GL_INCR, GL_KEEP);
-      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
+      statecache->SetStencilFunc (GL_ALWAYS, 0,
+        (clipping_stencil_enabled?128:0));
       break;
     case CS_SHADOW_VOLUME_PASS2:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_DECR);
-      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
+      statecache->SetStencilFunc (GL_ALWAYS, 0,
+        (clipping_stencil_enabled?128:0));
       break;
     case CS_SHADOW_VOLUME_FAIL2:
       statecache->SetStencilOp (GL_KEEP, GL_DECR, GL_KEEP);
-      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
+      statecache->SetStencilFunc (GL_ALWAYS, 0,
+        (clipping_stencil_enabled?128:0));
       break;
     case CS_SHADOW_VOLUME_USE:
       statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-      statecache->SetStencilFunc (GL_EQUAL, 0, 127);
+      statecache->SetStencilFunc (GL_EQUAL, 0, 127 |
+        (clipping_stencil_enabled?128:0));
       break;
     default:
       if (clipping_stencil_enabled)
       {
-        statecache->SetStencilFunc (GL_EQUAL, 0, 255);
+        statecache->SetStencilFunc (GL_EQUAL, 0, 128);
         statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
       }
   }
@@ -1869,7 +1879,7 @@ void csGLGraphics3D::SetShadowState (int state)
       glClearStencil (0);
       glClear (GL_STENCIL_BUFFER_BIT);
       EnableStencilShadow ();
-      statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
+      //statecache->SetStencilFunc (GL_ALWAYS, 0, 127);
       //statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
       // @@@ Jorrit: to avoid flickering I had to increase the
       // values below and multiply them with 3.
