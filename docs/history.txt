@@ -10,6 +10,8 @@ chronological order.
 	- res added a shader, or_lighting.xml, which mimics the old renderer.
 	- res fixed genmesh to provide the lighting as vertex colors on NR
 	  as well.
+	- res augmented xmlshader to report a warning when an unknown buffer
+	  destination was specified.
 20-Dec-2003
 	- Andreas Busch added Yield() to csThread for posix and win32.
 	- res made some changes to GL proc texes and the GL canvas to work

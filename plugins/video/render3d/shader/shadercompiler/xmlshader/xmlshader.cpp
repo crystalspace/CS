@@ -410,6 +410,14 @@ bool csXMLShaderCompiler::LoadPass (iDocumentNode *node,
       pass->bufferCount++;
       //pass->bufferCount = MAX (pass->bufferCount, a + 1);
     }
+    else
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	"Shader '%s', pass %d: invalid buffer destination '%s'",
+	pass->owner->GetName (), pass->owner->GetPassNumber (pass),
+	dest);
+      
+    }
   }
 
   if (pass->bufferCount == 0)
