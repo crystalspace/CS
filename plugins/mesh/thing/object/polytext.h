@@ -279,9 +279,8 @@ public:
   void SetRendererLightmap (iRendererLightmap* rlm);
 
   /**
-   * Set the lightmap for this polytexture (and call IncRef()
-   * on the lightmap). Can also be used to clear the reference
-   * to the lightmap if 'lightmap' is 0.
+   * Set the lightmap for this polytexture . Can also be used to clear
+   * the reference to the lightmap if 'lightmap' is 0.
    */
   void SetLightMap (csLightMap* lightmap);
 

@@ -1096,6 +1096,18 @@ void csPolyTexture::UpdateFromShadowBitmap (
   else
   {
     csRGBpixel *lightmap = lm->GetStaticMap ();
+    if (!lightmap)
+    {
+      lm->ReAlloc ();
+      lightmap = lm->GetStaticMap ();
+      csColor ambient;
+      polygon->GetParent ()->GetStaticData ()
+      	->thing_type->engine->GetAmbientLight (ambient);
+      lm->InitColor (
+          int(ambient.red * 255.0f),
+          int(ambient.green * 255.0f),
+          int(ambient.blue * 255.0f));
+    }
     shadow_bitmap->UpdateLightMap (
         lightmap,
         csLightMap::lightcell_shift,

@@ -159,6 +159,13 @@ void csLightMap::Alloc (int w, int h)
   static_lm = new csRGBpixel [lm_size];
 }
 
+void csLightMap::ReAlloc ()
+{
+  if (static_lm) return;
+  long lm_size = lwidth * lheight;
+  static_lm = new csRGBpixel [lm_size];
+}
+
 struct PolySave
 {
   char header[4];

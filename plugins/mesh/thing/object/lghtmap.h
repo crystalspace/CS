@@ -135,6 +135,13 @@ public:
   void Alloc (int w, int h);
 
   /**
+   * In case the lightmap has become zero (due to an optimization
+   * in a previous lighting step we can allocate it again here by
+   * calling ReAlloc()).
+   */
+  void ReAlloc ();
+
+  /**
    * Initialize the lightmap to the given color.
    * r,g,b is the ambient light color used to initialize the lightmap.
    */
@@ -154,11 +161,6 @@ public:
    * Create a ShadowMap for this LightMap.
    */
   csShadowMap* NewShadowMap (iLight* light, int w, int h);
-
-  /**
-   * Allocate the static csRGBMap.
-   */
-  void AllocStaticLM (int w, int h);
 
   /**
    * Find a ShadowMap for a specific pseudo-dynamic light.

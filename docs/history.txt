@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+25-Jan-2005
+	- Jorrit fixed a bug that could come up in case you are relighting
+	  several maps at the same time and a certain polygon was affected
+	  by lights from both maps (through a portal). And the lights in the
+	  first map didn't affect the polygon sufficiently to actually
+	  contribute to lighting. In that case the static lightmap would
+	  get cleared (as an optimization). This would cause recalculation
+	  during the second map to fail as the static lightmap was removed
+	  by then. Fixed this by refreshing the static lightmap in this
+	  situation.
 24-Jan-2005
 	- Jorrit reverted a fix from res2k in walktest/keys.cpp which changes
 	  the way keys are parsed. This fix breaks parsing of keys with
