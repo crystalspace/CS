@@ -1655,6 +1655,17 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
       {
         if(quaddiv_enabled)
 	{
+	  if(block.quaddiv)
+	  { // set neighbors of block
+	    if(by>0) block.quaddiv->SetNeighbor(CS_QUAD_TOP, 
+	      blocks[blidx-blockxy].quaddiv);
+	    if(by<blockxy-1) block.quaddiv->SetNeighbor(CS_QUAD_BOT, 
+	      blocks[blidx+blockxy].quaddiv);
+	    if(bx>0) block.quaddiv->SetNeighbor(CS_QUAD_LEFT, 
+	      blocks[blidx-1].quaddiv);
+	    if(bx<blockxy-1) block.quaddiv->SetNeighbor(CS_QUAD_RIGHT, 
+	      blocks[blidx+1].quaddiv);
+	  }
 	  if(!quad_height)
 	  {
 	    QuadDivHeightFunc *qdhf = new QuadDivHeightFunc();
@@ -1696,10 +1707,10 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	  }
 	  block.PrepareQuadDiv(quad_height);
 	  block.PrepareFrame( origin );
+	  //if(by!=0) continue; //  debug
 	  SetupVertexBuffer (block.vbuf[0], block.vbuf[0]);
 	  block.Draw(rview, clip_portal, clip_plane, clip_z_plane,
 	    correct_du, correct_su, correct_dv, correct_sv, this);
-	  //break; //// only one block
 	  continue;
 	}
         csVector3& bc = block.center;

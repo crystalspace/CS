@@ -87,9 +87,11 @@ csTerrainQuadDiv::~csTerrainQuadDiv()
 
 void csTerrainQuadDiv::SetNeighbor(int dir, csTerrainQuadDiv *neigh)
 {
+  if((neigh!=NULL) && (neighbors[dir] == neigh)) return;
   neighbors[dir] = neigh;
   if(!IsLeaf())
   {
+    neigh=NULL; /// make subchildren NULL so they will look up later.
     /// call 2 children only
     int c1=0, c2=0;
     switch(dir)
@@ -253,6 +255,7 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
   float e = dmax; 
   /// if camera in quad: dist = 1; (see full length)
   float dist = 1.;
+  float distfactor = 0.1;
   if( (campos.x < minx) || (campos.x > maxx) || (campos.z < miny)
     || (campos.z > maxy))
   {
@@ -262,15 +265,18 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
     if(campos.x > maxx) distx = campos.x-maxx;
     if(campos.z < miny) disty = miny-campos.z;
     if(campos.z > maxy) disty = campos.z-maxy;
-    distx*=0.1;
-    disty*=0.1;
-    dist = 1. / qsqrt(1.0 + distx*distx + disty*disty);
+    distx*=distfactor;
+    disty*=distfactor;
+    //dist = 1. / qsqrt(1.0 + distx*distx + disty*disty);
+    dist = 1. / (1.0 + distx*distx + disty*disty);
   }
   e *= dist;
   /// if camera in quad, camslant = 1 (full length is visible)
   float camslant = 1.0;
-  if(campos.y > max_height) camslant = 1.0 / (1.+ 01.*(campos.y - max_height));
-  if(campos.y < min_height) camslant = 1.0 / (1.+ 01.*(min_height - campos.y));
+  if(campos.y > max_height) camslant = 1.0 / 
+    (1.+ distfactor*(campos.y - max_height));
+  if(campos.y < min_height) camslant = 1.0 / 
+    (1.+ distfactor*(min_height - campos.y));
   e *= camslant;
 
   /// can this quad be displayed?
