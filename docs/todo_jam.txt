@@ -26,7 +26,6 @@ W - Wishlist (the build also works without this feature)
     and INITJAMFILE. Would be also nice to extract more of the detection
     scripts in CS (perl, python, nasm, problematic cflags?)
 
-[L] Add support to create Microsoft CHM format documentation packages.
 [L] Jorrit reports that with the command "jam -sMODE=profile walktest_static",
     dynavis/debug/static/dynavis.o gets compiled twice.
 [L] msvcgen.jam: Consider overhauling the "configuration" file handling rule so
@@ -52,6 +51,17 @@ W - Wishlist (the build also works without this feature)
     is sufficiently expressive that it should be able to handle the
     image-copying and other functionality without depending upon these external
     tools.
+[L] The Texi2Info, Texi2PS, and Texi2PDF rules needs to clean up the "image"
+    files (.jpg, .png, .gif, .txt, etc.) which are copied from the source
+    directory to the build directory.  These files are fully incorporated into
+    the generated documentation files as part of the conversion, and are not
+    needed after conversion has completed.
+[L] The Texi2DVI, Texi2PS, and Texi2PDF need to be augmented to maintain the
+    TeX .log so that it can be reviewed for problems by the user.  Also, it
+    might be wise to scan the file for common problems, such as error messages
+    (denoted by "!") and warnings (such as the common 'hbox' warning) and
+    present those messages to the user.
+[L] Add support to create Microsoft CHM format documentation packages.
 
 [W] See if there's a way to create some suitable MSVC templates for external
     projects, so that we autogenrate msvc-makefiles there too.
