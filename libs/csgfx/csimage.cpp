@@ -700,3 +700,7 @@ csPtr<iImage> csImageFile::Crop ( int x, int y, int width, int height )
   return csPtr<iImage> (nimg);
 }
 
+int csImageFile::HasMipmaps()
+{
+  return 0;
+}
