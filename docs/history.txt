@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+12-Apr-2002
+	- Added a fix to 'make csconfig' so that it also works on Win98
+	  now. The problem was that redirecting to out/csconfig.tmp works
+	  on Win2K and higher but not on Win98 (forward slashes).
 11-Apr-2002
 	- Replaced /bin/sh to sh in the csconf.mak makefile. Many mingw
 	  installations don't have /bin/sh. So using 'sh' is preferable.
