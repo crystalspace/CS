@@ -2,7 +2,7 @@ The history order is reversed so that new features are at the top.
 
 8-Aug-2001
 	- Michael Voase did the following:
-	- csObject: Changed the vector used to CS_TYPED_VECTOR_DECREF()
+	  csObject: Changed the vector used to CS_TYPED_VECTOR_DECREF()
 	  then changed the delete routines to feed the RefCount of an object
 	  as the FreeIt flag. This staunches cyclic reference runaways and
 	  prevents RefCounts on csObject's from going below zero. Also
