@@ -9,6 +9,7 @@ depends()
 	-lcsgfx) DEPS="-lcssys -lcsutil";;
 	-lcstool) DEPS="-lcsutil -lcssys -lcsgeom";;
 	-lcsws) DEPS="-lcsgfx -lcsgeom -lcsutil -lcssys";;
+	-lcsphyzik) DEPS="-lcsgeom -lcsutil -lcssys";;
 	*) DEPS=""
     esac
 }
@@ -159,6 +160,9 @@ while test $# -gt 0; do
 	;; 
     csws)
 	addlib "-lcsws"
+	;;
+    csphyzik)
+	addlib "-lcsphyzik"
 	;;
     *)
       usage 1 1>&2
