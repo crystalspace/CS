@@ -301,6 +301,7 @@
 	<usecfg>disableTC</usecfg>
       </applicable>
     </rule>
+    <!--
     <rule description="NVidia: glClear() doesn't always seem to clear">
       <conditions fulfill="all">
 	<regexp string="vendor" pattern="^NVIDIA" />
@@ -309,6 +310,7 @@
 	<usecfg>clearWithBox</usecfg>
       </applicable>
     </rule>
+    -->
     <!--
     <rule description="Software GL tweaks">
       <conditions fulfill="one">

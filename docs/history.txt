@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Mar-2005
+	- Jorrit disabled the new clearWithBox rule in gldrivers.xml
+	  because it breaks screen clearing on his nVidia card. If this is
+	  to be enabled again then I propose it is enabled ONLY on cards
+	  that are known to give this problem. Not on all nVidia cards.
 28-Mar-2005
 	- Marten changed how transforms are sent from meshobjects to the
 	  renderer.
