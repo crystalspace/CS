@@ -19,6 +19,13 @@ The history order is reversed so that new features are at the top.
 	- Added new HEIGHTGEN keyword to the loader. With this keyword it
 	  is now possible to use the new class from Wouter to dynamically
 	  generate textures in combination with a heightmap.
+	- Fixed a bug with 3D sprites which would crash on lighting if
+	  the sprite contained vertices that were not used in triangles.
+	  The function to calculate normals now sets the normal to 1,0,0
+	  in such case (previously it was undefined which could cause
+	  crashes).
+	- If a sprite has only one frame then tweening will be disabled
+	  by default. This should increase performance a little for them.
 3-May-2001
 	- Wouter Wijngaards did the following:
 	  added a class that can generate iImages for terrain textures on

@@ -390,12 +390,18 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
     if (vt.num_con_triangles)
     {
       csVector3 &n = GetNormal (frame_number, i);
-      n = csVector3 (0,0,0);
+      n.Set (0,0,0);
       for (j = 0; j < vt.num_con_triangles; j++)
         n += tri_normals [vt.con_triangles[j]];
       float norm = n.Norm ();
       if (norm)
         n /= norm;
+    }
+    else
+    {
+      // If there are no connecting triangles then we just
+      // initialize the normal to a default value.
+      GetNormal (frame_number, i).Set (1, 0, 0);
     }
   }
 
@@ -1099,6 +1105,9 @@ bool csSprite3DMeshObject::OldNextFrame (cs_time current_time, bool onestep, boo
 {
   bool ret = false;
 
+  // If the sprite has only one frame we disable tweening here.
+  if (cur_action->GetNumFrames () <= 1) do_tweening = false;
+  
   if(onestep)
   {
     if(current_time>last_time+cur_action->GetFrameDelay (cur_frame))
@@ -1138,7 +1147,10 @@ bool csSprite3DMeshObject::OldNextFrame (cs_time current_time, bool onestep, boo
   }
 
   if (do_tweening)
-    tween_ratio = (current_time - last_time) / (float)cur_action->GetFrameDelay (cur_frame);
+  {
+    if (current_time <= last_time) tween_ratio = 0;
+    else tween_ratio = (current_time - last_time) / float (cur_action->GetFrameDelay (cur_frame));
+  }
   else
     tween_ratio = 0;
 
