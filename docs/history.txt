@@ -50,7 +50,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine added a test to CS/bin/comptest.sh to determine if the
 	  compiler is able to understand CS/include/qsqrt.h.  If the compiler
 	  is unable to deal with this file, then the CS_NO_QSQRT flag is set in
-	  both config.mak and volatile.mak.  This test should allow users of
+	  both config.mak and volatile.h.  This test should allow users of
 	  RedHat version 7 to build the project without undue effort, since the
 	  compiler which shipped with RedHat 7 is quite buggy and is known to
 	  fail disastrously with an `internal compiler error' on qsqrt.h.
