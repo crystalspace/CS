@@ -1887,7 +1887,6 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n, iRenderView* rview
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
-
   csVector3 radius;
   csSphere sphere;
   GetRadius (radius, sphere.GetCenter ());

@@ -45,9 +45,9 @@ bool csMovableSectorList::PrepareSector (iSector* sector)
   if (sector == 0) return false;
 
   // if the movable has a parent, no sectors can be added.
+  // We still call MoveToSector() because MoveToSector will
+  // also register portal containers to the sector.
   CS_ASSERT (movable != 0);
-  if (movable->GetParent ()) return false;
-
   csMeshWrapper *mw = movable->GetMeshWrapper ();
   if (mw) mw->MoveToSector (sector);
   return true;
@@ -149,9 +149,9 @@ void csMovable::SetSector (iSector *sector)
 
 void csMovable::ClearSectors ()
 {
+  if (object) object->RemoveFromSectors ();
   if (parent == 0)
   {
-    if (object) object->RemoveFromSectors ();
     sectors.DeleteAll ();
     sectors.SetLength (0);
   }

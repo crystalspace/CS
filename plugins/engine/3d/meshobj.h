@@ -271,9 +271,11 @@ public:
   /// Culler flags.
   csFlags culler_flags;
 
-protected:
   /// Clear this object from all sector portal lists.
   void ClearFromSectorPortalLists ();
+  /// Add this object to all sector portal lists.
+  void AddToSectorPortalLists ();
+protected:
 
   /// Get the bounding box in world space and correct in hierarchy.
   void GetFullBBox (csBox3& box);
