@@ -46,6 +46,8 @@ The history order is reversed so that new features are at the top.
 	- Matze improved the introduction message in createproject.sh
 	- res changed the Win32 registry config to store floats as strings 
 	  instead of binaries for better human readability.
+	- Matze implemented platform config on unix. Now config files are
+	  created in $HOME/.crystal
 9-Jun-2003
 	- Jorrit made a new csStringArray class.
 	- res made the following changes:
