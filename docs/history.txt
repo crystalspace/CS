@@ -79,6 +79,9 @@ chronological order.
 	  longer requires a custom NSApplication subclass.  Eliminating this
 	  requirement will make it much more friendly to external OSX-specific
 	  projects.)
+	- Keith Fulton added a new sprcal3d plugin, with a sprcal3dldr plugin
+	  to load them.  Functionality is only partially implemented, but
+	  cal3d models are loadable and viewable in viewmesh at least.
 31-Jul-2003
 	- Jorrit replaced various occurances of csVector:
 	    - Replaced 'vTex' in OpenGL texture manager with
