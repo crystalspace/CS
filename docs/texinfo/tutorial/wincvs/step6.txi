@@ -1,3 +1,92 @@
 @c -*-texinfo-*-
 @node WinCVS Tutorial Step 6, WinCVS Tutorial Step 7, WinCVS Tutorial Step 5, WinCVS Tutorial
 @subsection Step 6: Checking out Crystal Space
+
+@subsubheading Checking out Crystal Space with WinCVS - PSERVER
+
+Before checking out the code Crystal Space code you must login to the server. From
+the WinCVS file menu click on @file{Admin} then @file{Login}. The @file{Password
+authentication} dialog prompt will appear, just click on the @file{OK} button.
+
+@picturess{tutorial,wincvs,wincvsshot6}
+
+In the @file{Output} window at the bottom of the WinCVS client should appear the following:
+
+@emph{cvs -z4 -q login}
+
+@emph{(Logging in to anonymous@cvs.crystal.sourceforge.net)}
+
+@emph{*****CVS exited normally with code 0*****}
+
+If yes, now you can proceed and checkout the Crystal Space code. In the left hand
+@file{Workspace} window, where you can see the directory @file{crystal_space}. Well
+right click on that directory and then click on @file{Checkout module} and the
+following dialog box will appear:
+
+In the edit box @file{Enter the module name and path on the server}, enter the word
+@file{crystal}.
+
+@picturess{tutorial,wincvs,wincvsshot7}
+
+Next click on the property sheet tab @file{Checkout options} and edit as shown in the
+screenshot below.
+
+@picturess{tutorial,wincvs,wincvsshot8}
+
+Next click on the property sheet tab @file{Globals} and edit as shown in the screenshot
+below.
+
+@picturess{tutorial,wincvs,wincvsshot9}
+
+Now just click on the @file{OK} button and after a few seconds no more than a minute
+you should start to see the files being checked out of the server start appearing in
+the bottom @fileOutput} window.
+
+The end of a successful checkout will be indicated by the line:
+
+@emph{*****CVS exited normally with code 0*****}
+
+@emph{If the checkout ends with the line:}
+
+@emph{*****CVS exited normally with code 1*****}
+
+@emph{The checkout has failed and you must repeat the checkout steps in this section.}
+
+@subsubheading Checking out Crystal Space with WinCVS - SSH
+
+In the left hand @file{Workspace} window of the WinCVS client, where you can see the
+directory @file{crystal_space}. Well right click on that directory and then click on
+@file{Checkout module}. The following dialog box will appear:
+
+In the edit box @file{Enter the module name and path on the server}, enter the word
+@file{crystal}.
+
+@picturess{tutorial,wincvs,wincvsshot7}
+
+Next click on the property sheet tab @file{Checkout options} and edit as shown in
+the screenshot below.
+
+@picturess{tutorial,wincvs,wincvsshot8}
+
+Next click on the property sheet tab @file{Globals} and edit as shown in the screenshot
+below.
+
+@picturess{tutorial,wincvs,wincvsshot9}
+
+Now just click on the @file{OK}
+
+This is where an SSH checkout differs from PSERVER, a blank DOS/Command window should
+have now appeared. Enter your Sourceforge password which corresponds to your username
+and hit the @file{ENTER} key. After a few seconds no more than a minute you should start
+to see the files being checked out appearing in the bottom @file{Output} window.
+
+The end of a successful checkout will be indicated by the line:
+
+@emph{*****CVS exited normally with code 0*****}
+
+@emph{If the checkout ends with the line:}
+
+@emph{*****CVS exited normally with code 1*****}
+
+@emph{The checkout has failed and you must repeat the checkout steps in this section.}
+
