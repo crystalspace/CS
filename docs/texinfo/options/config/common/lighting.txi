@@ -83,10 +83,9 @@ Use only powers of two. (Default: 16)
 @item Radiosity.ColourBleed=<float>
 This variable controls the amount of color emitted
 by a polygon. The colour is taken by examining the texture of the polygon.
-Thus a blue texture will reflect blueishly. Note that decreasing or
-increasing this value will increase the amount of lighting in the
-entire level by that amount. So 0.0 will be dark. And high values will
-create huge amounts of light (and use more calculation). Try 0.0-4.0. 
+Thus a blue texture will reflect blueishly. So 0.0 will remove texture
+influence, making the level render as if all white. And high values will
+make colour more important. Try 0.0-4.0. 
 (Default: 1.0)
 
 @item Radiosity.DoStaticSpecular=<yesno>
