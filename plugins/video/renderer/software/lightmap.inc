@@ -88,7 +88,6 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 	pt_cell_size = 1 << pt_cell_shift;
 	int pt_shfw = pt->GetShiftU () - mipmap;
 	int pt_w = 1 << pt_shfw;
-	int pt_h = (pt->GetHeight () + mipmap_delta) >> mipmap;
 	
 	int lm_color_shift = 6 - pt_cell_shift*2;
 

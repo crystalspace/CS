@@ -4864,7 +4864,6 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     {
       csTrianglesPerSuperLightmap* unlitPolys = polbuf->GetUnlitPolys();
       lightmap_cache->Cache(unlitPolys,dirty,&modified);
-      csLightMapQueue* fog_queue = lightmap_cache->GetQueue(unlitPolys);
       int num_triangles = unlitPolys->numTriangles;
       csTriangle* triangles = unlitPolys->triangles.GetArray();
       int num_vertices = unlitPolys->numVertices;
