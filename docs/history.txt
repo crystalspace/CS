@@ -23,6 +23,13 @@ Short-term cleanups that need to be done:
 	  who committed these changes to CVS on Seth's behalf, fixed two or
 	  three bugs which had crept in, and also renamed a couple methods for
 	  clarity and consistency.
+	- Eric Sunshine fixed a bug in the way lightmap scaling made use of
+	  csProgressMeter.  csProgressMeter expects to be called a fixed
+	  number of times so that it can correctly reflect percentage
+	  complete.  However, lightmap scaling was calling it an indeterminate
+	  number of times.
+	- Eric Sunshine moved standard.zip, shtlib_g.zip, and shtlib_m.zip
+	  from the CS directory into the CS/data directory.
 19-Sep-1999
 	- Moved LIGHTMAP_SIZE config value from softrdnr.cfg to cryst.cfg
 	  where it belongs.  It now works again.
