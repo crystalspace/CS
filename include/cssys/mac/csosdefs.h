@@ -25,12 +25,12 @@ int access (const char *path, int mode);
 
 // The 2D graphics driver used by software renderer on this platform
 #define SOFTWARE_2D_DRIVER	"crystalspace.graphics2d.macintosh"
-#define OPENGL_2D_DRIVER	"crystalspace.graphics2d.glmac"
+#define OPENGL_2D_DRIVER	"crystalspace.graphics2d.opengl.macintosh"
 #define GLIDE_2D_DRIVER		"crystalspace.graphics3d.glide.2x"
 #define RAVE_2D_DRIVER		"crystalspace.graphics3d.rave"
 
 // Sound driver
-#define SOUND_DRIVER            "crystalspace.sound.driver.mac"
+#define SOUND_DRIVER            "crystalspace.sound.driver.macintosh"
 
 #if defined (SYSDEF_DIR)
 #  define __NEED_GENERIC_ISDIR
