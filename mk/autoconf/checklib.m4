@@ -30,7 +30,7 @@ m4_define([cs_lib_paths_default], [])
 #	library location via --with-libLIBRARY=dir.  LIBRARY is the name of the
 #	library which is to be located (for example, "readline" for
 #	libreadline.a).  PROGRAM, which is typically composed with
-#	AC_LANG_PROGRAM(), is a program which refernces at least one function
+#	AC_LANG_PROGRAM(), is a program which references at least one function
 #	or symbol in LIBRARY.  SEARCH-LIST is a whitespace-delimited list of
 #	paths in which to search for the library and its header files, in
 #	addition to those searched by the compiler and linker by default, and
