@@ -88,11 +88,14 @@ inline bool csNetworkManager::HandleEvent (iEvent &ev)
       iNetworkSocket2 *newsock = sock->Accept ();
       if (newsock) RegisterConnectedSocket
         (newsock, ((iNetworkPacket *) packets.Get ((int) sock))->New ());
+
+      Poll (sock, ev.Time);
     }
 
     for ((i = connections.Length ())--; i >= 0; i--)
     {
       iNetworkSocket2 *sock = (iNetworkSocket2 *) connections.Get (i);
+
       if (sock->IsConnected ())
         Poll (sock, ev.Time);
       else
