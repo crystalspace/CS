@@ -41,9 +41,9 @@ LIB.PYSIMP = $(foreach d,$(DEP.PYSIMP),$($d.LIB))
 
 #TO_INSTALL.EXE += $(PYSIMP.EXE)
 
-#MSVC.DSP += PYSIMP
-#DSP.PYSIMP.NAME = pysimp
-#DSP.PYSIMP.TYPE = appgui
+MSVC.DSP += PYSIMP
+DSP.PYSIMP.NAME = pysimp
+DSP.PYSIMP.TYPE = appgui
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -40,6 +40,7 @@
 #------------------------------------------------------------------------------
 
 MSVC.PLUGINS.REQUIRED =     \
+  cscript/cspython          \
   font/server/freefont      \
   sound/driver/waveoutsd    \
   sound/renderer/ds3d       \

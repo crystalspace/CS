@@ -14,6 +14,9 @@ The history order has been reversed so that new features are at the top.
 	  has been done yesterday on csSpriteTemplate).
 	- Walktest now uses this new iSprite3DState for the skeleton and
 	  the ghost.
+	- Eric Sunshine enabled generation of MSVC DSP files for the csPython
+	  plug-in module and the PySimp application since we have one or two
+	  Windows users who would like to build these modules.
 1-Feb-2001
 	- Martin Geisse changed the sockets driver to use system events
 	  instead of Open() and Close() methods.
