@@ -13,6 +13,8 @@ chronological order.
 	  instead of the VC only _findfirst() etc.
 	- res fixed VfsNode::FindFiles() to not remove a trailing backslash
 	  from drive letters on Win32.
+	- Neil Mosafi made a few fixes to the csvosa3dl plugin to make it build
+	  on Windows
 11-Jun-2004
 	- Peter Amstutz added support for setting animation loops on
 	  models to the csvosa3dl plugin
