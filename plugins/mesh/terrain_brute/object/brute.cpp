@@ -140,70 +140,40 @@ void csTerrBlock::Detach ()
 
 void csTerrBlock::SetupMesh ()
 {
-  int res = terr->GetBlockResolution ();
+  int res = terr->GetBlockResolution () + 1;
 
   delete[] vertex_data;
-  vertex_data = new csVector3[(res+1)*(res+1)];
-  /*delete[] morphvertex_data;
-  morphvertex_data = new csVector3[(res+1)*(res+1)];*/
+  vertex_data = new csVector3[res * res];
   delete[] texcoord_data;
-  texcoord_data = new csVector2[(res+1)*(res+1)];
+  texcoord_data = new csVector2[res * res];
   delete[] normal_data;
-  normal_data = new csVector3[(res+1)*(res+1)];
-  /*delete[] morphnormal_data;
-  morphnormal_data = new csVector3[(res+1)*(res+1)];*/
+  normal_data = new csVector3[res * res];
 
   if (!terrasampler)
+  {
     terrasampler = terr->terraformer->GetSampler (
-      csBox2 (center.x-size/2.0, center.z-size/2.0, 
-              center.x+size/2.0, center.z+size/2.0),
-      res+1);
+      csBox2 (center.x - size / 2.0, center.z - size / 2.0, 
+      center.x + size / 2.0, center.z + size / 2.0), res);
+  }
 
   memcpy (vertex_data, terrasampler->SampleVector3 (terr->vertices_name),
-            (res+1)*(res+1)*sizeof(csVector3));
+    res * res * sizeof (csVector3));
   memcpy (normal_data, terrasampler->SampleVector3 (terr->normals_name),
-            (res+1)*(res+1)*sizeof(csVector3));
+    res * res * sizeof (csVector3));
   memcpy (texcoord_data, terrasampler->SampleVector2 (terr->texcoords_name),
-            (res+1)*(res+1)*sizeof(csVector2));
+    res * res * sizeof (csVector2));
   terrasampler->Cleanup ();
 
   bbox.Empty ();
-  for (int j=0; j<(res+1); ++j)
+  int i, j;
+  for (j = 0; j < res; ++j)
   {
-    for (int i=0; i<(res+1); ++i)
+    for (i = 0; i < res; ++i)
     {
-      const int pos = i+j*(res+1);
+      const int pos = i + j * res;
       bbox.AddBoundingVertexSmart (vertex_data[pos]);
-      /*if ((j%2) && (i%2))
-      {
-        morphvertex_data[i+j*(res+1)] = (vertex_data[i-1+(j-1)*(res+1)]+
-                                         vertex_data[i+1+(j-1)*(res+1)]+
-                                         vertex_data[i-1+(j+1)*(res+1)]+
-                                         vertex_data[i+1+(j+1)*(res+1)])/4.0;
-        morphnormal_data[i+j*(res+1)] = (normal_data[i-1+(j-1)*(res+1)]+
-                                         normal_data[i+1+(j-1)*(res+1)]+
-                                         normal_data[i-1+(j+1)*(res+1)]+
-                                         normal_data[i+1+(j+1)*(res+1)])/4.0;
-      } else if (i%2)
-      {
-        morphvertex_data[i+j*(res+1)] = (vertex_data[i-1+j*(res+1)]+
-                                         vertex_data[i+1+j*(res+1)])/2.0;
-        morphnormal_data[i+j*(res+1)] = (normal_data[i-1+j*(res+1)]+
-                                         normal_data[i+1+j*(res+1)])/2.0;
-      } else if (j%2)
-      {
-        morphvertex_data[i+j*(res+1)] = (vertex_data[i+(j-1)*(res+1)]+
-                                         vertex_data[i+(j+1)*(res+1)])/2.0;
-        morphnormal_data[i+j*(res+1)] = (normal_data[i+(j-1)*(res+1)]+
-                                         normal_data[i+(j+1)*(res+1)])/2.0;
-      } else
-      {
-        morphvertex_data[i+j*(res+1)] = vertex_data[i+j*(res+1)];
-        morphnormal_data[i+j*(res+1)] = normal_data[i+j*(res+1)];
-      }*/
     }
   }
-
   built = true;
 }
 
