@@ -314,7 +314,7 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
       pObj->SetNodeState(node_pos, CS_QUAD_FULL);
     /// mark children (if any) as unknown, since they should not be reached.
     if(node_pos->depth < pObj->max_depth)
-      pObj->CallChildren(mark_node_func, pObj, node_bbox, 
+      pObj->CallChildren(&csQuadTree::mark_node_func, pObj, node_bbox, 
         node_pos, (void*)CS_QUAD_UNKNOWN);
     return CS_QUAD_CERTAINCHANGE;
   }
@@ -332,7 +332,7 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
     {
       // mark children as empty now, since they should be empty, and
       // can be reached now...
-      pObj->CallChildren(mark_node_func, pObj, node_bbox, 
+      pObj->CallChildren(&csQuadTree::mark_node_func, pObj, node_bbox, 
         node_pos, (void*)CS_QUAD_EMPTY);
     }
     // this node is partially covered.
@@ -343,7 +343,7 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
     if(node_pos->depth < pObj->max_depth)
     {
       int retval[4];
-      pObj->CallChildren(insert_polygon_func, pObj, node_bbox, 
+      pObj->CallChildren(&csQuadTree::insert_polygon_func, pObj, node_bbox, 
         node_pos, data, retval);
       /// @@@ the polygon could have caused a child to become FULL and thus
       /// all children could be FULL now, in which case we should be FULL too.
@@ -439,7 +439,7 @@ int csQuadTree :: test_point_func (csQuadTree* pObj, const csBox2& node_bbox,
     return node_state;
   // for a partial covered node with children, call the children
   int retval[4];
-  CallChildren(test_point_func, pObj, node_bbox, node_pos,
+  CallChildren(&csQuadTree::test_point_func, pObj, node_bbox, node_pos,
     data, retval);
   return pObj->GetTestPointResult(retval);
 }
@@ -499,7 +499,7 @@ int csQuadTree :: propagate_down_func (csQuadTree* pObj,
   else if(node_state == CS_QUAD_FULL || node_state == CS_QUAD_EMPTY)
     newstate = node_state;
   if(node_pos->depth < pObj->max_depth)
-    CallChildren(propagate_down_func, pObj, node_bbox, node_pos,
+    CallChildren(&csQuadTree::propagate_down_func, pObj, node_bbox, node_pos,
     (void*)newstate);
   return 0;
 }
@@ -521,7 +521,7 @@ int csQuadTree :: sift_up_func (csQuadTree* pObj, const csBox2& node_bbox,
     return node_state;
   // ask my children what value should me
   int retval[4];
-  CallChildren(propagate_down_func, pObj, node_bbox, node_pos,
+  CallChildren(&csQuadTree::propagate_down_func, pObj, node_bbox, node_pos,
     data, retval);
   int newstate = pObj->GetTestPointResult(retval);
   if(node_state != newstate)
