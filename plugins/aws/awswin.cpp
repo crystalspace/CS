@@ -49,6 +49,7 @@ const bool DEBUG_WINDOW_EVENTS = false;
 awsWindow::awsWindow () :
   frame_options(foControl | foZoom | foClose | foTitle | foGrip | foRoundBorder),
   title(NULL),
+  title_bar_height(0),
   resizing_mode(false),
   moving_mode(false),
   sink(this),
@@ -112,7 +113,7 @@ bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 
   // setup title bar height and offset
 
-  int tw, th;
+  int tw=0, th=0;
 
     // Get the size of the text
   WindowManager ()->GetPrefMgr ()->GetDefaultFont ()->GetMaxSize (tw, th);
@@ -122,7 +123,6 @@ bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   th += title_offset;
   // Set the height of the title bar
   title_bar_height = MAX(th + 3, title_bar_height);
-
 
   // register triggers with our sink
   sink.RegisterTrigger("Close", &OnCloseClick);
