@@ -41,7 +41,7 @@ vectors. They will be explained in the next sections.
 
 @menu
 * csObject:: @code{csObject}
-* Typed Arrays:: @code{Typed Arrays}
+* Typed Arrays::
 @end menu
 
 @node csObject, Typed Arrays, csUtil, csUtil
