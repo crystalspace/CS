@@ -14,6 +14,9 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 8-Aug-1999
+	- Continued work on new csTransformationManager class. It is now fully
+	  functional and the old NewTransformation()/RestoreTransformation()
+	  functions have been removed.
 	- Eric Sunshine fixed the 'clean' target in the Makefile so that it
 	  also deletes the generated $(OUTDLL) directory.
 	- Eric Sunshine fixed problem in Squawk.  It was not properly clearing
@@ -30,6 +33,12 @@ Short-term cleanups that need to be done:
 	    - The version string now says "BeOS-Intel-GCC" rather than
 	      "Unix-Intel-GCC".
 	    - The user no longer needs to manually configure for buggy EGCS.
+7-Aug-1999
+	- Continued work on better bsp support. Added the
+	  csPolygonBspContainer class. Also moved new bsp stuff to
+	  libs/csengine/bsppol.cpp.
+	- Started work on new csTransformationManager class which will give us
+	  a better way to manage world to camera transformations.
 6-Aug-1999
 	- Wrote an object pool design pattern class for 2D polygons. They
 	  are used instead of the global 'clipped' variable which caused
@@ -80,6 +89,8 @@ Short-term cleanups that need to be done:
 	  complete_pixel_format().  It would go into an infinite loop when
 	  called unnecessarily by some 2D graphics drivers at 8-bit depth with
 	  the red, green, and blue masks set to zero.
+	- Compilation fixes for GCC 2.95 from Michael Dale Long.
+	- Andrew Zabolotny fixed the software renderer again.
 	- Eric Sunshine fixed a problem where a recent change to netsdrv.cpp
 	  caused compilation to fail on OpenStep and NextStep, on account of
 	  the unknown "socklen_t" type.
@@ -100,6 +111,9 @@ Short-term cleanups that need to be done:
 	  section where it belongs.
 	- Eric Sunshine generalized the MacOS/X Server, OpenStep, and NextStep
 	  makefiles slightly.
+	- Thomas Hieber made D3D port compilable again and fixed the
+	  project files for Win/VC.
+	- New project files for Macintosh from Robert Bate.
 4-Aug-1999
 	- Implemented dynamic lighting for gouraud shaded polygons (NOT sprites
 	  and curves, that's another matter).
