@@ -121,6 +121,7 @@ public:
   csMatrix3 ori;
   csVector3 hardpos;
   csMatrix3 hardtrans;
+  bool htapplied;
 
   ConstructObject3DTask(iObjectRegistry *objreg, csMetaObject3D* obj,
                         const csVector3& pos, const csMatrix3& ori,
@@ -221,7 +222,8 @@ public:
 
 csMetaObject3D::csMetaObject3D(VobjectBase* superobject)
     : A3DL::Object3D(superobject),
-    alreadyLoaded(false)
+      alreadyLoaded(false),
+      htvalid(false)
 {
   csvobj3d = new csVosObject3D(this, superobject);
   csvobj3d->IncRef();
@@ -276,27 +278,28 @@ Task* csMetaObject3D::GetSetupTask(csVosA3DL* vosa3dl, csVosSector* sect)
     xht = yht = zht = 0;
   }
 
-  double aht, bht, cht, dht;
-  try
-  {
-    getOrientationHT(aht, bht, cht, dht);
-    LOG("csMetaObject3D", 3, "got hard orientation ");
-  }
-  catch(...)
-  {
-    aht = bht = dht = 0;
-    cht = 1;
-  }
+  double aht = 0, bht = 0, cht = 1, dht = 0;
+  double sxht = 1, syht = 1, szht = 1;
+  if(! htvalid) {
+    htvalid = true;
+    try
+    {
+      getOrientationHT(aht, bht, cht, dht);
+      LOG("csMetaObject3D", 3, "using hard orientation "
+          << aht << " " << bht << " " << cht << " " << dht);
+    }
+    catch(...)
+    {
+    }
 
-  double sxht, syht, szht;
-  try
-  {
-    getScalingHT(sxht, syht, szht);
-    LOG("csMetaObject3D", 3, "got hard scaling");
-  }
-  catch(...)
-  {
-    sxht = syht = szht = 1.0;
+    try
+    {
+      getScalingHT(sxht, syht, szht);
+      LOG("csMetaObject3D", 3, "got hard scaling");
+    }
+    catch(...)
+    {
+    }
   }
 
   csQuaternion q;

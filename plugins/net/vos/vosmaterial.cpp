@@ -336,7 +336,7 @@ void csMetaMaterial::Setup(csVosA3DL* vosa3dl)
 
 void csMetaMaterial::notifyPropertyChange(const PropertyEvent& event)
 {
-  LOG("vosmaterial", 2, "woob woob property change!");
+  LOG("vosmaterial", 4, "property change!");
   try
   {
     vRef<ParentChildRelation> pcr = event.getProperty()->findParent(*this);
@@ -360,7 +360,7 @@ csRef<iMaterialWrapper> csMetaMaterial::GetMaterialWrapper()
 
 void csMetaMaterial::notifyChildInserted(VobjectEvent& event)
 {
-  LOG("vosmaterial", 2, "woob woob child inserted!");
+  LOG("vosmaterial", 4, "child inserted!");
 
   if(event.getContextualName() == "a3dl:texture")
   {

@@ -286,6 +286,7 @@ void csMetaModel::notifyChildInserted(VobjectEvent& e)
   if(!valid && metamaterial.isValid() && databuf.IsValid())
   {
     valid = true;
+    htvalid = false;
     // Create task
     vosa3dl->mainThreadTasks.push(new ConstructModelTask (vosa3dl->GetObjectRegistry(),
                                                           this, sector->GetSector()));
@@ -338,6 +339,7 @@ void csMetaModel::notifyPropertyChange(const PropertyEvent& event)
   if(!valid && metamaterial.isValid() && databuf.IsValid())
   {
     valid = true;
+    htvalid = false;
     // Create task
     vosa3dl->mainThreadTasks.push(new ConstructModelTask (vosa3dl->GetObjectRegistry(),
                                                           this, sector->GetSector()));

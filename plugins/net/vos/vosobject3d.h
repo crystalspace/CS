@@ -78,6 +78,7 @@ protected:
   csRef<csVosA3DL> vosa3dl;
   csRef<csVosSector> sector;
   VUtil::vRef<csMetaMaterial> metamaterial;
+  bool htvalid;
 
 public:
   csMetaObject3D(VOS::VobjectBase* superobject);
