@@ -76,7 +76,7 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   // Query system settings
   int sim_depth;
   bool do_shm;
-  GetX11Settings (sim_depth, do_shm, do_hwmouse);
+  GetX11Settings (pSystem, sim_depth, do_shm, do_hwmouse);
 
   dpy = XOpenDisplay (NULL);
 
@@ -300,12 +300,18 @@ static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
   return false;
 }
 
+#define DO_STUFF_EXTENDED_KEYCODE
+
 bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
 {
   static int button_mapping[6] = {0, 1, 3, 2, 4, 5};
   XEvent event;
+  bool cskey=true;
   int state, key;
   bool down;
+#ifdef DO_STUFF_EXTENDED_KEYCODE
+  unsigned char keytranslated;
+#endif
 
   while (XCheckMaskEvent (dpy, ~0, &event))
     switch (event.type)
@@ -338,8 +344,12 @@ bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
 	// in favour of KeyDown since this is most (sure?) an autorepeat
         XCheckIfEvent (event.xkey.display, &event, CheckKeyPress, (XPointer)&event);
         down = (event.type == KeyPress);
+#ifdef DO_STUFF_EXTENDED_KEYCODE
+        XLookupString ((XKeyEvent*)&event, (char*)&keytranslated, 1, (KeySym*)&key, NULL);
+#else
         key = XLookupKeysym (&event.xkey, 0);
         state = event.xkey.state;
+#endif
         switch (key)
         {
           case XK_Meta_L:
@@ -397,9 +407,16 @@ bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
           case XK_F10:        key = CSKEY_F10; break;
           case XK_F11:        key = CSKEY_F11; break;
           case XK_F12:        key = CSKEY_F12; break;
-          default:            break;
+          default:            cskey=false; break;
         }
+#ifdef DO_STUFF_EXTENDED_KEYCODE
+        if ( cskey )
+	  System->QueueKeyEvent (key, down);
+	else
+  	  System->QueueExtendedKeyEvent (key, (int)keytranslated, down);
+#else
 	System->QueueKeyEvent (key, down);
+#endif
         break;
       case FocusIn:
       case FocusOut:
@@ -418,4 +435,5 @@ bool csGraphics2DGlideX::HandleEvent (csEvent &/*Event*/)
     }
   return false;
 }
+
 
