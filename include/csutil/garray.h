@@ -1,6 +1,6 @@
 /*
     Crystal Space utility library: vector class interface
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -21,11 +21,11 @@
 #define __GARRAY_H__
 
 /**
- * This is a macro that will declare a (possibly static) growable array
- * variable that is able to contain a number of elements of given type.
- * It has an reference count, so if you do an IncRef each time you make
- * use of it and an DecRef when you're done, the array will be automatically
- * freed when there are no more references to it.<p>
+ * This is a macro that will declare a growable array variable that is able to 
+ * contain a number of elements of given type.  It has an reference count, so 
+ * if you do an IncRef each time you make use of it and an DecRef when you're 
+ * done, the array will be automatically freed when there are no more 
+ * references to it.<p> 
  * Methods:
  * <ul>
  * <li>void SetLimit (int) - set max number of values the array can hold
@@ -35,12 +35,12 @@
  * </ul>
  * Usage examples:
  * <pre>
- * DECLARE_GROWING_ARRAY (static, LightArray, csLight*)
- * DECLARE_GROWING_ARRAY (;, IntArray, int)
+ * DECLARE_GROWING_ARRAY (LightArray, csLight*)
+ * DECLARE_GROWING_ARRAY (IntArray, int)
  * </pre>
  */
-#define DECLARE_GROWING_ARRAY(Static, Name, Type)			\
-  Static class __##Name							\
+#define DECLARE_GROWING_ARRAY(Name, Type)				\
+  class __##Name							\
   {									\
     Type *root;								\
     int Limit;								\

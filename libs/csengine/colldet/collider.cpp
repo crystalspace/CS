@@ -25,7 +25,7 @@
 #define CD_MAX_COLLISION    1000
 
 // This array contains the colliding pairs
-DECLARE_GROWING_ARRAY (static, CD_contact, collision_pair);
+static DECLARE_GROWING_ARRAY (CD_contact, collision_pair);
 
 static int hits = 0;
 // Array of hits.

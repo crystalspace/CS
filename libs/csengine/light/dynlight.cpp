@@ -53,7 +53,7 @@
 
 IMPLEMENT_CSOBJTYPE (CLights, csObject);
 
-DECLARE_GROWING_ARRAY (static, theLights, CLights *);
+static DECLARE_GROWING_ARRAY (theLights, CLights *);
 static int numLights = 0;
 
 static inline unsigned long CLOCK ()

@@ -318,17 +318,17 @@ csSpriteAction* csSpriteTemplate::FindAction (const char *n)
 IMPLEMENT_CSOBJTYPE (csSprite3D, csObject)
 
 /// Static vertex array.
-DECLARE_GROWING_ARRAY (static, tr_verts, csVector3)
+static DECLARE_GROWING_ARRAY (tr_verts, csVector3)
 /// Static z array.
-DECLARE_GROWING_ARRAY (static, z_verts, float)
+static DECLARE_GROWING_ARRAY (z_verts, float)
 /// Static uv array.
-DECLARE_GROWING_ARRAY (static, uv_verts, csVector2)
+static DECLARE_GROWING_ARRAY (uv_verts, csVector2)
 /// The perspective corrected vertices.
-DECLARE_GROWING_ARRAY (static, persp, csVector2)
+static DECLARE_GROWING_ARRAY (persp, csVector2)
 /// Array which indicates which vertices are visible and which are not.
-DECLARE_GROWING_ARRAY (static, visible, bool)
+static DECLARE_GROWING_ARRAY (visible, bool)
 /// The list of lights that hit the sprite
-DECLARE_GROWING_ARRAY (static, light_worktable, csLight*)
+static DECLARE_GROWING_ARRAY (light_worktable, csLight*)
 
 csSprite3D::csSprite3D () : csObject ()
 {
