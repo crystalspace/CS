@@ -38,6 +38,10 @@ The history order is reversed so that new features are at the top.
 	  ObjC++ uniformly (since those are the common and well understood
 	  abbreviations).  Also added .M as registered file type for
 	  Objective-C++.
+	- Eric Sunshine fixed bug: configure was emitting the string
+	  "CS_24BIT_PIXEL_ARGB" to volatile.h, rather than the token
+	  CS_24BIT_PIXEL_ARGB.  This caused compilation of OpenGL-related code
+	  to fail on MacOS/X.
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in

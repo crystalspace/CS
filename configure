@@ -18531,7 +18531,7 @@ echo "${ECHO_T}no (assume MacOS/X)" >&6
 "
     cs_jamconfig_text="${cs_jamconfig_text}MACOSX.PLUGIN_EXT ?= \".csplugin\" ;
 "
-	cs_header_text="${cs_header_text}#define CS_24BIT_PIXEL_LAYOUT \"CS_24BIT_PIXEL_ARGB\"
+	cs_header_text="${cs_header_text}#define CS_24BIT_PIXEL_LAYOUT CS_24BIT_PIXEL_ARGB
 "
 
 	echo "$as_me:$LINENO: checking for Objective-C compiler" >&5
