@@ -718,7 +718,12 @@ void csSystemDriver::DemoWrite (const char* buf)
     Console->PutText ("%s", buf);
     csRect area;
     Console->Print (&area);
-    
+
+    if (area.xmax >= FrameWidth)
+      area.xmax = FrameWidth-1;
+    if (area.ymax >= FrameHeight)
+      area.ymax = FrameHeight-1;
+
     if (ok2d)
     {
       piG2D->FinishDraw ();
