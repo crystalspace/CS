@@ -33,6 +33,7 @@ class csDynLight;
 
 enum BlRotType
 {
+  ROT_NONE = 0,
   ROT_PX,
   ROT_PY,
   ROT_PZ,
@@ -88,6 +89,13 @@ enum BlShapeType
 // Max cubes in a shape.
 #define MAX_CUBES 30
 
+// Maximum speed (fall down speed).
+#define MAX_FALL_SPEED 12
+// Maximum speed in game.
+#define MAX_SPEED 10
+// Slowest speed.
+#define MIN_SPEED .2
+
 // Menus.
 #define MENU_NOVICE 0
 #define MENU_AVERAGE 1
@@ -95,7 +103,14 @@ enum BlShapeType
 #define MENU_HIGHSCORES 3
 #define MENU_SETUP 4
 #define MENU_QUIT 5
-#define MENU_TOTAL 6
+#define MENU_3X3 6
+#define MENU_4X4 7
+#define MENU_5X5 8
+#define MENU_6X6 9
+#define MENU_BOARDSIZE 10
+#define MENU_TOTAL 11	// Total number of menu entries in system.
+
+#define MAX_MENUS 20	// Maximum number of menus visible at same time.
 
 struct CubeInfo
 {
@@ -130,10 +145,13 @@ private:
   csMatrix3 full_rotate_z_reverse;
 
   // For the menu.
-  csThing* menus[MENU_TOTAL];
+  csThing* menus[MAX_MENUS];
+  int idx_menus[MAX_MENUS];
+  csThing* src_menus[MENU_TOTAL];
   int cur_menu;
   int old_cur_menu;
   float menu_todo;
+  int num_menus;	// Current number of active menu entries.
 
   csVector3 view_origin;
 
@@ -144,9 +162,6 @@ private:
   // the visual center of the shape and not the logical
   // center.
   csVector3 shift_rotate;
-
-  // For debugging: force the next shape.
-  BlShapeType force_next_shape;
 
   /*
    * How much distance does the camera still need to move (with
@@ -172,6 +187,7 @@ private:
   float rot_mx_todo;
   float rot_my_todo;
   float rot_mz_todo;
+  BlRotType queue_rot_todo;
 
   /*
    * How much do we have to move down before we reach another
@@ -186,6 +202,8 @@ private:
   float move_hor_todo;
   int move_hor_dx;
   int move_hor_dy;
+  int queue_move_dx_todo;
+  int queue_move_dy_todo;
   
   /*
    * The following four flags indicate how the movement keys work.
@@ -196,6 +214,9 @@ private:
   int move_right_dy;
   int move_down_dx;
   int move_down_dy;
+
+  // Current dimensions of game area.
+  int zone_dim;
 
   // Tells us wheather a cell is occupied. It's padded at both ends along
   // each axis. It is not recomended to access it directly (eg I forgot
@@ -208,7 +229,11 @@ private:
   CubeInfo cube_info[MAX_CUBES];
 
   int cube_x, cube_y, cube_z;
+
+  // Current speed.
   float speed;
+  // Current speed depending on level.
+  float cur_speed;
 
   /// If true we are paused.
   bool pause;
@@ -256,13 +281,20 @@ public:
   // Initialization stuff and starting of game/demo.
   void InitTextures ();
   void InitWorld ();
+  void InitGameRoom ();
+  void InitDemoRoom ();
+  void InitMainMenu ();
   void StartNewGame ();
   void StartDemo ();
   void set_cube_room (csSector* s) { room = s; }
-  void init_game ();
-  void CreateMenuEntry (csSector* sect, char* txt, int menu_nr);
-  void SetupMenu (int menu);
-  void SetupMenu (float menu_transition, int old_menu, int new_menu);
+  void InitGame ();
+  void CreateMenuEntry (char* txt, int menu_nr);
+  void ChangePlaySize (int new_size);
+
+  void DrawMenu (int menu);
+  void DrawMenu (float menu_transition, int old_menu, int new_menu);
+  void InitMenu ();
+  void AddMenuItem (int menu_nr);
 
   // Handling of basic events and frame drawing.
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
@@ -319,7 +351,7 @@ public:
   void start_horizontal_move (int dx, int dy);
   // If there is nothing falling down this function causes
   // a new shape to fall down.
-  void start_shape (BlShapeType type, int x, int y, int z);
+  void StartNewShape ();
   // For demo purposes.
   void start_demo_shape (BlShapeType type, float x, float y, float z);
 

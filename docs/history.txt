@@ -18,6 +18,19 @@ Short-term cleanups that need to be done:
 	- Fixed sprites so that they at least load again.
 	  But they are still completely wrong.
 	- Some improvements on Blocks. Added a 3D menu for starting.
+	- Made a fix in the rotating menu.
+	- Increased speed of falling blocks if score increases.
+	- Allowed to both move a falling block horizontally while
+	  rotating it. Previously Blocks could only handle one type
+	  of movement at the same time.
+	- Added one-level queue of keys in Blocks.
+	- Increased speed of rotation and movement of blocks a bit.
+	- Added a menu in Blocks to change play size to either 3x3,
+	  4x4, 5x5, or 6x6 (default).
+	- Some general cleanup to D3D code from Thomas Hieber.
+	- Thomas also fixed software renderer so that DrawPolygonFX
+	  supports all blending modes.
+	- Some changes to Glide StartPolygonFX from Norman Kramer.
 9-Feb-2000
 	- Andrew Zabolotny did some changes:
 	    - Renamed DEBUG to CS_DEBUG. On various systems many

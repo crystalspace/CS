@@ -24,7 +24,6 @@
     Add highscore list.
     Add 'nightmare' level.
     'pause' should temporarily remove visible blocks (or fog area).
-    Make it possible to change play area size.
  */
 
 #define SYSDEF_ACCESS
@@ -109,6 +108,8 @@ Blocks::Blocks ()
   newgame = true;
   startup_screen = true;
   dynlight = NULL;
+
+  zone_dim = ZONE_DIM;
 }
 
 Blocks::~Blocks ()
@@ -117,15 +118,15 @@ Blocks::~Blocks ()
   if (world) world->Clear ();
 }
 
-void Blocks::init_game ()
+void Blocks::InitGame ()
 {
   int i, j, k;
   for (k = 0 ; k < ZONE_SAFETY+ZONE_HEIGHT+ZONE_SAFETY ; k++)
-    for (j = 0 ; j < ZONE_SAFETY+ZONE_DIM+ZONE_SAFETY ; j++)
-      for (i = 0 ; i < ZONE_SAFETY+ZONE_DIM+ZONE_SAFETY ; i++)
+    for (j = 0 ; j < ZONE_SAFETY+zone_dim+ZONE_SAFETY ; j++)
+      for (i = 0 ; i < ZONE_SAFETY+zone_dim+ZONE_SAFETY ; i++)
         game_cube[i][j][k] =
 	  i < ZONE_SAFETY || j < ZONE_SAFETY || k < ZONE_SAFETY ||
-	  i >= ZONE_SAFETY+ZONE_DIM || j >= ZONE_SAFETY+ZONE_DIM ||
+	  i >= ZONE_SAFETY+zone_dim || j >= ZONE_SAFETY+zone_dim ||
 	  k >= ZONE_SAFETY+ZONE_HEIGHT;
   transition = false;
   newgame = false;
@@ -136,6 +137,9 @@ void Blocks::init_game ()
   rot_mx_todo = 0;
   rot_my_todo = 0;
   rot_mz_todo = 0;
+  queue_rot_todo = ROT_NONE;
+  queue_move_dx_todo = 0;
+  queue_move_dy_todo = 0;
   move_hor_todo = 0;
   cam_move_dist = 0;
 
@@ -147,10 +151,9 @@ void Blocks::init_game ()
   move_down_dy = dest_move_down_dy[cur_hor_dest];
   cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
 
-  force_next_shape = SHAPE_RANDOM;
-
   pause = false;
   gameover = false;
+  cur_speed = MIN_SPEED;
 }
 
 void reset_vertex_colors (csThing* th)
@@ -338,7 +341,7 @@ void Blocks::add_pillar (int x, int y)
   pillar->SetFlags (CS_ENTITY_MOVEABLE, 0);
   pillar->MergeTemplate (pillar_tmpl, pillar_txt, 1);
   room->AddThing (pillar);
-  csVector3 v ((x-ZONE_DIM/2)*CUBE_DIM, 0, (y-ZONE_DIM/2)*CUBE_DIM);
+  csVector3 v ((x-zone_dim/2)*CUBE_DIM, 0, (y-zone_dim/2)*CUBE_DIM);
   pillar->SetMove (room, v);
   pillar->Transform ();
 }
@@ -352,7 +355,7 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   vrast->SetFlags (CS_ENTITY_MOVEABLE, 0);
   vrast->MergeTemplate (vrast_tmpl, raster_txt, 1);
   room->AddThing (vrast);
-  csVector3 v ((x-ZONE_DIM/2)*CUBE_DIM+dx, 0, (y-ZONE_DIM/2)*CUBE_DIM+dy);
+  csVector3 v ((x-zone_dim/2)*CUBE_DIM+dx, 0, (y-zone_dim/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   vrast->Transform (rot);
   vrast->SetMove (room, v);
@@ -368,7 +371,7 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast->SetFlags (CS_ENTITY_MOVEABLE, 0);
   hrast->MergeTemplate (hrast_tmpl, raster_txt, 1);
   room->AddThing (hrast);
-  csVector3 v ((x-ZONE_DIM/2)*CUBE_DIM+dx, 0, (y-ZONE_DIM/2)*CUBE_DIM+dy);
+  csVector3 v ((x-zone_dim/2)*CUBE_DIM+dx, 0, (y-zone_dim/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
   hrast->Transform (rot);
   hrast->SetMove (room, v);
@@ -473,9 +476,9 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz)
 void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z)
 {
   csThing* cube = add_cube_thing (room, dx, dy, dz,
-  	(x-ZONE_DIM/2+shift_rotate.x)*CUBE_DIM,
+  	(x-zone_dim/2+shift_rotate.x)*CUBE_DIM,
 	(z+shift_rotate.z)*CUBE_DIM+CUBE_DIM/2,
-  	(y-ZONE_DIM/2+shift_rotate.y)*CUBE_DIM);
+  	(y-zone_dim/2+shift_rotate.y)*CUBE_DIM);
   cube_info[num_cubes].thing = cube;
   cube_info[num_cubes].dx = dx;
   cube_info[num_cubes].dy = dy;
@@ -499,15 +502,18 @@ csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
   return cube;
 }
 
-void Blocks::start_shape (BlShapeType type, int x, int y, int z)
+void Blocks::StartNewShape ()
 {
-  if (force_next_shape != SHAPE_RANDOM)
-  {
-    type = force_next_shape;
-    force_next_shape = SHAPE_RANDOM;
-  }
+  int x, y, z;
+  if (zone_dim <= 4) x = y = 1;
+  else if (zone_dim <= 5) x = y = 2;
+  else x = y = 3;
+  z = ZONE_HEIGHT-3;
   num_cubes = 0;
+
+again:
   shift_rotate.Set (0, 0, 0);
+  BlShapeType type = (BlShapeType)(rand () % difficulty);
   switch (type)
   {
     case SHAPE_R1:
@@ -523,13 +529,13 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
       add_cube (1, 0, 0, x, y, z);
       break;
     case SHAPE_R4:
+      if (zone_dim <= 3) goto again;
       add_cube (-1, 0, 0, x, y, z);
       add_cube (0, 0, 0, x, y, z);
       add_cube (1, 0, 0, x, y, z);
       add_cube (2, 0, 0, x, y, z);
       break;
     case SHAPE_L1:
-      shift_rotate.Set (-.5, 0, .5);
       add_cube (-1, 0, 1, x, y, z);
       add_cube (-1, 0, 0, x, y, z);
       add_cube (0, 0, 0, x, y, z);
@@ -585,6 +591,7 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
       add_cube (1, 0, -1, x, y, z);
       break;
     case SHAPE_L3:
+      if (zone_dim <= 3) goto again;
       add_cube (-1, 0, 1, x, y, z);
       add_cube (-1, 0, 0, x, y, z);
       add_cube (0, 0, 0, x, y, z);
@@ -621,7 +628,7 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
   cube_x = x;
   cube_y = y;
   cube_z = z;
-  speed = .2;
+  speed = cur_speed;
   int i;
   for (i = 0 ; i < num_cubes ; i++)
   {
@@ -710,46 +717,60 @@ void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
 void Blocks::start_rotation (BlRotType type)
 {
   if (rot_px_todo || rot_mx_todo || rot_py_todo ||
-  	rot_my_todo || rot_pz_todo || rot_mz_todo || move_hor_todo)
+  	rot_my_todo || rot_pz_todo || rot_mz_todo)
+  {
+    queue_rot_todo = type;
     return;
+  }
   switch (type)
   {
     case ROT_PX:
       if (!check_new_shape_rotation (full_rotate_x_reverse)) return;
+      rotate_shape_internal (full_rotate_x_reverse);
       rot_px_todo = M_PI/2;
       break;
     case ROT_MX:
       if (!check_new_shape_rotation (full_rotate_x)) return;
+      rotate_shape_internal (full_rotate_x);
       rot_mx_todo = M_PI/2;
       break;
     case ROT_PY:
       if (!check_new_shape_rotation (full_rotate_z)) return;
+      rotate_shape_internal (full_rotate_z);
       rot_py_todo = M_PI/2;
       break;
     case ROT_MY:
       if (!check_new_shape_rotation (full_rotate_z_reverse)) return;
+      rotate_shape_internal (full_rotate_z_reverse);
       rot_my_todo = M_PI/2;
       break;
     case ROT_PZ:
       if (!check_new_shape_rotation (full_rotate_y)) return;
+      rotate_shape_internal (full_rotate_y);
       rot_pz_todo = M_PI/2;
       break;
     case ROT_MZ:
       if (!check_new_shape_rotation (full_rotate_y_reverse)) return;
+      rotate_shape_internal (full_rotate_y_reverse);
       rot_mz_todo = M_PI/2;
       break;
+    case ROT_NONE: break;
   }
 }
 
 void Blocks::start_horizontal_move (int dx, int dy)
 {
-  if (rot_px_todo || rot_mx_todo || rot_py_todo || rot_my_todo ||
-  	rot_pz_todo || rot_mz_todo || move_hor_todo)
+  if (move_hor_todo)
+  {
+    queue_move_dx_todo = dx;
+    queue_move_dy_todo = dy;
     return;
+  }
   if (!check_new_shape_location (dx, dy, 0)) return;
   move_hor_todo = CUBE_DIM;
   move_hor_dx = dx;
   move_hor_dy = dy;
+  move_shape_internal (move_hor_dx, move_hor_dy, 0);
 }
 
 void Blocks::HandleCameraMovement ()
@@ -766,18 +787,55 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
     switch (key)
     {
       case CSKEY_UP:
-        old_cur_menu = cur_menu;
-        cur_menu = (cur_menu+1)%MENU_TOTAL;
-	menu_todo = 1;
+        if (!menu_todo)
+	{
+          old_cur_menu = cur_menu;
+          cur_menu = (cur_menu+1)%num_menus;
+	  menu_todo = 1;
+	}
         break;
       case CSKEY_DOWN:
-        old_cur_menu = cur_menu;
-        cur_menu = (cur_menu-1+MENU_TOTAL)%MENU_TOTAL;
-	menu_todo = 1;
+        if (!menu_todo)
+	{
+          old_cur_menu = cur_menu;
+          cur_menu = (cur_menu-1+num_menus)%num_menus;
+	  menu_todo = 1;
+	}
         break;
       case CSKEY_ENTER:
-        switch (cur_menu)
+        switch (idx_menus[cur_menu])
 	{
+	  case MENU_BOARDSIZE:
+	    InitMenu ();
+	    AddMenuItem (MENU_3X3);
+	    AddMenuItem (MENU_4X4);
+	    AddMenuItem (MENU_5X5);
+	    AddMenuItem (MENU_6X6);
+	    switch (zone_dim)
+	    {
+	      case 3: cur_menu = 0; break;
+	      case 4: cur_menu = 1; break;
+	      case 5: cur_menu = 2; break;
+	      case 6: cur_menu = 3; break;
+	    }
+  	    DrawMenu (cur_menu);
+	    break;
+	  case MENU_3X3:
+	    ChangePlaySize (3);
+	    InitMainMenu ();
+	    break;
+	  case MENU_4X4:
+	    ChangePlaySize (4);
+	    InitMainMenu ();
+	    break;
+	  case MENU_5X5:
+	    ChangePlaySize (5);
+	    InitMainMenu ();
+	    break;
+	  case MENU_6X6:
+	    ChangePlaySize (6);
+	    InitMainMenu ();
+	    break;
 	  case MENU_NOVICE:
             difficulty = NUM_EASY_SHAPE;
 	    startup_screen = false;
@@ -804,13 +862,6 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
 
   switch (key)
   {
-    case '1': force_next_shape = SHAPE_R2; break;
-    case '2': force_next_shape = SHAPE_R3; break;
-    case '3': force_next_shape = SHAPE_R4; break;
-    case '4': force_next_shape = SHAPE_L1; break;
-    case '5': force_next_shape = SHAPE_L2; break;
-    case '6': force_next_shape = SHAPE_FLAT; break;
-    case '7': force_next_shape = SHAPE_CUBE; break;
     case 'u':
       if (cam_move_dist) break;
       cam_move_dist = 1;
@@ -875,8 +926,12 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
     case 'k': start_horizontal_move (move_down_dx, move_down_dy); break;
     case 'j': start_horizontal_move (-move_right_dx, -move_right_dy); break;
     case 'l': start_horizontal_move (move_right_dx, move_right_dy); break;
-    case ' ': if (speed == 9) speed = 0.2; // Space changes speeds now.
-	      else speed = 9; break;
+    case ' ':
+      if (speed == MAX_FALL_SPEED)
+    	speed = cur_speed;
+      else
+        speed = MAX_FALL_SPEED;
+      break;
     case 'p': pause = !pause; break;
     case CSKEY_ESC: newgame = true; startup_screen = true; break;
   }
@@ -1030,6 +1085,8 @@ void Blocks::updateScore (void)
     if (filled_planes[i])
     {
       increase++;
+      cur_speed += .05;
+      if (cur_speed > MAX_SPEED) cur_speed = MAX_SPEED;
     }
   }
 
@@ -1041,10 +1098,10 @@ void Blocks::HandleStartupMovement (time_t elapsed_time)
   float elapsed = (float)elapsed_time/1000.;
   if (menu_todo)
   {
-    float elapsed_menu = elapsed*1.5;
+    float elapsed_menu = elapsed*1.8;
     if (elapsed_menu > menu_todo) elapsed_menu = menu_todo;
     menu_todo -= elapsed_menu;
-    SetupMenu (menu_todo, old_cur_menu, cur_menu);
+    DrawMenu (menu_todo, old_cur_menu, cur_menu);
   }
 
   float old_dyn_x = dynlight_x;
@@ -1062,9 +1119,9 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
 {
   int i;
   float elapsed = (float)elapsed_time/1000.;
-  float elapsed_rot = 3 * elapsed * (M_PI/2);
+  float elapsed_rot = 5 * elapsed * (M_PI/2);
   float elapsed_fall = elapsed*speed;
-  float elapsed_move = elapsed*1.6;
+  float elapsed_move = elapsed*2;
 
   if (!move_down_todo)
   {
@@ -1077,8 +1134,7 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
       {
         freeze_shape ();
         checkForPlane ();
-        if (!transition)
-          start_shape ((BlShapeType)(rand () % difficulty), 3, 3, ZONE_HEIGHT-3);
+        if (!transition) StartNewShape ();
         return;
       }
     }
@@ -1100,7 +1156,6 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
     rot_px_todo -= elapsed_rot;
     rot = create_rotate_x (elapsed_rot);
     do_rot = true;
-    if (!rot_px_todo) rotate_shape_internal (full_rotate_x_reverse);
   }
   else if (rot_mx_todo)
   {
@@ -1108,7 +1163,6 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
     rot_mx_todo -= elapsed_rot;
     rot = create_rotate_x (-elapsed_rot);
     do_rot = true;
-    if (!rot_mx_todo) rotate_shape_internal (full_rotate_x);
   }
   else if (rot_py_todo)
   {
@@ -1116,7 +1170,6 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
     rot_py_todo -= elapsed_rot;
     rot = create_rotate_y (elapsed_rot);
     do_rot = true;
-    if (!rot_py_todo) rotate_shape_internal (full_rotate_z);
   }
   else if (rot_my_todo)
   {
@@ -1124,7 +1177,6 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
     rot_my_todo -= elapsed_rot;
     rot = create_rotate_y (-elapsed_rot);
     do_rot = true;
-    if (!rot_my_todo) rotate_shape_internal (full_rotate_z_reverse);
   }
   else if (rot_pz_todo)
   {
@@ -1132,7 +1184,6 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
     rot_pz_todo -= elapsed_rot;
     rot = create_rotate_z (elapsed_rot);
     do_rot = true;
-    if (!rot_pz_todo) rotate_shape_internal (full_rotate_y);
   }
   else if (rot_mz_todo)
   {
@@ -1140,15 +1191,28 @@ void Blocks::HandleGameMovement (time_t elapsed_time)
     rot_mz_todo -= elapsed_rot;
     rot = create_rotate_z (-elapsed_rot);
     do_rot = true;
-    if (!rot_mz_todo) rotate_shape_internal (full_rotate_y_reverse);
   }
-  else if (move_hor_todo)
+  // Check if there is a rotation in the queue.
+  if (!(rot_px_todo || rot_mx_todo || rot_py_todo ||
+  	rot_my_todo || rot_pz_todo || rot_mz_todo) && queue_rot_todo)
+  {
+    start_rotation (queue_rot_todo);
+    queue_rot_todo = ROT_NONE;
+  }
+
+  if (move_hor_todo)
   {
     if (elapsed_move > move_hor_todo) elapsed_move = move_hor_todo;
     move_hor_todo -= elapsed_move;
     dx = elapsed_move*(float)move_hor_dx;
     dy = elapsed_move*(float)move_hor_dy;
-    if (!move_hor_todo) move_shape_internal (move_hor_dx, move_hor_dy, 0);
+    // Check if there is a horizontal move in the queue.
+    if (!move_hor_todo && (queue_move_dx_todo || queue_move_dy_todo))
+    {
+      start_horizontal_move (queue_move_dx_todo, queue_move_dy_todo);
+      queue_move_dx_todo = 0;
+      queue_move_dy_todo = 0;
+    }
   }
 
   for (i = 0 ; i < num_cubes ; i++)
@@ -1223,24 +1287,31 @@ void Blocks::InitTextures ()
   csLoader::LoadTexture (Sys->world, "menu_average", "average.gif");
   csLoader::LoadTexture (Sys->world, "menu_expert", "expert.gif");
   csLoader::LoadTexture (Sys->world, "menu_quit", "quit.gif");
+  csLoader::LoadTexture (Sys->world, "menu_3x3", "p3x3.gif");
+  csLoader::LoadTexture (Sys->world, "menu_4x4", "p4x4.gif");
+  csLoader::LoadTexture (Sys->world, "menu_5x5", "p5x5.gif");
+  csLoader::LoadTexture (Sys->world, "menu_6x6", "p6x6.gif");
+  csLoader::LoadTexture (Sys->world, "menu_board", "board.gif");
 }
 
-void Blocks::SetupMenu (int menu)
+void Blocks::DrawMenu (int menu)
 {
-  SetupMenu (0, 0, menu);
+  DrawMenu (0, 0, menu);
   menu_todo = 0;
 }
 
-void Blocks::SetupMenu (float menu_transition, int old_menu, int new_menu)
+void Blocks::DrawMenu (float menu_transition, int old_menu, int new_menu)
 {
   int i;
-  for (i = 0 ; i < MENU_TOTAL ; i++)
+  for (i = 0 ; i < num_menus ; i++)
   {
-    int old_curi = (i-old_menu+MENU_TOTAL)%MENU_TOTAL;
-    int new_curi = (i-new_menu+MENU_TOTAL)%MENU_TOTAL;
+    int old_curi = (i-old_menu+num_menus)%num_menus;
+    int new_curi = (i-new_menu+num_menus)%num_menus;
+    if (old_curi == 0 && new_curi == num_menus-1) old_curi = num_menus;
+    if (new_curi == 0 && old_curi == num_menus-1) new_curi = num_menus;
     float curi = menu_transition * ((float)old_curi) +
     	(1-menu_transition) * ((float)new_curi);
-    float angle = 2.*M_PI*curi/(float)MENU_TOTAL;
+    float angle = 2.*M_PI*curi/(float)num_menus;
     float y = 3. + sin (angle)*3.;
     float z = 5. - cos (angle)*3.;
     csVector3 v (0, y, z);
@@ -1249,7 +1320,7 @@ void Blocks::SetupMenu (float menu_transition, int old_menu, int new_menu)
   }
 }
 
-void Blocks::CreateMenuEntry (csSector* sect, char* txt, int menu_nr)
+void Blocks::CreateMenuEntry (char* txt, int menu_nr)
 {
   csTextureHandle* tm_back = world->GetTextures ()->GetTextureMM ("menu_back");
   csTextureHandle* tm_front = world->GetTextures ()->GetTextureMM (txt);
@@ -1292,17 +1363,39 @@ void Blocks::CreateMenuEntry (csSector* sect, char* txt, int menu_nr)
   p->SetTextureSpace (tx_matrix, tx_vector);
   set_uv (p, 1, 0, 1, 1, 0, 1);
 
-  menus[menu_nr] = thing;
-  sect->AddThing (thing);
+  src_menus[menu_nr] = thing;
 }
 
-void Blocks::InitWorld ()
+void Blocks::InitMenu ()
 {
-  InitTextures ();
+  num_menus = 0;
+  int i;
+  for (i = 0 ; i < MENU_TOTAL ; i++)
+    demo_room->RemoveThing (src_menus[i]);
+}
 
-  //-----
-  // Prepare the game area.
-  //-----
+void Blocks::AddMenuItem (int menu_nr)
+{
+  menus[num_menus] = src_menus[menu_nr];
+  idx_menus[num_menus] = menu_nr;
+  num_menus++;
+  demo_room->AddThing (src_menus[menu_nr]);
+}
+
+void Blocks::ChangePlaySize (int new_size)
+{
+  int idx = Sys->world->sectors.Find ((csSome)room);
+  Sys->world->sectors.Delete (idx);
+  zone_dim = new_size;
+  InitGameRoom ();
+  room->Prepare ();
+  room->InitLightMaps (false);
+  room->ShineLights ();
+  room->CreateLightMaps (Gfx3D);
+}
+
+void Blocks::InitGameRoom ()
+{
   csTextureHandle* tm = world->GetTextures ()->GetTextureMM ("room");
   room = Sys->world->NewSector ();
   room->SetName ("room");
@@ -1349,23 +1442,23 @@ void Blocks::InitWorld ()
   Sys->add_hrast_template ();
 
   Sys->add_pillar (-1, -1);
-  Sys->add_pillar (ZONE_DIM, -1);
-  Sys->add_pillar (-1, ZONE_DIM);
-  Sys->add_pillar (ZONE_DIM, ZONE_DIM);
+  Sys->add_pillar (zone_dim, -1);
+  Sys->add_pillar (-1, zone_dim);
+  Sys->add_pillar (zone_dim, zone_dim);
 
   int i;
-  for (i = 0 ; i < ZONE_DIM-1 ; i++)
+  for (i = 0 ; i < zone_dim-1 ; i++)
   {
     Sys->add_vrast (-1, i, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
-    Sys->add_vrast (ZONE_DIM-1, i, CUBE_DIM/2, CUBE_DIM/2, M_PI/2);
+    Sys->add_vrast (zone_dim-1, i, CUBE_DIM/2, CUBE_DIM/2, M_PI/2);
     Sys->add_vrast (i, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
-    Sys->add_vrast (i, ZONE_DIM-1, CUBE_DIM/2, CUBE_DIM/2, M_PI);
+    Sys->add_vrast (i, zone_dim-1, CUBE_DIM/2, CUBE_DIM/2, M_PI);
   }
 
   Sys->add_hrast (-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
-  Sys->add_hrast (ZONE_DIM-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
+  Sys->add_hrast (zone_dim-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
   Sys->add_hrast (2, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
-  Sys->add_hrast (2, ZONE_DIM-1, CUBE_DIM/2, CUBE_DIM/2, 0);
+  Sys->add_hrast (2, zone_dim-1, CUBE_DIM/2, CUBE_DIM/2, 0);
 
   room->AddLight (new csStatLight (-3, 5, 0, 10, .8, .4, .4, false));
   room->AddLight (new csStatLight (3, 5, 0, 10, .4, .4, .8, false));
@@ -1374,14 +1467,15 @@ void Blocks::InitWorld ()
   	CUBE_DIM*10, .5, .5, .5, false));
   room->AddLight (new csStatLight (0, (ZONE_HEIGHT-3+3)*CUBE_DIM+1, 0,
   	CUBE_DIM*10, .5, .5, .5, false));
+}
 
-  //-----
-  // Prepare the demo area.
-  //-----
+void Blocks::InitDemoRoom ()
+{
   csTextureHandle* demo_tm = world->GetTextures ()->GetTextureMM ("clouds");
   demo_room = Sys->world->NewSector ();
   demo_room->SetName ("room");
 
+  csPolygon3D* p;
   p = demo_room->NewPolygon (demo_tm);
   p->AddVertex (-50, 50, 50);
   p->AddVertex (50, 50, 50);
@@ -1401,13 +1495,24 @@ void Blocks::InitWorld ()
   start_demo_shape (SHAPE_DEMO_K, offset_x, 3, 4); offset_x += char_width;
   start_demo_shape (SHAPE_DEMO_S, offset_x, 3, 4); offset_x += char_width;
 
-  CreateMenuEntry (demo_room, "menu_novice", MENU_NOVICE);
-  CreateMenuEntry (demo_room, "menu_average", MENU_AVERAGE);
-  CreateMenuEntry (demo_room, "menu_expert", MENU_EXPERT);
-  CreateMenuEntry (demo_room, "menu_back", MENU_HIGHSCORES);
-  CreateMenuEntry (demo_room, "menu_back", MENU_SETUP);
-  CreateMenuEntry (demo_room, "menu_quit", MENU_QUIT);
+  CreateMenuEntry ("menu_novice", MENU_NOVICE);
+  CreateMenuEntry ("menu_average", MENU_AVERAGE);
+  CreateMenuEntry ("menu_expert", MENU_EXPERT);
+  CreateMenuEntry ("menu_back", MENU_HIGHSCORES);
+  CreateMenuEntry ("menu_back", MENU_SETUP);
+  CreateMenuEntry ("menu_quit", MENU_QUIT);
+  CreateMenuEntry ("menu_3x3", MENU_3X3);
+  CreateMenuEntry ("menu_4x4", MENU_4X4);
+  CreateMenuEntry ("menu_5x5", MENU_5X5);
+  CreateMenuEntry ("menu_6x6", MENU_6X6);
+  CreateMenuEntry ("menu_board", MENU_BOARDSIZE);
+}
 
+void Blocks::InitWorld ()
+{
+  InitTextures ();
+  InitGameRoom ();
+  InitDemoRoom ();
   Sys->world->Prepare ();
 }
 
@@ -1437,8 +1542,20 @@ void Blocks::StartDemo ()
   fog_density = 1;
   demo_room->SetFog (fog_density, csColor (0, 0, 0));
 
-  cur_menu = MENU_NOVICE;
-  SetupMenu (cur_menu);
+  InitMainMenu ();
+}
+
+void Blocks::InitMainMenu ()
+{
+  InitMenu ();
+  AddMenuItem (MENU_NOVICE);
+  AddMenuItem (MENU_AVERAGE);
+  AddMenuItem (MENU_EXPERT);
+  AddMenuItem (MENU_BOARDSIZE);
+  AddMenuItem (MENU_QUIT);
+
+  cur_menu = 0;
+  DrawMenu (cur_menu);
 }
 
 void Blocks::StartNewGame ()
@@ -1455,8 +1572,8 @@ void Blocks::StartNewGame ()
     cube = next_cube;
   }
 
-  Sys->init_game ();
-  Sys->start_shape ((BlShapeType)(rand () % difficulty), 3, 3, ZONE_HEIGHT-3);
+  Sys->InitGame ();
+  Sys->StartNewShape ();
 
   cam_move_up = csVector3 (0, -1, 0);
   view->SetSector (room);
@@ -1479,8 +1596,8 @@ void Blocks::checkForPlane ()
   for (z=0 ; z<ZONE_HEIGHT ; z++)
   {
     plane_hit = true;
-    for (x=0 ; x<ZONE_DIM ; x++)
-      for (y=0 ; y<ZONE_DIM ; y++)
+    for (x=0 ; x<zone_dim ; x++)
+      for (y=0 ; y<zone_dim ; y++)
       {
 	// If one cube is missing we don't have a plane.
 	if (!get_cube (x,y,z)) plane_hit = false; 
@@ -1504,16 +1621,16 @@ void Blocks::removePlane (int z)
   int x,y;
   char temp[20];
 
-  for (x=0 ; x<ZONE_DIM ; x++)
-    for (y=0 ; y<ZONE_DIM ; y++)
+  for (x=0 ; x<zone_dim ; x++)
+    for (y=0 ; y<zone_dim ; y++)
     {
       sprintf (temp, "cubeAt%d%d%d", x, y, z);
       // Physically remove it.
       room->RemoveThing (room->GetThing (temp));
     }
 
-  for (x=0 ; x<ZONE_DIM ; x++)
-    for (y=0 ; y<ZONE_DIM ; y++)
+  for (x=0 ; x<zone_dim ; x++)
+    for (y=0 ; y<zone_dim ; y++)
       // And then remove it from game_cube[][][].
       set_cube (x, y, z, false);
 }
@@ -1534,8 +1651,7 @@ void Blocks::HandleTransition (time_t elapsed_time)
       break;
     }
   }
-  if (!transition)
-    start_shape ((BlShapeType)(rand () % difficulty), 3, 3, ZONE_HEIGHT-3);
+  if (!transition) StartNewShape ();
 }
 
 
@@ -1566,8 +1682,8 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
     // Now that everything is visually ok we lower(change) their names
     // accordingly and clear them from game_cube[][][].
     for (z=gone_z+1 ; z<ZONE_HEIGHT ; z++)
-      for (x=0 ; x<ZONE_DIM ; x++)
-        for (y=0 ; y<ZONE_DIM ; y++)
+      for (x=0 ; x<zone_dim ; x++)
+        for (y=0 ; y<zone_dim ; y++)
 	{
 	  set_cube (x, y, z-1, get_cube (x, y, z));
           sprintf (temp, "cubeAt%d%d%d", x, y, z);
@@ -1580,8 +1696,8 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
 	}
 
     // Mustn't forget the topmost level.
-    for (x=0 ; x<ZONE_DIM ; x++)
-      for (y=0 ; y<ZONE_DIM ; y++)
+    for (x=0 ; x<zone_dim ; x++)
+      for (y=0 ; y<zone_dim ; y++)
         set_cube (x, y, ZONE_HEIGHT-1, false);
   }
 
@@ -1590,8 +1706,8 @@ void Blocks::HandleLoweringPlanes (time_t elapsed_time)
 
   // Move everything from above the plane that dissapeared a bit lower.
   for (z=gone_z+1 ; z<ZONE_HEIGHT ; z++)
-    for (x=0 ; x<ZONE_DIM ; x++)
-      for (y=0 ; y<ZONE_DIM ; y++)
+    for (x=0 ; x<zone_dim ; x++)
+      for (y=0 ; y<zone_dim ; y++)
       {
 	sprintf (temp, "cubeAt%d%d%d", x, y, z);
         // Only if there is a thing at that certain position, or less
