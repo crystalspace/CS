@@ -449,11 +449,22 @@ bool csEvent::Print (int level)
     }
     if (object->type == csEventAttrInt)
     {
-      IndentLevel(level); csPrintf (" Value: %lld\n", object->intVal);
+        
+      IndentLevel(level); 
+#ifdef CS_COMPILER_GCC
+      csPrintf (" Value: %lld\n", (long long int) object->intVal);
+#else
+      csPrintf (" Value: %lu\n", (long) object->intVal);
+#endif
     }
     else if (object->type == csEventAttrUInt)
     {
-      IndentLevel(level); csPrintf (" Value: %llu\n", (uint64)object->intVal);
+      IndentLevel(level);
+#ifdef CS_COMPILER_GCC
+      csPrintf (" Value: %llu\n", (unsigned long long int) object->intVal);
+#else
+      csPrintf (" Value %ld\n", (unsigned long) object->intVal);
+#endif
     }
     else if (object->type == csEventAttrFloat)
     {
