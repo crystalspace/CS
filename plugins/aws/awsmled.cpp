@@ -1063,7 +1063,7 @@ void awsMultiLineEdit::DeleteMarked ()
       for (int i=toRow; i >= fromRow; i--)
       {
         csString *s = (csString*)vText.Get(i);
-        int from, to;
+        int from = 0, to = 0;
 
         if (i == fromRow && i == toRow)
           from = fromCol, to = MIN (toCol, (int)s->Length ());
