@@ -35,6 +35,13 @@
 #include "ilghtmap.h"
 #include "IGraph3d.h"
 
+
+const int    LightmapBrightness = 0;   //can be 0 (darkest) to 254 (everything becomes white)
+const double LightmapGamma      = 0.7; //can be from 0.01   to 1.0 (1.0= no effect)
+  
+const int    TextureBrightness = 0;   //can be 0 (darkest) to 254 (everything becomes white)
+const double TextureGamma      = 0.7; //can be from 0.01   to 1.0 (1.0= no effect)
+
 ///////////////////////////////////
 // D3DTextureCache Implementation//
 ///////////////////////////////////
@@ -46,6 +53,12 @@ D3DTextureCache::D3DTextureCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pDDr
   m_lpD3dDevice= pDevice;
   m_bMipMapping = bMipmapping;
   m_b24BitTexture = b24bit;
+  
+  
+  for (int i=0; i<256; i++)
+  {
+    m_GammaCorrect[i] = TextureBrightness+(255-TextureBrightness)*pow(i/255.0, TextureGamma);
+  }
 }
 
 void D3DTextureCache::Dump()
@@ -185,10 +198,10 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
           {
             int r,g,b;
             
-            r = R24(*llpySrc);
-            g = G24(*llpySrc);
-            b = B24(*llpySrc);
-            
+            r = m_GammaCorrect[R24(*llpySrc)];
+            g = m_GammaCorrect[G24(*llpySrc)];
+            b = m_GammaCorrect[B24(*llpySrc)];
+
             *lpL =  ((r / red_scale) << red_shift) |
               ((g / green_scale) << green_shift) |
               ((b / blue_scale) << blue_shift);
@@ -237,9 +250,9 @@ void D3DTextureCache::Load(HighColorCache_Data *d)
           {
             int r,g,b;
             
-            r = R24(*llpySrc);
-            g = G24(*llpySrc);
-            b = B24(*llpySrc);
+            r = m_GammaCorrect[R24(*llpySrc)];
+            g = m_GammaCorrect[G24(*llpySrc)];
+            b = m_GammaCorrect[B24(*llpySrc)];
             
             *lpS =  ((r / red_scale) << red_shift) |
               ((g / green_scale) << green_shift) |
@@ -393,6 +406,11 @@ D3DLightMapCache::D3DLightMapCache(int nMaxSize, bool bHardware, LPDIRECTDRAW pD
   m_bHardware=bHardware;
   m_lpDD = pDDraw;
   m_lpD3dDevice= pDevice;
+
+  for (int i=0; i<256; i++)
+  {
+    m_GammaCorrect[i] = LightmapBrightness+(255-LightmapBrightness)*pow(i/255.0, LightmapGamma);
+  }
 }
 
 void D3DLightMapCache::Dump()
@@ -492,9 +510,9 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
       {
         int r,g,b;
         
-        r = *(lpRed + (i + (lwidth * j)));
-        g = *(lpGreen + (i + (lwidth * j)));
-        b = *(lpBlue + (i + (lwidth * j)));
+        r = m_GammaCorrect[*(lpRed + (i + (lwidth * j)))];
+        g = m_GammaCorrect[*(lpGreen + (i + (lwidth * j)))];
+        b = m_GammaCorrect[*(lpBlue + (i + (lwidth * j)))];
         
         *lpL =  ((r / red_scale) << red_shift) |
           ((g / green_scale) << green_shift) |
@@ -513,9 +531,9 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
       {
         int r,g,b;
         
-        r = *(lpRed + (i + (lwidth * j)));
-        g = *(lpGreen + (i + (lwidth * j)));
-        b = *(lpBlue + (i + (lwidth * j)));
+        r = m_GammaCorrect[*(lpRed + (i + (lwidth * j)))];
+        g = m_GammaCorrect[*(lpGreen + (i + (lwidth * j)))];
+        b = m_GammaCorrect[*(lpBlue + (i + (lwidth * j)))];
         
         *lpS =  ((r / red_scale) << red_shift) |
           ((g / green_scale) << green_shift) |
@@ -540,7 +558,7 @@ void D3DLightMapCache::Load(HighColorCache_Data *d)
         g = *(lpGreen + (i + (lwidth * j)));
         b = *(lpBlue + (i + (lwidth * j)));
         
-        mean = (r+g+b)/3;
+        mean = m_GammaCorrect[(r+g+b)/3];
         
         *lpC = mean;
         lpC++;

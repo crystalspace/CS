@@ -71,6 +71,8 @@ protected:
   virtual void Load(HighColorCache_Data *d);
   ///
   virtual void Unload(HighColorCache_Data *d);
+
+  unsigned char m_GammaCorrect[256];
 private:
   ///
   void LoadIntoVRAM(D3DTextureCache_Data *tex);
@@ -97,6 +99,8 @@ protected:
   virtual void Load(HighColorCache_Data *d);
   ///
   virtual void Unload(HighColorCache_Data *d);
+
+  unsigned char m_GammaCorrect[256];
 private:
   ///
   void LoadIntoVRAM(D3DLightCache_Data *tex);
