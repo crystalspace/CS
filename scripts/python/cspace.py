@@ -8977,6 +8977,7 @@ class iGraphics3D(iBase):
     def CreateHalo(*args): return _cspace.iGraphics3D_CreateHalo(*args)
     def DumpCache(*args): return _cspace.iGraphics3D_DumpCache(*args)
     def ClearCache(*args): return _cspace.iGraphics3D_ClearCache(*args)
+    def PrecacheTexture(*args): return _cspace.iGraphics3D_PrecacheTexture(*args)
     def RemoveFromCache(*args): return _cspace.iGraphics3D_RemoveFromCache(*args)
     def GetVertexBufferManager(*args): return _cspace.iGraphics3D_GetVertexBufferManager(*args)
     def IsLightmapOK(*args): return _cspace.iGraphics3D_IsLightmapOK(*args)
