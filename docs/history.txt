@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 25-Oct-2004
+	- Jorrit disabled VBO by default now. It gives too many problems
+	  (both on ATI and nVidia). Having this option on by default can
+	  give a bad initial impression if it doesn't work. With this option
+	  off at least things will work but slower.
 	- Eric Sunshine documented the semantic and syntactic changes to
 	  csList<>::Iterator in apimod100.txi.
 24-Oct-2004
