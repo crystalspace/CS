@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make glshader_cg   Make the $(DESCRIPTION.glshader_cg)$"
+  $(NEWLINE)echo $"  make glshader_cg  Make the $(DESCRIPTION.glshader_cg)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -34,6 +34,7 @@ vpath %.cpp $(SRCDIR)/plugins/video/render3d/shader/shaderplugins/glshader_cg
 ifeq ($(USE_PLUGINS),yes)
   GLSHADER_CG = $(OUTDLL)/glshader_cg$(DLL)
   LIB.GLSHADER_CG = $(foreach d,$(DEP.GLSHADER_CG),$($d.LIB))
+  LIB.GLSHADER_CG.LOCAL = $(CG.LFLAGS)
   TO_INSTALL.DYNAMIC_LIBS += $(GLSHADER_CG)
 else
   GLSHADER_CG = $(OUT)/$(LIB_PREFIX)glshader_cg$(LIB)
@@ -81,7 +82,7 @@ $(OUT)/%$O: $(SRCDIR)/plugins/video/render3d/shader/shaderpluginsglshader_cg/%.c
 
 $(GLSHADER_CG): $(OBJ.GLSHADER_CG) $(LIB.GLSHADER_CG)
 	$(DO.PLUGIN.PREAMBLE) \
-	$(DO.PLUGIN.CORE) $(CG.LFLAGS) \
+	$(DO.PLUGIN.CORE) $(LIB.GLSHADER_CG.LOCAL) \
 	$(DO.PLUGIN.POSTAMBLE)
 
 glshader_cgclean:

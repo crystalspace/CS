@@ -1737,6 +1737,54 @@ AS_IF([test $cs_cv_libCg = yes],
 
 
 #------------------------------------------------------------------------------
+# Check for OpenSoundSystem (OSS).
+#------------------------------------------------------------------------------
+AC_CHECK_HEADER([soundcard.h],
+    [CS_HEADER_PROPERTY([CS_HAS_SOUNDCARD_H])
+    cs_cv_header_soundcard_h=yes],
+    [AC_CHECK_HEADER([sys/soundcard.h],
+	[CS_HEADER_PROPERTY([CS_HAS_SYS_SOUNDCARD_H])
+	cs_cv_header_soundcard_h=yes],
+	[AC_CHECK_HEADER([machine/soundcard.h],
+	      [CS_HEADER_PROPERTY([CS_HAS_MACHINE_SOUNDCARD_H])
+	      cs_cv_header_soundcard_h=yes],
+	      [cs_cv_header_soundcard_h=no])])])
+
+AS_IF([test $cs_cv_header_soundcard_h = yes],
+    [CS_BUILD_PROPERTY([OSS.AVAILABLE], [yes])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for Advanced Linux Sound Architecture (ALSA)
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([asound],
+    [AC_LANG_PROGRAM(
+	[[#include <alsa/asoundlib.h>]],
+	[snd_pcm_hw_params_t* p; snd_pcm_hw_params_alloca(&p);])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libasound], [ALSA])])
+
+
+
+#------------------------------------------------------------------------------
+# Check for OpenDivX version 4+ or earlier.
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([divxdecore],
+    [AC_LANG_PROGRAM(
+	[[#include <divx4/decore.h>]],
+	[DEC_MEM_REQS r; decore(0, DEC_OPT_MEMORY_REQS, 0, &r);])],
+    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_divxdecore], [OPENDIVX4])])
+
+AS_IF([test $cs_cv_divxdecore != yes],
+    [CS_CHECK_LIB_WITH([divxdecore],
+	[AC_LANG_PROGRAM(
+	    [[#include <decore.h>]],
+	    [decore(0, DEC_OPT_RELEASE, 0, 0);])],
+	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_divxdecore], [OPENDIVX])])])
+
+
+
+#------------------------------------------------------------------------------
 # Determine if plugin modules must implement main().  This is needed on some
 # platforms to ensure that global constructors and functions which initialize
 # global variables in the plugin module get invoked.
@@ -1860,36 +1908,6 @@ AS_IF([test $cs_type_wchar_t = yes],
     [CS_HEADER_PROPERTY([CS_USE_FAKE_WCHAR_TYPE])])
 
 AC_LANG_POP([C++])
-
-
-
-#------------------------------------------------------------------------------
-# OpenSoundSystem support OSS
-#------------------------------------------------------------------------------
-AC_CHECK_HEADER([soundcard.h],
-    [CS_HEADER_PROPERTY([CS_HAS_SOUNDCARD_H])
-    cs_cv_header_soundcard_h=yes],
-    [AC_CHECK_HEADER([sys/soundcard.h],
-	[CS_HEADER_PROPERTY([CS_HAS_SYS_SOUNDCARD_H])
-	cs_cv_header_soundcard_h=yes],
-	[AC_CHECK_HEADER([machine/soundcard.h],
-	      [CS_HEADER_PROPERTY([CS_HAS_MACHINE_SOUNDCARD_H])
-	      cs_cv_header_soundcard_h=yes],
-	      [cs_cv_header_soundcard_h=no])])])
-
-AS_IF([test $cs_cv_header_soundcard_h = yes],
-    [CS_BUILD_PROPERTY([OSS.AVAILABLE], [yes])])
-
-
-
-#------------------------------------------------------------------------------
-# Advanced Linux Sound Architecture (ALSA)
-#------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([asound],
-    [AC_LANG_PROGRAM(
-	[[#include <alsa/asoundlib.h>]],
-	[snd_pcm_hw_params_t* p; snd_pcm_hw_params_alloca(&p);])],
-    [], [], [CS_EMIT_BUILD_RESULT([cs_cv_libasound], [ALSA])])
 
 
 

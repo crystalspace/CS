@@ -141,6 +141,9 @@ PLUGINS.DYNAMIC += video/canvas/memory
 ifeq ($(SDL.AVAILABLE),yes)
 PLUGINS.DYNAMIC += video/canvas/sdl
 endif
+ifeq ($(SVGA.AVAILABLE),yes)
+PLUGINS.DYNAMIC += video/canvas/svgalib
+endif
 PLUGINS.DYNAMIC += video/loader/sgi
 PLUGINS.DYNAMIC += video/loader/wal
 ifeq ($(MNG.AVAILABLE),yes)
@@ -181,8 +184,15 @@ endif
 ifeq ($(MIKMOD.AVAILABLE),yes)
 PLUGINS.DYNAMIC += sound/loader/mod
 endif
+PLUGINS.DYNAMIC += sound/renderer/software
 ifeq ($(OPENAL.AVAILABLE),yes)
 PLUGINS.DYNAMIC += sound/renderer/openal
+endif
+ifeq ($(OSS.AVAILABLE),yes)
+PLUGINS.DYNAMIC += sound/driver/oss
+endif
+ifeq ($(ALSA.AVAILABLE),yes)
+PLUGINS.DYNAMIC += sound/driver/alsa
 endif
 ifeq ($(ODE.AVAILABLE),yes)
 PLUGINS.DYNAMIC += physics/odedynam
@@ -209,4 +219,13 @@ endif
 
 ifeq ($(PERL5.AVAILABLE),yes)
 PLUGINS.DYNAMIC += cscript/csperl5
+endif
+
+PLUGINS.DYNAMIC += video/format/avi
+PLUGINS.DYNAMIC += video/format/codecs/rle
+ifeq ($(OPENDIVX4.AVAILABLE),yes)
+PLUGINS.DYNAMIC += video/format/codecs/divx4
+endif
+ifeq ($(OPENDIVX.AVAILABLE),yes)
+PLUGINS.DYNAMIC += video/format/codecs/opendivx
 endif

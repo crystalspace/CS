@@ -38,6 +38,12 @@ chronological order.
 	  on the position of the <scale> attribute in the xml file. Standard
 	  models that come with cal3d should work with this fix now (at least
 	  skeleton does), providing a scale of ~ 0.02.
+	- Eric Sunshine added an OpenDivX check to configure.ac.
+	- Eric Sunshine fixed bugs in glshader_cg.mak, odvix4.mak, and
+	  odivx.mak where they would send linker flags to $(AR) when
+	  USE_PLUGINS=no.
+	- Eric Sunshine moved more PLUGINS.DYNAMIC assignements out of
+	  platform-specific makefiles and into user.mak.
 16-Feb-2004
 	- Jorrit fixed rain mesh object so it now has a reasonably default
 	  box in case the user doesn't call SetBox().

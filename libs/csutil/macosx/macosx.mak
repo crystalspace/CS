@@ -1,14 +1,14 @@
 #==============================================================================
 # This is the system makefile for Apple MacOS/X.
-# Copyright (C)1998-2002 by Eric Sunshine <sunshine@sunshineco.com>
+# Copyright (C)1998-2004 by Eric Sunshine <sunshine@sunshineco.com>
 #==============================================================================
 
-# Choose which drivers you want to build/use
 PLUGINS += video/canvas/macosx/cocoa
 PLUGINS += video/canvas/macosx/coregraphics
+ifeq ($(GL.AVAILABLE),yes)
 PLUGINS += video/canvas/macosx/opengl
+endif
 PLUGINS += sound/driver/coreaudio
-PLUGINS += sound/renderer/software
 
 DESCRIPTION.macosx = MacOS/X
 DESCRIPTION.OS.macosx = MacOS/X

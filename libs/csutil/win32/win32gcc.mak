@@ -1,19 +1,13 @@
-# This is the makefile for Mingw+MSYS and Cygwin (gcc for Win32)
+# This is the makefile for Mingw/MSYS and Cygwin (gcc for Win32)
 
-# Friendly names for building environment
-DESCRIPTION.win32gcc = Windows with Mingw+MSYS or Cygwin
+# Friendly names for build environment
+DESCRIPTION.win32gcc = Windows with Mingw/MSYS or Cygwin
 DESCRIPTION.OS.win32gcc = Win32
 
-# Choose which drivers you want to build/use
-PLUGINS += sound/renderer/software
 PLUGINS += video/canvas/ddraw
-#PLUGINS +=video/format/avi
-#PLUGINS +=video/format/codecs/opendivx
-
 ifeq ($(GL.AVAILABLE),yes)
 PLUGINS += video/canvas/openglwin
 endif
-
 PLUGINS += sound/driver/waveoutsd
 PLUGINS += sound/renderer/ds3d
 

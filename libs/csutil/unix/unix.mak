@@ -2,48 +2,19 @@
 DESCRIPTION.unix = Unix
 DESCRIPTION.OS.unix = Unix
 
-# Choose the 2D/3D drivers you want to use.
-ifeq ($(SVGA.AVAILABLE),yes)
-PLUGINS += video/canvas/svgalib
-endif
-
 ifeq ($(X11.AVAILABLE),yes)
   PLUGINS += video/canvas/softx
   # The X-Window plugin
   PLUGINS += video/canvas/xwindow
-  # Shared Memory Plugin
+  # Shared Memory plugin
   PLUGINS += video/canvas/xextshm
-  # Video Modes Plugin
+  # Video Modes plugin
   ifeq ($(XFREE86VM.AVAILABLE),yes)
     PLUGINS += video/canvas/xextf86vm
   endif
   ifeq ($(GLX.AVAILABLE),yes)
     PLUGINS += video/canvas/openglx
   endif
-endif
-
-# Video support.
-# Formats (this is the wrapping format for the video data).
-# Microsofts AVI
-PLUGINS += video/format/avi
-# CODECS (some formats are dynamic, that is they need codecs to encode/decode
-# data) OpenDivX: you need an additional library you can get from
-# www.projectmayo.com
-#PLUGINS += video/format/codecs/opendivx
-#PLUGINS += video/format/codecs/divx4
-PLUGINS += video/format/codecs/rle
-
-# Sound drivers.
-ifeq ($(OSS.AVAILABLE),yes)
-PLUGINS += sound/driver/oss
-endif
-
-ifeq ($(ALSA.AVAILABLE),yes)
-PLUGINS += sound/driver/alsa
-endif
-
-ifeq ($(findstring yes,$(ALSA.AVAILABLE) $(OSS.AVAILABLE)),yes)
-PLUGINS += sound/renderer/software
 endif
 
 #----------------------------------------------------------------- defines ---#
