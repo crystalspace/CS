@@ -31,10 +31,32 @@
 
 #define PRINTF printf
 
+class csException {
+public:
+	csSTR Error, Hint;
+	INT64 ErrorVal;
+
+	csException(const char* tError, const char* tHint="", INT64 tErrorVal=0)
+		:Error(tError), Hint(tHint), ErrorVal(tErrorVal) {}
+
+	csSTR GetMessage() {
+		csSTR Msg("Exception: ");
+		Msg+=Error;
+
+		if(!Hint.IsNull())
+			Msg+="\nHint: "+Hint;
+
+		if(ErrorVal)
+			Msg+="\nErrorValue: "+IntToStr(ErrorVal);
+
+		return Msg;
+	}	
+};
+
 #ifndef NO_EXCEPTIONS
-#define csTHROW_RANGE(Text) { throw out_of_range(Text); }
+#define csTHROW(Exception) { throw csException Exception; }
 #else
-#define csTHROW_RANGE(Text) { PRINTF ("%s\n", Text); exit(1); }
+#define csTHROW(Exception) { PRINTF((csException Exception).GetMessage()); cleanup(); fatal_exit(0, false); }
 #endif
 
 #ifndef CHK
