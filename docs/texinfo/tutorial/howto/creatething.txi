@@ -104,14 +104,13 @@ the engine to create a thing (@code{CreateThingMesh}).
   csRef<iThingState> ws =
   	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
-  iPolygon3DStatic* p;
-  p = walls_state->CreatePolygon ("up");
-  p->SetMaterial (upMaterial);
-  p->CreateVertex (csVector3 (-.5, .5, -.5));
-  p->CreateVertex (csVector3 (.5, .5, -.5));
-  p->CreateVertex (csVector3 (.5, .5, .5));
-  p->CreateVertex (csVector3 (-.5, .5, .5));
-  p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
+  walls_state->AddQuad (
+    csVector3 (-.5, .5, -.5),
+    csVector3 (.5, .5, -.5),
+    csVector3 (.5, .5, .5),
+    csVector3 (-.5, .5, .5));
+  walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, upMaterial);
+  walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
   @dots{}
 @end example
@@ -125,5 +124,4 @@ The include files useful for this section are:
 
 @example
 #include "imesh/thing/thing.h"
-#include "imesh/thing/polygon.h"
 @end example

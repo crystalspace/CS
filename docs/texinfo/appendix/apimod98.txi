@@ -78,15 +78,8 @@ templates.
 @cindex @code{iMeshObject}
 @cindex @code{iMeshObjectFactory}
 
-The interfaces @samp{iPolygon3D} and @samp{iThingState} no longer inherit from
+The interface @samp{iThingState} no longer inherits from
 @samp{iObject}, thus the @code{QueryObject()} function has been removed.
-Polygons can still have names though.  Added @code{SetName()} and
-@code{GetName()} for that.
-
-@samp{iPolygon3D} has been split into @samp{iPolygon3D} and
-@samp{iPolygon3DStatic}. The static version contains all static data that
-can be put in a factory. Several functions like
-@code{iThingState::CreatePolygon()} will now return @samp{iPolygon3DStatic}.
 
 @samp{iThingState} has been split into @samp{iThingState} and
 @samp{iThingFactoryState}. A thing mesh no longer implements both a mesh
@@ -105,8 +98,56 @@ use @code{GetFactory()}.
 @code{iThingState::GetVertexC()} has been removed. It is no longer possible
 to get camera space information from a thing.
 
+The interface @code{iPolygon3D} is completely removed. The @code{iThingFactoryState} now
+contains a lot of new functions to create and manipulate polygons. Here is an example:
+
+First the old code:
+
+@example
+  iPolygon3D* p;
+  p = state->CreatePolygon ("First one");
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->SetMaterial (mat);
+  p = state->CreatePolygon ("Second one");
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->CreateVertex (csVector3 (@dots{}));
+  p->SetMaterial (mat);
+  @dots{}
+@end example
+
+Here the new code:
+
+@example
+  state->AddQuad (
+    csVector3 (@dots{}),
+    csVector3 (@dots{}),
+    csVector3 (@dots{}),
+    csVector3 (@dots{}));
+  state->SetPolygonName (CS_POLYRANGE_LAST, "First one");
+  state->AddQuad (
+    csVector3 (@dots{}),
+    csVector3 (@dots{}),
+    csVector3 (@dots{}),
+    csVector3 (@dots{}));
+  state->SetPolygonName (CS_POLYRANGE_LAST, "Second one");
+  state->SetPolygonMaterial (CS_POLYRANGE_ALL, mat);
+@end example
+
+If you want to add a box that can be seen from the inside (typically a room) then
+you can do it like this:
+
+@example
+  state->AddInsideBox (csVector3 (-5, 0, -5), csVector3 (5, 20, 5));
+  state->SetPolygonMaterial (CS_POLYRANGE_LAST, mat);
+  state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
+@end example
+
 @subheading Polygon Texture Mapping Changes
-@cindex @code{iPolygon3D}
 @cindex @code{iPolyTexNone}
 @cindex @code{iPolyTexGouraud}
 @cindex @code{iPolyTexFlat}
@@ -116,29 +157,13 @@ to get camera space information from a thing.
 The following interfaces have been removed: @samp{iPolyTexNone},
 @samp{iPolyTexGouraud}, @samp{iPolyTexFlat}, and  @samp{iPolyTexLightMap}.
 The combined @sc{api} from @samp{iPolyTexNone} and the @samp{iPolyTexLightMap}
-have moved to @samp{iPolygon3D} itself.
-
-@code{iPolygon3D::SetTextureType()} and @code{GetTextureType()} have been
-removed.  Instead use:
+have moved to @code{iThingFactoryState}.
 
 It is no longer possible to set mixmode and alpha for individual polygons
-(i.e. functions like @code{iPolygon3D::SetMixMode()} and
-@code{iPolygon3D::SetAlpha()} have been removed. Instead use the new
-@code{iThingState::SetMixMode()} function to set the mixmode globally.
-If needed you will have to seperate the transparent polygon in a seperate
-thing mesh.
+Instead use the new @code{iThingState::SetMixMode()} function to set the mixmode globally.
+If needed you will have to seperate the transparent polygon in a seperate thing mesh.
 
-@code{iPolygon3D::GetVertexC()} has been removed. It is no longer possible
-to get camera space information from a polygon.
-
-@itemize @bullet
-@item
-@code{iPolygon3D::EnableTextureMapping()}
-@item
-@code{iPolygon3D::IsTextureMappingEnabled()}
-@end itemize
-
-@code{iPolygon3D::GetPolyTexType()} has been removed.
+It is also no longer possible to get camera space information from polygons.
 
 The @samp{<shading>} keyword in polygons in map files now accepts a boolean
 value instead of @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}.
@@ -168,9 +193,7 @@ mapping planes.
 The plane loader and saver addons have been removed from the thing
 loader plugin.
 
-Removed @samp{iPolyTxtPlane} interface. Added
-@code{iPolygon3DStatic::GetTextureSpace()} function to get texture space
-definition for polygon.
+Removed @samp{iPolyTxtPlane} interface.
 
 @subheading Portal Changes
 @cindex @code{iPortal}
@@ -190,7 +213,7 @@ and how to change it to new code:
 
 @example
   @dots{} create thing in sourceSector @dots{}
-  iPolygon3DStatic* p = state->CreatePolygon ();
+  iPolygon3D* p = state->CreatePolygon ();
   p->CreateVertex (csVector3 (@dots{}));
   p->CreateVertex (csVector3 (@dots{}));
   p->CreateVertex (csVector3 (@dots{}));

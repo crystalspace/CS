@@ -35,9 +35,9 @@ iMeshWrapper* ClickedObject (iCamera* camera, int mousex, int mousey)
   csVector3 intersect;
 
   // Now do the actual intersection.
-  iPolygon3D* poly = 0;
+  int poly = -1;
   iSector* beamsector = camera->GetSector ();
-  iMeshWrapper* mesh = beamsector->HitBeam (
+  iMeshWrapper* mesh = beamsector->HitBeamPortals (
   	startbeam, endbeam, intersect, &poly);
   return mesh;
 @}

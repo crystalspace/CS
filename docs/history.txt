@@ -53,6 +53,7 @@ chronological order.
 	  when the new renderer is ready.
 	- Jorrit converted all applications to use the new thing API. As a consequence
 	  none of the applications use the iPolygon3D or iPolygon3DStatic interfaces now.
+	- Jorrit fixed some parts of the documentation to reflect the latest changes.
 8-Oct-2003
 	- Jorrit fixed keycolor rendering in the old OpenGL renderer in case
 	  DrawPolygonMesh was used (fastmesh).
