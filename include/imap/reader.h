@@ -24,7 +24,7 @@
 
 struct iEngine;
 
-SCF_VERSION (iLoaderPlugIn, 0, 0, 1);
+SCF_VERSION (iLoaderPlugIn, 0, 0, 2);
 
 /**
  * This is a plugin for the loader.
@@ -32,7 +32,7 @@ SCF_VERSION (iLoaderPlugIn, 0, 0, 1);
 struct iLoaderPlugIn : public iPlugIn
 {
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iEngine* engine) = 0;
+  virtual iBase* Parse (const char* string, iEngine* engine, iBase* context) = 0;
 };
 
 #endif

@@ -155,7 +155,7 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine)
+iBase* csSprite2DFactoryLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
@@ -292,7 +292,7 @@ bool csSprite2DLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine)
+iBase* csSprite2DLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)

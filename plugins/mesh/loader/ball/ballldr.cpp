@@ -104,7 +104,7 @@ bool csBallFactoryLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csBallFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
+iBase* csBallFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.mesh.object.ball", "MeshObj", iMeshObjectType);
   if (!type)
@@ -210,7 +210,7 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csBallLoader::Parse (const char* string, iEngine* engine)
+iBase* csBallLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)

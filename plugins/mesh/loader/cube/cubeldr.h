@@ -49,7 +49,7 @@ public:
   DECLARE_IBASE;
 
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iEngine* engine);
+  virtual iBase* Parse (const char* string, iEngine* engine, iBase *context);
 };
 
 /**
@@ -101,7 +101,7 @@ public:
   DECLARE_IBASE;
 
   /// Parse a given string and return a new object for it.
-  virtual iBase* Parse (const char* string, iEngine* engine);
+  virtual iBase* Parse (const char* string, iEngine* engine, iBase* context);
 };
 
 /**

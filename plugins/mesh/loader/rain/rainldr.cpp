@@ -108,7 +108,7 @@ bool csRainFactoryLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csRainFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
+iBase* csRainFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.mesh.object.rain", "MeshObj", iMeshObjectType);
   if (!type)
@@ -229,7 +229,7 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csRainLoader::Parse (const char* string, iEngine* engine)
+iBase* csRainLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)

@@ -379,7 +379,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iSkeletonLimb* limb, char* buf)
   return true;
 }
 
-iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
+iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine, iBase* context)
 {
   // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
@@ -412,7 +412,8 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string, iEngine* engine)
     type = LOAD_PLUGIN (sys, "crystalspace.mesh.object.sprite.3d", "MeshObj", iMeshObjectType);
     printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
   }
-  iMeshObjectFactory* fact = type->NewFactory ();
+  iMeshObjectFactory* fact = ( context ) ? (iMeshObjectFactory*) context :
+	type->NewFactory ();
   type->DecRef ();
   iSprite3DFactoryState* spr3dLook = QUERY_INTERFACE (fact, iSprite3DFactoryState);
 
@@ -777,7 +778,7 @@ bool csSprite3DLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine)
+iBase* csSprite3DLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (ACTION)

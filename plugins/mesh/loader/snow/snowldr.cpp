@@ -109,7 +109,7 @@ bool csSnowFactoryLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csSnowFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
+iBase* csSnowFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.mesh.object.snow", "MeshObj", iMeshObjectType);
   if (!type)
@@ -231,7 +231,7 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csSnowLoader::Parse (const char* string, iEngine* engine)
+iBase* csSnowLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)

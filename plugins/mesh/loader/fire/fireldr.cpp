@@ -110,7 +110,7 @@ bool csFireFactoryLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csFireFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
+iBase* csFireFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.mesh.object.fire", "MeshObj", iMeshObjectType);
   if (!type)
@@ -233,7 +233,7 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csFireLoader::Parse (const char* string, iEngine* engine)
+iBase* csFireLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)

@@ -71,7 +71,7 @@ bool csDDGFactoryLoader::Initialize( iSystem* pSys )
   return true;
 }
 
-iBase* csDDGFactoryLoader::Parse( const char* /*string*/, iEngine* /*engine*/ )
+iBase* csDDGFactoryLoader::Parse( const char* /*string*/, iEngine* /*engine*/, iBase* /* context */)
 {
   iTerrainObjectType* pType = QUERY_PLUGIN_CLASS( pSystem, "crystalspace.terrain.object.ddg", "TerrainObj", iTerrainObjectType);
   if (!pType)
@@ -100,7 +100,7 @@ bool csDDGLoader::Initialize( iSystem* pSys )
   return true;
 }
 
-iBase* csDDGLoader::Parse( const char* pString, iEngine *iEngine )
+iBase* csDDGLoader::Parse( const char* pString, iEngine *iEngine, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)

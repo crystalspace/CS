@@ -153,7 +153,7 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine)
+iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
@@ -314,7 +314,7 @@ bool csCubeLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csCubeLoader::Parse (const char* string, iEngine* engine)
+iBase* csCubeLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FACTORY)

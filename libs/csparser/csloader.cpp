@@ -3177,7 +3177,8 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	}
 	else
 	{
-	  iBase* mof = plug->Parse (params, csEngine::current_iengine);
+	  iBase* mof = stemp->GetMeshObjectFactory();
+	  mof = plug->Parse (params, csEngine::current_iengine, mof);
 	  if (!mof)
 	  {
 	    CsPrintf (MSG_FATAL_ERROR, "Plugin '%s' did not return a factory!\n",
@@ -3186,10 +3187,10 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	  }
 	  else
 	  {
-	    iMeshObjectFactory* mof2 = QUERY_INTERFACE (mof, iMeshObjectFactory);
-	    stemp->SetMeshObjectFactory (mof2);
+		// This is a glorified type cast.
+//	    iMeshObjectFactory* mof2 = QUERY_INTERFACE (mof, iMeshObjectFactory);
+	    stemp->SetMeshObjectFactory ((iMeshObjectFactory *)mof);
 	    mof->DecRef ();
-	    mof2->DecRef ();
 	  }
 	}
         break;
@@ -3237,8 +3238,8 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	  fact->DecRef ();
 	  iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
 	  csCrossBuild_SpriteTemplateFactory builder;
-	  builder.CrossBuild (state, *filedata);
-	  state->DecRef ();
+	  builder.CrossBuild (fact, *filedata);
+//	  state->DecRef ();
 	  delete filedata;
         }
         break;
@@ -3355,7 +3356,7 @@ bool csLoader::LoadMeshObject (csMeshWrapper* mesh, char* buf, csSector* sector)
 	}
 	else
 	{
-	  iBase* mo = plug->Parse (params, csEngine::current_iengine);
+	  iBase* mo = plug->Parse (params, csEngine::current_iengine, NULL);
 	  iMeshObject* mo2 = QUERY_INTERFACE (mo, iMeshObject);
 	  mesh->SetMeshObject (mo2);
 	  mo2->DecRef ();
@@ -3435,7 +3436,7 @@ bool csLoader::LoadTerrainObjectFactory (csTerrainFactoryWrapper* pWrapper, char
 	{
           // use the plugin to parse through the parameters the engine is passed also
           // a pointer to the factory is returned
-	  iBase *pBaseFactory = iPlugIn->Parse (params, csEngine::current_iengine);
+	  iBase *pBaseFactory = iPlugIn->Parse (params, csEngine::current_iengine,NULL);
           // if we couldn't get the factory leave
 	  if (!pBaseFactory)
 	  {
@@ -3514,7 +3515,7 @@ bool csLoader::LoadTerrainObject (csTerrainWrapper *pWrapper, char *pBuf, csSect
         {
           // use the plugin to parse through the parameters the engine is passed also
           // a pointer to the factory is returned
-	  iBase *iBaseObject = iPlugIn->Parse (params, csEngine::current_iengine);
+	  iBase *iBaseObject = iPlugIn->Parse (params, csEngine::current_iengine, NULL);
           // if we couldn't get the factory leave
 	  if (!iBaseObject)
 	  {

@@ -105,7 +105,7 @@ bool csSpiralFactoryLoader::Initialize (iSystem* system)
   return true;
 }
 
-iBase* csSpiralFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/)
+iBase* csSpiralFactoryLoader::Parse (const char* /*string*/, iEngine* /*engine*/, iBase* /* context */)
 {
   iMeshObjectType* type = QUERY_PLUGIN_CLASS (sys, "crystalspace.mesh.object.spiral", "MeshObj", iMeshObjectType);
   if (!type)
@@ -225,7 +225,7 @@ static UInt ParseMixmode (char* buf)
   return Mixmode;
 }
 
-iBase* csSpiralLoader::Parse (const char* string, iEngine* engine)
+iBase* csSpiralLoader::Parse (const char* string, iEngine* engine, iBase* /* context */)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (MATERIAL)
