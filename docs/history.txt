@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 15-Jun-2003
+        - Boyan added property "Image" that can be set in AWS component "Image View".
 	- Oktal rearranged the documentation of the scripting language stuff
 	  in the manual, and added Perl docs.
 	- Oktal moved from cspace.i to pythpre.i the rename directive of
