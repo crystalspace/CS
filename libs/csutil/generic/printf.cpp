@@ -20,6 +20,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "cssysdef.h"
+#include "csutil/ansiparse.h"
 #include "csutil/csstring.h"
 #include "csutil/csuctransform.h"
 #include "csutil/sysfunc.h"
@@ -82,7 +83,7 @@ static int csFPutStr (FILE* file, const char* str)
   csAnsiParser::CommandClass cmdClass;
   size_t textLen;
   // Check for ANSI codes
-  while (csAnsiParser::ParseAnsi (string, ansiCommandLen, cmdClass, textLen))
+  while (csAnsiParser::ParseAnsi (str, ansiCommandLen, cmdClass, textLen))
   {
     int rc;
     if (isTTY && (cmdClass == csAnsiParser::classFormat))
