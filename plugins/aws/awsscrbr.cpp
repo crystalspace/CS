@@ -301,6 +301,19 @@ bool awsScrollBar::SetProperty (const char *name, void *parm)
     Invalidate ();
     return true;
   }
+  else if (strcmp ("Value", name) == 0)
+  {
+    value = *(int *)parm;
+
+    // Fix value in case it's out of range
+    int maxval = (int)(max-amntvis);
+
+    value = (value < 0 ? 0 : (value > maxval ? maxval : value));
+
+    Invalidate ();
+    return true;
+  }
+
 
   return false;
 }
