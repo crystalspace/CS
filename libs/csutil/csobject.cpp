@@ -125,8 +125,8 @@ csObject::~csObject ()
 {
   ObjRemoveAll ();
 
-  if (Children) delete Children;
-  delete [] Name;
+  if (Children) { delete Children; Children = NULL; }
+  delete [] Name; Name = NULL;
 
   /*
    * @@@ This should not be required for two reasons:
@@ -135,7 +135,7 @@ csObject::~csObject ()
    *    its parent from here is only needed if the object was illegally
    *    deleted, not DecRef'ed.
    * 2. Several objects could contain this object as a child. The 'parent'
-   *    poitner is not a safe way to find out which object contains this
+   *    pointer is not a safe way to find out which object contains this
    *    object as a child.
    */
   if (ParentObject)
@@ -204,6 +204,14 @@ void csObject::ObjReleaseOld (iObject *obj)
   if (n>=0)
   {
     obj->SetObjectParent (NULL);
+    // @@@ WARNING! Doing only one DecRef() here does not prevent a second
+    // deletion of 'obj'.  Keep in mind that we are currently executing
+    // in the destructor of 'obj' itself. If only one 'IncRef()' is used
+    // then the Delete() from the children vector will simply destroy the
+    // object again (with bad consequences). Doing two IncRef()'s is a
+    // solution for this and it doesn't prevent deletion of the object
+    // since it is being deleted already.
+    obj->IncRef ();
     obj->IncRef ();
     Children->Delete (n);
   }

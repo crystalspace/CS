@@ -2,6 +2,11 @@ The history order is reversed so that new features are at the top.
 
 13-Nov-2001
 	- Small comment fix in vfs.h.
+	- Fixed a bad bug in csObject destructor. It appears that it could
+	  happen that a given object was destructed twice! This is caused
+	  by a weird construct around ObjReleaseOld(). To prevent deletion
+	  I had to add an additional IncRef() to the object being deleted.
+	  See the comment with ObjReleaseOld() for more detailed information.
 12-Nov-2001
 	- Fixed a MAJOR bug in the cslua and mp3 makefiles!!! This bug
 	  caused 'make' to show the description of both plugins
