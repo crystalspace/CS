@@ -1394,7 +1394,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  now respect the CS_POLY_LIGHTING flag.  Jorrit provided the
 	  information necessary to make this change.
 	- Eric Sunshine adjusted map2cs to conform to DOS's 8.3 limitation.
-	- Seth Galbrain :-) made more improvements to Squawk v17.
+	- Seth Galbrain :-) made more improvements to Squawk v17.  Sprites can
+	  now be loaded from the data/squawk folder
 	- Eric Sunshine fixed a bug in Squawk where it would crash if fewer
 	  than three views were created and the user tried navigating one of
 	  the missing views.
@@ -1430,7 +1431,10 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Eric Sunshine updated some documentation.
 	- Eric Sunshine fixed some compilation warnings in MazeD.
 	- Seth Galbraith imported Squawk version 17 which includes many
-	  improvements and changes.
+	  improvements and changes.  Environment models in @file{.mdl} format
+	  by Ulrich Galbraith New skybox textures (ugly, meant to be
+	  temporary).  Configurable view layout (see squawk.cfg).
+	  Configurable sky textures (see squawk.cfg).
 	- Eric Sunshine fixed a compilation error in Squawk 17.
 	- Eric Sunshine fixed a crasher in Squawk 17 caused by an unhandled
 	  boundary condition.
@@ -1461,18 +1465,27 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  24-bit RGBA mode on big-endian hardware.
 	- Andrew Zabolotny is back to MazeD. He has started a major rewrite
 	  of MazeD. It is now not compilable.
-	- Andrew also added 'const' to many arguments that should be
-	  const.
+	- Andrew also added 'const' to many arguments that should be const.
 	- Some changes from Thomas Hieber (removal of warnings mostly).
-	- New DX6.1 renderer from Tristan McLure (added by Thomas Hieber
-	  to CVS).
-	- Brandon Ehle updated the VC project files (added by Thomas
-	  Hieber).
+	- New DX6.1 renderer from Tristan McLure (added by Thomas Hieber to
+	  CVS).
+	- Brandon Ehle updated the VC project files (added by Thomas Hieber).
+	- Seth Galbraith made some modifications to Squawk (version 17):
+	    - Gravity flag controls whether a view rotates around the world's
+	      Y axis.
+	    - Enabled lighting for some sprites.
+	    - Changed the FOV of each view.
+	    - Added _control87 commands to disable some FPU exceptions.
 26-Sep-1999
 	- Continued work on lighting using octree. It is already working
 	  reasonably well but there are still a few bugs. I also haven't
 	  implemented the quad-tree yet which is essential for the big
 	  speed improvement.
+	- Seth Galbraith made some modifications to Squawk (version 16):
+	    - A lot of restructuring.
+	    - Replaced CS sprite with three .mdl format models.
+	    - Changed fixed-size arrays into csVector subclasses.
+	    - Created sqkView class which contains multiple csViews.
 25-Sep-1999
 	- Initial work on implementing lighting using octree.
 	- Progress bar for lighting is now based on number of lights instead
@@ -1572,6 +1585,12 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  vfs.cpp which afflicted the DOS port.
 	- Eric Sunshine fixed compilation errors in csLoader which showed up
 	  after recent changes to csPolygon3D and TextureTrans.
+	- Seth Galbraith made some modifications to Squawk (version 15):
+	    - Merged Squawk's history.txt into squawk.txt.
+	    - Changed 'room' to 'skybox' throughout squawk.cpp.
+	    - Added AddViewVertex() method that takes relative coordinates.
+	    - Two views are now always linked like a single concave view.  The
+	      other views are now always independent.
 20-Sep-1999
 	- Eric Sunshine fixed an accidental sign-extension problem in
 	  csPixelFormat.
@@ -1616,6 +1635,11 @@ This history is "historical".  See "history.txt" for more recent entries.
 18-Sep-1999
 	- Started work on calculating lightmaps in high resolution and then
 	  downsampling them later.
+17-Sep-1999
+	- Seth Galbraith made some modifications to Squawk (version 14):
+	    - Replaced sky box textures with big 512x512 JPEG images.
+	    - Centers of views adjusted depending on whether the views are
+	      linked.
 16-Sep-1999
 	- Fix to console printing in system stuff from Stephan Goetter.
 	- Siu-Hang Or implemented MergeTexture for the software renderer.
@@ -1834,6 +1858,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  to less than one minute.
 4-Sep-1999
 	- Solved a bug in optimization added on 2-sep with vertices.
+	- Seth Galbraith made some modifications to Squawk (version 13):
+	    - Converted all textures to 8 bit PNG format.
+	    - Disabled lighting and mipmapping for the sky box.
 3-Sep-1999
 	- Today my son Ruben Tyberghein is born!
 	- Gary Haussman did: initial change to OpenGL text drawing to use
@@ -1915,6 +1942,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  the Ascii Art library.  He also updated a number of keyboard and
 	  display drivers.
 	- *** Release of 0.14_001 ***
+	- Seth Galbraith modified Squawk (version 12) to load and display an
+	  animated 3D sprite.
 24-Aug-1999
 	- Jorrit fixed deletion of curve information in thing templates. It
 	  used the wrong type of 'delete []'.
@@ -2521,6 +2550,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Thomas Hieber added the latest changes to the input system by
 	  Xavier Trochu (DirectInput).
 	- Thomas also added WIN32_VOLATILE to the VC project files.
+	- Seth Galbraith made some modifications to Squawk (version 10):
+	    - Space bar links and unlinks view controls.
+	    - Allocate palette before creating console.
 28-Jul-1999
 	- Fixed fog in OpenGL. One-layered fog works now.
 	- Clipping portals are no longer automatic. There is now a CLIP()
@@ -2639,6 +2671,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  DirectInput keyboard handling (not yet activated) and fixed all
 	  binary libraries for the Win port.
 	- Some changes to Mac port from Robert Bate (error handling).
+	- Seth Galbraith made some modifications to Squawk (version 8):
+	    - Named sector (sectors must be named for lighting).
+	    - Added console (palette is odd, font too big).
 25-Jul-1999
 	- Eric Sunshine worked around a variable redeclaration error in the
 	  new md2.cpp file.  This problem affected older C++ compilers in
@@ -2656,6 +2691,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Jorrit did an optimization in the software version of DrawPolygon.
 24-Jul-1999
 	- Changes from Thomas Hieber to fix Win32 again.
+	- Seth Galbraith made some modifications to Squawk (version 7):
+	    - Misc updates based on CVS changes.
+	    - Moved stuff around, then moved it back :-)
 23-Jul-1999
 	- Small optimization in WhichSide3D (made inline). This could
 	  be important for the lighting routines which use this function
@@ -2671,6 +2709,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  also made it 2*SRC*DST complient (software version).
 	- Andrew made some fixes to the makefiles again (echo problem).
 	- Some changes to Mac port from Robert Bate.
+	- Seth Galbraith added terragent environment map textures to Squawk
+	  (version 6).
 22-Jul-1999
 	- Updated some docs (like the todo and faq).
 	- Added a callback to csSprite3D which is called just before the
@@ -2732,6 +2772,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  remember that sprite CD is not enabled in WalkTest).
 	- The ghost now moves around. It uses real collision detection instead
 	  of the hack that the bots use. So this should work much better.
+	- Seth Galbraith made some modifications to Squawk (version 5):
+	    - Use configuration file squawk.cfg.
+	    - Added $(CSSCRIPT.LIB) to dependencies in squawk.mak.
 20-Jul-1999
 	- Gary Haussmann changed the OpenGL X 2D driver to be a little
 	  bit smarter when detecting which supported visuals there are.
