@@ -29,7 +29,7 @@ extern "C"
 #include "csgfxldr/pngsave.h"
 #include "csgfxldr/rgbpixel.h"
 
-static void png_write (png_structp png, png_bytep data, unsigned int length)
+static void png_write (png_structp png, png_bytep data, png_size_t length)
 {
   png_uint_32 check = fwrite (data, 1, length, (FILE *)(png->io_ptr));
   if (check != length)
