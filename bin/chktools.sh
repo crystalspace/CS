@@ -33,3 +33,9 @@ if [ -n "${BISONBIN}" ]; then
     echo "BISONBIN = ${BISONBIN}"
 fi
 
+# do we have swig < 1.3
+SWIGBIN=`which swig 2>&1 | grep -v "[Nn]o"`
+if [ -n "${SWIGBIN}" ]; then
+    echo "SWIGBIN = ${SWIGBIN}"
+fi
+

@@ -120,9 +120,11 @@ $(OUT)/%$O: plugins/cscript/cspython/%.cpp
 $(OUT)/%$O: plugins/cscript/cspython/%.c
 	$(DO.COMPILE.C) $(CFLAGS.PYTHON)
 
+ifdef SWIGBIN
 $(SWIG.CSPYTHON): $(SWIG.INTERFACE)
-	swig -python -c++ -docstring -dascii -Sbefore -shadow -Iinclude/ -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
-	mv plugins/cscript/cspython/cspace.py scripts/python/
+	$(SWIGBIN) -python -c++ -docstring -dascii -Sbefore -shadow -Iinclude/ -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
+	$(MV) plugins/cscript/cspython/cspace.py scripts/python/
+endif
 
 python.cex: plugins/cscript/cspython/python.cin
 	@echo Generate python cs-config extension...
