@@ -213,7 +213,6 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
   if (tex)
   {
     tex->SetKeepImage (keep_image);
-    tex->IncRef ();	// To avoid smart pointer release.
   }
   return tex;
 }
