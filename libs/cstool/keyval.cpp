@@ -64,7 +64,7 @@ const char *csKeyValuePair::GetValue () const
 
 void csKeyValuePair::SetValue (const char* value)
 {
-  values.Put ("value", value);
+  values.PutUnique ("value", value);
   m_Value = values.Get ("value", 0);
 }
 
@@ -74,7 +74,6 @@ void csKeyValuePair::SetValue (const char* vname, const char* value)
     SetValue (value);
   else
   {
-    values.Put (vname, value);
+    values.PutUnique (vname, value);
   }
 }
-

@@ -22,6 +22,11 @@ chronological order.
 	  name is still recognized, though deprecated.) Also clarified
 	  documentation for Put() to state that it does not replace an existing
 	  key/tuple.
+	- Eric Sunshine fixed bug in csKeyValuePair::SetValue() where it was
+	  incorrectly invoking csHash<>::Put() rather than PutUnique(). In
+	  practice, this caused all invocations of SetValue(), other than the
+	  first, to appear to be ignored; and csKeyValuePair::GetValue() only
+	  ever returned the value set by the first invocation of SetValue().
 19-Nov-2004
 	- PK fixed the mesh attaching to sockets in viewmesh by adding
 	  sprite->GetMovable()->UpdateMove() to ViewMesh::AttachMeshToSocket.
