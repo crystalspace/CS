@@ -29,7 +29,6 @@
 				AdditionalOptions="%cflags%"
 				AdditionalIncludeDirectories="..\..,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
 				PreprocessorDefinitions="NDEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__"
-				MinimalRebuild="TRUE"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"

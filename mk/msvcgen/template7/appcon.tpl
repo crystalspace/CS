@@ -94,7 +94,6 @@ copy $(TargetPath)  csdebug\bin
 				AdditionalOptions="%cflags%"
 				AdditionalIncludeDirectories="..\..,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
 				PreprocessorDefinitions="NDEBUG,_CONSOLE,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__"
-				MinimalRebuild="TRUE"
 				RuntimeLibrary="0"
 				PrecompiledHeaderFile=".\csrelease\temp\%project%/%project%.pch"
 				AssemblerListingLocation=".\csrelease\temp\%project%/"

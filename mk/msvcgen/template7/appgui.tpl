@@ -95,7 +95,6 @@ copy $(TargetPath)  csdebug\bin
 				AdditionalOptions="%cflags%"
 				AdditionalIncludeDirectories="..\..,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
 				PreprocessorDefinitions="NDEBUG,_WINDOWS,WIN32,WIN32_VOLATILE,__CRYSTAL_SPACE__"
-				MinimalRebuild="TRUE"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
