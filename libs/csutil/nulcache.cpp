@@ -39,11 +39,11 @@ csNullCacheManager::~csNullCacheManager ()
 {
 }
 
-void csNullCacheManager::SetCurrentType (const char* type)
+void csNullCacheManager::SetCurrentType (const char*)
 {
 }
 
-void csNullCacheManager::SetCurrentScope (const char* scope)
+void csNullCacheManager::SetCurrentScope (const char*)
 {
 }
 
@@ -54,7 +54,7 @@ bool csNullCacheManager::CacheData (void*, uint32,
 }
 
 iDataBuffer* csNullCacheManager::ReadCache (
-  	const char* type, const char* scope, uint32 id)
+  	const char* /*type*/, const char* /*scope*/, uint32 /*id*/)
 {
   return NULL;
 }
