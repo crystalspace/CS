@@ -97,7 +97,7 @@ struct iPortal : public iBase
    * Set the warping transformation for this portal in object space and world
    * space.
    */
-  virtual void SetWarp (const csTransform& t);
+  virtual void SetWarp (const csTransform& t) = 0;
 
   /// Set warping transformation to mirror around given polygon
   virtual void SetMirror (iPolygon3D *iPoly) = 0;

@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+5-Apr-2001
+	- Fixed a bug in iPortal which prevented proper linking of all
+	  CS apps on some platforms.
 4-Apr-2001
 	- Started work on thing loader and saver. Although things haven't
 	  moved to a plugin yet it is already possible to make real
