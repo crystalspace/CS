@@ -35,13 +35,24 @@ public:
 
 	STDMETHODIMP Stop();
 	STDMETHODIMP Play(SoundBufferPlayMethod playMethod);
+
+  STDMETHODIMP SetVolume(float vol);
+  STDMETHODIMP GetVolume(float &vol);
+  
+  STDMETHODIMP SetFrequencyFactor(float vol);
+  STDMETHODIMP GetFrequencyFactor(float &vol);
+  
   STDMETHODIMP CreateSource(ISoundSource **source);
 
  	DECLARE_IUNKNOWN()
 	DECLARE_INTERFACE_TABLE(csSoundBufferEAX)
 
 public:
-	int DestroySoundBuffer();
+  float fFrequencyOrigin;
+  float fFrequencyFactor;
+  float fVolume;
+
+  int DestroySoundBuffer();
 	int CreateSoundBuffer(ISoundRender *render, csSoundData * sound);
 
   LPDIRECTSOUNDBUFFER		m_pDS3DBuffer2D;

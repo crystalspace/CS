@@ -334,7 +334,6 @@ STDMETHODIMP csSoundListenerEAX::SetEnvironment(SoundEnvironment env)
     }
   }
 
-
   return ret;
 }
 

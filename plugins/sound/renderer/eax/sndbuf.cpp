@@ -22,6 +22,7 @@
 #include "cscom/com.h"
 
 #include "dsound.h"
+#include "eax.h"
 
 #include "cssndrdr/eax/sndrdr.h"
 #include "cssndrdr/eax/sndbuf.h"
@@ -57,6 +58,7 @@ int csSoundBufferEAX::CreateSoundBuffer(ISoundRender * render, csSoundData * sou
   if (!sound) return E_FAIL;
 
   renderEAX = (csSoundRenderEAX *)render;
+  fFrequencyOrigin = sound->getFrequency();
 
   m_p3DAudioRenderer = renderEAX->m_p3DAudioRenderer;
   
@@ -165,10 +167,37 @@ STDMETHODIMP csSoundBufferEAX::Play(SoundBufferPlayMethod playMethod)
 {
   if (m_pDS3DBuffer2D)
   {
-    if (playMethod == SoundBufferPlay_InLoop)
-      m_pDS3DBuffer2D->Play(0, 0, DSBPLAY_LOOPING);
-    else
+    switch(playMethod)
+    {
+    case SoundBufferPlay_Normal:
+      m_pDS3DBuffer2D->Stop();
       m_pDS3DBuffer2D->Play(0, 0, 0);
+      break;
+
+    case SoundBufferPlay_InLoop:
+      m_pDS3DBuffer2D->Stop();
+      m_pDS3DBuffer2D->Play(0, 0, DSBPLAY_LOOPING);
+      break;
+
+    case SoundBufferPlay_RestartInLoop:
+      m_pDS3DBuffer2D->Stop();
+      m_pDS3DBuffer2D->SetCurrentPosition(0);
+      m_pDS3DBuffer2D->Play(0, 0, DSBPLAY_LOOPING);
+      break;
+
+    case SoundBufferPlay_Restart:
+      m_pDS3DBuffer2D->Stop();
+      m_pDS3DBuffer2D->SetCurrentPosition(0);
+      m_pDS3DBuffer2D->Play(0, 0, 0);
+      break;
+    
+    case SoundBufferPlay_DestroyAtEnd:
+      break;
+
+    default:
+      return S_FALSE;
+      break;
+    }
   }
 
   return S_OK;
@@ -181,3 +210,58 @@ STDMETHODIMP csSoundBufferEAX::Stop()
 
   return S_OK;
 }
+
+STDMETHODIMP csSoundBufferEAX::SetVolume(float vol)
+{
+  fVolume = vol;
+
+  if (m_pDS3DBuffer2D)
+  {
+    long dsvol=DSBVOLUME_MIN;
+    m_pDS3DBuffer2D->GetVolume(&dsvol);
+    vol = (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
+  }
+  
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferEAX::GetVolume(float &vol)
+{
+  vol = fVolume;
+
+  if (m_pDS3DBuffer2D)
+  {
+    long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
+    m_pDS3DBuffer2D->SetVolume(dsvol);
+  }
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferEAX::SetFrequencyFactor(float factor)
+{
+  fFrequencyFactor = factor;
+
+  if (m_pDS3DBuffer2D)
+  {
+    unsigned long dsfreq = fFrequencyOrigin*factor;
+    m_pDS3DBuffer2D->SetFrequency(dsfreq);
+  }
+  
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferEAX::GetFrequencyFactor(float &factor)
+{
+  factor = fFrequencyFactor;
+
+  if (m_pDS3DBuffer2D)
+  {
+    unsigned long dsfreq;
+    m_pDS3DBuffer2D->GetFrequency(&dsfreq);
+    factor = (float)(dsfreq)/fFrequencyOrigin;
+  }
+  
+  return S_OK;
+}
+

@@ -76,7 +76,8 @@ STDMETHODIMP csSoundRenderEAX::CreateSource(ISoundSource** ppv, csSoundData *snd
   }
   
   pNew->CreateSoundBuffer(this, snd);
-  
+  pNew->SetVolume (1.0);
+
   return pNew->CreateSource(ppv);
 }
 
@@ -90,6 +91,7 @@ STDMETHODIMP csSoundRenderEAX::CreateSoundBuffer(ISoundBuffer** ppv, csSoundData
   }
 
   pNew->CreateSoundBuffer(this, snd);
+  pNew->SetVolume (1.0);
   
   return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
 }
