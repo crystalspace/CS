@@ -2177,7 +2177,7 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
 
   if (!pause)
   {
-    cur_speed += ((float)elapsed_time)/(200.*1000.);
+    cur_speed += ((float)elapsed_time)/(300.*1000.);
     if (cur_speed > MAX_SPEED) cur_speed = MAX_SPEED;
 
     // Tell Gfx3D we're going to display 3D things
