@@ -34,6 +34,7 @@
 #define Debug csSystemDriver
 #define logf Printf
 #define log Printf
+// only takes two args....
 #define DEBUGLOGF( A, B )  csSystemDriver::Printf( MSG_DEBUG_1, A, B )
 #define DEBUGLOG( A )  csSystemDriver::Printf( MSG_DEBUG_1, A )
 #else
