@@ -121,7 +121,8 @@ awsWindow::Raise()
       Unlink();
 
       // Put us back into the window hierachy at the top.
-      LinkAbove(WindowManager()->GetTopWindow());
+      if (WindowManager()->GetTopWindow()) LinkAbove(WindowManager()->GetTopWindow());
+      else WindowManager()->SetTopWindow(this);
    }
 }
 
@@ -138,6 +139,10 @@ awsWindow::Lower()
 
       // Put us back in one level lower.
       LinkBelow(next);
+
+      // If we were the top window, fix it
+      if (WindowManager()->GetTopWindow() == this)
+        WindowManager()->SetTopWindow(next);
    }
 }
 
@@ -167,6 +172,7 @@ awsWindow::OnMouseDown(int button, int x, int y)
         y<Frame().ymax && y>Frame().ymax-grip_size)
     {
       resizing_mode=true;
+      WindowManager()->CaptureMouse();
       WindowManager()->Mark(Frame());
 
       if (DEBUG_WINDOW_EVENTS)
@@ -177,6 +183,7 @@ awsWindow::OnMouseDown(int button, int x, int y)
                y<Frame().ymin + title_bar_height  && y>Frame().ymin)
     {
       moving_mode=true;
+      WindowManager()->CaptureMouse();
       last_x=x;
       last_y=y;
 
@@ -196,6 +203,7 @@ awsWindow::OnMouseUp(int button, int x, int y)
   if (resizing_mode)
   {
     resizing_mode=false;
+    WindowManager()->ReleaseMouse();
     WindowManager()->Mark(Frame());
 
     if (DEBUG_WINDOW_EVENTS)
@@ -205,6 +213,7 @@ awsWindow::OnMouseUp(int button, int x, int y)
   } else if (moving_mode)
   {
     moving_mode=false;
+    WindowManager()->ReleaseMouse();
 
     if (DEBUG_WINDOW_EVENTS)
         printf("aws-debug: Window move mode=false\n");
@@ -248,26 +257,43 @@ awsWindow::OnMouseMove(int button, int x, int y)
 
     if (delta_x+Frame().xmin <0)
       delta_x=-Frame().xmin;
-    else if (delta_x+Frame().xmax < WindowManager()->G2D()->GetWidth())
+    else if (delta_x+Frame().xmax > WindowManager()->G2D()->GetWidth())
       delta_x=WindowManager()->G2D()->GetWidth() - Frame().xmax;
 
     if (delta_y+Frame().ymin <0)
       delta_y=-Frame().ymin;
-    else if (delta_y+Frame().ymax < WindowManager()->G2D()->GetHeight())
-       delta_y=WindowManager()->G2D()->GetHeight() - Frame().ymax;
+    else if (delta_y+Frame().ymax > WindowManager()->G2D()->GetHeight())
+      delta_y=WindowManager()->G2D()->GetHeight() - Frame().ymax;
       
       
-    // Mark old pos
-    WindowManager()->Mark(Frame());
+    csRect dirty1(Frame());
+   
 
     // Move frame
-    Frame().Move(delta_x, delta_y);
+    Frame().xmin+=delta_x;
+    Frame().ymin+=delta_y;
+    Frame().xmax+=delta_x;
+    Frame().ymax+=delta_y;
 
-    // Mark new pos
-    WindowManager()->Mark(Frame());
+    //if (DEBUG_WINDOW_EVENTS)
+        //printf("aws-debug: deltas for move: %d, %d\n", delta_x, delta_y);
 
-    if (DEBUG_WINDOW_EVENTS)
-        printf("aws-debug: Finished marking for window move.\n");
+    csRect dirty2(Frame());
+
+    dirty2.xmin-=2;
+    dirty2.ymin-=2;
+    dirty2.xmax+=2;
+    dirty2.ymax+=2;
+
+    dirty1.xmin-=2;
+    dirty1.ymin-=2;
+    dirty1.xmax+=2;
+    dirty1.ymax+=2;
+
+    // Mark changed pos
+    WindowManager()->Mark(dirty1);
+    WindowManager()->Mark(dirty2);
+    
   }
   return false;
 }

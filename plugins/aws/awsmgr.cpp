@@ -7,6 +7,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
+#include "iutil/event.h"
 #include "ivaria/reporter.h"
 #include <stdio.h>
 
@@ -418,12 +419,67 @@ awsManager::CreateChildrenFromDef(iAws *wmgr, awsComponent *parent, awsComponent
   
 }
 
+void
+awsManager::CaptureMouse()
+{
+  mouse_captured=true;
+}
+
+void   
+awsManager::ReleaseMouse()
+{
+  mouse_captured=false;
+}
+
+
 bool 
 awsManager::HandleEvent(iEvent& Event)
 {
-  if (GetTopWindow())
-    return GetTopWindow()->HandleEvent(Event);
+  // Find out what kind of event it is
+  switch(Event.Type)
+  {
+  case csevMouseMove:
+  case csevMouseUp:
+  case csevMouseDown:
+  case csevMouseClick:
 
+    // Find out which top most window contains the pointer.
+    if (GetTopWindow())
+    {
+      // If the mouse is locked into the top window, keep it there
+      if (mouse_captured)
+        return GetTopWindow()->HandleEvent(Event);
+
+      // If the top window still contains the mouse, it stays on top
+      if (GetTopWindow()->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
+        return GetTopWindow()->HandleEvent(Event);
+      else
+      {
+        // Find the window that DOES contain the mouse.
+
+        awsWindow *win=GetTopWindow();
+
+        while(win)
+        {
+          // If the window contains the mouse, it becomes new top.
+          if (win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
+          {
+            win->Raise();
+            return win->HandleEvent(Event);
+          }
+          else
+            win = win->WindowBelow();
+        }
+      }
+    }
+
+  break;
+
+  case csevKeyDown:
+    if (GetTopWindow()) return GetTopWindow()->HandleEvent(Event);
+  break;
+  }
+  
   return false;
 }
 

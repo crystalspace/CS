@@ -56,6 +56,9 @@ class awsManager : public iAws
    /// The current top window
    awsWindow   *top;
 
+   /// True if mouse events are locked into the top window
+   bool         mouse_captured;
+
    /// The 2d graphics context
    iGraphics2D *ptG2D;
 
@@ -160,6 +163,12 @@ public:
 
     /// Mark a section of the screen clean.
     virtual void       Unmark(csRect &rect);
+
+    /// Capture all mouse events until release is called, no matter where the mouse is
+    virtual void       CaptureMouse();
+
+    /// Release the mouse events to go where they normally would.
+    virtual void       ReleaseMouse();
 
 protected:
     /// Redraws a window only if it has areas in the dirtyarea
