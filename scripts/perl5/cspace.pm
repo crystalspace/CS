@@ -13294,7 +13294,7 @@ sub CS_FX_DESTALPHAADD () { $cspacec::CS_FX_DESTALPHAADD }
 sub CS_FX_SRCALPHAADD () { $cspacec::CS_FX_SRCALPHAADD }
 sub CS_FX_MESH () { $cspacec::CS_FX_MESH }
 sub CS_FX_KEYCOLOR () { $cspacec::CS_FX_KEYCOLOR }
-sub CS_FX_GOURAUD () { $cspacec::CS_FX_GOURAUD }
+sub CS_FX_FLAT () { $cspacec::CS_FX_FLAT }
 sub CS_FX_TILING () { $cspacec::CS_FX_TILING }
 sub CS_FX_MASK_ALPHA () { $cspacec::CS_FX_MASK_ALPHA }
 sub CS_LIGHTPARAM_POSITION () { $cspacec::CS_LIGHTPARAM_POSITION }
