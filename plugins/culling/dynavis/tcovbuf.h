@@ -376,9 +376,11 @@ private:
    * Returns false if outline is outside screen.
    * The 'used_verts' contains true for all vertices that are used.
    */
-  bool DrawOutline (csVector2* verts, int num_verts,
+  bool DrawOutline (const csReversibleTransform& trans,
+  	float fov, float sx, float sy, csVector3* verts, int num_verts,
   	bool* used_verts,
-  	int* edges, int num_edges, csBox2Int& bbox);
+  	int* edges, int num_edges, csBox2Int& bbox,
+	float& max_depth);
 
   /**
    * Find a given tile.
@@ -444,9 +446,10 @@ public:
    * per edge.
    * The 'used_verts' contains true for all vertices that are used.
    */
-  void InsertOutline (csVector2* verts, int num_verts,
+  void InsertOutline (const csReversibleTransform& trans,
+  	float fov, float sx, float sy, csVector3* verts, int num_verts,
   	bool* used_verts,
-  	int* edges, int num_edges, float max_depth);
+  	int* edges, int num_edges);
 
   /**
    * Prepare data for TestRectangle. If this returns false you have

@@ -341,7 +341,8 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   	CS_CULLER_HINT_GOODOCCLUDER);
 
   visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
-  	|| visobj_wrap->model->CanUseOutlineFiller ()) && !visobj_wrap->hint_goodoccluder;
+  	|| visobj_wrap->model->CanUseOutlineFiller ())
+	&& !visobj_wrap->hint_goodoccluder;
 
   visobj_vector.Push (visobj_wrap);
 }
@@ -421,7 +422,8 @@ void InvPerspective (const csVector2& p, float z, csVector3& v,
   v.z = z;
 }
 
-void Perspective (const csVector3& v, csVector2& p, float fov, float sx, float sy)
+void Perspective (const csVector3& v, csVector2& p,
+	float fov, float sx, float sy)
 {
   float iz = fov / v.z;
   p.x = v.x * iz + sx;
@@ -795,7 +797,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   iMovable* movable = visobj->GetMovable ();
   iPolygonMesh* polymesh = visobj->GetObjectModel ()->GetPolygonMeshViscull ();
 
-  const csVector3* verts = polymesh->GetVertices ();
+  csVector3* verts = polymesh->GetVertices ();
   int vertex_count = polymesh->GetVertexCount ();
 
   csReversibleTransform trans = camera->GetTransform ();
@@ -812,54 +814,8 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
     trans /= movtrans;
   }
 
-  float fov = camera->GetFOV ();
-  float sx = camera->GetShiftX ();
-  float sy = camera->GetShiftY ();
-
   model->UpdateOutline (campos_object);
   const csOutlineInfo& outline_info = model->GetOutlineInfo ();
-
-  int i;
-  // First transform all vertices.
-  //@@@ MEMORY LEAK!!!
-  static csVector2* tr_verts = 0;
-  static int max_tr_verts = 0;
-  if (vertex_count > max_tr_verts)
-  {
-    delete[] tr_verts;
-    max_tr_verts = vertex_count+20;
-    tr_verts = new csVector2[max_tr_verts];
-  }
-  float max_depth = -1.0;
-  csVector3 camv;
-  const csMatrix3& trans_mat = trans.GetO2T ();
-  const csVector3& trans_vec = trans.GetO2TTranslation ();
-  for (i = 0 ; i < vertex_count ; i++)
-  {
-    // Normally we would calculate:
-    //   csVector3 camv = trans.Other2This (verts[i]);
-    // But since we often only need the z of the transformed vertex
-    // we only calculate z and calculate x,y later if needed.
-    csVector3 v = verts[i] - trans_vec;
-    camv.z = trans_mat.m31 * v.x + trans_mat.m32 * v.y + trans_mat.m33 * v.z;
-
-    // @@@ Note: originally 0.1 was used here. However this could cause
-    // very large coordinates to be generated and our coverage line drawer
-    // cannot currently cope with that. We need to improve that line
-    // drawer considerably.
-    if (camv.z <= 0.2)
-    {
-      // @@@ Later we should clamp instead of ignoring this outline.
-      return;
-    }
-    if (camv.z > max_depth) max_depth = camv.z;
-    if (outline_info.outline_verts[i])
-    {
-      camv.x = trans_mat.m11 * v.x + trans_mat.m12 * v.y + trans_mat.m13 * v.z;
-      camv.y = trans_mat.m21 * v.x + trans_mat.m22 * v.y + trans_mat.m23 * v.z;
-      Perspective (camv, tr_verts[i], fov, sx, sy);
-    }
-  }
 
 # ifdef CS_DEBUG
   if (do_state_dump)
@@ -877,22 +833,23 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 # endif
 
   // Then insert the outline.
-  tcovbuf->InsertOutline (tr_verts, vertex_count,
+  tcovbuf->InsertOutline (trans, camera->GetFOV (), camera->GetShiftX (),
+  	camera->GetShiftY (), verts, vertex_count,
   	outline_info.outline_verts,
-  	outline_info.outline_edges, outline_info.num_outline_edges, max_depth);
+  	outline_info.outline_edges, outline_info.num_outline_edges);
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
-    printf ("  max_depth=%g\n", max_depth);
+    //printf ("  max_depth=%g\n", max_depth);
     int j;
     for (j = 0 ; j < vertex_count ; j++)
     {
       if (outline_info.outline_verts[j])
       {
         csVector3 cam = trans.Other2This (verts[j]);
-        printf ("  V%d: (%g,%g / %g,%g,%g / %g,%g,%g)\n",
+        printf ("  V%d: (%g,%g,%g / %g,%g,%g)\n",
 	  j,
-	  tr_verts[j].x, tr_verts[j].y,
+	  //tr_verts[j].x, tr_verts[j].y,
 	  verts[j].x, verts[j].y, verts[j].z,
 	  cam.x, cam.y, cam.z);
       }
@@ -2306,12 +2263,14 @@ private:
     float depth;
     int num_verts;
     csVector2* verts;
+    csVector3* verts3d;
     int* verts_idx;
     bool* used_verts;
     ~outline ()
     {
       delete[] edges;
       delete[] verts;
+      delete[] verts3d;
       delete[] verts_idx;
       delete[] used_verts;
     }
@@ -2345,6 +2304,7 @@ public:
     o1.edges = new int[o1.num_edges*2];
     o1.num_verts = 5;
     o1.verts = new csVector2[o1.num_verts];
+    o1.verts3d = new csVector3[o1.num_verts];
     o1.verts_idx = new int[o1.num_verts];
     o1.used_verts = new bool[o1.num_verts];
     o1.used_verts[0] = true;
@@ -2380,6 +2340,7 @@ public:
     o2.edges = new int[o2.num_edges*2];
     o2.num_verts = 5;
     o2.verts = new csVector2[o2.num_verts];
+    o2.verts3d = new csVector3[o2.num_verts];
     o2.verts_idx = new int[o2.num_verts];
     o2.used_verts = new bool[o2.num_verts];
     o2.used_verts[0] = true;
@@ -2415,6 +2376,7 @@ public:
     o3.edges = new int[o3.num_edges*2];
     o3.num_verts = 5;
     o3.verts = new csVector2[o3.num_verts];
+    o3.verts3d = new csVector3[o3.num_verts];
     o3.verts_idx = new int[o3.num_verts];
     o3.used_verts = new bool[o3.num_verts];
     o3.used_verts[0] = true;
@@ -2450,9 +2412,12 @@ public:
     for (i = 0 ; i < ol.num_verts ; i++)
     {
       ol.verts[i] = bugplug->DebugViewGetPoint (ol.verts_idx[i]);
+      ol.verts3d[i].Set (ol.verts[i].x, ol.verts[i].y, ol.depth);
     }
-    tcovbuf->InsertOutline (ol.verts, ol.num_verts, ol.used_verts,
-    	ol.edges, ol.num_edges, ol.depth);
+    csReversibleTransform trans;
+    tcovbuf->InsertOutline (trans, ol.depth, 0.0, 0.0,
+    	ol.verts3d, ol.num_verts, ol.used_verts,
+    	ol.edges, ol.num_edges);
   }
 
   virtual void Render (iGraphics3D* g3d, iBugPlug* bugplug)

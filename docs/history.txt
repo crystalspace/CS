@@ -33,6 +33,8 @@ chronological order.
 	- Eric Sunshine repaired outdated and incorrect Doxygen comments in
 	  scf.h.  For example, documentation for SCF_DESTRUCT_EMBEDDED_IBASE
 	  was 100% incorrect.
+	- Jorrit changed the way that the coverage buffer outline drawing
+	  works in preparation for outline clamping.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from
 	  emitting warning messages in csgfx/rgbpixel.h and shadervar.h.

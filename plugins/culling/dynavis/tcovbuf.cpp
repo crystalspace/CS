@@ -26,6 +26,7 @@
 #include "csgeom/box.h"
 #include "csgeom/math3d.h"
 #include "csgeom/csrect.h"
+#include "csgeom/transfrm.h"
 #include "tcovbuf.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -1771,8 +1772,6 @@ bool csTiledCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
   //@@@ TODO: pre-shift x with 16
   //---------
   int xa[128], ya[128];
-  int top_vt = 0;
-  int bot_vt = 0;
   xa[0] = QRound (verts[0].x);
   ya[0] = QRound (verts[0].y);
   bbox.minx = bbox.maxx = xa[0];
@@ -1786,15 +1785,9 @@ bool csTiledCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
     else if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
 
     if (ya[i] < bbox.miny)
-    {
       bbox.miny = ya[i];
-      top_vt = i;
-    }
     else if (ya[i] > bbox.maxy)
-    {
       bbox.maxy = ya[i];
-      bot_vt = i;
-    }
   }
 
   if (bbox.maxx <= 0) return false;
@@ -1842,56 +1835,86 @@ bool csTiledCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
   return true;
 }
 
-bool csTiledCoverageBuffer::DrawOutline (csVector2* verts, int num_verts,
+static void Perspective (const csVector3& v, csVector2& p,
+	float fov, float sx, float sy)
+{
+  float iz = fov / v.z;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
+bool csTiledCoverageBuffer::DrawOutline (const csReversibleTransform& trans,
+	float fov, float sx, float sy,
+	csVector3* verts, int num_verts,
 	bool* used_verts,
 	int* edges, int num_edges,
-	csBox2Int& bbox)
+	csBox2Int& bbox, float& max_depth)
 {
   int i;
 
+  static int* xa = 0, * ya = 0;
+  static int max_tr_verts = 0;
+  if (num_verts > max_tr_verts)
+  {
+    //@@@ MEMORY LEAK!!!
+    delete[] xa;
+    delete[] ya;
+    max_tr_verts = num_verts+20;
+    xa = new int[max_tr_verts];
+    ya = new int[max_tr_verts];
+  }
+
   //---------
-  // First we copy the vertices to xa/ya. In the mean time
+  // First transform all vertices.
+  // Then we copy the vertices to xa/ya. In the mean time
   // we convert to integer and also search for the top vertex (lowest
   // y coordinate) and bottom vertex.
   //@@@ TODO: pre-shift x with 16
   //---------
-  static int* xa = 0, * ya = 0;
-  static int num_xa = 0;
-  if (num_verts > num_xa)
-  {
-    delete[] xa;
-    delete[] ya;
-    num_xa = num_verts;
-    // @@@ MEMORY LEAK!!!
-    xa = new int[num_xa];
-    ya = new int[num_xa];
-  }
-  int top_vt = -1;
-  int bot_vt = -1;
+  max_depth = -1.0;
+  csVector3 camv;
+  const csMatrix3& trans_mat = trans.GetO2T ();
+  const csVector3& trans_vec = trans.GetO2TTranslation ();
+
   bbox.minx = 1000000;
   bbox.maxx = -1000000;
   bbox.miny = 1000000;
   bbox.maxy = -1000000;
+  csVector2 tr_vert;
+
   for (i = 0 ; i < num_verts ; i++)
   {
+    // Normally we would calculate:
+    //   csVector3 camv = trans.Other2This (verts[i]);
+    // But since we often only need the z of the transformed vertex
+    // we only calculate z and calculate x,y later if needed.
+    csVector3 v = verts[i] - trans_vec;
+    camv.z = trans_mat.m31 * v.x + trans_mat.m32 * v.y + trans_mat.m33 * v.z;
+
+    if (camv.z > max_depth) max_depth = camv.z;
     if (used_verts[i])
     {
-      xa[i] = QRound (verts[i].x);
-      ya[i] = QRound (verts[i].y);
+      // @@@ Note: originally 0.1 was used here. However this could cause
+      // very large coordinates to be generated and our coverage line drawer
+      // cannot currently cope with that. We need to improve that line
+      // drawer considerably.
+      if (camv.z <= 0.2)
+      {
+        // @@@ Later we should clamp instead of ignoring this outline.
+        return false;
+      }
+
+      camv.x = trans_mat.m11 * v.x + trans_mat.m12 * v.y + trans_mat.m13 * v.z;
+      camv.y = trans_mat.m21 * v.x + trans_mat.m22 * v.y + trans_mat.m23 * v.z;
+      Perspective (camv, tr_vert, fov, sx, sy);
+
+      xa[i] = QRound (tr_vert.x);
+      ya[i] = QRound (tr_vert.y);
 
       if (xa[i] < bbox.minx) bbox.minx = xa[i];
       if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
-
-      if (ya[i] < bbox.miny)
-      {
-        bbox.miny = ya[i];
-        top_vt = i;
-      }
-      if (ya[i] > bbox.maxy)
-      {
-        bbox.maxy = ya[i];
-        bot_vt = i;
-      }
+      if (ya[i] < bbox.miny) bbox.miny = ya[i];
+      if (ya[i] > bbox.maxy) bbox.maxy = ya[i];
     }
   }
 
@@ -2007,12 +2030,16 @@ void csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
   }
 }
 
-void csTiledCoverageBuffer::InsertOutline (csVector2* verts, int num_verts,
+void csTiledCoverageBuffer::InsertOutline (
+	const csReversibleTransform& trans, float fov, float sx, float sy,
+	csVector3* verts, int num_verts,
 	bool* used_verts,
-	int* edges, int num_edges, float max_depth)
+	int* edges, int num_edges)
 {
   csBox2Int bbox;
-  if (!DrawOutline (verts, num_verts, used_verts, edges, num_edges, bbox))
+  float max_depth;
+  if (!DrawOutline (trans, fov, sx, sy, verts, num_verts, used_verts, edges,
+  	num_edges, bbox, max_depth))
     return;
 
   int tx, ty;
