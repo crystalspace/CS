@@ -12,7 +12,7 @@ section (see later) contains more technical questions.
 
 @itemize @bullet
 @item
-From where can I download Crystal Space?
+@strong{Q}: From where can I download Crystal Space?
 
 @strong{A}: The latest release of Crystal Space is always available from the
 Crystal Space home page, and from the Crystal Space @sc{ftp} site
@@ -20,7 +20,7 @@ Crystal Space home page, and from the Crystal Space @sc{ftp} site
 also access the bleeding-edge developmental version.  @xref{Where to Get}.
 
 @item
-What do I need to compile Crystal Space?
+@strong{Q}: What do I need to compile Crystal Space?
 
 @strong{A}: You need the source code, which you can obtain in a variety of
 ways.  @xref{Where to Get}.  You also need a compiler and development system
@@ -28,7 +28,7 @@ for the platform which you are using.  Some of the supported compilers are
 @sc{gcc} (including @sc{MingW} and @sc{Cygwin}), @sc{msvc} and Code Warrior.
 
 @item
-What do you need to run Crystal Space?
+@strong{Q}: What do you need to run Crystal Space?
 
 @strong{A}: You need the following items:
 
@@ -78,7 +78,8 @@ located in the @file{data} directory.
 @end itemize
 
 @item
-I downloaded Crystal Space but it won't run.  What could be the cause?
+@strong{Q}: I downloaded Crystal Space but it won't run.  What could be the
+cause?
 
 @strong{A1}: Are you sure that you have downloaded all the necessary
 components, as explained by the previous section? If not, then download the
@@ -119,7 +120,7 @@ Walktest.Settings.WorldFile = flarge
 list.  @xref{Mailing Lists}.
 
 @item
-What documentation is available?  Where can I find it?
+@strong{Q}: What documentation is available?  Where can I find it?
 
 @strong{A}: There is a lot of documentation available.  Not all of it is
 completely up-to-date but we try to do our best in keeping it as up-to-date as
@@ -127,7 +128,7 @@ possible.  Refer to the section in the Crystal Space manual which discusses
 documentation resources.  @xref{Documentation Resources}.
 
 @item
-I don't have lots of memory.  Can I still run Crystal Space?
+@strong{Q}: I don't have lots of memory.  Can I still run Crystal Space?
 
 @strong{A1}: You may want to decrease the size of the texture cache with the
 @samp{-cache=<size>} command-line option or the @samp{CACHE} configuration
@@ -148,7 +149,8 @@ of memory used.  If you just want to try the engine you can run Crystal Space
 with some of the simpler worlds such as @file{room.zip} or @file{maze.zip}.
 
 @item
-Crystal Space is really slow on my computer.  What can I do to speed it up?
+@strong{Q}: Crystal Space is really slow on my computer.  What can I do to
+speed it up?
 
 @strong{A1}: Crystal Space is a 6@sc{dof} engine.  It needs to do
 semi-perspective correct texture mapping to get a nice display and
@@ -164,8 +166,8 @@ are quite popular these days and can perform extremely well, especially when
 compared to Crystal Space's software renderer.
 
 @item
-I want to create textures for Crystal Space.  What palette should I use?  How
-big should I create the textures?  What format can I use?
+@strong{Q}: I want to create textures for Crystal Space.  What palette should I
+use?  How big should I create the textures?  What format can I use?
 
 @strong{A1}: The palette does not really matter because Crystal Space
 calculates its own optimal palette given a set of input textures.  But there
@@ -192,7 +194,7 @@ specifically drawn for untiled usage.  An example would be a texture
 representing a computer keyboard.
 
 @item
-I'd like to contribute to Crystal Space.  What can I do?
+@strong{Q}: I would like to contribute to Crystal Space.  What can I do?
 
 @strong{A}: Have a look at the section of this manual about contributing
 to the project (@pxref{Contributing}), and take a look at the To-Do and
@@ -205,7 +207,7 @@ Bug lists on the Developer's Project page at SourceForge:
 order to coordinate your efforts with those of other people.
 
 @item
-How does Crystal Space work?
+@strong{Q}: How does Crystal Space work?
 
 @strong{A1} If you want to know how you can use CS, you can look at the
 chapters describing the libraries of which CS consists, @xref{Libraries}.  Or
@@ -219,7 +221,7 @@ earlier in this @sc{faq}.
 queries to the Crystal Space mailing list, @ref{Mailing Lists}.
 
 @item
-I want to write a game with Crystal Space.  Can I do this?
+@strong{Q}: I want to write a game with Crystal Space.  Can I do this?
 
 @strong{A1}: The ultimate purpose of Crystal Space is that it will become a
 useable and powerful engine for writing games and other graphics visualization
@@ -233,9 +235,9 @@ make commercial or shareware products using it.  For more details about what
 you can and cannot do, see the license, @ref{License}.
 
 @item
-How stable is the @sc{api} for Crystal Space?
+@strong{Q}: How stable is the @sc{api} for Crystal Space?
 
-@strong{A}: The API which you can find in the 0.90 release should be about
+@strong{A}: The @sc{api} which you can find in the 0.90 release should be about
 95% stable as compared to the 1.0 release. After 1.0 we will make sure
 to keep backwards compatibility (until we release 2.0 :-)
 @end itemize
@@ -244,8 +246,8 @@ The following section lists some more technical questions.
 
 @itemize @bullet
 @item
-I updated Crystal Space from @sc{cvs} (with either @samp{WinCVS} or
-commandline) but it seems some files are missing.
+@strong{Q}: I updated Crystal Space from @sc{cvs} (with either @samp{WinCVS} or
+command-line) but it seems some files are missing.
 
 @strong{A}: When doing an update from @sc{cvs} it is important not to
 forget the @samp{-d} and @samp{-P} commandline options. Otherwise you
@@ -254,8 +256,8 @@ everywhere. Using @samp{WinCVS} it is also possible to set these
 options.  @xref{WinCVS Tutorial}.
 
 @item
-Why isn't my object lit correctly (all black) and why doesn't lighting
-update when I move it?
+@strong{Q}: Why isn't my object lit correctly (all black) and why doesn't
+lighting update when I move it?
 
 @strong{A}: Keep in mind that things don't automatically update their
 static lightmaps as that is expensive. But for dynamic lighting and other
@@ -265,7 +267,7 @@ on the object when it is first created, when lights in the vicinity move,
 or when the object itself moves.  @xref{HOWTO Mesh LightAnim}.
 
 @item
-Why isn't my polygon lit correctly? It is simply full bright.
+@strong{Q}: Why isn't my polygon lit correctly? It is simply full bright.
 
 @strong{A}: Both the software and OpenGL renderer have a limitation on
 lightmap size. For the software renderer the limitation is that the
@@ -285,23 +287,23 @@ finally (4) use a low-resolution base texture and a high-resolution detail
 texture to add detail (this only works for OpenGL).
 
 @item
-I added lights, and/or moved geometry in my level but they are not correctly
-lit. What did I do wrong?
+@strong{Q}: I added lights, and/or moved geometry in my level but they are not
+correctly lit.  What did I do wrong?
 
 @strong{A}: Crystal Space does not automatically recalculate lighting.
 To do that you have to use the @samp{-relight} commandline option.
 
 @item
-Every time I start my Crystal Space based application the lights are
-recalculated. How can I avoid that?
+@strong{Q}: Every time I start my Crystal Space based application the lights
+are recalculated.  How can I avoid that?
 
 @strong{A}: Use the @samp{-relight} commandline option. This will make
 sure the lighting gets recalculated AND cached in the zip file of your
 level.
 
 @item
-I'm confused by the Crystal Space coordinate system. The 3D renderer
-seems to work in reverse y. What's up?
+@strong{Q}: I'm confused by the Crystal Space coordinate system.  The 3D
+renderer seems to work in reverse y.  What's up?
 
 @strong{A}: When talking in 3D, Crystal Space defines the positive X axis
 as pointing to the right, the positive Y axis as pointing upwards, and
@@ -315,9 +317,9 @@ However, when getting mouse events the normal screen
 space coordinate system is used with (0,0) in the top-left corner.
 
 @item
-Why can't I get the @code{iThingState}/@code{iSprite3DState}/@dots{} from
-my mesh wrapper? I do @code{SCF_QUERY_INTERFACE} from the mesh and it
-returns @samp{NULL}.
+@strong{Q}: Why can't I get the
+@code{iThingState} / @code{iSprite3DState} / @dots{} from my mesh wrapper?  I
+do @code{SCF_QUERY_INTERFACE} from the mesh and it returns @samp{NULL}.
 
 @strong{A}: A common error is to try to query the state interface for
 a mesh object from the @code{iMeshWrapper} instance. However it is not
@@ -327,8 +329,8 @@ it. To get the state interface you must query from the @code{iMeshObject}
 instance instead. You can get this instance with @code{mesh->GetMeshObject()}.
 
 @item
-I don't understand when I have to use @code{DecRef()} and when not. Can
-you explain this reference counting to me?
+@strong{Q}: I do not understand when I have to use @code{DecRef()} and when
+not.  Can you explain this reference counting to me?
 
 @strong{A1}: This answer is not valid if CS_STRICT_SMART_POINTERS
 flag is set (which is set by default in recent versions of CS). If you
@@ -339,6 +341,7 @@ is also responsible for cleaning up that reference later. You are not
 responsible for cleaning up references owned by other modules (like the
 engine). In general you should do @code{DecRef()} in the following
 cases:
+
 @itemize @bullet
 @item
 On the pointer returned by the following macros:
@@ -388,7 +391,8 @@ class) and call @code{DecRef()} just before the application exits.
 make it easier for you to keep track of references. They will automatically
 @code{DecRef()} when they are ready. Here is an example of their usage:
 @example
-csRef<iThingState> st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState));
+csRef<iThingState> st =
+  SCF_QUERY_INTERFACE(mesh->GetMeshObject(), iThingState));
 if (st)
 @{
   st->blabla @dots{};
@@ -403,11 +407,11 @@ is that you don't have to take care of calling @code{DecRef}.
 In very recent versions of CS the CS_STRICT_SMART_POINTERS flag is set
 which means that the only way to actually use the result of macros
 like @code{SCF_QUERY_INTERFACE} and others is to assign them to a
-@code{csRef}. @xref{HOWTO Smart Pointers}
+@code{csRef}. @xref{HOWTO Smart Pointers}.
 
 @item
-My objects are rendered incorrectly. It seems as if parts of it sometimes
-appear and sometimes disappear.
+@strong{Q}: My objects are rendered incorrectly.  It seems as if parts of it
+sometimes appear and sometimes disappear.
 
 @strong{A}: Incorrect rendering of objects can be caused by bugs but there
 is one common cause of this problem which is Z-buffer related. It is important
@@ -433,8 +437,8 @@ actually work (in fact you should @emph{always} use
 @code{GetBeginDrawFlags()}).
 
 @item
-I'm trying to use some plugin but it says that it cannot find it (i.e.
-@code{CS_QUERY_REGISTRY} returns null).
+@strong{Q}: I'm trying to use some plugin but it says that it cannot find it
+(i.e. @code{CS_QUERY_REGISTRY} returns null).
 
 @strong{A}: It is important to realize that @code{CS_QUERY_REGISTRY}
 does NOT load a plugin. It only looks for some component in the object
