@@ -51,7 +51,8 @@
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
 #include "imesh/terrfunc.h"
-#include "ilight/testlt.h"
+#include "ivideo/shader/shader.h"
+//#include "ilight/testlt.h"
 
 /*#include "csengine/material.h"
 #include "csengine/texture.h"*/
@@ -174,6 +175,7 @@ void R3DTest::SetupFrame ()
   static int timeaccum = 0;
   framecount++;
   timeaccum += elapsed_time;
+
   if ((framecount % 60) == 0)
   {
     FPS = 60000.0/(float)timeaccum;
@@ -216,7 +218,7 @@ void R3DTest::SetupFrame ()
   csReversibleTransform trans;
   static float a = 0;
 
-  /*csVector2 clipshape[10];
+  csVector2 clipshape[10];
   clipshape[0] = csVector2 (sin(a*5.0)*100.0+200, 100);
   clipshape[1] = csVector2 (sin(a*5.0+0.5)*100.0+150, 200);
   clipshape[2] = csVector2 (sin(a*5.0+1.0)*100.0+300, 300);
@@ -224,7 +226,7 @@ void R3DTest::SetupFrame ()
   clipshape[4] = csVector2 (sin(a*5.0+2.0)*100.0+400, 100);
   csPolygonClipper polyclip (clipshape, 5);
   csRef<iClipper2D> clipper = SCF_QUERY_INTERFACE (&polyclip, iClipper2D);
-  r3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);*/
+  r3d->SetClipper (clipper, CS_CLIPPER_TOPLEVEL);
 
   a += speed;
   trans.RotateOther (csVector3 (1,0,0), a*2.0);
@@ -246,10 +248,10 @@ void R3DTest::SetupFrame ()
   // Tell the camera to render into the frame buffer.
   //view->Draw ();
 
-  //r3d->SetClipper (NULL, CS_CLIPPER_NONE);
+  r3d->SetClipper (NULL, CS_CLIPPER_NONE);
 
   r3d->FinishDraw ();
-
+  
   if (!r3d->BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
@@ -456,6 +458,18 @@ bool R3DTest::Initialize ()
 
   r3d->FinishDraw ();
   r3d->SetRenderTarget (NULL);
+
+  csRef<iShaderManager> shmgr = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+  csRef<iShader> shader = shmgr->CreateShader();
+  shader->SetName("rainbow");
+
+  csRef<iShaderTechnique> shtech = shader->CreateTechnique();
+  shtech->SetPriority(100);
+
+  csRef<iShaderPass> shpass = shtech->CreatePass();
+  shpass->SetVertexProgram ( csRef<iShaderProgram>(shmgr->CreateShaderProgramFromFile("/shader/ms.avp","gl_arb_vp")) );
+
+  matwrap->GetMaterial()->SetShader(shader);
 
   return true;
 }
