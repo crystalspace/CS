@@ -16,9 +16,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <unistd.h>
-#include <signal.h>
-
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "iutil/vfs.h"
