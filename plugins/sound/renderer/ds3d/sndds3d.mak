@@ -47,6 +47,7 @@ DEP.SNDDS3D = CSUTIL CSGEOM CSSYS
 MSVC.DSP += SNDDS3D
 DSP.SNDDS3D.NAME = sndrdrds3d
 DSP.SNDDS3D.TYPE = plugin
+DSP.SNDDS3D.LIBS = dsound
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
