@@ -255,7 +255,13 @@ static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
   if (!idg)
   {
     idg = new csDebugGraph ();
-    object_reg->Register (idg, "__Debug_Graph__");
+    if (!object_reg->Register (idg, "__Debug_Graph__"))
+    {
+      // If registering fails this probably means we are in the destruction
+      // pass and the object registry doesn't allow new updates anymore.
+      idg->DecRef ();
+      return NULL;
+    }
   }
   idg->DecRef ();
   return (csDebugGraph*)idg;
@@ -265,7 +271,7 @@ static csDebugGraph* SetupDebugGraph (iObjectRegistry* object_reg)
 
 void csDebuggingGraph::SetupGraph (iObjectRegistry* object_reg)
 {
-  SetupDebugGraph (object_reg);
+  if (!SetupDebugGraph (object_reg)) return;
 #ifdef CS_DEBUG
   iSCF::SCF->object_reg = object_reg;
 #endif
@@ -280,6 +286,7 @@ void csDebuggingGraph::AddObject (iObjectRegistry* object_reg,
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
   if (el)
@@ -342,6 +349,7 @@ void csDebuggingGraph::AttachDescription (iObjectRegistry* object_reg,
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
   if (el == NULL)
@@ -378,6 +386,7 @@ void csDebuggingGraph::AttachType (iObjectRegistry* object_reg,
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
   if (el == NULL)
@@ -404,6 +413,7 @@ void csDebuggingGraph::RemoveObject (iObjectRegistry* object_reg,
   (void)file;
   (void)linenr;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
 
   csDGEL* el = dg->FindEl (object);
   if (!el)
@@ -432,6 +442,7 @@ void csDebuggingGraph::AddParent (iObjectRegistry* object_reg,
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
   csDGEL* p_el = dg->FindEl (parent);
   // If parent could not be found. Create a dummy place holder for later.
   if (!p_el) p_el = dg->AddEl (parent);
@@ -450,6 +461,7 @@ void csDebuggingGraph::AddChild (iObjectRegistry* object_reg,
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
   csDGEL* p_el = dg->FindEl (parent);
   // If parent could not be found. Create a dummy place holder for later.
   if (!p_el) p_el = dg->AddEl (parent);
@@ -468,6 +480,7 @@ void csDebuggingGraph::RemoveParent (iObjectRegistry* object_reg,
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
   csDGEL* c_el = dg->FindEl (child);
   if (!c_el) return;	// Nothing to do if child is not there.
   csDGEL* p_el = dg->FindEl (parent);
@@ -484,6 +497,7 @@ void csDebuggingGraph::RemoveChild (iObjectRegistry* object_reg,
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
   csDGEL* p_el = dg->FindEl (parent);
   if (!p_el) return;	// Nothing to do.
   csDGEL* c_el = dg->FindEl (child);
@@ -499,6 +513,7 @@ void csDebuggingGraph::Clear (iObjectRegistry* object_reg)
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
   dg->Clear ();
 }
 
@@ -509,6 +524,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg)
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
 
   csDGEL** els = dg->els;
   // First mark all elements as unused and count the number
@@ -665,6 +681,7 @@ void csDebuggingGraph::Dump (iObjectRegistry* object_reg, void* object,
 #endif
   if (!object_reg) return;
   csDebugGraph* dg = SetupDebugGraph (object_reg);
+  if (!dg) return;
   int i;
   if (reset_mark)
   {

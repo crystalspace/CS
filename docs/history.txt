@@ -3,6 +3,13 @@ The history order is reversed so that new features are at the top.
 23-Nov-2001
 	- Fixed test for default noconsole on mingw and cygwin by testing
 	  on COMP_GCC instead of _MINGW_. _MINGW_ doesn't seem to be defined.
+	- Fixed a bug with csDebuggingGraph. The debugging graph registers
+	  itself with the object registry. However when the object registry
+	  is cleared it may try to reregister itself. However this would fail
+	  causing crashes. Now csDebuggingGraph will check if Register()
+	  actually succeeds. If it doesn't then it will do nothing.
+	  This fixes a crash at exit for programs that use the debugging
+	  graph.
 22-Nov-2001
 	- Further work on documentation. Created a 'Documentation Guide'
 	  section which guides the CS game writer through some of the more
