@@ -343,7 +343,7 @@ public:
   /**
    * Find the first occurrence of a character in the string.
    * \param c Character to locate.
-   * \param p Start position of search (default 0).
+   * \param pos Start position of search (default 0).
    * \return First position of character, or (size_t)-1 if not found.
    */
   size_t FindFirst (char c, size_t pos = 0) const;
@@ -351,7 +351,7 @@ public:
   /**
    * Find the first occurrence of any of a set of characters in the string.
    * \param c Characters to locate.
-   * \param p Start position of search (default 0).
+   * \param pos Start position of search (default 0).
    * \return First position of character, or (size_t)-1 if not found.
    */
   size_t FindFirst (const char *c, size_t pos = 0) const;
@@ -359,8 +359,8 @@ public:
   /**
    * Find the last occurrence of a character in the string.
    * \param c Character to locate.
-   * \param p Start position of reverse search.  Specify (size_t)-1 if you want
-   *   the search to begin at the very end of string.
+   * \param pos Start position of reverse search.  Specify (size_t)-1 if you
+   *   want the search to begin at the very end of string.
    * \return Last position of character, or (size_t)-1 if not found.
    */
   size_t FindLast (char c, size_t pos = (size_t)-1) const;
@@ -368,7 +368,7 @@ public:
   /**
    * Find the occurrence of a substring in the string.
    * \param str String to locate.
-   * \param p Start position of search (default 0).
+   * \param pos Start position of search (default 0).
    * \return First position of string, or (size_t)-1 if not found.
    */
   size_t FindStr (const char* str, size_t pos = 0) const;
