@@ -506,7 +506,7 @@ IMPLEMENT_CSOBJTYPE (csSprite3D, csSprite)
 
 IMPLEMENT_IBASE_EXT (csSprite3D)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
-IMPLEMENT_IBASE_END
+IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csSprite3D::PolyMesh)
   IMPLEMENTS_INTERFACE (iPolygonMesh)
@@ -525,6 +525,7 @@ static DECLARE_GROWING_ARRAY (tween_verts, csVector3);
 
 csSprite3D::csSprite3D (csObject* theParent) : csSprite (theParent), bbox (NULL)
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   bbox.SetOwner (this);
   ptree_obj = &bbox;
   v_obj2world.x = 0;

@@ -100,8 +100,6 @@ csRAPIDCollider::csRAPIDCollider (iPolygonMesh* mesh)
 
 void csRAPIDCollider::GeometryInitialize (iPolygonMesh* mesh)
 {
-//    m_ColliderType = POLYGONSET;
-//    m_pPolygonSet = ps;
   m_pCollisionModel = NULL;
 
   CD_contact.IncRef ();
@@ -126,12 +124,13 @@ void csRAPIDCollider::GeometryInitialize (iPolygonMesh* mesh)
     for (i = 0; i < mesh->GetNumPolygons () ; i++)
     {
       csMeshedPolygon& p = polygons[i];
+      int* vidx = p.vertices;
       // Collision detection only works with triangles.
       for (int v = 2; v < p.num_vertices; v++)
       {
-        m_pCollisionModel->AddTriangle (vertices [v - 1],
-                                        vertices [v], 
-                                        vertices [0]);
+        m_pCollisionModel->AddTriangle (vertices [vidx[v - 1]],
+                                        vertices [vidx[v]], 
+                                        vertices [vidx[0]]);
       }
     }
     m_pCollisionModel->BuildHierarchy ();
