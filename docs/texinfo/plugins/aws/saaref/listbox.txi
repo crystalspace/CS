@@ -84,6 +84,12 @@ List boxes send the following signals.
 @table @code
 @item signalListBoxSelectionChanged
 Occurs when the currently selected item changes.
+@item signalListBoxStateChanged
+Occurs when the state of a stateful column changes.
+@item signalListBoxFocused
+Occurs when the list box gains focus.
+@item signalListBoxScrolled
+Occurs when the scroll bar at the side of the list box is used.
 @end table
 
 @subsubheading Actions
